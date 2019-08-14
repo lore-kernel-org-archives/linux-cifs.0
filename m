@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A945C32750
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Aug 2019 02:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D568C32750
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Aug 2019 02:34:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD25620679
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Aug 2019 02:30:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BCC92133F
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Aug 2019 02:34:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565749816;
-	bh=E+XwmjQVxHruMvGF0Jc53PukRwBG5+BMPyTR7bUQ6n8=;
+	s=default; t=1565750073;
+	bh=oUTvVHpGCXniprAY65ZrDbxr23TG1b7WMgMOcwgLu4Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=k9zum/JNnwBJ+siQ49F5tfbIYHQT/FTsSU3hm7zHNXZuFccuyYHiivqZl7WCPvk7h
-	 3c8HRg7yAZXiCOnscQM164byigzaT7rEJBJZKbkEeLFfxFFI3TSJXrr6fFSrkGjB1F
-	 0/z2gxec3/FxCNHS5EdiRN2vqqmdTg9X25BOBdF4=
+	b=qT5Hjt7C7MCJ5U/w+6Plh7E3KuPBGEBxglhRApT/GWlN+lDTHFoJTTQzWRvN/n0gJ
+	 6MitbaF7zob3NVMU3E4UX/JXoUziiNv7DyxWGkYXicydu0yjcTYha7ZIexLB/fF8ON
+	 ktLk10+OIzf2vA8V1b7SCQ6m/GueVAsX90AgxXbU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729311AbfHNCRK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 13 Aug 2019 22:17:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48482 "EHLO mail.kernel.org"
+        id S1728865AbfHNCe0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 13 Aug 2019 22:34:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45938 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728816AbfHNCRK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 13 Aug 2019 22:17:10 -0400
+        id S1728460AbfHNCNw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 13 Aug 2019 22:13:52 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DC49B2085A;
-        Wed, 14 Aug 2019 02:17:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AAE7920874;
+        Wed, 14 Aug 2019 02:13:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565749029;
-        bh=E+XwmjQVxHruMvGF0Jc53PukRwBG5+BMPyTR7bUQ6n8=;
+        s=default; t=1565748831;
+        bh=oUTvVHpGCXniprAY65ZrDbxr23TG1b7WMgMOcwgLu4Q=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pYClcZRvEcsIDeVA2eorDsjnIxemq1+L2xnpQt9Rz1YM4RLzF4ITYn0JuK20qY/dD
-         Zh5DitpYDOGhlPHxXeVvtXA5T2mA2HQwQ5FxbKqi9Q2nWm7nwzvbqLd4MeebSqFGcC
-         xzDqcstroTiXOLYmKJf4zK0WWTlNPWeLNNi6Tn5A=
+        b=pscl496XrhIt36Hq0oFPQPAsvI4j+tv4/VKyuwY6U8ELJv+jfzBqgezSG8OkCjB0Z
+         s4/UKfXmNsC712iEMXikO83Yno3/ABr6tE0cA69GKm7shL5bRtaJFqz1+1hFG6Jmbs
+         tJKCIfB9yre/AZgzayEseYCli//EDypHrybkuNI0=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sebastien Tisserant <stisserant@wallix.com>,
         Pavel Shilovsky <pshilov@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 47/68] SMB3: Kernel oops mounting a encryptData share with CONFIG_DEBUG_VIRTUAL
-Date:   Tue, 13 Aug 2019 22:15:25 -0400
-Message-Id: <20190814021548.16001-47-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.2 091/123] SMB3: Kernel oops mounting a encryptData share with CONFIG_DEBUG_VIRTUAL
+Date:   Tue, 13 Aug 2019 22:10:15 -0400
+Message-Id: <20190814021047.14828-91-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190814021548.16001-1-sashal@kernel.org>
-References: <20190814021548.16001-1-sashal@kernel.org>
+In-Reply-To: <20190814021047.14828-1-sashal@kernel.org>
+References: <20190814021047.14828-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -75,10 +75,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 97fdbec54db97..cc9e846a38658 100644
+index ae10d6e297c3a..42de31d206169 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -2545,7 +2545,15 @@ fill_transform_hdr(struct smb2_transform_hdr *tr_hdr, unsigned int orig_len,
+@@ -3439,7 +3439,15 @@ fill_transform_hdr(struct smb2_transform_hdr *tr_hdr, unsigned int orig_len,
  static inline void smb2_sg_set_buf(struct scatterlist *sg, const void *buf,
  				   unsigned int buflen)
  {
