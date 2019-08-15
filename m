@@ -2,190 +2,199 @@ Return-Path: <SRS0=/Ffk=WL=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB95C31E40
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Aug 2019 06:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F16EC3A589
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Aug 2019 15:15:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38E4A2086C
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Aug 2019 06:31:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30CB2208C2
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Aug 2019 15:15:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cONI0a3w"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="OrLJQbgj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730317AbfHOGbJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Aug 2019 02:31:09 -0400
-Received: from mail-ot1-f52.google.com ([209.85.210.52]:46021 "EHLO
-        mail-ot1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729796AbfHOGbJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Aug 2019 02:31:09 -0400
-Received: by mail-ot1-f52.google.com with SMTP id m24so3691840otp.12
-        for <linux-cifs@vger.kernel.org>; Wed, 14 Aug 2019 23:31:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=hLl0V+v0CBFiaOTChkifXK+5J0G0M11GkC8pAADHk5Q=;
-        b=cONI0a3wY3czey16nepuZN8r33Gmk9q6rBtlOlX6SXr7hTh+DGcaZulP+kV94Wjx8+
-         8n76ZUMgdJA82Yih03UsLjGc9Tp+iXnbjYwdHDKNd3GkvuXGil8XabAevSdTJpfzq/jv
-         BoHZ4Hpi6a16Ej25Pz4zKUmfb045aDWqwY5XsdU7edteQryl4J2hvjSjGQP3w7jiDrg8
-         AHW2GQYqH/w33ORP5iysc2lnJTawTMFCxqVB6R7nAvTogJPc+qyIyp4X/HtV0d2biwVv
-         cQAA5CwdtfoMuVoRgck+J9hY16T2OI+dRk4//Kidn+nDTFrBEVD9ghkR5yZRrmh3KM96
-         FoiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=hLl0V+v0CBFiaOTChkifXK+5J0G0M11GkC8pAADHk5Q=;
-        b=LFQ4pm+ycQSCkokrtFxO6C9/6SkEgfdFcGCJMhXVbq6aw/Ikr6SVG6J5WhhDJncGLB
-         FRFBCcfz9ctrbYU8Go4ZMM/uR4fnPva3W3wDewSgO/xONPJFPWfqkoH4MeXRxR2ijjkN
-         4ZikO9IDe4qlerE/lh9Jg98Vrjm7NhFfM/jF52vnJNtZNJCn3wjByrTWzXYp1AUWCkDI
-         c8VNHAnxHr24s1lCp+xhLc5mJ6AwIdy7JKj3b9XcDVkGSXQp4VAn/QbyBvv+kKksNEwR
-         zIXXHJ0s8aqWOmtwQoRifak6nThP5giL1GIe9cswm7NUpfN6sI/osafbf0QsFziwEcxI
-         6GKg==
-X-Gm-Message-State: APjAAAWc4D4XPKm9Y+Spvc4gmtLiNoJ3ENNXco/7qCujT2Sl+wgYl5vM
-        uicthLGPReIumoHRGnd7O9/nCaa/iVot/2moo20JZbFK
-X-Google-Smtp-Source: APXvYqwzciqf46SHd12pph6pi+wOW3usxd2JPuowkGoiQMlY+ZTT+l1gxT399jKdivMKlJw6vW8s09slryvhSLs6l48=
-X-Received: by 2002:a6b:3883:: with SMTP id f125mr3943623ioa.109.1565850668082;
- Wed, 14 Aug 2019 23:31:08 -0700 (PDT)
+        id S1732574AbfHOPPF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Aug 2019 11:15:05 -0400
+Received: from mail-eopbgr750095.outbound.protection.outlook.com ([40.107.75.95]:57859
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732517AbfHOPPF (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 15 Aug 2019 11:15:05 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NubSnb4kJqcq27mSiCOoZuRNR5mBXeug/w6BByz46MRkkuic/JLa90EBC/CkVVLzuXFj2eUzzNQhq48vu/71LnyiDjosalTcB/6N7VTGgl6vCKzw49XeBrBTetlTzpFyFtylQfgVY6ONPoAi5VzC9XnQpDVqlmd2ug1wl1mb+J3lcBMuKft4KzOYFxQzgLWtABJ9O2u1lK/Qnr9CGkt75Kf7g2v4MjmqEUICJ7hmzAS5eSaQWMEiGYRW/hs9BRhhetJEy4ufpZEcXgwQN5a4Sspq+3JRWoCPTTVwayRvql7GA6l5IMhKIQO2kjjK9hi8ebhoOcodOVdoATFcSBpgHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dyi6JT5Pgu1fDKHWuIDLpOUoXqgclMdxK8zmkyzTYB8=;
+ b=B51grzS+lWmNN2UB/1Jyk7gRTIcMKm/G4aG6i9qgoBiT0t29ByBnsm4XlHpzB2OEp0iwnF6KmeLzRwfkR/+nsOEUD8Ypb5wDj8b3vMiKJ1TusebL4qCh/ZhNM+/FOGdGHOnhgMKiAeHUET48r2sm1X5INOy3F8nNnl5h1vny2NBhzgJBkuawGhXcxJfV/rCrnp+75lRQZsDxdT3EpzUGr/TibUrTrRkh6pRxyD8cTXh+ABALq+0v8Os5rXKPCquOzXgswM7WWdqZNSnj5J6i0f25KpN7VM53Up/wmdW1KiZNbmwjI8y6ETlH710tnD4t3cQkcvb4ycrbpWSwYY9nXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dyi6JT5Pgu1fDKHWuIDLpOUoXqgclMdxK8zmkyzTYB8=;
+ b=OrLJQbgjQSNerhxVQUY1YT7HQ4Z8efzcKTNP9InoDQtptBxU9k93vHhdDGmOp6UWk0tCH7uluxVlu2XeUG2Ioj1vCe6o52RplTS7z/axnK2bkbg5GJZm9t6rsLrdQY844p0cFom5Sa4E/jkSpirTGcaSfG+itfQCosphoTrCl0o=
+Received: from MWHPR2101MB0731.namprd21.prod.outlook.com (10.167.238.165) by
+ MWHPR2101MB0730.namprd21.prod.outlook.com (10.167.237.167) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2199.6; Thu, 15 Aug 2019 15:15:01 +0000
+Received: from MWHPR2101MB0731.namprd21.prod.outlook.com
+ ([fe80::e950:3464:b81f:80e5]) by MWHPR2101MB0731.namprd21.prod.outlook.com
+ ([fe80::e950:3464:b81f:80e5%8]) with mapi id 15.20.2199.004; Thu, 15 Aug 2019
+ 15:15:01 +0000
+From:   Tom Talpey <ttalpey@microsoft.com>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Subject: RE: FSCTL_QUERY_ALLOCATED_RANGES issue with Windows2016
+Thread-Topic: FSCTL_QUERY_ALLOCATED_RANGES issue with Windows2016
+Thread-Index: AQHVUzMIxVep5FyrWkKPdfdBy87zGqb8T2kg
+Date:   Thu, 15 Aug 2019 15:15:01 +0000
+Message-ID: <MWHPR2101MB073136FE90E5C6FCD9F21CA8A0AC0@MWHPR2101MB0731.namprd21.prod.outlook.com>
+References: <CAN05THT0OkbAoNu8ZVSHF-xY7w0ZW4q4i-jTxjNManrnz0OMfg@mail.gmail.com>
+In-Reply-To: <CAN05THT0OkbAoNu8ZVSHF-xY7w0ZW4q4i-jTxjNManrnz0OMfg@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=ttalpey@microsoft.com;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-08-15T15:14:59.5669922Z;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
+ Information Protection;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=d953d639-9efb-4cf6-8fed-c0c483f6c321;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=ttalpey@microsoft.com; 
+x-originating-ip: [2001:4898:80e8:a:d0b4:afd0:5c6a:538e]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: dd48133a-159b-4c66-cf0e-08d7219357fc
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600158)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:MWHPR2101MB0730;
+x-ms-traffictypediagnostic: MWHPR2101MB0730:
+x-microsoft-antispam-prvs: <MWHPR2101MB0730BE51882273D0340F7A84A0AC0@MWHPR2101MB0730.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 01304918F3
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(979002)(4636009)(39860400002)(396003)(346002)(376002)(136003)(366004)(189003)(199004)(52294003)(13464003)(55674003)(86362001)(10290500003)(46003)(8990500004)(476003)(486006)(74316002)(11346002)(229853002)(446003)(2906002)(6506007)(53546011)(7736002)(6116002)(33656002)(6436002)(10090500001)(305945005)(102836004)(186003)(9686003)(55016002)(6246003)(478600001)(52536014)(76176011)(256004)(14444005)(53936002)(14454004)(99286004)(71190400001)(8676002)(5660300002)(76116006)(7696005)(66946007)(66476007)(25786009)(81156014)(81166006)(66556008)(110136005)(64756008)(66446008)(22452003)(8936002)(316002)(71200400001)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR2101MB0730;H:MWHPR2101MB0731.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: er60z+SRaKC7iJ4R3evSDzA2IP0qlpvA8+CibxYKE7mHFb7lKjbH9/31b8HkKJbgFSbOKuol0cezoopKWEVZ0351JFMRwSdOhG1lAcMacgAXVRnMLifJvS6+Kgt2tkHLKVPNiE2VZwDGaery7e7BD8E1q625BY3T7vV/8qPSR0D+MAm2gxgF1TxmA+XqGzDz76fPT7yZvAqcDNSPJFoT+jUDSfjslib5t6tkyMuZhUlhPj9StxmJHCXr6s5MU9No3gtdPEqalZyJr+J7FhD7V8Ed6IK/EQl7QQ9LrAc8HPpPJp4ukDVV30QCz2feGrGvASlcJNSoOgoj5tohov9qByRpONyYm3BwLyu+Ncuoa3rnwiDlCpRlu8g1sJwEOhxluw86AQ0lbg18cLDra6/Ny4I6u43n5QsnNXkXap26o1o=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 15 Aug 2019 16:30:56 +1000
-Message-ID: <CAN05THT0OkbAoNu8ZVSHF-xY7w0ZW4q4i-jTxjNManrnz0OMfg@mail.gmail.com>
-Subject: FSCTL_QUERY_ALLOCATED_RANGES issue with Windows2016
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd48133a-159b-4c66-cf0e-08d7219357fc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Aug 2019 15:15:01.5909
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EC3CTfl9SDaQiEVPsjSJFGeC2NZr/UbYvNc5M3ovOr/OQhh7uqTtyPLhXO6kJnIsUn+WLpD2oa+SZn6dxdksFw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR2101MB0730
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I am seeing issues with how FSCTL_QUERY_ALLOCATED_RANGES behaves under windows,
-in particular that it is inconsistent so we can't run certain xfstests
-against windows servers.
-
-
-The behavior can be triggered using the following command from xfstests :
-  ./src/seek_sanity_test -s 19 -e 19 /mnt/file
-(where /mnt is an smb share mounted from a windows 2016 server.)
-
-In cifs.ko we use this FSCTL to implement both SEEK_HOLE/SEEK_DATA as well as
-fiemap(). But since the behavior of this FSCTL is not deteministic it often
-cause the tests to fail.
-
-
-This is a test tool for SEEK_DATA and SEEK_HOLE. As part of this it performs
-a check to try to discover if the filesystem supports sparse files or not.
-For non-sparse files SEEK_DATA is basically a no-op and SEEK_HOLE just returns
-the file size.
-Later during the test, the result of whether the file is "sparse" or not
-will affect what the expected results are. If this check gets the
-sparse-supported wrong the test cases later will fail.
-
-
-How the check works:
-====================
-The actual check for whether the file supports being sparse or not is the
-following snippet :
-        ftruncate(fd, 0);
-        bufsz = alloc_size * 2;
-        filsz = bufsz * 2;
-
-        buf = do_malloc(bufsz);
-        if (!buf)
-                goto out;
-        memset(buf, 'a', bufsz);
-
-        /* File with 2 allocated blocks.... */
-        ret = do_pwrite(fd, buf, bufsz, 0);
-        if (ret)
-                goto out;
-
-        /* followed by a hole... */
-        ret = do_truncate(fd, filsz);
-        if (ret)
-                goto out;
-
-        /* Is SEEK_DATA and SEEK_HOLE supported in the kernel? */
-        pos = lseek(fd, 0, SEEK_HOLE);
-        if (pos == -1) {
-                fprintf(stderr, "Kernel does not support llseek(2) extension "
-                        "SEEK_HOLE. Aborting.\n");
-                ret = -1;
-                goto out;
-        }
-
-        if (pos == filsz) {
-                default_behavior = 1;
-                fprintf(stderr, "File system supports the default behavior.\n")\
-;
-        }
-
-I.e.
-1, ftruncate to 0
-2, write 2M to the start of the file
-3, ftruncate the file to be 4Mb
-4, SEEK_HOLE and check if it returns 4Mb or no.
-If it returns 4Mb then we switch back to default_behavior and we allow
-the semantics as if the file is not sparse.
-I.e. allow SEEK_DATA to behave as if the file is either sparse or not-sparse.
-
-Also note that if it looks like the sparse-file is not supported then
-it prints ""File system supports the default behavior." which may help when
-running the test tool.
-
-Strace for this check (when the check failed.)
-=============================================
-18:22:14.949612 ftruncate(3, 0)         = 0 <0.011513>
-18:22:14.963725 mmap(NULL, 2101248, PROT_READ|PROT_WRITE,
-MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fe8d9f14000 <0.0
-00192>
-18:22:14.970334 pwrite64(3,
-"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"...,
-2097152, 0) = 2097152 <0.002127>
-18:22:14.972620 ftruncate(3, 4194304)   = 0 <0.582491>
-18:22:15.557308 lseek(3, 0, SEEK_HOLE)  = 4194304 <0.012791>
-18:22:15.572457 write(2, "File system supports the default
-behavior.\n", 43) = 43 <0.000318>
-
-
-Example of when the check goes "Wrong". Capture seek_good.cap
-=============================================================
-The relevant packets here are
-1820, set end of file == 0
-(1822/1823 update timestamps)
-2930, write 2Mb to offset 0
-3008, set the file sparse
-3010, set end of file to 4M
-3019, query-allocated-ranges
-
-In 3019/3020 the server responds that the full 0-4M range is allocated.
-This is wrong since file should only be allocated in the first 2Mb at
-this stage.
-And this makes the test tool think that we don't support sparse files,
-and sets default_behavior to 1.
-
-A different run when the check is successful (seek_bad.cap)
-============================================================
-In the seek_bad capture you can see the same sequence in packets
-1869, set end of file == 0
-2990, write the first 2M of the file
-3067, set file sparse
-3069, set end of file to 4M
-3078, query-allocated-ranges
-But this time, query-allocated-ranges report that only 0-2M is mapped,
-which is the correct range,
-and thus the test tool assumes that we can handle holes properly.
-
-The captures are ~5MByte each unfiltered so too big for the list.
-Email me directly and I will send them to you.
-
-
-So the question here is what is the actual semantics for sparse files
-and query-allocated-ranges on windows?
-
-
-regards
-ronnie sahlberg
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jaWZzLW93bmVyQHZn
+ZXIua2VybmVsLm9yZyA8bGludXgtY2lmcy1vd25lckB2Z2VyLmtlcm5lbC5vcmc+IE9uDQo+IEJl
+aGFsZiBPZiByb25uaWUgc2FobGJlcmcNCj4gU2VudDogV2VkbmVzZGF5LCBBdWd1c3QgMTQsIDIw
+MTkgMTE6MzEgUE0NCj4gVG86IGxpbnV4LWNpZnMgPGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3Jn
+Pg0KPiBTdWJqZWN0OiBGU0NUTF9RVUVSWV9BTExPQ0FURURfUkFOR0VTIGlzc3VlIHdpdGggV2lu
+ZG93czIwMTYNCj4gDQo+IEkgYW0gc2VlaW5nIGlzc3VlcyB3aXRoIGhvdyBGU0NUTF9RVUVSWV9B
+TExPQ0FURURfUkFOR0VTIGJlaGF2ZXMNCj4gdW5kZXIgd2luZG93cywNCj4gaW4gcGFydGljdWxh
+ciB0aGF0IGl0IGlzIGluY29uc2lzdGVudCBzbyB3ZSBjYW4ndCBydW4gY2VydGFpbiB4ZnN0ZXN0
+cw0KPiBhZ2FpbnN0IHdpbmRvd3Mgc2VydmVycy4NCj4gDQo+IA0KPiBUaGUgYmVoYXZpb3IgY2Fu
+IGJlIHRyaWdnZXJlZCB1c2luZyB0aGUgZm9sbG93aW5nIGNvbW1hbmQgZnJvbSB4ZnN0ZXN0cyA6
+DQo+ICAgLi9zcmMvc2Vla19zYW5pdHlfdGVzdCAtcyAxOSAtZSAxOSAvbW50L2ZpbGUNCj4gKHdo
+ZXJlIC9tbnQgaXMgYW4gc21iIHNoYXJlIG1vdW50ZWQgZnJvbSBhIHdpbmRvd3MgMjAxNiBzZXJ2
+ZXIuKQ0KPiANCj4gSW4gY2lmcy5rbyB3ZSB1c2UgdGhpcyBGU0NUTCB0byBpbXBsZW1lbnQgYm90
+aCBTRUVLX0hPTEUvU0VFS19EQVRBIGFzIHdlbGwNCj4gYXMNCj4gZmllbWFwKCkuIEJ1dCBzaW5j
+ZSB0aGUgYmVoYXZpb3Igb2YgdGhpcyBGU0NUTCBpcyBub3QgZGV0ZW1pbmlzdGljIGl0IG9mdGVu
+DQo+IGNhdXNlIHRoZSB0ZXN0cyB0byBmYWlsLg0KPiANCj4gDQo+IFRoaXMgaXMgYSB0ZXN0IHRv
+b2wgZm9yIFNFRUtfREFUQSBhbmQgU0VFS19IT0xFLiBBcyBwYXJ0IG9mIHRoaXMgaXQgcGVyZm9y
+bXMNCj4gYSBjaGVjayB0byB0cnkgdG8gZGlzY292ZXIgaWYgdGhlIGZpbGVzeXN0ZW0gc3VwcG9y
+dHMgc3BhcnNlIGZpbGVzIG9yIG5vdC4NCj4gRm9yIG5vbi1zcGFyc2UgZmlsZXMgU0VFS19EQVRB
+IGlzIGJhc2ljYWxseSBhIG5vLW9wIGFuZCBTRUVLX0hPTEUganVzdCByZXR1cm5zDQo+IHRoZSBm
+aWxlIHNpemUuDQo+IExhdGVyIGR1cmluZyB0aGUgdGVzdCwgdGhlIHJlc3VsdCBvZiB3aGV0aGVy
+IHRoZSBmaWxlIGlzICJzcGFyc2UiIG9yIG5vdA0KPiB3aWxsIGFmZmVjdCB3aGF0IHRoZSBleHBl
+Y3RlZCByZXN1bHRzIGFyZS4gSWYgdGhpcyBjaGVjayBnZXRzIHRoZQ0KPiBzcGFyc2Utc3VwcG9y
+dGVkIHdyb25nIHRoZSB0ZXN0IGNhc2VzIGxhdGVyIHdpbGwgZmFpbC4NCj4gDQo+IA0KPiBIb3cg
+dGhlIGNoZWNrIHdvcmtzOg0KPiA9PT09PT09PT09PT09PT09PT09PQ0KPiBUaGUgYWN0dWFsIGNo
+ZWNrIGZvciB3aGV0aGVyIHRoZSBmaWxlIHN1cHBvcnRzIGJlaW5nIHNwYXJzZSBvciBub3QgaXMg
+dGhlDQo+IGZvbGxvd2luZyBzbmlwcGV0IDoNCj4gICAgICAgICBmdHJ1bmNhdGUoZmQsIDApOw0K
+PiAgICAgICAgIGJ1ZnN6ID0gYWxsb2Nfc2l6ZSAqIDI7DQo+ICAgICAgICAgZmlsc3ogPSBidWZz
+eiAqIDI7DQo+IA0KPiAgICAgICAgIGJ1ZiA9IGRvX21hbGxvYyhidWZzeik7DQo+ICAgICAgICAg
+aWYgKCFidWYpDQo+ICAgICAgICAgICAgICAgICBnb3RvIG91dDsNCj4gICAgICAgICBtZW1zZXQo
+YnVmLCAnYScsIGJ1ZnN6KTsNCj4gDQo+ICAgICAgICAgLyogRmlsZSB3aXRoIDIgYWxsb2NhdGVk
+IGJsb2Nrcy4uLi4gKi8NCj4gICAgICAgICByZXQgPSBkb19wd3JpdGUoZmQsIGJ1ZiwgYnVmc3os
+IDApOw0KPiAgICAgICAgIGlmIChyZXQpDQo+ICAgICAgICAgICAgICAgICBnb3RvIG91dDsNCj4g
+DQo+ICAgICAgICAgLyogZm9sbG93ZWQgYnkgYSBob2xlLi4uICovDQo+ICAgICAgICAgcmV0ID0g
+ZG9fdHJ1bmNhdGUoZmQsIGZpbHN6KTsNCj4gICAgICAgICBpZiAocmV0KQ0KPiAgICAgICAgICAg
+ICAgICAgZ290byBvdXQ7DQo+IA0KPiAgICAgICAgIC8qIElzIFNFRUtfREFUQSBhbmQgU0VFS19I
+T0xFIHN1cHBvcnRlZCBpbiB0aGUga2VybmVsPyAqLw0KPiAgICAgICAgIHBvcyA9IGxzZWVrKGZk
+LCAwLCBTRUVLX0hPTEUpOw0KPiAgICAgICAgIGlmIChwb3MgPT0gLTEpIHsNCj4gICAgICAgICAg
+ICAgICAgIGZwcmludGYoc3RkZXJyLCAiS2VybmVsIGRvZXMgbm90IHN1cHBvcnQgbGxzZWVrKDIp
+IGV4dGVuc2lvbiAiDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICJTRUVLX0hPTEUuIEFib3J0
+aW5nLlxuIik7DQo+ICAgICAgICAgICAgICAgICByZXQgPSAtMTsNCj4gICAgICAgICAgICAgICAg
+IGdvdG8gb3V0Ow0KPiAgICAgICAgIH0NCj4gDQo+ICAgICAgICAgaWYgKHBvcyA9PSBmaWxzeikg
+ew0KPiAgICAgICAgICAgICAgICAgZGVmYXVsdF9iZWhhdmlvciA9IDE7DQo+ICAgICAgICAgICAg
+ICAgICBmcHJpbnRmKHN0ZGVyciwgIkZpbGUgc3lzdGVtIHN1cHBvcnRzIHRoZSBkZWZhdWx0IGJl
+aGF2aW9yLlxuIilcDQo+IDsNCj4gICAgICAgICB9DQo+IA0KPiBJLmUuDQo+IDEsIGZ0cnVuY2F0
+ZSB0byAwDQo+IDIsIHdyaXRlIDJNIHRvIHRoZSBzdGFydCBvZiB0aGUgZmlsZQ0KPiAzLCBmdHJ1
+bmNhdGUgdGhlIGZpbGUgdG8gYmUgNE1iDQo+IDQsIFNFRUtfSE9MRSBhbmQgY2hlY2sgaWYgaXQg
+cmV0dXJucyA0TWIgb3Igbm8uDQo+IElmIGl0IHJldHVybnMgNE1iIHRoZW4gd2Ugc3dpdGNoIGJh
+Y2sgdG8gZGVmYXVsdF9iZWhhdmlvciBhbmQgd2UgYWxsb3cNCj4gdGhlIHNlbWFudGljcyBhcyBp
+ZiB0aGUgZmlsZSBpcyBub3Qgc3BhcnNlLg0KPiBJLmUuIGFsbG93IFNFRUtfREFUQSB0byBiZWhh
+dmUgYXMgaWYgdGhlIGZpbGUgaXMgZWl0aGVyIHNwYXJzZSBvciBub3Qtc3BhcnNlLg0KPiANCj4g
+QWxzbyBub3RlIHRoYXQgaWYgaXQgbG9va3MgbGlrZSB0aGUgc3BhcnNlLWZpbGUgaXMgbm90IHN1
+cHBvcnRlZCB0aGVuDQo+IGl0IHByaW50cyAiIkZpbGUgc3lzdGVtIHN1cHBvcnRzIHRoZSBkZWZh
+dWx0IGJlaGF2aW9yLiIgd2hpY2ggbWF5IGhlbHAgd2hlbg0KPiBydW5uaW5nIHRoZSB0ZXN0IHRv
+b2wuDQo+IA0KPiBTdHJhY2UgZm9yIHRoaXMgY2hlY2sgKHdoZW4gdGhlIGNoZWNrIGZhaWxlZC4p
+DQo+ID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiAxODoy
+MjoxNC45NDk2MTIgZnRydW5jYXRlKDMsIDApICAgICAgICAgPSAwIDwwLjAxMTUxMz4NCj4gMTg6
+MjI6MTQuOTYzNzI1IG1tYXAoTlVMTCwgMjEwMTI0OCwgUFJPVF9SRUFEfFBST1RfV1JJVEUsDQo+
+IE1BUF9QUklWQVRFfE1BUF9BTk9OWU1PVVMsIC0xLCAwKSA9IDB4N2ZlOGQ5ZjE0MDAwIDwwLjAN
+Cj4gMDAxOTI+DQo+IDE4OjIyOjE0Ljk3MDMzNCBwd3JpdGU2NCgzLA0KPiAiYWFhYWFhYWFhYWFh
+YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhDQo+
+IGFhYWFhYWFhYWFhYWFhYWFhYQ0KPiBhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh
+YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhDQo+IGFhYWFhYWFhYWFhYWFhYWFhYWFh
+YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWENCj4gYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh
+YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLi4uLA0KPiAyMDk3MTUyLCAwKSA9IDIw
+OTcxNTIgPDAuMDAyMTI3Pg0KPiAxODoyMjoxNC45NzI2MjAgZnRydW5jYXRlKDMsIDQxOTQzMDQp
+ICAgPSAwIDwwLjU4MjQ5MT4NCj4gMTg6MjI6MTUuNTU3MzA4IGxzZWVrKDMsIDAsIFNFRUtfSE9M
+RSkgID0gNDE5NDMwNCA8MC4wMTI3OTE+DQo+IDE4OjIyOjE1LjU3MjQ1NyB3cml0ZSgyLCAiRmls
+ZSBzeXN0ZW0gc3VwcG9ydHMgdGhlIGRlZmF1bHQNCj4gYmVoYXZpb3IuXG4iLCA0MykgPSA0MyA8
+MC4wMDAzMTg+DQo+IA0KPiANCj4gRXhhbXBsZSBvZiB3aGVuIHRoZSBjaGVjayBnb2VzICJXcm9u
+ZyIuIENhcHR1cmUgc2Vla19nb29kLmNhcA0KPiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09DQo+IFRoZSByZWxldmFudCBwYWNrZXRz
+IGhlcmUgYXJlDQo+IDE4MjAsIHNldCBlbmQgb2YgZmlsZSA9PSAwDQo+ICgxODIyLzE4MjMgdXBk
+YXRlIHRpbWVzdGFtcHMpDQo+IDI5MzAsIHdyaXRlIDJNYiB0byBvZmZzZXQgMA0KPiAzMDA4LCBz
+ZXQgdGhlIGZpbGUgc3BhcnNlDQo+IDMwMTAsIHNldCBlbmQgb2YgZmlsZSB0byA0TQ0KPiAzMDE5
+LCBxdWVyeS1hbGxvY2F0ZWQtcmFuZ2VzDQo+IA0KPiBJbiAzMDE5LzMwMjAgdGhlIHNlcnZlciBy
+ZXNwb25kcyB0aGF0IHRoZSBmdWxsIDAtNE0gcmFuZ2UgaXMgYWxsb2NhdGVkLg0KPiBUaGlzIGlz
+IHdyb25nIHNpbmNlIGZpbGUgc2hvdWxkIG9ubHkgYmUgYWxsb2NhdGVkIGluIHRoZSBmaXJzdCAy
+TWIgYXQNCj4gdGhpcyBzdGFnZS4NCj4gQW5kIHRoaXMgbWFrZXMgdGhlIHRlc3QgdG9vbCB0aGlu
+ayB0aGF0IHdlIGRvbid0IHN1cHBvcnQgc3BhcnNlIGZpbGVzLA0KPiBhbmQgc2V0cyBkZWZhdWx0
+X2JlaGF2aW9yIHRvIDEuDQo+IA0KPiBBIGRpZmZlcmVudCBydW4gd2hlbiB0aGUgY2hlY2sgaXMg
+c3VjY2Vzc2Z1bCAoc2Vla19iYWQuY2FwKQ0KPiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gSW4gdGhlIHNlZWtfYmFkIGNhcHR1
+cmUgeW91IGNhbiBzZWUgdGhlIHNhbWUgc2VxdWVuY2UgaW4gcGFja2V0cw0KPiAxODY5LCBzZXQg
+ZW5kIG9mIGZpbGUgPT0gMA0KPiAyOTkwLCB3cml0ZSB0aGUgZmlyc3QgMk0gb2YgdGhlIGZpbGUN
+Cj4gMzA2Nywgc2V0IGZpbGUgc3BhcnNlDQo+IDMwNjksIHNldCBlbmQgb2YgZmlsZSB0byA0TQ0K
+PiAzMDc4LCBxdWVyeS1hbGxvY2F0ZWQtcmFuZ2VzDQo+IEJ1dCB0aGlzIHRpbWUsIHF1ZXJ5LWFs
+bG9jYXRlZC1yYW5nZXMgcmVwb3J0IHRoYXQgb25seSAwLTJNIGlzIG1hcHBlZCwNCj4gd2hpY2gg
+aXMgdGhlIGNvcnJlY3QgcmFuZ2UsDQo+IGFuZCB0aHVzIHRoZSB0ZXN0IHRvb2wgYXNzdW1lcyB0
+aGF0IHdlIGNhbiBoYW5kbGUgaG9sZXMgcHJvcGVybHkuDQo+IA0KPiBUaGUgY2FwdHVyZXMgYXJl
+IH41TUJ5dGUgZWFjaCB1bmZpbHRlcmVkIHNvIHRvbyBiaWcgZm9yIHRoZSBsaXN0Lg0KPiBFbWFp
+bCBtZSBkaXJlY3RseSBhbmQgSSB3aWxsIHNlbmQgdGhlbSB0byB5b3UuDQo+IA0KPiANCj4gU28g
+dGhlIHF1ZXN0aW9uIGhlcmUgaXMgd2hhdCBpcyB0aGUgYWN0dWFsIHNlbWFudGljcyBmb3Igc3Bh
+cnNlIGZpbGVzDQo+IGFuZCBxdWVyeS1hbGxvY2F0ZWQtcmFuZ2VzIG9uIHdpbmRvd3M/DQoNCkkn
+bGwgdHJ5IHRvIGdldCB5b3UgYW4gYW5zd2VyLCBidXQgaW4gdGhlIG1lYW50aW1lIGp1c3QgYSBx
+dWVzdGlvbi4uLg0KRG9lcyB0aGUgYmVoYXZpb3IgY2hhbmdlIGlmIHRoZSBmaWxlIGlzIG9wZW5l
+ZCB3aXRoIEZJTEVfRkxBR19XUklURV9USFJPVUdIPw0KDQpUb20uDQo=
