@@ -2,52 +2,104 @@ Return-Path: <SRS0=NG9T=WM=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B1BC3A59C
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Aug 2019 09:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB25C3A59C
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Aug 2019 13:36:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EAB69206C2
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Aug 2019 09:07:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08DCD2086C
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Aug 2019 13:36:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726828AbfHPJHU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 16 Aug 2019 05:07:20 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53100 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726800AbfHPJHT (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 16 Aug 2019 05:07:19 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id CF141B64C;
-        Fri, 16 Aug 2019 09:07:18 +0000 (UTC)
-Date:   Fri, 16 Aug 2019 11:07:18 +0200
-From:   David Disseldorp <ddiss@suse.de>
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Subject: Re: FSCTL_QUERY_ALLOCATED_RANGES issue with Windows2016
-Message-ID: <20190816110718.385074fb@suse.de>
-In-Reply-To: <CAN05THThHLkSF=oVBezJQBsre7QoH6eS=SLbxo3Z=w8M+fa=RQ@mail.gmail.com>
-References: <CAN05THT0OkbAoNu8ZVSHF-xY7w0ZW4q4i-jTxjNManrnz0OMfg@mail.gmail.com>
-        <20190815174854.05661672@suse.de>
-        <CAN05THThHLkSF=oVBezJQBsre7QoH6eS=SLbxo3Z=w8M+fa=RQ@mail.gmail.com>
+        id S1727302AbfHPNgr convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 16 Aug 2019 09:36:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56118 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726597AbfHPNgq (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 16 Aug 2019 09:36:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 335931108;
+        Fri, 16 Aug 2019 13:36:46 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-255.rdu2.redhat.com [10.10.120.255])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5ED0BA4FAC;
+        Fri, 16 Aug 2019 13:36:43 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <1562814435.4014.11.camel@linux.ibm.com>
+References: <1562814435.4014.11.camel@linux.ibm.com> <28477.1562362239@warthog.procyon.org.uk> <CAHk-=wjxoeMJfeBahnWH=9zShKp2bsVy527vo3_y8HfOdhwAAw@mail.gmail.com> <20190710194620.GA83443@gmail.com> <20190710201552.GB83443@gmail.com> <CAHk-=wiFti6=K2fyAYhx-PSX9ovQPJUNp0FMdV0pDaO_pSx9MQ@mail.gmail.com>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+Cc:     dhowells@redhat.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        James Morris <jmorris@namei.org>, keyrings@vger.kernel.org,
+        Netdev <netdev@vger.kernel.org>, linux-nfs@vger.kernel.org,
+        CIFS <linux-cifs@vger.kernel.org>, linux-afs@lists.infradead.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>
+Subject: Re: [GIT PULL] Keys: Set 4 - Key ACLs for 5.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Date:   Fri, 16 Aug 2019 14:36:42 +0100
+Message-ID: <23498.1565962602@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Fri, 16 Aug 2019 13:36:46 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 16 Aug 2019 12:07:28 +1000, ronnie sahlberg wrote:
+Mimi Zohar <zohar@linux.ibm.com> wrote:
 
-> I am happy to mail you the wireshark traces for this. Can I do that?
-> Just so you can look at them and confirm I am not crazy :-)
-> I cant send them to the list because they are 5Mb each and it is rude
-> to send such big attachments to a mailinglist.
+> Sorry for the delay.  An exception is needed for loading builtin keys
+> "KEY_ALLOC_BUILT_IN" onto a keyring that is not writable by userspace.
+>  The following works, but probably is not how David would handle the
+> exception.
 
-Sure, go for it. btw, you could also put them up at
-https://www.samba.org/~sahlberg/
+I think the attached is the right way to fix it.
 
-Cheers, David
+load_system_certificate_list(), for example, when it creates keys does this:
+
+	key = key_create_or_update(make_key_ref(builtin_trusted_keys, 1),
+
+marking the keyring as "possessed" in make_key_ref().  This allows the
+possessor permits to be used - and that's the *only* way to use them for
+internal keyrings like this because you can't link to them and you can't join
+them.
+
+David
+---
+diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+index 57be78b5fdfc..1f8f26f7bb05 100644
+--- a/certs/system_keyring.c
++++ b/certs/system_keyring.c
+@@ -99,7 +99,7 @@ static __init int system_trusted_keyring_init(void)
+ 	builtin_trusted_keys =
+ 		keyring_alloc(".builtin_trusted_keys",
+ 			      KUIDT_INIT(0), KGIDT_INIT(0), current_cred(),
+-			      &internal_key_acl, KEY_ALLOC_NOT_IN_QUOTA,
++			      &internal_keyring_acl, KEY_ALLOC_NOT_IN_QUOTA,
+ 			      NULL, NULL);
+ 	if (IS_ERR(builtin_trusted_keys))
+ 		panic("Can't allocate builtin trusted keyring\n");
+diff --git a/security/keys/permission.c b/security/keys/permission.c
+index fc84d9ef6239..86efd3eaf083 100644
+--- a/security/keys/permission.c
++++ b/security/keys/permission.c
+@@ -47,7 +47,7 @@ struct key_acl internal_keyring_acl = {
+ 	.usage	= REFCOUNT_INIT(1),
+ 	.nr_ace	= 2,
+ 	.aces = {
+-		KEY_POSSESSOR_ACE(KEY_ACE_SEARCH),
++		KEY_POSSESSOR_ACE(KEY_ACE_SEARCH | KEY_ACE_WRITE),
+ 		KEY_OWNER_ACE(KEY_ACE_VIEW | KEY_ACE_READ | KEY_ACE_SEARCH),
+ 	}
+ };
