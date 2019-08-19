@@ -1,178 +1,145 @@
-Return-Path: <SRS0=g7xc=WO=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=7vhy=WP=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E5DC3A589
-	for <linux-cifs@archiver.kernel.org>; Sun, 18 Aug 2019 17:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CAACC3A59B
+	for <linux-cifs@archiver.kernel.org>; Mon, 19 Aug 2019 08:38:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF0DC21773
-	for <linux-cifs@archiver.kernel.org>; Sun, 18 Aug 2019 17:00:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDA04206DF
+	for <linux-cifs@archiver.kernel.org>; Mon, 19 Aug 2019 08:38:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LY1WM6E8"
+	dkim=pass (2048-bit key) header.d=linbit-com.20150623.gappssmtp.com header.i=@linbit-com.20150623.gappssmtp.com header.b="ntdlk6mV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726247AbfHRRAo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 18 Aug 2019 13:00:44 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35158 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727119AbfHRQ75 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 18 Aug 2019 12:59:57 -0400
-Received: by mail-pf1-f196.google.com with SMTP id d85so5742118pfd.2;
-        Sun, 18 Aug 2019 09:59:57 -0700 (PDT)
+        id S1726594AbfHSIiD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 19 Aug 2019 04:38:03 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38080 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726366AbfHSIiD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 19 Aug 2019 04:38:03 -0400
+Received: by mail-wr1-f65.google.com with SMTP id g17so7783006wrr.5
+        for <linux-cifs@vger.kernel.org>; Mon, 19 Aug 2019 01:38:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=OANlzDBkabtl5UN7ibJ4MLwySknYtbivCf67bcL51AQ=;
-        b=LY1WM6E8Kys2q7bNl2j7oB8/ISkGzEPiE0m9INgM32Ocw3Rsj+EYWZEUlZyH/X+yDW
-         uJmiZ2eQrFLYP1ngeyVFhdvwrjcpeJwA60pSqsAnTjGCnCWbgZxMQCNR6QSfIrhijmWV
-         DqF3vgYoawl+9EUYEgHazkgWm+ygOuKzuxtDpiN+VX5dFw0xDydRa1sZHnp0+znIpmoX
-         hJV+v6Wu5nIFkcgDm0oPB+WItqilJxlctvpkK2lxSMCBbNz9ww5Sxxqu/tIpwZprJIet
-         ttAu5Jw9SdUpCXQrU4Cco6c9sQq2kB/+xgyMMqXzHAnehdvOKgPS+TmiMjcnhGieYuGl
-         kshw==
+        d=linbit-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=yo+SdyqZ/O4jXuFjj8QZr2O/7A5RWexuHtaCgMhz+og=;
+        b=ntdlk6mVJT05SvDl8G9rkbVUSwiBi09oFdnJt4ab1t8Mc211HaWcimS5aP/d6EWWB/
+         ltgQmGv2xkM6fMtCmspbvi8CPgoaolEoqEi7S7/g6QPpSS/XjcjuudlJjyAfFl+zUKnZ
+         5FkOnONhEI1x4+t8GMItA+ikzNDYLhMq3m1nmgonF7EIq3HgQbHSgEt6sHoqDELbP2vf
+         omCCF6k6RwMRo+2zf0rx6pfB52zv3Ekb2l6HliGhB4RLBI+dw4Wwx97RvmEg8T4VkWbw
+         qITiQasUJNWwJf/6jujnoEcY1ChkHAvYg84J9FeZ04HlKtrPrx45rpT6S7zQBAFZHtT1
+         D0aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=OANlzDBkabtl5UN7ibJ4MLwySknYtbivCf67bcL51AQ=;
-        b=c7UDJ48Xxzmzvox2ecSXEqoX32wGPsn8/Swzpjx8MzUAvfB2vVNS0mDgqlyRxiT/jV
-         sXnOv75arNIInJngrh6b+XuTnkd8n6BGEtPbhqcQ4YiHYVR3aE9xLHiW22VBkR6d2tNr
-         s+S5/4S7PSl5/dEGEp4jMml/zj6EZr4eWCiFPVkLikMco0h6VuQZ97aaF+7IK2qvC7QU
-         nryA+XvEugJi5rZ+4Q8rh2rQ1uLALkhg+j5Yj2iTcAxONx+/JMZhrHEm4YZmBhJFNhWx
-         TL5lEqrDnEBTFtWGnzMN2TKnG3HV84VIz/T5YLq+K3JTUbLwsn88l8yROkLPkEj34p8A
-         VQzg==
-X-Gm-Message-State: APjAAAUvauVy0zccC3e26sLK9Gb2sxez14C1QZ6AxWYsldbDUPO+RMJT
-        hawSs9Wdnqe5yByZO5RGjyA=
-X-Google-Smtp-Source: APXvYqwz00Tt6K8qor9ax5HaEuLrqJg2JMRGS32/pgAAjnqroMTDadhto/XOMVcETYlxqjtrhrsgqw==
-X-Received: by 2002:aa7:8a99:: with SMTP id a25mr20446137pfc.127.1566147596711;
-        Sun, 18 Aug 2019 09:59:56 -0700 (PDT)
-Received: from deepa-ubuntu.lan (c-98-234-52-230.hsd1.ca.comcast.net. [98.234.52.230])
-        by smtp.gmail.com with ESMTPSA id b136sm15732831pfb.73.2019.08.18.09.59.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Aug 2019 09:59:56 -0700 (PDT)
-From:   Deepa Dinamani <deepa.kernel@gmail.com>
-To:     viro@zeniv.linux.org.uk, linux-kernel@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, y2038@lists.linaro.org,
-        arnd@arndb.de, sfrench@samba.org, linux-cifs@vger.kernel.org
-Subject: [PATCH v8 11/20] fs: cifs: Initialize filesystem timestamp ranges
-Date:   Sun, 18 Aug 2019 09:58:08 -0700
-Message-Id: <20190818165817.32634-12-deepa.kernel@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190818165817.32634-1-deepa.kernel@gmail.com>
-References: <20190818165817.32634-1-deepa.kernel@gmail.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=yo+SdyqZ/O4jXuFjj8QZr2O/7A5RWexuHtaCgMhz+og=;
+        b=a6gpmuzFPDCLVJOe/bvxNaWnySbzs+gQoaLBZJkIIBL68obXMrY2SGc8nDjnqOaRZ4
+         bqnD6DVNa/SQBs+V2NVn8R4Az/OcT/IQa9lPkO5CjzCaQfyPp24o/DY9GV5WCA6ZVaS7
+         rBTCCSPkbWxBZ1BCynPMq5NnFhkk+wnkS3k79HifoFkLCP8ykrA1r7K9ptV41dzZwMol
+         vpn4h8wCtNrZvoqbMvuwYVjJOkFDGJlhPVdPPmS5cKIY2LckFfqAjpxrB0xu5+aNQeos
+         PNL9OSOhoTmsCN8JCV5b56cat9n+ahzuOqJ0AcnQlb/f7kwzM1Xcn/yKNOfbuT2lhhvF
+         +8Rw==
+X-Gm-Message-State: APjAAAW6eK45F97mIn2KmC0jCTkIeEAcqQ+An35eZGCSzEsgWI2t5N80
+        IY0dIlOxJwzkaspW96tNGXXlsw==
+X-Google-Smtp-Source: APXvYqypvER9X0766kDn+Er3VblrpVkzmTxd+/kEnAYu/iDWYOMaqZpjxfXTAy2520/LCRDLpWF3xA==
+X-Received: by 2002:adf:9482:: with SMTP id 2mr25343130wrr.91.1566203881132;
+        Mon, 19 Aug 2019 01:38:01 -0700 (PDT)
+Received: from localhost ([2001:858:107:1:1d81:f726:81fa:b07a])
+        by smtp.gmail.com with ESMTPSA id p69sm13597648wme.36.2019.08.19.01.38.00
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 19 Aug 2019 01:38:00 -0700 (PDT)
+Date:   Mon, 19 Aug 2019 10:37:59 +0200
+From:   Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+To:     "Eric W. Biederman" <ebiederm@xmission.com>
+Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
+        David Laight <David.Laight@aculab.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Jeff Layton <jlayton@primarydata.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH] signal: Allow cifs and drbd to receive their terminating
+ signals
+Message-ID: <20190819083759.73ee5zct4yxbyyfd@gintonic.linbit>
+References: <20190729083248.30362-1-christoph.boehmwalder@linbit.com>
+ <1761552.9xIroHqhk7@fat-tyre>
+ <1fcbb94c5f264c17af3394807438ad50@AcuMS.aculab.com>
+ <2789113.VEJ2NpTmzX@fat-tyre>
+ <87k1bclpmt.fsf_-_@xmission.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87k1bclpmt.fsf_-_@xmission.com>
+User-Agent: NeoMutt/20171215
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fill in the appropriate limits to avoid inconsistencies
-in the vfs cached inode times when timestamps are
-outside the permitted range.
+On Fri, Aug 16, 2019 at 05:19:38PM -0500, Eric W. Biederman wrote:
+> 
+> My recent to change to only use force_sig for a synchronous events
+> wound up breaking signal reception cifs and drbd.  I had overlooked
+> the fact that by default kthreads start out with all signals set to
+> SIG_IGN.  So a change I thought was safe turned out to have made it
+> impossible for those kernel thread to catch their signals.
+> 
+> Reverting the work on force_sig is a bad idea because what the code
+> was doing was very much a misuse of force_sig.  As the way force_sig
+> ultimately allowed the signal to happen was to change the signal
+> handler to SIG_DFL.  Which after the first signal will allow userspace
+> to send signals to these kernel threads.  At least for
+> wake_ack_receiver in drbd that does not appear actively wrong.
+> 
+> So correct this problem by adding allow_kernel_signal that will allow
+> signals whose siginfo reports they were sent by the kernel through,
+> but will not allow userspace generated signals, and update cifs and
+> drbd to call allow_kernel_signal in an appropriate place so that their
+> thread can receive this signal.
+> 
+> Fixing things this way ensures that userspace won't be able to send
+> signals and cause problems, that it is clear which signals the
+> threads are expecting to receive, and it guarantees that nothing
+> else in the system will be affected.
+> 
+> This change was partly inspired by similar cifs and drbd patches that
+> added allow_signal.
+> 
+> Reported-by: ronnie sahlberg <ronniesahlberg@gmail.com>
+> Reported-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+> Cc: Steve French <smfrench@gmail.com>
+> Cc: Philipp Reisner <philipp.reisner@linbit.com>
+> Cc: David Laight <David.Laight@ACULAB.COM>
+> Fixes: 247bc9470b1e ("cifs: fix rmmod regression in cifs.ko caused by force_sig changes")
+> Fixes: 72abe3bcf091 ("signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig")
+> Fixes: fee109901f39 ("signal/drbd: Use send_sig not force_sig")
+> Fixes: 3cf5d076fb4d ("signal: Remove task parameter from force_sig")
+> Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+> ---
+>  drivers/block/drbd/drbd_main.c |  2 ++
+>  fs/cifs/connect.c              |  2 +-
+>  include/linux/signal.h         | 15 ++++++++++++++-
+>  kernel/signal.c                |  5 +++++
+>  4 files changed, 22 insertions(+), 2 deletions(-)
+> 
 
-Also fixed cnvrtDosUnixTm calculations to avoid int overflow
-while computing maximum date.
+Just tested this patch, and I can confirm that it makes DRBD work as
+intended again.
 
-References:
+Tested-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
 
-http://cifs.com/
-
-https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-cifs/d416ff7c-c536-406e-a951-4f04b2fd1d2b
-
-Signed-off-by: Deepa Dinamani <deepa.kernel@gmail.com>
-Cc: sfrench@samba.org
-Cc: linux-cifs@vger.kernel.org
----
- fs/cifs/cifsfs.c  | 22 ++++++++++++++++++++++
- fs/cifs/netmisc.c | 14 +++++++-------
- 2 files changed, 29 insertions(+), 7 deletions(-)
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 3289b566463f..7a75726442ad 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -56,6 +56,15 @@
- #include "dfs_cache.h"
- #endif
- 
-+/*
-+ * DOS dates from 1980/1/1 through 2107/12/31
-+ * Protocol specifications indicate the range should be to 119, which
-+ * limits maximum year to 2099. But this range has not been checked.
-+ */
-+#define SMB_DATE_MAX (127<<9 | 12<<5 | 31)
-+#define SMB_DATE_MIN (0<<9 | 1<<5 | 1)
-+#define SMB_TIME_MAX (23<<11 | 59<<5 | 29)
-+
- int cifsFYI = 0;
- bool traceSMB;
- bool enable_oplocks = true;
-@@ -142,6 +151,7 @@ cifs_read_super(struct super_block *sb)
- 	struct inode *inode;
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifs_tcon *tcon;
-+	struct timespec64 ts;
- 	int rc = 0;
- 
- 	cifs_sb = CIFS_SB(sb);
-@@ -161,6 +171,18 @@ cifs_read_super(struct super_block *sb)
- 	/* BB FIXME fix time_gran to be larger for LANMAN sessions */
- 	sb->s_time_gran = 100;
- 
-+	if (tcon->unix_ext) {
-+		ts = cifs_NTtimeToUnix(0);
-+		sb->s_time_min = ts.tv_sec;
-+		ts = cifs_NTtimeToUnix(cpu_to_le64(S64_MAX));
-+		sb->s_time_max = ts.tv_sec;
-+	} else {
-+		ts = cnvrtDosUnixTm(cpu_to_le16(SMB_DATE_MIN), 0, 0);
-+		sb->s_time_min = ts.tv_sec;
-+		ts = cnvrtDosUnixTm(cpu_to_le16(SMB_DATE_MAX), cpu_to_le16(SMB_TIME_MAX), 0);
-+		sb->s_time_max = ts.tv_sec;
-+	}
-+
- 	sb->s_magic = CIFS_MAGIC_NUMBER;
- 	sb->s_op = &cifs_super_ops;
- 	sb->s_xattr = cifs_xattr_handlers;
-diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-index ed92958e842d..49c17ee18254 100644
---- a/fs/cifs/netmisc.c
-+++ b/fs/cifs/netmisc.c
-@@ -949,8 +949,8 @@ static const int total_days_of_prev_months[] = {
- struct timespec64 cnvrtDosUnixTm(__le16 le_date, __le16 le_time, int offset)
- {
- 	struct timespec64 ts;
--	time64_t sec;
--	int min, days, month, year;
-+	time64_t sec, days;
-+	int min, day, month, year;
- 	u16 date = le16_to_cpu(le_date);
- 	u16 time = le16_to_cpu(le_time);
- 	SMB_TIME *st = (SMB_TIME *)&time;
-@@ -966,15 +966,15 @@ struct timespec64 cnvrtDosUnixTm(__le16 le_date, __le16 le_time, int offset)
- 	sec += 60 * 60 * st->Hours;
- 	if (st->Hours > 24)
- 		cifs_dbg(VFS, "illegal hours %d\n", st->Hours);
--	days = sd->Day;
-+	day = sd->Day;
- 	month = sd->Month;
--	if (days < 1 || days > 31 || month < 1 || month > 12) {
--		cifs_dbg(VFS, "illegal date, month %d day: %d\n", month, days);
--		days = clamp(days, 1, 31);
-+	if (day < 1 || day > 31 || month < 1 || month > 12) {
-+		cifs_dbg(VFS, "illegal date, month %d day: %d\n", month, day);
-+		day = clamp(day, 1, 31);
- 		month = clamp(month, 1, 12);
- 	}
- 	month -= 1;
--	days += total_days_of_prev_months[month];
-+	days = day + total_days_of_prev_months[month];
- 	days += 3652; /* account for difference in days between 1980 and 1970 */
- 	year = sd->Year;
- 	days += year * 365;
--- 
-2.17.1
-
+--
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
