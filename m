@@ -2,131 +2,95 @@ Return-Path: <SRS0=G0ZP=WQ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3DBC3A59E
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Aug 2019 11:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 155DDC3A589
+	for <linux-cifs@archiver.kernel.org>; Tue, 20 Aug 2019 13:54:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C3B6122CF5
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Aug 2019 11:05:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1566299118;
-	bh=T0rmHh8w3H3bwdXLru7KFY2A/8hjJcNt2eMc9MdFvoU=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
-	b=TZIgy3LD6/1pkrSQGfX8qVgXBZN0TwbPZJDgDSbY83WfjjMZYsG+RtNBIgR6srpEc
-	 JnvGOiSkd6zN5LzueTBPAa4BgoCidNPQB6AmnxREe+5x5+JXgRmX0ZhY3HacNBzdyG
-	 uEzOXn6Zq5tCFlGxTKmdOVvwCvuU9Ioi3TGd//lg=
+	by mail.kernel.org (Postfix) with ESMTP id DA5FB22CF7
+	for <linux-cifs@archiver.kernel.org>; Tue, 20 Aug 2019 13:54:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729564AbfHTLFS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Aug 2019 07:05:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58200 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729553AbfHTLFS (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 20 Aug 2019 07:05:18 -0400
-Received: from tleilax.poochiereds.net (68-20-15-154.lightspeed.rlghnc.sbcglobal.net [68.20.15.154])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EFF55205C9;
-        Tue, 20 Aug 2019 11:05:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1566299116;
-        bh=T0rmHh8w3H3bwdXLru7KFY2A/8hjJcNt2eMc9MdFvoU=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=OWYdJNUzSee+UuIh6LQ3YFru0x6seE2TTCifysIDGNOjR8O4ScYkdj2Vrw5S/JeTB
-         qmDzLYeDaoNBfNwX5IDihFikAWZqI1dzLhII85Qm3JJy6zIH2yIFue45EEMtXZPwcN
-         fgzdH+WlULgP+SUhyw7NDBScX/I9XuZMIU+ITkEg=
-Message-ID: <27d1943a0027cb4f658334fad8dc880df133c22d.camel@kernel.org>
-Subject: Re: [PATCH v8 00/20] vfs: Add support for timestamp limits
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Deepa Dinamani <deepa.kernel@gmail.com>, viro@zeniv.linux.org.uk,
-        linux-kernel@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, y2038@lists.linaro.org,
-        arnd@arndb.de, adilger.kernel@dilger.ca, adrian.hunter@intel.com,
-        aivazian.tigran@gmail.com, al@alarsen.net,
-        anna.schumaker@netapp.com, anton@enomsg.org,
-        asmadeus@codewreck.org, ccross@android.com,
-        ceph-devel@vger.kernel.org, coda@cs.cmu.edu,
-        codalist@coda.cs.cmu.edu, darrick.wong@oracle.com,
-        dedekind1@gmail.com, devel@lists.orangefs.org, dsterba@suse.com,
-        dushistov@mail.ru, dwmw2@infradead.org, ericvh@gmail.com,
-        gregkh@linuxfoundation.org, hch@infradead.org, hch@lst.de,
-        hirofumi@mail.parknet.co.jp, hubcap@omnibond.com,
-        idryomov@gmail.com, jack@suse.com, jaegeuk@kernel.org,
-        jaharkes@cs.cmu.edu, jfs-discussion@lists.sourceforge.net,
-        jlbec@evilplan.org, keescook@chromium.org,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-karma-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        lucho@ionkov.net, luisbg@kernel.org, martin@omnibond.com,
-        me@bobcopeland.com, mikulas@artax.karlin.mff.cuni.cz,
-        nico@fluxnic.net, phillip@squashfs.org.uk,
-        reiserfs-devel@vger.kernel.org, richard@nod.at, sage@redhat.com,
-        salah.triki@gmail.com, sfrench@samba.org, shaggy@kernel.org,
-        tj@kernel.org, tony.luck@intel.com,
-        trond.myklebust@hammerspace.com, tytso@mit.edu,
-        v9fs-developer@lists.sourceforge.net, yuchao0@huawei.com,
-        zyan@redhat.com
-Date:   Tue, 20 Aug 2019 07:05:10 -0400
-In-Reply-To: <20190818165817.32634-1-deepa.kernel@gmail.com>
-References: <20190818165817.32634-1-deepa.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
+        id S1729812AbfHTNya (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 20 Aug 2019 09:54:30 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4735 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729203AbfHTNya (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 20 Aug 2019 09:54:30 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 6A6FED3B6313764722A5;
+        Tue, 20 Aug 2019 21:54:22 +0800 (CST)
+Received: from huawei.com (10.90.53.225) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 20 Aug 2019
+ 21:54:15 +0800
+From:   zhengbin <zhengbin13@huawei.com>
+To:     <sfrench@samba.org>, <linux-cifs@vger.kernel.org>,
+        <samba-technical@lists.samba.org>
+CC:     <yi.zhang@huawei.com>, <zhengbin13@huawei.com>
+Subject: [PATCH] cifs: remove unused variable
+Date:   Tue, 20 Aug 2019 22:00:47 +0800
+Message-ID: <1566309647-67393-1-git-send-email-zhengbin13@huawei.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.225]
+X-CFilter-Loop: Reflected
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sun, 2019-08-18 at 09:57 -0700, Deepa Dinamani wrote:
-> The series is an update and a more complete version of the
-> previously posted series at
-> https://lore.kernel.org/linux-fsdevel/20180122020426.2988-1-deepa.kernel@gmail.com/
-> 
-> Thanks to Arnd Bergmann for doing a few preliminary reviews.
-> They helped me fix a few issues I had overlooked.
-> 
-> The limits (sometimes granularity also) for the filesystems updated here are according to the
-> following table:
-> 
-> File system   Time type                      Start year Expiration year Granularity
-> cramfs        fixed                          0          0
-> romfs         fixed                          0          0
-> pstore        ascii seconds (27 digit ascii) S64_MIN    S64_MAX         1
-> coda          INT64                          S64_MIN    S64_MAX         1
-> omfs          64-bit milliseconds            0          U64_MAX/ 1000   NSEC_PER_MSEC
-> befs          unsigned 48-bit seconds        0          0xffffffffffff  alloc_super
-> bfs           unsigned 32-bit seconds        0          U32_MAX         alloc_super
-> efs           unsigned 32-bit seconds        0          U32_MAX         alloc_super
-> ext2          signed 32-bit seconds          S32_MIN    S32_MAX         alloc_super
-> ext3          signed 32-bit seconds          S32_MIN    S32_MAX         alloc_super
-> ext4 (old)    signed 32-bit seconds          S32_MIN    S32_MAX         alloc_super
-> ext4 (extra)  34-bit seconds, 30-bit ns      S32_MIN    0x37fffffff	1
-> freevxfs      u32 secs/usecs                 0          U32_MAX         alloc_super
-> jffs2         unsigned 32-bit seconds        0          U32_MAX         alloc_super
-> jfs           unsigned 32-bit seconds/ns     0          U32_MAX         1
-> minix         unsigned 32-bit seconds        0          U32_MAX         alloc_super
-> orangefs      u64 seconds                    0          U64_MAX         alloc_super
-> qnx4          unsigned 32-bit seconds        0          U32_MAX         alloc_super
-> qnx6          unsigned 32-bit seconds        0          U32_MAX         alloc_super
-> reiserfs      unsigned 32-bit seconds        0          U32_MAX         alloc_super
-> squashfs      unsigned 32-bit seconds        0          U32_MAX         alloc_super
-> ufs1          signed 32-bit seconds          S32_MIN    S32_MAX         NSEC_PER_SEC
-> ufs2          signed 64-bit seconds/u32 ns   S64_MIN    S64_MAX         1
-> xfs           signed 32-bit seconds/ns       S32_MIN    S32_MAX         1
-> ceph          unsigned 32-bit second/ns      0          U32_MAX         1000
+In smb3_punch_hole, variable cifsi set but not used, remove it.
+In cifs_lock, variable netfid set but not used, remove it.
 
-Looks reasonable, overall.
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: zhengbin <zhengbin13@huawei.com>
+---
+ fs/cifs/file.c    | 2 --
+ fs/cifs/smb2ops.c | 2 --
+ 2 files changed, 4 deletions(-)
 
-Note that the granularity changed recently for cephfs. See commit
-0f7cf80ae96c2a (ceph: initialize superblock s_time_gran to 1).
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 9709069..ab07ae8 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1695,7 +1695,6 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+ 	struct cifs_tcon *tcon;
+ 	struct cifsInodeInfo *cinode;
+ 	struct cifsFileInfo *cfile;
+-	__u16 netfid;
+ 	__u32 type;
 
-In any case, you can add my Acked-by
+ 	rc = -EACCES;
+@@ -1711,7 +1710,6 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+ 	cifs_read_flock(flock, &type, &lock, &unlock, &wait_flag,
+ 			tcon->ses->server);
+ 	cifs_sb = CIFS_FILE_SB(file);
+-	netfid = cfile->fid.netfid;
+ 	cinode = CIFS_I(file_inode(file));
 
--- 
-Jeff Layton <jlayton@kernel.org>
+ 	if (cap_unix(tcon->ses) &&
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 64a5864..f5bbd1d 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2939,7 +2939,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 			    loff_t offset, loff_t len)
+ {
+ 	struct inode *inode;
+-	struct cifsInodeInfo *cifsi;
+ 	struct cifsFileInfo *cfile = file->private_data;
+ 	struct file_zero_data_information fsctl_buf;
+ 	long rc;
+@@ -2949,7 +2948,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 	xid = get_xid();
+
+ 	inode = d_inode(cfile->dentry);
+-	cifsi = CIFS_I(inode);
+
+ 	/* Need to make file sparse, if not already, before freeing range. */
+ 	/* Consider adding equivalent for compressed since it could also work */
+--
+2.7.4
 
