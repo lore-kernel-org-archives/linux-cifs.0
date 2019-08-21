@@ -2,132 +2,145 @@ Return-Path: <SRS0=KHP/=WR=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=DATE_IN_PAST_03_06,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A0CC3A59E
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Aug 2019 16:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92220C3A5A0
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Aug 2019 18:49:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51D9122D6D
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Aug 2019 16:40:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MGM+I4cV"
+	by mail.kernel.org (Postfix) with ESMTP id 6FF60214DA
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Aug 2019 18:49:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728806AbfHUQkl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 21 Aug 2019 12:40:41 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:44149 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728125AbfHUQkk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 21 Aug 2019 12:40:40 -0400
-Received: by mail-pf1-f196.google.com with SMTP id c81so1765907pfc.11
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2019 09:40:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=apmBza1D/jgq8ysrAYJLKFCh2KTiNJiS02F85HTZxwM=;
-        b=MGM+I4cVFJCHEZ3U9SQoxWMpfs5tfCg2ijgNS8TzK9IKDpoS7c63wFR1+BPJ8zxw2Y
-         uwbj8cMdLVUwQAtAqj6UmdXXhLVnRLGPWgMtn0l8SaVmn7RKECeqknEMSoqOerbh2mKz
-         yKGnZZaQOCWRnOLFYrW85l0xhctwqSgiAquO5s5z7mJHO+fPvd9BPDjGdpGg95qmuRT9
-         TBB9056F17W+8OcJds43/dy1hEVfU8X4qd8nzULm+abvqfDbKZWQBMJwEeeF/+gePg2d
-         SfiwedOR4z2D+dcyYSawFQ6wVBIox2DVeqMte4TRnK0ov+WsZg6rp2mx47MtmbIt9TAG
-         8AYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=apmBza1D/jgq8ysrAYJLKFCh2KTiNJiS02F85HTZxwM=;
-        b=j7PYrL+l29YpFUtK9Mpp/FPS2rgGhSMuzAiwbvgjIV1hqoTDAhaMwRcVGbZHlLSi2O
-         G+ocpRAOhoN+0IRsT8P0KaxhFZVD+ZGcyr8Ti7V+1lrHA0wOHBH0Xm27HfiABwz9vkSn
-         mMvD++tg0XodEmb6RSfpsyOuvgitHja6TJxs7gYb6as3ZL+pS2/DWEK/xdMumY/22yap
-         WXk5gOu/IRnJVhlTAzXwhZJXgV/WOx2A5ESX0o8v00/UwuAoIDZYRsBsA6Td/leNecxt
-         VZkROWI7hvQm2bRrmJNQfwwMcEIUgvVHCZe+HjBwPzVlvKTjPi1cod/Dxma7xOs2UV9G
-         0H0A==
-X-Gm-Message-State: APjAAAV8fLIsnve7co36Xm5dBsqYeSeXkgbYiNcBo46wjo777Bs0ada2
-        6xPI1KeqkWkcb/Rrw+X4B3pQtL4CQ/wGyzasm4c=
-X-Google-Smtp-Source: APXvYqySFNV7Fiio1XWiDQwaqpb6e509tE0QUHo6kTe+WUBLdA3o1pY/qTnJRfbmVkPpvjdkUcQtRwI1933ObaswpKQ=
-X-Received: by 2002:a63:7245:: with SMTP id c5mr30322787pgn.11.1566405639720;
- Wed, 21 Aug 2019 09:40:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <1566309647-67393-1-git-send-email-zhengbin13@huawei.com>
-In-Reply-To: <1566309647-67393-1-git-send-email-zhengbin13@huawei.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 21 Aug 2019 11:40:28 -0500
-Message-ID: <CAH2r5mvx7y7B-LsgFY-MSJ1B2OM-87zaVYrQDO3VToey-VjcUw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: remove unused variable
-To:     zhengbin <zhengbin13@huawei.com>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        yi.zhang@huawei.com
+        id S1728303AbfHUStQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 21 Aug 2019 14:49:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42366 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727992AbfHUStQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 21 Aug 2019 14:49:16 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7LIdkcS081292
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2019 14:49:15 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2uhb5y0vk3-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Aug 2019 14:49:15 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-cifs@vger.kernel.org> from <zohar@linux.ibm.com>;
+        Wed, 21 Aug 2019 19:49:13 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 21 Aug 2019 19:49:08 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7LIn7ub33620120
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Aug 2019 18:49:07 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 55C0AA4053;
+        Wed, 21 Aug 2019 18:49:07 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFD58A4040;
+        Wed, 21 Aug 2019 18:49:04 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.135.147])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 21 Aug 2019 18:49:04 +0000 (GMT)
+Subject: Re: [GIT PULL] Keys: Set 4 - Key ACLs for 5.3
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        James Morris <jmorris@namei.org>, keyrings@vger.kernel.org,
+        Netdev <netdev@vger.kernel.org>, linux-nfs@vger.kernel.org,
+        CIFS <linux-cifs@vger.kernel.org>, linux-afs@lists.infradead.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>
+In-Reply-To: <23498.1565962602@warthog.procyon.org.uk>
+References: <1562814435.4014.11.camel@linux.ibm.com>
+         <28477.1562362239@warthog.procyon.org.uk>
+         <CAHk-=wjxoeMJfeBahnWH=9zShKp2bsVy527vo3_y8HfOdhwAAw@mail.gmail.com>
+         <20190710194620.GA83443@gmail.com> <20190710201552.GB83443@gmail.com>
+         <CAHk-=wiFti6=K2fyAYhx-PSX9ovQPJUNp0FMdV0pDaO_pSx9MQ@mail.gmail.com>
+         <23498.1565962602@warthog.procyon.org.uk>
 Content-Type: text/plain; charset="UTF-8"
+Date:   Wed, 21 Aug 2019 10:20:44 -0400
+Mime-Version: 1.0
+X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19082118-0008-0000-0000-0000030B8E41
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19082118-0009-0000-0000-00004A29BA4E
+Message-Id: <1566397244.5162.11.camel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-21_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908210182
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+On Fri, 2019-08-16 at 14:36 +0100, David Howells wrote:
+> Mimi Zohar <zohar@linux.ibm.com> wrote:
+> 
+> > Sorry for the delay.  An exception is needed for loading builtin keys
+> > "KEY_ALLOC_BUILT_IN" onto a keyring that is not writable by userspace.
+> >  The following works, but probably is not how David would handle the
+> > exception.
+> 
+> I think the attached is the right way to fix it.
+> 
+> load_system_certificate_list(), for example, when it creates keys does this:
+> 
+> 	key = key_create_or_update(make_key_ref(builtin_trusted_keys, 1),
+> 
+> marking the keyring as "possessed" in make_key_ref().  This allows the
+> possessor permits to be used - and that's the *only* way to use them for
+> internal keyrings like this because you can't link to them and you can't join
+> them.
 
-On Tue, Aug 20, 2019 at 8:54 AM zhengbin <zhengbin13@huawei.com> wrote:
->
-> In smb3_punch_hole, variable cifsi set but not used, remove it.
-> In cifs_lock, variable netfid set but not used, remove it.
->
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: zhengbin <zhengbin13@huawei.com>
+In addition, as long as additional keys still can't be added or
+existing keys updated by userspace on the .builtin_trusted_keys, then
+this is fine.
+
+> 
+> David
 > ---
->  fs/cifs/file.c    | 2 --
->  fs/cifs/smb2ops.c | 2 --
->  2 files changed, 4 deletions(-)
->
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 9709069..ab07ae8 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -1695,7 +1695,6 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
->         struct cifs_tcon *tcon;
->         struct cifsInodeInfo *cinode;
->         struct cifsFileInfo *cfile;
-> -       __u16 netfid;
->         __u32 type;
->
->         rc = -EACCES;
-> @@ -1711,7 +1710,6 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
->         cifs_read_flock(flock, &type, &lock, &unlock, &wait_flag,
->                         tcon->ses->server);
->         cifs_sb = CIFS_FILE_SB(file);
-> -       netfid = cfile->fid.netfid;
->         cinode = CIFS_I(file_inode(file));
->
->         if (cap_unix(tcon->ses) &&
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 64a5864..f5bbd1d 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -2939,7 +2939,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
->                             loff_t offset, loff_t len)
->  {
->         struct inode *inode;
-> -       struct cifsInodeInfo *cifsi;
->         struct cifsFileInfo *cfile = file->private_data;
->         struct file_zero_data_information fsctl_buf;
->         long rc;
-> @@ -2949,7 +2948,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
->         xid = get_xid();
->
->         inode = d_inode(cfile->dentry);
-> -       cifsi = CIFS_I(inode);
->
->         /* Need to make file sparse, if not already, before freeing range. */
->         /* Consider adding equivalent for compressed since it could also work */
-> --
-> 2.7.4
->
+> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+> index 57be78b5fdfc..1f8f26f7bb05 100644
+> --- a/certs/system_keyring.c
+> +++ b/certs/system_keyring.c
+> @@ -99,7 +99,7 @@ static __init int system_trusted_keyring_init(void)
+>  	builtin_trusted_keys =
+>  		keyring_alloc(".builtin_trusted_keys",
+>  			      KUIDT_INIT(0), KGIDT_INIT(0), current_cred(),
+> -			      &internal_key_acl, KEY_ALLOC_NOT_IN_QUOTA,
+> +			      &internal_keyring_acl, KEY_ALLOC_NOT_IN_QUOTA,
+>  			      NULL, NULL);
+>  	if (IS_ERR(builtin_trusted_keys))
+>  		panic("Can't allocate builtin trusted keyring\n");
+> diff --git a/security/keys/permission.c b/security/keys/permission.c
+> index fc84d9ef6239..86efd3eaf083 100644
+> --- a/security/keys/permission.c
+> +++ b/security/keys/permission.c
+> @@ -47,7 +47,7 @@ struct key_acl internal_keyring_acl = {
+>  	.usage	= REFCOUNT_INIT(1),
+>  	.nr_ace	= 2,
+>  	.aces = {
+> -		KEY_POSSESSOR_ACE(KEY_ACE_SEARCH),
+> +		KEY_POSSESSOR_ACE(KEY_ACE_SEARCH | KEY_ACE_WRITE),
+>  		KEY_OWNER_ACE(KEY_ACE_VIEW | KEY_ACE_READ | KEY_ACE_SEARCH),
+>  	}
+>  };
 
+Thanks, David.  The builtin keys are now being loaded.
 
--- 
-Thanks,
+Mimi
 
-Steve
