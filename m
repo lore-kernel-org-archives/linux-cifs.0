@@ -1,143 +1,116 @@
-Return-Path: <SRS0=yfix=WS=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Weua=WT=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD30C3A5A1
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Aug 2019 22:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C49CC3A5A2
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Aug 2019 12:16:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1859021655
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Aug 2019 22:46:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T2Oi2D2+"
+	by mail.kernel.org (Postfix) with ESMTP id 77A5322CEC
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Aug 2019 12:16:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394173AbfHVWqX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Aug 2019 18:46:23 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:37869 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2394171AbfHVWqX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 22 Aug 2019 18:46:23 -0400
-Received: by mail-io1-f66.google.com with SMTP id q22so15593682iog.4
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Aug 2019 15:46:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=97giE2qTSf7Ll6aMfBGTim9Q2aKI/p1daYxAX6PB0Ho=;
-        b=T2Oi2D2+05kcdbN3eWZRIX31o/co5SQDSObCg1E23MCgscYzbj7nQzrEldQmMc6Eex
-         jTyBptkIXpS+7PEKsWmJNmDNDGlzJoYhN65ny4PFUOTFR1E9yDDgvLxrrSo2E8sv04ev
-         MqWKpPF289OZk0UkyColesuQDr8IZZnz/6L9Tglw8rzQSibtekXV4wND7bnLd6ywACJF
-         0se1vbZ5JEc1H1ex6aHcKGDMmz10gu8ixo4Ofs4lgLEh1AfrIxYZ8wuGfhzp0vMO4anw
-         KTQsfjtOd08hKn8eGK8D2ragYk7bnuH54smRyfUtkE/HFeggC+hxpdZ2h78apNJWyLaW
-         GM7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=97giE2qTSf7Ll6aMfBGTim9Q2aKI/p1daYxAX6PB0Ho=;
-        b=C1BjJ7C/ip55krE+Ge/TCIbGayv7pPtsbnUnppUbUK6Wz3WtUJ6Fl64g871sw+ZCzt
-         A6H0RS5TA6hNS2YXQpQhe84DT3bjg8mAwIZ7WhgeOKFpUtWGlY4pnSkIVglef+5LFagV
-         fOEgH449dqs8QVXK6caevWUWiMF2s3syjrVr6ik3SyHPoPCuK4/GUwFSRcMgVZ1w7O7g
-         pEdGgQRC/08oQmm6ZIchGXUoIb4iYTBqcNSk+eaBXXIXdoj9xMv3QWHsp0o7Wi3yqZxH
-         5pF+Rd1h1xhdH8Tk0VsH1LGNiBWtm/tMAvDeLc93RJwfeVb4KaaHXEUvxz3DzGbkv+2M
-         dP9Q==
-X-Gm-Message-State: APjAAAWlGYXv6E34GksuB5zGUxsO+Ykxw3BhndqYBl0FqOVETYVNdWdj
-        it0iAdufNo2w6hCnzy+JlJ4RJobC6LUXpzMWTgE=
-X-Google-Smtp-Source: APXvYqzAy8rYnCA0SY03jGDLg/XVp9sl7XDNG8Xfb4Yz/SgbLyJQbnw6FVOdVcAlXIxv7yXdN7DTr+JTFo7zUZzR7dc=
-X-Received: by 2002:a6b:5a12:: with SMTP id o18mr2688362iob.159.1566513982756;
- Thu, 22 Aug 2019 15:46:22 -0700 (PDT)
+        id S2391627AbfHWMQT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Aug 2019 08:16:19 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:45608 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2389773AbfHWMQS (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 23 Aug 2019 08:16:18 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 78ABB5F6FD15DD49C872;
+        Fri, 23 Aug 2019 20:16:08 +0800 (CST)
+Received: from localhost (10.133.213.239) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Fri, 23 Aug 2019
+ 20:15:58 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <sfrench@samba.org>
+CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+        <linux-kernel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] cifs: remove set but not used variables
+Date:   Fri, 23 Aug 2019 20:15:35 +0800
+Message-ID: <20190823121535.76296-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-References: <CAN05THT0OkbAoNu8ZVSHF-xY7w0ZW4q4i-jTxjNManrnz0OMfg@mail.gmail.com>
- <20190815174854.05661672@suse.de> <CAN05THThHLkSF=oVBezJQBsre7QoH6eS=SLbxo3Z=w8M+fa=RQ@mail.gmail.com>
- <CAN05THT3NF+eAd=H+gpmZQp0SWBQ0iFe32TT0VB5_rmibcN2Cw@mail.gmail.com>
- <20190819183151.15642e8f@suse.de> <20190820000348.440ee8ce@suse.de> <MWHPR2101MB07318FE687DAC9C78A54D1D3A0AB0@MWHPR2101MB0731.namprd21.prod.outlook.com>
-In-Reply-To: <MWHPR2101MB07318FE687DAC9C78A54D1D3A0AB0@MWHPR2101MB0731.namprd21.prod.outlook.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 23 Aug 2019 08:46:10 +1000
-Message-ID: <CAN05THSu=z4RoenzSYZjTUqBpz86DfLSKaoX==uwwPKsDyBO2w@mail.gmail.com>
-Subject: Re: FSCTL_QUERY_ALLOCATED_RANGES issue with Windows2016
-To:     Tom Talpey <ttalpey@microsoft.com>
-Cc:     David Disseldorp <ddiss@suse.de>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.133.213.239]
+X-CFilter-Loop: Reflected
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 3:47 AM Tom Talpey <ttalpey@microsoft.com> wrote:
->
-> > -----Original Message-----
-> > From: linux-cifs-owner@vger.kernel.org <linux-cifs-owner@vger.kernel.org> On
-> > Behalf Of David Disseldorp
-> > Sent: Monday, August 19, 2019 6:04 PM
-> > To: ronnie sahlberg <ronniesahlberg@gmail.com>
-> > Cc: linux-cifs <linux-cifs@vger.kernel.org>
-> > Subject: Re: FSCTL_QUERY_ALLOCATED_RANGES issue with Windows2016
-> >
-> > On Mon, 19 Aug 2019 18:31:51 +0200, David Disseldorp wrote:
-> >
-> > > Nothing stands out in the captures to me, but I'd be curious whether you
-> > > see any differences in behaviour if you set write-through on open or
-> > > explicitly FLUSH after the SET-SPARSE call.
-> >
-> > Hmm actually it looks like there's already a FLUSH shortly after the
-> > mtime update following the SetInfo(EOF). One thing that does look a
-> > little weird is the AllocationSize field before that FLUSH - in
-> > seek_bad.cap.gz it's 2M, whereas it's ~6M in seek_good.cap.gz.
->
-> Another oddity is that the FSCTL_SET_SPARSE comes *after* the 2MB
-> write. It seems entirely possible that filesystem may have decided to
-> allocate additional blocks during the write, in expectation of more
-> writes. Since the EOF pointer is still 2MB, I believe the filesystem may
-> be well within its rights there. In any event there may be a timing thing
-> going on, because it's doing immediately:
->
-> write 2MB
-> fsctl SET_SPARSE
-> setinfo EOF=4MB
-> compound open+mtime+close (why a new handle for setting mtime btw?)
+Fixes gcc '-Wunused-but-set-variable' warning:
 
-It is because internally in the kernel API setting this timestamps is
-a path based call.
-We could search for and see if there is a writeable open handle and
-use that IF there is such handle but it would be more code and
-complexity.
+fs/cifs/file.c: In function cifs_lock:
+fs/cifs/file.c:1696:24: warning: variable cinode set but not used [-Wunused-but-set-variable]
+fs/cifs/file.c: In function cifs_write:
+fs/cifs/file.c:1765:23: warning: variable cifs_sb set but not used [-Wunused-but-set-variable]
+fs/cifs/file.c: In function collect_uncached_read_data:
+fs/cifs/file.c:3578:20: warning: variable tcon set but not used [-Wunused-but-set-variable]
 
-It was just easier to make it into a compound. It should be cheap
-enough and have no ill effects.
+'cinode' is never used since introduced by
+commit 03776f4516bc ("CIFS: Simplify byte range locking code")
+'cifs_sb' is not used since commit cb7e9eabb2b5 ("CIFS: Use
+multicredits for SMB 2.1/3 writes").
+'tcon' is not used since commit d26e2903fc10 ("smb3: fix bytes_read statistics")
 
-> getinfo
-> flush
-> fsctl QUERY_ALLOCATED_RANGES
->
->
-> The NTFS developers were kind of skeptical of the approach of looking
-> at the block allocation counts to detect holes. The first example they
-> mentioned was a small file, like 400 bytes, for which the entire content
-> would fall into the MFT record. Such a file would show zero blocks
-> allocated, regardless of sparseness.
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ fs/cifs/file.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-Ok, fair enough.
-So if the filesystem has heuristics that can cause it to allocate
-extra blocks like that (not unreasonable)
-then it just means that these xfstests make assumptions about the
-filesystem that are just not guaranteed to be true
-when used with cifs.
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index ab07ae8..f16f6d2 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1693,7 +1693,6 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+ 	bool posix_lck = false;
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct cifs_tcon *tcon;
+-	struct cifsInodeInfo *cinode;
+ 	struct cifsFileInfo *cfile;
+ 	__u32 type;
+ 
+@@ -1710,7 +1709,6 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
+ 	cifs_read_flock(flock, &type, &lock, &unlock, &wait_flag,
+ 			tcon->ses->server);
+ 	cifs_sb = CIFS_FILE_SB(file);
+-	cinode = CIFS_I(file_inode(file));
+ 
+ 	if (cap_unix(tcon->ses) &&
+ 	    (CIFS_UNIX_FCNTL_CAP & le64_to_cpu(tcon->fsUnixInfo.Capability)) &&
+@@ -1762,7 +1760,6 @@ cifs_write(struct cifsFileInfo *open_file, __u32 pid, const char *write_data,
+ 	int rc = 0;
+ 	unsigned int bytes_written = 0;
+ 	unsigned int total_written;
+-	struct cifs_sb_info *cifs_sb;
+ 	struct cifs_tcon *tcon;
+ 	struct TCP_Server_Info *server;
+ 	unsigned int xid;
+@@ -1770,8 +1767,6 @@ cifs_write(struct cifsFileInfo *open_file, __u32 pid, const char *write_data,
+ 	struct cifsInodeInfo *cifsi = CIFS_I(d_inode(dentry));
+ 	struct cifs_io_parms io_parms;
+ 
+-	cifs_sb = CIFS_SB(dentry->d_sb);
+-
+ 	cifs_dbg(FYI, "write %zd bytes to offset %lld of %pd\n",
+ 		 write_size, *offset, dentry);
+ 
+@@ -3575,10 +3570,8 @@ collect_uncached_read_data(struct cifs_aio_ctx *ctx)
+ 	struct cifs_readdata *rdata, *tmp;
+ 	struct iov_iter *to = &ctx->iter;
+ 	struct cifs_sb_info *cifs_sb;
+-	struct cifs_tcon *tcon;
+ 	int rc;
+ 
+-	tcon = tlink_tcon(ctx->cfile->tlink);
+ 	cifs_sb = CIFS_SB(ctx->cfile->dentry->d_sb);
+ 
+ 	mutex_lock(&ctx->aio_mutex);
+-- 
+2.7.4
 
-That is fair enough. It just means there is no bug. It is just that
-the test tool is not compatible with ntfs.
-I can live with that. I do run it against btrfs and there I get the
-result to allow me to run this part of the test in
-the regression testsuite. That is good enough for me.
 
-Thanks
-Ronnie Sahlberg
-
->
-> Tom.
->
