@@ -2,147 +2,613 @@ Return-Path: <SRS0=RY9s=WW=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87353C3A59F
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Aug 2019 14:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F115C3A59F
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Aug 2019 23:30:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B4AC20679
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Aug 2019 14:55:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kQtT9FB5"
+	by mail.kernel.org (Postfix) with ESMTP id 519C3206B7
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Aug 2019 23:30:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732396AbfHZOz4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Aug 2019 10:55:56 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:46808 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731617AbfHZOz4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Aug 2019 10:55:56 -0400
-Received: by mail-io1-f67.google.com with SMTP id x4so37833736iog.13
-        for <linux-cifs@vger.kernel.org>; Mon, 26 Aug 2019 07:55:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fJMjRqfE6xl6N8fDlKv6iKb7xT5HXvz9BDOjyOZH+Eg=;
-        b=kQtT9FB5kswQKE43up/GMApCUscsyXPbjNxevRDV6hSa4lGVRywZpvJTZ9m1Hc4okN
-         QmUIwchyKzp8ZbyrXmsKacy39YeUevfvBcl/LaU3/Mih+mobVws00bM7B7C4rAD02Iif
-         Q2I2mpqQetzgdePVpZSBk66lU1+dxvCRbrN1iyepSTTy8Gapp74VSDiKxOrrn+ty7X1X
-         KKgYVXcCyH60a5JjAYAUCMDUCyDKeblhhDlrLCgsGJc0oMciFbhXN0mPPE2T3Vkgw2YR
-         Ochq/vs5OCnW5jlNDL7vJ7iFZNr3G7X9duPD+Fm6Q9MxoSSaEtBMgw9hJVqCU+FjWGO8
-         dyVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fJMjRqfE6xl6N8fDlKv6iKb7xT5HXvz9BDOjyOZH+Eg=;
-        b=mi3Mc4LUDRSrsSDVh2j1VaKNFpW3LlRspV0jNNL2DIyVZtzNi5bwlAbIrDZmL10mT4
-         Q9aXWs7yQj6YFAcNUppadh8AfkoH+dmbBbLVpBtvAO8JOS/pWAL6rbRWPAJLL7/7xk6p
-         duOtH3bTyVHRq9u1mtK0h5K+s9rMa7+sU0nB5gZRERfoX193h2Q2YzVS+FBU/6vYzjam
-         iNMMK5+pFZSDNesthckkUnbFJf9PBTp5we+Kw7r/M6fyb54teWFuM2bi9m+LRuPman7y
-         73ujKOHEuMBjcbitaQtaZYjdI7tyoQjF9ibxA7BXRGa/FJZGGbrF9mVCQBOD0ZpgYjif
-         wt8A==
-X-Gm-Message-State: APjAAAWlBCISdlukn8+pJhIxQYYfv99GVibicsgq5mStCD7PTM/0erwQ
-        NtRleSIJoYeQQtHBibOvvNGvkdMCnoDNdC2B/t/fNPLJAWo=
-X-Google-Smtp-Source: APXvYqzHBLHqVGIGKrsr/UvGi4olJ1v9OvwFwbHRQ7vZ6VYdBvPwpXHFWXH4zwIuU2+t87ejQviQlVTMttTz72J+9Gs=
-X-Received: by 2002:a02:b156:: with SMTP id s22mr4734670jah.132.1566831355573;
- Mon, 26 Aug 2019 07:55:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAE78Er-YVBzqaf8jCBio_V_1J2kRiWZ_SH-HnHm7KG3t46=j6w@mail.gmail.com>
-In-Reply-To: <CAE78Er-YVBzqaf8jCBio_V_1J2kRiWZ_SH-HnHm7KG3t46=j6w@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 26 Aug 2019 09:55:44 -0500
-Message-ID: <CAH2r5mu446ssSPrACP8q859Cs0ynUMpJopH0t5qAsR=sGrByFA@mail.gmail.com>
-Subject: Re: Frequent reconnections / session startups?
-To:     James Wettenhall <james.wettenhall@monash.edu>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726487AbfHZXaX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Aug 2019 19:30:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40720 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726278AbfHZXaX (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 26 Aug 2019 19:30:23 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BC23A10F23EF;
+        Mon, 26 Aug 2019 23:30:22 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-71.bne.redhat.com [10.64.54.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9225B608AB;
+        Mon, 26 Aug 2019 23:30:21 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: replace various strncpy with memcpy and similar
+Date:   Tue, 27 Aug 2019 09:30:14 +1000
+Message-Id: <20190826233014.11539-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.66]); Mon, 26 Aug 2019 23:30:22 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If you think that the disconnects are due to timeouts accessing files
-on offline storage you can also try mounting with the "hard" mount
-option.  The mount parm "echo_interval" can be also increased to make
-it less likely that we give up on an unresponsive server (it defaults
-to 60 seconds and can set to maximum of "echo_interval=600" ie 600
-seconds).
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/cifsproto.h |   1 +
+ fs/cifs/cifssmb.c   | 197 +++++++++++++++++-----------------------------------
+ fs/cifs/connect.c   |   7 +-
+ fs/cifs/dir.c       |   5 +-
+ fs/cifs/misc.c      |  22 ++++++
+ fs/cifs/sess.c      |  26 ++++---
+ 6 files changed, 112 insertions(+), 146 deletions(-)
 
-There were many fixes relating to crediting and reconnection that went
-in almost a year ago, but would not be in an older kernel like 4.15
-unless Ubuntu backported them.   Fortunately, Ubuntu makes it very
-easy to test if the fix is in a newer kernel by installing (as a test)
-a newer kernel on your client for doing an experiment like this (see
-https://wiki.ubuntu.com/Kernel/MainlineBuilds).
-
-If after installing a more recent mainline kernel as a quick test, if
-you don't see the reconnect problem, this would make it easier to ask
-Ubuntu to backport the various reconnect fixes marked for stable that
-went in late last year (or you could continue to use the more recent
-kernel).
-
-Also note that it is possible with dynamic tracing now in cifs.ko to
-do easier tracing of reconnect events (or all cifs events "trace-cmd
-record -e cifs") which can sometimes help narrow down the cause.
-Reconnect statistics are also updated in /proc/fs/cifs/Stats
-
-On Mon, Aug 26, 2019 at 1:57 AM James Wettenhall
-<james.wettenhall@monash.edu> wrote:
->
-> Hi,
->
-> We run a Django / Celery application which makes heavy use of CIFS
-> mounts.  We are experiencing frequent reconnections / session startups
-> and would like to understand how to avoid hammering the CIFS server
-> and/or the authentication server.  We've had multiple reports of
-> DoS-like hammering from server admins, causing frequent
-> re-authentication attempts and in one case causing core dumps on the
-> CIFS server.
->
-> Our CIFS client VMs have the following:
->
-> OS: Ubuntu 18.04.3
-> Kernel: 4.15.0-58-generic
-> mount.cifs: 6.8
->
-> Current mount options:
-> rw,relatime,vers=3.0,sec=ntlmssp,cache=strict,soft,nounix,serverino,mapposix,rsize=1048576,wsize=1048576,echo_interval=60,actimeo=1
->
-> We don't run the CIFS server, but we can request any information
-> required to diagnose the issue.
->
-> Over the past 10 hours, one of our virtual machine's kernel log has accumulated:
->
-> 8453 kern.log messages including "CIFS"
->
-> To break that down, we have:
->
-> 8305 "Free previous auth_key.response" messages
-> 111 "validate protocol negotiate failed: -11" messages
-> 26 "Close unmatched open" messages
-> 7 "has not responded in 120 seconds" messages
-> 4  "cifs_mount failed w/return code = -11" messages
->
-> The server is an HSM (Hierarchical Storage Management) system, so it
-> can be slow to respond if our application requests a file which is
-> only available on tape, not on disk.
->
-> The most common operation our application is performing on the
-> CIFS-mounted files is calculating MD5 checksums - with many Celery
-> worker processes running concurrently.
->
-> We would appreciate any advice on how to investigate further.
->
-> Thanks,
-> James
-
-
-
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index e23234207fc2..592a6cea2b79 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -579,6 +579,7 @@ extern void rqst_page_get_length(struct smb_rqst *rqst, unsigned int page,
+ 				unsigned int *len, unsigned int *offset);
+ 
+ void extract_unc_hostname(const char *unc, const char **h, size_t *len);
++int copy_path_name(char *dst, const char *src);
+ 
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ static inline int get_dfs_path(const unsigned int xid, struct cifs_ses *ses,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index e2f95965065d..3907653e63c7 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -942,10 +942,8 @@ CIFSPOSIXDelFile(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, nls_codepage, remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else { /* BB add path length overrun check */
+-		name_len = strnlen(fileName, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, fileName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, fileName);
+ 	}
+ 
+ 	params = 6 + name_len;
+@@ -1015,10 +1013,8 @@ CIFSSMBDelFile(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 					      remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {		/* BB improve check for buffer overruns BB */
+-		name_len = strnlen(name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->fileName, name, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->fileName, name);
+ 	}
+ 	pSMB->SearchAttributes =
+ 	    cpu_to_le16(ATTR_READONLY | ATTR_HIDDEN | ATTR_SYSTEM);
+@@ -1062,10 +1058,8 @@ CIFSSMBRmDir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 					      remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {		/* BB improve check for buffer overruns BB */
+-		name_len = strnlen(name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->DirName, name, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->DirName, name);
+ 	}
+ 
+ 	pSMB->BufferFormat = 0x04;
+@@ -1107,10 +1101,8 @@ CIFSSMBMkDir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ 					      remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {		/* BB improve check for buffer overruns BB */
+-		name_len = strnlen(name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->DirName, name, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->DirName, name);
+ 	}
+ 
+ 	pSMB->BufferFormat = 0x04;
+@@ -1157,10 +1149,8 @@ CIFSPOSIXCreate(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, nls_codepage, remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, name, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, name);
+ 	}
+ 
+ 	params = 6 + name_len;
+@@ -1324,11 +1314,9 @@ SMBLegacyOpen(const unsigned int xid, struct cifs_tcon *tcon,
+ 				      fileName, PATH_MAX, nls_codepage, remap);
+ 		name_len++;     /* trailing null */
+ 		name_len *= 2;
+-	} else {                /* BB improve check for buffer overruns BB */
++	} else {
+ 		count = 0;      /* no pad */
+-		name_len = strnlen(fileName, PATH_MAX);
+-		name_len++;     /* trailing null */
+-		strncpy(pSMB->fileName, fileName, name_len);
++		name_len = copy_path_name(pSMB->fileName, fileName);
+ 	}
+ 	if (*pOplock & REQ_OPLOCK)
+ 		pSMB->OpenFlags = cpu_to_le16(REQ_OPLOCK);
+@@ -1442,11 +1430,8 @@ CIFS_open(const unsigned int xid, struct cifs_open_parms *oparms, int *oplock,
+ 		/* BB improve check for buffer overruns BB */
+ 		/* no pad */
+ 		count = 0;
+-		name_len = strnlen(path, PATH_MAX);
+-		/* trailing null */
+-		name_len++;
++		name_len = copy_path_name(req->fileName, path);
+ 		req->NameLength = cpu_to_le16(name_len);
+-		strncpy(req->fileName, path, name_len);
+ 	}
+ 
+ 	if (*oplock & REQ_OPLOCK)
+@@ -2812,15 +2797,10 @@ CIFSSMBRename(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       remap);
+ 		name_len2 += 1 /* trailing null */  + 1 /* Signature word */ ;
+ 		name_len2 *= 2;	/* convert to bytes */
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(from_name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->OldFileName, from_name, name_len);
+-		name_len2 = strnlen(to_name, PATH_MAX);
+-		name_len2++;	/* trailing null */
++	} else {
++		name_len = copy_path_name(pSMB->OldFileName, from_name);
++		name_len2 = copy_path_name(pSMB->OldFileName+name_len+1, to_name);
+ 		pSMB->OldFileName[name_len] = 0x04;  /* 2nd buffer format */
+-		strncpy(&pSMB->OldFileName[name_len + 1], to_name, name_len2);
+-		name_len2++;	/* trailing null */
+ 		name_len2++;	/* signature byte */
+ 	}
+ 
+@@ -2962,15 +2942,10 @@ CIFSSMBCopy(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       toName, PATH_MAX, nls_codepage, remap);
+ 		name_len2 += 1 /* trailing null */  + 1 /* Signature word */ ;
+ 		name_len2 *= 2; /* convert to bytes */
+-	} else { 	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(fromName, PATH_MAX);
+-		name_len++;     /* trailing null */
+-		strncpy(pSMB->OldFileName, fromName, name_len);
+-		name_len2 = strnlen(toName, PATH_MAX);
+-		name_len2++;    /* trailing null */
++	} else {
++		name_len = copy_path_name(pSMB->OldFileName, fromName);
+ 		pSMB->OldFileName[name_len] = 0x04;  /* 2nd buffer format */
+-		strncpy(&pSMB->OldFileName[name_len + 1], toName, name_len2);
+-		name_len2++;    /* trailing null */
++		name_len2 = copy_path_name(pSMB->OldFileName+name_len+1, toName);
+ 		name_len2++;    /* signature byte */
+ 	}
+ 
+@@ -3021,10 +2996,8 @@ CIFSUnixCreateSymLink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+ 
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(fromName, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, fromName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, fromName);
+ 	}
+ 	params = 6 + name_len;
+ 	pSMB->MaxSetupCount = 0;
+@@ -3044,10 +3017,8 @@ CIFSUnixCreateSymLink(const unsigned int xid, struct cifs_tcon *tcon,
+ 					PATH_MAX, nls_codepage, remap);
+ 		name_len_target++;	/* trailing null */
+ 		name_len_target *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len_target = strnlen(toName, PATH_MAX);
+-		name_len_target++;	/* trailing null */
+-		strncpy(data_offset, toName, name_len_target);
++	} else {
++		name_len_target = copy_path_name(data_offset, toName);
+ 	}
+ 
+ 	pSMB->MaxParameterCount = cpu_to_le16(2);
+@@ -3109,10 +3080,8 @@ CIFSUnixCreateHardLink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+ 
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(toName, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, toName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, toName);
+ 	}
+ 	params = 6 + name_len;
+ 	pSMB->MaxSetupCount = 0;
+@@ -3131,10 +3100,8 @@ CIFSUnixCreateHardLink(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, nls_codepage, remap);
+ 		name_len_target++;	/* trailing null */
+ 		name_len_target *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len_target = strnlen(fromName, PATH_MAX);
+-		name_len_target++;	/* trailing null */
+-		strncpy(data_offset, fromName, name_len_target);
++	} else {
++		name_len_target = copy_path_name(data_offset, fromName);
+ 	}
+ 
+ 	pSMB->MaxParameterCount = cpu_to_le16(2);
+@@ -3213,15 +3180,10 @@ CIFSCreateHardLink(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       remap);
+ 		name_len2 += 1 /* trailing null */  + 1 /* Signature word */ ;
+ 		name_len2 *= 2;	/* convert to bytes */
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(from_name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->OldFileName, from_name, name_len);
+-		name_len2 = strnlen(to_name, PATH_MAX);
+-		name_len2++;	/* trailing null */
++	} else {
++		name_len = copy_path_name(pSMB->OldFileName, from_name);
+ 		pSMB->OldFileName[name_len] = 0x04;	/* 2nd buffer format */
+-		strncpy(&pSMB->OldFileName[name_len + 1], to_name, name_len2);
+-		name_len2++;	/* trailing null */
++		name_len2 = copy_path_name(pSMB->OldFileName+name_len+1, to_name);
+ 		name_len2++;	/* signature byte */
+ 	}
+ 
+@@ -3271,10 +3233,8 @@ CIFSSMBUnixQuerySymLink(const unsigned int xid, struct cifs_tcon *tcon,
+ 					   remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(searchName, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, searchName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, searchName);
+ 	}
+ 
+ 	params = 2 /* level */  + 4 /* rsrvd */  + name_len /* incl null */ ;
+@@ -3691,10 +3651,8 @@ CIFSSMBGetPosixACL(const unsigned int xid, struct cifs_tcon *tcon,
+ 		name_len *= 2;
+ 		pSMB->FileName[name_len] = 0;
+ 		pSMB->FileName[name_len+1] = 0;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(searchName, PATH_MAX);
+-		name_len++;     /* trailing null */
+-		strncpy(pSMB->FileName, searchName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, searchName);
+ 	}
+ 
+ 	params = 2 /* level */  + 4 /* rsrvd */  + name_len /* incl null */ ;
+@@ -3776,10 +3734,8 @@ CIFSSMBSetPosixACL(const unsigned int xid, struct cifs_tcon *tcon,
+ 					   PATH_MAX, nls_codepage, remap);
+ 		name_len++;     /* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(fileName, PATH_MAX);
+-		name_len++;     /* trailing null */
+-		strncpy(pSMB->FileName, fileName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, fileName);
+ 	}
+ 	params = 6 + name_len;
+ 	pSMB->MaxParameterCount = cpu_to_le16(2);
+@@ -4184,9 +4140,7 @@ SMBQueryInformation(const unsigned int xid, struct cifs_tcon *tcon,
+ 		name_len++;     /* trailing null */
+ 		name_len *= 2;
+ 	} else {
+-		name_len = strnlen(search_name, PATH_MAX);
+-		name_len++;     /* trailing null */
+-		strncpy(pSMB->FileName, search_name, name_len);
++		name_len = copy_path_name(pSMB->FileName, search_name);
+ 	}
+ 	pSMB->BufferFormat = 0x04;
+ 	name_len++; /* account for buffer type byte */
+@@ -4321,10 +4275,8 @@ CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, nls_codepage, remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(search_name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, search_name, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, search_name);
+ 	}
+ 
+ 	params = 2 /* level */ + 4 /* reserved */ + name_len /* includes NUL */;
+@@ -4490,10 +4442,8 @@ CIFSSMBUnixQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, nls_codepage, remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(searchName, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, searchName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, searchName);
+ 	}
+ 
+ 	params = 2 /* level */ + 4 /* reserved */ + name_len /* includes NUL */;
+@@ -4593,17 +4543,16 @@ CIFSFindFirst(const unsigned int xid, struct cifs_tcon *tcon,
+ 			pSMB->FileName[name_len+1] = 0;
+ 			name_len += 2;
+ 		}
+-	} else {	/* BB add check for overrun of SMB buf BB */
+-		name_len = strnlen(searchName, PATH_MAX);
+-/* BB fix here and in unicode clause above ie
+-		if (name_len > buffersize-header)
+-			free buffer exit; BB */
+-		strncpy(pSMB->FileName, searchName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, searchName);
+ 		if (msearch) {
+-			pSMB->FileName[name_len] = CIFS_DIR_SEP(cifs_sb);
+-			pSMB->FileName[name_len+1] = '*';
+-			pSMB->FileName[name_len+2] = 0;
+-			name_len += 3;
++			if (WARN_ON_ONCE(name_len > PATH_MAX-2))
++				name_len = PATH_MAX-2;
++			/* overwrite nul byte */
++			pSMB->FileName[name_len-1] = CIFS_DIR_SEP(cifs_sb);
++			pSMB->FileName[name_len] = '*';
++			pSMB->FileName[name_len+1] = 0;
++			name_len += 2;
+ 		}
+ 	}
+ 
+@@ -4898,10 +4847,8 @@ CIFSGetSrvInodeNumber(const unsigned int xid, struct cifs_tcon *tcon,
+ 					   remap);
+ 		name_len++;     /* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(search_name, PATH_MAX);
+-		name_len++;     /* trailing null */
+-		strncpy(pSMB->FileName, search_name, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, search_name);
+ 	}
+ 
+ 	params = 2 /* level */  + 4 /* rsrvd */  + name_len /* incl null */ ;
+@@ -5008,9 +4955,7 @@ CIFSGetDFSRefer(const unsigned int xid, struct cifs_ses *ses,
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+ 	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(search_name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->RequestFileName, search_name, name_len);
++		name_len = copy_path_name(pSMB->RequestFileName, search_name);
+ 	}
+ 
+ 	if (ses->server->sign)
+@@ -5663,10 +5608,8 @@ CIFSSMBSetEOF(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, cifs_sb->local_nls, remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(file_name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, file_name, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, file_name);
+ 	}
+ 	params = 6 + name_len;
+ 	data_count = sizeof(struct file_end_of_file_info);
+@@ -5959,10 +5902,8 @@ CIFSSMBSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, nls_codepage, remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(fileName, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, fileName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, fileName);
+ 	}
+ 
+ 	params = 6 + name_len;
+@@ -6040,10 +5981,8 @@ CIFSSMBSetAttrLegacy(unsigned int xid, struct cifs_tcon *tcon, char *fileName,
+ 				       PATH_MAX, nls_codepage);
+ 		name_len++;     /* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(fileName, PATH_MAX);
+-		name_len++;     /* trailing null */
+-		strncpy(pSMB->fileName, fileName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->fileName, fileName);
+ 	}
+ 	pSMB->attr = cpu_to_le16(dos_attrs);
+ 	pSMB->BufferFormat = 0x04;
+@@ -6203,10 +6142,8 @@ CIFSSMBUnixSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, nls_codepage, remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(file_name, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, file_name, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, file_name);
+ 	}
+ 
+ 	params = 6 + name_len;
+@@ -6298,10 +6235,8 @@ CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, nls_codepage, remap);
+ 		list_len++;	/* trailing null */
+ 		list_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		list_len = strnlen(searchName, PATH_MAX);
+-		list_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, searchName, list_len);
++	} else {
++		list_len = copy_path_name(pSMB->FileName, searchName);
+ 	}
+ 
+ 	params = 2 /* level */ + 4 /* reserved */ + list_len /* includes NUL */;
+@@ -6480,10 +6415,8 @@ CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
+ 				       PATH_MAX, nls_codepage, remap);
+ 		name_len++;	/* trailing null */
+ 		name_len *= 2;
+-	} else {	/* BB improve the check for buffer overruns BB */
+-		name_len = strnlen(fileName, PATH_MAX);
+-		name_len++;	/* trailing null */
+-		strncpy(pSMB->FileName, fileName, name_len);
++	} else {
++		name_len = copy_path_name(pSMB->FileName, fileName);
+ 	}
+ 
+ 	params = 6 + name_len;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 6f5c3ef327bd..1ed449f4a8ec 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -4231,16 +4231,19 @@ build_unc_path_to_root(const struct smb_vol *vol,
+ 		strlen(vol->prepath) + 1 : 0;
+ 	unsigned int unc_len = strnlen(vol->UNC, MAX_TREE_SIZE + 1);
+ 
++	if (unc_len > MAX_TREE_SIZE)
++		return -EINVAL;
++
+ 	full_path = kmalloc(unc_len + pplen + 1, GFP_KERNEL);
+ 	if (full_path == NULL)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	strncpy(full_path, vol->UNC, unc_len);
++	memcpy(full_path, vol->UNC, unc_len);
+ 	pos = full_path + unc_len;
+ 
+ 	if (pplen) {
+ 		*pos = CIFS_DIR_SEP(cifs_sb);
+-		strncpy(pos + 1, vol->prepath, pplen);
++		memcpy(pos + 1, vol->prepath, pplen);
+ 		pos += pplen;
+ 	}
+ 
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index f26a48dd2e39..be424e81e3ad 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -69,11 +69,10 @@ cifs_build_path_to_root(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
+ 		return full_path;
+ 
+ 	if (dfsplen)
+-		strncpy(full_path, tcon->treeName, dfsplen);
++		memcpy(full_path, tcon->treeName, dfsplen);
+ 	full_path[dfsplen] = CIFS_DIR_SEP(cifs_sb);
+-	strncpy(full_path + dfsplen + 1, vol->prepath, pplen);
++	memcpy(full_path + dfsplen + 1, vol->prepath, pplen);
+ 	convert_delimiter(full_path, CIFS_DIR_SEP(cifs_sb));
+-	full_path[dfsplen + pplen] = 0; /* add trailing null */
+ 	return full_path;
+ }
+ 
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index f383877a6511..5ad83bdb9bea 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1011,3 +1011,25 @@ void extract_unc_hostname(const char *unc, const char **h, size_t *len)
+ 	*h = unc;
+ 	*len = end - unc;
+ }
++
++/**
++ * copy_path_name - copy src path to dst, possibly truncating
++ *
++ * returns number of bytes written (including trailing nul)
++ */
++int copy_path_name(char *dst, const char *src)
++{
++	int name_len;
++
++	/*
++	 * PATH_MAX includes nul, so if strlen(src) >= PATH_MAX it
++	 * will truncate and strlen(dst) will be PATH_MAX-1
++	 */
++	name_len = strscpy(dst, src, PATH_MAX);
++	if (WARN_ON_ONCE(name_len < 0))
++		name_len = PATH_MAX-1;
++
++	/* we count the trailing nul */
++	name_len++;
++	return name_len;
++}
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index dcd49ad60c83..4c764ff7edd2 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -159,13 +159,16 @@ static void ascii_ssetup_strings(char **pbcc_area, struct cifs_ses *ses,
+ 				 const struct nls_table *nls_cp)
+ {
+ 	char *bcc_ptr = *pbcc_area;
++	int len;
+ 
+ 	/* copy user */
+ 	/* BB what about null user mounts - check that we do this BB */
+ 	/* copy user */
+ 	if (ses->user_name != NULL) {
+-		strncpy(bcc_ptr, ses->user_name, CIFS_MAX_USERNAME_LEN);
+-		bcc_ptr += strnlen(ses->user_name, CIFS_MAX_USERNAME_LEN);
++		len = strscpy(bcc_ptr, ses->user_name, CIFS_MAX_USERNAME_LEN);
++		if (WARN_ON_ONCE(len < 0))
++			len = CIFS_MAX_USERNAME_LEN - 1;
++		bcc_ptr += len;
+ 	}
+ 	/* else null user mount */
+ 	*bcc_ptr = 0;
+@@ -173,8 +176,10 @@ static void ascii_ssetup_strings(char **pbcc_area, struct cifs_ses *ses,
+ 
+ 	/* copy domain */
+ 	if (ses->domainName != NULL) {
+-		strncpy(bcc_ptr, ses->domainName, CIFS_MAX_DOMAINNAME_LEN);
+-		bcc_ptr += strnlen(ses->domainName, CIFS_MAX_DOMAINNAME_LEN);
++		len = strscpy(bcc_ptr, ses->domainName, CIFS_MAX_DOMAINNAME_LEN);
++		if (WARN_ON_ONCE(len < 0))
++			len = CIFS_MAX_DOMAINNAME_LEN - 1;
++		bcc_ptr += len;
+ 	} /* else we will send a null domain name
+ 	     so the server will default to its own domain */
+ 	*bcc_ptr = 0;
+@@ -242,9 +247,10 @@ static void decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
+ 
+ 	kfree(ses->serverOS);
+ 
+-	ses->serverOS = kzalloc(len + 1, GFP_KERNEL);
++	ses->serverOS = kmalloc(len + 1, GFP_KERNEL);
+ 	if (ses->serverOS) {
+-		strncpy(ses->serverOS, bcc_ptr, len);
++		memcpy(ses->serverOS, bcc_ptr, len);
++		ses->serverOS[len] = 0;
+ 		if (strncmp(ses->serverOS, "OS/2", 4) == 0)
+ 			cifs_dbg(FYI, "OS/2 server\n");
+ 	}
+@@ -258,9 +264,11 @@ static void decode_ascii_ssetup(char **pbcc_area, __u16 bleft,
+ 
+ 	kfree(ses->serverNOS);
+ 
+-	ses->serverNOS = kzalloc(len + 1, GFP_KERNEL);
+-	if (ses->serverNOS)
+-		strncpy(ses->serverNOS, bcc_ptr, len);
++	ses->serverNOS = kmalloc(len + 1, GFP_KERNEL);
++	if (ses->serverNOS) {
++		memcpy(ses->serverNOS, bcc_ptr, len);
++		ses->serverNOS[len] = 0;
++	}
+ 
+ 	bcc_ptr += len + 1;
+ 	bleft -= len + 1;
 -- 
-Thanks,
+2.13.6
 
-Steve
