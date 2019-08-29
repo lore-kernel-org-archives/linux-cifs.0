@@ -2,106 +2,375 @@ Return-Path: <SRS0=gUrR=WZ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 406F8C3A59F
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Aug 2019 05:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88CB7C3A59F
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Aug 2019 05:54:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0660C22CF5
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Aug 2019 05:02:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HGUOE0/G"
+	by mail.kernel.org (Postfix) with ESMTP id 4DA5E2339E
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Aug 2019 05:54:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725837AbfH2FCl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Aug 2019 01:02:41 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:35419 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725821AbfH2FCl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Aug 2019 01:02:41 -0400
-Received: by mail-pl1-f195.google.com with SMTP id gn20so1014312plb.2;
-        Wed, 28 Aug 2019 22:02:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=LgMi/tOCGdx9z9EgjX0DOVGstnnLhYUUExXCPTNrvk4=;
-        b=HGUOE0/GrUyV2OTY2CITe3OSYyiH1ZaPEVlYKIDE6D3wUi4KNgXz2F3Nw1NPJQvuQY
-         4q0hLcS6BC46Ir4eIlxdKcYm7KyFAIivvMpj+HTTjqwCNiKCrCdjcuICwnfZsUujsQEi
-         WvC5l3hqCtW/udICeHHBV1BnYq30TNVsRU14MTPKf1sUA9Ntw4ycWulsHVnyjj9ifCLI
-         yMPwWCnJrEx1ATI7rb75NRu0PGxbI0p46fNrYW73tEzdOcm96sd5vatezLa1lDGNDg+m
-         RqePAZfocxBvODzP9EvUraPX4W/GFY0k2GwTzUYFExEO511lgm6je1sK5cu9yDDP7dRM
-         74ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=LgMi/tOCGdx9z9EgjX0DOVGstnnLhYUUExXCPTNrvk4=;
-        b=jFblr3vrJ1ZSkVTTsAv6U9Xg6BGeoq/SkJObooCOuTa4TMmriN87rXimQu/pgtObu0
-         ToLYrY4FhjKgN6Tb/7gO9dh7eHA0n0rmlXpBZNeQayrrIZGfrk/t3+jQ1wj6ngRC2qrY
-         iC3hPVpTddYAG3g06Crc6BVwVLRLO9l0xVaXIz95RoNGsC+v+9BOqAOKM60IyuA0CA1m
-         xV3ZEv7der4rpKt8iAneic/ELNWXjx3zeYA31CI7Tjjan15VgvMYWKnItbSzV3wlOhYt
-         zibKB7UEwRYG8U2w/Of+aICWZ3bsITAUsH9B4VxynqM/yvFNgE64nYktKeywydrqCNVX
-         lSSg==
-X-Gm-Message-State: APjAAAXkw6/g2AdqzBvqFdi9o6YSkZr8JEhmwh77onO+en5GUCVfSb0T
-        /iDJy40tVtox7uip/1uqWmI=
-X-Google-Smtp-Source: APXvYqy2pYPQdzCT1BPAq+ZAXzjpkv7FaF1klfsNhhpKdjsKim7tOECfA/6XxqQTcmXrjMzD4/wGQg==
-X-Received: by 2002:a17:902:ff0c:: with SMTP id f12mr1164440plj.67.1567054960830;
-        Wed, 28 Aug 2019 22:02:40 -0700 (PDT)
-Received: from localhost ([39.7.51.95])
-        by smtp.gmail.com with ESMTPSA id s7sm1635703pfb.138.2019.08.28.22.02.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2019 22:02:40 -0700 (PDT)
-Date:   Thu, 29 Aug 2019 14:02:37 +0900
-From:   Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-To:     Steve French <stfrench@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: build_path_from_dentry_optional_prefix() may schedule from invalid
- context
-Message-ID: <20190829050237.GA5161@jagdpanzerIV>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.12.1 (2019-06-15)
+        id S1725853AbfH2Fyy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Aug 2019 01:54:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57652 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725823AbfH2Fyy (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 29 Aug 2019 01:54:54 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B9CA418C891C;
+        Thu, 29 Aug 2019 05:54:53 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-71.bne.redhat.com [10.64.54.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E31A56092D;
+        Thu, 29 Aug 2019 05:54:52 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: create a helper to find a writeable handle by path name
+Date:   Thu, 29 Aug 2019 15:54:46 +1000
+Message-Id: <20190829055446.11167-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Thu, 29 Aug 2019 05:54:53 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello,
+rename() takes a path for old_file and in SMB2 we used to just create
+a compound for create(old_path)/rename/close().
+If we already have a writable handle we can avoid the create() and close()
+altogether and just use the existing handle.
 
-Looking at commit "cifs: create a helper to find a writeable handle
-by path name":
+For this situation, as we avoid doing the create()
+we also avoid triggering an oplock break for the existing handle.
 
-->open_file_lock scope is atomic context, while build_path_from_dentry()
-can schedule - kmalloc(GFP_KERNEL)
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/cifsproto.h |  2 ++
+ fs/cifs/connect.c   |  2 +-
+ fs/cifs/dir.c       |  2 +-
+ fs/cifs/file.c      | 35 ++++++++++++++++++++
+ fs/cifs/smb2inode.c | 94 ++++++++++++++++++++++++++++++++++++++---------------
+ 5 files changed, 107 insertions(+), 28 deletions(-)
 
-       spin_lock(&tcon->open_file_lock);
-       list_for_each(tmp, &tcon->openFileList) {
-               cfile = list_entry(tmp, struct cifsFileInfo,
-                            tlist);
-               full_path = build_path_from_dentry(cfile->dentry);
-               if (full_path == NULL) {
-                       spin_unlock(&tcon->open_file_lock);
-                       return -ENOMEM;
-               }
-               if (strcmp(full_path, name)) {
-                       kfree(full_path);
-                       continue;
-               }
-               kfree(full_path);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 592a6cea2b79..be206744407c 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -137,6 +137,8 @@ extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *, bool);
+ extern int cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
+ 				  bool fsuid_only,
+ 				  struct cifsFileInfo **ret_file);
++extern int cifs_get_writable_path(struct cifs_tcon *tcon, const char *name,
++				  struct cifsFileInfo **ret_file);
+ extern struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *, bool);
+ extern unsigned int smbCalcSize(void *buf, struct TCP_Server_Info *server);
+ extern int decode_negTokenInit(unsigned char *security_blob, int length,
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 1ed449f4a8ec..c5dc8265b671 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -4232,7 +4232,7 @@ build_unc_path_to_root(const struct smb_vol *vol,
+ 	unsigned int unc_len = strnlen(vol->UNC, MAX_TREE_SIZE + 1);
+ 
+ 	if (unc_len > MAX_TREE_SIZE)
+-		return -EINVAL;
++		return ERR_PTR(-EINVAL);
+ 
+ 	full_path = kmalloc(unc_len + pplen + 1, GFP_KERNEL);
+ 	if (full_path == NULL)
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index be424e81e3ad..dd5ac841aefa 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -125,7 +125,7 @@ build_path_from_dentry_optional_prefix(struct dentry *direntry, bool prefix)
+ 	}
+ 	rcu_read_unlock();
+ 
+-	full_path = kmalloc(namelen+1, GFP_KERNEL);
++	full_path = kmalloc(namelen+1, GFP_ATOMIC);
+ 	if (full_path == NULL)
+ 		return full_path;
+ 	full_path[namelen] = 0;	/* trailing null */
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 97090693d182..885740496dae 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1980,6 +1980,41 @@ find_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only)
+ 	return cfile;
+ }
+ 
++int
++cifs_get_writable_path(struct cifs_tcon *tcon, const char *name,
++		       struct cifsFileInfo **ret_file)
++{
++	struct list_head *tmp;
++	struct cifsFileInfo *cfile;
++	struct cifsInodeInfo *cinode;
++	char *full_path;
++
++	*ret_file = NULL;
++
++	spin_lock(&tcon->open_file_lock);
++	list_for_each(tmp, &tcon->openFileList) {
++		cfile = list_entry(tmp, struct cifsFileInfo,
++			     tlist);
++		full_path = build_path_from_dentry(cfile->dentry);
++		if (full_path == NULL) {
++			spin_unlock(&tcon->open_file_lock);
++			return -ENOMEM;
++		}
++		if (strcmp(full_path, name)) {
++			kfree(full_path);
++			continue;
++		}
++
++		kfree(full_path);
++		cinode = CIFS_I(d_inode(cfile->dentry));
++		spin_unlock(&tcon->open_file_lock);
++		return cifs_get_writable_file(cinode, 0, ret_file);
++	}
++
++	spin_unlock(&tcon->open_file_lock);
++	return -ENOENT;
++}
++
+ static int cifs_partialpagewrite(struct page *page, unsigned from, unsigned to)
+ {
+ 	struct address_space *mapping = page->mapping;
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index d8d9cdfa30b6..939fc7b2234c 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -51,7 +51,8 @@ static int
+ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		 struct cifs_sb_info *cifs_sb, const char *full_path,
+ 		 __u32 desired_access, __u32 create_disposition,
+-		 __u32 create_options, void *ptr, int command)
++		 __u32 create_options, void *ptr, int command,
++		 struct cifsFileInfo *cfile)
+ {
+ 	int rc;
+ 	__le16 *utf16_path = NULL;
+@@ -83,10 +84,16 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 	resp_buftype[0] = resp_buftype[1] = resp_buftype[2] = CIFS_NO_BUFFER;
+ 	memset(rsp_iov, 0, sizeof(rsp_iov));
+ 
++	/* We already have a handle so we can skip the open */
++	if (cfile)
++		goto after_open;
++
+ 	/* Open */
+ 	utf16_path = cifs_convert_path_to_utf16(full_path, cifs_sb);
+-	if (!utf16_path)
+-		return -ENOMEM;
++	if (!utf16_path) {
++		rc = -ENOMEM;
++		goto finished;
++	}
+ 
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = desired_access;
+@@ -106,7 +113,10 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (rc)
+ 		goto finished;
+ 
+-	smb2_set_next_command(tcon, &rqst[num_rqst++]);
++	smb2_set_next_command(tcon, &rqst[num_rqst]);
++ after_open:
++	num_rqst++;
++	rc = 0;
+ 
+ 	/* Operation */
+ 	switch (command) {
+@@ -210,14 +220,23 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		size[1] = len + 2 /* null */;
+ 		data[1] = (__le16 *)ptr;
+ 
+-		rc = SMB2_set_info_init(tcon, &rqst[num_rqst], COMPOUND_FID,
+-					COMPOUND_FID, current->tgid,
+-					FILE_RENAME_INFORMATION,
++		if (cfile)
++			rc = SMB2_set_info_init(tcon, &rqst[num_rqst],
++						cfile->fid.persistent_fid,
++						cfile->fid.volatile_fid,
++					current->tgid, FILE_RENAME_INFORMATION,
++					SMB2_O_INFO_FILE, 0, data, size);
++		else {
++			rc = SMB2_set_info_init(tcon, &rqst[num_rqst],
++					COMPOUND_FID, COMPOUND_FID,
++					current->tgid, FILE_RENAME_INFORMATION,
+ 					SMB2_O_INFO_FILE, 0, data, size);
++			smb2_set_next_command(tcon, &rqst[num_rqst]);
++			smb2_set_related(&rqst[num_rqst]);
++		}
+ 		if (rc)
+ 			goto finished;
+-		smb2_set_next_command(tcon, &rqst[num_rqst]);
+-		smb2_set_related(&rqst[num_rqst++]);
++		num_rqst++;
+ 		trace_smb3_rename_enter(xid, ses->Suid, tcon->tid, full_path);
+ 		break;
+ 	case SMB2_OP_HARDLINK:
+@@ -254,20 +273,36 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (rc)
+ 		goto finished;
+ 
++	/* We already have a handle so we can skip the close */
++	if (cfile)
++		goto after_close;
+ 	/* Close */
+ 	memset(&close_iov, 0, sizeof(close_iov));
+ 	rqst[num_rqst].rq_iov = close_iov;
+ 	rqst[num_rqst].rq_nvec = 1;
+ 	rc = SMB2_close_init(tcon, &rqst[num_rqst], COMPOUND_FID,
+ 			     COMPOUND_FID);
+-	smb2_set_related(&rqst[num_rqst++]);
++	smb2_set_related(&rqst[num_rqst]);
+ 	if (rc)
+ 		goto finished;
+-
+-	rc = compound_send_recv(xid, ses, flags, num_rqst, rqst,
+-				resp_buftype, rsp_iov);
++ after_close:
++	num_rqst++;
++
++	if (cfile) {
++		cifsFileInfo_put(cfile);
++		cfile = NULL;
++		rc = compound_send_recv(xid, ses, flags, num_rqst - 2,
++					&rqst[1], &resp_buftype[1],
++					&rsp_iov[1]);
++	} else
++		rc = compound_send_recv(xid, ses, flags, num_rqst,
++					rqst, resp_buftype,
++					rsp_iov);
+ 
+  finished:
++	if (cfile)
++		cifsFileInfo_put(cfile);
++
+ 	SMB2_open_free(&rqst[0]);
+ 	switch (command) {
+ 	case SMB2_OP_QUERY_INFO:
+@@ -404,7 +439,7 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
+ 			      FILE_READ_ATTRIBUTES, FILE_OPEN, create_options,
+-			      smb2_data, SMB2_OP_QUERY_INFO);
++			      smb2_data, SMB2_OP_QUERY_INFO, NULL);
+ 	if (rc == -EOPNOTSUPP) {
+ 		*symlink = true;
+ 		create_options |= OPEN_REPARSE_POINT;
+@@ -413,7 +448,7 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
+ 				      FILE_READ_ATTRIBUTES, FILE_OPEN,
+ 				      create_options, smb2_data,
+-				      SMB2_OP_QUERY_INFO);
++				      SMB2_OP_QUERY_INFO, NULL);
+ 	}
+ 	if (rc)
+ 		goto out;
+@@ -430,7 +465,7 @@ smb2_mkdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ {
+ 	return smb2_compound_op(xid, tcon, cifs_sb, name,
+ 				FILE_WRITE_ATTRIBUTES, FILE_CREATE,
+-				CREATE_NOT_FILE, NULL, SMB2_OP_MKDIR);
++				CREATE_NOT_FILE, NULL, SMB2_OP_MKDIR, NULL);
+ }
+ 
+ void
+@@ -449,7 +484,8 @@ smb2_mkdir_setinfo(struct inode *inode, const char *name,
+ 	data.Attributes = cpu_to_le32(dosattrs);
+ 	tmprc = smb2_compound_op(xid, tcon, cifs_sb, name,
+ 				 FILE_WRITE_ATTRIBUTES, FILE_CREATE,
+-				 CREATE_NOT_FILE, &data, SMB2_OP_SET_INFO);
++				 CREATE_NOT_FILE, &data, SMB2_OP_SET_INFO,
++				 NULL);
+ 	if (tmprc == 0)
+ 		cifs_i->cifsAttrs = dosattrs;
+ }
+@@ -460,7 +496,7 @@ smb2_rmdir(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ {
+ 	return smb2_compound_op(xid, tcon, cifs_sb, name, DELETE, FILE_OPEN,
+ 				CREATE_NOT_FILE,
+-				NULL, SMB2_OP_RMDIR);
++				NULL, SMB2_OP_RMDIR, NULL);
+ }
+ 
+ int
+@@ -469,13 +505,14 @@ smb2_unlink(const unsigned int xid, struct cifs_tcon *tcon, const char *name,
+ {
+ 	return smb2_compound_op(xid, tcon, cifs_sb, name, DELETE, FILE_OPEN,
+ 				CREATE_DELETE_ON_CLOSE | OPEN_REPARSE_POINT,
+-				NULL, SMB2_OP_DELETE);
++				NULL, SMB2_OP_DELETE, NULL);
+ }
+ 
+ static int
+ smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *tcon,
+ 		   const char *from_name, const char *to_name,
+-		   struct cifs_sb_info *cifs_sb, __u32 access, int command)
++		   struct cifs_sb_info *cifs_sb, __u32 access, int command,
++		   struct cifsFileInfo *cfile)
+ {
+ 	__le16 *smb2_to_name = NULL;
+ 	int rc;
+@@ -486,7 +523,7 @@ smb2_set_path_attr(const unsigned int xid, struct cifs_tcon *tcon,
+ 		goto smb2_rename_path;
+ 	}
+ 	rc = smb2_compound_op(xid, tcon, cifs_sb, from_name, access,
+-			      FILE_OPEN, 0, smb2_to_name, command);
++			      FILE_OPEN, 0, smb2_to_name, command, cfile);
+ smb2_rename_path:
+ 	kfree(smb2_to_name);
+ 	return rc;
+@@ -497,8 +534,12 @@ smb2_rename_path(const unsigned int xid, struct cifs_tcon *tcon,
+ 		 const char *from_name, const char *to_name,
+ 		 struct cifs_sb_info *cifs_sb)
+ {
+-	return smb2_set_path_attr(xid, tcon, from_name, to_name, cifs_sb,
+-				  DELETE, SMB2_OP_RENAME);
++	struct cifsFileInfo *cfile;
++
++	cifs_get_writable_path(tcon, from_name, &cfile);
++
++	return smb2_set_path_attr(xid, tcon, from_name, to_name,
++				  cifs_sb, DELETE, SMB2_OP_RENAME, cfile);
+ }
+ 
+ int
+@@ -507,7 +548,8 @@ smb2_create_hardlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     struct cifs_sb_info *cifs_sb)
+ {
+ 	return smb2_set_path_attr(xid, tcon, from_name, to_name, cifs_sb,
+-				  FILE_READ_ATTRIBUTES, SMB2_OP_HARDLINK);
++				  FILE_READ_ATTRIBUTES, SMB2_OP_HARDLINK,
++				  NULL);
+ }
+ 
+ int
+@@ -519,7 +561,7 @@ smb2_set_path_size(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	return smb2_compound_op(xid, tcon, cifs_sb, full_path,
+ 				FILE_WRITE_DATA, FILE_OPEN, 0, &eof,
+-				SMB2_OP_SET_EOF);
++				SMB2_OP_SET_EOF, NULL);
+ }
+ 
+ int
+@@ -541,7 +583,7 @@ smb2_set_file_info(struct inode *inode, const char *full_path,
+ 
+ 	rc = smb2_compound_op(xid, tlink_tcon(tlink), cifs_sb, full_path,
+ 			      FILE_WRITE_ATTRIBUTES, FILE_OPEN, 0, buf,
+-			      SMB2_OP_SET_INFO);
++			      SMB2_OP_SET_INFO, NULL);
+ 	cifs_put_tlink(tlink);
+ 	return rc;
+ }
+-- 
+2.13.6
 
-               cinode = CIFS_I(d_inode(cfile->dentry));
-               spin_unlock(&tcon->open_file_lock);
-               return cifs_get_writable_file(cinode, 0, ret_file);
-       }
-
-       spin_unlock(&tcon->open_file_lock);
-
-Additionally, kfree() can (and should) be done outside of
-->open_file_lock scope.
-
-	-ss
