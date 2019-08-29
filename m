@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88CB7C3A59F
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Aug 2019 05:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D005EC3A59F
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Aug 2019 22:25:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4DA5E2339E
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Aug 2019 05:54:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9443421874
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Aug 2019 22:25:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725853AbfH2Fyy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Aug 2019 01:54:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57652 "EHLO mx1.redhat.com"
+        id S1727763AbfH2WZy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Aug 2019 18:25:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37690 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725823AbfH2Fyy (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 29 Aug 2019 01:54:54 -0400
+        id S1726526AbfH2WZy (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 29 Aug 2019 18:25:54 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B9CA418C891C;
-        Thu, 29 Aug 2019 05:54:53 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4035A793EC;
+        Thu, 29 Aug 2019 22:25:53 +0000 (UTC)
 Received: from test1135.test.redhat.com (vpn2-54-71.bne.redhat.com [10.64.54.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E31A56092D;
-        Thu, 29 Aug 2019 05:54:52 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6813A608A5;
+        Thu, 29 Aug 2019 22:25:52 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>
 Subject: [PATCH] cifs: create a helper to find a writeable handle by path name
-Date:   Thu, 29 Aug 2019 15:54:46 +1000
-Message-Id: <20190829055446.11167-1-lsahlber@redhat.com>
+Date:   Fri, 30 Aug 2019 08:25:46 +1000
+Message-Id: <20190829222546.11779-1-lsahlber@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.70]); Thu, 29 Aug 2019 05:54:53 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 29 Aug 2019 22:25:53 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
@@ -50,11 +50,10 @@ we also avoid triggering an oplock break for the existing handle.
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
  fs/cifs/cifsproto.h |  2 ++
- fs/cifs/connect.c   |  2 +-
  fs/cifs/dir.c       |  2 +-
  fs/cifs/file.c      | 35 ++++++++++++++++++++
  fs/cifs/smb2inode.c | 94 ++++++++++++++++++++++++++++++++++++++---------------
- 5 files changed, 107 insertions(+), 28 deletions(-)
+ 4 files changed, 106 insertions(+), 27 deletions(-)
 
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
 index 592a6cea2b79..be206744407c 100644
@@ -69,19 +68,6 @@ index 592a6cea2b79..be206744407c 100644
  extern struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *, bool);
  extern unsigned int smbCalcSize(void *buf, struct TCP_Server_Info *server);
  extern int decode_negTokenInit(unsigned char *security_blob, int length,
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 1ed449f4a8ec..c5dc8265b671 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -4232,7 +4232,7 @@ build_unc_path_to_root(const struct smb_vol *vol,
- 	unsigned int unc_len = strnlen(vol->UNC, MAX_TREE_SIZE + 1);
- 
- 	if (unc_len > MAX_TREE_SIZE)
--		return -EINVAL;
-+		return ERR_PTR(-EINVAL);
- 
- 	full_path = kmalloc(unc_len + pplen + 1, GFP_KERNEL);
- 	if (full_path == NULL)
 diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
 index be424e81e3ad..dd5ac841aefa 100644
 --- a/fs/cifs/dir.c
