@@ -2,194 +2,190 @@ Return-Path: <SRS0=0p8I=W2=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CEFCC3A5A6
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Aug 2019 07:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3BB2C41514
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Aug 2019 15:48:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 05F892070B
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Aug 2019 07:20:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 897DF2342C
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Aug 2019 15:48:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRkH8fZ9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7oWCY6w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727392AbfH3HU2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 30 Aug 2019 03:20:28 -0400
-Received: from mail-io1-f54.google.com ([209.85.166.54]:42185 "EHLO
-        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727133AbfH3HU2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 30 Aug 2019 03:20:28 -0400
-Received: by mail-io1-f54.google.com with SMTP id n197so10104952iod.9
-        for <linux-cifs@vger.kernel.org>; Fri, 30 Aug 2019 00:20:27 -0700 (PDT)
+        id S1728313AbfH3Psg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 30 Aug 2019 11:48:36 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:40743 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727135AbfH3Psg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 30 Aug 2019 11:48:36 -0400
+Received: by mail-pg1-f196.google.com with SMTP id w10so3745662pgj.7;
+        Fri, 30 Aug 2019 08:48:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=1MThpt1Jfw/2AZtFp55Kgh/q3z0vS+zdLRyguERz8fQ=;
-        b=lRkH8fZ9vfm4X++/TiH6WU/Zl7e9wU4K4KajSpA/GSu2QB0nJDuADbwiz6zllrllax
-         iOaIEfI+20os2sAs53CRM32Dbm/GDpDEPYlx5aI9utx1UJ8k1pai/TDLoI+DF0mcfP2Q
-         m8u3sdhByaISzbb6Y73S/CQ1TavsVC+yJcBKxi9PJJNhUjWOjJ+0WfdFKQnamQO9vllz
-         u+TRAT5Dw724eMkKemYhqw+1wTHmKLq/LawCH3T2uCtWQuvoNUs63gf1xtwvojpuA3oB
-         vgtbq2P4x3NJBwGS9p4e9k+zOymIBWRpkVxs+u2Ps1y7/hJulgtB+iFfSD7EDklQkE8m
-         Awew==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=4oHQ/J6gD7m5a2hZJIzg30k30/iTJHkHY5qB+o+D4cE=;
+        b=h7oWCY6wHIupyilklhVw3zKKmS4N6rNYStKFd6M4mXY2zoBod9UZ8VCkDGXpvOwPEx
+         y0aASnlb2KjG+wF+/aUT2biKn+NEObcgE8m7DGPrZYueZa0oebuiKl0kXOBZW/YvAFgG
+         wiNfxFX1BU+QMvruLmfNr9RwuUgTVgZhni7EzWpQBGg9w69s5GjxRS3CR8rDUkEmFDvX
+         StbzvePxJ6JAeogsEcWDy1lOLEazKGBM7XSWMidYvC4oTqL+OIaD7n27qxye/p6T0bld
+         MAh4tx6oguKUb4RPv6qhdVfxJi3jyYGLfFoX32P7ntEtN8+5CPxBMCDh7sUKz71y0419
+         8ZHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=1MThpt1Jfw/2AZtFp55Kgh/q3z0vS+zdLRyguERz8fQ=;
-        b=aMVMWn5EvzTOuik1DCnpQ/zLDJjzOFrKNYjBYlfk9eefjA//Jk/rjFUNgej/JyGxjL
-         7qiK/rAg4LBMArFxqn7WVYGtJsk1kvCSG4ex5okPPQ7DuiU1IZGOtCh7CWIM5aaRAzsr
-         R2hYgYQj2NjaX8lCYzB7mDbl3xKrur61u/139UuCjpHk5IOl9S0ARV9rNwfpmNGdpHMF
-         CRL/NkR7rGqO1hyW4FgG23kUgoTE/F2QxpXQ8+R8o8EhbaZQ2VGu6Ll8JGIWjGOjoxHT
-         iqOChD86jPXkBN5cmOUsNoqouDnOwr4rr3dfNpmCadN+1wCZHbUHPXjbccxCqP6nv9R8
-         ECug==
-X-Gm-Message-State: APjAAAWzOZovM/JuKh5TxLQqgWemUdc/LXpf0zSRUK1vYqEMAnlZknkA
-        5u6Zy+KJEVw2vVy2C3S08WEKDy6MV4nCMMt7HD9P7pFEmkY=
-X-Google-Smtp-Source: APXvYqzCd+nJBdoBRGXnFFesrKK/7oT4pUEmjiTCICFohdmGCg9kTbwbuUJq0agUfisLe2+xizqua/hVxEydLxVCsLM=
-X-Received: by 2002:a5d:8591:: with SMTP id f17mr5533988ioj.5.1567149626690;
- Fri, 30 Aug 2019 00:20:26 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 30 Aug 2019 02:20:15 -0500
-Message-ID: <CAH2r5msYxvoFhG0mrxH4UfirwEhH8Y8pWJRrd8pVwUiKZBucNg@mail.gmail.com>
-Subject: [RFC][SMB3][PATCH] Add cache=singleclient mount option to allow
- shares accessed by only client to be more aggressively cached
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000cf6c4a0591507487"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=4oHQ/J6gD7m5a2hZJIzg30k30/iTJHkHY5qB+o+D4cE=;
+        b=Rz2IvZhXVmR270TP1rqP+bsFbqlAzUFU+ogsw0a3zcwY73Ays/M2RoDIJGwjPEAIqb
+         VYIwMfiipdHXcn9UC5yDpmbdtlCxpSodv34k2jMbhAMUb4I1D1yTK97Vu+tKBIsc37s8
+         GSCCNIKpF+abp2YA7U7eDhepIydRU1+LGf+acYScrkZkAfI3Hsr9G0xmS6leWTO9GV1P
+         qKDUHC9/gYZhX6lYFYRG/Xe02tstyg3JDXt3BT27nS1ahs9QQ9wMYFFB/h96WRjXfAq2
+         cbwSTh8hXhQ9zOW+8zNECzDG6byv/+l0qNgvc+1tAE4pTmC0mHYePB1ZZAf5EqhfCUie
+         a90g==
+X-Gm-Message-State: APjAAAW5HNQUG6kwZYONGxLATMVAklsEp4QxQYDrVtQ9vXyJEDMlefx4
+        CC+IzJtV3xgw4tuO/Q2bDZk=
+X-Google-Smtp-Source: APXvYqw+TTjvl6C13mK+Kx+U+c7BoLzOucbYEU3GqDfQjm5bxaW7IFfh1q/TNPR40tNdaKG3mocNEw==
+X-Received: by 2002:a17:90a:c386:: with SMTP id h6mr16090687pjt.122.1567180114546;
+        Fri, 30 Aug 2019 08:48:34 -0700 (PDT)
+Received: from deepa-ubuntu.lan (c-98-234-52-230.hsd1.ca.comcast.net. [98.234.52.230])
+        by smtp.gmail.com with ESMTPSA id z28sm8093085pfj.74.2019.08.30.08.48.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Aug 2019 08:48:33 -0700 (PDT)
+From:   Deepa Dinamani <deepa.kernel@gmail.com>
+To:     arnd@arndb.de, viro@zeniv.linux.org.uk
+Cc:     adilger@dilger.ca, aivazian.tigran@gmail.com,
+        darrick.wong@oracle.com, deepa.kernel@gmail.com, dsterba@suse.com,
+        gregkh@linuxfoundation.org, jlayton@kernel.org,
+        keescook@chromium.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux@armlinux.org.uk,
+        me@bobcopeland.com, y2038@lists.linaro.org,
+        adrian.hunter@intel.com, al@alarsen.net, anna.schumaker@netapp.com,
+        anton@enomsg.org, asmadeus@codewreck.org, ccross@android.com,
+        ceph-devel@vger.kernel.org, coda@cs.cmu.edu,
+        codalist@coda.cs.cmu.edu, dedekind1@gmail.com,
+        devel@lists.orangefs.org, dushistov@mail.ru, dwmw2@infradead.org,
+        ericvh@gmail.com, hch@infradead.org, hch@lst.de,
+        hirofumi@mail.parknet.co.jp, hubcap@omnibond.com,
+        idryomov@gmail.com, jack@suse.com, jaegeuk@kernel.org,
+        jaharkes@cs.cmu.edu, jfs-discussion@lists.sourceforge.net,
+        jlbec@evilplan.org, linux-cifs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-karma-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        lucho@ionkov.net, luisbg@kernel.org, martin@omnibond.com,
+        mikulas@artax.karlin.mff.cuni.cz, nico@fluxnic.net,
+        phillip@squashfs.org.uk, reiserfs-devel@vger.kernel.org,
+        richard@nod.at, sage@redhat.com, salah.triki@gmail.com,
+        sfrench@samba.org, shaggy@kernel.org, tj@kernel.org,
+        tony.luck@intel.com, trond.myklebust@hammerspace.com,
+        tytso@mit.edu, v9fs-developer@lists.sourceforge.net,
+        yuchao0@huawei.com, zyan@redhat.com
+Subject: [GIT PULL RESEND] vfs: Add support for timestamp limits
+Date:   Fri, 30 Aug 2019 08:47:44 -0700
+Message-Id: <20190830154744.4868-1-deepa.kernel@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <CAK8P3a1XjOMpuS12Xao1xqOLFOuz1Jb8dTAfrhLcE643sSkC5g@mail.gmail.com>
+References: <CAK8P3a1XjOMpuS12Xao1xqOLFOuz1Jb8dTAfrhLcE643sSkC5g@mail.gmail.com>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000cf6c4a0591507487
-Content-Type: text/plain; charset="UTF-8"
+[resending, rebased onto linux v5.3-rc6, and dropped orangefs patch from the series]
 
-    Similar to the "cache=ro" patch but for the read write case ...
+Hi Al, Arnd,
 
-    smb3: add mount option to allow RW caching of share accessed by
-only 1 client
+This is a pull request for filling in min and max timestamps for filesystems.
+I've added all the acks, and dropped the adfs patch. That will be merged through
+Russell's tree.
 
-    If a share is known to be only to be accessed by one client, we
-    can aggressively cache writes not just reads to it.
+Dropped orangefs until the maintainers decide what its limits should be.
 
-    Add "cache=" option (cache=singleclient) for mounting read write shares
-    (that will not be read or written to from other clients while we have
-    it mounted) in order to improve performance.
+The following changes since commit a55aa89aab90fae7c815b0551b07be37db359d76:
 
+  Linux 5.3-rc6 (2019-08-25 12:01:23 -0700)
 
+are available in the Git repository at:
 
--- 
-Thanks,
+  https://github.com/deepa-hub/vfs limits
 
-Steve
+for you to fetch changes up to 5ad32b3acded06183f40806f76b030c3143017bb:
 
---000000000000cf6c4a0591507487
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-add-mount-option-to-allow-RW-caching-of-share-a.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-add-mount-option-to-allow-RW-caching-of-share-a.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_jzxsezp90>
-X-Attachment-Id: f_jzxsezp90
+  isofs: Initialize filesystem timestamp ranges (2019-08-30 08:11:25 -0700)
 
-RnJvbSBiOWIzYjZhODZjM2M2ZDM0YTg5MjAxZTQ1ODM3NDM1YWY1ZTY2NDQxIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IEZyaSwgMzAgQXVnIDIwMTkgMDI6MTI6NDEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiBhZGQgbW91bnQgb3B0aW9uIHRvIGFsbG93IFJXIGNhY2hpbmcgb2Ygc2hhcmUgYWNjZXNz
-ZWQKIGJ5IG9ubHkgMSBjbGllbnQKCklmIGEgc2hhcmUgaXMga25vd24gdG8gYmUgb25seSB0byBi
-ZSBhY2Nlc3NlZCBieSBvbmUgY2xpZW50LCB3ZQpjYW4gYWdncmVzc2l2ZWx5IGNhY2hlIHdyaXRl
-cyBub3QganVzdCByZWFkcyB0byBpdC4KCkFkZCAiY2FjaGU9IiBvcHRpb24gKGNhY2hlPXNpbmds
-ZWNsaWVudCkgZm9yIG1vdW50aW5nIHJlYWQgd3JpdGUgc2hhcmVzCih0aGF0IHdpbGwgbm90IGJl
-IHJlYWQgb3Igd3JpdHRlbiB0byBmcm9tIG90aGVyIGNsaWVudHMgd2hpbGUgd2UgaGF2ZQppdCBt
-b3VudGVkKSBpbiBvcmRlciB0byBpbXByb3ZlIHBlcmZvcm1hbmNlLgoKU2lnbmVkLW9mZi1ieTog
-U3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc19m
-c19zYi5oIHwgIDEgKwogZnMvY2lmcy9jaWZzZnMuYyAgICAgfCAgMiArKwogZnMvY2lmcy9jaWZz
-Z2xvYi5oICAgfCAgNSArKystLQogZnMvY2lmcy9jb25uZWN0LmMgICAgfCAyMCArKysrKysrKysr
-KysrKysrKysrLQogNCBmaWxlcyBjaGFuZ2VkLCAyNSBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9u
-cygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc19mc19zYi5oIGIvZnMvY2lmcy9jaWZzX2Zz
-X3NiLmgKaW5kZXggMjg2YTEwNGM0NzYxLi42ZTdjNDQyNzM2OWQgMTAwNjQ0Ci0tLSBhL2ZzL2Np
-ZnMvY2lmc19mc19zYi5oCisrKyBiL2ZzL2NpZnMvY2lmc19mc19zYi5oCkBAIC01NCw2ICs1NCw3
-IEBACiAjZGVmaW5lIENJRlNfTU9VTlRfTk9fREZTIDB4ODAwMDAwMCAvKiBkaXNhYmxlIERGUyBy
-ZXNvbHZpbmcgKi8KICNkZWZpbmUgQ0lGU19NT1VOVF9NT0RFX0ZST01fU0lEIDB4MTAwMDAwMDAg
-LyogcmV0cmlldmUgbW9kZSBmcm9tIHNwZWNpYWwgQUNFICovCiAjZGVmaW5lIENJRlNfTU9VTlRf
-Uk9fQ0FDSEUJMHgyMDAwMDAwMCAgLyogYXNzdW1lcyBzaGFyZSB3aWxsIG5vdCBjaGFuZ2UgKi8K
-KyNkZWZpbmUgQ0lGU19NT1VOVF9SV19DQUNIRQkweDQwMDAwMDAwICAvKiBhc3N1bWVzIG9ubHkg
-Y2xpZW50IGFjY2Vzc2luZyAqLwogCiBzdHJ1Y3QgY2lmc19zYl9pbmZvIHsKIAlzdHJ1Y3QgcmJf
-cm9vdCB0bGlua190cmVlOwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzZnMuYyBiL2ZzL2NpZnMv
-Y2lmc2ZzLmMKaW5kZXggOTcwMjUxYmMwNjYxLi5kZTkwZTY2NWVmMTEgMTAwNjQ0Ci0tLSBhL2Zz
-L2NpZnMvY2lmc2ZzLmMKKysrIGIvZnMvY2lmcy9jaWZzZnMuYwpAQCAtNDAwLDYgKzQwMCw4IEBA
-IGNpZnNfc2hvd19jYWNoZV9mbGF2b3Ioc3RydWN0IHNlcV9maWxlICpzLCBzdHJ1Y3QgY2lmc19z
-Yl9pbmZvICpjaWZzX3NiKQogCQlzZXFfcHV0cyhzLCAic3RyaWN0Iik7CiAJZWxzZSBpZiAoY2lm
-c19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX0RJUkVDVF9JTykKIAkJc2VxX3B1dHMo
-cywgIm5vbmUiKTsKKwllbHNlIGlmIChjaWZzX3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNfTU9V
-TlRfUldfQ0FDSEUpCisJCXNlcV9wdXRzKHMsICJzaW5nbGVjbGllbnQiKTsgLyogYXNzdW1lIG9u
-bHkgb25lIGNsaWVudCBhY2Nlc3MgKi8KIAllbHNlIGlmIChjaWZzX3NiLT5tbnRfY2lmc19mbGFn
-cyAmIENJRlNfTU9VTlRfUk9fQ0FDSEUpCiAJCXNlcV9wdXRzKHMsICJybyIpOyAvKiByZWFkIG9u
-bHkgY2FjaGluZyBhc3N1bWVkICovCiAJZWxzZQpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzZ2xv
-Yi5oIGIvZnMvY2lmcy9jaWZzZ2xvYi5oCmluZGV4IDNmMTJkYTdmMmY3Zi4uZmE1YWJlM2E4NTE0
-IDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNnbG9iLmgKKysrIGIvZnMvY2lmcy9jaWZzZ2xvYi5o
-CkBAIC01NjAsNiArNTYwLDcgQEAgc3RydWN0IHNtYl92b2wgewogCWJvb2wgZGlyZWN0X2lvOjE7
-CiAJYm9vbCBzdHJpY3RfaW86MTsgLyogc3RyaWN0IGNhY2hlIGJlaGF2aW9yICovCiAJYm9vbCBj
-YWNoZV9ybzoxOworCWJvb2wgY2FjaGVfcnc6MTsKIAlib29sIHJlbWFwOjE7ICAgICAgLyogc2V0
-IHRvIHJlbWFwIHNldmVuIHJlc2VydmVkIGNoYXJzIGluIGZpbGVuYW1lcyAqLwogCWJvb2wgc2Z1
-X3JlbWFwOjE7ICAvKiByZW1hcCBzZXZlbiByZXNlcnZlZCBjaGFycyBhbGEgU0ZVICovCiAJYm9v
-bCBwb3NpeF9wYXRoczoxOyAvKiB1bnNldCB0byBub3QgYXNrIGZvciBwb3NpeCBwYXRobmFtZXMu
-ICovCkBAIC02MjIsNyArNjIzLDcgQEAgc3RydWN0IHNtYl92b2wgewogCQkJIENJRlNfTU9VTlRf
-Q0lGU19CQUNLVVBVSUQgfCBDSUZTX01PVU5UX0NJRlNfQkFDS1VQR0lEIHwgXAogCQkJIENJRlNf
-TU9VTlRfVUlEX0ZST01fQUNMIHwgQ0lGU19NT1VOVF9OT19IQU5ETEVfQ0FDSEUgfCBcCiAJCQkg
-Q0lGU19NT1VOVF9OT19ERlMgfCBDSUZTX01PVU5UX01PREVfRlJPTV9TSUQgfCBcCi0JCQkgQ0lG
-U19NT1VOVF9ST19DQUNIRSkKKwkJCSBDSUZTX01PVU5UX1JPX0NBQ0hFIHwgQ0lGU19NT1VOVF9S
-V19DQUNIRSkKIAogLyoqCiAgKiBHZW5lcmljIFZGUyBzdXBlcmJsb2NrIG1vdW50IGZsYWdzIChz
-X2ZsYWdzKSB0byBjb25zaWRlciB3aGVuCkBAIC0xMzcwLDcgKzEzNzEsNyBAQCB2b2lkIGNpZnNG
-aWxlSW5mb19wdXQoc3RydWN0IGNpZnNGaWxlSW5mbyAqY2lmc19maWxlKTsKIAogI2RlZmluZSBD
-SUZTX0NBQ0hFX1JFQUQoY2lub2RlKSAoKGNpbm9kZS0+b3Bsb2NrICYgQ0lGU19DQUNIRV9SRUFE
-X0ZMRykgfHwgKENJRlNfU0IoY2lub2RlLT52ZnNfaW5vZGUuaV9zYiktPm1udF9jaWZzX2ZsYWdz
-ICYgQ0lGU19NT1VOVF9ST19DQUNIRSkpCiAjZGVmaW5lIENJRlNfQ0FDSEVfSEFORExFKGNpbm9k
-ZSkgKGNpbm9kZS0+b3Bsb2NrICYgQ0lGU19DQUNIRV9IQU5ETEVfRkxHKQotI2RlZmluZSBDSUZT
-X0NBQ0hFX1dSSVRFKGNpbm9kZSkgKGNpbm9kZS0+b3Bsb2NrICYgQ0lGU19DQUNIRV9XUklURV9G
-TEcpCisjZGVmaW5lIENJRlNfQ0FDSEVfV1JJVEUoY2lub2RlKSAoKGNpbm9kZS0+b3Bsb2NrICYg
-Q0lGU19DQUNIRV9XUklURV9GTEcpIHx8IChDSUZTX1NCKGNpbm9kZS0+dmZzX2lub2RlLmlfc2Ip
-LT5tbnRfY2lmc19mbGFncyAmIENJRlNfTU9VTlRfUldfQ0FDSEUpKQogCiAvKgogICogT25lIG9m
-IHRoZXNlIGZvciBlYWNoIGZpbGUgaW5vZGUKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5j
-IGIvZnMvY2lmcy9jb25uZWN0LmMKaW5kZXggMDcyYzAxZjRlOWMxLi5kOWE5OTU1ODhjNzQgMTAw
-NjQ0Ci0tLSBhL2ZzL2NpZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC0y
-OTksNiArMjk5LDcgQEAgZW51bSB7CiAJT3B0X2NhY2hlX3N0cmljdCwKIAlPcHRfY2FjaGVfbm9u
-ZSwKIAlPcHRfY2FjaGVfcm8sCisJT3B0X2NhY2hlX3J3LAogCU9wdF9jYWNoZV9lcnIKIH07CiAK
-QEAgLTMwNyw2ICszMDgsNyBAQCBzdGF0aWMgY29uc3QgbWF0Y2hfdGFibGVfdCBjaWZzX2NhY2hl
-Zmxhdm9yX3Rva2VucyA9IHsKIAl7IE9wdF9jYWNoZV9zdHJpY3QsICJzdHJpY3QiIH0sCiAJeyBP
-cHRfY2FjaGVfbm9uZSwgIm5vbmUiIH0sCiAJeyBPcHRfY2FjaGVfcm8sICJybyIgfSwKKwl7IE9w
-dF9jYWNoZV9ydywgInNpbmdsZWNsaWVudCIgfSwKIAl7IE9wdF9jYWNoZV9lcnIsIE5VTEwgfQog
-fTsKIApAQCAtMTQyMSwyMSArMTQyMywzMSBAQCBjaWZzX3BhcnNlX2NhY2hlX2ZsYXZvcihjaGFy
-ICp2YWx1ZSwgc3RydWN0IHNtYl92b2wgKnZvbCkKIAkJdm9sLT5kaXJlY3RfaW8gPSBmYWxzZTsK
-IAkJdm9sLT5zdHJpY3RfaW8gPSBmYWxzZTsKIAkJdm9sLT5jYWNoZV9ybyA9IGZhbHNlOworCQl2
-b2wtPmNhY2hlX3J3ID0gZmFsc2U7CiAJCWJyZWFrOwogCWNhc2UgT3B0X2NhY2hlX3N0cmljdDoK
-IAkJdm9sLT5kaXJlY3RfaW8gPSBmYWxzZTsKIAkJdm9sLT5zdHJpY3RfaW8gPSB0cnVlOwogCQl2
-b2wtPmNhY2hlX3JvID0gZmFsc2U7CisJCXZvbC0+Y2FjaGVfcncgPSBmYWxzZTsKIAkJYnJlYWs7
-CiAJY2FzZSBPcHRfY2FjaGVfbm9uZToKIAkJdm9sLT5kaXJlY3RfaW8gPSB0cnVlOwogCQl2b2wt
-PnN0cmljdF9pbyA9IGZhbHNlOwogCQl2b2wtPmNhY2hlX3JvID0gZmFsc2U7CisJCXZvbC0+Y2Fj
-aGVfcncgPSBmYWxzZTsKIAkJYnJlYWs7CiAJY2FzZSBPcHRfY2FjaGVfcm86CiAJCXZvbC0+ZGly
-ZWN0X2lvID0gZmFsc2U7CiAJCXZvbC0+c3RyaWN0X2lvID0gZmFsc2U7CiAJCXZvbC0+Y2FjaGVf
-cm8gPSB0cnVlOworCQl2b2wtPmNhY2hlX3J3ID0gZmFsc2U7CisJCWJyZWFrOworCWNhc2UgT3B0
-X2NhY2hlX3J3OgorCQl2b2wtPmRpcmVjdF9pbyA9IGZhbHNlOworCQl2b2wtPnN0cmljdF9pbyA9
-IGZhbHNlOworCQl2b2wtPmNhY2hlX3JvID0gZmFsc2U7CisJCXZvbC0+Y2FjaGVfcncgPSB0cnVl
-OwogCQlicmVhazsKIAlkZWZhdWx0OgogCQljaWZzX2RiZyhWRlMsICJiYWQgY2FjaGU9IG9wdGlv
-bjogJXNcbiIsIHZhbHVlKTsKQEAgLTQwNTQsNiArNDA2NiwxMCBAQCBpbnQgY2lmc19zZXR1cF9j
-aWZzX3NiKHN0cnVjdCBzbWJfdm9sICpwdm9sdW1lX2luZm8sCiAJaWYgKHB2b2x1bWVfaW5mby0+
-Y2FjaGVfcm8pIHsKIAkJY2lmc19kYmcoVkZTLCAibW91bnRpbmcgc2hhcmUgd2l0aCByZWFkIG9u
-bHkgY2FjaGluZy4gRW5zdXJlIHRoYXQgdGhlIHNoYXJlIHdpbGwgbm90IGJlIG1vZGlmaWVkIHdo
-aWxlIGluIHVzZS5cbiIpOwogCQljaWZzX3NiLT5tbnRfY2lmc19mbGFncyB8PSBDSUZTX01PVU5U
-X1JPX0NBQ0hFOworCX0gZWxzZSBpZiAocHZvbHVtZV9pbmZvLT5jYWNoZV9ydykgeworCQljaWZz
-X2RiZyhWRlMsICJtb3VudGluZyBzaGFyZSBpbiBzaW5nbGUgY2xpZW50IFJXIGNhY2hpbmcgbW9k
-ZS4gRW5zdXJlIHRoYXQgbm8gb3RoZXIgc3lzdGVtcyB3aWxsIGJlIGFjY2Vzc2luZyB0aGUgc2hh
-cmUuXG4iKTsKKwkJY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgfD0gKENJRlNfTU9VTlRfUk9fQ0FD
-SEUgfAorCQkJCQkgICAgQ0lGU19NT1VOVF9SV19DQUNIRSk7CiAJfQogCWlmIChwdm9sdW1lX2lu
-Zm8tPm1mc3ltbGlua3MpIHsKIAkJaWYgKHB2b2x1bWVfaW5mby0+c2Z1X2VtdWwpIHsKQEAgLTQy
-MDMsOCArNDIxOSwxMCBAQCBzdGF0aWMgaW50IG1vdW50X2dldF9jb25ucyhzdHJ1Y3Qgc21iX3Zv
-bCAqdm9sLCBzdHJ1Y3QgY2lmc19zYl9pbmZvICpjaWZzX3NiLAogCQkJaWYgKHRjb24tPmZzRGV2
-SW5mby5EZXZpY2VDaGFyYWN0ZXJpc3RpY3MgJgogCQkJICAgIEZJTEVfUkVBRF9PTkxZX0RFVklD
-RSkKIAkJCQljaWZzX2RiZyhWRlMsICJtb3VudGVkIHRvIHJlYWQgb25seSBzaGFyZVxuIik7Ci0J
-CQllbHNlCisJCQllbHNlIGlmICgoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJgorCQkJCSAgQ0lG
-U19NT1VOVF9SV19DQUNIRSkgPT0gMCkKIAkJCQljaWZzX2RiZyhWRlMsICJyZWFkIG9ubHkgbW91
-bnQgb2YgUlcgc2hhcmVcbiIpOworCQkJLyogbm8gbmVlZCB0byBsb2cgYSBSVyBtb3VudCBvZiBh
-IHR5cGljYWwgUlcgc2hhcmUgKi8KIAkJfQogCX0KIAotLSAKMi4yMC4xCgo=
---000000000000cf6c4a0591507487--
+----------------------------------------------------------------
+
+- Deepa
+
+Deepa Dinamani (18):
+      vfs: Add file timestamp range support
+      vfs: Add timestamp_truncate() api
+      timestamp_truncate: Replace users of timespec64_trunc
+      mount: Add mount warning for impending timestamp expiry
+      utimes: Clamp the timestamps before update
+      fs: Fill in max and min timestamps in superblock
+      9p: Fill min and max timestamps in sb
+      ext4: Initialize timestamps limits
+      fs: nfs: Initialize filesystem timestamp ranges
+      fs: cifs: Initialize filesystem timestamp ranges
+      fs: fat: Initialize filesystem timestamp ranges
+      fs: affs: Initialize filesystem timestamp ranges
+      fs: sysv: Initialize filesystem timestamp ranges
+      fs: ceph: Initialize filesystem timestamp ranges
+      fs: hpfs: Initialize filesystem timestamp ranges
+      fs: omfs: Initialize filesystem timestamp ranges
+      pstore: fs superblock limits
+      isofs: Initialize filesystem timestamp ranges
+
+ fs/9p/vfs_super.c        |  6 +++++-
+ fs/affs/amigaffs.c       |  2 +-
+ fs/affs/amigaffs.h       |  3 +++
+ fs/affs/inode.c          |  4 ++--
+ fs/affs/super.c          |  4 ++++
+ fs/attr.c                | 21 ++++++++++++---------
+ fs/befs/linuxvfs.c       |  2 ++
+ fs/bfs/inode.c           |  2 ++
+ fs/ceph/super.c          |  2 ++
+ fs/cifs/cifsfs.c         | 22 ++++++++++++++++++++++
+ fs/cifs/netmisc.c        | 14 +++++++-------
+ fs/coda/inode.c          |  3 +++
+ fs/configfs/inode.c      | 12 ++++++------
+ fs/cramfs/inode.c        |  2 ++
+ fs/efs/super.c           |  2 ++
+ fs/ext2/super.c          |  2 ++
+ fs/ext4/ext4.h           | 10 +++++++++-
+ fs/ext4/super.c          | 17 +++++++++++++++--
+ fs/f2fs/file.c           | 21 ++++++++++++---------
+ fs/fat/inode.c           | 12 ++++++++++++
+ fs/freevxfs/vxfs_super.c |  2 ++
+ fs/hpfs/hpfs_fn.h        |  6 ++----
+ fs/hpfs/super.c          |  2 ++
+ fs/inode.c               | 33 ++++++++++++++++++++++++++++++++-
+ fs/isofs/inode.c         |  7 +++++++
+ fs/jffs2/fs.c            |  3 +++
+ fs/jfs/super.c           |  2 ++
+ fs/kernfs/inode.c        |  7 +++----
+ fs/minix/inode.c         |  2 ++
+ fs/namespace.c           | 33 ++++++++++++++++++++++++++++++++-
+ fs/nfs/super.c           | 20 +++++++++++++++++++-
+ fs/ntfs/inode.c          | 21 ++++++++++++---------
+ fs/omfs/inode.c          |  4 ++++
+ fs/pstore/ram.c          |  2 ++
+ fs/qnx4/inode.c          |  2 ++
+ fs/qnx6/inode.c          |  2 ++
+ fs/reiserfs/super.c      |  3 +++
+ fs/romfs/super.c         |  2 ++
+ fs/squashfs/super.c      |  2 ++
+ fs/super.c               |  2 ++
+ fs/sysv/super.c          |  5 ++++-
+ fs/ubifs/file.c          | 21 ++++++++++++---------
+ fs/ufs/super.c           |  7 +++++++
+ fs/utimes.c              |  6 ++----
+ fs/xfs/xfs_super.c       |  2 ++
+ include/linux/fs.h       |  5 +++++
+ include/linux/time64.h   |  2 ++
+ 47 files changed, 296 insertions(+), 72 deletions(-)
