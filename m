@@ -2,99 +2,77 @@ Return-Path: <SRS0=HOJ7=W5=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E068C3A5A4
-	for <linux-cifs@archiver.kernel.org>; Mon,  2 Sep 2019 00:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 121FAC3A5A5
+	for <linux-cifs@archiver.kernel.org>; Mon,  2 Sep 2019 15:02:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1600A21744
-	for <linux-cifs@archiver.kernel.org>; Mon,  2 Sep 2019 00:23:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=monash.edu header.i=@monash.edu header.b="HThed39q"
+	by mail.kernel.org (Postfix) with ESMTP id DE3E922CF7
+	for <linux-cifs@archiver.kernel.org>; Mon,  2 Sep 2019 15:02:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729169AbfIBAXq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 1 Sep 2019 20:23:46 -0400
-Received: from mail-qt1-f174.google.com ([209.85.160.174]:41719 "EHLO
-        mail-qt1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729163AbfIBAXq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 1 Sep 2019 20:23:46 -0400
-Received: by mail-qt1-f174.google.com with SMTP id i4so13958430qtj.8
-        for <linux-cifs@vger.kernel.org>; Sun, 01 Sep 2019 17:23:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=monash.edu; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Q6lakCCnhlnA1yhPcvlcr3Hr91fQuL2Ay4fc5a36s10=;
-        b=HThed39q3wVl+lil8k3Mj4NTzl/FmPudYoJQKnb75qGRcSNoaEoDPzl+i9vW7p1J+/
-         ZdKbR0prmI4CvlXkTl5JsxF3RBFeghgkzzst8UN07KtzkrN+hMgOD9M4N36imfBPt9fC
-         NmbhgWYKCG5PIJTBwLTTraMvmLH9eQsf7caxr9kUnQ2u+3o9ZZr64axl38rKTh4wTa+4
-         r+XBLOjc6QwOhigglLkJlwXVji/gfgPDEOVO1VrZf5NOMsWe2JFzAT/t/1iHTSsMQZb/
-         AggOAhh/csF449+60WQlLmStsL8riwo/XpTZMns6FfWncFhG+U0no2L4JO1BDhAiFK0c
-         pCsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Q6lakCCnhlnA1yhPcvlcr3Hr91fQuL2Ay4fc5a36s10=;
-        b=O1uekRL12Db0vQagOCdY2wJSJxXlwju9tCC25mOMvxaaWBWa+S/qhSvB7S1UzkVOt5
-         jPRV9C1Iu2PPANot4N0XyyakQzSae/7VsQMjxDIpPgWasyUR+V0CW8IiItTazoqlfkR4
-         t8aN0nb/JPJW5T3n6M9mLCtOSIvSakjT3r50m1TcYPoqGtMRXBF4vIEh8guRPsy//Zwx
-         m2igQztOG6edLH1HFBY2V3GFEZuiZLTr4+clr8vMm2Bfzwa0FKHiWWUn4fl8zRaTnQ7S
-         3nbV6agS7Rh3ZJoUu8F6fPihgSW090isTyaAjr8f447GC8sDHMgA+iRikQEk4ccfrBlP
-         JtMg==
-X-Gm-Message-State: APjAAAWNdTabhav4UJ3/MC9c2NLCXs0++yhi6tVi4Kn66OHC28HpMGT2
-        VsYyMHiqPpvPraFqPn4D9FxzrFn+5LEGuteTtFkq8Q==
-X-Google-Smtp-Source: APXvYqzfh83a++FiarSKN40GgqytSC5mXYjBssv4rqQukv58pTT7L7oDY15INCJDYrRyatbTjUgr7v1A3IK3xJM+jnU=
-X-Received: by 2002:ad4:5145:: with SMTP id g5mr8554767qvq.127.1567383824801;
- Sun, 01 Sep 2019 17:23:44 -0700 (PDT)
+        id S1731731AbfIBPBy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 2 Sep 2019 11:01:54 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:41766 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730234AbfIBPBy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 2 Sep 2019 11:01:54 -0400
+Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
+        by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+        (Exim 4.76)
+        (envelope-from <colin.king@canonical.com>)
+        id 1i4nq4-00007n-OK; Mon, 02 Sep 2019 15:01:52 +0000
+From:   Colin King <colin.king@canonical.com>
+To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH][cifs-next] cifs: fix dereference on ses before it is null checked
+Date:   Mon,  2 Sep 2019 16:01:52 +0100
+Message-Id: <20190902150152.21550-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <CAE78Er-YVBzqaf8jCBio_V_1J2kRiWZ_SH-HnHm7KG3t46=j6w@mail.gmail.com>
- <CAH2r5mu446ssSPrACP8q859Cs0ynUMpJopH0t5qAsR=sGrByFA@mail.gmail.com>
-In-Reply-To: <CAH2r5mu446ssSPrACP8q859Cs0ynUMpJopH0t5qAsR=sGrByFA@mail.gmail.com>
-From:   James Wettenhall <james.wettenhall@monash.edu>
-Date:   Mon, 2 Sep 2019 10:23:33 +1000
-Message-ID: <CAE78Er8KYhRts+zKNsP6_11ZVA0kaTrtjvZPhdLAkHqDXhKOWA@mail.gmail.com>
-Subject: Re: Frequent reconnections / session startups?
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Steve,
+From: Colin Ian King <colin.king@canonical.com>
 
-We've been running the newer kernel - upgraded from 4.15.0 to 5.0.0
-using Ubuntu 18.04's LTS Enablement Stack - for several days, and it
-has certainly solved the frequent reconnection problem, so thanks for
-letting me know about the reconnection fixes that went in almost a
-year ago.
+The assignment of pointer server dereferences pointer ses, however,
+this dereference occurs before ses is null checked and hence we
+have a potential null pointer dereference.  Fix this by only
+dereferencing ses after it has been null checked.
 
-The only negative we are experiencing since the upgrade is that our
-VMs sometimes become unresponsive - appearing to require a reboot -
-with kernel messages like this:
+Addresses-Coverity: ("Dereference before null check")
+Fixes: 2808c6639104 ("cifs: add new debugging macro cifs_server_dbg")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ fs/cifs/transport.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-[74146.705917] rcu: INFO: rcu_sched detected stalls on CPUs/tasks:
-[74146.716713] rcu:     (detected by 0, t=285034 jiffies, g=15795253, q=11)
-[74146.718805] rcu: All QSes seen, last rcu_sched kthread activity
-285035 (4313428844-4313143809), jiffies_till_next_fqs=1, root ->qsmask
-0x0
-[74146.723702] rcu: rcu_sched kthread starved for 285036 jiffies!
-g15795253 f0x2 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-[74146.727649] rcu: RCU grace-period kthread stack dump:
-[74160.609964] watchdog: BUG: soft lockup - CPU#1 stuck for 22s! [cifsd:2854]
-[74172.594002] watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [cifsd:2441]
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 0d60bd2f4dca..a90bd4d75b4d 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -1242,12 +1242,13 @@ SendReceive(const unsigned int xid, struct cifs_ses *ses,
+ 	struct kvec iov = { .iov_base = in_buf, .iov_len = len };
+ 	struct smb_rqst rqst = { .rq_iov = &iov, .rq_nvec = 1 };
+ 	struct cifs_credits credits = { .value = 1, .instance = 0 };
+-	struct TCP_Server_Info *server = ses->server;
++	struct TCP_Server_Info *server;
+ 
+ 	if (ses == NULL) {
+ 		cifs_dbg(VFS, "Null smb session\n");
+ 		return -EIO;
+ 	}
++	server = ses->server;
+ 	if (server == NULL) {
+ 		cifs_dbg(VFS, "Null tcp session\n");
+ 		return -EIO;
+-- 
+2.20.1
 
-I wonder if this could be a different symptom of the same underlying
-problem?  Of course we would prefer not to have production VMs
-becoming unresponsive, but maybe this way, we are detecting and
-containing the problem earlier, so we can take the required action
-(reboot), instead of waiting for our CIFS service providers or
-authentication service providers to complain about the frequent
-reconnections?
-
-Cheers,
-James
