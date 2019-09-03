@@ -2,269 +2,139 @@ Return-Path: <SRS0=oOOd=W6=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D53C3A5A2
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C68EC3A5A2
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 22:54:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98A0E23697
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:35:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567528515;
-	bh=sFhHUfFFO1Bq+l+wG7Y4XqyYWd3tbsAiXcrtF0zOthE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=H3TNVMhdymcJ7BShSu+Qd0NSosBglhnU0i0/T70pj1bdToQeXbHw20h4jShbfUAqJ
-	 nWUc3NzQwv+bpfcC5h8re/jQunKB1LDkMQeoupzSgMlp7AToHCgD2e7eV3UupDl0Pa
-	 D7s/tYayQYfLurwcHjY+sR/IhugOVDLy3qHYTwgg=
+	by mail.kernel.org (Postfix) with ESMTP id E036F21883
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 22:54:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HDnpZZzG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730312AbfICQfO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 Sep 2019 12:35:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49404 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730961AbfICQ1v (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 3 Sep 2019 12:27:51 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 97C35238CE;
-        Tue,  3 Sep 2019 16:27:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567528070;
-        bh=sFhHUfFFO1Bq+l+wG7Y4XqyYWd3tbsAiXcrtF0zOthE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=srgc/rE1Sveo2Q9PACYgzv5YzGkuhDX8EITVtRRk2CrxJKYI1kw1jRAqJHoXPd39a
-         cGpSmVgChfLFhJV56WOgZQz9ATUnRAskVNsClozNHaDZmjgOKVtC4DDhDA6d32mBsh
-         xrjzSOPvxFHbdv4sBijMz6wlX070zlaJy5HeWT6Y=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Pavel Shilovsky <pshilov@microsoft.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 084/167] CIFS: Fix error paths in writeback code
-Date:   Tue,  3 Sep 2019 12:23:56 -0400
-Message-Id: <20190903162519.7136-84-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190903162519.7136-1-sashal@kernel.org>
-References: <20190903162519.7136-1-sashal@kernel.org>
+        id S1726090AbfICWy3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Sep 2019 18:54:29 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:41298 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726009AbfICWy3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 Sep 2019 18:54:29 -0400
+Received: by mail-io1-f68.google.com with SMTP id f19so1469479iof.8
+        for <linux-cifs@vger.kernel.org>; Tue, 03 Sep 2019 15:54:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=XX6PnSS0XGg/J1ZrD4AQewrN8q/0nOz94IYH1WHzKjk=;
+        b=HDnpZZzGzCPGC3Wpm2akx2tC2hmTaty2GGI0YqIg89UeaTKrtF3HjiXpy7s+u7aua4
+         fTTlC+Gvy2/fN9YnN6Ox4WFTRa47SE4KfmH7UfoLlS5jhLfzd3Pg7p/WtmHQjlcjSH2I
+         GjhMjjXrhLGrMuu81xo2ji5Mubghht0jWqwnn0Bq0tRMI9CLNzHjFryx+MjgV4rjZG3Q
+         caZe1VXaQHm4bamKHxcV/1umzHeYaqevtN9kEjvLBTI3NF+0ENIuZRyCYVYomXXRAYlE
+         mmuw6IBgdfA5uQTR4gX5rUkM9fQ+54QuNvQw2AYMP/MJ2ckh8CQVftWkD5HHCyzIb0LI
+         mwog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=XX6PnSS0XGg/J1ZrD4AQewrN8q/0nOz94IYH1WHzKjk=;
+        b=hpPrQxojYeEHXnMqsZJBRyr6icqA7H5cs1kIXiDrNzvCMCb5j95rqSeq84ngg/YV11
+         uXwvRHumloQid7Hx3ZNHahhil1BiwLnDWxy0F+fceU3TFcBg/vHi+hQyvC8ckvRp499a
+         Mss8Rw1l1XMdPR7jfqOEJhcDs0UG2onyEbczFM3BE4yNVq36BFkY2QsIADQ8jHlj5on8
+         r/tsm8Jy12NpiDpsCrxP2Z2gk2Kr2KZ765u5LPjxgufgllWFUcEeBIZph5eJoIcuyFST
+         2WUleI94Gik7wmI/bLz9cKoriZCzfTd/VHZo8fjln8fe6jLL8YuoJpWgtuo9dJDFJa2X
+         beMQ==
+X-Gm-Message-State: APjAAAUgRZ5nt4dO14E/vJtE1+ElKorHwty+b13ukuCtkAiW5RTLdWRO
+        9acZJSDg/NIEsBgepTb+60iN33a/ryULqACkHlxQpVZgqhA=
+X-Google-Smtp-Source: APXvYqy7MJrikA6cZoW3mUqxKonOcNME2sfKdgUyF+KZXJfVpeBdjnL7cdGX0I3KFyK0uIxGxc69qqZfNntbTiAAEJY=
+X-Received: by 2002:a6b:6303:: with SMTP id p3mr1006199iog.169.1567551268258;
+ Tue, 03 Sep 2019 15:54:28 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 3 Sep 2019 17:54:17 -0500
+Message-ID: <CAH2r5mtzztgoW91TvG_wTYju10dNJ+=r8Ncx3f3bebstMZiCpA@mail.gmail.com>
+Subject: [PATCH] smb3: log warning if CSC policy conflicts with linux kernel
+ client cache mount option
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: multipart/mixed; boundary="0000000000008327cd0591adf8db"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Pavel Shilovsky <pshilov@microsoft.com>
+--0000000000008327cd0591adf8db
+Content-Type: text/plain; charset="UTF-8"
 
-[ Upstream commit 9a66396f1857cc1de06f4f4771797315e1a4ea56 ]
+If the server config (e.g. Samba smb.conf "csc policy = disable)
+for the share indicates that the share should not be cached, log
+a warning message in the Linux kernel client if forced client side
+caching ("cache=ro" or "cache=singleclient") was requested on mount.
 
-This patch aims to address writeback code problems related to error
-paths. In particular it respects EINTR and related error codes and
-stores and returns the first error occurred during writeback.
-
-Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
-Acked-by: Jeff Layton <jlayton@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/cifsglob.h | 19 +++++++++++++++++++
- fs/cifs/cifssmb.c  |  7 ++++---
- fs/cifs/file.c     | 29 +++++++++++++++++++++++------
- fs/cifs/inode.c    | 10 ++++++++++
- 4 files changed, 56 insertions(+), 9 deletions(-)
+ fs/cifs/connect.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 6f227cc781e5d..0ee0072c1f362 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1563,6 +1563,25 @@ static inline void free_dfs_info_array(struct dfs_info3_param *param,
- 	kfree(param);
- }
- 
-+static inline bool is_interrupt_error(int error)
-+{
-+	switch (error) {
-+	case -EINTR:
-+	case -ERESTARTSYS:
-+	case -ERESTARTNOHAND:
-+	case -ERESTARTNOINTR:
-+		return true;
-+	}
-+	return false;
-+}
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index d9a995588c74..85f8d943a05a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3478,6 +3478,14 @@ cifs_get_tcon(struct cifs_ses *ses, struct
+smb_vol *volume_info)
+         tcon->use_resilient = true;
+     }
+
++    /* If the user really knows what they are doing they can override */
++    if (tcon->share_flags & SMB2_SHAREFLAG_NO_CACHING) {
++        if (volume_info->cache_ro)
++            cifs_dbg(VFS, "cache=ro requested on mount but NO_CACHING
+flag set on share\n");
++        else if (volume_info->cache_rw)
++            cifs_dbg(VFS, "cache=singleclient requested on mount but
+NO_CACHING flag set on share\n");
++    }
 +
-+static inline bool is_retryable_error(int error)
-+{
-+	if (is_interrupt_error(error) || error == -EAGAIN)
-+		return true;
-+	return false;
-+}
-+
- #define   MID_FREE 0
- #define   MID_REQUEST_ALLOCATED 1
- #define   MID_REQUEST_SUBMITTED 2
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 269471c8f42bf..a5cb7b2d1ac5d 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -2042,7 +2042,7 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
- 
- 		for (j = 0; j < nr_pages; j++) {
- 			unlock_page(wdata2->pages[j]);
--			if (rc != 0 && rc != -EAGAIN) {
-+			if (rc != 0 && !is_retryable_error(rc)) {
- 				SetPageError(wdata2->pages[j]);
- 				end_page_writeback(wdata2->pages[j]);
- 				put_page(wdata2->pages[j]);
-@@ -2051,7 +2051,7 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
- 
- 		if (rc) {
- 			kref_put(&wdata2->refcount, cifs_writedata_release);
--			if (rc == -EAGAIN)
-+			if (is_retryable_error(rc))
- 				continue;
- 			break;
- 		}
-@@ -2060,7 +2060,8 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
- 		i += nr_pages;
- 	} while (i < wdata->nr_pages);
- 
--	mapping_set_error(inode->i_mapping, rc);
-+	if (rc != 0 && !is_retryable_error(rc))
-+		mapping_set_error(inode->i_mapping, rc);
- 	kref_put(&wdata->refcount, cifs_writedata_release);
- }
- 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 23cee91ed442e..933013543edab 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -749,7 +749,8 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 
- 	if (can_flush) {
- 		rc = filemap_write_and_wait(inode->i_mapping);
--		mapping_set_error(inode->i_mapping, rc);
-+		if (!is_interrupt_error(rc))
-+			mapping_set_error(inode->i_mapping, rc);
- 
- 		if (tcon->unix_ext)
- 			rc = cifs_get_inode_info_unix(&inode, full_path,
-@@ -2137,6 +2138,7 @@ static int cifs_writepages(struct address_space *mapping,
- 	pgoff_t end, index;
- 	struct cifs_writedata *wdata;
- 	int rc = 0;
-+	int saved_rc = 0;
- 
- 	/*
- 	 * If wsize is smaller than the page cache size, default to writing
-@@ -2163,8 +2165,10 @@ static int cifs_writepages(struct address_space *mapping,
- 
- 		rc = server->ops->wait_mtu_credits(server, cifs_sb->wsize,
- 						   &wsize, &credits);
--		if (rc)
-+		if (rc != 0) {
-+			done = true;
- 			break;
-+		}
- 
- 		tofind = min((wsize / PAGE_SIZE) - 1, end - index) + 1;
- 
-@@ -2172,6 +2176,7 @@ static int cifs_writepages(struct address_space *mapping,
- 						  &found_pages);
- 		if (!wdata) {
- 			rc = -ENOMEM;
-+			done = true;
- 			add_credits_and_wake_if(server, credits, 0);
- 			break;
- 		}
-@@ -2200,7 +2205,7 @@ static int cifs_writepages(struct address_space *mapping,
- 		if (rc != 0) {
- 			add_credits_and_wake_if(server, wdata->credits, 0);
- 			for (i = 0; i < nr_pages; ++i) {
--				if (rc == -EAGAIN)
-+				if (is_retryable_error(rc))
- 					redirty_page_for_writepage(wbc,
- 							   wdata->pages[i]);
- 				else
-@@ -2208,7 +2213,7 @@ static int cifs_writepages(struct address_space *mapping,
- 				end_page_writeback(wdata->pages[i]);
- 				put_page(wdata->pages[i]);
- 			}
--			if (rc != -EAGAIN)
-+			if (!is_retryable_error(rc))
- 				mapping_set_error(mapping, rc);
- 		}
- 		kref_put(&wdata->refcount, cifs_writedata_release);
-@@ -2218,6 +2223,15 @@ static int cifs_writepages(struct address_space *mapping,
- 			continue;
- 		}
- 
-+		/* Return immediately if we received a signal during writing */
-+		if (is_interrupt_error(rc)) {
-+			done = true;
-+			break;
-+		}
-+
-+		if (rc != 0 && saved_rc == 0)
-+			saved_rc = rc;
-+
- 		wbc->nr_to_write -= nr_pages;
- 		if (wbc->nr_to_write <= 0)
- 			done = true;
-@@ -2235,6 +2249,9 @@ static int cifs_writepages(struct address_space *mapping,
- 		goto retry;
- 	}
- 
-+	if (saved_rc != 0)
-+		rc = saved_rc;
-+
- 	if (wbc->range_cyclic || (range_whole && wbc->nr_to_write > 0))
- 		mapping->writeback_index = index;
- 
-@@ -2266,8 +2283,8 @@ cifs_writepage_locked(struct page *page, struct writeback_control *wbc)
- 	set_page_writeback(page);
- retry_write:
- 	rc = cifs_partialpagewrite(page, 0, PAGE_SIZE);
--	if (rc == -EAGAIN) {
--		if (wbc->sync_mode == WB_SYNC_ALL)
-+	if (is_retryable_error(rc)) {
-+		if (wbc->sync_mode == WB_SYNC_ALL && rc == -EAGAIN)
- 			goto retry_write;
- 		redirty_page_for_writepage(wbc, page);
- 	} else if (rc != 0) {
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 1fadd314ae7f9..53f3d08898af8 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -2261,6 +2261,11 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
- 	 * the flush returns error?
- 	 */
- 	rc = filemap_write_and_wait(inode->i_mapping);
-+	if (is_interrupt_error(rc)) {
-+		rc = -ERESTARTSYS;
-+		goto out;
-+	}
-+
- 	mapping_set_error(inode->i_mapping, rc);
- 	rc = 0;
- 
-@@ -2404,6 +2409,11 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 	 * the flush returns error?
- 	 */
- 	rc = filemap_write_and_wait(inode->i_mapping);
-+	if (is_interrupt_error(rc)) {
-+		rc = -ERESTARTSYS;
-+		goto cifs_setattr_exit;
-+	}
-+
- 	mapping_set_error(inode->i_mapping, rc);
- 	rc = 0;
- 
+     /*
+      * We can have only one retry value for a connection to a share so for
+      * resources mounted more than once to the same server share the last
+
 -- 
-2.20.1
+Thanks,
 
+Steve
+
+--0000000000008327cd0591adf8db
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-log-warning-if-CSC-policy-conflicts-with-cache-.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-log-warning-if-CSC-policy-conflicts-with-cache-.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_k04fjknu0>
+X-Attachment-Id: f_k04fjknu0
+
+RnJvbSBkYWU5MzFjMDJhZWQxNDQyN2VhNDAyMmM3ZTgwMzhhYjMxMDNiNGQ5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgMyBTZXAgMjAxOSAxNzo0OTo0NiAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
+YjM6IGxvZyB3YXJuaW5nIGlmIENTQyBwb2xpY3kgY29uZmxpY3RzIHdpdGggY2FjaGUgbW91bnQK
+IG9wdGlvbgoKSWYgdGhlIHNlcnZlciBjb25maWcgKGUuZy4gU2FtYmEgc21iLmNvbmYgImNzYyBw
+b2xpY3kgPSBkaXNhYmxlKQpmb3IgdGhlIHNoYXJlIGluZGljYXRlcyB0aGF0IHRoZSBzaGFyZSBz
+aG91bGQgbm90IGJlIGNhY2hlZCwgbG9nCmEgd2FybmluZyBtZXNzYWdlIGlmIGZvcmNlZCBjbGll
+bnQgc2lkZSBjYWNoaW5nICgiY2FjaGU9cm8iIG9yCiJjYWNoZT1zaW5nbGVjbGllbnQiKSBpcyBy
+ZXF1ZXN0ZWQgb24gbW91bnQuCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNo
+QG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9jb25uZWN0LmMgfCA4ICsrKysrKysrCiAxIGZp
+bGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jb25uZWN0
+LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYwppbmRleCBkOWE5OTU1ODhjNzQuLjg1ZjhkOTQzYTA1YSAx
+MDA2NDQKLS0tIGEvZnMvY2lmcy9jb25uZWN0LmMKKysrIGIvZnMvY2lmcy9jb25uZWN0LmMKQEAg
+LTM0NzgsNiArMzQ3OCwxNCBAQCBjaWZzX2dldF90Y29uKHN0cnVjdCBjaWZzX3NlcyAqc2VzLCBz
+dHJ1Y3Qgc21iX3ZvbCAqdm9sdW1lX2luZm8pCiAJCXRjb24tPnVzZV9yZXNpbGllbnQgPSB0cnVl
+OwogCX0KIAorCS8qIElmIHRoZSB1c2VyIHJlYWxseSBrbm93cyB3aGF0IHRoZXkgYXJlIGRvaW5n
+IHRoZXkgY2FuIG92ZXJyaWRlICovCisJaWYgKHRjb24tPnNoYXJlX2ZsYWdzICYgU01CMl9TSEFS
+RUZMQUdfTk9fQ0FDSElORykgeworCQlpZiAodm9sdW1lX2luZm8tPmNhY2hlX3JvKQorCQkJY2lm
+c19kYmcoVkZTLCAiY2FjaGU9cm8gcmVxdWVzdGVkIG9uIG1vdW50IGJ1dCBOT19DQUNISU5HIGZs
+YWcgc2V0IG9uIHNoYXJlXG4iKTsKKwkJZWxzZSBpZiAodm9sdW1lX2luZm8tPmNhY2hlX3J3KQor
+CQkJY2lmc19kYmcoVkZTLCAiY2FjaGU9c2luZ2xlY2xpZW50IHJlcXVlc3RlZCBvbiBtb3VudCBi
+dXQgTk9fQ0FDSElORyBmbGFnIHNldCBvbiBzaGFyZVxuIik7CisJfQorCiAJLyoKIAkgKiBXZSBj
+YW4gaGF2ZSBvbmx5IG9uZSByZXRyeSB2YWx1ZSBmb3IgYSBjb25uZWN0aW9uIHRvIGEgc2hhcmUg
+c28gZm9yCiAJICogcmVzb3VyY2VzIG1vdW50ZWQgbW9yZSB0aGFuIG9uY2UgdG8gdGhlIHNhbWUg
+c2VydmVyIHNoYXJlIHRoZSBsYXN0Ci0tIAoyLjIwLjEKCg==
+--0000000000008327cd0591adf8db--
