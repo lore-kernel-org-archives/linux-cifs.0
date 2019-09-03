@@ -4,49 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5FBC3A5A8
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD24C3A5A2
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:35:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 061D723697
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:34:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B731223400
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:35:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567528477;
-	bh=vO/ZH76YJ35lxyy92BlgYST4jDQO3MLwsSLQcHAeT2k=;
+	s=default; t=1567528513;
+	bh=y7zrbxbyuIpeUNUY35urgqiiOnBeTRg/Nw172CvPTf0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=gzZHkDe2ltGJa0YK28h4E2HDVcBHtAbRSw/Rry56CWhaNR9AsiE4z66f1hcjtLDB+
-	 u3AeLKEjmNNrbFcmzcZZDO2koYa493QOa4BBHx28TIjhgQqxLMn6wFk9SLxWMJfWxI
-	 rZ8tTV4rSLTT24Me6WZBm7sYNwZOwZRUhN9UosRA=
+	b=ByFfjwcA2rKk/DkMoqNB0NgGwBKqKVxmqo3VQdVQy3R5juYK6NMIlRCI7tZ/v+um5
+	 kf6ge4ehOBHzUXfE3jFhPwNoMMzz4/sl8fjZQBWPcNjlmamaxZVHXEimyjIUim+sGk
+	 pEhqdiFs4UuNPfssyuDwfe6hNapNAsoQZa0ULhf4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730119AbfICQe0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 Sep 2019 12:34:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49734 "EHLO mail.kernel.org"
+        id S1730429AbfICQ1w (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Sep 2019 12:27:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49438 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731026AbfICQ2E (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 3 Sep 2019 12:28:04 -0400
+        id S1730964AbfICQ1w (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 3 Sep 2019 12:27:52 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 918132343A;
-        Tue,  3 Sep 2019 16:28:02 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BA0F32343A;
+        Tue,  3 Sep 2019 16:27:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567528083;
-        bh=vO/ZH76YJ35lxyy92BlgYST4jDQO3MLwsSLQcHAeT2k=;
+        s=default; t=1567528071;
+        bh=y7zrbxbyuIpeUNUY35urgqiiOnBeTRg/Nw172CvPTf0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=U3G/s4NeWGkkrZ7TWLyRH+KSG4uZeLgkakvYNkrN9oKv/yaTBtWYvVyNqS5U/KFMy
-         bTh7Peu9uKlBl9uEAP9Eid/ixRup4GiwLNZ+PrxIH9+zYozQbUMEIDCk4OYPLh6qre
-         AURys2JjmX11cqC6WvUOCq/oXwxvmKWWV0K8nlIw=
+        b=vkfpgPGdfz2fmWmNauNAkgvxl0v17rp9Ex+oikIiHFRZkJW9VLY2KWngITr3s1gt+
+         /qrYeWecB9FS7FcNjayrQACNeXc+OOHr5E4FbvDqxagrztBCcqBZepjrkuybAcH56E
+         6fe5qnEOwe3tFKVN75InuHYqTzyqJJsjXSQW6WCE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     ZhangXiaoxu <zhangxiaoxu5@huawei.com>,
+Cc:     Pavel Shilovsky <pshilov@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 095/167] cifs: Fix lease buffer length error
-Date:   Tue,  3 Sep 2019 12:24:07 -0400
-Message-Id: <20190903162519.7136-95-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 085/167] CIFS: Fix leaking locked VFS cache pages in writeback retry
+Date:   Tue,  3 Sep 2019 12:23:57 -0400
+Message-Id: <20190903162519.7136-85-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190903162519.7136-1-sashal@kernel.org>
 References: <20190903162519.7136-1-sashal@kernel.org>
@@ -59,87 +58,67 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: ZhangXiaoxu <zhangxiaoxu5@huawei.com>
+From: Pavel Shilovsky <pshilov@microsoft.com>
 
-[ Upstream commit b57a55e2200ede754e4dc9cce4ba9402544b9365 ]
+[ Upstream commit 165df9a080b6863ae286fa01780c13d87cd81076 ]
 
-There is a KASAN slab-out-of-bounds:
-BUG: KASAN: slab-out-of-bounds in _copy_from_iter_full+0x783/0xaa0
-Read of size 80 at addr ffff88810c35e180 by task mount.cifs/539
+If we don't find a writable file handle when retrying writepages
+we break of the loop and do not unlock and put pages neither from
+wdata2 nor from the original wdata. Fix this by walking through
+all the remaining pages and cleanup them properly.
 
-CPU: 1 PID: 539 Comm: mount.cifs Not tainted 4.19 #10
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-            rel-1.12.0-0-ga698c8995f-prebuilt.qemu.org 04/01/2014
-Call Trace:
- dump_stack+0xdd/0x12a
- print_address_description+0xa7/0x540
- kasan_report+0x1ff/0x550
- check_memory_region+0x2f1/0x310
- memcpy+0x2f/0x80
- _copy_from_iter_full+0x783/0xaa0
- tcp_sendmsg_locked+0x1840/0x4140
- tcp_sendmsg+0x37/0x60
- inet_sendmsg+0x18c/0x490
- sock_sendmsg+0xae/0x130
- smb_send_kvec+0x29c/0x520
- __smb_send_rqst+0x3ef/0xc60
- smb_send_rqst+0x25a/0x2e0
- compound_send_recv+0x9e8/0x2af0
- cifs_send_recv+0x24/0x30
- SMB2_open+0x35e/0x1620
- open_shroot+0x27b/0x490
- smb2_open_op_close+0x4e1/0x590
- smb2_query_path_info+0x2ac/0x650
- cifs_get_inode_info+0x1058/0x28f0
- cifs_root_iget+0x3bb/0xf80
- cifs_smb3_do_mount+0xe00/0x14c0
- cifs_do_mount+0x15/0x20
- mount_fs+0x5e/0x290
- vfs_kern_mount+0x88/0x460
- do_mount+0x398/0x31e0
- ksys_mount+0xc6/0x150
- __x64_sys_mount+0xea/0x190
- do_syscall_64+0x122/0x590
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-It can be reproduced by the following step:
-  1. samba configured with: server max protocol = SMB2_10
-  2. mount -o vers=default
-
-When parse the mount version parameter, the 'ops' and 'vals'
-was setted to smb30,  if negotiate result is smb21, just
-update the 'ops' to smb21, but the 'vals' is still smb30.
-When add lease context, the iov_base is allocated with smb21
-ops, but the iov_len is initiallited with the smb30. Because
-the iov_len is longer than iov_base, when send the message,
-copy array out of bounds.
-
-we need to keep the 'ops' and 'vals' consistent.
-
-Fixes: 9764c02fcbad ("SMB3: Add support for multidialect negotiate (SMB2.1 and later)")
-Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
-
-Signed-off-by: ZhangXiaoxu <zhangxiaoxu5@huawei.com>
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-CC: Stable <stable@vger.kernel.org>
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/smb2pdu.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/cifs/cifssmb.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 2bc47eb6215e2..cbe633f1840a2 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -712,6 +712,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
- 		} else if (rsp->DialectRevision == cpu_to_le16(SMB21_PROT_ID)) {
- 			/* ops set to 3.0 by default for default so update */
- 			ses->server->ops = &smb21_operations;
-+			ses->server->vals = &smb21_values;
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index a5cb7b2d1ac5d..86a54b809c484 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -2033,12 +2033,13 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
+ 
+ 		wdata2->cfile = find_writable_file(CIFS_I(inode), false);
+ 		if (!wdata2->cfile) {
+-			cifs_dbg(VFS, "No writable handles for inode\n");
++			cifs_dbg(VFS, "No writable handle to retry writepages\n");
+ 			rc = -EBADF;
+-			break;
++		} else {
++			wdata2->pid = wdata2->cfile->pid;
++			rc = server->ops->async_writev(wdata2,
++						       cifs_writedata_release);
  		}
- 	} else if (le16_to_cpu(rsp->DialectRevision) !=
- 				ses->server->vals->protocol_id) {
+-		wdata2->pid = wdata2->cfile->pid;
+-		rc = server->ops->async_writev(wdata2, cifs_writedata_release);
+ 
+ 		for (j = 0; j < nr_pages; j++) {
+ 			unlock_page(wdata2->pages[j]);
+@@ -2053,6 +2054,7 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
+ 			kref_put(&wdata2->refcount, cifs_writedata_release);
+ 			if (is_retryable_error(rc))
+ 				continue;
++			i += nr_pages;
+ 			break;
+ 		}
+ 
+@@ -2060,6 +2062,13 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
+ 		i += nr_pages;
+ 	} while (i < wdata->nr_pages);
+ 
++	/* cleanup remaining pages from the original wdata */
++	for (; i < wdata->nr_pages; i++) {
++		SetPageError(wdata->pages[i]);
++		end_page_writeback(wdata->pages[i]);
++		put_page(wdata->pages[i]);
++	}
++
+ 	if (rc != 0 && !is_retryable_error(rc))
+ 		mapping_set_error(inode->i_mapping, rc);
+ 	kref_put(&wdata->refcount, cifs_writedata_release);
 -- 
 2.20.1
 
