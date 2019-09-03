@@ -2,57 +2,132 @@ Return-Path: <SRS0=oOOd=W6=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1E6C3A5A2
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 10:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2627AC3A5A2
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:30:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E9A222CF8
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 10:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE775215EA
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:30:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1567528223;
+	bh=EIdcxOkdkMNL4Z0E6xJ4tDo5+bIlgiXBorMzcKhbaj4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=iSdCIIDhN8biFuIjQIAo8+v21NkvHWmr5QE/zNL2UuZf3q+XvBk4gkxcSYBUDyP9g
+	 2CQ1VoOZyFQn1p7/IakQvaJS1+sWaou5MqIg8semN2SjiqY78Le1waF6MugulHXsyC
+	 ZGWOO1Jwi7V93g09KnlmnJgKHB1xgAS2OKaVVGfw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728592AbfICKii convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 Sep 2019 06:38:38 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49422 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728576AbfICKii (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 3 Sep 2019 06:38:38 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E7425AE6D;
-        Tue,  3 Sep 2019 10:38:36 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     James Wettenhall <james.wettenhall@monash.edu>,
-        Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Frequent reconnections / session startups?
-In-Reply-To: <CAE78Er8KYhRts+zKNsP6_11ZVA0kaTrtjvZPhdLAkHqDXhKOWA@mail.gmail.com>
-References: <CAE78Er-YVBzqaf8jCBio_V_1J2kRiWZ_SH-HnHm7KG3t46=j6w@mail.gmail.com> <CAH2r5mu446ssSPrACP8q859Cs0ynUMpJopH0t5qAsR=sGrByFA@mail.gmail.com> <CAE78Er8KYhRts+zKNsP6_11ZVA0kaTrtjvZPhdLAkHqDXhKOWA@mail.gmail.com>
-Date:   Tue, 03 Sep 2019 12:38:33 +0200
-Message-ID: <87pnkh7jh2.fsf@suse.com>
+        id S1730694AbfICQaR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Sep 2019 12:30:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51386 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730502AbfICQ2z (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 3 Sep 2019 12:28:55 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F1E06238F7;
+        Tue,  3 Sep 2019 16:28:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1567528134;
+        bh=EIdcxOkdkMNL4Z0E6xJ4tDo5+bIlgiXBorMzcKhbaj4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=OBmzOeksz1FQtG1+TqhAKJ7F2Bvo3UriCue9BJy+Op8aIhLxeDvpgvDsDYxkt/UQt
+         tFVwrVsl4STn/7aH1jUyZGdcAwVdTxrn/ox6O0dUsDX9PSxfh8freeLKykRfwdEWF7
+         PUrpSKsZjWBCGL2FSG3WFEwiNI58qKCwqq16fRKA=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     "Paulo Alcantara (SUSE)" <paulo@paulo.ac>,
+        Steve French <stfrench@microsoft.com>,
+        Pavel Shilovsky <pshilove@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 129/167] cifs: Properly handle auto disabling of serverino option
+Date:   Tue,  3 Sep 2019 12:24:41 -0400
+Message-Id: <20190903162519.7136-129-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190903162519.7136-1-sashal@kernel.org>
+References: <20190903162519.7136-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-"James Wettenhall" <james.wettenhall@monash.edu> writes:
-> The only negative we are experiencing since the upgrade is that our
-> VMs sometimes become unresponsive - appearing to require a reboot -
-> with kernel messages like this:
+From: "Paulo Alcantara (SUSE)" <paulo@paulo.ac>
 
-Are the VMs completely unresponsive or can you run commands in a
-separate shell (assuming you're not touching the cifs mount in that shell)?
+[ Upstream commit 29fbeb7a908a60a5ae8c50fbe171cb8fdcef1980 ]
 
-Does dmesg include a stacktrace you would be wiling to share?
+Fix mount options comparison when serverino option is turned off later
+in cifs_autodisable_serverino() and thus avoiding mismatch of new cifs
+mounts.
 
-Cheers,
+Cc: stable@vger.kernel.org
+Signed-off-by: Paulo Alcantara (SUSE) <paulo@paulo.ac>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Reviewed-by: Pavel Shilovsky <pshilove@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/cifs_fs_sb.h | 5 +++++
+ fs/cifs/connect.c    | 8 ++++++--
+ fs/cifs/misc.c       | 1 +
+ 3 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
+index 9731d0d891e7e..aba2b48d4da1a 100644
+--- a/fs/cifs/cifs_fs_sb.h
++++ b/fs/cifs/cifs_fs_sb.h
+@@ -72,5 +72,10 @@ struct cifs_sb_info {
+ 	struct delayed_work prune_tlinks;
+ 	struct rcu_head rcu;
+ 	char *prepath;
++	/*
++	 * Indicate whether serverino option was turned off later
++	 * (cifs_autodisable_serverino) in order to match new mounts.
++	 */
++	bool mnt_cifs_serverino_autodisabled;
+ };
+ #endif				/* _CIFS_FS_SB_H */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index c53a2e86ed544..208430bb66fc6 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3247,12 +3247,16 @@ compare_mount_options(struct super_block *sb, struct cifs_mnt_data *mnt_data)
+ {
+ 	struct cifs_sb_info *old = CIFS_SB(sb);
+ 	struct cifs_sb_info *new = mnt_data->cifs_sb;
++	unsigned int oldflags = old->mnt_cifs_flags & CIFS_MOUNT_MASK;
++	unsigned int newflags = new->mnt_cifs_flags & CIFS_MOUNT_MASK;
+ 
+ 	if ((sb->s_flags & CIFS_MS_MASK) != (mnt_data->flags & CIFS_MS_MASK))
+ 		return 0;
+ 
+-	if ((old->mnt_cifs_flags & CIFS_MOUNT_MASK) !=
+-	    (new->mnt_cifs_flags & CIFS_MOUNT_MASK))
++	if (old->mnt_cifs_serverino_autodisabled)
++		newflags &= ~CIFS_MOUNT_SERVER_INUM;
++
++	if (oldflags != newflags)
+ 		return 0;
+ 
+ 	/*
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index facc94e159a16..e45f8e321371c 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -523,6 +523,7 @@ cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb)
+ {
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
+ 		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SERVER_INUM;
++		cifs_sb->mnt_cifs_serverino_autodisabled = true;
+ 		cifs_dbg(VFS, "Autodisabling the use of server inode numbers on %s. This server doesn't seem to support them properly. Hardlinks will not be recognized on this mount. Consider mounting with the \"noserverino\" option to silence this message.\n",
+ 			 cifs_sb_master_tcon(cifs_sb)->treeName);
+ 	}
 -- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
+2.20.1
+
