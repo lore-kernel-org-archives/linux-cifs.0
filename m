@@ -4,49 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2627AC3A5A2
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A284EC3A5A2
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:30:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EE775215EA
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:30:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AE992343A
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:30:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567528223;
-	bh=EIdcxOkdkMNL4Z0E6xJ4tDo5+bIlgiXBorMzcKhbaj4=;
+	s=default; t=1567528259;
+	bh=P+e9KRq2RbmuZr+hTt0ka7y0UD+ZQcVJc5pyEkgLWLo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=iSdCIIDhN8biFuIjQIAo8+v21NkvHWmr5QE/zNL2UuZf3q+XvBk4gkxcSYBUDyP9g
-	 2CQ1VoOZyFQn1p7/IakQvaJS1+sWaou5MqIg8semN2SjiqY78Le1waF6MugulHXsyC
-	 ZGWOO1Jwi7V93g09KnlmnJgKHB1xgAS2OKaVVGfw=
+	b=fdNDALUXUwM/x68EW76vW4O2a9IiMIPySyiy8TcnW5K28eBkeESrEDKecf1rczEK/
+	 bulOVFGeL7IPRKxt3jCCezzJOj1Cuc8b8GEMRZxxU1wxQSuapUbHA2B5Nc2z8TGKCH
+	 e7NGglAHp2Vf7w4ZuROJ8QSbPnqp+OPIr1XeBLwI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730694AbfICQaR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 Sep 2019 12:30:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51386 "EHLO mail.kernel.org"
+        id S1730433AbfICQay (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Sep 2019 12:30:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50898 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730502AbfICQ2z (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 3 Sep 2019 12:28:55 -0400
+        id S1730118AbfICQ2n (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 3 Sep 2019 12:28:43 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F1E06238F7;
-        Tue,  3 Sep 2019 16:28:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C9B9E23431;
+        Tue,  3 Sep 2019 16:28:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567528134;
-        bh=EIdcxOkdkMNL4Z0E6xJ4tDo5+bIlgiXBorMzcKhbaj4=;
+        s=default; t=1567528122;
+        bh=P+e9KRq2RbmuZr+hTt0ka7y0UD+ZQcVJc5pyEkgLWLo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OBmzOeksz1FQtG1+TqhAKJ7F2Bvo3UriCue9BJy+Op8aIhLxeDvpgvDsDYxkt/UQt
-         tFVwrVsl4STn/7aH1jUyZGdcAwVdTxrn/ox6O0dUsDX9PSxfh8freeLKykRfwdEWF7
-         PUrpSKsZjWBCGL2FSG3WFEwiNI58qKCwqq16fRKA=
+        b=H7JgiXNFAnaDt+EjZO38JIMck6eCi9yGfhmVRdraGEsVppoTXE7M6CpLhOo9+5xs+
+         9QmcALgdxl/9Lfl2zT/BBpNhr0rm5Fx5cnxARej7U7Q/ttX0RVskSZ1B8gLQNHsIip
+         jMO4HdcxHwngQsIEhFKsm1DBwtzDsYSQpAOpMApM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "Paulo Alcantara (SUSE)" <paulo@paulo.ac>,
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
-        Pavel Shilovsky <pshilove@microsoft.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 129/167] cifs: Properly handle auto disabling of serverino option
-Date:   Tue,  3 Sep 2019 12:24:41 -0400
-Message-Id: <20190903162519.7136-129-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 119/167] cifs: add spinlock for the openFileList to cifsInodeInfo
+Date:   Tue,  3 Sep 2019 12:24:31 -0400
+Message-Id: <20190903162519.7136-119-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190903162519.7136-1-sashal@kernel.org>
 References: <20190903162519.7136-1-sashal@kernel.org>
@@ -59,75 +59,110 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: "Paulo Alcantara (SUSE)" <paulo@paulo.ac>
+From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-[ Upstream commit 29fbeb7a908a60a5ae8c50fbe171cb8fdcef1980 ]
+[ Upstream commit 487317c99477d00f22370625d53be3239febabbe ]
 
-Fix mount options comparison when serverino option is turned off later
-in cifs_autodisable_serverino() and thus avoiding mismatch of new cifs
-mounts.
+We can not depend on the tcon->open_file_lock here since in multiuser mode
+we may have the same file/inode open via multiple different tcons.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Paulo Alcantara (SUSE) <paulo@paulo.ac>
+The current code is race prone and will crash if one user deletes a file
+at the same time a different user opens/create the file.
+
+To avoid this we need to have a spinlock attached to the inode and not the tcon.
+
+RHBZ:  1580165
+
+CC: Stable <stable@vger.kernel.org>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Reviewed-by: Pavel Shilovsky <pshilove@microsoft.com>
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/cifs_fs_sb.h | 5 +++++
- fs/cifs/connect.c    | 8 ++++++--
- fs/cifs/misc.c       | 1 +
+ fs/cifs/cifsfs.c   | 1 +
+ fs/cifs/cifsglob.h | 5 +++++
+ fs/cifs/file.c     | 8 ++++++--
  3 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifs_fs_sb.h b/fs/cifs/cifs_fs_sb.h
-index 9731d0d891e7e..aba2b48d4da1a 100644
---- a/fs/cifs/cifs_fs_sb.h
-+++ b/fs/cifs/cifs_fs_sb.h
-@@ -72,5 +72,10 @@ struct cifs_sb_info {
- 	struct delayed_work prune_tlinks;
- 	struct rcu_head rcu;
- 	char *prepath;
-+	/*
-+	 * Indicate whether serverino option was turned off later
-+	 * (cifs_autodisable_serverino) in order to match new mounts.
-+	 */
-+	bool mnt_cifs_serverino_autodisabled;
- };
- #endif				/* _CIFS_FS_SB_H */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index c53a2e86ed544..208430bb66fc6 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3247,12 +3247,16 @@ compare_mount_options(struct super_block *sb, struct cifs_mnt_data *mnt_data)
- {
- 	struct cifs_sb_info *old = CIFS_SB(sb);
- 	struct cifs_sb_info *new = mnt_data->cifs_sb;
-+	unsigned int oldflags = old->mnt_cifs_flags & CIFS_MOUNT_MASK;
-+	unsigned int newflags = new->mnt_cifs_flags & CIFS_MOUNT_MASK;
- 
- 	if ((sb->s_flags & CIFS_MS_MASK) != (mnt_data->flags & CIFS_MS_MASK))
- 		return 0;
- 
--	if ((old->mnt_cifs_flags & CIFS_MOUNT_MASK) !=
--	    (new->mnt_cifs_flags & CIFS_MOUNT_MASK))
-+	if (old->mnt_cifs_serverino_autodisabled)
-+		newflags &= ~CIFS_MOUNT_SERVER_INUM;
-+
-+	if (oldflags != newflags)
- 		return 0;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index fb32f3d6925e8..64e3888f30e6d 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -292,6 +292,7 @@ cifs_alloc_inode(struct super_block *sb)
+ 	cifs_inode->uniqueid = 0;
+ 	cifs_inode->createtime = 0;
+ 	cifs_inode->epoch = 0;
++	spin_lock_init(&cifs_inode->open_file_lock);
+ 	generate_random_uuid(cifs_inode->lease_key);
  
  	/*
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index facc94e159a16..e45f8e321371c 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -523,6 +523,7 @@ cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb)
- {
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM) {
- 		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SERVER_INUM;
-+		cifs_sb->mnt_cifs_serverino_autodisabled = true;
- 		cifs_dbg(VFS, "Autodisabling the use of server inode numbers on %s. This server doesn't seem to support them properly. Hardlinks will not be recognized on this mount. Consider mounting with the \"noserverino\" option to silence this message.\n",
- 			 cifs_sb_master_tcon(cifs_sb)->treeName);
- 	}
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 0ee0072c1f362..57af9bac0045a 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1287,6 +1287,7 @@ struct cifsInodeInfo {
+ 	struct rw_semaphore lock_sem;	/* protect the fields above */
+ 	/* BB add in lists for dirty pages i.e. write caching info for oplock */
+ 	struct list_head openFileList;
++	spinlock_t	open_file_lock;	/* protects openFileList */
+ 	__u32 cifsAttrs; /* e.g. DOS archive bit, sparse, compressed, system */
+ 	unsigned int oplock;		/* oplock/lease level we have */
+ 	unsigned int epoch;		/* used to track lease state changes */
+@@ -1687,10 +1688,14 @@ require use of the stronger protocol */
+  *  tcp_ses_lock protects:
+  *	list operations on tcp and SMB session lists
+  *  tcon->open_file_lock protects the list of open files hanging off the tcon
++ *  inode->open_file_lock protects the openFileList hanging off the inode
+  *  cfile->file_info_lock protects counters and fields in cifs file struct
+  *  f_owner.lock protects certain per file struct operations
+  *  mapping->page_lock protects certain per page operations
+  *
++ *  Note that the cifs_tcon.open_file_lock should be taken before
++ *  not after the cifsInodeInfo.open_file_lock
++ *
+  *  Semaphores
+  *  ----------
+  *  sesSem     operations on smb session
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 933013543edab..8703b5f26f452 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -336,10 +336,12 @@ cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
+ 	list_add(&cfile->tlist, &tcon->openFileList);
+ 
+ 	/* if readable file instance put first in list*/
++	spin_lock(&cinode->open_file_lock);
+ 	if (file->f_mode & FMODE_READ)
+ 		list_add(&cfile->flist, &cinode->openFileList);
+ 	else
+ 		list_add_tail(&cfile->flist, &cinode->openFileList);
++	spin_unlock(&cinode->open_file_lock);
+ 	spin_unlock(&tcon->open_file_lock);
+ 
+ 	if (fid->purge_cache)
+@@ -411,7 +413,9 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_handler)
+ 	cifs_add_pending_open_locked(&fid, cifs_file->tlink, &open);
+ 
+ 	/* remove it from the lists */
++	spin_lock(&cifsi->open_file_lock);
+ 	list_del(&cifs_file->flist);
++	spin_unlock(&cifsi->open_file_lock);
+ 	list_del(&cifs_file->tlist);
+ 
+ 	if (list_empty(&cifsi->openFileList)) {
+@@ -1929,10 +1933,10 @@ struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *cifs_inode,
+ 		if (!rc)
+ 			return inv_file;
+ 		else {
+-			spin_lock(&tcon->open_file_lock);
++			spin_lock(&cifs_inode->open_file_lock);
+ 			list_move_tail(&inv_file->flist,
+ 					&cifs_inode->openFileList);
+-			spin_unlock(&tcon->open_file_lock);
++			spin_unlock(&cifs_inode->open_file_lock);
+ 			cifsFileInfo_put(inv_file);
+ 			++refind;
+ 			inv_file = NULL;
 -- 
 2.20.1
 
