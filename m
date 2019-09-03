@@ -4,48 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29637C3A5A2
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5FBC3A5A8
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:34:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB130215EA
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:31:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 061D723697
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Sep 2019 16:34:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567528284;
-	bh=zgc+UioOUwGXb7TQaMJXT1bDsSiqExv5Xl/iGS1D/vA=;
+	s=default; t=1567528477;
+	bh=vO/ZH76YJ35lxyy92BlgYST4jDQO3MLwsSLQcHAeT2k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=WAMtT0qko194sDJM6ifs6FOZNMCssMXaHXTjSkb/+vAnw/7iE+l4LyPYg6MpMIBq0
-	 TaBNqEllYQ0+ScGXgFmShC6zxI3/eECuV6zLaIHndC6su4d4Fs+8SjPtw/WHwzVE1S
-	 F42iHruG64BBwUBAjygdg1XepCO4fm3ZUICfkxes=
+	b=gzZHkDe2ltGJa0YK28h4E2HDVcBHtAbRSw/Rry56CWhaNR9AsiE4z66f1hcjtLDB+
+	 u3AeLKEjmNNrbFcmzcZZDO2koYa493QOa4BBHx28TIjhgQqxLMn6wFk9SLxWMJfWxI
+	 rZ8tTV4rSLTT24Me6WZBm7sYNwZOwZRUhN9UosRA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731111AbfICQ2X (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 Sep 2019 12:28:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50324 "EHLO mail.kernel.org"
+        id S1730119AbfICQe0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Sep 2019 12:34:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49734 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730628AbfICQ2X (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 3 Sep 2019 12:28:23 -0400
+        id S1731026AbfICQ2E (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 3 Sep 2019 12:28:04 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4DE5023789;
-        Tue,  3 Sep 2019 16:28:21 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 918132343A;
+        Tue,  3 Sep 2019 16:28:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567528102;
-        bh=zgc+UioOUwGXb7TQaMJXT1bDsSiqExv5Xl/iGS1D/vA=;
+        s=default; t=1567528083;
+        bh=vO/ZH76YJ35lxyy92BlgYST4jDQO3MLwsSLQcHAeT2k=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=eUg9uguYV97Snh7ggScv1sJvhaDVZ9TmrE7enLB9FuDs6paTzATRKasYk1WPpA3QH
-         zo4LAUbVDZVL8Fjyt/GBjsMR+yxuSKVk3YAJ9k3Y8BVEjHlkyqjWQYys9cHqXyezY1
-         xvuPhT/5rw8LfVVdlGAnjjhfEjXnd2I0f5wO+vIU=
+        b=U3G/s4NeWGkkrZ7TWLyRH+KSG4uZeLgkakvYNkrN9oKv/yaTBtWYvVyNqS5U/KFMy
+         bTh7Peu9uKlBl9uEAP9Eid/ixRup4GiwLNZ+PrxIH9+zYozQbUMEIDCk4OYPLh6qre
+         AURys2JjmX11cqC6WvUOCq/oXwxvmKWWV0K8nlIw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Long Li <longli@microsoft.com>,
+Cc:     ZhangXiaoxu <zhangxiaoxu5@huawei.com>,
         Steve French <stfrench@microsoft.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 109/167] cifs: smbd: take an array of reqeusts when sending upper layer data
-Date:   Tue,  3 Sep 2019 12:24:21 -0400
-Message-Id: <20190903162519.7136-109-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 095/167] cifs: Fix lease buffer length error
+Date:   Tue,  3 Sep 2019 12:24:07 -0400
+Message-Id: <20190903162519.7136-95-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190903162519.7136-1-sashal@kernel.org>
 References: <20190903162519.7136-1-sashal@kernel.org>
@@ -58,178 +59,87 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Long Li <longli@microsoft.com>
+From: ZhangXiaoxu <zhangxiaoxu5@huawei.com>
 
-[ Upstream commit 4739f2328661d070f93f9bcc8afb2a82706c826d ]
+[ Upstream commit b57a55e2200ede754e4dc9cce4ba9402544b9365 ]
 
-To support compounding, __smb_send_rqst() now sends an array of requests to
-the transport layer.
-Change smbd_send() to take an array of requests, and send them in as few
-packets as possible.
+There is a KASAN slab-out-of-bounds:
+BUG: KASAN: slab-out-of-bounds in _copy_from_iter_full+0x783/0xaa0
+Read of size 80 at addr ffff88810c35e180 by task mount.cifs/539
 
-Signed-off-by: Long Li <longli@microsoft.com>
+CPU: 1 PID: 539 Comm: mount.cifs Not tainted 4.19 #10
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+            rel-1.12.0-0-ga698c8995f-prebuilt.qemu.org 04/01/2014
+Call Trace:
+ dump_stack+0xdd/0x12a
+ print_address_description+0xa7/0x540
+ kasan_report+0x1ff/0x550
+ check_memory_region+0x2f1/0x310
+ memcpy+0x2f/0x80
+ _copy_from_iter_full+0x783/0xaa0
+ tcp_sendmsg_locked+0x1840/0x4140
+ tcp_sendmsg+0x37/0x60
+ inet_sendmsg+0x18c/0x490
+ sock_sendmsg+0xae/0x130
+ smb_send_kvec+0x29c/0x520
+ __smb_send_rqst+0x3ef/0xc60
+ smb_send_rqst+0x25a/0x2e0
+ compound_send_recv+0x9e8/0x2af0
+ cifs_send_recv+0x24/0x30
+ SMB2_open+0x35e/0x1620
+ open_shroot+0x27b/0x490
+ smb2_open_op_close+0x4e1/0x590
+ smb2_query_path_info+0x2ac/0x650
+ cifs_get_inode_info+0x1058/0x28f0
+ cifs_root_iget+0x3bb/0xf80
+ cifs_smb3_do_mount+0xe00/0x14c0
+ cifs_do_mount+0x15/0x20
+ mount_fs+0x5e/0x290
+ vfs_kern_mount+0x88/0x460
+ do_mount+0x398/0x31e0
+ ksys_mount+0xc6/0x150
+ __x64_sys_mount+0xea/0x190
+ do_syscall_64+0x122/0x590
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+It can be reproduced by the following step:
+  1. samba configured with: server max protocol = SMB2_10
+  2. mount -o vers=default
+
+When parse the mount version parameter, the 'ops' and 'vals'
+was setted to smb30,  if negotiate result is smb21, just
+update the 'ops' to smb21, but the 'vals' is still smb30.
+When add lease context, the iov_base is allocated with smb21
+ops, but the iov_len is initiallited with the smb30. Because
+the iov_len is longer than iov_base, when send the message,
+copy array out of bounds.
+
+we need to keep the 'ops' and 'vals' consistent.
+
+Fixes: 9764c02fcbad ("SMB3: Add support for multidialect negotiate (SMB2.1 and later)")
+Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+
+Signed-off-by: ZhangXiaoxu <zhangxiaoxu5@huawei.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 CC: Stable <stable@vger.kernel.org>
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/smbdirect.c | 55 +++++++++++++++++++++++----------------------
- fs/cifs/smbdirect.h |  5 +++--
- fs/cifs/transport.c |  2 +-
- 3 files changed, 32 insertions(+), 30 deletions(-)
+ fs/cifs/smb2pdu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index 5fdb9a509a97f..1959931e14c1e 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -2090,7 +2090,8 @@ int smbd_recv(struct smbd_connection *info, struct msghdr *msg)
-  * rqst: the data to write
-  * return value: 0 if successfully write, otherwise error code
-  */
--int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
-+int smbd_send(struct TCP_Server_Info *server,
-+	int num_rqst, struct smb_rqst *rqst_array)
- {
- 	struct smbd_connection *info = server->smbd_conn;
- 	struct kvec vec;
-@@ -2102,6 +2103,8 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 		info->max_send_size - sizeof(struct smbd_data_transfer);
- 	struct kvec *iov;
- 	int rc;
-+	struct smb_rqst *rqst;
-+	int rqst_idx;
- 
- 	info->smbd_send_pending++;
- 	if (info->transport_status != SMBD_CONNECTED) {
-@@ -2109,47 +2112,41 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 		goto done;
- 	}
- 
--	/*
--	 * Skip the RFC1002 length defined in MS-SMB2 section 2.1
--	 * It is used only for TCP transport in the iov[0]
--	 * In future we may want to add a transport layer under protocol
--	 * layer so this will only be issued to TCP transport
--	 */
--
--	if (rqst->rq_iov[0].iov_len != 4) {
--		log_write(ERR, "expected the pdu length in 1st iov, but got %zu\n", rqst->rq_iov[0].iov_len);
--		return -EINVAL;
--	}
--
- 	/*
- 	 * Add in the page array if there is one. The caller needs to set
- 	 * rq_tailsz to PAGE_SIZE when the buffer has multiple pages and
- 	 * ends at page boundary
- 	 */
--	buflen = smb_rqst_len(server, rqst);
-+	remaining_data_length = 0;
-+	for (i = 0; i < num_rqst; i++)
-+		remaining_data_length += smb_rqst_len(server, &rqst_array[i]);
- 
--	if (buflen + sizeof(struct smbd_data_transfer) >
-+	if (remaining_data_length + sizeof(struct smbd_data_transfer) >
- 		info->max_fragmented_send_size) {
- 		log_write(ERR, "payload size %d > max size %d\n",
--			buflen, info->max_fragmented_send_size);
-+			remaining_data_length, info->max_fragmented_send_size);
- 		rc = -EINVAL;
- 		goto done;
- 	}
- 
--	iov = &rqst->rq_iov[1];
-+	rqst_idx = 0;
-+
-+next_rqst:
-+	rqst = &rqst_array[rqst_idx];
-+	iov = rqst->rq_iov;
- 
--	cifs_dbg(FYI, "Sending smb (RDMA): smb_len=%u\n", buflen);
--	for (i = 0; i < rqst->rq_nvec-1; i++)
-+	cifs_dbg(FYI, "Sending smb (RDMA): idx=%d smb_len=%lu\n",
-+		rqst_idx, smb_rqst_len(server, rqst));
-+	for (i = 0; i < rqst->rq_nvec; i++)
- 		dump_smb(iov[i].iov_base, iov[i].iov_len);
- 
--	remaining_data_length = buflen;
- 
--	log_write(INFO, "rqst->rq_nvec=%d rqst->rq_npages=%d rq_pagesz=%d "
--		"rq_tailsz=%d buflen=%d\n",
--		rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
--		rqst->rq_tailsz, buflen);
-+	log_write(INFO, "rqst_idx=%d nvec=%d rqst->rq_npages=%d rq_pagesz=%d "
-+		"rq_tailsz=%d buflen=%lu\n",
-+		rqst_idx, rqst->rq_nvec, rqst->rq_npages, rqst->rq_pagesz,
-+		rqst->rq_tailsz, smb_rqst_len(server, rqst));
- 
--	start = i = iov[0].iov_len ? 0 : 1;
-+	start = i = 0;
- 	buflen = 0;
- 	while (true) {
- 		buflen += iov[i].iov_len;
-@@ -2197,14 +2194,14 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
- 						goto done;
- 				}
- 				i++;
--				if (i == rqst->rq_nvec-1)
-+				if (i == rqst->rq_nvec)
- 					break;
- 			}
- 			start = i;
- 			buflen = 0;
- 		} else {
- 			i++;
--			if (i == rqst->rq_nvec-1) {
-+			if (i == rqst->rq_nvec) {
- 				/* send out all remaining vecs */
- 				remaining_data_length -= buflen;
- 				log_write(INFO,
-@@ -2248,6 +2245,10 @@ int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 2bc47eb6215e2..cbe633f1840a2 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -712,6 +712,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 		} else if (rsp->DialectRevision == cpu_to_le16(SMB21_PROT_ID)) {
+ 			/* ops set to 3.0 by default for default so update */
+ 			ses->server->ops = &smb21_operations;
++			ses->server->vals = &smb21_values;
  		}
- 	}
- 
-+	rqst_idx++;
-+	if (rqst_idx < num_rqst)
-+		goto next_rqst;
-+
- done:
- 	/*
- 	 * As an optimization, we don't wait for individual I/O to finish
-diff --git a/fs/cifs/smbdirect.h b/fs/cifs/smbdirect.h
-index a11096254f296..b5c240ff21919 100644
---- a/fs/cifs/smbdirect.h
-+++ b/fs/cifs/smbdirect.h
-@@ -292,7 +292,8 @@ void smbd_destroy(struct smbd_connection *info);
- 
- /* Interface for carrying upper layer I/O through send/recv */
- int smbd_recv(struct smbd_connection *info, struct msghdr *msg);
--int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst);
-+int smbd_send(struct TCP_Server_Info *server,
-+	int num_rqst, struct smb_rqst *rqst);
- 
- enum mr_state {
- 	MR_READY,
-@@ -332,7 +333,7 @@ static inline void *smbd_get_connection(
- static inline int smbd_reconnect(struct TCP_Server_Info *server) {return -1; }
- static inline void smbd_destroy(struct smbd_connection *info) {}
- static inline int smbd_recv(struct smbd_connection *info, struct msghdr *msg) {return -1; }
--static inline int smbd_send(struct TCP_Server_Info *server, struct smb_rqst *rqst) {return -1; }
-+static inline int smbd_send(struct TCP_Server_Info *server, int num_rqst, struct smb_rqst *rqst) {return -1; }
- #endif
- 
- #endif
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index f2938bd95c40e..fe77f41bff9f2 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -287,7 +287,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
- 	__be32 rfc1002_marker;
- 
- 	if (cifs_rdma_enabled(server) && server->smbd_conn) {
--		rc = smbd_send(server, rqst);
-+		rc = smbd_send(server, num_rqst, rqst);
- 		goto smbd_done;
- 	}
- 	if (ssocket == NULL)
+ 	} else if (le16_to_cpu(rsp->DialectRevision) !=
+ 				ses->server->vals->protocol_id) {
 -- 
 2.20.1
 
