@@ -2,165 +2,502 @@ Return-Path: <SRS0=RvcV=W7=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE4FC3A5A2
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 02:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20DCDC3A5A2
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 02:32:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A22D521897
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 02:25:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FkeQvs7K"
+	by mail.kernel.org (Postfix) with ESMTP id DA67622CF5
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 02:32:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727065AbfIDCZA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 Sep 2019 22:25:00 -0400
-Received: from mail-io1-f52.google.com ([209.85.166.52]:39247 "EHLO
-        mail-io1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726770AbfIDCZA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 Sep 2019 22:25:00 -0400
-Received: by mail-io1-f52.google.com with SMTP id d25so38195590iob.6
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Sep 2019 19:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=b9Oefijr97ob9N0SjnqspBlctoyErpMj+ykXifkNloY=;
-        b=FkeQvs7KcaVc51+04eeuofL7499F1/wr3JIB7eZS+cvoo4U94YeqGsYrguYTg6QNcw
-         QwfF/GQTj0hIYZZwVTy11m7E/V2HB99TdfcqxCXtdEB7vKFGYa0JccF3vLQvJG88q7Ew
-         1g8rXxGcb4nglxj86x8xnwmU1tOTEo2vAjQIBPQrhFmrBF+Xcixbu/IVSib2hSq/nf9i
-         TIT6jCB56gi7W4FJay67Tm0ydUuD9rXWHU31qaq97m5dfRG5lZ8bn4t601Tjqx1gbQP/
-         KtkQRY7ITaYeGngwXJTdwEcq6UbnJ0Ma2pH6l7u6snZ3jg/u6z3oIF+4ubFA5JLoR7t5
-         rIrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=b9Oefijr97ob9N0SjnqspBlctoyErpMj+ykXifkNloY=;
-        b=FkbcKsSq/xD0puN4lEWqoKCtIpszrJ7Wk+SPppTlpDRe5fiMsCZI/ew+istYtlCIXj
-         h5e0zhIlEqlW90T9dM/pzp0jxW2wwK2M/4fWA124p4HM8458eHARdzuTFgzGD38AxTjY
-         a1TR+KhD5jCxS03NfUMmh9zV456uWeCF9h5Jdj9MwP337/3kOKJMlXG+YD7c2znYoZBE
-         PzbT875yyD2q5agsqClel/F/qn0iiB07+KvheEqcfZpEQDrtIAk6IsEYX5tJ4xGRT/6A
-         +iG2as7K5XQ4cp+KlvF964tg1QMBncC4EIbhAs5NSN5Ln1FXJcIbEPzb1LWzbtamY7gt
-         tksA==
-X-Gm-Message-State: APjAAAV8O9oQq4SumnQ/eKGJ27fDsZMllL4p3UlD8zkdFWpDT3X1HTlK
-        K1wHeBrnRC+ZJwl6u1T53RYTea6x0pNXr3oyZzwTPAqCZ4c=
-X-Google-Smtp-Source: APXvYqzUCmd/sl/b0IS9y7It6nY9Li3+OmD21RV72jJIVpaM7Sexh2xr770dZG1KDD2vaEPBqNVINnqK4ndY5KHenjQ=
-X-Received: by 2002:a02:7f49:: with SMTP id r70mr37272119jac.85.1567563898607;
- Tue, 03 Sep 2019 19:24:58 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 3 Sep 2019 21:24:47 -0500
-Message-ID: <CAH2r5muznTsxD2BsyPBX8jfRP5SngyAYf-GFX-tEY+-1DfdMSg@mail.gmail.com>
-Subject: [PATCH][SMB3] Allow skipping signing verification for perf sensitive
- use cases
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000057644b0591b0e9d3"
+        id S1727374AbfIDCct (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Sep 2019 22:32:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50746 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727065AbfIDCct (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 3 Sep 2019 22:32:49 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8F3323082E72;
+        Wed,  4 Sep 2019 02:32:48 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-71.bne.redhat.com [10.64.54.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B3D6A19C4F;
+        Wed,  4 Sep 2019 02:32:47 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: add a debug macro that prints \\server\share for errors
+Date:   Wed,  4 Sep 2019 12:32:41 +1000
+Message-Id: <20190904023241.3312-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Wed, 04 Sep 2019 02:32:48 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000057644b0591b0e9d3
-Content-Type: text/plain; charset="UTF-8"
+Where we have a tcon available we can log \\server\share as part
+of the message. Only do this for the VFS log level.
 
-Add new mount option "signloosely" which enables signing but skips the
-sometimes expensive signing checks in the responses (signatures are
-calculated and sent correctly in the SMB2/SMB3 requests even with this
-mount option but skipped in the responses).  Although weaker for security
-(and also data integrity in case a packet were corrupted), this can provide
-enough of a performance benefit (calculating the signature to verify a
-packet can be expensive especially for large packets) to be useful in
-some cases.
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/cifs_debug.h | 50 +++++++++++++++++++++++++++++++++++++++++-------
+ fs/cifs/smb2ops.c    | 54 ++++++++++++++++++++++++++--------------------------
+ fs/cifs/smb2pdu.c    | 28 +++++++++++++--------------
+ fs/cifs/transport.c  |  4 ++--
+ 4 files changed, 86 insertions(+), 50 deletions(-)
 
-
+diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
+index 567af916f103..5deb3070d4e7 100644
+--- a/fs/cifs/cifs_debug.h
++++ b/fs/cifs/cifs_debug.h
+@@ -82,15 +82,18 @@ do {							\
+ 
+ #define cifs_server_dbg_func(ratefunc, type, fmt, ...)		\
+ do {								\
++	const char *sn = "";					\
++	if (server && server->hostname)				\
++		sn = server->hostname;				\
+ 	if ((type) & FYI && cifsFYI & CIFS_INFO) {		\
+-		pr_debug_ ## ratefunc("%s: Server:%s "	fmt,	\
+-			__FILE__, server->hostname, ##__VA_ARGS__);\
++		pr_debug_ ## ratefunc("%s: \\\\%s "	fmt,	\
++			__FILE__, sn, ##__VA_ARGS__);		\
+ 	} else if ((type) & VFS) {				\
+-		pr_err_ ## ratefunc("CIFS VFS: Server:%s " fmt,	\
+-			server->hostname, ##__VA_ARGS__);	\
++		pr_err_ ## ratefunc("CIFS VFS: \\\\%s " fmt,	\
++			sn, ##__VA_ARGS__);			\
+ 	} else if ((type) & NOISY && (NOISY != 0)) {		\
+-		pr_debug_ ## ratefunc("Server:%s " fmt,		\
+-			server->hostname, ##__VA_ARGS__);	\
++		pr_debug_ ## ratefunc("\\\\%s " fmt,		\
++			sn, ##__VA_ARGS__);			\
+ 	}							\
+ } while (0)
+ 
+@@ -104,6 +107,33 @@ do {							\
+ 			type, fmt, ##__VA_ARGS__);	\
+ } while (0)
+ 
++#define cifs_tcon_dbg_func(ratefunc, type, fmt, ...)		\
++do {								\
++	const char *tn = "";					\
++	if (tcon && tcon->treeName)				\
++		tn = tcon->treeName;				\
++	if ((type) & FYI && cifsFYI & CIFS_INFO) {		\
++		pr_debug_ ## ratefunc("%s: %s "	fmt,		\
++			__FILE__, tn, ##__VA_ARGS__);		\
++	} else if ((type) & VFS) {				\
++		pr_err_ ## ratefunc("CIFS VFS: %s " fmt,	\
++			tn, ##__VA_ARGS__);			\
++	} else if ((type) & NOISY && (NOISY != 0)) {		\
++		pr_debug_ ## ratefunc("%s " fmt,		\
++			tn, ##__VA_ARGS__);			\
++	}							\
++} while (0)
++
++#define cifs_tcon_dbg(type, fmt, ...)			\
++do {							\
++	if ((type) & ONCE)				\
++		cifs_tcon_dbg_func(once,		\
++			type, fmt, ##__VA_ARGS__);	\
++	else						\
++		cifs_tcon_dbg_func(ratelimited,	\
++			type, fmt, ##__VA_ARGS__);	\
++} while (0)
++
+ /*
+  *	debug OFF
+  *	---------
+@@ -118,10 +148,16 @@ do {									\
+ #define cifs_server_dbg(type, fmt, ...)					\
+ do {									\
+ 	if (0)								\
+-		pr_debug("Server:%s " fmt,				\
++		pr_debug("\\\\%s " fmt,					\
+ 			 server->hostname, ##__VA_ARGS__);		\
+ } while (0)
+ 
++#define cifs_tcon_dbg(type, fmt, ...)					\
++do {									\
++	if (0)								\
++	  pr_debug("%s " fmt, tcon->treeName, ##__VA_ARGS__);		\
++} while (0)
++
+ #define cifs_info(fmt, ...)						\
+ do {									\
+ 	pr_info("CIFS: "fmt, ##__VA_ARGS__);				\
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 070d0b7b21dc..83b02d74d48e 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -109,10 +109,10 @@ smb2_add_credits(struct TCP_Server_Info *server,
+ 		/* change_conf hasn't been executed */
+ 		break;
+ 	case 0:
+-		cifs_dbg(VFS, "Possible client or server bug - zero credits\n");
++		cifs_server_dbg(VFS, "Possible client or server bug - zero credits\n");
+ 		break;
+ 	case 1:
+-		cifs_dbg(VFS, "disabling echoes and oplocks\n");
++		cifs_server_dbg(VFS, "disabling echoes and oplocks\n");
+ 		break;
+ 	case 2:
+ 		cifs_dbg(FYI, "disabling oplocks\n");
+@@ -230,7 +230,7 @@ smb2_adjust_credits(struct TCP_Server_Info *server,
+ 
+ 	if (server->reconnect_instance != credits->instance) {
+ 		spin_unlock(&server->req_lock);
+-		cifs_dbg(VFS, "trying to return %d credits to old session\n",
++		cifs_server_dbg(VFS, "trying to return %d credits to old session\n",
+ 			 credits->value - new_val);
+ 		return -EAGAIN;
+ 	}
+@@ -270,7 +270,7 @@ smb2_find_mid(struct TCP_Server_Info *server, char *buf)
+ 	__u64 wire_mid = le64_to_cpu(shdr->MessageId);
+ 
+ 	if (shdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM) {
+-		cifs_dbg(VFS, "Encrypted frame parsing not supported yet\n");
++		cifs_server_dbg(VFS, "Encrypted frame parsing not supported yet\n");
+ 		return NULL;
+ 	}
+ 
+@@ -294,10 +294,10 @@ smb2_dump_detail(void *buf, struct TCP_Server_Info *server)
+ #ifdef CONFIG_CIFS_DEBUG2
+ 	struct smb2_sync_hdr *shdr = (struct smb2_sync_hdr *)buf;
+ 
+-	cifs_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
++	cifs_server_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
+ 		 shdr->Command, shdr->Status, shdr->Flags, shdr->MessageId,
+ 		 shdr->ProcessId);
+-	cifs_dbg(VFS, "smb buf %p len %u\n", buf,
++	cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
+ 		 server->ops->calc_smb_size(buf, server));
+ #endif
+ }
+@@ -576,7 +576,7 @@ SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon)
+ 			 "server does not support query network interfaces\n");
+ 		goto out;
+ 	} else if (rc != 0) {
+-		cifs_dbg(VFS, "error %d on ioctl to get interface list\n", rc);
++		cifs_tcon_dbg(VFS, "error %d on ioctl to get interface list\n", rc);
+ 		goto out;
+ 	}
+ 
+@@ -1330,11 +1330,11 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
+ 			(char **)&res_key, &ret_data_len);
+ 
+ 	if (rc) {
+-		cifs_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
++		cifs_tcon_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
+ 		goto req_res_key_exit;
+ 	}
+ 	if (ret_data_len < sizeof(struct resume_key_req)) {
+-		cifs_dbg(VFS, "Invalid refcopy resume key length\n");
++		cifs_tcon_dbg(VFS, "Invalid refcopy resume key length\n");
+ 		rc = -EINVAL;
+ 		goto req_res_key_exit;
+ 	}
+@@ -1486,7 +1486,7 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 				  qi.input_buffer_length,
+ 				  qi.output_buffer_length, buffer);
+ 	} else { /* unknown flags */
+-		cifs_dbg(VFS, "invalid passthru query flags: 0x%x\n", qi.flags);
++		cifs_tcon_dbg(VFS, "invalid passthru query flags: 0x%x\n", qi.flags);
+ 		rc = -EINVAL;
+ 	}
+ 
+@@ -1613,7 +1613,7 @@ smb2_copychunk_range(const unsigned int xid,
+ 		if (rc == 0) {
+ 			if (ret_data_len !=
+ 					sizeof(struct copychunk_ioctl_rsp)) {
+-				cifs_dbg(VFS, "invalid cchunk response size\n");
++				cifs_tcon_dbg(VFS, "invalid cchunk response size\n");
+ 				rc = -EIO;
+ 				goto cchunk_out;
+ 			}
+@@ -1627,12 +1627,12 @@ smb2_copychunk_range(const unsigned int xid,
+ 			 */
+ 			if (le32_to_cpu(retbuf->TotalBytesWritten) >
+ 			    le32_to_cpu(pcchunk->Length)) {
+-				cifs_dbg(VFS, "invalid copy chunk response\n");
++				cifs_tcon_dbg(VFS, "invalid copy chunk response\n");
+ 				rc = -EIO;
+ 				goto cchunk_out;
+ 			}
+ 			if (le32_to_cpu(retbuf->ChunksWritten) != 1) {
+-				cifs_dbg(VFS, "invalid num chunks written\n");
++				cifs_tcon_dbg(VFS, "invalid num chunks written\n");
+ 				rc = -EIO;
+ 				goto cchunk_out;
+ 			}
+@@ -2422,7 +2422,7 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+ 
+ 	if (rc) {
+ 		if ((rc != -ENOENT) && (rc != -EOPNOTSUPP))
+-			cifs_dbg(VFS, "ioctl error in %s rc=%d\n", __func__, rc);
++			cifs_tcon_dbg(VFS, "ioctl error in %s rc=%d\n", __func__, rc);
+ 		goto out;
+ 	}
+ 
+@@ -2431,7 +2431,7 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+ 				 nls_codepage, remap, search_name,
+ 				 true /* is_unicode */);
+ 	if (rc) {
+-		cifs_dbg(VFS, "parse error in %s rc=%d\n", __func__, rc);
++		cifs_tcon_dbg(VFS, "parse error in %s rc=%d\n", __func__, rc);
+ 		goto out;
+ 	}
+ 
+@@ -2661,7 +2661,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 		if (plen + le32_to_cpu(ioctl_rsp->OutputOffset) >
+ 		    rsp_iov[1].iov_len) {
+-			cifs_dbg(VFS, "srv returned invalid ioctl len: %d\n",
++			cifs_tcon_dbg(VFS, "srv returned invalid ioctl len: %d\n",
+ 				 plen);
+ 			rc = -EIO;
+ 			goto querty_exit;
+@@ -3614,14 +3614,14 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 
+ 	rc = smb2_get_enc_key(server, tr_hdr->SessionId, enc, key);
+ 	if (rc) {
+-		cifs_dbg(VFS, "%s: Could not get %scryption key\n", __func__,
++		cifs_server_dbg(VFS, "%s: Could not get %scryption key\n", __func__,
+ 			 enc ? "en" : "de");
+ 		return 0;
+ 	}
+ 
+ 	rc = smb3_crypto_aead_allocate(server);
+ 	if (rc) {
+-		cifs_dbg(VFS, "%s: crypto alloc failed\n", __func__);
++		cifs_server_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+ 		return rc;
+ 	}
+ 
+@@ -3629,19 +3629,19 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 						server->secmech.ccmaesdecrypt;
+ 	rc = crypto_aead_setkey(tfm, key, SMB3_SIGN_KEY_SIZE);
+ 	if (rc) {
+-		cifs_dbg(VFS, "%s: Failed to set aead key %d\n", __func__, rc);
++		cifs_server_dbg(VFS, "%s: Failed to set aead key %d\n", __func__, rc);
+ 		return rc;
+ 	}
+ 
+ 	rc = crypto_aead_setauthsize(tfm, SMB2_SIGNATURE_SIZE);
+ 	if (rc) {
+-		cifs_dbg(VFS, "%s: Failed to set authsize %d\n", __func__, rc);
++		cifs_server_dbg(VFS, "%s: Failed to set authsize %d\n", __func__, rc);
+ 		return rc;
+ 	}
+ 
+ 	req = aead_request_alloc(tfm, GFP_KERNEL);
+ 	if (!req) {
+-		cifs_dbg(VFS, "%s: Failed to alloc aead request\n", __func__);
++		cifs_server_dbg(VFS, "%s: Failed to alloc aead request\n", __func__);
+ 		return -ENOMEM;
+ 	}
+ 
+@@ -3652,7 +3652,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 
+ 	sg = init_sg(num_rqst, rqst, sign);
+ 	if (!sg) {
+-		cifs_dbg(VFS, "%s: Failed to init sg\n", __func__);
++		cifs_server_dbg(VFS, "%s: Failed to init sg\n", __func__);
+ 		rc = -ENOMEM;
+ 		goto free_req;
+ 	}
+@@ -3660,7 +3660,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+ 	iv_len = crypto_aead_ivsize(tfm);
+ 	iv = kzalloc(iv_len, GFP_KERNEL);
+ 	if (!iv) {
+-		cifs_dbg(VFS, "%s: Failed to alloc iv\n", __func__);
++		cifs_server_dbg(VFS, "%s: Failed to alloc iv\n", __func__);
+ 		rc = -ENOMEM;
+ 		goto free_sg;
+ 	}
+@@ -3902,7 +3902,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 	bool use_rdma_mr = false;
+ 
+ 	if (shdr->Command != SMB2_READ) {
+-		cifs_dbg(VFS, "only big read responses are supported\n");
++		cifs_server_dbg(VFS, "only big read responses are supported\n");
+ 		return -ENOTSUPP;
+ 	}
+ 
+@@ -4148,7 +4148,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
+ 	}
+ 
+ 	if (*num_mids >= MAX_COMPOUND) {
+-		cifs_dbg(VFS, "too many PDUs in compound\n");
++		cifs_server_dbg(VFS, "too many PDUs in compound\n");
+ 		return -1;
+ 	}
+ 	bufs[*num_mids] = buf;
+@@ -4194,7 +4194,7 @@ smb3_receive_transform(struct TCP_Server_Info *server,
+ 
+ 	if (pdu_length < sizeof(struct smb2_transform_hdr) +
+ 						sizeof(struct smb2_sync_hdr)) {
+-		cifs_dbg(VFS, "Transform message is too small (%u)\n",
++		cifs_server_dbg(VFS, "Transform message is too small (%u)\n",
+ 			 pdu_length);
+ 		cifs_reconnect(server);
+ 		wake_up(&server->response_q);
+@@ -4202,7 +4202,7 @@ smb3_receive_transform(struct TCP_Server_Info *server,
+ 	}
+ 
+ 	if (pdu_length < orig_len + sizeof(struct smb2_transform_hdr)) {
+-		cifs_dbg(VFS, "Transform message is broken\n");
++		cifs_server_dbg(VFS, "Transform message is broken\n");
+ 		cifs_reconnect(server);
+ 		wake_up(&server->response_q);
+ 		return -ECONNABORTED;
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 4c9c34cdf05f..dc9296569ed5 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1019,7 +1019,7 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+ 	}
+ 
+ 	if (tcon->ses->session_flags & SMB2_SESSION_FLAG_IS_NULL)
+-		cifs_server_dbg(VFS, "Unexpected null user (anonymous) auth flag sent by server\n");
++		cifs_tcon_dbg(VFS, "Unexpected null user (anonymous) auth flag sent by server\n");
+ 
+ 	pneg_inbuf = kmalloc(sizeof(*pneg_inbuf), GFP_NOFS);
+ 	if (!pneg_inbuf)
+@@ -1076,18 +1076,18 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+ 		 * Old Windows versions or Netapp SMB server can return
+ 		 * not supported error. Client should accept it.
+ 		 */
+-		cifs_server_dbg(VFS, "Server does not support validate negotiate\n");
++		cifs_tcon_dbg(VFS, "Server does not support validate negotiate\n");
+ 		rc = 0;
+ 		goto out_free_inbuf;
+ 	} else if (rc != 0) {
+-		cifs_server_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
++		cifs_tcon_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
+ 		rc = -EIO;
+ 		goto out_free_inbuf;
+ 	}
+ 
+ 	rc = -EIO;
+ 	if (rsplen != sizeof(*pneg_rsp)) {
+-		cifs_server_dbg(VFS, "invalid protocol negotiate response size: %d\n",
++		cifs_tcon_dbg(VFS, "invalid protocol negotiate response size: %d\n",
+ 			 rsplen);
+ 
+ 		/* relax check since Mac returns max bufsize allowed on ioctl */
+@@ -1114,7 +1114,7 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+ 	goto out_free_rsp;
+ 
+ vneg_out:
+-	cifs_server_dbg(VFS, "protocol revalidation - security settings mismatch\n");
++	cifs_tcon_dbg(VFS, "protocol revalidation - security settings mismatch\n");
+ out_free_rsp:
+ 	kfree(pneg_rsp);
+ out_free_inbuf:
+@@ -1762,11 +1762,11 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 
+ 	if ((rsp->Capabilities & SMB2_SHARE_CAP_DFS) &&
+ 	    ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
+-		cifs_server_dbg(VFS, "DFS capability contradicts DFS flag\n");
++		cifs_tcon_dbg(VFS, "DFS capability contradicts DFS flag\n");
+ 
+ 	if (tcon->seal &&
+ 	    !(server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
+-		cifs_server_dbg(VFS, "Encryption is requested but not supported\n");
++		cifs_tcon_dbg(VFS, "Encryption is requested but not supported\n");
+ 
+ 	init_copy_chunk_defaults(tcon);
+ 	if (server->ops->validate_negotiate)
+@@ -1779,7 +1779,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+ 
+ tcon_error_exit:
+ 	if (rsp && rsp->sync_hdr.Status == STATUS_BAD_NETWORK_NAME) {
+-		cifs_server_dbg(VFS, "BAD_NETWORK_NAME: %s\n", tree);
++		cifs_tcon_dbg(VFS, "BAD_NETWORK_NAME: %s\n", tree);
+ 	}
+ 	goto tcon_exit;
+ }
+@@ -2812,14 +2812,14 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 	if (*plen == 0)
+ 		goto ioctl_exit; /* server returned no data */
+ 	else if (*plen > rsp_iov.iov_len || *plen > 0xFF00) {
+-		cifs_server_dbg(VFS, "srv returned invalid ioctl length: %d\n", *plen);
++		cifs_tcon_dbg(VFS, "srv returned invalid ioctl length: %d\n", *plen);
+ 		*plen = 0;
+ 		rc = -EIO;
+ 		goto ioctl_exit;
+ 	}
+ 
+ 	if (rsp_iov.iov_len - *plen < le32_to_cpu(rsp->OutputOffset)) {
+-		cifs_server_dbg(VFS, "Malformed ioctl resp: len %d offset %d\n", *plen,
++		cifs_tcon_dbg(VFS, "Malformed ioctl resp: len %d offset %d\n", *plen,
+ 			le32_to_cpu(rsp->OutputOffset));
+ 		*plen = 0;
+ 		rc = -EIO;
+@@ -3110,7 +3110,7 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		if (!*data) {
+ 			*data = kmalloc(*dlen, GFP_KERNEL);
+ 			if (!*data) {
+-				cifs_server_dbg(VFS,
++				cifs_tcon_dbg(VFS,
+ 					"Error %d allocating memory for acl\n",
+ 					rc);
+ 				*dlen = 0;
+@@ -3505,7 +3505,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+ 
+ 			rc = smb2_verify_signature(&rqst, server);
+ 			if (rc)
+-				cifs_server_dbg(VFS, "SMB signature verification returned error = %d\n",
++				cifs_tcon_dbg(VFS, "SMB signature verification returned error = %d\n",
+ 					 rc);
+ 		}
+ 		/* FIXME: should this be counted toward the initiating task? */
+@@ -4095,7 +4095,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 		info_buf_size = sizeof(SEARCH_ID_FULL_DIR_INFO) - 1;
+ 		break;
+ 	default:
+-		cifs_server_dbg(VFS, "info level %u isn't supported\n",
++		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
+ 			 srch_inf->info_level);
+ 		rc = -EINVAL;
+ 		goto qdir_exit;
+@@ -4186,7 +4186,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+ 	else if (resp_buftype == CIFS_SMALL_BUFFER)
+ 		srch_inf->smallBuf = true;
+ 	else
+-		cifs_server_dbg(VFS, "illegal search buffer type\n");
++		cifs_tcon_dbg(VFS, "illegal search buffer type\n");
+ 
+ 	trace_smb3_query_dir_done(xid, persistent_fid, tcon->tid,
+ 			tcon->ses->Suid, index, srch_inf->entries_in_buffer);
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index a90bd4d75b4d..4fccb90492e9 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -1403,7 +1403,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 	   use ses->maxReq */
+ 
+ 	if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+-		cifs_server_dbg(VFS, "Illegal length, greater than maximum frame, %d\n",
++		cifs_tcon_dbg(VFS, "Illegal length, greater than maximum frame, %d\n",
+ 			 len);
+ 		return -EIO;
+ 	}
+@@ -1505,7 +1505,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+ 	/* rcvd frame is ok */
+ 	if (out_buf == NULL || midQ->mid_state != MID_RESPONSE_RECEIVED) {
+ 		rc = -EIO;
+-		cifs_server_dbg(VFS, "Bad MID state?\n");
++		cifs_tcon_dbg(VFS, "Bad MID state?\n");
+ 		goto out;
+ 	}
+ 
 -- 
-Thanks,
+2.13.6
 
-Steve
-
---00000000000057644b0591b0e9d3
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-allow-skipping-signature-verification-for-perf-.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-allow-skipping-signature-verification-for-perf-.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_k04n1dii0>
-X-Attachment-Id: f_k04n1dii0
-
-RnJvbSAyZWRmYWJjYjZlMzFlM2RlNTQzYTA2NmIzODg2ZjJkYjhkODRjZTQ3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgMyBTZXAgMjAxOSAyMToxODo0OSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjM6IGFsbG93IHNraXBwaW5nIHNpZ25hdHVyZSB2ZXJpZmljYXRpb24gZm9yIHBlcmYKIHNlbnNp
-dGl2ZSBjb25maWd1cmF0aW9ucwoKQWRkIG5ldyBtb3VudCBvcHRpb24gInNpZ25sb29zZWx5IiB3
-aGljaCBlbmFibGVzIHNpZ25pbmcgYnV0IHNraXBzIHRoZQpzb21ldGltZXMgZXhwZW5zaXZlIHNp
-Z25pbmcgY2hlY2tzIGluIHRoZSByZXNwb25zZXMgKHNpZ25hdHVyZXMgYXJlCmNhbGN1bGF0ZWQg
-YW5kIHNlbnQgY29ycmVjdGx5IGluIHRoZSBTTUIyL1NNQjMgcmVxdWVzdHMgZXZlbiB3aXRoIHRo
-aXMKbW91bnQgb3B0aW9uIGJ1dCBza2lwcGVkIGluIHRoZSByZXNwb25zZXMpLiAgQWx0aG91Z2gg
-d2Vha2VyIGZvciBzZWN1cml0eQooYW5kIGFsc28gZGF0YSBpbnRlZ3JpdHkgaW4gY2FzZSBhIHBh
-Y2tldCB3ZXJlIGNvcnJ1cHRlZCksIHRoaXMgY2FuIHByb3ZpZGUKZW5vdWdoIG9mIGEgcGVyZm9y
-bWFuY2UgYmVuZWZpdCAoY2FsY3VsYXRpbmcgdGhlIHNpZ25hdHVyZSB0byB2ZXJpZnkgYQpwYWNr
-ZXQgY2FuIGJlIGV4cGVuc2l2ZSBlc3BlY2lhbGx5IGZvciBsYXJnZSBwYWNrZXRzKSB0byBiZSB1
-c2VmdWwgaW4Kc29tZSBjYXNlcy4KClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVu
-Y2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNnbG9iLmggICAgICB8ICAyICsrCiBm
-cy9jaWZzL2Nvbm5lY3QuYyAgICAgICB8IDEzICsrKysrKysrKystLS0KIGZzL2NpZnMvc21iMnRy
-YW5zcG9ydC5jIHwgIDEgKwogMyBmaWxlcyBjaGFuZ2VkLCAxMyBpbnNlcnRpb25zKCspLCAzIGRl
-bGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lm
-c2dsb2IuaAppbmRleCBmYTVhYmUzYTg1MTQuLmVkMzEyNjRmZWVhMyAxMDA2NDQKLS0tIGEvZnMv
-Y2lmcy9jaWZzZ2xvYi5oCisrKyBiL2ZzL2NpZnMvY2lmc2dsb2IuaApAQCAtNTQyLDYgKzU0Miw3
-IEBAIHN0cnVjdCBzbWJfdm9sIHsKIAl1bW9kZV90IGRpcl9tb2RlOwogCWVudW0gc2VjdXJpdHlF
-bnVtIHNlY3R5cGU7IC8qIHNlY3R5cGUgcmVxdWVzdGVkIHZpYSBtbnQgb3B0cyAqLwogCWJvb2wg
-c2lnbjsgLyogd2FzIHNpZ25pbmcgcmVxdWVzdGVkIHZpYSBtbnQgb3B0cz8gKi8KKwlib29sIGln
-bm9yZV9zaWduYXR1cmU7CiAJYm9vbCByZXRyeToxOwogCWJvb2wgaW50cjoxOwogCWJvb2wgc2V0
-dWlkczoxOwpAQCAtNjgxLDYgKzY4Miw3IEBAIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gewogCWNo
-YXIgc2VydmVyX0dVSURbMTZdOwogCV9fdTE2IHNlY19tb2RlOwogCWJvb2wgc2lnbjsgLyogaXMg
-c2lnbmluZyBlbmFibGVkIG9uIHRoaXMgY29ubmVjdGlvbj8gKi8KKwlib29sIGlnbm9yZV9zaWdu
-YXR1cmU7IC8qIHNraXAgdmFsaWRhdGlvbiBvZiBzaWduYXR1cmVzIGluIFNNQjIvMyByc3AgKi8K
-IAlib29sIHNlc3Npb25fZXN0YWI7IC8qIG1hcmsgd2hlbiB2ZXJ5IGZpcnN0IHNlc3MgaXMgZXN0
-YWJsaXNoZWQgKi8KIAlpbnQgZWNob19jcmVkaXRzOyAgLyogZWNobyByZXNlcnZlZCBzbG90cyAq
-LwogCWludCBvcGxvY2tfY3JlZGl0czsgIC8qIG9wbG9jayBicmVhayByZXNlcnZlZCBzbG90cyAq
-LwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jb25uZWN0LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYwppbmRl
-eCA4NWY4ZDk0M2EwNWEuLjE3ODgyY2VkZTE5NyAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jb25uZWN0
-LmMKKysrIGIvZnMvY2lmcy9jb25uZWN0LmMKQEAgLTkxLDcgKzkxLDcgQEAgZW51bSB7CiAJT3B0
-X3NlcnZlcmlubywgT3B0X25vc2VydmVyaW5vLAogCU9wdF9yd3BpZGZvcndhcmQsIE9wdF9jaWZz
-YWNsLCBPcHRfbm9jaWZzYWNsLAogCU9wdF9hY2wsIE9wdF9ub2FjbCwgT3B0X2xvY2FsbGVhc2Us
-Ci0JT3B0X3NpZ24sIE9wdF9zZWFsLCBPcHRfbm9hYywKKwlPcHRfc2lnbiwgT3B0X2lnbm9yZV9z
-aWduYXR1cmUsIE9wdF9zZWFsLCBPcHRfbm9hYywKIAlPcHRfZnNjLCBPcHRfbWZzeW1saW5rcywK
-IAlPcHRfbXVsdGl1c2VyLCBPcHRfc2xvcHB5LCBPcHRfbm9zaGFyZXNvY2ssCiAJT3B0X3BlcnNp
-c3RlbnQsIE9wdF9ub3BlcnNpc3RlbnQsCkBAIC0xODMsNiArMTgzLDcgQEAgc3RhdGljIGNvbnN0
-IG1hdGNoX3RhYmxlX3QgY2lmc19tb3VudF9vcHRpb25fdG9rZW5zID0gewogCXsgT3B0X25vYWNs
-LCAibm9hY2wiIH0sCiAJeyBPcHRfbG9jYWxsZWFzZSwgImxvY2FsbGVhc2UiIH0sCiAJeyBPcHRf
-c2lnbiwgInNpZ24iIH0sCisJeyBPcHRfaWdub3JlX3NpZ25hdHVyZSwgInNpZ25sb29zZWx5IiB9
-LAogCXsgT3B0X3NlYWwsICJzZWFsIiB9LAogCXsgT3B0X25vYWMsICJub2FjIiB9LAogCXsgT3B0
-X2ZzYywgImZzYyIgfSwKQEAgLTE4NzcsNiArMTg3OCwxMCBAQCBjaWZzX3BhcnNlX21vdW50X29w
-dGlvbnMoY29uc3QgY2hhciAqbW91bnRkYXRhLCBjb25zdCBjaGFyICpkZXZuYW1lLAogCQljYXNl
-IE9wdF9zaWduOgogCQkJdm9sLT5zaWduID0gdHJ1ZTsKIAkJCWJyZWFrOworCQljYXNlIE9wdF9p
-Z25vcmVfc2lnbmF0dXJlOgorCQkJdm9sLT5zaWduID0gdHJ1ZTsKKwkJCXZvbC0+aWdub3JlX3Np
-Z25hdHVyZSA9IHRydWU7CisJCQlicmVhazsKIAkJY2FzZSBPcHRfc2VhbDoKIAkJCS8qIHdlIGRv
-IG5vdCBkbyB0aGUgZm9sbG93aW5nIGluIHNlY0ZsYWdzIGJlY2F1c2Ugc2VhbAogCQkJICogaXMg
-YSBwZXIgdHJlZSBjb25uZWN0aW9uIChtb3VudCkgbm90IGEgcGVyIHNvY2tldApAQCAtMjYwOCw2
-ICsyNjEzLDkgQEAgc3RhdGljIGludCBtYXRjaF9zZXJ2ZXIoc3RydWN0IFRDUF9TZXJ2ZXJfSW5m
-byAqc2VydmVyLCBzdHJ1Y3Qgc21iX3ZvbCAqdm9sKQogCWlmIChzZXJ2ZXItPnJkbWEgIT0gdm9s
-LT5yZG1hKQogCQlyZXR1cm4gMDsKIAorCWlmIChzZXJ2ZXItPmlnbm9yZV9zaWduYXR1cmUgIT0g
-dm9sLT5pZ25vcmVfc2lnbmF0dXJlKQorCQlyZXR1cm4gMDsKKwogCXJldHVybiAxOwogfQogCkBA
-IC0yNzg1LDcgKzI3OTMsNyBAQCBjaWZzX2dldF90Y3Bfc2Vzc2lvbihzdHJ1Y3Qgc21iX3ZvbCAq
-dm9sdW1lX2luZm8pCiAJdGNwX3Nlcy0+dGNwU3RhdHVzID0gQ2lmc05lZWROZWdvdGlhdGU7CiAK
-IAl0Y3Bfc2VzLT5ucl90YXJnZXRzID0gMTsKLQorCXRjcF9zZXMtPmlnbm9yZV9zaWduYXR1cmUg
-PSB2b2x1bWVfaW5mby0+aWdub3JlX3NpZ25hdHVyZTsKIAkvKiB0aHJlYWQgc3Bhd25lZCwgcHV0
-IGl0IG9uIHRoZSBsaXN0ICovCiAJc3Bpbl9sb2NrKCZjaWZzX3RjcF9zZXNfbG9jayk7CiAJbGlz
-dF9hZGQoJnRjcF9zZXMtPnRjcF9zZXNfbGlzdCwgJmNpZnNfdGNwX3Nlc19saXN0KTsKQEAgLTMy
-MzUsNyArMzI0Myw2IEBAIGNpZnNfZ2V0X3NtYl9zZXMoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAq
-c2VydmVyLCBzdHJ1Y3Qgc21iX3ZvbCAqdm9sdW1lX2luZm8pCiAKIAlzZXMtPnNlY3R5cGUgPSB2
-b2x1bWVfaW5mby0+c2VjdHlwZTsKIAlzZXMtPnNpZ24gPSB2b2x1bWVfaW5mby0+c2lnbjsKLQog
-CW11dGV4X2xvY2soJnNlcy0+c2Vzc2lvbl9tdXRleCk7CiAJcmMgPSBjaWZzX25lZ290aWF0ZV9w
-cm90b2NvbCh4aWQsIHNlcyk7CiAJaWYgKCFyYykKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iMnRy
-YW5zcG9ydC5jIGIvZnMvY2lmcy9zbWIydHJhbnNwb3J0LmMKaW5kZXggYjAyMjQyZWFjYjU1Li4x
-NDhkNzk0MmM3OTYgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnRyYW5zcG9ydC5jCisrKyBiL2Zz
-L2NpZnMvc21iMnRyYW5zcG9ydC5jCkBAIC01MjIsNiArNTIyLDcgQEAgc21iMl92ZXJpZnlfc2ln
-bmF0dXJlKHN0cnVjdCBzbWJfcnFzdCAqcnFzdCwgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2Vy
-dmVyKQogCWlmICgoc2hkci0+Q29tbWFuZCA9PSBTTUIyX05FR09USUFURSkgfHwKIAkgICAgKHNo
-ZHItPkNvbW1hbmQgPT0gU01CMl9TRVNTSU9OX1NFVFVQKSB8fAogCSAgICAoc2hkci0+Q29tbWFu
-ZCA9PSBTTUIyX09QTE9DS19CUkVBSykgfHwKKwkgICAgc2VydmVyLT5pZ25vcmVfc2lnbmF0dXJl
-IHx8CiAJICAgICghc2VydmVyLT5zZXNzaW9uX2VzdGFiKSkKIAkJcmV0dXJuIDA7CiAKLS0gCjIu
-MjAuMQoK
---00000000000057644b0591b0e9d3--
