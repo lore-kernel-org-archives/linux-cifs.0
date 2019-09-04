@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D87C3A5AA
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 16:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10A65C3A5AA
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 16:07:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 642FC20820
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 16:07:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D23A221883
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 16:07:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567613240;
-	bh=XoWVh8zkxqQBH7vyK96N6HQzgw676k1kvoxSzDKHeGA=;
+	s=default; t=1567613254;
+	bh=aw9Ccs93FdRhCdFHunJR7zrEHuMOFb3DevjX4PIvUr0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ffgrlLrma6jm8UxdaOW6NK2FGRODq+pu77JlhyM2oWEcEomRgCSnaLqO4EzCwckvG
-	 vL2HLSXfiYu/bB20JWHPZezhbTcwq3EYgN6cEH7oRNucJ1/pYhucb7Y1js7fDegolh
-	 vWZDrlRz8ZF543vP3seixN7KkzTdkHFsDd8NatWg=
+	b=X71fJbW3JKFKP2EjPMLblE9PHU/7NViT2NfPYjU4VbqDRo1ypadxP0MBTtmq+sL+C
+	 YMaNHxlnYv//g0dsFzb2G1xLVpz74pFUOgXb0pZpEOLB5vNhWPVyVt4JUnRvXLTtgk
+	 s37FI/eMiGYJwVQ0KvRYOtulcS5Syq0ppcUoTaAY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732528AbfIDQCB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 4 Sep 2019 12:02:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37688 "EHLO mail.kernel.org"
+        id S1733221AbfIDQHb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 4 Sep 2019 12:07:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37668 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733153AbfIDQCB (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 4 Sep 2019 12:02:01 -0400
+        id S1731751AbfIDQCA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 4 Sep 2019 12:02:00 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8984C2087E;
-        Wed,  4 Sep 2019 16:01:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8215D23402;
+        Wed,  4 Sep 2019 16:01:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567612920;
-        bh=XoWVh8zkxqQBH7vyK96N6HQzgw676k1kvoxSzDKHeGA=;
+        s=default; t=1567612919;
+        bh=aw9Ccs93FdRhCdFHunJR7zrEHuMOFb3DevjX4PIvUr0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=MZ/vjFM0tRAi22icgSD7JlfwngxZQm8hHFXfrNjhPULzcvHeicldm/ne8p+a1tALQ
-         b/mXc66CKXcPfi8ixKxkzKp0e0qf2glMsv6zW9siCE6Oj87hHiPNSJg4m7/+QYnY7b
-         DMBE7xMcH5hJsn9L8I5U9IlLrWmbMR6NJ3WPal+c=
+        b=egSuezYsEF+86S87JdyTa8Xure/GV4M3t5HMaNlNDZbzHrK86HhfW9/cbsjKT/hII
+         YDoNCAIQ0+8icUjZ2C87JeVljt4vXuS6iIQuURvEKeLTwjabqZc8LNI6tm5i4bCRl2
+         6jsSy6Otdoh8o5P8XYra855hHuCWa0uQxx1RomZc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 24/36] cifs: Use kzfree() to zero out the password
-Date:   Wed,  4 Sep 2019 12:01:10 -0400
-Message-Id: <20190904160122.4179-24-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 23/36] cifs: set domainName when a domain-key is used in multiuser
+Date:   Wed,  4 Sep 2019 12:01:09 -0400
+Message-Id: <20190904160122.4179-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190904160122.4179-1-sashal@kernel.org>
 References: <20190904160122.4179-1-sashal@kernel.org>
@@ -58,33 +58,70 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Dan Carpenter <dan.carpenter@oracle.com>
+From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-[ Upstream commit 478228e57f81f6cb60798d54fc02a74ea7dd267e ]
+[ Upstream commit f2aee329a68f5a907bcff11a109dfe17c0b41aeb ]
 
-It's safer to zero out the password so that it can never be disclosed.
+RHBZ: 1710429
 
-Fixes: 0c219f5799c7 ("cifs: set domainName when a domain-key is used in multiuser")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+When we use a domain-key to authenticate using multiuser we must also set
+the domainnmame for the new volume as it will be used and passed to the server
+in the NTLMSSP Domain-name.
+
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/connect.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/connect.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 699e763ea671a..f523a9ca9574f 100644
+index 57c62ff4e8d6d..699e763ea671a 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -2662,7 +2662,7 @@ cifs_set_cifscreds(struct smb_vol *vol, struct cifs_ses *ses)
- 			rc = -ENOMEM;
- 			kfree(vol->username);
- 			vol->username = NULL;
--			kfree(vol->password);
-+			kzfree(vol->password);
- 			vol->password = NULL;
- 			goto out_key_put;
+@@ -2542,6 +2542,7 @@ static int
+ cifs_set_cifscreds(struct smb_vol *vol, struct cifs_ses *ses)
+ {
+ 	int rc = 0;
++	int is_domain = 0;
+ 	const char *delim, *payload;
+ 	char *desc;
+ 	ssize_t len;
+@@ -2589,6 +2590,7 @@ cifs_set_cifscreds(struct smb_vol *vol, struct cifs_ses *ses)
+ 			rc = PTR_ERR(key);
+ 			goto out_err;
  		}
++		is_domain = 1;
+ 	}
+ 
+ 	down_read(&key->sem);
+@@ -2646,6 +2648,26 @@ cifs_set_cifscreds(struct smb_vol *vol, struct cifs_ses *ses)
+ 		goto out_key_put;
+ 	}
+ 
++	/*
++	 * If we have a domain key then we must set the domainName in the
++	 * for the request.
++	 */
++	if (is_domain && ses->domainName) {
++		vol->domainname = kstrndup(ses->domainName,
++					   strlen(ses->domainName),
++					   GFP_KERNEL);
++		if (!vol->domainname) {
++			cifs_dbg(FYI, "Unable to allocate %zd bytes for "
++				 "domain\n", len);
++			rc = -ENOMEM;
++			kfree(vol->username);
++			vol->username = NULL;
++			kfree(vol->password);
++			vol->password = NULL;
++			goto out_key_put;
++		}
++	}
++
+ out_key_put:
+ 	up_read(&key->sem);
+ 	key_put(key);
 -- 
 2.20.1
 
