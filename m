@@ -2,197 +2,163 @@ Return-Path: <SRS0=hPid=XA=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11855C00306
-	for <linux-cifs@archiver.kernel.org>; Thu,  5 Sep 2019 20:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32048C43331
+	for <linux-cifs@archiver.kernel.org>; Thu,  5 Sep 2019 23:00:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C2B2214D9
-	for <linux-cifs@archiver.kernel.org>; Thu,  5 Sep 2019 20:22:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76322206DF
+	for <linux-cifs@archiver.kernel.org>; Thu,  5 Sep 2019 23:00:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIEa2DK1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rVXbbkeZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389823AbfIEUWb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 5 Sep 2019 16:22:31 -0400
-Received: from mail-io1-f50.google.com ([209.85.166.50]:43688 "EHLO
-        mail-io1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389678AbfIEUWb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 Sep 2019 16:22:31 -0400
-Received: by mail-io1-f50.google.com with SMTP id u185so7685951iod.10
-        for <linux-cifs@vger.kernel.org>; Thu, 05 Sep 2019 13:22:30 -0700 (PDT)
+        id S1730601AbfIEXAD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 5 Sep 2019 19:00:03 -0400
+Received: from mail-io1-f46.google.com ([209.85.166.46]:37677 "EHLO
+        mail-io1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730065AbfIEXAD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 Sep 2019 19:00:03 -0400
+Received: by mail-io1-f46.google.com with SMTP id r4so8559440iop.4
+        for <linux-cifs@vger.kernel.org>; Thu, 05 Sep 2019 16:00:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to;
-        bh=8D6FuQXYV0uaDcUmZnFqujn9eeJ8hk7TXTK7/PtYQgw=;
-        b=lIEa2DK1bLq10R+KueM3iaylDtUPP1D4hYE7R8lEKhd3ho1JIH5sazThYRz1ohtXko
-         rX5/ydFxtq3udiseWkz7IZLdgi5fMhqG7IFHzsuwuCUdF7GV4rvlnZK14o24oC4U0B4o
-         r0w4Tkxulf9GEAmCis09B8DwJyOitwbvcVSMdhRNnM5euSInjcFl4khNTuMTKJXxSc2H
-         bjk0Z8d4YTvoEZiLgCkJ1aubMseu7SyPvL8cWY3J3ORsW0c0xBwvsZfp5/dMZU0YKNiv
-         IxajrVdIKw3cOtr3lqvDOKQB5lDz4itC9ekNQNJdOwbaTkDtFP1WVZMt1Q015G1G1Q4P
-         i78Q==
+        bh=2fn+U7E9o4/fsYuYo96+Wt1jksbDto1e6gs7W58Oj/I=;
+        b=rVXbbkeZXa0i3ZxX7LwMQga/PKIYS2SylL77PyDzokUQUZN2WvK1/ad15m2zGpgPB7
+         NeeOJlQAPPS+AJYN663kcsQ2tmnU24vR1OLZs8BZg5nnViKO5Q7kEitr5QlJ/FiCqw6l
+         03x7anUCIvEUFfTNWS54q/NazdeOG9YllSMtUAixPmi5fWffJ4U0UmVHUTMps3BRs+Jo
+         K6ah2roFYvYzHErMkNvitmeDU7OFeuo9ol5xkVEvbGRvdymEYdFCBAoCH0uAdINJtMoO
+         VTC+CFVCcQCBp1xtQa1UIbmQO8dsix3Yc6EhdHH4twgScumKWspfnoWYTs+3pHg2z/vN
+         MDDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=8D6FuQXYV0uaDcUmZnFqujn9eeJ8hk7TXTK7/PtYQgw=;
-        b=pYhvbGTI63N5X+yE3pik9WJfeXIxNXfyldjIFGnwCs360Aa5hBD7C4MGKsQJsyrISE
-         tEJNehXbeMGBsib7iiHDz5bpuf18Hx6ISpz58B0QAs8yeUOQ2TVDe/eSkFvyd448dtJP
-         WASAdXSz10ryY7PurnyJ1lYsW6dUYiYzsM+GUOcn35Y6JYMO02hUdgpIv09T0bEq/tid
-         MMbo/sPzjfI3S97ZcHz4oQW4qkLEnatadXMI9Ge50rcmxk1+s0/A0TGVW9qgHL8grtIn
-         jrGXJEO3oTfdBmj2HCXZ6Vpo0k7fUA83gRXfsVbHKWWPvn0XZyspemg/6S1hljB9Oyge
-         tbMw==
-X-Gm-Message-State: APjAAAX7AvZ59d8Q4ga2W4ZPc/Mlzuc17aBCA0v0fJx1WWErT3KKK5hI
-        76/ArjEMDVaRdA/OZgJNNO3+SLtDtqbit/WTB77xoJbb
-X-Google-Smtp-Source: APXvYqzdwqfAlJUCSrToS5X7rVY5JhrEPHhADlhNLkl1sUEIhaBZWKe6Z91v5fWcRIICKLFen/bunxFcGQJOYHc/t6Y=
-X-Received: by 2002:a5d:9c4c:: with SMTP id 12mr5872008iof.5.1567714949778;
- Thu, 05 Sep 2019 13:22:29 -0700 (PDT)
+        bh=2fn+U7E9o4/fsYuYo96+Wt1jksbDto1e6gs7W58Oj/I=;
+        b=bjUJUqw3u0sJp3z98D0AVIMI25D3WT1f4SP/sYLL6xRS5dH1NzLuwaOy22+06/N9zT
+         rRjlDTW9bvNbV6VUfaSt3/KSzWu0vdgZXTTYARMT0MqqVWCUaaL8sexbcLbu1Z7o0l2l
+         SzTQeZ7RdR7iBDjCF7xGRuIv9CZp5X4TaqC+ojqyUlXhgAzvd80GhCk6hCHDwlCuQa5e
+         FrzBZ5vhTdsy37pD8m1Gv/I2Nyyp4tOMu98IH2k6hRZxA7EQ+DkL7nSTyoEHLZfxP50q
+         l1fpRpKZo6OwRjxOqeDp9PDEGbT427Up7ruNDrFIlLEu2jyvJIMC3PtNKrQ/eFNP0uYP
+         /hRA==
+X-Gm-Message-State: APjAAAUXltB2TfJnuOn/KQv8MXO61K3M39N3x/gCNSFypg7Bo9n0fjm+
+        Nvleb791bBEujjnsknKl8SlOKVEDu+aiey9VxNKvc+k7
+X-Google-Smtp-Source: APXvYqziwT4CLNjtu+lAN7/leyAWGA9/xCC9o+4ev07NU2TQbj6Jx8ZPsU69apgKTQNTU9n/JH+5HWQwlVMhCJbo0lg=
+X-Received: by 2002:a02:290e:: with SMTP id p14mr7127554jap.22.1567724402453;
+ Thu, 05 Sep 2019 16:00:02 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 5 Sep 2019 15:22:19 -0500
-Message-ID: <CAH2r5msoo-XH7h6AAc-7jrFteW37fu6dDYs0Fhg1K6UwEW9aAw@mail.gmail.com>
-Subject: decrypt large read offload patch
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000b12e8c0591d41446"
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Fri, 6 Sep 2019 08:59:51 +1000
+Message-ID: <CAN05THTazV4oLs+yq5SR1RYDO2p1VVmN7qnb=KBkfmZEpx8E0A@mail.gmail.com>
+Subject: Oddity: When should Mtime and Ctime be updated for SMB servers?
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000b12e8c0591d41446
-Content-Type: text/plain; charset="UTF-8"
+List, All,
 
-I am getting EBADMSG from the call (in crypt_message in smb2ops.c) to
-crypto_wait_req when trying to decrypt a 512K array of pages from an
-SMB3 read in a worker thread (rather than in the usual cifsd thread
-which works) - see attached patch (doesn't fail with non-offload
-case).
+I was trying to investigate why we had a regression in xfstests
+generic/313 and found something odd about when Windows updates the
+timestamps for a file.
 
-Any obvious bug anyone spots here?  Looking at the crypto library for
-CCM wasn't exactly clear to me what could be going on
+What the test performs is basically:
+1, Create a file
+2, Set file size to 0
+3, explicitly set the ctime and mtime to the current time of the client
+4, read the timestamps back  and verify they are set correctly
+delay for 1 second
+5, write to the file
+6, truncate the file back to 0
+7, and check the timestamps again, they should have been updated due to 5,6
 
--- 
-Thanks,
+This works as expected IF step 3 uses a compound, i.e. a different
+handle (how cifs.ko used to work, since this particular kernel api is
+path based)
 
-Steve
+However, IF step 3 uses the same handle from step 1 instead of a
+compound then this no longer works. The timestamps are no longer
+updated in steps 5,6.
 
---000000000000b12e8c0591d41446
-Content-Type: text/x-patch; charset="US-ASCII"; name="read-decrypt-offload-rfc.patch"
-Content-Disposition: attachment; filename="read-decrypt-offload-rfc.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_k074y1f40>
-X-Attachment-Id: f_k074y1f40
+What are the semantics for when these timestamps should be updated by
+a write or a truncate?
+And why does it matter if step 4 is a compound with
+create/setinfo/close versus if it just uses the same handle from the
+create in step 1?
 
-ZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2ZzLmMgYi9mcy9jaWZzL2NpZnNmcy5jCmluZGV4IGRl
-OTBlNjY1ZWYxMS4uMGJkNjhiMGM5ZTM2IDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNmcy5jCisr
-KyBiL2ZzL2NpZnMvY2lmc2ZzLmMKQEAgLTEwOSw2ICsxMDksNyBAQCBleHRlcm4gbWVtcG9vbF90
-ICpjaWZzX3JlcV9wb29scDsKIGV4dGVybiBtZW1wb29sX3QgKmNpZnNfbWlkX3Bvb2xwOwogCiBz
-dHJ1Y3Qgd29ya3F1ZXVlX3N0cnVjdAkqY2lmc2lvZF93cTsKK3N0cnVjdCB3b3JrcXVldWVfc3Ry
-dWN0CSpkZWNyeXB0X3dxOwogc3RydWN0IHdvcmtxdWV1ZV9zdHJ1Y3QJKmNpZnNvcGxvY2tkX3dx
-OwogX191MzIgY2lmc19sb2NrX3NlY3JldDsKIApAQCAtMTQ5OSwxMSArMTUwMCwxOSBAQCBpbml0
-X2NpZnModm9pZCkKIAkJZ290byBvdXRfY2xlYW5fcHJvYzsKIAl9CiAKKwkvKiBCQiBDb25zaWRl
-ciBzZXQgbGltaXQhPTAgc28gZG9uJ3QgbGF1bmNoIHRvbyBtYW55IHdvcmtlciB0aHJlYWRzICov
-CisJZGVjcnlwdF93cSA9IGFsbG9jX3dvcmtxdWV1ZSgic21iM2RlY3J5cHRkIiwKKwkJCQkgICAg
-IFdRX0ZSRUVaQUJMRXxXUV9NRU1fUkVDTEFJTSwgMCk7CisJaWYgKCFkZWNyeXB0X3dxKSB7CisJ
-CXJjID0gLUVOT01FTTsKKwkJZ290byBvdXRfZGVzdHJveV9jaWZzaW9kX3dxOworCX0KKwogCWNp
-ZnNvcGxvY2tkX3dxID0gYWxsb2Nfd29ya3F1ZXVlKCJjaWZzb3Bsb2NrZCIsCiAJCQkJCSBXUV9G
-UkVFWkFCTEV8V1FfTUVNX1JFQ0xBSU0sIDApOwogCWlmICghY2lmc29wbG9ja2Rfd3EpIHsKIAkJ
-cmMgPSAtRU5PTUVNOwotCQlnb3RvIG91dF9kZXN0cm95X2NpZnNpb2Rfd3E7CisJCWdvdG8gb3V0
-X2Rlc3Ryb3lfZGVjcnlwdF93cTsKIAl9CiAKIAlyYyA9IGNpZnNfZnNjYWNoZV9yZWdpc3Rlcigp
-OwpAQCAtMTU2OSw2ICsxNTc4LDggQEAgaW5pdF9jaWZzKHZvaWQpCiAJY2lmc19mc2NhY2hlX3Vu
-cmVnaXN0ZXIoKTsKIG91dF9kZXN0cm95X2NpZnNvcGxvY2tkX3dxOgogCWRlc3Ryb3lfd29ya3F1
-ZXVlKGNpZnNvcGxvY2tkX3dxKTsKK291dF9kZXN0cm95X2RlY3J5cHRfd3E6CisJZGVzdHJveV93
-b3JrcXVldWUoZGVjcnlwdF93cSk7CiBvdXRfZGVzdHJveV9jaWZzaW9kX3dxOgogCWRlc3Ryb3lf
-d29ya3F1ZXVlKGNpZnNpb2Rfd3EpOwogb3V0X2NsZWFuX3Byb2M6CkBAIC0xNTk1LDYgKzE2MDYs
-NyBAQCBleGl0X2NpZnModm9pZCkKIAljaWZzX2Rlc3Ryb3lfaW5vZGVjYWNoZSgpOwogCWNpZnNf
-ZnNjYWNoZV91bnJlZ2lzdGVyKCk7CiAJZGVzdHJveV93b3JrcXVldWUoY2lmc29wbG9ja2Rfd3Ep
-OworCWRlc3Ryb3lfd29ya3F1ZXVlKGRlY3J5cHRfd3EpOwogCWRlc3Ryb3lfd29ya3F1ZXVlKGNp
-ZnNpb2Rfd3EpOwogCWNpZnNfcHJvY19jbGVhbigpOwogfQpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9j
-aWZzZ2xvYi5oIGIvZnMvY2lmcy9jaWZzZ2xvYi5oCmluZGV4IDFmNTNkZWUyMTFkOC4uZDY2MTA2
-YWMwMzFhIDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNnbG9iLmgKKysrIGIvZnMvY2lmcy9jaWZz
-Z2xvYi5oCkBAIC0xODkyLDYgKzE4OTIsNyBAQCB2b2lkIGNpZnNfcXVldWVfb3Bsb2NrX2JyZWFr
-KHN0cnVjdCBjaWZzRmlsZUluZm8gKmNmaWxlKTsKIAogZXh0ZXJuIGNvbnN0IHN0cnVjdCBzbG93
-X3dvcmtfb3BzIGNpZnNfb3Bsb2NrX2JyZWFrX29wczsKIGV4dGVybiBzdHJ1Y3Qgd29ya3F1ZXVl
-X3N0cnVjdCAqY2lmc2lvZF93cTsKK2V4dGVybiBzdHJ1Y3Qgd29ya3F1ZXVlX3N0cnVjdCAqZGVj
-cnlwdF93cTsKIGV4dGVybiBzdHJ1Y3Qgd29ya3F1ZXVlX3N0cnVjdCAqY2lmc29wbG9ja2Rfd3E7
-CiBleHRlcm4gX191MzIgY2lmc19sb2NrX3NlY3JldDsKIApkaWZmIC0tZ2l0IGEvZnMvY2lmcy9z
-bWIyb3BzLmMgYi9mcy9jaWZzL3NtYjJvcHMuYwppbmRleCAwNzBkMGI3YjIxZGMuLjRmOTg1ZjUx
-N2JiYiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIyb3BzLmMKKysrIGIvZnMvY2lmcy9zbWIyb3Bz
-LmMKQEAgLTM2ODMsNiArMzY4Myw4IEBAIGNyeXB0X21lc3NhZ2Uoc3RydWN0IFRDUF9TZXJ2ZXJf
-SW5mbyAqc2VydmVyLCBpbnQgbnVtX3Jxc3QsCiAKIAlpZiAoIXJjICYmIGVuYykKIAkJbWVtY3B5
-KCZ0cl9oZHItPlNpZ25hdHVyZSwgc2lnbiwgU01CMl9TSUdOQVRVUkVfU0laRSk7CisJZWxzZQor
-CQljaWZzX2RiZyhWRlMsICJjcnlwdG9fd2FpdF9yZXEgcmV0dXJuZWQgJWQgd2l0aCBlbmMgJWRc
-biIsIHJjLCBlbmMpOyAvKiBCQiBSRU1PVkVNRSAqLwogCiAJa2ZyZWUoaXYpOwogZnJlZV9zZzoK
-QEAgLTM4MTQsNyArMzgxNiw3IEBAIGRlY3J5cHRfcmF3X2RhdGEoc3RydWN0IFRDUF9TZXJ2ZXJf
-SW5mbyAqc2VydmVyLCBjaGFyICpidWYsCiAJcnFzdC5ycV90YWlsc3ogPSAocGFnZV9kYXRhX3Np
-emUgJSBQQUdFX1NJWkUpID8gOiBQQUdFX1NJWkU7CiAKIAlyYyA9IGNyeXB0X21lc3NhZ2Uoc2Vy
-dmVyLCAxLCAmcnFzdCwgMCk7Ci0JY2lmc19kYmcoRllJLCAiRGVjcnlwdCBtZXNzYWdlIHJldHVy
-bmVkICVkXG4iLCByYyk7CisJY2lmc19kYmcoVkZTLCAiRGVjcnlwdCBtZXNzYWdlIHJldHVybmVk
-ICVkIHdpdGggcGFnZXMgJXAgbnBhZ2VzICVkIHRhaWxzeiAlZFxuIiwgcmMsIHBhZ2VzLCBucGFn
-ZXMsIHJxc3QucnFfdGFpbHN6KTsgLyogQkIgUkVNT1ZFTUUgKi8KIAogCWlmIChyYykKIAkJcmV0
-dXJuIHJjOwpAQCAtNDAxNyw4ICs0MDE5LDY1IEBAIGhhbmRsZV9yZWFkX2RhdGEoc3RydWN0IFRD
-UF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBzdHJ1Y3QgbWlkX3FfZW50cnkgKm1pZCwKIAlyZXR1cm4g
-bGVuZ3RoOwogfQogCitzdHJ1Y3Qgc21iMl9kZWNyeXB0X3dvcmsgeworCXN0cnVjdCB3b3JrX3N0
-cnVjdCBkZWNyeXB0OworCXN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcjsKKwlzdHJ1Y3Qg
-cGFnZSAqKnBwYWdlczsKKwljaGFyICpidWY7CisJdW5zaWduZWQgaW50IG5wYWdlczsKKwl1bnNp
-Z25lZCBpbnQgbGVuOworfTsKKworCitzdGF0aWMgdm9pZCBzbWIyX2RlY3J5cHRfb2ZmbG9hZChz
-dHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspCit7CisJc3RydWN0IHNtYjJfZGVjcnlwdF93b3JrICpk
-dyA9IGNvbnRhaW5lcl9vZih3b3JrLAorCQkJCXN0cnVjdCBzbWIyX2RlY3J5cHRfd29yaywgZGVj
-cnlwdCk7CisJaW50IGksIHJjOworCXN0cnVjdCBtaWRfcV9lbnRyeSAqbWlkOworCisJcmMgPSBk
-ZWNyeXB0X3Jhd19kYXRhKGR3LT5zZXJ2ZXIsIGR3LT5idWYsIGR3LT5zZXJ2ZXItPnZhbHMtPnJl
-YWRfcnNwX3NpemUsCisJCQkgICAgICBkdy0+cHBhZ2VzLCBkdy0+bnBhZ2VzLCBkdy0+bGVuKTsK
-KwlpZiAocmMpIHsKKwkJY2lmc19kYmcoVkZTLCAiZXJyb3IgZGVjcnlwdGluZyByYz0lZFxuIiwg
-cmMpOworCQlnb3RvIGZyZWVfcGFnZXM7CisJfQorCisJbWlkID0gc21iMl9maW5kX21pZChkdy0+
-c2VydmVyLCBkdy0+YnVmKTsKKwlpZiAobWlkID09IE5VTEwpCisJCWNpZnNfZGJnKFZGUywgIm1p
-ZCBub3QgZm91bmRcbiIpOworCWVsc2UgeworCQljaWZzX2RiZyhWRlMsICJtaWQgZm91bmQgJWxs
-ZFxuIiwgbWlkLT5taWQpOyAvKiBCQiByZW1vdmVtZSAqLworCQltaWQtPmRlY3J5cHRlZCA9IHRy
-dWU7CisJCXJjID0gaGFuZGxlX3JlYWRfZGF0YShkdy0+c2VydmVyLCBtaWQsIGR3LT5idWYsCisJ
-CQkJICAgICAgZHctPnNlcnZlci0+dmFscy0+cmVhZF9yc3Bfc2l6ZSwKKwkJCQkgICAgICBkdy0+
-cHBhZ2VzLCBkdy0+bnBhZ2VzLCBkdy0+bGVuKTsKKwl9CisKKwlkdy0+c2VydmVyLT5sc3RycCA9
-IGppZmZpZXM7CisKKwltaWQtPmNhbGxiYWNrKG1pZCk7CisKKwljaWZzX21pZF9xX2VudHJ5X3Jl
-bGVhc2UobWlkKTsKKworZnJlZV9wYWdlczoKKwkvKiBCQiBUT0RPIGRvdWJsZSBjaGVjayB0aGF0
-IHdlIGFyZSBmcmVlaW5nIHRoZSByaWdodCBudW1iZXIgb2YgcGFnZXMgKi8KKwlmb3IgKGkgPSBk
-dy0+bnBhZ2VzOyBpID49IDA7IGktLSkgeworCQljaWZzX2RiZyhWRlMsICJmcmVlIHBhZ2UgJWQg
-JXBcbiIsIGksIGR3LT5wcGFnZXNbaS0xXSk7CisJCXB1dF9wYWdlKGR3LT5wcGFnZXNbaS0xXSk7
-CisJCW1zbGVlcCgxMCk7CisJfQorCWtmcmVlKGR3LT5idWYpOworLyogRklYTUUgKi8KKy8qIGRp
-c2NhcmRfZGF0YToKKwljaWZzX2Rpc2NhcmRfcmVtYWluaW5nX2RhdGEoc2VydmVyKTsKKwlnb3Rv
-IGZyZWVfcGFnZXM7ICovCit9CisKKwogc3RhdGljIGludAotcmVjZWl2ZV9lbmNyeXB0ZWRfcmVh
-ZChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIHN0cnVjdCBtaWRfcV9lbnRyeSAqKm1p
-ZCkKK3JlY2VpdmVfZW5jcnlwdGVkX3JlYWQoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVy
-LCBzdHJ1Y3QgbWlkX3FfZW50cnkgKiptaWQsCisJCSAgICAgICBpbnQgKm51bV9taWRzKQogewog
-CWNoYXIgKmJ1ZiA9IHNlcnZlci0+c21hbGxidWY7CiAJc3RydWN0IHNtYjJfdHJhbnNmb3JtX2hk
-ciAqdHJfaGRyID0gKHN0cnVjdCBzbWIyX3RyYW5zZm9ybV9oZHIgKilidWY7CkBAIC00MDI4LDcg
-KzQwODcsOSBAQCByZWNlaXZlX2VuY3J5cHRlZF9yZWFkKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8g
-KnNlcnZlciwgc3RydWN0IG1pZF9xX2VudHJ5ICoqbWlkKQogCXVuc2lnbmVkIGludCBidWZsZW4g
-PSBzZXJ2ZXItPnBkdV9zaXplOwogCWludCByYzsKIAlpbnQgaSA9IDA7CisJc3RydWN0IHNtYjJf
-ZGVjcnlwdF93b3JrICpkdzsKIAorCSpudW1fbWlkcyA9IDE7CiAJbGVuID0gbWluX3QodW5zaWdu
-ZWQgaW50LCBidWZsZW4sIHNlcnZlci0+dmFscy0+cmVhZF9yc3Bfc2l6ZSArCiAJCXNpemVvZihz
-dHJ1Y3Qgc21iMl90cmFuc2Zvcm1faGRyKSkgLSBIRUFERVJfU0laRShzZXJ2ZXIpICsgMTsKIApA
-QCAtNDA2NCw2ICs0MTI1LDMzIEBAIHJlY2VpdmVfZW5jcnlwdGVkX3JlYWQoc3RydWN0IFRDUF9T
-ZXJ2ZXJfSW5mbyAqc2VydmVyLCBzdHJ1Y3QgbWlkX3FfZW50cnkgKiptaWQpCiAJaWYgKHJjKQog
-CQlnb3RvIGZyZWVfcGFnZXM7CiAKKwkvKgorCSAqIEZvciBsYXJnZSByZWFkcywgb2ZmbG9hZCB0
-byBkaWZmZXJlbnQgdGhyZWFkIGZvciBiZXR0ZXIgcGVyZm9ybWFuY2UsCisJICogdXNlIG1vcmUg
-Y29yZXMgZGVjcnlwdGluZyB3aGljaCBjYW4gYmUgZXhwZW5zaXZlCisJICovCisKKwlpZiAoc2Vy
-dmVyLT5wZHVfc2l6ZSA+ICg1MTIgKiAxMDI0KSkgeworCQlkdyA9IGttYWxsb2Moc2l6ZW9mKHN0
-cnVjdCBzbWIyX2RlY3J5cHRfd29yayksIEdGUF9LRVJORUwpOworCQlpZiAoZHcgPT0gTlVMTCkK
-KwkJCWdvdG8gbm9uX29mZmxvYWRlZF9kZWNyeXB0OworCQlkdy0+YnVmID0ga21hbGxvYyhzaXpl
-b2Yoc3RydWN0IHNtYjJfdHJhbnNmb3JtX2hkciksIEdGUF9LRVJORUwpOworCQlpZiAoZHctPmJ1
-ZiA9PSBOVUxMKSB7CisJCQlrZnJlZShkdyk7CisJCQlnb3RvIG5vbl9vZmZsb2FkZWRfZGVjcnlw
-dDsKKwkJfQorCQltZW1jcHkoZHctPmJ1ZiwgYnVmLCBzaXplb2Yoc3RydWN0IHNtYjJfdHJhbnNm
-b3JtX2hkcikpOworCQlJTklUX1dPUksoJmR3LT5kZWNyeXB0LCBzbWIyX2RlY3J5cHRfb2ZmbG9h
-ZCk7CisKKwkJZHctPm5wYWdlcyA9IG5wYWdlczsKKwkJZHctPnNlcnZlciA9IHNlcnZlcjsKKwkJ
-ZHctPnBwYWdlcyA9IHBhZ2VzOworCQlkdy0+bGVuID0gbGVuOworCQlxdWV1ZV93b3JrKGNpZnNp
-b2Rfd3EsICZkdy0+ZGVjcnlwdCk7CisJCSpudW1fbWlkcyA9IDA7IC8qIHdvcmtlciB0aHJlYWQg
-dGFrZXMgY2FyZSBvZiBmaW5kaW5nIG1pZCAqLworCQlyZXR1cm4gLTE7CisJfQorCitub25fb2Zm
-bG9hZGVkX2RlY3J5cHQ6CiAJcmMgPSBkZWNyeXB0X3Jhd19kYXRhKHNlcnZlciwgYnVmLCBzZXJ2
-ZXItPnZhbHMtPnJlYWRfcnNwX3NpemUsCiAJCQkgICAgICBwYWdlcywgbnBhZ2VzLCBsZW4pOwog
-CWlmIChyYykKQEAgLTQyMTAsOCArNDI5OCw3IEBAIHNtYjNfcmVjZWl2ZV90cmFuc2Zvcm0oc3Ry
-dWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLAogCiAJLyogVE9ETzogYWRkIHN1cHBvcnQgZm9y
-IGNvbXBvdW5kcyBjb250YWluaW5nIFJFQUQuICovCiAJaWYgKHBkdV9sZW5ndGggPiBDSUZTTWF4
-QnVmU2l6ZSArIE1BWF9IRUFERVJfU0laRShzZXJ2ZXIpKSB7Ci0JCSpudW1fbWlkcyA9IDE7Ci0J
-CXJldHVybiByZWNlaXZlX2VuY3J5cHRlZF9yZWFkKHNlcnZlciwgJm1pZHNbMF0pOworCQlyZXR1
-cm4gcmVjZWl2ZV9lbmNyeXB0ZWRfcmVhZChzZXJ2ZXIsICZtaWRzWzBdLCBudW1fbWlkcyk7CiAJ
-fQogCiAJcmV0dXJuIHJlY2VpdmVfZW5jcnlwdGVkX3N0YW5kYXJkKHNlcnZlciwgbWlkcywgYnVm
-cywgbnVtX21pZHMpOwo=
---000000000000b12e8c0591d41446--
+
+Since the traces are tiny I will include them in ASCII form. Anyone
+that wants the actual pcap traces to view them in wireshark, just
+email me and I will send them.
+
+
+Original cifs.ko behavior:
+====================
+    1 0.000000000 SMB2 Create Request File: bar
+    2 0.001809747 SMB2 Create Response File: bar
+    8 0.004397925 SMB2 Flush Request File: bar
+    9 0.013682200 SMB2 Flush Response
+   11 0.014561091 SMB2 SetInfo Request
+FILE_INFO/SMB2_FILE_ENDOFFILE_INFO File: bar
+   12 0.014957578 SMB2 SetInfo Response
+   14 0.015851218 SMB2 Create Request File: bar;SetInfo Request
+FILE_INFO/SMB2_FILE_BASIC_INFO;Close Request
+   15 0.016358273 SMB2 Create Response File: bar;SetInfo Response;Close Response
+   17 0.017253133 SMB2 Create Request File: bar;GetInfo Request
+FILE_INFO/SMB2_FILE_ALL_INFO;Close Request
+   18 0.017736416 SMB2 Create Response File: bar;GetInfo Response;Close Response
+   20 1.019048674 SMB2 Write Request Len:22 Off:0 File: bar
+   21 1.020140390 SMB2 Write Response
+   23 1.021696732 SMB2 SetInfo Request
+FILE_INFO/SMB2_FILE_ENDOFFILE_INFO File: bar
+   24 1.022446473 SMB2 SetInfo Response
+   26 1.024223917 SMB2 Create Request File: bar;GetInfo Request
+FILE_INFO/SMB2_FILE_ALL_INFO;Close Request
+   27 1.025163155 SMB2 Create Response File: bar;GetInfo Response;Close Response
+   29 1.028479545 SMB2 Close Request File: bar
+   30 1.029246502 SMB2 Close Response
+
+In this case, packet 14 is the compound used to set the timestamps.
+Packet 17 reports that the timestamps were set to the values in 14.
+Now there is a one second delay and we write to the file, truncate it
+and then read back the timestamps and the timestamps have incremented.
+
+New cifs.ko behavior:
+=================
+    4 0.003062951 SMB2 Create Request File: bar
+    5 0.004362998 SMB2 Create Response File: bar
+    7 0.005922755 SMB2 Flush Request File: bar
+    8 0.009779700 SMB2 Flush Response
+   10 0.011293505 SMB2 SetInfo Request
+FILE_INFO/SMB2_FILE_ENDOFFILE_INFO File: bar
+   11 0.012076033 SMB2 SetInfo Response
+   12 0.013181837 SMB2 SetInfo Request FILE_INFO/SMB2_FILE_BASIC_INFO File: bar
+   13 0.014015512 SMB2 SetInfo Response
+   14 0.015743571 SMB2 Create Request File: bar;GetInfo Request
+FILE_INFO/SMB2_FILE_ALL_INFO;Close Request
+   15 0.016904597 SMB2 Create Response File: bar;GetInfo Response;Close Response
+   17 1.018801828 SMB2 Write Request Len:22 Off:0 File: bar
+   18 1.019773131 SMB2 Write Response
+   20 1.021448036 SMB2 SetInfo Request
+FILE_INFO/SMB2_FILE_ENDOFFILE_INFO File: bar
+   21 1.022202409 SMB2 SetInfo Response
+   23 1.023990091 SMB2 Create Request File: bar;GetInfo Request
+FILE_INFO/SMB2_FILE_ALL_INFO;Close Request
+   24 1.025077567 SMB2 Create Response File: bar;GetInfo Response;Close Response
+   26 1.028801682 SMB2 Close Request File: bar
+   27 1.029697708 SMB2 Close Response
+
+The only difference here is that in packet 12, where we set the
+timestamps, we no longer use a new handle in a c reate/setinfo/close
+compound but instead
+use the existing handle that is already open.
+In this case the timestamps are no longer updated by the write or
+truncate in packets 17 and 20.
+
+
+Regards
+Ronnie Sahlberg
