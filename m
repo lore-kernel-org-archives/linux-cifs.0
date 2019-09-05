@@ -1,127 +1,135 @@
-Return-Path: <SRS0=RvcV=W7=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=hPid=XA=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A25C3A5AA
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 16:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A46C43331
+	for <linux-cifs@archiver.kernel.org>; Thu,  5 Sep 2019 18:57:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBC7D23400
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Sep 2019 16:17:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567613853;
-	bh=xNd4kCXq6hUuyEVyhnEMc4+6Y/+LDdNmnahKeej3FwM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=E/nw21YAjKdhEnFgvfUIlOKU/B6NDpZxV9jQX4Fi21JHeMufdWcDu8V90AODvK1P0
-	 AXstKda/VZiMNoRnfjWOWaGKVqULd5n8xLKywxg1w5G7RoKLkZ8Rgoh1yjZ5nEQjZi
-	 doEODyKwMDPR4utYsTGZXc/o2DgSLgQcMeD5wrEA=
+	by mail.kernel.org (Postfix) with ESMTP id 0288B20828
+	for <linux-cifs@archiver.kernel.org>; Thu,  5 Sep 2019 18:57:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=paulo.ac header.i=@paulo.ac header.b="vccxvvoU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732462AbfIDQR3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 4 Sep 2019 12:17:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33504 "EHLO mail.kernel.org"
+        id S2388875AbfIES5t (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 5 Sep 2019 14:57:49 -0400
+Received: from mx.paulo.ac ([51.15.251.127]:60412 "EHLO mx.paulo.ac"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731559AbfIDP7K (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 4 Sep 2019 11:59:10 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 15F7522CF5;
-        Wed,  4 Sep 2019 15:59:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567612749;
-        bh=xNd4kCXq6hUuyEVyhnEMc4+6Y/+LDdNmnahKeej3FwM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SWH7/GM7O6bnnohA9vsAM1iuR7C/tuQ3KUK18UW+ZD7VDDnOBqBEh2lN6Zxh9xNRd
-         HwGMIZzjkM0BWTbCnLc+k8lsIsMe+jn1jPMpHElZSn6g6NrPL9CZbb04We4Ug7actC
-         AH705lXo7hSAEKXs3qZ4/H01+2qco0CI51z+hIWo=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 59/94] cifs: set domainName when a domain-key is used in multiuser
-Date:   Wed,  4 Sep 2019 11:57:04 -0400
-Message-Id: <20190904155739.2816-59-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190904155739.2816-1-sashal@kernel.org>
-References: <20190904155739.2816-1-sashal@kernel.org>
+        id S2388858AbfIES5t (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 5 Sep 2019 14:57:49 -0400
+X-Greylist: delayed 483 seconds by postgrey-1.27 at vger.kernel.org; Thu, 05 Sep 2019 14:57:47 EDT
+Received: from mx.paulo.ac (mx.paulo.ac [51.15.251.127])
+        by mx.paulo.ac (Postfix) with ESMTPSA id 181CD81016;
+        Thu,  5 Sep 2019 18:49:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=paulo.ac; s=dkim;
+        t=1567709383;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MQ7QSppux8Y1s8kfSsUNxZsA9QRimRonn/ZdxFo92cA=;
+        b=vccxvvoUDr8FPEYKNNYFwfUHq8ZkGCN0TRwgc+RhT8NM1FJTvLV28ujnehxmwys6UvFCdO
+        4LpdsdmssykAiiMzfRe+OwhF8fDOuvZ+FOM+v+Oz1p6HS+SdqMhVjbUBg2c4fom9+HJLem
+        68oltt90EeKJEeo9URxczTyE8T63hRlB4wFnr91NNosPtMEiNwMeRZx+Hs+4Vxe8qlW4kA
+        2BFzXb7AfLQyjLN4IFJbVWiAG6SmFkDmvEuleGr3Y//G38MwBmT3dj09bM9BPae3o4cGE5
+        mNOI+s94Ih9mZYiMmmAZP+JF4me+3lHSUAgO7QTuXwO2nGqEt+ITvkltZ2JKmg==
+From:   "Paulo Alcantara (SUSE)" <paulo@paulo.ac>
+To:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        piastryyy@gmail.com
+Cc:     aaptel@suse.com, "Paulo Alcantara (SUSE)" <paulo@paulo.ac>
+Subject: [PATCH] mount.cifs: Fix double-free issue when mounting with setuid root
+Date:   Thu,  5 Sep 2019 15:49:35 -0300
+Message-Id: <20190905184935.30694-1-paulo@paulo.ac>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=paulo.ac;
+        s=dkim; t=1567709383;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MQ7QSppux8Y1s8kfSsUNxZsA9QRimRonn/ZdxFo92cA=;
+        b=euLPc8ag9RahIWeWYeelTfcGYoctWu35HllLNKX3oUyhez5RkslSZ97FmINOnR7oeS5ty6
+        VUXFK0E8bL7ciLpdZPLer0fiFE17VByOc/2Uw9DdRjaKuWFUcOdgIJKW17WgQMnHBJJEPE
+        MmRKNmwgf3PSLHRM7/aQsPRRiWsVYAlvgOT294umRWKXnTF+YOHDjjOzO1uMEwMESpAIQm
+        QP+ShyqejFxC+RUdZ/ywo4mRH7LR0YX9Fd4v5O8XsSTfSxxmx4PhpYLQxZSP4M8m0Ub8oz
+        Vm1GBikO4IJz4860ClhCX9acjzoL3iBBcy8vdz6A7YVvyYdzW3mfzD9MLeMKPA==
+ARC-Seal: i=1; s=dkim; d=paulo.ac; t=1567709383; a=rsa-sha256; cv=none;
+        b=wTxMtOpNbs7crE8yweiTee4D6xh1wC/dcI9RYhBRnon/BWdcjVFOdcUT0iavAx4bTIYNbX
+        UKFh5UvRqVIfJAFfoXDEesmkjxxK1VmOejeCCI0lLp+xpKu5uV/VlQBou+kT6crJRl9h1y
+        dGmd/nOGPLOdSvzhcIhR3fxE5mmMtnvgYywPLCL1RmEkxyJlNJsmdLo9vZStdylzF6GJQz
+        8yaq3jo2uZYKpw6ZVmoROUPVZKVqJqJ1x3KTI/2kGG98HPch5oKgtC9Ur8NBJCB6Dvk1gL
+        g1MvuthhxyuEejo1SumndR2JB05GhWyCodj9g5JpYbkISWgBZ5hSZUKPQpCWzQ==
+ARC-Authentication-Results: i=1;
+        mx.paulo.ac;
+        auth=pass smtp.auth=paulo smtp.mailfrom=paulo@paulo.ac
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Ronnie Sahlberg <lsahlber@redhat.com>
+It can be easily reproduced with the following:
 
-[ Upstream commit f2aee329a68f5a907bcff11a109dfe17c0b41aeb ]
+  # chmod +s `which mount.cifs`
+  # echo "//localhost/share /mnt cifs \
+    users,username=foo,password=XXXX" >> /etc/fstab
+  # su - foo
+  $ mount /mnt
+  free(): double free detected in tcache 2
+  Child process terminated abnormally.
 
-RHBZ: 1710429
+The problem was that check_fstab() already freed orgoptions pointer
+and then we freed it again in main() function.
 
-When we use a domain-key to authenticate using multiuser we must also set
-the domainnmame for the new volume as it will be used and passed to the server
-in the NTLMSSP Domain-name.
-
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: bf7f48f4c7dc ("mount.cifs.c: fix memory leaks in main func")
+Signed-off-by: Paulo Alcantara (SUSE) <paulo@paulo.ac>
 ---
- fs/cifs/connect.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ mount.cifs.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 18c7c6b2fe08a..2beaa14519f5d 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2961,6 +2961,7 @@ static int
- cifs_set_cifscreds(struct smb_vol *vol, struct cifs_ses *ses)
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 7748d54aa814..2116fc803311 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -247,7 +247,6 @@ check_fstab(const char *progname, const char *mountpoint, const char *devname,
+ 	 * set of options. We don't want to trust what the user
+ 	 * gave us, so just take whatever is in /etc/fstab.
+ 	 */
+-	free(*options);
+ 	*options = strdup(mnt->mnt_opts);
+ 	return 0;
+ }
+@@ -1762,6 +1761,7 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+ 		   const char *orig_dev, char *orgoptions)
  {
- 	int rc = 0;
-+	int is_domain = 0;
- 	const char *delim, *payload;
- 	char *desc;
- 	ssize_t len;
-@@ -3008,6 +3009,7 @@ cifs_set_cifscreds(struct smb_vol *vol, struct cifs_ses *ses)
- 			rc = PTR_ERR(key);
- 			goto out_err;
- 		}
-+		is_domain = 1;
+ 	int rc;
++	char *newopts = NULL;
+ 
+ 	rc = drop_capabilities(0);
+ 	if (rc)
+@@ -1773,10 +1773,11 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
+ 
+ 	if (getuid()) {
+ 		rc = check_fstab(thisprogram, mountpoint, orig_dev,
+-				 &orgoptions);
++				 &newopts);
+ 		if (rc)
+ 			goto assemble_exit;
+ 
++		orgoptions = newopts;
+ 		/* enable any default user mount flags */
+ 		parsed_info->flags |= CIFS_SETUID_FLAGS;
+ 	}
+@@ -1880,6 +1881,7 @@ assemble_mountinfo(struct parsed_mount_info *parsed_info,
  	}
  
- 	down_read(&key->sem);
-@@ -3065,6 +3067,26 @@ cifs_set_cifscreds(struct smb_vol *vol, struct cifs_ses *ses)
- 		goto out_key_put;
- 	}
+ assemble_exit:
++	free(newopts);
+ 	return rc;
+ }
  
-+	/*
-+	 * If we have a domain key then we must set the domainName in the
-+	 * for the request.
-+	 */
-+	if (is_domain && ses->domainName) {
-+		vol->domainname = kstrndup(ses->domainName,
-+					   strlen(ses->domainName),
-+					   GFP_KERNEL);
-+		if (!vol->domainname) {
-+			cifs_dbg(FYI, "Unable to allocate %zd bytes for "
-+				 "domain\n", len);
-+			rc = -ENOMEM;
-+			kfree(vol->username);
-+			vol->username = NULL;
-+			kfree(vol->password);
-+			vol->password = NULL;
-+			goto out_key_put;
-+		}
-+	}
-+
- out_key_put:
- 	up_read(&key->sem);
- 	key_put(key);
 -- 
-2.20.1
+2.23.0
 
