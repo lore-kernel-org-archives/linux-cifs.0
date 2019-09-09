@@ -7,285 +7,534 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C19B6C00307
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Sep 2019 04:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC614C00307
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Sep 2019 04:31:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9AFD62196F
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Sep 2019 04:31:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B0712084D
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Sep 2019 04:31:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lc06ZxQr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kf/1GKhJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726519AbfIIEb0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 9 Sep 2019 00:31:26 -0400
-Received: from mail-io1-f46.google.com ([209.85.166.46]:46794 "EHLO
-        mail-io1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725710AbfIIEb0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Sep 2019 00:31:26 -0400
-Received: by mail-io1-f46.google.com with SMTP id d17so3749716ios.13
-        for <linux-cifs@vger.kernel.org>; Sun, 08 Sep 2019 21:31:24 -0700 (PDT)
+        id S1726523AbfIIEbg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 9 Sep 2019 00:31:36 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:41651 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725710AbfIIEbg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Sep 2019 00:31:36 -0400
+Received: by mail-io1-f67.google.com with SMTP id r26so25583030ioh.8
+        for <linux-cifs@vger.kernel.org>; Sun, 08 Sep 2019 21:31:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=6S001QTLpuwiMmjjg1GD4/Y0yKcv2Uwi0CdK8MiFNTE=;
-        b=lc06ZxQr4ORM21EPnh19gL1w9LaYZNjm5RgyqHEbhf7d3GRoo/vGsbNA+y03FwQItz
-         TbT2ox9ujXkiG724pncpCB6YyIIMgN/sTCLDHsEswQxug/oZow/qnhusFE3oLFV9xJaB
-         elz2dI6F1N/z82C5TeXEZC+TgURQyyr9sfK4shpGnHIyYyYNBJA7CVdqdE817frXybmj
-         w8lrOmgn4nWzpfXwUioyA8qWQe/fg9ft86aobiUh6P73JpiQy6t4mpaZIWNrXRjs5fuN
-         EH1EF+4yRcEdSpI/VcnQHBr5/B6mm89ERYlboUE1QNpRQLVs7EIlnq+PYw0M25n1dzMi
-         prZQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=x2G/J07V+olK1G5PVs0ttEfqdNEK7LotRiPVdipgVSU=;
+        b=Kf/1GKhJ4mnMW5ndjWGF1CSyoFsBi7ymhTZ81dNTV0BPyRM8IKShDR9eOgEv/Cn+fi
+         yu/ebIZHWPfs4DmtJc3ruSi4xzBdFz9s9E3d/8poIgQSs3inUJLAz2YQ0DrwgAG+CmyJ
+         X+HFB/Oc+DTzEYVS1sYYHRgDJsBrJAG6WJRZPGKEonKufqQ/0w/p8kMO1jr2ltHP6vX/
+         E8hB4ElP90ZjwK2P1X80HKG0SnDWwXecw+22X3YRMcAXvowFT0MZ46r+4o0Xiu5cLlvk
+         oWJom/+WtdJida5LUTty8v8m4mnhTsB+qXiHDUt4H8pOvZuTxuI+hTZmbCfLLgK3kAxU
+         +E6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=6S001QTLpuwiMmjjg1GD4/Y0yKcv2Uwi0CdK8MiFNTE=;
-        b=CpeaEUcEqyI8wgZXgO9cHapg9zqZUy2CsCrO48TJvPYfpVZ7E+z+gfEI08CLQ89xEU
-         nN1qgBYMXJxG2uZJ3j7Gc3ob6rLi9jy2RDByZPausCG+rxwxksOmxbvAV8HilKa7+Osr
-         CUj7QKXRr7VFiNpCAYj6Kl29UX089CzajugQyavYm4WDLFcrnStgKUZAY2KQ5vJzNYZk
-         3ZZ+HCTTKhLfUdfyMwvFtTSAApx/lIT+I7KeLo/FiJe9LNrDSXVEhb/bOAb+NYq0UiS2
-         07RGOX+kjsgRzdfTAjnGseClYRCPSh85+zp7Q4P0r3tjHAghSAg6gl8cJeuvb6pQYoqM
-         UDmw==
-X-Gm-Message-State: APjAAAVEuXcJFadF023H/nJ8svqK1sLYBsh5l6cBVd7bMvPe0+A2LsAc
-        ieNfz9VniZsyyex7SVreZogNiXmtow+D0Y5UuZ/ppTm+
-X-Google-Smtp-Source: APXvYqxdqzaGDJomlSX9BqiIiKQ0kQUClioxYjoCfAIczEdBWeOIxjHj39ANiVgQdT/WjPYloO6dbF1qbxSCMl8149g=
-X-Received: by 2002:a5d:89cd:: with SMTP id a13mr12065800iot.272.1568003483369;
- Sun, 08 Sep 2019 21:31:23 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=x2G/J07V+olK1G5PVs0ttEfqdNEK7LotRiPVdipgVSU=;
+        b=BBAWbxVWK0yIIVs7c3Cm7CfZTRi7He4pjXSoUfebRbX/IbsUsKMvq7eTmVlKVjsJVh
+         vc96+n5dbSaGxaUu5Q2kUlb9PvCgFGogIGLw3/MUb7o3T4j9Hkpp0YuvfQXdkTJwg2x7
+         zR4HWjmUHeV8Lng83Cy82sHMv9a51rmQ00sZkKyiRhcLcdFKxLJ6WYCNn6rZrvqNrTFn
+         UObCP8TxDtRILX9lot0hSj1y8VLBAdt5oMG76E1XOIe/zW6D2lDTVljanw1nRUsUxFnE
+         zzcwGY2TiSW4HVJ1XYJt17JDuIGGPWz4m3SdExHOOdV38v0xnvHSsnKLtoMgS13H59jH
+         4tLQ==
+X-Gm-Message-State: APjAAAW2NJIKuFVLD33rVZhBsKZ44dcqf5W0zcrvOo+ulCl2FNHAliZG
+        HGSXqICn67R3sVlB+fq3GhX0j2J7ypFuPGj1a6w=
+X-Google-Smtp-Source: APXvYqw5g56SVPMsYqXQ2XL6z3AItKGCG8eJ4UcgIQQppybFD4l4oc3iYwyf0O0KhWd+QHLsrLP1HHtaImyE3yqFBkw=
+X-Received: by 2002:a6b:ee17:: with SMTP id i23mr2015203ioh.168.1568003495025;
+ Sun, 08 Sep 2019 21:31:35 -0700 (PDT)
 MIME-Version: 1.0
+References: <20190904023241.3312-1-lsahlber@redhat.com>
+In-Reply-To: <20190904023241.3312-1-lsahlber@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 8 Sep 2019 23:31:12 -0500
-Message-ID: <CAH2r5msbRyGMY2XQifbxB0iU3a3EPp8UcemO8QE5bhq9HPMqBQ@mail.gmail.com>
-Subject: [SMB3][PATCHes] parallelizing decryption of large read responses
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000a27719059217420c"
+Date:   Sun, 8 Sep 2019 23:31:23 -0500
+Message-ID: <CAH2r5muapcTHvomMBqzwhv9b2axmch3Aan3tEFT9p=L9-7OvUg@mail.gmail.com>
+Subject: Re: [PATCH] cifs: add a debug macro that prints \\server\share for errors
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000a27719059217420c
-Content-Type: text/plain; charset="UTF-8"
+Fixed trivial code indentation problem and merged into cifs-2.6.git
+for-next pending more testing
 
-I am seeing very good performance benefit from offload of decryption
-of encrypted SMB3 read responses to a pool of worker threads
-(optionally).  See attached patches.
+On Tue, Sep 3, 2019 at 9:32 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+>
+> Where we have a tcon available we can log \\server\share as part
+> of the message. Only do this for the VFS log level.
+>
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/cifs_debug.h | 50 +++++++++++++++++++++++++++++++++++++++++-------
+>  fs/cifs/smb2ops.c    | 54 ++++++++++++++++++++++++++--------------------------
+>  fs/cifs/smb2pdu.c    | 28 +++++++++++++--------------
+>  fs/cifs/transport.c  |  4 ++--
+>  4 files changed, 86 insertions(+), 50 deletions(-)
+>
+> diff --git a/fs/cifs/cifs_debug.h b/fs/cifs/cifs_debug.h
+> index 567af916f103..5deb3070d4e7 100644
+> --- a/fs/cifs/cifs_debug.h
+> +++ b/fs/cifs/cifs_debug.h
+> @@ -82,15 +82,18 @@ do {                                                        \
+>
+>  #define cifs_server_dbg_func(ratefunc, type, fmt, ...)         \
+>  do {                                                           \
+> +       const char *sn = "";                                    \
+> +       if (server && server->hostname)                         \
+> +               sn = server->hostname;                          \
+>         if ((type) & FYI && cifsFYI & CIFS_INFO) {              \
+> -               pr_debug_ ## ratefunc("%s: Server:%s "  fmt,    \
+> -                       __FILE__, server->hostname, ##__VA_ARGS__);\
+> +               pr_debug_ ## ratefunc("%s: \\\\%s "     fmt,    \
+> +                       __FILE__, sn, ##__VA_ARGS__);           \
+>         } else if ((type) & VFS) {                              \
+> -               pr_err_ ## ratefunc("CIFS VFS: Server:%s " fmt, \
+> -                       server->hostname, ##__VA_ARGS__);       \
+> +               pr_err_ ## ratefunc("CIFS VFS: \\\\%s " fmt,    \
+> +                       sn, ##__VA_ARGS__);                     \
+>         } else if ((type) & NOISY && (NOISY != 0)) {            \
+> -               pr_debug_ ## ratefunc("Server:%s " fmt,         \
+> -                       server->hostname, ##__VA_ARGS__);       \
+> +               pr_debug_ ## ratefunc("\\\\%s " fmt,            \
+> +                       sn, ##__VA_ARGS__);                     \
+>         }                                                       \
+>  } while (0)
+>
+> @@ -104,6 +107,33 @@ do {                                                       \
+>                         type, fmt, ##__VA_ARGS__);      \
+>  } while (0)
+>
+> +#define cifs_tcon_dbg_func(ratefunc, type, fmt, ...)           \
+> +do {                                                           \
+> +       const char *tn = "";                                    \
+> +       if (tcon && tcon->treeName)                             \
+> +               tn = tcon->treeName;                            \
+> +       if ((type) & FYI && cifsFYI & CIFS_INFO) {              \
+> +               pr_debug_ ## ratefunc("%s: %s " fmt,            \
+> +                       __FILE__, tn, ##__VA_ARGS__);           \
+> +       } else if ((type) & VFS) {                              \
+> +               pr_err_ ## ratefunc("CIFS VFS: %s " fmt,        \
+> +                       tn, ##__VA_ARGS__);                     \
+> +       } else if ((type) & NOISY && (NOISY != 0)) {            \
+> +               pr_debug_ ## ratefunc("%s " fmt,                \
+> +                       tn, ##__VA_ARGS__);                     \
+> +       }                                                       \
+> +} while (0)
+> +
+> +#define cifs_tcon_dbg(type, fmt, ...)                  \
+> +do {                                                   \
+> +       if ((type) & ONCE)                              \
+> +               cifs_tcon_dbg_func(once,                \
+> +                       type, fmt, ##__VA_ARGS__);      \
+> +       else                                            \
+> +               cifs_tcon_dbg_func(ratelimited, \
+> +                       type, fmt, ##__VA_ARGS__);      \
+> +} while (0)
+> +
+>  /*
+>   *     debug OFF
+>   *     ---------
+> @@ -118,10 +148,16 @@ do {                                                                      \
+>  #define cifs_server_dbg(type, fmt, ...)                                        \
+>  do {                                                                   \
+>         if (0)                                                          \
+> -               pr_debug("Server:%s " fmt,                              \
+> +               pr_debug("\\\\%s " fmt,                                 \
+>                          server->hostname, ##__VA_ARGS__);              \
+>  } while (0)
+>
+> +#define cifs_tcon_dbg(type, fmt, ...)                                  \
+> +do {                                                                   \
+> +       if (0)                                                          \
+> +         pr_debug("%s " fmt, tcon->treeName, ##__VA_ARGS__);           \
+> +} while (0)
+> +
+>  #define cifs_info(fmt, ...)                                            \
+>  do {                                                                   \
+>         pr_info("CIFS: "fmt, ##__VA_ARGS__);                            \
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 070d0b7b21dc..83b02d74d48e 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -109,10 +109,10 @@ smb2_add_credits(struct TCP_Server_Info *server,
+>                 /* change_conf hasn't been executed */
+>                 break;
+>         case 0:
+> -               cifs_dbg(VFS, "Possible client or server bug - zero credits\n");
+> +               cifs_server_dbg(VFS, "Possible client or server bug - zero credits\n");
+>                 break;
+>         case 1:
+> -               cifs_dbg(VFS, "disabling echoes and oplocks\n");
+> +               cifs_server_dbg(VFS, "disabling echoes and oplocks\n");
+>                 break;
+>         case 2:
+>                 cifs_dbg(FYI, "disabling oplocks\n");
+> @@ -230,7 +230,7 @@ smb2_adjust_credits(struct TCP_Server_Info *server,
+>
+>         if (server->reconnect_instance != credits->instance) {
+>                 spin_unlock(&server->req_lock);
+> -               cifs_dbg(VFS, "trying to return %d credits to old session\n",
+> +               cifs_server_dbg(VFS, "trying to return %d credits to old session\n",
+>                          credits->value - new_val);
+>                 return -EAGAIN;
+>         }
+> @@ -270,7 +270,7 @@ smb2_find_mid(struct TCP_Server_Info *server, char *buf)
+>         __u64 wire_mid = le64_to_cpu(shdr->MessageId);
+>
+>         if (shdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM) {
+> -               cifs_dbg(VFS, "Encrypted frame parsing not supported yet\n");
+> +               cifs_server_dbg(VFS, "Encrypted frame parsing not supported yet\n");
+>                 return NULL;
+>         }
+>
+> @@ -294,10 +294,10 @@ smb2_dump_detail(void *buf, struct TCP_Server_Info *server)
+>  #ifdef CONFIG_CIFS_DEBUG2
+>         struct smb2_sync_hdr *shdr = (struct smb2_sync_hdr *)buf;
+>
+> -       cifs_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
+> +       cifs_server_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
+>                  shdr->Command, shdr->Status, shdr->Flags, shdr->MessageId,
+>                  shdr->ProcessId);
+> -       cifs_dbg(VFS, "smb buf %p len %u\n", buf,
+> +       cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
+>                  server->ops->calc_smb_size(buf, server));
+>  #endif
+>  }
+> @@ -576,7 +576,7 @@ SMB3_request_interfaces(const unsigned int xid, struct cifs_tcon *tcon)
+>                          "server does not support query network interfaces\n");
+>                 goto out;
+>         } else if (rc != 0) {
+> -               cifs_dbg(VFS, "error %d on ioctl to get interface list\n", rc);
+> +               cifs_tcon_dbg(VFS, "error %d on ioctl to get interface list\n", rc);
+>                 goto out;
+>         }
+>
+> @@ -1330,11 +1330,11 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
+>                         (char **)&res_key, &ret_data_len);
+>
+>         if (rc) {
+> -               cifs_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
+> +               cifs_tcon_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
+>                 goto req_res_key_exit;
+>         }
+>         if (ret_data_len < sizeof(struct resume_key_req)) {
+> -               cifs_dbg(VFS, "Invalid refcopy resume key length\n");
+> +               cifs_tcon_dbg(VFS, "Invalid refcopy resume key length\n");
+>                 rc = -EINVAL;
+>                 goto req_res_key_exit;
+>         }
+> @@ -1486,7 +1486,7 @@ smb2_ioctl_query_info(const unsigned int xid,
+>                                   qi.input_buffer_length,
+>                                   qi.output_buffer_length, buffer);
+>         } else { /* unknown flags */
+> -               cifs_dbg(VFS, "invalid passthru query flags: 0x%x\n", qi.flags);
+> +               cifs_tcon_dbg(VFS, "invalid passthru query flags: 0x%x\n", qi.flags);
+>                 rc = -EINVAL;
+>         }
+>
+> @@ -1613,7 +1613,7 @@ smb2_copychunk_range(const unsigned int xid,
+>                 if (rc == 0) {
+>                         if (ret_data_len !=
+>                                         sizeof(struct copychunk_ioctl_rsp)) {
+> -                               cifs_dbg(VFS, "invalid cchunk response size\n");
+> +                               cifs_tcon_dbg(VFS, "invalid cchunk response size\n");
+>                                 rc = -EIO;
+>                                 goto cchunk_out;
+>                         }
+> @@ -1627,12 +1627,12 @@ smb2_copychunk_range(const unsigned int xid,
+>                          */
+>                         if (le32_to_cpu(retbuf->TotalBytesWritten) >
+>                             le32_to_cpu(pcchunk->Length)) {
+> -                               cifs_dbg(VFS, "invalid copy chunk response\n");
+> +                               cifs_tcon_dbg(VFS, "invalid copy chunk response\n");
+>                                 rc = -EIO;
+>                                 goto cchunk_out;
+>                         }
+>                         if (le32_to_cpu(retbuf->ChunksWritten) != 1) {
+> -                               cifs_dbg(VFS, "invalid num chunks written\n");
+> +                               cifs_tcon_dbg(VFS, "invalid num chunks written\n");
+>                                 rc = -EIO;
+>                                 goto cchunk_out;
+>                         }
+> @@ -2422,7 +2422,7 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+>
+>         if (rc) {
+>                 if ((rc != -ENOENT) && (rc != -EOPNOTSUPP))
+> -                       cifs_dbg(VFS, "ioctl error in %s rc=%d\n", __func__, rc);
+> +                       cifs_tcon_dbg(VFS, "ioctl error in %s rc=%d\n", __func__, rc);
+>                 goto out;
+>         }
+>
+> @@ -2431,7 +2431,7 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
+>                                  nls_codepage, remap, search_name,
+>                                  true /* is_unicode */);
+>         if (rc) {
+> -               cifs_dbg(VFS, "parse error in %s rc=%d\n", __func__, rc);
+> +               cifs_tcon_dbg(VFS, "parse error in %s rc=%d\n", __func__, rc);
+>                 goto out;
+>         }
+>
+> @@ -2661,7 +2661,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+>
+>                 if (plen + le32_to_cpu(ioctl_rsp->OutputOffset) >
+>                     rsp_iov[1].iov_len) {
+> -                       cifs_dbg(VFS, "srv returned invalid ioctl len: %d\n",
+> +                       cifs_tcon_dbg(VFS, "srv returned invalid ioctl len: %d\n",
+>                                  plen);
+>                         rc = -EIO;
+>                         goto querty_exit;
+> @@ -3614,14 +3614,14 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+>
+>         rc = smb2_get_enc_key(server, tr_hdr->SessionId, enc, key);
+>         if (rc) {
+> -               cifs_dbg(VFS, "%s: Could not get %scryption key\n", __func__,
+> +               cifs_server_dbg(VFS, "%s: Could not get %scryption key\n", __func__,
+>                          enc ? "en" : "de");
+>                 return 0;
+>         }
+>
+>         rc = smb3_crypto_aead_allocate(server);
+>         if (rc) {
+> -               cifs_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+> +               cifs_server_dbg(VFS, "%s: crypto alloc failed\n", __func__);
+>                 return rc;
+>         }
+>
+> @@ -3629,19 +3629,19 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+>                                                 server->secmech.ccmaesdecrypt;
+>         rc = crypto_aead_setkey(tfm, key, SMB3_SIGN_KEY_SIZE);
+>         if (rc) {
+> -               cifs_dbg(VFS, "%s: Failed to set aead key %d\n", __func__, rc);
+> +               cifs_server_dbg(VFS, "%s: Failed to set aead key %d\n", __func__, rc);
+>                 return rc;
+>         }
+>
+>         rc = crypto_aead_setauthsize(tfm, SMB2_SIGNATURE_SIZE);
+>         if (rc) {
+> -               cifs_dbg(VFS, "%s: Failed to set authsize %d\n", __func__, rc);
+> +               cifs_server_dbg(VFS, "%s: Failed to set authsize %d\n", __func__, rc);
+>                 return rc;
+>         }
+>
+>         req = aead_request_alloc(tfm, GFP_KERNEL);
+>         if (!req) {
+> -               cifs_dbg(VFS, "%s: Failed to alloc aead request\n", __func__);
+> +               cifs_server_dbg(VFS, "%s: Failed to alloc aead request\n", __func__);
+>                 return -ENOMEM;
+>         }
+>
+> @@ -3652,7 +3652,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+>
+>         sg = init_sg(num_rqst, rqst, sign);
+>         if (!sg) {
+> -               cifs_dbg(VFS, "%s: Failed to init sg\n", __func__);
+> +               cifs_server_dbg(VFS, "%s: Failed to init sg\n", __func__);
+>                 rc = -ENOMEM;
+>                 goto free_req;
+>         }
+> @@ -3660,7 +3660,7 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
+>         iv_len = crypto_aead_ivsize(tfm);
+>         iv = kzalloc(iv_len, GFP_KERNEL);
+>         if (!iv) {
+> -               cifs_dbg(VFS, "%s: Failed to alloc iv\n", __func__);
+> +               cifs_server_dbg(VFS, "%s: Failed to alloc iv\n", __func__);
+>                 rc = -ENOMEM;
+>                 goto free_sg;
+>         }
+> @@ -3902,7 +3902,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+>         bool use_rdma_mr = false;
+>
+>         if (shdr->Command != SMB2_READ) {
+> -               cifs_dbg(VFS, "only big read responses are supported\n");
+> +               cifs_server_dbg(VFS, "only big read responses are supported\n");
+>                 return -ENOTSUPP;
+>         }
+>
+> @@ -4148,7 +4148,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
+>         }
+>
+>         if (*num_mids >= MAX_COMPOUND) {
+> -               cifs_dbg(VFS, "too many PDUs in compound\n");
+> +               cifs_server_dbg(VFS, "too many PDUs in compound\n");
+>                 return -1;
+>         }
+>         bufs[*num_mids] = buf;
+> @@ -4194,7 +4194,7 @@ smb3_receive_transform(struct TCP_Server_Info *server,
+>
+>         if (pdu_length < sizeof(struct smb2_transform_hdr) +
+>                                                 sizeof(struct smb2_sync_hdr)) {
+> -               cifs_dbg(VFS, "Transform message is too small (%u)\n",
+> +               cifs_server_dbg(VFS, "Transform message is too small (%u)\n",
+>                          pdu_length);
+>                 cifs_reconnect(server);
+>                 wake_up(&server->response_q);
+> @@ -4202,7 +4202,7 @@ smb3_receive_transform(struct TCP_Server_Info *server,
+>         }
+>
+>         if (pdu_length < orig_len + sizeof(struct smb2_transform_hdr)) {
+> -               cifs_dbg(VFS, "Transform message is broken\n");
+> +               cifs_server_dbg(VFS, "Transform message is broken\n");
+>                 cifs_reconnect(server);
+>                 wake_up(&server->response_q);
+>                 return -ECONNABORTED;
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 4c9c34cdf05f..dc9296569ed5 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -1019,7 +1019,7 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+>         }
+>
+>         if (tcon->ses->session_flags & SMB2_SESSION_FLAG_IS_NULL)
+> -               cifs_server_dbg(VFS, "Unexpected null user (anonymous) auth flag sent by server\n");
+> +               cifs_tcon_dbg(VFS, "Unexpected null user (anonymous) auth flag sent by server\n");
+>
+>         pneg_inbuf = kmalloc(sizeof(*pneg_inbuf), GFP_NOFS);
+>         if (!pneg_inbuf)
+> @@ -1076,18 +1076,18 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+>                  * Old Windows versions or Netapp SMB server can return
+>                  * not supported error. Client should accept it.
+>                  */
+> -               cifs_server_dbg(VFS, "Server does not support validate negotiate\n");
+> +               cifs_tcon_dbg(VFS, "Server does not support validate negotiate\n");
+>                 rc = 0;
+>                 goto out_free_inbuf;
+>         } else if (rc != 0) {
+> -               cifs_server_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
+> +               cifs_tcon_dbg(VFS, "validate protocol negotiate failed: %d\n", rc);
+>                 rc = -EIO;
+>                 goto out_free_inbuf;
+>         }
+>
+>         rc = -EIO;
+>         if (rsplen != sizeof(*pneg_rsp)) {
+> -               cifs_server_dbg(VFS, "invalid protocol negotiate response size: %d\n",
+> +               cifs_tcon_dbg(VFS, "invalid protocol negotiate response size: %d\n",
+>                          rsplen);
+>
+>                 /* relax check since Mac returns max bufsize allowed on ioctl */
+> @@ -1114,7 +1114,7 @@ int smb3_validate_negotiate(const unsigned int xid, struct cifs_tcon *tcon)
+>         goto out_free_rsp;
+>
+>  vneg_out:
+> -       cifs_server_dbg(VFS, "protocol revalidation - security settings mismatch\n");
+> +       cifs_tcon_dbg(VFS, "protocol revalidation - security settings mismatch\n");
+>  out_free_rsp:
+>         kfree(pneg_rsp);
+>  out_free_inbuf:
+> @@ -1762,11 +1762,11 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+>
+>         if ((rsp->Capabilities & SMB2_SHARE_CAP_DFS) &&
+>             ((tcon->share_flags & SHI1005_FLAGS_DFS) == 0))
+> -               cifs_server_dbg(VFS, "DFS capability contradicts DFS flag\n");
+> +               cifs_tcon_dbg(VFS, "DFS capability contradicts DFS flag\n");
+>
+>         if (tcon->seal &&
+>             !(server->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION))
+> -               cifs_server_dbg(VFS, "Encryption is requested but not supported\n");
+> +               cifs_tcon_dbg(VFS, "Encryption is requested but not supported\n");
+>
+>         init_copy_chunk_defaults(tcon);
+>         if (server->ops->validate_negotiate)
+> @@ -1779,7 +1779,7 @@ SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
+>
+>  tcon_error_exit:
+>         if (rsp && rsp->sync_hdr.Status == STATUS_BAD_NETWORK_NAME) {
+> -               cifs_server_dbg(VFS, "BAD_NETWORK_NAME: %s\n", tree);
+> +               cifs_tcon_dbg(VFS, "BAD_NETWORK_NAME: %s\n", tree);
+>         }
+>         goto tcon_exit;
+>  }
+> @@ -2812,14 +2812,14 @@ SMB2_ioctl(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+>         if (*plen == 0)
+>                 goto ioctl_exit; /* server returned no data */
+>         else if (*plen > rsp_iov.iov_len || *plen > 0xFF00) {
+> -               cifs_server_dbg(VFS, "srv returned invalid ioctl length: %d\n", *plen);
+> +               cifs_tcon_dbg(VFS, "srv returned invalid ioctl length: %d\n", *plen);
+>                 *plen = 0;
+>                 rc = -EIO;
+>                 goto ioctl_exit;
+>         }
+>
+>         if (rsp_iov.iov_len - *plen < le32_to_cpu(rsp->OutputOffset)) {
+> -               cifs_server_dbg(VFS, "Malformed ioctl resp: len %d offset %d\n", *plen,
+> +               cifs_tcon_dbg(VFS, "Malformed ioctl resp: len %d offset %d\n", *plen,
+>                         le32_to_cpu(rsp->OutputOffset));
+>                 *plen = 0;
+>                 rc = -EIO;
+> @@ -3110,7 +3110,7 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+>                 if (!*data) {
+>                         *data = kmalloc(*dlen, GFP_KERNEL);
+>                         if (!*data) {
+> -                               cifs_server_dbg(VFS,
+> +                               cifs_tcon_dbg(VFS,
+>                                         "Error %d allocating memory for acl\n",
+>                                         rc);
+>                                 *dlen = 0;
+> @@ -3505,7 +3505,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
+>
+>                         rc = smb2_verify_signature(&rqst, server);
+>                         if (rc)
+> -                               cifs_server_dbg(VFS, "SMB signature verification returned error = %d\n",
+> +                               cifs_tcon_dbg(VFS, "SMB signature verification returned error = %d\n",
+>                                          rc);
+>                 }
+>                 /* FIXME: should this be counted toward the initiating task? */
+> @@ -4095,7 +4095,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+>                 info_buf_size = sizeof(SEARCH_ID_FULL_DIR_INFO) - 1;
+>                 break;
+>         default:
+> -               cifs_server_dbg(VFS, "info level %u isn't supported\n",
+> +               cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
+>                          srch_inf->info_level);
+>                 rc = -EINVAL;
+>                 goto qdir_exit;
+> @@ -4186,7 +4186,7 @@ SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+>         else if (resp_buftype == CIFS_SMALL_BUFFER)
+>                 srch_inf->smallBuf = true;
+>         else
+> -               cifs_server_dbg(VFS, "illegal search buffer type\n");
+> +               cifs_tcon_dbg(VFS, "illegal search buffer type\n");
+>
+>         trace_smb3_query_dir_done(xid, persistent_fid, tcon->tid,
+>                         tcon->ses->Suid, index, srch_inf->entries_in_buffer);
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index a90bd4d75b4d..4fccb90492e9 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -1403,7 +1403,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+>            use ses->maxReq */
+>
+>         if (len > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
+> -               cifs_server_dbg(VFS, "Illegal length, greater than maximum frame, %d\n",
+> +               cifs_tcon_dbg(VFS, "Illegal length, greater than maximum frame, %d\n",
+>                          len);
+>                 return -EIO;
+>         }
+> @@ -1505,7 +1505,7 @@ SendReceiveBlockingLock(const unsigned int xid, struct cifs_tcon *tcon,
+>         /* rcvd frame is ok */
+>         if (out_buf == NULL || midQ->mid_state != MID_RESPONSE_RECEIVED) {
+>                 rc = -EIO;
+> -               cifs_server_dbg(VFS, "Bad MID state?\n");
+> +               cifs_tcon_dbg(VFS, "Bad MID state?\n");
+>                 goto out;
+>         }
+>
+> --
+> 2.13.6
+>
 
-I plan to add another patch to only offload when number of requests in
-flight is > 1 (since there is no point offloading and doing a thread
-switch if no other responses would overlap in the cifsd thread reading
-from the socket).
 
 -- 
 Thanks,
 
 Steve
-
---000000000000a27719059217420c
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0002-smb3-enable-offload-of-decryption-of-large-reads-via.patch"
-Content-Disposition: attachment; 
-	filename="0002-smb3-enable-offload-of-decryption-of-large-reads-via.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_k0bwry5g1>
-X-Attachment-Id: f_k0bwry5g1
-
-RnJvbSBlNWRlNzJkOGI2OTIwZmQ2Mzk3NTEyYzdmZWQ1OTc4MGZhMjczYWRhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgOCBTZXAgMjAxOSAyMzoyMjowMiAtMDUwMApTdWJqZWN0OiBbUEFUQ0ggMi8y
-XSBzbWIzOiBlbmFibGUgb2ZmbG9hZCBvZiBkZWNyeXB0aW9uIG9mIGxhcmdlIHJlYWRzIHZpYQog
-bW91bnQgb3B0aW9uCgpEaXNhYmxlIG9mZmxvYWQgb2YgdGhlIGRlY3J5cHRpb24gb2YgZW5jcnlw
-dGVkIHJlYWQgcmVzcG9uc2VzCmJ5IGRlZmF1bHQgKGVxdWl2YWxlbnQgdG8gc2V0dGluZyB0aGlz
-IG5ldyBtb3VudCBvcHRpb24gImVzaXplPTAiKS4KCkFsbG93IHNldHRpbmcgdGhlIG1pbmltdW0g
-ZW5jcnlwdGVkIHJlYWQgcmVzcG9uc2Ugc2l6ZSB0aGF0IHdlCndpbGwgY2hvb3NlIHRvIG9mZmxv
-YWQgdG8gYSB3b3JrZXIgdGhyZWFkIC0gaXQgaXMgbm93IGNvbmZpZ3VyYWJsZQp2aWEgb24gYSBu
-ZXcgbW91bnQgb3B0aW9uICJlc2l6ZT0iCgpEZXBlbmRpbmcgb24gd2hpY2ggZW5jcnlwdGlvbiBt
-ZWNoYW5pc20gKEdDTSB2cy4gQ0NNKSBhbmQKdGhlIG51bWJlciBvZiByZWFkcyB0aGF0IHdpbGwg
-YmUgaXNzdWVkIGluIHBhcmFsbGVsIGFuZCB0aGUKcGVyZm9ybWFuY2Ugb2YgdGhlIG5ldHdvcmsg
-YW5kIENQVSBvbiB0aGUgY2xpZW50LCBpdCBtYXkgbWFrZQpzZW5zZSB0byBlbmFibGUgdGhpcyBz
-aW5jZSBpdCBjYW4gcHJvdmlkZSBzdWJzdGFudGlhbCBiZW5lZml0IHdoZW4KbXVsdGlwbGUgbGFy
-Z2UgcmVhZHMgYXJlIGluIGZsaWdodCBhdCB0aGUgc2FtZSB0aW1lLgoKU2lnbmVkLW9mZi1ieTog
-U3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc2Zz
-LmMgICB8ICAyICsrCiBmcy9jaWZzL2NpZnNnbG9iLmggfCAgMiArKwogZnMvY2lmcy9jb25uZWN0
-LmMgIHwgMTMgKysrKysrKysrKysrKwogZnMvY2lmcy9zbWIyb3BzLmMgIHwgIDQgKystLQogNCBm
-aWxlcyBjaGFuZ2VkLCAxOSBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdp
-dCBhL2ZzL2NpZnMvY2lmc2ZzLmMgYi9mcy9jaWZzL2NpZnNmcy5jCmluZGV4IGIwZWEzMzJhZjM1
-Yy4uZWJmODVhNWQ5NWU0IDEwMDY0NAotLS0gYS9mcy9jaWZzL2NpZnNmcy5jCisrKyBiL2ZzL2Np
-ZnMvY2lmc2ZzLmMKQEAgLTU1OSw2ICs1NTksOCBAQCBjaWZzX3Nob3dfb3B0aW9ucyhzdHJ1Y3Qg
-c2VxX2ZpbGUgKnMsIHN0cnVjdCBkZW50cnkgKnJvb3QpCiAJc2VxX3ByaW50ZihzLCAiLHJzaXpl
-PSV1IiwgY2lmc19zYi0+cnNpemUpOwogCXNlcV9wcmludGYocywgIix3c2l6ZT0ldSIsIGNpZnNf
-c2ItPndzaXplKTsKIAlzZXFfcHJpbnRmKHMsICIsYnNpemU9JXUiLCBjaWZzX3NiLT5ic2l6ZSk7
-CisJaWYgKHRjb24tPnNlcy0+c2VydmVyLT5taW5fb2ZmbG9hZCkKKwkJc2VxX3ByaW50ZihzLCAi
-LGVzaXplPSV1IiwgdGNvbi0+c2VzLT5zZXJ2ZXItPm1pbl9vZmZsb2FkKTsKIAlzZXFfcHJpbnRm
-KHMsICIsZWNob19pbnRlcnZhbD0lbHUiLAogCQkJdGNvbi0+c2VzLT5zZXJ2ZXItPmVjaG9faW50
-ZXJ2YWwgLyBIWik7CiAKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMv
-Y2lmc2dsb2IuaAppbmRleCBkNjYxMDZhYzAzMWEuLjY5ODdmYmM1YTI0YSAxMDA2NDQKLS0tIGEv
-ZnMvY2lmcy9jaWZzZ2xvYi5oCisrKyBiL2ZzL2NpZnMvY2lmc2dsb2IuaApAQCAtNTkyLDYgKzU5
-Miw3IEBAIHN0cnVjdCBzbWJfdm9sIHsKIAl1bnNpZ25lZCBpbnQgYnNpemU7CiAJdW5zaWduZWQg
-aW50IHJzaXplOwogCXVuc2lnbmVkIGludCB3c2l6ZTsKKwl1bnNpZ25lZCBpbnQgbWluX29mZmxv
-YWQ7CiAJYm9vbCBzb2Nrb3B0X3RjcF9ub2RlbGF5OjE7CiAJdW5zaWduZWQgbG9uZyBhY3RpbWVv
-OyAvKiBhdHRyaWJ1dGUgY2FjaGUgdGltZW91dCAoamlmZmllcykgKi8KIAlzdHJ1Y3Qgc21iX3Zl
-cnNpb25fb3BlcmF0aW9ucyAqb3BzOwpAQCAtNzQ1LDYgKzc0Niw3IEBAIHN0cnVjdCBUQ1BfU2Vy
-dmVyX0luZm8gewogI2VuZGlmIC8qIFNUQVRTMiAqLwogCXVuc2lnbmVkIGludAltYXhfcmVhZDsK
-IAl1bnNpZ25lZCBpbnQJbWF4X3dyaXRlOworCXVuc2lnbmVkIGludAltaW5fb2ZmbG9hZDsKIAlf
-X2xlMTYJY29tcHJlc3NfYWxnb3JpdGhtOwogCV9fbGUxNgljaXBoZXJfdHlwZTsKIAkgLyogc2F2
-ZSBpbml0aXRhbCBuZWdwcm90IGhhc2ggKi8KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5j
-IGIvZnMvY2lmcy9jb25uZWN0LmMKaW5kZXggMTc4ODJjZWRlMTk3Li40MDNiNWNlYmMxNTIgMTAw
-NjQ0Ci0tLSBhL2ZzL2NpZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC0x
-MDMsNiArMTAzLDcgQEAgZW51bSB7CiAJT3B0X2JhY2t1cHVpZCwgT3B0X2JhY2t1cGdpZCwgT3B0
-X3VpZCwKIAlPcHRfY3J1aWQsIE9wdF9naWQsIE9wdF9maWxlX21vZGUsCiAJT3B0X2Rpcm1vZGUs
-IE9wdF9wb3J0LAorCU9wdF9taW5fZW5jX29mZmxvYWQsCiAJT3B0X2Jsb2Nrc2l6ZSwgT3B0X3Jz
-aXplLCBPcHRfd3NpemUsIE9wdF9hY3RpbWVvLAogCU9wdF9lY2hvX2ludGVydmFsLCBPcHRfbWF4
-X2NyZWRpdHMsIE9wdF9oYW5kbGV0aW1lb3V0LAogCU9wdF9zbmFwc2hvdCwKQEAgLTIwNyw2ICsy
-MDgsNyBAQCBzdGF0aWMgY29uc3QgbWF0Y2hfdGFibGVfdCBjaWZzX21vdW50X29wdGlvbl90b2tl
-bnMgPSB7CiAJeyBPcHRfZGlybW9kZSwgImRpcm1vZGU9JXMiIH0sCiAJeyBPcHRfZGlybW9kZSwg
-ImRpcl9tb2RlPSVzIiB9LAogCXsgT3B0X3BvcnQsICJwb3J0PSVzIiB9LAorCXsgT3B0X21pbl9l
-bmNfb2ZmbG9hZCwgImVzaXplPSVzIiB9LAogCXsgT3B0X2Jsb2Nrc2l6ZSwgImJzaXplPSVzIiB9
-LAogCXsgT3B0X3JzaXplLCAicnNpemU9JXMiIH0sCiAJeyBPcHRfd3NpemUsICJ3c2l6ZT0lcyIg
-fSwKQEAgLTIwMTYsNiArMjAxOCwxMyBAQCBjaWZzX3BhcnNlX21vdW50X29wdGlvbnMoY29uc3Qg
-Y2hhciAqbW91bnRkYXRhLCBjb25zdCBjaGFyICpkZXZuYW1lLAogCQkJfQogCQkJcG9ydCA9ICh1
-bnNpZ25lZCBzaG9ydClvcHRpb247CiAJCQlicmVhazsKKwkJY2FzZSBPcHRfbWluX2VuY19vZmZs
-b2FkOgorCQkJaWYgKGdldF9vcHRpb25fdWwoYXJncywgJm9wdGlvbikpIHsKKwkJCQljaWZzX2Ri
-ZyhWRlMsICIlczogSW52YWxpZCBtaW5pbXVtIGVuY3J5cHRlZCByZWFkIG9mZmxvYWQgc2l6ZSAo
-ZXNpemUpXG4iKTsKKwkJCQlnb3RvIGNpZnNfcGFyc2VfbW91bnRfZXJyOworCQkJfQorCQkJdm9s
-LT5taW5fb2ZmbG9hZCA9IG9wdGlvbjsKKwkJCWJyZWFrOwogCQljYXNlIE9wdF9ibG9ja3NpemU6
-CiAJCQlpZiAoZ2V0X29wdGlvbl91bChhcmdzLCAmb3B0aW9uKSkgewogCQkJCWNpZnNfZGJnKFZG
-UywgIiVzOiBJbnZhbGlkIGJsb2Nrc2l6ZSB2YWx1ZVxuIiwKQEAgLTI2MTYsNiArMjYyNSw5IEBA
-IHN0YXRpYyBpbnQgbWF0Y2hfc2VydmVyKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwg
-c3RydWN0IHNtYl92b2wgKnZvbCkKIAlpZiAoc2VydmVyLT5pZ25vcmVfc2lnbmF0dXJlICE9IHZv
-bC0+aWdub3JlX3NpZ25hdHVyZSkKIAkJcmV0dXJuIDA7CiAKKwlpZiAoc2VydmVyLT5taW5fb2Zm
-bG9hZCAhPSB2b2wtPm1pbl9vZmZsb2FkKQorCQlyZXR1cm4gMDsKKwogCXJldHVybiAxOwogfQog
-CkBAIC0yNzkwLDYgKzI4MDIsNyBAQCBjaWZzX2dldF90Y3Bfc2Vzc2lvbihzdHJ1Y3Qgc21iX3Zv
-bCAqdm9sdW1lX2luZm8pCiAJCW1vZHVsZV9wdXQoVEhJU19NT0RVTEUpOwogCQlnb3RvIG91dF9l
-cnJfY3J5cHRvX3JlbGVhc2U7CiAJfQorCXRjcF9zZXMtPm1pbl9vZmZsb2FkID0gdm9sdW1lX2lu
-Zm8tPm1pbl9vZmZsb2FkOwogCXRjcF9zZXMtPnRjcFN0YXR1cyA9IENpZnNOZWVkTmVnb3RpYXRl
-OwogCiAJdGNwX3Nlcy0+bnJfdGFyZ2V0cyA9IDE7CmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJv
-cHMuYyBiL2ZzL2NpZnMvc21iMm9wcy5jCmluZGV4IDY0ZmUwZDkzYzQ0Mi4uMDQ3MDY2NDkzODMy
-IDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJvcHMuYworKysgYi9mcy9jaWZzL3NtYjJvcHMuYwpA
-QCAtNDEyNSw4ICs0MTI1LDggQEAgcmVjZWl2ZV9lbmNyeXB0ZWRfcmVhZChzdHJ1Y3QgVENQX1Nl
-cnZlcl9JbmZvICpzZXJ2ZXIsIHN0cnVjdCBtaWRfcV9lbnRyeSAqKm1pZCwKIAkgKiB1c2UgbW9y
-ZSBjb3JlcyBkZWNyeXB0aW5nIHdoaWNoIGNhbiBiZSBleHBlbnNpdmUKIAkgKi8KIAotCS8qIFRP
-RE86IG1ha2UgdGhlIHNpemUgbGltaXQgdG8gZW5hYmxlIGRlY3J5cHQgb2ZmbG9hZCBjb25maWd1
-cmFibGUgKi8KLQlpZiAoc2VydmVyLT5wZHVfc2l6ZSA+ICg1MTIgKiAxMDI0KSkgeworCWlmICgo
-c2VydmVyLT5taW5fb2ZmbG9hZCkgJiYKKwkgICAgKHNlcnZlci0+cGR1X3NpemUgPj0gc2VydmVy
-LT5taW5fb2ZmbG9hZCkpIHsKIAkJZHcgPSBrbWFsbG9jKHNpemVvZihzdHJ1Y3Qgc21iMl9kZWNy
-eXB0X3dvcmspLCBHRlBfS0VSTkVMKTsKIAkJaWYgKGR3ID09IE5VTEwpCiAJCQlnb3RvIG5vbl9v
-ZmZsb2FkZWRfZGVjcnlwdDsKLS0gCjIuMjAuMQoK
---000000000000a27719059217420c
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-allow-parallelizing-decryption-of-reads.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-allow-parallelizing-decryption-of-reads.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_k0bwry530>
-X-Attachment-Id: f_k0bwry530
-
-RnJvbSAwM2I5MDI0OWZhMzVmYWUyNTQwMWY1ZjA2ZjMzY2U5ZjM2ODM0Yzg2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFNhdCwgNyBTZXAgMjAxOSAwMTowOTo0OSAtMDUwMApTdWJqZWN0OiBbUEFUQ0ggMS8y
-XSBzbWIzOiBhbGxvdyBwYXJhbGxlbGl6aW5nIGRlY3J5cHRpb24gb2YgcmVhZHMKCmRlY3J5cHRp
-bmcgbGFyZ2UgcmVhZHMgb24gZW5jcnlwdGVkIHNoYXJlcyBjYW4gYmUgc2xvdyAoZS5nLiBhZGRp
-bmcKbXVsdGlwbGUgbWlsbGlzZWNvbmRzIHBlci1yZWFkIG9uIG5vbi1HQ00gY2FwYWJsZSBzZXJ2
-ZXJzIG9yCndoZW4gbW91bnRpbmcgd2l0aCBkaWFsZWN0cyBwcmlvciB0byBTTUIzLjEuMSkgLSBh
-bGxvdyBwYXJhbGxlbGl6aW5nCm9mIHJlYWQgZGVjcnlwdGlvbiBieSBsYXVuY2hpbmcgd29ya2Vy
-IHRocmVhZHMuCgpUZXN0aW5nIHRvIFNhbWJhIG9uIGxvY2FsaG9zdCBzaG93ZWQgMjUlIGltcHJv
-dmVtZW50LgpUZXN0aW5nIHRvIHJlbW90ZSBzZXJ2ZXIgc2hvd2VkIHZlcnkgbGFyZ2UgaW1wcm92
-ZW1lbnQgd2hlbgpkb2luZyBtb3JlIHRoYW4gb25lICdjcCcgY29tbWFuZCB3YXMgY2FsbGVkIGF0
-IG9uZSB0aW1lLgoKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3Nv
-ZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc2ZzLmMgICB8IDE3ICsrKysrKysrLQogZnMvY2lmcy9j
-aWZzZ2xvYi5oIHwgIDEgKwogZnMvY2lmcy9zbWIyb3BzLmMgIHwgODcgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQogMyBmaWxlcyBjaGFuZ2VkLCAxMDEgaW5z
-ZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5j
-IGIvZnMvY2lmcy9jaWZzZnMuYwppbmRleCBkZTkwZTY2NWVmMTEuLmIwZWEzMzJhZjM1YyAxMDA2
-NDQKLS0tIGEvZnMvY2lmcy9jaWZzZnMuYworKysgYi9mcy9jaWZzL2NpZnNmcy5jCkBAIC0xMDks
-NiArMTA5LDcgQEAgZXh0ZXJuIG1lbXBvb2xfdCAqY2lmc19yZXFfcG9vbHA7CiBleHRlcm4gbWVt
-cG9vbF90ICpjaWZzX21pZF9wb29scDsKIAogc3RydWN0IHdvcmtxdWV1ZV9zdHJ1Y3QJKmNpZnNp
-b2Rfd3E7CitzdHJ1Y3Qgd29ya3F1ZXVlX3N0cnVjdAkqZGVjcnlwdF93cTsKIHN0cnVjdCB3b3Jr
-cXVldWVfc3RydWN0CSpjaWZzb3Bsb2NrZF93cTsKIF9fdTMyIGNpZnNfbG9ja19zZWNyZXQ7CiAK
-QEAgLTE0OTksMTEgKzE1MDAsMjIgQEAgaW5pdF9jaWZzKHZvaWQpCiAJCWdvdG8gb3V0X2NsZWFu
-X3Byb2M7CiAJfQogCisJLyoKKwkgKiBCQiBDb25zaWRlciBzZXR0aW5nIGxpbWl0IT0wIG1heWJl
-IHRvIG1pbihudW1fb2ZfY29yZXMgLSAxLCAzKSBzbyB3ZQorCSAqIGRvbid0IGxhdW5jaCB0b28g
-bWFueSB3b3JrZXIgdGhyZWFkcworCSAqLworCWRlY3J5cHRfd3EgPSBhbGxvY193b3JrcXVldWUo
-InNtYjNkZWNyeXB0ZCIsCisJCQkJICAgICBXUV9GUkVFWkFCTEV8V1FfTUVNX1JFQ0xBSU0sIDAp
-OworCWlmICghZGVjcnlwdF93cSkgeworCQlyYyA9IC1FTk9NRU07CisJCWdvdG8gb3V0X2Rlc3Ry
-b3lfY2lmc2lvZF93cTsKKwl9CisKIAljaWZzb3Bsb2NrZF93cSA9IGFsbG9jX3dvcmtxdWV1ZSgi
-Y2lmc29wbG9ja2QiLAogCQkJCQkgV1FfRlJFRVpBQkxFfFdRX01FTV9SRUNMQUlNLCAwKTsKIAlp
-ZiAoIWNpZnNvcGxvY2tkX3dxKSB7CiAJCXJjID0gLUVOT01FTTsKLQkJZ290byBvdXRfZGVzdHJv
-eV9jaWZzaW9kX3dxOworCQlnb3RvIG91dF9kZXN0cm95X2RlY3J5cHRfd3E7CiAJfQogCiAJcmMg
-PSBjaWZzX2ZzY2FjaGVfcmVnaXN0ZXIoKTsKQEAgLTE1NjksNiArMTU4MSw4IEBAIGluaXRfY2lm
-cyh2b2lkKQogCWNpZnNfZnNjYWNoZV91bnJlZ2lzdGVyKCk7CiBvdXRfZGVzdHJveV9jaWZzb3Bs
-b2NrZF93cToKIAlkZXN0cm95X3dvcmtxdWV1ZShjaWZzb3Bsb2NrZF93cSk7CitvdXRfZGVzdHJv
-eV9kZWNyeXB0X3dxOgorCWRlc3Ryb3lfd29ya3F1ZXVlKGRlY3J5cHRfd3EpOwogb3V0X2Rlc3Ry
-b3lfY2lmc2lvZF93cToKIAlkZXN0cm95X3dvcmtxdWV1ZShjaWZzaW9kX3dxKTsKIG91dF9jbGVh
-bl9wcm9jOgpAQCAtMTU5NSw2ICsxNjA5LDcgQEAgZXhpdF9jaWZzKHZvaWQpCiAJY2lmc19kZXN0
-cm95X2lub2RlY2FjaGUoKTsKIAljaWZzX2ZzY2FjaGVfdW5yZWdpc3RlcigpOwogCWRlc3Ryb3lf
-d29ya3F1ZXVlKGNpZnNvcGxvY2tkX3dxKTsKKwlkZXN0cm95X3dvcmtxdWV1ZShkZWNyeXB0X3dx
-KTsKIAlkZXN0cm95X3dvcmtxdWV1ZShjaWZzaW9kX3dxKTsKIAljaWZzX3Byb2NfY2xlYW4oKTsK
-IH0KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lmc2dsb2IuaApp
-bmRleCAxZjUzZGVlMjExZDguLmQ2NjEwNmFjMDMxYSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZz
-Z2xvYi5oCisrKyBiL2ZzL2NpZnMvY2lmc2dsb2IuaApAQCAtMTg5Miw2ICsxODkyLDcgQEAgdm9p
-ZCBjaWZzX3F1ZXVlX29wbG9ja19icmVhayhzdHJ1Y3QgY2lmc0ZpbGVJbmZvICpjZmlsZSk7CiAK
-IGV4dGVybiBjb25zdCBzdHJ1Y3Qgc2xvd193b3JrX29wcyBjaWZzX29wbG9ja19icmVha19vcHM7
-CiBleHRlcm4gc3RydWN0IHdvcmtxdWV1ZV9zdHJ1Y3QgKmNpZnNpb2Rfd3E7CitleHRlcm4gc3Ry
-dWN0IHdvcmtxdWV1ZV9zdHJ1Y3QgKmRlY3J5cHRfd3E7CiBleHRlcm4gc3RydWN0IHdvcmtxdWV1
-ZV9zdHJ1Y3QgKmNpZnNvcGxvY2tkX3dxOwogZXh0ZXJuIF9fdTMyIGNpZnNfbG9ja19zZWNyZXQ7
-CiAKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iMm9wcy5jIGIvZnMvY2lmcy9zbWIyb3BzLmMKaW5k
-ZXggODNiMDJkNzRkNDhlLi42NGZlMGQ5M2M0NDIgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMm9w
-cy5jCisrKyBiL2ZzL2NpZnMvc21iMm9wcy5jCkBAIC00MDE3LDggKzQwMTcsNjIgQEAgaGFuZGxl
-X3JlYWRfZGF0YShzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIHN0cnVjdCBtaWRfcV9l
-bnRyeSAqbWlkLAogCXJldHVybiBsZW5ndGg7CiB9CiAKK3N0cnVjdCBzbWIyX2RlY3J5cHRfd29y
-ayB7CisJc3RydWN0IHdvcmtfc3RydWN0IGRlY3J5cHQ7CisJc3RydWN0IFRDUF9TZXJ2ZXJfSW5m
-byAqc2VydmVyOworCXN0cnVjdCBwYWdlICoqcHBhZ2VzOworCWNoYXIgKmJ1ZjsKKwl1bnNpZ25l
-ZCBpbnQgbnBhZ2VzOworCXVuc2lnbmVkIGludCBsZW47Cit9OworCisKK3N0YXRpYyB2b2lkIHNt
-YjJfZGVjcnlwdF9vZmZsb2FkKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykKK3sKKwlzdHJ1Y3Qg
-c21iMl9kZWNyeXB0X3dvcmsgKmR3ID0gY29udGFpbmVyX29mKHdvcmssCisJCQkJc3RydWN0IHNt
-YjJfZGVjcnlwdF93b3JrLCBkZWNyeXB0KTsKKwlpbnQgaSwgcmM7CisJc3RydWN0IG1pZF9xX2Vu
-dHJ5ICptaWQ7CisKKwlyYyA9IGRlY3J5cHRfcmF3X2RhdGEoZHctPnNlcnZlciwgZHctPmJ1Ziwg
-ZHctPnNlcnZlci0+dmFscy0+cmVhZF9yc3Bfc2l6ZSwKKwkJCSAgICAgIGR3LT5wcGFnZXMsIGR3
-LT5ucGFnZXMsIGR3LT5sZW4pOworCWlmIChyYykgeworCQljaWZzX2RiZyhWRlMsICJlcnJvciBk
-ZWNyeXB0aW5nIHJjPSVkXG4iLCByYyk7CisJCWdvdG8gZnJlZV9wYWdlczsKKwl9CisKKwltaWQg
-PSBzbWIyX2ZpbmRfbWlkKGR3LT5zZXJ2ZXIsIGR3LT5idWYpOworCWlmIChtaWQgPT0gTlVMTCkK
-KwkJY2lmc19kYmcoVkZTLCAibWlkIG5vdCBmb3VuZFxuIik7IC8qIEJCIEZJWE1FPyBjaGFuZ2Ug
-dG8gRllJPyAqLworCWVsc2UgeworCQltaWQtPmRlY3J5cHRlZCA9IHRydWU7CisJCXJjID0gaGFu
-ZGxlX3JlYWRfZGF0YShkdy0+c2VydmVyLCBtaWQsIGR3LT5idWYsCisJCQkJICAgICAgZHctPnNl
-cnZlci0+dmFscy0+cmVhZF9yc3Bfc2l6ZSwKKwkJCQkgICAgICBkdy0+cHBhZ2VzLCBkdy0+bnBh
-Z2VzLCBkdy0+bGVuKTsKKwl9CisKKwlkdy0+c2VydmVyLT5sc3RycCA9IGppZmZpZXM7CisKKwlt
-aWQtPmNhbGxiYWNrKG1pZCk7CisKKwljaWZzX21pZF9xX2VudHJ5X3JlbGVhc2UobWlkKTsKKwor
-ZnJlZV9wYWdlczoKKwlmb3IgKGkgPSBkdy0+bnBhZ2VzLTE7IGkgPj0gMDsgaS0tKQorCQlwdXRf
-cGFnZShkdy0+cHBhZ2VzW2ldKTsKKworCWtmcmVlKGR3LT5wcGFnZXMpOworCWNpZnNfc21hbGxf
-YnVmX3JlbGVhc2UoZHctPmJ1Zik7CisKKy8qIEZJWE1FIERvIHdlIG5lZWQgdGhlIGVxdWl2YWxl
-bnQgb2YgdGhpcz8gKi8KKy8qIGRpc2NhcmRfZGF0YToKKwljaWZzX2Rpc2NhcmRfcmVtYWluaW5n
-X2RhdGEoc2VydmVyKTsgKi8KK30KKworCiBzdGF0aWMgaW50Ci1yZWNlaXZlX2VuY3J5cHRlZF9y
-ZWFkKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgc3RydWN0IG1pZF9xX2VudHJ5ICoq
-bWlkKQorcmVjZWl2ZV9lbmNyeXB0ZWRfcmVhZChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2
-ZXIsIHN0cnVjdCBtaWRfcV9lbnRyeSAqKm1pZCwKKwkJICAgICAgIGludCAqbnVtX21pZHMpCiB7
-CiAJY2hhciAqYnVmID0gc2VydmVyLT5zbWFsbGJ1ZjsKIAlzdHJ1Y3Qgc21iMl90cmFuc2Zvcm1f
-aGRyICp0cl9oZHIgPSAoc3RydWN0IHNtYjJfdHJhbnNmb3JtX2hkciAqKWJ1ZjsKQEAgLTQwMjgs
-NyArNDA4Miw5IEBAIHJlY2VpdmVfZW5jcnlwdGVkX3JlYWQoc3RydWN0IFRDUF9TZXJ2ZXJfSW5m
-byAqc2VydmVyLCBzdHJ1Y3QgbWlkX3FfZW50cnkgKiptaWQpCiAJdW5zaWduZWQgaW50IGJ1Zmxl
-biA9IHNlcnZlci0+cGR1X3NpemU7CiAJaW50IHJjOwogCWludCBpID0gMDsKKwlzdHJ1Y3Qgc21i
-Ml9kZWNyeXB0X3dvcmsgKmR3OwogCisJKm51bV9taWRzID0gMTsKIAlsZW4gPSBtaW5fdCh1bnNp
-Z25lZCBpbnQsIGJ1Zmxlbiwgc2VydmVyLT52YWxzLT5yZWFkX3JzcF9zaXplICsKIAkJc2l6ZW9m
-KHN0cnVjdCBzbWIyX3RyYW5zZm9ybV9oZHIpKSAtIEhFQURFUl9TSVpFKHNlcnZlcikgKyAxOwog
-CkBAIC00MDY0LDYgKzQxMjAsMzIgQEAgcmVjZWl2ZV9lbmNyeXB0ZWRfcmVhZChzdHJ1Y3QgVENQ
-X1NlcnZlcl9JbmZvICpzZXJ2ZXIsIHN0cnVjdCBtaWRfcV9lbnRyeSAqKm1pZCkKIAlpZiAocmMp
-CiAJCWdvdG8gZnJlZV9wYWdlczsKIAorCS8qCisJICogRm9yIGxhcmdlIHJlYWRzLCBvZmZsb2Fk
-IHRvIGRpZmZlcmVudCB0aHJlYWQgZm9yIGJldHRlciBwZXJmb3JtYW5jZSwKKwkgKiB1c2UgbW9y
-ZSBjb3JlcyBkZWNyeXB0aW5nIHdoaWNoIGNhbiBiZSBleHBlbnNpdmUKKwkgKi8KKworCS8qIFRP
-RE86IG1ha2UgdGhlIHNpemUgbGltaXQgdG8gZW5hYmxlIGRlY3J5cHQgb2ZmbG9hZCBjb25maWd1
-cmFibGUgKi8KKwlpZiAoc2VydmVyLT5wZHVfc2l6ZSA+ICg1MTIgKiAxMDI0KSkgeworCQlkdyA9
-IGttYWxsb2Moc2l6ZW9mKHN0cnVjdCBzbWIyX2RlY3J5cHRfd29yayksIEdGUF9LRVJORUwpOwor
-CQlpZiAoZHcgPT0gTlVMTCkKKwkJCWdvdG8gbm9uX29mZmxvYWRlZF9kZWNyeXB0OworCisJCWR3
-LT5idWYgPSBzZXJ2ZXItPnNtYWxsYnVmOworCQlzZXJ2ZXItPnNtYWxsYnVmID0gKGNoYXIgKilj
-aWZzX3NtYWxsX2J1Zl9nZXQoKTsKKworCQlJTklUX1dPUksoJmR3LT5kZWNyeXB0LCBzbWIyX2Rl
-Y3J5cHRfb2ZmbG9hZCk7CisKKwkJZHctPm5wYWdlcyA9IG5wYWdlczsKKwkJZHctPnNlcnZlciA9
-IHNlcnZlcjsKKwkJZHctPnBwYWdlcyA9IHBhZ2VzOworCQlkdy0+bGVuID0gbGVuOworCQlxdWV1
-ZV93b3JrKGNpZnNpb2Rfd3EsICZkdy0+ZGVjcnlwdCk7CisJCSpudW1fbWlkcyA9IDA7IC8qIHdv
-cmtlciB0aHJlYWQgdGFrZXMgY2FyZSBvZiBmaW5kaW5nIG1pZCAqLworCQlyZXR1cm4gLTE7CisJ
-fQorCitub25fb2ZmbG9hZGVkX2RlY3J5cHQ6CiAJcmMgPSBkZWNyeXB0X3Jhd19kYXRhKHNlcnZl
-ciwgYnVmLCBzZXJ2ZXItPnZhbHMtPnJlYWRfcnNwX3NpemUsCiAJCQkgICAgICBwYWdlcywgbnBh
-Z2VzLCBsZW4pOwogCWlmIChyYykKQEAgLTQyMTAsOCArNDI5Miw3IEBAIHNtYjNfcmVjZWl2ZV90
-cmFuc2Zvcm0oc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLAogCiAJLyogVE9ETzogYWRk
-IHN1cHBvcnQgZm9yIGNvbXBvdW5kcyBjb250YWluaW5nIFJFQUQuICovCiAJaWYgKHBkdV9sZW5n
-dGggPiBDSUZTTWF4QnVmU2l6ZSArIE1BWF9IRUFERVJfU0laRShzZXJ2ZXIpKSB7Ci0JCSpudW1f
-bWlkcyA9IDE7Ci0JCXJldHVybiByZWNlaXZlX2VuY3J5cHRlZF9yZWFkKHNlcnZlciwgJm1pZHNb
-MF0pOworCQlyZXR1cm4gcmVjZWl2ZV9lbmNyeXB0ZWRfcmVhZChzZXJ2ZXIsICZtaWRzWzBdLCBu
-dW1fbWlkcyk7CiAJfQogCiAJcmV0dXJuIHJlY2VpdmVfZW5jcnlwdGVkX3N0YW5kYXJkKHNlcnZl
-ciwgbWlkcywgYnVmcywgbnVtX21pZHMpOwotLSAKMi4yMC4xCgo=
---000000000000a27719059217420c--
