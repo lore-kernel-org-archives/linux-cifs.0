@@ -2,162 +2,107 @@ Return-Path: <SRS0=ZOHs=XF=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29493C3A5A2
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 04:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6B59C3A5A2
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 09:19:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E596B21928
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 04:03:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79A9A20872
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 09:19:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ntl4gn/d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="utNmMpJ4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731683AbfIJEDx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 10 Sep 2019 00:03:53 -0400
-Received: from mail-io1-f47.google.com ([209.85.166.47]:41768 "EHLO
-        mail-io1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725283AbfIJEDx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Sep 2019 00:03:53 -0400
-Received: by mail-io1-f47.google.com with SMTP id r26so34249881ioh.8
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Sep 2019 21:03:52 -0700 (PDT)
+        id S2389294AbfIJJTS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 10 Sep 2019 05:19:18 -0400
+Received: from mail-io1-f51.google.com ([209.85.166.51]:33939 "EHLO
+        mail-io1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728837AbfIJJTR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Sep 2019 05:19:17 -0400
+Received: by mail-io1-f51.google.com with SMTP id k13so20639832ioj.1
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Sep 2019 02:19:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=Eci64ju3Fxd3NkK+D+JXIT+Wb2UNsBD52dsCzd+zNTc=;
-        b=ntl4gn/dpWvIdD26Nkw7jU8Atl34yz1kme8eIHde6+3HXWtxrA+obcEvuHI3obDHUf
-         1COejYj+O8clndJobTeQg34p2G0zUkBTl9g1udBrawTFktB4OJQDcvTjMpXiDRLraAWM
-         OF5+faHPqZ28uiVF+P55+swWNvD0SaOLsnSQvHSFalT4z6+xj3lTfkE17805hW1G92CG
-         GbXP2PYjr313mLlDGkARFLuK9Q+betMdTyLn9w/ChTjiKGGyAWLkeS8kQuzFkdBeroVO
-         cxA9BreLBvSAjJCSXnIrrvK7MHO4cMaX+J5eWEJhTEQK++zu2UJ7pP7ysXFpHR6KEsXZ
-         U8fA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FLSH+s3I1EjuRyWzmaf5krWguVxQOdOr9FFToFUKS0U=;
+        b=utNmMpJ4VB7VGYKfV7uyZvjahve502gtTAQ514WsAbhOKf5NjYPC8yTlxwEnLX5mjU
+         SEAryeZ1hKG0HYOmv/abGeZrq10blJJQsA1TyJ6BkM8vSkpaHewFfarbpuTXJuS/0Rgk
+         YvS7lUFSCXpaKQoQUftjd8brABaHcghfmiBmUxaMEbMBnqggTWlGnqkhk7knlcFwkvy8
+         T/zjmnRoLiTcoWAh9Yi81JStyd3RSeOv5UpSyt/uKl+vcd75b14CyHqUIRsN16Nlz7j/
+         VCnVahLNnSGQExpGLiR0CbnjpBxmHN1OC/xDce0c+42rHKEts17jLNuDv2P0uncIbUfj
+         UuxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=Eci64ju3Fxd3NkK+D+JXIT+Wb2UNsBD52dsCzd+zNTc=;
-        b=fjrZv5ZIR8dO66HAbcq15RTIsZR6mZSX5fiEZ04dV72kY50MYd5v/gBWtWlzQxe4j9
-         +WVPK3o6exe+Sx5b6DSbc/FY6HoICXL5oEQWTVCDPGMGDEJMPeh8MDix0aos7cCjw0jx
-         9WD79Ae0r7oFyiqMnEaN37Nu9ZcGluAx/yutKLryvsPc7ch2Jnmv9hxtY/BD/CWPwEVx
-         l3AWWcX9SU77hcxYOEZbRMvhPjzm9W530ct5KoQIEw+J4UO3/H2hoEx8JXukrFxd3lpC
-         AlCTg8PlBsPL7fs8IUaWsXh0NeGuIzfcMMlQlu+9Cb8jOTd0FZ/xICfV2u48jawnWYiU
-         cu5A==
-X-Gm-Message-State: APjAAAUCjkyeeAQyfdfl+a0QW5doaG+9fFuOCvPLu3OumW/jmKTmK8Ta
-        W5GC3XxJZev1ASC0s9FIzUaBjl5ved88t74q76taSRb/
-X-Google-Smtp-Source: APXvYqwJpgZUADxr0REjW0YxsNCq0T3Nay+uDSx/4oPBz0iQEG0Mhgc4UrcnCf3BB04J/Jcn4LOiPHGZcEN+aw/n4h0=
-X-Received: by 2002:a6b:2b07:: with SMTP id r7mr28642541ior.173.1568088231721;
- Mon, 09 Sep 2019 21:03:51 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FLSH+s3I1EjuRyWzmaf5krWguVxQOdOr9FFToFUKS0U=;
+        b=WyFY34JvA/LA2qgWKdhOGXd9oCBa4O/e88kGeMsiuTbllH5SOihEbpzM+DGtA/XaWg
+         NHNrAuI+it9PAjTEN+NRY4zo9p61yPxRlCEh69vEd4LMzWp64Y8CtjSqZ31VdA6Y9PdK
+         IRd863D0S7fYVx9oXoQ6wjGPi38URzVW6wdM2rwYxTUz+LG731VNvUQkx1CQnJVWBwtf
+         mQ8qb3YpzedRTBZaQiO3T6RyGGT9c8+Hhrdtrf++I4d+UIiLd1Y73lBybY5iLAw2N790
+         66QvNEdAyREQv+MYijAK34bcbaHDlZbcDT0bE/5M7I72klTMRVc7Q+wx1L9UJpV/72gf
+         zIEQ==
+X-Gm-Message-State: APjAAAVZBaM7A/40hLey9W4GlYD/i9IYLuk5W0zVi8QXouIDT2IegP25
+        95slO27RcEqlx6aPkVFoGuW+YXAEX0DjMB7ZRtg=
+X-Google-Smtp-Source: APXvYqz5vq/WSdEy20ox0jWzi5PdZC4USpVsflzfhX7kFAxlii23mTG5DOqYe4BmhWiVT+BIU6K7cqeXPfXlVdlzWZ4=
+X-Received: by 2002:a6b:4404:: with SMTP id r4mr22556736ioa.159.1568107156750;
+ Tue, 10 Sep 2019 02:19:16 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 9 Sep 2019 23:03:40 -0500
-Message-ID: <CAH2r5mtcHR2BpthaubPNgC8fO4uu2d7QkYraMAK3cFOciR9g2Q@mail.gmail.com>
-Subject: [PATCH] Display max credits used at any one time for in flight requests
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000008113005922afe13"
+References: <CAH2r5msbRyGMY2XQifbxB0iU3a3EPp8UcemO8QE5bhq9HPMqBQ@mail.gmail.com>
+ <CAH2r5mv=6dR+5nxJbw19C0QZf3wJQOc5j4CTGTZ=OABqMdQDpw@mail.gmail.com>
+In-Reply-To: <CAH2r5mv=6dR+5nxJbw19C0QZf3wJQOc5j4CTGTZ=OABqMdQDpw@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Tue, 10 Sep 2019 19:19:05 +1000
+Message-ID: <CAN05THQxtGKMfO6aRELK5fsc-x1m+u0fCCsNmRYaoFQHa_v86A@mail.gmail.com>
+Subject: Re: [SMB3][PATCHes] parallelizing decryption of large read responses
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000008113005922afe13
-Content-Type: text/plain; charset="UTF-8"
+Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
 
--- 
-Thanks,
 
-Steve
+We have now a decently large number of new mount options so we need a
+patch to the manpage.
+That said, we should also make sure that we try to set reasonable
+values by default,
+or even longer term, remove the options with heuristics.
 
---00000000000008113005922afe13
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-display-max-credits-used-at-any-one-time.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-display-max-credits-used-at-any-one-time.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_k0db8ki00>
-X-Attachment-Id: f_k0db8ki00
+(Very very few people read the manpage or ever use any of these mount options
+so our default should be "as close to optimal as possible" and using a
+mount option
+should be the rare exception where our heuristics just went wrong.)
 
-RnJvbSAwYWI4M2YzMTUyZGM2N2RhNjQzODQ0ZDkxYjcwZWY5ZWI5OGE3MjNmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IE1vbiwgOSBTZXAgMjAxOSAyMjo1NzoxMSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjM6IGRpc3BsYXkgbWF4IGNyZWRpdHMgdXNlZCBhdCBhbnkgb25lIHRpbWUKCkRpc3BsYXllZCBp
-biAvcHJvYy9mcy9jaWZzL1N0YXRzIG9uY2UgZm9yIGVhY2gKc29ja2V0IHdlIGFyZSBjb25uZWN0
-ZWQgdG8uCgpUaGlzIGFsbG93cyB1cyB0byBmaW5kIG91dCB3aGF0IHRoZSBtYXhpbXVtIGxvYWQg
-d2UKcHV0IG9uIGEgc2VydmVyIHdhcy4gIEV4Y2VwdCBmb3IgbGFyZ2Ugd3JpdGVzIHdoaWNoIGNh
-biB1c2UKbXVsdGlwbGUgY3JlZGl0cyB0aGlzIHdvdWxkIG5vcm1hbGx5IGVxdWFsIHRoZSBtYXhp
-bXVtIG51bWJlcgpvZiByZXF1ZXN0cyB0aGF0IGhhZCBiZWVuIGluIGZsaWdodCAoYXQgYW55IG9u
-ZSB0aW1lKS4gTm90ZSB0aGF0Ci9wcm9jL2ZzL2NpZnMvU3RhdHMgY2FuIGJlIHJlc2V0IGlmIHlv
-dSB3YW50IHRvIGxvb2sgYXQgYQptYXhpbXVtIGluIGZsaWdodCBjcmVkaXRzIG92ZXIgYSBzbWFs
-bCBwZXJpb2Qgb2YgdGltZS4KClNhbXBsZSBvdXRwdXQgKGltbWVkaWF0ZWx5IGFmdGVyIG1vdW50
-KToKClJlc291cmNlcyBpbiB1c2UKQ0lGUyBTZXNzaW9uOiAxClNoYXJlICh1bmlxdWUgbW91bnQg
-dGFyZ2V0cyk6IDIKU01CIFJlcXVlc3QvUmVzcG9uc2UgQnVmZmVyOiAxIFBvb2wgc2l6ZTogNQpT
-TUIgU21hbGwgUmVxL1Jlc3AgQnVmZmVyOiAxIFBvb2wgc2l6ZTogMzAKT3BlcmF0aW9ucyAoTUlE
-cyk6IDAKCjAgc2Vzc2lvbiAwIHNoYXJlIHJlY29ubmVjdHMKVG90YWwgdmZzIG9wZXJhdGlvbnM6
-IDUgbWF4aW11bSBhdCBvbmUgdGltZTogMgoKTWF4IGNyZWRpdHMgaW4gZmxpZ2h0OiAyCjEpIFxc
-bG9jYWxob3N0XHNjcmF0Y2gKU01CczogMTgKQnl0ZXMgcmVhZDogMCAgQnl0ZXMgd3JpdHRlbjog
-MAouLi4KClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNv
-bT4KLS0tCiBmcy9jaWZzL2NpZnNfZGVidWcuYyB8IDIgKysKIGZzL2NpZnMvY2lmc2dsb2IuaCAg
-IHwgMSArCiBmcy9jaWZzL2Nvbm5lY3QuYyAgICB8IDEgKwogZnMvY2lmcy9zbWIyb3BzLmMgICAg
-fCAyICsrCiBmcy9jaWZzL3RyYW5zcG9ydC5jICB8IDQgKysrKwogNSBmaWxlcyBjaGFuZ2VkLCAx
-MCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzX2RlYnVnLmMgYi9mcy9j
-aWZzL2NpZnNfZGVidWcuYwppbmRleCBhMzhkNzk2ZjVmZmUuLmRjNTQzY2E4MDFiZiAxMDA2NDQK
-LS0tIGEvZnMvY2lmcy9jaWZzX2RlYnVnLmMKKysrIGIvZnMvY2lmcy9jaWZzX2RlYnVnLmMKQEAg
-LTQ1Miw2ICs0NTIsNyBAQCBzdGF0aWMgc3NpemVfdCBjaWZzX3N0YXRzX3Byb2Nfd3JpdGUoc3Ry
-dWN0IGZpbGUgKmZpbGUsCiAJCWxpc3RfZm9yX2VhY2godG1wMSwgJmNpZnNfdGNwX3Nlc19saXN0
-KSB7CiAJCQlzZXJ2ZXIgPSBsaXN0X2VudHJ5KHRtcDEsIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8s
-CiAJCQkJCSAgICB0Y3Bfc2VzX2xpc3QpOworCQkJc2VydmVyLT5tYXhfaW5fZmxpZ2h0ID0gMDsK
-ICNpZmRlZiBDT05GSUdfQ0lGU19TVEFUUzIKIAkJCWZvciAoaSA9IDA7IGkgPCBOVU1CRVJfT0Zf
-U01CMl9DT01NQU5EUzsgaSsrKSB7CiAJCQkJYXRvbWljX3NldCgmc2VydmVyLT5udW1fY21kc1tp
-XSwgMCk7CkBAIC01MjYsNiArNTI3LDcgQEAgc3RhdGljIGludCBjaWZzX3N0YXRzX3Byb2Nfc2hv
-dyhzdHJ1Y3Qgc2VxX2ZpbGUgKm0sIHZvaWQgKnYpCiAJbGlzdF9mb3JfZWFjaCh0bXAxLCAmY2lm
-c190Y3Bfc2VzX2xpc3QpIHsKIAkJc2VydmVyID0gbGlzdF9lbnRyeSh0bXAxLCBzdHJ1Y3QgVENQ
-X1NlcnZlcl9JbmZvLAogCQkJCSAgICB0Y3Bfc2VzX2xpc3QpOworCQlzZXFfcHJpbnRmKG0sICJc
-bk1heCBjcmVkaXRzIGluIGZsaWdodDogJWQiLCBzZXJ2ZXItPm1heF9pbl9mbGlnaHQpOwogI2lm
-ZGVmIENPTkZJR19DSUZTX1NUQVRTMgogCQlzZXFfcHV0cyhtLCAiXG5Ub3RhbCB0aW1lIHNwZW50
-IHByb2Nlc3NpbmcgYnkgY29tbWFuZC4gVGltZSAiKTsKIAkJc2VxX3ByaW50ZihtLCAidW5pdHMg
-YXJlIGppZmZpZXMgKCVkIHBlciBzZWNvbmQpXG4iLCBIWik7CmRpZmYgLS1naXQgYS9mcy9jaWZz
-L2NpZnNnbG9iLmggYi9mcy9jaWZzL2NpZnNnbG9iLmgKaW5kZXggNjk4N2ZiYzVhMjRhLi5lZjIx
-OTk5MTMyMTcgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc2dsb2IuaAorKysgYi9mcy9jaWZzL2Np
-ZnNnbG9iLmgKQEAgLTY3Nyw2ICs2NzcsNyBAQCBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvIHsKIAl1
-bnNpZ25lZCBpbnQgY3JlZGl0czsgIC8qIHNlbmQgbm8gbW9yZSByZXF1ZXN0cyBhdCBvbmNlICov
-CiAJdW5zaWduZWQgaW50IG1heF9jcmVkaXRzOyAvKiBjYW4gb3ZlcnJpZGUgbGFyZ2UgMzIwMDAg
-ZGVmYXVsdCBhdCBtbnQgKi8KIAl1bnNpZ25lZCBpbnQgaW5fZmxpZ2h0OyAgLyogbnVtYmVyIG9m
-IHJlcXVlc3RzIG9uIHRoZSB3aXJlIHRvIHNlcnZlciAqLworCXVuc2lnbmVkIGludCBtYXhfaW5f
-ZmxpZ2h0OyAvKiBtYXggbnVtYmVyIG9mIHJlcXVlc3RzIHRoYXQgd2VyZSBvbiB3aXJlICovCiAJ
-c3BpbmxvY2tfdCByZXFfbG9jazsgIC8qIHByb3RlY3QgdGhlIHR3byB2YWx1ZXMgYWJvdmUgKi8K
-IAlzdHJ1Y3QgbXV0ZXggc3J2X211dGV4OwogCXN0cnVjdCB0YXNrX3N0cnVjdCAqdHNrOwpkaWZm
-IC0tZ2l0IGEvZnMvY2lmcy9jb25uZWN0LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYwppbmRleCBlNzAx
-MTJkNjdiMGUuLmRmMWNjYjU4MTgyOCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jb25uZWN0LmMKKysr
-IGIvZnMvY2lmcy9jb25uZWN0LmMKQEAgLTI3MjgsNiArMjcyOCw3IEBAIGNpZnNfZ2V0X3RjcF9z
-ZXNzaW9uKHN0cnVjdCBzbWJfdm9sICp2b2x1bWVfaW5mbykKIAl0Y3Bfc2VzLT50Y3Bfbm9kZWxh
-eSA9IHZvbHVtZV9pbmZvLT5zb2Nrb3B0X3RjcF9ub2RlbGF5OwogCXRjcF9zZXMtPnJkbWEgPSB2
-b2x1bWVfaW5mby0+cmRtYTsKIAl0Y3Bfc2VzLT5pbl9mbGlnaHQgPSAwOworCXRjcF9zZXMtPm1h
-eF9pbl9mbGlnaHQgPSAwOwogCXRjcF9zZXMtPmNyZWRpdHMgPSAxOwogCWluaXRfd2FpdHF1ZXVl
-X2hlYWQoJnRjcF9zZXMtPnJlc3BvbnNlX3EpOwogCWluaXRfd2FpdHF1ZXVlX2hlYWQoJnRjcF9z
-ZXMtPnJlcXVlc3RfcSk7CmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJvcHMuYyBiL2ZzL2NpZnMv
-c21iMm9wcy5jCmluZGV4IGYwNGNmNjJmZjkxZC4uODU0NmU2M2JiOWI5IDEwMDY0NAotLS0gYS9m
-cy9jaWZzL3NtYjJvcHMuYworKysgYi9mcy9jaWZzL3NtYjJvcHMuYwpAQCAtMjAzLDYgKzIwMyw4
-IEBAIHNtYjJfd2FpdF9tdHVfY3JlZGl0cyhzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIs
-IHVuc2lnbmVkIGludCBzaXplLAogCQkJY3JlZGl0cy0+aW5zdGFuY2UgPSBzZXJ2ZXItPnJlY29u
-bmVjdF9pbnN0YW5jZTsKIAkJCXNlcnZlci0+Y3JlZGl0cyAtPSBjcmVkaXRzLT52YWx1ZTsKIAkJ
-CXNlcnZlci0+aW5fZmxpZ2h0Kys7CisJCQlpZiAoc2VydmVyLT5pbl9mbGlnaHQgPiBzZXJ2ZXIt
-Pm1heF9pbl9mbGlnaHQpCisJCQkJc2VydmVyLT5tYXhfaW5fZmxpZ2h0ID0gc2VydmVyLT5pbl9m
-bGlnaHQ7CiAJCQlicmVhazsKIAkJfQogCX0KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvdHJhbnNwb3J0
-LmMgYi9mcy9jaWZzL3RyYW5zcG9ydC5jCmluZGV4IDRmY2NiOTA0OTJlOS4uMzA4YWQwZjQ5NWUx
-IDEwMDY0NAotLS0gYS9mcy9jaWZzL3RyYW5zcG9ydC5jCisrKyBiL2ZzL2NpZnMvdHJhbnNwb3J0
-LmMKQEAgLTUzMiw2ICs1MzIsOCBAQCB3YWl0X2Zvcl9mcmVlX2NyZWRpdHMoc3RydWN0IFRDUF9T
-ZXJ2ZXJfSW5mbyAqc2VydmVyLCBjb25zdCBpbnQgbnVtX2NyZWRpdHMsCiAJaWYgKChmbGFncyAm
-IENJRlNfVElNRU9VVF9NQVNLKSA9PSBDSUZTX05PTl9CTE9DS0lORykgewogCQkvKiBvcGxvY2sg
-YnJlYWtzIG11c3Qgbm90IGJlIGhlbGQgdXAgKi8KIAkJc2VydmVyLT5pbl9mbGlnaHQrKzsKKwkJ
-aWYgKHNlcnZlci0+aW5fZmxpZ2h0ID4gc2VydmVyLT5tYXhfaW5fZmxpZ2h0KQorCQkJc2VydmVy
-LT5tYXhfaW5fZmxpZ2h0ID0gc2VydmVyLT5pbl9mbGlnaHQ7CiAJCSpjcmVkaXRzIC09IDE7CiAJ
-CSppbnN0YW5jZSA9IHNlcnZlci0+cmVjb25uZWN0X2luc3RhbmNlOwogCQlzcGluX3VubG9jaygm
-c2VydmVyLT5yZXFfbG9jayk7CkBAIC02MDgsNiArNjEwLDggQEAgd2FpdF9mb3JfZnJlZV9jcmVk
-aXRzKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgY29uc3QgaW50IG51bV9jcmVkaXRz
-LAogCQkJaWYgKChmbGFncyAmIENJRlNfVElNRU9VVF9NQVNLKSAhPSBDSUZTX0JMT0NLSU5HX09Q
-KSB7CiAJCQkJKmNyZWRpdHMgLT0gbnVtX2NyZWRpdHM7CiAJCQkJc2VydmVyLT5pbl9mbGlnaHQg
-Kz0gbnVtX2NyZWRpdHM7CisJCQkJaWYgKHNlcnZlci0+aW5fZmxpZ2h0ID4gc2VydmVyLT5tYXhf
-aW5fZmxpZ2h0KQorCQkJCQlzZXJ2ZXItPm1heF9pbl9mbGlnaHQgPSBzZXJ2ZXItPmluX2ZsaWdo
-dDsKIAkJCQkqaW5zdGFuY2UgPSBzZXJ2ZXItPnJlY29ubmVjdF9pbnN0YW5jZTsKIAkJCX0KIAkJ
-CXNwaW5fdW5sb2NrKCZzZXJ2ZXItPnJlcV9sb2NrKTsKLS0gCjIuMjAuMQoK
---00000000000008113005922afe13--
+On Tue, Sep 10, 2019 at 12:21 AM Steve French <smfrench@gmail.com> wrote:
+>
+> Had a minor typo in patch 2 - fixed in attached
+>
+> On Sun, Sep 8, 2019 at 11:31 PM Steve French <smfrench@gmail.com> wrote:
+> >
+> > I am seeing very good performance benefit from offload of decryption
+> > of encrypted SMB3 read responses to a pool of worker threads
+> > (optionally).  See attached patches.
+> >
+> > I plan to add another patch to only offload when number of requests in
+> > flight is > 1 (since there is no point offloading and doing a thread
+> > switch if no other responses would overlap in the cifsd thread reading
+> > from the socket).
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
