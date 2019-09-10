@@ -2,58 +2,89 @@ Return-Path: <SRS0=ZOHs=XF=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7836AC3A5A2
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 11:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ECD3C49ED9
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 16:46:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5906720872
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 11:41:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 517132082C
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 16:46:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JVy55lB1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730707AbfIJLlt convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 10 Sep 2019 07:41:49 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58596 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728639AbfIJLls (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 10 Sep 2019 07:41:48 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 70C09B66C;
-        Tue, 10 Sep 2019 11:41:47 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>
-Cc:     Murphy Zhou <jencce.kernel@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Are the xfstests exclusion files on wiki.samba.org up to date?
-In-Reply-To: <CAN05THREAX12uBdWULEQnP+Ko52uDzTjry3dYKM3ZFiB2cYaJw@mail.gmail.com>
-References: <20190909104127.nsdxptzxcf5a6b72@XZHOUW.usersys.redhat.com>
- <87mufdiw0u.fsf@suse.com>
- <CAH2r5mt9etVvg5jFk5jXRV6FadGz=qcqgG+JBhojKwVKmvRPZw@mail.gmail.com>
- <CAN05THREAX12uBdWULEQnP+Ko52uDzTjry3dYKM3ZFiB2cYaJw@mail.gmail.com>
-Date:   Tue, 10 Sep 2019 13:41:46 +0200
-Message-ID: <87h85kidj9.fsf@suse.com>
+        id S2436785AbfIJQqQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 10 Sep 2019 12:46:16 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:37911 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2436798AbfIJQqP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Sep 2019 12:46:15 -0400
+Received: by mail-lf1-f68.google.com with SMTP id c12so14039710lfh.5
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Sep 2019 09:46:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=DtydDkET6u9RWaQ0b5P2/ejHrO2lFzMPZy/pbS3RlBo=;
+        b=JVy55lB1kt+NyiDh0eHg+x4fjQ8a3ifJ4GzxAmqbtOyceVRn9NnRoVS6UXOF1rwVPT
+         6yHu/zCx6wtwpDDo4KR1P33GMeFyan5rjre0T+pba6krPk7EMaM2cHe1i9V2eszeBnXE
+         gmTSjf9tEp0EllaT+hPW/HbL74qdOUWcUEquspIptVK5oP6XZ4bOenU2tNMvmauCpmA6
+         xE4FNKNPwRsNTnsdOhtQU+v3Y2ue7y9GGagCcXqez3FW7YBwB2mFFLRalm/0X/6Mhpi3
+         K5c+/gCTrkjm2p8Wf2e8FLa4KsYh0SbbVvAGcqWytpP+CqviAqJpALIiJ6q8EsqxAW9B
+         PYKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=DtydDkET6u9RWaQ0b5P2/ejHrO2lFzMPZy/pbS3RlBo=;
+        b=dCj7o9IE/wbGqg4YvVXJ5poG21W+1lwuI3PqUO4laClz/9Ja3S/vWhCZrG82nJNoph
+         xkU9LrFdZfy89xLd1tcycjt0vHQgIkFiEEpiVEiqj/fz9n9CfOy3ouCml/In/5KO90sM
+         xdd2YfKK0z3G2tnue6hsBtPGqR7V+G7mUxYVbxQ4HoAMPZN0ilxnNBW8qw7NoFBLg5As
+         rGzJmPC+RNPcxTW9VfOEGFLWQn09rpGl34IFdDPLB322PXoR7n3YusxPwKDHMOr++Cpn
+         xt0l+qExQp27WMxyFqjzKfoljG0NFAs+fUiEsPscKI5syFrEpmZIPIrUWFxduECHU7XY
+         AXMw==
+X-Gm-Message-State: APjAAAXEnPKQpVy71x6WeEcPkVmoWC1i2Gw0PvE89SSEabsw8QM9hr7N
+        C0+lTM8uJ4U/XwxFseoSZ6phVPrUgdrzD9DDBuBFUmg=
+X-Google-Smtp-Source: APXvYqyy5tgZF61zfNth1+LF+y9D8eHMXDQzrtX4rUESVgM605RUusOLeDoIEVwde81cGWRZVXh+jb/zOe31xanijBk=
+X-Received: by 2002:ac2:4117:: with SMTP id b23mr21505262lfi.36.1568133973814;
+ Tue, 10 Sep 2019 09:46:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+References: <CAH2r5mtcHR2BpthaubPNgC8fO4uu2d7QkYraMAK3cFOciR9g2Q@mail.gmail.com>
+In-Reply-To: <CAH2r5mtcHR2BpthaubPNgC8fO4uu2d7QkYraMAK3cFOciR9g2Q@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Tue, 10 Sep 2019 09:46:02 -0700
+Message-ID: <CAKywueS3S_DPfFzENhHDQqTQ+aazbAPMdwVQX4nzDG63tuHsdg@mail.gmail.com>
+Subject: Re: [PATCH] Display max credits used at any one time for in flight requests
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-"ronnie sahlberg" <ronniesahlberg@gmail.com> writes:
-> Lets get rid of the list of tests from the wiki and let the buildbot
-> be the single canonical source of truth.
+server->in-flight is the number of requests in flight, not credits.
+Even for multi-credit requests (READ or WRITE) we only
+increment/decrement this value, so the following change line should be
+updated:
 
-Sounds good to me. Ideally this list should be exportable (perhaps
-automatically from the buildbot script) in a format that can be used
-directly by the check script for others to use.
++ seq_printf(m, "\nMax credits in flight: %d", server->max_in_flight);
 
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
+with 's/Max credits/Max requests/'
+
+The description of the patch and the title need similar changes as well.
+
+--
+Best regards,
+Pavel Shilovsky
+
+=D0=B2=D1=82, 10 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 03:42, Steve=
+ French <smfrench@gmail.com>:
+>
+> --
+> Thanks,
+>
+> Steve
