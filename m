@@ -1,142 +1,163 @@
-Return-Path: <SRS0=r/yF=XE=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=ZOHs=XF=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C43DC4740A
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Sep 2019 23:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29493C3A5A2
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 04:03:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE89520863
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Sep 2019 23:23:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E596B21928
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Sep 2019 04:03:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bRvuBpza"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ntl4gn/d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730137AbfIIXXX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 9 Sep 2019 19:23:23 -0400
-Received: from mail-io1-f42.google.com ([209.85.166.42]:39064 "EHLO
-        mail-io1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389986AbfIIXXX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Sep 2019 19:23:23 -0400
-Received: by mail-io1-f42.google.com with SMTP id d25so33114794iob.6
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Sep 2019 16:23:22 -0700 (PDT)
+        id S1731683AbfIJEDx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 10 Sep 2019 00:03:53 -0400
+Received: from mail-io1-f47.google.com ([209.85.166.47]:41768 "EHLO
+        mail-io1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725283AbfIJEDx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Sep 2019 00:03:53 -0400
+Received: by mail-io1-f47.google.com with SMTP id r26so34249881ioh.8
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Sep 2019 21:03:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=U3vK5q3syyMym5e2mUwckINzGgbMb35z6bQYvvL3G74=;
-        b=bRvuBpzaXCYnc9FUWTITGTbW+DnSztbn4hVcPQaouxKpHPkeDi+YBqT/xyXdUXaRnE
-         INJWF70fQkZA5KjaJJy+xeEo2TK0xSa7UTkzzLpFgvuA5fsQc+NEbTWab5V/Is1QPFAB
-         DKR6LrDCOGI1I3wHML2B98H+e3qlSNSaaNuN7RdN3rDPG0/C5eNr+OZU++KVCgvcyj2T
-         SSY8h9rulYXnSbRWr03Awx+xCFy94Tfd4c79l/49j/JtCwVvDF0a0Bc1puwagWe6s4Xh
-         BMoI8NpiAV1XOEYSxC1uCdB6jzpkwYd4p5QbUfekir3WrBYGx2LCoYz6ZYu/wmHjJAMp
-         HMdg==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=Eci64ju3Fxd3NkK+D+JXIT+Wb2UNsBD52dsCzd+zNTc=;
+        b=ntl4gn/dpWvIdD26Nkw7jU8Atl34yz1kme8eIHde6+3HXWtxrA+obcEvuHI3obDHUf
+         1COejYj+O8clndJobTeQg34p2G0zUkBTl9g1udBrawTFktB4OJQDcvTjMpXiDRLraAWM
+         OF5+faHPqZ28uiVF+P55+swWNvD0SaOLsnSQvHSFalT4z6+xj3lTfkE17805hW1G92CG
+         GbXP2PYjr313mLlDGkARFLuK9Q+betMdTyLn9w/ChTjiKGGyAWLkeS8kQuzFkdBeroVO
+         cxA9BreLBvSAjJCSXnIrrvK7MHO4cMaX+J5eWEJhTEQK++zu2UJ7pP7ysXFpHR6KEsXZ
+         U8fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=U3vK5q3syyMym5e2mUwckINzGgbMb35z6bQYvvL3G74=;
-        b=T/F+ClGpBJj/gkoHieV8aorG3ZaUEwsLfm4cL7/uksHl7zpx15axt2SjQktjwMzGTW
-         zakPLCsXaafj0tVbFHF+3Azrq8LeTbwv3U6y1GfGJVJZW1LivK5weBnKeDJWuvdj7OzJ
-         W9c28xbN/JNIkr/OfVHkP+xtPWf1j+TUkG7oKN/WquA9QPPhRVxRgmMy6SC90cGiS05t
-         kFgNJ8QRZoaAmUANdwq+MfIpVmb+Z/CDK+UW3WquWQhT2wqqM5NBCkONiwnzCPpmSBwg
-         2d3ux29mseu+Wh7fh335BO0ilqBcOv+Cns2qTVu4Kn/oR+ohpuoLY15UP9WLx6tQNgwW
-         5ciA==
-X-Gm-Message-State: APjAAAVnc5m1b6RIheELkQbPgNX/UdDO2BIQKjDp/w6KnHNreOtxTSG1
-        zdpEllg8VNXwSga8KfbF6K7TRGtVBMueqQmrc/gXbT+X
-X-Google-Smtp-Source: APXvYqz778FzVUai5+ElRsn1CLAG+B6E+Jc+JBJTCd1K7Uh95Pro4FNyPCx9KsCca42anED6WqcZ4cfkucp+qeM31hE=
-X-Received: by 2002:a5d:89cd:: with SMTP id a13mr1353465iot.272.1568071402381;
- Mon, 09 Sep 2019 16:23:22 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=Eci64ju3Fxd3NkK+D+JXIT+Wb2UNsBD52dsCzd+zNTc=;
+        b=fjrZv5ZIR8dO66HAbcq15RTIsZR6mZSX5fiEZ04dV72kY50MYd5v/gBWtWlzQxe4j9
+         +WVPK3o6exe+Sx5b6DSbc/FY6HoICXL5oEQWTVCDPGMGDEJMPeh8MDix0aos7cCjw0jx
+         9WD79Ae0r7oFyiqMnEaN37Nu9ZcGluAx/yutKLryvsPc7ch2Jnmv9hxtY/BD/CWPwEVx
+         l3AWWcX9SU77hcxYOEZbRMvhPjzm9W530ct5KoQIEw+J4UO3/H2hoEx8JXukrFxd3lpC
+         AlCTg8PlBsPL7fs8IUaWsXh0NeGuIzfcMMlQlu+9Cb8jOTd0FZ/xICfV2u48jawnWYiU
+         cu5A==
+X-Gm-Message-State: APjAAAUCjkyeeAQyfdfl+a0QW5doaG+9fFuOCvPLu3OumW/jmKTmK8Ta
+        W5GC3XxJZev1ASC0s9FIzUaBjl5ved88t74q76taSRb/
+X-Google-Smtp-Source: APXvYqwJpgZUADxr0REjW0YxsNCq0T3Nay+uDSx/4oPBz0iQEG0Mhgc4UrcnCf3BB04J/Jcn4LOiPHGZcEN+aw/n4h0=
+X-Received: by 2002:a6b:2b07:: with SMTP id r7mr28642541ior.173.1568088231721;
+ Mon, 09 Sep 2019 21:03:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190909104127.nsdxptzxcf5a6b72@XZHOUW.usersys.redhat.com> <87mufdiw0u.fsf@suse.com>
-In-Reply-To: <87mufdiw0u.fsf@suse.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 9 Sep 2019 18:23:10 -0500
-Message-ID: <CAH2r5mt9etVvg5jFk5jXRV6FadGz=qcqgG+JBhojKwVKmvRPZw@mail.gmail.com>
-Subject: Re: Are the xfstests exclusion files on wiki.samba.org up to date?
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Murphy Zhou <jencce.kernel@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 9 Sep 2019 23:03:40 -0500
+Message-ID: <CAH2r5mtcHR2BpthaubPNgC8fO4uu2d7QkYraMAK3cFOciR9g2Q@mail.gmail.com>
+Subject: [PATCH] Display max credits used at any one time for in flight requests
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="00000000000008113005922afe13"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We have done a lot of work (with Ronnie, Aurelien, Pavel and others)
-on xfstest automation.
+--00000000000008113005922afe13
+Content-Type: text/plain; charset="UTF-8"
 
-As you might guess it is frustrating for two reasons:
-1) updated xfstests can be flaky (as the tests themselves are updated,
-they add subtle required features, or regress from time to time)
-2) test automation can run into resource constraints (VMs trying to
-run tests with less memory than might be optimal - especially those
-run against Samba with "VMs inside VMs").
-
-But the good news is that we have VERY good data on which tests pass
-to various servers (just as noted, need to update the external pages)
-and we should have even more data as we go through two weeks of SMB3
-testing events in late September.
-
-In general we want to test against all typical servers and have test
-targets setup for
- - Samba (reasonably current stable) on ext4/xfs and Samba with btrfs
-(which has various optional extensions enabled in the server)
- - Samba with POSIX Extensions
- - Windows (and against both NTFS and REFS server file system)
-- Azure (Cloud0
-
-But would really like to add test targets for other common servers and
-in a perfect world would like to be able to have external test
-automation pull our trees periodically to run these (similar to what
-is done for the six targets above):
-  - Macs
-  - NetApp
-(and any others of interest to the community)
-
-Obviously xfstest has a few hundred tests which only make sense for
-local file systems with block devices, but there are hundreds of
-xfstests of value, and most should run on cifs.ko and we are working
-through them but already have a very good set running.
-
-On Mon, Sep 9, 2019 at 5:50 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
->
-> "Murphy Zhou" <jencce.kernel@gmail.com> writes:
-> > As $subject. Is this wiki being maintained ?
-> >
-> > Looks like the last update was in January 2019.
-> >
-> > https://wiki.samba.org/index.php/Xfstesting-cifs#Exclusion_files
->
-> We have a buildbot running xfstests relatively often here
->
-> http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/
->
-> Each group has slightly different tests run, you can see which one gets
-> run by clicking on a build:
->
-> http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/b=
-uilds/249
->
-> Overall xfstests+cifs is very finicky and frustrating to get working
-> reliably. Not to mention long. So good luck :)
->
-> Cheers,
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
-
-
-
---=20
+-- 
 Thanks,
 
 Steve
+
+--00000000000008113005922afe13
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-display-max-credits-used-at-any-one-time.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-display-max-credits-used-at-any-one-time.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_k0db8ki00>
+X-Attachment-Id: f_k0db8ki00
+
+RnJvbSAwYWI4M2YzMTUyZGM2N2RhNjQzODQ0ZDkxYjcwZWY5ZWI5OGE3MjNmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IE1vbiwgOSBTZXAgMjAxOSAyMjo1NzoxMSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
+YjM6IGRpc3BsYXkgbWF4IGNyZWRpdHMgdXNlZCBhdCBhbnkgb25lIHRpbWUKCkRpc3BsYXllZCBp
+biAvcHJvYy9mcy9jaWZzL1N0YXRzIG9uY2UgZm9yIGVhY2gKc29ja2V0IHdlIGFyZSBjb25uZWN0
+ZWQgdG8uCgpUaGlzIGFsbG93cyB1cyB0byBmaW5kIG91dCB3aGF0IHRoZSBtYXhpbXVtIGxvYWQg
+d2UKcHV0IG9uIGEgc2VydmVyIHdhcy4gIEV4Y2VwdCBmb3IgbGFyZ2Ugd3JpdGVzIHdoaWNoIGNh
+biB1c2UKbXVsdGlwbGUgY3JlZGl0cyB0aGlzIHdvdWxkIG5vcm1hbGx5IGVxdWFsIHRoZSBtYXhp
+bXVtIG51bWJlcgpvZiByZXF1ZXN0cyB0aGF0IGhhZCBiZWVuIGluIGZsaWdodCAoYXQgYW55IG9u
+ZSB0aW1lKS4gTm90ZSB0aGF0Ci9wcm9jL2ZzL2NpZnMvU3RhdHMgY2FuIGJlIHJlc2V0IGlmIHlv
+dSB3YW50IHRvIGxvb2sgYXQgYQptYXhpbXVtIGluIGZsaWdodCBjcmVkaXRzIG92ZXIgYSBzbWFs
+bCBwZXJpb2Qgb2YgdGltZS4KClNhbXBsZSBvdXRwdXQgKGltbWVkaWF0ZWx5IGFmdGVyIG1vdW50
+KToKClJlc291cmNlcyBpbiB1c2UKQ0lGUyBTZXNzaW9uOiAxClNoYXJlICh1bmlxdWUgbW91bnQg
+dGFyZ2V0cyk6IDIKU01CIFJlcXVlc3QvUmVzcG9uc2UgQnVmZmVyOiAxIFBvb2wgc2l6ZTogNQpT
+TUIgU21hbGwgUmVxL1Jlc3AgQnVmZmVyOiAxIFBvb2wgc2l6ZTogMzAKT3BlcmF0aW9ucyAoTUlE
+cyk6IDAKCjAgc2Vzc2lvbiAwIHNoYXJlIHJlY29ubmVjdHMKVG90YWwgdmZzIG9wZXJhdGlvbnM6
+IDUgbWF4aW11bSBhdCBvbmUgdGltZTogMgoKTWF4IGNyZWRpdHMgaW4gZmxpZ2h0OiAyCjEpIFxc
+bG9jYWxob3N0XHNjcmF0Y2gKU01CczogMTgKQnl0ZXMgcmVhZDogMCAgQnl0ZXMgd3JpdHRlbjog
+MAouLi4KClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNv
+bT4KLS0tCiBmcy9jaWZzL2NpZnNfZGVidWcuYyB8IDIgKysKIGZzL2NpZnMvY2lmc2dsb2IuaCAg
+IHwgMSArCiBmcy9jaWZzL2Nvbm5lY3QuYyAgICB8IDEgKwogZnMvY2lmcy9zbWIyb3BzLmMgICAg
+fCAyICsrCiBmcy9jaWZzL3RyYW5zcG9ydC5jICB8IDQgKysrKwogNSBmaWxlcyBjaGFuZ2VkLCAx
+MCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzX2RlYnVnLmMgYi9mcy9j
+aWZzL2NpZnNfZGVidWcuYwppbmRleCBhMzhkNzk2ZjVmZmUuLmRjNTQzY2E4MDFiZiAxMDA2NDQK
+LS0tIGEvZnMvY2lmcy9jaWZzX2RlYnVnLmMKKysrIGIvZnMvY2lmcy9jaWZzX2RlYnVnLmMKQEAg
+LTQ1Miw2ICs0NTIsNyBAQCBzdGF0aWMgc3NpemVfdCBjaWZzX3N0YXRzX3Byb2Nfd3JpdGUoc3Ry
+dWN0IGZpbGUgKmZpbGUsCiAJCWxpc3RfZm9yX2VhY2godG1wMSwgJmNpZnNfdGNwX3Nlc19saXN0
+KSB7CiAJCQlzZXJ2ZXIgPSBsaXN0X2VudHJ5KHRtcDEsIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8s
+CiAJCQkJCSAgICB0Y3Bfc2VzX2xpc3QpOworCQkJc2VydmVyLT5tYXhfaW5fZmxpZ2h0ID0gMDsK
+ICNpZmRlZiBDT05GSUdfQ0lGU19TVEFUUzIKIAkJCWZvciAoaSA9IDA7IGkgPCBOVU1CRVJfT0Zf
+U01CMl9DT01NQU5EUzsgaSsrKSB7CiAJCQkJYXRvbWljX3NldCgmc2VydmVyLT5udW1fY21kc1tp
+XSwgMCk7CkBAIC01MjYsNiArNTI3LDcgQEAgc3RhdGljIGludCBjaWZzX3N0YXRzX3Byb2Nfc2hv
+dyhzdHJ1Y3Qgc2VxX2ZpbGUgKm0sIHZvaWQgKnYpCiAJbGlzdF9mb3JfZWFjaCh0bXAxLCAmY2lm
+c190Y3Bfc2VzX2xpc3QpIHsKIAkJc2VydmVyID0gbGlzdF9lbnRyeSh0bXAxLCBzdHJ1Y3QgVENQ
+X1NlcnZlcl9JbmZvLAogCQkJCSAgICB0Y3Bfc2VzX2xpc3QpOworCQlzZXFfcHJpbnRmKG0sICJc
+bk1heCBjcmVkaXRzIGluIGZsaWdodDogJWQiLCBzZXJ2ZXItPm1heF9pbl9mbGlnaHQpOwogI2lm
+ZGVmIENPTkZJR19DSUZTX1NUQVRTMgogCQlzZXFfcHV0cyhtLCAiXG5Ub3RhbCB0aW1lIHNwZW50
+IHByb2Nlc3NpbmcgYnkgY29tbWFuZC4gVGltZSAiKTsKIAkJc2VxX3ByaW50ZihtLCAidW5pdHMg
+YXJlIGppZmZpZXMgKCVkIHBlciBzZWNvbmQpXG4iLCBIWik7CmRpZmYgLS1naXQgYS9mcy9jaWZz
+L2NpZnNnbG9iLmggYi9mcy9jaWZzL2NpZnNnbG9iLmgKaW5kZXggNjk4N2ZiYzVhMjRhLi5lZjIx
+OTk5MTMyMTcgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc2dsb2IuaAorKysgYi9mcy9jaWZzL2Np
+ZnNnbG9iLmgKQEAgLTY3Nyw2ICs2NzcsNyBAQCBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvIHsKIAl1
+bnNpZ25lZCBpbnQgY3JlZGl0czsgIC8qIHNlbmQgbm8gbW9yZSByZXF1ZXN0cyBhdCBvbmNlICov
+CiAJdW5zaWduZWQgaW50IG1heF9jcmVkaXRzOyAvKiBjYW4gb3ZlcnJpZGUgbGFyZ2UgMzIwMDAg
+ZGVmYXVsdCBhdCBtbnQgKi8KIAl1bnNpZ25lZCBpbnQgaW5fZmxpZ2h0OyAgLyogbnVtYmVyIG9m
+IHJlcXVlc3RzIG9uIHRoZSB3aXJlIHRvIHNlcnZlciAqLworCXVuc2lnbmVkIGludCBtYXhfaW5f
+ZmxpZ2h0OyAvKiBtYXggbnVtYmVyIG9mIHJlcXVlc3RzIHRoYXQgd2VyZSBvbiB3aXJlICovCiAJ
+c3BpbmxvY2tfdCByZXFfbG9jazsgIC8qIHByb3RlY3QgdGhlIHR3byB2YWx1ZXMgYWJvdmUgKi8K
+IAlzdHJ1Y3QgbXV0ZXggc3J2X211dGV4OwogCXN0cnVjdCB0YXNrX3N0cnVjdCAqdHNrOwpkaWZm
+IC0tZ2l0IGEvZnMvY2lmcy9jb25uZWN0LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYwppbmRleCBlNzAx
+MTJkNjdiMGUuLmRmMWNjYjU4MTgyOCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jb25uZWN0LmMKKysr
+IGIvZnMvY2lmcy9jb25uZWN0LmMKQEAgLTI3MjgsNiArMjcyOCw3IEBAIGNpZnNfZ2V0X3RjcF9z
+ZXNzaW9uKHN0cnVjdCBzbWJfdm9sICp2b2x1bWVfaW5mbykKIAl0Y3Bfc2VzLT50Y3Bfbm9kZWxh
+eSA9IHZvbHVtZV9pbmZvLT5zb2Nrb3B0X3RjcF9ub2RlbGF5OwogCXRjcF9zZXMtPnJkbWEgPSB2
+b2x1bWVfaW5mby0+cmRtYTsKIAl0Y3Bfc2VzLT5pbl9mbGlnaHQgPSAwOworCXRjcF9zZXMtPm1h
+eF9pbl9mbGlnaHQgPSAwOwogCXRjcF9zZXMtPmNyZWRpdHMgPSAxOwogCWluaXRfd2FpdHF1ZXVl
+X2hlYWQoJnRjcF9zZXMtPnJlc3BvbnNlX3EpOwogCWluaXRfd2FpdHF1ZXVlX2hlYWQoJnRjcF9z
+ZXMtPnJlcXVlc3RfcSk7CmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJvcHMuYyBiL2ZzL2NpZnMv
+c21iMm9wcy5jCmluZGV4IGYwNGNmNjJmZjkxZC4uODU0NmU2M2JiOWI5IDEwMDY0NAotLS0gYS9m
+cy9jaWZzL3NtYjJvcHMuYworKysgYi9mcy9jaWZzL3NtYjJvcHMuYwpAQCAtMjAzLDYgKzIwMyw4
+IEBAIHNtYjJfd2FpdF9tdHVfY3JlZGl0cyhzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIs
+IHVuc2lnbmVkIGludCBzaXplLAogCQkJY3JlZGl0cy0+aW5zdGFuY2UgPSBzZXJ2ZXItPnJlY29u
+bmVjdF9pbnN0YW5jZTsKIAkJCXNlcnZlci0+Y3JlZGl0cyAtPSBjcmVkaXRzLT52YWx1ZTsKIAkJ
+CXNlcnZlci0+aW5fZmxpZ2h0Kys7CisJCQlpZiAoc2VydmVyLT5pbl9mbGlnaHQgPiBzZXJ2ZXIt
+Pm1heF9pbl9mbGlnaHQpCisJCQkJc2VydmVyLT5tYXhfaW5fZmxpZ2h0ID0gc2VydmVyLT5pbl9m
+bGlnaHQ7CiAJCQlicmVhazsKIAkJfQogCX0KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvdHJhbnNwb3J0
+LmMgYi9mcy9jaWZzL3RyYW5zcG9ydC5jCmluZGV4IDRmY2NiOTA0OTJlOS4uMzA4YWQwZjQ5NWUx
+IDEwMDY0NAotLS0gYS9mcy9jaWZzL3RyYW5zcG9ydC5jCisrKyBiL2ZzL2NpZnMvdHJhbnNwb3J0
+LmMKQEAgLTUzMiw2ICs1MzIsOCBAQCB3YWl0X2Zvcl9mcmVlX2NyZWRpdHMoc3RydWN0IFRDUF9T
+ZXJ2ZXJfSW5mbyAqc2VydmVyLCBjb25zdCBpbnQgbnVtX2NyZWRpdHMsCiAJaWYgKChmbGFncyAm
+IENJRlNfVElNRU9VVF9NQVNLKSA9PSBDSUZTX05PTl9CTE9DS0lORykgewogCQkvKiBvcGxvY2sg
+YnJlYWtzIG11c3Qgbm90IGJlIGhlbGQgdXAgKi8KIAkJc2VydmVyLT5pbl9mbGlnaHQrKzsKKwkJ
+aWYgKHNlcnZlci0+aW5fZmxpZ2h0ID4gc2VydmVyLT5tYXhfaW5fZmxpZ2h0KQorCQkJc2VydmVy
+LT5tYXhfaW5fZmxpZ2h0ID0gc2VydmVyLT5pbl9mbGlnaHQ7CiAJCSpjcmVkaXRzIC09IDE7CiAJ
+CSppbnN0YW5jZSA9IHNlcnZlci0+cmVjb25uZWN0X2luc3RhbmNlOwogCQlzcGluX3VubG9jaygm
+c2VydmVyLT5yZXFfbG9jayk7CkBAIC02MDgsNiArNjEwLDggQEAgd2FpdF9mb3JfZnJlZV9jcmVk
+aXRzKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgY29uc3QgaW50IG51bV9jcmVkaXRz
+LAogCQkJaWYgKChmbGFncyAmIENJRlNfVElNRU9VVF9NQVNLKSAhPSBDSUZTX0JMT0NLSU5HX09Q
+KSB7CiAJCQkJKmNyZWRpdHMgLT0gbnVtX2NyZWRpdHM7CiAJCQkJc2VydmVyLT5pbl9mbGlnaHQg
+Kz0gbnVtX2NyZWRpdHM7CisJCQkJaWYgKHNlcnZlci0+aW5fZmxpZ2h0ID4gc2VydmVyLT5tYXhf
+aW5fZmxpZ2h0KQorCQkJCQlzZXJ2ZXItPm1heF9pbl9mbGlnaHQgPSBzZXJ2ZXItPmluX2ZsaWdo
+dDsKIAkJCQkqaW5zdGFuY2UgPSBzZXJ2ZXItPnJlY29ubmVjdF9pbnN0YW5jZTsKIAkJCX0KIAkJ
+CXNwaW5fdW5sb2NrKCZzZXJ2ZXItPnJlcV9sb2NrKTsKLS0gCjIuMjAuMQoK
+--00000000000008113005922afe13--
