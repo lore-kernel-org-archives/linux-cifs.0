@@ -4,86 +4,104 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01FF9C49ED9
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Sep 2019 07:22:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04066C49ED9
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Sep 2019 08:45:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C871521479
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Sep 2019 07:22:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7444208E4
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Sep 2019 08:45:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8erAlqG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sjDrQVTc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726308AbfILHW5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 12 Sep 2019 03:22:57 -0400
-Received: from mail-io1-f45.google.com ([209.85.166.45]:45935 "EHLO
-        mail-io1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725765AbfILHW5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Sep 2019 03:22:57 -0400
-Received: by mail-io1-f45.google.com with SMTP id f12so52101096iog.12
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Sep 2019 00:22:56 -0700 (PDT)
+        id S1730175AbfILIpN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 12 Sep 2019 04:45:13 -0400
+Received: from mail-pf1-f176.google.com ([209.85.210.176]:41487 "EHLO
+        mail-pf1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726159AbfILIpN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Sep 2019 04:45:13 -0400
+Received: by mail-pf1-f176.google.com with SMTP id b13so15514703pfo.8
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Sep 2019 01:45:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qnnBn+SZ4v0P83O2zx0v8u1iki5NbL0knBgkgi8SgCE=;
-        b=l8erAlqGDiSGD3MAyg7NYUI0yNJrHma6vpei7hR0diShQq8iWt+aQgBvY4Vd/Mc0ZW
-         fFmWUpdyP//zzZD03qej8unRCfBHwWWMxAdOeOTQkwrMiot8EKJ7rcJ1lAJsmZ09m0es
-         a30EU8z+OtTFgPJZBDM1Updm2ed7yBXS79JTzEKOTLZLAqlh6A8J3LPmFmfES6UFxWDu
-         gkDAemCYwvWdwf//vQUkOAjOXial0SYeGpHfUbAeFo67myquVmuNmC/2M/xdsWP2/w/j
-         U6pLpY9GAtXPDBM/c2kh4Pk9V/zpwVV4eCtWKcqM8g83FD8f6Sac38OuD9wj5+9ZLORF
-         EU4Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=oWhk4mY9kaQumLncfrLHlm8v2yU2jwOxKrRiPvY2Bi4=;
+        b=sjDrQVTczNVJlXuATe/VCL1Oiebzx83Dzq2xYY25kHV1aOfS6c6oO6Vd5mXPkRkTob
+         +y/gT5eWFxO1oDb4VGnnh+yRDANR9BfuXBfIv94AEH945jJ550nWjRDI7XqIdwhpkDRO
+         L8WLkG229TMhrrZGcOzqJ6fsMSUoU0VfYl9EvD7qPTrmhptM0g+ggN73OE7k9Y6mQNdU
+         JFc6bipAxm+JD5XbzN41E7krJvwXkSNley49a3GeLdZiI83BtlgUScwjI6/5oVzFJswi
+         Jb8IcXH7HyFU6vawvzYm0MWBBwoJuFdIpjIcKbPocytH2CwuX1I01nOrAGwqk7clJNk3
+         aHjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qnnBn+SZ4v0P83O2zx0v8u1iki5NbL0knBgkgi8SgCE=;
-        b=YNL0GfNOWXhfP06D+8cggC+vEGtB+Y8/RH1LZ32mB1DWeTqSW2xLwuyHNgEtbVGWX/
-         K+nB/DChQb/oRE58Lr+Omg+k6lFbN/9XMk8JOZTwQwPW5lIm9I19ADtrXysooA9ZrUP2
-         yRq9CznLgPT2O/WIvQVIwiJOO27PBg4QzUWF4Mc0c07VDtn1dytq1XPau3dUMNThn4Th
-         EKHb+CcR4Q3t5H61lvGkHUsV8hwEoMhRcT9FvU62Gm0hb9YipILod7YdvRq8Ji+Tik4U
-         HKWkFLwudD2kQ++tL2LH2/np8MOr8EdVNxpqYcgMXZ0TZK2b2iEB0IkzqiQ+VVQIyY81
-         FZdw==
-X-Gm-Message-State: APjAAAUYUW8VCGuHNoAxRkY5oF2MlpggfkLyqISdt7dRLC0OBsmZ/gNz
-        0e8F3fLMpRDrLnN3QO/psK6AgxTut1gPxlIp/oo=
-X-Google-Smtp-Source: APXvYqy9QiHwbL8UiFczwxRn4mU+CIuvOXTswA0SGLqJjV7nT3fXIhUkoDJmcsSzyed/tacbWMTYvhrW7etA2arGd34=
-X-Received: by 2002:a6b:8d06:: with SMTP id p6mr2030779iod.219.1568272976463;
- Thu, 12 Sep 2019 00:22:56 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=oWhk4mY9kaQumLncfrLHlm8v2yU2jwOxKrRiPvY2Bi4=;
+        b=X6cWJq3iQYL9OsCPb1GHE4UxdgPQ88rpu99Cy2rw0hH+OWVWVzQ2jlTqZdJB41fspg
+         xUF05ImBp0FgNzmwui0/GdVXnrtCGEiRT09xrlFoz049ESDTMfNSV/Xzb3L9UuEuPY/z
+         WVvMIq7kCjPyHsBBh1mjwpZYrpXO7sB0rza/9l9X1QW66kpX22RSh9hCmf4gbUwtx3zo
+         CB5THmOOBkP0tTboMFwLSDODXVIf5nriNqpM6qrypfXvnXzNSv2d8VFd8ASsZarXdqNh
+         hUpFjlarWCVKifwV+P+Ugqr9jjhuBKX4Rt4k5pmmSChewGCG0vM3DOEPUBcMwJta7HAc
+         MlWw==
+X-Gm-Message-State: APjAAAUW43nmQ/VAr4DdllFE3zyBHRU1EUO2JDgArERdkYaOnzMl0ALT
+        G8k7ydYS7z26hAtSkus6pxo=
+X-Google-Smtp-Source: APXvYqyd08dC5Nf1gDrgSZ1gp13iJjnxLSbehl/CViuKUaCPnya0hDsPd+oNo5tsTbBR/9eVQ1mCCQ==
+X-Received: by 2002:a62:d445:: with SMTP id u5mr48255595pfl.92.1568277912397;
+        Thu, 12 Sep 2019 01:45:12 -0700 (PDT)
+Received: from localhost ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id l124sm22007849pgl.54.2019.09.12.01.45.11
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 12 Sep 2019 01:45:11 -0700 (PDT)
+Date:   Thu, 12 Sep 2019 16:45:04 +0800
+From:   Murphy Zhou <jencce.kernel@gmail.com>
+To:     =?utf-8?B?QXVyw6lsaWVu?= Aptel <aaptel@suse.com>
+Cc:     Murphy Zhou <jencce.kernel@gmail.com>, linux-cifs@vger.kernel.org
+Subject: Re: Are the xfstests exclusion files on wiki.samba.org up to date?
+Message-ID: <20190912084504.olymktr7h3ixq3uk@XZHOUW.usersys.redhat.com>
+References: <20190909104127.nsdxptzxcf5a6b72@XZHOUW.usersys.redhat.com>
+ <87mufdiw0u.fsf@suse.com>
 MIME-Version: 1.0
-References: <CAH2r5mtc2A-s1is6eZXZx5neDWZs_4aSW_Tx72PH8sBA4pmqhg@mail.gmail.com>
-In-Reply-To: <CAH2r5mtc2A-s1is6eZXZx5neDWZs_4aSW_Tx72PH8sBA4pmqhg@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 12 Sep 2019 17:22:44 +1000
-Message-ID: <CAN05THSKORVny25_fR6wgK1noJ_DoLHHucpwVhvDD_zNJeHL0A@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] allow disabling requesting of leases
-To:     Steve French <smfrench@gmail.com>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87mufdiw0u.fsf@suse.com>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reviewed by me.
+On Mon, Sep 09, 2019 at 12:50:09PM +0200, Aurélien Aptel wrote:
+> "Murphy Zhou" <jencce.kernel@gmail.com> writes:
+> > As $subject. Is this wiki being maintained ?
+> >
+> > Looks like the last update was in January 2019.
+> >
+> > https://wiki.samba.org/index.php/Xfstesting-cifs#Exclusion_files
+> 
+> We have a buildbot running xfstests relatively often here
+> 
+> http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/
+> 
+> Each group has slightly different tests run, you can see which one gets
+> run by clicking on a build:
+> 
+> http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/249
 
-We need a big patch to the manpage after all these new mount options
+Looks like I am unauthorised to access these sites.
 
-On Thu, Sep 12, 2019 at 5:03 PM Steve French <smfrench@gmail.com> wrote:
->
-> smb3: allow disabling requesting leases
->
-> In some cases to work around server bugs or performance
-> problems it can be helpful to be able to disable requesting
-> SMB2.1/SMB3 leases on a particular mount (not to all servers
-> and all shares we are mounted to). Add new mount parm
-> "nolease" which turns off requesting leases on directory
-> or file opens.  Currently the only way to disable leases is
-> globally through a module load parameter. This approach is more
-> granular (and easier for some) as Pavel had noted in a recent suggestion.
->
-> --
-> Thanks,
->
-> Steve
+> 
+> Overall xfstests+cifs is very finicky and frustrating to get working
+> reliably. Not to mention long. So good luck :)
+
+Indeed. Thanks :)
+
+> 
+> Cheers,
+> -- 
+> Aurélien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
+> GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
