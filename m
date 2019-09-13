@@ -2,235 +2,199 @@ Return-Path: <SRS0=frs6=XI=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4925C49ED7
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Sep 2019 21:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C2EC49ED7
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Sep 2019 23:47:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9445F20692
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Sep 2019 21:52:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 309212089F
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Sep 2019 23:47:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WbGH3hIM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MayBhqoV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390012AbfIMVwN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Sep 2019 17:52:13 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:46527 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389992AbfIMVwN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Sep 2019 17:52:13 -0400
-Received: by mail-io1-f67.google.com with SMTP id d17so43945381ios.13
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Sep 2019 14:52:12 -0700 (PDT)
+        id S2390600AbfIMXrq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Sep 2019 19:47:46 -0400
+Received: from mail-lj1-f170.google.com ([209.85.208.170]:45336 "EHLO
+        mail-lj1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390597AbfIMXrq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Sep 2019 19:47:46 -0400
+Received: by mail-lj1-f170.google.com with SMTP id q64so18117254ljb.12
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Sep 2019 16:47:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kQXCij7p1IOwTylOihi+RbfbQJGFM7gV75fK8wdtcXQ=;
-        b=WbGH3hIMsfDu5tdg1m4X92DF/CO84QQZVYbEmF7fSByah7d39ZASmEXtoS0oNbCTcy
-         L8bXZEIqp+tbYkEM8AoeOAbVl4rIyxP4iUjuLW5RDHQgVq3AIlLEMGXhqw7f3YRqeUmd
-         Z/xgHBy5wByoWTifTdtedc2zo6+9uuYIdAlO+R9+1h1U7l/rtK0BBjYrDQA31jb0Jg+G
-         LZh1lYRIkgizBtjJ6DJGXrq6jNKxCUHGpVcVEO2hn/z3W19bEIuLfnsGAjN0uU/J5Hue
-         HOvt9Y17Dehwp68k9sBlCMJjIm9rIsmx+N1Yg0wRL11C5pNPDsXpkzJWWDOXctj8OObF
-         2YYA==
+         :cc:content-transfer-encoding;
+        bh=ziesQ2JCtK1aH82OTLINI++lxExaH9Fu6JnbD2RfCHk=;
+        b=MayBhqoVv1PI9mgRcjE7m9lO3tBDrzHUfvopkTez10JN1ZFySU9s1S+xZ/WxSRLWnc
+         CojxxSyG9vBjrxTpTOvSJY/lKpo4cUxCMB3Ra7mqQ58Qs9JSB9D+YSRnYCk+UCkpVfat
+         urUC1VHUfFo6DiEN7eDGaOOKUkq/sYLG+zg5VsXd7VPgHuIgTPGYm/nz+HjfZMZn66SZ
+         4VngDlM1tr3BTosH4Nwi5gNMMgrCK16DonHBJChjwE3Q0E86IxqL5DdqriD3ejo1L48j
+         QHu8OCNDkOl+Uve+8LBw3g66duwo+3QXBAq/BLIIhscw2XuOaJKrndkfDLeIndeK7vf4
+         mHTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kQXCij7p1IOwTylOihi+RbfbQJGFM7gV75fK8wdtcXQ=;
-        b=eYc2e7cXL3Beptnzto3g/oAGkvIUc508aMdB8FLtXLF+uTH6T2XAaHOVAVBPjhq6kV
-         a66Ywps4pL/BWnI08DJqIfnWP6UBxJncBZRVjntAmGgzHmaguPedrW2OUHh39ux7uGst
-         hxgm+4hJ9tjYPoJivoEr3KJPU8aGJJEHGZw/6s//gV/S4kyPgJ5nqZdPs9SM4vg/U64l
-         ZCPcwJctJMEnkQcwL+9yl5Jv7x7xPyVl8noewDI/RzVQqiVFCMElU74l0NTQB45+ZOcT
-         OiDYzj6zcA9iJEfhFzrDgn9hgTCP4I94HOrJLx3t21P0O7xziGfe7iSPFEdkvuBik9cf
-         kuRg==
-X-Gm-Message-State: APjAAAUf/bmQIf4D7bGIqXdQGUFj9NJwizOPvzS5zQ3oQRgrasB5X5NT
-        ulMAx6s2pDybbmXJocboL9MUQ1ARjo4yc30cZKo=
-X-Google-Smtp-Source: APXvYqy3NoeI4WCIM8NJ7L90lX4Az/h7QHPNASX58paoVITibHgY+5jdjtJHi4/Iv3ZCKEHj/0jQLbrjknlpRwuDGds=
-X-Received: by 2002:a02:3786:: with SMTP id r128mr24282578jar.76.1568411531726;
- Fri, 13 Sep 2019 14:52:11 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ziesQ2JCtK1aH82OTLINI++lxExaH9Fu6JnbD2RfCHk=;
+        b=ptJNq+PIUtEBt4WShkSy50+xz06P9W/VQrTNAxXt8AbdeMX7Lof+Eq+LwZui8jhm3F
+         +ewnsbkUUyDx9Abcst0NCBhZkKphfbXWE/6j+vLj6ntPZjWhfA2uyj6agaqQq7oQrofU
+         O/+x9IV/P05KjJ3BPmvnfzyA+su9YMYYWihB9L4mnwjr5LoRj9zwhKVIKu5kAPE0+fC+
+         /8D4OvTkyzxJoqY0IJLddsxUAN/HlThVSWbMqpwMgNEpyUXg8kMfeRw/yEUkXoQA6XMp
+         9mmsvmFhzOJaZtsDh2Lm8TQ0RPzxs0Fh04eKs8Hrmq5UX7tPv8ZL5AiyYERS7rg3nG8k
+         5+Sg==
+X-Gm-Message-State: APjAAAVPK6UZHu2XocCjanZoI4SZFs/UhKIjCI6t9TalNk/k7JBfTNqF
+        jNetQp/5tSIKJvAXD+RGBFPHQOKSBvfZtgQ34w==
+X-Google-Smtp-Source: APXvYqyJivdHrP/qMgCUI3UdlrCUNgVgP4K/QPOzUh+KRUcwjy9e7UCWAM1ijRzjJcxPHgKrh6MN7/XOUhSzS7b/KY4=
+X-Received: by 2002:a2e:9012:: with SMTP id h18mr299326ljg.45.1568418463649;
+ Fri, 13 Sep 2019 16:47:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190913134634.GR20699@kadam> <CAKywueTGT9=G-uYAdK8VY4P2a4TC8PsOKfz78n8tc0rngMWc7Q@mail.gmail.com>
-In-Reply-To: <CAKywueTGT9=G-uYAdK8VY4P2a4TC8PsOKfz78n8tc0rngMWc7Q@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 13 Sep 2019 16:52:00 -0500
-Message-ID: <CAH2r5mtahgXfrKA2hyiDWBm9wVOh-QUv+Y=9Bn6s95zYxm6x8Q@mail.gmail.com>
-Subject: Re: [cifs:for-next 24/31] fs/cifs/smb2ops.c:4056 smb2_decrypt_offload()
- error: we previously assumed 'mid' could be null (see line 4045)
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>, kbuild@01.org,
-        kbuild-all@01.org, Steve French <stfrench@microsoft.com>
-Content-Type: multipart/mixed; boundary="00000000000035f1660592764452"
+References: <CAE78Er-YVBzqaf8jCBio_V_1J2kRiWZ_SH-HnHm7KG3t46=j6w@mail.gmail.com>
+ <CAH2r5mu446ssSPrACP8q859Cs0ynUMpJopH0t5qAsR=sGrByFA@mail.gmail.com>
+ <CAE78Er8KYhRts+zKNsP6_11ZVA0kaTrtjvZPhdLAkHqDXhKOWA@mail.gmail.com>
+ <87pnkh7jh2.fsf@suse.com> <CAE78Er_ea5mtp-6VxyNPzCSDuPym7cXcD3=Udcpv=jGo80XhZg@mail.gmail.com>
+In-Reply-To: <CAE78Er_ea5mtp-6VxyNPzCSDuPym7cXcD3=Udcpv=jGo80XhZg@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Fri, 13 Sep 2019 16:47:32 -0700
+Message-ID: <CAKywueT2mr1i3Y6iNQOzXEc1CePMozfvoJUz=TJAmbnskdofhw@mail.gmail.com>
+Subject: Re: Frequent reconnections / session startups?
+To:     James Wettenhall <james.wettenhall@monash.edu>
+Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000035f1660592764452
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi James,
 
-Fix attached.  Tentatively merged into cifs-2.6.git for-next pending
-review and the usual "buildbot" automated regression testing
+Thanks for providing this information.
 
-On Fri, Sep 13, 2019 at 12:09 PM Pavel Shilovsky via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
-> Yes, this is a bug.
->
-> Steve, let's move
->
-> +       mid->callback(mid);
-> +
-> +       cifs_mid_q_entry_release(mid);
->
-> under ELSE {} block above.
->
-> We should probably move
->
-> +       dw->server->lstrp =3D jiffies;
->
-> before we looking for a mid.
->
-> --
-> Best regards,
-> Pavel Shilovsky
->
-> =D0=BF=D1=82, 13 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 06:47, Dan=
- Carpenter <dan.carpenter@oracle.com>:
-> >
-> > tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
-> > head:   5fc321fb644fc787710353be11129edadd313f3a
-> > commit: a091c5f67c994d154e8faf95ab774644be2f4dd7 [24/31] smb3: allow pa=
-rallelizing decryption of reads
-> >
-> > If you fix the issue, kindly add following tag
-> > Reported-by: kbuild test robot <lkp@intel.com>
-> > Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> >
-> > New smatch warnings:
-> > fs/cifs/smb2ops.c:4056 smb2_decrypt_offload() error: we previously assu=
-med 'mid' could be null (see line 4045)
-> >
-> > git remote add cifs git://git.samba.org/sfrench/cifs-2.6.git
-> > git remote update cifs
-> > git checkout a091c5f67c994d154e8faf95ab774644be2f4dd7
-> > vim +/mid +4056 fs/cifs/smb2ops.c
-> >
-> > a091c5f67c994d Steve French 2019-09-07  4030  static void smb2_decrypt_=
-offload(struct work_struct *work)
-> > a091c5f67c994d Steve French 2019-09-07  4031  {
-> > a091c5f67c994d Steve French 2019-09-07  4032    struct smb2_decrypt_wor=
-k *dw =3D container_of(work,
-> > a091c5f67c994d Steve French 2019-09-07  4033                           =
- struct smb2_decrypt_work, decrypt);
-> > a091c5f67c994d Steve French 2019-09-07  4034    int i, rc;
-> > a091c5f67c994d Steve French 2019-09-07  4035    struct mid_q_entry *mid=
-;
-> > a091c5f67c994d Steve French 2019-09-07  4036
-> > a091c5f67c994d Steve French 2019-09-07  4037    rc =3D decrypt_raw_data=
-(dw->server, dw->buf, dw->server->vals->read_rsp_size,
-> > a091c5f67c994d Steve French 2019-09-07  4038                          d=
-w->ppages, dw->npages, dw->len);
-> > a091c5f67c994d Steve French 2019-09-07  4039    if (rc) {
-> > a091c5f67c994d Steve French 2019-09-07  4040            cifs_dbg(VFS, "=
-error decrypting rc=3D%d\n", rc);
-> > a091c5f67c994d Steve French 2019-09-07  4041            goto free_pages=
-;
-> > a091c5f67c994d Steve French 2019-09-07  4042    }
-> > a091c5f67c994d Steve French 2019-09-07  4043
-> > a091c5f67c994d Steve French 2019-09-07  4044    mid =3D smb2_find_mid(d=
-w->server, dw->buf);
-> > a091c5f67c994d Steve French 2019-09-07 @4045    if (mid =3D=3D NULL)
-> > a091c5f67c994d Steve French 2019-09-07  4046            cifs_dbg(FYI, "=
-mid not found\n");
-> >
-> > Return here?
-> >
-> > a091c5f67c994d Steve French 2019-09-07  4047    else {
-> > a091c5f67c994d Steve French 2019-09-07  4048            mid->decrypted =
-=3D true;
-> > a091c5f67c994d Steve French 2019-09-07  4049            rc =3D handle_r=
-ead_data(dw->server, mid, dw->buf,
-> > a091c5f67c994d Steve French 2019-09-07  4050                           =
-       dw->server->vals->read_rsp_size,
-> > a091c5f67c994d Steve French 2019-09-07  4051                           =
-       dw->ppages, dw->npages, dw->len);
-> > a091c5f67c994d Steve French 2019-09-07  4052    }
-> > a091c5f67c994d Steve French 2019-09-07  4053
-> > a091c5f67c994d Steve French 2019-09-07  4054    dw->server->lstrp =3D j=
-iffies;
-> > a091c5f67c994d Steve French 2019-09-07  4055
-> > a091c5f67c994d Steve French 2019-09-07 @4056    mid->callback(mid);
-> >                                                 ^^^^^^^^^^^^^
-> > Potential NULL derference.
-> >
-> > a091c5f67c994d Steve French 2019-09-07  4057
-> > a091c5f67c994d Steve French 2019-09-07  4058    cifs_mid_q_entry_releas=
-e(mid);
-> > a091c5f67c994d Steve French 2019-09-07  4059
-> > a091c5f67c994d Steve French 2019-09-07  4060  free_pages:
-> > a091c5f67c994d Steve French 2019-09-07  4061    for (i =3D dw->npages-1=
-; i >=3D 0; i--)
-> > a091c5f67c994d Steve French 2019-09-07  4062            put_page(dw->pp=
-ages[i]);
-> > a091c5f67c994d Steve French 2019-09-07  4063
-> > a091c5f67c994d Steve French 2019-09-07  4064    kfree(dw->ppages);
-> > a091c5f67c994d Steve French 2019-09-07  4065    cifs_small_buf_release(=
-dw->buf);
-> > a091c5f67c994d Steve French 2019-09-07  4066  }
-> >
-> > ---
-> > 0-DAY kernel test infrastructure                Open Source Technology =
-Center
-> > https://lists.01.org/pipermail/kbuild-all                   Intel Corpo=
-ration
->
+The 5.0 kernel has the known bug when handling cached root handle
+which may cause kernel to stuck like in your case.
 
+In order to work around the problem for you, please mount with
+"nohandlecache" mount option. This will turn off caching of the root
+handle in the CIFS module and the problematic code path won't be
+executed.
 
---=20
-Thanks,
+Please let us know if this solves the problem for you.
 
-Steve
+--
+Best regards,
+Pavel Shilovsky
 
---00000000000035f1660592764452
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-fix-potential-null-dereference-in-decrypt-offlo.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-fix-potential-null-dereference-in-decrypt-offlo.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_k0inpdcv0>
-X-Attachment-Id: f_k0inpdcv0
-
-RnJvbSA5YjZlY2YzMjQ5OWIzMjI1OWVhMzA2ZmMzZTE1MGNlMjMzN2E4YjdiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IEZyaSwgMTMgU2VwIDIwMTkgMTY6NDc6MzEgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiBmaXggcG90ZW50aWFsIG51bGwgZGVyZWZlcmVuY2UgaW4gZGVjcnlwdCBvZmZsb2FkCgpj
-b21taXQgYTA5MWM1ZjY3Yzk5ICgic21iMzogYWxsb3cgcGFyYWxsZWxpemluZyBkZWNyeXB0aW9u
-IG9mIHJlYWRzIikKaGFkIGEgcG90ZW50aWFsIG51bGwgZGVyZWZlcmVuY2UKClJlcG9ydGVkLWJ5
-OiBrYnVpbGQgdGVzdCByb2JvdCA8bGtwQGludGVsLmNvbT4KUmVwb3J0ZWQtYnk6IERhbiBDYXJw
-ZW50ZXIgPGRhbi5jYXJwZW50ZXJAb3JhY2xlLmNvbT4KU3VnZ2VzdGVkLWJ5OiBQYXZlbCBTaGls
-b3Zza3kgPHBzaGlsb3ZAbWljcm9zb2Z0LmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNo
-IDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvc21iMm9wcy5jIHwgOSArKyst
-LS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDYgZGVsZXRpb25zKC0pCgpk
-aWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIyb3BzLmMgYi9mcy9jaWZzL3NtYjJvcHMuYwppbmRleCA1
-Nzc2ZDdiMGE5N2UuLmVhZWQxODA2MTMxNCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIyb3BzLmMK
-KysrIGIvZnMvY2lmcy9zbWIyb3BzLmMKQEAgLTQwNTUsNiArNDA1NSw3IEBAIHN0YXRpYyB2b2lk
-IHNtYjJfZGVjcnlwdF9vZmZsb2FkKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykKIAkJZ290byBm
-cmVlX3BhZ2VzOwogCX0KIAorCWR3LT5zZXJ2ZXItPmxzdHJwID0gamlmZmllczsKIAltaWQgPSBz
-bWIyX2ZpbmRfbWlkKGR3LT5zZXJ2ZXIsIGR3LT5idWYpOwogCWlmIChtaWQgPT0gTlVMTCkKIAkJ
-Y2lmc19kYmcoRllJLCAibWlkIG5vdCBmb3VuZFxuIik7CkBAIC00MDYzLDE0ICs0MDY0LDEwIEBA
-IHN0YXRpYyB2b2lkIHNtYjJfZGVjcnlwdF9vZmZsb2FkKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29y
-aykKIAkJcmMgPSBoYW5kbGVfcmVhZF9kYXRhKGR3LT5zZXJ2ZXIsIG1pZCwgZHctPmJ1ZiwKIAkJ
-CQkgICAgICBkdy0+c2VydmVyLT52YWxzLT5yZWFkX3JzcF9zaXplLAogCQkJCSAgICAgIGR3LT5w
-cGFnZXMsIGR3LT5ucGFnZXMsIGR3LT5sZW4pOworCQltaWQtPmNhbGxiYWNrKG1pZCk7CisJCWNp
-ZnNfbWlkX3FfZW50cnlfcmVsZWFzZShtaWQpOwogCX0KIAotCWR3LT5zZXJ2ZXItPmxzdHJwID0g
-amlmZmllczsKLQotCW1pZC0+Y2FsbGJhY2sobWlkKTsKLQotCWNpZnNfbWlkX3FfZW50cnlfcmVs
-ZWFzZShtaWQpOwotCiBmcmVlX3BhZ2VzOgogCWZvciAoaSA9IGR3LT5ucGFnZXMtMTsgaSA+PSAw
-OyBpLS0pCiAJCXB1dF9wYWdlKGR3LT5wcGFnZXNbaV0pOwotLSAKMi4yMC4xCgo=
---00000000000035f1660592764452--
+=D0=B2=D1=82, 3 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 23:47, James =
+Wettenhall <james.wettenhall@monash.edu>:
+>
+> Hi Aur=C3=A9lien,
+>
+> The VMs become completely unresponsive, so we can't run commands in a
+> separate shell.
+>
+> I've included a stack trace below.
+>
+> I'm considering trying the cache=3Dloose mount option.
+>
+> Cheers,
+> James
+>
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.616360] INFO: task
+> dockerd:786 blocked for more than 120 seconds.
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.621073]       Not
+> tainted 5.0.0-25-generic #26~18.04.1-Ubuntu
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.625436] "echo 0 >
+> /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629464] dockerd
+> D    0   786      1 0x00000000
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629467] Call Trace:
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629477]  __schedule+0x2bd/0=
+x850
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629482]  ?
+> __switch_to_asm+0x35/0x70
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629484]  schedule+0x2c/0x70
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629485]
+> schedule_preempt_disabled+0xe/0x10
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629487]
+> __mutex_lock.isra.9+0x183/0x4e0
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629488]  ?
+> schedule_timeout+0x171/0x360
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629490]
+> __mutex_lock_slowpath+0x13/0x20
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629491]  ?
+> __mutex_lock_slowpath+0x13/0x20
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629492]  mutex_lock+0x2f/0x=
+40
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629528]
+> smb2_reconnect+0x106/0x7f0 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629531]  ? __switch_to+0x12=
+3/0x4e0
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629533]  ?
+> __switch_to_asm+0x35/0x70
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629537]  ?
+> __switch_to_asm+0x41/0x70
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629540]  ? wait_woken+0x80/=
+0x80
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629556]
+> smb2_plain_req_init+0x34/0x270 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629577]
+> SMB2_open_init+0x6d/0x730 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629595]
+> SMB2_open+0x148/0x4f0 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629609]  ?
+> SMB2_open+0x148/0x4f0 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629624]
+> open_shroot+0x16c/0x210 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629637]  ?
+> open_shroot+0x16c/0x210 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629654]
+> smb2_query_path_info+0x11c/0x1b0 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629656]  ? _cond_resched+0x=
+19/0x40
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629660]  ?
+> kmem_cache_alloc_trace+0x151/0x1c0
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629673]
+> cifs_get_inode_info+0x3e3/0xb70 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629685]  ?
+> build_path_from_dentry_optional_prefix+0x103/0x430 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629699]
+> cifs_revalidate_dentry_attr+0xe9/0x3d0 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629712]
+> cifs_getattr+0x5d/0x1a0 [cifs]
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629715]  ?
+> common_perm_cond+0x4c/0x70
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629719]
+> vfs_getattr_nosec+0x73/0x90
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629720]  vfs_getattr+0x36/0=
+x40
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629721]  vfs_statx+0x8d/0xe=
+0
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629723]
+> __do_sys_newlstat+0x3d/0x70
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629725]
+> __x64_sys_newlstat+0x16/0x20
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629729]  do_syscall_64+0x5a=
+/0x120
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629731]
+> entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629734] RIP: 0033:0x55fd5a4=
+b1e40
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629739] Code: Bad RIP value=
+.
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629741] RSP:
+> 002b:000000c421af6948 EFLAGS: 00000212 ORIG_RAX: 0000000000000006
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629742] RAX:
+> ffffffffffffffda RBX: 0000000000000000 RCX: 000055fd5a4b1e40
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629743] RDX:
+> 0000000000000000 RSI: 000000c421491488 RDI: 000000c4227a4060
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629743] RBP:
+> 000000c421af69b0 R08: 0000000000000000 R09: 0000000000000000
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629744] R10:
+> 0000000000000000 R11: 0000000000000212 R12: ffffffffffffffff
+> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629745] R13:
+> 0000000000000002 R14: 0000000000000001 R15: 0000000000000055
