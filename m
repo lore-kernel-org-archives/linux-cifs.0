@@ -1,200 +1,261 @@
-Return-Path: <SRS0=frs6=XI=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Inbq=XJ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C2EC49ED7
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Sep 2019 23:47:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 442E0C49ED7
+	for <linux-cifs@archiver.kernel.org>; Sat, 14 Sep 2019 00:02:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 309212089F
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Sep 2019 23:47:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07AFC20692
+	for <linux-cifs@archiver.kernel.org>; Sat, 14 Sep 2019 00:02:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MayBhqoV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l6Jhb1Ue"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390600AbfIMXrq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Sep 2019 19:47:46 -0400
-Received: from mail-lj1-f170.google.com ([209.85.208.170]:45336 "EHLO
-        mail-lj1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390597AbfIMXrq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Sep 2019 19:47:46 -0400
-Received: by mail-lj1-f170.google.com with SMTP id q64so18117254ljb.12
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Sep 2019 16:47:44 -0700 (PDT)
+        id S2388508AbfINACf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Sep 2019 20:02:35 -0400
+Received: from mail-pg1-f174.google.com ([209.85.215.174]:35733 "EHLO
+        mail-pg1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388019AbfINACf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Sep 2019 20:02:35 -0400
+Received: by mail-pg1-f174.google.com with SMTP id n4so16099538pgv.2
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Sep 2019 17:02:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=ziesQ2JCtK1aH82OTLINI++lxExaH9Fu6JnbD2RfCHk=;
-        b=MayBhqoVv1PI9mgRcjE7m9lO3tBDrzHUfvopkTez10JN1ZFySU9s1S+xZ/WxSRLWnc
-         CojxxSyG9vBjrxTpTOvSJY/lKpo4cUxCMB3Ra7mqQ58Qs9JSB9D+YSRnYCk+UCkpVfat
-         urUC1VHUfFo6DiEN7eDGaOOKUkq/sYLG+zg5VsXd7VPgHuIgTPGYm/nz+HjfZMZn66SZ
-         4VngDlM1tr3BTosH4Nwi5gNMMgrCK16DonHBJChjwE3Q0E86IxqL5DdqriD3ejo1L48j
-         QHu8OCNDkOl+Uve+8LBw3g66duwo+3QXBAq/BLIIhscw2XuOaJKrndkfDLeIndeK7vf4
-         mHTg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=ZceXkaFbLfQDK/lAWSFZdIYxWI4w4Ch/WDpeA1zCMLQ=;
+        b=l6Jhb1UedQAarHtqumJj5TeTRm71/UkPmzEad+oH+gM7Ek4qLQvlSQq9ZaJ+dnstQu
+         Gwko0MIwNWccAp9nVELRGbAPCf3hKYANQ6uDTDC3FH5CAA4pyvmTITWrhk0RhJzT4szn
+         dNFj5Tk/fz5UJwoDaAEYRFpWJ1QGtU1fJqGUgJxEgtUmWS+HLVfA2b7F7lNRtrcnrTG7
+         VFF6Y1UEogDGsgxxPdUNEZl9rRBUwprakAEYBOR5sAlZzsVcItvQoDLUPxnO0OX3pPzv
+         S4l0dZR13pdEcLkydoAKYM+PpUohin7ko2DpOd9g7cqILqAsjn1pgo9cH2yXthuhDwrX
+         mHgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ziesQ2JCtK1aH82OTLINI++lxExaH9Fu6JnbD2RfCHk=;
-        b=ptJNq+PIUtEBt4WShkSy50+xz06P9W/VQrTNAxXt8AbdeMX7Lof+Eq+LwZui8jhm3F
-         +ewnsbkUUyDx9Abcst0NCBhZkKphfbXWE/6j+vLj6ntPZjWhfA2uyj6agaqQq7oQrofU
-         O/+x9IV/P05KjJ3BPmvnfzyA+su9YMYYWihB9L4mnwjr5LoRj9zwhKVIKu5kAPE0+fC+
-         /8D4OvTkyzxJoqY0IJLddsxUAN/HlThVSWbMqpwMgNEpyUXg8kMfeRw/yEUkXoQA6XMp
-         9mmsvmFhzOJaZtsDh2Lm8TQ0RPzxs0Fh04eKs8Hrmq5UX7tPv8ZL5AiyYERS7rg3nG8k
-         5+Sg==
-X-Gm-Message-State: APjAAAVPK6UZHu2XocCjanZoI4SZFs/UhKIjCI6t9TalNk/k7JBfTNqF
-        jNetQp/5tSIKJvAXD+RGBFPHQOKSBvfZtgQ34w==
-X-Google-Smtp-Source: APXvYqyJivdHrP/qMgCUI3UdlrCUNgVgP4K/QPOzUh+KRUcwjy9e7UCWAM1ijRzjJcxPHgKrh6MN7/XOUhSzS7b/KY4=
-X-Received: by 2002:a2e:9012:: with SMTP id h18mr299326ljg.45.1568418463649;
- Fri, 13 Sep 2019 16:47:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAE78Er-YVBzqaf8jCBio_V_1J2kRiWZ_SH-HnHm7KG3t46=j6w@mail.gmail.com>
- <CAH2r5mu446ssSPrACP8q859Cs0ynUMpJopH0t5qAsR=sGrByFA@mail.gmail.com>
- <CAE78Er8KYhRts+zKNsP6_11ZVA0kaTrtjvZPhdLAkHqDXhKOWA@mail.gmail.com>
- <87pnkh7jh2.fsf@suse.com> <CAE78Er_ea5mtp-6VxyNPzCSDuPym7cXcD3=Udcpv=jGo80XhZg@mail.gmail.com>
-In-Reply-To: <CAE78Er_ea5mtp-6VxyNPzCSDuPym7cXcD3=Udcpv=jGo80XhZg@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Fri, 13 Sep 2019 16:47:32 -0700
-Message-ID: <CAKywueT2mr1i3Y6iNQOzXEc1CePMozfvoJUz=TJAmbnskdofhw@mail.gmail.com>
-Subject: Re: Frequent reconnections / session startups?
-To:     James Wettenhall <james.wettenhall@monash.edu>
-Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=ZceXkaFbLfQDK/lAWSFZdIYxWI4w4Ch/WDpeA1zCMLQ=;
+        b=hcrgNOErOsKFQ9DVTAo2Fv/cc70haKQC0nCcqymCQtQ/YIWNblpm2sl7VeKw18kqLh
+         UHExcKKguhxY7D1v+KzO1AMHBiBkLjYi14gDtK/KDAgFngrPhpNSoOIoqaUb4xslU1t2
+         +x0i6c3rTSo1Y5GdO7n8jTGhCLBBk0HiJZzHMrASK8WVZ2le1OGddf1iFurpYK6vEhc3
+         5iSuN5locp4Leptb5nJuEtN9yDvRwgI9X2HXXt00IyisQRC0hCCINQ/MXArIjuy1yH5w
+         SEVOZRs+U+8ilpSWXy5yahoJbF7T6BaqFe22gTaB68bGCWvfyblnsYcY299TmrSgHSFy
+         MAHA==
+X-Gm-Message-State: APjAAAWjB7Oac97fZy0thNFvLv48BX/kBVn9C9oQK5xQjElB2HBo+SjN
+        AVwTP4UEAx67zgM8+dLk4tM=
+X-Google-Smtp-Source: APXvYqzL5w3l+xALAnkJo786Y++rfz3UjVuzyVBEyDv3wux+ju1cPsFH2DF91QRafri+hVOS8l1A7g==
+X-Received: by 2002:a17:90a:d804:: with SMTP id a4mr8229339pjv.43.1568419354331;
+        Fri, 13 Sep 2019 17:02:34 -0700 (PDT)
+Received: from localhost ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id u5sm30540276pfl.25.2019.09.13.17.02.32
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 13 Sep 2019 17:02:33 -0700 (PDT)
+Date:   Sat, 14 Sep 2019 08:02:25 +0800
+From:   Murphy Zhou <jencce.kernel@gmail.com>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Murphy Zhou <jencce.kernel@gmail.com>,
         Steve French <smfrench@gmail.com>,
+        =?utf-8?B?QXVyw6lsaWVu?= Aptel <aaptel@suse.com>,
         CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: Are the xfstests exclusion files on wiki.samba.org up to date?
+Message-ID: <20190914000225.raez7vcvl5wkhn3z@XZHOUW.usersys.redhat.com>
+References: <20190909104127.nsdxptzxcf5a6b72@XZHOUW.usersys.redhat.com>
+ <87mufdiw0u.fsf@suse.com>
+ <CAH2r5mt9etVvg5jFk5jXRV6FadGz=qcqgG+JBhojKwVKmvRPZw@mail.gmail.com>
+ <20190912084914.4hwfptpaqdod6f6k@XZHOUW.usersys.redhat.com>
+ <CAN05THSw6fCjjDjPmNppRTpogvREQwLy_2BCOZiU+R-_Gj+agQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAN05THSw6fCjjDjPmNppRTpogvREQwLy_2BCOZiU+R-_Gj+agQ@mail.gmail.com>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi James,
+On Thu, Sep 12, 2019 at 07:06:52PM +1000, ronnie sahlberg wrote:
+> On Thu, Sep 12, 2019 at 6:50 PM Murphy Zhou <jencce.kernel@gmail.com> wrote:
+> >
+> > On Mon, Sep 09, 2019 at 06:23:10PM -0500, Steve French wrote:
+> > > We have done a lot of work (with Ronnie, Aurelien, Pavel and others)
+> > > on xfstest automation.
+> >
+> > Kudos!
+> >
+> > >
+> > > As you might guess it is frustrating for two reasons:
+> > > 1) updated xfstests can be flaky (as the tests themselves are updated,
+> > > they add subtle required features, or regress from time to time)
+> > > 2) test automation can run into resource constraints (VMs trying to
+> > > run tests with less memory than might be optimal - especially those
+> > > run against Samba with "VMs inside VMs").
+> > >
+> > > But the good news is that we have VERY good data on which tests pass
+> > > to various servers (just as noted, need to update the external pages)
+> > > and we should have even more data as we go through two weeks of SMB3
+> > > testing events in late September.
+> > >
+> > > In general we want to test against all typical servers and have test
+> > > targets setup for
+> > >  - Samba (reasonably current stable) on ext4/xfs and Samba with btrfs
+> > > (which has various optional extensions enabled in the server)
+> > >  - Samba with POSIX Extensions
+> > >  - Windows (and against both NTFS and REFS server file system)
+> > > - Azure (Cloud0
+> >
+> > Thanks for sharing this!
+> >
+> > Besides server type, server configuration options and client mount
+> > options also make this matrix even bigger..
+> >
+> > How that is handled in the buildbot ?
+> 
+> We have several different targets, which maps to the local.config for
+> xfstests so for every single test we run
+> we also specify the different targets to run that for.
+> 
+> Here is an example:
+> all_tests = [
+>         [ "cifs/100", "smb3azureseal"],
+>         [ "cifs/101", "smb3multiuser"],
+>         [ "generic/001", "smb3sign", "smb3"],
+>         [ "generic/002", "smb3", "smb3sign", "smb21", "smb3samba"],
+>         [ "generic/005", "smb3", "smb21", "smb3samba", "smb3sambabtrfs"],
+>         [ "generic/006", "smb3"],
+>         [ "generic/007", "smb3"],
+>         [ "generic/010", "smb3"],
+>         [ "generic/011", "smb3"],
+>         [ "generic/013", "smb3samba"],
+>         [ "generic/014", "smb3"],
+>         [ "generic/020", "smb3samba"],
+>         [ "generic/023", "smb3samba"],
+>         [ "generic/024", "smb3", "smb3samba"],
+>         [ "generic/028", "smb3", "smb3samba"],
+> ...
+> 
+> 
+> The first argument is which xfstest to run and the remainder of the
+> arguments are a list of which local.config.* files to use.
+> That way we can run a test against different servers and also
+> different configurations.
 
-Thanks for providing this information.
+This is smart. :)
 
-The 5.0 kernel has the known bug when handling cached root handle
-which may cause kernel to stuck like in your case.
+> I try to keep the target names meaningful, so
+> 
+> "smb3" just means a basic smb3   windows 2016 server running in a vm
+> "smb3samba" is just a generic smb3 server with samba.
+> etc etc.
+> 
+> 
+> We started doing this upstream about a year ago which is when I
+> started setting it up
+> and now I am honest but since we do this for every pull request we
+> send to linus,
+> we have SIGNIFICANTLY increased the quality of cifs.ko.
 
-In order to work around the problem for you, please mount with
-"nohandlecache" mount option. This will turn off caching of the root
-handle in the CIFS module and the problematic code path won't be
-executed.
+/Thumbs up!
 
-Please let us know if this solves the problem for you.
+> 
+> We run quite a lot of tests nowadays and I always try to remind Steve
+> to "please put a link to the buildbot result in the pull request"
+> to bring awareness to our buildbot.
+> 
+> For upstream, here is the most recent test:
+> http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/249
+> 
+> cifs-testing is the most generic test target. We also have specific
+> targets that are just for Azure, and other targets, but the aim is
+> that the canonical cifs-target tests will all pass before we pass a
+> pull request onto linus.
+> 
+> 
+> Please contact me directly if you want more info about the buildbot. I
+> have one setup internally at rh too that runs many, but not all, the
+> tests we run upstream.
 
---
-Best regards,
-Pavel Shilovsky
+Sure! Have replied to you. Thank you very much for sharing!
 
-=D0=B2=D1=82, 3 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 23:47, James =
-Wettenhall <james.wettenhall@monash.edu>:
->
-> Hi Aur=C3=A9lien,
->
-> The VMs become completely unresponsive, so we can't run commands in a
-> separate shell.
->
-> I've included a stack trace below.
->
-> I'm considering trying the cache=3Dloose mount option.
->
-> Cheers,
-> James
->
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.616360] INFO: task
-> dockerd:786 blocked for more than 120 seconds.
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.621073]       Not
-> tainted 5.0.0-25-generic #26~18.04.1-Ubuntu
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.625436] "echo 0 >
-> /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629464] dockerd
-> D    0   786      1 0x00000000
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629467] Call Trace:
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629477]  __schedule+0x2bd/0=
-x850
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629482]  ?
-> __switch_to_asm+0x35/0x70
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629484]  schedule+0x2c/0x70
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629485]
-> schedule_preempt_disabled+0xe/0x10
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629487]
-> __mutex_lock.isra.9+0x183/0x4e0
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629488]  ?
-> schedule_timeout+0x171/0x360
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629490]
-> __mutex_lock_slowpath+0x13/0x20
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629491]  ?
-> __mutex_lock_slowpath+0x13/0x20
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629492]  mutex_lock+0x2f/0x=
-40
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629528]
-> smb2_reconnect+0x106/0x7f0 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629531]  ? __switch_to+0x12=
-3/0x4e0
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629533]  ?
-> __switch_to_asm+0x35/0x70
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629537]  ?
-> __switch_to_asm+0x41/0x70
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629540]  ? wait_woken+0x80/=
-0x80
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629556]
-> smb2_plain_req_init+0x34/0x270 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629577]
-> SMB2_open_init+0x6d/0x730 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629595]
-> SMB2_open+0x148/0x4f0 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629609]  ?
-> SMB2_open+0x148/0x4f0 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629624]
-> open_shroot+0x16c/0x210 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629637]  ?
-> open_shroot+0x16c/0x210 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629654]
-> smb2_query_path_info+0x11c/0x1b0 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629656]  ? _cond_resched+0x=
-19/0x40
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629660]  ?
-> kmem_cache_alloc_trace+0x151/0x1c0
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629673]
-> cifs_get_inode_info+0x3e3/0xb70 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629685]  ?
-> build_path_from_dentry_optional_prefix+0x103/0x430 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629699]
-> cifs_revalidate_dentry_attr+0xe9/0x3d0 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629712]
-> cifs_getattr+0x5d/0x1a0 [cifs]
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629715]  ?
-> common_perm_cond+0x4c/0x70
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629719]
-> vfs_getattr_nosec+0x73/0x90
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629720]  vfs_getattr+0x36/0=
-x40
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629721]  vfs_statx+0x8d/0xe=
-0
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629723]
-> __do_sys_newlstat+0x3d/0x70
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629725]
-> __x64_sys_newlstat+0x16/0x20
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629729]  do_syscall_64+0x5a=
-/0x120
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629731]
-> entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629734] RIP: 0033:0x55fd5a4=
-b1e40
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629739] Code: Bad RIP value=
-.
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629741] RSP:
-> 002b:000000c421af6948 EFLAGS: 00000212 ORIG_RAX: 0000000000000006
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629742] RAX:
-> ffffffffffffffda RBX: 0000000000000000 RCX: 000055fd5a4b1e40
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629743] RDX:
-> 0000000000000000 RSI: 000000c421491488 RDI: 000000c4227a4060
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629743] RBP:
-> 000000c421af69b0 R08: 0000000000000000 R09: 0000000000000000
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629744] R10:
-> 0000000000000000 R11: 0000000000000212 R12: ffffffffffffffff
-> Sep  4 13:36:36 prod-worker-1a kernel: [ 3384.629745] R13:
-> 0000000000000002 R14: 0000000000000001 R15: 0000000000000055
+If anybody resting cifs or I know that the expected setup and result of
+every tests for you developers, it will save much time of investigation
+and report false alarms.
+
+After several months working on cifs, I've got a feeling that cifs is
+much different from other Linux filesystems. Maybe because of Windows
+or the SMB protocols. I'm wondering that xfstests which is a typical
+testsuite for Unix/Linux filesystems, maybe is not that suitable for
+cifs. I agree with Steve that there are hundreds of tests suitable.
+If, only if, :) if we could know how MS testing NTFS or SMB protocols,
+would that help or more suitable?
+
+
+Thanks!
+Murphy
+
+
+> Any help to maintain and expand the tests are super welcome.
+> 
+> 
+> Rant-off
+> ronnie sahlberg
+> 
+> >
+> > >
+> > > But would really like to add test targets for other common servers and
+> > > in a perfect world would like to be able to have external test
+> > > automation pull our trees periodically to run these (similar to what
+> > > is done for the six targets above):
+> > >   - Macs
+> > >   - NetApp
+> > > (and any others of interest to the community)
+> > >
+> > > Obviously xfstest has a few hundred tests which only make sense for
+> > > local file systems with block devices, but there are hundreds of
+> > > xfstests of value, and most should run on cifs.ko and we are working
+> > > through them but already have a very good set running.
+> >
+> > Agree!  Thanks!
+> >
+> > Murphy
+> >
+> > >
+> > > On Mon, Sep 9, 2019 at 5:50 PM Aurélien Aptel <aaptel@suse.com> wrote:
+> > > >
+> > > > "Murphy Zhou" <jencce.kernel@gmail.com> writes:
+> > > > > As $subject. Is this wiki being maintained ?
+> > > > >
+> > > > > Looks like the last update was in January 2019.
+> > > > >
+> > > > > https://wiki.samba.org/index.php/Xfstesting-cifs#Exclusion_files
+> > > >
+> > > > We have a buildbot running xfstests relatively often here
+> > > >
+> > > > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/
+> > > >
+> > > > Each group has slightly different tests run, you can see which one gets
+> > > > run by clicking on a build:
+> > > >
+> > > > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/249
+> > > >
+> > > > Overall xfstests+cifs is very finicky and frustrating to get working
+> > > > reliably. Not to mention long. So good luck :)
+> > > >
+> > > > Cheers,
+> > > > --
+> > > > Aurélien Aptel / SUSE Labs Samba Team
+> > > > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> > > > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
+> > > > GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
+> > >
+> > >
+> > >
+> > > --
+> > > Thanks,
+> > >
+> > > Steve
