@@ -2,158 +2,146 @@ Return-Path: <SRS0=fTzl=XL=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE51C4CEC4
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Sep 2019 03:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52996C49ED7
+	for <linux-cifs@archiver.kernel.org>; Mon, 16 Sep 2019 08:47:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A375214AF
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Sep 2019 03:42:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22F69214AF
+	for <linux-cifs@archiver.kernel.org>; Mon, 16 Sep 2019 08:47:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fu7GVOWP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LPheMWPf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728808AbfIPDmB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 15 Sep 2019 23:42:01 -0400
-Received: from mail-io1-f54.google.com ([209.85.166.54]:38015 "EHLO
-        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728295AbfIPDmB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 15 Sep 2019 23:42:01 -0400
-Received: by mail-io1-f54.google.com with SMTP id k5so50176644iol.5
-        for <linux-cifs@vger.kernel.org>; Sun, 15 Sep 2019 20:41:59 -0700 (PDT)
+        id S1726604AbfIPIra (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 16 Sep 2019 04:47:30 -0400
+Received: from mail-pg1-f171.google.com ([209.85.215.171]:45250 "EHLO
+        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726055AbfIPIra (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 16 Sep 2019 04:47:30 -0400
+Received: by mail-pg1-f171.google.com with SMTP id 4so19401445pgm.12;
+        Mon, 16 Sep 2019 01:47:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=uhrclg99FtPrREsCN0Bh1kEhIWWOCZyDK+/CFOr8kkA=;
-        b=fu7GVOWPjKjJS3qCfCUMqFhxMrMEw52pm2Qnf9OVsOYZh7mxpeVkUiJxkP0EpGQMw6
-         tonPYgzxixY6iQRV+8uBwQnlntfhizuLIrmbbnaRem6dgDCwwt//vBYGukQemHDm5418
-         Ghn4u0ftoazil3qma55I8GQq/VtAOaAe+XNujYn69XaABZWtX1GGogAxTWGqeYMWpE0n
-         JdY6Ov8vir4fCdQ3wzbEo1pv80l8wIYlZmTNqDo+/hsrjorAwrM2c1Wdu6wA4+I4hXCM
-         PlQOO4E7QW8AgDXMEnY9SIu5HWlXstvdXZg3YBezdev58ai6na+G4Q43dNMPZrvQHGtt
-         DKrQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Gyn3btCz9cNXYEqkvH7pmaZl3Kq7Fu1fE9/8V04nDY4=;
+        b=LPheMWPfWx/BFOboUl96lKkaxRdmSNiIHB5ABSlQfLq60whuuTvqc6V5F1uMOiwDiS
+         LsmhNm5PiuFje1CXtYBgTvXrZvKtm4M7n6ojX1mtdFYw3hIrFC+0iaMmCEDQ24AetR24
+         M/Ij6SpCLwyrWW1IA9V0tmkf97g4MGYU/Taa4IGg1mA7oFpmqd/lrYGPWgmZtMEbxKsA
+         oDOxtoHqOl2TSvQS8s/yRnCMSmey9vjhLxnBWlZCtn9SHFgdoaHCLRBWMbfvMJ0moSr6
+         zuZUxYtuWKlxaTCxqg2f6gw5zt9uD92Q1TIokcAhDMffB7NBnL2du4UpbrT9b2EutcMW
+         5sDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=uhrclg99FtPrREsCN0Bh1kEhIWWOCZyDK+/CFOr8kkA=;
-        b=K/WZrj84q5NUsGNVV/b1ybGMofuImmSlVZsgvj2pnl6kqjc8SVoe1A6e8QGPIvUxRK
-         4GTH9HQI8Y05meyPgAqTdEGtRfvXnup+uXqUlUi5f/ZrpQmm6QDuTAv0ZeAOb7PbrlIp
-         L5V/VS8GhiGn6R+hKWJhNbN2pUjHAgDSdYG7Xv2ELqXbTNexgFNpUgo/SspMgAQ6eus6
-         Pu9TocR5eOB7t3eyJT0lUoIoAuLwhWEtK36h9fpPPCHStQ0g29rls5EJx1pI7IlLDcQS
-         QedAwPGPuBJTOmmcMl0dlcKx8PFrfX9tvoWgS5tsx20Jt7s8EbXSUxnxLR8nRZ/ThpfI
-         2FPA==
-X-Gm-Message-State: APjAAAU8w0xzIqau3Wffmud1RDqUFRrs8it7IYfIZP2FwBm5/cH5PxVa
-        oHVSP9mfMJEG9Ame4sxv+es7ufkB+vz7xpBt9m1i0Wpv
-X-Google-Smtp-Source: APXvYqxfPI2aOUmjiknkpWVbntJNoNhDjHYpczQqnRIuDtAJMcYAh98McomIpf2IsjOywd69hxicmXyHQnBfoZbEgPw=
-X-Received: by 2002:a6b:c38f:: with SMTP id t137mr14717725iof.137.1568605318935;
- Sun, 15 Sep 2019 20:41:58 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Gyn3btCz9cNXYEqkvH7pmaZl3Kq7Fu1fE9/8V04nDY4=;
+        b=ZBsmFomHIzusqh4eeipEbo98ULJiYzW8x4kpeBozTAQkSiGy3xVj4AtkX8ABgi+Scl
+         K//PJdB3P3eFB0n6i8I06azCpa4NhwBIF/Rm4+txuOAAnMmF9HMahPz7FsFAep0ROt5q
+         MXWe6YC2tB4aRJ5gb03Nmd5onN2z/pcZPU9NivezaBfgnYFAdKQG7Itc9SJq5FJYxYfQ
+         4xFPLYJKLtAcELENZ9llfAwL4yVdXcWT6pyKrdg7DpAaGkLDipxhBjJjpvUTLTCfWVvt
+         66vWXkX3bJQ/2qi576Wrdrk2J26ifQmAoFVTg0DNJnsi5k8xx7B9JgAOM2XRbfWZNGgm
+         f1ww==
+X-Gm-Message-State: APjAAAUgzboT5/I/In0ucjiho2vm/kn8f2TdR+GRCgtONnqTZu5oLwtC
+        EEcV1n3iavwiX75fFisUYtT/NFd2
+X-Google-Smtp-Source: APXvYqxQ7x5j3ArgClajmu/ymyOGy1G0n52CRk9oWIfvxSRpUkvFTHQvzef6b61uyH97KPLlfAWK1A==
+X-Received: by 2002:a62:8209:: with SMTP id w9mr32821817pfd.112.1568623649481;
+        Mon, 16 Sep 2019 01:47:29 -0700 (PDT)
+Received: from localhost ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id 127sm4736675pfc.115.2019.09.16.01.47.27
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 16 Sep 2019 01:47:28 -0700 (PDT)
+Date:   Mon, 16 Sep 2019 16:47:20 +0800
+From:   Murphy Zhou <jencce.kernel@gmail.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     Murphy Zhou <jencce.kernel@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>, amir73il@gmail.com,
+        fstests@vger.kernel.org
+Subject: Re: seek sanity check failures
+Message-ID: <20190916084720.l4ln6l3tv36aqbja@XZHOUW.usersys.redhat.com>
+References: <20190915020810.jy5pxjtk7buenmqk@XZHOUW.usersys.redhat.com>
+ <CAH2r5muncmiTKBuaYEie6L7PeXmQ-MjKsBy9WrET4v85f36=qA@mail.gmail.com>
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 15 Sep 2019 22:41:47 -0500
-Message-ID: <CAH2r5msvi8_+yaoJbEo0a-T46B+L84fV9Rai5p30Ny+RSsyNiA@mail.gmail.com>
-Subject: [PATCH][SMB3] Add worker function for smb3 change notify
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000d42b480592a362e8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAH2r5muncmiTKBuaYEie6L7PeXmQ-MjKsBy9WrET4v85f36=qA@mail.gmail.com>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000d42b480592a362e8
-Content-Type: text/plain; charset="UTF-8"
+On Sat, Sep 14, 2019 at 11:11:49PM -0500, Steve French wrote:
+> Test 285 and 490 broke when xfstests were updated on the buildbot, and
+> are temporarily deleted (commented out in the buildbot script).  We
+> had a difficult choice - update xfstests and add 10 new tests but
+> disable 3 tests which broke with updated tests, or not add the 10
+> tests by keeping running last year's old xfstest test suite.
+> 
+> Ronnie and I did some investigation of why 285 and 490 failed and any
+> additional data would help - since we both got distracted with other
+> features and fixes
 
-Fairly trivial
+In Apr 2019, Amir updated seek_sanity_check:
 
+(xfstests commit 34081087748)
 
+pwrite a file, then double the filesize by ftruncate, then SEEK_HOLE.
+If SEEK_HOLE returns EOF, and fstype is in this list:
 
--- 
-Thanks,
++       btrfs|ext4|xfs|ceph|cifs|f2fs|gfs2|nfs*|ocfs2|tmpfs)
 
-Steve
+It's the default behavior and it's NOT allowed. Test prints error and exit.
 
---000000000000d42b480592a362e8
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-add-missing-worker-function-for-SMB3-change-not.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-add-missing-worker-function-for-SMB3-change-not.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_k0lv3jx10>
-X-Attachment-Id: f_k0lv3jx10
+If cifs is removed from above list, all seek sanity check tests pass on cifs.
 
-RnJvbSA3MjdhYzA2Y2M3MDA3YWZlYTcyOWJmZjA0Y2U0NGY1NDk5NWE4NzQzIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgMTUgU2VwIDIwMTkgMjI6Mzg6NTIgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiBhZGQgbWlzc2luZyB3b3JrZXIgZnVuY3Rpb24gZm9yIFNNQjMgY2hhbmdlIG5vdGlmeQoK
-U01CMyBjaGFuZ2Ugbm90aWZ5IGlzIGltcG9ydGFudCB0byBhbGxvdyBhcHBsaWNhdGlvbnMgdG8g
-d2FpdApvbiBkaXJlY3RvcnkgY2hhbmdlIGV2ZW50cyBvZiBkaWZmZXJlbnQgdHlwZXMgKGUuZy4g
-YWRkaW5nCmFuZCBkZWxldGluZyBmaWxlcyBmcm9tIG90aGVycyBzeXN0ZW1zKS4gQWRkIHdvcmtl
-ciBmdW5jdGlvbnMKZm9yIHRoaXMuCgpBY2tlZC1ieTogQXVyZWxpZW4gQXB0ZWwgPGFhcHRlbEBz
-dXNlLmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQu
-Y29tPgotLS0KIGZzL2NpZnMvc21iMnBkdS5jIHwgODUgKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysKIGZzL2NpZnMvdHJhY2UuaCAgIHwgIDMgKysKIDIgZmls
-ZXMgY2hhbmdlZCwgODggaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iMnBk
-dS5jIGIvZnMvY2lmcy9zbWIycGR1LmMKaW5kZXggY2U2NDdjZmRjMDRmLi44NzA2NmYxYWYxMmMg
-MTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBkdS5jCisrKyBiL2ZzL2NpZnMvc21iMnBkdS5jCkBA
-IC0zMTc1LDYgKzMxNzUsOTEgQEAgU01CMl9nZXRfc3J2X251bShjb25zdCB1bnNpZ25lZCBpbnQg
-eGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCQkJICAodm9pZCAqKikmdW5pcXVlaWQsIE5V
-TEwpOwogfQogCisvKgorICogQ0hBTkdFX05PVElGWSBSZXF1ZXN0IGlzIHNlbnQgdG8gZ2V0IG5v
-dGlmaWNhdGlvbnMgb24gY2hhbmdlcyB0byBhIGRpcmVjdG9yeQorICogU2VlIE1TLVNNQjIgMi4y
-LjM1IGFuZCAyLjIuMzYKKyAqLworCitpbnQKK1NNQjJfbm90aWZ5X2luaXQoY29uc3QgdW5zaWdu
-ZWQgaW50IHhpZCwgc3RydWN0IHNtYl9ycXN0ICpycXN0LAorCQlzdHJ1Y3QgY2lmc190Y29uICp0
-Y29uLCB1NjQgcGVyc2lzdGVudF9maWQsIHU2NCB2b2xhdGlsZV9maWQsCisJCXUzMiBjb21wbGV0
-aW9uX2ZpbHRlciwgYm9vbCB3YXRjaF90cmVlKQoreworCXN0cnVjdCBzbWIyX2NoYW5nZV9ub3Rp
-ZnlfcmVxICpyZXE7CisJc3RydWN0IGt2ZWMgKmlvdiA9IHJxc3QtPnJxX2lvdjsKKwl1bnNpZ25l
-ZCBpbnQgdG90YWxfbGVuOworCWludCByYzsKKworCXJjID0gc21iMl9wbGFpbl9yZXFfaW5pdChT
-TUIyX0NIQU5HRV9OT1RJRlksIHRjb24sICh2b2lkICoqKSAmcmVxLCAmdG90YWxfbGVuKTsKKwlp
-ZiAocmMpCisJCXJldHVybiByYzsKKworCXJlcS0+UGVyc2lzdGVudEZpbGVJZCA9IHBlcnNpc3Rl
-bnRfZmlkOworCXJlcS0+Vm9sYXRpbGVGaWxlSWQgPSB2b2xhdGlsZV9maWQ7CisJcmVxLT5PdXRw
-dXRCdWZmZXJMZW5ndGggPSBTTUIyX01BWF9CVUZGRVJfU0laRSAtIE1BWF9TTUIyX0hEUl9TSVpF
-OworCXJlcS0+Q29tcGxldGlvbkZpbHRlciA9IGNwdV90b19sZTMyKGNvbXBsZXRpb25fZmlsdGVy
-KTsKKwlpZiAod2F0Y2hfdHJlZSkKKwkJcmVxLT5GbGFncyA9IGNwdV90b19sZTE2KFNNQjJfV0FU
-Q0hfVFJFRSk7CisJZWxzZQorCQlyZXEtPkZsYWdzID0gMDsKKworCWlvdlswXS5pb3ZfYmFzZSA9
-IChjaGFyICopcmVxOworCWlvdlswXS5pb3ZfbGVuID0gdG90YWxfbGVuOworCisJcmV0dXJuIDA7
-Cit9CisKK2ludAorU01CMl9jaGFuZ2Vfbm90aWZ5KGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0
-cnVjdCBjaWZzX3Rjb24gKnRjb24sCisJCXU2NCBwZXJzaXN0ZW50X2ZpZCwgdTY0IHZvbGF0aWxl
-X2ZpZCwgYm9vbCB3YXRjaF90cmVlLAorCQl1MzIgY29tcGxldGlvbl9maWx0ZXIpCit7CisJc3Ry
-dWN0IGNpZnNfc2VzICpzZXMgPSB0Y29uLT5zZXM7CisJc3RydWN0IHNtYl9ycXN0IHJxc3Q7CisJ
-c3RydWN0IGt2ZWMgaW92WzFdOworCXN0cnVjdCBrdmVjIHJzcF9pb3YgPSB7TlVMTCwgMH07CisJ
-aW50IHJlc3BfYnVmdHlwZSA9IENJRlNfTk9fQlVGRkVSOworCWludCBmbGFncyA9IDA7CisJaW50
-IHJjID0gMDsKKworCWNpZnNfZGJnKEZZSSwgImNoYW5nZSBub3RpZnlcbiIpOworCWlmICghc2Vz
-IHx8ICEoc2VzLT5zZXJ2ZXIpKQorCQlyZXR1cm4gLUVJTzsKKworCWlmIChzbWIzX2VuY3J5cHRp
-b25fcmVxdWlyZWQodGNvbikpCisJCWZsYWdzIHw9IENJRlNfVFJBTlNGT1JNX1JFUTsKKworCW1l
-bXNldCgmcnFzdCwgMCwgc2l6ZW9mKHN0cnVjdCBzbWJfcnFzdCkpOworCW1lbXNldCgmaW92LCAw
-LCBzaXplb2YoaW92KSk7CisJcnFzdC5ycV9pb3YgPSBpb3Y7CisJcnFzdC5ycV9udmVjID0gMTsK
-KworCXJjID0gU01CMl9ub3RpZnlfaW5pdCh4aWQsICZycXN0LCB0Y29uLCBwZXJzaXN0ZW50X2Zp
-ZCwgdm9sYXRpbGVfZmlkLAorCQkJICAgICAgY29tcGxldGlvbl9maWx0ZXIsIHdhdGNoX3RyZWUp
-OworCWlmIChyYykKKwkJZ290byBjbm90aWZ5X2V4aXQ7CisKKwl0cmFjZV9zbWIzX25vdGlmeV9l
-bnRlcih4aWQsIHBlcnNpc3RlbnRfZmlkLCB0Y29uLT50aWQsIHNlcy0+U3VpZCwKKwkJCQkodTgp
-d2F0Y2hfdHJlZSwgY29tcGxldGlvbl9maWx0ZXIpOworCXJjID0gY2lmc19zZW5kX3JlY3YoeGlk
-LCBzZXMsICZycXN0LCAmcmVzcF9idWZ0eXBlLCBmbGFncywgJnJzcF9pb3YpOworCisJaWYgKHJj
-ICE9IDApIHsKKwkJY2lmc19zdGF0c19mYWlsX2luYyh0Y29uLCBTTUIyX0NIQU5HRV9OT1RJRllf
-SEUpOworCQl0cmFjZV9zbWIzX25vdGlmeV9lcnIoeGlkLCBwZXJzaXN0ZW50X2ZpZCwgdGNvbi0+
-dGlkLCBzZXMtPlN1aWQsCisJCQkJKHU4KXdhdGNoX3RyZWUsIGNvbXBsZXRpb25fZmlsdGVyLCBy
-Yyk7CisJfSBlbHNlCisJCXRyYWNlX3NtYjNfbm90aWZ5X2RvbmUoeGlkLCBwZXJzaXN0ZW50X2Zp
-ZCwgdGNvbi0+dGlkLAorCQkJCXNlcy0+U3VpZCwgKHU4KXdhdGNoX3RyZWUsIGNvbXBsZXRpb25f
-ZmlsdGVyKTsKKworIGNub3RpZnlfZXhpdDoKKwlpZiAocnFzdC5ycV9pb3YpCisJCWNpZnNfc21h
-bGxfYnVmX3JlbGVhc2UocnFzdC5ycV9pb3ZbMF0uaW92X2Jhc2UpOyAvKiByZXF1ZXN0ICovCisJ
-ZnJlZV9yc3BfYnVmKHJlc3BfYnVmdHlwZSwgcnNwX2lvdi5pb3ZfYmFzZSk7CisJcmV0dXJuIHJj
-OworfQorCisKKwogLyoKICAqIFRoaXMgaXMgYSBuby1vcCBmb3Igbm93LiBXZSdyZSBub3QgcmVh
-bGx5IGludGVyZXN0ZWQgaW4gdGhlIHJlcGx5LCBidXQKICAqIHJhdGhlciBpbiB0aGUgZmFjdCB0
-aGF0IHRoZSBzZXJ2ZXIgc2VudCBvbmUgYW5kIHRoYXQgc2VydmVyLT5sc3RycApkaWZmIC0tZ2l0
-IGEvZnMvY2lmcy90cmFjZS5oIGIvZnMvY2lmcy90cmFjZS5oCmluZGV4IGYxMzM5ZjRhMmQwNy4u
-ZTdlMzUwYjEzZDZhIDEwMDY0NAotLS0gYS9mcy9jaWZzL3RyYWNlLmgKKysrIGIvZnMvY2lmcy90
-cmFjZS5oCkBAIC0yMzUsNiArMjM1LDggQEAgREVGSU5FX0VWRU5UKHNtYjNfaW5mX2VudGVyX2Ns
-YXNzLCBzbWIzXyMjbmFtZSwgICAgXAogCiBERUZJTkVfU01CM19JTkZfRU5URVJfRVZFTlQocXVl
-cnlfaW5mb19lbnRlcik7CiBERUZJTkVfU01CM19JTkZfRU5URVJfRVZFTlQocXVlcnlfaW5mb19k
-b25lKTsKK0RFRklORV9TTUIzX0lORl9FTlRFUl9FVkVOVChub3RpZnlfZW50ZXIpOworREVGSU5F
-X1NNQjNfSU5GX0VOVEVSX0VWRU5UKG5vdGlmeV9kb25lKTsKIAogREVDTEFSRV9FVkVOVF9DTEFT
-UyhzbWIzX2luZl9lcnJfY2xhc3MsCiAJVFBfUFJPVE8odW5zaWduZWQgaW50IHhpZCwKQEAgLTI4
-MSw2ICsyODMsNyBAQCBERUZJTkVfRVZFTlQoc21iM19pbmZfZXJyX2NsYXNzLCBzbWIzXyMjbmFt
-ZSwgICAgXAogCiBERUZJTkVfU01CM19JTkZfRVJSX0VWRU5UKHF1ZXJ5X2luZm9fZXJyKTsKIERF
-RklORV9TTUIzX0lORl9FUlJfRVZFTlQoc2V0X2luZm9fZXJyKTsKK0RFRklORV9TTUIzX0lORl9F
-UlJfRVZFTlQobm90aWZ5X2Vycik7CiBERUZJTkVfU01CM19JTkZfRVJSX0VWRU5UKGZzY3RsX2Vy
-cik7CiAKIERFQ0xBUkVfRVZFTlRfQ0xBU1Moc21iM19pbmZfY29tcG91bmRfZW50ZXJfY2xhc3Ms
-Ci0tIAoyLjIwLjEKCg==
---000000000000d42b480592a362e8--
+cifs SEEK_DATA SEEK_HOLE support were added in May 2019 with Linux
+commit dece44e381a
+
+A xfstests patch removing cifs from the list can address these failures,
+but is the "default behavior" of SEEK_HOLE on cifs expected?
+
+If it's not expected and need to work on, we should keep current status.
+
+Thanks!
+M
+
+> 
+> On Sat, Sep 14, 2019 at 10:14 PM Murphy Zhou <jencce.kernel@gmail.com> wrote:
+> >
+> > Hi,
+> >
+> > On latest Linus tree, several seek tests fails:
+> >
+> > generic/285 generic/490 generic/539    fails on v3.11 v3.02 v3.0
+> > generic/285 generic/490                fails on v2.0 v2.1
+> > generic/285 generic/448 generic/490    fails on v1.0
+> >
+> >
+> > Are they expected or being worked on?
+> >
+> > Thanks!
+> >
+> >
+> > FSTYP         -- cifs
+> > PLATFORM      -- Linux/x86_64 hp-dl380pg8-14 5.3.0-rc8+ #1 SMP Thu Sep 12 07:31:21 EDT 2019
+> > MKFS_OPTIONS  -- //hp-dl380pg8-14.rhts.eng.pek2.redhat.com/scratch
+> > MOUNT_OPTIONS -- -o vers=3.11,mfsymlinks -o username=root,password=redhat -o context=system_u:object_r:nfs_t:s0 //hp-dl380pg8-14.rhts.eng.pek2.redhat.com/scratch /mnt/testarea/scratch
+> >
+> > generic/285     [failed, exit status 1]- output mismatch (see /var/lib/xfstests/results//generic/285.out.bad)
+> >     --- tests/generic/285.out   2019-09-12 08:04:14.120990746 -0400
+> >     +++ /var/lib/xfstests/results//generic/285.out.bad  2019-09-12 08:36:49.151230335 -0400
+> >     @@ -1 +1,3 @@
+> >      QA output created by 285
+> >     +seek sanity check failed!
+> >     +(see /var/lib/xfstests/results//generic/285.full for details)
+> >     ...
+> 
+> 
+> 
+> -- 
+> Thanks,
+> 
+> Steve
