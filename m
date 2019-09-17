@@ -6,29 +6,31 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F5AC4CEC9
-	for <linux-cifs@archiver.kernel.org>; Tue, 17 Sep 2019 22:15:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AFC6C4CECD
+	for <linux-cifs@archiver.kernel.org>; Tue, 17 Sep 2019 23:51:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D13F2189D
-	for <linux-cifs@archiver.kernel.org>; Tue, 17 Sep 2019 22:15:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47B4A216C8
+	for <linux-cifs@archiver.kernel.org>; Tue, 17 Sep 2019 23:51:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726982AbfIQWPQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 17 Sep 2019 18:15:16 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38536 "EHLO mx1.suse.de"
+        id S1725989AbfIQXvi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 17 Sep 2019 19:51:38 -0400
+Received: from mx2.suse.de ([195.135.220.15]:34280 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727821AbfIQWPQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 17 Sep 2019 18:15:16 -0400
+        id S1725922AbfIQXvi (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 17 Sep 2019 19:51:38 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 84C7AACEF;
-        Tue, 17 Sep 2019 22:15:09 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 81A67B152;
+        Tue, 17 Sep 2019 23:51:32 +0000 (UTC)
 From:   Aurelien Aptel <aaptel@suse.com>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
-Subject: [WIP] multichannel
-Date:   Wed, 18 Sep 2019 00:14:51 +0200
-Message-Id: <20190917221451.18065-1-aaptel@suse.com>
+Subject: [WIP v3] multichannel
+Date:   Wed, 18 Sep 2019 01:51:14 +0200
+Message-Id: <20190917235114.26247-1-aaptel@suse.com>
 X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20190917221451.18065-1-aaptel@suse.com>
+References: <20190917221451.18065-1-aaptel@suse.com>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
@@ -36,30 +38,31 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 WIP WIP WIP WIP WIP WIP
 
-New version that applies and work on top of for-next, please test and
-comment :)
+to test, mount server with multiple interface with
 
-to test, mount server offering multiple interface with
-
-    -o vers=3.11,multichannel,max_channels=3 to test
+    -o vers=3.11,multichannel,max_channels=3
 
 WIP WIP WIP WIP WIP WIP
+
+changes since last version:
+- reuse client guid from master tcp connection
+- now works against samba & windows server
 
 Signed-off-by: Aurelien Aptel <aaptel@suse.com>
 ---
  fs/cifs/cifs_debug.c    |   6 +-
  fs/cifs/cifs_spnego.c   |   2 +-
- fs/cifs/cifsglob.h      |  28 ++++++-
+ fs/cifs/cifsglob.h      |  30 ++++++-
  fs/cifs/cifsproto.h     |   8 ++
- fs/cifs/connect.c       |  79 ++++++++++++++----
- fs/cifs/sess.c          | 212 +++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/connect.c       |  84 +++++++++++++++----
+ fs/cifs/sess.c          | 216 +++++++++++++++++++++++++++++++++++++++++++++++-
  fs/cifs/smb2misc.c      |  37 ++++++---
  fs/cifs/smb2ops.c       |  13 ++-
  fs/cifs/smb2pdu.c       | 106 ++++++++++++++----------
  fs/cifs/smb2proto.h     |   3 +-
  fs/cifs/smb2transport.c | 162 +++++++++++++++++++++++++++---------
  fs/cifs/transport.c     |  14 +++-
- 12 files changed, 552 insertions(+), 118 deletions(-)
+ 12 files changed, 562 insertions(+), 119 deletions(-)
 
 diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
 index 0b4eee3bed66..ef454170f37d 100644
@@ -93,7 +96,7 @@ index 7f01c6e60791..7b9b876b513b 100644
  	struct sockaddr_in6 *sa6 = (struct sockaddr_in6 *) &server->dstaddr;
  	char *description, *dp;
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 54e204589cb9..b4e1fc815ed7 100644
+index 54e204589cb9..441970293697 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
 @@ -230,7 +230,8 @@ struct smb_version_operations {
@@ -106,15 +109,17 @@ index 54e204589cb9..b4e1fc815ed7 100644
  	/* setup async request: allocate mid, sign message */
  	struct mid_q_entry *(*setup_async_request)(struct TCP_Server_Info *,
  						struct smb_rqst *);
-@@ -590,6 +591,7 @@ struct smb_vol {
+@@ -590,6 +591,9 @@ struct smb_vol {
  	bool resilient:1; /* noresilient not required since not fored for CA */
  	bool domainauto:1;
  	bool rdma:1;
 +	bool multichannel:1;
++	bool use_client_guid:1;
++	u8 client_guid[SMB2_CLIENT_GUID_SIZE]; /* reuse existing guid from master channel */
  	unsigned int bsize;
  	unsigned int rsize;
  	unsigned int wsize;
-@@ -606,6 +608,7 @@ struct smb_vol {
+@@ -606,6 +610,7 @@ struct smb_vol {
  	__u64 snapshot_time; /* needed for timewarp tokens */
  	__u32 handle_timeout; /* persistent and durable handle timeout in ms */
  	unsigned int max_credits; /* smb3 max_credits 10 < credits < 60000 */
@@ -122,7 +127,7 @@ index 54e204589cb9..b4e1fc815ed7 100644
  	__u16 compression; /* compression algorithm 0xFFFF default 0=disabled */
  	bool rootfs:1; /* if it's a SMB root file system */
  };
-@@ -952,11 +955,17 @@ struct cifs_server_iface {
+@@ -952,11 +957,17 @@ struct cifs_server_iface {
  	struct sockaddr_storage sockaddr;
  };
  
@@ -140,7 +145,7 @@ index 54e204589cb9..b4e1fc815ed7 100644
  	struct list_head tcon_list;
  	struct cifs_tcon *tcon_ipc;
  	struct mutex session_mutex;
-@@ -982,12 +991,15 @@ struct cifs_ses {
+@@ -982,12 +993,15 @@ struct cifs_ses {
  	bool sign;		/* is signing required? */
  	bool need_reconnect:1; /* connection reset, uid now invalid */
  	bool domainAuto:1;
@@ -156,7 +161,7 @@ index 54e204589cb9..b4e1fc815ed7 100644
  	/*
  	 * Network interfaces available on the server this session is
  	 * connected to.
-@@ -1001,8 +1013,22 @@ struct cifs_ses {
+@@ -1001,8 +1015,22 @@ struct cifs_ses {
  	struct cifs_server_iface *iface_list;
  	size_t iface_count;
  	unsigned long iface_last_update; /* jiffies */
@@ -213,7 +218,7 @@ index 99b1b1ef558c..4cda8bba308b 100644
  void extract_unc_hostname(const char *unc, const char **h, size_t *len);
  int copy_path_name(char *dst, const char *src);
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 2850c3ce4391..0d5212cb1ed6 100644
+index 2850c3ce4391..efd9ed46d5d6 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
 @@ -97,6 +97,7 @@ enum {
@@ -307,7 +312,19 @@ index 2850c3ce4391..0d5212cb1ed6 100644
  cifs_get_tcp_session(struct smb_vol *volume_info)
  {
  	struct TCP_Server_Info *tcp_ses = NULL;
-@@ -2853,6 +2877,13 @@ static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
+@@ -2764,7 +2788,10 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
+ 	       sizeof(tcp_ses->srcaddr));
+ 	memcpy(&tcp_ses->dstaddr, &volume_info->dstaddr,
+ 		sizeof(tcp_ses->dstaddr));
+-	generate_random_uuid(tcp_ses->client_guid);
++	if (volume_info->use_client_guid)
++		memcpy(tcp_ses->client_guid, volume_info->client_guid, SMB2_CLIENT_GUID_SIZE);
++	else
++		generate_random_uuid(tcp_ses->client_guid);
+ 	/*
+ 	 * at this point we are the only ones with the pointer
+ 	 * to the struct since the kernel thread not created yet
+@@ -2853,6 +2880,13 @@ static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
  	    vol->sectype != ses->sectype)
  		return 0;
  
@@ -321,7 +338,7 @@ index 2850c3ce4391..0d5212cb1ed6 100644
  	switch (ses->sectype) {
  	case Kerberos:
  		if (!uid_eq(vol->cred_uid, ses->cred_uid))
-@@ -3269,14 +3300,25 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
+@@ -3269,14 +3303,25 @@ cifs_get_smb_ses(struct TCP_Server_Info *server, struct smb_vol *volume_info)
  	ses->sectype = volume_info->sectype;
  	ses->sign = volume_info->sign;
  	mutex_lock(&ses->session_mutex);
@@ -348,7 +365,7 @@ index 2850c3ce4391..0d5212cb1ed6 100644
  	spin_lock(&cifs_tcp_ses_lock);
  	list_add(&ses->smb_ses_list, &server->smb_ses_list);
  	spin_unlock(&cifs_tcp_ses_lock);
-@@ -4885,6 +4927,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
+@@ -4885,6 +4930,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
  	cifs_autodisable_serverino(cifs_sb);
  out:
  	free_xid(xid);
@@ -356,7 +373,7 @@ index 2850c3ce4391..0d5212cb1ed6 100644
  	return mount_setup_tlink(cifs_sb, ses, tcon);
  
  error:
-@@ -5130,7 +5173,7 @@ int
+@@ -5130,7 +5176,7 @@ int
  cifs_negotiate_protocol(const unsigned int xid, struct cifs_ses *ses)
  {
  	int rc = 0;
@@ -365,7 +382,7 @@ index 2850c3ce4391..0d5212cb1ed6 100644
  
  	if (!server->ops->need_neg || !server->ops->negotiate)
  		return -ENOSYS;
-@@ -5157,23 +5200,25 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+@@ -5157,23 +5203,25 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
  		   struct nls_table *nls_info)
  {
  	int rc = -ENOSYS;
@@ -405,10 +422,10 @@ index 2850c3ce4391..0d5212cb1ed6 100644
  		rc = server->ops->sess_setup(xid, ses, nls_info);
  
 diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 4c764ff7edd2..473ec41ccb60 100644
+index 4c764ff7edd2..20c73a42755d 100644
 --- a/fs/cifs/sess.c
 +++ b/fs/cifs/sess.c
-@@ -31,6 +31,213 @@
+@@ -31,6 +31,217 @@
  #include <linux/utsname.h>
  #include <linux/slab.h>
  #include "cifs_spnego.h"
@@ -567,6 +584,10 @@ index 4c764ff7edd2..473ec41ccb60 100644
 +	vol.rdma = iface->rdma_capable;
 +	memcpy(&vol.dstaddr, &iface->sockaddr, sizeof(struct sockaddr_storage));
 +
++	/* reuse master con client guid */
++	memcpy(&vol.client_guid, ses->server->client_guid, SMB2_CLIENT_GUID_SIZE);
++	vol.use_client_guid = true;
++
 +	mutex_lock(&ses->session_mutex);
 +
 +	chan = &ses->chans[ses->chan_count];
@@ -622,7 +643,7 @@ index 4c764ff7edd2..473ec41ccb60 100644
  
  static __u32 cifs_ssetup_hdr(struct cifs_ses *ses, SESSION_SETUP_ANDX *pSMB)
  {
-@@ -342,6 +549,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+@@ -342,6 +553,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
  void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
  					 struct cifs_ses *ses)
  {
@@ -630,7 +651,7 @@ index 4c764ff7edd2..473ec41ccb60 100644
  	NEGOTIATE_MESSAGE *sec_blob = (NEGOTIATE_MESSAGE *)pbuffer;
  	__u32 flags;
  
-@@ -354,9 +562,9 @@ void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+@@ -354,9 +566,9 @@ void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
  		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
  		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC |
  		NTLMSSP_NEGOTIATE_SEAL;
