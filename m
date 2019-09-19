@@ -1,117 +1,143 @@
-Return-Path: <SRS0=9D0L=XN=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=OUN2=XO=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A15AC4CEC4
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Sep 2019 17:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD44C3A5A6
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Sep 2019 12:21:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1265921897
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Sep 2019 17:58:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3053A207FC
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Sep 2019 12:21:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tHeHkEaD"
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="ILi49dpi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727000AbfIRR65 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 18 Sep 2019 13:58:57 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:44876 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726983AbfIRR65 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 Sep 2019 13:58:57 -0400
-Received: by mail-lf1-f66.google.com with SMTP id q11so306736lfc.11
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Sep 2019 10:58:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=2TOCR6CjifybQQWjmdVjJ+0VrD8tH3RreILxB1lNrIQ=;
-        b=tHeHkEaDPBCp/sN1OlZifiOg3ZmkMdsWzCYFm7rm3MV2jmsUjteLPPml060C+6e/4p
-         jv5BULE45uCFIjo/qnva2fifhHbj88XW/r/kfinadGMwzyGE4TLKGUnj0nyPkwAho4rB
-         69NLG3nJfq1s7UW1OCJXXJ1vS3gXMGAQS625hKVv7GKz+k6PLCaVnxQFwQnykDtl0P6m
-         /xNeY7BwU1bOH+8KRJPTEZWnUMZPgdxMjaxDJnLmss/hJCteYBTVfkUOB7NeEP5OtA5y
-         WnvKz1SrPiSNDqXezlrmJusFgMSxKvqozy/TDyxmTlS50vGzLImH6pb2MNW8GQA/JFgm
-         rBgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2TOCR6CjifybQQWjmdVjJ+0VrD8tH3RreILxB1lNrIQ=;
-        b=NnJBoiDXaS7jpeVM0HrBOKdDu+qF+vNcjCObRaeV7Jc3YJ7oRTvotB+9gg7EFwBH5c
-         2ltczRlCpTQ0RCWcTCkRLiQYVWVajwPACIEGk8EwSYJGt2ldiPQVeqZQFZWoqtJZKxf/
-         F8glnzkE8FnzeAHwdcxsefHvWlZvI67B2tE4lGwck/23JLex0pbalGBywCoRgY/FQMq+
-         wDuQCdhfaJ1CxlwA6JUriQYN/EagABLPDCHrHoxrkkXhax53sMXeR5mD2jv/AOrfJFbn
-         ylW9Q9/9ZrYbdlYXbqSSPFMS4Nb7DmHQi+I2eGgbRirb0y+zvjuEsPzDY+f4dNai3Yd3
-         lZZw==
-X-Gm-Message-State: APjAAAXqHN9z4HQXylNFufursNx7Dt7DWp0CsiuhdKK04hhbVwx8qJX5
-        VS5rIyHbrN8anj0yE2yHmKTa0/fXln8bjgfZhA==
-X-Google-Smtp-Source: APXvYqxZGj9qO7QkQlz1e5LjXmgW1IBGFljpjiKXUZn2WyTW0hvkSHYzc/LmUSTQ0D/8zLWwEihojoPRM0/I53h5pW0=
-X-Received: by 2002:a05:6512:304:: with SMTP id t4mr2844311lfp.15.1568829535311;
- Wed, 18 Sep 2019 10:58:55 -0700 (PDT)
+        id S2389225AbfISMVQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 19 Sep 2019 08:21:16 -0400
+Received: from mx.cjr.nz ([51.158.111.142]:37822 "EHLO mx.cjr.nz"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387977AbfISMVQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 19 Sep 2019 08:21:16 -0400
+X-Greylist: delayed 517 seconds by postgrey-1.27 at vger.kernel.org; Thu, 19 Sep 2019 08:21:14 EDT
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id E62CF810D5;
+        Thu, 19 Sep 2019 12:12:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1568895156;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xYHaguuqkZAjGKqBi/wff33jzCeg21O+5/4qDe2Bzsg=;
+        b=ILi49dpi9tB8Ua1osuj+YxzBeu2EP20naHgIK+Yo+YJeNzJ1zEQDB7q5Hof7a4vTKxPGuF
+        GzZnfoESt4P99CMXOkhAZ1vokSwQFNQyEJgwycprJrLC/WsrWL+q3oTNCFDKSu14dQefmO
+        6W0YYOw65P9QU7sp2urwYWEDwQC0OeuTXIHud3UFO5Bd2ZdwXLiDe0G+XbZPumLao7krCb
+        oMErQ23dkjNu8Wi4oL2pBq3oPtiO1BhitHY4MSyv5fRtvsFaFYAGuUjf/ngs4QbVXlg+ox
+        6aB3I+Nez6D/0/sJFq3TmsDC+Kh4cvKbYDcxLapJPjNGf/7xzyMl/nE79qry4A==
+From:   "Paulo Alcantara (SUSE)" <pc@cjr.nz>
+To:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Cc:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>
+Subject: [PATCH] mount.cifs: Fix invalid free
+Date:   Thu, 19 Sep 2019 09:12:26 -0300
+Message-Id: <20190919121226.8756-1-pc@cjr.nz>
 MIME-Version: 1.0
-References: <CAE78Er-YVBzqaf8jCBio_V_1J2kRiWZ_SH-HnHm7KG3t46=j6w@mail.gmail.com>
- <CAH2r5mu446ssSPrACP8q859Cs0ynUMpJopH0t5qAsR=sGrByFA@mail.gmail.com>
- <CAE78Er8KYhRts+zKNsP6_11ZVA0kaTrtjvZPhdLAkHqDXhKOWA@mail.gmail.com>
- <87pnkh7jh2.fsf@suse.com> <CAE78Er_ea5mtp-6VxyNPzCSDuPym7cXcD3=Udcpv=jGo80XhZg@mail.gmail.com>
- <CAKywueT2mr1i3Y6iNQOzXEc1CePMozfvoJUz=TJAmbnskdofhw@mail.gmail.com>
- <CAE78Er97k7O-GDGdMtp0qXtQ-q-1nS_d1AE6HHH+Kz6PV_G2uQ@mail.gmail.com>
- <CAE78Er_L5fY31JdVaSUgbd7uyXpMAb+81adcVFD3GBQfMeWX0g@mail.gmail.com> <CAN05THRrUB0T5Zho+HjbmTzp4X6-Sx+N+QqaV5A4SDHrkqKWTA@mail.gmail.com>
-In-Reply-To: <CAN05THRrUB0T5Zho+HjbmTzp4X6-Sx+N+QqaV5A4SDHrkqKWTA@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 18 Sep 2019 10:58:44 -0700
-Message-ID: <CAKywueRr6n3LwgS3w3rhLHq-GedX2SnxdRFaauZqZdfoNoWyjg@mail.gmail.com>
-Subject: Re: Frequent reconnections / session startups?
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     James Wettenhall <james.wettenhall@monash.edu>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz;
+        s=dkim; t=1568895156; h=from:from:sender:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:references; bh=xYHaguuqkZAjGKqBi/wff33jzCeg21O+5/4qDe2Bzsg=;
+        b=rLB2+4mKS1HTM+j5bsgs2n+8w8NOpFxJY7FgUIgJdARelR94krlFuANYEkUMysAiuATZAU
+        q38LpY93MKBFcHgQqXamBXT435fkSI81SnClUippQxp/sy0AZs31E5Uwc1/CJnsyTKOhLI
+        +pj/8DG+iwbaqJn2DMig5jTuWyZYu0cAHMTU5zJlwDSkEX/CyWN+9qGy7OosUYzCmxc5By
+        cXgBBZBskqaJ+DdEtL7P2YhvJrJPAwxPVI6EeYWh6dHxbqNVu9XFvACuSorFEUKrHSNXA6
+        RB1/2NdDw3l77xVMeSJUgnP+EW8j7CmzJyblvsOfAKuVEisaED319eSN5zMm/g==
+ARC-Seal: i=1; s=dkim; d=cjr.nz; t=1568895156; a=rsa-sha256; cv=none;
+        b=ruYd0dg3VWEmHBPwv6x+9AyZBvURT23m8AOeKOsdXHRHbCyozqyLY2jOsmo0poVWKZGPZC
+        Ft0lQXRJY0dDLzL3YEAzoSiNHC9UYICG0rhhHiZbECDVwt76ZgT7i6g7seeblGh2puvhSz
+        RrQi86wpDueCBvMZK9dp6LcL82fe5lowKB9V8f3z+adcKiQwQRMY2VKsO2+9MH8jXVrGqK
+        zpHTFYxCkH4tI3mFUZ1g2zggwWJLm9T80QfQ3BbVXKqcBbv0hvZAR9x43OpBV373YDBfQA
+        kSHN2UxIAajtlCS49HsfLBIwupFXQPqtG2SzSAkxn/Do3CWUbB63zdKtX5zUGw==
+ARC-Authentication-Results: i=1;
+        mx.cjr.nz;
+        auth=pass smtp.auth=pc smtp.mailfrom=pc@cjr.nz
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=B2=D1=82, 17 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 23:49, ronni=
-e sahlberg <ronniesahlberg@gmail.com>:
->
-> On Wed, Sep 18, 2019 at 4:16 PM James Wettenhall
-> <james.wettenhall@monash.edu> wrote:
-> >
-> > Thanks Pavel,
-> >
-> > We've been running Kernel v5.2.14 over the past week (updated using
-> > Ukuu) and it seems to have improved the situation considerably.
->
-> Thank you for the feedback.
-> This is very good news.
->
->
-> >
-> > I assume that the "nohandlecache" mount option recommendation was just =
-for v5.0.
+When attemping to chdir into non-existing directories, mount.cifs
+crashes.
 
-Glad to know that the situation have improved for your workload.
-Thanks for the feedback.
+This patch fixes the following ASAN report:
 
-v5.2 kernel has many fixes preventing reconnects that's probably why
-you stopped observing the original problem. The latter haven't been
-completely fixed yet in v5.2.y yet. We have a patch in for-next that
-aims to fix it but it haven't been sent to the mainline yet, see
+$ ./mount.cifs //localhost/foo /mnt/invalid-dir -o ...
+/mnt/bar -o username=foo,password=foo,vers=1.0
+Couldn't chdir to /mnt/bar: No such file or directory
+=================================================================
+==11846==ERROR: AddressSanitizer: attempting free on address which was
+not malloc()-ed: 0x7ffd86332e97 in thread T0
+    #0 0x7f0860ca01e7 in
+    __interceptor_free (/usr/lib64/libasan.so.5+0x10a1e7)
+    #1 0x557edece9ccb in
+    acquire_mountpoint (/home/paulo/src/cifs-utils/mount.cifs+0xeccb)
+    #2 0x557edecea63d in
+    main (/home/paulo/src/cifs-utils/mount.cifs+0xf63d)
+    #3 0x7f08609f0bca in __libc_start_main (/lib64/libc.so.6+0x26bca)
+    #4 0x557edece27d9 in
+    _start (/home/paulo/src/cifs-utils/mount.cifs+0x77d9)
 
-https://git.samba.org/?p=3Dsfrench/cifs-2.6.git;a=3Dcommitdiff;h=3D96d9f7ed=
-00b86104bf03adeffc8980897e9694ab.
+Address 0x7ffd86332e97 is located in stack of thread T0 at offset 8951
+in frame
+    #0 0x557edece9ce0 in
+    main (/home/paulo/src/cifs-utils/mount.cifs+0xece0)
 
-Once it is there, it should be automatically picked up for backporting
-to all active stable kernels it applies to.
+  This frame has 2 object(s):
+    [48, 52) 'rc' (line 1959)
+    [64, 72) 'mountpoint' (line 1955) <== Memory access at offset 8951
+    overflows this variable
+HINT: this may be a false positive if your program uses some custom
+stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: bad-free (/usr/lib64/libasan.so.5+0x10a1e7)
+in __interceptor_free
+==11846==ABORTING
 
-In the meantime, If you start hitting the issue again, please try
-mount option "nohandlecache" as a workaround.
+Fixes: bf7f48f4c7dc ("mount.cifs.c: fix memory leaks in main func")
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+---
+ mount.cifs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
---
-Best regards,
-Pavel Shilovsky
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 7748d54aa814..0c38adcd99b1 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -1893,7 +1893,7 @@ acquire_mountpoint(char **mountpointp)
+ 	int rc, dacrc;
+ 	uid_t realuid, oldfsuid;
+ 	gid_t oldfsgid;
+-	char *mountpoint;
++	char *mountpoint = NULL;
+ 
+ 	/*
+ 	 * Acquire the necessary privileges to chdir to the mountpoint. If
+@@ -1942,9 +1942,9 @@ restore_privs:
+ 		gid_t __attribute__((unused)) gignore = setfsgid(oldfsgid);
+ 	}
+ 
+-	if (rc) {
+-		free(*mountpointp);
+-	}
++	if (rc)
++		free(mountpoint);
++
+ 	return rc;
+ }
+ 
+-- 
+2.23.0
+
