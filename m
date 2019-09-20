@@ -2,111 +2,144 @@ Return-Path: <SRS0=I8uG=XP=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B543CC4CEC9
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Sep 2019 10:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA17EC49ED7
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 Sep 2019 11:04:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BBB52070C
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Sep 2019 10:05:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="HQiIlFXv"
+	by mail.kernel.org (Postfix) with ESMTP id B893B208C0
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 Sep 2019 11:04:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393364AbfITKFk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 20 Sep 2019 06:05:40 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:56130 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393354AbfITKFj (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 20 Sep 2019 06:05:39 -0400
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 46FA580C01;
-        Fri, 20 Sep 2019 10:05:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1568973936;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ins2TSKeYgQuuE+zqzLA/MBqsHxtlvLHMg+kDG21zGY=;
-        b=HQiIlFXvSGJ9bvFAHnEJa5A93NGyhuDVMhBAG1FLanJ9+yKTI0LazbNZFW6ApR3HAAfX9t
-        e3RP4Y8t75bopox2k/lc4kpQyWFS0GvlQbC2vd6c2gq3zzZhLYqgkDQOFGNZCUCXFX70OK
-        gQLQJBI9QH2/gKG8kZOIbKogYT5cie15o3hxgq8RrhTfY1fHH0zIUqCPR9XE01BDZSEq3l
-        hmu5MLN5JiIz2zAD0IcDWU4fbdIkLBV9yF7QOctU+q9L8ihJnYaSxH8IcpR5a8ZCDDg7vD
-        gAbl636P8ZgOIP1i4EPVW7vlR3VTi6iI0eG6qHlTKRgRA642YbvvWMs2s/Obiw==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Steve French <smfrench@gmail.com>
-Cc:     Aurelien Aptel <aaptel@suse.com>
-Subject: Re: [PATCH v2 1/3] cifs: Add support for root file systems
-In-Reply-To: <20190919152116.27076-1-pc@cjr.nz>
-References: <20190716220452.3382-1-paulo@paulo.ac>
- <20190919152116.27076-1-pc@cjr.nz>
-Date:   Fri, 20 Sep 2019 07:04:06 -0300
-Message-ID: <8736gr2six.fsf@cjr.nz>
+        id S2408659AbfITLEM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 20 Sep 2019 07:04:12 -0400
+Received: from rigel.uberspace.de ([95.143.172.238]:38820 "EHLO
+        rigel.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2406008AbfITLEM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Sep 2019 07:04:12 -0400
+X-Greylist: delayed 400 seconds by postgrey-1.27 at vger.kernel.org; Fri, 20 Sep 2019 07:04:11 EDT
+Received: (qmail 21475 invoked from network); 20 Sep 2019 10:57:29 -0000
+Received: from localhost (HELO webmail.rigel.uberspace.de) (127.0.0.1)
+  by ::1 with SMTP; 20 Sep 2019 10:57:29 -0000
 MIME-Version: 1.0
-Content-Type: text/plain
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz;
-        s=dkim; t=1568973936; h=from:from:sender:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ins2TSKeYgQuuE+zqzLA/MBqsHxtlvLHMg+kDG21zGY=;
-        b=d5hvI/vrK5+fjiRA3B6UvBReH0gSktp65GgjBG11y05GGTgctQp+sey17Utou6dJmkFG/d
-        LPA52E458xYgbVpnALCwU/kBuj5ZVFHt0KtWqgfjUc0ajgDMqZtczVztP+bB1p+bsKxuOZ
-        fSl9MIqzs8Z4ADD6FCY9KaRevFT6lCEm99fsok46dHzjfhr35R5ZRx42C19Lzw+Z5v/vRz
-        H8lk+e0F64VcgnDFGwBqse1xnwK1d88DIuLzLQgLeWKD0fvdfEm4Fq9DDPIlsD5Ala3UoE
-        6EPfEuznXiCSV2hJNR/Eu831wqsMM5Xl5zLjmy79w7ld5bwwdyvbT2G+6NIdtw==
-ARC-Seal: i=1; s=dkim; d=cjr.nz; t=1568973936; a=rsa-sha256; cv=none;
-        b=eM0lxNtzOEjwskAm5TldDSBc1eqyNpVHMoqait7Y3FeAXIJ3wjcgaDCIFQCgPQEOnXkeAK
-        ZjynmpkDE6c8bGTX6UxxBDacrr7t0zLVPx7atc6e7mGojetcAl+FdKN7QPzc6tpasdFHBC
-        FU8S2DJOiQrnxmYFic/GOqMc8Itgnx5JpBM2snkGsiFCss3bVzJap8ZhT5EtFojIr1dv6j
-        Jv5V6LWBAznuELZuAfQMbsn28WYXmEloXX9KAADuMfBMi0fdhqmaKQz8yMo5DBwy9Fhm/I
-        zEMPPN3wioqU2PtB9Hpr/AmRXGSOb21Z6WLxpU6cflr4gn9Cyhfo8X/hh3y9Jg==
-ARC-Authentication-Results: i=1;
-        mx.cjr.nz;
-        auth=pass smtp.auth=pc smtp.mailfrom=pc@cjr.nz
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 20 Sep 2019 12:57:28 +0200
+From:   Moritz M <mailinglist@moritzmueller.ee>
+To:     linux-cifs@vger.kernel.org
+Subject: Possible timeout problem when opening a file twice on a SMB mount
+Message-ID: <61d3d6774247fe6159456b249dbc3c63@moritzmueller.ee>
+X-Sender: mailinglist@moritzmueller.ee
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-"Paulo Alcantara (SUSE)" <pc@cjr.nz> writes:
+Hello,
 
-> Introduce a new CONFIG_CIFS_ROOT option to handle root file systems
-> over a SMB share.
->
-> In order to mount the root file system during the init process, make
-> cifs.ko perform non-blocking socket operations while mounting and
-> accessing it.
->
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-> ---
->  Documentation/filesystems/cifs/cifsroot.txt | 97 +++++++++++++++++++++
->  fs/cifs/Kconfig                             |  8 ++
->  fs/cifs/Makefile                            |  2 +
->  fs/cifs/cifsglob.h                          |  2 +
->  fs/cifs/cifsroot.c                          | 94 ++++++++++++++++++++
->  fs/cifs/connect.c                           | 17 +++-
->  include/linux/root_dev.h                    |  1 +
->  7 files changed, 218 insertions(+), 3 deletions(-)
->  create mode 100644 Documentation/filesystems/cifs/cifsroot.txt
->  create mode 100644 fs/cifs/cifsroot.c
+I've some trouble with saving files with a particular software, LyX[0] 
+in this case.
+The problem is that saving a file on a SMB share makes the programm 
+freeze for 30 s
+due to creating an empty temp file.
 
-Hi David,
+While investigating I created a small python script which mimics 
+(compared the strace output)
+the LyX behaviour and also freezes the python script for 30 s.
+That makes me believe that it could be a cifs problem.
 
-This patch has already been merged into Linus tree. The other two (2/3
-and 3/3) still need to be reviewed.
+The python script is:
 
-I'm not sure how this works when series touch multiple subsystems --
-that is, these changes should go through your tree or Steve's?
+#!/usr/bin/env python3
 
-Please let me you know if you need anything else.
+import os, sys
 
-Thanks!
-Paulo
+fd = os.open( "/mnt/share/foo.txt", 
+os.O_RDWR|os.O_CREAT|os.O_EXCL|os.O_CLOEXEC, 0o600 )
+fd = os.access( "/mnt/share/foo.txt", os.F_OK )
+fd = os.chmod( "/mnt/share/foo.txt", 0o755 )
+fd = os.open( "/mnt/share/foo.txt", os.O_WRONLY|os.O_CREAT|os.O_TRUNC, 
+0o666 )
+
+# Close opened file
+os.close( fd )
+
+
+Stracing it with
+
+strace -f -t -T -e trace=openat,close,chmod,access python open.py
+
+gives
+
+23:18:52 openat(AT_FDCWD, "/mnt/share/foo.txt", 
+O_RDWR|O_CREAT|O_EXCL|O_CLOEXEC, 0600) = 3 <0.002434>
+23:18:52 access("/mnt/share/foo.txt", F_OK) = 0 <0.000091>
+23:18:52 chmod("/mnt/share/foo.txt", 0755) = 0 <0.000168>
+23:18:52 openat(AT_FDCWD, "/mnt/share/foo.txt", 
+O_WRONLY|O_CREAT|O_TRUNC|O_CLOEXEC, 0666) = 4 <30.033585>
+
+The second openat call takes 30 s and freezes the script.
+
+When doing a os.close( fd ) after first open in the python script it 
+works as expected:
+
+23:22:11 openat(AT_FDCWD, "/mnt/share/foo.txt", 
+O_RDWR|O_CREAT|O_EXCL|O_CLOEXEC, 0600) = 3 <0.002464>
+23:22:11 close(3)                       = 0 <0.001652>
+23:22:11 access("/mnt/share/foo.txt", F_OK) = 0 <0.000082>
+23:22:11 chmod("/mnt/share/foo.txt", 0755) = 0 <0.000175>
+23:22:11 openat(AT_FDCWD, "/mnt/share/foo.txt", 
+O_WRONLY|O_CREAT|O_TRUNC|O_CLOEXEC, 0666) = 3 <0.003221>
+
+My setup ist (server is a Synology Diskstation):
+
+$ uname -r
+5.1.21-1-MANJARO
+
+$ mount.cifs -V
+mount.cifs version: 6.8
+
+$ samba --version
+Version 4.4.16
+
+
+Display Internal CIFS Data Structures for Debugging
+---------------------------------------------------
+CIFS Version 2.19
+Features: 
+DFS,FSCACHE,STATS,DEBUG,ALLOW_INSECURE_LEGACY,CIFS_POSIX,UPCALL(SPNEGO),XATTR,ACL
+CIFSMaxBufSize: 16384
+Active VFS Requests: 0
+Servers:
+Number of credits: 510 Dialect 0x311
+1) Name: x.x.x.x Uses: 1 Capability: 0x300045	Session Status: 1 TCP 
+status: 1 Instance: 1
+	Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 SessionId: 
+0x14e3311d
+	Shares:
+	0) IPC: \\server\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
+	PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0
+	Share Capabilities: None	Share Flags: 0x0
+	tid: 0xf1884345	Maximal Access: 0x1f00a9
+
+	1) \\server\share Mounts: 1 DevInfo: 0x20 Attributes: 0x5006f
+	PathComponentMax: 255 Status: 1 type: DISK Serial Number: 0x1dc3f115
+	Share Capabilities: None Aligned, Partition Aligned,	Share Flags: 0x800
+	tid: 0xe3ad48c8	Optimal sector size: 0x200	Maximal Access: 0x1f01ff
+
+	MIDs:
+
+
+
+Does anybody has a clue why it takes exactly 30 s when opening a file 
+twice?
+Even more important: how can I prevent it?
+Any help is appreciated.
+
+Thanks
+Moritz
+
+[0]: https://www.lyx.org/
+
