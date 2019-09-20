@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E71A5C49ED7
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Sep 2019 05:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0077EC49ED7
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 Sep 2019 05:01:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C40FE2080F
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Sep 2019 05:01:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFF562080F
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 Sep 2019 05:01:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437188AbfITFBd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 20 Sep 2019 01:01:33 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48812 "EHLO mx1.suse.de"
+        id S2437190AbfITFBj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 20 Sep 2019 01:01:39 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48832 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725781AbfITFBd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 20 Sep 2019 01:01:33 -0400
+        id S1725781AbfITFBj (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 20 Sep 2019 01:01:39 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 49B1EAF11;
-        Fri, 20 Sep 2019 05:01:31 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 5908BAF84;
+        Fri, 20 Sep 2019 05:01:37 +0000 (UTC)
 From:   Aurelien Aptel <aaptel@suse.com>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH v4 1/6] cifs: add multichannel mount options and data structs
-Date:   Fri, 20 Sep 2019 07:01:14 +0200
-Message-Id: <20190920050119.27017-2-aaptel@suse.com>
+Subject: [PATCH v4 2/6] cifs: add server param
+Date:   Fri, 20 Sep 2019 07:01:15 +0200
+Message-Id: <20190920050119.27017-3-aaptel@suse.com>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190920050119.27017-1-aaptel@suse.com>
 References: <20190920050119.27017-1-aaptel@suse.com>
@@ -36,185 +36,151 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-adds:
-- [no]multichannel to enable/disable multichannel
-- max_channels=N to control how many channels to create
-
-these options are then stored in the volume struct.
-
-- store channels and max_channels in cifs_ses
+pass server pointer instead of using ses-server
 
 Signed-off-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/cifsfs.c   |  3 +++
- fs/cifs/cifsglob.h | 14 ++++++++++++++
- fs/cifs/connect.c  | 37 +++++++++++++++++++++++++++++++++++--
- 3 files changed, 52 insertions(+), 2 deletions(-)
+ fs/cifs/cifsglob.h      |  3 ++-
+ fs/cifs/cifsproto.h     |  1 +
+ fs/cifs/smb2proto.h     |  3 ++-
+ fs/cifs/smb2transport.c | 24 ++++++++++++------------
+ fs/cifs/transport.c     |  4 ++--
+ 5 files changed, 19 insertions(+), 16 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 69601a9b29ad..fb4d2152b1d4 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -577,6 +577,9 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 	/* convert actimeo and display it in seconds */
- 	seq_printf(s, ",actimeo=%lu", cifs_sb->actimeo / HZ);
- 
-+	if (tcon->ses->chan_max > 1)
-+		seq_printf(s, ",multichannel,max_channel=%zu", tcon->ses->chan_max);
-+
- 	return 0;
- }
- 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 54e204589cb9..2418a1948321 100644
+index 2418a1948321..e980e7b0d79d 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -590,6 +590,9 @@ struct smb_vol {
- 	bool resilient:1; /* noresilient not required since not fored for CA */
- 	bool domainauto:1;
- 	bool rdma:1;
-+	bool multichannel:1;
-+	bool use_client_guid:1;
-+	u8 client_guid[SMB2_CLIENT_GUID_SIZE]; /* reuse existing guid from master channel */
- 	unsigned int bsize;
- 	unsigned int rsize;
- 	unsigned int wsize;
-@@ -606,6 +609,7 @@ struct smb_vol {
- 	__u64 snapshot_time; /* needed for timewarp tokens */
- 	__u32 handle_timeout; /* persistent and durable handle timeout in ms */
- 	unsigned int max_credits; /* smb3 max_credits 10 < credits < 60000 */
-+	unsigned int max_channels;
- 	__u16 compression; /* compression algorithm 0xFFFF default 0=disabled */
- 	bool rootfs:1; /* if it's a SMB root file system */
- };
-@@ -952,6 +956,11 @@ struct cifs_server_iface {
- 	struct sockaddr_storage sockaddr;
- };
+@@ -230,7 +230,8 @@ struct smb_version_operations {
+ 	bool (*compare_fids)(struct cifsFileInfo *, struct cifsFileInfo *);
+ 	/* setup request: allocate mid, sign message */
+ 	struct mid_q_entry *(*setup_request)(struct cifs_ses *,
+-						struct smb_rqst *);
++					     struct TCP_Server_Info *,
++					     struct smb_rqst *);
+ 	/* setup async request: allocate mid, sign message */
+ 	struct mid_q_entry *(*setup_async_request)(struct TCP_Server_Info *,
+ 						struct smb_rqst *);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 99b1b1ef558c..ee3e6d6556a7 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -109,6 +109,7 @@ extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
+ extern int SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
+ 			    char *in_buf, int flags);
+ extern struct mid_q_entry *cifs_setup_request(struct cifs_ses *,
++				struct TCP_Server_Info *,
+ 				struct smb_rqst *);
+ extern struct mid_q_entry *cifs_setup_async_request(struct TCP_Server_Info *,
+ 						struct smb_rqst *);
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 67a91b11fd59..804b6dc5546b 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -46,7 +46,8 @@ extern int smb2_verify_signature(struct smb_rqst *, struct TCP_Server_Info *);
+ extern int smb2_check_receive(struct mid_q_entry *mid,
+ 			      struct TCP_Server_Info *server, bool log_error);
+ extern struct mid_q_entry *smb2_setup_request(struct cifs_ses *ses,
+-			      struct smb_rqst *rqst);
++					      struct TCP_Server_Info *,
++					      struct smb_rqst *rqst);
+ extern struct mid_q_entry *smb2_setup_async_request(
+ 			struct TCP_Server_Info *server, struct smb_rqst *rqst);
+ extern struct cifs_ses *smb2_find_smb_ses(struct TCP_Server_Info *server,
+diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
+index 148d7942c796..d7d89741f3f0 100644
+--- a/fs/cifs/smb2transport.c
++++ b/fs/cifs/smb2transport.c
+@@ -610,18 +610,18 @@ smb2_mid_entry_alloc(const struct smb2_sync_hdr *shdr,
+ }
  
-+struct cifs_chan {
-+	struct TCP_Server_Info *server;
-+	__u8 signkey[SMB3_SIGN_KEY_SIZE];
-+};
-+
- /*
-  * Session structure.  One of these for each uid session with a particular host
-  */
-@@ -1001,6 +1010,11 @@ struct cifs_ses {
- 	struct cifs_server_iface *iface_list;
- 	size_t iface_count;
- 	unsigned long iface_last_update; /* jiffies */
-+
-+#define CIFS_MAX_CHANNELS 16
-+	struct cifs_chan chans[CIFS_MAX_CHANNELS];
-+	size_t chan_count;
-+	size_t chan_max;
- };
+ static int
+-smb2_get_mid_entry(struct cifs_ses *ses, struct smb2_sync_hdr *shdr,
++smb2_get_mid_entry(struct cifs_ses *ses, struct TCP_Server_Info *server, struct smb2_sync_hdr *shdr,
+ 		   struct mid_q_entry **mid)
+ {
+-	if (ses->server->tcpStatus == CifsExiting)
++	if (server->tcpStatus == CifsExiting)
+ 		return -ENOENT;
  
- static inline bool
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 2850c3ce4391..fb95fd90b578 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -97,6 +97,7 @@ enum {
- 	Opt_persistent, Opt_nopersistent,
- 	Opt_resilient, Opt_noresilient,
- 	Opt_domainauto, Opt_rdma, Opt_modesid, Opt_rootfs,
-+	Opt_multichannel, Opt_nomultichannel,
- 	Opt_compress,
+-	if (ses->server->tcpStatus == CifsNeedReconnect) {
++	if (server->tcpStatus == CifsNeedReconnect) {
+ 		cifs_dbg(FYI, "tcp session dead - return to caller to retry\n");
+ 		return -EAGAIN;
+ 	}
  
- 	/* Mount options which take numeric value */
-@@ -106,7 +107,7 @@ enum {
- 	Opt_min_enc_offload,
- 	Opt_blocksize, Opt_rsize, Opt_wsize, Opt_actimeo,
- 	Opt_echo_interval, Opt_max_credits, Opt_handletimeout,
--	Opt_snapshot,
-+	Opt_snapshot, Opt_max_channels,
+-	if (ses->server->tcpStatus == CifsNeedNegotiate &&
++	if (server->tcpStatus == CifsNeedNegotiate &&
+ 	   shdr->Command != SMB2_NEGOTIATE)
+ 		return -EAGAIN;
  
- 	/* Mount options which take string value */
- 	Opt_user, Opt_pass, Opt_ip,
-@@ -199,6 +200,8 @@ static const match_table_t cifs_mount_option_tokens = {
- 	{ Opt_noresilient, "noresilienthandles"},
- 	{ Opt_domainauto, "domainauto"},
- 	{ Opt_rdma, "rdma"},
-+	{ Opt_multichannel, "multichannel" },
-+	{ Opt_nomultichannel, "nomultichannel" },
+@@ -638,11 +638,11 @@ smb2_get_mid_entry(struct cifs_ses *ses, struct smb2_sync_hdr *shdr,
+ 		/* else ok - we are shutting down the session */
+ 	}
  
- 	{ Opt_backupuid, "backupuid=%s" },
- 	{ Opt_backupgid, "backupgid=%s" },
-@@ -218,6 +221,7 @@ static const match_table_t cifs_mount_option_tokens = {
- 	{ Opt_echo_interval, "echo_interval=%s" },
- 	{ Opt_max_credits, "max_credits=%s" },
- 	{ Opt_snapshot, "snapshot=%s" },
-+	{ Opt_max_channels, "max_channels=%s" },
- 	{ Opt_compress, "compress=%s" },
+-	*mid = smb2_mid_entry_alloc(shdr, ses->server);
++	*mid = smb2_mid_entry_alloc(shdr, server);
+ 	if (*mid == NULL)
+ 		return -ENOMEM;
+ 	spin_lock(&GlobalMid_Lock);
+-	list_add_tail(&(*mid)->qhead, &ses->server->pending_mid_q);
++	list_add_tail(&(*mid)->qhead, &server->pending_mid_q);
+ 	spin_unlock(&GlobalMid_Lock);
  
- 	{ Opt_blank_user, "user=" },
-@@ -1664,6 +1668,10 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
+ 	return 0;
+@@ -675,24 +675,24 @@ smb2_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ }
  
- 	vol->echo_interval = SMB_ECHO_INTERVAL_DEFAULT;
+ struct mid_q_entry *
+-smb2_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
++smb2_setup_request(struct cifs_ses *ses, struct TCP_Server_Info *server, struct smb_rqst *rqst)
+ {
+ 	int rc;
+ 	struct smb2_sync_hdr *shdr =
+ 			(struct smb2_sync_hdr *)rqst->rq_iov[0].iov_base;
+ 	struct mid_q_entry *mid;
  
-+	/* default to no multichannel (single server connection) */
-+	vol->multichannel = false;
-+	vol->max_channels = 1;
-+
- 	if (!mountdata)
- 		goto cifs_parse_mount_err;
+-	smb2_seq_num_into_buf(ses->server, shdr);
++	smb2_seq_num_into_buf(server, shdr);
  
-@@ -1957,6 +1965,12 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 		case Opt_rdma:
- 			vol->rdma = true;
- 			break;
-+		case Opt_multichannel:
-+			vol->multichannel = true;
-+			break;
-+		case Opt_nomultichannel:
-+			vol->multichannel = false;
-+			break;
- 		case Opt_compress:
- 			vol->compression = UNKNOWN_TYPE;
- 			cifs_dbg(VFS,
-@@ -2120,6 +2134,15 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			}
- 			vol->max_credits = option;
- 			break;
-+		case Opt_max_channels:
-+			if (get_option_ul(args, &option) || option < 1 ||
-+				option > CIFS_MAX_CHANNELS) {
-+				cifs_dbg(VFS, "%s: Invalid max_channels value, needs to be 1-%d\n",
-+					 __func__, CIFS_MAX_CHANNELS);
-+				goto cifs_parse_mount_err;
-+			}
-+			vol->max_channels = option;
-+			break;
+-	rc = smb2_get_mid_entry(ses, shdr, &mid);
++	rc = smb2_get_mid_entry(ses, server, shdr, &mid);
+ 	if (rc) {
+-		revert_current_mid_from_hdr(ses->server, shdr);
++		revert_current_mid_from_hdr(server, shdr);
+ 		return ERR_PTR(rc);
+ 	}
  
- 		/* String Arguments */
+-	rc = smb2_sign_rqst(rqst, ses->server);
++	rc = smb2_sign_rqst(rqst, server);
+ 	if (rc) {
+-		revert_current_mid_from_hdr(ses->server, shdr);
++		revert_current_mid_from_hdr(server, shdr);
+ 		cifs_delete_mid(mid);
+ 		return ERR_PTR(rc);
+ 	}
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index 308ad0f495e1..afe66f9cb15e 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -923,7 +923,7 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ }
  
-@@ -2764,7 +2787,10 @@ cifs_get_tcp_session(struct smb_vol *volume_info)
- 	       sizeof(tcp_ses->srcaddr));
- 	memcpy(&tcp_ses->dstaddr, &volume_info->dstaddr,
- 		sizeof(tcp_ses->dstaddr));
--	generate_random_uuid(tcp_ses->client_guid);
-+	if (volume_info->use_client_guid)
-+		memcpy(tcp_ses->client_guid, volume_info->client_guid, SMB2_CLIENT_GUID_SIZE);
-+	else
-+		generate_random_uuid(tcp_ses->client_guid);
- 	/*
- 	 * at this point we are the only ones with the pointer
- 	 * to the struct since the kernel thread not created yet
-@@ -2853,6 +2879,13 @@ static int match_session(struct cifs_ses *ses, struct smb_vol *vol)
- 	    vol->sectype != ses->sectype)
- 		return 0;
+ struct mid_q_entry *
+-cifs_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
++cifs_setup_request(struct cifs_ses *ses, struct TCP_Server_Info *ignored, struct smb_rqst *rqst)
+ {
+ 	int rc;
+ 	struct smb_hdr *hdr = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
+@@ -1040,7 +1040,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	}
  
-+	/*
-+	 * If an existing session is limited to less channels than
-+	 * requested, it should not be reused
-+	 */
-+	if (ses->chan_max < vol->max_channels)
-+		return 0;
-+
- 	switch (ses->sectype) {
- 	case Kerberos:
- 		if (!uid_eq(vol->cred_uid, ses->cred_uid))
+ 	for (i = 0; i < num_rqst; i++) {
+-		midQ[i] = server->ops->setup_request(ses, &rqst[i]);
++		midQ[i] = server->ops->setup_request(ses, server, &rqst[i]);
+ 		if (IS_ERR(midQ[i])) {
+ 			revert_current_mid(server, i);
+ 			for (j = 0; j < i; j++)
 -- 
 2.16.4
 
