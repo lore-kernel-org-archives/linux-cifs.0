@@ -2,88 +2,87 @@ Return-Path: <SRS0=rQDn=XQ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 132F2C49ED7
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Sep 2019 06:16:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEAAEC49ED7
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Sep 2019 09:44:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D76352067B
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Sep 2019 06:16:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD90021835
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Sep 2019 09:44:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AW01f4lK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730993AbfIUGQI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 21 Sep 2019 02:16:08 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:34386 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730989AbfIUGQI (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 21 Sep 2019 02:16:08 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 3346F1E69AA13AFB05E9;
-        Sat, 21 Sep 2019 14:16:01 +0800 (CST)
-Received: from huawei.com (10.90.53.225) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Sat, 21 Sep 2019
- 14:15:52 +0800
-From:   zhengbin <zhengbin13@huawei.com>
-To:     <sfrench@samba.org>, <linux-cifs@vger.kernel.org>
-CC:     <yi.zhang@huawei.com>, <zhengbin13@huawei.com>
-Subject: [PATCH] fs/cifs/smb2transport.c: Make some functions static
-Date:   Sat, 21 Sep 2019 14:22:46 +0800
-Message-ID: <1569046966-118677-1-git-send-email-zhengbin13@huawei.com>
-X-Mailer: git-send-email 2.7.4
+        id S2394076AbfIUJoc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 21 Sep 2019 05:44:32 -0400
+Received: from mail-io1-f43.google.com ([209.85.166.43]:45039 "EHLO
+        mail-io1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2394062AbfIUJoc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 21 Sep 2019 05:44:32 -0400
+Received: by mail-io1-f43.google.com with SMTP id j4so21784861iog.11
+        for <linux-cifs@vger.kernel.org>; Sat, 21 Sep 2019 02:44:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=udbQo3HwW3wvcBCXw3BLsLO1iikSmqxQh+yfiLe552g=;
+        b=AW01f4lKePxU2m8hK9jM25qstyaQCNNP60OQnos9prG/ZODYWfskoC2dlmXv9alsw3
+         cWZicj83VRFbkWmHeBJkdBL16aQQ/NinVcGiWPkliHyi5WCeQJaxPx8sE6LyAza6ro4Q
+         QmCbKV5R+dhqz2M9wPrN3UkvSwy1ggvfgu6Ro40Rp+M5fQnEfx0ELdJ9PS0YrN+zrzuK
+         ckhqOWI5CWmjwLvz+gGfaw6H21+yTkvxNi6Awt4Ijr7Qe8J6okWGWG7XUdYGeQB0AKWu
+         mPXA1Rpq1tSOXakyhIQsRZYuXcZTEdRCWA4FfGhjeTgnTq9o/QDtELru3GZU13s2IqLD
+         DtIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=udbQo3HwW3wvcBCXw3BLsLO1iikSmqxQh+yfiLe552g=;
+        b=WxOtJINzP4nz1P0hyoysUWs5NJIC8ENlheaHM3KulAuTzJ90u6j4V6G89Xoe+ERmYi
+         mvOjZAdXR6w52Ld7WzegAolTbpwWxVZm93qepLMNn9SnRPjqD7bq06BD5a/PLpErH9E2
+         zs1D6aJecZlvfgaFX5xvBDctjZhlzrlYKBP2g8ZYs9RKgGafG/EC7BrMcnKd1Nsn1A+z
+         Vuqr41IIQtURtFXjl1GXYISlBb/QzGIZ1mJMUunTr0Kc3Dk8WB41MWIif5DZFOxjKj40
+         UQO2bZVBU/bGL6UPrCeUekStDfw5wyeSlX6YQI81agO8hLZgU8hYObwCDzopU8Hf1n1e
+         nenA==
+X-Gm-Message-State: APjAAAUuNdjd28uaZLmHPGe6OX9TtkHFpA3xlP2cLCIiWiwHvVx6dLo8
+        hb4Efx6qAe872f6vj4Kv07EXyIel3mFDhad4JS8=
+X-Google-Smtp-Source: APXvYqw2jcTj3DzQAaJiW66hWG1iMWy6QRNgrl9XaJWDBVRKiZFGlnF+ZEqbbSh6oQnylbwsQeKN3YXp0CebL0PpUFY=
+X-Received: by 2002:a5d:8e0d:: with SMTP id e13mr12089725iod.3.1569059071088;
+ Sat, 21 Sep 2019 02:44:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 21 Sep 2019 02:44:20 -0700
+Message-ID: <CAH2r5mui+2q-DNW9a7-prRWt82ZLCc9hLBNsSQxNdVa=Go1QEg@mail.gmail.com>
+Subject: WSL and remapping of reserved characters to Unicode remap range
+To:     Edgar Olougouna <edgaro@microsoft.com>,
+        Jeremy Allison <jra@samba.org>,
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fix sparse warnings:
+Did some experiments today with files created by the Windows Subsystem
+for Linux and noticed that they create files which have reserved
+characters by using the SFU remap strategy not the default used by
+Macs and Linux (the posix or "SFM" mapping)
 
-fs/cifs/smb2transport.c:52:1: warning: symbol 'smb3_crypto_shash_allocate' was not declared. Should it be static?
-fs/cifs/smb2transport.c:101:4: warning: symbol 'smb2_find_chan_signkey' was not declared. Should it be static?
-fs/cifs/smb2transport.c:121:17: warning: symbol 'smb2_find_global_smb_ses' was not declared. Should it be static?
+But at least it means if you mount to a windows system which has run
+the Windows Linux Subsystem you can simply do mount with mount option
+"mapchars" and the file names should show up fine.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: zhengbin <zhengbin13@huawei.com>
----
- fs/cifs/smb2transport.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+See example below (mounted to Windows directory created by WSL):
 
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 12988df..7cc8641 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -48,7 +48,7 @@ smb2_crypto_shash_allocate(struct TCP_Server_Info *server)
- 			       &server->secmech.sdeschmacsha256);
- }
+Virtual-Machine:~# ls /mnt/special-file-names
+'dirwithtrailingspace '   filewith:colon         'filewith space'
+'filewith*asterisk'      'filewith>greaterthan'   filewithtrailing.
+ filewithbackslash       'filewith<lessthan'
 
--int
-+static int
- smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
- {
- 	struct cifs_secmech *p = &server->secmech;
-@@ -98,7 +98,8 @@ smb311_crypto_shash_allocate(struct TCP_Server_Info *server)
- 	return rc;
- }
-
--u8 *smb2_find_chan_signkey(struct cifs_ses *ses, struct TCP_Server_Info *server)
-+static u8 *
-+smb2_find_chan_signkey(struct cifs_ses *ses, struct TCP_Server_Info *server)
- {
- 	int i;
- 	struct cifs_chan *chan;
-@@ -118,7 +119,7 @@ u8 *smb2_find_chan_signkey(struct cifs_ses *ses, struct TCP_Server_Info *server)
- 	return NULL;
- }
-
--struct cifs_ses *
-+static struct cifs_ses *
- smb2_find_global_smb_ses(__u64 ses_id)
- {
- 	struct TCP_Server_Info *server;
 --
-2.7.4
+Thanks,
 
+Steve
