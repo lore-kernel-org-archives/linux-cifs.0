@@ -2,56 +2,107 @@ Return-Path: <SRS0=rQDn=XQ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B25C4360D
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Sep 2019 18:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DD76C4360D
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Sep 2019 22:38:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BC04205F4
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Sep 2019 18:23:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4556B20830
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Sep 2019 22:38:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732281AbfIUSXj convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 21 Sep 2019 14:23:39 -0400
-Received: from mx2.suse.de ([195.135.220.15]:40704 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732278AbfIUSXj (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 21 Sep 2019 14:23:39 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 00C8DAE1A;
-        Sat, 21 Sep 2019 18:23:38 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Murphy Zhou <jencce.kernel@gmail.com>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] CIFS: fix max ea value size
-In-Reply-To: <20190921112600.utzouyddp3cdmxhe@XZHOUW.usersys.redhat.com>
-References: <20190921112600.utzouyddp3cdmxhe@XZHOUW.usersys.redhat.com>
-Date:   Sat, 21 Sep 2019 20:23:32 +0200
-Message-ID: <878sqhfqzf.fsf@suse.com>
+        id S1726769AbfIUWiv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 21 Sep 2019 18:38:51 -0400
+Received: from zeniv.linux.org.uk ([195.92.253.2]:32848 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726768AbfIUWiv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 21 Sep 2019 18:38:51 -0400
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.2 #3 (Red Hat Linux))
+        id 1iBo1f-0006TZ-OP; Sat, 21 Sep 2019 22:38:47 +0000
+Date:   Sat, 21 Sep 2019 23:38:47 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Steve French <stfrench@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: build_path_from_dentry_optional_prefix() may schedule from
+ invalid context
+Message-ID: <20190921223847.GB29065@ZenIV.linux.org.uk>
+References: <20190829050237.GA5161@jagdpanzerIV>
+ <CAKywueRd4d_fojGL+n4BisoibhgkYfN9Wyc_+0=-1sarz4-HZw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKywueRd4d_fojGL+n4BisoibhgkYfN9Wyc_+0=-1sarz4-HZw@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-"Murphy Zhou" <jencce.kernel@gmail.com> writes:
-> It should not be larger then the slab max buf size. If user
-> specifies a larger size, it passes this check and goes
-> straightly to SMB2_set_info_init performing an insecure memcpy.
+On Thu, Sep 19, 2019 at 05:11:54PM -0700, Pavel Shilovsky wrote:
 
-It's even smaller than that as CIFSMaxBufSize is the max size for the
-whole packet IIRC. The EA payload needs to fit into that. So it should
-be CIFSMaxBufSize-(largest SMB2 header size + Set EA initial
-header). And if we set multiple EA at the same time it has to be divided
-by the number of EAs etc...
+> Good catch. I think we should have another version of
+> build_path_from_dentry() which takes pre-allocated (probably on stack)
+> full_path as an argument. This would allow us to avoid allocations
+> under the spin lock.
 
-Cheers,
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
+On _stack_?  For relative pathname?  Er...  You do realize that
+kernel stack is small, right?  And said relative pathname can
+bloody well be up to 4Kb (i.e. the half of said stack already,
+on top of whatever the call chain has already eaten up)...
+
+BTW, looking at build_path_from_dentry()...  WTF is this?
+                temp = temp->d_parent;
+                if (temp == NULL) {
+                        cifs_dbg(VFS, "corrupt dentry\n");
+                        rcu_read_unlock();
+                        return NULL;
+                }
+Why not check for any number of other forms of memory corruption?
+Like, say it, if (temp == (void *)0xf0adf0adf0adf0ad)?
+
+IOW, kindly lose that nonsense.  More importantly, why bother
+with that kmalloc()?  Just __getname() in the very beginning
+and __putname() on failure (and for freeing the result afterwards).
+
+What's more, you are open-coding dentry_path_raw(), badly.
+The only differences are
+	* use of dirsep instead of '/' and
+	* a prefix slapped in the beginning.
+
+I'm fairly sure that
+	char *buf = __getname();
+	char *s;
+
+	*to_free = NULL;
+	if (unlikely(!buf))
+		return NULL;
+
+	s = dentry_path_raw(dentry, buf, PATH_MAX);
+	if (IS_ERR(s) || s < buf + prefix_len)
+		__putname(buf);
+		return NULL; // assuming that you don't care about details
+	}
+
+	if (dirsep != '/') {
+		char *p = s;
+		while ((p = strchr(p, '/')) != NULL)
+			*p++ = dirsep;
+	}
+
+	s -= prefix_len;
+	memcpy(s, prefix, prefix_len);
+	
+	*to_free = buf;
+	return s;
+
+would end up being faster, not to mention much easier to understand.
+With the caller expected to pass &to_free among the arguments and
+__putname() it once it's done.
+
+Or just do __getname() in the caller and pass it to the function -
+in that case freeing (in all cases) would be up to the caller.
