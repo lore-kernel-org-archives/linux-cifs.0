@@ -2,231 +2,150 @@ Return-Path: <SRS0=4YGq=XT=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA90C4360C
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 13:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5938BC432C2
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 13:30:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D9CB214AF
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 13:01:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569330111;
-	bh=VjC9QYJgAgnTEPx9z1RT20pzPjeLepKvzMZuyKza5N0=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=PWZS6KjIa0PGc7t4A94s8mAy5Iv1194xTvzz6E+sSPTR2BWXhUGNdHy+njDpYpyGB
-	 tePbMjSEAqzhTAHm5So7B+FGkmOk5jFuXUj38xB+g/gefNLpQ3vEQGu3Dk7DF5MuME
-	 5dzeRiDufneqYPY5Wnyd4yN5mWjQCV+d1/wI8tx4=
+	by mail.kernel.org (Postfix) with ESMTP id 2FFCB2064A
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 13:30:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="ux/4VDyH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2441077AbfIXNBi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 24 Sep 2019 09:01:38 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:35200 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2441070AbfIXNBi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Sep 2019 09:01:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=2DxfHYXnwwUH36k2ScufOGUb3wQBtCqq7ti4FtFbk+w=; b=G3W8W/4deGODTCIYCpCmbmoGr
-        bn2FSqr7JxfkjNfDSZADFk4BPK3kvMk5KVoT7cmVNH67m2k9PwB2Q5V3EGsoSZPhFsMKpcgDQK9z6
-        O2Eqj33TGU7ewR8EW2Pa2YCFi0SRttxIhH1va4ItMB7112Qo4MRvjba0obXSH7UFCEKaulAB0wqEk
-        TxtNpV9Xem6Ow7wfsnw6dyrBtI1AxCLEJC03/zAFUQ+PfVEiheZ3Cf9ZULqVqId1EiPP9w4N9nPAW
-        6gnN63y0cK7PqkJqgFzuXLy30ePttDbdx4kC+0HmpmacfZTorgXX3WwpknN0cvh9Gvguqg7cjWQoK
-        dSWeHc9rA==;
-Received: from 177.96.206.173.dynamic.adsl.gvt.net.br ([177.96.206.173] helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.2 #3 (Red Hat Linux))
-        id 1iCkRi-0000un-7T; Tue, 24 Sep 2019 13:01:34 +0000
-Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.2)
-        (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iCkRf-0001ax-RW; Tue, 24 Sep 2019 10:01:31 -0300
-From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>, corbet@lwn.net
-Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Paul Burton <paul.burton@mips.com>,
-        James Hogan <jhogan@kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shannon Nelson <snelson@pensando.io>,
-        Pensando Drivers <drivers@pensando.io>,
-        Steve French <sfrench@samba.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, devicetree@vger.kernel.org,
-        linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-mips@vger.kernel.org, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-riscv@lists.infradead.org
-Subject: [PATCH 1/3] docs: fix some broken references
-Date:   Tue, 24 Sep 2019 10:01:28 -0300
-Message-Id: <b87385b2ac6ce6c75df82062fce2976149bbaa6b.1569330078.git.mchehab+samsung@kernel.org>
-X-Mailer: git-send-email 2.21.0
+        id S2504930AbfIXNac (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 24 Sep 2019 09:30:32 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:35021 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2505058AbfIXNab (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Sep 2019 09:30:31 -0400
+Received: by mail-qt1-f194.google.com with SMTP id m15so2119266qtq.2
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Sep 2019 06:30:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=5MMdmEI5E3YGr18eOY+CzA36GDQKBSr573ORf++OIig=;
+        b=ux/4VDyHuy/J1rXbaFWi7pE86io9QNhjmComOk8cMBBOnRq+ypAy5jXyK6J4quq4m3
+         bxWvfnfgVEkiES1wLPmv0DY8yS0YqWEGzh18RgfRTLCtvF/pUN25LfZmlJn+1NHQQdGT
+         0EQ7Y1tvTprvs+E+Mj0oemTj5V9Yizq5/SmUrDdkHuQ1U+fh/UeTErWEQssMZljcX9l6
+         Dc/ej2E4wVuCvihnRc9jv8Y2QCm7emT0L8d9uVBw1Ren0DWNKHj4KdIAU4cV9jPSeBie
+         sx/8GbD/8Sgp4xpevPnX1Xwn/3a111uB5vj0xkXE9oyzdCU8u/SH4Be5UsbrKo9O3iOJ
+         Mfsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=5MMdmEI5E3YGr18eOY+CzA36GDQKBSr573ORf++OIig=;
+        b=CzcmgKa7QlJoVtX6PD7tLLA/Vy7joMha+OWp7wFQjAHmzVFG8l06p9OaUcxBsHYldq
+         HVaSMwqnUYJmKulHehcvlr/Sjlxy1Nht3Ja5SuQ/8aC5sa5RvQ4+lxtnxJ6aiExF5o9q
+         MgjkFJu/uWHTLQQ/zYFF2ksVGaj+5ZGaRLqkZhaOa2dxQ8tv38aVC1cpJWcCbZOY86cs
+         6Q7OGwjVkA0Vw/Q6mVq/MZdljswH+KTUybdZNWrnA4QMcvcsbIrk4zDQBwGEn2RTvkom
+         rSRmuL8AfiwFrQOAavjwoH76bxitaUlwn0HLd8odSJ/kuV7WzrWI0nX7qMwMBBLg6Xot
+         caGA==
+X-Gm-Message-State: APjAAAWaVnIjHIpoXgj2v6qubGffMqRIhaWMa0/tcWjQLa3sBaR2PAIC
+        V31+Ayv5/TNoHi8ViNieH6kQVw==
+X-Google-Smtp-Source: APXvYqzjyxB9ym582W5hkail5QrvOGDSjAstiMeIulH4RPqRz7KSnnBtvmkpRJW3vuDrKCbF7rRPHg==
+X-Received: by 2002:ad4:458d:: with SMTP id x13mr2442272qvu.85.1569331828635;
+        Tue, 24 Sep 2019 06:30:28 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::b7c9])
+        by smtp.gmail.com with ESMTPSA id p22sm856947qkk.92.2019.09.24.06.30.27
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 24 Sep 2019 06:30:27 -0700 (PDT)
+Date:   Tue, 24 Sep 2019 09:30:26 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "zhengbin (A)" <zhengbin13@huawei.com>, Jan Kara <jack@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "zhangyi (F)" <yi.zhang@huawei.com>, renxudong1@huawei.com,
+        Hou Tao <houtao1@huawei.com>, linux-btrfs@vger.kernel.org,
+        "Yan, Zheng" <zyan@redhat.com>, linux-cifs@vger.kernel.org,
+        Steve French <sfrench@us.ibm.com>
+Subject: Re: [PATCH] Re: Possible FS race condition between iterate_dir and
+ d_alloc_parallel
+Message-ID: <20190924133025.jeh7ond2svm3lsub@macbook-pro-91.dhcp.thefacebook.com>
+References: <20190914170146.GT1131@ZenIV.linux.org.uk>
+ <CAHk-=wiPv+yo86GpA+Gd_et0KS2Cydk4gSbEj3p4S4tEb1roKw@mail.gmail.com>
+ <20190914200412.GU1131@ZenIV.linux.org.uk>
+ <CAHk-=whpoQ_hX2KeqjQs3DeX6Wb4Tmb8BkHa5zr-Xu=S55+ORg@mail.gmail.com>
+ <20190915005046.GV1131@ZenIV.linux.org.uk>
+ <CAHk-=wjcZBB2GpGP-cxXppzW=M0EuFnSLoTXHyqJ4BtffYrCXw@mail.gmail.com>
+ <20190915160236.GW1131@ZenIV.linux.org.uk>
+ <CAHk-=whjNE+_oSBP_o_9mquUKsJn4gomL2f0MM79gxk_SkYLRw@mail.gmail.com>
+ <20190921140731.GQ1131@ZenIV.linux.org.uk>
+ <20190924025215.GA9941@ZenIV.linux.org.uk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190924025215.GA9941@ZenIV.linux.org.uk>
+User-Agent: NeoMutt/20180716
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-There are a number of documentation files that got moved or
-renamed. update their references.
+On Tue, Sep 24, 2019 at 03:52:15AM +0100, Al Viro wrote:
+> [btrfs and cifs folks Cc'd]
+> 
+> On Sat, Sep 21, 2019 at 03:07:31PM +0100, Al Viro wrote:
+> 
+> > No "take cursors out of the list" parts yet.
+> 
+> Argh...  The things turned interesting.  The tricky part is
+> where do we handle switching cursors away from something
+> that gets moved.
+> 
+> What I hoped for was "just do it in simple_rename()".  Which is
+> almost OK; there are 3 problematic cases.  One is shmem -
+> there we have a special ->rename(), which handles things
+> like RENAME_EXCHANGE et.al.  Fair enough - some of that
+> might've been moved into simple_rename(), but some (whiteouts)
+> won't be that easy.  Fair enough - we can make kicking the
+> cursors outs a helper called by simple_rename() and by that.
+> Exchange case is going to cause a bit of headache (the
+> pathological case is when the entries being exchanged are
+> next to each other in the same directory), but it's not
+> that bad.
+> 
+> Two other cases, though, might be serious trouble.  Those are
+> btrfs new_simple_dir() and this in cifs_root_iget():
+>         if (rc && tcon->pipe) {
+>                 cifs_dbg(FYI, "ipc connection - fake read inode\n");
+>                 spin_lock(&inode->i_lock);
+>                 inode->i_mode |= S_IFDIR;
+>                 set_nlink(inode, 2);
+>                 inode->i_op = &cifs_ipc_inode_ops;
+>                 inode->i_fop = &simple_dir_operations;
+>                 inode->i_uid = cifs_sb->mnt_uid;
+>                 inode->i_gid = cifs_sb->mnt_gid;
+>                 spin_unlock(&inode->i_lock);
+> 	}
+> The trouble is, it looks like d_splice_alias() from a lookup elsewhere
+> might find an alias of some subdirectory in those.  And in that case
+> we'll end up with a child of those (dcache_readdir-using) directories
+> being ripped out and moved elsewhere.  With no calls of ->rename() in
+> sight, of course, *AND* with only shared lock on the parent.  The
+> last part is really nasty.  And not just for hanging cursors off the
+> dentries they point to - it's a problem for dcache_readdir() itself
+> even in the mainline and with all the lockless crap reverted.
+> 
+> We pass next->d_name.name to dir_emit() (i.e. potentially to
+> copy_to_user()).  And we have no warranty that it's not a long
+> (== separately allocated) name, that will be freed while
+> copy_to_user() is in progress.  Sure, it'll get an RCU delay
+> before freeing, but that doesn't help us at all.
+> 
+> I'm not familiar with those areas in btrfs or cifs; could somebody
+> explain what's going on there and can we indeed end up finding aliases
+> to those suckers?
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
----
- Documentation/devicetree/bindings/cpu/cpu-topology.txt    | 2 +-
- Documentation/devicetree/bindings/timer/ingenic,tcu.txt   | 2 +-
- Documentation/driver-api/gpio/driver.rst                  | 2 +-
- Documentation/hwmon/inspur-ipsps1.rst                     | 2 +-
- Documentation/mips/ingenic-tcu.rst                        | 2 +-
- Documentation/networking/device_drivers/mellanox/mlx5.rst | 2 +-
- MAINTAINERS                                               | 2 +-
- drivers/net/ethernet/faraday/ftgmac100.c                  | 2 +-
- drivers/net/ethernet/pensando/ionic/ionic_if.h            | 4 ++--
- fs/cifs/cifsfs.c                                          | 2 +-
- 10 files changed, 11 insertions(+), 11 deletions(-)
+We can't for the btrfs case.  This is used for the case where we have a link to
+a subvolume but the root has disappeared already, so we add in that dummy inode.
+We completely drop the dcache from that root downards when we drop the
+subvolume, so we're not going to find aliases underneath those things.  Is that
+what you're asking?  Thanks,
 
-diff --git a/Documentation/devicetree/bindings/cpu/cpu-topology.txt b/Documentation/devicetree/bindings/cpu/cpu-topology.txt
-index 99918189403c..9bd530a35d14 100644
---- a/Documentation/devicetree/bindings/cpu/cpu-topology.txt
-+++ b/Documentation/devicetree/bindings/cpu/cpu-topology.txt
-@@ -549,5 +549,5 @@ Example 3: HiFive Unleashed (RISC-V 64 bit, 4 core system)
- [2] Devicetree NUMA binding description
-     Documentation/devicetree/bindings/numa.txt
- [3] RISC-V Linux kernel documentation
--    Documentation/devicetree/bindings/riscv/cpus.txt
-+    Documentation/devicetree/bindings/riscv/cpus.yaml
- [4] https://www.devicetree.org/specifications/
-diff --git a/Documentation/devicetree/bindings/timer/ingenic,tcu.txt b/Documentation/devicetree/bindings/timer/ingenic,tcu.txt
-index 5a4b9ddd9470..7f6fe20503f5 100644
---- a/Documentation/devicetree/bindings/timer/ingenic,tcu.txt
-+++ b/Documentation/devicetree/bindings/timer/ingenic,tcu.txt
-@@ -2,7 +2,7 @@ Ingenic JZ47xx SoCs Timer/Counter Unit devicetree bindings
- ==========================================================
- 
- For a description of the TCU hardware and drivers, have a look at
--Documentation/mips/ingenic-tcu.txt.
-+Documentation/mips/ingenic-tcu.rst.
- 
- Required properties:
- 
-diff --git a/Documentation/driver-api/gpio/driver.rst b/Documentation/driver-api/gpio/driver.rst
-index 3fdb32422f8a..9076cc76d5bf 100644
---- a/Documentation/driver-api/gpio/driver.rst
-+++ b/Documentation/driver-api/gpio/driver.rst
-@@ -493,7 +493,7 @@ available but we try to move away from this:
-   gpiochip. It will pass the struct gpio_chip* for the chip to all IRQ
-   callbacks, so the callbacks need to embed the gpio_chip in its state
-   container and obtain a pointer to the container using container_of().
--  (See Documentation/driver-model/design-patterns.txt)
-+  (See Documentation/driver-api/driver-model/design-patterns.rst)
- 
- - gpiochip_irqchip_add_nested(): adds a nested cascaded irqchip to a gpiochip,
-   as discussed above regarding different types of cascaded irqchips. The
-diff --git a/Documentation/hwmon/inspur-ipsps1.rst b/Documentation/hwmon/inspur-ipsps1.rst
-index 2b871ae3448f..ed32a65c30e1 100644
---- a/Documentation/hwmon/inspur-ipsps1.rst
-+++ b/Documentation/hwmon/inspur-ipsps1.rst
-@@ -17,7 +17,7 @@ Usage Notes
- -----------
- 
- This driver does not auto-detect devices. You will have to instantiate the
--devices explicitly. Please see Documentation/i2c/instantiating-devices for
-+devices explicitly. Please see Documentation/i2c/instantiating-devices.rst for
- details.
- 
- Sysfs entries
-diff --git a/Documentation/mips/ingenic-tcu.rst b/Documentation/mips/ingenic-tcu.rst
-index c4ef4c45aade..c5a646b14450 100644
---- a/Documentation/mips/ingenic-tcu.rst
-+++ b/Documentation/mips/ingenic-tcu.rst
-@@ -68,4 +68,4 @@ and frameworks can be controlled from the same registers, all of these
- drivers access their registers through the same regmap.
- 
- For more information regarding the devicetree bindings of the TCU drivers,
--have a look at Documentation/devicetree/bindings/mfd/ingenic,tcu.txt.
-+have a look at Documentation/devicetree/bindings/timer/ingenic,tcu.txt.
-diff --git a/Documentation/networking/device_drivers/mellanox/mlx5.rst b/Documentation/networking/device_drivers/mellanox/mlx5.rst
-index d071c6b49e1f..a74422058351 100644
---- a/Documentation/networking/device_drivers/mellanox/mlx5.rst
-+++ b/Documentation/networking/device_drivers/mellanox/mlx5.rst
-@@ -258,7 +258,7 @@ mlx5 tracepoints
- ================
- 
- mlx5 driver provides internal trace points for tracking and debugging using
--kernel tracepoints interfaces (refer to Documentation/trace/ftrase.rst).
-+kernel tracepoints interfaces (refer to Documentation/trace/ftrace.rst).
- 
- For the list of support mlx5 events check /sys/kernel/debug/tracing/events/mlx5/
- 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 54f1286087e9..65b7d9a0a44a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3680,7 +3680,7 @@ M:	Oleksij Rempel <o.rempel@pengutronix.de>
- R:	Pengutronix Kernel Team <kernel@pengutronix.de>
- L:	linux-can@vger.kernel.org
- S:	Maintained
--F:	Documentation/networking/j1939.txt
-+F:	Documentation/networking/j1939.rst
- F:	net/can/j1939/
- F:	include/uapi/linux/can/j1939.h
- 
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 9b7af94a40bb..8abe5e90d268 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.c
-+++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -1835,7 +1835,7 @@ static int ftgmac100_probe(struct platform_device *pdev)
- 		}
- 
- 		/* Indicate that we support PAUSE frames (see comment in
--		 * Documentation/networking/phy.txt)
-+		 * Documentation/networking/phy.rst)
- 		 */
- 		phy_support_asym_pause(phy);
- 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_if.h b/drivers/net/ethernet/pensando/ionic/ionic_if.h
-index 5bfdda19f64d..80028f781c83 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_if.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_if.h
-@@ -596,8 +596,8 @@ enum ionic_txq_desc_opcode {
-  *                      the @encap is set, the device will
-  *                      offload the outer header checksums using
-  *                      LCO (local checksum offload) (see
-- *                      Documentation/networking/checksum-
-- *                      offloads.txt for more info).
-+ *                      Documentation/networking/checksum-offloads.rst
-+ *                      for more info).
-  *
-  *                   IONIC_TXQ_DESC_OPCODE_CSUM_HW:
-  *
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 2e9c7f493f99..811f510578cb 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1529,7 +1529,7 @@ init_cifs(void)
- 	/*
- 	 * Consider in future setting limit!=0 maybe to min(num_of_cores - 1, 3)
- 	 * so that we don't launch too many worker threads but
--	 * Documentation/workqueue.txt recommends setting it to 0
-+	 * Documentation/core-api/workqueue.rst recommends setting it to 0
- 	 */
- 
- 	/* WQ_UNBOUND allows decrypt tasks to run on any CPU */
--- 
-2.21.0
-
+Josef
