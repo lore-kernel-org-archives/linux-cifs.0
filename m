@@ -2,76 +2,107 @@ Return-Path: <SRS0=4YGq=XT=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58312C432C1
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 02:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ADDFC432C1
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 02:52:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 31E6C207FD
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 02:07:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45911207FD
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 02:52:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388704AbfIXCHA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 23 Sep 2019 22:07:00 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2709 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729136AbfIXCHA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 23 Sep 2019 22:07:00 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id DEF3F643F7FD1C187B77
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Sep 2019 10:06:58 +0800 (CST)
-Received: from huawei.com (10.90.53.225) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Tue, 24 Sep 2019
- 10:06:53 +0800
-From:   zhengbin <zhengbin13@huawei.com>
-To:     <smfrench@gmail.com>, <linux-cifs@vger.kernel.org>
-CC:     <zhengbin13@huawei.com>
-Subject: [PATCH] fs/cifs/sess.c: Remove set but not used variable 'capabilities'
-Date:   Tue, 24 Sep 2019 10:13:47 +0800
-Message-ID: <1569291227-51027-1-git-send-email-zhengbin13@huawei.com>
-X-Mailer: git-send-email 2.7.4
+        id S1729443AbfIXCwX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 23 Sep 2019 22:52:23 -0400
+Received: from zeniv.linux.org.uk ([195.92.253.2]:41660 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728992AbfIXCwX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 23 Sep 2019 22:52:23 -0400
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.2 #3 (Red Hat Linux))
+        id 1iCaw3-000329-O6; Tue, 24 Sep 2019 02:52:15 +0000
+Date:   Tue, 24 Sep 2019 03:52:15 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "zhengbin (A)" <zhengbin13@huawei.com>, Jan Kara <jack@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "zhangyi (F)" <yi.zhang@huawei.com>, renxudong1@huawei.com,
+        Hou Tao <houtao1@huawei.com>, linux-btrfs@vger.kernel.org,
+        "Yan, Zheng" <zyan@redhat.com>, linux-cifs@vger.kernel.org,
+        Steve French <sfrench@us.ibm.com>
+Subject: Re: [PATCH] Re: Possible FS race condition between iterate_dir and
+ d_alloc_parallel
+Message-ID: <20190924025215.GA9941@ZenIV.linux.org.uk>
+References: <CAHk-=whpKgNTxjrenAed2sNkegrpCCPkV77_pWKbqo+c7apCOw@mail.gmail.com>
+ <20190914170146.GT1131@ZenIV.linux.org.uk>
+ <CAHk-=wiPv+yo86GpA+Gd_et0KS2Cydk4gSbEj3p4S4tEb1roKw@mail.gmail.com>
+ <20190914200412.GU1131@ZenIV.linux.org.uk>
+ <CAHk-=whpoQ_hX2KeqjQs3DeX6Wb4Tmb8BkHa5zr-Xu=S55+ORg@mail.gmail.com>
+ <20190915005046.GV1131@ZenIV.linux.org.uk>
+ <CAHk-=wjcZBB2GpGP-cxXppzW=M0EuFnSLoTXHyqJ4BtffYrCXw@mail.gmail.com>
+ <20190915160236.GW1131@ZenIV.linux.org.uk>
+ <CAHk-=whjNE+_oSBP_o_9mquUKsJn4gomL2f0MM79gxk_SkYLRw@mail.gmail.com>
+ <20190921140731.GQ1131@ZenIV.linux.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190921140731.GQ1131@ZenIV.linux.org.uk>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+[btrfs and cifs folks Cc'd]
 
-fs/cifs/sess.c: In function sess_auth_lanman:
-fs/cifs/sess.c:910:8: warning: variable capabilities set but not used [-Wunused-but-set-variable]
+On Sat, Sep 21, 2019 at 03:07:31PM +0100, Al Viro wrote:
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: zhengbin <zhengbin13@huawei.com>
----
- fs/cifs/sess.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> No "take cursors out of the list" parts yet.
 
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 20c73a4..82e29f8 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -910,7 +910,6 @@ sess_auth_lanman(struct sess_data *sess_data)
- 	char *bcc_ptr;
- 	struct cifs_ses *ses = sess_data->ses;
- 	char lnm_session_key[CIFS_AUTH_RESP_SIZE];
--	__u32 capabilities;
- 	__u16 bytes_remaining;
+Argh...  The things turned interesting.  The tricky part is
+where do we handle switching cursors away from something
+that gets moved.
 
- 	/* lanman 2 style sessionsetup */
-@@ -921,7 +920,7 @@ sess_auth_lanman(struct sess_data *sess_data)
+What I hoped for was "just do it in simple_rename()".  Which is
+almost OK; there are 3 problematic cases.  One is shmem -
+there we have a special ->rename(), which handles things
+like RENAME_EXCHANGE et.al.  Fair enough - some of that
+might've been moved into simple_rename(), but some (whiteouts)
+won't be that easy.  Fair enough - we can make kicking the
+cursors outs a helper called by simple_rename() and by that.
+Exchange case is going to cause a bit of headache (the
+pathological case is when the entries being exchanged are
+next to each other in the same directory), but it's not
+that bad.
 
- 	pSMB = (SESSION_SETUP_ANDX *)sess_data->iov[0].iov_base;
- 	bcc_ptr = sess_data->iov[2].iov_base;
--	capabilities = cifs_ssetup_hdr(ses, pSMB);
-+	(void)cifs_ssetup_hdr(ses, pSMB);
+Two other cases, though, might be serious trouble.  Those are
+btrfs new_simple_dir() and this in cifs_root_iget():
+        if (rc && tcon->pipe) {
+                cifs_dbg(FYI, "ipc connection - fake read inode\n");
+                spin_lock(&inode->i_lock);
+                inode->i_mode |= S_IFDIR;
+                set_nlink(inode, 2);
+                inode->i_op = &cifs_ipc_inode_ops;
+                inode->i_fop = &simple_dir_operations;
+                inode->i_uid = cifs_sb->mnt_uid;
+                inode->i_gid = cifs_sb->mnt_gid;
+                spin_unlock(&inode->i_lock);
+	}
+The trouble is, it looks like d_splice_alias() from a lookup elsewhere
+might find an alias of some subdirectory in those.  And in that case
+we'll end up with a child of those (dcache_readdir-using) directories
+being ripped out and moved elsewhere.  With no calls of ->rename() in
+sight, of course, *AND* with only shared lock on the parent.  The
+last part is really nasty.  And not just for hanging cursors off the
+dentries they point to - it's a problem for dcache_readdir() itself
+even in the mainline and with all the lockless crap reverted.
 
- 	pSMB->req.hdr.Flags2 &= ~SMBFLG2_UNICODE;
+We pass next->d_name.name to dir_emit() (i.e. potentially to
+copy_to_user()).  And we have no warranty that it's not a long
+(== separately allocated) name, that will be freed while
+copy_to_user() is in progress.  Sure, it'll get an RCU delay
+before freeing, but that doesn't help us at all.
 
---
-2.7.4
-
+I'm not familiar with those areas in btrfs or cifs; could somebody
+explain what's going on there and can we indeed end up finding aliases
+to those suckers?
