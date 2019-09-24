@@ -2,98 +2,109 @@ Return-Path: <SRS0=4YGq=XT=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC0EC432C1
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 15:19:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09F9DC432C2
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 15:26:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B232B20665
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 15:19:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D36A1214DA
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 15:26:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CJcKb3e1"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="DBGhILW/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731501AbfIXPTB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 24 Sep 2019 11:19:01 -0400
-Received: from mail-lf1-f44.google.com ([209.85.167.44]:40647 "EHLO
-        mail-lf1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730610AbfIXPTB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Sep 2019 11:19:01 -0400
-Received: by mail-lf1-f44.google.com with SMTP id d17so1713081lfa.7
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Sep 2019 08:19:00 -0700 (PDT)
+        id S2389285AbfIXP0c (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 24 Sep 2019 11:26:32 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:44103 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389379AbfIXP0c (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Sep 2019 11:26:32 -0400
+Received: by mail-qt1-f195.google.com with SMTP id u40so2599108qth.11
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Sep 2019 08:26:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=XwtCxduiaizIi6QX2xQuk08roAb1261lgMxAYujwlvk=;
-        b=CJcKb3e1eLxmmiyWUgs3KY2VSLm/xP7+ZORZTXMeJtVezPXb72HGW6v83LE9Td4Ova
-         j1I3dhCQQFOKpKRzQhtVImFLO3xIgSnIh4wncvLm1Gt4JKqCM5JLmaVPBmLqLgoaZR5F
-         O2TnEdvsFtjB6ostsQ5RgGW3alTIOPqSXErZGO4av+R2v2r9B1lL1eroEvu3GMxVTuz4
-         nzYZDWmaHUfBFIm3hMUULp558gL/DeucEZYzcRqEmfwSadaIgBGO84pdhDSE5noPQTh/
-         2l67MQRt2nO3pprBpf0/pIUeiqlf2HgV4wAo23DskLf8BtKwIpQRAV/CbEVHE2LkuvxG
-         PKDA==
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=o6SX2bYbXAGHBybfVZh0fw5VGyAoUYkj0YnKMsvN2mE=;
+        b=DBGhILW/UlkUyxuVcQ8G0wTX6F4dvTFGNFUyr2C1Ledj0k8uPXTOu1gJVZ8q8NwFKd
+         dPTbJZg7etvDl5IFYBgTfMM/kTz8w7KnvVC6H5D/fXGx3e7ZO4u/XeFgw0S/+CNWcjxT
+         ilKawlilxZ026qa6ZGyZ+KUwWJjlMLh1eCSpZPBXHKkiK2t/JlFFNxSjPIDg4zdnPcd8
+         +es8Mk0Uq26qMD1VUwJKrhF4R00Eiklf1shpqWheixkcFzq9SO0ZlCUJB4/v0Feevzuu
+         jbx9y/wALNRKTKLWOTOLanE4xKaMIyLlsFrSBTRQ/3ORpDYKWpE6IjicoXAkXpjAtV72
+         +U3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=XwtCxduiaizIi6QX2xQuk08roAb1261lgMxAYujwlvk=;
-        b=HNvxduvKA2tn/hz6wLmukJUANZYThh71hyIvYA2IiDMhMHEsl01H/6ovQwBPkj6uL7
-         Tux2D3BuoTcbbZ30g9XtXHoSHqns40Kv5IFhFURvlaVtk5vSmxI15Mt2cOatauUa+s/q
-         xdFPxqifiRte/oDJWSp9Ot+bsCtrVFxOl7H0hHY1Vd5U5FI9Pv07dSNdKJPNHF4kBaen
-         7/iyB5585/54KhsHP9Lu932I8A4G9rWy69r23J0jp4IcNSpMFPiDNaoLXxUubPQUee6K
-         tup+SQwvDdN5e5PQZKRHRSX5iDHECztHPkBV8D36CwVzQpMSvtKacEXZO9JueH1UCIVE
-         YYLQ==
-X-Gm-Message-State: APjAAAUXYF0o3+wn6JwgEJnOayIxAJ6SNn29L9E+HuDUTUcT65ap3lXM
-        UYrZYmz1GQCV6oBOA4yaQFah1EOFc9TzRViPdA==
-X-Google-Smtp-Source: APXvYqz3xR04ZEaUDGlftEt8ejCiYNfgkT/PNEOcVLaEDDTrk6n2myIo5qvB44+GJgz33di6Vr/r62VRkAP7Z2Bbvqo=
-X-Received: by 2002:ac2:4308:: with SMTP id l8mr2226416lfh.25.1569338339168;
- Tue, 24 Sep 2019 08:18:59 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=o6SX2bYbXAGHBybfVZh0fw5VGyAoUYkj0YnKMsvN2mE=;
+        b=Bjr47GiO17raHnFKu8YeH2eOxO/4NZAMp7WPVV9EsiUMXfKg0KJlbNWZrixeAafW0W
+         aG6f+k4WIReZ3zLnWDE0+x2wiY0wa8XWkTM8uTj2dGV5vney/r7RZrAQso/lyZPuEKrB
+         ge11F5DA1DHPSZAkLPXjFOdKyx9QwdJNuOXZt8W6bCxfssi+VVSMv99DbSgoiH2I2DVX
+         0wcxWPQblww6y3JCxOQuPcJCfQ34COUsNfRGmZIKn9+7UoFuRVnE2wB/cc8iFEveAZF/
+         HVJQYI1YKCd6eS0yBhYETB2K2Z69lcsyBxBkJJYQVcYO9L1hM3N33XTXcEozu+Ng3B/c
+         iSVg==
+X-Gm-Message-State: APjAAAXQsVW3epWXPxNOmp3o8RCBlqT1srtUcvyjNGMkH6oYVATtlST/
+        4EKd3gcFA/es3bBeDuz/sDNzUOads32qYhlc
+X-Google-Smtp-Source: APXvYqzOc7iQ4khQTvZkqykYy70kyTHNkYYL+Rvm+VHLy5Guvj2CqZkXM9DGtMHXlAZPuEHjNAXziQ==
+X-Received: by 2002:ac8:4a12:: with SMTP id x18mr3346297qtq.84.1569338790819;
+        Tue, 24 Sep 2019 08:26:30 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::b7c9])
+        by smtp.gmail.com with ESMTPSA id d45sm1398604qtc.70.2019.09.24.08.26.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 24 Sep 2019 08:26:29 -0700 (PDT)
+Date:   Tue, 24 Sep 2019 11:26:28 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        "zhengbin (A)" <zhengbin13@huawei.com>, Jan Kara <jack@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "zhangyi (F)" <yi.zhang@huawei.com>, renxudong1@huawei.com,
+        Hou Tao <houtao1@huawei.com>, linux-btrfs@vger.kernel.org,
+        "Yan, Zheng" <zyan@redhat.com>, linux-cifs@vger.kernel.org,
+        Steve French <sfrench@us.ibm.com>
+Subject: Re: [PATCH] Re: Possible FS race condition between iterate_dir and
+ d_alloc_parallel
+Message-ID: <20190924152627.kmbvxb4elpxfoybf@macbook-pro-91.dhcp.thefacebook.com>
+References: <20190915005046.GV1131@ZenIV.linux.org.uk>
+ <CAHk-=wjcZBB2GpGP-cxXppzW=M0EuFnSLoTXHyqJ4BtffYrCXw@mail.gmail.com>
+ <20190915160236.GW1131@ZenIV.linux.org.uk>
+ <CAHk-=whjNE+_oSBP_o_9mquUKsJn4gomL2f0MM79gxk_SkYLRw@mail.gmail.com>
+ <20190921140731.GQ1131@ZenIV.linux.org.uk>
+ <20190924025215.GA9941@ZenIV.linux.org.uk>
+ <20190924133025.jeh7ond2svm3lsub@macbook-pro-91.dhcp.thefacebook.com>
+ <20190924145104.GE26530@ZenIV.linux.org.uk>
+ <20190924150144.6yqukmzwc3xlnfql@macbook-pro-91.dhcp.thefacebook.com>
+ <20190924151107.GF26530@ZenIV.linux.org.uk>
 MIME-Version: 1.0
-References: <CAH2r5mvfb3nkdz8r8sAUXGJkx678XZkt4dn=4xiuq0UD2vxFrw@mail.gmail.com>
-In-Reply-To: <CAH2r5mvfb3nkdz8r8sAUXGJkx678XZkt4dn=4xiuq0UD2vxFrw@mail.gmail.com>
-From:   Pavel Shilovsky <pavel.shilovsky@gmail.com>
-Date:   Tue, 24 Sep 2019 08:18:47 -0700
-Message-ID: <CAKywueQXsnMzS30q2QidWAjvMinCXXWQg0ysUH=62RWLnPW1UQ@mail.gmail.com>
-Subject: Re: [PATCH] smbinfo dump encryption keys for using wireshark
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190924151107.GF26530@ZenIV.linux.org.uk>
+User-Agent: NeoMutt/20180716
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-+ if (keys_info.cipher_type =3D=3D 1)
-+ printf("CCM encryption");
-+ else if (keys_info.cipher_type =3D=3D 2)
-+ printf("GCM encryption");
-+ else if (keys_info.cipher_type =3D=3D 0)
-+ printf("SMB3.0 CCM encryption");
+On Tue, Sep 24, 2019 at 04:11:07PM +0100, Al Viro wrote:
+> On Tue, Sep 24, 2019 at 11:01:45AM -0400, Josef Bacik wrote:
+> 
+> > Sorry I mis-read the code a little bit.  This is purely for the subvolume link
+> > directories.  We haven't wandered down into this directory yet.  If the
+> > subvolume is being deleted and we still have the fake directory entry for it
+> > then we just populate it with this dummy inode and then we can't lookup anything
+> > underneath it.  Thanks,
+> 
+> Umm...  OK, I guess my question would be better stated a bit differently: we
+> have a directory inode, with btrfs_lookup() for lookups in it *and* with
+> dcache_readdir() called when you try to do getdents(2) on that thing.
+> How does that work?
 
-Do we need to mention SMB3.0 here? It is the same CCM as cipher_type
-1, why don't just extend the 1st IF to
+Sorry I hadn't read through the context.  We won't end up with things under this
+directory.  The lookup will try to look up into the subvolume, see that it's
+empty, and just return nothing.  There should never be any entries that end up
+under this dummy entry.  Thanks,
 
-if (keys_info.cipher_type =3D=3D 0 || keys_info.cipher_type =3D=3D 1)
-
-+ else
-+ printf("unknown encryption type");
-
-Best regards,
-Pavel Shilovskiy
-
-=D0=BF=D0=BD, 23 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 21:51, Steve=
- French via samba-technical
-<samba-technical@lists.samba.org>:
->
-> Updated with feedback from Aurelien and Pavel
->
->
->
-> --
-> Thanks,
->
-> Steve
+Josef
