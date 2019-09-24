@@ -2,76 +2,94 @@ Return-Path: <SRS0=4YGq=XT=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4962EC432C1
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 16:33:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0278EC432C1
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 18:12:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 14E4120872
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 16:33:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C65F0214AF
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 18:12:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qz96Mlo/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387406AbfIXQdH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 24 Sep 2019 12:33:07 -0400
-Received: from zeniv.linux.org.uk ([195.92.253.2]:52086 "EHLO
-        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725208AbfIXQdH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Sep 2019 12:33:07 -0400
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.2 #3 (Red Hat Linux))
-        id 1iCnkL-0005pD-Ec; Tue, 24 Sep 2019 16:33:01 +0000
-Date:   Tue, 24 Sep 2019 17:33:01 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "zhengbin (A)" <zhengbin13@huawei.com>, Jan Kara <jack@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        "zhangyi (F)" <yi.zhang@huawei.com>, renxudong1@huawei.com,
-        Hou Tao <houtao1@huawei.com>, linux-btrfs@vger.kernel.org,
-        "Yan, Zheng" <zyan@redhat.com>, linux-cifs@vger.kernel.org,
-        Steve French <sfrench@us.ibm.com>
-Subject: Re: [PATCH] Re: Possible FS race condition between iterate_dir and
- d_alloc_parallel
-Message-ID: <20190924163301.GG26530@ZenIV.linux.org.uk>
-References: <CAHk-=wjcZBB2GpGP-cxXppzW=M0EuFnSLoTXHyqJ4BtffYrCXw@mail.gmail.com>
- <20190915160236.GW1131@ZenIV.linux.org.uk>
- <CAHk-=whjNE+_oSBP_o_9mquUKsJn4gomL2f0MM79gxk_SkYLRw@mail.gmail.com>
- <20190921140731.GQ1131@ZenIV.linux.org.uk>
- <20190924025215.GA9941@ZenIV.linux.org.uk>
- <20190924133025.jeh7ond2svm3lsub@macbook-pro-91.dhcp.thefacebook.com>
- <20190924145104.GE26530@ZenIV.linux.org.uk>
- <20190924150144.6yqukmzwc3xlnfql@macbook-pro-91.dhcp.thefacebook.com>
- <20190924151107.GF26530@ZenIV.linux.org.uk>
- <20190924152627.kmbvxb4elpxfoybf@macbook-pro-91.dhcp.thefacebook.com>
+        id S1730347AbfIXSML (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 24 Sep 2019 14:12:11 -0400
+Received: from mail-io1-f50.google.com ([209.85.166.50]:39631 "EHLO
+        mail-io1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730328AbfIXSML (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Sep 2019 14:12:11 -0400
+Received: by mail-io1-f50.google.com with SMTP id a1so6773307ioc.6
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Sep 2019 11:12:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=smuayUEU8rmhnRLjhl24Yn31b44MmB9vFUlaX2MYpBI=;
+        b=qz96Mlo/8cOOWUprC64jaYDAmTPUaJ670ZZjBkTM+7JshZcRE4gfFTXZaxsXMN8TBn
+         PX8cb8HkUotg/MQHmDgXgcLO52oCxmWontxBo/iGRBAMFK5CnJkyZNxe8qLqJFetUIHM
+         ZFGDsG8AdAs50bEKKbfs8UERFa0Ftpt2tfC4V/Qfi2a+G/+zAtSmdLAb+7WmWqexZ7cq
+         AYLY57dFsuwUGuU1633qQLK8SjABsLlVKAzDMSC4jUagtVfX0xx4uUK1XpNfhNyQmWWk
+         XPq0kDsQZid2a/3m81JC7Yxt7ZThaSmoalLeT1v2yOuXFa8zPw8oXPjaOb+RAze5ifnM
+         i4gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=smuayUEU8rmhnRLjhl24Yn31b44MmB9vFUlaX2MYpBI=;
+        b=VBPOwSHT/2SctyZCx0id7b6a+LEmk9Mgo6wFh305/Y8gpYgnDCLcYn0nPcKQkdnrXz
+         sgb4H73YzlmoNdPhwL4EMVy3kwX6Ur9S5kpsLHCqPKuWHmD/v7kN4yrpIKU8mOng0TKh
+         SPqqK6dyWaG6uG+MJgbh/MmZN8BWBkmPNmtqoDSHxo23c6AZvxbj8k79yFEHsKFL+MHP
+         bsgpp9JHFkHYhEa+V5lnPYJh6FTDoQKdNAjUX10pCpfyr7k9WiYfIw8cGzQ3YGa2KZRz
+         OLM9lbN5fgcMQrAES8zZppyOlgheA7M+LeK3pk2BEHfSB1SCiXIT6OM22oSrphRNlAy/
+         X5Gg==
+X-Gm-Message-State: APjAAAXkX3gheHkzImuf1dBXoas9bij5cbQftKARAa6kkTXBjfz8TDCM
+        FI8MjcVKUg35uyOwCkmAPPxjEb+S1IMqOc/FRAo=
+X-Google-Smtp-Source: APXvYqxaOuMODj/dg67TD/hpgKtoU8d78Ebu2xth69rNXTczGZtz5AhV1CL7MRe2s4K6EN6EiXmCleX06ekz6wkMh7I=
+X-Received: by 2002:a02:7044:: with SMTP id f65mr74022jac.37.1569348727629;
+ Tue, 24 Sep 2019 11:12:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190924152627.kmbvxb4elpxfoybf@macbook-pro-91.dhcp.thefacebook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+References: <61d3d6774247fe6159456b249dbc3c63@moritzmueller.ee>
+ <CAKywueT=hWCTM=Crsafrj-8P=1mD93DY73oK=Ub8JeWc5X85fQ@mail.gmail.com> <4a017b583eb0f5fab477ecbe0e43b3a1@moritzmueller.ee>
+In-Reply-To: <4a017b583eb0f5fab477ecbe0e43b3a1@moritzmueller.ee>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Tue, 24 Sep 2019 11:11:56 -0700
+Message-ID: <CAN05THR5FE80VsnbKfpBzvt+g5jPu3rtiOqWkzU5yKoKUkhkiA@mail.gmail.com>
+Subject: Re: Possible timeout problem when opening a file twice on a SMB mount
+To:     Moritz M <mailinglist@moritzmueller.ee>
+Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Sep 24, 2019 at 11:26:28AM -0400, Josef Bacik wrote:
-> On Tue, Sep 24, 2019 at 04:11:07PM +0100, Al Viro wrote:
-> > On Tue, Sep 24, 2019 at 11:01:45AM -0400, Josef Bacik wrote:
-> > 
-> > > Sorry I mis-read the code a little bit.  This is purely for the subvolume link
-> > > directories.  We haven't wandered down into this directory yet.  If the
-> > > subvolume is being deleted and we still have the fake directory entry for it
-> > > then we just populate it with this dummy inode and then we can't lookup anything
-> > > underneath it.  Thanks,
-> > 
-> > Umm...  OK, I guess my question would be better stated a bit differently: we
-> > have a directory inode, with btrfs_lookup() for lookups in it *and* with
-> > dcache_readdir() called when you try to do getdents(2) on that thing.
-> > How does that work?
-> 
-> Sorry I hadn't read through the context.  We won't end up with things under this
-> directory.  The lookup will try to look up into the subvolume, see that it's
-> empty, and just return nothing.  There should never be any entries that end up
-> under this dummy entry.  Thanks,
+That pcap shows a problem with the lease break.
 
-Er...  Then why not use simple_lookup() in there?  Confused...
+I just tried your python reproducer with the current cifs upstream
+kernel and the problem does not manifest.
+There were oplock related fixes in the cifs.ko module a while ago that
+might have fixed the problem you see.
+
+Which kernel version are you using ?
+
+
+On Tue, Sep 24, 2019 at 10:53 AM Moritz M <mailinglist@moritzmueller.ee> wrote:
+>
+> Hi Pavel,
+> >
+> >
+> > Could you please enable debugging logging
+> > (https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting#Enabling_Debugging),
+> > reproduce the problem and send us the kernel logs? A network capture
+> > of a repro could also be useful
+> > (https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting#Wire_Captures).
+>
+> see the debug output and the pcap file attached.
+>
+> Best regards
+> Moritz
+>
