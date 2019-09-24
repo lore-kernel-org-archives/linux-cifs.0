@@ -2,107 +2,104 @@ Return-Path: <SRS0=4YGq=XT=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ADDFC432C1
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 02:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 758CEC432C1
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 03:47:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 45911207FD
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 02:52:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F1FC206C2
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Sep 2019 03:47:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EntG0qKv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729443AbfIXCwX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 23 Sep 2019 22:52:23 -0400
-Received: from zeniv.linux.org.uk ([195.92.253.2]:41660 "EHLO
-        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728992AbfIXCwX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 23 Sep 2019 22:52:23 -0400
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.2 #3 (Red Hat Linux))
-        id 1iCaw3-000329-O6; Tue, 24 Sep 2019 02:52:15 +0000
-Date:   Tue, 24 Sep 2019 03:52:15 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "zhengbin (A)" <zhengbin13@huawei.com>, Jan Kara <jack@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        "zhangyi (F)" <yi.zhang@huawei.com>, renxudong1@huawei.com,
-        Hou Tao <houtao1@huawei.com>, linux-btrfs@vger.kernel.org,
-        "Yan, Zheng" <zyan@redhat.com>, linux-cifs@vger.kernel.org,
-        Steve French <sfrench@us.ibm.com>
-Subject: Re: [PATCH] Re: Possible FS race condition between iterate_dir and
- d_alloc_parallel
-Message-ID: <20190924025215.GA9941@ZenIV.linux.org.uk>
-References: <CAHk-=whpKgNTxjrenAed2sNkegrpCCPkV77_pWKbqo+c7apCOw@mail.gmail.com>
- <20190914170146.GT1131@ZenIV.linux.org.uk>
- <CAHk-=wiPv+yo86GpA+Gd_et0KS2Cydk4gSbEj3p4S4tEb1roKw@mail.gmail.com>
- <20190914200412.GU1131@ZenIV.linux.org.uk>
- <CAHk-=whpoQ_hX2KeqjQs3DeX6Wb4Tmb8BkHa5zr-Xu=S55+ORg@mail.gmail.com>
- <20190915005046.GV1131@ZenIV.linux.org.uk>
- <CAHk-=wjcZBB2GpGP-cxXppzW=M0EuFnSLoTXHyqJ4BtffYrCXw@mail.gmail.com>
- <20190915160236.GW1131@ZenIV.linux.org.uk>
- <CAHk-=whjNE+_oSBP_o_9mquUKsJn4gomL2f0MM79gxk_SkYLRw@mail.gmail.com>
- <20190921140731.GQ1131@ZenIV.linux.org.uk>
+        id S2408868AbfIXDrm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 23 Sep 2019 23:47:42 -0400
+Received: from mail-io1-f44.google.com ([209.85.166.44]:38702 "EHLO
+        mail-io1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389841AbfIXDrm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 23 Sep 2019 23:47:42 -0400
+Received: by mail-io1-f44.google.com with SMTP id u8so965158iom.5
+        for <linux-cifs@vger.kernel.org>; Mon, 23 Sep 2019 20:47:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=SaNxviayXEFKyWSyGzuTNLWg//LBXEPOjgaXs2+N2mA=;
+        b=EntG0qKvj0smvSAVXMt5pMPJTkR/2r9AKDEkfeuP+lnCjjxitd6VRFrEWA4vGVAbId
+         YCFNgpAsDgHnZ8qv75lOIGMk2d2o2SqgMQYw4vi3FDuzWiTN6SwIfCTym/FRAL27fccM
+         c19WDzNELttqQ8w7/7XyizK42UeLKsD0I3fYbZIi4/iMWsyMv4xUZDY46dFTR/6QXpB3
+         jr3qe6ijl0wH9Rd7espSIgvUVAE6jsjm5VGkkj2bL3ByiBcD3i9+gZpdj9V6Tbuw5dzN
+         v2bwtQ4XF0FrHIyQjmgrPSDJEYiwl33mvXdR/nWTus2CkalCRSLwxvdw096GvMqJEfcN
+         Jeyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=SaNxviayXEFKyWSyGzuTNLWg//LBXEPOjgaXs2+N2mA=;
+        b=cTsMTisNfHiQVhqhD4Ua/vS6VGR+lWphZUFe2B0FDNf2XOO3jNvt8aDLuAM8pHeWZW
+         WVjE+RhMAxJVrGWBrGxPVmSVAC22WZpUZJbx7ZUDEM7jPJMoyUnW1uAMj9q6djaTIBbP
+         wc/BZrVOsj74iKZXsd1vfot9SKkBXKmNyrb05oQ8roFbTksLUeSupwoeUIh+km9Bvl8b
+         4a8xyXWMxMGnhBOhmG0rIYI91q6Nmw86o2E3LVcd3/bNBziOvXIR1n0HVBk3uDPS0LFd
+         QUbpXBdMxbZyLTN3wml6YOktA60abOO2oN8QSMJEnsLpxsy2mrbumJ4rRLwYhemP82Sb
+         tIfQ==
+X-Gm-Message-State: APjAAAUhxwtIm+r1GC1/Az+VJanPv1ZUuy9kXjk34iarDOZ9h2As8vvm
+        ZJtKCkVnhMDgMz8cS1yCU4IkJDWY/FbqJDcHxZI=
+X-Google-Smtp-Source: APXvYqzMyf9HoCgO6wVkY+JgXnZKzu8a/6Eaz/7qjp+Fz+84raYif6Mc5iYaLYky+25wEt3x7Paq3N+U3ZCMS544utI=
+X-Received: by 2002:a6b:c38f:: with SMTP id t137mr1162215iof.137.1569296860246;
+ Mon, 23 Sep 2019 20:47:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190921140731.GQ1131@ZenIV.linux.org.uk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+References: <CAH2r5mv6x_aJQJ_N9f+9zYFgFN7FkmpR1=sNzCR8Ln5m=kGL-Q@mail.gmail.com>
+ <CAKywueSQGT13QQZtWz9t8vQPpukZ8cydXnT43kRyWv9scHOivw@mail.gmail.com>
+In-Reply-To: <CAKywueSQGT13QQZtWz9t8vQPpukZ8cydXnT43kRyWv9scHOivw@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 23 Sep 2019 22:47:29 -0500
+Message-ID: <CAH2r5mtGoieAYa9rX7B5isu7NL0cD2a+imdaXFvhcu-C-0NX=A@mail.gmail.com>
+Subject: Re: Fix for "requests in flight" showing negative
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-[btrfs and cifs folks Cc'd]
+aaah - the typos -- thank you for noticing the obvious!
 
-On Sat, Sep 21, 2019 at 03:07:31PM +0100, Al Viro wrote:
+Fixed and repushed.
 
-> No "take cursors out of the list" parts yet.
+On Mon, Sep 23, 2019 at 12:26 PM Pavel Shilovsky <piastryyy@gmail.com> wrot=
+e:
+>
+> I guess it should be "open files" instead of "requests in flight" in
+> the title and the description of the patch.
+>
+> Other than that looks good:
+>
+> Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+>
+> --
+> Best regards,
+> Pavel Shilovsky
+>
+> =D1=81=D0=B1, 21 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 22:58, Ste=
+ve French <smfrench@gmail.com>:
+>
+> >
+> > Requests in flight could display as negative when should be zero
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
 
-Argh...  The things turned interesting.  The tricky part is
-where do we handle switching cursors away from something
-that gets moved.
 
-What I hoped for was "just do it in simple_rename()".  Which is
-almost OK; there are 3 problematic cases.  One is shmem -
-there we have a special ->rename(), which handles things
-like RENAME_EXCHANGE et.al.  Fair enough - some of that
-might've been moved into simple_rename(), but some (whiteouts)
-won't be that easy.  Fair enough - we can make kicking the
-cursors outs a helper called by simple_rename() and by that.
-Exchange case is going to cause a bit of headache (the
-pathological case is when the entries being exchanged are
-next to each other in the same directory), but it's not
-that bad.
 
-Two other cases, though, might be serious trouble.  Those are
-btrfs new_simple_dir() and this in cifs_root_iget():
-        if (rc && tcon->pipe) {
-                cifs_dbg(FYI, "ipc connection - fake read inode\n");
-                spin_lock(&inode->i_lock);
-                inode->i_mode |= S_IFDIR;
-                set_nlink(inode, 2);
-                inode->i_op = &cifs_ipc_inode_ops;
-                inode->i_fop = &simple_dir_operations;
-                inode->i_uid = cifs_sb->mnt_uid;
-                inode->i_gid = cifs_sb->mnt_gid;
-                spin_unlock(&inode->i_lock);
-	}
-The trouble is, it looks like d_splice_alias() from a lookup elsewhere
-might find an alias of some subdirectory in those.  And in that case
-we'll end up with a child of those (dcache_readdir-using) directories
-being ripped out and moved elsewhere.  With no calls of ->rename() in
-sight, of course, *AND* with only shared lock on the parent.  The
-last part is really nasty.  And not just for hanging cursors off the
-dentries they point to - it's a problem for dcache_readdir() itself
-even in the mainline and with all the lockless crap reverted.
+--=20
+Thanks,
 
-We pass next->d_name.name to dir_emit() (i.e. potentially to
-copy_to_user()).  And we have no warranty that it's not a long
-(== separately allocated) name, that will be freed while
-copy_to_user() is in progress.  Sure, it'll get an RCU delay
-before freeing, but that doesn't help us at all.
-
-I'm not familiar with those areas in btrfs or cifs; could somebody
-explain what's going on there and can we indeed end up finding aliases
-to those suckers?
+Steve
