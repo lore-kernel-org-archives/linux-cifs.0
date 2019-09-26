@@ -2,110 +2,103 @@ Return-Path: <SRS0=5yhP=XV=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D659BC352AA
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Sep 2019 16:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C59C4360C
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Sep 2019 18:58:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ADC19222CC
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Sep 2019 16:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B318222C3
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Sep 2019 18:58:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=pensando.io header.i=@pensando.io header.b="y3h5OT0U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ERrTAUs1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727358AbfIZQaD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 26 Sep 2019 12:30:03 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:40749 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727480AbfIZQaC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Sep 2019 12:30:02 -0400
-Received: by mail-pl1-f196.google.com with SMTP id d22so1528497pll.7
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2019 09:30:00 -0700 (PDT)
+        id S1728379AbfIZS6a (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 26 Sep 2019 14:58:30 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:45239 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726029AbfIZS6a (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Sep 2019 14:58:30 -0400
+Received: by mail-lf1-f68.google.com with SMTP id r134so2483959lff.12
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2019 11:58:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pensando.io; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=iUBOjyHfuR7bXfhhUiHsxfKRvIQzrO86xTAr8Ifre0Q=;
-        b=y3h5OT0UmQqXJi0n0rBvqkcTo+13EdxQBhESuHKUhhUdt4HIIcVQewbszw7316Jbj3
-         B26hOzlkXv8XsgeN5pGs7wsfUu35kRVDjdfbd80Cz2QkLIg0M3MsvsJVJdd9QD5RXeiy
-         6UEhQ9sxyZ6zQojKZM8g8YSAiU0HmfS6EeGLmm2G3M5zDUXby8glVotg/+s3ve95UAlT
-         DAQ0U/ntgxEnEPfGxe+68Qz99D7tUdj8cjDtGb+44i81+8OKBcckxrd+3wvZeL0MsCVS
-         GUydrXVlNXeNeT9yD3EB7dKB2lMU1zF3uY6+lKZ9hv2ld2NLoMT31L6wdQwnvoc03z5L
-         JHDg==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=IOdARELbeQgn/BVJGtpQ08IlR4eqA9+NesNiRx7hmsw=;
+        b=ERrTAUs1ZgxlbwH5OQnp62fzebGYagyjljMLzIHnI8vZLg0VRVgTt8fxCxiBj6Jbcy
+         uYHOohMWaha7+zceIxsb6EN5naY7lv0QKmIH/m+CpbwsWlN3SSfw//O8pBy8PZv94W3q
+         4EjSBRoHoV/YUt54e0g1Q4tjGjaoyT9rQq3XpbjMCk2+wU87sL6y075/kwahxhg9rVph
+         psKr54SaADVDDF6Tjz//CeCS7Sv3szYLFlWHTknahml9OzufHxjBsDbaiADs0sIh/hWM
+         bEnhReo+XjsxUY36m5OMzQvMwBewNgEP3lxqDVQCg3HMEEaNKzus9G6UsQiuJ/hvEzq+
+         4fiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=iUBOjyHfuR7bXfhhUiHsxfKRvIQzrO86xTAr8Ifre0Q=;
-        b=U13z2R/VCqjs+J2k3uFDhnNbcqGt2hrI/JQFaaZCWPJljHQB+0seV2bssspjgp30CO
-         tVO/y5PY1U8C2QZ7GLPOckAM+4V86zn/GjVvy2LYDWjd9cAoVF0szlhdlEx9pgRCYnJR
-         q2B8J+6vmkB6fV5kFh9rJbb5RCOZnc5gtFYCzFxQ0jBhpcpzF2bxwjc7sPdKeCK+8Igk
-         vtgWM3ogp5QqbJxiR+YKy4NSNwPEM0bxvahlCqQtoHvtPxQsPAb0wS0bmWzM9TNy9BFZ
-         P1Cei8DAafzFD6cQ6f92JG1eAZ9Ov+Jb3KJtKO3NFSjIMCiG5QGC4fqMCWC4oiQwRZ5v
-         OTGw==
-X-Gm-Message-State: APjAAAVD3w6fKCj8OCDFTMUDRhfXg7bw7eJEVWMzcIKZ9rAJE3njvyA4
-        nG46XFtsxiVAGNDTNT8ZvghAqw==
-X-Google-Smtp-Source: APXvYqzWSovEndvhpUlPPG2KWsLiHc/5J0wB0jU8KW7kk3lkOzlRWdHFYbFHIpUg2H8EkpfjsR5P5g==
-X-Received: by 2002:a17:902:8a88:: with SMTP id p8mr4822043plo.152.1569515400373;
-        Thu, 26 Sep 2019 09:30:00 -0700 (PDT)
-Received: from Shannons-MacBook-Pro.local (static-50-53-47-17.bvtn.or.frontiernet.net. [50.53.47.17])
-        by smtp.gmail.com with ESMTPSA id e127sm3547209pfe.37.2019.09.26.09.29.57
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 26 Sep 2019 09:29:59 -0700 (PDT)
-Subject: Re: [PATCH 1/3] docs: fix some broken references
-To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        corbet@lwn.net
-Cc:     Mauro Carvalho Chehab <mchehab@infradead.org>,
-        linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Paul Burton <paul.burton@mips.com>,
-        James Hogan <jhogan@kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Pensando Drivers <drivers@pensando.io>,
-        Steve French <sfrench@samba.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, devicetree@vger.kernel.org,
-        linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-mips@vger.kernel.org, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-riscv@lists.infradead.org
-References: <b87385b2ac6ce6c75df82062fce2976149bbaa6b.1569330078.git.mchehab+samsung@kernel.org>
-From:   Shannon Nelson <snelson@pensando.io>
-Message-ID: <81dc41d5-606a-7638-1d11-4fe53e9c2a7f@pensando.io>
-Date:   Thu, 26 Sep 2019 09:29:56 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=IOdARELbeQgn/BVJGtpQ08IlR4eqA9+NesNiRx7hmsw=;
+        b=MuNJBkcX/Lx3JTItn0i5Rv+svfrP4bA1Efn9Vp0zsxRHNv9p4c2Q6qYUyZf4dDh0V0
+         7tdzprqPAAbUQ795n+33Nj6aM1wCYMRfG/tcbH4qvnzfrTBa7mm+pSCMLXdvD5Yt4U3t
+         w8noH9fcDk4UKoUO8AldBUnTU025y6BBVkQXyOJ7C15x7SJVcG6pXSdAUcNFDhoySSvo
+         8d7Lu0yW9Evx/wm9Bbh/sCLJ0EICs3LmTHit4hrd6ZrQrfQgH2EgxV54lTC2U5J+uXr6
+         rfU+iRK3PB8M24zrAkXJk13qV3iATOZZFCdZWWq1GwxbtfAwhIrvlCVmJitywomf2yIB
+         roDw==
+X-Gm-Message-State: APjAAAXA0unN1Q8ky6kVHhQiM70+8MU3XL3EY1zkD+1Y3bJ/fq/2+Gtq
+        ZeomX0lRXANAKuSpkHeXCbN/K3K8HRsnVkoSP0GxDX8=
+X-Google-Smtp-Source: APXvYqwBMdVWkjwsYoYgqzPCtg+HfVaS5/rLm9YQ3s5HKiGoBoTi0qz1c5ZgsdZ3DV049GtK4fpqIHoAdyL5C5xop1k=
+X-Received: by 2002:ac2:4196:: with SMTP id z22mr57154lfh.54.1569524308109;
+ Thu, 26 Sep 2019 11:58:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b87385b2ac6ce6c75df82062fce2976149bbaa6b.1569330078.git.mchehab+samsung@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+References: <61d3d6774247fe6159456b249dbc3c63@moritzmueller.ee>
+ <CAKywueT=hWCTM=Crsafrj-8P=1mD93DY73oK=Ub8JeWc5X85fQ@mail.gmail.com>
+ <4a017b583eb0f5fab477ecbe0e43b3a1@moritzmueller.ee> <CAN05THR5FE80VsnbKfpBzvt+g5jPu3rtiOqWkzU5yKoKUkhkiA@mail.gmail.com>
+ <CAKywueTOjoP-Jh7WWCi5XJhfzgK+KZs3kvHKuVG_HW0fnYYY7A@mail.gmail.com>
+ <CAKywueQUuwRK7hbbJhdquVVPre2+8GBCvnrG76L-KodoMm9m6g@mail.gmail.com>
+ <b7b7a790feac88d59fe00c9ca2f5960d@moritzmueller.ee> <CAKywueQ7g9VYe=d7WU4AzL2Hv+pPznUgQBD7-RVi0ygBkhtGRw@mail.gmail.com>
+ <bdf21b8770373c9ea4c37c27a12344d8@moritzmueller.ee>
+In-Reply-To: <bdf21b8770373c9ea4c37c27a12344d8@moritzmueller.ee>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Thu, 26 Sep 2019 11:58:16 -0700
+Message-ID: <CAKywueQ8woeupNRqspAuOqL8rG1hNpWN_hwLCjFUpkk4mXeCvQ@mail.gmail.com>
+Subject: Re: Possible timeout problem when opening a file twice on a SMB mount
+To:     Moritz M <mailinglist@moritzmueller.ee>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 9/24/19 6:01 AM, Mauro Carvalho Chehab wrote:
-> There are a number of documentation files that got moved or
-> renamed. update their references.
+=D1=87=D1=82, 26 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 03:58, Morit=
+z M <mailinglist@moritzmueller.ee>:
 >
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+> > Please update the thread once you verify the patch with the other
+> > software you mentioned.
+>
+> It works as expected. Issue is gone. Thanks a lot.
 
->   drivers/net/ethernet/pensando/ionic/ionic_if.h            | 4 ++--
+Thanks for validating the patch, I will proceed with creating a formal
+patch then.
 
-Acked-by: Shannon Nelson <snelson@pensando.io>
+>
+> > If it works fine, I will prepare a formal
+> > patch for the mainline and active stable kernels.
+>
+> As I'm not familiar with the kernel development cycle: how long will
+> it usually take for a patch to be included in the kernel?
+>
+> Which are the active stable kernels?
 
+Since this is a fix not a new functionality it can be merged in the
+mainline pretty quickly. It will be tagged for Stable kernels, so, it
+will be automatically picked up for the stable kernels. Right now the
+active stable kernels are: v4.19.x, v5.2.x and v5.3.x. The v5.1.x that
+you are using doesn't receive updates any more, so, I would recommend
+you to update you kernel to one of those.
+
+--
+Best regards,
+Pavel Shilovsky
