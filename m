@@ -4,40 +4,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7FF0C4360C
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Sep 2019 06:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96396C4360C
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Sep 2019 06:59:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61AF521783
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Sep 2019 06:55:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C8A8217D9
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Sep 2019 06:59:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samba.org header.i=@samba.org header.b="EuzJWNGo"
+	dkim=pass (1024-bit key) header.d=samba.org header.i=@samba.org header.b="LbEY+0W4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725828AbfI0Gz2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 Sep 2019 02:55:28 -0400
-Received: from hr2.samba.org ([144.76.82.148]:34762 "EHLO hr2.samba.org"
+        id S1726276AbfI0G67 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 Sep 2019 02:58:59 -0400
+Received: from hr2.samba.org ([144.76.82.148]:36054 "EHLO hr2.samba.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725808AbfI0Gz1 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 27 Sep 2019 02:55:27 -0400
-X-Greylist: delayed 676 seconds by postgrey-1.27 at vger.kernel.org; Fri, 27 Sep 2019 02:55:24 EDT
+        id S1725804AbfI0G67 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 27 Sep 2019 02:58:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42627210; h=Date:Message-ID:From:To:CC;
-        bh=BbRacnU9lvVJJ1qqejPlaWlb/jx0rjYcuO0bYczHebQ=; b=EuzJWNGo2zeVI8tlegaQXQmIQm
-        KeBvSFO2a5Ouacee5GXRBAsbl3Icpn+jJuh81TKMMKd2kVbSy0sGdPRh/p60gqy2jj18bicA7MjY1
-        5Wzm95odTaeu0PKVEIYa1Bqg404zSg6KL+wngl97Z4m8XEK+dudNZfq1qIMBjOkETCho=;
+         s=42627210; h=Date:Message-ID:From:Cc:To;
+        bh=C9x72+4zRJ6h8Yzgh+YYgIzrMjGAaWr5a968UMlXpfA=; b=LbEY+0W4SAjDVPMxs+QFbJ1UuC
+        I7FnVLwC8zAnI/CzPnXwbmMeqhx+PbBzBHGq6KxPM6ciB6lhgz/ZO0VRvZKWTwTXoFWCzozZSnuCF
+        LtG88W4aGYAWPVMxo64hQnfDhkfLg1wWsFXVatKmnCk13BChDauCJ5JjE3bpdnsYynnE=;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.2:ECDHE_ECDSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1iDjz2-0000dh-T4; Fri, 27 Sep 2019 06:44:05 +0000
+        id 1iDkDO-0000sr-77; Fri, 27 Sep 2019 06:58:55 +0000
 Subject: Re: Getting the SID of the user out of the PAC ...
-To:     Steve French <smfrench@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
+To:     Steve French <smfrench@gmail.com>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
         Pavel Shilovsky <piastryyy@gmail.com>,
         =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
         samba-technical <samba-technical@lists.samba.org>,
         CIFS <linux-cifs@vger.kernel.org>
 References: <CAH2r5mueOCtAsWjOc3n2OgnygSMmj22uycsvfNKPAiqhx68xsg@mail.gmail.com>
+ <461a8f64-1f29-5b30-6b2d-4f4f88812323@samba.org>
+ <CAH2r5mvC6qMyxmhB_fdXxnXCztefowpWcgqxUgK1m_GSFZOS-g@mail.gmail.com>
 From:   Stefan Metzmacher <metze@samba.org>
 Openpgp: id=A3D192CE44EF412517BCED646A739B025C6B98D4
 Autocrypt: addr=metze@samba.org; prefer-encrypt=mutual; keydata=
@@ -300,77 +302,92 @@ Autocrypt: addr=metze@samba.org; prefer-encrypt=mutual; keydata=
  Ni4gS17UG0YAZkvjncljeRd6UzGW+Jnep5B4tIYYzmbPnOnA1KhnhRlT5lICc7qvCK+d6cSR
  qwZDheb6YDf6miyYDFqUjGg0jAdZI5/RmaYxSWypa/tHB3ivQnKwKx5T2ud7ORnFESvtSaEg
  TMt9+YYVzXoQcRaCWWvnbFSFeI+4jbgjosLpUEFU7a8H1dVgrrHVj8K1pxc=
-Message-ID: <461a8f64-1f29-5b30-6b2d-4f4f88812323@samba.org>
-Date:   Fri, 27 Sep 2019 08:43:51 +0200
+Message-ID: <9a5da317-166d-d5a6-6026-88d1cdd92ac2@samba.org>
+Date:   Fri, 27 Sep 2019 08:58:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5mueOCtAsWjOc3n2OgnygSMmj22uycsvfNKPAiqhx68xsg@mail.gmail.com>
+In-Reply-To: <CAH2r5mvC6qMyxmhB_fdXxnXCztefowpWcgqxUgK1m_GSFZOS-g@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="0j1nGIgo9z9LNwjbBmi6mp5x1FDZMyjtS"
+ boundary="r7dKPTXJFn8kbcUNckKWrrKT97veeZAkZ"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0j1nGIgo9z9LNwjbBmi6mp5x1FDZMyjtS
-Content-Type: multipart/mixed; boundary="GUmOFe03RQqGMz6n8bKM8FMRHg4DuVoJ1";
+--r7dKPTXJFn8kbcUNckKWrrKT97veeZAkZ
+Content-Type: multipart/mixed; boundary="kow7aNOOH6xfUSHAWEK62341EwKfsBTfE";
  protected-headers="v1"
 From: Stefan Metzmacher <metze@samba.org>
-To: Steve French <smfrench@gmail.com>,
- ronnie sahlberg <ronniesahlberg@gmail.com>,
+To: Steve French <smfrench@gmail.com>
+Cc: ronnie sahlberg <ronniesahlberg@gmail.com>,
  Pavel Shilovsky <piastryyy@gmail.com>, =?UTF-8?Q?Aur=c3=a9lien_Aptel?=
  <aaptel@suse.com>, samba-technical <samba-technical@lists.samba.org>,
  CIFS <linux-cifs@vger.kernel.org>
-Message-ID: <461a8f64-1f29-5b30-6b2d-4f4f88812323@samba.org>
+Message-ID: <9a5da317-166d-d5a6-6026-88d1cdd92ac2@samba.org>
 Subject: Re: Getting the SID of the user out of the PAC ...
 References: <CAH2r5mueOCtAsWjOc3n2OgnygSMmj22uycsvfNKPAiqhx68xsg@mail.gmail.com>
-In-Reply-To: <CAH2r5mueOCtAsWjOc3n2OgnygSMmj22uycsvfNKPAiqhx68xsg@mail.gmail.com>
+ <461a8f64-1f29-5b30-6b2d-4f4f88812323@samba.org>
+ <CAH2r5mvC6qMyxmhB_fdXxnXCztefowpWcgqxUgK1m_GSFZOS-g@mail.gmail.com>
+In-Reply-To: <CAH2r5mvC6qMyxmhB_fdXxnXCztefowpWcgqxUgK1m_GSFZOS-g@mail.gmail.com>
 
---GUmOFe03RQqGMz6n8bKM8FMRHg4DuVoJ1
+--kow7aNOOH6xfUSHAWEK62341EwKfsBTfE
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-Am 27.09.19 um 08:39 schrieb Steve French via samba-technical:
-> Is there a way to get the SID of the user out of the MS-PAC through
-> Samba utils (or winbind)?
+Am 27.09.19 um 08:50 schrieb Steve French:
+> On Fri, Sep 27, 2019 at 1:44 AM Stefan Metzmacher <metze@samba.org> wro=
+te:
+>>
+>> Am 27.09.19 um 08:39 schrieb Steve French via samba-technical:
+>>> Is there a way to get the SID of the user out of the MS-PAC through
+>>> Samba utils (or winbind)?
+>>>
+>>> This would help cifs if when we upcall as we do today to get the
+>>> kerberos ticket, we were also given the user's SID not just the ticke=
+t
+>>> to use to send to the server during session setup.
+>>
+>> Only if you get a service ticket for the joined client machine.
+>>
+>> But I don't understand what a possible use case would be.
 >=20
-> This would help cifs if when we upcall as we do today to get the
-> kerberos ticket, we were also given the user's SID not just the ticket
-> to use to send to the server during session setup.
+> When not mounting with "idsfromsid" this would allow us to use the
+> correct owner SID when creating ACLs (to include the owner and mode)
+> on mkdir and filecreate (the acl can be sent in the sd_context during
+> create)
 
-Only if you get a service ticket for the joined client machine.
-
-But I don't understand what a possible use case would be.
+Maybe CREATOR_GROUP and CREATOR_OWNER are of some use for that...
 
 metze
 
 
---GUmOFe03RQqGMz6n8bKM8FMRHg4DuVoJ1--
 
---0j1nGIgo9z9LNwjbBmi6mp5x1FDZMyjtS
+--kow7aNOOH6xfUSHAWEK62341EwKfsBTfE--
+
+--r7dKPTXJFn8kbcUNckKWrrKT97veeZAkZ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEfFbGo3YXpfgryIw9DbX1YShpvVYFAl2Nr6sACgkQDbX1YShp
-vVadAw//RdSE2lCGB0hIoIwUDhv5yKu0B1mi2GsbehJSXR8o+jhMzDU6SfPYM14G
-sd/GQT4RIIL+A8N2gulSazxI0m5KSE1FQiCH0Z9LhLnL24dEyheXwVFEMEWAeUd2
-r3HBAhqPliL5+PZVo94v41eAn//9Wx2mT0sePIfnPAXEjwE8XimOkWlXzHAT7ItK
-HzjYQU64XgG4Gp7TzQpF8WeKk48BeoJFU9a4dUuOmNUGLu+dpIukdmArm6YmEL0D
-Lt9rqh1KUR88RIkO4RkBiljKuXP94oJMuWkYBBbvV3onqXQa1IsDUp1ga20NO0NC
-2fL0EdIQdZMzUNF5K+0pW9AyR+1tdt2mIy1v5F8IpmY2el4MougUchSE8dRT9A2b
-aLsxNcUqvMsz1+ogd1j1vMuVTfEirD+VHqJthq3K2sXQrp3qEvsJwR68xwEy4Ork
-7ajKZ5DOGDaJ+kxP4H9k5h7+DzlPjc+W91DuD5eqzw1YAidIX2ay4g/rxNpEZYB7
-NBqBZUJtLaFzcLrxPJ3RLVB/WugoZuVZt9PXk2/4BMftTBqiOF9NG5EGYl1/ZowT
-UsWizy8d97OqgFTd5EGE+PxnaHe58yRg/rit1Bn2X/Bq4HoT7eFmRt/0Ji6+j5q6
-CLvMTPZkvfXptgUZQVSLaYmd2gtfJA4ujiHNXZCqKsiu6LeoHRc=
-=/z5p
+iQIzBAEBCgAdFiEEfFbGo3YXpfgryIw9DbX1YShpvVYFAl2NsyMACgkQDbX1YShp
+vVa0XQ//Z+Yt+W9q2DKAWY7FOdwoEEC+lnbM7OLNbpA9QEN2wzwLEcWTf0FzpTUf
+fA4jLmOl0C4r5p9wqj7I2gml0IDEs2pRRbT1xLmMKrqNYYxgUejvk8z6/2/x1oLF
+uGVeeE/b5gYbMpK6IRjAFJpVG25ExAa443LdEhkmuX2FMTSIOl0gCFtFXDfPJDJF
++5sKfx1MCpQeFlqklJLnc5JfcZv7EDeccN7mI3+8t316JPHNvSn5I20V1Wf2aUHo
+aiZNAfBI6oMCCdMAqTVptW+Bhb2NCC9Ma+m6kBzjTjWtunGphMHTDp8PDDw9sY5d
+ZSgDU8mkaPlWwgiSd7oxzffF6ujCybJrTi5tRJ3qB3x0j/hcHtxwY1enPAdo3pot
+wHhqiZeMh/waUpLdtjaEYYu/t0W00YWATYrf5GzTsoHX5oiYV3rWTNIVzQ2U145C
+/ofXwTMPKZKcRGOw1A0YtzZGi9MlRTuutnxGoOoX7BZOK6XHhDQXLZWIyzQGaNfy
++EdgnGQS5C3lTKwORsgx2lbRRzmzxrwpOfS66Pb4jnC4J2/AECQ/Q4/H0orNHCls
+nRJoH/Zk5WyM2GwzslAbzlzYbAzGr9FD5fHMPzr1wnhCduVBocWyain3lhDGGuPB
+6vTzVSOCwHbIBjKWZbTyXLvwwFR6UqS4KCBL4gC9hQq47AUkIPA=
+=W6F7
 -----END PGP SIGNATURE-----
 
---0j1nGIgo9z9LNwjbBmi6mp5x1FDZMyjtS--
+--r7dKPTXJFn8kbcUNckKWrrKT97veeZAkZ--
