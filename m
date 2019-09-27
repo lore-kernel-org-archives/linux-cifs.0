@@ -1,109 +1,79 @@
-Return-Path: <SRS0=5yhP=XV=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=ovf2=XW=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A69C4360C
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Sep 2019 19:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E94C4360C
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Sep 2019 06:39:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34DE02245A
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Sep 2019 19:31:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8751E217D7
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Sep 2019 06:39:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ADxx9B+R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vr8iCUUn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728652AbfIZTb1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 26 Sep 2019 15:31:27 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:44315 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728499AbfIZTb1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Sep 2019 15:31:27 -0400
-Received: by mail-pl1-f195.google.com with SMTP id q15so49813pll.11
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2019 12:31:27 -0700 (PDT)
+        id S1726276AbfI0Gjt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 Sep 2019 02:39:49 -0400
+Received: from mail-io1-f49.google.com ([209.85.166.49]:35591 "EHLO
+        mail-io1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725804AbfI0Gjt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 Sep 2019 02:39:49 -0400
+Received: by mail-io1-f49.google.com with SMTP id q10so13545679iop.2
+        for <linux-cifs@vger.kernel.org>; Thu, 26 Sep 2019 23:39:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=VrHrjzt3sjcG3Iy3BHBAfwtcSmU1GcHkdCBhDpI1hG4=;
-        b=ADxx9B+Ra/HeU4hpr9voxGuHK4ezjKu5D0jSf1Wjwo5WntEOodWTuCRU4H/+qRBZQh
-         Wz5HJKGzESTX7LiUA4CWWAcDw43LQO6XOtnFk3yuVgRe4Xvj1nrVuUsnNna6lQWqdf/3
-         Hznh0s/RcXlKjj4tIKJac/bKhslb4WyR+IWI1y7QhUJBZzOPuczJ9/yT2GftqyyUixY0
-         37wgHLCFknY1lnskynWZYlaaeyInvBpBFY7Btm2BcosRHIEhhFJF76XaiL+Ri6PZlXz9
-         vf9R3zQLzdr+bobHG6AMSbH5ji8bjLTrAySl2VJ+DoMKyT32YQ4wRMhrmtBmg71MpS81
-         /2uA==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=YcAfvLPy/pxT4ppeidkfafwRUndj54+MRWsrMKkiHAI=;
+        b=Vr8iCUUnlwhWtQOljuexwHzRvzj7QWCOOd91gmkjdqVtaCHr/x8eTnKuL8XfQ+lPzK
+         C2c7y4nOGS5B1nRQlKj/iKlKI45ik80ZFP9/JckxPfrzGTCH7YKy/9UVe8CKNzFhNTwN
+         sx0xQxIf9gE+YrBGRnHUNp+Sk/zLALe9VCP567OiLFkZyd436fljClHJNkx5pD1E+AxV
+         v53gHouSiz0kqGoFis/KIqKr+Dx6gzG/NCbnRo4j6SfGuoCxcVT1nJKwMVewWKkd4t2+
+         cgPh6FeQx+wXc22Y1cFym8Q7nwmw8qqM4UREhjWuvncaTQSOAzIjykhGOj8b8MC5Lhtq
+         BIHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=VrHrjzt3sjcG3Iy3BHBAfwtcSmU1GcHkdCBhDpI1hG4=;
-        b=P8rchAht0WDJDWm0lwqSm42xkaG3wzLV9exH1U98MWm/Q/1zARHpCJwx1UOx0IFD/f
-         sj4N0AG0c4RGUuhHqNP1NyBCmlN7EnFqHfVvNwnKY2I9PVPUuR2WnC7I+uZxiev9kXt8
-         07xn2qPr8Qh/dNm6dknNhKYZy6iCQ4HocPtXqc+JGG5XOaxp8Ytsxg7SqQpqDQ4HvBy7
-         l7jWBiwNsyaTI3O/ln8zl69OiQiiqKzVX1vkST5/FCKKfmncpX5EE/pVoiHnyzaJ/Fgy
-         v6K3JyyPJ7YyLcmuXX/QwsJhrUpcSuo+q43X0kbbw2G9IpfHTpGKfOUgmwWhV82ycq1x
-         l3kA==
-X-Gm-Message-State: APjAAAWf0eLfX9AHGF7yi3SK5+NJHPo9vxAScwNS8+KUSnSxA/1s9g7C
-        9Z++Vi4yzY0NK8Oz+KlegMRXkvA=
-X-Google-Smtp-Source: APXvYqzQ2zU30WytIw170Pv86DIU/HBf9y4wnYZ0MWKK1PLGvwY5g+lOvbTAfwBYon32pSJb/Qx/3A==
-X-Received: by 2002:a17:902:9f83:: with SMTP id g3mr249451plq.154.1569526286483;
-        Thu, 26 Sep 2019 12:31:26 -0700 (PDT)
-Received: from ubuntu-vm.mshome.net ([131.107.147.106])
-        by smtp.gmail.com with ESMTPSA id v12sm2981894pgr.31.2019.09.26.12.31.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2019 12:31:25 -0700 (PDT)
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-X-Google-Original-From: Pavel Shilovsky <pshilov@microsoft.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     Moritz M <mailinglist@moritzmueller.ee>,
-        Steve French <smfrench@gmail.com>
-Subject: [PATCH] CIFS: Fix oplock handling for SMB 2.1+ protocols
-Date:   Thu, 26 Sep 2019 12:31:20 -0700
-Message-Id: <20190926193120.23769-1-pshilov@microsoft.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=YcAfvLPy/pxT4ppeidkfafwRUndj54+MRWsrMKkiHAI=;
+        b=JOv9a/y7kpYThXwD45vjXEeuhrO/zrxrZ+Fe2dX2RpQiEejMQT+/COWgz4ECsRUaFB
+         82CTPIg8RweHD7b6Vom+lSFg0AfMUFO49F09Qn5a63pL3xbAGT5eV7WfalLylF4QnJOE
+         Rt8N4R+IzOrweVSfLjMNKvZsyJk8NnDSJyMC2Z9/Op9Us7agppXjZ3mn24ydcTPRYwVU
+         zXbaIQfh+xEXv+2jBRPV1jcu96M9IPhPCX+57Vf65vFLLjOJO3zzp8F49oYMwm4QooRU
+         t8RDOB/9qObddmCNUvBS5TfZEzNTuXtuw8dvtTIIIar+TMKDS4v9UdFaU2o9Bs8ui7R3
+         Kykw==
+X-Gm-Message-State: APjAAAXLsY7KYq2eVMZJzWiu8ROYgDzhGc9g+wTpf0n0lTI0YHI2XaCQ
+        dKsuAtf1snQToPQQRfwfTUWW7m/c0nmsnqLXW3OBIQFWMBQ=
+X-Google-Smtp-Source: APXvYqwSwsmHDb02MjyWRngpxmOTIbX3Yk914OYbmkp8U7NE767Y87BptXWCKJX4MRMdibF6msnHNvsAu9fRj7zzJ6s=
+X-Received: by 2002:a92:d641:: with SMTP id x1mr3033237ilp.272.1569566388391;
+ Thu, 26 Sep 2019 23:39:48 -0700 (PDT)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 27 Sep 2019 01:39:37 -0500
+Message-ID: <CAH2r5mueOCtAsWjOc3n2OgnygSMmj22uycsvfNKPAiqhx68xsg@mail.gmail.com>
+Subject: Getting the SID of the user out of the PAC ...
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        samba-technical <samba-technical@lists.samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-There may be situations when a server negotiates SMB 2.1
-protocol version or higher but responds to a CREATE request
-with an oplock rather than a lease.
+Is there a way to get the SID of the user out of the MS-PAC through
+Samba utils (or winbind)?
 
-Currently the client doesn't handle such a case correctly:
-when another CREATE comes in the server sends an oplock
-break to the initial CREATE and the client doesn't send
-an ack back due to a wrong caching level being set (READ
-instead of RWH). Missing an oplock break ack makes the
-server wait until the break times out which dramatically
-increases the latency of the second CREATE.
+This would help cifs if when we upcall as we do today to get the
+kerberos ticket, we were also given the user's SID not just the ticket
+to use to send to the server during session setup.
 
-Fix this by properly detecting oplocks when using SMB 2.1
-protocol version and higher.
 
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
----
- fs/cifs/smb2ops.c | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 047066493832..00d2ac80cd6e 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -3314,6 +3314,11 @@ smb21_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
- 	if (oplock == SMB2_OPLOCK_LEVEL_NOCHANGE)
- 		return;
- 
-+	/* Check if the server granted an oplock rather than a lease */
-+	if (oplock & SMB2_OPLOCK_LEVEL_EXCLUSIVE)
-+		return smb2_set_oplock_level(cinode, oplock, epoch,
-+					     purge_cache);
-+
- 	if (oplock & SMB2_LEASE_READ_CACHING_HE) {
- 		new_oplock |= CIFS_CACHE_READ_FLG;
- 		strcat(message, "R");
 -- 
-2.17.1
+Thanks,
 
+Steve
