@@ -1,89 +1,134 @@
-Return-Path: <SRS0=ovf2=XW=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=8MWe=XX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FAE3C4360C
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Sep 2019 08:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E85EC4360C
+	for <linux-cifs@archiver.kernel.org>; Sat, 28 Sep 2019 21:36:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 53D22217D7
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Sep 2019 08:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CB2720866
+	for <linux-cifs@archiver.kernel.org>; Sat, 28 Sep 2019 21:36:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rgBxjCxj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MNzZrXao"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726054AbfI0IFX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 Sep 2019 04:05:23 -0400
-Received: from mail-io1-f50.google.com ([209.85.166.50]:41449 "EHLO
-        mail-io1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbfI0IFW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 Sep 2019 04:05:22 -0400
-Received: by mail-io1-f50.google.com with SMTP id r26so13976107ioh.8
-        for <linux-cifs@vger.kernel.org>; Fri, 27 Sep 2019 01:05:22 -0700 (PDT)
+        id S1728601AbfI1Vgf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 28 Sep 2019 17:36:35 -0400
+Received: from mail-io1-f43.google.com ([209.85.166.43]:36584 "EHLO
+        mail-io1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726581AbfI1Vgf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 28 Sep 2019 17:36:35 -0400
+Received: by mail-io1-f43.google.com with SMTP id b136so27262088iof.3;
+        Sat, 28 Sep 2019 14:36:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aII4M2SwZO+GRDmd3nm0B9UpYMTlksmgmY752Xryfwg=;
-        b=rgBxjCxjhPdcbOfu4hiaChXBj51sjdBd/pOIfRwcGb+gHt0bYoxcDGmZBzFmhe4/ui
-         2YKrQX3qA93oZbxUdftjoSrdCYpGdvZTLDz8clv7fXMwSNIa1XygnIOaX5KTQMA4dYbw
-         oT7z7CECOUmtiGIbWpJpqQasaug3PjG0RVD0LDrbcLrrbR0fDPp2ijbckxj16XvZxCYl
-         oJbh6VgOaK3DLAhFbJu2heVPX6FhSRCBOfTKyIC3wUnTMyN6zL4Di0Z87y2WGC/ZLran
-         TSnOWrVXNhN2kfJLugBVMGjaTe0mjnzUGaKgTD832t70AbOrd6FP40h2j44cBtGGt2JN
-         T7dQ==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=5N4/gVVHg8/PXbBpdg5Q+FRK+1aZx3zHcEy4NEqiJd4=;
+        b=MNzZrXaoy2TPXpWG4NBGtaMn+r5sli8/zEzYtR0/pRwqIr1TP8ziTcAEBcQ+Sh5+9y
+         F71vk79/k8uP50HgzpZi77kMsM9WQqmRiQWvyEeVgkCvA5us50sIwOoWtvNJmMlpO9Ym
+         63DrvCmTn2znGGoPu7tPfOyHYpxeWc22Wk88zoWY1yx42/ruDghjrEpRwgZv6SfzNdTP
+         TaqIFqodvDCedIg4goJIfNY8b0U/2xxko2DuWXGSM/Isys+eLtA45Sxx/SBho0kAA+P6
+         G1BlKMvDnlFG52vO+BmVZnu5uyiQ1oar3ziVrV2Yy8Ozxy0ND7aYHlN31D+CZTnp37dY
+         N/Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aII4M2SwZO+GRDmd3nm0B9UpYMTlksmgmY752Xryfwg=;
-        b=KMPy6YdBmMvmnvYJvL+q7tB1rT/++svFd/EI+PDwapwYKys4m03lchvvajX2n8jaOs
-         EfZv45yRbHZJPSty7QtDWPTRrJwq10gcXN+AcCVZ0pZ+QL0u9wCYne7jYQlV41lwRMW9
-         8yu+PbZb847JjhKWmAUtAWD8d92sSQ0Whir/iQuXEKyrZX6wsi2H2mainwskp3heaMfW
-         LHQJXhXUgcpnA0cfn2iH6o69q/ygVdnopWDS2r6Oc7v7hQQQQCQPSTIhz3gODeHcy2dj
-         zIRkVTUHOzCyJWNK9KWikSQmLK53cXGXXNPE0J2rY73fTBwcB98xyFIdIZxagpLz5LWA
-         YseQ==
-X-Gm-Message-State: APjAAAXXXtRLimoLGomrr8AIyAyBc0Pl3GtoXatbCI0aQ52cZrQqhiKf
-        EPI34t+7eZ2X9AihzhO8IUbW20DmIdNxHohrYYs=
-X-Google-Smtp-Source: APXvYqyy5KszHwxSTkUamxhjSmdfrXjsdptssDmQF/MWhvmTa3qKwsUQDohWBRPumTR2JE1fiwGXLHlJ55ffxIrjQ+E=
-X-Received: by 2002:a02:3e91:: with SMTP id s139mr7333168jas.22.1569571521958;
- Fri, 27 Sep 2019 01:05:21 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=5N4/gVVHg8/PXbBpdg5Q+FRK+1aZx3zHcEy4NEqiJd4=;
+        b=BNpj9jgHKsrbI963HJOware+0Lpiix5NqYgFjeBopKytcXFi0apZC4VW5Q/xRYHC9w
+         3jIp/JITET/z02VD4gCVKlSHPmOZ8gPIhYwQz+eqKVbXUft3+4dWDOIBzf5SyDklLnpi
+         5x0XfJ9UxcdOKRbCA7OYk2X2BUSNlGBhToTpol8/KigXNrdfSLTppZyv56GXEeFPk+yp
+         2mEsovv3CY1Q9wynjayNFdDq698sqH0/V/1rRZ3KUEez3Eo5L8gdtgFk7I9BWrxV9i+4
+         sKweNr72tWweVEijhpFSRUMZn4TtxiAVVCpPJbNoxWfCshHYe8iEDjf9LUNw3NBF/3kZ
+         UiXQ==
+X-Gm-Message-State: APjAAAXM5s4WPSJHFHzyVm7UkhvCXYDGu1vgSZXTmx8Z9An6TpZGZ5Eo
+        3mXtoAOXhtHwfcVRCGCFlLA03Kq+S+SY2ZRRT4DyrXqDLwE=
+X-Google-Smtp-Source: APXvYqxnXaC+9p8LeEm+NJ6+Bo+NYpDLlxh0kkJV07GLJbeIqGODs1GCXkzlOMeua378WEyd73MOTxVHmLfQgzOjfvE=
+X-Received: by 2002:a05:6e02:60f:: with SMTP id t15mr12840728ils.3.1569706592677;
+ Sat, 28 Sep 2019 14:36:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mueOCtAsWjOc3n2OgnygSMmj22uycsvfNKPAiqhx68xsg@mail.gmail.com>
-In-Reply-To: <CAH2r5mueOCtAsWjOc3n2OgnygSMmj22uycsvfNKPAiqhx68xsg@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 27 Sep 2019 01:05:10 -0700
-Message-ID: <CAN05THT-hc84ZOK-c7ZAxRitCKWDVtRCJpvBzYfv9=CqpSNdmA@mail.gmail.com>
-Subject: Re: Getting the SID of the user out of the PAC ...
-To:     Steve French <smfrench@gmail.com>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        samba-technical <samba-technical@lists.samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 28 Sep 2019 16:36:21 -0500
+Message-ID: <CAH2r5mu_4C=V=BsNAsEiPQp-rFbV-rYixgkpG1oJzRWdSsbejw@mail.gmail.com>
+Subject: [GIT PULL] SMB3 Fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please don't.
+Please update the following changes since commit
+4d6bcba70aeb4a512ead9c9eaf9edc6bbab00b14:
 
-You can't get the sid from NTLMSSP
+  cifs: update internal module version number (2019-09-16 19:18:39 -0500)
 
-On Thu, Sep 26, 2019 at 11:39 PM Steve French <smfrench@gmail.com> wrote:
->
-> Is there a way to get the SID of the user out of the MS-PAC through
-> Samba utils (or winbind)?
->
-> This would help cifs if when we upcall as we do today to get the
-> kerberos ticket, we were also given the user's SID not just the ticket
-> to use to send to the server during session setup.
->
->
->
-> --
-> Thanks,
->
-> Steve
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.4-rc-smb3-fixes
+
+for you to fetch changes up to a016e2794fc3a245a91946038dd8f34d65e53cc3:
+
+  CIFS: Fix oplock handling for SMB 2.1+ protocols (2019-09-26 16:42:44 -0500)
+
+----------------------------------------------------------------
+Fixes from the recent SMB3 Test events and Storage Developer
+Conference (held the last two weeks).
+
+9 smb3 patches including an important patch needed for viewing SMB3
+encrypted traffic in wireshark for debugging, and 3 patches for stable
+
+Buildbot SMB3 regression tests passed:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/253
+
+Additional fixes from last week to better handle some newly discovered
+reparse points, and a fix the create/mkdir path for setting the mode
+more atomically (in SMB3 Create security descriptor context), and one
+for path name processing are still being tested so are not included in
+this PR.
+
+----------------------------------------------------------------
+Murphy Zhou (1):
+      CIFS: fix max ea value size
+
+Pavel Shilovsky (1):
+      CIFS: Fix oplock handling for SMB 2.1+ protocols
+
+Steve French (5):
+      smb3: allow decryption keys to be dumped by admin for debugging
+      smb3: fix leak in "open on server" perf counter
+      smb3: Add missing reparse tags
+      smb3: pass mode bits into create calls
+      smb3: missing ACL related flags
+
+zhengbin (2):
+      fs/cifs/smb2pdu.c: Make SMB2_notify_init static
+      fs/cifs/sess.c: Remove set but not used variable 'capabilities'
+
+ fs/cifs/cifs_ioctl.h |  9 +++++++++
+ fs/cifs/cifsacl.h    | 81
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/cifsglob.h   |  6 ++++--
+ fs/cifs/cifsproto.h  |  3 ++-
+ fs/cifs/cifssmb.c    |  3 ++-
+ fs/cifs/inode.c      |  3 ++-
+ fs/cifs/ioctl.c      | 29 +++++++++++++++++++++++++++++
+ fs/cifs/sess.c       |  3 +--
+ fs/cifs/smb2inode.c  | 34 +++++++++++++++++++---------------
+ fs/cifs/smb2ops.c    | 10 ++++++++++
+ fs/cifs/smb2pdu.c    | 23 ++++++++++++++++++++++-
+ fs/cifs/smb2proto.h  |  3 ++-
+ fs/cifs/smbfsctl.h   | 11 +++++++++++
+ fs/cifs/xattr.c      |  2 +-
+ 14 files changed, 194 insertions(+), 26 deletions(-)
+
+
+-- 
+Thanks,
+
+Steve
