@@ -1,134 +1,127 @@
-Return-Path: <SRS0=8MWe=XX=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=ecKs=XY=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFFEC4360C
-	for <linux-cifs@archiver.kernel.org>; Sat, 28 Sep 2019 21:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8528AC4360C
+	for <linux-cifs@archiver.kernel.org>; Sun, 29 Sep 2019 05:29:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 498FF20863
-	for <linux-cifs@archiver.kernel.org>; Sat, 28 Sep 2019 21:46:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1fzCEba"
+	by mail.kernel.org (Postfix) with ESMTP id 5401E21835
+	for <linux-cifs@archiver.kernel.org>; Sun, 29 Sep 2019 05:29:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728696AbfI1Vq0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 28 Sep 2019 17:46:26 -0400
-Received: from mail-io1-f47.google.com ([209.85.166.47]:35446 "EHLO
-        mail-io1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728577AbfI1Vq0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 28 Sep 2019 17:46:26 -0400
-Received: by mail-io1-f47.google.com with SMTP id q10so27374125iop.2
-        for <linux-cifs@vger.kernel.org>; Sat, 28 Sep 2019 14:46:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=o0rTboQ/5hSDaw+v/cjxVuZx+jXotfnmHhllgTBo5sA=;
-        b=I1fzCEbaC/uF6ddrCqjj90xHF3tcy/Jt114T0Zjy39qJ532QbUhpTf+dLUZ9AYSJyI
-         TRztoazeJHcF92w/RQtA1sFQkrLMsLpSExeLq8cW6g/idKhtiVSVLYTvwDTWI3PNh6ro
-         qLhKaHnn0PYwjRJbg79BKr0DIA9WStOpBKmaWXHNrikx9MiwTeugTcTIG9Jt3BQ/ui0z
-         ZtgQmEdIKtR57WxIZEQWv6LJa5zT7QudXs8zq+IMjS66eixJbK/4zwRDbGPAqSaqcXqm
-         oGLYUGHa6hW2N3wJcePPFqvOjpcTBzmAUuS7niJdxdXT0+u/jdSAqmWgqa6cotaHX4T3
-         t2vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=o0rTboQ/5hSDaw+v/cjxVuZx+jXotfnmHhllgTBo5sA=;
-        b=K6DqK1rpO9AQWpIyw1zHuJOPLykf2Pclnohz+Fl4nDsLhLdKTEf0RfF4ssrcY92BaM
-         YMNnCMqXweCKcFcOgyXpXYX9n6RwRwE8WoL+sGCIMWGGs6T2QmChk2G3YAJImaXCoI3D
-         2stJoKwDF9DkTkzZq1Hg4OjSOosSKeGXitJKywh3jtqFPPxOJZzYHoGNGkXYH3eUuTIC
-         PZ9Xx2l0uLk0dXkk5jgnINtaPuX9ckUlgKfLN2Q0pgYJQCioDhhDhyzpuXkRY7xsnBvm
-         EWv+VY85qsxidJQ2mmC4VPUnW+3o/vwmIzevS2kI6yhEwlimL/Ynjh/yd/86i+PAvwBL
-         7dIg==
-X-Gm-Message-State: APjAAAVU1hJ6BNqsHhaxgoLXMaSTIHWIOfLBmbHKB68a4pXZoJwFieET
-        MezvKAkP58qYQIbcuCQuhBYG4576Zr56Lwz+GYZcuAJaYIo=
-X-Google-Smtp-Source: APXvYqzHj8O7+ASh7ShqYKuPcRRcsJMGJa5JI7+iv3kKrcJ+YALLBn9LDqhlbe55tchw4QGC/Nv25Sh+pHFPNnJqCSE=
-X-Received: by 2002:a92:d641:: with SMTP id x1mr12288457ilp.272.1569707185521;
- Sat, 28 Sep 2019 14:46:25 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 28 Sep 2019 16:46:13 -0500
-Message-ID: <CAH2r5mvQ7VU7NCW1omMxMzdv-s3hbWjrbC=vdXfzj2q2_7ZObQ@mail.gmail.com>
-Subject: [GIT PULL] SMB3 Fixes
+        id S1726076AbfI2F3z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 29 Sep 2019 01:29:55 -0400
+Received: from zeniv.linux.org.uk ([195.92.253.2]:45158 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725379AbfI2F3z (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Sep 2019 01:29:55 -0400
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.2 #3 (Red Hat Linux))
+        id 1iERm2-0000VV-2n; Sun, 29 Sep 2019 05:29:36 +0000
+Date:   Sun, 29 Sep 2019 06:29:34 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     zhengbin <zhengbin13@huawei.com>, Jan Kara <jack@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "zhangyi (F)" <yi.zhang@huawei.com>, renxudong1@huawei.com,
+        Hou Tao <houtao1@huawei.com>, linux-btrfs@vger.kernel.org,
+        "Yan, Zheng" <zyan@redhat.com>, linux-cifs@vger.kernel.org,
+        Steve French <sfrench@samba.org>
+Subject: Re: [PATCH] Re: Possible FS race condition between iterate_dir and
+ d_alloc_parallel
+Message-ID: <20190929052934.GY26530@ZenIV.linux.org.uk>
+References: <CAHk-=wiPv+yo86GpA+Gd_et0KS2Cydk4gSbEj3p4S4tEb1roKw@mail.gmail.com>
+ <20190914200412.GU1131@ZenIV.linux.org.uk>
+ <CAHk-=whpoQ_hX2KeqjQs3DeX6Wb4Tmb8BkHa5zr-Xu=S55+ORg@mail.gmail.com>
+ <20190915005046.GV1131@ZenIV.linux.org.uk>
+ <CAHk-=wjcZBB2GpGP-cxXppzW=M0EuFnSLoTXHyqJ4BtffYrCXw@mail.gmail.com>
+ <20190915160236.GW1131@ZenIV.linux.org.uk>
+ <CAHk-=whjNE+_oSBP_o_9mquUKsJn4gomL2f0MM79gxk_SkYLRw@mail.gmail.com>
+ <20190921140731.GQ1131@ZenIV.linux.org.uk>
+ <20190924025215.GA9941@ZenIV.linux.org.uk>
+ <CAHk-=wiJ1eY7y6r_cFNRPCqD+BJZS7eJeQFO6OrXxRFjDAipsQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wiJ1eY7y6r_cFNRPCqD+BJZS7eJeQFO6OrXxRFjDAipsQ@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-(resending, correcting typo on line below)
+On Tue, Sep 24, 2019 at 09:55:06AM -0700, Linus Torvalds wrote:
+> [ Sorry for html, I'm driving around ]
+> 
+> On Mon, Sep 23, 2019, 19:52 Al Viro <viro@zeniv.linux.org.uk> wrote:
+> 
+> >
+> > Argh...  The things turned interesting.  The tricky part is
+> > where do we handle switching cursors away from something
+> > that gets moved.
+> >
+> 
+> I forget why we do that. Remind me?
+> 
+> Anyway, I think to a first approximation, we should probably first just see
+> if the "remove cursors from the end" change already effectively makes most
+> of the regression go away.
+> 
+> Because with that change, if you just readdir() things with a sufficiently
+> big buffer, you'll never have the cursor hang around over several system
+> calls.
+> 
+> Before, you'd do a readdir, add the cursor, return to user space, then do
+> another readdir just to see the EOF, and then do the close().
+> 
+> So it used to leave the cursor in place over those two final system calls,
+> and now it's all gone.
+> 
+> I'm sure that on the big systems you can still trigger the whole d_lock
+> contention on the parent, but I wonder if it's all that much of a problem
+> any more in practice with your other change..
 
-Please pull the following changes since commit
-4d6bcba70aeb4a512ead9c9eaf9edc6bbab00b14:
+If nothing else, it's DoSable right now.  And getting rid of that would
+reduce the memory footprint, while we are at it.
 
-  cifs: update internal module version number (2019-09-16 19:18:39 -0500)
+In any case, it looks like btrfs really wants an empty directory there,
+i.e. the right thing to do would be simple_lookup() for ->lookup.
 
-are available in the Git repository at:
+CIFS is potentially trickier.  AFAICS, what's going on is
+	* Windows has a strange export, called IPC$.  Looks like it
+was (still is?) the place where they export their named pipes.  From
+what I'd been able to figure out, it's always there and allows for
+some other uses - it can be used to get the list of exports.  Whether
+the actual named pipes are seen there these days... no idea.
+	* there seems to be nothing to prevent a server (modified
+samba, for example) from exporting whatever it wants under that
+name.
+	* IF it can be non-empty, mounting it will end up with
+root directory where we can do lookups for whatever is there.
+getdents() on that root will show what's currently in dcache
+(== had been looked up and still has not been evicted by
+memory pressure).  Mainline can get seriously buggered if
+dcache_readdir() steps into something that is going away.  With the
+patches in this series that's no longer a problem.  HOWEVER, if
+lookup in one subdirectory picks an alias for another subdirectory
+of root, we will be really screwed - shared lock on parent
+won't stop d_splice_alias() from moving the alias, and that can
+bloody well lead to freeing the original name.  From under
+copy_to_user()...  And grabbing a reference to dentry obviously
+doesn't prevent that - dentry itself won't get freed, but
+external name very well might be.
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/5.4-rc-smb3-fixes
+Again, I don't know CIFS well enough to tell how IPC$ is really
+used.  If it doesn't normally contain anything but named pipes,
+we can simply have cifs_lookup() refuse to return subdirectories
+on such mounts, with solves any problems with d_splice_alias().
+If it's always empty - better yet.  If the impressions above
+(and that's all those are) are correct, we might have a problem
+in mainline with bogus/malicious servers.
 
-for you to fetch changes up to a016e2794fc3a245a91946038dd8f34d65e53cc3:
-
-  CIFS: Fix oplock handling for SMB 2.1+ protocols (2019-09-26 16:42:44 -0500)
-
-----------------------------------------------------------------
-Fixes from the recent SMB3 Test events and Storage Developer
-Conference (held the last two weeks).
-
-9 smb3 patches including an important patch needed for viewing SMB3
-encrypted traffic in wireshark for debugging, and 3 patches for stable
-
-Buildbot SMB3 regression tests passed:
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/253
-
-Additional fixes from last week to better handle some newly discovered
-reparse points, and a fix the create/mkdir path for setting the mode
-more atomically (in SMB3 Create security descriptor context), and one
-for path name processing are still being tested so are not included in
-this PR.
-
-----------------------------------------------------------------
-Murphy Zhou (1):
-      CIFS: fix max ea value size
-
-Pavel Shilovsky (1):
-      CIFS: Fix oplock handling for SMB 2.1+ protocols
-
-Steve French (5):
-      smb3: allow decryption keys to be dumped by admin for debugging
-      smb3: fix leak in "open on server" perf counter
-      smb3: Add missing reparse tags
-      smb3: pass mode bits into create calls
-      smb3: missing ACL related flags
-
-zhengbin (2):
-      fs/cifs/smb2pdu.c: Make SMB2_notify_init static
-      fs/cifs/sess.c: Remove set but not used variable 'capabilities'
-
- fs/cifs/cifs_ioctl.h |  9 +++++++++
- fs/cifs/cifsacl.h    | 81
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- fs/cifs/cifsglob.h   |  6 ++++--
- fs/cifs/cifsproto.h  |  3 ++-
- fs/cifs/cifssmb.c    |  3 ++-
- fs/cifs/inode.c      |  3 ++-
- fs/cifs/ioctl.c      | 29 +++++++++++++++++++++++++++++
- fs/cifs/sess.c       |  3 +--
- fs/cifs/smb2inode.c  | 34 +++++++++++++++++++---------------
- fs/cifs/smb2ops.c    | 10 ++++++++++
- fs/cifs/smb2pdu.c    | 23 ++++++++++++++++++++++-
- fs/cifs/smb2proto.h  |  3 ++-
- fs/cifs/smbfsctl.h   | 11 +++++++++++
- fs/cifs/xattr.c      |  2 +-
- 14 files changed, 194 insertions(+), 26 deletions(-)
-
--- 
-Thanks,
-
-Steve
+That's independent from what we do with the cursors.  I asked
+around a bit; no luck so far.  It would be really nice if
+some CIFS folks could give a braindump on that thing...
