@@ -2,115 +2,152 @@ Return-Path: <SRS0=Aodf=XZ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.0 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ADDBC35280
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Sep 2019 17:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629E7C32792
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Sep 2019 21:38:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61B0A2086A
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Sep 2019 17:06:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 335EF20815
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Sep 2019 21:38:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JCJgCSPq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="twO4PxZg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729217AbfI3RGc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Sep 2019 13:06:32 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:41323 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726425AbfI3RGb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Sep 2019 13:06:31 -0400
-Received: by mail-pg1-f196.google.com with SMTP id s1so7718078pgv.8
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2019 10:06:30 -0700 (PDT)
+        id S1730639AbfI3ViG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Sep 2019 17:38:06 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:44039 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726504AbfI3ViG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Sep 2019 17:38:06 -0400
+Received: by mail-lj1-f193.google.com with SMTP id m13so11046797ljj.11;
+        Mon, 30 Sep 2019 14:38:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=XdIZEeRl8rX3xz1HbP4700Ee7ySwvlKM/eWCQUVJ3a4=;
-        b=JCJgCSPqm3YYzpwSGh7+gJ3I6gCzAwIWdsJ9XaxlXdeND+mhxBE4TSOT75fmgWBWpc
-         PJ60ZXTPBHoba/777E0PTEIfjfcjZ4x2tGpTqsa/KHCDqQrBEt2AYmHddjzFLrZm6XFn
-         5mV8ZJtu7sdTwgc43MVv8dcTQ4kiBAoYtz93ue6xB5xw8WU83YtyZyUuqpUtMeZhTnCA
-         GMe2WJHBrbdy0gQnqRB+5wjr1sPdo2nJWP9tAjimZDPdeQUL90/a/hQ99mAKnyqPXigX
-         +5cDgc7vKwG9UZdy5RNqC6evgLWucikCrhZS/n8JEPX6/r8gT8D7OqmKxmJrNqpaiHd5
-         UPpw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=fAydBCiqlcHtzHCOL0kArH593FU8lQU2VIhbalxOpL4=;
+        b=twO4PxZgUikmA43DkdoQx3BJB8pqgap8QbXid8WEcRB4KpnqlCLlspa3aoEXZ7hzb+
+         fjHT5EiSDiel3CSaCkxDyrGx57XsSzfW6xPqGoNdsjHPhxwmeFRl4hUiEjnTX8JpHvnJ
+         /jk04+yv0/cFCOl0yUuK4p14R8YQrSXOXWy+dzypl8aZqqmdnJy98f/cCXg5tpEfzYcg
+         3TN1DnWwkvUNzU6zDewi2VRy1M43MOLQPw7IksnAaLdNgIyngYlnOl+fsAgEEv0b+DZh
+         NNhAfr4ObRQVw9ybQ79PzvgSuRZbbjWCrfBKAzDofUVbAzgu7wCVdeIa+y/oMMSk8rO5
+         ybMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=XdIZEeRl8rX3xz1HbP4700Ee7ySwvlKM/eWCQUVJ3a4=;
-        b=WExsKGkCj4CrYItKrmgORyWsVTeN93I6T3osQTwljBxkk1O4o5Rrn859V2GPoKzSqz
-         kzq6+BOa0XLJxv+KABItsHM7p8m/+Y8/iOD2QZfybcFwRo/CUHLzB+Toqc4fDTK/PkB3
-         4LSzumQ7lpN1oivICpnumYFAeyiQfC0qYzhThht99atEWe16K/kFdfQroNhBFZ7fkGsU
-         UryYrvakJuQCs0vYarJHTw5AnsHZAWrSOoRsElIuJFaEMxfQ89zrn/GLfGWYBNIOR+dU
-         3ywDS/rO5F++3t/yn80X2Vb631GdhMzZcFXtWNALCHox2ydP6ato1MtwU2vMEgMVdYPQ
-         ddOQ==
-X-Gm-Message-State: APjAAAUso9d4zrKH1MjbTyXnVg4+Cp6x2maoDiA2aieJHOjJICEqQyaT
-        xBRwj9/pVtzPpuIQxHhJxsK3eks=
-X-Google-Smtp-Source: APXvYqyyxlIQjuRdKygo76MFhgoVhfEJoy1UlB8hlnX0ogrbzwGsR6LQsSl1iiTw9q62YQTCU6qhrg==
-X-Received: by 2002:a17:90a:fe0b:: with SMTP id ck11mr234764pjb.87.1569863189303;
-        Mon, 30 Sep 2019 10:06:29 -0700 (PDT)
-Received: from ubuntu-vm.mshome.net ([131.107.147.106])
-        by smtp.gmail.com with ESMTPSA id d5sm18350780pfa.180.2019.09.30.10.06.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2019 10:06:28 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=fAydBCiqlcHtzHCOL0kArH593FU8lQU2VIhbalxOpL4=;
+        b=TIpZyGduQPGJHKpnHYjeVKF89DwhsDbvfaWoVHv3lBkaf4hNgXkODRbtZBUxalEVUa
+         cuC+Y4OhNkfhlsBs93KvYI52pcoEznTLzh7Gnd4tjX0jj6kjEMZN4yWJFBjJgywKx6De
+         9AhWSltp6DZHzMnJ76Jn0OvUNT5NDso750AnLNJKDvAIDnohXMRCQvmQouYoa6sKz/sE
+         5eOpZSFYmeWx+Ol7P+UJdiO9mANDfInAjnPGlhDWdTyYf6LlGduiIncoqSbZ7qXP6zaY
+         h8QShtE99cn6t7lnP0P4AciPCRhwlA96hXswIAaWTGTMFSppkAgQGfQKUT5W+Z/q0WPz
+         6Mjg==
+X-Gm-Message-State: APjAAAX3XqYUgvNSmyvaASFSvipgNLCCSk1dX8s1TK9+VRxSxlaujA+D
+        jBy+j9vr9Q386zMkPkNHL9Y6/i5D8vO+QtuwrRMx
+X-Google-Smtp-Source: APXvYqzZoMJNBKkH52zUnVPvUNJ550xiv8X4zLrwV3JvYY2/vT4x09UXAG2dGnYq5NXCXJWeD+8rXZhpnLzXm3bSTg8=
+X-Received: by 2002:a2e:9713:: with SMTP id r19mr12332903lji.81.1569864747839;
+ Mon, 30 Sep 2019 10:32:27 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190829050237.GA5161@jagdpanzerIV> <CAKywueRd4d_fojGL+n4BisoibhgkYfN9Wyc_+0=-1sarz4-HZw@mail.gmail.com>
+ <20190921223847.GB29065@ZenIV.linux.org.uk>
+In-Reply-To: <20190921223847.GB29065@ZenIV.linux.org.uk>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-X-Google-Original-From: Pavel Shilovsky <pshilov@microsoft.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     Steve French <smfrench@gmail.com>,
-        Pavel Shilovskiy <pshilov@microsoft.com>
-Subject: [PATCH 3/3] CIFS: Force reval dentry if LOOKUP_REVAL flag is set
-Date:   Mon, 30 Sep 2019 10:06:20 -0700
-Message-Id: <20190930170620.29979-3-pshilov@microsoft.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190930170620.29979-1-pshilov@microsoft.com>
-References: <20190930170620.29979-1-pshilov@microsoft.com>
+Date:   Mon, 30 Sep 2019 10:32:16 -0700
+Message-ID: <CAKywueSC=MoBB6t2OeUiyc6+GST2Jgg8FTO-kkXif-pn+1k-cw@mail.gmail.com>
+Subject: Re: build_path_from_dentry_optional_prefix() may schedule from
+ invalid context
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
+        Steve French <stfrench@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Mark inode for force revalidation if LOOKUP_REVAL flag is set.
-This tells the client to actually send a QueryInfo request to
-the server to obtain the latest metadata in case a directory
-or a file were changed remotely.
+=D1=81=D0=B1, 21 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 15:38, Al Vi=
+ro <viro@zeniv.linux.org.uk>:
+>
+> On Thu, Sep 19, 2019 at 05:11:54PM -0700, Pavel Shilovsky wrote:
+>
+> > Good catch. I think we should have another version of
+> > build_path_from_dentry() which takes pre-allocated (probably on stack)
+> > full_path as an argument. This would allow us to avoid allocations
+> > under the spin lock.
+>
+> On _stack_?  For relative pathname?  Er...  You do realize that
+> kernel stack is small, right?  And said relative pathname can
+> bloody well be up to 4Kb (i.e. the half of said stack already,
+> on top of whatever the call chain has already eaten up)...
 
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
----
- fs/cifs/dir.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+My idea was to use a small stack-allocated array which satisfies most
+cases (say 100-200 bytes) and fallback to dynamic a heap allocation
+for longer path names.
 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index be424e81e3ad..91a46b01d748 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -738,10 +738,16 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
- static int
- cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
- {
-+	struct inode *inode;
-+
- 	if (flags & LOOKUP_RCU)
- 		return -ECHILD;
- 
- 	if (d_really_is_positive(direntry)) {
-+		inode = d_inode(direntry);
-+		if (flags & LOOKUP_REVAL)
-+			CIFS_I(inode)->time = 0; /* force reval */
-+
- 		if (cifs_revalidate_dentry(direntry))
- 			return 0;
- 		else {
-@@ -752,7 +758,7 @@ cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
- 			 * attributes will have been updated by
- 			 * cifs_revalidate_dentry().
- 			 */
--			if (IS_AUTOMOUNT(d_inode(direntry)) &&
-+			if (IS_AUTOMOUNT(inode) &&
- 			   !(direntry->d_flags & DCACHE_NEED_AUTOMOUNT)) {
- 				spin_lock(&direntry->d_lock);
- 				direntry->d_flags |= DCACHE_NEED_AUTOMOUNT;
--- 
-2.17.1
+>
+> BTW, looking at build_path_from_dentry()...  WTF is this?
+>                 temp =3D temp->d_parent;
+>                 if (temp =3D=3D NULL) {
+>                         cifs_dbg(VFS, "corrupt dentry\n");
+>                         rcu_read_unlock();
+>                         return NULL;
+>                 }
+> Why not check for any number of other forms of memory corruption?
+> Like, say it, if (temp =3D=3D (void *)0xf0adf0adf0adf0ad)?
+>
+> IOW, kindly lose that nonsense.  More importantly, why bother
+> with that kmalloc()?  Just __getname() in the very beginning
+> and __putname() on failure (and for freeing the result afterwards).
+>
+> What's more, you are open-coding dentry_path_raw(), badly.
+> The only differences are
+>         * use of dirsep instead of '/' and
+>         * a prefix slapped in the beginning.
+>
+> I'm fairly sure that
+>         char *buf =3D __getname();
+>         char *s;
+>
+>         *to_free =3D NULL;
+>         if (unlikely(!buf))
+>                 return NULL;
+>
+>         s =3D dentry_path_raw(dentry, buf, PATH_MAX);
+>         if (IS_ERR(s) || s < buf + prefix_len)
+>                 __putname(buf);
+>                 return NULL; // assuming that you don't care about detail=
+s
+>         }
+>
+>         if (dirsep !=3D '/') {
+>                 char *p =3D s;
+>                 while ((p =3D strchr(p, '/')) !=3D NULL)
+>                         *p++ =3D dirsep;
+>         }
+>
+>         s -=3D prefix_len;
+>         memcpy(s, prefix, prefix_len);
+>
+>         *to_free =3D buf;
+>         return s;
+>
+> would end up being faster, not to mention much easier to understand.
+> With the caller expected to pass &to_free among the arguments and
+> __putname() it once it's done.
+>
+> Or just do __getname() in the caller and pass it to the function -
+> in that case freeing (in all cases) would be up to the caller.
 
+Thanks for pointing this out. Someone should look at this closely and
+clean it up.
+
+--
+Best regards,
+Pavel Shilovsky
