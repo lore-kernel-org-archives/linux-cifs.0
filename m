@@ -8,60 +8,60 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31024C35280
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Sep 2019 17:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ADDBC35280
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Sep 2019 17:06:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07A9B2086A
-	for <linux-cifs@archiver.kernel.org>; Mon, 30 Sep 2019 17:06:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61B0A2086A
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Sep 2019 17:06:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfIbQYvc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JCJgCSPq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730274AbfI3RGa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Sep 2019 13:06:30 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:39777 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726425AbfI3RGa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Sep 2019 13:06:30 -0400
-Received: by mail-pf1-f194.google.com with SMTP id v4so5958167pff.6
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2019 10:06:28 -0700 (PDT)
+        id S1729217AbfI3RGc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Sep 2019 13:06:32 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:41323 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbfI3RGb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Sep 2019 13:06:31 -0400
+Received: by mail-pg1-f196.google.com with SMTP id s1so7718078pgv.8
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Sep 2019 10:06:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=/0F0HHtb70WhU8UdtnaMQFz8WqIiuAICsVCiy0Bk4Rs=;
-        b=jfIbQYvcq3EWDUjHH8FNfuFTrULnm4+Bo+dhlQF0l4sQHCfop1r8u9ghOZ3S+FQGSy
-         2IuZkpRO9fIyrujkJt7r6XQh/6sB6OPNs1AHhtSDUGIbl+YGyPItTjgaRDB7askA8dR5
-         vJ81Rxzb2H3UrkS2txmFCs2yTfdwxUcukjI7ZLcGEmVcedFKKcSSoj87I+5RuE4Dl9pP
-         98H91sw9X1eEokopU726Uo1OSxA/qjpiZst3HzXzsUtMGEi88NBv7glgJ6O8Ga8bOOoj
-         y91gse0uZpK397fyiVlGoR1vlqvBFk+LEY0Nj8rMLIGFAf7BWLpdbHgMhMsckmznrQ3a
-         xboA==
+        bh=XdIZEeRl8rX3xz1HbP4700Ee7ySwvlKM/eWCQUVJ3a4=;
+        b=JCJgCSPqm3YYzpwSGh7+gJ3I6gCzAwIWdsJ9XaxlXdeND+mhxBE4TSOT75fmgWBWpc
+         PJ60ZXTPBHoba/777E0PTEIfjfcjZ4x2tGpTqsa/KHCDqQrBEt2AYmHddjzFLrZm6XFn
+         5mV8ZJtu7sdTwgc43MVv8dcTQ4kiBAoYtz93ue6xB5xw8WU83YtyZyUuqpUtMeZhTnCA
+         GMe2WJHBrbdy0gQnqRB+5wjr1sPdo2nJWP9tAjimZDPdeQUL90/a/hQ99mAKnyqPXigX
+         +5cDgc7vKwG9UZdy5RNqC6evgLWucikCrhZS/n8JEPX6/r8gT8D7OqmKxmJrNqpaiHd5
+         UPpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=/0F0HHtb70WhU8UdtnaMQFz8WqIiuAICsVCiy0Bk4Rs=;
-        b=WAfpdKTAmRXzRyjtpCPFF4PNQp2M0ZVI2fljATUt5+NSaW3uvo8xQgsY7WVwKtt8GE
-         l+tNgRj7/mPcw4HQ3XuB07N9nTKulvYBq6zqvwjsT+YdBgWDbe6Lqixnmb28bAcxP3QH
-         CbN8hY3U4c+7H6fieOILfoHsYoktZ/VjKemkMrq084FwA1jV1Poy2NCpPt+XjX60Da22
-         SqhTHymlJgVXMWIxNjdDA/4/gM6h8qsFK+UqteNuIU31Pp6DTBaFtbNN1Kf4aOH1En1y
-         cgq+0FOou6BQTj8OjJyOsBHdI/56/i6tK5GR8CWu7pX1Bawv0qBa7UXys8ay9bkSLkK+
-         OiQQ==
-X-Gm-Message-State: APjAAAXEEYsc6yv3FwtB9ukVTnjX9N26b5M6x+KEOUmjylNxVnojxZcK
-        C14I0ebpyKnq7IV7lD5rT9iK/Vw=
-X-Google-Smtp-Source: APXvYqy/Dl01ExaAXsRri+D9B1dzSBhmcHk0K3TqhayZahtSpfH3vaOwaZbReBWjJSxCHQAf3IvFBQ==
-X-Received: by 2002:a17:90a:c212:: with SMTP id e18mr258364pjt.110.1569863188043;
-        Mon, 30 Sep 2019 10:06:28 -0700 (PDT)
+        bh=XdIZEeRl8rX3xz1HbP4700Ee7ySwvlKM/eWCQUVJ3a4=;
+        b=WExsKGkCj4CrYItKrmgORyWsVTeN93I6T3osQTwljBxkk1O4o5Rrn859V2GPoKzSqz
+         kzq6+BOa0XLJxv+KABItsHM7p8m/+Y8/iOD2QZfybcFwRo/CUHLzB+Toqc4fDTK/PkB3
+         4LSzumQ7lpN1oivICpnumYFAeyiQfC0qYzhThht99atEWe16K/kFdfQroNhBFZ7fkGsU
+         UryYrvakJuQCs0vYarJHTw5AnsHZAWrSOoRsElIuJFaEMxfQ89zrn/GLfGWYBNIOR+dU
+         3ywDS/rO5F++3t/yn80X2Vb631GdhMzZcFXtWNALCHox2ydP6ato1MtwU2vMEgMVdYPQ
+         ddOQ==
+X-Gm-Message-State: APjAAAUso9d4zrKH1MjbTyXnVg4+Cp6x2maoDiA2aieJHOjJICEqQyaT
+        xBRwj9/pVtzPpuIQxHhJxsK3eks=
+X-Google-Smtp-Source: APXvYqyyxlIQjuRdKygo76MFhgoVhfEJoy1UlB8hlnX0ogrbzwGsR6LQsSl1iiTw9q62YQTCU6qhrg==
+X-Received: by 2002:a17:90a:fe0b:: with SMTP id ck11mr234764pjb.87.1569863189303;
+        Mon, 30 Sep 2019 10:06:29 -0700 (PDT)
 Received: from ubuntu-vm.mshome.net ([131.107.147.106])
-        by smtp.gmail.com with ESMTPSA id d5sm18350780pfa.180.2019.09.30.10.06.26
+        by smtp.gmail.com with ESMTPSA id d5sm18350780pfa.180.2019.09.30.10.06.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2019 10:06:27 -0700 (PDT)
+        Mon, 30 Sep 2019 10:06:28 -0700 (PDT)
 From:   Pavel Shilovsky <piastryyy@gmail.com>
 X-Google-Original-From: Pavel Shilovsky <pshilov@microsoft.com>
 To:     linux-cifs@vger.kernel.org
 Cc:     Steve French <smfrench@gmail.com>,
         Pavel Shilovskiy <pshilov@microsoft.com>
-Subject: [PATCH 2/3] CIFS: Force revalidate inode when dentry is stale
-Date:   Mon, 30 Sep 2019 10:06:19 -0700
-Message-Id: <20190930170620.29979-2-pshilov@microsoft.com>
+Subject: [PATCH 3/3] CIFS: Force reval dentry if LOOKUP_REVAL flag is set
+Date:   Mon, 30 Sep 2019 10:06:20 -0700
+Message-Id: <20190930170620.29979-3-pshilov@microsoft.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190930170620.29979-1-pshilov@microsoft.com>
 References: <20190930170620.29979-1-pshilov@microsoft.com>
@@ -70,57 +70,47 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Currently the client indicates that a dentry is stale when inode
-numbers or type types between a local inode and a remote file
-don't match. If this is the case attributes is not being copied
-from remote to local, so, it is already known that the local copy
-has stale metadata. That's why the inode needs to be marked for
-revalidation in order to tell the VFS to lookup the dentry again
-before openning a file. This prevents unexpected stale errors
-to be returned to the user space when openning a file.
+Mark inode for force revalidation if LOOKUP_REVAL flag is set.
+This tells the client to actually send a QueryInfo request to
+the server to obtain the latest metadata in case a directory
+or a file were changed remotely.
 
 Cc: <stable@vger.kernel.org>
 Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
 ---
- fs/cifs/inode.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ fs/cifs/dir.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 56ca4b8ccaba..79d9a60f21ba 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -414,6 +414,7 @@ int cifs_get_inode_info_unix(struct inode **pinode,
- 		/* if uniqueid is different, return error */
- 		if (unlikely(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM &&
- 		    CIFS_I(*pinode)->uniqueid != fattr.cf_uniqueid)) {
-+			CIFS_I(*pinode)->time = 0; /* force reval */
- 			rc = -ESTALE;
- 			goto cgiiu_exit;
- 		}
-@@ -421,6 +422,7 @@ int cifs_get_inode_info_unix(struct inode **pinode,
- 		/* if filetype is different, return error */
- 		if (unlikely(((*pinode)->i_mode & S_IFMT) !=
- 		    (fattr.cf_mode & S_IFMT))) {
-+			CIFS_I(*pinode)->time = 0; /* force reval */
- 			rc = -ESTALE;
- 			goto cgiiu_exit;
- 		}
-@@ -924,6 +926,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
- 		/* if uniqueid is different, return error */
- 		if (unlikely(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SERVER_INUM &&
- 		    CIFS_I(*inode)->uniqueid != fattr.cf_uniqueid)) {
-+			CIFS_I(*inode)->time = 0; /* force reval */
- 			rc = -ESTALE;
- 			goto cgii_exit;
- 		}
-@@ -931,6 +934,7 @@ cifs_get_inode_info(struct inode **inode, const char *full_path,
- 		/* if filetype is different, return error */
- 		if (unlikely(((*inode)->i_mode & S_IFMT) !=
- 		    (fattr.cf_mode & S_IFMT))) {
-+			CIFS_I(*inode)->time = 0; /* force reval */
- 			rc = -ESTALE;
- 			goto cgii_exit;
- 		}
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index be424e81e3ad..91a46b01d748 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -738,10 +738,16 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ static int
+ cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
+ {
++	struct inode *inode;
++
+ 	if (flags & LOOKUP_RCU)
+ 		return -ECHILD;
+ 
+ 	if (d_really_is_positive(direntry)) {
++		inode = d_inode(direntry);
++		if (flags & LOOKUP_REVAL)
++			CIFS_I(inode)->time = 0; /* force reval */
++
+ 		if (cifs_revalidate_dentry(direntry))
+ 			return 0;
+ 		else {
+@@ -752,7 +758,7 @@ cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
+ 			 * attributes will have been updated by
+ 			 * cifs_revalidate_dentry().
+ 			 */
+-			if (IS_AUTOMOUNT(d_inode(direntry)) &&
++			if (IS_AUTOMOUNT(inode) &&
+ 			   !(direntry->d_flags & DCACHE_NEED_AUTOMOUNT)) {
+ 				spin_lock(&direntry->d_lock);
+ 				direntry->d_flags |= DCACHE_NEED_AUTOMOUNT;
 -- 
 2.17.1
 
