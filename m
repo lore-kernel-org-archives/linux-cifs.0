@@ -1,118 +1,120 @@
-Return-Path: <SRS0=UtyP=X2=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Gq5t=X3=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7934BC352AA
-	for <linux-cifs@archiver.kernel.org>; Tue,  1 Oct 2019 17:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E81C352AA
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Oct 2019 01:24:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4925E2086A
-	for <linux-cifs@archiver.kernel.org>; Tue,  1 Oct 2019 17:11:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A659A2168B
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Oct 2019 01:24:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="Qy9yzP+l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SELtzi6L"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727783AbfJARLG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 1 Oct 2019 13:11:06 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:51216 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726181AbfJARLG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 1 Oct 2019 13:11:06 -0400
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 32276810FF;
-        Tue,  1 Oct 2019 17:11:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1569949864;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rLq6NrvgWlOxafDDM+c6iexkM/ndt0VYoz1zUvZNkVA=;
-        b=Qy9yzP+lxlyen2JaRIpgBbCuLJCgKfdKh/xE4pjSIDxjFygcodaRC+1xZaevidGqiutC1P
-        c+Q5x4zGOpDnCZBb73QZitTtz+q/WnvPt3TFRqJJ3pqaAzpGmz9WLIl5eVU5bK+qUxsMWy
-        C+0DUDHyDORnnVnvpEU8MZra5nFbYbB13DjWYLkGIB4ZybOa53h3bpn/Q7qW5WSjUySiv1
-        cvPUL+cwnCO9AfFv3HEWfYqYlFVO395S38mcCUuZDD7+bOEK/a7W8sTGi+4GFINJ71qhps
-        7+K1WjfOmp2yhOU033d98w0YaybnZA4VsaTdikvFTRTkFcse992mvZV3/VAPgQ==
-From:   "Paulo Alcantara (SUSE)" <pc@cjr.nz>
-To:     netdev@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, davem@davemloft.net,
-        smfrench@gmail.com
-Cc:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>
-Subject: [PATCH net-next 2/2] ipconfig: Handle CONFIG_CIFS_ROOT option
-Date:   Tue,  1 Oct 2019 14:10:28 -0300
-Message-Id: <20191001171028.23356-3-pc@cjr.nz>
-In-Reply-To: <20191001171028.23356-1-pc@cjr.nz>
-References: <20191001171028.23356-1-pc@cjr.nz>
+        id S1729682AbfJBBY5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 1 Oct 2019 21:24:57 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46160 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729681AbfJBBY5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 1 Oct 2019 21:24:57 -0400
+Received: by mail-io1-f65.google.com with SMTP id c6so52935145ioo.13;
+        Tue, 01 Oct 2019 18:24:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WW4/xkSDQIhkfsesG9YoLnUMFaDJjWvzNHAEkW7fJkA=;
+        b=SELtzi6LjPYxNmk8TonlToYJ4dYGk/DN/z7VRaW2PzJqDnDQaeOgeMZP8OI+vQnSpw
+         O4xP5NaXSwqj7tsClZcMPkxop33TffDN5xUboR3xabL07aaIv48fVdZlk4PaEvQT7Qsu
+         T1U2kVyrfKhSP77hvAjdDypCgFCwkYs9LbYyG76k7NGbQ/wCwAZgJP/qyj8d5Mecfluc
+         nTya1o8pxjDteRZSM7GQMakA071DvylNWInlaTtqBevulSTwArJxz8rnBm37bPnzTHyo
+         LXzOTKZvZyqJQ8D6me/wa1HxQmXhOefjLqRI3O80Z782g7ub22+sA1zFlpRJiPWEvGjd
+         EyFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WW4/xkSDQIhkfsesG9YoLnUMFaDJjWvzNHAEkW7fJkA=;
+        b=RJcuHXfOFw132Q4b+pYQuXV4atxgh2JFKk9x3KMZFsPh/3x1V/9OY12c/Gk7Hc0hBF
+         SdPk5E6yhB4WaobIcaTndZdvsuAT0oXSe6k0voq5ppEfyo+EHaOzUnLRSyJB7qBtBpoT
+         XODRJr7FxjoVI6pSi59cBN0WAnKitKOCA9hObGxw/SyIcZDHl7n0q+2FpE7MB9bFUqXD
+         o7KKk0AGT0J7jWArBGNjecprRIpmY7UBLCLqX40npL+MC8qrEaOt/LhiJ9a241IX7ByV
+         8c9kNqx/XB6ZBBTEwBh0oVg9kEWd/NGob3+/c8DgtIcTZ0calBLoKWOJBUjBTRnzYjn5
+         vDfA==
+X-Gm-Message-State: APjAAAVIUmV4uwMwAcVSSTFROCWqHBowPnspbzwO7ehF1yeQfGCYQg4L
+        53nWHzN+XE+VzCo9tAxK9TM/Yljbr8ekk20dVUTMepB08rc=
+X-Google-Smtp-Source: APXvYqwPE/tA65lT7b97m29565vMbtiutIr7UlQrMhri6hjabguFSCCYzFrADLTzw+T2Q2e4tXm6uRC+6WwGY65gP3w=
+X-Received: by 2002:a92:d641:: with SMTP id x1mr1188239ilp.272.1569979495933;
+ Tue, 01 Oct 2019 18:24:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz;
-        s=dkim; t=1569949864; h=from:from:sender:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rLq6NrvgWlOxafDDM+c6iexkM/ndt0VYoz1zUvZNkVA=;
-        b=rT1sGLVZIHXYV8QzEUAeLdTWu5trcIaeR73V1u9PPYldRbX+cU7CgX481AsJV8VTCiQH78
-        EIaHbWZjclSJg/4jlMXyj+UMEY2Gwh/LpQkKJ4Jw8jW/hgGSXf4Enuev5mWH8wa3ybnPxW
-        ypTefXdC7owjxY0PDM7ci46Mvawg1bpgvGl7svycZNe5RKOUliN9JNfjwcG9AgaCpHR8TH
-        eWMZfFvjiOnQhBoVJO4ETCgRAozFYxao2pM2hbJgi60gTDlDjqB0SXDl/0iSPqmdu7WKiZ
-        C0WT9ZrOZsNRQ9L/EcwVEV7IYPSXY2n4eZBwS3sIuUcojlVkLM+6ws3zxk3Erg==
-ARC-Seal: i=1; s=dkim; d=cjr.nz; t=1569949864; a=rsa-sha256; cv=none;
-        b=qkQnxVYsdUF2yZZx/AAHVudnuf6iKSr2Rx3JPDizvo/AbdY0BpnOgrc87dGPMfMDeqI084
-        Iqdui4GmxSeW8xE66fUyUdrzUfEf0VJ4OJRVS1S7OxSmTw6PIzx/FsuFOTDs1Ljb39C1rE
-        OgsvaCZuE7rqQPYxlG9ewU5ZKb6RZpWNWnWaEkwThiO3/Ylycx1Wl+JZMi63geU4QLpENG
-        JA1lTqs+UXUL/3myQWycE64QlA+KXfBaK4Oku/Ea9Dw1sk3MpH/tT+SU+HmKzkEdgu9Ey/
-        L9UEHGEmauZY7N3zr1xuxLe2qNzKGkuJjtkzubfP5bKyqmYVSyQ75R8KtZfW4w==
-ARC-Authentication-Results: i=1;
-        mx.cjr.nz;
-        auth=pass smtp.auth=pc smtp.mailfrom=pc@cjr.nz
+References: <CAH2r5mspD=iMnO-CuyHMf3jmS0zm7fbqNOXe0cqMcKsXfLAu-Q@mail.gmail.com>
+ <20191001231017.67txq4dhrvhyzbu5@desk.local> <CAH2r5mvnYtmfpHY+jeUbN4JehQwY1XfBWYVNSLO+wx1wkAA6gA@mail.gmail.com>
+ <20191002001859.qeyo3btl7tosz3vo@desk.local>
+In-Reply-To: <20191002001859.qeyo3btl7tosz3vo@desk.local>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 1 Oct 2019 20:24:45 -0500
+Message-ID: <CAH2r5mtzAgcJTrGuderq4DEHBXtPujcQ8DWJUzM0w=hHX8WbJQ@mail.gmail.com>
+Subject: Re: Many unexpected warnings with current sparse
+To:     Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+        Paulo Alcantara <paulo@paulo.ac>,
+        David Howells <dhowells@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, linux-sparse@vger.kernel.org,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The experimental root file system support in cifs.ko relies on
-ipconfig to set up the network stack and then accessing the SMB share
-that contains the rootfs files.
+On Tue, Oct 1, 2019 at 7:19 PM Luc Van Oostenryck
+<luc.vanoostenryck@gmail.com> wrote:
+>
+> On Tue, Oct 01, 2019 at 06:14:23PM -0500, Steve French wrote:
+> > It may be related to the following sparse make warning:
+> >
+> > No rule to make target
+> > '/usr/include/x86_64-linux-gnu/bits/huge_val.h', needed by
+> > 'sparse-llvm.o'
+> >
+> > I don't see huge_val.h in the Ubuntu 19 version of libc6-dev
+>
+> Yes, I've been bitten myself by this. It's fixed since a little while.
+> So, just doing a clean build or removing all the deps (.*.d)
+> should allow you to build sparse.
+>
+> I've verified the problem with asm and __inline in quota.h:
+> it's autodetected by kconfig (CC_HAS_ASM_INLINE) so the exact config
+> doesn't matter (only gcc's version does) but in all cases recent
+> versions of sparse don't have a problem with it
 
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
----
- net/ipv4/ipconfig.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Removed the dependencies and rebuilt as you suggested and it worked ...
+and even better ... with the noise removed I now see two real bugs
+(endian conversion missing on two lines) and only one possible problem
+with sparse/gcc itself
 
-diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-index 9bcca08efec9..32e20b758b68 100644
---- a/net/ipv4/ipconfig.c
-+++ b/net/ipv4/ipconfig.c
-@@ -1483,10 +1483,10 @@ static int __init ip_auto_config(void)
- 	 * missing values.
- 	 */
- 	if (ic_myaddr == NONE ||
--#ifdef CONFIG_ROOT_NFS
-+#if defined(CONFIG_ROOT_NFS) || defined(CONFIG_CIFS_ROOT)
- 	    (root_server_addr == NONE &&
- 	     ic_servaddr == NONE &&
--	     ROOT_DEV == Root_NFS) ||
-+	     (ROOT_DEV == Root_NFS || ROOT_DEV == Root_CIFS)) ||
- #endif
- 	    ic_first_dev->next) {
- #ifdef IPCONFIG_DYNAMIC
-@@ -1513,6 +1513,12 @@ static int __init ip_auto_config(void)
- 				goto try_try_again;
- 			}
- #endif
-+#ifdef CONFIG_CIFS_ROOT
-+			if (ROOT_DEV == Root_CIFS) {
-+				pr_err("IP-Config: Retrying forever (CIFS root)...\n");
-+				goto try_try_again;
-+			}
-+#endif
- 
- 			if (--retries) {
- 				pr_err("IP-Config: Reopening network devices...\n");
+Sparse now flags this line from one of Paulo's DFS features merged last year:
+
+      struct smb_vol fake_vol = {0};
+
+with
+
+      "warning: Using plain integer as NULL pointer"
+
+What is the recommended way to initialize a struct to avoid the sparse warning?
+
+
+And what about the "namespace" warnings from the fscache (cache.o)
+code that now show up?  I hadn't seen those before.
+Any easy way to remove them?
+
+"WARNING: module cifs uses symbol sigprocmask from namespace
+fs/cifs/cache.o: $(deps_/home/sfrench/cifs-2.6/fs/cifs/cache.o), but
+does not import it."
 -- 
-2.23.0
+Thanks,
 
+Steve
