@@ -2,133 +2,121 @@ Return-Path: <SRS0=Gq5t=X3=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE1BC47404
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Oct 2019 22:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F93C4360C
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Oct 2019 23:54:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2FCA21783
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Oct 2019 22:10:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 313A420881
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Oct 2019 23:54:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="kboGfl6V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b2vL5M9T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726062AbfJBWKI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Oct 2019 18:10:08 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:42246 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725975AbfJBWKH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Oct 2019 18:10:07 -0400
-Received: by mail-io1-f68.google.com with SMTP id n197so894724iod.9
-        for <linux-cifs@vger.kernel.org>; Wed, 02 Oct 2019 15:10:07 -0700 (PDT)
+        id S1729021AbfJBXyi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Oct 2019 19:54:38 -0400
+Received: from mail-io1-f54.google.com ([209.85.166.54]:44573 "EHLO
+        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729016AbfJBXyi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Oct 2019 19:54:38 -0400
+Received: by mail-io1-f54.google.com with SMTP id w12so1330061iol.11;
+        Wed, 02 Oct 2019 16:54:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=6c+UtI1uYDbyYxUQwSa9jl5b6+0JQI0MJumhi18xfQg=;
-        b=kboGfl6VR6AFG/YCMnKlVG1+DLAnMRlmrb8TUPJMLPA8HrsPJg1Wv8qBfjT/1q4Bki
-         bBHNbIFDJCUEivY6JcJ8nmU4c1/OM5zE+nbfYeEhQBMkd4DgnMpt27LQCB66JR4ey7Zc
-         LS2WLuNO7xZj1wj/3HEnrW2rj2gpzQnUmlwALGcM0Wm9pCjPbLzsr0mq1mz7Kq+YUbob
-         9ht8eU3m5L9/xHmvhA1RZaSsMCPDzEHDCd0xVDaqVHUzRaHAY/ldADDT6KFMPW0FPa54
-         yvmv+K2YV95Qr4Cy6BOpBN7bF6oZcWYlKVB7T3RlKmOz/SK53j9xC0hFrC1dwk4swq6R
-         0EfQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cZPeZ9QA0izyHZj/Kh72cgFN6oQf3sUmRlez3jkPjYo=;
+        b=b2vL5M9TmRdpPSLbFkimiw7bLRScR7EZcDjBE+l2UsvueYO/IXnpoC8kXZARwico2s
+         Fg5OqExQX8zbxgdQdfvuswcOTJSSNOEm0ztNDk2RLqICiqzX2kn4ZJQBzlTpk25STvke
+         v/CwZfOK0yLl9jNgveztRfBs4rwYjKQTIpTaUioJzhyn859f7W/LQ1I9CrLHLPsq5DeY
+         jGXvbOoHLXzwdh4QzFnVT7753/3RftwrvauJw/hQo98pRWt+wSJiTxYpsBGbULT386Or
+         djJ5/rHF42FJdA4ZTRGd/d0fRWp9mhIDWD6UNLJ1KO6iZX4VEJT8MknsRZ6aSrgqNHOm
+         D6BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=6c+UtI1uYDbyYxUQwSa9jl5b6+0JQI0MJumhi18xfQg=;
-        b=b7mMy+9AVggFjhQcGkppAG1N+wFaOTs2bY4Tymp6w66eGkMev4XsMBHTf9m0SnapmN
-         1EKY2qTB/TT42o/1d6iwy/rr6bAq+dWtuDWrunqtlAIH4Ihl3k6JPCjiQ2tthZbthdO4
-         8XrMeCd/4YsP4WO+paFo5XgTlSrsU6kKdVX2C9Dn5u01g4d705bJKItP8sisbUxnw2TJ
-         kEuLSEQj3ReFXlD66zDBHXIy4B7yRtp/GnpmcQgUvhea/jA2tTfNeAzTwSbtSKKq8jzY
-         Um9fxDkDcJihxbLI9O3LSexRlEsIcK6B/zUu/OAbRzD2XSHvv7kDZ5HFtB1R2wL7HjQo
-         TLdA==
-X-Gm-Message-State: APjAAAUXvexwQy8BdUaTGXG2Jr/CBqJZAhh0neuyruhdXxKf0vm+ql7x
-        JreYjMGKxTyiBj3xY8BRV8OF/A==
-X-Google-Smtp-Source: APXvYqwYei1g/xOWE2U+PJHvvft5qrbaOfrE6nk3lP1n8pcWvN76f2qecpvDskoigtVrXYEOtuSqcA==
-X-Received: by 2002:a6b:8bd4:: with SMTP id n203mr5741864iod.133.1570054206751;
-        Wed, 02 Oct 2019 15:10:06 -0700 (PDT)
-Received: from localhost (67-0-10-3.albq.qwest.net. [67.0.10.3])
-        by smtp.gmail.com with ESMTPSA id l16sm350067ilm.67.2019.10.02.15.10.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2019 15:10:05 -0700 (PDT)
-Date:   Wed, 2 Oct 2019 15:10:05 -0700 (PDT)
-From:   Paul Walmsley <paul.walmsley@sifive.com>
-X-X-Sender: paulw@viisi.sifive.com
-To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>, corbet@lwn.net,
-        Mark Rutland <mark.rutland@arm.com>,
-        James Hogan <jhogan@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Palmer Dabbelt <palmer@sifive.com>, linux-mips@vger.kernel.org,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        linux-riscv@lists.infradead.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-cifs@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        linux-rdma@vger.kernel.org,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        Guenter Roeck <linux@roeck-us.net>, devicetree@vger.kernel.org,
-        Jean Delvare <jdelvare@suse.com>,
-        Mauro Carvalho Chehab <mchehab@infradead.org>,
-        linux-gpio@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-        Pensando Drivers <drivers@pensando.io>,
-        linux-hwmon@vger.kernel.org, netdev@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Steve French <sfrench@samba.org>,
-        Paul Burton <paul.burton@mips.com>,
-        Shannon Nelson <snelson@pensando.io>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 1/3] docs: fix some broken references
-In-Reply-To: <b87385b2ac6ce6c75df82062fce2976149bbaa6b.1569330078.git.mchehab+samsung@kernel.org>
-Message-ID: <alpine.DEB.2.21.9999.1910021509260.3732@viisi.sifive.com>
-References: <b87385b2ac6ce6c75df82062fce2976149bbaa6b.1569330078.git.mchehab+samsung@kernel.org>
-User-Agent: Alpine 2.21.9999 (DEB 301 2018-08-15)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cZPeZ9QA0izyHZj/Kh72cgFN6oQf3sUmRlez3jkPjYo=;
+        b=QTBuxUrhrXCBOl0NCCN5P8CIIai3ak/6xJySz+0kcl2Aj+GIsEj8wMQolTj4jevwvr
+         8JYZkCVATt5ddC75HkaFB9aomUfUOtEQfWRi+IkWU5QZWQcEFwuRtFloHXX+8+9IQOzK
+         1dUKL9Qo2ISFRsDf99Ct/rX4vwPDXl94MzzU2+QN9ma49VYXC6L2W84qtSssEv+kbrhP
+         JJAggXtwvRY/9AxdYCUW2BFcjnBL3nq6Sx3Ca/0ucBwrOooMnOFJyomnhAtXfYrDUO5g
+         /iTdhlPD3dZ23ViuEoybzDefbCalQEj1cXwXM72J7Odqd87QDzHFGWjjJky1REZuJdvG
+         8UjA==
+X-Gm-Message-State: APjAAAWShV8mwkE4SpNwB3rKduDEX3nw1RD6efeN4K679MDKqjZj3Ll8
+        ITR11EVWMLWz9gAQHgjHueWCOPJ1ECamlv/zXs39Ld8XBYE=
+X-Google-Smtp-Source: APXvYqz/V1EkbNvG/GvN5vV+R5zDLsI55LMpAZ0vyGNhL5gNrX0tKnhCgO+GNBYWZVYO7yBrfkhg8/s4/sI20cuUDMA=
+X-Received: by 2002:a92:c00d:: with SMTP id q13mr7107590ild.169.1570060477257;
+ Wed, 02 Oct 2019 16:54:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <CAH2r5mv49T9gwwoJxKJfkgdi6xbf+hDALUiAJHghGikgUNParw@mail.gmail.com>
+In-Reply-To: <CAH2r5mv49T9gwwoJxKJfkgdi6xbf+hDALUiAJHghGikgUNParw@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 2 Oct 2019 18:54:26 -0500
+Message-ID: <CAH2r5mtVW=3-2L+0QFJAqBG+uj2sYmF=dtzT_kqwK59cu94vGw@mail.gmail.com>
+Subject: Re: nsdeps not working on modules in 5.4-rc1
+To:     LKML <linux-kernel@vger.kernel.org>,
+        Matthias Maennich <maennich@google.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 24 Sep 2019, Mauro Carvalho Chehab wrote:
+And running the build differently, from the root of the git tree
+(5.4-rc1) rather than using the Ubuntu 5.4-rc1 headers also fails
 
-> There are a number of documentation files that got moved or
-> renamed. update their references.
-> 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-> ---
->  Documentation/devicetree/bindings/cpu/cpu-topology.txt    | 2 +-
->  Documentation/devicetree/bindings/timer/ingenic,tcu.txt   | 2 +-
->  Documentation/driver-api/gpio/driver.rst                  | 2 +-
->  Documentation/hwmon/inspur-ipsps1.rst                     | 2 +-
->  Documentation/mips/ingenic-tcu.rst                        | 2 +-
->  Documentation/networking/device_drivers/mellanox/mlx5.rst | 2 +-
->  MAINTAINERS                                               | 2 +-
->  drivers/net/ethernet/faraday/ftgmac100.c                  | 2 +-
->  drivers/net/ethernet/pensando/ionic/ionic_if.h            | 4 ++--
->  fs/cifs/cifsfs.c                                          | 2 +-
->  10 files changed, 11 insertions(+), 11 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/cpu/cpu-topology.txt b/Documentation/devicetree/bindings/cpu/cpu-topology.txt
-> index 99918189403c..9bd530a35d14 100644
-> --- a/Documentation/devicetree/bindings/cpu/cpu-topology.txt
-> +++ b/Documentation/devicetree/bindings/cpu/cpu-topology.txt
-> @@ -549,5 +549,5 @@ Example 3: HiFive Unleashed (RISC-V 64 bit, 4 core system)
->  [2] Devicetree NUMA binding description
->      Documentation/devicetree/bindings/numa.txt
->  [3] RISC-V Linux kernel documentation
-> -    Documentation/devicetree/bindings/riscv/cpus.txt
-> +    Documentation/devicetree/bindings/riscv/cpus.yaml
->  [4] https://www.devicetree.org/specifications/
+e.g. "make  M=fs/cifs modules nsdeps"
 
-For the RISC-V related change:
+...
+  LD [M]  fs/cifs/cifs.o
+  Building modules, stage 2.
+  MODPOST 1 modules
+WARNING: module cifs uses symbol sigprocmask from namespace
+_fs/cifs/cache.o), but does not import it.
+...
+WARNING: module cifs uses symbol posix_test_lock from namespace
+cifs/cache.o), but does not import it.
+  CC [M]  fs/cifs/cifs.mod.o
+  LD [M]  fs/cifs/cifs.ko
+  Building modules, stage 2.
+  MODPOST 1 modules
+./scripts/nsdeps: 34: local: ./fs/cifs/cifsfs.c: bad variable name
+make: *** [Makefile:1710: nsdeps] Error 2
 
-Acked-by: Paul Walmsley <paul.walmsley@sifive.com> # RISC-V
+On Wed, Oct 2, 2019 at 6:45 PM Steve French <smfrench@gmail.com> wrote:
+>
+> Following the instructions in Documentation/namespaces to autogenerate
+> the namespace changes to avoid the multiple build warnings in 5.4-rc1
+> for my module ... I am not able to get nsdeps to work.   For example
+> in my module directory (fs/cifs) trying to build with nsdeps:
+>
+>       make -C /usr/src/linux-headers-`uname -r` M=`pwd` modules nsdeps
+>
+> gets the error "cat: ./modules.order: No such file or directory"
+>
+> This is on Ubuntu 18, running current 5.4-rc1 kernel.  It looks like
+> it is looking for modules.order in the wrong directory (it is present
+> in fs/cifs - but it looks like it is looking for it in /usr/src where
+> of course it won't be found)
+>
+> I am trying to remove the hundreds of new warnings introduced by
+> namespaces in 5.4-rc1 when building my module e.g.
+>
+> WARNING: module cifs uses symbol __fscache_acquire_cookie from
+> namespace .o: $(deps_/home/sfrench/cifs-2.6/fs/cifs/cache.o), but does
+> not import it.
+> --
+> Thanks,
+>
+> Steve
 
 
-- Paul
+
+-- 
+Thanks,
+
+Steve
