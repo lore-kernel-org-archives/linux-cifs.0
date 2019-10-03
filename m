@@ -2,244 +2,134 @@ Return-Path: <SRS0=2csP=X4=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B147AC32792
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 14:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC38C10F14
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 15:15:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 837C5215EA
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 14:33:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F0012133F
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 15:15:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oTWdxx7p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbfJCOdQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 3 Oct 2019 10:33:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33594 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726393AbfJCOdQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 3 Oct 2019 10:33:16 -0400
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3FA747FDCA
-        for <linux-cifs@vger.kernel.org>; Thu,  3 Oct 2019 14:33:15 +0000 (UTC)
-Received: by mail-qt1-f198.google.com with SMTP id h10so3045105qtq.11
-        for <linux-cifs@vger.kernel.org>; Thu, 03 Oct 2019 07:33:15 -0700 (PDT)
+        id S1729159AbfJCPPG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 3 Oct 2019 11:15:06 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:40476 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726364AbfJCPPG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Oct 2019 11:15:06 -0400
+Received: by mail-io1-f65.google.com with SMTP id h144so6356391iof.7;
+        Thu, 03 Oct 2019 08:15:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BFFGExXDIOP688HODdFkIiqsjWnVg60lYlZNG2xLq9A=;
+        b=oTWdxx7pbev64Bc7cqoj93/GvY/xdreUbNKmZoAn9Mm89tX3kb25USyQObqSfrp3kx
+         ErPyyOF3wXzdSXFAd8XLrpZyY781HEpnH2+JFBT5xNRaHNN+xwFWHK50JDMqknxS+R7b
+         uf4FXTQRR0tBSKlGgQVqHv+/uSYfKzmbdihfmWVfxh/Y2tl5uOwrrbF2DVUcj6j39tDe
+         onO6tPj2IuSkL6qLS1shxUYGiuwxP5XdvTKcMidZ2V7RMT7tB4B0vgnTgRmDUISinHTe
+         WieVn4gnC7Pl2+AA7MvreRdNo92mhkoAK78OU9UW3C9bUH2LY2v5N1j0KNBigkoCsvDZ
+         GyOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=w1UQcOsVykX6Y03oTK99bBNgy905gW+1mY3fluD8DBg=;
-        b=Uc2KjJIA3uf73NeqGaEZFIzDXigsWOzXTivkOUVuUM9xUhKxZCkQ7Jq5DSz+EsrQFN
-         VfxZVqU/gw4+tzrQvQS6XeICZgjyRXT9wzM4KK2qKVhrjmnZa1qncAASzxmrhZg+kNHd
-         8XDMS8Y4wp+EquYHyKoV9TabgWCahMk4WoJM6222jGG/wiDQYkrxOZQLtindKmbL7M+E
-         /My23ZvKH/wI9YutC3ieFBaG9AyX+BzSw/jyebcdEbvQU1jwoU9ep00BWO+reO+SGr5u
-         /RGhejvgQkaJ4BurHzn06kDAi924aR8UDw1sQUaDxntxkxisnMtiuh+D0DME+e96jjdW
-         xmbA==
-X-Gm-Message-State: APjAAAUG9WdiTQZxWJFjVGU9Ig44Cye9jQ9gkjL1F4ixpdmkKh4IpUWz
-        9MOmFnMKn96WTAWbLUHJRE/BMk+h1n4MWLOsFRKr4761nuBsyl6iV6XOjsikjK9zRSWgvCvGBh8
-        ieWVi+FI0CydsjR7yj7f/qwJtioPAMX7/syeDLA==
-X-Received: by 2002:ac8:2e31:: with SMTP id r46mr9990948qta.293.1570113194317;
-        Thu, 03 Oct 2019 07:33:14 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx+Y8IQiiGc5AqZP3z+RjaLu6cmq4oynUuS0dfeCiP1gDoC8THzlbnbKrR8bi8vkWLmjHAoYnwukAUz3CS0vWU=
-X-Received: by 2002:ac8:2e31:: with SMTP id r46mr9990913qta.293.1570113194010;
- Thu, 03 Oct 2019 07:33:14 -0700 (PDT)
+        bh=BFFGExXDIOP688HODdFkIiqsjWnVg60lYlZNG2xLq9A=;
+        b=k+uyQc1QP1ow1gqzqHBPli5cqGgchA6+SkQYRv2sMbjiK5oT13MPHYhBtwOdHB3CDq
+         kVCpojl1/wNbz3XTJiJC1WXc6wFTaX/2i+IRKY4yaZKJi41jM3om7AH5wQ1Z8qjZuj3j
+         IDcD93IR8plaex2N1qajO0tnoiiN/bnMIwUW3qwgRw14quq6WsDORrTL/bOFQdOXzXSn
+         ItV8dFFH7dEpRyqVGkg/RQhf99+9m41yvIJxIvxUfmuLu1HcFDLEfjNsI2FZr0kJl9qk
+         93EC9JijrxDPs2sfOVG4JHhzxCILmFi1GVMZTuOo4ewDHwT15B/WtjbPDJqlGhRIcV1c
+         Qw4g==
+X-Gm-Message-State: APjAAAWLckyGA2T83TUPxZkN7+Sfxa86FYg3Py0Y7fwRKI2OMayShGHW
+        tEQO7UeVP130SCfnNAee8MBb6up07xSwQyFj0Hg=
+X-Google-Smtp-Source: APXvYqzJ/zX2nd/XPq84jrI516/U/wJV0qmtgohJTozU6PDbDv+UccxtLygnD08lGJmOfk56Dh9QLU+VvnjWNPsmk0o=
+X-Received: by 2002:a92:15c4:: with SMTP id 65mr10840441ilv.173.1570115705615;
+ Thu, 03 Oct 2019 08:15:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191003051627.19835-1-lsahlber@redhat.com> <CAH2r5ms+SkmGhPW7zQ3u1e-0VeJWEiAfCxYfyEJJ+aHT1eq4Tw@mail.gmail.com>
-In-Reply-To: <CAH2r5ms+SkmGhPW7zQ3u1e-0VeJWEiAfCxYfyEJJ+aHT1eq4Tw@mail.gmail.com>
-From:   David Wysochanski <dwysocha@redhat.com>
-Date:   Thu, 3 Oct 2019 10:32:37 -0400
-Message-ID: <CALF+zO=f0XcK4Ka7WFY0ScLV4PgHrzHc2ghD1sWoNnXq2X8EoA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: use cifsInodeInfo->open_file_lock while iterating
- to avoid a panic
-To:     Steve French <smfrench@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+References: <CAH2r5mv49T9gwwoJxKJfkgdi6xbf+hDALUiAJHghGikgUNParw@mail.gmail.com>
+ <CAH2r5mtVW=3-2L+0QFJAqBG+uj2sYmF=dtzT_kqwK59cu94vGw@mail.gmail.com> <20191003104356.GA77584@google.com>
+In-Reply-To: <20191003104356.GA77584@google.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 3 Oct 2019 10:14:53 -0500
+Message-ID: <CAH2r5msF5DF2ac+-V0xRR-8RYeQdwpsS1iBLHM6iKTB+aEVc5Q@mail.gmail.com>
+Subject: Re: nsdeps not working on modules in 5.4-rc1
+To:     Matthias Maennich <maennich@google.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Jessica Yu <jeyu@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I'm ok with stable
-
-On Thu, Oct 3, 2019 at 10:21 AM Steve French <smfrench@gmail.com> wrote:
+On Thu, Oct 3, 2019 at 5:43 AM Matthias Maennich <maennich@google.com> wrote:
 >
-> opinions on stable?   The patch it refers to was cc:stable 487317c99477
+> Hi Steve!
 >
-> On Thu, Oct 3, 2019 at 12:16 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+> On Wed, Oct 02, 2019 at 06:54:26PM -0500, Steve French wrote:
+> >And running the build differently, from the root of the git tree
+> >(5.4-rc1) rather than using the Ubuntu 5.4-rc1 headers also fails
 > >
-> > From: Dave Wysochanski <dwysocha@redhat.com>
+> >e.g. "make  M=fs/cifs modules nsdeps"
 > >
-> > Commit 487317c99477 ("cifs: add spinlock for the openFileList to
-> > cifsInodeInfo") added cifsInodeInfo->open_file_lock spin_lock to protect
-> > the openFileList, but missed a few places where cifs_inode->openFileList
-> > was enumerated.  Change these remaining tcon->open_file_lock to
-> > cifsInodeInfo->open_file_lock to avoid panic in is_size_safe_to_change.
-> >
-> > [17313.245641] RIP: 0010:is_size_safe_to_change+0x57/0xb0 [cifs]
-> > [17313.245645] Code: 68 40 48 89 ef e8 19 67 b7 f1 48 8b 43 40 48 8d 4b 40 48 8d 50 f0 48 39 c1 75 0f eb 47 48 8b 42 10 48 8d 50 f0 48 39 c1 74 3a <8b> 80 88 00 00 00 83 c0 01 a8 02 74 e6 48 89 ef c6 07 00 0f 1f 40
-> > [17313.245649] RSP: 0018:ffff94ae1baefa30 EFLAGS: 00010202
-> > [17313.245654] RAX: dead000000000100 RBX: ffff88dc72243300 RCX: ffff88dc72243340
-> > [17313.245657] RDX: dead0000000000f0 RSI: 00000000098f7940 RDI: ffff88dd3102f040
-> > [17313.245659] RBP: ffff88dd3102f040 R08: 0000000000000000 R09: ffff94ae1baefc40
-> > [17313.245661] R10: ffffcdc8bb1c4e80 R11: ffffcdc8b50adb08 R12: 00000000098f7940
-> > [17313.245663] R13: ffff88dc72243300 R14: ffff88dbc8f19600 R15: ffff88dc72243428
-> > [17313.245667] FS:  00007fb145485700(0000) GS:ffff88dd3e000000(0000) knlGS:0000000000000000
-> > [17313.245670] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [17313.245672] CR2: 0000026bb46c6000 CR3: 0000004edb110003 CR4: 00000000007606e0
-> > [17313.245753] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > [17313.245756] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > [17313.245759] PKRU: 55555554
-> > [17313.245761] Call Trace:
-> > [17313.245803]  cifs_fattr_to_inode+0x16b/0x580 [cifs]
-> > [17313.245838]  cifs_get_inode_info+0x35c/0xa60 [cifs]
-> > [17313.245852]  ? kmem_cache_alloc_trace+0x151/0x1d0
-> > [17313.245885]  cifs_open+0x38f/0x990 [cifs]
-> > [17313.245921]  ? cifs_revalidate_dentry_attr+0x3e/0x350 [cifs]
-> > [17313.245953]  ? cifsFileInfo_get+0x30/0x30 [cifs]
-> > [17313.245960]  ? do_dentry_open+0x132/0x330
-> > [17313.245963]  do_dentry_open+0x132/0x330
-> > [17313.245969]  path_openat+0x573/0x14d0
-> > [17313.245974]  do_filp_open+0x93/0x100
-> > [17313.245979]  ? __check_object_size+0xa3/0x181
-> > [17313.245986]  ? audit_alloc_name+0x7e/0xd0
-> > [17313.245992]  do_sys_open+0x184/0x220
-> > [17313.245999]  do_syscall_64+0x5b/0x1b0
-> >
-> > Fixes: 487317c99477 ("cifs: add spinlock for the openFileList to cifsInodeInfo")
-> >
-> > Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
-> > Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/file.c | 27 +++++++++++----------------
-> >  1 file changed, 11 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> > index 4b95700c507c..3758237bf951 100644
-> > --- a/fs/cifs/file.c
-> > +++ b/fs/cifs/file.c
-> > @@ -1840,13 +1840,12 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
-> >  {
-> >         struct cifsFileInfo *open_file = NULL;
-> >         struct cifs_sb_info *cifs_sb = CIFS_SB(cifs_inode->vfs_inode.i_sb);
-> > -       struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-> >
-> >         /* only filter by fsuid on multiuser mounts */
-> >         if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
-> >                 fsuid_only = false;
-> >
-> > -       spin_lock(&tcon->open_file_lock);
-> > +       spin_lock(&cifs_inode->open_file_lock);
-> >         /* we could simply get the first_list_entry since write-only entries
-> >            are always at the end of the list but since the first entry might
-> >            have a close pending, we go through the whole list */
-> > @@ -1858,7 +1857,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
-> >                                 /* found a good file */
-> >                                 /* lock it so it will not be closed on us */
-> >                                 cifsFileInfo_get(open_file);
-> > -                               spin_unlock(&tcon->open_file_lock);
-> > +                               spin_unlock(&cifs_inode->open_file_lock);
-> >                                 return open_file;
-> >                         } /* else might as well continue, and look for
-> >                              another, or simply have the caller reopen it
-> > @@ -1866,7 +1865,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
-> >                 } else /* write only file */
-> >                         break; /* write only files are last so must be done */
-> >         }
-> > -       spin_unlock(&tcon->open_file_lock);
-> > +       spin_unlock(&cifs_inode->open_file_lock);
-> >         return NULL;
-> >  }
-> >
-> > @@ -1877,7 +1876,6 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
-> >  {
-> >         struct cifsFileInfo *open_file, *inv_file = NULL;
-> >         struct cifs_sb_info *cifs_sb;
-> > -       struct cifs_tcon *tcon;
-> >         bool any_available = false;
-> >         int rc = -EBADF;
-> >         unsigned int refind = 0;
-> > @@ -1897,16 +1895,15 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
-> >         }
-> >
-> >         cifs_sb = CIFS_SB(cifs_inode->vfs_inode.i_sb);
-> > -       tcon = cifs_sb_master_tcon(cifs_sb);
-> >
-> >         /* only filter by fsuid on multiuser mounts */
-> >         if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
-> >                 fsuid_only = false;
-> >
-> > -       spin_lock(&tcon->open_file_lock);
-> > +       spin_lock(&cifs_inode->open_file_lock);
-> >  refind_writable:
-> >         if (refind > MAX_REOPEN_ATT) {
-> > -               spin_unlock(&tcon->open_file_lock);
-> > +               spin_unlock(&cifs_inode->open_file_lock);
-> >                 return rc;
-> >         }
-> >         list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
-> > @@ -1918,7 +1915,7 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
-> >                         if (!open_file->invalidHandle) {
-> >                                 /* found a good writable file */
-> >                                 cifsFileInfo_get(open_file);
-> > -                               spin_unlock(&tcon->open_file_lock);
-> > +                               spin_unlock(&cifs_inode->open_file_lock);
-> >                                 *ret_file = open_file;
-> >                                 return 0;
-> >                         } else {
-> > @@ -1938,7 +1935,7 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
-> >                 cifsFileInfo_get(inv_file);
-> >         }
-> >
-> > -       spin_unlock(&tcon->open_file_lock);
-> > +       spin_unlock(&cifs_inode->open_file_lock);
-> >
-> >         if (inv_file) {
-> >                 rc = cifs_reopen_file(inv_file, false);
-> > @@ -1953,7 +1950,7 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
-> >                 cifsFileInfo_put(inv_file);
-> >                 ++refind;
-> >                 inv_file = NULL;
-> > -               spin_lock(&tcon->open_file_lock);
-> > +               spin_lock(&cifs_inode->open_file_lock);
-> >                 goto refind_writable;
-> >         }
-> >
-> > @@ -4461,17 +4458,15 @@ static int cifs_readpage(struct file *file, struct page *page)
-> >  static int is_inode_writable(struct cifsInodeInfo *cifs_inode)
-> >  {
-> >         struct cifsFileInfo *open_file;
-> > -       struct cifs_tcon *tcon =
-> > -               cifs_sb_master_tcon(CIFS_SB(cifs_inode->vfs_inode.i_sb));
-> >
-> > -       spin_lock(&tcon->open_file_lock);
-> > +       spin_lock(&cifs_inode->open_file_lock);
-> >         list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
-> >                 if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
-> > -                       spin_unlock(&tcon->open_file_lock);
-> > +                       spin_unlock(&cifs_inode->open_file_lock);
-> >                         return 1;
-> >                 }
-> >         }
-> > -       spin_unlock(&tcon->open_file_lock);
-> > +       spin_unlock(&cifs_inode->open_file_lock);
-> >         return 0;
-> >  }
-> >
-> > --
-> > 2.13.6
-> >
+> >...
+> >  LD [M]  fs/cifs/cifs.o
+> >  Building modules, stage 2.
+> >  MODPOST 1 modules
+> >WARNING: module cifs uses symbol sigprocmask from namespace
+> >_fs/cifs/cache.o), but does not import it.
+> >...
+> >WARNING: module cifs uses symbol posix_test_lock from namespace
+> >cifs/cache.o), but does not import it.
+> >  CC [M]  fs/cifs/cifs.mod.o
+> >  LD [M]  fs/cifs/cifs.ko
+> >  Building modules, stage 2.
+> >  MODPOST 1 modules
+> >./scripts/nsdeps: 34: local: ./fs/cifs/cifsfs.c: bad variable name
+> >make: *** [Makefile:1710: nsdeps] Error 2
 >
+> Thanks for reporting this. It appears to me you hit a bug that was
+> recently discovered: when building with `make M=some/subdirectory`,
+> modpost is misbehaving. Can you try whether this patch series solves
+> your problems:
+> https://lore.kernel.org/lkml/20191003075826.7478-1-yamada.masahiro@socionext.com/
+> In particular patch 2/6 out of the series.
 >
-> --
-> Thanks,
->
-> Steve
+> Cheers,
+> Matthias
 
 
+Applying just patch 2 and doing "make" from the root of the git tree
+(5.4-rc1), at the tail end of the build I got
 
---
-Dave Wysochanski
-Principal Software Maintenance Engineer
-T: 919-754-4024
+...
+Kernel: arch/x86/boot/bzImage is ready  (#87)
+  Building modules, stage 2.
+  MODPOST 5340 modules
+free(): invalid pointer
+Aborted (core dumped)
+make[1]: *** [scripts/Makefile.modpost:94: __modpost] Error 134
+make: *** [Makefile:1303: modules] Error 2
+
+With patch 2 and doing make M=fs/cifs nsdeps from the root of the git tree I get
+
+$ make M=fs/cifs nsdeps
+  Building modules, stage 2.
+  MODPOST 1 modules
+  Building modules, stage 2.
+  MODPOST 1 modules
+./scripts/nsdeps: 34: local: ./fs/cifs/cifsfs.c: bad variable name
+make: *** [Makefile:1710: nsdeps] Error 2
+
+
+-- 
+Thanks,
+
+Steve
