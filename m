@@ -2,202 +2,271 @@ Return-Path: <SRS0=2csP=X4=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29873C32792
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 05:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41763C4CED1
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 07:53:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EFE35222C3
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 05:16:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 051D121D81
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 07:53:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="0ljP/Xqk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726116AbfJCFQm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 3 Oct 2019 01:16:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45244 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725497AbfJCFQm (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 3 Oct 2019 01:16:42 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5428430917AA;
-        Thu,  3 Oct 2019 05:16:41 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-82.bne.redhat.com [10.64.54.82])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA48C19C7F;
-        Thu,  3 Oct 2019 05:16:40 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Dave Wysochanski <dwysocha@redhat.com>
-Subject: [PATCH] cifs: use cifsInodeInfo->open_file_lock while iterating to avoid a panic
-Date:   Thu,  3 Oct 2019 15:16:27 +1000
-Message-Id: <20191003051627.19835-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Thu, 03 Oct 2019 05:16:41 +0000 (UTC)
+        id S1727207AbfJCHxV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 3 Oct 2019 03:53:21 -0400
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:45127 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726039AbfJCHxV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Oct 2019 03:53:21 -0400
+Received: by mail-oi1-f193.google.com with SMTP id o205so1704524oib.12
+        for <linux-cifs@vger.kernel.org>; Thu, 03 Oct 2019 00:53:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=OjGOtM7igFnxOTkazDzEAF1mbsEsRdgokYn8LnXlxak=;
+        b=0ljP/Xqkv8mT++dxL9IDYrrnXlEv9lrJP90Bahq1OBLUXK3btgYh5wyHlZssI3YurN
+         pFDAkt12ppGUrER632fCfdihcSkLnFygz07D3eEGii2r2Puunq5JCKwhf/olqSyQJkhe
+         y4sxSAWaYpjr9f5Wrxp90qzT0eir6UjXXj2LeikUk8mVJIBX5nJR3znXBIO9CoTmsRr6
+         LkMnSa//LbiPkRtmhxr1iEvteUzvh1LjMwn00n5k+Q+R5FcGfpoYjlNwxgcL0FpK8Y1W
+         tjUDW9f2sxUGKn5ZjbjT1ogyxC+SzYQbv5HTFeCum1+SvlQU5DzEXntInmz46VsYXXrg
+         dQMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=OjGOtM7igFnxOTkazDzEAF1mbsEsRdgokYn8LnXlxak=;
+        b=qf/4N9FBNQZa/WQJLsgFN1a54yJtrU1tFyyK8cio3MWgX9KCslxnzUtrRx9q6cBvoh
+         7wVRR2KfBoVG82eVqApUvvnDoxv/42SgqPNzH4lOtF5mbyTPiI858quPLAGXOsF5/C+Z
+         VGdvh9O0ENdrm2FIowMf+RmINGiRhMqB4nIhSRdVg1aSLlpYPRpEmNbul8OtapyFt789
+         qnmx0bwdqkRsjkWwXgLdLVKOwTQ1m+JTCwAZTWpYnU7/kVIQGF2fbGg1scQY8j18g3Qp
+         iiaVy+PJgOC4GPlZ+7+m9X/ZStOEE4CrMr9Ne4Low4SN15R+eOZ4Q9N3B9dLBxF7e0AS
+         VG7w==
+X-Gm-Message-State: APjAAAUcV3sPSTSE/K4x+NEsO0YVW29S+v4qGI0qs/e18eemNNe65KrJ
+        G71f/0PkL6dHhI/INMGNd5xDO2CgYZ3rnybUWpwm3A==
+X-Google-Smtp-Source: APXvYqz7m7kCXZYIv7j5R46VZcpbdhhoa42pgCHxxwP/titPUyQPDIy7EJgb+avLl4yWojBI9F0QLe5D/MGpfKQJ+94=
+X-Received: by 2002:a54:4f8a:: with SMTP id g10mr1832202oiy.147.1570089199061;
+ Thu, 03 Oct 2019 00:53:19 -0700 (PDT)
+MIME-Version: 1.0
+References: <b87385b2ac6ce6c75df82062fce2976149bbaa6b.1569330078.git.mchehab+samsung@kernel.org>
+In-Reply-To: <b87385b2ac6ce6c75df82062fce2976149bbaa6b.1569330078.git.mchehab+samsung@kernel.org>
+From:   Bartosz Golaszewski <bgolaszewski@baylibre.com>
+Date:   Thu, 3 Oct 2019 09:53:08 +0200
+Message-ID: <CAMpxmJUYZ-6p_uD=ktO+mDMZ3VooRkjLBwDVDieT1gvo3474uw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] docs: fix some broken references
+To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Paul Burton <paul.burton@mips.com>,
+        James Hogan <jhogan@kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Shannon Nelson <snelson@pensando.io>,
+        Pensando Drivers <drivers@pensando.io>,
+        Steve French <sfrench@samba.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        linux-devicetree <devicetree@vger.kernel.org>,
+        linux-gpio <linux-gpio@vger.kernel.org>,
+        linux-hwmon@vger.kernel.org, linux-mips@vger.kernel.org,
+        netdev <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Dave Wysochanski <dwysocha@redhat.com>
+wt., 24 wrz 2019 o 15:01 Mauro Carvalho Chehab
+<mchehab+samsung@kernel.org> napisa=C5=82(a):
+>
+> There are a number of documentation files that got moved or
+> renamed. update their references.
+>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/cpu/cpu-topology.txt    | 2 +-
+>  Documentation/devicetree/bindings/timer/ingenic,tcu.txt   | 2 +-
+>  Documentation/driver-api/gpio/driver.rst                  | 2 +-
+>  Documentation/hwmon/inspur-ipsps1.rst                     | 2 +-
+>  Documentation/mips/ingenic-tcu.rst                        | 2 +-
+>  Documentation/networking/device_drivers/mellanox/mlx5.rst | 2 +-
+>  MAINTAINERS                                               | 2 +-
+>  drivers/net/ethernet/faraday/ftgmac100.c                  | 2 +-
+>  drivers/net/ethernet/pensando/ionic/ionic_if.h            | 4 ++--
+>  fs/cifs/cifsfs.c                                          | 2 +-
+>  10 files changed, 11 insertions(+), 11 deletions(-)
+>
+> diff --git a/Documentation/devicetree/bindings/cpu/cpu-topology.txt b/Doc=
+umentation/devicetree/bindings/cpu/cpu-topology.txt
+> index 99918189403c..9bd530a35d14 100644
+> --- a/Documentation/devicetree/bindings/cpu/cpu-topology.txt
+> +++ b/Documentation/devicetree/bindings/cpu/cpu-topology.txt
+> @@ -549,5 +549,5 @@ Example 3: HiFive Unleashed (RISC-V 64 bit, 4 core sy=
+stem)
+>  [2] Devicetree NUMA binding description
+>      Documentation/devicetree/bindings/numa.txt
+>  [3] RISC-V Linux kernel documentation
+> -    Documentation/devicetree/bindings/riscv/cpus.txt
+> +    Documentation/devicetree/bindings/riscv/cpus.yaml
+>  [4] https://www.devicetree.org/specifications/
+> diff --git a/Documentation/devicetree/bindings/timer/ingenic,tcu.txt b/Do=
+cumentation/devicetree/bindings/timer/ingenic,tcu.txt
+> index 5a4b9ddd9470..7f6fe20503f5 100644
+> --- a/Documentation/devicetree/bindings/timer/ingenic,tcu.txt
+> +++ b/Documentation/devicetree/bindings/timer/ingenic,tcu.txt
+> @@ -2,7 +2,7 @@ Ingenic JZ47xx SoCs Timer/Counter Unit devicetree binding=
+s
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>  For a description of the TCU hardware and drivers, have a look at
+> -Documentation/mips/ingenic-tcu.txt.
+> +Documentation/mips/ingenic-tcu.rst.
+>
+>  Required properties:
+>
+> diff --git a/Documentation/driver-api/gpio/driver.rst b/Documentation/dri=
+ver-api/gpio/driver.rst
+> index 3fdb32422f8a..9076cc76d5bf 100644
+> --- a/Documentation/driver-api/gpio/driver.rst
+> +++ b/Documentation/driver-api/gpio/driver.rst
+> @@ -493,7 +493,7 @@ available but we try to move away from this:
+>    gpiochip. It will pass the struct gpio_chip* for the chip to all IRQ
+>    callbacks, so the callbacks need to embed the gpio_chip in its state
+>    container and obtain a pointer to the container using container_of().
+> -  (See Documentation/driver-model/design-patterns.txt)
+> +  (See Documentation/driver-api/driver-model/design-patterns.rst)
+>
+>  - gpiochip_irqchip_add_nested(): adds a nested cascaded irqchip to a gpi=
+ochip,
+>    as discussed above regarding different types of cascaded irqchips. The
+> diff --git a/Documentation/hwmon/inspur-ipsps1.rst b/Documentation/hwmon/=
+inspur-ipsps1.rst
+> index 2b871ae3448f..ed32a65c30e1 100644
+> --- a/Documentation/hwmon/inspur-ipsps1.rst
+> +++ b/Documentation/hwmon/inspur-ipsps1.rst
+> @@ -17,7 +17,7 @@ Usage Notes
+>  -----------
+>
+>  This driver does not auto-detect devices. You will have to instantiate t=
+he
+> -devices explicitly. Please see Documentation/i2c/instantiating-devices f=
+or
+> +devices explicitly. Please see Documentation/i2c/instantiating-devices.r=
+st for
+>  details.
+>
+>  Sysfs entries
+> diff --git a/Documentation/mips/ingenic-tcu.rst b/Documentation/mips/inge=
+nic-tcu.rst
+> index c4ef4c45aade..c5a646b14450 100644
+> --- a/Documentation/mips/ingenic-tcu.rst
+> +++ b/Documentation/mips/ingenic-tcu.rst
+> @@ -68,4 +68,4 @@ and frameworks can be controlled from the same register=
+s, all of these
+>  drivers access their registers through the same regmap.
+>
+>  For more information regarding the devicetree bindings of the TCU driver=
+s,
+> -have a look at Documentation/devicetree/bindings/mfd/ingenic,tcu.txt.
+> +have a look at Documentation/devicetree/bindings/timer/ingenic,tcu.txt.
+> diff --git a/Documentation/networking/device_drivers/mellanox/mlx5.rst b/=
+Documentation/networking/device_drivers/mellanox/mlx5.rst
+> index d071c6b49e1f..a74422058351 100644
+> --- a/Documentation/networking/device_drivers/mellanox/mlx5.rst
+> +++ b/Documentation/networking/device_drivers/mellanox/mlx5.rst
+> @@ -258,7 +258,7 @@ mlx5 tracepoints
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>  mlx5 driver provides internal trace points for tracking and debugging us=
+ing
+> -kernel tracepoints interfaces (refer to Documentation/trace/ftrase.rst).
+> +kernel tracepoints interfaces (refer to Documentation/trace/ftrace.rst).
+>
+>  For the list of support mlx5 events check /sys/kernel/debug/tracing/even=
+ts/mlx5/
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 54f1286087e9..65b7d9a0a44a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3680,7 +3680,7 @@ M:        Oleksij Rempel <o.rempel@pengutronix.de>
+>  R:     Pengutronix Kernel Team <kernel@pengutronix.de>
+>  L:     linux-can@vger.kernel.org
+>  S:     Maintained
+> -F:     Documentation/networking/j1939.txt
+> +F:     Documentation/networking/j1939.rst
+>  F:     net/can/j1939/
+>  F:     include/uapi/linux/can/j1939.h
+>
+> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ether=
+net/faraday/ftgmac100.c
+> index 9b7af94a40bb..8abe5e90d268 100644
+> --- a/drivers/net/ethernet/faraday/ftgmac100.c
+> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
+> @@ -1835,7 +1835,7 @@ static int ftgmac100_probe(struct platform_device *=
+pdev)
+>                 }
+>
+>                 /* Indicate that we support PAUSE frames (see comment in
+> -                * Documentation/networking/phy.txt)
+> +                * Documentation/networking/phy.rst)
+>                  */
+>                 phy_support_asym_pause(phy);
+>
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_if.h b/drivers/net=
+/ethernet/pensando/ionic/ionic_if.h
+> index 5bfdda19f64d..80028f781c83 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_if.h
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_if.h
+> @@ -596,8 +596,8 @@ enum ionic_txq_desc_opcode {
+>   *                      the @encap is set, the device will
+>   *                      offload the outer header checksums using
+>   *                      LCO (local checksum offload) (see
+> - *                      Documentation/networking/checksum-
+> - *                      offloads.txt for more info).
+> + *                      Documentation/networking/checksum-offloads.rst
+> + *                      for more info).
+>   *
+>   *                   IONIC_TXQ_DESC_OPCODE_CSUM_HW:
+>   *
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 2e9c7f493f99..811f510578cb 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -1529,7 +1529,7 @@ init_cifs(void)
+>         /*
+>          * Consider in future setting limit!=3D0 maybe to min(num_of_core=
+s - 1, 3)
+>          * so that we don't launch too many worker threads but
+> -        * Documentation/workqueue.txt recommends setting it to 0
+> +        * Documentation/core-api/workqueue.rst recommends setting it to =
+0
+>          */
+>
+>         /* WQ_UNBOUND allows decrypt tasks to run on any CPU */
+> --
+> 2.21.0
+>
 
-Commit 487317c99477 ("cifs: add spinlock for the openFileList to
-cifsInodeInfo") added cifsInodeInfo->open_file_lock spin_lock to protect
-the openFileList, but missed a few places where cifs_inode->openFileList
-was enumerated.  Change these remaining tcon->open_file_lock to
-cifsInodeInfo->open_file_lock to avoid panic in is_size_safe_to_change.
+For GPIO:
 
-[17313.245641] RIP: 0010:is_size_safe_to_change+0x57/0xb0 [cifs]
-[17313.245645] Code: 68 40 48 89 ef e8 19 67 b7 f1 48 8b 43 40 48 8d 4b 40 48 8d 50 f0 48 39 c1 75 0f eb 47 48 8b 42 10 48 8d 50 f0 48 39 c1 74 3a <8b> 80 88 00 00 00 83 c0 01 a8 02 74 e6 48 89 ef c6 07 00 0f 1f 40
-[17313.245649] RSP: 0018:ffff94ae1baefa30 EFLAGS: 00010202
-[17313.245654] RAX: dead000000000100 RBX: ffff88dc72243300 RCX: ffff88dc72243340
-[17313.245657] RDX: dead0000000000f0 RSI: 00000000098f7940 RDI: ffff88dd3102f040
-[17313.245659] RBP: ffff88dd3102f040 R08: 0000000000000000 R09: ffff94ae1baefc40
-[17313.245661] R10: ffffcdc8bb1c4e80 R11: ffffcdc8b50adb08 R12: 00000000098f7940
-[17313.245663] R13: ffff88dc72243300 R14: ffff88dbc8f19600 R15: ffff88dc72243428
-[17313.245667] FS:  00007fb145485700(0000) GS:ffff88dd3e000000(0000) knlGS:0000000000000000
-[17313.245670] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[17313.245672] CR2: 0000026bb46c6000 CR3: 0000004edb110003 CR4: 00000000007606e0
-[17313.245753] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[17313.245756] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[17313.245759] PKRU: 55555554
-[17313.245761] Call Trace:
-[17313.245803]  cifs_fattr_to_inode+0x16b/0x580 [cifs]
-[17313.245838]  cifs_get_inode_info+0x35c/0xa60 [cifs]
-[17313.245852]  ? kmem_cache_alloc_trace+0x151/0x1d0
-[17313.245885]  cifs_open+0x38f/0x990 [cifs]
-[17313.245921]  ? cifs_revalidate_dentry_attr+0x3e/0x350 [cifs]
-[17313.245953]  ? cifsFileInfo_get+0x30/0x30 [cifs]
-[17313.245960]  ? do_dentry_open+0x132/0x330
-[17313.245963]  do_dentry_open+0x132/0x330
-[17313.245969]  path_openat+0x573/0x14d0
-[17313.245974]  do_filp_open+0x93/0x100
-[17313.245979]  ? __check_object_size+0xa3/0x181
-[17313.245986]  ? audit_alloc_name+0x7e/0xd0
-[17313.245992]  do_sys_open+0x184/0x220
-[17313.245999]  do_syscall_64+0x5b/0x1b0
-
-Fixes: 487317c99477 ("cifs: add spinlock for the openFileList to cifsInodeInfo")
-
-Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
-Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/file.c | 27 +++++++++++----------------
- 1 file changed, 11 insertions(+), 16 deletions(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 4b95700c507c..3758237bf951 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1840,13 +1840,12 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
- {
- 	struct cifsFileInfo *open_file = NULL;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(cifs_inode->vfs_inode.i_sb);
--	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
- 
- 	/* only filter by fsuid on multiuser mounts */
- 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
- 		fsuid_only = false;
- 
--	spin_lock(&tcon->open_file_lock);
-+	spin_lock(&cifs_inode->open_file_lock);
- 	/* we could simply get the first_list_entry since write-only entries
- 	   are always at the end of the list but since the first entry might
- 	   have a close pending, we go through the whole list */
-@@ -1858,7 +1857,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
- 				/* found a good file */
- 				/* lock it so it will not be closed on us */
- 				cifsFileInfo_get(open_file);
--				spin_unlock(&tcon->open_file_lock);
-+				spin_unlock(&cifs_inode->open_file_lock);
- 				return open_file;
- 			} /* else might as well continue, and look for
- 			     another, or simply have the caller reopen it
-@@ -1866,7 +1865,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
- 		} else /* write only file */
- 			break; /* write only files are last so must be done */
- 	}
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&cifs_inode->open_file_lock);
- 	return NULL;
- }
- 
-@@ -1877,7 +1876,6 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
- {
- 	struct cifsFileInfo *open_file, *inv_file = NULL;
- 	struct cifs_sb_info *cifs_sb;
--	struct cifs_tcon *tcon;
- 	bool any_available = false;
- 	int rc = -EBADF;
- 	unsigned int refind = 0;
-@@ -1897,16 +1895,15 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
- 	}
- 
- 	cifs_sb = CIFS_SB(cifs_inode->vfs_inode.i_sb);
--	tcon = cifs_sb_master_tcon(cifs_sb);
- 
- 	/* only filter by fsuid on multiuser mounts */
- 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER))
- 		fsuid_only = false;
- 
--	spin_lock(&tcon->open_file_lock);
-+	spin_lock(&cifs_inode->open_file_lock);
- refind_writable:
- 	if (refind > MAX_REOPEN_ATT) {
--		spin_unlock(&tcon->open_file_lock);
-+		spin_unlock(&cifs_inode->open_file_lock);
- 		return rc;
- 	}
- 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
-@@ -1918,7 +1915,7 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
- 			if (!open_file->invalidHandle) {
- 				/* found a good writable file */
- 				cifsFileInfo_get(open_file);
--				spin_unlock(&tcon->open_file_lock);
-+				spin_unlock(&cifs_inode->open_file_lock);
- 				*ret_file = open_file;
- 				return 0;
- 			} else {
-@@ -1938,7 +1935,7 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
- 		cifsFileInfo_get(inv_file);
- 	}
- 
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&cifs_inode->open_file_lock);
- 
- 	if (inv_file) {
- 		rc = cifs_reopen_file(inv_file, false);
-@@ -1953,7 +1950,7 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, bool fsuid_only,
- 		cifsFileInfo_put(inv_file);
- 		++refind;
- 		inv_file = NULL;
--		spin_lock(&tcon->open_file_lock);
-+		spin_lock(&cifs_inode->open_file_lock);
- 		goto refind_writable;
- 	}
- 
-@@ -4461,17 +4458,15 @@ static int cifs_readpage(struct file *file, struct page *page)
- static int is_inode_writable(struct cifsInodeInfo *cifs_inode)
- {
- 	struct cifsFileInfo *open_file;
--	struct cifs_tcon *tcon =
--		cifs_sb_master_tcon(CIFS_SB(cifs_inode->vfs_inode.i_sb));
- 
--	spin_lock(&tcon->open_file_lock);
-+	spin_lock(&cifs_inode->open_file_lock);
- 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
- 		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
--			spin_unlock(&tcon->open_file_lock);
-+			spin_unlock(&cifs_inode->open_file_lock);
- 			return 1;
- 		}
- 	}
--	spin_unlock(&tcon->open_file_lock);
-+	spin_unlock(&cifs_inode->open_file_lock);
- 	return 0;
- }
- 
--- 
-2.13.6
-
+Acked-by: Bartosz Golaszewski <bgolaszewski@baylibre.com>
