@@ -2,66 +2,65 @@ Return-Path: <SRS0=e7DE=X5=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3AEDC10F14
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Oct 2019 00:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42F8C32792
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Oct 2019 00:23:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C625720862
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Oct 2019 00:22:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99C362133F
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Oct 2019 00:23:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aGpfCVRc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EazOEHZ3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731023AbfJDAWk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 3 Oct 2019 20:22:40 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:39459 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730969AbfJDAWk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Oct 2019 20:22:40 -0400
-Received: by mail-lj1-f193.google.com with SMTP id y3so4660819ljj.6
-        for <linux-cifs@vger.kernel.org>; Thu, 03 Oct 2019 17:22:39 -0700 (PDT)
+        id S1732368AbfJDAXV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 3 Oct 2019 20:23:21 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:34472 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730969AbfJDAXU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Oct 2019 20:23:20 -0400
+Received: by mail-lf1-f65.google.com with SMTP id r22so3194005lfm.1
+        for <linux-cifs@vger.kernel.org>; Thu, 03 Oct 2019 17:23:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=VpPaB31YKwLTVOdlGQZYQGQcqgsQZ/YDZDxerxCqdVA=;
-        b=aGpfCVRczGcytuV+hPB1KOD41nAkza4w8EYZuaN6bhEJZr5z7ERMokKxZR6UT6fdPq
-         X3Aty9VKweZZUGZZwE+Y2R8yfOPWyDMVvUFFHBVgG1cKwTY5OVe34EJqEsS7HMnF0dDc
-         Uf8a+KFyMa+UshtpGIkfX0A3tgRUvmF7c7UPRFuu56xEJhTBYewA0EsyZImO2pfT+W8s
-         w1101gz0iBGlbeUoI+57q8xRdzeAwcb80mPS3ILQwKOcYmTSBzE/bOc/SfATjEH44Vzf
-         kSNMlJP+W4ZZaF+Ru0Wk+9Mpt13eAK30WQNUG35OpeTxgrkiIEY4O6uiBR5xv36CtEY+
-         OY4g==
+        bh=7vMc6KDlBcnghGB9c43lv1XQLrLse3+j0pr6CseKS/c=;
+        b=EazOEHZ392ZrKlo3aqbBugnP+8Mh7YknVLEzRrYoLM2seLAkQ+82InqtT9lgsyTuSa
+         JvYEXrDupxxrxGuPCxk3YxpnM55TXqMkyTExLDXnJ0GQikRpyykphxR8wMHsfpDoBJuo
+         SdvlnMs0zPHglHE1QL0E14Dd1wWoZvizR5kzUQW1s21dwIayp+Xn34iZJeTboGRaLnPo
+         s9SRtpJMSnhTfuDdOIweteMV6QjmHjVYQhFjUPzRXJmondg8RzSN5KuTCXVQBiffdTh5
+         wd2zKONC/FcXxS7BzKaJPsvd7+icIxZLGAlLl1VnlBdEermDEn8pm29Be2oZ69FSSTTE
+         Z5oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=VpPaB31YKwLTVOdlGQZYQGQcqgsQZ/YDZDxerxCqdVA=;
-        b=j7zCvHHQPueWz0dQ2uEubCHGSGvfkBJB+u/783loHe7moZveZPrR5tTs5u3ZnLpSgi
-         Yodd2qKJQ+FXWO0k05odPo28eA2YrIvwZfh95tcVtuo9EWYqM++B2Ir8Er3bH0dklxCO
-         blT0lYjWYffvOFzZjLe4q37rMMl3h1ifVsaJHYm+vI9NiHS5DLjcd4fvzl2avuXzg7iK
-         vYm+fa65tTbdPohbTmECgDudHL9ZGDH0wP4RExoKp6OfpBYaluavHRxeFRKCtmEQZuH9
-         +4S44JJHMPEOBr8jLfYdiH0Pidp0kHw3v3ubjkFxH4rut0T9N5KRZxbS99ezLucmhN5r
-         1YZQ==
-X-Gm-Message-State: APjAAAXC2t9+PDxzGE0FPh84IXOBGB855Bk8bhuMqk0chdoeHwtSQ3x4
-        dzabMNqvGh2VmBNUIdbopuHwVQbUX2XZv8oT0qQDbIk=
-X-Google-Smtp-Source: APXvYqwXpkAxgkYWyx0YKKn7INxIt/vdRxkuTxxyM6XSkMS2kH4K8tmSF3B5u4LE8jUkivseGWcDoi4PchwOj7CVDAA=
-X-Received: by 2002:a2e:7d19:: with SMTP id y25mr7562122ljc.177.1570148558386;
- Thu, 03 Oct 2019 17:22:38 -0700 (PDT)
+        bh=7vMc6KDlBcnghGB9c43lv1XQLrLse3+j0pr6CseKS/c=;
+        b=ug7qC4/pKlrbRrrOBvUn5JYRBceuMzOTAcW1A9bZpDcDJZel9yGA+0hZBJGZd+k57s
+         2ljHcA5mOTjU+gBGWJfSwTBZ18cjcNkTsVA6dy0mthhRnzXC4h4zD9AuLuI240Pkv5Mj
+         ktbqxu4HMl8luCoL8tJT0YMSI2Wvhg6muofN8k8TRQcOD8fuwYUhxjL7mCP8YeN0lydt
+         vAsMx4cIDjBeep34Qt2A06LHvqkenVWcrxRzMlsrzfLJkBalGKoHC0bv1adelswEiINw
+         wI4QMZAy1nXA0jHZ1uUn1OtzyIH7iHyS94ylmpvb/7dkm/hWQSulpCyvs/9Py9eyeWbV
+         4QKQ==
+X-Gm-Message-State: APjAAAWxXC/bp5YhIKKHPZSSj1LScA4hDMAX5/3aEMpWYvgmom6kMQMj
+        h31OXMn4abWBW9bLN9A+fLJQqAs5KWR0DvyAIpSh3Pk=
+X-Google-Smtp-Source: APXvYqwOGw9nZ/A5ERBBn8vCm6/MAZzsFlCyTjV4eiEu/gGx676lSBKnhvnMXZZ8KCrnkBkL1byYt8UO1BIicye8qu8=
+X-Received: by 2002:a05:6512:304:: with SMTP id t4mr7493883lfp.15.1570148598838;
+ Thu, 03 Oct 2019 17:23:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190905184935.30694-1-paulo@paulo.ac> <87k1ahiqmd.fsf@suse.com>
-In-Reply-To: <87k1ahiqmd.fsf@suse.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 3 Oct 2019 17:22:27 -0700
-Message-ID: <CAKywueQZSHj6autWPkyjhnfpEttFbr=81Y6a7_tWSQVnr-PmJw@mail.gmail.com>
-Subject: Re: [PATCH] mount.cifs: Fix double-free issue when mounting with
- setuid root
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     "Paulo Alcantara (SUSE)" <paulo@paulo.ac>,
-        samba-technical <samba-technical@lists.samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+References: <20190919121226.8756-1-pc@cjr.nz> <4451b38f-abb2-8437-62f6-e499a3497737@suse.com>
+In-Reply-To: <4451b38f-abb2-8437-62f6-e499a3497737@suse.com>
+From:   Pavel Shilovsky <pavel.shilovsky@gmail.com>
+Date:   Thu, 3 Oct 2019 17:23:07 -0700
+Message-ID: <CAKywueSaA8gavuVWhVGcEjdTt_u_GiPSW0bkCc_jLqpL2t_P9g@mail.gmail.com>
+Subject: Re: [PATCH] mount.cifs: Fix invalid free
+To:     David Mulder <dmulder@suse.com>
+Cc:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -69,89 +68,89 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D0=BD, 9 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 05:46, Aur=C3=
-=A9lien Aptel <aaptel@suse.com>:
+=D1=81=D1=80, 2 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 13:04, David Mulder=
+ via samba-technical
+<samba-technical@lists.samba.org>:
 >
-> " Paulo Alcantara (SUSE) " <paulo@paulo.ac> writes:
-> > It can be easily reproduced with the following:
-> >
-> >   # chmod +s `which mount.cifs`
-> >   # echo "//localhost/share /mnt cifs \
-> >     users,username=3Dfoo,password=3DXXXX" >> /etc/fstab
-> >   # su - foo
-> >   $ mount /mnt
-> >   free(): double free detected in tcache 2
-> >   Child process terminated abnormally.
-> >
-> > The problem was that check_fstab() already freed orgoptions pointer
-> > and then we freed it again in main() function.
-> >
-> > Fixes: bf7f48f4c7dc ("mount.cifs.c: fix memory leaks in main func")
-> > Signed-off-by: Paulo Alcantara (SUSE) <paulo@paulo.ac>
+> Reviewed-by: David Mulder <dmulder@suse.com><mailto:dmulder@suse.com>
 >
-> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+> On 9/19/19 6:12 AM, Paulo Alcantara (SUSE) wrote:
 >
-> I've compiled next branch with ASAN and can confirm the double-free and
-> the fix works
+> When attemping to chdir into non-existing directories, mount.cifs
+> crashes.
 >
-> Compiling with ASAN
-> -------------------
+> This patch fixes the following ASAN report:
 >
-> $ CFLAGS=3D-fsanitize=3Daddress \
->   LDFLAGS=3D-fsanitize=3Daddress \
->   ac_cv_func_malloc_0_nonnull=3Dyes \
->   ./configure
-> $ make clean && make -j4
->
-> Next branch
-> -----------
->
-> $ mount /mnt; echo $?
+> $ ./mount.cifs //localhost/foo /mnt/invalid-dir -o ...
+> /mnt/bar -o username=3Dfoo,password=3Dfoo,vers=3D1.0
+> Couldn't chdir to /mnt/bar: No such file or directory
 > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =3D=3D29883=3D=3DERROR: AddressSanitizer: attempting double-free on 0x607=
-000000020 in thread T0:
->     #0 0x7f69d480a1b8 in __interceptor_free (/usr/lib64/libasan.so.4+0xdc=
-1b8)
->     #1 0x559381795f33 in main (/sbin/mount.cifs+0xef33)
->     #2 0x7f69d4394f89 in __libc_start_main (/lib64/libc.so.6+0x20f89)
->     #3 0x55938178e079 in _start (/sbin/mount.cifs+0x7079)
+> =3D=3D11846=3D=3DERROR: AddressSanitizer: attempting free on address whic=
+h was
+> not malloc()-ed: 0x7ffd86332e97 in thread T0
+>     #0 0x7f0860ca01e7 in
+>     __interceptor_free (/usr/lib64/libasan.so.5+0x10a1e7)
+>     #1 0x557edece9ccb in
+>     acquire_mountpoint (/home/paulo/src/cifs-utils/mount.cifs+0xeccb)
+>     #2 0x557edecea63d in
+>     main (/home/paulo/src/cifs-utils/mount.cifs+0xf63d)
+>     #3 0x7f08609f0bca in __libc_start_main (/lib64/libc.so.6+0x26bca)
+>     #4 0x557edece27d9 in
+>     _start (/home/paulo/src/cifs-utils/mount.cifs+0x77d9)
 >
-> 0x607000000020 is located 0 bytes inside of 68-byte region [0x60700000002=
-0,0x607000000064)
-> freed by thread T0 here:
->     #0 0x7f69d480a1b8 in __interceptor_free (/usr/lib64/libasan.so.4+0xdc=
-1b8)
->     #1 0x55938178e372 in check_fstab (/sbin/mount.cifs+0x7372)
->     #2 0x559381794661 in assemble_mountinfo (/sbin/mount.cifs+0xd661)
->     #3 0x559381795eef in main (/sbin/mount.cifs+0xeeef)
->     #4 0x7f69d4394f89 in __libc_start_main (/lib64/libc.so.6+0x20f89)
+> Address 0x7ffd86332e97 is located in stack of thread T0 at offset 8951
+> in frame
+>     #0 0x557edece9ce0 in
+>     main (/home/paulo/src/cifs-utils/mount.cifs+0xece0)
 >
-> previously allocated by thread T0 here:
->     #0 0x7f69d480a510 in malloc (/usr/lib64/libasan.so.4+0xdc510)
->     #1 0x7f69d43fc2a9 in __GI___strndup (/lib64/libc.so.6+0x882a9)
+>   This frame has 2 object(s):
+>     [48, 52) 'rc' (line 1959)
+>     [64, 72) 'mountpoint' (line 1955) <=3D=3D Memory access at offset 895=
+1
+>     overflows this variable
+> HINT: this may be a false positive if your program uses some custom
+> stack unwind mechanism, swapcontext or vfork
+>       (longjmp and C++ exceptions *are* supported)
+> SUMMARY: AddressSanitizer: bad-free (/usr/lib64/libasan.so.5+0x10a1e7)
+> in __interceptor_free
+> =3D=3D11846=3D=3DABORTING
 >
-> SUMMARY: AddressSanitizer: double-free (/usr/lib64/libasan.so.4+0xdc1b8) =
-in __interceptor_free
-> =3D=3D29883=3D=3DABORTING
-> 1
+> Fixes: bf7f48f4c7dc ("mount.cifs.c: fix memory leaks in main func")
+> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz><mailto:pc@cjr.nz>
+> ---
+>  mount.cifs.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> With fix
-> --------
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 7748d54aa814..0c38adcd99b1 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -1893,7 +1893,7 @@ acquire_mountpoint(char **mountpointp)
+>         int rc, dacrc;
+>         uid_t realuid, oldfsuid;
+>         gid_t oldfsgid;
+> -       char *mountpoint;
+> +       char *mountpoint =3D NULL;
 >
-> $ mount /mnt; echo $?
-> 0
+>         /*
+>          * Acquire the necessary privileges to chdir to the mountpoint. I=
+f
+> @@ -1942,9 +1942,9 @@ restore_privs:
+>                 gid_t __attribute__((unused)) gignore =3D setfsgid(oldfsg=
+id);
+>         }
 >
-> Cheers,
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
-
+> -       if (rc) {
+> -               free(*mountpointp);
+> -       }
+> +       if (rc)
+> +               free(mountpoint);
+> +
+>         return rc;
+>  }
+>
 Merged, thanks.
 --
 Best regards,
