@@ -1,154 +1,85 @@
-Return-Path: <SRS0=2csP=X4=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=e7DE=X5=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B706C10F14
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 23:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA495C10F14
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Oct 2019 00:21:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 44D0C2133F
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Oct 2019 23:29:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEE5520862
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Oct 2019 00:21:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="imlmDu4R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729589AbfJCX3Y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 3 Oct 2019 19:29:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59340 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727452AbfJCX3Y (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 3 Oct 2019 19:29:24 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 461DD308FE8F;
-        Thu,  3 Oct 2019 23:29:24 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-57.bne.redhat.com [10.64.54.57])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C3FA600C4;
-        Thu,  3 Oct 2019 23:29:23 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Pavel Shilovsky <pshilov@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH] smbinfo: Add SETCOMPRESSION support
-Date:   Fri,  4 Oct 2019 09:29:02 +1000
-Message-Id: <20191003232902.16332-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 03 Oct 2019 23:29:24 +0000 (UTC)
+        id S1730609AbfJDAV6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 3 Oct 2019 20:21:58 -0400
+Received: from mail-lf1-f45.google.com ([209.85.167.45]:44587 "EHLO
+        mail-lf1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730098AbfJDAV6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Oct 2019 20:21:58 -0400
+Received: by mail-lf1-f45.google.com with SMTP id q11so3154965lfc.11
+        for <linux-cifs@vger.kernel.org>; Thu, 03 Oct 2019 17:21:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=DvWimnm16b3bqPmod3i89DpArW16zTxOuKvtcXsDPr4=;
+        b=imlmDu4RCjXhYCo04eJjsfiClmtoSkI0RACqdj6gw8ejAfpXeXioost/UKgVM3bgUD
+         ZW0LOD4MWUN6s2UMW+Z0WjbS7QrqVT2IzYXrr2WG3HfL1fhQE5TppToGD/1mc6Zz5aUS
+         4ct+E2s/HNwk+ha/mERN3xZf18Q/VIjJI5sTZDLMJ7IaPx1ivim3VByeJyxDQ0sM5bF7
+         S2v/pM+wfg5ZOidArIyWPCGoerRPVKm1jUHmnrJKcPIa8+JwNBnbsz4U6hpbc6tayfwq
+         MEESi8JLfktMb7rCha3rJP8/HLbv8Xk0UjOd5RsY6dvx6NKXJEozQh4UXiQ8UmOXalmu
+         RKow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=DvWimnm16b3bqPmod3i89DpArW16zTxOuKvtcXsDPr4=;
+        b=lPLrsIPls4nBaI+DW0+q9oRQT2+1dQHX5bBfVTV9BGSgs0sNY2Wr+C1OOg3zTfZQYj
+         j4VJ8MFf3KJl8LbZaUgW9WtLOjI8hwXkjHLsWm3iLrt9WEZ48f/9pDJgw2IsMF3KdTkb
+         Pv887A1imHluLdTQaK7KLd3FvpuejxSlSPVNSWHmK7DsS/Owyo+/IMJNllYA3+e591hy
+         ULIrIsnUfI45BBEoRdcLYhnJHZ0o7vjMWCbYlWRlLmHmZr23ZM+E4QeZrbjl3SsvtwBG
+         BUuzxU/YBJ4W5g/HHkvgE6iOkl7yO4buwR5O/UCx8bPjEJzVpR/QLaLtrVoPYx0oNZGT
+         ZqUA==
+X-Gm-Message-State: APjAAAUt8B+Dk9B+9pRP/zveXyiXNJwz99V0vLMI0lKvMM3pMD5mLHpA
+        ZOtNcmxSCrN4xkykF0/9IBGrXTFK11zacqp56w==
+X-Google-Smtp-Source: APXvYqxgNqrER0ObirqCA2yomjsELvfP0xpCwrHkURjot6U6htqjamv4DkU1bzYWd3u20NRMOV2yeMZ6wWDnwgiY5ZU=
+X-Received: by 2002:a19:ae0d:: with SMTP id f13mr5630546lfc.36.1570148515981;
+ Thu, 03 Oct 2019 17:21:55 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAH2r5mvfb3nkdz8r8sAUXGJkx678XZkt4dn=4xiuq0UD2vxFrw@mail.gmail.com>
+In-Reply-To: <CAH2r5mvfb3nkdz8r8sAUXGJkx678XZkt4dn=4xiuq0UD2vxFrw@mail.gmail.com>
+From:   Pavel Shilovsky <pavel.shilovsky@gmail.com>
+Date:   Thu, 3 Oct 2019 17:21:44 -0700
+Message-ID: <CAKywueQ2rGannA7Mi-7j02E0aDN5KYGCLz5faHUDKhC+zp2ODA@mail.gmail.com>
+Subject: Re: [PATCH] smbinfo dump encryption keys for using wireshark
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- smbinfo.c   | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
- smbinfo.rst |  2 ++
- 2 files changed, 49 insertions(+), 1 deletion(-)
+Merged, thanks.
+Best regards,
+Pavel Shilovskiy
 
-diff --git a/smbinfo.c b/smbinfo.c
-index b4d497b..049a4f2 100644
---- a/smbinfo.c
-+++ b/smbinfo.c
-@@ -91,6 +91,8 @@ usage(char *name)
- 		"      Prints the objectid of the file and GUID of the underlying volume.\n"
- 		"  getcompression:\n"
- 		"      Prints the compression setting for the file.\n"
-+		"  setcompression <no|default|lznt1>:\n"
-+		"      Sets the compression level for the file.\n"
- 		"  list-snapshots:\n"
- 		"      List the previous versions of the volume that backs this file.\n"
- 		"  quota:\n"
-@@ -299,6 +301,30 @@ getcompression(int f)
- }
- 
- static void
-+setcompression(int f, uint16_t level)
-+{
-+	struct smb_query_info *qi;
-+
-+	qi = malloc(sizeof(struct smb_query_info) + 2);
-+	memset(qi, 0, sizeof(qi) + 2);
-+	qi->info_type = 0x9c040;
-+	qi->file_info_class = 0;
-+	qi->additional_information = 0;
-+	qi->output_buffer_length = 2;
-+	qi->flags = PASSTHRU_FSCTL;
-+
-+	level = htole16(level);
-+	memcpy(&qi[1], &level, 2);
-+
-+	if (ioctl(f, CIFS_QUERY_INFO, qi) < 0) {
-+		fprintf(stderr, "ioctl failed with %s\n", strerror(errno));
-+		exit(1);
-+	}
-+
-+	free(qi);
-+}
-+
-+static void
- print_fileaccessinfo(uint8_t *sd, int type)
- {
- 	uint32_t access_flags;
-@@ -1126,17 +1152,35 @@ list_snapshots(int f)
- 	free(buf);
- }
- 
-+static int
-+parse_compression(const char *arg)
-+{
-+	if (!strcmp(arg, "no"))
-+		return 0;
-+	else if (!strcmp(arg, "default"))
-+		return 1;
-+	else if (!strcmp(arg, "lznt1"))
-+		return 2;
-+
-+	fprintf(stderr, "compression must be no|default|lznt1\n");
-+	exit(10);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	int c;
- 	int f;
-+	int compression = 1;
- 
- 	if (argc < 2) {
- 		short_usage(argv[0]);
- 	}
- 
--	while ((c = getopt_long(argc, argv, "vVh", NULL, NULL)) != -1) {
-+	while ((c = getopt_long(argc, argv, "c:vVh", NULL, NULL)) != -1) {
- 		switch (c) {
-+		case 'c':
-+			compression = parse_compression(optarg);
-+			break;
- 		case 'v':
- 			printf("smbinfo version %s\n", VERSION);
- 			return 0;
-@@ -1183,6 +1227,8 @@ int main(int argc, char *argv[])
- 		fsctlgetobjid(f);
- 	else if (!strcmp(argv[optind], "getcompression"))
- 		getcompression(f);
-+	else if (!strcmp(argv[optind], "setcompression"))
-+		setcompression(f, compression);
- 	else if (!strcmp(argv[optind], "list-snapshots"))
- 		list_snapshots(f);
- 	else if (!strcmp(argv[optind], "quota"))
-diff --git a/smbinfo.rst b/smbinfo.rst
-index 500ce0e..c8f76e6 100644
---- a/smbinfo.rst
-+++ b/smbinfo.rst
-@@ -69,6 +69,8 @@ COMMAND
- 
- `getcompression`: Prints the compression setting for the file.
- 
-+`setcompression -c <no|default|lznt1>`: Sets the compression setting for the file.
-+
- `list-snapshots`: Lists the previous versions of the volume that backs this file
- 
- `quota`: Print the quota for the volume in the form
--- 
-2.13.6
-
+=D0=BF=D0=BD, 23 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 21:51, Steve=
+ French via samba-technical
+<samba-technical@lists.samba.org>:
+>
+> Updated with feedback from Aurelien and Pavel
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
