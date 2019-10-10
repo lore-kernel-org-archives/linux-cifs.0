@@ -2,85 +2,77 @@ Return-Path: <SRS0=PeaU=YD=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A6B2C4360C
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Oct 2019 15:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A786CC4360C
+	for <linux-cifs@archiver.kernel.org>; Thu, 10 Oct 2019 17:28:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF459206B6
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Oct 2019 15:32:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="rvm3wqng"
+	by mail.kernel.org (Postfix) with ESMTP id 867482196E
+	for <linux-cifs@archiver.kernel.org>; Thu, 10 Oct 2019 17:28:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726017AbfJJPcT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 10 Oct 2019 11:32:19 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:42354 "EHLO mx.cjr.nz"
+        id S1726157AbfJJR2d (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 10 Oct 2019 13:28:33 -0400
+Received: from ms.lwn.net ([45.79.88.28]:60706 "EHLO ms.lwn.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725862AbfJJPcT (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 10 Oct 2019 11:32:19 -0400
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id B819A81032;
-        Thu, 10 Oct 2019 15:32:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1570721537;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=DT05UIB34qgZ21VKCCSFG+qP5wQYRjlisOShZMc+G7U=;
-        b=rvm3wqngV62GigB/4x+JaHVZN0J+zQW5cYVlwWmQrsB7CW2N814zObqkGOGFMU5CFVVdxO
-        YWfEcBVte/uGQ2LRwuNeWUOcowm11Cvkbsu0MycTP407vCStPo3DBI4EQMAJtas+GjPQB5
-        OGcicOncRo9effHUIA6pLqedYAsfoztG8JSYcfniB3eIyS4Y1g40TzRyrII9GvSXrYuDs6
-        RhhswYCXTgt7oN6U87jDaNZjll9yZOHWCDDuOaTbpcIaOA86yWr3n1/xqe98x6tSuJNq+l
-        7JtJFaA0FXGxnY6R0y7xKYluzh+OEfiSy1BvrWPB6x5/XqVSsjvfrStd0tSSpw==
-From:   "Paulo Alcantara (SUSE)" <pc@cjr.nz>
-To:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        smfrench@gmail.com
-Cc:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>
-Subject: [PATCH] cifs: Handle -EINPROGRESS only when noblockcnt is set
-Date:   Thu, 10 Oct 2019 12:31:58 -0300
-Message-Id: <20191010153158.14160-1-pc@cjr.nz>
+        id S1725862AbfJJR2d (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 10 Oct 2019 13:28:33 -0400
+Received: from lwn.net (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id 7CBEE2BD;
+        Thu, 10 Oct 2019 17:28:31 +0000 (UTC)
+Date:   Thu, 10 Oct 2019 11:28:30 -0600
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Paul Burton <paul.burton@mips.com>,
+        James Hogan <jhogan@kernel.org>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Shannon Nelson <snelson@pensando.io>,
+        Pensando Drivers <drivers@pensando.io>,
+        Steve French <sfrench@samba.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, devicetree@vger.kernel.org,
+        linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-mips@vger.kernel.org, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-riscv@lists.infradead.org
+Subject: Re: [PATCH 1/3] docs: fix some broken references
+Message-ID: <20191010112830.11ce7007@lwn.net>
+In-Reply-To: <b87385b2ac6ce6c75df82062fce2976149bbaa6b.1569330078.git.mchehab+samsung@kernel.org>
+References: <b87385b2ac6ce6c75df82062fce2976149bbaa6b.1569330078.git.mchehab+samsung@kernel.org>
+Organization: LWN.net
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We only want to avoid blocking in connect when mounting SMB root
-filesystems, otherwise bail out from generic_ip_connect() so cifs.ko
-can perform any reconnect failover appropriately.
+On Tue, 24 Sep 2019 10:01:28 -0300
+Mauro Carvalho Chehab <mchehab+samsung@kernel.org> wrote:
 
-This fixes DFS failover/reconnection tests in upstream buildbot.
+> There are a number of documentation files that got moved or
+> renamed. update their references.
+> 
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
 
-Fixes: 8eecd1c2e5bc ("cifs: Add support for root file systems")
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
----
- fs/cifs/connect.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+I've applied this set, thanks.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index a64dfa95a925..bdea4b3e8005 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3882,8 +3882,12 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 
- 	rc = socket->ops->connect(socket, saddr, slen,
- 				  server->noblockcnt ? O_NONBLOCK : 0);
--
--	if (rc == -EINPROGRESS)
-+	/*
-+	 * When mounting SMB root file systems, we do not want to block in
-+	 * connect. Otherwise bail out and then let cifs_reconnect() perform
-+	 * reconnect failover - if possible.
-+	 */
-+	if (server->noblockcnt && rc == -EINPROGRESS)
- 		rc = 0;
- 	if (rc < 0) {
- 		cifs_dbg(FYI, "Error %d connecting to server\n", rc);
--- 
-2.23.0
-
+jon
