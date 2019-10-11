@@ -1,130 +1,116 @@
-Return-Path: <SRS0=PeaU=YD=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=7m4E=YE=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 480AAC4360C
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Oct 2019 18:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DADC47404
+	for <linux-cifs@archiver.kernel.org>; Fri, 11 Oct 2019 20:40:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24A9F214E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Oct 2019 18:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCEDC20659
+	for <linux-cifs@archiver.kernel.org>; Fri, 11 Oct 2019 20:40:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F+zoyUoc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S9Y/IZxZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726970AbfJJSGy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 10 Oct 2019 14:06:54 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:39707 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726387AbfJJSGy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Oct 2019 14:06:54 -0400
-Received: by mail-lf1-f67.google.com with SMTP id 72so5094525lfh.6
-        for <linux-cifs@vger.kernel.org>; Thu, 10 Oct 2019 11:06:53 -0700 (PDT)
+        id S1729027AbfJKUkj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 11 Oct 2019 16:40:39 -0400
+Received: from mail-io1-f42.google.com ([209.85.166.42]:45696 "EHLO
+        mail-io1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728976AbfJKUkj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 11 Oct 2019 16:40:39 -0400
+Received: by mail-io1-f42.google.com with SMTP id c25so24175515iot.12
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Oct 2019 13:40:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=BndcwX1Z+lIjfOHVWvJ0qAxRuB4weS1oprdoAEC5iHc=;
-        b=F+zoyUocezVwQwiliSpeYUSFYllfJRTqsNbwggas9EDlofFE2r/6pzgZ4JxmYTnAGd
-         PLszu/dwkR/HXw6/ZKeIqomgjfRUv504MGmjEyCUiyylAKO3p2m+bL9BbLbDs4qwRPWl
-         c82duUvUUGwavn7//P6gkUpVqdDkkuwYnm3UaGSYBze8orfMpWDcZFA1RyY7O6JaQjr+
-         ua+rIYFZUHkXTSDG7BPtn+MQa1BehO70WZUd6/Ax9OdqEEv1ZseDbRm2uNujG/vj7pK4
-         ZNzYLtdZCPEJvM2MTvoVUW5xoyriU0R0Ua4lg638Q2M4Mpeg9dTqx4c4/tQtf1awgkCa
-         Eg1A==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=lNXZEnRIMNmSLJiWUAJd8jmpQMFEguP2CDFA6d0nvJg=;
+        b=S9Y/IZxZ2a2L+xtPd7JkAmyHeqNUJoyAv54fVppRx4CC3VPTM86QeQ18P1UWx1vX9l
+         qhcix6JTtAK5LPzp3ihEQ9tUOtYclYF73XaBarXR3szTYEDBxQVpCV/t+wOll/7uKZay
+         Nw/4zRdjpnZQwGrt3V8cFmmeexNu79dp4x7EOnH2+QAKC7B282RcaaqMUVI/2ihmEyFY
+         65y6t7TA6Rbep1fIHcg0k7lxtPr4dB7y6oCvUSELniDloAB/uJM/jRAPWYibwdbtgHSF
+         Q7KY6/k6j+ox0ZTcmylOfAKcz0m0R8AduwDstz4RL+QKdc3Erk50MXLHBa2JaTj4TgZL
+         am3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=BndcwX1Z+lIjfOHVWvJ0qAxRuB4weS1oprdoAEC5iHc=;
-        b=GzkhhiTa3SWoIbVScb2c3ywuKZdgwkTLk0qqKoAYJJ+qm8STovQk3SY6+tdvndSRIB
-         vIf4WU5lvmp4lx5QojNzbJ3MJyhdBkP82OF19tGJYU+mRX/WJtieKTYCZEoBYrebXTxK
-         o0UieF96qtkzGocls/VY8GVyv/+3ToCeu9IwgsYZLr4GPTHwdi4W3QB0lW23uXJeBBZC
-         GVNkN2oFwvv/kwcKsYLYvGC6NKwiAVoN5ZFkMqwSfe4vU9Ac0DQN449eIrMayk5lXaLl
-         vOIOGkNieFbtwbHb+J06Hrr8nVhZXVOdlZQ08kMqN+wskNMTBaM29gBD7qxUbhnSvwz7
-         XMWg==
-X-Gm-Message-State: APjAAAUj7dxpyXYLvXvgTkBtfpNxojzjunc9jhlTaSvBpaEF5nS7QZFC
-        hGfcf5lcodH+v89tsXJMSsgeaIla1PME3aJXRCcwV8g=
-X-Google-Smtp-Source: APXvYqxjTGJmw8jqYRWx3myIhSH0hloUfypJNgzoaH7zQAHmVr4OEtmhPDYG2Exr5uixevWiE7VJXb4qkXH/KTbEou0=
-X-Received: by 2002:a19:ed14:: with SMTP id y20mr6789422lfy.4.1570730812430;
- Thu, 10 Oct 2019 11:06:52 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=lNXZEnRIMNmSLJiWUAJd8jmpQMFEguP2CDFA6d0nvJg=;
+        b=nQlDul6nwaKNrSjPrnCI3DfBWNmkg5PEh0RO6BumeWS1rjdnFmXXHPxKZ4+WrXk5SU
+         k4CuCemVTRyMcvBp/tTJWJTCm8O2Pee8Wp1J6GC/rMk+3tLfijZqYkhbPv0wTz7XrMn8
+         CG3EPRT0hAJwT9SGiwhiKpeXf9z7Wpep8gUF50YS62djY6qOXeOpeTrj7WXf3sXoiBnK
+         Sz2r1Y5CdIXSodaX/5vM3cYvjYdkLGItqsc3jurLL6lA65C9NoIA2Rlu/iqRar+PE6Zt
+         qGff2ubR7Xb59fblrwOyD5A6QvI0G3Ydi9gLqCJC86g1zwgD/6x4DwNYIKDuRhz9bv5L
+         Levg==
+X-Gm-Message-State: APjAAAUNVK7LI9wfEkCROv2JlSRYfO+4UVrAf0evxJ8EGDTJI2XMpGO5
+        U1E3OpHuwJCpCxKMuYgFPzSd8gA9txDqM3/TNIf8vntJ
+X-Google-Smtp-Source: APXvYqwiD6fJbmim28xM6OKKce+Y7msNSEIQY9nPkFGHzN1p0HzkrExrF1mNFb4LC+zc1RoyHX+e/emK3hNsMy2zv3s=
+X-Received: by 2002:a02:cc5b:: with SMTP id i27mr12108660jaq.63.1570826438219;
+ Fri, 11 Oct 2019 13:40:38 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190930170620.29979-1-pshilov@microsoft.com> <20190930170620.29979-3-pshilov@microsoft.com>
-In-Reply-To: <20190930170620.29979-3-pshilov@microsoft.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 10 Oct 2019 11:06:41 -0700
-Message-ID: <CAKywueSX_KQqyFaQQgJBt2AYivNP=Y+mBmJH+XVoCbQBCsoBCg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] CIFS: Force reval dentry if LOOKUP_REVAL flag is set
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Pavel Shilovskiy <pshilov@microsoft.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 11 Oct 2019 15:40:26 -0500
+Message-ID: <CAH2r5mt06W-HjArS-+XMRjuY9FvMrZGWndKn0M8-0tc=jMmG-g@mail.gmail.com>
+Subject: [GIT PULL] SMB3 fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The updated version of this has been merged into for-next:
+Please pull the following changes since commit
+da0c9ea146cbe92b832f1b0f694840ea8eb33cce:
 
-https://git.samba.org/?p=3Dsfrench/cifs-2.6.git;a=3Dcommitdiff;h=3D0b3d0ef9=
-840f7be202393ca9116b857f6f793715
+  Linux 5.4-rc2 (2019-10-06 14:27:30 -0700)
 
---
-Best regards,
-Pavel Shilovsky
+are available in the Git repository at:
 
-=D0=BF=D0=BD, 30 =D1=81=D0=B5=D0=BD=D1=82. 2019 =D0=B3. =D0=B2 10:06, Pavel=
- Shilovsky <piastryyy@gmail.com>:
->
-> Mark inode for force revalidation if LOOKUP_REVAL flag is set.
-> This tells the client to actually send a QueryInfo request to
-> the server to obtain the latest metadata in case a directory
-> or a file were changed remotely.
->
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
-> ---
->  fs/cifs/dir.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index be424e81e3ad..91a46b01d748 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -738,10 +738,16 @@ cifs_lookup(struct inode *parent_dir_inode, struct =
-dentry *direntry,
->  static int
->  cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
->  {
-> +       struct inode *inode;
-> +
->         if (flags & LOOKUP_RCU)
->                 return -ECHILD;
->
->         if (d_really_is_positive(direntry)) {
-> +               inode =3D d_inode(direntry);
-> +               if (flags & LOOKUP_REVAL)
-> +                       CIFS_I(inode)->time =3D 0; /* force reval */
-> +
->                 if (cifs_revalidate_dentry(direntry))
->                         return 0;
->                 else {
-> @@ -752,7 +758,7 @@ cifs_d_revalidate(struct dentry *direntry, unsigned i=
-nt flags)
->                          * attributes will have been updated by
->                          * cifs_revalidate_dentry().
->                          */
-> -                       if (IS_AUTOMOUNT(d_inode(direntry)) &&
-> +                       if (IS_AUTOMOUNT(inode) &&
->                            !(direntry->d_flags & DCACHE_NEED_AUTOMOUNT)) =
-{
->                                 spin_lock(&direntry->d_lock);
->                                 direntry->d_flags |=3D DCACHE_NEED_AUTOMO=
-UNT;
-> --
-> 2.17.1
->
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.4-rc2-smb3
+
+for you to fetch changes up to 0b3d0ef9840f7be202393ca9116b857f6f793715:
+
+  CIFS: Force reval dentry if LOOKUP_REVAL flag is set (2019-10-09
+00:10:50 -0500)
+
+----------------------------------------------------------------
+Eight small SMB3 fixes, 4 for stable, and important fix for the recent
+regression
+introduced by filesystem timestamp range patches.
+
+----------------------------------------------------------------
+Austin Kim (1):
+      fs: cifs: mute -Wunused-const-variable message
+
+Dave Wysochanski (1):
+      cifs: use cifsInodeInfo->open_file_lock while iterating to avoid a panic
+
+Pavel Shilovsky (3):
+      CIFS: Gracefully handle QueryInfo errors during open
+      CIFS: Force revalidate inode when dentry is stale
+      CIFS: Force reval dentry if LOOKUP_REVAL flag is set
+
+Steve French (3):
+      smb3: cleanup some recent endian errors spotted by updated sparse
+      smb3: remove noisy debug message and minor cleanup
+      smb3: Fix regression in time handling
+
+ fs/cifs/cifsfs.c    | 24 ++++++++++++++++--------
+ fs/cifs/cifsglob.h  |  2 +-
+ fs/cifs/connect.c   |  4 ++--
+ fs/cifs/dir.c       |  8 +++++++-
+ fs/cifs/file.c      | 33 +++++++++++++++++----------------
+ fs/cifs/inode.c     |  4 ++++
+ fs/cifs/netmisc.c   |  4 ----
+ fs/cifs/smb2pdu.c   | 14 ++++++--------
+ fs/cifs/smb2proto.h |  4 ++++
+ 9 files changed, 57 insertions(+), 40 deletions(-)
+
+
+-- 
+Thanks,
+
+Steve
