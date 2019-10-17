@@ -2,65 +2,113 @@ Return-Path: <SRS0=tZQk=YK=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 584A6ECE58E
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Oct 2019 11:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21160ECE58E
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Oct 2019 14:08:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 200A220659
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Oct 2019 11:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E8F412054F
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Oct 2019 14:08:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405880AbfJQLmq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Oct 2019 07:42:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46882 "EHLO mx1.redhat.com"
+        id S1730605AbfJQOI1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Oct 2019 10:08:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34690 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727991AbfJQLmq (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 17 Oct 2019 07:42:46 -0400
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1727429AbfJQOI1 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 17 Oct 2019 10:08:27 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8F09AC04AC50
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Oct 2019 11:42:45 +0000 (UTC)
-Received: by mail-qk1-f197.google.com with SMTP id d25so1786813qkk.17
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Oct 2019 04:42:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=URcAyKlaRcGBWBA1Pdb4H29qbLSr0HQTdFsecgtXCyM=;
-        b=tj/vHvYOHZX7NXOOkissQIBBXDutv2sFReDTghpV5pyOaYikK6vztBOly/yoxIivtY
-         bDr4TKtphmnvok/f3ptdEpFdEEul8ZR4s0v9/tmSq4VEpPyU5jGYGktqdf+MpQgkiR5w
-         m8u06BsuGVT34Kf73aMTt2WlVwO40leY1I0zUQbwbAwFXX1zz47gaZ2OMLL9jShzli8O
-         s45m1zplxYzAfiIc9pBecfXfpzbCSK7BeSIa68+VmDqLIAp3TUWbycThfcCtmymh9Cc9
-         BriwlrFpPD3j/ZchU39D4GMSC1QTuRlV2NR2Fe3WorKUR4oX8WPz6nctFg4YHoPVmE6Q
-         pg1g==
-X-Gm-Message-State: APjAAAXVwNsaOghx8DimJZ+BJSFIGgmwRs4AElPbCa66yLmNARl+Hi2G
-        qcXoMsMs5T7nr1pwCH4DymcbjSivz1sIGkrzlWawL4SZO8o4U/yrO33QGK3N9CZQx2B+zPbv3RS
-        KQtVxeLu+4yTnDkNWQrshnlNK7QtRcZ0xkdw8Aw==
-X-Received: by 2002:a0c:ee86:: with SMTP id u6mr3376316qvr.48.1571312564604;
-        Thu, 17 Oct 2019 04:42:44 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqw97GjmlWL7fMZLOxHtUK0KBO120iBX3QR6b6ZmqUJ0QikCv4HjrPxOXyOdz7GU5M6FVWXA8/6Tul5geH3/aH8=
-X-Received: by 2002:a0c:ee86:: with SMTP id u6mr3376289qvr.48.1571312564245;
- Thu, 17 Oct 2019 04:42:44 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id DA6C630842A9;
+        Thu, 17 Oct 2019 14:08:26 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D08765D6C8;
+        Thu, 17 Oct 2019 14:08:26 +0000 (UTC)
+Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id C534A4EE50;
+        Thu, 17 Oct 2019 14:08:26 +0000 (UTC)
+Date:   Thu, 17 Oct 2019 10:08:26 -0400 (EDT)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     Pavel Shilovsky <pshilov@microsoft.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Frank Sorenson <sorenson@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>
+Message-ID: <1383472639.7033868.1571321306723.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CALF+zOkAEH5Zz9wBmTBM21wLcWU7mKnpFAktxdpNGyo4xET5zA@mail.gmail.com>
+References: <CALF+zOkugWpn6aCApqj8dF+AovgbQ8zgC-Hf8_0uvwqwHYTPiw@mail.gmail.com> <1206360169.6955748.1571271438699.JavaMail.zimbra@redhat.com> <1205168.6984242.1571303132895.JavaMail.zimbra@redhat.com> <CALF+zOkAEH5Zz9wBmTBM21wLcWU7mKnpFAktxdpNGyo4xET5zA@mail.gmail.com>
+Subject: Re: list_del corruption while iterating retry_list in
+ cifs_reconnect still seen on 5.4-rc3
 MIME-Version: 1.0
-References: <CALF+zOkugWpn6aCApqj8dF+AovgbQ8zgC-Hf8_0uvwqwHYTPiw@mail.gmail.com>
- <1206360169.6955748.1571271438699.JavaMail.zimbra@redhat.com> <1205168.6984242.1571303132895.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1205168.6984242.1571303132895.JavaMail.zimbra@redhat.com>
-From:   David Wysochanski <dwysocha@redhat.com>
-Date:   Thu, 17 Oct 2019 07:42:08 -0400
-Message-ID: <CALF+zOkAEH5Zz9wBmTBM21wLcWU7mKnpFAktxdpNGyo4xET5zA@mail.gmail.com>
-Subject: Re: list_del corruption while iterating retry_list in cifs_reconnect
- still seen on 5.4-rc3
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Frank Sorenson <sorenson@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.64.54.116, 10.4.195.29]
+Thread-Topic: list_del corruption while iterating retry_list in cifs_reconnect still seen on 5.4-rc3
+Thread-Index: +EwffHQSmzXHqV9xGX6r/Hquw40nZg==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Thu, 17 Oct 2019 14:08:26 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
+
+List, Pavel,
+
+So I think there are two bugs we need to fix in this small block to make it safe against a race against other threads calling cifs_delete_mid() and similar.
+
+We need to to protect the list mutate functions and wrap them inside the GlobalMid_Lock mutex
+but we can not hold this lock across the callback call.
+
+But we still need to protect the mid_entry dereference and the ->callback call against the mid structure being freed
+by DeleteMidQEntry().  We can do that by taking out an extra reference to the mid while holding the GlobalMid_Lock
+and then dropping the reference again after the callback completes.
+
+
+I think something like this might work :
+
+
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index bdea4b3e8005..3a1a9b63bd9b 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -572,11 +572,19 @@ cifs_reconnect(struct TCP_Server_Info *server)
+        mutex_unlock(&server->srv_mutex);
+ 
+        cifs_dbg(FYI, "%s: issuing mid callbacks\n", __func__);
++       spin_lock(&GlobalMid_Lock);
+        list_for_each_safe(tmp, tmp2, &retry_list) {
+                mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+                list_del_init(&mid_entry->qhead);
++               kref_get(&mid_entry->refcount);
++               spin_unlock(&GlobalMid_Lock);
++
+                mid_entry->callback(mid_entry);
++               cifs_mid_q_entry_release(mid_entry);
++
++               spin_lock(&GlobalMid_Lock);
+        }
++       spin_unlock(&GlobalMid_Lock);
+ 
+        if (cifs_rdma_enabled(server)) {
+                mutex_lock(&server->srv_mutex);
+
+
+Pavel, can you have a look at this and comment?  It is very delicate code so it needs careful review.
+
+
+regards
+ronnie sahlberg
+
+
+
+----- Original Message -----
+From: "David Wysochanski" <dwysocha@redhat.com>
+To: "Ronnie Sahlberg" <lsahlber@redhat.com>
+Cc: "linux-cifs" <linux-cifs@vger.kernel.org>, "Frank Sorenson" <sorenson@redhat.com>
+Sent: Thursday, 17 October, 2019 9:42:08 PM
+Subject: Re: list_del corruption while iterating retry_list in cifs_reconnect still seen on 5.4-rc3
 
 On Thu, Oct 17, 2019 at 5:05 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 >
