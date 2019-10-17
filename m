@@ -2,423 +2,502 @@ Return-Path: <SRS0=tZQk=YK=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3713FECE58E
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Oct 2019 18:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BC4ECE58E
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Oct 2019 19:23:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A607520854
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Oct 2019 18:29:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="imND54Qm"
+	by mail.kernel.org (Postfix) with ESMTP id B81ED20869
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Oct 2019 19:23:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390652AbfJQS30 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Oct 2019 14:29:26 -0400
-Received: from mail-eopbgr790108.outbound.protection.outlook.com ([40.107.79.108]:21104
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2390554AbfJQS3Z (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 17 Oct 2019 14:29:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ecfY87jz6/KH5go9lr07IobeO2qEtY+QKpudaU6qf+LkxuvyXxVe2RMM2Fk6a6oKGdoRhjyz1f68POoWtTRIQDzLn8QdDKJBuaRBwrj+U5lHiNzkBcahBxDUYehVJ9OMJoyCpTkyy+ux/OCGhl0JXkZIIQpbNyFGRIveGCZA9QszyduNm/bG2CRH0TykchpRYROJC6AyUzhfPTMzyfa3aYmgdmastF2CG7Q4GKTzWQoU6BDB0MBTRCZv63bv26U2LetUNkJGe2PKI5vaKUM7MBwis19M2cGLYxvnHYetHsEI+IuRUa90SnMJRFTnM7drtmf3ByUZrv8GbFzSEOuplw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UhPKUOuEyRMO4JKpaI4btBWMmEprSqxH6PqkVu4tsv0=;
- b=N8jAw9UCX72qxHvetqXTyFrEpZdyAQN09LwcR2fVVFUWy+BYqvKkpo5W5AjyC9dqWXi/z3DfBDjZJumcjaTO6ENbbs86rCAJ70hXTyAz/vjVpUAGtVcxwHXyhfQZhcYL/bx5pMIM6/xKXvCWQPJIMbpbh+lNOYR3BfzWL9jtq+S9Nmq2WbAqjAPGLVqwWIpTMjsHfunDulmsUQzqpALD6vKS4/irsWcnZ9g2a1q278BKULfhFKmfMkSdC2qfQS2DagFYq5qCsfbJDHJay3WdWyVPvYRmWgRMHda5pagfw974aSPDJGH0U5v8niNDeW00p+UentKyUdYO8tbLGUqZkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UhPKUOuEyRMO4JKpaI4btBWMmEprSqxH6PqkVu4tsv0=;
- b=imND54QmFZMuKE9FLpOUh/U2/kUP38BcrZ+jLDJnkEDXh5HZHBUu8mBzMH5c3PDBqQT94oheCuc46OM+gA2BHLCshXuUv4w4vhGvxdt0y7z5V6VWW3Qug16myYM7Gh6rqjPPvDKLp5cdzBtSntAfwu6WOaNebeAN2qdkDOaii/A=
-Received: from DM5PR21MB0185.namprd21.prod.outlook.com (10.173.173.136) by
- DM5PR21MB0857.namprd21.prod.outlook.com (10.173.172.143) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2367.4; Thu, 17 Oct 2019 18:29:15 +0000
-Received: from DM5PR21MB0185.namprd21.prod.outlook.com
- ([fe80::40b9:1196:e1ef:8fa4]) by DM5PR21MB0185.namprd21.prod.outlook.com
- ([fe80::40b9:1196:e1ef:8fa4%11]) with mapi id 15.20.2387.010; Thu, 17 Oct
- 2019 18:29:15 +0000
-From:   Pavel Shilovskiy <pshilov@microsoft.com>
-To:     David Wysochanski <dwysocha@redhat.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-CC:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Frank Sorenson <sorenson@redhat.com>
-Subject: RE: list_del corruption while iterating retry_list in cifs_reconnect
- still seen on 5.4-rc3
-Thread-Topic: list_del corruption while iterating retry_list in cifs_reconnect
- still seen on 5.4-rc3
-Thread-Index: AQHVhFfJ9oP6OHPYNEeW5MnF2E27oqdd98kAgACTlgCAACvBAIAAKOAAgAAWtQCAADArYA==
-Date:   Thu, 17 Oct 2019 18:29:15 +0000
-Message-ID: <DM5PR21MB018567FF1ED90591DC1D43D0B66D0@DM5PR21MB0185.namprd21.prod.outlook.com>
+        id S2503378AbfJQTXt convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Oct 2019 15:23:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52538 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2393438AbfJQTXt (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 17 Oct 2019 15:23:49 -0400
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 6908051EF6
+        for <linux-cifs@vger.kernel.org>; Thu, 17 Oct 2019 19:23:48 +0000 (UTC)
+Received: by mail-qt1-f197.google.com with SMTP id z12so3362790qtn.3
+        for <linux-cifs@vger.kernel.org>; Thu, 17 Oct 2019 12:23:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=uInR/ZADWW4yB7CZPNY0Q9ZntiBVy/KC25xmSL4yuaA=;
+        b=CYUGfl9On/8d8p9AIjHiA/RR6nKh9aPUqqWEliv8DYPj8vei0rGU0IXEvoQZcU5qe5
+         t5Luxd8L6tBzwPxglxErSGOq8Dx2fdt1vG6ofxllnL8JZBbaAalsfljX94fOJbET6SHJ
+         Nq1oa6R9aLO/JRdhpXGPE6ysdvfyuEZjxpc9EGIP0p/MGqzIXjfIFSzDoRO2prPdQ6HJ
+         ZcpqKStO3fc34WVurTWS5QimUqobGx9JthEaQInf39mxyVBENMzjCFdOKo/jLOyhnug1
+         hRKQSsJwCKGMpu58m7k8XLjYjrkP+0IJKSPA0SAqCBj+mCWa6lCBo64TRJANvrTsqWAq
+         j/xw==
+X-Gm-Message-State: APjAAAXATpQQkoPuLNL/dRgCSat99H8b1t+CfCoT3q99IJbR4udJcW6w
+        WVLkwKvHNvEDJB7HgnH/HXHvBjU06GeFHp69YIfOrtak4OyQ8fBsF55RNrYeat8THe1bzUwHAVw
+        bpQJAnxqE8RiDRI6cBdzoPj2uLXdF0GH4haV0/g==
+X-Received: by 2002:a37:68b:: with SMTP id 133mr4809466qkg.315.1571340227024;
+        Thu, 17 Oct 2019 12:23:47 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyb5ckT1ZTGCfxjjEh5zMJBYCUxOkYLbsfncVhB7L32EQewZxQB/aTMIkxywZlMp+E2gP4IZa53etCyP0MlsoY=
+X-Received: by 2002:a37:68b:: with SMTP id 133mr4809440qkg.315.1571340226608;
+ Thu, 17 Oct 2019 12:23:46 -0700 (PDT)
+MIME-Version: 1.0
 References: <CALF+zOkugWpn6aCApqj8dF+AovgbQ8zgC-Hf8_0uvwqwHYTPiw@mail.gmail.com>
  <1206360169.6955748.1571271438699.JavaMail.zimbra@redhat.com>
  <1205168.6984242.1571303132895.JavaMail.zimbra@redhat.com>
  <CALF+zOkAEH5Zz9wBmTBM21wLcWU7mKnpFAktxdpNGyo4xET5zA@mail.gmail.com>
  <1383472639.7033868.1571321306723.JavaMail.zimbra@redhat.com>
- <CALF+zOnkhUYZpu_2xPVHaXx8CeX_kR+caVZj4YLmoYWR-aQaqg@mail.gmail.com>
-In-Reply-To: <CALF+zOnkhUYZpu_2xPVHaXx8CeX_kR+caVZj4YLmoYWR-aQaqg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=pshilov@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-10-17T18:29:11.7984317Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=6cc27004-2f9a-4fd0-b8d8-c97bd9be0bf5;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pshilov@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:a:886b:711c:fc21:5d2a]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ec9dcd3d-4e31-4aec-716b-08d7532fea30
-x-ms-office365-filtering-ht: Tenant
-x-ms-traffictypediagnostic: DM5PR21MB0857:
-x-microsoft-antispam-prvs: <DM5PR21MB08577F2FDE2BC43EE68FCB91B66D0@DM5PR21MB0857.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:341;
-x-forefront-prvs: 01930B2BA8
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(136003)(366004)(346002)(39860400002)(396003)(376002)(189003)(199004)(13464003)(54094003)(8676002)(25786009)(66946007)(66476007)(81166006)(76116006)(478600001)(10290500003)(66556008)(966005)(8936002)(14444005)(256004)(81156014)(14454004)(71190400001)(10090500001)(33656002)(71200400001)(8990500004)(2906002)(66446008)(64756008)(6246003)(30864003)(7736002)(74316002)(6116002)(102836004)(446003)(305945005)(52536014)(110136005)(7696005)(6436002)(9686003)(5660300002)(86362001)(54906003)(229853002)(22452003)(76176011)(6506007)(316002)(53546011)(6306002)(4326008)(99286004)(476003)(55016002)(486006)(11346002)(186003)(46003);DIR:OUT;SFP:1102;SCL:1;SRVR:DM5PR21MB0857;H:DM5PR21MB0185.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: za7S0VyfjUz8tMOsSNaR4P6wiWSF2hxSDxiR9Y62MkrERfTL+mTpo6RZwQdJwpR6gLMRPS1Ff8ouav/Mud20oky5DX0TNpTNLi8rW7fMoE3C2SPkvhkJrvABoq/dyZopOG3wbGWgsODXqHerWXC2fN1EDDnopX/lR//GjIvAe3b0pYxma6fm+43KcIZm2knYmlW9MWKIBgQI0+fEvAURRzdORN7aQCHHZCYygRcnB0dVUTxxoTY9xNmh7Z9oc1du2mTmtLjkud8FjBe8yCJyq9l8mZqfXopSIcHusQ4qNP/YT4KFmOyQTY0sL1SIL5ZSIV+iUspMXR1EdzF5G3CsG6zlsVV+DSxFxeUO35JRn7okVOyMsWdHtkyeA7v8NetEc5sEuiXXCitFtV3+8FPEbazP2dI2U+tleQbhjt34tDU=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec9dcd3d-4e31-4aec-716b-08d7532fea30
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2019 18:29:15.2655
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uPHKp+f4DcRll/UrlI1DLSUI3iAJSi+wbQsLxyNBk3W1xXK2yBBniuX21KYbjr5k52nMidGnToQilbvCsYztHA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR21MB0857
+ <CALF+zOnkhUYZpu_2xPVHaXx8CeX_kR+caVZj4YLmoYWR-aQaqg@mail.gmail.com> <DM5PR21MB018567FF1ED90591DC1D43D0B66D0@DM5PR21MB0185.namprd21.prod.outlook.com>
+In-Reply-To: <DM5PR21MB018567FF1ED90591DC1D43D0B66D0@DM5PR21MB0185.namprd21.prod.outlook.com>
+From:   David Wysochanski <dwysocha@redhat.com>
+Date:   Thu, 17 Oct 2019 15:23:10 -0400
+Message-ID: <CALF+zO=8ZJkqR951NsxOf4hDDyUZzMfyiEN-j8DgA+i+FzcfGw@mail.gmail.com>
+Subject: Re: list_del corruption while iterating retry_list in cifs_reconnect
+ still seen on 5.4-rc3
+To:     Pavel Shilovskiy <pshilov@microsoft.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Frank Sorenson <sorenson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-SGkgUm9ubmllLCBEYXZpZCwNCg0KVGhhbmtzIGZvciBsb29raW5nIGludG8gdGhpcy4gVGhpcyBh
-Y3R1YWxseSByZW1pbmRzIG1lIG9mIHRoZSBjb21taXQgNjk2ZTQyMGJiMmE2NjoNCg0KLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCmNvbW1pdCA2OTZlNDIwYmIyYTY2MjQ0
-NzgxMDU2NTFkNTM2OGQ0NWI1MDJiMzI0DQpBdXRob3I6IExhcnMgUGVyc3NvbiA8bGFycy5wZXJz
-c29uQGF4aXMuY29tPg0KRGF0ZTogICBNb24gSnVuIDI1IDE0OjA1OjI1IDIwMTggKzAyMDANCg0K
-ICAgIGNpZnM6IEZpeCB1c2UgYWZ0ZXIgZnJlZSBvZiBhIG1pZF9xX2VudHJ5DQoNCiAgICBXaXRo
-IHByb3RvY29sIHZlcnNpb24gMi4wIG1vdW50cyB3ZSBoYXZlIHNlZW4gY3Jhc2hlcyB3aXRoIGNv
-cnJ1cHQgbWlkDQogICAgZW50cmllcy4gRWl0aGVyIHRoZSBzZXJ2ZXItPnBlbmRpbmdfbWlkX3Eg
-bGlzdCBiZWNvbWVzIGNvcnJ1cHQgd2l0aCBhDQogICAgY3ljbGljIHJlZmVyZW5jZSBpbiBvbmUg
-ZWxlbWVudCBvciBhIG1pZCBvYmplY3QgZmV0Y2hlZCBieSB0aGUNCiAgICBkZW11bHRpcGxleGVy
-IHRocmVhZCBiZWNvbWVzIG92ZXJ3cml0dGVuIGR1cmluZyB1c2UuDQoNCiAgICBDb2RlIHJldmll
-dyBpZGVudGlmaWVkIGEgcmFjZSBiZXR3ZWVuIHRoZSBkZW11bHRpcGxleGVyIHRocmVhZCBhbmQg
-dGhlDQogICAgcmVxdWVzdCBpc3N1aW5nIHRocmVhZC4gVGhlIGRlbXVsdGlwbGV4ZXIgdGhyZWFk
-IHNlZW1zIHRvIGJlIHdyaXR0ZW4NCiAgICB3aXRoIHRoZSBhc3N1bXB0aW9uIHRoYXQgaXQgaXMg
-dGhlIHNvbGUgdXNlciBvZiB0aGUgbWlkIG9iamVjdCB1bnRpbA0KICAgIGl0IGNhbGxzIHRoZSBt
-aWQgY2FsbGJhY2sgd2hpY2ggZWl0aGVyIHdha2VzIHRoZSBpc3N1ZXIgdGFzayBvcg0KICAgIGRl
-bGV0ZXMgdGhlIG1pZC4NCg0KICAgIFRoaXMgYXNzdW1wdGlvbiBpcyBub3QgdHJ1ZSBiZWNhdXNl
-IHRoZSBpc3N1ZXIgdGFzayBjYW4gYmUgd29rZW4gdXANCiAgICBlYXJsaWVyIGJ5IGEgc2lnbmFs
-LiBJZiB0aGUgZGVtdWx0aXBsZXhlciB0aHJlYWQgaGFzIHByb2NlZWRlZCBhcyBmYXINCiAgICBh
-cyBzZXR0aW5nIHRoZSBtaWRfc3RhdGUgdG8gTUlEX1JFU1BPTlNFX1JFQ0VJVkVEIHRoZW4gdGhl
-IGlzc3Vlcg0KICAgIHRocmVhZCB3aWxsIGhhcHBpbHkgZW5kIHVwIGNhbGxpbmcgY2lmc19kZWxl
-dGVfbWlkIHdoaWxlIHRoZQ0KICAgIGRlbXVsdGlwbGV4ZXIgdGhyZWFkIHN0aWxsIGlzIHVzaW5n
-IHRoZSBtaWQgb2JqZWN0Lg0KDQogICAgSW5zZXJ0aW5nIGEgZGVsYXkgaW4gdGhlIGNpZnMgZGVt
-dWx0aXBsZXhlciB0aHJlYWQgd2lkZW5zIHRoZSByYWNlDQogICAgd2luZG93IGFuZCBtYWtlcyBy
-ZXByb2R1Y3Rpb24gb2YgdGhlIHJhY2UgdmVyeSBlYXN5Og0KDQogICAgICAgICAgICAgICAgICAg
-IGlmIChzZXJ2ZXItPmxhcmdlX2J1ZikNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBidWYg
-PSBzZXJ2ZXItPmJpZ2J1ZjsNCg0KICAgICsgICAgICAgICAgICAgICB1c2xlZXBfcmFuZ2UoNTAw
-LCA0MDAwKTsNCg0KICAgICAgICAgICAgICAgICAgICBzZXJ2ZXItPmxzdHJwID0gamlmZmllczsN
-Cg0KICAgIFRvIHJlc29sdmUgdGhpcyBJIHRoaW5rIHRoZSBwcm9wZXIgc29sdXRpb24gaW52b2x2
-ZXMgcHV0dGluZyBhDQogICAgcmVmZXJlbmNlIGNvdW50IG9uIHRoZSBtaWQgb2JqZWN0LiBUaGlz
-IHBhdGNoIG1ha2VzIHN1cmUgdGhhdCB0aGUNCiAgICBkZW11bHRpcGxleGVyIHRocmVhZCBob2xk
-cyBhIHJlZmVyZW5jZSB1bnRpbCBpdCBoYXMgZmluaXNoZWQNCiAgICBwcm9jZXNzaW5nIHRoZSB0
-cmFuc2FjdGlvbi4NCg0KICAgIENjOiBzdGFibGVAdmdlci5rZXJuZWwub3JnDQogICAgU2lnbmVk
-LW9mZi1ieTogTGFycyBQZXJzc29uIDxsYXJwZXJAYXhpcy5jb20+DQogICAgQWNrZWQtYnk6IFBh
-dWxvIEFsY2FudGFyYSA8cGFsY2FudGFyYUBzdXNlLmRlPg0KICAgIFJldmlld2VkLWJ5OiBSb25u
-aWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+DQogICAgUmV2aWV3ZWQtYnk6IFBhdmVs
-IFNoaWxvdnNreSA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPg0KICAgIFNpZ25lZC1vZmYtYnk6IFN0
-ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4NCg0KLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0NCg0KVGhlIHNpbWlsYXIgc29sdXRpb24gb2YgdGFraW5nIGFu
-IGV4dHJhIHJlZmVyZW5jZSBzaG91bGQgYXBwbHkgdG8gdGhlIGNhc2Ugb2YgcmVjb25uZWN0IGFz
-IHdlbGwuIFRoZSByZWZlcmVuY2Ugc2hvdWxkIGJlIHRha2VuIGR1cmluZyB0aGUgcHJvY2VzcyBv
-ZiBtb3ZpbmcgbWlkIGVudHJpZXMgdG8gdGhlIHByaXZhdGUgbGlzdC4gT25jZSBhIGNhbGxiYWNr
-IGNvbXBsZXRlcywgc3VjaCBhIHJlZmVyZW5jZSBzaG91bGQgYmUgcHV0IGJhY2sgdGh1cyBmcmVl
-aW5nIHRoZSBtaWQuDQoNCi0tDQpCZXN0IHJlZ2FyZHMsDQpQYXZlbCBTaGlsb3Zza3kNCg0KLS0t
-LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IERhdmlkIFd5c29jaGFuc2tpIDxkd3lzb2No
-YUByZWRoYXQuY29tPiANClNlbnQ6IFRodXJzZGF5LCBPY3RvYmVyIDE3LCAyMDE5IDg6MzAgQU0N
-ClRvOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+DQpDYzogUGF2ZWwgU2hp
-bG92c2tpeSA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPjsgbGludXgtY2lmcyA8bGludXgtY2lmc0B2
-Z2VyLmtlcm5lbC5vcmc+OyBGcmFuayBTb3JlbnNvbiA8c29yZW5zb25AcmVkaGF0LmNvbT4NClN1
-YmplY3Q6IFJlOiBsaXN0X2RlbCBjb3JydXB0aW9uIHdoaWxlIGl0ZXJhdGluZyByZXRyeV9saXN0
-IGluIGNpZnNfcmVjb25uZWN0IHN0aWxsIHNlZW4gb24gNS40LXJjMw0KDQpPbiBUaHUsIE9jdCAx
-NywgMjAxOSBhdCAxMDowOCBBTSBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+
-IHdyb3RlOg0KPg0KPiBMaXN0LCBQYXZlbCwNCj4NCj4gU28gSSB0aGluayB0aGVyZSBhcmUgdHdv
-IGJ1Z3Mgd2UgbmVlZCB0byBmaXggaW4gdGhpcyBzbWFsbCBibG9jayB0byBtYWtlIGl0IHNhZmUg
-YWdhaW5zdCBhIHJhY2UgYWdhaW5zdCBvdGhlciB0aHJlYWRzIGNhbGxpbmcgY2lmc19kZWxldGVf
-bWlkKCkgYW5kIHNpbWlsYXIuDQo+DQo+IFdlIG5lZWQgdG8gdG8gcHJvdGVjdCB0aGUgbGlzdCBt
-dXRhdGUgZnVuY3Rpb25zIGFuZCB3cmFwIHRoZW0gaW5zaWRlIA0KPiB0aGUgR2xvYmFsTWlkX0xv
-Y2sgbXV0ZXggYnV0IHdlIGNhbiBub3QgaG9sZCB0aGlzIGxvY2sgYWNyb3NzIHRoZSBjYWxsYmFj
-ayBjYWxsLg0KPg0KPiBCdXQgd2Ugc3RpbGwgbmVlZCB0byBwcm90ZWN0IHRoZSBtaWRfZW50cnkg
-ZGVyZWZlcmVuY2UgYW5kIHRoZSANCj4gLT5jYWxsYmFjayBjYWxsIGFnYWluc3QgdGhlIG1pZCBz
-dHJ1Y3R1cmUgYmVpbmcgZnJlZWQgYnkgDQo+IERlbGV0ZU1pZFFFbnRyeSgpLiAgV2UgY2FuIGRv
-IHRoYXQgYnkgdGFraW5nIG91dCBhbiBleHRyYSByZWZlcmVuY2UgdG8gdGhlIG1pZCB3aGlsZSBo
-b2xkaW5nIHRoZSBHbG9iYWxNaWRfTG9jayBhbmQgdGhlbiBkcm9wcGluZyB0aGUgcmVmZXJlbmNl
-IGFnYWluIGFmdGVyIHRoZSBjYWxsYmFjayBjb21wbGV0ZXMuDQo+DQo+DQo+IEkgdGhpbmsgc29t
-ZXRoaW5nIGxpa2UgdGhpcyBtaWdodCB3b3JrIDoNCj4NCj4NCj4NCj4gZGlmZiAtLWdpdCBhL2Zz
-L2NpZnMvY29ubmVjdC5jIGIvZnMvY2lmcy9jb25uZWN0LmMgaW5kZXggDQo+IGJkZWE0YjNlODAw
-NS4uM2ExYTliNjNiZDliIDEwMDY0NA0KPiAtLS0gYS9mcy9jaWZzL2Nvbm5lY3QuYw0KPiArKysg
-Yi9mcy9jaWZzL2Nvbm5lY3QuYw0KPiBAQCAtNTcyLDExICs1NzIsMTkgQEAgY2lmc19yZWNvbm5l
-Y3Qoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQ0KPiAgICAgICAgIG11dGV4X3VubG9j
-aygmc2VydmVyLT5zcnZfbXV0ZXgpOw0KPg0KPiAgICAgICAgIGNpZnNfZGJnKEZZSSwgIiVzOiBp
-c3N1aW5nIG1pZCBjYWxsYmFja3NcbiIsIF9fZnVuY19fKTsNCj4gKyAgICAgICBzcGluX2xvY2so
-Jkdsb2JhbE1pZF9Mb2NrKTsNCj4gICAgICAgICBsaXN0X2Zvcl9lYWNoX3NhZmUodG1wLCB0bXAy
-LCAmcmV0cnlfbGlzdCkgew0KPiAgICAgICAgICAgICAgICAgbWlkX2VudHJ5ID0gbGlzdF9lbnRy
-eSh0bXAsIHN0cnVjdCBtaWRfcV9lbnRyeSwgDQo+IHFoZWFkKTsNCg0KSSB0aGluayB5b3UgbmVl
-ZCBhIHJlZmVyZW5jZSBiZWZvcmUgdGhpcyBhbmQgc29tZXRoaW5nIGxpa2UgaWYgKG1pZC0+bWlk
-X2ZsYWdzIC4uLikgIC8qIGNoZWNrIGZvciBzb21lb25lIGVsc2UgYWxyZWFkeSBkZWxldGluZyBp
-dCAqLyA7IGVsc2UNCj4gICAgICAgICAgICAgICAgIGxpc3RfZGVsX2luaXQoJm1pZF9lbnRyeS0+
-cWhlYWQpOw0KDQpJIGFtIHN0aWxsIHRyYWNpbmcgYW5kIEkgZG8gbm90IHNlZSB0aGUgcm9vdCBv
-ZiB0aGUgcHJvYmxlbSB5ZXQuDQpVbnN1cnByaXNpbmdseSwgaXQgbG9va3MgbGlrZSBhIHVzZSBh
-ZnRlciBmcmVlIHRob3VnaC4NCg0KDQo+ICsgICAgICAgICAgICAgICBrcmVmX2dldCgmbWlkX2Vu
-dHJ5LT5yZWZjb3VudCk7DQo+ICsgICAgICAgICAgICAgICBzcGluX3VubG9jaygmR2xvYmFsTWlk
-X0xvY2spOw0KPiArDQo+ICAgICAgICAgICAgICAgICBtaWRfZW50cnktPmNhbGxiYWNrKG1pZF9l
-bnRyeSk7DQo+ICsgICAgICAgICAgICAgICBjaWZzX21pZF9xX2VudHJ5X3JlbGVhc2UobWlkX2Vu
-dHJ5KTsNCj4gKw0KPiArICAgICAgICAgICAgICAgc3Bpbl9sb2NrKCZHbG9iYWxNaWRfTG9jayk7
-DQo+ICAgICAgICAgfQ0KPiArICAgICAgIHNwaW5fdW5sb2NrKCZHbG9iYWxNaWRfTG9jayk7DQo+
-DQo+ICAgICAgICAgaWYgKGNpZnNfcmRtYV9lbmFibGVkKHNlcnZlcikpIHsNCj4gICAgICAgICAg
-ICAgICAgIG11dGV4X2xvY2soJnNlcnZlci0+c3J2X211dGV4KTsNCj4NCj4NCj4gUGF2ZWwsIGNh
-biB5b3UgaGF2ZSBhIGxvb2sgYXQgdGhpcyBhbmQgY29tbWVudD8gIEl0IGlzIHZlcnkgZGVsaWNh
-dGUgY29kZSBzbyBpdCBuZWVkcyBjYXJlZnVsIHJldmlldy4NCj4NCj4NCj4gcmVnYXJkcw0KPiBy
-b25uaWUgc2FobGJlcmcNCj4NCj4NCj4NCj4gLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLQ0K
-PiBGcm9tOiAiRGF2aWQgV3lzb2NoYW5za2kiIDxkd3lzb2NoYUByZWRoYXQuY29tPg0KPiBUbzog
-IlJvbm5pZSBTYWhsYmVyZyIgPGxzYWhsYmVyQHJlZGhhdC5jb20+DQo+IENjOiAibGludXgtY2lm
-cyIgPGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPiwgIkZyYW5rIFNvcmVuc29uIiANCj4gPHNv
-cmVuc29uQHJlZGhhdC5jb20+DQo+IFNlbnQ6IFRodXJzZGF5LCAxNyBPY3RvYmVyLCAyMDE5IDk6
-NDI6MDggUE0NCj4gU3ViamVjdDogUmU6IGxpc3RfZGVsIGNvcnJ1cHRpb24gd2hpbGUgaXRlcmF0
-aW5nIHJldHJ5X2xpc3QgaW4gDQo+IGNpZnNfcmVjb25uZWN0IHN0aWxsIHNlZW4gb24gNS40LXJj
-Mw0KPg0KPiBPbiBUaHUsIE9jdCAxNywgMjAxOSBhdCA1OjA1IEFNIFJvbm5pZSBTYWhsYmVyZyA8
-bHNhaGxiZXJAcmVkaGF0LmNvbT4gd3JvdGU6DQo+ID4NCj4gPg0KPiA+DQo+ID4gPiA+IDU3NS0t
-PiAgICBsaXN0X2Zvcl9lYWNoX3NhZmUodG1wLCB0bXAyLCAmcmV0cnlfbGlzdCkgew0KPiA+ID4g
-PiA1NzYgICAgICAgICBtaWRfZW50cnkgPSBsaXN0X2VudHJ5KHRtcCwgc3RydWN0IG1pZF9xX2Vu
-dHJ5LCBxaGVhZCk7DQo+ID4gPiA+IDU3NyAgICAgICAgIGxpc3RfZGVsX2luaXQoJm1pZF9lbnRy
-eS0+cWhlYWQpOw0KPiA+ID4gPiA1NzggICAgICAgICBtaWRfZW50cnktPmNhbGxiYWNrKG1pZF9l
-bnRyeSk7DQo+ID4gPiA+IDU3OSAgICAgfQ0KPiA+DQo+ID4gVGhpcyBwYXJ0IChhbmQgYSBzaW1p
-bGFyIGxvb3AgZHVyaW5nIHNodXR0aW5nIGRvd24gdGhlIGRlbXVsdGlwbGV4IA0KPiA+IHRocmVh
-ZCkgaXMgdGhlIG9ubHkgcGxhY2Ugd2hlcmUgd2UgYWRkL3JlbW92ZSB0byB0aGUgLT5xaGVhZCBs
-aXN0IHdpdGhvdXQgaG9sZGluZyB0aGUgR2xvYmFsTWlkX0xvY2suDQo+ID4NCj4gPiBJIHdvbmRl
-ciBpZiBpdCBpcyByYWNpbmcgYWdhaW5zdCBhIGRpZmZlcmVudCB0aHJlYWQgYWxzbyBtb2RpZnlp
-bmcgDQo+ID4gcWhlYWQgZm9yIHRoZSBzYW1lIG1pZCwgbGlrZSBjaWZzX2RlbGV0ZV9taWQoKSBm
-b3IgZXhhbXBsZS4NCj4gPg0KPg0KPiBZZXMgSSBhZ3JlZSwgSSB3YXMgdGhpbmtpbmcgYWxvbmcg
-dGhlc2Ugc2FtZSBsaW5lcyBvZiByZWFzb25pbmcgYXMgSSANCj4gcmVhZCB0aGUgY29kZS4gIEkg
-cHV0IHRoZSBsYXRlc3Qgb24gdGhlIGludmVzdGlnYXRpb24gaW50byB0aGUgYnVnOg0KPiBodHRw
-czovL25hbTA2LnNhZmVsaW5rcy5wcm90ZWN0aW9uLm91dGxvb2suY29tLz91cmw9aHR0cHMlM0El
-MkYlMkZidWd6DQo+IGlsbGEucmVkaGF0LmNvbSUyRnNob3dfYnVnLmNnaSUzRmlkJTNEMTY1NDUz
-OCUyM2MxNSZhbXA7ZGF0YT0wMiU3QzAxJTcNCj4gQ3BzaGlsb3YlNDBtaWNyb3NvZnQuY29tJTdD
-M2Y3ZjM5ODFkNDRmNGNhYzVhZmMwOGQ3NTMxNmVmZTglN0M3MmY5ODhiZg0KPiA4NmYxNDFhZjkx
-YWIyZDdjZDAxMWRiNDclN0MxJTdDMCU3QzYzNzA2OTIzMDI5MTY5MDQwNiZhbXA7c2RhdGE9MFAl
-MkJqDQo+IFlKV2ZCU0hYR1VOUFpFZVpSNFc5dE9iMiUyQkdDQzFXdERtaXl6cEVJJTNEJmFtcDty
-ZXNlcnZlZD0wDQo+DQo+IEp1c3QgYmVmb3JlIHRoZSBjcmFzaCwgd2hlbiB3ZSBoaXQgdGhlIGl0
-ZXJhdGlvbiBvZiByZXRyeV9saXN0IA0KPiBzb21ldGhpbmcgaGFzIGdvbmUgd3JvbmcgLSB0aGUg
-dmVyeSBmaXJzdCBtaWRfZW50cnkgb24gcmV0cnlfbGlzdCBpcyBhIA0KPiBnYXJiYWdlIGFkZHJl
-c3MsIHdoZW4gbm9ybWFsbHkgaXQgc2hvdWxkIGJlIHRoZSBsYXN0IGFkZHJlc3MgZnJvbSB0aGUg
-DQo+IHByZXZpb3VzIGNhbGwgdG8gbGlzdF9tb3ZlIGluIHRoZSBsb29wIGFib3ZlIGl0Lg0KPg0K
-Pg0KPiAgLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLQ0KPiA+ID4gRnJvbTogIlJvbm5pZSBT
-YWhsYmVyZyIgPGxzYWhsYmVyQHJlZGhhdC5jb20+DQo+ID4gPiBUbzogIkRhdmlkIFd5c29jaGFu
-c2tpIiA8ZHd5c29jaGFAcmVkaGF0LmNvbT4NCj4gPiA+IENjOiAibGludXgtY2lmcyIgPGxpbnV4
-LWNpZnNAdmdlci5rZXJuZWwub3JnPiwgIkZyYW5rIFNvcmVuc29uIiANCj4gPiA+IDxzb3JlbnNv
-bkByZWRoYXQuY29tPg0KPiA+ID4gU2VudDogVGh1cnNkYXksIDE3IE9jdG9iZXIsIDIwMTkgMTA6
-MTc6MTggQU0NCj4gPiA+IFN1YmplY3Q6IFJlOiBsaXN0X2RlbCBjb3JydXB0aW9uIHdoaWxlIGl0
-ZXJhdGluZyByZXRyeV9saXN0IGluIA0KPiA+ID4gY2lmc19yZWNvbm5lY3Qgc3RpbGwgc2VlbiBv
-biA1LjQtcmMzDQo+ID4gPg0KPiA+ID4gSSBjYW4gbm90IHJlcHJvZHVjZSB0aGlzIDotKA0KPiA+
-ID4NCj4gPiA+IEkgaGF2ZSBydW4gaXQgZm9yIGEgZmV3IGhvdXJzLCByZXN0YXJ0aW5nIHNhbWJh
-IGluIGEgbG9vcCB3aXRoIHVwIA0KPiA+ID4gdG8gMzAgdGhyZWFkcy4NCj4gPiA+DQo+DQo+IEkg
-YW0gbm90IHN1cmUgaWYgaXQgaGVscHMgYnV0IEkgaGF2ZSA4IENQVXMgb24gbXkgVk0uDQo+IEkg
-YWxzbyBoYXZlIHNlcnZlciBzaWduaW5nIGFuZCBjbGllbnQgc2lnbmluZyBtYW5kYXRvcnkuDQo+
-IEkgY2FuIHNlbmQgeW91IHRoZSBzbWIuY29uZiBvZmZsaW5lLg0KPg0KPg0KPiA+ID4NCj4gPiA+
-IENhbiB5b3UgY2hlY2sNCj4gPiA+IDEsIElmIHRoaXMgb25seSByZXByb2R1Y2UgZm9yIHlvdSBm
-b3IgdGhlIHJvb3Qgb2YgdGhlIHNoYXJlIG9yIGl0IA0KPiA+ID4gYWxzbyByZXByb2R1Y2VzIGZv
-ciBhIHN1YmRpcmVjdG9yeT8NCj4gPiA+IDIsIERvZXMgaXQgcmVwcm9kdWNlIGFsc28gaWYgeW91
-IHVzZSAibm9oYW5kbGVjYWNoZSIgbW91bnQgb3B0aW9uPw0KPiA+ID4gICAgVGhpcyBkaXNhYmxl
-cyB0aGUgdXNlIG9mIGNhY2hlZCBvcGVuIG9mIHRoZSByb290IGhhbmRsZSwgaS5lLg0KPiA+ID4g
-ICAgb3Blbl9zaHJvb3QoKQ0KPiA+ID4gMywgV2hlbiB0aGlzIGhhcHBlbnMsIGNhbiB5b3UgY2hl
-Y2sgdGhlIGNvbnRlbnQgb2YgdGhlIG1pZCBlbnRyeSANCj4gPiA+IGFuZCB3aGF0IHRoZXNlIGZp
-ZWxkcyBhcmU6DQo+ID4gPiAgICBtaWQtPm1pZF9mbGFncywgbWlkLT5oYW5kbGUgKHRoaXMgaXMg
-YSBmdW5jdGlvbiBwb2ludGVyLCB3aGF0IGRvZXMgaXQNCj4gPiA+ICAgIHBvaW50IHRvKQ0KPiA+
-ID4gICAgbWlkLT5jb21tYW5kLiAgIE1heWJlIHByaW50IHRoZSB3aG9sZSBzdHJ1Y3R1cmUuDQo+
-ID4gPg0KPg0KPiBPayBJJ2xsIHNlZSB3aGF0IEkgY2FuIGZpbmQgb3V0LiAgU28gZmFyIEkgYW0g
-bm90IHN1cmUgSSBoYXZlIA0KPiBpZGVudGlmaWVkIHdoYXQgZWxzZSBpcyB0b3VjaGluZyB0aGUg
-bWlkIGluIGJldHdlZW4gdGhlIHR3byBsb29wcy4NCj4NCj4gPiA+IHJlZ2FyZHMNCj4gPiA+IHJv
-bm5pZSBzYWhsYmVyZw0KPiA+ID4NCj4gPiA+DQo+ID4gPg0KPiA+ID4NCj4gPiA+IC0tLS0tIE9y
-aWdpbmFsIE1lc3NhZ2UgLS0tLS0NCj4gPiA+ID4gRnJvbTogIkRhdmlkIFd5c29jaGFuc2tpIiA8
-ZHd5c29jaGFAcmVkaGF0LmNvbT4NCj4gPiA+ID4gVG86ICJsaW51eC1jaWZzIiA8bGludXgtY2lm
-c0B2Z2VyLmtlcm5lbC5vcmc+DQo+ID4gPiA+IENjOiAiRnJhbmsgU29yZW5zb24iIDxzb3JlbnNv
-bkByZWRoYXQuY29tPg0KPiA+ID4gPiBTZW50OiBUaHVyc2RheSwgMTcgT2N0b2JlciwgMjAxOSA1
-OjI3OjAyIEFNDQo+ID4gPiA+IFN1YmplY3Q6IGxpc3RfZGVsIGNvcnJ1cHRpb24gd2hpbGUgaXRl
-cmF0aW5nIHJldHJ5X2xpc3QgaW4gDQo+ID4gPiA+IGNpZnNfcmVjb25uZWN0IHN0aWxsIHNlZW4g
-b24gNS40LXJjMw0KPiA+ID4gPg0KPiA+ID4gPiBJIHRoaW5rIHRoaXMgaGFzIGJlZW4gdGhlcmUg
-Zm9yIGEgbG9uZyB0aW1lLCBzaW5jZSB3ZSBmaXJzdCBzYXcgDQo+ID4gPiA+IHRoaXMgb24gYSA0
-LjE4LjAgYmFzZWQga2VybmVsIGJ1dCBJIGp1c3Qgbm90aWNlZCB0aGUgYnVnIHJlY2VudGx5Lg0K
-PiA+ID4gPiBJIGp1c3QgcmV0ZXN0ZWQgb24gNS40LXJjMyBhbmQgaXQncyBzdGlsbCB0aGVyZS4g
-IEVhc3kgdG8gcmVwcm8gDQo+ID4gPiA+IHdpdGggYSBmYWlybHkgc2ltcGxlIGJ1dCBpbnZhc2l2
-ZSBzZXJ2ZXIgcmVzdGFydCB0ZXN0IC0gdGFrZXMgDQo+ID4gPiA+IG9ubHkgbWF5YmUgYSBjb3Vw
-bGUgbWludXRlcyBvbiBteSBWTS4NCj4gPiA+ID4NCj4gPiA+ID4NCj4gPiA+ID4gRnJvbSBGcmFu
-ayBTb3JlbnNvbjoNCj4gPiA+ID4NCj4gPiA+ID4gbW91bnQgb2ZmIGEgc2FtYmEgc2VydmVyOg0K
-PiA+ID4gPg0KPiA+ID4gPiAgICAgIyBtb3VudCAvL3ZtMS9zaGFyZSAvbW50L3ZtMSANCj4gPiA+
-ID4gLW92ZXJzPTIuMSxoYXJkLHNlYz1udGxtc3NwLGNyZWRlbnRpYWxzPS9yb290Ly5zbWJfY3Jl
-ZHMNCj4gPiA+ID4NCj4gPiA+ID4NCj4gPiA+ID4gb24gdGhlIGNsaWVudCwgc3RhcnQgMTAgJ2Zp
-bmQnIGxvb3BzOg0KPiA+ID4gPg0KPiA+ID4gPiAgICAgIyBleHBvcnQgdGVzdF9wYXRoPS9tbnQv
-dm0xDQo+ID4gPiA+ICAgICAjIGRvX2ZpbmQoKSB7IHdoaWxlIHRydWUgOyBkbyBmaW5kICR0ZXN0
-X3BhdGggPi9kZXYvbnVsbCANCj4gPiA+ID4gMj4mMSA7IGRvbmUgfQ0KPiA+ID4gPg0KPiA+ID4g
-PiAgICAgIyBmb3IgaSBpbiB7MS4uMTB9IDsgZG8gZG9fZmluZCAmIGRvbmUNCj4gPiA+ID4NCj4g
-PiA+ID4NCj4gPiA+ID4gb3B0aW9uYWw6ICBhbHNvIHN0YXJ0IHNvbWV0aGluZyB0byBtb25pdG9y
-IGZvciB3aGVuIHRoZSBoYW5nIG9jY3VyczoNCj4gPiA+ID4NCj4gPiA+ID4gICAgICMgd2hpbGUg
-dHJ1ZSA7IGRvIGNvdW50PSQoZ3JlcCBzbWIyX3JlY29ubmVjdCAvcHJvYy8qL3N0YWNrIA0KPiA+
-ID4gPiAtQTMgfCBncmVwIC1jIG9wZW5fc2hyb290KSA7IFtbICRjb3VudCAtZ3QgMCBdXSAmJiB7
-IGVjaG8gIiQoZGF0ZSk6DQo+ID4gPiA+IHJlcHJvZHVjZWQgYnVnIiA7IGJyZWFrIDsgfSA7IGVj
-aG8gIiQoZGF0ZSk6IHN0YXlpbicgYWxpdmUiIDsgDQo+ID4gPiA+IHNsZWVwIDIgOyBkb25lDQo+
-ID4gPiA+DQo+ID4gPiA+DQo+ID4gPiA+DQo+ID4gPiA+IE9uIHRoZSBzYW1iYSBzZXJ2ZXI6ICBy
-ZXN0YXJ0IHNtYi5zZXJ2aWNlIChsb29wIGl0IGluIGNhc2UgaXQgDQo+ID4gPiA+IHJlcXVpcmVz
-IG1vcmUgdGhhbiBvbmUgcmVzdGFydCk6DQo+ID4gPiA+DQo+ID4gPiA+ICAgICAjIHdoaWxlIHRy
-dWUgOyBkbyBlY2hvICIkKGRhdGUpOiByZXN0YXJ0aW5nIiA7IHN5c3RlbWN0bCANCj4gPiA+ID4g
-cmVzdGFydCBzbWIuc2VydmljZSA7IHNsZWVwIDUgOyBkb25lIHwgdGVlIA0KPiA+ID4gPiAvdmFy
-L3RtcC9zbWJfcmVzdGFydF9sb2cub3V0DQo+ID4gPiA+DQo+ID4gPiA+DQo+ID4gPiA+DQo+ID4g
-PiA+DQo+ID4gPiA+IFsgIDQzMC40NTQ4OTddIGxpc3RfZGVsIGNvcnJ1cHRpb24uIHByZXYtPm5l
-eHQgc2hvdWxkIGJlIA0KPiA+ID4gPiBmZmZmOThkM2E4ZjMxNmMwLCBidXQgd2FzIDJlODg1Y2Iy
-NjYzNTU0NjkgWyAgNDMwLjQ2NDY2OF0gDQo+ID4gPiA+IC0tLS0tLS0tLS0tLVsgY3V0IGhlcmUg
-XS0tLS0tLS0tLS0tLSBbICA0MzAuNDY2NTY5XSBrZXJuZWwgQlVHIA0KPiA+ID4gPiBhdCBsaWIv
-bGlzdF9kZWJ1Zy5jOjUxIQ0KPiA+ID4gPiBbICA0MzAuNDY4NDc2XSBpbnZhbGlkIG9wY29kZTog
-MDAwMCBbIzFdIFNNUCBQVEkgWyAgNDMwLjQ3MDI4Nl0gDQo+ID4gPiA+IENQVTogMCBQSUQ6IDEz
-MjY3IENvbW06IGNpZnNkIEtkdW1wOiBsb2FkZWQgTm90IHRhaW50ZWQgDQo+ID4gPiA+IDUuNC4w
-LXJjMysgIzE5IFsgIDQzMC40NzM0NzJdIEhhcmR3YXJlIG5hbWU6IFJlZCBIYXQgS1ZNLCBCSU9T
-IA0KPiA+ID4gPiAwLjUuMSAwMS8wMS8yMDExIFsgIDQzMC40NzU4NzJdIFJJUDogDQo+ID4gPiA+
-IDAwMTA6X19saXN0X2RlbF9lbnRyeV92YWxpZC5jb2xkKzB4MzEvMHg1NQ0KPiA+ID4gPiBbICA0
-MzAuNDc4MTI5XSBDb2RlOiA1ZSAxNSA4ZSBlOCA1NCBhMyBjNSBmZiAwZiAwYiA0OCBjNyBjNyA3
-OCANCj4gPiA+ID4gNWYgMTUgOGUgZTggNDYgYTMgYzUgZmYgMGYgMGIgNDggODkgZjIgNDggODkg
-ZmUgNDggYzcgYzcgMzggNWYgDQo+ID4gPiA+IDE1IDhlIGU4IDMyDQo+ID4gPiA+IGEzIGM1IGZm
-IDwwZj4gMGIgNDggODkgZmUgNGMgODkgYzIgNDggYzcgYzcgMDAgNWYgMTUgOGUgZTggMWUgYTMg
-DQo+ID4gPiA+IGM1IGZmIDBmIDBiIFsgIDQzMC40ODU1NjNdIFJTUDogMDAxODpmZmZmYjRkYjAw
-NDJmZDM4IEVGTEFHUzogDQo+ID4gPiA+IDAwMDEwMjQ2IFsgIDQzMC40ODc2NjVdIFJBWDogMDAw
-MDAwMDAwMDAwMDA1NCBSQlg6IA0KPiA+ID4gPiBmZmZmOThkM2FhYmI4ODAwIFJDWDoNCj4gPiA+
-ID4gMDAwMDAwMDAwMDAwMDAwMA0KPiA+ID4gPiBbICA0MzAuNDkwNTEzXSBSRFg6IDAwMDAwMDAw
-MDAwMDAwMDAgUlNJOiBmZmZmOThkM2I3YTE3OTA4IFJESToNCj4gPiA+ID4gZmZmZjk4ZDNiN2Ex
-NzkwOA0KPiA+ID4gPiBbICA0MzAuNDkzMzgzXSBSQlA6IGZmZmY5OGQzYThmMzE2YzAgUjA4OiBm
-ZmZmOThkM2I3YTE3OTA4IFIwOToNCj4gPiA+ID4gMDAwMDAwMDAwMDAwMDI4NQ0KPiA+ID4gPiBb
-ICA0MzAuNDk2MjU4XSBSMTA6IGZmZmZiNGRiMDA0MmZiZjAgUjExOiBmZmZmYjRkYjAwNDJmYmY1
-IFIxMjoNCj4gPiA+ID4gZmZmZjk4ZDNhYWJiODljMA0KPiA+ID4gPiBbICA0MzAuNDk5MTEzXSBS
-MTM6IGZmZmZiNGRiMDA0MmZkNDggUjE0OiAyZTg4NWNiMjY2MzU1NDY5IFIxNToNCj4gPiA+ID4g
-ZmZmZjk4ZDNiMjRjNDQ4MA0KPiA+ID4gPiBbICA0MzAuNTAxOTgxXSBGUzogIDAwMDAwMDAwMDAw
-MDAwMDAoMDAwMCkgDQo+ID4gPiA+IEdTOmZmZmY5OGQzYjdhMDAwMDAoMDAwMCkNCj4gPiA+ID4g
-a25sR1M6MDAwMDAwMDAwMDAwMDAwMA0KPiA+ID4gPiBbICA0MzAuNTA1MjMyXSBDUzogIDAwMTAg
-RFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgwMDUwMDMzIA0KPiA+ID4gPiBbICA0MzAu
-NTA3NTQ2XSBDUjI6IDAwMDA3ZjA4Y2QxN2I5YzAgQ1IzOiAwMDAwMDAwMjM0ODRhMDAwIENSNDoN
-Cj4gPiA+ID4gMDAwMDAwMDAwMDA0MDZmMA0KPiA+ID4gPiBbICA0MzAuNTEwNDI2XSBDYWxsIFRy
-YWNlOg0KPiA+ID4gPiBbICA0MzAuNTExNTAwXSAgY2lmc19yZWNvbm5lY3QrMHgyNWUvMHg2MTAg
-W2NpZnNdIFsgIDQzMC41MTMzNTBdICANCj4gPiA+ID4gY2lmc19yZWFkdl9mcm9tX3NvY2tldCsw
-eDIyMC8weDI1MCBbY2lmc10gWyAgNDMwLjUxNTQ2NF0gIA0KPiA+ID4gPiBjaWZzX3JlYWRfZnJv
-bV9zb2NrZXQrMHg0YS8weDcwIFtjaWZzXSBbICA0MzAuNTE3NDUyXSAgPyANCj4gPiA+ID4gdHJ5
-X3RvX3dha2VfdXArMHgyMTIvMHg2NTAgWyAgNDMwLjUxOTEyMl0gID8gDQo+ID4gPiA+IGNpZnNf
-c21hbGxfYnVmX2dldCsweDE2LzB4MzAgW2NpZnNdIFsgIDQzMC41MjEwODZdICA/IA0KPiA+ID4g
-PiBhbGxvY2F0ZV9idWZmZXJzKzB4NjYvMHgxMjAgW2NpZnNdIFsgIDQzMC41MjMwMTldICANCj4g
-PiA+ID4gY2lmc19kZW11bHRpcGxleF90aHJlYWQrMHhkYy8weGMzMCBbY2lmc10gWyAgNDMwLjUy
-NTExNl0gIA0KPiA+ID4gPiBrdGhyZWFkKzB4ZmIvMHgxMzAgWyAgNDMwLjUyNjQyMV0gID8gDQo+
-ID4gPiA+IGNpZnNfaGFuZGxlX3N0YW5kYXJkKzB4MTkwLzB4MTkwIFtjaWZzXSBbICA0MzAuNTI4
-NTE0XSAgPyANCj4gPiA+ID4ga3RocmVhZF9wYXJrKzB4OTAvMHg5MCBbICA0MzAuNTMwMDE5XSAg
-cmV0X2Zyb21fZm9yaysweDM1LzB4NDAgWyAgDQo+ID4gPiA+IDQzMC41MzE0ODddIE1vZHVsZXMg
-bGlua2VkIGluOiBjaWZzIGxpYmRlcyBsaWJhcmM0IGlwNnRfcnBmaWx0ZXIgDQo+ID4gPiA+IGlw
-NnRfUkVKRUNUIG5mX3JlamVjdF9pcHY2IHh0X2Nvbm50cmFjayBlYnRhYmxlX25hdCBpcDZ0YWJs
-ZV9uYXQgDQo+ID4gPiA+IGlwNnRhYmxlX21hbmdsZSBpcDZ0YWJsZV9yYXcgaXA2dGFibGVfc2Vj
-dXJpdHkgaXB0YWJsZV9uYXQgDQo+ID4gPiA+IG5mX25hdCBpcHRhYmxlX21hbmdsZSBpcHRhYmxl
-X3JhdyBpcHRhYmxlX3NlY3VyaXR5IG5mX2Nvbm50cmFjaw0KPiA+ID4gPiBuZl9kZWZyYWdfaXB2
-NiBuZl9kZWZyYWdfaXB2NCBpcF9zZXQgbmZuZXRsaW5rIGVidGFibGVfZmlsdGVyIA0KPiA+ID4g
-PiBlYnRhYmxlcyBpcDZ0YWJsZV9maWx0ZXIgaXA2X3RhYmxlcyBjcmN0MTBkaWZfcGNsbXVsIA0K
-PiA+ID4gPiBjcmMzMl9wY2xtdWwgam95ZGV2IHZpcnRpb19iYWxsb29uIGdoYXNoX2NsbXVsbmlf
-aW50ZWwgaTJjX3BpaXg0IA0KPiA+ID4gPiBuZnNkIG5mc19hY2wgbG9ja2QgYXV0aF9ycGNnc3Mg
-Z3JhY2Ugc3VucnBjIHhmcyBsaWJjcmMzMmMgDQo+ID4gPiA+IHZpcnRpb19uZXQgbmV0X2ZhaWxv
-dmVyIGNyYzMyY19pbnRlbCB2aXJ0aW9fY29uc29sZSBzZXJpb19yYXcgDQo+ID4gPiA+IHZpcnRp
-b19ibGsgYXRhX2dlbmVyaWMgZmFpbG92ZXIgcGF0YV9hY3BpIHFlbXVfZndfY2ZnIFsgIA0KPiA+
-ID4gPiA0MzAuNTUyNzgyXSAtLS1bIGVuZCB0cmFjZSBjOTFkNDQ2OGY4Njg5NDgyIF0tLS0gWyAg
-NDMwLjU1NDk0OF0gDQo+ID4gPiA+IFJJUDogMDAxMDpfX2xpc3RfZGVsX2VudHJ5X3ZhbGlkLmNv
-bGQrMHgzMS8weDU1DQo+ID4gPiA+IFsgIDQzMC41NTcyNTFdIENvZGU6IDVlIDE1IDhlIGU4IDU0
-IGEzIGM1IGZmIDBmIDBiIDQ4IGM3IGM3IDc4IA0KPiA+ID4gPiA1ZiAxNSA4ZSBlOCA0NiBhMyBj
-NSBmZiAwZiAwYiA0OCA4OSBmMiA0OCA4OSBmZSA0OCBjNyBjNyAzOCA1ZiANCj4gPiA+ID4gMTUg
-OGUgZTggMzINCj4gPiA+ID4gYTMgYzUgZmYgPDBmPiAwYiA0OCA4OSBmZSA0YyA4OSBjMiA0OCBj
-NyBjNyAwMCA1ZiAxNSA4ZSBlOCAxZSBhMyANCj4gPiA+ID4gYzUgZmYgMGYgMGIgWyAgNDMwLjU2
-NTAxOV0gUlNQOiAwMDE4OmZmZmZiNGRiMDA0MmZkMzggRUZMQUdTOiANCj4gPiA+ID4gMDAwMTAy
-NDYgWyAgNDMwLjU2NzE4MV0gUkFYOiAwMDAwMDAwMDAwMDAwMDU0IFJCWDogDQo+ID4gPiA+IGZm
-ZmY5OGQzYWFiYjg4MDAgUkNYOg0KPiA+ID4gPiAwMDAwMDAwMDAwMDAwMDAwDQo+ID4gPiA+IFsg
-IDQzMC41NzAwNzNdIFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IGZmZmY5OGQzYjdhMTc5MDgg
-UkRJOg0KPiA+ID4gPiBmZmZmOThkM2I3YTE3OTA4DQo+ID4gPiA+IFsgIDQzMC41NzI5NTVdIFJC
-UDogZmZmZjk4ZDNhOGYzMTZjMCBSMDg6IGZmZmY5OGQzYjdhMTc5MDggUjA5Og0KPiA+ID4gPiAw
-MDAwMDAwMDAwMDAwMjg1DQo+ID4gPiA+IFsgIDQzMC41NzU4NTRdIFIxMDogZmZmZmI0ZGIwMDQy
-ZmJmMCBSMTE6IGZmZmZiNGRiMDA0MmZiZjUgUjEyOg0KPiA+ID4gPiBmZmZmOThkM2FhYmI4OWMw
-DQo+ID4gPiA+IFsgIDQzMC41Nzg3NDVdIFIxMzogZmZmZmI0ZGIwMDQyZmQ0OCBSMTQ6IDJlODg1
-Y2IyNjYzNTU0NjkgUjE1Og0KPiA+ID4gPiBmZmZmOThkM2IyNGM0NDgwDQo+ID4gPiA+IFsgIDQz
-MC41ODE2MjRdIEZTOiAgMDAwMDAwMDAwMDAwMDAwMCgwMDAwKSANCj4gPiA+ID4gR1M6ZmZmZjk4
-ZDNiN2EwMDAwMCgwMDAwKQ0KPiA+ID4gPiBrbmxHUzowMDAwMDAwMDAwMDAwMDAwDQo+ID4gPiA+
-IFsgIDQzMC41ODQ4ODFdIENTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAw
-ODAwNTAwMzMgDQo+ID4gPiA+IFsgIDQzMC41ODcyMzBdIENSMjogMDAwMDdmMDhjZDE3YjljMCBD
-UjM6IDAwMDAwMDAyMzQ4NGEwMDAgQ1I0Og0KPiA+ID4gPiAwMDAwMDAwMDAwMDQwNmYwDQo+ID4g
-PiA+DQo+ID4gPiA+DQo+ID4gPiA+IGNyYXNoPiBkaXMgLWxyIGNpZnNfcmVjb25uZWN0KzB4MjVl
-IHwgdGFpbCAtLWxpbmVzPTIwDQo+ID4gPiA+IDB4ZmZmZmZmZmZjMDYyZGMyNiA8Y2lmc19yZWNv
-bm5lY3QrMHgyMjY+OiAgICAgIG1vdmINCj4gPiA+ID4gJDB4MCwweGJiMzZiKCVyaXApICAgICAg
-ICAjIDB4ZmZmZmZmZmZjMDZlOGY5OCA8R2xvYmFsTWlkX0xvY2s+DQo+ID4gPiA+IC9tbnQvYnVp
-bGQva2VybmVsL2ZzL2NpZnMvY29ubmVjdC5jOiA1NzINCj4gPiA+ID4gMHhmZmZmZmZmZmMwNjJk
-YzJkIDxjaWZzX3JlY29ubmVjdCsweDIyZD46ICAgICAgbW92ICAgICVyMTIsJXJkaQ0KPiA+ID4g
-PiAweGZmZmZmZmZmYzA2MmRjMzAgPGNpZnNfcmVjb25uZWN0KzB4MjMwPjogICAgICBjYWxscQ0K
-PiA+ID4gPiAweGZmZmZmZmZmOGQ5ZDVhMjAgPG11dGV4X3VubG9jaz4NCj4gPiA+ID4gL21udC9i
-dWlsZC9rZXJuZWwvZnMvY2lmcy9jb25uZWN0LmM6IDU3NA0KPiA+ID4gPiAweGZmZmZmZmZmYzA2
-MmRjMzUgPGNpZnNfcmVjb25uZWN0KzB4MjM1PjogICAgICB0ZXN0Yg0KPiA+ID4gPiAkMHgxLDB4
-YmIzMDAoJXJpcCkgICAgICAgICMgMHhmZmZmZmZmZmMwNmU4ZjNjIDxjaWZzRllJPg0KPiA+ID4g
-PiAweGZmZmZmZmZmYzA2MmRjM2MgPGNpZnNfcmVjb25uZWN0KzB4MjNjPjogICAgICBqZQ0KPiA+
-ID4gPiAweGZmZmZmZmZmYzA2MmRjNDMgPGNpZnNfcmVjb25uZWN0KzB4MjQzPg0KPiA+ID4gPiAv
-bW50L2J1aWxkL2tlcm5lbC8uL2FyY2gveDg2L2luY2x1ZGUvYXNtL2p1bXBfbGFiZWwuaDogMjUN
-Cj4gPiA+ID4gMHhmZmZmZmZmZmMwNjJkYzNlIDxjaWZzX3JlY29ubmVjdCsweDIzZT46ICAgICAg
-ZGF0YTMyIGRhdGEzMiBkYXRhMzINCj4gPiA+ID4geGNoZyAlYXgsJWF4DQo+ID4gPiA+IC9tbnQv
-YnVpbGQva2VybmVsL2ZzL2NpZnMvY29ubmVjdC5jOiA1NzUNCj4gPiA+ID4gMHhmZmZmZmZmZmMw
-NjJkYzQzIDxjaWZzX3JlY29ubmVjdCsweDI0Mz46ICAgICAgbW92ICAgIDB4OCglcnNwKSwlcmJw
-DQo+ID4gPiA+IDB4ZmZmZmZmZmZjMDYyZGM0OCA8Y2lmc19yZWNvbm5lY3QrMHgyNDg+OiAgICAg
-IG1vdiAgICAweDAoJXJicCksJXIxNA0KPiA+ID4gPiAweGZmZmZmZmZmYzA2MmRjNGMgPGNpZnNf
-cmVjb25uZWN0KzB4MjRjPjogICAgICBjbXAgICAgJXIxMywlcmJwDQo+ID4gPiA+IDB4ZmZmZmZm
-ZmZjMDYyZGM0ZiA8Y2lmc19yZWNvbm5lY3QrMHgyNGY+OiAgICAgIGpuZQ0KPiA+ID4gPiAweGZm
-ZmZmZmZmYzA2MmRjNTYgPGNpZnNfcmVjb25uZWN0KzB4MjU2Pg0KPiA+ID4gPiAweGZmZmZmZmZm
-YzA2MmRjNTEgPGNpZnNfcmVjb25uZWN0KzB4MjUxPjogICAgICBqbXANCj4gPiA+ID4gMHhmZmZm
-ZmZmZmMwNjJkYzkwIDxjaWZzX3JlY29ubmVjdCsweDI5MD4NCj4gPiA+ID4gMHhmZmZmZmZmZmMw
-NjJkYzUzIDxjaWZzX3JlY29ubmVjdCsweDI1Mz46ICAgICAgbW92ICAgICVyYXgsJXIxNA0KPiA+
-ID4gPiAvbW50L2J1aWxkL2tlcm5lbC8uL2luY2x1ZGUvbGludXgvbGlzdC5oOiAxOTANCj4gPiA+
-ID4gMHhmZmZmZmZmZmMwNjJkYzU2IDxjaWZzX3JlY29ubmVjdCsweDI1Nj46ICAgICAgbW92ICAg
-ICVyYnAsJXJkaQ0KPiA+ID4gPiAweGZmZmZmZmZmYzA2MmRjNTkgPGNpZnNfcmVjb25uZWN0KzB4
-MjU5PjogICAgICBjYWxscQ0KPiA+ID4gPiAweGZmZmZmZmZmOGQ0ZTZiMDAgPF9fbGlzdF9kZWxf
-ZW50cnlfdmFsaWQ+DQo+ID4gPiA+IDB4ZmZmZmZmZmZjMDYyZGM1ZSA8Y2lmc19yZWNvbm5lY3Qr
-MHgyNWU+OiAgICAgIHRlc3QgICAlYWwsJWFsDQo+ID4gPiA+DQo+ID4gPiA+DQo+ID4gPiA+IGZz
-L2NpZnMvY29ubmVjdC5jDQo+ID4gPiA+IDU2NiAgICAgICAgIG1pZF9lbnRyeSA9IGxpc3RfZW50
-cnkodG1wLCBzdHJ1Y3QgbWlkX3FfZW50cnksIHFoZWFkKTsNCj4gPiA+ID4gNTY3ICAgICAgICAg
-aWYgKG1pZF9lbnRyeS0+bWlkX3N0YXRlID09IE1JRF9SRVFVRVNUX1NVQk1JVFRFRCkNCj4gPiA+
-ID4gNTY4ICAgICAgICAgICAgIG1pZF9lbnRyeS0+bWlkX3N0YXRlID0gTUlEX1JFVFJZX05FRURF
-RDsNCj4gPiA+ID4gNTY5ICAgICAgICAgbGlzdF9tb3ZlKCZtaWRfZW50cnktPnFoZWFkLCAmcmV0
-cnlfbGlzdCk7DQo+ID4gPiA+IDU3MCAgICAgfQ0KPiA+ID4gPiA1NzEgICAgIHNwaW5fdW5sb2Nr
-KCZHbG9iYWxNaWRfTG9jayk7DQo+ID4gPiA+IDU3MiAgICAgbXV0ZXhfdW5sb2NrKCZzZXJ2ZXIt
-PnNydl9tdXRleCk7DQo+ID4gPiA+IDU3Mw0KPiA+ID4gPiA1NzQgICAgIGNpZnNfZGJnKEZZSSwg
-IiVzOiBpc3N1aW5nIG1pZCBjYWxsYmFja3NcbiIsIF9fZnVuY19fKTsNCj4gPiA+ID4gNTc1LS0+
-ICAgIGxpc3RfZm9yX2VhY2hfc2FmZSh0bXAsIHRtcDIsICZyZXRyeV9saXN0KSB7DQo+ID4gPiA+
-IDU3NiAgICAgICAgIG1pZF9lbnRyeSA9IGxpc3RfZW50cnkodG1wLCBzdHJ1Y3QgbWlkX3FfZW50
-cnksIHFoZWFkKTsNCj4gPiA+ID4gNTc3ICAgICAgICAgbGlzdF9kZWxfaW5pdCgmbWlkX2VudHJ5
-LT5xaGVhZCk7DQo+ID4gPiA+IDU3OCAgICAgICAgIG1pZF9lbnRyeS0+Y2FsbGJhY2sobWlkX2Vu
-dHJ5KTsNCj4gPiA+ID4gNTc5ICAgICB9DQo+ID4gPiA+IDU4MA0KPiA+ID4gPiA1ODEgICAgIGlm
-IChjaWZzX3JkbWFfZW5hYmxlZChzZXJ2ZXIpKSB7DQo+ID4gPiA+IDU4MiAgICAgICAgIG11dGV4
-X2xvY2soJnNlcnZlci0+c3J2X211dGV4KTsNCj4gPiA+ID4gNTgzICAgICAgICAgc21iZF9kZXN0
-cm95KHNlcnZlcik7DQo+ID4gPiA+IDU4NCAgICAgICAgIG11dGV4X3VubG9jaygmc2VydmVyLT5z
-cnZfbXV0ZXgpOw0KPiA+ID4gPg0KPiA+ID4NCj4NCj4NCj4NCj4gLS0NCj4gRGF2ZSBXeXNvY2hh
-bnNraQ0KPiBQcmluY2lwYWwgU29mdHdhcmUgTWFpbnRlbmFuY2UgRW5naW5lZXINCj4gVDogOTE5
-LTc1NC00MDI0DQoNCg0KDQotLQ0KRGF2ZSBXeXNvY2hhbnNraQ0KUHJpbmNpcGFsIFNvZnR3YXJl
-IE1haW50ZW5hbmNlIEVuZ2luZWVyDQpUOiA5MTktNzU0LTQwMjQNCg==
+On Thu, Oct 17, 2019 at 2:29 PM Pavel Shilovskiy <pshilov@microsoft.com> wrote:
+>
+> Hi Ronnie, David,
+>
+> Thanks for looking into this. This actually reminds me of the commit 696e420bb2a66:
+>
+> --------------------------------------
+> commit 696e420bb2a6624478105651d5368d45b502b324
+> Author: Lars Persson <lars.persson@axis.com>
+> Date:   Mon Jun 25 14:05:25 2018 +0200
+>
+>     cifs: Fix use after free of a mid_q_entry
+>
+>     With protocol version 2.0 mounts we have seen crashes with corrupt mid
+>     entries. Either the server->pending_mid_q list becomes corrupt with a
+>     cyclic reference in one element or a mid object fetched by the
+>     demultiplexer thread becomes overwritten during use.
+>
+>     Code review identified a race between the demultiplexer thread and the
+>     request issuing thread. The demultiplexer thread seems to be written
+>     with the assumption that it is the sole user of the mid object until
+>     it calls the mid callback which either wakes the issuer task or
+>     deletes the mid.
+>
+>     This assumption is not true because the issuer task can be woken up
+>     earlier by a signal. If the demultiplexer thread has proceeded as far
+>     as setting the mid_state to MID_RESPONSE_RECEIVED then the issuer
+>     thread will happily end up calling cifs_delete_mid while the
+>     demultiplexer thread still is using the mid object.
+>
+>     Inserting a delay in the cifs demultiplexer thread widens the race
+>     window and makes reproduction of the race very easy:
+>
+>                     if (server->large_buf)
+>                             buf = server->bigbuf;
+>
+>     +               usleep_range(500, 4000);
+>
+>                     server->lstrp = jiffies;
+>
+>     To resolve this I think the proper solution involves putting a
+>     reference count on the mid object. This patch makes sure that the
+>     demultiplexer thread holds a reference until it has finished
+>     processing the transaction.
+>
+>     Cc: stable@vger.kernel.org
+>     Signed-off-by: Lars Persson <larper@axis.com>
+>     Acked-by: Paulo Alcantara <palcantara@suse.de>
+>     Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+>     Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+>     Signed-off-by: Steve French <stfrench@microsoft.com>
+>
+> --------------------------------------
+>
+> The similar solution of taking an extra reference should apply to the case of reconnect as well. The reference should be taken during the process of moving mid entries to the private list. Once a callback completes, such a reference should be put back thus freeing the mid.
+>
+
+Ah ok very good.  The above seems consistent with the traces I'm
+seeing of the race.
+I am going to test this patch as it sounds like what you're describing
+and similar to what Ronnie suggested earlier:
+
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -564,6 +564,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+        spin_lock(&GlobalMid_Lock);
+        list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+                mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
++               kref_get(&mid_entry->refcount);
+                if (mid_entry->mid_state == MID_REQUEST_SUBMITTED)
+                        mid_entry->mid_state = MID_RETRY_NEEDED;
+                list_move(&mid_entry->qhead, &retry_list);
+@@ -576,6 +577,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+                mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+                list_del_init(&mid_entry->qhead);
+                mid_entry->callback(mid_entry);
++               cifs_mid_q_entry_release(mid_entry);
+        }
+
+        if (cifs_rdma_enabled(server)) {
+
+
+
+
+
+
+> -----Original Message-----
+> From: David Wysochanski <dwysocha@redhat.com>
+> Sent: Thursday, October 17, 2019 8:30 AM
+> To: Ronnie Sahlberg <lsahlber@redhat.com>
+> Cc: Pavel Shilovskiy <pshilov@microsoft.com>; linux-cifs <linux-cifs@vger.kernel.org>; Frank Sorenson <sorenson@redhat.com>
+> Subject: Re: list_del corruption while iterating retry_list in cifs_reconnect still seen on 5.4-rc3
+>
+> On Thu, Oct 17, 2019 at 10:08 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+> >
+> > List, Pavel,
+> >
+> > So I think there are two bugs we need to fix in this small block to make it safe against a race against other threads calling cifs_delete_mid() and similar.
+> >
+> > We need to to protect the list mutate functions and wrap them inside
+> > the GlobalMid_Lock mutex but we can not hold this lock across the callback call.
+> >
+> > But we still need to protect the mid_entry dereference and the
+> > ->callback call against the mid structure being freed by
+> > DeleteMidQEntry().  We can do that by taking out an extra reference to the mid while holding the GlobalMid_Lock and then dropping the reference again after the callback completes.
+> >
+> >
+> > I think something like this might work :
+> >
+> >
+> >
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c index
+> > bdea4b3e8005..3a1a9b63bd9b 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -572,11 +572,19 @@ cifs_reconnect(struct TCP_Server_Info *server)
+> >         mutex_unlock(&server->srv_mutex);
+> >
+> >         cifs_dbg(FYI, "%s: issuing mid callbacks\n", __func__);
+> > +       spin_lock(&GlobalMid_Lock);
+> >         list_for_each_safe(tmp, tmp2, &retry_list) {
+> >                 mid_entry = list_entry(tmp, struct mid_q_entry,
+> > qhead);
+>
+> I think you need a reference before this and something like if (mid->mid_flags ...)  /* check for someone else already deleting it */ ; else
+> >                 list_del_init(&mid_entry->qhead);
+>
+> I am still tracing and I do not see the root of the problem yet.
+> Unsurprisingly, it looks like a use after free though.
+>
+>
+> > +               kref_get(&mid_entry->refcount);
+> > +               spin_unlock(&GlobalMid_Lock);
+> > +
+> >                 mid_entry->callback(mid_entry);
+> > +               cifs_mid_q_entry_release(mid_entry);
+> > +
+> > +               spin_lock(&GlobalMid_Lock);
+> >         }
+> > +       spin_unlock(&GlobalMid_Lock);
+> >
+> >         if (cifs_rdma_enabled(server)) {
+> >                 mutex_lock(&server->srv_mutex);
+> >
+> >
+> > Pavel, can you have a look at this and comment?  It is very delicate code so it needs careful review.
+> >
+> >
+> > regards
+> > ronnie sahlberg
+> >
+> >
+> >
+> > ----- Original Message -----
+> > From: "David Wysochanski" <dwysocha@redhat.com>
+> > To: "Ronnie Sahlberg" <lsahlber@redhat.com>
+> > Cc: "linux-cifs" <linux-cifs@vger.kernel.org>, "Frank Sorenson"
+> > <sorenson@redhat.com>
+> > Sent: Thursday, 17 October, 2019 9:42:08 PM
+> > Subject: Re: list_del corruption while iterating retry_list in
+> > cifs_reconnect still seen on 5.4-rc3
+> >
+> > On Thu, Oct 17, 2019 at 5:05 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+> > >
+> > >
+> > >
+> > > > > 575-->    list_for_each_safe(tmp, tmp2, &retry_list) {
+> > > > > 576         mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+> > > > > 577         list_del_init(&mid_entry->qhead);
+> > > > > 578         mid_entry->callback(mid_entry);
+> > > > > 579     }
+> > >
+> > > This part (and a similar loop during shutting down the demultiplex
+> > > thread) is the only place where we add/remove to the ->qhead list without holding the GlobalMid_Lock.
+> > >
+> > > I wonder if it is racing against a different thread also modifying
+> > > qhead for the same mid, like cifs_delete_mid() for example.
+> > >
+> >
+> > Yes I agree, I was thinking along these same lines of reasoning as I
+> > read the code.  I put the latest on the investigation into the bug:
+> > https://nam06.safelinks.protection.outlook.com/?url=https%3A%2F%2Fbugz
+> > illa.redhat.com%2Fshow_bug.cgi%3Fid%3D1654538%23c15&amp;data=02%7C01%7
+> > Cpshilov%40microsoft.com%7C3f7f3981d44f4cac5afc08d75316efe8%7C72f988bf
+> > 86f141af91ab2d7cd011db47%7C1%7C0%7C637069230291690406&amp;sdata=0P%2Bj
+> > YJWfBSHXGUNPZEeZR4W9tOb2%2BGCC1WtDmiyzpEI%3D&amp;reserved=0
+> >
+> > Just before the crash, when we hit the iteration of retry_list
+> > something has gone wrong - the very first mid_entry on retry_list is a
+> > garbage address, when normally it should be the last address from the
+> > previous call to list_move in the loop above it.
+> >
+> >
+> >  ----- Original Message -----
+> > > > From: "Ronnie Sahlberg" <lsahlber@redhat.com>
+> > > > To: "David Wysochanski" <dwysocha@redhat.com>
+> > > > Cc: "linux-cifs" <linux-cifs@vger.kernel.org>, "Frank Sorenson"
+> > > > <sorenson@redhat.com>
+> > > > Sent: Thursday, 17 October, 2019 10:17:18 AM
+> > > > Subject: Re: list_del corruption while iterating retry_list in
+> > > > cifs_reconnect still seen on 5.4-rc3
+> > > >
+> > > > I can not reproduce this :-(
+> > > >
+> > > > I have run it for a few hours, restarting samba in a loop with up
+> > > > to 30 threads.
+> > > >
+> >
+> > I am not sure if it helps but I have 8 CPUs on my VM.
+> > I also have server signing and client signing mandatory.
+> > I can send you the smb.conf offline.
+> >
+> >
+> > > >
+> > > > Can you check
+> > > > 1, If this only reproduce for you for the root of the share or it
+> > > > also reproduces for a subdirectory?
+> > > > 2, Does it reproduce also if you use "nohandlecache" mount option?
+> > > >    This disables the use of cached open of the root handle, i.e.
+> > > >    open_shroot()
+> > > > 3, When this happens, can you check the content of the mid entry
+> > > > and what these fields are:
+> > > >    mid->mid_flags, mid->handle (this is a function pointer, what does it
+> > > >    point to)
+> > > >    mid->command.   Maybe print the whole structure.
+> > > >
+> >
+> > Ok I'll see what I can find out.  So far I am not sure I have
+> > identified what else is touching the mid in between the two loops.
+> >
+> > > > regards
+> > > > ronnie sahlberg
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > ----- Original Message -----
+> > > > > From: "David Wysochanski" <dwysocha@redhat.com>
+> > > > > To: "linux-cifs" <linux-cifs@vger.kernel.org>
+> > > > > Cc: "Frank Sorenson" <sorenson@redhat.com>
+> > > > > Sent: Thursday, 17 October, 2019 5:27:02 AM
+> > > > > Subject: list_del corruption while iterating retry_list in
+> > > > > cifs_reconnect still seen on 5.4-rc3
+> > > > >
+> > > > > I think this has been there for a long time, since we first saw
+> > > > > this on a 4.18.0 based kernel but I just noticed the bug recently.
+> > > > > I just retested on 5.4-rc3 and it's still there.  Easy to repro
+> > > > > with a fairly simple but invasive server restart test - takes
+> > > > > only maybe a couple minutes on my VM.
+> > > > >
+> > > > >
+> > > > > From Frank Sorenson:
+> > > > >
+> > > > > mount off a samba server:
+> > > > >
+> > > > >     # mount //vm1/share /mnt/vm1
+> > > > > -overs=2.1,hard,sec=ntlmssp,credentials=/root/.smb_creds
+> > > > >
+> > > > >
+> > > > > on the client, start 10 'find' loops:
+> > > > >
+> > > > >     # export test_path=/mnt/vm1
+> > > > >     # do_find() { while true ; do find $test_path >/dev/null
+> > > > > 2>&1 ; done }
+> > > > >
+> > > > >     # for i in {1..10} ; do do_find & done
+> > > > >
+> > > > >
+> > > > > optional:  also start something to monitor for when the hang occurs:
+> > > > >
+> > > > >     # while true ; do count=$(grep smb2_reconnect /proc/*/stack
+> > > > > -A3 | grep -c open_shroot) ; [[ $count -gt 0 ]] && { echo "$(date):
+> > > > > reproduced bug" ; break ; } ; echo "$(date): stayin' alive" ;
+> > > > > sleep 2 ; done
+> > > > >
+> > > > >
+> > > > >
+> > > > > On the samba server:  restart smb.service (loop it in case it
+> > > > > requires more than one restart):
+> > > > >
+> > > > >     # while true ; do echo "$(date): restarting" ; systemctl
+> > > > > restart smb.service ; sleep 5 ; done | tee
+> > > > > /var/tmp/smb_restart_log.out
+> > > > >
+> > > > >
+> > > > >
+> > > > >
+> > > > > [  430.454897] list_del corruption. prev->next should be
+> > > > > ffff98d3a8f316c0, but was 2e885cb266355469 [  430.464668]
+> > > > > ------------[ cut here ]------------ [  430.466569] kernel BUG
+> > > > > at lib/list_debug.c:51!
+> > > > > [  430.468476] invalid opcode: 0000 [#1] SMP PTI [  430.470286]
+> > > > > CPU: 0 PID: 13267 Comm: cifsd Kdump: loaded Not tainted
+> > > > > 5.4.0-rc3+ #19 [  430.473472] Hardware name: Red Hat KVM, BIOS
+> > > > > 0.5.1 01/01/2011 [  430.475872] RIP:
+> > > > > 0010:__list_del_entry_valid.cold+0x31/0x55
+> > > > > [  430.478129] Code: 5e 15 8e e8 54 a3 c5 ff 0f 0b 48 c7 c7 78
+> > > > > 5f 15 8e e8 46 a3 c5 ff 0f 0b 48 89 f2 48 89 fe 48 c7 c7 38 5f
+> > > > > 15 8e e8 32
+> > > > > a3 c5 ff <0f> 0b 48 89 fe 4c 89 c2 48 c7 c7 00 5f 15 8e e8 1e a3
+> > > > > c5 ff 0f 0b [  430.485563] RSP: 0018:ffffb4db0042fd38 EFLAGS:
+> > > > > 00010246 [  430.487665] RAX: 0000000000000054 RBX:
+> > > > > ffff98d3aabb8800 RCX:
+> > > > > 0000000000000000
+> > > > > [  430.490513] RDX: 0000000000000000 RSI: ffff98d3b7a17908 RDI:
+> > > > > ffff98d3b7a17908
+> > > > > [  430.493383] RBP: ffff98d3a8f316c0 R08: ffff98d3b7a17908 R09:
+> > > > > 0000000000000285
+> > > > > [  430.496258] R10: ffffb4db0042fbf0 R11: ffffb4db0042fbf5 R12:
+> > > > > ffff98d3aabb89c0
+> > > > > [  430.499113] R13: ffffb4db0042fd48 R14: 2e885cb266355469 R15:
+> > > > > ffff98d3b24c4480
+> > > > > [  430.501981] FS:  0000000000000000(0000)
+> > > > > GS:ffff98d3b7a00000(0000)
+> > > > > knlGS:0000000000000000
+> > > > > [  430.505232] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > > > [  430.507546] CR2: 00007f08cd17b9c0 CR3: 000000023484a000 CR4:
+> > > > > 00000000000406f0
+> > > > > [  430.510426] Call Trace:
+> > > > > [  430.511500]  cifs_reconnect+0x25e/0x610 [cifs] [  430.513350]
+> > > > > cifs_readv_from_socket+0x220/0x250 [cifs] [  430.515464]
+> > > > > cifs_read_from_socket+0x4a/0x70 [cifs] [  430.517452]  ?
+> > > > > try_to_wake_up+0x212/0x650 [  430.519122]  ?
+> > > > > cifs_small_buf_get+0x16/0x30 [cifs] [  430.521086]  ?
+> > > > > allocate_buffers+0x66/0x120 [cifs] [  430.523019]
+> > > > > cifs_demultiplex_thread+0xdc/0xc30 [cifs] [  430.525116]
+> > > > > kthread+0xfb/0x130 [  430.526421]  ?
+> > > > > cifs_handle_standard+0x190/0x190 [cifs] [  430.528514]  ?
+> > > > > kthread_park+0x90/0x90 [  430.530019]  ret_from_fork+0x35/0x40 [
+> > > > > 430.531487] Modules linked in: cifs libdes libarc4 ip6t_rpfilter
+> > > > > ip6t_REJECT nf_reject_ipv6 xt_conntrack ebtable_nat ip6table_nat
+> > > > > ip6table_mangle ip6table_raw ip6table_security iptable_nat
+> > > > > nf_nat iptable_mangle iptable_raw iptable_security nf_conntrack
+> > > > > nf_defrag_ipv6 nf_defrag_ipv4 ip_set nfnetlink ebtable_filter
+> > > > > ebtables ip6table_filter ip6_tables crct10dif_pclmul
+> > > > > crc32_pclmul joydev virtio_balloon ghash_clmulni_intel i2c_piix4
+> > > > > nfsd nfs_acl lockd auth_rpcgss grace sunrpc xfs libcrc32c
+> > > > > virtio_net net_failover crc32c_intel virtio_console serio_raw
+> > > > > virtio_blk ata_generic failover pata_acpi qemu_fw_cfg [
+> > > > > 430.552782] ---[ end trace c91d4468f8689482 ]--- [  430.554948]
+> > > > > RIP: 0010:__list_del_entry_valid.cold+0x31/0x55
+> > > > > [  430.557251] Code: 5e 15 8e e8 54 a3 c5 ff 0f 0b 48 c7 c7 78
+> > > > > 5f 15 8e e8 46 a3 c5 ff 0f 0b 48 89 f2 48 89 fe 48 c7 c7 38 5f
+> > > > > 15 8e e8 32
+> > > > > a3 c5 ff <0f> 0b 48 89 fe 4c 89 c2 48 c7 c7 00 5f 15 8e e8 1e a3
+> > > > > c5 ff 0f 0b [  430.565019] RSP: 0018:ffffb4db0042fd38 EFLAGS:
+> > > > > 00010246 [  430.567181] RAX: 0000000000000054 RBX:
+> > > > > ffff98d3aabb8800 RCX:
+> > > > > 0000000000000000
+> > > > > [  430.570073] RDX: 0000000000000000 RSI: ffff98d3b7a17908 RDI:
+> > > > > ffff98d3b7a17908
+> > > > > [  430.572955] RBP: ffff98d3a8f316c0 R08: ffff98d3b7a17908 R09:
+> > > > > 0000000000000285
+> > > > > [  430.575854] R10: ffffb4db0042fbf0 R11: ffffb4db0042fbf5 R12:
+> > > > > ffff98d3aabb89c0
+> > > > > [  430.578745] R13: ffffb4db0042fd48 R14: 2e885cb266355469 R15:
+> > > > > ffff98d3b24c4480
+> > > > > [  430.581624] FS:  0000000000000000(0000)
+> > > > > GS:ffff98d3b7a00000(0000)
+> > > > > knlGS:0000000000000000
+> > > > > [  430.584881] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > > > [  430.587230] CR2: 00007f08cd17b9c0 CR3: 000000023484a000 CR4:
+> > > > > 00000000000406f0
+> > > > >
+> > > > >
+> > > > > crash> dis -lr cifs_reconnect+0x25e | tail --lines=20
+> > > > > 0xffffffffc062dc26 <cifs_reconnect+0x226>:      movb
+> > > > > $0x0,0xbb36b(%rip)        # 0xffffffffc06e8f98 <GlobalMid_Lock>
+> > > > > /mnt/build/kernel/fs/cifs/connect.c: 572
+> > > > > 0xffffffffc062dc2d <cifs_reconnect+0x22d>:      mov    %r12,%rdi
+> > > > > 0xffffffffc062dc30 <cifs_reconnect+0x230>:      callq
+> > > > > 0xffffffff8d9d5a20 <mutex_unlock>
+> > > > > /mnt/build/kernel/fs/cifs/connect.c: 574
+> > > > > 0xffffffffc062dc35 <cifs_reconnect+0x235>:      testb
+> > > > > $0x1,0xbb300(%rip)        # 0xffffffffc06e8f3c <cifsFYI>
+> > > > > 0xffffffffc062dc3c <cifs_reconnect+0x23c>:      je
+> > > > > 0xffffffffc062dc43 <cifs_reconnect+0x243>
+> > > > > /mnt/build/kernel/./arch/x86/include/asm/jump_label.h: 25
+> > > > > 0xffffffffc062dc3e <cifs_reconnect+0x23e>:      data32 data32 data32
+> > > > > xchg %ax,%ax
+> > > > > /mnt/build/kernel/fs/cifs/connect.c: 575
+> > > > > 0xffffffffc062dc43 <cifs_reconnect+0x243>:      mov    0x8(%rsp),%rbp
+> > > > > 0xffffffffc062dc48 <cifs_reconnect+0x248>:      mov    0x0(%rbp),%r14
+> > > > > 0xffffffffc062dc4c <cifs_reconnect+0x24c>:      cmp    %r13,%rbp
+> > > > > 0xffffffffc062dc4f <cifs_reconnect+0x24f>:      jne
+> > > > > 0xffffffffc062dc56 <cifs_reconnect+0x256>
+> > > > > 0xffffffffc062dc51 <cifs_reconnect+0x251>:      jmp
+> > > > > 0xffffffffc062dc90 <cifs_reconnect+0x290>
+> > > > > 0xffffffffc062dc53 <cifs_reconnect+0x253>:      mov    %rax,%r14
+> > > > > /mnt/build/kernel/./include/linux/list.h: 190
+> > > > > 0xffffffffc062dc56 <cifs_reconnect+0x256>:      mov    %rbp,%rdi
+> > > > > 0xffffffffc062dc59 <cifs_reconnect+0x259>:      callq
+> > > > > 0xffffffff8d4e6b00 <__list_del_entry_valid>
+> > > > > 0xffffffffc062dc5e <cifs_reconnect+0x25e>:      test   %al,%al
+> > > > >
+> > > > >
+> > > > > fs/cifs/connect.c
+> > > > > 566         mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+> > > > > 567         if (mid_entry->mid_state == MID_REQUEST_SUBMITTED)
+> > > > > 568             mid_entry->mid_state = MID_RETRY_NEEDED;
+> > > > > 569         list_move(&mid_entry->qhead, &retry_list);
+> > > > > 570     }
+> > > > > 571     spin_unlock(&GlobalMid_Lock);
+> > > > > 572     mutex_unlock(&server->srv_mutex);
+> > > > > 573
+> > > > > 574     cifs_dbg(FYI, "%s: issuing mid callbacks\n", __func__);
+> > > > > 575-->    list_for_each_safe(tmp, tmp2, &retry_list) {
+> > > > > 576         mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+> > > > > 577         list_del_init(&mid_entry->qhead);
+> > > > > 578         mid_entry->callback(mid_entry);
+> > > > > 579     }
+> > > > > 580
+> > > > > 581     if (cifs_rdma_enabled(server)) {
+> > > > > 582         mutex_lock(&server->srv_mutex);
+> > > > > 583         smbd_destroy(server);
+> > > > > 584         mutex_unlock(&server->srv_mutex);
+> > > > >
+> > > >
+> >
+> >
+> >
+> > --
+> > Dave Wysochanski
+> > Principal Software Maintenance Engineer
+> > T: 919-754-4024
+>
+>
+>
+> --
+> Dave Wysochanski
+> Principal Software Maintenance Engineer
+> T: 919-754-4024
