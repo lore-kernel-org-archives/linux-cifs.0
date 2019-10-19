@@ -1,162 +1,395 @@
-Return-Path: <SRS0=SV7R=YL=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=C9ZR=YM=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7223CCA9EA0
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Oct 2019 22:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B12ADCA9EAC
+	for <linux-cifs@archiver.kernel.org>; Sat, 19 Oct 2019 09:44:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29FF620679
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Oct 2019 22:45:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="IbRrRiNB"
+	by mail.kernel.org (Postfix) with ESMTP id 84051222C2
+	for <linux-cifs@archiver.kernel.org>; Sat, 19 Oct 2019 09:44:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730838AbfJRWpo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Oct 2019 18:45:44 -0400
-Received: from mail-eopbgr740118.outbound.protection.outlook.com ([40.107.74.118]:31541
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726458AbfJRWpo (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 18 Oct 2019 18:45:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fGbfNa+3iKMmkLPTfSLmNBmKBAMybZpiToB8AYb6AhcgsRodtJqOUQeq20TfjYW2WOextehisA6D4PQKKJqKWyi9X7kJLY/3EzBbs8VBLVb2HP7wWH3wnnCyjtwjVhn5BiXg5QVWEZUhSfrOPOJv0dZAl81RVR9nr8UF4EYM0XdlU0sF+lNoH1oWFVWmYZ9EY5CMaMq1jmYiZyErLl2GTZtf/8QSIG9Od2FJfhq9CGCX4EIO2/zpN6bQEy4Kwn5pF+ZrQgdVAcOl4p6g6ZJThAW8X9+bToOteEtAKpFW2ODce8d3xtDcMfURf6kEAQiarrf9OCwpC3ckL761uJtPYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ReIK8voV0Xcs1Mic+mHEJd3ilxy1PhvCmfnCXuw5PDk=;
- b=FR8ATEyzyuz0YvvY3m/venVDCUUtfW5j6jmtus+tvXW+TewayaB8Nc3nMDL1WU8RMHDS7w3j/Da4t+U3WghWSNoPN1b+Nz9LEH5tGVqPoFBRpD4CbROwfOJuk1+drly0WMHjud0VS8F7DzdIXKLaYhtQjoDuqx3Z+5yATq2kolGhodilC9SAzLkYpY7A2TobVDnXVEIi5/zqdcSbo5cUahdsBpGOrDaDpcz61xCTNbeF6Firb8NtammNGy3bE417LsbiMEUbW9z1VjXAdUm/mYaN6v7tysEiAk6RQgPvT+EPwkESd9NqLolRAKf0rbGXwWm8uvSFrJX6xTwSMoPhng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ReIK8voV0Xcs1Mic+mHEJd3ilxy1PhvCmfnCXuw5PDk=;
- b=IbRrRiNBhqaDs47Ar+1QTVvmRFPqTTXvIqvKYJUhTSLgA3EUbw8CbJJNv9R7gKPk1qDYciWSpvcCJokMpBH0ITfTl5ZqStO8QZ8F0HcDKu0bxQBJJKYSRbnUyjQNH0zSfn9NASJ5PoWQddIKwJHVf1AT41SeFunJTMrVNl0Qfl4=
-Received: from DM5PR21MB0185.namprd21.prod.outlook.com (10.173.173.136) by
- DM5PR21MB0746.namprd21.prod.outlook.com (10.173.172.12) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2387.8; Fri, 18 Oct 2019 22:45:40 +0000
-Received: from DM5PR21MB0185.namprd21.prod.outlook.com
- ([fe80::40b9:1196:e1ef:8fa4]) by DM5PR21MB0185.namprd21.prod.outlook.com
- ([fe80::40b9:1196:e1ef:8fa4%11]) with mapi id 15.20.2387.010; Fri, 18 Oct
- 2019 22:45:40 +0000
-From:   Pavel Shilovskiy <pshilov@microsoft.com>
+        id S1726554AbfJSJoz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 19 Oct 2019 05:44:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46856 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725938AbfJSJoy (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 19 Oct 2019 05:44:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 05DBF18C4267;
+        Sat, 19 Oct 2019 09:44:54 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F1FF55C21A;
+        Sat, 19 Oct 2019 09:44:53 +0000 (UTC)
+Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id DF3A318089DC;
+        Sat, 19 Oct 2019 09:44:53 +0000 (UTC)
+Date:   Sat, 19 Oct 2019 05:44:53 -0400 (EDT)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     David Wysochanski <dwysocha@redhat.com>
-CC:     Ronnie Sahlberg <lsahlber@redhat.com>,
+Cc:     Pavel Shilovskiy <pshilov@microsoft.com>,
         linux-cifs <linux-cifs@vger.kernel.org>,
         Frank Sorenson <sorenson@redhat.com>
-Subject: RE: list_del corruption while iterating retry_list in cifs_reconnect
- still seen on 5.4-rc3
-Thread-Topic: list_del corruption while iterating retry_list in cifs_reconnect
- still seen on 5.4-rc3
-Thread-Index: AQHVhFfJ9oP6OHPYNEeW5MnF2E27oqdd98kAgACTlgCAACvBAIAAKOAAgAAWtQCAADArYIAAEQ8AgAAJKVCAAArhgIAAE4yAgAAC0eDft33iN6BJL9qAgAATzgCAAAxsgIAAsG0AgAAKh4CAAAZ5gIAABw4Q
-Date:   Fri, 18 Oct 2019 22:45:40 +0000
-Message-ID: <DM5PR21MB01851871D57ABCF685712C76B66C0@DM5PR21MB0185.namprd21.prod.outlook.com>
-References: <CALF+zOkugWpn6aCApqj8dF+AovgbQ8zgC-Hf8_0uvwqwHYTPiw@mail.gmail.com>
- <CALF+zO=8ZJkqR951NsxOf4hDDyUZzMfyiEN-j8DgA+i+FzcfGw@mail.gmail.com>
- <DM5PR21MB018515AFDDDE766D318BC489B66D0@DM5PR21MB0185.namprd21.prod.outlook.com>
- <CALF+zOmz5LFkzHrLpLGWcfwkOD7s-VhVz39pFgMNAFRT9_-KYg@mail.gmail.com>
- <58429039.7213410.1571348691819.JavaMail.zimbra@redhat.com>
- <DM5PR21MB0185FD6A138A5682BB9DE310B66D0@DM5PR21MB0185.namprd21.prod.outlook.com>
- <106934753.7215598.1571352823170.JavaMail.zimbra@redhat.com>
- <CALF+zOn-J9KyDDTL6dJ23RbQ9Gh+V3ti+4-O051zqOur6Fv-PA@mail.gmail.com>
- <1884745525.7250940.1571390858862.JavaMail.zimbra@redhat.com>
- <CALF+zOkmFMtxsnrUR-anXOdMzUFxtAWG+VYLAQuq3DJuH=eDMw@mail.gmail.com>
- <DM5PR21MB0185857761946DBE12AEB3ADB66C0@DM5PR21MB0185.namprd21.prod.outlook.com>
- <CALF+zO=heBJSLW4ELPAwKegL3rJQiSebCLAh=4syEtPYoaevgA@mail.gmail.com>
- <CALF+zO=BUC2pCcz=n6hBx7ZPsL8gABLqx_hBQXVC=OOLJ-DDig@mail.gmail.com>
-In-Reply-To: <CALF+zO=BUC2pCcz=n6hBx7ZPsL8gABLqx_hBQXVC=OOLJ-DDig@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=pshilov@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-10-18T22:45:38.6877333Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=01011192-3e96-42cf-84e8-82d1eed5c61e;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pshilov@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:0:2c8b:427a:370f:b81]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 30c3e9c1-e1da-4038-12c0-08d7541ce6db
-x-ms-office365-filtering-ht: Tenant
-x-ms-traffictypediagnostic: DM5PR21MB0746:
-x-microsoft-antispam-prvs: <DM5PR21MB0746496775C8DA3940726FAAB66C0@DM5PR21MB0746.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01949FE337
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(376002)(396003)(346002)(39860400002)(366004)(136003)(51914003)(189003)(199004)(10290500003)(71200400001)(52536014)(2906002)(33656002)(10090500001)(478600001)(76176011)(102836004)(6506007)(66476007)(8990500004)(53546011)(99286004)(5660300002)(4326008)(66556008)(22452003)(9686003)(54906003)(6436002)(8936002)(305945005)(7696005)(71190400001)(55016002)(81166006)(66446008)(81156014)(6246003)(316002)(64756008)(8676002)(74316002)(66946007)(5024004)(6916009)(76116006)(486006)(14454004)(476003)(186003)(256004)(14444005)(11346002)(7736002)(6116002)(46003)(446003)(229853002)(25786009)(86362001);DIR:OUT;SFP:1102;SCL:1;SRVR:DM5PR21MB0746;H:DM5PR21MB0185.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: MUgiktydF7Ez/WAJ5VquBsLS3fSLNKz1ORvd/as0dz9CFZ2NflumhaMUzdPyuEPrSrMQA+FhNtWPRHmyp/MmiyexjvWu0BQK88grU1lh14HJKiLTkZK7N4u6K9mULqESKV7DCQH5zNMRT2o7UPIRRjRmrijrpOxtRH0+OfQCMEZM9pkVu+TjfUSKYwM/llxbp+MqNTBiqj7sJqodHbkmd+E/wJhwkzlKiv3Zt6wXOi6P0/iz6c+G7U69v8ogZe6GLqWt5jVWJ6vMG5tfO2U7pUnezo94tT7CxqHU7mkWa70ddIo02gYeRraw/nOE9IFWJDF83fbx7tY+FPuATHQhWe34SyiOKOm1kX1KKs/JRQqJ+PREbTsVXjUuJMVOsTxUEuio1i0Q9bo37FQIKKZM6V7S4KlBvOcRYuc0Y2QXcFY=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Message-ID: <634184076.7383590.1571478293664.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CALF+zOn-J9KyDDTL6dJ23RbQ9Gh+V3ti+4-O051zqOur6Fv-PA@mail.gmail.com>
+References: <CALF+zOkugWpn6aCApqj8dF+AovgbQ8zgC-Hf8_0uvwqwHYTPiw@mail.gmail.com> <CALF+zO=8ZJkqR951NsxOf4hDDyUZzMfyiEN-j8DgA+i+FzcfGw@mail.gmail.com> <DM5PR21MB018515AFDDDE766D318BC489B66D0@DM5PR21MB0185.namprd21.prod.outlook.com> <CALF+zOmz5LFkzHrLpLGWcfwkOD7s-VhVz39pFgMNAFRT9_-KYg@mail.gmail.com> <58429039.7213410.1571348691819.JavaMail.zimbra@redhat.com> <DM5PR21MB0185FD6A138A5682BB9DE310B66D0@DM5PR21MB0185.namprd21.prod.outlook.com> <106934753.7215598.1571352823170.JavaMail.zimbra@redhat.com> <CALF+zOn-J9KyDDTL6dJ23RbQ9Gh+V3ti+4-O051zqOur6Fv-PA@mail.gmail.com>
+Subject: Re: list_del corruption while iterating retry_list in
+ cifs_reconnect still seen on 5.4-rc3
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 30c3e9c1-e1da-4038-12c0-08d7541ce6db
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Oct 2019 22:45:40.3977
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QwyKXwwvmNmHARBPUzGSQi6z76Bd4yKOe2TxZO0XmYOzfXpdGNX+YmBtKq3xt14+JHIpQMMMcLrgxgJYSpu7kw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR21MB0746
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.64.54.116, 10.4.195.22]
+Thread-Topic: list_del corruption while iterating retry_list in cifs_reconnect still seen on 5.4-rc3
+Thread-Index: kFX2uIL3pjskiJLlGmL9dbIzeUIUCA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.62]); Sat, 19 Oct 2019 09:44:54 +0000 (UTC)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-T24gRnJpLCBPY3QgMTgsIDIwMTkgYXQgNToyMSBQTSBEYXZpZCBXeXNvY2hhbnNraSA8ZHd5c29j
-aGFAcmVkaGF0LmNvbT4gd3JvdGU6DQo+DQo+IE9uIEZyaSwgT2N0IDE4LCAyMDE5IGF0IDQ6NTkg
-UE0gUGF2ZWwgU2hpbG92c2tpeSA8cHNoaWxvdkBtaWNyb3NvZnQuY29tPiB3cm90ZToNCj4gPg0K
-PiA+IFRoYW5rcyBmb3IgdGhlIGdvb2QgbmV3cyB0aGF0IHRoZSBwYXRjaCBpcyBzdGFibGUgaW4g
-eW91ciB3b3JrbG9hZCENCj4gPg0KPiBUaGUgYXR0YWNoZWQgcGF0Y2ggSSByYW4gb24gdG9wIG9m
-IDUuNC1yYzMgZm9yIG92ZXIgNSBocnMgdG9kYXkgb24gdGhlIA0KPiByZWJvb3QgdGVzdCAtIGJl
-Zm9yZSBpdCB3b3VsZCBjcmFzaCBhZnRlciBhIGZldyBtaW51dGVzIHRvcHMuDQoNClRoaXMgaXMg
-Z3JlYXQhIFRoYW5rcyBmb3IgdmVyaWZ5aW5nIHRoZSBmaXguDQoNCj4gPiBUaGUgZXh0cmEgZmxh
-ZyBtYXkgbm90IGJlIG5lY2Vzc2FyeSBhbmQgd2UgbWF5IHJlbHkgb24gYSBNSUQgc3RhdGUgYnV0
-IHdlIHdvdWxkIG5lZWQgdG8gaGFuZGxlIHR3byBzdGF0ZXMgYWN0dWFsbHk6IE1JRF9SRVRSWV9O
-RUVERUQgYW5kIE1JRF9TSFVURE9XTiAtIHNlZSBjbGVhbl9kZW11bHRpcGxleF9pbmZvKCkgd2hp
-Y2ggaXMgZG9pbmcgdGhlIHNhbWUgdGhpbmdzIHdpdGggbWlkIGFzIGNpZnNfcmVjb25uZWN0KCku
-IFBsZWFzZSBhZGQgcmVmIGNvdW50aW5nIHRvIGJvdGggZnVuY3Rpb25zIHNpbmNlIHRoZXkgYm90
-aCBjYW4gcmFjZSB3aXRoIHN5c3RlbSBjYWxsIHRocmVhZHMuDQo+ID4NCg0KPiBJIGFncmVlIHRo
-YXQgbG9vcCBoYXMgdGhlIHNhbWUgcHJvYmxlbS4gIEkgY2FuIGFkZCB0aGF0IHlvdSdyZSBvayB3
-aXRoIHRoZSBtaWRfc3RhdGUgYXBwcm9hY2guICBJIHRoaW5rIHRoZSBvbmx5IG90aGVyIG9wdGlv
-biBpcyBwcm9iYWJseSBhIGZsYWcgbGlrZSBSb25uaWUNCj4gc3VnZ2VzdGVkLg0KPiBJIHdpbGwg
-aGF2ZSB0byByZXZpZXcgdGhlIHN0YXRlIG1hY2hpbmUgbW9yZSB3aGVuIEkgYW0gbW9yZSBhbGVy
-dCBpZiB5b3UgYXJlIGNvbmNlcm5lZCBhYm91dCBwb3NzaWJsZSBzdWJ0bGUgcmVncmVzc2lvbnMu
-DQoNCkkgYW0gb2sgd2l0aCBib3RoIGFwcHJvYWNoZXMgYXMgbG9uZyBhcyB0aGUgc3RhYmxlIHBh
-dGNoIGlzIG1pbmltYWwuIFRoaW5raW5nIGFib3V0IHRoaXMgY29uZGl0aW9uYWwgYXNzaWdubWVu
-dCBvZiB0aGUgbWlkIHJldHJ5IHN0YXRlOiBJIGRvbid0IHRoaW5rIHRoZXJlIGlzIGFueSBjYXNl
-IGluIHRoZSBjdXJyZW50IGNvZGUgYmFzZSB3aGVyZSB0aGUgV0FSTl9PTiB5b3UgcHJvcG9zZWQg
-d291bGQgZmlyZSBidXQgSSBjYW4ndCBiZSBzdXJlIGFib3V0IGFsbCBwb3NzaWJsZSBzdGFibGUg
-a2VybmVsIHRoYXQgdGhlIHN0YWJsZSBwYXRjaCBpcyBnb2luZyB0byBiZSBhcHBsaWVkLg0KDQpB
-bm90aGVyIG1vcmUgZ2VuZXJhbCB0aG91Z2h0OiB3ZSBoYXZlIGNpZnNfZGVsZXRlX21pZCAtPiBE
-ZWxldGVNaWRRRW50cnkgLT4gX2NpZnNfbWlkX3FfZW50cnlfcmVsZWFzZSBjaGFpbiBvZiBjYWxs
-cyBhbmQgZXZlcnkgZnVuY3Rpb24gZnJlZXMgaXRzIG93biBwYXJ0IG9mIHRoZSBtaWQgZW50cnku
-IEkgdGhpbmsgd2Ugc2hvdWxkIG1lcmdlIHRoZSBsYXN0IHR3byBhdCBsZWFzdC4gSXQgd291bGQg
-YWxsb3cgdXMgdG8gZ3VhcmFudGVlIHRoYXQgaG9sZGluZyBhIHJlZmVyZW5jZSB0byB0aGUgbWlk
-IG1lYW5zOg0KDQoxKSB0aGUgbWlkIGl0c2VsZiBpcyB2YWxpZDsNCjIpIHRoZSBtaWQgcmVzcG9u
-c2UgYnVmZmVyIGlzIHZhbGlkOw0KMykgdGhlIG1pZCBpcyBpbiBhIGxpc3QgaWYgaXQgaXMgUkVR
-VUVTVF9TVUJNSVRURUQsIFJFVFJZX05FRURFRCBvciBTSFVURE9XTiBhbmQgaXMgbm90IGluIGEg
-bGlzdCBpZiBpdCBpcyBBTExPQ0FURUQsIFJFU1BPTlNFX1JFQ0VJVkVELCBSRVNQT05TRV9NQUxG
-T1JNRUQgb3IgRlJFRTsgdGhlIHJlbGVhc2UgZnVuY3Rpb24gc2hvdWxkIHJlbW92ZSB0aGUgbWlk
-IGZyb20gdGhlIGxpc3Qgb3Igd2FybiBhcHByb3ByaWF0ZWx5IGRlcGVuZGluZyBvbiBhIHN0YXRl
-IG9mIHRoZSBtaWQuDQoNClRoZSBtaWQgc3RhdGUgYW5kIGxpc3QgbG9jYXRpb24gYXJlIGNoYW5n
-ZWQgb25seSB3aGVuIHRoZSBHbG9iYWxNaWRfTG9jayBpcyBoZWxkLiBJbiB0aGlzIGNhc2UgY2lm
-c19kZWxldGVfbWlkIGlzIG5vdCBuZWVkZWQgdG9vIGJlY2F1c2UgYWxsIHdoYXQgaXQgZG9lcyB3
-aWxsIGJlIGRvbmUgaW4gdGhlIHJlbGVhc2UgZnVuY3Rpb24uIEkgdGhpbmsgdGhpcyB3b3VsZCBh
-bGxvdyB0byBhdm9pZCBhbGwgdGhlIHByb2JsZW1zIGRpc2N1c3NlZCBpbiB0aGlzIHRocmVhZCBi
-dXQgbG9va3MgdG9vIHJpc2t5IGZvciBzdGFibGUuDQoNCi0tDQpCZXN0IHJlZ2FyZHMsDQpQYXZl
-bCBTaGlsb3Zza3kNCg==
+Only comment is that in the header where  MID_RETRY_NEEDED is defined, please add a big comments to describe the semantics of this state and how it interacts with the reconnect logic.
+
+
+
+----- Original Message -----
+From: "David Wysochanski" <dwysocha@redhat.com>
+To: "Ronnie Sahlberg" <lsahlber@redhat.com>
+Cc: "Pavel Shilovskiy" <pshilov@microsoft.com>, "linux-cifs" <linux-cifs@vger.kernel.org>, "Frank Sorenson" <sorenson@redhat.com>
+Sent: Friday, 18 October, 2019 6:16:45 PM
+Subject: Re: list_del corruption while iterating retry_list in cifs_reconnect still seen on 5.4-rc3
+
+On Thu, Oct 17, 2019 at 6:53 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+>
+>
+>
+>
+>
+> ----- Original Message -----
+> > From: "Pavel Shilovskiy" <pshilov@microsoft.com>
+> > To: "Ronnie Sahlberg" <lsahlber@redhat.com>, "David Wysochanski" <dwysocha@redhat.com>
+> > Cc: "linux-cifs" <linux-cifs@vger.kernel.org>, "Frank Sorenson" <sorenson@redhat.com>
+> > Sent: Friday, 18 October, 2019 8:02:23 AM
+> > Subject: RE: list_del corruption while iterating retry_list in cifs_reconnect still seen on 5.4-rc3
+> >
+> > Ok, looking at cifs_delete_mid():
+> >
+> >  172 void
+> >  173 cifs_delete_mid(struct mid_q_entry *mid)
+> >  174 {
+> >  175 >-------spin_lock(&GlobalMid_Lock);
+> >  176 >-------list_del_init(&mid->qhead);
+> >  177 >-------mid->mid_flags |= MID_DELETED;
+> >  178 >-------spin_unlock(&GlobalMid_Lock);
+> >  179
+> >  180 >-------DeleteMidQEntry(mid);
+> >  181 }
+> >
+> > So, regardless of us taking references on the mid itself or not, the mid
+> > might be removed from the list. I also don't think taking GlobalMid_Lock
+> > would help much because the next mid in the list might be deleted from the
+> > list by another process while cifs_reconnect is calling callback for the
+> > current mid.
+> >
+
+Yes the above is consistent with my tracing the crash after the first
+initial refcount patch was applied.
+After the simple refcount patch, when iterating the retry_loop, it was
+processing an orphaned list with a single item over and over and
+eventually ran itself down to refcount == 0 and crashed like before.
+
+
+> > Instead, shouldn't we try marking the mid as being reconnected? Once we took
+> > a reference, let's mark mid->mid_flags with a new flag MID_RECONNECT under
+> > the GlobalMid_Lock. Then modify cifs_delete_mid() to check for this flag and
+> > do not remove the mid from the list if the flag exists.
+>
+> That could work. But then we should also use that flag to suppress the other places where we do a list_del*, so something like this ?
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 50dfd9049370..b324fff33e53 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1702,6 +1702,7 @@ static inline bool is_retryable_error(int error)
+>  /* Flags */
+>  #define   MID_WAIT_CANCELLED    1 /* Cancelled while waiting for response */
+>  #define   MID_DELETED            2 /* Mid has been dequeued/deleted */
+> +#define   MID_RECONNECT          4 /* Mid is being used during reconnect */
+>
+Do we need this extra flag?  Can just use  mid_state ==
+MID_RETRY_NEEDED in the necessary places?
+
+
+>  /* Types of response buffer returned from SendReceive2 */
+>  #define   CIFS_NO_BUFFER        0    /* Response buffer not returned */
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index bdea4b3e8005..b142bd2a3ef5 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -564,6 +564,8 @@ cifs_reconnect(struct TCP_Server_Info *server)
+>         spin_lock(&GlobalMid_Lock);
+>         list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+>                 mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+> +               kref_get(&mid_entry->refcount);
+> +               mid_entry->mid_flags |= MID_RECONNECT;
+>                 if (mid_entry->mid_state == MID_REQUEST_SUBMITTED)
+>                         mid_entry->mid_state = MID_RETRY_NEEDED;
+
+What happens if the state is wrong going in there, and it is not set
+to MID_RETRY_NEEDED, but yet we queue up the retry_list and run it
+below?
+Should the above 'if' check for MID_REQUEST_SUBMITTED be a WARN_ON
+followed by unconditionally setting the state?
+
+WARN_ON(mid_entry->mid_state != MID_REQUEST_SUBMITTED);
+/* Unconditionally set MID_RETRY_NEEDED */
+mid_etnry->mid_state = MID_RETRY_NEEDED;
+
+
+>                 list_move(&mid_entry->qhead, &retry_list);
+> @@ -575,7 +577,9 @@ cifs_reconnect(struct TCP_Server_Info *server)
+>         list_for_each_safe(tmp, tmp2, &retry_list) {
+>                 mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+>                 list_del_init(&mid_entry->qhead);
+> +
+>                 mid_entry->callback(mid_entry);
+> +               cifs_mid_q_entry_release(mid_entry);
+>         }
+>
+>         if (cifs_rdma_enabled(server)) {
+> @@ -895,7 +899,7 @@ dequeue_mid(struct mid_q_entry *mid, bool malformed)
+>         if (mid->mid_flags & MID_DELETED)
+>                 printk_once(KERN_WARNING
+>                             "trying to dequeue a deleted mid\n");
+> -       else
+> +       else if (!(mid->mid_flags & MID_RECONNECT))
+
+Instead of the above,
+
+ -       else
++          else if (mid_entry->mid_state == MID_RETRY_NEEDED)
+                  list_del_init(&mid->qhead);
+
+
+>         spin_unlock(&GlobalMid_Lock);
+>  }
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 308ad0f495e1..ba4b5ab9cf35 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -173,7 +173,8 @@ void
+>  cifs_delete_mid(struct mid_q_entry *mid)
+>  {
+>         spin_lock(&GlobalMid_Lock);
+> -       list_del_init(&mid->qhead);
+> +       if (!(mid->mid_flags & MID_RECONNECT))
+> +               list_del_init(&mid->qhead);
+
+Same check as above.
+
+
+>         mid->mid_flags |= MID_DELETED;
+>         spin_unlock(&GlobalMid_Lock);
+>
+> @@ -872,7 +873,8 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
+>                 rc = -EHOSTDOWN;
+>                 break;
+>         default:
+> -               list_del_init(&mid->qhead);
+> +               if (!(mid->mid_flags & MID_RECONNECT))
+> +                       list_del_init(&mid->qhead);
+
+Same check as above.
+
+>                 cifs_server_dbg(VFS, "%s: invalid mid state mid=%llu state=%d\n",
+>                          __func__, mid->mid, mid->mid_state);
+>                 rc = -EIO;
+>
+>
+> >
+> > --
+> > Best regards,
+> > Pavel Shilovsky
+> >
+> > -----Original Message-----
+> > From: Ronnie Sahlberg <lsahlber@redhat.com>
+> > Sent: Thursday, October 17, 2019 2:45 PM
+> > To: David Wysochanski <dwysocha@redhat.com>
+> > Cc: Pavel Shilovskiy <pshilov@microsoft.com>; linux-cifs
+> > <linux-cifs@vger.kernel.org>; Frank Sorenson <sorenson@redhat.com>
+> > Subject: Re: list_del corruption while iterating retry_list in cifs_reconnect
+> > still seen on 5.4-rc3
+> >
+> > Dave, Pavel
+> >
+> > If it takes longer to trigger it might indicate we are on the right path but
+> > there are additional places to fix.
+> >
+> > I still think you also need to protect the list mutate functions as well
+> > using the global mutex, so something like this :
+> >
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c index
+> > bdea4b3e8005..16705a855818 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -564,6 +564,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+> >         spin_lock(&GlobalMid_Lock);
+> >         list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+> >                 mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+> > +               kref_get(&mid_entry->refcount);
+> >                 if (mid_entry->mid_state == MID_REQUEST_SUBMITTED)
+> >                         mid_entry->mid_state = MID_RETRY_NEEDED;
+> >                 list_move(&mid_entry->qhead, &retry_list); @@ -572,11 +573,18
+> >                 @@ cifs_reconnect(struct TCP_Server_Info *server)
+> >         mutex_unlock(&server->srv_mutex);
+> >
+> >         cifs_dbg(FYI, "%s: issuing mid callbacks\n", __func__);
+> > +       spin_lock(&GlobalMid_Lock);
+> >         list_for_each_safe(tmp, tmp2, &retry_list) {
+> >                 mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+> >                 list_del_init(&mid_entry->qhead);
+> > +               spin_unlock(&GlobalMid_Lock);
+> > +
+> >                 mid_entry->callback(mid_entry);
+> > +               cifs_mid_q_entry_release(mid_entry);
+> > +
+> > +               spin_lock(&GlobalMid_Lock);
+> >         }
+> > +       spin_unlock(&GlobalMid_Lock);
+> >
+> >         if (cifs_rdma_enabled(server)) {
+> >                 mutex_lock(&server->srv_mutex);
+> >
+> >
+> > ----- Original Message -----
+> > From: "David Wysochanski" <dwysocha@redhat.com>
+> > To: "Pavel Shilovskiy" <pshilov@microsoft.com>
+> > Cc: "Ronnie Sahlberg" <lsahlber@redhat.com>, "linux-cifs"
+> > <linux-cifs@vger.kernel.org>, "Frank Sorenson" <sorenson@redhat.com>
+> > Sent: Friday, 18 October, 2019 6:34:53 AM
+> > Subject: Re: list_del corruption while iterating retry_list in cifs_reconnect
+> > still seen on 5.4-rc3
+> >
+> > Unfortunately that did not fix the list_del corruption.
+> > It did seem to run longer but I'm not sure runtime is meaningful.
+> >
+> > [ 1424.215537] list_del corruption. prev->next should be ffff8d9b74c84d80,
+> > but was a6787a60550c54a9 [ 1424.232688] ------------[ cut here ]------------
+> > [ 1424.234535] kernel BUG at lib/list_debug.c:51!
+> > [ 1424.236502] invalid opcode: 0000 [#1] SMP PTI [ 1424.238334] CPU: 5 PID:
+> > 10212 Comm: cifsd Kdump: loaded Not tainted 5.4.0-rc3-fix1+ #33 [
+> > 1424.241489] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011 [
+> > 1424.243770] RIP: 0010:__list_del_entry_valid.cold+0x31/0x55
+> > [ 1424.245972] Code: 5e 15 b5 e8 54 a3 c5 ff 0f 0b 48 c7 c7 70 5f 15
+> > b5 e8 46 a3 c5 ff 0f 0b 48 89 f2 48 89 fe 48 c7 c7 30 5f 15 b5 e8 32
+> > a3 c5 ff <0f> 0b 48 89 fe 4c 89 c2 48 c7 c7 f8 5e 15 b5 e8 1e a3 c5 ff 0f 0b
+> > [ 1424.253409] RSP: 0018:ffff9a12404b3d38 EFLAGS: 00010246 [ 1424.255576]
+> > RAX: 0000000000000054 RBX: ffff8d9b6ece1000 RCX: 0000000000000000 [
+> > 1424.258504] RDX: 0000000000000000 RSI: ffff8d9b77b57908 RDI:
+> > ffff8d9b77b57908 [ 1424.261404] RBP: ffff8d9b74c84d80 R08: ffff8d9b77b57908
+> > R09: 0000000000000280 [ 1424.264336] R10: ffff9a12404b3bf0 R11:
+> > ffff9a12404b3bf5 R12: ffff8d9b6ece11c0 [ 1424.267285] R13: ffff9a12404b3d48
+> > R14: a6787a60550c54a9 R15: ffff8d9b6fcec300 [ 1424.270191] FS:
+> > 0000000000000000(0000) GS:ffff8d9b77b40000(0000)
+> > knlGS:0000000000000000
+> > [ 1424.273491] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033 [
+> > 1424.275831] CR2: 0000562cdf4a2000 CR3: 000000023340c000 CR4:
+> > 00000000000406e0 [ 1424.278733] Call Trace:
+> > [ 1424.279844]  cifs_reconnect+0x268/0x620 [cifs] [ 1424.281723]
+> > cifs_readv_from_socket+0x220/0x250 [cifs] [ 1424.283876]
+> > cifs_read_from_socket+0x4a/0x70 [cifs] [ 1424.285922]  ?
+> > try_to_wake_up+0x212/0x650 [ 1424.287595]  ? cifs_small_buf_get+0x16/0x30
+> > [cifs] [ 1424.289520]  ? allocate_buffers+0x66/0x120 [cifs] [ 1424.291421]
+> > cifs_demultiplex_thread+0xdc/0xc30 [cifs] [ 1424.293506]
+> > kthread+0xfb/0x130 [ 1424.294789]  ? cifs_handle_standard+0x190/0x190
+> > [cifs] [ 1424.296833]  ? kthread_park+0x90/0x90 [ 1424.298295]
+> > ret_from_fork+0x35/0x40 [ 1424.299717] Modules linked in: cifs libdes
+> > libarc4 ip6t_rpfilter ip6t_REJECT nf_reject_ipv6 xt_conntrack ebtable_nat
+> > ip6table_nat ip6table_mangle ip6table_raw ip6table_security iptable_nat
+> > nf_nat iptable_mangle iptable_raw iptable_security nf_conntrack
+> > nf_defrag_ipv6 nf_defrag_ipv4 ip_set nfnetlink ebtable_filter ebtables
+> > ip6table_filter ip6_tables crct10dif_pclmul crc32_pclmul ghash_clmulni_intel
+> > virtio_balloon joydev i2c_piix4 nfsd nfs_acl lockd auth_rpcgss grace sunrpc
+> > xfs libcrc32c crc32c_intel virtio_net net_failover ata_generic serio_raw
+> > virtio_console virtio_blk failover pata_acpi qemu_fw_cfg [ 1424.322374] ---[
+> > end trace 214af7e68b58e94b ]--- [ 1424.324305] RIP:
+> > 0010:__list_del_entry_valid.cold+0x31/0x55
+> > [ 1424.326551] Code: 5e 15 b5 e8 54 a3 c5 ff 0f 0b 48 c7 c7 70 5f 15
+> > b5 e8 46 a3 c5 ff 0f 0b 48 89 f2 48 89 fe 48 c7 c7 30 5f 15 b5 e8 32
+> > a3 c5 ff <0f> 0b 48 89 fe 4c 89 c2 48 c7 c7 f8 5e 15 b5 e8 1e a3 c5 ff 0f 0b
+> > [ 1424.333874] RSP: 0018:ffff9a12404b3d38 EFLAGS: 00010246 [ 1424.335976]
+> > RAX: 0000000000000054 RBX: ffff8d9b6ece1000 RCX: 0000000000000000 [
+> > 1424.338842] RDX: 0000000000000000 RSI: ffff8d9b77b57908 RDI:
+> > ffff8d9b77b57908 [ 1424.341668] RBP: ffff8d9b74c84d80 R08: ffff8d9b77b57908
+> > R09: 0000000000000280 [ 1424.344511] R10: ffff9a12404b3bf0 R11:
+> > ffff9a12404b3bf5 R12: ffff8d9b6ece11c0 [ 1424.347343] R13: ffff9a12404b3d48
+> > R14: a6787a60550c54a9 R15: ffff8d9b6fcec300 [ 1424.350184] FS:
+> > 0000000000000000(0000) GS:ffff8d9b77b40000(0000)
+> > knlGS:0000000000000000
+> > [ 1424.353394] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033 [
+> > 1424.355699] CR2: 0000562cdf4a2000 CR3: 000000023340c000 CR4:
+> > 00000000000406e0
+> >
+> > On Thu, Oct 17, 2019 at 3:58 PM Pavel Shilovskiy <pshilov@microsoft.com>
+> > wrote:
+> > >
+> > >
+> > > The patch looks good. Let's see if it fixes the issue in your setup.
+> > >
+> > > --
+> > > Best regards,
+> > > Pavel Shilovsky
+> > >
+> > > -----Original Message-----
+> > > From: David Wysochanski <dwysocha@redhat.com>
+> > > Sent: Thursday, October 17, 2019 12:23 PM
+> > > To: Pavel Shilovskiy <pshilov@microsoft.com>
+> > > Cc: Ronnie Sahlberg <lsahlber@redhat.com>; linux-cifs
+> > > <linux-cifs@vger.kernel.org>; Frank Sorenson <sorenson@redhat.com>
+> > > Subject: Re: list_del corruption while iterating retry_list in
+> > > cifs_reconnect still seen on 5.4-rc3 On Thu, Oct 17, 2019 at 2:29 PM Pavel
+> > > Shilovskiy <pshilov@microsoft.com> wrote:
+> > > >
+> > > > The similar solution of taking an extra reference should apply to the
+> > > > case of reconnect as well. The reference should be taken during the
+> > > > process of moving mid entries to the private list. Once a callback
+> > > > completes, such a reference should be put back thus freeing the mid.
+> > > >
+> > >
+> > > Ah ok very good.  The above seems consistent with the traces I'm seeing of
+> > > the race.
+> > > I am going to test this patch as it sounds like what you're describing and
+> > > similar to what Ronnie suggested earlier:
+> > >
+> > > --- a/fs/cifs/connect.c
+> > > +++ b/fs/cifs/connect.c
+> > > @@ -564,6 +564,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+> > >         spin_lock(&GlobalMid_Lock);
+> > >         list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
+> > >                 mid_entry = list_entry(tmp, struct mid_q_entry,
+> > > qhead);
+> > > +               kref_get(&mid_entry->refcount);
+> > >                 if (mid_entry->mid_state == MID_REQUEST_SUBMITTED)
+> > >                         mid_entry->mid_state = MID_RETRY_NEEDED;
+> > >                 list_move(&mid_entry->qhead, &retry_list); @@ -576,6 +577,7
+> > >                 @@ cifs_reconnect(struct TCP_Server_Info *server)
+> > >                 mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
+> > >                 list_del_init(&mid_entry->qhead);
+> > >                 mid_entry->callback(mid_entry);
+> > > +               cifs_mid_q_entry_release(mid_entry);
+> > >         }
+> > >
+> > >         if (cifs_rdma_enabled(server)) {
+> > >
+> >
+> >
+> > --
+> > Dave Wysochanski
+> > Principal Software Maintenance Engineer
+> > T: 919-754-4024
+> >
