@@ -2,63 +2,76 @@ Return-Path: <SRS0=KUb6=YP=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D402CA9EA0
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Oct 2019 16:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92695CA9EA0
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Oct 2019 18:40:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F220F20684
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Oct 2019 16:44:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62A962184C
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Oct 2019 18:40:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731320AbfJVQoF convert rfc822-to-8bit (ORCPT
+        id S1731436AbfJVSkQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Oct 2019 12:44:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:1944 "EHLO mx1.redhat.com"
+        Tue, 22 Oct 2019 14:40:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54356 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728768AbfJVQoF (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 22 Oct 2019 12:44:05 -0400
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+        id S1729666AbfJVSkP (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 22 Oct 2019 14:40:15 -0400
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com [209.85.222.197])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 24E9583F3D
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Oct 2019 16:44:05 +0000 (UTC)
-Received: by mail-qk1-f199.google.com with SMTP id w67so9419903qkb.4
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Oct 2019 09:44:05 -0700 (PDT)
+        by mx1.redhat.com (Postfix) with ESMTPS id 01E8D859FF
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Oct 2019 18:40:15 +0000 (UTC)
+Received: by mail-qk1-f197.google.com with SMTP id h4so17539035qkd.18
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Oct 2019 11:40:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ahTqrI+t9Y3cyaUoS74mgv7KWvBN0HdBQHVIcoq1Quo=;
-        b=Epq9bExavzDJuh+hKHloXFZAdPFI9BUzCdIS7XOyhzMbqq7SAHh8wDxIfP1JCCqIoo
-         H3d6645zL8+xPDLAhaZQCfZ8NGgDzDHib8MPzR25fJckYStHjPIm7V+HVu12XZBOPzxv
-         if9ZtGVb3EGzbK9RBeonwuPJYeY+xC6kU0Jktw0VpQaqrzhmQ+EiTFZBSsUABafrAQlF
-         FC4Qqg4ZiruFO11G6kaadPahJe8bmMRTzdfuZiywewCHM7HYcJyE3pFGLaMpdNwIZdBP
-         2Blm9Hda/wE18Ap1zDMRZwPxfAWOAD9MoXbgQDd3pc1UtO52E0/giR+16EOlr21c7oY5
-         67qA==
-X-Gm-Message-State: APjAAAWfzCE2gG/hqkT8ERnY75WDtCiCqxTAS6OXki1Vd/LsVrVZKSfB
-        1nps1Km8c+5xve8tD+Xj7xZPlf18RzZ7yE86rV+qi+nauc+7qrtIKc7YrKHctYn9klF2QoE4+bl
-        LS8XCGBE7iEW/Et48G6JWvci2Jjuu+i72u47R0w==
-X-Received: by 2002:a37:68b:: with SMTP id 133mr3753667qkg.315.1571762644375;
-        Tue, 22 Oct 2019 09:44:04 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqx4ZWOMA/0vGoLShQKF7ObrjPtL37b319p5xyMN+TKl0i5NDcq2h9Jy1rJaSrc6FNAcPRZwy6VzYDhOGkUgadw=
-X-Received: by 2002:a37:68b:: with SMTP id 133mr3753640qkg.315.1571762644008;
- Tue, 22 Oct 2019 09:44:04 -0700 (PDT)
+        bh=T968YqkoqVPwsfYrtiZUniacudH+qXATPaqw260KTuo=;
+        b=MwaFx86ASTu3muw9h2waJwSRE7MeSHlW8o3J0V4nj73K0c70awXyNSX+ik4cQbjfe/
+         KrphLU8IYFiOEKQm4OM5jV9ykT88B18uD8ez76MKcL/sfKjm+No8V5lCRba2m91zzhCr
+         sMQjj2Ky869zGjboS68OaOT3EMxQ6FG3to8QAU9cENUuiG4CUYLAd+6VSpTWyJCxmcFb
+         qLrht0wQKp9uFm++bY5jL+P6ICkDl0X9IQ3cQWN9Dhn16G8vUugdcCG/k8uawlFqTSQt
+         5GIxjw3SRteMJVsrFIOI/wKnb178mXz4gts8UqbVE9negPcgIhEPPh73oYc8zWSaD9oj
+         9PUw==
+X-Gm-Message-State: APjAAAVAa1SUD4zJ3GoRjG69RTAmjS5L8h364as3L2n0q74gyYffnH94
+        ik6TFQZTqo7SOuzcO2Fu5NEKmkujsx2M4bUjL5zUP2Lc9pEtwHUpXkAHbyFl5kuEq+FuKIrY1Mo
+        aO+Ho18WIX6BM14IsFwK7EWSNml77amCn+RK+YA==
+X-Received: by 2002:ae9:e90e:: with SMTP id x14mr2492505qkf.229.1571769614096;
+        Tue, 22 Oct 2019 11:40:14 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw9MZWDhj2lujQxe/Bi0gMMg7QVDcbkcNZ+Fc33+Ul38pvIDmfVF7eW30T0OiGszQ0JkNYmPsAu/WacKzq9hl8=
+X-Received: by 2002:ae9:e90e:: with SMTP id x14mr2492470qkf.229.1571769613780;
+ Tue, 22 Oct 2019 11:40:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <CALF+zOmFsykoOWHy6Yt6dH6i-Cn9XWWCMsnsdPZaKuLE6jjO7w@mail.gmail.com>
- <CAKywueQRnmAuXJq+5ZER3ir6BhUgNFaaFCG6aZE7ep=qe=qbmQ@mail.gmail.com>
- <CALF+zO=UaXnrwn1X0MnZ9Gn4g5qOZ4_SdH=WDyQ3Uc1fpWtD_Q@mail.gmail.com> <CAKywueRo=uD+J2C0LxSgRG6TtvwL5XALiy-qBoxXf5ETQhdmHg@mail.gmail.com>
-In-Reply-To: <CAKywueRo=uD+J2C0LxSgRG6TtvwL5XALiy-qBoxXf5ETQhdmHg@mail.gmail.com>
+References: <CALF+zOkugWpn6aCApqj8dF+AovgbQ8zgC-Hf8_0uvwqwHYTPiw@mail.gmail.com>
+ <CALF+zO=8ZJkqR951NsxOf4hDDyUZzMfyiEN-j8DgA+i+FzcfGw@mail.gmail.com>
+ <DM5PR21MB018515AFDDDE766D318BC489B66D0@DM5PR21MB0185.namprd21.prod.outlook.com>
+ <CALF+zOmz5LFkzHrLpLGWcfwkOD7s-VhVz39pFgMNAFRT9_-KYg@mail.gmail.com>
+ <58429039.7213410.1571348691819.JavaMail.zimbra@redhat.com>
+ <DM5PR21MB0185FD6A138A5682BB9DE310B66D0@DM5PR21MB0185.namprd21.prod.outlook.com>
+ <106934753.7215598.1571352823170.JavaMail.zimbra@redhat.com>
+ <CALF+zOn-J9KyDDTL6dJ23RbQ9Gh+V3ti+4-O051zqOur6Fv-PA@mail.gmail.com>
+ <1884745525.7250940.1571390858862.JavaMail.zimbra@redhat.com>
+ <CALF+zOkmFMtxsnrUR-anXOdMzUFxtAWG+VYLAQuq3DJuH=eDMw@mail.gmail.com>
+ <DM5PR21MB0185857761946DBE12AEB3ADB66C0@DM5PR21MB0185.namprd21.prod.outlook.com>
+ <CALF+zO=heBJSLW4ELPAwKegL3rJQiSebCLAh=4syEtPYoaevgA@mail.gmail.com>
+ <CALF+zO=BUC2pCcz=n6hBx7ZPsL8gABLqx_hBQXVC=OOLJ-DDig@mail.gmail.com>
+ <DM5PR21MB01851871D57ABCF685712C76B66C0@DM5PR21MB0185.namprd21.prod.outlook.com>
+ <CALF+zOkTwetUsL0he3nqjvTO4QPJm6bgk2CnEbcjihW2h4CZNw@mail.gmail.com> <CAKywueRjL=Ob1jKFyV+ApxZPXWM91aQRD8UJxe0h6kLi-iDmpA@mail.gmail.com>
+In-Reply-To: <CAKywueRjL=Ob1jKFyV+ApxZPXWM91aQRD8UJxe0h6kLi-iDmpA@mail.gmail.com>
 From:   David Wysochanski <dwysocha@redhat.com>
-Date:   Tue, 22 Oct 2019 12:43:26 -0400
-Message-ID: <CALF+zOkqMLL05W6i_VZf17G+exz2PNObNwATVeU2GAZFFQyE6A@mail.gmail.com>
-Subject: Re: Easily reproducible deadlock on 5.4-rc4 with cifsInodeInfo.lock_sem
- semaphore after network disruption or smb restart
+Date:   Tue, 22 Oct 2019 14:39:37 -0400
+Message-ID: <CALF+zOkji2d7=WJcSmPKhFgm53aCb3Qxy4t1O4=W+4fOR5Qa7A@mail.gmail.com>
+Subject: Re: list_del corruption while iterating retry_list in cifs_reconnect
+ still seen on 5.4-rc3
 To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
+Cc:     Pavel Shilovskiy <pshilov@microsoft.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Frank Sorenson <sorenson@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
@@ -66,115 +79,72 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Oct 22, 2019 at 12:09 PM Pavel Shilovsky <piastryyy@gmail.com> wrote:
+On Mon, Oct 21, 2019 at 5:55 PM Pavel Shilovsky <piastryyy@gmail.com> wrote:
 >
-> пн, 21 окт. 2019 г. в 20:05, David Wysochanski <dwysocha@redhat.com>:
-> > > ? If yes, then we can create another work queue that will be
-> > > re-locking files that have been re-opened. In this case
-> > > cifs_reopen_file will simply submit the "re-lock" request to the queue
-> > > without the need to grab the lock one more time.
-> > >
-> > I think you're approach of a work queue may work but it would have to
-> > be on a per-pid basis, as would any solution.
+> сб, 19 окт. 2019 г. в 04:10, David Wysochanski <dwysocha@redhat.com>:
+> > Right but look at it this way.  If we conditionally set the state,
+> > then what is preventing a duplicate list_del_init call?  Let's say we
+> > get into the special case that you're not sure it could happen
+> > (mid_entry->mid_state == MID_REQUEST_SUBMITTED is false), and so the
+> > mid_state does not get set to MID_RETRY_NEEDED inside cifs_reconnect
+> > but yet the mid gets added to retry_list.  In that case both the
+> > cifs_reconnect code path will call list_del_init as well as the other
+> > code paths which we're adding the conditional tests and that will
+> > cause a blowup again because cifs_reconnect retry_list loop will end
+> > up in a singleton list and exhaust the refcount, leading to the same
+> > crash.  This is exactly why the refcount only patch crashed again -
+> > it's erroneous to think it's ok to modify mid_entry->qhead without a)
+> > taking globalMid_Lock and b) checking mid_state is what you think it
+> > should be.  But if you're really concerned about that 'if' condition
+> > and want to leave it, and you want a stable patch, then the extra flag
+> > seems like the way to go.  But that has the downside that it's only
+> > being done for stable, so a later patch will likely remove it
+> > (presumably).  I am not sure what such policy is or if that is even
+> > acceptable or allowed.
 >
-> Why do you think we should have a queue per pid? What are possible
-> problems to have a single queue per SMB connection or Share (Tree)
-> connection?
+> This is acceptable and it is a good practice to fix the existing issue
+> with the smallest possible patch and then enhance the code/fix for the
+> current master branch if needed. This simplify backporting a lot.
 >
+> Actually looking at the code:
+>
+> cifsglob.h:
+>
+> 1692 #define   MID_DELETED            2 /* Mid has been dequeued/deleted */
+>
+>                     ^^^
+> Isn't "deqeueued" what we need? It seems so because it serves the same
+> purpose: to indicate that a request has been deleted from the pending
+> queue. So, I think we need to just make use of this existing flag and
+> mark the mid with MID_DELETED every time we remove the mid from the
+> pending list. Also assume moving mids from the pending lists to the
+> local lists in cleanup_demultiplex_info and cifs_reconnect as a
+> deletion too because those lists are not exposed globally and mids are
+> removed from those lists before the functions exit.
+>
+> I made a patch which is using MID_DELETED logic and merging
+> DeleteMidQEntry and cifs_mid_q_entry_release into one function to
+> avoid possible use-after free of mid->resp_buf.
+>
+> David, could you please test the attached patch in your environment? I
+> only did sanity testing of it.
+>
+I ran 5.4-rc4 plus this patch with the reproducer, and it ran fine for
+over 6 hours.
+I verified 5.4-rc4 would still crash too - at first I wasn't sure
+since it took about 30 mins to crash, but it definitely crashes too
+(not surprising).
 
-What you're proposing may work but would have to see the code and how
-lock_sem would be used.  If you're serializing the relocking to only
-one pid it should be fine.
+Your patch seems reasonable to me and is in the spirit of the existing
+code and the flag idea that Ronnie had.
 
-I can describe what I tried (attached patch) and why it did not work.
-Here's the problem code path.  Note that down_read(lock_sem) #2 is
-only a problem if down_write(lock_sem) happens between #1 and #2, but
-we're trying to avoid #2 to avoid the deadlock.
+To be honest when I look at the other flag (unrelated to this problem)
+I am also not sure if it should be a state or a flag, but you probably
+know the history on mid_state vs flag better than me.  For purposes of
+this bug, I think your patch is fine and if you're wanting a stable
+patch and this looks better, FWIW this is fine with me.  I think
+probably as your comments earlier there is probably more refactoring
+or work that can be done in this area, but is beyond the scope of a
+stable patch.
 
-PID: 5464   TASK: ffff9862640b2f80  CPU: 1   COMMAND: "python3-openloo"
- #0 [ffffbd2d81203a20] __schedule at ffffffff9aa629e3
- #1 [ffffbd2d81203ac0] schedule at ffffffff9aa62fe8
- #2 [ffffbd2d81203ac8] rwsem_down_read_failed at ffffffff9aa660cd
- #3 [ffffbd2d81203b58] cifs_reopen_file at ffffffffc0529dce [cifs]
-<--- down_read (lock_sem) #2
- #4 [ffffbd2d81203c00] cifs_read.constprop.46 at ffffffffc052bbe0 [cifs]
- #5 [ffffbd2d81203ca8] cifs_readpage_worker at ffffffffc052c0a7 [cifs]
- #6 [ffffbd2d81203ce0] cifs_readpage at ffffffffc052c427 [cifs]
- #7 [ffffbd2d81203d20] generic_file_buffered_read at ffffffff9a40f2b1
- #8 [ffffbd2d81203e10] cifs_strict_readv at ffffffffc0533a7b [cifs]
-<---- down_read (lock_sem) #1
- #9 [ffffbd2d81203e40] new_sync_read at ffffffff9a4b6e21
-#10 [ffffbd2d81203ec8] vfs_read at ffffffff9a4b9671
-#11 [ffffbd2d81203f00] ksys_read at ffffffff9a4b9aaf
-#12 [ffffbd2d81203f38] do_syscall_64 at ffffffff9a2041cb
-
-Note that each of these down_read() calls are per-pid (each pid has to
-get the sem).   I tried this patch:
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1404,6 +1404,7 @@ struct cifsInodeInfo {
- #define CIFS_INO_DELETE_PENDING                  (3) /* delete
-pending on server */
- #define CIFS_INO_INVALID_MAPPING         (4) /* pagecache is invalid */
- #define CIFS_INO_LOCK                    (5) /* lock bit for synchronization */
-+#define CIFS_LOCK_SEM_HELD               (6) /* the lock_sem is held */
-        unsigned long flags;
-        spinlock_t writers_lock;
-        unsigned int writers;           /* Number of writers on this inode */
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 5ad15de2bb4f..153adcd3ad16 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -620,11 +620,15 @@ cifs_relock_file(struct cifsFileInfo *cfile)
-        struct cifsInodeInfo *cinode = CIFS_I(d_inode(cfile->dentry));
-        struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
-        int rc = 0;
-+       int lock_sem_held = 0;
-
--       down_read_nested(&cinode->lock_sem, SINGLE_DEPTH_NESTING);
-+       lock_sem_held = test_bit(CIFS_LOCK_SEM_HELD, &cinode->flags);
-+       if (!lock_sem_held)
-+               down_read_nested(&cinode->lock_sem, SINGLE_DEPTH_NESTING);
-        if (cinode->can_cache_brlcks) {
-                /* can cache locks - no need to relock */
--               up_read(&cinode->lock_sem);
-+               if (!lock_sem_held)
-+                       up_read(&cinode->lock_sem);
-                return rc;
-        }
-
-@@ -635,7 +639,8 @@ cifs_relock_file(struct cifsFileInfo *cfile)
-        else
-                rc = tcon->ses->server->ops->push_mand_locks(cfile);
-
--       up_read(&cinode->lock_sem);
-+       if (!lock_sem_held)
-+               up_read(&cinode->lock_sem);
-        return rc;
- }
-
-@@ -3888,11 +3893,13 @@ cifs_strict_readv(struct kiocb *iocb, struct
-iov_iter *to)
-         * with a brlock that prevents reading.
-         */
-        down_read(&cinode->lock_sem);
-+       set_bit(CIFS_LOCK_SEM_HELD, &cinode->flags);
-        if (!cifs_find_lock_conflict(cfile, iocb->ki_pos, iov_iter_count(to),
-                                     tcon->ses->server->vals->shared_lock_type,
-                                     0, NULL, CIFS_READ_OP))
-                rc = generic_file_read_iter(iocb, to);
-        up_read(&cinode->lock_sem);
-+       clear_bit(CIFS_LOCK_SEM_HELD, &cinode->flags);
-        return rc;
- }
-
-
-Note that the bit is associated with the cifsInodeInfo file, and we
-only have one file but multiple pids so it's not an effective
-solution.  To describe, the patch doesn't work because when the server
-goes down, you have many processes all having passed down_read() #1,
-and they are blocked waiting for a response.  When the server comes
-back at least one will see the bit is set and will skip down_read()
-#2, but then it will proceed to finish the cifs_strict_readv(), and so
-clear the bit, and other pids may not see the bit set anymore, and
-will call down_read() #2, leading to the same deadlock.
+Thanks!
