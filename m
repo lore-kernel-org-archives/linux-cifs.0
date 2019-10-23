@@ -2,265 +2,358 @@ Return-Path: <SRS0=Yjbq=YQ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE897CA9EA0
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Oct 2019 02:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F9ECA9EAE
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Oct 2019 04:50:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A76E021848
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Oct 2019 02:56:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D33B2173B
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Oct 2019 04:50:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGzXQpAT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W8Ccxomh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389459AbfJWC4i (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Oct 2019 22:56:38 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:44842 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732748AbfJWC4i (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Oct 2019 22:56:38 -0400
-Received: by mail-io1-f67.google.com with SMTP id w12so23057929iol.11
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Oct 2019 19:56:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TWYUjkBL22KTOxZSuSY/WWTbm6UdaYCyLk9okPQwusY=;
-        b=QGzXQpATrzhxryb8qFE8iARWz+b3vvbtP6kBeOJo1hqz4NPqhS7++IlegpQYYNq3W3
-         K0hi9Z0+kzTqWkL59bRAitGAImAkA65JFlZaMJB/TMiHbKaxGDUqDRGit861rLU9tWTV
-         SEMPokRkWiZtO/5v/3DnLu24P7MGXmq93mfcXqmBVIu6XL0XWaHjq4+63ECC2PssGTtP
-         yvf+li58smFH64xf3opmuZRsavwSqLcr0SEUOXeIUgOQPMF51isA4yhFFRDKfATiam6p
-         408IsTx2BPvuEFv/BBZkSEJVsjFvi4+gbKW/gWQ3FkAP0kdxkX7CIw8gIGEsi8LriRdu
-         EQfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TWYUjkBL22KTOxZSuSY/WWTbm6UdaYCyLk9okPQwusY=;
-        b=f2nts4XeBBFybsUfOr0lwgsVP2JjWcs0mt15EVZwaNiglfNg2GL/q1LTYpdYA0iiGP
-         Sq1ReztS8owOt26gHb+KDV82QgXDxtizC1YcMhbkDq4Ck6oVqTXcipNgFHXcMEVlh0jO
-         QrRNHl71Pqlf0rOCNFZHvhf0bVHS8Uf4D43DpmOj08Ew4JbCAOLKYbvrQNgmEl2reL5d
-         TAWxTBQB7Kt82p365JSUfTwnHAOu7XuOPLl9nBWvLXZI8+WYNdnPT/LdWDzz1ILeW5oJ
-         4NxX6k3UPFyZ4ZYmJ1I6BEAep6/r0TXxy6YgByfW/RGPpqDdOZfs9YfGZdvO59qX0Vqx
-         t/Jw==
-X-Gm-Message-State: APjAAAWoEurXlTO78KRI87sxcOH7liLqp8L0mD89deu5666/3RV3g5wI
-        CpxapnpsCdhSLBK7vxJsGFMj4WhftSN7wMtumctSqr1wHS0=
-X-Google-Smtp-Source: APXvYqzvTOBPTgeRJIyxDnUJbRN/Y15r7QM4qXWH7ZqfwCXf16DtMHwa7/ISJEspEHl9f9IH9W6BMWxCR0kv9OBw94o=
-X-Received: by 2002:a6b:fa12:: with SMTP id p18mr1078920ioh.272.1571799396383;
- Tue, 22 Oct 2019 19:56:36 -0700 (PDT)
+        id S1732748AbfJWEuy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 23 Oct 2019 00:50:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31076 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1732753AbfJWEuy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 23 Oct 2019 00:50:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571806252;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Vd0e3nEW+sW/DtHq0UtXLwpUsjwVDiaera1vKpPdQDk=;
+        b=W8Ccxomhv8XA0hceK1/1E4YMFkOPKMHYGl9AqNhUZAJyPsgCGxmAGolGMt7fNk+AiX1Gk6
+        HjudYKLUOikWmMwzxyF6SJJjSZynJ9ZnHmUJnAq1acFP08DDAb/7kTM2SPSQHJeu/hY9D7
+        oOju6sw3b+mmL9Qlg4yZvnKzhIyKqJA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42-XiC5dDOPP2OLFUloeiLY5w-1; Wed, 23 Oct 2019 00:50:49 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49F0847B
+        for <linux-cifs@vger.kernel.org>; Wed, 23 Oct 2019 04:50:48 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 40CB460624
+        for <linux-cifs@vger.kernel.org>; Wed, 23 Oct 2019 04:50:48 +0000 (UTC)
+Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 2EF4A18089C8;
+        Wed, 23 Oct 2019 04:50:48 +0000 (UTC)
+Date:   Wed, 23 Oct 2019 00:50:48 -0400 (EDT)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     Dave Wysochanski <dwysocha@redhat.com>
+Cc:     linux-cifs@vger.kernel.org
+Message-ID: <1786263555.8106229.1571806248056.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1571776423-32000-1-git-send-email-dwysocha@redhat.com>
+References: <1571776423-32000-1-git-send-email-dwysocha@redhat.com>
+Subject: Re: [RFC PATCH] cifs: Fix cifsInodeInfo lock_sem deadlock with
+ multiple readers
 MIME-Version: 1.0
-References: <20191022223534.21711-1-pshilov@microsoft.com>
-In-Reply-To: <20191022223534.21711-1-pshilov@microsoft.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 22 Oct 2019 21:56:25 -0500
-Message-ID: <CAH2r5muBF5cb5bUtVcF1qa-7Bd=khnsYet=OnqKy5tBAseZFdQ@mail.gmail.com>
-Subject: Re: [PATCH] CIFS: Fix retry mid list corruption on reconnects
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Pavel Shilovskiy <pshilov@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Originating-IP: [10.64.54.48, 10.4.195.11]
+Thread-Topic: cifs: Fix cifsInodeInfo lock_sem deadlock with multiple readers
+Thread-Index: 0yzaKb3c7PHu7jVoLit+Z/U/T5jc2w==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: XiC5dDOPP2OLFUloeiLY5w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next
 
-running buildbot now ...
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/268
 
-On Tue, Oct 22, 2019 at 5:35 PM Pavel Shilovsky <piastryyy@gmail.com> wrote:
->
-> When the client hits reconnect it iterates over the mid
-> pending queue marking entries for retry and moving them
-> to a temporary list to issue callbacks later without holding
-> GlobalMid_Lock. In the same time there is no guarantee that
-> mids can't be removed from the temporary list or even
-> freed completely by another thread. It may cause a temporary
-> list corruption:
->
-> [  430.454897] list_del corruption. prev->next should be ffff98d3a8f316c0, but was 2e885cb266355469
-> [  430.464668] ------------[ cut here ]------------
-> [  430.466569] kernel BUG at lib/list_debug.c:51!
-> [  430.468476] invalid opcode: 0000 [#1] SMP PTI
-> [  430.470286] CPU: 0 PID: 13267 Comm: cifsd Kdump: loaded Not tainted 5.4.0-rc3+ #19
-> [  430.473472] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-> [  430.475872] RIP: 0010:__list_del_entry_valid.cold+0x31/0x55
-> ...
-> [  430.510426] Call Trace:
-> [  430.511500]  cifs_reconnect+0x25e/0x610 [cifs]
-> [  430.513350]  cifs_readv_from_socket+0x220/0x250 [cifs]
-> [  430.515464]  cifs_read_from_socket+0x4a/0x70 [cifs]
-> [  430.517452]  ? try_to_wake_up+0x212/0x650
-> [  430.519122]  ? cifs_small_buf_get+0x16/0x30 [cifs]
-> [  430.521086]  ? allocate_buffers+0x66/0x120 [cifs]
-> [  430.523019]  cifs_demultiplex_thread+0xdc/0xc30 [cifs]
-> [  430.525116]  kthread+0xfb/0x130
-> [  430.526421]  ? cifs_handle_standard+0x190/0x190 [cifs]
-> [  430.528514]  ? kthread_park+0x90/0x90
-> [  430.530019]  ret_from_fork+0x35/0x40
->
-> Fix this by obtaining extra references for mids being retried
-> and marking them as MID_DELETED which indicates that such a mid
-> has been dequeued from the pending list.
->
-> Also move mid cleanup logic from DeleteMidQEntry to
-> _cifs_mid_q_entry_release which is called when the last reference
-> to a particular mid is put. This allows to avoid any use-after-free
-> of response buffers.
->
-> The patch needs to be backported to stable kernels. A stable tag
-> is not mentioned below because the patch doesn't apply cleanly
-> to any actively maintained stable kernel.
->
-> Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> Reviewed-and-tested-by: David Wysochanski <dwysocha@redhat.com>
-> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+
+
+----- Original Message -----
+> From: "Dave Wysochanski" <dwysocha@redhat.com>
+> To: linux-cifs@vger.kernel.org
+> Sent: Wednesday, 23 October, 2019 6:33:43 AM
+> Subject: [RFC PATCH] cifs: Fix cifsInodeInfo lock_sem deadlock with multi=
+ple readers
+>=20
+> NOTE: I have verified this fixes the problem but have not run
+> locking tests yet.
+>=20
+> There's a deadlock that is possible that can easily be seen with
+> multiple readers open/read/close of the same file.  The deadlock
+> is due to a reader calling down_read(lock_sem) and holding
+> it across the full IO, even if a network or server disruption
+> occurs and the session has to be reconnected.  Upon reconnect,
+> cifs_relock_file is called where down_read(lock_sem) is called
+> a second time.  Normally this is not a problem, but if there is
+> another process that calls down_write(lock_sem) in between the
+> first and second reader call to down_read(lock_sem), this will
+> cause a deadlock.  The caller of down_write (often either
+> _cifsFileInfo_put that is just removing and freeing cifsLockInfo
+> structures from the list of locks, or cifs_new_fileinfo, which
+> is just attaching cifs_fid_locks to cifsInodeInfo->llist), will
+> block due to the reader's first down_read(lock_sem) that obtains
+> the semaphore (read IO in flight).  And then when the server
+> comes back up, the reader that holds calls down_read(lock_sem)
+> a second time, and this time is blocked too because of the
+> blocked in down_write (rw_semaphores would starve writers if
+> this was not the case).  Interestingly enough, the callers of
+> down_write in the simple test case was not adding a
+> conflicting lock at all, just either opening or closing the
+> file, and modifying the list of locks attached to cifsInodeInfo,
+> this ends up tripping up the reader process and causing the
+> deadlock.
+>=20
+> The root of the problem is that lock_sem both protects the
+> cifsInodeInfo fields (such as the lllist - the list of locks),
+> but is also being re-used to avoid a conflicting lock coming
+> in while IO is in flight.  Add a new semaphore that tracks
+> just the IO in flight, and must be obtained before adding
+> a new lock.  While this does add another layer of complexity
+> and a semaphore ordering that must be obeyed to avoid new
+> deadlocks, it does clealy solve the underlying problem.
+
+The patch is hard to read(not your fault) since "patch" decided that almost=
+ all changes are in cifs_closedir() :-(
+
+
+You are reverting 560d388950. it is unfortunate because I think we should m=
+ake either cifs_reopen_file() or cifs_strict_readv()
+using down_read_nested() to suppress the warnings from the validator or els=
+e we will get a lot of these log entries in dmesg=20
+(almost) everytime we get a reconnect.
+
+A different approach, could be to change _cifsFileInfo_put() to use a down_=
+write_trylock()-sleep() loop instead of a blocking down_write() call.=20
+
+I.e. something like this ?
+(and then the same at the other places where we have a deadlock vulnerable =
+down_write() call)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 936e03892e2a..530af080dc61 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -464,7 +464,8 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, =
+bool wait_oplock_handler)
+         * Delete any outstanding lock records. We'll lose them when the fi=
+le
+         * is closed anyway.
+         */
+-       down_write(&cifsi->lock_sem);
++       while (!down_write_trylock(&cifsi->lock_sem))
++               msleep(125);
+        list_for_each_entry_safe(li, tmp, &cifs_file->llist->locks, llist) =
+{
+                list_del(&li->llist);
+                cifs_del_lock_waiters(li);
+
+
+
+
+>=20
+> Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
 > ---
->  fs/cifs/connect.c   | 10 +++++++++-
->  fs/cifs/transport.c | 42 +++++++++++++++++++++++-------------------
->  2 files changed, 32 insertions(+), 20 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index b724227b853c..ac43c79ebdf5 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -564,9 +564,11 @@ cifs_reconnect(struct TCP_Server_Info *server)
->         spin_lock(&GlobalMid_Lock);
->         list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
->                 mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
-> +               kref_get(&mid_entry->refcount);
->                 if (mid_entry->mid_state == MID_REQUEST_SUBMITTED)
->                         mid_entry->mid_state = MID_RETRY_NEEDED;
->                 list_move(&mid_entry->qhead, &retry_list);
-> +               mid_entry->mid_flags |= MID_DELETED;
->         }
->         spin_unlock(&GlobalMid_Lock);
->         mutex_unlock(&server->srv_mutex);
-> @@ -576,6 +578,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
->                 mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
->                 list_del_init(&mid_entry->qhead);
->                 mid_entry->callback(mid_entry);
-> +               cifs_mid_q_entry_release(mid_entry);
->         }
->
->         if (cifs_rdma_enabled(server)) {
-> @@ -895,8 +898,10 @@ dequeue_mid(struct mid_q_entry *mid, bool malformed)
->         if (mid->mid_flags & MID_DELETED)
->                 printk_once(KERN_WARNING
->                             "trying to dequeue a deleted mid\n");
-> -       else
-> +       else {
->                 list_del_init(&mid->qhead);
-> +               mid->mid_flags |= MID_DELETED;
-> +       }
->         spin_unlock(&GlobalMid_Lock);
+>  fs/cifs/cifsfs.c   |  1 +
+>  fs/cifs/cifsglob.h |  1 +
+>  fs/cifs/file.c     | 24 +++++++++++++++++++-----
+>  3 files changed, 21 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index c049c7b3aa87..10f614324e4e 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -1336,6 +1336,7 @@ static ssize_t cifs_copy_file_range(struct file
+> *src_file, loff_t off,
+> =20
+>  =09inode_init_once(&cifsi->vfs_inode);
+>  =09init_rwsem(&cifsi->lock_sem);
+> +=09init_rwsem(&cifsi->io_inflight_sem);
 >  }
->
-> @@ -966,8 +971,10 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
->                 list_for_each_safe(tmp, tmp2, &server->pending_mid_q) {
->                         mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
->                         cifs_dbg(FYI, "Clearing mid 0x%llx\n", mid_entry->mid);
-> +                       kref_get(&mid_entry->refcount);
->                         mid_entry->mid_state = MID_SHUTDOWN;
->                         list_move(&mid_entry->qhead, &dispose_list);
-> +                       mid_entry->mid_flags |= MID_DELETED;
->                 }
->                 spin_unlock(&GlobalMid_Lock);
->
-> @@ -977,6 +984,7 @@ static void clean_demultiplex_info(struct TCP_Server_Info *server)
->                         cifs_dbg(FYI, "Callback mid 0x%llx\n", mid_entry->mid);
->                         list_del_init(&mid_entry->qhead);
->                         mid_entry->callback(mid_entry);
-> +                       cifs_mid_q_entry_release(mid_entry);
->                 }
->                 /* 1/8th of sec is more than enough time for them to exit */
->                 msleep(125);
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index 308ad0f495e1..ca3de62688d6 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -86,22 +86,8 @@ AllocMidQEntry(const struct smb_hdr *smb_buffer, struct TCP_Server_Info *server)
->
->  static void _cifs_mid_q_entry_release(struct kref *refcount)
->  {
-> -       struct mid_q_entry *mid = container_of(refcount, struct mid_q_entry,
-> -                                              refcount);
-> -
-> -       mempool_free(mid, cifs_mid_poolp);
-> -}
-> -
-> -void cifs_mid_q_entry_release(struct mid_q_entry *midEntry)
-> -{
-> -       spin_lock(&GlobalMid_Lock);
-> -       kref_put(&midEntry->refcount, _cifs_mid_q_entry_release);
-> -       spin_unlock(&GlobalMid_Lock);
-> -}
-> -
-> -void
-> -DeleteMidQEntry(struct mid_q_entry *midEntry)
-> -{
-> +       struct mid_q_entry *midEntry =
-> +                       container_of(refcount, struct mid_q_entry, refcount);
->  #ifdef CONFIG_CIFS_STATS2
->         __le16 command = midEntry->server->vals->lock_cmd;
->         __u16 smb_cmd = le16_to_cpu(midEntry->command);
-> @@ -166,6 +152,19 @@ DeleteMidQEntry(struct mid_q_entry *midEntry)
->                 }
->         }
->  #endif
-> +
-> +       mempool_free(midEntry, cifs_mid_poolp);
-> +}
-> +
-> +void cifs_mid_q_entry_release(struct mid_q_entry *midEntry)
-> +{
-> +       spin_lock(&GlobalMid_Lock);
-> +       kref_put(&midEntry->refcount, _cifs_mid_q_entry_release);
-> +       spin_unlock(&GlobalMid_Lock);
-> +}
-> +
-> +void DeleteMidQEntry(struct mid_q_entry *midEntry)
-> +{
->         cifs_mid_q_entry_release(midEntry);
+> =20
+>  static int __init
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 50dfd9049370..40e8358dc1cc 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1392,6 +1392,7 @@ struct cifsInodeInfo {
+>  =09bool can_cache_brlcks;
+>  =09struct list_head llist;=09/* locks helb by this inode */
+>  =09struct rw_semaphore lock_sem;=09/* protect the fields above */
+> +=09struct rw_semaphore io_inflight_sem; /* Used to avoid lock conflicts =
+ */
+>  =09/* BB add in lists for dirty pages i.e. write caching info for oplock=
+ */
+>  =09struct list_head openFileList;
+>  =09spinlock_t=09open_file_lock;=09/* protects openFileList */
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 5ad15de2bb4f..417baa7f5dd3 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -621,7 +621,7 @@ int cifs_open(struct inode *inode, struct file *file)
+>  =09struct cifs_tcon *tcon =3D tlink_tcon(cfile->tlink);
+>  =09int rc =3D 0;
+> =20
+> -=09down_read_nested(&cinode->lock_sem, SINGLE_DEPTH_NESTING);
+> +=09down_read(&cinode->lock_sem);
+>  =09if (cinode->can_cache_brlcks) {
+>  =09=09/* can cache locks - no need to relock */
+>  =09=09up_read(&cinode->lock_sem);
+> @@ -973,6 +973,7 @@ int cifs_closedir(struct inode *inode, struct file *f=
+ile)
+>  =09struct cifs_fid_locks *cur;
+>  =09struct cifsInodeInfo *cinode =3D CIFS_I(d_inode(cfile->dentry));
+> =20
+> +=09down_read(&cinode->lock_sem);
+>  =09list_for_each_entry(cur, &cinode->llist, llist) {
+>  =09=09rc =3D cifs_find_fid_lock_conflict(cur, offset, length, type,
+>  =09=09=09=09=09=09 flags, cfile, conf_lock,
+> @@ -980,6 +981,7 @@ int cifs_closedir(struct inode *inode, struct file *f=
+ile)
+>  =09=09if (rc)
+>  =09=09=09break;
+>  =09}
+> +=09up_read(&cinode->lock_sem);
+> =20
+>  =09return rc;
 >  }
->
-> @@ -173,8 +172,10 @@ void
->  cifs_delete_mid(struct mid_q_entry *mid)
+> @@ -1027,9 +1029,11 @@ int cifs_closedir(struct inode *inode, struct file
+> *file)
+>  cifs_lock_add(struct cifsFileInfo *cfile, struct cifsLockInfo *lock)
 >  {
->         spin_lock(&GlobalMid_Lock);
-> -       list_del_init(&mid->qhead);
-> -       mid->mid_flags |= MID_DELETED;
-> +       if (!(mid->mid_flags & MID_DELETED)) {
-> +               list_del_init(&mid->qhead);
-> +               mid->mid_flags |= MID_DELETED;
-> +       }
->         spin_unlock(&GlobalMid_Lock);
->
->         DeleteMidQEntry(mid);
-> @@ -872,7 +873,10 @@ cifs_sync_mid_result(struct mid_q_entry *mid, struct TCP_Server_Info *server)
->                 rc = -EHOSTDOWN;
->                 break;
->         default:
-> -               list_del_init(&mid->qhead);
-> +               if (!(mid->mid_flags & MID_DELETED)) {
-> +                       list_del_init(&mid->qhead);
-> +                       mid->mid_flags |= MID_DELETED;
-> +               }
->                 cifs_server_dbg(VFS, "%s: invalid mid state mid=%llu state=%d\n",
->                          __func__, mid->mid, mid->mid_state);
->                 rc = -EIO;
+>  =09struct cifsInodeInfo *cinode =3D CIFS_I(d_inode(cfile->dentry));
+> +=09down_write(&cinode->io_inflight_sem);
+>  =09down_write(&cinode->lock_sem);
+>  =09list_add_tail(&lock->llist, &cfile->llist->locks);
+>  =09up_write(&cinode->lock_sem);
+> +=09up_write(&cinode->io_inflight_sem);
+>  }
+> =20
+>  /*
+> @@ -1049,6 +1053,7 @@ int cifs_closedir(struct inode *inode, struct file
+> *file)
+> =20
+>  try_again:
+>  =09exist =3D false;
+> +=09down_write(&cinode->io_inflight_sem);
+>  =09down_write(&cinode->lock_sem);
+> =20
+>  =09exist =3D cifs_find_lock_conflict(cfile, lock->offset, lock->length,
+> @@ -1057,6 +1062,7 @@ int cifs_closedir(struct inode *inode, struct file
+> *file)
+>  =09if (!exist && cinode->can_cache_brlcks) {
+>  =09=09list_add_tail(&lock->llist, &cfile->llist->locks);
+>  =09=09up_write(&cinode->lock_sem);
+> +=09=09up_write(&cinode->io_inflight_sem);
+>  =09=09return rc;
+>  =09}
+> =20
+> @@ -1077,6 +1083,7 @@ int cifs_closedir(struct inode *inode, struct file
+> *file)
+>  =09}
+> =20
+>  =09up_write(&cinode->lock_sem);
+> +=09up_write(&cinode->io_inflight_sem);
+>  =09return rc;
+>  }
+> =20
+> @@ -1125,14 +1132,17 @@ int cifs_closedir(struct inode *inode, struct fil=
+e
+> *file)
+>  =09=09return rc;
+> =20
+>  try_again:
+> +=09down_write(&cinode->io_inflight_sem);
+>  =09down_write(&cinode->lock_sem);
+>  =09if (!cinode->can_cache_brlcks) {
+>  =09=09up_write(&cinode->lock_sem);
+> +=09=09down_write(&cinode->io_inflight_sem);
+>  =09=09return rc;
+>  =09}
+> =20
+>  =09rc =3D posix_lock_file(file, flock, NULL);
+>  =09up_write(&cinode->lock_sem);
+> +=09up_write(&cinode->io_inflight_sem);
+>  =09if (rc =3D=3D FILE_LOCK_DEFERRED) {
+>  =09=09rc =3D wait_event_interruptible(flock->fl_wait, !flock->fl_blocker=
+);
+>  =09=09if (!rc)
+> @@ -1331,6 +1341,7 @@ struct lock_to_push {
+>  =09int rc =3D 0;
+> =20
+>  =09/* we are going to update can_cache_brlcks here - need a write access=
+ */
+> +=09down_write(&cinode->io_inflight_sem);
+>  =09down_write(&cinode->lock_sem);
+>  =09if (!cinode->can_cache_brlcks) {
+>  =09=09up_write(&cinode->lock_sem);
+> @@ -1346,6 +1357,7 @@ struct lock_to_push {
+> =20
+>  =09cinode->can_cache_brlcks =3D false;
+>  =09up_write(&cinode->lock_sem);
+> +=09up_write(&cinode->io_inflight_sem);
+>  =09return rc;
+>  }
+> =20
+> @@ -1522,6 +1534,7 @@ struct lock_to_push {
+>  =09if (!buf)
+>  =09=09return -ENOMEM;
+> =20
+> +=09down_write(&cinode->io_inflight_sem);
+>  =09down_write(&cinode->lock_sem);
+>  =09for (i =3D 0; i < 2; i++) {
+>  =09=09cur =3D buf;
+> @@ -1593,6 +1606,7 @@ struct lock_to_push {
+>  =09}
+> =20
+>  =09up_write(&cinode->lock_sem);
+> +=09up_write(&cinode->io_inflight_sem);
+>  =09kfree(buf);
+>  =09return rc;
+>  }
+> @@ -3148,7 +3162,7 @@ ssize_t cifs_user_writev(struct kiocb *iocb, struct
+> iov_iter *from)
+>  =09 * We need to hold the sem to be sure nobody modifies lock list
+>  =09 * with a brlock that prevents writing.
+>  =09 */
+> -=09down_read(&cinode->lock_sem);
+> +=09down_read(&cinode->io_inflight_sem);
+> =20
+>  =09rc =3D generic_write_checks(iocb, from);
+>  =09if (rc <=3D 0)
+> @@ -3161,7 +3175,7 @@ ssize_t cifs_user_writev(struct kiocb *iocb, struct
+> iov_iter *from)
+>  =09else
+>  =09=09rc =3D -EACCES;
+>  out:
+> -=09up_read(&cinode->lock_sem);
+> +=09up_read(&cinode->io_inflight_sem);
+>  =09inode_unlock(inode);
+> =20
+>  =09if (rc > 0)
+> @@ -3887,12 +3901,12 @@ ssize_t cifs_user_readv(struct kiocb *iocb, struc=
+t
+> iov_iter *to)
+>  =09 * We need to hold the sem to be sure nobody modifies lock list
+>  =09 * with a brlock that prevents reading.
+>  =09 */
+> -=09down_read(&cinode->lock_sem);
+> +=09down_read(&cinode->io_inflight_sem);
+>  =09if (!cifs_find_lock_conflict(cfile, iocb->ki_pos, iov_iter_count(to),
+>  =09=09=09=09     tcon->ses->server->vals->shared_lock_type,
+>  =09=09=09=09     0, NULL, CIFS_READ_OP))
+>  =09=09rc =3D generic_file_read_iter(iocb, to);
+> -=09up_read(&cinode->lock_sem);
+> +=09up_read(&cinode->io_inflight_sem);
+>  =09return rc;
+>  }
+> =20
 > --
-> 2.17.1
->
+> 1.8.3.1
+>=20
+>=20
 
-
--- 
-Thanks,
-
-Steve
