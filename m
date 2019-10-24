@@ -2,235 +2,160 @@ Return-Path: <SRS0=ZfIs=YR=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B908FCA9EB9
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 02:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0EA2CA9EAF
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 04:57:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 80F3320679
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 02:57:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91E5E2166E
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 04:57:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fz4MvRw9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f+iU1lVJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437190AbfJXC5O (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 23 Oct 2019 22:57:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57146 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2406392AbfJXC5N (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Oct 2019 22:57:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571885831;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x68XJTnKjf41lGoeYGsmEP+gTcg5aS/f3BGFui9N0Ug=;
-        b=Fz4MvRw9Uwqz75hnxdHOOvcHkRA6Lm8PkLmDJCwMhOCBR8JvLk0Pf6CBuKCpnlm1ATqAFW
-        rc+i9YSKknrQ/OKKA4mHtPAvuUgMN1EQhq+3RuJxQM4pkw+eQGCkywvhDHvxj48iWxVSYY
-        k1X/XE/vxaOji9LIkGFgvmmHMzu9xrQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-7RqOpilgNii4pkRMbCtoOg-1; Wed, 23 Oct 2019 22:57:10 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46D0A800D5A
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Oct 2019 02:57:09 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F54E5C1D4
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Oct 2019 02:57:09 +0000 (UTC)
-Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 3278118089C8;
-        Thu, 24 Oct 2019 02:57:09 +0000 (UTC)
-Date:   Wed, 23 Oct 2019 22:57:09 -0400 (EDT)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     Dave Wysochanski <dwysocha@redhat.com>
-Cc:     linux-cifs@vger.kernel.org
-Message-ID: <1052193585.8275161.1571885829108.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1571882902-23966-1-git-send-email-dwysocha@redhat.com>
-References: <1571882902-23966-1-git-send-email-dwysocha@redhat.com>
-Subject: Re: [PATCH] cifs: Fix cifsInodeInfo lock_sem deadlock when
- reconnect occurs
+        id S2408361AbfJXE5Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 24 Oct 2019 00:57:16 -0400
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:41658 "EHLO
+        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725298AbfJXE5Q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 24 Oct 2019 00:57:16 -0400
+Received: by mail-yw1-f68.google.com with SMTP id o195so3404768ywd.8;
+        Wed, 23 Oct 2019 21:57:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Qp4ylpFjT2NK5D3YlCPCDZfnUsSpfLeB6JcWlmTT8JE=;
+        b=f+iU1lVJ+8MXE0YjXhbzT4Z+QZTKEVbpSj7I64WEMcxAgcUOKckEALuDnxjfop1KDz
+         /GEuxtdqM/gAmg/8rUQcbM54P8ZvUqXo23LCox8OZKBVBlVoDn1p5gmEXxfQnAWBfBHW
+         uZZaGVOWsT//cwHGlbqENLvAYitmYf5NxnxRGYapcBJVSV1rP+NlFCXZHqVZ6fsYCVwo
+         HiL1fAZTVAeLbnNXS5YnMp44jrRgVnpRxhkGyVWlHqmqFFsCMZbuTBKjna3CheOTh8v8
+         hD6hfXAtyLGGlQqfHMdlsFiQ1XgpXWIL5nune/Pgn/JF3P1WqL13u+LVKHRsnQpi/3uP
+         Pzow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Qp4ylpFjT2NK5D3YlCPCDZfnUsSpfLeB6JcWlmTT8JE=;
+        b=t2MGTIc8mTc7xW5/p/CK16Ve9OEKmiR3Bt1eoB5Z7AoMwDnIldppJFs4AQlRg5rSTa
+         q12+rvFQWnsBdLRSERRYnp2UD56h9Ed7dygSLlsN0K+KpagF9fNJEIyKLAZLanO3WOPf
+         xM/lf7xUbla/jk3vlTj9s1KC4BPrPrpH5tFKq9eB/9V+W/lhbBMXJOZIyvrB5aDeJJ6t
+         C+eN3/HhTt2oLPFy4NmgSsOa9Izgi1LmAXlmxlOybOx4Ju3ogFv6LeWPgiB0NsBh1iZd
+         fM7e68NeYec1KF3EY1ABYuene9koRVfxcXINUYEd59XIU70IQZHgjxsu/Ak2dZoAh9dB
+         jjbg==
+X-Gm-Message-State: APjAAAX2taqOZp6Wh4uI+eNoiHVcayhSQURKPdVWJQhiiAase5zce9Le
+        cDp9IVjonZ/SxmlpoPcPLJDkSfLsNotmk4dR8To=
+X-Google-Smtp-Source: APXvYqzpUv8fnfcjV1KksbDdhWbx31x/A6CcO3wQjALxaBgCfUkMkcsChuqQOOuA9702g94fFIVsWA6cYWlyk5yi/8s=
+X-Received: by 2002:a81:6c58:: with SMTP id h85mr5010753ywc.88.1571893034732;
+ Wed, 23 Oct 2019 21:57:14 -0700 (PDT)
 MIME-Version: 1.0
-X-Originating-IP: [10.64.54.48, 10.4.195.19]
-Thread-Topic: cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
-Thread-Index: vkNlK21QITy76NZ/w2TPmrJ2FYesCA==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 7RqOpilgNii4pkRMbCtoOg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20191022204453.97058-1-salyzyn@android.com> <20191022204453.97058-2-salyzyn@android.com>
+ <8CE5B6E8-DCB7-4F0B-91C1-48030947F585@dilger.ca>
+In-Reply-To: <8CE5B6E8-DCB7-4F0B-91C1-48030947F585@dilger.ca>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Thu, 24 Oct 2019 07:57:03 +0300
+Message-ID: <CAOQ4uxis-oQSjKrtBDi-8BQ2M3ve3w8o-YVGRwWLnq+5JLUttA@mail.gmail.com>
+Subject: Re: [PATCH v14 1/5] Add flags option to get xattr method paired to __vfs_getxattr
+To:     Andreas Dilger <adilger@dilger.ca>
+Cc:     Mark Salyzyn <salyzyn@android.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-doc@vger.kernel.org, CIFS <linux-cifs@vger.kernel.org>,
+        kernel-team@android.com, selinux@vger.kernel.org,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        Stephen Smalley <sds@tycho.nsa.gov>,
+        overlayfs <linux-unionfs@vger.kernel.org>,
+        Andreas Gruenbacher <agruenba@redhat.com>,
+        ecryptfs@vger.kernel.org,
+        LSM List <linux-security-module@vger.kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reviewed-by me
+[excessive CC list reduced]
 
------ Original Message -----
-From: "Dave Wysochanski" <dwysocha@redhat.com>
-To: linux-cifs@vger.kernel.org
-Sent: Thursday, 24 October, 2019 12:08:22 PM
-Subject: [PATCH] cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect o=
-ccurs
+On Wed, Oct 23, 2019 at 11:07 AM Andreas Dilger via samba-technical
+<samba-technical@lists.samba.org> wrote:
+>
+>
+> On Oct 22, 2019, at 2:44 PM, Mark Salyzyn <salyzyn@android.com> wrote:
+> >
+> > Replace arguments for get and set xattr methods, and __vfs_getxattr
+> > and __vfs_setaxtr functions with a reference to the following now
+> > common argument structure:
+> >
+> > struct xattr_gs_args {
+> >       struct dentry *dentry;
+> >       struct inode *inode;
+> >       const char *name;
+> >       union {
+> >               void *buffer;
+> >               const void *value;
+> >       };
+> >       size_t size;
+> >       int flags;
+> > };
+>
 
-There's a deadlock that is possible and can easily be seen with
-a test where multiple readers open/read/close of the same file
-and a disruption occurs causing reconnect.  The deadlock is due
-a reader thread inside cifs_strict_readv calling down_read and
-obtaining lock_sem, and then after reconnect inside
-cifs_reopen_file calling down_read a second time.  If in
-between the two down_read calls, a down_write comes from
-another process, deadlock occurs.
+> > Mark,
+> >
+> > I do not see the first patch on fsdevel
+> > and I am confused from all the suggested APIs
+> > I recall Christoph's comment on v8 for not using xattr_gs_args
+> > and just adding flags to existing get() method.
+> > I agree to that comment.
+>
+> As already responded, third (?) patch version was like that,
 
-        CPU0                    CPU1
-        ----                    ----
-cifs_strict_readv()
- down_read(&cifsi->lock_sem);
-                               _cifsFileInfo_put
-                                  OR
-                               cifs_new_fileinfo
-                                down_write(&cifsi->lock_sem);
-cifs_reopen_file()
- down_read(&cifsi->lock_sem);
+The problem is that because of the waaay too long CC list, most revisions
+of the patch and discussion were bounced from fsdevel, most emails
+I did not get and cannot find in archives, so the discussion around
+them is not productive.
 
-Fix the above by changing all down_write(lock_sem) calls to
-down_write_trylock(lock_sem)/msleep() loop, which in turn
-makes the second down_read call benign since it will never
-block behind the writer while holding lock_sem.
+Please resend patch to fsdevel discarding the auto added CC list
+of all fs maintainers.
 
-Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
-Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/cifsglob.h |  5 +++++
- fs/cifs/file.c     | 24 ++++++++++++++++--------
- fs/cifs/smb2file.c |  3 ++-
- 3 files changed, 23 insertions(+), 9 deletions(-)
+> gregkh@
+> said it passed the limit for number of arguments, is looking a bit silly
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 50dfd9049370..2c4a7adbcb4e 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1391,6 +1391,11 @@ struct cifs_writedata {
- struct cifsInodeInfo {
- =09bool can_cache_brlcks;
- =09struct list_head llist;=09/* locks helb by this inode */
-+=09/*
-+=09 * NOTE: Some code paths call down_read(lock_sem) twice, so
-+=09 * we must always use use down_write_trylock()/msleep() loop
-+=09 * to avoid deadlock.
-+=09 */
- =09struct rw_semaphore lock_sem;=09/* protect the fields above */
- =09/* BB add in lists for dirty pages i.e. write caching info for oplock *=
-/
- =09struct list_head openFileList;
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 5ad15de2bb4f..52454df5ae39 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -306,7 +306,8 @@ struct cifsFileInfo *
- =09INIT_LIST_HEAD(&fdlocks->locks);
- =09fdlocks->cfile =3D cfile;
- =09cfile->llist =3D fdlocks;
--=09down_write(&cinode->lock_sem);
-+=09while (!down_write_trylock(&cinode->lock_sem))
-+=09=09msleep(125);
- =09list_add(&fdlocks->llist, &cinode->llist);
- =09up_write(&cinode->lock_sem);
-=20
-@@ -464,7 +465,8 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, =
-bool wait_oplock_handler)
- =09 * Delete any outstanding lock records. We'll lose them when the file
- =09 * is closed anyway.
- =09 */
--=09down_write(&cifsi->lock_sem);
-+=09while (!down_write_trylock(&cifsi->lock_sem))
-+=09=09msleep(125);
- =09list_for_each_entry_safe(li, tmp, &cifs_file->llist->locks, llist) {
- =09=09list_del(&li->llist);
- =09=09cifs_del_lock_waiters(li);
-@@ -1027,7 +1029,8 @@ int cifs_closedir(struct inode *inode, struct file *f=
-ile)
- cifs_lock_add(struct cifsFileInfo *cfile, struct cifsLockInfo *lock)
- {
- =09struct cifsInodeInfo *cinode =3D CIFS_I(d_inode(cfile->dentry));
--=09down_write(&cinode->lock_sem);
-+=09while (!down_write_trylock(&cinode->lock_sem))
-+=09=09msleep(125);
- =09list_add_tail(&lock->llist, &cfile->llist->locks);
- =09up_write(&cinode->lock_sem);
- }
-@@ -1049,7 +1052,8 @@ int cifs_closedir(struct inode *inode, struct file *f=
-ile)
-=20
- try_again:
- =09exist =3D false;
--=09down_write(&cinode->lock_sem);
-+=09while (!down_write_trylock(&cinode->lock_sem))
-+=09=09msleep(125);
-=20
- =09exist =3D cifs_find_lock_conflict(cfile, lock->offset, lock->length,
- =09=09=09=09=09lock->type, lock->flags, &conf_lock,
-@@ -1072,7 +1076,8 @@ int cifs_closedir(struct inode *inode, struct file *f=
-ile)
- =09=09=09=09=09(lock->blist.next =3D=3D &lock->blist));
- =09=09if (!rc)
- =09=09=09goto try_again;
--=09=09down_write(&cinode->lock_sem);
-+=09=09while (!down_write_trylock(&cinode->lock_sem))
-+=09=09=09msleep(125);
- =09=09list_del_init(&lock->blist);
- =09}
-=20
-@@ -1125,7 +1130,8 @@ int cifs_closedir(struct inode *inode, struct file *f=
-ile)
- =09=09return rc;
-=20
- try_again:
--=09down_write(&cinode->lock_sem);
-+=09while (!down_write_trylock(&cinode->lock_sem))
-+=09=09msleep(125);
- =09if (!cinode->can_cache_brlcks) {
- =09=09up_write(&cinode->lock_sem);
- =09=09return rc;
-@@ -1331,7 +1337,8 @@ struct lock_to_push {
- =09int rc =3D 0;
-=20
- =09/* we are going to update can_cache_brlcks here - need a write access *=
-/
--=09down_write(&cinode->lock_sem);
-+=09while (!down_write_trylock(&cinode->lock_sem))
-+=09=09msleep(125);
- =09if (!cinode->can_cache_brlcks) {
- =09=09up_write(&cinode->lock_sem);
- =09=09return rc;
-@@ -1522,7 +1529,8 @@ struct lock_to_push {
- =09if (!buf)
- =09=09return -ENOMEM;
-=20
--=09down_write(&cinode->lock_sem);
-+=09while (!down_write_trylock(&cinode->lock_sem))
-+=09=09msleep(125);
- =09for (i =3D 0; i < 2; i++) {
- =09=09cur =3D buf;
- =09=09num =3D 0;
-diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-index e6a1fc72018f..61f6cc8d9cc9 100644
---- a/fs/cifs/smb2file.c
-+++ b/fs/cifs/smb2file.c
-@@ -145,7 +145,8 @@
-=20
- =09cur =3D buf;
-=20
--=09down_write(&cinode->lock_sem);
-+=09while (!down_write_trylock(&cinode->lock_sem))
-+=09=09msleep(125);
- =09list_for_each_entry_safe(li, tmp, &cfile->llist->locks, llist) {
- =09=09if (flock->fl_start > li->offset ||
- =09=09    (flock->fl_start + length) <
---=20
-1.8.3.1
+Well, you just matched get() to set() args list, so this is not a strong
+argument IMO.
 
+> (my paraphrase), and that it should be passed as a structure. Two others
+> agreed. We gained because both set and get use the same structure after
+> this change (this allows a simplified read-modify-write cycle).
+
+That sounds like a nice benefit if this was user API, but are there any
+kernel users that intend to make use of that read-modify-write cycle?
+I don't think so.
+
+>
+> We will need a quorum on this, 3 (structure) to 2 (flag) now (but really
+> basically between Greg and Christoph?). Coding style issue: Add a flag,
+> or switch to a common xattr argument  structure?
+>
+
+IIRC, Christoph was asking why the silly struct and not simply add flags
+(as did I). He probably did not see Greg's comments due to the list bounce
+issue. If I read your second hand description of Greg's reaction correctly,
+it doesn't sound so strong opinionated as well.
+Me, I can live with flags or struct - I don't care, but...
+
+Be prepared that if you are going ahead with struct you are going to
+suffer from bike shedding, which has already started and you will be
+instructed (just now) to also fix all the relevant and missing Documentation.
+If, on the other hand, you can get Greg and the rest to concede to adding
+flags arg and match get() arg list to set() arg list, you will have a much
+easier job and the patch line count, especially in fs code will be *much*
+smaller - just saying.
+
+Thanks,
+Amir.
