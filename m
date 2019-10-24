@@ -2,160 +2,153 @@ Return-Path: <SRS0=ZfIs=YR=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0EA2CA9EAF
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 04:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C070CA9EAF
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 22:22:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91E5E2166E
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 04:57:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF11D2166E
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 22:22:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f+iU1lVJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dM3a70dc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408361AbfJXE5Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 24 Oct 2019 00:57:16 -0400
-Received: from mail-yw1-f68.google.com ([209.85.161.68]:41658 "EHLO
-        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725298AbfJXE5Q (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 24 Oct 2019 00:57:16 -0400
-Received: by mail-yw1-f68.google.com with SMTP id o195so3404768ywd.8;
-        Wed, 23 Oct 2019 21:57:15 -0700 (PDT)
+        id S1730365AbfJXWWp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 24 Oct 2019 18:22:45 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:39211 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729789AbfJXWWp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 24 Oct 2019 18:22:45 -0400
+Received: by mail-lf1-f68.google.com with SMTP id 195so20421807lfj.6
+        for <linux-cifs@vger.kernel.org>; Thu, 24 Oct 2019 15:22:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Qp4ylpFjT2NK5D3YlCPCDZfnUsSpfLeB6JcWlmTT8JE=;
-        b=f+iU1lVJ+8MXE0YjXhbzT4Z+QZTKEVbpSj7I64WEMcxAgcUOKckEALuDnxjfop1KDz
-         /GEuxtdqM/gAmg/8rUQcbM54P8ZvUqXo23LCox8OZKBVBlVoDn1p5gmEXxfQnAWBfBHW
-         uZZaGVOWsT//cwHGlbqENLvAYitmYf5NxnxRGYapcBJVSV1rP+NlFCXZHqVZ6fsYCVwo
-         HiL1fAZTVAeLbnNXS5YnMp44jrRgVnpRxhkGyVWlHqmqFFsCMZbuTBKjna3CheOTh8v8
-         hD6hfXAtyLGGlQqfHMdlsFiQ1XgpXWIL5nune/Pgn/JF3P1WqL13u+LVKHRsnQpi/3uP
-         Pzow==
+         :cc:content-transfer-encoding;
+        bh=aU0iP5CmSHUVI5uSPp29ZIOe+PEwKvMBMSbDGnySMlk=;
+        b=dM3a70dca3wwQeWYngW2s9d2q2ef/1BhCUPoFxkZWe4yJUTpV6AiK2Q739tcNpM8rE
+         VJcj8IhyArOdjOIYlQ3WEtjahYiyJWmjW0JpE+ivqK3YVTPmrNUFnLKxUe/6Qk3bQj31
+         PTqQ0oUd6cr++cdmU6c+ACTw6RHOWiyWg5VEiXgy4hwXIq/iR0+RA3QnKzo6l/RZbFuA
+         QRj5bXeujrnDKuqfXGExki73Nq4KYzugIF0w8LAIEfpZ/iwNXADbHwh07WwtRXzGca5x
+         gzMN/QTltMB5ukfiOTa3BYnrLh/gUDBSGJq0I1lU1H/52Vya104H+0cxqDZLMosET5+n
+         8Lxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Qp4ylpFjT2NK5D3YlCPCDZfnUsSpfLeB6JcWlmTT8JE=;
-        b=t2MGTIc8mTc7xW5/p/CK16Ve9OEKmiR3Bt1eoB5Z7AoMwDnIldppJFs4AQlRg5rSTa
-         q12+rvFQWnsBdLRSERRYnp2UD56h9Ed7dygSLlsN0K+KpagF9fNJEIyKLAZLanO3WOPf
-         xM/lf7xUbla/jk3vlTj9s1KC4BPrPrpH5tFKq9eB/9V+W/lhbBMXJOZIyvrB5aDeJJ6t
-         C+eN3/HhTt2oLPFy4NmgSsOa9Izgi1LmAXlmxlOybOx4Ju3ogFv6LeWPgiB0NsBh1iZd
-         fM7e68NeYec1KF3EY1ABYuene9koRVfxcXINUYEd59XIU70IQZHgjxsu/Ak2dZoAh9dB
-         jjbg==
-X-Gm-Message-State: APjAAAX2taqOZp6Wh4uI+eNoiHVcayhSQURKPdVWJQhiiAase5zce9Le
-        cDp9IVjonZ/SxmlpoPcPLJDkSfLsNotmk4dR8To=
-X-Google-Smtp-Source: APXvYqzpUv8fnfcjV1KksbDdhWbx31x/A6CcO3wQjALxaBgCfUkMkcsChuqQOOuA9702g94fFIVsWA6cYWlyk5yi/8s=
-X-Received: by 2002:a81:6c58:: with SMTP id h85mr5010753ywc.88.1571893034732;
- Wed, 23 Oct 2019 21:57:14 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=aU0iP5CmSHUVI5uSPp29ZIOe+PEwKvMBMSbDGnySMlk=;
+        b=ZwOTpmdnCu0n8STyJhyafHK9L70mz6q8RNJS9WzzAXFh42Ea7CuoNDVAWGmrMWJ4TV
+         1mW7kZb4W5RdbXszfdTz0OMaU1Yu/mAhv7H2eKitvB/qFta/g3mvg6LS4vhmJUDfKj4C
+         9HZHJgySLPGFWr0d2+sH+4w2bGRN9a+tyOe9wqwmt1+OjId3UGw+ZhN1jxcShq6M6fob
+         /0IbBcKoGP+6BLiwUFF6Q6dG4fgJGBwEmOUWDmWpMdk4MOBAGBb76ko5iy79K/CCxgAI
+         m1BS9opS/06LY/orSmwVkKUj1c0g5BHZQMXLjz8ztcm0dSkTMm2cmwZexLG0gZ4YekaT
+         Lk8w==
+X-Gm-Message-State: APjAAAV0uWACPZTGY/tDgSonxlbGqLofNPUbdGeWzNV67Qcq+s5QSh9Z
+        vbFfFMBIBcgEHogbbrvpBr6n+zwsoywvRSaBu8yShbw=
+X-Google-Smtp-Source: APXvYqwC715t4r/rnI8HGc6iVC5KjFAGBxSC8eVCUbbyXtFkWqKm/ez8871gHX1phFEFWlmwVq08TrTJyFiJxmGSksU=
+X-Received: by 2002:ac2:55b4:: with SMTP id y20mr289654lfg.173.1571955761866;
+ Thu, 24 Oct 2019 15:22:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191022204453.97058-1-salyzyn@android.com> <20191022204453.97058-2-salyzyn@android.com>
- <8CE5B6E8-DCB7-4F0B-91C1-48030947F585@dilger.ca>
-In-Reply-To: <8CE5B6E8-DCB7-4F0B-91C1-48030947F585@dilger.ca>
-From:   Amir Goldstein <amir73il@gmail.com>
-Date:   Thu, 24 Oct 2019 07:57:03 +0300
-Message-ID: <CAOQ4uxis-oQSjKrtBDi-8BQ2M3ve3w8o-YVGRwWLnq+5JLUttA@mail.gmail.com>
-Subject: Re: [PATCH v14 1/5] Add flags option to get xattr method paired to __vfs_getxattr
-To:     Andreas Dilger <adilger@dilger.ca>
-Cc:     Mark Salyzyn <salyzyn@android.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-doc@vger.kernel.org, CIFS <linux-cifs@vger.kernel.org>,
-        kernel-team@android.com, selinux@vger.kernel.org,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        Stephen Smalley <sds@tycho.nsa.gov>,
-        overlayfs <linux-unionfs@vger.kernel.org>,
-        Andreas Gruenbacher <agruenba@redhat.com>,
-        ecryptfs@vger.kernel.org,
-        LSM List <linux-security-module@vger.kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>
+References: <1571882902-23966-1-git-send-email-dwysocha@redhat.com>
+In-Reply-To: <1571882902-23966-1-git-send-email-dwysocha@redhat.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Thu, 24 Oct 2019 15:22:30 -0700
+Message-ID: <CAKywueTnbWBW9CtGL8vjYaPVOZxvG54=YNk=kYSJFA1gMQoC1w@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+To:     Dave Wysochanski <dwysocha@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-[excessive CC list reduced]
-
-On Wed, Oct 23, 2019 at 11:07 AM Andreas Dilger via samba-technical
-<samba-technical@lists.samba.org> wrote:
+=D1=87=D1=82, 24 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 04:04, Dave Wysoch=
+anski <dwysocha@redhat.com>:
 >
+> There's a deadlock that is possible and can easily be seen with
+> a test where multiple readers open/read/close of the same file
+> and a disruption occurs causing reconnect.  The deadlock is due
+> a reader thread inside cifs_strict_readv calling down_read and
+> obtaining lock_sem, and then after reconnect inside
+> cifs_reopen_file calling down_read a second time.  If in
+> between the two down_read calls, a down_write comes from
+> another process, deadlock occurs.
 >
-> On Oct 22, 2019, at 2:44 PM, Mark Salyzyn <salyzyn@android.com> wrote:
-> >
-> > Replace arguments for get and set xattr methods, and __vfs_getxattr
-> > and __vfs_setaxtr functions with a reference to the following now
-> > common argument structure:
-> >
-> > struct xattr_gs_args {
-> >       struct dentry *dentry;
-> >       struct inode *inode;
-> >       const char *name;
-> >       union {
-> >               void *buffer;
-> >               const void *value;
-> >       };
-> >       size_t size;
-> >       int flags;
-> > };
+>         CPU0                    CPU1
+>         ----                    ----
+> cifs_strict_readv()
+>  down_read(&cifsi->lock_sem);
+>                                _cifsFileInfo_put
+>                                   OR
+>                                cifs_new_fileinfo
+>                                 down_write(&cifsi->lock_sem);
+> cifs_reopen_file()
+>  down_read(&cifsi->lock_sem);
 >
-
-> > Mark,
-> >
-> > I do not see the first patch on fsdevel
-> > and I am confused from all the suggested APIs
-> > I recall Christoph's comment on v8 for not using xattr_gs_args
-> > and just adding flags to existing get() method.
-> > I agree to that comment.
+> Fix the above by changing all down_write(lock_sem) calls to
+> down_write_trylock(lock_sem)/msleep() loop, which in turn
+> makes the second down_read call benign since it will never
+> block behind the writer while holding lock_sem.
 >
-> As already responded, third (?) patch version was like that,
-
-The problem is that because of the waaay too long CC list, most revisions
-of the patch and discussion were bounced from fsdevel, most emails
-I did not get and cannot find in archives, so the discussion around
-them is not productive.
-
-Please resend patch to fsdevel discarding the auto added CC list
-of all fs maintainers.
-
-> gregkh@
-> said it passed the limit for number of arguments, is looking a bit silly
-
-Well, you just matched get() to set() args list, so this is not a strong
-argument IMO.
-
-> (my paraphrase), and that it should be passed as a structure. Two others
-> agreed. We gained because both set and get use the same structure after
-> this change (this allows a simplified read-modify-write cycle).
-
-That sounds like a nice benefit if this was user API, but are there any
-kernel users that intend to make use of that read-modify-write cycle?
-I don't think so.
-
+> Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
+> Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/cifsglob.h |  5 +++++
+>  fs/cifs/file.c     | 24 ++++++++++++++++--------
+>  fs/cifs/smb2file.c |  3 ++-
+>  3 files changed, 23 insertions(+), 9 deletions(-)
 >
-> We will need a quorum on this, 3 (structure) to 2 (flag) now (but really
-> basically between Greg and Christoph?). Coding style issue: Add a flag,
-> or switch to a common xattr argument  structure?
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 50dfd9049370..2c4a7adbcb4e 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1391,6 +1391,11 @@ struct cifs_writedata {
+>  struct cifsInodeInfo {
+>         bool can_cache_brlcks;
+>         struct list_head llist; /* locks helb by this inode */
+> +       /*
+> +        * NOTE: Some code paths call down_read(lock_sem) twice, so
+> +        * we must always use use down_write_trylock()/msleep() loop
+> +        * to avoid deadlock.
+> +        */
+>         struct rw_semaphore lock_sem;   /* protect the fields above */
+>         /* BB add in lists for dirty pages i.e. write caching info for op=
+lock */
+>         struct list_head openFileList;
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 5ad15de2bb4f..52454df5ae39 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -306,7 +306,8 @@ struct cifsFileInfo *
+>         INIT_LIST_HEAD(&fdlocks->locks);
+>         fdlocks->cfile =3D cfile;
+>         cfile->llist =3D fdlocks;
+> -       down_write(&cinode->lock_sem);
+> +       while (!down_write_trylock(&cinode->lock_sem))
+> +               msleep(125);
+>         list_add(&fdlocks->llist, &cinode->llist);
+>         up_write(&cinode->lock_sem);
 >
+> @@ -464,7 +465,8 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file=
+, bool wait_oplock_handler)
+>          * Delete any outstanding lock records. We'll lose them when the =
+file
+>          * is closed anyway.
+>          */
+> -       down_write(&cifsi->lock_sem);
+> +       while (!down_write_trylock(&cifsi->lock_sem))
+> +               msleep(125);
 
-IIRC, Christoph was asking why the silly struct and not simply add flags
-(as did I). He probably did not see Greg's comments due to the list bounce
-issue. If I read your second hand description of Greg's reaction correctly,
-it doesn't sound so strong opinionated as well.
-Me, I can live with flags or struct - I don't care, but...
+Please wrap the above code into a helper function e.g.
+cifs_acquire_lock_sem(struct cifsInodeInfo *cinode) or any other name
+you like.
 
-Be prepared that if you are going ahead with struct you are going to
-suffer from bike shedding, which has already started and you will be
-instructed (just now) to also fix all the relevant and missing Documentation.
-If, on the other hand, you can get Greg and the rest to concede to adding
-flags arg and match get() arg list to set() arg list, you will have a much
-easier job and the patch line count, especially in fs code will be *much*
-smaller - just saying.
+Other than that it looks good.
 
-Thanks,
-Amir.
+--
+Best regards,
+Pavel Shilovsky
