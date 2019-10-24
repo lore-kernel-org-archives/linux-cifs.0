@@ -7,54 +7,75 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D33ACA9EB9
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 02:08:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B908FCA9EB9
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 02:57:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F27CD2084B
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 02:08:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80F3320679
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 02:57:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cr6O+nE0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fz4MvRw9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408168AbfJXCI3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 23 Oct 2019 22:08:29 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33055 "EHLO
+        id S2437190AbfJXC5O (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 23 Oct 2019 22:57:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57146 "EHLO
         us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2408092AbfJXCI3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Oct 2019 22:08:29 -0400
+        with ESMTP id S2406392AbfJXC5N (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Oct 2019 22:57:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571882907;
+        s=mimecast20190719; t=1571885831;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=6ztLRceEh+GlM9KbaXqjTtQMabPALX4VRhLhXgPR4zk=;
-        b=cr6O+nE0Ve5FdcSfFugDy+IZT2BUaA3K7pZqwybI30SMW0NBxmwPtf4tIzWX1UUWGCADXS
-        bxaoy5DXyrSqvoA1y6WUs6NLKvxygRYKQupGKHA3wwUAIg5LadHifEZMv2S5lmNOx8K/Fa
-        r0MBnNGuZNbsQPHVVfkXHj2R13fZ9dQ=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=x68XJTnKjf41lGoeYGsmEP+gTcg5aS/f3BGFui9N0Ug=;
+        b=Fz4MvRw9Uwqz75hnxdHOOvcHkRA6Lm8PkLmDJCwMhOCBR8JvLk0Pf6CBuKCpnlm1ATqAFW
+        rc+i9YSKknrQ/OKKA4mHtPAvuUgMN1EQhq+3RuJxQM4pkw+eQGCkywvhDHvxj48iWxVSYY
+        k1X/XE/vxaOji9LIkGFgvmmHMzu9xrQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-790jP3jKOvu4YI6zlKCJmw-1; Wed, 23 Oct 2019 22:08:25 -0400
+ us-mta-166-7RqOpilgNii4pkRMbCtoOg-1; Wed, 23 Oct 2019 22:57:10 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A43A747B
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Oct 2019 02:08:24 +0000 (UTC)
-Received: from dwysocha.rdu.csb (ovpn-120-59.rdu2.redhat.com [10.10.120.59])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 554595C1D4
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Oct 2019 02:08:24 +0000 (UTC)
-From:   Dave Wysochanski <dwysocha@redhat.com>
-To:     linux-cifs@vger.kernel.org
-Subject: [PATCH] cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
-Date:   Wed, 23 Oct 2019 22:08:22 -0400
-Message-Id: <1571882902-23966-1-git-send-email-dwysocha@redhat.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46D0A800D5A
+        for <linux-cifs@vger.kernel.org>; Thu, 24 Oct 2019 02:57:09 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F54E5C1D4
+        for <linux-cifs@vger.kernel.org>; Thu, 24 Oct 2019 02:57:09 +0000 (UTC)
+Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 3278118089C8;
+        Thu, 24 Oct 2019 02:57:09 +0000 (UTC)
+Date:   Wed, 23 Oct 2019 22:57:09 -0400 (EDT)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     Dave Wysochanski <dwysocha@redhat.com>
+Cc:     linux-cifs@vger.kernel.org
+Message-ID: <1052193585.8275161.1571885829108.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1571882902-23966-1-git-send-email-dwysocha@redhat.com>
+References: <1571882902-23966-1-git-send-email-dwysocha@redhat.com>
+Subject: Re: [PATCH] cifs: Fix cifsInodeInfo lock_sem deadlock when
+ reconnect occurs
+MIME-Version: 1.0
+X-Originating-IP: [10.64.54.48, 10.4.195.19]
+Thread-Topic: cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+Thread-Index: vkNlK21QITy76NZ/w2TPmrJ2FYesCA==
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 790jP3jKOvu4YI6zlKCJmw-1
+X-MC-Unique: 7RqOpilgNii4pkRMbCtoOg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
+
+Reviewed-by me
+
+----- Original Message -----
+From: "Dave Wysochanski" <dwysocha@redhat.com>
+To: linux-cifs@vger.kernel.org
+Sent: Thursday, 24 October, 2019 12:08:22 PM
+Subject: [PATCH] cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect o=
+ccurs
 
 There's a deadlock that is possible and can easily be seen with
 a test where multiple readers open/read/close of the same file
