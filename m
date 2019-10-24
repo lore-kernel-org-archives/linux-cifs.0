@@ -1,129 +1,215 @@
-Return-Path: <SRS0=Yjbq=YQ=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=ZfIs=YR=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 509A1CA9EB9
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Oct 2019 22:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D33ACA9EB9
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 02:08:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F6E220663
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Oct 2019 22:55:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F27CD2084B
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Oct 2019 02:08:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sVHezYDm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cr6O+nE0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730032AbfJWWzs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 23 Oct 2019 18:55:48 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:46644 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727831AbfJWWzs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Oct 2019 18:55:48 -0400
-Received: by mail-pg1-f195.google.com with SMTP id e15so12975506pgu.13
-        for <linux-cifs@vger.kernel.org>; Wed, 23 Oct 2019 15:55:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=uEWVNeR2W07hTCVyB8RjEut1LPMiDrNPqmTc4HggtgA=;
-        b=sVHezYDmrOpFWT+XYbxN7T2sjwiwoOjXP3q5815Sjr7Ah4NHFQkxkpjRH8kaXHIWUl
-         CeE9j9zGeY50XoF5/IHbk00WwIRd9WAGCqo4J7rrAAzmf2Ea1RyRfe3QJRUYT5ybaDXD
-         /avz2C7glgckP0MCullO0469fVNNe1J31ADA8ru4vaURa2tgw3mh3YsO4LPQh53xLpMG
-         2c+VO3ydJNmo4qlVBjF7+LxlsmcrM9JxgYmMTKmh01sKziptj0yQ+cd5kiA+HRghEdAN
-         PFkuSk1z0AilJX2OkKoFrkADBJealk0hC9yWyjEi5WFGoIYtIXOqTfynj3drawG+Ai9E
-         Pj5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=uEWVNeR2W07hTCVyB8RjEut1LPMiDrNPqmTc4HggtgA=;
-        b=RlCww+qdGw2Cxma2XGFBSYvKaguqRztqJVVUAhTwOfyQyd9bVd7RAKLXyzoIx1/LKM
-         nSWcre3nlE0b1TY44WgVpsA3WV8WQuYICnDSYR90sIGcgvcK36zZS9vsQmiVjQf6zo/L
-         1fLmOGjMgrI5w+x/I3Ks2bUfGqWD7LL/10ZY4PPNlUOwKm05d9sJ9QZkofSSwnZw8RbO
-         IiioXQ/6f1FrgyP8wfKjttw0VoDWOHiUm+ZTeIxg9ACnWnMchP8rfKMDqCwT3hBjqb0c
-         0GFgqLbQpF0MjgzL4UgGpuVI8xHwOmvqwb9yjZucB1XCTqCo7u3Nyz0X96QN2kIcQdrU
-         b0mg==
-X-Gm-Message-State: APjAAAUc4/3fDxKMWA9EIdhlA21mX1toUxW5QKiuqhaa5LozgxQRLCOQ
-        WVekYX81I+kU8kUJFlNtZuL8Vv8=
-X-Google-Smtp-Source: APXvYqyQza5xaAn+rS1r38WQ2PVl6v78Roxyt70TNylno+7y3tWLxb5oSrZifZ6H2mfX6xuUXXmY8A==
-X-Received: by 2002:a63:f40e:: with SMTP id g14mr13067007pgi.62.1571871347758;
-        Wed, 23 Oct 2019 15:55:47 -0700 (PDT)
-Received: from ubuntu-vm.mshome.net ([167.220.2.106])
-        by smtp.gmail.com with ESMTPSA id z13sm29022860pfq.121.2019.10.23.15.55.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2019 15:55:46 -0700 (PDT)
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-X-Google-Original-From: Pavel Shilovsky <pshilov@microsoft.com>
-To:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Steve French <smfrench@gmail.com>,
-        Dave Wysochanski <dwysocha@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Pavel Shilovskiy <pshilov@microsoft.com>
-Subject: [PATCH] CIFS: Fix use after free of file info structures
-Date:   Wed, 23 Oct 2019 15:55:40 -0700
-Message-Id: <20191023225540.1916-1-pshilov@microsoft.com>
-X-Mailer: git-send-email 2.17.1
+        id S2408168AbfJXCI3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 23 Oct 2019 22:08:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33055 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2408092AbfJXCI3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Oct 2019 22:08:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571882907;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=6ztLRceEh+GlM9KbaXqjTtQMabPALX4VRhLhXgPR4zk=;
+        b=cr6O+nE0Ve5FdcSfFugDy+IZT2BUaA3K7pZqwybI30SMW0NBxmwPtf4tIzWX1UUWGCADXS
+        bxaoy5DXyrSqvoA1y6WUs6NLKvxygRYKQupGKHA3wwUAIg5LadHifEZMv2S5lmNOx8K/Fa
+        r0MBnNGuZNbsQPHVVfkXHj2R13fZ9dQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-790jP3jKOvu4YI6zlKCJmw-1; Wed, 23 Oct 2019 22:08:25 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A43A747B
+        for <linux-cifs@vger.kernel.org>; Thu, 24 Oct 2019 02:08:24 +0000 (UTC)
+Received: from dwysocha.rdu.csb (ovpn-120-59.rdu2.redhat.com [10.10.120.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 554595C1D4
+        for <linux-cifs@vger.kernel.org>; Thu, 24 Oct 2019 02:08:24 +0000 (UTC)
+From:   Dave Wysochanski <dwysocha@redhat.com>
+To:     linux-cifs@vger.kernel.org
+Subject: [PATCH] cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+Date:   Wed, 23 Oct 2019 22:08:22 -0400
+Message-Id: <1571882902-23966-1-git-send-email-dwysocha@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 790jP3jKOvu4YI6zlKCJmw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Currently the code assumes that if a file info entry belongs
-to lists of open file handles of an inode and a tcon then
-it has non-zero reference. The recent changes broke that
-assumption when putting the last reference of the file info.
-There may be a situation when a file is being deleted but
-nothing prevents another thread to reference it again
-and start using it. This happens because we do not hold
-the inode list lock while checking the number of references
-of the file info structure. Fix this by doing the proper
-locking when doing the check.
+There's a deadlock that is possible and can easily be seen with
+a test where multiple readers open/read/close of the same file
+and a disruption occurs causing reconnect.  The deadlock is due
+a reader thread inside cifs_strict_readv calling down_read and
+obtaining lock_sem, and then after reconnect inside
+cifs_reopen_file calling down_read a second time.  If in
+between the two down_read calls, a down_write comes from
+another process, deadlock occurs.
 
-Fixes: 487317c99477d ("cifs: add spinlock for the openFileList to cifsInodeInfo")
-Fixes: cb248819d209d ("cifs: use cifsInodeInfo->open_file_lock while iterating to avoid a panic")
-Cc: Stable <stable@vger.kernel.org>
-Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+        CPU0                    CPU1
+        ----                    ----
+cifs_strict_readv()
+ down_read(&cifsi->lock_sem);
+                               _cifsFileInfo_put
+                                  OR
+                               cifs_new_fileinfo
+                                down_write(&cifsi->lock_sem);
+cifs_reopen_file()
+ down_read(&cifsi->lock_sem);
+
+Fix the above by changing all down_write(lock_sem) calls to
+down_write_trylock(lock_sem)/msleep() loop, which in turn
+makes the second down_read call benign since it will never
+block behind the writer while holding lock_sem.
+
+Signed-off-by: Dave Wysochanski <dwysocha@redhat.com>
+Suggested-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/cifs/file.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/cifs/cifsglob.h |  5 +++++
+ fs/cifs/file.c     | 24 ++++++++++++++++--------
+ fs/cifs/smb2file.c |  3 ++-
+ 3 files changed, 23 insertions(+), 9 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 50dfd9049370..2c4a7adbcb4e 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1391,6 +1391,11 @@ struct cifs_writedata {
+ struct cifsInodeInfo {
+ =09bool can_cache_brlcks;
+ =09struct list_head llist;=09/* locks helb by this inode */
++=09/*
++=09 * NOTE: Some code paths call down_read(lock_sem) twice, so
++=09 * we must always use use down_write_trylock()/msleep() loop
++=09 * to avoid deadlock.
++=09 */
+ =09struct rw_semaphore lock_sem;=09/* protect the fields above */
+ =09/* BB add in lists for dirty pages i.e. write caching info for oplock *=
+/
+ =09struct list_head openFileList;
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 4c1aeb2cf7f5..53dbb6e0d390 100644
+index 5ad15de2bb4f..52454df5ae39 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -405,10 +405,11 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_handler)
- 	bool oplock_break_cancelled;
- 
- 	spin_lock(&tcon->open_file_lock);
--
-+	spin_lock(&cifsi->open_file_lock);
- 	spin_lock(&cifs_file->file_info_lock);
- 	if (--cifs_file->count > 0) {
- 		spin_unlock(&cifs_file->file_info_lock);
-+		spin_unlock(&cifsi->open_file_lock);
- 		spin_unlock(&tcon->open_file_lock);
- 		return;
- 	}
-@@ -421,9 +422,7 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_handler)
- 	cifs_add_pending_open_locked(&fid, cifs_file->tlink, &open);
- 
- 	/* remove it from the lists */
--	spin_lock(&cifsi->open_file_lock);
- 	list_del(&cifs_file->flist);
--	spin_unlock(&cifsi->open_file_lock);
- 	list_del(&cifs_file->tlist);
- 	atomic_dec(&tcon->num_local_opens);
- 
-@@ -440,6 +439,7 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_handler)
- 		cifs_set_oplock_level(cifsi, 0);
- 	}
- 
-+	spin_unlock(&cifsi->open_file_lock);
- 	spin_unlock(&tcon->open_file_lock);
- 
- 	oplock_break_cancelled = wait_oplock_handler ?
--- 
-2.17.1
+@@ -306,7 +306,8 @@ struct cifsFileInfo *
+ =09INIT_LIST_HEAD(&fdlocks->locks);
+ =09fdlocks->cfile =3D cfile;
+ =09cfile->llist =3D fdlocks;
+-=09down_write(&cinode->lock_sem);
++=09while (!down_write_trylock(&cinode->lock_sem))
++=09=09msleep(125);
+ =09list_add(&fdlocks->llist, &cinode->llist);
+ =09up_write(&cinode->lock_sem);
+=20
+@@ -464,7 +465,8 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, =
+bool wait_oplock_handler)
+ =09 * Delete any outstanding lock records. We'll lose them when the file
+ =09 * is closed anyway.
+ =09 */
+-=09down_write(&cifsi->lock_sem);
++=09while (!down_write_trylock(&cifsi->lock_sem))
++=09=09msleep(125);
+ =09list_for_each_entry_safe(li, tmp, &cifs_file->llist->locks, llist) {
+ =09=09list_del(&li->llist);
+ =09=09cifs_del_lock_waiters(li);
+@@ -1027,7 +1029,8 @@ int cifs_closedir(struct inode *inode, struct file *f=
+ile)
+ cifs_lock_add(struct cifsFileInfo *cfile, struct cifsLockInfo *lock)
+ {
+ =09struct cifsInodeInfo *cinode =3D CIFS_I(d_inode(cfile->dentry));
+-=09down_write(&cinode->lock_sem);
++=09while (!down_write_trylock(&cinode->lock_sem))
++=09=09msleep(125);
+ =09list_add_tail(&lock->llist, &cfile->llist->locks);
+ =09up_write(&cinode->lock_sem);
+ }
+@@ -1049,7 +1052,8 @@ int cifs_closedir(struct inode *inode, struct file *f=
+ile)
+=20
+ try_again:
+ =09exist =3D false;
+-=09down_write(&cinode->lock_sem);
++=09while (!down_write_trylock(&cinode->lock_sem))
++=09=09msleep(125);
+=20
+ =09exist =3D cifs_find_lock_conflict(cfile, lock->offset, lock->length,
+ =09=09=09=09=09lock->type, lock->flags, &conf_lock,
+@@ -1072,7 +1076,8 @@ int cifs_closedir(struct inode *inode, struct file *f=
+ile)
+ =09=09=09=09=09(lock->blist.next =3D=3D &lock->blist));
+ =09=09if (!rc)
+ =09=09=09goto try_again;
+-=09=09down_write(&cinode->lock_sem);
++=09=09while (!down_write_trylock(&cinode->lock_sem))
++=09=09=09msleep(125);
+ =09=09list_del_init(&lock->blist);
+ =09}
+=20
+@@ -1125,7 +1130,8 @@ int cifs_closedir(struct inode *inode, struct file *f=
+ile)
+ =09=09return rc;
+=20
+ try_again:
+-=09down_write(&cinode->lock_sem);
++=09while (!down_write_trylock(&cinode->lock_sem))
++=09=09msleep(125);
+ =09if (!cinode->can_cache_brlcks) {
+ =09=09up_write(&cinode->lock_sem);
+ =09=09return rc;
+@@ -1331,7 +1337,8 @@ struct lock_to_push {
+ =09int rc =3D 0;
+=20
+ =09/* we are going to update can_cache_brlcks here - need a write access *=
+/
+-=09down_write(&cinode->lock_sem);
++=09while (!down_write_trylock(&cinode->lock_sem))
++=09=09msleep(125);
+ =09if (!cinode->can_cache_brlcks) {
+ =09=09up_write(&cinode->lock_sem);
+ =09=09return rc;
+@@ -1522,7 +1529,8 @@ struct lock_to_push {
+ =09if (!buf)
+ =09=09return -ENOMEM;
+=20
+-=09down_write(&cinode->lock_sem);
++=09while (!down_write_trylock(&cinode->lock_sem))
++=09=09msleep(125);
+ =09for (i =3D 0; i < 2; i++) {
+ =09=09cur =3D buf;
+ =09=09num =3D 0;
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index e6a1fc72018f..61f6cc8d9cc9 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -145,7 +145,8 @@
+=20
+ =09cur =3D buf;
+=20
+-=09down_write(&cinode->lock_sem);
++=09while (!down_write_trylock(&cinode->lock_sem))
++=09=09msleep(125);
+ =09list_for_each_entry_safe(li, tmp, &cfile->llist->locks, llist) {
+ =09=09if (flock->fl_start > li->offset ||
+ =09=09    (flock->fl_start + length) <
+--=20
+1.8.3.1
 
