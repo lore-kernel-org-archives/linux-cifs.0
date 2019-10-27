@@ -2,68 +2,157 @@ Return-Path: <SRS0=GKCu=YU=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 818F1CA9EBC
-	for <linux-cifs@archiver.kernel.org>; Sun, 27 Oct 2019 11:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3105CA9EBD
+	for <linux-cifs@archiver.kernel.org>; Sun, 27 Oct 2019 19:59:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5893321928
-	for <linux-cifs@archiver.kernel.org>; Sun, 27 Oct 2019 11:30:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572175825;
-	bh=2VaHNPvCx/dmdR/cKdZwOAI/jgLgRvfZOTPcNXII2I8=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=e25e5G1jjSqPai2OZLLuye+11dMawKXP33rOmIW0A6CypSRAEKruz+xfFpYv9sYhq
-	 0ysFBb5CrSeEsdrOi6B1/Tj8GOgkMJZTGJVc28RlVStURGmdw3NqTyMIDE5pzLVpl9
-	 LH5kDYdZDOZvNuWOdT75LvXU4a+WYALqXk8phYpM=
+	by mail.kernel.org (Postfix) with ESMTP id 7674C20650
+	for <linux-cifs@archiver.kernel.org>; Sun, 27 Oct 2019 19:59:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IfnIIUZp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726867AbfJ0LaV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 27 Oct 2019 07:30:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48572 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726706AbfJ0LaF (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 27 Oct 2019 07:30:05 -0400
-Subject: Re: [GIT PULL] CIFS/SMB3 Fixes
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572175805;
-        bh=2VaHNPvCx/dmdR/cKdZwOAI/jgLgRvfZOTPcNXII2I8=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=odSZ15MmLnoqKYq1MgAOqtNeKKm/V2Rq97mpkxnP/CDoOobnRFipSV/E5glZH0mte
-         79w+er4HPwnR6B1ulQRANmewenmiaUq1ANN6cPHNrOMByLesXwO247XK1teSDCMIIw
-         WOIT1zu+NdBskQ6E/zgBRy0zhDEF5ZkwSVgZlukI=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5muwqB-D9=2ZxBkT-T77PkjAHh4TPpsr9vsDZD5nmu9jyw@mail.gmail.com>
-References: <CAH2r5muwqB-D9=2ZxBkT-T77PkjAHh4TPpsr9vsDZD5nmu9jyw@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5muwqB-D9=2ZxBkT-T77PkjAHh4TPpsr9vsDZD5nmu9jyw@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git
- tags/5.4-rc5-smb3-fixes
-X-PR-Tracked-Commit-Id: d46b0da7a33dd8c99d969834f682267a45444ab3
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: c9a2e4a82905c4759d3894bbe827b84574a69b91
-Message-Id: <157217580523.15608.9168706059879836770.pr-tracker-bot@kernel.org>
-Date:   Sun, 27 Oct 2019 11:30:05 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        id S1727275AbfJ0T7a (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 27 Oct 2019 15:59:30 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:40513 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727268AbfJ0T7a (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 27 Oct 2019 15:59:30 -0400
+Received: by mail-io1-f65.google.com with SMTP id p6so8155166iod.7;
+        Sun, 27 Oct 2019 12:59:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1JDSmw4J3XoscIws3mjSmVtK+pmmPNy7/Yi1UQKGYyc=;
+        b=IfnIIUZpwalkn0FyuXzidd6QbzoB/pizIfsG7Kq/pLUDKe0/r/6k5nl+T0L9VY9LHc
+         UeGyRrDWobnZWk772raunkKmfuhcIGE0AxgzD2dJP6FhRnJ6GuSMv1pGLWkfMZYMy/H7
+         gmrvOpgA6virUieOFyZq+NtEsOHCSy5RIthtjfuhEqqcQlUNlp9uRgEqZLrPsIhnF0aQ
+         WJMee5yNIYIexo27dVyCe79v5SIirCLDi2mjXncXVZHBNrqfrRQMzDiU7PJstoHNi4E7
+         tOpDpcnmFi1b1YL1x447NeM2Eg6QcyQkSmKwLZOWmD/c9Ef4G0j+UosEKCForP5i5Tfl
+         +fug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1JDSmw4J3XoscIws3mjSmVtK+pmmPNy7/Yi1UQKGYyc=;
+        b=UHC+7r/tVMnU2bCSoVjkNQPD8htHZLJv5NgenJlwrRPslDuG5hGWhQ8tBJllAq90JP
+         x2tg9dgHX3i2Fyc091QJDudWlO8S1uBznpDa1hQhRDM7hWRchDV3UXX4z/lDRAasK1G1
+         jECDGd+dRBIqpPSm3wcVdmETKimVas+YC3sfEVxlnEqb3p4fWfXwWCs97xfpLKa5wsi8
+         Ow9/U4/4lImng6fWyXinSn19SWOKW7pXRcbqfx5AZBUy0YL+Xtnrsyc3x9jBHZ/BWkNt
+         Nxpewsq0LmaA+D83kgkeH2vwK7yOpG8m1mg3GathPYdOEobRGk6JL3tL31czyy9n8oxV
+         ep2Q==
+X-Gm-Message-State: APjAAAUu/RSrtjyS2nBsWuC2e1U0IfIVtKtP7WlZFUey5tcd+xUcgDaD
+        lMnAWIqG83tOOylm8k9wdDQWesjAAMNL00v8VCo=
+X-Google-Smtp-Source: APXvYqzQBpwMNIT2dG22laDowix/1mJWw64mvlIHL9mvLhX8iaqPbYdgarAGvzKHfXWihZYw3Fy20QQ5B1mKqGkyQ3M=
+X-Received: by 2002:a02:1c41:: with SMTP id c62mr12041847jac.132.1572206367691;
+ Sun, 27 Oct 2019 12:59:27 -0700 (PDT)
+MIME-Version: 1.0
+References: <1571259116-102015-1-git-send-email-longli@linuxonhyperv.com> <1571259116-102015-7-git-send-email-longli@linuxonhyperv.com>
+In-Reply-To: <1571259116-102015-7-git-send-email-longli@linuxonhyperv.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 27 Oct 2019 14:59:16 -0500
+Message-ID: <CAH2r5mto-Jbp1_yoLsFuiCWiFd-HA8TFVFB91CjDaBABq9PiuQ@mail.gmail.com>
+Subject: Re: [PATCH 6/7] cifs: smbd: Only queue work for error recovery on
+ memory registration
+To:     Long Li <longli@microsoft.com>
+Cc:     Steve French <sfrench@samba.org>,
         CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>, longli@linuxonhyperv.com,
+        Stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 26 Oct 2019 21:40:04 -0500:
+I cleaned up minor cosmetic nit spotted by checkpatch
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.4-rc5-smb3-fixes
+$ scripts/checkpatch.pl
+0001-cifs-smbd-Only-queue-work-for-error-recovery-on-memo.patch
+WARNING: Possible unwrapped commit description (prefer a maximum 75
+chars per line)
+#7:
+It's not necessary to queue invalidated memory registration to work queue, as
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/c9a2e4a82905c4759d3894bbe827b84574a69b91
+WARNING: Block comments use a trailing */ on a separate line
+#58: FILE: fs/cifs/smbdirect.c:2614:
++ * current I/O */
 
-Thank you!
+total: 0 errors, 2 warnings, 38 lines checked
+
+On Wed, Oct 16, 2019 at 4:11 PM longli--- via samba-technical
+<samba-technical@lists.samba.org> wrote:
+>
+> From: Long Li <longli@microsoft.com>
+>
+> It's not necessary to queue invalidated memory registration to work queue, as
+> all we need to do is to unmap the SG and make it usable again. This can save
+> CPU cycles in normal data paths as memory registration errors are rare and
+> normally only happens during reconnection.
+>
+> Signed-off-by: Long Li <longli@microsoft.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  fs/cifs/smbdirect.c | 26 +++++++++++++++-----------
+>  1 file changed, 15 insertions(+), 11 deletions(-)
+>
+> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+> index cf001f10d555..c00629a41d81 100644
+> --- a/fs/cifs/smbdirect.c
+> +++ b/fs/cifs/smbdirect.c
+> @@ -2269,12 +2269,7 @@ static void smbd_mr_recovery_work(struct work_struct *work)
+>         int rc;
+>
+>         list_for_each_entry(smbdirect_mr, &info->mr_list, list) {
+> -               if (smbdirect_mr->state == MR_INVALIDATED)
+> -                       ib_dma_unmap_sg(
+> -                               info->id->device, smbdirect_mr->sgl,
+> -                               smbdirect_mr->sgl_count,
+> -                               smbdirect_mr->dir);
+> -               else if (smbdirect_mr->state == MR_ERROR) {
+> +               if (smbdirect_mr->state == MR_ERROR) {
+>
+>                         /* recover this MR entry */
+>                         rc = ib_dereg_mr(smbdirect_mr->mr);
+> @@ -2602,11 +2597,20 @@ int smbd_deregister_mr(struct smbd_mr *smbdirect_mr)
+>                  */
+>                 smbdirect_mr->state = MR_INVALIDATED;
+>
+> -       /*
+> -        * Schedule the work to do MR recovery for future I/Os
+> -        * MR recovery is slow and we don't want it to block the current I/O
+> -        */
+> -       queue_work(info->workqueue, &info->mr_recovery_work);
+> +       if (smbdirect_mr->state == MR_INVALIDATED) {
+> +               ib_dma_unmap_sg(
+> +                       info->id->device, smbdirect_mr->sgl,
+> +                       smbdirect_mr->sgl_count,
+> +                       smbdirect_mr->dir);
+> +               smbdirect_mr->state = MR_READY;
+> +               if (atomic_inc_return(&info->mr_ready_count) == 1)
+> +                       wake_up_interruptible(&info->wait_mr);
+> +       } else
+> +               /*
+> +                * Schedule the work to do MR recovery for future I/Os
+> +                * MR recovery is slow and we don't want it to block the
+> +                * current I/O */
+> +               queue_work(info->workqueue, &info->mr_recovery_work);
+>
+>  done:
+>         if (atomic_dec_and_test(&info->mr_used_count))
+> --
+> 2.17.1
+>
+>
+
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+Thanks,
+
+Steve
