@@ -2,64 +2,63 @@ Return-Path: <SRS0=uI0J=YV=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC66CA9EC0
-	for <linux-cifs@archiver.kernel.org>; Mon, 28 Oct 2019 22:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D14CA9EC0
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Oct 2019 23:18:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35DDD21479
-	for <linux-cifs@archiver.kernel.org>; Mon, 28 Oct 2019 22:52:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7186E214E0
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Oct 2019 23:18:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YsPwTLkC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u7dVKbbR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730302AbfJ1WwH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 28 Oct 2019 18:52:07 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:43849 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725867AbfJ1WwH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Oct 2019 18:52:07 -0400
-Received: by mail-lf1-f68.google.com with SMTP id j5so2683240lfh.10
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Oct 2019 15:52:06 -0700 (PDT)
+        id S1727030AbfJ1XS5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 28 Oct 2019 19:18:57 -0400
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:42318 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727001AbfJ1XS4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Oct 2019 19:18:56 -0400
+Received: by mail-lj1-f194.google.com with SMTP id a21so13162114ljh.9
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Oct 2019 16:18:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=2D9UvgzO0SOv4NOWC35xK0MEf3H9gkR9jqoxpLM6W4E=;
-        b=YsPwTLkCc7rpt0BMYn5yqt062gd+6bbhjwIMn8BBY5lt1AJsOeuFLeFeegzfCRU6IJ
-         vhZPMsH8DxrmLgU1HK5/LR6uiiRdDtbZFzNpIgVnrNoETQFjMzOYCjBg97uqZ4OuElMq
-         JDudSJj0EOtAogjRJmlGxIhrSe3kgjaDQnorhK19XDYNEMyU3xKVusd6+sEqM9frkNrU
-         TS3JaUoVmjmCm7ZC7H2Qa3rH/99x2Egl2u2tVOFentsIgdvl+6qVxQZiX0oGTt0dm09b
-         1A43SHvqb4lo4F7NjFRfkqYfxsdeiQv8vxcd0aPKK9G+TGndOsvCN5nx8iaDLNpAmMUF
-         zWbQ==
+        bh=xT/ZHUdnnFGv0+dKACOZ9tFuBtbo/66azQKuxeRJEmw=;
+        b=u7dVKbbRQNig6BDY3xUi95KdTY30OorR0c6cbkKue10v8Q7l8BBbf5cLrrzbwSeDBm
+         Gyj0AoMsbAYctr0WvxFtrWPlLHrE0BZToWXiBVGJXQvXFLEP67pg4swK6agExeVJKXQE
+         9SqtCq1iV07440Z8M8T8iMm1s7gVSNOn3UE/UDAZrsAeqJ1gjm59eFVgsEcY7eEhBMk0
+         Az+WSqA/DWYgOxeCPKsgE01OqCgfyjG9diQjH5hJznJ7LR/5zR4NKptQo7UqzGLkOhh+
+         lOSvhbvCyfFHBMNYNMJ6Z2y4TG8km3zmPM+f6IQlW+DoYXpIv3QVjUaXNl8f4O0kPaZy
+         n/gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2D9UvgzO0SOv4NOWC35xK0MEf3H9gkR9jqoxpLM6W4E=;
-        b=ogTFlmipHmWg5ZsxYUwPdSb4zLsOsye596fYc09VqTdYtEFs0uEeuz7vMQyh8HIhTF
-         QMLz2op4l+Di8g6SGiVGBwWC08CQLX1w2Jcnruz7lEJcdcfvN7OOd0Ev/mOHoV/7U3C/
-         lHnXVc2hRWRKNYxbNFTIp6A6tqZtZ3bfNqP9b5Ob3hDbZGHF6wdvQULQZG6At2uCHHBb
-         Qz/yAWqyX96m83BKkKIRRmgVa63VXjBHTJTzBXaymDZHCdRevqOK757p4rMIo0PSsFxc
-         By3gnnXuJq8IDmB6PmjMG1zMr9+N30sgj+30wOfgfeUWnbdnBWIz9BWtEyWqMvMu5qGq
-         f0Fw==
-X-Gm-Message-State: APjAAAVp7ozdSGtXX2SKb+oJcHgbfedwOCaE9k45RE0DSwwNrv7EwJya
-        2msHYbEIOXAw1JPY/4ZZvYml3bq3C1jK+PohhA==
-X-Google-Smtp-Source: APXvYqzf/B6XHWqQ5VRvVDWG1wdfMi6/AapvcT+aNa3Jd0rRFANzxON7ekSk8N3XPsikWjLI1IZIZWXc/HupVqyL1KM=
-X-Received: by 2002:ac2:5144:: with SMTP id q4mr182307lfd.36.1572303125715;
- Mon, 28 Oct 2019 15:52:05 -0700 (PDT)
+        bh=xT/ZHUdnnFGv0+dKACOZ9tFuBtbo/66azQKuxeRJEmw=;
+        b=MLq7xMC7qB1xJ+z+wiWaGqwtvraCvS7kxUaydLCaocofhJGP43UU/uJmzLHIjfKQr8
+         Mkv01Xu+pzLz+KTVJ7lI88LkqYmT6MkXgKYm3c2loQJ038SBoxyOgb4QjIApMpzRcSRE
+         wynuuuOYmPD3SKRqpRP+i8Mu5yctMjwBbOR/9LUauw0e89zYPR419IABAQ5s5CgQf7AS
+         UgurY+nE1MlqYNBOJGg4uux/qF7wRiHvCVG/2biljlH2nf07SKa/IArS5KojSu/MboX+
+         y7Uo8LnOBBS19rlgJ7LaSGzp/yf74kHmZUke3PCYYZJQ9giXs5Gjr6WQ2fNMR5ZyY/83
+         AoGA==
+X-Gm-Message-State: APjAAAULLoCfOV99t4hsOxY0HhSdYpgSSacFiP/d8sf3qZ/9RREyVMfm
+        y2MVxpeGQcSQGwN054FRsR/BgtvaIwrd7yWId9TJ95U=
+X-Google-Smtp-Source: APXvYqxt/ucFw/IFUWfeqTTQ/J8iQ765RL5zQSzbn0113T/PJrPiEdBMBpEayTuzQZ2F9jng70dMm9jWSCAG6ZyoxxI=
+X-Received: by 2002:a2e:9942:: with SMTP id r2mr211692ljj.168.1572304732299;
+ Mon, 28 Oct 2019 16:18:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191026210419.7575-1-lsahlber@redhat.com> <ca15c743-11f0-ff36-6c66-23ad795cf293@redhat.com>
-In-Reply-To: <ca15c743-11f0-ff36-6c66-23ad795cf293@redhat.com>
+References: <20191026210419.7575-1-lsahlber@redhat.com> <20191026210419.7575-2-lsahlber@redhat.com>
+In-Reply-To: <20191026210419.7575-2-lsahlber@redhat.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Mon, 28 Oct 2019 15:51:54 -0700
-Message-ID: <CAKywueQhAOjPQoF2=LPmvBASeWmixM1dr6u_8_R70CZUdMawAA@mail.gmail.com>
-Subject: Re: [PATCH 0/1] cifs: move cifsFileInfo_put logic into a work-queue
-To:     Frank Sorenson <sorenson@redhat.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+Date:   Mon, 28 Oct 2019 16:18:40 -0700
+Message-ID: <CAKywueRtakp4KX2=HafEy4WOZmCHC-f_ey1S9R6DzzxMQYBVvQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: move cifsFileInfo_put logic into a work-queue
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -67,87 +66,223 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D0=BD, 28 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 05:13, Frank Soren=
-son <sorenson@redhat.com>:
+=D1=81=D0=B1, 26 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 14:04, Ronnie Sahl=
+berg <lsahlber@redhat.com>:
 >
-> On 10/26/19 4:04 PM, Ronnie Sahlberg wrote:
-> > Steve, Pavel, Frank
-> >
-> > This patch moves the logic in cifsFileInfo_put() into a work-queue so t=
-hat
-> > it will be processed in a different thread which, importantly, does not=
- hold
-> > any other locks.
-> >
-> > This should address the deadlock that Frank reported in the thread:
-> > Yet another hang after network disruption or smb restart -- multiple fi=
-le writers
->
-> Pavel,
->
-> Thanks for understanding my report and translating it into what it meant.
->
-> Ronnie,
-> Thanks for the patch.  I'm happy to say that my attempt at the same
-> looks like it would have been similar, had I known what I was doing to
-> begin with :)
->
->
-> Unfortunately, I think the patch really only moves the problem from one
-> place to another.  I'm guessing that means we have a second underlying
-> deadlock.  (this reproducer appears to be quite effective)
->
->
-> On the plus side, only the one file involved is jammed in the deadlock
-> now, as opposed to the parent directory as well, so it is at least progre=
-ss.
+> This patch moves the _put logic to be processed in a separate thread that
+> holds no other locks to prevent deadlocks like below from happening
 >
 
-Hi Frank, Ronnie,
+Ronnie,
 
-Ok, it seems there is another bug resulting in a deadlock between a
-page lock and writeback (WB) flag in cifs_writev_complete and
-cifs_writepages.
+Thanks for creating the patch! Please find my comments below.
 
-1) cifs_writev_complete. in the case of WB_SYNC_ALL and EAGAIN
-(reconnect) it calls cifs_writev_requeue. At this point it still has
-WB flag set for all the pages being retried. Inside
-cifs_writev_requeue it tries to lock the page:
+...
+>
+> Reported-by: Frank Sorenson <sorenson@redhat.com>:
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/cifsfs.c   | 13 ++++++++-
+>  fs/cifs/cifsglob.h |  1 +
+>  fs/cifs/file.c     | 79 +++++++++++++++++++++++++++++++++++++-----------=
+------
+>  3 files changed, 68 insertions(+), 25 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index e4e3b573d20c..f8e201c45ccb 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -119,6 +119,7 @@ extern mempool_t *cifs_mid_poolp;
+>
+>  struct workqueue_struct        *cifsiod_wq;
+>  struct workqueue_struct        *decrypt_wq;
+> +struct workqueue_struct        *fileinfo_put_wq;
+>  struct workqueue_struct        *cifsoplockd_wq;
+>  __u32 cifs_lock_secret;
+>
+> @@ -1557,11 +1558,18 @@ init_cifs(void)
+>                 goto out_destroy_cifsiod_wq;
+>         }
+>
+> +       fileinfo_put_wq =3D alloc_workqueue("cifsfileinfoput",
+> +                                    WQ_UNBOUND|WQ_FREEZABLE|WQ_MEM_RECLA=
+IM, 0);
+> +       if (!fileinfo_put_wq) {
+> +               rc =3D -ENOMEM;
+> +               goto out_destroy_decrypt_wq;
+> +       }
+> +
+>         cifsoplockd_wq =3D alloc_workqueue("cifsoplockd",
+>                                          WQ_FREEZABLE|WQ_MEM_RECLAIM, 0);
+>         if (!cifsoplockd_wq) {
+>                 rc =3D -ENOMEM;
+> -               goto out_destroy_decrypt_wq;
+> +               goto out_destroy_fileinfo_put_wq;
+>         }
+>
+>         rc =3D cifs_fscache_register();
+> @@ -1627,6 +1635,8 @@ init_cifs(void)
+>         cifs_fscache_unregister();
+>  out_destroy_cifsoplockd_wq:
+>         destroy_workqueue(cifsoplockd_wq);
+> +out_destroy_fileinfo_put_wq:
+> +       destroy_workqueue(fileinfo_put_wq);
+>  out_destroy_decrypt_wq:
+>         destroy_workqueue(decrypt_wq);
+>  out_destroy_cifsiod_wq:
+> @@ -1656,6 +1666,7 @@ exit_cifs(void)
+>         cifs_fscache_unregister();
+>         destroy_workqueue(cifsoplockd_wq);
+>         destroy_workqueue(decrypt_wq);
+> +       destroy_workqueue(fileinfo_put_wq);
+>         destroy_workqueue(cifsiod_wq);
+>         cifs_proc_clean();
+>  }
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 50dfd9049370..8361e30adcd9 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1902,6 +1902,7 @@ void cifs_queue_oplock_break(struct cifsFileInfo *c=
+file);
+>  extern const struct slow_work_ops cifs_oplock_break_ops;
+>  extern struct workqueue_struct *cifsiod_wq;
+>  extern struct workqueue_struct *decrypt_wq;
+> +extern struct workqueue_struct *fileinfo_put_wq;
+>  extern struct workqueue_struct *cifsoplockd_wq;
+>  extern __u32 cifs_lock_secret;
+>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 0e0217641de1..e222cf04b325 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -368,30 +368,8 @@ cifsFileInfo_get(struct cifsFileInfo *cifs_file)
+>         return cifs_file;
+>  }
+>
+> -/**
+> - * cifsFileInfo_put - release a reference of file priv data
+> - *
+> - * Always potentially wait for oplock handler. See _cifsFileInfo_put().
+> - */
+> -void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+> -{
+> -       _cifsFileInfo_put(cifs_file, true);
+> -}
+> -
+> -/**
+> - * _cifsFileInfo_put - release a reference of file priv data
+> - *
+> - * This may involve closing the filehandle @cifs_file out on the
+> - * server. Must be called without holding tcon->open_file_lock and
+> - * cifs_file->file_info_lock.
+> - *
+> - * If @wait_for_oplock_handler is true and we are releasing the last
+> - * reference, wait for any running oplock break handler of the file
+> - * and cancel any pending one. If calling this function from the
+> - * oplock break handler, you need to pass false.
+> - *
+> - */
+> -void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_=
+handler)
+> +static void
+> +_cifsFileInfo_put_work(struct cifsFileInfo *cifs_file, bool wait_oplock_=
+handler)
+>  {
+>         struct inode *inode =3D d_inode(cifs_file->dentry);
+>         struct cifs_tcon *tcon =3D tlink_tcon(cifs_file->tlink);
+> @@ -480,6 +458,59 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_fil=
+e, bool wait_oplock_handler)
+>         kfree(cifs_file);
+>  }
+>
+> +struct cifsFileInfo_w {
+> +       struct work_struct put;
+> +       struct cifsFileInfo *cifs_file;
+> +       bool wait_oplock_handler;
+> +};
+> +
+> +static void cifsFileInfo_put_work(struct work_struct *work)
+> +{
+> +       struct cifsFileInfo_w *cfiw =3D container_of(work,
+> +                                                  struct cifsFileInfo_w,=
+ put);
+> +       _cifsFileInfo_put_work(cfiw->cifs_file, cfiw->wait_oplock_handler=
+);
+> +       kfree(cfiw);
+> +}
+> +
+> +/**
+> + * cifsFileInfo_put - release a reference of file priv data
+> + *
+> + * Always potentially wait for oplock handler. See _cifsFileInfo_put().
+> + */
+> +void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+> +{
+> +       _cifsFileInfo_put(cifs_file, true);
+> +}
+> +
+> +/**
+> + * _cifsFileInfo_put - release a reference of file priv data
+> + *
+> + * This may involve closing the filehandle @cifs_file out on the
+> + * server. Must be called without holding tcon->open_file_lock and
+> + * cifs_file->file_info_lock.
 
-kworker/4:3+cifsiod
-#0 __schedule at ffffffffab4f1a45
-#1 schedule at ffffffffab4f1ea0
-#2 io_schedule at ffffffffab4f22a2
-#3 __lock_page at ffffffffaae3f66f
-#4 cifs_writev_complete at ffffffffc07df762
-#5 process_one_work at ffffffffaacecc11
-#6 worker_thread at ffffffffaaced0f0
-#7 kthread at ffffffffaacf2ac2
-#8 ret_from_fork at ffffffffab600215
+cinode->open_file_lock should be mentioned here as well.
 
-2) cifs_writepages. It locks the page and then waits on WB flag to be
-cleared before processing pages:
+> + *
+> + * If @wait_for_oplock_handler is true and we are releasing the last
+> + * reference, wait for any running oplock break handler of the file
+> + * and cancel any pending one. If calling this function from the
+> + * oplock break handler, you need to pass false.
+> + *
+> + */
+> +void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_=
+handler)
+> +{
+> +       struct cifsFileInfo_w *work;
+> +
+> +       work =3D kmalloc(sizeof(struct cifsFileInfo_w), GFP_KERNEL);
 
-1 openloop.sh
-#0 __schedule at ffffffffab4f1a45
-#1 schedule at ffffffffab4f1ea0
-#2 io_schedule at ffffffffab4f22a2
-#3 wait_on_page_bit at ffffffffaae3fbc6
-#4 cifs_writepages at ffffffffc07ffc73
-#5 do_writepages at ffffffffaae4ba71
-#6 __filemap_fdatawrite_range at ffffffffaae4321b
-#7 filemap_write_and_wait at ffffffffaae432aa
-#8 cifs_flush at ffffffffc0800fe3
-#9 filp_close at ffffffffaaeed181
-#10 do_dup2 at ffffffffaaf12c0b
-#11 __x64_sys_dup2 at ffffffffaaf1306a
-#12 do_syscall_64 at ffffffffaac04345
+I would suggest to make this a part of cifsFileInfo structure (like
+oplock handling work) to avoid unnecessary memory allocations every
+time we put/close the handle.
 
-The bug is in cifs_writev_complete and cifs_writev_requeue: the 1st
-needs to clear the WB flag and re-dirty pages before trying to retry
-the IO; the 2nd needs additionally to skip pages that are no longer
-dirty (e.g. written by another thread) and re-set the WB flag before
-sending pages over the wire.
+> +       if (work =3D=3D NULL) {
+> +               _cifsFileInfo_put_work(cifs_file, wait_oplock_handler);
+> +               return;
+> +       }
+> +
+> +       INIT_WORK(&work->put, cifsFileInfo_put_work);
+> +       work->cifs_file =3D cifs_file;
+> +       work->wait_oplock_handler =3D wait_oplock_handler;
+> +       queue_work(fileinfo_put_wq, &work->put);
+
+I don't think we should offload the work to another thread
+unconditionally here - e.g. cifs_close() can safely do it in the same
+thread. Since there are more places where we want to offload, so let's
+do the similar thing as we have to the "wait_oplock_handler" argument:
+
+cifsFileInfo_put(cifs_file) -> _cifsFileInfo_put(cifs_file, true /*
+wait_oplock_handler */, true /* offload */);
+
+and convert cifs_close() to call _cifsFileInfo_put(cifs_file, true /*
+wait_oplock_handler */, false /* offload */);
+
+Note, that we do not need to conditionally cancel the worker thread as
+we do for the oplock handler because once we reach zero references
+there should be only one thread (we) that has access to the file info
+structure, thus no need to cancel anything. We may add a Warning if
+the work is scheduled but we reached zero references to highlight a
+potential bug.
+
+Also, as an optimization, we may use the caller thread to check the
+number of references and only offload if both conditions meet:
+"offload" argument is true and the current number of references is 1
+(putting the last reference). This optimization may be done in the
+same patch or as a separate patch.
+
+Thoughts?
 
 --
 Best regards,
