@@ -7,100 +7,148 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E2FCA9EC0
-	for <linux-cifs@archiver.kernel.org>; Mon, 28 Oct 2019 15:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC66CA9EC0
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Oct 2019 22:52:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF05421721
-	for <linux-cifs@archiver.kernel.org>; Mon, 28 Oct 2019 15:44:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35DDD21479
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Oct 2019 22:52:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bpUwQifv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YsPwTLkC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729836AbfJ1Po7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 28 Oct 2019 11:44:59 -0400
-Received: from mail-il1-f171.google.com ([209.85.166.171]:39542 "EHLO
-        mail-il1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728601AbfJ1Po7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Oct 2019 11:44:59 -0400
-Received: by mail-il1-f171.google.com with SMTP id i12so8583848ils.6
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Oct 2019 08:44:57 -0700 (PDT)
+        id S1730302AbfJ1WwH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 28 Oct 2019 18:52:07 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:43849 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725867AbfJ1WwH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Oct 2019 18:52:07 -0400
+Received: by mail-lf1-f68.google.com with SMTP id j5so2683240lfh.10
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Oct 2019 15:52:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=M60CXvffZqLcG4nYdAJjI4fwF4m2/pv8YEoOG+Ye5/M=;
-        b=bpUwQifvYstxgHr/20FU82mfs8Y1bS8RNYcIRY2yW1gZEp6XpfubBX1z/uNOZYsRos
-         G80FK5Xmb0o79H0YV30pKS1/u738CjBTUYb9+ov2wimGB6MiROZGd5aJkxyz2VqTZwm+
-         9NKPtHXBddM4oUJELAzSN1mzjnqopRK4Bl4GRxTUImuHtP5fLuitjoJ2ADMSCIMyEU4b
-         kSgENKhB/cGkZrjIgNZB0OLTYubjehdo4ZCnm0liz2j723+lN80lJ3EiKRpYGKyBARNY
-         uIkxsxT9jXRO1VN/kO2IQjDzJbD2oorQD14+z8ngz+0G3/ayBU0jLiYwwUVoGYbbCMyo
-         tLag==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=2D9UvgzO0SOv4NOWC35xK0MEf3H9gkR9jqoxpLM6W4E=;
+        b=YsPwTLkCc7rpt0BMYn5yqt062gd+6bbhjwIMn8BBY5lt1AJsOeuFLeFeegzfCRU6IJ
+         vhZPMsH8DxrmLgU1HK5/LR6uiiRdDtbZFzNpIgVnrNoETQFjMzOYCjBg97uqZ4OuElMq
+         JDudSJj0EOtAogjRJmlGxIhrSe3kgjaDQnorhK19XDYNEMyU3xKVusd6+sEqM9frkNrU
+         TS3JaUoVmjmCm7ZC7H2Qa3rH/99x2Egl2u2tVOFentsIgdvl+6qVxQZiX0oGTt0dm09b
+         1A43SHvqb4lo4F7NjFRfkqYfxsdeiQv8vxcd0aPKK9G+TGndOsvCN5nx8iaDLNpAmMUF
+         zWbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=M60CXvffZqLcG4nYdAJjI4fwF4m2/pv8YEoOG+Ye5/M=;
-        b=VEF9Zlo0V7EvoiU9aChnK7eZFMLUdjiKm6sFCfFRX5cVWRhBgLmAEb0anjpyT9dsS1
-         mn+Bs7hzfHaRK11vMkV3nM9d/AzEmv6oCrVUzAM06Hk57d3TB2wCAzK0VKWQQHfZ11j0
-         x+xliRDa49AfaPpQntRb80EfGn4jHeE/cvoOKOgKC4RqUAd1MaCfN/QAX17tl7plcYZY
-         fo/efjyur1sVzjEIWaT7FK++fM+sSLxCN2iaulB4mNMAAIisNqsTj+rl/OirgiM/5mUB
-         THGrDRhVP7SEYXPnoAdq6AsGzRlbk6FQbPbdAHXa2gBvIFLadSyYcH68yfasrbHWc0HN
-         YULw==
-X-Gm-Message-State: APjAAAVHaOwuxm3W0qjeNhJszFKmKxfOYTVy+h9ouZAjXVFfhuOFTe3h
-        ylNvgjPVKGDxCIia1ovWs2BK+rAPrctq/7TCFL8DU3bX7Po=
-X-Google-Smtp-Source: APXvYqxXGM4QrETgmb6DUjT1LfwhxWhVekd1tsAJm5DEFwprHulfVoHDBb3fIe8z3BCdQwYmscbbG/yizHuk/vQ2zhQ=
-X-Received: by 2002:a92:48d8:: with SMTP id j85mr20442767ilg.272.1572277496301;
- Mon, 28 Oct 2019 08:44:56 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=2D9UvgzO0SOv4NOWC35xK0MEf3H9gkR9jqoxpLM6W4E=;
+        b=ogTFlmipHmWg5ZsxYUwPdSb4zLsOsye596fYc09VqTdYtEFs0uEeuz7vMQyh8HIhTF
+         QMLz2op4l+Di8g6SGiVGBwWC08CQLX1w2Jcnruz7lEJcdcfvN7OOd0Ev/mOHoV/7U3C/
+         lHnXVc2hRWRKNYxbNFTIp6A6tqZtZ3bfNqP9b5Ob3hDbZGHF6wdvQULQZG6At2uCHHBb
+         Qz/yAWqyX96m83BKkKIRRmgVa63VXjBHTJTzBXaymDZHCdRevqOK757p4rMIo0PSsFxc
+         By3gnnXuJq8IDmB6PmjMG1zMr9+N30sgj+30wOfgfeUWnbdnBWIz9BWtEyWqMvMu5qGq
+         f0Fw==
+X-Gm-Message-State: APjAAAVp7ozdSGtXX2SKb+oJcHgbfedwOCaE9k45RE0DSwwNrv7EwJya
+        2msHYbEIOXAw1JPY/4ZZvYml3bq3C1jK+PohhA==
+X-Google-Smtp-Source: APXvYqzf/B6XHWqQ5VRvVDWG1wdfMi6/AapvcT+aNa3Jd0rRFANzxON7ekSk8N3XPsikWjLI1IZIZWXc/HupVqyL1KM=
+X-Received: by 2002:ac2:5144:: with SMTP id q4mr182307lfd.36.1572303125715;
+ Mon, 28 Oct 2019 15:52:05 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 28 Oct 2019 10:44:45 -0500
-Message-ID: <CAH2r5mv-1YBTnYNp6Sx2nU4Sf5F92YKe6M+W4xP-UE1mUYQXBg@mail.gmail.com>
-Subject: Updated for-next with patches for 5.5-rc
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     Long Li <longli@microsoft.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Dave Wysochanski <dwysocha@redhat.com>,
-        Pavel Shilovsky <piastryyy@gmail.com>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+References: <20191026210419.7575-1-lsahlber@redhat.com> <ca15c743-11f0-ff36-6c66-23ad795cf293@redhat.com>
+In-Reply-To: <ca15c743-11f0-ff36-6c66-23ad795cf293@redhat.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Mon, 28 Oct 2019 15:51:54 -0700
+Message-ID: <CAKywueQhAOjPQoF2=LPmvBASeWmixM1dr6u_8_R70CZUdMawAA@mail.gmail.com>
+Subject: Re: [PATCH 0/1] cifs: move cifsFileInfo_put logic into a work-queue
+To:     Frank Sorenson <sorenson@redhat.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Passes the buildbot with the current 13 patches in for-next post
-5.4-rc5 (probably all but the first will target for 5.5-rc)
+=D0=BF=D0=BD, 28 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 05:13, Frank Soren=
+son <sorenson@redhat.com>:
+>
+> On 10/26/19 4:04 PM, Ronnie Sahlberg wrote:
+> > Steve, Pavel, Frank
+> >
+> > This patch moves the logic in cifsFileInfo_put() into a work-queue so t=
+hat
+> > it will be processed in a different thread which, importantly, does not=
+ hold
+> > any other locks.
+> >
+> > This should address the deadlock that Frank reported in the thread:
+> > Yet another hang after network disruption or smb restart -- multiple fi=
+le writers
+>
+> Pavel,
+>
+> Thanks for understanding my report and translating it into what it meant.
+>
+> Ronnie,
+> Thanks for the patch.  I'm happy to say that my attempt at the same
+> looks like it would have been similar, had I known what I was doing to
+> begin with :)
+>
+>
+> Unfortunately, I think the patch really only moves the problem from one
+> place to another.  I'm guessing that means we have a second underlying
+> deadlock.  (this reproducer appears to be quite effective)
+>
+>
+> On the plus side, only the one file involved is jammed in the deadlock
+> now, as opposed to the parent directory as well, so it is at least progre=
+ss.
+>
 
-Buildbot results
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/273
+Hi Frank, Ronnie,
 
-(it also passes Azure and Windows test groups as well).  Here is the
-current list of patches in for-next.  Doesn't include the Ronnie/David
-W. patch since still open question on that one, and doesn't include
-Aurelien's multichannel ones yet  (although I would really like to get
-those in 5.5) since there is an encryption crash to work through when
-multichannel enabled.
+Ok, it seems there is another bug resulting in a deadlock between a
+page lock and writeback (WB) flag in cifs_writev_complete and
+cifs_writepages.
 
-eac95a44f454 (HEAD -> for-next, origin/for-next) cifs: update internal
-module version number
-a1356cad7e64 cifs: smbd: Return -EAGAIN when transport is reconnecting
-5fb584dcf073 cifs: smbd: Only queue work for error recovery on memory
-registration
-a4ed3149a5dc cifs: smbd: Return -ECONNABORTED when trasnport is not in
-connected state
-3465bca3963c cifs: smbd: Add messages on RDMA session destroy and reconnection
-0e1e0c31b7f9 cifs: smbd: Return -EINVAL when the number of iovs
-exceeds SMBDIRECT_MAX_SGE
-727b00af4253 cifs: smbd: Invalidate and deregister memory registration
-on re-send for direct I/O
-c7d1d76af023 cifs: Don't display RDMA transport on reconnect
-1a9e24ea2b9a CIFS: remove set but not used variables 'cinode' and 'netfid'
-8a974989ef5e cifs: add support for flock
-0455298f0efb cifs: remove unused variable 'sid_user'
-f556e4949186 cifs: rename a variable in SendReceive()
-a08d897bc04f fix memory leak in large read decrypt offload
+1) cifs_writev_complete. in the case of WB_SYNC_ALL and EAGAIN
+(reconnect) it calls cifs_writev_requeue. At this point it still has
+WB flag set for all the pages being retried. Inside
+cifs_writev_requeue it tries to lock the page:
 
-Let me know if any patches missing (it is easy to overlook on the
-mailing lists).
+kworker/4:3+cifsiod
+#0 __schedule at ffffffffab4f1a45
+#1 schedule at ffffffffab4f1ea0
+#2 io_schedule at ffffffffab4f22a2
+#3 __lock_page at ffffffffaae3f66f
+#4 cifs_writev_complete at ffffffffc07df762
+#5 process_one_work at ffffffffaacecc11
+#6 worker_thread at ffffffffaaced0f0
+#7 kthread at ffffffffaacf2ac2
+#8 ret_from_fork at ffffffffab600215
 
--- 
-Thanks,
+2) cifs_writepages. It locks the page and then waits on WB flag to be
+cleared before processing pages:
 
-Steve
+1 openloop.sh
+#0 __schedule at ffffffffab4f1a45
+#1 schedule at ffffffffab4f1ea0
+#2 io_schedule at ffffffffab4f22a2
+#3 wait_on_page_bit at ffffffffaae3fbc6
+#4 cifs_writepages at ffffffffc07ffc73
+#5 do_writepages at ffffffffaae4ba71
+#6 __filemap_fdatawrite_range at ffffffffaae4321b
+#7 filemap_write_and_wait at ffffffffaae432aa
+#8 cifs_flush at ffffffffc0800fe3
+#9 filp_close at ffffffffaaeed181
+#10 do_dup2 at ffffffffaaf12c0b
+#11 __x64_sys_dup2 at ffffffffaaf1306a
+#12 do_syscall_64 at ffffffffaac04345
+
+The bug is in cifs_writev_complete and cifs_writev_requeue: the 1st
+needs to clear the WB flag and re-dirty pages before trying to retry
+the IO; the 2nd needs additionally to skip pages that are no longer
+dirty (e.g. written by another thread) and re-set the WB flag before
+sending pages over the wire.
+
+--
+Best regards,
+Pavel Shilovsky
