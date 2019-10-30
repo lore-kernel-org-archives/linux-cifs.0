@@ -2,398 +2,596 @@ Return-Path: <SRS0=jcY3=YX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEBD0CA9EC5
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 13:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75680CA9EC5
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 15:47:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF9CA2087E
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 13:26:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D66A20874
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 15:47:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I+crBLro"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726171AbfJ3N0i (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 30 Oct 2019 09:26:38 -0400
-Received: from rigel.uberspace.de ([95.143.172.238]:33892 "EHLO
-        rigel.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726119AbfJ3N0i (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 30 Oct 2019 09:26:38 -0400
-Received: (qmail 9238 invoked from network); 30 Oct 2019 13:26:35 -0000
-Received: from localhost (HELO webmail.rigel.uberspace.de) (127.0.0.1)
-  by localhost with SMTP; 30 Oct 2019 13:26:35 -0000
+        id S1726596AbfJ3PrB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 30 Oct 2019 11:47:01 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:46854 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726175AbfJ3PrB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 30 Oct 2019 11:47:01 -0400
+Received: by mail-lf1-f67.google.com with SMTP id t8so1921609lfc.13
+        for <linux-cifs@vger.kernel.org>; Wed, 30 Oct 2019 08:46:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=9yqm3LFJdptZluJ4Xg7XM5zxtyK6GhMMt4YJmrD1kNo=;
+        b=I+crBLrocZV/bxir2gX07z/L9IgNnWeG09KiRbeN57q598kOHWYI8yWNWP64vvaPsf
+         vaN130kmecA3CU4fM9lyO6EKBxpDQmCmUeDM7mPhTjJEsTP+AjfDo2eD3AdMhw6xw8Us
+         cAJm5PS4oqjkLZae3B/xa05LvC0VpsxcSFIWEs8qEC9UG7dFexKMLxweYq7/YGUV2NWr
+         bbFy8gBwtsCXqk8lynRhTBYzUWZ4AZ2ykvGa8mUoOGZhlGR3fOQqwigOi+2uPud312ow
+         +TcILqVHDf7SkZnBc4wnjNxGxiruJxo4Yk+yzenk0/Z9oJKSNf2TS8y4m8GW6265dGrp
+         glnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=9yqm3LFJdptZluJ4Xg7XM5zxtyK6GhMMt4YJmrD1kNo=;
+        b=gn9cV8nNVyiszBtDkAXYOzcG60aapB1conhTQAb72Tr0rUIyphe/ZXm8omSTdGQFQ1
+         kSsQcr3RFMOLb1cYa1g6/8mCappUxm55mOi3kT0LnHHiQtnVSIuGMCkGo+M+ighfAsva
+         mXRjFJYkQgg84ibjBYeX+5kfKK+1ahsxCL5K0e0LOUGD9PnJx7RbejZMR5vpbqR3cTJZ
+         JD4Oq5eL6nFJ+qmaCP4A/XJwrEgoz1mtawx1MiH4oxHByWvrrVur5+K/zyONtgSvT+pM
+         b7lFEiSryg8XnkbMimj66gQgaCvZ8GUdVKm++oa9IBJTyh20XuEAkEhYC9raXAciyGMS
+         vvNA==
+X-Gm-Message-State: APjAAAVlgKNtcnYZQhoVVkHGjTCRR3I6aYYl147XFTBI6H+6QxgA7edE
+        SnGZpY4thavdvHL4ifWGuB6uenQnyuFbXztwFQ==
+X-Google-Smtp-Source: APXvYqyLizmGhPikRZK8DKur5qmNxrGJT/yU9KIK5sWYZTI0QoRFM4Gk99+VhzSiD6vM0uLE5NEE9I8CDTYeiJPGsHM=
+X-Received: by 2002:ac2:5144:: with SMTP id q4mr6863509lfd.36.1572450418126;
+ Wed, 30 Oct 2019 08:46:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="=_a040e6653d182697ac19eeacad00a3f0"
-Date:   Wed, 30 Oct 2019 14:26:35 +0100
-From:   Moritz M <mailinglist@moritzmueller.ee>
-To:     Pavel Shilovsky <piastryyy@gmail.com>
+References: <20191030025906.14395-1-lsahlber@redhat.com> <20191030025906.14395-2-lsahlber@redhat.com>
+In-Reply-To: <20191030025906.14395-2-lsahlber@redhat.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Wed, 30 Oct 2019 08:46:46 -0700
+Message-ID: <CAKywueT11XLviGCiVp8g9YnUcWonuxWpY4nCGN2KSpTh6aXGPQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: move cifsFileInfo_put logic into a work-queue
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Subject: Re: Possible timeout problem when opening a file twice on a SMB mount
-In-Reply-To: <CAKywueQ8woeupNRqspAuOqL8rG1hNpWN_hwLCjFUpkk4mXeCvQ@mail.gmail.com>
-References: <61d3d6774247fe6159456b249dbc3c63@moritzmueller.ee>
- <CAKywueT=hWCTM=Crsafrj-8P=1mD93DY73oK=Ub8JeWc5X85fQ@mail.gmail.com>
- <4a017b583eb0f5fab477ecbe0e43b3a1@moritzmueller.ee>
- <CAN05THR5FE80VsnbKfpBzvt+g5jPu3rtiOqWkzU5yKoKUkhkiA@mail.gmail.com>
- <CAKywueTOjoP-Jh7WWCi5XJhfzgK+KZs3kvHKuVG_HW0fnYYY7A@mail.gmail.com>
- <CAKywueQUuwRK7hbbJhdquVVPre2+8GBCvnrG76L-KodoMm9m6g@mail.gmail.com>
- <b7b7a790feac88d59fe00c9ca2f5960d@moritzmueller.ee>
- <CAKywueQ7g9VYe=d7WU4AzL2Hv+pPznUgQBD7-RVi0ygBkhtGRw@mail.gmail.com>
- <bdf21b8770373c9ea4c37c27a12344d8@moritzmueller.ee>
- <CAKywueQ8woeupNRqspAuOqL8rG1hNpWN_hwLCjFUpkk4mXeCvQ@mail.gmail.com>
-Message-ID: <6492326ef9d8d1a9401fac243160646f@moritzmueller.ee>
-X-Sender: mailinglist@moritzmueller.ee
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---=_a040e6653d182697ac19eeacad00a3f0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+=D0=B2=D1=82, 29 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 19:59, Ronnie Sahl=
+berg <lsahlber@redhat.com>:
+>
+> This patch moves the final part of the cifsFileInfo_put() logic where we
+> need a write lock on lock_sem to be processed in a separate thread that
+> holds no other locks.
+> This is to prevent deadlocks like the one below:
+>
+> > there are 6 processes looping to while trying to down_write
+> > cinode->lock_sem, 5 of them from _cifsFileInfo_put, and one from
+> > cifs_new_fileinfo
+> >
+> > and there are 5 other processes which are blocked, several of them
+> > waiting on either PG_writeback or PG_locked (which are both set), all
+> > for the same page of the file
+> >
+> > 2 inode_lock() (inode->i_rwsem) for the file
+> > 1 wait_on_page_writeback() for the page
+> > 1 down_read(inode->i_rwsem) for the inode of the directory
+> > 1 inode_lock()(inode->i_rwsem) for the inode of the directory
+> > 1 __lock_page
+> >
+> >
+> > so processes are blocked waiting on:
+> >   page flags PG_locked and PG_writeback for one specific page
+> >   inode->i_rwsem for the directory
+> >   inode->i_rwsem for the file
+> >   cifsInodeInflock_sem
+> >
+> >
+> >
+> > here are the more gory details (let me know if I need to provide
+> > anything more/better):
+> >
+> > [0 00:48:22.765] [UN]  PID: 8863   TASK: ffff8c691547c5c0  CPU: 3
+> > COMMAND: "reopen_file"
+> >  #0 [ffff9965007e3ba8] __schedule at ffffffff9b6e6095
+> >  #1 [ffff9965007e3c38] schedule at ffffffff9b6e64df
+> >  #2 [ffff9965007e3c48] rwsem_down_write_slowpath at ffffffff9af283d7
+> >  #3 [ffff9965007e3cb8] legitimize_path at ffffffff9b0f975d
+> >  #4 [ffff9965007e3d08] path_openat at ffffffff9b0fe55d
+> >  #5 [ffff9965007e3dd8] do_filp_open at ffffffff9b100a33
+> >  #6 [ffff9965007e3ee0] do_sys_open at ffffffff9b0eb2d6
+> >  #7 [ffff9965007e3f38] do_syscall_64 at ffffffff9ae04315
+> > * (I think legitimize_path is bogus)
+> >
+> > in path_openat
+> >         } else {
+> >                 const char *s =3D path_init(nd, flags);
+> >                 while (!(error =3D link_path_walk(s, nd)) &&
+> >                         (error =3D do_last(nd, file, op)) > 0) {  <<<<
+> >
+> > do_last:
+> >         if (open_flag & O_CREAT)
+> >                 inode_lock(dir->d_inode);  <<<<
+> >         else
+> > so it's trying to take inode->i_rwsem for the directory
+> >
+> >      DENTRY           INODE           SUPERBLK     TYPE PATH
+> > ffff8c68bb8e79c0 ffff8c691158ef20 ffff8c6915bf9000 DIR  /mnt/vm1_smb/
+> > inode.i_rwsem is ffff8c691158efc0
+> >
+> > <struct rw_semaphore 0xffff8c691158efc0>:
+> >         owner: <struct task_struct 0xffff8c6914275d00> (UN -   8856 -
+> > reopen_file), counter: 0x0000000000000003
+> >         waitlist: 2
+> >         0xffff9965007e3c90     8863   reopen_file      UN 0  1:29:22.92=
+6
+> >   RWSEM_WAITING_FOR_WRITE
+> >         0xffff996500393e00     9802   ls               UN 0  1:17:26.70=
+0
+> >   RWSEM_WAITING_FOR_READ
+> >
+> >
+> > the owner of the inode.i_rwsem of the directory is:
+> >
+> > [0 00:00:00.109] [UN]  PID: 8856   TASK: ffff8c6914275d00  CPU: 3
+> > COMMAND: "reopen_file"
+> >  #0 [ffff99650065b828] __schedule at ffffffff9b6e6095
+> >  #1 [ffff99650065b8b8] schedule at ffffffff9b6e64df
+> >  #2 [ffff99650065b8c8] schedule_timeout at ffffffff9b6e9f89
+> >  #3 [ffff99650065b940] msleep at ffffffff9af573a9
+> >  #4 [ffff99650065b948] _cifsFileInfo_put.cold.63 at ffffffffc0a42dd6 [c=
+ifs]
+> >  #5 [ffff99650065ba38] cifs_writepage_locked at ffffffffc0a0b8f3 [cifs]
+> >  #6 [ffff99650065bab0] cifs_launder_page at ffffffffc0a0bb72 [cifs]
+> >  #7 [ffff99650065bb30] invalidate_inode_pages2_range at ffffffff9b04d4b=
+d
+> >  #8 [ffff99650065bcb8] cifs_invalidate_mapping at ffffffffc0a11339 [cif=
+s]
+> >  #9 [ffff99650065bcd0] cifs_revalidate_mapping at ffffffffc0a1139a [cif=
+s]
+> > #10 [ffff99650065bcf0] cifs_d_revalidate at ffffffffc0a014f6 [cifs]
+> > #11 [ffff99650065bd08] path_openat at ffffffff9b0fe7f7
+> > #12 [ffff99650065bdd8] do_filp_open at ffffffff9b100a33
+> > #13 [ffff99650065bee0] do_sys_open at ffffffff9b0eb2d6
+> > #14 [ffff99650065bf38] do_syscall_64 at ffffffff9ae04315
+> >
+> > cifs_launder_page is for page 0xffffd1e2c07d2480
+> >
+> > crash> page.index,mapping,flags 0xffffd1e2c07d2480
+> >       index =3D 0x8
+> >       mapping =3D 0xffff8c68f3cd0db0
+> >   flags =3D 0xfffffc0008095
+> >
+> >   PAGE-FLAG       BIT  VALUE
+> >   PG_locked         0  0000001
+> >   PG_uptodate       2  0000004
+> >   PG_lru            4  0000010
+> >   PG_waiters        7  0000080
+> >   PG_writeback     15  0008000
+> >
+> >
+> > inode is ffff8c68f3cd0c40
+> > inode.i_rwsem is ffff8c68f3cd0ce0
+> >      DENTRY           INODE           SUPERBLK     TYPE PATH
+> > ffff8c68a1f1b480 ffff8c68f3cd0c40 ffff8c6915bf9000 REG
+> > /mnt/vm1_smb/testfile.8853
+> >
+> >
+> > this process holds the inode->i_rwsem for the parent directory, is
+> > laundering a page attached to the inode of the file it's opening, and i=
+n
+> > _cifsFileInfo_put is trying to down_write the cifsInodeInflock_sem
+> > for the file itself.
+> >
+> >
+> > <struct rw_semaphore 0xffff8c68f3cd0ce0>:
+> >         owner: <struct task_struct 0xffff8c6914272e80> (UN -   8854 -
+> > reopen_file), counter: 0x0000000000000003
+> >         waitlist: 1
+> >         0xffff9965005dfd80     8855   reopen_file      UN 0  1:29:22.91=
+2
+> >   RWSEM_WAITING_FOR_WRITE
+> >
+> > this is the inode.i_rwsem for the file
+> >
+> > the owner:
+> >
+> > [0 00:48:22.739] [UN]  PID: 8854   TASK: ffff8c6914272e80  CPU: 2
+> > COMMAND: "reopen_file"
+> >  #0 [ffff99650054fb38] __schedule at ffffffff9b6e6095
+> >  #1 [ffff99650054fbc8] schedule at ffffffff9b6e64df
+> >  #2 [ffff99650054fbd8] io_schedule at ffffffff9b6e68e2
+> >  #3 [ffff99650054fbe8] __lock_page at ffffffff9b03c56f
+> >  #4 [ffff99650054fc80] pagecache_get_page at ffffffff9b03dcdf
+> >  #5 [ffff99650054fcc0] grab_cache_page_write_begin at ffffffff9b03ef4c
+> >  #6 [ffff99650054fcd0] cifs_write_begin at ffffffffc0a064ec [cifs]
+> >  #7 [ffff99650054fd30] generic_perform_write at ffffffff9b03bba4
+> >  #8 [ffff99650054fda8] __generic_file_write_iter at ffffffff9b04060a
+> >  #9 [ffff99650054fdf0] cifs_strict_writev.cold.70 at ffffffffc0a4469b [=
+cifs]
+> > #10 [ffff99650054fe48] new_sync_write at ffffffff9b0ec1dd
+> > #11 [ffff99650054fed0] vfs_write at ffffffff9b0eed35
+> > #12 [ffff99650054ff00] ksys_write at ffffffff9b0eefd9
+> > #13 [ffff99650054ff38] do_syscall_64 at ffffffff9ae04315
+> >
+> > the process holds the inode->i_rwsem for the file to which it's writing=
+,
+> > and is trying to __lock_page for the same page as in the other processe=
+s
+> >
+> >
+> > the other tasks:
+> > [0 00:00:00.028] [UN]  PID: 8859   TASK: ffff8c6915479740  CPU: 2
+> > COMMAND: "reopen_file"
+> >  #0 [ffff9965007b39d8] __schedule at ffffffff9b6e6095
+> >  #1 [ffff9965007b3a68] schedule at ffffffff9b6e64df
+> >  #2 [ffff9965007b3a78] schedule_timeout at ffffffff9b6e9f89
+> >  #3 [ffff9965007b3af0] msleep at ffffffff9af573a9
+> >  #4 [ffff9965007b3af8] cifs_new_fileinfo.cold.61 at ffffffffc0a42a07 [c=
+ifs]
+> >  #5 [ffff9965007b3b78] cifs_open at ffffffffc0a0709d [cifs]
+> >  #6 [ffff9965007b3cd8] do_dentry_open at ffffffff9b0e9b7a
+> >  #7 [ffff9965007b3d08] path_openat at ffffffff9b0fe34f
+> >  #8 [ffff9965007b3dd8] do_filp_open at ffffffff9b100a33
+> >  #9 [ffff9965007b3ee0] do_sys_open at ffffffff9b0eb2d6
+> > #10 [ffff9965007b3f38] do_syscall_64 at ffffffff9ae04315
+> >
+> > this is opening the file, and is trying to down_write cinode->lock_sem
+> >
+> >
+> > [0 00:00:00.041] [UN]  PID: 8860   TASK: ffff8c691547ae80  CPU: 2
+> > COMMAND: "reopen_file"
+> > [0 00:00:00.057] [UN]  PID: 8861   TASK: ffff8c6915478000  CPU: 3
+> > COMMAND: "reopen_file"
+> > [0 00:00:00.059] [UN]  PID: 8858   TASK: ffff8c6914271740  CPU: 2
+> > COMMAND: "reopen_file"
+> > [0 00:00:00.109] [UN]  PID: 8862   TASK: ffff8c691547dd00  CPU: 6
+> > COMMAND: "reopen_file"
+> >  #0 [ffff9965007c3c78] __schedule at ffffffff9b6e6095
+> >  #1 [ffff9965007c3d08] schedule at ffffffff9b6e64df
+> >  #2 [ffff9965007c3d18] schedule_timeout at ffffffff9b6e9f89
+> >  #3 [ffff9965007c3d90] msleep at ffffffff9af573a9
+> >  #4 [ffff9965007c3d98] _cifsFileInfo_put.cold.63 at ffffffffc0a42dd6 [c=
+ifs]
+> >  #5 [ffff9965007c3e88] cifs_close at ffffffffc0a07aaf [cifs]
+> >  #6 [ffff9965007c3ea0] __fput at ffffffff9b0efa6e
+> >  #7 [ffff9965007c3ee8] task_work_run at ffffffff9aef1614
+> >  #8 [ffff9965007c3f20] exit_to_usermode_loop at ffffffff9ae03d6f
+> >  #9 [ffff9965007c3f38] do_syscall_64 at ffffffff9ae0444c
+> >
+> > closing the file, and trying to down_write cifsi->lock_sem
+> >
+> >
+> > [0 00:48:22.839] [UN]  PID: 8857   TASK: ffff8c6914270000  CPU: 7
+> > COMMAND: "reopen_file"
+> >  #0 [ffff9965006a7cc8] __schedule at ffffffff9b6e6095
+> >  #1 [ffff9965006a7d58] schedule at ffffffff9b6e64df
+> >  #2 [ffff9965006a7d68] io_schedule at ffffffff9b6e68e2
+> >  #3 [ffff9965006a7d78] wait_on_page_bit at ffffffff9b03cac6
+> >  #4 [ffff9965006a7e10] __filemap_fdatawait_range at ffffffff9b03b028
+> >  #5 [ffff9965006a7ed8] filemap_write_and_wait at ffffffff9b040165
+> >  #6 [ffff9965006a7ef0] cifs_flush at ffffffffc0a0c2fa [cifs]
+> >  #7 [ffff9965006a7f10] filp_close at ffffffff9b0e93f1
+> >  #8 [ffff9965006a7f30] __x64_sys_close at ffffffff9b0e9a0e
+> >  #9 [ffff9965006a7f38] do_syscall_64 at ffffffff9ae04315
+> >
+> > in __filemap_fdatawait_range
+> >                         wait_on_page_writeback(page);
+> > for the same page of the file
+> >
+> >
+> >
+> > [0 00:48:22.718] [UN]  PID: 8855   TASK: ffff8c69142745c0  CPU: 7
+> > COMMAND: "reopen_file"
+> >  #0 [ffff9965005dfc98] __schedule at ffffffff9b6e6095
+> >  #1 [ffff9965005dfd28] schedule at ffffffff9b6e64df
+> >  #2 [ffff9965005dfd38] rwsem_down_write_slowpath at ffffffff9af283d7
+> >  #3 [ffff9965005dfdf0] cifs_strict_writev at ffffffffc0a0c40a [cifs]
+> >  #4 [ffff9965005dfe48] new_sync_write at ffffffff9b0ec1dd
+> >  #5 [ffff9965005dfed0] vfs_write at ffffffff9b0eed35
+> >  #6 [ffff9965005dff00] ksys_write at ffffffff9b0eefd9
+> >  #7 [ffff9965005dff38] do_syscall_64 at ffffffff9ae04315
+> >
+> >         inode_lock(inode);
+> >
+> >
+> > and one 'ls' later on, to see whether the rest of the mount is availabl=
+e
+> > (the test file is in the root, so we get blocked up on the directory
+> > ->i_rwsem), so the entire mount is unavailable
+> >
+> > [0 00:36:26.473] [UN]  PID: 9802   TASK: ffff8c691436ae80  CPU: 4
+> > COMMAND: "ls"
+> >  #0 [ffff996500393d28] __schedule at ffffffff9b6e6095
+> >  #1 [ffff996500393db8] schedule at ffffffff9b6e64df
+> >  #2 [ffff996500393dc8] rwsem_down_read_slowpath at ffffffff9b6e9421
+> >  #3 [ffff996500393e78] down_read_killable at ffffffff9b6e95e2
+> >  #4 [ffff996500393e88] iterate_dir at ffffffff9b103c56
+> >  #5 [ffff996500393ec8] ksys_getdents64 at ffffffff9b104b0c
+> >  #6 [ffff996500393f30] __x64_sys_getdents64 at ffffffff9b104bb6
+> >  #7 [ffff996500393f38] do_syscall_64 at ffffffff9ae04315
+> >
+> > in iterate_dir:
+> >         if (shared)
+> >                 res =3D down_read_killable(&inode->i_rwsem);  <<<<
+> >         else
+> >                 res =3D down_write_killable(&inode->i_rwsem);
+> >
+>
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/cifsfs.c   | 13 +++++++-
+>  fs/cifs/cifsglob.h |  3 +-
+>  fs/cifs/file.c     | 91 ++++++++++++++++++++++++++++++++++--------------=
+------
+>  3 files changed, 72 insertions(+), 35 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index e4e3b573d20c..f8e201c45ccb 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -119,6 +119,7 @@ extern mempool_t *cifs_mid_poolp;
+>
+>  struct workqueue_struct        *cifsiod_wq;
+>  struct workqueue_struct        *decrypt_wq;
+> +struct workqueue_struct        *fileinfo_put_wq;
+>  struct workqueue_struct        *cifsoplockd_wq;
+>  __u32 cifs_lock_secret;
+>
+> @@ -1557,11 +1558,18 @@ init_cifs(void)
+>                 goto out_destroy_cifsiod_wq;
+>         }
+>
+> +       fileinfo_put_wq =3D alloc_workqueue("cifsfileinfoput",
+> +                                    WQ_UNBOUND|WQ_FREEZABLE|WQ_MEM_RECLA=
+IM, 0);
+> +       if (!fileinfo_put_wq) {
+> +               rc =3D -ENOMEM;
+> +               goto out_destroy_decrypt_wq;
+> +       }
+> +
+>         cifsoplockd_wq =3D alloc_workqueue("cifsoplockd",
+>                                          WQ_FREEZABLE|WQ_MEM_RECLAIM, 0);
+>         if (!cifsoplockd_wq) {
+>                 rc =3D -ENOMEM;
+> -               goto out_destroy_decrypt_wq;
+> +               goto out_destroy_fileinfo_put_wq;
+>         }
+>
+>         rc =3D cifs_fscache_register();
+> @@ -1627,6 +1635,8 @@ init_cifs(void)
+>         cifs_fscache_unregister();
+>  out_destroy_cifsoplockd_wq:
+>         destroy_workqueue(cifsoplockd_wq);
+> +out_destroy_fileinfo_put_wq:
+> +       destroy_workqueue(fileinfo_put_wq);
+>  out_destroy_decrypt_wq:
+>         destroy_workqueue(decrypt_wq);
+>  out_destroy_cifsiod_wq:
+> @@ -1656,6 +1666,7 @@ exit_cifs(void)
+>         cifs_fscache_unregister();
+>         destroy_workqueue(cifsoplockd_wq);
+>         destroy_workqueue(decrypt_wq);
+> +       destroy_workqueue(fileinfo_put_wq);
+>         destroy_workqueue(cifsiod_wq);
+>         cifs_proc_clean();
+>  }
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index d78bfcc19156..0819b6498a3c 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1265,6 +1265,7 @@ struct cifsFileInfo {
+>         struct mutex fh_mutex; /* prevents reopen race after dead ses*/
+>         struct cifs_search_info srch_inf;
+>         struct work_struct oplock_break; /* work for oplock breaks */
+> +       struct work_struct put; /* work for the final part of _put */
+>  };
+>
+>  struct cifs_io_parms {
+> @@ -1370,7 +1371,6 @@ cifsFileInfo_get_locked(struct cifsFileInfo *cifs_f=
+ile)
+>  }
+>
+>  struct cifsFileInfo *cifsFileInfo_get(struct cifsFileInfo *cifs_file);
+> -void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_=
+hdlr);
+>  void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
+>
+>  #define CIFS_CACHE_READ_FLG    1
+> @@ -1907,6 +1907,7 @@ void cifs_queue_oplock_break(struct cifsFileInfo *c=
+file);
+>  extern const struct slow_work_ops cifs_oplock_break_ops;
+>  extern struct workqueue_struct *cifsiod_wq;
+>  extern struct workqueue_struct *decrypt_wq;
+> +extern struct workqueue_struct *fileinfo_put_wq;
+>  extern struct workqueue_struct *cifsoplockd_wq;
+>  extern __u32 cifs_lock_secret;
+>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 67e7d0ffe385..d1dedb8fb31f 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -375,30 +375,7 @@ cifsFileInfo_get(struct cifsFileInfo *cifs_file)
+>         return cifs_file;
+>  }
+>
+> -/**
+> - * cifsFileInfo_put - release a reference of file priv data
+> - *
+> - * Always potentially wait for oplock handler. See _cifsFileInfo_put().
+> - */
+> -void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+> -{
+> -       _cifsFileInfo_put(cifs_file, true);
+> -}
+> -
+> -/**
+> - * _cifsFileInfo_put - release a reference of file priv data
+> - *
+> - * This may involve closing the filehandle @cifs_file out on the
+> - * server. Must be called without holding tcon->open_file_lock and
+> - * cifs_file->file_info_lock.
+> - *
+> - * If @wait_for_oplock_handler is true and we are releasing the last
+> - * reference, wait for any running oplock break handler of the file
+> - * and cancel any pending one. If calling this function from the
+> - * oplock break handler, you need to pass false.
+> - *
+> - */
+> -void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_=
+handler)
+> +void cifsFileInfo_put_final(struct cifsFileInfo *cifs_file)
+>  {
+>         struct inode *inode =3D d_inode(cifs_file->dentry);
+>         struct cifs_tcon *tcon =3D tlink_tcon(cifs_file->tlink);
+> @@ -409,7 +386,6 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file=
+, bool wait_oplock_handler)
+>         struct cifsLockInfo *li, *tmp;
+>         struct cifs_fid fid;
+>         struct cifs_pending_open open;
+> -       bool oplock_break_cancelled;
+>
+>         spin_lock(&tcon->open_file_lock);
+>         spin_lock(&cifsi->open_file_lock);
+> @@ -449,9 +425,6 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file=
+, bool wait_oplock_handler)
+>         spin_unlock(&cifsi->open_file_lock);
+>         spin_unlock(&tcon->open_file_lock);
+>
+> -       oplock_break_cancelled =3D wait_oplock_handler ?
+> -               cancel_work_sync(&cifs_file->oplock_break) : false;
+> -
+>         if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
+>                 struct TCP_Server_Info *server =3D tcon->ses->server;
+>                 unsigned int xid;
+> @@ -462,9 +435,6 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file=
+, bool wait_oplock_handler)
+>                 _free_xid(xid);
+>         }
+>
+> -       if (oplock_break_cancelled)
+> -               cifs_done_oplock_break(cifsi);
+> -
+>         cifs_del_pending_open(&open);
+>
+>         /*
+> @@ -487,6 +457,61 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_fil=
+e, bool wait_oplock_handler)
+>         kfree(cifs_file);
+>  }
+>
+> +static void cifsFileInfo_put_work(struct work_struct *work)
+> +{
+> +       struct cifsFileInfo *cifs_file =3D container_of(work,
+> +                       struct cifsFileInfo, put);
+> +
+> +       cifsFileInfo_put_final(cifs_file);
+> +}
+> +
+> +/**
+> + * _cifsFileInfo_put - release a reference of file priv data
+> + *
+> + * This may involve closing the filehandle @cifs_file out on the
+> + * server. Must be called without holding tcon->open_file_lock,
+> + * cinode->open_file_lock and cifs_file->file_info_lock.
+> + *
+> + * If @wait_for_oplock_handler is true and we are releasing the last
+> + * reference, wait for any running oplock break handler of the file
+> + * and cancel any pending one. If calling this function from the
+> + * oplock break handler, you need to pass false.
+> + *
+> + */
+> +void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
+> +                      bool wait_oplock_handler, bool offload)
+> +{
+> +       struct inode *inode =3D d_inode(cifs_file->dentry);
+> +       struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
+> +
+> +       spin_lock(&cifs_file->file_info_lock);
+> +       if (cifs_file->count > 1) {
+> +               cifs_file->count--;
+> +               spin_unlock(&cifs_file->file_info_lock);
+> +               return;
+> +       }
+> +       spin_unlock(&cifs_file->file_info_lock);
+> +
+> +       if (wait_oplock_handler && cancel_work_sync(&cifs_file->oplock_br=
+eak))
+> +               cifs_done_oplock_break(cifsi);
 
-Pavel,
+At this point the file info is still in the lists and can be
+referenced by other threads not only including oplock break routine.
+So, we can't cancel oplock break here - it would lead to big timeouts
+to other clients trying to open the file because the server will be
+waiting for an oplock break ack.
 
-meanwhile I updated to the supported kernels. The strange thing is, in 
-the kernel 5.2.21 in my distro (Manjaro) it works.
+Let's do it in cifsFileInfo_put_final() as it was originally in
+cifsFileInfo_put() and we do not need an extra *wait_oplock_handler*
+argument - just cancel it unconditionally. If a caller of this
+function don't want to deadlock on himself (like cifs_oplock_break) it
+will just specify *offload* as True.
 
-While it is not working with 5.3.7.
+> +
+> +       if (offload) {
+> +               INIT_WORK(&cifs_file->put, cifsFileInfo_put_work);
+> +               queue_work(fileinfo_put_wq, &cifs_file->put);
+> +       } else
+> +               cifsFileInfo_put_final(cifs_file);
+> +}
+> +
+> +/**
+> + * cifsFileInfo_put - release a reference of file priv data
+> + *
+> + * Always potentially wait for oplock handler. See _cifsFileInfo_put().
+> + */
+> +void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+> +{
+> +       _cifsFileInfo_put(cifs_file, true, true);
+> +}
+> +
+>  int cifs_open(struct inode *inode, struct file *file)
+>
+>  {
+> @@ -808,7 +833,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can=
+_flush)
+>  int cifs_close(struct inode *inode, struct file *file)
+>  {
+>         if (file->private_data !=3D NULL) {
+> -               cifsFileInfo_put(file->private_data);
+> +               _cifsFileInfo_put(file->private_data, true, false);
+>                 file->private_data =3D NULL;
+>         }
+>
+> @@ -4742,7 +4767,7 @@ void cifs_oplock_break(struct work_struct *work)
+>                                                              cinode);
+>                 cifs_dbg(FYI, "Oplock release rc =3D %d\n", rc);
+>         }
+> -       _cifsFileInfo_put(cfile, false /* do not wait for ourself */);
+> +       _cifsFileInfo_put(cfile, false /* do not wait for ourself */, tru=
+e);
 
-I checked the kernel sources of my distro and the patch is included 
-there.
+As mentioned above, here we only need *offload* as True to not wait
+for ourselves.
 
-I've attached a pcap and the dmesg output when using my small demo tool.
+>         cifs_done_oplock_break(cinode);
+>  }
+>
+> --
+> 2.13.6
+>
 
-Can you check if it is the same issue as before or something different?
+Other than that, I think we the patch is on the right track. It should
+give us an opportunity to do file handle batching easily.
 
-
-
-$ uname -r
-5.3.7-2-MANJARO
-
-$ mount.cifs -V
-mount.cifs version: 6.8
-
-$ samba --version
-Version 4.10.8
-
-Thanks
-Moritz
---=_a040e6653d182697ac19eeacad00a3f0
-Content-Transfer-Encoding: base64
-Content-Type: application/vnd.tcpdump.pcap;
- name=smb_.pcapng
-Content-Disposition: attachment;
- filename=smb_.pcapng;
- size=5839
-
-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
-5HbR8BGAEAH1PWYAAAEBCArWQYoBF10UrQ==
---=_a040e6653d182697ac19eeacad00a3f0
-Content-Transfer-Encoding: base64
-Content-Type: text/plain;
- name=dmesg.txt
-Content-Disposition: attachment;
- filename=dmesg.txt;
- size=11286
-
-W01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2lub2RlLmM6IENJRlMgVkZTOiBpbiBj
-aWZzX3JldmFsaWRhdGVfZGVudHJ5X2F0dHIgYXMgWGlkOiAxNTA4IHdpdGggdWlkOiAwCltNaSBP
-a3QgMzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9kaXIuYzogbmFtZTogXGx5eHRlc3QKW01pIE9r
-dCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2lub2RlLmM6IFVwZGF0ZSBhdHRyaWJ1dGVzOiBc
-bHl4dGVzdCBpbm9kZSAweDAwMDAwMDAwMGE0NzY0ZDUgY291bnQgMSBkZW50cnk6IDB4MDAwMDAw
-MDBkZDI5OWM0NyBkX3RpbWUgNDI5OTY2NjcwNSBqaWZmaWVzIDQyOTk2NzE1NzEKW01pIE9rdCAz
-MCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2lub2RlLmM6IEdldHRpbmcgaW5mbyBvbiBcbHl4dGVz
-dApbTWkgT2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2NpZnMvdHJhbnNwb3J0LmM6IFNlbmRpbmcg
-c21iOiBzbWJfbGVuPTM1NgpbTWkgT2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2NpZnMvY29ubmVj
-dC5jOiBSRkMxMDAyIGhlYWRlciAweDIxMApbTWkgT2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2Np
-ZnMvc21iMm1pc2MuYzogU01CMiBkYXRhIGxlbmd0aCA1NiBvZmZzZXQgMTUyCltNaSBPa3QgMzAg
-MTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9zbWIybWlzYy5jOiBTTUIyIGxlbiAyMDgKW01pIE9rdCAz
-MCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL3NtYjJtaXNjLmM6IFNNQjIgZGF0YSBsZW5ndGggMTE2
-IG9mZnNldCA3MgpbTWkgT2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2NpZnMvc21iMm1pc2MuYzog
-U01CMiBsZW4gMTg4CltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9zbWIybWlzYy5j
-OiBDYWxjdWxhdGVkIHNpemUgMTg4IGxlbmd0aCAxOTIgbWlzbWF0Y2ggbWlkIDE3MTYKW01pIE9r
-dCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL3NtYjJtaXNjLmM6IFNNQjIgbGVuIDEyNApbTWkg
-T2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2NpZnMvc21iMm1pc2MuYzogQ2FsY3VsYXRlZCBzaXpl
-IDEyNCBsZW5ndGggMTI4IG1pc21hdGNoIG1pZCAxNzE3CltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAx
-OV0gZnMvY2lmcy9zbWIyb3BzLmM6IGFkZCAzIGNyZWRpdHMgdG90YWw9NTEyCltNaSBPa3QgMzAg
-MTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy90cmFuc3BvcnQuYzogY2lmc19zeW5jX21pZF9yZXN1bHQ6
-IGNtZD01IG1pZD0xNzE1IHN0YXRlPTQKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZz
-L3RyYW5zcG9ydC5jOiBjaWZzX3N5bmNfbWlkX3Jlc3VsdDogY21kPTE2IG1pZD0xNzE2IHN0YXRl
-PTQKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL3RyYW5zcG9ydC5jOiBjaWZzX3N5
-bmNfbWlkX3Jlc3VsdDogY21kPTYgbWlkPTE3MTcgc3RhdGU9NApbTWkgT2t0IDMwIDE0OjEyOjI5
-IDIwMTldIGZzL2NpZnMvbWlzYy5jOiBOdWxsIGJ1ZmZlciBwYXNzZWQgdG8gY2lmc19zbWFsbF9i
-dWZfcmVsZWFzZQpbTWkgT2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2NpZnMvbWlzYy5jOiBOdWxs
-IGJ1ZmZlciBwYXNzZWQgdG8gY2lmc19zbWFsbF9idWZfcmVsZWFzZQpbTWkgT2t0IDMwIDE0OjEy
-OjI5IDIwMTldIGZzL2NpZnMvbWlzYy5jOiBOdWxsIGJ1ZmZlciBwYXNzZWQgdG8gY2lmc19zbWFs
-bF9idWZfcmVsZWFzZQpbTWkgT2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2NpZnMvaW5vZGUuYzog
-Y2lmc19yZXZhbGlkYXRlX2NhY2hlOiByZXZhbGlkYXRpbmcgaW5vZGUgNTY0OTE0CltNaSBPa3Qg
-MzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9pbm9kZS5jOiBjaWZzX3JldmFsaWRhdGVfY2FjaGU6
-IGludmFsaWRhdGluZyBpbm9kZSA1NjQ5MTQgbWFwcGluZwpbTWkgT2t0IDMwIDE0OjEyOjI5IDIw
-MTldIGZzL2NpZnMvaW5vZGUuYzogQ0lGUyBWRlM6IGxlYXZpbmcgY2lmc19yZXZhbGlkYXRlX2Rl
-bnRyeV9hdHRyICh4aWQgPSAxNTA4KSByYyA9IDAKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBm
-cy9jaWZzL2Rpci5jOiBDSUZTIFZGUzogaW4gY2lmc19hdG9taWNfb3BlbiBhcyBYaWQ6IDE1MDkg
-d2l0aCB1aWQ6IDAKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2Rpci5jOiBwYXJl
-bnQgaW5vZGUgPSAweDAwMDAwMDAwMGE0NzY0ZDUgbmFtZSBpczogZm9vLnR4dCBhbmQgZGVudHJ5
-ID0gMHgwMDAwMDAwMDE3NTljYzIwCltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9k
-aXIuYzogbmFtZTogXGZvby50eHQKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2Rp
-ci5jOiBuYW1lOiBcbHl4dGVzdFxmb28udHh0CltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAxOV0gU01C
-Ml9vcGVuOiAzNjIgY2FsbGJhY2tzIHN1cHByZXNzZWQKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5
-XSBmcy9jaWZzL3NtYjJwZHUuYzogY3JlYXRlL29wZW4KW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5
-XSBmcy9jaWZzL3RyYW5zcG9ydC5jOiBTZW5kaW5nIHNtYjogc21iX2xlbj0yMjAKW01pIE9rdCAz
-MCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2Nvbm5lY3QuYzogUkZDMTAwMiBoZWFkZXIgMHhkMApb
-TWkgT2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2NpZnMvc21iMm1pc2MuYzogU01CMiBkYXRhIGxl
-bmd0aCA1NiBvZmZzZXQgMTUyCltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9zbWIy
-bWlzYy5jOiBTTUIyIGxlbiAyMDgKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL3Nt
-YjJvcHMuYzogYWRkIDEgY3JlZGl0cyB0b3RhbD01MTIKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5
-XSBmcy9jaWZzL3RyYW5zcG9ydC5jOiBjaWZzX3N5bmNfbWlkX3Jlc3VsdDogY21kPTUgbWlkPTE3
-MTggc3RhdGU9NApbTWkgT2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2NpZnMvbWlzYy5jOiBOdWxs
-IGJ1ZmZlciBwYXNzZWQgdG8gY2lmc19zbWFsbF9idWZfcmVsZWFzZQpbTWkgT2t0IDMwIDE0OjEy
-OjI5IDIwMTldIGZzL2NpZnMvc21iMnBkdS5jOiBwYXJzZSBxdWVyeSBpZCBjb250ZXh0IDB4OGYz
-MTkgMHgxMDAwMDcKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2lub2RlLmM6IEdl
-dHRpbmcgaW5mbyBvbiBcbHl4dGVzdFxmb28udHh0CltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAxOV0g
-ZnMvY2lmcy9pbm9kZS5jOiBsb29raW5nIGZvciB1bmlxdWVpZD01ODY1MjEKW01pIE9rdCAzMCAx
-NDoxMjoyOSAyMDE5XSBmcy9jaWZzL2lub2RlLmM6IGNpZnNfcmV2YWxpZGF0ZV9jYWNoZTogcmV2
-YWxpZGF0aW5nIGlub2RlIDU4NjUyMQpbTWkgT2t0IDMwIDE0OjEyOjI5IDIwMTldIGZzL2NpZnMv
-aW5vZGUuYzogY2lmc19yZXZhbGlkYXRlX2NhY2hlOiBpbm9kZSA1ODY1MjEgaXMgbmV3CltNaSBP
-a3QgMzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9zbWIyb3BzLmM6IEJhdGNoIE9wbG9jayBncmFu
-dGVkIG9uIGlub2RlIDAwMDAwMDAwNDk3ZjEzNDQKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBm
-cy9jaWZzL2Rpci5jOiBDSUZTIFZGUzogbGVhdmluZyBjaWZzX2F0b21pY19vcGVuICh4aWQgPSAx
-NTA5KSByYyA9IDAKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2ZpbGUuYzogQ0lG
-UyBWRlM6IGluIGNpZnNfb3BlbiBhcyBYaWQ6IDE1MTAgd2l0aCB1aWQ6IDAKW01pIE9rdCAzMCAx
-NDoxMjoyOSAyMDE5XSBmcy9jaWZzL2Rpci5jOiBuYW1lOiBcZm9vLnR4dApbTWkgT2t0IDMwIDE0
-OjEyOjI5IDIwMTldIGZzL2NpZnMvZGlyLmM6IG5hbWU6IFxseXh0ZXN0XGZvby50eHQKW01pIE9r
-dCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2ZpbGUuYzogaW5vZGUgPSAweDAwMDAwMDAwNDk3
-ZjEzNDQgZmlsZSBmbGFncyBhcmUgMHg4MjQxIGZvciBcbHl4dGVzdFxmb28udHh0CltNaSBPa3Qg
-MzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9zbWIycGR1LmM6IGNyZWF0ZS9vcGVuCltNaSBPa3Qg
-MzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6IHNtYl9s
-ZW49MjIwCltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9jb25uZWN0LmM6IFJGQzEw
-MDIgaGVhZGVyIDB4NTgKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL3NtYjJtaXNj
-LmM6IFNNQjIgbGVuIDg4CltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9zbWIybWlz
-Yy5jOiBDaGVja2luZyBmb3Igb3Bsb2NrIGJyZWFrCltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAxOV0g
-ZnMvY2lmcy9zbWIybWlzYy5jOiBvcGxvY2sgbGV2ZWwgMHgwCltNaSBPa3QgMzAgMTQ6MTI6Mjkg
-MjAxOV0gZnMvY2lmcy9zbWIybWlzYy5jOiBObyBtYXRjaGluZyBmaWxlIGZvciBvcGxvY2sgYnJl
-YWsKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL2Nvbm5lY3QuYzogUmVjZWl2ZWQg
-b3Bsb2NrIGJyZWFrCltNaSBPa3QgMzAgMTQ6MTI6MjkgMjAxOV0gZnMvY2lmcy9jb25uZWN0LmM6
-IFJGQzEwMDIgaGVhZGVyIDB4NDkKW01pIE9rdCAzMCAxNDoxMjoyOSAyMDE5XSBmcy9jaWZzL3Nt
-YjJtaXNjLmM6IFNNQjIgZGF0YSBsZW5ndGggMCBvZmZzZXQgMApbTWkgT2t0IDMwIDE0OjEyOjI5
-IDIwMTldIGZzL2NpZnMvc21iMm1pc2MuYzogU01CMiBsZW4gNzMKW01pIE9rdCAzMCAxNDoxMjo1
-OSAyMDE5XSBmcy9jaWZzL2Nvbm5lY3QuYzogUkZDMTAwMiBoZWFkZXIgMHhkMApbTWkgT2t0IDMw
-IDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvc21iMm1pc2MuYzogU01CMiBkYXRhIGxlbmd0aCA1NiBv
-ZmZzZXQgMTUyCltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9zbWIybWlzYy5jOiBT
-TUIyIGxlbiAyMDgKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL3NtYjJvcHMuYzog
-YWRkIDAgY3JlZGl0cyB0b3RhbD01MTIKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZz
-L3RyYW5zcG9ydC5jOiBjaWZzX3N5bmNfbWlkX3Jlc3VsdDogY21kPTUgbWlkPTE3MTkgc3RhdGU9
-NApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvbWlzYy5jOiBOdWxsIGJ1ZmZlciBw
-YXNzZWQgdG8gY2lmc19zbWFsbF9idWZfcmVsZWFzZQpbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTld
-IGZzL2NpZnMvc21iMnBkdS5jOiBwYXJzZSBxdWVyeSBpZCBjb250ZXh0IDB4OGYzMTkgMHgxMDAw
-MDcKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL2lub2RlLmM6IEdldHRpbmcgaW5m
-byBvbiBcbHl4dGVzdFxmb28udHh0CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9p
-bm9kZS5jOiBjaWZzX3JldmFsaWRhdGVfY2FjaGU6IHJldmFsaWRhdGluZyBpbm9kZSA1ODY1MjEK
-W01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL2lub2RlLmM6IGNpZnNfcmV2YWxpZGF0
-ZV9jYWNoZTogaW5vZGUgNTg2NTIxIGlzIG9wbG9ja2VkCltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAx
-OV0gZnMvY2lmcy9zbWIyb3BzLmM6IFIgTGVhc2UgZ3JhbnRlZCBvbiBpbm9kZSAwMDAwMDAwMDQ5
-N2YxMzQ0CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9maWxlLmM6IENJRlMgVkZT
-OiBsZWF2aW5nIGNpZnNfb3BlbiAoeGlkID0gMTUxMCkgcmMgPSAwCltNaSBPa3QgMzAgMTQ6MTI6
-NTkgMjAxOV0gZnMvY2lmcy9pbm9kZS5jOiBDSUZTIFZGUzogaW4gY2lmc19zZXRhdHRyX25vdW5p
-eCBhcyBYaWQ6IDE1MTEgd2l0aCB1aWQ6IDAKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9j
-aWZzL2lub2RlLmM6IHNldGF0dHIgb24gZmlsZSBmb28udHh0IGF0dHJzLT5pYV92YWxpZCAweGEw
-NjgKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL2Rpci5jOiBuYW1lOiBcZm9vLnR4
-dApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvZGlyLmM6IG5hbWU6IFxseXh0ZXN0
-XGZvby50eHQKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL3NtYjJwZHUuYzogRmx1
-c2gKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL3RyYW5zcG9ydC5jOiBTZW5kaW5n
-IHNtYjogc21iX2xlbj05MgpbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvY29ubmVj
-dC5jOiBSRkMxMDAyIGhlYWRlciAweDQ0CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lm
-cy9zbWIybWlzYy5jOiBTTUIyIGxlbiA2OApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2Np
-ZnMvc21iMm9wcy5jOiBhZGQgMSBjcmVkaXRzIHRvdGFsPTUxMgpbTWkgT2t0IDMwIDE0OjEyOjU5
-IDIwMTldIGZzL2NpZnMvdHJhbnNwb3J0LmM6IGNpZnNfc3luY19taWRfcmVzdWx0OiBjbWQ9NyBt
-aWQ9MTcyMCBzdGF0ZT00CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9taXNjLmM6
-IE51bGwgYnVmZmVyIHBhc3NlZCB0byBjaWZzX3NtYWxsX2J1Zl9yZWxlYXNlCltNaSBPa3QgMzAg
-MTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6IHNtYl9sZW49
-MTA4CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9jb25uZWN0LmM6IFJGQzEwMDIg
-aGVhZGVyIDB4NDIKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL3NtYjJtaXNjLmM6
-IFNNQjIgbGVuIDY2CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9zbWIyb3BzLmM6
-IGFkZCAxIGNyZWRpdHMgdG90YWw9NTEyCltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lm
-cy90cmFuc3BvcnQuYzogY2lmc19zeW5jX21pZF9yZXN1bHQ6IGNtZD0xNyBtaWQ9MTcyMSBzdGF0
-ZT00CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9taXNjLmM6IE51bGwgYnVmZmVy
-IHBhc3NlZCB0byBjaWZzX3NtYWxsX2J1Zl9yZWxlYXNlCltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAx
-OV0gZnMvY2lmcy9pbm9kZS5jOiBTZXRGU2l6ZSBmb3IgYXR0cnMgcmMgPSAwCltNaSBPa3QgMzAg
-MTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9pbm9kZS5jOiBDSUZTIC0gQ1RJTUUgY2hhbmdlZApbTWkg
-T2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvdHJhbnNwb3J0LmM6IFNlbmRpbmcgc21iOiBz
-bWJfbGVuPTQwNApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvY29ubmVjdC5jOiBS
-RkMxMDAyIGhlYWRlciAweDE5OApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvc21i
-Mm1pc2MuYzogU01CMiBkYXRhIGxlbmd0aCA1NiBvZmZzZXQgMTUyCltNaSBPa3QgMzAgMTQ6MTI6
-NTkgMjAxOV0gZnMvY2lmcy9zbWIybWlzYy5jOiBTTUIyIGxlbiAyMDgKW01pIE9rdCAzMCAxNDox
-Mjo1OSAyMDE5XSBmcy9jaWZzL3NtYjJtaXNjLmM6IFNNQjIgbGVuIDY2CltNaSBPa3QgMzAgMTQ6
-MTI6NTkgMjAxOV0gZnMvY2lmcy9zbWIybWlzYy5jOiBDYWxjdWxhdGVkIHNpemUgNjYgbGVuZ3Ro
-IDcyIG1pc21hdGNoIG1pZCAxNzIzCltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9z
-bWIybWlzYy5jOiBTTUIyIGxlbiAxMjQKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZz
-L3NtYjJtaXNjLmM6IENhbGN1bGF0ZWQgc2l6ZSAxMjQgbGVuZ3RoIDEyOCBtaXNtYXRjaCBtaWQg
-MTcyNApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvc21iMm9wcy5jOiBhZGQgMyBj
-cmVkaXRzIHRvdGFsPTUxMgpbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvdHJhbnNw
-b3J0LmM6IGNpZnNfc3luY19taWRfcmVzdWx0OiBjbWQ9NSBtaWQ9MTcyMiBzdGF0ZT00CltNaSBP
-a3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy90cmFuc3BvcnQuYzogY2lmc19zeW5jX21pZF9y
-ZXN1bHQ6IGNtZD0xNyBtaWQ9MTcyMyBzdGF0ZT00CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0g
-ZnMvY2lmcy90cmFuc3BvcnQuYzogY2lmc19zeW5jX21pZF9yZXN1bHQ6IGNtZD02IG1pZD0xNzI0
-IHN0YXRlPTQKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL21pc2MuYzogTnVsbCBi
-dWZmZXIgcGFzc2VkIHRvIGNpZnNfc21hbGxfYnVmX3JlbGVhc2UKW01pIE9rdCAzMCAxNDoxMjo1
-OSAyMDE5XSBmcy9jaWZzL21pc2MuYzogTnVsbCBidWZmZXIgcGFzc2VkIHRvIGNpZnNfc21hbGxf
-YnVmX3JlbGVhc2UKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL21pc2MuYzogTnVs
-bCBidWZmZXIgcGFzc2VkIHRvIGNpZnNfc21hbGxfYnVmX3JlbGVhc2UKW01pIE9rdCAzMCAxNDox
-Mjo1OSAyMDE5XSBmcy9jaWZzL2lub2RlLmM6IENJRlMgVkZTOiBsZWF2aW5nIGNpZnNfc2V0YXR0
-cl9ub3VuaXggKHhpZCA9IDE1MTEpIHJjID0gMApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZz
-L2NpZnMvZmlsZS5jOiBDSUZTIFZGUzogaW4gY2lmc193cml0ZXBhZ2VzIGFzIFhpZDogMTUxMiB3
-aXRoIHVpZDogMApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvc21iMm9wcy5jOiBh
-ZGQgNjQgY3JlZGl0cyB0b3RhbD01MTIKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZz
-L2ZpbGUuYzogQ0lGUyBWRlM6IGxlYXZpbmcgY2lmc193cml0ZXBhZ2VzICh4aWQgPSAxNTEyKSBy
-YyA9IDAKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL2ZpbGUuYzogRmx1c2ggaW5v
-ZGUgMDAwMDAwMDA0OTdmMTM0NCBmaWxlIDAwMDAwMDAwOGE0NjNkN2YgcmMgMApbTWkgT2t0IDMw
-IDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvZmlsZS5jOiBDSUZTIFZGUzogaW4gX2NpZnNGaWxlSW5m
-b19wdXQgYXMgWGlkOiAxNTEzIHdpdGggdWlkOiAwCltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0g
-U01CMl9jbG9zZV9mbGFnczogMzc5IGNhbGxiYWNrcyBzdXBwcmVzc2VkCltNaSBPa3QgMzAgMTQ6
-MTI6NTkgMjAxOV0gZnMvY2lmcy9zbWIycGR1LmM6IENsb3NlCltNaSBPa3QgMzAgMTQ6MTI6NTkg
-MjAxOV0gZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6IHNtYl9sZW49OTIKW01pIE9r
-dCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL2Nvbm5lY3QuYzogUkZDMTAwMiBoZWFkZXIgMHg3
-YwpbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvc21iMm1pc2MuYzogU01CMiBsZW4g
-MTI0CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9zbWIyb3BzLmM6IGFkZCAxIGNy
-ZWRpdHMgdG90YWw9NTEyCltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy90cmFuc3Bv
-cnQuYzogY2lmc19zeW5jX21pZF9yZXN1bHQ6IGNtZD02IG1pZD0xNzI1IHN0YXRlPTQKW01pIE9r
-dCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL21pc2MuYzogTnVsbCBidWZmZXIgcGFzc2VkIHRv
-IGNpZnNfc21hbGxfYnVmX3JlbGVhc2UKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZz
-L2ZpbGUuYzogQ0lGUyBWRlM6IGluIGNpZnNfd3JpdGVwYWdlcyBhcyBYaWQ6IDE1MTQgd2l0aCB1
-aWQ6IDAKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZzL3NtYjJvcHMuYzogYWRkIDY0
-IGNyZWRpdHMgdG90YWw9NTEyCltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9maWxl
-LmM6IENJRlMgVkZTOiBsZWF2aW5nIGNpZnNfd3JpdGVwYWdlcyAoeGlkID0gMTUxNCkgcmMgPSAw
-CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9maWxlLmM6IEZsdXNoIGlub2RlIDAw
-MDAwMDAwNDk3ZjEzNDQgZmlsZSAwMDAwMDAwMDQyYWExZGMwIHJjIDAKW01pIE9rdCAzMCAxNDox
-Mjo1OSAyMDE5XSBmcy9jaWZzL2ZpbGUuYzogY2xvc2luZyBsYXN0IG9wZW4gaW5zdGFuY2UgZm9y
-IGlub2RlIDAwMDAwMDAwNDk3ZjEzNDQKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZz
-L2ZpbGUuYzogQ0lGUyBWRlM6IGluIF9jaWZzRmlsZUluZm9fcHV0IGFzIFhpZDogMTUxNSB3aXRo
-IHVpZDogMApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvc21iMnBkdS5jOiBDbG9z
-ZQpbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2NpZnMvdHJhbnNwb3J0LmM6IFNlbmRpbmcg
-c21iOiBzbWJfbGVuPTkyCltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9jb25uZWN0
-LmM6IFJGQzEwMDIgaGVhZGVyIDB4N2MKW01pIE9rdCAzMCAxNDoxMjo1OSAyMDE5XSBmcy9jaWZz
-L3NtYjJtaXNjLmM6IFNNQjIgbGVuIDEyNApbTWkgT2t0IDMwIDE0OjEyOjU5IDIwMTldIGZzL2Np
-ZnMvc21iMm9wcy5jOiBhZGQgMSBjcmVkaXRzIHRvdGFsPTUxMgpbTWkgT2t0IDMwIDE0OjEyOjU5
-IDIwMTldIGZzL2NpZnMvdHJhbnNwb3J0LmM6IGNpZnNfc3luY19taWRfcmVzdWx0OiBjbWQ9NiBt
-aWQ9MTcyNiBzdGF0ZT00CltNaSBPa3QgMzAgMTQ6MTI6NTkgMjAxOV0gZnMvY2lmcy9taXNjLmM6
-IE51bGwgYnVmZmVyIHBhc3NlZCB0byBjaWZzX3NtYWxsX2J1Zl9yZWxlYXNlCltNaSBPa3QgMzAg
-MTQ6MTM6MTUgMjAxOV0gZnMvY2lmcy9maWxlLmM6IENJRlMgVkZTOiBpbiBjaWZzX3dyaXRlcGFn
-ZXMgYXMgWGlkOiAxNTE2IHdpdGggdWlkOiAwCltNaSBPa3QgMzAgMTQ6MTM6MTUgMjAxOV0gZnMv
-Y2lmcy9zbWIyb3BzLmM6IGFkZCA2NCBjcmVkaXRzIHRvdGFsPTUxMgpbTWkgT2t0IDMwIDE0OjEz
-OjE1IDIwMTldIGZzL2NpZnMvc21iMm9wcy5jOiBhZGQgNjQgY3JlZGl0cyB0b3RhbD01MTIKW01p
-IE9rdCAzMCAxNDoxMzoxNSAyMDE5XSBmcy9jaWZzL2ZpbGUuYzogQ0lGUyBWRlM6IGxlYXZpbmcg
-Y2lmc193cml0ZXBhZ2VzICh4aWQgPSAxNTE2KSByYyA9IDAKW01pIE9rdCAzMCAxNDoxMzo1OSAy
-MDE5XSBmcy9jaWZzL3NtYjJwZHUuYzogSW4gZWNobyByZXF1ZXN0CltNaSBPa3QgMzAgMTQ6MTM6
-NTkgMjAxOV0gZnMvY2lmcy90cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6IHNtYl9sZW49NzIKW01p
-IE9rdCAzMCAxNDoxMzo1OSAyMDE5XSBmcy9jaWZzL2Nvbm5lY3QuYzogUkZDMTAwMiBoZWFkZXIg
-MHg0NApbTWkgT2t0IDMwIDE0OjEzOjU5IDIwMTldIGZzL2NpZnMvc21iMm1pc2MuYzogU01CMiBs
-ZW4gNjgKW01pIE9rdCAzMCAxNDoxMzo1OSAyMDE5XSBmcy9jaWZzL3NtYjJvcHMuYzogYWRkIDEg
-Y3JlZGl0cyB0b3RhbD01MTIKW01pIE9rdCAzMCAxNDoxNTowMCAyMDE5XSBmcy9jaWZzL3NtYjJw
-ZHUuYzogSW4gZWNobyByZXF1ZXN0CltNaSBPa3QgMzAgMTQ6MTU6MDAgMjAxOV0gZnMvY2lmcy90
-cmFuc3BvcnQuYzogU2VuZGluZyBzbWI6IHNtYl9sZW49NzIKW01pIE9rdCAzMCAxNDoxNTowMCAy
-MDE5XSBmcy9jaWZzL2Nvbm5lY3QuYzogUkZDMTAwMiBoZWFkZXIgMHg0NApbTWkgT2t0IDMwIDE0
-OjE1OjAwIDIwMTldIGZzL2NpZnMvc21iMm1pc2MuYzogU01CMiBsZW4gNjgKW01pIE9rdCAzMCAx
-NDoxNTowMCAyMDE5XSBmcy9jaWZzL3NtYjJvcHMuYzogYWRkIDEgY3JlZGl0cyB0b3RhbD01MTIK
---=_a040e6653d182697ac19eeacad00a3f0--
+--
+Best regards,
+Pavel Shilovsky
