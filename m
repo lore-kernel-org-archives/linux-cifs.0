@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54BDDCA9EC5
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 15:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C89E3CA9EC7
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 15:58:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18946217F9
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 15:58:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FD9321835
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 15:58:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572451110;
-	bh=WffkOkUgb2tXkK1mhFEfKH95x/HnOK6MpL+NvjdoMYM=;
+	s=default; t=1572451138;
+	bh=QQnacO8XTYFkVvC98SZyoS78neMj+cLplwvBEkW6pO8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=I8QO8QvSxak1/a0sxvMjmxbnsqcCIq13ONP/s0V5rwaVCCejgu+NauXwdxgtUIcdP
-	 olXiOC+xHr3xd/m/E741rY9GMKopC9XcGD76TJepTtyu1ZVQlsofKQdE1OxkP6uwc6
-	 IiXHLSIylMQC5dHEtBnkKcrenYDAB32MmnCU+82c=
+	b=SgHavM4Mm+3ACPuLlkNs8dxG22gCVMlVvzYBFX+0waBprXA1B4Bz2dQDlz7YG/FyO
+	 AMItfJ1YUIyZLTG2T7kfEGTAKOc5L6zm/BQZN9051aIgramRTvBzuOWkdj1NSoedkJ
+	 zJEhQeuPeItZhYiQ7CF7yujrnc8CrQGbHUAAe1PM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729312AbfJ3P62 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 30 Oct 2019 11:58:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60324 "EHLO mail.kernel.org"
+        id S1727716AbfJ3P65 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 30 Oct 2019 11:58:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59526 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729307AbfJ3P62 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 30 Oct 2019 11:58:28 -0400
+        id S1729150AbfJ3P5v (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 30 Oct 2019 11:57:51 -0400
 Received: from sasha-vm.mshome.net (100.50.158.77.rev.sfr.net [77.158.50.100])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 915AC21D7D;
-        Wed, 30 Oct 2019 15:58:25 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4C686217D9;
+        Wed, 30 Oct 2019 15:57:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572451107;
-        bh=WffkOkUgb2tXkK1mhFEfKH95x/HnOK6MpL+NvjdoMYM=;
+        s=default; t=1572451069;
+        bh=QQnacO8XTYFkVvC98SZyoS78neMj+cLplwvBEkW6pO8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Vw+UaOYky4INXnYyvxGL+WK7fW3k/RSXhcyzwRNRYusrH1URVovJcrGfS6uTeQJ5o
-         KAA0T0G3DA2Pw1zTvrnQ5El44+XgeiQRfu22Rhlf68Q5J/rsnNhxI42B8Mvj4iwRIM
-         I03tie1lu56SubAEunIBQ0vjN1ynwqLvIHuK6o6o=
+        b=EbBrvsm4zvy9sKIuL5t5fI2c65Qr8/uvXMS7q8MyE9wJrPhGVbbBQu/qZhQEYlEXE
+         SyC/azLSzoabutLBMLlhZHODq+3zWhng+Z0n7tVGtGvhEVxeHNm3Bk5K5XSXIJJ4EA
+         DLSkzSm/hDoZ0RyI7KsSb9JdNse/f5fDFSucu1T4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Dave Wysochanski <dwysocha@redhat.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Pavel Shilovsky <pshilov@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 13/13] cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
-Date:   Wed, 30 Oct 2019 11:57:51 -0400
-Message-Id: <20191030155751.10960-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 18/18] cifs: Fix cifsInodeInfo lock_sem deadlock when reconnect occurs
+Date:   Wed, 30 Oct 2019 11:57:00 -0400
+Message-Id: <20191030155700.10748-18-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191030155751.10960-1-sashal@kernel.org>
-References: <20191030155751.10960-1-sashal@kernel.org>
+In-Reply-To: <20191030155700.10748-1-sashal@kernel.org>
+References: <20191030155700.10748-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -101,10 +101,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  4 files changed, 22 insertions(+), 9 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 8225de3c97431..6b61d4ad30b52 100644
+index 5367b684c1f74..7ae21ad420fbf 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -1152,6 +1152,11 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
+@@ -1178,6 +1178,11 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
  struct cifsInodeInfo {
  	bool can_cache_brlcks;
  	struct list_head llist;	/* locks helb by this inode */
@@ -117,7 +117,7 @@ index 8225de3c97431..6b61d4ad30b52 100644
  	/* BB add in lists for dirty pages i.e. write caching info for oplock */
  	struct list_head openFileList;
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 54590fd33df12..257c06c6a6c2a 100644
+index cd8025a249bba..cdf244df91c25 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
 @@ -138,6 +138,7 @@ extern int cifs_unlock_range(struct cifsFileInfo *cfile,
@@ -129,7 +129,7 @@ index 54590fd33df12..257c06c6a6c2a 100644
  					      struct file *file,
  					      struct tcon_link *tlink,
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 737cff7bc08ac..c6bd820f94093 100644
+index 3504ef015493b..1c3f262d9c4d4 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
 @@ -280,6 +280,13 @@ cifs_has_mand_locks(struct cifsInodeInfo *cinode)
@@ -155,7 +155,7 @@ index 737cff7bc08ac..c6bd820f94093 100644
  	list_add(&fdlocks->llist, &cinode->llist);
  	up_write(&cinode->lock_sem);
  
-@@ -438,7 +445,7 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
+@@ -457,7 +464,7 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oplock_handler)
  	 * Delete any outstanding lock records. We'll lose them when the file
  	 * is closed anyway.
  	 */
@@ -164,7 +164,7 @@ index 737cff7bc08ac..c6bd820f94093 100644
  	list_for_each_entry_safe(li, tmp, &cifs_file->llist->locks, llist) {
  		list_del(&li->llist);
  		cifs_del_lock_waiters(li);
-@@ -947,7 +954,7 @@ static void
+@@ -1011,7 +1018,7 @@ static void
  cifs_lock_add(struct cifsFileInfo *cfile, struct cifsLockInfo *lock)
  {
  	struct cifsInodeInfo *cinode = CIFS_I(d_inode(cfile->dentry));
@@ -173,7 +173,7 @@ index 737cff7bc08ac..c6bd820f94093 100644
  	list_add_tail(&lock->llist, &cfile->llist->locks);
  	up_write(&cinode->lock_sem);
  }
-@@ -969,7 +976,7 @@ cifs_lock_add_if(struct cifsFileInfo *cfile, struct cifsLockInfo *lock,
+@@ -1033,7 +1040,7 @@ cifs_lock_add_if(struct cifsFileInfo *cfile, struct cifsLockInfo *lock,
  
  try_again:
  	exist = false;
@@ -182,7 +182,7 @@ index 737cff7bc08ac..c6bd820f94093 100644
  
  	exist = cifs_find_lock_conflict(cfile, lock->offset, lock->length,
  					lock->type, &conf_lock, CIFS_LOCK_OP);
-@@ -991,7 +998,7 @@ cifs_lock_add_if(struct cifsFileInfo *cfile, struct cifsLockInfo *lock,
+@@ -1055,7 +1062,7 @@ cifs_lock_add_if(struct cifsFileInfo *cfile, struct cifsLockInfo *lock,
  					(lock->blist.next == &lock->blist));
  		if (!rc)
  			goto try_again;
@@ -191,7 +191,7 @@ index 737cff7bc08ac..c6bd820f94093 100644
  		list_del_init(&lock->blist);
  	}
  
-@@ -1044,7 +1051,7 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
+@@ -1108,7 +1115,7 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
  		return rc;
  
  try_again:
@@ -200,7 +200,7 @@ index 737cff7bc08ac..c6bd820f94093 100644
  	if (!cinode->can_cache_brlcks) {
  		up_write(&cinode->lock_sem);
  		return rc;
-@@ -1242,7 +1249,7 @@ cifs_push_locks(struct cifsFileInfo *cfile)
+@@ -1312,7 +1319,7 @@ cifs_push_locks(struct cifsFileInfo *cfile)
  	int rc = 0;
  
  	/* we are going to update can_cache_brlcks here - need a write access */
@@ -209,7 +209,7 @@ index 737cff7bc08ac..c6bd820f94093 100644
  	if (!cinode->can_cache_brlcks) {
  		up_write(&cinode->lock_sem);
  		return rc;
-@@ -1430,7 +1437,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
+@@ -1501,7 +1508,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
  	if (!buf)
  		return -ENOMEM;
  
