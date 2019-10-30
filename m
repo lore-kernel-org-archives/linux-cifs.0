@@ -2,645 +2,1129 @@ Return-Path: <SRS0=jcY3=YX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C3FCA9EC5
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 16:56:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7150CA9EC5
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 19:17:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7210E2054F
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 16:56:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UekdQhiX"
+	by mail.kernel.org (Postfix) with ESMTP id 73C2B204FD
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Oct 2019 19:17:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727002AbfJ3Q42 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 30 Oct 2019 12:56:28 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:36550 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726640AbfJ3Q41 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 30 Oct 2019 12:56:27 -0400
-Received: by mail-lj1-f196.google.com with SMTP id v24so3501457ljj.3
-        for <linux-cifs@vger.kernel.org>; Wed, 30 Oct 2019 09:56:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=XVdj6nBzu+DaukKawHblF/GjaZ0IYa0CbBktJ7640fg=;
-        b=UekdQhiX/lDCbr6FRkopdHkC3UsElO3wQ+YHWpThSHrEgelJUw/jWn40vwyZYZz4PT
-         1u5MtV9f5vruyOmNtFgLxbTPPkb6llzUJIXgB/0pJ2Jij99uDOCUiPOAHg0X4Kr3KCrw
-         pSejaYZeze5zPbrfs+7ke0w4iZwN7IfnT0djdZLNY3XPhoQadr+wxOUJoCBWHeY7rNJ6
-         tW3LNhfkhL1tfba+znW/0gqpdtMC8I6yeukDsdnisjb+aiA/Ru7BWco+UPKQNqm6utQ3
-         pjGagJ6AjiOd/NUpabhmnY3iwnsFvPUaxCoy++yixnQR2h7IT+Lsb7OnxrOtzWYLcp5t
-         5KSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=XVdj6nBzu+DaukKawHblF/GjaZ0IYa0CbBktJ7640fg=;
-        b=dX7hE3ZjfClqsQ0SsAGW0p7vQkVIEkIlro01k5QPUIcyhSgAsZUH2nI1vyIEupmUxv
-         xUUbrHmnpa9IoyI8xD6hVNh417gWgHhBhZxoeCauxB3GwNG40UQeH1hgRc8jMYB9c9Sz
-         FWNwBkFioW7vgmr7XTFix7jAhefuvo4Tpw77flIqdtBNmo5UpNgT2LVnhPv/Xt95oW9H
-         mGaojYtJMjTlosgXVT5ogR2OxPKUNdKLYvi5MqKezPGK6L5d6iLMRtXZUCbrNGehC560
-         DS/dZJ06zq3PfNVVDuh53Wj+nQWScJ3tnJJDzDngxQfBIJa+5OLO/6QI6HtfpJLtC2RR
-         sCOw==
-X-Gm-Message-State: APjAAAWpeyQLqvzyEBHQ2B6Mgr+FvWJbugT29IpcM0fIGFHX2WdRZ3U7
-        jYme8JRoXwwbGf9Oz5N8eLRSdbdGWqO2Q/Tecw==
-X-Google-Smtp-Source: APXvYqwVL4j+u4ekuJg5a7hzdmJx0dRtJ7IgohHIVgXEJa3ltLHOcdNdT87i7f9QUBnPKN1hHv+gNPzvHEqT5o0hIWA=
-X-Received: by 2002:a2e:8843:: with SMTP id z3mr517236ljj.15.1572454583568;
- Wed, 30 Oct 2019 09:56:23 -0700 (PDT)
+        id S1726596AbfJ3TRd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 30 Oct 2019 15:17:33 -0400
+Received: from mail.prodrive-technologies.com ([212.61.153.67]:54077 "EHLO
+        mail.prodrive-technologies.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726488AbfJ3TRd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 30 Oct 2019 15:17:33 -0400
+Received: from mail.prodrive-technologies.com (localhost.localdomain [127.0.0.1])
+        by localhost (Email Security Appliance) with SMTP id 9FBED32F53_DB9E1C6B;
+        Wed, 30 Oct 2019 19:17:26 +0000 (GMT)
+Received: from mail.prodrive-technologies.com (exc04.bk.prodrive.nl [10.1.1.213])
+        (using TLSv1.2 with cipher AES256-GCM-SHA384 (256/256 bits))
+        (Client CN "mail.prodrive-technologies.com", Issuer "Prodrive Technologies B.V. OV SSL Issuing CA" (verified OK))
+        by mail.prodrive-technologies.com (Sophos Email Appliance) with ESMTPS id 4842530E89_DB9E1C6F;
+        Wed, 30 Oct 2019 19:17:26 +0000 (GMT)
+Received: from [10.10.240.93] (10.1.249.1) by EXC04.bk.prodrive.nl
+ (10.1.1.213) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1779.2; Wed, 30
+ Oct 2019 20:17:25 +0100
+Subject: Re: Kernel hangs in cifs_reconnect
+To:     Paulo Alcantara <pc@cjr.nz>,
+        =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+        <linux-cifs@vger.kernel.org>
+References: <56d13db4-62ed-99c0-90b8-bb332143cece@prodrive-technologies.com>
+ <871rveaurv.fsf@suse.com> <87a7a2ynxg.fsf@cjr.nz>
+ <68a58b8e-3cab-093b-3098-6ee4a6dd3117@prodrive-technologies.com>
+ <9c5eeb76-7895-5938-355f-f5d43c5affe5@prodrive-technologies.com>
+ <87pnif4nfd.fsf@cjr.nz>
+From:   Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>
+Organization: Prodrive Technologies
+Message-ID: <7d19b448-1342-fd50-55ee-d2a46da6d431@prodrive-technologies.com>
+Date:   Wed, 30 Oct 2019 20:17:25 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20191030025906.14395-1-lsahlber@redhat.com> <20191030025906.14395-2-lsahlber@redhat.com>
- <CAKywueT11XLviGCiVp8g9YnUcWonuxWpY4nCGN2KSpTh6aXGPQ@mail.gmail.com>
-In-Reply-To: <CAKywueT11XLviGCiVp8g9YnUcWonuxWpY4nCGN2KSpTh6aXGPQ@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 30 Oct 2019 09:56:11 -0700
-Message-ID: <CAKywueRv7WLf_f-xBBs=NP-CjWgg=aSwSYaKQveT5OtvkoBUgA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: move cifsFileInfo_put logic into a work-queue
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87pnif4nfd.fsf@cjr.nz>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EXC03.bk.prodrive.nl (10.1.1.212) To EXC04.bk.prodrive.nl
+ (10.1.1.213)
+X-SASI-RCODE: 200
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D1=81=D1=80, 30 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 08:46, Pavel Shilo=
-vsky <piastryyy@gmail.com>:
->
-> =D0=B2=D1=82, 29 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 19:59, Ronnie Sa=
-hlberg <lsahlber@redhat.com>:
-> >
-> > This patch moves the final part of the cifsFileInfo_put() logic where w=
-e
-> > need a write lock on lock_sem to be processed in a separate thread that
-> > holds no other locks.
-> > This is to prevent deadlocks like the one below:
-> >
-> > > there are 6 processes looping to while trying to down_write
-> > > cinode->lock_sem, 5 of them from _cifsFileInfo_put, and one from
-> > > cifs_new_fileinfo
-> > >
-> > > and there are 5 other processes which are blocked, several of them
-> > > waiting on either PG_writeback or PG_locked (which are both set), all
-> > > for the same page of the file
-> > >
-> > > 2 inode_lock() (inode->i_rwsem) for the file
-> > > 1 wait_on_page_writeback() for the page
-> > > 1 down_read(inode->i_rwsem) for the inode of the directory
-> > > 1 inode_lock()(inode->i_rwsem) for the inode of the directory
-> > > 1 __lock_page
-> > >
-> > >
-> > > so processes are blocked waiting on:
-> > >   page flags PG_locked and PG_writeback for one specific page
-> > >   inode->i_rwsem for the directory
-> > >   inode->i_rwsem for the file
-> > >   cifsInodeInflock_sem
-> > >
-> > >
-> > >
-> > > here are the more gory details (let me know if I need to provide
-> > > anything more/better):
-> > >
-> > > [0 00:48:22.765] [UN]  PID: 8863   TASK: ffff8c691547c5c0  CPU: 3
-> > > COMMAND: "reopen_file"
-> > >  #0 [ffff9965007e3ba8] __schedule at ffffffff9b6e6095
-> > >  #1 [ffff9965007e3c38] schedule at ffffffff9b6e64df
-> > >  #2 [ffff9965007e3c48] rwsem_down_write_slowpath at ffffffff9af283d7
-> > >  #3 [ffff9965007e3cb8] legitimize_path at ffffffff9b0f975d
-> > >  #4 [ffff9965007e3d08] path_openat at ffffffff9b0fe55d
-> > >  #5 [ffff9965007e3dd8] do_filp_open at ffffffff9b100a33
-> > >  #6 [ffff9965007e3ee0] do_sys_open at ffffffff9b0eb2d6
-> > >  #7 [ffff9965007e3f38] do_syscall_64 at ffffffff9ae04315
-> > > * (I think legitimize_path is bogus)
-> > >
-> > > in path_openat
-> > >         } else {
-> > >                 const char *s =3D path_init(nd, flags);
-> > >                 while (!(error =3D link_path_walk(s, nd)) &&
-> > >                         (error =3D do_last(nd, file, op)) > 0) {  <<<=
-<
-> > >
-> > > do_last:
-> > >         if (open_flag & O_CREAT)
-> > >                 inode_lock(dir->d_inode);  <<<<
-> > >         else
-> > > so it's trying to take inode->i_rwsem for the directory
-> > >
-> > >      DENTRY           INODE           SUPERBLK     TYPE PATH
-> > > ffff8c68bb8e79c0 ffff8c691158ef20 ffff8c6915bf9000 DIR  /mnt/vm1_smb/
-> > > inode.i_rwsem is ffff8c691158efc0
-> > >
-> > > <struct rw_semaphore 0xffff8c691158efc0>:
-> > >         owner: <struct task_struct 0xffff8c6914275d00> (UN -   8856 -
-> > > reopen_file), counter: 0x0000000000000003
-> > >         waitlist: 2
-> > >         0xffff9965007e3c90     8863   reopen_file      UN 0  1:29:22.=
-926
-> > >   RWSEM_WAITING_FOR_WRITE
-> > >         0xffff996500393e00     9802   ls               UN 0  1:17:26.=
-700
-> > >   RWSEM_WAITING_FOR_READ
-> > >
-> > >
-> > > the owner of the inode.i_rwsem of the directory is:
-> > >
-> > > [0 00:00:00.109] [UN]  PID: 8856   TASK: ffff8c6914275d00  CPU: 3
-> > > COMMAND: "reopen_file"
-> > >  #0 [ffff99650065b828] __schedule at ffffffff9b6e6095
-> > >  #1 [ffff99650065b8b8] schedule at ffffffff9b6e64df
-> > >  #2 [ffff99650065b8c8] schedule_timeout at ffffffff9b6e9f89
-> > >  #3 [ffff99650065b940] msleep at ffffffff9af573a9
-> > >  #4 [ffff99650065b948] _cifsFileInfo_put.cold.63 at ffffffffc0a42dd6 =
-[cifs]
-> > >  #5 [ffff99650065ba38] cifs_writepage_locked at ffffffffc0a0b8f3 [cif=
-s]
-> > >  #6 [ffff99650065bab0] cifs_launder_page at ffffffffc0a0bb72 [cifs]
-> > >  #7 [ffff99650065bb30] invalidate_inode_pages2_range at ffffffff9b04d=
-4bd
-> > >  #8 [ffff99650065bcb8] cifs_invalidate_mapping at ffffffffc0a11339 [c=
-ifs]
-> > >  #9 [ffff99650065bcd0] cifs_revalidate_mapping at ffffffffc0a1139a [c=
-ifs]
-> > > #10 [ffff99650065bcf0] cifs_d_revalidate at ffffffffc0a014f6 [cifs]
-> > > #11 [ffff99650065bd08] path_openat at ffffffff9b0fe7f7
-> > > #12 [ffff99650065bdd8] do_filp_open at ffffffff9b100a33
-> > > #13 [ffff99650065bee0] do_sys_open at ffffffff9b0eb2d6
-> > > #14 [ffff99650065bf38] do_syscall_64 at ffffffff9ae04315
-> > >
-> > > cifs_launder_page is for page 0xffffd1e2c07d2480
-> > >
-> > > crash> page.index,mapping,flags 0xffffd1e2c07d2480
-> > >       index =3D 0x8
-> > >       mapping =3D 0xffff8c68f3cd0db0
-> > >   flags =3D 0xfffffc0008095
-> > >
-> > >   PAGE-FLAG       BIT  VALUE
-> > >   PG_locked         0  0000001
-> > >   PG_uptodate       2  0000004
-> > >   PG_lru            4  0000010
-> > >   PG_waiters        7  0000080
-> > >   PG_writeback     15  0008000
-> > >
-> > >
-> > > inode is ffff8c68f3cd0c40
-> > > inode.i_rwsem is ffff8c68f3cd0ce0
-> > >      DENTRY           INODE           SUPERBLK     TYPE PATH
-> > > ffff8c68a1f1b480 ffff8c68f3cd0c40 ffff8c6915bf9000 REG
-> > > /mnt/vm1_smb/testfile.8853
-> > >
-> > >
-> > > this process holds the inode->i_rwsem for the parent directory, is
-> > > laundering a page attached to the inode of the file it's opening, and=
- in
-> > > _cifsFileInfo_put is trying to down_write the cifsInodeInflock_sem
-> > > for the file itself.
-> > >
-> > >
-> > > <struct rw_semaphore 0xffff8c68f3cd0ce0>:
-> > >         owner: <struct task_struct 0xffff8c6914272e80> (UN -   8854 -
-> > > reopen_file), counter: 0x0000000000000003
-> > >         waitlist: 1
-> > >         0xffff9965005dfd80     8855   reopen_file      UN 0  1:29:22.=
-912
-> > >   RWSEM_WAITING_FOR_WRITE
-> > >
-> > > this is the inode.i_rwsem for the file
-> > >
-> > > the owner:
-> > >
-> > > [0 00:48:22.739] [UN]  PID: 8854   TASK: ffff8c6914272e80  CPU: 2
-> > > COMMAND: "reopen_file"
-> > >  #0 [ffff99650054fb38] __schedule at ffffffff9b6e6095
-> > >  #1 [ffff99650054fbc8] schedule at ffffffff9b6e64df
-> > >  #2 [ffff99650054fbd8] io_schedule at ffffffff9b6e68e2
-> > >  #3 [ffff99650054fbe8] __lock_page at ffffffff9b03c56f
-> > >  #4 [ffff99650054fc80] pagecache_get_page at ffffffff9b03dcdf
-> > >  #5 [ffff99650054fcc0] grab_cache_page_write_begin at ffffffff9b03ef4=
-c
-> > >  #6 [ffff99650054fcd0] cifs_write_begin at ffffffffc0a064ec [cifs]
-> > >  #7 [ffff99650054fd30] generic_perform_write at ffffffff9b03bba4
-> > >  #8 [ffff99650054fda8] __generic_file_write_iter at ffffffff9b04060a
-> > >  #9 [ffff99650054fdf0] cifs_strict_writev.cold.70 at ffffffffc0a4469b=
- [cifs]
-> > > #10 [ffff99650054fe48] new_sync_write at ffffffff9b0ec1dd
-> > > #11 [ffff99650054fed0] vfs_write at ffffffff9b0eed35
-> > > #12 [ffff99650054ff00] ksys_write at ffffffff9b0eefd9
-> > > #13 [ffff99650054ff38] do_syscall_64 at ffffffff9ae04315
-> > >
-> > > the process holds the inode->i_rwsem for the file to which it's writi=
-ng,
-> > > and is trying to __lock_page for the same page as in the other proces=
-ses
-> > >
-> > >
-> > > the other tasks:
-> > > [0 00:00:00.028] [UN]  PID: 8859   TASK: ffff8c6915479740  CPU: 2
-> > > COMMAND: "reopen_file"
-> > >  #0 [ffff9965007b39d8] __schedule at ffffffff9b6e6095
-> > >  #1 [ffff9965007b3a68] schedule at ffffffff9b6e64df
-> > >  #2 [ffff9965007b3a78] schedule_timeout at ffffffff9b6e9f89
-> > >  #3 [ffff9965007b3af0] msleep at ffffffff9af573a9
-> > >  #4 [ffff9965007b3af8] cifs_new_fileinfo.cold.61 at ffffffffc0a42a07 =
-[cifs]
-> > >  #5 [ffff9965007b3b78] cifs_open at ffffffffc0a0709d [cifs]
-> > >  #6 [ffff9965007b3cd8] do_dentry_open at ffffffff9b0e9b7a
-> > >  #7 [ffff9965007b3d08] path_openat at ffffffff9b0fe34f
-> > >  #8 [ffff9965007b3dd8] do_filp_open at ffffffff9b100a33
-> > >  #9 [ffff9965007b3ee0] do_sys_open at ffffffff9b0eb2d6
-> > > #10 [ffff9965007b3f38] do_syscall_64 at ffffffff9ae04315
-> > >
-> > > this is opening the file, and is trying to down_write cinode->lock_se=
-m
-> > >
-> > >
-> > > [0 00:00:00.041] [UN]  PID: 8860   TASK: ffff8c691547ae80  CPU: 2
-> > > COMMAND: "reopen_file"
-> > > [0 00:00:00.057] [UN]  PID: 8861   TASK: ffff8c6915478000  CPU: 3
-> > > COMMAND: "reopen_file"
-> > > [0 00:00:00.059] [UN]  PID: 8858   TASK: ffff8c6914271740  CPU: 2
-> > > COMMAND: "reopen_file"
-> > > [0 00:00:00.109] [UN]  PID: 8862   TASK: ffff8c691547dd00  CPU: 6
-> > > COMMAND: "reopen_file"
-> > >  #0 [ffff9965007c3c78] __schedule at ffffffff9b6e6095
-> > >  #1 [ffff9965007c3d08] schedule at ffffffff9b6e64df
-> > >  #2 [ffff9965007c3d18] schedule_timeout at ffffffff9b6e9f89
-> > >  #3 [ffff9965007c3d90] msleep at ffffffff9af573a9
-> > >  #4 [ffff9965007c3d98] _cifsFileInfo_put.cold.63 at ffffffffc0a42dd6 =
-[cifs]
-> > >  #5 [ffff9965007c3e88] cifs_close at ffffffffc0a07aaf [cifs]
-> > >  #6 [ffff9965007c3ea0] __fput at ffffffff9b0efa6e
-> > >  #7 [ffff9965007c3ee8] task_work_run at ffffffff9aef1614
-> > >  #8 [ffff9965007c3f20] exit_to_usermode_loop at ffffffff9ae03d6f
-> > >  #9 [ffff9965007c3f38] do_syscall_64 at ffffffff9ae0444c
-> > >
-> > > closing the file, and trying to down_write cifsi->lock_sem
-> > >
-> > >
-> > > [0 00:48:22.839] [UN]  PID: 8857   TASK: ffff8c6914270000  CPU: 7
-> > > COMMAND: "reopen_file"
-> > >  #0 [ffff9965006a7cc8] __schedule at ffffffff9b6e6095
-> > >  #1 [ffff9965006a7d58] schedule at ffffffff9b6e64df
-> > >  #2 [ffff9965006a7d68] io_schedule at ffffffff9b6e68e2
-> > >  #3 [ffff9965006a7d78] wait_on_page_bit at ffffffff9b03cac6
-> > >  #4 [ffff9965006a7e10] __filemap_fdatawait_range at ffffffff9b03b028
-> > >  #5 [ffff9965006a7ed8] filemap_write_and_wait at ffffffff9b040165
-> > >  #6 [ffff9965006a7ef0] cifs_flush at ffffffffc0a0c2fa [cifs]
-> > >  #7 [ffff9965006a7f10] filp_close at ffffffff9b0e93f1
-> > >  #8 [ffff9965006a7f30] __x64_sys_close at ffffffff9b0e9a0e
-> > >  #9 [ffff9965006a7f38] do_syscall_64 at ffffffff9ae04315
-> > >
-> > > in __filemap_fdatawait_range
-> > >                         wait_on_page_writeback(page);
-> > > for the same page of the file
-> > >
-> > >
-> > >
-> > > [0 00:48:22.718] [UN]  PID: 8855   TASK: ffff8c69142745c0  CPU: 7
-> > > COMMAND: "reopen_file"
-> > >  #0 [ffff9965005dfc98] __schedule at ffffffff9b6e6095
-> > >  #1 [ffff9965005dfd28] schedule at ffffffff9b6e64df
-> > >  #2 [ffff9965005dfd38] rwsem_down_write_slowpath at ffffffff9af283d7
-> > >  #3 [ffff9965005dfdf0] cifs_strict_writev at ffffffffc0a0c40a [cifs]
-> > >  #4 [ffff9965005dfe48] new_sync_write at ffffffff9b0ec1dd
-> > >  #5 [ffff9965005dfed0] vfs_write at ffffffff9b0eed35
-> > >  #6 [ffff9965005dff00] ksys_write at ffffffff9b0eefd9
-> > >  #7 [ffff9965005dff38] do_syscall_64 at ffffffff9ae04315
-> > >
-> > >         inode_lock(inode);
-> > >
-> > >
-> > > and one 'ls' later on, to see whether the rest of the mount is availa=
-ble
-> > > (the test file is in the root, so we get blocked up on the directory
-> > > ->i_rwsem), so the entire mount is unavailable
-> > >
-> > > [0 00:36:26.473] [UN]  PID: 9802   TASK: ffff8c691436ae80  CPU: 4
-> > > COMMAND: "ls"
-> > >  #0 [ffff996500393d28] __schedule at ffffffff9b6e6095
-> > >  #1 [ffff996500393db8] schedule at ffffffff9b6e64df
-> > >  #2 [ffff996500393dc8] rwsem_down_read_slowpath at ffffffff9b6e9421
-> > >  #3 [ffff996500393e78] down_read_killable at ffffffff9b6e95e2
-> > >  #4 [ffff996500393e88] iterate_dir at ffffffff9b103c56
-> > >  #5 [ffff996500393ec8] ksys_getdents64 at ffffffff9b104b0c
-> > >  #6 [ffff996500393f30] __x64_sys_getdents64 at ffffffff9b104bb6
-> > >  #7 [ffff996500393f38] do_syscall_64 at ffffffff9ae04315
-> > >
-> > > in iterate_dir:
-> > >         if (shared)
-> > >                 res =3D down_read_killable(&inode->i_rwsem);  <<<<
-> > >         else
-> > >                 res =3D down_write_killable(&inode->i_rwsem);
-> > >
-> >
-> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/cifsfs.c   | 13 +++++++-
-> >  fs/cifs/cifsglob.h |  3 +-
-> >  fs/cifs/file.c     | 91 ++++++++++++++++++++++++++++++++++------------=
---------
-> >  3 files changed, 72 insertions(+), 35 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> > index e4e3b573d20c..f8e201c45ccb 100644
-> > --- a/fs/cifs/cifsfs.c
-> > +++ b/fs/cifs/cifsfs.c
-> > @@ -119,6 +119,7 @@ extern mempool_t *cifs_mid_poolp;
-> >
-> >  struct workqueue_struct        *cifsiod_wq;
-> >  struct workqueue_struct        *decrypt_wq;
-> > +struct workqueue_struct        *fileinfo_put_wq;
-> >  struct workqueue_struct        *cifsoplockd_wq;
-> >  __u32 cifs_lock_secret;
-> >
-> > @@ -1557,11 +1558,18 @@ init_cifs(void)
-> >                 goto out_destroy_cifsiod_wq;
-> >         }
-> >
-> > +       fileinfo_put_wq =3D alloc_workqueue("cifsfileinfoput",
-> > +                                    WQ_UNBOUND|WQ_FREEZABLE|WQ_MEM_REC=
-LAIM, 0);
-> > +       if (!fileinfo_put_wq) {
-> > +               rc =3D -ENOMEM;
-> > +               goto out_destroy_decrypt_wq;
-> > +       }
-> > +
-> >         cifsoplockd_wq =3D alloc_workqueue("cifsoplockd",
-> >                                          WQ_FREEZABLE|WQ_MEM_RECLAIM, 0=
-);
-> >         if (!cifsoplockd_wq) {
-> >                 rc =3D -ENOMEM;
-> > -               goto out_destroy_decrypt_wq;
-> > +               goto out_destroy_fileinfo_put_wq;
-> >         }
-> >
-> >         rc =3D cifs_fscache_register();
-> > @@ -1627,6 +1635,8 @@ init_cifs(void)
-> >         cifs_fscache_unregister();
-> >  out_destroy_cifsoplockd_wq:
-> >         destroy_workqueue(cifsoplockd_wq);
-> > +out_destroy_fileinfo_put_wq:
-> > +       destroy_workqueue(fileinfo_put_wq);
-> >  out_destroy_decrypt_wq:
-> >         destroy_workqueue(decrypt_wq);
-> >  out_destroy_cifsiod_wq:
-> > @@ -1656,6 +1666,7 @@ exit_cifs(void)
-> >         cifs_fscache_unregister();
-> >         destroy_workqueue(cifsoplockd_wq);
-> >         destroy_workqueue(decrypt_wq);
-> > +       destroy_workqueue(fileinfo_put_wq);
-> >         destroy_workqueue(cifsiod_wq);
-> >         cifs_proc_clean();
-> >  }
-> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> > index d78bfcc19156..0819b6498a3c 100644
-> > --- a/fs/cifs/cifsglob.h
-> > +++ b/fs/cifs/cifsglob.h
-> > @@ -1265,6 +1265,7 @@ struct cifsFileInfo {
-> >         struct mutex fh_mutex; /* prevents reopen race after dead ses*/
-> >         struct cifs_search_info srch_inf;
-> >         struct work_struct oplock_break; /* work for oplock breaks */
-> > +       struct work_struct put; /* work for the final part of _put */
-> >  };
-> >
-> >  struct cifs_io_parms {
-> > @@ -1370,7 +1371,6 @@ cifsFileInfo_get_locked(struct cifsFileInfo *cifs=
-_file)
-> >  }
-> >
-> >  struct cifsFileInfo *cifsFileInfo_get(struct cifsFileInfo *cifs_file);
-> > -void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oploc=
-k_hdlr);
-> >  void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
-> >
-> >  #define CIFS_CACHE_READ_FLG    1
-> > @@ -1907,6 +1907,7 @@ void cifs_queue_oplock_break(struct cifsFileInfo =
-*cfile);
-> >  extern const struct slow_work_ops cifs_oplock_break_ops;
-> >  extern struct workqueue_struct *cifsiod_wq;
-> >  extern struct workqueue_struct *decrypt_wq;
-> > +extern struct workqueue_struct *fileinfo_put_wq;
-> >  extern struct workqueue_struct *cifsoplockd_wq;
-> >  extern __u32 cifs_lock_secret;
-> >
-> > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> > index 67e7d0ffe385..d1dedb8fb31f 100644
-> > --- a/fs/cifs/file.c
-> > +++ b/fs/cifs/file.c
-> > @@ -375,30 +375,7 @@ cifsFileInfo_get(struct cifsFileInfo *cifs_file)
-> >         return cifs_file;
-> >  }
-> >
-> > -/**
-> > - * cifsFileInfo_put - release a reference of file priv data
-> > - *
-> > - * Always potentially wait for oplock handler. See _cifsFileInfo_put()=
-.
-> > - */
-> > -void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
-> > -{
-> > -       _cifsFileInfo_put(cifs_file, true);
-> > -}
-> > -
-> > -/**
-> > - * _cifsFileInfo_put - release a reference of file priv data
-> > - *
-> > - * This may involve closing the filehandle @cifs_file out on the
-> > - * server. Must be called without holding tcon->open_file_lock and
-> > - * cifs_file->file_info_lock.
-> > - *
-> > - * If @wait_for_oplock_handler is true and we are releasing the last
-> > - * reference, wait for any running oplock break handler of the file
-> > - * and cancel any pending one. If calling this function from the
-> > - * oplock break handler, you need to pass false.
-> > - *
-> > - */
-> > -void _cifsFileInfo_put(struct cifsFileInfo *cifs_file, bool wait_oploc=
-k_handler)
-> > +void cifsFileInfo_put_final(struct cifsFileInfo *cifs_file)
-> >  {
-> >         struct inode *inode =3D d_inode(cifs_file->dentry);
-> >         struct cifs_tcon *tcon =3D tlink_tcon(cifs_file->tlink);
-> > @@ -409,7 +386,6 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_fi=
-le, bool wait_oplock_handler)
-> >         struct cifsLockInfo *li, *tmp;
-> >         struct cifs_fid fid;
-> >         struct cifs_pending_open open;
-> > -       bool oplock_break_cancelled;
-> >
-> >         spin_lock(&tcon->open_file_lock);
-> >         spin_lock(&cifsi->open_file_lock);
-> > @@ -449,9 +425,6 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_fi=
-le, bool wait_oplock_handler)
-> >         spin_unlock(&cifsi->open_file_lock);
-> >         spin_unlock(&tcon->open_file_lock);
-> >
-> > -       oplock_break_cancelled =3D wait_oplock_handler ?
-> > -               cancel_work_sync(&cifs_file->oplock_break) : false;
-> > -
-> >         if (!tcon->need_reconnect && !cifs_file->invalidHandle) {
-> >                 struct TCP_Server_Info *server =3D tcon->ses->server;
-> >                 unsigned int xid;
-> > @@ -462,9 +435,6 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_fi=
-le, bool wait_oplock_handler)
-> >                 _free_xid(xid);
-> >         }
-> >
-> > -       if (oplock_break_cancelled)
-> > -               cifs_done_oplock_break(cifsi);
-> > -
-> >         cifs_del_pending_open(&open);
-> >
-> >         /*
-> > @@ -487,6 +457,61 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_f=
-ile, bool wait_oplock_handler)
-> >         kfree(cifs_file);
-> >  }
-> >
-> > +static void cifsFileInfo_put_work(struct work_struct *work)
-> > +{
-> > +       struct cifsFileInfo *cifs_file =3D container_of(work,
-> > +                       struct cifsFileInfo, put);
-> > +
-> > +       cifsFileInfo_put_final(cifs_file);
-> > +}
-> > +
-> > +/**
-> > + * _cifsFileInfo_put - release a reference of file priv data
-> > + *
-> > + * This may involve closing the filehandle @cifs_file out on the
-> > + * server. Must be called without holding tcon->open_file_lock,
-> > + * cinode->open_file_lock and cifs_file->file_info_lock.
-> > + *
-> > + * If @wait_for_oplock_handler is true and we are releasing the last
-> > + * reference, wait for any running oplock break handler of the file
-> > + * and cancel any pending one. If calling this function from the
-> > + * oplock break handler, you need to pass false.
-> > + *
-> > + */
-> > +void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
-> > +                      bool wait_oplock_handler, bool offload)
-> > +{
-> > +       struct inode *inode =3D d_inode(cifs_file->dentry);
-> > +       struct cifsInodeInfo *cifsi =3D CIFS_I(inode);
-> > +
-> > +       spin_lock(&cifs_file->file_info_lock);
-> > +       if (cifs_file->count > 1) {
-> > +               cifs_file->count--;
-> > +               spin_unlock(&cifs_file->file_info_lock);
-> > +               return;
-> > +       }
-> > +       spin_unlock(&cifs_file->file_info_lock);
-> > +
-> > +       if (wait_oplock_handler && cancel_work_sync(&cifs_file->oplock_=
-break))
-> > +               cifs_done_oplock_break(cifsi);
->
-> At this point the file info is still in the lists and can be
-> referenced by other threads not only including oplock break routine.
-> So, we can't cancel oplock break here - it would lead to big timeouts
-> to other clients trying to open the file because the server will be
-> waiting for an oplock break ack.
->
-> Let's do it in cifsFileInfo_put_final() as it was originally in
-> cifsFileInfo_put() and we do not need an extra *wait_oplock_handler*
-> argument - just cancel it unconditionally. If a caller of this
-> function don't want to deadlock on himself (like cifs_oplock_break) it
-> will just specify *offload* as True.
->
-> > +
-> > +       if (offload) {
-> > +               INIT_WORK(&cifs_file->put, cifsFileInfo_put_work);
+Hi Paulo,
 
-INIT_WORK should be done when initializing cifsFileInfo structure.
+On 29-10-2019 15:49, Paulo Alcantara wrote:
+> Hi Martijn,
+> 
+> Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com> writes:
+> 
+>> Anybody any idea on what goes wrong here?
+> 
+> Looks like an use-after-free bug in cifs_reconnect(). cifs superblock
+> gets freed due to automount expiration and then we dereference it in
+> dfs_cache_noreq_find().
+> 
+>> Is any of the recently posted patches related to my issue, because I'm
+>> more that willing to test out patches if needed.
+> 
+> Could you please test it again with below patch?
 
+Again cifs stopped working, it looks more like a live/dead lock to me than a use-after-free.
+I cut the dmesg from the moment the echo to DC02 starts failing.
 
-> > +               queue_work(fileinfo_put_wq, &cifs_file->put);
+[70939.980125] fs/cifs/smb2pdu.c: In echo request
+[70939.980137] fs/cifs/smb2pdu.c: Echo request failed: -11
+[70939.980143] fs/cifs/connect.c: Unable to send echo request to server: DC02
+[70960.106599] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13353 with uid: 999
+[70960.106697] fs/cifs/transport.c: Sending smb: smb_len=372
+[70960.116162] fs/cifs/connect.c: RFC1002 header 0x1b8
+[70960.116170] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[70960.116171] fs/cifs/smb2misc.c: SMB2 len 208
+[70960.116185] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[70960.116186] fs/cifs/smb2misc.c: SMB2 len 104
+[70960.116196] fs/cifs/smb2misc.c: SMB2 len 124
+[70960.116197] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 4066
+[70960.116200] fs/cifs/smb2ops.c: add 3 credits total=512
+[70960.116218] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=4064 state=4
+[70960.116227] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=4065 state=4
+[70960.116230] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=4066 state=4
+[70960.116234] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[70960.116242] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[70960.116247] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[70960.116290] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13353) rc = 0
+[70960.116319] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13354 with uid: 999
+[70960.116429] fs/cifs/transport.c: Sending smb: smb_len=348
+[70960.116829] fs/cifs/connect.c: RFC1002 header 0x1b8
+[70960.116834] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[70960.116835] fs/cifs/smb2misc.c: SMB2 len 208
+[70960.116842] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[70960.116843] fs/cifs/smb2misc.c: SMB2 len 104
+[70960.116856] fs/cifs/smb2misc.c: SMB2 len 124
+[70960.116857] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 74
+[70960.116859] fs/cifs/smb2ops.c: add 30 credits total=897
+[70960.116872] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=72 state=4
+[70960.116874] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=73 state=4
+[70960.116876] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=74 state=4
+[70960.116877] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[70960.116882] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[70960.116887] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[70960.116954] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13354) rc = 0
+[71001.418549] fs/cifs/smb2pdu.c: In echo request
+[71001.418565] fs/cifs/smb2pdu.c: Echo request failed: -11
+[71001.418570] fs/cifs/connect.c: Unable to send echo request to server: DC02
+[71020.097059] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13355 with uid: 999
+[71020.097165] fs/cifs/transport.c: Sending smb: smb_len=372
+[71020.097760] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71020.097767] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71020.097768] fs/cifs/smb2misc.c: SMB2 len 208
+[71020.097777] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71020.097778] fs/cifs/smb2misc.c: SMB2 len 104
+[71020.097788] fs/cifs/smb2misc.c: SMB2 len 124
+[71020.097789] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 4069
+[71020.097796] fs/cifs/smb2ops.c: add 3 credits total=512
+[71020.098387] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=4067 state=4
+[71020.098395] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=4068 state=4
+[71020.098398] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=4069 state=4
+[71020.098405] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71020.098414] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71020.098419] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71020.098461] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13355) rc = 0
+[71020.098488] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13356 with uid: 999
+[71020.098556] fs/cifs/transport.c: Sending smb: smb_len=348
+[71020.098915] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71020.098921] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71020.098922] fs/cifs/smb2misc.c: SMB2 len 208
+[71020.098932] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71020.098932] fs/cifs/smb2misc.c: SMB2 len 104
+[71020.098942] fs/cifs/smb2misc.c: SMB2 len 124
+[71020.098944] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 77
+[71020.098946] fs/cifs/smb2ops.c: add 30 credits total=924
+[71020.098956] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=75 state=4
+[71020.098958] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=76 state=4
+[71020.098959] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=77 state=4
+[71020.098961] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71020.098968] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71020.098973] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71020.099011] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13356) rc = 0
+[71044.418723] INFO: task node_exporter:7214 blocked for more than 120 seconds.
+[71044.420037]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71044.421491] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71044.422762] node_exporter   D    0  7214      1 0x00000000
+[71044.422781] Call Trace:
+[71044.422806]  ? __schedule+0x540/0xac0
+[71044.422813]  ? firmware_map_remove+0xe9/0xe9
+[71044.422821]  ? vsnprintf+0x32c/0x870
+[71044.422826]  ? _raw_spin_lock+0x7a/0xd0
+[71044.422829]  schedule+0x5e/0x100
+[71044.422837]  schedule_preempt_disabled+0xa/0x10
+[71044.422840]  __mutex_lock.isra.4+0x484/0x820
+[71044.422844]  ? mutex_trylock+0x90/0x90
+[71044.422848]  ? string_nocheck+0xb0/0xd0
+[71044.422854]  ? pointer+0x387/0x460
+[71044.422859]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71044.422863]  ? _raw_write_lock_bh+0xe0/0xe0
+[71044.422868]  ? mutex_lock+0xce/0xe0
+[71044.422871]  mutex_lock+0xce/0xe0
+[71044.422875]  ? __mutex_lock_slowpath+0x10/0x10
+[71044.422892]  ? find_nls+0x7d/0xa0
+[71044.422976]  smb2_reconnect.part.21+0x218/0xbd0 [cifs]
+[71044.422992]  ? deref_stack_reg+0x88/0xd0
+[71044.422995]  ? 0xffffffffa1e00000
+[71044.423065]  ? SMB2_tcon+0xab0/0xab0 [cifs]
+[71044.423067]  ? unwind_next_frame+0x90a/0x980
+[71044.423070]  ? entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[71044.423081]  ? __module_text_address+0x11/0xa0
+[71044.423087]  ? __is_insn_slot_addr+0x1b/0x70
+[71044.423094]  ? is_bpf_text_address+0xa/0x20
+[71044.423101]  ? kernel_text_address+0xe2/0xf0
+[71044.423104]  ? __kernel_text_address+0xe/0x30
+[71044.423108]  ? unwind_get_return_address+0x2f/0x50
+[71044.423114]  ? create_prof_cpu_mask+0x20/0x20
+[71044.423120]  ? arch_stack_walk+0x92/0xe0
+[71044.423125]  ? stack_trace_save+0x8a/0xb0
+[71044.423195]  smb2_plain_req_init+0x2fe/0x3d0 [cifs]
+[71044.423272]  SMB2_open_init+0x143/0x12b0 [cifs]
+[71044.423339]  ? cifs_statfs+0x13a/0x420 [cifs]
+[71044.423352]  ? statfs_by_dentry+0xa5/0xf0
+[71044.423354]  ? vfs_statfs+0x28/0x110
+[71044.423357]  ? __do_sys_statfs+0x64/0xc0
+[71044.423413]  ? smb2_parse_contexts+0x270/0x270 [cifs]
+[71044.423416]  ? _raw_write_trylock+0xe0/0xe0
+[71044.423419]  ? _raw_spin_lock+0x7a/0xd0
+[71044.423421]  ? _raw_write_trylock+0xe0/0xe0
+[71044.423429]  ? memset+0x1f/0x40
+[71044.423433]  ? stack_access_ok+0x35/0x90
+[71044.423437]  ? deref_stack_reg+0x88/0xd0
+[71044.423439]  ? stack_access_ok+0x35/0x90
+[71044.423442]  ? deref_stack_reg+0x88/0xd0
+[71044.423446]  ? __read_once_size_nocheck.constprop.6+0x10/0x10
+[71044.423450]  ? put_dec_trunc8+0x73/0x110
+[71044.423453]  ? number+0x356/0x4b0
+[71044.423456]  ? widen_string+0x23/0xf0
+[71044.423517]  ? smb2_query_info_compound+0x242/0x4d0 [cifs]
+[71044.423558]  smb2_query_info_compound+0x242/0x4d0 [cifs]
+[71044.423601]  ? smb2_query_symlink+0xc70/0xc70 [cifs]
+[71044.423604]  ? pointer+0x460/0x460
+[71044.423606]  ? kernel_text_address+0xe2/0xf0
+[71044.423608]  ? va_format.isra.12+0xee/0x100
+[71044.423612]  ? vsnprintf+0x870/0x870
+[71044.423614]  ? string_nocheck+0xb0/0xd0
+[71044.423616]  ? pointer+0x387/0x460
+[71044.423619]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71044.423620]  ? _raw_write_lock_bh+0xe0/0xe0
+[71044.423622]  ? _raw_spin_lock+0x7a/0xd0
+[71044.423624]  ? _raw_write_trylock+0xe0/0xe0
+[71044.423626]  ? up+0x32/0x70
+[71044.423630]  ? __switch_to_asm+0x34/0x70
+[71044.423636]  ? dynamic_emit_prefix+0x29/0x220
+[71044.423684]  ? smb2_queryfs+0xd9/0x1c0 [cifs]
+[71044.423735]  smb2_queryfs+0xd9/0x1c0 [cifs]
+[71044.423776]  ? smb2_query_eas+0x4f0/0x4f0 [cifs]
+[71044.423780]  ? vfs_mknod+0xc0/0x320
+[71044.423785]  ? map_id_up+0x12f/0x1d0
+[71044.423787]  ? make_kprojid+0x20/0x20
+[71044.423789]  ? _raw_spin_lock+0x7a/0xd0
+[71044.423837]  cifs_statfs+0x13a/0x420 [cifs]
+[71044.423844]  statfs_by_dentry+0xa5/0xf0
+[71044.423848]  vfs_statfs+0x28/0x110
+[71044.423851]  user_statfs+0x91/0xf0
+[71044.423853]  ? vfs_statfs+0x110/0x110
+[71044.423855]  ? __schedule+0x562/0xac0
+[71044.423857]  __do_sys_statfs+0x64/0xc0
+[71044.423859]  ? user_statfs+0xf0/0xf0
+[71044.423865]  do_syscall_64+0x73/0x190
+[71044.423868]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[71044.423875] RIP: 0033:0x4a5c20
+[71044.423880] Code: Bad RIP value.
+[71044.423882] RSP: 002b:000000c000341490 EFLAGS: 00000206 ORIG_RAX: 0000000000000089
+[71044.423888] RAX: ffffffffffffffda RBX: 000000c00002ea00 RCX: 00000000004a5c20
+[71044.423890] RDX: 0000000000000000 RSI: 000000c0003415c0 RDI: 000000c0001c43c0
+[71044.423892] RBP: 000000c0003414f0 R08: 0000000000000000 R09: 0000000000000000
+[71044.423893] R10: 0000000000000000 R11: 0000000000000206 R12: ffffffffffffffff
+[71044.423894] R13: 000000000000001f R14: 000000000000001e R15: 0000000000000100
+[71044.423926] INFO: task cifsd:9136 blocked for more than 120 seconds.
+[71044.425076]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71044.426421] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71044.427718] cifsd           D    0  9136      2 0x80004000
+[71044.427721] Call Trace:
+[71044.427738]  ? __schedule+0x540/0xac0
+[71044.427745]  ? firmware_map_remove+0xe9/0xe9
+[71044.427752]  ? _raw_spin_lock+0x7a/0xd0
+[71044.427757]  schedule+0x5e/0x100
+[71044.427765]  schedule_preempt_disabled+0xa/0x10
+[71044.427775]  __mutex_lock.isra.4+0x484/0x820
+[71044.427781]  ? mutex_trylock+0x90/0x90
+[71044.427787]  ? irq_work_claim+0x2e/0x50
+[71044.427792]  ? vprintk_emit+0x11d/0x2e0
+[71044.427795]  ? mutex_lock+0xce/0xe0
+[71044.427797]  mutex_lock+0xce/0xe0
+[71044.427800]  ? __mutex_lock_slowpath+0x10/0x10
+[71044.427877]  dfs_cache_noreq_find+0xa7/0x190 [cifs]
+[71044.427951]  cifs_reconnect+0x18c/0x1510 [cifs]
+[71044.427970]  ? ___ratelimit+0x106/0x190
+[71044.428050]  ? smb2_calc_size+0x15c/0x250 [cifs]
+[71044.428107]  ? extract_hostname+0xa0/0xa0 [cifs]
+[71044.428121]  ? _raw_spin_trylock+0x91/0xe0
+[71044.428129]  ? _raw_spin_trylock_bh+0x100/0x100
+[71044.428134]  ? ___ratelimit+0x106/0x190
+[71044.428179]  cifs_handle_standard+0x252/0x270 [cifs]
+[71044.428224]  cifs_demultiplex_thread+0x124a/0x13e0 [cifs]
+[71044.428267]  ? cifs_handle_standard+0x270/0x270 [cifs]
+[71044.428272]  ? __switch_to_asm+0x40/0x70
+[71044.428276]  ? __switch_to_asm+0x34/0x70
+[71044.428278]  ? __switch_to_asm+0x40/0x70
+[71044.428280]  ? __switch_to_asm+0x34/0x70
+[71044.428281]  ? __switch_to_asm+0x40/0x70
+[71044.428283]  ? __switch_to_asm+0x34/0x70
+[71044.428284]  ? __switch_to_asm+0x40/0x70
+[71044.428286]  ? __switch_to_asm+0x34/0x70
+[71044.428287]  ? __switch_to_asm+0x40/0x70
+[71044.428289]  ? __switch_to_asm+0x34/0x70
+[71044.428290]  ? __switch_to_asm+0x40/0x70
+[71044.428292]  ? __switch_to_asm+0x34/0x70
+[71044.428293]  ? __switch_to_asm+0x40/0x70
+[71044.428295]  ? __switch_to_asm+0x34/0x70
+[71044.428296]  ? __switch_to_asm+0x40/0x70
+[71044.428298]  ? __switch_to_asm+0x34/0x70
+[71044.428299]  ? __switch_to_asm+0x40/0x70
+[71044.428301]  ? __switch_to_asm+0x34/0x70
+[71044.428303]  ? __switch_to_asm+0x40/0x70
+[71044.428304]  ? __switch_to_asm+0x34/0x70
+[71044.428306]  ? __switch_to_asm+0x40/0x70
+[71044.428307]  ? __switch_to_asm+0x34/0x70
+[71044.428309]  ? __switch_to_asm+0x40/0x70
+[71044.428310]  ? __switch_to_asm+0x34/0x70
+[71044.428312]  ? __switch_to_asm+0x40/0x70
+[71044.428313]  ? __switch_to_asm+0x34/0x70
+[71044.428317]  ? finish_task_switch+0xf6/0x370
+[71044.428319]  ? __switch_to+0x2ec/0x5e0
+[71044.428321]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71044.428323]  ? _raw_write_lock_bh+0xe0/0xe0
+[71044.428375]  ? cifs_handle_standard+0x270/0x270 [cifs]
+[71044.428378]  kthread+0x192/0x1e0
+[71044.428381]  ? kthread_create_worker_on_cpu+0xc0/0xc0
+[71044.428384]  ret_from_fork+0x35/0x40
+[71062.848999] fs/cifs/smb2pdu.c: In echo request
+[71062.849014] fs/cifs/smb2pdu.c: Echo request failed: -11
+[71062.849025] fs/cifs/connect.c: Unable to send echo request to server: DC02
+[71080.092803] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13357 with uid: 999
+[71080.092915] fs/cifs/transport.c: Sending smb: smb_len=372
+[71080.097568] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71080.097580] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71080.097581] fs/cifs/smb2misc.c: SMB2 len 208
+[71080.097591] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71080.097592] fs/cifs/smb2misc.c: SMB2 len 104
+[71080.097601] fs/cifs/smb2misc.c: SMB2 len 124
+[71080.097603] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 4072
+[71080.097605] fs/cifs/smb2ops.c: add 3 credits total=512
+[71080.097741] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=4070 state=4
+[71080.097749] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=4071 state=4
+[71080.097752] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=4072 state=4
+[71080.097758] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71080.097767] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71080.097771] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71080.097812] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13357) rc = 0
+[71080.097992] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13358 with uid: 999
+[71080.098070] fs/cifs/transport.c: Sending smb: smb_len=348
+[71080.098487] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71080.098492] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71080.098493] fs/cifs/smb2misc.c: SMB2 len 208
+[71080.098500] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71080.098501] fs/cifs/smb2misc.c: SMB2 len 104
+[71080.098510] fs/cifs/smb2misc.c: SMB2 len 124
+[71080.098512] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 80
+[71080.098514] fs/cifs/smb2ops.c: add 30 credits total=951
+[71080.098609] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=78 state=4
+[71080.098610] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=79 state=4
+[71080.098612] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=80 state=4
+[71080.098613] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71080.098619] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71080.098624] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71080.098655] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13358) rc = 0
+[71105.853107] fs/cifs/connect.c: Existing tcp session with server found
+[71105.853114] fs/cifs/dfs_cache.c: CIFS VFS: in do_refresh_tcon as Xid: 13359 with uid: 0
+[71116.587766] fs/cifs/inode.c: CIFS VFS: in cifs_revalidate_dentry_attr as Xid: 13360 with uid: 11025
+[71116.587834] fs/cifs/dir.c: name: \SOMEDIRX
+[71116.587842] fs/cifs/inode.c: Update attributes: \SOMEDIRX inode 0x000000009f726d03 count 1 dentry: 0x00000000d22e461a d_time 4312598279 jiffies 4312672891
+[71116.587847] fs/cifs/inode.c: Getting info on \SOMEDIRX
+[71116.588001] fs/cifs/transport.c: Sending smb: smb_len=388
+[71124.283416] fs/cifs/smb2pdu.c: In echo request
+[71124.283434] fs/cifs/smb2pdu.c: Echo request failed: -11
+[71124.283442] fs/cifs/connect.c: Unable to send echo request to server: DC02
+[71140.087648] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13361 with uid: 999
+[71140.087743] fs/cifs/transport.c: Sending smb: smb_len=372
+[71140.088088] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71140.088095] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71140.088096] fs/cifs/smb2misc.c: SMB2 len 208
+[71140.088106] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71140.088107] fs/cifs/smb2misc.c: SMB2 len 104
+[71140.088116] fs/cifs/smb2misc.c: SMB2 len 124
+[71140.088118] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 4075
+[71140.088120] fs/cifs/smb2ops.c: add 3 credits total=512
+[71140.088137] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=4073 state=4
+[71140.088141] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=4074 state=4
+[71140.088144] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=4075 state=4
+[71140.088147] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71140.088153] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71140.088158] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71140.088190] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13361) rc = 0
+[71140.088218] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13362 with uid: 999
+[71140.088304] fs/cifs/transport.c: Sending smb: smb_len=348
+[71140.088643] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71140.088647] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71140.088648] fs/cifs/smb2misc.c: SMB2 len 208
+[71140.088655] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71140.088656] fs/cifs/smb2misc.c: SMB2 len 104
+[71140.088664] fs/cifs/smb2misc.c: SMB2 len 124
+[71140.088665] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 83
+[71140.088667] fs/cifs/smb2ops.c: add 30 credits total=978
+[71140.088680] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=81 state=4
+[71140.088682] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=82 state=4
+[71140.088684] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=83 state=4
+[71140.088686] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71140.088692] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71140.088696] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71140.088728] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13362) rc = 0
+[71165.239724] INFO: task node_exporter:7214 blocked for more than 241 seconds.
+[71165.240866]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71165.241935] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71165.243018] node_exporter   D    0  7214      1 0x00000000
+[71165.243022] Call Trace:
+[71165.243028]  ? __schedule+0x540/0xac0
+[71165.243031]  ? firmware_map_remove+0xe9/0xe9
+[71165.243035]  ? vsnprintf+0x32c/0x870
+[71165.243038]  ? _raw_spin_lock+0x7a/0xd0
+[71165.243040]  schedule+0x5e/0x100
+[71165.243042]  schedule_preempt_disabled+0xa/0x10
+[71165.243044]  __mutex_lock.isra.4+0x484/0x820
+[71165.243047]  ? mutex_trylock+0x90/0x90
+[71165.243049]  ? string_nocheck+0xb0/0xd0
+[71165.243051]  ? pointer+0x387/0x460
+[71165.243054]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71165.243056]  ? _raw_write_lock_bh+0xe0/0xe0
+[71165.243059]  ? mutex_lock+0xce/0xe0
+[71165.243060]  mutex_lock+0xce/0xe0
+[71165.243062]  ? __mutex_lock_slowpath+0x10/0x10
+[71165.243065]  ? find_nls+0x7d/0xa0
+[71165.243133]  smb2_reconnect.part.21+0x218/0xbd0 [cifs]
+[71165.243137]  ? deref_stack_reg+0x88/0xd0
+[71165.243139]  ? 0xffffffffa1e00000
+[71165.243180]  ? SMB2_tcon+0xab0/0xab0 [cifs]
+[71165.243181]  ? unwind_next_frame+0x90a/0x980
+[71165.243183]  ? entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[71165.243187]  ? __module_text_address+0x11/0xa0
+[71165.243189]  ? __is_insn_slot_addr+0x1b/0x70
+[71165.243193]  ? is_bpf_text_address+0xa/0x20
+[71165.243195]  ? kernel_text_address+0xe2/0xf0
+[71165.243197]  ? __kernel_text_address+0xe/0x30
+[71165.243200]  ? unwind_get_return_address+0x2f/0x50
+[71165.243203]  ? create_prof_cpu_mask+0x20/0x20
+[71165.243207]  ? arch_stack_walk+0x92/0xe0
+[71165.243210]  ? stack_trace_save+0x8a/0xb0
+[71165.243251]  smb2_plain_req_init+0x2fe/0x3d0 [cifs]
+[71165.243294]  SMB2_open_init+0x143/0x12b0 [cifs]
+[71165.243332]  ? cifs_statfs+0x13a/0x420 [cifs]
+[71165.243336]  ? statfs_by_dentry+0xa5/0xf0
+[71165.243338]  ? vfs_statfs+0x28/0x110
+[71165.243340]  ? __do_sys_statfs+0x64/0xc0
+[71165.243382]  ? smb2_parse_contexts+0x270/0x270 [cifs]
+[71165.243384]  ? _raw_write_trylock+0xe0/0xe0
+[71165.243385]  ? _raw_spin_lock+0x7a/0xd0
+[71165.243387]  ? _raw_write_trylock+0xe0/0xe0
+[71165.243389]  ? memset+0x1f/0x40
+[71165.243391]  ? stack_access_ok+0x35/0x90
+[71165.243393]  ? deref_stack_reg+0x88/0xd0
+[71165.243396]  ? stack_access_ok+0x35/0x90
+[71165.243399]  ? deref_stack_reg+0x88/0xd0
+[71165.243402]  ? __read_once_size_nocheck.constprop.6+0x10/0x10
+[71165.243404]  ? put_dec_trunc8+0x73/0x110
+[71165.243406]  ? number+0x356/0x4b0
+[71165.243408]  ? widen_string+0x23/0xf0
+[71165.243449]  ? smb2_query_info_compound+0x242/0x4d0 [cifs]
+[71165.243490]  smb2_query_info_compound+0x242/0x4d0 [cifs]
+[71165.243533]  ? smb2_query_symlink+0xc70/0xc70 [cifs]
+[71165.243535]  ? pointer+0x460/0x460
+[71165.243537]  ? kernel_text_address+0xe2/0xf0
+[71165.243539]  ? va_format.isra.12+0xee/0x100
+[71165.243541]  ? vsnprintf+0x870/0x870
+[71165.243543]  ? string_nocheck+0xb0/0xd0
+[71165.243545]  ? pointer+0x387/0x460
+[71165.243547]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71165.243549]  ? _raw_write_lock_bh+0xe0/0xe0
+[71165.243551]  ? _raw_spin_lock+0x7a/0xd0
+[71165.243552]  ? _raw_write_trylock+0xe0/0xe0
+[71165.243555]  ? up+0x32/0x70
+[71165.243558]  ? __switch_to_asm+0x34/0x70
+[71165.243561]  ? dynamic_emit_prefix+0x29/0x220
+[71165.243602]  ? smb2_queryfs+0xd9/0x1c0 [cifs]
+[71165.243644]  smb2_queryfs+0xd9/0x1c0 [cifs]
+[71165.243688]  ? smb2_query_eas+0x4f0/0x4f0 [cifs]
+[71165.243764]  ? vfs_mknod+0xc0/0x320
+[71165.243770]  ? map_id_up+0x12f/0x1d0
+[71165.243774]  ? make_kprojid+0x20/0x20
+[71165.243777]  ? _raw_spin_lock+0x7a/0xd0
+[71165.243818]  cifs_statfs+0x13a/0x420 [cifs]
+[71165.243825]  statfs_by_dentry+0xa5/0xf0
+[71165.243829]  vfs_statfs+0x28/0x110
+[71165.243835]  user_statfs+0x91/0xf0
+[71165.243838]  ? vfs_statfs+0x110/0x110
+[71165.243844]  ? __schedule+0x562/0xac0
+[71165.243847]  __do_sys_statfs+0x64/0xc0
+[71165.243854]  ? user_statfs+0xf0/0xf0
+[71165.243859]  do_syscall_64+0x73/0x190
+[71165.243863]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[71165.243866] RIP: 0033:0x4a5c20
+[71165.243873] Code: Bad RIP value.
+[71165.243876] RSP: 002b:000000c000341490 EFLAGS: 00000206 ORIG_RAX: 0000000000000089
+[71165.243881] RAX: ffffffffffffffda RBX: 000000c00002ea00 RCX: 00000000004a5c20
+[71165.243883] RDX: 0000000000000000 RSI: 000000c0003415c0 RDI: 000000c0001c43c0
+[71165.243885] RBP: 000000c0003414f0 R08: 0000000000000000 R09: 0000000000000000
+[71165.243886] R10: 0000000000000000 R11: 0000000000000206 R12: ffffffffffffffff
+[71165.243887] R13: 000000000000001f R14: 000000000000001e R15: 0000000000000100
+[71165.243905] INFO: task cifsd:9136 blocked for more than 241 seconds.
+[71165.245022]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71165.246156] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71165.247272] cifsd           D    0  9136      2 0x80004000
+[71165.247274] Call Trace:
+[71165.247281]  ? __schedule+0x540/0xac0
+[71165.247284]  ? firmware_map_remove+0xe9/0xe9
+[71165.247287]  ? _raw_spin_lock+0x7a/0xd0
+[71165.247289]  schedule+0x5e/0x100
+[71165.247291]  schedule_preempt_disabled+0xa/0x10
+[71165.247293]  __mutex_lock.isra.4+0x484/0x820
+[71165.247296]  ? mutex_trylock+0x90/0x90
+[71165.247300]  ? irq_work_claim+0x2e/0x50
+[71165.247303]  ? vprintk_emit+0x11d/0x2e0
+[71165.247305]  ? mutex_lock+0xce/0xe0
+[71165.247306]  mutex_lock+0xce/0xe0
+[71165.247308]  ? __mutex_lock_slowpath+0x10/0x10
+[71165.247358]  dfs_cache_noreq_find+0xa7/0x190 [cifs]
+[71165.247398]  cifs_reconnect+0x18c/0x1510 [cifs]
+[71165.247402]  ? ___ratelimit+0x106/0x190
+[71165.247444]  ? smb2_calc_size+0x15c/0x250 [cifs]
+[71165.247484]  ? extract_hostname+0xa0/0xa0 [cifs]
+[71165.247486]  ? _raw_spin_trylock+0x91/0xe0
+[71165.247487]  ? _raw_spin_trylock_bh+0x100/0x100
+[71165.247490]  ? ___ratelimit+0x106/0x190
+[71165.247533]  cifs_handle_standard+0x252/0x270 [cifs]
+[71165.247575]  cifs_demultiplex_thread+0x124a/0x13e0 [cifs]
+[71165.247616]  ? cifs_handle_standard+0x270/0x270 [cifs]
+[71165.247618]  ? __switch_to_asm+0x40/0x70
+[71165.247620]  ? __switch_to_asm+0x34/0x70
+[71165.247621]  ? __switch_to_asm+0x40/0x70
+[71165.247623]  ? __switch_to_asm+0x34/0x70
+[71165.247624]  ? __switch_to_asm+0x40/0x70
+[71165.247626]  ? __switch_to_asm+0x34/0x70
+[71165.247627]  ? __switch_to_asm+0x40/0x70
+[71165.247629]  ? __switch_to_asm+0x34/0x70
+[71165.247630]  ? __switch_to_asm+0x40/0x70
+[71165.247632]  ? __switch_to_asm+0x34/0x70
+[71165.247633]  ? __switch_to_asm+0x40/0x70
+[71165.247635]  ? __switch_to_asm+0x34/0x70
+[71165.247637]  ? __switch_to_asm+0x40/0x70
+[71165.247638]  ? __switch_to_asm+0x34/0x70
+[71165.247640]  ? __switch_to_asm+0x40/0x70
+[71165.247641]  ? __switch_to_asm+0x34/0x70
+[71165.247643]  ? __switch_to_asm+0x40/0x70
+[71165.247644]  ? __switch_to_asm+0x34/0x70
+[71165.247646]  ? __switch_to_asm+0x40/0x70
+[71165.247647]  ? __switch_to_asm+0x34/0x70
+[71165.247649]  ? __switch_to_asm+0x40/0x70
+[71165.247651]  ? __switch_to_asm+0x34/0x70
+[71165.247653]  ? __switch_to_asm+0x40/0x70
+[71165.247659]  ? __switch_to_asm+0x34/0x70
+[71165.247678]  ? __switch_to_asm+0x40/0x70
+[71165.247680]  ? __switch_to_asm+0x34/0x70
+[71165.247683]  ? finish_task_switch+0xf6/0x370
+[71165.247685]  ? __switch_to+0x2ec/0x5e0
+[71165.247688]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71165.247690]  ? _raw_write_lock_bh+0xe0/0xe0
+[71165.247731]  ? cifs_handle_standard+0x270/0x270 [cifs]
+[71165.247735]  kthread+0x192/0x1e0
+[71165.247737]  ? kthread_create_worker_on_cpu+0xc0/0xc0
+[71165.247739]  ret_from_fork+0x35/0x40
+[71185.717885] fs/cifs/smb2pdu.c: In echo request
+[71185.717900] fs/cifs/smb2pdu.c: Echo request failed: -11
+[71185.717906] fs/cifs/connect.c: Unable to send echo request to server: DC02
+[71200.086057] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13363 with uid: 999
+[71200.086149] fs/cifs/transport.c: Sending smb: smb_len=372
+[71200.086716] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71200.086725] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71200.086726] fs/cifs/smb2misc.c: SMB2 len 208
+[71200.086740] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71200.086741] fs/cifs/smb2misc.c: SMB2 len 104
+[71200.086751] fs/cifs/smb2misc.c: SMB2 len 124
+[71200.086752] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 4078
+[71200.086755] fs/cifs/smb2ops.c: add 3 credits total=512
+[71200.086770] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=4076 state=4
+[71200.086775] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=4077 state=4
+[71200.086777] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=4078 state=4
+[71200.086781] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71200.086786] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71200.086791] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71200.086824] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13363) rc = 0
+[71200.086841] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13364 with uid: 999
+[71200.086938] fs/cifs/transport.c: Sending smb: smb_len=348
+[71200.087336] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71200.087342] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71200.087343] fs/cifs/smb2misc.c: SMB2 len 208
+[71200.087352] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71200.087353] fs/cifs/smb2misc.c: SMB2 len 104
+[71200.087362] fs/cifs/smb2misc.c: SMB2 len 124
+[71200.087364] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 86
+[71200.087366] fs/cifs/smb2ops.c: add 30 credits total=1005
+[71200.087379] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=84 state=4
+[71200.087381] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=85 state=4
+[71200.087383] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=86 state=4
+[71200.087384] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71200.087391] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71200.087395] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71200.087428] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13364) rc = 0
+[71247.152290] fs/cifs/smb2pdu.c: In echo request
+[71247.152306] fs/cifs/smb2pdu.c: Echo request failed: -11
+[71247.152313] fs/cifs/connect.c: Unable to send echo request to server: DC02
+[71260.080476] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13365 with uid: 999
+[71260.080564] fs/cifs/transport.c: Sending smb: smb_len=372
+[71260.080923] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71260.080931] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71260.080932] fs/cifs/smb2misc.c: SMB2 len 208
+[71260.080946] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71260.080947] fs/cifs/smb2misc.c: SMB2 len 104
+[71260.080958] fs/cifs/smb2misc.c: SMB2 len 124
+[71260.080959] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 4081
+[71260.080962] fs/cifs/smb2ops.c: add 3 credits total=512
+[71260.080975] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=4079 state=4
+[71260.080979] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=4080 state=4
+[71260.080982] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=4081 state=4
+[71260.080985] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71260.080991] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71260.080996] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71260.081032] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13365) rc = 0
+[71260.081163] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13366 with uid: 999
+[71260.081228] fs/cifs/transport.c: Sending smb: smb_len=348
+[71260.081798] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71260.081804] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71260.081805] fs/cifs/smb2misc.c: SMB2 len 208
+[71260.081814] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71260.081814] fs/cifs/smb2misc.c: SMB2 len 104
+[71260.081824] fs/cifs/smb2misc.c: SMB2 len 124
+[71260.081826] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 89
+[71260.081828] fs/cifs/smb2ops.c: add 30 credits total=1032
+[71260.081841] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=87 state=4
+[71260.081843] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=88 state=4
+[71260.081845] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=89 state=4
+[71260.081847] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71260.081854] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71260.081904] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71260.081936] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13366) rc = 0
+[71286.060785] INFO: task node_exporter:7214 blocked for more than 362 seconds.
+[71286.061989]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71286.063131] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71286.064284] node_exporter   D    0  7214      1 0x00000000
+[71286.064287] Call Trace:
+[71286.064294]  ? __schedule+0x540/0xac0
+[71286.064297]  ? firmware_map_remove+0xe9/0xe9
+[71286.064301]  ? vsnprintf+0x32c/0x870
+[71286.064304]  ? _raw_spin_lock+0x7a/0xd0
+[71286.064306]  schedule+0x5e/0x100
+[71286.064308]  schedule_preempt_disabled+0xa/0x10
+[71286.064310]  __mutex_lock.isra.4+0x484/0x820
+[71286.064312]  ? mutex_trylock+0x90/0x90
+[71286.064315]  ? string_nocheck+0xb0/0xd0
+[71286.064317]  ? pointer+0x387/0x460
+[71286.064319]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71286.064321]  ? _raw_write_lock_bh+0xe0/0xe0
+[71286.064324]  ? mutex_lock+0xce/0xe0
+[71286.064325]  mutex_lock+0xce/0xe0
+[71286.064327]  ? __mutex_lock_slowpath+0x10/0x10
+[71286.064331]  ? find_nls+0x7d/0xa0
+[71286.064381]  smb2_reconnect.part.21+0x218/0xbd0 [cifs]
+[71286.064386]  ? deref_stack_reg+0x88/0xd0
+[71286.064392]  ? 0xffffffffa1e00000
+[71286.064434]  ? SMB2_tcon+0xab0/0xab0 [cifs]
+[71286.064436]  ? unwind_next_frame+0x90a/0x980
+[71286.064438]  ? entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[71286.064442]  ? __module_text_address+0x11/0xa0
+[71286.064444]  ? __is_insn_slot_addr+0x1b/0x70
+[71286.064447]  ? is_bpf_text_address+0xa/0x20
+[71286.064450]  ? kernel_text_address+0xe2/0xf0
+[71286.064451]  ? __kernel_text_address+0xe/0x30
+[71286.064454]  ? unwind_get_return_address+0x2f/0x50
+[71286.064457]  ? create_prof_cpu_mask+0x20/0x20
+[71286.064460]  ? arch_stack_walk+0x92/0xe0
+[71286.064463]  ? stack_trace_save+0x8a/0xb0
+[71286.064505]  smb2_plain_req_init+0x2fe/0x3d0 [cifs]
+[71286.064548]  SMB2_open_init+0x143/0x12b0 [cifs]
+[71286.064586]  ? cifs_statfs+0x13a/0x420 [cifs]
+[71286.064590]  ? statfs_by_dentry+0xa5/0xf0
+[71286.064592]  ? vfs_statfs+0x28/0x110
+[71286.064594]  ? __do_sys_statfs+0x64/0xc0
+[71286.064636]  ? smb2_parse_contexts+0x270/0x270 [cifs]
+[71286.064638]  ? _raw_write_trylock+0xe0/0xe0
+[71286.064640]  ? _raw_spin_lock+0x7a/0xd0
+[71286.064641]  ? _raw_write_trylock+0xe0/0xe0
+[71286.064643]  ? memset+0x1f/0x40
+[71286.064646]  ? stack_access_ok+0x35/0x90
+[71286.064648]  ? deref_stack_reg+0x88/0xd0
+[71286.064650]  ? stack_access_ok+0x35/0x90
+[71286.064652]  ? deref_stack_reg+0x88/0xd0
+[71286.064654]  ? __read_once_size_nocheck.constprop.6+0x10/0x10
+[71286.064656]  ? put_dec_trunc8+0x73/0x110
+[71286.064658]  ? number+0x356/0x4b0
+[71286.064660]  ? widen_string+0x23/0xf0
+[71286.064705]  ? smb2_query_info_compound+0x242/0x4d0 [cifs]
+[71286.064770]  smb2_query_info_compound+0x242/0x4d0 [cifs]
+[71286.064817]  ? smb2_query_symlink+0xc70/0xc70 [cifs]
+[71286.064821]  ? pointer+0x460/0x460
+[71286.064827]  ? kernel_text_address+0xe2/0xf0
+[71286.064835]  ? va_format.isra.12+0xee/0x100
+[71286.064841]  ? vsnprintf+0x870/0x870
+[71286.064854]  ? string_nocheck+0xb0/0xd0
+[71286.064869]  ? pointer+0x387/0x460
+[71286.064875]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71286.064886]  ? _raw_write_lock_bh+0xe0/0xe0
+[71286.064888]  ? _raw_spin_lock+0x7a/0xd0
+[71286.064889]  ? _raw_write_trylock+0xe0/0xe0
+[71286.064892]  ? up+0x32/0x70
+[71286.064896]  ? __switch_to_asm+0x34/0x70
+[71286.064898]  ? dynamic_emit_prefix+0x29/0x220
+[71286.064940]  ? smb2_queryfs+0xd9/0x1c0 [cifs]
+[71286.064982]  smb2_queryfs+0xd9/0x1c0 [cifs]
+[71286.065029]  ? smb2_query_eas+0x4f0/0x4f0 [cifs]
+[71286.065035]  ? vfs_mknod+0xc0/0x320
+[71286.065038]  ? map_id_up+0x12f/0x1d0
+[71286.065040]  ? make_kprojid+0x20/0x20
+[71286.065042]  ? _raw_spin_lock+0x7a/0xd0
+[71286.065081]  cifs_statfs+0x13a/0x420 [cifs]
+[71286.065088]  statfs_by_dentry+0xa5/0xf0
+[71286.065091]  vfs_statfs+0x28/0x110
+[71286.065093]  user_statfs+0x91/0xf0
+[71286.065095]  ? vfs_statfs+0x110/0x110
+[71286.065099]  ? __schedule+0x562/0xac0
+[71286.065103]  __do_sys_statfs+0x64/0xc0
+[71286.065105]  ? user_statfs+0xf0/0xf0
+[71286.065109]  do_syscall_64+0x73/0x190
+[71286.065112]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[71286.065116] RIP: 0033:0x4a5c20
+[71286.065121] Code: Bad RIP value.
+[71286.065122] RSP: 002b:000000c000341490 EFLAGS: 00000206 ORIG_RAX: 0000000000000089
+[71286.065125] RAX: ffffffffffffffda RBX: 000000c00002ea00 RCX: 00000000004a5c20
+[71286.065127] RDX: 0000000000000000 RSI: 000000c0003415c0 RDI: 000000c0001c43c0
+[71286.065131] RBP: 000000c0003414f0 R08: 0000000000000000 R09: 0000000000000000
+[71286.065133] R10: 0000000000000000 R11: 0000000000000206 R12: ffffffffffffffff
+[71286.065134] R13: 000000000000001f R14: 000000000000001e R15: 0000000000000100
+[71286.065156] INFO: task cifsd:9136 blocked for more than 362 seconds.
+[71286.066326]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71286.068159] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71286.069395] cifsd           D    0  9136      2 0x80004000
+[71286.069399] Call Trace:
+[71286.069405]  ? __schedule+0x540/0xac0
+[71286.069408]  ? firmware_map_remove+0xe9/0xe9
+[71286.069411]  ? _raw_spin_lock+0x7a/0xd0
+[71286.069413]  schedule+0x5e/0x100
+[71286.069416]  schedule_preempt_disabled+0xa/0x10
+[71286.069417]  __mutex_lock.isra.4+0x484/0x820
+[71286.069420]  ? mutex_trylock+0x90/0x90
+[71286.069424]  ? irq_work_claim+0x2e/0x50
+[71286.069427]  ? vprintk_emit+0x11d/0x2e0
+[71286.069430]  ? mutex_lock+0xce/0xe0
+[71286.069431]  mutex_lock+0xce/0xe0
+[71286.069433]  ? __mutex_lock_slowpath+0x10/0x10
+[71286.069485]  dfs_cache_noreq_find+0xa7/0x190 [cifs]
+[71286.069526]  cifs_reconnect+0x18c/0x1510 [cifs]
+[71286.069530]  ? ___ratelimit+0x106/0x190
+[71286.069572]  ? smb2_calc_size+0x15c/0x250 [cifs]
+[71286.069611]  ? extract_hostname+0xa0/0xa0 [cifs]
+[71286.069613]  ? _raw_spin_trylock+0x91/0xe0
+[71286.069615]  ? _raw_spin_trylock_bh+0x100/0x100
+[71286.069617]  ? ___ratelimit+0x106/0x190
+[71286.069657]  cifs_handle_standard+0x252/0x270 [cifs]
+[71286.069697]  cifs_demultiplex_thread+0x124a/0x13e0 [cifs]
+[71286.069737]  ? cifs_handle_standard+0x270/0x270 [cifs]
+[71286.069739]  ? __switch_to_asm+0x40/0x70
+[71286.069741]  ? __switch_to_asm+0x34/0x70
+[71286.069742]  ? __switch_to_asm+0x40/0x70
+[71286.069744]  ? __switch_to_asm+0x34/0x70
+[71286.069746]  ? __switch_to_asm+0x40/0x70
+[71286.069748]  ? __switch_to_asm+0x34/0x70
+[71286.069750]  ? __switch_to_asm+0x40/0x70
+[71286.069752]  ? __switch_to_asm+0x34/0x70
+[71286.069753]  ? __switch_to_asm+0x40/0x70
+[71286.069755]  ? __switch_to_asm+0x34/0x70
+[71286.069756]  ? __switch_to_asm+0x40/0x70
+[71286.069758]  ? __switch_to_asm+0x34/0x70
+[71286.069759]  ? __switch_to_asm+0x40/0x70
+[71286.069761]  ? __switch_to_asm+0x34/0x70
+[71286.069762]  ? __switch_to_asm+0x40/0x70
+[71286.069764]  ? __switch_to_asm+0x34/0x70
+[71286.069765]  ? __switch_to_asm+0x40/0x70
+[71286.069767]  ? __switch_to_asm+0x34/0x70
+[71286.069768]  ? __switch_to_asm+0x40/0x70
+[71286.069770]  ? __switch_to_asm+0x34/0x70
+[71286.069772]  ? __switch_to_asm+0x40/0x70
+[71286.069773]  ? __switch_to_asm+0x34/0x70
+[71286.069775]  ? __switch_to_asm+0x40/0x70
+[71286.069776]  ? __switch_to_asm+0x34/0x70
+[71286.069778]  ? __switch_to_asm+0x40/0x70
+[71286.069779]  ? __switch_to_asm+0x34/0x70
+[71286.069782]  ? finish_task_switch+0xf6/0x370
+[71286.069784]  ? __switch_to+0x2ec/0x5e0
+[71286.069786]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71286.069788]  ? _raw_write_lock_bh+0xe0/0xe0
+[71286.069828]  ? cifs_handle_standard+0x270/0x270 [cifs]
+[71286.069830]  kthread+0x192/0x1e0
+[71286.069832]  ? kthread_create_worker_on_cpu+0xc0/0xc0
+[71286.069834]  ret_from_fork+0x35/0x40
+[71286.069842] INFO: task kworker/0:0:16069 blocked for more than 120 seconds.
+[71286.071059]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71286.072279] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71286.073534] kworker/0:0     D    0 16069      2 0x80004000
+[71286.073585] Workqueue: cifsiod refresh_cache_worker [cifs]
+[71286.073586] Call Trace:
+[71286.073590]  ? __schedule+0x540/0xac0
+[71286.073592]  ? firmware_map_remove+0xe9/0xe9
+[71286.073595]  ? _raw_read_lock_irq+0x40/0x40
+[71286.073597]  ? _raw_spin_lock+0x7a/0xd0
+[71286.073599]  schedule+0x5e/0x100
+[71286.073601]  schedule_preempt_disabled+0xa/0x10
+[71286.073603]  __mutex_lock.isra.4+0x484/0x820
+[71286.073606]  ? mutex_trylock+0x90/0x90
+[71286.073609]  ? dynamic_emit_prefix+0x29/0x220
+[71286.073610]  ? __dynamic_pr_debug+0xf8/0x140
+[71286.073612]  ? dynamic_emit_prefix+0x220/0x220
+[71286.073618]  ? update_dl_rq_load_avg+0x2c3/0x4d0
+[71286.073620]  ? mutex_lock+0xce/0xe0
+[71286.073621]  mutex_lock+0xce/0xe0
+[71286.073623]  ? __mutex_lock_slowpath+0x10/0x10
+[71286.073665]  refresh_cache_worker+0x48f/0x14a0 [cifs]
+[71286.073668]  ? __switch_to_asm+0x40/0x70
+[71286.073670]  ? __switch_to_asm+0x40/0x70
+[71286.073672]  ? __switch_to_asm+0x34/0x70
+[71286.073673]  ? __switch_to_asm+0x40/0x70
+[71286.073675]  ? __switch_to_asm+0x34/0x70
+[71286.073676]  ? __switch_to_asm+0x40/0x70
+[71286.073718]  ? find_root_ses.isra.9+0x320/0x320 [cifs]
+[71286.073720]  ? __switch_to_asm+0x40/0x70
+[71286.073722]  ? __switch_to_asm+0x40/0x70
+[71286.073723]  ? __switch_to_asm+0x34/0x70
+[71286.073725]  ? __switch_to_asm+0x40/0x70
+[71286.073728]  ? __switch_to_asm+0x34/0x70
+[71286.073729]  ? __switch_to_asm+0x40/0x70
+[71286.073731]  ? __switch_to_asm+0x34/0x70
+[71286.073732]  ? __switch_to_asm+0x40/0x70
+[71286.073734]  ? __switch_to_asm+0x40/0x70
+[71286.073736]  ? __switch_to_asm+0x34/0x70
+[71286.073738]  ? finish_task_switch+0xf6/0x370
+[71286.073741]  ? __switch_to+0x2ec/0x5e0
+[71286.073742]  ? __schedule+0x562/0xac0
+[71286.073745]  ? read_word_at_a_time+0xe/0x20
+[71286.073747]  ? strscpy+0xca/0x1d0
+[71286.073753]  process_one_work+0x373/0x6e0
+[71286.073756]  worker_thread+0x78/0x5b0
+[71286.073759]  ? rescuer_thread+0x5e0/0x5e0
+[71286.073760]  kthread+0x192/0x1e0
+[71286.073762]  ? kthread_create_worker_on_cpu+0xc0/0xc0
+[71286.073764]  ret_from_fork+0x35/0x40
+[71308.590706] fs/cifs/smb2pdu.c: In echo request
+[71308.590730] fs/cifs/smb2pdu.c: Echo request failed: -11
+[71308.590743] fs/cifs/connect.c: Unable to send echo request to server: DC02
+[71320.544886] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13367 with uid: 999
+[71320.544989] fs/cifs/transport.c: Sending smb: smb_len=372
+[71320.545462] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71320.545477] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71320.545479] fs/cifs/smb2misc.c: SMB2 len 208
+[71320.545495] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71320.545496] fs/cifs/smb2misc.c: SMB2 len 104
+[71320.545512] fs/cifs/smb2misc.c: SMB2 len 124
+[71320.545515] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 4084
+[71320.545517] fs/cifs/smb2ops.c: add 3 credits total=512
+[71320.545533] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=4082 state=4
+[71320.545539] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=4083 state=4
+[71320.545542] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=4084 state=4
+[71320.545548] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71320.545555] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71320.545559] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71320.545620] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13367) rc = 0
+[71320.548354] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13368 with uid: 999
+[71320.548525] fs/cifs/transport.c: Sending smb: smb_len=348
+[71320.548816] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71320.548826] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71320.548828] fs/cifs/smb2misc.c: SMB2 len 208
+[71320.548844] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71320.548846] fs/cifs/smb2misc.c: SMB2 len 104
+[71320.548864] fs/cifs/smb2misc.c: SMB2 len 124
+[71320.548867] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 92
+[71320.548870] fs/cifs/smb2ops.c: add 30 credits total=1059
+[71320.548887] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=90 state=4
+[71320.548890] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=91 state=4
+[71320.548891] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=92 state=4
+[71320.548893] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71320.548900] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71320.548904] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71320.548937] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13368) rc = 0
+[71370.021141] fs/cifs/smb2pdu.c: In echo request
+[71370.021164] fs/cifs/smb2pdu.c: Echo request failed: -11
+[71370.021172] fs/cifs/connect.c: Unable to send echo request to server: DC02
+[71380.065094] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13369 with uid: 999
+[71380.065186] fs/cifs/transport.c: Sending smb: smb_len=372
+[71380.065747] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71380.065757] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71380.065758] fs/cifs/smb2misc.c: SMB2 len 208
+[71380.065771] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71380.065773] fs/cifs/smb2misc.c: SMB2 len 104
+[71380.065786] fs/cifs/smb2misc.c: SMB2 len 124
+[71380.065789] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 4087
+[71380.065792] fs/cifs/smb2ops.c: add 3 credits total=512
+[71380.065826] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=4085 state=4
+[71380.065831] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=4086 state=4
+[71380.065834] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=4087 state=4
+[71380.065837] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71380.065843] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71380.065848] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71380.065881] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13369) rc = 0
+[71380.065908] fs/cifs/cifsfs.c: CIFS VFS: in cifs_statfs as Xid: 13370 with uid: 999
+[71380.065966] fs/cifs/transport.c: Sending smb: smb_len=348
+[71380.066494] fs/cifs/connect.c: RFC1002 header 0x1b8
+[71380.066501] fs/cifs/smb2misc.c: SMB2 data length 56 offset 152
+[71380.066503] fs/cifs/smb2misc.c: SMB2 len 208
+[71380.066516] fs/cifs/smb2misc.c: SMB2 data length 32 offset 72
+[71380.066517] fs/cifs/smb2misc.c: SMB2 len 104
+[71380.066532] fs/cifs/smb2misc.c: SMB2 len 124
+[71380.066534] fs/cifs/smb2misc.c: Calculated size 124 length 128 mismatch mid 95
+[71380.066536] fs/cifs/smb2ops.c: add 30 credits total=1086
+[71380.067649] fs/cifs/transport.c: cifs_sync_mid_result: cmd=5 mid=93 state=4
+[71380.067652] fs/cifs/transport.c: cifs_sync_mid_result: cmd=16 mid=94 state=4
+[71380.067656] fs/cifs/transport.c: cifs_sync_mid_result: cmd=6 mid=95 state=4
+[71380.067658] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71380.067667] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71380.067672] fs/cifs/misc.c: Null buffer passed to cifs_small_buf_release
+[71380.067707] fs/cifs/cifsfs.c: CIFS VFS: leaving cifs_statfs (xid = 13370) rc = 0
+[71406.881866] INFO: task node_exporter:7214 blocked for more than 483 seconds.
+[71406.883327]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71406.884700] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71406.886064] node_exporter   D    0  7214      1 0x00000000
+[71406.886068] Call Trace:
+[71406.886075]  ? __schedule+0x540/0xac0
+[71406.886080]  ? firmware_map_remove+0xe9/0xe9
+[71406.886087]  ? vsnprintf+0x32c/0x870
+[71406.886091]  ? _raw_spin_lock+0x7a/0xd0
+[71406.886095]  schedule+0x5e/0x100
+[71406.886098]  schedule_preempt_disabled+0xa/0x10
+[71406.886104]  __mutex_lock.isra.4+0x484/0x820
+[71406.886106]  ? mutex_trylock+0x90/0x90
+[71406.886108]  ? string_nocheck+0xb0/0xd0
+[71406.886111]  ? pointer+0x387/0x460
+[71406.886113]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71406.886115]  ? _raw_write_lock_bh+0xe0/0xe0
+[71406.886121]  ? mutex_lock+0xce/0xe0
+[71406.886122]  mutex_lock+0xce/0xe0
+[71406.886124]  ? __mutex_lock_slowpath+0x10/0x10
+[71406.886126]  ? find_nls+0x7d/0xa0
+[71406.886194]  smb2_reconnect.part.21+0x218/0xbd0 [cifs]
+[71406.886206]  ? deref_stack_reg+0x88/0xd0
+[71406.886210]  ? 0xffffffffa1e00000
+[71406.886254]  ? SMB2_tcon+0xab0/0xab0 [cifs]
+[71406.886258]  ? unwind_next_frame+0x90a/0x980
+[71406.886260]  ? entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[71406.886263]  ? __module_text_address+0x11/0xa0
+[71406.886265]  ? __is_insn_slot_addr+0x1b/0x70
+[71406.886272]  ? is_bpf_text_address+0xa/0x20
+[71406.886274]  ? kernel_text_address+0xe2/0xf0
+[71406.886275]  ? __kernel_text_address+0xe/0x30
+[71406.886278]  ? unwind_get_return_address+0x2f/0x50
+[71406.886280]  ? create_prof_cpu_mask+0x20/0x20
+[71406.886288]  ? arch_stack_walk+0x92/0xe0
+[71406.886291]  ? stack_trace_save+0x8a/0xb0
+[71406.886337]  smb2_plain_req_init+0x2fe/0x3d0 [cifs]
+[71406.886381]  SMB2_open_init+0x143/0x12b0 [cifs]
+[71406.886420]  ? cifs_statfs+0x13a/0x420 [cifs]
+[71406.886424]  ? statfs_by_dentry+0xa5/0xf0
+[71406.886426]  ? vfs_statfs+0x28/0x110
+[71406.886428]  ? __do_sys_statfs+0x64/0xc0
+[71406.886470]  ? smb2_parse_contexts+0x270/0x270 [cifs]
+[71406.886475]  ? _raw_write_trylock+0xe0/0xe0
+[71406.886476]  ? _raw_spin_lock+0x7a/0xd0
+[71406.886478]  ? _raw_write_trylock+0xe0/0xe0
+[71406.886480]  ? memset+0x1f/0x40
+[71406.886482]  ? stack_access_ok+0x35/0x90
+[71406.886484]  ? deref_stack_reg+0x88/0xd0
+[71406.886486]  ? stack_access_ok+0x35/0x90
+[71406.886488]  ? deref_stack_reg+0x88/0xd0
+[71406.886491]  ? __read_once_size_nocheck.constprop.6+0x10/0x10
+[71406.886493]  ? put_dec_trunc8+0x73/0x110
+[71406.886495]  ? number+0x356/0x4b0
+[71406.886497]  ? widen_string+0x23/0xf0
+[71406.886538]  ? smb2_query_info_compound+0x242/0x4d0 [cifs]
+[71406.886580]  smb2_query_info_compound+0x242/0x4d0 [cifs]
+[71406.886622]  ? smb2_query_symlink+0xc70/0xc70 [cifs]
+[71406.886624]  ? pointer+0x460/0x460
+[71406.886626]  ? kernel_text_address+0xe2/0xf0
+[71406.886628]  ? va_format.isra.12+0xee/0x100
+[71406.886630]  ? vsnprintf+0x870/0x870
+[71406.886632]  ? string_nocheck+0xb0/0xd0
+[71406.886634]  ? pointer+0x387/0x460
+[71406.886636]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71406.886638]  ? _raw_write_lock_bh+0xe0/0xe0
+[71406.886640]  ? _raw_spin_lock+0x7a/0xd0
+[71406.886641]  ? _raw_write_trylock+0xe0/0xe0
+[71406.886644]  ? up+0x32/0x70
+[71406.886647]  ? __switch_to_asm+0x34/0x70
+[71406.886649]  ? dynamic_emit_prefix+0x29/0x220
+[71406.886691]  ? smb2_queryfs+0xd9/0x1c0 [cifs]
+[71406.886744]  smb2_queryfs+0xd9/0x1c0 [cifs]
+[71406.886789]  ? smb2_query_eas+0x4f0/0x4f0 [cifs]
+[71406.886792]  ? vfs_mknod+0xc0/0x320
+[71406.886795]  ? map_id_up+0x12f/0x1d0
+[71406.886797]  ? make_kprojid+0x20/0x20
+[71406.886799]  ? _raw_spin_lock+0x7a/0xd0
+[71406.886836]  cifs_statfs+0x13a/0x420 [cifs]
+[71406.886839]  statfs_by_dentry+0xa5/0xf0
+[71406.886842]  vfs_statfs+0x28/0x110
+[71406.886844]  user_statfs+0x91/0xf0
+[71406.886846]  ? vfs_statfs+0x110/0x110
+[71406.886848]  ? __schedule+0x562/0xac0
+[71406.886850]  __do_sys_statfs+0x64/0xc0
+[71406.886852]  ? user_statfs+0xf0/0xf0
+[71406.886856]  do_syscall_64+0x73/0x190
+[71406.886858]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[71406.886860] RIP: 0033:0x4a5c20
+[71406.886864] Code: Bad RIP value.
+[71406.886865] RSP: 002b:000000c000341490 EFLAGS: 00000206 ORIG_RAX: 0000000000000089
+[71406.886867] RAX: ffffffffffffffda RBX: 000000c00002ea00 RCX: 00000000004a5c20
+[71406.886868] RDX: 0000000000000000 RSI: 000000c0003415c0 RDI: 000000c0001c43c0
+[71406.886869] RBP: 000000c0003414f0 R08: 0000000000000000 R09: 0000000000000000
+[71406.886871] R10: 0000000000000000 R11: 0000000000000206 R12: ffffffffffffffff
+[71406.886871] R13: 000000000000001f R14: 000000000000001e R15: 0000000000000100
+[71406.886897] INFO: task cifsd:9136 blocked for more than 483 seconds.
+[71406.888219]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71406.889666] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71406.891125] cifsd           D    0  9136      2 0x80004000
+[71406.891130] Call Trace:
+[71406.891138]  ? __schedule+0x540/0xac0
+[71406.891147]  ? firmware_map_remove+0xe9/0xe9
+[71406.891156]  ? _raw_spin_lock+0x7a/0xd0
+[71406.891161]  schedule+0x5e/0x100
+[71406.891168]  schedule_preempt_disabled+0xa/0x10
+[71406.891173]  __mutex_lock.isra.4+0x484/0x820
+[71406.891179]  ? mutex_trylock+0x90/0x90
+[71406.891192]  ? irq_work_claim+0x2e/0x50
+[71406.891207]  ? vprintk_emit+0x11d/0x2e0
+[71406.891216]  ? mutex_lock+0xce/0xe0
+[71406.891228]  mutex_lock+0xce/0xe0
+[71406.891232]  ? __mutex_lock_slowpath+0x10/0x10
+[71406.891317]  dfs_cache_noreq_find+0xa7/0x190 [cifs]
+[71406.891378]  cifs_reconnect+0x18c/0x1510 [cifs]
+[71406.891383]  ? ___ratelimit+0x106/0x190
+[71406.891439]  ? smb2_calc_size+0x15c/0x250 [cifs]
+[71406.891505]  ? extract_hostname+0xa0/0xa0 [cifs]
+[71406.891510]  ? _raw_spin_trylock+0x91/0xe0
+[71406.891513]  ? _raw_spin_trylock_bh+0x100/0x100
+[71406.891516]  ? ___ratelimit+0x106/0x190
+[71406.891574]  cifs_handle_standard+0x252/0x270 [cifs]
+[71406.891631]  cifs_demultiplex_thread+0x124a/0x13e0 [cifs]
+[71406.891692]  ? cifs_handle_standard+0x270/0x270 [cifs]
+[71406.891696]  ? __switch_to_asm+0x40/0x70
+[71406.891698]  ? __switch_to_asm+0x34/0x70
+[71406.891701]  ? __switch_to_asm+0x40/0x70
+[71406.891703]  ? __switch_to_asm+0x34/0x70
+[71406.891706]  ? __switch_to_asm+0x40/0x70
+[71406.891709]  ? __switch_to_asm+0x34/0x70
+[71406.891712]  ? __switch_to_asm+0x40/0x70
+[71406.891715]  ? __switch_to_asm+0x34/0x70
+[71406.891718]  ? __switch_to_asm+0x40/0x70
+[71406.891720]  ? __switch_to_asm+0x34/0x70
+[71406.891723]  ? __switch_to_asm+0x40/0x70
+[71406.891725]  ? __switch_to_asm+0x34/0x70
+[71406.891727]  ? __switch_to_asm+0x40/0x70
+[71406.891729]  ? __switch_to_asm+0x34/0x70
+[71406.891732]  ? __switch_to_asm+0x40/0x70
+[71406.891734]  ? __switch_to_asm+0x34/0x70
+[71406.891737]  ? __switch_to_asm+0x40/0x70
+[71406.891739]  ? __switch_to_asm+0x34/0x70
+[71406.891741]  ? __switch_to_asm+0x40/0x70
+[71406.891744]  ? __switch_to_asm+0x34/0x70
+[71406.891746]  ? __switch_to_asm+0x40/0x70
+[71406.891749]  ? __switch_to_asm+0x34/0x70
+[71406.891751]  ? __switch_to_asm+0x40/0x70
+[71406.891753]  ? __switch_to_asm+0x34/0x70
+[71406.891756]  ? __switch_to_asm+0x40/0x70
+[71406.891758]  ? __switch_to_asm+0x34/0x70
+[71406.891763]  ? finish_task_switch+0xf6/0x370
+[71406.891767]  ? __switch_to+0x2ec/0x5e0
+[71406.891772]  ? _raw_spin_lock_irqsave+0x8d/0xf0
+[71406.891774]  ? _raw_write_lock_bh+0xe0/0xe0
+[71406.891946]  ? cifs_handle_standard+0x270/0x270 [cifs]
+[71406.891951]  kthread+0x192/0x1e0
+[71406.891955]  ? kthread_create_worker_on_cpu+0xc0/0xc0
+[71406.891958]  ret_from_fork+0x35/0x40
+[71406.891970] INFO: task kworker/0:0:16069 blocked for more than 241 seconds.
+[71406.894262]       Tainted: G            E     5.3.11-pd-5.3.y #20191029
+[71406.896328] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[71406.898113] kworker/0:0     D    0 16069      2 0x80004000
+[71406.898203] Workqueue: cifsiod refresh_cache_worker [cifs]
+[71406.898211] Call Trace:
+[71406.898220]  ? __schedule+0x540/0xac0
+[71406.898224]  ? firmware_map_remove+0xe9/0xe9
+[71406.898228]  ? _raw_read_lock_irq+0x40/0x40
+[71406.898231]  ? _raw_spin_lock+0x7a/0xd0
+[71406.898234]  schedule+0x5e/0x100
+[71406.898239]  schedule_preempt_disabled+0xa/0x10
+[71406.898242]  __mutex_lock.isra.4+0x484/0x820
+[71406.898247]  ? mutex_trylock+0x90/0x90
+[71406.898251]  ? dynamic_emit_prefix+0x29/0x220
+[71406.898255]  ? __dynamic_pr_debug+0xf8/0x140
+[71406.898260]  ? dynamic_emit_prefix+0x220/0x220
+[71406.898271]  ? update_dl_rq_load_avg+0x2c3/0x4d0
+[71406.898277]  ? mutex_lock+0xce/0xe0
+[71406.898280]  mutex_lock+0xce/0xe0
+[71406.898283]  ? __mutex_lock_slowpath+0x10/0x10
+[71406.898362]  refresh_cache_worker+0x48f/0x14a0 [cifs]
+[71406.898370]  ? __switch_to_asm+0x40/0x70
+[71406.898373]  ? __switch_to_asm+0x40/0x70
+[71406.898376]  ? __switch_to_asm+0x34/0x70
+[71406.898378]  ? __switch_to_asm+0x40/0x70
+[71406.898383]  ? __switch_to_asm+0x34/0x70
+[71406.898389]  ? __switch_to_asm+0x40/0x70
+[71406.898467]  ? find_root_ses.isra.9+0x320/0x320 [cifs]
+[71406.898472]  ? __switch_to_asm+0x40/0x70
+[71406.898476]  ? __switch_to_asm+0x40/0x70
+[71406.898479]  ? __switch_to_asm+0x34/0x70
+[71406.898484]  ? __switch_to_asm+0x40/0x70
+[71406.898488]  ? __switch_to_asm+0x34/0x70
+[71406.898490]  ? __switch_to_asm+0x40/0x70
+[71406.898499]  ? __switch_to_asm+0x34/0x70
+[71406.898502]  ? __switch_to_asm+0x40/0x70
+[71406.898505]  ? __switch_to_asm+0x40/0x70
+[71406.898508]  ? __switch_to_asm+0x34/0x70
+[71406.898516]  ? finish_task_switch+0xf6/0x370
+[71406.898519]  ? __switch_to+0x2ec/0x5e0
+[71406.898523]  ? __schedule+0x562/0xac0
+[71406.898530]  ? read_word_at_a_time+0xe/0x20
+[71406.898533]  ? strscpy+0xca/0x1d0
+[71406.898539]  process_one_work+0x373/0x6e0
+[71406.898547]  worker_thread+0x78/0x5b0
+[71406.898552]  ? rescuer_thread+0x5e0/0x5e0
+[71406.898555]  kthread+0x192/0x1e0
+[71406.898559]  ? kthread_create_worker_on_cpu+0xc0/0xc0
+[71406.898563]  ret_from_fork+0x35/0x40
+[71417.962152] fs/cifs/inode.c: CIFS VFS: in cifs_revalidate_dentry_attr as Xid: 13371 with uid: 11025
+[71417.962171] fs/cifs/dir.c: name: \SOMEDIRX
+[71417.962177] fs/cifs/inode.c: Update attributes: \SOMEDIRX inode 0x000000009f726d03 count 1 dentry: 0x00000000d22e461a d_time 4312598279 jiffies 4312748242
+[71417.962180] fs/cifs/inode.c: Getting info on \SOMEDIRX
+[71417.962367] fs/cifs/transport.c: Sending smb: smb_len=388 
 
-As I mentioned in the parallel discussion queue_work here may return
-False if the same work has been already queued. It may happen in the
-following scenario:
-
-T1 gets reference - 1
-T1 is in putting the reference - checked ref > 1
-T2 gets reference - 2
-T1 queues work
-T3 (worker) puts the reference - 1 but still didn't exit and remains
-in the queue
-T2 is in putting the reference - checked ref >1
-T2 queues work and it returns false (!) <--- error
-
-Sorry, it wasn't obvious to me when I was suggesting this yesterday.
-
-One way to fix this is to check queue_work output and "goto" to the
-beginning of the function if False. But there is always a probability
-that we end up in the same situation and it repeats and repeats again.
-I think it should resolve itself at some point in time but it doesn't
-look like a good approach.
-
-Another way to fix it is to revert the patch to the state it was at
-yesterday - to offload only the remaining part of cifsFileInfo_put()
-which will allow us to avoid the race from above. I am personally
-leaning towards this way.
-
-Other may comments about eliminating the need of *wait_oplock_handler*
-and INIT_WORK stand for yesterday's patch too.
-
-Thoughts?
-
-
-> > +       } else
-> > +               cifsFileInfo_put_final(cifs_file);
-> > +}
-> > +
-> > +/**
-> > + * cifsFileInfo_put - release a reference of file priv data
-> > + *
-> > + * Always potentially wait for oplock handler. See _cifsFileInfo_put()=
-.
-> > + */
-> > +void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
-> > +{
-> > +       _cifsFileInfo_put(cifs_file, true, true);
-> > +}
-> > +
-> >  int cifs_open(struct inode *inode, struct file *file)
-> >
-> >  {
-> > @@ -808,7 +833,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool c=
-an_flush)
-> >  int cifs_close(struct inode *inode, struct file *file)
-> >  {
-> >         if (file->private_data !=3D NULL) {
-> > -               cifsFileInfo_put(file->private_data);
-> > +               _cifsFileInfo_put(file->private_data, true, false);
-> >                 file->private_data =3D NULL;
-> >         }
-> >
-> > @@ -4742,7 +4767,7 @@ void cifs_oplock_break(struct work_struct *work)
-> >                                                              cinode);
-> >                 cifs_dbg(FYI, "Oplock release rc =3D %d\n", rc);
-> >         }
-> > -       _cifsFileInfo_put(cfile, false /* do not wait for ourself */);
-> > +       _cifsFileInfo_put(cfile, false /* do not wait for ourself */, t=
-rue);
->
-> As mentioned above, here we only need *offload* as True to not wait
-> for ourselves.
->
-> >         cifs_done_oplock_break(cinode);
-> >  }
-> >
-> > --
-> > 2.13.6
-> >
->
-> Other than that, I think we the patch is on the right track. It should
-> give us an opportunity to do file handle batching easily.
->
-> --
-> Best regards,
-> Pavel Shilovsky
+Gr, Martijn
+-- 
+Martijn de Gouw
+Designer
+Prodrive Technologies
+Mobile: +31 63 17 76 161
+Phone:  +31 40 26 76 200 
