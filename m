@@ -2,106 +2,69 @@ Return-Path: <SRS0=po33=YY=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641EACA9EC3
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Oct 2019 03:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F76CA9EC3
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Oct 2019 09:20:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 37DBC2086D
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Oct 2019 03:55:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d/ndIimS"
+	by mail.kernel.org (Postfix) with ESMTP id C67DD20862
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Oct 2019 09:20:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726845AbfJaDz0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 30 Oct 2019 23:55:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44841 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726524AbfJaDz0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 30 Oct 2019 23:55:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1572494125;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=NVfgJW3nDXWOYa6XY+/47PTAbUS5h/LHk6lmSiLVxdI=;
-        b=d/ndIimSHswm+OhJwSVC2jWUl0Y+DSsBBi0rK2AEa2tkjLLXfyUEX4/K7tiN04jKFFm/79
-        2taoPrTdnjPczyWupZ6pULwvJyXPtSD/Sp3fgRNXit4NwkxEC3bmI1Nd9H1GKnaKFsQvkI
-        2ozg/p4A0Jn8MHn0g7OQURfYzncBxBY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-x2hsDETEM_SJxD4b7CQOxA-1; Wed, 30 Oct 2019 23:55:23 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E57501800D55
-        for <linux-cifs@vger.kernel.org>; Thu, 31 Oct 2019 03:55:22 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-99.bne.redhat.com [10.64.54.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7AE411001B07;
-        Thu, 31 Oct 2019 03:55:22 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH] cifs: don't use 'pre:' for MODULE_SOFTDEP
-Date:   Thu, 31 Oct 2019 13:55:14 +1000
-Message-Id: <20191031035514.20871-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: x2hsDETEM_SJxD4b7CQOxA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+        id S1726884AbfJaJUc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 31 Oct 2019 05:20:32 -0400
+Received: from rigel.uberspace.de ([95.143.172.238]:49982 "EHLO
+        rigel.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726864AbfJaJUc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Oct 2019 05:20:32 -0400
+Received: (qmail 9749 invoked from network); 31 Oct 2019 09:20:30 -0000
+Received: from localhost (HELO webmail.rigel.uberspace.de) (127.0.0.1)
+  by ::1 with SMTP; 31 Oct 2019 09:20:30 -0000
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 31 Oct 2019 10:20:28 +0100
+From:   Moritz M <mailinglist@moritzmueller.ee>
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Subject: Re: Possible timeout problem when opening a file twice on a SMB mount
+In-Reply-To: <CAKywueSWxDA5veCWjf+vGM96TSKrJbiddt93dv=arXyizJCbmw@mail.gmail.com>
+References: <61d3d6774247fe6159456b249dbc3c63@moritzmueller.ee>
+ <CAKywueT=hWCTM=Crsafrj-8P=1mD93DY73oK=Ub8JeWc5X85fQ@mail.gmail.com>
+ <4a017b583eb0f5fab477ecbe0e43b3a1@moritzmueller.ee>
+ <CAN05THR5FE80VsnbKfpBzvt+g5jPu3rtiOqWkzU5yKoKUkhkiA@mail.gmail.com>
+ <CAKywueTOjoP-Jh7WWCi5XJhfzgK+KZs3kvHKuVG_HW0fnYYY7A@mail.gmail.com>
+ <CAKywueQUuwRK7hbbJhdquVVPre2+8GBCvnrG76L-KodoMm9m6g@mail.gmail.com>
+ <b7b7a790feac88d59fe00c9ca2f5960d@moritzmueller.ee>
+ <CAKywueQ7g9VYe=d7WU4AzL2Hv+pPznUgQBD7-RVi0ygBkhtGRw@mail.gmail.com>
+ <bdf21b8770373c9ea4c37c27a12344d8@moritzmueller.ee>
+ <CAKywueQ8woeupNRqspAuOqL8rG1hNpWN_hwLCjFUpkk4mXeCvQ@mail.gmail.com>
+ <6492326ef9d8d1a9401fac243160646f@moritzmueller.ee>
+ <CAKywueSWxDA5veCWjf+vGM96TSKrJbiddt93dv=arXyizJCbmw@mail.gmail.com>
+Message-ID: <6a49aa3e2cf17975efc5259f94c01ce7@moritzmueller.ee>
+X-Sender: mailinglist@moritzmueller.ee
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-It can cause
-to fail with
-modprobe: FATAL: Module <module> is builtin.
+Hi Pavel,
 
-RHBZ: 1767094
+Am 2019-10-30 22:51, schrieb Pavel Shilovsky:
+> I think there is a difference in your setup between v5.2.21 and v5.3.7
+> kernels. I found the issue in oplock break processing that can happen
+> if you have several shares from the same server mounted on the client.
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/cifsfs.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+I think you are right. Usually I mount multiple shares from one server.
+It could had happened that I tested it with just one share mounted when 
+using the
+v5.2 Kernel.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index f8e201c45ccb..a578699ce63c 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1677,17 +1677,17 @@ MODULE_DESCRIPTION
- =09("VFS to access SMB3 servers e.g. Samba, Macs, Azure and Windows (and "
- =09"also older servers complying with the SNIA CIFS Specification)");
- MODULE_VERSION(CIFS_VERSION);
--MODULE_SOFTDEP("pre: ecb");
--MODULE_SOFTDEP("pre: hmac");
--MODULE_SOFTDEP("pre: md4");
--MODULE_SOFTDEP("pre: md5");
--MODULE_SOFTDEP("pre: nls");
--MODULE_SOFTDEP("pre: aes");
--MODULE_SOFTDEP("pre: cmac");
--MODULE_SOFTDEP("pre: sha256");
--MODULE_SOFTDEP("pre: sha512");
--MODULE_SOFTDEP("pre: aead2");
--MODULE_SOFTDEP("pre: ccm");
--MODULE_SOFTDEP("pre: gcm");
-+MODULE_SOFTDEP("ecb");
-+MODULE_SOFTDEP("hmac");
-+MODULE_SOFTDEP("md4");
-+MODULE_SOFTDEP("md5");
-+MODULE_SOFTDEP("nls");
-+MODULE_SOFTDEP("aes");
-+MODULE_SOFTDEP("cmac");
-+MODULE_SOFTDEP("sha256");
-+MODULE_SOFTDEP("sha512");
-+MODULE_SOFTDEP("aead2");
-+MODULE_SOFTDEP("ccm");
-+MODULE_SOFTDEP("gcm");
- module_init(init_cifs)
- module_exit(exit_cifs)
---=20
-2.13.6
 
+> Could you test the patch to see if it works for your environment?
+
+I did and it worked ;)
+
+Thanks.
