@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EF0CA9EC7
-	for <linux-cifs@archiver.kernel.org>; Sun,  3 Nov 2019 01:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70896CA9ED1
+	for <linux-cifs@archiver.kernel.org>; Sun,  3 Nov 2019 01:21:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 49E54215EA
-	for <linux-cifs@archiver.kernel.org>; Sun,  3 Nov 2019 01:21:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47CC1215EA
+	for <linux-cifs@archiver.kernel.org>; Sun,  3 Nov 2019 01:21:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727367AbfKCBV2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 2 Nov 2019 21:21:28 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57544 "EHLO mx1.suse.de"
+        id S1727370AbfKCBV3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 2 Nov 2019 21:21:29 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57556 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727346AbfKCBV1 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 2 Nov 2019 21:21:27 -0400
+        id S1727335AbfKCBV2 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 2 Nov 2019 21:21:28 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id D2C1FAE9A;
-        Sun,  3 Nov 2019 01:21:25 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id A24E1B135;
+        Sun,  3 Nov 2019 01:21:26 +0000 (UTC)
 From:   Aurelien Aptel <aaptel@suse.com>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH v4 3/6] cifs: add server param
-Date:   Sun,  3 Nov 2019 02:21:09 +0100
-Message-Id: <20191103012112.12212-4-aaptel@suse.com>
+Subject: [PATCH v4 4/6] cifs: switch servers depending on binding state
+Date:   Sun,  3 Nov 2019 02:21:10 +0100
+Message-Id: <20191103012112.12212-5-aaptel@suse.com>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20191103012112.12212-1-aaptel@suse.com>
 References: <20191103012112.12212-1-aaptel@suse.com>
@@ -36,158 +36,223 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-As we get down to the transport layer, plenty of functions are passed
-the session pointer and assume the transport to use is ses->server.
+Currently a lot of the code to initialize a connection & session uses
+the cifs_ses as input. But depending on if we are opening a new session
+or a new channel we need to use different server pointers.
 
-Instead we modify those functions to pass (ses, server) so that we
-can decouple the session from the server.
+Add a "binding" flag in cifs_ses and a helper function that returns
+the server ptr a session should use (only in the sess establishment
+code path).
 
 Signed-off-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/cifsglob.h      |  3 ++-
- fs/cifs/cifsproto.h     |  1 +
- fs/cifs/smb2proto.h     |  3 ++-
- fs/cifs/smb2transport.c | 27 ++++++++++++++-------------
- fs/cifs/transport.c     |  5 +++--
- 5 files changed, 22 insertions(+), 17 deletions(-)
+ fs/cifs/cifs_spnego.c |  2 +-
+ fs/cifs/cifsglob.h    | 10 ++++++++++
+ fs/cifs/connect.c     |  4 ++--
+ fs/cifs/sess.c        |  5 +++--
+ fs/cifs/smb2ops.c     |  2 +-
+ fs/cifs/smb2pdu.c     | 31 ++++++++++++++++---------------
+ 6 files changed, 33 insertions(+), 21 deletions(-)
 
+diff --git a/fs/cifs/cifs_spnego.c b/fs/cifs/cifs_spnego.c
+index 7f01c6e60791..7b9b876b513b 100644
+--- a/fs/cifs/cifs_spnego.c
++++ b/fs/cifs/cifs_spnego.c
+@@ -98,7 +98,7 @@ struct key_type cifs_spnego_key_type = {
+ struct key *
+ cifs_get_spnego_key(struct cifs_ses *sesInfo)
+ {
+-	struct TCP_Server_Info *server = sesInfo->server;
++	struct TCP_Server_Info *server = cifs_ses_server(sesInfo);
+ 	struct sockaddr_in *sa = (struct sockaddr_in *) &server->dstaddr;
+ 	struct sockaddr_in6 *sa6 = (struct sockaddr_in6 *) &server->dstaddr;
+ 	char *description, *dp;
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 132dd8fd81ff..bff3c97288e0 100644
+index bff3c97288e0..0426815288f4 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -230,7 +230,8 @@ struct smb_version_operations {
- 	bool (*compare_fids)(struct cifsFileInfo *, struct cifsFileInfo *);
- 	/* setup request: allocate mid, sign message */
- 	struct mid_q_entry *(*setup_request)(struct cifs_ses *,
--						struct smb_rqst *);
-+					     struct TCP_Server_Info *,
-+					     struct smb_rqst *);
- 	/* setup async request: allocate mid, sign message */
- 	struct mid_q_entry *(*setup_async_request)(struct TCP_Server_Info *,
- 						struct smb_rqst *);
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index fe597d3d5208..737547ddfa79 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -109,6 +109,7 @@ extern int SendReceive(const unsigned int /* xid */ , struct cifs_ses *,
- extern int SendReceiveNoRsp(const unsigned int xid, struct cifs_ses *ses,
- 			    char *in_buf, int flags);
- extern struct mid_q_entry *cifs_setup_request(struct cifs_ses *,
-+				struct TCP_Server_Info *,
- 				struct smb_rqst *);
- extern struct mid_q_entry *cifs_setup_async_request(struct TCP_Server_Info *,
- 						struct smb_rqst *);
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 71b2930b8e0b..a469fa211f37 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -46,7 +46,8 @@ extern int smb2_verify_signature(struct smb_rqst *, struct TCP_Server_Info *);
- extern int smb2_check_receive(struct mid_q_entry *mid,
- 			      struct TCP_Server_Info *server, bool log_error);
- extern struct mid_q_entry *smb2_setup_request(struct cifs_ses *ses,
--			      struct smb_rqst *rqst);
-+					      struct TCP_Server_Info *,
-+					      struct smb_rqst *rqst);
- extern struct mid_q_entry *smb2_setup_async_request(
- 			struct TCP_Server_Info *server, struct smb_rqst *rqst);
- extern struct cifs_ses *smb2_find_smb_ses(struct TCP_Server_Info *server,
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 148d7942c796..c6ef52e44408 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -610,18 +610,18 @@ smb2_mid_entry_alloc(const struct smb2_sync_hdr *shdr,
- }
+@@ -994,6 +994,7 @@ struct cifs_ses {
+ 	bool sign;		/* is signing required? */
+ 	bool need_reconnect:1; /* connection reset, uid now invalid */
+ 	bool domainAuto:1;
++	bool binding:1; /* are we binding the session? */
+ 	__u16 session_flags;
+ 	__u8 smb3signingkey[SMB3_SIGN_KEY_SIZE];
+ 	__u8 smb3encryptionkey[SMB3_SIGN_KEY_SIZE];
+@@ -1021,6 +1022,15 @@ struct cifs_ses {
+ 	atomic_t chan_seq; /* round robin state */
+ };
  
- static int
--smb2_get_mid_entry(struct cifs_ses *ses, struct smb2_sync_hdr *shdr,
--		   struct mid_q_entry **mid)
-+smb2_get_mid_entry(struct cifs_ses *ses, struct TCP_Server_Info *server,
-+		   struct smb2_sync_hdr *shdr, struct mid_q_entry **mid)
++static inline
++struct TCP_Server_Info *cifs_ses_server(struct cifs_ses *ses)
++{
++	if (ses->binding)
++		return ses->chans[ses->chan_count].server;
++	else
++		return ses->server;
++}
++
+ static inline bool
+ cap_unix(struct cifs_ses *ses)
  {
--	if (ses->server->tcpStatus == CifsExiting)
-+	if (server->tcpStatus == CifsExiting)
- 		return -ENOENT;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index d50f0676bf8a..9ce6301f82c3 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -5176,7 +5176,7 @@ int
+ cifs_negotiate_protocol(const unsigned int xid, struct cifs_ses *ses)
+ {
+ 	int rc = 0;
+-	struct TCP_Server_Info *server = ses->server;
++	struct TCP_Server_Info *server = cifs_ses_server(ses);
  
--	if (ses->server->tcpStatus == CifsNeedReconnect) {
-+	if (server->tcpStatus == CifsNeedReconnect) {
- 		cifs_dbg(FYI, "tcp session dead - return to caller to retry\n");
- 		return -EAGAIN;
+ 	if (!server->ops->need_neg || !server->ops->negotiate)
+ 		return -ENOSYS;
+@@ -5203,7 +5203,7 @@ cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+ 		   struct nls_table *nls_info)
+ {
+ 	int rc = -ENOSYS;
+-	struct TCP_Server_Info *server = ses->server;
++	struct TCP_Server_Info *server = cifs_ses_server(ses);
+ 
+ 	ses->capabilities = server->capabilities;
+ 	if (linuxExtEnabled == 0)
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 85bd644f9773..bb3e506435de 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -342,6 +342,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+ 					 struct cifs_ses *ses)
+ {
++	struct TCP_Server_Info *server = cifs_ses_server(ses);
+ 	NEGOTIATE_MESSAGE *sec_blob = (NEGOTIATE_MESSAGE *)pbuffer;
+ 	__u32 flags;
+ 
+@@ -354,9 +355,9 @@ void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+ 		NTLMSSP_NEGOTIATE_128 | NTLMSSP_NEGOTIATE_UNICODE |
+ 		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_NEGOTIATE_EXTENDED_SEC |
+ 		NTLMSSP_NEGOTIATE_SEAL;
+-	if (ses->server->sign)
++	if (server->sign)
+ 		flags |= NTLMSSP_NEGOTIATE_SIGN;
+-	if (!ses->server->session_estab || ses->ntlmssp->sesskey_per_smbsess)
++	if (!server->session_estab || ses->ntlmssp->sesskey_per_smbsess)
+ 		flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
+ 
+ 	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index ea634581791a..9afda3dffaba 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -316,7 +316,7 @@ smb2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ {
+ 	int rc;
+ 
+-	ses->server->CurrentMid = 0;
++	cifs_ses_server(ses)->CurrentMid = 0;
+ 	rc = SMB2_negotiate(xid, ses);
+ 	/* BB we probably don't need to retry with modern servers */
+ 	if (rc == -EAGAIN)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 05149862aea4..b9a583a81542 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -791,7 +791,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 	struct kvec rsp_iov;
+ 	int rc = 0;
+ 	int resp_buftype;
+-	struct TCP_Server_Info *server = ses->server;
++	struct TCP_Server_Info *server = cifs_ses_server(ses);
+ 	int blob_offset, blob_length;
+ 	char *security_blob;
+ 	int flags = CIFS_NEG_OP;
+@@ -813,7 +813,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 	memset(server->preauth_sha_hash, 0, SMB2_PREAUTH_HASH_SIZE);
+ 	memset(ses->preauth_sha_hash, 0, SMB2_PREAUTH_HASH_SIZE);
+ 
+-	if (strcmp(ses->server->vals->version_string,
++	if (strcmp(server->vals->version_string,
+ 		   SMB3ANY_VERSION_STRING) == 0) {
+ 		req->Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
+ 		req->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
+@@ -829,7 +829,7 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ 		total_len += 8;
+ 	} else {
+ 		/* otherwise send specific dialect */
+-		req->Dialects[0] = cpu_to_le16(ses->server->vals->protocol_id);
++		req->Dialects[0] = cpu_to_le16(server->vals->protocol_id);
+ 		req->DialectCount = cpu_to_le16(1);
+ 		total_len += 2;
  	}
+@@ -1171,7 +1171,7 @@ SMB2_sess_alloc_buffer(struct SMB2_sess_data *sess_data)
+ 	int rc;
+ 	struct cifs_ses *ses = sess_data->ses;
+ 	struct smb2_sess_setup_req *req;
+-	struct TCP_Server_Info *server = ses->server;
++	struct TCP_Server_Info *server = cifs_ses_server(ses);
+ 	unsigned int total_len;
  
--	if (ses->server->tcpStatus == CifsNeedNegotiate &&
-+	if (server->tcpStatus == CifsNeedNegotiate &&
- 	   shdr->Command != SMB2_NEGOTIATE)
- 		return -EAGAIN;
+ 	rc = smb2_plain_req_init(SMB2_SESSION_SETUP, NULL, (void **) &req,
+@@ -1258,22 +1258,23 @@ SMB2_sess_establish_session(struct SMB2_sess_data *sess_data)
+ {
+ 	int rc = 0;
+ 	struct cifs_ses *ses = sess_data->ses;
++	struct TCP_Server_Info *server = cifs_ses_server(ses);
  
-@@ -638,11 +638,11 @@ smb2_get_mid_entry(struct cifs_ses *ses, struct smb2_sync_hdr *shdr,
- 		/* else ok - we are shutting down the session */
+-	mutex_lock(&ses->server->srv_mutex);
+-	if (ses->server->ops->generate_signingkey) {
+-		rc = ses->server->ops->generate_signingkey(ses);
++	mutex_lock(&server->srv_mutex);
++	if (server->ops->generate_signingkey) {
++		rc = server->ops->generate_signingkey(ses);
+ 		if (rc) {
+ 			cifs_dbg(FYI,
+ 				"SMB3 session key generation failed\n");
+-			mutex_unlock(&ses->server->srv_mutex);
++			mutex_unlock(&server->srv_mutex);
+ 			return rc;
+ 		}
  	}
+-	if (!ses->server->session_estab) {
+-		ses->server->sequence_number = 0x2;
+-		ses->server->session_estab = true;
++	if (!server->session_estab) {
++		server->sequence_number = 0x2;
++		server->session_estab = true;
+ 	}
+-	mutex_unlock(&ses->server->srv_mutex);
++	mutex_unlock(&server->srv_mutex);
  
--	*mid = smb2_mid_entry_alloc(shdr, ses->server);
-+	*mid = smb2_mid_entry_alloc(shdr, server);
- 	if (*mid == NULL)
- 		return -ENOMEM;
+ 	cifs_dbg(FYI, "SMB2/3 session established successfully\n");
  	spin_lock(&GlobalMid_Lock);
--	list_add_tail(&(*mid)->qhead, &ses->server->pending_mid_q);
-+	list_add_tail(&(*mid)->qhead, &server->pending_mid_q);
- 	spin_unlock(&GlobalMid_Lock);
- 
- 	return 0;
-@@ -675,24 +675,25 @@ smb2_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- }
- 
- struct mid_q_entry *
--smb2_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
-+smb2_setup_request(struct cifs_ses *ses, struct TCP_Server_Info *server,
-+		   struct smb_rqst *rqst)
+@@ -1509,7 +1510,7 @@ SMB2_select_sec(struct cifs_ses *ses, struct SMB2_sess_data *sess_data)
  {
- 	int rc;
- 	struct smb2_sync_hdr *shdr =
- 			(struct smb2_sync_hdr *)rqst->rq_iov[0].iov_base;
- 	struct mid_q_entry *mid;
+ 	int type;
  
--	smb2_seq_num_into_buf(ses->server, shdr);
-+	smb2_seq_num_into_buf(server, shdr);
- 
--	rc = smb2_get_mid_entry(ses, shdr, &mid);
-+	rc = smb2_get_mid_entry(ses, server, shdr, &mid);
- 	if (rc) {
--		revert_current_mid_from_hdr(ses->server, shdr);
-+		revert_current_mid_from_hdr(server, shdr);
- 		return ERR_PTR(rc);
- 	}
- 
--	rc = smb2_sign_rqst(rqst, ses->server);
-+	rc = smb2_sign_rqst(rqst, server);
- 	if (rc) {
--		revert_current_mid_from_hdr(ses->server, shdr);
-+		revert_current_mid_from_hdr(server, shdr);
- 		cifs_delete_mid(mid);
- 		return ERR_PTR(rc);
- 	}
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index ed4ce2954db1..94f6ea02aa3e 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -930,7 +930,8 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- }
- 
- struct mid_q_entry *
--cifs_setup_request(struct cifs_ses *ses, struct smb_rqst *rqst)
-+cifs_setup_request(struct cifs_ses *ses, struct TCP_Server_Info *ignored,
-+		   struct smb_rqst *rqst)
+-	type = smb2_select_sectype(ses->server, ses->sectype);
++	type = smb2_select_sectype(cifs_ses_server(ses), ses->sectype);
+ 	cifs_dbg(FYI, "sess setup type %d\n", type);
+ 	if (type == Unspecified) {
+ 		cifs_dbg(VFS,
+@@ -1537,7 +1538,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+ 		const struct nls_table *nls_cp)
  {
- 	int rc;
- 	struct smb_hdr *hdr = (struct smb_hdr *)rqst->rq_iov[0].iov_base;
-@@ -1047,7 +1048,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 	}
+ 	int rc = 0;
+-	struct TCP_Server_Info *server = ses->server;
++	struct TCP_Server_Info *server = cifs_ses_server(ses);
+ 	struct SMB2_sess_data *sess_data;
  
- 	for (i = 0; i < num_rqst; i++) {
--		midQ[i] = server->ops->setup_request(ses, &rqst[i]);
-+		midQ[i] = server->ops->setup_request(ses, server, &rqst[i]);
- 		if (IS_ERR(midQ[i])) {
- 			revert_current_mid(server, i);
- 			for (j = 0; j < i; j++)
+ 	cifs_dbg(FYI, "Session Setup\n");
+@@ -1563,7 +1564,7 @@ SMB2_sess_setup(const unsigned int xid, struct cifs_ses *ses,
+ 	/*
+ 	 * Initialize the session hash with the server one.
+ 	 */
+-	memcpy(ses->preauth_sha_hash, ses->server->preauth_sha_hash,
++	memcpy(ses->preauth_sha_hash, server->preauth_sha_hash,
+ 	       SMB2_PREAUTH_HASH_SIZE);
+ 
+ 	while (sess_data->func)
 -- 
 2.16.4
 
