@@ -8,33 +8,33 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 840D7C5DF60
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Nov 2019 21:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54234C5DF60
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Nov 2019 21:44:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3739521882
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Nov 2019 21:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0AD6021882
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Nov 2019 21:44:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="UXZ+gIvr"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="RsCkRYNG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729989AbfKEVm0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Nov 2019 16:42:26 -0500
-Received: from mout.web.de ([212.227.15.3]:56159 "EHLO mout.web.de"
+        id S1729839AbfKEVod (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 5 Nov 2019 16:44:33 -0500
+Received: from mout.web.de ([212.227.15.4]:55075 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729747AbfKEVm0 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 5 Nov 2019 16:42:26 -0500
+        id S1729680AbfKEVod (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 5 Nov 2019 16:44:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1572990136;
-        bh=eTKu9EhCet3dmCm5fMl3kzNcurmyEyUCoyJuLDVwWj4=;
+        s=dbaedf251592; t=1572990264;
+        bh=0qnYFMDMyA7y0OfkTj2iUOaga/IHqw5JPmaH5tNvbVc=;
         h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
-        b=UXZ+gIvrdgGTyGNrYsRuKAGrS3T1ztQ49s9NW8BbKMEr4sw7pNXCGAAPdWY6WTdEa
-         ubRG5jfcdm9NqVXllqFhDokWcIICNXARCw/uh9rvKlW7JkCNwo17l1n4TbBF+P8M0U
-         N2IXqB63JetNsyOgaJv+wcat1xf+SzSgrrF29BjQ=
+        b=RsCkRYNGty3MLOh/R5H+mNg+y+22YJ+B9dOaEjQ8oEKUZD/L81gzcIRTRKiNWpNdz
+         W9PBuc1lLzH35TzQFUaW5aM5Yo8nwFBJTPmvmAk0lhuQHGh70DD52WRW9xr7UgIx6X
+         +rQsPm41ulaGneHj6Im0lh19it1OmxXF7z3Ya530=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([78.48.164.204]) by smtp.web.de (mrweb003
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MFcDF-1ig6o90KBx-00EaJb; Tue, 05
- Nov 2019 22:42:16 +0100
-Subject: [PATCH 1/2] CIFS: Use memdup_user() rather than duplicating its
- implementation
+Received: from [192.168.1.2] ([78.48.164.204]) by smtp.web.de (mrweb002
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MYejS-1iOAkP3zEo-00VLq5; Tue, 05
+ Nov 2019 22:44:24 +0100
+Subject: [PATCH 2/2] CIFS: Use common error handling code in
+ smb2_ioctl_query_info()
 From:   Markus Elfring <Markus.Elfring@web.de>
 To:     linux-cifs@vger.kernel.org, Ronnie Sahlberg <lsahlber@redhat.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>
@@ -84,8 +84,8 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <df3d1da0-a907-80f3-b8f1-6ec7615086d9@web.de>
-Date:   Tue, 5 Nov 2019 22:42:13 +0100
+Message-ID: <bfd1b925-7190-ba05-aeaf-f5f3a3e3d124@web.de>
+Date:   Tue, 5 Nov 2019 22:44:21 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.1
 MIME-Version: 1.0
@@ -93,73 +93,118 @@ In-Reply-To: <b797b2fc-1a33-7311-70d7-dd258d721a03@web.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:zVgHY/tLl0DgTUrHlaIsTs+ghIDoq/nAsyESs+m2Vvv6afj9lXY
- D8pEyCanIRHZkgoI9ZiGjmgl/tc2aHo+ZQtP3DwvsNrjr7OKiUV3+NNBIC9l7eeN9Ynsvjy
- R6J9RCzyRhpsMIRN7tb1EJ8ckx4KZy9v7sXv74RrKNAV3l0bzNL1DH7T8Hn9Qw24F4za4di
- FrfouKqwPyzdYR5bv9OiA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zmxHj2FgTwg=:WavkJNZsT5CIYITR1Am806
- qd76cDAfyzfuGRSwM9Xn7fLH97qgSZoUR4hNyGVtubpt8eAucb48N+DX8XkG8E9Xt2x09O5l5
- dfoWRLpPS07fcfGzbR2P7wvPYNdwRrchQIXkuHtNNl3jfFPjHHyZqGAzHlcyBVmVRpkkVCEct
- pXBCixMVdcri1lx+ecQUHDh1CS5IaOSlD8qxkhXSl9M5+zCh/XiftD+H9qr6EyBox8aUsiU8V
- tmichAyJ3QEvPROUSN5WYbmWNd9oiiYor5KHX+AhUJjZt06U+jh9tqlYLxPpkembegiwgbpNN
- BN72vTyrR+ilTramaL1k26YyLFuljYjpLPjCKn8+H8/IOyhTa5B2yhm5xtRLpU4zDB2zrdcIo
- IW6eHftD6hQtPF+qfGTcy6trd9rVJOg2ojhcStBUD1/8zyo+GlQ1S+uPftDaDj+NTbbwqzqQW
- r4z9N2tLGNVdSQY8oM9s/BH/+awRI5LdIpAlt+7pkh4jSi8TsoGe0dwyKsftkJ6qVSqJMXst4
- NCeQ/S7CNTQn3gBw538KMEisE8JvXCAxhf0PIXNaduTxGWKkB1oIaoTocI+RkGyF2h6RuIqLG
- C2g4je0cVz6AZUE5uia3pmdpQKmSr9ewgE2b3xP0jq0Yx5Sx2Icu4r2PZ+RZaQ1bkGm4eIxjm
- 5qD9Wr4/0PPWzTGTJYU+54v8XgA+uYK3b5dbeC6FmPcp7IQbWO3IUW9NfNMIVjob28jpqzttz
- 5nlwBeUwzhjZJKVhMlW46EXk5fp6hq4+s+5G5affEnGFhg3XxcxaCjj/uTfr+CDnZWgpwR1zh
- s5CPpCF6X6hk2JYZHPMZ75ERfWIa7xmgPgM/SJykh8FrKsGuf8a1j8K2ANEWf2YGZDk4Atls5
- 8ER1tqJAOhyHwuxP6GHfz+JEzGkWJwrVeL2MZypVQLiMs2YqF6rqFaSQxgGsqmp8PwHjJnxHs
- eDfkm79CjqfxQjw4VmAInFgjowoWv6f2fKyDD/vmnZWx1f3yWMN9J96Q/j9CWjd8X56oZNOUv
- MN/Z7T685XrEcdV9cD7slwXkFOvak4V487uy9l6QJpNoFBLSMRUV55HsMNB/2CWcnz+8N4dpI
- LGsObt1+isxA5FTgysQ8NQ6FLPSUhfz3kUZwRcUFWkheP5P6q4hinwbe15e/0lQpXYJDEa+Ec
- S5X7Aeu1eoeDYwGX6BoeBlkSz7Y7C0i+gWcEHp+FtHZv/bXGosxc0IvM5fXUcwqud12SOn7Xr
- 2Rpw33Dirrd74dImqnrWGRY/HIdtH7kZwfxMH1G0UmL7qM9dn6+dP20D7TLo=
+X-Provags-ID: V03:K1:SWfNy9wh8i4ZLQM/dRU5mV9Gqh6cS80cu7li+ZwtkhaMVDhmFaJ
+ jhoHLnRIQGbEIRvZl6e/gEw1sPEV2EIcNc180nUQxpZQefZacnKGxDepdtl0V2ODkK5j2Pc
+ x4oJYPKidLpAFjEhM/w5zbxaqGsnoKk6N2apLdNFGcjz5dqbYKca9piQRk4A8MwJuuL6lsV
+ PMuoTmVpdGCiXBrIPD1aw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:99U6//HAIGA=:KvydFjGSVqPmdvUTEq06zE
+ X6krgbJP8pFsAnFnEVYGdsvcSRfwGCfPg+RQ7uXDmomAC7+ZX2ePIntvswvJ03Y2UIdK9vecu
+ MkUScc708ERkzK05DCiDTk996z102+T2SChJzQGo4RFEp2UpL+poh5VeFzjbg1TVgehgLswIQ
+ Ztm9c2Te8JLwnDtBGSVoxz7u/eiKAS4NNao8MpXkWv43yRYzT8sLfmjOJvd2uRCRQmJ0HH8RQ
+ GTTqQFKr4HkKvKvPtcJx8e4PU4FkjC1ORMxSpqIKcR7ALkdh+nqPFcQHCpSc3s6IfeQPNeypK
+ iOOajOVxVA3qogYPD74CN9qq1zsM/gHFAGf96RRTQDME18A6t1cmIQ7nFDOP4WGn9vvt8eqYn
+ Qd+iXrFx+tKGXj3s23UjKvUyQW9B6kU23Ak4tZJrdGiP3L58Biu8DjeBgrWGsDF0hJoDqkX6U
+ WESIFhMofWDn/G+rmiuyaEbVumIvX9R9VegTtQW6M8zGHNyFTV6jzvzNUndYXtFAVY+Xgd9NQ
+ pNvTpV8zlz8kr/mRlykSXZTidx4DxPJq01QWtkUktxiOR1A0OkzsW1KulSJtcuijlMhVbnY31
+ XPqEcxFywpUXtysc9n4CVyUsKcDZpbPJ/mdnCfYhxQTwB5Or/m3vIwSGCO/VCFNBo6X80oovf
+ jqm/dtHChf9WYtzWDMeYnz59Yyz8sHfTv7g/MY0ji/wKHbvRewErBtKmZRG8htm7ehueg03Xy
+ nuJ+Jr9dRCh1kgiEN2WtEs95BKwBxQ2tJJgyut/DGPtE170KidiVFvgyC5eQDhjqJhjVSufTK
+ eZWdNANwobXMoGsm6M4lJVDRUW3RB4HDdg4/w0F8Q+Jcq5Qj6MStcZnisQrlxz62E6Ecwpueh
+ CwlnRjOo/Z0YejacZCytZg7lboH4q6stbg43o68RuVObPgCHDSEZr+NIcv6ILt4NgupBeoA0+
+ Pr54EW4sJS7Bl6tRAOMEFPrwYyxI1fomfko2o755GH8vM59v1y/QTdK+gFHvNOELG/en8r+MG
+ edcCrtv74rYF4RXEJTcdEcY2Q7ltQNSOAwJrR7DbjG9pCMi/qdYK/jm7QvxpdNsKQvXz/yEiU
+ qGsaSLH7W7SI5ClEaCEO2iUZPj6GcDNEnDL5oSXjYfQkQXW2loAmhxt7KCI0imVj3Ct0K6Cis
+ 223qqdTT8hN0I1bmSEWVMsdhGbdrD3/jwNh4jGi+RKaqH5SYOf4QPeSr9Y6Zl0IemaR8V/+Sv
+ KtG/27/gICttr4g0c2di1agNtBoNiN4wLM3GQnocHtyQkKgw726duXJ2+bmE=
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Tue, 5 Nov 2019 21:30:25 +0100
+Date: Tue, 5 Nov 2019 22:26:53 +0100
 
-Reuse existing functionality from memdup_user() instead of keeping
-duplicate source code.
+Move the same error code assignments so that such exception handling
+can be better reused at the end of this function.
 
-Generated by: scripts/coccinelle/api/memdup_user.cocci
+This issue was detected by using the Coccinelle software.
 
-Fixes: f5b05d622a3e99e6a97a189fe500414be802a05c ("cifs: add IOCTL for QUER=
-Y_INFO passthrough to userspace")
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 =2D--
- fs/cifs/smb2ops.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ fs/cifs/smb2ops.c | 45 +++++++++++++++++++++++----------------------
+ 1 file changed, 23 insertions(+), 22 deletions(-)
 
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 9cbb0ae0e53e..fde2e6d241a8 100644
+index fde2e6d241a8..fde912aabb20 100644
 =2D-- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -1413,15 +1413,10 @@ smb2_ioctl_query_info(const unsigned int xid,
- 	if (smb3_encryption_required(tcon))
- 		flags |=3D CIFS_TRANSFORM_REQ;
+@@ -1535,35 +1535,32 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 		if (le32_to_cpu(io_rsp->OutputCount) < qi.input_buffer_length)
+ 			qi.input_buffer_length =3D le32_to_cpu(io_rsp->OutputCount);
+ 		if (qi.input_buffer_length > 0 &&
+-		    le32_to_cpu(io_rsp->OutputOffset) + qi.input_buffer_length > rsp_io=
+v[1].iov_len) {
+-			rc =3D -EFAULT;
+-			goto iqinf_exit;
+-		}
+-		if (copy_to_user(&pqi->input_buffer_length, &qi.input_buffer_length,
+-				 sizeof(qi.input_buffer_length))) {
+-			rc =3D -EFAULT;
+-			goto iqinf_exit;
+-		}
++		    le32_to_cpu(io_rsp->OutputOffset) + qi.input_buffer_length
++		    > rsp_iov[1].iov_len)
++			goto e_fault;
++
++		if (copy_to_user(&pqi->input_buffer_length,
++				 &qi.input_buffer_length,
++				 sizeof(qi.input_buffer_length)))
++			goto e_fault;
++
+ 		if (copy_to_user((void __user *)pqi + sizeof(struct smb_query_info),
+ 				 (const void *)io_rsp + le32_to_cpu(io_rsp->OutputOffset),
+-				 qi.input_buffer_length)) {
+-			rc =3D -EFAULT;
+-			goto iqinf_exit;
+-		}
++				 qi.input_buffer_length))
++			goto e_fault;
+ 	} else {
+ 		pqi =3D (struct smb_query_info __user *)arg;
+ 		qi_rsp =3D (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
+ 		if (le32_to_cpu(qi_rsp->OutputBufferLength) < qi.input_buffer_length)
+ 			qi.input_buffer_length =3D le32_to_cpu(qi_rsp->OutputBufferLength);
+-		if (copy_to_user(&pqi->input_buffer_length, &qi.input_buffer_length,
+-				 sizeof(qi.input_buffer_length))) {
+-			rc =3D -EFAULT;
+-			goto iqinf_exit;
+-		}
+-		if (copy_to_user(pqi + 1, qi_rsp->Buffer, qi.input_buffer_length)) {
+-			rc =3D -EFAULT;
+-			goto iqinf_exit;
+-		}
++		if (copy_to_user(&pqi->input_buffer_length,
++				 &qi.input_buffer_length,
++				 sizeof(qi.input_buffer_length)))
++			goto e_fault;
++
++		if (copy_to_user(pqi + 1, qi_rsp->Buffer,
++				 qi.input_buffer_length))
++			goto e_fault;
+ 	}
 
--	buffer =3D kmalloc(qi.output_buffer_length, GFP_KERNEL);
--	if (buffer =3D=3D NULL)
--		return -ENOMEM;
--
--	if (copy_from_user(buffer, arg + sizeof(struct smb_query_info),
--			   qi.output_buffer_length)) {
--		rc =3D -EFAULT;
--		goto iqinf_exit;
--	}
-+	buffer =3D memdup_user(arg + sizeof(struct smb_query_info),
-+			     qi.output_buffer_length);
-+	if (IS_ERR(buffer))
-+		return PTR_ERR(buffer);
+  iqinf_exit:
+@@ -1579,6 +1576,10 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+ 	free_rsp_buf(resp_buftype[2], rsp_iov[2].iov_base);
+ 	return rc;
++
++e_fault:
++	rc =3D -EFAULT;
++	goto iqinf_exit;
+ }
 
- 	/* Open */
- 	memset(&open_iov, 0, sizeof(open_iov));
+ static ssize_t
 =2D-
 2.24.0
 
