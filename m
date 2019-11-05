@@ -2,43 +2,45 @@ Return-Path: <SRS0=8LXX=Y5=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2E5C5DF60
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Nov 2019 21:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 840D7C5DF60
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Nov 2019 21:42:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C545B21882
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Nov 2019 21:38:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3739521882
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Nov 2019 21:42:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="By5GKG3/"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="UXZ+gIvr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729989AbfKEVi0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Nov 2019 16:38:26 -0500
-Received: from mout.web.de ([212.227.15.4]:45601 "EHLO mout.web.de"
+        id S1729989AbfKEVm0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 5 Nov 2019 16:42:26 -0500
+Received: from mout.web.de ([212.227.15.3]:56159 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729680AbfKEVi0 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 5 Nov 2019 16:38:26 -0500
+        id S1729747AbfKEVm0 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 5 Nov 2019 16:42:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1572989897;
-        bh=Z0h9yJgXnSUcWdErBXHxvaR+qAseoj0Jwa1kwKZvWjs=;
-        h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
-        b=By5GKG3/XauRyP4gGGo/jEQFdb5JlgyZ/lkCeciTGQjvQ70TBL/6c9nJOVD9ytTfQ
-         Y81rZyXzB8tzj3Hmwh/kqzxVRh1xdRDBlLaZSc/6/eGI5jBbns6laW29yR7HsBzoeM
-         7UPxQU3mwqnUUPiB5bpWDJHnwhLcxBG4KLNvzSoo=
+        s=dbaedf251592; t=1572990136;
+        bh=eTKu9EhCet3dmCm5fMl3kzNcurmyEyUCoyJuLDVwWj4=;
+        h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
+        b=UXZ+gIvrdgGTyGNrYsRuKAGrS3T1ztQ49s9NW8BbKMEr4sw7pNXCGAAPdWY6WTdEa
+         ubRG5jfcdm9NqVXllqFhDokWcIICNXARCw/uh9rvKlW7JkCNwo17l1n4TbBF+P8M0U
+         N2IXqB63JetNsyOgaJv+wcat1xf+SzSgrrF29BjQ=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.2] ([78.48.164.204]) by smtp.web.de (mrweb002
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0Lxf1X-1hqkIl4Bzf-017AXB; Tue, 05
- Nov 2019 22:38:17 +0100
-To:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
+Received: from [192.168.1.2] ([78.48.164.204]) by smtp.web.de (mrweb003
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MFcDF-1ig6o90KBx-00EaJb; Tue, 05
+ Nov 2019 22:42:16 +0100
+Subject: [PATCH 1/2] CIFS: Use memdup_user() rather than duplicating its
+ implementation
+From:   Markus Elfring <Markus.Elfring@web.de>
+To:     linux-cifs@vger.kernel.org, Ronnie Sahlberg <lsahlber@redhat.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         kernel-janitors@vger.kernel.org, Aurelien Aptel <aaptel@suse.com>
-From:   Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH 0/2] CIFS: Adjustments for smb2_ioctl_query_info()
+References: <b797b2fc-1a33-7311-70d7-dd258d721a03@web.de>
 Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
  +v43YoGpDNyhgA0w9CEhuwfZrE91GocMtjLO67TAc2i2nxMc/FJRDI0OemO4VJ9RwID6ltwt
@@ -82,55 +84,82 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <b797b2fc-1a33-7311-70d7-dd258d721a03@web.de>
-Date:   Tue, 5 Nov 2019 22:38:15 +0100
+Message-ID: <df3d1da0-a907-80f3-b8f1-6ec7615086d9@web.de>
+Date:   Tue, 5 Nov 2019 22:42:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.1
 MIME-Version: 1.0
+In-Reply-To: <b797b2fc-1a33-7311-70d7-dd258d721a03@web.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:B+T63bsrdVK7IeDZFAXORLQRkM1LR5oi1X3PWAnIzQtetpH249q
- ZkQ/dJ2HnOpCiLx3HTQuS10Xw8JK4pAnLZ1BPY7kqcSlMdfkZMJVZPtR3lMTeaDA67zwFsz
- KW5YsR96AbDz6dvByurxtk8cDtK/vapGzDRAzQKEFx2zquTH9wGkIjIKiqPWbhxBn24xZEX
- veP5yVdWsZt6bBpkfGHtA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:25K7cMc+uzo=:suAa/4UDPTeSi6PRwAHKXN
- sa2tI8gEgU1s0DozqaCjb/iYgOJi5cAUcUCel57c4UQJHDueRCwskbr/0woz9oAj/M1XkWgaj
- WkA7s308uQsi3t+oOqR5dhVl0Ewscl5/K1lazje1+lSsa7g7DLGH3QcyOWruhCAuMTPSX6U1o
- tINe5to8MasWU+HyKSCoAoH36aGmdXQ88xMAE25xeoviIAUDORW1kgIOI4b4tTowMvPxhLlsD
- uaMU6f7SLbhpccVY6i9icoYE/Y1ey6yX4qnVAVEM+lDNW9Jup8IHqXhiyzrr4m/D9kDyMv0an
- GRRakd669Kyb2WUXsQxXlaklCbJ4mZEWjRugq2suw7heDtf6aYpHyvIBkXI9mpYq04mP4zb0M
- OUbLukvRQOO0pN4+dE3ZL0zCmhxHDD1H0sBJbnLCpTmUmcNRA/FE8//De9OpQy0Js+qS8L/Jy
- NRNc+mRiJ5qG/ruDlS+Z99EtV40SgPs1YLvUg2SJHkNUCgeAW399DwGcI8EHoKmM/+4mxO578
- b0Uyi0nenTW+FW229WcdhwkIpPqJbrIeDlfC+EKNFmIYQzWsfKuUxE/lslrFqPQxCzbtNctEL
- A7OS2a24ImONlYGfpb2AafHaY64UMCG+2ob7vw1CRqrsgscAOMR9E9htHkBmOX3pkAJeqWAKR
- kMHq+dWDeiiNdUkHZ9PPQDxFDHdYkBaoZZAQ5Br3qVe22trI+WAlT+62QCbQDmPgGTCBXatvy
- IYkcg1SWU5YItuJJZrztzJxJxHIUo3fOgkalFq8PNGK5jzevLLqktljXcL8fPJQFFEvFvlG7c
- 5SWvdeRLBEwTbU3z+kR+JoU125jyFFB+vHIrtPM0SCzWAkmeXX72Ak7aVrt0bv2YYASA2Afj4
- 6k3I+m0wuSRTd5RGPu9HPRDXtbGCuKFEuZ1jJFi0y8W7tg58G4fZmt6+XbX3QrYvfJER8FX6i
- /rmH1IT6wrZ7gCobFEdsw1O+LyRHOPkOYb6DPQt5xtIhAIjx28uE8hu5w5MzpNz2LPTb+zyW3
- Hx9X26X4bcGDkUziiS5MBFHoDf+EPiLhMyZcFG2aTSYSAWIcYhjAqkf6meei2VVk3bKsnp6/B
- K1ZxzQR5NCTtQal1oDMJMhPgBQa1lG7q+KI+ejLG+ehoJYvyH5U+fHoCiY55CXD7UUlDfJjq9
- ud46X8byLCaaaNyg1Fl+MR0QeUkOtPixRF8mmVZSCnWvCK3s1srtYxaFlD7/HbvV0jOSuU6kP
- N4I1P5Qs+KQnCFpyf0aDzyYJ2+h6JeAOxEE6Qqjmgzfey3DlOIppWm6rNR2k=
+X-Provags-ID: V03:K1:zVgHY/tLl0DgTUrHlaIsTs+ghIDoq/nAsyESs+m2Vvv6afj9lXY
+ D8pEyCanIRHZkgoI9ZiGjmgl/tc2aHo+ZQtP3DwvsNrjr7OKiUV3+NNBIC9l7eeN9Ynsvjy
+ R6J9RCzyRhpsMIRN7tb1EJ8ckx4KZy9v7sXv74RrKNAV3l0bzNL1DH7T8Hn9Qw24F4za4di
+ FrfouKqwPyzdYR5bv9OiA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zmxHj2FgTwg=:WavkJNZsT5CIYITR1Am806
+ qd76cDAfyzfuGRSwM9Xn7fLH97qgSZoUR4hNyGVtubpt8eAucb48N+DX8XkG8E9Xt2x09O5l5
+ dfoWRLpPS07fcfGzbR2P7wvPYNdwRrchQIXkuHtNNl3jfFPjHHyZqGAzHlcyBVmVRpkkVCEct
+ pXBCixMVdcri1lx+ecQUHDh1CS5IaOSlD8qxkhXSl9M5+zCh/XiftD+H9qr6EyBox8aUsiU8V
+ tmichAyJ3QEvPROUSN5WYbmWNd9oiiYor5KHX+AhUJjZt06U+jh9tqlYLxPpkembegiwgbpNN
+ BN72vTyrR+ilTramaL1k26YyLFuljYjpLPjCKn8+H8/IOyhTa5B2yhm5xtRLpU4zDB2zrdcIo
+ IW6eHftD6hQtPF+qfGTcy6trd9rVJOg2ojhcStBUD1/8zyo+GlQ1S+uPftDaDj+NTbbwqzqQW
+ r4z9N2tLGNVdSQY8oM9s/BH/+awRI5LdIpAlt+7pkh4jSi8TsoGe0dwyKsftkJ6qVSqJMXst4
+ NCeQ/S7CNTQn3gBw538KMEisE8JvXCAxhf0PIXNaduTxGWKkB1oIaoTocI+RkGyF2h6RuIqLG
+ C2g4je0cVz6AZUE5uia3pmdpQKmSr9ewgE2b3xP0jq0Yx5Sx2Icu4r2PZ+RZaQ1bkGm4eIxjm
+ 5qD9Wr4/0PPWzTGTJYU+54v8XgA+uYK3b5dbeC6FmPcp7IQbWO3IUW9NfNMIVjob28jpqzttz
+ 5nlwBeUwzhjZJKVhMlW46EXk5fp6hq4+s+5G5affEnGFhg3XxcxaCjj/uTfr+CDnZWgpwR1zh
+ s5CPpCF6X6hk2JYZHPMZ75ERfWIa7xmgPgM/SJykh8FrKsGuf8a1j8K2ANEWf2YGZDk4Atls5
+ 8ER1tqJAOhyHwuxP6GHfz+JEzGkWJwrVeL2MZypVQLiMs2YqF6rqFaSQxgGsqmp8PwHjJnxHs
+ eDfkm79CjqfxQjw4VmAInFgjowoWv6f2fKyDD/vmnZWx1f3yWMN9J96Q/j9CWjd8X56oZNOUv
+ MN/Z7T685XrEcdV9cD7slwXkFOvak4V487uy9l6QJpNoFBLSMRUV55HsMNB/2CWcnz+8N4dpI
+ LGsObt1+isxA5FTgysQ8NQ6FLPSUhfz3kUZwRcUFWkheP5P6q4hinwbe15e/0lQpXYJDEa+Ec
+ S5X7Aeu1eoeDYwGX6BoeBlkSz7Y7C0i+gWcEHp+FtHZv/bXGosxc0IvM5fXUcwqud12SOn7Xr
+ 2Rpw33Dirrd74dImqnrWGRY/HIdtH7kZwfxMH1G0UmL7qM9dn6+dP20D7TLo=
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Tue, 5 Nov 2019 22:32:23 +0100
+Date: Tue, 5 Nov 2019 21:30:25 +0100
 
-Two update suggestions were taken into account
-from static source code analysis.
+Reuse existing functionality from memdup_user() instead of keeping
+duplicate source code.
 
-Markus Elfring (2):
-  Use memdup_user() rather than duplicating its implementation
-  Use common error handling code in smb2_ioctl_query_info()
+Generated by: scripts/coccinelle/api/memdup_user.cocci
 
- fs/cifs/smb2ops.c | 58 ++++++++++++++++++++++-------------------------
- 1 file changed, 27 insertions(+), 31 deletions(-)
+Fixes: f5b05d622a3e99e6a97a189fe500414be802a05c ("cifs: add IOCTL for QUER=
+Y_INFO passthrough to userspace")
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ fs/cifs/smb2ops.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 9cbb0ae0e53e..fde2e6d241a8 100644
+=2D-- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1413,15 +1413,10 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 	if (smb3_encryption_required(tcon))
+ 		flags |=3D CIFS_TRANSFORM_REQ;
+
+-	buffer =3D kmalloc(qi.output_buffer_length, GFP_KERNEL);
+-	if (buffer =3D=3D NULL)
+-		return -ENOMEM;
+-
+-	if (copy_from_user(buffer, arg + sizeof(struct smb_query_info),
+-			   qi.output_buffer_length)) {
+-		rc =3D -EFAULT;
+-		goto iqinf_exit;
+-	}
++	buffer =3D memdup_user(arg + sizeof(struct smb_query_info),
++			     qi.output_buffer_length);
++	if (IS_ERR(buffer))
++		return PTR_ERR(buffer);
+
+ 	/* Open */
+ 	memset(&open_iov, 0, sizeof(open_iov));
 =2D-
 2.24.0
 
