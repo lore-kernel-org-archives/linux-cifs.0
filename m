@@ -2,137 +2,209 @@ Return-Path: <SRS0=+Q0n=ZE=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4151C43331
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Nov 2019 19:34:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FB5C17440
+	for <linux-cifs@archiver.kernel.org>; Tue, 12 Nov 2019 21:52:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C841D20818
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Nov 2019 19:34:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JXJ9cJeG"
+	by mail.kernel.org (Postfix) with ESMTP id 3C89020818
+	for <linux-cifs@archiver.kernel.org>; Tue, 12 Nov 2019 21:52:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726970AbfKLTed (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 12 Nov 2019 14:34:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59128 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726958AbfKLTed (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Nov 2019 14:34:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1573587271;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=T5DefNER+aV1euCWowrL7STfT7DW0q2UlUNjm6spyC8=;
-        b=JXJ9cJeGxp0KqfmM9yuEQGAtYAhe9/BRJNfV1gHFNW2IDMns5r98FSKBO5IAnMHkt/iyV2
-        P+Vb2qrlbiNz3yXAzwPYCKXTRHWZ/4GQwnW79hF7O8dw77XYGHZOiL7lzhqWqkan9bUZDa
-        031BH+E1IhUdJDqnuJmJ9WR06aZgKSk=
-Received: from mail-yw1-f69.google.com (mail-yw1-f69.google.com
- [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-I55CSb71MQG-nRmALnfEVg-1; Tue, 12 Nov 2019 14:34:30 -0500
-Received: by mail-yw1-f69.google.com with SMTP id 202so14976568ywf.8
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Nov 2019 11:34:30 -0800 (PST)
+        id S1726923AbfKLVwy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 12 Nov 2019 16:52:54 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:38262 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726936AbfKLVwx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Nov 2019 16:52:53 -0500
+Received: from mail-pl1-f200.google.com ([209.85.214.200])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <matthew.ruffell@canonical.com>)
+        id 1iUe5i-0002uG-P9
+        for linux-cifs@vger.kernel.org; Tue, 12 Nov 2019 21:52:50 +0000
+Received: by mail-pl1-f200.google.com with SMTP id h7so13803341pll.18
+        for <linux-cifs@vger.kernel.org>; Tue, 12 Nov 2019 13:52:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=vmZLAqD1L7tNQ17Pu9kYcjSWeSH67xEYMADCwlwj9Ko=;
-        b=RvKHbxO5Gs/W5Srbq70/uOMOJqtHKU1TFWzAos0ZXh3jPcjvi/cR5MAYja/fR9uKXa
-         G8lPU6gQ1OF7dgW80bTV0IV8e+E2Dqpz8B+HL94udS/jDksbswdX1lCj0OEBpOig+TNp
-         LT8pSozcofMwEt0rK1+xvm3Btg1LfkmWHVqONO9dv7j9DHMLHA6RH+jNvD2iWc3chKEJ
-         9WI+oL1bDf8Wt7vqETDFmQsHP55ivRri9VquIO/LiDTbn4wwTKKg0uV/RZcvTlOsQB72
-         wf5qU0pdFUeqreLa0r3PKVk5rl515dDmv0UTUrRxb5mEjCqOdsakaFox28EcjngVdOoU
-         kfvA==
-X-Gm-Message-State: APjAAAWfAFVdNeKmeHZqkvIVkI1hDFSeTelm/k3sbxxx/ykx3T7DMJvT
-        oMYIjO2Rcd10niIDklQVj/bA1EsuIvUvOhtGVjr5fo8Jcpk5woAg2riz/7A6VgLQGy0usTkiyOR
-        cAveO90qQeUo6CsuBlSmnQw==
-X-Received: by 2002:a25:dd07:: with SMTP id u7mr16697331ybg.255.1573587269762;
-        Tue, 12 Nov 2019 11:34:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxy+2EzJsrvURST7YvgYjCgmaL5Ir/ZlhQPQWu749jWSOmZp0fvivhiIfAvWh6EVnTB81vLtQ==
-X-Received: by 2002:a25:dd07:: with SMTP id u7mr16697297ybg.255.1573587269161;
-        Tue, 12 Nov 2019 11:34:29 -0800 (PST)
-Received: from hut.sorensonfamily.com (198-0-247-150-static.hfc.comcastbusiness.net. [198.0.247.150])
-        by smtp.gmail.com with ESMTPSA id 197sm8369099ywf.42.2019.11.12.11.34.28
-        for <linux-cifs@vger.kernel.org>
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-transfer-encoding:content-language;
+        bh=14po5GSb10XCLM5qiypNjpVOhIJ2gDZn74IerOODagU=;
+        b=qEMVc79DvfxIJeO6zrEa0Iee1ZvsK+9d+d06RL5gmS53siMHYJaEMHE959uFcjUQVs
+         icaHgYJjF7g1N8Vx+dCaO45akHHY4g4UvXB4rJ88Ay5RnXsE6OtIsVyG6OeX+mqMQBGT
+         OyKzLzolwXbNZmlPe+SXjsgpIa2TnM8e/76H2fhbkgb2+SJVqSXPxzRs/7xNNchkp+Q3
+         x03uYsZnum55ncY+zhYd0t/DReTw2LCWQ2YyIQalLvyRWQ0pcndWzi81uagjFnkxy1PB
+         SzNPD/pmjJWSTCp/Ia+erZr2rS4F33n7iyOzCZfbJLCIuVYziYutSdtNabetRw6ryGGy
+         RuWg==
+X-Gm-Message-State: APjAAAWcDOTZ9ZXRRRdMzEGngezISUxU4C0WyrzyU3bQ1v7+fixzT5of
+        VgDHCwjcfcwyqV00F/iS1V8zH/ePa3rhTJerRFTk2ZbIYCX9Fe1cKBkrrB2RLWGC6OezATGQ6x8
+        ZPB35zCkUuHn1qG45tLnSSBEE+VO5Ltnn/VIvDEs=
+X-Received: by 2002:a63:a34e:: with SMTP id v14mr37705834pgn.58.1573595569429;
+        Tue, 12 Nov 2019 13:52:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzRQ4ayLxp3P51eM5qEG9Du8S4iRHGIsCZEIxHf6DB2qmLMCB4hmzX1hqvGtGLuvK2qov0B9w==
+X-Received: by 2002:a63:a34e:: with SMTP id v14mr37705804pgn.58.1573595569089;
+        Tue, 12 Nov 2019 13:52:49 -0800 (PST)
+Received: from [192.168.1.107] (222-154-99-146-fibre.sparkbb.co.nz. [222.154.99.146])
+        by smtp.gmail.com with ESMTPSA id y14sm20335341pff.69.2019.11.12.13.52.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Nov 2019 11:34:28 -0800 (PST)
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-From:   Frank Sorenson <sorenson@redhat.com>
-Subject: A process killed while opening a file can result in leaked open
- handle on the server
-Message-ID: <0326b8d9-d66c-1df0-2d04-91b9a861c10f@redhat.com>
-Date:   Tue, 12 Nov 2019 13:34:27 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        Tue, 12 Nov 2019 13:52:48 -0800 (PST)
+To:     linux-cifs@vger.kernel.org
+Cc:     sfrench@samba.org, palcantara@suse.de
+From:   Matthew Ruffell <matthew.ruffell@canonical.com>
+Subject: PROBLEM: DFS Caching feature causing problems traversing multi-tier
+ DFS setups
+Message-ID: <05aa2995-e85e-0ff4-d003-5bb08bd17a22@canonical.com>
+Date:   Wed, 13 Nov 2019 10:52:44 +1300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-X-MC-Unique: I55CSb71MQG-nRmALnfEVg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If a process opening a file is killed while waiting for a SMB2_CREATE
-response from the server, the response may not be handled by the client,
-leaking an open file handle on the server.
+Hi Steve, Paulo, and maintainers of CIFS,
 
-This can be reproduced with the following:
+We have come across a problem where kernels 5.0-rc1 and onwards cannot mount
+a multi tier DFS setup, while kernels 4.20 and below can mount the share fine.
 
-# mount //vm3/user1 /mnt/vm3 -overs=3D3,sec=3Dntlmssp,credentials=3D/root/.=
-user1_smb_creds
-# cd /mnt/vm3
-# echo foo > foo
+The DFS tiering structure looks like this:
 
-# for i in {1..100} ; do cat foo >/dev/null 2>&1 & sleep 0.0001 ; kill -9 $=
-! ; done
+Domain virtual DFS (i.e. \\company.com\folders\share)
+|-- Domain controller DFS (i.e. \\regional-dc.company.com\folders\share)
+    |-- Regional DFS Server (i.e. \\regional-dfs.company.com\folders\share)
+        |-- Actual file server (i.e. \\regional-svr.company.com\share)
 
-(increase count if necessary--100 appears sufficient to cause multiple leak=
-ed file handles)
+On the 5.x series kernels, after getting the DFS referrals list through to the
+Regional DFS Server, which responds with the correct server/share, instead of
+going to the Actual file server, the kernel backtracks from the Regional DFS
+Server back to the Domain controller and requests the share there. Of course,
+this share does not exist on the Domain controller, as it only exists on the
+Actual file server, and the connection dies.
 
+We have collected a packet capture, and the flow looks like this:
 
-The client will stop waiting for the response, and will output
-the following when the response does arrive:
+4.18.0-21-generic Ubuntu kernel - Good
 
-    CIFS VFS: Close unmatched open
+Host                                            request/response
+--------------------------------------------    ----------------------------------------------------
+Domain controller / Domain DFS Root             company.com\folders
+Domain controller / Domain DFS Root             Referral List
+Regional Domain Controller / Domain DFS Root    start convo
+Regional Domain Controller / Domain DFS Root    <Regional Domain Controller>\Folders\Country\<Share> referral
+Regional Domain Controller / Domain DFS Root    <Regional Domain Controller>\Folders\Country\<Share> referral
+Regional DFS server                             start convo
+Regional DFS server                             <Regional DFS Server>\Root\Country\<Share>
+Regional DFS server                             STATUS_PATH_NOT_COVERED
+Regional DFS server                             request referrals
+Regional DFS server                             Referral List
+Actual File Server                              convo started
+Actual File Server                              <Actual File Server>\<Share>
+Actual File Server                              Good response
 
-on the server side, an open file handle is leaked.  If using samba,
-the following will show these open files:
+5.0.0-26-generic Ubuntu kernel - Bad
 
+Host                                            request/response
+--------------------------------------------    -------------------------------------------
+Domain controller / Domain DFS Root             company.com\folders
+Regional Domain Controller / Domain DFS Root    start convo
+Regional Domain Controller / Domain DFS Root    <Regional Domain Controller>\Folders\Country\<Share>
+Regional Domain Controller / Domain DFS Root    STATUS_PATH_NOT_COVERED
+Regional DFS server                             start convo
+Regional DFS server                             <Regional DFS Server>\Root\Country\<Share>
+Regional DFS server                             STATUS_PATH_NOT_COVERED
+Regional Domain Controller / Domain DFS Root    <Regional DFS Server>\Root\Country\<Share>
+Regional Domain Controller / Domain DFS Root    STATUS_PATH_NOT_COVERED
 
-# smbstatus | grep -i Locked -A1000
-Locked files:
-Pid          Uid        DenyMode   Access      R/W        Oplock           =
-SharePath   Name   Time
----------------------------------------------------------------------------=
------------------------
-25936        501        DENY_NONE  0x80        RDONLY     NONE             =
-/home/user1   .   Tue Nov 12 12:29:24 2019
-25936        501        DENY_NONE  0x80        RDONLY     NONE             =
-/home/user1   .   Tue Nov 12 12:29:24 2019
-25936        501        DENY_NONE  0x120089    RDONLY     LEASE(RWH)       =
-/home/user1   foo   Tue Nov 12 12:29:24 2019
-25936        501        DENY_NONE  0x120089    RDONLY     LEASE(RWH)       =
-/home/user1   foo   Tue Nov 12 12:29:24 2019
-25936        501        DENY_NONE  0x120089    RDONLY     LEASE(RWH)       =
-/home/user1   foo   Tue Nov 12 12:29:24 2019
-25936        501        DENY_NONE  0x120089    RDONLY     LEASE(RWH)       =
-/home/user1   foo   Tue Nov 12 12:29:24 2019
-25936        501        DENY_NONE  0x120089    RDONLY     LEASE(RWH)       =
-/home/user1   foo   Tue Nov 12 12:29:24 2019
+If you are interested in any parts of the packet capture, let us know and I will
+provide you with portions that you need.
 
+We also enabled CIFS dynamic debugging with:
 
-(also tracked https://bugzilla.redhat.com/show_bug.cgi?id=3D1771691)
+echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
+echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
+echo 7 > /proc/fs/cifs/cifsFYI
 
-Frank
---
-Frank Sorenson
-sorenson@redhat.com
-Principal Software Maintenance Engineer
-Global Support Services - filesystems
-Red Hat
+From there the debugging output was more or less the same between the two kernel
+versions, until the problematic area:
+
+Linux 4.18:
+
+Full log: https://paste.ubuntu.com/p/D9XwBbvTXc/
+
+Status code returned 0xc0000257 STATUS_PATH_NOT_COVERED
+fs/cifs/smb2maperror.c: Mapping SMB2 status code 0xc0000257 to POSIX err -66
+fs/cifs/connect.c: build_unc_path_to_root: full_path=\\<Regional DFS Server>\Root\Country\<Share>
+fs/cifs/smb2ops.c: smb2_get_dfs_refer path <\<Regional DFS Server>\Root\Country\<Share>>
+fs/cifs/misc.c: num_referrals: 1 dfs flags: 0x2 ...
+fs/cifs/dns_resolve.c: dns_resolve_server_name_to_ip: resolved: <Actual File Server> to <IPV4 Address>
+fs/cifs/connect.c: Username: XXX
+// mounts the share successfully
+
+Linux 5.0:
+
+Full log: https://paste.ubuntu.com/p/9sXPj7WMQv/
+
+Status code returned 0xc0000257 STATUS_PATH_NOT_COVERED
+fs/cifs/smb2maperror.c: Mapping SMB2 status code 0xc0000257 to POSIX err -66
+fs/cifs/connect.c: build_unc_path_to_root: full_path=\\<Regional DFS Server>\Root\Country\<Share>
+fs/cifs/connect.c: build_unc_path_to_root: full_path=\\<Regional DFS Server>\Root\Country\<Share>
+fs/cifs/dfs_cache.c: do_dfs_cache_find: search path: \<Regional DFS Server>\Root\Country\<Share>
+fs/cifs/dfs_cache.c: do_dfs_cache_find: cache miss
+fs/cifs/dfs_cache.c: do_dfs_cache_find: DFS referral request for \<Regional DFS Server>\Root\Country\<Share>
+fs/cifs/smb2ops.c: smb2_get_dfs_refer path <\<Regional DFS Server>\Root\Country\<Share>>
+fs/cifs/smb2pdu.c: SMB2 IOCTL
+Status code returned 0xc0000225 STATUS_NOT_FOUND
+fs/cifs/smb2maperror.c: Mapping SMB2 status code 0xc0000225 to POSIX err -2
+// mounting the share fails shortly after
+
+Since there seems to be problems with how referrals are handled, I examined
+the commit history, and came across the new DFS caching feature introduced in
+5.0-rc1.
+
+I built a test kernel at:
+
+commit e7b602f43719fc6173ae86d2de8f6f07c6858ddd
+Author: Paulo Alcantara <palcantara@suse.de>
+Date: Wed Nov 14 15:38:51 2018 -0200
+Subject: cifs: Save TTL value when parsing DFS referrals
+
+Which is the commit directly before the first commit of the DFS caching feature,
+
+commit 54be1f6c1c37498bba557049df646cc239fa37e3
+Author: Paulo Alcantara <palcantara@suse.de>
+Date: Wed Nov 14 16:01:21 2018 -0200
+Subject: cifs: Add DFS cache routines
+
+I also built a test kernel at the end of the patch series which implements the
+DFS caching feature, at:
+
+commit 14e92c5dc7a1a1d4a82fb7142b5642837fef962a
+Author: Steve French <stfrench@microsoft.com>
+Date: Mon Dec 24 01:05:22 2018 -0600
+Subject: cifs: Minor Kconfig clarification
+
+We then tried to mount the CIFS share, and found that:
+
+e7b602f43719fc6173ae86d2de8f6f07c6858ddd -> mounts successfully
+14e92c5dc7a1a1d4a82fb7142b5642837fef962a -> fails to mount.
+
+So there is a problem somewhere in the DFS caching feature, covered in the
+following commits:
+
+https://paste.ubuntu.com/p/XcNwp3dVBV/
+
+We have also tried 5.3.5 mainline kernel, and the issue is still present.
+
+We are available to help out with gathering more debugging data and trying
+test patches. Please let us know what data to collect, or patches to test, and
+we will collect whatever you need to get this fixed.
+
+Thanks,
+Matthew Ruffell
+Sustaining Engineer @ Canonical
 
