@@ -2,160 +2,105 @@ Return-Path: <SRS0=3kj9=ZF=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB90C43331
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Nov 2019 01:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1832C43331
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Nov 2019 01:16:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A536222C1
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Nov 2019 01:11:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99F1B2196E
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Nov 2019 01:16:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="JaUT76es"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YyudXKpz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727020AbfKMBL3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 12 Nov 2019 20:11:29 -0500
-Received: from mx.cjr.nz ([51.158.111.142]:48048 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726979AbfKMBL3 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 12 Nov 2019 20:11:29 -0500
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 77E4C81354;
-        Wed, 13 Nov 2019 01:11:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1573607486;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uZEQRbM/obvQw2d02TXsXsliBHOvXePVFSDZ+2A5iIU=;
-        b=JaUT76esqFPJdrfaGT1Q3JGlzLFUG6z64XxP874x2CT8v46h70GevfLTDg3dt58RekB1nK
-        BBl99ufDEHW64XtIdt+acM6fTu7k2k0jtHyaOl6lvKO+H+Z1CjxBLwVdQDzR67djCOdSqR
-        iG1rmRPuKDNULzmzhmlidPB+M7BAB8Tv3XHMYArSB6d3uvOmeLHlOHfHRunslCYn/Ups5y
-        NhX5IDSgVAvblUYKHz3SmQGO38GuSKTnaUqdTWWCOKRAMGVgF0tmrOEN3eHvE4fnVPkg1x
-        Ncl3hqXIK6YkiuSwjpSUaGXrFuwTQy1Y3gVUUUrFGwnx88a+ICOuM57sYO/PJg==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Matthew Ruffell <matthew.ruffell@canonical.com>,
-        linux-cifs@vger.kernel.org
-Cc:     sfrench@samba.org
-Subject: Re: PROBLEM: DFS Caching feature causing problems traversing
- multi-tier DFS setups
-In-Reply-To: <05aa2995-e85e-0ff4-d003-5bb08bd17a22@canonical.com>
-References: <05aa2995-e85e-0ff4-d003-5bb08bd17a22@canonical.com>
-Date:   Tue, 12 Nov 2019 22:11:20 -0300
-Message-ID: <87imnooa13.fsf@cjr.nz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        id S1727180AbfKMBQp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 12 Nov 2019 20:16:45 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:38331 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727124AbfKMBQp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Nov 2019 20:16:45 -0500
+Received: by mail-pg1-f195.google.com with SMTP id 15so213979pgh.5
+        for <linux-cifs@vger.kernel.org>; Tue, 12 Nov 2019 17:16:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id;
+        bh=+lOE/k6LVJEXdnmts7jJUIQUP0fNfgL7TBq9P5cqt00=;
+        b=YyudXKpzR789Z54Wun5UFUDV/VfYUvR56CFlpTl9KUlwO/gV5GDVb6hQazu8xNPd5D
+         l8h6oeLE8+2DnJvrlIFRc9XT1mE4GemDCo2FAfPKlSAVe7q+sZycKF6fEM1kY/v7Uzqz
+         b5jztLQCZDUHpwEqes33Zb8s/K/3TYHFI+yHit1wZDN2Uwo2TObCcUeHsFvKxMndiWgD
+         RsbS2pojoUAdwwmVy56TLtnbfa6ME4/fYGoisQwMVpLLZd9m2XXoAdRa3DT8F1tg2kII
+         M4Brzqz8j91FqATtyw2yUvOpGRaZB2cKR38w807BTbPI2B3CQvxRpPJnCygpsKvh795F
+         irKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=+lOE/k6LVJEXdnmts7jJUIQUP0fNfgL7TBq9P5cqt00=;
+        b=GQ8zhX88hJyYRHtveB8knMKnC/QyvtFaxzmP9gR5luQNfT7ka08ED4F8hext7szlnh
+         zc0wItyv3701Rl9JvPmz27OcK3TVmD6M3489C8590ASRALJDgO3tETOJ3FMAbtoICD6g
+         Z7M9Zgdy3sVdqcv6D5qjyMJA0dTp1RzbKBffqfONFkzfnDfDLFSOHO38XjVH9nGIih8O
+         yTISrRIhrBGR9trtHx+GBynF7AOT3+kmq2SKO++zYcqcy5jIwEOMTFFKl6rl9ldH7iqy
+         syqRD7FhSrkpuZYFYgWmW7i/wNM3QS05a8ggzHN9dGm71veXBnn9+yvtGff2KFcPQRU3
+         ZszQ==
+X-Gm-Message-State: APjAAAWtB7SMSaurbKof2l67Nh4RTslJGDIT6BIeTx3aJeBhm7DGnvwi
+        hZoTMZrUYxlspNXdWYn2J1pNOGY=
+X-Google-Smtp-Source: APXvYqzhWIxDp5JGd6jAWASxzRGGbbLdHjg2NvtHL50Hu6KqxyOKJaffG50RrW8PioWwa4FY3OaiuQ==
+X-Received: by 2002:aa7:9ab0:: with SMTP id x16mr1030971pfi.139.1573607803809;
+        Tue, 12 Nov 2019 17:16:43 -0800 (PST)
+Received: from ubuntu-vm.mshome.net ([167.220.2.106])
+        by smtp.gmail.com with ESMTPSA id f13sm219703pfa.57.2019.11.12.17.16.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Nov 2019 17:16:42 -0800 (PST)
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+X-Google-Original-From: Pavel Shilovsky <pshilov@microsoft.com>
+To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
+Subject: [PATCH] CIFS: Respect O_SYNC and O_DIRECT flags during reconnect
+Date:   Tue, 12 Nov 2019 17:16:35 -0800
+Message-Id: <20191113011635.3511-1-pshilov@microsoft.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Matthew,
+Currently the client translates O_SYNC and O_DIRECT flags
+into corresponding SMB create options when openning a file.
+The problem is that on reconnect when the file is being
+re-opened the client doesn't set those flags and it causes
+a server to reject re-open requests because create options
+don't match. The latter means that any subsequent system
+call against that open file fail until a share is re-mounted.
 
-Thanks for the report.
+Fix this by properly setting SMB create options when
+re-openning files after reconnects.
 
-Matthew Ruffell <matthew.ruffell@canonical.com> writes:
+Fixes: 1013e760d10e6: ("SMB3: Don't ignore O_SYNC/O_DSYNC and O_DIRECT flags")
+Cc: Stable <stable@vger.kernel.org>
+Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+---
+ fs/cifs/file.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-> We have come across a problem where kernels 5.0-rc1 and onwards cannot mo=
-unt
-> a multi tier DFS setup, while kernels 4.20 and below can mount the share =
-fine.
->
-> The DFS tiering structure looks like this:
->
-> Domain virtual DFS (i.e. \\company.com\folders\share)
-> |-- Domain controller DFS (i.e. \\regional-dc.company.com\folders\share)
-> =C2=A0=C2=A0=C2=A0 |-- Regional DFS Server (i.e. \\regional-dfs.company.c=
-om\folders\share)
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |-- Actual file server (i.e. \=
-\regional-svr.company.com\share)
->
-> On the 5.x series kernels, after getting the DFS referrals list through t=
-o the
-> Regional DFS Server, which responds with the correct server/share, instea=
-d of
-> going to the Actual file server, the kernel backtracks from the Regional =
-DFS
-> Server back to the Domain controller and requests the share there. Of cou=
-rse,
-> this share does not exist on the Domain controller, as it only exists on =
-the
-> Actual file server, and the connection dies.
-
-I've got some DFS cache patches[1] and haven't sent them yet due to lack
-of time and testing. Those contain a lot of important fixes but none of
-them seem to fix the issue you're having -- thus I won't ask you to
-apply them on top.
-
-Instead, could you please try below changes?
-
-Thanks,
-Paulo
-
-[1] https://git.cjr.nz/linux.git/log/?h=3Dcifs-dfscache
-
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 3991d6c8f255..9158d5d14ac9 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -4777,6 +4777,15 @@ static int is_path_remote(struct cifs_sb_info *cifs_=
-sb, struct smb_vol *vol,
- }
-=20
- #ifdef CONFIG_CIFS_DFS_UPCALL
-+static inline void set_root_tcon(struct cifs_tcon *tcon,
-+				 struct cifs_tcon **root)
-+{
-+	spin_lock(&cifs_tcp_ses_lock);
-+	tcon->tc_count++;
-+	spin_unlock(&cifs_tcp_ses_lock);
-+	*root =3D tcon;
-+}
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index b6f544bc6c73..89617bb058ae 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -721,6 +721,13 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 	if (backup_cred(cifs_sb))
+ 		create_options |= CREATE_OPEN_BACKUP_INTENT;
+ 
++	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
++	if (cfile->f_flags & O_SYNC)
++		create_options |= CREATE_WRITE_THROUGH;
 +
- int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
- {
- 	int rc =3D 0;
-@@ -4878,18 +4887,10 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct=
- smb_vol *vol)
- 	/* Cache out resolved root server */
- 	(void)dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb),
- 			     root_path + 1, NULL, NULL);
--	/*
--	 * Save root tcon for additional DFS requests to update or create a new
--	 * DFS cache entry, or even perform DFS failover.
--	 */
--	spin_lock(&cifs_tcp_ses_lock);
--	tcon->tc_count++;
--	tcon->dfs_path =3D root_path;
-+	kfree(root_path);
- 	root_path =3D NULL;
--	tcon->remap =3D cifs_remap(cifs_sb);
--	spin_unlock(&cifs_tcp_ses_lock);
-=20
--	root_tcon =3D tcon;
-+	set_root_tcon(tcon, &root_tcon);
-=20
- 	for (count =3D 1; ;) {
- 		if (!rc && tcon) {
-@@ -4926,6 +4927,15 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct =
-smb_vol *vol)
- 			mount_put_conns(cifs_sb, xid, server, ses, tcon);
- 			rc =3D mount_get_conns(vol, cifs_sb, &xid, &server, &ses,
- 					     &tcon);
-+			/*
-+			 * Ensure that DFS referrals go through new root server.
-+			 */
-+			if (!rc && tcon &&
-+			    (tcon->share_flags & (SHI1005_FLAGS_DFS |
-+						  SHI1005_FLAGS_DFS_ROOT))) {
-+				cifs_put_tcon(root_tcon);
-+				set_root_tcon(tcon, &root_tcon);
-+			}
- 		}
- 		if (rc) {
- 			if (rc =3D=3D -EACCES || rc =3D=3D -EOPNOTSUPP)
++	if (cfile->f_flags & O_DIRECT)
++		create_options |= CREATE_NO_BUFFER;
++
+ 	if (server->ops->get_lease_key)
+ 		server->ops->get_lease_key(inode, &cfile->fid);
+ 
+-- 
+2.17.1
+
