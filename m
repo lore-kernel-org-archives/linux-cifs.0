@@ -2,257 +2,133 @@ Return-Path: <SRS0=3kj9=ZF=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B64C43141
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Nov 2019 18:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5FB1C432C3
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Nov 2019 22:15:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E52C206F4
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Nov 2019 18:46:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573670795;
-	bh=lESbQP5An6nmu6kVw/V4bAiGSPHD+7/u/nvGSyiNHFA=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
-	b=Aza9iG/xFWO1suHStlLxYW3UL0mbl4ER/TUSfAcKE2nfZ/1eEMLi1WFGzdSqJ3pF9
-	 /IaW4kcJquQhGXjpD6fRZR8wAcZo50GjuIWJiedK9/yViHfcLP//9fmAO06ueaEnkc
-	 viNrRCcjVlzs5x+rVdtN0q09n4CaB7ShUebBE58M=
+	by mail.kernel.org (Postfix) with ESMTP id E6948206E3
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Nov 2019 22:15:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bt/lldns"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727401AbfKMSq2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 Nov 2019 13:46:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60682 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727241AbfKMSq2 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 13 Nov 2019 13:46:28 -0500
-Received: from tleilax.poochiereds.net (68-20-15-154.lightspeed.rlghnc.sbcglobal.net [68.20.15.154])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 31A64206F0;
-        Wed, 13 Nov 2019 18:46:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573670787;
-        bh=lESbQP5An6nmu6kVw/V4bAiGSPHD+7/u/nvGSyiNHFA=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=IY3S1rOeLYoFo6cwP2f0D0wmiBYIEB93tBnn2xWHQstHGXXVgesJUVpJPtbZCyauM
-         b3gSWjK1YIXeUFpDGuvxkNB+UnPn9FRzcjdoyqW4zY0by1WtQBb+kt//ITqAQXxXRH
-         1D5pENoEbeAWkBrhEZHVMk6ZDWhGkW5zw6E1gmrk=
-Message-ID: <3a349de02d646e9f0a2c06405a9081eb44570344.camel@kernel.org>
-Subject: Re: FS-Cache/CacheFiles rewrite
-From:   Jeff Layton <jlayton@kernel.org>
-To:     David Howells <dhowells@redhat.com>,
-        Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve Dickson <steved@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-        linux-cachefs@redhat.com, ceph-devel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 13 Nov 2019 13:46:23 -0500
-In-Reply-To: <24942.1573667720@warthog.procyon.org.uk>
-References: <24942.1573667720@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.1 (3.34.1-1.fc31) 
+        id S1726409AbfKMWPy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 Nov 2019 17:15:54 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28095 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726189AbfKMWPy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 13 Nov 2019 17:15:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1573683352;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6jmw4dUCAd0KIxRuhxrtSeQlvzKuPrWQkOEZFVofPy0=;
+        b=bt/lldnsBUevSWGhQC+7EsknL6rq4NWOsjTXwRAVYAhVFoL1jRT0L3NSd0gTyDB3Un08Js
+        tQJWix01j6AJ1zcP1dRJrLvvHxAAJc8SGX57XxkSqhVK1VjDQPnePiTRBTDDeSDlaOZeN7
+        /yAzp7asLLbcpvz0Ov0trky9VRFkqco=
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
+ [209.85.219.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-JgBpBIXPM--hlqE8d9Qplg-1; Wed, 13 Nov 2019 17:15:49 -0500
+Received: by mail-yb1-f198.google.com with SMTP id n9so3224905ybd.5
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Nov 2019 14:15:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zDdlp0oUejibPVqcPILeNjroLMFyNQO2b+ipdDuldnE=;
+        b=hpPctLqQnut4yuGAUY+PNYHEEK8AH1sEs7/dkBckZ8diISXIF6OAbsBrFEkswUkZ6n
+         mh5RJz7AGuvWHVARylK1AtBVAhowD2JRtLeQNVLFhIp9fAkZtgHZymmoq3PwpdM904Wv
+         f81J4N4Np0bZDcz7e6UZ4VPODt/MsFy9WqOEdebZeCN7r0Yef2vxd1FcDeKgimd0ELc0
+         U/JSCdpcaULm2AexRc14vSoiDQ8SVUJKfk1RORWwfNAHvuRys25e3I3zU4WtLxRwYnqq
+         FI5+mIP7d5TUfpqJlpUstlhcxlM4bw/nE8O7Rzowfa+Lq7O6D9BaSY+iXBspLV0iesrO
+         uybA==
+X-Gm-Message-State: APjAAAUPBxDy9NJd5ClEFaiZTBuxaY3C/EaEDt56x34mddWoCUA03IOe
+        gLyxm7w4jT21Ny1OId6JTcNKiYM/2Gpkef4nukihvcn0VJek4Y/gIlt7VlLb5EKjb6K7scGh+5d
+        Dz11xbXi0zVG+SGC6z7odaw==
+X-Received: by 2002:a0d:f042:: with SMTP id z63mr3512407ywe.490.1573683348836;
+        Wed, 13 Nov 2019 14:15:48 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxUFw3wrcvx/c0MD1q9KlIOi1O0czmWTiSDPB9NoAPymPeY7t2099ToTedDNi/p3EvboEheAQ==
+X-Received: by 2002:a0d:f042:: with SMTP id z63mr3512378ywe.490.1573683348451;
+        Wed, 13 Nov 2019 14:15:48 -0800 (PST)
+Received: from hut.sorensonfamily.com (198-0-247-150-static.hfc.comcastbusiness.net. [198.0.247.150])
+        by smtp.gmail.com with ESMTPSA id z139sm2445351ywz.32.2019.11.13.14.15.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Nov 2019 14:15:47 -0800 (PST)
+Subject: Re: A process killed while opening a file can result in leaked open
+ handle on the server
+To:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+References: <0326b8d9-d66c-1df0-2d04-91b9a861c10f@redhat.com>
+ <CAKywueQ4nx2=V889Ty40QZOfoVij7Wp4dmhuhHV4A6mhGpgYAA@mail.gmail.com>
+ <579288007.11441637.1573622351338.JavaMail.zimbra@redhat.com>
+ <81694688.11451093.1573627786969.JavaMail.zimbra@redhat.com>
+From:   Frank Sorenson <sorenson@redhat.com>
+Message-ID: <9195bac2-e271-537b-e1a0-8736efc80771@redhat.com>
+Date:   Wed, 13 Nov 2019 16:15:46 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <81694688.11451093.1573627786969.JavaMail.zimbra@redhat.com>
+Content-Language: en-US
+X-MC-Unique: JgBpBIXPM--hlqE8d9Qplg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 2019-11-13 at 17:55 +0000, David Howells wrote:
-> Hi,
-> 
-> I've been rewriting the local cache for network filesystems with the aim of
-> simplifying it, speeding it up, reducing its memory overhead and making it
-> more understandable and easier to debug.
-> 
-> For the moment fscache support is disabled in all network filesystems that
-> were using, apart from afs.
-> 
-> To this end, I have so far made the following changes to fscache:
-> 
->  (1) The fscache_cookie_def struct has gone, along with all the callback
->      functions it used to contain.  The filesystem stores the auxiliary data
->      and file size into the cookie and these are written back lazily (possibly
->      too lazily at the moment).  Any necessary information is passed in to
->      fscache_acquire_cookie().
-> 
->  (2) The object state machine has been removed and replaced by a much simpler
->      dispatcher that runs the entire cookie instantiation procedure, cookie
->      teardown procedure or cache object withdrawal procedure in one go without
->      breaking it down into cancellable/abortable states.
-> 
->      To avoid latency issues, a thread pool is created to which these
->      operations will be handed off if any threads are idle; if no threads are
->      idle, the operation is run in the process that triggered it.
-> 
->  (3) The entire I/O API has been deleted and replaced with one that *only*
->      provides a "read cache to iter" function and a "write iter to cache"
->      function.  The cache therefore neither knows nor cares where netfs pages
->      are - and indeed, reads and writes don't need to go to such places.
-> 
->  (4) The netfs must allow the cache the opportunity to 'shape' a read from the
->      server, both from ->readpages() and from ->write_begin(), so that the
->      size and start of the read are of a suitably aligned for the cache
->      granularity.  Cachefiles is currently using a 256KiB granule size.
-> 
->      A helper is provided to do most of the work: fscache_read_helper().
-> 
->  (5) An additional layer, an fscache_io_handle, has been interposed in the I/O
->      API that allows the cache to store transient stuff, such as the open file
->      struct pointer to the backing file for the duration of the netfs file
->      being open.
-> 
->      I'm tempted on one hand to merge this into the fscache_object struct and
->      on the other hand to use this to get rid of 'cookie enablement' and allow
->      already open files to be connected to the cache.
-> 
->  (6) The PG_fscache bit is now set on a page to indicate that the page is
->      being written to the cache and cleared upon completion.  write_begin,
->      page_mkwrite, releasepage, invalidatepage, etc. can wait on this.
-> 
->  (7) Cookie removal now read-locks the semaphore that is used to manage
->      addition and removal of a cache.  This greatly simplifies the logic in
->      detaching an object from a cookie and cleaning it up as relinquishment
->      and withdrawal can't then happen simultaneously.
-> 
->      It does mean, though, that cookie relinquishment is held up by cache
->      removal.
-> 
-> And the following changes to cachefiles:
-> 
->  (1) The I/O code has been replaced.  The page waitqueue snooping and deferred
->      backing-page to netfs-page copy is now entirely gone and asynchronous
->      direct I/O through kiocbs is now used instead to effect the transfer of
->      data to/from the cache.
-> 
->      This affords a speed increase of something like 40-50% and reduces the
->      amount of memory that is pinned during I/O.
-> 
->  (2) bmap() is no longer used to detect the presence of blocks in the
->      filesystem.  With a modern extent based filesystem, this may give both
->      false positives and false negatives if the filesystem optimises an extent
->      by eliminating a block of zeros or adds a block to bridge between two
->      close neighbours.
-> 
->      Instead, a content map is stored in an xattr on the backing file, with 1
->      bit per 256KiB block.  The cache shapes the netfs's read requests to
->      request multiple-of-256KiB reads from the server, which are then written
->      back.
-> 
->  (3) The content map and attributes are then stored lazily when the object is
->      destroyed.  This may be too lazy.
-> 
+On 11/13/19 12:49 AM, Ronnie Sahlberg wrote:
+> Steve, Pavel
+>=20
+> This patch goes ontop of Pavels patch.
+> Maybe it should be merged with Pavels patch since his patch changes from =
+"we only send a close() on an interrupted open()"
+> to now "we send a close() on either interrupted open() or interrupted clo=
+se()" so both comments as well as log messages are updates.
+>=20
+> Additionally it adds logging of the MID that failed in the case of an int=
+errupted Open() so that it is easy to find it in wireshark
+> and check whether that smb2 file handle was indeed handles by a SMB_Close=
+() or not.
+>=20
+>=20
+> From testing it appears Pavels patch works. When the close() is interrupt=
+ed we don't leak handles as far as I can tell.
+> We do have a leak in the Open() case though and it seems that eventhough =
+we set things up and flags the MID to be cancelled we actually never end up
+> calling smb2_cancelled_close_fid() and thus we never send a SMB2_Close().
+> I haven't found the root cause yet but I suspect we mess up mid flags or =
+state somewhere.
+>=20
+>=20
+> It did work in the past though when Sachin provided the initial implement=
+ation so we have regressed I think.
+> I have added a new test 'cifs/102'  to the buildbot that checks for this =
+but have not integrated into the cifs-testing run yet since we still fail t=
+his test.
+> At least we will not have further regressions once we fix this and enable=
+ the test in the future.
+>=20
+> ronnie s
 
-Having something that just provides a caching facility without so many
-tendrils back into the netfs seems like a big improvement.
+The patches do indeed improve it significantly.
 
-> To aid this I've added the following:
-> 
->  (1) Wait/wake functions for the PG_fscache bit.
-> 
->  (2) ITER_MAPPING iterator that refers to a contiguous sequence of pinned
->      pages with no holes in a mapping.  This means you don't have to allocate
->      a sequence of bio_vecs to represent the same thing.
-> 
->      As stated, the pages *must* be pinned - such as by PG_locked,
->      PG_writeback or PG_fscache - before iov_iter_mapping() is called to set
->      the mapping up.
-> 
-> Things that still need doing:
-> 
->  (1) afs (and any other netfs) needs to write changes to the cache at the same
->      time it writes them to the server so that the cache doesn't get out of
->      sync.  This is also necessary to implement write-back caching and
->      disconnected operation.
-> 
->  (2) The content map is limited by the maximum xattr size.  Is it possible to
->      configure the backing filesystem so that it doesn't merge extents across
->      certain boundaries or eliminate blocks of zeros so that I don't need a
->      content map?
-> 
->  (3) Use O_TMPFILE in the cache to effect immediate invalidation.  I/O can
->      then continue to progress whilst the cache driver replaces the linkage.
-> 
->  (4) The file in the cache needs to be truncated if the netfs file is
->      shortened by truncation.
-> 
->  (5) Data insertion into the cache is not currently checked for space
->      availability.
-> 
->  (6) The stats need going over.  Some of them are obsolete and there are no
->      I/O stats working at the moment.
-> 
->  (7) Replacement I/O tracepoints are required.
-> 
-> Future changes:
-> 
->  (1) Get rid of cookie enablement.
-> 
->  (2) Frame the limit on the cache capacity in terms of an amount of data that
->      can be stored in it rather than an amount of free space that must be
->      kept.
-> 
->  (3) Move culling out of cachefilesd into the kernel.
-> 
->  (4) Use the I/O handle to add caching to files that are already open, perhaps
->      listing I/O handles from the cache tag.
-> 
-> Questions:
-> 
->  (*) Does it make sense to actually permit multiple caches?
-> 
+I'm still seeing some leak as well, and I'm removing ratelimiting so
+that I can see what the added debugging is trying to tell us.  I'll
+report if I find more details.
 
-I don't see a lot of value in having more than one per fstype. Given
-that the index_key can be as big as you'd reasonably need, it seems
-better to just require that the netfs drivers generate keys that are
-unique system-wide.
 
-fscache should however, be prepared to deal with collisions between
-different drivers (e.g. NFS and ceph). That said, we could just require
-that the fs' add some per-fstype value into each index_key.
+Thanks for the help.
 
->  (*) Do we want to allow multiple filesystem instances (think NFS) to use the
->      same cache objects?  fscache no longer knows about the netfs state, and
->      the netfs now just reads and writes to the cache, so it's kind of
->      possible - but coherency management is tricky and would definitely be up
->      to the netfs.
 
-NFS is sort of a difficult example. It aggressively shares superblocks
-where it can. You only get multiple inodes for the same server-side
-object when you mount with "-o nosharecache" (or some other option
-prevents sharing), and at that point you probably don't want to share
-objects.
-
-For something like ceph, you could have two mounts with different local
-superblocks that point to different subtrees of the root cephfs. In that
-configuration we can have two different inodes (in different sb's) for
-the same cephfs MDS inode (maybe hardlinked across the two mounted
-directories).
-
-I think it comes down to how atomic the read and write operations are.
-Are the reads and writes serialized such that a read will block until a
-write completes?
-
-Assuming that you won't end up with the data in some half-baked state,
-then leaving that up to the netfs seems like the right thing to do. That
-seems more in accordance with just having fscache be a simple(r) caching
-layer anyway.
-
-> The patches can be found here:
-> 
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=fscache-iter
-> 
-> I'm not going to post them for the moment unless someone really wants that.
-
-The diffstat looks great so far!
-
- 62 files changed, 4036 insertions(+), 7095 deletions(-)
-
--- 
-Jeff Layton <jlayton@kernel.org>
+Frank
 
