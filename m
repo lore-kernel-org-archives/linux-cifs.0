@@ -1,219 +1,117 @@
-Return-Path: <SRS0=EccA=ZH=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=a1Jc=ZI=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B0CC432C3
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Nov 2019 18:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56973C43141
+	for <linux-cifs@archiver.kernel.org>; Sat, 16 Nov 2019 16:21:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A9692073B
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Nov 2019 18:21:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="Sh3TEQix"
+	by mail.kernel.org (Postfix) with ESMTP id 2515620895
+	for <linux-cifs@archiver.kernel.org>; Sat, 16 Nov 2019 16:21:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573921295;
+	bh=kvrgsIZ8Gymbi6c4WYY9shIxHq3UQvTGVVPm6yj3KAY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=tcu6IuoC/l2j7JGN2XCMHI07FB4yeQh96jKWIc5set2bEHUy8/fG6gh33OkBpEnAN
+	 EsXtmBc8uD+gCwIFJo002xvT+AUwzajb/mMnQShhdb2bUyTo1b8NwLBfPIhpS35SRt
+	 XDEq5YdMxikL3PaJFRgPWo1u2JAz1aJCrn2a85Fg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726323AbfKOSVG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 15 Nov 2019 13:21:06 -0500
-Received: from mail-eopbgr700133.outbound.protection.outlook.com ([40.107.70.133]:33536
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726131AbfKOSVG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 15 Nov 2019 13:21:06 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lfxcVDCiNEVX4tIQtyvg7/6VoQJxyr5l10C85sPh7fziYX0SxM+kRfCr+UE6zMrBxizHBzjqso0TkBiY9GcKX36WecMhK03AKC1BArP8Nc/hD+VEobQMni1qrRwH0dFk0pj99RtQOqYr4rO6M+zKRsdH/8slPLXBoIPXjJoPn1rxSRG0CX0yfzn7Mp8V5ptX6UG3k6EAlkD0l/AM7ncIMyeCIvdgxYtrAiONs8tnVHA3gxOoC5ETLYOIL9//nTbmioXHfXsVccuIItF5R56GIpFi7oKNljF2mfON5qzI0JOL+rAYKkCZtigWy/1kNawmKryE3Ck4sbMmF7FXSABRcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gLt7Ad0FpbpYIohCqIrjQNN0VxUCWqn+IJvfF9Bm3lI=;
- b=DE9CEhLD/kZKOOf1eKem+/Jsc7noyI83Hx6aOvmr/boEFgZ4qXzeR81Bs0fAAt7+UywCySQ/BWhowfgyknkJ9NQeP2Z9MljK0cfYR7k973H1kqNPv2s4tQdvkAxrhckbDxLhzAlfFhGE3o4bck6ZhjgUBE94nIKaO5rvLUWC5DJxqUfRLt6DIjPuIVVzmDp6V5q/CXleFJ352xTnI5EuiD714cGJXuIlwyTYlVzAAEtnPQnFKx7mbtfMSxyEyDeIWsto9yi6Q5kH3/NeJsNvSU4Go9aJnne6Ityr5FJipeLYK8Rxn/MuPDOWnFkAlbrv2DV/dGMxzO71ADB5ZMyezQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gLt7Ad0FpbpYIohCqIrjQNN0VxUCWqn+IJvfF9Bm3lI=;
- b=Sh3TEQixcwjTTMa8O0t+7ygTWNgYJUfam514aTZVtswqSzbcl2p8p1yjRSzkA3535FHLHizznJaXWnxgfHz+WyV2WteVfduJo/ONYaLNxU3+bM1W7DU4cgPMpmCeOJ9smntwUCJs8trT7HQFjC6vb/E5nCVKfm7vG9gKIKcCii4=
-Received: from DM5PR21MB0185.namprd21.prod.outlook.com (10.173.173.136) by
- DM5PR21MB0746.namprd21.prod.outlook.com (10.173.172.12) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2474.6; Fri, 15 Nov 2019 18:21:03 +0000
-Received: from DM5PR21MB0185.namprd21.prod.outlook.com
- ([fe80::2cf3:ad83:2bb1:b778]) by DM5PR21MB0185.namprd21.prod.outlook.com
- ([fe80::2cf3:ad83:2bb1:b778%3]) with mapi id 15.20.2474.009; Fri, 15 Nov 2019
- 18:21:03 +0000
-From:   Pavel Shilovskiy <pshilov@microsoft.com>
-To:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Frank Sorenson <sorenson@redhat.com>,
-        Steven French <Steven.French@microsoft.com>
-CC:     Pavel Shilovsky <piastryyy@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Subject: RE: A process killed while opening a file can result in leaked open
- handle on the server
-Thread-Topic: A process killed while opening a file can result in leaked open
- handle on the server
-Thread-Index: AQHVmZA5FvyJIlQ2jUGP4WkbfnwoLaeIY38AgAAtI4CAABlPAIABArkAgAA4/QCAAqlJQA==
-Date:   Fri, 15 Nov 2019 18:21:03 +0000
-Message-ID: <DM5PR21MB0185D7AD589CA373E8BDEF01B6700@DM5PR21MB0185.namprd21.prod.outlook.com>
-References: <0326b8d9-d66c-1df0-2d04-91b9a861c10f@redhat.com>
- <CAKywueQ4nx2=V889Ty40QZOfoVij7Wp4dmhuhHV4A6mhGpgYAA@mail.gmail.com>
- <579288007.11441637.1573622351338.JavaMail.zimbra@redhat.com>
- <81694688.11451093.1573627786969.JavaMail.zimbra@redhat.com>
- <9195bac2-e271-537b-e1a0-8736efc80771@redhat.com>
- <1468784979.11678511.1573695584530.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1468784979.11678511.1573695584530.JavaMail.zimbra@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=pshilov@microsoft.com;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2019-11-15T18:21:02.1217982Z;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=47940223-b9a2-4f49-a81d-1fa2a618d065;
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pshilov@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:0:7c01:2bf9:d6a4:613f]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 5ec8c991-822e-4f8d-e77e-08d769f8931f
-x-ms-traffictypediagnostic: DM5PR21MB0746:|DM5PR21MB0746:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM5PR21MB0746E185958A13C5C337B99BB6700@DM5PR21MB0746.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 02229A4115
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(366004)(39860400002)(396003)(376002)(136003)(189003)(199004)(51914003)(13464003)(11346002)(25786009)(186003)(8990500004)(46003)(22452003)(76176011)(316002)(14444005)(6636002)(54906003)(6246003)(5660300002)(55016002)(10090500001)(74316002)(6116002)(256004)(305945005)(33656002)(2906002)(478600001)(110136005)(14454004)(10290500003)(7736002)(446003)(81156014)(86362001)(229853002)(486006)(8936002)(102836004)(476003)(64756008)(9686003)(1511001)(53546011)(71200400001)(7696005)(99286004)(71190400001)(52536014)(6436002)(66476007)(66556008)(76116006)(8676002)(66446008)(81166006)(66946007)(4326008)(6506007);DIR:OUT;SFP:1102;SCL:1;SRVR:DM5PR21MB0746;H:DM5PR21MB0185.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XYMglk4nglHXAG3C+D8t5yRg5fK53b20I05ItlcOdN3cSf5I74C2ZAfZ1oYQ14TB2HfCGaQaf0D9P1X7XwUgRBhlvAKvLNQZTruNzXgX4ZxNOURp8ubzbcPto7bF6Oh1BLAxE42NKGe2Ro/L1lVWfh5NFf4RiMCJ9SHDuTbTFgSPjcdB4KNt0koosWhKQrznmXBvL8qwqFO5bKOvCChCQNs1DLdMWmL9FJnPVj1VGAJYVqn1WPTekFPMjAyjZAkLk3wVceApgumREtTMl5/xdEeTa63Zq4FZu8J/j8EjMkTaTeSD8qMrDH0ra8seQIRGKldhkpCdVyIpey5lC6juziQh2Uyf07QVP8CqnR4MzRZ+10fkgqtxnFllCI750M/zZf6RsqqHZoKdBspg2+fo3qxe9EbgBWggIuEJrYoMQK28135rBqG67+PKj9/z1a8z
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1728738AbfKPQVd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 16 Nov 2019 11:21:33 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47490 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728754AbfKPPnb (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 16 Nov 2019 10:43:31 -0500
+Received: from sasha-vm.mshome.net (unknown [50.234.116.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3A5372082E;
+        Sat, 16 Nov 2019 15:43:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573919010;
+        bh=kvrgsIZ8Gymbi6c4WYY9shIxHq3UQvTGVVPm6yj3KAY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=hFR+Gcfon30PiINYsSwpeLOzQbG21u3OMBhJDEUijVfpQ2OYhqtR1nYiDzM11JZei
+         CDwbF+IUIWaeopifCJdO4KX6gBlvCXBDYGXIgwnLUqFJVcxaXCQ5Ih2OjjIKMBhTqg
+         A7BQPGzIa+SRcmscVPG/qxXOtVRgNuCAzGY10JTA=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Garry McNulty <garrmcnu@gmail.com>,
+        Steve French <stfrench@microsoft.com>,
+        Aurelien Aptel <aaptel@suse.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 114/237] fs/cifs: fix uninitialised variable warnings
+Date:   Sat, 16 Nov 2019 10:39:09 -0500
+Message-Id: <20191116154113.7417-114-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191116154113.7417-1-sashal@kernel.org>
+References: <20191116154113.7417-1-sashal@kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5ec8c991-822e-4f8d-e77e-08d769f8931f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2019 18:21:03.5572
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8gkMOBSvOPjlOCiitas/ADMa3MSXL40/6bgBW1N79NAedfXIQ+us6vnBPIlhrhVPh5pnst6wENqjERyqZKydWA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR21MB0746
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-0YHRgCwgMTMg0L3QvtGP0LEuIDIwMTkg0LMuINCyIDE3OjM5LCBSb25uaWUgU2FobGJlcmcgPGxz
-YWhsYmVyQHJlZGhhdC5jb20+Og0KPg0KPg0KPg0KPg0KPg0KPiAtLS0tLSBPcmlnaW5hbCBNZXNz
-YWdlIC0tLS0tDQo+ID4gRnJvbTogIkZyYW5rIFNvcmVuc29uIiA8c29yZW5zb25AcmVkaGF0LmNv
-bT4NCj4gPiBUbzogIlJvbm5pZSBTYWhsYmVyZyIgPGxzYWhsYmVyQHJlZGhhdC5jb20+LCAiUGF2
-ZWwgU2hpbG92c2t5IiA8cGlhc3RyeXl5QGdtYWlsLmNvbT4NCj4gPiBDYzogImxpbnV4LWNpZnMi
-IDxsaW51eC1jaWZzQHZnZXIua2VybmVsLm9yZz4NCj4gPiBTZW50OiBUaHVyc2RheSwgMTQgTm92
-ZW1iZXIsIDIwMTkgODoxNTo0NiBBTQ0KPiA+IFN1YmplY3Q6IFJlOiBBIHByb2Nlc3Mga2lsbGVk
-IHdoaWxlIG9wZW5pbmcgYSBmaWxlIGNhbiByZXN1bHQgaW4gbGVha2VkIG9wZW4gaGFuZGxlIG9u
-IHRoZSBzZXJ2ZXINCj4gPg0KPiA+IE9uIDExLzEzLzE5IDEyOjQ5IEFNLCBSb25uaWUgU2FobGJl
-cmcgd3JvdGU6DQo+ID4gPiBTdGV2ZSwgUGF2ZWwNCj4gPiA+DQo+ID4gPiBUaGlzIHBhdGNoIGdv
-ZXMgb250b3Agb2YgUGF2ZWxzIHBhdGNoLg0KPiA+ID4gTWF5YmUgaXQgc2hvdWxkIGJlIG1lcmdl
-ZCB3aXRoIFBhdmVscyBwYXRjaCBzaW5jZSBoaXMgcGF0Y2ggY2hhbmdlcyBmcm9tDQo+ID4gPiAi
-d2Ugb25seSBzZW5kIGEgY2xvc2UoKSBvbiBhbiBpbnRlcnJ1cHRlZCBvcGVuKCkiDQo+ID4gPiB0
-byBub3cgIndlIHNlbmQgYSBjbG9zZSgpIG9uIGVpdGhlciBpbnRlcnJ1cHRlZCBvcGVuKCkgb3Ig
-aW50ZXJydXB0ZWQNCj4gPiA+IGNsb3NlKCkiIHNvIGJvdGggY29tbWVudHMgYXMgd2VsbCBhcyBs
-b2cgbWVzc2FnZXMgYXJlIHVwZGF0ZXMuDQo+ID4gPg0KPiA+ID4gQWRkaXRpb25hbGx5IGl0IGFk
-ZHMgbG9nZ2luZyBvZiB0aGUgTUlEIHRoYXQgZmFpbGVkIGluIHRoZSBjYXNlIG9mIGFuDQo+ID4g
-PiBpbnRlcnJ1cHRlZCBPcGVuKCkgc28gdGhhdCBpdCBpcyBlYXN5IHRvIGZpbmQgaXQgaW4gd2ly
-ZXNoYXJrDQo+ID4gPiBhbmQgY2hlY2sgd2hldGhlciB0aGF0IHNtYjIgZmlsZSBoYW5kbGUgd2Fz
-IGluZGVlZCBoYW5kbGVzIGJ5IGEgU01CX0Nsb3NlKCkNCj4gPiA+IG9yIG5vdC4NCj4gPiA+DQo+
-ID4gPg0KPiA+ID4gRnJvbSB0ZXN0aW5nIGl0IGFwcGVhcnMgUGF2ZWxzIHBhdGNoIHdvcmtzLiBX
-aGVuIHRoZSBjbG9zZSgpIGlzIGludGVycnVwdGVkDQo+ID4gPiB3ZSBkb24ndCBsZWFrIGhhbmRs
-ZXMgYXMgZmFyIGFzIEkgY2FuIHRlbGwuDQo+ID4gPiBXZSBkbyBoYXZlIGEgbGVhayBpbiB0aGUg
-T3BlbigpIGNhc2UgdGhvdWdoIGFuZCBpdCBzZWVtcyB0aGF0IGV2ZW50aG91Z2ggd2UNCj4gPiA+
-IHNldCB0aGluZ3MgdXAgYW5kIGZsYWdzIHRoZSBNSUQgdG8gYmUgY2FuY2VsbGVkIHdlIGFjdHVh
-bGx5IG5ldmVyIGVuZCB1cA0KPiA+ID4gY2FsbGluZyBzbWIyX2NhbmNlbGxlZF9jbG9zZV9maWQo
-KSBhbmQgdGh1cyB3ZSBuZXZlciBzZW5kIGEgU01CMl9DbG9zZSgpLg0KPiA+ID4gSSBoYXZlbid0
-IGZvdW5kIHRoZSByb290IGNhdXNlIHlldCBidXQgSSBzdXNwZWN0IHdlIG1lc3MgdXAgbWlkIGZs
-YWdzIG9yDQo+ID4gPiBzdGF0ZSBzb21ld2hlcmUuDQo+ID4gPg0KPiA+ID4NCj4gPiA+IEl0IGRp
-ZCB3b3JrIGluIHRoZSBwYXN0IHRob3VnaCB3aGVuIFNhY2hpbiBwcm92aWRlZCB0aGUgaW5pdGlh
-bA0KPiA+ID4gaW1wbGVtZW50YXRpb24gc28gd2UgaGF2ZSByZWdyZXNzZWQgSSB0aGluay4NCj4g
-PiA+IEkgaGF2ZSBhZGRlZCBhIG5ldyB0ZXN0ICdjaWZzLzEwMicgwqB0byB0aGUgYnVpbGRib3Qg
-dGhhdCBjaGVja3MgZm9yIHRoaXMNCj4gPiA+IGJ1dCBoYXZlIG5vdCBpbnRlZ3JhdGVkIGludG8g
-dGhlIGNpZnMtdGVzdGluZyBydW4geWV0IHNpbmNlIHdlIHN0aWxsIGZhaWwNCj4gPiA+IHRoaXMg
-dGVzdC4NCj4gPiA+IEF0IGxlYXN0IHdlIHdpbGwgbm90IGhhdmUgZnVydGhlciByZWdyZXNzaW9u
-cyBvbmNlIHdlIGZpeCB0aGlzIGFuZCBlbmFibGUNCj4gPiA+IHRoZSB0ZXN0IGluIHRoZSBmdXR1
-cmUuDQo+ID4gPg0KPiA+ID4gcm9ubmllIHMNCj4gPg0KPiA+IFRoZSBwYXRjaGVzIGRvIGluZGVl
-ZCBpbXByb3ZlIGl0IHNpZ25pZmljYW50bHkuDQo+ID4NCj4gPiBJJ20gc3RpbGwgc2VlaW5nIHNv
-bWUgbGVhayBhcyB3ZWxsLCBhbmQgSSdtIHJlbW92aW5nIHJhdGVsaW1pdGluZyBzbw0KPiA+IHRo
-YXQgSSBjYW4gc2VlIHdoYXQgdGhlIGFkZGVkIGRlYnVnZ2luZyBpcyB0cnlpbmcgdG8gdGVsbCB1
-cy4gwqBJJ2xsDQo+ID4gcmVwb3J0IGlmIEkgZmluZCBtb3JlIGRldGFpbHMuDQo+ID4NCj4NCj4g
-V2UgYXJlIG1ha2luZyBwcm9ncmVzcy4NCj4gQ2FuIHlvdSB0ZXN0IHRoaXMgcGF0Y2ggaWYgaXQg
-aW1wcm92ZXMgZXZlbiBtb3JlIGZvciB5b3U/DQo+IEl0IGZpeGVzIG1vc3QgYnV0IG5vdCBhbGwg
-dGhlIGxlYWtzIEkgc2VlIGZvciBpbnRlcnJ1cHRlZCBvcGVuKCk6DQo+DQo+IEkgd2lsbCBwb3N0
-IHRoaXMgdG8gdGhlIGxpc3QgdG9vIGFzIGEgc2VwYXJhdGUgbWFpbC9wYXRjaC4NCj4NCj4NCj4g
-QXV0aG9yOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+DQo+IERhdGU6IMKg
-IFRodSBOb3YgMTQgMTE6MjM6MDYgMjAxOSArMTAwMA0KPg0KPiDCoCDCoCBjaWZzOiBmaXggcmFj
-ZSBiZXR3ZWVuIGNvbXBvdW5kX3NlbmRfcmVjdigpIGFuZCB0aGUgZGVtdWx0aXBsZXggdGhyZWFk
-DQo+DQo+IMKgIMKgIFRoZXJlIGlzIGEgcmFjZSB3aGVyZSB0aGUgb3BlbigpIG1heSBiZSBpbnRl
-cnJ1cHRlZCBiZXR3ZWVuIHdoZW4gd2UgcmVjZWl2ZSB0aGUgcmVwbHkNCj4gwqAgwqAgYnV0IGJl
-Zm9yZSB3ZSBoYXZlIGludm9rZWQgdGhlIGNhbGxiYWNrIGluIHdoaWNoIGNhc2Ugd2UgbmV2ZXIg
-ZW5kIHVwIGNhbGxpbmcNCj4gwqAgwqAgaGFuZGxlX2NhbmNlbGxlZF9taWQoKSBhbmQgdGh1cyBs
-ZWFrIGFuIG9wZW4gaGFuZGxlIG9uIHRoZSBzZXJ2ZXIuDQo+DQo+IMKgIMKgIFNpZ25lZC1vZmYt
-Ynk6IFJvbm5pZSBTYWhsYmVyZyA8bHNhaGxiZXJAcmVkaGF0LmNvbT4NCj4NCj4gZGlmZiAtLWdp
-dCBhL2ZzL2NpZnMvY29ubmVjdC5jIGIvZnMvY2lmcy9jb25uZWN0LmMNCj4gaW5kZXggY2NhYThi
-YWQzMzZmLi44MDI2MDRhN2U2OTIgMTAwNjQ0DQo+IC0tLSBhL2ZzL2NpZnMvY29ubmVjdC5jDQo+
-ICsrKyBiL2ZzL2NpZnMvY29ubmVjdC5jDQo+IEBAIC0xMjIzLDcgKzEyMjMsNiBAQCBjaWZzX2Rl
-bXVsdGlwbGV4X3RocmVhZCh2b2lkICpwKQ0KPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCBpZiAobWlkc1tpXSAhPSBOVUxMKSB7DQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG1pZHNbaV0tPnJlc3BfYnVmX3NpemUgPSBzZXJ2ZXIt
-PnBkdV9zaXplOw0KPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCBpZiAoKG1pZHNbaV0tPm1pZF9mbGFncyAmIE1JRF9XQUlUX0NBTkNFTExFRCkgJiYNCj4g
-LSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBtaWRz
-W2ldLT5taWRfc3RhdGUgPT0gTUlEX1JFU1BPTlNFX1JFQ0VJVkVEICYmDQo+IMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHNlcnZlci0+b3BzLT5o
-YW5kbGVfY2FuY2VsbGVkX21pZCkNCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgc2VydmVyLT5vcHMtPmhhbmRsZV9jYW5jZWxsZWRf
-bWlkKA0KPiDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBtaWRzW2ldLT5yZXNwX2J1ZiwNCj4g
-ZGlmZiAtLWdpdCBhL2ZzL2NpZnMvdHJhbnNwb3J0LmMgYi9mcy9jaWZzL3RyYW5zcG9ydC5jDQo+
-IGluZGV4IGNhM2RlNjI2ODhkNi4uMjgwMThhN2VjY2IyIDEwMDY0NA0KPiAtLS0gYS9mcy9jaWZz
-L3RyYW5zcG9ydC5jDQo+ICsrKyBiL2ZzL2NpZnMvdHJhbnNwb3J0LmMNCj4gQEAgLTExMTksNyAr
-MTExOSw4IEBAIGNvbXBvdW5kX3NlbmRfcmVjdihjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1
-Y3QgY2lmc19zZXMgKnNlcywNCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqBtaWRRW2ldLT5taWQsIGxlMTZfdG9fY3B1KG1pZFFbaV0tPmNvbW1hbmQp
-KTsNCj4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgc2VuZF9jYW5jZWwoc2Vy
-dmVyLCAmcnFzdFtpXSwgbWlkUVtpXSk7DQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIHNwaW5fbG9jaygmR2xvYmFsTWlkX0xvY2spOw0KPiAtIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIGlmIChtaWRRW2ldLT5taWRfc3RhdGUgPT0gTUlEX1JFUVVFU1RfU1VC
-TUlUVEVEKSB7DQo+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaWYgKG1pZFFb
-aV0tPm1pZF9zdGF0ZSA9PSBNSURfUkVRVUVTVF9TVUJNSVRURUQgfHwNCj4gKyDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBtaWRRW2ldLT5taWRfc3RhdGUgPT0gTUlEX1JF
-U1BPTlNFX1JFQ0VJVkVEKSB7DQo+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIG1pZFFbaV0tPm1pZF9mbGFncyB8PSBNSURfV0FJVF9DQU5DRUxMRUQ7DQo+
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIG1pZFFbaV0t
-PmNhbGxiYWNrID0gY2lmc19jYW5jZWxsZWRfY2FsbGJhY2s7DQo+IMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGNhbmNlbGxlZF9taWRbaV0gPSB0cnVlOw0K
-Pg0KPg0KPg0KPg0KPg0KPiA+DQo+ID4gVGhhbmtzIGZvciB0aGUgaGVscC4NCj4gPg0KPiA+DQo+
-ID4gRnJhbmsNCj4gPg0KPiA+DQo+DQoNClRoYW5rcyBGcmFuaywgUm9ubmllIGZvciB0ZXN0aW5n
-IG15IHBhdGNoISBJIGFsc28gbGlrZSB0aGUgUm9ubmllJ3MgcGF0Y2ggLSBnb29kIHByb2dyZXNz
-IG92ZXJhbGwhDQoNCkFib3V0IG15IHBhdGNoLCBJIGFtIGdvaW5nIHRvIGFkZCBhIHByb3BlciBk
-ZXNjcmlwdGlvbiBvbmNlIEkgZ2V0IHRpbWUgbmV4dCB3ZWVrIGFuZCB3aWxsIHByb2JhYmx5IGRv
-IHNvbWUgaW1wcm92ZW1lbnRzOg0KDQoxKSBDdXJyZW50bHkgd2l0aCBteSBwYXRjaCB0aGUgY2xp
-ZW50IHdpbGwgc2VuZCBDbG9zZSBldmVuIGlmIGl0IGhhcyBhbHJlYWR5IHJlY2VpdmVkIGEgcmVz
-cG9uc2UgYnV0IHdhaXRfZm9yX3Jlc3BvbnNlKCkgd2FzIGludGVycnVwdGVkLiBUaGUgbGF0dGVy
-IGZ1bmN0aW9uIHJldHVybnMgLUVSRVNUQVJUU1lTLiBXaGF0IHdlIHdhbnQgdG8gZG8gaW5zdGVh
-ZCBpcyB0byBzZW5kIENsb3NlIG9ubHkgaWYgKnNlbmRpbmcqIHdhcyBpbnRlcnJ1cHRlZC4gSW4g
-dGhhdCBjYXNlIHdlIHJldHVybiAtRUlOVFIsIHNlZSBfX3NtYl9zZW5kX3Jxc3QoKToNCg0KaWYg
-KHNpZ25hbF9wZW5kaW5nKGN1cnJlbnQpKSB7DQrCoCDCoCBjaWZzX2RiZyhGWUksICJzaWduYWwg
-aXMgcGVuZGluZyBiZWZvcmUgc2VuZGluZyBhbnkgZGF0YVxuIik7DQrCoCDCoCByZXR1cm4gLUVJ
-TlRSOw0KfQ0KDQoyKSBNb3ZlIHRoZSBlcnJvciBoYW5kbGluZyB0byB0aGUgUERVIGxheWVyIGZ1
-bmN0aW9uIFNNQjJfY2xvc2UoKSB0byBoYW5kbGUgKmFsbCogaW50ZXJydXB0ZWQgY2xvc2UgcmVx
-dWVzdHMgaW5jbHVkaW5nIG9uZXMgY2xvc2luZyB0ZW1wb3JhcnkgaGFuZGxlcy4NCg0KUGxlYXNl
-IGNvbW1lbnQgb24gdGhlIHR3byBjaGFuZ2VzIGFib3ZlIQ0KDQotLQ0KQmVzdCByZWdhcmRzLA0K
-UGF2ZWwgU2hpbG92c2t5DQo=
+From: Garry McNulty <garrmcnu@gmail.com>
+
+[ Upstream commit ef2298a06d012973bbc592b86fe5ff730d4d0c63 ]
+
+In some error conditions, resp_buftype can be passed uninitialised to
+free_rsp_buf(), potentially resulting in a spurious debug message.
+If resp_buftype randomly had the value 1 (CIFS_SMALL_BUFFER) then this
+would log a debug message.
+The rsp pointer is initialised to NULL so there is no other side-effect.
+
+Detected by CoverityScan, CID 1438585 ("Uninitialized scalar variable")
+Detected by CoverityScan, CID 1438667 ("Uninitialized scalar variable")
+Detected by CoverityScan, CID 1438764 ("Uninitialized scalar variable")
+
+Signed-off-by: Garry McNulty <garrmcnu@gmail.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/smb2pdu.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index b1f5d0d28335a..9194f17675c89 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2283,7 +2283,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct kvec iov[SMB2_CREATE_IOV_SIZE];
+ 	struct kvec rsp_iov = {NULL, 0};
+-	int resp_buftype;
++	int resp_buftype = CIFS_NO_BUFFER;
+ 	int rc = 0;
+ 	int flags = 0;
+ 
+@@ -2570,7 +2570,7 @@ SMB2_close_flags(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct kvec iov[1];
+ 	struct kvec rsp_iov;
+-	int resp_buftype;
++	int resp_buftype = CIFS_NO_BUFFER;
+ 	int rc = 0;
+ 
+ 	cifs_dbg(FYI, "Close\n");
+@@ -2723,7 +2723,7 @@ query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct kvec iov[1];
+ 	struct kvec rsp_iov;
+ 	int rc = 0;
+-	int resp_buftype;
++	int resp_buftype = CIFS_NO_BUFFER;
+ 	struct cifs_ses *ses = tcon->ses;
+ 	int flags = 0;
+ 
+-- 
+2.20.1
+
