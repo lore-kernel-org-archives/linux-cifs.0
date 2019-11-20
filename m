@@ -1,109 +1,67 @@
-Return-Path: <SRS0=sSqu=ZL=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=JRKv=ZM=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D11DFC432C0
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Nov 2019 16:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C38C43215
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Nov 2019 00:20:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE495223AB
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Nov 2019 16:56:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7353A2243F
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Nov 2019 00:20:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727991AbfKSQ4A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Nov 2019 11:56:00 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:39207 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728320AbfKSQz7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Nov 2019 11:55:59 -0500
-Received: from mail-il1-f200.google.com ([209.85.166.200])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <matthew.ruffell@canonical.com>)
-        id 1iX6nF-0006sC-U9
-        for linux-cifs@vger.kernel.org; Tue, 19 Nov 2019 16:55:58 +0000
-Received: by mail-il1-f200.google.com with SMTP id t23so19918003ila.19
-        for <linux-cifs@vger.kernel.org>; Tue, 19 Nov 2019 08:55:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qMVxz7DEvrAqdEQJ+q0LV0JU+LXgEg2dOoNA2KuMQqQ=;
-        b=ZroQtiiEpLoEf2t3aQJupvMD9nzqT+32tUbXpTBQvpG83Mh511sVQIP8YpdqvfaOEa
-         zsRpP+V2qCZa4IXvhE8X4ZDpl5JSTj0eEGzN4Nmddf73BohaUUZUG7dF1MX9x6ame2jz
-         2qDo+mcNXQ82K5xqJqvIUQrval9rKshjINzH/wCVh4z0IsrbnUzXtEn2I3ibt06NXZ+A
-         J6Om5MlM+O6Pz69lFfGugRy55F2zB69s1xxnUO1BOo7+Q4KZ/wkUlEMXSrGxBWSvTDqK
-         wlXLiobDN438LbPfQpGLvaCc77nOHL3hvyOiJRkZ45WeCdTXci/3Z63PqKw7G0IboZKK
-         8qZw==
-X-Gm-Message-State: APjAAAU9AeZBaRsL6o7IMV/zdEv4iprOB5nQ0vcfLmGpuI1Yhw76KSk/
-        pdZSFkkSznRC7VmK9ypHgpzEjUesx1Brjii5InrwF/u/0qj9P0m7kaoqKB/2y01h9Qm3CmrBfkw
-        ymtobOnrqLrNrGScuRSm5OiwpYGID63VVuuUXbv8g9qHAq0MavV7/rNQ=
-X-Received: by 2002:a05:6602:2592:: with SMTP id p18mr2856098ioo.70.1574182556896;
-        Tue, 19 Nov 2019 08:55:56 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwU2kIEes3MA+w8AJRjpzGjbx+TVcNYUZrveoT+LXddYs4wLpcezSWo3d0zGnpJQz5XvqpKwIfgrjly8Xkkgj0=
-X-Received: by 2002:a05:6602:2592:: with SMTP id p18mr2856074ioo.70.1574182556633;
- Tue, 19 Nov 2019 08:55:56 -0800 (PST)
+        id S1727374AbfKTAUu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Nov 2019 19:20:50 -0500
+Received: from 216-12-86-13.cv.mvl.ntelos.net ([216.12.86.13]:50212 "EHLO
+        brightrain.aerifal.cx" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727298AbfKTAUu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Nov 2019 19:20:50 -0500
+X-Greylist: delayed 325 seconds by postgrey-1.27 at vger.kernel.org; Tue, 19 Nov 2019 19:20:49 EST
+Received: from dalias by brightrain.aerifal.cx with local (Exim 3.15 #2)
+        id 1iXDeU-0006sP-00; Wed, 20 Nov 2019 00:15:22 +0000
+Date:   Tue, 19 Nov 2019 19:15:22 -0500
+From:   Rich Felker <dalias@libc.org>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     musl@lists.openwall.com, linux-kernel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org
+Subject: getdents64 lost direntries with SMB/NFS and buffer size < unknown
+ threshold
+Message-ID: <20191120001522.GA25139@brightrain.aerifal.cx>
 MIME-Version: 1.0
-References: <05aa2995-e85e-0ff4-d003-5bb08bd17a22@canonical.com> <87imnooa13.fsf@cjr.nz>
-In-Reply-To: <87imnooa13.fsf@cjr.nz>
-From:   Matthew Ruffell <matthew.ruffell@canonical.com>
-Date:   Tue, 19 Nov 2019 08:55:45 -0800
-Message-ID: <CAKAwkKuwsCQGPJJD7HwFhqfqO+_u=z8nt=L2TC-k-9da2iQCPw@mail.gmail.com>
-Subject: Re: PROBLEM: DFS Caching feature causing problems traversing
- multi-tier DFS setups
-To:     Paulo Alcantara <pc@cjr.nz>, linux-cifs@vger.kernel.org
-Cc:     sfrench@samba.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Paulo,
+An issue was reported today on the Alpine Linux tracker at
+https://gitlab.alpinelinux.org/alpine/aports/issues/10960 regarding
+readdir results from SMB/NFS shares with musl libc.
 
-Apologies for the delay.
+After a good deal of analysis, we determined the root cause to be that
+the second and subsequent calls to getdents64 are dropping/skipping
+direntries (that have not yet been deleted) when some entries were
+deleted following the previous call. The issue appears to happen only
+when the buffer size passed to getdents64 is below some threshold
+greater than 2k (the size musl uses) but less than 32k (the size glibc
+uses, with which we were unable to reproduce the issue).
 
-I built the patch you placed at the end of your message into a test kernel for
-our customer, based on 5.4-rc7. I also sent the customer a vanilla 5.4-rc7 to
-test against, to see if the patch is what fixes the problem.
+My guess at the mechanism of failure is that the kernel has cached
+some entries which it obtained from the FS server based on whatever
+its preferred transfer size is, but didn't yet pass them to userspace
+due to limited buffer space, and then purged the buffer when resuming
+getdents64 after some entries were deleted for reasons related to the
+changes made way back in 0c0308066ca5 (NFS: Fix spurious readdir
+cookie loop messages). If so, any such purge likely needs to be
+delayed until already-buffered results are read, and there may be
+related buggy interactions with seeking that need to be examined.
 
-The customer just got back to me, and confirmed that vanilla 5.4-rc7 fails to
-mount their multi tier DFS share, and the patched 5.4-rc7 with the patch you
-provided successfully mounts their multi tier DFS share.
+The to/cc for this message are just my best guesses. Please cc anyone
+I missed who should be included when replying, and keep me on cc since
+I'm not subscribed to any of these lists but the musl one.
 
-Not working - Vanilla 5.4-rc7
-$ uname -rv
-5.4.0-rc7 #4 SMP Wed Nov 13 17:23:52 NZDT 2019
-$ sudo mount -v -t cifs //company.com/folders/country/<share> -o
-defaults,user=<user> /mnt/share
-Password for <user>@//company.com/folders/country/<share>: ************
-mount.cifs kernel mount options: ip=<IPv4
-Address>,unc=\\company.com\folders,user=<user>,prefixpath=country/<share>,pass=**********
-mount error(2): No such file or directory
-Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
-
-Working - Patched 5.4-rc7 with https://paste.ubuntu.com/p/DnCTNMjQJC/
-$ uname -rv
-5.4.0-rc7+upstreampatch1+ #3 SMP Wed Nov 13 16:42:34 NZDT 2019
-$ sudo mount -v -t cifs //company.com/folders/country/<share> -o
-defaults,user=<user> /mnt/share
-Password for <user>@//company.com/folders/country/<share>: ************
-mount.cifs kernel mount options: ip=<IPv4
-Address>,unc=\\company.com\folders,user=<user>,prefixpath=country/<share>,pass=**********
-$ cd /mnt/share/
-:/mnt/share$ ll
-total 4
-drwxr-xr-x 2 root root 0 Oct 18 2017 ./
-drwxr-xr-x 3 root root 4096 Nov 19 15:51 ../
-drwxr-xr-x 2 root root 0 Oct 23 15:27 <Directory>/
-drwxr-xr-x 2 root root 0 Aug 13 2018 <Directory 2>/
-
-Please, go ahead and prepare the patch for mainline inclusion, and as Steve
-mentioned before, consider cc stable.
-
-Thank you for developing the fix quickly.
-
-Matthew Ruffell
-Sustaining Engineer @ Canonical
+Rich
