@@ -2,66 +2,108 @@ Return-Path: <SRS0=JRKv=ZM=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C38C43215
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Nov 2019 00:20:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA6DC432C0
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Nov 2019 16:16:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7353A2243F
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Nov 2019 00:20:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C85C320715
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Nov 2019 16:16:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727374AbfKTAUu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Nov 2019 19:20:50 -0500
-Received: from 216-12-86-13.cv.mvl.ntelos.net ([216.12.86.13]:50212 "EHLO
-        brightrain.aerifal.cx" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727298AbfKTAUu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Nov 2019 19:20:50 -0500
-X-Greylist: delayed 325 seconds by postgrey-1.27 at vger.kernel.org; Tue, 19 Nov 2019 19:20:49 EST
-Received: from dalias by brightrain.aerifal.cx with local (Exim 3.15 #2)
-        id 1iXDeU-0006sP-00; Wed, 20 Nov 2019 00:15:22 +0000
-Date:   Tue, 19 Nov 2019 19:15:22 -0500
-From:   Rich Felker <dalias@libc.org>
-To:     linux-fsdevel@vger.kernel.org
-Cc:     musl@lists.openwall.com, linux-kernel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org
-Subject: getdents64 lost direntries with SMB/NFS and buffer size < unknown
- threshold
-Message-ID: <20191120001522.GA25139@brightrain.aerifal.cx>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+        id S1728728AbfKTQQE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Nov 2019 11:16:04 -0500
+Received: from mx2.suse.de ([195.135.220.15]:46662 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728305AbfKTQQE (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 20 Nov 2019 11:16:04 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 9A4A8B2F95;
+        Wed, 20 Nov 2019 16:16:02 +0000 (UTC)
+From:   Aurelien Aptel <aaptel@suse.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
+Subject: [PATCH 1/2] cifs: dump channel info in DebugData
+Date:   Wed, 20 Nov 2019 17:15:58 +0100
+Message-Id: <20191120161559.30295-1-aaptel@suse.com>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-An issue was reported today on the Alpine Linux tracker at
-https://gitlab.alpinelinux.org/alpine/aports/issues/10960 regarding
-readdir results from SMB/NFS shares with musl libc.
+* show server&TCP states for extra channels
+* mention if an interface has a channel connected to it
 
-After a good deal of analysis, we determined the root cause to be that
-the second and subsequent calls to getdents64 are dropping/skipping
-direntries (that have not yet been deleted) when some entries were
-deleted following the previous call. The issue appears to happen only
-when the buffer size passed to getdents64 is below some threshold
-greater than 2k (the size musl uses) but less than 32k (the size glibc
-uses, with which we were unable to reproduce the issue).
+Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+---
+ fs/cifs/cifs_debug.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
 
-My guess at the mechanism of failure is that the kernel has cached
-some entries which it obtained from the FS server based on whatever
-its preferred transfer size is, but didn't yet pass them to userspace
-due to limited buffer space, and then purged the buffer when resuming
-getdents64 after some entries were deleted for reasons related to the
-changes made way back in 0c0308066ca5 (NFS: Fix spurious readdir
-cookie loop messages). If so, any such purge likely needs to be
-delayed until already-buffered results are read, and there may be
-related buggy interactions with seeking that need to be examined.
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index efb2928ff6c8..c2dd07903d56 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -121,6 +121,27 @@ static void cifs_debug_tcon(struct seq_file *m, struct cifs_tcon *tcon)
+ 	seq_putc(m, '\n');
+ }
+ 
++static void
++cifs_dump_channel(struct seq_file *m, int i, struct cifs_chan *chan)
++{
++	struct TCP_Server_Info *server = chan->server;
++
++	seq_printf(m, "\t\tChannel %d Number of credits: %d Dialect 0x%x "
++		   "TCP status: %d Instance: %d Local Users To Server: %d "
++		   "SecMode: 0x%x Req On Wire: %d In Send: %d "
++		   "In MaxReq Wait: %d\n",
++		   i+1,
++		   server->credits,
++		   server->dialect,
++		   server->tcpStatus,
++		   server->reconnect_instance,
++		   server->srv_count,
++		   server->sec_mode,
++		   in_flight(server),
++		   atomic_read(&server->in_send),
++		   atomic_read(&server->num_waiters));
++}
++
+ static void
+ cifs_dump_iface(struct seq_file *m, struct cifs_server_iface *iface)
+ {
+@@ -377,6 +398,13 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 			if (ses->sign)
+ 				seq_puts(m, " signed");
+ 
++			if (ses->chan_count > 1) {
++				seq_printf(m, "\n\n\tExtra Channels: %lu\n",
++					   ses->chan_count-1);
++				for (j = 1; j < ses->chan_count; j++)
++					cifs_dump_channel(m, j, &ses->chans[j]);
++			}
++
+ 			seq_puts(m, "\n\tShares:");
+ 			j = 0;
+ 
+@@ -415,8 +443,13 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 				seq_printf(m, "\n\tServer interfaces: %zu\n",
+ 					   ses->iface_count);
+ 			for (j = 0; j < ses->iface_count; j++) {
++				struct cifs_server_iface *iface;
++
++				iface = &ses->iface_list[j];
+ 				seq_printf(m, "\t%d)", j);
+-				cifs_dump_iface(m, &ses->iface_list[j]);
++				cifs_dump_iface(m, iface);
++				if (is_ses_using_iface(ses, iface))
++					seq_puts(m, "\t\t[CONNECTED]\n");
+ 			}
+ 			spin_unlock(&ses->iface_lock);
+ 		}
+-- 
+2.16.4
 
-The to/cc for this message are just my best guesses. Please cc anyone
-I missed who should be included when replying, and keep me on cc since
-I'm not subscribed to any of these lists but the musl one.
-
-Rich
