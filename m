@@ -2,80 +2,92 @@ Return-Path: <SRS0=LLm2=ZN=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67AD7C43215
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Nov 2019 16:07:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78674C432C3
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Nov 2019 17:54:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F23920637
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Nov 2019 16:07:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="M9Dg9W3x"
+	by mail.kernel.org (Postfix) with ESMTP id 4BF8220658
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Nov 2019 17:54:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727022AbfKUQHa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 21 Nov 2019 11:07:30 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:33980 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726992AbfKUQHa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Nov 2019 11:07:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=zwTICfRN5iACciAHZej7Yc13+NfID7IlxajfIE6j//U=; b=M9Dg9W3xQri5/iGpRMcBCnDHT
-        Rq+TUwNMYFn45MoG8UEYPNCuWZtZbFPkFKYwSp8k3Mr/WM/ConXVjW4ee0bYkrFXfihxS5iEog2R7
-        LqIhicHqEHG833ceHRr+8Ff2HRtkL2SUJxNhaVl0lo9382vdai2B4TrZiXxEaRwVric7HeYzhT38C
-        DHaL0WkAGuJ7nU8m+ydaWbjtQ/Flcva12OImgfH2Qg+Pf3AiKwmt3RHfF5TMNDAX3IueIVRrIgS5z
-        SL3r6r5qwi+8kITxgAJHXrY6uQgz3MqzkiWa1pjfiHOe5PkOpEwoJYu63zUuSpEzcsrGoq150/Cnx
-        A4DD4JI3Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iXozN-00055c-L3; Thu, 21 Nov 2019 16:07:25 +0000
-Date:   Thu, 21 Nov 2019 08:07:25 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Don't use iov_iter::type directly
-Message-ID: <20191121160725.GA19291@infradead.org>
-References: <20191121081923.GA19366@infradead.org>
- <157432403818.17624.9300948341879954830.stgit@warthog.procyon.org.uk>
- <30992.1574327471@warthog.procyon.org.uk>
+        id S1726546AbfKURyl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 21 Nov 2019 12:54:41 -0500
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:38798 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726293AbfKURyl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Nov 2019 12:54:41 -0500
+Received: from callcc.thunk.org (guestnat-104-133-8-103.corp.google.com [104.133.8.103] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id xALHsJ6a011724
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 21 Nov 2019 12:54:21 -0500
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id CA5FF4202FD; Thu, 21 Nov 2019 12:54:18 -0500 (EST)
+Date:   Thu, 21 Nov 2019 12:54:18 -0500
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Rich Felker <dalias@libc.org>
+Cc:     Florian Weimer <fw@deneb.enyo.de>, linux-fsdevel@vger.kernel.org,
+        musl@lists.openwall.com, linux-kernel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org
+Subject: Re: [musl] getdents64 lost direntries with SMB/NFS and buffer size <
+ unknown threshold
+Message-ID: <20191121175418.GI4262@mit.edu>
+References: <20191120001522.GA25139@brightrain.aerifal.cx>
+ <8736eiqq1f.fsf@mid.deneb.enyo.de>
+ <20191120205913.GD16318@brightrain.aerifal.cx>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <30992.1574327471@warthog.procyon.org.uk>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20191120205913.GD16318@brightrain.aerifal.cx>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Nov 21, 2019 at 09:11:11AM +0000, David Howells wrote:
-> What I've been exploring is moving to:
+On Wed, Nov 20, 2019 at 03:59:13PM -0500, Rich Felker wrote:
 > 
-> 	ITER_IOVEC = 0
-> 	ITER_KVEC = 1,
-> 	ITER_BVEC = 2,
-> 	ITER_PIPE = 3,
-> 	ITER_DISCARD = 4,
-> 
-> and using switch statements - and then leaving it to the compiler to decide
-> how best to do things.  In some ways, it might be nice to let the compiler
-> decide what constants it might use for this so as to best optimise the use
-> cases, but there's no way to do that at the moment.
+> POSIX only allows both behaviors (showing or not showing) the entry
+> that was deleted. It does not allow deletion of one entry to cause
+> other entries not to be seen.
 
-I'm all in favor of that. 
+Agreed, but POSIX requires this of *readdir*.  POSIX says nothing
+about getdents64(2), which is Linux's internal implementation which is
+exposed to a libc.
 
-> However, all the code that is doing direct accesses using '&' has to change to
-> make that work - so I've converted it all to using accessors so that I only
-> have to change the header file, except that the patch to do that crossed with
-> a cifs patch that added more direct accesses, IIRC.
+So we would need to see what is exactly going on at the interfaces
+between the VFS and libc, the nfs client code and the VFS, the nfs
+client code and the nfs server, and possibly the behavior of the nfs
+server.
 
-But I still don't really see the point of the wrappers.  Maybe they are
-ok as a migration strategy, but in that case this patch mostly makes
-sense as part of the series only.
+First of all.... you can't reproduce this on anything other than with
+NFS, correct?  That is, does it show up if you are using ext4, xfs,
+btrfs, etc.?
+
+Secondly, have you tried this on more than one NFS server
+implementation?
+
+Finally, can you capture strace logs and tcpdump logs of the
+communication between the NFS client and server code?
+
+> > But many file systems simply provide not the necessary on-disk data
+> > structures which are need to ensure stable iteration in the face of
+> > modification of the directory.  There are hacks, of course, such as
+> > compacting the on-disk directory only on file creation, which solves
+> > the file removal case.
+
+Oh, that's not the worst of it.  You have to do a lot more if the file
+system needs to support telldir/seekdir, and if you want to export the
+file system over NFS.  If you are using anything other than a linear
+linked list implementation for your directory, you have to really turn
+sommersaults to make sure things work (and work efficiently) in the
+face of, say, node splits of you are using some kind of tree structure
+for your directory.
+
+Most file systems do get this right, at least if they hope to be
+safely able to be exportable via NFS, or via CIFS using Samba.
+
+       	       	  	     	      	 - Ted
