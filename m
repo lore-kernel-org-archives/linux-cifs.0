@@ -7,226 +7,136 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E479C432C3
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Nov 2019 22:01:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 415B0C432C0
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Nov 2019 23:29:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D848B2068E
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Nov 2019 22:01:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C7B220674
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Nov 2019 23:29:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BAId8u52"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fguTswre"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726329AbfKUWBA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 21 Nov 2019 17:01:00 -0500
-Received: from mail-il1-f194.google.com ([209.85.166.194]:34445 "EHLO
-        mail-il1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726297AbfKUWBA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Nov 2019 17:01:00 -0500
-Received: by mail-il1-f194.google.com with SMTP id p6so4914047ilp.1
-        for <linux-cifs@vger.kernel.org>; Thu, 21 Nov 2019 14:00:59 -0800 (PST)
+        id S1726038AbfKUX35 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 21 Nov 2019 18:29:57 -0500
+Received: from mail-io1-f41.google.com ([209.85.166.41]:38924 "EHLO
+        mail-io1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725956AbfKUX35 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 21 Nov 2019 18:29:57 -0500
+Received: by mail-io1-f41.google.com with SMTP id k1so5594873ioj.6
+        for <linux-cifs@vger.kernel.org>; Thu, 21 Nov 2019 15:29:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0NXwl2AhtTokQEuDPfAeUbmlZE5jOQqNJIcuGhmGcxE=;
-        b=BAId8u526Ecnpo7/ZeiT6aLeCbpP8/UfDM9Vfxy0PXKRooCjGUUH7eTgDrE4zo/rQU
-         WXen96TcytlWIAA6B5x6q0WETvKSro4JHqMK2q6W1hdUo4JjeucvtWPO4SLm4J7wZHY0
-         Hg7jQBFqOlZcQfcKHOmpYK99WIDIgVW6XbBdv+X6bsw/y9h4jSHYxp7a/R50LURx303s
-         gxvXlbVtlzwyHz3oS6JdKnZfVZ9LYFBfxb7yZdoXu8WfwVxXgQsWSBl/qOoYCrmTklVV
-         7f7/Ji0LkUaM6kP3xSaBsQqnG9ho/CqrNBf8LOry/QAvtAPBHIKKAF/F53zlcQM+1dZi
-         qs8A==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=BGK3nktBWdQF19efdzCopVrZpMUHW7hGUEQVypCgK4Y=;
+        b=fguTswreFq+OmTH4/PZGTIDWQbWIJDgcc5G4IG3xPF6Ca2SXTJwdp8Y+eY93gu/Og4
+         5Bk/B4SZKupfVDIzCvTencm81hBs9pfFBQHhgr4Aw1fTrfI3bv9xHfZPhmTQW0eV9Fev
+         A0xO/eo7o40K8x3G65o7MGvf651xinzlbDgw6ojDneC9YJaqvrX5bfh/C2rGkcymuHny
+         gVlSblAfch2fHKwYRoETsHA4axM3y04uLmNtQ4NkyR8TMfRfyPENmjCZX5o8ZsJeIUWm
+         73LlQ6E22BdGwZmRJNFHviTi+sg25YJ+NwzFigcVsUBX/f0p/8rLxk9DaOunQsHdr6PH
+         SNlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0NXwl2AhtTokQEuDPfAeUbmlZE5jOQqNJIcuGhmGcxE=;
-        b=h/iumou1b6sBA9CYabKDe+9AcDdCqplyVGmjx2H2pn/NjHdoj7ggZ0cvWy+P7bqG4f
-         fp2zO7UV9c+Ekzx/XCzXpHxp/+n+r/XdQWWQvIu5wb7WYQ8H7f2S3WI+n+YcZ2eMnTzf
-         ppWOKK+DF2kjttDYPD41cUezGAZENpks2q5L6LnLg/OdZA0UK7IO9BC9fBKr7pIrld8Y
-         Y8rxkIut5YTMj/2TCttiOabxBcDD46jZ9EOPv6wSSIY/PgNsjQzjCPFTnSV6W4kvO2Jy
-         gk4TuU1u2wq1Y6ecKRheawOmHwdc1qrOlktqVL1QyCfNu5B2f3y3Fw78PRhGlt6RWinC
-         EwBw==
-X-Gm-Message-State: APjAAAV1VLzpu+CyQmo/QAfShO3gFDsIguHVkKKGdgXhKXCwemmjIKDR
-        2TPSy263b6nJa/G9X4ILgoVK4Q/GXUZhg0eD960=
-X-Google-Smtp-Source: APXvYqxRpeLWrkCJAIFoRChzo4lEqI/dBKCKC46qAF8YUceMJAjpBR5yIKhDjmlN8HtHer+3VB4xnZ0j54L6XFUtgvM=
-X-Received: by 2002:a92:8b4e:: with SMTP id i75mr12088878ild.5.1574373658707;
- Thu, 21 Nov 2019 14:00:58 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=BGK3nktBWdQF19efdzCopVrZpMUHW7hGUEQVypCgK4Y=;
+        b=Lh3N7yLRtreJYFaRfXcAzLgpAZd/ZlSmwIlUX0Wu9v7GYdCGy3rGiDyynU7rO12p2j
+         76wQxceUIm4X78zkXwwd0+tJFrGymSw9F9Ocp5ldztTiMLemqSei+pQoxLOn7UFOinK+
+         SBVQp4BKeIfNjEgzWSQF5JdUK+9UUY6eQep+fj+Yc0Ilm8VRPHuMsDbN3BxXj92vL9iK
+         m7L6yJBMrLf6iDIAGWezvj7Bgya6WGBBFpE8M+qMWm5pXx80WmM3GhKFLbp1Fz4SQIKG
+         2SkQcBFU9arvcbgbZTh4GJCWz4dCmU5gqvcRCBNvTz4+rqj7ExCU6Oa8J2uthaPDH11V
+         CFkQ==
+X-Gm-Message-State: APjAAAWjv60/O7sQjfbqfzOEHZeFowrB8OCE6JdrDZrqvB1XA/I3nixM
+        HXLEa+f3o6oGiHtPVviaaMo6RsJfJlh9J7CnZgM=
+X-Google-Smtp-Source: APXvYqxUbW1uqFJtrPlooulAB0eRHT9CqB+B68eJmz8NXO1KIhEkTWTuRZAyoHqV/DlRGbV12K0xIDq3Uyjgb0hNiAw=
+X-Received: by 2002:a5d:848c:: with SMTP id t12mr9617025iom.5.1574378996147;
+ Thu, 21 Nov 2019 15:29:56 -0800 (PST)
 MIME-Version: 1.0
-References: <20191121193514.3086-1-pshilov@microsoft.com>
-In-Reply-To: <20191121193514.3086-1-pshilov@microsoft.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 21 Nov 2019 16:00:47 -0600
-Message-ID: <CAH2r5muszgyJWP6mUYs6nsHQQN-6ST63DJvyFus+STrJYP4-ug@mail.gmail.com>
-Subject: Re: [PATCH 1/3] CIFS: Close open handle after interrupted close
-To:     Pavel Shilovsky <piastryyy@gmail.com>,
+Date:   Thu, 21 Nov 2019 17:29:45 -0600
+Message-ID: <CAH2r5munzGbsOs-WGxgo+023_becDWoSVeXzVNJB25K6mvtRLw@mail.gmail.com>
+Subject: [PATCH][SMB3] move num_waiters and in_send counters from
+ CONFIG_CIFS_STAT2 to default
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>,
         =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        Paulo Alcantara <paulo@paulo.ac>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Frank Sorenson <sorenson@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000cf25c30597e3ac77"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Merged these three (and one of Aurelien's recent patches for
-multichannel - need updates to that, also waiting on Paulo's DFS fix)
-into cifs-2.6.git for-next (and also the buildbot's gitub for-next
-branch)
+--000000000000cf25c30597e3ac77
+Content-Type: text/plain; charset="UTF-8"
 
-
-On Thu, Nov 21, 2019 at 1:35 PM Pavel Shilovsky <piastryyy@gmail.com> wrote:
->
-> If Close command is interrupted before sending a request
-> to the server the client ends up leaking an open file
-> handle. This wastes server resources and can potentially
-> block applications that try to remove the file or any
-> directory containing this file.
->
-> Fix this by putting the close command into a worker queue,
-> so another thread retries it later.
->
-> Cc: Stable <stable@vger.kernel.org>
-> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
-> ---
->  fs/cifs/smb2misc.c  | 59 ++++++++++++++++++++++++++++++++++-----------
->  fs/cifs/smb2pdu.c   | 16 +++++++++++-
->  fs/cifs/smb2proto.h |  3 +++
->  3 files changed, 63 insertions(+), 15 deletions(-)
->
-> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-> index 527c9efd3de0..80a8f4b2daab 100644
-> --- a/fs/cifs/smb2misc.c
-> +++ b/fs/cifs/smb2misc.c
-> @@ -725,36 +725,67 @@ smb2_cancelled_close_fid(struct work_struct *work)
->         kfree(cancelled);
->  }
->
-> +/* Caller should already has an extra reference to @tcon */
-> +static int
-> +__smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
-> +                             __u64 volatile_fid)
-> +{
-> +       struct close_cancelled_open *cancelled;
-> +
-> +       cancelled = kzalloc(sizeof(*cancelled), GFP_KERNEL);
-> +       if (!cancelled)
-> +               return -ENOMEM;
-> +
-> +       cancelled->fid.persistent_fid = persistent_fid;
-> +       cancelled->fid.volatile_fid = volatile_fid;
-> +       cancelled->tcon = tcon;
-> +       INIT_WORK(&cancelled->work, smb2_cancelled_close_fid);
-> +       WARN_ON(queue_work(cifsiod_wq, &cancelled->work) == false);
-> +
-> +       return 0;
-> +}
-> +
-> +int
-> +smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
-> +                           __u64 volatile_fid)
-> +{
-> +       int rc;
-> +
-> +       cifs_dbg(FYI, "%s: tc_count=%d\n", __func__, tcon->tc_count);
-> +       spin_lock(&cifs_tcp_ses_lock);
-> +       tcon->tc_count++;
-> +       spin_unlock(&cifs_tcp_ses_lock);
-> +
-> +       rc = __smb2_handle_cancelled_close(tcon, persistent_fid, volatile_fid);
-> +       if (rc)
-> +               cifs_put_tcon(tcon);
-> +
-> +       return rc;
-> +}
-> +
->  int
->  smb2_handle_cancelled_mid(char *buffer, struct TCP_Server_Info *server)
->  {
->         struct smb2_sync_hdr *sync_hdr = (struct smb2_sync_hdr *)buffer;
->         struct smb2_create_rsp *rsp = (struct smb2_create_rsp *)buffer;
->         struct cifs_tcon *tcon;
-> -       struct close_cancelled_open *cancelled;
-> +       int rc;
->
->         if (sync_hdr->Command != SMB2_CREATE ||
->             sync_hdr->Status != STATUS_SUCCESS)
->                 return 0;
->
-> -       cancelled = kzalloc(sizeof(*cancelled), GFP_KERNEL);
-> -       if (!cancelled)
-> -               return -ENOMEM;
-> -
->         tcon = smb2_find_smb_tcon(server, sync_hdr->SessionId,
->                                   sync_hdr->TreeId);
-> -       if (!tcon) {
-> -               kfree(cancelled);
-> +       if (!tcon)
->                 return -ENOENT;
-> -       }
->
-> -       cancelled->fid.persistent_fid = rsp->PersistentFileId;
-> -       cancelled->fid.volatile_fid = rsp->VolatileFileId;
-> -       cancelled->tcon = tcon;
-> -       INIT_WORK(&cancelled->work, smb2_cancelled_close_fid);
-> -       queue_work(cifsiod_wq, &cancelled->work);
-> +       rc = __smb2_handle_cancelled_close(tcon, rsp->PersistentFileId,
-> +                                          rsp->VolatileFileId);
-> +       if (rc)
-> +               cifs_put_tcon(tcon);
->
-> -       return 0;
-> +       return rc;
->  }
->
->  /**
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 0aa40129dfb5..2f541e9efba1 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -2942,7 +2942,21 @@ int
->  SMB2_close(const unsigned int xid, struct cifs_tcon *tcon,
->            u64 persistent_fid, u64 volatile_fid)
->  {
-> -       return SMB2_close_flags(xid, tcon, persistent_fid, volatile_fid, 0);
-> +       int rc;
-> +       int tmp_rc;
-> +
-> +       rc = SMB2_close_flags(xid, tcon, persistent_fid, volatile_fid, 0);
-> +
-> +       /* retry close in a worker thread if this one is interrupted */
-> +       if (rc == -EINTR) {
-> +               tmp_rc = smb2_handle_cancelled_close(tcon, persistent_fid,
-> +                                                    volatile_fid);
-> +               if (tmp_rc)
-> +                       cifs_dbg(VFS, "handle cancelled close fid 0x%llx returned error %d\n",
-> +                                persistent_fid, tmp_rc);
-> +       }
-> +
-> +       return rc;
->  }
->
->  int
-> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-> index 07ca72486cfa..e239f98093a9 100644
-> --- a/fs/cifs/smb2proto.h
-> +++ b/fs/cifs/smb2proto.h
-> @@ -203,6 +203,9 @@ extern int SMB2_set_compression(const unsigned int xid, struct cifs_tcon *tcon,
->  extern int SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
->                              const u64 persistent_fid, const u64 volatile_fid,
->                              const __u8 oplock_level);
-> +extern int smb2_handle_cancelled_close(struct cifs_tcon *tcon,
-> +                                      __u64 persistent_fid,
-> +                                      __u64 volatile_fid);
->  extern int smb2_handle_cancelled_mid(char *buffer,
->                                         struct TCP_Server_Info *server);
->  void smb2_cancelled_close_fid(struct work_struct *work);
-> --
-> 2.17.1
->
-
+Any objections? (Was needed for one of Aurelien's patches)
 
 -- 
 Thanks,
 
 Steve
+
+--000000000000cf25c30597e3ac77
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-dump-in_send-and-num_waiters-stats-counters-by-.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-dump-in_send-and-num_waiters-stats-counters-by-.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_k39clczs0>
+X-Attachment-Id: f_k39clczs0
+
+RnJvbSBkYWQ0NjM5YmUyZjQzMGY2ZGRmMDNiNWU5YmNkY2I0NjE5Y2Q1NDA3IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFRodSwgMjEgTm92IDIwMTkgMTc6MjY6MzUgLTA2MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBkdW1wIGluX3NlbmQgYW5kIG51bV93YWl0ZXJzIHN0YXRzIGNvdW50ZXJzIGJ5IGRlZmF1
+bHQKCk51bWJlciBvZiByZXF1ZXN0cyBpbl9zZW5kIGFuZCB0aGUgbnVtYmVyIG9mIHdhaXRlcnMg
+b24gc2VuZFJlY3YKYXJlIHVzZWZ1bCBjb3VudGVycyBpbiB2YXJpb3VzIGNhc2VzLCBtb3ZlIHRo
+ZW0gZnJvbQpDT05GSUdfQ0lGU19TVEFUUzIgdG8gYmUgb24gYnkgZGVmYXVsdCBlc3BlY2lhbGx5
+IHdpdGggbXVsdGljaGFubmVsCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNo
+QG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9jaWZzX2RlYnVnLmMgfCAgMyArLS0KIGZzL2Np
+ZnMvY2lmc2dsb2IuaCAgIHwgMjIgKysrLS0tLS0tLS0tLS0tLS0tLS0tLQogMiBmaWxlcyBjaGFu
+Z2VkLCA0IGluc2VydGlvbnMoKyksIDIxIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2Np
+ZnMvY2lmc19kZWJ1Zy5jIGIvZnMvY2lmcy9jaWZzX2RlYnVnLmMKaW5kZXggYzJkZDA3OTAzZDU2
+Li42NDEyMWYzNGFjZDAgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc19kZWJ1Zy5jCisrKyBiL2Zz
+L2NpZnMvY2lmc19kZWJ1Zy5jCkBAIC0zODYsMTEgKzM4NiwxMCBAQCBzdGF0aWMgaW50IGNpZnNf
+ZGVidWdfZGF0YV9wcm9jX3Nob3coc3RydWN0IHNlcV9maWxlICptLCB2b2lkICp2KQogCQkJCSAg
+IHNlcnZlci0+c3J2X2NvdW50LAogCQkJCSAgIHNlcnZlci0+c2VjX21vZGUsIGluX2ZsaWdodChz
+ZXJ2ZXIpKTsKIAotI2lmZGVmIENPTkZJR19DSUZTX1NUQVRTMgogCQkJc2VxX3ByaW50ZihtLCAi
+IEluIFNlbmQ6ICVkIEluIE1heFJlcSBXYWl0OiAlZCIsCiAJCQkJYXRvbWljX3JlYWQoJnNlcnZl
+ci0+aW5fc2VuZCksCiAJCQkJYXRvbWljX3JlYWQoJnNlcnZlci0+bnVtX3dhaXRlcnMpKTsKLSNl
+bmRpZgorCiAJCQkvKiBkdW1wIHNlc3Npb24gaWQgaGVscGZ1bCBmb3IgdXNlIHdpdGggbmV0d29y
+ayB0cmFjZSAqLwogCQkJc2VxX3ByaW50ZihtLCAiIFNlc3Npb25JZDogMHglbGx4Iiwgc2VzLT5T
+dWlkKTsKIAkJCWlmIChzZXMtPnNlc3Npb25fZmxhZ3MgJiBTTUIyX1NFU1NJT05fRkxBR19FTkNS
+WVBUX0RBVEEpCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNnbG9iLmggYi9mcy9jaWZzL2NpZnNn
+bG9iLmgKaW5kZXggMmZjM2Q3NzQ2M2QzLi5kMzRhNGVkOGM1N2QgMTAwNjQ0Ci0tLSBhL2ZzL2Np
+ZnMvY2lmc2dsb2IuaAorKysgYi9mcy9jaWZzL2NpZnNnbG9iLmgKQEAgLTc0MywxMiArNzQzLDEy
+IEBAIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gewogCS8qIFRvdGFsIHNpemUgb2YgdGhpcyBQRFUu
+IE9ubHkgdmFsaWQgZnJvbSBjaWZzX2RlbXVsdGlwbGV4X3RocmVhZCAqLwogCXVuc2lnbmVkIGlu
+dCBwZHVfc2l6ZTsKIAl1bnNpZ25lZCBpbnQgdG90YWxfcmVhZDsgLyogdG90YWwgYW1vdW50IG9m
+IGRhdGEgcmVhZCBpbiB0aGlzIHBhc3MgKi8KKwlhdG9taWNfdCBpbl9zZW5kOyAvKiByZXF1ZXN0
+cyB0cnlpbmcgdG8gc2VuZCAqLworCWF0b21pY190IG51bV93YWl0ZXJzOyAgIC8qIGJsb2NrZWQg
+d2FpdGluZyB0byBnZXQgaW4gc2VuZHJlY3YgKi8KICNpZmRlZiBDT05GSUdfQ0lGU19GU0NBQ0hF
+CiAJc3RydWN0IGZzY2FjaGVfY29va2llICAgKmZzY2FjaGU7IC8qIGNsaWVudCBpbmRleCBjYWNo
+ZSBjb29raWUgKi8KICNlbmRpZgogI2lmZGVmIENPTkZJR19DSUZTX1NUQVRTMgotCWF0b21pY190
+IGluX3NlbmQ7IC8qIHJlcXVlc3RzIHRyeWluZyB0byBzZW5kICovCi0JYXRvbWljX3QgbnVtX3dh
+aXRlcnM7ICAgLyogYmxvY2tlZCB3YWl0aW5nIHRvIGdldCBpbiBzZW5kcmVjdiAqLwogCWF0b21p
+Y190IG51bV9jbWRzW05VTUJFUl9PRl9TTUIyX0NPTU1BTkRTXTsgLyogdG90YWwgcmVxdWVzdHMg
+YnkgY21kICovCiAJYXRvbWljX3Qgc21iMnNsb3djbWRbTlVNQkVSX09GX1NNQjJfQ09NTUFORFNd
+OyAvKiBjb3VudCByZXNwcyA+IDEgc2VjICovCiAJX191NjQgdGltZV9wZXJfY21kW05VTUJFUl9P
+Rl9TTUIyX0NPTU1BTkRTXTsgLyogdG90YWwgdGltZSBwZXIgY21kICovCkBAIC0xNjA2LDggKzE2
+MDYsNiBAQCBzdHJ1Y3QgY2xvc2VfY2FuY2VsbGVkX29wZW4gewogCiAvKglNYWtlIGNvZGUgaW4g
+dHJhbnNwb3J0LmMgYSBsaXR0bGUgY2xlYW5lciBieSBtb3ZpbmcKIAl1cGRhdGUgb2Ygb3B0aW9u
+YWwgc3RhdHMgaW50byBmdW5jdGlvbiBiZWxvdyAqLwotI2lmZGVmIENPTkZJR19DSUZTX1NUQVRT
+MgotCiBzdGF0aWMgaW5saW5lIHZvaWQgY2lmc19pbl9zZW5kX2luYyhzdHJ1Y3QgVENQX1NlcnZl
+cl9JbmZvICpzZXJ2ZXIpCiB7CiAJYXRvbWljX2luYygmc2VydmVyLT5pbl9zZW5kKTsKQEAgLTE2
+MjgsMjYgKzE2MjYsMTIgQEAgc3RhdGljIGlubGluZSB2b2lkIGNpZnNfbnVtX3dhaXRlcnNfZGVj
+KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikKIAlhdG9taWNfZGVjKCZzZXJ2ZXItPm51
+bV93YWl0ZXJzKTsKIH0KIAorI2lmZGVmIENPTkZJR19DSUZTX1NUQVRTMgogc3RhdGljIGlubGlu
+ZSB2b2lkIGNpZnNfc2F2ZV93aGVuX3NlbnQoc3RydWN0IG1pZF9xX2VudHJ5ICptaWQpCiB7CiAJ
+bWlkLT53aGVuX3NlbnQgPSBqaWZmaWVzOwogfQogI2Vsc2UKLXN0YXRpYyBpbmxpbmUgdm9pZCBj
+aWZzX2luX3NlbmRfaW5jKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikKLXsKLX0KLXN0
+YXRpYyBpbmxpbmUgdm9pZCBjaWZzX2luX3NlbmRfZGVjKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8g
+KnNlcnZlcikKLXsKLX0KLQotc3RhdGljIGlubGluZSB2b2lkIGNpZnNfbnVtX3dhaXRlcnNfaW5j
+KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikKLXsKLX0KLQotc3RhdGljIGlubGluZSB2
+b2lkIGNpZnNfbnVtX3dhaXRlcnNfZGVjKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikK
+LXsKLX0KLQogc3RhdGljIGlubGluZSB2b2lkIGNpZnNfc2F2ZV93aGVuX3NlbnQoc3RydWN0IG1p
+ZF9xX2VudHJ5ICptaWQpCiB7CiB9Ci0tIAoyLjIzLjAKCg==
+--000000000000cf25c30597e3ac77--
