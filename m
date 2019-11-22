@@ -7,43 +7,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA6BC432C0
-	for <linux-cifs@archiver.kernel.org>; Fri, 22 Nov 2019 15:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AEBEC432C3
+	for <linux-cifs@archiver.kernel.org>; Fri, 22 Nov 2019 15:31:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4277220715
-	for <linux-cifs@archiver.kernel.org>; Fri, 22 Nov 2019 15:31:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E97E2071C
+	for <linux-cifs@archiver.kernel.org>; Fri, 22 Nov 2019 15:31:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="pNZ6U/Ik"
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="Z3LN6aUq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726633AbfKVPbl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 22 Nov 2019 10:31:41 -0500
-Received: from mx.cjr.nz ([51.158.111.142]:28400 "EHLO mx.cjr.nz"
+        id S1726686AbfKVPbu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 22 Nov 2019 10:31:50 -0500
+Received: from mx.cjr.nz ([51.158.111.142]:28476 "EHLO mx.cjr.nz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726046AbfKVPbk (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 22 Nov 2019 10:31:40 -0500
+        id S1726655AbfKVPbt (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 22 Nov 2019 10:31:49 -0500
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id A978180A4E;
-        Fri, 22 Nov 2019 15:31:33 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 1D0B580A51;
+        Fri, 22 Nov 2019 15:31:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1574436695;
+        t=1574436707;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yknjX8epFUwENSsCqC2VXl6TBNeeL8Vq3yG71VEu7oA=;
-        b=pNZ6U/IktmQIA1j9T+qpAKyT44R9wKm3Fz+JVJ+P5Ys3zrC7CemUhehJeZc//Ec/qN1GUj
-        VJ7TfcvlixPQ+Y6XBnbVfNxpog7Yz3JZyA+U8Av1dbGHv73rq867HufOZza06MNfRZ6H4l
-        1LhZa7jua/+mKM+XgfC2i75ghtj0QYjvOhPYGQOX/oZQSP1VRt2HsNw7Yo4HCOjcYS+ZYZ
-        pJrh/zod4t/P7DtkWBY4VLk6zeL7pKd3tU+zgrRJokNp0rdyUdehg5XfX8eoVym7EcUNKN
-        tUcZDDiKFD52EP9aC3+gXQxirefnH+FyNl7YCNJ7RZTMkgb+UfZZJfdWqX353A==
+        bh=NmCdYtHTRFtTbKwICBxuny47W3tQAxRiRVHAX01WFq8=;
+        b=Z3LN6aUqKJYcnCGOhPTuZouNKfMSdufsOlNUfCi+ybz9/+f7kIMt1OIMhosZZ9RGHTzGN8
+        a3iBMQQP3KnO35D8F5SRZn6VOi28OZHUAdgLIgojFC7C6G74Afjb6F0oauUyjhh95IaVAu
+        i0Dly6xDy4kAKe17AU+oXeyiGZd+fwsPlH5v6q4FgNDqpnBBdeUKVqw42QPDTtRhrdywAo
+        lnR1NjsgRKzA0gCY1+lytb9LBwsd6cjPQqxwjcWVoWL0KwICM9KHRgHGgvJHmcJ+g/NtlE
+        09ihkkFNZL7WG9BmLKEuFA135i1F6x/AT7oQd1xH/V99U7MIMVHB+j8HQYLcVA==
 From:   "Paulo Alcantara (SUSE)" <pc@cjr.nz>
 To:     smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
-        Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH 3/7] cifs: Fix potential softlockups while refreshing DFS cache
-Date:   Fri, 22 Nov 2019 12:30:53 -0300
-Message-Id: <20191122153057.6608-4-pc@cjr.nz>
+Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara (SUSE)" <pc@cjr.nz>
+Subject: [PATCH 5/7] cifs: Fix potential deadlock when updating vol in cifs_reconnect()
+Date:   Fri, 22 Nov 2019 12:30:55 -0300
+Message-Id: <20191122153057.6608-6-pc@cjr.nz>
 In-Reply-To: <20191122153057.6608-1-pc@cjr.nz>
 References: <20191122153057.6608-1-pc@cjr.nz>
 MIME-Version: 1.0
@@ -53,96 +52,131 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We used to skip reconnects on all SMB2_IOCTL commands due to SMB3+
-FSCTL_VALIDATE_NEGOTIATE_INFO - which made sense since we're still
-establishing a SMB session.
+We can't hold the vol_lock spinlock while refreshing the DFS cache
+because cifs_reconnect() may call dfs_cache_update_vol() while we are
+walking through the volume list.
 
-However, when refresh_cache_worker() calls smb2_get_dfs_refer() and
-we're under reconnect, SMB2_ioctl() will not be able to get a proper
-status error (e.g. -EHOSTDOWN in case we failed to reconnect) but an
--EAGAIN from cifs_send_recv() thus looping forever in
-refresh_cache_worker().
+Create a temp list with all volumes eligible for refreshing and then
+use it without any locks held.
 
 Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Suggested-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/smb2pdu.c | 41 +++++++++++++++++++++++++++++------------
- 1 file changed, 29 insertions(+), 12 deletions(-)
+ fs/cifs/dfs_cache.c | 45 +++++++++++++++++++++++++++++++++------------
+ 1 file changed, 33 insertions(+), 12 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index c09ca6963394..3cd90088d8ac 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -252,7 +252,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- 	if (tcon == NULL)
- 		return 0;
+diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+index b082603c793a..5b9d7281dd67 100644
+--- a/fs/cifs/dfs_cache.c
++++ b/fs/cifs/dfs_cache.c
+@@ -49,6 +49,8 @@ struct vol_info {
+ 	struct smb_vol smb_vol;
+ 	char *mntdata;
+ 	struct list_head list;
++	struct list_head rlist;
++	int vol_count;
+ };
  
--	if (smb2_command == SMB2_TREE_CONNECT || smb2_command == SMB2_IOCTL)
-+	if (smb2_command == SMB2_TREE_CONNECT)
- 		return 0;
- 
- 	if (tcon->tidStatus == CifsExiting) {
-@@ -426,16 +426,9 @@ fill_small_buf(__le16 smb2_command, struct cifs_tcon *tcon, void *buf,
-  * SMB information in the SMB header. If the return code is zero, this
-  * function must have filled in request_buf pointer.
-  */
--static int
--smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
--		    void **request_buf, unsigned int *total_len)
-+static int __smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
-+				  void **request_buf, unsigned int *total_len)
- {
--	int rc;
--
--	rc = smb2_reconnect(smb2_command, tcon);
--	if (rc)
--		return rc;
--
- 	/* BB eventually switch this to SMB2 specific small buf size */
- 	if (smb2_command == SMB2_SET_INFO)
- 		*request_buf = cifs_buf_get();
-@@ -456,7 +449,31 @@ smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
- 		cifs_stats_inc(&tcon->num_smbs_sent);
- 	}
- 
--	return rc;
-+	return 0;
-+}
-+
-+static int smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
-+			       void **request_buf, unsigned int *total_len)
-+{
-+	int rc;
-+
-+	rc = smb2_reconnect(smb2_command, tcon);
-+	if (rc)
-+		return rc;
-+
-+	return __smb2_plain_req_init(smb2_command, tcon, request_buf,
-+				     total_len);
-+}
-+
-+static int smb2_ioctl_req_init(u32 opcode, struct cifs_tcon *tcon,
-+			       void **request_buf, unsigned int *total_len)
-+{
-+	/* Skip reconnect only for FSCTL_VALIDATE_NEGOTIATE_INFO IOCTLs */
-+	if (opcode == FSCTL_VALIDATE_NEGOTIATE_INFO) {
-+		return __smb2_plain_req_init(SMB2_IOCTL, tcon, request_buf,
-+					     total_len);
-+	}
-+	return smb2_plain_req_init(SMB2_IOCTL, tcon, request_buf, total_len);
+ static struct kmem_cache *cache_slab __read_mostly;
+@@ -516,13 +518,15 @@ static struct cache_entry *lookup_cache_entry(const char *path,
+ 	return ce;
  }
  
- /* For explanation of negotiate contexts see MS-SMB2 section 2.2.3.1 */
-@@ -2686,7 +2703,7 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct smb_rqst *rqst,
+-static inline void free_vol(struct vol_info *vi)
++static void put_vol(struct vol_info *vi)
+ {
+-	list_del(&vi->list);
+-	kfree(vi->fullpath);
+-	kfree(vi->mntdata);
+-	cifs_cleanup_volume_info_contents(&vi->smb_vol);
+-	kfree(vi);
++	if (!--vi->vol_count) {
++		list_del_init(&vi->list);
++		kfree(vi->fullpath);
++		kfree(vi->mntdata);
++		cifs_cleanup_volume_info_contents(&vi->smb_vol);
++		kfree(vi);
++	}
+ }
+ 
+ static inline void free_vol_list(void)
+@@ -530,7 +534,7 @@ static inline void free_vol_list(void)
+ 	struct vol_info *vi, *nvi;
+ 
+ 	list_for_each_entry_safe(vi, nvi, &vol_list, list)
+-		free_vol(vi);
++		put_vol(vi);
+ }
+ 
+ /**
+@@ -1140,6 +1144,7 @@ int dfs_cache_add_vol(char *mntdata, struct smb_vol *vol, const char *fullpath)
+ 		goto err_free_fullpath;
+ 
+ 	vi->mntdata = mntdata;
++	vi->vol_count++;
+ 
+ 	spin_lock(&vol_lock);
+ 	list_add_tail(&vi->list, &vol_list);
+@@ -1219,11 +1224,9 @@ void dfs_cache_del_vol(const char *fullpath)
+ 	cifs_dbg(FYI, "%s: fullpath: %s\n", __func__, fullpath);
+ 
+ 	spin_lock(&vol_lock);
+-
+ 	vi = find_vol(fullpath);
+ 	if (!IS_ERR(vi))
+-		free_vol(vi);
+-
++		put_vol(vi);
+ 	spin_unlock(&vol_lock);
+ }
+ 
+@@ -1446,18 +1449,31 @@ static int refresh_tcon(struct vol_info *vi, struct cifs_tcon *tcon)
+  */
+ static void refresh_cache_worker(struct work_struct *work)
+ {
+-	struct vol_info *vi;
++	struct vol_info *vi, *nvi;
+ 	struct TCP_Server_Info *server;
++	LIST_HEAD(vols);
+ 	LIST_HEAD(tcons);
+ 	struct cifs_tcon *tcon, *ntcon;
  	int rc;
- 	char *in_data_buf;
  
--	rc = smb2_plain_req_init(SMB2_IOCTL, tcon, (void **) &req, &total_len);
-+	rc = smb2_ioctl_req_init(opcode, tcon, (void **) &req, &total_len);
- 	if (rc)
- 		return rc;
++	/* Get SMB volumes that are eligible (CifsGood) for refreshing */
+ 	spin_lock(&vol_lock);
+ 	list_for_each_entry(vi, &vol_list, list) {
+ 		server = get_tcp_server(&vi->smb_vol);
+ 		if (!server)
+ 			continue;
  
++		vi->vol_count++;
++		list_add_tail(&vi->rlist, &vols);
++		put_tcp_server(server);
++	}
++	spin_unlock(&vol_lock);
++
++	list_for_each_entry_safe(vi, nvi, &vols, rlist) {
++		server = get_tcp_server(&vi->smb_vol);
++		if (!server)
++			goto next_vol;
++
+ 		get_tcons(server, &tcons);
+ 		rc = 0;
+ 
+@@ -1474,8 +1490,13 @@ static void refresh_cache_worker(struct work_struct *work)
+ 		}
+ 
+ 		put_tcp_server(server);
++
++next_vol:
++		list_del_init(&vi->rlist);
++		spin_lock(&vol_lock);
++		put_vol(vi);
++		spin_unlock(&vol_lock);
+ 	}
+-	spin_unlock(&vol_lock);
+ 
+ 	queue_delayed_work(dfscache_wq, &refresh_task,
+ 			   atomic_read(&cache_ttl) * HZ);
 -- 
 2.24.0
 
