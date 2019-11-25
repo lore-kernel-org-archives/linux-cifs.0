@@ -2,151 +2,52 @@ Return-Path: <SRS0=nVbX=ZR=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD99C432C0
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 07:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84986C432C3
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 11:36:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 727E320748
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 07:38:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ucdDkToO"
+	by mail.kernel.org (Postfix) with ESMTP id 5F9CF2068E
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 11:36:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726876AbfKYHie (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 25 Nov 2019 02:38:34 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:36190 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725535AbfKYHie (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 25 Nov 2019 02:38:34 -0500
-Received: by mail-io1-f67.google.com with SMTP id s3so15111353ioe.3;
-        Sun, 24 Nov 2019 23:38:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cWZU06oGCt/NTMskbHFOCtlhbvDkJkmKXOKYuC8j6Rw=;
-        b=ucdDkToOXC5hweutKXqitWlBQrnqFRhngV5JjuWF3uG35P5V/0pyVoQPMpimVr4GSQ
-         O79X64D7XpEbN8ub3x7DDXponGOh9y0KIvu3z4BmMyttF1dHppXZZHv2EqTMK+d5qsjK
-         gMxTvuH4sNPKfs0MQvC2vKRYBZpkx0EJddx3Y1AMU0JvTeWBM+luGV+XK5H8GI/55gc3
-         bc+I0QZg6j9jZvoIFbVzacjr4Z16fMFqu/UIntDs1wrmStsc7jcJKxjTPSzgEviXR99y
-         bpbVGGmv0XyT95ejxtrHj5WPsmja0YR09tO5DhIYA5FTXuHbroN2HT9UCj08KkONZh1N
-         iYGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cWZU06oGCt/NTMskbHFOCtlhbvDkJkmKXOKYuC8j6Rw=;
-        b=TjU1lAdBl70Q+KpyTYvdCKwp31c4fbasJj1uB/9HDvnBqrAPc8knCOy6WbRs/Xjtfs
-         LTFW8xuw457TCVFSm3PhBl18iBCPnx29d16cCpcQM9tCSE0vFAec/pFF8wDhJsqjkvL5
-         yo/4NDhjUqnO/8oZrmMMl18qz44NBu8ldhLct6SczvK+1cE9pxMthJcYiGCJSEXG4hue
-         FXJ6ewUjUEsGYOdTDj2XgVVB95tFVUJZpSW6Eppx/vEKC5VXlwJGsFXvgSKFhgmY82wx
-         WYODLriNhNVkir/ew0AmiAobQN2lOVLX1Ru3ntr62VGpRk36ENvqr39HBbYfXj7JJN2y
-         /WBw==
-X-Gm-Message-State: APjAAAUBmosf3INiI4S4l6cN1Y5FVCTxAXSjneUoljl+Lg5ivGqRPf9l
-        B/pdhuI7V1qvtrPsHzuyB4BrvQuUNNPnTR/6lgM=
-X-Google-Smtp-Source: APXvYqx36rKM3nwChJ+tW2AJi/h1Bm/W/azfjdiieRMCsg0dcunruIS9Zb+RDs8QLQEWUphqxzZlliaDxZV48ufiyWU=
-X-Received: by 2002:a6b:6617:: with SMTP id a23mr24392886ioc.3.1574667513131;
- Sun, 24 Nov 2019 23:38:33 -0800 (PST)
+        id S1727225AbfKYLgt convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 25 Nov 2019 06:36:49 -0500
+Received: from mx2.suse.de ([195.135.220.15]:60478 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726094AbfKYLgt (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 25 Nov 2019 06:36:49 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id D6298AAC2;
+        Mon, 25 Nov 2019 11:36:47 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     "Paulo Alcantara \(SUSE\)" <pc@cjr.nz>, smfrench@gmail.com
+Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara \(SUSE\)" <pc@cjr.nz>
+Subject: Re: [PATCH 1/7] cifs: Fix use-after-free bug in cifs_reconnect()
+In-Reply-To: <20191122153057.6608-2-pc@cjr.nz>
+References: <20191122153057.6608-1-pc@cjr.nz> <20191122153057.6608-2-pc@cjr.nz>
+Date:   Mon, 25 Nov 2019 12:36:46 +0100
+Message-ID: <87lfs4w5kh.fsf@suse.com>
 MIME-Version: 1.0
-References: <20191122153057.6608-1-pc@cjr.nz> <20191122153057.6608-7-pc@cjr.nz>
-In-Reply-To: <20191122153057.6608-7-pc@cjr.nz>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 25 Nov 2019 01:38:22 -0600
-Message-ID: <CAH2r5mtBXg8WJWFWEuX-_4zPVrtt=_Z_B6GWis+sQXnwWgFiVA@mail.gmail.com>
-Subject: Re: [PATCH 6/7] cifs: Fix retrieval of DFS referrals in cifs_mount()
-To:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>
-Cc:     CIFS <linux-cifs@vger.kernel.org>, Stable <stable@vger.kernel.org>,
-        Matthew Ruffell <matthew.ruffell@canonical.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+"Paulo Alcantara (SUSE)" <pc@cjr.nz> writes:
+> Ensure we grab an active reference in cifs superblock while doing
+> failover to prevent automounts (DFS links) of expiring and then
+> destroying the superblock pointer.
 
-On Fri, Nov 22, 2019 at 9:31 AM Paulo Alcantara (SUSE) <pc@cjr.nz> wrote:
->
-> Make sure that DFS referrals are sent to newly resolved root targets
-> as in a multi tier DFS setup.
->
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-> Link: https://lkml.kernel.org/r/05aa2995-e85e-0ff4-d003-5bb08bd17a22@canonical.com
-> Cc: stable@vger.kernel.org
-> Tested-by: Matthew Ruffell <matthew.ruffell@canonical.com>
-> ---
->  fs/cifs/connect.c | 32 ++++++++++++++++++++++----------
->  1 file changed, 22 insertions(+), 10 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 668d477cc9c7..86d98d73749d 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -4776,6 +4776,17 @@ static int is_path_remote(struct cifs_sb_info *cifs_sb, struct smb_vol *vol,
->  }
->
->  #ifdef CONFIG_CIFS_DFS_UPCALL
-> +static inline void set_root_tcon(struct cifs_sb_info *cifs_sb,
-> +                                struct cifs_tcon *tcon,
-> +                                struct cifs_tcon **root)
-> +{
-> +       spin_lock(&cifs_tcp_ses_lock);
-> +       tcon->tc_count++;
-> +       tcon->remap = cifs_remap(cifs_sb);
-> +       spin_unlock(&cifs_tcp_ses_lock);
-> +       *root = tcon;
-> +}
-> +
->  int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
->  {
->         int rc = 0;
-> @@ -4877,18 +4888,10 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
->         /* Cache out resolved root server */
->         (void)dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb),
->                              root_path + 1, NULL, NULL);
-> -       /*
-> -        * Save root tcon for additional DFS requests to update or create a new
-> -        * DFS cache entry, or even perform DFS failover.
-> -        */
-> -       spin_lock(&cifs_tcp_ses_lock);
-> -       tcon->tc_count++;
-> -       tcon->dfs_path = root_path;
-> +       kfree(root_path);
->         root_path = NULL;
-> -       tcon->remap = cifs_remap(cifs_sb);
-> -       spin_unlock(&cifs_tcp_ses_lock);
->
-> -       root_tcon = tcon;
-> +       set_root_tcon(cifs_sb, tcon, &root_tcon);
->
->         for (count = 1; ;) {
->                 if (!rc && tcon) {
-> @@ -4925,6 +4928,15 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
->                         mount_put_conns(cifs_sb, xid, server, ses, tcon);
->                         rc = mount_get_conns(vol, cifs_sb, &xid, &server, &ses,
->                                              &tcon);
-> +                       /*
-> +                        * Ensure that DFS referrals go through new root server.
-> +                        */
-> +                       if (!rc && tcon &&
-> +                           (tcon->share_flags & (SHI1005_FLAGS_DFS |
-> +                                                 SHI1005_FLAGS_DFS_ROOT))) {
-> +                               cifs_put_tcon(root_tcon);
-> +                               set_root_tcon(cifs_sb, tcon, &root_tcon);
-> +                       }
->                 }
->                 if (rc) {
->                         if (rc == -EACCES || rc == -EOPNOTSUPP)
-> --
-> 2.24.0
->
-
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 
 -- 
-Thanks,
-
-Steve
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
