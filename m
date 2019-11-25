@@ -2,83 +2,119 @@ Return-Path: <SRS0=nVbX=ZR=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5275C432C0
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 16:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32142C432C3
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 19:53:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A89F2068E
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 16:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0612620748
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 19:53:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="Dl9vmphD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RjRMdwbx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728990AbfKYQ6r (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 25 Nov 2019 11:58:47 -0500
-Received: from mx.cjr.nz ([51.158.111.142]:22816 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728986AbfKYQ6r (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 25 Nov 2019 11:58:47 -0500
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 3332680A5A;
-        Mon, 25 Nov 2019 16:58:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1574701125;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ix0Iktx0qBl5olZaVTf2RZcQs3IqaAZGabXBU25Eldw=;
-        b=Dl9vmphDWDNJCcF4lCEftTt6PXSIVNdWr7Q2F+T0IDmw11uxZR8Qzj5MwlzuYXqtLGFHiT
-        2Cr0Lzu20zxNHvGfZjzRSFgiL0/X2tSd30FmtNivt9zcU14PShNsvLZbe0dkyHVfgMuBzc
-        tu1nB9ZJsNLNdbaDCznxnuswhrg3lFdXq9HggsRMhSgAncg4eSNlFPkCednRXgXMNsjFPK
-        RUxBbD30utqw451B7CrXa32+D9lguphe/j4sLdNLbPPGElTTjphaWO8ODr+zMnwzCCuq2G
-        qlfISJbhKlQ4ViRttnA6OuZDbxosuMzNcrGYJxJ3yzshTgwkAHw5u/Frb0bu9A==
-From:   "Paulo Alcantara (SUSE)" <pc@cjr.nz>
-To:     smfrench@gmail.com, aaptel@suse.com
-Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara (SUSE)" <pc@cjr.nz>
-Subject: [PATCH v2 7/7] cifs: Always update signing key of first channel
-Date:   Mon, 25 Nov 2019 13:57:58 -0300
-Message-Id: <20191125165758.3793-8-pc@cjr.nz>
-In-Reply-To: <20191125165758.3793-1-pc@cjr.nz>
-References: <20191125165758.3793-1-pc@cjr.nz>
+        id S1726876AbfKYTxQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 25 Nov 2019 14:53:16 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:45732 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725818AbfKYTxQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 25 Nov 2019 14:53:16 -0500
+Received: by mail-lf1-f68.google.com with SMTP id 203so11991242lfa.12
+        for <linux-cifs@vger.kernel.org>; Mon, 25 Nov 2019 11:53:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=FUQ2/2y14kGrdFzEmai/f5XcF0XBbXHfSsnwS83pjeo=;
+        b=RjRMdwbxDxgbb8CquZshQbJ6AAYUHh7eTW5adJAJ8nFsfZr2La9aaeJqdr4af/TrpH
+         a/5ICEp2hm7VrpdA2yZlqAwli6j3yAWuT7362g3FRtSIDlTJLGjjvHd/nOcHbK0suON/
+         q/iHRZjEmwjZa10Qpnn+ZLzJc9edFhGNxEUdSjSFt1Z+Yzt5Mv3+ggY8E1Y4tSsuiKDY
+         /xbn+a/x7AvJwZrarK8uXAqpC8ybHQ1z9mcTdmlmJSAZyTEjk03ELGbIw9uIkT+sD0mu
+         oH7mwQ3RVc82Md99lOFhG0/QGEhLPc9EKhsPleVAkbH2Ot/4dHZRpH+Oay6fULoMuZVV
+         RVRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=FUQ2/2y14kGrdFzEmai/f5XcF0XBbXHfSsnwS83pjeo=;
+        b=ZhnEQ+zNbWgFr5QXIQLC3OX0DyA2TjkKQFBXxRDhdrODjny9UlGfgcxZinsMxY2Ysh
+         lGNFZqlh5VRtx/EfkrRmEMDjfEZbqHl8IiWltjlh2IOl02Nn9PTQ/KnnetMxWmZtR236
+         7uQx/y6bDJE0cl/lpfvJfB3DF/3eIGj6WONgvZFXxxKwJeWMfyfVBtNvce6QP306Hhiz
+         6Udv/hHUbsWhrSl7h1FOmsWWtawx4HhZQWWSU5xzbztaqC/hy45PBuSJ++ul1qOtJ2ze
+         FDliwbPux5XQLZiSv0toW9/eLZW1Pvms2Y25KU4wV3dvKNml6wKNfgtkvgC4gr2WBAOx
+         6BuQ==
+X-Gm-Message-State: APjAAAW3944SiPXkSu0AbRaR+UZyaP+j1WOxbJ90yHV5WbyoDJ8wt+2J
+        t7s4Fvs2iM3FZjPoiRAzhb/0cycjkCb7Pm6UNnOk
+X-Google-Smtp-Source: APXvYqwLcFEQk1IhplLVibl3bWGeIc0tFAsUOU2N8Plupd9Si9oOjReL7MUpWhGcBIseCaRMfOwdQ59J3kcOxsxJN3s=
+X-Received: by 2002:a19:c697:: with SMTP id w145mr17684203lff.54.1574711594456;
+ Mon, 25 Nov 2019 11:53:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20191122153057.6608-1-pc@cjr.nz> <20191122153057.6608-4-pc@cjr.nz>
+ <87fticw5bx.fsf@suse.com> <CAH2r5mthG19J-vkMXDeNKcw_AdeWTHxKphTLzdacbO_GYSeFog@mail.gmail.com>
+In-Reply-To: <CAH2r5mthG19J-vkMXDeNKcw_AdeWTHxKphTLzdacbO_GYSeFog@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Mon, 25 Nov 2019 11:53:03 -0800
+Message-ID: <CAKywueQDLmWTH_RY47RSV2Dx8anTUKQMpoTfz0kqN+Zeq8UfFA@mail.gmail.com>
+Subject: Re: [PATCH 3/7] cifs: Fix potential softlockups while refreshing DFS cache
+To:     Steve French <smfrench@gmail.com>
+Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Update signing key of first channel whenever generating the master
-sigining/encryption/decryption keys rather than only in cifs_mount().
+Stable candidate?
+--
+Best regards,
+Pavel Shilovsky
 
-This also fixes reconnect when re-establishing smb sessions to other
-servers.
-
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
----
- fs/cifs/smb2transport.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index 86501239cef5..387c88704c52 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -407,6 +407,10 @@ generate_smb3signingkey(struct cifs_ses *ses,
- 				  SMB3_SIGN_KEY_SIZE);
- 		if (rc)
- 			return rc;
-+
-+		memcpy(ses->chans[0].signkey, ses->smb3signingkey,
-+		       SMB3_SIGN_KEY_SIZE);
-+
- 		rc = generate_key(ses, ptriplet->encryption.label,
- 				  ptriplet->encryption.context,
- 				  ses->smb3encryptionkey,
--- 
-2.24.0
-
+=D0=BF=D0=BD, 25 =D0=BD=D0=BE=D1=8F=D0=B1. 2019 =D0=B3. =D0=B2 07:35, Steve=
+ French <smfrench@gmail.com>:
+>
+> tags added - tentatively merged into cifs-2.6.git for-next pending
+> testing (buildbot)
+>
+> On Mon, Nov 25, 2019 at 5:41 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wro=
+te:
+> >
+> > "Paulo Alcantara (SUSE)" <pc@cjr.nz> writes:
+> > > We used to skip reconnects on all SMB2_IOCTL commands due to SMB3+
+> > > FSCTL_VALIDATE_NEGOTIATE_INFO - which made sense since we're still
+> > > establishing a SMB session.
+> > >
+> > > However, when refresh_cache_worker() calls smb2_get_dfs_refer() and
+> > > we're under reconnect, SMB2_ioctl() will not be able to get a proper
+> > > status error (e.g. -EHOSTDOWN in case we failed to reconnect) but an
+> > > -EAGAIN from cifs_send_recv() thus looping forever in
+> > > refresh_cache_worker().
+> >
+> >
+> > I think we can add a Fixes tag:
+> >
+> > Fixes: e99c63e4d86d ("SMB3: Fix deadlock in validate negotiate hits rec=
+onnect")
+> >
+> > Otherwise looks good.
+> >
+> > Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+> >
+> > --
+> > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnber=
+g, DE
+> > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
+=C3=BCnchen)
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
