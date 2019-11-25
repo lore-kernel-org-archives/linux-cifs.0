@@ -2,35 +2,36 @@ Return-Path: <SRS0=nVbX=ZR=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D10C43215
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 11:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC264C432C0
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 12:01:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8ADFB2075C
-	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 11:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98A972082F
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Nov 2019 12:01:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725828AbfKYLya convert rfc822-to-8bit (ORCPT
+        id S1727150AbfKYMBl convert rfc822-to-8bit (ORCPT
         <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 25 Nov 2019 06:54:30 -0500
-Received: from mx2.suse.de ([195.135.220.15]:39066 "EHLO mx1.suse.de"
+        Mon, 25 Nov 2019 07:01:41 -0500
+Received: from mx2.suse.de ([195.135.220.15]:42312 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727110AbfKYLya (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 25 Nov 2019 06:54:30 -0500
+        id S1726980AbfKYMBk (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 25 Nov 2019 07:01:40 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 88ED8AD95;
-        Mon, 25 Nov 2019 11:54:28 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 73716B16E;
+        Mon, 25 Nov 2019 12:01:39 +0000 (UTC)
 From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
 To:     "Paulo Alcantara \(SUSE\)" <pc@cjr.nz>, smfrench@gmail.com
 Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara \(SUSE\)" <pc@cjr.nz>
-Subject: Re: [PATCH 4/7] cifs: Clean up DFS referral cache
-In-Reply-To: <20191122153057.6608-5-pc@cjr.nz>
-References: <20191122153057.6608-1-pc@cjr.nz> <20191122153057.6608-5-pc@cjr.nz>
-Date:   Mon, 25 Nov 2019 12:54:27 +0100
-Message-ID: <87d0dgw4r0.fsf@suse.com>
+Subject: Re: [PATCH 5/7] cifs: Fix potential deadlock when updating vol in
+ cifs_reconnect()
+In-Reply-To: <20191122153057.6608-6-pc@cjr.nz>
+References: <20191122153057.6608-1-pc@cjr.nz> <20191122153057.6608-6-pc@cjr.nz>
+Date:   Mon, 25 Nov 2019 13:01:38 +0100
+Message-ID: <87a78kw4f1.fsf@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
@@ -40,35 +41,58 @@ List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 "Paulo Alcantara (SUSE)" <pc@cjr.nz> writes:
-> This patch does a couple of things:
+
+> We can't hold the vol_lock spinlock while refreshing the DFS cache
+> because cifs_reconnect() may call dfs_cache_update_vol() while we are
+> walking through the volume list.
 >
->   - Do some renaming in static code (cosmetic)
->   - Use rwlock for cache list
->   - Use spinlock for volume list
->   - Avoid lock contention in some places
+> Create a temp list with all volumes eligible for refreshing and then
+> use it without any locks held.
 
-There is too much going on here for a proper review but nothing major
-caught my eye (cosmetic should have been separate imo).
+Commit msg should mention it makes the vol_info refcounted.
+
+> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+> ---
+>  fs/cifs/dfs_cache.c | 45 +++++++++++++++++++++++++++++++++------------
+>  1 file changed, 33 insertions(+), 12 deletions(-)
+>
+> diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+> index b082603c793a..5b9d7281dd67 100644
+> --- a/fs/cifs/dfs_cache.c
+> +++ b/fs/cifs/dfs_cache.c
+> @@ -49,6 +49,8 @@ struct vol_info {
+>  	struct smb_vol smb_vol;
+>  	char *mntdata;
+>  	struct list_head list;
+> +	struct list_head rlist;
+> +	int vol_count;
+>  };
+>  
+>  static struct kmem_cache *cache_slab __read_mostly;
+> @@ -516,13 +518,15 @@ static struct cache_entry *lookup_cache_entry(const char *path,
+>  	return ce;
+>  }
+>  
+> -static inline void free_vol(struct vol_info *vi)
+> +static void put_vol(struct vol_info *vi)
+>  {
+> -	list_del(&vi->list);
+> -	kfree(vi->fullpath);
+> -	kfree(vi->mntdata);
+> -	cifs_cleanup_volume_info_contents(&vi->smb_vol);
+> -	kfree(vi);
+> +	if (!--vi->vol_count) {
+> +		list_del_init(&vi->list);
+> +		kfree(vi->fullpath);
+> +		kfree(vi->mntdata);
+> +		cifs_cleanup_volume_info_contents(&vi->smb_vol);
+> +		kfree(vi);
+> +	}
+>  }
+
+Can we document that put_vol() assumes vol_lock is held?
 
 
-> -	ce = find_cache_entry(path, &h);
-> -	if (IS_ERR(ce)) {
-> -		cifs_dbg(FYI, "%s: cache miss\n", __func__);
-> -		/*
-> -		 * If @noreq is set, no requests will be sent to the server for
-> -		 * either updating or getting a new DFS referral.
-> -		 */
-> -		if (noreq)
-> -			return ce;
-> -		/*
-> -		 * No cache entry was found, so check for valid parameters that
-> -		 * will be required to get a new DFS referral and then create a
-> -		 * new cache entry.
-> -		 */
-
-I think we should keep comments.
-
-Cheers,
 -- 
 Aurélien Aptel / SUSE Labs Samba Team
 GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
