@@ -7,43 +7,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52688C432C0
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 00:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69BF1C43215
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 00:37:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2411520665
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 00:37:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D1F12075C
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 00:37:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="U8uCAmz9"
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="a18jhQmb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726957AbfK0AhP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Nov 2019 19:37:15 -0500
-Received: from mx.cjr.nz ([51.158.111.142]:16070 "EHLO mx.cjr.nz"
+        id S1726983AbfK0AhU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Nov 2019 19:37:20 -0500
+Received: from mx.cjr.nz ([51.158.111.142]:16132 "EHLO mx.cjr.nz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726947AbfK0AhO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 26 Nov 2019 19:37:14 -0500
+        id S1726980AbfK0AhT (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 26 Nov 2019 19:37:19 -0500
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id E176980A21;
-        Wed, 27 Nov 2019 00:37:10 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id EB50280A27;
+        Wed, 27 Nov 2019 00:37:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1574815032;
+        t=1574815038;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cwJx7z+bkC3/gD+ONb1P6E34ZBefqumUIraTyBEflQk=;
-        b=U8uCAmz94aOO+s0XdNXJVFsCMmEX+RdAR/VLRVfYxeDv0zil+rEIzSX2jBmIQQV9qTDGIE
-        98DPQzst39LtwWvLYwvhcCI+sBdx485tKTJfpQY54lROb6rneEJgxtBAS2QW/ovmlKQynb
-        UAkN5W+uPpWr954EbnRNaQIU1dEBxvJO5atWm2k5gGbnQeVCLnC846wjoBURfxP8cG6Pm8
-        CUYXZ7nK8AVfJF5H/u/fEHq1VMBMaAL4JMiXE9rvjIT6tQCd1NFVtp1aI1507r1msePd+F
-        3bHvjKpUWvb0rkaIVl8EjXxWhZyYIT83nptJHyNzBEds4MgwM0gRGRjSQxreUg==
+        bh=8V5zt7MzulYrRwFSBPjsU7IixvtZhpZeey44jEmfZJg=;
+        b=a18jhQmbcqH3f7jU9Cop+y577RZYBn7rCnwC1dErvZl+LqAQTXl+XQKDB5vROGP1Yu95x5
+        mL7qiczb2B9/6M/XFQf9b24Y458HB0oKFd1LxF55D3upvpBmc00XVpERjGv3GCrdbdyWSx
+        nbKUIVfk2cvnWQxIX0QT0kG4/4bVHXNFkUhuBfRG33QjndpqEoo64cyHfFLJxKTrYErqKc
+        X+j931h2AlGiNwmMJloL5Bd8PE0TwDf+ONGYe82o+TMgtW1IGncRe5N0hvV1Ux9mUJZEUB
+        JJ2ffaDsd2E8m4TPYBp320xPaohQurFnHZOlPyJqxBgkPhp/mI7qkVxtDsQ5UQ==
 From:   "Paulo Alcantara (SUSE)" <pc@cjr.nz>
 To:     smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
-        Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH v3 03/11] cifs: Fix potential softlockups while refreshing DFS cache
-Date:   Tue, 26 Nov 2019 21:36:26 -0300
-Message-Id: <20191127003634.14072-4-pc@cjr.nz>
+Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara (SUSE)" <pc@cjr.nz>
+Subject: [PATCH v3 05/11] cifs: Get rid of kstrdup_const()'d paths
+Date:   Tue, 26 Nov 2019 21:36:28 -0300
+Message-Id: <20191127003634.14072-6-pc@cjr.nz>
 In-Reply-To: <20191127003634.14072-1-pc@cjr.nz>
 References: <20191127003634.14072-1-pc@cjr.nz>
 MIME-Version: 1.0
@@ -53,98 +52,44 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We used to skip reconnects on all SMB2_IOCTL commands due to SMB3+
-FSCTL_VALIDATE_NEGOTIATE_INFO - which made sense since we're still
-establishing a SMB session.
-
-However, when refresh_cache_worker() calls smb2_get_dfs_refer() and
-we're under reconnect, SMB2_ioctl() will not be able to get a proper
-status error (e.g. -EHOSTDOWN in case we failed to reconnect) but an
--EAGAIN from cifs_send_recv() thus looping forever in
-refresh_cache_worker().
+The DFS cache API is mostly used with heap allocated strings.
 
 Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Suggested-by: Aurelien Aptel <aaptel@suse.com>
-Fixes: e99c63e4d86d ("SMB3: Fix deadlock in validate negotiate hits reconnect")
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/smb2pdu.c | 41 +++++++++++++++++++++++++++++------------
- 1 file changed, 29 insertions(+), 12 deletions(-)
+ fs/cifs/dfs_cache.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index c09ca6963394..3cd90088d8ac 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -252,7 +252,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- 	if (tcon == NULL)
- 		return 0;
+diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+index aed4183840c5..49c5f045270f 100644
+--- a/fs/cifs/dfs_cache.c
++++ b/fs/cifs/dfs_cache.c
+@@ -131,7 +131,7 @@ static inline void flush_cache_ent(struct cache_entry *ce)
+ 		return;
  
--	if (smb2_command == SMB2_TREE_CONNECT || smb2_command == SMB2_IOCTL)
-+	if (smb2_command == SMB2_TREE_CONNECT)
- 		return 0;
+ 	hlist_del_init_rcu(&ce->hlist);
+-	kfree_const(ce->path);
++	kfree(ce->path);
+ 	free_tgts(ce);
+ 	cache_count--;
+ 	call_rcu(&ce->rcu, free_cache_entry);
+@@ -420,7 +420,7 @@ static struct cache_entry *alloc_cache_entry(const char *path,
+ 	if (!ce)
+ 		return ERR_PTR(-ENOMEM);
  
- 	if (tcon->tidStatus == CifsExiting) {
-@@ -426,16 +426,9 @@ fill_small_buf(__le16 smb2_command, struct cifs_tcon *tcon, void *buf,
-  * SMB information in the SMB header. If the return code is zero, this
-  * function must have filled in request_buf pointer.
-  */
--static int
--smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
--		    void **request_buf, unsigned int *total_len)
-+static int __smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
-+				  void **request_buf, unsigned int *total_len)
- {
--	int rc;
--
--	rc = smb2_reconnect(smb2_command, tcon);
--	if (rc)
--		return rc;
--
- 	/* BB eventually switch this to SMB2 specific small buf size */
- 	if (smb2_command == SMB2_SET_INFO)
- 		*request_buf = cifs_buf_get();
-@@ -456,7 +449,31 @@ smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
- 		cifs_stats_inc(&tcon->num_smbs_sent);
+-	ce->path = kstrdup_const(path, GFP_KERNEL);
++	ce->path = kstrndup(path, strlen(path), GFP_KERNEL);
+ 	if (!ce->path) {
+ 		kmem_cache_free(cache_slab, ce);
+ 		return ERR_PTR(-ENOMEM);
+@@ -430,7 +430,7 @@ static struct cache_entry *alloc_cache_entry(const char *path,
+ 
+ 	rc = copy_ref_data(refs, numrefs, ce, NULL);
+ 	if (rc) {
+-		kfree_const(ce->path);
++		kfree(ce->path);
+ 		kmem_cache_free(cache_slab, ce);
+ 		ce = ERR_PTR(rc);
  	}
- 
--	return rc;
-+	return 0;
-+}
-+
-+static int smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
-+			       void **request_buf, unsigned int *total_len)
-+{
-+	int rc;
-+
-+	rc = smb2_reconnect(smb2_command, tcon);
-+	if (rc)
-+		return rc;
-+
-+	return __smb2_plain_req_init(smb2_command, tcon, request_buf,
-+				     total_len);
-+}
-+
-+static int smb2_ioctl_req_init(u32 opcode, struct cifs_tcon *tcon,
-+			       void **request_buf, unsigned int *total_len)
-+{
-+	/* Skip reconnect only for FSCTL_VALIDATE_NEGOTIATE_INFO IOCTLs */
-+	if (opcode == FSCTL_VALIDATE_NEGOTIATE_INFO) {
-+		return __smb2_plain_req_init(SMB2_IOCTL, tcon, request_buf,
-+					     total_len);
-+	}
-+	return smb2_plain_req_init(SMB2_IOCTL, tcon, request_buf, total_len);
- }
- 
- /* For explanation of negotiate contexts see MS-SMB2 section 2.2.3.1 */
-@@ -2686,7 +2703,7 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct smb_rqst *rqst,
- 	int rc;
- 	char *in_data_buf;
- 
--	rc = smb2_plain_req_init(SMB2_IOCTL, tcon, (void **) &req, &total_len);
-+	rc = smb2_ioctl_req_init(opcode, tcon, (void **) &req, &total_len);
- 	if (rc)
- 		return rc;
- 
 -- 
 2.24.0
 
