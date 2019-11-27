@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B7CC432C0
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 00:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65392C432C3
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 00:37:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 189532075C
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 00:37:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B31E20665
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 00:37:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="ji0qVimy"
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="RvS9hEwO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726926AbfK0AhK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Nov 2019 19:37:10 -0500
-Received: from mx.cjr.nz ([51.158.111.142]:16010 "EHLO mx.cjr.nz"
+        id S1726636AbfK0AhM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Nov 2019 19:37:12 -0500
+Received: from mx.cjr.nz ([51.158.111.142]:16046 "EHLO mx.cjr.nz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726636AbfK0AhK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 26 Nov 2019 19:37:10 -0500
+        id S1726947AbfK0AhL (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 26 Nov 2019 19:37:11 -0500
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 4813780A23;
-        Wed, 27 Nov 2019 00:37:04 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 8BAF880A25;
+        Wed, 27 Nov 2019 00:37:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1574815027;
+        t=1574815030;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eHC8QhdtwQbvGWhYhkPpRJegoiqaFgk8+W7ygiJGyyI=;
-        b=ji0qVimyZ25irsgWb5xsHyWPIEsHxtcZKuyx6PYHMyUomz/RdO19MV4cbbpNFT3uPI4QWN
-        xqVnVDylSahrMNzINuHmO55pqHW1fI38Ay3bsLc4QAzZRnQFLfmNYp3rihVUlCEkT7gm1Y
-        XJOv3uI5YbjOXa7PuTw3RdQ1S9gYnbDC/blmMkvhPeTN+2OhNbFAgn2b4PIUEPUbKNnlQ+
-        nvGDRCyqT8q+dD0QwOv3wjYcQPWgYkk7KNcn7NvgZt87ljduaX9OsEBGNfg0FPhkbHCzmd
-        ejvxiNsrB3Mbmjl5y+Rvqkf+eqdqUajacD6+T9FdLvpuyuW12oNYoEdQC4A39A==
+        bh=rk32UaLLN+J9fuPxZ8qipKNID3hk/dOmeEn10Rii4Qw=;
+        b=RvS9hEwOH2eLF6ImyQV5y4X2reJX8S0iMu1dIOkdJDFWoouLnVNO2JXpxBZJ3gVtMdNkzx
+        40RYH0+Ht9RZbsHZ7HiEHpOPZj6eW4Eirv7/541ZzqULkBxxyFGVTbSWcn+XLFaIZmNG35
+        znnJu3QaQxMVwzcfmuHpUrVbNZ8Pqi3s3MpRMz27RZFL48iMpZvOPr3Yrg10RDuup/jmTy
+        LGUb78DQFv+QjarCz1lqzJlXN1e4bnR4TX/unhrAU8VlUC1oxqWgmRwTltXcUYSWR4u/8c
+        by0Oaxeq1L53KIQ2Fs0EenSw9Q6sHdzxL/QR2ZpxpOYA4ow1wF2E1ZqN0yLHBA==
 From:   "Paulo Alcantara (SUSE)" <pc@cjr.nz>
 To:     smfrench@gmail.com
 Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
         Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH v3 01/11] cifs: Fix use-after-free bug in cifs_reconnect()
-Date:   Tue, 26 Nov 2019 21:36:24 -0300
-Message-Id: <20191127003634.14072-2-pc@cjr.nz>
+Subject: [PATCH v3 02/11] cifs: Fix lookup of root ses in DFS referral cache
+Date:   Tue, 26 Nov 2019 21:36:25 -0300
+Message-Id: <20191127003634.14072-3-pc@cjr.nz>
 In-Reply-To: <20191127003634.14072-1-pc@cjr.nz>
 References: <20191127003634.14072-1-pc@cjr.nz>
 MIME-Version: 1.0
@@ -53,226 +53,53 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ensure we grab an active reference in cifs superblock while doing
-failover to prevent automounts (DFS links) of expiring and then
-destroying the superblock pointer.
+We don't care about module aliasing validation in
+cifs_compose_mount_options(..., is_smb3) when finding the root SMB
+session of an DFS namespace in order to refresh DFS referral cache.
 
-This patch fixes the following KASAN report:
+The following issue has been observed when mounting with '-t smb3' and
+then specifying 'vers=2.0':
 
-[  464.301462] BUG: KASAN: use-after-free in
-cifs_reconnect+0x6ab/0x1350
-[  464.303052] Read of size 8 at addr ffff888155e580d0 by task
-cifsd/1107
+...
+Nov 08 15:27:08 tw kernel: address conversion returned 0 for FS0.WIN.LOCAL
+Nov 08 15:27:08 tw kernel: [kworke] ==> dns_query((null),FS0.WIN.LOCAL,13,(null))
+Nov 08 15:27:08 tw kernel: [kworke] call request_key(,FS0.WIN.LOCAL,)
+Nov 08 15:27:08 tw kernel: [kworke] ==> dns_resolver_cmp(FS0.WIN.LOCAL,FS0.WIN.LOCAL)
+Nov 08 15:27:08 tw kernel: [kworke] <== dns_resolver_cmp() = 1
+Nov 08 15:27:08 tw kernel: [kworke] <== dns_query() = 13
+Nov 08 15:27:08 tw kernel: fs/cifs/dns_resolve.c: dns_resolve_server_name_to_ip: resolved: FS0.WIN.LOCAL to 192.168.30.26
+===> Nov 08 15:27:08 tw kernel: CIFS VFS: vers=2.0 not permitted when mounting with smb3
+Nov 08 15:27:08 tw kernel: fs/cifs/dfs_cache.c: CIFS VFS: leaving refresh_tcon (xid = 26) rc = -22
+...
 
-[  464.304682] CPU: 3 PID: 1107 Comm: cifsd Not tainted 5.4.0-rc4+ #13
-[  464.305552] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
-BIOS rel-1.12.1-0-ga5cab58-rebuilt.opensuse.org 04/01/2014
-[  464.307146] Call Trace:
-[  464.307875]  dump_stack+0x5b/0x90
-[  464.308631]  print_address_description.constprop.0+0x16/0x200
-[  464.309478]  ? cifs_reconnect+0x6ab/0x1350
-[  464.310253]  ? cifs_reconnect+0x6ab/0x1350
-[  464.311040]  __kasan_report.cold+0x1a/0x41
-[  464.311811]  ? cifs_reconnect+0x6ab/0x1350
-[  464.312563]  kasan_report+0xe/0x20
-[  464.313300]  cifs_reconnect+0x6ab/0x1350
-[  464.314062]  ? extract_hostname.part.0+0x90/0x90
-[  464.314829]  ? printk+0xad/0xde
-[  464.315525]  ? _raw_spin_lock+0x7c/0xd0
-[  464.316252]  ? _raw_read_lock_irq+0x40/0x40
-[  464.316961]  ? ___ratelimit+0xed/0x182
-[  464.317655]  cifs_readv_from_socket+0x289/0x3b0
-[  464.318386]  cifs_read_from_socket+0x98/0xd0
-[  464.319078]  ? cifs_readv_from_socket+0x3b0/0x3b0
-[  464.319782]  ? try_to_wake_up+0x43c/0xa90
-[  464.320463]  ? cifs_small_buf_get+0x4b/0x60
-[  464.321173]  ? allocate_buffers+0x98/0x1a0
-[  464.321856]  cifs_demultiplex_thread+0x218/0x14a0
-[  464.322558]  ? cifs_handle_standard+0x270/0x270
-[  464.323237]  ? __switch_to_asm+0x40/0x70
-[  464.323893]  ? __switch_to_asm+0x34/0x70
-[  464.324554]  ? __switch_to_asm+0x40/0x70
-[  464.325226]  ? __switch_to_asm+0x40/0x70
-[  464.325863]  ? __switch_to_asm+0x34/0x70
-[  464.326505]  ? __switch_to_asm+0x40/0x70
-[  464.327161]  ? __switch_to_asm+0x34/0x70
-[  464.327784]  ? finish_task_switch+0xa1/0x330
-[  464.328414]  ? __switch_to+0x363/0x640
-[  464.329044]  ? __schedule+0x575/0xaf0
-[  464.329655]  ? _raw_spin_lock_irqsave+0x82/0xe0
-[  464.330301]  kthread+0x1a3/0x1f0
-[  464.330884]  ? cifs_handle_standard+0x270/0x270
-[  464.331624]  ? kthread_create_on_node+0xd0/0xd0
-[  464.332347]  ret_from_fork+0x35/0x40
-
-[  464.333577] Allocated by task 1110:
-[  464.334381]  save_stack+0x1b/0x80
-[  464.335123]  __kasan_kmalloc.constprop.0+0xc2/0xd0
-[  464.335848]  cifs_smb3_do_mount+0xd4/0xb00
-[  464.336619]  legacy_get_tree+0x6b/0xa0
-[  464.337235]  vfs_get_tree+0x41/0x110
-[  464.337975]  fc_mount+0xa/0x40
-[  464.338557]  vfs_kern_mount.part.0+0x6c/0x80
-[  464.339227]  cifs_dfs_d_automount+0x336/0xd29
-[  464.339846]  follow_managed+0x1b1/0x450
-[  464.340449]  lookup_fast+0x231/0x4a0
-[  464.341039]  path_openat+0x240/0x1fd0
-[  464.341634]  do_filp_open+0x126/0x1c0
-[  464.342277]  do_sys_open+0x1eb/0x2c0
-[  464.342957]  do_syscall_64+0x5e/0x190
-[  464.343555]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-[  464.344772] Freed by task 0:
-[  464.345347]  save_stack+0x1b/0x80
-[  464.345966]  __kasan_slab_free+0x12c/0x170
-[  464.346576]  kfree+0xa6/0x270
-[  464.347211]  rcu_core+0x39c/0xc80
-[  464.347800]  __do_softirq+0x10d/0x3da
-
-[  464.348919] The buggy address belongs to the object at
-ffff888155e58000
-                which belongs to the cache kmalloc-256 of size 256
-[  464.350222] The buggy address is located 208 bytes inside of
-                256-byte region [ffff888155e58000, ffff888155e58100)
-[  464.351575] The buggy address belongs to the page:
-[  464.352333] page:ffffea0005579600 refcount:1 mapcount:0
-mapping:ffff88815a803400 index:0x0 compound_mapcount: 0
-[  464.353583] flags: 0x200000000010200(slab|head)
-[  464.354209] raw: 0200000000010200 ffffea0005576200 0000000400000004
-ffff88815a803400
-[  464.355353] raw: 0000000000000000 0000000080100010 00000001ffffffff
-0000000000000000
-[  464.356458] page dumped because: kasan: bad access detected
-
-[  464.367005] Memory state around the buggy address:
-[  464.367787]  ffff888155e57f80: fc fc fc fc fc fc fc fc fc fc fc fc
-fc fc fc fc
-[  464.368877]  ffff888155e58000: fb fb fb fb fb fb fb fb fb fb fb fb
-fb fb fb fb
-[  464.369967] >ffff888155e58080: fb fb fb fb fb fb fb fb fb fb fb fb
-fb fb fb fb
-[  464.371111]                                                  ^
-[  464.371775]  ffff888155e58100: fc fc fc fc fc fc fc fc fc fc fc fc
-fc fc fc fc
-[  464.372893]  ffff888155e58180: fc fc fc fc fc fc fc fc fc fc fc fc
-fc fc fc fc
-[  464.373983] ==================================================================
-
+Fixes: 5072010ccf05 ("cifs: Fix DFS cache refresher for DFS links")
 Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
 Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/connect.c | 46 +++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 35 insertions(+), 11 deletions(-)
+ fs/cifs/dfs_cache.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index fce71a6cc3f4..668d477cc9c7 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -391,7 +391,7 @@ static inline int reconn_set_ipaddr(struct TCP_Server_Info *server)
- #ifdef CONFIG_CIFS_DFS_UPCALL
- struct super_cb_data {
+diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+index 1692c0c6c23a..2faa05860a48 100644
+--- a/fs/cifs/dfs_cache.c
++++ b/fs/cifs/dfs_cache.c
+@@ -1317,7 +1317,6 @@ static struct cifs_ses *find_root_ses(struct dfs_cache_vol_info *vi,
+ 	int rc;
+ 	struct dfs_info3_param ref = {0};
+ 	char *mdata = NULL, *devname = NULL;
+-	bool is_smb3 = tcon->ses->server->vals->header_preamble_size == 0;
  	struct TCP_Server_Info *server;
--	struct cifs_sb_info *cifs_sb;
-+	struct super_block *sb;
- };
- 
- /* These functions must be called with server->srv_mutex held */
-@@ -402,25 +402,39 @@ static void super_cb(struct super_block *sb, void *arg)
- 	struct cifs_sb_info *cifs_sb;
- 	struct cifs_tcon *tcon;
- 
--	if (d->cifs_sb)
-+	if (d->sb)
- 		return;
- 
- 	cifs_sb = CIFS_SB(sb);
- 	tcon = cifs_sb_master_tcon(cifs_sb);
- 	if (tcon->ses->server == d->server)
--		d->cifs_sb = cifs_sb;
-+		d->sb = sb;
- }
- 
--static inline struct cifs_sb_info *
--find_super_by_tcp(struct TCP_Server_Info *server)
-+static struct super_block *get_tcp_super(struct TCP_Server_Info *server)
- {
- 	struct super_cb_data d = {
- 		.server = server,
--		.cifs_sb = NULL,
-+		.sb = NULL,
- 	};
- 
- 	iterate_supers_type(&cifs_fs_type, super_cb, &d);
--	return d.cifs_sb ? d.cifs_sb : ERR_PTR(-ENOENT);
-+
-+	if (unlikely(!d.sb))
-+		return ERR_PTR(-ENOENT);
-+	/*
-+	 * Grab an active reference in order to prevent automounts (DFS links)
-+	 * of expiring and then freeing up our cifs superblock pointer while
-+	 * we're doing failover.
-+	 */
-+	cifs_sb_active(d.sb);
-+	return d.sb;
-+}
-+
-+static inline void put_tcp_super(struct super_block *sb)
-+{
-+	if (!IS_ERR_OR_NULL(sb))
-+		cifs_sb_deactive(sb);
- }
- 
- static void reconn_inval_dfs_target(struct TCP_Server_Info *server,
-@@ -484,6 +498,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 	struct mid_q_entry *mid_entry;
- 	struct list_head retry_list;
- #ifdef CONFIG_CIFS_DFS_UPCALL
-+	struct super_block *sb = NULL;
- 	struct cifs_sb_info *cifs_sb = NULL;
- 	struct dfs_cache_tgt_list tgt_list = {0};
- 	struct dfs_cache_tgt_iterator *tgt_it = NULL;
-@@ -493,13 +508,15 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 	server->nr_targets = 1;
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	spin_unlock(&GlobalMid_Lock);
--	cifs_sb = find_super_by_tcp(server);
--	if (IS_ERR(cifs_sb)) {
--		rc = PTR_ERR(cifs_sb);
-+	sb = get_tcp_super(server);
-+	if (IS_ERR(sb)) {
-+		rc = PTR_ERR(sb);
- 		cifs_dbg(FYI, "%s: will not do DFS failover: rc = %d\n",
- 			 __func__, rc);
--		cifs_sb = NULL;
-+		sb = NULL;
- 	} else {
-+		cifs_sb = CIFS_SB(sb);
-+
- 		rc = reconn_setup_dfs_targets(cifs_sb, &tgt_list, &tgt_it);
- 		if (rc && (rc != -EOPNOTSUPP)) {
- 			cifs_server_dbg(VFS, "%s: no target servers for DFS failover\n",
-@@ -516,6 +533,10 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 		/* the demux thread will exit normally
- 		next time through the loop */
- 		spin_unlock(&GlobalMid_Lock);
-+#ifdef CONFIG_CIFS_DFS_UPCALL
-+		dfs_cache_free_tgts(&tgt_list);
-+		put_tcp_super(sb);
-+#endif
- 		return rc;
- 	} else
- 		server->tcpStatus = CifsNeedReconnect;
-@@ -642,7 +663,10 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 				 __func__, rc);
- 		}
- 		dfs_cache_free_tgts(&tgt_list);
-+
+ 	struct cifs_ses *ses;
+ 	struct smb_vol vol;
+@@ -1344,7 +1343,7 @@ static struct cifs_ses *find_root_ses(struct dfs_cache_vol_info *vi,
+ 		goto out;
  	}
-+
-+	put_tcp_super(sb);
- #endif
- 	if (server->tcpStatus == CifsNeedNegotiate)
- 		mod_delayed_work(cifsiod_wq, &server->echo, 0);
+ 
+-	rc = cifs_setup_volume_info(&vol, mdata, devname, is_smb3);
++	rc = cifs_setup_volume_info(&vol, mdata, devname, false);
+ 	kfree(devname);
+ 
+ 	if (rc) {
 -- 
 2.24.0
 
