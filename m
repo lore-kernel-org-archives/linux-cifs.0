@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC006C432C0
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 11:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9924FC43215
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 11:33:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98AB620684
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 11:32:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77CE02068E
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Nov 2019 11:33:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726556AbfK0Lc6 convert rfc822-to-8bit (ORCPT
+        id S1726526AbfK0LdO convert rfc822-to-8bit (ORCPT
         <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Nov 2019 06:32:58 -0500
-Received: from mx2.suse.de ([195.135.220.15]:59762 "EHLO mx1.suse.de"
+        Wed, 27 Nov 2019 06:33:14 -0500
+Received: from mx2.suse.de ([195.135.220.15]:59884 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726204AbfK0Lc6 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 27 Nov 2019 06:32:58 -0500
+        id S1726383AbfK0LdO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 27 Nov 2019 06:33:14 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 2047DB22C;
-        Wed, 27 Nov 2019 11:32:57 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id C0A2DAC5F;
+        Wed, 27 Nov 2019 11:33:13 +0000 (UTC)
 From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
 To:     "Paulo Alcantara \(SUSE\)" <pc@cjr.nz>, smfrench@gmail.com
 Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara \(SUSE\)" <pc@cjr.nz>
-Subject: Re: [PATCH v3 04/11] cifs: Clean up DFS referral cache
-In-Reply-To: <20191127003634.14072-5-pc@cjr.nz>
+Subject: Re: [PATCH v3 05/11] cifs: Get rid of kstrdup_const()'d paths
+In-Reply-To: <20191127003634.14072-6-pc@cjr.nz>
 References: <20191127003634.14072-1-pc@cjr.nz>
- <20191127003634.14072-5-pc@cjr.nz>
-Date:   Wed, 27 Nov 2019 12:32:56 +0100
-Message-ID: <87d0ddv9jr.fsf@suse.com>
+ <20191127003634.14072-6-pc@cjr.nz>
+Date:   Wed, 27 Nov 2019 12:33:12 +0100
+Message-ID: <87a78hv9jb.fsf@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
@@ -41,9 +41,7 @@ List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 "Paulo Alcantara (SUSE)" <pc@cjr.nz> writes:
-> Do some renaming and code cleanup.
->
-> No functional changes.
+> The DFS cache API is mostly used with heap allocated strings.
 
 Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 
