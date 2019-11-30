@@ -2,88 +2,148 @@ Return-Path: <SRS0=R0d0=ZW=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA20C43215
-	for <linux-cifs@archiver.kernel.org>; Sat, 30 Nov 2019 21:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27271C432C3
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 Nov 2019 21:25:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B70602075A
-	for <linux-cifs@archiver.kernel.org>; Sat, 30 Nov 2019 21:20:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEE602082E
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 Nov 2019 21:25:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X5WaM+IY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ly0yRe+o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727305AbfK3VUP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 30 Nov 2019 16:20:15 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:42779 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727025AbfK3VUP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 Nov 2019 16:20:15 -0500
-Received: by mail-io1-f67.google.com with SMTP id f25so9894744iog.9;
-        Sat, 30 Nov 2019 13:20:15 -0800 (PST)
+        id S1727213AbfK3VZv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 30 Nov 2019 16:25:51 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:39601 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727201AbfK3VZv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 Nov 2019 16:25:51 -0500
+Received: by mail-io1-f66.google.com with SMTP id c16so10589209ioh.6;
+        Sat, 30 Nov 2019 13:25:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=NbOkOAsiiOjamOjJqITROUWM1WjDallWI/CL6nXDDWc=;
-        b=X5WaM+IYr0X8/nF6gmcecUSKqP61OObhlUcs61f+iELjVbB9YvqEHioXS3nouQxr/R
-         Jd98e1SLXedIb6Vg6bw8YS15jpGhRjw5D7e/ngcaj8DviIZ3/TIMlat3I8RiuyUcz4lS
-         klTNSoHNTFqrCnbYctMIZTzMs6QbI9SwASjsGqi3vaNSfR0yK2bxAbpBe+7RMsTl70D0
-         UYiSRz1jsP7tBf58+lol/JeaZ1qPKbBXy1xUgycZqCql1lgrsqJNhUR2wnLAcxlZP8Om
-         RRd2P0dgQzQwVGYvdLwHN9bUjplZ1CsCzL9QkiBsqgyhx05Bym9rqR4e8R5+EhGGOpAS
-         Xmrg==
+        bh=xN2NEYgLxOLt/H9lUAJjUJ5JSxlsQ1fRNDxtHYCIblE=;
+        b=ly0yRe+o3kS13C86HWT4bTLzDRbrg56nDLSbbJgI5RE8dwkXyz7RlJQLBX1Y3PSiFH
+         kHUgmAQxTf7UN8cq3EGVKyrwTyW1JsrnzELs2A73ijoOWxiQk2AmV2JMpEubzu7t9dFx
+         itjAjf0evgPqLvZcJ4lEh3YntgyHDM+2Wu4rA9mDATcib4sdSq8Xn7Ska484rEuY5z40
+         nnoAr+QnQosoM/JTBfKp/sICBrzkMQ127tH/8AwrnVL8MI86MqXoFA4iDpoHDeOaJg2f
+         7p0AT5THqyylqPy5oknuLRYy7EB3HPon5/rlT8s8LGznyDaEFcxOK36BtJlWaupGFcLd
+         /pXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=NbOkOAsiiOjamOjJqITROUWM1WjDallWI/CL6nXDDWc=;
-        b=oRLSDB+UvWhvVhEXtygFkQFt5K4jQ3uYpA+gqqMWv/D3Q2QeBKy11Z2ZLZxUodnIA3
-         6lBURrVNlqzoF2JGndKntpVCyNIN9xGsFuKmm1U+X8ybxfI66x/6V38n3kne4+13A6nJ
-         3mtI5aGPoEBCtRaiSPsF+zvNteMCv5j3vYPWCU7ti1vD35i3fwZWtN7/AbtbpQ2oJkri
-         jl306AYuvHS76f3WAtISQa/6v84ugUgyHqDMsRMpyJwOIibr0nutekJatmImRzNQ8ogc
-         VzOks557vZ4WxlX9cUyCmKQGK2cpu1mZw+MUe/aeukKDk9JIn2Cmg0Dii92i7SbDg+iK
-         m8ow==
-X-Gm-Message-State: APjAAAX30niO0QfVGBKOR8pzBc2ayinQRv5h0YOeu0FFioxVWhJYjN0Y
-        Zcc4lksyhFLCTAsjOAd0z0ncQeaFF5KBq7Qd7TOFLQ==
-X-Google-Smtp-Source: APXvYqwBORWr8IdF9/z/AmkxTIZedBNklTNEuFR4EgxV2ImrMwzl0FAnvT8no/nrr3x229YTK9alrK+CQX74QtKGCw8=
-X-Received: by 2002:a6b:8d11:: with SMTP id p17mr4258661iod.3.1575148814828;
- Sat, 30 Nov 2019 13:20:14 -0800 (PST)
+        bh=xN2NEYgLxOLt/H9lUAJjUJ5JSxlsQ1fRNDxtHYCIblE=;
+        b=pMgM0PpNi1T2O68XteZubh2gOEnTNfEBGtvK+jWwhNO+h0VMyDnGHNm+hnmGY93DUb
+         9ZGyk5D7tBMAFdnjBMz6lbkoVOunwiuxvD04kQXOpbl4SE0bDKW1en34BLyIsMKfrXlS
+         5RYVQU4D+OZ6XEdlFauaQ5yvjUPwEkOp7OZU++4fZYm09NerCS8DZqIdKUJHT5HKACZT
+         w2jZq6jVM0oJIQmZpjBEwR5Ilwl3LlJ8Jr8lUl58L2TJNDKr/3axLJRmBeTkRfNOD0mN
+         f8qY5QW/Z64WBM0bYunIcw4T8i7s86OV8k9ldyBV4YHy7HrqeR5fzU+a56sDLzu5T3wY
+         n81g==
+X-Gm-Message-State: APjAAAXl6DQRm8LfTzFLbnTD7C0LHcD2Wy6nM64hQrbjqH2W84VpWswy
+        /086SqNrjporP40Qh4Jh6N21egfnin8lVKJ9NolrZw==
+X-Google-Smtp-Source: APXvYqzUJmvy9Gmi9HiG+HIP45gcXxN9IhfEILjc3pjvRqFTaaUvdE5JM6DbKzVXAosomlkXF8r6wIJBuSEYss1HXTM=
+X-Received: by 2002:a5d:83c9:: with SMTP id u9mr5646687ior.272.1575149150175;
+ Sat, 30 Nov 2019 13:25:50 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5mtDpwY=MrQ=yN29JeWUqf+ozgYvgnzbnb91VoK8Vg4Zmw@mail.gmail.com>
- <CAHk-=wiy3Bh5c6mCYSzxOL63oQWO40s1PNM9q6hD46M3wPKR_A@mail.gmail.com>
-In-Reply-To: <CAHk-=wiy3Bh5c6mCYSzxOL63oQWO40s1PNM9q6hD46M3wPKR_A@mail.gmail.com>
+References: <20191130053030.7868-1-deepa.kernel@gmail.com> <20191130053030.7868-4-deepa.kernel@gmail.com>
+In-Reply-To: <20191130053030.7868-4-deepa.kernel@gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 30 Nov 2019 15:20:04 -0600
-Message-ID: <CAH2r5muv535qCrzLZ_ZiEa=nc1=pis=xX2nYLaUVLS59DdD7Lg@mail.gmail.com>
-Subject: Re: [GIT PULL] CIFS/SMB3 Fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+Date:   Sat, 30 Nov 2019 15:25:39 -0600
+Message-ID: <CAH2r5msrqokxHGr6c4N8=mOw6v1h9ZXDQFSVMRPHnTmV1n0L=w@mail.gmail.com>
+Subject: Re: [PATCH 3/7] fs: cifs: Delete usage of timespec64_trunc
+To:     Deepa Dinamani <deepa.kernel@gmail.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Steve French <stfrench@microsoft.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, Nov 30, 2019 at 1:13 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Wed, Nov 27, 2019 at 3:49 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > Various smb3 fixes (including 12 for stable) and also features
-> > (addition of multichannel support).
->
-> That's a _very_ weak explanation for many hundreds of lines of code changed:
->
-> >  23 files changed, 1340 insertions(+), 529 deletions(-)
->
-> Please spend more time explaining what you send me, so that I can
-> write better merge messages or what is actually going on.
+Is this intended to merge separately or do you want it merged through
+the cifs git tree?
 
-Sorry about leaving that out. Will have more detail in subsequent
-pull requests.
+On Fri, Nov 29, 2019 at 11:33 PM Deepa Dinamani <deepa.kernel@gmail.com> wrote:
+>
+> timestamp_truncate() is the replacement api for
+> timespec64_trunc. timestamp_truncate() additionally clamps
+> timestamps to make sure the timestamps lie within the
+> permitted range for the filesystem.
+>
+> Truncate the timestamps in the struct cifs_attr at the
+> site of assignment to inode times. This
+> helps us use the right fs api timestamp_trucate() to
+> perform the truncation.
+>
+> Also update the ktime_get_* api to match the one used in
+> current_time(). This allows for timestamps to be updated
+> the same way always.
+>
+> Signed-off-by: Deepa Dinamani <deepa.kernel@gmail.com>
+> Cc: stfrench@microsoft.com
+> Cc: linux-cifs@vger.kernel.org
+> ---
+>  fs/cifs/inode.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+>
+> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+> index ca76a9287456..026ed49e8aa4 100644
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -113,6 +113,7 @@ cifs_revalidate_cache(struct inode *inode, struct cifs_fattr *fattr)
+>         }
+>
+>          /* revalidate if mtime or size have changed */
+> +       fattr->cf_mtime = timestamp_truncate(fattr->cf_mtime, inode);
+>         if (timespec64_equal(&inode->i_mtime, &fattr->cf_mtime) &&
+>             cifs_i->server_eof == fattr->cf_eof) {
+>                 cifs_dbg(FYI, "%s: inode %llu is unchanged\n",
+> @@ -162,6 +163,9 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
+>         cifs_revalidate_cache(inode, fattr);
+>
+>         spin_lock(&inode->i_lock);
+> +       fattr->cf_mtime = timestamp_truncate(fattr->cf_mtime, inode);
+> +       fattr->cf_atime = timestamp_truncate(fattr->cf_atime, inode);
+> +       fattr->cf_ctime = timestamp_truncate(fattr->cf_ctime, inode);
+>         /* we do not want atime to be less than mtime, it broke some apps */
+>         if (timespec64_compare(&fattr->cf_atime, &fattr->cf_mtime) < 0)
+>                 inode->i_atime = fattr->cf_mtime;
+> @@ -329,8 +333,7 @@ cifs_create_dfs_fattr(struct cifs_fattr *fattr, struct super_block *sb)
+>         fattr->cf_mode = S_IFDIR | S_IXUGO | S_IRWXU;
+>         fattr->cf_uid = cifs_sb->mnt_uid;
+>         fattr->cf_gid = cifs_sb->mnt_gid;
+> -       ktime_get_real_ts64(&fattr->cf_mtime);
+> -       fattr->cf_mtime = timespec64_trunc(fattr->cf_mtime, sb->s_time_gran);
+> +       ktime_get_coarse_real_ts64(&fattr->cf_mtime);
+>         fattr->cf_atime = fattr->cf_ctime = fattr->cf_mtime;
+>         fattr->cf_nlink = 2;
+>         fattr->cf_flags = CIFS_FATTR_DFS_REFERRAL;
+> @@ -609,10 +612,8 @@ cifs_all_info_to_fattr(struct cifs_fattr *fattr, FILE_ALL_INFO *info,
+>
+>         if (info->LastAccessTime)
+>                 fattr->cf_atime = cifs_NTtimeToUnix(info->LastAccessTime);
+> -       else {
+> -               ktime_get_real_ts64(&fattr->cf_atime);
+> -               fattr->cf_atime = timespec64_trunc(fattr->cf_atime, sb->s_time_gran);
+> -       }
+> +       else
+> +               ktime_get_coarse_real_ts64(&fattr->cf_atime);
+>
+>         fattr->cf_ctime = cifs_NTtimeToUnix(info->ChangeTime);
+>         fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
+> --
+> 2.17.1
+>
 
 
 -- 
