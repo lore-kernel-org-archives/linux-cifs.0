@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C865C43215
-	for <linux-cifs@archiver.kernel.org>; Mon,  2 Dec 2019 07:29:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2343C432C0
+	for <linux-cifs@archiver.kernel.org>; Mon,  2 Dec 2019 07:29:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 49A5D20715
-	for <linux-cifs@archiver.kernel.org>; Mon,  2 Dec 2019 07:29:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF03320715
+	for <linux-cifs@archiver.kernel.org>; Mon,  2 Dec 2019 07:29:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GQuS/3ND"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VbliR3z0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725977AbfLBH3P (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 2 Dec 2019 02:29:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52083 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726010AbfLBH3O (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 2 Dec 2019 02:29:14 -0500
+        id S1726263AbfLBH3Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 2 Dec 2019 02:29:16 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26649 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726010AbfLBH3Q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 2 Dec 2019 02:29:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575271753;
+        s=mimecast20190719; t=1575271755;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lBE2Mnyi4BgxQ05rdTMKHFLN6j9kemNalwQjFo3CDmk=;
-        b=GQuS/3NDVm2vt3OuX5RlHC2KdEgWVEGM6racF14Y4zZ6bpZxGLH5KFZnEsgSzhcWgay3Hu
-        DJfQ/H38QYznAeyt0v5y9fJ35JCUi5g44FwrGtkAOyU10HVm5n1we+OtN5deFFdVICTO0P
-        qLS1QtgUb8pCnFW3w13Ohd23vHhrQbo=
+        bh=O9gUCs/cEBpxrT7eKfVFRimfnB7hqRsKbRDQyHZ9Yt4=;
+        b=VbliR3z0AFFvdWE2B+2jYn/vXleaw9QKYL7jX7IK5dltNzv9BrMfv7kRYK9aIIYxQJ0n6o
+        n1/n4N90+YxjW+KyuTACmRaLXbTdo+3g8Ak6Jk0Sv5vp9fU/xGaOpD2BBM7H0l2oQnxk3n
+        EtXIyzFK5M2m97ANvbBJRtimS3Kj7uY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-Wwz9E-D6OK-VU_tcnfFDWw-1; Mon, 02 Dec 2019 02:29:12 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-287-fk2qsD-BOYSOIPUEDYTAUQ-1; Mon, 02 Dec 2019 02:29:14 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A0CC183B708
-        for <linux-cifs@vger.kernel.org>; Mon,  2 Dec 2019 07:29:11 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40528800D4C
+        for <linux-cifs@vger.kernel.org>; Mon,  2 Dec 2019 07:29:13 +0000 (UTC)
 Received: from test1135.test.redhat.com (vpn2-54-114.bne.redhat.com [10.64.54.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AEB4C5C545;
-        Mon,  2 Dec 2019 07:29:10 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 919B967E4D;
+        Mon,  2 Dec 2019 07:29:12 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH 3/3] cifs: use compounding for open and first query-dir for readdir()
-Date:   Mon,  2 Dec 2019 17:29:00 +1000
-Message-Id: <20191202072900.21981-4-lsahlber@redhat.com>
+Subject: [PATCH 1/3] cifs: prepare SMB2_query_directory to be used with compounding
+Date:   Mon,  2 Dec 2019 17:28:58 +1000
+Message-Id: <20191202072900.21981-2-lsahlber@redhat.com>
 In-Reply-To: <20191202072900.21981-1-lsahlber@redhat.com>
 References: <20191202072900.21981-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: Wwz9E-D6OK-VU_tcnfFDWw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: fk2qsD-BOYSOIPUEDYTAUQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -60,164 +60,218 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Combine the initial SMB2_Open and the first SMB2_Query_Directory in a compo=
-und.
-This shaves one round-trip of each directory listing, changing it from 4 to=
- 3
-for small directories.
-
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/cifs/cifsproto.h |  3 ++
- fs/cifs/smb2ops.c   | 95 ++++++++++++++++++++++++++++++++++++++++++++++---=
+ fs/cifs/smb2pdu.c   | 108 +++++++++++++++++++++++++++++++++++-------------=
 ----
- 2 files changed, 86 insertions(+), 12 deletions(-)
+ fs/cifs/smb2pdu.h   |   2 +
+ fs/cifs/smb2proto.h |   5 +++
+ 3 files changed, 80 insertions(+), 35 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 1ed695336f62..b276281ec0d8 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -595,6 +595,9 @@ bool is_ses_using_iface(struct cifs_ses *ses, struct ci=
-fs_server_iface *iface);
-=20
- void extract_unc_hostname(const char *unc, const char **h, size_t *len);
- int copy_path_name(char *dst, const char *src);
-+int smb2_parse_query_directory(struct cifs_tcon *tcon, struct kvec *rsp_io=
-v,
-+=09=09=09       int resp_buftype,
-+=09=09=09       struct cifs_search_info *srch_inf);
-=20
- #ifdef CONFIG_CIFS_DFS_UPCALL
- static inline int get_dfs_path(const unsigned int xid, struct cifs_ses *se=
-s,
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index a7f328f79c6f..58b9b694b62f 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -1997,14 +1997,33 @@ smb2_query_dir_first(const unsigned int xid, struct=
- cifs_tcon *tcon,
- =09=09     struct cifs_search_info *srch_inf)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index ed77f94dbf1d..df903931590e 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -4214,56 +4214,36 @@ num_entries(char *bufstart, char *end_of_buf, char =
+**lastentry, size_t size)
+ /*
+  * Readdir/FindFirst
+  */
+-int
+-SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
+-=09=09     u64 persistent_fid, u64 volatile_fid, int index,
+-=09=09     struct cifs_search_info *srch_inf)
++int SMB2_query_directory_init(const unsigned int xid,
++=09=09=09      struct cifs_tcon *tcon, struct smb_rqst *rqst,
++=09=09=09      u64 persistent_fid, u64 volatile_fid,
++=09=09=09      int index, int info_level)
  {
- =09__le16 *utf16_path;
--=09int rc;
--=09__u8 oplock =3D SMB2_OPLOCK_LEVEL_NONE;
-+=09struct smb_rqst rqst[2];
-+=09struct kvec rsp_iov[2];
-+=09int resp_buftype[2];
-+=09struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
-+=09struct kvec qd_iov[SMB2_QUERY_DIRECTORY_IOV_SIZE];
-+=09int rc, flags =3D 0;
-+=09u8 oplock =3D SMB2_OPLOCK_LEVEL_NONE;
- =09struct cifs_open_parms oparms;
-+=09struct smb2_query_directory_rsp *qd_rsp =3D NULL;
-+=09struct smb2_create_rsp *op_rsp =3D NULL;
+-=09struct smb_rqst rqst;
++=09struct TCP_Server_Info *server =3D tcon->ses->server;
+ =09struct smb2_query_directory_req *req;
+-=09struct smb2_query_directory_rsp *rsp =3D NULL;
+-=09struct kvec iov[2];
+-=09struct kvec rsp_iov;
+-=09int rc =3D 0;
+-=09int len;
+-=09int resp_buftype =3D CIFS_NO_BUFFER;
+ =09unsigned char *bufptr;
+-=09struct TCP_Server_Info *server;
+-=09struct cifs_ses *ses =3D tcon->ses;
+ =09__le16 asteriks =3D cpu_to_le16('*');
+-=09char *end_of_smb;
+ =09unsigned int output_size =3D CIFSMaxBufSize;
+-=09size_t info_buf_size;
+-=09int flags =3D 0;
+ =09unsigned int total_len;
+-
+-=09if (ses && (ses->server))
+-=09=09server =3D ses->server;
+-=09else
+-=09=09return -EIO;
++=09struct kvec *iov =3D rqst->rq_iov;
++=09int len, rc;
 =20
- =09utf16_path =3D cifs_convert_path_to_utf16(path, cifs_sb);
- =09if (!utf16_path)
- =09=09return -ENOMEM;
+ =09rc =3D smb2_plain_req_init(SMB2_QUERY_DIRECTORY, tcon, (void **) &req,
+ =09=09=09     &total_len);
+ =09if (rc)
+ =09=09return rc;
 =20
+-=09if (smb3_encryption_required(tcon))
+-=09=09flags |=3D CIFS_TRANSFORM_REQ;
+-
+-=09switch (srch_inf->info_level) {
++=09switch (info_level) {
+ =09case SMB_FIND_FILE_DIRECTORY_INFO:
+ =09=09req->FileInformationClass =3D FILE_DIRECTORY_INFORMATION;
+-=09=09info_buf_size =3D sizeof(FILE_DIRECTORY_INFO) - 1;
+ =09=09break;
+ =09case SMB_FIND_FILE_ID_FULL_DIR_INFO:
+ =09=09req->FileInformationClass =3D FILEID_FULL_DIRECTORY_INFORMATION;
+-=09=09info_buf_size =3D sizeof(SEARCH_ID_FULL_DIR_INFO) - 1;
+ =09=09break;
+ =09default:
+ =09=09cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
+-=09=09=09 srch_inf->info_level);
+-=09=09rc =3D -EINVAL;
+-=09=09goto qdir_exit;
++=09=09=09info_level);
++=09=09return -EINVAL;
+ =09}
+=20
+ =09req->FileIndex =3D cpu_to_le32(index);
+@@ -4292,15 +4272,56 @@ SMB2_query_directory(const unsigned int xid, struct=
+ cifs_tcon *tcon,
+ =09iov[1].iov_base =3D (char *)(req->Buffer);
+ =09iov[1].iov_len =3D len;
+=20
++=09trace_smb3_query_dir_enter(xid, persistent_fid, tcon->tid,
++=09=09=09tcon->ses->Suid, index, output_size);
++
++=09return 0;
++}
++
++void SMB2_query_directory_free(struct smb_rqst *rqst)
++{
++=09if (rqst && rqst->rq_iov) {
++=09=09cifs_small_buf_release(rqst->rq_iov[0].iov_base); /* request */
++=09}
++}
++
++int
++SMB2_query_directory(const unsigned int xid, struct cifs_tcon *tcon,
++=09=09     u64 persistent_fid, u64 volatile_fid, int index,
++=09=09     struct cifs_search_info *srch_inf)
++{
++=09struct smb_rqst rqst;
++=09struct kvec iov[SMB2_QUERY_DIRECTORY_IOV_SIZE];
++=09struct smb2_query_directory_rsp *rsp =3D NULL;
++=09int resp_buftype =3D CIFS_NO_BUFFER;
++=09struct kvec rsp_iov;
++=09int rc =3D 0;
++=09struct TCP_Server_Info *server;
++=09struct cifs_ses *ses =3D tcon->ses;
++=09char *end_of_smb;
++=09size_t info_buf_size;
++=09int flags =3D 0;
++
++=09if (ses && (ses->server))
++=09=09server =3D ses->server;
++=09else
++=09=09return -EIO;
++
 +=09if (smb3_encryption_required(tcon))
 +=09=09flags |=3D CIFS_TRANSFORM_REQ;
 +
-+=09memset(rqst, 0, sizeof(rqst));
-+=09resp_buftype[0] =3D resp_buftype[1] =3D CIFS_NO_BUFFER;
-+=09memset(rsp_iov, 0, sizeof(rsp_iov));
-+
-+=09/* Open */
-+=09memset(&open_iov, 0, sizeof(open_iov));
-+=09rqst[0].rq_iov =3D open_iov;
-+=09rqst[0].rq_nvec =3D SMB2_CREATE_IOV_SIZE;
-+
- =09oparms.tcon =3D tcon;
- =09oparms.desired_access =3D FILE_READ_ATTRIBUTES | FILE_READ_DATA;
- =09oparms.disposition =3D FILE_OPEN;
-@@ -2015,22 +2034,74 @@ smb2_query_dir_first(const unsigned int xid, struct=
- cifs_tcon *tcon,
- =09oparms.fid =3D fid;
- =09oparms.reconnect =3D false;
+ =09memset(&rqst, 0, sizeof(struct smb_rqst));
++=09memset(&iov, 0, sizeof(iov));
+ =09rqst.rq_iov =3D iov;
+-=09rqst.rq_nvec =3D 2;
++=09rqst.rq_nvec =3D SMB2_QUERY_DIRECTORY_IOV_SIZE;
 =20
--=09rc =3D SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL, NULL);
--=09kfree(utf16_path);
--=09if (rc) {
--=09=09cifs_dbg(FYI, "open dir failed rc=3D%d\n", rc);
--=09=09return rc;
--=09}
-+=09rc =3D SMB2_open_init(tcon, &rqst[0], &oplock, &oparms, utf16_path);
+-=09trace_smb3_query_dir_enter(xid, persistent_fid, tcon->tid,
+-=09=09=09tcon->ses->Suid, index, output_size);
++=09rc =3D SMB2_query_directory_init(xid, tcon, &rqst, persistent_fid,
++=09=09=09=09       volatile_fid, index,
++=09=09=09=09       srch_inf->info_level);
 +=09if (rc)
-+=09=09goto qdf_free;
-+=09smb2_set_next_command(tcon, &rqst[0]);
++=09=09goto qdir_exit;
 =20
-+=09/* Query directory */
- =09srch_inf->entries_in_buffer =3D 0;
- =09srch_inf->index_of_last_entry =3D 2;
+ =09rc =3D cifs_send_recv(xid, ses, &rqst, &resp_buftype, flags, &rsp_iov);
+-=09cifs_small_buf_release(req);
+ =09rsp =3D (struct smb2_query_directory_rsp *)rsp_iov.iov_base;
 =20
--=09rc =3D SMB2_query_directory(xid, tcon, fid->persistent_fid,
--=09=09=09=09  fid->volatile_fid, 0, srch_inf);
-+=09memset(&qd_iov, 0, sizeof(qd_iov));
-+=09rqst[1].rq_iov =3D qd_iov;
-+=09rqst[1].rq_nvec =3D SMB2_QUERY_DIRECTORY_IOV_SIZE;
-+
-+=09rc =3D SMB2_query_directory_init(xid, tcon, &rqst[1],
-+=09=09=09=09       COMPOUND_FID, COMPOUND_FID,
-+=09=09=09=09       0, srch_inf->info_level);
-+=09if (rc)
-+=09=09goto qdf_free;
-+
-+=09smb2_set_related(&rqst[1]);
-+
-+=09rc =3D compound_send_recv(xid, tcon->ses, flags, 2, rqst,
-+=09=09=09=09resp_buftype, rsp_iov);
-+=09if (!rc) {
-+=09=09op_rsp =3D (struct smb2_create_rsp *)rsp_iov[0].iov_base;
-+=09=09if (op_rsp->sync_hdr.Status =3D=3D STATUS_SUCCESS) {
-+=09=09=09fid->persistent_fid =3D op_rsp->PersistentFileId;
-+=09=09=09fid->volatile_fid =3D op_rsp->VolatileFileId;
-+=09=09} else {
-+=09=09=09cifs_dbg(FYI, "query_dir_first: open failed rc=3D%d\n", rc);
-+=09=09=09goto qdf_free;
-+=09=09}
-+=09} else {
-+=09=09qd_rsp =3D (struct smb2_query_directory_rsp *)rsp_iov[1].iov_base;
-+=09=09if (rc =3D=3D -ENODATA &&
-+=09=09    qd_rsp->sync_hdr.Status =3D=3D STATUS_NO_MORE_FILES) {
-+=09=09=09trace_smb3_query_dir_done(xid, fid->persistent_fid,
-+=09=09=09=09tcon->tid, tcon->ses->Suid, 0, 0);
-+=09=09=09srch_inf->endOfSearch =3D true;
-+=09=09=09rc =3D 0;
-+=09=09} else {
-+=09=09=09SMB2_close(xid, tcon, fid->persistent_fid,
-+=09=09=09=09   fid->volatile_fid);
-+=09=09=09cifs_dbg(FYI, "query_dir_first: query directory failed rc=3D%d\n"=
-, rc);
-+=09=09=09trace_smb3_query_dir_err(xid, fid->persistent_fid,
-+=09=09=09=09tcon->tid, tcon->ses->Suid, 0, 0, rc);
-+=09=09}
-+=09=09goto qdf_free;
+ =09if (rc) {
+@@ -4318,6 +4339,20 @@ SMB2_query_directory(const unsigned int xid, struct =
+cifs_tcon *tcon,
+ =09=09goto qdir_exit;
+ =09}
+=20
++=09switch (srch_inf->info_level) {
++=09case SMB_FIND_FILE_DIRECTORY_INFO:
++=09=09info_buf_size =3D sizeof(FILE_DIRECTORY_INFO) - 1;
++=09=09break;
++=09case SMB_FIND_FILE_ID_FULL_DIR_INFO:
++=09=09info_buf_size =3D sizeof(SEARCH_ID_FULL_DIR_INFO) - 1;
++=09=09break;
++=09default:
++=09=09cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
++=09=09=09 srch_inf->info_level);
++=09=09rc =3D -EINVAL;
++=09=09goto qdir_exit;
 +=09}
 +
-+=09rc =3D smb2_parse_query_directory(tcon, &rsp_iov[1], resp_buftype[1],
-+=09=09=09=09=09srch_inf);
- =09if (rc) {
--=09=09cifs_dbg(FYI, "query directory failed rc=3D%d\n", rc);
--=09=09SMB2_close(xid, tcon, fid->persistent_fid, fid->volatile_fid);
-+=09=09trace_smb3_query_dir_err(xid, fid->persistent_fid, tcon->tid,
-+=09=09=09tcon->ses->Suid, 0, 0, rc);
-+=09=09goto qdf_free;
- =09}
-+=09resp_buftype[1] =3D CIFS_NO_BUFFER;
+ =09rc =3D smb2_validate_iov(le16_to_cpu(rsp->OutputBufferOffset),
+ =09=09=09       le32_to_cpu(rsp->OutputBufferLength), &rsp_iov,
+ =09=09=09       info_buf_size);
+@@ -4353,11 +4388,14 @@ SMB2_query_directory(const unsigned int xid, struct=
+ cifs_tcon *tcon,
+ =09else
+ =09=09cifs_tcon_dbg(VFS, "illegal search buffer type\n");
+=20
++=09rsp =3D NULL;
++=09resp_buftype =3D CIFS_NO_BUFFER;
 +
-+=09trace_smb3_query_dir_done(xid, fid->persistent_fid, tcon->tid,
-+=09=09=09tcon->ses->Suid, 0, srch_inf->entries_in_buffer);
-+
-+ qdf_free:
-+=09kfree(utf16_path);
-+=09SMB2_open_free(&rqst[0]);
-+=09SMB2_query_directory_free(&rqst[1]);
-+=09free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
-+=09free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
+ =09trace_smb3_query_dir_done(xid, persistent_fid, tcon->tid,
+ =09=09=09tcon->ses->Suid, index, srch_inf->entries_in_buffer);
+-=09return rc;
+=20
+ qdir_exit:
++=09SMB2_query_directory_free(&rqst);
+ =09free_rsp_buf(resp_buftype, rsp);
  =09return rc;
  }
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index f264e1d36fe1..caf323be0d7f 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -1272,6 +1272,8 @@ struct smb2_echo_rsp {
+ #define SMB2_INDEX_SPECIFIED=09=090x04
+ #define SMB2_REOPEN=09=09=090x10
 =20
++#define SMB2_QUERY_DIRECTORY_IOV_SIZE 2
++
+ struct smb2_query_directory_req {
+ =09struct smb2_sync_hdr sync_hdr;
+ =09__le16 StructureSize; /* Must be 33 */
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index d21a5fcc8d06..ba48ce9af620 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -194,6 +194,11 @@ extern int SMB2_echo(struct TCP_Server_Info *server);
+ extern int SMB2_query_directory(const unsigned int xid, struct cifs_tcon *=
+tcon,
+ =09=09=09=09u64 persistent_fid, u64 volatile_fid, int index,
+ =09=09=09=09struct cifs_search_info *srch_inf);
++extern int SMB2_query_directory_init(unsigned int xid, struct cifs_tcon *t=
+con,
++=09=09=09=09     struct smb_rqst *rqst,
++=09=09=09=09     u64 persistent_fid, u64 volatile_fid,
++=09=09=09=09     int index, int info_level);
++extern void SMB2_query_directory_free(struct smb_rqst *rqst);
+ extern int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
+ =09=09=09u64 persistent_fid, u64 volatile_fid, u32 pid,
+ =09=09=09__le64 *eof);
 --=20
 2.13.6
 
