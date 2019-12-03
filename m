@@ -2,95 +2,110 @@ Return-Path: <SRS0=JIor=ZZ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D61C432C0
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Dec 2019 03:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96BF4C432C3
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Dec 2019 05:20:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B4DA4206E1
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Dec 2019 03:07:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CD0220684
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Dec 2019 05:20:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ee4IFCAz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ztb0Rrey"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726186AbfLCDHr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 2 Dec 2019 22:07:47 -0500
-Received: from mail-il1-f172.google.com ([209.85.166.172]:34559 "EHLO
-        mail-il1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726142AbfLCDHq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 2 Dec 2019 22:07:46 -0500
-Received: by mail-il1-f172.google.com with SMTP id w13so1814141ilo.1
-        for <linux-cifs@vger.kernel.org>; Mon, 02 Dec 2019 19:07:46 -0800 (PST)
+        id S1726308AbfLCFUF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Dec 2019 00:20:05 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33870 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725845AbfLCFUE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 Dec 2019 00:20:04 -0500
+Received: by mail-pf1-f195.google.com with SMTP id n13so1253073pff.1;
+        Mon, 02 Dec 2019 21:20:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=aWxpOiIQ/Y/5zfPc2pZkD3w649HYW4jfhPdsFDHmASM=;
-        b=ee4IFCAzRNl23Sm7P2kX9vyq8Qp9c2lJhqMZCiF8hEL1ze+I57Mw7uP4vbvt4OF04E
-         Jscqtde26FD3AQ4H1hcyZjueUFJ8C3wmZ2mFIggUtR3vq6mOAeKmWrBqnU7StguIER4L
-         bmGCmXl9PK1k7ACf9PMs1iipqYP8GVYyJ1m9ViSFfcqj5c+4XLnLBKBUr6IepTIG7ImU
-         5SKR1VR6YKjdQCghA70tV10Q1QPCCbhVi2R0O1rZA5SvuVAO59EZkXxbKohCzd0SCTIQ
-         qIIzqXM+VarByfPIOr26XW5CiPGSSjMMU29vD+eTAHovAtfZboOOJeQJPI27qMwKyc0u
-         HKQA==
+        h=from:to:cc:subject:date:message-id;
+        bh=Lo1FIdw7u0NV2Tgo0tQfhnWJEQxmW3ioGg2cCeozVqA=;
+        b=Ztb0RreyoIgcYMObe/fxFbZfmUwBOO9ZNQVyf+0wUkqB4IUF8iX0Aj4QAEgwK2Y8HM
+         9R9J2WuuwQAzhlQ/JTsmxUblpgOZSEXSlTYpieISOLR+lxkkznNggFCdSHSHCjpIqfV7
+         /xfCn0FBK0DACW28QfMqcF/4QzP3mvELDENsDx94okHKtlscY7ccBwXgRl5XhA2ZeExO
+         JSpLajE42kSVi4FjSO+rDXerjrHBAEwhAUn3qReScV8VZLmL+FP5uXu88tMcR4sQc4xI
+         mZycIOiu7BQgSsmJ7DMs0dilebUnmKiNVXx2Vhj+jT13hSRhf6hCmXcJlxcxNITmsd5n
+         SpQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=aWxpOiIQ/Y/5zfPc2pZkD3w649HYW4jfhPdsFDHmASM=;
-        b=DbNxxrS5bg3oYZZLQM0fSui+edMAdYhXhKLR3xjJsttKc8lEwBe7FippWgkPMxZ1/p
-         6wdjmJPfshTVNBtlwe23xdq74dJrnefqAFvzPmJr9hU9HRoIJmyzAuGppuNPw2r0qc2R
-         py3fYdU8L3E2ovELcKuTWZ8lZ9I2dSjR+d3hcA/DZ1inO0iGvvM0ffBVGbvCXZcPNx2h
-         kLEJpkVxBbL128kYfrLhwOxseCr6GQPEmz+e2Zq/Rp4l6kAVLhBJRUCibZzfxQdgT38u
-         pQgctvhlsDRmfmuRUC1qoqTc16s5WhDVPvSBl4a2PQF5hAfFRahVwXwodrFZD0KvafGs
-         tVlw==
-X-Gm-Message-State: APjAAAVPGxkokPaTNJBcOqIr/O2a8/KjrWOhM+EVa5pOnLAcFbbZr/Xa
-        bcRHkB1vnOVxhIy/TGCzeWhxP6u8r1U0QXFjv8gkG535
-X-Google-Smtp-Source: APXvYqzuPhfR+1d5QvMz7AOXBnhD/7aDXc2x+sSZ8DCxqM2v0uza7VWF/AgTcPZVfWvFRliCljf9ed/Wl8E29iiAO2g=
-X-Received: by 2002:a92:1553:: with SMTP id v80mr2823968ilk.49.1575342466268;
- Mon, 02 Dec 2019 19:07:46 -0800 (PST)
-MIME-Version: 1.0
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Tue, 3 Dec 2019 13:07:35 +1000
-Message-ID: <CAN05THS0S-fRFMMJzhrdozs6VRbXHAZigSK2KVu=sjhQ6eDNXA@mail.gmail.com>
-Subject: FileIndex in FSCC FileIdFullDirectoryInformation
-To:     Interoperability Documentation Help <dochelp@winse.microsoft.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=Lo1FIdw7u0NV2Tgo0tQfhnWJEQxmW3ioGg2cCeozVqA=;
+        b=FaewhzjznJ8gUADr9XNN+Sz1PXWM16WhTsnJE1NL6gUhNfSMzvbJIbxPMCEoX8Vq2D
+         X8aDOPu58IjZTk5ck2GV7sv9G9RnUeTx+0etFFpYhB5iZ4XxNKJieFTTrTegEi+wkHsT
+         LAcKuItYWTkfDiS/0pnubibGXuN2zzgiMXrsoltE+CHrAJclhoYQVSUeQ6Cj+lTas1Jj
+         Kz7K6HdslPUy5JkRIUavM7ykHgtpAfLYq05OOVgcbgZoCmnwUUVHHAz6AndC3+tW3iRg
+         Trsldac6MyUEK7Afycy38xjJGIrTOqQZO+xOwCaULFn62k6ImLykQEdODta3YlDdhH9t
+         CAUg==
+X-Gm-Message-State: APjAAAVLcM/b68TpbUL7BB3k/7WNX5fh8moExhUHR7Q9Fvjmi5KtLKKq
+        z5qfrE+95gclFIeNeK9j6jZPbrJZ
+X-Google-Smtp-Source: APXvYqxzZDh2NfeBrYDTnnOf9/hdb2fm1fLorKVVSa377tbXVjQqr8t/Sr3B1HKNXY0bY7gwbZcU3Q==
+X-Received: by 2002:aa7:9465:: with SMTP id t5mr2899660pfq.18.1575350404175;
+        Mon, 02 Dec 2019 21:20:04 -0800 (PST)
+Received: from deepa-ubuntu.lan (c-98-234-52-230.hsd1.ca.comcast.net. [98.234.52.230])
+        by smtp.gmail.com with ESMTPSA id h9sm1451915pgk.84.2019.12.02.21.20.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Dec 2019 21:20:03 -0800 (PST)
+From:   Deepa Dinamani <deepa.kernel@gmail.com>
+To:     viro@zeniv.linux.org.uk, linux-kernel@vger.kernel.org
+Cc:     linux-fsdevel@vger.kernel.org, arnd@arndb.de,
+        ceph-devel@vger.kernel.org, hirofumi@mail.parknet.co.jp,
+        jlayton@kernel.org, linux-cifs@vger.kernel.org,
+        linux-mtd@lists.infradead.org, richard@nod.at,
+        stfrench@microsoft.com
+Subject: [PATCH v2 0/6] Delete timespec64_trunc()
+Date:   Mon,  2 Dec 2019 21:19:39 -0800
+Message-Id: <20191203051945.9440-1-deepa.kernel@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Dochelp,
+This series aims at deleting timespec64_trunc().
+There is a new api: timestamp_truncate() that is the
+replacement api. The api additionally does a limits
+check on the filesystem timestamps.
 
-I am looking at MS-FSCC for the FileIdFullDirectoryInformation
-responses.
-The description of FileIndex is as:
-===
-FileIndex (4 bytes): A 32-bit unsigned integer that contains the byte
-offset of the file within the
-parent directory. For file systems in which the position of a file
-within the parent directory is not
-fixed and can be changed at any time to maintain sort order, this
-field SHOULD be set to 0 and
-MUST be ignored.<107>
+The suggestion to open code some of the truncate logic
+came from Al Viro. And, this does make the code in some
+filesystems easy to follow.
 
-Footnote for <107> is :
-===
-<107> Section 2.4.18: When using NTFS, the position of a file within
-the parent directory is not fixed
-and can be changed at any time. Windows 2000, Windows XP, Windows
-Server 2003, Windows Vista,
-Windows Server 2008, Windows 7, and Windows Server 2008 R2 set this
-value to zero for files on
-NTFS file systems.
+The series also does some update_time() cleanup as
+suggested by Al Viro.
 
+Deepa Dinamani (6):
+  fs: fat: Eliminate timespec64_trunc() usage
+  fs: cifs: Delete usage of timespec64_trunc
+  fs: ceph: Delete timespec64_trunc() usage
+  fs: ubifs: Eliminate timespec64_trunc() usage
+  fs: Delete timespec64_trunc()
+  fs: Do not overload update_time
 
-Is this list of OSs where FileIndex == 0 for NTFS complete?
-I am testing against Windows2016 with a share on NTFS and it returns
-FileIndex==0 also.
-Can you check and clarify?
+ fs/ceph/mds_client.c |  4 +---
+ fs/cifs/inode.c      | 13 +++++++------
+ fs/fat/misc.c        | 10 +++++++++-
+ fs/inode.c           | 33 +++------------------------------
+ fs/ubifs/sb.c        | 11 ++++-------
+ include/linux/fs.h   |  1 -
+ 6 files changed, 24 insertions(+), 48 deletions(-)
 
+-- 
+Changes since v1:
+* Dropped the atime comparison (patch 2/7) taken through cifs tree.
+* Refactored update_time according to review comments.
+2.17.1
 
-regards
-ronnie sahlberg
+Cc: ceph-devel@vger.kernel.org
+Cc: hirofumi@mail.parknet.co.jp
+Cc: jlayton@kernel.org
+Cc: linux-cifs@vger.kernel.org
+Cc: linux-mtd@lists.infradead.org
+Cc: richard@nod.at
+Cc: stfrench@microsoft.com
