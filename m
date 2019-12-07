@@ -1,88 +1,64 @@
-Return-Path: <SRS0=lGtv=Z4=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=CnDO=Z5=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC1EC43603
-	for <linux-cifs@archiver.kernel.org>; Fri,  6 Dec 2019 08:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C538AC43603
+	for <linux-cifs@archiver.kernel.org>; Sat,  7 Dec 2019 06:02:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FBE024677
-	for <linux-cifs@archiver.kernel.org>; Fri,  6 Dec 2019 08:35:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PdWnXlEF"
+	by mail.kernel.org (Postfix) with ESMTP id 955C1206DB
+	for <linux-cifs@archiver.kernel.org>; Sat,  7 Dec 2019 06:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726088AbfLFIfe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 6 Dec 2019 03:35:34 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24564 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725966AbfLFIfe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 6 Dec 2019 03:35:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1575621333;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iPZy+V17MKteQvTO9+cmdtR7EFzYQSfyCwkrYE6HtDQ=;
-        b=PdWnXlEFOFUAt/R5raSUUtqmvKxnWVhCrVKNU9T1OqupthqsQHEl8Jfr8UmyeePQGLz5Pt
-        Qw3Y7A1btz7sAIx5NttksFs0sL4xxDjfCF+xJesIAsEQcYl9LcFD30zE8pZl2DTVnPz/Dd
-        /od+8PrUidaUPf24rUutBcpWetnfHyU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-23rVRtNFMvyLMhb_N0T65g-1; Fri, 06 Dec 2019 03:35:30 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE4EE107ACC9;
-        Fri,  6 Dec 2019 08:35:28 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-250.rdu2.redhat.com [10.10.120.250])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C479B5C1C3;
-        Fri,  6 Dec 2019 08:35:27 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20191121160725.GA19291@infradead.org>
-References: <20191121160725.GA19291@infradead.org> <20191121081923.GA19366@infradead.org> <157432403818.17624.9300948341879954830.stgit@warthog.procyon.org.uk> <30992.1574327471@warthog.procyon.org.uk>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     dhowells@redhat.com, sfrench@samba.org, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Don't use iov_iter::type directly
+        id S1725869AbfLGGCI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 7 Dec 2019 01:02:08 -0500
+Received: from zeniv.linux.org.uk ([195.92.253.2]:43758 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725280AbfLGGCI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 7 Dec 2019 01:02:08 -0500
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1idTAH-0006SZ-5o; Sat, 07 Dec 2019 06:02:01 +0000
+Date:   Sat, 7 Dec 2019 06:02:01 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Deepa Dinamani <deepa.kernel@gmail.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Jeff Layton <jlayton@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        linux-mtd <linux-mtd@lists.infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Steve French <stfrench@microsoft.com>
+Subject: Re: [PATCH v2 0/6] Delete timespec64_trunc()
+Message-ID: <20191207060201.GN4203@ZenIV.linux.org.uk>
+References: <20191203051945.9440-1-deepa.kernel@gmail.com>
+ <CABeXuvpkYQbsvGTuktEAR8ptr478peet3EH=RD0v+nK5o2Wmjg@mail.gmail.com>
 MIME-Version: 1.0
-Content-ID: <26835.1575621327.1@warthog.procyon.org.uk>
-Date:   Fri, 06 Dec 2019 08:35:27 +0000
-Message-ID: <26836.1575621327@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 23rVRtNFMvyLMhb_N0T65g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABeXuvpkYQbsvGTuktEAR8ptr478peet3EH=RD0v+nK5o2Wmjg@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Christoph Hellwig <hch@infradead.org> wrote:
+On Thu, Dec 05, 2019 at 06:43:26PM -0800, Deepa Dinamani wrote:
+> On Mon, Dec 2, 2019 at 9:20 PM Deepa Dinamani <deepa.kernel@gmail.com> wrote:
+> > This series aims at deleting timespec64_trunc().
+> > There is a new api: timestamp_truncate() that is the
+> > replacement api. The api additionally does a limits
+> > check on the filesystem timestamps.
+> 
+> Al/Andrew, can one of you help merge these patches?
 
-> > However, all the code that is doing direct accesses using '&' has to
-> > change to make that work - so I've converted it all to using accessors =
-so
-> > that I only have to change the header file, except that the patch to do
-> > that crossed with a cifs patch that added more direct accesses, IIRC.
->=20
-> But I still don't really see the point of the wrappers.  Maybe they are
-> ok as a migration strategy, but in that case this patch mostly makes
-> sense as part of the series only.
+Looks sane.  Could you check if #misc.timestamp looks sane to you?
 
-Can we at least push this patch?  All the other users have been converted t=
-o
-use the wrappers upstream, just not these because the patch adding them
-crossed with the wrapper patch.  Then everything is consistent (unless more
-unwrapped users got added in the merge window).
-
-David
-
+One thing that leaves me scratching head is kernfs - surely we
+are _not_ limited by any external layouts there, so why do we
+need to bother with truncation?
