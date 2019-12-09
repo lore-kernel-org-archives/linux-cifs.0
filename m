@@ -6,92 +6,59 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D886AC43603
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Dec 2019 00:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE75C2D0BF
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Dec 2019 00:48:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B147B20637
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Dec 2019 00:34:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09330206D5
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Dec 2019 00:48:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726596AbfLIAeX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 8 Dec 2019 19:34:23 -0500
-Received: from zeniv.linux.org.uk ([195.92.253.2]:41962 "EHLO
+        id S1726653AbfLIAs2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 8 Dec 2019 19:48:28 -0500
+Received: from zeniv.linux.org.uk ([195.92.253.2]:42096 "EHLO
         ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726534AbfLIAeX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 8 Dec 2019 19:34:23 -0500
+        with ESMTP id S1726422AbfLIAs2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 8 Dec 2019 19:48:28 -0500
 Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1ie709-0006VC-GC; Mon, 09 Dec 2019 00:34:13 +0000
-Date:   Mon, 9 Dec 2019 00:34:13 +0000
+        id 1ie7Do-0006tf-V9; Mon, 09 Dec 2019 00:48:21 +0000
+Date:   Mon, 9 Dec 2019 00:48:20 +0000
 From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>,
-        Steve French <stfrench@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: build_path_from_dentry_optional_prefix() may schedule from
- invalid context
-Message-ID: <20191209003413.GY4203@ZenIV.linux.org.uk>
-References: <20190829050237.GA5161@jagdpanzerIV>
- <CAKywueRd4d_fojGL+n4BisoibhgkYfN9Wyc_+0=-1sarz4-HZw@mail.gmail.com>
- <20190921223847.GB29065@ZenIV.linux.org.uk>
- <CAKywueSC=MoBB6t2OeUiyc6+GST2Jgg8FTO-kkXif-pn+1k-cw@mail.gmail.com>
+To:     Deepa Dinamani <deepa.kernel@gmail.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        Jeff Layton <jlayton@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        linux-mtd <linux-mtd@lists.infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Steve French <stfrench@microsoft.com>
+Subject: Re: [PATCH v2 0/6] Delete timespec64_trunc()
+Message-ID: <20191209004820.GZ4203@ZenIV.linux.org.uk>
+References: <20191203051945.9440-1-deepa.kernel@gmail.com>
+ <CABeXuvpkYQbsvGTuktEAR8ptr478peet3EH=RD0v+nK5o2Wmjg@mail.gmail.com>
+ <20191207060201.GN4203@ZenIV.linux.org.uk>
+ <CABeXuvrvATrw9QfVpi1s80Duen6jf5sw+pU91yN_0f3N1xWJQQ@mail.gmail.com>
+ <20191208030407.GO4203@ZenIV.linux.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKywueSC=MoBB6t2OeUiyc6+GST2Jgg8FTO-kkXif-pn+1k-cw@mail.gmail.com>
+In-Reply-To: <20191208030407.GO4203@ZenIV.linux.org.uk>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Sep 30, 2019 at 10:32:16AM -0700, Pavel Shilovsky wrote:
-> сб, 21 сент. 2019 г. в 15:38, Al Viro <viro@zeniv.linux.org.uk>:
+On Sun, Dec 08, 2019 at 03:04:07AM +0000, Al Viro wrote:
 
-> > IOW, kindly lose that nonsense.  More importantly, why bother
-> > with that kmalloc()?  Just __getname() in the very beginning
-> > and __putname() on failure (and for freeing the result afterwards).
-> >
-> > What's more, you are open-coding dentry_path_raw(), badly.
-> > The only differences are
-> >         * use of dirsep instead of '/' and
-> >         * a prefix slapped in the beginning.
-> >
-> > I'm fairly sure that
-> >         char *buf = __getname();
-> >         char *s;
-> >
-> >         *to_free = NULL;
-> >         if (unlikely(!buf))
-> >                 return NULL;
-> >
-> >         s = dentry_path_raw(dentry, buf, PATH_MAX);
-> >         if (IS_ERR(s) || s < buf + prefix_len)
-> >                 __putname(buf);
-> >                 return NULL; // assuming that you don't care about details
-> >         }
-> >
-> >         if (dirsep != '/') {
-> >                 char *p = s;
-> >                 while ((p = strchr(p, '/')) != NULL)
-> >                         *p++ = dirsep;
-> >         }
-> >
-> >         s -= prefix_len;
-> >         memcpy(s, prefix, prefix_len);
-> >
-> >         *to_free = buf;
-> >         return s;
-> >
-> > would end up being faster, not to mention much easier to understand.
-> > With the caller expected to pass &to_free among the arguments and
-> > __putname() it once it's done.
-> >
-> > Or just do __getname() in the caller and pass it to the function -
-> > in that case freeing (in all cases) would be up to the caller.
-> 
-> Thanks for pointing this out. Someone should look at this closely and
-> clean it up.
+> OK...  I've tossed a followup removing the truncation from kernfs;
+> the whole series looks reasonably safe, but I don't think it's urgent
+> enough to even try getting it merged before -rc1.  So here's what
+> I'm going to do: immediately after -rc1 it gets renamed[*] to #imm.timestamp,
+> which will be in the never-modified mode, in #for-next from the very
+> begining and safe for other trees to pull.
 
-Could you take a look through vfs.git#misc.cifs?
+Rebased to -rc1, pushed out as #imm.timestamp, included into #for-next.
+Never-modified mode...
