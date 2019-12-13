@@ -2,65 +2,64 @@ Return-Path: <SRS0=IAhR=2D=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB8EC3F68F
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Dec 2019 00:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D1DC43603
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Dec 2019 00:25:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D984D2073B
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Dec 2019 00:25:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 187462073B
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Dec 2019 00:25:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j6mBTlNV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hatYQCcb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730883AbfLMAZK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 12 Dec 2019 19:25:10 -0500
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:41236 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731313AbfLMAZK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Dec 2019 19:25:10 -0500
-Received: by mail-lf1-f67.google.com with SMTP id m30so621512lfp.8
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Dec 2019 16:25:09 -0800 (PST)
+        id S1731313AbfLMAZg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 12 Dec 2019 19:25:36 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:33339 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731326AbfLMAZg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Dec 2019 19:25:36 -0500
+Received: by mail-lf1-f65.google.com with SMTP id n25so655550lfl.0
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Dec 2019 16:25:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=PrZTh2RUXWweRegz/rs4F6o/Fpos7TnzFefrYo+y2a0=;
-        b=j6mBTlNVh+ke6S+mK9By8YZfwCEar3jEYJNUcVl63B533MGBL8xx2OUBoDAolcISW8
-         EDhwzQp//JZXwNR6IciDbSI76cwquUUjXN5qP44QimRyTOP1mchJZGTixfXXDCh9uSLu
-         VG1ZZHHeJDaMD1OwkhblvD/CSIytJcexIcV8KgJHe0ONmO/NNdVi4MnkDDInFktb5HRj
-         4Q3E/odVp31tgkBolNaaksJGdoi/kC4C/+wtNE1hbhESQShJsEltM9mh86f4XHArDbFl
-         3kno4a3AGqq3Z6ATijokKSG1zX5hLvHcCIQt+e86KlYcnfoCPlMYqoGSrg5720DgFHvH
-         V/Pw==
+        bh=NK7K/MtOkBr8pC/9zl/kfIGDuDFh4Hl1P4xL5LLt4Bo=;
+        b=hatYQCcbUIbdmfin7bcKpEVNGo/Qk9qsXlo3kg5GnOzWwhEjJlmekeL7O4Zs28uO7g
+         u1z/Ho+EQZCgcTMUNnWiNmg2L3nIqx6f2jMA1LAo/+oK2zAn2AqolRaMLsZAgsV421S1
+         Rp3MomVto4zc8SgbrXHi6+3Mna8/HokNVtwS176kfVxrcMLE90EXlX07dp+vlSOgvwpa
+         nTJ4bqZCgLqG12nEGISErChJG44htlS8sE704LuQPqm9zeFLQPPF7ZxWMA2UGBYYyYU3
+         S5I2+x0YFcEVBUkSqXQrohUjUAXP/g2LxwABmj6N1ai38zBhYnGH7W5EzUTjFczFHiZR
+         /HVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=PrZTh2RUXWweRegz/rs4F6o/Fpos7TnzFefrYo+y2a0=;
-        b=gHkStq7+XFrsShSOtlpY+LS+LIYoBkhXdQ7vUxOIl2YsSy+69w8IumxgnaNapO4CCd
-         rkj5mL3l4t9F/uMtEGFkmJ7pe8CrXpUsvX028Mg/i2NScvmReROfz/W3bh60+rmGV3dN
-         vaUBkoYfsnxtU+Cnbocm8iby8F0DGC31VHAhbkM6QKxZe8+hFj60wWg6wHap61pBCrwx
-         gPrdG4NYnJIRFw63JJ9UEfT8JRrqwHv4583KrgnYVpAN/Mewf+wWn1VktvfBi/g5XVtm
-         aHbfOy2wuKYiRmTK25OMS6Y1c/c1CmH6G+TJ1sU6yzurjO5Db8hobZYS2vN4KaU3XzIQ
-         AMfA==
-X-Gm-Message-State: APjAAAWKdygkfkJOjzNXPTVYToT/S5WaHZY/EJzPZiHUK5JlsvtM6H1d
-        oGUV+urRbPACnsaPkH4xZYEU/KmPxgIRd/maDA==
-X-Google-Smtp-Source: APXvYqzGOZvT91jE23mGpIa8JpE/0Vn4Nm5Cjh8eLuZCOtP462pd5KYbZsJTnB1tRWZ+bIyQYT9DADJbD6/hwESkZ4U=
-X-Received: by 2002:ac2:57cc:: with SMTP id k12mr7585722lfo.36.1576196708362;
- Thu, 12 Dec 2019 16:25:08 -0800 (PST)
+        bh=NK7K/MtOkBr8pC/9zl/kfIGDuDFh4Hl1P4xL5LLt4Bo=;
+        b=HOl6LaJGfjiLIsMIafDZtkE9UQufOcplTccvAM7dACwxxa/FCeQvCO2Ljp8kpGsDny
+         lc5uEgsOaSe7NZpVwbNEsNY5woxAIxy/xWx69lvNSb1TvVdd/TeAlcRMRXn+0uHtBF26
+         cbmapbQgr2rkS4mCfCsDdp3Dz/ofj0NDyoLx2q9SS5znzl8uMTW8Kbr3rwzyCrTe6m7G
+         DQLuhjMgw9QIdOMy4C06hwt26YlcmDxzSQ71y9VBO0AlGq8jf/tgVdk9HWQQ/FG6D3/d
+         3H80suwrWn4UPxBVkM7FNipJMbzIdsUB9DbcNQRPr/JJr7omuEbhJcITsDR1Tqy53iuf
+         ho5w==
+X-Gm-Message-State: APjAAAVJHaBpUMhb5esIfydjEIV/VfywzajdIFeQD2NwGLEHyWWeWu9T
+        YMe0lmGHtIM/2eZQsDWTjOKxrtAQdj619gdp8Q==
+X-Google-Smtp-Source: APXvYqzD+gm7UhelJNFMh8nGN5Pdg3As6yB/tFHyxGL8gRWREBi08Ul8HpQxPfwyZtYGp98MdWFF8fw43X8kljj6NZg=
+X-Received: by 2002:a19:c697:: with SMTP id w145mr7111959lff.54.1576196734632;
+ Thu, 12 Dec 2019 16:25:34 -0800 (PST)
 MIME-Version: 1.0
-References: <20191009060151.7913-1-kdsouza@redhat.com> <87r23mf5ji.fsf@suse.com>
-In-Reply-To: <87r23mf5ji.fsf@suse.com>
+References: <20191014170625.21643-1-aaptel@suse.com>
+In-Reply-To: <20191014170625.21643-1-aaptel@suse.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 12 Dec 2019 16:24:57 -0800
-Message-ID: <CAKywueTyRz=+UbrAE4YTarTqPFFD8RS9kcndfxCc+ThJZJ+bkw@mail.gmail.com>
-Subject: Re: [PATCH v3] mount.cifs.rst: remove prefixpath mount option.
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     "Kenneth D'souza" <kdsouza@redhat.com>,
-        Steve French <smfrench@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+Date:   Thu, 12 Dec 2019 16:25:23 -0800
+Message-ID: <CAKywueRyhs86UfqaXf5ByYLYAB6RxWM5GZSidkgC-2cXhKenOw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] smbinfo.rst: document new `keys` command
+To:     Aurelien Aptel <aaptel@suse.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -68,19 +67,34 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fixed 3.1 -> 3.10 in the description and merged.
+=D0=BF=D0=BD, 14 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 10:06, Aurelien Ap=
+tel <aaptel@suse.com>:
+>
+> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+> ---
+>  smbinfo.rst | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/smbinfo.rst b/smbinfo.rst
+> index c8f76e6..7413849 100644
+> --- a/smbinfo.rst
+> +++ b/smbinfo.rst
+> @@ -90,6 +90,10 @@ COMMAND
+>  - File types
+>  - File flags
+>
+> +`keys`: Dump session id, encryption keys and decryption keys so that
+> +the SMB3 traffic of this mount can be decryped e.g. via wireshark
+> +(requires root).
+> +
+>  *****
+>  NOTES
+>  *****
+> --
+> 2.16.4
+>
+
+Merged, thanks.
 --
 Best regards,
 Pavel Shilovsky
-
-=D1=81=D1=80, 9 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 05:48, Aur=C3=A9lie=
-n Aptel <aaptel@suse.com>:
->
-> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
