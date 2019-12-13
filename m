@@ -1,67 +1,73 @@
-Return-Path: <SRS0=7r19=2C=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=IAhR=2D=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EB51C43603
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Dec 2019 23:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E8AC43603
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Dec 2019 00:23:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D8DE21556
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Dec 2019 23:08:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 928AA21655
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Dec 2019 00:23:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C9pvPtHe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8x0Ip9y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730883AbfLLXIu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 12 Dec 2019 18:08:50 -0500
-Received: from mail-il1-f196.google.com ([209.85.166.196]:42322 "EHLO
-        mail-il1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730859AbfLLXIu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Dec 2019 18:08:50 -0500
-Received: by mail-il1-f196.google.com with SMTP id a6so441305ili.9
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Dec 2019 15:08:50 -0800 (PST)
+        id S1731128AbfLMAX5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 12 Dec 2019 19:23:57 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:33463 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730883AbfLMAX5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Dec 2019 19:23:57 -0500
+Received: by mail-lj1-f196.google.com with SMTP id 21so699475ljr.0
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Dec 2019 16:23:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=VdUK52azywFqIMxPcGV5h2RwARC+4tQqSy1B37keJLQ=;
-        b=C9pvPtHeiAh3bW7S5aha4XEx5JMIxvqNYyYx35ZAYhN7LbB9J3C7fvDOBC9BF0oh5p
-         XFYDqc5ieBtrfFdk4LZGvC020lov2Ie21BQpOxBiHpfzG71hGzV9SiHkfyscZenEaPbk
-         8pJ9oo0RAJWvXnP/r4AyQiS4ALcB5PO9UkPVI1cT+v4pm7nVaq9w22LgVFHIffcRRQqN
-         KjHwS3bR9JOhPnt7SJgHLcD+RF8qJYIBL+yTGivemKFq2akLl+cRMaLTiq6qT0t2PJhA
-         ZPE+jhaopRnunBPOmb+f2jeg1mIuCTb1uREbrKDaw4YqR9tOxQdsv/5WHivHdeAY+8nk
-         MgOw==
+        bh=HJ2coV9kgtRyh7n/88Fu97n26kXWABPP9CnRUglgklA=;
+        b=f8x0Ip9y9zxy/ppagano6w/wS4F+2acx3f7KAaDvs1zuMyCXdEifO5fGLWja8PRaAB
+         vFK+R1fuipbWIVaFBO9tBqzPXxp8/zASo1MUoaAqf40XF4M0bWbWRzq1mx0d965QawwC
+         YUrRHj2qkiW3PdoVWjHH9+ya8aCURykFYN0RVV6cWYfy1dUJwKjoljCMBfSdBMHQpTpc
+         v9Au+g27wMooNOk2BEz9JxugyKSHA3jYSC0UOevBYqrLuHK6i0us5ZOFkMLPstwPbcDm
+         UNOiRDu7/t2AuoaTmwGTwzsoaKnWhAilyqydNwQJVa3w2E9TkfKFLvTXgEtzwZm3zF8c
+         Qpbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=VdUK52azywFqIMxPcGV5h2RwARC+4tQqSy1B37keJLQ=;
-        b=ViUnuYMXPopBPrh3dxBg6RzNKzzj0YK4W2Fp8vDt107YP8IfyzLLQPlm1EtmzdlhBQ
-         7rXcgS/CHKv5LqHplOM9cL+5nIrULAatcGLj5+u/ESXNGDBFfvqEjwMO8eSouLhy1XbH
-         No7tfGaMoHNudl/1+MHZ9VHZrYrswKlzqHxm1JfPRRmGT++A2f9TdgMhi7SIMQt16JXj
-         +Ep5hAeS/PzVf32iXFJy9PMFObzOY+JeU+tDutc77ybcSx5EtFI9wLRrhbKAtHbgVF7b
-         k6XMI7lbVGZWVtgHC2CsBo8m4k9YiM+PDXOuKWkArJ+4HTRaEvg0M4EdMhL0HDywWiva
-         10/A==
-X-Gm-Message-State: APjAAAUuugJ1A9gOKd3lo/ABYNT5KN1YPtk+BmjzXG3B+wZZkaGbzTQ1
-        qkokamRL8keL6Q9N/swjbgLV/W94ODdWn2QHUoCGWw==
-X-Google-Smtp-Source: APXvYqx8RYTU9D8jCNqDrbtKWVTbgsSLDiN3BE+oLMUQT1lk9C5nQXDdq99AJmLuUH2OtH7uLVFPUpsZ2MBhLJxmw34=
-X-Received: by 2002:a92:d2cd:: with SMTP id w13mr10768427ilg.173.1576192129856;
- Thu, 12 Dec 2019 15:08:49 -0800 (PST)
+        bh=HJ2coV9kgtRyh7n/88Fu97n26kXWABPP9CnRUglgklA=;
+        b=NLG/4W7CpD8HKQuX0+fJglYGi1F/RJuk+NXKGGL3PJpBrs43mFES5Ip8V5AckSjNpX
+         o7PePIf7Uz67H6M0QMv10dUnNLvmuzHd4GX3A+sDO9T+aVixuUenoxgHbntXC+LkOz9h
+         2llAHAmeeZ47TR/weugiok9Wbi00V2hBgGMYvacDIo3/MRGUGMypDnXbSB9FBBtfCUAC
+         kpNCiKWT1+BcAz4K8pnerMjedMGqux8Oj/EoSTfQfTfc2thndkTo4DAivj89EzU8WcaO
+         DHFv6B6l75H8QAxThZQAuLeKD9f01EjhEk0LZjXCFQVrFVyUQQKLojGroIGFup68+61N
+         1RWQ==
+X-Gm-Message-State: APjAAAW2D/pJbTgJM5y/Zr5iqgLD2thwFPoYcCHzsuwD9XwCszhzAjt4
+        oLcxkD6hemZTK02PPBHSFD4GyFhqfWdTKUADBg==
+X-Google-Smtp-Source: APXvYqy05To8zT0ZyF+uA0RcV/bjVY3D1Uvv6CFBS2+WUYBlM3G9lzm1ENGZugu+hNSUc1w4AUJCQF1cnPzIqK27ka8=
+X-Received: by 2002:a2e:81c3:: with SMTP id s3mr7961714ljg.168.1576196635036;
+ Thu, 12 Dec 2019 16:23:55 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5muJSARbGJ4cOZoGy32mCtUTG9wyEyw8aF06zexshAmqfQ@mail.gmail.com>
- <CAKywueQSgGgPB+tQz28_VCe1LiyxpY7tU9tByypkTJALdHOOWg@mail.gmail.com> <CAN05THSZXrOvZtwYWgejMGKbxrGePNdFSPV5+hUkX8yHySee8Q@mail.gmail.com>
-In-Reply-To: <CAN05THSZXrOvZtwYWgejMGKbxrGePNdFSPV5+hUkX8yHySee8Q@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 12 Dec 2019 17:08:39 -0600
-Message-ID: <CAH2r5mvquYCfY0X5j9jxHxEv98RBAQsr3Cz828yQKcKDs2CKWg@mail.gmail.com>
-Subject: Re: [PATCH] smb3: fix refcount underflow warning on unmount when no
- directory leases
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
+References: <20190924045611.21689-1-kdsouza@redhat.com> <87o8yqf4f6.fsf@suse.com>
+ <CAA_-hQL8MpS9YEcaQpuiQnbsuJwerutnbxWhE-Fyk1X4jpvwcw@mail.gmail.com>
+ <87k19ef0si.fsf@suse.com> <CAN05THSfA9e1DP9+nM=CkgU-mKRnUeJp2p96umrOA3aBiWe9Gg@mail.gmail.com>
+ <87h84hf4k6.fsf@suse.com>
+In-Reply-To: <87h84hf4k6.fsf@suse.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Thu, 12 Dec 2019 16:23:43 -0800
+Message-ID: <CAKywueRD76842q22OpZePdhO9+febBv-CxdhZZiCjCrCjrpAGQ@mail.gmail.com>
+Subject: Re: [PATCH] smb2quota.py: Userspace helper to display quota
+ information for the Linux SMB client file system (CIFS)
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        Kenneth Dsouza <kdsouza@redhat.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -69,67 +75,57 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending more testing
+Hi everyone,
 
-On Thu, Dec 12, 2019 at 1:36 PM ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
+Sorry for the delay in responses. I agree with the idea to re-write
+smbinfo in python since it gives more flexibility. And yes, we will
+need installers for python utilities in order to properly ship those.
+
+I am going to cut off the next release at the beginning of next week.
+The "next" branch is updated to have everything that I have got for
+now, except smbinfo re-write in python that I would like to postpone
+for the next release.
+
+https://github.com/piastry/cifs-utils/commits/next
+
+If any patch is missed or If someone has any WIP patches that need to
+be in the next release, please let me know.
+
+--
+Best regards,
+Pavel Shilovsky
+
+=D1=87=D1=82, 10 =D0=BE=D0=BA=D1=82. 2019 =D0=B3. =D0=B2 00:22, Aur=C3=A9li=
+en Aptel <aaptel@suse.com>:
 >
-> This makes sense. Thanks for this patch.
+> "ronnie sahlberg" <ronniesahlberg@gmail.com> writes:
+> > I think it would be good to have these tools as part of the actual inst=
+all.
+> > They are in python so they are imho much more useful to the target user=
+s
+> > (sysadmins) than a utility written in C.
+> > (I kind of regret that smbinfo is in C, it should have been python
+> > too:-( )
 >
-> Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> I completely agree, we could rewrite smbinfo in python.
 >
-> On Wed, Dec 11, 2019 at 5:53 AM Pavel Shilovsky <piastryyy@gmail.com> wro=
-te:
-> >
-> > =D0=BF=D0=BD, 9 =D0=B4=D0=B5=D0=BA. 2019 =D0=B3. =D0=B2 20:48, Steve Fr=
-ench <smfrench@gmail.com>:
-> > >
-> > > Fix refcount underflow warning when unmounting to servers which didn'=
-t grant
-> > > directory leases.
-> > >
-> > > [  301.680095] refcount_t: underflow; use-after-free.
-> > > [  301.680192] WARNING: CPU: 1 PID: 3569 at lib/refcount.c:28
-> > > refcount_warn_saturate+0xb4/0xf3
-> > > ...
-> > > [  301.682139] Call Trace:
-> > > [  301.682240]  close_shroot+0x97/0xda [cifs]
-> > > [  301.682351]  SMB2_tdis+0x7c/0x176 [cifs]
-> > > [  301.682456]  ? _get_xid+0x58/0x91 [cifs]
-> > > [  301.682563]  cifs_put_tcon.part.0+0x99/0x202 [cifs]
-> > > [  301.682637]  ? ida_free+0x99/0x10a
-> > > [  301.682727]  ? cifs_umount+0x3d/0x9d [cifs]
-> > > [  301.682829]  cifs_put_tlink+0x3a/0x50 [cifs]
-> > > [  301.682929]  cifs_umount+0x44/0x9d [cifs]
-> > >
-> > > Fixes: 72e73c78c446 ("cifs: close the shared root handle on tree disc=
-onnect")
-> > >
-> > > Signed-off-by: Steve French <stfrench@microsoft.com>
-> > > Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > > Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-> > > Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
-> > > Reported-and-tested-by: Arthur Marsh <arthur.marsh@internode.on.net>
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> >
-> > Looking at this more, I think that the fact that the handle is valid
-> > doesn't mean that it has a directory lease. So, I think we need to
-> > track that fact separately. I coded a quick follow-on fix (untested)
-> > to describe my idea - see the attached patch.
-> >
-> > Thoughts?
-> >
-> > --
-> > Best regards,
-> > Pavel Shilovsky
-
-
-
---=20
-Thanks,
-
-Steve
+> > Maybe we just need to decide on a naming prefix for these utilities
+> > and then there shouldn't be
+> > a problem to add many small useful tools.
+>
+> We can also make the C code call the python script for now (or vice
+> versa, while smbinfo gets rewritten).
+>
+> > The nice thing with small python tools is that it is so easy to tweak
+> > them to specific usecases.
+>
+> +100
+>
+> Cheers,
+> --
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
+ DE
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
+=BCnchen)
