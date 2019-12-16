@@ -2,82 +2,126 @@ Return-Path: <SRS0=ZQfQ=2G=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE103C43603
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Dec 2019 11:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43506C43603
+	for <linux-cifs@archiver.kernel.org>; Mon, 16 Dec 2019 15:30:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0236206EC
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Dec 2019 11:38:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14FA6205C9
+	for <linux-cifs@archiver.kernel.org>; Mon, 16 Dec 2019 15:30:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="adnfKTti"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727230AbfLPLiI convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 16 Dec 2019 06:38:08 -0500
-Received: from mx2.suse.de ([195.135.220.15]:55652 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727199AbfLPLiI (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 16 Dec 2019 06:38:08 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id B7CF8AB89;
-        Mon, 16 Dec 2019 11:38:06 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     =?utf-8?Q?Bj=C3=B6rn?= JACKE <bj@SerNet.DE>,
-        linux-cifs@vger.kernel.org
-Subject: Re: cifs multiuser mode and per session treatment
-In-Reply-To: <20191213121452.GA12253@sernet.de>
-References: <20191213121452.GA12253@sernet.de>
-Date:   Mon, 16 Dec 2019 12:38:04 +0100
-Message-ID: <8736dkv6ub.fsf@suse.com>
+        id S1728259AbfLPPaN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 16 Dec 2019 10:30:13 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38927 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728225AbfLPPaN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 16 Dec 2019 10:30:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1576510212;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:  in-reply-to:in-reply-to;
+        bh=aEp+MJBOuE8pF/cjQ/nNYtbTCoMdScKTwrbxZ3Nqll4=;
+        b=adnfKTtiJoDO5bBJ/J0rPVEIkxHAsGg6TzTcBOk6uAtfNEml6P655WnF0PhTImsVMLwztn
+        ldFzayR2zVzX/uIj/Z25b+Oy53FlNkLarJFGmHphzmHM5uuiRkN8ER8IPO7mweE01ft4DJ
+        cWakemWIbSSrzTR5oa9wfwhoHRE9FuU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-429-aZghXvlPNgSZQE6qPKmqTQ-1; Mon, 16 Dec 2019 10:30:11 -0500
+X-MC-Unique: aZghXvlPNgSZQE6qPKmqTQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 467B218B9FC1
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2019 15:30:10 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 394D66886E
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2019 15:30:10 +0000 (UTC)
+Received: from zmail23.collab.prod.int.phx2.redhat.com (zmail23.collab.prod.int.phx2.redhat.com [10.5.83.28])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id 30A63ADAAD
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Dec 2019 15:30:10 +0000 (UTC)
+Date:   Mon, 16 Dec 2019 10:30:09 -0500 (EST)
+From:   Xiaoli Feng <xifeng@redhat.com>
+To:     linux-cifs@vger.kernel.org
+Message-ID: <180194560.1531945.1576510209913.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1327532317.1529923.1576509501382.JavaMail.zimbra@redhat.com>
+Subject: How to use SMB Direct
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [10.72.12.30, 10.4.195.3]
+Thread-Topic: How to use SMB Direct
+Thread-Index: UIMmQ9EQHszzT+199YRg7frRdlFZzQ==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Björn,
+Hello guys,
 
-Björn JACKE <bj@SerNet.DE> writes:
-> cifs.upcall might need some tuning to make use of a session keyring but even if
-> that would be done, there is still one important limitation left to solve: cifs
+I'd like to test SMB Direct. But it's failed. I'm not sure if it works in u=
+pstream.
+I setup samba server on one rdma machine with 5.5.0-rc1+ kernel. The smb.co=
+nf is:
+[cifs]
+path=3D/mnt/cifs
+writeable=3Dyes
 
-IIRC cifs.upcall uses the session keyring already. 
+Then I try to mount the share on another rdma machine with 5.5.0-rc1+ kerne=
+l.
+   mount //$RDMA/cifs cifs -o user=3Droot,password=3D$password,rdma
 
-> multiuser SMB connections should also be initiated per session, same like the
-> keyring. Currently the cifs SMB connections are accessible also from other all
-> sessions.
+It's failed because of "CIFS VFS: smbd_create_id:614 rdma_resolve_addr() co=
+mpleted -113"
+Does SMB Direct work fine in upstream?
 
-That needs to be implemented indeed.
+Thanks.
 
-> For example if I kinit a ticket, access a multiuser cifs mount successfully (so
-> that the smb session is initiated), then kdestroy my ticket, log in to the
-> machine again to open a new session, and then access the multiuser cifs mount
-> from there, this is currently successful. For a cifs multiuser mount with per
-> session limitation, this access should be denied accordingly.
+$ cat /boot/config-5.5.0-rc1+ |grep SMB_DIRECT
+CONFIG_CIFS_SMB_DIRECT=3Dy
+$ ibstat
+CA 'mlx4_0'
+=09CA type: MT4099
+=09Number of ports: 2
+=09Firmware version: 2.42.5000
+=09Hardware version: 1
+=09Node GUID: 0xf4521403007be0e0
+=09System image GUID: 0xf4521403007be0e3
+=09Port 1:
+=09=09State: Active
+=09=09Physical state: LinkUp
+=09=09Rate: 56
+=09=09Base lid: 29
+=09=09LMC: 0
+=09=09SM lid: 1
+=09=09Capability mask: 0x0259486a
+=09=09Port GUID: 0xf4521403007be0e1
+=09=09Link layer: InfiniBand
+=09Port 2:
+=09=09State: Active
+=09=09Physical state: LinkUp
+=09=09Rate: 40
+=09=09Base lid: 44
+=09=09LMC: 1
+=09=09SM lid: 36
+=09=09Capability mask: 0x02594868
+=09=09Port GUID: 0xf4521403007be0e2
+=09=09Link layer: InfiniBand
 
-I think I understood.
 
-In terms of implementation each cifs mount stores a dictionnary mapping
-uid to TreeCon (it's the tlink rb-tree, see cifs_sb_tlink(),
-tlink_rb_search(), etc).
+--=20
+Best regards!
+XiaoLi Feng =E5=86=AF=E5=B0=8F=E4=B8=BD
 
-I think it should just be a matter of storing the session id as the key
-in the tlink rb-tree instead of uid (we use fsuid actually). This way
-when a new session does a syscall on the mount, the lookup will fail, it
-will try to create a new tlink, and fail unless there is the krb stuff
-in the keyring.
+Red Hat Software (Beijing) Co.,Ltd
+filesystem-qe Team
+IRC:xifeng=EF=BC=8C#channel: fs-qe
+Tel:+86-10-8388112
+9/F, Raycom
 
-But are you sure root cannot "enter" an existing user session? I think
-I've done it for screen sessions in the past... If yes, would this make
-this per-session smb session pointless or is there still some value? 
-
-Cheers,
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
