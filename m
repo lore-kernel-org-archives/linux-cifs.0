@@ -2,47 +2,70 @@ Return-Path: <SRS0=Aa8Y=2J=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 070C7C2D0C1
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Dec 2019 13:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD512C43603
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Dec 2019 16:53:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8DC7521D7D
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Dec 2019 13:56:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A611E2146E
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Dec 2019 16:53:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="Qy6eG5S9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VSopvtiC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726759AbfLSN4r (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 Dec 2019 08:56:47 -0500
-Received: from mx.cjr.nz ([51.158.111.142]:6626 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726712AbfLSN4q (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 19 Dec 2019 08:56:46 -0500
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 624DB808AB;
-        Thu, 19 Dec 2019 13:56:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1576763803;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=pe6rll17PT5KE+t/kX2qmf1yPndwnisYjuvru0kC0qM=;
-        b=Qy6eG5S9MjnvacvU1ePBlt8eXdggB9DaByhWdPGFBfA910EC57BYmdpDYun1isOERCHpkA
-        lmaY2p254e0ueoWPM3cs5llkngpGsyUiPOQquqpFC6pM02z4DZ70F7ssZ5A0Hg1mzK+pnr
-        MeVX4YvWe7QvpVY5Ij9OESgLSzhHWabTZd/zt8ZuTSUiZjCNTyYm8Vrfk+wSLe/aH+DpIV
-        y0Qk5jfQRRiZanoWUq3FPmtPVbtJ1uG377YKNKbu002RJg+jB+Byjhx4zI1orT0YO9I3aO
-        sEl6DpQ/d92Ffsf65zuoHrq6ESJuQupdqNSO9ADZi0tn0XZgb/WFteXnvbI8pQ==
-From:   "Paulo Alcantara (SUSE)" <pc@cjr.nz>
-To:     smfrench@gmail.com
-Cc:     linux-cifs@vger.kernel.org, "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
-        Pavel Shilovsky <pshilov@microsoft.com>
-Subject: [PATCH] cifs: Optimize readdir on reparse points
-Date:   Thu, 19 Dec 2019 10:56:30 -0300
-Message-Id: <20191219135630.10803-1-pc@cjr.nz>
+        id S1726895AbfLSQxB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 19 Dec 2019 11:53:01 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:36289 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726840AbfLSQxB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Dec 2019 11:53:01 -0500
+Received: by mail-qk1-f196.google.com with SMTP id a203so5549275qkc.3;
+        Thu, 19 Dec 2019 08:53:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ASbUfDCYHbt3Y67CGPVPZ89yMthCCT2FPfcqAT4MypI=;
+        b=VSopvtiCElW5kTzSFVCRvQ1lxh5EIzdbMQiZ1M/U7j36ZN5PVjv4TbzMs5Z++mMuCX
+         81De++WFPEfA61I0s6s4Nz5TEINn2DiHDXMft14fE3eX71i1SJDvB/PITiQsi+QYxIZv
+         hndjmTu+JpwU6GrDD95iHqg6imKvPuaxR2q3yQswCzt9K6cmdb1AAMEV/kxg5OqQFJav
+         eyxQlCCTYFo+5L+BCETNWR/tBqakjaD0YxFn5YHi9lK7w9q3CMt1YteOUaMbz+BVQkLd
+         W4aI7HhqqGooTe1Yabx58Dt0cscim7AiRmV7y4K2n+dz8F6wskeFYUinspqQvfSIPAU6
+         ksLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ASbUfDCYHbt3Y67CGPVPZ89yMthCCT2FPfcqAT4MypI=;
+        b=TIOiMBjKp7BIiUGWrhwAg4+gSDzFN9Aldu91fIkOiwfuzO0LiTXWIkLnLaXK3q0Drq
+         pqD+4N2o5DVytKP+jelcVPrhYuOYYf3lFYCXp2TXiaZ94TOZ0Cw6ctILw9CyugziT+LV
+         KGK51Txq213fQ8PJanVKGSMV0+dlh/7W3PMUEyAlxsnzB7jKMUOvAuS5ot9G94RswAjT
+         +wvMZGRBVvR9sFgC5htLs3XI2kOg7wc4hh4/31QHdYceBKdgDdEZ6zKWi3CH+BiTWgY+
+         3wt3GVyJumnh8W0sImdJxJ2FNK4zpDLor8Zf0xWjiQSXvGTomDQ8XuB5eLJRZugYnfCC
+         ZAvg==
+X-Gm-Message-State: APjAAAW9W72NfzxHez0uULr4KAFscD0poWw1u987mlZLjlRfizQuW28i
+        Qis47XQMvKqo2WQD3+iUjYM0G3FaeTSGTQ==
+X-Google-Smtp-Source: APXvYqxEpAwD5rlZ5E+ac5zUv/2p3o53HH92IcRAUrbZAH3vGlu+3wpqmMX6Qmd8YbM3H6wwFEWu7g==
+X-Received: by 2002:a37:4f95:: with SMTP id d143mr9535910qkb.161.1576774379187;
+        Thu, 19 Dec 2019 08:52:59 -0800 (PST)
+Received: from ip-172-31-1-121.ec2.internal (ec2-3-231-202-5.compute-1.amazonaws.com. [3.231.202.5])
+        by smtp.gmail.com with ESMTPSA id q34sm2073960qtc.33.2019.12.19.08.52.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 19 Dec 2019 08:52:58 -0800 (PST)
+From:   Boris Protopopov <boris.v.protopopov@gmail.com>
+X-Google-Original-From: Boris Protopopov <bprotopopov@hotmail.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     sblbir@amazon.com, boris.v.protopopov@gmail.com,
+        Boris Protopopov <bprotopopov@hotmail.com>,
+        Steve French <sfrench@samba.org>,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Add support for setting owner info, dos attributes, and create time
+Date:   Thu, 19 Dec 2019 16:52:50 +0000
+Message-Id: <20191219165250.2875-1-bprotopopov@hotmail.com>
+X-Mailer: git-send-email 2.24.1.485.gad05a3d8e5
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
@@ -50,136 +73,218 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When listing a directory with thounsands of files and most of them are
-reparse points, we simply marked all those dentries for revalidation
-and then sending additional (compounded) create/getinfo/close requests
-for each of them.
+Add extended attribute "system.cifs_ntsd" (and alias "system.smb3_ntsd")
+to allow for setting owner and DACL in the security descriptor. This is in
+addition to the existing "system.cifs_acl" and "system.smb3_acl" attributes
+that allow for setting DACL only. Add support for setting creation time and
+dos attributes using set_file_info() calls to complement the existing
+support for getting these attributes via query_path_info() calls. 
 
-Instead, upon receiving a response from an SMB2_QUERY_DIRECTORY
-(FileIdFullDirectoryInformation) command, the directory entries that
-have a file attribute of FILE_ATTRIBUTE_REPARSE_POINT will contain an
-EaSize field with a reparse tag in it, so we parse it and mark the
-dentry for revalidation only if it is a DFS or a symlink.
-
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+Signed-off-by: Boris Protopopov <bprotopopov@hotmail.com>
 ---
- fs/cifs/cifsglob.h |  1 +
- fs/cifs/readdir.c  | 63 +++++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 55 insertions(+), 9 deletions(-)
+ fs/cifs/xattr.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 117 insertions(+), 11 deletions(-)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index ce9bac756c2a..40705e862451 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1693,6 +1693,7 @@ struct cifs_fattr {
- 	struct timespec64 cf_atime;
- 	struct timespec64 cf_mtime;
- 	struct timespec64 cf_ctime;
-+	u32             cf_cifstag;
+diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
+index 9076150758d8..c41856e6fa22 100644
+--- a/fs/cifs/xattr.c
++++ b/fs/cifs/xattr.c
+@@ -32,7 +32,8 @@
+ #include "cifs_unicode.h"
+ 
+ #define MAX_EA_VALUE_SIZE CIFSMaxBufSize
+-#define CIFS_XATTR_CIFS_ACL "system.cifs_acl"
++#define CIFS_XATTR_CIFS_ACL "system.cifs_acl" /* DACL only */
++#define CIFS_XATTR_CIFS_NTSD "system.cifs_ntsd" /* owner plus DACL */
+ #define CIFS_XATTR_ATTRIB "cifs.dosattrib"  /* full name: user.cifs.dosattrib */
+ #define CIFS_XATTR_CREATETIME "cifs.creationtime"  /* user.cifs.creationtime */
+ /*
+@@ -40,12 +41,62 @@
+  * confusing users and using the 20+ year old term 'cifs' when it is no longer
+  * secure, replaced by SMB2 (then even more highly secure SMB3) many years ago
+  */
+-#define SMB3_XATTR_CIFS_ACL "system.smb3_acl"
++#define SMB3_XATTR_CIFS_ACL "system.smb3_acl" /* DACL only */
++#define SMB3_XATTR_CIFS_NTSD "system.smb3_ntsd" /* owner plus DACL */
+ #define SMB3_XATTR_ATTRIB "smb3.dosattrib"  /* full name: user.smb3.dosattrib */
+ #define SMB3_XATTR_CREATETIME "smb3.creationtime"  /* user.smb3.creationtime */
+ /* BB need to add server (Samba e.g) support for security and trusted prefix */
+ 
+-enum { XATTR_USER, XATTR_CIFS_ACL, XATTR_ACL_ACCESS, XATTR_ACL_DEFAULT };
++enum { XATTR_USER, XATTR_CIFS_ACL, XATTR_ACL_ACCESS, XATTR_ACL_DEFAULT,
++	XATTR_CIFS_NTSD };
++
++static int cifs_attrib_set(unsigned int xid, struct cifs_tcon *pTcon,
++			   struct inode *inode, char *full_path,
++			   const void *value, size_t size)
++{
++	ssize_t rc = -EOPNOTSUPP;
++	__u32 *pattrib = (__u32 *)value;
++	__u32 attrib;
++	FILE_BASIC_INFO info_buf;
++
++	if ((value == NULL) || (size != sizeof(__u32)))
++		return -ERANGE;
++
++	memset(&info_buf, 0, sizeof(info_buf));
++	info_buf.Attributes = attrib = cpu_to_le32(*pattrib);
++
++	if (pTcon->ses->server->ops->set_file_info)
++		rc = pTcon->ses->server->ops->set_file_info(inode, full_path,
++				&info_buf, xid);
++	if (rc == 0)
++		CIFS_I(inode)->cifsAttrs = attrib;
++
++	return rc;
++}
++
++static int cifs_creation_time_set(unsigned int xid, struct cifs_tcon *pTcon,
++				  struct inode *inode, char *full_path,
++				  const void *value, size_t size)
++{
++	ssize_t rc = -EOPNOTSUPP;
++	__u64 *pcreation_time = (__u64 *)value;
++	__u64 creation_time;
++	FILE_BASIC_INFO info_buf;
++
++	if ((value == NULL) || (size != sizeof(__u64)))
++		return -ERANGE;
++
++	memset(&info_buf, 0, sizeof(info_buf));
++	info_buf.CreationTime = creation_time = cpu_to_le64(*pcreation_time);
++
++	if (pTcon->ses->server->ops->set_file_info)
++		rc = pTcon->ses->server->ops->set_file_info(inode, full_path,
++				&info_buf, xid);
++	if (rc == 0)
++		CIFS_I(inode)->createtime = creation_time;
++
++	return rc;
++}
+ 
+ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 			  struct dentry *dentry, struct inode *inode,
+@@ -86,6 +137,23 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 
+ 	switch (handler->flags) {
+ 	case XATTR_USER:
++		cifs_dbg(FYI, "%s:setting user xattr %s\n", __func__, name);
++		if ((strcmp(name, CIFS_XATTR_ATTRIB) == 0) ||
++		    (strcmp(name, SMB3_XATTR_ATTRIB) == 0)) {
++			rc = cifs_attrib_set(xid, pTcon, inode, full_path,
++					value, size);
++			if (rc == 0) /* force revalidate of the inode */
++				CIFS_I(inode)->time = 0;
++			break;
++		} else if ((strcmp(name, CIFS_XATTR_CREATETIME) == 0) ||
++			   (strcmp(name, SMB3_XATTR_CREATETIME) == 0)) {
++			rc = cifs_creation_time_set(xid, pTcon, inode,
++					full_path, value, size);
++			if (rc == 0) /* force revalidate of the inode */
++				CIFS_I(inode)->time = 0;
++			break;
++		}
++
+ 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_XATTR)
+ 			goto out;
+ 
+@@ -95,7 +163,8 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 				cifs_sb->local_nls, cifs_sb);
+ 		break;
+ 
+-	case XATTR_CIFS_ACL: {
++	case XATTR_CIFS_ACL:
++	case XATTR_CIFS_NTSD: {
+ 		struct cifs_ntsd *pacl;
+ 
+ 		if (!value)
+@@ -106,12 +175,25 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 		} else {
+ 			memcpy(pacl, value, size);
+ 			if (value &&
+-			    pTcon->ses->server->ops->set_acl)
+-				rc = pTcon->ses->server->ops->set_acl(pacl,
+-						size, inode,
+-						full_path, CIFS_ACL_DACL);
+-			else
++			    pTcon->ses->server->ops->set_acl) {
++				rc = 0;
++				if (handler->flags == XATTR_CIFS_NTSD) {
++					/* set owner and DACL */
++					rc = pTcon->ses->server->ops->set_acl(
++							pacl, size, inode,
++							full_path,
++							CIFS_ACL_OWNER);
++				}
++				if (rc == 0) {
++					/* set DACL */
++					rc = pTcon->ses->server->ops->set_acl(
++							pacl, size, inode,
++							full_path,
++							CIFS_ACL_DACL);
++				}
++			} else {
+ 				rc = -EOPNOTSUPP;
++			}
+ 			if (rc == 0) /* force revalidate of the inode */
+ 				CIFS_I(inode)->time = 0;
+ 			kfree(pacl);
+@@ -179,7 +261,7 @@ static int cifs_creation_time_get(struct dentry *dentry, struct inode *inode,
+ 				  void *value, size_t size)
+ {
+ 	ssize_t rc;
+-	__u64 * pcreatetime;
++	__u64 *pcreatetime;
+ 
+ 	rc = cifs_revalidate_dentry_attr(dentry);
+ 	if (rc)
+@@ -244,7 +326,9 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
+ 				full_path, name, value, size, cifs_sb);
+ 		break;
+ 
+-	case XATTR_CIFS_ACL: {
++	case XATTR_CIFS_ACL:
++	case XATTR_CIFS_NTSD: {
++		/* the whole ntsd is fetched regardless */
+ 		u32 acllen;
+ 		struct cifs_ntsd *pacl;
+ 
+@@ -382,6 +466,26 @@ static const struct xattr_handler smb3_acl_xattr_handler = {
+ 	.set = cifs_xattr_set,
  };
  
- static inline void free_dfs_info_param(struct dfs_info3_param *param)
-diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-index 3925a7bfc74d..d17587c2c4ab 100644
---- a/fs/cifs/readdir.c
-+++ b/fs/cifs/readdir.c
-@@ -139,6 +139,28 @@ cifs_prime_dcache(struct dentry *parent, struct qstr *name,
- 	dput(dentry);
- }
- 
-+static bool reparse_file_needs_reval(const struct cifs_fattr *fattr)
-+{
-+	if (!(fattr->cf_cifsattrs & ATTR_REPARSE))
-+		return false;
-+	/*
-+	 * The DFS tags should be only intepreted by server side as per
-+	 * MS-FSCC 2.1.2.1, but let's include them anyway.
-+	 *
-+	 * Besides, if cf_cifstag is unset (0), then we still need it to be
-+	 * revalidated to know exactly what reparse point it is.
-+	 */
-+	switch (fattr->cf_cifstag) {
-+	case IO_REPARSE_TAG_DFS:
-+	case IO_REPARSE_TAG_DFSR:
-+	case IO_REPARSE_TAG_SYMLINK:
-+	case IO_REPARSE_TAG_NFS:
-+	case 0:
-+		return true;
-+	}
-+	return false;
-+}
++static const struct xattr_handler cifs_cifs_ntsd_xattr_handler = {
++	.name = CIFS_XATTR_CIFS_NTSD,
++	.flags = XATTR_CIFS_NTSD,
++	.get = cifs_xattr_get,
++	.set = cifs_xattr_set,
++};
 +
- static void
- cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
- {
-@@ -158,7 +180,7 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
- 	 * is a symbolic link, DFS referral or a reparse point with a direct
- 	 * access like junctions, deduplicated files, NFS symlinks.
- 	 */
--	if (fattr->cf_cifsattrs & ATTR_REPARSE)
-+	if (reparse_file_needs_reval(fattr))
- 		fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
- 
- 	/* non-unix readdir doesn't provide nlink */
-@@ -194,19 +216,37 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
- 	}
- }
- 
-+static void __dir_info_to_fattr(struct cifs_fattr *fattr, const void *info)
-+{
-+	const FILE_DIRECTORY_INFO *fi = info;
++/*
++ * Although this is just an alias for the above, need to move away from
++ * confusing users and using the 20 year old term 'cifs' when it is no
++ * longer secure and was replaced by SMB2/SMB3 a long time ago, and
++ * SMB3 and later are highly secure.
++ */
++static const struct xattr_handler smb3_ntsd_xattr_handler = {
++	.name = SMB3_XATTR_CIFS_NTSD,
++	.flags = XATTR_CIFS_NTSD,
++	.get = cifs_xattr_get,
++	.set = cifs_xattr_set,
++};
 +
-+	memset(fattr, 0, sizeof(*fattr));
-+	fattr->cf_cifsattrs = le32_to_cpu(fi->ExtFileAttributes);
-+	fattr->cf_eof = le64_to_cpu(fi->EndOfFile);
-+	fattr->cf_bytes = le64_to_cpu(fi->AllocationSize);
-+	fattr->cf_createtime = le64_to_cpu(fi->CreationTime);
-+	fattr->cf_atime = cifs_NTtimeToUnix(fi->LastAccessTime);
-+	fattr->cf_ctime = cifs_NTtimeToUnix(fi->ChangeTime);
-+	fattr->cf_mtime = cifs_NTtimeToUnix(fi->LastWriteTime);
-+}
-+
- void
- cifs_dir_info_to_fattr(struct cifs_fattr *fattr, FILE_DIRECTORY_INFO *info,
- 		       struct cifs_sb_info *cifs_sb)
- {
--	memset(fattr, 0, sizeof(*fattr));
--	fattr->cf_cifsattrs = le32_to_cpu(info->ExtFileAttributes);
--	fattr->cf_eof = le64_to_cpu(info->EndOfFile);
--	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
--	fattr->cf_createtime = le64_to_cpu(info->CreationTime);
--	fattr->cf_atime = cifs_NTtimeToUnix(info->LastAccessTime);
--	fattr->cf_ctime = cifs_NTtimeToUnix(info->ChangeTime);
--	fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
-+	__dir_info_to_fattr(fattr, info);
-+	cifs_fill_common_info(fattr, cifs_sb);
-+}
- 
-+static void cifs_fulldir_info_to_fattr(struct cifs_fattr *fattr,
-+				       SEARCH_ID_FULL_DIR_INFO *info,
-+				       struct cifs_sb_info *cifs_sb)
-+{
-+	__dir_info_to_fattr(fattr, info);
-+
-+	/* See MS-FSCC 2.4.18 FileIdFullDirectoryInformation */
-+	if (fattr->cf_cifsattrs & ATTR_REPARSE)
-+		fattr->cf_cifstag = le32_to_cpu(info->EaSize);
- 	cifs_fill_common_info(fattr, cifs_sb);
- }
- 
-@@ -755,6 +795,11 @@ static int cifs_filldir(char *find_entry, struct file *file,
- 				       (FIND_FILE_STANDARD_INFO *)find_entry,
- 				       cifs_sb);
- 		break;
-+	case SMB_FIND_FILE_ID_FULL_DIR_INFO:
-+		cifs_fulldir_info_to_fattr(&fattr,
-+					   (SEARCH_ID_FULL_DIR_INFO *)find_entry,
-+					   cifs_sb);
-+		break;
- 	default:
- 		cifs_dir_info_to_fattr(&fattr,
- 				       (FILE_DIRECTORY_INFO *)find_entry,
+ static const struct xattr_handler cifs_posix_acl_access_xattr_handler = {
+ 	.name = XATTR_NAME_POSIX_ACL_ACCESS,
+ 	.flags = XATTR_ACL_ACCESS,
+@@ -401,6 +505,8 @@ const struct xattr_handler *cifs_xattr_handlers[] = {
+ 	&cifs_os2_xattr_handler,
+ 	&cifs_cifs_acl_xattr_handler,
+ 	&smb3_acl_xattr_handler, /* alias for above since avoiding "cifs" */
++	&cifs_cifs_ntsd_xattr_handler,
++	&smb3_ntsd_xattr_handler, /* alias for above since avoiding "cifs" */
+ 	&cifs_posix_acl_access_xattr_handler,
+ 	&cifs_posix_acl_default_xattr_handler,
+ 	NULL
 -- 
-2.24.0
+2.14.5
 
