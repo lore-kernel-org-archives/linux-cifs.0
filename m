@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6D8C43603
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Dec 2019 03:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ECC9C2D0C0
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 Dec 2019 04:33:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BAD624680
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Dec 2019 03:26:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 476C424683
+	for <linux-cifs@archiver.kernel.org>; Fri, 20 Dec 2019 04:33:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ncBPFNof"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvlkCr6f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727089AbfLTD0s (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 Dec 2019 22:26:48 -0500
-Received: from mail-il1-f195.google.com ([209.85.166.195]:33808 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727071AbfLTD0s (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Dec 2019 22:26:48 -0500
-Received: by mail-il1-f195.google.com with SMTP id s15so6760622iln.1
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Dec 2019 19:26:48 -0800 (PST)
+        id S1727465AbfLTEdx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 19 Dec 2019 23:33:53 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33378 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727128AbfLTEdx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Dec 2019 23:33:53 -0500
+Received: by mail-wr1-f67.google.com with SMTP id b6so8124950wrq.0
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Dec 2019 20:33:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=uOXFshj1xVChSolQz9pmkip32JivOplrMkun05ZNlN0=;
-        b=ncBPFNofVEDip1v0UJQHzWdSsCDGJImyaK5uBjvJN3qgCvfns0HL67ZsxlOaT651QR
-         DyGHjjtSrSzkfn2vuUPbUhWOUYY2ltEl4LzEpiItQ/fRZAY9tkdodJQ71W0bJE0+67cv
-         YNWsHCi5t3Cj538rO0pRpdf6QwVvcmn/K7w5pH9M6tfeFs1F6Yd5cbvoQMVLo2twbFGh
-         mdppAji8GFFcwCuDyPy4/psZwZ2XU96D88frWWke0ucNGBzWZRp9FfUGkVL2a22GH3Q0
-         JEcbHoRT2QPR8lBAuSi6LtBUMZ/hff5BXc1uLY/OnoRff7oo5DRMrGnUiYcsnWPsOdIC
-         kzFw==
+        bh=QRBukMNDPMMB0lG96kyaqaEalCs3+vNed+Anplmweqw=;
+        b=UvlkCr6fYL20YtGCcQubmrPLj/G4mpGrGQnclfFRfapBtFDEFHRBgoj77j3zw8P7xR
+         z/m0rT0hw6I5vFaIDRuyAGX/vgixm35P/nARztkkTXIyx4pepTvfKT1hV3/qRhZMk5PL
+         4/3ZVYoetJXfMdGv8nW9pekibkewEFbHGFy5cW/3Xlf7divifFfrJImKlTzedAOAkEvI
+         ft7ggx7PyTfW3yzp9lCN0QjIBct1HmtxH4kb8GYVLUplhCMbfqDY/tmpUSM5JhVR8onV
+         S/QnhKw+raCJfQGfJZUTW/9e9SQxprYV71wiluegu06YsQCuq2Afw8O9M1WE3gorKs9Q
+         XRYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=uOXFshj1xVChSolQz9pmkip32JivOplrMkun05ZNlN0=;
-        b=UlYeT0ALV7249MCeIAgk7am9TLpqH2WY+X/S2zxmEMuZhIT18yF2ZYo7jkv6ikkHbJ
-         mjktpc56Wt1ykqeCyoZD0d0EZQHkj6EboJnIbLNxjNlcVGQKZ3HqvHIPhe2I/XgiiyXV
-         eX1sCJCJqbAiOS0hfTg/OszawWwlrsEOgXYSsegZjLx8p+TUyT75um2OUcEjXw07nMlu
-         qfV5rBjBmZBO6Ikxfd/VPHRGcxQGSrIZQdcbTC48/QP5VAnPb9HkjRB2K4u5v8eh6KVq
-         Fb4Hm21TDfb+ccC4nZpLVInUrxYvffO66ZlyeUYeccXaWHeEuXKFEdppwq8dNSmn6qT6
-         iSZw==
-X-Gm-Message-State: APjAAAVCIuVE45fwbsIuSzDpuF5mSAxECDEFP8LGuiRKYMR/qVMNmlmc
-        71oz+B6z+ZAaGek5g/tcgt3kXii5M78/A/G9NQk=
-X-Google-Smtp-Source: APXvYqzwYXNmwjapuHon+ltHnIyKptou0M+Wp/za7ntTwlrU9SS12soRaNQDLnlTPC5mGXonmQV96UYmQav5k4mwwic=
-X-Received: by 2002:a92:d642:: with SMTP id x2mr10388261ilp.169.1576812407524;
- Thu, 19 Dec 2019 19:26:47 -0800 (PST)
+        bh=QRBukMNDPMMB0lG96kyaqaEalCs3+vNed+Anplmweqw=;
+        b=r460c0o+dOqnHaxBx6qpfR3E+kFxEYFEF+BxnjzlBxCSLgm4HJjV+b/1Dpt00qoeDL
+         qW28DQqRxXuKGXVFWcK4yDPjBuw5Xzzub88/2dGloOin7B3BZc6QCc9MkR41ZVnlAyku
+         WVj8Y+727PhGMOnulxnybtVaxVymbGdysMb7UrJZi8Cvlg5AxnvBmZBEhOX3YO4nIGOe
+         po3XUPpsZatPJCvX97nyIPOHLyj3ZpvG6C3j+HLBB+JRH8rDeNrd4/7rYAQ6m9C33lfs
+         Ss3gL7ZISZZLBsuAV6RwBSXLFjPbNwIPuPZqLkf1O+Jmv3iPnsupN/HWOGOmGETg9eNL
+         sYGg==
+X-Gm-Message-State: APjAAAVyG6PObvX0l2V/fPMnXEml0LVxftGVe0JLekI7opWCrBLjZd6Q
+        oXm2rO2s29+99Wmy9PiCC4KZeiu3oEP9tZm8i79J2U2qGbk=
+X-Google-Smtp-Source: APXvYqyD5H/9qZRxybrTqq5JaEI3HVC9tTh3lriLlRTcB7alS9QnE/l/3JXv1Z8MVfWpjKa5mItDNMQEQHOL3yQxVGY=
+X-Received: by 2002:a5d:4749:: with SMTP id o9mr12476634wrs.242.1576816431176;
+ Thu, 19 Dec 2019 20:33:51 -0800 (PST)
 MIME-Version: 1.0
 References: <1327532317.1529923.1576509501382.JavaMail.zimbra@redhat.com>
  <180194560.1531945.1576510209913.JavaMail.zimbra@redhat.com>
@@ -59,18 +59,16 @@ References: <1327532317.1529923.1576509501382.JavaMail.zimbra@redhat.com>
  <2122939021.2041834.1576722876658.JavaMail.zimbra@redhat.com>
  <CANFS6bY6b23MznmrGuugcVUEW3UuRbzAxBd4p35K3qdkz4DCAA@mail.gmail.com> <1047490239.2348842.1576810790780.JavaMail.zimbra@redhat.com>
 In-Reply-To: <1047490239.2348842.1576810790780.JavaMail.zimbra@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 19 Dec 2019 21:26:36 -0600
-Message-ID: <CAH2r5mtFUQ67=s4KaqNTZw81_YQMNqcUUZCratk3F54ouqiZiA@mail.gmail.com>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Fri, 20 Dec 2019 13:33:39 +0900
+Message-ID: <CANFS6bZ8A_OHtGK1+qKfWFJi15-e9t44Wm63++RZ9W9VZwJ8ng@mail.gmail.com>
 Subject: Re: How to use SMB Direct
 To:     Xiaoli Feng <xifeng@redhat.com>
-Cc:     Hyeoncheol Lee <hyc.lee@gmail.com>,
-        "Stefan (metze) Metzmacher" <metze@samba.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
+Cc:     metze@samba.org, ronnie sahlberg <ronniesahlberg@gmail.com>,
         Tom Talpey <ttalpey@microsoft.com>,
         linux-cifs <linux-cifs@vger.kernel.org>,
         linux-cifsd-devel@lists.sourceforge.net,
-        Namjae Jeon <namjae.jeon@samsung.com>
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -78,27 +76,10 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The work of Metze's on RDMA/smbdirect extensions to Samba, rely in
-part on kernel code.   I can help merge that into the kernel but I
-would like some agreement between Metze and Long Li (and Tom etc.) on
-what would be useful to be shared between cifs.ko and the proposed
-RDMA helpe driver for Samba.   From discussions this fall, it is
-probably too early to consider the merge request, but I am very open
-to following up discussions on this.
+Hello Xiaoli,
 
-The alternative RDMA/smbdirect implementation in cifsd (the proposed
-smb3 kernel server written by Namjae and other) is very exciting and
-an interesting topic, but likely unrelated to the Samba server
-implementation that Metze is working on.   The issues involved in
-merging cifsd (the SMB3 kernel server) into the mainline kernel are
-quite different than those related to Samba's RDMA implementation, and
-instead mostly have to deal with addressing review comments from
-others (I have sent namjae various suggestions which he appears to be
-addressing).   More review feedback of the cifsd kernel server will be
-very helpful - but the main issues are not RDMA related.
-
-
-On Thu, Dec 19, 2019 at 9:00 PM Xiaoli Feng <xifeng@redhat.com> wrote:
+2019=EB=85=84 12=EC=9B=94 20=EC=9D=BC (=EA=B8=88) =EC=98=A4=ED=9B=84 12:00,=
+ Xiaoli Feng <xifeng@redhat.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
 >
 > Hello Hyeoncheol,
 >
@@ -109,6 +90,29 @@ rc1+.
 he
 > concern of Samba server. Is it right?
 >
+Yes, you can use the SMB Direct without Samba server.
+
+Following are instructions for cifsd setup.
+And cifsd utils and a detailed description can be found in
+https://github.com/cifsd-team/cifsd-tools
+
+-  Build and install cifsd kernel driver
+modprobe cifsd
+
+- Create user/password for SMB share
+cifsuseradd -a <Enter USERNAME for SMB share access>
+Enter password for SMB share access
+
+- Create /etc/cifs/smb.conf file, add SMB share in smb.conf file
+Refer smb.conf.example
+
+- Start cifsd user space daemon
+cifsd
+
+- Access share from Windows or Linux using CIFS
+
+Thank you.
+
 > As I know, seems there are two projects for SMB Direct(kernel part). One =
 is
 > the cifsd. The others is Metze's repo. Which one is planning to go into l=
@@ -308,9 +312,3 @@ ss
 > >
 > >
 >
-
-
---=20
-Thanks,
-
-Steve
