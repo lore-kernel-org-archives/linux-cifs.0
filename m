@@ -2,70 +2,86 @@ Return-Path: <SRS0=/7KZ=2P=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 982F2C2D0D0
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Dec 2019 03:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF44C2D0C8
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Dec 2019 19:39:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 790482063A
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Dec 2019 03:23:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 462312073B
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Dec 2019 19:39:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726330AbfLYDXL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 24 Dec 2019 22:23:11 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:8180 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726328AbfLYDXK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 24 Dec 2019 22:23:10 -0500
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 57B48A10080D804759C0;
-        Wed, 25 Dec 2019 11:23:08 +0800 (CST)
-Received: from huawei.com (10.90.53.225) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Wed, 25 Dec 2019
- 11:23:01 +0800
-From:   zhengbin <zhengbin13@huawei.com>
-To:     <sfrench@samba.org>, <linux-cifs@vger.kernel.org>,
-        <samba-technical@lists.samba.org>
-CC:     <zhengbin13@huawei.com>
-Subject: [PATCH 1/2] fs/cifs/smb2ops.c: use true,false for bool variable
-Date:   Wed, 25 Dec 2019 11:30:20 +0800
-Message-ID: <1577244621-117474-2-git-send-email-zhengbin13@huawei.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1577244621-117474-1-git-send-email-zhengbin13@huawei.com>
-References: <1577244621-117474-1-git-send-email-zhengbin13@huawei.com>
+        id S1726461AbfLYTjB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 25 Dec 2019 14:39:01 -0500
+Received: from albireo.enyo.de ([37.24.231.21]:43874 "EHLO albireo.enyo.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726420AbfLYTjB (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 25 Dec 2019 14:39:01 -0500
+Received: from [172.17.203.2] (helo=deneb.enyo.de)
+        by albireo.enyo.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        id 1ikCUh-000786-Vl; Wed, 25 Dec 2019 19:38:55 +0000
+Received: from fw by deneb.enyo.de with local (Exim 4.92)
+        (envelope-from <fw@deneb.enyo.de>)
+        id 1ikCTv-0004Mj-Rz; Wed, 25 Dec 2019 20:38:07 +0100
+From:   Florian Weimer <fw@deneb.enyo.de>
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     Rich Felker <dalias@libc.org>, linux-fsdevel@vger.kernel.org,
+        musl@lists.openwall.com, linux-kernel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org
+Subject: Re: [musl] getdents64 lost direntries with SMB/NFS and buffer size < unknown threshold
+References: <20191120001522.GA25139@brightrain.aerifal.cx>
+        <8736eiqq1f.fsf@mid.deneb.enyo.de>
+        <20191120205913.GD16318@brightrain.aerifal.cx>
+        <20191121175418.GI4262@mit.edu>
+Date:   Wed, 25 Dec 2019 20:38:07 +0100
+In-Reply-To: <20191121175418.GI4262@mit.edu> (Theodore Y. Ts'o's message of
+        "Thu, 21 Nov 2019 12:54:18 -0500")
+Message-ID: <87a77g2o2o.fsf@mid.deneb.enyo.de>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fixes coccicheck warning:
+* Theodore Y. Ts'o:
 
-fs/cifs/smb2ops.c:807:2-36: WARNING: Assignment of 0/1 to bool variable
+> On Wed, Nov 20, 2019 at 03:59:13PM -0500, Rich Felker wrote:
+>> 
+>> POSIX only allows both behaviors (showing or not showing) the entry
+>> that was deleted. It does not allow deletion of one entry to cause
+>> other entries not to be seen.
+>
+> Agreed, but POSIX requires this of *readdir*.  POSIX says nothing
+> about getdents64(2), which is Linux's internal implementation which is
+> exposed to a libc.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: zhengbin <zhengbin13@huawei.com>
----
- fs/cifs/smb2ops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sure, but Linux better provides some reasonable foundation for a libc.
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 6250370..2c50022 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -804,7 +804,7 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon, struct cifs_fid *pfid)
- 				sizeof(struct smb2_file_all_info),
- 				&rsp_iov[1], sizeof(struct smb2_file_all_info),
- 				(char *)&tcon->crfid.file_all_info))
--		tcon->crfid.file_all_info_is_valid = 1;
-+		tcon->crfid.file_all_info_is_valid = true;
+I mean, sure, we can read the entire directory into RAM on the first
+readdir, and get a fully conforming implementation this way (and as
+Rich noted, glibc's 32 KiB buffer tends to approximate that in
+practice).  But that doesn't strike me as particularly useful.
 
- oshr_exit:
- 	mutex_unlock(&tcon->crfid.fid_mutex);
---
-2.7.4
+The POSIX requirement is really unfortunate because it leads to
+incorrect implementations of rm -rf which would on a compliant system
+and fail in practice.
 
+> So we would need to see what is exactly going on at the interfaces
+> between the VFS and libc, the nfs client code and the VFS, the nfs
+> client code and the nfs server, and possibly the behavior of the nfs
+> server.
+>
+> First of all.... you can't reproduce this on anything other than with
+> NFS, correct?  That is, does it show up if you are using ext4, xfs,
+> btrfs, etc.?
+
+I'm sure it shows up with certain directory contents on any Linux file
+system except for those that happen to have a separate B-tree (or
+equivalent) for telldir/seekdir support.  And even those will have
+broken corner case in case of billions of directory operations.
+
+32 bits are simply not enough storage space for the cookie.  Hashing
+just masks the presence of these bugs, but does not eliminate them
+completely.
