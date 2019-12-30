@@ -1,69 +1,90 @@
-Return-Path: <SRS0=MPZ3=2T=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=dl2r=2U=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA978C2D0CE
-	for <linux-cifs@archiver.kernel.org>; Sun, 29 Dec 2019 19:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F3AC2D0C3
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Dec 2019 05:29:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F12E208C4
-	for <linux-cifs@archiver.kernel.org>; Sun, 29 Dec 2019 19:35:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1577648107;
-	bh=VA2PNe7EHtMwnyNTfXbhD2csLpbuw+O4ePPjAc9+z2M=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=sSjJteUZdT1O+k4wDwRMOKEryyLVEpveQMBxRzHcTsrl6shAGQtWJZafYs1JbWQjZ
-	 3PeIG31zMlwEcnDtTk+H+8w8g0LiI1nZ0b6/G2gjXiJycfghdkSrHcEsc9qSeaNSIu
-	 4Gu2haHwhhBvQLaSLQsFGO4z3tys5ZPAvUhQMsEk=
+	by mail.kernel.org (Postfix) with ESMTP id 9E9D02071E
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Dec 2019 05:29:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SMehIdrS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727121AbfL2TfH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 29 Dec 2019 14:35:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39928 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727106AbfL2TfH (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 29 Dec 2019 14:35:07 -0500
-Subject: Re: [GIT PULL] SMB3 Fixes
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1577648106;
-        bh=VA2PNe7EHtMwnyNTfXbhD2csLpbuw+O4ePPjAc9+z2M=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=m3VMUc/42fVuF9HjSmy+MD6ZBh8YD7HzXf8M4S5V9Zv0LCHCDjyUgpKE8Y6/CN8t0
-         U6rW6kHfBtRe2gNLTW+iVXCHpjiGiDo8VsCno20rJ9bvvyB2FseNF28aU8UwPIycUT
-         TW6Q5gWJrR+gsSH/jF4GdL/ggtd3ktsS0pWLuGFU=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvWwwSA70MnKBZXm_ji9iT+DxVPu-33EcFb9L+GgEwcXA@mail.gmail.com>
-References: <CAH2r5mvWwwSA70MnKBZXm_ji9iT+DxVPu-33EcFb9L+GgEwcXA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvWwwSA70MnKBZXm_ji9iT+DxVPu-33EcFb9L+GgEwcXA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git
- tags/5.5-rc3-smb3-fixes
-X-PR-Tracked-Commit-Id: 046aca3c25fd28da591f59a2dc1a01848e81e0b2
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: cc2f36ec7188e48c2afb1428fc3ce18884ad634b
-Message-Id: <157764810649.31581.368065453512872010.pr-tracker-bot@kernel.org>
-Date:   Sun, 29 Dec 2019 19:35:06 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        id S1727069AbfL3F3U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Dec 2019 00:29:20 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:36782 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725834AbfL3F3T (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Dec 2019 00:29:19 -0500
+Received: by mail-il1-f193.google.com with SMTP id b15so27047180iln.3
+        for <linux-cifs@vger.kernel.org>; Sun, 29 Dec 2019 21:29:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oaq9J86A5qT7Ev0xA8fI+XgQrZQUEfev6OaFKLCG7Dw=;
+        b=SMehIdrSF8BkcyHoop7g/76N+O+AJj4+31Bn0PLKZUCkw2mFTTnVBShq+bgLnQ/9u0
+         wvEELyH5m+sQcYhCCKXFRMWk0NQ7qitRLqHcMk6sxP7Ymm9QrbSc2ts5V+ayAVxwA+56
+         CpnU1Z4KvqVZjRSNktnuvq3y8YO4rgzCs4qoEXGj8tDWwfqTFGKxONnN+U9EJotHsGKZ
+         mr6rYRtvRV8kI5FODrPH1KMSO8KA2iPcLMngz/txFhfMbtI6K3kjDQpJdTia2dLxmYRb
+         tXsXXP3Mvw+KGWiDqRbZb1cY+aTTXNWhQ65r6GjW8zAhUpRE7gHUvk9A+G62hvzrZoyU
+         xtYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oaq9J86A5qT7Ev0xA8fI+XgQrZQUEfev6OaFKLCG7Dw=;
+        b=dnP0zZmiHN2tPOHrhewOsn5gExzUrcwG9gBw1L1frmimko/pR0s6P2ysOg2bIWuvPb
+         aaRlzplIvlI9LX5buARmJRfyZK9J+UnCNcch/JliJxqPa0hyxXAD7lzSoxqiVWUfD/6H
+         GKe/yz9dGNStcypwNpGPugerb8ZJjCFiexSsuOXt7uvcDXhQghgeX3MkkmQ/tQ1cAEo2
+         N4SFpG+qmPVKyoEplgVlhrPsvoG/8kJXgZyWIvQyF/cm8VR/QI/OwrfmkNb6HcVijVBC
+         E2k98O32wWLwCggaVY3h5BCuKoqh/vh9ULM+NiRDc8qbkyLVHoSKLNL2EQ+vqRBiAJe1
+         Iqrg==
+X-Gm-Message-State: APjAAAXZehoAOikY0xFwEY8Hz7N1XmwkJqb3O5nYEXe+i+6xWX9COXSr
+        er+XOous51LodaJXooo7bV4sICLLIMm2rrjw7Wg=
+X-Google-Smtp-Source: APXvYqznxWMOc/zeoeuvpB4zDr6gxOrtbKhiqFQDRhYff1gxXRNYl6M6jFdOGJOqlPZESbiMwJfJRV7An3TD5Cy5fEY=
+X-Received: by 2002:a05:6e02:d05:: with SMTP id g5mr37929888ilj.272.1577683759157;
+ Sun, 29 Dec 2019 21:29:19 -0800 (PST)
+MIME-Version: 1.0
+References: <1577244621-117474-1-git-send-email-zhengbin13@huawei.com>
+In-Reply-To: <1577244621-117474-1-git-send-email-zhengbin13@huawei.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 29 Dec 2019 23:29:08 -0600
+Message-ID: <CAH2r5msEOq877Rudaz1aOeF-sxe2qvy+Rc8nWc-Bq_-qZNqYHQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] fs/cifs: use true,false for bool variable
+To:     zhengbin <zhengbin13@huawei.com>
+Cc:     Steve French <sfrench@samba.org>,
         CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 28 Dec 2019 23:06:35 -0600:
+Merged into cifs-2.6.git for-next
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.5-rc3-smb3-fixes
+On Tue, Dec 24, 2019 at 9:23 PM zhengbin <zhengbin13@huawei.com> wrote:
+>
+> zhengbin (2):
+>   fs/cifs/smb2ops.c: use true,false for bool variable
+>   fs/cifs/cifssmb.c: use true,false for bool variable
+>
+>  fs/cifs/cifssmb.c | 4 ++--
+>  fs/cifs/smb2ops.c | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>
+> --
+> 2.7.4
+>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/cc2f36ec7188e48c2afb1428fc3ce18884ad634b
-
-Thank you!
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+Thanks,
+
+Steve
