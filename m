@@ -1,239 +1,116 @@
-Return-Path: <SRS0=RzJs=2X=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=alM3=2Y=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C31BC2D0DC
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jan 2020 21:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6C4BC2D0C2
+	for <linux-cifs@archiver.kernel.org>; Fri,  3 Jan 2020 14:11:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6448222C3
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jan 2020 21:19:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6899F2085B
+	for <linux-cifs@archiver.kernel.org>; Fri,  3 Jan 2020 14:11:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ppGZNFVa"
+	dkim=pass (1024-bit key) header.d=prodrive-technologies.com header.i=@prodrive-technologies.com header.b="DPjLYfYX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725883AbgABVTB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 2 Jan 2020 16:19:01 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38685 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgABVTB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Jan 2020 16:19:01 -0500
-Received: by mail-wr1-f68.google.com with SMTP id y17so40639096wrh.5;
-        Thu, 02 Jan 2020 13:18:58 -0800 (PST)
+        id S1727539AbgACOL3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 3 Jan 2020 09:11:29 -0500
+Received: from mail-eopbgr60139.outbound.protection.outlook.com ([40.107.6.139]:29654
+        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727523AbgACOL2 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 3 Jan 2020 09:11:28 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Uu8noLu6oGDeW3g7ypuAG8qUtUm5g1lJqXvKllmZJigC0yva+E47H0u/Cte119q1eu8GxlwR14fal5Rl7RG9lRYPw1YD0hNnnvl9CSQNflbRAe2ZUd4eOZytNEWsxUXUNbqTLvztRFyXMNtrEdJ07r6PF+P5SftQUXYUqT2qXryd2p/06M8W/jpDFiiVh4+/lXsx3uFUJyP3IwF4cqXABR44HIbFI5ovCdGwac+VqqCmlblMqEz5mHGSaYNEHlJgp1SoduImz96zcJp2rFhorps0NW5Q5dQLZgN0uuNrN3wKBmatB1OCYc9+wySy/OX7E5VFqFy03Af8M0a1Bj0skQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yWWrVWpxCX+saqefkZVttyYlntz1N/yEuJmE8IAqTLw=;
+ b=nw51a2VXiQASVSM2aKh35hRTE8v4QxmLpBsk17k5fmAO8CXXQ7s9SKG31XFZZmMmhdX5syfe27ewrt0Dq7D9VMF2twvuldymtsStg9hRIYB9GDKGu5IoUM/40sshMhAX+bBDqOh+y0TmakppilEH9tt/MVIMADFybsveUGl04SsdhWof1JURi9WyxjYszHBWROqbxsSgMH6gnqJVSP1ek5edAN53Bw7f79ySaQMIJYIUfXDdM9r1cG/7Acef4dWba7X6WdxKHEf6PYjVXzMa3hpLJL2/b1R1HtFSEU6ebCaWa/GQihg/nbNIlHMo8t4a9wGbU5WB1j+s/+tS9Z4vPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=prodrive-technologies.com; dmarc=pass action=none
+ header.from=prodrive-technologies.com; dkim=pass
+ header.d=prodrive-technologies.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=Q7ILQ6vE+vwpRyA2bKiM3+nO07Ltd687WzjuuO8GNN0=;
-        b=ppGZNFVayH2pDy0fY9yk4nY8GKytJUuZIp3fKFfCVW1xRiYW60rKO1ulce/XD+XFcF
-         vKPUNYdoIB3qp2EZBgnWdW9ZOCAM2yMoGR4KpX7E8NgR9FhKlhQJl3NioHJ4nqqRpakc
-         52kynZvAMUTX2gqxzc/ZqVxflW5YURkiSA3nuPIe0NP81QWDQwyca/wH6Bt3HlzW9iJE
-         rp440YEzd77UYFRDcBybosTAFlTCQDdLcOGbrkKyzJssjn67/VIY7W5eHBwY3v7MjA3x
-         bU9mVfz8xZ8pYJNGY2zN+e3946p1aM3r6VFDgGB6M9rD+yWo0lcFTDOWtcxZcAXJlgNK
-         Cnyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=Q7ILQ6vE+vwpRyA2bKiM3+nO07Ltd687WzjuuO8GNN0=;
-        b=FiwPIIrSAxUaMDBHwzyDAikeyAokqjIXMVB98iJ19PcGeH1HHKDWWRbFS8bYzrNR+/
-         Ndj5LlXCmN2/relTYGqZ6oc/7mwY5DYFda9AqGDhRQJ9VwwrV2MfScb35QR9WvBSDCDL
-         QN5pFq4oXXPYwkHNNQuSkovAESDW3NUgk96s/sMfd28zhU/JPapW8TwdeOCBHDv4aW2+
-         sYMuTgAOvRrXJOlozUxeldeH8pMP993y0sCNgQc2D4fYNnubHSJ2uhvogZmfhxC9OQMl
-         u0WqcexRp8085C0vXwnPNEN1ycFgWu15KBa+3E7YEbxrtDItHt+zNSk5UR+0YWBUOcj8
-         WX4A==
-X-Gm-Message-State: APjAAAX//4CXow3Nhp59wYhZO66uA0ANh3yjaO62jR8ZdfI8NTuaHOnY
-        K8Ko7QtuVARTy7oFRbjPhxZC9OqpwD4=
-X-Google-Smtp-Source: APXvYqwEUdeL8z2rIw9tFIjYESsxWr3A8E/lAIAoIkXSadr8DwfuLip02FMQem52XKT8Y4GoK4ATvg==
-X-Received: by 2002:a05:6000:367:: with SMTP id f7mr81873888wrf.174.1577999937679;
-        Thu, 02 Jan 2020 13:18:57 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id p15sm9618677wma.40.2020.01.02.13.18.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jan 2020 13:18:56 -0800 (PST)
-Date:   Thu, 2 Jan 2020 22:18:55 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org
-Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        Steve French <sfrench@samba.org>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Sterba <dsterba@suse.com>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Jan Kara <jack@suse.com>, "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Eric Sandeen <sandeen@redhat.com>,
-        Namjae Jeon <linkinjeon@gmail.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Unification of filesystem encoding options
-Message-ID: <20200102211855.gg62r7jshp742d6i@pali>
+ d=prodrive-technologies.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yWWrVWpxCX+saqefkZVttyYlntz1N/yEuJmE8IAqTLw=;
+ b=DPjLYfYXdg7FVQ+GiBW/ZiFw1n+Q+pD8TIGibAbqEB0z4phCVx9+Lg/NzIKfNjjW2dwUz7mU9jNAPSFDQ5KToFq53nhSh+wplHLnovnYaQQgY1K5voD/rSykSBIJf9KLDiPvDwE2FAW/OisPTtuXDPctmjrwtEUuCzAY07fyobM=
+Received: from VE1PR02MB5550.eurprd02.prod.outlook.com (20.179.30.11) by
+ VE1PR02MB5695.eurprd02.prod.outlook.com (10.255.158.14) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2602.13; Fri, 3 Jan 2020 14:11:23 +0000
+Received: from VE1PR02MB5550.eurprd02.prod.outlook.com
+ ([fe80::d01e:58a8:3b2d:c74b]) by VE1PR02MB5550.eurprd02.prod.outlook.com
+ ([fe80::d01e:58a8:3b2d:c74b%7]) with mapi id 15.20.2602.012; Fri, 3 Jan 2020
+ 14:11:23 +0000
+From:   Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>
+To:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Subject: cifs.upcall requests ticket for wrong host when using dfs
+Thread-Topic: cifs.upcall requests ticket for wrong host when using dfs
+Thread-Index: AQHVwj+tztbeRMwVFU+OqRHcECQz4Q==
+Date:   Fri, 3 Jan 2020 14:11:23 +0000
+Message-ID: <39643d7d-2abb-14d3-ced6-c394fab9a777@prodrive-technologies.com>
+Accept-Language: en-NL, en-US
+Content-Language: aa
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101
+ Thunderbird/24.0
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=martijn.de.gouw@prodrive-technologies.com; 
+x-originating-ip: [212.61.153.66]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7da7726e-d5b0-40d6-bbe8-08d79056d06c
+x-ms-traffictypediagnostic: VE1PR02MB5695:
+x-microsoft-antispam-prvs: <VE1PR02MB569504FF8CEA853761FEFCF4F5230@VE1PR02MB5695.eurprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0271483E06
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(376002)(346002)(39840400004)(136003)(366004)(199004)(189003)(66556008)(26005)(316002)(66476007)(64756008)(66946007)(186003)(66446008)(31686004)(6512007)(6486002)(2906002)(76116006)(2616005)(6916009)(8676002)(81156014)(81166006)(8936002)(71200400001)(86362001)(36756003)(478600001)(6506007)(5660300002)(31696002);DIR:OUT;SFP:1102;SCL:1;SRVR:VE1PR02MB5695;H:VE1PR02MB5550.eurprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: prodrive-technologies.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uPCLFkNYEjhpDF93+1tVQ3hUOTc0AtYKAaj8+ZyBsDAnHdMWRwtSk9DlUudUfxeXom4YJinIfW0xfXniTtD2BH5GmG6Z8zjLT0SZQmlwdN6Mm7HZuI9XmBVclizatLcFFmUU5FoJypE5aTAbehb7ZCLuqvcYWtU61Z/9RE7RDIfB3lhddAehrx7ptLo9MSNRq0fehJnMCKv7eVkkAGzr5cDVXeG4sAE1vwvwCqNip9cpYZAlH3l6igDEkgBvMtEKKfrAJWyIifUqLa3S4W3B4vCbOmpt8CmGQd5pk1+PUWEUmxXKP6mCbJougBsMrfqzh1kc4gGLVc37nhJ/oRB/p/olfYeJB4b1dna9+VQMYWDl9ZlIBs79X+MkD03Bpbu93myrl/O5XZvis8GDroiF4oq+sahzX+0+0kTVS/2SnSfxjcRYrCjQkF0IZooi3v6x
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B42E625155D7C84B8D3926A18B7F3A51@eurprd02.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="yemvk4r42345xvlb"
-Content-Disposition: inline
-User-Agent: NeoMutt/20180716
+X-OriginatorOrg: prodrive-technologies.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7da7726e-d5b0-40d6-bbe8-08d79056d06c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jan 2020 14:11:23.0820
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 612607c9-5af7-4e7f-8976-faf1ae77be60
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mXErpyjz7pCKIfFGcUVC/08EMEL8ACL4a7EK62eiylLHqidr99MHbmp9GMzU2xdGi4YhFOAUpe6xLAVKUgGrR4zYFr2Bpuu3cmKtH8j+o2Tk12B+mr3DjK5itPfaeZ/DVHzg5PlIvS6evqRYfMG3KQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR02MB5695
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-
---yemvk4r42345xvlb
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hello!
-
-While I was reading a new patch series for exfat filesystem driver I
-saw how is proposed implementation for converting exfat's UTF-16LE
-filenames to userspace and so I decided to investigate what filesystems
-which are already part of Linux kernel are doing.
-
-I looked at filesystems supported by Linux kernel which do not store
-filenames as sequence of octets, but rather expect that on-disk format
-of filenames is according to some encoding.
-
-Below is list of these filesystems with its native encoding:
-
-befs     UTF-8
-cifs     UTF-16LE
-msdos    unspecified OEM codepage
-vfat     unspecified OEM codepage or UTF-16LE
-hfs      octets
-hfsplus  UTF-16BE-NFD-Apple
-isofs    octets or UTF-16BE
-jfs      UTF-16LE
-ntfs     UTF-16LE
-udf      Latin1 or UTF-16BE
-
-Filesystems msdos, vfat, hfs and isofs are bogus as their filesystem
-structure does not say in which encoding is filename stored. For vfat
-and isofs there is information if it is UTF-16LE or some unspecified
-encoding. User who access such filesystem must know under which encoding
-he stored data on it. For this purpose there is for vfat and hfs mount
-option codepage=3D<codepage>.
-
-All other filesystems stores in their structures encoding of filenames.
-Either implicitly (hfsplus is always in UTF-16BE with modified Apple's
-NFD normalization) or explicitly (in UDF is byte which says if filename
-is in Latin1 or in UTF-16BE).
-
-
-As passing UTF-16(LE|BE) buffers is not possible via null term strings
-for any VFS sycall, Linux kernel translates these Unicode filenames to
-some charset. It is done by various mount options. I looked which mount
-options are understood by our Linux filesystems implementations. In all
-next paragraphs by filesystem I would mean Linux driver implementation
-(and not structure on disk), so do not be confused.
-
-Below is table:
-
-befs     iocharset=3D<charset>
-cifs     iocharset=3D<charset>
-msdos    (unsupported)
-vfat     utf8=3D0|no|false|1|yes|true OR utf8 OR iocharset=3D<charset>
-hfs      iocharset=3D<charset>
-hfsplus  nls=3D<charset>
-isofs    iocharset=3D<charset> OR utf8
-jfs      iocharset=3D<charset>
-ntfs     nls=3D<charset> OR iochrset=3D<charset> OR utf8
-udf      utf8 OR iocharset=3D<charset>
-
-Filesystem msdos does not support specifying OEM codepage encoding. It
-passthrough 8bit buffer to userspace and expects that userspace
-understand correct OEM codepage. There is no support for reencoding it
-to UTF-8 (or any other charset). Same applies for isofs when Joliet
-structure is not stored on filesystem.
-
-Filesystem vfat has the most obscure way how to specifying charset.
-Details are in mount(8) manual page. What is important: option
-iocharset=3Dutf8 is buggy and may break filesystem consistency (it allows
-to create two directory entries which would differ only in case
-sensitivity which is not allowed by FAT specification). Due to this
-problem there is a fix, mount option utf8=3D1 (or utf8=3Dyes or utf8=3Dtrue=
- or
-just utf8) which do what you have would expect from iocharset=3Dutf8 if it
-was not buggy.
-
-Filesystem ntfs has option iocharset=3D<charset> which is just alias for
-nls=3D<charset> and says that iocharset=3D is deprecated. Same applies for
-option utf8 which is just alias for nls=3Dutf8.
-
-Filesystems isofs and udf have two ways how to specify UTF-8 encoding.
-First way is via utf8 mount option and second one via iocharset=3Dutf8
-option. Looks like that difference is only one, iocharset=3Dutf8 supports
-only Uncicode code points up to the U+FFFF (limited to 3 byte long UTF-8
-sequences, like utf8/utf8mb3 encoding in MySQL/MariaDB) and utf8 option
-supports also code points above U+FFFF, so full Unicode and not just
-limited subset.
-
-Filesystem cifs in UTF-8 mode (via iocharset=3Dutf8) always supports code
-points above U+FFFF. But remaining filesystems befs, hfs, hfsplus, jfs
-and ntfs seems to supports only Unicode code points up to the U+FFFF. So
-effectively they do not support UTF-16, but effectively just UCS-2. This
-limitation comes from Kernel NLS table framework/API which is limited to
-16bit integers and therefore maximal Unicode code point is U+FFFF.
-Filesystems cifs, isofs, udf and vfat has own special code to work with
-surrogate pairs and do not use limited NLS table functions. There are
-also functions utf8s_to_utf16s() and utf16s_to_utf8s() for this purpose.
-
-
-And here I see these improvements for all above filesystems:
-
-
-1) Unify mount options for specifying charset.
-
-Currently all filesystems except msdos and hfsplus have mount option
-iocharset=3D<charset>. hfsplus has nls=3D<charset> and msdos does not
-implement re-encoding support. Plus vfat, udf and isofs have broken
-iocharset=3Dutf8 option (but working utf8 option) And ntfs has deprecated
-iocharset=3D<charset> option.
-
-I would suggest following changes for unification:
-
-* Add a new alias iocharset=3D for hfsplus which would do same as nls=3D
-* Make iocharset=3Dutf8 option for vfat, udf and isofs to do same as utf8
-* Un-deprecate iocharset=3D<charset> option for ntfs
-
-This would cause that all filesystems would have iocharset=3D<charset>
-option which would work for any charset, including iocharset=3Dutf8.
-And it would fix also broken iocharset=3Dutf8 for vfat, udf and isofs.
-
-
-2) Add support for Unicode code points above U+FFFF for filesystems
-befs, hfs, hfsplus, jfs and ntfs, so iocharset=3Dutf8 option would work
-also with filenames in userspace which would be 4 bytes long UTF-8.
-
-
-3) Add support for iocharset=3D and codepage=3D options for msdos
-filesystem. It shares lot of pars of code with vfat driver.
-
-
-What do you think about these improvements? First improvement should be
-relatively simple and if we agree that this unification of mount option
-iocharset=3D make sense, I could do it.
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---yemvk4r42345xvlb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXg5eNQAKCRCL8Mk9A+RD
-UiLNAJoDSF9XHS0h4NVhiAJxSkMkLyvosQCcCOV2ieT4teXX72Iv7nd4IsdCVuU=
-=e0M9
------END PGP SIGNATURE-----
-
---yemvk4r42345xvlb--
+SGksDQoNCkknbSB0cnlpbmcgdG8gc3dpdGNoIGZyb20gbnRscHNzcCB0byBrZXJiZWJvcyBmb3Ig
+bW91bnRpbmcgb3VyIGRmcyANCnNoYXJlcy4gSXQgc2VlbXMgdG8gd29yaywgYnV0IG9ubHkgZm9y
+ICdvbGRlcicga2VybmVsIHZlcnNpb25zLiBTaW5jZSB3ZSANCmFyZSBydW5uaW5nIGRlYmlhbiA5
+IGFuZCAxMCwgSSdtIHRlc3RpbmcgdGhpcyBmb3IgYm90aCB2ZXJzaW9uLiBUaGUgDQp0aGluZyBp
+cyB0aGF0IGlzIHNlZW1zIHRvIHdvcmsgd2hlbiBJIHJ1biBrZXJuZWwgNC4xOS42NywgYnV0IG5v
+dCB3aGVuIA0KSSdtIHJ1bm5pbmcga2VybmVsIDUuMy45Lg0KDQpXaGF0IEknbSB0cnlpbmcgdG8g
+ZG86DQptb3VudCAtdCBjaWZzIC8vZG9tYWluLmNvbS9jb21tb24gL21udC9jb21tb24gLW8gDQpy
+dyx2ZXJzPTMuMCxzZWM9a3JiNSxjcnVpZD0xMDAwMyx1c2VybmFtZT1tZGcsdWlkPTEwMDAzLGdp
+ZD0xMDI3NixhZGRyPTEwLjEuMS4xNCxmaWxlX21vZGU9MDYwMCxkaXJfbW9kZT0wNzAwLG5vYnJs
+LG5vaGFuZGxlY2FjaGUsdXNlcj1tZGcNCg0KU28gZmFyIGl0IHdvcmtzIGZpbmUgb24gNC4xOSwg
+YnV0IG5vdCBvbiA1LjMuIEJlY2F1c2Ugd2hlbiBJIHRyeSB0byANCnRyYXZlbCBpbnRvIHRoZSBk
+aXJlY3RvcmllcyAod2hpY2ggYXJlIGFjdHVhbGx5IGRmcyBwb2ludGVycyB0byB0aGUgTkFTIA0K
+c2hhcmVzKSBJIGdldCBwZXJtaXNzaW9uIGRlbmllZC4NCg0KU28gZmFyLCBJIHdhcyBhYmxlIHRv
+IHRyYWNrIHRoaXMgZG93biB0byBjaWZzLnVwY2FsbCwgYmVjYXVzZSBvbiBrZXJuZWwgDQo0LjE5
+IEkgc2VlIGl0IHRyaWVzIHRvIGdldCBhIHNlcnZpY2UgdGlja2V0IGZvciB0aGUgbmFzIChjaWZz
+LnVwY2FsbDogDQpoYW5kbGVfa3JiNV9tZWNoOiBnZXR0aW5nIHNlcnZpY2UgdGlja2V0IGZvciBu
+YXMwMS5kb21haW4uY29tKS4gQnV0IG9uIA0Ka2VybmVsIDUuMyBpdCB0cmllcyB0byBnZXQgYSB0
+aWNrZXQgZm9yIHRoZSBkYyBhZ2FpbjogY2lmcy51cGNhbGw6IA0KaGFuZGxlX2tyYjVfbWVjaDog
+Z2V0dGluZyBzZXJ2aWNlIHRpY2tldCBmb3IgZGMwMS5kb21haW4uY29tLg0KDQpXaGF0IGNvdWxk
+IGJlIHdyb25nIGhlcmU/DQotLSANCk1hcnRpam4gZGUgR291dw0KRGVzaWduZXINClByb2RyaXZl
+IFRlY2hub2xvZ2llcw0KTW9iaWxlOiArMzEgNjMgMTcgNzYgMTYxDQpQaG9uZTogICszMSA0MCAy
+NiA3NiAyMDANCg==
