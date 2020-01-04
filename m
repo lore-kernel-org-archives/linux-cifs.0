@@ -1,83 +1,105 @@
-Return-Path: <SRS0=alM3=2Y=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=i2Ti=2Z=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2557EC2D0C2
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Jan 2020 20:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BEAFC00523
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Jan 2020 03:37:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7A78222C4
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Jan 2020 20:15:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="zK1KPVtt"
+	by mail.kernel.org (Postfix) with ESMTP id 05E4321D7D
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Jan 2020 03:37:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1578109068;
+	bh=Iqlz+iKxY3zlUcIPQj4U95OV05qdZTm+7hovQRC5Z/4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=PCbRkAxeyjM9Sn+wxoH3orY8sPWXcL4h1A8oiKqzmzSPr57SA1CH3yLthlzYKZ2FZ
+	 Nboc5rwmbkMDoEgR0RIcsX61G7CsbW5RxUJdW/dgY6AubCu1S5o39BC2MNMFns7017
+	 Jp8x/nxU8JqvSYsTQ6+GoubvnJAqz8R/B3PBF+Z4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727221AbgACUPG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 3 Jan 2020 15:15:06 -0500
-Received: from mx.cjr.nz ([51.158.111.142]:26992 "EHLO mx.cjr.nz"
+        id S1727502AbgADDga (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 3 Jan 2020 22:36:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37138 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726050AbgACUPG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 3 Jan 2020 15:15:06 -0500
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 5B471808BF;
-        Fri,  3 Jan 2020 20:14:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1578082502;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MTrmozS1XlNh03xz8nSVFM0VPXg4j9R25i/QkMW/Lvg=;
-        b=zK1KPVtt015ck7RrOs02z6tFp2ZcZn1UqcN7oPWGxV1YSC2bA4s/DchhoZbCG0SPxDunsx
-        k0dGiW+GCxi33jqRUDOgs3X0ucyvRKAvsSrJJw+1jrhJcoYzOo2LAWKk5vlxfjYQWqaxZ/
-        HardvUK579Vbl/1vQl0exgvvR3BDMNFRtXCraF9i621R0TbpmzsW5J5jHry+suTbib4Itj
-        HwrlSJWcoFCbOl/CApaCKbT6gddwxfDs2R/S/lWr+Pk/wBKoQSUOth6tMqkIdYW/hoTC9n
-        bwK5noXM+ZMyWQ7h4fT2R0HD51uiZAJbXmGDtXP+QPxYxctzAXvCoC1k7ZywNQ==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Subject: Re: cifs.upcall requests ticket for wrong host when using dfs
-In-Reply-To: <5260c45c-0a31-168d-f9db-83bb6bd4a2cf@prodrive-technologies.com>
-References: <39643d7d-2abb-14d3-ced6-c394fab9a777@prodrive-technologies.com>
- <87png0boej.fsf@cjr.nz>
- <5260c45c-0a31-168d-f9db-83bb6bd4a2cf@prodrive-technologies.com>
-Date:   Fri, 03 Jan 2020 17:14:48 -0300
-Message-ID: <878smoqouf.fsf@cjr.nz>
+        id S1727481AbgADDga (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 3 Jan 2020 22:36:30 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B45E221D7D;
+        Sat,  4 Jan 2020 03:36:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1578108989;
+        bh=Iqlz+iKxY3zlUcIPQj4U95OV05qdZTm+7hovQRC5Z/4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=bftARHLSRgkNOleN01R+iVEizRwLEWEMwdrXG8mBPijBb+9Rj2Z3Su7t0ZDlJqwS0
+         vwqoSzDXgTd/W+rEbHTq1TdiWMI6E+5Y3rZlxRLDXkWuyDdiJ+R0+TEiR0ZZYRN2Mp
+         XJR6jYfqWWn0aqTgJEN51rdifhZ6dW/4yWDXKY4g=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Nathan Chancellor <natechancellor@gmail.com>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 5.4 07/10] cifs: Adjust indentation in smb2_open_file
+Date:   Fri,  3 Jan 2020 22:36:16 -0500
+Message-Id: <20200104033620.10977-7-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200104033620.10977-1-sashal@kernel.org>
+References: <20200104033620.10977-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com> writes:
+From: Nathan Chancellor <natechancellor@gmail.com>
 
-> I tried kernel 5.4.6, including this fix, but still no luck:
-> [   25.825075] CIFS: Attempting to mount //domain.com/common
-> [   27.127925] CIFS VFS:  BAD_NETWORK_NAME: \\domain.com\common
-> [   31.406697] CIFS: Attempting to mount //DC01.domain.com/common/Pd_Std
-> [   31.414527] srv rsp padded more than expected. Length 98 not 73 for cmd:1 mid:1
-> [   31.414533] Status code returned 0xc000006d STATUS_LOGON_FAILURE
-> [   31.414537] CIFS VFS: \\DC01.domain.com Send error in SessSetup = -13
-> [   31.414544] CIFS VFS: cifs_mount failed w/return code = -13
-> [   31.414590] CIFS: Attempting to mount //DC01.domain.com/common/Pd_Std
-> [   31.422410] Status code returned 0xc000006d STATUS_LOGON_FAILURE
-> [   31.422416] CIFS VFS: \\DC01.domain.com Send error in SessSetup = -13
-> [   31.422423] CIFS VFS: cifs_mount failed w/return code = -13
->
-> Where 4.19 prints:
-> [  132.012498] CIFS: Attempting to mount //domain.com/common
-> [  132.183038] CIFS VFS: error -2 on ioctl to get interface list
-> [  132.344343] CIFS: Attempting to mount //nas01/common$/pd_std
+[ Upstream commit 7935799e041ae10d380d04ea23868240f082bd11 ]
 
-Thanks for testing it.
+Clang warns:
 
-Could you post dmesg output of both versions with debugging enabled as per
-instructions in [1]?
+../fs/cifs/smb2file.c:70:3: warning: misleading indentation; statement
+is not part of the previous 'if' [-Wmisleading-indentation]
+         if (oparms->tcon->use_resilient) {
+         ^
+../fs/cifs/smb2file.c:66:2: note: previous statement is here
+        if (rc)
+        ^
+1 warning generated.
 
-Thanks,
-Paulo
+This warning occurs because there is a space after the tab on this line.
+Remove it so that the indentation is consistent with the Linux kernel
+coding style and clang no longer warns.
 
-[1] https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
+Fixes: 592fafe644bf ("Add resilienthandles mount parm")
+Link: https://github.com/ClangBuiltLinux/linux/issues/826
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/smb2file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
+index 8b0b512c5792..afe1f03aabe3 100644
+--- a/fs/cifs/smb2file.c
++++ b/fs/cifs/smb2file.c
+@@ -67,7 +67,7 @@ smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
+ 		goto out;
+ 
+ 
+-	 if (oparms->tcon->use_resilient) {
++	if (oparms->tcon->use_resilient) {
+ 		/* default timeout is 0, servers pick default (120 seconds) */
+ 		nr_ioctl_req.Timeout =
+ 			cpu_to_le32(oparms->tcon->handle_timeout);
+-- 
+2.20.1
+
