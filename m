@@ -2,62 +2,35 @@ Return-Path: <SRS0=wi6E=24=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCE1C33C8C
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jan 2020 17:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB42C282DD
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jan 2020 20:04:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FA0A222D9
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jan 2020 17:38:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Meu8tDGf"
+	by mail.kernel.org (Postfix) with ESMTP id 3967F2080A
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jan 2020 20:04:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728482AbgAGRir (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 Jan 2020 12:38:47 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:56285 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728408AbgAGRiq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Jan 2020 12:38:46 -0500
-Received: by mail-wm1-f67.google.com with SMTP id q9so391683wmj.5;
-        Tue, 07 Jan 2020 09:38:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=UDJ8iFEh0aT3XRBjDUtj+5yED1IZ3Xq7M2iH1ATPT9k=;
-        b=Meu8tDGf+9Oi621KmTxxNn/4M8q5vRm1K5UNhLCERDDplY19yg2I6Lcwf4dvqYUvrS
-         n9yIMB0++fEra3BC7w4hMJnmhgjv/0LZM9jGRnISJnjttfZGzP9xXMst1DgfYN24gIVk
-         +Ki5j71eXXhAJVV7Jpnvv/URIIy40S4UaqMcOs0ETquYskWTWpD1lttPwQ9d2xn3Tqtg
-         HAKuYddqhUnBF605CrcQ3dnGLIQUmRuGOob3w8mmrPALZaFZCZHGgBSRUN5a0dZiNlHe
-         J3pvwSPRPIw3ngd/v07NOKFKtMM0Ph4a56oVRN3+XtVwXG10FibOlBw+1T7slZSjEpFk
-         icdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=UDJ8iFEh0aT3XRBjDUtj+5yED1IZ3Xq7M2iH1ATPT9k=;
-        b=otGNsKY+EB/XIPYx6TlqISBH/JFHTO6nqeOq0F+PFanUqu1L9fzVyljEYBIZtcd1d6
-         xY2ZXTL0vXQ4lPHpEVcfcTatdRFMo/dCwUh1tB99Pu7+6ZAkq7+5qiu40hQq/5SbSAUl
-         avUnR5m1KcP9Mt28o51OVIPl37AOHs9oK89JLcPZpFyuSJ7bOYM1oL6FI5KdMah9pQHH
-         4rRSqGOKLarSvSL7TAjJ4zwxbp11GR0j1QVSenFgLu+MdjsvfU80egENGmsGumZGH+O3
-         LMlv/5qC+Ud9eMSIdjvirPeHe43KaEQV6J1RgfRxtbL4htkJeUyMG3Ghs1Om+xDUhcik
-         tdIA==
-X-Gm-Message-State: APjAAAVIJIBIC4X2moLb8HbY7VIHi0Vlh/RFEGt+wi4O0BJIDC1WaXXH
-        CujmyyGwinzQVD7/0lkXB9U=
-X-Google-Smtp-Source: APXvYqzwLRulzQbtxC/ILXD1jYjGPIVShe805pZOTDvpMu4Plb8/5UsUdltQgFOzbeaaErb+AbS2kg==
-X-Received: by 2002:a1c:4454:: with SMTP id r81mr146049wma.117.1578418724124;
-        Tue, 07 Jan 2020 09:38:44 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id m21sm374927wmi.27.2020.01.07.09.38.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jan 2020 09:38:43 -0800 (PST)
-Date:   Tue, 7 Jan 2020 18:38:42 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        id S1728451AbgAGUEt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 7 Jan 2020 15:04:49 -0500
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:54363 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1728358AbgAGUEt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Jan 2020 15:04:49 -0500
+Received: from callcc.thunk.org (guestnat-104-133-0-111.corp.google.com [104.133.0.111] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 007K31WJ002663
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 7 Jan 2020 15:03:02 -0500
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id B2F684207DF; Tue,  7 Jan 2020 15:03:01 -0500 (EST)
+Date:   Tue, 7 Jan 2020 15:03:01 -0500
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Cc:     Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Luis de Bethencourt <luisbg@kernel.org>,
@@ -69,128 +42,53 @@ Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         David Sterba <dsterba@suse.com>,
         Dave Kleikamp <shaggy@kernel.org>,
         Anton Altaparmakov <anton@tuxera.com>,
-        Jan Kara <jack@suse.com>, "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Eric Sandeen <sandeen@redhat.com>,
+        Jan Kara <jack@suse.com>, Eric Sandeen <sandeen@redhat.com>,
         Namjae Jeon <linkinjeon@gmail.com>,
         Pavel Machek <pavel@ucw.cz>,
         Christoph Hellwig <hch@infradead.org>
 Subject: Re: Unification of filesystem encoding options
-Message-ID: <20200107173842.ciskn4ahuhiklycm@pali>
+Message-ID: <20200107200301.GE3619@mit.edu>
 References: <20200102211855.gg62r7jshp742d6i@pali>
  <20200107133233.GC25547@quack2.suse.cz>
+ <20200107173842.ciskn4ahuhiklycm@pali>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="uelhbz7cmchbh2fr"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20200107133233.GC25547@quack2.suse.cz>
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200107173842.ciskn4ahuhiklycm@pali>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+On Tue, Jan 07, 2020 at 06:38:42PM +0100, Pali Rohár wrote:
+> Adding support for case-insensitivity into UTF-8 NLS encoding would mean
+> to create completely new kernel NLS API (which would support variable
+> length encodings) and rewrite all NLS filesystems to use this new API.
+> Also all existing NLS encodings would be needed to port into this new
+> API.
+> 
+> It is really something which have a value? Just because of UTF-8?
+> 
+> For me it looks like better option would be to remove UTF-8 NLS encoding
+> as it is broken. Some filesystems already do not use NLS API for their
+> UTF-8 support (e.g. vfat, udf or newly prepared exfat). And others could
+> be modified/extended/fixed in similar way.
 
---uelhbz7cmchbh2fr
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You didn't mention ext4 and f2fs, which is using the Unicode code in
+fs/unicode for its case-folding and normalization support.  Ext4 and
+f2fs only supports utf-8, so using the NLS API would have added no
+value --- and it as you pointed out, the NLS API doesn't support
+variable length encoding anyway.  In contrast the fs/unicode functions
+have support for full Unicode case folding and normalization, and
+currently has the latest Unicode 12.1 tables (released May 2019).
 
-On Tuesday 07 January 2020 14:32:33 Jan Kara wrote:
-> On Thu 02-01-20 22:18:55, Pali Roh=C3=A1r wrote:
-> > 1) Unify mount options for specifying charset.
-> >=20
-> > Currently all filesystems except msdos and hfsplus have mount option
-> > iocharset=3D<charset>. hfsplus has nls=3D<charset> and msdos does not
-> > implement re-encoding support. Plus vfat, udf and isofs have broken
-> > iocharset=3Dutf8 option (but working utf8 option) And ntfs has deprecat=
-ed
-> > iocharset=3D<charset> option.
-> >=20
-> > I would suggest following changes for unification:
-> >=20
-> > * Add a new alias iocharset=3D for hfsplus which would do same as nls=3D
-> > * Make iocharset=3Dutf8 option for vfat, udf and isofs to do same as ut=
-f8
-> > * Un-deprecate iocharset=3D<charset> option for ntfs
-> >=20
-> > This would cause that all filesystems would have iocharset=3D<charset>
-> > option which would work for any charset, including iocharset=3Dutf8.
-> > And it would fix also broken iocharset=3Dutf8 for vfat, udf and isofs.
->=20
-> Makes sense to me.
+What I'd suggest is to create a new API, enhancing the functions in
+fs/unicode, to support those file systems that need to deal with
+UTF-16 and UTF-32 for their on-disk directory format, and that we
+assume that for the most part, userspace *will* be using a UTF-8
+encoding for the user<->kernel interface.  We can keep the existing
+NLS interface and mount options for legacy support, but in my opinion
+it's not worth the effort to try to do anything else.
 
-Ok!
-
-> > 2) Add support for Unicode code points above U+FFFF for filesystems
-> > befs, hfs, hfsplus, jfs and ntfs, so iocharset=3Dutf8 option would work
-> > also with filenames in userspace which would be 4 bytes long UTF-8.
->=20
-> Also looks good but when doing this, I'd suggest we extend NLS to support
-> full UTF-8 rather than implementing it by hand like e.g. we did for UDF.
-
-Current kernel NLS framework API supports upper-case / lower-case
-conversion only for single byte encodings. So no case-insensitive
-support for UTF-8 encoding. And for Unicode conversion it supports only
-UCS-2, therefore code points up to the U+FFFF, so for UTF-8 maximally
-3byte long sequences.
-
-This really is not possible to fix without rewriting existing
-filesystems which uses NLS API.
-
-One hacky option would be to extend NLS API from UCS-2 to UTF-16 and fix
-all users of NLS API to expects UTF-16 surrogate pairs.
-
-But I dislike UTF-16 and rather would use usage of unicode_t (UTF-32)
-which is already present in kernel. But because existing filesystems
-drivers pass their UCS-2/UTF-16 buffers from FS to NLS API it is not
-easy to change whole NLS API from UCS-2 to UTF-32.
-
-And still this change does not add support for case-insensitivity, so
-is useless for all MS filesystems (msdos, vfat, ntfs), which is
-majority.
-
-Kernel already provides functions for converting between UTF-8 and
-UTF-16, so this seems to be the easiest way how to provide full UTF-8
-support for filesystems which internally uses UTF-16. Similarly like it
-is implemented in UDF.
-
-Moreover all NLS encodings except UTF-8 are single byte encodings and
-maps into Plane-0, so can be represented by currently used UCS-2
-encoding. Therefore conversion to Unicode works correctly and also their
-case-insensitivity functions (or rather tables).
-
-Adding support for case-insensitivity into UTF-8 NLS encoding would mean
-to create completely new kernel NLS API (which would support variable
-length encodings) and rewrite all NLS filesystems to use this new API.
-Also all existing NLS encodings would be needed to port into this new
-API.
-
-It is really something which have a value? Just because of UTF-8?
-
-For me it looks like better option would be to remove UTF-8 NLS encoding
-as it is broken. Some filesystems already do not use NLS API for their
-UTF-8 support (e.g. vfat, udf or newly prepared exfat). And others could
-be modified/extended/fixed in similar way.
-
-> > 3) Add support for iocharset=3D and codepage=3D options for msdos
-> > filesystem. It shares lot of pars of code with vfat driver.
->=20
-> I guess this is for msdos filesystem maintainers to decide.
-
-Yes!
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---uelhbz7cmchbh2fr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXhTCIAAKCRCL8Mk9A+RD
-UsF7AJ9F2SRZ9iGtWdPUOIf/F7cGh/vSfQCgnZEHYTrE7RxwVOhGPebC7+Gdz1g=
-=zjaq
------END PGP SIGNATURE-----
-
---uelhbz7cmchbh2fr--
+					- Ted
