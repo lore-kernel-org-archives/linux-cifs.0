@@ -2,33 +2,61 @@ Return-Path: <SRS0=wi6E=24=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB42C282DD
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jan 2020 20:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54013C282DD
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jan 2020 20:37:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3967F2080A
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jan 2020 20:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10D8B2072A
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Jan 2020 20:37:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C/67CYdw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728451AbgAGUEt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 Jan 2020 15:04:49 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:54363 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728358AbgAGUEt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Jan 2020 15:04:49 -0500
-Received: from callcc.thunk.org (guestnat-104-133-0-111.corp.google.com [104.133.0.111] (may be forged))
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 007K31WJ002663
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 7 Jan 2020 15:03:02 -0500
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id B2F684207DF; Tue,  7 Jan 2020 15:03:01 -0500 (EST)
-Date:   Tue, 7 Jan 2020 15:03:01 -0500
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+        id S1726210AbgAGUhi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 7 Jan 2020 15:37:38 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37958 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726149AbgAGUhi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Jan 2020 15:37:38 -0500
+Received: by mail-wr1-f65.google.com with SMTP id y17so1019978wrh.5;
+        Tue, 07 Jan 2020 12:37:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=XaL6t4v2vQUuUGBKgzCS+DPAs1rbOJ+x6CyTwGXWZL0=;
+        b=C/67CYdw9EiQTFkhFOwzG+gP69UccHKLh6hfprav8IpJr0WD44mZdr9L0I3GqHUVCR
+         69B49Dtk6DdGFFD96VjQpGzVRINXuzjfBYTdbu3BBIrM3Y6GOf2C8U1DOEhjyz/JV0Kw
+         aDGH2skhGmNK5EHAIhCzbiSh47rqgBtqxTxf3117roTrL09CcWRlEG5PYlWMfRJlz4yh
+         bLIHla0MAFoFcee11+QehjnhjA3kkAjIBzP+ykypocJCRQGmx492N0eda6mclwoZuW6u
+         kMKoBXA9s8fDoVpePlCUv94RD/myDhPz/3B3aCQYFmny7I6I79rLoxU2ZSTcHHXv+M+a
+         aTwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=XaL6t4v2vQUuUGBKgzCS+DPAs1rbOJ+x6CyTwGXWZL0=;
+        b=By8vFvBIgS12NLPKclqzToubROVAFBEMNTqqmOaHRh/DCMohLkY6zmPNYmgFM4Z8Cn
+         Zl7t/nHtMJGqkH7pY7RUqGCsFy8sFDJXAHOaQQwL+bRtC33vsdJFfZePFerJZtBRvk9G
+         cJ1KnyZg9aZgjZ2INFy7ilI/X9yAKfHIM6RxZ3GkCj51aqjH4O0/C91SPeKYnKmzIJ10
+         3G8hbMjGMopsPl6ObsHp26+4AVFn+t0ed/3nb9J9RcB7MVW2p12cTDfK6D+A+mEmlhRu
+         M6alME6CSUxevy84i9C55uX7L8EGXEd5+9ZQsjfRCSpDphm8wKbBMPaxp+9tOiFvkRF4
+         MKAQ==
+X-Gm-Message-State: APjAAAXhp2FPhPR7hiQmklsN+tm9WsvD7MST/26M2x1VtMnTRVzXWZwr
+        vH0WMwM9/X9nak9hYOjToYSNTsJA/1k=
+X-Google-Smtp-Source: APXvYqyD0plNPIcXsFUAfF5pcRe9N7C+GGkj6Hfr9SCzoDTfpq5AQglUrgRw/V+S9kk8LgpZ51NLkw==
+X-Received: by 2002:a05:6000:12c9:: with SMTP id l9mr969096wrx.304.1578429454861;
+        Tue, 07 Jan 2020 12:37:34 -0800 (PST)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id o129sm957337wmb.1.2020.01.07.12.37.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jan 2020 12:37:33 -0800 (PST)
+Date:   Tue, 7 Jan 2020 21:37:32 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
 Cc:     Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org,
         linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
@@ -47,48 +75,139 @@ Cc:     Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org,
         Pavel Machek <pavel@ucw.cz>,
         Christoph Hellwig <hch@infradead.org>
 Subject: Re: Unification of filesystem encoding options
-Message-ID: <20200107200301.GE3619@mit.edu>
+Message-ID: <20200107203732.ab4jnfgsjobtt5xa@pali>
 References: <20200102211855.gg62r7jshp742d6i@pali>
  <20200107133233.GC25547@quack2.suse.cz>
  <20200107173842.ciskn4ahuhiklycm@pali>
+ <20200107200301.GE3619@mit.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="77fn7474fypyqytm"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200107173842.ciskn4ahuhiklycm@pali>
+In-Reply-To: <20200107200301.GE3619@mit.edu>
+User-Agent: NeoMutt/20180716
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Jan 07, 2020 at 06:38:42PM +0100, Pali Rohár wrote:
-> Adding support for case-insensitivity into UTF-8 NLS encoding would mean
-> to create completely new kernel NLS API (which would support variable
-> length encodings) and rewrite all NLS filesystems to use this new API.
-> Also all existing NLS encodings would be needed to port into this new
-> API.
-> 
-> It is really something which have a value? Just because of UTF-8?
-> 
-> For me it looks like better option would be to remove UTF-8 NLS encoding
-> as it is broken. Some filesystems already do not use NLS API for their
-> UTF-8 support (e.g. vfat, udf or newly prepared exfat). And others could
-> be modified/extended/fixed in similar way.
 
-You didn't mention ext4 and f2fs, which is using the Unicode code in
-fs/unicode for its case-folding and normalization support.  Ext4 and
-f2fs only supports utf-8, so using the NLS API would have added no
-value --- and it as you pointed out, the NLS API doesn't support
-variable length encoding anyway.  In contrast the fs/unicode functions
-have support for full Unicode case folding and normalization, and
-currently has the latest Unicode 12.1 tables (released May 2019).
+--77fn7474fypyqytm
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-What I'd suggest is to create a new API, enhancing the functions in
-fs/unicode, to support those file systems that need to deal with
-UTF-16 and UTF-32 for their on-disk directory format, and that we
-assume that for the most part, userspace *will* be using a UTF-8
-encoding for the user<->kernel interface.  We can keep the existing
-NLS interface and mount options for legacy support, but in my opinion
-it's not worth the effort to try to do anything else.
+On Tuesday 07 January 2020 15:03:01 Theodore Y. Ts'o wrote:
+> On Tue, Jan 07, 2020 at 06:38:42PM +0100, Pali Roh=C3=A1r wrote:
+> > Adding support for case-insensitivity into UTF-8 NLS encoding would mean
+> > to create completely new kernel NLS API (which would support variable
+> > length encodings) and rewrite all NLS filesystems to use this new API.
+> > Also all existing NLS encodings would be needed to port into this new
+> > API.
+> >=20
+> > It is really something which have a value? Just because of UTF-8?
+> >=20
+> > For me it looks like better option would be to remove UTF-8 NLS encoding
+> > as it is broken. Some filesystems already do not use NLS API for their
+> > UTF-8 support (e.g. vfat, udf or newly prepared exfat). And others could
+> > be modified/extended/fixed in similar way.
+>=20
+> You didn't mention ext4 and f2fs, which is using the Unicode code in
+> fs/unicode for its case-folding and normalization support.
 
-					- Ted
+Hi! I have not mentioned because I took only filesystems which use NLS.
+And also I forgot that ext4 now has unicode flag which basically put
+this filesystem into group where FS "enforce" encoding of on disk
+structure.
+
+> Ext4 and
+> f2fs only supports utf-8, so using the NLS API would have added no
+> value --- and it as you pointed out, the NLS API doesn't support
+> variable length encoding anyway.
+
+Theoretically using NLS API could have a value if userspace is
+configured to work in e.g. Latin1 encoding and you want to use ext4/f2fs
+with unicode flag in this userspace (NLS API in this case could convert
+3byte UTF-8 to Latin1). But it is very theoretical and limited use case.
+
+> In contrast the fs/unicode functions
+> have support for full Unicode case folding and normalization, and
+> currently has the latest Unicode 12.1 tables (released May 2019).
+
+That is great!
+
+But for example even this is not enough for exfat. exfat has stored
+upcase table directly in on-disk FS, so ensure that every implementation
+of exfat driver would have same rules how to convert character (code
+point) to upper case or lower case (case folding). Upcase table is
+stored to FS itself when formatting. And in MS decided that for exfat
+would not be used any Unicode normalization. So this whole fs/unicode
+code is not usable for exfat.
+
+> What I'd suggest is to create a new API, enhancing the functions in
+> fs/unicode, to support those file systems that need to deal with
+> UTF-16 and UTF-32 for their on-disk directory format, and that we
+> assume that for the most part, userspace *will* be using a UTF-8
+> encoding for the user<->kernel interface.
+
+I do not see a use-case for such a new API. Kernel has already API
+functions:
+
+    int utf8_to_utf32(const u8 *s, int len, unicode_t *pu);
+    int utf32_to_utf8(unicode_t u, u8 *s, int maxlen);
+    int utf8s_to_utf16s(const u8 *s, int len, enum utf16_endian endian, wch=
+ar_t *pwcs, int maxlen);
+    int utf16s_to_utf8s(const wchar_t *pwcs, int len, enum utf16_endian end=
+ian, u8 *s, int maxlen);
+
+which are basically enough for all mentioned filesystems. Maybe in for
+some cases would be useful function utf16 to utf32 (and vice-versa), but
+that is all. fs/unicode does not bring a new value or simplification.
+
+Mentioned filesystems are in most cases either case-sensitive (UDF),
+having own case-folding (exfat), using own special normalization
+incompatible with anything (hfsplus) or do not enforce any normalization
+(cifs, vfat, ntfs, isofs+joliet). So result is that simple UTF-8 to
+UTF-16LE/BE conversion function is enough and then filesystem module
+implements own specific rules (special upcase table, incompatible
+normalization).
+
+And I do not thing that it make sense to extending fs/unicode for every
+one stupid functionality which those filesystems have and needs to
+handle. I see this as a unique filesystem specific code.
+
+> We can keep the existing
+> NLS interface and mount options for legacy support, but in my opinion
+> it's not worth the effort to try to do anything else.
+
+NLS interface is crucial part of VFAT. Reason is that in VFAT can be
+filenames stored either as UTF-16LE or as 8bit in some CP encoding.
+Linux kernel stores new non-7-bit-ASCII filenames as UTF-16LE, but it
+has to able to read 8-bit filenames which were not stored as UTF-16LE,
+but rather as 8bit in CP encoding. And therefore mount option codepage=3D
+which specify it is required needs to be implemented. It says how
+vfat.ko should handle on-disk structure, not which encoding is exported
+to userspace (those are two different things).
+
+And current vfat implementation uses NLS API for it. Via CONFIG_* is
+specified default codepage=3D mount option (CP473 or what it is -- if you
+do not specify one explicitly at mount time). And because FAT is
+required part of UEFI, Linux kernel would have to support this stuff
+forever (or at least until it support UEFI). I think this cannot be
+marked as "legacy". It is pity, but truth.
+
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
+
+--77fn7474fypyqytm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXhTsCgAKCRCL8Mk9A+RD
+UtPtAKCm4SOQXuN/Oeg6lDHCG/Gp5bqLKgCfTCeg9MXar+6v7z2MH87xYH2CpYo=
+=utpq
+-----END PGP SIGNATURE-----
+
+--77fn7474fypyqytm--
