@@ -2,78 +2,615 @@ Return-Path: <SRS0=5TF8=26=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A5DC282DD
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jan 2020 13:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B89DCC33CA2
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jan 2020 16:07:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3D8C2072A
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jan 2020 13:06:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7037920661
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jan 2020 16:07:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="dsk7vEUU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XkU5PlAR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728435AbgAINGp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 9 Jan 2020 08:06:45 -0500
-Received: from mx.cjr.nz ([51.158.111.142]:40934 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730471AbgAINGp (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 9 Jan 2020 08:06:45 -0500
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id EAF9E808C0;
-        Thu,  9 Jan 2020 13:06:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1578575203;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sZasYUESR4DSh0lVK71V9TVjOHaoB9cH6O288Vq1hBM=;
-        b=dsk7vEUUIeB8blQoqvqhwh3A6qV+S6SS0+PIT+980dLp+xJTIqxy6XcbSTTehUncGygyrj
-        rpwZoQPn3q0sYF0UPRjOpx3Ln1/AdRD5CAa3TYFEbqkjWxAxEIACY69rNTyt6p9cfSPs28
-        U6SqOHip0JuLbMeJcUwl15xlT40KpNuKQ9twUY32wdlSxoy2klLE0O48MEZmgpqyzeUDUY
-        1hC5bjnDZmmIQbGMYjLDj9bF+dSGc/iuT/7vG7GjzXFKyn9A5YodMCwjjZZnstPk9hyWDL
-        9Hj1P+wzumc52nSE1jazsAIs/tXsEnUpVemuKjkfKRkL561riy5EkFQzKksiTQ==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Subject: Re: cifs.upcall requests ticket for wrong host when using dfs
-In-Reply-To: <3ddf0683-0213-1c43-bcc7-cfc3cb8bc28b@prodrive-technologies.com>
-References: <39643d7d-2abb-14d3-ced6-c394fab9a777@prodrive-technologies.com>
- <87png0boej.fsf@cjr.nz>
- <5260c45c-0a31-168d-f9db-83bb6bd4a2cf@prodrive-technologies.com>
- <878smoqouf.fsf@cjr.nz>
- <VE1PR02MB55503665681374E805CA7815F53C0@VE1PR02MB5550.eurprd02.prod.outlook.com>
- <87k16417ud.fsf@cjr.nz>
- <VE1PR02MB55502AA359141C1D29B2AB82F53F0@VE1PR02MB5550.eurprd02.prod.outlook.com>
- <87y2uh264k.fsf@cjr.nz>
- <3ddf0683-0213-1c43-bcc7-cfc3cb8bc28b@prodrive-technologies.com>
-Date:   Thu, 09 Jan 2020 10:06:40 -0300
-Message-ID: <871rs8eq3j.fsf@cjr.nz>
+        id S1733160AbgAIQHX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 9 Jan 2020 11:07:23 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:42754 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733124AbgAIQHW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Jan 2020 11:07:22 -0500
+Received: by mail-oi1-f194.google.com with SMTP id 18so6264070oin.9
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Jan 2020 08:07:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=kXkR02KMQUjoHl2oE7ICna2BidhFbvpA98/jkSfITdY=;
+        b=XkU5PlARahDIY11MloeM3R2IhsN8l+yfBApdwGfx/QAVjwPWEayaDjy3C7i7wrdHZR
+         K7/eIaQudv2Z1MgpYqp5tjYLGG3QAVRR5lQX3+o9zetaSw+ScMQgvLi+a9l6HLQOaV40
+         5gF4/5m/3KdkWS9Iy6tL1TKvckn72Vj/mA8qkF7hk8LF/ivPFvSC/qIPKXkT4W05LJb7
+         0LyImfMrTRlZ37iHuS36opxpgsWU0X/Ut/JfpJQmahuN3/+fu0GMysfh4ExzSkj8UIg2
+         jf6HXYwhrWdxT29ihFHVK0FvsmWnNRGkfMwbJcBTSgnaOXMPOoxBdR/TXNqaXeSqH1HW
+         O0gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=kXkR02KMQUjoHl2oE7ICna2BidhFbvpA98/jkSfITdY=;
+        b=Q1s+eiDa1mqJIbQwcrKPMrp2Wemwzgp8mmUB/vlGv758L4QMsZoioX3CXRZX4C4t0w
+         cx38togOlSu78C724gdS8ETHcbh/Vx2z0jEgJBhw1jBFyi1Le7xr46Xe1WMkmrkZUgaP
+         lDjMXcld25majgqz0GpkgjvZJ9VKBT3lVPFQyw8xFCIEeQ9ra6SSsQgq21KVgWbdZp5z
+         BgQIQ/BKKOgzkQZKASPckZSHUyVbn6yi+wqQo5D1yxBSZF0DaGaXAmou3snn03zp0vd/
+         JZQjOA1HKQSHQ1b80Fp+FlwlA6vB4IvuP8beARqqr1PIRaFXmhUcONwYiGWkOQLW4u+c
+         QzAQ==
+X-Gm-Message-State: APjAAAVFP9EYFqaw18P1urRWd8j/3XW59BqtVcJS/a0NxuD7AD6jXqLy
+        PmdDqdgeJWhihZGDJff7pFWmsydMDOZqDyNyc98=
+X-Google-Smtp-Source: APXvYqxr2JDVb3c4RpOL6xNYp1tgtK9hVtUdxcwgl8wiklax8WG19dxceQjBhZ+A4d7lGjQwh/eAC0sN6Z0e6M/jE5k=
+X-Received: by 2002:aca:f1c2:: with SMTP id p185mr3773519oih.87.1578586041460;
+ Thu, 09 Jan 2020 08:07:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20200106163119.9083-1-boris.v.protopopov@gmail.com>
+ <20200106163119.9083-2-boris.v.protopopov@gmail.com> <CAKywueSK-_zzF-K3_ehmLT3yje_hGaQU-1z-G3hYugMv3ZV-eA@mail.gmail.com>
+In-Reply-To: <CAKywueSK-_zzF-K3_ehmLT3yje_hGaQU-1z-G3hYugMv3ZV-eA@mail.gmail.com>
+From:   Boris Protopopov <boris.v.protopopov@gmail.com>
+Date:   Thu, 9 Jan 2020 11:07:10 -0500
+Message-ID: <CAHhKpQ7PCQXgvXkjTUuPtX2OHVxee9seGyRT=omJXvZLt3=ygg@mail.gmail.com>
+Subject: Re: [PATCH] Add support for setting owner and group in ntsd
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        sblbir@amazon.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Martijn,
+Yes, there is a patch that I have recently posted to linux-cifs and
+linux-kernel list (subject line "Add support for setting owner info,
+dos attributes, and create time") that enable setting owner/group in
+ntsd, file native attributes, and file create time.
 
-Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com> writes:
+Best regards, Boris Protopopov.
 
-> Yes, so far so good. Thanks a lot for the quick response! Not a trivial 
-> patch as far I as i can judge.
 
-Cool! Thanks for the confirmation. Just sent a patch with this fix, BTW.
-
-> Also the machine we have running with your other DFS patches is running 
-> for 8 weeks now and survived several relocations of our dfs shares and 
-> adding/removal of DCs!
+On Wed, Jan 8, 2020 at 3:42 PM Pavel Shilovsky <piastryyy@gmail.com> wrote:
 >
-> Is there any news on the acceptance of your [PATCH v4 0/6] DFS fixes?
-
-I don't have any news, but I'll talk to Steve and Aurelien about them.
-
-Thanks,
-Paulo
+> =D0=BF=D0=BD, 6 =D1=8F=D0=BD=D0=B2. 2020 =D0=B3. =D0=B2 08:31, Boris Prot=
+opopov <boris.v.protopopov@gmail.com>:
+> >
+> > Extend setcifsacl utility to allow setting owner and group SIDs
+> > in the security descriptor in addition to setting ACLs. This is
+> > a user-friendly intefrace for setting owner and group SIDs that
+> > takes advantage of the recent extensions in the CIFS kernel
+> > client, and it complements setting raw values via setfattr.
+> >
+> > Signed-off-by: Boris Protopopov <boris.v.protopopov@gmail.com>
+>
+> Thanks for the patch. Could you clarify which recent changes in the
+> CIFS kernel client are referenced in the patch description?
+>
+> > ---
+> >  cifsacl.h         |   4 +-
+> >  setcifsacl.c      | 253 ++++++++++++++++++++++++++++++++++++++++++++--=
+--------
+> >  setcifsacl.rst.in |  27 ++++--
+> >  3 files changed, 235 insertions(+), 49 deletions(-)
+> >
+> > diff --git a/cifsacl.h b/cifsacl.h
+> > index ca72dd4..bd0c695 100644
+> > --- a/cifsacl.h
+> > +++ b/cifsacl.h
+> > @@ -26,7 +26,9 @@
+> >  #define _CIFSACL_H
+> >
+> >  #define BUFSIZE 1024
+> > -#define ATTRNAME "system.cifs_acl"
+> > +#define ATTRNAME       "system.cifs_acl"
+> > +#define ATTRNAME_ACL   ATTRNAME
+> > +#define ATTRNAME_NTSD  "system.cifs_ntsd"
+> >
+> >  #define MAX_NUM_AUTHS 6
+> >
+> > diff --git a/setcifsacl.c b/setcifsacl.c
+> > index 9a301e2..6e5a633 100644
+> > --- a/setcifsacl.c
+> > +++ b/setcifsacl.c
+> > @@ -44,7 +44,9 @@ enum setcifsacl_actions {
+> >         ActDelete,
+> >         ActModify,
+> >         ActAdd,
+> > -       ActSet
+> > +       ActSetAcl,
+> > +       ActSetOwner,
+> > +       ActSetGroup
+> >  };
+> >
+> >  static void *plugin_handle;
+> > @@ -140,6 +142,90 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struc=
+t cifs_ntsd *pnntsd,
+> >         return bufsize;
+> >  }
+> >
+> > +/*
+> > + * This function (and the one above) does not need to set the SACL-rel=
+ated
+> > + * fields, and this works fine because on the SMB protocol level, sett=
+ing owner
+> > + * info, DACL, and SACL requires one to use separate flags that contro=
+l which
+> > + * part of the descriptor is begin looked at on the server side
+> > + */
+> > +static ssize_t
+> > +copy_sec_desc_with_sid(const struct cifs_ntsd *pntsd, struct cifs_ntsd=
+ *pnntsd,
+> > +               struct cifs_sid *sid, int maction)
+> > +{
+> > +       int size, daclsize;
+> > +       int osidoffset, gsidoffset, dacloffset;
+> > +       int nosidoffset, ngsidoffset, ndacloffset, nsidssize;
+> > +       ssize_t bufsize;
+> > +       struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
+> > +       struct cifs_sid *nowner_sid_ptr, *ngroup_sid_ptr;
+> > +       struct cifs_ctrl_acl *dacl_ptr, *ndacl_ptr;
+> > +
+> > +       /* copy security descriptor control portion */
+> > +       osidoffset =3D le32toh(pntsd->osidoffset);
+> > +       gsidoffset =3D le32toh(pntsd->gsidoffset);
+> > +       dacloffset =3D le32toh(pntsd->dacloffset);
+> > +       /*
+> > +        * the size of the owner or group sid might be different from t=
+he old
+> > +        * one, so the group sid offest might change, and if the owner =
+is
+> > +        * positioned before the DACL, the dacl offset might change as =
+well;
+> > +        * note however, that the owner sid offset does not change
+> > +        */
+> > +       nosidoffset =3D osidoffset;
+> > +       size =3D sizeof(struct cifs_ntsd);
+> > +       pnntsd->revision =3D pntsd->revision;
+> > +       pnntsd->type =3D pntsd->type;
+> > +       pnntsd->osidoffset =3D pntsd->osidoffset;
+> > +       bufsize =3D size;
+> > +
+> > +       /* set the pointers for source sids */
+> > +       if (maction =3D=3D ActSetOwner) {
+> > +               owner_sid_ptr =3D sid;
+> > +               group_sid_ptr =3D (struct cifs_sid *)((char *)pntsd + g=
+sidoffset);
+> > +       }
+> > +       if (maction =3D=3D ActSetGroup) {
+> > +               owner_sid_ptr =3D (struct cifs_sid *)((char *)pntsd + o=
+sidoffset);
+> > +               group_sid_ptr =3D sid;
+> > +       }
+> > +
+> > +       dacl_ptr =3D (struct cifs_ctrl_acl *)((char *)pntsd + dacloffse=
+t);
+> > +       daclsize =3D le16toh(dacl_ptr->size) + sizeof(struct cifs_ctrl_=
+acl);
+> > +
+> > +       /* copy owner sid */
+> > +       nowner_sid_ptr =3D (struct cifs_sid *)((char *)pnntsd + nosidof=
+fset);
+> > +       size =3D copy_cifs_sid(nowner_sid_ptr, owner_sid_ptr);
+> > +       bufsize +=3D size;
+> > +       nsidssize =3D size;
+> > +
+> > +       /* copy group sid */
+> > +       ngsidoffset =3D nosidoffset + size;
+> > +       ngroup_sid_ptr =3D (struct cifs_sid *)((char *)pnntsd + ngsidof=
+fset);
+> > +       pnntsd->gsidoffset =3D htole32(ngsidoffset);
+> > +       size =3D copy_cifs_sid(ngroup_sid_ptr, group_sid_ptr);
+> > +       bufsize +=3D size;
+> > +       nsidssize +=3D size;
+> > +
+> > +       /* position the dacl control info as in the fetched descriptor =
+*/
+> > +       if (dacloffset <=3D osidoffset)
+> > +               ndacloffset =3D dacloffset;
+> > +       else
+> > +               ndacloffset =3D nosidoffset + nsidssize;
+> > +       ndacl_ptr =3D (struct cifs_ctrl_acl *)((char *)pnntsd + ndaclof=
+fset);
+> > +       pnntsd->dacloffset =3D htole32(ndacloffset);
+> > +
+> > +       /* the DACL control fields do not change */
+> > +       ndacl_ptr->revision =3D dacl_ptr->revision;
+> > +       ndacl_ptr->size =3D dacl_ptr->size;
+> > +       ndacl_ptr->num_aces =3D dacl_ptr->num_aces;
+> > +
+> > +       /*
+> > +        * add DACL size (control portion and the array of aces) to the
+> > +        * buffer size
+> > +        */
+> > +       bufsize +=3D daclsize;
+> > +
+> > +       return bufsize;
+> > +}
+> > +
+> >  static int
+> >  copy_ace(struct cifs_ace *dace, struct cifs_ace *sace)
+> >  {
+> > @@ -788,7 +874,7 @@ setacl_action(struct cifs_ntsd *pntsd, struct cifs_=
+ntsd **npntsd,
+> >                 rc =3D ace_add(pntsd, npntsd, bufsize, facesptr,
+> >                                 numfaces, cacesptr, numcaces);
+> >                 break;
+> > -       case ActSet:
+> > +       case ActSetAcl:
+> >                 rc =3D ace_set(pntsd, npntsd, bufsize, cacesptr, numcac=
+es);
+> >                 break;
+> >         default:
+> > @@ -803,9 +889,10 @@ static void
+> >  setcifsacl_usage(const char *prog)
+> >  {
+> >         fprintf(stderr,
+> > -       "%s: Alter CIFS/NTFS ACL in a security descriptor of a file obj=
+ect\n",
+> > +       "%s: Alter CIFS/NTFS ACL or owner/group in a security descripto=
+r of a file object\n",
+> > +               prog);
+> > +       fprintf(stderr, "Usage: %s option [<list_of_ACEs>|<SID>] <file_=
+name>\n",
+> >                 prog);
+> > -       fprintf(stderr, "Usage: %s option <list_of_ACEs> <file_name>\n"=
+, prog);
+> >         fprintf(stderr, "Valid options:\n");
+> >         fprintf(stderr, "\t-v   Version of the program\n");
+> >         fprintf(stderr, "\n\t-a Add ACE(s), separated by a comma, to an=
+ ACL\n");
+> > @@ -825,21 +912,32 @@ setcifsacl_usage(const char *prog)
+> >         "\n\t-S Replace existing ACL with ACE(s), separated by a comma\=
+n");
+> >         fprintf(stderr,
+> >         "\tsetcifsacl -S \"ACL:Administrator:ALLOWED/0x0/D\" <file_name=
+>\n");
+> > +       fprintf(stderr,
+> > +       "\n\t-o Set owner using specified SID (name or raw format)\n");
+> > +       fprintf(stderr,
+> > +       "\tsetcifsacl -o \"Administrator\" <file_name>\n");
+> > +       fprintf(stderr,
+> > +       "\n\t-g Set group using specified SID (name or raw format)\n");
+> > +       fprintf(stderr,
+> > +       "\tsetcifsacl -g \"Administrators\" <file_name>\n");
+> >         fprintf(stderr, "\nRefer to setcifsacl(1) manpage for details\n=
+");
+> >  }
+> >
+> >  int
+> >  main(const int argc, char *const argv[])
+> >  {
+> > -       int i, rc, c, numcaces, numfaces;
+> > +       int i, rc, c, numcaces =3D 0, numfaces =3D 0;
+> >         enum setcifsacl_actions maction =3D ActUnknown;
+> >         ssize_t attrlen, bufsize =3D BUFSIZE;
+> > -       char *ace_list, *filename, *attrval, **arrptr =3D NULL;
+> > +       char *ace_list =3D NULL, *filename =3D NULL, *attrval =3D NULL,
+> > +               **arrptr =3D NULL, *sid_str =3D NULL;
+> >         struct cifs_ctrl_acl *daclptr =3D NULL;
+> >         struct cifs_ace **cacesptr =3D NULL, **facesptr =3D NULL;
+> >         struct cifs_ntsd *ntsdptr =3D NULL;
+> > +       struct cifs_sid sid;
+> > +       char *attrname =3D ATTRNAME_ACL;
+> >
+> > -       c =3D getopt(argc, argv, "hvD:M:a:S:");
+> > +       c =3D getopt(argc, argv, "hvD:M:a:S:o:g:");
+> >         switch (c) {
+> >         case 'D':
+> >                 maction =3D ActDelete;
+> > @@ -854,9 +952,19 @@ main(const int argc, char *const argv[])
+> >                 ace_list =3D optarg;
+> >                 break;
+> >         case 'S':
+> > -               maction =3D ActSet;
+> > +               maction =3D ActSetAcl;
+> >                 ace_list =3D optarg;
+> >                 break;
+> > +       case 'o':
+> > +               maction =3D ActSetOwner;
+> > +               sid_str =3D optarg;
+> > +               attrname =3D ATTRNAME_NTSD;
+> > +               break;
+> > +       case 'g':
+> > +               maction =3D ActSetGroup;
+> > +               sid_str =3D optarg;
+> > +               attrname =3D ATTRNAME_NTSD;
+> > +               break;
+> >         case 'h':
+> >                 setcifsacl_usage(basename(argv[0]));
+> >                 return 0;
+> > @@ -875,11 +983,16 @@ main(const int argc, char *const argv[])
+> >         }
+> >         filename =3D argv[3];
+> >
+> > -       if (!ace_list) {
+> > +       if (!ace_list && maction !=3D ActSetOwner && maction !=3D ActSe=
+tGroup) {
+> >                 printf("%s: No valid ACEs specified\n", __func__);
+> >                 return -1;
+> >         }
+> >
+> > +       if (!sid_str && (maction =3D=3D ActSetOwner || maction =3D=3D A=
+ctSetGroup)) {
+> > +               printf("%s: No valid SIDs specified\n", __func__);
+> > +               return -1;
+> > +       }
+> > +
+> >         if (init_plugin(&plugin_handle)) {
+> >                 fprintf(stderr, "WARNING: unable to initialize idmappin=
+g "
+> >                                 "plugin. Only \"raw\" SID strings will =
+be "
+> > @@ -889,16 +1002,24 @@ main(const int argc, char *const argv[])
+> >                 plugin_loaded =3D true;
+> >         }
+> >
+> > -       numcaces =3D get_numcaces(ace_list);
+> > -
+> > -       arrptr =3D parse_cmdline_aces(ace_list, numcaces);
+> > -       if (!arrptr)
+> > -               goto setcifsacl_numcaces_ret;
+> > +       if (maction =3D=3D ActSetOwner || maction =3D=3D ActSetGroup) {
+> > +               /* parse the sid */
+> > +               if (setcifsacl_str_to_sid(sid_str, &sid)) {
+> > +                       printf("%s: failed to parce \'%s\' as SID\n", _=
+_func__,
+> > +                               sid_str);
+> > +                       goto setcifsacl_numcaces_ret;
+> > +               }
+> > +       } else {
+> > +               numcaces =3D get_numcaces(ace_list);
+> >
+> > -       cacesptr =3D build_cmdline_aces(arrptr, numcaces);
+> > -       if (!cacesptr)
+> > -               goto setcifsacl_cmdlineparse_ret;
+> > +               arrptr =3D parse_cmdline_aces(ace_list, numcaces);
+> > +               if (!arrptr)
+> > +                       goto setcifsacl_numcaces_ret;
+> >
+> > +               cacesptr =3D build_cmdline_aces(arrptr, numcaces);
+> > +               if (!cacesptr)
+> > +                       goto setcifsacl_cmdlineparse_ret;
+> > +       }
+> >  cifsacl:
+> >         if (bufsize >=3D XATTR_SIZE_MAX) {
+> >                 printf("%s: Buffer size %zd exceeds max size of %d\n",
+> > @@ -912,7 +1033,7 @@ cifsacl:
+> >                 goto setcifsacl_cmdlineverify_ret;
+> >         }
+> >
+> > -       attrlen =3D getxattr(filename, ATTRNAME, attrval, bufsize);
+> > +       attrlen =3D getxattr(filename, attrname, attrval, bufsize);
+> >         if (attrlen =3D=3D -1) {
+> >                 if (errno =3D=3D ERANGE) {
+> >                         free(attrval);
+> > @@ -924,26 +1045,64 @@ cifsacl:
+> >                 }
+> >         }
+> >
+> > -       numfaces =3D get_numfaces((struct cifs_ntsd *)attrval, attrlen,=
+ &daclptr);
+> > -       if (!numfaces && maction !=3D ActAdd) { /* if we are not adding=
+ aces */
+> > -               printf("%s: Empty DACL\n", __func__);
+> > -               goto setcifsacl_facenum_ret;
+> > -       }
+> > +       if (maction =3D=3D ActSetOwner || maction =3D=3D ActSetGroup) {
+> > +               struct cifs_ntsd *pfntsd =3D (struct cifs_ntsd *)attrva=
+l;
+> > +               int dacloffset =3D le32toh(pfntsd->dacloffset);
+> > +               struct cifs_ctrl_acl *daclinfo =3D
+> > +                               (struct cifs_ctrl_acl *)(attrval + dacl=
+offset);
+> > +               int numaces =3D le16toh(daclinfo->num_aces);
+> > +               int acessize =3D le32toh(daclinfo->size);
+> > +               size_t faceoffset, naceoffset;
+> > +               char *faceptr, *naceptr;
+> >
+> > -       facesptr =3D build_fetched_aces((char *)daclptr, numfaces);
+> > -       if (!facesptr)
+> > -               goto setcifsacl_facenum_ret;
+> > +               /*
+> > +                * this allocates large enough buffer for max sid size =
+and the
+> > +                * dacl info from the fetched security descriptor
+> > +                */
+> > +               rc =3D alloc_sec_desc(pfntsd, &ntsdptr, numaces, &faceo=
+ffset);
+> > +               if (rc)
+> > +                       goto setcifsacl_numcaces_ret;
+> >
+> > -       bufsize =3D 0;
+> > -       rc =3D setacl_action((struct cifs_ntsd *)attrval, &ntsdptr, &bu=
+fsize,
+> > -               facesptr, numfaces, cacesptr, numcaces, maction);
+> > -       if (rc)
+> > -               goto setcifsacl_action_ret;
+> > +               /*
+> > +                * copy the control structures from the fetched descrip=
+tor, the
+> > +                * sid specified by the user, and adjust the offsets/mo=
+ve dacl
+> > +                * control structure if needed
+> > +                */
+> > +               bufsize =3D copy_sec_desc_with_sid(pfntsd, ntsdptr, &si=
+d,
+> > +                               maction);
+> > +
+> > +               /* copy aces verbatim as they have not changed */
+> > +               faceptr =3D attrval + faceoffset;
+> > +               naceoffset =3D le32toh(ntsdptr->dacloffset) +
+> > +                               sizeof(struct cifs_ctrl_acl);
+> > +               naceptr =3D (char *)ntsdptr + naceoffset;
+> > +               memcpy(naceptr, faceptr, acessize);
+> > +       } else {
+> > +               bufsize =3D 0;
+> > +
+> > +               numfaces =3D get_numfaces((struct cifs_ntsd *)attrval, =
+attrlen,
+> > +                               &daclptr);
+> > +               if (!numfaces && maction !=3D ActAdd) {
+> > +                       /* if we are not adding aces */
+> > +                       printf("%s: Empty DACL\n", __func__);
+> > +                       goto setcifsacl_facenum_ret;
+> > +               }
+> > +
+> > +               facesptr =3D build_fetched_aces((char *)daclptr, numfac=
+es);
+> > +               if (!facesptr)
+> > +                       goto setcifsacl_facenum_ret;
+> >
+> > -       attrlen =3D setxattr(filename, ATTRNAME, ntsdptr, bufsize, 0);
+> > +               rc =3D setacl_action((struct cifs_ntsd *)attrval, &ntsd=
+ptr,
+> > +                               &bufsize, facesptr, numfaces, cacesptr,
+> > +                               numcaces, maction);
+> > +               if (rc)
+> > +                       goto setcifsacl_action_ret;
+> > +       }
+> > +
+> > +       attrlen =3D setxattr(filename, attrname, ntsdptr, bufsize, 0);
+> >         if (attrlen =3D=3D -1) {
+> >                 printf("%s: setxattr error: %s\n", __func__, strerror(e=
+rrno));
+> > -               goto setcifsacl_facenum_ret;
+> > +               goto setcifsacl_action_ret;
+> >         }
+> >
+> >         if (plugin_loaded)
+> > @@ -951,25 +1110,33 @@ cifsacl:
+> >         return 0;
+> >
+> >  setcifsacl_action_ret:
+> > -       free(ntsdptr);
+> > +       if (ntsdptr)
+> > +               free(ntsdptr);
+> >
+> >  setcifsacl_facenum_ret:
+> > -       for (i =3D 0; i < numfaces; ++i)
+> > -               free(facesptr[i]);
+> > -       free(facesptr);
+> > +       if (facesptr) {
+> > +               for (i =3D 0; i < numfaces; ++i)
+> > +                       free(facesptr[i]);
+> > +               free(facesptr);
+> > +       }
+> >
+> >  setcifsacl_getx_ret:
+> > -       free(attrval);
+> > +       if (attrval)
+> > +               free(attrval);
+> >
+> >  setcifsacl_cmdlineverify_ret:
+> > -       for (i =3D 0; i < numcaces; ++i)
+> > -               free(cacesptr[i]);
+> > -       free(cacesptr);
+> > +       if (cacesptr) {
+> > +               for (i =3D 0; i < numcaces; ++i)
+> > +                       free(cacesptr[i]);
+> > +               free(cacesptr);
+> > +       }
+> >
+> >  setcifsacl_cmdlineparse_ret:
+> > -       free(arrptr);
+> > +       if (arrptr)
+> > +               free(arrptr);
+> >
+> >  setcifsacl_numcaces_ret:
+> > -       exit_plugin(plugin_handle);
+> > +       if (plugin_loaded)
+> > +               exit_plugin(plugin_handle);
+> >         return -1;
+> >  }
+> > diff --git a/setcifsacl.rst.in b/setcifsacl.rst.in
+> > index de9c758..985af7c 100644
+> > --- a/setcifsacl.rst.in
+> > +++ b/setcifsacl.rst.in
+> > @@ -2,16 +2,16 @@
+> >  setcifsacl
+> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > -----------------------------------------------------------------------=
+--------------------------
+> > -Userspace helper to alter an ACL in a security descriptor for Common I=
+nternet File System (CIFS)
+> > -----------------------------------------------------------------------=
+--------------------------
+> > +----------------------------------------------------------------------=
+---------------------------------------------
+> > +Userspace helper to alter an ACL or owner/group SID in a security desc=
+riptor for Common Internet File System (CIFS)
+> > +----------------------------------------------------------------------=
+---------------------------------------------
+> >  :Manual section: 1
+> >
+> >  ********
+> >  SYNOPSIS
+> >  ********
+> >
+> > -  setcifsacl [-v|-a|-D|-M|-S] "{one or more ACEs}" {file system object=
+}
+> > +  setcifsacl [-v|-a|-D|-M|-S|-o|-g] "{one or more ACEs or a SID}" {fil=
+e system object}
+> >
+> >  ***********
+> >  DESCRIPTION
+> > @@ -20,7 +20,7 @@ DESCRIPTION
+> >  This tool is part of the cifs-utils suite.
+> >
+> >  ``setcifsacl`` is a userspace helper program for the Linux CIFS client
+> > -file system. It is intended to alter an ACL of a security descriptor
+> > +file system. It is intended to alter an ACL or set owner/group SID of =
+a security descriptor
+> >  for a file system object. Whether a security descriptor to be set is
+> >  applied or not is determined by the CIFS/SMB server.
+> >
+> > @@ -55,6 +55,13 @@ OPTIONS
+> >    Set an ACL of security descriptor with the list of ACEs Existing ACL
+> >    is replaced entirely with the specified ACEs.
+> >
+> > +-o
+> > +  Set owner SID to one specified as a command line argument.
+> > +
+> > +-g
+> > +  Set group SID to one specified as a command line argument.
+> > +
+> > +  The owner/group SID can be specified as a name or a raw SID value.
+> >    Every ACE entry starts with "ACL:" One or more ACEs are specified
+> >    within double quotes.  Multiple ACEs are separated by a comma.
+> >
+> > @@ -93,6 +100,16 @@ Set an ACL
+> >
+> >    setcifsacl -S "ACL:CIFSTESTDOM\Administrator:0x0/0x0/FULL,ACL:CIFSTE=
+STDOM\user2:0x0/0x0/FULL" <file_name>
+> >
+> > +Set owner SID
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +  setcifsacl -o "S-1-5-21-3338130290-3403600371-1423429424-2102" <file=
+_name>
+> > +
+> > +Set group SID
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +  setcifsacl -g "Administrators@BUILTIN" <file_name>
+> > +
+> >  *****
+> >  NOTES
+> >  *****
+> > --
+> > 2.14.5
+> >
+>
+>
+> --
+> Best regards,
+> Pavel Shilovsky
