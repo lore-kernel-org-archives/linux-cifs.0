@@ -1,4 +1,4 @@
-Return-Path: <SRS0=t/jT=3D=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=xi6A=3E=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,117 +7,83 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F6AC33C9E
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Jan 2020 23:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7264C33C9E
+	for <linux-cifs@archiver.kernel.org>; Wed, 15 Jan 2020 01:23:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 83D082075B
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Jan 2020 23:45:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E76124658
+	for <linux-cifs@archiver.kernel.org>; Wed, 15 Jan 2020 01:23:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YoetUD6T"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X7iE16ew"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728759AbgANXpz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Jan 2020 18:45:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31859 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728757AbgANXpz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Jan 2020 18:45:55 -0500
+        id S1728874AbgAOBXe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Jan 2020 20:23:34 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27696 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728862AbgAOBXe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 14 Jan 2020 20:23:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579045554;
+        s=mimecast20190719; t=1579051413;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=onsGIkWFBzdfk1KHltW97HcGUAAvBGZFhiHwafDjRZY=;
-        b=YoetUD6TAhI+Arw1T1feDD2y5yKbp/5hncJF7LTRX6lms7bNF4Cs0+fJ3/AbXHmvgM3AsQ
-        VlV1F5XqqpXzgjXBc/zW1E6we+IsrsnWVT5a9dA1djRTN6nzoOppCSbrcomHyKhI11UHHT
-        Su08ynszxE7esVXE51Mi909didPfXR0=
+         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
+        bh=tjRyWYPgjpbChzORh+hplaL0f98qTKL3yyJAnPuKxzQ=;
+        b=X7iE16ewRsUSdxgbMh7+Y0/Upw+tDVGcg0vah8BnZLKOpF5N+Lg+IzFJ0ft21G/jq49zGq
+        OUtxVCYBqVCr3/vo5si1k3FsM56Sv7J+yRdXzOWBRzwalzstjTJsfqekPO/yButPL9uA72
+        +hiP8qbsF3/lqgsAhHuRrShkUWBCSJg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-zvEsx356OaOfZvYyXXCF7A-1; Tue, 14 Jan 2020 18:45:51 -0500
-X-MC-Unique: zvEsx356OaOfZvYyXXCF7A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-258-ncLmBw3zOqaZmwfKJVA5Ag-1; Tue, 14 Jan 2020 20:23:31 -0500
+X-MC-Unique: ncLmBw3zOqaZmwfKJVA5Ag-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C751189CD20;
-        Tue, 14 Jan 2020 23:45:50 +0000 (UTC)
-Received: from hut.sorensonfamily.com.com (ovpn-117-144.phx2.redhat.com [10.3.117.144])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 87A5184330;
-        Tue, 14 Jan 2020 23:45:45 +0000 (UTC)
-From:   Frank Sorenson <sorenson@redhat.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     stfrench@microsoft.com, sorenson@redhat.com
-Subject: [PATCH] cifs: Fix mode output in debugging statements
-Date:   Tue, 14 Jan 2020 17:45:44 -0600
-Message-Id: <20200114234544.151108-1-sorenson@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01A246DD59
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Jan 2020 01:23:31 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-61.bne.redhat.com [10.64.54.61])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 89BE010018FF;
+        Wed, 15 Jan 2020 01:23:30 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH] cifs: add support for fallocate mode 0 for non-sparse files
+Date:   Wed, 15 Jan 2020 11:23:21 +1000
+Message-Id: <20200115012321.6780-2-lsahlber@redhat.com>
+In-Reply-To: <20200115012321.6780-1-lsahlber@redhat.com>
+References: <20200115012321.6780-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-A number of the debug statements output file or directory mode
-in hex.  Change these to print using octal.
+RHBZ 1336264
 
-Signed-off-by: Frank Sorenson <sorenson@redhat.com>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/cifs/cifsacl.c | 4 ++--
- fs/cifs/connect.c | 2 +-
- fs/cifs/inode.c   | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ fs/cifs/smb2ops.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 96ae72b556ac..58b4014fecb6 100644
---- a/fs/cifs/cifsacl.c
-+++ b/fs/cifs/cifsacl.c
-@@ -601,7 +601,7 @@ static void access_flags_to_mode(__le32 ace_flags, in=
-t type, umode_t *pmode,
- 			((flags & FILE_EXEC_RIGHTS) =3D=3D FILE_EXEC_RIGHTS))
- 		*pmode |=3D (S_IXUGO & (*pbits_to_set));
-=20
--	cifs_dbg(NOISY, "access flags 0x%x mode now 0x%x\n", flags, *pmode);
-+	cifs_dbg(NOISY, "access flags 0x%x mode now %04o\n", flags, *pmode);
- 	return;
- }
-=20
-@@ -630,7 +630,7 @@ static void mode_to_access_flags(umode_t mode, umode_=
-t bits_to_use,
- 	if (mode & S_IXUGO)
- 		*pace_flags |=3D SET_FILE_EXEC_RIGHTS;
-=20
--	cifs_dbg(NOISY, "mode: 0x%x, access flags now 0x%x\n",
-+	cifs_dbg(NOISY, "mode: %04o, access flags now 0x%x\n",
- 		 mode, *pace_flags);
- 	return;
- }
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 05ea0e2b7e0e..071f5d6726e5 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -4149,7 +4149,7 @@ int cifs_setup_cifs_sb(struct smb_vol *pvolume_info=
-,
- 	cifs_sb->mnt_gid =3D pvolume_info->linux_gid;
- 	cifs_sb->mnt_file_mode =3D pvolume_info->file_mode;
- 	cifs_sb->mnt_dir_mode =3D pvolume_info->dir_mode;
--	cifs_dbg(FYI, "file mode: 0x%hx  dir mode: 0x%hx\n",
-+	cifs_dbg(FYI, "file mode: %04ho  dir mode: %04ho\n",
- 		 cifs_sb->mnt_file_mode, cifs_sb->mnt_dir_mode);
-=20
- 	cifs_sb->actimeo =3D pvolume_info->actimeo;
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index ca76a9287456..b3f3675e1878 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1649,7 +1649,7 @@ int cifs_mkdir(struct inode *inode, struct dentry *=
-direntry, umode_t mode)
- 	struct TCP_Server_Info *server;
- 	char *full_path;
-=20
--	cifs_dbg(FYI, "In cifs_mkdir, mode =3D 0x%hx inode =3D 0x%p\n",
-+	cifs_dbg(FYI, "In cifs_mkdir, mode =3D %04ho inode =3D 0x%p\n",
- 		 mode, inode);
-=20
- 	cifs_sb =3D CIFS_SB(inode->i_sb);
---=20
-2.14.4
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 6250370c1170..91818f7c1b9c 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -3106,9 +3106,13 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 		else if (i_size_read(inode) >= off + len)
+ 			/* not extending file and already not sparse */
+ 			rc = 0;
+-		/* BB: in future add else clause to extend file */
+-		else
+-			rc = -EOPNOTSUPP;
++		/* extend file */
++		else {
++			eof = cpu_to_le64(off + len);
++			rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
++					  cfile->fid.volatile_fid, cfile->pid,
++					  &eof);
++		}
+ 		if (rc)
+ 			trace_smb3_falloc_err(xid, cfile->fid.persistent_fid,
+ 				tcon->tid, tcon->ses->Suid, off, len, rc);
+-- 
+2.13.6
 
