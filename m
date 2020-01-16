@@ -1,76 +1,143 @@
-Return-Path: <SRS0=xi6A=3E=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=6r7N=3F=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8075C33CB3
-	for <linux-cifs@archiver.kernel.org>; Wed, 15 Jan 2020 21:20:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 341F8C32771
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 02:03:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8404C2084D
-	for <linux-cifs@archiver.kernel.org>; Wed, 15 Jan 2020 21:20:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0627E222C3
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 02:03:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LsKYN4Mz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SmI5Tr8m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729320AbgAOVUI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 15 Jan 2020 16:20:08 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57788 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729318AbgAOVUG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 15 Jan 2020 16:20:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579123206;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/9aI+XysB2K8PkWSb2xgoTza9SmIoeznTkyTmdcAhMI=;
-        b=LsKYN4MzHgT8eyx3aaNnqkqULZwjMOL+GhwuhwCEDENefbieZO+XwzSlkMthEM9irWf5dL
-        UVVOZ/4iEVLMlspxw8ZmsZvG0HJUAQLno+jXEPGOJPqrOxPTihsv5ocne6ovcc6yGVfdzp
-        OYpjTX4zS+j4qKm6RNC6t4GvLg2TuwY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-63FEipuPOjSs30P70YfqlA-1; Wed, 15 Jan 2020 16:20:02 -0500
-X-MC-Unique: 63FEipuPOjSs30P70YfqlA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BABD92FA0;
-        Wed, 15 Jan 2020 21:20:01 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-52.rdu2.redhat.com [10.10.120.52])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6661160BE0;
-        Wed, 15 Jan 2020 21:20:00 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAH2r5msP9W5Jd+=W0oFnEbqzj5dYEzdiydSoX0m0sdZ5KOF-zQ@mail.gmail.com>
-References: <CAH2r5msP9W5Jd+=W0oFnEbqzj5dYEzdiydSoX0m0sdZ5KOF-zQ@mail.gmail.com> <157432403818.17624.9300948341879954830.stgit@warthog.procyon.org.uk>
-To:     Steve French <smfrench@gmail.com>
-Cc:     dhowells@redhat.com, Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH] cifs: Don't use iov_iter::type directly
+        id S1730355AbgAPCDY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 15 Jan 2020 21:03:24 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:35601 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729431AbgAPCDY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Jan 2020 21:03:24 -0500
+Received: by mail-io1-f66.google.com with SMTP id h8so20069532iob.2
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Jan 2020 18:03:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:cc;
+        bh=uLN8gvdsJzlF4d7rIsjRwvW4G+c/g0exjRqbdM0g7UU=;
+        b=SmI5Tr8mB9n091pJcZdDQxTJY1Ssn2ekLsegJGz5OZRVsFqPuoFQ6vcdU7tvoFlRyv
+         08le2PVmuJ1nUlj72ybU/riKSq9g39yuXMEc6W+y3FihDA7G0PmVvCJkepcwJ8bPeaC/
+         lu3KE3D1vgwHP1Jpes4Tv9wA/cU2/ASfH2aKNULKNZylmYelH/4bWLqwGjhejq9gR1So
+         3CP5dD4kwJpObDGryjy4iRHV9BCntNlYzuHS8vGMu6tQltKCPwfHiLfRr9V8WMzaiNLn
+         /mxHB+qWothDU0niNhYrf0TBYcNXROtvzYTkEb0pgdVmeE7IP6uDvu3PtyaTYcXd2rPp
+         X7Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:cc;
+        bh=uLN8gvdsJzlF4d7rIsjRwvW4G+c/g0exjRqbdM0g7UU=;
+        b=TnqJ+v0Du3+sJryYsO0FUrS4gMFpGYQ31LvGpdikU6jW3cPB0rqTGdTwEOoCfMTYx9
+         oSIYWa5Ul/SecUIF4DS4wtlwVtQ+T6iT+KBHl6mkv5aCP2wWvrvv/jaOQdfL49hM2yvQ
+         EOuWTE73DRPFVcI8qSt4mJv2bK+Ej41AV99vdNh653cuoiMcnVopMCTlhie6xWZS0oL5
+         i2MTw32ocPbRLxnvfp4+x37wxc2lNqdBCD3Rk1/fDg1aADN0cSbhPEWZtmkUrx4jN9x2
+         8xXYhiCcuJphQXayliLVfYUvAqT7CQhxkNQ69DxXhBJ+sKBROjL1cZXjL6KEPxMdhjeW
+         5zQg==
+X-Gm-Message-State: APjAAAWVnJgd+1JN6JmfcJiOY7ODUvYHGuOJftLdoSVDcu0kzVs4cMED
+        KQLN6Ea8iRPlgRMrSwDk8iZm8FNzK0cr4gHCJpU=
+X-Received: by 2002:a5d:84d1:: with SMTP id z17mt2700337ior.169.1579140203521;
+ Wed, 15 Jan 2020 18:03:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <26196.1579123199.1@warthog.procyon.org.uk>
-Date:   Wed, 15 Jan 2020 21:19:59 +0000
-Message-ID: <26197.1579123199@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20200115012321.6780-1-lsahlber@redhat.com> <20200115012321.6780-2-lsahlber@redhat.com>
+ <CAH2r5mst8zDCachJMZC-BgtJs2M7c1F+1VCf-Hfe68Qz0vQ8aQ@mail.gmail.com>
+ <CAN05THSBKBw3Az8UUW8fuV_K9_e9is+po1Q05m8mbcd5Rv_uUw@mail.gmail.com> <CAH2r5msuycQNBXYdJQF-1pnmzJcikMD-e2mYUWQNCLA_SFFsvw@mail.gmail.com>
+In-Reply-To: <CAH2r5msuycQNBXYdJQF-1pnmzJcikMD-e2mYUWQNCLA_SFFsvw@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 15 Jan 2020 20:03:12 -0600
+Message-ID: <CAH2r5mumEjNcCT=Dc4CMatjprWgBDGVS-3nsds2QqPoZMs8xZQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: add support for fallocate mode 0 for non-sparse files
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve French <smfrench@gmail.com> wrote:
+temporarily removed to allow Ronnie to debug a test failure
 
-> tentatively merged into cifs-2.6.git for-next (pending more of the
-> usual automated testing we do with the buildbot)
+On Wed, Jan 15, 2020 at 2:14 PM Steve French <smfrench@gmail.com> wrote:
+>
+> Tentatively merged into cifs-2.6.git for-next pending more testing
+>
+> On Tue, Jan 14, 2020 at 8:25 PM ronnie sahlberg
+> <ronniesahlberg@gmail.com> wrote:
+> >
+> > On Wed, Jan 15, 2020 at 11:25 AM Steve French <smfrench@gmail.com> wrote:
+> > >
+> > > Does it affect (or enable) any xfstests?
+> >
+> > It shouldn't affect any current tests.
+> > It adds support for
+> >    xfs_io -c "falloc 0 512M" <file>
+> >
+> > generic/071 now passes with this patch.   Possibly other tests as well
+> > that use "xfs_io -c falloc" as well
+> >
+> >
+> > >
+> > > On Tue, Jan 14, 2020 at 7:23 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+> > > >
+> > > > RHBZ 1336264
+> > > >
+> > > > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > > > ---
+> > > >  fs/cifs/smb2ops.c | 10 +++++++---
+> > > >  1 file changed, 7 insertions(+), 3 deletions(-)
+> > > >
+> > > > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> > > > index 6250370c1170..91818f7c1b9c 100644
+> > > > --- a/fs/cifs/smb2ops.c
+> > > > +++ b/fs/cifs/smb2ops.c
+> > > > @@ -3106,9 +3106,13 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+> > > >                 else if (i_size_read(inode) >= off + len)
+> > > >                         /* not extending file and already not sparse */
+> > > >                         rc = 0;
+> > > > -               /* BB: in future add else clause to extend file */
+> > > > -               else
+> > > > -                       rc = -EOPNOTSUPP;
+> > > > +               /* extend file */
+> > > > +               else {
+> > > > +                       eof = cpu_to_le64(off + len);
+> > > > +                       rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
+> > > > +                                         cfile->fid.volatile_fid, cfile->pid,
+> > > > +                                         &eof);
+> > > > +               }
+> > > >                 if (rc)
+> > > >                         trace_smb3_falloc_err(xid, cfile->fid.persistent_fid,
+> > > >                                 tcon->tid, tcon->ses->Suid, off, len, rc);
+> > > > --
+> > > > 2.13.6
+> > > >
+> > >
+> > >
+> > > --
+> > > Thanks,
+> > >
+> > > Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-Thanks.
 
-David
 
+-- 
+Thanks,
+
+Steve
