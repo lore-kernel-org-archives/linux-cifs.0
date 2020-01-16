@@ -7,48 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D7FCC33CB6
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 18:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B072C33CAF
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 18:07:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D52622073A
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 18:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9DEA214AF
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 18:07:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579198026;
-	bh=9mwGrx6aEgxNRi/HJ+0HH6YChaUmnqQW3NP2bo8ezdU=;
+	s=default; t=1579198047;
+	bh=krTTpBGmxTcFV7DMMTstVif5MPee/1qDrzXnztVGfTc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=K1Z1r6ypCy5twClNsIrOAwkir7YnRCubLpc2pI6KXHBSdDIuV1EQ2oU863j9a9A+k
-	 jXJgMMrnWsAVcAZ7nLf2J/VwJqBKWjxIr/ctAiX169ToOUfOvgskQOz5Ps/fsb3v7Z
-	 BI37ATFyNkCW9cfnGtEfHJKK+lu73d4r40FqypMw=
+	b=TS/5hRqenoziwJQvu+xgIvR9j1vpjd2qiB5Ludm9L9sKgGz8kVMiNCin3wdieLXvk
+	 k56xWT/RI8T9moF9IgEv6G2AIzpjYMgzozoGv824wJzqwmigxjzpEpuf8Kv/qIM/3M
+	 AUdY2P4qJvClUMPn5g8AVGbvQKkRV/WTi6Z91ewA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731630AbgAPRjT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:39:19 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55522 "EHLO mail.kernel.org"
+        id S2405052AbgAPRkB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Jan 2020 12:40:01 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56832 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393455AbgAPRjS (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:39:18 -0500
+        id S2405002AbgAPRkB (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:40:01 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7FCF8246D3;
-        Thu, 16 Jan 2020 17:39:16 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id ACA9924710;
+        Thu, 16 Jan 2020 17:39:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579196357;
-        bh=9mwGrx6aEgxNRi/HJ+0HH6YChaUmnqQW3NP2bo8ezdU=;
+        s=default; t=1579196400;
+        bh=krTTpBGmxTcFV7DMMTstVif5MPee/1qDrzXnztVGfTc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NTPUtDN3ntsnHm0vAwQCMFCH1duUlvPBF/lvgp5LnrbPzr98dKb8yWWLhkktl04Xn
-         uKb0QYhc06M9UGpQU/syMyUWyfaR+HOhC6zkDins2psvMo3wNfBgkjQUlJjBCzOhjy
-         0JcUmnf8LbfS6oXlma3ZuJb7TWoesEyNql1Cyvnw=
+        b=C/IVPhVZyzMWtVp6xCdtfi894k42tn366xdlDowrNB4YmwiH3XRHkm/O+iEXmYzim
+         CpAcPf5RH0L5CvWXSp/ph0RVDs/q2hfCZcs7q+ebmLozP8WNFa+7OmbVhSneKC2VGU
+         MLmlPpHA8BECCvDC9lB0drq62tt7DNrYecHTg6No=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "Eric W. Biederman" <ebiederm@xmission.com>,
-        Namjae Jeon <namjae.jeon@samsung.com>,
-        Jeff Layton <jlayton@primarydata.com>,
-        Steve French <smfrench@gmail.com>,
+Cc:     Steve French <stfrench@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        "Eric W . Biederman" <ebiederm@xmission.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.9 149/251] signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig
-Date:   Thu, 16 Jan 2020 12:34:58 -0500
-Message-Id: <20200116173641.22137-109-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 177/251] cifs: fix rmmod regression in cifs.ko caused by force_sig changes
+Date:   Thu, 16 Jan 2020 12:35:26 -0500
+Message-Id: <20200116173641.22137-137-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200116173641.22137-1-sashal@kernel.org>
 References: <20200116173641.22137-1-sashal@kernel.org>
@@ -61,51 +60,36 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: "Eric W. Biederman" <ebiederm@xmission.com>
+From: Steve French <stfrench@microsoft.com>
 
-[ Upstream commit 72abe3bcf0911d69b46c1e8bdb5612675e0ac42c ]
+[ Upstream commit 247bc9470b1eeefc7b58cdf2c39f2866ba651509 ]
 
-The locking in force_sig_info is not prepared to deal with a task that
-exits or execs (as sighand may change).  The is not a locking problem
-in force_sig as force_sig is only built to handle synchronous
-exceptions.
+Fixes: 72abe3bcf091 ("signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig")
 
-Further the function force_sig_info changes the signal state if the
-signal is ignored, or blocked or if SIGNAL_UNKILLABLE will prevent the
-delivery of the signal.  The signal SIGKILL can not be ignored and can
-not be blocked and SIGNAL_UNKILLABLE won't prevent it from being
-delivered.
+The global change from force_sig caused module unloading of cifs.ko
+to fail (since the cifsd process could not be killed, "rmmod cifs"
+now would always fail)
 
-So using force_sig rather than send_sig for SIGKILL is confusing
-and pointless.
-
-Because it won't impact the sending of the signal and and because
-using force_sig is wrong, replace force_sig with send_sig.
-
-Cc: Namjae Jeon <namjae.jeon@samsung.com>
-Cc: Jeff Layton <jlayton@primarydata.com>
-Cc: Steve French <smfrench@gmail.com>
-Fixes: a5c3e1c725af ("Revert "cifs: No need to send SIGKILL to demux_thread during umount"")
-Fixes: e7ddee9037e7 ("cifs: disable sharing session and tcon and add new TCP sharing code")
-Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+CC: Eric W. Biederman <ebiederm@xmission.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/connect.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/connect.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index e43ba6db2bdd..110febd69737 100644
+index 110febd69737..7d46025d5e89 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -2221,7 +2221,7 @@ cifs_put_tcp_session(struct TCP_Server_Info *server, int from_reconnect)
+@@ -885,6 +885,7 @@ cifs_demultiplex_thread(void *p)
+ 		mempool_resize(cifs_req_poolp, length + cifs_min_rcv);
  
- 	task = xchg(&server->tsk, NULL);
- 	if (task)
--		force_sig(SIGKILL, task);
-+		send_sig(SIGKILL, task, 1);
- }
- 
- static struct TCP_Server_Info *
+ 	set_freezable();
++	allow_signal(SIGKILL);
+ 	while (server->tcpStatus != CifsExiting) {
+ 		if (try_to_freeze())
+ 			continue;
 -- 
 2.20.1
 
