@@ -2,205 +2,159 @@ Return-Path: <SRS0=6r7N=3F=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B104DC33CAF
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 19:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE28C33CAF
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 19:11:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 880C62073A
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 19:10:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD6C62075B
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 19:11:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="DfIIKlQ/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388093AbgAPTKM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Jan 2020 14:10:12 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:48777 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726973AbgAPTKL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jan 2020 14:10:11 -0500
-Received: from 1.general.cking.uk.vpn ([10.172.193.212])
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <colin.king@canonical.com>)
-        id 1isAWt-0006N4-Si; Thu, 16 Jan 2020 19:10:07 +0000
-From:   Colin Ian King <colin.king@canonical.com>
-Autocrypt: addr=colin.king@canonical.com; prefer-encrypt=mutual; keydata=
- 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
-To:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: re: cifs: Avoid doing network I/O while holding cache lock
-Message-ID: <26f61914-3c0d-4911-7f21-23967839554c@canonical.com>
-Date:   Thu, 16 Jan 2020 19:10:07 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        id S2437461AbgAPTLP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Jan 2020 14:11:15 -0500
+Received: from mail-bn8nam12on2130.outbound.protection.outlook.com ([40.107.237.130]:60129
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2437452AbgAPTLO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 16 Jan 2020 14:11:14 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JwGP2ltf0LyNIPn2dRMwENABsuTrtYFj8/9/8k7ZKecxFkWvuGjMz84UBFkpw030g3Bj3ClzDQzkjTIg27AvMDe0xOwifrV6Pm3h4oI9xJQ5V+S2ogd+DzIORiA9drbi6t9PZajhv9fHutYWg+aqjqRIKyyXu2WCPvGXwLP40OwFJkx1t4wy/WbA/ddCMysPlNcfhaNu4khfKC77IN8RFpDUH7wihqpw20Sg0nyn4qnmk52CeJKHD07uzQHU/31KL9sNs/FUdwPi+SbM3FQ9trdWDaO3fquZZQ0jHN4lZQ1GWCGHVqBPRHqUfb1/JO5JNA+ZZ+9RYaUCD403fTpDyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6pk4CKnA7H3LVTZPb6vK96Ey59ZMKy7QnyltmO54jSk=;
+ b=VaEr3vDA9KvC5ne16YEDqpyXmrbMAqRAVAVovErWpP41AlOWaO+ixDWuma1n8ewiyUCD6o+/lGllJ2kI+QR6ZyM6eGDErzoUzN2adLL0tYAGMPyi2AXN6RH82MiK1WE8Ol1W/oJPZaySENtPNKZD+0tNN5I/GsAGG1z14mixVOMu0C/XdjDrKfunmSuGhHLVWYH4CjRsAUf187qKMHDXds5Ux8cdYtJwuhI5eejk8PTwd+PVOLXi5ZQiNeNmlHSoIfcZPGEXaSsEw7Wap6CSmWiYodBJqWOWh+lEIOvMvVijpBLqwgrOtTTyS20M3gBdDf/tv+5q1WyAPEg5OeYVOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6pk4CKnA7H3LVTZPb6vK96Ey59ZMKy7QnyltmO54jSk=;
+ b=DfIIKlQ/FKU66VId0ctlhPohvmKWPccP1kU4hSam3zpfdflpid8hZXbGTVCRZvfFnOU6yrsLKLdd7vgRDdGtaUw4qxUPs7vlhsyH743d9j+YlVeNyW6XVUQp5gHWjnlK0lWOzS3bR9WRFDCIxvnHFN37kR5Ruf6eg5krQieDoJI=
+Received: from SN6PR2101MB1325.namprd21.prod.outlook.com (20.178.200.71) by
+ SN6PR2101MB1136.namprd21.prod.outlook.com (52.132.114.25) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.2; Thu, 16 Jan 2020 19:11:11 +0000
+Received: from SN6PR2101MB1325.namprd21.prod.outlook.com
+ ([fe80::5061:51b6:2876:745f]) by SN6PR2101MB1325.namprd21.prod.outlook.com
+ ([fe80::5061:51b6:2876:745f%9]) with mapi id 15.20.2665.006; Thu, 16 Jan 2020
+ 19:11:11 +0000
+From:   Steven French <Steven.French@microsoft.com>
+To:     Sasha Levin <sashal@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+CC:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        "Eric W . Biederman" <ebiederm@xmission.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
+Subject: RE: [EXTERNAL] [PATCH AUTOSEL 4.9 177/251] cifs: fix rmmod regression
+ in cifs.ko caused by force_sig changes
+Thread-Topic: [EXTERNAL] [PATCH AUTOSEL 4.9 177/251] cifs: fix rmmod
+ regression in cifs.ko caused by force_sig changes
+Thread-Index: AQHVzJP77eNTOODVQkO1VLoRqzt7d6ftqA2Q
+Date:   Thu, 16 Jan 2020 19:11:11 +0000
+Message-ID: <SN6PR2101MB1325121720B1E3645F2CF369E4360@SN6PR2101MB1325.namprd21.prod.outlook.com>
+References: <20200116173641.22137-1-sashal@kernel.org>
+ <20200116173641.22137-137-sashal@kernel.org>
+In-Reply-To: <20200116173641.22137-137-sashal@kernel.org>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=True;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Owner=stfrench@microsoft.com;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2020-01-16T19:11:10.2876097Z;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=General;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Application=Microsoft Azure
+ Information Protection;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=97e8512a-c205-4ccd-9d56-864f4d2fb040;
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Extended_MSFT_Method=Automatic
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Steven.French@microsoft.com; 
+x-originating-ip: [2001:4898:80e8:f:fd1b:143e:cf7:7c1a]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 96ebd4bd-2b3c-44bd-efda-08d79ab7d999
+x-ms-traffictypediagnostic: SN6PR2101MB1136:
+x-microsoft-antispam-prvs: <SN6PR2101MB1136E9C2D33BDA611A8E0F61E4360@SN6PR2101MB1136.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 02843AA9E0
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(396003)(376002)(136003)(39860400002)(366004)(199004)(189003)(7696005)(8936002)(5660300002)(4326008)(6506007)(110136005)(71200400001)(2906002)(53546011)(54906003)(478600001)(8990500004)(86362001)(316002)(55016002)(9686003)(10290500003)(52536014)(66476007)(64756008)(66946007)(66556008)(81156014)(33656002)(81166006)(186003)(8676002)(66446008)(76116006);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR2101MB1136;H:SN6PR2101MB1325.namprd21.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Y3g5rsRt0LmUX6I8rJqyl1OjN96s/IU+XBpjvuNtYTDDEWdysqJ/NkE+BoDQJiEYCGUqzxIbcRIHFMf5hV/15lQhGEuc7In+aXwLrXRvcML0adem48M+jkHQcV/XT3QvGvgDpAAb4BNKzG4u0pmmGC7f2Z7IwI1yqawykh/h3cnu4NejZ9RfHK3hS4QdlzWNQZ+YM4qLK4yFotu8OY+kwBHe7zCJAc/szPszZQXichvUnk7VlJBLlbeROp8m9cuKh2JTOfjIUl6KiFNveo6vdQ279CtcG/mRMuX+UV4nK2kkA6gh9AsIjnNC15i4tY0qzQ2Tpsr5A9MAMEjopH0l6YA6oXtQIkSg0GGIKnOLNEfF0q9Lc5V4lcrN+39X2BQaT7hgnS1b78XOXLDopMYd84OrimtJTGmO8lTaEtoPI8voNqTHv4HXGl1Lc5squAH6
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96ebd4bd-2b3c-44bd-efda-08d79ab7d999
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2020 19:11:11.4710
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lQmTT7rVf64KtUtV0ZIyXI9MnbDxt7LvMfg8jAW8dGZ/W5ME9EI01iWkdQb/wmIuv/Ep5sN1un8sl7/mbYAErg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR2101MB1136
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
+I didn't think the patch that this fixes (72abe3bcf091) was in 4.9 (it was =
+May 2019)?  Did Eric's patch to switch from force_sig to send_sig get backp=
+orted as well?
 
-static analysis with Coverity has detected an issue with the following
-commit:
+-----Original Message-----
+From: Sasha Levin <sashal@kernel.org>=20
+Sent: Thursday, January 16, 2020 9:35 AM
+To: linux-kernel@vger.kernel.org; stable@vger.kernel.org
+Cc: Steven French <Steven.French@microsoft.com>; Ronnie Sahlberg <lsahlber@=
+redhat.com>; Eric W . Biederman <ebiederm@xmission.com>; Sasha Levin <sasha=
+l@kernel.org>; linux-cifs@vger.kernel.org; samba-technical@lists.samba.org
+Subject: [EXTERNAL] [PATCH AUTOSEL 4.9 177/251] cifs: fix rmmod regression =
+in cifs.ko caused by force_sig changes
 
-commit 03535b72873ba74e80e6938b5f772cf5b07ca76b
-Author: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Date:   Wed Dec 4 17:38:03 2019 -0300
+From: Steve French <stfrench@microsoft.com>
 
-    cifs: Avoid doing network I/O while holding cache lock
+[ Upstream commit 247bc9470b1eeefc7b58cdf2c39f2866ba651509 ]
 
+Fixes: 72abe3bcf091 ("signal/cifs: Fix cifs_put_tcp_session to call send_si=
+g instead of force_sig")
 
+The global change from force_sig caused module unloading of cifs.ko to fail=
+ (since the cifsd process could not be killed, "rmmod cifs"
+now would always fail)
 
-This commit removed a memset on the vol object, causing the issue as
-reported below by Coverity:
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+CC: Eric W. Biederman <ebiederm@xmission.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/connect.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-1342static struct cifs_ses *find_root_ses(struct vol_info *vi,
-1343                                      struct cifs_tcon *tcon,
-1344                                      const char *path)
-1345{
-1346        char *rpath;
-1347        int rc;
-1348        struct cache_entry *ce;
-1349        struct dfs_info3_param ref = {0};
-1350        char *mdata = NULL, *devname = NULL;
-1351        struct TCP_Server_Info *server;
-1352        struct cifs_ses *ses;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c index 110febd69737..7d46=
+025d5e89 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -885,6 +885,7 @@ cifs_demultiplex_thread(void *p)
+ 		mempool_resize(cifs_req_poolp, length + cifs_min_rcv);
+=20
+ 	set_freezable();
++	allow_signal(SIGKILL);
+ 	while (server->tcpStatus !=3D CifsExiting) {
+ 		if (try_to_freeze())
+ 			continue;
+--
+2.20.1
 
-    1. var_decl: Declaring variable vol without initializer.
-1353        struct smb_vol vol;
-1354
-1355        rpath = get_dfs_root(path);
-
-    2. Condition IS_ERR(rpath), taking false branch.
-1356        if (IS_ERR(rpath))
-1357                return ERR_CAST(rpath);
-1358
-1359        down_read(&htable_rw_lock);
-1360
-1361        ce = lookup_cache_entry(rpath, NULL);
-
-    3. Condition IS_ERR(ce), taking true branch.
-1362        if (IS_ERR(ce)) {
-1363                up_read(&htable_rw_lock);
-1364                ses = ERR_CAST(ce);
-
-    4. Jumping to label out.
-1365                goto out;
-1366        }
-1367
-1368        rc = setup_referral(path, ce, &ref, get_tgt_name(ce));
-1369        if (rc) {
-1370                up_read(&htable_rw_lock);
-1371                ses = ERR_PTR(rc);
-1372                goto out;
-1373        }
-1374
-1375        up_read(&htable_rw_lock);
-1376
-1377        mdata = cifs_compose_mount_options(vi->mntdata, rpath, &ref,
-1378                                           &devname);
-1379        free_dfs_info_param(&ref);
-1380
-1381        if (IS_ERR(mdata)) {
-1382                ses = ERR_CAST(mdata);
-1383                mdata = NULL;
-1384                goto out;
-1385        }
-1386
-1387        rc = cifs_setup_volume_info(&vol, mdata, devname, false);
-1388        kfree(devname);
-1389
-1390        if (rc) {
-1391                ses = ERR_PTR(rc);
-1392                goto out;
-1393        }
-1394
-1395        server = get_tcp_server(&vol);
-1396        if (!server) {
-1397                ses = ERR_PTR(-EHOSTDOWN);
-1398                goto out;
-1399        }
-1400
-1401        ses = cifs_get_smb_ses(server, &vol);
-1402
-1403out:
-
-    5. uninit_use_in_call: Using uninitialized value vol.username when
-calling cifs_cleanup_volume_info_contents.
-
-    6. uninit_use_in_call: Using uninitialized value vol.password when
-calling cifs_cleanup_volume_info_contents.
-
-    7. uninit_use_in_call: Using uninitialized value vol.domainname when
-calling cifs_cleanup_volume_info_contents.
-
-    8. uninit_use_in_call: Using uninitialized value vol.UNC when
-calling cifs_cleanup_volume_info_contents.
-
-    9. uninit_use_in_call: Using uninitialized value vol.iocharset when
-calling cifs_cleanup_volume_info_contents.
-
- Uninitialized pointer read
-   10. uninit_use_in_call: Using uninitialized value vol.prepath when
-calling cifs_cleanup_volume_info_contents.
-
-1404        cifs_cleanup_volume_info_contents(&vol);
-1405        kfree(mdata);
-1406        kfree(rpath);
-
-The vol object is memset as a result of calling cifs_setup_volume_info()
-but this is too late for the earlier jumps to the error cleanup path at
-label out.  I did think about putting this back but it adds an
-unnecessary memset, a better fix may be return immediately or to exit
-via the kfree(mdata) at the end of the function.
-
-Not sure what is best, so I'm flagging this up as an issue that needs
-fixing.
-
-Colin
