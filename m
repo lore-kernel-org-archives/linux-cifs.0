@@ -2,167 +2,94 @@ Return-Path: <SRS0=6r7N=3F=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C70C1C33CB1
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 08:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 020C8C3F68F
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 17:10:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9AAEF2073A
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 08:42:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3fwlr22"
+	by mail.kernel.org (Postfix) with ESMTP id C3E2824688
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 17:10:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1579194621;
+	bh=ul71Y/zEbW7xkWlk/aceUw/nzMusboXygjav+Ia0Llo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Dha8BkRZQyGUWWihZKccHPnk5QBnPbWc79Vh8cmN8d4NeX5JFjxXnpDJFS9dqa4xI
+	 0r++fbdQSNm9hdWBzlm+yB3WiDAvHwhYdV4Y3YBSpFanxMon0efGn5iQtjkNnmWCRL
+	 eApUkTO7doJahocmXLCTahAxd0xStXEtdNQ/h0Fs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726883AbgAPImk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Jan 2020 03:42:40 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:43973 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727009AbgAPImk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jan 2020 03:42:40 -0500
-Received: by mail-io1-f66.google.com with SMTP id n21so20844481ioo.10
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Jan 2020 00:42:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xIFI4+cGZkzyjo9sgL1qeM64lzBdQDxXx0KpFVgXeSw=;
-        b=O3fwlr22HE+lyG7sH7zj2m1b9s17No9rUFX5lDdYm0GXGEh3dbQ3bOQucKl91Wy/iS
-         Wv5TXp7MCd1xDzHpe8HKjqU/1pQtxWDhL3fDzHLWJZBorHg+UQZyKj4R9Y6bGauStwW7
-         7ZzJGmaaGFYEjY0ISVwdt5TSFAAopqVkXlEpB8bEpzdQ564pr4B1Xn67pxdI49NKQiUl
-         yuZ/50IR1vwY6/IxKFg7b96k9dv/6MSasHdiScrDdaPFaZ2/0siKuJwaYYRT4nk4sE1e
-         X6bV3UfcwDkrfFfDfzRhtXMAP1qURoWWP8qPnpI/Fs9XDXblZjf2uepAFY/t4pLyjAuy
-         HxSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xIFI4+cGZkzyjo9sgL1qeM64lzBdQDxXx0KpFVgXeSw=;
-        b=T27WdDW5OvbCIaJHjNMJdfia1hDopqA0feT5RKdzQSlxR6wtLasZZDJ/9mRymgJuG9
-         yWO6yBME3jKOU28+MaaR4v6sMNg0CbI92XPQ2WNNPLtk2XPPE98W5kPTOMAykIw4buUD
-         KZLAgDozDCHqkGsOsc4px4DHO2cXq6tE1AcqT5w0hucxfp5Nvoc/bmStHoAzmPVtwNyF
-         EUCVafGFUdqPxJ8XYsffXDFwEbS4lXh4H04HsBV7gaiETdX7CexmJA/dvqOu9k4Iy8WB
-         3GWyvU5569pNLFex/PmTUeeG9nBukN6bGDLaUnuTSteakv2+IpKU83xMfHu/KumEf/Mh
-         m2tA==
-X-Gm-Message-State: APjAAAX52fVvEDm/muRwR2+YmIBPYhx8ndEKL6OUqhZgyIaGZhkoeYxw
-        tRue3dAuYzCZepWhEE2eclkkpOJymh5+hOMD7OU=
-X-Google-Smtp-Source: APXvYqxna9MExzNJp1JjER1jPDep5e/NwaSbF/LWoANtPOQx6shXC7+wCCl4fIYIK4xkpPiW3hZXEoXgsUfxlq3fi1k=
-X-Received: by 2002:a02:b897:: with SMTP id p23mr28304483jam.58.1579164159379;
- Thu, 16 Jan 2020 00:42:39 -0800 (PST)
+        id S2389904AbgAPRKU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Jan 2020 12:10:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48210 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389900AbgAPRKU (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:10:20 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 26F5921D56;
+        Thu, 16 Jan 2020 17:10:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579194619;
+        bh=ul71Y/zEbW7xkWlk/aceUw/nzMusboXygjav+Ia0Llo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=KNrGCXyZOfUNa7q0ntGnXKruh+BdC5lwrn3Z4Dppf7DFZmrlfvPHnqF1yJvnQF5GL
+         FoMhaonFjL018f8lEaq9IgFu6yhwFyrK6NBJnynqzBoaFg7oku5P/jYtSQ0tw042yD
+         wU6y6lKKJuk1SJ8dcE5UG30qG1vyKNG1DX/PdpU0=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Steve French <stfrench@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        "Eric W . Biederman" <ebiederm@xmission.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 4.19 481/671] cifs: fix rmmod regression in cifs.ko caused by force_sig changes
+Date:   Thu, 16 Jan 2020 12:01:59 -0500
+Message-Id: <20200116170509.12787-218-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200116170509.12787-1-sashal@kernel.org>
+References: <20200116170509.12787-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20200115012321.6780-1-lsahlber@redhat.com> <20200115012321.6780-2-lsahlber@redhat.com>
- <CAH2r5mst8zDCachJMZC-BgtJs2M7c1F+1VCf-Hfe68Qz0vQ8aQ@mail.gmail.com>
- <CAN05THSBKBw3Az8UUW8fuV_K9_e9is+po1Q05m8mbcd5Rv_uUw@mail.gmail.com>
- <CAH2r5msuycQNBXYdJQF-1pnmzJcikMD-e2mYUWQNCLA_SFFsvw@mail.gmail.com> <CAH2r5mumEjNcCT=Dc4CMatjprWgBDGVS-3nsds2QqPoZMs8xZQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mumEjNcCT=Dc4CMatjprWgBDGVS-3nsds2QqPoZMs8xZQ@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 16 Jan 2020 18:42:28 +1000
-Message-ID: <CAN05THRbNrd=ZmSMO4yE8oHD3Xn93zNTMBRXnJBuf7J3C5Cmow@mail.gmail.com>
-Subject: Re: [PATCH] cifs: add support for fallocate mode 0 for non-sparse files
-To:     Steve French <smfrench@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The bug is basically that if we extend a file by fallocate mode==0
-and immediately afterwards mmap() the file we will only mmap() as much
-as end-of-file was
-prior to the truncate  and then if we try to touch any
-address in this extended region userspace dies with bus error.
+From: Steve French <stfrench@microsoft.com>
 
-The patch added "extend a file with fallocate mode==0 for NON-Sparse
-files" and caused xfstest to fail.
-The fix is to force us to revalidate the file attributes (the size is
-the important one) when we extend the file so
-mmap() will work properly.
-I have fixed this in the patch and will resend tomorrow after some more testing.
+[ Upstream commit 247bc9470b1eeefc7b58cdf2c39f2866ba651509 ]
 
-Looking for other SMB2_set_eof() callsites I see we already had the
-same bug for the case of extending a SPARSE
-file using fallocate mode==0. I fixed that too and will audit all
-other plases where we use SMB2_set_eof()
-to see if they are safe or not before resending.
+Fixes: 72abe3bcf091 ("signal/cifs: Fix cifs_put_tcp_session to call send_sig instead of force_sig")
 
+The global change from force_sig caused module unloading of cifs.ko
+to fail (since the cifsd process could not be killed, "rmmod cifs"
+now would always fail)
 
-On Thu, Jan 16, 2020 at 12:33 PM Steve French <smfrench@gmail.com> wrote:
->
-> temporarily removed to allow Ronnie to debug a test failure
->
-> On Wed, Jan 15, 2020 at 2:14 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > Tentatively merged into cifs-2.6.git for-next pending more testing
-> >
-> > On Tue, Jan 14, 2020 at 8:25 PM ronnie sahlberg
-> > <ronniesahlberg@gmail.com> wrote:
-> > >
-> > > On Wed, Jan 15, 2020 at 11:25 AM Steve French <smfrench@gmail.com> wrote:
-> > > >
-> > > > Does it affect (or enable) any xfstests?
-> > >
-> > > It shouldn't affect any current tests.
-> > > It adds support for
-> > >    xfs_io -c "falloc 0 512M" <file>
-> > >
-> > > generic/071 now passes with this patch.   Possibly other tests as well
-> > > that use "xfs_io -c falloc" as well
-> > >
-> > >
-> > > >
-> > > > On Tue, Jan 14, 2020 at 7:23 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
-> > > > >
-> > > > > RHBZ 1336264
-> > > > >
-> > > > > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > > > > ---
-> > > > >  fs/cifs/smb2ops.c | 10 +++++++---
-> > > > >  1 file changed, 7 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> > > > > index 6250370c1170..91818f7c1b9c 100644
-> > > > > --- a/fs/cifs/smb2ops.c
-> > > > > +++ b/fs/cifs/smb2ops.c
-> > > > > @@ -3106,9 +3106,13 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
-> > > > >                 else if (i_size_read(inode) >= off + len)
-> > > > >                         /* not extending file and already not sparse */
-> > > > >                         rc = 0;
-> > > > > -               /* BB: in future add else clause to extend file */
-> > > > > -               else
-> > > > > -                       rc = -EOPNOTSUPP;
-> > > > > +               /* extend file */
-> > > > > +               else {
-> > > > > +                       eof = cpu_to_le64(off + len);
-> > > > > +                       rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
-> > > > > +                                         cfile->fid.volatile_fid, cfile->pid,
-> > > > > +                                         &eof);
-> > > > > +               }
-> > > > >                 if (rc)
-> > > > >                         trace_smb3_falloc_err(xid, cfile->fid.persistent_fid,
-> > > > >                                 tcon->tid, tcon->ses->Suid, off, len, rc);
-> > > > > --
-> > > > > 2.13.6
-> > > > >
-> > > >
-> > > >
-> > > > --
-> > > > Thanks,
-> > > >
-> > > > Steve
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+CC: Eric W. Biederman <ebiederm@xmission.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/connect.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index a59dcda07534..a8790bf04e95 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -970,6 +970,7 @@ cifs_demultiplex_thread(void *p)
+ 		mempool_resize(cifs_req_poolp, length + cifs_min_rcv);
+ 
+ 	set_freezable();
++	allow_signal(SIGKILL);
+ 	while (server->tcpStatus != CifsExiting) {
+ 		if (try_to_freeze())
+ 			continue;
+-- 
+2.20.1
+
