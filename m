@@ -2,191 +2,126 @@ Return-Path: <SRS0=TaZu=3G=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABD4C33CAF
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 00:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E43A9C33CAF
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 00:27:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF21A206E6
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 00:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9F5B2077B
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 00:27:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FEQChekF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTpUtiee"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726370AbgAQAFC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Jan 2020 19:05:02 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27565 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726343AbgAQAFC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jan 2020 19:05:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579219499;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=ZMSohtMnPRAPAREa8pgIJxf1Qh375Ycttp/nXgBEprI=;
-        b=FEQChekFMh9HYgINDPDdWci0eJiPMOOFfkNWKjfGM4QA9z9NyiyBcOgYk7cExlKNoobdWu
-        No9ZTMdfzHaUA9/sOiFuDZS/PJ9hZbg0JLKnEDQbUfj+lsWilEYGE9/5sbBqJgj8hJfLxM
-        uPsOTGNGBE5k+T65R5uQvaZy6mr2Yc4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-fkIZMCClPpuCMXUFpMwtfQ-1; Thu, 16 Jan 2020 19:04:58 -0500
-X-MC-Unique: fkIZMCClPpuCMXUFpMwtfQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F91B8017CC
-        for <linux-cifs@vger.kernel.org>; Fri, 17 Jan 2020 00:04:57 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-71.bne.redhat.com [10.64.54.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 02EFF5D9C9;
-        Fri, 17 Jan 2020 00:04:56 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH] cifs: add support for fallocate mode 0 for non-sparse files
-Date:   Fri, 17 Jan 2020 10:04:48 +1000
-Message-Id: <20200117000448.13704-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        id S1729261AbgAQA1a (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Jan 2020 19:27:30 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:32856 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729253AbgAQA1a (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jan 2020 19:27:30 -0500
+Received: by mail-lf1-f67.google.com with SMTP id n25so17028888lfl.0
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Jan 2020 16:27:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=IBtspxAHnbaMfQ3JtefCYVNfriVlJvE+7wnC6Cw2PnU=;
+        b=FTpUtieeAaLYMsw/8uZX5npMVbyT1plJEBi1wu9i3GZPVPH6+e87Fhvt551mLYssIh
+         Sf75qolpL5JwVnW+w1AWpq7yGLuL9NGskVcIRGHkx03YtADcMWBLx2MKPpqKoAQ4zOzJ
+         eR7Vh4qB8/aMvbYXlVgnYj1/zD+zsEphhxIlnN+8z8Voo31AwQai2rGYk/tAMDV9z40+
+         rG6r3NZ7fYKnr3oDe9luqbmfYCN+IQpT1Fm1eeUVpmv1WbRAkShbxJp76oTMGGPcYqu3
+         0+1g+ItDZbGjIn84M1obEzyUMoWnfuw6A7adxpHfrkM6H/866l3EP6VBurScV9HD+x+l
+         R4RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=IBtspxAHnbaMfQ3JtefCYVNfriVlJvE+7wnC6Cw2PnU=;
+        b=UgA9LNRJKwR4zj1RQOaBsDIQOR4sAs1WS0HfRMnavyY6bb1hh4X1Ta87OV1HuLgLVi
+         BFYtfh33K7EBcgCzrVzhUI6OKGDv90QkyOXfIL+lDYX0ttpVVnSQDscJjxVFSzUpgrrv
+         hTwmwOmj7+5kaK5qOrq+tRhWIU12+5PL/bDvPUnu4hoofP8rQGhxfQgnkaVFgeyqRnns
+         nDGZ07GIEY2Z48sVI+iIv1ablWQDE9ezarldHALfSMM/Tte0I2OpWDh70rOfLNfbBAYO
+         1eAOc3e7R+wBDLoezYax/DGt6/6i/yMcc38R8qOGuoM6HfMeFe0HvSzwaDeGYNGiHC/Q
+         AyIQ==
+X-Gm-Message-State: APjAAAVrHFrcxs8Mz/6HYuD2CeHqUr8jRkiA3xQbXEKMWWjsdjfGA5Zf
+        KUowyAyYHFq88fihcyjx4CTPt7LNnnFxEWkNPw==
+X-Google-Smtp-Source: APXvYqxZMUNsbMSeDJegBcC1PrunwvnujOX17/ffXb7ppT3CGR/zsEam+kBT2PfB7jzkixtY6c0QIkpQ5u8iTGT24yQ=
+X-Received: by 2002:ac2:5287:: with SMTP id q7mr3911220lfm.66.1579220848167;
+ Thu, 16 Jan 2020 16:27:28 -0800 (PST)
+MIME-Version: 1.0
+References: <20200115012321.6780-1-lsahlber@redhat.com> <20200115012321.6780-2-lsahlber@redhat.com>
+ <CAH2r5mst8zDCachJMZC-BgtJs2M7c1F+1VCf-Hfe68Qz0vQ8aQ@mail.gmail.com>
+ <CAN05THSBKBw3Az8UUW8fuV_K9_e9is+po1Q05m8mbcd5Rv_uUw@mail.gmail.com>
+ <CAH2r5msuycQNBXYdJQF-1pnmzJcikMD-e2mYUWQNCLA_SFFsvw@mail.gmail.com>
+ <CAH2r5mumEjNcCT=Dc4CMatjprWgBDGVS-3nsds2QqPoZMs8xZQ@mail.gmail.com> <CAN05THRbNrd=ZmSMO4yE8oHD3Xn93zNTMBRXnJBuf7J3C5Cmow@mail.gmail.com>
+In-Reply-To: <CAN05THRbNrd=ZmSMO4yE8oHD3Xn93zNTMBRXnJBuf7J3C5Cmow@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Thu, 16 Jan 2020 16:27:16 -0800
+Message-ID: <CAKywueTB28BQDdBPo=RDHxjPydrKcniRJmbHGaJ3jOD0KKTzVA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: add support for fallocate mode 0 for non-sparse files
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-RHBZ 1336264
+=D1=87=D1=82, 16 =D1=8F=D0=BD=D0=B2. 2020 =D0=B3. =D0=B2 01:05, ronnie sahl=
+berg <ronniesahlberg@gmail.com>:
+>
+> The bug is basically that if we extend a file by fallocate mode=3D=3D0
+> and immediately afterwards mmap() the file we will only mmap() as much
+> as end-of-file was
+> prior to the truncate  and then if we try to touch any
+> address in this extended region userspace dies with bus error.
+>
+> The patch added "extend a file with fallocate mode=3D=3D0 for NON-Sparse
+> files" and caused xfstest to fail.
+> The fix is to force us to revalidate the file attributes (the size is
+> the important one) when we extend the file so
+> mmap() will work properly.
+> I have fixed this in the patch and will resend tomorrow after some more t=
+esting.
+>
+> Looking for other SMB2_set_eof() callsites I see we already had the
+> same bug for the case of extending a SPARSE
 
-When we extend a file we must also force the attributes (the size)
-to be revalidated.
+I agree that regardless of file being sparse or not, we should somehow
+update a size in the VFS after calling SMB2_set_eof().
 
-This fixes an issue with holetest in xfs-tests which performs the following
-sequence :
-1, create a new file
-2, use fallocate mode==0 to populate the file
-3, mmap the file
-4, touch each page by reading the mmapped region.
+> file using fallocate mode=3D=3D0. I fixed that too and will audit all
+> other plases where we use SMB2_set_eof()
+> to see if they are safe or not before resending.
 
-If we don't revalidate the file as part of step 2, the handle will still have
-cached attributes where the size is 0 and thus the mmap will not map the
-requested region leading to SIGBUS for the application in step 4.
+One of those places where SMB2_set_eof() is called is
+cifs_set_file_size() which does call the following after getting a
+successful response from the server:
 
-We already had the same crash bug for sparse files but we never triggered that
-with our xfstests.
+2250 >-------if (rc =3D=3D 0) {
+2251 >------->-------cifsInode->server_eof =3D attrs->ia_size;
+2252 >------->-------cifs_setsize(inode, attrs->ia_size);
+2253 >------->-------cifs_truncate_page(inode->i_mapping, inode->i_size);
+2254 >-------}
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/cifsfs.c  |  6 ++----
- fs/cifs/cifsfs.h  |  2 +-
- fs/cifs/inode.c   |  6 +++---
- fs/cifs/smb2ops.c | 23 ++++++++++++++++++++---
- 4 files changed, 26 insertions(+), 11 deletions(-)
+This is called by cifs_setattr_[no]unix() which does the following afterwar=
+ds:
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 5492b9860baa..638337dc04ee 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -957,11 +957,9 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
- 		/*
- 		 * Some applications poll for the file length in this strange
- 		 * way so we must seek to end on non-oplocked files by
--		 * setting the revalidate time to zero.
-+		 * forcing revalidation.
- 		 */
--		CIFS_I(inode)->time = 0;
--
--		rc = cifs_revalidate_file_attr(file);
-+		rc = cifs_revalidate_file_attr(file, true);
- 		if (rc < 0)
- 			return (loff_t)rc;
- 	}
-diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
-index b59dc7478130..e72aec945875 100644
---- a/fs/cifs/cifsfs.h
-+++ b/fs/cifs/cifsfs.h
-@@ -75,7 +75,7 @@ extern int cifs_mkdir(struct inode *, struct dentry *, umode_t);
- extern int cifs_rmdir(struct inode *, struct dentry *);
- extern int cifs_rename2(struct inode *, struct dentry *, struct inode *,
- 			struct dentry *, unsigned int);
--extern int cifs_revalidate_file_attr(struct file *filp);
-+extern int cifs_revalidate_file_attr(struct file *filp, bool force);
- extern int cifs_revalidate_dentry_attr(struct dentry *);
- extern int cifs_revalidate_file(struct file *filp);
- extern int cifs_revalidate_dentry(struct dentry *);
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index ca76a9287456..1db84db822ec 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -2050,13 +2050,13 @@ cifs_zap_mapping(struct inode *inode)
- 	return cifs_revalidate_mapping(inode);
- }
- 
--int cifs_revalidate_file_attr(struct file *filp)
-+int cifs_revalidate_file_attr(struct file *filp, bool force)
- {
- 	int rc = 0;
- 	struct inode *inode = file_inode(filp);
- 	struct cifsFileInfo *cfile = (struct cifsFileInfo *) filp->private_data;
- 
--	if (!cifs_inode_needs_reval(inode))
-+	if (!force && !cifs_inode_needs_reval(inode))
- 		return rc;
- 
- 	if (tlink_tcon(cfile->tlink)->unix_ext)
-@@ -2112,7 +2112,7 @@ int cifs_revalidate_file(struct file *filp)
- 	int rc;
- 	struct inode *inode = file_inode(filp);
- 
--	rc = cifs_revalidate_file_attr(filp);
-+	rc = cifs_revalidate_file_attr(filp, false);
- 	if (rc)
- 		return rc;
- 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 6250370c1170..6c0fe6544fd7 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -12,6 +12,7 @@
- #include <linux/uuid.h>
- #include <linux/sort.h>
- #include <crypto/aead.h>
-+#include "cifsfs.h"
- #include "cifsglob.h"
- #include "smb2pdu.h"
- #include "smb2proto.h"
-@@ -3106,9 +3107,19 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 		else if (i_size_read(inode) >= off + len)
- 			/* not extending file and already not sparse */
- 			rc = 0;
--		/* BB: in future add else clause to extend file */
--		else
--			rc = -EOPNOTSUPP;
-+		/* extend file */
-+		else {
-+			eof = cpu_to_le64(off + len);
-+			rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
-+					  cfile->fid.volatile_fid, cfile->pid,
-+					  &eof);
-+			if (!rc) {
-+				rc = cifs_revalidate_file_attr(file, true);
-+				if (rc)
-+					cifs_dbg(FYI, "Validation during fallocate "
-+						 "failed, error=%ld\n", rc);
-+			}
-+		}
- 		if (rc)
- 			trace_smb3_falloc_err(xid, cfile->fid.persistent_fid,
- 				tcon->tid, tcon->ses->Suid, off, len, rc);
-@@ -3146,6 +3157,12 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 			rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 					  cfile->fid.volatile_fid, cfile->pid,
- 					  &eof);
-+			if (!rc) {
-+				rc = cifs_revalidate_file_attr(file, true);
-+				if (rc)
-+					cifs_dbg(FYI, "Validation during fallocate "
-+						 "failed, error=%ld\n", rc);
-+			}
- 		}
- 	}
- 
--- 
-2.13.6
+2569 >-------if ((attrs->ia_valid & ATTR_SIZE) &&
+2570 >-------    attrs->ia_size !=3D i_size_read(inode))
+2571 >------->-------truncate_setsize(inode, attrs->ia_size);
 
+truncate_setsize() does  similar things as cifs_setsize() besides
+setting cinode->time to 0. This code path probably needs to be
+refactored. But putting this aside, for the current fallocate fix I
+think we should use the same existing mechanism to update a file size
+in the VFS without revalidating the inode.
+
+--
+Best regards,
+Pavel Shilovsky
