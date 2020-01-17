@@ -2,99 +2,104 @@ Return-Path: <SRS0=TaZu=3G=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8DB0C33CAF
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 03:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDE2C33C9E
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 04:48:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ACDEF2072B
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 03:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11D912082F
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 04:48:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="alOk43hD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pu+rPYnG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389236AbgAQDEV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Jan 2020 22:04:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48850 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S2388298AbgAQDEV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jan 2020 22:04:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1579230260;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dPPEBcv4TBO33AV58McnGR9jTaMWRyaA5nLrYaJHFWE=;
-        b=alOk43hD9uzPW8QBkg3krZajbg3o5oVXohQpxOBQPNyIuHuh5owxTaipDiW68r/hRxUQjh
-        O9dVONSxA/BzlcVMGdJFoGKKPnfcMUvppiMHi/Oourtug9RY6+glZdQQNQNU12AGz/b1jj
-        lv3VMErp3BO+R8ZfDFqFZfakZpxbz7M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-O6_ZzSWyPFmgEwirHChFzg-1; Thu, 16 Jan 2020 22:04:18 -0500
-X-MC-Unique: O6_ZzSWyPFmgEwirHChFzg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D80BDBA5;
-        Fri, 17 Jan 2020 03:04:18 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 036008432E;
-        Fri, 17 Jan 2020 03:04:18 +0000 (UTC)
-Received: from zmail25.collab.prod.int.phx2.redhat.com (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id EDA28503A4;
-        Fri, 17 Jan 2020 03:04:17 +0000 (UTC)
-Date:   Thu, 16 Jan 2020 22:04:17 -0500 (EST)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Message-ID: <644970174.6192265.1579230257768.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAH2r5mvLCqTXVFG93AgSJHTu8daMLwV_hpbjgJs-7orUwr7ffg@mail.gmail.com>
+        id S1727008AbgAQEsS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Jan 2020 23:48:18 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:41732 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726343AbgAQEsS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jan 2020 23:48:18 -0500
+Received: by mail-io1-f66.google.com with SMTP id m25so8982843ioo.8
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Jan 2020 20:48:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8gAo1V9znQ7t47L0/xlbEGazTNRJs4nKnBkcsrviBV0=;
+        b=Pu+rPYnGFOo+DnyHDuDJxQmzIYbYaSXBIWVIIg6pvteWE3BKruYDmnE4NxYpOJyVun
+         kjWxXBdzGuLPXojG4aq/uAQjqy7wRSSmjWU197kuPZ7Y3E+fu49vCUQYuBwGhQcsMvQr
+         GJZBcHezM0xxMiHhnYQ60UbijdOEA3DPne9JI3JdceNE8udwCxWAwOLXQXtuyXIiLw4A
+         Q4Weo2Sldv0Q/G/2/k5joBd4UZm+ZOanfZXETE23uBTsy4AM5EKsiMLfkOHGjgFdvOeD
+         VobExottfvO55hpeO960O8WwhbgM+oubuW7GIS2K54BNDILanLIVgsYClmC/Gnf0gO3k
+         ukEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8gAo1V9znQ7t47L0/xlbEGazTNRJs4nKnBkcsrviBV0=;
+        b=E3e61B7XrOxCOiKu7k9OSKP7o/O0CAbYLcwqmz/9u9cTXBHXkj0O2TLJnuvXhxiUUE
+         jO0BbwV1l6yE/i0CrqYgCrVKy4C3gDe8qpYZq9fpt493+ghTZYNsOjg55LvD1LN6c2I9
+         5InpqPkCANyq/KHHV+YEw3EyrSDfa7/pJw4uFLbczlYfSyFpHmS0QWaiPonKbdggAxa5
+         61oUnjGC4IyOR5mkJ+JY+WR24CdRTMmIxnajAVM484yH5+g+C87+TlgJpJ56f2Rhl67H
+         DGsVo2ibA6aZ/PVdwpXYUwcJs2N428ueiKUWxGOSfDRD2AlQuXVaJe4/i093X76uPcWm
+         3L7g==
+X-Gm-Message-State: APjAAAWZyhyzbkChzOUx+h5VMYETfScyC9cnj2uMF/7y60FDZQzS8mOH
+        QQESvtQOyrKy7LWn17M8Stp45MXr8OGGRyyR8gA=
+X-Google-Smtp-Source: APXvYqylxdkj6uvkC9qhuOvk0YUcTcRFaGULMBDMQzttMeU3m7n3YYBX85vdw4gUlvYUsXeYtNolPi05N5VOPpkCjDY=
+X-Received: by 2002:a6b:a06:: with SMTP id z6mr28093268ioi.5.1579236497563;
+ Thu, 16 Jan 2020 20:48:17 -0800 (PST)
+MIME-Version: 1.0
 References: <CAH2r5mvLCqTXVFG93AgSJHTu8daMLwV_hpbjgJs-7orUwr7ffg@mail.gmail.com>
+ <644970174.6192265.1579230257768.JavaMail.zimbra@redhat.com>
+In-Reply-To: <644970174.6192265.1579230257768.JavaMail.zimbra@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 16 Jan 2020 22:48:06 -0600
+Message-ID: <CAH2r5mvGDLY0CN3i0R3sLK9exaGbTVohVNzRjh8-482mp-d_yg@mail.gmail.com>
 Subject: Re: [PATCH][SMB3] Fix modefromsid newly created files to allow more
  permission on server
-MIME-Version: 1.0
-Content-Type: multipart/alternative; 
-        boundary="----=_Part_6192263_448403399.1579230257767"
-X-Originating-IP: [10.64.54.71, 10.4.195.6]
-Thread-Topic: Fix modefromsid newly created files to allow more permission on server
-Thread-Index: +zyBFZFPqsvmA4AnQ4A+n/tg1tJcHQ==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-------=_Part_6192263_448403399.1579230257767
-Content-Type: multipart/related; 
-	boundary="----=_Part_6192264_795809670.1579230257768"
+updated with your suggestion and reviewed-by
 
-------=_Part_6192264_795809670.1579230257768
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-Reviewed-By: Ronnie Sahlberg <lsahlber@redhat.com>
-
-But drop the extra parenthesises here :
-+		 (2 * sizeof(struct cifs_ace));
-
------ Original Message -----
-From: "Steve French" <smfrench@gmail.com>
-To: "CIFS" <linux-cifs@vger.kernel.org>
-Sent: Friday, 17 January, 2020 12:28:03 PM
-Subject: [PATCH][SMB3] Fix modefromsid newly created files to allow more permission on server
-
-    When mounting with "modefromsid" mount parm most servers will require
-    that some default permissions are given to users in the ACL on newly
-    created files, and for files created with the new 'sd context' -
-when passing in
-    an sd context on create, permissions are not inherited from the parent
-    directory, so in addition to the ACE with the special SID (which contains
-    the mode), we also must pass in an ACE allowing users to access the file
-    (GENERIC_ALL for authenticated users seemed like a reasonable default,
-    although later we could allow a mount option or config switch to make
-    it GENERIC_ALL for EVERYONE special sid).
-
+On Thu, Jan 16, 2020 at 9:04 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+>
+> Reviewed-By: Ronnie Sahlberg <lsahlber@redhat.com>
+>
+> But drop the extra parenthesises here :
+> +                (2 * sizeof(struct cifs_ace));
+>
+> ----- Original Message -----
+> From: "Steve French" <smfrench@gmail.com>
+> To: "CIFS" <linux-cifs@vger.kernel.org>
+> Sent: Friday, 17 January, 2020 12:28:03 PM
+> Subject: [PATCH][SMB3] Fix modefromsid newly created files to allow more permission on server
+>
+>     When mounting with "modefromsid" mount parm most servers will require
+>     that some default permissions are given to users in the ACL on newly
+>     created files, and for files created with the new 'sd context' -
+> when passing in
+>     an sd context on create, permissions are not inherited from the parent
+>     directory, so in addition to the ACE with the special SID (which contains
+>     the mode), we also must pass in an ACE allowing users to access the file
+>     (GENERIC_ALL for authenticated users seemed like a reasonable default,
+>     although later we could allow a mount option or config switch to make
+>     it GENERIC_ALL for EVERYONE special sid).
+>
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
 
 
@@ -102,8 +107,3 @@ when passing in
 Thanks,
 
 Steve
-
-------=_Part_6192264_795809670.1579230257768--
-
-------=_Part_6192263_448403399.1579230257767--
-
