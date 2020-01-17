@@ -1,204 +1,192 @@
-Return-Path: <SRS0=6r7N=3F=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=TaZu=3G=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C04EC33CAF
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 22:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABD4C33CAF
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 00:05:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5EABC20748
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jan 2020 22:06:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF21A206E6
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Jan 2020 00:05:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nc0X5ckw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FEQChekF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389764AbgAPWGw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Jan 2020 17:06:52 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40937 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729260AbgAPWGw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jan 2020 17:06:52 -0500
-Received: by mail-io1-f68.google.com with SMTP id x1so23695988iop.7;
-        Thu, 16 Jan 2020 14:06:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=knzeQPpwpmUJ11TawlbFVOi7iUcMTe9UXbqXHmIy6x8=;
-        b=Nc0X5ckwS0Uncvh6W9RMln28oDNFJf92A6ApU1c+wkQPPYhW1nbCAiqa/woL1MRNct
-         8y1KcS2KVv7lCAEthRdvlIIB9F/whSaW+ngES7vrub2eyoGIGn28Z2yEyAWC/oHfJxR8
-         bcdgICJ76pHCkarN8qfZe9gRvcDncD08jVk1fSHMJ8lJejjeeSgGDSgXkaDec+59yQ//
-         /wAKv1uAlXU2wdf8TfZI2HzllyGqSSMjMh1pV00RwhDJgQVAM1/dDBf143Teaa/pB1MJ
-         KxqOuGZhQ4YXUUXu/mMiToQcY4VqNHxOqGa/H3Lib8ObAFwnHLgc8Ri5mkbmSOHLX+sW
-         xQdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=knzeQPpwpmUJ11TawlbFVOi7iUcMTe9UXbqXHmIy6x8=;
-        b=aKFJQC7XZInBHRtIFdQapLmbcbqrxrncAHvoxZO3j20RTxraXG4pQqTtvpEp9pxSQO
-         +i503SExvx34kEEpZG0Lci/jEWx0Lkhnv9WW3ka80kFp5kFJt97Lm7Hy2+3pCPto+kU/
-         V0FJv7gwbmJEsGa9y6rg039fA82Hjm6NMI56g4+qKKrzhXgmRP6AVnn1uj35N0p35fO9
-         l8rycI/vzh0YpsJLpIEDNrd9uHJWzGVHbgZaFHV8w2pRbWnBu4cZw92QG9OPr7PpwtRJ
-         sVqruhrGYRGzNyUiif+fu3OzyJYu1KziedVHJkJKkOdmmmDEGRnA8SCNUU7m5dY5klgr
-         y8Fw==
-X-Gm-Message-State: APjAAAW9oWSFRf1XI7bUzGqGy/SRAt34veeBUcFrF7sVH7si+NnBqtyn
-        DIq+rGKtBWZKSRR8xasE5lAXKNF3lvhE3ANayRc=
-X-Google-Smtp-Source: APXvYqxLK0nmek4moXMlWTzFOChCalpCN0T4wM+Ql3A33S8tK9KrwjxQPrkF8tPOqUuEVelBvumhZG++ugI41Oliorc=
-X-Received: by 2002:a05:6638:6a6:: with SMTP id d6mr30886433jad.132.1579212411258;
- Thu, 16 Jan 2020 14:06:51 -0800 (PST)
-MIME-Version: 1.0
-References: <26f61914-3c0d-4911-7f21-23967839554c@canonical.com>
-In-Reply-To: <26f61914-3c0d-4911-7f21-23967839554c@canonical.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 16 Jan 2020 16:06:40 -0600
-Message-ID: <CAH2r5msT7GjFLGBbu40cYu3ZuwvWtdsCNM5V8n67o4uguC95Yg@mail.gmail.com>
-Subject: Re: cifs: Avoid doing network I/O while holding cache lock
-To:     Colin Ian King <colin.king@canonical.com>
-Cc:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
-        Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726370AbgAQAFC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Jan 2020 19:05:02 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27565 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726343AbgAQAFC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jan 2020 19:05:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579219499;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=ZMSohtMnPRAPAREa8pgIJxf1Qh375Ycttp/nXgBEprI=;
+        b=FEQChekFMh9HYgINDPDdWci0eJiPMOOFfkNWKjfGM4QA9z9NyiyBcOgYk7cExlKNoobdWu
+        No9ZTMdfzHaUA9/sOiFuDZS/PJ9hZbg0JLKnEDQbUfj+lsWilEYGE9/5sbBqJgj8hJfLxM
+        uPsOTGNGBE5k+T65R5uQvaZy6mr2Yc4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-6-fkIZMCClPpuCMXUFpMwtfQ-1; Thu, 16 Jan 2020 19:04:58 -0500
+X-MC-Unique: fkIZMCClPpuCMXUFpMwtfQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F91B8017CC
+        for <linux-cifs@vger.kernel.org>; Fri, 17 Jan 2020 00:04:57 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-71.bne.redhat.com [10.64.54.71])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 02EFF5D9C9;
+        Fri, 17 Jan 2020 00:04:56 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH] cifs: add support for fallocate mode 0 for non-sparse files
+Date:   Fri, 17 Jan 2020 10:04:48 +1000
+Message-Id: <20200117000448.13704-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Added the one line patch from Paulo to address what Colin reported and
-added a "Reported-by" for Colin mentioning Coverity.  merged into
-cifs-2.6.git for-next
+RHBZ 1336264
 
-On Thu, Jan 16, 2020 at 1:10 PM Colin Ian King <colin.king@canonical.com> wrote:
->
-> Hi,
->
-> static analysis with Coverity has detected an issue with the following
-> commit:
->
-> commit 03535b72873ba74e80e6938b5f772cf5b07ca76b
-> Author: Paulo Alcantara (SUSE) <pc@cjr.nz>
-> Date:   Wed Dec 4 17:38:03 2019 -0300
->
->     cifs: Avoid doing network I/O while holding cache lock
->
->
->
-> This commit removed a memset on the vol object, causing the issue as
-> reported below by Coverity:
->
-> 1342static struct cifs_ses *find_root_ses(struct vol_info *vi,
-> 1343                                      struct cifs_tcon *tcon,
-> 1344                                      const char *path)
-> 1345{
-> 1346        char *rpath;
-> 1347        int rc;
-> 1348        struct cache_entry *ce;
-> 1349        struct dfs_info3_param ref = {0};
-> 1350        char *mdata = NULL, *devname = NULL;
-> 1351        struct TCP_Server_Info *server;
-> 1352        struct cifs_ses *ses;
->
->     1. var_decl: Declaring variable vol without initializer.
-> 1353        struct smb_vol vol;
-> 1354
-> 1355        rpath = get_dfs_root(path);
->
->     2. Condition IS_ERR(rpath), taking false branch.
-> 1356        if (IS_ERR(rpath))
-> 1357                return ERR_CAST(rpath);
-> 1358
-> 1359        down_read(&htable_rw_lock);
-> 1360
-> 1361        ce = lookup_cache_entry(rpath, NULL);
->
->     3. Condition IS_ERR(ce), taking true branch.
-> 1362        if (IS_ERR(ce)) {
-> 1363                up_read(&htable_rw_lock);
-> 1364                ses = ERR_CAST(ce);
->
->     4. Jumping to label out.
-> 1365                goto out;
-> 1366        }
-> 1367
-> 1368        rc = setup_referral(path, ce, &ref, get_tgt_name(ce));
-> 1369        if (rc) {
-> 1370                up_read(&htable_rw_lock);
-> 1371                ses = ERR_PTR(rc);
-> 1372                goto out;
-> 1373        }
-> 1374
-> 1375        up_read(&htable_rw_lock);
-> 1376
-> 1377        mdata = cifs_compose_mount_options(vi->mntdata, rpath, &ref,
-> 1378                                           &devname);
-> 1379        free_dfs_info_param(&ref);
-> 1380
-> 1381        if (IS_ERR(mdata)) {
-> 1382                ses = ERR_CAST(mdata);
-> 1383                mdata = NULL;
-> 1384                goto out;
-> 1385        }
-> 1386
-> 1387        rc = cifs_setup_volume_info(&vol, mdata, devname, false);
-> 1388        kfree(devname);
-> 1389
-> 1390        if (rc) {
-> 1391                ses = ERR_PTR(rc);
-> 1392                goto out;
-> 1393        }
-> 1394
-> 1395        server = get_tcp_server(&vol);
-> 1396        if (!server) {
-> 1397                ses = ERR_PTR(-EHOSTDOWN);
-> 1398                goto out;
-> 1399        }
-> 1400
-> 1401        ses = cifs_get_smb_ses(server, &vol);
-> 1402
-> 1403out:
->
->     5. uninit_use_in_call: Using uninitialized value vol.username when
-> calling cifs_cleanup_volume_info_contents.
->
->     6. uninit_use_in_call: Using uninitialized value vol.password when
-> calling cifs_cleanup_volume_info_contents.
->
->     7. uninit_use_in_call: Using uninitialized value vol.domainname when
-> calling cifs_cleanup_volume_info_contents.
->
->     8. uninit_use_in_call: Using uninitialized value vol.UNC when
-> calling cifs_cleanup_volume_info_contents.
->
->     9. uninit_use_in_call: Using uninitialized value vol.iocharset when
-> calling cifs_cleanup_volume_info_contents.
->
->  Uninitialized pointer read
->    10. uninit_use_in_call: Using uninitialized value vol.prepath when
-> calling cifs_cleanup_volume_info_contents.
->
-> 1404        cifs_cleanup_volume_info_contents(&vol);
-> 1405        kfree(mdata);
-> 1406        kfree(rpath);
->
-> The vol object is memset as a result of calling cifs_setup_volume_info()
-> but this is too late for the earlier jumps to the error cleanup path at
-> label out.  I did think about putting this back but it adds an
-> unnecessary memset, a better fix may be return immediately or to exit
-> via the kfree(mdata) at the end of the function.
->
-> Not sure what is best, so I'm flagging this up as an issue that needs
-> fixing.
->
-> Colin
+When we extend a file we must also force the attributes (the size)
+to be revalidated.
 
+This fixes an issue with holetest in xfs-tests which performs the following
+sequence :
+1, create a new file
+2, use fallocate mode==0 to populate the file
+3, mmap the file
+4, touch each page by reading the mmapped region.
 
+If we don't revalidate the file as part of step 2, the handle will still have
+cached attributes where the size is 0 and thus the mmap will not map the
+requested region leading to SIGBUS for the application in step 4.
 
+We already had the same crash bug for sparse files but we never triggered that
+with our xfstests.
+
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/cifsfs.c  |  6 ++----
+ fs/cifs/cifsfs.h  |  2 +-
+ fs/cifs/inode.c   |  6 +++---
+ fs/cifs/smb2ops.c | 23 ++++++++++++++++++++---
+ 4 files changed, 26 insertions(+), 11 deletions(-)
+
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 5492b9860baa..638337dc04ee 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -957,11 +957,9 @@ static loff_t cifs_llseek(struct file *file, loff_t offset, int whence)
+ 		/*
+ 		 * Some applications poll for the file length in this strange
+ 		 * way so we must seek to end on non-oplocked files by
+-		 * setting the revalidate time to zero.
++		 * forcing revalidation.
+ 		 */
+-		CIFS_I(inode)->time = 0;
+-
+-		rc = cifs_revalidate_file_attr(file);
++		rc = cifs_revalidate_file_attr(file, true);
+ 		if (rc < 0)
+ 			return (loff_t)rc;
+ 	}
+diff --git a/fs/cifs/cifsfs.h b/fs/cifs/cifsfs.h
+index b59dc7478130..e72aec945875 100644
+--- a/fs/cifs/cifsfs.h
++++ b/fs/cifs/cifsfs.h
+@@ -75,7 +75,7 @@ extern int cifs_mkdir(struct inode *, struct dentry *, umode_t);
+ extern int cifs_rmdir(struct inode *, struct dentry *);
+ extern int cifs_rename2(struct inode *, struct dentry *, struct inode *,
+ 			struct dentry *, unsigned int);
+-extern int cifs_revalidate_file_attr(struct file *filp);
++extern int cifs_revalidate_file_attr(struct file *filp, bool force);
+ extern int cifs_revalidate_dentry_attr(struct dentry *);
+ extern int cifs_revalidate_file(struct file *filp);
+ extern int cifs_revalidate_dentry(struct dentry *);
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index ca76a9287456..1db84db822ec 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -2050,13 +2050,13 @@ cifs_zap_mapping(struct inode *inode)
+ 	return cifs_revalidate_mapping(inode);
+ }
+ 
+-int cifs_revalidate_file_attr(struct file *filp)
++int cifs_revalidate_file_attr(struct file *filp, bool force)
+ {
+ 	int rc = 0;
+ 	struct inode *inode = file_inode(filp);
+ 	struct cifsFileInfo *cfile = (struct cifsFileInfo *) filp->private_data;
+ 
+-	if (!cifs_inode_needs_reval(inode))
++	if (!force && !cifs_inode_needs_reval(inode))
+ 		return rc;
+ 
+ 	if (tlink_tcon(cfile->tlink)->unix_ext)
+@@ -2112,7 +2112,7 @@ int cifs_revalidate_file(struct file *filp)
+ 	int rc;
+ 	struct inode *inode = file_inode(filp);
+ 
+-	rc = cifs_revalidate_file_attr(filp);
++	rc = cifs_revalidate_file_attr(filp, false);
+ 	if (rc)
+ 		return rc;
+ 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 6250370c1170..6c0fe6544fd7 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -12,6 +12,7 @@
+ #include <linux/uuid.h>
+ #include <linux/sort.h>
+ #include <crypto/aead.h>
++#include "cifsfs.h"
+ #include "cifsglob.h"
+ #include "smb2pdu.h"
+ #include "smb2proto.h"
+@@ -3106,9 +3107,19 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 		else if (i_size_read(inode) >= off + len)
+ 			/* not extending file and already not sparse */
+ 			rc = 0;
+-		/* BB: in future add else clause to extend file */
+-		else
+-			rc = -EOPNOTSUPP;
++		/* extend file */
++		else {
++			eof = cpu_to_le64(off + len);
++			rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
++					  cfile->fid.volatile_fid, cfile->pid,
++					  &eof);
++			if (!rc) {
++				rc = cifs_revalidate_file_attr(file, true);
++				if (rc)
++					cifs_dbg(FYI, "Validation during fallocate "
++						 "failed, error=%ld\n", rc);
++			}
++		}
+ 		if (rc)
+ 			trace_smb3_falloc_err(xid, cfile->fid.persistent_fid,
+ 				tcon->tid, tcon->ses->Suid, off, len, rc);
+@@ -3146,6 +3157,12 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 			rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
+ 					  cfile->fid.volatile_fid, cfile->pid,
+ 					  &eof);
++			if (!rc) {
++				rc = cifs_revalidate_file_attr(file, true);
++				if (rc)
++					cifs_dbg(FYI, "Validation during fallocate "
++						 "failed, error=%ld\n", rc);
++			}
+ 		}
+ 	}
+ 
 -- 
-Thanks,
+2.13.6
 
-Steve
