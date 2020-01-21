@@ -7,100 +7,116 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87134C33CAA
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jan 2020 03:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC11C2D0DB
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jan 2020 07:47:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55E4422522
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jan 2020 03:55:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BF9B2253D
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jan 2020 07:47:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="va2tkpi6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqc+rxO6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727144AbgAUDzS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Jan 2020 22:55:18 -0500
-Received: from mail-io1-f48.google.com ([209.85.166.48]:44153 "EHLO
-        mail-io1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727009AbgAUDzS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Jan 2020 22:55:18 -0500
-Received: by mail-io1-f48.google.com with SMTP id b10so1314036iof.11;
-        Mon, 20 Jan 2020 19:55:18 -0800 (PST)
+        id S1727590AbgAUHry (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Jan 2020 02:47:54 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:33102 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726729AbgAUHry (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Jan 2020 02:47:54 -0500
+Received: by mail-il1-f193.google.com with SMTP id v15so1651461iln.0;
+        Mon, 20 Jan 2020 23:47:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=A4tDUIGRmfMPIKlyexLTrGsvOihJxfhsquzCv2ViF0c=;
-        b=va2tkpi6L71ioWs27G3qEUMLYaraNLXkvXwkhtxBc/JRduz6BMOq6Loo0yRPvdoi7c
-         jqzsG2PGCrYlgh7lvNCf9tq2yVP9aT37U5AaZCcXIq0nNief8Hy8QP9xeV40YyZdc8Ah
-         O1WpvYwIXbYCtwCqwogr74LsvZgUqJYwluCvTgVIfFf+0MXbFZaJ+3JC+LhEzR4dWENr
-         WJU+TRv/w2pRPqIiwzMqKwpkPQzXxWZ1ZTovR0dZXWycpSKoksZHTOQ3HQB6DkRN86rb
-         cU35jHGRR+t28c73gKD2jxDhKrYOQDN3Y/KKhlAwH58il2cXOGjklOZyPedeM+BV9yxH
-         Ly0g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PgjBhPbvshFDfbTkhZA28Te0UEivEgnibuK+F+CDeMw=;
+        b=nqc+rxO6ibTOcZJ566VYbsDxMcnlALzKdSMga43H9i0fCDdV3POAscmCBadFbbfKcR
+         BFfIqQ7TO+4bZril9E6hqr32maedxZE95eYHZnGUB/fLXYzwjbYA9qth94MBbHLlftb9
+         gHe0f47lfmVXPrsYv7/BD6c3e5EV4xzzcuAlmXXhrTS1XG69RnJ5mdkEAfFAvTVqdbfq
+         7HX4fR57V2jbx+mT6X7QFyHSKlYhnNBjs6clvOccnlquQ/38qu+3v7O8WgcsToGAmriB
+         NZJqF+hIWO5NyEeVfQnjMdtCZbPbUa0VSdY7bhrW/okdm/B75124cjFWo9Y0ksx22ifl
+         R1dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=A4tDUIGRmfMPIKlyexLTrGsvOihJxfhsquzCv2ViF0c=;
-        b=saqdJv8AHl3tlCqLStvnlu7amxgtF8ghg0kBvWEp8OqdhcUYg3L6d42YxvQd8RZyhT
-         UF5fXfzLta96GFBFfAkMpSKgAYuuhHj5SFMwQ8jjpGaQDe14RPSW75YvkdHXVGixRTi/
-         B6fGANHyuPSALhjZCQNF6D4BxjxpZKl2MiLRQ9mEIYSgp6bw8BypY3gNvUhDXkf3K5h4
-         hS1boknonSqDstnxRmwUmPIf7Z5ssWu6CqMYmBGYpylG7ghSIlOQF3Hs73phouwXhde9
-         WhfzP4duXTimNTh9xmxXCKBnotsBgyTT0w9X8SjbDzXmpggtAxwlK3qA4if0BeMdTM92
-         zJQQ==
-X-Gm-Message-State: APjAAAUCRdVXCX6sG04sYqVGhcGzWTZipzikFFreGbV62FW0okP7KPK5
-        iiNYls5me7fkUIlON87s1/0gyJ7AgqT0YBsRLhvti/J+1VA=
-X-Google-Smtp-Source: APXvYqxcIn8DniNQJStIEFSLLJoSkZuZDAanME5mwJ0UM/0eRf98+lLJwHIXq8ODvZ36D2Yhj1f06vViWDC2c3KEn/s=
-X-Received: by 2002:a02:2446:: with SMTP id q6mr1779382jae.78.1579578917548;
- Mon, 20 Jan 2020 19:55:17 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PgjBhPbvshFDfbTkhZA28Te0UEivEgnibuK+F+CDeMw=;
+        b=GCtg6HVm1a7yeCROxLDvtIQ7elNjljSLFwsxFQLyYSu4iKLgewa/g1qMlo6+oU7LZb
+         POtVB+QUfYYnOM2gWMfzC+hwCQwpc1nM9oWDShnCLdtDYWk/mbgHL72pADUr39PHQkf3
+         BYrnnIYBghGlOs3ulHXufxTqJ1d1Eu9O9wLmA5msDZ4AI0p5vKdhv9h2ssblYovch9C5
+         vIgFZ9bz5Zzw4smGRuIlz3kr/ciqsrcPZPgjobpRBV5xwJdGrzqmncNGSEUy/ogp+T1h
+         fJz5iaRN/Ryx8LpxZgr9y41i0KW5+Mh1VgGebHeq1UgWBGdL0JNjxl4Zh0xZtrFbSi8R
+         LWBA==
+X-Gm-Message-State: APjAAAVavxxedBjQlpCd+25BmCCDNbNQCwVEmNWa7wukGIR+IkH0X1mP
+        7VHwoZCnAEGB+rByFeNQUEomBEMwugRCvDAL98A=
+X-Google-Smtp-Source: APXvYqwvCy26eK74WcnhrWGh3ZJau/X4Pbmh8O54PvYsw6GC0n0c4VxqXT0yqYF88bbM9pFnRRP31sV5HpO7nVVnKIw=
+X-Received: by 2002:a92:9c8c:: with SMTP id x12mr2548323ill.275.1579592873495;
+ Mon, 20 Jan 2020 23:47:53 -0800 (PST)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 20 Jan 2020 21:55:06 -0600
-Message-ID: <CAH2r5mvUmZca8TRVsyZvrB_Loeeo4Kd8T7rHw5s6iaN=yC+O_Q@mail.gmail.com>
-Subject: [LFS/MM TOPIC] Enabling file and directory change notification for
- network and cluster file systems
-To:     linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
+References: <CAH2r5mvUmZca8TRVsyZvrB_Loeeo4Kd8T7rHw5s6iaN=yC+O_Q@mail.gmail.com>
+In-Reply-To: <CAH2r5mvUmZca8TRVsyZvrB_Loeeo4Kd8T7rHw5s6iaN=yC+O_Q@mail.gmail.com>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Tue, 21 Jan 2020 09:47:42 +0200
+Message-ID: <CAOQ4uxipauh1UXHSFt=WsiaDexqecjm4eDkVfnQXN8eYofdg2A@mail.gmail.com>
+Subject: Re: [LFS/MM TOPIC] Enabling file and directory change notification
+ for network and cluster file systems
+To:     Steve French <smfrench@gmail.com>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        Jan Kara <jack@suse.cz>, Miklos Szeredi <miklos@szeredi.hu>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Currently the inotify interface in the kernel can only be used for
-local file systems (unlike the previous change notify API used years
-ago, and the change notify interface in Windows and other OS which is
-primarily of interest for network file systems).
+On Tue, Jan 21, 2020 at 5:55 AM Steve French <smfrench@gmail.com> wrote:
+>
+> Currently the inotify interface in the kernel can only be used for
+> local file systems (unlike the previous change notify API used years
+> ago, and the change notify interface in Windows and other OS which is
+> primarily of interest for network file systems).
+>
+> I wanted to discuss the VFS changes needed to allow inotify requests
+> to be passed into file systems so network and cluster file systems (as
+> an example in the SMB3 case this simply means sending a
+> SMB3_CHANGE_NOTIFY request to the server, whether Samba or Cloud
+> (Azure) or Mac or Windows or Network Appliance - all support the API
+> on the server side, the problem is that the network or cluster fs
+> client isn't told about the request to wait on the inotify event).
+> Although user space tools can use file system specific ioctls to wait
+> on events, it is obviously preferable to allow network and cluster
+> file systems to wait on events using the calls which current Linux
+> GUIs use.
+>
+> This would allow gnome file manager GUI for example to be
+> automatically updated when a file is added to an open directory window
+> from another remote client.
+>
+> It would also fix the embarrassing problem noted in the inotify man page:
+>
+> "Inotify  reports  only events that a user-space program triggers
+> through the filesystem
+>        API.  As a result, it does not catch remote events that occur
+> on  network  filesystems."
+>
+> but that is precisely the types of notifications that are most useful
+> ... users often are aware of updates to local directories from the
+> same system, but ... automatic notifications that allow GUIs to be
+> updated on changes from **other** clients is of more value (and this
+> is exactly what the equivalent API allows on other OS).
+>
+> The changes to the Linux VFS are small.
+>
+>
 
-I wanted to discuss the VFS changes needed to allow inotify requests
-to be passed into file systems so network and cluster file systems (as
-an example in the SMB3 case this simply means sending a
-SMB3_CHANGE_NOTIFY request to the server, whether Samba or Cloud
-(Azure) or Mac or Windows or Network Appliance - all support the API
-on the server side, the problem is that the network or cluster fs
-client isn't told about the request to wait on the inotify event).
-Although user space tools can use file system specific ioctls to wait
-on events, it is obviously preferable to allow network and cluster
-file systems to wait on events using the calls which current Linux
-GUIs use.
+Miklos has already posted an RFC patch:
+https://lore.kernel.org/linux-fsdevel/20190507085707.GD30899@veci.piliscsaba.redhat.com/
 
-This would allow gnome file manager GUI for example to be
-automatically updated when a file is added to an open directory window
-from another remote client.
+Did you try it?
 
-It would also fix the embarrassing problem noted in the inotify man page:
+You also did not answer Miklos' question:
+does the smb protocol support whole filesystem (or subtree) notifications?
+(or just per-directory notifications)?
 
-"Inotify  reports  only events that a user-space program triggers
-through the filesystem
-       API.  As a result, it does not catch remote events that occur
-on  network  filesystems."
-
-but that is precisely the types of notifications that are most useful
-... users often are aware of updates to local directories from the
-same system, but ... automatic notifications that allow GUIs to be
-updated on changes from **other** clients is of more value (and this
-is exactly what the equivalent API allows on other OS).
-
-The changes to the Linux VFS are small.
-
-
--- 
 Thanks,
-
-Steve
+Amir.
