@@ -2,66 +2,66 @@ Return-Path: <SRS0=MBFb=3L=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B23F8C2D0CE
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 00:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97ED8C2D0CE
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 00:25:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82EE724655
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 00:04:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33B1D217F4
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 00:25:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMDSbD16"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOD7sbiS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726970AbgAVAEq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Jan 2020 19:04:46 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:40796 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726876AbgAVAEq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Jan 2020 19:04:46 -0500
-Received: by mail-lj1-f193.google.com with SMTP id u1so4758557ljk.7
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Jan 2020 16:04:44 -0800 (PST)
+        id S1728890AbgAVAZ5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Jan 2020 19:25:57 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:33198 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726876AbgAVAZ5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Jan 2020 19:25:57 -0500
+Received: by mail-ed1-f66.google.com with SMTP id r21so4987374edq.0
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Jan 2020 16:25:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=y/Ajp2Z27bCzKH6Yb4QKQSOWD/W+krohknSFQu5P+qY=;
-        b=YMDSbD161QKsfw4NhR4pVjQvgPk55qZ+jYLqpCclb9BVDy9YUG8azRRnEpwP2kUtD4
-         iVOS090Bl2qc3f0eJeiLh1w6e6W4JWl+dNKMq+75zfDWB0s1fOeeiW0zl7DPg2+35m4+
-         t6aWGyf+qloVz17fobYxZvhjnRc5rZxUA5VCe55XF5xfxBKFnUcORamsPPkX5bXHP73q
-         iz0Y8q9Z3UhrxHNEsY1f3hgqKsmRhdtq9TPHpEns27P8cZNg/akkg+bO6CDbhTOiUh2+
-         /Dw9V9SVdiBzB4fuaatZQls9qrsRC75sr5gIQy/zB9GAwY64XYhrbsLGgybY8vAj8Gg7
-         Y7Fw==
+        bh=YJUFydQOHJtIkFbRTL42mdIWMgmFTOzV0gMgMMwvfKA=;
+        b=kOD7sbiS54fVkCmUDaSJ/Ifj4slr5fXvFIqdD+9ZIbaKs2SU7+4NGzpHSPz8rPzM/K
+         0TJ0qcm4rGgslJGUALjGuq9YkRxcPDNHSIkQiBC+GwU5/Dhc5cx8fNzDfeHF+1qbBOss
+         aOR2ym9+69xyElRDWXWzFDVCVIT11l53Up96519e584IBzN5vun5Yw7K+R33/nval4TV
+         sbM3m2uaXBBtgcaOSseHM3IbKqZQh2GsQ0NYGCnOlpUmacFOb/7VSstGdtB0qO6dufZm
+         NR8ZXc4WZV5xGVyeE9AHR8fwfdmBixOPbMkaXDx8X2tJUepKBoIM/wZuCIQPAUdIiWha
+         OJeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=y/Ajp2Z27bCzKH6Yb4QKQSOWD/W+krohknSFQu5P+qY=;
-        b=rj3yCQAzF1uc9HedjeaFlWJM00QgqN9QiBnh4fmgMqX6IsAS96ZmRtlx6yv7EQBkfq
-         E1yNNDlf2bhZafFQxxm41FW56ji53D7JA3/b6f0KiQ6q97upPfMm9XszTky3GKNZ4mrZ
-         yaR5OzaQAIlB8vZfqSa4yPwkKV1JMoNrrDuSSC6mdInKDMOqakhGVMUCfbBpd5kJULuU
-         BJxl1CZ2o1kmyyVTZj3lnCD0ZwiX4fFPrvpx9JM7v5kAyId9Cz91Q79dojlQiP/GLvil
-         15hYhs/W66Bt6wyD7hsTW8RwHVpSxKHHGr1lapNECB0e7O7D9vzNaUzK6NxrXrgziJh/
-         QdPA==
-X-Gm-Message-State: APjAAAUJHT4+9ykpXlTQvd/aRAhZsclatJxPOWM8/Zf9Y62Zo/1d5hg5
-        25IejxrKH25HFTxTZ+V2rM9dfexZNeZ3/lEPRA==
-X-Google-Smtp-Source: APXvYqxa0H5jIWe+cs6vHhI8uL6lmfGUTxNZ/4YWmZA4Up+kO+RId1cfO5pxGKrvtlZV1wMMitsTTcn2yBRqVsM5FBc=
-X-Received: by 2002:a2e:9708:: with SMTP id r8mr17744893lji.92.1579651483750;
- Tue, 21 Jan 2020 16:04:43 -0800 (PST)
+        bh=YJUFydQOHJtIkFbRTL42mdIWMgmFTOzV0gMgMMwvfKA=;
+        b=Ed0SrQDjbEpxAYsF8MTdicez1+ArP9xt0FudGZd+lCPk/xOJd5Je+F+CwBGtjCIjCm
+         UovGsg8jTk0cOPjxcDBpt87gBJqKVIkbR3GkQSjy/lc9bzNbC3j/sej0i9PQsYnhu2/x
+         q3wLmSXTYVJfYenhLQCUk/xyrLmCp4nzPQmNUFvxDGKr4coSsJsryzygNFiaPO3oDka1
+         G3nfqH4u8ZojXUei20eMOJdfr1h3HlfpbwbYH7b2sMupElESfInFj5moHQlnM+tv58MN
+         rBC09oKh8uMt9t5j9W0mvuEYSmsb7EV03Dt/3n58Ybj8YSjlH2dxQRxvdXSlOaC/i5eX
+         oTeQ==
+X-Gm-Message-State: APjAAAXwSf/B8EufU+a5wCVq4gJgqY8WMWrQ/T81FF4k0nvT+MLKQAwm
+        Zzv1jq7F7cNbEMvSe+3EI1km7GIo+slw/ce42/VdkxU=
+X-Google-Smtp-Source: APXvYqzueXcfblW2WXruWbzzwxJmu4W6PRMjZ7QZst5r9WyXa3vPuMSS1uKlPQNqinr3X2iVN8Dr4RrKGCS9dGT5rA4=
+X-Received: by 2002:a2e:9708:: with SMTP id r8mr17779288lji.92.1579652754963;
+ Tue, 21 Jan 2020 16:25:54 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5mvLCqTXVFG93AgSJHTu8daMLwV_hpbjgJs-7orUwr7ffg@mail.gmail.com>
- <644970174.6192265.1579230257768.JavaMail.zimbra@redhat.com> <CAH2r5mvGDLY0CN3i0R3sLK9exaGbTVohVNzRjh8-482mp-d_yg@mail.gmail.com>
-In-Reply-To: <CAH2r5mvGDLY0CN3i0R3sLK9exaGbTVohVNzRjh8-482mp-d_yg@mail.gmail.com>
+References: <20200106163119.9083-1-boris.v.protopopov@gmail.com>
+In-Reply-To: <20200106163119.9083-1-boris.v.protopopov@gmail.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Tue, 21 Jan 2020 16:04:32 -0800
-Message-ID: <CAKywueS+3KdMHzg60Mp=NLbUv3EYwzaUROq5w4uD7jj1Ph42kQ@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] Fix modefromsid newly created files to allow more
- permission on server
-To:     Steve French <smfrench@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>
+Date:   Tue, 21 Jan 2020 16:25:43 -0800
+Message-ID: <CAKywueQu5sK8gbNurZw0qZppbAJ9C4myqzPdD_6vSVJw=LXPsQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Convert owner and group SID offsets to LE format
+To:     Boris Protopopov <boris.v.protopopov@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        sblbir@amazon.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -69,63 +69,48 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good.
+=D0=BF=D0=BD, 6 =D1=8F=D0=BD=D0=B2. 2020 =D0=B3. =D0=B2 08:31, Boris Protop=
+opov <boris.v.protopopov@gmail.com>:
+>
+> Convert owner and group SID offsets to LE format
+> when writing to ntsd
+>
+> Signed-off-by: Boris Protopopov <boris.v.protopopov@gmail.com>
+> ---
+>  setcifsacl.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/setcifsacl.c b/setcifsacl.c
+> index f3d0189..9a301e2 100644
+> --- a/setcifsacl.c
+> +++ b/setcifsacl.c
+> @@ -114,12 +114,14 @@ copy_sec_desc(const struct cifs_ntsd *pntsd, struct=
+ cifs_ntsd *pnntsd,
+>         if (dacloffset <=3D osidsoffset) {
+>                 /* owners placed at end of ACL */
+>                 nowner_sid_ptr =3D (struct cifs_sid *)((char *)pnntsd + d=
+acloffset + size);
+> -               pnntsd->osidoffset =3D dacloffset + size;
+> +               osidsoffset =3D dacloffset + size;
+> +               pnntsd->osidoffset =3D htole32(osidsoffset);
+>                 size =3D copy_cifs_sid(nowner_sid_ptr, owner_sid_ptr);
+>                 bufsize +=3D size;
+>                 /* put group SID after owner SID */
+>                 ngroup_sid_ptr =3D (struct cifs_sid *)((char *)nowner_sid=
+_ptr + size);
+> -               pnntsd->gsidoffset =3D pnntsd->osidoffset + size;
+> +               gsidsoffset =3D osidsoffset + size;
+> +               pnntsd->gsidoffset =3D htole32(gsidsoffset);
+>         } else {
+>                 /*
+>                  * Most servers put the owner information at the beginnin=
+g,
+> --
+> 2.14.5
+>
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+Merged into "next". Thanks!
 
 --
 Best regards,
 Pavel Shilovsky
-
-=D1=87=D1=82, 16 =D1=8F=D0=BD=D0=B2. 2020 =D0=B3. =D0=B2 21:26, Steve Frenc=
-h <smfrench@gmail.com>:
->
-> updated with your suggestion and reviewed-by
->
-> On Thu, Jan 16, 2020 at 9:04 PM Ronnie Sahlberg <lsahlber@redhat.com> wro=
-te:
-> >
-> > Reviewed-By: Ronnie Sahlberg <lsahlber@redhat.com>
-> >
-> > But drop the extra parenthesises here :
-> > +                (2 * sizeof(struct cifs_ace));
-> >
-> > ----- Original Message -----
-> > From: "Steve French" <smfrench@gmail.com>
-> > To: "CIFS" <linux-cifs@vger.kernel.org>
-> > Sent: Friday, 17 January, 2020 12:28:03 PM
-> > Subject: [PATCH][SMB3] Fix modefromsid newly created files to allow mor=
-e permission on server
-> >
-> >     When mounting with "modefromsid" mount parm most servers will requi=
-re
-> >     that some default permissions are given to users in the ACL on newl=
-y
-> >     created files, and for files created with the new 'sd context' -
-> > when passing in
-> >     an sd context on create, permissions are not inherited from the par=
-ent
-> >     directory, so in addition to the ACE with the special SID (which co=
-ntains
-> >     the mode), we also must pass in an ACE allowing users to access the=
- file
-> >     (GENERIC_ALL for authenticated users seemed like a reasonable defau=
-lt,
-> >     although later we could allow a mount option or config switch to ma=
-ke
-> >     it GENERIC_ALL for EVERYONE special sid).
-> >
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
