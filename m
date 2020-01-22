@@ -1,4 +1,4 @@
-Return-Path: <SRS0=Mt6t=3K=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=MBFb=3L=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,163 +7,125 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FA2FC2D0CE
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jan 2020 10:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B23F8C2D0CE
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 00:04:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4387B20882
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jan 2020 10:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82EE724655
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 00:04:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DVh8CqzI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMDSbD16"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728682AbgAUKDI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Jan 2020 05:03:08 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38061 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728512AbgAUKDI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Jan 2020 05:03:08 -0500
-Received: by mail-io1-f66.google.com with SMTP id i7so2230448ioo.5;
-        Tue, 21 Jan 2020 02:03:07 -0800 (PST)
+        id S1726970AbgAVAEq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Jan 2020 19:04:46 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:40796 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726876AbgAVAEq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Jan 2020 19:04:46 -0500
+Received: by mail-lj1-f193.google.com with SMTP id u1so4758557ljk.7
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Jan 2020 16:04:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lRLVY0ayDDdLTY8PY27WBbkZWTqTTISM+W1lZC8rwFw=;
-        b=DVh8CqzIeJJCqf5lPCo5fml9z41h0s45Lfl19jzzHrciveokpsxw7VW7fTTioI29IB
-         TJviJ2WeJFbjyw/16aezwF10+mby0r/igGmygy98Ayh/qHA6/y8UjimBFTMzYrEeBIes
-         eofkvD99ixwuArs+n6WicBKTYUh1n7hZsA6Ptrvj+DEdP/feNKBqMVfp7kE5Wsyus/VG
-         NtJW4Ety1aQ2WMMfX7L/VS9KJINaXUy6SKYcaLj2gWrUN3W9b9eeteQZ4syX7rFN73bN
-         3UPOaVn4B68rlZaUcnI3ZTSaWE696jPhWItmAlFWH7gsY792e2Ne4qvYCq06DtsdQUif
-         IT7A==
+         :cc:content-transfer-encoding;
+        bh=y/Ajp2Z27bCzKH6Yb4QKQSOWD/W+krohknSFQu5P+qY=;
+        b=YMDSbD161QKsfw4NhR4pVjQvgPk55qZ+jYLqpCclb9BVDy9YUG8azRRnEpwP2kUtD4
+         iVOS090Bl2qc3f0eJeiLh1w6e6W4JWl+dNKMq+75zfDWB0s1fOeeiW0zl7DPg2+35m4+
+         t6aWGyf+qloVz17fobYxZvhjnRc5rZxUA5VCe55XF5xfxBKFnUcORamsPPkX5bXHP73q
+         iz0Y8q9Z3UhrxHNEsY1f3hgqKsmRhdtq9TPHpEns27P8cZNg/akkg+bO6CDbhTOiUh2+
+         /Dw9V9SVdiBzB4fuaatZQls9qrsRC75sr5gIQy/zB9GAwY64XYhrbsLGgybY8vAj8Gg7
+         Y7Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lRLVY0ayDDdLTY8PY27WBbkZWTqTTISM+W1lZC8rwFw=;
-        b=UzU+reaj/m9rDebajOrOjm1oG2PHX1AgZTFIGsVWIuXE+T0MUsy5yU/jDt9c1RmE5l
-         QNEBawWWcnhbJLwf8uSt7PXPJ1YCTG3Rp/v6pwAkFU1D325BRGneBARbNVdhk0sHNbQO
-         80oHTlefzKxppxFLCuJH3r00ZF3RUUIYE4rmflNf6ZuUspVdVhT96+wGNZPNEF4NyHlW
-         a55TxTEO/Pz4jMa53Vfoap2MNy2zpPyzwWzxNIo1//5lvjfsFtFiDdCjuf4xctX3GpEU
-         PTi2W3UCvQ0+HVv9I+N4vUBH+NfhFJ9ONTRZo+zawtYMlznJNbZimi8Y3J+i3S6oiex8
-         t56g==
-X-Gm-Message-State: APjAAAVCEKU+J1OcEY/UmaT4+ChHnLioUTH5Fc6W5Z6XpUI43rZJjf3G
-        zZn28t3RCzSVf52h41t2xvJb4lFLkeCyTvuWFgSrsfbd
-X-Google-Smtp-Source: APXvYqzdOeESSnZVuwRJTueioQY/+cJkRvgsK9YbBYEH2ehmz0OoLGmo5Er8u4bnQhrPYdvAfN0uy9vXJg71sUzjV8U=
-X-Received: by 2002:a6b:e506:: with SMTP id y6mr2340288ioc.209.1579600987362;
- Tue, 21 Jan 2020 02:03:07 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=y/Ajp2Z27bCzKH6Yb4QKQSOWD/W+krohknSFQu5P+qY=;
+        b=rj3yCQAzF1uc9HedjeaFlWJM00QgqN9QiBnh4fmgMqX6IsAS96ZmRtlx6yv7EQBkfq
+         E1yNNDlf2bhZafFQxxm41FW56ji53D7JA3/b6f0KiQ6q97upPfMm9XszTky3GKNZ4mrZ
+         yaR5OzaQAIlB8vZfqSa4yPwkKV1JMoNrrDuSSC6mdInKDMOqakhGVMUCfbBpd5kJULuU
+         BJxl1CZ2o1kmyyVTZj3lnCD0ZwiX4fFPrvpx9JM7v5kAyId9Cz91Q79dojlQiP/GLvil
+         15hYhs/W66Bt6wyD7hsTW8RwHVpSxKHHGr1lapNECB0e7O7D9vzNaUzK6NxrXrgziJh/
+         QdPA==
+X-Gm-Message-State: APjAAAUJHT4+9ykpXlTQvd/aRAhZsclatJxPOWM8/Zf9Y62Zo/1d5hg5
+        25IejxrKH25HFTxTZ+V2rM9dfexZNeZ3/lEPRA==
+X-Google-Smtp-Source: APXvYqxa0H5jIWe+cs6vHhI8uL6lmfGUTxNZ/4YWmZA4Up+kO+RId1cfO5pxGKrvtlZV1wMMitsTTcn2yBRqVsM5FBc=
+X-Received: by 2002:a2e:9708:: with SMTP id r8mr17744893lji.92.1579651483750;
+ Tue, 21 Jan 2020 16:04:43 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5mvUmZca8TRVsyZvrB_Loeeo4Kd8T7rHw5s6iaN=yC+O_Q@mail.gmail.com>
- <CAOQ4uxipauh1UXHSFt=WsiaDexqecjm4eDkVfnQXN8eYofdg2A@mail.gmail.com>
- <CAN05THQeUs1ksOv5sRTx7Dvr0=WKxSguw+gWpw2KpX3byEJagw@mail.gmail.com> <CAOQ4uxgNEoO-NHb9V=Nqho5dBz2U034Q6wa_Gw=sKmYj2uUJMQ@mail.gmail.com>
-In-Reply-To: <CAOQ4uxgNEoO-NHb9V=Nqho5dBz2U034Q6wa_Gw=sKmYj2uUJMQ@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Tue, 21 Jan 2020 20:02:56 +1000
-Message-ID: <CAN05THSwSMji9CHM=x6oKzRmD2XO9TUShBO-ExT07vom8fRdoA@mail.gmail.com>
-Subject: Re: [LFS/MM TOPIC] Enabling file and directory change notification
- for network and cluster file systems
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        Jan Kara <jack@suse.cz>, Miklos Szeredi <miklos@szeredi.hu>
+References: <CAH2r5mvLCqTXVFG93AgSJHTu8daMLwV_hpbjgJs-7orUwr7ffg@mail.gmail.com>
+ <644970174.6192265.1579230257768.JavaMail.zimbra@redhat.com> <CAH2r5mvGDLY0CN3i0R3sLK9exaGbTVohVNzRjh8-482mp-d_yg@mail.gmail.com>
+In-Reply-To: <CAH2r5mvGDLY0CN3i0R3sLK9exaGbTVohVNzRjh8-482mp-d_yg@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Tue, 21 Jan 2020 16:04:32 -0800
+Message-ID: <CAKywueS+3KdMHzg60Mp=NLbUv3EYwzaUROq5w4uD7jj1Ph42kQ@mail.gmail.com>
+Subject: Re: [PATCH][SMB3] Fix modefromsid newly created files to allow more
+ permission on server
+To:     Steve French <smfrench@gmail.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Jan 21, 2020 at 7:43 PM Amir Goldstein <amir73il@gmail.com> wrote:
+Looks good.
+
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+
+--
+Best regards,
+Pavel Shilovsky
+
+=D1=87=D1=82, 16 =D1=8F=D0=BD=D0=B2. 2020 =D0=B3. =D0=B2 21:26, Steve Frenc=
+h <smfrench@gmail.com>:
 >
-> On Tue, Jan 21, 2020 at 10:30 AM ronnie sahlberg
-> <ronniesahlberg@gmail.com> wrote:
+> updated with your suggestion and reviewed-by
+>
+> On Thu, Jan 16, 2020 at 9:04 PM Ronnie Sahlberg <lsahlber@redhat.com> wro=
+te:
 > >
-> > On Tue, Jan 21, 2020 at 5:48 PM Amir Goldstein <amir73il@gmail.com> wrote:
-> > >
-> > > On Tue, Jan 21, 2020 at 5:55 AM Steve French <smfrench@gmail.com> wrote:
-> > > >
-> > > > Currently the inotify interface in the kernel can only be used for
-> > > > local file systems (unlike the previous change notify API used years
-> > > > ago, and the change notify interface in Windows and other OS which is
-> > > > primarily of interest for network file systems).
-> > > >
-> > > > I wanted to discuss the VFS changes needed to allow inotify requests
-> > > > to be passed into file systems so network and cluster file systems (as
-> > > > an example in the SMB3 case this simply means sending a
-> > > > SMB3_CHANGE_NOTIFY request to the server, whether Samba or Cloud
-> > > > (Azure) or Mac or Windows or Network Appliance - all support the API
-> > > > on the server side, the problem is that the network or cluster fs
-> > > > client isn't told about the request to wait on the inotify event).
-> > > > Although user space tools can use file system specific ioctls to wait
-> > > > on events, it is obviously preferable to allow network and cluster
-> > > > file systems to wait on events using the calls which current Linux
-> > > > GUIs use.
-> > > >
-> > > > This would allow gnome file manager GUI for example to be
-> > > > automatically updated when a file is added to an open directory window
-> > > > from another remote client.
-> > > >
-> > > > It would also fix the embarrassing problem noted in the inotify man page:
-> > > >
-> > > > "Inotify  reports  only events that a user-space program triggers
-> > > > through the filesystem
-> > > >        API.  As a result, it does not catch remote events that occur
-> > > > on  network  filesystems."
-> > > >
-> > > > but that is precisely the types of notifications that are most useful
-> > > > ... users often are aware of updates to local directories from the
-> > > > same system, but ... automatic notifications that allow GUIs to be
-> > > > updated on changes from **other** clients is of more value (and this
-> > > > is exactly what the equivalent API allows on other OS).
-> > > >
-> > > > The changes to the Linux VFS are small.
-> > > >
-> > > >
-> > >
-> > > Miklos has already posted an RFC patch:
-> > > https://lore.kernel.org/linux-fsdevel/20190507085707.GD30899@veci.piliscsaba.redhat.com/
-> > >
-> > > Did you try it?
-> > >
-> > > You also did not answer Miklos' question:
-> > > does the smb protocol support whole filesystem (or subtree) notifications?
-> > > (or just per-directory notifications)?
+> > Reviewed-By: Ronnie Sahlberg <lsahlber@redhat.com>
 > >
-> > SMB can do both. There is a flag that specifies if you want to just
-> > get notified about the directory itself
-> > or whether  you want notifications from the whole subtree.
+> > But drop the extra parenthesises here :
+> > +                (2 * sizeof(struct cifs_ace));
 > >
+> > ----- Original Message -----
+> > From: "Steve French" <smfrench@gmail.com>
+> > To: "CIFS" <linux-cifs@vger.kernel.org>
+> > Sent: Friday, 17 January, 2020 12:28:03 PM
+> > Subject: [PATCH][SMB3] Fix modefromsid newly created files to allow mor=
+e permission on server
+> >
+> >     When mounting with "modefromsid" mount parm most servers will requi=
+re
+> >     that some default permissions are given to users in the ACL on newl=
+y
+> >     created files, and for files created with the new 'sd context' -
+> > when passing in
+> >     an sd context on create, permissions are not inherited from the par=
+ent
+> >     directory, so in addition to the ACE with the special SID (which co=
+ntains
+> >     the mode), we also must pass in an ACE allowing users to access the=
+ file
+> >     (GENERIC_ALL for authenticated users seemed like a reasonable defau=
+lt,
+> >     although later we could allow a mount option or config switch to ma=
+ke
+> >     it GENERIC_ALL for EVERYONE special sid).
+> >
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
 >
-> I see. There is no user API in Linux to request a "subtree" watch.
-> For the private case that the user requests a FAN_MARK_FILESYSTEM,
-> cifs may translate that into a SMB2_WATCH_TREE for the share root dir.
 >
-> For that, Miklos' RFC of vfs interface inode->i_op->notify_update(inode)
-> should be enriched with sb->s_op->notify_update(sb).
-
-It all depends on what actual linux applications want/need.
-
-On windows, things like the windows explorer file manager only uses
-"this directory only" watches.
-I imagine that linux gui filemanagers would do the same and be fine
-with this directory only watches.
-
-On windows you also have a large class of applications that does file
-caching in the userspace application itself. Like IIS or other
-applications
-such as indexing services or things that keep track of changes to know
-what to backup at a later stage.
-They always use "watch the whole subtree" version of notifications.
-I don't think there are any linux native applications that would
-depend on this as the functionality was never present. Maybe an
-exception would be windows applications running under wine, but surely
-no currently existing linux native applications.
-
-If we do get an API that would allow to watch an entire subtree then
-that would make it possible for future backup applications to become
-much more effective for incremental backups.  Things like "git status"
-would likely also benefit greatly from such an api if it became
-available.
-
 >
+> --
 > Thanks,
-> Amir.
+>
+> Steve
