@@ -2,103 +2,89 @@ Return-Path: <SRS0=MBFb=3L=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E03B3C2D0DB
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 16:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EE46C32771
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 23:14:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B295924656
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 16:56:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC2E22465B
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jan 2020 23:14:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NKfoMhoK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ktVitgYh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725943AbgAVQ4D (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 22 Jan 2020 11:56:03 -0500
-Received: from mail-io1-f53.google.com ([209.85.166.53]:45533 "EHLO
-        mail-io1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725836AbgAVQ4D (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Jan 2020 11:56:03 -0500
-Received: by mail-io1-f53.google.com with SMTP id i11so7275702ioi.12;
-        Wed, 22 Jan 2020 08:56:02 -0800 (PST)
+        id S1726004AbgAVXOF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 22 Jan 2020 18:14:05 -0500
+Received: from mail-il1-f176.google.com ([209.85.166.176]:33832 "EHLO
+        mail-il1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725884AbgAVXOF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Jan 2020 18:14:05 -0500
+Received: by mail-il1-f176.google.com with SMTP id l4so294379ilj.1;
+        Wed, 22 Jan 2020 15:14:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZHdhn6fXAUDdnrx4kd/QPO0tJ0CsK7JpRCtqUMJ7Cm4=;
-        b=NKfoMhoKha20dXUbR9fhBu5NawwwGFdt7yueRkrClQareyo65KCPW2oNJD6Rmz56Sn
-         D2xBYFaJ5d5hZIXXtiV4PTNyURLxZlIhzI8Nfs66apcVazKAA4qDmY0U3iwXxB46il7k
-         4asyJ076h+pn+3dQTDDdq6fpBv2WZt8wYteusrDRiSGMLf/8B8e4q1y8be72z3k5HUHP
-         wqNIthWZphaOpKt2VTBkKRRdQ/x6/kErRscIuRsrOLzWLIwjdwjPNjQvP5q4jvmOo8h9
-         99BVwVfjcoFQxLl83tQ3xGNEwGxf18AntdVrHwWSV5mDX0FPOAeEhdsQ2XF6CmAVXQy2
-         caOA==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=Kq2IP1hIGuKFw/G8CqaH+hWfQgqsWkoIbXt/bd1XL0Q=;
+        b=ktVitgYhBUqR8NzwkRgAs3yeevVeyIhhQcQ82fIVplKqd/mb01nWRf2d1nvzz646iZ
+         DTLUqFRXvzB9/IytlnDBWkg9/ilZDlg03hXfWSxLoTbu1jKEuGPtkIu+QGb4+8qYNVtX
+         m249WvyimAlaKq4S/Luz+llPW1lhVCn5znaijYjYl0hFyDWHMAZRu/QQQ5nJnjFfu+Py
+         tRaxDAndT7EFds/wJaviZrMcoAbjgvkWQyszpvwmZAMgPKzR3VtXH+hMaUEJsdZ0nDqn
+         NKypOP2+DM5n9eiwujFqiB27LBO6f6r8fhEU+wKa/ZnVC09BAhxQ354NO7XI9eNpOQxn
+         0CGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZHdhn6fXAUDdnrx4kd/QPO0tJ0CsK7JpRCtqUMJ7Cm4=;
-        b=fZ2bGvuJtuBpFMRqQ3TFBuw1LCXFj770cicVqVZFJ18KtbCNAWITe4HnXTgWhkB6LD
-         uDdL7iH/sHYDtsr3CC9tSx1RATkN6RSXAK9Q42zsFkWEbumYsmRaAfwHINZgIWy0mCmL
-         Aqcbol9NSwOzutC4BZ7zYYPy4o3Pka6pnCCVkwkflfcy3oFT6pM30J2o8XKlj13+dBgX
-         V6Swn9aTP+1YPnDXu4KdvaotcYijkIIjrXMRCNMxfI6guiRZIeNqtbpz9GZNri720Daw
-         M3wIpUtVimv3ZYoXmyJEfQ4cBSv5IdmbTCmZk9lCZrKF3eqCF+NI8JBGZFvHFxNG8NmM
-         MkKQ==
-X-Gm-Message-State: APjAAAXDKl8Wj6Fuosab59wcHF0Ftl5plKUP07GWuL5XeLqa75ac7gwR
-        NibxmQZW9aQdb0Khs1mXGnRtt+iBr+nTO8TXrlSjrM8m
-X-Google-Smtp-Source: APXvYqyBbHrbpZbLz8l/A1YUBkn6s5Bfj3VkhX6XhSTnkIlgQUXUY7gokWPNPOguWfpyCvG0LUFQukLm9VT2UvT6Mw0=
-X-Received: by 2002:a05:6602:d4:: with SMTP id z20mr7834112ioe.173.1579712162351;
- Wed, 22 Jan 2020 08:56:02 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=Kq2IP1hIGuKFw/G8CqaH+hWfQgqsWkoIbXt/bd1XL0Q=;
+        b=Vt2bSuytBK6TNIFdZPOIt/WNCLX64C16mOpwAFF2eGKbswYXVzs89Ey7ElzSfT0ANa
+         EAosmwDDhJv4r9V2vBw4YkhOAp/yZZw6LlIGnzAtjTI7NnGFakVNsWrDImxbc8jdvHY3
+         UwfsVQeG22HKWFDSbY1bbqZMzwjPo7KloQHuuELV8OKSJhqw1SfWgecMzAsLGtKmLUJy
+         3nUp7Zpw3ikVhYRM1endgcN+/lr5ZGEgOWS1Ey09wz2D72YU0p3433Fm59fyofDA3Kiu
+         BCPaVaGKtaC2I41Bl/Eho2PMNgsHY+s71bNyFdSSy/5pZeYQNjL+286b5HZqgrcyrqIf
+         e2fQ==
+X-Gm-Message-State: APjAAAUhRRrb/lZsgTH1jU5bzdHeHIohsH+pHBug48dJfmyzsDtzVsrR
+        d7Y1lBcy0nRPPZiZBhYF+g1ecET9lK9zh0+hYmlv3i5iogY=
+X-Google-Smtp-Source: APXvYqzLAqRau6zdAqo/jrMCBTejWOPbgKpEV7QlBIuCkdLF1bAb7z5hojjPYoKPzq8i9RZOqIvIo270Em3XX7utEc0=
+X-Received: by 2002:a92:9a90:: with SMTP id c16mr10104878ill.3.1579734844056;
+ Wed, 22 Jan 2020 15:14:04 -0800 (PST)
 MIME-Version: 1.0
-References: <20200122102030.95853-1-chenzhou10@huawei.com>
-In-Reply-To: <20200122102030.95853-1-chenzhou10@huawei.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 22 Jan 2020 10:55:51 -0600
-Message-ID: <CAH2r5mv+dCyj4dQm8kSiVSyu161oyuOSYO3Ec0VbewjFJMv5hw@mail.gmail.com>
-Subject: Re: [PATCH -next] cifs: use PTR_ERR_OR_ZERO() to simplify code
-To:     Chen Zhou <chenzhou10@huawei.com>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
+Date:   Wed, 22 Jan 2020 17:13:53 -0600
+Message-ID: <CAH2r5mvYTimXUfJB+p0mvYV3jAR1u5G4F3m+OqA_5jKiLhVE8A@mail.gmail.com>
+Subject: [LSF/MM/BPF TOPIC] Enhancing Linux Copy Performance and Function and
+ improving backup scenarios
+To:     linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        lsf-pc@lists.linux-foundation.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+As discussed last year:
 
-On Wed, Jan 22, 2020 at 4:25 AM Chen Zhou <chenzhou10@huawei.com> wrote:
->
-> PTR_ERR_OR_ZERO contains if(IS_ERR(...)) + PTR_ERR, just use
-> PTR_ERR_OR_ZERO directly.
->
-> Signed-off-by: Chen Zhou <chenzhou10@huawei.com>
-> ---
->  fs/cifs/dfs_cache.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-> index 751c2fc..43c1b43 100644
-> --- a/fs/cifs/dfs_cache.c
-> +++ b/fs/cifs/dfs_cache.c
-> @@ -662,7 +662,7 @@ static int __dfs_cache_find(const unsigned int xid, struct cifs_ses *ses,
->          */
->         if (noreq) {
->                 up_read(&htable_rw_lock);
-> -               return IS_ERR(ce) ? PTR_ERR(ce) : 0;
-> +               return PTR_ERR_OR_ZERO(ce);
->         }
->
->         if (!IS_ERR(ce)) {
-> --
-> 2.7.4
->
+Current Linux copy tools have various problems compared to other
+platforms - small I/O sizes (and most don't allow it to be
+configured), lack of parallel I/O for multi-file copies, inability to
+reduce metadata updates by setting file size first, lack of cross
+mount (to the same file system) copy optimizations, limited ability to
+handle the wide variety of server side copy (and copy offload)
+mechanisms and error handling problems.   And copy tools rely less on
+the kernel file system (vs. code in the user space tool) in Linux than
+would be expected, in order to determine which optimizations to use.
 
+But some progress has been made since last year's summit, with new
+copy tools being released and improvements to some of the kernel file
+systems, and also some additional feedback on lwn and on the mailing
+lists.  In addition these discussions have prompted additional
+feedback on how to improve file backup/restore scenarios (e.g. to
+mounts to the cloud from local Linux systems) which require preserving
+more timestamps, ACLs and metadata, and preserving them efficiently.
 
--- 
-Thanks,
-
-Steve
+Let's continue our discussions from last year, and see how we can move
+forward on improving the performance and function of Linux fs
+(including the VFS and user space tools) for various backup, restore
+and copy scenarios operations.
