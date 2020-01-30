@@ -2,129 +2,113 @@ Return-Path: <SRS0=B7dF=3T=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA0EC33CB2
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 01:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D742C2D0DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 17:47:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C0472070E
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 01:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3315E20661
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 17:47:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qVJw16Vc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aHt2mXM/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726647AbgA3Bya (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Jan 2020 20:54:30 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:50906 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726632AbgA3Bya (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Jan 2020 20:54:30 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00U1r4L1117242;
-        Thu, 30 Jan 2020 01:54:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=ecgDIRlaXBwoQEpgNoqgE17XeCASHz7xplSZ2VE9IVo=;
- b=qVJw16Vccb5PJ/8bEMeZ5hlqFMDsXEG6h0IuqVGlZiayps77itHQQ9AFUg52kMibrqiH
- sCqdml9ywwxzghItNKz93AGxXm2mLApiol1yF8OZeuHs3rTSaHFG0w5UrVY3zp3yZXJI
- x9ayFV0EYvJ2WsWvXLcef/8Zeq/Tsle3+iohS+yNa1tapKnq0tOj4UPx17Hs443tpMjU
- x1OPMSwKmIO7xrLbRX5DTVFjYK1ohmoK/OHLcxxURXAFtDVhvtLy/CcWQ/xSeAfdMGsr
- YjqwFsH2o+m7cJNyvYnVXSPqOsbNlUJLWEW6wsanMxe9cEa2LnHPdAIi0+kBeWoNPIaW vw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2xrd3uh63j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Jan 2020 01:54:15 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00U1hjbt080079;
-        Thu, 30 Jan 2020 01:52:14 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3030.oracle.com with ESMTP id 2xuemva2br-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Jan 2020 01:52:14 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00U1qBo2025023;
-        Thu, 30 Jan 2020 01:52:11 GMT
-Received: from localhost (/10.159.240.218)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 29 Jan 2020 17:52:11 -0800
-Date:   Wed, 29 Jan 2020 17:52:10 -0800
-From:   "Darrick J. Wong" <darrick.wong@oracle.com>
-To:     Steve French <smfrench@gmail.com>
-Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        lsf-pc@lists.linux-foundation.org
-Subject: Re: [LSF/MM/BPF TOPIC] Enhancing Linux Copy Performance and Function
- and improving backup scenarios
-Message-ID: <20200130015210.GB3673284@magnolia>
-References: <CAH2r5mvYTimXUfJB+p0mvYV3jAR1u5G4F3m+OqA_5jKiLhVE8A@mail.gmail.com>
+        id S1727370AbgA3RrC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 30 Jan 2020 12:47:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55865 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727263AbgA3RrB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Jan 2020 12:47:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580406420;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=U5faISZ00T/kU+d88dUlGQmBHfl3Fc8Bn1yPunkgFRM=;
+        b=aHt2mXM/nOUKc9eMEo1xtZxv+uMuOPDiV4A3KjqlhWuV7MB0LV3idBaYIr6k8ghH7u2zGr
+        5s/BbtmyCAlhMfbPN5AAQeadUtrQGeHfjqQZMb2Q+1roROo4Gi0iDkivvGMDKOaZwRWzmc
+        eEr8zdUykfXvMOZffM1LtUaUFMYrsXI=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-374-LyNbu-NOOEKyJQhlIlabhA-1; Thu, 30 Jan 2020 12:46:59 -0500
+X-MC-Unique: LyNbu-NOOEKyJQhlIlabhA-1
+Received: by mail-pf1-f198.google.com with SMTP id z26so2258464pfr.9
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Jan 2020 09:46:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=U5faISZ00T/kU+d88dUlGQmBHfl3Fc8Bn1yPunkgFRM=;
+        b=tQUYUtJGL2XuhbJzM7izACzcVIujOu904YWN7pAfclBuu5nBKggu5E5PLb5/yD2vYm
+         FgrgNKW1zbY8wBqw9As/tyTr5wr9MNqoIkVfnlHuqZYTJZ0UxMdtgpROoaeo4DcMf+dB
+         dL16ubCAIQsKDTDx4uP0UdPuwirjlD/j/X3g0m4Qmpqf4pC2RC5c6GJSD25NWEjV44m8
+         dqoenuiylf+Y7uSlotl+wxS9g9JZ6v0LJifpdynNg0AdTKuYhaIUZNgwK6OtZnaSe7Dr
+         vsnDggIN8FFi+ep3/dbD7LN9SdwG6TuoCG3e+SxoE6eaLn1Ynk6V0jQXvP6m0CqALrmN
+         A/4A==
+X-Gm-Message-State: APjAAAUdbHHwwQuUxGAdohGjnL42YjrqAoKX3/in60SqVNiOnVqUiPmS
+        0pjb9evbThwghNC0d7s7pdWoPVWtTg6muEFPR5LRp4ShMj7VXcOak8FCsBkSkd8DpxvO7bMO4ij
+        WySmTDUBln8RFID1It0C7IY+CTTG1YNR8hVWZeA==
+X-Received: by 2002:a17:90a:d205:: with SMTP id o5mr7328501pju.46.1580406415510;
+        Thu, 30 Jan 2020 09:46:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwvZLRwp57N5NCTybxmna0CVj7zruyyZqMM7N6kIQMOaDMfS1q6PWDzno7Pd6OWFnxx6mYa0JoRdDc66gcG1H0=
+X-Received: by 2002:a17:90a:d205:: with SMTP id o5mr7328460pju.46.1580406415040;
+ Thu, 30 Jan 2020 09:46:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH2r5mvYTimXUfJB+p0mvYV3jAR1u5G4F3m+OqA_5jKiLhVE8A@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9515 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001300009
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9515 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001300010
+References: <39643d7d-2abb-14d3-ced6-c394fab9a777@prodrive-technologies.com>
+ <87png0boej.fsf@cjr.nz> <5260c45c-0a31-168d-f9db-83bb6bd4a2cf@prodrive-technologies.com>
+ <878smoqouf.fsf@cjr.nz> <VE1PR02MB55503665681374E805CA7815F53C0@VE1PR02MB5550.eurprd02.prod.outlook.com>
+ <87k16417ud.fsf@cjr.nz> <VE1PR02MB55502AA359141C1D29B2AB82F53F0@VE1PR02MB5550.eurprd02.prod.outlook.com>
+ <87y2uh264k.fsf@cjr.nz> <3ddf0683-0213-1c43-bcc7-cfc3cb8bc28b@prodrive-technologies.com>
+ <871rs8eq3j.fsf@cjr.nz>
+In-Reply-To: <871rs8eq3j.fsf@cjr.nz>
+From:   Jacob Shivers <jshivers@redhat.com>
+Date:   Thu, 30 Jan 2020 12:46:18 -0500
+Message-ID: <CALe0_75hsoemi1-du=-YO=xO_gR7-41RKirwNrnU+L753Ycrhg@mail.gmail.com>
+Subject: Re: cifs.upcall requests ticket for wrong host when using dfs
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Jan 22, 2020 at 05:13:53PM -0600, Steve French wrote:
-> As discussed last year:
-> 
-> Current Linux copy tools have various problems compared to other
-> platforms - small I/O sizes (and most don't allow it to be
-> configured), lack of parallel I/O for multi-file copies, inability to
-> reduce metadata updates by setting file size first, lack of cross
+Hello Paulo,
 
-...and yet weirdly we tell everyone on xfs not to do that or to use
-fallocate, so that delayed speculative allocation can do its thing.
-We also tell them not to create deep directory trees because xfs isn't
-ext4.
+I ran into this issue and noted that I can reproduce this 100% of the
+time with a Samba SMB target. I tried with Windows SMB targets, even
+when they are not part of the direct DFS namespace, but I have so far
+been unable to reproduce that way.
 
-> mount (to the same file system) copy optimizations, limited ability to
-> handle the wide variety of server side copy (and copy offload)
-> mechanisms and error handling problems.   And copy tools rely less on
-> the kernel file system (vs. code in the user space tool) in Linux than
-> would be expected, in order to determine which optimizations to use.
+Hello Martijn,
+Would you mind stating who the provider is for the impacted SMB target
+in your environment?
 
-What kernel interfaces would we expect userspace to use to figure out
-the confusing mess of optimizations? :)
+Thanks,
+Jacob
 
-There's a whole bunch of xfs ioctls like dioinfo and the like that we
-ought to push to statx too.  Is that an example of what you mean?
+On Thu, Jan 9, 2020 at 8:06 AM Paulo Alcantara <pc@cjr.nz> wrote:
+>
+> Hi Martijn,
+>
+> Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com> writes:
+>
+> > Yes, so far so good. Thanks a lot for the quick response! Not a trivial
+> > patch as far I as i can judge.
+>
+> Cool! Thanks for the confirmation. Just sent a patch with this fix, BTW.
+>
+> > Also the machine we have running with your other DFS patches is running
+> > for 8 weeks now and survived several relocations of our dfs shares and
+> > adding/removal of DCs!
+> >
+> > Is there any news on the acceptance of your [PATCH v4 0/6] DFS fixes?
+>
+> I don't have any news, but I'll talk to Steve and Aurelien about them.
+>
+> Thanks,
+> Paulo
+>
 
-(I wasn't at last year's LSF.)
-
-> But some progress has been made since last year's summit, with new
-> copy tools being released and improvements to some of the kernel file
-> systems, and also some additional feedback on lwn and on the mailing
-> lists.  In addition these discussions have prompted additional
-> feedback on how to improve file backup/restore scenarios (e.g. to
-> mounts to the cloud from local Linux systems) which require preserving
-> more timestamps, ACLs and metadata, and preserving them efficiently.
-
-I suppose it would be useful to think a little more about cross-device
-fs copies considering that the "devices" can be VM block devs backed by
-files on a filesystem that supports reflink.  I have no idea how you
-manage that sanely though.
-
---D
-
-> Let's continue our discussions from last year, and see how we can move
-> forward on improving the performance and function of Linux fs
-> (including the VFS and user space tools) for various backup, restore
-> and copy scenarios operations.
