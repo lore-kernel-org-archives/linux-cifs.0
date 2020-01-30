@@ -2,54 +2,58 @@ Return-Path: <SRS0=B7dF=3T=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 399C2C2D0DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 18:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E02C2D0DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 19:07:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 088BB20702
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 18:55:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 219FC20658
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 19:07:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hGanAmQa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AfOEdyKP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727544AbgA3Szb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 30 Jan 2020 13:55:31 -0500
-Received: from mail-il1-f172.google.com ([209.85.166.172]:37657 "EHLO
-        mail-il1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727529AbgA3Szb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Jan 2020 13:55:31 -0500
-Received: by mail-il1-f172.google.com with SMTP id v13so3990134iln.4
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Jan 2020 10:55:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CZeEb8FjE4DHJGjCeMVoihLV/ZKhpSh79haiybxPqxc=;
-        b=hGanAmQaf1UvSvK/UmSFWeCfnDsaME3CyOCdRXwRurVF9JhdhZo/YFsrfND/lrkiN1
-         +ZpkFVfFsOYotm8HU/egDxnkGkjXVnTHm0IeBZaGlcAjM+9Eb+YoK5Am8Eaf+BJ3RNnj
-         /XMYI35PTMNiDOCPedebN5DaaVqk6tG9TcyFnKB9G/7QSDxcLV/fxmdsU2Ee2yQjdEGw
-         XeOveJduf0QS/svaI/Ckd6KaMM4aoOjKW9zpZC12hqbMe4/rU5G7pKZa3aTkEWcf/8X9
-         0V+7mmXmM92D0uyLL/CFebRYcCTR3osRzelTrbyiA+eQJAo7q416QR78nRLoekmtKzRc
-         IUGA==
+        id S1727535AbgA3THd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 30 Jan 2020 14:07:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30688 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727476AbgA3THd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Jan 2020 14:07:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1580411251;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hRlr2R73vsSNo6ih7PE6X4K2KpQ7XN3/rNyD+b0SB4Q=;
+        b=AfOEdyKPW8lUhqgYN2yYHpdQhbOgpMX3iXrqe5+B6wgVlDTL9VjsHleg9JBHKG4vlkGqXx
+        2UyLnCZiSsI+etau4tauz+OTPYkPFCiJSFtL2CxJGVOQkP0OzYFHfPpPFx9Rzb9TK5AUPq
+        YMEViF4TV8atd6ghCs1Rw8oBTZazi6c=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-58-xtA317f-PViCmCSk270sdg-1; Thu, 30 Jan 2020 14:07:30 -0500
+X-MC-Unique: xtA317f-PViCmCSk270sdg-1
+Received: by mail-pl1-f197.google.com with SMTP id 71so639571plb.18
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Jan 2020 11:07:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=CZeEb8FjE4DHJGjCeMVoihLV/ZKhpSh79haiybxPqxc=;
-        b=eecHvW58T9a95FyY1qIEx53l4dSjQLYCJqQDR+1lt10UEOLml5lyc//5rAnmMPN65L
-         dJV4Zr3+wth8zAZuVVvP6rMl7iJnV4hYkaw7OGaoY1eTJZwUEOC8w4BBTmv09hh0NEXy
-         kInQST6xJk6B0jHpG7SW0hxoUqi+qAkYktSet3AXZiEpE8Tpy30TFoX5dd8HkQ3x0xc2
-         zrShcBte1GhpSOLp5HWcspfcnAsYe8O3aipZbR8fdz8n19FWTwr3okW7gU4ilLKJv+2F
-         v0FQ0lKZMBviuPIFptHRMWuUu31UWxBOzDs99KGrBaT7TquEGrWMekWbXK+Qm5IAc+yV
-         E+3Q==
-X-Gm-Message-State: APjAAAUknkE8LPUCG9JPHq94ppMOVvH2Sl3jF9Ve6ZRoNE8ktm9sPwAd
-        yrGqd9SLT6iKWL+I+UKGk66v2IN0sJjn6rrdZ47JGEHegGU=
-X-Google-Smtp-Source: APXvYqxcjxi5Ug64bB+V+4C0ZtozDYlYx1bsjSyTyjO67e9yU8EbD9HOnRuaLakMkGa7uut5x67iZ567PdOoYQvx1Hw=
-X-Received: by 2002:a92:cb8c:: with SMTP id z12mr5537168ilo.5.1580410530041;
- Thu, 30 Jan 2020 10:55:30 -0800 (PST)
+        bh=hRlr2R73vsSNo6ih7PE6X4K2KpQ7XN3/rNyD+b0SB4Q=;
+        b=PvpF56VkTTbwK6BKSlMKNtwINwkdWXdQxEoTjQk3U+SWMd1tjfqgYcWNkTmW0qBGs1
+         ndY5t+ahStu4VejSC2d30/WzgN1Ay6MXEa0fn+kCGsgz5MyH/nU2AFRFEzpBYWzTINpO
+         lpJPRJrlOpm9TGJr1aUK4XYtQ8N41NPN3WJcljfoX/Ikyxgu21M71HHNxFo3h5xM4n0l
+         otKkUIyVojss0uakbSH6tJUEDAdjicyqHb7TBgVNpA38+uQrDP3oISnsBx+q8nwK3tw2
+         6ZANla5ttygADQZ7bs+Ffmnuo8zm3kd/Eiy0Bun+njc3qp7264b9zVpl9AylBaq2rRWs
+         htYQ==
+X-Gm-Message-State: APjAAAWri7y2LCiMAiLYRKJFbpiJE88BZysQGn41kCCyl9rfI9GjekJd
+        dzfXY3vjGnZJijjzsffByK1ASr2T0kVtFLKWsEXHa99Vcdoq1FTG1oNa73a61Ydvn2g0VwSiMv/
+        VI1yw0XN4jTPxl5h14Di0RZT6DecsFj7KO0oP/g==
+X-Received: by 2002:a17:902:788b:: with SMTP id q11mr6142598pll.21.1580411248119;
+        Thu, 30 Jan 2020 11:07:28 -0800 (PST)
+X-Google-Smtp-Source: APXvYqytLIVAmijqO485hTWM6heoDmyDKuBy8oJgHrHm7Xu4V9oWPN1jBSsqEso5auK8VtWAteZHeX4GdEQelujcgmc=
+X-Received: by 2002:a17:902:788b:: with SMTP id q11mr6142569pll.21.1580411247745;
+ Thu, 30 Jan 2020 11:07:27 -0800 (PST)
 MIME-Version: 1.0
 References: <39643d7d-2abb-14d3-ced6-c394fab9a777@prodrive-technologies.com>
  <87png0boej.fsf@cjr.nz> <5260c45c-0a31-168d-f9db-83bb6bd4a2cf@prodrive-technologies.com>
@@ -57,12 +61,13 @@ References: <39643d7d-2abb-14d3-ced6-c394fab9a777@prodrive-technologies.com>
  <87k16417ud.fsf@cjr.nz> <VE1PR02MB55502AA359141C1D29B2AB82F53F0@VE1PR02MB5550.eurprd02.prod.outlook.com>
  <87y2uh264k.fsf@cjr.nz> <3ddf0683-0213-1c43-bcc7-cfc3cb8bc28b@prodrive-technologies.com>
  <871rs8eq3j.fsf@cjr.nz> <CALe0_75hsoemi1-du=-YO=xO_gR7-41RKirwNrnU+L753Ycrhg@mail.gmail.com>
-In-Reply-To: <CALe0_75hsoemi1-du=-YO=xO_gR7-41RKirwNrnU+L753Ycrhg@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 30 Jan 2020 12:55:19 -0600
-Message-ID: <CAH2r5mvEjD9rggUyTJMXKiyPn9fyRAq9DDWsn5xAkJC_6bFfrw@mail.gmail.com>
+ <CAH2r5mvEjD9rggUyTJMXKiyPn9fyRAq9DDWsn5xAkJC_6bFfrw@mail.gmail.com>
+In-Reply-To: <CAH2r5mvEjD9rggUyTJMXKiyPn9fyRAq9DDWsn5xAkJC_6bFfrw@mail.gmail.com>
+From:   Jacob Shivers <jshivers@redhat.com>
+Date:   Thu, 30 Jan 2020 14:06:49 -0500
+Message-ID: <CALe0_77uoUgs__d-O9TS5SKqGSeuDk4rHXNzAOE=TWPOOESDyg@mail.gmail.com>
 Subject: Re: cifs.upcall requests ticket for wrong host when using dfs
-To:     Jacob Shivers <jshivers@redhat.com>
+To:     Steve French <smfrench@gmail.com>
 Cc:     Paulo Alcantara <pc@cjr.nz>,
         Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com>,
         "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
@@ -72,51 +77,61 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fix is already upstream, merged into mainline Linux (commit
-5739375ee4230980166807d347cc21c305532bbc)
+I missed that.
+I just checked again and I completely overlooked this.
 
-On Thu, Jan 30, 2020 at 11:47 AM Jacob Shivers <jshivers@redhat.com> wrote:
+Sorry for the confusion.
+
+
+On Thu, Jan 30, 2020 at 1:55 PM Steve French <smfrench@gmail.com> wrote:
 >
-> Hello Paulo,
+> Fix is already upstream, merged into mainline Linux (commit
+> 5739375ee4230980166807d347cc21c305532bbc)
 >
-> I ran into this issue and noted that I can reproduce this 100% of the
-> time with a Samba SMB target. I tried with Windows SMB targets, even
-> when they are not part of the direct DFS namespace, but I have so far
-> been unable to reproduce that way.
->
-> Hello Martijn,
-> Would you mind stating who the provider is for the impacted SMB target
-> in your environment?
->
-> Thanks,
-> Jacob
->
-> On Thu, Jan 9, 2020 at 8:06 AM Paulo Alcantara <pc@cjr.nz> wrote:
+> On Thu, Jan 30, 2020 at 11:47 AM Jacob Shivers <jshivers@redhat.com> wrote:
 > >
-> > Hi Martijn,
+> > Hello Paulo,
 > >
-> > Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com> writes:
+> > I ran into this issue and noted that I can reproduce this 100% of the
+> > time with a Samba SMB target. I tried with Windows SMB targets, even
+> > when they are not part of the direct DFS namespace, but I have so far
+> > been unable to reproduce that way.
 > >
-> > > Yes, so far so good. Thanks a lot for the quick response! Not a trivial
-> > > patch as far I as i can judge.
-> >
-> > Cool! Thanks for the confirmation. Just sent a patch with this fix, BTW.
-> >
-> > > Also the machine we have running with your other DFS patches is running
-> > > for 8 weeks now and survived several relocations of our dfs shares and
-> > > adding/removal of DCs!
-> > >
-> > > Is there any news on the acceptance of your [PATCH v4 0/6] DFS fixes?
-> >
-> > I don't have any news, but I'll talk to Steve and Aurelien about them.
+> > Hello Martijn,
+> > Would you mind stating who the provider is for the impacted SMB target
+> > in your environment?
 > >
 > > Thanks,
-> > Paulo
+> > Jacob
+> >
+> > On Thu, Jan 9, 2020 at 8:06 AM Paulo Alcantara <pc@cjr.nz> wrote:
+> > >
+> > > Hi Martijn,
+> > >
+> > > Martijn de Gouw <martijn.de.gouw@prodrive-technologies.com> writes:
+> > >
+> > > > Yes, so far so good. Thanks a lot for the quick response! Not a trivial
+> > > > patch as far I as i can judge.
+> > >
+> > > Cool! Thanks for the confirmation. Just sent a patch with this fix, BTW.
+> > >
+> > > > Also the machine we have running with your other DFS patches is running
+> > > > for 8 weeks now and survived several relocations of our dfs shares and
+> > > > adding/removal of DCs!
+> > > >
+> > > > Is there any news on the acceptance of your [PATCH v4 0/6] DFS fixes?
+> > >
+> > > I don't have any news, but I'll talk to Steve and Aurelien about them.
+> > >
+> > > Thanks,
+> > > Paulo
+> > >
 > >
 >
+>
+> --
+> Thanks,
+>
+> Steve
+>
 
-
--- 
-Thanks,
-
-Steve
