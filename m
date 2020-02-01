@@ -2,71 +2,130 @@ Return-Path: <SRS0=KQhF=3V=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CC8C33CB3
-	for <linux-cifs@archiver.kernel.org>; Sat,  1 Feb 2020 19:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A41A4C35246
+	for <linux-cifs@archiver.kernel.org>; Sat,  1 Feb 2020 19:54:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCC8020723
-	for <linux-cifs@archiver.kernel.org>; Sat,  1 Feb 2020 19:25:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1580585115;
-	bh=7IeGbr88xPxfAlsmvZYtOueWgWLzVV8Rhk3GwYQGS8k=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=rUfhxSq1wzeNUY1eXCcpwIMnEaOOeQ+6pka9nF8chWT1tv9Fm9rOnRqOOa+BEugbB
-	 gwJ7vRCFn4futvTYa5od3ZpAKc+I5sMlBnmwSQIxEURsHjSFStt9n79bZ6s2zZCB5Z
-	 XVTGyWXfCT7nj4Byhj8CzROsTbaWwTZEOKbr+NWo=
+	by mail.kernel.org (Postfix) with ESMTP id 7BED62067C
+	for <linux-cifs@archiver.kernel.org>; Sat,  1 Feb 2020 19:54:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nM4GcWpA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726514AbgBATZP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 1 Feb 2020 14:25:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44370 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726270AbgBATZP (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 1 Feb 2020 14:25:15 -0500
-Subject: Re: [GIT PULL] small SMB3 fix for stable
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1580585114;
-        bh=7IeGbr88xPxfAlsmvZYtOueWgWLzVV8Rhk3GwYQGS8k=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=VPibsYMCguCX74umyl2gdMFwI1ZwtO77Hc0F0PfZeN3lk4hJNknvkP6RLMPKEcQZ1
-         Q53KnRiFnUEhMDGCs+UQk+62Dv6uLNDb3AEPXCqGXlVHtzwBI3RHJgSq/e/wbG/8a2
-         Xedsj3631A2tkBiPWJzvSkdzX1cL+NFd8HpAHoj8=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mt-Q1_ZBJmC+8jr5gJhr-NmUGG933y0gc+_1DVWTJUVZQ@mail.gmail.com>
-References: <CAH2r5mt-Q1_ZBJmC+8jr5gJhr-NmUGG933y0gc+_1DVWTJUVZQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mt-Q1_ZBJmC+8jr5gJhr-NmUGG933y0gc+_1DVWTJUVZQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git
- tags/5.6-rc-small-smb3-fix-for-stable
-X-PR-Tracked-Commit-Id: b581098482e6f177a4f64ea021fd5a9327ea08d5
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 94f2630b18975bb56eee5d1a36371db967643479
-Message-Id: <158058511480.16683.1703962010950781039.pr-tracker-bot@kernel.org>
-Date:   Sat, 01 Feb 2020 19:25:14 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Stable <stable@vger.kernel.org>,
+        id S1726443AbgBATy6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 1 Feb 2020 14:54:58 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:43884 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726354AbgBATy6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 1 Feb 2020 14:54:58 -0500
+Received: by mail-il1-f193.google.com with SMTP id o13so9231429ilg.10;
+        Sat, 01 Feb 2020 11:54:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5ZM+XG0Qafoo8yoA94Tb8BHY4hUIVe3CK4bN+n5GzG8=;
+        b=nM4GcWpAjqrvtL0Lcot/MfvVHtdRX+7g84363eMq/9AuOgxISlHekqaj3V52RNVmkm
+         /ioWKfJZAkxg9iBcZUCW+mJwCkoFS+Gb2xhExyOKZiXItEGsDEX6Dt5Bf541NXK0sTHQ
+         OfSkxk/se9sB5wMFojGXz6KvoP2KlTASo44Wb5gNchmhOs5LdCdGhr1HSlyzGMHAbUM0
+         1vOEEpt5AHGPBBXSY3iF3kHqh/J8eRjPlfPcq8DEwu8wYUDvZ1sFG07i5GXZDeTamJaW
+         wKuM+UDaxinaG+hK+FRey6eXOpNF3EFJAePEkon67a03z3EeFPsWnfyVfm251IsJtyWl
+         LvbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5ZM+XG0Qafoo8yoA94Tb8BHY4hUIVe3CK4bN+n5GzG8=;
+        b=jUdX4t3R3jdzd3ueQGHzY2G8+9e2sPV852u1thekUtgmkqxrqK0E2dYk1y+gqsYAjW
+         2+UWJcC2URYhqeh29s04RZzVFX5B69meUq3zwJxG5k/o+agJVXyjMSaSFb5PKNadw8gT
+         n7YzWTxJCE8s5cq6knc0unpeUoE3O1cjFMRRSKZ5zHl0tAr5xBj6EP0SwKSHNpK2xFbd
+         NyUiEThcGzVNs6qDLJB+c8n36lelL5n4y2RP3NPjfBS65/Q7ixRiBVOXxnzk3HOe3kyO
+         5Zld4lmgm/WdVYp8uBPiFmmjpgJ3z50/4+XOc5HsSJvzJyhlV39qRV5WUoQrLdqaSVRe
+         HmnQ==
+X-Gm-Message-State: APjAAAU7sllHClubQbzGtqt6dpvASy9CZAU04r8loFn3JNpUgu8omm2h
+        c9s2NQV6nLmk+7f7ya8PRkmaksc+diyUP8ybMRo=
+X-Google-Smtp-Source: APXvYqwLHAZsySBQ5toZfqW/3M9sNi5WUjCIwF+SI1xCAeDRgfX4LKqJmF2bmQV/9y0r2Ld5SOqDmVCpjzeN7PYQtxs=
+X-Received: by 2002:a92:d642:: with SMTP id x2mr8368738ilp.169.1580586897434;
+ Sat, 01 Feb 2020 11:54:57 -0800 (PST)
+MIME-Version: 1.0
+References: <CAH2r5mvYTimXUfJB+p0mvYV3jAR1u5G4F3m+OqA_5jKiLhVE8A@mail.gmail.com>
+ <20200130015210.GB3673284@magnolia>
+In-Reply-To: <20200130015210.GB3673284@magnolia>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 1 Feb 2020 13:54:46 -0600
+Message-ID: <CAH2r5mv55Ua3B8WX1Qht1xfWL-k5pGJrN+Uz0L4jHtYOo9RMKw@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Enhancing Linux Copy Performance and Function
+ and improving backup scenarios
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>
+        samba-technical <samba-technical@lists.samba.org>,
+        lsf-pc@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 1 Feb 2020 12:40:31 -0600:
+On Wed, Jan 29, 2020 at 7:54 PM Darrick J. Wong <darrick.wong@oracle.com> wrote:
+>
+> On Wed, Jan 22, 2020 at 05:13:53PM -0600, Steve French wrote:
+> > As discussed last year:
+> >
+> > Current Linux copy tools have various problems compared to other
+> > platforms - small I/O sizes (and most don't allow it to be
+> > configured), lack of parallel I/O for multi-file copies, inability to
+> > reduce metadata updates by setting file size first, lack of cross
+>
+> ...and yet weirdly we tell everyone on xfs not to do that or to use
+> fallocate, so that delayed speculative allocation can do its thing.
+> We also tell them not to create deep directory trees because xfs isn't
+> ext4.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.6-rc-small-smb3-fix-for-stable
+Delayed speculative allocation may help xfs but changing file size
+thousands of times for network and cluster fs for a single file copy
+can be a disaster for other file systems (due to the excessive cost
+it adds to metadata sync time) - so there are file systems where
+setting the file size first can help
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/94f2630b18975bb56eee5d1a36371db967643479
+> >  And copy tools rely less on
+> > the kernel file system (vs. code in the user space tool) in Linux than
+> > would be expected, in order to determine which optimizations to use.
+>
+> What kernel interfaces would we expect userspace to use to figure out
+> the confusing mess of optimizations? :)
 
-Thank you!
+copy_file_range and clone_file_range are a good start ... few tools
+use them ...
+
+> There's a whole bunch of xfs ioctls like dioinfo and the like that we
+> ought to push to statx too.  Is that an example of what you mean?
+
+That is a good example.   And then getting tools to use these,
+even if there are some file system dependent cases.
+
+>
+> > But some progress has been made since last year's summit, with new
+> > copy tools being released and improvements to some of the kernel file
+> > systems, and also some additional feedback on lwn and on the mailing
+> > lists.  In addition these discussions have prompted additional
+> > feedback on how to improve file backup/restore scenarios (e.g. to
+> > mounts to the cloud from local Linux systems) which require preserving
+> > more timestamps, ACLs and metadata, and preserving them efficiently.
+>
+> I suppose it would be useful to think a little more about cross-device
+> fs copies considering that the "devices" can be VM block devs backed by
+> files on a filesystem that supports reflink.  I have no idea how you
+> manage that sanely though.
+
+I trust XFS and BTRFS and SMB3 and cluster fs etc. to solve this better
+than the block level (better locking, leases/delegation, state management, etc.)
+though.
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+Thanks,
+
+Steve
