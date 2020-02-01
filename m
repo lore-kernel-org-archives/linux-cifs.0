@@ -1,118 +1,96 @@
-Return-Path: <SRS0=B7dF=3T=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=KQhF=3V=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C17D6C2D0DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 21:24:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E803C33CB3
+	for <linux-cifs@archiver.kernel.org>; Sat,  1 Feb 2020 18:40:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87D3720674
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jan 2020 21:24:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E027206E3
+	for <linux-cifs@archiver.kernel.org>; Sat,  1 Feb 2020 18:40:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rj1LlI0J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LJk2X4cA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727277AbgA3VYw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 30 Jan 2020 16:24:52 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:46477 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727263AbgA3VYw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Jan 2020 16:24:52 -0500
-Received: by mail-io1-f66.google.com with SMTP id t26so5687856ioi.13
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Jan 2020 13:24:51 -0800 (PST)
+        id S1726379AbgBASkn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 1 Feb 2020 13:40:43 -0500
+Received: from mail-il1-f172.google.com ([209.85.166.172]:39435 "EHLO
+        mail-il1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726335AbgBASkm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 1 Feb 2020 13:40:42 -0500
+Received: by mail-il1-f172.google.com with SMTP id f70so9143377ill.6;
+        Sat, 01 Feb 2020 10:40:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Ms35iyyJALeam/e23imjOs9uwHQwNwwwbnNF3oepDXM=;
-        b=Rj1LlI0JQab6chDGf/GESj7QMUauqsXWGuYxhE0VtUpSOX2voXZl9zJkm9goMibCew
-         w11SVJsCFQOrChgMCtTIOH+V2LMXADamdk7UjUDPcJu8A6n0o111c6iUkerziGhbmNjD
-         +M8MRQA0Wwgs8QGEbWnrhsTSmg8A5MUuOcYrxKo/mvBVOEguS1k2uMU9N3xInkPMk+il
-         9DGz0m1NMSoDkCElm6FWx24n6tqMdIn9HEOhozLFQoUgFIoSNkboLe01TfXDnJQQ6WP3
-         NGJakvRXYppg0wZmyu5yWko5/WXSGhfzEdxlLWSCxUbh8oN+vmopZb0Az/XhfifIcvBi
-         q/nA==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=Z11+/yeQUB6zTwEssk9IOz1CExq34IGy3Oa8TOXh/Dw=;
+        b=LJk2X4cA1MrCsi7mlcIeHVA+FtISyoUCmOSZ9maIXGIt7xpBTTfNjoMb+7Zfz4bnrA
+         EZ1rWKDrG8M6+RnNPzPmsHDRYDFKVLaHJ7k9GBgoeIcvfe0DTIcP5YuppQIKDtX0HXeU
+         nwajDVdfmYJlRWA8N9cMvMFo/CHKaQIzUohK1cnprQ0yswJlIde47ZlTxGjK2PGY4lYT
+         MnR2+lwL95F3jTWPxCKF+y6ydIb4cd1IZWhy+FjENLsKtz8pBBACNOp11SESbRRRC1Ed
+         sEaCEFcWIzKyn57dqrXsCeEisvcnPhJ+fglLKkrQX+m2FL5/PYemVrrffeMeYpLto3YM
+         RARw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Ms35iyyJALeam/e23imjOs9uwHQwNwwwbnNF3oepDXM=;
-        b=Io2ILs/Uv4fqkTs5Qg92xFJkwwGitI6FwECamOJaJjoMetLYZDNpC0Xi7Kn4GgO1ed
-         sGFJwHrF/jHvoeprnbDPiUeyTjebHVZCWqU9426vaErz279ZKJfHvUh8U3EFusc/QgFN
-         B3H8Zt46Atr1HaLPX47dp7zd8uJZLKSxTv8oEbusGbJr5A1X5lxd/O7uDuLjLifZX3Q7
-         4Dh+ge6QE+PeJnPt3Zd0lIRWHj9hag6rfED+r99W+ZzbgCMaNPTicepDw/gC+7G2eR1G
-         yoDdzIkLRJCZnOvNLI8xkTwMsqBAOn4oxD+8V386qGHWRrACa/gzspy+hEOu3fF7tefw
-         AkOA==
-X-Gm-Message-State: APjAAAVr8a0RA/FDc03L+3a6x1a43ebl5opc8jNqA98XvzE5FGuq3OnI
-        2GNOIpgoPtojE2+alj7DDQr5ln1Ohzxf4obWVoI=
-X-Google-Smtp-Source: APXvYqzruedVp+wnTYdB88Zia2ZKGuk2Ig2DzS/5hbNllXBKzhIA1wNgoFXF+63CT6OEKZimQ3VFe46MlSYx3MQveyE=
-X-Received: by 2002:a6b:cd0e:: with SMTP id d14mr5625723iog.272.1580419491254;
- Thu, 30 Jan 2020 13:24:51 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=Z11+/yeQUB6zTwEssk9IOz1CExq34IGy3Oa8TOXh/Dw=;
+        b=bt2UUjXMwzmvilLod3qbu96zmEJDQZNV73fj+XS5iQJ4pLzaMmogs4mWB2wtVv3hV5
+         fPO7od+m9hyWL6J/lg3azx+Fcux+JGz09ukZA4rqydx22R1Do2VZBARtLWOJwHddo2I5
+         MiaNGINSib6d2UQ7HvrhPwvu7zufMeR6HKouvx1Mjyt8nYwjqWvq7/jYR13aTlypJdUa
+         HLjKQ/j74n493hRXPmN6e6unRJQQ7TGmmHewxYsjisz8NZCcK2BMDHoXg0yNi2tB+MyD
+         tGcZmczxAXvsvpEzIhV/S/in0DlUcLOQ0tx1t8VvnMOPivb7af/LUMhA80e51zpgo5iZ
+         AiQQ==
+X-Gm-Message-State: APjAAAVT43hHEouRweENJD7VUry9Fzt9o6xf8f30hUQi/gpksRKAcVJt
+        JCZJm82YsykUToWodwvrAK4iOTRf+HeNeAXQr+g=
+X-Google-Smtp-Source: APXvYqxHdowNbvOAZgwablQ3gQQL55H32fErt8bUECbN0wCs1Pws7yWJjkaghzNxBt/2ALxYrUhQMOOMAxp3Wh5+Irs=
+X-Received: by 2002:a05:6e02:c71:: with SMTP id f17mr14485694ilj.272.1580582441983;
+ Sat, 01 Feb 2020 10:40:41 -0800 (PST)
 MIME-Version: 1.0
-References: <20200130195251.15789-1-lsahlber@redhat.com>
-In-Reply-To: <20200130195251.15789-1-lsahlber@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 30 Jan 2020 15:24:40 -0600
-Message-ID: <CAH2r5mu9CNKFQ5Mht-qUWKQShPXNefcMY+RsuMcOzFKkSb=0xw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix soft mounts hanging in the reconnect code
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Paulo Alcantara <palcantara@suse.de>
+Date:   Sat, 1 Feb 2020 12:40:31 -0600
+Message-ID: <CAH2r5mt-Q1_ZBJmC+8jr5gJhr-NmUGG933y0gc+_1DVWTJUVZQ@mail.gmail.com>
+Subject: [GIT PULL] small SMB3 fix for stable
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Stable <stable@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Added cc:stable and Reviewed-by and merged into cifs-2.6.git for-next
+Please pull the following change since commit
+68353984d63d8d7ea728819dbdb7aecc5f32d360:
 
-On Thu, Jan 30, 2020 at 1:53 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> RHBZ: 1795429
->
-> In recent DFS updates we have a new variable controlling how many times we will
-> retry to reconnect the share.
-> If DFS is not used, then this variable is initialized to 0 in:
->
-> static inline int
-> dfs_cache_get_nr_tgts(const struct dfs_cache_tgt_list *tl)
-> {
->         return tl ? tl->tl_numtgts : 0;
-> }
->
-> This means that in the reconnect loop in smb2_reconnect() we will immediately wrap retries to -1
-> and never actually get to pass this conditional:
->
->                 if (--retries)
->                         continue;
->
-> The effect is that we no longer reach the point where we fail the commands with -EHOSTDOWN
-> and basically the kernel threads are virtually hung and unkillable.
->
-> Fixes: a3a53b7603798fd8 (cifs: Add support for failover in smb2_reconnect())
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/smb2pdu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 7edba3e6d5e6..14f209f7376f 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -312,7 +312,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
->                 if (server->tcpStatus != CifsNeedReconnect)
->                         break;
->
-> -               if (--retries)
-> +               if (retries && --retries)
->                         continue;
->
->                 /*
-> --
-> 2.13.6
->
+  Merge tag '5.6-smb3-fixes-and-dfs-and-readdir-improvements' of
+git://git.samba.org/sfrench/cifs-2.6 (2020-01-28 15:34:03 -0800)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.6-rc-small-smb3-fix-for-stable
+
+for you to fetch changes up to b581098482e6f177a4f64ea021fd5a9327ea08d5:
+
+  cifs: update internal module version number (2020-01-31 15:13:22 -0600)
+
+----------------------------------------------------------------
+Small SMB3 fix for stable (fixes problem with reconnect for soft mounts)
+
+----------------------------------------------------------------
+Ronnie Sahlberg (1):
+      cifs: fix soft mounts hanging in the reconnect code
+
+Steve French (1):
+      cifs: update internal module version number
+
+ fs/cifs/cifsfs.h  | 2 +-
+ fs/cifs/smb2pdu.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 
 -- 
