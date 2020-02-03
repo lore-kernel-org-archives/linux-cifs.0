@@ -1,266 +1,801 @@
-Return-Path: <SRS0=KQhF=3V=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=kDuE=3X=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A434C3524B
-	for <linux-cifs@archiver.kernel.org>; Sat,  1 Feb 2020 23:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ADECC35247
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Feb 2020 19:46:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F1C5520658
-	for <linux-cifs@archiver.kernel.org>; Sat,  1 Feb 2020 23:16:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 086172051A
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Feb 2020 19:46:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=dilger-ca.20150623.gappssmtp.com header.i=@dilger-ca.20150623.gappssmtp.com header.b="VG8VHgFW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q27EP5pL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726643AbgBAXQS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 1 Feb 2020 18:16:18 -0500
-Received: from mail-pj1-f51.google.com ([209.85.216.51]:54682 "EHLO
-        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726487AbgBAXQS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 1 Feb 2020 18:16:18 -0500
-Received: by mail-pj1-f51.google.com with SMTP id dw13so4595316pjb.4
-        for <linux-cifs@vger.kernel.org>; Sat, 01 Feb 2020 15:16:16 -0800 (PST)
+        id S1726187AbgBCTq6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 3 Feb 2020 14:46:58 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:33269 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725372AbgBCTq6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Feb 2020 14:46:58 -0500
+Received: by mail-wm1-f68.google.com with SMTP id m10so607907wmc.0
+        for <linux-cifs@vger.kernel.org>; Mon, 03 Feb 2020 11:46:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dilger-ca.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=iGWodyo7BE3SjtJqSzBK4M9PQhoTpRtuGVVx63VdcvE=;
-        b=VG8VHgFW5Y8I1qQ+mKKmHk3CK1FeLilftSPodp/gAQLO7H0iMnXo/hbXzzW+1sBgCy
-         FVFZJbW2QCXRlgfWq52EZyv8hyFKxVc7n0VUJSzxoGj6M0Ma3oBg8m+qb8v9DwzpC1t6
-         dmK7lN+1vbf5qhYIMTy8ObDbZgfXaAI1SCI/gBHNGC6XQG6/ZWuKSSBrPUefrSvYszQZ
-         zyCWCNDZn5eh9psagZ4lktWyeufza8klNNhqusERsju64VtmXzSxDL/TjlaX9lL62+1N
-         lad3q8zuHBPNqmJ3WN0Ev/jLSE9OK/3/+q+Kr6aTOKtX3lqH7aN9HchPQuvDC+FRxgC4
-         U6ow==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=KUU21cXloxNxOMt4PD5uDRdDWyyybg/kvfonXwgvoJQ=;
+        b=q27EP5pLBRPSknNaYNruyrDBtqZnjCEzPI0aSSP2Wnt5mFh8IHdQlNhdMGvAQKhu7h
+         QKxw0StPSqeDCB6GvJ6xwsYZ31lumKbit+oAMlZJvA3oQJw9hyDJdGT2t6FAhPGcFOKe
+         oe7lHSj3h8un4CVYP6o5A6B1ZJ8gZviG/iEYGLkgH2q9OQbc2jPg/uDzXuck8n1l9WSX
+         0vA+iRIZncJdZijfClTEXrYMVTeT9YQFw4ZqUv01jLWLabep/vZ5OnNJl3wPY+4GCz/Z
+         2qx2+G4zTUq91Lgxc5srKarMcRIqV6RwfQeNxGNF3QVIDtZw1zfDZgJwgOrxKwa10edv
+         Kc8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=iGWodyo7BE3SjtJqSzBK4M9PQhoTpRtuGVVx63VdcvE=;
-        b=eN0B7V4fXb+3A8GSjA9SqSbmqQg3OgCL1VY6zLRVZ4XdR/jQkT5JqDSfgwZz9w/UJN
-         Scump8Xabx7CUkXoQY4X4o+ht0j4IUB4wzKjPlAK+id5QeBj1sDZapDLqql6Q0/s8lbn
-         jfSSmFXXuCiMYXe/jkTVXyFtBs+kzZV3K3x+5K7ueMJpK+mFxfcCmumZBvLARYy13lhK
-         hv3XQulH4fx7a8AWFKskP2Ms0bPdccQa6R6/bo2NG+irVntx/gKwAv0MuRucOaMjL+sZ
-         8R8NjMQt6oJQSrB9nxM+EYGGES0oMICnYOohL/muGYvvb3KYUl8nlT/4HpUHtTh5PnPM
-         HK5A==
-X-Gm-Message-State: APjAAAXEBzsRlxh2XvZng3rGd1FiJ+/fV5B2wRKQJrI9dkeODpDaQ5bL
-        khvCFQ2LrDordWslDNlQOOwwtA==
-X-Google-Smtp-Source: APXvYqzwWU/jmICW8I0Bs+kQESOAJUhqZqQrxBQZImpPgkzh/M14GEdRdgArFATUrqRq68VbajhSyA==
-X-Received: by 2002:a17:902:8688:: with SMTP id g8mr16718690plo.277.1580598976077;
-        Sat, 01 Feb 2020 15:16:16 -0800 (PST)
-Received: from cabot-wlan.adilger.int (S0106a84e3fe4b223.cg.shawcable.net. [70.77.216.213])
-        by smtp.gmail.com with ESMTPSA id 136sm14221343pgg.74.2020.02.01.15.16.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 01 Feb 2020 15:16:15 -0800 (PST)
-From:   Andreas Dilger <adilger@dilger.ca>
-Message-Id: <497E0258-F69E-4739-B9B5-B3DA92571A27@dilger.ca>
-Content-Type: multipart/signed;
- boundary="Apple-Mail=_18888712-B94F-4C77-8A59-99C68A3C505C";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [LSF/MM/BPF TOPIC] Enhancing Linux Copy Performance and Function
- and improving backup scenarios
-Date:   Sat, 1 Feb 2020 16:16:11 -0700
-In-Reply-To: <CAH2r5mv55Ua3B8WX1Qht1xfWL-k5pGJrN+Uz0L4jHtYOo9RMKw@mail.gmail.com>
-Cc:     "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        lsf-pc@lists.linux-foundation.org
-To:     Steve French <smfrench@gmail.com>
-References: <CAH2r5mvYTimXUfJB+p0mvYV3jAR1u5G4F3m+OqA_5jKiLhVE8A@mail.gmail.com>
- <20200130015210.GB3673284@magnolia>
- <CAH2r5mv55Ua3B8WX1Qht1xfWL-k5pGJrN+Uz0L4jHtYOo9RMKw@mail.gmail.com>
-X-Mailer: Apple Mail (2.3273)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=KUU21cXloxNxOMt4PD5uDRdDWyyybg/kvfonXwgvoJQ=;
+        b=IquY0nI0jTgIA7q+lEBz1GkkUSKB6ruQMtLkg2yofBUGaQNRWSGVJkPrb2GotbCWv2
+         /wnW/pixU7rjMzPjgUg+aUzcZaMIaMvHj8MAHiWDsTODwxCX6pl/uKeM9o1jL9kb1o9V
+         l1BmGV17cU1+tcyE/B5omG4bDR8bCLNJOymz+n3jet+p4FGYt7lbb4Tq92hA2dRz9m/0
+         8mQnGUYHf98vFgi7W1BE9mUUb3Fv/iM2zOQjwQAq5IwYurq4eh/f6rQ2OL4FZSy4dmWF
+         1J2RZr7smFfTDBKXo8CcoxVGTZoVjQtdnmFwZA2/577CYo4FybLhpca6D+UCm7KeLKAs
+         mMhQ==
+X-Gm-Message-State: APjAAAWLE52lALmSksiVVsaeSSJ9hkBKGuhRhgQH3jAXgH44KYcdQvR5
+        bHphMit6OHPiV9KiuLl1egU=
+X-Google-Smtp-Source: APXvYqwDqqsdA4+RkhcRAmm4a9FEVtKC7FHJLtPQvkJzyRld7zi3yw5im/fp/jAgCwuaG/UsKPawnA==
+X-Received: by 2002:a05:600c:2c06:: with SMTP id q6mr685377wmg.154.1580759211975;
+        Mon, 03 Feb 2020 11:46:51 -0800 (PST)
+Received: from localhost.localdomain ([141.226.11.142])
+        by smtp.gmail.com with ESMTPSA id h13sm15213815wrw.54.2020.02.03.11.46.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Feb 2020 11:46:50 -0800 (PST)
+From:   Amir Goldstein <amir73il@gmail.com>
+To:     Steve French <sfrench@samba.org>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>, whh@rubrik.com,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Subject: [PATCH] SMB3: Backup intent flag missing from some more ops
+Date:   Mon,  3 Feb 2020 21:46:43 +0200
+Message-Id: <20200203194643.21698-1-amir73il@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+When "backup intent" is requested on the mount (e.g. backupuid or
+backupgid mount options), the corresponding flag was missing from
+some of the operations.
 
---Apple-Mail=_18888712-B94F-4C77-8A59-99C68A3C505C
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+Change all operations to use the macro cifs_create_options() to
+set the backup intent flag if needed.
 
-On Feb 1, 2020, at 12:54 PM, Steve French <smfrench@gmail.com> wrote:
->=20
-> On Wed, Jan 29, 2020 at 7:54 PM Darrick J. Wong =
-<darrick.wong@oracle.com> wrote:
->>=20
->> On Wed, Jan 22, 2020 at 05:13:53PM -0600, Steve French wrote:
->>> As discussed last year:
->>>=20
->>> Current Linux copy tools have various problems compared to other
->>> platforms - small I/O sizes (and most don't allow it to be
->>> configured), lack of parallel I/O for multi-file copies, inability =
-to
->>> reduce metadata updates by setting file size first, lack of cross
->>=20
->> ...and yet weirdly we tell everyone on xfs not to do that or to use
->> fallocate, so that delayed speculative allocation can do its thing.
->> We also tell them not to create deep directory trees because xfs =
-isn't
->> ext4.
->=20
-> Delayed speculative allocation may help xfs but changing file size
-> thousands of times for network and cluster fs for a single file copy
-> can be a disaster for other file systems (due to the excessive cost
-> it adds to metadata sync time) - so there are file systems where
-> setting the file size first can help
+Signed-off-by: Amir Goldstein <amir73il@gmail.com>
+---
 
-Sometimes I think it is worthwhile to bite the bullet and just submit
-patches to the important upstream tools to make them work well.  I've
-sone that in the past for cp, tar, rsync, ls, etc. so that they work
-better.  If you've ever straced those tools, you will see they do a
-lot of needless filesystem operations (repeated stat() in particular)
-that could be optimized - no syscall is better than a fast syscall.
+Hi Steve,
 
-For cp it was changed to not allocate the st_blksize buffer on the
-stack, which choked when Lustre reported st_blksize=3D8MB.  I'm starting
-to think that it makes sense for all filesystems to use multi-MB buffers
-when reading/copying file data, rather than 4KB or 32KB as it does =
-today.
-It might also be good for cp to use O_DIRECT for large file copies =
-rather
-than buffered IO to avoid polluting the cache?  Having it use AIO/DIO
-would likely be a huge improvement as well.
+We have a backup test case which failed on some operations, so I tried
+to fix all operations. Hope I found them all.
+This change fixed the backup test case failure, but I did not run any
+other cifs sanity tests.
 
-That probably holds true for many other tools that still use st_blksize.
-Maybe filesystems like ext4/xfs/btrfs should start reporting a larger
-st_blksize as well?
+I also have a v4.19.y backport patch. Will post it if and when this
+patch is merged.
 
-As for parallel file copying, we've been working on MPIFileUtils, which
-has parallel tree/file operations (also multi-node), but has the =
-drawback
-that it depends on MPI for remote thread startup, and isn't for =
-everyone.
-It should be possible to change it to run in parallel on a single node =
-if
-MPI wasn't installed, which would make the tools more generally usable.
+Thanks,
+Amir.
 
->>> And copy tools rely less on
->>> the kernel file system (vs. code in the user space tool) in Linux =
-than
->>> would be expected, in order to determine which optimizations to use.
->>=20
->> What kernel interfaces would we expect userspace to use to figure out
->> the confusing mess of optimizations? :)
->=20
-> copy_file_range and clone_file_range are a good start ... few tools
-> use them ...
+ fs/cifs/cifsacl.c   | 14 +++-----
+ fs/cifs/cifsfs.c    |  2 +-
+ fs/cifs/cifsglob.h  |  6 ++--
+ fs/cifs/cifsproto.h |  8 +++++
+ fs/cifs/connect.c   |  2 +-
+ fs/cifs/dir.c       |  5 +--
+ fs/cifs/file.c      | 10 ++----
+ fs/cifs/inode.c     |  8 ++---
+ fs/cifs/ioctl.c     |  2 +-
+ fs/cifs/link.c      | 18 +++-------
+ fs/cifs/smb1ops.c   | 19 +++++------
+ fs/cifs/smb2inode.c |  9 ++---
+ fs/cifs/smb2ops.c   | 81 +++++++++++++++------------------------------
+ fs/cifs/smb2proto.h |  2 +-
+ 14 files changed, 68 insertions(+), 118 deletions(-)
 
-One area that is really lacking a parallel interface is for directory
-and namespace operations.  We still need to do serialized readdir()
-and stat for operations in a directory.  There are now parallel VFS
-lookups, but it would be useful to allow parallel create and unlink
-for regular files, and possibly renames of files within a directory.
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index fb41e51dd574..440828afcdde 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -1084,7 +1084,7 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 	struct cifs_ntsd *pntsd = NULL;
+ 	int oplock = 0;
+ 	unsigned int xid;
+-	int rc, create_options = 0;
++	int rc;
+ 	struct cifs_tcon *tcon;
+ 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+ 	struct cifs_fid fid;
+@@ -1096,13 +1096,10 @@ static struct cifs_ntsd *get_cifs_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 	tcon = tlink_tcon(tlink);
+ 	xid = get_xid();
+ 
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+-
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = READ_CONTROL;
+-	oparms.create_options = create_options;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.path = path;
+ 	oparms.fid = &fid;
+@@ -1147,7 +1144,7 @@ int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+ {
+ 	int oplock = 0;
+ 	unsigned int xid;
+-	int rc, access_flags, create_options = 0;
++	int rc, access_flags;
+ 	struct cifs_tcon *tcon;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
+@@ -1160,9 +1157,6 @@ int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+ 	tcon = tlink_tcon(tlink);
+ 	xid = get_xid();
+ 
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+-
+ 	if (aclflag == CIFS_ACL_OWNER || aclflag == CIFS_ACL_GROUP)
+ 		access_flags = WRITE_OWNER;
+ 	else
+@@ -1171,7 +1165,7 @@ int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = access_flags;
+-	oparms.create_options = create_options;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.path = path;
+ 	oparms.fid = &fid;
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 5492b9860baa..febab27cd838 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -275,7 +275,7 @@ cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
+ 	buf->f_ffree = 0;	/* unlimited */
+ 
+ 	if (server->ops->queryfs)
+-		rc = server->ops->queryfs(xid, tcon, buf);
++		rc = server->ops->queryfs(xid, tcon, cifs_sb, buf);
+ 
+ 	free_xid(xid);
+ 	return 0;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 239338d57086..1205041fd966 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -298,7 +298,8 @@ struct smb_version_operations {
+ 			     const char *, struct dfs_info3_param **,
+ 			     unsigned int *, const struct nls_table *, int);
+ 	/* informational QFS call */
+-	void (*qfs_tcon)(const unsigned int, struct cifs_tcon *);
++	void (*qfs_tcon)(const unsigned int, struct cifs_tcon *,
++			 struct cifs_sb_info *);
+ 	/* check if a path is accessible or not */
+ 	int (*is_path_accessible)(const unsigned int, struct cifs_tcon *,
+ 				  struct cifs_sb_info *, const char *);
+@@ -409,7 +410,7 @@ struct smb_version_operations {
+ 			       struct cifsInodeInfo *);
+ 	/* query remote filesystem */
+ 	int (*queryfs)(const unsigned int, struct cifs_tcon *,
+-		       struct kstatfs *);
++		       struct cifs_sb_info *, struct kstatfs *);
+ 	/* send mandatory brlock to the server */
+ 	int (*mand_lock)(const unsigned int, struct cifsFileInfo *, __u64,
+ 			 __u64, __u32, int, int, bool);
+@@ -490,6 +491,7 @@ struct smb_version_operations {
+ 	/* ioctl passthrough for query_info */
+ 	int (*ioctl_query_info)(const unsigned int xid,
+ 				struct cifs_tcon *tcon,
++				struct cifs_sb_info *cifs_sb,
+ 				__le16 *path, int is_dir,
+ 				unsigned long p);
+ 	/* make unix special files (block, char, fifo, socket) */
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 948bf3474db1..748bd00cb5f1 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -612,4 +612,12 @@ static inline int get_dfs_path(const unsigned int xid, struct cifs_ses *ses,
+ }
+ #endif
+ 
++static inline int cifs_create_options(struct cifs_sb_info *cifs_sb, int options)
++{
++	if (backup_cred(cifs_sb))
++		return options | CREATE_OPEN_BACKUP_INTENT;
++	else
++		return options;
++}
++
+ #endif			/* _CIFSPROTO_H */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 0aa3623ae0e1..a941ac7a659d 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -4365,7 +4365,7 @@ static int mount_get_conns(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
+ 
+ 	/* do not care if a following call succeed - informational */
+ 	if (!tcon->pipe && server->ops->qfs_tcon) {
+-		server->ops->qfs_tcon(*xid, tcon);
++		server->ops->qfs_tcon(*xid, tcon, cifs_sb);
+ 		if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RO_CACHE) {
+ 			if (tcon->fsDevInfo.DeviceCharacteristics &
+ 			    cpu_to_le32(FILE_READ_ONLY_DEVICE))
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index f3b79012ff29..0ef099442f20 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -355,13 +355,10 @@ cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned int xid,
+ 	if (!tcon->unix_ext && (mode & S_IWUGO) == 0)
+ 		create_options |= CREATE_OPTION_READONLY;
+ 
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+-
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = desired_access;
+-	oparms.create_options = create_options;
++	oparms.create_options = cifs_create_options(cifs_sb, create_options);
+ 	oparms.disposition = disposition;
+ 	oparms.path = full_path;
+ 	oparms.fid = fid;
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index a4e8f7d445ac..79e6f4f55b9b 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -222,9 +222,6 @@ cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
+ 	if (!buf)
+ 		return -ENOMEM;
+ 
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+-
+ 	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
+ 	if (f_flags & O_SYNC)
+ 		create_options |= CREATE_WRITE_THROUGH;
+@@ -235,7 +232,7 @@ cifs_nt_open(char *full_path, struct inode *inode, struct cifs_sb_info *cifs_sb,
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = desired_access;
+-	oparms.create_options = create_options;
++	oparms.create_options = cifs_create_options(cifs_sb, create_options);
+ 	oparms.disposition = disposition;
+ 	oparms.path = full_path;
+ 	oparms.fid = fid;
+@@ -752,9 +749,6 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 
+ 	desired_access = cifs_convert_flags(cfile->f_flags);
+ 
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+-
+ 	/* O_SYNC also has bit for O_DSYNC so following check picks up either */
+ 	if (cfile->f_flags & O_SYNC)
+ 		create_options |= CREATE_WRITE_THROUGH;
+@@ -768,7 +762,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = desired_access;
+-	oparms.create_options = create_options;
++	oparms.create_options = cifs_create_options(cifs_sb, create_options);
+ 	oparms.disposition = disposition;
+ 	oparms.path = full_path;
+ 	oparms.fid = &cfile->fid;
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 9b547f7f5f5d..b1383c524b98 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -472,9 +472,7 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = GENERIC_READ;
+-	oparms.create_options = CREATE_NOT_DIR;
+-	if (backup_cred(cifs_sb))
+-		oparms.create_options |= CREATE_OPEN_BACKUP_INTENT;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.path = path;
+ 	oparms.fid = &fid;
+@@ -1284,7 +1282,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = DELETE | FILE_WRITE_ATTRIBUTES;
+-	oparms.create_options = CREATE_NOT_DIR;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.path = full_path;
+ 	oparms.fid = &fid;
+@@ -1822,7 +1820,7 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
+ 	oparms.cifs_sb = cifs_sb;
+ 	/* open the file to be renamed -- we need DELETE perms */
+ 	oparms.desired_access = DELETE;
+-	oparms.create_options = CREATE_NOT_DIR;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.path = from_path;
+ 	oparms.fid = &fid;
+diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+index 1a01e108d75e..e4c935026d5e 100644
+--- a/fs/cifs/ioctl.c
++++ b/fs/cifs/ioctl.c
+@@ -65,7 +65,7 @@ static long cifs_ioctl_query_info(unsigned int xid, struct file *filep,
+ 
+ 	if (tcon->ses->server->ops->ioctl_query_info)
+ 		rc = tcon->ses->server->ops->ioctl_query_info(
+-				xid, tcon, utf16_path,
++				xid, tcon, cifs_sb, utf16_path,
+ 				filep->private_data ? 0 : 1, p);
+ 	else
+ 		rc = -EOPNOTSUPP;
+diff --git a/fs/cifs/link.c b/fs/cifs/link.c
+index b736acd3917b..852aa00ec729 100644
+--- a/fs/cifs/link.c
++++ b/fs/cifs/link.c
+@@ -315,7 +315,7 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = GENERIC_READ;
+-	oparms.create_options = CREATE_NOT_DIR;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.path = path;
+ 	oparms.fid = &fid;
+@@ -353,15 +353,11 @@ cifs_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_fid fid;
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_io_parms io_parms;
+-	int create_options = CREATE_NOT_DIR;
+-
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+ 
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = GENERIC_WRITE;
+-	oparms.create_options = create_options;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR);
+ 	oparms.disposition = FILE_CREATE;
+ 	oparms.path = path;
+ 	oparms.fid = &fid;
+@@ -402,9 +398,7 @@ smb3_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = GENERIC_READ;
+-	oparms.create_options = CREATE_NOT_DIR;
+-	if (backup_cred(cifs_sb))
+-		oparms.create_options |= CREATE_OPEN_BACKUP_INTENT;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+@@ -457,14 +451,10 @@ smb3_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_fid fid;
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_io_parms io_parms;
+-	int create_options = CREATE_NOT_DIR;
+ 	__le16 *utf16_path;
+ 	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	struct kvec iov[2];
+ 
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+-
+ 	cifs_dbg(FYI, "%s: path: %s\n", __func__, path);
+ 
+ 	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
+@@ -474,7 +464,7 @@ smb3_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = GENERIC_WRITE;
+-	oparms.create_options = create_options;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR);
+ 	oparms.disposition = FILE_CREATE;
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index d70a2bb062df..eb994e313c6a 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -504,7 +504,8 @@ cifs_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
+ }
+ 
+ static void
+-cifs_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon)
++cifs_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
++	      struct cifs_sb_info *cifs_sb)
+ {
+ 	CIFSSMBQFSDeviceInfo(xid, tcon);
+ 	CIFSSMBQFSAttributeInfo(xid, tcon);
+@@ -565,7 +566,7 @@ cifs_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		oparms.tcon = tcon;
+ 		oparms.cifs_sb = cifs_sb;
+ 		oparms.desired_access = FILE_READ_ATTRIBUTES;
+-		oparms.create_options = 0;
++		oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 		oparms.disposition = FILE_OPEN;
+ 		oparms.path = full_path;
+ 		oparms.fid = &fid;
+@@ -793,7 +794,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = SYNCHRONIZE | FILE_WRITE_ATTRIBUTES;
+-	oparms.create_options = CREATE_NOT_DIR;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.path = full_path;
+ 	oparms.fid = &fid;
+@@ -872,7 +873,7 @@ cifs_oplock_response(struct cifs_tcon *tcon, struct cifs_fid *fid,
+ 
+ static int
+ cifs_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+-	     struct kstatfs *buf)
++	     struct cifs_sb_info *cifs_sb, struct kstatfs *buf)
+ {
+ 	int rc = -EOPNOTSUPP;
+ 
+@@ -970,7 +971,8 @@ cifs_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES;
+-	oparms.create_options = OPEN_REPARSE_POINT;
++	oparms.create_options = cifs_create_options(cifs_sb,
++						    OPEN_REPARSE_POINT);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.path = full_path;
+ 	oparms.fid = &fid;
+@@ -1029,7 +1031,6 @@ cifs_make_node(unsigned int xid, struct inode *inode,
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct inode *newinode = NULL;
+ 	int rc = -EPERM;
+-	int create_options = CREATE_NOT_DIR | CREATE_OPTION_SPECIAL;
+ 	FILE_ALL_INFO *buf = NULL;
+ 	struct cifs_io_parms io_parms;
+ 	__u32 oplock = 0;
+@@ -1090,13 +1091,11 @@ cifs_make_node(unsigned int xid, struct inode *inode,
+ 		goto out;
+ 	}
+ 
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+-
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = GENERIC_WRITE;
+-	oparms.create_options = create_options;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR |
++						    CREATE_OPTION_SPECIAL);
+ 	oparms.disposition = FILE_CREATE;
+ 	oparms.path = full_path;
+ 	oparms.fid = &fid;
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 5ef5e97a6d13..1cf207564ff9 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -99,9 +99,7 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = desired_access;
+ 	oparms.disposition = create_disposition;
+-	oparms.create_options = create_options;
+-	if (backup_cred(cifs_sb))
+-		oparms.create_options |= CREATE_OPEN_BACKUP_INTENT;
++	oparms.create_options = cifs_create_options(cifs_sb, create_options);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 	oparms.mode = mode;
+@@ -457,7 +455,7 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* If it is a root and its handle is cached then use it */
+ 	if (!strlen(full_path) && !no_cached_open) {
+-		rc = open_shroot(xid, tcon, &fid);
++		rc = open_shroot(xid, tcon, cifs_sb, &fid);
+ 		if (rc)
+ 			goto out;
+ 
+@@ -474,9 +472,6 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 		goto out;
+ 	}
+ 
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+-
+ 	cifs_get_readable_path(tcon, full_path, &cfile);
+ 	rc = smb2_compound_op(xid, tcon, cifs_sb, full_path,
+ 			      FILE_READ_ATTRIBUTES, FILE_OPEN, create_options,
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 6787fce26f20..33bb86cae369 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -655,7 +655,8 @@ smb2_cached_lease_break(struct work_struct *work)
+ /*
+  * Open the directory at the root of a share
+  */
+-int open_shroot(unsigned int xid, struct cifs_tcon *tcon, struct cifs_fid *pfid)
++int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
++		struct cifs_sb_info *cifs_sb, struct cifs_fid *pfid)
+ {
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct TCP_Server_Info *server = ses->server;
+@@ -702,7 +703,7 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon, struct cifs_fid *pfid)
+ 	rqst[0].rq_nvec = SMB2_CREATE_IOV_SIZE;
+ 
+ 	oparms.tcon = tcon;
+-	oparms.create_options = 0;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES;
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.fid = pfid;
+@@ -818,7 +819,8 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon, struct cifs_fid *pfid)
+ }
+ 
+ static void
+-smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon)
++smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
++	      struct cifs_sb_info *cifs_sb)
+ {
+ 	int rc;
+ 	__le16 srch_path = 0; /* Null - open root of share */
+@@ -830,7 +832,7 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon)
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES;
+ 	oparms.disposition = FILE_OPEN;
+-	oparms.create_options = 0;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+@@ -838,7 +840,7 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon)
+ 		rc = SMB2_open(xid, &oparms, &srch_path, &oplock, NULL, NULL,
+ 			       NULL);
+ 	else
+-		rc = open_shroot(xid, tcon, &fid);
++		rc = open_shroot(xid, tcon, cifs_sb, &fid);
+ 
+ 	if (rc)
+ 		return;
+@@ -860,7 +862,8 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon)
+ }
+ 
+ static void
+-smb2_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon)
++smb2_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
++	      struct cifs_sb_info *cifs_sb)
+ {
+ 	int rc;
+ 	__le16 srch_path = 0; /* Null - open root of share */
+@@ -871,7 +874,7 @@ smb2_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon)
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES;
+ 	oparms.disposition = FILE_OPEN;
+-	oparms.create_options = 0;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+@@ -906,10 +909,7 @@ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES;
+ 	oparms.disposition = FILE_OPEN;
+-	if (backup_cred(cifs_sb))
+-		oparms.create_options = CREATE_OPEN_BACKUP_INTENT;
+-	else
+-		oparms.create_options = 0;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+@@ -1151,10 +1151,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = FILE_WRITE_EA;
+ 	oparms.disposition = FILE_OPEN;
+-	if (backup_cred(cifs_sb))
+-		oparms.create_options = CREATE_OPEN_BACKUP_INTENT;
+-	else
+-		oparms.create_options = 0;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+@@ -1422,6 +1419,7 @@ SMB2_request_res_key(const unsigned int xid, struct cifs_tcon *tcon,
+ static int
+ smb2_ioctl_query_info(const unsigned int xid,
+ 		      struct cifs_tcon *tcon,
++		      struct cifs_sb_info *cifs_sb,
+ 		      __le16 *path, int is_dir,
+ 		      unsigned long p)
+ {
+@@ -1447,6 +1445,7 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 	struct kvec close_iov[1];
+ 	unsigned int size[2];
+ 	void *data[2];
++	int create_options = is_dir ? CREATE_NOT_FILE : CREATE_NOT_DIR;
+ 
+ 	memset(rqst, 0, sizeof(rqst));
+ 	resp_buftype[0] = resp_buftype[1] = resp_buftype[2] = CIFS_NO_BUFFER;
+@@ -1477,10 +1476,7 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 	memset(&oparms, 0, sizeof(oparms));
+ 	oparms.tcon = tcon;
+ 	oparms.disposition = FILE_OPEN;
+-	if (is_dir)
+-		oparms.create_options = CREATE_NOT_FILE;
+-	else
+-		oparms.create_options = CREATE_NOT_DIR;
++	oparms.create_options = cifs_create_options(cifs_sb, create_options);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+@@ -2086,10 +2082,7 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES | FILE_READ_DATA;
+ 	oparms.disposition = FILE_OPEN;
+-	if (backup_cred(cifs_sb))
+-		oparms.create_options = CREATE_OPEN_BACKUP_INTENT;
+-	else
+-		oparms.create_options = 0;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.fid = fid;
+ 	oparms.reconnect = false;
+ 
+@@ -2343,10 +2336,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = desired_access;
+ 	oparms.disposition = FILE_OPEN;
+-	if (cifs_sb && backup_cred(cifs_sb))
+-		oparms.create_options = CREATE_OPEN_BACKUP_INTENT;
+-	else
+-		oparms.create_options = 0;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+@@ -2402,7 +2392,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ static int
+ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+-	     struct kstatfs *buf)
++	     struct cifs_sb_info *cifs_sb, struct kstatfs *buf)
+ {
+ 	struct smb2_query_info_rsp *rsp;
+ 	struct smb2_fs_full_size_info *info = NULL;
+@@ -2439,7 +2429,7 @@ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ static int
+ smb311_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+-	     struct kstatfs *buf)
++	       struct cifs_sb_info *cifs_sb, struct kstatfs *buf)
+ {
+ 	int rc;
+ 	__le16 srch_path = 0; /* Null - open root of share */
+@@ -2448,12 +2438,12 @@ smb311_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_fid fid;
+ 
+ 	if (!tcon->posix_extensions)
+-		return smb2_queryfs(xid, tcon, buf);
++		return smb2_queryfs(xid, tcon, cifs_sb, buf);
+ 
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES;
+ 	oparms.disposition = FILE_OPEN;
+-	oparms.create_options = 0;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+@@ -2722,6 +2712,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct smb2_create_rsp *create_rsp;
+ 	struct smb2_ioctl_rsp *ioctl_rsp;
+ 	struct reparse_data_buffer *reparse_buf;
++	int create_options = is_reparse_point ? OPEN_REPARSE_POINT : 0;
+ 	u32 plen;
+ 
+ 	cifs_dbg(FYI, "%s: path: %s\n", __func__, full_path);
+@@ -2748,14 +2739,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES;
+ 	oparms.disposition = FILE_OPEN;
+-
+-	if (backup_cred(cifs_sb))
+-		oparms.create_options = CREATE_OPEN_BACKUP_INTENT;
+-	else
+-		oparms.create_options = 0;
+-	if (is_reparse_point)
+-		oparms.create_options = OPEN_REPARSE_POINT;
+-
++	oparms.create_options = cifs_create_options(cifs_sb, create_options);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+@@ -2934,11 +2918,6 @@ get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 	tcon = tlink_tcon(tlink);
+ 	xid = get_xid();
+ 
+-	if (backup_cred(cifs_sb))
+-		oparms.create_options = CREATE_OPEN_BACKUP_INTENT;
+-	else
+-		oparms.create_options = 0;
+-
+ 	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
+ 	if (!utf16_path) {
+ 		rc = -ENOMEM;
+@@ -2949,6 +2928,7 @@ get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = READ_CONTROL;
+ 	oparms.disposition = FILE_OPEN;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+@@ -2990,11 +2970,6 @@ set_smb2_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+ 	tcon = tlink_tcon(tlink);
+ 	xid = get_xid();
+ 
+-	if (backup_cred(cifs_sb))
+-		oparms.create_options = CREATE_OPEN_BACKUP_INTENT;
+-	else
+-		oparms.create_options = 0;
+-
+ 	if (aclflag == CIFS_ACL_OWNER || aclflag == CIFS_ACL_GROUP)
+ 		access_flags = WRITE_OWNER;
+ 	else
+@@ -3009,6 +2984,7 @@ set_smb2_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
+ 
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = access_flags;
++	oparms.create_options = cifs_create_options(cifs_sb, 0);
+ 	oparms.disposition = FILE_OPEN;
+ 	oparms.path = path;
+ 	oparms.fid = &fid;
+@@ -4491,7 +4467,6 @@ smb2_make_node(unsigned int xid, struct inode *inode,
+ {
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	int rc = -EPERM;
+-	int create_options = CREATE_NOT_DIR | CREATE_OPTION_SPECIAL;
+ 	FILE_ALL_INFO *buf = NULL;
+ 	struct cifs_io_parms io_parms;
+ 	__u32 oplock = 0;
+@@ -4527,13 +4502,11 @@ smb2_make_node(unsigned int xid, struct inode *inode,
+ 		goto out;
+ 	}
+ 
+-	if (backup_cred(cifs_sb))
+-		create_options |= CREATE_OPEN_BACKUP_INTENT;
+-
+ 	oparms.tcon = tcon;
+ 	oparms.cifs_sb = cifs_sb;
+ 	oparms.desired_access = GENERIC_WRITE;
+-	oparms.create_options = create_options;
++	oparms.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR |
++						    CREATE_OPTION_SPECIAL);
+ 	oparms.disposition = FILE_CREATE;
+ 	oparms.path = full_path;
+ 	oparms.fid = &fid;
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 6c678e00046f..de6388ef344f 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -68,7 +68,7 @@ extern int smb3_handle_read_data(struct TCP_Server_Info *server,
+ 				 struct mid_q_entry *mid);
+ 
+ extern int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
+-			struct cifs_fid *pfid);
++		       struct cifs_sb_info *cifs_sb, struct cifs_fid *pfid);
+ extern void close_shroot(struct cached_fid *cfid);
+ extern void close_shroot_lease(struct cached_fid *cfid);
+ extern void close_shroot_lease_locked(struct cached_fid *cfid);
+-- 
+2.17.1
 
-For ext4 at least, it would be possible to have parallel readdir()
-by generating synthetic telldir() cookies to divide up the directory
-into several chunks that can be read in parallel.  Something like:
-
-     seek(dir_fd[0], 0, SEEK_END)
-     pos_max =3D telldir(dir_fd[0])
-     pos_inc =3D pos_max / num_threads
-     for (i =3D 0; i < num_threads; i++)
-         seekdir(dir_fd[i], i * pos_inc)
-
-but I don't know if that would be portable to other filesystems.
-
-XFS has a "bulkstat" interface which would likely be useful for
-directory traversal tools.
-
->> There's a whole bunch of xfs ioctls like dioinfo and the like that we
->> ought to push to statx too.  Is that an example of what you mean?
->=20
-> That is a good example.   And then getting tools to use these,
-> even if there are some file system dependent cases.
-
-I've seen that copy to/from userspace is a bottleneck if the storage is
-fast.  Since the cross-filesystem copy_file_range() patches have landed,
-getting those into userspace tools would be a big performance win.
-
-Dave talked a few times about adding better info than st_blksize for
-different IO-related parameters (alignment, etc).  It was not included
-in the initial statx() landing because of excessive bikeshedding, but
-makes sense to re-examine what could be used there.  Since statx() is
-flexible, applications could be patched immediately to check for the
-new fields, without having to wait for a new syscall to propagate out.
-
-That said, if data copies are done in the kernel, this may be moot for
-some tools, but would still be useful for others.
-
->>> But some progress has been made since last year's summit, with new
->>> copy tools being released and improvements to some of the kernel =
-file
->>> systems, and also some additional feedback on lwn and on the mailing
->>> lists.
-
-I think if the tools are named anything other than cp, dd, tar, find
-it is much less likely that anyone will use them, so focussing developer
-efforts on the common GNU tools is more likely to be a win than making
-another new copy tool that nobody will use, IMHO.
-
->>> In addition these discussions have prompted additional
->>> feedback on how to improve file backup/restore scenarios (e.g. to
->>> mounts to the cloud from local Linux systems) which require =
-preserving
->>> more timestamps, ACLs and metadata, and preserving them efficiently.
->>=20
->> I suppose it would be useful to think a little more about =
-cross-device
->> fs copies considering that the "devices" can be VM block devs backed =
-by
->> files on a filesystem that supports reflink.  I have no idea how you
->> manage that sanely though.
->=20
-> I trust XFS and BTRFS and SMB3 and cluster fs etc. to solve this =
-better
-> than the block level (better locking, leases/delegation, state =
-management,
-> etc.) though.
-
-Getting RichACLs into the kernel would definitely help here.  Non-Linux
-filesystems have some variant of NFSv4 ACLs, and having only POSIX ACLs
-on Linux is a real hassle here.  Either the outside ACLs are stored as =
-an
-xattr blob, which leads to different semantics depending on the access
-method (CIFS, NFS, etc) or they are shoe-horned into the POSIX ACL and
-lose information.
-
-Cheers, Andreas
-
-
-
-
-
-
---Apple-Mail=_18888712-B94F-4C77-8A59-99C68A3C505C
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
-
-iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAl42BrsACgkQcqXauRfM
-H+AxlQ/9FywysisQOOCc/ouusT5nKTjv6mvLQmY+1TxXBie24tz+ndWXs6gz68MF
-j8Lqz7BYaTTfeLc98s488jHPA9O/MIounuAtUfx/mqiwFIwPlysrXhAXam9lo+HZ
-DnhMYBzlGtoHy/82Wb3pkl5iNauqFNMVeInnHOaRtmEmutqSsZ1EPXId6MMIGr1N
-LbjkXXLpL2LXmn3pVM+0xVRdaWRYUEe8DBQ3YskaIf4lqjw6HlAHOHsrRm9DZqTi
-B4C9zVVfIdDFss8N9lOemMRX7yMVDNKMxBdHRQExLpKN4B9p4rK405K5YDuxY0yp
-3wYcZPEBXlIDsR2y7EkJR4DQ80DF3W4rlsACzLDp6wsjdIRLq0IxlZEZuzptoyiN
-RJvgy4e6nyVWcX3j864vqHcAAd5NQ3XVCAMRNPy4OXOPWmWovcN845uDL6mcX5SN
-fykRtlAKJs/+L8LRy+tbAt4FJD0e+fIuBls7t8M90tGEs49bg8GZIzk3HMvOdKvD
-ld9VkWf6lFIwg/zkidEvYxRpYFwwdh9j9LPg6cgc1VKneMzNbAuEK9OmODXmT8gy
-s/YNiqj8JMWVU50V5MDYRda4LoTcH6eUR4ANXcnNiF0UlIdoj9Id2BpUbr92KvoD
-/Fw+XQIy96XHZGrM7wly17Jqz3NGu5e/O8hJKVUWXlaAqRx09nQ=
-=zjhF
------END PGP SIGNATURE-----
-
---Apple-Mail=_18888712-B94F-4C77-8A59-99C68A3C505C--
