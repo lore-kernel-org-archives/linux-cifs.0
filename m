@@ -8,56 +8,56 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7D5C35247
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Feb 2020 18:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA1CC33CAC
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Feb 2020 18:24:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B9D6214AF
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Feb 2020 18:20:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5401620659
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Feb 2020 18:24:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C5NVrTAX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vgJOSc5r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727768AbgBFSUh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 6 Feb 2020 13:20:37 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:40601 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727747AbgBFSUg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Feb 2020 13:20:36 -0500
-Received: by mail-lj1-f193.google.com with SMTP id n18so7147097ljo.7
-        for <linux-cifs@vger.kernel.org>; Thu, 06 Feb 2020 10:20:35 -0800 (PST)
+        id S1727711AbgBFSYK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 6 Feb 2020 13:24:10 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:34732 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726990AbgBFSYJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Feb 2020 13:24:09 -0500
+Received: by mail-lf1-f66.google.com with SMTP id l18so4809085lfc.1
+        for <linux-cifs@vger.kernel.org>; Thu, 06 Feb 2020 10:24:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=rvf/YAjW9+llqL24KCvy6wUQbPJ65GkKEaJqqc6MVbE=;
-        b=C5NVrTAXicRFyhRUcr08RFwKy3m2ijKddAgcoCPK47Z528tfCxMR/hmt3e6uTzNILL
-         spa6HAb6nZ51HH1Dfq+Ic3YkhZ6L9xZxyxv6ry/EV7SC0g2yczAaM9Qvn5k0nIqQ+Ir6
-         XkXhjMVwlw9NiDwqrUjfcUAYRBGDRwVpnDN35eBsXKR+ohXTtnCgHAFga3CSc63naQyP
-         cCwxULqijqxeYoiDq8W5e5+gkrxY4B/hbS51UsXMVTL8FHuZDqTuFXPIdwev9x4vPvI8
-         9eeo0nwIIEsHLl/gtJ2IgnZPtKE/NQbsNSvHfQtbB5vx3Q26ZaTXpLpkFuIjJFfZdtIt
-         iGeA==
+        bh=lbZBSFwDqSxZ0pCrF1kKALw4EFoKV+ZsKnlp3YXTxLI=;
+        b=vgJOSc5rGnhQV8WiHw6Tad37z8m44AU8q2WePJXWC4j/jR2PDuRtOI90yJIVNHRYyZ
+         9KZZNwIuCh4cmJ3SLfVzymsI5dPLUy8+YSdYgjNOTvp7xjazy0ZmZlzgKxwWpxSNmnhs
+         SB5l6qhAbH1GXPPzXv9D6WynfTGT7hXGVYOGF8POE4/K3eYIZanphbPqdlFZjCljn0ZB
+         AFfGl1a/50/UtVceNAECKZBrSARdDN9X8V09h0MmF8UUZ35U+lRIV3FD6bRJcH2pHbFC
+         t1Y2N0GgGqNYvnwxS/DO3YlFD7XzpgIfwpm3UI17FhsVleZaU+FBlmkdDKDMvkz6lCEL
+         BBog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=rvf/YAjW9+llqL24KCvy6wUQbPJ65GkKEaJqqc6MVbE=;
-        b=n06p8SZ6XAUd96mok7k3LHxc7G9OBXYsHA3ZhG64b+l9fIZlV0q6UBCPNx8zppozAe
-         sohLkCaqdQ4zPqLud0ZYQnQaTGJQWRns8pyQrqjfT8yODoNThd05ig6BZ4K7VDrPYdX2
-         igs2hxsAFCZdfaBXdLxUPUpxU6MCyOkiCNWZDljsETMDXRBgXAYTlHmtATaGTweG36Xh
-         JH8FmTEI2AQzRpukh9RlTH1F8SDkOZnt7db+3i9ILzhjcxMC/WunbB/RDxjmxcl+wIWQ
-         0CyRdIddn6Sl/4jq0pecgsbcPgZSzY+JoAqnq47UtYzKAIj97a/hoNAlSCoEizcx1ImW
-         GkPw==
-X-Gm-Message-State: APjAAAX8DyiSu+/cY2rOr1amltIwHFlhuDwv511WZHMke3rRpdXJ+40g
-        2DICRv83aFW31RXBZBBU6ts0RaAMPXm2tT7P5Q==
-X-Google-Smtp-Source: APXvYqzfGUd04QIRyLAHkQdzo/8ibjeoYdIMfxESgzbDAbaFkN6q4L+gjwewsEth/jC8By++v0JBq9ve7weBcZMD3lk=
-X-Received: by 2002:a2e:8755:: with SMTP id q21mr2910174ljj.156.1581013235090;
- Thu, 06 Feb 2020 10:20:35 -0800 (PST)
+        bh=lbZBSFwDqSxZ0pCrF1kKALw4EFoKV+ZsKnlp3YXTxLI=;
+        b=OR2NdfQG7e0t35cnlDwFgp8O/NFC/f7fKUfSn4sUwQ0fEAlrWETArwUB4whCkYQY5A
+         ySXIBrX/aOMj9I8SL8VFKa/t+XZq5xOesSKQOpRExRMsWvlKEFet9Xtp5CQ9jbgY3hTi
+         gsYDPqLyuQ8DSv1ImN3RICHMtAwr00yF/+aIe7jQFeD015VQWmHjkaHxJi1l2gP6Lb8Q
+         PD0gIQrTuxnM7iJDaVo0ApVVe7X8eTiiaRRUOhbkMY5iToaVNEJudlA6Z481DgPrNFKh
+         tBzbrbiiDn2R4p2AZZxpnEhvV0tqQ/i5Kv6V778qr2QNDeWmmIXD70nvAXO/Rs3BOUEt
+         H79g==
+X-Gm-Message-State: APjAAAVzutQXzIm7QCphSBC2QiXI5vJlAWAfJ1XIBkOX8G/+41fRjTzI
+        UU2gMGmsldtNzoUnuh2W0oVKRCQt9TNd1hyMRw==
+X-Google-Smtp-Source: APXvYqxkgDvm0AZoaR1QZIbW8VouqQKCDomcYzki0rcQZ835QKhAfT6T/kZ5A5UV/HasTEZeBb14nv05psl9KY9+vGs=
+X-Received: by 2002:ac2:5335:: with SMTP id f21mr2542134lfh.150.1581013446679;
+ Thu, 06 Feb 2020 10:24:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20200206124926.25376-1-aaptel@suse.com>
-In-Reply-To: <20200206124926.25376-1-aaptel@suse.com>
+References: <20200206171655.23659-1-aaptel@suse.com>
+In-Reply-To: <20200206171655.23659-1-aaptel@suse.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 6 Feb 2020 10:20:23 -0800
-Message-ID: <CAKywueQP9sUQx6OtEAETkH=X2ewthf3CZ6qyLiL+pV-MLxwMbA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix channel signing
+Date:   Thu, 6 Feb 2020 10:23:55 -0800
+Message-ID: <CAKywueRn3R1P7FXAkMAOD0unbFvUAJcojEXrqT0=bUBCU9b8Jw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix mode bits from dir listing when mounted with modefromsid
 To:     Aurelien Aptel <aaptel@suse.com>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
         Steve French <smfrench@gmail.com>
@@ -68,50 +68,58 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D1=87=D1=82, 6 =D1=84=D0=B5=D0=B2=D1=80. 2020 =D0=B3. =D0=B2 05:00, Aureli=
+=D1=87=D1=82, 6 =D1=84=D0=B5=D0=B2=D1=80. 2020 =D0=B3. =D0=B2 09:17, Aureli=
 en Aptel <aaptel@suse.com>:
 >
-> The server var was accidentally used as an iterator over the global
-> list of connections, thus overwritten the passed argument. This
-> resulted in the wrong signing key being returned for extra channels.
+> When mounting with -o modefromsid, the mode bits are stored in an
+> ACE. Directory enumeration (e.g. ls -l /mnt) triggers an SMB Query Dir
+> which does not include ACEs in its response. The mode bits in this
+> case are silently set to a default value of 755 instead.
 >
-> Fix this by using a separate var to iterate.
+> This patch marks the dentry created during the directory enumeration
+> as needing re-evaluation (i.e. additional Query Info with ACEs) so
+> that the mode bits can be properly extracted.
+>
+> Quick repro:
+>
+> $ mount.cifs //win19.test/data /mnt -o ...,modefromsid
+> $ touch /mnt/foo && chmod 751 /mnt/foo
+> $ stat /mnt/foo
+>   # reports 751 (OK)
+> $ sleep 2
+>   # dentry older than 1s by default get invalidated
+> $ ls -l /mnt
+>   # since dentry invalid, ls does a Query Dir
+>   # and reports foo as 755 (WRONG)
 >
 > Signed-off-by: Aurelien Aptel <aaptel@suse.com>
 > ---
->  fs/cifs/smb2transport.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  fs/cifs/readdir.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> index fe6acfce3390..08b703b7a15e 100644
-> --- a/fs/cifs/smb2transport.c
-> +++ b/fs/cifs/smb2transport.c
-> @@ -104,13 +104,14 @@ int smb2_get_sign_key(__u64 ses_id, struct TCP_Serv=
-er_Info *server, u8 *key)
->  {
->         struct cifs_chan *chan;
->         struct cifs_ses *ses =3D NULL;
-> +       struct TCP_Server_Info *it =3D NULL;
->         int i;
->         int rc =3D 0;
+> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> index d17587c2c4ab..ba9dadf3be24 100644
+> --- a/fs/cifs/readdir.c
+> +++ b/fs/cifs/readdir.c
+> @@ -196,7 +196,8 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struc=
+t cifs_sb_info *cifs_sb)
+>          * may look wrong since the inodes may not have timed out by the =
+time
+>          * "ls" does a stat() call on them.
+>          */
+> -       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL)
+> +       if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) ||
+> +           (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MODE_FROM_SID))
+>                 fattr->cf_flags |=3D CIFS_FATTR_NEED_REVAL;
 >
->         spin_lock(&cifs_tcp_ses_lock);
+>         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL &&
+> --
+> 2.16.4
 >
-> -       list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-> -               list_for_each_entry(ses, &server->smb_ses_list, smb_ses_l=
-ist) {
-> +       list_for_each_entry(it, &cifs_tcp_ses_list, tcp_ses_list) {
-> +               list_for_each_entry(ses, &it->smb_ses_list, smb_ses_list)=
- {
->                         if (ses->Suid =3D=3D ses_id)
->                                 goto found;
->                 }
-
-Good catch!
 
 Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 
-Stable candidate?
+This patch needs stable tag since "modefromsid" was introduced in v5.5.
 
 --
 Best regards,
