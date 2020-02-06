@@ -6,66 +6,74 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8793DC2D0B1
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Feb 2020 12:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98087C33CAC
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Feb 2020 17:17:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 655CC20661
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Feb 2020 12:49:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7756A21775
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Feb 2020 17:17:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727575AbgBFMte (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 6 Feb 2020 07:49:34 -0500
-Received: from mx2.suse.de ([195.135.220.15]:47256 "EHLO mx2.suse.de"
+        id S1727479AbgBFRRC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 6 Feb 2020 12:17:02 -0500
+Received: from mx2.suse.de ([195.135.220.15]:59640 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727138AbgBFMte (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 6 Feb 2020 07:49:34 -0500
+        id S1727390AbgBFRRC (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 6 Feb 2020 12:17:02 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 7F13CAE2D;
-        Thu,  6 Feb 2020 12:49:32 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id E9754AAA6;
+        Thu,  6 Feb 2020 17:17:00 +0000 (UTC)
 From:   Aurelien Aptel <aaptel@suse.com>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH] cifs: fix channel signing
-Date:   Thu,  6 Feb 2020 13:49:26 +0100
-Message-Id: <20200206124926.25376-1-aaptel@suse.com>
+Subject: [PATCH] cifs: fix mode bits from dir listing when mounted with modefromsid
+Date:   Thu,  6 Feb 2020 18:16:55 +0100
+Message-Id: <20200206171655.23659-1-aaptel@suse.com>
 X-Mailer: git-send-email 2.16.4
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The server var was accidentally used as an iterator over the global
-list of connections, thus overwritten the passed argument. This
-resulted in the wrong signing key being returned for extra channels.
+When mounting with -o modefromsid, the mode bits are stored in an
+ACE. Directory enumeration (e.g. ls -l /mnt) triggers an SMB Query Dir
+which does not include ACEs in its response. The mode bits in this
+case are silently set to a default value of 755 instead.
 
-Fix this by using a separate var to iterate.
+This patch marks the dentry created during the directory enumeration
+as needing re-evaluation (i.e. additional Query Info with ACEs) so
+that the mode bits can be properly extracted.
+
+Quick repro:
+
+$ mount.cifs //win19.test/data /mnt -o ...,modefromsid
+$ touch /mnt/foo && chmod 751 /mnt/foo
+$ stat /mnt/foo
+  # reports 751 (OK)
+$ sleep 2
+  # dentry older than 1s by default get invalidated
+$ ls -l /mnt
+  # since dentry invalid, ls does a Query Dir
+  # and reports foo as 755 (WRONG)
 
 Signed-off-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/smb2transport.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ fs/cifs/readdir.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-index fe6acfce3390..08b703b7a15e 100644
---- a/fs/cifs/smb2transport.c
-+++ b/fs/cifs/smb2transport.c
-@@ -104,13 +104,14 @@ int smb2_get_sign_key(__u64 ses_id, struct TCP_Server_Info *server, u8 *key)
- {
- 	struct cifs_chan *chan;
- 	struct cifs_ses *ses = NULL;
-+	struct TCP_Server_Info *it = NULL;
- 	int i;
- 	int rc = 0;
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index d17587c2c4ab..ba9dadf3be24 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -196,7 +196,8 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+ 	 * may look wrong since the inodes may not have timed out by the time
+ 	 * "ls" does a stat() call on them.
+ 	 */
+-	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL)
++	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) ||
++	    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MODE_FROM_SID))
+ 		fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
  
- 	spin_lock(&cifs_tcp_ses_lock);
- 
--	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
--		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+	list_for_each_entry(it, &cifs_tcp_ses_list, tcp_ses_list) {
-+		list_for_each_entry(ses, &it->smb_ses_list, smb_ses_list) {
- 			if (ses->Suid == ses_id)
- 				goto found;
- 		}
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_UNX_EMUL &&
 -- 
 2.16.4
 
