@@ -1,156 +1,124 @@
-Return-Path: <SRS0=pODE=33=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=LZk2=34=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD4AC352A2
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Feb 2020 08:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 909EDC35250
+	for <linux-cifs@archiver.kernel.org>; Sat,  8 Feb 2020 14:51:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EE75121741
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Feb 2020 08:12:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7168620726
+	for <linux-cifs@archiver.kernel.org>; Sat,  8 Feb 2020 14:51:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726816AbgBGIMh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 7 Feb 2020 03:12:37 -0500
-Received: from baptiste.telenet-ops.be ([195.130.132.51]:58988 "EHLO
-        baptiste.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726130AbgBGIMh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Feb 2020 03:12:37 -0500
-Received: from ramsan ([84.195.182.253])
-        by baptiste.telenet-ops.be with bizsmtp
-        id zkCb2100B5USYZQ01kCbur; Fri, 07 Feb 2020 09:12:35 +0100
-Received: from geert (helo=localhost)
-        by ramsan with local-esmtp (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1izykd-0006Uw-5k; Fri, 07 Feb 2020 09:12:35 +0100
-Date:   Fri, 7 Feb 2020 09:12:35 +0100 (CET)
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-X-X-Sender: geert@ramsan.of.borg
-To:     Steve French <smfrench@gmail.com>
-cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        kbuild test robot <lkp@intel.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        =?ISO-8859-15?Q?Aur=E9lien_Aptel?= <aaptel@suse.com>,
-        samba-technical <samba-technical@lists.samba.org>,
-        Pavel Shilovsky <piastryyy@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [cifs:for-next 10/11] fs/cifs/smb2pdu.c:1985:38: error: macro
- "memcmp" passed 18 arguments, but takes just 3
-In-Reply-To: <CAH2r5mvtYcc+=bKApMsb=Cg2VgiwPoEfV92cncfhFswjBmkKFw@mail.gmail.com>
-Message-ID: <alpine.DEB.2.21.2002070904270.23274@ramsan.of.borg>
-References: <202002070617.AbeYy9qc%lkp@intel.com> <CAH2r5mtHY6OGMpMdpLcxZ_xyjzZHANhqr_NoeGERiFiQyfc-PQ@mail.gmail.com> <CAN05THQ8ajLM58-dyQA0teD56Hkt7wmJMRtHB8DW1Yh5qKBrjg@mail.gmail.com> <CAH2r5mvtYcc+=bKApMsb=Cg2VgiwPoEfV92cncfhFswjBmkKFw@mail.gmail.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+        id S1727379AbgBHOvI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 8 Feb 2020 09:51:08 -0500
+Received: from mx2.suse.de ([195.135.220.15]:39576 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727335AbgBHOvH (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 8 Feb 2020 09:51:07 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 26B9BAC2C;
+        Sat,  8 Feb 2020 14:51:06 +0000 (UTC)
+From:   Aurelien Aptel <aaptel@suse.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
+Subject: [PATCH 1/3] cifs: rename posix create rsp
+Date:   Sat,  8 Feb 2020 15:50:56 +0100
+Message-Id: <20200208145058.10429-1-aaptel@suse.com>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
- 	Hi Steve,
+little progress on the posix create response.
 
-On Thu, 6 Feb 2020, Steve French wrote:
-> ok - changed as suggested. Tested out ok
+* rename struct to create_posix_rsp to match with the request
+  create_posix context
+* make struct packed
+* pass smb info struct for parse_posix_ctxt to fill
+* use smb info struct as param
+* update TODO
 
-> From ab3459d8f0ef52c38119ed58c4c29139efc7022c Mon Sep 17 00:00:00 2001
-> From: Steve French <stfrench@microsoft.com>
-> Date: Thu, 6 Feb 2020 17:31:56 -0600
-> Subject: [PATCH 1/2]  smb3: print warning once if posix context returned on
->  open
-> 
-> SMB3.1.1 POSIX Context processing is not complete yet - so print warning
-> (once) if server returns it on open.
-> 
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-> ---
->  fs/cifs/smb2pdu.c | 22 ++++++++++++++++++++++
->  fs/cifs/smb2pdu.h |  8 ++++++++
->  2 files changed, 30 insertions(+)
-> 
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 47cce0bd1afe..1234f9ccab03 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1950,6 +1960,9 @@ smb2_parse_contexts(struct TCP_Server_Info *server,
->  	unsigned int next;
->  	unsigned int remaining;
->  	char *name;
-> +	const char smb3_create_tag_posix[] = {0x93, 0xAD, 0x25, 0x50, 0x9C,
-> +					0xB4, 0x11, 0xE7, 0xB4, 0x23, 0x83,
-> +					0xDE, 0x96, 0x8B, 0xCD, 0x7C};
+What needs to be done:
 
-Given this data is used in 2 other places, you may want to make it
-global, and use it in build_posix_ctxt() and create_posix_buf(), too.
+SMB2_open() has an optional smb info out argument that it will fill.
+Callers making use of this are:
 
-> On Thu, Feb 6, 2020 at 5:16 PM ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
->>
->> It is probably that m68k lage quite behind in GCC versions and
->> probably that compiler can not handle this construct:
->>> 1983                          if (memcmp(name, (char []) {0x93, 0xAD, 0x25, 0x50,
->>   1984                                  0x9C, 0xB4, 0x11, 0xE7, 0xB4,
->> 0x23, 0x83,
->>> 1985                                  0xDE, 0x96, 0x8B, 0xCD, 0x7C}, 16) == 0)
->> and you would probably need something like this:
->>      const char foo[] = {0x93, 0xAD, 0x25, 0x50, 0x9C, 0xB4, 0x11,
->> 0xE7, 0xB4, 0x23, 0x83, 0xDE, 0x96, 0x8B, 0xCD, 0x7C};
->>      if (memcmp(name, foo, sizeof(foo)) == 0)
->> ...
+- smb3_query_mf_symlink (need to investigate)
+- smb2_open_file
 
-This is not related to compiler version (I can trigger it with a small
-test program on gcc-7 and gcc-8 on amd64), but due to the use of a
-macro in arch/m68k/include/asm/string.h for providing memset():
+Callers of smb2_open_file (via server->ops->open) are passing an
+smbinfo struct but that struct cannot hold POSIX information. All the
+call stack needs to be changed for a different info type. Maybe pass
+SMB generic struct like cifs_fattr instead.
 
-     #define memset(d, c, n) __builtin_memset(d, c, n)
+Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+---
+ fs/cifs/smb2pdu.c | 13 +++++++++----
+ fs/cifs/smb2pdu.h |  9 ++++++---
+ 2 files changed, 15 insertions(+), 7 deletions(-)
 
-As several other architectures do to the same (even x86, depending on
-config options and other parameters), I guess it can be triggered there
-as well.
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 1234f9ccab03..7d4d7cdb2eb4 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -1940,13 +1940,18 @@ parse_query_id_ctxt(struct create_context *cc, struct smb2_file_all_info *buf)
+ }
+ 
+ static void
+-parse_posix_ctxt(struct create_context *cc, struct smb_posix_info *pposix_inf)
++parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info)
+ {
+-	/* struct smb_posix_info *ppinf = (struct smb_posix_info *)cc; */
++	/* struct create_posix_rsp *posix = (struct create_posix_rsp *)cc; */
+ 
+-	/* TODO: Need to add parsing for the context and return */
++	/*
++	 * TODO: Need to add parsing for the context and return. Can
++	 * smb2_file_all_info hold POSIX data? Need to change the
++	 * passed type from SMB2_open.
++	 */
+ 	printk_once(KERN_WARNING
+ 		    "SMB3 3.11 POSIX response context not completed yet\n");
++
+ }
+ 
+ void
+@@ -1984,7 +1989,7 @@ smb2_parse_contexts(struct TCP_Server_Info *server,
+ 			parse_query_id_ctxt(cc, buf);
+ 		else if ((le16_to_cpu(cc->NameLength) == 16)) {
+ 			if (memcmp(name, smb3_create_tag_posix, 16) == 0)
+-				parse_posix_ctxt(cc, NULL);
++				parse_posix_ctxt(cc, buf);
+ 		}
+ 		/* else {
+ 			cifs_dbg(FYI, "Context not matched with len %d\n",
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index fa03df130f1a..c84405ed603c 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -1604,11 +1604,14 @@ struct smb2_file_id_information {
+ extern char smb2_padding[7];
+ 
+ /* equivalent of the contents of SMB3.1.1 POSIX open context response */
+-struct smb_posix_info {
++struct create_posix_rsp {
+ 	__le32 nlink;
+ 	__le32 reparse_tag;
+ 	__le32 mode;
+-	kuid_t	uid;
+-	kuid_t	gid;
++	/*
++	  var sized owner SID
++	  var sized group SID
++	*/
++} __packed;
+ };
+ #endif				/* _SMB2PDU_H */
+-- 
+2.16.4
 
->> On Fri, Feb 7, 2020 at 8:48 AM Steve French <smfrench@gmail.com> wrote:
->>>
->>> It compiled and tested ok.  Is this warning a limitation of the kbuild robot?
->>>
->>> On Thu, Feb 6, 2020 at 4:26 PM kbuild test robot <lkp@intel.com> wrote:
->>>>
->>>> tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
->>>> head:   58b322cfd219fd570d4fcc2e2eb8b5d945389d46
->>>> commit: 3d9d8c48232a668ada5f680f70c8b3d366629ab6 [10/11] smb3: print warning once if posix context returned on open
->>>> config: m68k-multi_defconfig (attached as .config)
->>>> compiler: m68k-linux-gcc (GCC) 7.5.0
->>>> reproduce:
->>>>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>>>         chmod +x ~/bin/make.cross
->>>>         git checkout 3d9d8c48232a668ada5f680f70c8b3d366629ab6
->>>>         # save the attached .config to linux build tree
->>>>         GCC_VERSION=7.5.0 make.cross ARCH=m68k
->>>>
->>>> If you fix the issue, kindly add following tag
->>>> Reported-by: kbuild test robot <lkp@intel.com>
->>>>
->>>> All errors (new ones prefixed by >>):
->>>>
->>>>    fs/cifs/smb2pdu.c: In function 'smb2_parse_contexts':
->>>>>> fs/cifs/smb2pdu.c:1985:38: error: macro "memcmp" passed 18 arguments, but takes just 3
->>>>         0xDE, 0x96, 0x8B, 0xCD, 0x7C}, 16) == 0)
->>>>                                          ^
->>>>>> fs/cifs/smb2pdu.c:1983:8: error: 'memcmp' undeclared (first use in this function); did you mean 'memchr'?
->>>>        if (memcmp(name, (char []) {0x93, 0xAD, 0x25, 0x50,
->>>>            ^~~~~~
->>>>            memchr
->>>>    fs/cifs/smb2pdu.c:1983:8: note: each undeclared identifier is reported only once for each function it appears in
-
-
-Gr{oetje,eeting}s,
-
- 						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
- 							    -- Linus Torvalds
