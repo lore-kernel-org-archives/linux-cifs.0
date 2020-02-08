@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE46C35250
-	for <linux-cifs@archiver.kernel.org>; Sat,  8 Feb 2020 14:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C232FC35250
+	for <linux-cifs@archiver.kernel.org>; Sat,  8 Feb 2020 14:51:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5380320726
-	for <linux-cifs@archiver.kernel.org>; Sat,  8 Feb 2020 14:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A09622464
+	for <linux-cifs@archiver.kernel.org>; Sat,  8 Feb 2020 14:51:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727381AbgBHOvO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 8 Feb 2020 09:51:14 -0500
-Received: from mx2.suse.de ([195.135.220.15]:39606 "EHLO mx2.suse.de"
+        id S1727335AbgBHOvW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 8 Feb 2020 09:51:22 -0500
+Received: from mx2.suse.de ([195.135.220.15]:39622 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727335AbgBHOvO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 8 Feb 2020 09:51:14 -0500
+        id S1727383AbgBHOvW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 8 Feb 2020 09:51:22 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id BDB2BAC2C;
-        Sat,  8 Feb 2020 14:51:11 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 43382AC2C;
+        Sat,  8 Feb 2020 14:51:17 +0000 (UTC)
 From:   Aurelien Aptel <aaptel@suse.com>
 To:     linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH 2/3] cifs: add smb2 POSIX info level
-Date:   Sat,  8 Feb 2020 15:50:57 +0100
-Message-Id: <20200208145058.10429-2-aaptel@suse.com>
+Subject: [PATCH 3/3] cifs: plumb smb2 POSIX dir enumeration
+Date:   Sat,  8 Feb 2020 15:50:58 +0100
+Message-Id: <20200208145058.10429-3-aaptel@suse.com>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20200208145058.10429-1-aaptel@suse.com>
 References: <20200208145058.10429-1-aaptel@suse.com>
@@ -36,200 +36,252 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-* add new info level and structs for SMB2 posix extension
-* add functions to parse and validate it
+* add code to request POSIX info level
+* parse dir entries and fill cifs_fattr to get correct inode data
+
+since the POSIX payload is variable size the number of entries in a
+FIND response needs to be computed differently.
+
+Dirs and regular files are properly reported along with mode bits,
+hardlink number, c/m/atime. No special files yet (see below).
+
+Current experimental version of Samba with the extension unfortunately
+has issues with wildcards and needs the following patch:
+
+> --- i/source3/smbd/smb2_query_directory.c
+> +++ w/source3/smbd/smb2_query_directory.c
+> @@ -397,9 +397,7 @@ smbd_smb2_query_directory_send(TALLOC_CTX
+> *mem_ctx,
+> 		}
+> 	}
+>
+> -       if (!state->smbreq->posix_pathnames) {
+> 		wcard_has_wild = ms_has_wild(state->in_file_name);
+> -       }
+>
+> 	/* Ensure we've canonicalized any search path if not a wildcard. */
+> 	if (!wcard_has_wild) {
+>
+
+Also for special files despite reporting them as reparse point samba
+doesnt set the reparse tag field. This patch will mark them as needing
+re-evaluation but the re-evaluate code doesn't deal with it yet.
 
 Signed-off-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/cifspdu.h   |  1 +
- fs/cifs/smb2pdu.c   | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.h   | 44 +++++++++++++++++++++++++
- fs/cifs/smb2proto.h |  2 ++
- 4 files changed, 142 insertions(+)
+ fs/cifs/readdir.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.c | 34 ++++++++++++++++++-----
+ 2 files changed, 109 insertions(+), 7 deletions(-)
 
-diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-index 79d842e7240c..8e15887d1f1f 100644
---- a/fs/cifs/cifspdu.h
-+++ b/fs/cifs/cifspdu.h
-@@ -1691,6 +1691,7 @@ struct smb_t2_rsp {
- #define SMB_FIND_FILE_ID_FULL_DIR_INFO    0x105
- #define SMB_FIND_FILE_ID_BOTH_DIR_INFO    0x106
- #define SMB_FIND_FILE_UNIX                0x202
-+#define SMB_FIND_FILE_POSIX_INFO          0x064
+diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+index ba9dadf3be24..753ca064e2b3 100644
+--- a/fs/cifs/readdir.c
++++ b/fs/cifs/readdir.c
+@@ -32,6 +32,7 @@
+ #include "cifs_debug.h"
+ #include "cifs_fs_sb.h"
+ #include "cifsfs.h"
++#include "smb2proto.h"
  
- typedef struct smb_com_transaction2_qpi_req {
- 	struct smb_hdr hdr;	/* wct = 14+ */
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 7d4d7cdb2eb4..174ae2ef6310 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -4290,6 +4290,101 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	return rc;
+ /*
+  * To be safe - for UCS to UTF-8 with strings loaded with the rare long
+@@ -217,6 +218,60 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
+ 	}
  }
  
-+static int posix_info_sid_size(const void *beg, const void *end)
++/* Fill a cifs_fattr struct with info from SMB_FIND_FILE_POSIX_INFO. */
++static void
++cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
++		    struct cifs_sb_info *cifs_sb)
 +{
-+	size_t subauth;
-+	int total;
++	struct smb2_posix_info_parsed parsed;
 +
-+	if (beg + 1 > end)
-+		return -1;
++	posix_info_parse(info, NULL, &parsed);
 +
-+	subauth = *(u8 *)(beg+1);
-+	if (subauth < 1 || subauth > 15)
-+		return -1;
++	memset(fattr, 0, sizeof(*fattr));
++	fattr->cf_uniqueid = le64_to_cpu(info->Inode);
++	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
++	fattr->cf_eof = le64_to_cpu(info->EndOfFile);
 +
-+	total = 1 + 1 + 6 + 4*subauth;
-+	if (beg + total > end)
-+		return -1;
++	fattr->cf_atime = cifs_NTtimeToUnix(info->LastAccessTime);
++	fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
++	fattr->cf_ctime = cifs_NTtimeToUnix(info->CreationTime);
 +
-+	return total;
-+}
++	fattr->cf_nlink = le64_to_cpu(info->HardLinks);
++	fattr->cf_cifsattrs = le32_to_cpu(info->DosAttributes);
 +
-+int posix_info_parse(const void *beg, const void *end,
-+		     struct smb2_posix_info_parsed *out)
-+
-+{
-+	int total_len = 0;
-+	int sid_len;
-+	int name_len;
-+	const void *owner_sid;
-+	const void *group_sid;
-+	const void *name;
-+
-+	/* if no end bound given, assume payload to be correct */
-+	if (!end) {
-+		const struct smb2_posix_info *p = beg;
-+
-+		end = beg + le32_to_cpu(p->NextEntryOffset);
-+		/* last element will have a 0 offset, pick a sensible bound */
-+		if (end == beg)
-+			end += 0xFFFF;
-+	}
-+
-+	/* check base buf */
-+	if (beg + sizeof(struct smb2_posix_info) > end)
-+		return -1;
-+	total_len = sizeof(struct smb2_posix_info);
-+
-+	/* check owner sid */
-+	owner_sid = beg + total_len;
-+	sid_len = posix_info_sid_size(owner_sid, end);
-+	if (sid_len < 0)
-+		return -1;
-+	total_len += sid_len;
-+
-+	/* check group sid */
-+	group_sid = beg + total_len;
-+	sid_len = posix_info_sid_size(group_sid, end);
-+	if (sid_len < 0)
-+		return -1;
-+	total_len += sid_len;
-+
-+	/* check name len */
-+	if (beg + total_len + 4 > end)
-+		return -1;
-+	name_len = le32_to_cpu(*(__le32 *)(beg + total_len));
-+	if (name_len < 1 || name_len > 0xFFFF)
-+		return -1;
-+	total_len += 4;
-+
-+	/* check name */
-+	name = beg + total_len;
-+	if (name + name_len > end)
-+		return -1;
-+	total_len += name_len;
-+
-+	if (out) {
-+		out->base = beg;
-+		out->size = total_len;
-+		out->name_len = name_len;
-+		out->name = name;
-+		memcpy(&out->owner, owner_sid,
-+		       posix_info_sid_size(owner_sid, end));
-+		memcpy(&out->group, group_sid,
-+		       posix_info_sid_size(group_sid, end));
-+	}
-+	return total_len;
-+}
-+
-+static int posix_info_extra_size(const void *beg, const void *end)
-+{
-+	int len = posix_info_parse(beg, end, NULL);
-+
-+	if (len < 0)
-+		return -1;
-+	return len - sizeof(struct smb2_posix_info);
-+}
-+
- static unsigned int
- num_entries(char *bufstart, char *end_of_buf, char **lastentry, size_t size)
- {
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index c84405ed603c..4f30c745ed88 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -1613,5 +1613,49 @@ struct create_posix_rsp {
- 	  var sized group SID
- 	*/
- } __packed;
-+
-+/*
-+ * SMB2-only POSIX info level
-+ *
-+ * See posix_info_sid_size(), posix_info_extra_size() and
-+ * posix_info_parse() to help with the handling of this struct.
-+ */
-+struct smb2_posix_info {
-+	__le32 NextEntryOffset;
-+	__u32 Ignored;
-+	__le64 CreationTime;
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le64 EndOfFile;
-+	__le64 AllocationSize;
-+	__le32 DosAttributes;
-+	__le64 Inode;
-+	__le32 DeviceId;
-+	__le32 Zero;
-+	/* beginning of POSIX Create Context Response */
-+	__le32 HardLinks;
-+	__le32 ReparseTag;
-+	__le32 Mode;
 +	/*
-+	 * var sized owner SID
-+	 * var sized group SID
-+	 * le32 filenamelength
-+	 * u8  filename[]
++	 * Since we set the inode type below we need to mask off
++	 * to avoid strange results if bits set above.
++	 * XXX: why not make server&client use the type bits?
 +	 */
-+} __packed;
++	fattr->cf_mode = le32_to_cpu(info->Mode) & ~S_IFMT;
 +
-+/*
-+ * Parsed version of the above struct. Allows direct access to the
-+ * variable length fields
-+ */
-+struct smb2_posix_info_parsed {
-+	const struct smb2_posix_info *base;
-+	size_t size;
-+	struct cifs_sid owner;
-+	struct cifs_sid group;
-+	int name_len;
-+	const u8 *name;
++	cifs_dbg(VFS, "XXX dev %d, reparse %d, mode %o",
++		 le32_to_cpu(info->DeviceId),
++		 le32_to_cpu(info->ReparseTag),
++		 le32_to_cpu(info->Mode));
++
++	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
++		fattr->cf_mode |= S_IFDIR;
++		fattr->cf_dtype = DT_DIR;
++	} else {
++		/*
++		 * mark anything that is not a dir as regular
++		 * file. special files should have the REPARSE
++		 * attribute and will be marked as needing revaluation
++		 */
++		fattr->cf_mode |= S_IFREG;
++		fattr->cf_dtype = DT_REG;
++	}
++
++	if (reparse_file_needs_reval(fattr))
++		fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
++
++	/* TODO map SIDs */
++	fattr->cf_uid = cifs_sb->mnt_uid;
++	fattr->cf_gid = cifs_sb->mnt_gid;
++}
++
+ static void __dir_info_to_fattr(struct cifs_fattr *fattr, const void *info)
+ {
+ 	const FILE_DIRECTORY_INFO *fi = info;
+@@ -359,6 +414,8 @@ initiate_cifs_search(const unsigned int xid, struct file *file)
+ 	/* if (cap_unix(tcon->ses) { */
+ 	if (tcon->unix_ext)
+ 		cifsFile->srch_inf.info_level = SMB_FIND_FILE_UNIX;
++	else if (tcon->posix_extensions)
++		cifsFile->srch_inf.info_level = SMB_FIND_FILE_POSIX_INFO;
+ 	else if ((tcon->ses->capabilities &
+ 		  tcon->ses->server->vals->cap_nt_find) == 0) {
+ 		cifsFile->srch_inf.info_level = SMB_FIND_FILE_INFO_STANDARD;
+@@ -451,6 +508,23 @@ struct cifs_dirent {
+ 	u64		ino;
  };
+ 
++static void cifs_fill_dirent_posix(struct cifs_dirent *de,
++				   const struct smb2_posix_info *info)
++{
++	struct smb2_posix_info_parsed parsed;
 +
- #endif				/* _SMB2PDU_H */
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index de6388ef344f..c0f0801e7e8e 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -272,4 +272,6 @@ extern int smb2_query_info_compound(const unsigned int xid,
- 				    u32 class, u32 type, u32 output_len,
- 				    struct kvec *rsp, int *buftype,
- 				    struct cifs_sb_info *cifs_sb);
-+int posix_info_parse(const void *beg, const void *end,
-+		     struct smb2_posix_info_parsed *out);
- #endif			/* _SMB2PROTO_H */
++	/* payload should have already been checked at this point */
++	if (posix_info_parse(info, NULL, &parsed) < 0) {
++		cifs_dbg(VFS, "invalid POSIX info payload");
++		return;
++	}
++
++	de->name = parsed.name;
++	de->namelen = parsed.name_len;
++	de->resume_key = info->Ignored;
++	de->ino = le64_to_cpu(info->Inode);
++}
++
+ static void cifs_fill_dirent_unix(struct cifs_dirent *de,
+ 		const FILE_UNIX_INFO *info, bool is_unicode)
+ {
+@@ -511,6 +585,9 @@ static int cifs_fill_dirent(struct cifs_dirent *de, const void *info,
+ 	memset(de, 0, sizeof(*de));
+ 
+ 	switch (level) {
++	case SMB_FIND_FILE_POSIX_INFO:
++		cifs_fill_dirent_posix(de, info);
++		break;
+ 	case SMB_FIND_FILE_UNIX:
+ 		cifs_fill_dirent_unix(de, info, is_unicode);
+ 		break;
+@@ -786,6 +863,11 @@ static int cifs_filldir(char *find_entry, struct file *file,
+ 	}
+ 
+ 	switch (file_info->srch_inf.info_level) {
++	case SMB_FIND_FILE_POSIX_INFO:
++		cifs_posix_to_fattr(&fattr,
++				    (struct smb2_posix_info *)find_entry,
++				    cifs_sb);
++		break;
+ 	case SMB_FIND_FILE_UNIX:
+ 		cifs_unix_basic_to_fattr(&fattr,
+ 					 &((FILE_UNIX_INFO *)find_entry)->basic,
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 174ae2ef6310..abc0a0512181 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -4386,7 +4386,8 @@ static int posix_info_extra_size(const void *beg, const void *end)
+ }
+ 
+ static unsigned int
+-num_entries(char *bufstart, char *end_of_buf, char **lastentry, size_t size)
++num_entries(int infotype, char *bufstart, char *end_of_buf, char **lastentry,
++	    size_t size)
+ {
+ 	int len;
+ 	unsigned int entrycount = 0;
+@@ -4410,8 +4411,13 @@ num_entries(char *bufstart, char *end_of_buf, char **lastentry, size_t size)
+ 		entryptr = entryptr + next_offset;
+ 		dir_info = (FILE_DIRECTORY_INFO *)entryptr;
+ 
+-		len = le32_to_cpu(dir_info->FileNameLength);
+-		if (entryptr + len < entryptr ||
++		if (infotype == SMB_FIND_FILE_POSIX_INFO)
++			len = posix_info_extra_size(entryptr, end_of_buf);
++		else
++			len = le32_to_cpu(dir_info->FileNameLength);
++
++		if (len < 0 ||
++		    entryptr + len < entryptr ||
+ 		    entryptr + len > end_of_buf ||
+ 		    entryptr + len + size > end_of_buf) {
+ 			cifs_dbg(VFS, "directory entry name would overflow frame end of buf %p\n",
+@@ -4461,6 +4467,9 @@ int SMB2_query_directory_init(const unsigned int xid,
+ 	case SMB_FIND_FILE_ID_FULL_DIR_INFO:
+ 		req->FileInformationClass = FILEID_FULL_DIRECTORY_INFORMATION;
+ 		break;
++	case SMB_FIND_FILE_POSIX_INFO:
++		req->FileInformationClass = SMB_FIND_FILE_POSIX_INFO;
++		break;
+ 	default:
+ 		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
+ 			info_level);
+@@ -4526,6 +4535,10 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
+ 	case SMB_FIND_FILE_ID_FULL_DIR_INFO:
+ 		info_buf_size = sizeof(SEARCH_ID_FULL_DIR_INFO) - 1;
+ 		break;
++	case SMB_FIND_FILE_POSIX_INFO:
++		/* note that posix payload are variable size */
++		info_buf_size = sizeof(struct smb2_posix_info);
++		break;
+ 	default:
+ 		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
+ 			 srch_inf->info_level);
+@@ -4535,8 +4548,10 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
+ 	rc = smb2_validate_iov(le16_to_cpu(rsp->OutputBufferOffset),
+ 			       le32_to_cpu(rsp->OutputBufferLength), rsp_iov,
+ 			       info_buf_size);
+-	if (rc)
++	if (rc) {
++		cifs_tcon_dbg(VFS, "bad info payload");
+ 		return rc;
++	}
+ 
+ 	srch_inf->unicode = true;
+ 
+@@ -4550,9 +4565,14 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
+ 	srch_inf->srch_entries_start = srch_inf->last_entry =
+ 		(char *)rsp + le16_to_cpu(rsp->OutputBufferOffset);
+ 	end_of_smb = rsp_iov->iov_len + (char *)rsp;
+-	srch_inf->entries_in_buffer =
+-			num_entries(srch_inf->srch_entries_start, end_of_smb,
+-				    &srch_inf->last_entry, info_buf_size);
++
++	srch_inf->entries_in_buffer = num_entries(
++		srch_inf->info_level,
++		srch_inf->srch_entries_start,
++		end_of_smb,
++		&srch_inf->last_entry,
++		info_buf_size);
++
+ 	srch_inf->index_of_last_entry += srch_inf->entries_in_buffer;
+ 	cifs_dbg(FYI, "num entries %d last_index %lld srch start %p srch end %p\n",
+ 		 srch_inf->entries_in_buffer, srch_inf->index_of_last_entry,
 -- 
 2.16.4
 
