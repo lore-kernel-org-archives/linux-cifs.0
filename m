@@ -1,287 +1,148 @@
-Return-Path: <SRS0=LZk2=34=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=CoXL=35=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C232FC35250
-	for <linux-cifs@archiver.kernel.org>; Sat,  8 Feb 2020 14:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 619F6C352A1
+	for <linux-cifs@archiver.kernel.org>; Sun,  9 Feb 2020 01:45:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A09622464
-	for <linux-cifs@archiver.kernel.org>; Sat,  8 Feb 2020 14:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7782922522
+	for <linux-cifs@archiver.kernel.org>; Sun,  9 Feb 2020 01:45:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q61BSIdw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727335AbgBHOvW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 8 Feb 2020 09:51:22 -0500
-Received: from mx2.suse.de ([195.135.220.15]:39622 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727383AbgBHOvW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 8 Feb 2020 09:51:22 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 43382AC2C;
-        Sat,  8 Feb 2020 14:51:17 +0000 (UTC)
-From:   Aurelien Aptel <aaptel@suse.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH 3/3] cifs: plumb smb2 POSIX dir enumeration
-Date:   Sat,  8 Feb 2020 15:50:58 +0100
-Message-Id: <20200208145058.10429-3-aaptel@suse.com>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20200208145058.10429-1-aaptel@suse.com>
-References: <20200208145058.10429-1-aaptel@suse.com>
+        id S1727542AbgBIBpj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 8 Feb 2020 20:45:39 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:36307 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727502AbgBIBpj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 8 Feb 2020 20:45:39 -0500
+Received: by mail-io1-f66.google.com with SMTP id d15so3775406iog.3;
+        Sat, 08 Feb 2020 17:45:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=MCQaQpg0y2itnJBTvG3xjWtDW7J07F5JpEm9F18Dlno=;
+        b=q61BSIdwNFuESRBLf1qekdUkE4NIAnZnpkpNYj6ThHG/y4GYEZL3EsPWgETi74w1mj
+         U73iXjNIZP+7y7DUmlUhC20FpaECDZdwq4KNTbOB8XglvudoXJf6uePwY0SpV0ytY5L7
+         gsX6oHuG3sb8w29IC1Hbl70/U06bmbK2hsizl25kyunbOtKzVKIOxSw6zRnrHgGzBNAa
+         efgd0fId1pbCkHi+rhw9S7CO11tzA6RU5yAzY18l/ghwpL2/6oTfq+TpcEWZ9ehFH+ZC
+         KCfi9TFpuhTKtg6zebWSIVV1Np/YWPLOOfeZL1apTITLCbjKnylFIAZFw6DJ0qbyTZRz
+         8geg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=MCQaQpg0y2itnJBTvG3xjWtDW7J07F5JpEm9F18Dlno=;
+        b=Qk3xVXOfPdg6SvOmG9ZKd4GkN6biEOZ3xFxZc1Mren+0mNCFiehThqC9uOQA6jVZaR
+         LTfEAo8qfwNQf5NnquZtUTYOXoLYzbGydUGA69WlP71rKbsJ7CkQB5viRBWgOUM5Uebr
+         hreW4q+KU9ORtfTW5E9yUKzjxI4+CCGWUglievVos57Y6atItznA7mcDsZDh/JJPoY3x
+         wZF6C97eMwyxr+QWJgf4M20CCcvvcRrE7gPrLrILG1viVR6JQrNzbtsYv7k8W7/3LnKG
+         aaqfSqnumxarflQEQOqOX2p4EGUOxZaWRq7W0CDeZ1NbwJXNGCZEnMOYO9yHLdI5Ou0b
+         wzYg==
+X-Gm-Message-State: APjAAAX4r+xqJvF9uTowkbOQNU6vv//q4Uz8MgmBfwmPpjzfhU7slDPT
+        gMngCQPddS2q63n8Du9Y0g0wMkPfBxlVvAWjBwPM2FZ9zEM=
+X-Google-Smtp-Source: APXvYqw6LHx2aENMZsLdSsMP6GQzPN0w9vcXI01havkzcHcJUU5xSPnT3DYkygMeAVO5szcIHK4MEAandSHSPyYHXbA=
+X-Received: by 2002:a5d:9419:: with SMTP id v25mr4324008ion.3.1581212737288;
+ Sat, 08 Feb 2020 17:45:37 -0800 (PST)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 8 Feb 2020 19:45:26 -0600
+Message-ID: <CAH2r5ms=hyEdeSLo2qN11rB41e-+yFn7Xg=8CVWwXVa1R0hooQ@mail.gmail.com>
+Subject: [GIT PULL] CIFS/SMB3 Fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-* add code to request POSIX info level
-* parse dir entries and fill cifs_fattr to get correct inode data
+Please pull the following changes since commit
+94f2630b18975bb56eee5d1a36371db967643479:
 
-since the POSIX payload is variable size the number of entries in a
-FIND response needs to be computed differently.
+  Merge tag '5.6-rc-small-smb3-fix-for-stable' of
+git://git.samba.org/sfrench/cifs-2.6 (2020-02-01 11:22:41 -0800)
 
-Dirs and regular files are properly reported along with mode bits,
-hardlink number, c/m/atime. No special files yet (see below).
+are available in the Git repository at:
 
-Current experimental version of Samba with the extension unfortunately
-has issues with wildcards and needs the following patch:
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.6-rc-smb3-plugfest-patches
 
-> --- i/source3/smbd/smb2_query_directory.c
-> +++ w/source3/smbd/smb2_query_directory.c
-> @@ -397,9 +397,7 @@ smbd_smb2_query_directory_send(TALLOC_CTX
-> *mem_ctx,
-> 		}
-> 	}
->
-> -       if (!state->smbreq->posix_pathnames) {
-> 		wcard_has_wild = ms_has_wild(state->in_file_name);
-> -       }
->
-> 	/* Ensure we've canonicalized any search path if not a wildcard. */
-> 	if (!wcard_has_wild) {
->
+for you to fetch changes up to 51d92d69f77b121d8093af82eb3bd2e8e631be55:
 
-Also for special files despite reporting them as reparse point samba
-doesnt set the reparse tag field. This patch will mark them as needing
-re-evaluation but the re-evaluate code doesn't deal with it yet.
+  smb3: Add defines for new information level, FileIdInformation
+(2020-02-06 17:32:24 -0600)
 
-Signed-off-by: Aurelien Aptel <aaptel@suse.com>
----
- fs/cifs/readdir.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c | 34 ++++++++++++++++++-----
- 2 files changed, 109 insertions(+), 7 deletions(-)
+----------------------------------------------------------------
+13 cifs/smb3 patches (most from testing at the SMB3 plugfest this week)
 
-diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
-index ba9dadf3be24..753ca064e2b3 100644
---- a/fs/cifs/readdir.c
-+++ b/fs/cifs/readdir.c
-@@ -32,6 +32,7 @@
- #include "cifs_debug.h"
- #include "cifs_fs_sb.h"
- #include "cifsfs.h"
-+#include "smb2proto.h"
- 
- /*
-  * To be safe - for UCS to UTF-8 with strings loaded with the rare long
-@@ -217,6 +218,60 @@ cifs_fill_common_info(struct cifs_fattr *fattr, struct cifs_sb_info *cifs_sb)
- 	}
- }
- 
-+/* Fill a cifs_fattr struct with info from SMB_FIND_FILE_POSIX_INFO. */
-+static void
-+cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
-+		    struct cifs_sb_info *cifs_sb)
-+{
-+	struct smb2_posix_info_parsed parsed;
-+
-+	posix_info_parse(info, NULL, &parsed);
-+
-+	memset(fattr, 0, sizeof(*fattr));
-+	fattr->cf_uniqueid = le64_to_cpu(info->Inode);
-+	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
-+	fattr->cf_eof = le64_to_cpu(info->EndOfFile);
-+
-+	fattr->cf_atime = cifs_NTtimeToUnix(info->LastAccessTime);
-+	fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
-+	fattr->cf_ctime = cifs_NTtimeToUnix(info->CreationTime);
-+
-+	fattr->cf_nlink = le64_to_cpu(info->HardLinks);
-+	fattr->cf_cifsattrs = le32_to_cpu(info->DosAttributes);
-+
-+	/*
-+	 * Since we set the inode type below we need to mask off
-+	 * to avoid strange results if bits set above.
-+	 * XXX: why not make server&client use the type bits?
-+	 */
-+	fattr->cf_mode = le32_to_cpu(info->Mode) & ~S_IFMT;
-+
-+	cifs_dbg(VFS, "XXX dev %d, reparse %d, mode %o",
-+		 le32_to_cpu(info->DeviceId),
-+		 le32_to_cpu(info->ReparseTag),
-+		 le32_to_cpu(info->Mode));
-+
-+	if (fattr->cf_cifsattrs & ATTR_DIRECTORY) {
-+		fattr->cf_mode |= S_IFDIR;
-+		fattr->cf_dtype = DT_DIR;
-+	} else {
-+		/*
-+		 * mark anything that is not a dir as regular
-+		 * file. special files should have the REPARSE
-+		 * attribute and will be marked as needing revaluation
-+		 */
-+		fattr->cf_mode |= S_IFREG;
-+		fattr->cf_dtype = DT_REG;
-+	}
-+
-+	if (reparse_file_needs_reval(fattr))
-+		fattr->cf_flags |= CIFS_FATTR_NEED_REVAL;
-+
-+	/* TODO map SIDs */
-+	fattr->cf_uid = cifs_sb->mnt_uid;
-+	fattr->cf_gid = cifs_sb->mnt_gid;
-+}
-+
- static void __dir_info_to_fattr(struct cifs_fattr *fattr, const void *info)
- {
- 	const FILE_DIRECTORY_INFO *fi = info;
-@@ -359,6 +414,8 @@ initiate_cifs_search(const unsigned int xid, struct file *file)
- 	/* if (cap_unix(tcon->ses) { */
- 	if (tcon->unix_ext)
- 		cifsFile->srch_inf.info_level = SMB_FIND_FILE_UNIX;
-+	else if (tcon->posix_extensions)
-+		cifsFile->srch_inf.info_level = SMB_FIND_FILE_POSIX_INFO;
- 	else if ((tcon->ses->capabilities &
- 		  tcon->ses->server->vals->cap_nt_find) == 0) {
- 		cifsFile->srch_inf.info_level = SMB_FIND_FILE_INFO_STANDARD;
-@@ -451,6 +508,23 @@ struct cifs_dirent {
- 	u64		ino;
- };
- 
-+static void cifs_fill_dirent_posix(struct cifs_dirent *de,
-+				   const struct smb2_posix_info *info)
-+{
-+	struct smb2_posix_info_parsed parsed;
-+
-+	/* payload should have already been checked at this point */
-+	if (posix_info_parse(info, NULL, &parsed) < 0) {
-+		cifs_dbg(VFS, "invalid POSIX info payload");
-+		return;
-+	}
-+
-+	de->name = parsed.name;
-+	de->namelen = parsed.name_len;
-+	de->resume_key = info->Ignored;
-+	de->ino = le64_to_cpu(info->Inode);
-+}
-+
- static void cifs_fill_dirent_unix(struct cifs_dirent *de,
- 		const FILE_UNIX_INFO *info, bool is_unicode)
- {
-@@ -511,6 +585,9 @@ static int cifs_fill_dirent(struct cifs_dirent *de, const void *info,
- 	memset(de, 0, sizeof(*de));
- 
- 	switch (level) {
-+	case SMB_FIND_FILE_POSIX_INFO:
-+		cifs_fill_dirent_posix(de, info);
-+		break;
- 	case SMB_FIND_FILE_UNIX:
- 		cifs_fill_dirent_unix(de, info, is_unicode);
- 		break;
-@@ -786,6 +863,11 @@ static int cifs_filldir(char *find_entry, struct file *file,
- 	}
- 
- 	switch (file_info->srch_inf.info_level) {
-+	case SMB_FIND_FILE_POSIX_INFO:
-+		cifs_posix_to_fattr(&fattr,
-+				    (struct smb2_posix_info *)find_entry,
-+				    cifs_sb);
-+		break;
- 	case SMB_FIND_FILE_UNIX:
- 		cifs_unix_basic_to_fattr(&fattr,
- 					 &((FILE_UNIX_INFO *)find_entry)->basic,
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 174ae2ef6310..abc0a0512181 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -4386,7 +4386,8 @@ static int posix_info_extra_size(const void *beg, const void *end)
- }
- 
- static unsigned int
--num_entries(char *bufstart, char *end_of_buf, char **lastentry, size_t size)
-+num_entries(int infotype, char *bufstart, char *end_of_buf, char **lastentry,
-+	    size_t size)
- {
- 	int len;
- 	unsigned int entrycount = 0;
-@@ -4410,8 +4411,13 @@ num_entries(char *bufstart, char *end_of_buf, char **lastentry, size_t size)
- 		entryptr = entryptr + next_offset;
- 		dir_info = (FILE_DIRECTORY_INFO *)entryptr;
- 
--		len = le32_to_cpu(dir_info->FileNameLength);
--		if (entryptr + len < entryptr ||
-+		if (infotype == SMB_FIND_FILE_POSIX_INFO)
-+			len = posix_info_extra_size(entryptr, end_of_buf);
-+		else
-+			len = le32_to_cpu(dir_info->FileNameLength);
-+
-+		if (len < 0 ||
-+		    entryptr + len < entryptr ||
- 		    entryptr + len > end_of_buf ||
- 		    entryptr + len + size > end_of_buf) {
- 			cifs_dbg(VFS, "directory entry name would overflow frame end of buf %p\n",
-@@ -4461,6 +4467,9 @@ int SMB2_query_directory_init(const unsigned int xid,
- 	case SMB_FIND_FILE_ID_FULL_DIR_INFO:
- 		req->FileInformationClass = FILEID_FULL_DIRECTORY_INFORMATION;
- 		break;
-+	case SMB_FIND_FILE_POSIX_INFO:
-+		req->FileInformationClass = SMB_FIND_FILE_POSIX_INFO;
-+		break;
- 	default:
- 		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
- 			info_level);
-@@ -4526,6 +4535,10 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
- 	case SMB_FIND_FILE_ID_FULL_DIR_INFO:
- 		info_buf_size = sizeof(SEARCH_ID_FULL_DIR_INFO) - 1;
- 		break;
-+	case SMB_FIND_FILE_POSIX_INFO:
-+		/* note that posix payload are variable size */
-+		info_buf_size = sizeof(struct smb2_posix_info);
-+		break;
- 	default:
- 		cifs_tcon_dbg(VFS, "info level %u isn't supported\n",
- 			 srch_inf->info_level);
-@@ -4535,8 +4548,10 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
- 	rc = smb2_validate_iov(le16_to_cpu(rsp->OutputBufferOffset),
- 			       le32_to_cpu(rsp->OutputBufferLength), rsp_iov,
- 			       info_buf_size);
--	if (rc)
-+	if (rc) {
-+		cifs_tcon_dbg(VFS, "bad info payload");
- 		return rc;
-+	}
- 
- 	srch_inf->unicode = true;
- 
-@@ -4550,9 +4565,14 @@ smb2_parse_query_directory(struct cifs_tcon *tcon,
- 	srch_inf->srch_entries_start = srch_inf->last_entry =
- 		(char *)rsp + le16_to_cpu(rsp->OutputBufferOffset);
- 	end_of_smb = rsp_iov->iov_len + (char *)rsp;
--	srch_inf->entries_in_buffer =
--			num_entries(srch_inf->srch_entries_start, end_of_smb,
--				    &srch_inf->last_entry, info_buf_size);
-+
-+	srch_inf->entries_in_buffer = num_entries(
-+		srch_inf->info_level,
-+		srch_inf->srch_entries_start,
-+		end_of_smb,
-+		&srch_inf->last_entry,
-+		info_buf_size);
-+
- 	srch_inf->index_of_last_entry += srch_inf->entries_in_buffer;
- 	cifs_dbg(FYI, "num entries %d last_index %lld srch start %p srch end %p\n",
- 		 srch_inf->entries_in_buffer, srch_inf->index_of_last_entry,
--- 
-2.16.4
+Important fix for multichannel and for modefromsid mounts.
+Two reconnect fixes
+Addition of SMB3 change notify support
+Backup tools fix
+A few additional minor debug improvements (tracepoints and additional
+logging found useful during testing this week)
 
+Unit test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/314
+
+An additional set of important improvements for SMB3.1.1 POSIX
+Extensions that was being worked on and tested at the recent SNIA test
+event is still under testing and is not included in this pull request.
+----------------------------------------------------------------
+Amir Goldstein (1):
+      SMB3: Backup intent flag missing from some more ops
+
+Aurelien Aptel (3):
+      cifs: make multichannel warning more visible
+      cifs: fix channel signing
+      cifs: fix mode bits from dir listing when mounted with modefromsid
+
+Ronnie Sahlberg (2):
+      cifs: fail i/o on soft mounts if sessionsetup errors out
+      cifs: fix soft mounts hanging in the reconnect code
+
+Steve French (7):
+      smb3: fix problem with null cifs super block with previous patch
+      cifs: log warning message (once) if out of disk space
+      cifs: Add tracepoints for errors on flush or fsync
+      cifs: add SMB3 change notification support
+      smb3: add one more dynamic tracepoint missing from strict fsync path
+      smb3: print warning once if posix context returned on open
+      smb3: Add defines for new information level, FileIdInformation
+
+ fs/cifs/cifs_ioctl.h    |   6 +++++
+ fs/cifs/cifsacl.c       |  14 +++--------
+ fs/cifs/cifsfs.c        |   2 +-
+ fs/cifs/cifsglob.h      |   8 ++++--
+ fs/cifs/cifsproto.h     |   8 ++++++
+ fs/cifs/cifssmb.c       |   2 +-
+ fs/cifs/connect.c       |   2 +-
+ fs/cifs/dir.c           |   5 +---
+ fs/cifs/file.c          |  21 ++++++++--------
+ fs/cifs/inode.c         |   8 +++---
+ fs/cifs/ioctl.c         |  18 +++++++++++++-
+ fs/cifs/link.c          |  18 +++-----------
+ fs/cifs/readdir.c       |   3 ++-
+ fs/cifs/sess.c          |   2 +-
+ fs/cifs/smb1ops.c       |  19 +++++++-------
+ fs/cifs/smb2inode.c     |   9 ++-----
+ fs/cifs/smb2ops.c       | 145
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------------------------------
+ fs/cifs/smb2pdu.c       |  36 +++++++++++++++++++++++++--
+ fs/cifs/smb2pdu.h       |  16 ++++++++++++
+ fs/cifs/smb2proto.h     |   2 +-
+ fs/cifs/smb2transport.c |   5 ++--
+ fs/cifs/trace.h         |  27 ++++++++++++++++++++
+ 22 files changed, 247 insertions(+), 129 deletions(-)
+
+
+--
+Thanks,
+
+Steve
