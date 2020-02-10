@@ -2,72 +2,63 @@ Return-Path: <SRS0=6quT=36=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC17CC352A4
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Feb 2020 09:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D7EC352A3
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Feb 2020 12:03:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBCC821739
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Feb 2020 09:38:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34E5A20733
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Feb 2020 12:03:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726950AbgBJJis (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Feb 2020 04:38:48 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50854 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726796AbgBJJis (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 10 Feb 2020 04:38:48 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id BB124AEC4;
-        Mon, 10 Feb 2020 09:38:46 +0000 (UTC)
-From:   Petr Pavlu <petr.pavlu@suse.com>
-To:     stfrench@microsoft.com, linux-cifs@vger.kernel.org
-Cc:     Petr Pavlu <petr.pavlu@suse.com>
-Subject: [PATCH] cifs: fix mount option display for sec=krb5i
-Date:   Mon, 10 Feb 2020 10:38:14 +0100
-Message-Id: <20200210093814.24198-1-petr.pavlu@suse.com>
-X-Mailer: git-send-email 2.16.4
+        id S1726796AbgBJMDU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Feb 2020 07:03:20 -0500
+Received: from ishtar.tlinx.org ([173.164.175.65]:50842 "EHLO
+        Ishtar.sc.tlinx.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726950AbgBJMDU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Feb 2020 07:03:20 -0500
+X-Greylist: delayed 1891 seconds by postgrey-1.27 at vger.kernel.org; Mon, 10 Feb 2020 07:03:20 EST
+Received: from [192.168.3.12] (Athenae [192.168.3.12])
+        by Ishtar.sc.tlinx.org (8.14.7/8.14.4/SuSE Linux 0.8) with ESMTP id 01ABVkYY028755;
+        Mon, 10 Feb 2020 03:31:48 -0800
+Message-ID: <5E413F22.3070101@tlinx.org>
+Date:   Mon, 10 Feb 2020 03:31:46 -0800
+From:   L Walsh <cifs@tlinx.org>
+User-Agent: Thunderbird
+MIME-Version: 1.0
+To:     Steve French <smfrench@gmail.com>
+CC:     CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [CIFS][PATCH] Add SMB2? Change Notify
+References: <CAH2r5mtQRVX3_-_sVjvigRSv2LpSoUBQo7YeY5v0nXm7BGaDig@mail.gmail.com>
+In-Reply-To: <CAH2r5mtQRVX3_-_sVjvigRSv2LpSoUBQo7YeY5v0nXm7BGaDig@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fix display for sec=krb5i which was wrongly interleaved by cruid,
-resulting in string "sec=krb5,cruid=<...>i" instead of
-"sec=krb5i,cruid=<...>".
+On 2020/02/06 04:29, Steve French wrote:
+> A commonly used SMB3 feature is change notification, allowing an
+> app to be notified about changes to a directory. The SMB3
+> Notify request blocks until the server detects a change to that
+> directory or its contents that matches the completion flags
+> that were passed in and the "watch_tree" flag (which indicates
+> whether subdirectories under this directory should be also
+> included).  See MS-SMB2 2.2.35 for additional detail.
+>   
+----
+    How does the SMB3 feature "change notification" differ from
+the SMB2 feature described in MS-SMB2 2.2.35?
 
-Fixes: 96281b9e46eb ("smb3: for kerberos mounts display the credential uid used")
-Signed-off-by: Petr Pavlu <petr.pavlu@suse.com>
----
- fs/cifs/cifsfs.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+    Isn't it more typical to describe features by the spec version
+that they were first publish under -- especially since the doc
+describing the feature is under the SMB2 documents?
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 5492b9860baa..92b9c8221f07 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -414,7 +414,7 @@ cifs_show_security(struct seq_file *s, struct cifs_ses *ses)
- 		seq_puts(s, "ntlm");
- 		break;
- 	case Kerberos:
--		seq_printf(s, "krb5,cruid=%u", from_kuid_munged(&init_user_ns,ses->cred_uid));
-+		seq_puts(s, "krb5");
- 		break;
- 	case RawNTLMSSP:
- 		seq_puts(s, "ntlmssp");
-@@ -427,6 +427,10 @@ cifs_show_security(struct seq_file *s, struct cifs_ses *ses)
- 
- 	if (ses->sign)
- 		seq_puts(s, "i");
-+
-+	if (ses->sectype == Kerberos)
-+		seq_printf(s, ",cruid=%u",
-+			   from_kuid_munged(&init_user_ns, ses->cred_uid));
- }
- 
- static void
--- 
-2.16.4
+    By calling it a SMB3 feature, does that mean you are removing
+it from SMB2?
+Thanks!
+
+
 
