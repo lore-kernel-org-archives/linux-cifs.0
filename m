@@ -1,69 +1,66 @@
-Return-Path: <SRS0=zJQV=4E=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=c9dP=4G=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	PDS_TONAME_EQ_TOLOCAL_SHORT,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7E3C7619B
-	for <linux-cifs@archiver.kernel.org>; Sun, 16 Feb 2020 19:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 272DDC34031
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Feb 2020 04:18:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8FE420857
-	for <linux-cifs@archiver.kernel.org>; Sun, 16 Feb 2020 19:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581882629;
-	bh=sB/vufOEvmQ45ty5tmh+DsYCIhFHuK0fdMMza9D3je4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=nyYRyVgEyLTjB7Gjp2RZeYMSs1tjeWA7/vmHA6Uk5i8sHTQpcF8PvG4+Y4lHhBayK
-	 hHBpOG98P+LSkNrpNSW5FlXbOL2Hz2WD5rWLR9vGEDC0ePk9NClKkx0NM/6rv4sNZA
-	 ayi6olV43hJ5fLsobI3m8XWcAjvwlaYiXYG6N+mI=
+	by mail.kernel.org (Postfix) with ESMTP id EDB2720801
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Feb 2020 04:18:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGQFHZWX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726009AbgBPTuU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 16 Feb 2020 14:50:20 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45718 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725989AbgBPTuT (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 16 Feb 2020 14:50:19 -0500
-Subject: Re: [GIT PULL] CIFS/SMB3 Fixes
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581882619;
-        bh=sB/vufOEvmQ45ty5tmh+DsYCIhFHuK0fdMMza9D3je4=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=J+SloLGG765Mit5Ykk0z/5+byFPRiGJPNt3g1CQ8T3f9NTxWJzbgZyhrqdCjt3uA6
-         KUs4wVQ+sk4Gtz9vWxLEaGSFcJaasO4QElBXD8vWd9uD8BbAejcK1fG9Vnk4y1ghyQ
-         qsf5FlhgHdB1eQDMvzoj0YMOzuh6a6GdgHp2mUZI=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mt=_P2tUC6H+bmFL-FAyKYQuvim2fYqa27gMdJj3882=g@mail.gmail.com>
-References: <CAH2r5mt=_P2tUC6H+bmFL-FAyKYQuvim2fYqa27gMdJj3882=g@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mt=_P2tUC6H+bmFL-FAyKYQuvim2fYqa27gMdJj3882=g@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git
- tags/5.6-rc1-smb3-fixes
-X-PR-Tracked-Commit-Id: 85db6b7ae65f33be4bb44f1c28261a3faa126437
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 288b27a06e4f8f7bad63792cf015c160ae578d89
-Message-Id: <158188261896.7458.9742510133908572108.pr-tracker-bot@kernel.org>
-Date:   Sun, 16 Feb 2020 19:50:18 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        id S1726289AbgBRESy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Feb 2020 23:18:54 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40754 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726352AbgBRESy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 17 Feb 2020 23:18:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1581999533;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc; bh=2tjhgUW6BCBghuYbAyXmhLETZhZVWWt5+fTJ8ksqV1E=;
+        b=dGQFHZWXIX5IlLoAAFnG4NHNO0MhiRASlwFLEIcoKKXUjwzfLrug7WOlxfPOC4NXbe7Had
+        9qGcpDCmmW+NXhFY9BB90gntdZeKCaMzV0JO2jS8JK9utCf+3i+iuUSxYD/v2GJ6axnU5+
+        D+gI1D1JmN/cJD3V6TAkHZNISfJPCNQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-198-r2KSW0zuNTio3EWmfAGNgg-1; Mon, 17 Feb 2020 23:18:51 -0500
+X-MC-Unique: r2KSW0zuNTio3EWmfAGNgg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADA795F9
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Feb 2020 04:18:50 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-132.bne.redhat.com [10.64.54.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3FC7F19C69
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Feb 2020 04:18:50 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Subject: [PATCH 0/1] dont leak -EAGAIN
+Date:   Tue, 18 Feb 2020 14:18:41 +1000
+Message-Id: <20200218041842.13986-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 15 Feb 2020 20:58:53 -0600:
+Steve, List
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.6-rc1-smb3-fixes
+Please find a small patch to fix an issue where during a session reconnect we may leak
+-EAGAIN back to the application instead of retrying the operation once reconnect has completed.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/288b27a06e4f8f7bad63792cf015c160ae578d89
+This can affects for example the stat() call :
+  stat("/mnt", 0x55b802c096f8) = -1 EAGAIN (Resource temporarily unavailable) <0.002447>
+causing applications such as 'ls' to fail with an error as this is not a valid return
+for stat()
 
-Thank you!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+
