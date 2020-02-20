@@ -1,103 +1,101 @@
-Return-Path: <SRS0=bM6M=4H=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=hW7M=4I=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3ACDC3524E
-	for <linux-cifs@archiver.kernel.org>; Wed, 19 Feb 2020 21:40:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E72C34031
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Feb 2020 06:02:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9969B24654
-	for <linux-cifs@archiver.kernel.org>; Wed, 19 Feb 2020 21:40:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A95324654
+	for <linux-cifs@archiver.kernel.org>; Thu, 20 Feb 2020 06:02:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q7FEeBlm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YVQbzqV7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727434AbgBSVkE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 19 Feb 2020 16:40:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59133 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726703AbgBSVkE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 19 Feb 2020 16:40:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1582148403;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Akm5nZ5Nk5RDJvPlHXdmc1pTXqzcrHwStmylDtS4kdo=;
-        b=Q7FEeBlmVUh0HfH0GHlPoGXauLp7DnFB6j6lWOhAMobuz6Bvil01pYOrKCVXZ5j+ALZb/6
-        LTf2FDXpJx8MyQCpCZ2xsY8CHR+BzRQ7WRv8ZvriohhuqX/gmjvWSTqAruI+K0vJ8/gueG
-        jIRGGzP2zMHrQa2QbkAMqZVZdGyQhWY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-lYV3sqb5NxSus3qboGNwYQ-1; Wed, 19 Feb 2020 16:39:58 -0500
-X-MC-Unique: lYV3sqb5NxSus3qboGNwYQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF399800D50;
-        Wed, 19 Feb 2020 21:39:56 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-122-163.rdu2.redhat.com [10.10.122.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A04215C1B0;
-        Wed, 19 Feb 2020 21:39:54 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wgtAEvD6J_zVPKXHDjZ7rNe3piRzD_bX2HcVgY3AMGhjw@mail.gmail.com>
-References: <CAHk-=wgtAEvD6J_zVPKXHDjZ7rNe3piRzD_bX2HcVgY3AMGhjw@mail.gmail.com> <158212290024.224464.862376690360037918.stgit@warthog.procyon.org.uk> <CAMuHMdV+H0p3qFV=gDz0dssXVhzd+L_eEn6s0jzrU5M79_50HQ@mail.gmail.com> <227117.1582124888@warthog.procyon.org.uk> <CAHk-=wjFwT-fRw0kH-dYS9M5eBz3Jg0FeUfhf6VnGrPMVDDCBg@mail.gmail.com> <241568.1582134931@warthog.procyon.org.uk> <CAHk-=wi=UbOwm8PMQUB1xaXRWEhhoVFdsKDSz=bX++rMQOUj0w@mail.gmail.com> <CAHk-=whfoWHvL29PPXncxV6iprC4e_m6CQWQJ1G4-JtR+uGVUA@mail.gmail.com> <252465.1582142281@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, jaltman@auristor.com,
-        Al Viro <viro@zeniv.linux.org.uk>, coda@cs.cmu.edu,
-        linux-afs@lists.infradead.org, CIFS <linux-cifs@vger.kernel.org>,
-        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH] vfs: syscalls: Add create_automount() and remove_automount()
+        id S1725942AbgBTGCe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 20 Feb 2020 01:02:34 -0500
+Received: from mail-il1-f169.google.com ([209.85.166.169]:41239 "EHLO
+        mail-il1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725857AbgBTGCe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 20 Feb 2020 01:02:34 -0500
+Received: by mail-il1-f169.google.com with SMTP id f10so22695733ils.8
+        for <linux-cifs@vger.kernel.org>; Wed, 19 Feb 2020 22:02:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=KxsmKEiTS88kyWKQdpasQktV17phbtF1I5mwS48S9uA=;
+        b=YVQbzqV7NvDXfk0E8OaJLuCqwVpOMtjM0013ide3ZLnXH4spXbNrbhpGIvfbldo33E
+         AaE8KIYdQ+inH85hEUMLUK6HwnrqNTiykt/X8MngTTqcG+vguur1JrdOF3I0JTeajyfZ
+         LWGzq94lGC9FtMPny0pHD6HfoA0uqh8VqCHGXgmNSchGgncbEFplzoa2/XoYzUqNwiJq
+         mf4yCetqtsL4xA2E1ikRYel7OSc7QPh8RPqK35fpOuCWUZe+SPhpZjBvFzYTWufURVa8
+         ZreyTphhagwWrREQlxyRNbJHdwxzmA8F7YCKJER+m27VdVVKgZXnARuMfOkwkL6zbO8y
+         aK/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=KxsmKEiTS88kyWKQdpasQktV17phbtF1I5mwS48S9uA=;
+        b=olVH1WceGN9qiT2z+uPOlAZMp/stk15aTjEa3HqtJLmxPOnbSIu6ilftWBiFWw58Lo
+         97yiMaxzOOv6yKrJP7ROtit7cnZNSbONjA0hKm3/hcI+Xny1DSjRVK0NI4phqfc3A4Im
+         aG2RrpUJbZaAot4jYvp6KIHxWGF8yfLcyQjOu4HK51XhNmJo9ePZh+d5rOyKKBHmfGiO
+         O5YiITq9x1wXqG5vEjizUg4BW/HhWRBi05FLcNh0Z2h/MZVLeNIuTUUyZykdFUp6U2+f
+         Soy/MiyZlRp8ejfWDlNKP2JXNXzS59TyRpEPbV+VHPTacACSiNj59vsCgtYz3Jimztx+
+         Ap4g==
+X-Gm-Message-State: APjAAAXSWrjjA7Zm8gprgjR7YtKrGdc7WTx8x456r1ztI1B4YQe7xh5t
+        AXdwvKNSn977ygtlrCcDin5VlyAv3XGscvzQphLZs31/
+X-Google-Smtp-Source: APXvYqxIYXqihUcgBsuPLM5WXdiE2J8/+68JiTS8z51LVtaMYsgOMIE/0kW8bpt9ymwuTkgp8YQCY1aZD5Pk0yj2nKA=
+X-Received: by 2002:a92:9a90:: with SMTP id c16mr27302812ill.3.1582178553683;
+ Wed, 19 Feb 2020 22:02:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <260917.1582148393.1@warthog.procyon.org.uk>
-Date:   Wed, 19 Feb 2020 21:39:53 +0000
-Message-ID: <260918.1582148393@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 20 Feb 2020 00:02:22 -0600
+Message-ID: <CAH2r5msy+zQCWdBARfdw5TTk1va3vXU9f3JcWmd_xgHASJj9jQ@mail.gmail.com>
+Subject: [PATCH] [CIFS] Add missing mount option 'signloosely' to what is
+ displayed in /proc/mounts
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000ab5df3059efba6f0"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+--000000000000ab5df3059efba6f0
+Content-Type: text/plain; charset="UTF-8"
 
-> so you _could_ actually just make the rule be something simple like
-> 
->    symlink(target, "//datagoeshere")
-> 
-> being the "create magic autolink directory using "datagoeshere".
+    We were not displaying the mount option "signloosely" in /proc/mounts
+    for cifs mounts which some users found confusing recently
 
-Interesting.  I'll ask around to see if this is feasible.  Some applications
-(emacs being one maybe) sometimes appear to store information in symlink
-bodies - I'm not sure if any of those could be a problem.
 
-Since the mountpoint body is formulaic:
+-- 
+Thanks,
 
-	[%#](<cellname>:)?<volumename>(.readonly|.backup)?.
+Steve
 
-maybe I can use that pattern.
+--000000000000ab5df3059efba6f0
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-add-missing-mount-option-to-proc-mounts.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-add-missing-mount-option-to-proc-mounts.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_k6uc8rho0>
+X-Attachment-Id: f_k6uc8rho0
 
-symlink() would be returning a dentry that appears to be a directory, but it
-doesn't look like that should be a problem.
-
-> So then you could again script things with
-> 
->    mknod dirname c X Y
->    echo "datagoeshere" > dirname
-
-This would be tricky to get right as it's not atomic and the second part could
-fail to happen.  For extra fun, another client could interfere between the
-steps (setxattr would be safer than write here).
-
-David
-
+RnJvbSA0NWJmNjg1ODRjZTkzNzkzNmZlMDdkMjJhNzJiMjFiYTQ3ODZmMTc0IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFdlZCwgMTkgRmViIDIwMjAgMjM6NTk6MzIgLTA2MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBhZGQgbWlzc2luZyBtb3VudCBvcHRpb24gdG8gL3Byb2MvbW91bnRzCgpXZSB3ZXJlIG5v
+dCBkaXNwbGF5aW5nIHRoZSBtb3VudCBvcHRpb24gInNpZ25sb29zZWx5IiBpbiAvcHJvYy9tb3Vu
+dHMKZm9yIGNpZnMgbW91bnRzIHdoaWNoIHNvbWUgdXNlcnMgZm91bmQgY29uZnVzaW5nIHJlY2Vu
+dGx5CgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+Ci0tLQogZnMvY2lmcy9jaWZzZnMuYyB8IDIgKysKIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlv
+bnMoKykKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIvZnMvY2lmcy9jaWZzZnMuYwpp
+bmRleCA0NmViYWYzZjA4MjQuLmZhNzdmZTUyNThiMCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZz
+ZnMuYworKysgYi9mcy9jaWZzL2NpZnNmcy5jCkBAIC01MzAsNiArNTMwLDggQEAgY2lmc19zaG93
+X29wdGlvbnMoc3RydWN0IHNlcV9maWxlICpzLCBzdHJ1Y3QgZGVudHJ5ICpyb290KQogCiAJaWYg
+KHRjb24tPnNlYWwpCiAJCXNlcV9wdXRzKHMsICIsc2VhbCIpOworCWVsc2UgaWYgKHRjb24tPnNl
+cy0+c2VydmVyLT5pZ25vcmVfc2lnbmF0dXJlKQorCQlzZXFfcHV0cyhzLCAiLHNpZ25sb29zZWx5
+Iik7CiAJaWYgKHRjb24tPm5vY2FzZSkKIAkJc2VxX3B1dHMocywgIixub2Nhc2UiKTsKIAlpZiAo
+dGNvbi0+bG9jYWxfbGVhc2UpCi0tIAoyLjIwLjEKCg==
+--000000000000ab5df3059efba6f0--
