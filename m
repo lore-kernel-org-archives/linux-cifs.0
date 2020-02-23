@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 313F9C35669
-	for <linux-cifs@archiver.kernel.org>; Sun, 23 Feb 2020 02:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DE1C35673
+	for <linux-cifs@archiver.kernel.org>; Sun, 23 Feb 2020 02:31:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0824420707
-	for <linux-cifs@archiver.kernel.org>; Sun, 23 Feb 2020 02:29:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F6E822464
+	for <linux-cifs@archiver.kernel.org>; Sun, 23 Feb 2020 02:31:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582424942;
-	bh=VJl0l3HT/6xbtOrM+ACwuJjPmzziUCLCfBox3w+pcyw=;
+	s=default; t=1582425079;
+	bh=EvRrfe3Ps87aO1nFmpzG91f2tvwhJSODKG8/2hvJyQg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=NkU2A9Pr/uU+7/aX2HG5U/eN2uREEWFdSWn759C98+9rZMitXlQ9I3LnMHFrCVgXt
-	 /TncD4HVXLVnGN1G+79gx3kQ30LdfzpLaMuraAkqrqjbHXyxcB2094VZ5d0+htvrec
-	 hEuDo0pWhIqhV81+js6kdQ+iEG15FtTK/Z8eSkmE=
+	b=o/HqBVCxb33VfPvwyg+uUZFWQ5YJVZWHwFobWXDUKWYUGFRjWj0VeAHQh2vlygylc
+	 tHJgdvAvhBR69Qmep9mhjjrwhJQODEfZzNkHBrHHYFtC4W/ie7xOwe6aRDP4Y7JUbL
+	 0AUrFJljvT4jQX48797ZMmOkulJc6t1LMULWmA5o=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729025AbgBWCYI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 22 Feb 2020 21:24:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53956 "EHLO mail.kernel.org"
+        id S1727982AbgBWCX2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 22 Feb 2020 21:23:28 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52936 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729016AbgBWCYI (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 22 Feb 2020 21:24:08 -0500
+        id S1728639AbgBWCX1 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 22 Feb 2020 21:23:27 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A274C20707;
-        Sun, 23 Feb 2020 02:24:06 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 33F78208C3;
+        Sun, 23 Feb 2020 02:23:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582424647;
-        bh=VJl0l3HT/6xbtOrM+ACwuJjPmzziUCLCfBox3w+pcyw=;
+        s=default; t=1582424607;
+        bh=EvRrfe3Ps87aO1nFmpzG91f2tvwhJSODKG8/2hvJyQg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cI+K1ytMSCn9uv19ci5GUWUzIBKXTKKcgeJDdrnhl0zGTzd/DIrhpXLgAbWJAi2t4
-         jp40Bi1Zd3L9JSktzVKniQXj9Iy0uqiO7+l51pQUVWNUjppl/SPnNoIPFgESYNAk34
-         cHdx4zo7yZU6z5y2eEnlgRpDEr0W3sDXHZhNxkLU=
+        b=D2kqKhprVjV9YcqA8Ze/cHrfjOyCjEqJqed+2hOKy6xEFHAjHiIMh0e0X/s8NWpR4
+         Pg4ao1VtJ/9yIGVPLxOyCY6CLKMqnc6bpGRC6CWZAw9ZIF3aZkNiCRbj1uNtVWzBpj
+         zTAmeWdz+8pER6IGDnfylUmiQRYj5PbDUmOKteI4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Frank Sorenson <sorenson@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.19 23/25] cifs: Fix mode output in debugging statements
-Date:   Sat, 22 Feb 2020 21:23:37 -0500
-Message-Id: <20200223022339.1885-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 42/50] cifs: Fix mode output in debugging statements
+Date:   Sat, 22 Feb 2020 21:22:27 -0500
+Message-Id: <20200223022235.1404-42-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200223022339.1885-1-sashal@kernel.org>
-References: <20200223022339.1885-1-sashal@kernel.org>
+In-Reply-To: <20200223022235.1404-1-sashal@kernel.org>
+References: <20200223022235.1404-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,7 +76,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 1d377b7f28605..130bdca9e5680 100644
+index f842944a5c76a..1619af216677c 100644
 --- a/fs/cifs/cifsacl.c
 +++ b/fs/cifs/cifsacl.c
 @@ -603,7 +603,7 @@ static void access_flags_to_mode(__le32 ace_flags, int type, umode_t *pmode,
@@ -98,10 +98,10 @@ index 1d377b7f28605..130bdca9e5680 100644
  	return;
  }
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 576cf71576da1..5a4d677a5b19d 100644
+index 02451d085ddd0..28af1f7523f34 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -3792,7 +3792,7 @@ int cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
+@@ -4092,7 +4092,7 @@ int cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
  	cifs_sb->mnt_gid = pvolume_info->linux_gid;
  	cifs_sb->mnt_file_mode = pvolume_info->file_mode;
  	cifs_sb->mnt_dir_mode = pvolume_info->dir_mode;
@@ -111,10 +111,10 @@ index 576cf71576da1..5a4d677a5b19d 100644
  
  	cifs_sb->actimeo = pvolume_info->actimeo;
 diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 26154db6c87f1..fbebf241dbf24 100644
+index ed59e4a8db598..aafcd79c47722 100644
 --- a/fs/cifs/inode.c
 +++ b/fs/cifs/inode.c
-@@ -1579,7 +1579,7 @@ int cifs_mkdir(struct inode *inode, struct dentry *direntry, umode_t mode)
+@@ -1586,7 +1586,7 @@ int cifs_mkdir(struct inode *inode, struct dentry *direntry, umode_t mode)
  	struct TCP_Server_Info *server;
  	char *full_path;
  
