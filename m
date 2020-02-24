@@ -7,98 +7,85 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82AE3C38BF9
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 21:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64667C38BFA
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 22:27:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5252921556
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 21:37:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D7082176D
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 22:27:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ub27fz6D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wci2Ct75"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727249AbgBXVhC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 24 Feb 2020 16:37:02 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:42249 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726980AbgBXVhB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Feb 2020 16:37:01 -0500
-Received: by mail-lj1-f195.google.com with SMTP id d10so11738592ljl.9
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Feb 2020 13:37:00 -0800 (PST)
+        id S1728048AbgBXW1m (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 24 Feb 2020 17:27:42 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46331 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727219AbgBXW1m (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Feb 2020 17:27:42 -0500
+Received: by mail-io1-f65.google.com with SMTP id e7so1865871ioe.13;
+        Mon, 24 Feb 2020 14:27:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=QUdcFIHu39jksi7ynt9bLceAH97MdpNVo4rpRP5wDxA=;
-        b=ub27fz6DfSLSPltzurkE7UkcNJtP7RhBVVUqPEuxQP9RlCjTE3iKvaqd0KHAF/ucuv
-         PQU7zcg45dalqrsYwL29u8PMfVuY5K+r89okR/sTDUS5bVdlltjwr2+ScLPZ2QX4Fvie
-         sXEwZ1Dc27N/z9k3yvP1Z2bKz1tC/3wvFjI0p15aYj7+JTU1T4kRmJGpAcqghqeXUmv3
-         a2jjSbcKrNNY7XfTebsP99xSbm2rQaLJppiYRsGmcow7Z0lGxTeV7mgIkuQB51Z3Sy/J
-         Pgx2CHKiJ/+r2r+LAfAPiVvKuuDjTDBw5wNFR0Bku5Rut4oZbRtvRjtMgAqVTvFeB/lD
-         CHcA==
+         :cc;
+        bh=okoEokk8koFi0gbrNVrs/CtK734/+xWplYEPxW27+Gc=;
+        b=Wci2Ct75KDbCFUhLx2OoDlxXrlzD6YzLomd/+CaJKS7ovaUCAfTfeP+SKU3NDEQBKG
+         X5UJJrKhPzn5aPiK0tCRQJAOx6GCV3NJsv3ahtsP55qKWaBjuwD0lhuhZ7DUAnzH2Bqi
+         xTdlPhbbBl8o0UjlB3xFGoTkKtSRVV4p9yrPaPR5H7gbe9K3tQbQ7wWiI5CqXlpdFWM8
+         f/0JJGm1fMj8xFUACo8xRr+jXCzDwQolfdJxkynDJdkQ2UF4Th9PtcXeaVPYfqoswlV8
+         Aq/PVHB7koAmFnt/R7pFT6gZpoWuv9XuLOvXP3EaArqfs7jj/mUGLbxUcDBhuwbfpng2
+         nQBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QUdcFIHu39jksi7ynt9bLceAH97MdpNVo4rpRP5wDxA=;
-        b=crX90z5E9OUILsjl2L2mVKdEA5UVsvPtdsT9LccXMB/4gaKB4JmyE+Q5MOUrq1uWNO
-         nCTBJc3sQGJifcQlYcRGiCwy24Rs9ELTkikjOICNsM8D1BuanP1wf/vTfL2tBmuL2DW2
-         Oahn9fSfItpv3K0y2vke1vVsyjkIHsr1hn9qe7FvDhXTE3TNseT1ktn19qBhdS3CO0Vh
-         CkvIV+UovfpX/rBHSv1DsicpLFZ38nYxvyiAaGcGTpAflfKVd4vne70AiwFmYA7wDQ7e
-         fJ+F1xe0O/jifdftooMhOBO/JUJQT0XpOCLLSmjglyTpyjKfVbhxqIUfAoZHkjfviXrH
-         4JwA==
-X-Gm-Message-State: APjAAAUAnkPnI5YasWKKd9nSKoFL/BwKsVYNdrpqO+W0Ms81itPng0m9
-        T5DQCKmBlzmrgDkXU8ZeKO6qcYIOw1b3qOXjgA==
-X-Google-Smtp-Source: APXvYqwX+BrVZpG6yKZAh3Bi2/8YkqAOC3OkW4HBtJSFo1M5z91sf3kv6h+ILziIreDIob+qa2fkjM3sHo8lRmrD7Nw=
-X-Received: by 2002:a2e:9e55:: with SMTP id g21mr32261678ljk.245.1582580219775;
- Mon, 24 Feb 2020 13:36:59 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=okoEokk8koFi0gbrNVrs/CtK734/+xWplYEPxW27+Gc=;
+        b=LtWhOWBg4FDJdDjGaBzQcYApdIoX3PqBiDtIm0Ep0iiiCPLZbI8IyYxqipMOdAG5JR
+         9dolEYQFgoDlv4mwB9r8WOtROuI2CA9Q4owI7dl6GMTmDQXqcMoLNAMoP1uDNwpJMX1x
+         SdnBKtSOWhNxG1NWCZXw7NryMDmQ8byxe7ys7RKIc02ZojMlww67PFqfAeauTfvOd6Gk
+         loh2OxHtlfdfpedbQn/N9l8d/nNfZGKH3VOer9uq+QwzsPK7PDnW+9uo/SOQV+66HIV9
+         AT4c4ZHoHHF4pfJ2ZtFZLiwod1sbFzEK7dgqKO84zn0sK3yUnr6m5WB9ODPBm8vWckoB
+         XStQ==
+X-Gm-Message-State: APjAAAVhnCJuCe9ahEuCTNDMUud4ybPsTlHvgchbSOvykSEwUTFhzr+K
+        ytyJ3tiH8kua+UseiGXtrq9uS8jpZItF3q1wtqeBQA==
+X-Google-Smtp-Source: APXvYqyvB53aFrIiMdZSK+Pyl7Sam7svWwN4rs//H5xeSV3qfK+PHY59oqCwhlbWovNG9LjrT85SyFgM+QyFjzuDSKs=
+X-Received: by 2002:a02:5b8a:: with SMTP id g132mr2106136jab.78.1582583261895;
+ Mon, 24 Feb 2020 14:27:41 -0800 (PST)
 MIME-Version: 1.0
-References: <20200224131510.20608-1-metze@samba.org> <20200224131510.20608-4-metze@samba.org>
- <87pne34zye.fsf@suse.com> <CAH2r5msm43TLWYUx++9+tND2rOBDUFuZJ4+vtiTPQwQiqPbSyQ@mail.gmail.com>
-In-Reply-To: <CAH2r5msm43TLWYUx++9+tND2rOBDUFuZJ4+vtiTPQwQiqPbSyQ@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Mon, 24 Feb 2020 13:36:48 -0800
-Message-ID: <CAKywueSXfMM6Pz6Wv85pRqYsqy---PS1s-0dWVuTAdKtogdLkg@mail.gmail.com>
-Subject: Re: [PATCH v1 03/13] cifs: make use of cap_unix(ses) in cifs_reconnect_tcon()
-To:     Steve French <smfrench@gmail.com>
-Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@samba.org>,
-        Stefan Metzmacher <metze@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+References: <20200225075237.61e103e4@canb.auug.org.au>
+In-Reply-To: <20200225075237.61e103e4@canb.auug.org.au>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 24 Feb 2020 16:27:31 -0600
+Message-ID: <CAH2r5mv0YhqRNYogxo4TkK9FdzG1JrDz1SBfQt2+91RgdiAEfg@mail.gmail.com>
+Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The first tree patches look good.
+fixed
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
-
---
-Best regards,
-Pavel Shilovsky
-
-=D0=BF=D0=BD, 24 =D1=84=D0=B5=D0=B2=D1=80. 2020 =D0=B3. =D0=B2 12:39, Steve=
- French <smfrench@gmail.com>:
+On Mon, Feb 24, 2020 at 2:52 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
 >
-> First three patches in this series merged into cifs-2.6.git for-next
-> (and the buildbot's github tree) pending more testing and review
+> Hi all,
 >
-> On Mon, Feb 24, 2020 at 12:12 PM Aur=C3=A9lien Aptel <aaptel@samba.org> w=
-rote:
-> >
-> > Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-> >
-> > --
-> > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnber=
-g, DE
-> > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
-=C3=BCnchen)
+> Commit
 >
+>   39452a5239bb ("cifs: call wake_up(&server->response_q) inside of cifs_reconnect()")
 >
+> is missing a Signed-off-by from its committer.
 >
 > --
-> Thanks,
->
-> Steve
+> Cheers,
+> Stephen Rothwell
+
+
+
+-- 
+Thanks,
+
+Steve
