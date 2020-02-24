@@ -1,258 +1,231 @@
-Return-Path: <SRS0=0fOs=4L=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Mxq5=4M=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAEB3C35671
-	for <linux-cifs@archiver.kernel.org>; Sun, 23 Feb 2020 08:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FF6C35670
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 02:00:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7364D205C9
-	for <linux-cifs@archiver.kernel.org>; Sun, 23 Feb 2020 08:16:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s1ift0Dj"
+	by mail.kernel.org (Postfix) with ESMTP id AC82C205C9
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 02:00:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726236AbgBWIQZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 23 Feb 2020 03:16:25 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:52679 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726208AbgBWIQZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 23 Feb 2020 03:16:25 -0500
-Received: by mail-pj1-f65.google.com with SMTP id ep11so2692821pjb.2
-        for <linux-cifs@vger.kernel.org>; Sun, 23 Feb 2020 00:16:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=KYv/emFmvFmLFOlquTAP6rKDcRKbzfT6WmjrnyG17bY=;
-        b=s1ift0Dj4qR2HLFHzXoT19MH215ac/eli2FYfqnT9HY1PYKs+V646JvwvUlu0p7Udo
-         L/161+JWVEm8JqEj/hdOpk+IMLdQkibYMIkuDvlG6VdDAIP+qamjR5xfuEqLluikAxoD
-         lFW11AEbqqKqP9EFiKIM7o+05nbHyqfB7xRcRAcXajwwNOYdZ4a/itz3aLg/r092oqUV
-         zrhSXYeB6q2sVXks+UyO7BbIlgPBrsTjp2QjIZOEfL9aJI4Rp3KvMgdld/EczKig1Bt6
-         DPH3gzAKcrWkES22V1N/F0BZwVwZPEejXC/fTGcWUGFP8pYp+B/GKnjVnxJxcy+QABGQ
-         PzGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=KYv/emFmvFmLFOlquTAP6rKDcRKbzfT6WmjrnyG17bY=;
-        b=QBmN0QhdUNJfOC4nrBV0RegHU9EXikHATHGWdoM/8L4NQHmgsU6Tw3DqhtmQAdBRey
-         Z4PVqF6qaLdhrBota8sjEYcgFOohylUa0LYFD97wwCYd7xS8ndZNafGbr3qjj+64nPTm
-         SzXhs4L/W6+niFaYOutgjaH+DCGUTl0sINvX27oUvInguZ5IMlckcy6WblIuInbUNLGL
-         W9pZURdxiERHP0lbwbJowTImrOxPeWSlBU48/xMf6OrwXd+WoNgwxyavpGfpeblQzXvr
-         HVVCD2tW5tnbmIVrZY1bmEtux2rHdA54dXK5rqWb/1sOGparzB1gU0xpNRZte/iOTs+R
-         hrWQ==
-X-Gm-Message-State: APjAAAXuFmzKbP2DkToGLh8sRqSdm8DoPogRNz1yVgUysE8ZZ3G6m37B
-        M1t9Gw0zYe6mtGvSO5/XAK8=
-X-Google-Smtp-Source: APXvYqw3HwDiTUg+cQjt6okcQf/FEGZECSEf/k7jmLQXMwKX1C7JxfVIHIvuck0ftXTXt8MUl7V5fA==
-X-Received: by 2002:a17:90a:5d18:: with SMTP id s24mr12661859pji.141.1582445784385;
-        Sun, 23 Feb 2020 00:16:24 -0800 (PST)
-Received: from localhost ([43.224.245.179])
-        by smtp.gmail.com with ESMTPSA id e9sm7902865pjt.16.2020.02.23.00.16.23
-        (version=TLS1_2 cipher=AES128-SHA bits=128/128);
-        Sun, 23 Feb 2020 00:16:23 -0800 (PST)
-From:   qiwuchen55@gmail.com
-To:     sfrench@samba.org
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        chenqiwu <chenqiwu@xiaomi.com>
-Subject: [PATCH] cifs: cifs_debug: list_for_each() -> list_for_each_entry()
-Date:   Sun, 23 Feb 2020 16:16:19 +0800
-Message-Id: <1582445779-3842-1-git-send-email-qiwuchen55@gmail.com>
-X-Mailer: git-send-email 1.9.1
+        id S1727166AbgBXCAB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 23 Feb 2020 21:00:01 -0500
+Received: from ishtar.tlinx.org ([173.164.175.65]:51816 "EHLO
+        Ishtar.sc.tlinx.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727151AbgBXCAB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 23 Feb 2020 21:00:01 -0500
+Received: from [192.168.3.12] (Athenae [192.168.3.12])
+        by Ishtar.sc.tlinx.org (8.14.7/8.14.4/SuSE Linux 0.8) with ESMTP id 01O1xueA033845;
+        Sun, 23 Feb 2020 17:59:58 -0800
+Message-ID: <5E532E1C.7090009@tlinx.org>
+Date:   Sun, 23 Feb 2020 17:59:56 -0800
+From:   L Walsh <cifs@tlinx.org>
+User-Agent: Thunderbird
+MIME-Version: 1.0
+To:     Steve French <smfrench@gmail.com>
+CC:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Linux-Kernel <linux-kernel@vger.kernel.org>
+Subject: Re: Regression -- linux 5.5.3: can no longer mount with unix extentions
+ using cifs 2.1 (Win10-only client additions).
+References: <5E51DAEA.8090702@tlinx.org> <CAH2r5mtNgEi1noHAY0v_LmnwFOOZ1LsQ20zwTwWNk4uL5HY3EA@mail.gmail.com>
+In-Reply-To: <CAH2r5mtNgEi1noHAY0v_LmnwFOOZ1LsQ20zwTwWNk4uL5HY3EA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: chenqiwu <chenqiwu@xiaomi.com>
-
-Use list_for_each_entry() instead of list_for_each() to simplify code.
-
-Signed-off-by: chenqiwu <chenqiwu@xiaomi.com>
+On 2020/02/22 17:57, Steve French wrote:
+> This is unlikely related to smb2.1 ... As it doesn't support either 
+> smb1 Unix extensions or smb3.1.1 posix extensions.
 ---
- fs/cifs/cifs_debug.c | 68 +++++++++++++++-------------------------------------
- 1 file changed, 19 insertions(+), 49 deletions(-)
+    Shouldn't the mount have fallen back automatically to the unix 
+extensions
+that worked?  I have had the hard links working correctly which I thought
+required the unix extensions.  Right now, it seems my ability to
+access my win7 workstation from the unix client is messed up -- get
+permission errors all over the place, so this limits my testing.
 
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 276e4b5..7825d3b 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -48,7 +48,6 @@ void cifs_dump_detail(void *buf, struct TCP_Server_Info *server)
- void cifs_dump_mids(struct TCP_Server_Info *server)
- {
- #ifdef CONFIG_CIFS_DEBUG2
--	struct list_head *tmp;
- 	struct mid_q_entry *mid_entry;
- 
- 	if (server == NULL)
-@@ -56,8 +55,7 @@ void cifs_dump_mids(struct TCP_Server_Info *server)
- 
- 	cifs_dbg(VFS, "Dump pending requests:\n");
- 	spin_lock(&GlobalMid_Lock);
--	list_for_each(tmp, &server->pending_mid_q) {
--		mid_entry = list_entry(tmp, struct mid_q_entry, qhead);
-+	list_for_each_entry(mid_entry, &server->pending_mid_q, qhead) {
- 		cifs_dbg(VFS, "State: %d Cmd: %d Pid: %d Cbdata: %p Mid %llu\n",
- 			 mid_entry->mid_state,
- 			 le16_to_cpu(mid_entry->command),
-@@ -163,7 +161,6 @@ static void cifs_debug_tcon(struct seq_file *m, struct cifs_tcon *tcon)
- 
- static int cifs_debug_files_proc_show(struct seq_file *m, void *v)
- {
--	struct list_head *stmp, *tmp, *tmp1, *tmp2;
- 	struct TCP_Server_Info *server;
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
-@@ -178,17 +175,12 @@ static int cifs_debug_files_proc_show(struct seq_file *m, void *v)
- 	seq_printf(m, " <filename>\n");
- #endif /* CIFS_DEBUG2 */
- 	spin_lock(&cifs_tcp_ses_lock);
--	list_for_each(stmp, &cifs_tcp_ses_list) {
--		server = list_entry(stmp, struct TCP_Server_Info,
--				    tcp_ses_list);
--		list_for_each(tmp, &server->smb_ses_list) {
--			ses = list_entry(tmp, struct cifs_ses, smb_ses_list);
--			list_for_each(tmp1, &ses->tcon_list) {
--				tcon = list_entry(tmp1, struct cifs_tcon, tcon_list);
-+	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
-+		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
- 				spin_lock(&tcon->open_file_lock);
--				list_for_each(tmp2, &tcon->openFileList) {
--					cfile = list_entry(tmp2, struct cifsFileInfo,
--						     tlist);
-+				list_for_each_entry(cfile, &tcon->openFileList,
-+						    tlist) {
- 					seq_printf(m,
- 						"0x%x 0x%llx 0x%x %d %d %d %s",
- 						tcon->tid,
-@@ -215,7 +207,6 @@ static int cifs_debug_files_proc_show(struct seq_file *m, void *v)
- 
- static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- {
--	struct list_head *tmp1, *tmp2, *tmp3;
- 	struct mid_q_entry *mid_entry;
- 	struct TCP_Server_Info *server;
- 	struct cifs_ses *ses;
-@@ -269,9 +260,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 
- 	i = 0;
- 	spin_lock(&cifs_tcp_ses_lock);
--	list_for_each(tmp1, &cifs_tcp_ses_list) {
--		server = list_entry(tmp1, struct TCP_Server_Info,
--				    tcp_ses_list);
-+	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
- 
- #ifdef CONFIG_CIFS_SMB_DIRECT
- 		if (!server->rdma)
-@@ -355,9 +344,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 			seq_printf(m, " posix");
- 
- 		i++;
--		list_for_each(tmp2, &server->smb_ses_list) {
--			ses = list_entry(tmp2, struct cifs_ses,
--					 smb_ses_list);
-+		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
- 			if ((ses->serverDomain == NULL) ||
- 				(ses->serverOS == NULL) ||
- 				(ses->serverNOS == NULL)) {
-@@ -413,9 +400,7 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 			else
- 				seq_puts(m, "none\n");
- 
--			list_for_each(tmp3, &ses->tcon_list) {
--				tcon = list_entry(tmp3, struct cifs_tcon,
--						  tcon_list);
-+			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
- 				++j;
- 				seq_printf(m, "\n\t%d) ", j);
- 				cifs_debug_tcon(m, tcon);
-@@ -424,9 +409,8 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 			seq_puts(m, "\n\tMIDs:\n");
- 
- 			spin_lock(&GlobalMid_Lock);
--			list_for_each(tmp3, &server->pending_mid_q) {
--				mid_entry = list_entry(tmp3, struct mid_q_entry,
--					qhead);
-+			list_for_each_entry(mid_entry, &server->pending_mid_q,
-+					    qhead) {
- 				seq_printf(m, "\tState: %d com: %d pid:"
- 					      " %d cbdata: %p mid %llu\n",
- 					      mid_entry->mid_state,
-@@ -465,7 +449,6 @@ static ssize_t cifs_stats_proc_write(struct file *file,
- {
- 	bool bv;
- 	int rc;
--	struct list_head *tmp1, *tmp2, *tmp3;
- 	struct TCP_Server_Info *server;
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
-@@ -486,9 +469,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
- 		GlobalCurrentXid = 0;
- 		spin_unlock(&GlobalMid_Lock);
- 		spin_lock(&cifs_tcp_ses_lock);
--		list_for_each(tmp1, &cifs_tcp_ses_list) {
--			server = list_entry(tmp1, struct TCP_Server_Info,
--					    tcp_ses_list);
-+		list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
- 			server->max_in_flight = 0;
- #ifdef CONFIG_CIFS_STATS2
- 			for (i = 0; i < NUMBER_OF_SMB2_COMMANDS; i++) {
-@@ -499,13 +480,10 @@ static ssize_t cifs_stats_proc_write(struct file *file,
- 				server->fastest_cmd[0] = 0;
- 			}
- #endif /* CONFIG_CIFS_STATS2 */
--			list_for_each(tmp2, &server->smb_ses_list) {
--				ses = list_entry(tmp2, struct cifs_ses,
--						 smb_ses_list);
--				list_for_each(tmp3, &ses->tcon_list) {
--					tcon = list_entry(tmp3,
--							  struct cifs_tcon,
--							  tcon_list);
-+			list_for_each_entry(ses, &server->smb_ses_list,
-+					    smb_ses_list) {
-+				list_for_each_entry(tcon, &ses->tcon_list,
-+						    tcon_list) {
- 					atomic_set(&tcon->num_smbs_sent, 0);
- 					spin_lock(&tcon->stat_lock);
- 					tcon->bytes_read = 0;
-@@ -530,7 +508,6 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
- #ifdef CONFIG_CIFS_STATS2
- 	int j;
- #endif /* STATS2 */
--	struct list_head *tmp1, *tmp2, *tmp3;
- 	struct TCP_Server_Info *server;
- 	struct cifs_ses *ses;
- 	struct cifs_tcon *tcon;
-@@ -561,9 +538,7 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
- 
- 	i = 0;
- 	spin_lock(&cifs_tcp_ses_lock);
--	list_for_each(tmp1, &cifs_tcp_ses_list) {
--		server = list_entry(tmp1, struct TCP_Server_Info,
--				    tcp_ses_list);
-+	list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
- 		seq_printf(m, "\nMax requests in flight: %d", server->max_in_flight);
- #ifdef CONFIG_CIFS_STATS2
- 		seq_puts(m, "\nTotal time spent processing by command. Time ");
-@@ -582,13 +557,8 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
- 					atomic_read(&server->smb2slowcmd[j]),
- 					server->hostname, j);
- #endif /* STATS2 */
--		list_for_each(tmp2, &server->smb_ses_list) {
--			ses = list_entry(tmp2, struct cifs_ses,
--					 smb_ses_list);
--			list_for_each(tmp3, &ses->tcon_list) {
--				tcon = list_entry(tmp3,
--						  struct cifs_tcon,
--						  tcon_list);
-+		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-+			list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
- 				i++;
- 				seq_printf(m, "\n%d) %s", i, tcon->treeName);
- 				if (tcon->need_reconnect)
--- 
-1.9.1
 
+However this problem with link/symlines I can preproduce:
+I was able to create some type of symlink/softlink as well as
+able to use existing symlinks on windows to access other windows
+destinations.
+
+For example (following are 4 dir listings of my C-drive
+root).  First is how things look under win cmd. and 1A is cygwin listing 
+
+2rd is slightly interesting it's how the linux client see that same root.
+without cifsacls in place.
+
+3th is the most broken showing howt he linux client sees the root mounting
+it with cifsacls.
+
+If note: 'bliss/Isthar' is my domain server.
+---------------------------
+
+Win7 View of files in root of C drive:
+Win7 dir of win7 root:
+2016/09/24  13:55    <SYMLINKD>     D [\\Bliss\Documents]
+2016/06/13  17:40    <SYMLINKD>     Documents [\\Bliss\Documents]
+2015/06/05  11:52    <SYMLINKD>     FolderChanger [M:\FolderChanger]
+2017/05/13  01:02    <SYMLINKD>     Home [Users]
+2017/05/13  01:02    <SYMLINKD>     lib64 [lib]
+2016/01/14  21:17    <SYMLINKD>     M [\\Ishtar\Music\Anime]
+2016/09/24  13:54    <SYMLINKD>     P [D:\Pictures]
+2014/11/06  19:45    <JUNCTION>     Prog [C:\Program Files (x86)]
+2013/04/21  22:53    <SYMLINKD>     Prog64 [Program Files]
+2015/08/09  15:05    <JUNCTION>     ProgD [C:\ProgramData]
+2019/02/22  16:15    <JUNCTION>     S [\??\\\Bliss\Share]
+2017/04/17  08:45    <SYMLINKD>     Share [S:\]
+2019/06/27  21:17    <JUNCTION>     T [C:\??\Bliss\Share]
+2014/01/12  14:07    <SYMLINKD>     temp [tmp]
+
+
+1a) As an aside, for completeness of listing types:
+Cygwin on the workstation, cygwin loses info in regards to
+reparsed points junctions and mountd(not shown) vs. symlinks.
+
+drwxrwxr-x+  1            0 Feb 13 10:47 D/
+lrwxrwxrwx   1           17 Jun 13  2016 Documents -> //Bliss/Documents/
+lrwxrwxrwx   1           16 Jun  5  2015 FolderChanger -> /m/FolderChanger/
+lrwxrwxrwx   1            5 May 13  2017 Home -> Users/
+drwxrwxr-x+  1            0 May 17  2019 M/
+drwxrwxr-x+  1            0 Jan 22 16:18 P/
+lrwxrwxrwx   1           20 Nov  6  2014 Prog -> /Program Files (x86)/
+lrwxrwxrwx   1           13 Apr 21  2013 Prog64 -> Program Files/
+lrwxrwxrwx   1           12 Aug  9  2015 ProgD -> /ProgramData/
+drwxrwxr-x   1            0 Feb 23 04:02 S/
+lrwxrwxrwx   1            2 Apr 17  2017 Share -> /s/
+drwxrwxr-x   1            0 Feb 19 03:54 T/
+lrwxrwxrwx   1            3 May 13  2017 lib64 -> lib/
+
+
+2: mount as 1 user: seems to be mostly good.
+(basic diff -- no 'cifsacl' on mount;  Note that the links listed below
+do work and put you in their target)
+Linux5.5.3 Client of Win7 root:
+
+(mount options: 
+user,noauto,rw,uid=law,gid=Administrators,domainauto,resilienthandles,noblocksend,serverino,nocase,vers=2.1,credentials=/home/law/.ssh/athenae,setuids,noauto,rsize=1048576,wsize=1048576)
+(kernellog:
+[743714.609791] CIFS: Attempting to mount //Athenae/C/)
+
+l--------- 1            0 Sep 24  2016 D -> /??/UNC/Bliss/Documents/
+l--------- 1            0 Jun 13  2016 Documents -> /??/UNC/Bliss/Documents/
+l--------- 1            0 Jun  5  2015 FolderChanger -> 
+/??/M:/FolderChanger/
+l--------- 1            0 May 13  2017 Home -> Users/
+l--------- 1            0 Jan 14  2016 M -> /??/UNC/Ishtar/Music/Anime/
+l--------- 1            0 Sep 24  2016 P -> /??/D:/Pictures/
+drwxr-xr-x 2            0 Nov  6  2014 Prog/
+l--------- 1            0 Apr 21  2013 Prog64 -> Program Files/
+drwxr-xr-x 2            0 Aug  9  2015 ProgD/
+drwxr-xr-x 2            0 Feb 22  2019 S/
+l--------- 1            0 Apr 17  2017 Share -> /??/S://
+drwxr-xr-x 2            0 Jun 27  2019 T/
+l--------- 1            0 May 13  2017 lib64 -> lib/
+l--------- 1            0 Jan 12  2014 temp -> tmp/
+
+
+
+
+This is where problems are: -- multiple errors listed in kernel
+
+Same kernel (Linux5.5.3) Client of Win7 root:
+This mount line adds 'cifsacl':
+(mount options: 
+user,noauto,rw,uid=law,gid=Administrators,cifsacl,domainauto,resilienthandles,noblocksend,serverino,nocase,vers=2.1,credentials=/home/law/.ssh/athenae,setuids,noauto,rsize=1048576,wsize=1048576 
+0 0
+
+kernellog:
+[786299.920847] CIFS: Attempting to mount //Athenae/C/
+[786317.942002] cifs_acl_to_fattr: 1 callbacks suppressed
+[786317.942004] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786317.955716] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786317.964091] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786317.972594] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786317.980362] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786317.987305] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786317.997108] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786318.004615] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786318.014402] CIFS VFS: Autodisabling the use of server inode numbers 
+on \\Athenae\C.
+----Note, NOW, server inodes doesn't work
+
+[786318.022149] CIFS VFS: The server doesn't seem to support them 
+properly or the files might be on different servers (DFS).
+[786318.033131] CIFS VFS: Hardlinks will not be recognized on this 
+mount. Consider mounting with the "noserverino" option to silence this 
+message.
+--
+-----and NOW hardlinks won't work.
+
+
+[786318.051199] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786318.058613] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.484773] cifs_acl_to_fattr: 1 callbacks suppressed
+[786327.484775] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.498098] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.506405] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.515147] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.523366] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.530254] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.541838] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.549552] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.562458] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+[786327.569879] CIFS VFS: cifs_acl_to_fattr: error -95 getting sec desc
+
+****output on user terminal:  Not really desirable or usable output:
+
+ls: cannot access '/Athenae/D': Operation not supported
+ls: cannot access '/Athenae/Documents': Operation not supported
+ls: cannot access '/Athenae/FolderChanger': Operation not supported
+ls: cannot access '/Athenae/Home': Operation not supported
+ls: cannot access '/Athenae/lib64': Operation not supported
+ls: cannot access '/Athenae/M': Operation not supported
+ls: cannot access '/Athenae/P': Operation not supported
+ls: cannot access '/Athenae/pagefile.sys': Device or resource busy
+ls: cannot access '/Athenae/Prog64': Operation not supported
+ls: cannot access '/Athenae/S': No such file or directory
+ls: cannot access '/Athenae/Share': Operation not supported
+ls: cannot access '/Athenae/Symbols': Operation not supported
+ls: cannot access '/Athenae/Symbols-': Input/output error
+ls: cannot access '/Athenae/T': No such file or directory
+ls: cannot access '/Athenae/temp': Operation not supported
+
+**** nothing is readable though permissions should allow
+
+d????????? ?       ?            ? D/
+d????????? ?       ?            ? Documents/
+d????????? ?       ?            ? FolderChanger/
+d????????? ?       ?            ? Home/
+d????????? ?       ?            ? M/
+d????????? ?       ?            ? P/
+drwx------ 2   98304 Feb 14 14:34 Prog/
+d????????? ?       ?            ? Prog64/
+drwx------ 2   40960 Jan 27 09:41 ProgD/
+d????????? ?       ?            ? S/
+d????????? ?       ?            ? Share/
+d????????? ?       ?            ? T/
+d????????? ?       ?            ? lib64/
+d????????? ?       ?            ? temp/
+
+
+
+
+---------------------------
+>
+> There was an issue with inode numbers returned for root of drives in 
+> windows (returning zero incorrectly). Can you see if this works to non 
+> root share?
+----
+    I only have one (1) disk on my windows box...various reasons.
+O.T.
+
+OF note my login from the linux client has no access
