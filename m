@@ -2,87 +2,103 @@ Return-Path: <SRS0=Mxq5=4M=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F6BC38BE6
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 20:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82AE3C38BF9
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 21:37:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA1132176D
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 20:52:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5252921556
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 21:37:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="WN8t6JCT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ub27fz6D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727249AbgBXUw6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 24 Feb 2020 15:52:58 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38675 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726722AbgBXUw5 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 24 Feb 2020 15:52:57 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 48RDm56mz5z9sNg;
-        Tue, 25 Feb 2020 07:52:53 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1582577574;
-        bh=MAXNZNQzY7aWe610oRUrFuU3fPXDxQs5ZuGRxGqGl+s=;
-        h=Date:From:To:Cc:Subject:From;
-        b=WN8t6JCTEEWspOP6wUG02//WxqNNyCl/nUuZHhC/p8JPKQjxiHFOy1L9sKlIjpQu9
-         cyDZF3y36tuIjFmlxiTm6CI/+zUxFHldY9pou8K57hfmOJeZbbEhtayxMZbGlKw6C9
-         AlZWbSjlSrGPToKerpyHYk2L6HZj2W1q58gZqmG5Fln0guHeRcngd7ajwo2zsCIeP1
-         Fc2Hfv/qIQWW4y/dQjQM6DyEQR25221idG1gqpyC8xliSu+gRCYEqZJuZrkNKJNP9b
-         BI4pF/xKXdCMbJdT4EPscVz3EgmfW5fzhF25ETjdiMWaGlIRXWjt5uSN6tBCW9vqU/
-         xUBFsK9pdbuCw==
-Date:   Tue, 25 Feb 2020 07:52:37 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commit in the cifs tree
-Message-ID: <20200225075237.61e103e4@canb.auug.org.au>
+        id S1727249AbgBXVhC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 24 Feb 2020 16:37:02 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:42249 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726980AbgBXVhB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Feb 2020 16:37:01 -0500
+Received: by mail-lj1-f195.google.com with SMTP id d10so11738592ljl.9
+        for <linux-cifs@vger.kernel.org>; Mon, 24 Feb 2020 13:37:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=QUdcFIHu39jksi7ynt9bLceAH97MdpNVo4rpRP5wDxA=;
+        b=ub27fz6DfSLSPltzurkE7UkcNJtP7RhBVVUqPEuxQP9RlCjTE3iKvaqd0KHAF/ucuv
+         PQU7zcg45dalqrsYwL29u8PMfVuY5K+r89okR/sTDUS5bVdlltjwr2+ScLPZ2QX4Fvie
+         sXEwZ1Dc27N/z9k3yvP1Z2bKz1tC/3wvFjI0p15aYj7+JTU1T4kRmJGpAcqghqeXUmv3
+         a2jjSbcKrNNY7XfTebsP99xSbm2rQaLJppiYRsGmcow7Z0lGxTeV7mgIkuQB51Z3Sy/J
+         Pgx2CHKiJ/+r2r+LAfAPiVvKuuDjTDBw5wNFR0Bku5Rut4oZbRtvRjtMgAqVTvFeB/lD
+         CHcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=QUdcFIHu39jksi7ynt9bLceAH97MdpNVo4rpRP5wDxA=;
+        b=crX90z5E9OUILsjl2L2mVKdEA5UVsvPtdsT9LccXMB/4gaKB4JmyE+Q5MOUrq1uWNO
+         nCTBJc3sQGJifcQlYcRGiCwy24Rs9ELTkikjOICNsM8D1BuanP1wf/vTfL2tBmuL2DW2
+         Oahn9fSfItpv3K0y2vke1vVsyjkIHsr1hn9qe7FvDhXTE3TNseT1ktn19qBhdS3CO0Vh
+         CkvIV+UovfpX/rBHSv1DsicpLFZ38nYxvyiAaGcGTpAflfKVd4vne70AiwFmYA7wDQ7e
+         fJ+F1xe0O/jifdftooMhOBO/JUJQT0XpOCLLSmjglyTpyjKfVbhxqIUfAoZHkjfviXrH
+         4JwA==
+X-Gm-Message-State: APjAAAUAnkPnI5YasWKKd9nSKoFL/BwKsVYNdrpqO+W0Ms81itPng0m9
+        T5DQCKmBlzmrgDkXU8ZeKO6qcYIOw1b3qOXjgA==
+X-Google-Smtp-Source: APXvYqwX+BrVZpG6yKZAh3Bi2/8YkqAOC3OkW4HBtJSFo1M5z91sf3kv6h+ILziIreDIob+qa2fkjM3sHo8lRmrD7Nw=
+X-Received: by 2002:a2e:9e55:: with SMTP id g21mr32261678ljk.245.1582580219775;
+ Mon, 24 Feb 2020 13:36:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/PMq/HqWQoevQGdgfHWnJ69F";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+References: <20200224131510.20608-1-metze@samba.org> <20200224131510.20608-4-metze@samba.org>
+ <87pne34zye.fsf@suse.com> <CAH2r5msm43TLWYUx++9+tND2rOBDUFuZJ4+vtiTPQwQiqPbSyQ@mail.gmail.com>
+In-Reply-To: <CAH2r5msm43TLWYUx++9+tND2rOBDUFuZJ4+vtiTPQwQiqPbSyQ@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Mon, 24 Feb 2020 13:36:48 -0800
+Message-ID: <CAKywueSXfMM6Pz6Wv85pRqYsqy---PS1s-0dWVuTAdKtogdLkg@mail.gmail.com>
+Subject: Re: [PATCH v1 03/13] cifs: make use of cap_unix(ses) in cifs_reconnect_tcon()
+To:     Steve French <smfrench@gmail.com>
+Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@samba.org>,
+        Stefan Metzmacher <metze@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/PMq/HqWQoevQGdgfHWnJ69F
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The first tree patches look good.
 
-Hi all,
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 
-Commit
+--
+Best regards,
+Pavel Shilovsky
 
-  39452a5239bb ("cifs: call wake_up(&server->response_q) inside of cifs_rec=
-onnect()")
-
-is missing a Signed-off-by from its committer.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/PMq/HqWQoevQGdgfHWnJ69F
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl5UN5UACgkQAVBC80lX
-0GwMwQf/RKRlhmK1GG9uxgicXXh6I9YeBC8wbuEM0dWRRh/PtFuBm3CJ4S1Rp/l7
-5qy7A4tMWBP0NZ4jYeVRVyNVZdhLpIykZGBgUiBUD0RVA0fiIDSgMfB5El+hJDJI
-SdvmjOBMxuif17PS08n7VcIWS84vKTQ2T8Ih/wgyHO0/olVR206fqvV/wzRgmZ1N
-gTj2JtDnWPDXbgX1g3ejWnOKzVvOK4SpcQdR6T5WtxN1E+rdB7TPHiMRhQoG78pL
-b1nGAWJMJhYAqLAVA+K9/uZpe9AO6ZmVhLlzOJPqb32ghZX/xapPm5bVqNRn7bqp
-VseVTIAUSNNIYkBIq0q9gedwfI43Gg==
-=EFT4
------END PGP SIGNATURE-----
-
---Sig_/PMq/HqWQoevQGdgfHWnJ69F--
+=D0=BF=D0=BD, 24 =D1=84=D0=B5=D0=B2=D1=80. 2020 =D0=B3. =D0=B2 12:39, Steve=
+ French <smfrench@gmail.com>:
+>
+> First three patches in this series merged into cifs-2.6.git for-next
+> (and the buildbot's github tree) pending more testing and review
+>
+> On Mon, Feb 24, 2020 at 12:12 PM Aur=C3=A9lien Aptel <aaptel@samba.org> w=
+rote:
+> >
+> > Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+> >
+> > --
+> > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnber=
+g, DE
+> > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
+=C3=BCnchen)
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
