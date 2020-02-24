@@ -2,64 +2,68 @@ Return-Path: <SRS0=Mxq5=4M=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23BBAC38BE2
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 19:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B10C38BE2
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 19:39:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E74F72080D
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 19:36:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A5F62080D
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 19:39:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iWcXJhnF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9kRuf9J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726593AbgBXTg5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 24 Feb 2020 14:36:57 -0500
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:34683 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726452AbgBXTg5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Feb 2020 14:36:57 -0500
-Received: by mail-lf1-f67.google.com with SMTP id l18so7693325lfc.1
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Feb 2020 11:36:56 -0800 (PST)
+        id S1726593AbgBXTjl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 24 Feb 2020 14:39:41 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:46978 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726452AbgBXTjl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 24 Feb 2020 14:39:41 -0500
+Received: by mail-lj1-f193.google.com with SMTP id x14so11410999ljd.13
+        for <linux-cifs@vger.kernel.org>; Mon, 24 Feb 2020 11:39:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=ijjCxN/28FlXrGzuIcLcmSw3EaxMb4V10DErszQLBR4=;
-        b=iWcXJhnFN9e+kmrej0AqWQpDtTqdUC6EfpyCJk160NKfBEEKNcLCVNgbrOwdZTN49t
-         JahZJb6rDUcARKy4t6uwuwsGisqpMMiFOaRnGmT668m2NKc/siQSRYAN2+6pVUriqVL9
-         3x6n1o2bEC5YMNTKgKB8zdMjMmYAoMBB/eU8gLo9Wigwnix1JMr6xHtbelRPAIAOLUSc
-         1OLoiQJxI3E9blzSF35cOmZ/3AF5LwLfrHBDwrRytyFwGEMDAz+gG8Sl1TAQn7A/ysQY
-         UFnwOx44kklvF7Z1afUZSRgPk0PBbAvt3S7/DS02YN5Ho0U0z35lWQaISNJzyStJOB7B
-         m7Rg==
+        bh=kYOMPSsxvVzfVid8qwJEguKtkDtd6InQllJLWbdjL+U=;
+        b=Q9kRuf9JuXoqdDeZbWF/TgCeS7sueMbUhtG2aLLPvFJF/2lMNyVtxL6NSsHiRiP0Vy
+         /azMWC2woXw4gI2G9XV7NVa7bgErkJLNoyDNc8EHS9Ubux19mioRTktsBdoZg9Bhi94O
+         fhpW6aKtmJMQqMa95yTbylUR20WTZ/TG1IW2SIlF4dAw4chpYGtbcdPbb3TtxtqtGfkV
+         Br9OznFhcOBrc3IIxd6x+NlOMNVWlFbzIrAmWGRStL3zXWV2je86KrQggt29GHInRgkW
+         0o7ZYunao4fnbp/hqJgB1PLYprDhJinYWDs6vPfH1ofjBhRDHFPpND46aI60M74nM0NH
+         e7zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ijjCxN/28FlXrGzuIcLcmSw3EaxMb4V10DErszQLBR4=;
-        b=TmChjT4PWihM9y8NjzWUiI1s9QBnpOz6zfHGberLrnvgqmkqUVMcpnzFsVY7sEbiLT
-         +Lk47jFdMTuVcl34/WnQZbtAEQaUladHuSYoeqWuXvUZgdqrJbbzOAQXX3uTy07q5LTa
-         oa4oxdWtE6B7sVVzlvRafuR4dR0dOivaJKWAZTg2SSgS38v4ml9R2s5kBWWv8lHE5Op5
-         8ozELdYQ9CHWeqTsYt4iTfi0rCtzEGTnw7np7YaPacQWbxJr6Cn/XuHQIORt2W+juxjQ
-         YbPYXlblsEquVj38hiRVCyYOM7RyaG2gtZspOQxX1sWMxYY3q3da1cNpUQRxqbLur/+m
-         V4UQ==
-X-Gm-Message-State: APjAAAXvK5L0IIF8uYn8lmzZRn4VJmoiwAeIRqArd+JSLWDSYaX3JbO/
-        3igVmfW+xCY5a8oSRcwDm4t/YYtYhAWVnr1J1w==
-X-Google-Smtp-Source: APXvYqzRX1Si432K7nf2FN0S4B9bSAQZpcQtgtQnQKmYARSzTcK+9eCXJ5D/YBne49C2YveVR0hAD5Zdsk5nybeHjko=
-X-Received: by 2002:ac2:4d41:: with SMTP id 1mr5481829lfp.171.1582573015330;
- Mon, 24 Feb 2020 11:36:55 -0800 (PST)
+        bh=kYOMPSsxvVzfVid8qwJEguKtkDtd6InQllJLWbdjL+U=;
+        b=bywBzUm2UOxIWvH/9cdq8BBLeZfOu8uaWIxdjSqOFDTu039IduXBLTbUwCyVM/oooS
+         6FXx2KhX0sHFhSp1FvRZxvm+YgXxjZ7l0T2ORoYkpJCzx4QHD57LnwSefwCyexaGcMKZ
+         Atn+De+VOlrGzZwONy9bPVKffnbm2HBhHrq/vymuOlPCNL+vNNq0F2vhGmajQ7niPqjw
+         i6c9JYjNqs6+Eoav1kAe/YBS5Ei+WZHIhqmZTBSsvGydBOrTmbQ9zwqGJmgLdirs2LQk
+         uiOb+P3eA9vRxuT9pKFVZOCfaG/onS/1HPwusA945AeuqdmiEr9U1/HtlGXp6VK4pIa6
+         4QEw==
+X-Gm-Message-State: APjAAAUHqjzl0/W4qkNG/pF1QRD7tslh/xthL+dQiP5AasSgxwq1yV0S
+        jbKvYDW64rzkjyJFaBLkslhrmH7VaZF75cLEV7w9Prs=
+X-Google-Smtp-Source: APXvYqwyhaQHtw2W385V95AZ4o3p/Niy+hn61o6vCLj65xISTEFhs4SURfYuIVfxD/lfK3bjZtCNtD8f9WIrTTlQhcs=
+X-Received: by 2002:a2e:556:: with SMTP id 83mr31209374ljf.127.1582573179487;
+ Mon, 24 Feb 2020 11:39:39 -0800 (PST)
 MIME-Version: 1.0
-References: <20200218200103.12574-1-lsahlber@redhat.com> <CAH2r5mvXp_KvT5CmpmsbNbb2bVD+qKRu22QPw3_KTq38UURFTA@mail.gmail.com>
-In-Reply-To: <CAH2r5mvXp_KvT5CmpmsbNbb2bVD+qKRu22QPw3_KTq38UURFTA@mail.gmail.com>
+References: <20200214043513.uh2jtb62qf54nmud@xzhoux.usersys.redhat.com>
+ <370134c148a5f4d12df31a3a9020b66ef316a004.camel@kernel.org>
+ <20200214142836.2rhitx3jfa5nxada@xzhoux.usersys.redhat.com>
+ <CAKywueRV8+8qVP6e5nsvbpMQtwDU5mQGw5h51w=5rOsCN+Oj0w@mail.gmail.com> <20200219021039.3mpkrmvipd6z3wes@xzhoux.usersys.redhat.com>
+In-Reply-To: <20200219021039.3mpkrmvipd6z3wes@xzhoux.usersys.redhat.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Mon, 24 Feb 2020 11:36:44 -0800
-Message-ID: <CAKywueSsso_n_KM5qv9kuLVEPyjUaqh3u973EJ_+RLRaGwBFtg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: don't leak -EAGAIN for stat() during reconnect
-To:     Steve French <smfrench@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+Date:   Mon, 24 Feb 2020 11:39:27 -0800
+Message-ID: <CAKywueRvfABoVrdipic6x5_V31K0sOqs8T5y9VzJuyB4Q40bUQ@mail.gmail.com>
+Subject: Re: [PATCH] CIFS: unlock file across process
+To:     Murphy Zhou <jencce.kernel@gmail.com>
+Cc:     Jeff Layton <jlayton@kernel.org>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
@@ -67,86 +71,32 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=B2=D1=82, 18 =D1=84=D0=B5=D0=B2=D1=80. 2020 =D0=B3. =D0=B2 15:27, Steve=
- French <smfrench@gmail.com>:
+=D0=B2=D1=82, 18 =D1=84=D0=B5=D0=B2=D1=80. 2020 =D0=B3. =D0=B2 18:10, Murph=
+y Zhou <jencce.kernel@gmail.com>:
 >
-> merged into cifs-2.6.git for-next
+> On Fri, Feb 14, 2020 at 11:03:00AM -0800, Pavel Shilovsky wrote:
+> > Also, please make sure that resulting patch works against Windows file
+> > share since the locking semantics may be different there.
 >
-> On Tue, Feb 18, 2020 at 2:07 PM Ronnie Sahlberg <lsahlber@redhat.com> wro=
-te:
+> OK.
+>
 > >
-> > If from cifs_revalidate_dentry_attr() the SMB2/QUERY_INFO call fails wi=
-th an
-> > error, such as STATUS_SESSION_EXPIRED, causing the session to be reconn=
-ected
-> > it is possible we will leak -EAGAIN back to the application even for
-> > system calls such as stat() where this is not a valid error.
-> >
-> > Fix this by re-trying the operation from within cifs_revalidate_dentry_=
-attr()
-> > if cifs_get_inode_info*() returns -EAGAIN.
-> >
-> > This fixes stat() and possibly also other system calls that uses
-> > cifs_revalidate_dentry*().
-> >
-> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/inode.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> > index b5e6635c578e..1212ace05258 100644
-> > --- a/fs/cifs/inode.c
-> > +++ b/fs/cifs/inode.c
-> > @@ -2073,6 +2073,7 @@ int cifs_revalidate_dentry_attr(struct dentry *de=
-ntry)
-> >         struct inode *inode =3D d_inode(dentry);
-> >         struct super_block *sb =3D dentry->d_sb;
-> >         char *full_path =3D NULL;
-> > +       int count =3D 0;
-> >
-> >         if (inode =3D=3D NULL)
-> >                 return -ENOENT;
-> > @@ -2094,15 +2095,18 @@ int cifs_revalidate_dentry_attr(struct dentry *=
-dentry)
-> >                  full_path, inode, inode->i_count.counter,
-> >                  dentry, cifs_get_time(dentry), jiffies);
-> >
-> > +again:
-> >         if (cifs_sb_master_tcon(CIFS_SB(sb))->unix_ext)
-> >                 rc =3D cifs_get_inode_info_unix(&inode, full_path, sb, =
-xid);
-> >         else
-> >                 rc =3D cifs_get_inode_info(&inode, full_path, NULL, sb,
-> >                                          xid, NULL);
-> > -
-> > +       if (is_retryable_error(rc) && count++ < 10)
-> > +               goto again;
+> > Depending on a kind of lease we have on a file, locks may be cached or
+> > not. We probably don't want to have different behavior for cached and
+> > non-cached locks. Especially given the fact that a lease may be broken
+> > in the middle of app execution and the different behavior will be
+> > applied immediately.
+>
+> Testing new patch with and without cache=3Dnone option, both samba
+> and Win2019 server.
+>
+> Thanks very much for reviewing!
+>
 
-If there is interrupt error, you will end up doing 10 attempts with
-the same outcome - interrupt error. Such errors should be returned to
-the upper layers to be handled correctly (restart of a system call or
-return of EINTR error to the user space).
-
-Please revert to your original version that handles EAGAIN only.
+cache=3Dnone only affects IO and doesn't change the client behavior
+regarding locks. "nolease" mount option can be used to turn off leases
+and make all locks go to the server.
 
 --
 Best regards,
 Pavel Shilovsky
-
-> >  out:
-> >         kfree(full_path);
-> >         free_xid(xid);
-> > +
-> >         return rc;
-> >  }
-> >
-> > --
-> > 2.13.6
-> >
->
->
-> --
-> Thanks,
->
-> Steve
