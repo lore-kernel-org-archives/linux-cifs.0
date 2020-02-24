@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1985AC11D30
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 13:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A908C11D2F
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 13:16:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E5C9520838
-	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 13:15:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EA7A20828
+	for <linux-cifs@archiver.kernel.org>; Mon, 24 Feb 2020 13:16:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="O2gBoUey"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="evV/kRFA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727510AbgBXNP6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 24 Feb 2020 08:15:58 -0500
+        id S1727515AbgBXNQA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 24 Feb 2020 08:16:00 -0500
 Received: from hr2.samba.org ([144.76.82.148]:41900 "EHLO hr2.samba.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727299AbgBXNP6 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 24 Feb 2020 08:15:58 -0500
+        id S1727299AbgBXNP7 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 24 Feb 2020 08:15:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Message-Id:Date:Cc:To:From;
-        bh=mtilYb3PJCQGi4skmKYWlpj2keUF1IlKC3+yztwWDW8=; b=O2gBoUeyMO3U7+MlunXW3NeLmo
-        tNAsTg1xaSfTjhJLvhhlwfaUfpvHBWKK9UafdBKKU1iEBkNWZlINCJIFppJg5EDjQPtEFCJ3S9iug
-        xkpvnAPSeQz7F/I04p5FAtfe7tZgRxsOkaQ32acaD9yinIrm/uUYQxmlbaaUyOD7WZtbaW6oN4Fcc
-        F7aQyqbob9fGgR0ZtYDiR2Vh6Ht3bPju89v8XTdWjI4U89JQ8bv2gIdeFrLuVrY6mnIJ+S3KfK1R5
-        jKUWwBxJ7UOhG926UyfU9NidFtiFmJEyJSpEPy0fo1x6UQ70clyvRKbRJiJEp83ZWN5oGQN5YEz5J
-        lPDX7YZ+Z12cnPLOrI+WAZGbGihxRYwibgiEun2Mn0sEW8flSOFwKia9WPO71cwuDw49Aexsd4xx6
-        Ja0OD8VkfGumzaGlfZVXULe3kGJl2ca6YMC6EuxF12qWACtaZF8rbFyCn1v6u3Sq/AiD12KKYxY5A
-        5QzduxmtaqOnYRqh4G3EAF3/;
+        bh=Lnzk87gzlPDD2Ke8eoX8So/Qf8ffZufw/NezDqjHb7Y=; b=evV/kRFAi7dm0GyIe9s2WxTWNV
+        MDzupPqXFxiuAKfGybrdZ9gMEzZAl6Xjh/azNY386ZXPQwTLv98CvyhM0XiarVBRgZDq8vN4D1nAD
+        THj5//nSQqHVKti9JhJzhIHqMELVdil43fWlhD+jCdLBvzbxlKrMWjA19D9O4iVh3wbKggNvH+OaX
+        oCikVRdH7IRJaXENkYovIkWzDHpsha6N4siBNsEl8yn/fyw7HgPjUwQHMoWMEKh2W4aOhZ9nWiWCs
+        dKRVYHLRFyicfTs9fZ/wtOB0p3WZLQh0H68N2Zbpu8rQjQNdV6m0k/xLeJ3SoT54x5ny6cxoP1xml
+        BbIRBlQwaJwUpWA7pV79fez0zEPOlSCQNd9rI+1vcZ4deSjMc5S6O9p03iZwX6ENXCZhIBKFhVnF4
+        FOE0kQcu32j/azkYFQo4xsdkCri2gmcXrDTrVW4xcpDghZyEb1Aqp7CP9WDSlpqm9E9X8DEf828vG
+        j1ts967OKA3DMSPMy1YjZxTy;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1j6DaQ-00061e-0N; Mon, 24 Feb 2020 13:15:50 +0000
+        id 1j6DaP-00061e-Ov; Mon, 24 Feb 2020 13:15:49 +0000
 From:   Stefan Metzmacher <metze@samba.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     Stefan Metzmacher <metze@samba.org>
-Subject: [PATCH v1 03/13] cifs: make use of cap_unix(ses) in cifs_reconnect_tcon()
-Date:   Mon, 24 Feb 2020 14:15:00 +0100
-Message-Id: <20200224131510.20608-4-metze@samba.org>
+Subject: [PATCH v1 02/13] cifs: use mod_delayed_work() for &server->reconnect if already queued
+Date:   Mon, 24 Feb 2020 14:14:59 +0100
+Message-Id: <20200224131510.20608-3-metze@samba.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200224131510.20608-1-metze@samba.org>
 References: <20200224131510.20608-1-metze@samba.org>
@@ -49,26 +49,36 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-cap_unix(ses) defaults to false for SMB2.
+mod_delayed_work() is safer than queue_delayed_work() if there's a
+chance that the work is already in the queue.
 
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/cifs/cifssmb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifs/smb2pdu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 01206e12975a..d2b92770384b 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -320,7 +320,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 1234f9ccab03..2495c3021772 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -378,7 +378,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
+ 	}
+ 
+ 	if (smb2_command != SMB2_INTERNAL_CMD)
+-		queue_delayed_work(cifsiod_wq, &server->reconnect, 0);
++		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
+ 
  	atomic_inc(&tconInfoReconnectCount);
+ out:
+@@ -3558,7 +3558,7 @@ SMB2_echo(struct TCP_Server_Info *server)
  
- 	/* tell server Unix caps we support */
--	if (ses->capabilities & CAP_UNIX)
-+	if (cap_unix(ses))
- 		reset_cifs_unix_caps(0, tcon, NULL, NULL);
+ 	if (server->tcpStatus == CifsNeedNegotiate) {
+ 		/* No need to send echo on newly established connections */
+-		queue_delayed_work(cifsiod_wq, &server->reconnect, 0);
++		mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
+ 		return rc;
+ 	}
  
- 	/*
 -- 
 2.17.1
 
