@@ -2,111 +2,93 @@ Return-Path: <SRS0=XnNO=4O=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A278C4BA0B
-	for <linux-cifs@archiver.kernel.org>; Wed, 26 Feb 2020 06:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B44C4BA0B
+	for <linux-cifs@archiver.kernel.org>; Wed, 26 Feb 2020 09:22:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEB5D21556
-	for <linux-cifs@archiver.kernel.org>; Wed, 26 Feb 2020 06:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 680F021556
+	for <linux-cifs@archiver.kernel.org>; Wed, 26 Feb 2020 09:22:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhEjyFqS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ICPhGHr7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726229AbgBZGgE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 26 Feb 2020 01:36:04 -0500
-Received: from mail-io1-f46.google.com ([209.85.166.46]:36777 "EHLO
-        mail-io1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725890AbgBZGgE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 Feb 2020 01:36:04 -0500
-Received: by mail-io1-f46.google.com with SMTP id d15so2144878iog.3;
-        Tue, 25 Feb 2020 22:36:03 -0800 (PST)
+        id S1727339AbgBZJWi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 26 Feb 2020 04:22:38 -0500
+Received: from mail-io1-f48.google.com ([209.85.166.48]:40518 "EHLO
+        mail-io1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726494AbgBZJWi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 Feb 2020 04:22:38 -0500
+Received: by mail-io1-f48.google.com with SMTP id x1so2553720iop.7;
+        Wed, 26 Feb 2020 01:22:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=eFo/amBiw4ra9qJF2sHSoCjzhIEMIa3Edz34Kt0xAwI=;
-        b=dhEjyFqSp7aLk7RcKJXSEmWOU7r54o17dGXzyFHN8nQmy7U4LSAteSM9R6BMen+myC
-         p0g18JZldQiTYVqNeQV6YphadUZyuQtae0ieyNcTIBsEbYis1+gJUWsbpDQEvqw5jOSq
-         NcUO1qT4ZKkREme2LLJgVvHwZCK3a4TR1vnjfq8DnX8Ll4z5eO5MCtHbuzrVaIaD1KZp
-         zViAo1aP4ibxvCnHKkBje0CNaPZN2DU9ltuFEm/0hLPcY2ScTs3C2QQxNC0o6hqVW8WW
-         /Tb3PZgcXpcSaxOmud+91auzF6stQDtvMGZNIa6lesmFshl+iER96CluI/z0IY5yZucy
-         BrVQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=EV7FGZpFqM3MXMRpDIfQuZeYXOQ0Cm1sB7r0IOS6lMw=;
+        b=ICPhGHr7tJmDzDBkCqyFZ5ucRR+vGT8BRVZ+bPsX2Fnd4trg/jrsJ/9iRN6BHvgE9F
+         VaIB9RZTo0yZf95ykQ+Eyk8//usLHs4Lwagd7GFHXW+9TM46lmVoMdAXVpST4Nzn34GX
+         ykO8dwGAj/62eS77sZaK4Srdorlzg+yCQjE9Zrg2HsnkGnULOAFCSS2NwGd/9dfANpu9
+         24EjtOzkX9lNGe8cBFum3AJ0dWXgZAYfTYXYyhb3EDaLZkZHamaXTDGfIJHL3nF6E/4S
+         2ePKrfEZRvZZLqA/l3ZmCH29TJDmV2aofXuhhTot/s4oJvV2TOeqFqx/VZ9yGmrCrPb5
+         KTgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=eFo/amBiw4ra9qJF2sHSoCjzhIEMIa3Edz34Kt0xAwI=;
-        b=ugLBAhl+LFYom2qAB4LCfV09snSYzXD20iL6IT/UooELQO5kPBlYoSh1M4nWVpMIdf
-         IS//xgsRJEBy1oo8A23hwPK60KZTJM2SiaGDi8+NJO90CqYsRfUFM68I4c4j6R5NakVA
-         9dgzOaxtNZ91TzO2r5PGE1uT+UrUBBIJ8je5jm7KjmtE/LWHh0bpG+rJDt+UwU8ql2TQ
-         i6tX99DJ36KOMW0djO/uSgGhjPHPr2JLWrg2zzZwaq+hKRoWTeFP7ceefHFnaLrnFuNk
-         l2FLMQYbJDGkiDNKuGtH+GtZfcbmvt4PsoWu7Vm74JRkC7yQV8KZ677R6Bwg5vOZnHfB
-         94RQ==
-X-Gm-Message-State: APjAAAWuIiLGPG/q1xNj5mO+L5WNw5sQIMJ5WEsSKChcheM6dpTn8beZ
-        q0g57SogR3uAs5Jbt25wN3YK2MuY2Osh7d9GtoUX1g==
-X-Google-Smtp-Source: APXvYqwX8A3Hd2lbBCep5kIfXNaBAi1xmcK8jdjkUNhedPox5PQphF/+56QeowLlHLT0ZLEsa7wPK8bYwAPdQPAXIbA=
-X-Received: by 2002:a05:6638:149:: with SMTP id y9mr2359365jao.132.1582698963130;
- Tue, 25 Feb 2020 22:36:03 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EV7FGZpFqM3MXMRpDIfQuZeYXOQ0Cm1sB7r0IOS6lMw=;
+        b=TG1AoIFmyPdwDi8Wsh69YxgtwxAS5um2EpfX5gDo968IiuoGKRhy+QsHgijYFARZrt
+         VsOh1MHM9ShyNYTFwBhlgeV8n2LG/XsPu+WrsULB9t1p9s3kYTkR4J4B9JH6OJFog4lW
+         GiKUx9xLyy1rGemdXeMZXNRz5VHjNn8buDuVmQrOyF7OCL1jTiCyvBz/W5456QBz8olK
+         T8U66PoT7CVuYMmWK6s+gJizxOHnzD4F2chY9H2Mn+LjGjCP2PcAh45D9pTJ2fNc6Zdb
+         yqKmZVANWoiDegdASwCEiZPlIQ4ANWtZw4xHJnBZJcsLiJBEyNDzU92H6izcrdPt3l90
+         J+WQ==
+X-Gm-Message-State: APjAAAXKfKnnZUAMoPH5NAuGoxp063gdfxZJLtibAREK8KupV0yfWbl+
+        wrN50ma56q9n31RHQ5LjlcD3wBDDMreLPOki2eM2/lV2
+X-Google-Smtp-Source: APXvYqw0sD4ErZ4gv5YKtxhRLMl66m8Y/T3l3446JfpEtvmwI6jm6LXWXnEG8XHui07nTxCndkxDZUEQU7H5+6BOPXM=
+X-Received: by 2002:a5d:9c88:: with SMTP id p8mr3424343iop.9.1582708957178;
+ Wed, 26 Feb 2020 01:22:37 -0800 (PST)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 26 Feb 2020 00:35:51 -0600
-Message-ID: <CAH2r5mt0=WRC2SgG6UZmZ32PbjZrcK4N_sZ9=WcSEar1utTmCw@mail.gmail.com>
-Subject: [PATCH][CIFS] Use FS_RENAME_DOES_D_MOVE to minimize races in rename
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000007c35c8059f74d1c0"
+References: <CAH2r5mt0=WRC2SgG6UZmZ32PbjZrcK4N_sZ9=WcSEar1utTmCw@mail.gmail.com>
+In-Reply-To: <CAH2r5mt0=WRC2SgG6UZmZ32PbjZrcK4N_sZ9=WcSEar1utTmCw@mail.gmail.com>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Wed, 26 Feb 2020 11:22:26 +0200
+Message-ID: <CAOQ4uxgUuR__Epnt4tfDuZ4-qiRQxt9mVY5ukBCC2z59YNdDHw@mail.gmail.com>
+Subject: Re: [PATCH][CIFS] Use FS_RENAME_DOES_D_MOVE to minimize races in rename
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000007c35c8059f74d1c0
-Content-Type: text/plain; charset="UTF-8"
+On Wed, Feb 26, 2020 at 8:37 AM Steve French <smfrench@gmail.com> wrote:
+>
 
-Should be safer to do the dentry move immediately after the rename
-rather than later.
+What sort of rename races? Is that a real/reproducible problem?
 
+> Should be safer to do the dentry move immediately after the rename
+> rather than later.
+>
 
+Looking at what "later" means, you moved d_move() before
+cifs_put_tlink(tlink);
+and
+shrink_dcache_parent(new_dentry);
+detach_mounts(new_dentry);
 
+I suppose cifs_put_tlink() is not the issue.
 
+It makes me wonder about shrink_dcache_parent()/detach_mounts() -
+they happen for some fs before d_move() and for some fs after d_move()
 
--- 
+I think it kind of makes sense to have them moved after dentry is
+unhashed anyway? (that is after d_move()).
+
 Thanks,
-
-Steve
-
---0000000000007c35c8059f74d1c0
-Content-Type: text/x-patch; charset="US-ASCII"; name="0001-cifs-do-d_move-in-rename.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-do-d_move-in-rename.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_k72y39610>
-X-Attachment-Id: f_k72y39610
-
-RnJvbSBjMWJjNzUxNzg3ODA2NjU3MTZhZDE0YjhjNDBhOGQ4ZTU4ZDBmM2UzIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgMjUgRmViIDIwMjAgMTg6MDg6NTQgLTA2MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBkbyBkX21vdmUgaW4gcmVuYW1lCgpJdCBpcyBzYWZlciB0byBkbyB0aGUgZF9tb3ZlIGNs
-b3NlciB0byB0aGUgcmVuYW1lIHRvCmF2b2lkIHJhY2VzLgoKU2lnbmVkLW9mZi1ieTogU3RldmUg
-RnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc2ZzLmMgfCA0
-ICsrLS0KIGZzL2NpZnMvaW5vZGUuYyAgfCAyICsrCiAyIGZpbGVzIGNoYW5nZWQsIDQgaW5zZXJ0
-aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIv
-ZnMvY2lmcy9jaWZzZnMuYwppbmRleCBmYTc3ZmU1MjU4YjAuLjk0ZTNlZDQ4NTBiNSAxMDA2NDQK
-LS0tIGEvZnMvY2lmcy9jaWZzZnMuYworKysgYi9mcy9jaWZzL2NpZnNmcy5jCkBAIC0xMDE4LDcg
-KzEwMTgsNyBAQCBzdHJ1Y3QgZmlsZV9zeXN0ZW1fdHlwZSBjaWZzX2ZzX3R5cGUgPSB7CiAJLm5h
-bWUgPSAiY2lmcyIsCiAJLm1vdW50ID0gY2lmc19kb19tb3VudCwKIAkua2lsbF9zYiA9IGNpZnNf
-a2lsbF9zYiwKLQkvKiAgLmZzX2ZsYWdzICovCisJLmZzX2ZsYWdzID0gRlNfUkVOQU1FX0RPRVNf
-RF9NT1ZFLAogfTsKIE1PRFVMRV9BTElBU19GUygiY2lmcyIpOwogCkBAIC0xMDI3LDcgKzEwMjcs
-NyBAQCBzdGF0aWMgc3RydWN0IGZpbGVfc3lzdGVtX3R5cGUgc21iM19mc190eXBlID0gewogCS5u
-YW1lID0gInNtYjMiLAogCS5tb3VudCA9IHNtYjNfZG9fbW91bnQsCiAJLmtpbGxfc2IgPSBjaWZz
-X2tpbGxfc2IsCi0JLyogIC5mc19mbGFncyAqLworCS5mc19mbGFncyA9IEZTX1JFTkFNRV9ET0VT
-X0RfTU9WRSwKIH07CiBNT0RVTEVfQUxJQVNfRlMoInNtYjMiKTsKIE1PRFVMRV9BTElBUygic21i
-MyIpOwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9pbm9kZS5jIGIvZnMvY2lmcy9pbm9kZS5jCmluZGV4
-IDY1NDM0NjU1OTVmNi4uN2JiN2ZmMTEwZGM2IDEwMDY0NAotLS0gYS9mcy9jaWZzL2lub2RlLmMK
-KysrIGIvZnMvY2lmcy9pbm9kZS5jCkBAIC0xODM1LDYgKzE4MzUsOCBAQCBjaWZzX2RvX3JlbmFt
-ZShjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgZGVudHJ5ICpmcm9tX2RlbnRyeSwKIAkJ
-Q0lGU1NNQkNsb3NlKHhpZCwgdGNvbiwgZmlkLm5ldGZpZCk7CiAJfQogZG9fcmVuYW1lX2V4aXQ6
-CisJaWYgKHJjID09IDApCisJCWRfbW92ZShmcm9tX2RlbnRyeSwgdG9fZGVudHJ5KTsKIAljaWZz
-X3B1dF90bGluayh0bGluayk7CiAJcmV0dXJuIHJjOwogfQotLSAKMi4yMC4xCgo=
---0000000000007c35c8059f74d1c0--
+Amir.
