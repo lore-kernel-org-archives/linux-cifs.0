@@ -1,69 +1,112 @@
-Return-Path: <SRS0=6k4I=4N=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=XnNO=4O=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA518C35E04
-	for <linux-cifs@archiver.kernel.org>; Tue, 25 Feb 2020 19:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A278C4BA0B
+	for <linux-cifs@archiver.kernel.org>; Wed, 26 Feb 2020 06:36:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 907B020CC7
-	for <linux-cifs@archiver.kernel.org>; Tue, 25 Feb 2020 19:26:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEB5D21556
+	for <linux-cifs@archiver.kernel.org>; Wed, 26 Feb 2020 06:36:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UwoZKA8s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhEjyFqS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731017AbgBYT0U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 25 Feb 2020 14:26:20 -0500
-Received: from mail-il1-f174.google.com ([209.85.166.174]:34456 "EHLO
-        mail-il1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728367AbgBYT0U (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 25 Feb 2020 14:26:20 -0500
-Received: by mail-il1-f174.google.com with SMTP id l4so213167ilj.1
-        for <linux-cifs@vger.kernel.org>; Tue, 25 Feb 2020 11:26:19 -0800 (PST)
+        id S1726229AbgBZGgE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 26 Feb 2020 01:36:04 -0500
+Received: from mail-io1-f46.google.com ([209.85.166.46]:36777 "EHLO
+        mail-io1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725890AbgBZGgE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 Feb 2020 01:36:04 -0500
+Received: by mail-io1-f46.google.com with SMTP id d15so2144878iog.3;
+        Tue, 25 Feb 2020 22:36:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=Vg2w9E/3hxLxS3OkDxLjagNz/LlWgHvNpy3TU70Hx/8=;
-        b=UwoZKA8sgD0e03kHWXR5KT4nOdrK8j4fAQ1XjStM8PgDM7a95B9pf2u+SZnEKiyJ4q
-         yYMFHEZLrHmHNGAhrT6zALaENiTvJEtR9eW7h97CMiPu2PG1Y5OG+1H/yr05gZOGe0qM
-         +O1qlblh+K6tHzmQ/eb0v7Xbhzu7cISw04K3irKtt94t0YE6Rl3bG9h3bzXR64W1kKMf
-         SESBjOnRTnenBGgLtQMGEffwLzj17OH+eERciF8e0eVWquHLhz+5d114NxmWcaPwHUz7
-         Yh/tVkKWvp2tYsi6vsdnGdNd7cYWMGGb85A9h/hEZVADa6bDVXscbKnwx8la+t8Rot9/
-         YWDg==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=eFo/amBiw4ra9qJF2sHSoCjzhIEMIa3Edz34Kt0xAwI=;
+        b=dhEjyFqSp7aLk7RcKJXSEmWOU7r54o17dGXzyFHN8nQmy7U4LSAteSM9R6BMen+myC
+         p0g18JZldQiTYVqNeQV6YphadUZyuQtae0ieyNcTIBsEbYis1+gJUWsbpDQEvqw5jOSq
+         NcUO1qT4ZKkREme2LLJgVvHwZCK3a4TR1vnjfq8DnX8Ll4z5eO5MCtHbuzrVaIaD1KZp
+         zViAo1aP4ibxvCnHKkBje0CNaPZN2DU9ltuFEm/0hLPcY2ScTs3C2QQxNC0o6hqVW8WW
+         /Tb3PZgcXpcSaxOmud+91auzF6stQDtvMGZNIa6lesmFshl+iER96CluI/z0IY5yZucy
+         BrVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=Vg2w9E/3hxLxS3OkDxLjagNz/LlWgHvNpy3TU70Hx/8=;
-        b=M2Z9I7SXgKJIINrrQqmRWOOMMU7yw5Wh08ZMxqmOOxndXZgKaU8b0nhDzVXsxgUGPx
-         xGn0Nc8g6WlnRRg7M6ifBVmTL4UOmHo38W5sGcy8X+Eo3s/AFkxn4k7bG6zIJl9yaY1p
-         rYHQhzkl+FOmlrXMyMxWH31P0FoxaMZvgmL4RGGkofXMZerTw6Zft0yEAzkYkWvdNW21
-         GEoeOGeMD2W248mzvsqIoI695ZpTnn9iYyWBxgdWxoIT0+XRc3Js1LPz6Z4Mkx8rKfmJ
-         mQorTY5wWuBDCH2Qmz18KJUUAB6Jjqt8PyzOL+H7Anu1jh9eFCt5p5Rer6B34YDaWJR2
-         g7QQ==
-X-Gm-Message-State: APjAAAW8fB6NHpEuh4YIgQUtTLYpLV0M6UJUg4oZujy9hDUzlamEANOp
-        PcKn7Y2nwGCYMIGMb6ZW2gTr4RDSCLogmU/OQckQtQ==
-X-Google-Smtp-Source: APXvYqx8JwlWijuCtdIqC71fW0a6y4GPl+7FQq90KdIf0sgm9nzzdVA00LbRE1kaiwu5MnO9ZCbk6IGFsODqT3AusCc=
-X-Received: by 2002:a92:7301:: with SMTP id o1mr184476ilc.272.1582658779180;
- Tue, 25 Feb 2020 11:26:19 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=eFo/amBiw4ra9qJF2sHSoCjzhIEMIa3Edz34Kt0xAwI=;
+        b=ugLBAhl+LFYom2qAB4LCfV09snSYzXD20iL6IT/UooELQO5kPBlYoSh1M4nWVpMIdf
+         IS//xgsRJEBy1oo8A23hwPK60KZTJM2SiaGDi8+NJO90CqYsRfUFM68I4c4j6R5NakVA
+         9dgzOaxtNZ91TzO2r5PGE1uT+UrUBBIJ8je5jm7KjmtE/LWHh0bpG+rJDt+UwU8ql2TQ
+         i6tX99DJ36KOMW0djO/uSgGhjPHPr2JLWrg2zzZwaq+hKRoWTeFP7ceefHFnaLrnFuNk
+         l2FLMQYbJDGkiDNKuGtH+GtZfcbmvt4PsoWu7Vm74JRkC7yQV8KZ677R6Bwg5vOZnHfB
+         94RQ==
+X-Gm-Message-State: APjAAAWuIiLGPG/q1xNj5mO+L5WNw5sQIMJ5WEsSKChcheM6dpTn8beZ
+        q0g57SogR3uAs5Jbt25wN3YK2MuY2Osh7d9GtoUX1g==
+X-Google-Smtp-Source: APXvYqwX8A3Hd2lbBCep5kIfXNaBAi1xmcK8jdjkUNhedPox5PQphF/+56QeowLlHLT0ZLEsa7wPK8bYwAPdQPAXIbA=
+X-Received: by 2002:a05:6638:149:: with SMTP id y9mr2359365jao.132.1582698963130;
+ Tue, 25 Feb 2020 22:36:03 -0800 (PST)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 25 Feb 2020 13:26:08 -0600
-Message-ID: <CAH2r5mtSiFk__O7pJcyHPYW_r59hthzh+XYD3rRG++zO+KzqHA@mail.gmail.com>
-Subject: mount.cifs "sloppy" mount option
+Date:   Wed, 26 Feb 2020 00:35:51 -0600
+Message-ID: <CAH2r5mt0=WRC2SgG6UZmZ32PbjZrcK4N_sZ9=WcSEar1utTmCw@mail.gmail.com>
+Subject: [PATCH][CIFS] Use FS_RENAME_DOES_D_MOVE to minimize races in rename
 To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000007c35c8059f74d1c0"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I noticed that the "sloppy" mount option is not documented in the man
-page.  Thoughts on whether it should be?
+--0000000000007c35c8059f74d1c0
+Content-Type: text/plain; charset="UTF-8"
+
+Should be safer to do the dentry move immediately after the rename
+rather than later.
+
+
+
+
 
 -- 
 Thanks,
 
 Steve
+
+--0000000000007c35c8059f74d1c0
+Content-Type: text/x-patch; charset="US-ASCII"; name="0001-cifs-do-d_move-in-rename.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-do-d_move-in-rename.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_k72y39610>
+X-Attachment-Id: f_k72y39610
+
+RnJvbSBjMWJjNzUxNzg3ODA2NjU3MTZhZDE0YjhjNDBhOGQ4ZTU4ZDBmM2UzIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgMjUgRmViIDIwMjAgMTg6MDg6NTQgLTA2MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBkbyBkX21vdmUgaW4gcmVuYW1lCgpJdCBpcyBzYWZlciB0byBkbyB0aGUgZF9tb3ZlIGNs
+b3NlciB0byB0aGUgcmVuYW1lIHRvCmF2b2lkIHJhY2VzLgoKU2lnbmVkLW9mZi1ieTogU3RldmUg
+RnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc2ZzLmMgfCA0
+ICsrLS0KIGZzL2NpZnMvaW5vZGUuYyAgfCAyICsrCiAyIGZpbGVzIGNoYW5nZWQsIDQgaW5zZXJ0
+aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIv
+ZnMvY2lmcy9jaWZzZnMuYwppbmRleCBmYTc3ZmU1MjU4YjAuLjk0ZTNlZDQ4NTBiNSAxMDA2NDQK
+LS0tIGEvZnMvY2lmcy9jaWZzZnMuYworKysgYi9mcy9jaWZzL2NpZnNmcy5jCkBAIC0xMDE4LDcg
+KzEwMTgsNyBAQCBzdHJ1Y3QgZmlsZV9zeXN0ZW1fdHlwZSBjaWZzX2ZzX3R5cGUgPSB7CiAJLm5h
+bWUgPSAiY2lmcyIsCiAJLm1vdW50ID0gY2lmc19kb19tb3VudCwKIAkua2lsbF9zYiA9IGNpZnNf
+a2lsbF9zYiwKLQkvKiAgLmZzX2ZsYWdzICovCisJLmZzX2ZsYWdzID0gRlNfUkVOQU1FX0RPRVNf
+RF9NT1ZFLAogfTsKIE1PRFVMRV9BTElBU19GUygiY2lmcyIpOwogCkBAIC0xMDI3LDcgKzEwMjcs
+NyBAQCBzdGF0aWMgc3RydWN0IGZpbGVfc3lzdGVtX3R5cGUgc21iM19mc190eXBlID0gewogCS5u
+YW1lID0gInNtYjMiLAogCS5tb3VudCA9IHNtYjNfZG9fbW91bnQsCiAJLmtpbGxfc2IgPSBjaWZz
+X2tpbGxfc2IsCi0JLyogIC5mc19mbGFncyAqLworCS5mc19mbGFncyA9IEZTX1JFTkFNRV9ET0VT
+X0RfTU9WRSwKIH07CiBNT0RVTEVfQUxJQVNfRlMoInNtYjMiKTsKIE1PRFVMRV9BTElBUygic21i
+MyIpOwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9pbm9kZS5jIGIvZnMvY2lmcy9pbm9kZS5jCmluZGV4
+IDY1NDM0NjU1OTVmNi4uN2JiN2ZmMTEwZGM2IDEwMDY0NAotLS0gYS9mcy9jaWZzL2lub2RlLmMK
+KysrIGIvZnMvY2lmcy9pbm9kZS5jCkBAIC0xODM1LDYgKzE4MzUsOCBAQCBjaWZzX2RvX3JlbmFt
+ZShjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgZGVudHJ5ICpmcm9tX2RlbnRyeSwKIAkJ
+Q0lGU1NNQkNsb3NlKHhpZCwgdGNvbiwgZmlkLm5ldGZpZCk7CiAJfQogZG9fcmVuYW1lX2V4aXQ6
+CisJaWYgKHJjID09IDApCisJCWRfbW92ZShmcm9tX2RlbnRyeSwgdG9fZGVudHJ5KTsKIAljaWZz
+X3B1dF90bGluayh0bGluayk7CiAJcmV0dXJuIHJjOwogfQotLSAKMi4yMC4xCgo=
+--0000000000007c35c8059f74d1c0--
