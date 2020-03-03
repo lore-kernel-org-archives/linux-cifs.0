@@ -2,363 +2,201 @@ Return-Path: <SRS0=S2CZ=4U=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2F3C3F2D1
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Mar 2020 00:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CF55C3F2C6
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Mar 2020 07:26:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C7B42467B
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Mar 2020 00:31:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1011215A4
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Mar 2020 07:26:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HJ1d1UH3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DZUTRr81"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726758AbgCCAbp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 2 Mar 2020 19:31:45 -0500
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:46852 "EHLO
-        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726752AbgCCAbp (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 2 Mar 2020 19:31:45 -0500
-Received: by mail-yw1-f66.google.com with SMTP id y62so1701627ywd.13
-        for <linux-cifs@vger.kernel.org>; Mon, 02 Mar 2020 16:31:44 -0800 (PST)
+        id S1727500AbgCCH0B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Mar 2020 02:26:01 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:33109 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727340AbgCCH0B (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 Mar 2020 02:26:01 -0500
+Received: by mail-oi1-f194.google.com with SMTP id q81so2058846oig.0
+        for <linux-cifs@vger.kernel.org>; Mon, 02 Mar 2020 23:26:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=hGWBq9kjrBU3Qz6jaeNg7FotpoVAUeGYMNbyzhyhgBs=;
-        b=HJ1d1UH3caz79b2yIeRSbL92TObNvo2zJjUO7BSgy0WibC9fDuk8v3Io9RURqmOIHp
-         9SE3MBCLkqmqJv6rMtLPjJdt/7OaxLAeiTCLwg36EFgmUk8UVABPtZecvnGCgWnisiR2
-         omboXtkS3cU/KgEOt3cC823fjObz6FmeMCRtbU2bssRkZYvT7q6zLbxblEMlsR5EiWI3
-         O5kkfCYldKT3TBiLcU024/b/6vbHKqVMrwr2nLYH6A6jW4lpdYQAXFDW4PeOvvGjJKHM
-         iErjtk9gQEYsaNH5EXIL6w4cSCehHymmkX8S7Ay/1oLkrzY4a+Jcl8ryheDTQZ686H99
-         SdNg==
+        bh=8phNjd84s4ojHhQTXUEqwkLmkijLD+34SKnwMUfVk2o=;
+        b=DZUTRr81aXTmoA4koFswnopdP//ps7m7rLAxXNUoOgI00Vl0m9ID+OvzWlHKUvqtLZ
+         JCLHvLCFKhFLr6liBhzCWLPyjakzZQVVJw92GAUhX+jXB4s+BV8QqyHNGS3FbgzvBmaJ
+         oQwP1c6/G7wIVXX9azvYYSIjvSlrcycdDmuPjnDj5biNVGvF1n9bCB7T5OLzQVU3tx60
+         8gCGYz71JrjzjrTMmTJRDjvcd7TpVXrSQQpnVHGcZywRMZGAXpz3T12EYWJ1SwaTwNUi
+         3wB6Jux4UQyJ6+49gLktwZ6lX4oYAbtmkChesEzeHKqOEaFeOHIy5Tk2Avu1zHz2PEni
+         +i4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=hGWBq9kjrBU3Qz6jaeNg7FotpoVAUeGYMNbyzhyhgBs=;
-        b=JWkoQjDmDo71nQ3wx+uUCT3iAOrSfGVJsH2FzI3NiwlsDaMjsHMjCmG9NEKniY777L
-         GfIWTnUhhLMGCuXqbs9O8OkOehrMOjDOeeWUPWxfO/T5zBXta3Ab28LkWfuvWmuT53AU
-         Dor/smH5KTmdB13uM8EFJhkQ/opm8ImztXnllGk+DFay4KuhsD3Act7zjRlwbvFFKDaH
-         kZkLAik5CzprMnhJWuqZJpZBUXe9MZA3JIogTzabJDQb5T7qPtAe/9lLAOh+8jIFFchC
-         +V08SU5KdJdD5BLvq5BkzkfiHbLVEgS4pa1F6uJu3i2qfNwcqKvYsfekCQMn3DnSvtcw
-         cDLw==
-X-Gm-Message-State: ANhLgQ3moDPpeylINRIHZWByGsSVdVXABHRqf4NIpyiIgpGcdPFD/Vrj
-        D1eL4sxJMbe5aMg7xD0DeszROppYe7q7KKaMbLuJUg==
-X-Google-Smtp-Source: ADFU+vsJrG0mqyzuQuXX3677uAKze9fCMjCLWXF09WhVZNCpAeXgQXC3HnKX4cbjhVXJO1zLjE3sMFenINuxNK6I4i0=
-X-Received: by 2002:a5b:2ce:: with SMTP id h14mr1525546ybp.167.1583195503740;
- Mon, 02 Mar 2020 16:31:43 -0800 (PST)
+        bh=8phNjd84s4ojHhQTXUEqwkLmkijLD+34SKnwMUfVk2o=;
+        b=gHlOpfk9CVO3dV2xOSjv6s3AWq3lv8NGIdFckYultF2pE0ycMj6KKxVBHuvscGpCCC
+         HTU6ytv12mVOz5WNo8j6k2C/bLUgJSqDcVkhXoW8eFC1286KuD/RK04ltC5lzxtZr7hF
+         dj0cGuA0YGI0d6zcpFw6UpyllPnNaMDRK2SCbbuux44xQPMp6N/50R6LwBNQRwWtWuAz
+         exv13CpbsUk0h0F4tmO64fAq1n6atx0+a9qsFFXW4iC7IR6G7KYXDw3nnmwwruomBS8d
+         dXF58D3w+TR5MwIBLZQuvKsG6LHtLYmKx1HKG3yd+Z3+5xoUdexv53KaciGvbdi92qIu
+         G9qg==
+X-Gm-Message-State: ANhLgQ0Og/EmrDfh5doEGPL7os+ASBkFP53iRnr1+B1hrxTjODbOSrNq
+        krtW1AQjGDFp+Z8Rd3/C6jWwV4tj76RpEXds8G0=
+X-Google-Smtp-Source: ADFU+vu8MZWe9xo/olSTbuXnCJSyHk2YqvjmrJadizYAvRO+vCNQs8I7XpGeIkH1xR7A6keztvhsIhTp0hb/ebs7ygU=
+X-Received: by 2002:aca:4e14:: with SMTP id c20mr1615607oib.96.1583220360132;
+ Mon, 02 Mar 2020 23:26:00 -0800 (PST)
 MIME-Version: 1.0
-References: <20200302165322.7380-1-aaptel@suse.com>
-In-Reply-To: <20200302165322.7380-1-aaptel@suse.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 2 Mar 2020 18:31:32 -0600
-Message-ID: <CAH2r5muGRuqfWA4QJLsRJ9TGfq6qvg8VKVwg5w2EcXnfhTVyGw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: add SMB2_open() arg to return POSIX data
-To:     Aurelien Aptel <aaptel@suse.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+References: <CA+7wUszkCoy_o2RJ76QESUH3S7NKG6RvFyVY+5sDcQA+dC6utw@mail.gmail.com>
+ <CAH2r5mtd-WbXbTG6bgT9EfZyXCC2Qr-TB8QszOy+oFRu5CrerQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mtd-WbXbTG6bgT9EfZyXCC2Qr-TB8QszOy+oFRu5CrerQ@mail.gmail.com>
+From:   Mathieu Malaterre <mathieu.malaterre@gmail.com>
+Date:   Tue, 3 Mar 2020 08:25:47 +0100
+Message-ID: <CA+7wUsyWb1UTxKdF2Q=h3scqEu43aFb4tgdoWcFrXt2SOXZ6tg@mail.gmail.com>
+Subject: Re: Proper mounting Windows DFS Namespace in Linux / Object is remote
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending more testing
+Well not on that specific system. I'll install a newer ubuntu under
+virtualbox and give it a try at least for the curiosity.
 
-On Mon, Mar 2, 2020 at 10:53 AM Aurelien Aptel <aaptel@suse.com> wrote:
+On Mon, Mar 2, 2020 at 10:12 PM Steve French <smfrench@gmail.com> wrote:
 >
-> allows SMB2_open() callers to pass down a POSIX data buffer that will
-> trigger requesting POSIX create context and parsing the response into
-> the provided buffer.
+> Can you try an experiment with Ubuntu's newer kernel:
 >
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-> ---
->  fs/cifs/link.c      |  4 ++--
->  fs/cifs/smb2file.c  |  2 +-
->  fs/cifs/smb2ops.c   | 23 ++++++++++++++--------
->  fs/cifs/smb2pdu.c   | 55 +++++++++++++++++++++++++++++++++++++----------------
->  fs/cifs/smb2pdu.h   | 12 +++++-------
->  fs/cifs/smb2proto.h |  5 ++++-
->  6 files changed, 66 insertions(+), 35 deletions(-)
+> https://wiki.ubuntu.com/Kernel/MainlineBuilds
+> Or
 >
-> diff --git a/fs/cifs/link.c b/fs/cifs/link.c
-> index 852aa00ec729..a25ef35b023e 100644
-> --- a/fs/cifs/link.c
-> +++ b/fs/cifs/link.c
-> @@ -416,7 +416,7 @@ smb3_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
->         }
+> https://github.com/pimlie/ubuntu-mainline-kernel.sh
 >
->         rc = SMB2_open(xid, &oparms, utf16_path, &oplock, pfile_info, NULL,
-> -                      NULL);
-> +                      NULL, NULL);
->         if (rc)
->                 goto qmf_out_open_fail;
->
-> @@ -470,7 +470,7 @@ smb3_create_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
->         oparms.reconnect = false;
->
->         rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL,
-> -                      NULL);
-> +                      NULL, NULL);
->         if (rc) {
->                 kfree(utf16_path);
->                 return rc;
-> diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-> index afe1f03aabe3..0a19d6d8e1cc 100644
-> --- a/fs/cifs/smb2file.c
-> +++ b/fs/cifs/smb2file.c
-> @@ -62,7 +62,7 @@ smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
->         smb2_oplock = SMB2_OPLOCK_LEVEL_BATCH;
->
->         rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, smb2_data, NULL,
-> -                      NULL);
-> +                      NULL, NULL);
->         if (rc)
->                 goto out;
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 5fa34225a99b..076bedb261d5 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -794,7 +794,8 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
->                 tcon->crfid.has_lease = true;
->                 smb2_parse_contexts(server, o_rsp,
->                                 &oparms.fid->epoch,
-> -                               oparms.fid->lease_key, &oplock, NULL);
-> +                                   oparms.fid->lease_key, &oplock,
-> +                                   NULL, NULL);
->         } else
->                 goto oshr_exit;
->
-> @@ -838,7 +839,7 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
->
->         if (no_cached_open)
->                 rc = SMB2_open(xid, &oparms, &srch_path, &oplock, NULL, NULL,
-> -                              NULL);
-> +                              NULL, NULL);
->         else
->                 rc = open_shroot(xid, tcon, cifs_sb, &fid);
->
-> @@ -878,7 +879,8 @@ smb2_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
->         oparms.fid = &fid;
->         oparms.reconnect = false;
->
-> -       rc = SMB2_open(xid, &oparms, &srch_path, &oplock, NULL, NULL, NULL);
-> +       rc = SMB2_open(xid, &oparms, &srch_path, &oplock, NULL, NULL,
-> +                      NULL, NULL);
->         if (rc)
->                 return;
->
-> @@ -913,7 +915,8 @@ smb2_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
->         oparms.fid = &fid;
->         oparms.reconnect = false;
->
-> -       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL, NULL);
-> +       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL, NULL,
-> +                      NULL);
->         if (rc) {
->                 kfree(utf16_path);
->                 return rc;
-> @@ -2122,7 +2125,8 @@ smb3_notify(const unsigned int xid, struct file *pfile,
->         oparms.fid = &fid;
->         oparms.reconnect = false;
->
-> -       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL, NULL);
-> +       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL, NULL,
-> +                      NULL);
->         if (rc)
->                 goto notify_exit;
->
-> @@ -2541,7 +2545,8 @@ smb311_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
->         oparms.fid = &fid;
->         oparms.reconnect = false;
->
-> -       rc = SMB2_open(xid, &oparms, &srch_path, &oplock, NULL, NULL, NULL);
-> +       rc = SMB2_open(xid, &oparms, &srch_path, &oplock, NULL, NULL,
-> +                      NULL, NULL);
->         if (rc)
->                 return rc;
->
-> @@ -3026,7 +3031,8 @@ get_smb2_acl_by_path(struct cifs_sb_info *cifs_sb,
->         oparms.fid = &fid;
->         oparms.reconnect = false;
->
-> -       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL, NULL);
-> +       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL,NULL, NULL,
-> +                      NULL);
->         kfree(utf16_path);
->         if (!rc) {
->                 rc = SMB2_query_acl(xid, tlink_tcon(tlink), fid.persistent_fid,
-> @@ -3084,7 +3090,8 @@ set_smb2_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
->         oparms.fid = &fid;
->         oparms.reconnect = false;
->
-> -       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL, NULL);
-> +       rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL,
-> +                      NULL, NULL);
->         kfree(utf16_path);
->         if (!rc) {
->                 rc = SMB2_set_acl(xid, tlink_tcon(tlink), fid.persistent_fid,
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 7356017a0821..47d3e382ecaa 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1951,25 +1951,46 @@ parse_query_id_ctxt(struct create_context *cc, struct smb2_file_all_info *buf)
->  }
->
->  static void
-> -parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info)
-> +parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info,
-> +                struct create_posix_rsp *posix)
->  {
-> -       /* struct create_posix_rsp *posix = (struct create_posix_rsp *)cc; */
-> +       int sid_len;
-> +       u8 *beg = (u8 *)cc + le16_to_cpu(cc->DataOffset);
-> +       u8 *end = beg + le32_to_cpu(cc->DataLength);
-> +       u8 *sid;
->
-> -       /*
-> -        * TODO: Need to add parsing for the context and return. Can
-> -        * smb2_file_all_info hold POSIX data? Need to change the
-> -        * passed type from SMB2_open.
-> -        */
-> -       printk_once(KERN_WARNING
-> -                   "SMB3 3.11 POSIX response context not completed yet\n");
-> +       memset(posix, 0, sizeof(*posix));
-> +
-> +       posix->nlink = le32_to_cpu(*(__le32 *)(beg + 0));
-> +       posix->reparse_tag = le32_to_cpu(*(__le32 *)(beg + 4));
-> +       posix->mode = le32_to_cpu(*(__le32 *)(beg + 8));
-> +
-> +       sid = beg + 12;
-> +       sid_len = posix_info_sid_size(sid, end);
-> +       if (sid_len < 0) {
-> +               cifs_dbg(VFS, "bad owner sid in posix create response\n");
-> +               return;
-> +       }
-> +       memcpy(&posix->owner, sid, sid_len);
-> +
-> +       sid = sid + sid_len;
-> +       sid_len = posix_info_sid_size(sid, end);
-> +       if (sid_len < 0) {
-> +               cifs_dbg(VFS, "bad group sid in posix create response\n");
-> +               return;
-> +       }
-> +       memcpy(&posix->group, sid, sid_len);
->
-> +       cifs_dbg(FYI, "nlink=%d mode=%o reparse_tag=%x\n",
-> +                posix->nlink, posix->mode, posix->reparse_tag);
->  }
->
->  void
->  smb2_parse_contexts(struct TCP_Server_Info *server,
-> -                      struct smb2_create_rsp *rsp,
-> -                      unsigned int *epoch, char *lease_key, __u8 *oplock,
-> -                      struct smb2_file_all_info *buf)
-> +                   struct smb2_create_rsp *rsp,
-> +                   unsigned int *epoch, char *lease_key, __u8 *oplock,
-> +                   struct smb2_file_all_info *buf,
-> +                   struct create_posix_rsp *posix)
->  {
->         char *data_offset;
->         struct create_context *cc;
-> @@ -1999,8 +2020,9 @@ smb2_parse_contexts(struct TCP_Server_Info *server,
->                     strncmp(name, SMB2_CREATE_QUERY_ON_DISK_ID, 4) == 0)
->                         parse_query_id_ctxt(cc, buf);
->                 else if ((le16_to_cpu(cc->NameLength) == 16)) {
-> -                       if (memcmp(name, smb3_create_tag_posix, 16) == 0)
-> -                               parse_posix_ctxt(cc, buf);
-> +                       if (posix &&
-> +                           memcmp(name, smb3_create_tag_posix, 16) == 0)
-> +                               parse_posix_ctxt(cc, buf, posix);
->                 }
->                 /* else {
->                         cifs_dbg(FYI, "Context not matched with len %d\n",
-> @@ -2725,6 +2747,7 @@ SMB2_open_free(struct smb_rqst *rqst)
->  int
->  SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
->           __u8 *oplock, struct smb2_file_all_info *buf,
-> +         struct create_posix_rsp *posix,
->           struct kvec *err_iov, int *buftype)
->  {
->         struct smb_rqst rqst;
-> @@ -2803,7 +2826,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
->
->
->         smb2_parse_contexts(server, rsp, &oparms->fid->epoch,
-> -                           oparms->fid->lease_key, oplock, buf);
-> +                           oparms->fid->lease_key, oplock, buf, posix);
->  creat_exit:
->         SMB2_open_free(&rqst);
->         free_rsp_buf(resp_buftype, rsp);
-> @@ -4302,7 +4325,7 @@ SMB2_write(const unsigned int xid, struct cifs_io_parms *io_parms,
->         return rc;
->  }
->
-> -static int posix_info_sid_size(const void *beg, const void *end)
-> +int posix_info_sid_size(const void *beg, const void *end)
->  {
->         size_t subauth;
->         int total;
-> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-> index 700311978523..ad14b8505b4d 100644
-> --- a/fs/cifs/smb2pdu.h
-> +++ b/fs/cifs/smb2pdu.h
-> @@ -1605,13 +1605,11 @@ extern char smb2_padding[7];
->
->  /* equivalent of the contents of SMB3.1.1 POSIX open context response */
->  struct create_posix_rsp {
-> -       __le32 nlink;
-> -       __le32 reparse_tag;
-> -       __le32 mode;
-> -       /*
-> -        * var sized owner SID
-> -        * var sized group SID
-> -        */
-> +       u32 nlink;
-> +       u32 reparse_tag;
-> +       u32 mode;
-> +       struct cifs_sid owner; /* var-sized on the wire */
-> +       struct cifs_sid group; /* var-sized on the wire */
->  } __packed;
->
->  /*
-> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-> index c0f0801e7e8e..4d1ff7b66fdc 100644
-> --- a/fs/cifs/smb2proto.h
-> +++ b/fs/cifs/smb2proto.h
-> @@ -139,6 +139,7 @@ extern int SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon);
->  extern int SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms,
->                      __le16 *path, __u8 *oplock,
->                      struct smb2_file_all_info *buf,
-> +                    struct create_posix_rsp *posix,
->                      struct kvec *err_iov, int *resp_buftype);
->  extern int SMB2_open_init(struct cifs_tcon *tcon, struct smb_rqst *rqst,
->                           __u8 *oplock, struct cifs_open_parms *oparms,
-> @@ -252,7 +253,8 @@ extern enum securityEnum smb2_select_sectype(struct TCP_Server_Info *,
->  extern void smb2_parse_contexts(struct TCP_Server_Info *server,
->                                 struct smb2_create_rsp *rsp,
->                                 unsigned int *epoch, char *lease_key,
-> -                               __u8 *oplock, struct smb2_file_all_info *buf);
-> +                               __u8 *oplock, struct smb2_file_all_info *buf,
-> +                               struct create_posix_rsp *posix);
->  extern int smb3_encryption_required(const struct cifs_tcon *tcon);
->  extern int smb2_validate_iov(unsigned int offset, unsigned int buffer_length,
->                              struct kvec *iov, unsigned int min_buf_size);
-> @@ -274,4 +276,5 @@ extern int smb2_query_info_compound(const unsigned int xid,
->                                     struct cifs_sb_info *cifs_sb);
->  int posix_info_parse(const void *beg, const void *end,
->                      struct smb2_posix_info_parsed *out);
-> +int posix_info_sid_size(const void *beg, const void *end);
->  #endif                 /* _SMB2PROTO_H */
-> --
-> 2.16.4
->
+> On Mon, Mar 2, 2020, 01:50 Mathieu Malaterre <mathieu.malaterre@gmail.com> wrote:
+>>
+>> I am struggling to mount a remote CIFS directory on a Ubuntu system at
+>> work. The remote folder appears to be working just fine from my
+>> Windows 8.1 session (also at work).
+>>
+>> I could not get normal mounting to work:
+>>
+>>     $ sudo mount -v -t cifs //1.2.3.4/network ~/z -o
+>> username=malat,domain=MY,uid=$(id -u),gid=$(id -g),iocharset=utf8
+>>     Password for malat@//1.2.3.4/network:  *********
+>>     mount.cifs kernel mount options:
+>> ip=1.2.3.4,unc=\\1.2.3.4\network,iocharset=utf8,uid=1002,gid=1002,user=mmalaterre,domain=MY,pass=********
+>>     mount error(2): No such file or directory
+>>     Refer to the mount.cifs(8) manual page (e.g. man mount.cifs)
+>>
+>> But I eventually stumble upon this ref[1]:
+>>
+>>     $ sudo mount -v -t cifs //1.2.3.4/network ~/z -o
+>> username=malat,domain=MY,uid=$(id -u),gid=$(id
+>> -g),iocharset=utf8,nodfs
+>>     Password for malat@//1.2.3.4/network:  *********
+>>     mount.cifs kernel mount options:
+>> ip=1.2.3.4,unc=\\1.2.3.4\network,iocharset=utf8,nodfs,uid=1002,gid=1002,user=malat,domain=MY,pass=********
+>>
+>> At least I have something working now, so AFAIK the option 'nodfs' is
+>> a required option for me:
+>>
+>>     $ mount | grep network
+>>     //1.2.3.4/network on /home/malat/z type cifs
+>> (rw,relatime,vers=2.1,cache=strict,username=malat,domain=MY,uid=1002,forceuid,gid=1002,forcegid,addr=1.2.3.4,file_mode=0755,dir_mode=0755,soft,nounix,nodfs,mapposix,rsize=1048576,wsize=1048576,bsize=1048576,echo_interval=60,actimeo=1)
+>>
+>> However there seems to be something not working (related to 'nodfs'
+>> option I guess). Here are the symptoms:
+>>
+>>     $ cd ~/z
+>>     $ ls
+>>     folder1 folder2
+>>     $ ls folder1
+>>     subfolder1
+>>     $ ls folder2
+>>     ls: cannot access 'folder2': Invalid argument
+>>
+>> If I add `vers=1.0` to the mount command, the symptoms are slightly different:
+>>
+>>     $ cd ~/z
+>>     $ cd folder2
+>>     $ ls
+>>     subfolder2
+>>     $ cd subfolder2/
+>>     bash: cd: subfolder2/: Object is remote
+>>
+>> I can access the folder `folder2` just fine from my Windows 8.1
+>> session, so this is not a permission issue.
+>>
+>> For instance I have a work around : use the DFS Referral list. So from
+>> my windows box I navigate to the problematic "subfolder2" (symlink
+>> icon), right click get the properties (third tab is named 'DFS'), then
+>> go back to my Linux session, and mount using instead:
+>>
+>>     $ sudo mount -t cifs //xyzclus01-cifs.mydoma.acme.corp/Disk12
+>> ~/disk12 -v -o username=malat,domain=MY,uid=$(id -u),gid=$(id
+>> -g),iocharset=utf8,nodfs,vers=1.0
+>>     Password for malat@//xyzclus01-cifs.mydoma.acme.corp/Disk12:  *********
+>>     mount.cifs kernel mount options:
+>> ip=5.6.7.8,unc=\\xyzclus01-cifs.mydoma.acme.corp\Disk12,iocharset=utf8,nodfs,vers=1.0,uid=1002,gid=1002,user=malat,domain=MY,pass=********
+>>     $ cd folder2/subfolder2/
+>>
+>> I can (finally!) access the content of subfolder2. This is quite
+>> cumbersome and counter-intuitive. So this qualify at best as
+>> work-around and not as real solution.
+>>
+>> How can I access `folder2` from my Linux session ? Or at least how can
+>> I find the magic value "//xyzclus01-cifs.mydoma.acme.corp/Disk12"
+>> directly from my running Linux system ?
+>>
+>> ---
+>>
+>> For reference:
+>>
+>> Here is the tail of `dmesg`:
+>>
+>>     [1927958.534353] CIFS: Attempting to mount //1.2.3.4/network
+>>     [1927958.534403] No dialect specified on mount. Default has
+>> changed to a more secure dialect, SMB2.1 or later (e.g. SMB3), from
+>> CIFS (SMB1). To use the less secure SMB1 dialect to access old servers
+>> which do not support SMB3 (or SMB2.1) specify vers=1.0 on mount.
+>>     [1927960.069018] CIFS VFS: DFS capability contradicts DFS flag
+>>     [1927960.375111] CIFS VFS: Autodisabling the use of server inode
+>> numbers on new server.
+>>     [1927960.375115] CIFS VFS: The server doesn't seem to support them
+>> properly or the files might be on different servers (DFS).
+>>     [1927960.375117] CIFS VFS: Hardlinks will not be recognized on
+>> this mount. Consider mounting with the "noserverino" option to silence
+>> this message.
+>>
+>>     $ lsb_release -a
+>>     No LSB modules are available.
+>>     Distributor ID: Ubuntu
+>>     Description:    Ubuntu 19.04
+>>     Release:        19.04
+>>     Codename:       disco
+>>
+>> kernel version:
+>>
+>>     $ uname -rvo
+>>     5.0.0-38-generic #41-Ubuntu SMP Tue Dec 3 00:27:35 UTC 2019 GNU/Linux
+>>
+>> and
+>>
+>>     $ cat /etc/request-key.d/cifs.spnego.conf
+>>     create  cifs.spnego    * * /usr/sbin/cifs.upcall %k
+>>
+>>   [1]: https://unix.stackexchange.com/questions/164037/mount-cifs-error2-no-such-file-or-directory-when-using-a-prefixpath
+>>
+>> --
+>> Mathieu
+
 
 
 -- 
-Thanks,
-
-Steve
+Mathieu
