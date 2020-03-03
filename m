@@ -2,112 +2,113 @@ Return-Path: <SRS0=S2CZ=4U=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 904C4C3F2D1
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Mar 2020 20:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEAEC3F2D1
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Mar 2020 20:22:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E52A20CC7
-	for <linux-cifs@archiver.kernel.org>; Tue,  3 Mar 2020 20:13:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0394208C3
+	for <linux-cifs@archiver.kernel.org>; Tue,  3 Mar 2020 20:22:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HSdwRA5B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpjtCMLg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730475AbgCCUNw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 3 Mar 2020 15:13:52 -0500
-Received: from mail-yw1-f65.google.com ([209.85.161.65]:42018 "EHLO
-        mail-yw1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730352AbgCCUNv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 Mar 2020 15:13:51 -0500
-Received: by mail-yw1-f65.google.com with SMTP id n127so4612264ywd.9;
-        Tue, 03 Mar 2020 12:13:51 -0800 (PST)
+        id S1730096AbgCCUWn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 3 Mar 2020 15:22:43 -0500
+Received: from mail-yw1-f47.google.com ([209.85.161.47]:36786 "EHLO
+        mail-yw1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728176AbgCCUWn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 3 Mar 2020 15:22:43 -0500
+Received: by mail-yw1-f47.google.com with SMTP id y72so4687538ywg.3
+        for <linux-cifs@vger.kernel.org>; Tue, 03 Mar 2020 12:22:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pCzvYSdF8vmgaLCTyZpeoxltcbWBACzfXPrjZZqp6qg=;
-        b=HSdwRA5Bre9VwcSxMFaoCPSA0sPrtL1sp1XGm7Ny1rzf9Vq9rU/Dn+qUCnDuf2pCMt
-         wftX96Y7fd7IIoOntNw7zGMgK57yrEarZLclj6RrcBI5A0f9rHFnPUIasBiiWEMYzwWR
-         JzVPPXHJXW5mPHkhi7HCDIvfjhk1qrXsCnqtuEXCiXTVAdieSA7EprD6b3UQY4sTFoDg
-         hD6k51IOCmpoxhG6mDgWl5cE3pHbMAxH2ujpxrNvitgm/jb94F+2/6HdxvTcwA5MhZDC
-         gwdmUDZmV/s9K21zvY1zt3RLsn6fNQfyWyvFXBreOdQ+zy3RGoBzoLWMMX1OgWArQt+h
-         W7Tg==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=TAkK6bk4uP9VyqYT4IT0Yr5ezBih1RCiSQeEBdaRUFU=;
+        b=IpjtCMLgA7+Dwiu1qUuUomwjU2rzMRO6aLOmD/lFf5b7hfxHHZEx/iXSFUavcOVhRi
+         M5fBlcbE3FeyXo94HIqePonMRW1eMdrWSRElUdkCct608VwBZTvBCbEjraSVOk/fOcfP
+         aEZuypTkitlVo3k/t5ycpe4T+H8Y36WWmxGOwpyXbJDW55FID/LKU1T6MEbiG4pxVkcc
+         G+cO81GTri3Pw7rqgTYz8HSEX+HvBAJHlMDfKCBBSNvmQT0qx/iIKkcpuwwlybnIaADN
+         zBXVqPfgr0L/uO7OHPNxBuuLPmIHj4SQY1RelFs3dkBSv3UatZVwbzddSXXhbDTTz/TU
+         7R9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pCzvYSdF8vmgaLCTyZpeoxltcbWBACzfXPrjZZqp6qg=;
-        b=BIXr5vqsSfmh3vtNyoFZ235atj0qBySD/IJYLt3g+Q1gh+7HT36AHlZNFYA9JKOat9
-         1WL7Jzq2AUNZpBIma0prakUfaCScSfdXC2VTXbkXYNPW3ODuXNGDW3zLE7kDL/dOaS2F
-         VMUzS6i8R6ZmaCSV6tsoElwkL2s8j4ZL9R8qYPt/oRjANDcyOIVwaw3Fq/IZI0Va2nIZ
-         2uOxdG7FER1HBaYefikoRkhi6OdwA/rs2HMqDUU99AK48YkxdZkB1vX01/OXsGbWT05D
-         Pc2eaJ9J+/D+Gatj7mTZJaqufQwkuU1dfXF9bYLXTkAPPyp+rJc7Ja7urrMwwT0XgqMi
-         s58w==
-X-Gm-Message-State: ANhLgQ3arakZgpQPTOFbw6MjZdWnj0qmMhT4QQMSLD2wS08lQCBymKOB
-        LjsTb9pUO0P5cAJnrOX5QR1rPly176gT9fBm8xBXGW4v
-X-Google-Smtp-Source: ADFU+vse4AsegA7GlUrSvWXsI5JQFIAMJz76HINEijP2ceCWNl2LChFRI5gUzeg5y40xNet9+LnNSpv1FKu/Ff1YFSg=
-X-Received: by 2002:a81:6c55:: with SMTP id h82mr6562001ywc.381.1583266430034;
- Tue, 03 Mar 2020 12:13:50 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=TAkK6bk4uP9VyqYT4IT0Yr5ezBih1RCiSQeEBdaRUFU=;
+        b=m62GIVReoBvE0Ycs23N7qGNltdwo+JbF9ufwrAirlWrFuAmDjjdL87eSfyqfwUkH2X
+         zfkKX5eaY+QCPLzKU/nGbRnFi3yetEHYIp1VUCmU0xKspvGG86qc1i0KLk8hvq1nunEE
+         xr88sG+PvMwsvgxilGbUpo3vshX4r+r+y+vOWWr+usZTalI4fsrTxBdtBlJ/I2fY/OMu
+         ej6CK9/jmRD0GTun6nH7/dC1oBewToQabkFbFvfEFNn/vuzWrJMWozN/O5kxa/FjneT3
+         m0pBTRcfOqogJYM9xbYT3gtysYehPsI78Wy3YA9c9OOnUF2/UBk3sV8bPUErvagGOqc6
+         N8Qg==
+X-Gm-Message-State: ANhLgQ3p2LuZ0pMYGKnjD6Akx+G3dIHN4lfx5yTd67bUoFxaIdI+PFHf
+        /TcVO02CCHIYk1raeV4CxceZMq77KyCeoF36PnBxLTGD
+X-Google-Smtp-Source: ADFU+vs4fHAjXAgcGuaTYxOY34tBdg5PiCELPz54rwcaHcmQqP5fO/71qOpjqjO9ZiUPAHC3W/xkzHGcH3lxpFK72cc=
+X-Received: by 2002:a81:6507:: with SMTP id z7mr6226975ywb.77.1583266960867;
+ Tue, 03 Mar 2020 12:22:40 -0800 (PST)
 MIME-Version: 1.0
-References: <1583250197-10786-1-git-send-email-hqjagain@gmail.com>
-In-Reply-To: <1583250197-10786-1-git-send-email-hqjagain@gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 3 Mar 2020 14:13:39 -0600
-Message-ID: <CAH2r5mv2VrSBT_MvUNjd=h354v=29htRQdLSEZi+pDtdggNfoQ@mail.gmail.com>
-Subject: Re: [PATCH] fs/cifs/cifsacl: fix sid_to_id
-To:     Qiujun Huang <hqjagain@gmail.com>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+Date:   Tue, 3 Mar 2020 14:22:30 -0600
+Message-ID: <CAH2r5muzDocCzjYJ_ahYXz3G2e=UA4jmfowbHBMt4iWsu6+yVg@mail.gmail.com>
+Subject: [GIT PULL] CIFS/SMB3 fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Doesn't rc = 0 have to be set earlier (preferably in the declaration
-on line 345)?
+Please pull the following changes since commit
+f8788d86ab28f61f7b46eb6be375f8a726783636:
 
-since line 392 does
-            goto got_valid_id;
-which appears to leave rc unitialized with your change
+  Linux 5.6-rc3 (2020-02-23 16:17:42 -0800)
 
-On Tue, Mar 3, 2020 at 9:56 AM Qiujun Huang <hqjagain@gmail.com> wrote:
->
-> fix it to return the errcode.
->
-> Signed-off-by: Qiujun Huang <hqjagain@gmail.com>
-> ---
->  fs/cifs/cifsacl.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-> index 716574a..a8d2aa8 100644
-> --- a/fs/cifs/cifsacl.c
-> +++ b/fs/cifs/cifsacl.c
-> @@ -400,6 +400,7 @@
->         if (!sidstr)
->                 return -ENOMEM;
->
-> +       rc = 0;
->         saved_cred = override_creds(root_cred);
->         sidkey = request_key(&cifs_idmap_key_type, sidstr, "");
->         if (IS_ERR(sidkey)) {
-> @@ -454,7 +455,7 @@
->                 fattr->cf_uid = fuid;
->         else
->                 fattr->cf_gid = fgid;
-> -       return 0;
-> +       return rc;
->  }
->
->  int
-> --
-> 1.8.3.1
->
+are available in the Git repository at:
 
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.6-rc4-smb3-fixes
+
+for you to fetch changes up to fb4b5f13464c468a9c10ae1ab8ba9aa352d0256a:
+
+  cifs: Use #define in cifs_dbg (2020-02-24 14:20:38 -0600)
+
+----------------------------------------------------------------
+five small cifs/smb3 fixes, two for stable (one for a reconnect problem
+and the other fixes a use case when renaming an open file)
+
+Regression test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/320
+----------------------------------------------------------------
+Aurelien Aptel (1):
+      cifs: fix rename() by ensuring source handle opened with DELETE bit
+
+Joe Perches (1):
+      cifs: Use #define in cifs_dbg
+
+Paulo Alcantara (SUSE) (1):
+      cifs: fix potential mismatch of UNC paths
+
+Ronnie Sahlberg (1):
+      cifs: don't leak -EAGAIN for stat() during reconnect
+
+Steve French (1):
+      cifs: add missing mount option to /proc/mounts
+
+ fs/cifs/cifs_dfs_ref.c |  2 ++
+ fs/cifs/cifsfs.c       |  2 ++
+ fs/cifs/cifsglob.h     |  7 +++++++
+ fs/cifs/cifsproto.h    |  5 +++--
+ fs/cifs/cifssmb.c      |  3 ++-
+ fs/cifs/file.c         | 19 ++++++++++++-------
+ fs/cifs/inode.c        | 16 ++++++++++------
+ fs/cifs/smb1ops.c      |  2 +-
+ fs/cifs/smb2inode.c    |  4 ++--
+ fs/cifs/smb2ops.c      |  3 ++-
+ fs/cifs/smb2pdu.c      |  1 +
+ 11 files changed, 44 insertions(+), 20 deletions(-)
 
 -- 
 Thanks,
