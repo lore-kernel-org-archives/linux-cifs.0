@@ -2,119 +2,119 @@ Return-Path: <SRS0=Ot+p=4V=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 836A8C3F2D1
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Mar 2020 06:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8675C3F2D1
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 Mar 2020 06:23:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 590BD2166E
-	for <linux-cifs@archiver.kernel.org>; Wed,  4 Mar 2020 06:18:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FE4F2166E
+	for <linux-cifs@archiver.kernel.org>; Wed,  4 Mar 2020 06:23:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTCe6sWf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pnUUEvB3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726389AbgCDGSV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 4 Mar 2020 01:18:21 -0500
-Received: from mail-yw1-f68.google.com ([209.85.161.68]:34903 "EHLO
-        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725774AbgCDGSV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 Mar 2020 01:18:21 -0500
-Received: by mail-yw1-f68.google.com with SMTP id a132so997544ywb.2
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Mar 2020 22:18:19 -0800 (PST)
+        id S1725822AbgCDGXa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 4 Mar 2020 01:23:30 -0500
+Received: from mail-yw1-f67.google.com ([209.85.161.67]:39803 "EHLO
+        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725271AbgCDGX3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 4 Mar 2020 01:23:29 -0500
+Received: by mail-yw1-f67.google.com with SMTP id x184so980944ywd.6;
+        Tue, 03 Mar 2020 22:23:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=jcz2rfW34qu6+b+jI00dFaLIo0kKDE91j2N3+6pK3rI=;
-        b=FTCe6sWfAwgSExWrWZQR4JO3VyTW5RTXR4oST49CB0ZtcKY/FadArUV+HNYyqkkgAn
-         4qLuo403wsiIiBSQG6O51v/f83t/URPQJztlrmmbt00aJ4ZEUqdKyjbaHWt5YAGCK1Yn
-         Ue+X9taEplgv4tkRc0m1ZECVgytT8PpBbCESjvV8UenncljWCHt0qlZKW0Idp2CWKTrR
-         OgLUcSCUwlljgWUjvA1mSFSJUxl2quDKc10IWJS4v7XJrOyc3bU3H5IUYB2VYiQgaX4H
-         V/LyZdcnN8iU69AZpgHYORiWA8NvIdUjdg5QVAydv2+ZiA5XKEW1ck/duaRvp6UVZogr
-         ljqg==
+        bh=tbcuDfYaDl0s2pOUxHvvOkfOWHYsJpebfP0ObmyJLhA=;
+        b=pnUUEvB3emIIYIR+4DE+c2kjKv/n3JDAttQZl/Z8rY5peVO84IFZ7XMRFn9sGz13ki
+         7xYAbcCnds8+jE3Az1o6tS6Vm0utLaCW75ICVgGZ36fvpIW5pNm4AhSJONxVtqsMlhQ8
+         tJNldWnRN0W9DXGj6W9iGcdmxomrCXhDZGwPgyezJSieiMeBjiVcstmnvKXulRAZssbP
+         g6lqxXdV6UB42snjshIGMEvZF/8PUKHp1iQi71wp2TNfyJxRXDZSlyyOZFv8kvSe+hSV
+         fORT4Wbocws1DsnD1VTADO3nTJX4Rrpndhhm5qtsli8VqT35VW9LbRPAC6+kFYnx+51p
+         E96A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=jcz2rfW34qu6+b+jI00dFaLIo0kKDE91j2N3+6pK3rI=;
-        b=JbfO/c9g5vxrPQWUXiVJgKTdtlGRW7pUolS7HpomMcLKvIxbBfoyzeEPLouuJ3hw5o
-         l9NrsjBqrLMJoOd4UY3JiH6Aw8jWN+KC4HCQHkGMSb82+0f8cAWqUJqif4J0I0yTxHXO
-         UaPvrfbuuLhx/aoo8lFaTtZ07Fht8kWlLs8GXujL2Qx8GrIBaUfPV9AYpcWNqVdvy/zC
-         XVfpuT7gwsfyyTyXlm2evrBKv0kaya7oz8WCu7bYsMmNz1E+mzAVpaeePNoPk+/1jOvI
-         YnwbLorY7sUwblALQ+88Dqs9SJ4fqwr+zlzH9ONFGp6eIl9BJj1JuS9XzF/zxcmOfNhb
-         wv6g==
-X-Gm-Message-State: ANhLgQ32RiweTZu5zwNmsCMPZl4ARLSKCyYIzqRDCJxg4FvtA9l58b4o
-        HazffvaAMeZ3DNlSu99JYWU/LLGcbNi7VboQ53KvwQ==
-X-Google-Smtp-Source: ADFU+vtE9vnGKUcQy7SCZ1y8Z3ed/W99AuCZ4t7dWDWlAU/IxIKP3rMk+hr0nJNtB9YkLC3j/SUaCz+CgCBlOU6Xhvs=
-X-Received: by 2002:a25:f20f:: with SMTP id i15mr1108093ybe.364.1583302699139;
- Tue, 03 Mar 2020 22:18:19 -0800 (PST)
+        bh=tbcuDfYaDl0s2pOUxHvvOkfOWHYsJpebfP0ObmyJLhA=;
+        b=LUKkBSuI/Oz50G51Wn12C3voyJ0nuR4xOVljiuoI/YJsTbH4G3eDUDb/p3kw5ahpW7
+         u8WOE9EyufaKeTN4w6HMiCQ94vKfAgPevo5JBWuWi+KpEgGB0NouSxLv+H6HIbq5GCa4
+         uX6pYBLgdd4UtfdpHY2l2v+e6aUqwp/SsHM2EVruUs0p6yXjDFPuo89JKsBhbYt9wAyj
+         aY0wKCuXqXLmvevJoLZQDk5hh0iGdlFCT5/Ky0kSXLQ+aDt5A7/jF5v+fo8f+uqac7Oz
+         QXUlgRGetuG2Yfy8UROPr4SCX476mpwuEMYvTxlPdiiq/zD7MMw9SNnOgzfiBAa0knUr
+         rJVA==
+X-Gm-Message-State: ANhLgQ2d+aGvLlmdxPENeT01HWObMhHuo10YXEOAPb2KihbT/nN4/GZc
+        NM+tLrSgaCzbUksFgxkbmI2idHc+EWIfXJ42PIXDGQ==
+X-Google-Smtp-Source: ADFU+vtJJiFniW/eKxBD4MR+qeAqmZ5k8NJak28YOj5w+Lndf/ByC4XUp8y8n7q9Pqhtb5af3SjTW245SjErulbzu/Q=
+X-Received: by 2002:a81:4cc2:: with SMTP id z185mr1475074ywa.357.1583303007222;
+ Tue, 03 Mar 2020 22:23:27 -0800 (PST)
 MIME-Version: 1.0
-References: <20200221023001.vcoc5f43rdqqeifn@xzhoux.usersys.redhat.com>
-In-Reply-To: <20200221023001.vcoc5f43rdqqeifn@xzhoux.usersys.redhat.com>
+References: <1583278783-11584-1-git-send-email-hqjagain@gmail.com>
+In-Reply-To: <1583278783-11584-1-git-send-email-hqjagain@gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 4 Mar 2020 00:18:08 -0600
-Message-ID: <CAH2r5mttkA0MAofhVHe6phT65nLzoeBR8phbPuyn1zC+u+Ltpw@mail.gmail.com>
-Subject: Re: [PATCH v2] cifs: allow unlock flock and OFD lock across fork
-To:     Murphy Zhou <jencce.kernel@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Wed, 4 Mar 2020 00:23:16 -0600
+Message-ID: <CAH2r5mv9N_vo+vX7TaaPc2MBNFgsOAO6nGZcfaiaz8JqjM0BnQ@mail.gmail.com>
+Subject: Re: [PATCH] fs/cifs/cifsacl: remove set but not used variable 'rc'
+To:     Qiujun Huang <hqjagain@gmail.com>
+Cc:     Steve French <sfrench@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending more testing
+Isn't it not used because of a potential bug - missing returning an
+error in two cases.
 
-On Thu, Feb 20, 2020 at 8:30 PM Murphy Zhou <jencce.kernel@gmail.com> wrote:
+If we leave the two lines you removed in - and set rc=0 in its
+declaration (and return rc at the end as you originally had suggested)
+- doesn't that solve the problem?  A minor modification to your first
+proposed patch?
+
+On Tue, Mar 3, 2020 at 5:39 PM Qiujun Huang <hqjagain@gmail.com> wrote:
 >
-> Since commit d0677992d2af ("cifs: add support for flock") added
-> support for flock, LTP/flock03[1] testcase started to fail.
+>  It is set but not used, So can be removed.
 >
-> This testcase is testing flock lock and unlock across fork.
-> The parent locks file and starts the child process, in which
-> it unlock the same fd and lock the same file with another fd
-> again. All the lock and unlock operation should succeed.
->
-> Now the child process does not actually unlock the file, so
-> the following lock fails. Fix this by allowing flock and OFD
-> lock go through the unlock routine, not skipping if the unlock
-> request comes from another process.
->
-> Patch has been tested by LTP/xfstests on samba and Windows
-> server, v3.11, with or without cache=none mount option.
->
-> [1] https://github.com/linux-test-project/ltp/blob/master/testcases/kernel/syscalls/flock/flock03.c
-> Signed-off-by: Murphy Zhou <jencce.kernel@gmail.com>
+> Signed-off-by: Qiujun Huang <hqjagain@gmail.com>
 > ---
->  fs/cifs/smb2file.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  fs/cifs/cifsacl.c | 3 ---
+>  1 file changed, 3 deletions(-)
 >
-> diff --git a/fs/cifs/smb2file.c b/fs/cifs/smb2file.c
-> index afe1f03aabe3..eebfbf3a8c80 100644
-> --- a/fs/cifs/smb2file.c
-> +++ b/fs/cifs/smb2file.c
-> @@ -152,7 +152,12 @@ smb2_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
->                     (li->offset + li->length))
->                         continue;
->                 if (current->tgid != li->pid)
-> -                       continue;
-> +                       /*
-> +                        * flock and OFD lock are associated with an open
-> +                        * file description, not the process.
-> +                        */
-> +                       if (!(flock->fl_flags & (FL_FLOCK | FL_OFDLCK)))
-> +                               continue;
->                 if (cinode->can_cache_brlcks) {
->                         /*
->                          * We can cache brlock requests - simply remove a lock
+> diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+> index 716574a..1cf3916 100644
+> --- a/fs/cifs/cifsacl.c
+> +++ b/fs/cifs/cifsacl.c
+> @@ -342,7 +342,6 @@
+>  sid_to_id(struct cifs_sb_info *cifs_sb, struct cifs_sid *psid,
+>                 struct cifs_fattr *fattr, uint sidtype)
+>  {
+> -       int rc;
+>         struct key *sidkey;
+>         char *sidstr;
+>         const struct cred *saved_cred;
+> @@ -403,7 +402,6 @@
+>         saved_cred = override_creds(root_cred);
+>         sidkey = request_key(&cifs_idmap_key_type, sidstr, "");
+>         if (IS_ERR(sidkey)) {
+> -               rc = -EINVAL;
+>                 cifs_dbg(FYI, "%s: Can't map SID %s to a %cid\n",
+>                          __func__, sidstr, sidtype == SIDOWNER ? 'u' : 'g');
+>                 goto out_revert_creds;
+> @@ -416,7 +414,6 @@
+>          */
+>         BUILD_BUG_ON(sizeof(uid_t) != sizeof(gid_t));
+>         if (sidkey->datalen != sizeof(uid_t)) {
+> -               rc = -EIO;
+>                 cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu)\n",
+>                          __func__, sidkey->datalen);
+>                 key_invalidate(sidkey);
 > --
-> 2.20.1
->
+> 1.8.3.1
 >
 
 
