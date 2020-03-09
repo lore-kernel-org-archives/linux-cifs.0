@@ -2,121 +2,146 @@ Return-Path: <SRS0=hrCW=42=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 665AFC10F25
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Mar 2020 05:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86485C10F29
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Mar 2020 10:10:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 381B720728
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Mar 2020 05:59:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583733593;
-	bh=S4XLLB0u7ZrovlJVWMX+h/jJbJG8MDh37MbRley/rR4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=IoIDRwV6HqgtZQt6F5y3M6nMdE6+iTiy6kxenJ+c8WxlZr7kuxtcRYGA9S1hHXEVV
-	 MQa+0y45hpWdmVquM4RYkuFNFYZZESOTxSnUkGRtolxSD4rdmgRVKbklyDR0jOWNb8
-	 2xK8hlADV22lftZJeRqcWwGfWPmmW2dzNGmMO2JE=
+	by mail.kernel.org (Postfix) with ESMTP id 5D68220828
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Mar 2020 10:10:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VCpdR/7l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726368AbgCIF7w (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 9 Mar 2020 01:59:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57372 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725796AbgCIF7w (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 9 Mar 2020 01:59:52 -0400
-Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EC9DF20727;
-        Mon,  9 Mar 2020 05:59:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583733592;
-        bh=S4XLLB0u7ZrovlJVWMX+h/jJbJG8MDh37MbRley/rR4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pmPSswZ2vGgU8If1BI7OFSZ6GWcpwVvgwiBSM+aK21bouP1Ych0a9sf7i1j+FRvAU
-         5iP1oGe48nvls1HTGErJ6MsWwTemo1jRjq1NIhPSXtC5ClszMwGFXS+M8PTiPOdOYk
-         Fjdaw/PH2e7uQI8lXzLGshTFnTxphXb4m7YjHQwg=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     linux-ext4@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3] cifs: clear PF_MEMALLOC before exiting demultiplex thread
-Date:   Sun,  8 Mar 2020 22:58:20 -0700
-Message-Id: <20200309055820.272703-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200309055621.GA272474@sol.localdomain>
-References: <20200309055621.GA272474@sol.localdomain>
+        id S1726379AbgCIKK6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 9 Mar 2020 06:10:58 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:41524 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725796AbgCIKK6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Mar 2020 06:10:58 -0400
+Received: by mail-oi1-f196.google.com with SMTP id i1so9535233oie.8
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Mar 2020 03:10:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CN4iAlbjItoDXwwZc9+toj2fr45v+x1gzBMqHr20QKc=;
+        b=VCpdR/7lAPdGJ42zzuqETlylmQgu0elf39ILetcSn8HNWj8tq2Wq7WJP1y5gq5K5CA
+         8rdx0F+nFMGoRSsPjwiNmylYtpxUw953MhKCOldYZYbI0f5/rEPu1ryg/RtUYV1xSg98
+         XjX1iJr8uFS2YSTRJ04kyEBiV4uuUMMhN0udiMO8nvMoqJ7rc6yy20oSkysaG1imaoBe
+         qzbTaovWRrWH4CU5ne8uzONVVo+Uglg9l8zt7c9e8mHMw+XRCe88TQD0+6hYMCnEIJjc
+         UnH1G2zawxNY4drJEvn9B1oGn6227unLa3nAkb4l6PnghFSQQI7mDC3Y7jlYZ5OK05a9
+         Tziw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CN4iAlbjItoDXwwZc9+toj2fr45v+x1gzBMqHr20QKc=;
+        b=Drpb30Tw4NVvyauf3pyriiGQbXZ93ctHd2DfGPiOWQZEXvgDPace7LrPy+V3I6ickc
+         BEzM2QQBXiEoMsey+BK2npB6VmmLuHRR89VFYq7NHn/fESdJszrG3o/GPa1lYCunLwa6
+         QPxjtwCeZPYny6dGi+IMzlaQyyO8inXdrqs6Jey0jefiAZMfAXRdirboKzZICVOBC5le
+         tDqYn+DLCwn9uIohyk9w9f8EXE/ulY181zVlAOEQ0gzC1wtgAdgKstP4ibWx/rcuglg2
+         0hxjBkvQHQo+9CulPlRvUftM/RSYSJeo661+SzIapne5twrqe46+BSJfZ9OMs7CeOV69
+         37WQ==
+X-Gm-Message-State: ANhLgQ2G3fWJXp9m1+ZwtbLv91KIeo6X0Y29ZArp1wpjkD2PBsMWLbOL
+        P0E7MUvWFXDPGqXLBMkyCgx0mmPSGX4waPFzO30=
+X-Google-Smtp-Source: ADFU+vsRIZN6qA/qyG9ouMw8jPh93h1yUnZmz7EFY6BUpWmMivR8GJfdagetL4zkTxYq1T2zw0SuNZ9NJQSOEtxA0pA=
+X-Received: by 2002:aca:56c2:: with SMTP id k185mr5409192oib.141.1583748657878;
+ Mon, 09 Mar 2020 03:10:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CA+7wUszkCoy_o2RJ76QESUH3S7NKG6RvFyVY+5sDcQA+dC6utw@mail.gmail.com>
+ <CAH2r5mtd-WbXbTG6bgT9EfZyXCC2Qr-TB8QszOy+oFRu5CrerQ@mail.gmail.com> <CA+7wUsx7sBMzSFnaynBoU3zoBAaG1n6909EhTsixuzKLTzB79Q@mail.gmail.com>
+In-Reply-To: <CA+7wUsx7sBMzSFnaynBoU3zoBAaG1n6909EhTsixuzKLTzB79Q@mail.gmail.com>
+From:   Mathieu Malaterre <mathieu.malaterre@gmail.com>
+Date:   Mon, 9 Mar 2020 11:10:40 +0100
+Message-ID: <CA+7wUsxNJ2KQgQ8v+hob31NP45HDAEKEHPKNJ6+F+6AFBCeaJw@mail.gmail.com>
+Subject: Re: Proper mounting Windows DFS Namespace in Linux / Object is remote
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, Mar 6, 2020 at 2:58 PM Mathieu Malaterre
+<mathieu.malaterre@gmail.com> wrote:
+>
+> Steve,
+>
+> On Mon, Mar 2, 2020 at 10:12 PM Steve French <smfrench@gmail.com> wrote:
+> >
+> > Can you try an experiment with Ubuntu's newer kernel:
+> >
+> > https://wiki.ubuntu.com/Kernel/MainlineBuilds
+> > Or
+> >
+> > https://github.com/pimlie/ubuntu-mainline-kernel.sh
+>
+> I picked latest Debian bullseye installer. Here is what I have:
+>
+> $ uname -rvo
+> 5.4.0-4-amd64 #1 SMP Debian 5.4.19-1 (2020-02-13) GNU/Linux
+>
+> I am observing the same behavior with regard to 'nodfs' option. I am
+> required to use this option to get the first mount working.
+>
+> $ mount
+> [...]
+> //mydoma01.acme.corp/network on /tmp/z type cifs
+> (rw,relatime,vers=default,cache=strict,username=mmalaterre,domain=MY,uid=0,noforceuid,gid=0,noforcegid,addr=1.2.3.4,file_mode=0755,dir_mode=0755,soft,nounix,nodfs,mapposix,rsize=4194304,wsize=4194304,bsize=1048576,echo_interval=60,actimeo=1)
+>
+> For some reason I am getting vers=1.0 behavior (described previously):
+>
+>     $ cd /tmp/z
+>     $ cd folder2
+>     $ ls
+>     subfolder2
+>     $ cd subfolder2/
+>     bash: cd: subfolder2/: Object is remote
+>
+> Ref:
+>
+> $ apt-cache policy cifs-utils
+> cifs-utils:
+>   Installed: 2:6.9-1
+>   Candidate: 2:6.9-1
+>   Version table:
+>  *** 2:6.9-1 500
+>         500 http://deb.debian.org/debian bullseye/main amd64 Packages
+>         100 /var/lib/dpkg/status
 
-Leaving PF_MEMALLOC set when exiting a kthread causes it to remain set
-during do_exit().  That can confuse things.  For example, if BSD process
-accounting is enabled and the accounting file has FS_SYNC_FL set and is
-located on an ext4 filesystem without a journal, then do_exit() can end
-up calling ext4_write_inode().  That triggers the
-WARN_ON_ONCE(current->flags & PF_MEMALLOC) there, as it assumes
-(appropriately) that inodes aren't written when allocating memory.
+I eventually stumble upon:
 
-This was originally reported for another kernel thread, xfsaild() [1].
-cifs_demultiplex_thread() also exits with PF_MEMALLOC set, so it's
-potentially subject to this same class of issue -- though I haven't been
-able to reproduce the WARN_ON_ONCE() via CIFS, since unlike xfsaild(),
-cifs_demultiplex_thread() is sent SIGKILL before exiting, and that
-interrupts the write to the BSD process accounting file.
+* https://wiki.samba.org/index.php/LinuxCIFS_troubleshooting
 
-Either way, leaving PF_MEMALLOC set is potentially problematic.  Let's
-clean this up by properly saving and restoring PF_MEMALLOC.
+Which gave me a more verbose error log I found out that:
 
-[1] https://lore.kernel.org/r/0000000000000e7156059f751d7b@google.com
+[...]
+[  687.037593] fs/cifs/dns_resolve.c: dns_resolve_server_name_to_ip:
+unable to resolve: MYSERV13
+[  687.037606] fs/cifs/cifs_dfs_ref.c: cifs_compose_mount_options:
+Failed to resolve server part of //MYSERV13/network to IP: -2
+[...]
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
+Updating my resolve.conf from:
 
-v3: improved commit message
-v2: added missing include
+search acme.corp
 
- fs/cifs/connect.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+to:
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 4804d1df8c1cf..97b8eb585cf9d 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -21,6 +21,7 @@
- #include <linux/fs.h>
- #include <linux/net.h>
- #include <linux/string.h>
-+#include <linux/sched/mm.h>
- #include <linux/sched/signal.h>
- #include <linux/list.h>
- #include <linux/wait.h>
-@@ -1164,8 +1165,9 @@ cifs_demultiplex_thread(void *p)
- 	struct task_struct *task_to_wake = NULL;
- 	struct mid_q_entry *mids[MAX_COMPOUND];
- 	char *bufs[MAX_COMPOUND];
-+	unsigned int noreclaim_flag;
- 
--	current->flags |= PF_MEMALLOC;
-+	noreclaim_flag = memalloc_noreclaim_save();
- 	cifs_dbg(FYI, "Demultiplex PID: %d\n", task_pid_nr(current));
- 
- 	length = atomic_inc_return(&tcpSesAllocCount);
-@@ -1320,6 +1322,7 @@ cifs_demultiplex_thread(void *p)
- 		set_current_state(TASK_RUNNING);
- 	}
- 
-+	memalloc_noreclaim_restore(noreclaim_flag);
- 	module_put_and_exit(0);
- }
- 
+search acme.corp mydoma01.acme.corp
+
+I was finally able to call mount -t cifs without the 'nodfs' option.
+The symptoms are no longer an error and simply informative:
+
+$ cd subfolder2
+CIFS VFS: BAD_NETWORK_NAME: \\MYSERV13\network
+[...]
+
+I can finally access the content of subfolder2 without issue.
+
 -- 
-2.25.1
-
+Mathieu
