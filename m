@@ -2,112 +2,96 @@ Return-Path: <SRS0=R6NA=5B=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EAE5C10DCE
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Mar 2020 01:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8220C10F29
+	for <linux-cifs@archiver.kernel.org>; Mon, 16 Mar 2020 02:33:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD63D20674
-	for <linux-cifs@archiver.kernel.org>; Mon, 16 Mar 2020 01:19:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLZx8I99"
+	by mail.kernel.org (Postfix) with ESMTP id 9B7D420722
+	for <linux-cifs@archiver.kernel.org>; Mon, 16 Mar 2020 02:33:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1584326017;
+	bh=X2U8BZK1mRjV0hmRrAocA+0FcUAr5GGTKyHMMuN4tbE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=aVXHLkB73MdTjWyPdWSIyLqg2U+jCPuCvu3MWnmy2D9wGgHoCgdJ8MkSx6lsLOxbD
+	 Lq8TgmZugz9Q46eCJuWAftdzzqVbNdgwLutjb5I+T5MVg54AC/PgqzI2hH1knIHukm
+	 WvVwhtgLaSez1ZiXfCR1LouZVWGRktp9bZQplB4E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729306AbgCPBTT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 15 Mar 2020 21:19:19 -0400
-Received: from mail-qk1-f179.google.com ([209.85.222.179]:33275 "EHLO
-        mail-qk1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729300AbgCPBTT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 15 Mar 2020 21:19:19 -0400
-Received: by mail-qk1-f179.google.com with SMTP id p62so23449379qkb.0
-        for <linux-cifs@vger.kernel.org>; Sun, 15 Mar 2020 18:19:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tdNus9zNxtSOm7qlUBtshsyO4JEC1pBu4ig8znf74kI=;
-        b=HLZx8I99a+P4axfDNAujOaj/sQ1oqWAkLLgslZHbQu3jOXcgPkidzv+SVdME8bPtHg
-         SetElvl+jvyP8ArVe1imVQSMEAqraHsIHuO7It27JfTDq2shH5ZAqozXZfGuaKP3N1CI
-         +RlGyyQFey82asFc2MLft70ftZNdw5QZllCoiOGR3l7TSkXuDaN62sQRFUYqsslaRb+f
-         EvOtozGv6wxJHGalAc2mPYdOxZnhxQYkNijy6rsu8m9TMQmXPhJGWQPE5vCW1h9bapQ+
-         zLn4wqFtX5DgonwWspODRTSHwSG1QRsHg9IO+RvJc+v3TTVTOwfI1cD4MBQRreyNxGHB
-         FD0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tdNus9zNxtSOm7qlUBtshsyO4JEC1pBu4ig8znf74kI=;
-        b=JG7VKPykvKA7h2le95vBh6+f4g14JZSfgfRjjxWKA1EF7S2oJsG2scLl9aDHQrCRUZ
-         x6HP8JpGBZbDzYW4Y7cEcucB0vciIbqE2WXd2iTUcovv7yAcPUMRbRqhHngu4v5FDT6c
-         4B/M/nlcQtdxE7uEk7eNOAySSPJzPmOzmOM7z90Zs9ZHIo95cBC5Fs+jVXF21Fhvpu2R
-         zx78tC9734wQ6IrfHLKW9NRGuR17Z+3ffTLxCf3e6pShAhcG2HhqitsmuWnjMSL6b7Wu
-         RbZzRvG6VKKxIgj45FaicnM0Lx1g70/Yo9d4Smw148KUmpUFxqRu0zbUfMLWHKxGdDrh
-         GJyw==
-X-Gm-Message-State: ANhLgQ3rDs24RP/r0w8acck0q9BRujHuppH9TqnLqUksB6PkWLWgyncr
-        /AVItJ0p7BfqW8Hduq2aM3+hnLvjQZmdwK1kf6Qd65Zd
-X-Google-Smtp-Source: ADFU+vvw/EgWwz9qn98zRlv/vkB/Ds3xaZkM10Q58FUN+jkPEolnt14MxubPuUTRaVB71Gb83IcXCHDVqcN0gHs8nAc=
-X-Received: by 2002:a25:2554:: with SMTP id l81mr32492135ybl.375.1584321556736;
- Sun, 15 Mar 2020 18:19:16 -0700 (PDT)
+        id S1729497AbgCPCdg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 15 Mar 2020 22:33:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36294 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729560AbgCPCdf (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 15 Mar 2020 22:33:35 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9CC512073C;
+        Mon, 16 Mar 2020 02:33:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584326014;
+        bh=X2U8BZK1mRjV0hmRrAocA+0FcUAr5GGTKyHMMuN4tbE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Seh/NSkBoj3iYRI3svqZHrh47XsHzzPcSVnS1Mp74xQoalppekLTZC6A5ELDLYWuN
+         8rekGS+7oHTLNYWSNSFWeBavx0kwjbhcdgq5vhm00UDevAQoqGUgqtFKIsZq3aAvPW
+         o4Jm87A9FaxLTHKh9pv7IqkYBKhTSvQ8kP1Jqp/k=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
+        Steve French <stfrench@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 5.5 12/41] cifs: fix potential mismatch of UNC paths
+Date:   Sun, 15 Mar 2020 22:32:50 -0400
+Message-Id: <20200316023319.749-12-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200316023319.749-1-sashal@kernel.org>
+References: <20200316023319.749-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <CAH2r5ms_oxqwHm56nzabM-x2XMR1Ni-WD1_LEYYxOW_NkswsOQ@mail.gmail.com>
- <CAH2r5mvN5ri_7x3dVah8tUft6Xxbjia9MSANZV04TkVwtqY9Tw@mail.gmail.com> <CAN05THSjfj2ZJCSEdgdEfiEcxG8=xd-e5zR6KrF8gR_O1Mxb7w@mail.gmail.com>
-In-Reply-To: <CAN05THSjfj2ZJCSEdgdEfiEcxG8=xd-e5zR6KrF8gR_O1Mxb7w@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 15 Mar 2020 20:19:05 -0500
-Message-ID: <CAH2r5mtO_dC88hNj-UAj61Oy2OA4XX+LKjftK_+jwwzXzdnwEw@mail.gmail.com>
-Subject: Re: [SMB3] New compression flags
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-fixed typo - thx
+From: "Paulo Alcantara (SUSE)" <pc@cjr.nz>
 
-(and also added acked-by) and pushed to cifs-2.6.git for-next
+[ Upstream commit 154255233830e1e4dd0d99ac929a5dce588c0b81 ]
 
-On Sun, Mar 15, 2020 at 6:10 PM ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
->
-> Typo in
-> +    __le32    Repititions;
->
-> otherwise looks good.
-> Acked-by me for both.
->
-> On Mon, Mar 16, 2020 at 9:07 AM Steve French via samba-technical
-> <samba-technical@lists.samba.org> wrote:
-> >
-> > And one more small set of structures for the updated transform header.
-> > See MS-SMB2 2.2.42.1 and 2.2.42.2
-> >
-> >
-> > On Sun, Mar 15, 2020 at 5:50 PM Steve French <smfrench@gmail.com> wrote:
-> > >
-> > > Some compression related flags I noticed were added in the latest MS-SMB2
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
+Ensure that full_path is an UNC path that contains '\\' as delimiter,
+which is required by cifs_build_devname().
 
+The build_path_from_dentry_optional_prefix() function may return a
+path with '/' as delimiter when using SMB1 UNIX extensions, for
+example.
 
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/cifs_dfs_ref.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
+index 606f26d862dc1..cc3ada12848d9 100644
+--- a/fs/cifs/cifs_dfs_ref.c
++++ b/fs/cifs/cifs_dfs_ref.c
+@@ -324,6 +324,8 @@ static struct vfsmount *cifs_dfs_do_automount(struct dentry *mntpt)
+ 	if (full_path == NULL)
+ 		goto cdda_exit;
+ 
++	convert_delimiter(full_path, '\\');
++
+ 	cifs_dbg(FYI, "%s: full_path: %s\n", __func__, full_path);
+ 
+ 	if (!cifs_sb_master_tlink(cifs_sb)) {
 -- 
-Thanks,
+2.20.1
 
-Steve
