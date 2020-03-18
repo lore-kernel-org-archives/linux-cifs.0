@@ -7,99 +7,103 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA4FC1975A
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 01:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D14C1975A
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 02:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E1B2120738
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 01:56:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D215C20738
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 02:01:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O0QSlAKe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GGzdmGwK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726934AbgCRB4f (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 17 Mar 2020 21:56:35 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:35834 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726871AbgCRB4f (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Mar 2020 21:56:35 -0400
-Received: by mail-pg1-f196.google.com with SMTP id 7so12780191pgr.2
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Mar 2020 18:56:32 -0700 (PDT)
+        id S1726871AbgCRCBZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 17 Mar 2020 22:01:25 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:36805 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726680AbgCRCBZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Mar 2020 22:01:25 -0400
+Received: by mail-io1-f67.google.com with SMTP id d15so23325947iog.3
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Mar 2020 19:01:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
-        bh=UuKTZphxyHELGJiAUZZZIv1h2clYb7eause3yawbkiA=;
-        b=O0QSlAKeTn21lw3vHM4ehdkG00qNNYqCWIQGXwQHohp8Wqqax3PuQindEZw+EZKPgU
-         EyWG80NZFmlc7p2Bw9lAl6dnwHQ6zPAYHPjTR/B2Wq6J6oNavwQyGBAtoosAHXyry5tU
-         QQ1c1HnlZMYp/bczjI67rIutxMBgMhXw/GvgzLww57jeyc9kfnXaeOIVmsYHMITyh66C
-         SmgCuIi/xyijA/0vc0HnCdvSsBsgtruJQ/Ljq/50/Zyoo8/PlAZ++5/nGwsrspDC9EdW
-         x4etIPw0YmnaU8wP4fiZjwMSaJIyzsnQ2U4Ib0lerxny+tSo4CK0ulQep0Q9JGWe+ov7
-         V/Ng==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GcjnegM2S9W/wrTabVBPi2axgy50klV3Is7PgYxHwNU=;
+        b=GGzdmGwKvyRPeOjCEqIF6d1jfZjoCOLFIjoqbojgj9gYAnyGs6dpnzzzYqYeA+TtdN
+         q2tIEtLaDYQsXvfbpZHsb5srvkTZV3RP5zqj1Vqc1xhj6ETZCHpr6pFqixOOk4aHBZvv
+         IWPCc8OLyoPoxKpejbmdmEcJhkjP9u0BbwBH/ZTselzEKqfMiaPUHd1SwXkUNIFnWnIJ
+         N6PN/yJYyyzYsu7mIaS2Er10MiOYh0Y+mOSQeZL5KFJNF1JT4DzRTNnqHlC08hIlnxWl
+         trdMrPw9wtdW5FyIiTGShxkL0p2/hD5NiHuS0PeOBf9I9FKPVlmjVnCrart7fFi5pMPA
+         mwpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=UuKTZphxyHELGJiAUZZZIv1h2clYb7eause3yawbkiA=;
-        b=Zerd688a8571RurHVmkzbzyNAGoQMlu5iFpm+6bpPk6vhps+cp3ui/piC3mkorisIp
-         aTFb+ZIbuG5jZ/01p9YISA5GeFRqKJriWMGMatmXci7KQf87D9zhAFEhCwDlYTD2bsuq
-         hGCNUwqODuQrHj+G8zeF4cITSg9gKpP5od0AvTAiOKLTQIABCJed44YXgGpVfAJu3kmO
-         4McaKgxC43OZ6kJYn//UdmmM4yCKlCatvDdDXUkvFf5ikKSOM6PHy4dU4lyaJWUaOM6q
-         nDi7wF0GLVR3kRbmKNBkwqSwRqdNsP0Q88qrzwexfT6HV8t4azXZ42cgzV1Fuq3SDLjH
-         B9xA==
-X-Gm-Message-State: ANhLgQ3qq6B1lEddom/biIOAVaOPzS3LKHVSxMPEw4stQlJB1rOxSpl4
-        lNUk4Jj1AL77WPqjTbnE93v/5ZDd
-X-Google-Smtp-Source: ADFU+vs1x6Ta/mPcUqKnRg1tefurvCdq0H+c1YkEOfxKZml9euJiATflfjf4Vhlghzew4bVIPdeCVA==
-X-Received: by 2002:a63:7b4e:: with SMTP id k14mr2085873pgn.434.1584496592194;
-        Tue, 17 Mar 2020 18:56:32 -0700 (PDT)
-Received: from localhost ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id y7sm4413606pfq.159.2020.03.17.18.56.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2020 18:56:31 -0700 (PDT)
-Date:   Wed, 18 Mar 2020 09:56:24 +0800
-From:   Murphy Zhou <jencce.kernel@gmail.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        Steve French <sfrench@samba.org>
-Subject: [PATCH] CIFS: check new file size when extending file by fallocate
-Message-ID: <20200318015624.spmlc7izbszkpdqf@xzhoux.usersys.redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GcjnegM2S9W/wrTabVBPi2axgy50klV3Is7PgYxHwNU=;
+        b=JPsMI07mlIvMWkBJkputUXUZp3cFC3XRO2cDNHSi+YOee/IEoonScQ9UPEE62VsMMf
+         4oD8yeA54YsjLhH9fOtwYTdIuXc718bku+j35x4xYzmQWlPq4r8CwDX5CQxNQZwGupLw
+         MKh5VMgwqlFtkf1UV3iB88oz8ZrvOQpwlvkdBMRriPn7EqI07HZ9YllLfvWxGK6oq6YM
+         Jq+UNPZAEo9qRzw6Klg5UPuWmByWsKbtypxBK9lQc1cLFj5xCrWZF4p2hvLqML77hFJL
+         UHzS0zC2MBucven5M9WUOSQfJw+vYffHPebHyrbQyhOCLskBUWBZXGWUKLH2q0rnvaxv
+         QR0A==
+X-Gm-Message-State: ANhLgQ1u3gjPDZrZR7sunz6ap8gYcydKoM1riJQ/x1E++XXDiA7vSzoa
+        c0exXsON6zeXGAo/J+hxc2b9pyI8LlM8rkYeqFQ=
+X-Google-Smtp-Source: ADFU+vub78Xk9XTXxkplXJ6b6pPAcg0UlwrHTl44loVyAexWXsKTtxtegLSto0IvSKhMJlDLYwe32Kp1IOpLjzbU7MM=
+X-Received: by 2002:a05:6602:2098:: with SMTP id a24mr1607343ioa.101.1584496884191;
+ Tue, 17 Mar 2020 19:01:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20200318015624.spmlc7izbszkpdqf@xzhoux.usersys.redhat.com>
+In-Reply-To: <20200318015624.spmlc7izbszkpdqf@xzhoux.usersys.redhat.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Wed, 18 Mar 2020 12:01:12 +1000
+Message-ID: <CAN05THRkPZEzsWuXQi_LOMtkD5vC80Zv6r2EohwfKoXxat2MqA@mail.gmail.com>
+Subject: Re: [PATCH] CIFS: check new file size when extending file by fallocate
+To:     Murphy Zhou <jencce.kernel@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <sfrench@samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-xfstests generic/228 checks if fallocate respects RLIMIT_FSIZE.
-After fallocate mode 0 extending enabled, cifs can hit this failure.
-Fix this by checking the new file size with the vfs helper, which
-checks with RLIMIT_FSIZE(ulimit -f) and s_maxbytes.
+Looks good.
+Ackd-by: me
 
-This patch has been tested by LTP/xfstests aginst samba and
-Windows server. No new issue was found.
-
-Signed-off-by: Murphy Zhou <jencce.kernel@gmail.com>
----
- fs/cifs/smb2ops.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index c31e84ee3c39..48bbbb68540d 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -3246,10 +3246,14 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 	 * Extending the file
- 	 */
- 	if ((keep_size == false) && i_size_read(inode) < off + len) {
-+		eof = cpu_to_le64(off + len);
-+		rc = inode_newsize_ok(inode, eof);
-+		if (rc)
-+			goto out;
-+
- 		if ((cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) == 0)
- 			smb2_set_sparse(xid, tcon, cfile, inode, false);
- 
--		eof = cpu_to_le64(off + len);
- 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 				  cfile->fid.volatile_fid, cfile->pid, &eof);
- 		if (rc == 0) {
--- 
-2.20.1
+On Wed, Mar 18, 2020 at 11:57 AM Murphy Zhou <jencce.kernel@gmail.com> wrote:
+>
+> xfstests generic/228 checks if fallocate respects RLIMIT_FSIZE.
+> After fallocate mode 0 extending enabled, cifs can hit this failure.
+> Fix this by checking the new file size with the vfs helper, which
+> checks with RLIMIT_FSIZE(ulimit -f) and s_maxbytes.
+>
+> This patch has been tested by LTP/xfstests aginst samba and
+> Windows server. No new issue was found.
+>
+> Signed-off-by: Murphy Zhou <jencce.kernel@gmail.com>
+> ---
+>  fs/cifs/smb2ops.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index c31e84ee3c39..48bbbb68540d 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -3246,10 +3246,14 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+>          * Extending the file
+>          */
+>         if ((keep_size == false) && i_size_read(inode) < off + len) {
+> +               eof = cpu_to_le64(off + len);
+> +               rc = inode_newsize_ok(inode, eof);
+> +               if (rc)
+> +                       goto out;
+> +
+>                 if ((cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) == 0)
+>                         smb2_set_sparse(xid, tcon, cfile, inode, false);
+>
+> -               eof = cpu_to_le64(off + len);
+>                 rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
+>                                   cfile->fid.volatile_fid, cfile->pid, &eof);
+>                 if (rc == 0) {
+> --
+> 2.20.1
