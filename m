@@ -2,108 +2,100 @@ Return-Path: <SRS0=eY7I=5D=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D14C1975A
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 02:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B1C3C10DCE
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 03:59:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D215C20738
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 02:01:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GGzdmGwK"
+	by mail.kernel.org (Postfix) with ESMTP id 3088D20753
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 03:59:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726871AbgCRCBZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 17 Mar 2020 22:01:25 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:36805 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726680AbgCRCBZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Mar 2020 22:01:25 -0400
-Received: by mail-io1-f67.google.com with SMTP id d15so23325947iog.3
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Mar 2020 19:01:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GcjnegM2S9W/wrTabVBPi2axgy50klV3Is7PgYxHwNU=;
-        b=GGzdmGwKvyRPeOjCEqIF6d1jfZjoCOLFIjoqbojgj9gYAnyGs6dpnzzzYqYeA+TtdN
-         q2tIEtLaDYQsXvfbpZHsb5srvkTZV3RP5zqj1Vqc1xhj6ETZCHpr6pFqixOOk4aHBZvv
-         IWPCc8OLyoPoxKpejbmdmEcJhkjP9u0BbwBH/ZTselzEKqfMiaPUHd1SwXkUNIFnWnIJ
-         N6PN/yJYyyzYsu7mIaS2Er10MiOYh0Y+mOSQeZL5KFJNF1JT4DzRTNnqHlC08hIlnxWl
-         trdMrPw9wtdW5FyIiTGShxkL0p2/hD5NiHuS0PeOBf9I9FKPVlmjVnCrart7fFi5pMPA
-         mwpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GcjnegM2S9W/wrTabVBPi2axgy50klV3Is7PgYxHwNU=;
-        b=JPsMI07mlIvMWkBJkputUXUZp3cFC3XRO2cDNHSi+YOee/IEoonScQ9UPEE62VsMMf
-         4oD8yeA54YsjLhH9fOtwYTdIuXc718bku+j35x4xYzmQWlPq4r8CwDX5CQxNQZwGupLw
-         MKh5VMgwqlFtkf1UV3iB88oz8ZrvOQpwlvkdBMRriPn7EqI07HZ9YllLfvWxGK6oq6YM
-         Jq+UNPZAEo9qRzw6Klg5UPuWmByWsKbtypxBK9lQc1cLFj5xCrWZF4p2hvLqML77hFJL
-         UHzS0zC2MBucven5M9WUOSQfJw+vYffHPebHyrbQyhOCLskBUWBZXGWUKLH2q0rnvaxv
-         QR0A==
-X-Gm-Message-State: ANhLgQ1u3gjPDZrZR7sunz6ap8gYcydKoM1riJQ/x1E++XXDiA7vSzoa
-        c0exXsON6zeXGAo/J+hxc2b9pyI8LlM8rkYeqFQ=
-X-Google-Smtp-Source: ADFU+vub78Xk9XTXxkplXJ6b6pPAcg0UlwrHTl44loVyAexWXsKTtxtegLSto0IvSKhMJlDLYwe32Kp1IOpLjzbU7MM=
-X-Received: by 2002:a05:6602:2098:: with SMTP id a24mr1607343ioa.101.1584496884191;
- Tue, 17 Mar 2020 19:01:24 -0700 (PDT)
+        id S1726250AbgCRD7b (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 17 Mar 2020 23:59:31 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11716 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726682AbgCRD7b (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 17 Mar 2020 23:59:31 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 8E4C28FB8D73FE15242A;
+        Wed, 18 Mar 2020 11:59:27 +0800 (CST)
+Received: from [127.0.0.1] (10.173.223.48) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Wed, 18 Mar 2020
+ 11:59:20 +0800
+From:   Yilu Lin <linyilu@huawei.com>
+Subject: [PATCH] CIFS: Fix bug which the return value by asynchronous read is
+ error
+To:     <linux-cifs@vger.kernel.org>, Steve French <sfrench@samba.org>,
+        <samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
+        <alex.chen@huawei.com>
+Message-ID: <ef49e240-fc8f-9eb4-af98-26bfd39104aa@huawei.com>
+Date:   Wed, 18 Mar 2020 11:59:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200318015624.spmlc7izbszkpdqf@xzhoux.usersys.redhat.com>
-In-Reply-To: <20200318015624.spmlc7izbszkpdqf@xzhoux.usersys.redhat.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Wed, 18 Mar 2020 12:01:12 +1000
-Message-ID: <CAN05THRkPZEzsWuXQi_LOMtkD5vC80Zv6r2EohwfKoXxat2MqA@mail.gmail.com>
-Subject: Re: [PATCH] CIFS: check new file size when extending file by fallocate
-To:     Murphy Zhou <jencce.kernel@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Steve French <sfrench@samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.223.48]
+X-CFilter-Loop: Reflected
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good.
-Ackd-by: me
+This patch is used to fix the bug in collect_uncached_read_data()
+that rc is automatically converted from a signed number to an
+unsigned number when the CIFS asynchronous read fails.
+It will cause ctx->rc is error.
 
-On Wed, Mar 18, 2020 at 11:57 AM Murphy Zhou <jencce.kernel@gmail.com> wrote:
->
-> xfstests generic/228 checks if fallocate respects RLIMIT_FSIZE.
-> After fallocate mode 0 extending enabled, cifs can hit this failure.
-> Fix this by checking the new file size with the vfs helper, which
-> checks with RLIMIT_FSIZE(ulimit -f) and s_maxbytes.
->
-> This patch has been tested by LTP/xfstests aginst samba and
-> Windows server. No new issue was found.
->
-> Signed-off-by: Murphy Zhou <jencce.kernel@gmail.com>
-> ---
->  fs/cifs/smb2ops.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index c31e84ee3c39..48bbbb68540d 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -3246,10 +3246,14 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
->          * Extending the file
->          */
->         if ((keep_size == false) && i_size_read(inode) < off + len) {
-> +               eof = cpu_to_le64(off + len);
-> +               rc = inode_newsize_ok(inode, eof);
-> +               if (rc)
-> +                       goto out;
-> +
->                 if ((cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) == 0)
->                         smb2_set_sparse(xid, tcon, cfile, inode, false);
->
-> -               eof = cpu_to_le64(off + len);
->                 rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
->                                   cfile->fid.volatile_fid, cfile->pid, &eof);
->                 if (rc == 0) {
-> --
-> 2.20.1
+Example:
+Share a directory and create a file on the Windows OS.
+Mount the directory to the Linux OS using CIFS.
+On the CIFS client of the Linux OS, invoke the pread interface to
+deliver the read request.
+
+The size of the read length plus offset of the read request is greater
+than the maximum file size.
+
+In this case, the CIFS server on the Windows OS returns a failure
+message (for example, the return value of
+smb2.nt_status is STATUS_INVALID_PARAMETER).
+
+After receiving the response message, the CIFS client parses
+smb2.nt_status to STATUS_INVALID_PARAMETER
+and converts it to the Linux error code (rdata->result=-22).
+
+Then the CIFS client invokes the collect_uncached_read_data function to
+assign the value of rdata->result to rc, that is, rc=rdata->result=-22.
+
+The type of the ctx->total_len variable is unsigned integer,
+the type of the rc variable is integer, and the type of
+the ctx->rc variable is ssize_t.
+
+Therefore, during the ternary operation, the value of rc is
+automatically converted to an unsigned number. The final result is
+ctx->rc=4294967274. However, the expected result is ctx->rc=-22.
+
+Signed-off-by: Yilu Lin <linyilu@huawei.com>
+---
+ fs/cifs/file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 022029a5d..ff4ac244c 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -3323,7 +3323,7 @@ again:
+ 	if (rc == -ENODATA)
+ 		rc = 0;
+
+-	ctx->rc = (rc == 0) ? ctx->total_len : rc;
++	ctx->rc = (rc == 0) ? (ssize_t)ctx->total_len : rc;
+
+ 	mutex_unlock(&ctx->aio_mutex);
+
+-- 
+2.19.1
+
+
