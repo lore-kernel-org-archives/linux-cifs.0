@@ -2,220 +2,105 @@ Return-Path: <SRS0=eY7I=5D=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E19C5ACD7
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 11:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD15C10DCE
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 12:43:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D12DE20771
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 11:52:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584532345;
-	bh=5GLWT1f9E683xDdoXqNUxPS3l1Q+Rt9YCz4xV7Th2WQ=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=xyF3p01zx+qbc0RTKU3gS/KL+AUKNPHARcmWdjOv3KBX0JQhNN/D5mJQG0HtQQ3Ud
-	 7nMxKyaR7rDlKhIkyZn2yOkRtZGIq8FEabrH4yEr7l4vYvP3Nk8VcqJOJttM18W1c1
-	 MSGXq2mXVcf1Ir9co/luLxDrtSZy7s+1ui6ORpdo=
+	by mail.kernel.org (Postfix) with ESMTP id 63B7F2076D
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Mar 2020 12:43:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dV/k+m3Q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727121AbgCRLwZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 18 Mar 2020 07:52:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33072 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726586AbgCRLwZ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 18 Mar 2020 07:52:25 -0400
-Received: from tleilax.poochiereds.net (68-20-15-154.lightspeed.rlghnc.sbcglobal.net [68.20.15.154])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C494120770;
-        Wed, 18 Mar 2020 11:52:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584532343;
-        bh=5GLWT1f9E683xDdoXqNUxPS3l1Q+Rt9YCz4xV7Th2WQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=gqVorwm6ZZJFKDnX+/RkNZB7QEWGyZCOQyAdkUbfdmn0rSyCgjp80B81QdwcNa/8a
-         A86BASt5L6Hp3xDtLhizhVLCozZFitehHCeMzwLIlB3MVvqhtqp1R+zd7Ou3DxN+mU
-         zUIqmU28QphTL6+b3FQultdJXBD8QnFbBDhxqiJc=
-From:   Jeff Layton <jlayton@kernel.org>
-To:     torvalds@linux-foundation.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yangerkun@huawei.com, neilb@suse.de, sfrench@samba.org,
-        viro@zeniv.linux.org.uk, bfields@fieldses.org,
-        linux-cifs@vger.kernel.org
-Subject: [PATCH] locks: reinstate locks_delete_block optimization
-Date:   Wed, 18 Mar 2020 07:52:21 -0400
-Message-Id: <20200318115221.13870-1-jlayton@kernel.org>
-X-Mailer: git-send-email 2.24.1
+        id S1726832AbgCRMns (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 18 Mar 2020 08:43:48 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39287 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726550AbgCRMnr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 Mar 2020 08:43:47 -0400
+Received: by mail-pf1-f193.google.com with SMTP id d25so5829321pfn.6
+        for <linux-cifs@vger.kernel.org>; Wed, 18 Mar 2020 05:43:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
+        bh=ZMEsmFlOAhMVNcWJSQKpoyZGH8jqSuY6lY2pfF9vav4=;
+        b=dV/k+m3Qmbg+A/48O5xlkvRFd2ienTH+9+6mWb7mliYVrvbqODjmYfo4ECKT6KRQSr
+         hoDvm9+PBR0P4zI4pG1S1PnmYKEdv9JoQ1JecgBddPQg+OzAHBdwpNFIN6LZhd5sREtP
+         A9FGytHxvwZA3t84uXdZPYYBszCtGlmfkhmRCGwpNwfxnZWTt5xQA4bCf2bmHMgEpq40
+         Np82kVZf4uyJpMbRUc/B4xyIRztLpkEjoW3U4EjqwAPPAjLinABIB26hrvBHshBaVNE4
+         MivR76zH0cHeePviao/RJfH8Z3I7aIykpr7Hg2d26qogJ0RkiFUTVIzb4ajCK3KpR+Me
+         bqlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=ZMEsmFlOAhMVNcWJSQKpoyZGH8jqSuY6lY2pfF9vav4=;
+        b=MnghzQXZHWFtoRYr+vu56lSwrKNIXGZlDQLd0oypV6w6cfvpLWjKQ05hOf2nPk0CPu
+         rO+mf3TRyHGU508ekIGXQ2gKoxslDW5OQyjXmxsH2BrIZwbY/oElHXhkCyhbIy8254OR
+         TUw4mulXVKnnreeJ6RCsYsNbs3wG7w6hR6thKrQ3yHKRuSemMFpjGyKCY0qg9M3gEZN8
+         y4hmEzBDPjSxj8lGNPEdLsfERuzzpXq5bD0eKeF8L+hTktQTgekivn2dfE+Aj6NPBBwR
+         IyY88olZNXsXQUrZbsYL8PxLFYPXZmz6gj4xxPiOame6AswDC7dFyNTtdR8+k8qpsJLo
+         VfTw==
+X-Gm-Message-State: ANhLgQ1opJQtKa11wqpc2RSv9+W+yObAICG0mOsYhek8Go7ceGYynx+g
+        XtZQzQIV7b/1RaT6Vjd1DoszJPDm
+X-Google-Smtp-Source: ADFU+vu4pSx7GgNc6NPNKrFP3c4p5M+PQ+w0xmGAvu94VybAgpH9439OPyuKAwbUVxFHAik8SUGLWA==
+X-Received: by 2002:a63:c050:: with SMTP id z16mr4294856pgi.177.1584535426687;
+        Wed, 18 Mar 2020 05:43:46 -0700 (PDT)
+Received: from localhost ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id mg16sm2488039pjb.12.2020.03.18.05.43.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Mar 2020 05:43:46 -0700 (PDT)
+Date:   Wed, 18 Mar 2020 20:43:38 +0800
+From:   Murphy Zhou <jencce.kernel@gmail.com>
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        Steve French <sfrench@samba.org>
+Subject: [PATCH v2] CIFS: check new file size when extending file by fallocate
+Message-ID: <20200318124338.tcfccbpvn3a3z2sn@xzhoux.usersys.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Linus Torvalds <torvalds@linux-foundation.org>
+xfstests generic/228 checks if fallocate respect RLIMIT_FSIZE.
+After fallocate mode 0 extending enabled, we can hit this failure.
+Fix this by check the new file size with vfs helper, return
+error if file size is larger then RLIMIT_FSIZE(ulimit -f).
 
-There is measurable performance impact in some synthetic tests due to
-commit 6d390e4b5d48 (locks: fix a potential use-after-free problem when
-wakeup a waiter). Fix the race condition instead by clearing the
-fl_blocker pointer after the wake_up, using explicit acquire/release
-semantics.
+This patch has been tested by LTP/xfstests aginst samba and
+Windows server.
 
-This does mean that we can no longer use the clearing of fl_blocker as
-the wait condition, so switch the waiters over to checking whether the
-fl_blocked_member list_head is empty.
-
-Reviewed-by: yangerkun <yangerkun@huawei.com>
-Reviewed-by: NeilBrown <neilb@suse.de>
-Fixes: 6d390e4b5d48 (locks: fix a potential use-after-free problem when wakeup a waiter)
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Signed-off-by: Murphy Zhou <jencce.kernel@gmail.com>
 ---
- fs/cifs/file.c |  3 ++-
- fs/locks.c     | 54 ++++++++++++++++++++++++++++++++++++++++++++------
- 2 files changed, 50 insertions(+), 7 deletions(-)
 
-Hi Linus,
+v2:
+  Use (off+len) instead of eof for correct argument type
 
-Sending this individually since it's just a single patch. If you'd
-prefer a pull request, let me know.
+ fs/cifs/smb2ops.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
--- Jeff
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 3b942ecdd4be..8f9d849a0012 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1169,7 +1169,8 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
- 	rc = posix_lock_file(file, flock, NULL);
- 	up_write(&cinode->lock_sem);
- 	if (rc == FILE_LOCK_DEFERRED) {
--		rc = wait_event_interruptible(flock->fl_wait, !flock->fl_blocker);
-+		rc = wait_event_interruptible(flock->fl_wait,
-+					list_empty(&flock->fl_blocked_member));
- 		if (!rc)
- 			goto try_again;
- 		locks_delete_block(flock);
-diff --git a/fs/locks.c b/fs/locks.c
-index 426b55d333d5..b8a31c1c4fff 100644
---- a/fs/locks.c
-+++ b/fs/locks.c
-@@ -725,7 +725,6 @@ static void __locks_delete_block(struct file_lock *waiter)
- {
- 	locks_delete_global_blocked(waiter);
- 	list_del_init(&waiter->fl_blocked_member);
--	waiter->fl_blocker = NULL;
- }
- 
- static void __locks_wake_up_blocks(struct file_lock *blocker)
-@@ -740,6 +739,13 @@ static void __locks_wake_up_blocks(struct file_lock *blocker)
- 			waiter->fl_lmops->lm_notify(waiter);
- 		else
- 			wake_up(&waiter->fl_wait);
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index c31e84ee3c39..f221a01f62bd 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -3246,6 +3246,10 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 	 * Extending the file
+ 	 */
+ 	if ((keep_size == false) && i_size_read(inode) < off + len) {
++		rc = inode_newsize_ok(inode, off + len);
++		if (rc)
++			goto out;
 +
-+		/*
-+		 * The setting of fl_blocker to NULL marks the "done"
-+		 * point in deleting a block. Paired with acquire at the top
-+		 * of locks_delete_block().
-+		 */
-+		smp_store_release(&waiter->fl_blocker, NULL);
- 	}
- }
+ 		if ((cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) == 0)
+ 			smb2_set_sparse(xid, tcon, cfile, inode, false);
  
-@@ -753,11 +759,42 @@ int locks_delete_block(struct file_lock *waiter)
- {
- 	int status = -ENOENT;
- 
-+	/*
-+	 * If fl_blocker is NULL, it won't be set again as this thread "owns"
-+	 * the lock and is the only one that might try to claim the lock.
-+	 *
-+	 * We use acquire/release to manage fl_blocker so that we can
-+	 * optimize away taking the blocked_lock_lock in many cases.
-+	 *
-+	 * The smp_load_acquire guarantees two things:
-+	 *
-+	 * 1/ that fl_blocked_requests can be tested locklessly. If something
-+	 * was recently added to that list it must have been in a locked region
-+	 * *before* the locked region when fl_blocker was set to NULL.
-+	 *
-+	 * 2/ that no other thread is accessing 'waiter', so it is safe to free
-+	 * it.  __locks_wake_up_blocks is careful not to touch waiter after
-+	 * fl_blocker is released.
-+	 *
-+	 * If a lockless check of fl_blocker shows it to be NULL, we know that
-+	 * no new locks can be inserted into its fl_blocked_requests list, and
-+	 * can avoid doing anything further if the list is empty.
-+	 */
-+	if (!smp_load_acquire(&waiter->fl_blocker) &&
-+	    list_empty(&waiter->fl_blocked_requests))
-+		return status;
-+
- 	spin_lock(&blocked_lock_lock);
- 	if (waiter->fl_blocker)
- 		status = 0;
- 	__locks_wake_up_blocks(waiter);
- 	__locks_delete_block(waiter);
-+
-+	/*
-+	 * The setting of fl_blocker to NULL marks the "done" point in deleting
-+	 * a block. Paired with acquire at the top of this function.
-+	 */
-+	smp_store_release(&waiter->fl_blocker, NULL);
- 	spin_unlock(&blocked_lock_lock);
- 	return status;
- }
-@@ -1350,7 +1387,8 @@ static int posix_lock_inode_wait(struct inode *inode, struct file_lock *fl)
- 		error = posix_lock_inode(inode, fl, NULL);
- 		if (error != FILE_LOCK_DEFERRED)
- 			break;
--		error = wait_event_interruptible(fl->fl_wait, !fl->fl_blocker);
-+		error = wait_event_interruptible(fl->fl_wait,
-+					list_empty(&fl->fl_blocked_member));
- 		if (error)
- 			break;
- 	}
-@@ -1435,7 +1473,8 @@ int locks_mandatory_area(struct inode *inode, struct file *filp, loff_t start,
- 		error = posix_lock_inode(inode, &fl, NULL);
- 		if (error != FILE_LOCK_DEFERRED)
- 			break;
--		error = wait_event_interruptible(fl.fl_wait, !fl.fl_blocker);
-+		error = wait_event_interruptible(fl.fl_wait,
-+					list_empty(&fl.fl_blocked_member));
- 		if (!error) {
- 			/*
- 			 * If we've been sleeping someone might have
-@@ -1638,7 +1677,8 @@ int __break_lease(struct inode *inode, unsigned int mode, unsigned int type)
- 
- 	locks_dispose_list(&dispose);
- 	error = wait_event_interruptible_timeout(new_fl->fl_wait,
--						!new_fl->fl_blocker, break_time);
-+					list_empty(&new_fl->fl_blocked_member),
-+					break_time);
- 
- 	percpu_down_read(&file_rwsem);
- 	spin_lock(&ctx->flc_lock);
-@@ -2122,7 +2162,8 @@ static int flock_lock_inode_wait(struct inode *inode, struct file_lock *fl)
- 		error = flock_lock_inode(inode, fl);
- 		if (error != FILE_LOCK_DEFERRED)
- 			break;
--		error = wait_event_interruptible(fl->fl_wait, !fl->fl_blocker);
-+		error = wait_event_interruptible(fl->fl_wait,
-+				list_empty(&fl->fl_blocked_member));
- 		if (error)
- 			break;
- 	}
-@@ -2399,7 +2440,8 @@ static int do_lock_file_wait(struct file *filp, unsigned int cmd,
- 		error = vfs_lock_file(filp, cmd, fl, NULL);
- 		if (error != FILE_LOCK_DEFERRED)
- 			break;
--		error = wait_event_interruptible(fl->fl_wait, !fl->fl_blocker);
-+		error = wait_event_interruptible(fl->fl_wait,
-+					list_empty(&fl->fl_blocked_member));
- 		if (error)
- 			break;
- 	}
 -- 
-2.24.1
+2.20.1
 
