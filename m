@@ -2,552 +2,436 @@ Return-Path: <SRS0=HB3D=5K=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 626A5C43331
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Mar 2020 21:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38297C43331
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Mar 2020 23:29:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B6982070A
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Mar 2020 21:39:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB76E20719
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Mar 2020 23:29:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pnMICQnF"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="F1nUhWqq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726947AbgCYVjs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 25 Mar 2020 17:39:48 -0400
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:35512 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726081AbgCYVjs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 25 Mar 2020 17:39:48 -0400
-Received: by mail-lf1-f65.google.com with SMTP id t16so2285216lfl.2;
-        Wed, 25 Mar 2020 14:39:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=vhgziHWNnGTKbEdo6ONanwBqvFeu0tKyMSevlBBoFls=;
-        b=pnMICQnFK4uWO2jhCdyM9YRHyKbIXwpxe5qnIplPvGdvIIWT9AZwWThQmINBGJFaey
-         Gzxu2ZDRUwP3F5cGymKYT6VnilRk8jrbpNJsJ7cPOIqtcLePVG6sCKOiKSxlNn7LGReH
-         rkd45aCZznq8yjQtJ6Afyw8X/25keATgF9g3BKqC6CNihrH7yzc2sjZ3hnzlEWJqKrN9
-         DOWQG6AgyN3SSk4pvbplPIfA9WbHrzJeuJL1nFo4ORxPZne/vxMII8TciWx3x//Zadbt
-         4oRMb1W+1z1q3nAYdnNZsMd6fjsDBUdPzeLOykVZODlGR/XxwS9ZxdFh6KAVPo8lHjDg
-         mx6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=vhgziHWNnGTKbEdo6ONanwBqvFeu0tKyMSevlBBoFls=;
-        b=RIcRBtArrQVS2e+cIApK2B94GC3nSLltKcxJ+1f67IqwcqsDx42Q5J34ZfKgug+mKW
-         cTd41y/+/5Ii9POL/Itiat8xC5B1GUgYqgg8OMYs+5jnJyOUhqCy8ozdeq3QFA+AzMXA
-         76e362vkeHpTS5pBgmny0DBElxCihzkA8oOEjnpTDMrS7l9jkoxmK/KqWxc5u4r33tiR
-         9XfQucn9c0xJzKwf3fZtFSxx0zn/iyf/Rt1PRV5zv3oC/uLu6vP5CJVLUywFC5KhzwA0
-         5149YDa8MT5aoMrr9hQO2zxOK8XMaXr/+AIfDoXnH6syyjXsMAjb7XpuSojZ1UcFiuHi
-         JDKg==
-X-Gm-Message-State: ANhLgQ3ygsXYafvgn0VS4dBb1nqI97UDI4qe0TicIQjNK12MIFx9Y3sj
-        IrwMNCHSuVZ8x4qOu4dlKZABb29wSB289qGoaw==
-X-Google-Smtp-Source: ADFU+vttN9Q4h/VtaSj5PLgxlxQqm6ZwZ7bZ1XU5lpc6mtfhqvB/PySTqwvsfKTw56C84PJPezIzIzB4emWHnzLyggU=
-X-Received: by 2002:a19:c6cf:: with SMTP id w198mr3666214lff.86.1585172382688;
- Wed, 25 Mar 2020 14:39:42 -0700 (PDT)
-MIME-Version: 1.0
-References: <1585159997-115196-1-git-send-email-longli@linuxonhyperv.com>
-In-Reply-To: <1585159997-115196-1-git-send-email-longli@linuxonhyperv.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 25 Mar 2020 14:39:30 -0700
-Message-ID: <CAKywueQWcjWP7FNG0y-gGOSV5S1kSKJfWpspwXVzY9S2oHh+zQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Remove locking in smb2_verify_signature() when
- calculating SMB2/SMB3 signature on receiving packets
-To:     Long Li <longli@microsoft.com>
-Cc:     Steve French <sfrench@samba.org>,
+        id S1727399AbgCYX3u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 25 Mar 2020 19:29:50 -0400
+Received: from mail-bn8nam12on2090.outbound.protection.outlook.com ([40.107.237.90]:7329
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727395AbgCYX3u (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 25 Mar 2020 19:29:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Hl7xWA6eZTLJzgdb/gRSNq7pahoc7zTIGPWk6Tc2dobOuDvdZlD+GI/skuiZkFI+aI+moW8wCWSDQ1tS14oZPCKBQ7cAgSxBuXGAySrj6CucQcz9tlK+S7CUbommbx4NWYw0C7X9oDWcDyiRBiqjzG8LO4jFQWtmnQVdanQPWhGJU06/o6YgX8eO8JnkKrXikz9zYMlUibU84dPveTao9y4BZXJZcJ1kDOq2eGkg+Zn0ZZUP4kGmPtRILGRXicCobYVWjmWrPPnf978/rCUi/WI8EPVD2q5rh2PUcHkHIn475vEmBmA/lZo//54CI7QRWfPITPcjVyj/a/HKvnB56Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=g+5nJKJzeWZ2/v8hJFG31jtrl1ORXHVdPUqBT5cHQ4k=;
+ b=Z9rK31fYBAqlOf0v/j3OBKsYEFVCGJeila0D2goKXRRUA5Ibh9wYcPVvNdSgq3kIeRTwfrVtQxCBLTfq3Fxh7AaTL5l/fETz92SGLsvW7S4mDbz5K/UoITekiqPui6H69JSmI3KlSuJcqGgPd8vy9QqUHM6bdbuffz78wwS8q9b/v9mY/3dfhhuNbOEg9y6XrELqddgCayOu9w5PkXhkhm7gfXwvNpDcO0Em/jymT2/69pwZGwXozu0qOOtnN6PcxJb9w/2x7tp63i0vFSSGpXx9J3fTk+OsK+DZJ8Vutp0yCKJ30POOnBeuctG0hvHYWUpXuwA4MpGDAJ7KVoAJzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=g+5nJKJzeWZ2/v8hJFG31jtrl1ORXHVdPUqBT5cHQ4k=;
+ b=F1nUhWqqZupc/rTtxwdlTHYe5G7nlLaDSiMfyaHLWDOFuaqlM7A9kcObGCH2m7a4VrUZUAaPmrzfLBK03l4EJNmvqdCunP4cofoc/AZCzVCo5pvq9Bl2udWVIAccB16M5pwV7HDERxfsqPJzw3hGkVyejS/xJUMbfhXceeXoaRI=
+Received: from BN8PR21MB1155.namprd21.prod.outlook.com (2603:10b6:408:73::10)
+ by BN8PR21MB1218.namprd21.prod.outlook.com (2603:10b6:408:77::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.7; Wed, 25 Mar
+ 2020 23:29:43 +0000
+Received: from BN8PR21MB1155.namprd21.prod.outlook.com
+ ([fe80::d11:18b7:289c:ea17]) by BN8PR21MB1155.namprd21.prod.outlook.com
+ ([fe80::d11:18b7:289c:ea17%7]) with mapi id 15.20.2878.000; Wed, 25 Mar 2020
+ 23:29:43 +0000
+From:   Long Li <longli@microsoft.com>
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+CC:     Steve French <sfrench@samba.org>,
         linux-cifs <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
         Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: RE: [PATCH] cifs: Remove locking in smb2_verify_signature() when
+ calculating SMB2/SMB3 signature on receiving packets
+Thread-Topic: [PATCH] cifs: Remove locking in smb2_verify_signature() when
+ calculating SMB2/SMB3 signature on receiving packets
+Thread-Index: AQHWAtFD/Rup8jtV9E+7q8K5j1eLM6hZ1hgAgAAcDHA=
+Date:   Wed, 25 Mar 2020 23:29:43 +0000
+Message-ID: <BN8PR21MB1155747496EDA5197AA3240DCECE0@BN8PR21MB1155.namprd21.prod.outlook.com>
+References: <1585159997-115196-1-git-send-email-longli@linuxonhyperv.com>
+ <CAKywueQWcjWP7FNG0y-gGOSV5S1kSKJfWpspwXVzY9S2oHh+zQ@mail.gmail.com>
+In-Reply-To: <CAKywueQWcjWP7FNG0y-gGOSV5S1kSKJfWpspwXVzY9S2oHh+zQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=longli@microsoft.com; 
+x-originating-ip: [2001:4898:80e8:2:edec:db5c:c6fe:798]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 2d3ef930-8b98-4dc4-9077-08d7d11465da
+x-ms-traffictypediagnostic: BN8PR21MB1218:
+x-microsoft-antispam-prvs: <BN8PR21MB12181E83287C504CD76B16ACCECE0@BN8PR21MB1218.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4125;
+x-forefront-prvs: 0353563E2B
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR21MB1155.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(136003)(39860400002)(346002)(366004)(376002)(396003)(66946007)(6506007)(64756008)(66556008)(81166006)(81156014)(76116006)(66476007)(8676002)(10290500003)(316002)(30864003)(86362001)(66446008)(55016002)(33656002)(4326008)(71200400001)(8990500004)(478600001)(7696005)(8936002)(54906003)(186003)(6916009)(5660300002)(52536014)(9686003)(2906002);DIR:OUT;SFP:1102;
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: FkvRefHp4xFY1DczSLjyxkNwQJD9NRmJSQePs6txZvXn4sAuprNrBusnA8IzeCuDsDqf3SQGjaguIjMyt6fy+oVGPQlSVT3s5Sjhw/6/nNZIbkZO8OBFwpQ2pJs+rVMm7MzvQMIXjGAxUCUuBixNFpBN487XkZhwyCS5zaNQ35YXDviBQmP0kryXVG+Mwwd5CEheE96VV28YiVyQ/xMDA8mTEsOVhHhjBkmFTAU9rDe8dWPCSPjtokkEOVaNXI4NuAMm3Fj7ADjf8HQb9bKodwcCA8173ghrFdnrnQASeQ4v/vvuMnAymgnB0LI8GIJJxHScvZ/1E4PVG7hlywirHuVsWd43FA4DwD48z3Hxa3dPyCS19H2UHbJfQDNqjI+gKf21/lIb/E9f6kNBsZ2oYXoQorvnI9VgzL3RYTmgCyMcvU9WC69ZFBIS07aNZG4h
+x-ms-exchange-antispam-messagedata: eifJErW4oqbWjmEKAeQKrg5EPDm9oM0XsxrJHFQ/ZhGP+46O8zwEBiL+0Q3XezKLedmRR1AsmT0h6DbY8uImaJsoIRDqMzTOgNrc1wnORdcQ8a1AY3nS68V7/hx+ZWKvnTw9lq/YQyDHfeAuhpith9LBI/f11/UcNjNvRTmEzjvnYYJFPVG1WzgdI22uRd8uSBNJcBrdLdAObmUmtyxxdQ==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d3ef930-8b98-4dc4-9077-08d7d11465da
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2020 23:29:43.3329
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HOGAncp9eflasAdHLdVuSxgOAS2Tco61W9jocUxGsb8ZiwSae7p+y8Z+IkWBBrri4OTG/vHuy3l9i33maHHBVw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR21MB1218
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D1=81=D1=80, 25 =D0=BC=D0=B0=D1=80. 2020 =D0=B3. =D0=B2 11:15, <longli@lin=
-uxonhyperv.com>:
->
-> From: Long Li <longli@microsoft.com>
->
-> On the sending and receiving paths, CIFS uses the same cypto data structu=
-res
-> to calculate SMB2/SMB3 packet signatures. A lock on the receiving path is
-> necessary to control shared access to crypto data structures. This lock
-> degrades performance because it races with the sending path.
->
-> Define separate crypto data structures for sending and receiving paths an=
-d
-> remove this lock.
->
-> Signed-off-by: Long Li <longli@microsoft.com>
-> ---
->  fs/cifs/cifsencrypt.c   |  29 +++++----
->  fs/cifs/cifsglob.h      |  21 +++++--
->  fs/cifs/smb2proto.h     |   4 +-
->  fs/cifs/smb2transport.c | 130 +++++++++++++++++++++++++---------------
->  4 files changed, 119 insertions(+), 65 deletions(-)
->
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index 97b7497c13ef..222e8d13302c 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -804,16 +804,27 @@ calc_seckey(struct cifs_ses *ses)
->  void
->  cifs_crypto_secmech_release(struct TCP_Server_Info *server)
->  {
-> -       if (server->secmech.cmacaes) {
-> -               crypto_free_shash(server->secmech.cmacaes);
-> -               server->secmech.cmacaes =3D NULL;
-> -       }
-> +       int i;
-> +
-> +       for (i =3D CIFS_SECMECH_DIR_IN; i < CIFS_SECMECH_DIR_MAX; i++) {
-> +               if (server->secmech.cmacaes[i]) {
-> +                       crypto_free_shash(server->secmech.cmacaes[i]);
-> +                       server->secmech.cmacaes[i] =3D NULL;
-> +               }
->
-> -       if (server->secmech.hmacsha256) {
-> -               crypto_free_shash(server->secmech.hmacsha256);
-> -               server->secmech.hmacsha256 =3D NULL;
-> +               if (server->secmech.hmacsha256[i]) {
-> +                       crypto_free_shash(server->secmech.hmacsha256[i]);
-> +                       server->secmech.hmacsha256[i] =3D NULL;
-> +               }
-> +
-> +               kfree(server->secmech.sdesccmacaes[i]);
-> +               server->secmech.sdesccmacaes[i] =3D NULL;
-> +
-> +               kfree(server->secmech.sdeschmacsha256[i]);
-> +               server->secmech.sdeschmacsha256[i] =3D NULL;
->         }
->
-> +
->         if (server->secmech.md5) {
->                 crypto_free_shash(server->secmech.md5);
->                 server->secmech.md5 =3D NULL;
-> @@ -839,10 +850,6 @@ cifs_crypto_secmech_release(struct TCP_Server_Info *=
-server)
->                 server->secmech.ccmaesdecrypt =3D NULL;
->         }
->
-> -       kfree(server->secmech.sdesccmacaes);
-> -       server->secmech.sdesccmacaes =3D NULL;
-> -       kfree(server->secmech.sdeschmacsha256);
-> -       server->secmech.sdeschmacsha256 =3D NULL;
->         kfree(server->secmech.sdeschmacmd5);
->         server->secmech.sdeschmacmd5 =3D NULL;
->         kfree(server->secmech.sdescmd5);
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 0d956360e984..e31a902ebadc 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -137,17 +137,27 @@ struct sdesc {
->         char ctx[];
->  };
->
-> +enum {
-> +       CIFS_SECMECH_DIR_IN =3D 0,
-> +       CIFS_SECMECH_DIR_OUT,
-> +       CIFS_SECMECH_DIR_MAX
-> +};
-> +
->  /* crypto hashing related structure/fields, not specific to a sec mech *=
-/
->  struct cifs_secmech {
->         struct crypto_shash *hmacmd5; /* hmac-md5 hash function */
->         struct crypto_shash *md5; /* md5 hash function */
-> -       struct crypto_shash *hmacsha256; /* hmac-sha256 hash function */
-> -       struct crypto_shash *cmacaes; /* block-cipher based MAC function =
-*/
-> +       /* hmac-sha256 hash functions */
-> +       struct crypto_shash *hmacsha256[CIFS_SECMECH_DIR_MAX];
-> +       /* block-cipher based MAC function */
-> +       struct crypto_shash *cmacaes[CIFS_SECMECH_DIR_MAX];
->         struct crypto_shash *sha512; /* sha512 hash function */
->         struct sdesc *sdeschmacmd5;  /* ctxt to generate ntlmv2 hash, CR1=
- */
->         struct sdesc *sdescmd5; /* ctxt to generate cifs/smb signature */
-> -       struct sdesc *sdeschmacsha256;  /* ctxt to generate smb2 signatur=
-e */
-> -       struct sdesc *sdesccmacaes;  /* ctxt to generate smb3 signature *=
-/
-> +       /* ctxt to generate smb2 signature */
-> +       struct sdesc *sdeschmacsha256[CIFS_SECMECH_DIR_MAX];
-> +       /* ctxt to generate smb3 signature */
-> +       struct sdesc *sdesccmacaes[CIFS_SECMECH_DIR_MAX];
->         struct sdesc *sdescsha512; /* ctxt to generate smb3.11 signing ke=
-y */
->         struct crypto_aead *ccmaesencrypt; /* smb3 encryption aead */
->         struct crypto_aead *ccmaesdecrypt; /* smb3 decryption aead */
-> @@ -426,7 +436,8 @@ struct smb_version_operations {
->         /* generate new lease key */
->         void (*new_lease_key)(struct cifs_fid *);
->         int (*generate_signingkey)(struct cifs_ses *);
-> -       int (*calc_signature)(struct smb_rqst *, struct TCP_Server_Info *=
-);
-> +       int (*calc_signature)(struct smb_rqst *, struct TCP_Server_Info *=
-,
-> +                             int direction);
->         int (*set_integrity)(const unsigned int, struct cifs_tcon *tcon,
->                              struct cifsFileInfo *src_file);
->         int (*enum_snapshots)(const unsigned int xid, struct cifs_tcon *t=
-con,
-> diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-> index 4d1ff7b66fdc..f5edd6ea3639 100644
-> --- a/fs/cifs/smb2proto.h
-> +++ b/fs/cifs/smb2proto.h
-> @@ -55,9 +55,9 @@ extern struct cifs_ses *smb2_find_smb_ses(struct TCP_Se=
-rver_Info *server,
->  extern struct cifs_tcon *smb2_find_smb_tcon(struct TCP_Server_Info *serv=
-er,
->                                                 __u64 ses_id, __u32  tid)=
-;
->  extern int smb2_calc_signature(struct smb_rqst *rqst,
-> -                               struct TCP_Server_Info *server);
-> +                               struct TCP_Server_Info *server, int direc=
-tion);
->  extern int smb3_calc_signature(struct smb_rqst *rqst,
-> -                               struct TCP_Server_Info *server);
-> +                               struct TCP_Server_Info *server, int direc=
-tion);
->  extern void smb2_echo_request(struct work_struct *work);
->  extern __le32 smb2_get_lease_state(struct cifsInodeInfo *cinode);
->  extern bool smb2_is_valid_oplock_break(char *buffer,
-> diff --git a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c
-> index 08b703b7a15e..c8ba40d8fedf 100644
-> --- a/fs/cifs/smb2transport.c
-> +++ b/fs/cifs/smb2transport.c
-> @@ -43,30 +43,51 @@
->  static int
->  smb2_crypto_shash_allocate(struct TCP_Server_Info *server)
->  {
-> -       return cifs_alloc_hash("hmac(sha256)",
-> -                              &server->secmech.hmacsha256,
-> -                              &server->secmech.sdeschmacsha256);
-> +       int i, rc;
-> +
-> +       for (i =3D CIFS_SECMECH_DIR_IN; i < CIFS_SECMECH_DIR_MAX; i++) {
-> +               rc =3D cifs_alloc_hash("hmac(sha256)",
-> +                              &server->secmech.hmacsha256[i],
-> +                              &server->secmech.sdeschmacsha256[i]);
-> +               if (rc)
-> +                       goto fail;
-> +       }
-> +       return 0;
-> +
-> +fail:
-> +       for (i =3D CIFS_SECMECH_DIR_IN; i < CIFS_SECMECH_DIR_MAX; i++)
-> +               cifs_free_hash(
-> +                      &server->secmech.hmacsha256[i],
-> +                      &server->secmech.sdeschmacsha256[i]);
-> +       return rc;
->  }
->
->  static int
->  smb3_crypto_shash_allocate(struct TCP_Server_Info *server)
->  {
->         struct cifs_secmech *p =3D &server->secmech;
-> -       int rc;
-> +       int i, rc;
->
-> -       rc =3D cifs_alloc_hash("hmac(sha256)",
-> -                            &p->hmacsha256,
-> -                            &p->sdeschmacsha256);
-> -       if (rc)
-> -               goto err;
-> +       for (i =3D CIFS_SECMECH_DIR_IN; i < CIFS_SECMECH_DIR_MAX; i++) {
-> +               rc =3D cifs_alloc_hash("hmac(sha256)",
-> +                            &p->hmacsha256[i],
-> +                            &p->sdeschmacsha256[i]);
-> +               if (rc)
-> +                       goto fail;
->
-> -       rc =3D cifs_alloc_hash("cmac(aes)", &p->cmacaes, &p->sdesccmacaes=
-);
-> -       if (rc)
-> -               goto err;
-> +               rc =3D cifs_alloc_hash("cmac(aes)",
-> +                       &p->cmacaes[i], &p->sdesccmacaes[i]);
->
-> +               if (rc)
-> +                       goto fail;
-> +       }
->         return 0;
-> -err:
-> -       cifs_free_hash(&p->hmacsha256, &p->sdeschmacsha256);
-> +
-> +fail:
-> +       for (i =3D CIFS_SECMECH_DIR_IN; i < CIFS_SECMECH_DIR_MAX; i++) {
-> +               cifs_free_hash(&p->hmacsha256[i], &p->sdeschmacsha256[i])=
-;
-> +               cifs_free_hash(&p->cmacaes[i], &p->sdesccmacaes[i]);
-> +       }
->         return rc;
->  }
->
-> @@ -74,27 +95,32 @@ int
->  smb311_crypto_shash_allocate(struct TCP_Server_Info *server)
->  {
->         struct cifs_secmech *p =3D &server->secmech;
-> -       int rc =3D 0;
-> +       int i, rc =3D 0;
->
-> -       rc =3D cifs_alloc_hash("hmac(sha256)",
-> -                            &p->hmacsha256,
-> -                            &p->sdeschmacsha256);
-> -       if (rc)
-> -               return rc;
-> +       for (i =3D CIFS_SECMECH_DIR_IN; i < CIFS_SECMECH_DIR_MAX; i++) {
-> +               rc =3D cifs_alloc_hash("hmac(sha256)",
-> +                            &p->hmacsha256[i],
-> +                            &p->sdeschmacsha256[i]);
-> +               if (rc)
-> +                       goto fail;
->
-> -       rc =3D cifs_alloc_hash("cmac(aes)", &p->cmacaes, &p->sdesccmacaes=
-);
-> -       if (rc)
-> -               goto err;
-> +               rc =3D cifs_alloc_hash("cmac(aes)",
-> +                       &p->cmacaes[i], &p->sdesccmacaes[i]);
-> +               if (rc)
-> +                       goto fail;
-> +       }
->
->         rc =3D cifs_alloc_hash("sha512", &p->sha512, &p->sdescsha512);
->         if (rc)
-> -               goto err;
-> +               goto fail;
->
->         return 0;
->
-> -err:
-> -       cifs_free_hash(&p->cmacaes, &p->sdesccmacaes);
-> -       cifs_free_hash(&p->hmacsha256, &p->sdeschmacsha256);
-> +fail:
-> +       for (i =3D CIFS_SECMECH_DIR_IN; i < CIFS_SECMECH_DIR_MAX; i++) {
-> +               cifs_free_hash(&p->hmacsha256[i], &p->sdeschmacsha256[i])=
-;
-> +               cifs_free_hash(&p->cmacaes[i], &p->sdesccmacaes[i]);
-> +       }
->         return rc;
->  }
->
-> @@ -219,7 +245,8 @@ smb2_find_smb_tcon(struct TCP_Server_Info *server, __=
-u64 ses_id, __u32  tid)
->  }
->
->  int
-> -smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *serve=
-r)
-> +smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *serve=
-r,
-> +                   int direction)
->  {
->         int rc;
->         unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
-> @@ -229,6 +256,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP=
-_Server_Info *server)
->         struct cifs_ses *ses;
->         struct shash_desc *shash;
->         struct smb_rqst drqst;
-> +       struct crypto_shash *hmacsha256;
->
->         ses =3D smb2_find_smb_ses(server, shdr->SessionId);
->         if (!ses) {
-> @@ -245,14 +273,16 @@ smb2_calc_signature(struct smb_rqst *rqst, struct T=
-CP_Server_Info *server)
->                 return rc;
->         }
->
-> -       rc =3D crypto_shash_setkey(server->secmech.hmacsha256,
-> +       hmacsha256 =3D server->secmech.hmacsha256[direction];
-> +
-> +       rc =3D crypto_shash_setkey(hmacsha256,
->                                  ses->auth_key.response, SMB2_NTLMV2_SESS=
-KEY_SIZE);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not update with response\=
-n", __func__);
->                 return rc;
->         }
->
-> -       shash =3D &server->secmech.sdeschmacsha256->shash;
-> +       shash =3D &server->secmech.sdeschmacsha256[direction]->shash;
->         rc =3D crypto_shash_init(shash);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not init sha256", __func_=
-_);
-> @@ -296,6 +326,8 @@ static int generate_key(struct cifs_ses *ses, struct =
-kvec label,
->         unsigned char prfhash[SMB2_HMACSHA256_SIZE];
->         unsigned char *hashptr =3D prfhash;
->         struct TCP_Server_Info *server =3D ses->server;
-> +       struct crypto_shash *hmacsha256;
-> +       struct sdesc *sdeschmacsha256;
->
->         memset(prfhash, 0x0, SMB2_HMACSHA256_SIZE);
->         memset(key, 0x0, key_size);
-> @@ -306,55 +338,58 @@ static int generate_key(struct cifs_ses *ses, struc=
-t kvec label,
->                 goto smb3signkey_ret;
->         }
->
-> -       rc =3D crypto_shash_setkey(server->secmech.hmacsha256,
-> +       hmacsha256 =3D server->secmech.hmacsha256[CIFS_SECMECH_DIR_OUT];
-> +       sdeschmacsha256 =3D server->secmech.sdeschmacsha256[CIFS_SECMECH_=
-DIR_OUT];
-> +
-> +       rc =3D crypto_shash_setkey(hmacsha256,
->                 ses->auth_key.response, SMB2_NTLMV2_SESSKEY_SIZE);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not set with session key\=
-n", __func__);
->                 goto smb3signkey_ret;
->         }
->
-> -       rc =3D crypto_shash_init(&server->secmech.sdeschmacsha256->shash)=
-;
-> +       rc =3D crypto_shash_init(&sdeschmacsha256->shash);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not init sign hmac\n", __=
-func__);
->                 goto smb3signkey_ret;
->         }
->
-> -       rc =3D crypto_shash_update(&server->secmech.sdeschmacsha256->shas=
-h,
-> +       rc =3D crypto_shash_update(&sdeschmacsha256->shash,
->                                 i, 4);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not update with n\n", __f=
-unc__);
->                 goto smb3signkey_ret;
->         }
->
-> -       rc =3D crypto_shash_update(&server->secmech.sdeschmacsha256->shas=
-h,
-> +       rc =3D crypto_shash_update(&sdeschmacsha256->shash,
->                                 label.iov_base, label.iov_len);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not update with label\n",=
- __func__);
->                 goto smb3signkey_ret;
->         }
->
-> -       rc =3D crypto_shash_update(&server->secmech.sdeschmacsha256->shas=
-h,
-> +       rc =3D crypto_shash_update(&sdeschmacsha256->shash,
->                                 &zero, 1);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not update with zero\n", =
-__func__);
->                 goto smb3signkey_ret;
->         }
->
-> -       rc =3D crypto_shash_update(&server->secmech.sdeschmacsha256->shas=
-h,
-> +       rc =3D crypto_shash_update(&sdeschmacsha256->shash,
->                                 context.iov_base, context.iov_len);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not update with context\n=
-", __func__);
->                 goto smb3signkey_ret;
->         }
->
-> -       rc =3D crypto_shash_update(&server->secmech.sdeschmacsha256->shas=
-h,
-> +       rc =3D crypto_shash_update(&sdeschmacsha256->shash,
->                                 L, 4);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not update with L\n", __f=
-unc__);
->                 goto smb3signkey_ret;
->         }
->
-> -       rc =3D crypto_shash_final(&server->secmech.sdeschmacsha256->shash=
-,
-> +       rc =3D crypto_shash_final(&sdeschmacsha256->shash,
->                                 hashptr);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not generate sha256 hash\=
-n", __func__);
-> @@ -504,16 +539,18 @@ generate_smb311signingkey(struct cifs_ses *ses)
->  }
->
->  int
-> -smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *serve=
-r)
-> +smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *serve=
-r,
-> +                   int direction)
->  {
->         int rc;
->         unsigned char smb3_signature[SMB2_CMACAES_SIZE];
->         unsigned char *sigptr =3D smb3_signature;
->         struct kvec *iov =3D rqst->rq_iov;
->         struct smb2_sync_hdr *shdr =3D (struct smb2_sync_hdr *)iov[0].iov=
-_base;
-> -       struct shash_desc *shash =3D &server->secmech.sdesccmacaes->shash=
-;
-> +       struct shash_desc *shash;
->         struct smb_rqst drqst;
->         u8 key[SMB3_SIGN_KEY_SIZE];
-> +       struct crypto_shash *cmacaes;
->
->         rc =3D smb2_get_sign_key(shdr->SessionId, server, key);
->         if (rc)
-> @@ -522,8 +559,10 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TC=
-P_Server_Info *server)
->         memset(smb3_signature, 0x0, SMB2_CMACAES_SIZE);
->         memset(shdr->Signature, 0x0, SMB2_SIGNATURE_SIZE);
->
-> -       rc =3D crypto_shash_setkey(server->secmech.cmacaes,
-> -                                key, SMB2_CMACAES_SIZE);
-> +       cmacaes =3D server->secmech.cmacaes[direction];
-> +       shash =3D &server->secmech.sdesccmacaes[direction]->shash;
-> +
-> +       rc =3D crypto_shash_setkey(cmacaes, key, SMB2_CMACAES_SIZE);
->         if (rc) {
->                 cifs_server_dbg(VFS, "%s: Could not set key for cmac aes\=
-n", __func__);
->                 return rc;
-> @@ -593,8 +632,7 @@ smb2_sign_rqst(struct smb_rqst *rqst, struct TCP_Serv=
-er_Info *server)
->                 return 0;
->         }
->
-> -       rc =3D server->ops->calc_signature(rqst, server);
-> -
-> +       rc =3D server->ops->calc_signature(rqst, server, CIFS_SECMECH_DIR=
-_OUT);
->         return rc;
->  }
->
-> @@ -631,9 +669,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct T=
-CP_Server_Info *server)
->
->         memset(shdr->Signature, 0, SMB2_SIGNATURE_SIZE);
->
-> -       mutex_lock(&server->srv_mutex);
-> -       rc =3D server->ops->calc_signature(rqst, server);
-> -       mutex_unlock(&server->srv_mutex);
-> +       rc =3D server->ops->calc_signature(rqst, server, CIFS_SECMECH_DIR=
-_IN);
-
-Multiple threads may be calling smb2_verify_signature from
-smb2_check_receive in separate threads (see compound_send_recv). What
-will prevent races on crypto data structures once the mutex around
-calc_signature is removed?
-
---
-Best regards,
-Pavel Shilovsky
+PlN1YmplY3Q6IFJlOiBbUEFUQ0hdIGNpZnM6IFJlbW92ZSBsb2NraW5nIGluIHNtYjJfdmVyaWZ5
+X3NpZ25hdHVyZSgpIHdoZW4NCj5jYWxjdWxhdGluZyBTTUIyL1NNQjMgc2lnbmF0dXJlIG9uIHJl
+Y2VpdmluZyBwYWNrZXRzDQo+DQo+0YHRgCwgMjUg0LzQsNGALiAyMDIwINCzLiDQsiAxMToxNSwg
+PGxvbmdsaUBsaW51eG9uaHlwZXJ2LmNvbT46DQo+Pg0KPj4gRnJvbTogTG9uZyBMaSA8bG9uZ2xp
+QG1pY3Jvc29mdC5jb20+DQo+Pg0KPj4gT24gdGhlIHNlbmRpbmcgYW5kIHJlY2VpdmluZyBwYXRo
+cywgQ0lGUyB1c2VzIHRoZSBzYW1lIGN5cHRvIGRhdGENCj4+IHN0cnVjdHVyZXMgdG8gY2FsY3Vs
+YXRlIFNNQjIvU01CMyBwYWNrZXQgc2lnbmF0dXJlcy4gQSBsb2NrIG9uIHRoZQ0KPj4gcmVjZWl2
+aW5nIHBhdGggaXMgbmVjZXNzYXJ5IHRvIGNvbnRyb2wgc2hhcmVkIGFjY2VzcyB0byBjcnlwdG8g
+ZGF0YQ0KPj4gc3RydWN0dXJlcy4gVGhpcyBsb2NrIGRlZ3JhZGVzIHBlcmZvcm1hbmNlIGJlY2F1
+c2UgaXQgcmFjZXMgd2l0aCB0aGUNCj5zZW5kaW5nIHBhdGguDQo+Pg0KPj4gRGVmaW5lIHNlcGFy
+YXRlIGNyeXB0byBkYXRhIHN0cnVjdHVyZXMgZm9yIHNlbmRpbmcgYW5kIHJlY2VpdmluZyBwYXRo
+cw0KPj4gYW5kIHJlbW92ZSB0aGlzIGxvY2suDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogTG9uZyBM
+aSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+DQo+PiAtLS0NCj4+ICBmcy9jaWZzL2NpZnNlbmNyeXB0
+LmMgICB8ICAyOSArKysrKy0tLS0NCj4+ICBmcy9jaWZzL2NpZnNnbG9iLmggICAgICB8ICAyMSAr
+KysrKy0tDQo+PiAgZnMvY2lmcy9zbWIycHJvdG8uaCAgICAgfCAgIDQgKy0NCj4+ICBmcy9jaWZz
+L3NtYjJ0cmFuc3BvcnQuYyB8IDEzMA0KPj4gKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0t
+LS0tLS0tLS0tLQ0KPj4gIDQgZmlsZXMgY2hhbmdlZCwgMTE5IGluc2VydGlvbnMoKyksIDY1IGRl
+bGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNlbmNyeXB0LmMgYi9m
+cy9jaWZzL2NpZnNlbmNyeXB0LmMgaW5kZXgNCj4+IDk3Yjc0OTdjMTNlZi4uMjIyZThkMTMzMDJj
+IDEwMDY0NA0KPj4gLS0tIGEvZnMvY2lmcy9jaWZzZW5jcnlwdC5jDQo+PiArKysgYi9mcy9jaWZz
+L2NpZnNlbmNyeXB0LmMNCj4+IEBAIC04MDQsMTYgKzgwNCwyNyBAQCBjYWxjX3NlY2tleShzdHJ1
+Y3QgY2lmc19zZXMgKnNlcykgIHZvaWQNCj4+IGNpZnNfY3J5cHRvX3NlY21lY2hfcmVsZWFzZShz
+dHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIpICB7DQo+PiAtICAgICAgIGlmIChzZXJ2ZXIt
+PnNlY21lY2guY21hY2Flcykgew0KPj4gLSAgICAgICAgICAgICAgIGNyeXB0b19mcmVlX3NoYXNo
+KHNlcnZlci0+c2VjbWVjaC5jbWFjYWVzKTsNCj4+IC0gICAgICAgICAgICAgICBzZXJ2ZXItPnNl
+Y21lY2guY21hY2FlcyA9IE5VTEw7DQo+PiAtICAgICAgIH0NCj4+ICsgICAgICAgaW50IGk7DQo+
+PiArDQo+PiArICAgICAgIGZvciAoaSA9IENJRlNfU0VDTUVDSF9ESVJfSU47IGkgPCBDSUZTX1NF
+Q01FQ0hfRElSX01BWDsgaSsrKSB7DQo+PiArICAgICAgICAgICAgICAgaWYgKHNlcnZlci0+c2Vj
+bWVjaC5jbWFjYWVzW2ldKSB7DQo+PiArICAgICAgICAgICAgICAgICAgICAgICBjcnlwdG9fZnJl
+ZV9zaGFzaChzZXJ2ZXItPnNlY21lY2guY21hY2Flc1tpXSk7DQo+PiArICAgICAgICAgICAgICAg
+ICAgICAgICBzZXJ2ZXItPnNlY21lY2guY21hY2Flc1tpXSA9IE5VTEw7DQo+PiArICAgICAgICAg
+ICAgICAgfQ0KPj4NCj4+IC0gICAgICAgaWYgKHNlcnZlci0+c2VjbWVjaC5obWFjc2hhMjU2KSB7
+DQo+PiAtICAgICAgICAgICAgICAgY3J5cHRvX2ZyZWVfc2hhc2goc2VydmVyLT5zZWNtZWNoLmht
+YWNzaGEyNTYpOw0KPj4gLSAgICAgICAgICAgICAgIHNlcnZlci0+c2VjbWVjaC5obWFjc2hhMjU2
+ID0gTlVMTDsNCj4+ICsgICAgICAgICAgICAgICBpZiAoc2VydmVyLT5zZWNtZWNoLmhtYWNzaGEy
+NTZbaV0pIHsNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgIGNyeXB0b19mcmVlX3NoYXNoKHNl
+cnZlci0+c2VjbWVjaC5obWFjc2hhMjU2W2ldKTsNCj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+IHNlcnZlci0+c2VjbWVjaC5obWFjc2hhMjU2W2ldID0gTlVMTDsNCj4+ICsgICAgICAgICAgICAg
+ICB9DQo+PiArDQo+PiArICAgICAgICAgICAgICAga2ZyZWUoc2VydmVyLT5zZWNtZWNoLnNkZXNj
+Y21hY2Flc1tpXSk7DQo+PiArICAgICAgICAgICAgICAgc2VydmVyLT5zZWNtZWNoLnNkZXNjY21h
+Y2Flc1tpXSA9IE5VTEw7DQo+PiArDQo+PiArICAgICAgICAgICAgICAga2ZyZWUoc2VydmVyLT5z
+ZWNtZWNoLnNkZXNjaG1hY3NoYTI1NltpXSk7DQo+PiArICAgICAgICAgICAgICAgc2VydmVyLT5z
+ZWNtZWNoLnNkZXNjaG1hY3NoYTI1NltpXSA9IE5VTEw7DQo+PiAgICAgICAgIH0NCj4+DQo+PiAr
+DQo+PiAgICAgICAgIGlmIChzZXJ2ZXItPnNlY21lY2gubWQ1KSB7DQo+PiAgICAgICAgICAgICAg
+ICAgY3J5cHRvX2ZyZWVfc2hhc2goc2VydmVyLT5zZWNtZWNoLm1kNSk7DQo+PiAgICAgICAgICAg
+ICAgICAgc2VydmVyLT5zZWNtZWNoLm1kNSA9IE5VTEw7IEBAIC04MzksMTAgKzg1MCw2IEBADQo+
+PiBjaWZzX2NyeXB0b19zZWNtZWNoX3JlbGVhc2Uoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2Vy
+dmVyKQ0KPj4gICAgICAgICAgICAgICAgIHNlcnZlci0+c2VjbWVjaC5jY21hZXNkZWNyeXB0ID0g
+TlVMTDsNCj4+ICAgICAgICAgfQ0KPj4NCj4+IC0gICAgICAga2ZyZWUoc2VydmVyLT5zZWNtZWNo
+LnNkZXNjY21hY2Flcyk7DQo+PiAtICAgICAgIHNlcnZlci0+c2VjbWVjaC5zZGVzY2NtYWNhZXMg
+PSBOVUxMOw0KPj4gLSAgICAgICBrZnJlZShzZXJ2ZXItPnNlY21lY2guc2Rlc2NobWFjc2hhMjU2
+KTsNCj4+IC0gICAgICAgc2VydmVyLT5zZWNtZWNoLnNkZXNjaG1hY3NoYTI1NiA9IE5VTEw7DQo+
+PiAgICAgICAgIGtmcmVlKHNlcnZlci0+c2VjbWVjaC5zZGVzY2htYWNtZDUpOw0KPj4gICAgICAg
+ICBzZXJ2ZXItPnNlY21lY2guc2Rlc2NobWFjbWQ1ID0gTlVMTDsNCj4+ICAgICAgICAga2ZyZWUo
+c2VydmVyLT5zZWNtZWNoLnNkZXNjbWQ1KTsgZGlmZiAtLWdpdA0KPj4gYS9mcy9jaWZzL2NpZnNn
+bG9iLmggYi9mcy9jaWZzL2NpZnNnbG9iLmggaW5kZXgNCj4+IDBkOTU2MzYwZTk4NC4uZTMxYTkw
+MmViYWRjIDEwMDY0NA0KPj4gLS0tIGEvZnMvY2lmcy9jaWZzZ2xvYi5oDQo+PiArKysgYi9mcy9j
+aWZzL2NpZnNnbG9iLmgNCj4+IEBAIC0xMzcsMTcgKzEzNywyNyBAQCBzdHJ1Y3Qgc2Rlc2Mgew0K
+Pj4gICAgICAgICBjaGFyIGN0eFtdOw0KPj4gIH07DQo+Pg0KPj4gK2VudW0gew0KPj4gKyAgICAg
+ICBDSUZTX1NFQ01FQ0hfRElSX0lOID0gMCwNCj4+ICsgICAgICAgQ0lGU19TRUNNRUNIX0RJUl9P
+VVQsDQo+PiArICAgICAgIENJRlNfU0VDTUVDSF9ESVJfTUFYDQo+PiArfTsNCj4+ICsNCj4+ICAv
+KiBjcnlwdG8gaGFzaGluZyByZWxhdGVkIHN0cnVjdHVyZS9maWVsZHMsIG5vdCBzcGVjaWZpYyB0
+byBhIHNlYw0KPj4gbWVjaCAqLyAgc3RydWN0IGNpZnNfc2VjbWVjaCB7DQo+PiAgICAgICAgIHN0
+cnVjdCBjcnlwdG9fc2hhc2ggKmhtYWNtZDU7IC8qIGhtYWMtbWQ1IGhhc2ggZnVuY3Rpb24gKi8N
+Cj4+ICAgICAgICAgc3RydWN0IGNyeXB0b19zaGFzaCAqbWQ1OyAvKiBtZDUgaGFzaCBmdW5jdGlv
+biAqLw0KPj4gLSAgICAgICBzdHJ1Y3QgY3J5cHRvX3NoYXNoICpobWFjc2hhMjU2OyAvKiBobWFj
+LXNoYTI1NiBoYXNoIGZ1bmN0aW9uICovDQo+PiAtICAgICAgIHN0cnVjdCBjcnlwdG9fc2hhc2gg
+KmNtYWNhZXM7IC8qIGJsb2NrLWNpcGhlciBiYXNlZCBNQUMgZnVuY3Rpb24gKi8NCj4+ICsgICAg
+ICAgLyogaG1hYy1zaGEyNTYgaGFzaCBmdW5jdGlvbnMgKi8NCj4+ICsgICAgICAgc3RydWN0IGNy
+eXB0b19zaGFzaCAqaG1hY3NoYTI1NltDSUZTX1NFQ01FQ0hfRElSX01BWF07DQo+PiArICAgICAg
+IC8qIGJsb2NrLWNpcGhlciBiYXNlZCBNQUMgZnVuY3Rpb24gKi8NCj4+ICsgICAgICAgc3RydWN0
+IGNyeXB0b19zaGFzaCAqY21hY2Flc1tDSUZTX1NFQ01FQ0hfRElSX01BWF07DQo+PiAgICAgICAg
+IHN0cnVjdCBjcnlwdG9fc2hhc2ggKnNoYTUxMjsgLyogc2hhNTEyIGhhc2ggZnVuY3Rpb24gKi8N
+Cj4+ICAgICAgICAgc3RydWN0IHNkZXNjICpzZGVzY2htYWNtZDU7ICAvKiBjdHh0IHRvIGdlbmVy
+YXRlIG50bG12MiBoYXNoLCBDUjEgKi8NCj4+ICAgICAgICAgc3RydWN0IHNkZXNjICpzZGVzY21k
+NTsgLyogY3R4dCB0byBnZW5lcmF0ZSBjaWZzL3NtYiBzaWduYXR1cmUgKi8NCj4+IC0gICAgICAg
+c3RydWN0IHNkZXNjICpzZGVzY2htYWNzaGEyNTY7ICAvKiBjdHh0IHRvIGdlbmVyYXRlIHNtYjIg
+c2lnbmF0dXJlICovDQo+PiAtICAgICAgIHN0cnVjdCBzZGVzYyAqc2Rlc2NjbWFjYWVzOyAgLyog
+Y3R4dCB0byBnZW5lcmF0ZSBzbWIzIHNpZ25hdHVyZSAqLw0KPj4gKyAgICAgICAvKiBjdHh0IHRv
+IGdlbmVyYXRlIHNtYjIgc2lnbmF0dXJlICovDQo+PiArICAgICAgIHN0cnVjdCBzZGVzYyAqc2Rl
+c2NobWFjc2hhMjU2W0NJRlNfU0VDTUVDSF9ESVJfTUFYXTsNCj4+ICsgICAgICAgLyogY3R4dCB0
+byBnZW5lcmF0ZSBzbWIzIHNpZ25hdHVyZSAqLw0KPj4gKyAgICAgICBzdHJ1Y3Qgc2Rlc2MgKnNk
+ZXNjY21hY2Flc1tDSUZTX1NFQ01FQ0hfRElSX01BWF07DQo+PiAgICAgICAgIHN0cnVjdCBzZGVz
+YyAqc2Rlc2NzaGE1MTI7IC8qIGN0eHQgdG8gZ2VuZXJhdGUgc21iMy4xMSBzaWduaW5nIGtleSAq
+Lw0KPj4gICAgICAgICBzdHJ1Y3QgY3J5cHRvX2FlYWQgKmNjbWFlc2VuY3J5cHQ7IC8qIHNtYjMg
+ZW5jcnlwdGlvbiBhZWFkICovDQo+PiAgICAgICAgIHN0cnVjdCBjcnlwdG9fYWVhZCAqY2NtYWVz
+ZGVjcnlwdDsgLyogc21iMyBkZWNyeXB0aW9uIGFlYWQgKi8NCj4+IEBAIC00MjYsNyArNDM2LDgg
+QEAgc3RydWN0IHNtYl92ZXJzaW9uX29wZXJhdGlvbnMgew0KPj4gICAgICAgICAvKiBnZW5lcmF0
+ZSBuZXcgbGVhc2Uga2V5ICovDQo+PiAgICAgICAgIHZvaWQgKCpuZXdfbGVhc2Vfa2V5KShzdHJ1
+Y3QgY2lmc19maWQgKik7DQo+PiAgICAgICAgIGludCAoKmdlbmVyYXRlX3NpZ25pbmdrZXkpKHN0
+cnVjdCBjaWZzX3NlcyAqKTsNCj4+IC0gICAgICAgaW50ICgqY2FsY19zaWduYXR1cmUpKHN0cnVj
+dCBzbWJfcnFzdCAqLCBzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICopOw0KPj4gKyAgICAgICBpbnQg
+KCpjYWxjX3NpZ25hdHVyZSkoc3RydWN0IHNtYl9ycXN0ICosIHN0cnVjdCBUQ1BfU2VydmVyX0lu
+Zm8gKiwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludCBkaXJlY3Rpb24pOw0K
+Pj4gICAgICAgICBpbnQgKCpzZXRfaW50ZWdyaXR5KShjb25zdCB1bnNpZ25lZCBpbnQsIHN0cnVj
+dCBjaWZzX3Rjb24gKnRjb24sDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cnVj
+dCBjaWZzRmlsZUluZm8gKnNyY19maWxlKTsNCj4+ICAgICAgICAgaW50ICgqZW51bV9zbmFwc2hv
+dHMpKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24NCj4+ICp0Y29uLCBk
+aWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIycHJvdG8uaCBiL2ZzL2NpZnMvc21iMnByb3RvLmggaW5k
+ZXgNCj4+IDRkMWZmN2I2NmZkYy4uZjVlZGQ2ZWEzNjM5IDEwMDY0NA0KPj4gLS0tIGEvZnMvY2lm
+cy9zbWIycHJvdG8uaA0KPj4gKysrIGIvZnMvY2lmcy9zbWIycHJvdG8uaA0KPj4gQEAgLTU1LDkg
+KzU1LDkgQEAgZXh0ZXJuIHN0cnVjdCBjaWZzX3NlcyAqc21iMl9maW5kX3NtYl9zZXMoc3RydWN0
+DQo+PiBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgIGV4dGVybiBzdHJ1Y3QgY2lmc190Y29uDQo+
+KnNtYjJfZmluZF9zbWJfdGNvbihzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsDQo+PiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBfX3U2NCBzZXNf
+aWQsIF9fdTMyDQo+PiB0aWQpOyAgZXh0ZXJuIGludCBzbWIyX2NhbGNfc2lnbmF0dXJlKHN0cnVj
+dCBzbWJfcnFzdCAqcnFzdCwNCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3Ry
+dWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKTsNCj4+ICsgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBpbnQNCj4+ICsgZGlyZWN0
+aW9uKTsNCj4+ICBleHRlcm4gaW50IHNtYjNfY2FsY19zaWduYXR1cmUoc3RydWN0IHNtYl9ycXN0
+ICpycXN0LA0KPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3QgVENQX1Nl
+cnZlcl9JbmZvICpzZXJ2ZXIpOw0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBz
+dHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIGludA0KPj4gKyBkaXJlY3Rpb24pOw0KPj4g
+IGV4dGVybiB2b2lkIHNtYjJfZWNob19yZXF1ZXN0KHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yayk7
+ICBleHRlcm4NCj4+IF9fbGUzMiBzbWIyX2dldF9sZWFzZV9zdGF0ZShzdHJ1Y3QgY2lmc0lub2Rl
+SW5mbyAqY2lub2RlKTsgIGV4dGVybg0KPj4gYm9vbCBzbWIyX2lzX3ZhbGlkX29wbG9ja19icmVh
+ayhjaGFyICpidWZmZXIsIGRpZmYgLS1naXQNCj4+IGEvZnMvY2lmcy9zbWIydHJhbnNwb3J0LmMg
+Yi9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYyBpbmRleA0KPj4gMDhiNzAzYjdhMTVlLi5jOGJhNDBk
+OGZlZGYgMTAwNjQ0DQo+PiAtLS0gYS9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYw0KPj4gKysrIGIv
+ZnMvY2lmcy9zbWIydHJhbnNwb3J0LmMNCj4+IEBAIC00MywzMCArNDMsNTEgQEANCj4+ICBzdGF0
+aWMgaW50DQo+PiAgc21iMl9jcnlwdG9fc2hhc2hfYWxsb2NhdGUoc3RydWN0IFRDUF9TZXJ2ZXJf
+SW5mbyAqc2VydmVyKSAgew0KPj4gLSAgICAgICByZXR1cm4gY2lmc19hbGxvY19oYXNoKCJobWFj
+KHNoYTI1NikiLA0KPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZzZXJ2ZXItPnNl
+Y21lY2guaG1hY3NoYTI1NiwNCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmc2Vy
+dmVyLT5zZWNtZWNoLnNkZXNjaG1hY3NoYTI1Nik7DQo+PiArICAgICAgIGludCBpLCByYzsNCj4+
+ICsNCj4+ICsgICAgICAgZm9yIChpID0gQ0lGU19TRUNNRUNIX0RJUl9JTjsgaSA8IENJRlNfU0VD
+TUVDSF9ESVJfTUFYOyBpKyspIHsNCj4+ICsgICAgICAgICAgICAgICByYyA9IGNpZnNfYWxsb2Nf
+aGFzaCgiaG1hYyhzaGEyNTYpIiwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAm
+c2VydmVyLT5zZWNtZWNoLmhtYWNzaGEyNTZbaV0sDQo+PiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgJnNlcnZlci0+c2VjbWVjaC5zZGVzY2htYWNzaGEyNTZbaV0pOw0KPj4gKyAgICAg
+ICAgICAgICAgIGlmIChyYykNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZmFpbDsN
+Cj4+ICsgICAgICAgfQ0KPj4gKyAgICAgICByZXR1cm4gMDsNCj4+ICsNCj4+ICtmYWlsOg0KPj4g
+KyAgICAgICBmb3IgKGkgPSBDSUZTX1NFQ01FQ0hfRElSX0lOOyBpIDwgQ0lGU19TRUNNRUNIX0RJ
+Ul9NQVg7IGkrKykNCj4+ICsgICAgICAgICAgICAgICBjaWZzX2ZyZWVfaGFzaCgNCj4+ICsgICAg
+ICAgICAgICAgICAgICAgICAgJnNlcnZlci0+c2VjbWVjaC5obWFjc2hhMjU2W2ldLA0KPj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAmc2VydmVyLT5zZWNtZWNoLnNkZXNjaG1hY3NoYTI1NltpXSk7
+DQo+PiArICAgICAgIHJldHVybiByYzsNCj4+ICB9DQo+Pg0KPj4gIHN0YXRpYyBpbnQNCj4+ICBz
+bWIzX2NyeXB0b19zaGFzaF9hbGxvY2F0ZShzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIp
+ICB7DQo+PiAgICAgICAgIHN0cnVjdCBjaWZzX3NlY21lY2ggKnAgPSAmc2VydmVyLT5zZWNtZWNo
+Ow0KPj4gLSAgICAgICBpbnQgcmM7DQo+PiArICAgICAgIGludCBpLCByYzsNCj4+DQo+PiAtICAg
+ICAgIHJjID0gY2lmc19hbGxvY19oYXNoKCJobWFjKHNoYTI1NikiLA0KPj4gLSAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAmcC0+aG1hY3NoYTI1NiwNCj4+IC0gICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgJnAtPnNkZXNjaG1hY3NoYTI1Nik7DQo+PiAtICAgICAgIGlmIChyYykNCj4+IC0g
+ICAgICAgICAgICAgICBnb3RvIGVycjsNCj4+ICsgICAgICAgZm9yIChpID0gQ0lGU19TRUNNRUNI
+X0RJUl9JTjsgaSA8IENJRlNfU0VDTUVDSF9ESVJfTUFYOyBpKyspIHsNCj4+ICsgICAgICAgICAg
+ICAgICByYyA9IGNpZnNfYWxsb2NfaGFzaCgiaG1hYyhzaGEyNTYpIiwNCj4+ICsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgJnAtPmhtYWNzaGEyNTZbaV0sDQo+PiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICZwLT5zZGVzY2htYWNzaGEyNTZbaV0pOw0KPj4gKyAgICAgICAgICAgICAg
+IGlmIChyYykNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZmFpbDsNCj4+DQo+PiAt
+ICAgICAgIHJjID0gY2lmc19hbGxvY19oYXNoKCJjbWFjKGFlcykiLCAmcC0+Y21hY2FlcywgJnAt
+PnNkZXNjY21hY2Flcyk7DQo+PiAtICAgICAgIGlmIChyYykNCj4+IC0gICAgICAgICAgICAgICBn
+b3RvIGVycjsNCj4+ICsgICAgICAgICAgICAgICByYyA9IGNpZnNfYWxsb2NfaGFzaCgiY21hYyhh
+ZXMpIiwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICZwLT5jbWFjYWVzW2ldLCAmcC0+c2Rl
+c2NjbWFjYWVzW2ldKTsNCj4+DQo+PiArICAgICAgICAgICAgICAgaWYgKHJjKQ0KPj4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgZ290byBmYWlsOw0KPj4gKyAgICAgICB9DQo+PiAgICAgICAgIHJl
+dHVybiAwOw0KPj4gLWVycjoNCj4+IC0gICAgICAgY2lmc19mcmVlX2hhc2goJnAtPmhtYWNzaGEy
+NTYsICZwLT5zZGVzY2htYWNzaGEyNTYpOw0KPj4gKw0KPj4gK2ZhaWw6DQo+PiArICAgICAgIGZv
+ciAoaSA9IENJRlNfU0VDTUVDSF9ESVJfSU47IGkgPCBDSUZTX1NFQ01FQ0hfRElSX01BWDsgaSsr
+KSB7DQo+PiArICAgICAgICAgICAgICAgY2lmc19mcmVlX2hhc2goJnAtPmhtYWNzaGEyNTZbaV0s
+ICZwLT5zZGVzY2htYWNzaGEyNTZbaV0pOw0KPj4gKyAgICAgICAgICAgICAgIGNpZnNfZnJlZV9o
+YXNoKCZwLT5jbWFjYWVzW2ldLCAmcC0+c2Rlc2NjbWFjYWVzW2ldKTsNCj4+ICsgICAgICAgfQ0K
+Pj4gICAgICAgICByZXR1cm4gcmM7DQo+PiAgfQ0KPj4NCj4+IEBAIC03NCwyNyArOTUsMzIgQEAg
+aW50DQo+PiAgc21iMzExX2NyeXB0b19zaGFzaF9hbGxvY2F0ZShzdHJ1Y3QgVENQX1NlcnZlcl9J
+bmZvICpzZXJ2ZXIpDQo+PiAgew0KPj4gICAgICAgICBzdHJ1Y3QgY2lmc19zZWNtZWNoICpwID0g
+JnNlcnZlci0+c2VjbWVjaDsNCj4+IC0gICAgICAgaW50IHJjID0gMDsNCj4+ICsgICAgICAgaW50
+IGksIHJjID0gMDsNCj4+DQo+PiAtICAgICAgIHJjID0gY2lmc19hbGxvY19oYXNoKCJobWFjKHNo
+YTI1NikiLA0KPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcC0+aG1hY3NoYTI1NiwN
+Cj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgJnAtPnNkZXNjaG1hY3NoYTI1Nik7DQo+
+PiAtICAgICAgIGlmIChyYykNCj4+IC0gICAgICAgICAgICAgICByZXR1cm4gcmM7DQo+PiArICAg
+ICAgIGZvciAoaSA9IENJRlNfU0VDTUVDSF9ESVJfSU47IGkgPCBDSUZTX1NFQ01FQ0hfRElSX01B
+WDsgaSsrKSB7DQo+PiArICAgICAgICAgICAgICAgcmMgPSBjaWZzX2FsbG9jX2hhc2goImhtYWMo
+c2hhMjU2KSIsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICZwLT5obWFjc2hhMjU2
+W2ldLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAmcC0+c2Rlc2NobWFjc2hhMjU2
+W2ldKTsNCj4+ICsgICAgICAgICAgICAgICBpZiAocmMpDQo+PiArICAgICAgICAgICAgICAgICAg
+ICAgICBnb3RvIGZhaWw7DQo+Pg0KPj4gLSAgICAgICByYyA9IGNpZnNfYWxsb2NfaGFzaCgiY21h
+YyhhZXMpIiwgJnAtPmNtYWNhZXMsICZwLT5zZGVzY2NtYWNhZXMpOw0KPj4gLSAgICAgICBpZiAo
+cmMpDQo+PiAtICAgICAgICAgICAgICAgZ290byBlcnI7DQo+PiArICAgICAgICAgICAgICAgcmMg
+PSBjaWZzX2FsbG9jX2hhc2goImNtYWMoYWVzKSIsDQo+PiArICAgICAgICAgICAgICAgICAgICAg
+ICAmcC0+Y21hY2Flc1tpXSwgJnAtPnNkZXNjY21hY2Flc1tpXSk7DQo+PiArICAgICAgICAgICAg
+ICAgaWYgKHJjKQ0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgZ290byBmYWlsOw0KPj4gKyAg
+ICAgICB9DQo+Pg0KPj4gICAgICAgICByYyA9IGNpZnNfYWxsb2NfaGFzaCgic2hhNTEyIiwgJnAt
+PnNoYTUxMiwgJnAtPnNkZXNjc2hhNTEyKTsNCj4+ICAgICAgICAgaWYgKHJjKQ0KPj4gLSAgICAg
+ICAgICAgICAgIGdvdG8gZXJyOw0KPj4gKyAgICAgICAgICAgICAgIGdvdG8gZmFpbDsNCj4+DQo+
+PiAgICAgICAgIHJldHVybiAwOw0KPj4NCj4+IC1lcnI6DQo+PiAtICAgICAgIGNpZnNfZnJlZV9o
+YXNoKCZwLT5jbWFjYWVzLCAmcC0+c2Rlc2NjbWFjYWVzKTsNCj4+IC0gICAgICAgY2lmc19mcmVl
+X2hhc2goJnAtPmhtYWNzaGEyNTYsICZwLT5zZGVzY2htYWNzaGEyNTYpOw0KPj4gK2ZhaWw6DQo+
+PiArICAgICAgIGZvciAoaSA9IENJRlNfU0VDTUVDSF9ESVJfSU47IGkgPCBDSUZTX1NFQ01FQ0hf
+RElSX01BWDsgaSsrKSB7DQo+PiArICAgICAgICAgICAgICAgY2lmc19mcmVlX2hhc2goJnAtPmht
+YWNzaGEyNTZbaV0sICZwLT5zZGVzY2htYWNzaGEyNTZbaV0pOw0KPj4gKyAgICAgICAgICAgICAg
+IGNpZnNfZnJlZV9oYXNoKCZwLT5jbWFjYWVzW2ldLCAmcC0+c2Rlc2NjbWFjYWVzW2ldKTsNCj4+
+ICsgICAgICAgfQ0KPj4gICAgICAgICByZXR1cm4gcmM7DQo+PiAgfQ0KPj4NCj4+IEBAIC0yMTks
+NyArMjQ1LDggQEAgc21iMl9maW5kX3NtYl90Y29uKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8NCj4q
+c2VydmVyLCBfX3U2NCBzZXNfaWQsIF9fdTMyICB0aWQpDQo+PiAgfQ0KPj4NCj4+ICBpbnQNCj4+
+IC1zbWIyX2NhbGNfc2lnbmF0dXJlKHN0cnVjdCBzbWJfcnFzdCAqcnFzdCwgc3RydWN0IFRDUF9T
+ZXJ2ZXJfSW5mbw0KPipzZXJ2ZXIpDQo+PiArc21iMl9jYWxjX3NpZ25hdHVyZShzdHJ1Y3Qgc21i
+X3Jxc3QgKnJxc3QsIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8NCj4qc2VydmVyLA0KPj4gKyAgICAg
+ICAgICAgICAgICAgICBpbnQgZGlyZWN0aW9uKQ0KPj4gIHsNCj4+ICAgICAgICAgaW50IHJjOw0K
+Pj4gICAgICAgICB1bnNpZ25lZCBjaGFyIHNtYjJfc2lnbmF0dXJlW1NNQjJfSE1BQ1NIQTI1Nl9T
+SVpFXTsNCj4+IEBAIC0yMjksNiArMjU2LDcgQEAgc21iMl9jYWxjX3NpZ25hdHVyZShzdHJ1Y3Qg
+c21iX3Jxc3QgKnJxc3QsIHN0cnVjdA0KPlRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQ0KPj4gICAg
+ICAgICBzdHJ1Y3QgY2lmc19zZXMgKnNlczsNCj4+ICAgICAgICAgc3RydWN0IHNoYXNoX2Rlc2Mg
+KnNoYXNoOw0KPj4gICAgICAgICBzdHJ1Y3Qgc21iX3Jxc3QgZHJxc3Q7DQo+PiArICAgICAgIHN0
+cnVjdCBjcnlwdG9fc2hhc2ggKmhtYWNzaGEyNTY7DQo+Pg0KPj4gICAgICAgICBzZXMgPSBzbWIy
+X2ZpbmRfc21iX3NlcyhzZXJ2ZXIsIHNoZHItPlNlc3Npb25JZCk7DQo+PiAgICAgICAgIGlmICgh
+c2VzKSB7DQo+PiBAQCAtMjQ1LDE0ICsyNzMsMTYgQEAgc21iMl9jYWxjX3NpZ25hdHVyZShzdHJ1
+Y3Qgc21iX3Jxc3QgKnJxc3QsIHN0cnVjdA0KPlRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQ0KPj4g
+ICAgICAgICAgICAgICAgIHJldHVybiByYzsNCj4+ICAgICAgICAgfQ0KPj4NCj4+IC0gICAgICAg
+cmMgPSBjcnlwdG9fc2hhc2hfc2V0a2V5KHNlcnZlci0+c2VjbWVjaC5obWFjc2hhMjU2LA0KPj4g
+KyAgICAgICBobWFjc2hhMjU2ID0gc2VydmVyLT5zZWNtZWNoLmhtYWNzaGEyNTZbZGlyZWN0aW9u
+XTsNCj4+ICsNCj4+ICsgICAgICAgcmMgPSBjcnlwdG9fc2hhc2hfc2V0a2V5KGhtYWNzaGEyNTYs
+DQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzZXMtPmF1dGhfa2V5LnJlc3Bv
+bnNlLCBTTUIyX05UTE1WMl9TRVNTS0VZX1NJWkUpOw0KPj4gICAgICAgICBpZiAocmMpIHsNCj4+
+ICAgICAgICAgICAgICAgICBjaWZzX3NlcnZlcl9kYmcoVkZTLCAiJXM6IENvdWxkIG5vdCB1cGRh
+dGUgd2l0aCByZXNwb25zZVxuIiwNCj5fX2Z1bmNfXyk7DQo+PiAgICAgICAgICAgICAgICAgcmV0
+dXJuIHJjOw0KPj4gICAgICAgICB9DQo+Pg0KPj4gLSAgICAgICBzaGFzaCA9ICZzZXJ2ZXItPnNl
+Y21lY2guc2Rlc2NobWFjc2hhMjU2LT5zaGFzaDsNCj4+ICsgICAgICAgc2hhc2ggPSAmc2VydmVy
+LT5zZWNtZWNoLnNkZXNjaG1hY3NoYTI1NltkaXJlY3Rpb25dLT5zaGFzaDsNCj4+ICAgICAgICAg
+cmMgPSBjcnlwdG9fc2hhc2hfaW5pdChzaGFzaCk7DQo+PiAgICAgICAgIGlmIChyYykgew0KPj4g
+ICAgICAgICAgICAgICAgIGNpZnNfc2VydmVyX2RiZyhWRlMsICIlczogQ291bGQgbm90IGluaXQg
+c2hhMjU2IiwgX19mdW5jX18pOw0KPj4gQEAgLTI5Niw2ICszMjYsOCBAQCBzdGF0aWMgaW50IGdl
+bmVyYXRlX2tleShzdHJ1Y3QgY2lmc19zZXMgKnNlcywgc3RydWN0DQo+a3ZlYyBsYWJlbCwNCj4+
+ICAgICAgICAgdW5zaWduZWQgY2hhciBwcmZoYXNoW1NNQjJfSE1BQ1NIQTI1Nl9TSVpFXTsNCj4+
+ICAgICAgICAgdW5zaWduZWQgY2hhciAqaGFzaHB0ciA9IHByZmhhc2g7DQo+PiAgICAgICAgIHN0
+cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciA9IHNlcy0+c2VydmVyOw0KPj4gKyAgICAgICBz
+dHJ1Y3QgY3J5cHRvX3NoYXNoICpobWFjc2hhMjU2Ow0KPj4gKyAgICAgICBzdHJ1Y3Qgc2Rlc2Mg
+KnNkZXNjaG1hY3NoYTI1NjsNCj4+DQo+PiAgICAgICAgIG1lbXNldChwcmZoYXNoLCAweDAsIFNN
+QjJfSE1BQ1NIQTI1Nl9TSVpFKTsNCj4+ICAgICAgICAgbWVtc2V0KGtleSwgMHgwLCBrZXlfc2l6
+ZSk7DQo+PiBAQCAtMzA2LDU1ICszMzgsNTggQEAgc3RhdGljIGludCBnZW5lcmF0ZV9rZXkoc3Ry
+dWN0IGNpZnNfc2VzICpzZXMsIHN0cnVjdA0KPmt2ZWMgbGFiZWwsDQo+PiAgICAgICAgICAgICAg
+ICAgZ290byBzbWIzc2lnbmtleV9yZXQ7DQo+PiAgICAgICAgIH0NCj4+DQo+PiAtICAgICAgIHJj
+ID0gY3J5cHRvX3NoYXNoX3NldGtleShzZXJ2ZXItPnNlY21lY2guaG1hY3NoYTI1NiwNCj4+ICsg
+ICAgICAgaG1hY3NoYTI1NiA9IHNlcnZlci0NCj4+c2VjbWVjaC5obWFjc2hhMjU2W0NJRlNfU0VD
+TUVDSF9ESVJfT1VUXTsNCj4+ICsgICAgICAgc2Rlc2NobWFjc2hhMjU2ID0gc2VydmVyLQ0KPj5z
+ZWNtZWNoLnNkZXNjaG1hY3NoYTI1NltDSUZTX1NFQ01FQ0hfRElSX09VVF07DQo+PiArDQo+PiAr
+ICAgICAgIHJjID0gY3J5cHRvX3NoYXNoX3NldGtleShobWFjc2hhMjU2LA0KPj4gICAgICAgICAg
+ICAgICAgIHNlcy0+YXV0aF9rZXkucmVzcG9uc2UsIFNNQjJfTlRMTVYyX1NFU1NLRVlfU0laRSk7
+DQo+PiAgICAgICAgIGlmIChyYykgew0KPj4gICAgICAgICAgICAgICAgIGNpZnNfc2VydmVyX2Ri
+ZyhWRlMsICIlczogQ291bGQgbm90IHNldCB3aXRoIHNlc3Npb24ga2V5XG4iLA0KPl9fZnVuY19f
+KTsNCj4+ICAgICAgICAgICAgICAgICBnb3RvIHNtYjNzaWdua2V5X3JldDsNCj4+ICAgICAgICAg
+fQ0KPj4NCj4+IC0gICAgICAgcmMgPSBjcnlwdG9fc2hhc2hfaW5pdCgmc2VydmVyLT5zZWNtZWNo
+LnNkZXNjaG1hY3NoYTI1Ni0+c2hhc2gpOw0KPj4gKyAgICAgICByYyA9IGNyeXB0b19zaGFzaF9p
+bml0KCZzZGVzY2htYWNzaGEyNTYtPnNoYXNoKTsNCj4+ICAgICAgICAgaWYgKHJjKSB7DQo+PiAg
+ICAgICAgICAgICAgICAgY2lmc19zZXJ2ZXJfZGJnKFZGUywgIiVzOiBDb3VsZCBub3QgaW5pdCBz
+aWduIGhtYWNcbiIsIF9fZnVuY19fKTsNCj4+ICAgICAgICAgICAgICAgICBnb3RvIHNtYjNzaWdu
+a2V5X3JldDsNCj4+ICAgICAgICAgfQ0KPj4NCj4+IC0gICAgICAgcmMgPSBjcnlwdG9fc2hhc2hf
+dXBkYXRlKCZzZXJ2ZXItPnNlY21lY2guc2Rlc2NobWFjc2hhMjU2LQ0KPj5zaGFzaCwNCj4+ICsg
+ICAgICAgcmMgPSBjcnlwdG9fc2hhc2hfdXBkYXRlKCZzZGVzY2htYWNzaGEyNTYtPnNoYXNoLA0K
+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpLCA0KTsNCj4+ICAgICAgICAgaWYg
+KHJjKSB7DQo+PiAgICAgICAgICAgICAgICAgY2lmc19zZXJ2ZXJfZGJnKFZGUywgIiVzOiBDb3Vs
+ZCBub3QgdXBkYXRlIHdpdGggblxuIiwgX19mdW5jX18pOw0KPj4gICAgICAgICAgICAgICAgIGdv
+dG8gc21iM3NpZ25rZXlfcmV0Ow0KPj4gICAgICAgICB9DQo+Pg0KPj4gLSAgICAgICByYyA9IGNy
+eXB0b19zaGFzaF91cGRhdGUoJnNlcnZlci0+c2VjbWVjaC5zZGVzY2htYWNzaGEyNTYtDQo+PnNo
+YXNoLA0KPj4gKyAgICAgICByYyA9IGNyeXB0b19zaGFzaF91cGRhdGUoJnNkZXNjaG1hY3NoYTI1
+Ni0+c2hhc2gsDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxhYmVsLmlvdl9i
+YXNlLCBsYWJlbC5pb3ZfbGVuKTsNCj4+ICAgICAgICAgaWYgKHJjKSB7DQo+PiAgICAgICAgICAg
+ICAgICAgY2lmc19zZXJ2ZXJfZGJnKFZGUywgIiVzOiBDb3VsZCBub3QgdXBkYXRlIHdpdGggbGFi
+ZWxcbiIsDQo+X19mdW5jX18pOw0KPj4gICAgICAgICAgICAgICAgIGdvdG8gc21iM3NpZ25rZXlf
+cmV0Ow0KPj4gICAgICAgICB9DQo+Pg0KPj4gLSAgICAgICByYyA9IGNyeXB0b19zaGFzaF91cGRh
+dGUoJnNlcnZlci0+c2VjbWVjaC5zZGVzY2htYWNzaGEyNTYtDQo+PnNoYXNoLA0KPj4gKyAgICAg
+ICByYyA9IGNyeXB0b19zaGFzaF91cGRhdGUoJnNkZXNjaG1hY3NoYTI1Ni0+c2hhc2gsDQo+PiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZ6ZXJvLCAxKTsNCj4+ICAgICAgICAgaWYg
+KHJjKSB7DQo+PiAgICAgICAgICAgICAgICAgY2lmc19zZXJ2ZXJfZGJnKFZGUywgIiVzOiBDb3Vs
+ZCBub3QgdXBkYXRlIHdpdGggemVyb1xuIiwNCj5fX2Z1bmNfXyk7DQo+PiAgICAgICAgICAgICAg
+ICAgZ290byBzbWIzc2lnbmtleV9yZXQ7DQo+PiAgICAgICAgIH0NCj4+DQo+PiAtICAgICAgIHJj
+ID0gY3J5cHRvX3NoYXNoX3VwZGF0ZSgmc2VydmVyLT5zZWNtZWNoLnNkZXNjaG1hY3NoYTI1Ni0N
+Cj4+c2hhc2gsDQo+PiArICAgICAgIHJjID0gY3J5cHRvX3NoYXNoX3VwZGF0ZSgmc2Rlc2NobWFj
+c2hhMjU2LT5zaGFzaCwNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29udGV4
+dC5pb3ZfYmFzZSwgY29udGV4dC5pb3ZfbGVuKTsNCj4+ICAgICAgICAgaWYgKHJjKSB7DQo+PiAg
+ICAgICAgICAgICAgICAgY2lmc19zZXJ2ZXJfZGJnKFZGUywgIiVzOiBDb3VsZCBub3QgdXBkYXRl
+IHdpdGggY29udGV4dFxuIiwNCj5fX2Z1bmNfXyk7DQo+PiAgICAgICAgICAgICAgICAgZ290byBz
+bWIzc2lnbmtleV9yZXQ7DQo+PiAgICAgICAgIH0NCj4+DQo+PiAtICAgICAgIHJjID0gY3J5cHRv
+X3NoYXNoX3VwZGF0ZSgmc2VydmVyLT5zZWNtZWNoLnNkZXNjaG1hY3NoYTI1Ni0NCj4+c2hhc2gs
+DQo+PiArICAgICAgIHJjID0gY3J5cHRvX3NoYXNoX3VwZGF0ZSgmc2Rlc2NobWFjc2hhMjU2LT5z
+aGFzaCwNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTCwgNCk7DQo+PiAgICAg
+ICAgIGlmIChyYykgew0KPj4gICAgICAgICAgICAgICAgIGNpZnNfc2VydmVyX2RiZyhWRlMsICIl
+czogQ291bGQgbm90IHVwZGF0ZSB3aXRoIExcbiIsIF9fZnVuY19fKTsNCj4+ICAgICAgICAgICAg
+ICAgICBnb3RvIHNtYjNzaWdua2V5X3JldDsNCj4+ICAgICAgICAgfQ0KPj4NCj4+IC0gICAgICAg
+cmMgPSBjcnlwdG9fc2hhc2hfZmluYWwoJnNlcnZlci0+c2VjbWVjaC5zZGVzY2htYWNzaGEyNTYt
+PnNoYXNoLA0KPj4gKyAgICAgICByYyA9IGNyeXB0b19zaGFzaF9maW5hbCgmc2Rlc2NobWFjc2hh
+MjU2LT5zaGFzaCwNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaGFzaHB0cik7
+DQo+PiAgICAgICAgIGlmIChyYykgew0KPj4gICAgICAgICAgICAgICAgIGNpZnNfc2VydmVyX2Ri
+ZyhWRlMsICIlczogQ291bGQgbm90IGdlbmVyYXRlIHNoYTI1NiBoYXNoXG4iLA0KPl9fZnVuY19f
+KTsNCj4+IEBAIC01MDQsMTYgKzUzOSwxOCBAQCBnZW5lcmF0ZV9zbWIzMTFzaWduaW5na2V5KHN0
+cnVjdCBjaWZzX3NlcyAqc2VzKQ0KPj4gIH0NCj4+DQo+PiAgaW50DQo+PiAtc21iM19jYWxjX3Np
+Z25hdHVyZShzdHJ1Y3Qgc21iX3Jxc3QgKnJxc3QsIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8NCj4q
+c2VydmVyKQ0KPj4gK3NtYjNfY2FsY19zaWduYXR1cmUoc3RydWN0IHNtYl9ycXN0ICpycXN0LCBz
+dHJ1Y3QgVENQX1NlcnZlcl9JbmZvDQo+KnNlcnZlciwNCj4+ICsgICAgICAgICAgICAgICAgICAg
+aW50IGRpcmVjdGlvbikNCj4+ICB7DQo+PiAgICAgICAgIGludCByYzsNCj4+ICAgICAgICAgdW5z
+aWduZWQgY2hhciBzbWIzX3NpZ25hdHVyZVtTTUIyX0NNQUNBRVNfU0laRV07DQo+PiAgICAgICAg
+IHVuc2lnbmVkIGNoYXIgKnNpZ3B0ciA9IHNtYjNfc2lnbmF0dXJlOw0KPj4gICAgICAgICBzdHJ1
+Y3Qga3ZlYyAqaW92ID0gcnFzdC0+cnFfaW92Ow0KPj4gICAgICAgICBzdHJ1Y3Qgc21iMl9zeW5j
+X2hkciAqc2hkciA9IChzdHJ1Y3Qgc21iMl9zeW5jX2hkciAqKWlvdlswXS5pb3ZfYmFzZTsNCj4+
+IC0gICAgICAgc3RydWN0IHNoYXNoX2Rlc2MgKnNoYXNoID0gJnNlcnZlci0+c2VjbWVjaC5zZGVz
+Y2NtYWNhZXMtPnNoYXNoOw0KPj4gKyAgICAgICBzdHJ1Y3Qgc2hhc2hfZGVzYyAqc2hhc2g7DQo+
+PiAgICAgICAgIHN0cnVjdCBzbWJfcnFzdCBkcnFzdDsNCj4+ICAgICAgICAgdTgga2V5W1NNQjNf
+U0lHTl9LRVlfU0laRV07DQo+PiArICAgICAgIHN0cnVjdCBjcnlwdG9fc2hhc2ggKmNtYWNhZXM7
+DQo+Pg0KPj4gICAgICAgICByYyA9IHNtYjJfZ2V0X3NpZ25fa2V5KHNoZHItPlNlc3Npb25JZCwg
+c2VydmVyLCBrZXkpOw0KPj4gICAgICAgICBpZiAocmMpDQo+PiBAQCAtNTIyLDggKzU1OSwxMCBA
+QCBzbWIzX2NhbGNfc2lnbmF0dXJlKHN0cnVjdCBzbWJfcnFzdCAqcnFzdCwgc3RydWN0DQo+VENQ
+X1NlcnZlcl9JbmZvICpzZXJ2ZXIpDQo+PiAgICAgICAgIG1lbXNldChzbWIzX3NpZ25hdHVyZSwg
+MHgwLCBTTUIyX0NNQUNBRVNfU0laRSk7DQo+PiAgICAgICAgIG1lbXNldChzaGRyLT5TaWduYXR1
+cmUsIDB4MCwgU01CMl9TSUdOQVRVUkVfU0laRSk7DQo+Pg0KPj4gLSAgICAgICByYyA9IGNyeXB0
+b19zaGFzaF9zZXRrZXkoc2VydmVyLT5zZWNtZWNoLmNtYWNhZXMsDQo+PiAtICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBrZXksIFNNQjJfQ01BQ0FFU19TSVpFKTsNCj4+ICsgICAgICAg
+Y21hY2FlcyA9IHNlcnZlci0+c2VjbWVjaC5jbWFjYWVzW2RpcmVjdGlvbl07DQo+PiArICAgICAg
+IHNoYXNoID0gJnNlcnZlci0+c2VjbWVjaC5zZGVzY2NtYWNhZXNbZGlyZWN0aW9uXS0+c2hhc2g7
+DQo+PiArDQo+PiArICAgICAgIHJjID0gY3J5cHRvX3NoYXNoX3NldGtleShjbWFjYWVzLCBrZXks
+IFNNQjJfQ01BQ0FFU19TSVpFKTsNCj4+ICAgICAgICAgaWYgKHJjKSB7DQo+PiAgICAgICAgICAg
+ICAgICAgY2lmc19zZXJ2ZXJfZGJnKFZGUywgIiVzOiBDb3VsZCBub3Qgc2V0IGtleSBmb3IgY21h
+YyBhZXNcbiIsDQo+X19mdW5jX18pOw0KPj4gICAgICAgICAgICAgICAgIHJldHVybiByYzsNCj4+
+IEBAIC01OTMsOCArNjMyLDcgQEAgc21iMl9zaWduX3Jxc3Qoc3RydWN0IHNtYl9ycXN0ICpycXN0
+LCBzdHJ1Y3QNCj5UQ1BfU2VydmVyX0luZm8gKnNlcnZlcikNCj4+ICAgICAgICAgICAgICAgICBy
+ZXR1cm4gMDsNCj4+ICAgICAgICAgfQ0KPj4NCj4+IC0gICAgICAgcmMgPSBzZXJ2ZXItPm9wcy0+
+Y2FsY19zaWduYXR1cmUocnFzdCwgc2VydmVyKTsNCj4+IC0NCj4+ICsgICAgICAgcmMgPSBzZXJ2
+ZXItPm9wcy0+Y2FsY19zaWduYXR1cmUocnFzdCwgc2VydmVyLA0KPkNJRlNfU0VDTUVDSF9ESVJf
+T1VUKTsNCj4+ICAgICAgICAgcmV0dXJuIHJjOw0KPj4gIH0NCj4+DQo+PiBAQCAtNjMxLDkgKzY2
+OSw3IEBAIHNtYjJfdmVyaWZ5X3NpZ25hdHVyZShzdHJ1Y3Qgc21iX3Jxc3QgKnJxc3QsIHN0cnVj
+dA0KPlRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQ0KPj4NCj4+ICAgICAgICAgbWVtc2V0KHNoZHIt
+PlNpZ25hdHVyZSwgMCwgU01CMl9TSUdOQVRVUkVfU0laRSk7DQo+Pg0KPj4gLSAgICAgICBtdXRl
+eF9sb2NrKCZzZXJ2ZXItPnNydl9tdXRleCk7DQo+PiAtICAgICAgIHJjID0gc2VydmVyLT5vcHMt
+PmNhbGNfc2lnbmF0dXJlKHJxc3QsIHNlcnZlcik7DQo+PiAtICAgICAgIG11dGV4X3VubG9jaygm
+c2VydmVyLT5zcnZfbXV0ZXgpOw0KPj4gKyAgICAgICByYyA9IHNlcnZlci0+b3BzLT5jYWxjX3Np
+Z25hdHVyZShycXN0LCBzZXJ2ZXIsIENJRlNfU0VDTUVDSF9ESVJfSU4pOw0KPg0KPk11bHRpcGxl
+IHRocmVhZHMgbWF5IGJlIGNhbGxpbmcgc21iMl92ZXJpZnlfc2lnbmF0dXJlIGZyb20NCj5zbWIy
+X2NoZWNrX3JlY2VpdmUgaW4gc2VwYXJhdGUgdGhyZWFkcyAoc2VlIGNvbXBvdW5kX3NlbmRfcmVj
+dikuIFdoYXQNCj53aWxsIHByZXZlbnQgcmFjZXMgb24gY3J5cHRvIGRhdGEgc3RydWN0dXJlcyBv
+bmNlIHRoZSBtdXRleCBhcm91bmQNCj5jYWxjX3NpZ25hdHVyZSBpcyByZW1vdmVkPw0KDQpJdCdz
+IG15IGJhZCBJIHdpbGwgZml4IGl0LiBJbiB0aGlzIGNhc2Ugd2UgbmVlZCBhbm90aGVyIG11dGV4
+IGZvciB0aGUgcmVjZWl2aW5nIHBhdGhzLiBJIHdhcyBsb29raW5nIGF0IHNtYjJfd3JpdGV2X2Nh
+bGxiYWNrKCkgYW5kIHNtYjJfcmVhZHZfY2FsbGJhY2soKSwgdGhleSBhcmUgY2FsbGVkIGZyb20g
+Y2lmc2QgYW5kIGFsc28gdXNlIHRoaXMgbXV0ZXguIFRoaXMgbXV0ZXggZG9lcyB0aGUgbW9zdCBk
+YW1hZ2UgaW4gdGhvc2UgdHdvIGNhbGxiYWNrIGZ1bmN0aW9ucyBhcyBpdCBtYXkgYmxvY2sgdGhl
+IHJlY2VpdmluZyB0aHJlYWQuDQoNClRoYW5rcywNCkxvbmcNCg0KPg0KPi0tDQo+QmVzdCByZWdh
+cmRzLA0KPlBhdmVsIFNoaWxvdnNreQ0K
