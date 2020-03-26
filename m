@@ -2,196 +2,219 @@ Return-Path: <SRS0=YqT1=5L=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFC1C43331
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Mar 2020 02:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41336C43331
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Mar 2020 02:43:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7170820737
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Mar 2020 02:02:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 016CB2076A
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Mar 2020 02:43:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A470PTWm"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="id0X6EgO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727564AbgCZCCT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 25 Mar 2020 22:02:19 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:37489 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727561AbgCZCCS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 25 Mar 2020 22:02:18 -0400
-Received: by mail-io1-f67.google.com with SMTP id q9so4508262iod.4;
-        Wed, 25 Mar 2020 19:02:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4xp15kfS5NUhuffpTH0eDvjkAD1zDSgezpo7dNfleWM=;
-        b=A470PTWmd3GEYYQ4A9YPKgbChJGyiY4F/5V6tcTy0Ga8tbBdJSYPz/yC1fvPflKC8t
-         WT1IfvFT5UA8wR63Th2NKqY/PfnKZBL2AlVbiXDux3dX32OD+3x48cmCev8maPRSMctw
-         fpJ2WGSxh3ZXObrhTsnQjWHPAF7jDOWQon21L1ZpOloI/0Aw7A7OxyIAFk6q9OCaypmO
-         asZ8yswb5cUYK7ryzf6JBnfJ3G3zJWWwcZnMccr2dxbWr5hbvukhmq+Jj9Usat4VM6xk
-         LZyyXwmJTzoZjDhXYwz4nKOePITfEIm/WUbVlGg86nkknSWbaIs5H5iqcDmYuBmLO+F7
-         UoXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4xp15kfS5NUhuffpTH0eDvjkAD1zDSgezpo7dNfleWM=;
-        b=pra/aJfty1EJRUqmW7F2zQSUGN4zZZjBPXk03d9/LvoQkv5AhDYoskiSlkGyucDvE0
-         hNwkTmP65A/QdhbnMLwx7B5Pml2uBa7LNHxb2+KwPeYt9dLuOJnaFMG0qjYG9F07PQlN
-         hU3SNcOU2ylopVuzxFD3jxx2eypv9xX/b4nUK3YHSWmZLEOmDT30SaeKFlsb4ZDs79Y7
-         q5PKsH9HzyisxPtpZ+qr5v4eaAP41DlV7V2e1ianWd1I9CaTUzBp8Q+Lqwzv5/w871HV
-         0hh08srYPXzL6GmDU9awMvZNyDQgartF1sI51gkLDkjr5HniLrL9G4eCPtTr5aAPvQwp
-         eA9Q==
-X-Gm-Message-State: ANhLgQ35tko9PXHfiWIxhRy3bi89uxKtVZyKZ+CYw0vZnD26d4lyM7Bc
-        uLSY0ncxDejqUeovzaWDt/anRiStbxFM/zuVMyw=
-X-Google-Smtp-Source: ADFU+vucW6te80eivq0ZUfTKnqSxSc1+eL3rS9tLJ0yst4sgacQvScGP8hbBJX3hkuA0Xv/JiphAaGlq1hTtVpSHdco=
-X-Received: by 2002:a05:6638:a99:: with SMTP id 25mr5874582jas.37.1585188137103;
- Wed, 25 Mar 2020 19:02:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <1585164614-123696-1-git-send-email-longli@linuxonhyperv.com>
-In-Reply-To: <1585164614-123696-1-git-send-email-longli@linuxonhyperv.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 26 Mar 2020 12:02:05 +1000
-Message-ID: <CAN05THTH8-pK9uw77COWSUQ_knztT1o1Ms0b=2PPvmBJd=ovUw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: smbd: Calculate the correct maximum packet size for
- segmented SMBDirect send/receive
-To:     Long Li <longli@microsoft.com>
-Cc:     Steve French <sfrench@samba.org>,
+        id S1727690AbgCZCnd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 25 Mar 2020 22:43:33 -0400
+Received: from mail-eopbgr770111.outbound.protection.outlook.com ([40.107.77.111]:45280
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727575AbgCZCnd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 25 Mar 2020 22:43:33 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OqafUjsHF8xIG8x5aobA2tsCfQ0vDOOK4MUbFpRC0rTEBa0eHNePjVu0v4bnK3d0E/qTirEBUQKFyAPqyJBBNNiYYTopXcvWNgU+XwuVC4Q8ZjPbm67aoyxW3ZwJXbesyJRWqhYa2hKFg9QpGO97KGlSE009ShJo4XrbjpOU8muJn51xnE8l5XEFNZJOrWObhRZIkGdsMgH4UZ/e6IVkueSo0+jE5mcUO4FHd1NhwL+DdTdYzyZ3VX7MRByUwbjF4YzVuyfAsfyr8PZhMapJb/jkpQBwt8spi5sn/vw/uUJLA6aal4LVwH2IJhtcwBc645VIoZh71GWwzXfOj0KkYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=No4rc9QygUWXm7doiPhwQpKT39n8cbEX39oBm26qQwY=;
+ b=dIQxvM/vdQ9wGNkLIBtySET17aZw4P8YAEM1sG/NM5h7GWbuRT4pt9vm/yf150HV2sy1muqe6qRV1Vw7YhQydARppuNrrJAJiYx4TklchhPWi1Q3bxQr5kJrvG27T9D6EbzY6YYeR0Kg0jlKdIab5oxmm6gZI4fxSQNI/QHr53gjU1sgALK3JvsghZFriYayjlUM8K4d9ZH0BNkkJorR2GVgMJ2yGpEtZKxf3yOdRFW0WsOOXQ6GburJUIhYKh+23gurUfx5I8WP0MOtGpeoYc+AXXe51wdlO0UqfqO7212VMSYeHKklWgqvDDPlhAW5Qdxqt6dwp8WkdeIy+Tdc9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=No4rc9QygUWXm7doiPhwQpKT39n8cbEX39oBm26qQwY=;
+ b=id0X6EgOnXOJ9473TS0FmnSTc+wS5TBf42FDALGuRmt29vkQQPKihjJaXh7CzRFQ2E5SXRx1U1aEg+GDsTESc6wVDLI61mGzXE9PwE0vn7s2aw/bFnx0vIlHR54Pz0xPUQaM1/zgBex7+h1d4EUtGy2atskF9r96t73CLB0+NG0=
+Received: from BN8PR21MB1155.namprd21.prod.outlook.com (2603:10b6:408:73::10)
+ by BN8PR21MB1218.namprd21.prod.outlook.com (2603:10b6:408:77::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.7; Thu, 26 Mar
+ 2020 02:43:29 +0000
+Received: from BN8PR21MB1155.namprd21.prod.outlook.com
+ ([fe80::d11:18b7:289c:ea17]) by BN8PR21MB1155.namprd21.prod.outlook.com
+ ([fe80::d11:18b7:289c:ea17%7]) with mapi id 15.20.2878.000; Thu, 26 Mar 2020
+ 02:43:29 +0000
+From:   Long Li <longli@microsoft.com>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+CC:     Steve French <sfrench@samba.org>,
         linux-cifs <linux-cifs@vger.kernel.org>,
         "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>, longli@linuxonhyperv.com
-Content-Type: text/plain; charset="UTF-8"
+        LKML <linux-kernel@vger.kernel.org>,
+        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>
+Subject: RE: [PATCH] cifs: smbd: Calculate the correct maximum packet size for
+ segmented SMBDirect send/receive
+Thread-Topic: [PATCH] cifs: smbd: Calculate the correct maximum packet size
+ for segmented SMBDirect send/receive
+Thread-Index: AQHWAtvYNY3DmDmGG0eYPROAwhxW46haH2CAgAAJY1A=
+Date:   Thu, 26 Mar 2020 02:43:29 +0000
+Message-ID: <BN8PR21MB1155CECE3C53742CC389E5F9CECF0@BN8PR21MB1155.namprd21.prod.outlook.com>
+References: <1585164614-123696-1-git-send-email-longli@linuxonhyperv.com>
+ <CAN05THTH8-pK9uw77COWSUQ_knztT1o1Ms0b=2PPvmBJd=ovUw@mail.gmail.com>
+In-Reply-To: <CAN05THTH8-pK9uw77COWSUQ_knztT1o1Ms0b=2PPvmBJd=ovUw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=longli@microsoft.com; 
+x-originating-ip: [2001:4898:80e8:2:edec:db5c:c6fe:798]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 0f95960e-ddf3-4c1a-8655-08d7d12f77bb
+x-ms-traffictypediagnostic: BN8PR21MB1218:
+x-microsoft-antispam-prvs: <BN8PR21MB12181547F5A11A6FB1D4C06ACECF0@BN8PR21MB1218.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 0354B4BED2
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR21MB1155.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(136003)(39860400002)(346002)(366004)(376002)(396003)(8936002)(54906003)(186003)(7696005)(5660300002)(2906002)(52536014)(9686003)(6916009)(316002)(10290500003)(86362001)(64756008)(66556008)(81166006)(81156014)(76116006)(6506007)(66946007)(8676002)(66476007)(66446008)(8990500004)(71200400001)(478600001)(55016002)(4326008)(33656002);DIR:OUT;SFP:1102;
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: BY5y9EsEszcdCqFJd5oHTCsH8yV7bA+y/J5D7nz0ICWmifUN1ModF8Tgz/yBPzzGjuDR80QErGWv6f6wQrxzZ21PXQkJCAWgA6J4H/7rqlQ/DXMCPxHmr1gXHv57lexp58L6QnMwf9SN54EejGYp6Lw+5T7UnUr5Rf4IXEhe7/WSCgxDoyz1rW49QTHHj4R51HZrmEtY4JamC/mduw2L9XkDpPAx9zmPIppVWP4tHBykiSWP8nu5jZ8G3eIkfY8l/Bx/6EEJlXO9+2d+JZHEk4Kz2zcPLyc8cfec4uU9OVkzQ1O/vl3cspLbOWWi1G68R4y89kc7Jy8qfs4EtXV5payMAtGziuGDh+h7ODHVwdHlbNqcomNhQWHrkYekDKBlscbJJ8wBSRZ1GP2kK/ksmzjsdWBZg+uTsFkBucvjRJRfzr8TGYowSmRpZYhIPvKs
+x-ms-exchange-antispam-messagedata: Z/faKDjQLW01HVc3D2BnshstEqT78MB+w9YPPNa5zZp3Qlu8eEpeOn7WyThjeSS/ZND417tqsq+GDIyUywSh++Zo4AI1UN17KfH2UmfO0DIF3dn2PN/NW23c4k4m5BwAVkCfajyF1Z4Er5J8ZAqPEfEVhiSTodaBawzDgB+JkItRRve2Nxb/byTJ2aBNGTZyrEUfgbf+GP9E3aUFOvMuSA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f95960e-ddf3-4c1a-8655-08d7d12f77bb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2020 02:43:29.7111
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: IT163s9B9QEJvRqlKHmxz6sEta6jCtNqZswSogY05wkVZlcDcby7d7HrDSMTIX47oJMFBL5pLdoxeHA/u3zERQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR21MB1218
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Long Li,
-
-Mostly looks good  but the magic constant 49 I think is wrong.
-49 is the structure size of the read/write request header
-but for these sizes, if they are odd it just means that the header contain a
-variable sized blob.
-I.e. the size is 48 bytes (for the fixed part of the header) + a variable part
-which in this case are the ChannelInfo blobs.
-
-So we should probably add to smb2pdu.h a
-#define MAX_SMB2_READWRITE_RESPONSE_SIZE 48
-and use this in the calculations. Then we need to add the maximum size
-we will use for ChannelInfo.
-
-Maybe we should have a define also for the MAX_SMB2_CHANNEL_INFO_SIZE
-
-regards
-ronnie sahlberg
-
-On Thu, Mar 26, 2020 at 5:31 AM longli--- via samba-technical
-<samba-technical@lists.samba.org> wrote:
->
-> From: Long Li <longli@microsoft.com>
->
-> The packet size needs to take account of SMB2 header size and possible
-> encryption header size. This is only done when signing is used and it is for
-> RDMA send/receive, not read/write.
->
-> Also remove the dead SMBD code in smb2_negotiate_r(w)size.
->
-> Signed-off-by: Long Li <longli@microsoft.com>
-> ---
->  fs/cifs/smb2ops.c   | 38 ++++++++++++++++----------------------
->  fs/cifs/smbdirect.c |  3 +--
->  2 files changed, 17 insertions(+), 24 deletions(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 4c0922596467..9043d34eef43 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -332,16 +332,6 @@ smb2_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
->         /* start with specified wsize, or default */
->         wsize = volume_info->wsize ? volume_info->wsize : CIFS_DEFAULT_IOSIZE;
->         wsize = min_t(unsigned int, wsize, server->max_write);
-> -#ifdef CONFIG_CIFS_SMB_DIRECT
-> -       if (server->rdma) {
-> -               if (server->sign)
-> -                       wsize = min_t(unsigned int,
-> -                               wsize, server->smbd_conn->max_fragmented_send_size);
-> -               else
-> -                       wsize = min_t(unsigned int,
-> -                               wsize, server->smbd_conn->max_readwrite_size);
-> -       }
-> -#endif
->         if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
->                 wsize = min_t(unsigned int, wsize, SMB2_MAX_BUFFER_SIZE);
->
-> @@ -360,8 +350,15 @@ smb3_negotiate_wsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
->  #ifdef CONFIG_CIFS_SMB_DIRECT
->         if (server->rdma) {
->                 if (server->sign)
-> +                       /*
-> +                        * Account for SMB2 data transfer packet header
-> +                        * SMB2_READ/SMB2_WRITE (49) and possible encryption
-> +                        * headers
-> +                        */
->                         wsize = min_t(unsigned int,
-> -                               wsize, server->smbd_conn->max_fragmented_send_size);
-> +                               wsize,
-> +                               server->smbd_conn->max_fragmented_send_size -
-> +                                       49 - sizeof(struct smb2_transform_hdr));
->                 else
->                         wsize = min_t(unsigned int,
->                                 wsize, server->smbd_conn->max_readwrite_size);
-> @@ -382,16 +379,6 @@ smb2_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
->         /* start with specified rsize, or default */
->         rsize = volume_info->rsize ? volume_info->rsize : CIFS_DEFAULT_IOSIZE;
->         rsize = min_t(unsigned int, rsize, server->max_read);
-> -#ifdef CONFIG_CIFS_SMB_DIRECT
-> -       if (server->rdma) {
-> -               if (server->sign)
-> -                       rsize = min_t(unsigned int,
-> -                               rsize, server->smbd_conn->max_fragmented_recv_size);
-> -               else
-> -                       rsize = min_t(unsigned int,
-> -                               rsize, server->smbd_conn->max_readwrite_size);
-> -       }
-> -#endif
->
->         if (!(server->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU))
->                 rsize = min_t(unsigned int, rsize, SMB2_MAX_BUFFER_SIZE);
-> @@ -411,8 +398,15 @@ smb3_negotiate_rsize(struct cifs_tcon *tcon, struct smb_vol *volume_info)
->  #ifdef CONFIG_CIFS_SMB_DIRECT
->         if (server->rdma) {
->                 if (server->sign)
-> +                       /*
-> +                        * Account for SMB2 data transfer packet header
-> +                        * SMB2_READ/SMB2_WRITE (49) and possible encryption
-> +                        * headers
-> +                        */
->                         rsize = min_t(unsigned int,
-> -                               rsize, server->smbd_conn->max_fragmented_recv_size);
-> +                               rsize,
-> +                               server->smbd_conn->max_fragmented_recv_size -
-> +                                       49 - sizeof(struct smb2_transform_hdr));
->                 else
->                         rsize = min_t(unsigned int,
->                                 rsize, server->smbd_conn->max_readwrite_size);
-> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> index eb1e40af9f3a..0327b575ab87 100644
-> --- a/fs/cifs/smbdirect.c
-> +++ b/fs/cifs/smbdirect.c
-> @@ -2097,8 +2097,7 @@ int smbd_send(struct TCP_Server_Info *server,
->         for (i = 0; i < num_rqst; i++)
->                 remaining_data_length += smb_rqst_len(server, &rqst_array[i]);
->
-> -       if (remaining_data_length + sizeof(struct smbd_data_transfer) >
-> -               info->max_fragmented_send_size) {
-> +       if (remaining_data_length > info->max_fragmented_send_size) {
->                 log_write(ERR, "payload size %d > max size %d\n",
->                         remaining_data_length, info->max_fragmented_send_size);
->                 rc = -EINVAL;
-> --
-> 2.17.1
->
->
+PlN1YmplY3Q6IFJlOiBbUEFUQ0hdIGNpZnM6IHNtYmQ6IENhbGN1bGF0ZSB0aGUgY29ycmVjdCBt
+YXhpbXVtIHBhY2tldCBzaXplDQo+Zm9yIHNlZ21lbnRlZCBTTUJEaXJlY3Qgc2VuZC9yZWNlaXZl
+DQo+DQo+TG9uZyBMaSwNCj4NCj5Nb3N0bHkgbG9va3MgZ29vZCAgYnV0IHRoZSBtYWdpYyBjb25z
+dGFudCA0OSBJIHRoaW5rIGlzIHdyb25nLg0KPjQ5IGlzIHRoZSBzdHJ1Y3R1cmUgc2l6ZSBvZiB0
+aGUgcmVhZC93cml0ZSByZXF1ZXN0IGhlYWRlciBidXQgZm9yIHRoZXNlIHNpemVzLCBpZg0KPnRo
+ZXkgYXJlIG9kZCBpdCBqdXN0IG1lYW5zIHRoYXQgdGhlIGhlYWRlciBjb250YWluIGEgdmFyaWFi
+bGUgc2l6ZWQgYmxvYi4NCj5JLmUuIHRoZSBzaXplIGlzIDQ4IGJ5dGVzIChmb3IgdGhlIGZpeGVk
+IHBhcnQgb2YgdGhlIGhlYWRlcikgKyBhIHZhcmlhYmxlIHBhcnQNCj53aGljaCBpbiB0aGlzIGNh
+c2UgYXJlIHRoZSBDaGFubmVsSW5mbyBibG9icy4NCg0KQWdyZWVkLiBVc2luZyBhIG1hZ2ljIG51
+bWJlciBpcyBub3QgYSBnb29kIGlkZWEuDQoNCkkgd2FzIGxvb2tpbmcgYXQgcmVxdWVzdCBzaXpl
+IGRlZmluaXRpb25zIGluIA0KImZzL2NpZnMvc21iMnBkdS5jIiwgIHRoZXkgYXJlIGRlZmluZWQg
+YXQNCnN0YXRpYyBjb25zdCBpbnQgc21iMl9yZXFfc3RydWN0X3NpemVzW05VTUJFUl9PRl9TTUIy
+X0NPTU1BTkRTXQ0KDQpmb3IgcmVhZCBhbmQgd3JpdGUsIHRoZSBzaXplcyBhcmU6DQogICAgICAg
+IC8qIFNNQjJfUkVBRCAqLyA0OSwNCiAgICAgICAgLyogU01CMl9XUklURSAqLyA0OSwNCg0KVGhl
+eSBhcmUgdXNlZCB0byBjYWxjdWxhdGUgY29tbWFuZCBoZWFkZXIgc2l6ZXMsIGFuZCBmaWxsIGlu
+IHRoZSByZXF1ZXN0IGhlYWRlcnMuIE1heWJlIEkgc2hvdWxkIHVzZSB0aGlzIHZhcmlhYmxlIHRv
+IGdldCB0aGUgc2l6ZT8NCg0KPg0KPlNvIHdlIHNob3VsZCBwcm9iYWJseSBhZGQgdG8gc21iMnBk
+dS5oIGEgI2RlZmluZQ0KPk1BWF9TTUIyX1JFQURXUklURV9SRVNQT05TRV9TSVpFIDQ4IGFuZCB1
+c2UgdGhpcyBpbiB0aGUgY2FsY3VsYXRpb25zLg0KPlRoZW4gd2UgbmVlZCB0byBhZGQgdGhlIG1h
+eGltdW0gc2l6ZSB3ZSB3aWxsIHVzZSBmb3IgQ2hhbm5lbEluZm8uDQo+DQo+TWF5YmUgd2Ugc2hv
+dWxkIGhhdmUgYSBkZWZpbmUgYWxzbyBmb3IgdGhlDQo+TUFYX1NNQjJfQ0hBTk5FTF9JTkZPX1NJ
+WkUNCj4NCj5yZWdhcmRzDQo+cm9ubmllIHNhaGxiZXJnDQo+DQo+T24gVGh1LCBNYXIgMjYsIDIw
+MjAgYXQgNTozMSBBTSBsb25nbGktLS0gdmlhIHNhbWJhLXRlY2huaWNhbCA8c2FtYmEtDQo+dGVj
+aG5pY2FsQGxpc3RzLnNhbWJhLm9yZz4gd3JvdGU6DQo+Pg0KPj4gRnJvbTogTG9uZyBMaSA8bG9u
+Z2xpQG1pY3Jvc29mdC5jb20+DQo+Pg0KPj4gVGhlIHBhY2tldCBzaXplIG5lZWRzIHRvIHRha2Ug
+YWNjb3VudCBvZiBTTUIyIGhlYWRlciBzaXplIGFuZCBwb3NzaWJsZQ0KPj4gZW5jcnlwdGlvbiBo
+ZWFkZXIgc2l6ZS4gVGhpcyBpcyBvbmx5IGRvbmUgd2hlbiBzaWduaW5nIGlzIHVzZWQgYW5kIGl0
+DQo+PiBpcyBmb3IgUkRNQSBzZW5kL3JlY2VpdmUsIG5vdCByZWFkL3dyaXRlLg0KPj4NCj4+IEFs
+c28gcmVtb3ZlIHRoZSBkZWFkIFNNQkQgY29kZSBpbiBzbWIyX25lZ290aWF0ZV9yKHcpc2l6ZS4N
+Cj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4+
+IC0tLQ0KPj4gIGZzL2NpZnMvc21iMm9wcy5jICAgfCAzOCArKysrKysrKysrKysrKysrLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLQ0KPj4gIGZzL2NpZnMvc21iZGlyZWN0LmMgfCAgMyArLS0NCj4+ICAy
+IGZpbGVzIGNoYW5nZWQsIDE3IGluc2VydGlvbnMoKyksIDI0IGRlbGV0aW9ucygtKQ0KPj4NCj4+
+IGRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJvcHMuYyBiL2ZzL2NpZnMvc21iMm9wcy5jIGluZGV4
+DQo+PiA0YzA5MjI1OTY0NjcuLjkwNDNkMzRlZWY0MyAxMDA2NDQNCj4+IC0tLSBhL2ZzL2NpZnMv
+c21iMm9wcy5jDQo+PiArKysgYi9mcy9jaWZzL3NtYjJvcHMuYw0KPj4gQEAgLTMzMiwxNiArMzMy
+LDYgQEAgc21iMl9uZWdvdGlhdGVfd3NpemUoc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwNCj5zdHJ1
+Y3Qgc21iX3ZvbCAqdm9sdW1lX2luZm8pDQo+PiAgICAgICAgIC8qIHN0YXJ0IHdpdGggc3BlY2lm
+aWVkIHdzaXplLCBvciBkZWZhdWx0ICovDQo+PiAgICAgICAgIHdzaXplID0gdm9sdW1lX2luZm8t
+PndzaXplID8gdm9sdW1lX2luZm8tPndzaXplIDoNCj5DSUZTX0RFRkFVTFRfSU9TSVpFOw0KPj4g
+ICAgICAgICB3c2l6ZSA9IG1pbl90KHVuc2lnbmVkIGludCwgd3NpemUsIHNlcnZlci0+bWF4X3dy
+aXRlKTsgLSNpZmRlZg0KPj4gQ09ORklHX0NJRlNfU01CX0RJUkVDVA0KPj4gLSAgICAgICBpZiAo
+c2VydmVyLT5yZG1hKSB7DQo+PiAtICAgICAgICAgICAgICAgaWYgKHNlcnZlci0+c2lnbikNCj4+
+IC0gICAgICAgICAgICAgICAgICAgICAgIHdzaXplID0gbWluX3QodW5zaWduZWQgaW50LA0KPj4g
+LSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB3c2l6ZSwgc2VydmVyLT5zbWJkX2Nvbm4t
+Pm1heF9mcmFnbWVudGVkX3NlbmRfc2l6ZSk7DQo+PiAtICAgICAgICAgICAgICAgZWxzZQ0KPj4g
+LSAgICAgICAgICAgICAgICAgICAgICAgd3NpemUgPSBtaW5fdCh1bnNpZ25lZCBpbnQsDQo+PiAt
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHdzaXplLCBzZXJ2ZXItPnNtYmRfY29ubi0+
+bWF4X3JlYWR3cml0ZV9zaXplKTsNCj4+IC0gICAgICAgfQ0KPj4gLSNlbmRpZg0KPj4gICAgICAg
+ICBpZiAoIShzZXJ2ZXItPmNhcGFiaWxpdGllcyAmIFNNQjJfR0xPQkFMX0NBUF9MQVJHRV9NVFUp
+KQ0KPj4gICAgICAgICAgICAgICAgIHdzaXplID0gbWluX3QodW5zaWduZWQgaW50LCB3c2l6ZSwN
+Cj4+IFNNQjJfTUFYX0JVRkZFUl9TSVpFKTsNCj4+DQo+PiBAQCAtMzYwLDggKzM1MCwxNSBAQCBz
+bWIzX25lZ290aWF0ZV93c2l6ZShzdHJ1Y3QgY2lmc190Y29uICp0Y29uLA0KPj4gc3RydWN0IHNt
+Yl92b2wgKnZvbHVtZV9pbmZvKSAgI2lmZGVmIENPTkZJR19DSUZTX1NNQl9ESVJFQ1QNCj4+ICAg
+ICAgICAgaWYgKHNlcnZlci0+cmRtYSkgew0KPj4gICAgICAgICAgICAgICAgIGlmIChzZXJ2ZXIt
+PnNpZ24pDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAvKg0KPj4gKyAgICAgICAgICAgICAg
+ICAgICAgICAgICogQWNjb3VudCBmb3IgU01CMiBkYXRhIHRyYW5zZmVyIHBhY2tldCBoZWFkZXIN
+Cj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAqIFNNQjJfUkVBRC9TTUIyX1dSSVRFICg0OSkg
+YW5kIHBvc3NpYmxlIGVuY3J5cHRpb24NCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAqIGhl
+YWRlcnMNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAqLw0KPj4gICAgICAgICAgICAgICAg
+ICAgICAgICAgd3NpemUgPSBtaW5fdCh1bnNpZ25lZCBpbnQsDQo+PiAtICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIHdzaXplLCBzZXJ2ZXItPnNtYmRfY29ubi0+bWF4X2ZyYWdtZW50ZWRf
+c2VuZF9zaXplKTsNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgd3NpemUsDQo+
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNlcnZlci0+c21iZF9jb25uLT5tYXhf
+ZnJhZ21lbnRlZF9zZW5kX3NpemUgLQ0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIDQ5IC0gc2l6ZW9mKHN0cnVjdA0KPj4gKyBzbWIyX3RyYW5zZm9ybV9oZHIpKTsN
+Cj4+ICAgICAgICAgICAgICAgICBlbHNlDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICB3c2l6
+ZSA9IG1pbl90KHVuc2lnbmVkIGludCwNCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgd3NpemUsDQo+PiBzZXJ2ZXItPnNtYmRfY29ubi0+bWF4X3JlYWR3cml0ZV9zaXplKTsNCj4+
+IEBAIC0zODIsMTYgKzM3OSw2IEBAIHNtYjJfbmVnb3RpYXRlX3JzaXplKHN0cnVjdCBjaWZzX3Rj
+b24gKnRjb24sIHN0cnVjdA0KPnNtYl92b2wgKnZvbHVtZV9pbmZvKQ0KPj4gICAgICAgICAvKiBz
+dGFydCB3aXRoIHNwZWNpZmllZCByc2l6ZSwgb3IgZGVmYXVsdCAqLw0KPj4gICAgICAgICByc2l6
+ZSA9IHZvbHVtZV9pbmZvLT5yc2l6ZSA/IHZvbHVtZV9pbmZvLT5yc2l6ZSA6IENJRlNfREVGQVVM
+VF9JT1NJWkU7DQo+PiAgICAgICAgIHJzaXplID0gbWluX3QodW5zaWduZWQgaW50LCByc2l6ZSwg
+c2VydmVyLT5tYXhfcmVhZCk7IC0jaWZkZWYNCj4+IENPTkZJR19DSUZTX1NNQl9ESVJFQ1QNCj4+
+IC0gICAgICAgaWYgKHNlcnZlci0+cmRtYSkgew0KPj4gLSAgICAgICAgICAgICAgIGlmIChzZXJ2
+ZXItPnNpZ24pDQo+PiAtICAgICAgICAgICAgICAgICAgICAgICByc2l6ZSA9IG1pbl90KHVuc2ln
+bmVkIGludCwNCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcnNpemUsIHNlcnZl
+ci0+c21iZF9jb25uLT5tYXhfZnJhZ21lbnRlZF9yZWN2X3NpemUpOw0KPj4gLSAgICAgICAgICAg
+ICAgIGVsc2UNCj4+IC0gICAgICAgICAgICAgICAgICAgICAgIHJzaXplID0gbWluX3QodW5zaWdu
+ZWQgaW50LA0KPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByc2l6ZSwgc2VydmVy
+LT5zbWJkX2Nvbm4tPm1heF9yZWFkd3JpdGVfc2l6ZSk7DQo+PiAtICAgICAgIH0NCj4+IC0jZW5k
+aWYNCj4+DQo+PiAgICAgICAgIGlmICghKHNlcnZlci0+Y2FwYWJpbGl0aWVzICYgU01CMl9HTE9C
+QUxfQ0FQX0xBUkdFX01UVSkpDQo+PiAgICAgICAgICAgICAgICAgcnNpemUgPSBtaW5fdCh1bnNp
+Z25lZCBpbnQsIHJzaXplLA0KPj4gU01CMl9NQVhfQlVGRkVSX1NJWkUpOyBAQCAtNDExLDggKzM5
+OCwxNSBAQA0KPj4gc21iM19uZWdvdGlhdGVfcnNpemUoc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwg
+c3RydWN0IHNtYl92b2wgKnZvbHVtZV9pbmZvKQ0KPiNpZmRlZiBDT05GSUdfQ0lGU19TTUJfRElS
+RUNUDQo+PiAgICAgICAgIGlmIChzZXJ2ZXItPnJkbWEpIHsNCj4+ICAgICAgICAgICAgICAgICBp
+ZiAoc2VydmVyLT5zaWduKQ0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgLyoNCj4+ICsgICAg
+ICAgICAgICAgICAgICAgICAgICAqIEFjY291bnQgZm9yIFNNQjIgZGF0YSB0cmFuc2ZlciBwYWNr
+ZXQgaGVhZGVyDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgKiBTTUIyX1JFQUQvU01CMl9X
+UklURSAoNDkpIGFuZCBwb3NzaWJsZSBlbmNyeXB0aW9uDQo+PiArICAgICAgICAgICAgICAgICAg
+ICAgICAgKiBoZWFkZXJzDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgKi8NCj4+ICAgICAg
+ICAgICAgICAgICAgICAgICAgIHJzaXplID0gbWluX3QodW5zaWduZWQgaW50LA0KPj4gLSAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICByc2l6ZSwgc2VydmVyLT5zbWJkX2Nvbm4tPm1heF9m
+cmFnbWVudGVkX3JlY3Zfc2l6ZSk7DQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IHJzaXplLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzZXJ2ZXItPnNtYmRf
+Y29ubi0+bWF4X2ZyYWdtZW50ZWRfcmVjdl9zaXplIC0NCj4+ICsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICA0OSAtIHNpemVvZihzdHJ1Y3QNCj4+ICsgc21iMl90cmFuc2Zv
+cm1faGRyKSk7DQo+PiAgICAgICAgICAgICAgICAgZWxzZQ0KPj4gICAgICAgICAgICAgICAgICAg
+ICAgICAgcnNpemUgPSBtaW5fdCh1bnNpZ25lZCBpbnQsDQo+PiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHJzaXplLA0KPj4gc2VydmVyLT5zbWJkX2Nvbm4tPm1heF9yZWFkd3JpdGVf
+c2l6ZSk7DQo+PiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWJkaXJlY3QuYyBiL2ZzL2NpZnMvc21i
+ZGlyZWN0LmMgaW5kZXgNCj4+IGViMWU0MGFmOWYzYS4uMDMyN2I1NzVhYjg3IDEwMDY0NA0KPj4g
+LS0tIGEvZnMvY2lmcy9zbWJkaXJlY3QuYw0KPj4gKysrIGIvZnMvY2lmcy9zbWJkaXJlY3QuYw0K
+Pj4gQEAgLTIwOTcsOCArMjA5Nyw3IEBAIGludCBzbWJkX3NlbmQoc3RydWN0IFRDUF9TZXJ2ZXJf
+SW5mbyAqc2VydmVyLA0KPj4gICAgICAgICBmb3IgKGkgPSAwOyBpIDwgbnVtX3Jxc3Q7IGkrKykN
+Cj4+ICAgICAgICAgICAgICAgICByZW1haW5pbmdfZGF0YV9sZW5ndGggKz0gc21iX3Jxc3RfbGVu
+KHNlcnZlciwNCj4+ICZycXN0X2FycmF5W2ldKTsNCj4+DQo+PiAtICAgICAgIGlmIChyZW1haW5p
+bmdfZGF0YV9sZW5ndGggKyBzaXplb2Yoc3RydWN0IHNtYmRfZGF0YV90cmFuc2ZlcikgPg0KPj4g
+LSAgICAgICAgICAgICAgIGluZm8tPm1heF9mcmFnbWVudGVkX3NlbmRfc2l6ZSkgew0KPj4gKyAg
+ICAgICBpZiAocmVtYWluaW5nX2RhdGFfbGVuZ3RoID4gaW5mby0+bWF4X2ZyYWdtZW50ZWRfc2Vu
+ZF9zaXplKSB7DQo+PiAgICAgICAgICAgICAgICAgbG9nX3dyaXRlKEVSUiwgInBheWxvYWQgc2l6
+ZSAlZCA+IG1heCBzaXplICVkXG4iLA0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgcmVtYWlu
+aW5nX2RhdGFfbGVuZ3RoLCBpbmZvLT5tYXhfZnJhZ21lbnRlZF9zZW5kX3NpemUpOw0KPj4gICAg
+ICAgICAgICAgICAgIHJjID0gLUVJTlZBTDsNCj4+IC0tDQo+PiAyLjE3LjENCj4+DQo+Pg0K
