@@ -2,262 +2,64 @@ Return-Path: <SRS0=YqT1=5L=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3834C18E5B
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Mar 2020 03:08:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10B32C43331
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Mar 2020 09:56:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 73DC420838
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Mar 2020 03:08:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="h7kIVkYJ"
+	by mail.kernel.org (Postfix) with ESMTP id E546E20714
+	for <linux-cifs@archiver.kernel.org>; Thu, 26 Mar 2020 09:56:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727701AbgCZDIR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 25 Mar 2020 23:08:17 -0400
-Received: from mail-bn8nam11on2126.outbound.protection.outlook.com ([40.107.236.126]:41458
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727688AbgCZDIO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 25 Mar 2020 23:08:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dY5ZMABQudn4RSUIKEXp1J0UQlEAxXcreF9xBnXzZXYp6FXhnZ/R1+QUPPz7LG+AtbI/BVHkDo5l0Cq1ZTORwZmKhilA4beGqEglsDydv2bdRcKpCECgEXETyYXYmnKj1FBcvjOHDW6efzpsgy2+mL8ocxj3k/hRiYQbSi3HCpl5u7NiJ87N2A/mXxsEzpp6mVzl1FkY5PZ5dNhfO8MRAGOcAxjDxAj0r7lUG8ElbW8SFc1Xm5oADSo02c3UUBi9/qgeu5d828x0nhewddnyPVGecrtH2XKYFKv/gUeTaLBVgJ30uRCVu/3OcxCJR4y1NJdTwcjBHeCRFevw/pMfrw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ghO5YK2b71CAc0L4y7gEALTW0QPqc8IpEqedKrE3Bec=;
- b=bd7arTJ03BxuxaxlGPpg6ZPCOdQI2CS5Ei3PET6tRqMd6UPfVJUxrar/f83nEr/lsiuOYIxCfwcHRYuJMO5+8KMJQjBUeCMyRIyhPC31K8iK+K2RUEcRffUDUj/+2Who7/m0p/vToGXn41bSZafI6rEkiQoabereA+GIuJ8vQz6IqTiBqe9/Z66GOaumxeuQeG+dDTUzG8UTVVYQ+g08ydwaW6btm9Uxue4WIbFRQ0fyd0/JYaSYRp0xE0B2qSk0lCeuWWxhXil1hmL/PTyvrSMn+qixL83fa9Zk2yjlqGwBKfo0SIIfyQ9Z63srRtKY4Y1cneLej62mMezD4UlHnA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ghO5YK2b71CAc0L4y7gEALTW0QPqc8IpEqedKrE3Bec=;
- b=h7kIVkYJuD1xwjjKkII5pmeNKZbpc3Wnu1yYWS4/8Je/m0WogGqWQod4J1KdiT76YN0qQD0NaSW3uujikyOQ/EcX+n7fy+tYWkIhlv1aTmEnZ5A8r684pcIfJuA33QRYdOooyx2ngdYOpk23kmXDSRbHo4jjFhIFhjD17ljgMXs=
-Received: from BN8PR21MB1155.namprd21.prod.outlook.com (2603:10b6:408:73::10)
- by BN8PR21MB1249.namprd21.prod.outlook.com (2603:10b6:408:a0::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.8; Thu, 26 Mar
- 2020 03:08:11 +0000
-Received: from BN8PR21MB1155.namprd21.prod.outlook.com
- ([fe80::d11:18b7:289c:ea17]) by BN8PR21MB1155.namprd21.prod.outlook.com
- ([fe80::d11:18b7:289c:ea17%7]) with mapi id 15.20.2878.000; Thu, 26 Mar 2020
- 03:08:11 +0000
-From:   Long Li <longli@microsoft.com>
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-CC:     Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>
-Subject: RE: [PATCH] cifs: smbd: Calculate the correct maximum packet size for
- segmented SMBDirect send/receive
-Thread-Topic: [PATCH] cifs: smbd: Calculate the correct maximum packet size
- for segmented SMBDirect send/receive
-Thread-Index: AQHWAtvYNY3DmDmGG0eYPROAwhxW46haH2CAgAAJY1CAAAfSAIAAAQFA
-Date:   Thu, 26 Mar 2020 03:08:11 +0000
-Message-ID: <BN8PR21MB11555E5A18F51E2034025FC0CECF0@BN8PR21MB1155.namprd21.prod.outlook.com>
-References: <1585164614-123696-1-git-send-email-longli@linuxonhyperv.com>
- <CAN05THTH8-pK9uw77COWSUQ_knztT1o1Ms0b=2PPvmBJd=ovUw@mail.gmail.com>
- <BN8PR21MB1155CECE3C53742CC389E5F9CECF0@BN8PR21MB1155.namprd21.prod.outlook.com>
- <CAN05THRvway64Kp1BtNkEBHCrLLx45uooN0DPu3JGPZHq28m9g@mail.gmail.com>
-In-Reply-To: <CAN05THRvway64Kp1BtNkEBHCrLLx45uooN0DPu3JGPZHq28m9g@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=longli@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:2:edec:db5c:c6fe:798]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 410cb7e2-5d78-4090-0ae9-08d7d132eaea
-x-ms-traffictypediagnostic: BN8PR21MB1249:
-x-microsoft-antispam-prvs: <BN8PR21MB1249AF2963132C846017D23FCECF0@BN8PR21MB1249.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0354B4BED2
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR21MB1155.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(366004)(39860400002)(396003)(346002)(376002)(136003)(8936002)(7696005)(71200400001)(10290500003)(81166006)(76116006)(316002)(54906003)(33656002)(6916009)(81156014)(8990500004)(8676002)(5660300002)(64756008)(2906002)(55016002)(52536014)(9686003)(4326008)(66446008)(86362001)(186003)(66556008)(478600001)(66946007)(6506007)(66476007);DIR:OUT;SFP:1102;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Ay/LLOmXWDVxnHzsRzTEXOLaWRfVXbW1Gj/Ah8c22sfYhATnJgsp42n+SSvLjjr36u7hvP1Cbiss2esPvCRv4ffIusGvx3krDeMlzkMpeNkLjUrlO0M16ANRi5D0lB7zELWkk/FVkU9eIz0CnVRdo7ijLRwGkUZh9DPX46Xo1POMWrdbhloseZa9YbjCug6uQppilWRK4WpNNJEGNtyijbBNpCpY5/0e39QTi5GVwrMfZyAImCnGBYw3Q8/Nz4ZslYFv5VgytPBrc2uiuUdzJhE0uNYS6EpGSAYjAMUHnO6qtZkOaesvokCe77KbNrarlHLxyugI0DbABKw5gvESVZjExBSJyrJZJFFzLfUjS6fmZ4p0TGaL9lhodbKyjWUySutfRDIlmDNHUM/MeBUiWWSFmBeqQQWRML2ba6QOBUiYNbqyT3cPJF3uI41r4ddS
-x-ms-exchange-antispam-messagedata: QRcgGNopuN85F33K5LBHKtjeAT8y0P33YtkDLH+N+ycxw4Wc+Nj1YlSA/wA0eWWz03TJ0mODPPfjzrVKlY3heUc1R3kjceLh4fzlaOzOj2KCTeTQw63ZEcGH19LWbsMXk3KN4mEkHmkaLvj/kw+tAUqdPEU1bbqGZi7hQhWNz8uzEaIJGgSRhPvodUcFM4Vv4+8e6jlwKmkgdndSf1ywMw==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1726318AbgCZJ42 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 26 Mar 2020 05:56:28 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57842 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726270AbgCZJ42 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 26 Mar 2020 05:56:28 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 982FBAC8F;
+        Thu, 26 Mar 2020 09:56:26 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     longli@linuxonhyperv.com, Steve French <sfrench@samba.org>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org
+Cc:     Long Li <longli@microsoft.com>
+Subject: Re: [PATCH] cifs: Remove locking in smb2_verify_signature() when
+ calculating SMB2/SMB3 signature on receiving packets
+In-Reply-To: <1585159997-115196-1-git-send-email-longli@linuxonhyperv.com>
+References: <1585159997-115196-1-git-send-email-longli@linuxonhyperv.com>
+Date:   Thu, 26 Mar 2020 10:56:25 +0100
+Message-ID: <87d08zzbg6.fsf@suse.com>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 410cb7e2-5d78-4090-0ae9-08d7d132eaea
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2020 03:08:11.4042
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LVY8I7Z0bqelSuyyp0fW7ajnNlqa5A9/atvwaaeWbEy0tjKPdNFDc6P6z9yOgp/BnG1jDnCwilWYz5Lktgk+Nw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR21MB1249
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-PlN1YmplY3Q6IFJlOiBbUEFUQ0hdIGNpZnM6IHNtYmQ6IENhbGN1bGF0ZSB0aGUgY29ycmVjdCBt
-YXhpbXVtIHBhY2tldCBzaXplDQo+Zm9yIHNlZ21lbnRlZCBTTUJEaXJlY3Qgc2VuZC9yZWNlaXZl
-DQo+DQo+T24gVGh1LCBNYXIgMjYsIDIwMjAgYXQgMTI6NDMgUE0gTG9uZyBMaSA8bG9uZ2xpQG1p
-Y3Jvc29mdC5jb20+IHdyb3RlOg0KPj4NCj4+ID5TdWJqZWN0OiBSZTogW1BBVENIXSBjaWZzOiBz
-bWJkOiBDYWxjdWxhdGUgdGhlIGNvcnJlY3QgbWF4aW11bSBwYWNrZXQNCj4+ID5zaXplIGZvciBz
-ZWdtZW50ZWQgU01CRGlyZWN0IHNlbmQvcmVjZWl2ZQ0KPj4gPg0KPj4gPkxvbmcgTGksDQo+PiA+
-DQo+PiA+TW9zdGx5IGxvb2tzIGdvb2QgIGJ1dCB0aGUgbWFnaWMgY29uc3RhbnQgNDkgSSB0aGlu
-ayBpcyB3cm9uZy4NCj4+ID40OSBpcyB0aGUgc3RydWN0dXJlIHNpemUgb2YgdGhlIHJlYWQvd3Jp
-dGUgcmVxdWVzdCBoZWFkZXIgYnV0IGZvcg0KPj4gPnRoZXNlIHNpemVzLCBpZiB0aGV5IGFyZSBv
-ZGQgaXQganVzdCBtZWFucyB0aGF0IHRoZSBoZWFkZXIgY29udGFpbiBhIHZhcmlhYmxlDQo+c2l6
-ZWQgYmxvYi4NCj4+ID5JLmUuIHRoZSBzaXplIGlzIDQ4IGJ5dGVzIChmb3IgdGhlIGZpeGVkIHBh
-cnQgb2YgdGhlIGhlYWRlcikgKyBhDQo+PiA+dmFyaWFibGUgcGFydCB3aGljaCBpbiB0aGlzIGNh
-c2UgYXJlIHRoZSBDaGFubmVsSW5mbyBibG9icy4NCj4+DQo+PiBBZ3JlZWQuIFVzaW5nIGEgbWFn
-aWMgbnVtYmVyIGlzIG5vdCBhIGdvb2QgaWRlYS4NCj4+DQo+PiBJIHdhcyBsb29raW5nIGF0IHJl
-cXVlc3Qgc2l6ZSBkZWZpbml0aW9ucyBpbiAiZnMvY2lmcy9zbWIycGR1LmMiLA0KPj4gdGhleSBh
-cmUgZGVmaW5lZCBhdCBzdGF0aWMgY29uc3QgaW50DQo+PiBzbWIyX3JlcV9zdHJ1Y3Rfc2l6ZXNb
-TlVNQkVSX09GX1NNQjJfQ09NTUFORFNdDQo+Pg0KPj4gZm9yIHJlYWQgYW5kIHdyaXRlLCB0aGUg
-c2l6ZXMgYXJlOg0KPj4gICAgICAgICAvKiBTTUIyX1JFQUQgKi8gNDksDQo+PiAgICAgICAgIC8q
-IFNNQjJfV1JJVEUgKi8gNDksDQo+Pg0KPj4gVGhleSBhcmUgdXNlZCB0byBjYWxjdWxhdGUgY29t
-bWFuZCBoZWFkZXIgc2l6ZXMsIGFuZCBmaWxsIGluIHRoZSByZXF1ZXN0DQo+aGVhZGVycy4gTWF5
-YmUgSSBzaG91bGQgdXNlIHRoaXMgdmFyaWFibGUgdG8gZ2V0IHRoZSBzaXplPw0KPg0KPk5haCwg
-dGhvc2UgdmFsdWVzIG9ubHkgc3BlY2lmeSB3aGF0IHZhbHVlcyBtdXN0IGJlIHNldCBhcyB0aGUg
-c3RydWN0dXJlIHNpemUgaW4NCj50aGUgYWN0dWFsIHBhY2tldCBoZWFkZXJzLg0KPkJ1dCB0aGV5
-IGRvIG5vdCByZXByZXNlbnQgdGhlIGFjdHVhbCBzaXplcy4NCj5BbGwgY29tbWFuZCBoZWFkZXJz
-IHN0YXJ0IHdpdGggYSAyIGJ5dGUgU3RydWN0dXJlU2l6ZSBmaWVsZCB3aGVyZSBldmVyeXRoaW5n
-DQo+ZXhjZXB0IHRoZSBsZWFzdCBzaWduaWZpY2FudCBiaXQgaW5kaWNhdGVzIHRoZSBmaXhlZCBw
-b3J0aW9uIG9mIHRoZSByZXNwb25zZQ0KPmhlYWRlciBhbmQgaWYgdGhlIGxlYXN0IHNpZ25pZmlj
-YW50IGJpdCBpcyBzZXQsIHRoZW4gaXQgaW5kaWNhdGVzIHRoYXQgdGhlIGhlYWRlcg0KPmNvbnRh
-aW5zIGFuIGFkZGl0aW9uYWwgdmFyaWFibGUgc2l6ZWQgcGFydCBvZiBoZWFkZXIsICAodGhlIHNp
-emUgb2Ygd2hpY2ggY2FuIGJlDQo+ZGV0ZXJtaW5lZCBieSBsb29raW5nIGF0IHRoZSBpbmRpdmlk
-dWFsIGZpZWxkcyBpbiB0aGUgZml4ZWQgcG9ydGlvbiBvZiB0aGUNCj5oZWFkZXIpLg0KPg0KPlNv
-IDQ5IGRvZXMgbm90IGluZGljYXRlIHRoYXQgdGhlIGhlYWRlciBpcyA0OSBieXRlcyBpbiBzaXpl
-LiBJdCBtZWFucyB0aGUgaGVhZGVyDQo+Y29udGFpbnMgYSA0OCBieXRlIGZpeGVkIHBhcnQgdGhh
-dCBpcyBwcmVzZW50IGluIGV2ZXJ5IHN1Y2ggY29tbWFuZCBoZWFkZXJzDQo+YnV0IGl0IGFsc28g
-Y29udGFpbnMgMCBvciBtb3JlIGJ5dGVzIG9mIGFkZGl0aW9uYWwgaGVhZGVyLg0KPg0KPlNvIHNl
-ZSB0aGVzZSBudW1iZXJzIGFzICJ0aGVzZSBhcmUgdGhlIHZhbHVlcyB3ZSBtdXN0IHB1dCBpbiB0
-aGUNCj5TdHJ1Y3R1cmVTaXplIGZvciB0aGUgaGVhZGVyIiAgYnV0IHRoZXkgZG8gbm90IHJlcHJl
-c2VudCB0aGUgYWN0dWFsIHNpemUgb2YgdGhlDQo+aGVhZGVyLiAod2VsbCwgZXhjZXB0IGlmIHRo
-ZSB2YWx1ZSBpcyBldmVuLCB0aGVuIGl0IGRvZXMgcmVwcmVzZW50IHRoZSBoZWFkZXINCj5zaXpl
-LikNCj4NCj4NCj5TbyBmb3IgU01CMl9SRUFEIGFuZCBTTUIyX1dSSVRFIGNvbW1hbmRzLCBJZiB3
-ZSBkbyBub3QgdXNlIFJETUEsDQo+dGhlbiBDaGFubmVsIHdpbGwgYmUgc2V0IHRvIDAgYW5kIHdl
-IHdpbGwgbm90IGhhdmUgYW55IFJlYWRXcml0ZUNoYW5uZWxJbmZvDQo+ZGF0YS4NCj5JbiB0aGlz
-IGNhc2UgdGhlIFJFQUQvV1JJVEUgaGVhZGVyIHNpemUgaXMgYWx3YXlzIDQ4ICAoPT00OSAmIDB4
-ZmZmZSkNCj4NCj5JZiB3ZSBhcmUgdXNpbmcgUkRNQSwgdGhlbiB3ZSBzdGlsbCBoYXZlIHRoZSA0
-OCBieXRlIG5vcm1hbCBoZWFkZXIgYnV0IHdlDQo+YWxzbyBoYXZlIDEgb3IgbW9yZSBTTUJfRElS
-RUNUX0JVRkZFUl9ERVNDUklQVE9SX1YxIHN0cnVjdHVyZXMgdGhlcmUuDQo+U28gZm9yIHRoYXQg
-Y2FzZSB0aGUgbWF4aW11bSBoZWFkZXIgc2l6ZSB3b3VsZCBiZSA0OCAgKyA8bWF4IG51bWJlciBv
-Zg0KPnN0cnVjdHVyZXM+ICogc2l6ZW9mKFNNQl9ESVJFQ1RfQlVGRkVSX0RFU0NSSVBUT1JfVjEp
-DQoNCkkgc2VlLCBJIHdpbGwgc2VuZCBhbiB1cGRhdGVkIHBhdGNoLg0KDQpUaGFua3MsDQpMb25n
-DQoNCj4NCj4NCj5yZWdhcmRzDQo+cm9ubmllIHNhaGxiZXJnDQo+DQo+DQo+DQo+Pg0KPj4gPg0K
-Pj4gPlNvIHdlIHNob3VsZCBwcm9iYWJseSBhZGQgdG8gc21iMnBkdS5oIGEgI2RlZmluZQ0KPj4g
-Pk1BWF9TTUIyX1JFQURXUklURV9SRVNQT05TRV9TSVpFIDQ4IGFuZCB1c2UgdGhpcyBpbiB0aGUN
-Cj5jYWxjdWxhdGlvbnMuDQo+PiA+VGhlbiB3ZSBuZWVkIHRvIGFkZCB0aGUgbWF4aW11bSBzaXpl
-IHdlIHdpbGwgdXNlIGZvciBDaGFubmVsSW5mby4NCj4+ID4NCj4+ID5NYXliZSB3ZSBzaG91bGQg
-aGF2ZSBhIGRlZmluZSBhbHNvIGZvciB0aGUNCj5NQVhfU01CMl9DSEFOTkVMX0lORk9fU0laRQ0K
-Pj4gPg0KPj4gPnJlZ2FyZHMNCj4+ID5yb25uaWUgc2FobGJlcmcNCj4+ID4NCj4+ID5PbiBUaHUs
-IE1hciAyNiwgMjAyMCBhdCA1OjMxIEFNIGxvbmdsaS0tLSB2aWEgc2FtYmEtdGVjaG5pY2FsIDxz
-YW1iYS0NCj4+ID50ZWNobmljYWxAbGlzdHMuc2FtYmEub3JnPiB3cm90ZToNCj4+ID4+DQo+PiA+
-PiBGcm9tOiBMb25nIExpIDxsb25nbGlAbWljcm9zb2Z0LmNvbT4NCj4+ID4+DQo+PiA+PiBUaGUg
-cGFja2V0IHNpemUgbmVlZHMgdG8gdGFrZSBhY2NvdW50IG9mIFNNQjIgaGVhZGVyIHNpemUgYW5k
-DQo+PiA+PiBwb3NzaWJsZSBlbmNyeXB0aW9uIGhlYWRlciBzaXplLiBUaGlzIGlzIG9ubHkgZG9u
-ZSB3aGVuIHNpZ25pbmcgaXMNCj4+ID4+IHVzZWQgYW5kIGl0IGlzIGZvciBSRE1BIHNlbmQvcmVj
-ZWl2ZSwgbm90IHJlYWQvd3JpdGUuDQo+PiA+Pg0KPj4gPj4gQWxzbyByZW1vdmUgdGhlIGRlYWQg
-U01CRCBjb2RlIGluIHNtYjJfbmVnb3RpYXRlX3IodylzaXplLg0KPj4gPj4NCj4+ID4+IFNpZ25l
-ZC1vZmYtYnk6IExvbmcgTGkgPGxvbmdsaUBtaWNyb3NvZnQuY29tPg0KPj4gPj4gLS0tDQo+PiA+
-PiAgZnMvY2lmcy9zbWIyb3BzLmMgICB8IDM4ICsrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tDQo+PiA+PiAgZnMvY2lmcy9zbWJkaXJlY3QuYyB8ICAzICstLQ0KPj4gPj4gIDIg
-ZmlsZXMgY2hhbmdlZCwgMTcgaW5zZXJ0aW9ucygrKSwgMjQgZGVsZXRpb25zKC0pDQo+PiA+Pg0K
-Pj4gPj4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iMm9wcy5jIGIvZnMvY2lmcy9zbWIyb3BzLmMg
-aW5kZXgNCj4+ID4+IDRjMDkyMjU5NjQ2Ny4uOTA0M2QzNGVlZjQzIDEwMDY0NA0KPj4gPj4gLS0t
-IGEvZnMvY2lmcy9zbWIyb3BzLmMNCj4+ID4+ICsrKyBiL2ZzL2NpZnMvc21iMm9wcy5jDQo+PiA+
-PiBAQCAtMzMyLDE2ICszMzIsNiBAQCBzbWIyX25lZ290aWF0ZV93c2l6ZShzdHJ1Y3QgY2lmc190
-Y29uICp0Y29uLA0KPj4gPnN0cnVjdCBzbWJfdm9sICp2b2x1bWVfaW5mbykNCj4+ID4+ICAgICAg
-ICAgLyogc3RhcnQgd2l0aCBzcGVjaWZpZWQgd3NpemUsIG9yIGRlZmF1bHQgKi8NCj4+ID4+ICAg
-ICAgICAgd3NpemUgPSB2b2x1bWVfaW5mby0+d3NpemUgPyB2b2x1bWVfaW5mby0+d3NpemUgOg0K
-Pj4gPkNJRlNfREVGQVVMVF9JT1NJWkU7DQo+PiA+PiAgICAgICAgIHdzaXplID0gbWluX3QodW5z
-aWduZWQgaW50LCB3c2l6ZSwgc2VydmVyLT5tYXhfd3JpdGUpOw0KPj4gPj4gLSNpZmRlZiBDT05G
-SUdfQ0lGU19TTUJfRElSRUNUDQo+PiA+PiAtICAgICAgIGlmIChzZXJ2ZXItPnJkbWEpIHsNCj4+
-ID4+IC0gICAgICAgICAgICAgICBpZiAoc2VydmVyLT5zaWduKQ0KPj4gPj4gLSAgICAgICAgICAg
-ICAgICAgICAgICAgd3NpemUgPSBtaW5fdCh1bnNpZ25lZCBpbnQsDQo+PiA+PiAtICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHdzaXplLCBzZXJ2ZXItPnNtYmRfY29ubi0NCj4+bWF4X2Zy
-YWdtZW50ZWRfc2VuZF9zaXplKTsNCj4+ID4+IC0gICAgICAgICAgICAgICBlbHNlDQo+PiA+PiAt
-ICAgICAgICAgICAgICAgICAgICAgICB3c2l6ZSA9IG1pbl90KHVuc2lnbmVkIGludCwNCj4+ID4+
-IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgd3NpemUsIHNlcnZlci0+c21iZF9jb25u
-LT5tYXhfcmVhZHdyaXRlX3NpemUpOw0KPj4gPj4gLSAgICAgICB9DQo+PiA+PiAtI2VuZGlmDQo+
-PiA+PiAgICAgICAgIGlmICghKHNlcnZlci0+Y2FwYWJpbGl0aWVzICYgU01CMl9HTE9CQUxfQ0FQ
-X0xBUkdFX01UVSkpDQo+PiA+PiAgICAgICAgICAgICAgICAgd3NpemUgPSBtaW5fdCh1bnNpZ25l
-ZCBpbnQsIHdzaXplLA0KPj4gPj4gU01CMl9NQVhfQlVGRkVSX1NJWkUpOw0KPj4gPj4NCj4+ID4+
-IEBAIC0zNjAsOCArMzUwLDE1IEBAIHNtYjNfbmVnb3RpYXRlX3dzaXplKHN0cnVjdCBjaWZzX3Rj
-b24gKnRjb24sDQo+PiA+PiBzdHJ1Y3Qgc21iX3ZvbCAqdm9sdW1lX2luZm8pICAjaWZkZWYgQ09O
-RklHX0NJRlNfU01CX0RJUkVDVA0KPj4gPj4gICAgICAgICBpZiAoc2VydmVyLT5yZG1hKSB7DQo+
-PiA+PiAgICAgICAgICAgICAgICAgaWYgKHNlcnZlci0+c2lnbikNCj4+ID4+ICsgICAgICAgICAg
-ICAgICAgICAgICAgIC8qDQo+PiA+PiArICAgICAgICAgICAgICAgICAgICAgICAgKiBBY2NvdW50
-IGZvciBTTUIyIGRhdGEgdHJhbnNmZXIgcGFja2V0IGhlYWRlcg0KPj4gPj4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICogU01CMl9SRUFEL1NNQjJfV1JJVEUgKDQ5KSBhbmQgcG9zc2libGUgZW5j
-cnlwdGlvbg0KPj4gPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICogaGVhZGVycw0KPj4gPj4g
-KyAgICAgICAgICAgICAgICAgICAgICAgICovDQo+PiA+PiAgICAgICAgICAgICAgICAgICAgICAg
-ICB3c2l6ZSA9IG1pbl90KHVuc2lnbmVkIGludCwNCj4+ID4+IC0gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgd3NpemUsIHNlcnZlci0+c21iZF9jb25uLQ0KPj5tYXhfZnJhZ21lbnRlZF9z
-ZW5kX3NpemUpOw0KPj4gPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB3c2l6ZSwN
-Cj4+ID4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2VydmVyLT5zbWJkX2Nvbm4t
-Pm1heF9mcmFnbWVudGVkX3NlbmRfc2l6ZSAtDQo+PiA+PiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgNDkgLSBzaXplb2Yoc3RydWN0DQo+PiA+PiArIHNtYjJfdHJhbnNm
-b3JtX2hkcikpOw0KPj4gPj4gICAgICAgICAgICAgICAgIGVsc2UNCj4+ID4+ICAgICAgICAgICAg
-ICAgICAgICAgICAgIHdzaXplID0gbWluX3QodW5zaWduZWQgaW50LA0KPj4gPj4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICB3c2l6ZSwNCj4+ID4+IHNlcnZlci0+c21iZF9jb25uLT5t
-YXhfcmVhZHdyaXRlX3NpemUpOw0KPj4gPj4gQEAgLTM4MiwxNiArMzc5LDYgQEAgc21iMl9uZWdv
-dGlhdGVfcnNpemUoc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwNCj4+ID4+IHN0cnVjdA0KPj4gPnNt
-Yl92b2wgKnZvbHVtZV9pbmZvKQ0KPj4gPj4gICAgICAgICAvKiBzdGFydCB3aXRoIHNwZWNpZmll
-ZCByc2l6ZSwgb3IgZGVmYXVsdCAqLw0KPj4gPj4gICAgICAgICByc2l6ZSA9IHZvbHVtZV9pbmZv
-LT5yc2l6ZSA/IHZvbHVtZV9pbmZvLT5yc2l6ZSA6DQo+Q0lGU19ERUZBVUxUX0lPU0laRTsNCj4+
-ID4+ICAgICAgICAgcnNpemUgPSBtaW5fdCh1bnNpZ25lZCBpbnQsIHJzaXplLCBzZXJ2ZXItPm1h
-eF9yZWFkKTsNCj4+ID4+IC0jaWZkZWYgQ09ORklHX0NJRlNfU01CX0RJUkVDVA0KPj4gPj4gLSAg
-ICAgICBpZiAoc2VydmVyLT5yZG1hKSB7DQo+PiA+PiAtICAgICAgICAgICAgICAgaWYgKHNlcnZl
-ci0+c2lnbikNCj4+ID4+IC0gICAgICAgICAgICAgICAgICAgICAgIHJzaXplID0gbWluX3QodW5z
-aWduZWQgaW50LA0KPj4gPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByc2l6ZSwg
-c2VydmVyLT5zbWJkX2Nvbm4tDQo+Pm1heF9mcmFnbWVudGVkX3JlY3Zfc2l6ZSk7DQo+PiA+PiAt
-ICAgICAgICAgICAgICAgZWxzZQ0KPj4gPj4gLSAgICAgICAgICAgICAgICAgICAgICAgcnNpemUg
-PSBtaW5fdCh1bnNpZ25lZCBpbnQsDQo+PiA+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIHJzaXplLCBzZXJ2ZXItPnNtYmRfY29ubi0+bWF4X3JlYWR3cml0ZV9zaXplKTsNCj4+ID4+
-IC0gICAgICAgfQ0KPj4gPj4gLSNlbmRpZg0KPj4gPj4NCj4+ID4+ICAgICAgICAgaWYgKCEoc2Vy
-dmVyLT5jYXBhYmlsaXRpZXMgJiBTTUIyX0dMT0JBTF9DQVBfTEFSR0VfTVRVKSkNCj4+ID4+ICAg
-ICAgICAgICAgICAgICByc2l6ZSA9IG1pbl90KHVuc2lnbmVkIGludCwgcnNpemUsDQo+PiA+PiBT
-TUIyX01BWF9CVUZGRVJfU0laRSk7IEBAIC00MTEsOCArMzk4LDE1IEBADQo+PiA+PiBzbWIzX25l
-Z290aWF0ZV9yc2l6ZShzdHJ1Y3QgY2lmc190Y29uICp0Y29uLCBzdHJ1Y3Qgc21iX3ZvbA0KPj4g
-Pj4gKnZvbHVtZV9pbmZvKQ0KPj4gPiNpZmRlZiBDT05GSUdfQ0lGU19TTUJfRElSRUNUDQo+PiA+
-PiAgICAgICAgIGlmIChzZXJ2ZXItPnJkbWEpIHsNCj4+ID4+ICAgICAgICAgICAgICAgICBpZiAo
-c2VydmVyLT5zaWduKQ0KPj4gPj4gKyAgICAgICAgICAgICAgICAgICAgICAgLyoNCj4+ID4+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAqIEFjY291bnQgZm9yIFNNQjIgZGF0YSB0cmFuc2ZlciBw
-YWNrZXQgaGVhZGVyDQo+PiA+PiArICAgICAgICAgICAgICAgICAgICAgICAgKiBTTUIyX1JFQUQv
-U01CMl9XUklURSAoNDkpIGFuZCBwb3NzaWJsZSBlbmNyeXB0aW9uDQo+PiA+PiArICAgICAgICAg
-ICAgICAgICAgICAgICAgKiBoZWFkZXJzDQo+PiA+PiArICAgICAgICAgICAgICAgICAgICAgICAg
-Ki8NCj4+ID4+ICAgICAgICAgICAgICAgICAgICAgICAgIHJzaXplID0gbWluX3QodW5zaWduZWQg
-aW50LA0KPj4gPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByc2l6ZSwgc2VydmVy
-LT5zbWJkX2Nvbm4tDQo+Pm1heF9mcmFnbWVudGVkX3JlY3Zfc2l6ZSk7DQo+PiA+PiArICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHJzaXplLA0KPj4gPj4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBzZXJ2ZXItPnNtYmRfY29ubi0+bWF4X2ZyYWdtZW50ZWRfcmVjdl9zaXpl
-IC0NCj4+ID4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA0OSAtIHNp
-emVvZihzdHJ1Y3QNCj4+ID4+ICsgc21iMl90cmFuc2Zvcm1faGRyKSk7DQo+PiA+PiAgICAgICAg
-ICAgICAgICAgZWxzZQ0KPj4gPj4gICAgICAgICAgICAgICAgICAgICAgICAgcnNpemUgPSBtaW5f
-dCh1bnNpZ25lZCBpbnQsDQo+PiA+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJz
-aXplLA0KPj4gPj4gc2VydmVyLT5zbWJkX2Nvbm4tPm1heF9yZWFkd3JpdGVfc2l6ZSk7DQo+PiA+
-PiBkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWJkaXJlY3QuYyBiL2ZzL2NpZnMvc21iZGlyZWN0LmMg
-aW5kZXgNCj4+ID4+IGViMWU0MGFmOWYzYS4uMDMyN2I1NzVhYjg3IDEwMDY0NA0KPj4gPj4gLS0t
-IGEvZnMvY2lmcy9zbWJkaXJlY3QuYw0KPj4gPj4gKysrIGIvZnMvY2lmcy9zbWJkaXJlY3QuYw0K
-Pj4gPj4gQEAgLTIwOTcsOCArMjA5Nyw3IEBAIGludCBzbWJkX3NlbmQoc3RydWN0IFRDUF9TZXJ2
-ZXJfSW5mbyAqc2VydmVyLA0KPj4gPj4gICAgICAgICBmb3IgKGkgPSAwOyBpIDwgbnVtX3Jxc3Q7
-IGkrKykNCj4+ID4+ICAgICAgICAgICAgICAgICByZW1haW5pbmdfZGF0YV9sZW5ndGggKz0gc21i
-X3Jxc3RfbGVuKHNlcnZlciwNCj4+ID4+ICZycXN0X2FycmF5W2ldKTsNCj4+ID4+DQo+PiA+PiAt
-ICAgICAgIGlmIChyZW1haW5pbmdfZGF0YV9sZW5ndGggKyBzaXplb2Yoc3RydWN0IHNtYmRfZGF0
-YV90cmFuc2ZlcikgPg0KPj4gPj4gLSAgICAgICAgICAgICAgIGluZm8tPm1heF9mcmFnbWVudGVk
-X3NlbmRfc2l6ZSkgew0KPj4gPj4gKyAgICAgICBpZiAocmVtYWluaW5nX2RhdGFfbGVuZ3RoID4g
-aW5mby0+bWF4X2ZyYWdtZW50ZWRfc2VuZF9zaXplKQ0KPj4gPj4gKyB7DQo+PiA+PiAgICAgICAg
-ICAgICAgICAgbG9nX3dyaXRlKEVSUiwgInBheWxvYWQgc2l6ZSAlZCA+IG1heCBzaXplICVkXG4i
-LA0KPj4gPj4gICAgICAgICAgICAgICAgICAgICAgICAgcmVtYWluaW5nX2RhdGFfbGVuZ3RoLCBp
-bmZvLT5tYXhfZnJhZ21lbnRlZF9zZW5kX3NpemUpOw0KPj4gPj4gICAgICAgICAgICAgICAgIHJj
-ID0gLUVJTlZBTDsNCj4+ID4+IC0tDQo+PiA+PiAyLjE3LjENCj4+ID4+DQo+PiA+Pg0K
+longli@linuxonhyperv.com writes:
+> On the sending and receiving paths, CIFS uses the same cypto data structures
+> to calculate SMB2/SMB3 packet signatures. A lock on the receiving path is
+> necessary to control shared access to crypto data structures. This lock
+> degrades performance because it races with the sending path.
+>
+> Define separate crypto data structures for sending and receiving paths and
+> remove this lock.
+
+Something I've often wondered: why do we keep crypto state in the server
+structure instead of creating it as needed in the caller stack (thus
+avoiding the need for locks). AFAIK there's no state that need to be
+kept between signing/encrypting calls beside the access to keys. Is it that
+expensive to create/release?
+
+Cheers,
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
