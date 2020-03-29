@@ -1,48 +1,86 @@
-Return-Path: <SRS0=a8IY=5M=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=fJij=5O=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A3FC43331
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Mar 2020 20:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B10FC43331
+	for <linux-cifs@archiver.kernel.org>; Sun, 29 Mar 2020 21:57:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 08B3020714
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Mar 2020 20:19:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D271020774
+	for <linux-cifs@archiver.kernel.org>; Sun, 29 Mar 2020 21:57:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="qlge1KQc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727352AbgC0UTr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 Mar 2020 16:19:47 -0400
-Received: from goliath.siemens.de ([192.35.17.28]:40533 "EHLO
-        goliath.siemens.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727347AbgC0UTr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 Mar 2020 16:19:47 -0400
-X-Greylist: delayed 1452 seconds by postgrey-1.27 at vger.kernel.org; Fri, 27 Mar 2020 16:19:47 EDT
-Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
-        by goliath.siemens.de (8.15.2/8.15.2) with ESMTPS id 02RJfmjL019488
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Mar 2020 20:41:48 +0100
-Received: from md1za8fc.ad001.siemens.net ([139.22.33.101])
-        by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 02RJfmVR014998;
-        Fri, 27 Mar 2020 20:41:48 +0100
-Date:   Fri, 27 Mar 2020 20:41:45 +0100
-From:   Henning Schild <henning.schild@siemens.com>
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH] smb3: use SMB2_SIGNATURE_SIZE define
-Message-ID: <20200327204145.59c7c1b6@md1za8fc.ad001.siemens.net>
-In-Reply-To: <CAH2r5muYwx1TvdmJo5H2aXfzDXc2VP4u-=UeFA53cwiO3ZB+EQ@mail.gmail.com>
-References: <CAH2r5muYwx1TvdmJo5H2aXfzDXc2VP4u-=UeFA53cwiO3ZB+EQ@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S1729184AbgC2V5z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 29 Mar 2020 17:57:55 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54255 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728966AbgC2V5z (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 29 Mar 2020 17:57:55 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 48r8bN6WYnz9sR4;
+        Mon, 30 Mar 2020 08:57:52 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1585519073;
+        bh=YsqONLcUYQqleKUQ4xMM7DVzQvWlb866TQnITGGl5BI=;
+        h=Date:From:To:Cc:Subject:From;
+        b=qlge1KQcFkSMJv2lvvvCEYUPjMBzY6nHVA7J6fyOtvOpwsQ50yVYJmscRjoN9tX++
+         DmODvd2rILM+P7b/gMgrrhkO/7lYDLd74/x+LhuUxU5SKrMU0sXrRS1sRR5/yEhp0r
+         gp0MC/jD1YaTjcnpRe89AW25ePhdUfnWIwejI+0yIVueqmKhxQW61GaggSkiLUKwNF
+         ctXrURcgzDpzfOeCmPAf4L6PVLODadhBZGaTItN3mc+pIStD1TRnOa0ZJdpaFZ9sSL
+         Hi4W85BtTE1lJlZphL64NjQhsdrx3WWlInk01RZnHGcv+96VZSpDooJ/5q3WA+MBKN
+         bagNvVV6a6rLQ==
+Date:   Mon, 30 Mar 2020 08:57:47 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Signed-off-by missing for commit in the cifs tree
+Message-ID: <20200330085747.082749d4@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/tNyDWNd.D=YgcvIHK=z77Uv";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-maybe sizeofs for the memc(mp|py)s would be a good addition
+--Sig_/tNyDWNd.D=YgcvIHK=z77Uv
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Henning
+Hi all,
+
+ommit
+
+  cfc825ccc046 ("cifs: update internal module version number")
+
+is missing a Signed-off-by from its author and committer.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/tNyDWNd.D=YgcvIHK=z77Uv
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl6BGdsACgkQAVBC80lX
+0GzU8Qf+MD1EaB5r7iE0BnP1oOMkxDY4cn4kh4Xd8K96akHQbmgcuUYQOd6IzMj9
+oWZh0o0UeqR0wXyFiTF2Dq+KHdKND+E5UYM6+mkHdJMM82kYCOP14wWNaKf/bV0q
+PD3BudWfhNXWWj5CA73DIZfieutEg3yRAKJ/D5DGeSGs+YDt0THquSPml9Jkc5kW
+/6sMlR2c8FJVLiJE2x4bFcKiOW3oTH1grQ89tmoOHCxNEW/rw9uYV3UiS8TMKnCK
+f6h+/UteUUcJ7efN+OiOSWWBOn72ix4THvndLy1ccyYBllDibwI1Vw0stF6m/Udw
+i7nGKVwqVoO+MBa1gt/70KnztrKMEQ==
+=Sg17
+-----END PGP SIGNATURE-----
+
+--Sig_/tNyDWNd.D=YgcvIHK=z77Uv--
