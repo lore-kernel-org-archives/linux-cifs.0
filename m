@@ -2,118 +2,114 @@ Return-Path: <SRS0=Gt6D=5Q=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43AF0C43331
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Mar 2020 07:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A449C43331
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Mar 2020 12:59:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 08E5720771
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Mar 2020 07:18:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="rMSDw//j"
+	by mail.kernel.org (Postfix) with ESMTP id 03A96206DB
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Mar 2020 12:59:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729825AbgCaHSZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 31 Mar 2020 03:18:25 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:41590 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729819AbgCaHSZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Mar 2020 03:18:25 -0400
-Received: by linux.microsoft.com (Postfix, from userid 1004)
-        id 74EC520B46F0; Tue, 31 Mar 2020 00:18:24 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 74EC520B46F0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-        s=default; t=1585639104;
-        bh=Zh/cLcI+Ah3wcuYsIdpQ01rlvOu5+wS8MBqhfVdQiOU=;
-        h=From:To:Cc:Subject:Date:Reply-To:From;
-        b=rMSDw//jQGt+IvEV719WbBHeCl6MGjNajTHyFvacQFtTY/DT9pxa2zKdgFcSYWGZe
-         n/k3RKEQjEGghDm8r4kt3bS7kywxAXjsM2h9ThIFMnHaY2GKaZRYnzf2zyXA3w3/8H
-         g3Mjy6gf1Jso3yxSLm1ri6gj53hdeWhjeO1hVHCE=
-From:   longli@linuxonhyperv.com
-To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-Cc:     Long Li <longli@microsoft.com>
-Subject: [PATCH] cifs: smbd: Update receive credits before sending and deal with credits roll back on failure before sending
-Date:   Tue, 31 Mar 2020 00:18:21 -0700
-Message-Id: <1585639101-117035-1-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
-Reply-To: longli@microsoft.com
+        id S1730560AbgCaM71 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 31 Mar 2020 08:59:27 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50596 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730473AbgCaM71 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 31 Mar 2020 08:59:27 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id A4649ACE3;
+        Tue, 31 Mar 2020 12:59:25 +0000 (UTC)
+From:   Aurelien Aptel <aaptel@suse.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     smfrench@gmail.com, piastryyy@gmail.com,
+        Aurelien Aptel <aaptel@suse.com>
+Subject: [PATCH] cifs: ignore cached share root handle closing errors
+Date:   Tue, 31 Mar 2020 14:59:23 +0200
+Message-Id: <20200331125923.1063-1-aaptel@suse.com>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Long Li <longli@microsoft.com>
+Fix tcon use-after-free and NULL ptr deref.
 
-Recevie credits should be updated before sending the packet, not
-before a work is scheduled. Also, the value needs roll back if
-something fails and cannot send.
+Customer system crashes with the following kernel log:
 
-Signed-off-by: Long Li <longli@microsoft.com>
+[462233.169868] CIFS VFS: Cancelling wait for mid 4894753 cmd: 14       => a QUERY DIR
+[462233.228045] CIFS VFS: cifs_put_smb_ses: Session Logoff failure rc=-4
+[462233.305922] CIFS VFS: cifs_put_smb_ses: Session Logoff failure rc=-4
+[462233.306205] CIFS VFS: cifs_put_smb_ses: Session Logoff failure rc=-4
+[462233.347060] CIFS VFS: cifs_put_smb_ses: Session Logoff failure rc=-4
+[462233.347107] CIFS VFS: Close unmatched open
+[462233.347113] BUG: unable to handle kernel NULL pointer dereference at 0000000000000038
+...
+    [exception RIP: cifs_put_tcon+0xa0] (this is doing tcon->ses->server)
+ #6 [...] smb2_cancelled_close_fid at ... [cifs]
+ #7 [...] process_one_work at ...
+ #8 [...] worker_thread at ...
+ #9 [...] kthread at ...
+
+The most likely explanation we have is:
+
+* When we put the last reference of a tcon (refcount=0), we close the
+  cached share root handle.
+* If closing a handle is interupted, SMB2_close() will
+  queue a SMB2_close() in a work thread.
+* The queued object keeps a tcon ref so we bump the tcon
+  refcount, jumping from 0 to 1.
+* We reach the end of cifs_put_tcon(), we free the tcon object despite
+  it now having a refcount of 1.
+* The queued work now runs, but the tcon, ses & server was freed in
+  the meantime resulting in a crash.
+
+THREAD 1
+========
+cifs_put_tcon                 => tcon refcount reach 0
+  SMB2_tdis
+   close_shroot_lease
+    close_shroot_lease_locked => if cached root has lease && refcount reach 0
+     smb2_close_cached_fid    => if cached root valid
+      SMB2_close              => retry close in a worker thread if interrupted
+       smb2_handle_cancelled_close
+        __smb2_handle_cancelled_close    => !! tcon refcount bump 0 => 1 !!
+         INIT_WORK(&cancelled->work, smb2_cancelled_close_fid);
+         queue_work(cifsiod_wq, &cancelled->work) => queue work
+ tconInfoFree(tcon);    ==> freed!
+ cifs_put_smb_ses(ses); ==> freed!
+
+THREAD 2 (workqueue)
+========
+smb2_cancelled_close_fid
+  SMB2_close(0, cancelled->tcon, ...); => use-after-free of tcon
+  cifs_put_tcon(cancelled->tcon);      => tcon refcount reach 0 second time
+  *CRASH*
+
+Fixes: d9191319358d ("CIFS: Close cached root handle only if it has a lease")
+Signed-off-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/smbdirect.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ fs/cifs/smb2ops.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index c7ef2d7ce0ef..bdae6d41748c 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -450,8 +450,6 @@ static void smbd_post_send_credits(struct work_struct *work)
- 	info->new_credits_offered += ret;
- 	spin_unlock(&info->lock_new_credits_offered);
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index b36c46f48705..cb3896a9f004 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -607,8 +607,9 @@ smb2_close_cached_fid(struct kref *ref)
  
--	atomic_add(ret, &info->receive_credits);
--
- 	/* Check if we can post new receive and grant credits to peer */
- 	check_and_send_immediate(info);
- }
-@@ -840,7 +838,7 @@ static int smbd_create_header(struct smbd_connection *info,
- 	request = mempool_alloc(info->request_mempool, GFP_KERNEL);
- 	if (!request) {
- 		rc = -ENOMEM;
--		goto err;
-+		goto err_alloc;
- 	}
- 
- 	request->info = info;
-@@ -851,6 +849,7 @@ static int smbd_create_header(struct smbd_connection *info,
- 	packet->credits_granted =
- 		cpu_to_le16(manage_credits_prior_sending(info));
- 	info->send_immediate = false;
-+	atomic_add(packet->credits_granted, &info->receive_credits);
- 
- 	packet->flags = 0;
- 	if (manage_keep_alive_before_sending(info))
-@@ -887,7 +886,7 @@ static int smbd_create_header(struct smbd_connection *info,
- 	if (ib_dma_mapping_error(info->id->device, request->sge[0].addr)) {
- 		mempool_free(request, info->request_mempool);
- 		rc = -EIO;
--		goto err;
-+		goto err_dma;
- 	}
- 
- 	request->sge[0].length = header_length;
-@@ -896,8 +895,17 @@ static int smbd_create_header(struct smbd_connection *info,
- 	*request_out = request;
- 	return 0;
- 
--err:
-+err_dma:
-+	/* roll back receive credits */
-+	spin_lock(&info->lock_new_credits_offered);
-+	info->new_credits_offered += packet->credits_granted;
-+	spin_unlock(&info->lock_new_credits_offered);
-+	atomic_sub(packet->credits_granted, &info->receive_credits);
-+
-+err_alloc:
-+	/* roll back send credits */
- 	atomic_inc(&info->send_credits);
-+
- 	return rc;
- }
- 
+ 	if (cfid->is_valid) {
+ 		cifs_dbg(FYI, "clear cached root file handle\n");
+-		SMB2_close(0, cfid->tcon, cfid->fid->persistent_fid,
+-			   cfid->fid->volatile_fid);
++		/* ignore errors here & do not retry in worker thread */
++		SMB2_close_flags(0, cfid->tcon, cfid->fid->persistent_fid,
++				 cfid->fid->volatile_fid, 0);
+ 		cfid->is_valid = false;
+ 		cfid->file_all_info_is_valid = false;
+ 		cfid->has_lease = false;
 -- 
-2.17.1
+2.16.4
 
