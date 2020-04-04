@@ -1,211 +1,236 @@
-Return-Path: <SRS0=FgSA=5T=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=eyz5=5U=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 319FAC43331
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Apr 2020 23:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB1FC43331
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Apr 2020 00:05:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF06320721
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Apr 2020 23:11:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3A9C20787
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Apr 2020 00:05:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="KwLKEZ0J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eeBSdTHx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728102AbgDCXLe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 3 Apr 2020 19:11:34 -0400
-Received: from mail-eopbgr770108.outbound.protection.outlook.com ([40.107.77.108]:61282
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727829AbgDCXLe (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 3 Apr 2020 19:11:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AsvpIfzW9npm28JbpMg10LZRVPBmbpfdsKLcHL3WAxnFNBBS+fkruwioXrVgHlQCU/ID/ipnlkwMuwv9yCGSZUS+2hDjgAnIzszL2AZ2GRRtR2f3fezFAiXOPBpVDX8puWGXebbesFzwWsiY1eSVuiT8II2kVZ8dtChsSLvbM8gfx3FockAoTOkkUEtMe2dDuIPyabPdnU6vMaVqf8fs4SAGtsTkfBlN1g4wdPuWrqUDzDjzn/ygqyQDGUOF7WHOhlKRhSdMvdpisB1T8vgZUDD88RRtD8dg+IyteVJTTLHxBwmWjVpn4iFnEUWH/y7ywdWtGooWLuodb41CPDkaCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/oD9mfSlG8yRT/eqVfElYn1r98GatJqLCU8NH82NxMA=;
- b=A/vvpehCClRBIr90YMvPtyDpD3Lux3d8eOpOz0jyANicDsAYZkh+NTx7hu7e6KJGSYfGCdVYqi35ZSzG7EtHaoEmWJgIo0WdshKiHIfzHrblbo+IAwljIwHgA8ZlVm2icp4YeHDMuRVlzCxhyzpiQIi0s3Fh4c5spaADarUwqvaCgNOiLZTd0mjUSzPdX8L+/B8/3HPh7uaCGgbAD9HPMnb8toom7W33VcAZtTupu6mvQwn/7h2jTk/R/ZVwFxGSE2yHgDPBg+wFXun8hZZ3Qg0Ycb3DqKYkn4i6JJ701KY6hUCJEoaFM81+f7dJrydgpQ5/hd2tKX4cWKP5g6qthg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/oD9mfSlG8yRT/eqVfElYn1r98GatJqLCU8NH82NxMA=;
- b=KwLKEZ0JwtejyWes6iQR/ZZ/2TYP8Ftue7ewhHeDwWybXqsIA8s25G3zUq/Rry+UFlM6j0ddkVsQt9XujYwEpzQ0OJnXKJa8n2DBdq9nhcqKREbnGjQS6zh+tH8Gh6a1bu8G0FlNbj+vh7uR4bHOIAOtHVAe3a63hkRA+G7VXi0=
-Received: from BN8PR21MB1155.namprd21.prod.outlook.com (2603:10b6:408:73::10)
- by BN8PR21MB1204.namprd21.prod.outlook.com (2603:10b6:408:76::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2900.4; Fri, 3 Apr
- 2020 23:11:31 +0000
-Received: from BN8PR21MB1155.namprd21.prod.outlook.com
- ([fe80::d11:18b7:289c:ea17]) by BN8PR21MB1155.namprd21.prod.outlook.com
- ([fe80::d11:18b7:289c:ea17%6]) with mapi id 15.20.2900.010; Fri, 3 Apr 2020
- 23:11:31 +0000
-From:   Long Li <longli@microsoft.com>
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-CC:     Steve French <sfrench@samba.org>,
+        id S1726186AbgDDAFD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 3 Apr 2020 20:05:03 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:37206 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725980AbgDDAFD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Apr 2020 20:05:03 -0400
+Received: by mail-lf1-f68.google.com with SMTP id t11so7235380lfe.4;
+        Fri, 03 Apr 2020 17:05:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=5TVVdjtml6JXABon4unEArMGra7kJXacNjWILU9VOgc=;
+        b=eeBSdTHxVvlrlWwR1il4ox3+YNTYTuKEz8ChUXXdJ9QO01OJiER/Ilj4rjlf6kh5eR
+         GWR9aTXnS19ZwzEmgOFXVnR7KeheI03r7KczGIJICQz/i2Te0tflqiXaSt14JCZTcO48
+         lctScDzzdcoS/IK3eEDCH9KtZko/sKqARtNhj1xaSamVsIS4ouiRkBjB2+0G2p/BuGQK
+         r1XkcoNQaCg2r/zVMhnYcwSaFrHM4+pra14Yo5vAwrIFDRcah+756mwaEA4OvyUXNIwA
+         8rv4H92TpXLFIungGUqFOAjc67Pue6jp/HNgVuirxNLEUxAPesrSvFaFdRSpwqqDqq4M
+         9NtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=5TVVdjtml6JXABon4unEArMGra7kJXacNjWILU9VOgc=;
+        b=ObE4tiSAgBN7l3BlF5y/WDUN1vkxIKpQHOn4JwXcnIkkYbywCjFtZz9cvrTcN6wNw8
+         sellEsr+yz1AG0O2ynZlW0av3ymZa4Gvr0GpF+tJjKTRatjnJUaY1ezb4zUUbeNdGCbW
+         +giFDBIJxkZyQIgzYBc8Fky47m/LDdzuE47uuamnji7kd8GaGNyRCyBtMNIxizHSQrTz
+         drlzmAttwWqAja+KgQSCN40+1EZ0ia3V4SIAm/9dl/bC4u04ihEjjNdeIFyfaIv5oWWW
+         VLu2FFrMQu2wA04aXKbP5ksofGScXTxYZkNTZZLcFpfw0OtoWqLHfWRQgp1itfise7IT
+         4g3w==
+X-Gm-Message-State: AGi0PubnCCEWiYk4WkVnnrvhD2yX3YG0Bc1fQkD259NSo8/ixbdwmVb2
+        NTEJbTeBVsMxWUP6QnO+CvvqXi/0MPmehTNzHA==
+X-Google-Smtp-Source: APiQypJZjzkMlOLYGeKDvfA8A+NrC/WyIP5a930kImq35w+pFFHBlpZDxqgaTcuW8L38FQYwLGnqFZUM2dLexYuIGG8=
+X-Received: by 2002:a19:4843:: with SMTP id v64mr6664943lfa.171.1585958699614;
+ Fri, 03 Apr 2020 17:04:59 -0700 (PDT)
+MIME-Version: 1.0
+References: <1585696903-96794-1-git-send-email-longli@linuxonhyperv.com>
+ <CAKywueRg8kJ+0aOehM-QKGuRwbDSb2TA5vNje8eSCdMqBT+EdQ@mail.gmail.com> <BN8PR21MB11559BF18DF932A38624369ECEC70@BN8PR21MB1155.namprd21.prod.outlook.com>
+In-Reply-To: <BN8PR21MB11559BF18DF932A38624369ECEC70@BN8PR21MB1155.namprd21.prod.outlook.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Fri, 3 Apr 2020 17:04:48 -0700
+Message-ID: <CAKywueRBghVuNtfP0XdLYL-wS_Nfci8uF_7pRPSjvQDif22BFQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Allocate crypto structures on the fly for
+ calculating signatures of incoming packets
+To:     Long Li <longli@microsoft.com>
+Cc:     Steve French <sfrench@samba.org>,
         linux-cifs <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
         Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] cifs: Allocate crypto structures on the fly for
- calculating signatures of incoming packets
-Thread-Topic: [PATCH] cifs: Allocate crypto structures on the fly for
- calculating signatures of incoming packets
-Thread-Index: AQHWB7MtPXoQyB3r4UeEU1cU9RQrrKhnr/SAgABZ51A=
-Date:   Fri, 3 Apr 2020 23:11:30 +0000
-Message-ID: <BN8PR21MB11559BF18DF932A38624369ECEC70@BN8PR21MB1155.namprd21.prod.outlook.com>
-References: <1585696903-96794-1-git-send-email-longli@linuxonhyperv.com>
- <CAKywueRg8kJ+0aOehM-QKGuRwbDSb2TA5vNje8eSCdMqBT+EdQ@mail.gmail.com>
-In-Reply-To: <CAKywueRg8kJ+0aOehM-QKGuRwbDSb2TA5vNje8eSCdMqBT+EdQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=longli@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:7:ede7:db5c:c6fe:798]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: e46a7230-fd6a-4cab-67d0-08d7d8245872
-x-ms-traffictypediagnostic: BN8PR21MB1204:
-x-microsoft-antispam-prvs: <BN8PR21MB1204B5BB5315A47AF6090A24CEC70@BN8PR21MB1204.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-forefront-prvs: 0362BF9FDB
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR21MB1155.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10019020)(4636009)(366004)(39860400002)(346002)(396003)(136003)(376002)(71200400001)(81166006)(6916009)(54906003)(478600001)(186003)(52536014)(33656002)(8676002)(10290500003)(86362001)(82960400001)(2906002)(8990500004)(4326008)(76116006)(6506007)(55016002)(66946007)(82950400001)(81156014)(5660300002)(316002)(7696005)(9686003)(66556008)(66476007)(8936002)(66446008)(64756008);DIR:OUT;SFP:1102;
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ETrp+1Z8RvfWF1iAMQUxE6ve7broIVULVUnUiJyzj8xIosU6FbYc1eMMk46njJwCbowl5Hkz/brLF/nX6y3gTq6fi4gQvSn/zlC0H1eYavfkTQrMzOgEUGG8p46GNrudLmOz3shXuxjI+hZBNnVxEvXdghowIb4tLpZJdLDEl/ZuBFu7Ro1gcozSY4YaPEBqeZcXJ8SD6troUp9aKkYRN8cNuH2HqAvEiYlqm/ZjPvrhaNGfs28holsq+BVi9qRzRBWxrYxsyDAoCr7xSI/KG+sVn9OCT+/Swr4LMMdhSceNy7XsAfVvMVhCus0jk+oJzp15iqVZddqGfc6M46Ow6i9ZTkaVhR4m0lwH7oxt+ASKfrHAz4bVFf6D6MFVcDmIF6JSVy7O/8f+u63HfSG1verF5qtGaqrgOOgdFy2r5iSIFcGWTwgLuoY6BRQf2Qes
-x-ms-exchange-antispam-messagedata: ILNsrKAqb1u3wD9DR6UDWzCX+NfgvCx+NOED4j2MAuham9mojDGWwlK3rR5XF/8+v1T1cMhyb2gV4t76ruNL7xefmgssmmSY+5VzLQsH4MEdfta5+Ph+hTo+dWJrMi2rPaPmBaozMYK5/Q+xBq8ECIp6r0pEMpra4x2kLNaEZbBMo8OKangUKarlF64hIuLOdDwIVuHW47rT2n5jkVDJrg==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e46a7230-fd6a-4cab-67d0-08d7d8245872
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Apr 2020 23:11:30.8610
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: G5H8/Xk7Adcg99Kpxa3fAzjzyS1lbikgy/P45xd+ZrFDnht4wP49fyZjWh66AIbytqZNlAi68mB6IdpddNiSuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR21MB1204
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-PlN1YmplY3Q6IFJlOiBbUEFUQ0hdIGNpZnM6IEFsbG9jYXRlIGNyeXB0byBzdHJ1Y3R1cmVzIG9u
-IHRoZSBmbHkgZm9yIGNhbGN1bGF0aW5nDQo+c2lnbmF0dXJlcyBvZiBpbmNvbWluZyBwYWNrZXRz
-DQo+DQo+0LLRgiwgMzEg0LzQsNGALiAyMDIwINCzLiDQsiAxNjoyMiwgPGxvbmdsaUBsaW51eG9u
-aHlwZXJ2LmNvbT46DQo+Pg0KPj4gRnJvbTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jvc29mdC5jb20+
-DQo+Pg0KPj4gQ0lGUyB1c2VzIHByZS1hbGxvY2F0ZWQgY3J5cHRvIHN0cnVjdHVyZXMgdG8gY2Fs
-Y3VsYXRlIHNpZ25hdHVyZXMgZm9yDQo+PiBib3RoIGluY29taW5nIGFuZCBvdXRnb2luZyBwYWNr
-ZXRzLiBJbiB0aGlzIHdheSBpdCBkb2Vzbid0IG5lZWQgdG8NCj4+IGFsbG9jYXRlIGNyeXB0byBz
-dHJ1Y3R1cmVzIGZvciBldmVyeSBwYWNrZXQsIGJ1dCBpdCByZXF1aXJlcyBhIGxvY2sgdG8NCj4+
-IHByZXZlbnQgY29uY3VycmVudCBhY2Nlc3MgdG8gY3J5cHRvIHN0cnVjdHVyZXMuDQo+Pg0KPj4g
-UmVtb3ZlIHRoZSBsb2NrIGJ5IGFsbG9jYXRpbmcgY3J5cHRvIHN0cnVjdHVyZXMgb24gdGhlIGZs
-eSBmb3INCj4+IGluY29taW5nIHBhY2tldHMuIEF0IHRoZSBzYW1lIHRpbWUsIHdlIGNhbiBzdGls
-bCB1c2UgcHJlLWFsbG9jYXRlZA0KPj4gY3J5cHRvIHN0cnVjdHVyZXMgZm9yIG91dGdvaW5nIHBh
-Y2tldHMsIGFzIHRoZXkgYXJlIGFscmVhZHkgcHJvdGVjdGVkDQo+PiBieSB0cmFuc3BvcnQgbG9j
-ayBzcnZfbXV0ZXguDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogTG9uZyBMaSA8bG9uZ2xpQG1pY3Jv
-c29mdC5jb20+DQo+PiAtLS0NCj4+ICBmcy9jaWZzL2NpZnNnbG9iLmggICAgICB8ICAzICstDQo+
-PiAgZnMvY2lmcy9zbWIycHJvdG8uaCAgICAgfCAgNiArKy0NCj4+ICBmcy9jaWZzL3NtYjJ0cmFu
-c3BvcnQuYyB8IDg3DQo+PiArKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0t
-LQ0KPj4gIDMgZmlsZXMgY2hhbmdlZCwgNjAgaW5zZXJ0aW9ucygrKSwgMzYgZGVsZXRpb25zKC0p
-DQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lmc2ds
-b2IuaCBpbmRleA0KPj4gMGQ5NTYzNjBlOTg0Li43NDQ4ZTcyMDJlN2EgMTAwNjQ0DQo+PiAtLS0g
-YS9mcy9jaWZzL2NpZnNnbG9iLmgNCj4+ICsrKyBiL2ZzL2NpZnMvY2lmc2dsb2IuaA0KPj4gQEAg
-LTQyNiw3ICs0MjYsOCBAQCBzdHJ1Y3Qgc21iX3ZlcnNpb25fb3BlcmF0aW9ucyB7DQo+PiAgICAg
-ICAgIC8qIGdlbmVyYXRlIG5ldyBsZWFzZSBrZXkgKi8NCj4+ICAgICAgICAgdm9pZCAoKm5ld19s
-ZWFzZV9rZXkpKHN0cnVjdCBjaWZzX2ZpZCAqKTsNCj4+ICAgICAgICAgaW50ICgqZ2VuZXJhdGVf
-c2lnbmluZ2tleSkoc3RydWN0IGNpZnNfc2VzICopOw0KPj4gLSAgICAgICBpbnQgKCpjYWxjX3Np
-Z25hdHVyZSkoc3RydWN0IHNtYl9ycXN0ICosIHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKik7DQo+
-PiArICAgICAgIGludCAoKmNhbGNfc2lnbmF0dXJlKShzdHJ1Y3Qgc21iX3Jxc3QgKiwgc3RydWN0
-IFRDUF9TZXJ2ZXJfSW5mbyAqLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBi
-b29sIGFsbG9jYXRlX2NyeXB0byk7DQo+PiAgICAgICAgIGludCAoKnNldF9pbnRlZ3JpdHkpKGNv
-bnN0IHVuc2lnbmVkIGludCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwNCj4+ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgc3RydWN0IGNpZnNGaWxlSW5mbyAqc3JjX2ZpbGUpOw0KPj4gICAg
-ICAgICBpbnQgKCplbnVtX3NuYXBzaG90cykoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0
-IGNpZnNfdGNvbg0KPj4gKnRjb24sIGRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJwcm90by5oIGIv
-ZnMvY2lmcy9zbWIycHJvdG8uaCBpbmRleA0KPj4gNGQxZmY3YjY2ZmRjLi4wODdkNWYxNDMyMGIg
-MTAwNjQ0DQo+PiAtLS0gYS9mcy9jaWZzL3NtYjJwcm90by5oDQo+PiArKysgYi9mcy9jaWZzL3Nt
-YjJwcm90by5oDQo+PiBAQCAtNTUsOSArNTUsMTEgQEAgZXh0ZXJuIHN0cnVjdCBjaWZzX3NlcyAq
-c21iMl9maW5kX3NtYl9zZXMoc3RydWN0DQo+PiBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgIGV4
-dGVybiBzdHJ1Y3QgY2lmc190Y29uDQo+KnNtYjJfZmluZF9zbWJfdGNvbihzdHJ1Y3QgVENQX1Nl
-cnZlcl9JbmZvICpzZXJ2ZXIsDQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBfX3U2NCBzZXNfaWQsIF9fdTMyDQo+PiB0aWQpOyAgZXh0ZXJuIGludCBz
-bWIyX2NhbGNfc2lnbmF0dXJlKHN0cnVjdCBzbWJfcnFzdCAqcnFzdCwNCj4+IC0gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKTsNCj4+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAq
-c2VydmVyLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBib29sIGFsbG9jYXRl
-X2NyeXB0byk7DQo+PiAgZXh0ZXJuIGludCBzbWIzX2NhbGNfc2lnbmF0dXJlKHN0cnVjdCBzbWJf
-cnFzdCAqcnFzdCwNCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IFRD
-UF9TZXJ2ZXJfSW5mbyAqc2VydmVyKTsNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLA0KPj4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBib29sIGFsbG9jYXRlX2NyeXB0byk7DQo+PiAgZXh0ZXJuIHZvaWQgc21i
-Ml9lY2hvX3JlcXVlc3Qoc3RydWN0IHdvcmtfc3RydWN0ICp3b3JrKTsgIGV4dGVybg0KPj4gX19s
-ZTMyIHNtYjJfZ2V0X2xlYXNlX3N0YXRlKHN0cnVjdCBjaWZzSW5vZGVJbmZvICpjaW5vZGUpOyAg
-ZXh0ZXJuDQo+PiBib29sIHNtYjJfaXNfdmFsaWRfb3Bsb2NrX2JyZWFrKGNoYXIgKmJ1ZmZlciwg
-ZGlmZiAtLWdpdA0KPj4gYS9mcy9jaWZzL3NtYjJ0cmFuc3BvcnQuYyBiL2ZzL2NpZnMvc21iMnRy
-YW5zcG9ydC5jIGluZGV4DQo+PiAwOGI3MDNiN2ExNWUuLmMwMWUxOWEzYjExMiAxMDA2NDQNCj4+
-IC0tLSBhL2ZzL2NpZnMvc21iMnRyYW5zcG9ydC5jDQo+PiArKysgYi9mcy9jaWZzL3NtYjJ0cmFu
-c3BvcnQuYw0KPj4gQEAgLTQwLDE0ICs0MCw2IEBADQo+PiAgI2luY2x1ZGUgInNtYjJzdGF0dXMu
-aCINCj4+ICAjaW5jbHVkZSAic21iMmdsb2IuaCINCj4+DQo+PiAtc3RhdGljIGludA0KPj4gLXNt
-YjJfY3J5cHRvX3NoYXNoX2FsbG9jYXRlKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlcikg
-LXsNCj4+IC0gICAgICAgcmV0dXJuIGNpZnNfYWxsb2NfaGFzaCgiaG1hYyhzaGEyNTYpIiwNCj4+
-IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmc2VydmVyLT5zZWNtZWNoLmhtYWNzaGEy
-NTYsDQo+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJnNlcnZlci0+c2VjbWVjaC5z
-ZGVzY2htYWNzaGEyNTYpOw0KPj4gLX0NCj4+IC0NCj4+ICBzdGF0aWMgaW50DQo+PiAgc21iM19j
-cnlwdG9fc2hhc2hfYWxsb2NhdGUoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKSAgeyBA
-QA0KPj4gLTIxOSw3ICsyMTEsOCBAQCBzbWIyX2ZpbmRfc21iX3Rjb24oc3RydWN0IFRDUF9TZXJ2
-ZXJfSW5mbyAqc2VydmVyLA0KPj4gX191NjQgc2VzX2lkLCBfX3UzMiAgdGlkKSAgfQ0KPj4NCj4+
-ICBpbnQNCj4+IC1zbWIyX2NhbGNfc2lnbmF0dXJlKHN0cnVjdCBzbWJfcnFzdCAqcnFzdCwgc3Ry
-dWN0IFRDUF9TZXJ2ZXJfSW5mbw0KPj4gKnNlcnZlcikNCj4+ICtzbWIyX2NhbGNfc2lnbmF0dXJl
-KHN0cnVjdCBzbWJfcnFzdCAqcnFzdCwgc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbw0KPipzZXJ2ZXIs
-DQo+PiArICAgICAgICAgICAgICAgICAgICAgICBib29sIGFsbG9jYXRlX2NyeXB0bykNCj4+ICB7
-DQo+PiAgICAgICAgIGludCByYzsNCj4+ICAgICAgICAgdW5zaWduZWQgY2hhciBzbWIyX3NpZ25h
-dHVyZVtTTUIyX0hNQUNTSEEyNTZfU0laRV07DQo+PiBAQCAtMjI4LDYgKzIyMSw4IEBAIHNtYjJf
-Y2FsY19zaWduYXR1cmUoc3RydWN0IHNtYl9ycXN0ICpycXN0LCBzdHJ1Y3QNCj5UQ1BfU2VydmVy
-X0luZm8gKnNlcnZlcikNCj4+ICAgICAgICAgc3RydWN0IHNtYjJfc3luY19oZHIgKnNoZHIgPSAo
-c3RydWN0IHNtYjJfc3luY19oZHIgKilpb3ZbMF0uaW92X2Jhc2U7DQo+PiAgICAgICAgIHN0cnVj
-dCBjaWZzX3NlcyAqc2VzOw0KPj4gICAgICAgICBzdHJ1Y3Qgc2hhc2hfZGVzYyAqc2hhc2g7DQo+
-PiArICAgICAgIHN0cnVjdCBjcnlwdG9fc2hhc2ggKmhhc2g7DQo+PiArICAgICAgIHN0cnVjdCBz
-ZGVzYyAqc2Rlc2MgPSBOVUxMOw0KPj4gICAgICAgICBzdHJ1Y3Qgc21iX3Jxc3QgZHJxc3Q7DQo+
-Pg0KPj4gICAgICAgICBzZXMgPSBzbWIyX2ZpbmRfc21iX3NlcyhzZXJ2ZXIsIHNoZHItPlNlc3Np
-b25JZCk7IEBAIC0yMzksMjQNCj4+ICsyMzQsMzIgQEAgc21iMl9jYWxjX3NpZ25hdHVyZShzdHJ1
-Y3Qgc21iX3Jxc3QgKnJxc3QsIHN0cnVjdA0KPlRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyKQ0KPj4g
-ICAgICAgICBtZW1zZXQoc21iMl9zaWduYXR1cmUsIDB4MCwgU01CMl9ITUFDU0hBMjU2X1NJWkUp
-Ow0KPj4gICAgICAgICBtZW1zZXQoc2hkci0+U2lnbmF0dXJlLCAweDAsIFNNQjJfU0lHTkFUVVJF
-X1NJWkUpOw0KPj4NCj4+IC0gICAgICAgcmMgPSBzbWIyX2NyeXB0b19zaGFzaF9hbGxvY2F0ZShz
-ZXJ2ZXIpOw0KPj4gLSAgICAgICBpZiAocmMpIHsNCj4+IC0gICAgICAgICAgICAgICBjaWZzX3Nl
-cnZlcl9kYmcoVkZTLCAiJXM6IHNoYTI1NiBhbGxvYyBmYWlsZWRcbiIsIF9fZnVuY19fKTsNCj4+
-IC0gICAgICAgICAgICAgICByZXR1cm4gcmM7DQo+PiArICAgICAgIGlmIChhbGxvY2F0ZV9jcnlw
-dG8pIHsNCj4+ICsgICAgICAgICAgICAgICByYyA9IGNpZnNfYWxsb2NfaGFzaCgiaG1hYyhzaGEy
-NTYpIiwgJmhhc2gsICZzZGVzYyk7DQo+PiArICAgICAgICAgICAgICAgaWYgKHJjKSB7DQo+PiAr
-ICAgICAgICAgICAgICAgICAgICAgICBjaWZzX3NlcnZlcl9kYmcoVkZTLA0KPj4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICIlczogc2hhMjU2IGFsbG9jIGZhaWxlZFxu
-IiwgX19mdW5jX18pOw0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIHJjOw0KPj4g
-KyAgICAgICAgICAgICAgIH0NCj4+ICsgICAgICAgICAgICAgICBzaGFzaCA9ICZzZGVzYy0+c2hh
-c2g7DQo+PiArICAgICAgIH0gZWxzZSB7DQo+PiArICAgICAgICAgICAgICAgaGFzaCA9IHNlcnZl
-ci0+c2VjbWVjaC5obWFjc2hhMjU2Ow0KPj4gKyAgICAgICAgICAgICAgIHNoYXNoID0gJnNlcnZl
-ci0+c2VjbWVjaC5zZGVzY2htYWNzaGEyNTYtPnNoYXNoOw0KPj4gICAgICAgICB9DQo+DQo+c21i
-Ml9jcnlwdG9fc2hhc2hfYWxsb2NhdGUoKSB1bmNvbmRpdGlvbmFsbHkgYWxsb2NhdGVkDQo+c2Vy
-dmVyLT5zZWNtZWNoLmhtYWNzaGEyNTYgYW5kIHNlcnZlci0+c2VjbWVjaC5zZGVzY2htYWNzaGEy
-NTYtDQo+PnNoYXNoLg0KDQpJIHRoaW5rIHRoZXkgYXJlIGFsbG9jYXRlZCBpbiBzbWIzMTFfY3J5
-cHRvX3NoYXNoX2FsbG9jYXRlKCksIHRocm91Z2gNCj0+IHNtYjMxMV9jcnlwdG9fc2hhc2hfYWxs
-b2NhdGUNCiA9PiBzbWIzMTFfdXBkYXRlX3ByZWF1dGhfaGFzaA0KID0+IGNvbXBvdW5kX3NlbmRf
-cmVjdg0KID0+IGNpZnNfc2VuZF9yZWN2DQogPT4gU01CMl9uZWdvdGlhdGUNCg0KVGhlIGZ1bmN0
-aW9uIG5hbWVzIGFyZSBhIGxpdHRsZSBtaXNsZWFkaW5nLi4uDQoNCj5Ob3cgdGhlIGNvZGUgZG9l
-c24ndCBhbGxvY2F0ZSB0aG9zZSB2YXJpYWJsZXMgYXQgYWxsLiBVbmxpa2UgU01CMyB3aGVyZQ0K
-PnN0cnVjdHVyZXMgYXJlIGFsbG9jYXRlZCBpbiBkdXJpbmcga2V5IGdlbmVyYXRpb24sIGZvciBT
-TUIyIHdlIGRvIGl0IG9uDQo+ZGVtYW5kIGluIHNtYjJfY2FsY19zaWduYXR1cmUoKS4gU28sIHRo
-ZSBjb2RlIGFib3ZlIHNob3VsZCBiZSBjaGFuZ2VkIHRvDQo+Y2FsbCBzbWIyX2NyeXB0b19zaGFz
-aF9hbGxvY2F0ZSgpIGluICJlbHNlIiBibG9jay4NCj4NCj4tLQ0KPkJlc3QgcmVnYXJkcywNCj5Q
-YXZlbCBTaGlsb3Zza3kNCg==
+=D0=BF=D1=82, 3 =D0=B0=D0=BF=D1=80. 2020 =D0=B3. =D0=B2 16:11, Long Li <lon=
+gli@microsoft.com>:
+>
+> >Subject: Re: [PATCH] cifs: Allocate crypto structures on the fly for cal=
+culating
+> >signatures of incoming packets
+> >
+> >=D0=B2=D1=82, 31 =D0=BC=D0=B0=D1=80. 2020 =D0=B3. =D0=B2 16:22, <longli@=
+linuxonhyperv.com>:
+> >>
+> >> From: Long Li <longli@microsoft.com>
+> >>
+> >> CIFS uses pre-allocated crypto structures to calculate signatures for
+> >> both incoming and outgoing packets. In this way it doesn't need to
+> >> allocate crypto structures for every packet, but it requires a lock to
+> >> prevent concurrent access to crypto structures.
+> >>
+> >> Remove the lock by allocating crypto structures on the fly for
+> >> incoming packets. At the same time, we can still use pre-allocated
+> >> crypto structures for outgoing packets, as they are already protected
+> >> by transport lock srv_mutex.
+> >>
+> >> Signed-off-by: Long Li <longli@microsoft.com>
+> >> ---
+> >>  fs/cifs/cifsglob.h      |  3 +-
+> >>  fs/cifs/smb2proto.h     |  6 ++-
+> >>  fs/cifs/smb2transport.c | 87
+> >> +++++++++++++++++++++++++----------------
+> >>  3 files changed, 60 insertions(+), 36 deletions(-)
+> >>
+> >> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h index
+> >> 0d956360e984..7448e7202e7a 100644
+> >> --- a/fs/cifs/cifsglob.h
+> >> +++ b/fs/cifs/cifsglob.h
+> >> @@ -426,7 +426,8 @@ struct smb_version_operations {
+> >>         /* generate new lease key */
+> >>         void (*new_lease_key)(struct cifs_fid *);
+> >>         int (*generate_signingkey)(struct cifs_ses *);
+> >> -       int (*calc_signature)(struct smb_rqst *, struct TCP_Server_Inf=
+o *);
+> >> +       int (*calc_signature)(struct smb_rqst *, struct TCP_Server_Inf=
+o *,
+> >> +                               bool allocate_crypto);
+> >>         int (*set_integrity)(const unsigned int, struct cifs_tcon *tco=
+n,
+> >>                              struct cifsFileInfo *src_file);
+> >>         int (*enum_snapshots)(const unsigned int xid, struct cifs_tcon
+> >> *tcon, diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h index
+> >> 4d1ff7b66fdc..087d5f14320b 100644
+> >> --- a/fs/cifs/smb2proto.h
+> >> +++ b/fs/cifs/smb2proto.h
+> >> @@ -55,9 +55,11 @@ extern struct cifs_ses *smb2_find_smb_ses(struct
+> >> TCP_Server_Info *server,  extern struct cifs_tcon
+> >*smb2_find_smb_tcon(struct TCP_Server_Info *server,
+> >>                                                 __u64 ses_id, __u32
+> >> tid);  extern int smb2_calc_signature(struct smb_rqst *rqst,
+> >> -                               struct TCP_Server_Info *server);
+> >> +                               struct TCP_Server_Info *server,
+> >> +                               bool allocate_crypto);
+> >>  extern int smb3_calc_signature(struct smb_rqst *rqst,
+> >> -                               struct TCP_Server_Info *server);
+> >> +                               struct TCP_Server_Info *server,
+> >> +                               bool allocate_crypto);
+> >>  extern void smb2_echo_request(struct work_struct *work);  extern
+> >> __le32 smb2_get_lease_state(struct cifsInodeInfo *cinode);  extern
+> >> bool smb2_is_valid_oplock_break(char *buffer, diff --git
+> >> a/fs/cifs/smb2transport.c b/fs/cifs/smb2transport.c index
+> >> 08b703b7a15e..c01e19a3b112 100644
+> >> --- a/fs/cifs/smb2transport.c
+> >> +++ b/fs/cifs/smb2transport.c
+> >> @@ -40,14 +40,6 @@
+> >>  #include "smb2status.h"
+> >>  #include "smb2glob.h"
+> >>
+> >> -static int
+> >> -smb2_crypto_shash_allocate(struct TCP_Server_Info *server) -{
+> >> -       return cifs_alloc_hash("hmac(sha256)",
+> >> -                              &server->secmech.hmacsha256,
+> >> -                              &server->secmech.sdeschmacsha256);
+> >> -}
+> >> -
+> >>  static int
+> >>  smb3_crypto_shash_allocate(struct TCP_Server_Info *server)  { @@
+> >> -219,7 +211,8 @@ smb2_find_smb_tcon(struct TCP_Server_Info *server,
+> >> __u64 ses_id, __u32  tid)  }
+> >>
+> >>  int
+> >> -smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info
+> >> *server)
+> >> +smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info
+> >*server,
+> >> +                       bool allocate_crypto)
+> >>  {
+> >>         int rc;
+> >>         unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
+> >> @@ -228,6 +221,8 @@ smb2_calc_signature(struct smb_rqst *rqst, struct
+> >TCP_Server_Info *server)
+> >>         struct smb2_sync_hdr *shdr =3D (struct smb2_sync_hdr *)iov[0].=
+iov_base;
+> >>         struct cifs_ses *ses;
+> >>         struct shash_desc *shash;
+> >> +       struct crypto_shash *hash;
+> >> +       struct sdesc *sdesc =3D NULL;
+> >>         struct smb_rqst drqst;
+> >>
+> >>         ses =3D smb2_find_smb_ses(server, shdr->SessionId); @@ -239,24
+> >> +234,32 @@ smb2_calc_signature(struct smb_rqst *rqst, struct
+> >TCP_Server_Info *server)
+> >>         memset(smb2_signature, 0x0, SMB2_HMACSHA256_SIZE);
+> >>         memset(shdr->Signature, 0x0, SMB2_SIGNATURE_SIZE);
+> >>
+> >> -       rc =3D smb2_crypto_shash_allocate(server);
+> >> -       if (rc) {
+> >> -               cifs_server_dbg(VFS, "%s: sha256 alloc failed\n", __fu=
+nc__);
+> >> -               return rc;
+> >> +       if (allocate_crypto) {
+> >> +               rc =3D cifs_alloc_hash("hmac(sha256)", &hash, &sdesc);
+> >> +               if (rc) {
+> >> +                       cifs_server_dbg(VFS,
+> >> +                                       "%s: sha256 alloc failed\n", _=
+_func__);
+> >> +                       return rc;
+> >> +               }
+> >> +               shash =3D &sdesc->shash;
+> >> +       } else {
+> >> +               hash =3D server->secmech.hmacsha256;
+> >> +               shash =3D &server->secmech.sdeschmacsha256->shash;
+> >>         }
+> >
+> >smb2_crypto_shash_allocate() unconditionally allocated
+> >server->secmech.hmacsha256 and server->secmech.sdeschmacsha256-
+> >>shash.
+>
+> I think they are allocated in smb311_crypto_shash_allocate(), through
+> =3D> smb311_crypto_shash_allocate
+>  =3D> smb311_update_preauth_hash
+>  =3D> compound_send_recv
+>  =3D> cifs_send_recv
+>  =3D> SMB2_negotiate
+>
+> The function names are a little misleading...
+
+smb311_crypto_shash_allocate() only allocate those structures for SMB
+3.1.1 protocol version, see the code below:
+
+797 int
+798 smb311_update_preauth_hash(struct cifs_ses *ses, struct kvec *iov, int =
+nvec)
+799 {
+800 >-------int i, rc;
+801 >-------struct sdesc *d;
+802 >-------struct smb2_sync_hdr *hdr;
+803
+804 >-------if (ses->server->tcpStatus =3D=3D CifsGood) {
+805 >------->-------/* skip non smb311 connections */
+806 >------->-------if (ses->server->dialect !=3D SMB311_PROT_ID)
+807 >------->------->-------return 0;
+
+--
+Best regards,
+Pavel Shilovsky
