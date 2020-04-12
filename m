@@ -2,120 +2,118 @@ Return-Path: <SRS0=YkwU=54=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72AD8C2D0EC
-	for <linux-cifs@archiver.kernel.org>; Sun, 12 Apr 2020 21:51:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEA6C2BB85
+	for <linux-cifs@archiver.kernel.org>; Sun, 12 Apr 2020 22:28:52 +0000 (UTC)
 Received: from vger.kernel.org (unknown [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 398F0206E5
-	for <linux-cifs@archiver.kernel.org>; Sun, 12 Apr 2020 21:51:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88C46206C3
+	for <linux-cifs@archiver.kernel.org>; Sun, 12 Apr 2020 22:28:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bjzLDvcX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 398F0206E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=juliacomputing-com.20150623.gappssmtp.com header.i=@juliacomputing-com.20150623.gappssmtp.com header.b="tAqXHlP8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C46206C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=juliacomputing.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-cifs-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728387AbgDLVvl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 12 Apr 2020 17:51:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.18]:51876 "EHLO
+        id S1726206AbgDLW2v (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 12 Apr 2020 18:28:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.18]:57742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727388AbgDLVvk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 12 Apr 2020 17:51:40 -0400
-Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 374A7C0A88B5
-        for <linux-cifs@vger.kernel.org>; Sun, 12 Apr 2020 14:51:41 -0700 (PDT)
-Received: by mail-yb1-xb41.google.com with SMTP id n188so3776287ybc.3
-        for <linux-cifs@vger.kernel.org>; Sun, 12 Apr 2020 14:51:41 -0700 (PDT)
+        with ESMTP id S1726185AbgDLW2v (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 12 Apr 2020 18:28:51 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE5CDC014A42
+        for <linux-cifs@vger.kernel.org>; Sun, 12 Apr 2020 15:28:51 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id z12so7030000ilb.10
+        for <linux-cifs@vger.kernel.org>; Sun, 12 Apr 2020 15:28:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=juliacomputing-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=sY+YvxlZHZQb3BkdYydzdcDG4Kx43IySzoO9d5wFmUQ=;
-        b=bjzLDvcXQq2PgxAlCidD0LRhy/hTENH+nOrQK4nxOVIimGgHJFmT63U9mzfp9gTcrQ
-         uZL1BDgjUHptHPfJrRXQwduGWZpUN8O7AMCB4zkyTuDHVArqgX+xFoF8YVTrLw+U/Rii
-         AzvD8U6yNWEwVEr9WBn2yqtE7LQP9NDqXOGj/+nr6aRbM+t5a6wlOO2ky6ps6QjMstDF
-         b0+IqjhygnwufGptkj0ZIkYGBH2kamYuOM1qce6E0dwT5T5W+hJtHXNjq4Ho6i8nBV5y
-         Qxk3O+qUK/5YnqHn4PurAaCHO053/d+e3KSoIyx4rOIDU0kAWHf0v879kRfhDkbSSBTe
-         EjcQ==
+        bh=ANGfUKyG+6xWky2jJ2nWMKG+M8IIxgEacG/h0ycqR20=;
+        b=tAqXHlP8pnC0Fae5HqLveAPHChvu5fDrBR9aCpdJ/+VGWLe239sL5EQQWbqaz3R9zk
+         EAQUa5NP5nmgrY74n41PftFvtCCNCkmDthGZgO1ECVJSvQ4IMF53VSupjwSpg+7RuiI2
+         v8IH811tUAia95Hhy4SCvG+4vNYPYkm/oQwKOCJSYOIjRu3W/kSiUZHWJk1lZ+sCtpCN
+         sz3mK9n7qAcYjYqEBtPNGS5pNjUaJMtI1sYKypSgAKOTUQlwM5XiVkmGcy1PN8/Nb7x4
+         5Dp2zxa0TXQ+m0aDA5A0d4GXIcPgOuuLePU4s7tZZkslKAfNetsNFpjzQdzBZpgG9Dy/
+         XODw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=sY+YvxlZHZQb3BkdYydzdcDG4Kx43IySzoO9d5wFmUQ=;
-        b=q+i+abEdMisBvHluZHk6DbnUIkNBJ7aQOEMcCMlXWvAzesjl5D/VUbg6u+Nr5SMHl1
-         ZvzyfjoDGMcONQYm+3q0NCcOgQQtNLCxxdy2EIIe4XvreRYw70a06A0QJmbdpEeygDb5
-         MVZiHjTRPBKr9B7COg8hdOYmVXbiK4ZXGIAv8bYtaqsGQXNe+MRxjWDE3ouKq+/6OchC
-         bg+RSecqHN3tb5eSzPJWo76qp1m3e2qJxj4cj7vF+3AJnrxH+MXTl96Xhe+ZYX2csRAA
-         k4M4/VwVWHJIuovJW0HcsZPb7parO1MaqhrNibz1kYY+VKRTt/I+KapnmpD01CVHylJV
-         0HFg==
-X-Gm-Message-State: AGi0PuZ8EZtRKdZAdXNzspKDxCijPb3yYbIEvjuVp8rjrpbZ70EJj155
-        uoYvZhKMnz0LcFK/KJLjzpbFG39qMwFzYZc7c2M=
-X-Google-Smtp-Source: APiQypLQBf75dKYQ37DNNjSdiHZ7aQ9aAsmWgUZS+MIIxXTL+Qqz1pMcPEpWL+Q5/I856DNCZ6Q0h8MApoC7DrYrwwo=
-X-Received: by 2002:a25:cd04:: with SMTP id d4mr21908561ybf.375.1586728300312;
- Sun, 12 Apr 2020 14:51:40 -0700 (PDT)
+        bh=ANGfUKyG+6xWky2jJ2nWMKG+M8IIxgEacG/h0ycqR20=;
+        b=DhY2fI/yNmF59Jjbnhnzb//riQR15d50MfB+7jNVBa610A4kw5I0gA9Ry5snzKOxT3
+         fIP7s+EerOiEu9qu5RVuLMVznYWgX5hluuSrf5J+9ScvRsPTq/zGkKhBliVZDyqG7YtN
+         /9shAA7n9kRad+kvZwT+f9khFAURJ0PzjlB5nU5Hk4Ua1/oWgFEekwyVz/fmfiUpU8PI
+         9o0m1fz1jYLUTjum52BxcKKJRaYat48Y0ZAsRzRTnvoRq7rc4tptFBeRi/a6sJMqNLYX
+         MgWnwK73WHtNXG7YOZ/KAkefCY6UzpkFjsK7Spa4cPblVJ5LnKz5dxhCC6WIVX5Mszkn
+         q73Q==
+X-Gm-Message-State: AGi0PubFsxl8wTFqEgIhxMQx9zegl4JOtKyMWBzpihmDmF+eh5IJhJit
+        A0f24sUXXQp/uQ+lghyreoFLjKPQ4wFBiIO+1vw94Q==
+X-Google-Smtp-Source: APiQypJO2Sswe5+NMVXMBxFMyLnpwoxty/zztpPW7J2prcZwXcKcdiwPWUFR1BvBQmKAE2/hAJpBzCD4M7x9p/ukihc=
+X-Received: by 2002:a92:250e:: with SMTP id l14mr14538847ill.201.1586730530779;
+ Sun, 12 Apr 2020 15:28:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200412060926.30733-1-lsahlber@redhat.com>
-In-Reply-To: <20200412060926.30733-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 12 Apr 2020 16:51:29 -0500
-Message-ID: <CAH2r5mvQ2HcFrdjSsW0XJiTRxRNFgUm+g7+ZUgTkkqQXP7s6Cw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: dump the session id and keys also for SMB2 sessions
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+References: <CABV8kRw_jGxPqWc68Bj-uP_hSrKO0MmShOmtuzGQA2W3WHyCrg@mail.gmail.com>
+ <CAOQ4uxhPKR34cXvWfF49z8mTGJm+oP2ibfohsXNdY7tXaOi4RA@mail.gmail.com>
+In-Reply-To: <CAOQ4uxhPKR34cXvWfF49z8mTGJm+oP2ibfohsXNdY7tXaOi4RA@mail.gmail.com>
+From:   Keno Fischer <keno@juliacomputing.com>
+Date:   Sun, 12 Apr 2020 18:28:13 -0400
+Message-ID: <CABV8kRxVA0j2qLkyWx+vULh2DxK2Ef4nPk-zXCikN8XmdBOFgQ@mail.gmail.com>
+Subject: Re: Same mountpoint restriction in FICLONE ioctls
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Olga Kornievskaia <kolga@netapp.com>,
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next
+> You did not specify your use case.
 
-On Sun, Apr 12, 2020 at 1:11 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> We already dump these keys for SMB3, lets also dump it for SMB2
-> sessions so that we can use the session key in wireshark to check and validate
-> that the signatures are correct.
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/smb2pdu.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 28c0be5e69b7..3ddb0fe6889a 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1541,6 +1541,21 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
->         }
->
->         rc = SMB2_sess_establish_session(sess_data);
-> +#ifdef CONFIG_CIFS_DEBUG_DUMP_KEYS
-> +       if (ses->server->dialect < SMB30_PROT_ID) {
-> +               cifs_dbg(VFS, "%s: dumping generated SMB2 session keys\n", __func__);
-> +               /*
-> +                * The session id is opaque in terms of endianness, so we can't
-> +                * print it as a long long. we dump it as we got it on the wire
-> +                */
-> +               cifs_dbg(VFS, "Session Id    %*ph\n", (int)sizeof(ses->Suid),
-> +                        &ses->Suid);
-> +               cifs_dbg(VFS, "Session Key   %*ph\n",
-> +                        SMB2_NTLMV2_SESSKEY_SIZE, ses->auth_key.response);
-> +               cifs_dbg(VFS, "Signing Key   %*ph\n",
-> +                        SMB3_SIGN_KEY_SIZE, ses->auth_key.response);
-> +       }
-> +#endif
->  out:
->         kfree(ntlmssp_blob);
->         SMB2_sess_free_buffer(sess_data);
-> --
-> 2.13.6
->
+My use case is recording (https://rr-project.org/) executions
+of containers (which often make heavy use of bind mounts on
+the same file system, thus me running into this restriction).
+In essence, at relevant read or mmap operations,
+rr needs to checkpoint the file that was opened,
+in case it later gets deleted or modified.
+It always tries to FICLONE the file first,
+before deciding heuristically whether to
+instead create a copy (if it decides there is a low
+likelihood the file will get changed - e.g. because
+it's a system file - it may decide to take the chance and
+not copy it at the risk of creating a broken recording).
+That's often a decent trade-off, but of course it's not
+100% perfect.
 
+> The question is: do you *really* need cross mount clone?
+> Can you use copy_file_range() instead?
 
--- 
-Thanks,
+Good question. copy_file_range doesn't quite work
+for that initial clone, because we do want it to fail if
+cloning doesn't work (so that we can apply the
+heuristics). However, you make a good point that
+the copy fallback should probably use copy_file_range.
+At least that way, if it does decide to copy, the
+performance will be better.
 
-Steve
+It would still be nice for FICLONE to ease this restriction,
+since it reduces the chance of the heuristics getting
+it wrong and preventing the copy, even if such
+a copy would have been cheap.
+
+> Across which filesystems mounts are you trying to clone?
+
+This functionality was written with btrfs in mind, so that's
+what I was testing with. The mounts themselves are just
+different bindmounts into the same filesystem.
+
+Keno
