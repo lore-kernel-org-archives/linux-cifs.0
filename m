@@ -2,92 +2,118 @@ Return-Path: <SRS0=YkwU=54=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC67CC2BB85
-	for <linux-cifs@archiver.kernel.org>; Sun, 12 Apr 2020 06:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B63C2BB85
+	for <linux-cifs@archiver.kernel.org>; Sun, 12 Apr 2020 11:29:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C6F020709
-	for <linux-cifs@archiver.kernel.org>; Sun, 12 Apr 2020 06:09:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C110920644
+	for <linux-cifs@archiver.kernel.org>; Sun, 12 Apr 2020 11:29:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zr3t7oNf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LRxbCfnM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725903AbgDLGJj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 12 Apr 2020 02:09:39 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33965 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725263AbgDLGJi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 12 Apr 2020 02:09:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1586671778;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=QcpSZP7NpmF1miYqSO3BH6PxZTslJeNRsQ7VsRdxyiA=;
-        b=Zr3t7oNfVZyAXlZpUmhhfmMm5kvMUBQg6y1S1jVgmO5ZHoJBysJUT8+FSP1j+6otpXsI4R
-        K5htid2PAwShxvIccTVMMi3fqhKsHVWEyzucSpMjPlg3Y7iRz4nHGWkAzfbb7yfY5OSGd5
-        FwYR7aVuMZeS6iFRsaSMNpc+FDuKLSI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-DnZue9egNquycWa2G4l5-A-1; Sun, 12 Apr 2020 02:09:35 -0400
-X-MC-Unique: DnZue9egNquycWa2G4l5-A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95779800D5B
-        for <linux-cifs@vger.kernel.org>; Sun, 12 Apr 2020 06:09:34 +0000 (UTC)
-Received: from test1135.test.redhat.com (vpn2-54-101.bne.redhat.com [10.64.54.101])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 292D811B25D;
-        Sun, 12 Apr 2020 06:09:33 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH] cifs: dump the session id and keys also for SMB2 sessions
-Date:   Sun, 12 Apr 2020 16:09:26 +1000
-Message-Id: <20200412060926.30733-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+        id S1726689AbgDLL3r (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 12 Apr 2020 07:29:47 -0400
+Received: from mail-io1-f52.google.com ([209.85.166.52]:39075 "EHLO
+        mail-io1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726139AbgDLL3q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 12 Apr 2020 07:29:46 -0400
+Received: by mail-io1-f52.google.com with SMTP id m4so6597107ioq.6;
+        Sun, 12 Apr 2020 04:29:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lr8Du1SNizwqButahq7qkxIKOJ2tYQem2z0WmME8mcI=;
+        b=LRxbCfnM2pAXUuR19iUj6iP0vBxBl6OyeOmOOFBnYiOUeygcQ6wd1ZJA8timIuABUC
+         qwiyPIxYWoFB0KCfgStqa+sucIENFSFvuxV8jsgBP98rW2uLQoWKjQxVJhKDGBVZ+6xe
+         R7PXQvvSTcHwhvyiqPcN/tjHlnXBVdMgSle2tEim4e0DIJkyK36IJJVTuF4NMB9PnNgy
+         B7JPZMVRJ2EQMuwlhRlQreGJoMd/A9TK4nt09k72toTtnRmCb9qFnVIIux0+PIBx24ng
+         qHmcHmpPCaKYSBeG1F+fEImHYHNyFphV79PbEwuBStrk1+bH4acZopN6z/F0OA7M8hY4
+         zEZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lr8Du1SNizwqButahq7qkxIKOJ2tYQem2z0WmME8mcI=;
+        b=DNCrM6CC1K7gz75dwyseFfjfYG0aNrb6lKA6PO9gsCRpO8Eje2Tzy75VHJDRsxbSNS
+         zWqGkP18q4RFbsG+XbJa29s9KYguopuRHk8bhC8P95t9aLEit8HQG/6rE9f/qS+/qZQa
+         xAPKzTsZc3xbb7S1KGlwjn/K1R0pM1+LQZBgU5aM5tHyXnK5EpK2Aeqxr1LUU1hrMO9+
+         DSluX7McTJcMjULXVeZDcX939IP/K3aCOo1ZOfYZXP00Tnest2cPbEEHxJQ7NHss1X2M
+         dLDcCV/PJLtN6BFziFbNMh9IiVbAxSkiJ4dxdTx48geHuemYYrUek1bHr23wCsYN+iVM
+         hRyg==
+X-Gm-Message-State: AGi0Pubk4M+aVapQJc/fO1Qik9hs3qL4vXT11L/icNFxAK5lIz5SR7LZ
+        afG1agQYkDrEpnsEftJ6sJKQ/QN8kXLg++4gftE=
+X-Google-Smtp-Source: APiQypJoFFkbwvHNs7m2NtbtOkd6202kUw0Zhm4Xg4fnqOTM83ohDAaCR7uPl1lz0AyybO2GXi0EnO5JCXeTMI5sX7g=
+X-Received: by 2002:a05:6638:38e:: with SMTP id y14mr11426792jap.123.1586690986095;
+ Sun, 12 Apr 2020 04:29:46 -0700 (PDT)
+MIME-Version: 1.0
+References: <CABV8kRw_jGxPqWc68Bj-uP_hSrKO0MmShOmtuzGQA2W3WHyCrg@mail.gmail.com>
+In-Reply-To: <CABV8kRw_jGxPqWc68Bj-uP_hSrKO0MmShOmtuzGQA2W3WHyCrg@mail.gmail.com>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Sun, 12 Apr 2020 14:29:35 +0300
+Message-ID: <CAOQ4uxhPKR34cXvWfF49z8mTGJm+oP2ibfohsXNdY7tXaOi4RA@mail.gmail.com>
+Subject: Re: Same mountpoint restriction in FICLONE ioctls
+To:     Keno Fischer <keno@juliacomputing.com>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Olga Kornievskaia <kolga@netapp.com>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We already dump these keys for SMB3, lets also dump it for SMB2
-sessions so that we can use the session key in wireshark to check and validate
-that the signatures are correct.
++CC XFS,NFS,CIFS
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/smb2pdu.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+On Sun, Apr 12, 2020 at 1:06 PM Keno Fischer <keno@juliacomputing.com> wrote:
+>
+> Hello,
+>
+> I was curious about the reasoning behind the
+> same-mountpoint restriction in the FICLONE
+> ioctl. I saw that in commit
+>
+> [913b86e92] vfs: allow vfs_clone_file_range() across mount points
+>
+> this check was moved from the vfs layer into
+> the ioctl itself, so it appears to be a policy restriction
+> rather than a technical limitation. I understand why
+> hardlinks are disallowed across mount point boundaries,
+> but it seems like that rationale would not apply to clones,
+> since modifying the clone would not affect the original
+> file. Is there some other reason that the ioctl enforces
+> this restriction?
+>
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 28c0be5e69b7..3ddb0fe6889a 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1541,6 +1541,21 @@ SMB2_sess_auth_rawntlmssp_authenticate(struct SMB2_sess_data *sess_data)
- 	}
- 
- 	rc = SMB2_sess_establish_session(sess_data);
-+#ifdef CONFIG_CIFS_DEBUG_DUMP_KEYS
-+	if (ses->server->dialect < SMB30_PROT_ID) {
-+		cifs_dbg(VFS, "%s: dumping generated SMB2 session keys\n", __func__);
-+		/*
-+		 * The session id is opaque in terms of endianness, so we can't
-+		 * print it as a long long. we dump it as we got it on the wire
-+		 */
-+		cifs_dbg(VFS, "Session Id    %*ph\n", (int)sizeof(ses->Suid),
-+			 &ses->Suid);
-+		cifs_dbg(VFS, "Session Key   %*ph\n",
-+			 SMB2_NTLMV2_SESSKEY_SIZE, ses->auth_key.response);
-+		cifs_dbg(VFS, "Signing Key   %*ph\n",
-+			 SMB3_SIGN_KEY_SIZE, ses->auth_key.response);
-+	}
-+#endif
- out:
- 	kfree(ntlmssp_blob);
- 	SMB2_sess_free_buffer(sess_data);
--- 
-2.13.6
+I don't know. I suppose that when FICLONE was introduced
+there wasn't any use case for cross mount clone.
 
+Note that copy_file_range() also had this restriction, which was
+recently lifted, because NFSv4 and CIFS needed this functionality.
+
+As far as I can tell, CIFS and NFSv4 can also support cross mount
+clone, but nobody stepped up to request or implement that.
+
+The question is: do you *really* need cross mount clone?
+Can you use copy_file_range() instead?
+It attempts to do remap_file_range() (clone) before falling back to
+kernel copy_file_range().
+
+> Removing this restrictions would have some performance
+> advantages for us, but I figured there must be a good reason
+> why it's there that I just don't know about, so I figured I'd ask.
+>
+
+You did not specify your use case.
+Across which filesystems mounts are you trying to clone?
+
+Thanks,
+Amir.
