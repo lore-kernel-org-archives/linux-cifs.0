@@ -2,113 +2,114 @@ Return-Path: <SRS0=FuFi=55=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECDC6C2BA19
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Apr 2020 16:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE7FBC352B6
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Apr 2020 19:40:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C34C1206DA
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Apr 2020 16:37:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1E2720732
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Apr 2020 19:40:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gkp8FwXM"
+	dkim=pass (2048-bit key) header.d=juliacomputing-com.20150623.gappssmtp.com header.i=@juliacomputing-com.20150623.gappssmtp.com header.b="1x8U2KZM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731657AbgDMQhx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 13 Apr 2020 12:37:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42926 "EHLO
+        id S2388000AbgDMTkk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 13 Apr 2020 15:40:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1731652AbgDMQhw (ORCPT
+        by vger.kernel.org with ESMTP id S2387997AbgDMTkh (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 13 Apr 2020 12:37:52 -0400
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC58C0A3BDC;
-        Mon, 13 Apr 2020 09:37:51 -0700 (PDT)
-Received: by mail-lj1-x243.google.com with SMTP id r24so9377796ljd.4;
-        Mon, 13 Apr 2020 09:37:51 -0700 (PDT)
+        Mon, 13 Apr 2020 15:40:37 -0400
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67AEFC0A3BE2
+        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2020 12:40:35 -0700 (PDT)
+Received: by mail-il1-x12c.google.com with SMTP id i2so8813640ils.12
+        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2020 12:40:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=juliacomputing-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=5m0R0HH7xPMq9eV0wmAE5UEDNS7eZKBSnZWMR5kVcDw=;
-        b=gkp8FwXMYf5wvGgoKzptwHCycc7Ie2RYdjk6B0M83HhH/7yF6wQOB6lmwLhkWGXPFS
-         3jFIkxEWYMSbRYovjFGWQWtFgRMV6GX5T0nttEM9mjdG2UdM5KwlRqDGRex1qy8IJtT8
-         AixbzhT0O6by7knmIcP9NQFxzMo0X0V7MQllsWgpwhtfmcdHnBv7QCE6lPAj5DRVVlIh
-         +3zUnM30fa2Eqs8pWZ9gRci0tYxna4mZOZtsg8e6spoAOBjuoMlirOgwJNNxUzZqv7Yh
-         eTL5eDwfSSFf407pWo1BJ/ENmoQ9Chd/KPOTiG75kDg42ZCgWhSClyp++045164UqYYL
-         WFTQ==
+         :cc;
+        bh=bdK8gEyBj47+B+b5fdWD48DFf9snz/SocRpKyG/PMKw=;
+        b=1x8U2KZMxLh/Y782kba7SyBXt1QFaYYGloH3M3XRqPHvjiH2sJChN66jW+0oFeYTho
+         U3L1FYkAiqUREN247XRMF+D9yNlFBFCwnvXrstKNfnLkFZgulF1vt3r9u3ewQnRRdlX1
+         ZM/jrhK7ZZkhAAQoeg5QtMZesveYglPTsh7Q+RqGlSxHkvA6V3plAF0jBUQbY9NtCwas
+         Y+Px8gK2IVOkpFQ3xiy5g8ywMA2Zt4DKXaeRoYg2yyG/nXnRDqNCE87GJG9j/1C10x5Z
+         MfkMxvvdM71yjDwaY0nbxX+Yd5JaG3w//3ZXeQNKiX2QRcF8Ml5y9h6WpbuMziJnx9vQ
+         bOXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=5m0R0HH7xPMq9eV0wmAE5UEDNS7eZKBSnZWMR5kVcDw=;
-        b=EZ14ut4f8CwXPnaGfiacYXtnmNDMX1MYdC78lkL/6CKloB02v8MqD0fr4Nuf0Zr7ct
-         /kZA7I6ejLPfK1ms+VpaQ/yKaOrex+Z3Ctw2Kw5hcP5VXAnLFzggHJwSZSQvszB+d+cE
-         JxA9Jw7le1hRqs2/7ER4EOtXeE+FeqrdDeyNc1q0N3Q3whQ8Wb3oplmwMeo6/wyqbL1U
-         kcMP4amRVVx3+Y3ez5BYsdNcJx5GWHe8KBgVZSbYaxiAUDxvvR8WLMOaVxcSssTVsEvY
-         P/aBOhGsWqZIfluHijTacn/G127IkywrgTFUii4JLEJf/wmKvQ2Y+CrV8J1o6VSBXatG
-         SenA==
-X-Gm-Message-State: AGi0PuauoM7EVIqhK0rNo2F+EmH1pIGPhfIaqgkpsRQuaZhpNzFsQrE4
-        GHRIwnHTVAm9ZYLPfVagVAZqMSTvyb7rd9diHg==
-X-Google-Smtp-Source: APiQypKwJ7dCuFOX7Y93nrccvrccezhTEhgLknrZUISWmmHboFRRxHEMB6PMFWIu0dTkl7gqf/FfWgTspjJhsV2Eemg=
-X-Received: by 2002:a2e:b53b:: with SMTP id z27mr2036328ljm.109.1586795870329;
- Mon, 13 Apr 2020 09:37:50 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=bdK8gEyBj47+B+b5fdWD48DFf9snz/SocRpKyG/PMKw=;
+        b=gcbRnWx/ZSA5U1utVTwKdIA8804IkZ7elXlBwbcHCI4gZuhPPXTZO+SHZolmZuPwM4
+         9hbpiImoPWp9HZohHtPH2aCpm6iwyCbn9mAMyM3VtsZsjugUT959bBVPA4mVqb768V9R
+         IA4NqvcM6FuFBOjawmPHa7Al8cLNwggTkaLbfI0fXPhAQigvSudjh5eGfOcRcBwWonde
+         89T3hzXKBAtD1EoZktLHjaSjXMQnlNMuoVTuyALkbEB+WsA6Rf5r0pIAL3vJhyV9q2SQ
+         YDyOMkCJ2rqWn1nLQYv0egXvtvpywiXdQpHTUV9bLNP0VYaMknAjo6iJ/KvSqMIapz+Z
+         arYw==
+X-Gm-Message-State: AGi0PuYx8YJQom7x+p2KfyLjZVYlhBvf2QT63X4Buoi7R1CFJce1ixYb
+        zHlpFSY9Df+n6RNL+cGU5ELTYFmx5QKZS9UtsB2E4w==
+X-Google-Smtp-Source: APiQypIknUBY7zD49Gd1oPk5pW7D4JYc6dZ50SjzIyGXfthayjGIWZ1Eh2CgEOvbLhUjF/axckqco/b7Gsb8b6IyFfM=
+X-Received: by 2002:a92:5f17:: with SMTP id t23mr4857115ilb.2.1586806834685;
+ Mon, 13 Apr 2020 12:40:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAEUGjKiLPQP9wp0AgLUvHgKBOe9We2a-RQaZ7cd7CvhnarwWiw@mail.gmail.com>
- <CAKywueT0Q9WkANNsg8cEDwGZSMaaE5c4LHuEeMhVDzJAzycroQ@mail.gmail.com> <CAEUGjKhSBNQboKOMFMgos9OQfxcLQZsXp8aBrUSFcaSe1saH2Q@mail.gmail.com>
-In-Reply-To: <CAEUGjKhSBNQboKOMFMgos9OQfxcLQZsXp8aBrUSFcaSe1saH2Q@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Mon, 13 Apr 2020 09:37:38 -0700
-Message-ID: <CAKywueTsaRfut9C4qj96Qc5VaeuRKO2WjahS==bz5kAqWB1KNQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: improve read performance for page size 64KB &
- cache=strict & vers=2.1+
-To:     Jones Syue <jonessyue@qnap.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Samba Technical <samba-technical@lists.samba.org>,
-        Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <CABV8kRw_jGxPqWc68Bj-uP_hSrKO0MmShOmtuzGQA2W3WHyCrg@mail.gmail.com>
+ <CAOQ4uxhPKR34cXvWfF49z8mTGJm+oP2ibfohsXNdY7tXaOi4RA@mail.gmail.com>
+ <CABV8kRxVA0j2qLkyWx+vULh2DxK2Ef4nPk-zXCikN8XmdBOFgQ@mail.gmail.com> <CAOQ4uxh2KKwORLC+gWEF=mWzBa3Kh4A4HgRoiad5N5qu06xjcg@mail.gmail.com>
+In-Reply-To: <CAOQ4uxh2KKwORLC+gWEF=mWzBa3Kh4A4HgRoiad5N5qu06xjcg@mail.gmail.com>
+From:   Keno Fischer <keno@juliacomputing.com>
+Date:   Mon, 13 Apr 2020 15:39:58 -0400
+Message-ID: <CABV8kRxsGm2-RLsuWPQGc82=6+x8v8FtV0=a6MQS=Nt-Pv3V9A@mail.gmail.com>
+Subject: Re: Same mountpoint restriction in FICLONE ioctls
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Miklos Szeredi <mszeredi@redhat.com>,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Olga Kornievskaia <kolga@netapp.com>,
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good, thanks!
+> You make it sound like the heuristic decision must be made
+> *after* trying to clone, but it can be made before and pass
+> flags to the kernel whether or to fallback to copy.
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+True, though I simplified slightly. There's other things we try
+first if the clone fails, like creating a hardlink. If cloning fails,
+we also often only want to copy a part of the file (again
+heuristically, whether more than what the program asked
+for will be useful for debugging)
 
---
-Best regards,
-Pavel Shilovsky
+> copy_file_range(2) has an unused flags argument.
+> Adding support for flags like:
+> COPY_FILE_RANGE_BY_FS
+> COPY_FILE_RANGE_BY_KERNEL
 
-=D0=B2=D1=81, 12 =D0=B0=D0=BF=D1=80. 2020 =D0=B3. =D0=B2 19:23, Jones Syue =
-<jonessyue@qnap.com>:
->
-> Hello Pavel
->
-> Thanks for kindly reviewing!
-> Please find the attached v2.patch.
->
-> --
-> Regards,
-> Jones Syue | =E8=96=9B=E6=87=B7=E5=AE=97
-> QNAP Systems, Inc.
->
->
-> On Sat, Apr 11, 2020 at 2:25 AM Pavel Shilovsky <piastryyy@gmail.com> wro=
-te:
-> >
-> > Hi Jones,
-> >
-> > Thanks for the patch!
-> >
-> > It will work although it is probably a little bit cleaner to
-> > initialize server->max_read to server->maxBuf for SMB1 and use the
-> > server->max_read in the readpages condition check instead.
-> >
-> > @Others, thoughts?
-> >
-> > --
-> > Best regards,
-> > Pavel Shilovsky
+That would solve it of course, and I'd be happy with that
+solution, but it seems like we'd end up with just another
+spelling for the cloning ioctls then that have subtly different
+semantics.
+
+> I can also suggest a workaround for you.
+> If your only problem is bind mounts and if recorder is a privileged
+> process (CAP_DAC_READ_SEARCH) then you can use a "master"
+> bind mount to perform all clone operations on.
+> Use name_to_handle_at(2) to get sb file handle of source file.
+> Use open_by_handle_at(2) to get an open file descriptor of the source
+> file under the "master" bind mount.
+
+Thanks, that's a very valuable suggestion - I hadn't considered
+that. Unfortunately, I don't think the recorder does generally have
+those privileges. It doesn't help in my use case, since I'm recording
+a container that makes use of user namespaces, so nothing requires
+priviledge, but it does seem like it would be useful if the recorder does
+have appropriate capabilities (rr already has a mode where it runs
+with privilege, e.g. for recording setuid binaries).
+
+Keno
