@@ -1,76 +1,137 @@
-Return-Path: <SRS0=FuFi=55=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=o2U4=56=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FDA6C2BA2B
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Apr 2020 23:26:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9BDC2BB86
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Apr 2020 00:30:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D52022075E
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Apr 2020 23:26:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B80A2166E
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Apr 2020 00:30:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YQaZcA6C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PMRE9MFB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389974AbgDMX04 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 13 Apr 2020 19:26:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727839AbgDMX0z (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 13 Apr 2020 19:26:55 -0400
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808C4C0A3BDC;
-        Mon, 13 Apr 2020 16:26:55 -0700 (PDT)
-Received: by mail-yb1-xb34.google.com with SMTP id g6so6157441ybh.12;
-        Mon, 13 Apr 2020 16:26:55 -0700 (PDT)
+        id S2390485AbgDNAaE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 13 Apr 2020 20:30:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47866 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390461AbgDNAaC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 13 Apr 2020 20:30:02 -0400
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE3CC008613
+        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2020 17:30:00 -0700 (PDT)
+Received: by mail-pf1-x442.google.com with SMTP id r14so5277084pfl.12
+        for <linux-cifs@vger.kernel.org>; Mon, 13 Apr 2020 17:30:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=yG3fNKshW7r+Tp/fTvnCfUCdvteVMueq4fN0wsYEHcE=;
-        b=YQaZcA6CjuIVjCyRDtvWOiL+ETSg+H2a9wd1B9wUtMgB+mn9AHOGrxWZZRFv28uCo/
-         nhxW2vXFxAwhy+cJ1FWvSdV5fekdxKcYBFDKsi5jetBk9+sB+BGQY4aBQOSWfua3jEig
-         xoC24kNoPjwW81FmxVRzkyCJP4ddlGncBliDWJGPsszMIHkENqoiYL1LQCsVpP9eDn5m
-         QoY5zeoTr9Mdrd4SFn5vnAZ2RmxPLAtFiou2m/ljjLJZSzemIoLXYQlkhCf2BvgdmWSv
-         J40Dl9Yf+cfA9J6QvMTs1y2DRVqMvBX4O0PqReb1arokN8YAFRLaAqYP4+s0fTInOQY4
-         QWtw==
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:in-reply-to:message-id:references
+         :user-agent:mime-version;
+        bh=GtP40NBc6K+wY7TevCqJVJVyGGxw6eyhk3x6njvRZbI=;
+        b=PMRE9MFBjRNguCLZJxvQ0tC6cbj5HN/L0mNJHOjg1H5naWvyPaji8Uw6CjXqOQ2azW
+         MhWs/LuNrHlvICFisvb7Cy6SJ3VKQrmiHJlokad5hGoOXcGXzDY3vorrrgpyAZrAVUDE
+         dUN76VdbMCLvs9G10TRyVoj/R2uKEUPKhrkRhwWPh9Qq6Oj8zqhrDAXwnWHye+K8R3ym
+         lDZQumSHVx6+RupP9U0o1EyjztcXPr7zTXefIIyzd+nYkxQBJg3bKkumuWN4k6N/hrZC
+         eN210smaNX58gX6QVglgalvDGfi5xzWfnOSt7/cWPG1d3xQeaexIo7gZ03EO3NRYAH/8
+         2wUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=yG3fNKshW7r+Tp/fTvnCfUCdvteVMueq4fN0wsYEHcE=;
-        b=Yal+RR1E7sPNiwHmh3iF8kEjHpTZWgN55UIrs8GcM9yIn5uv1v6X0JV8J1mr6pDKxD
-         9K+poqDixY842lzdPbUUdKgSUe4N7NH7O8Hs5B7JyamVXmJD0v6fYdSPA73hqP+zD29J
-         oBmZgU2LANc7Ly+7DveBdgMcYtNq6IeHpJKZKmfPS4SA8DUMEfEo0gQkDNHXnGpfyjAT
-         eXktSRCuMvVi9JA91tXc0dx0v6zBNtucctC/3PqfmHE5Oxa/1uq9AmFbqyxfGC+ekf0K
-         42ClN9lZdkbpy71QV/ANKJvRpn1fF3JGVw7Nr8L63Fz5wHUF4dpMnBBv2qAZ4aAVeeNX
-         39vg==
-X-Gm-Message-State: AGi0PuaTPXrIMaEsDl/AY8S6tCCt9UoQZGMRJvB5mnnY8m7VaMo64ex6
-        2xdscsNFO2JEed0FSFoqnmYx1S2nizMcY7hROLML2mQO
-X-Google-Smtp-Source: APiQypJR10P9Uy26BeYm1oqKqfY8jQeBMRG+1HNT0uLUY8vzndes77nStCt4NQU6cAJnXqSuBxGNbjZV85fMAPtO1rU=
-X-Received: by 2002:a25:b78b:: with SMTP id n11mr33636844ybh.376.1586820414396;
- Mon, 13 Apr 2020 16:26:54 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
+         :references:user-agent:mime-version;
+        bh=GtP40NBc6K+wY7TevCqJVJVyGGxw6eyhk3x6njvRZbI=;
+        b=fOzGrcyzeY8SNa2V0lQhANWHtw0c/QbLxuTdlfNF2aYI0NPqEDUaeRZpe9OYmB0l6O
+         molc7Sgi5MSF0g0/K6cNgL6xCD1NXeiHfFjQbCIlM8OnVAOcugPJ1gHNipwqRoQitQWc
+         Ge9l0tLjsro4OyzNdKaOrHEEi3BthWZtAe8Ycf2eeM9jwH4kshjJ1wrjUQdpNetjFQvR
+         Vv26tzKD6fmd+5DLKwB2Ms83hP2PSPAsUPd2ZhtcaNqg6eMdx8dAxDDQS3F3nUSITxBx
+         omeNNPJVXt09xzs/77WxQm2pz736rpXWKHPJf6dc0jcHzrnuftMLjcCgLN6rPmQ3dqCy
+         ObCQ==
+X-Gm-Message-State: AGi0PuYD5QP0VsxskAu9nV9k3A+czT0Q+cyRMXkvKhwhQG34xgxRk3EQ
+        8plDbFQryp3UdEDAY+9H9zqzEg==
+X-Google-Smtp-Source: APiQypL5W5g7xmsU3GZXO1UecYYPwVLK1dPD412glciRM3pdZ8NSkRu/LjnNHn8Pg6Fxg4L/cgCpIw==
+X-Received: by 2002:a62:dd48:: with SMTP id w69mr10144721pff.86.1586824199909;
+        Mon, 13 Apr 2020 17:29:59 -0700 (PDT)
+Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
+        by smtp.gmail.com with ESMTPSA id g11sm10055136pjs.17.2020.04.13.17.29.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Apr 2020 17:29:59 -0700 (PDT)
+Date:   Mon, 13 Apr 2020 17:29:58 -0700 (PDT)
+From:   David Rientjes <rientjes@google.com>
+X-X-Sender: rientjes@chino.kir.corp.google.com
+To:     Waiman Long <longman@redhat.com>
+cc:     Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Joe Perches <joe@perches.com>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        x86@kernel.org, linux-crypto@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, linux-ppp@vger.kernel.org,
+        wireguard@lists.zx2c4.com, linux-wireless@vger.kernel.org,
+        devel@driverdev.osuosl.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        cocci@systeme.lip6.fr, linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Subject: Re: [PATCH 1/2] mm, treewide: Rename kzfree() to kfree_sensitive()
+In-Reply-To: <20200413211550.8307-2-longman@redhat.com>
+Message-ID: <alpine.DEB.2.21.2004131729410.260270@chino.kir.corp.google.com>
+References: <20200413211550.8307-1-longman@redhat.com> <20200413211550.8307-2-longman@redhat.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 13 Apr 2020 18:26:43 -0500
-Message-ID: <CAH2r5msrX8CqNRnhObAuNs501sGAib4fOfsTbVhR6eY15=zmGw@mail.gmail.com>
-Subject: how to create VM for testing with page size 64K
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I was trying to test a file system patch for a case where page size is
-64K (apparently possible with ARM) - any easy way to build the kernel
-for the usual VMs (amd64 etc.) where page size is 64K instead of 4K so
-I can test the patch ...?
+On Mon, 13 Apr 2020, Waiman Long wrote:
 
--- 
-Thanks,
+> As said by Linus:
+> 
+>   A symmetric naming is only helpful if it implies symmetries in use.
+>   Otherwise it's actively misleading.
+> 
+>   In "kzalloc()", the z is meaningful and an important part of what the
+>   caller wants.
+> 
+>   In "kzfree()", the z is actively detrimental, because maybe in the
+>   future we really _might_ want to use that "memfill(0xdeadbeef)" or
+>   something. The "zero" part of the interface isn't even _relevant_.
+> 
+> The main reason that kzfree() exists is to clear sensitive information
+> that should not be leaked to other future users of the same memory
+> objects.
+> 
+> Rename kzfree() to kfree_sensitive() to follow the example of the
+> recently added kvfree_sensitive() and make the intention of the API
+> more explicit. In addition, memzero_explicit() is used to clear the
+> memory to make sure that it won't get optimized away by the compiler.
+> 
+> The renaming is done by using the command sequence:
+> 
+>   git grep -w --name-only kzfree |\
+>   xargs sed -i 's/\bkzfree\b/kfree_sensitive/'
+> 
+> followed by some editing of the kfree_sensitive() kerneldoc and the
+> use of memzero_explicit() instead of memset().
+> 
+> Suggested-by: Joe Perches <joe@perches.com>
+> Signed-off-by: Waiman Long <longman@redhat.com>
 
-Steve
+Acked-by: David Rientjes <rientjes@google.com>
