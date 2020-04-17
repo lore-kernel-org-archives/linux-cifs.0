@@ -1,168 +1,92 @@
-Return-Path: <SRS0=tWJG=6A=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=3vLh=6B=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F672C2BB55
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Apr 2020 15:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A5DC38A2C
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Apr 2020 11:31:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E2A9621D91
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Apr 2020 15:34:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iqUrY2H9"
+	by mail.kernel.org (Postfix) with ESMTP id 9DB7F207FC
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Apr 2020 11:31:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2898193AbgDPNkr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Apr 2020 09:40:47 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:43404 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2898166AbgDPNko (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Apr 2020 09:40:44 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03GDcKwv084649;
-        Thu, 16 Apr 2020 13:40:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2020-01-29; bh=+FwckwE718nnFr/35g3gcj/92E89oTBl1ZMCTR5KEIM=;
- b=iqUrY2H9ib6Tqb8czeWAPq4BibUWiDCpkkPRWOnjSVYxuYoossgOsmNXjtBStklxsrN/
- BOrP9qPYV44t2frUqNHruNf9bA99+R1qP05U+WRC7YzNrDD4UzCq2QgGT4EAt3bshHe6
- uvecHlGvvSUAozs7pESH75q4v9OcVMlmTfFEh0f+eEkP2GqqF+jBS5y6ULF4Gts0ilKP
- UQfVBSJ7cQ7MzwTlxH2YR1ArDYswN+/zbvf8AinEnvTOh0UOv/IUc/kzXkl9LS1QrkrD
- UccoJqRh/62a5sd4sXPR5SXu9rhd4Vp7QE2zsD71SkinXrPHQBHbDi4LQL4ew9aox85j 2Q== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 30dn95sfm5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Apr 2020 13:40:34 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03GDc55R134095;
-        Thu, 16 Apr 2020 13:40:33 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 30dynyqbr5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Apr 2020 13:40:33 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03GDeWWD019065;
-        Thu, 16 Apr 2020 13:40:32 GMT
-Received: from anon-dhcp-153.1015granger.net (/68.61.232.219)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 16 Apr 2020 06:40:32 -0700
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: What's a good default TTL for DNS keys in the kernel
-From:   Chuck Lever <chuck.lever@oracle.com>
-In-Reply-To: <128769.1587032833@warthog.procyon.org.uk>
-Date:   Thu, 16 Apr 2020 09:40:30 -0400
+        id S1730336AbgDQLbo convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Apr 2020 07:31:44 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55428 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730236AbgDQLbo (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 17 Apr 2020 07:31:44 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 4A696ABEF;
+        Fri, 17 Apr 2020 11:31:40 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Chuck Lever <chuck.lever@oracle.com>,
+        David Howells <dhowells@redhat.com>
 Cc:     Florian Weimer <fweimer@redhat.com>,
         Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
         linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
         ceph-devel@vger.kernel.org, keyrings@vger.kernel.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <8DC44895-E904-4155-B7B8-B109A777F23C@oracle.com>
+Subject: Re: What's a good default TTL for DNS keys in the kernel
+In-Reply-To: <8DC44895-E904-4155-B7B8-B109A777F23C@oracle.com>
 References: <874ktl2ide.fsf@oldenburg2.str.redhat.com>
  <3865908.1586874010@warthog.procyon.org.uk>
  <128769.1587032833@warthog.procyon.org.uk>
-To:     David Howells <dhowells@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9592 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
- malwarescore=0 phishscore=0 spamscore=0 adultscore=0 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004160097
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9592 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 clxscore=1011
- malwarescore=0 bulkscore=0 priorityscore=1501 lowpriorityscore=0
- mlxscore=0 phishscore=0 spamscore=0 impostorscore=0 suspectscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004160097
+ <8DC44895-E904-4155-B7B8-B109A777F23C@oracle.com>
+Date:   Fri, 17 Apr 2020 13:31:39 +0200
+Message-ID: <87sgh22vs4.fsf@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi David-
+Chuck Lever <chuck.lever@oracle.com> writes:
+> The Linux NFS client won't connect to a new server when the server's
+> DNS information changes. A fresh mount operation would be needed for
+> the client to recognize and make use of it.
+>
+> There are mechanisms in the NFSv4 protocol to collect server IP addresses
+> from the server itself (fs_locations) and then try those locations if the
+> current server fails to respond. But currently that is not implemented in
+> Linux (and servers would need to be ready to provide that kind of update).
 
-> On Apr 16, 2020, at 6:27 AM, David Howells <dhowells@redhat.com> =
-wrote:
->=20
-> Florian Weimer <fweimer@redhat.com> wrote:
->=20
->> You can get the real TTL if you do a DNS resolution on the name and
->> match the addresses against what you get out of the NSS functions.  =
-If
->> they match, you can use the TTL from DNS.  Hackish, but it does give =
-you
->> *some* TTL value.
->=20
-> I guess I'd have to do that in parallel.  Would calling something like
-> res_mkquery() use local DNS caching?
->=20
->> The question remains what the expected impact of TTL expiry is.  Will
->> the kernel just perform a new DNS query if it needs one?  Or would =
-you
->> expect that (say) the NFS client rechecks the addresses after TTL =
-expiry
->> and if they change, reconnect to a new NFS server?
->=20
-> It depends on the filesystem.
+We have a very similar system in CIFS. Failover can be handled in 2 ways
+(technically both can be used at the same time):
 
-Agreed. For example:
+a) with DFS, the mount can have a list of possible location to connect
+   to, sort of like cross-server symlinks with multiple possible
+   targets. Note that the target value uses hostnames.
+b) the domain controler can notice the server is down and automatically
+   switch the server hostname DNS entry to a backup one with a different IP.
 
-The Linux NFS client won't connect to a new server when the server's
-DNS information changes. A fresh mount operation would be needed for
-the client to recognize and make use of it.
+>> CIFS also doesn't make direct use of the TTL, and again this may be because it
+>> uses the server address as part of the primary key for the superblock (see
+>> cifs_match_super()).
 
-There are mechanisms in the NFSv4 protocol to collect server IP =
-addresses
-from the server itself (fs_locations) and then try those locations if =
-the
-current server fails to respond. But currently that is not implemented =
-in
-Linux (and servers would need to be ready to provide that kind of =
-update).
+When we try to reconnect after a failure (using (a) or just reconnecting
+to same server) we resolve the host again to try to use any new IP (in
+case (b) happened). This is done via upcalling using the request_key()
+API.
 
+The cifs.upcall prog (from cifs-utils) calls getaddrinfo() and sets a
+key with a default TTL of 10mn [2][3] but if the system uses DNS caching
+via nscd[1] there's no way to tell how long the old IP will remain in
+use...
 
-> AFS keeps track of the expiration on the record and will issue a new =
-lookup
-> when the data expires, but NFS doesn't make use of this information.  =
-The
-> keyring subsystem will itself dispose of dns_resolver keys that expire =
-and
-> request_key() will only upcall again if the key has expired.
+1: https://linux.die.net/man/8/nscd
+2: https://github.com/piastry/cifs-utils/blob/9a8c21ad9e4510a83a3a41f7a04f763a4fe9ec09/cifs.upcall.c#L66
+3: https://github.com/piastry/cifs-utils/blob/9a8c21ad9e4510a83a3a41f7a04f763a4fe9ec09/cifs.upcall.c#L783
 
-Our NFS colleagues working on Solaris have noted that handling the =
-expiry
-of DNS information can be tricky. It is usually desirable to continue =
-using
-expired information when a new DNS query fails temporarily (times out, =
-or
-the network is partitioned, etc). That makes for a more robust network =
-file
-service.
-
-
-> The problem for NFS is that the host IP address is the primary key for =
-the
-> superblock (see nfs_compare_super_address()).
-
-I thought that NFSv4.1 and newer have server-provided unique information
-that might be used in place of the server's IP address. This information
-is supposed to be independent of a server's network addresses.
-
-
-> CIFS also doesn't make direct use of the TTL, and again this may be =
-because it
-> uses the server address as part of the primary key for the superblock =
-(see
-> cifs_match_super()).
-
---
-Chuck Lever
-
-
-
+Cheers,
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
