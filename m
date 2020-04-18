@@ -1,109 +1,81 @@
-Return-Path: <SRS0=3vLh=6B=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=QeLg=6C=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A845C2BB1D
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Apr 2020 23:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9610C38A29
+	for <linux-cifs@archiver.kernel.org>; Sat, 18 Apr 2020 18:11:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 304F8221EA
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Apr 2020 23:24:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9983F221F7
+	for <linux-cifs@archiver.kernel.org>; Sat, 18 Apr 2020 18:11:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJdb1cMF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fmR27FWL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727911AbgDQXYG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Apr 2020 19:24:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33860 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726036AbgDQXYF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Apr 2020 19:24:05 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81C8AC061A0C;
-        Fri, 17 Apr 2020 16:24:05 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id l5so1921595ybf.5;
-        Fri, 17 Apr 2020 16:24:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HoiSxHhSigFRcJk85mjSruoDJHuLkPKUFTIYImgm6Ug=;
-        b=kJdb1cMFcngGa0qp/KwVwgNtuNxTmrDtjaIwLAJFoNFpQhRy6q5sHg5MTKyXeGjwWu
-         vBHicJ4/2qO+c9u26+845klREFX9I5XdF+lkZsUOX2W59oXD0X0snxgaFfClthr3xbn7
-         CSudiFAf2zSIPObwc6IUG29u/5JVnUYcHJCsdF3lhu2ldziUi5lRt1Q4zpTHq3PeSNwp
-         Ng7+cMA/1D8kIComwJKKXIEVQliODb/0w0bKTuk3Wjf9vtPXDhcpIxgRPo+bitkuLBz8
-         T/MyKESZ3xGPBcP7fJ3cdb8wdGhksJnnBUgXmE7OdCW6qXouR6PLxcE4Ehr2Pan6h5je
-         ocIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HoiSxHhSigFRcJk85mjSruoDJHuLkPKUFTIYImgm6Ug=;
-        b=PpJ9P/8wjU3j4oc3yZw7kO8WwsGNPB8NCIPH30Tz6MYU7JIC3fRhBH8b2rEB7Jequj
-         m5qV+TMT/hjNrBibT7NSb+T1c73BcBaiBFi94ypGHFs6DQPLNaTZQybeWBDkdu7kk3ln
-         1BDDra7oOkvl9UwWvIHGZc5HcFqZmo4m+F+qDkZ7oC2hgqydndMhqJ1bp4lhLQG1g8/j
-         29fRPRgbdy7IY2SaDpFbEUPvsg39H8+QO0Bp5UGe19qV8ZE5xU6+rPlUFk0TcYDN1pLe
-         k7DwHR4YU7s4T9X3Xx2wg9JAZ2OHpn3WvWdV9HHxCeMOv48MtzoUxrsP8F/SQcR09qRT
-         582g==
-X-Gm-Message-State: AGi0PubH9hQX9syL+0r1MIJ3zNS+wTxwF1ydGLWBUuowGujn0jKFLV3r
-        mmJknmdUUZqsQSqMr7c/ZJXrFm4gz/5CSLU9ohzZvcEVB2g=
-X-Google-Smtp-Source: APiQypIaoZNcLb0nbIIWdy9AexGlinfJyksDNrXL01uuwQ39JevXQ5RG2DIGZoNajN0gFWDBeQoLtKsPk7LcZ6YXDU0=
-X-Received: by 2002:a25:aa0c:: with SMTP id s12mr2066981ybi.183.1587165844440;
- Fri, 17 Apr 2020 16:24:04 -0700 (PDT)
-MIME-Version: 1.0
-References: <3865908.1586874010@warthog.procyon.org.uk>
-In-Reply-To: <3865908.1586874010@warthog.procyon.org.uk>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 17 Apr 2020 18:23:53 -0500
-Message-ID: <CAH2r5mv5p=WJQu2SbTn53FeTsXyN6ke_CgEjVARQ3fX8QAtK_w@mail.gmail.com>
-Subject: Re: What's a good default TTL for DNS keys in the kernel
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-nfs <linux-nfs@vger.kernel.org>,
+        id S1726751AbgDRSLF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 18 Apr 2020 14:11:05 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34645 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726025AbgDRSLD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 18 Apr 2020 14:11:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587233462;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4MjBHhLWma7Wyo6Y0oaah6/D7fXV7EHmjvl18i27sII=;
+        b=fmR27FWL2yLBFrSVJnhvzPFRJwD4ItzBNr6CtBjHA581JHeZypyZpFXr3TxTYPTLAX4oaU
+        edStjPyFqd4ryz41FGuZ99C4JGFrQgU5is4SY+F14U+f1OljhHmHhQBDjCT+6OZNwvRX8R
+        75u2l9M+DKCVXZLcduJQStJGaZWoKQM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-VnSCfK7uOTK_mHQ6IZsLpQ-1; Sat, 18 Apr 2020 14:10:58 -0400
+X-MC-Unique: VnSCfK7uOTK_mHQ6IZsLpQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BD3D1005510;
+        Sat, 18 Apr 2020 18:10:57 +0000 (UTC)
+Received: from oldenburg2.str.redhat.com (ovpn-112-5.ams2.redhat.com [10.36.112.5])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BEF660C05;
+        Sat, 18 Apr 2020 18:10:54 +0000 (UTC)
+From:   Florian Weimer <fweimer@redhat.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        linux-nfs <linux-nfs@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>, linux-afs@lists.infradead.org,
         ceph-devel@vger.kernel.org, keyrings@vger.kernel.org,
         Network Development <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, fweimer@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: What's a good default TTL for DNS keys in the kernel
+References: <3865908.1586874010@warthog.procyon.org.uk>
+        <CAH2r5mv5p=WJQu2SbTn53FeTsXyN6ke_CgEjVARQ3fX8QAtK_w@mail.gmail.com>
+Date:   Sat, 18 Apr 2020 20:10:53 +0200
+In-Reply-To: <CAH2r5mv5p=WJQu2SbTn53FeTsXyN6ke_CgEjVARQ3fX8QAtK_w@mail.gmail.com>
+        (Steve French's message of "Fri, 17 Apr 2020 18:23:53 -0500")
+Message-ID: <87a738aclu.fsf@oldenburg2.str.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
->> The question remains what the expected impact of TTL expiry is.  Will
->> the kernel just perform a new DNS query if it needs one?
+* Steve French:
 
-For SMB3/CIFS mounts, Paulo added support last year for automatic
-reconnect if the IP address of the server changes.  It also is helpful
-when DFS (global name space) addresses change.
+>>> The question remains what the expected impact of TTL expiry is.  Will
+>>> the kernel just perform a new DNS query if it needs one?
+>
+> For SMB3/CIFS mounts, Paulo added support last year for automatic
+> reconnect if the IP address of the server changes.  It also is helpful
+> when DFS (global name space) addresses change.
 
-It does not require a remount for SMB3/CIFS
+Do you have reference to the source code implementation?  Thanks.
 
-On Tue, Apr 14, 2020 at 11:09 AM David Howells <dhowells@redhat.com> wrote:
->
-> Since key.dns_resolver isn't given a TTL for the address information obtained
-> for getaddrinfo(), no expiry is set on dns_resolver keys in the kernel for
-> NFS, CIFS or Ceph.  AFS gets one if it looks up a cell SRV or AFSDB record
-> because that is looked up in the DNS directly, but it doesn't look up A or
-> AAAA records, so doesn't get an expiry for the addresses themselves.
->
-> I've previously asked the libc folks if there's a way to get this information
-> exposed in struct addrinfo, but I don't think that ended up going anywhere -
-> and, in any case, would take a few years to work through the system.
->
-> For the moment, I think I should put a default on any dns_resolver keys and
-> have it applied either by the kernel (configurable with a /proc/sys/ setting)
-> or by the key.dnf_resolver program (configurable with an /etc file).
->
-> Any suggestion as to the preferred default TTL?  10 minutes?
->
-> David
->
+Florian
 
-
--- 
-Thanks,
-
-Steve
