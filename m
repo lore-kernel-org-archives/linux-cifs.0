@@ -2,54 +2,41 @@ Return-Path: <SRS0=N3pp=6E=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A76BC3815B
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Apr 2020 13:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29788C3815B
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Apr 2020 18:21:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7BED8206DD
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Apr 2020 13:13:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 082B82071C
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Apr 2020 18:21:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f/2co/SU"
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="JeY6U99P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726840AbgDTNNw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Apr 2020 09:13:52 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23238 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726050AbgDTNNs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Apr 2020 09:13:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1587388427;
+        id S1728038AbgDTSVg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Apr 2020 14:21:36 -0400
+Received: from mx.cjr.nz ([51.158.111.142]:21034 "EHLO mx.cjr.nz"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727980AbgDTSVd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 20 Apr 2020 14:21:33 -0400
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 701BB7FCFC;
+        Mon, 20 Apr 2020 18:21:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1587406891;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IYew2ybNbEYlxnWhOLAX8rprgalSjY8htLDKj7llLh0=;
-        b=f/2co/SUzVgqO+vx5jBvEWWT0ZbE7IJgrb7wpxxCkS6cnhDWFHcocKa5iYw8v6fhe1Bf0j
-        WXtK1UTtA1fjvHYzfNiQv7Y2+yWzFVI0hGDs6w1QLZXmeErm0ZXcx1hsJYmNDitVS35fxK
-        RBr57UUVzEb+ct7eka7VJO0DKky4A7E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-109-8q1U0xdCNU2fff9u2tmIGQ-1; Mon, 20 Apr 2020 09:13:45 -0400
-X-MC-Unique: 8q1U0xdCNU2fff9u2tmIGQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80352149C1;
-        Mon, 20 Apr 2020 13:13:43 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-113-129.rdu2.redhat.com [10.10.113.129])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0BDD510013A1;
-        Mon, 20 Apr 2020 13:13:40 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <87imhvj7m6.fsf@cjr.nz>
-References: <87imhvj7m6.fsf@cjr.nz> <CAH2r5mv5p=WJQu2SbTn53FeTsXyN6ke_CgEjVARQ3fX8QAtK_w@mail.gmail.com> <3865908.1586874010@warthog.procyon.org.uk> <927453.1587285472@warthog.procyon.org.uk>
-To:     Paulo Alcantara <pc@cjr.nz>
+        bh=XLtiuMGzfer0pae2SDTC3iJPxGcLgbM+htJ0fXQblHE=;
+        b=JeY6U99PmBoc7K2kOj51HYcjWJeX3//jnLGabU3mmTwXpybaIMRJQSxLX8x/+7gxTOCSTr
+        Hv9mwFQRIWgFkU0lT98JLFFXxsnrL4qfqJunWNNOnIL/KrXOyC5lZOjKcC3YlFTbGDQtU6
+        xiDiGgZdH4R3VvQD3aMCGUX/PVZDmGHawAflJgUTW+n36YLIYoSEEDxOfqo/4tk0toZJoJ
+        QvV5XbHnd5OBz63WIKMLqBxjEsMaOct1YcZv5TRbzGMxha3OUejx3dbWx7r5NQRWS/QhUO
+        DPFmdQUzLUwfD0GPDW+5vaZskSiTqXTNvqVn7Ckm/7Bq1RKQO5JmzPsQb+bzrA==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     David Howells <dhowells@redhat.com>
 Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
         linux-nfs <linux-nfs@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>, linux-afs@lists.infradead.org,
@@ -57,45 +44,44 @@ Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
         Network Development <netdev@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>, fweimer@redhat.com
 Subject: Re: What's a good default TTL for DNS keys in the kernel
+In-Reply-To: <1136024.1587388420@warthog.procyon.org.uk>
+References: <87imhvj7m6.fsf@cjr.nz>
+ <CAH2r5mv5p=WJQu2SbTn53FeTsXyN6ke_CgEjVARQ3fX8QAtK_w@mail.gmail.com>
+ <3865908.1586874010@warthog.procyon.org.uk>
+ <927453.1587285472@warthog.procyon.org.uk>
+ <1136024.1587388420@warthog.procyon.org.uk>
+Date:   Mon, 20 Apr 2020 15:21:23 -0300
+Message-ID: <878siq587w.fsf@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1136023.1587388420.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Mon, 20 Apr 2020 14:13:40 +0100
-Message-ID: <1136024.1587388420@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Paulo Alcantara <pc@cjr.nz> wrote:
+David Howells <dhowells@redhat.com> writes:
 
-> >> For SMB3/CIFS mounts, Paulo added support last year for automatic
-> >> reconnect if the IP address of the server changes.  It also is helpfu=
-l
-> >> when DFS (global name space) addresses change.
-> >
-> > What happens if the IP address the superblock is going to changes, the=
-n
-> > another mount is made back to the original IP address?  Does the secon=
-d mount
-> > just pick the original superblock?
-> =
+> Paulo Alcantara <pc@cjr.nz> wrote:
+>
+>> >> For SMB3/CIFS mounts, Paulo added support last year for automatic
+>> >> reconnect if the IP address of the server changes.  It also is helpful
+>> >> when DFS (global name space) addresses change.
+>> >
+>> > What happens if the IP address the superblock is going to changes, then
+>> > another mount is made back to the original IP address?  Does the second mount
+>> > just pick the original superblock?
+>> 
+>> It is going to transparently reconnect to the new ip address, SMB share,
+>> and cifs superblock is kept unchanged.  We, however, update internal
+>> TCP_Server_Info structure to reflect new destination ip address.
+>> 
+>> For the second mount, since the hostname (extracted out of the UNC path
+>> at mount time) resolves to a new ip address and that address was saved earlier
+>> in TCP_Server_Info structure during reconnect, we will end up
+>> reusing same cifs superblock as per fs/cifs/connect.c:cifs_match_super().
+>
+> Would that be a bug?
 
-> It is going to transparently reconnect to the new ip address, SMB share,
-> and cifs superblock is kept unchanged.  We, however, update internal
-> TCP_Server_Info structure to reflect new destination ip address.
-> =
+Probably.
 
-> For the second mount, since the hostname (extracted out of the UNC path
-> at mount time) resolves to a new ip address and that address was saved e=
-arlier
-> in TCP_Server_Info structure during reconnect, we will end up
-> reusing same cifs superblock as per fs/cifs/connect.c:cifs_match_super()=
-.
-
-Would that be a bug?
-
-David
-
+I'm not sure how that code is supposed to work, TBH.
