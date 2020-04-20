@@ -2,108 +2,69 @@ Return-Path: <SRS0=N3pp=6E=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 527A4C3815B
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Apr 2020 09:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 548D4C3815B
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Apr 2020 11:04:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3046320CC7
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Apr 2020 09:20:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qD7dU5/9"
+	by mail.kernel.org (Postfix) with ESMTP id 36F2520735
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Apr 2020 11:04:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725865AbgDTJUo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Apr 2020 05:20:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58164 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725773AbgDTJUo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 20 Apr 2020 05:20:44 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A99AC061A0C
-        for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2020 02:20:44 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id 72so1019882otu.1
-        for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2020 02:20:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=+o2MubV5Cdgqye2zDT1wZ/fa3KJxNdquL3qHQXEaxGs=;
-        b=qD7dU5/9pqX/YzMqf/28Qxo5sXrWTBq5FmNTpw5B49+Lfcuc7A+xWvbkvNCw/8ldxe
-         TOT3SIm5GlAvxAs5tHm5fhA8Sl7N0JA2rFj1zv3fvUQunlbS6tCQl/RWMNqntr/WFrBq
-         E2ZjAgWmUNoxZAo4uP+M3Nhn/vqVA1uzpZS5fPUYZmJjvgWrO5f0LYp4AHLm/Iyx9HHU
-         6HFUT17t8P/W4V0MCL3cXfIa9O/CqS3D4JoKiIN04OXGsE+Ezir79+Vkbn8sDdt2vuYW
-         bvYhroBcq6utYPUFXfKEh+ASD+F59GcgpufKTwJzYEK2cFPLEX6OVGN/dghb70AzF3yT
-         OMeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=+o2MubV5Cdgqye2zDT1wZ/fa3KJxNdquL3qHQXEaxGs=;
-        b=rIYOylXFQ9tKoh7io4lGAm9tHx4prjtGUQd+l6540nw5bKb1aovh/Aw8vUT1iSdQUJ
-         Fgq+8GGSXP2jaJpjgIRBqPkGdXuvZ2jAAOwpx4Q9bkiUGrbZ7Am88m4hhhC9bDMX7pkZ
-         jowSFTfu21NkuTLmTVI8DMJ5Q40SwrmoBpqH6ZnqxKtGKAASyqBqv2urAzvP5AlUBugo
-         oXi3OFtemPB2UESbAPW2kOeGxfC+h2in5wW2vaCEGtY8CvT7B/soSy4oPsGa54D4du7m
-         WkcRSYSJ0ImyF5oa6SpgZUj4b58djTQ2YsFbomwnDKBqXUVLhU5AzWvnfrbAv7ttJ6fC
-         u/dg==
-X-Gm-Message-State: AGi0PuaBBKbK96kCVk2Ng4O54Xjd914qlRJMIu4KZSNDSo8fu6hxO8Fx
-        twtGg3IW//u9TTBHhI2PI2RGDZveELqmHc1+wxo=
-X-Google-Smtp-Source: APiQypKXdJw5i6XzFACdmaDWlJCa2X2rKsHLET7z47zC6cKsLFZ01xBg0+Kx5BuOSOQEtoJWMP+kvP8uYo1Dba9oz9M=
-X-Received: by 2002:a05:6830:3150:: with SMTP id c16mr8287505ots.251.1587374443720;
- Mon, 20 Apr 2020 02:20:43 -0700 (PDT)
-MIME-Version: 1.0
-From:   =?UTF-8?B?5Lq/5LiA?= <teroincn@gmail.com>
-Date:   Mon, 20 Apr 2020 17:20:32 +0800
-Message-ID: <CANTwqXDyh0Vvc=bgCMafGFLtheDtn31=ffDkg++2qn+RWq=vMQ@mail.gmail.com>
-Subject: [BUG] fs: cifs : does there exist a memleak in function cifs_writev_requeue
-To:     sfrench@samba.org
+        id S1725865AbgDTLEZ convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Apr 2020 07:04:25 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33846 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725775AbgDTLEZ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 20 Apr 2020 07:04:25 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id AF0D3AED2;
+        Mon, 20 Apr 2020 11:04:23 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     =?utf-8?B?5Lq/5LiA?= <teroincn@gmail.com>, sfrench@samba.org
 Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [BUG] fs: cifs : does there exist a memleak in function
+ cifs_writev_requeue
+In-Reply-To: <CANTwqXDyh0Vvc=bgCMafGFLtheDtn31=ffDkg++2qn+RWq=vMQ@mail.gmail.com>
+References: <CANTwqXDyh0Vvc=bgCMafGFLtheDtn31=ffDkg++2qn+RWq=vMQ@mail.gmail.com>
+Date:   Mon, 20 Apr 2020 13:04:23 +0200
+Message-ID: <87lfmq2zbc.fsf@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi all:
- When reviewing the code of function cifs_writev_requeue, wdata2
-allocated in while loop.
-however,  if wdata2->cfile is NULL, the loop break without release
-wdata2, there exists a memleak of wdata2?
+Hi,
 
-static void
-cifs_writev_requeue(struct cifs_writedata *wdata)
-{
-......
-      wdata2 = cifs_writedata_alloc(nr_pages, cifs_writev_complete);
-    // allocate wdata2
-      if (!wdata2) {
-             rc = -ENOMEM;
-             break;
-      }
+亿一 <teroincn@gmail.com> writes:
+> Hi all:
+>  When reviewing the code of function cifs_writev_requeue, wdata2
+> allocated in while loop.
+> however,  if wdata2->cfile is NULL, the loop break without release
+> wdata2, there exists a memleak of wdata2?
 
-      for (j = 0; j < nr_pages; j++) {
-          wdata2->pages[j] = wdata->pages[i + j];
-          lock_page(wdata2->pages[j]);
-          clear_page_dirty_for_io(wdata2->pages[j]);
-      }
+Yes, good catch. It was fixed last year by the following commit:
 
-      wdata2->sync_mode = wdata->sync_mode;
-      wdata2->nr_pages = nr_pages;
-      wdata2->offset = page_offset(wdata2->pages[0]);
-      wdata2->pagesz = PAGE_SIZE;
-      wdata2->tailsz = tailsz;
-      wdata2->bytes = cur_len;
+commit 165df9a080b6
+Author: Pavel Shilovsky <pshilov@microsoft.com>
+Date:   Tue Jan 29 16:40:28 2019 -0800
 
-      wdata2->cfile = find_writable_file(CIFS_I(inode), false);
-      if (!wdata2->cfile) {
-            cifs_dbg(VFS, "No writable handles for inode\n");
-            rc = -EBADF;
-            break;                         // break without release wdata2.
-      }
-      ......
-      }  while (i < wdata->nr_pages);
+    CIFS: Fix leaking locked VFS cache pages in writeback retry
+    
+    If we don't find a writable file handle when retrying writepages
+    we break of the loop and do not unlock and put pages neither from
+    wdata2 nor from the original wdata. Fix this by walking through
+    all the remaining pages and cleanup them properly.
 
-      mapping_set_error(inode->i_mapping, rc);
-      kref_put(&wdata->refcount, cifs_writedata_release);
- }
+Cheers,
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
