@@ -2,147 +2,81 @@ Return-Path: <SRS0=EeRJ=6F=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDB34C38A30
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Apr 2020 02:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCEEC38A30
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Apr 2020 02:37:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C1782078C
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Apr 2020 02:30:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA0AD2084D
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Apr 2020 02:37:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nskicTJK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fn7Eh0z9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726013AbgDUC35 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Apr 2020 22:29:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50544 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725829AbgDUC34 (ORCPT
+        id S1726024AbgDUChy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Apr 2020 22:37:54 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45300 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725829AbgDUChy (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 20 Apr 2020 22:29:56 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC92C061A0E;
-        Mon, 20 Apr 2020 19:29:56 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id l5so6578621ybf.5;
-        Mon, 20 Apr 2020 19:29:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ciqMYOZ6XZlVSQyI6y4r8cJk5afnaKUbe9fyNVTLy4E=;
-        b=nskicTJK540KM6kUpMBHGIY79Scrkytk33f3ctgvzoNRv0IVgrN9FbpxZo338pKKKA
-         dxIuxHw7RBGUbRoiqGjAjYWA18x2D3jDIuVIzE+z4oVzr6HVh1Am00169EbpDgEwdPYd
-         pRzdCpwBS8wO49lvtS4xA+/NezVfob8lBCrdnQzr6TM4nJKx1PKViH5vUgZR2wLcm+hH
-         BJlfJUVNWBYU6IhQbe9wx4izmJQOYRmg4JoaiOHXWH5XrPh7b+/nPthf7pIqlbk61q+9
-         gMs0c04/nw8Vb8XgXULeNori93Te19o399FtO32zVOcz+yqBDY26SSCEiKh4OhEigwiT
-         VvVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ciqMYOZ6XZlVSQyI6y4r8cJk5afnaKUbe9fyNVTLy4E=;
-        b=HMZDbBviJ4fNy9dQJNImZTq4dxP4M8EOoLqjMjH+KkMfEc0BTOd//LvPbwgxPI54Os
-         oLf5ewQj/XquiGicFYm7063jXJStXipUqqyWRIBDAsurA1+V8kGq+xVMpmO3R6ns9o+w
-         JtD3WWXQ6dnay4dHCuD4Y2w0FmTmG2fgqPLIbfa4BUbeoZdD7vzVqt/2MEIYx37mvmsy
-         WIG4Zudu7wPGwVG5ahsecqNrEdDQB1D9cjtCL0QCXxT1kUvXJYnliyXReLug5r+wKGeZ
-         amaVag6hSQUrB4pZ5Xk3pYibILu1IEeeNnGLJcp+Skoa/cDW90AY4rqUhrKKrH6CQjV9
-         xMHw==
-X-Gm-Message-State: AGi0PuYTXeqnHIpLftKFAotGf1IYXLNr5gi5mIDpnv3WjxEHXFSIkYb6
-        EPKy8RVYAEt1FD1NSfHBB76JZLK7P0Oh5Y8+u9w=
-X-Google-Smtp-Source: APiQypJEyN++b8Zrn/RN2+wWJ9QpMpPqYddQf+U0oij1N2zwZqnREbkZdKwu5PYzQWVoGBjggaLlEfcGSBG6yNXVHdk=
-X-Received: by 2002:a25:9cc2:: with SMTP id z2mr22838180ybo.375.1587436195667;
- Mon, 20 Apr 2020 19:29:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <878siq587w.fsf@cjr.nz> <87imhvj7m6.fsf@cjr.nz>
- <CAH2r5mv5p=WJQu2SbTn53FeTsXyN6ke_CgEjVARQ3fX8QAtK_w@mail.gmail.com>
- <3865908.1586874010@warthog.procyon.org.uk> <927453.1587285472@warthog.procyon.org.uk>
- <1136024.1587388420@warthog.procyon.org.uk> <1986040.1587420879@warthog.procyon.org.uk>
- <93e1141d15e44a7490d756b0a00060660306fadc.camel@redhat.com>
-In-Reply-To: <93e1141d15e44a7490d756b0a00060660306fadc.camel@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 20 Apr 2020 21:29:44 -0500
-Message-ID: <CAH2r5msv0r1-bXJKdN-ansMnpay0+Aw9FP5us5zHrhp3adzV=Q@mail.gmail.com>
-Subject: Re: cifs - Race between IP address change and sget()?
-To:     Jeff Layton <jlayton@redhat.com>
-Cc:     David Howells <dhowells@redhat.com>, Paulo Alcantara <pc@cjr.nz>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-nfs <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>, linux-afs@lists.infradead.org,
-        ceph-devel@vger.kernel.org, keyrings@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Florian Weimer <fweimer@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 20 Apr 2020 22:37:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1587436673;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=jsoZwi80dr+M7YxmoORXcBzYw6P3DuIbaP9ksFgibwg=;
+        b=fn7Eh0z9ohmqenMwLtwIEqfptYVHA1EdBH6VV8oDz1opwXVe5Kg0sMKKt2cfd1da4s78Yf
+        UsLhSXrD/voPjwX3EYuk9JgbT+0Uisgp+FLp/Rdko33hVkJO0nijFV4gI9VvLT9+Vf1zgb
+        i+UcowDcprewV3CWdTXmUr8sCWGt2f0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-eRoBdycEO2-H0UquXjgoGw-1; Mon, 20 Apr 2020 22:37:51 -0400
+X-MC-Unique: eRoBdycEO2-H0UquXjgoGw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 677571007275
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Apr 2020 02:37:50 +0000 (UTC)
+Received: from test1135.test.redhat.com (vpn2-54-101.bne.redhat.com [10.64.54.101])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EEDD15DA7C;
+        Tue, 21 Apr 2020 02:37:49 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH] cifs: protect updating server->dstaddr with a spinlock
+Date:   Tue, 21 Apr 2020 12:37:39 +1000
+Message-Id: <20200421023739.10708-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Apr 20, 2020 at 5:30 PM Jeff Layton <jlayton@redhat.com> wrote:
->
-> On Mon, 2020-04-20 at 23:14 +0100, David Howells wrote:
-> > Paulo Alcantara <pc@cjr.nz> wrote:
-> >
-> > > > > > What happens if the IP address the superblock is going to changes, then
-> > > > > > another mount is made back to the original IP address?  Does the second
-> > > > > > mount just pick the original superblock?
-> > > > >
-> > > > > It is going to transparently reconnect to the new ip address, SMB share,
-> > > > > and cifs superblock is kept unchanged.  We, however, update internal
-> > > > > TCP_Server_Info structure to reflect new destination ip address.
-> > > > >
-> > > > > For the second mount, since the hostname (extracted out of the UNC path
-> > > > > at mount time) resolves to a new ip address and that address was saved
-> > > > > earlier in TCP_Server_Info structure during reconnect, we will end up
-> > > > > reusing same cifs superblock as per fs/cifs/connect.c:cifs_match_super().
-> > > >
-> > > > Would that be a bug?
-> > >
-> > > Probably.
-> > >
-> > > I'm not sure how that code is supposed to work, TBH.
-> >
-> > Hmmm...  I think there may be a race here then - but I'm not sure it can be
-> > avoided or if it matters.
-> >
-> > Since the address is part of the primary key to sget() for cifs, changing the
-> > IP address will change the primary key.  Jeff tells me that this is governed
-> > by a spinlock taken by cifs_match_super().  However, sget() may be busy
-> > attaching a new mount to the old superblock under the sb_lock core vfs lock,
-> > having already found a match.
-> >
->
-> Not exactly. Both places that match TCP_Server_Info objects by address
-> hold the cifs_tcp_ses_lock. The address looks like it gets changed in
-> reconn_set_ipaddr, and the lock is not currently taken there, AFAICT. I
-> think it probably should be (at least around the cifs_convert_address
-> call).
->
-> > Should the change of parameters made by cifs be effected with sb_lock held to
-> > try and avoid ending up using the wrong superblock?
-> >
-> > However, because the TCP_Server_Info is apparently updated, it looks like my
-> > original concern is not actually a problem (the idea that if a mounted server
-> > changes its IP address and then a new server comes online at the old IP
-> > address, it might end up sharing superblocks because the IP address is part of
-> > the key).
-> >
->
-> I'm not sure we should concern ourselves with much more than just not
-> allowing addresses to change while matching/searching. If you're
-> standing up new servers at old addresses while you still have clients
-> are migrating, then you are probably Doing it Wrong.
+We use a spinlock while we are reading and accessing the destination address for a server.
+We need to also use this spinlock to protect when we are modifying this adress from
+reconn_set_ipaddr().
 
-Yes.   The most important thing is to support the reasonably
-common scenario where the server's IP address changes (there are
-fancier ways to handle this gracefully e.g. the "Witness Protocol" feature
-of SMB3 mounts, but that is not always supported by servers and we
-still need to add Witness protocol to clients - but current code allowing
-SMB3 server IP address to change has helped some customers out)
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/connect.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 95b3ab0ca8c0..63830f228b4a 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -375,8 +375,10 @@ static int reconn_set_ipaddr(struct TCP_Server_Info *server)
+ 		return rc;
+ 	}
+ 
++	spin_lock(&cifs_tcp_ses_lock);
+ 	rc = cifs_convert_address((struct sockaddr *)&server->dstaddr, ipaddr,
+ 				  strlen(ipaddr));
++	spin_unlock(&cifs_tcp_ses_lock);
+ 	kfree(ipaddr);
+ 
+ 	return !rc ? -1 : 0;
 -- 
-Thanks,
+2.13.6
 
-Steve
