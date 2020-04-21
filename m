@@ -2,85 +2,72 @@ Return-Path: <SRS0=EeRJ=6F=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 267C6C54FCC
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Apr 2020 02:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BB2C2BA19
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Apr 2020 04:23:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E913E20781
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Apr 2020 02:45:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B214E208E4
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Apr 2020 04:23:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="L2vHT9O0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I87b6t3H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726534AbgDUCpB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Apr 2020 22:45:01 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:24984 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725988AbgDUCpB (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 20 Apr 2020 22:45:01 -0400
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id B4721804E0;
-        Tue, 21 Apr 2020 02:44:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1587437100;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LoWESeIpMF7OxmcC/QgUNWBUj7YSsoAc3GveT4i4nAA=;
-        b=L2vHT9O0iEUyHqHb+FcgupeoFzDokY+TXw71mVSfz3q3dJVu9eWbq6/Gw1YBtK/x4CvsTP
-        IwdAtLc98J6JXvRA+evcpJFJ6u/SV8UHM1uuFcB/3jND1zfPZPcXl5+IqzOpJmESQVA6iN
-        9WvQaqF8l/usubvxUf9Qh4GokFrY9zjluu/xHhbR7+imXuhZKtap/Ct0T1zz6NTblPmZEq
-        7OEzJl88w20yk9keDc5EZ3MKuRPyjS2e4WUi/x05aL4fiXvOIdn8kfQc9ZZJG7pd51k60X
-        9Cn1CqscVhadv6v87ke0qYYZDU8cccEzaLuxw4zWB7ctUd9xm+hbObKR4YkyxA==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     linux-cifs@vger.kernel.org, smfrench@gmail.com,
-        samba-technical@lists.samba.org
-Cc:     Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH 3/3] cifs: fix uninitialised lease_key in open_shroot()
-Date:   Mon, 20 Apr 2020 23:44:24 -0300
-Message-Id: <20200421024424.3112-3-pc@cjr.nz>
-In-Reply-To: <20200421024424.3112-1-pc@cjr.nz>
-References: <20200421024424.3112-1-pc@cjr.nz>
+        id S1726013AbgDUEXT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Apr 2020 00:23:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39754 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725730AbgDUEXS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 21 Apr 2020 00:23:18 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8FBBC061A0F
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2020 21:23:18 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id l5so6684006ybf.5
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Apr 2020 21:23:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=eDZW2mHdBXstG6Ls5f6VyykFoiU7c4nJSuLfTb8PW2Y=;
+        b=I87b6t3HKK6psRogsi6DEGrc9+F7QZJe9tWS2Y63LO1HQubp8M/8b13Z29glekX3Xs
+         NRpPTVKeo/OymwWEXoAtc5bviVURbWXtwux27ZoO2AQA6CQRPJG53fEWbDbbo+QPI+xP
+         iO9mh1UqvpTab5gLqv13zbMS5IEja8t14FVg2rInWGtL9zEzUdQT3xOqUrkqs7pGmgAk
+         tFWOQ4AetkZX6ieKts9t0SiwOaeB3KgGc9PFdGOfI2/1LmR7LsoT7i23amDhNKDzYZuL
+         +m+K8AYPoOWwy/f53z1qvWVGKX469ok/KIC3c59SAJCaTQe5u8JoRfGWOGLSvt07bCpO
+         zs/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=eDZW2mHdBXstG6Ls5f6VyykFoiU7c4nJSuLfTb8PW2Y=;
+        b=Z94sWxQwGq+NZes55Dqs0cw/pTXgIbvRDtcBFVrxPW5X59B1+N3fDuIEA4WncxSsD8
+         A9hWmpgtFWeshfzpWv7EZWix20NcDyPh7vcdkMujOsofFtKIztcZdS/IQkYxbcg7CW3T
+         7fnDG6Q0rLhzhT7rglS/SuqynOtUmc/LIsoeSbpX9JxcPar+I9EEwnJJSfcGpPvoKu0c
+         1v7CKWGpWQ6vnGWj3TDIMp6H66Chz7ryOlJudt9d0HPzl6DiPLDFDg5uxV1hNamLg8F5
+         lka7KglcJfQ6K+ZkcoFjoqoqHk8zH8kvlLszkkIaWR96xKHPn572DBNrmjG08zmgSBaU
+         wtXQ==
+X-Gm-Message-State: AGi0Pub9MWa8dOMTlq20xlsh6O/5DZgJnSXAZy9p0mqnlNifxQismyDo
+        T8W1V6fAa3zCkipZRdx1lAZHLc7Gj3LvOT5wlnuHxR1z
+X-Google-Smtp-Source: APiQypL9zSgrayZvvaqbMD0CwrXUlAboTH+sNjsgnKPIc3fCucSTKqKbBj+3zzqu07vizZq4d3ydZ/Kqaj7A9/5ywsM=
+X-Received: by 2002:a25:aa0c:: with SMTP id s12mr24480516ybi.183.1587442997787;
+ Mon, 20 Apr 2020 21:23:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 20 Apr 2020 23:23:06 -0500
+Message-ID: <CAH2r5msSe_j8xyRd7noarQ-9mkiS4WmM+6w1+kLP1gYf+=0avA@mail.gmail.com>
+Subject: smbinfo --version
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-SMB2_open_init() expects a pre-initialised lease_key when opening a
-file with a lease, so set pfid->lease_key prior to calling it in
-open_shroot().
+Do we need to add a --version (or -V) option to smbinfo to display the
+version number (as we do with mount.cifs e.g.)
 
-This issue was observed when performing some DFS failover tests and
-the lease key was never randomly generated.
-
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
----
- fs/cifs/smb2ops.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index b36c46f48705..f829f4165d38 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -687,6 +687,11 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
- 	if (smb3_encryption_required(tcon))
- 		flags |= CIFS_TRANSFORM_REQ;
- 
-+	if (!server->ops->new_lease_key)
-+		return -EIO;
-+
-+	server->ops->new_lease_key(pfid);
-+
- 	memset(rqst, 0, sizeof(rqst));
- 	resp_buftype[0] = resp_buftype[1] = CIFS_NO_BUFFER;
- 	memset(rsp_iov, 0, sizeof(rsp_iov));
 -- 
-2.26.0
+Thanks,
 
+Steve
