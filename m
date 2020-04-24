@@ -1,103 +1,81 @@
-Return-Path: <SRS0=2Jb1=6M=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Xozj=6N=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.7 required=3.0 tests=DEAR_FRIEND,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	SUBJ_ALL_CAPS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E65C83004
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Apr 2020 03:27:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CADFAC83003
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Apr 2020 12:11:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABB2E206D6
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Apr 2020 03:27:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FP4xowzV"
+	by mail.kernel.org (Postfix) with ESMTP id 933C12087E
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Apr 2020 12:11:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726270AbgD1D11 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 27 Apr 2020 23:27:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43112 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726047AbgD1D11 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 27 Apr 2020 23:27:27 -0400
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86171C03C1A9
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Apr 2020 20:27:26 -0700 (PDT)
-Received: by mail-qt1-x842.google.com with SMTP id x12so15706530qts.9
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Apr 2020 20:27:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=JQR1OfNwgBtU/st8kVswtbKCK/UzrXgKI4losikiDdA=;
-        b=FP4xowzVxgsRzsZFGr/9bMfh8pQFYqBUUXU3fvQ+q46oAlnth1NZOZRAvOf046alZH
-         hKZq93gIWywUR/s3aog31VeSxzoEUGpoA6YGYuHdg+iHijyNFNt3B9ft+VblcuHGSniC
-         PqTQcAVApkx7EtxaUzfa/HiB90tcKWi5eszCc4Yo1T7nFR+Krx/QfzQzWJBxhEEIVHqA
-         9VIdKt1Xjb9V81yS2IKwFpxv/m/uR74OwnIdHXNGyCZyFZrWBnKMCKY0aiQCdrT2inZ/
-         vfhYB9sLa71sJI/gK3kYncqygMga/hud3V4/PKzBoqDMt09Au6jvmH04K0FveeMS2UwC
-         4jiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=JQR1OfNwgBtU/st8kVswtbKCK/UzrXgKI4losikiDdA=;
-        b=HoB2foRdLwdFmFy+lPX+/SauPIgXWTEHZD50kcqcIKiTj3nRpBk92zCBqWBaCbJnB7
-         vAvJusA3ahuxKCuw/lAAsBiSgOkM+0p4eYmps75k/C8Nx1ZaWwW2OJhZj7t5ZQGT8jjD
-         +MFnECE4bv+8PF1SpBRdVJkaQzwUAv3oJjSZE6YzWY6vqdLP57/M26p3M+G+At5m+keW
-         wc3ZYmO/MWTD1eWnfq2XK0M0kNFeHLxEAHgIKtCCPHE0u+klXp27OwmrwFgTgzx5zkeX
-         xTe8SFabTYo7zOe2G1MdqR/p6KfpnO8pXRBYqvOco5DSLqHcZ8tcXMtCIjNeQNRzmgRf
-         /AVg==
-X-Gm-Message-State: AGi0PuZXd8FG0NgVA/UsGbAzDYmipwOD5qj2rFh0MDuwND0n++x01zLS
-        M3o/hDT0Fc37quKXgXHu1zRssepjb3744A==
-X-Google-Smtp-Source: APiQypLa8VAn7WDUiRFDycWhNd4ytNLsYbE6ICJGAziWMvpFSLgq38LeNB3GMRV9lLHw/tnvk4F79w==
-X-Received: by 2002:ac8:5302:: with SMTP id t2mr27237737qtn.124.1588044445430;
-        Mon, 27 Apr 2020 20:27:25 -0700 (PDT)
-Received: from ryan-xps13.lilmerv.home (50-80-22-148.client.mchsi.com. [50.80.22.148])
-        by smtp.gmail.com with ESMTPSA id x194sm1307930qkb.131.2020.04.27.20.27.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2020 20:27:25 -0700 (PDT)
-From:   Ryan Barnett <ryanbarnett3@gmail.com>
+        id S1726617AbgD2MLg convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Apr 2020 08:11:36 -0400
+Received: from [116.62.10.213] ([116.62.10.213]:47608 "EHLO mail.qdztrk.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1726847AbgD2MLg (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 29 Apr 2020 08:11:36 -0400
+X-Greylist: delayed 36296 seconds by postgrey-1.27 at vger.kernel.org; Wed, 29 Apr 2020 08:11:34 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by mail.qdztrk.com (Postfix) with ESMTP id 702F4246168
+        for <linux-cifs@vger.kernel.org>; Sat, 25 Apr 2020 08:21:34 +0800 (CST)
+Received: from mail.qdztrk.com ([127.0.0.1])
+        by localhost (mail.qdztrk.com [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id 9V3scJvaaW3I for <linux-cifs@vger.kernel.org>;
+        Sat, 25 Apr 2020 08:21:33 +0800 (CST)
+Received: from localhost (localhost [127.0.0.1])
+        by mail.qdztrk.com (Postfix) with ESMTP id 4F3B61EA8FA
+        for <linux-cifs@vger.kernel.org>; Sat, 25 Apr 2020 08:03:33 +0800 (CST)
+X-Virus-Scanned: amavisd-new at mail.qdztrk.com
+Received: from mail.qdztrk.com ([127.0.0.1])
+        by localhost (mail.qdztrk.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id iREICbrZdoEa for <linux-cifs@vger.kernel.org>;
+        Sat, 25 Apr 2020 08:03:33 +0800 (CST)
+Received: from coris.com (unknown [103.207.36.17])
+        by mail.qdztrk.com (Postfix) with ESMTP id 22EA612A3AD
+        for <linux-cifs@vger.kernel.org>; Sat, 25 Apr 2020 07:46:12 +0800 (CST)
+Reply-To: kentpace@sina.com
+From:   Kent Pace <kentpace@coris.com>
 To:     linux-cifs@vger.kernel.org
-Cc:     Ryan Barnett <ryanbarnett3@gmail.com>
-Subject: [PATCH] Use DESTDIR when installing mount.smb3 and optionally install man page
-Date:   Mon, 27 Apr 2020 22:26:47 -0500
-Message-Id: <20200428032647.2420-1-ryanbarnett3@gmail.com>
-X-Mailer: git-send-email 2.17.1
+Subject: URGENT!! PLEASE READ
+Date:   24 Apr 2020 16:46:09 -0700
+Message-ID: <20200424164609.DE60385EF3C5BD4E@coris.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Properly create mount.smb3 symlink by using DESTDIR. Also use
-CONFIG_MAN to optionally install manpage for mount.smb3.
+Dear Friend,
 
-Signed-off-by: Ryan Barnett <ryanbarnett3@gmail.com>
----
- Makefile.am | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index fe9cd34..e0587f1 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -119,11 +119,13 @@ endif
- SUBDIRS = contrib
- 
- install-exec-hook:
--	(cd $(ROOTSBINDIR) && ln -sf mount.cifs mount.smb3)
-+	(cd $(DESTDIR)$(ROOTSBINDIR) && ln -sf mount.cifs mount.smb3)
- 
-+if CONFIG_MAN
- install-data-hook:
--	(cd $(man8dir) && ln -sf mount.cifs.8 mount.smb3.8)
-+	(cd $(DESTDIR)$(man8dir) && ln -sf mount.cifs.8 mount.smb3.8)
-+endif
- 
- uninstall-hook:
--	(cd $(ROOTSBINDIR) && rm -f $(ROOTSBINDIR)/mount.smb3)
--	(cd $(man8dir) && rm -f $(man8dir)/mount.smb3.8)
-+	rm -f $(DESTDIR)$(ROOTSBINDIR)/mount.smb3
-+	rm -f $(DESTDIR)$(man8dir)/mount.smb3.8
--- 
-2.17.1
+There is something very important I need to discuss with you.  I 
+am writing  this letter in tears and fear. In tears because I 
+will soon depart and in fear because I don't really know if you 
+will do this faithfully.
+
+I am COVID-19  patient and the doctor has already confirmed I may 
+not last for the next 7 days.
+
+I have substantial amount of money deposited in a security vault 
+around your country. It is in trunk boxes and once  I receive 
+your response and see your readiness to claim the money 
+immediately, I will forward the needed documents and the contact 
+of the security vault where the consignment is deposited,
+I am not asking you to give me anything but I want you to help 
+people that has been infected with this deadly virus with 60% of 
+the money and 40% should be for you and your family.
+
+I will disclose exact amount in the boxes as soon as I 
+receive your response.
+
+
+Regards.
 
