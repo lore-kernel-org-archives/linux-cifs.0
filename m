@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B9AC47247
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Apr 2020 13:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1296C4724C
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Apr 2020 13:58:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15ED720661
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Apr 2020 13:57:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 853E820661
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Apr 2020 13:58:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588255039;
-	bh=B0THgzLB98z6nynqqw9dkSLS0zUCJgWl0JwEXxMV4wY=;
+	s=default; t=1588255100;
+	bh=44MdXW0/tQSc7zi1YMwilVS4B9vWAuvAITdw+uxpS34=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=RFwAJEHKGiPLSCNoOeXYExpUk4wukgm7V7fAEf6EdK2NlN6BuMKoU3Je3rnHp6qTG
-	 avkAF4G39qPksjR/uTIAzAR/qH+T5owkUUEsp+K/LjIa3y4ogDFX2UygN303nuHRV8
-	 5RQkLassKbsuBmFGfDxTq88Gw9LYQZ2fIZz5UD94=
+	b=Cxes8+d6bnI1u2XHRbvv2L9FOWS1Z3KnaZLq8ktHptnRXZo3IZiulNHJycoAVy8yE
+	 NZWncpKD1McyjsvRp/Y0btVqHEVIm6Ix2sOnS1s9ZcnCePLI3SxpZ4Rh/YbZl3uXEp
+	 7am5EvBOGMcS7J7OrElq0LrlS2GRlvYg7te6XCkI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729108AbgD3NzB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 30 Apr 2020 09:55:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37842 "EHLO mail.kernel.org"
+        id S1728705AbgD3N6L (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 30 Apr 2020 09:58:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37362 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727121AbgD3NzA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 30 Apr 2020 09:55:00 -0400
+        id S1729035AbgD3Nyn (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 30 Apr 2020 09:54:43 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 298C72137B;
-        Thu, 30 Apr 2020 13:54:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6A110208D5;
+        Thu, 30 Apr 2020 13:54:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588254900;
-        bh=B0THgzLB98z6nynqqw9dkSLS0zUCJgWl0JwEXxMV4wY=;
+        s=default; t=1588254883;
+        bh=44MdXW0/tQSc7zi1YMwilVS4B9vWAuvAITdw+uxpS34=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FA44ig/uLEEH1luvErhGj0VPfOPWhXLQCXIbmxposSeoP9IxVXwkM2qNRGKtSElC6
-         L7QHk1o+0cR9w79L4hjgWugfwqMcIsHPGTbx6DCVDodIjS91sAD4+tfZp7aM/nFxBe
-         MBoU2ws1TG4Qgl4fCtorqkwVqyOdZzQFX1uu3mEU=
+        b=LM/V/Duq42TmFIVpr9RtYZl2QQj8vsMP8z6x3YqigSFLfkcbib05QlI+4feUJWkuu
+         VPPnL/74M0jFSnzI+4uCUCm0diDcNIemYxrHN1L0Fo1YuTd3hMnfTQLJ+i1YA0uZiE
+         GBx7I4h8MCcMTBww5oY64quizp7uASJqONT7iV0Y=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
@@ -45,12 +45,12 @@ Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.4 05/11] cifs: protect updating server->dstaddr with a spinlock
-Date:   Thu, 30 Apr 2020 09:54:47 -0400
-Message-Id: <20200430135453.21353-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 08/17] cifs: protect updating server->dstaddr with a spinlock
+Date:   Thu, 30 Apr 2020 09:54:24 -0400
+Message-Id: <20200430135433.21204-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200430135453.21353-1-sashal@kernel.org>
-References: <20200430135453.21353-1-sashal@kernel.org>
+In-Reply-To: <20200430135433.21204-1-sashal@kernel.org>
+References: <20200430135433.21204-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -77,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index cf104bbe30a14..c9793ce0d3368 100644
+index f2707ff795d45..c018d161735c4 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -338,8 +338,10 @@ static int reconn_set_ipaddr(struct TCP_Server_Info *server)
+@@ -341,8 +341,10 @@ static int reconn_set_ipaddr(struct TCP_Server_Info *server)
  		return rc;
  	}
  
