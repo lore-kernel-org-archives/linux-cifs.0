@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6408DC47247
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Apr 2020 13:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B9AC47247
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Apr 2020 13:57:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39B57208CA
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Apr 2020 13:51:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15ED720661
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Apr 2020 13:57:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588254719;
-	bh=b2QdKOeAuXxVphJVniePs7dMgcY5GW7kcKW3nlDsHuM=;
+	s=default; t=1588255039;
+	bh=B0THgzLB98z6nynqqw9dkSLS0zUCJgWl0JwEXxMV4wY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ngs5mr2SeL2dxbyuuy+CHq4bP7FUY5DSihL/isaJy67YviXQQBgnhCkusrVMFIYiS
-	 VsR9Sv3B7bP+z0WUD6CnnnSfLeF4yE2aoz703fzhJ+NdH6pxiLCLVGZ7puSioX3vl/
-	 aEKZLj5JHDGJ4u5rqWUPc7mgnZXOaBxXwNlEawS8=
+	b=RFwAJEHKGiPLSCNoOeXYExpUk4wukgm7V7fAEf6EdK2NlN6BuMKoU3Je3rnHp6qTG
+	 avkAF4G39qPksjR/uTIAzAR/qH+T5owkUUEsp+K/LjIa3y4ogDFX2UygN303nuHRV8
+	 5RQkLassKbsuBmFGfDxTq88Gw9LYQZ2fIZz5UD94=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728244AbgD3Nv5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 30 Apr 2020 09:51:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60742 "EHLO mail.kernel.org"
+        id S1729108AbgD3NzB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 30 Apr 2020 09:55:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37842 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728239AbgD3Nv4 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 30 Apr 2020 09:51:56 -0400
+        id S1727121AbgD3NzA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 30 Apr 2020 09:55:00 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C14D920873;
-        Thu, 30 Apr 2020 13:51:54 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 298C72137B;
+        Thu, 30 Apr 2020 13:54:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588254715;
-        bh=b2QdKOeAuXxVphJVniePs7dMgcY5GW7kcKW3nlDsHuM=;
+        s=default; t=1588254900;
+        bh=B0THgzLB98z6nynqqw9dkSLS0zUCJgWl0JwEXxMV4wY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Puz9FCESQ1C2Wav2lcfWu+xLcVl8Ohw2i3tnmuHoUBpRGV3ZTy8M3uyr93EZ/l3WH
-         ie1fwK7mNTEZ1TcQ7+A2IgsHun9j173VSiGbFHG437gJZfucQoEOj1QjwXMULlfFYG
-         8a5CHlZbgWn41mMLeMFp+hlEDL8FkbeKeZIITvcI=
+        b=FA44ig/uLEEH1luvErhGj0VPfOPWhXLQCXIbmxposSeoP9IxVXwkM2qNRGKtSElC6
+         L7QHk1o+0cR9w79L4hjgWugfwqMcIsHPGTbx6DCVDodIjS91sAD4+tfZp7aM/nFxBe
+         MBoU2ws1TG4Qgl4fCtorqkwVqyOdZzQFX1uu3mEU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paulo Alcantara <pc@cjr.nz>, Aurelien Aptel <aaptel@suse.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        Jeff Layton <jlayton@kernel.org>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.6 63/79] cifs: do not share tcons with DFS
-Date:   Thu, 30 Apr 2020 09:50:27 -0400
-Message-Id: <20200430135043.19851-63-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 05/11] cifs: protect updating server->dstaddr with a spinlock
+Date:   Thu, 30 Apr 2020 09:54:47 -0400
+Message-Id: <20200430135453.21353-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200430135043.19851-1-sashal@kernel.org>
-References: <20200430135043.19851-1-sashal@kernel.org>
+In-Reply-To: <20200430135453.21353-1-sashal@kernel.org>
+References: <20200430135453.21353-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,63 +60,37 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Paulo Alcantara <pc@cjr.nz>
+From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-[ Upstream commit 65303de829dd6d291a4947c1a31de31896f8a060 ]
+[ Upstream commit fada37f6f62995cc449b36ebba1220594bfe55fe ]
 
-This disables tcon re-use for DFS shares.
+We use a spinlock while we are reading and accessing the destination address for a server.
+We need to also use this spinlock to protect when we are modifying this address from
+reconn_set_ipaddr().
 
-tcon->dfs_path stores the path that the tcon should connect to when
-doing failing over.
-
-If that tcon is used multiple times e.g. 2 mounts using it with
-different prefixpath, each will need a different dfs_path but there is
-only one tcon. The other solution would be to split the tcon in 2
-tcons during failover but that is much harder.
-
-tcons could not be shared with DFS in cifs.ko because in a
-DFS namespace like:
-
-          //domain/dfsroot -> /serverA/dfsroot, /serverB/dfsroot
-
-          //serverA/dfsroot/link -> /serverA/target1/aa/bb
-
-          //serverA/dfsroot/link2 -> /serverA/target1/cc/dd
-
-you can see that link and link2 are two DFS links that both resolve to
-the same target share (/serverA/target1), so cifs.ko will only contain a
-single tcon for both link and link2.
-
-The problem with that is, if we (auto)mount "link" and "link2", cifs.ko
-will only contain a single tcon for both DFS links so we couldn't
-perform failover or refresh the DFS cache for both links because
-tcon->dfs_path was set to either "link" or "link2", but not both --
-which is wrong.
-
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/connect.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ fs/cifs/connect.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index d4a23b48e24d8..9c614d6916c2d 100644
+index cf104bbe30a14..c9793ce0d3368 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -3419,6 +3419,10 @@ cifs_find_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 	spin_lock(&cifs_tcp_ses_lock);
- 	list_for_each(tmp, &ses->tcon_list) {
- 		tcon = list_entry(tmp, struct cifs_tcon, tcon_list);
-+#ifdef CONFIG_CIFS_DFS_UPCALL
-+		if (tcon->dfs_path)
-+			continue;
-+#endif
- 		if (!match_tcon(tcon, volume_info))
- 			continue;
- 		++tcon->tc_count;
+@@ -338,8 +338,10 @@ static int reconn_set_ipaddr(struct TCP_Server_Info *server)
+ 		return rc;
+ 	}
+ 
++	spin_lock(&cifs_tcp_ses_lock);
+ 	rc = cifs_convert_address((struct sockaddr *)&server->dstaddr, ipaddr,
+ 				  strlen(ipaddr));
++	spin_unlock(&cifs_tcp_ses_lock);
+ 	kfree(ipaddr);
+ 
+ 	return !rc ? -1 : 0;
 -- 
 2.20.1
 
