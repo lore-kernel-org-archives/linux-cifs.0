@@ -1,302 +1,443 @@
-Return-Path: <SRS0=2f0v=6P=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=2HAQ=6Q=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0250AC35280
-	for <linux-cifs@archiver.kernel.org>; Fri,  1 May 2020 19:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEBAC3A5A9
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 May 2020 06:02:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C758F206F0
-	for <linux-cifs@archiver.kernel.org>; Fri,  1 May 2020 19:39:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC6A72137B
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 May 2020 06:02:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YO09C+3Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726405AbgEATjX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 1 May 2020 15:39:23 -0400
-Received: from mout.perfora.net ([74.208.4.197]:52997 "EHLO mout.perfora.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726377AbgEATjX (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 1 May 2020 15:39:23 -0400
-Received: from mbox0.exch.wynstonegroup.com ([173.174.199.113]) by
- mrelay.perfora.net (mreueus003 [74.208.5.2]) with ESMTPSA (Nemesis) id
- 0MRnFH-1jbMqM1wdN-00Ssui; Fri, 01 May 2020 21:39:19 +0200
-Received: from mbox0.exch.wynstonegroup.com (10.0.200.50) by
- mbox0.exch.wynstonegroup.com (10.0.200.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.595.3;
- Fri, 1 May 2020 14:37:53 -0500
-Received: from mbox0.exch.wynstonegroup.com ([fe80::cc87:845e:e093:fc4a]) by
- mbox0.exch.wynstonegroup.com ([fe80::cc87:845e:e093:fc4a%4]) with mapi id
- 15.02.0595.003; Fri, 1 May 2020 14:37:53 -0500
-To:     Steve French <smfrench@gmail.com>
-CC:     CIFS <linux-cifs@vger.kernel.org>
-Subject: RE: issues with CIFS on Ubuntu 20 mounting Windows 2019
-Thread-Topic: issues with CIFS on Ubuntu 20 mounting Windows 2019
-Thread-Index: AdYfcd+fKz9EbKocTJmKaZWJpcHBlQALm+wAAAolBmAAAWqY8AALHK8AAAMkUmA=
-Date:   Fri, 1 May 2020 19:37:53 +0000
-Message-ID: <14d642e4db6e42cc853755660d0bba20@wynstonegroup.com>
+        id S1726520AbgEBGCW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 2 May 2020 02:02:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36466 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726468AbgEBGCV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 May 2020 02:02:21 -0400
+Received: from mail-yb1-xb42.google.com (mail-yb1-xb42.google.com [IPv6:2607:f8b0:4864:20::b42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96BBAC061A0C
+        for <linux-cifs@vger.kernel.org>; Fri,  1 May 2020 23:02:21 -0700 (PDT)
+Received: by mail-yb1-xb42.google.com with SMTP id b17so6060110ybq.13
+        for <linux-cifs@vger.kernel.org>; Fri, 01 May 2020 23:02:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=bPujRJCBpsdHWdB+GYFeZ9NJiBELwW0kDy3YCAnZ7l8=;
+        b=YO09C+3YNI8ttcYpZ5T6f0QrHKFfG3VfI/il3OUxyenulRP6ux+NjjwRiYjbyp43px
+         fb/gCF8Mf2QHOjePnpDLlNPy3rUOGbP/qe9W4/m5zStK/qaNx0tOOOz9ajQ++EHa9yyC
+         gjoeAhrTN7uNVUSh37mN8vPxvZmOTKP14ipxzVbmzuIK68yMDc9BiOXy2SQdce6jCpNF
+         SC1EEvO1wqLg9OWf/3+YzIDk0AbJGn9ki+z7E6u0nAZaAaBhl5zj51XaLdXIlU96Xb0t
+         8qY2Qu79efBhhpqC0971d9Q6dN93Udp/DNKn42fpqSNnJr6gMJCL7WcXGahFFNo89d7+
+         xHZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=bPujRJCBpsdHWdB+GYFeZ9NJiBELwW0kDy3YCAnZ7l8=;
+        b=ZxX6tHgsuHcT8gsywocPCfiAxKq+htS3VnXZcbLR6BCkKrUFw3ijNckLtx8bdBZzMC
+         8X06JDZIoH8PLbqtmj0I2BLUuRioagGtSEztikKtwCHqg+hZRM6ZyrPKD4NRJPrqcYAO
+         5d4PQ90L/l0qTFS6IijlOJ4oTotVYvXy7AzTSRQfm5//8SW07tB0SMGTKk+ORopDoCx4
+         PTq516vsUz5rstXH3i95ojBK8EhQoc9KSiWt/XYs1mZbQWj/d5W90vy7mE14OOayzo1u
+         vDye6KBuAVLT74pJiQr3zsc8hqQ7asouqRL9Bf5RqyCXwj+dowPemLIJLR1zioA2z+6I
+         M+Og==
+X-Gm-Message-State: AGi0PuZLVtaoqfmZPZ8kndlKajvR3S3OKRKf0R7t7wERw1/rX4xvz/cg
+        3mxq7bLacYeKHPrua6g3oLu31cYsdbiJK57YmnttAE2I
+X-Google-Smtp-Source: APiQypKzA+OJPAMt/Xdrc32Ss2401JWTAVnDlEyUzeNlKciakvrNwn4s/eSFIATShbLQzCLT0nDa6emi7hi+X5+yh2M=
+X-Received: by 2002:a25:e907:: with SMTP id n7mr11648440ybd.85.1588399340558;
+ Fri, 01 May 2020 23:02:20 -0700 (PDT)
+MIME-Version: 1.0
 References: <52e802d7dde642c29662e9e05019c323@wynstonegroup.com>
  <CAH2r5msOBGS7QYagUkby4upxFKbxCdQg=T65K4s9VhRKkWY+Xw@mail.gmail.com>
- <5924ec7684ff4dd1ab853b1574cb140e@wynstonegroup.com>
- <37908dec611a429c9055f84fc9958745@wynstonegroup.com>
- <CAH2r5mtSXjyFOaPY5oKx2TDh6wZrUuZsFqqc7A=+jkG8zQsfKA@mail.gmail.com>
-In-Reply-To: <CAH2r5mtSXjyFOaPY5oKx2TDh6wZrUuZsFqqc7A=+jkG8zQsfKA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.0.210.11]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-From:   "Scott M. Lewandowski" <vgerkernel@scottl.com>
-X-Provags-ID: V03:K1:jIq1wuXefLz9n9IuKQRoMGxszcg9pghAWzxUs5XuXT4kT4uJysa
- PJX1YhPighwjldV4BsWcb6mEHkG9IWvveRvPhWPSoGVa7j05x6VHYNzKOuYWdWQfdwSywIS
- M5HkBOIxjzHrEoK3Jkm1/xuvnGdll2J1LIynqbuxfj6maalTutgIbLKD+MNjyCm0OQ3gTEx
- Tux3snYjqs/Rt4qi6gAYw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ysVKLFgxX5E=:6TC+heRrozTqEeXxoBKXn4
- a/b3L4TA8on7CCkZ6nvshw6KDjRCojgRh9cIs40ltcCqBW3iwFdxOpj9PYuxMHQOy7iqhawYl
- LXRFm9DRqWvFDCbGCbItSfnk62LuQcgQYalRr59H8AxTMZQuuKyz3YkdmsqFpGQpF8fknrO8j
- w2JjI2CWRF3XHKhinZklSEPR2luK2ILBGfkEZq5gqkoBXo6K7JJb51nSYWV7kMiPKcmNSQx1K
- HhcaHlJ7AAsEjXMCI3B10ZY7hcV10WlY/GodVx82HjA3BWsUSG8+8dCyFpJT6yozvZWVZJyRD
- WwiBcs5b5qPgwcjRyIcUsuzbRwNK8+2L8dkOxMYxe58GkeclDdPbDSC5Q0wqnp3O3yzq1IeKW
- ljUo15NV2ik6xO90nRsnDB/9V5s3IyxzZlqTPyXT2etX+R4gGNv3OlFn0ncgomXHzbleEt8vM
- Plpue3590gErA+oVM3IQv1Iap5J1gSfD2EYFW/5MyopeVwaC63Ol3UirLacYGHPos4I49PQFa
- Vpn5EV7BdQFFnHTDaSvQWzPfwiHXdyUhDMQdKpWvb72AsaG+dlcsKQ+kTxN+OsS3100bc1F6e
- egrfd1fbMa7lrEyUUv1ySsjG8rwSx/WRxntkDA3ux9pUE0GRRDn1TeHQSZniUbV66/3zA+cxp
- s4HZQFXdH28s2iK9TjGHpauv3Yh5kM6h68lg8f3EUllDNdhwg0zgZVXCZvTFuBrVusnCOErmO
- 9CfgO5KEyzqlJgUDkDNKeSmYTH46l7nh5Aqa+kK6dI8de+iMs/8hdrIp45hoUcZPX4dmmVkhY
- eCtCqGvKJSqzkS+yzigRU6ZjhhAoaGuAQBf5Bk687e+6mrVKCLGU+d4l2tMPKDQlQxD8x0j
+ <5924ec7684ff4dd1ab853b1574cb140e@wynstonegroup.com> <37908dec611a429c9055f84fc9958745@wynstonegroup.com>
+ <CAH2r5mtSXjyFOaPY5oKx2TDh6wZrUuZsFqqc7A=+jkG8zQsfKA@mail.gmail.com> <14d642e4db6e42cc853755660d0bba20@wynstonegroup.com>
+In-Reply-To: <14d642e4db6e42cc853755660d0bba20@wynstonegroup.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 2 May 2020 01:02:09 -0500
+Message-ID: <CAH2r5msMw29oL4uscBvK18UwJd4ag+iiJojQ1Rk1UZERodgDEQ@mail.gmail.com>
+Subject: Re: issues with CIFS on Ubuntu 20 mounting Windows 2019
+To:     "Scott M. Lewandowski" <vgerkernel@scottl.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-SSd2ZSBub3cgZ290IGEgdHJhY2UgdGhhdCBjb3JyZXNwb25kcyB0byB0aGUgZG1lc2cgb3V0cHV0
-IGJlbG93LiBJIHdpbGwgdGFrZSBhIGxvb2sgbGF0ZXIsIGJ1dCB1cG9uIHF1aWNrIGdsYW5jZSwg
-dGhpcyBkb2Vzbid0IGxvb2sgbGlrZSBhbnl0aGluZyB0aGF0IHdpbGwgbWVhbiBtdWNoIHRvIG1l
-LCB1bmZvcnR1bmF0ZWx5LiBJZiBzb21lb25lIHdvdWxkIGxpa2UgdG8gbG9vayBhdCB0aGUgZmls
-ZSBJIGNhbiBmaW5kIGEgd2F5IHRvIGdldCBpdCB0byB5b3UuDQoNCg0KWzUzMjIzLjA5OTIyMV0g
-Q0lGUyBWRlM6IFNlbmQgZXJyb3IgaW4gcmVhZCA9IC00DQpbNTMyMjMuMjMyMzczXSBDSUZTIFZG
-UzogU2VuZCBlcnJvciBpbiByZWFkID0gLTQNCls1MzI1NC43NjI5MTRdIENJRlMgVkZTOiBTZW5k
-IGVycm9yIGluIHJlYWQgPSAtNA0KWzUzMzAxLjQwMzkyNV0gQ0lGUyBWRlM6IFNlbmQgZXJyb3Ig
-aW4gcmVhZCA9IC00DQpbNTMzMDEuNzcyNTY4XSBDSUZTIFZGUzogU2VuZCBlcnJvciBpbiByZWFk
-ID0gLTQNCls1MzMwMS44MTg1NjZdIENJRlMgVkZTOiBTZW5kIGVycm9yIGluIHJlYWQgPSAtNA0K
-WzUzMzAxLjg4NTUxMF0gQ0lGUyBWRlM6IFNlbmQgZXJyb3IgaW4gcmVhZCA9IC00DQpbNTMzMDIu
-MDU1OTU5XSBDSUZTIFZGUzogU2VuZCBlcnJvciBpbiByZWFkID0gLTQNCls1MzMwMi4xNDYzMzdd
-IENJRlMgVkZTOiBTZW5kIGVycm9yIGluIHJlYWQgPSAtNA0KWzUzMzAyLjIzNjMyMl0gQ0lGUyBW
-RlM6IFNlbmQgZXJyb3IgaW4gcmVhZCA9IC00DQpbNTMzMDIuMzI5NTI1XSBDSUZTIFZGUzogU2Vu
-ZCBlcnJvciBpbiByZWFkID0gLTQNCls1MzMwMy4wMDA4NjldIENJRlMgVkZTOiBTZW5kIGVycm9y
-IGluIHJlYWQgPSAtNA0KWzUzMzAzLjEwNjk2MV0gQ0lGUyBWRlM6IFNlbmQgZXJyb3IgaW4gcmVh
-ZCA9IC00DQpbNTMzMDQuNzU2OTk4XSBDSUZTIFZGUzogQ2xvc2UgdW5tYXRjaGVkIG9wZW4NCls1
-MzY3MC43NzY4MzJdIENJRlMgVkZTOiBDbG9zZSB1bm1hdGNoZWQgb3Blbg0KDQoNCj4gLS0tLS1P
-cmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFp
-bC5jb20+DQo+IFNlbnQ6IEZyaWRheSwgTWF5IDEsIDIwMjAgMTA6NTcgQU0NCj4gVG86IFNjb3R0
-IE0uIExld2FuZG93c2tpIDx2Z2Vya2VybmVsQHNjb3R0bC5jb20+DQo+IENjOiBTY290dCBNLiBM
-ZXdhbmRvd3NraSA8c2NvdHRAd3luc3RvbmVncm91cC5jb20+OyBDSUZTIDxsaW51eC0NCj4gY2lm
-c0B2Z2VyLmtlcm5lbC5vcmc+DQo+IFN1YmplY3Q6IFJlOiBpc3N1ZXMgd2l0aCBDSUZTIG9uIFVi
-dW50dSAyMCBtb3VudGluZyBXaW5kb3dzIDIwMTkNCj4gDQo+IEFyZSB5b3UgY29tZm9ydGFibGUg
-d2l0aCBkeW5hbWljIHRyYWNpbmcgKCJ0cmFjZS1jbWQgcmVjb3JkIC1lIC4uLiINCj4gLi4uIHRo
-ZSBsaXN0IG9mIHRyYWNlIHBvaW50cyBjYW4gYmUgc2VlbiBpbg0KPiAvc3lzL2tlcm5lbC9kZWJ1
-Zy90cmFjaW5nL2V2ZW50cy9jaWZzKT8NCj4gDQo+IE9uIEZyaSwgTWF5IDEsIDIwMjAgYXQgMTA6
-NDAgQU0gU2NvdHQgTS4gTGV3YW5kb3dza2kNCj4gPHZnZXJrZXJuZWxAc2NvdHRsLmNvbT4gd3Jv
-dGU6DQo+ID4NCj4gPiBJ4oCZbSBhbHNvIHNlZWluZyBlbnRyaWVzIGxpa2UgdGhlIGZvbGxvd2lu
-ZyBtaXhlZCBpbiB3aXRoIHRoZSBvdGhlciBtZXNzYWdlczoNCj4gPg0KPiA+IFsyNzA3OC42NjUx
-OTJdIENJRlMgVkZTOiBcXGZpbGUxIENhbmNlbGxpbmcgd2FpdCBmb3IgbWlkIDEzNDQzMjU3IGNt
-ZDoNCj4gPiA1DQo+ID4NCj4gPiBBbmQNCj4gPg0KPiA+IFszMTgzMy4zNTE3ODVdIENJRlMgVkZT
-OiBjaWZzX2ludmFsaWRhdGVfbWFwcGluZzogY291bGQgbm90IGludmFsaWRhdGUNCj4gPiBpbm9k
-ZSAwMDAwMDAwMGI0NzMzZTk2DQo+ID4NCj4gPg0KPiA+DQo+ID4NCj4gPiA+IC0tLS0tT3JpZ2lu
-YWwgTWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9tOiBTY290dCBNLiBMZXdhbmRvd3NraSA8dmdlcmtl
-cm5lbEBzY290dGwuY29tPg0KPiA+ID4gU2VudDogRnJpZGF5LCBNYXkgMSwgMjAyMCAxMjoyMCBB
-TQ0KPiA+ID4gVG86ICdTdGV2ZSBGcmVuY2gnIDxzbWZyZW5jaEBnbWFpbC5jb20+DQo+ID4gPiBD
-YzogQ0lGUyA8bGludXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmc+DQo+ID4gPiBTdWJqZWN0OiBSRTog
-aXNzdWVzIHdpdGggQ0lGUyBvbiBVYnVudHUgMjAgbW91bnRpbmcgV2luZG93cyAyMDE5DQo+ID4g
-Pg0KPiA+ID4gPiBFSU5UUiBvbiByZWFkIC4uLiBIdW5kcmVkcyBvZiB0aW1lcz8hIEkgaGF2ZSBz
-ZWVuIHNjcCBkbyB0aGF0IGJ5DQo+ID4gPiA+IHNlbmRpbmcgc2lnbmFscyBidXQgaW4gd3JpdGVz
-IG5vdCByZWFkcw0KPiA+ID4NCj4gPiA+IE5vdCB1c2luZyBzY3AgYXQgdGhlIG1vbWVudC4NCj4g
-PiA+DQo+ID4gPiA+IENvdWxkIGFuIGFwcCBiZSBzZW5kaW5nIHNpZ25hbHMgdHJ5aW5nIHRvIGtp
-bGwgdGhlIHByb2Nlc3MgZG9pbmcgdGhlDQo+IHJlYWRzPw0KPiA+ID4NCj4gPiA+IE5vdCB0aGF0
-IEknbSBhd2FyZSBvZi4gSSdtIG5vdCBzdXJlIGV4YWN0bHkgaG93IEknZCBjaGVjayB0aGF0LCBi
-dXQNCj4gPiA+IEkgd2lsbCBsb29rIGludG8gaXQuDQo+ID4gPg0KPiA+ID4gT25lIG90aGVyIHRo
-aW5nIHRoYXQgY2FtZSB0byBtaW5kIHRoYXQgbWF5IGJlIGhlbHBmdWwgaXMgdGhhdCBvbmUgb2YN
-Cj4gPiA+IHRoZSBwcm9jZXNzZXMgZG9pbmcgdGhlIG1vc3QgSU8gaXMgcnVubmluZyB1bmRlciBt
-b25vIDYuOC4wLjEwNQ0KPiA+ID4NCj4gPiA+IC1zY290dA0KPiA+ID4NCj4gPiA+DQo+ID4gPg0K
-PiA+ID4NCj4gPiA+IEZyb206IFN0ZXZlIEZyZW5jaCA8c21mcmVuY2hAZ21haWwuY29tPg0KPiA+
-ID4gU2VudDogRnJpZGF5LCBNYXkgMSwgMjAyMCAxMjowNyBBTQ0KPiA+ID4gVG86IFNjb3R0IE0u
-IExld2FuZG93c2tpIDx2Z2Vya2VybmVsQHNjb3R0bC5jb20+DQo+ID4gPiBDYzogQ0lGUyA8bGlu
-dXgtY2lmc0B2Z2VyLmtlcm5lbC5vcmc+DQo+ID4gPiBTdWJqZWN0OiBSZTogaXNzdWVzIHdpdGgg
-Q0lGUyBvbiBVYnVudHUgMjAgbW91bnRpbmcgV2luZG93cyAyMDE5DQo+ID4gPg0KPiA+ID4gRUlO
-VFIgb24gcmVhZCAuLi4gSHVuZHJlZHMgb2YgdGltZXM/ISBJIGhhdmUgc2VlbiBzY3AgZG8gdGhh
-dCBieQ0KPiA+ID4gc2VuZGluZyBzaWduYWxzIGJ1dCBpbiB3cml0ZXMgbm90IHJlYWRzDQo+ID4g
-Pg0KPiA+ID4gT24gVGh1LCBBcHIgMzAsIDIwMjAsIDIzOjQ4IFNjb3R0IE0uIExld2FuZG93c2tp
-DQo+ID4gPiA8bWFpbHRvOnZnZXJrZXJuZWxAc2NvdHRsLmNvbT4gd3JvdGU6DQo+ID4gPiBJIGhh
-dmUgYW4gVWJ1bnR1IDIwLjA0IGJveCBtb3VudGluZyBzaGFyZXMgZnJvbSBhIFdpbmRvd3MgMjAx
-OQ0KPiBzZXJ2ZXIuDQo+ID4gPiBCb3RoIGJveGVzIGFyZSBmdWxseSBwYXRjaGVkLiBUaGV5IGFy
-ZSByZXNpZGVudCBvbiB0aGUgc2FtZQ0KPiA+ID4gaHlwZXJ2aXNvciBhbmQgY29tbXVuaWNhdGlu
-ZyBkaXJlY3RseSB2aWEgYSB2U3dpdGNoLiBJIGhhdmUgNCBzaGFyZXMNCj4gPiA+IG1vdW50ZWQ7
-IGhlcmUgaXMgYW4gZXhhbXBsZSBmcm9tIG15IGZzdGFiICh5ZXMsIEkga25vdyBJIHNob3VsZCBt
-b3ZlDQo+IHRoZSBjcmVkZW50aWFsIGZpbGUpOg0KPiA+ID4NCj4gPiA+IC8vZmlsZTEvdXNlbmV0
-IC9tbnQvdXNlbmV0IGNpZnMNCj4gPiA+IHZlcnM9My4wLHVpZD1zY290dCxjcmVkZW50aWFscz0v
-aG9tZS9zY290dC8uc21iY3JlZGVudGlhbHMsbm9zZXJ2ZXJpDQo+ID4gPiBubyxuDQo+ID4gPiBv
-dW5peCxpb2NoYXJzZXQ9dXRmOCAwIDANCj4gPiA+DQo+ID4gPiBNeSBrZXJuZWwgaXMgNS40LjAt
-MjgtZ2VuZXJpYyBhbmQgbW91bnQuY2lmcyB2ZXJzaW9uIGlzIDYuOS4gVGhlDQo+ID4gPiBjb250
-ZW50cyBvZiBEZWJ1Z0RhdGEgYXJlIGluY2x1ZGVkIGJlbG93Lg0KPiA+ID4NCj4gPiA+IFJpZ2h0
-IGFmdGVyIHRoZSBtb3VudCwgSSBzZWUgYSBkdXBsaWNhdGUgY29va2llIHJlcG9ydGVkLiBJdCBp
-cw0KPiA+ID4gdW5jbGVhciBpZiB0aGlzIGlzIGEgcHJvYmxlbSBvciBub3QuIEZvbGxvd2luZyB0
-aGF0LCBJIHBlcmlvZGljYWxseQ0KPiA+ID4gc2VlIG1lc3NhZ2VzIHNpbWlsYXIgdG8gdGhlIGZv
-bGxvd2luZyByZXBlYXRlZCBpbiBkbWVzZzoNCj4gPiA+DQo+ID4gPiBbICAxNzkuNjI1Mjk2XSBT
-TUIyX3JlYWQ6IDkgY2FsbGJhY2tzIHN1cHByZXNzZWQgWyAgMTc5LjYyNTI5OF0gQ0lGUyBWRlM6
-DQo+ID4gPiBTZW5kIGVycm9yIGluIHJlYWQgPSAtNCBbICAxNzkuNzA0MTkxXSBDSUZTIFZGUzog
-U2VuZCBlcnJvciBpbiByZWFkDQo+ID4gPiA9IC00IFsgIDE3OS44NDc1MTRdIENJRlMgVkZTOiBT
-ZW5kIGVycm9yIGluIHJlYWQgPSAtNCBbICAxODAuMDMxNTE2XQ0KPiA+ID4gQ0lGUyBWRlM6IFNl
-bmQgZXJyb3IgaW4gcmVhZCA9IC00IFsgIDE4MC4yMTQ4NDhdIENJRlMgVkZTOiBTZW5kDQo+ID4g
-PiBlcnJvciBpbiByZWFkID0gLTQgWyAgMTgwLjI4MjkwOV0gQ0lGUyBWRlM6IFNlbmQgZXJyb3Ig
-aW4gcmVhZCA9IC00DQo+ID4gPiBbICAxODAuNDc0ODI5XSBDSUZTIFZGUzogU2VuZCBlcnJvciBp
-biByZWFkID0gLTQgWyAgMTgwLjYyMTM0OV0gQ0lGUw0KPiA+ID4gVkZTOiBTZW5kIGVycm9yIGlu
-IHJlYWQgPSAtNCBbICAxODAuNzgwNDY1XSBDSUZTIFZGUzogU2VuZCBlcnJvciBpbg0KPiA+ID4g
-cmVhZCA9IC00IFsgIDE4MC44MjMyNDldIENJRlMgVkZTOiBTZW5kIGVycm9yIGluIHJlYWQgPSAt
-NCBbDQo+ID4gPiAxODIuMzM5MzUxXSBDSUZTIFZGUzogQ2xvc2UgdW5tYXRjaGVkIG9wZW4gWyAg
-MTgyLjcyNjgyOV0gQ0lGUyBWRlM6DQo+ID4gPiBDbG9zZSB1bm1hdGNoZWQgb3BlbiBbICAxODQu
-MjkyNjYzXSBDSUZTIFZGUzogQ2xvc2UgdW5tYXRjaGVkIG9wZW4gWw0KPiA+ID4gMTg0LjUwMTE4
-NV0gQ0lGUyBWRlM6IENsb3NlIHVubWF0Y2hlZCBvcGVuIFsgIDE5MS43ODQ5MjJdIFNNQjJfcmVh
-ZDoNCj4gNCBjYWxsYmFja3Mgc3VwcHJlc3NlZCBbICAxOTEuNzg0OTI1XSBDSUZTIFZGUzoNCj4g
-PiA+IFNlbmQgZXJyb3IgaW4gcmVhZCA9IC00IFsgIDE5MS44ODQxODZdIENJRlMgVkZTOiBTZW5k
-IGVycm9yIGluIHJlYWQNCj4gPiA+ID0gLTQgWyAgMTkyLjI3MDg1MV0gQ0lGUyBWRlM6IFNlbmQg
-ZXJyb3IgaW4gcmVhZCA9IC00IFsgIDE5Mi4zMjM0NjddDQo+ID4gPiBDSUZTIFZGUzogU2VuZCBl
-cnJvciBpbiByZWFkID0gLTQgWyAgMTkyLjM4MTMzNl0gQ0lGUyBWRlM6IFNlbmQNCj4gPiA+IGVy
-cm9yIGluIHJlYWQgPSAtNCBbICAxOTIuNDQ2NzExXSBDSUZTIFZGUzogU2VuZCBlcnJvciBpbiBy
-ZWFkID0gLTQNCj4gPiA+IFsgIDE5Mi41MDc2MDVdIENJRlMgVkZTOiBTZW5kIGVycm9yIGluIHJl
-YWQgPSAtNCBbICAxOTMuMjQ0Mzk3XSBDSUZTDQo+ID4gPiBWRlM6IFNlbmQgZXJyb3IgaW4gcmVh
-ZCA9IC00IFsgIDE5My4zMDc1ODhdIENJRlMgVkZTOiBTZW5kIGVycm9yIGluDQo+ID4gPiByZWFk
-ID0gLTQgWyAgMTkzLjQwMzQxMF0gQ0lGUyBWRlM6IFNlbmQgZXJyb3IgaW4gcmVhZCA9IC00IFsN
-Cj4gPiA+IDE5My43OTcwMzhdIENJRlMgVkZTOiBDbG9zZSB1bm1hdGNoZWQgb3BlbiBbICAxOTYu
-Nzg0MDgyXSBDSUZTIFZGUzoNCj4gPiA+IENsb3NlIHVubWF0Y2hlZCBvcGVuIFsgIDE5OC4yNDc1
-OTRdIENJRlMgVkZTOiBDbG9zZSB1bm1hdGNoZWQgb3Blbg0KPiA+ID4NCj4gPiA+IEhlcmUgaXMg
-dGhlIGR1cGxpY2F0ZSBjb29raWUgaW5mbzoNCj4gPiA+DQo+ID4gPiBbICAgMjEuNzEzMzA3XSBG
-Uy1DYWNoZTogRHVwbGljYXRlIGNvb2tpZSBkZXRlY3RlZCBbICAgMjEuNzEzODQwXSBGUy0NCj4g
-Q2FjaGU6IE8tDQo+ID4gPiBjb29raWUgYz0wMDAwMDAwMGU4Mjc2Mjc5IFtwPTAwMDAwMDAwNzll
-ZjAzNjUgZmw9MjIyIG5jPTAgbmE9MV0NCj4gPiA+IFsgICAyMS43MTQzMzBdIEZTLUNhY2hlOiBP
-LWNvb2tpZSBkPTAwMDAwMDAwMTczZWEwZWUNCj4gbj0wMDAwMDAwMDI0M2YyMTBjDQo+ID4gPiBb
-ICAgMjEuNzE0Nzc5XSBGUy1DYWNoZTogTy1rZXk9WzhdICcwMjAwMDFiZGMwYTgwMWFmJw0KPiA+
-ID4gWyAgIDIxLjcxNTIxOV0gRlMtQ2FjaGU6IE4tY29va2llIGM9MDAwMDAwMDBhZmI0OWQ5Yw0K
-PiBbcD0wMDAwMDAwMDc5ZWYwMzY1DQo+ID4gPiBmbD0yIG5jPTAgbmE9MV0gWyAgIDIxLjcxNTY3
-Ml0gRlMtQ2FjaGU6IE4tY29va2llIGQ9MDAwMDAwMDAxNzNlYTBlZQ0KPiA+ID4gbj0wMDAwMDAw
-MGRkMTQ2NWM1IFsgICAyMS43MTYxNDFdIEZTLUNhY2hlOiBOLWtleT1bOF0NCj4gJzAyMDAwMWJk
-YzBhODAxYWYnDQo+ID4gPiBbICAgMjEuNzE2NTkxXSBGUy1DYWNoZTogRHVwbGljYXRlIGNvb2tp
-ZSBkZXRlY3RlZCBbICAgMjEuNzE3MjE3XSBGUy0NCj4gQ2FjaGU6IE8tDQo+ID4gPiBjb29raWUg
-Yz0wMDAwMDAwMGU4Mjc2Mjc5IFtwPTAwMDAwMDAwNzllZjAzNjUgZmw9MjIyIG5jPTAgbmE9MV0N
-Cj4gPiA+IFsgICAyMS43MTc2NzldIEZTLUNhY2hlOiBPLWNvb2tpZSBkPTAwMDAwMDAwMTczZWEw
-ZWUNCj4gbj0wMDAwMDAwMDI0M2YyMTBjDQo+ID4gPiBbICAgMjEuNzE4MjIwXSBGUy1DYWNoZTog
-Ty1rZXk9WzhdICcwMjAwMDFiZGMwYTgwMWFmJw0KPiA+ID4gWyAgIDIxLjcxODY4MV0gRlMtQ2Fj
-aGU6IE4tY29va2llIGM9MDAwMDAwMDA2MzY2NWNmNw0KPiBbcD0wMDAwMDAwMDc5ZWYwMzY1DQo+
-ID4gPiBmbD0yIG5jPTAgbmE9MV0gWyAgIDIxLjcxOTE2Nl0gRlMtQ2FjaGU6IE4tY29va2llIGQ9
-MDAwMDAwMDAxNzNlYTBlZQ0KPiA+ID4gbj0wMDAwMDAwMGU3NTdmOTE3IFsgICAyMS43MTk2MjFd
-IEZTLUNhY2hlOiBOLWtleT1bOF0NCj4gJzAyMDAwMWJkYzBhODAxYWYnDQo+ID4gPiBbICAgMjEu
-NzIwMDk3XSBGUy1DYWNoZTogRHVwbGljYXRlIGNvb2tpZSBkZXRlY3RlZCBbICAgMjEuNzIwNTY1
-XSBGUy0NCj4gQ2FjaGU6IE8tDQo+ID4gPiBjb29raWUgYz0wMDAwMDAwMGU4Mjc2Mjc5IFtwPTAw
-MDAwMDAwNzllZjAzNjUgZmw9MjIyIG5jPTAgbmE9MV0NCj4gPiA+IFsgICAyMS43MjEwNTNdIEZT
-LUNhY2hlOiBPLWNvb2tpZSBkPTAwMDAwMDAwMTczZWEwZWUNCj4gbj0wMDAwMDAwMDI0M2YyMTBj
-DQo+ID4gPiBbICAgMjEuNzIxNTE4XSBGUy1DYWNoZTogTy1rZXk9WzhdICcwMjAwMDFiZGMwYTgw
-MWFmJw0KPiA+ID4gWyAgIDIxLjcyMTk5NF0gRlMtQ2FjaGU6IE4tY29va2llIGM9MDAwMDAwMDBk
-NDc5YzI5NA0KPiBbcD0wMDAwMDAwMDc5ZWYwMzY1DQo+ID4gPiBmbD0yIG5jPTAgbmE9MV0gWyAg
-IDIxLjcyMjQ3Nl0gRlMtQ2FjaGU6IE4tY29va2llIGQ9MDAwMDAwMDAxNzNlYTBlZQ0KPiA+ID4g
-bj0wMDAwMDAwMGNhMTg5MWZhIFsgICAyMS43MjI5NDFdIEZTLUNhY2hlOiBOLWtleT1bOF0NCj4g
-JzAyMDAwMWJkYzBhODAxYWYnDQo+ID4gPg0KPiA+ID4gQW55IGlkZWFzIHdoYXQgY291bGQgYmUg
-Z29pbmcgb24/DQo+ID4gPg0KPiA+ID4gVGhhbmtzIGZvciBhbnkgaGVscCENCj4gPiA+DQo+ID4g
-Pg0KPiA+ID4NCj4gPiA+DQo+ID4gPg0KPiA+ID4NCj4gPiA+IERlYnVnRGF0YToNCj4gPiA+IENJ
-RlMgVmVyc2lvbiAyLjIzDQo+ID4gPiBGZWF0dXJlczoNCj4gPiA+DQo+IERGUyxGU0NBQ0hFLFNU
-QVRTLERFQlVHLEFMTE9XX0lOU0VDVVJFX0xFR0FDWSxXRUFLX1BXX0hBU0gsQw0KPiA+ID4gSUZT
-X1BPU0lYLFVQQ0FMTChTUE5FR08pLFhBVFRSLEFDTA0KPiA+ID4gQ0lGU01heEJ1ZlNpemU6IDE2
-Mzg0DQo+ID4gPiBBY3RpdmUgVkZTIFJlcXVlc3RzOiAwDQo+ID4gPiBTZXJ2ZXJzOg0KPiA+ID4g
-TnVtYmVyIG9mIGNyZWRpdHM6IDgxOTAgRGlhbGVjdCAweDMwMA0KPiA+ID4gMSkgTmFtZTogMTky
-LjE2OC4xLjE3NSBVc2VzOiAxIENhcGFiaWxpdHk6IDB4MzAwMDY3ICAgICBTZXNzaW9uIFN0YXR1
-czogMQ0KPiBUQ1ANCj4gPiA+IHN0YXR1czogMSBJbnN0YW5jZTogMQ0KPiA+ID4gICAgICAgICBM
-b2NhbCBVc2VycyBUbyBTZXJ2ZXI6IDEgU2VjTW9kZTogMHgxIFJlcSBPbiBXaXJlOiAwIFNlc3Np
-b25JZDoNCj4gPiA+IDB4MTAwMDgwMDAwMDIxDQo+ID4gPiAgICAgICAgIFNoYXJlczoNCj4gPiA+
-ICAgICAgICAgMCkgSVBDOiBcXGZpbGUxXElQQyQgTW91bnRzOiAxIERldkluZm86IDB4MCBBdHRy
-aWJ1dGVzOiAweDANCj4gPiA+ICAgICAgICAgUGF0aENvbXBvbmVudE1heDogMCBTdGF0dXM6IDEg
-dHlwZTogMCBTZXJpYWwgTnVtYmVyOiAweDANCj4gPiA+ICAgICAgICAgU2hhcmUgQ2FwYWJpbGl0
-aWVzOiBOb25lICAgICAgICBTaGFyZSBGbGFnczogMHgzMA0KPiA+ID4gICAgICAgICB0aWQ6IDB4
-MSAgICAgICAgTWF4aW1hbCBBY2Nlc3M6IDB4MTFmMDFmZg0KPiA+ID4NCj4gPiA+ICAgICAgICAg
-MSkgXFxmaWxlMVxYWFggTW91bnRzOiAxIERldkluZm86IDB4MjAwMjAgQXR0cmlidXRlczogMHg4
-NTAwZGYNCj4gPiA+ICAgICAgICAgUGF0aENvbXBvbmVudE1heDogMjU1IFN0YXR1czogMSB0eXBl
-OiBESVNLIFNlcmlhbCBOdW1iZXI6DQo+IDB4YTNjMzM5YTANCj4gPiA+ICAgICAgICAgU2hhcmUg
-Q2FwYWJpbGl0aWVzOiBOb25lIEFsaWduZWQsIFBhcnRpdGlvbiBBbGlnbmVkLCAgICBTaGFyZSBG
-bGFnczogMHgwDQo+ID4gPiAgICAgICAgIHRpZDogMHg1ICAgICAgICBPcHRpbWFsIHNlY3RvciBz
-aXplOiAweDIwMCAgICAgIE1heGltYWwgQWNjZXNzOiAweDFmMDFmZg0KPiA+ID4NCj4gPiA+ICAg
-ICAgICAgTUlEczoNCj4gPiA+DQo+ID4gPiAgICAgICAgIFNlcnZlciBpbnRlcmZhY2VzOiAyDQo+
-ID4gPiAgICAgICAgIDApICAgICAgU3BlZWQ6IDEwMDAwMDAwMDAwIGJwcw0KPiA+ID4gICAgICAg
-ICAgICAgICAgIENhcGFiaWxpdGllczoNCj4gPiA+ICAgICAgICAgICAgICAgICBJUHY2OiBmZTgw
-OjAwMDA6MDAwMDowMDAwOjcxY2I6MTgzOToxMDY5Ojk4MDYNCj4gPiA+ICAgICAgICAgMSkgICAg
-ICBTcGVlZDogMTAwMDAwMDAwMDAgYnBzDQo+ID4gPiAgICAgICAgICAgICAgICAgQ2FwYWJpbGl0
-aWVzOg0KPiA+ID4gICAgICAgICAgICAgICAgIElQdjQ6IDE5Mi4xNjguMS4xNzUNCj4gPiA+IE51
-bWJlciBvZiBjcmVkaXRzOiA4MTkwIERpYWxlY3QgMHgzMDANCj4gPiA+DQo+ID4gPiAyKSBOYW1l
-OiAxOTIuMTY4LjEuMTc1IFVzZXM6IDEgQ2FwYWJpbGl0eTogMHgzMDAwNjcgICAgIFNlc3Npb24g
-U3RhdHVzOiAxDQo+IFRDUA0KPiA+ID4gc3RhdHVzOiAxIEluc3RhbmNlOiAxDQo+ID4gPiAgICAg
-ICAgIExvY2FsIFVzZXJzIFRvIFNlcnZlcjogMSBTZWNNb2RlOiAweDEgUmVxIE9uIFdpcmU6IDAg
-U2Vzc2lvbklkOg0KPiA+ID4gMHgxMDAwNmMwMDAwMTkNCj4gPiA+ICAgICAgICAgU2hhcmVzOg0K
-PiA+ID4gICAgICAgICAwKSBJUEM6IFxcZmlsZTFcSVBDJCBNb3VudHM6IDEgRGV2SW5mbzogMHgw
-IEF0dHJpYnV0ZXM6IDB4MA0KPiA+ID4gICAgICAgICBQYXRoQ29tcG9uZW50TWF4OiAwIFN0YXR1
-czogMSB0eXBlOiAwIFNlcmlhbCBOdW1iZXI6IDB4MA0KPiA+ID4gICAgICAgICBTaGFyZSBDYXBh
-YmlsaXRpZXM6IE5vbmUgICAgICAgIFNoYXJlIEZsYWdzOiAweDMwDQo+ID4gPiAgICAgICAgIHRp
-ZDogMHgxICAgICAgICBNYXhpbWFsIEFjY2VzczogMHgxMWYwMWZmDQo+ID4gPg0KPiA+ID4gICAg
-ICAgICAxKSBcXGZpbGUxXHVzZW5ldCBNb3VudHM6IDEgRGV2SW5mbzogMHgyMDAyMCBBdHRyaWJ1
-dGVzOiAweDg1MDBkZg0KPiA+ID4gICAgICAgICBQYXRoQ29tcG9uZW50TWF4OiAyNTUgU3RhdHVz
-OiAxIHR5cGU6IERJU0sgU2VyaWFsIE51bWJlcjoNCj4gMHhhM2MzMzlhMA0KPiA+ID4gICAgICAg
-ICBTaGFyZSBDYXBhYmlsaXRpZXM6IE5vbmUgQWxpZ25lZCwgUGFydGl0aW9uIEFsaWduZWQsICAg
-IFNoYXJlIEZsYWdzOiAweDANCj4gPiA+ICAgICAgICAgdGlkOiAweDUgICAgICAgIE9wdGltYWwg
-c2VjdG9yIHNpemU6IDB4MjAwICAgICAgTWF4aW1hbCBBY2Nlc3M6IDB4MWYwMWZmDQo+ID4gPg0K
-PiA+ID4gICAgICAgICBNSURzOg0KPiA+ID4NCj4gPiA+ICAgICAgICAgU2VydmVyIGludGVyZmFj
-ZXM6IDINCj4gPiA+ICAgICAgICAgMCkgICAgICBTcGVlZDogMTAwMDAwMDAwMDAgYnBzDQo+ID4g
-PiAgICAgICAgICAgICAgICAgQ2FwYWJpbGl0aWVzOg0KPiA+ID4gICAgICAgICAgICAgICAgIElQ
-djY6IGZlODA6MDAwMDowMDAwOjAwMDA6NzFjYjoxODM5OjEwNjk6OTgwNg0KPiA+ID4gICAgICAg
-ICAxKSAgICAgIFNwZWVkOiAxMDAwMDAwMDAwMCBicHMNCj4gPiA+ICAgICAgICAgICAgICAgICBD
-YXBhYmlsaXRpZXM6DQo+ID4gPiAgICAgICAgICAgICAgICAgSVB2NDogMTkyLjE2OC4xLjE3NQ0K
-PiA+ID4NCj4gPiA+DQo+ID4gPiAzKSBOYW1lOiAxOTIuMTY4LjEuMTc1IFVzZXM6IDEgQ2FwYWJp
-bGl0eTogMHgzMDAwNjcgICAgIFNlc3Npb24gU3RhdHVzOiAxDQo+IFRDUA0KPiA+ID4gc3RhdHVz
-OiAxIEluc3RhbmNlOiAxDQo+ID4gPiAgICAgICAgIExvY2FsIFVzZXJzIFRvIFNlcnZlcjogMSBT
-ZWNNb2RlOiAweDEgUmVxIE9uIFdpcmU6IDIgU2Vzc2lvbklkOg0KPiA+ID4gMHgxMDAwN2MwMDAw
-NjENCj4gPiA+ICAgICAgICAgU2hhcmVzOg0KPiA+ID4gICAgICAgICAwKSBJUEM6IFxcZmlsZTFc
-SVBDJCBNb3VudHM6IDEgRGV2SW5mbzogMHgwIEF0dHJpYnV0ZXM6IDB4MA0KPiA+ID4gICAgICAg
-ICBQYXRoQ29tcG9uZW50TWF4OiAwIFN0YXR1czogMSB0eXBlOiAwIFNlcmlhbCBOdW1iZXI6IDB4
-MA0KPiA+ID4gICAgICAgICBTaGFyZSBDYXBhYmlsaXRpZXM6IE5vbmUgICAgICAgIFNoYXJlIEZs
-YWdzOiAweDMwDQo+ID4gPiAgICAgICAgIHRpZDogMHgxICAgICAgICBNYXhpbWFsIEFjY2Vzczog
-MHgxMWYwMWZmDQo+ID4gPg0KPiA+ID4gICAgICAgICAxKSBcXGZpbGUxXFlZWSBNb3VudHM6IDEg
-RGV2SW5mbzogMHgyMDAyMCBBdHRyaWJ1dGVzOiAweDg1MDBkZg0KPiA+ID4gICAgICAgICBQYXRo
-Q29tcG9uZW50TWF4OiAyNTUgU3RhdHVzOiAxIHR5cGU6IERJU0sgU2VyaWFsIE51bWJlcjoNCj4g
-MHhhM2MzMzlhMA0KPiA+ID4gICAgICAgICBTaGFyZSBDYXBhYmlsaXRpZXM6IE5vbmUgQWxpZ25l
-ZCwgUGFydGl0aW9uIEFsaWduZWQsICAgIFNoYXJlIEZsYWdzOiAweDANCj4gPiA+ICAgICAgICAg
-dGlkOiAweDUgICAgICAgIE9wdGltYWwgc2VjdG9yIHNpemU6IDB4MjAwICAgICAgTWF4aW1hbCBB
-Y2Nlc3M6IDB4MWYwMWZmDQo+ID4gPg0KPiA+ID4gICAgICAgICBNSURzOg0KPiA+ID4gICAgICAg
-ICBTdGF0ZTogMiBjb206IDggcGlkOiAxMjE4IGNiZGF0YTogMDAwMDAwMDBlNDVjNTlkMiBtaWQg
-MTIxMTQ4OQ0KPiA+ID4gICAgICAgICBTdGF0ZTogMiBjb206IDggcGlkOiAxMjE4IGNiZGF0YTog
-MDAwMDAwMDAxODQ3NjE5NSBtaWQNCj4gPiA+IDEyMTE1NTMNCj4gPiA+DQo+ID4gPiAgICAgICAg
-IFNlcnZlciBpbnRlcmZhY2VzOiAyDQo+ID4gPiAgICAgICAgIDApICAgICAgU3BlZWQ6IDEwMDAw
-MDAwMDAwIGJwcw0KPiA+ID4gICAgICAgICAgICAgICAgIENhcGFiaWxpdGllczoNCj4gPiA+ICAg
-ICAgICAgICAgICAgICBJUHY2OiBmZTgwOjAwMDA6MDAwMDowMDAwOjcxY2I6MTgzOToxMDY5Ojk4
-MDYNCj4gPiA+ICAgICAgICAgMSkgICAgICBTcGVlZDogMTAwMDAwMDAwMDAgYnBzDQo+ID4gPiAg
-ICAgICAgICAgICAgICAgQ2FwYWJpbGl0aWVzOg0KPiA+ID4gICAgICAgICAgICAgICAgIElQdjQ6
-IDE5Mi4xNjguMS4xNzUNCj4gPiA+DQo+ID4gPiBOdW1iZXIgb2YgY3JlZGl0czogODE5MCBEaWFs
-ZWN0IDB4MzAwDQo+ID4gPiA0KSBOYW1lOiAxOTIuMTY4LjEuMTc1IFVzZXM6IDEgQ2FwYWJpbGl0
-eTogMHgzMDAwNjcgICAgIFNlc3Npb24gU3RhdHVzOiAxDQo+IFRDUA0KPiA+ID4gc3RhdHVzOiAx
-IEluc3RhbmNlOiAxDQo+ID4gPiAgICAgICAgIExvY2FsIFVzZXJzIFRvIFNlcnZlcjogMSBTZWNN
-b2RlOiAweDEgUmVxIE9uIFdpcmU6IDAgU2Vzc2lvbklkOg0KPiA+ID4gMHgxMDAwNmMwMDAwNTUN
-Cj4gPiA+ICAgICAgICAgU2hhcmVzOg0KPiA+ID4gICAgICAgICAwKSBJUEM6IFxcZmlsZTFcSVBD
-JCBNb3VudHM6IDEgRGV2SW5mbzogMHgwIEF0dHJpYnV0ZXM6IDB4MA0KPiA+ID4gICAgICAgICBQ
-YXRoQ29tcG9uZW50TWF4OiAwIFN0YXR1czogMSB0eXBlOiAwIFNlcmlhbCBOdW1iZXI6IDB4MA0K
-PiA+ID4gICAgICAgICBTaGFyZSBDYXBhYmlsaXRpZXM6IE5vbmUgICAgICAgIFNoYXJlIEZsYWdz
-OiAweDMwDQo+ID4gPiAgICAgICAgIHRpZDogMHgxICAgICAgICBNYXhpbWFsIEFjY2VzczogMHgx
-MWYwMWZmDQo+ID4gPg0KPiA+ID4gICAgICAgICAxKSBcXGZpbGUxXFpaWiBNb3VudHM6IDEgRGV2
-SW5mbzogMHgyMDAyMCBBdHRyaWJ1dGVzOiAweDg1MDBkZg0KPiA+ID4gICAgICAgICBQYXRoQ29t
-cG9uZW50TWF4OiAyNTUgU3RhdHVzOiAxIHR5cGU6IERJU0sgU2VyaWFsIE51bWJlcjoNCj4gMHhh
-M2MzMzlhMA0KPiA+ID4gICAgICAgICBTaGFyZSBDYXBhYmlsaXRpZXM6IE5vbmUgQWxpZ25lZCwg
-UGFydGl0aW9uIEFsaWduZWQsICAgIFNoYXJlIEZsYWdzOiAweDANCj4gPiA+ICAgICAgICAgdGlk
-OiAweDUgICAgICAgIE9wdGltYWwgc2VjdG9yIHNpemU6IDB4MjAwICAgICAgTWF4aW1hbCBBY2Nl
-c3M6IDB4MWYwMWZmDQo+ID4gPg0KPiA+ID4gICAgICAgICBNSURzOg0KPiA+ID4NCj4gPiA+ICAg
-ICAgICAgU2VydmVyIGludGVyZmFjZXM6IDINCj4gPiA+ICAgICAgICAgMCkgICAgICBTcGVlZDog
-MTAwMDAwMDAwMDAgYnBzDQo+ID4gPiAgICAgICAgICAgICAgICAgQ2FwYWJpbGl0aWVzOg0KPiA+
-ID4gICAgICAgICAgICAgICAgIElQdjY6IGZlODA6MDAwMDowMDAwOjAwMDA6NzFjYjoxODM5OjEw
-Njk6OTgwNg0KPiA+ID4gICAgICAgICAxKSAgICAgIFNwZWVkOiAxMDAwMDAwMDAwMCBicHMNCj4g
-PiA+ICAgICAgICAgICAgICAgICBDYXBhYmlsaXRpZXM6DQo+ID4gPiAgICAgICAgICAgICAgICAg
-SVB2NDogMTkyLjE2OC4xLjE3NQ0KPiANCj4gDQo+IA0KPiAtLQ0KPiBUaGFua3MsDQo+IA0KPiBT
-dGV2ZQ0K
+I would expect the close unmatched open to be related to the session
+being closed (thus all files implicitly closed on the server) but the
+session drop overlapping the application closing a file.
+
+On Fri, May 1, 2020 at 2:39 PM Scott M. Lewandowski
+<vgerkernel@scottl.com> wrote:
+>
+> I've now got a trace that corresponds to the dmesg output below. I will t=
+ake a look later, but upon quick glance, this doesn't look like anything th=
+at will mean much to me, unfortunately. If someone would like to look at th=
+e file I can find a way to get it to you.
+>
+>
+> [53223.099221] CIFS VFS: Send error in read =3D -4
+> [53223.232373] CIFS VFS: Send error in read =3D -4
+> [53254.762914] CIFS VFS: Send error in read =3D -4
+> [53301.403925] CIFS VFS: Send error in read =3D -4
+> [53301.772568] CIFS VFS: Send error in read =3D -4
+> [53301.818566] CIFS VFS: Send error in read =3D -4
+> [53301.885510] CIFS VFS: Send error in read =3D -4
+> [53302.055959] CIFS VFS: Send error in read =3D -4
+> [53302.146337] CIFS VFS: Send error in read =3D -4
+> [53302.236322] CIFS VFS: Send error in read =3D -4
+> [53302.329525] CIFS VFS: Send error in read =3D -4
+> [53303.000869] CIFS VFS: Send error in read =3D -4
+> [53303.106961] CIFS VFS: Send error in read =3D -4
+> [53304.756998] CIFS VFS: Close unmatched open
+> [53670.776832] CIFS VFS: Close unmatched open
+>
+>
+> > -----Original Message-----
+> > From: Steve French <smfrench@gmail.com>
+> > Sent: Friday, May 1, 2020 10:57 AM
+> > To: Scott M. Lewandowski <vgerkernel@scottl.com>
+> > Cc: Scott M. Lewandowski <scott@wynstonegroup.com>; CIFS <linux-
+> > cifs@vger.kernel.org>
+> > Subject: Re: issues with CIFS on Ubuntu 20 mounting Windows 2019
+> >
+> > Are you comfortable with dynamic tracing ("trace-cmd record -e ..."
+> > ... the list of trace points can be seen in
+> > /sys/kernel/debug/tracing/events/cifs)?
+> >
+> > On Fri, May 1, 2020 at 10:40 AM Scott M. Lewandowski
+> > <vgerkernel@scottl.com> wrote:
+> > >
+> > > I=E2=80=99m also seeing entries like the following mixed in with the =
+other messages:
+> > >
+> > > [27078.665192] CIFS VFS: \\file1 Cancelling wait for mid 13443257 cmd=
+:
+> > > 5
+> > >
+> > > And
+> > >
+> > > [31833.351785] CIFS VFS: cifs_invalidate_mapping: could not invalidat=
+e
+> > > inode 00000000b4733e96
+> > >
+> > >
+> > >
+> > >
+> > > > -----Original Message-----
+> > > > From: Scott M. Lewandowski <vgerkernel@scottl.com>
+> > > > Sent: Friday, May 1, 2020 12:20 AM
+> > > > To: 'Steve French' <smfrench@gmail.com>
+> > > > Cc: CIFS <linux-cifs@vger.kernel.org>
+> > > > Subject: RE: issues with CIFS on Ubuntu 20 mounting Windows 2019
+> > > >
+> > > > > EINTR on read ... Hundreds of times?! I have seen scp do that by
+> > > > > sending signals but in writes not reads
+> > > >
+> > > > Not using scp at the moment.
+> > > >
+> > > > > Could an app be sending signals trying to kill the process doing =
+the
+> > reads?
+> > > >
+> > > > Not that I'm aware of. I'm not sure exactly how I'd check that, but
+> > > > I will look into it.
+> > > >
+> > > > One other thing that came to mind that may be helpful is that one o=
+f
+> > > > the processes doing the most IO is running under mono 6.8.0.105
+> > > >
+> > > > -scott
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > From: Steve French <smfrench@gmail.com>
+> > > > Sent: Friday, May 1, 2020 12:07 AM
+> > > > To: Scott M. Lewandowski <vgerkernel@scottl.com>
+> > > > Cc: CIFS <linux-cifs@vger.kernel.org>
+> > > > Subject: Re: issues with CIFS on Ubuntu 20 mounting Windows 2019
+> > > >
+> > > > EINTR on read ... Hundreds of times?! I have seen scp do that by
+> > > > sending signals but in writes not reads
+> > > >
+> > > > On Thu, Apr 30, 2020, 23:48 Scott M. Lewandowski
+> > > > <mailto:vgerkernel@scottl.com> wrote:
+> > > > I have an Ubuntu 20.04 box mounting shares from a Windows 2019
+> > server.
+> > > > Both boxes are fully patched. They are resident on the same
+> > > > hypervisor and communicating directly via a vSwitch. I have 4 share=
+s
+> > > > mounted; here is an example from my fstab (yes, I know I should mov=
+e
+> > the credential file):
+> > > >
+> > > > //file1/usenet /mnt/usenet cifs
+> > > > vers=3D3.0,uid=3Dscott,credentials=3D/home/scott/.smbcredentials,no=
+serveri
+> > > > no,n
+> > > > ounix,iocharset=3Dutf8 0 0
+> > > >
+> > > > My kernel is 5.4.0-28-generic and mount.cifs version is 6.9. The
+> > > > contents of DebugData are included below.
+> > > >
+> > > > Right after the mount, I see a duplicate cookie reported. It is
+> > > > unclear if this is a problem or not. Following that, I periodically
+> > > > see messages similar to the following repeated in dmesg:
+> > > >
+> > > > [  179.625296] SMB2_read: 9 callbacks suppressed [  179.625298] CIF=
+S VFS:
+> > > > Send error in read =3D -4 [  179.704191] CIFS VFS: Send error in re=
+ad
+> > > > =3D -4 [  179.847514] CIFS VFS: Send error in read =3D -4 [  180.03=
+1516]
+> > > > CIFS VFS: Send error in read =3D -4 [  180.214848] CIFS VFS: Send
+> > > > error in read =3D -4 [  180.282909] CIFS VFS: Send error in read =
+=3D -4
+> > > > [  180.474829] CIFS VFS: Send error in read =3D -4 [  180.621349] C=
+IFS
+> > > > VFS: Send error in read =3D -4 [  180.780465] CIFS VFS: Send error =
+in
+> > > > read =3D -4 [  180.823249] CIFS VFS: Send error in read =3D -4 [
+> > > > 182.339351] CIFS VFS: Close unmatched open [  182.726829] CIFS VFS:
+> > > > Close unmatched open [  184.292663] CIFS VFS: Close unmatched open =
+[
+> > > > 184.501185] CIFS VFS: Close unmatched open [  191.784922] SMB2_read=
+:
+> > 4 callbacks suppressed [  191.784925] CIFS VFS:
+> > > > Send error in read =3D -4 [  191.884186] CIFS VFS: Send error in re=
+ad
+> > > > =3D -4 [  192.270851] CIFS VFS: Send error in read =3D -4 [  192.32=
+3467]
+> > > > CIFS VFS: Send error in read =3D -4 [  192.381336] CIFS VFS: Send
+> > > > error in read =3D -4 [  192.446711] CIFS VFS: Send error in read =
+=3D -4
+> > > > [  192.507605] CIFS VFS: Send error in read =3D -4 [  193.244397] C=
+IFS
+> > > > VFS: Send error in read =3D -4 [  193.307588] CIFS VFS: Send error =
+in
+> > > > read =3D -4 [  193.403410] CIFS VFS: Send error in read =3D -4 [
+> > > > 193.797038] CIFS VFS: Close unmatched open [  196.784082] CIFS VFS:
+> > > > Close unmatched open [  198.247594] CIFS VFS: Close unmatched open
+> > > >
+> > > > Here is the duplicate cookie info:
+> > > >
+> > > > [   21.713307] FS-Cache: Duplicate cookie detected [   21.713840] F=
+S-
+> > Cache: O-
+> > > > cookie c=3D00000000e8276279 [p=3D0000000079ef0365 fl=3D222 nc=3D0 n=
+a=3D1]
+> > > > [   21.714330] FS-Cache: O-cookie d=3D00000000173ea0ee
+> > n=3D00000000243f210c
+> > > > [   21.714779] FS-Cache: O-key=3D[8] '020001bdc0a801af'
+> > > > [   21.715219] FS-Cache: N-cookie c=3D00000000afb49d9c
+> > [p=3D0000000079ef0365
+> > > > fl=3D2 nc=3D0 na=3D1] [   21.715672] FS-Cache: N-cookie d=3D0000000=
+0173ea0ee
+> > > > n=3D00000000dd1465c5 [   21.716141] FS-Cache: N-key=3D[8]
+> > '020001bdc0a801af'
+> > > > [   21.716591] FS-Cache: Duplicate cookie detected [   21.717217] F=
+S-
+> > Cache: O-
+> > > > cookie c=3D00000000e8276279 [p=3D0000000079ef0365 fl=3D222 nc=3D0 n=
+a=3D1]
+> > > > [   21.717679] FS-Cache: O-cookie d=3D00000000173ea0ee
+> > n=3D00000000243f210c
+> > > > [   21.718220] FS-Cache: O-key=3D[8] '020001bdc0a801af'
+> > > > [   21.718681] FS-Cache: N-cookie c=3D0000000063665cf7
+> > [p=3D0000000079ef0365
+> > > > fl=3D2 nc=3D0 na=3D1] [   21.719166] FS-Cache: N-cookie d=3D0000000=
+0173ea0ee
+> > > > n=3D00000000e757f917 [   21.719621] FS-Cache: N-key=3D[8]
+> > '020001bdc0a801af'
+> > > > [   21.720097] FS-Cache: Duplicate cookie detected [   21.720565] F=
+S-
+> > Cache: O-
+> > > > cookie c=3D00000000e8276279 [p=3D0000000079ef0365 fl=3D222 nc=3D0 n=
+a=3D1]
+> > > > [   21.721053] FS-Cache: O-cookie d=3D00000000173ea0ee
+> > n=3D00000000243f210c
+> > > > [   21.721518] FS-Cache: O-key=3D[8] '020001bdc0a801af'
+> > > > [   21.721994] FS-Cache: N-cookie c=3D00000000d479c294
+> > [p=3D0000000079ef0365
+> > > > fl=3D2 nc=3D0 na=3D1] [   21.722476] FS-Cache: N-cookie d=3D0000000=
+0173ea0ee
+> > > > n=3D00000000ca1891fa [   21.722941] FS-Cache: N-key=3D[8]
+> > '020001bdc0a801af'
+> > > >
+> > > > Any ideas what could be going on?
+> > > >
+> > > > Thanks for any help!
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > DebugData:
+> > > > CIFS Version 2.23
+> > > > Features:
+> > > >
+> > DFS,FSCACHE,STATS,DEBUG,ALLOW_INSECURE_LEGACY,WEAK_PW_HASH,C
+> > > > IFS_POSIX,UPCALL(SPNEGO),XATTR,ACL
+> > > > CIFSMaxBufSize: 16384
+> > > > Active VFS Requests: 0
+> > > > Servers:
+> > > > Number of credits: 8190 Dialect 0x300
+> > > > 1) Name: 192.168.1.175 Uses: 1 Capability: 0x300067     Session Sta=
+tus: 1
+> > TCP
+> > > > status: 1 Instance: 1
+> > > >         Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Sessio=
+nId:
+> > > > 0x100080000021
+> > > >         Shares:
+> > > >         0) IPC: \\file1\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
+> > > >         PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0
+> > > >         Share Capabilities: None        Share Flags: 0x30
+> > > >         tid: 0x1        Maximal Access: 0x11f01ff
+> > > >
+> > > >         1) \\file1\XXX Mounts: 1 DevInfo: 0x20020 Attributes: 0x850=
+0df
+> > > >         PathComponentMax: 255 Status: 1 type: DISK Serial Number:
+> > 0xa3c339a0
+> > > >         Share Capabilities: None Aligned, Partition Aligned,    Sha=
+re Flags: 0x0
+> > > >         tid: 0x5        Optimal sector size: 0x200      Maximal Acc=
+ess: 0x1f01ff
+> > > >
+> > > >         MIDs:
+> > > >
+> > > >         Server interfaces: 2
+> > > >         0)      Speed: 10000000000 bps
+> > > >                 Capabilities:
+> > > >                 IPv6: fe80:0000:0000:0000:71cb:1839:1069:9806
+> > > >         1)      Speed: 10000000000 bps
+> > > >                 Capabilities:
+> > > >                 IPv4: 192.168.1.175
+> > > > Number of credits: 8190 Dialect 0x300
+> > > >
+> > > > 2) Name: 192.168.1.175 Uses: 1 Capability: 0x300067     Session Sta=
+tus: 1
+> > TCP
+> > > > status: 1 Instance: 1
+> > > >         Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Sessio=
+nId:
+> > > > 0x10006c000019
+> > > >         Shares:
+> > > >         0) IPC: \\file1\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
+> > > >         PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0
+> > > >         Share Capabilities: None        Share Flags: 0x30
+> > > >         tid: 0x1        Maximal Access: 0x11f01ff
+> > > >
+> > > >         1) \\file1\usenet Mounts: 1 DevInfo: 0x20020 Attributes: 0x=
+8500df
+> > > >         PathComponentMax: 255 Status: 1 type: DISK Serial Number:
+> > 0xa3c339a0
+> > > >         Share Capabilities: None Aligned, Partition Aligned,    Sha=
+re Flags: 0x0
+> > > >         tid: 0x5        Optimal sector size: 0x200      Maximal Acc=
+ess: 0x1f01ff
+> > > >
+> > > >         MIDs:
+> > > >
+> > > >         Server interfaces: 2
+> > > >         0)      Speed: 10000000000 bps
+> > > >                 Capabilities:
+> > > >                 IPv6: fe80:0000:0000:0000:71cb:1839:1069:9806
+> > > >         1)      Speed: 10000000000 bps
+> > > >                 Capabilities:
+> > > >                 IPv4: 192.168.1.175
+> > > >
+> > > >
+> > > > 3) Name: 192.168.1.175 Uses: 1 Capability: 0x300067     Session Sta=
+tus: 1
+> > TCP
+> > > > status: 1 Instance: 1
+> > > >         Local Users To Server: 1 SecMode: 0x1 Req On Wire: 2 Sessio=
+nId:
+> > > > 0x10007c000061
+> > > >         Shares:
+> > > >         0) IPC: \\file1\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
+> > > >         PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0
+> > > >         Share Capabilities: None        Share Flags: 0x30
+> > > >         tid: 0x1        Maximal Access: 0x11f01ff
+> > > >
+> > > >         1) \\file1\YYY Mounts: 1 DevInfo: 0x20020 Attributes: 0x850=
+0df
+> > > >         PathComponentMax: 255 Status: 1 type: DISK Serial Number:
+> > 0xa3c339a0
+> > > >         Share Capabilities: None Aligned, Partition Aligned,    Sha=
+re Flags: 0x0
+> > > >         tid: 0x5        Optimal sector size: 0x200      Maximal Acc=
+ess: 0x1f01ff
+> > > >
+> > > >         MIDs:
+> > > >         State: 2 com: 8 pid: 1218 cbdata: 00000000e45c59d2 mid 1211=
+489
+> > > >         State: 2 com: 8 pid: 1218 cbdata: 0000000018476195 mid
+> > > > 1211553
+> > > >
+> > > >         Server interfaces: 2
+> > > >         0)      Speed: 10000000000 bps
+> > > >                 Capabilities:
+> > > >                 IPv6: fe80:0000:0000:0000:71cb:1839:1069:9806
+> > > >         1)      Speed: 10000000000 bps
+> > > >                 Capabilities:
+> > > >                 IPv4: 192.168.1.175
+> > > >
+> > > > Number of credits: 8190 Dialect 0x300
+> > > > 4) Name: 192.168.1.175 Uses: 1 Capability: 0x300067     Session Sta=
+tus: 1
+> > TCP
+> > > > status: 1 Instance: 1
+> > > >         Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0 Sessio=
+nId:
+> > > > 0x10006c000055
+> > > >         Shares:
+> > > >         0) IPC: \\file1\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
+> > > >         PathComponentMax: 0 Status: 1 type: 0 Serial Number: 0x0
+> > > >         Share Capabilities: None        Share Flags: 0x30
+> > > >         tid: 0x1        Maximal Access: 0x11f01ff
+> > > >
+> > > >         1) \\file1\ZZZ Mounts: 1 DevInfo: 0x20020 Attributes: 0x850=
+0df
+> > > >         PathComponentMax: 255 Status: 1 type: DISK Serial Number:
+> > 0xa3c339a0
+> > > >         Share Capabilities: None Aligned, Partition Aligned,    Sha=
+re Flags: 0x0
+> > > >         tid: 0x5        Optimal sector size: 0x200      Maximal Acc=
+ess: 0x1f01ff
+> > > >
+> > > >         MIDs:
+> > > >
+> > > >         Server interfaces: 2
+> > > >         0)      Speed: 10000000000 bps
+> > > >                 Capabilities:
+> > > >                 IPv6: fe80:0000:0000:0000:71cb:1839:1069:9806
+> > > >         1)      Speed: 10000000000 bps
+> > > >                 Capabilities:
+> > > >                 IPv4: 192.168.1.175
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+
+
+
+--=20
+Thanks,
+
+Steve
