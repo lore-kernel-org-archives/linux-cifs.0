@@ -1,76 +1,91 @@
-Return-Path: <SRS0=N30I=6T=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=SI7l=6U=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B60C47254
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 May 2020 13:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87355C28CBC
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 May 2020 07:58:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB43320735
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 May 2020 13:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 681F32075A
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 May 2020 07:58:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ERQuhCO8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729088AbgEENsk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 May 2020 09:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44522 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728898AbgEENsk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 May 2020 09:48:40 -0400
-X-Greylist: delayed 300 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 May 2020 06:48:39 PDT
-Received: from baptiste.telenet-ops.be (baptiste.telenet-ops.be [IPv6:2a02:1800:120:4::f00:13])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F04B1C061A0F
-        for <linux-cifs@vger.kernel.org>; Tue,  5 May 2020 06:48:39 -0700 (PDT)
-Received: from ramsan ([IPv6:2a02:1810:ac12:ed60:bd97:8453:3b10:1832])
-        by baptiste.telenet-ops.be with bizsmtp
-        id b1jc2200m3VwRR3011jccL; Tue, 05 May 2020 15:43:37 +0200
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan with esmtp (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1jVxrF-0008LA-Dt; Tue, 05 May 2020 15:43:37 +0200
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1jVxrF-0006z1-Bm; Tue, 05 May 2020 15:43:37 +0200
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     Steve French <sfrench@samba.org>, Jiri Kosina <trivial@kernel.org>,
-        Aurelien Aptel <aaptel@suse.com>
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH trivial] CIFS: Spelling s/EACCESS/EACCES/
-Date:   Tue,  5 May 2020 15:43:35 +0200
-Message-Id: <20200505134335.26802-1-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
+        id S1727937AbgEFH6I (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 May 2020 03:58:08 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40591 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728345AbgEFH6H (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 May 2020 03:58:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1588751886;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3XSAt+Mkup/SofBBKUCYx2i7ecGmmjnSIl1ryVz58Ao=;
+        b=ERQuhCO8JpQaYzfso9+zJJAQPLHiLzZmFQhRvmOKgJ1YDyVhNBfsF/CDmvI0J79TGTR2WB
+        HJ58dLWps9KOCBw61nB9SXurgh1AdJ/S6FROLW07/zPOoWlKjVWvDYjgDbcYy6twmtmeUN
+        nUQZ9KhZ/mQTtPGTikf9+7S7uc4dv6o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-459--Q3klqpZNS2sU59OYqcCAQ-1; Wed, 06 May 2020 03:58:03 -0400
+X-MC-Unique: -Q3klqpZNS2sU59OYqcCAQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A672B835B49;
+        Wed,  6 May 2020 07:58:01 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-118-225.rdu2.redhat.com [10.10.118.225])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 014C45D9DA;
+        Wed,  6 May 2020 07:57:58 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20200505115946.GF16070@bombadil.infradead.org>
+References: <20200505115946.GF16070@bombadil.infradead.org> <158861203563.340223.7585359869938129395.stgit@warthog.procyon.org.uk> <158861253957.340223.7465334678444521655.stgit@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 54/61] afs: Wait on PG_fscache before modifying/releasing a page
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <683738.1588751878.1@warthog.procyon.org.uk>
+Date:   Wed, 06 May 2020 08:57:58 +0100
+Message-ID: <683739.1588751878@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-As per POSIX, the correct spelling is EACCES:
+Matthew Wilcox <willy@infradead.org> wrote:
 
-include/uapi/asm-generic/errno-base.h:#define EACCES 13 /* Permission denied */
+> > PG_fscache is going to be used to indicate that a page is being written to
+> > the cache, and that the page should not be modified or released until it's
+> > finished.
+> > 
+> > Make afs_invalidatepage() and afs_releasepage() wait for it.
+> 
+> Well, why?  Keeping a refcount on the page will prevent it from going
+> away while it's being written to storage.  And the fact that it's
+> being written to this cache is no reason to delay the truncate of a file
+> (is it?)
 
-Fixes: b8f7442bc46e48fb ("CIFS: refactor cifs_get_inode_info()")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- fs/cifs/inode.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Won't that screw up ITER_MAPPING?  Does that mean that ITER_MAPPING isn't
+viable?
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 390d2b15ef6ef9d7..5d2965a2373054a4 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -730,7 +730,7 @@ static __u64 simple_hashstr(const char *str)
-  * cifs_backup_query_path_info - SMB1 fallback code to get ino
-  *
-  * Fallback code to get file metadata when we don't have access to
-- * @full_path (EACCESS) and have backup creds.
-+ * @full_path (EACCES) and have backup creds.
-  *
-  * @data will be set to search info result buffer
-  * @resp_buf will be set to cifs resp buf and needs to be freed with
--- 
-2.17.1
+David
 
