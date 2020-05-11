@@ -1,119 +1,126 @@
-Return-Path: <SRS0=djom=6W=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=pVcL=6Z=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D0EC47247
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 May 2020 14:40:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB71C47255
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 May 2020 15:42:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99213214D8
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 May 2020 14:40:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7A5A206DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 May 2020 15:42:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gl4lNuj7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AP08LLKo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727902AbgEHOkE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 8 May 2020 10:40:04 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60751 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727907AbgEHOj7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 8 May 2020 10:39:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1588948798;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hEKOJFeBe0XhjAsTACvee48OxZfeBzXxgNIQnHiBGQA=;
-        b=Gl4lNuj7Ki9pavwxpT7H1K3PsTz9f9XvJI3PAsJqmdFwhxlzQJrrVkeWprMV/N67y4bQ8j
-        Mt/W21+61NlFx5L5A01EcezdhZ2E+zJ2DzWuBm8tzlAeJx0aawbnTxdzJccdHHT+QhZrJE
-        1DXe4LFBr1KhzSPKr06oPKYBS4DYP84=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-uSDcl7BqPWCt8KdWQCXcuA-1; Fri, 08 May 2020 10:39:54 -0400
-X-MC-Unique: uSDcl7BqPWCt8KdWQCXcuA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D86B464;
-        Fri,  8 May 2020 14:39:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-118-225.rdu2.redhat.com [10.10.118.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 42DCE707A6;
-        Fri,  8 May 2020 14:39:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <713141.1588775072@warthog.procyon.org.uk>
-References: <713141.1588775072@warthog.procyon.org.uk> <20200506110942.GL16070@bombadil.infradead.org> <20200505115946.GF16070@bombadil.infradead.org> <158861203563.340223.7585359869938129395.stgit@warthog.procyon.org.uk> <158861253957.340223.7465334678444521655.stgit@warthog.procyon.org.uk> <683739.1588751878@warthog.procyon.org.uk>
-Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 54/61] afs: Wait on PG_fscache before modifying/releasing a page
+        id S1728089AbgEKPmT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 11 May 2020 11:42:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50918 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726934AbgEKPmT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 11 May 2020 11:42:19 -0400
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E793FC061A0C
+        for <linux-cifs@vger.kernel.org>; Mon, 11 May 2020 08:42:18 -0700 (PDT)
+Received: by mail-ej1-x642.google.com with SMTP id se13so1628168ejb.9
+        for <linux-cifs@vger.kernel.org>; Mon, 11 May 2020 08:42:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=ZyayfKHbdUpDZhSDZes91ie4j30cvRqOr7VTsuNDqxY=;
+        b=AP08LLKof0NbWrTFE0ns3UqDkISQ+UaKUgBJ+P3JXLw5dnsDuBPfaG45V+FR/BgZ3T
+         rp6YpNhqSMlNX9wp9FMW79WTF4/2pWJP0DUoYRU+hkaDrF7k+32yBrWq+Cnk6aB7cQCq
+         gPTBspqZOnbAirCN6F16iusYqKSk9LqiqQTeP2Y80ClzxFt0w99vrDXHdeTq45vr68ad
+         ZWI5PuXOO8R4/lbInJrSMehqBw7+RqDHI8RaAT5ome7RI6xj805rmA7BzL0HRQr3PRMn
+         NbXsh4gY0JgWlgvTEX+E1KyqjBiwyDamOfm3hwDTlTYNULt+nLMfTgofNfvcLggu6a1G
+         OFLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ZyayfKHbdUpDZhSDZes91ie4j30cvRqOr7VTsuNDqxY=;
+        b=Lh6qOOMzQJkW7vK/X0wBNETPKEIcMJvVQ/1Y20y2dgzkmhOKcRClOy9tLwK3G7mydp
+         NVjksKt3DOE0KkDuD6+B5lTsxMMH+doexFn9OCMMphYcPoHMulQaXLrfAVsXiNzUzFTh
+         ACG0zZznU3kWJlH76U5c5TmYxrlIsCzZEiK1G6Cj9ULN3UDIaDeC4bl0SPejZD+ryd35
+         Rv7y+vkb/EfLJy4mIwE5q7M1orUhqM/FRqdblEGL8twu20Zbc1eKlW/9xXI3MQS4K5f1
+         MWHWT3I2EviIHVFbWMBsYX5ndjTNgZEFveHCyGhvtOvcBkrZ1BpJsqjX5cOfATtMKwFk
+         BxWg==
+X-Gm-Message-State: AOAM531Q02+1TSdO07y/JBxu+1wVG7EKhQw2U/vUvrYEaJcpbkLxw+DJ
+        Rc3m4A5+c/q2HAG41i0jEjKB0b1X8aNmbSEKPg==
+X-Google-Smtp-Source: ABdhPJxeCVz6Uaud3XaG7vY5Jr5pM8fWCSc4TRXkFdw36fYZF+oJShpwEviEUyOOOoGguDC1emhmMCZl90IyzHf0G60=
+X-Received: by 2002:a17:906:eb1a:: with SMTP id mb26mr439212ejb.362.1589211737550;
+ Mon, 11 May 2020 08:42:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1040570.1588948788.1@warthog.procyon.org.uk>
+References: <20200428032647.2420-1-ryanbarnett3@gmail.com>
+In-Reply-To: <20200428032647.2420-1-ryanbarnett3@gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Mon, 11 May 2020 08:42:06 -0700
+Message-ID: <CAKywueSWxHNKqZMhTGg_vHhCbfy46TnaQPb+Dwy6AEc5hyj4xQ@mail.gmail.com>
+Subject: Re: [PATCH] Use DESTDIR when installing mount.smb3 and optionally
+ install man page
+To:     Ryan Barnett <ryanbarnett3@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 08 May 2020 15:39:48 +0100
-Message-ID: <1040571.1588948788@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-David Howells <dhowells@redhat.com> wrote:
+Hi Ryan,
 
-> ITER_MAPPING relies on the mapping to maintain the pointers to the pages=
- so
-> that it can find them rather than being like ITER_BVEC where there's a
-> separate list.
-> =
+Thanks for the patches.
 
-> Truncate removes the pages from the mapping - at which point ITER_MAPPIN=
-G can
-> no longer find them.
+I think they are duplicates of ones posted in January which I haven't
+merged yet:
 
-It looks like ITER_MAPPING is fine with truncate, provided the invalidatio=
-n
-waits for the iterator to complete first:
+https://lists.samba.org/archive/samba-technical/2020-January/134770.html
+https://lists.samba.org/archive/samba-technical/2020-January/134771.html
 
-	int truncate_inode_page(struct address_space *mapping, struct page *page)
-	{
-		VM_BUG_ON_PAGE(PageTail(page), page);
+Please let me know if you would still like any additional changes on
+top of the two patches above.
 
-		if (page->mapping !=3D mapping)
-			return -EIO;
+--
+Best regards,
+Pavel Shilovsky
 
-		truncate_cleanup_page(mapping, page);
-		delete_from_page_cache(page);
-		return 0;
-	}
-
-In which case, ->invalidatepage() needs to wait for PG_fscache.
-
-Similarly, it looks like ->releasepage() is fine, provided it waits for
-PG_fscache also.
-
-If I have to use ITER_BVEC, what's the advisability of using vmalloc() to
-allocate the bio_vec array for a transient op?  Such an array can referenc=
-e up
-to 1MiB on a 64-bit machine with 4KiB non-compound pages if it only alloca=
-tes
-up to a single page.  I'm wondering what the teardown cost is, though, if =
-all
-the corresponding PTEs have to be erased from all CPUs.
-
-David
-
+=D0=BF=D0=BD, 27 =D0=B0=D0=BF=D1=80. 2020 =D0=B3. =D0=B2 20:27, Ryan Barnet=
+t <ryanbarnett3@gmail.com>:
+>
+> Properly create mount.smb3 symlink by using DESTDIR. Also use
+> CONFIG_MAN to optionally install manpage for mount.smb3.
+>
+> Signed-off-by: Ryan Barnett <ryanbarnett3@gmail.com>
+> ---
+>  Makefile.am | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index fe9cd34..e0587f1 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -119,11 +119,13 @@ endif
+>  SUBDIRS =3D contrib
+>
+>  install-exec-hook:
+> -       (cd $(ROOTSBINDIR) && ln -sf mount.cifs mount.smb3)
+> +       (cd $(DESTDIR)$(ROOTSBINDIR) && ln -sf mount.cifs mount.smb3)
+>
+> +if CONFIG_MAN
+>  install-data-hook:
+> -       (cd $(man8dir) && ln -sf mount.cifs.8 mount.smb3.8)
+> +       (cd $(DESTDIR)$(man8dir) && ln -sf mount.cifs.8 mount.smb3.8)
+> +endif
+>
+>  uninstall-hook:
+> -       (cd $(ROOTSBINDIR) && rm -f $(ROOTSBINDIR)/mount.smb3)
+> -       (cd $(man8dir) && rm -f $(man8dir)/mount.smb3.8)
+> +       rm -f $(DESTDIR)$(ROOTSBINDIR)/mount.smb3
+> +       rm -f $(DESTDIR)$(man8dir)/mount.smb3.8
+> --
+> 2.17.1
+>
