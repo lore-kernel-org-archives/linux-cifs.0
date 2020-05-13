@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B62A4C2D0F8
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 877E0C2D0FD
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9424E206F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:27:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68CB32312B
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fVaTPPyQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fLErZ9RW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729428AbgEMG1w (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 May 2020 02:27:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45960 "EHLO
+        id S1730018AbgEMG2W (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 May 2020 02:28:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729126AbgEMG1v (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 May 2020 02:27:51 -0400
+        with ESMTP id S1729411AbgEMG2V (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 May 2020 02:28:21 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEBCC061A0C;
-        Tue, 12 May 2020 23:27:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818A1C061A0C;
+        Tue, 12 May 2020 23:28:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Yll3LCPJutUiti34Ki4uSQu1Yod3OpGLSI0ZUkOV0es=; b=fVaTPPyQ4BtT0M8ekjDS78Wb9d
-        M8I6DK33t8lIVkxbaHtMLKAZ2IqvfPjgpQucDW+uYpNWLjpjjsAiEpPjtWS5DnsHmEuEawjUM+Q3q
-        rpM4zoHJRwfp/e3tWizs/J0wXunGbDwD2TcJ29bRVrFdsutbMtjcpyK94rKyrBEUtb1JmAM9pC+GK
-        iGGcP6ux1/HKgoYnJLMWsosI6+i9M9vApVbLrrflK0fpWcowTgQ42xFJXlA9V64+X2p+s58R7diRe
-        V1AO+TSBlgkduGSYdXguiyzxy0KwoInAqysUqGPQGzvFq43RAgWTapgLvhV/5xo3fZfS1sGFwjwNF
-        FFUDzXwg==;
+        bh=trhEuTIn4Vg1DhT2avaHLce2knn1iz/f6nKwvZ2I5VY=; b=fLErZ9RWcPdCrJe8PN8doo4THM
+        XwKQxHDFt3rFQLUc+chfdiyQ26TV1RW8HyH1/zrR+BZUvcncrPN68MW2C0lrXXww+My2XyFZWtQlC
+        JgIQMKO7ut8N8TyQN+GiykC6nm8Oy7yNSDW5+0tihXApIVVmlV6ILUU2JalBr4L3fgCFDNN8lwIEa
+        4/Q8w2aYzE5347WNGTNWtb5CvdN0fTKXWe5L5HFlMG5Uj5EIYjYEkIXcahz6Y5wTfGqw757xZXkt1
+        RHBzfLCnJMUucSSreMLMVyWIi2HbzKvW7+wVJZNnSG5vCdO25dCKJUPQwhX++i0ZUdMnYy5g33vSd
+        55BX8sOw==;
 Received: from [2001:4bb8:180:9d3f:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jYkrB-0003wN-SH; Wed, 13 May 2020 06:27:06 +0000
+        id 1jYkrL-000471-Cn; Wed, 13 May 2020 06:27:15 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -55,9 +55,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
         linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
-Subject: [PATCH 05/33] net: add sock_bindtoindex
-Date:   Wed, 13 May 2020 08:26:20 +0200
-Message-Id: <20200513062649.2100053-6-hch@lst.de>
+Subject: [PATCH 08/33] net: add sock_set_rcvbuf
+Date:   Wed, 13 May 2020 08:26:23 +0200
+Message-Id: <20200513062649.2100053-9-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200513062649.2100053-1-hch@lst.de>
 References: <20200513062649.2100053-1-hch@lst.de>
@@ -69,111 +69,137 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper to directly set the SO_BINDTOIFINDEX sockopt from kernel
-space without going through a fake uaccess.
+Add a helper to directly set the SO_RCVBUFFORCE sockopt from kernel space
+without going through a fake uaccess.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/net/sock.h        |  1 +
- net/core/sock.c           | 21 +++++++++++++++------
- net/ipv4/udp_tunnel.c     |  4 +---
- net/ipv6/ip6_udp_tunnel.c |  4 +---
- 4 files changed, 18 insertions(+), 12 deletions(-)
+ fs/dlm/lowcomms.c  |  7 +-----
+ include/net/sock.h |  1 +
+ net/core/sock.c    | 59 +++++++++++++++++++++++++---------------------
+ 3 files changed, 34 insertions(+), 33 deletions(-)
 
+diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
+index 16d616c180613..223c185ecd0c7 100644
+--- a/fs/dlm/lowcomms.c
++++ b/fs/dlm/lowcomms.c
+@@ -1297,7 +1297,6 @@ static int sctp_listen_for_all(void)
+ 	struct socket *sock = NULL;
+ 	int result = -EINVAL;
+ 	struct connection *con = nodeid2con(0, GFP_NOFS);
+-	int bufsize = NEEDED_RMEM;
+ 	int one = 1;
+ 
+ 	if (!con)
+@@ -1312,11 +1311,7 @@ static int sctp_listen_for_all(void)
+ 		goto out;
+ 	}
+ 
+-	result = kernel_setsockopt(sock, SOL_SOCKET, SO_RCVBUFFORCE,
+-				 (char *)&bufsize, sizeof(bufsize));
+-	if (result)
+-		log_print("Error increasing buffer space on socket %d", result);
+-
++	sock_set_rcvbuf(sock->sk, NEEDED_RMEM);
+ 	result = kernel_setsockopt(sock, SOL_SCTP, SCTP_NODELAY, (char *)&one,
+ 				   sizeof(one));
+ 	if (result < 0)
 diff --git a/include/net/sock.h b/include/net/sock.h
-index 809596ffd32d2..b63ea15362065 100644
+index 4cedde585424f..e1ed40ff01312 100644
 --- a/include/net/sock.h
 +++ b/include/net/sock.h
-@@ -2691,5 +2691,6 @@ void sock_set_reuseaddr(struct sock *sk, unsigned char reuse);
- void sock_set_linger(struct sock *sk, bool onoff, unsigned int linger);
+@@ -2692,6 +2692,7 @@ void sock_set_linger(struct sock *sk, bool onoff, unsigned int linger);
  void sock_set_priority(struct sock *sk, u32 priority);
  void sock_set_sndtimeo(struct sock *sk, unsigned int secs);
-+int sock_bindtoindex(struct sock *sk, int ifindex);
+ void sock_set_keepalive(struct sock *sk, bool keepalive);
++void sock_set_rcvbuf(struct sock *sk, int val);
+ int sock_bindtoindex(struct sock *sk, int ifindex);
+ void sock_set_timestamps(struct sock *sk, bool val, bool new, bool ns);
  
- #endif	/* _SOCK_H */
 diff --git a/net/core/sock.c b/net/core/sock.c
-index 76527681e50b9..4b7439308caec 100644
+index dfd2b839f88bb..6af01b757cf24 100644
 --- a/net/core/sock.c
 +++ b/net/core/sock.c
-@@ -566,7 +566,7 @@ struct dst_entry *sk_dst_check(struct sock *sk, u32 cookie)
+@@ -804,6 +804,35 @@ void sock_set_keepalive(struct sock *sk, bool keepalive)
  }
- EXPORT_SYMBOL(sk_dst_check);
+ EXPORT_SYMBOL(sock_set_keepalive);
  
--static int sock_setbindtodevice_locked(struct sock *sk, int ifindex)
-+static int sock_bindtoindex_locked(struct sock *sk, int ifindex)
- {
- 	int ret = -ENOPROTOOPT;
- #ifdef CONFIG_NETDEVICES
-@@ -594,6 +594,18 @@ static int sock_setbindtodevice_locked(struct sock *sk, int ifindex)
- 	return ret;
- }
- 
-+int sock_bindtoindex(struct sock *sk, int ifindex)
++void __sock_set_rcvbuf(struct sock *sk, int val)
 +{
-+	int ret;
++	/* Ensure val * 2 fits into an int, to prevent max_t() from treating it
++	 * as a negative value.
++	 */
++	val = min_t(int, val, INT_MAX / 2);
++	sk->sk_userlocks |= SOCK_RCVBUF_LOCK;
 +
-+	lock_sock(sk);
-+	ret = sock_bindtoindex_locked(sk, ifindex);
-+	release_sock(sk);
-+
-+	return ret;
++	/* We double it on the way in to account for "struct sk_buff" etc.
++	 * overhead.   Applications assume that the SO_RCVBUF setting they make
++	 * will allow that much actual data to be received on that socket.
++	 *
++	 * Applications are unaware that "struct sk_buff" and other overheads
++	 * allocate from the receive buffer during socket buffer allocation.
++	 *
++	 * And after considering the possible alternatives, returning the value
++	 * we actually used in getsockopt is the most desirable behavior.
++	 */
++	WRITE_ONCE(sk->sk_rcvbuf, max_t(int, val * 2, SOCK_MIN_RCVBUF));
 +}
-+EXPORT_SYMBOL(sock_bindtoindex);
 +
- static int sock_setbindtodevice(struct sock *sk, char __user *optval,
- 				int optlen)
- {
-@@ -634,10 +646,7 @@ static int sock_setbindtodevice(struct sock *sk, char __user *optval,
- 			goto out;
- 	}
- 
--	lock_sock(sk);
--	ret = sock_setbindtodevice_locked(sk, index);
--	release_sock(sk);
--
-+	return sock_bindtoindex(sk, index);
- out:
- #endif
- 
-@@ -1221,7 +1230,7 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
++void sock_set_rcvbuf(struct sock *sk, int val)
++{
++	lock_sock(sk);
++	__sock_set_rcvbuf(sk, val);
++	release_sock(sk);
++}
++EXPORT_SYMBOL(sock_set_rcvbuf);
++
+ /*
+  *	This is meant for all protocols to use and covers goings on
+  *	at the socket level. Everything here is generic.
+@@ -900,30 +929,7 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
+ 		 * play 'guess the biggest size' games. RCVBUF/SNDBUF
+ 		 * are treated in BSD as hints
+ 		 */
+-		val = min_t(u32, val, sysctl_rmem_max);
+-set_rcvbuf:
+-		/* Ensure val * 2 fits into an int, to prevent max_t()
+-		 * from treating it as a negative value.
+-		 */
+-		val = min_t(int, val, INT_MAX / 2);
+-		sk->sk_userlocks |= SOCK_RCVBUF_LOCK;
+-		/*
+-		 * We double it on the way in to account for
+-		 * "struct sk_buff" etc. overhead.   Applications
+-		 * assume that the SO_RCVBUF setting they make will
+-		 * allow that much actual data to be received on that
+-		 * socket.
+-		 *
+-		 * Applications are unaware that "struct sk_buff" and
+-		 * other overheads allocate from the receive buffer
+-		 * during socket buffer allocation.
+-		 *
+-		 * And after considering the possible alternatives,
+-		 * returning the value we actually used in getsockopt
+-		 * is the most desirable behavior.
+-		 */
+-		WRITE_ONCE(sk->sk_rcvbuf,
+-			   max_t(int, val * 2, SOCK_MIN_RCVBUF));
++		__sock_set_rcvbuf(sk, min_t(u32, val, sysctl_rmem_max));
  		break;
  
- 	case SO_BINDTOIFINDEX:
--		ret = sock_setbindtodevice_locked(sk, val);
-+		ret = sock_bindtoindex_locked(sk, val);
- 		break;
+ 	case SO_RCVBUFFORCE:
+@@ -935,9 +941,8 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
+ 		/* No negative values (to prevent underflow, as val will be
+ 		 * multiplied by 2).
+ 		 */
+-		if (val < 0)
+-			val = 0;
+-		goto set_rcvbuf;
++		__sock_set_rcvbuf(sk, max(val, 0));
++		break;
  
- 	default:
-diff --git a/net/ipv4/udp_tunnel.c b/net/ipv4/udp_tunnel.c
-index 150e6f0fdbf59..2158e8bddf41c 100644
---- a/net/ipv4/udp_tunnel.c
-+++ b/net/ipv4/udp_tunnel.c
-@@ -22,9 +22,7 @@ int udp_sock_create4(struct net *net, struct udp_port_cfg *cfg,
- 		goto error;
- 
- 	if (cfg->bind_ifindex) {
--		err = kernel_setsockopt(sock, SOL_SOCKET, SO_BINDTOIFINDEX,
--					(void *)&cfg->bind_ifindex,
--					sizeof(cfg->bind_ifindex));
-+		err = sock_bindtoindex(sock->sk, cfg->bind_ifindex);
- 		if (err < 0)
- 			goto error;
- 	}
-diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
-index 58956a6b66a21..6523609516d25 100644
---- a/net/ipv6/ip6_udp_tunnel.c
-+++ b/net/ipv6/ip6_udp_tunnel.c
-@@ -33,9 +33,7 @@ int udp_sock_create6(struct net *net, struct udp_port_cfg *cfg,
- 			goto error;
- 	}
- 	if (cfg->bind_ifindex) {
--		err = kernel_setsockopt(sock, SOL_SOCKET, SO_BINDTOIFINDEX,
--					(void *)&cfg->bind_ifindex,
--					sizeof(cfg->bind_ifindex));
-+		err = sock_bindtoindex(sock->sk, cfg->bind_ifindex);
- 		if (err < 0)
- 			goto error;
- 	}
+ 	case SO_KEEPALIVE:
+ 		if (sk->sk_prot->keepalive)
 -- 
 2.26.2
 
