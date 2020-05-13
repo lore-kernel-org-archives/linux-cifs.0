@@ -4,39 +4,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE71C2D0F9
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28FCCC47076
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A91C206B7
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05DEB206B7
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CIhLIwgW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AnGUZI2W"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730325AbgEMG22 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 May 2020 02:28:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46084 "EHLO
+        id S1730406AbgEMG2f (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 May 2020 02:28:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729411AbgEMG21 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 May 2020 02:28:27 -0400
+        with ESMTP id S1730322AbgEMG22 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 May 2020 02:28:28 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818B2C061A0C;
-        Tue, 12 May 2020 23:28:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A9AC061A0C;
+        Tue, 12 May 2020 23:28:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=z4667jYF+9mTSml5XJ3AsBbdFU5P9vBjAx21l/MQDCM=; b=CIhLIwgW3tiGerd8TnnR0/YUfS
-        QnghRsdfPHWV6Lm5BoqsYTlYRv/c5x2gqCbIMxJb4+0qMRqSFDS4OImJ933zmllqpk0ODxtTGBm4A
-        FSB+S63q7fvioxTyBVVvRRm47QZtgztYaV1jDuhSVR1wi8LuPhvDUFsYeYxk8YkBCrkYaLS/JEUd0
-        6YHcWJx0X0I/f0T7u9CQdPQlVJzvXp/eOAF7Wzb0Mex0XKr1aJTIQ2lhxgUHsZmcwcmnRgZgwizis
-        z/s/7ZP9wy39Ff3pCVdxB/j4hVNWWDta2welFroTgTxwnh6rf7XMimmhsgkh35WF4XfUBWdC/1PNI
-        fcCT2aIA==;
+        bh=t2+3d1GMUU2gBdyKmy97XR5S00mpHCy5yoItuCa1zGY=; b=AnGUZI2WfSEtplEsKif/1o+xBr
+        EwZUHPMEJ6jWSrgBiNmJdYUPVwb+jvhZisK8EGPuaO/mX54wLLt9P4ZR4OOg8+f29wNKBTDf+ZvtR
+        mBkRKyC7LoK1AJehXOF0Se8IXja1iutw1kSSk5O3dfsb56Tt1awvGAhlZvQbg3PTncpC3lcSEyCOx
+        pzwvBvJX7oSjM9LJZ4URrlajmOmKb+7ZOG8qgMsJMoYFMgNkurPlWLjF4MrPa93USxsMDMkdabanv
+        iYzBD/b+XoWw0gVDYrAFWHKIXUaoMxyPzyhA4J3Orhc6WeM82PYgGLU41gozvE5be/R2OXfUBuRvU
+        /74d/HLA==;
 Received: from [2001:4bb8:180:9d3f:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jYkrX-0004Hq-2R; Wed, 13 May 2020 06:27:28 +0000
+        id 1jYkrw-0004ea-1N; Wed, 13 May 2020 06:27:52 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -55,9 +55,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
         linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
-Subject: [PATCH 12/33] tcp: add tcp_sock_set_quickack
-Date:   Wed, 13 May 2020 08:26:27 +0200
-Message-Id: <20200513062649.2100053-13-hch@lst.de>
+Subject: [PATCH 20/33] ipv4: add ip_sock_set_recverr
+Date:   Wed, 13 May 2020 08:26:35 +0200
+Message-Id: <20200513062649.2100053-21-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200513062649.2100053-1-hch@lst.de>
 References: <20200513062649.2100053-1-hch@lst.de>
@@ -69,127 +69,67 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper to directly set the TCP_QUICKACK sockopt from kernel space
-without going through a fake uaccess.  Cleanup the callers to avoid
-pointless wrappers now that this is a simple function call.
+Add a helper to directly set the IP_RECVERR sockopt from kernel space
+without going through a fake uaccess.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/drbd/drbd_int.h      |  7 ------
- drivers/block/drbd/drbd_receiver.c |  5 ++--
- include/linux/tcp.h                |  1 +
- net/ipv4/tcp.c                     | 39 ++++++++++++++++++++----------
- 4 files changed, 29 insertions(+), 23 deletions(-)
+ include/net/ip.h         |  1 +
+ net/ipv4/ip_sockglue.c   | 10 ++++++++++
+ net/rxrpc/local_object.c |  8 +-------
+ 3 files changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index e24bba87c8e02..14345a87c7cc5 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -1570,13 +1570,6 @@ extern void drbd_set_recv_tcq(struct drbd_device *device, int tcq_enabled);
- extern void _drbd_clear_done_ee(struct drbd_device *device, struct list_head *to_be_freed);
- extern int drbd_connected(struct drbd_peer_device *);
+diff --git a/include/net/ip.h b/include/net/ip.h
+index 1e2feca8630d0..7ab8140b54429 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -767,5 +767,6 @@ static inline bool inetdev_valid_mtu(unsigned int mtu)
  
--static inline void drbd_tcp_quickack(struct socket *sock)
--{
--	int val = 2;
--	(void) kernel_setsockopt(sock, SOL_TCP, TCP_QUICKACK,
--			(char*)&val, sizeof(val));
--}
--
- /* sets the number of 512 byte sectors of our virtual device */
- void drbd_set_my_capacity(struct drbd_device *device, sector_t size);
+ void ip_sock_set_tos(struct sock *sk, int val);
+ void ip_sock_set_freebind(struct sock *sk, bool val);
++void ip_sock_set_recverr(struct sock *sk, bool val);
  
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index da5a9ee896a43..cdd317ae97021 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -1223,7 +1223,7 @@ static int drbd_recv_header_maybe_unplug(struct drbd_connection *connection, str
- 		 * quickly as possible, and let remote TCP know what we have
- 		 * received so far. */
- 		if (err == -EAGAIN) {
--			drbd_tcp_quickack(connection->data.socket);
-+			tcp_sock_set_quickack(connection->data.socket->sk, 2);
- 			drbd_unplug_all_devices(connection);
- 		}
- 		if (err > 0) {
-@@ -4959,8 +4959,7 @@ static int receive_UnplugRemote(struct drbd_connection *connection, struct packe
- {
- 	/* Make sure we've acked all the TCP data associated
- 	 * with the data requests being unplugged */
--	drbd_tcp_quickack(connection->data.socket);
--
-+	tcp_sock_set_quickack(connection->data.socket->sk, 2);
- 	return 0;
+ #endif	/* _IP_H */
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index 0c40887a817f8..9abecc3195520 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -589,6 +589,16 @@ void ip_sock_set_freebind(struct sock *sk, bool val)
  }
+ EXPORT_SYMBOL(ip_sock_set_freebind);
  
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 533610b6ae420..e7ab6da5111b5 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -496,5 +496,6 @@ int tcp_skb_shift(struct sk_buff *to, struct sk_buff *from, int pcount,
- 
- void tcp_sock_set_cork(struct sock *sk, bool on);
- void tcp_sock_set_nodelay(struct sock *sk, bool on);
-+void tcp_sock_set_quickack(struct sock *sk, int val);
- 
- #endif	/* _LINUX_TCP_H */
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 300ce622607d8..c681f43f0bb85 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2845,6 +2845,31 @@ void tcp_sock_set_nodelay(struct sock *sk, bool on)
- }
- EXPORT_SYMBOL(tcp_sock_set_nodelay);
- 
-+static void __tcp_sock_set_quickack(struct sock *sk, int val)
-+{
-+	if (!val) {
-+		inet_csk_enter_pingpong_mode(sk);
-+		return;
-+	}
-+
-+	inet_csk_exit_pingpong_mode(sk);
-+	if ((1 << sk->sk_state) & (TCPF_ESTABLISHED | TCPF_CLOSE_WAIT) &&
-+	    inet_csk_ack_scheduled(sk)) {
-+		inet_csk(sk)->icsk_ack.pending |= ICSK_ACK_PUSHED;
-+		tcp_cleanup_rbuf(sk, 1);
-+		if (!(val & 1))
-+			inet_csk_enter_pingpong_mode(sk);
-+	}
-+}
-+
-+void tcp_sock_set_quickack(struct sock *sk, int val)
++void ip_sock_set_recverr(struct sock *sk, bool val)
 +{
 +	lock_sock(sk);
-+	__tcp_sock_set_quickack(sk, val);
++	inet_sk(sk)->recverr = val;
++	if (!val)
++		skb_queue_purge(&sk->sk_error_queue);
 +	release_sock(sk);
 +}
-+EXPORT_SYMBOL(tcp_sock_set_quickack);
++EXPORT_SYMBOL(ip_sock_set_recverr);
 +
  /*
-  *	Socket option code for TCP.
-  */
-@@ -3085,19 +3110,7 @@ static int do_tcp_setsockopt(struct sock *sk, int level,
- 		break;
- 
- 	case TCP_QUICKACK:
--		if (!val) {
--			inet_csk_enter_pingpong_mode(sk);
--		} else {
--			inet_csk_exit_pingpong_mode(sk);
--			if ((1 << sk->sk_state) &
--			    (TCPF_ESTABLISHED | TCPF_CLOSE_WAIT) &&
--			    inet_csk_ack_scheduled(sk)) {
--				icsk->icsk_ack.pending |= ICSK_ACK_PUSHED;
--				tcp_cleanup_rbuf(sk, 1);
--				if (!(val & 1))
--					inet_csk_enter_pingpong_mode(sk);
--			}
+  *	Socket option code for IP. This is the end of the line after any
+  *	TCP,UDP etc options on an IP socket.
+diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
+index 562ea36c96b0f..1b87b8a9ff725 100644
+--- a/net/rxrpc/local_object.c
++++ b/net/rxrpc/local_object.c
+@@ -171,13 +171,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
+ 		/* Fall through */
+ 	case AF_INET:
+ 		/* we want to receive ICMP errors */
+-		opt = 1;
+-		ret = kernel_setsockopt(local->socket, SOL_IP, IP_RECVERR,
+-					(char *) &opt, sizeof(opt));
+-		if (ret < 0) {
+-			_debug("setsockopt failed");
+-			goto error;
 -		}
-+		__tcp_sock_set_quickack(sk, val);
- 		break;
++		ip_sock_set_recverr(local->socket->sk, true);
  
- #ifdef CONFIG_TCP_MD5SIG
+ 		/* we want to set the don't fragment bit */
+ 		opt = IP_PMTUDISC_DO;
 -- 
 2.26.2
 
