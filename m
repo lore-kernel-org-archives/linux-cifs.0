@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28FCCC47076
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F9DC2D0F9
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05DEB206B7
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5143D20708
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:28:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AnGUZI2W"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Wqf2t06b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730406AbgEMG2f (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 May 2020 02:28:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46086 "EHLO
+        id S1730843AbgEMG2t (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 May 2020 02:28:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730322AbgEMG22 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 May 2020 02:28:28 -0400
+        with ESMTP id S1730583AbgEMG2n (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 May 2020 02:28:43 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A9AC061A0C;
-        Tue, 12 May 2020 23:28:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6923EC061A0C;
+        Tue, 12 May 2020 23:28:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=t2+3d1GMUU2gBdyKmy97XR5S00mpHCy5yoItuCa1zGY=; b=AnGUZI2WfSEtplEsKif/1o+xBr
-        EwZUHPMEJ6jWSrgBiNmJdYUPVwb+jvhZisK8EGPuaO/mX54wLLt9P4ZR4OOg8+f29wNKBTDf+ZvtR
-        mBkRKyC7LoK1AJehXOF0Se8IXja1iutw1kSSk5O3dfsb56Tt1awvGAhlZvQbg3PTncpC3lcSEyCOx
-        pzwvBvJX7oSjM9LJZ4URrlajmOmKb+7ZOG8qgMsJMoYFMgNkurPlWLjF4MrPa93USxsMDMkdabanv
-        iYzBD/b+XoWw0gVDYrAFWHKIXUaoMxyPzyhA4J3Orhc6WeM82PYgGLU41gozvE5be/R2OXfUBuRvU
-        /74d/HLA==;
+        bh=m2cJUr52FglwX1vg/2cpZagwD/qeXka2YOLw7+cE1hw=; b=Wqf2t06bPG68kMAO/liebkvId6
+        2VigPyauHsu9RHu5Vg+NB8l/4cY4aPtc5RJs3S7CEUDu75rMEzX/zDMO/UDEATyGXjVGb0u3P5BMy
+        Oix1BY75NsjQyfaXhlXYZ+Ge1dsuqXPNQbo+gr3tcjJpevlyytQvdy0E6uFQzYuuZuy4mB1NUUSK6
+        PwZLHaw2WeTa86I4bE//xvWghB4mm6nsz6oVLFCYxsG3D4OmR2tUS4A61xo3ePDTTnLMmXdO12SMR
+        OQ9s9W9u/tksMHORHYRLN86m3Ahq8dQ/lb4KSs3ycsmyAm4HUl9JOviXtYqmB29EfzplCnZ8UDlnZ
+        r2iRA9DA==;
 Received: from [2001:4bb8:180:9d3f:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jYkrw-0004ea-1N; Wed, 13 May 2020 06:27:52 +0000
+        id 1jYksU-0005Dh-Pl; Wed, 13 May 2020 06:28:27 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -55,9 +55,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
         linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
-Subject: [PATCH 20/33] ipv4: add ip_sock_set_recverr
-Date:   Wed, 13 May 2020 08:26:35 +0200
-Message-Id: <20200513062649.2100053-21-hch@lst.de>
+Subject: [PATCH 31/33] net: remove kernel_setsockopt
+Date:   Wed, 13 May 2020 08:26:46 +0200
+Message-Id: <20200513062649.2100053-32-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200513062649.2100053-1-hch@lst.de>
 References: <20200513062649.2100053-1-hch@lst.de>
@@ -69,67 +69,69 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper to directly set the IP_RECVERR sockopt from kernel space
-without going through a fake uaccess.
+No users left.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/net/ip.h         |  1 +
- net/ipv4/ip_sockglue.c   | 10 ++++++++++
- net/rxrpc/local_object.c |  8 +-------
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ include/linux/net.h |  2 --
+ net/socket.c        | 31 -------------------------------
+ 2 files changed, 33 deletions(-)
 
-diff --git a/include/net/ip.h b/include/net/ip.h
-index 1e2feca8630d0..7ab8140b54429 100644
---- a/include/net/ip.h
-+++ b/include/net/ip.h
-@@ -767,5 +767,6 @@ static inline bool inetdev_valid_mtu(unsigned int mtu)
- 
- void ip_sock_set_tos(struct sock *sk, int val);
- void ip_sock_set_freebind(struct sock *sk, bool val);
-+void ip_sock_set_recverr(struct sock *sk, bool val);
- 
- #endif	/* _IP_H */
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 0c40887a817f8..9abecc3195520 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -589,6 +589,16 @@ void ip_sock_set_freebind(struct sock *sk, bool val)
+diff --git a/include/linux/net.h b/include/linux/net.h
+index 6451425e828f5..ece7513326293 100644
+--- a/include/linux/net.h
++++ b/include/linux/net.h
+@@ -305,8 +305,6 @@ int kernel_getsockname(struct socket *sock, struct sockaddr *addr);
+ int kernel_getpeername(struct socket *sock, struct sockaddr *addr);
+ int kernel_getsockopt(struct socket *sock, int level, int optname, char *optval,
+ 		      int *optlen);
+-int kernel_setsockopt(struct socket *sock, int level, int optname, char *optval,
+-		      unsigned int optlen);
+ int kernel_sendpage(struct socket *sock, struct page *page, int offset,
+ 		    size_t size, int flags);
+ int kernel_sendpage_locked(struct sock *sk, struct page *page, int offset,
+diff --git a/net/socket.c b/net/socket.c
+index 1c9a7260a41de..f37c3ef508691 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -3749,37 +3749,6 @@ int kernel_getsockopt(struct socket *sock, int level, int optname,
  }
- EXPORT_SYMBOL(ip_sock_set_freebind);
+ EXPORT_SYMBOL(kernel_getsockopt);
  
-+void ip_sock_set_recverr(struct sock *sk, bool val)
-+{
-+	lock_sock(sk);
-+	inet_sk(sk)->recverr = val;
-+	if (!val)
-+		skb_queue_purge(&sk->sk_error_queue);
-+	release_sock(sk);
-+}
-+EXPORT_SYMBOL(ip_sock_set_recverr);
-+
- /*
-  *	Socket option code for IP. This is the end of the line after any
-  *	TCP,UDP etc options on an IP socket.
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 562ea36c96b0f..1b87b8a9ff725 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -171,13 +171,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
- 		/* Fall through */
- 	case AF_INET:
- 		/* we want to receive ICMP errors */
--		opt = 1;
--		ret = kernel_setsockopt(local->socket, SOL_IP, IP_RECVERR,
--					(char *) &opt, sizeof(opt));
--		if (ret < 0) {
--			_debug("setsockopt failed");
--			goto error;
--		}
-+		ip_sock_set_recverr(local->socket->sk, true);
- 
- 		/* we want to set the don't fragment bit */
- 		opt = IP_PMTUDISC_DO;
+-/**
+- *	kernel_setsockopt - set a socket option (kernel space)
+- *	@sock: socket
+- *	@level: API level (SOL_SOCKET, ...)
+- *	@optname: option tag
+- *	@optval: option value
+- *	@optlen: option length
+- *
+- *	Returns 0 or an error.
+- */
+-
+-int kernel_setsockopt(struct socket *sock, int level, int optname,
+-			char *optval, unsigned int optlen)
+-{
+-	mm_segment_t oldfs = get_fs();
+-	char __user *uoptval;
+-	int err;
+-
+-	uoptval = (char __user __force *) optval;
+-
+-	set_fs(KERNEL_DS);
+-	if (level == SOL_SOCKET)
+-		err = sock_setsockopt(sock, level, optname, uoptval, optlen);
+-	else
+-		err = sock->ops->setsockopt(sock, level, optname, uoptval,
+-					    optlen);
+-	set_fs(oldfs);
+-	return err;
+-}
+-EXPORT_SYMBOL(kernel_setsockopt);
+-
+ /**
+  *	kernel_sendpage - send a &page through a socket (kernel space)
+  *	@sock: socket
 -- 
 2.26.2
 
