@@ -2,126 +2,121 @@ Return-Path: <SRS0=OaSP=63=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60937C433DF
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 19:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A001CC433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 21:00:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F5972065C
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 19:14:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SqNqMTYs"
+	by mail.kernel.org (Postfix) with ESMTP id ADBFA20675
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 21:00:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390206AbgEMTOz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 May 2020 15:14:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52888 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2387469AbgEMTOy (ORCPT
+        id S1726098AbgEMVAv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 May 2020 17:00:51 -0400
+Received: from smtprelay0154.hostedemail.com ([216.40.44.154]:51208 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725977AbgEMVAu (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 13 May 2020 15:14:54 -0400
-Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D5F0C061A0C
-        for <linux-cifs@vger.kernel.org>; Wed, 13 May 2020 12:14:53 -0700 (PDT)
-Received: by mail-yb1-xb41.google.com with SMTP id x15so312823ybr.10
-        for <linux-cifs@vger.kernel.org>; Wed, 13 May 2020 12:14:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1BPZyzx2D6+WsQweiS3jDVQK58QvT198EDhUhZzZ4ZI=;
-        b=SqNqMTYsuAOh+vwx5r5X65Ct34veGPlPQW8q5jtTKFqtc4IUBgjwXmMVLz7l5nL4BK
-         U9QGEwjj47fbTdAXDfXjTbXaoO72iFf1qIfvWyXxmK5QRh/nHiC2309Y/ZUI8MfYXVp1
-         yU5goOOTISNqFUyl+ESKD2PQ0hdvDe0bwANeuZ3rJ7SSSNO1j2UmO+dhblkpRzxNn4vS
-         XA9Ast+iSzF2ZlvzXxMQpCmksiOeS0SnWhDFjM+ilfV80n7bmd3j2gaqT99LO8wUy0wx
-         OkLcj48a4mvKYtMto9CaslSkxRTRwiGGaiDBKrL5E3iGYga7fiVpQ3QcmIkWV1xdu6n1
-         KKCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1BPZyzx2D6+WsQweiS3jDVQK58QvT198EDhUhZzZ4ZI=;
-        b=kgji6iGMz3Uy5fDAs7Li+l+/gqb2tiOFvIf+gOF5gRvebIeUw9tiANMuuB9xlhPu3C
-         yxs65z1JXXiEo7wVDXPVL3mA1Pw4LfuRCPimnM8dSeOgrxz0zt2A2glTrrpurnRU2sIf
-         YdFWMSxUpH6rukrLaAPon2M86eQI7FoYHowV2Ky2Jyx9qzUWZbj9PbHNiDt4gt7VgxZn
-         ZnKBYbDL0Uq8rgqDgJrYsO9PiY5ECn1MbHuOD1LeRvwWdaaW6bsipkCPaxBfjgJdqWtc
-         ysUsUcxG80fKSDegB2tk/qUK9yY4l763QjweedxVdzz1AzAjzoBS1kj0ScgzSrrn32DW
-         mdxg==
-X-Gm-Message-State: AOAM5333etXoMzPe/qrz/OCIMyz/qCF8VQXCcoqtG9V4OcfOwIDPJAvx
-        R8TWlqqKyemH+3BThb7QIR3dBvkO8V++THvLAuZuLdcw
-X-Google-Smtp-Source: ABdhPJwKzxcPos66h9ErYJowNZShgncfeMSRuiKKEoZFwvKjpYJYeaHdLSHZV8mjxKwl1UKXFYCtm/eAaZaQzbD4rUQ=
-X-Received: by 2002:a25:b94:: with SMTP id 142mr1049749ybl.14.1589397292355;
- Wed, 13 May 2020 12:14:52 -0700 (PDT)
+        Wed, 13 May 2020 17:00:50 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay08.hostedemail.com (Postfix) with ESMTP id CA6F0182CED34;
+        Wed, 13 May 2020 21:00:48 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: mist41_5dde648048f06
+X-Filterd-Recvd-Size: 3554
+Received: from XPS-9350.home (unknown [47.151.136.130])
+        (Authenticated sender: joe@perches.com)
+        by omf01.hostedemail.com (Postfix) with ESMTPA;
+        Wed, 13 May 2020 21:00:44 +0000 (UTC)
+Message-ID: <0ee5acfaca4cf32d4efad162046b858981a4dae3.camel@perches.com>
+Subject: Re: [PATCH 20/33] ipv4: add ip_sock_set_recverr
+From:   Joe Perches <joe@perches.com>
+To:     Christoph Hellwig <hch@lst.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     Eric Dumazet <edumazet@google.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>, drbd-dev@lists.linbit.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
+        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
+        ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
+        linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
+Date:   Wed, 13 May 2020 14:00:43 -0700
+In-Reply-To: <20200513062649.2100053-21-hch@lst.de>
+References: <20200513062649.2100053-1-hch@lst.de>
+         <20200513062649.2100053-21-hch@lst.de>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.1-2 
 MIME-Version: 1.0
-References: <20200513115330.5187-1-adam@forsedomani.com>
-In-Reply-To: <20200513115330.5187-1-adam@forsedomani.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 13 May 2020 14:14:41 -0500
-Message-ID: <CAH2r5ms14KKspfjv7rc_vkWGMantAxoTE7p0bi66NmMzcex+tg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix leaked reference on requeued write
-To:     Adam McCoy <adam@forsedomani.com>, Jeff Layton <jlayton@kernel.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Pavel Shilovsky <piastryyy@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Shyam and Pavel noticed things which didn't make sense
+On Wed, 2020-05-13 at 08:26 +0200, Christoph Hellwig wrote:
+> Add a helper to directly set the IP_RECVERR sockopt from kernel space
+> without going through a fake uaccess.
 
-e.g. in cifs_writepages weare putting the reference unconditionally
-but in cifs_write_from_iter we are doing the same thing.   So how was
-this working before - should have resulted in a reference leak and
-direct i/o shouldn't have had a chance to complete??
+This seems used only with true as the second arg.
+Is there reason to have that argument at all?
 
-and wouldn't there be an underrun if a retryable error with your patch
-with it getting called twice?
+> diff --git a/include/net/ip.h b/include/net/ip.h
+[]
+> @@ -767,5 +767,6 @@ static inline bool inetdev_valid_mtu(unsigned int mtu)
+>  
+>  void ip_sock_set_tos(struct sock *sk, int val);
+>  void ip_sock_set_freebind(struct sock *sk, bool val);
+> +void ip_sock_set_recverr(struct sock *sk, bool val);
+>  
+>  #endif	/* _IP_H */
+> diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+> index 0c40887a817f8..9abecc3195520 100644
+> --- a/net/ipv4/ip_sockglue.c
+> +++ b/net/ipv4/ip_sockglue.c
+> @@ -589,6 +589,16 @@ void ip_sock_set_freebind(struct sock *sk, bool val)
+>  }
+>  EXPORT_SYMBOL(ip_sock_set_freebind);
+>  
+> +void ip_sock_set_recverr(struct sock *sk, bool val)
+> +{
+> +	lock_sock(sk);
+> +	inet_sk(sk)->recverr = val;
+> +	if (!val)
+> +		skb_queue_purge(&sk->sk_error_queue);
+> +	release_sock(sk);
+> +}
+> +EXPORT_SYMBOL(ip_sock_set_recverr);
+> +
+>  /*
+>   *	Socket option code for IP. This is the end of the line after any
+>   *	TCP,UDP etc options on an IP socket.
+> diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
+> index 562ea36c96b0f..1b87b8a9ff725 100644
+> --- a/net/rxrpc/local_object.c
+> +++ b/net/rxrpc/local_object.c
+> @@ -171,13 +171,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
+>  		/* Fall through */
+>  	case AF_INET:
+>  		/* we want to receive ICMP errors */
+> -		opt = 1;
+> -		ret = kernel_setsockopt(local->socket, SOL_IP, IP_RECVERR,
+> -					(char *) &opt, sizeof(opt));
+> -		if (ret < 0) {
+> -			_debug("setsockopt failed");
+> -			goto error;
+> -		}
+> +		ip_sock_set_recverr(local->socket->sk, true);
+>  
+>  		/* we want to set the don't fragment bit */
+>  		opt = IP_PMTUDISC_DO;
 
-Jeff,
-Any thoughts on this?
-
-
-
-On Wed, May 13, 2020 at 6:55 AM Adam McCoy <adam@forsedomani.com> wrote:
->
-> Failed async writes that are requeued may not clean up a refcount
-> on the file, which can result in a leaked open. This scenario arises
-> very reliably when using persistent handles and a reconnect occurs
-> while writing.
->
-> cifs_writev_requeue only releases the reference if the write fails
-> (rc != 0). The server->ops->async_writev operation will take its own
-> reference, so the initial reference can always be released.
->
-> Signed-off-by: Adam McCoy <adam@forsedomani.com>
-> ---
->  fs/cifs/cifssmb.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 182b864b3075..5014a82391ff 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -2152,8 +2152,8 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
->                         }
->                 }
->
-> +               kref_put(&wdata2->refcount, cifs_writedata_release);
->                 if (rc) {
-> -                       kref_put(&wdata2->refcount, cifs_writedata_release);
->                         if (is_retryable_error(rc))
->                                 continue;
->                         i += nr_pages;
-> --
-> 2.17.1
->
-
-
---
-Thanks,
-
-Steve
