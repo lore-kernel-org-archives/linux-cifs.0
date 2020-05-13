@@ -2,41 +2,41 @@ Return-Path: <SRS0=OaSP=63=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57DC3C2D0FD
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:30:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C635C2D0F8
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:30:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32383206F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:30:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E1FC206F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 May 2020 06:30:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XHNQYFmw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sR5EMxLZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729587AbgEMGag (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 May 2020 02:30:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46162 "EHLO
+        id S1730760AbgEMG2t (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 May 2020 02:28:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731653AbgEMG2v (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 May 2020 02:28:51 -0400
+        with ESMTP id S1730668AbgEMG2s (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 May 2020 02:28:48 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C920C061A0C;
-        Tue, 12 May 2020 23:28:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED09BC061A0E;
+        Tue, 12 May 2020 23:28:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=beuMJecpNDtYdrGZTXNqKLBd2qUZH1cCrxP1hAJq0kM=; b=XHNQYFmw87bS0nnjFvAjejBSh+
-        jsVw9DNYQFAOSqkOB/S4J4EdYPjHvEKVdMr+nbRrplagJdhkFZOXyapJsOabAHYGecUC+Ot5y68I5
-        8odznIQPngBB3k96mQTa/y64vDUe57/PlZSGAZR3ugdHdzJo6QFsIpTXi9CxeylDxWoZM6YhQw01l
-        YXNGnPoyolWrVz1fZDj/q6AlSXDTNbVFoUWnfV/OGxcKbbDcRBL071jD6WH24xhkOPNlFyM+CYgiV
-        Uu4JtzNh6SKB8z9HEB77Ic2FnIlOuP82ICYI8fFOMxY8y6MLpuHdiFQ1niguudD3X2s1QMHMAXK4B
-        SH7OT+wQ==;
+        bh=VriKupxRYsJlL2uxVcilvd0cTKLGSfORdeySMsHEWM0=; b=sR5EMxLZAt8B7bA1KxAxjuv6wd
+        og2rytl6Jc0A+7hlcV8EXWIPDvh8UgyAUErFODUlIipxvuEJxEu+x0A+pFk4I9pySnf1f6T/pJsTu
+        KUB2RdqvTmiJkfhDXGEnvLdf2lvs3k6LXxLu8DoXiOA5hsxN5fm073OAF4CTNSLl0Ep1EftErwAfc
+        ruLPqbJ9CiN7AAnc5ZtNGwBAsO1fO1kYiDgavZXz4LAWVgsG1wmLD7Lx1Aqs0ZTJ+3mTtyrj5sjE6
+        Cyq8JY7tvf4boI1g+6bKr+ilMXPAkaVbj0N5rx+PLXDX6Fpi6bbyIG6W385vcDxJrl4RMddG0+l3X
+        3F/wY21g==;
 Received: from [2001:4bb8:180:9d3f:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jYksR-0005AD-TD; Wed, 13 May 2020 06:28:24 +0000
+        id 1jYksL-00054q-LC; Wed, 13 May 2020 06:28:18 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -55,9 +55,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
         linux-sctp@vger.kernel.org, ceph-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
-Subject: [PATCH 30/33] tipc: call tsk_set_importance from tipc_topsrv_create_listener
-Date:   Wed, 13 May 2020 08:26:45 +0200
-Message-Id: <20200513062649.2100053-31-hch@lst.de>
+Subject: [PATCH 28/33] sctp: add sctp_sock_set_nodelay
+Date:   Wed, 13 May 2020 08:26:43 +0200
+Message-Id: <20200513062649.2100053-29-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200513062649.2100053-1-hch@lst.de>
 References: <20200513062649.2100053-1-hch@lst.de>
@@ -69,99 +69,88 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Avoid using kernel_setsockopt for the TIPC_IMPORTANCE option when we can
-just use the internal helper.  The only change needed is to pass a struct
-sock instead of tipc_sock, which is private to socket.c
+Add a helper to directly set the SCTP_NODELAY sockopt from kernel space
+without going through a fake uaccess.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- net/tipc/socket.c | 18 +++++++++---------
- net/tipc/socket.h |  2 ++
- net/tipc/topsrv.c |  6 +++---
- 3 files changed, 14 insertions(+), 12 deletions(-)
+ fs/dlm/lowcomms.c       | 10 ++--------
+ include/net/sctp/sctp.h |  1 +
+ net/sctp/socket.c       |  8 ++++++++
+ 3 files changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/net/tipc/socket.c b/net/tipc/socket.c
-index 87466607097f1..f2e10fbfb03df 100644
---- a/net/tipc/socket.c
-+++ b/net/tipc/socket.c
-@@ -191,17 +191,17 @@ static int tsk_importance(struct tipc_sock *tsk)
- 	return msg_importance(&tsk->phdr);
+diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
+index e4939d770df53..6fa45365666a8 100644
+--- a/fs/dlm/lowcomms.c
++++ b/fs/dlm/lowcomms.c
+@@ -1034,7 +1034,6 @@ static int sctp_bind_addrs(struct connection *con, uint16_t port)
+ static void sctp_connect_to_sock(struct connection *con)
+ {
+ 	struct sockaddr_storage daddr;
+-	int one = 1;
+ 	int result;
+ 	int addr_len;
+ 	struct socket *sock;
+@@ -1081,8 +1080,7 @@ static void sctp_connect_to_sock(struct connection *con)
+ 	log_print("connecting to %d", con->nodeid);
+ 
+ 	/* Turn off Nagle's algorithm */
+-	kernel_setsockopt(sock, SOL_SCTP, SCTP_NODELAY, (char *)&one,
+-			  sizeof(one));
++	sctp_sock_set_nodelay(sock->sk, true);
+ 
+ 	/*
+ 	 * Make sock->ops->connect() function return in specified time,
+@@ -1296,7 +1294,6 @@ static int sctp_listen_for_all(void)
+ 	struct socket *sock = NULL;
+ 	int result = -EINVAL;
+ 	struct connection *con = nodeid2con(0, GFP_NOFS);
+-	int one = 1;
+ 
+ 	if (!con)
+ 		return -ENOMEM;
+@@ -1311,10 +1308,7 @@ static int sctp_listen_for_all(void)
+ 	}
+ 
+ 	sock_set_rcvbuf(sock->sk, NEEDED_RMEM);
+-	result = kernel_setsockopt(sock, SOL_SCTP, SCTP_NODELAY, (char *)&one,
+-				   sizeof(one));
+-	if (result < 0)
+-		log_print("Could not set SCTP NODELAY error %d\n", result);
++	sctp_sock_set_nodelay(sock->sk, true);
+ 
+ 	write_lock_bh(&sock->sk->sk_callback_lock);
+ 	/* Init con struct */
+diff --git a/include/net/sctp/sctp.h b/include/net/sctp/sctp.h
+index f702b14d768ba..b505fa082f254 100644
+--- a/include/net/sctp/sctp.h
++++ b/include/net/sctp/sctp.h
+@@ -617,5 +617,6 @@ static inline bool sctp_newsk_ready(const struct sock *sk)
+ 
+ int sctp_setsockopt_bindx(struct sock *sk, struct sockaddr *kaddrs,
+ 		int addrs_size, int op);
++void sctp_sock_set_nodelay(struct sock *sk, bool val);
+ 
+ #endif /* __net_sctp_h__ */
+diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+index 30c981d9f6158..64c395f7a86d5 100644
+--- a/net/sctp/socket.c
++++ b/net/sctp/socket.c
+@@ -3066,6 +3066,14 @@ static int sctp_setsockopt_nodelay(struct sock *sk, char __user *optval,
+ 	return 0;
  }
  
--static int tsk_set_importance(struct tipc_sock *tsk, int imp)
-+static struct tipc_sock *tipc_sk(const struct sock *sk)
- {
--	if (imp > TIPC_CRITICAL_IMPORTANCE)
--		return -EINVAL;
--	msg_set_importance(&tsk->phdr, (u32)imp);
--	return 0;
-+	return container_of(sk, struct tipc_sock, sk);
- }
- 
--static struct tipc_sock *tipc_sk(const struct sock *sk)
-+int tsk_set_importance(struct sock *sk, int imp)
- {
--	return container_of(sk, struct tipc_sock, sk);
-+	if (imp > TIPC_CRITICAL_IMPORTANCE)
-+		return -EINVAL;
-+	msg_set_importance(&tipc_sk(sk)->phdr, (u32)imp);
-+	return 0;
- }
- 
- static bool tsk_conn_cong(struct tipc_sock *tsk)
-@@ -2661,7 +2661,7 @@ static int tipc_accept(struct socket *sock, struct socket *new_sock, int flags,
- 	/* Connect new socket to it's peer */
- 	tipc_sk_finish_conn(new_tsock, msg_origport(msg), msg_orignode(msg));
- 
--	tsk_set_importance(new_tsock, msg_importance(msg));
-+	tsk_set_importance(new_sk, msg_importance(msg));
- 	if (msg_named(msg)) {
- 		new_tsock->conn_type = msg_nametype(msg);
- 		new_tsock->conn_instance = msg_nameinst(msg);
-@@ -3079,7 +3079,7 @@ static int tipc_setsockopt(struct socket *sock, int lvl, int opt,
- 
- 	switch (opt) {
- 	case TIPC_IMPORTANCE:
--		res = tsk_set_importance(tsk, value);
-+		res = tsk_set_importance(sk, value);
- 		break;
- 	case TIPC_SRC_DROPPABLE:
- 		if (sock->type != SOCK_STREAM)
-diff --git a/net/tipc/socket.h b/net/tipc/socket.h
-index 235b9679acee4..b11575afc66fe 100644
---- a/net/tipc/socket.h
-+++ b/net/tipc/socket.h
-@@ -75,4 +75,6 @@ u32 tipc_sock_get_portid(struct sock *sk);
- bool tipc_sk_overlimit1(struct sock *sk, struct sk_buff *skb);
- bool tipc_sk_overlimit2(struct sock *sk, struct sk_buff *skb);
- 
-+int tsk_set_importance(struct sock *sk, int imp);
-+
- #endif
-diff --git a/net/tipc/topsrv.c b/net/tipc/topsrv.c
-index 73dbed0c4b6b8..a0d50649f71c2 100644
---- a/net/tipc/topsrv.c
-+++ b/net/tipc/topsrv.c
-@@ -494,7 +494,6 @@ static void tipc_topsrv_listener_data_ready(struct sock *sk)
- 
- static int tipc_topsrv_create_listener(struct tipc_topsrv *srv)
- {
--	int imp = TIPC_CRITICAL_IMPORTANCE;
- 	struct socket *lsock = NULL;
- 	struct sockaddr_tipc saddr;
- 	struct sock *sk;
-@@ -511,8 +510,9 @@ static int tipc_topsrv_create_listener(struct tipc_topsrv *srv)
- 	sk->sk_user_data = srv;
- 	write_unlock_bh(&sk->sk_callback_lock);
- 
--	rc = kernel_setsockopt(lsock, SOL_TIPC, TIPC_IMPORTANCE,
--			       (char *)&imp, sizeof(imp));
++void sctp_sock_set_nodelay(struct sock *sk, bool val)
++{
 +	lock_sock(sk);
-+	rc = tsk_set_importance(sk, TIPC_CRITICAL_IMPORTANCE);
++	sctp_sk(sk)->nodelay = val;
 +	release_sock(sk);
- 	if (rc < 0)
- 		goto err;
- 
++}
++EXPORT_SYMBOL(sctp_sock_set_nodelay);
++
+ /*
+  *
+  * 7.1.1 SCTP_RTOINFO
 -- 
 2.26.2
 
