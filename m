@@ -2,106 +2,167 @@ Return-Path: <SRS0=idcP=65=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA13C433E0
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 May 2020 08:14:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9EEDC433E0
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 May 2020 15:14:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DF0C206B6
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 May 2020 08:14:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABC14207C4
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 May 2020 15:14:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e++cvvTh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727924AbgEOIOO convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 15 May 2020 04:14:14 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:58855 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727882AbgEOION (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 15 May 2020 04:14:13 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-135-kgvmV9-GP7CT7oWXwAS8yw-1; Fri, 15 May 2020 09:14:08 +0100
-X-MC-Unique: kgvmV9-GP7CT7oWXwAS8yw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Fri, 15 May 2020 09:14:07 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Fri, 15 May 2020 09:14:07 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'David Miller' <davem@davemloft.net>
-CC:     "hch@lst.de" <hch@lst.de>, "joe@perches.com" <joe@perches.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuznet@ms2.inr.ac.ru" <kuznet@ms2.inr.ac.ru>,
-        "yoshfuji@linux-ipv6.org" <yoshfuji@linux-ipv6.org>,
-        "vyasevich@gmail.com" <vyasevich@gmail.com>,
-        "nhorman@tuxdriver.com" <nhorman@tuxdriver.com>,
-        "marcelo.leitner@gmail.com" <marcelo.leitner@gmail.com>,
-        "jmaloy@redhat.com" <jmaloy@redhat.com>,
-        "ying.xue@windriver.com" <ying.xue@windriver.com>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
-        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
-        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>
-Subject: RE: remove kernel_setsockopt and kernel_getsockopt
-Thread-Topic: remove kernel_setsockopt and kernel_getsockopt
-Thread-Index: AQHWKU15LJmP4mOGDE2/GHhLszFt9KinP7aQgAAO/ACAABIowIAAkWGAgADbQOA=
-Date:   Fri, 15 May 2020 08:14:07 +0000
-Message-ID: <29428bc7a5344412be9f632bced8888d@AcuMS.aculab.com>
-References: <756758e8f0e34e2e97db470609f5fbba@AcuMS.aculab.com>
-        <20200514101838.GA12548@lst.de>
-        <a76440f7305c4653877ff2abff499f4e@AcuMS.aculab.com>
- <20200514.130357.1683454520750761365.davem@davemloft.net>
-In-Reply-To: <20200514.130357.1683454520750761365.davem@davemloft.net>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        id S1726188AbgEOPOS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 15 May 2020 11:14:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50747 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726227AbgEOPOR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 May 2020 11:14:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589555655;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4jFShFTg902A0q2PIFAj13bBAo+TkoHxdtSFzmSJaQc=;
+        b=e++cvvThyYv4aKsLluJBvO82fRXFgEx877eclifgT4+055dzJglDryNaw43IuJuqhzYM6+
+        vyESHyl+yVpeqyEKxC+Xmb3fWk6nqOeN+u6lCVfCyujUb/tuFw6xfmBgJzld4RUJ8g4KqE
+        G8KNOq0X7aIyEYv9hV9MOvkUloE/LNA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-LQVTQu0OPIyPDmXCi0pv9g-1; Fri, 15 May 2020 11:14:13 -0400
+X-MC-Unique: LQVTQu0OPIyPDmXCi0pv9g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03A5684B8A0;
+        Fri, 15 May 2020 15:14:10 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-112-95.rdu2.redhat.com [10.10.112.95])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D912F76E64;
+        Fri, 15 May 2020 15:13:59 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20200514102919.GA12680@lst.de>
+References: <20200514102919.GA12680@lst.de> <20200513062649.2100053-30-hch@lst.de> <20200513062649.2100053-1-hch@lst.de> <3123534.1589375587@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     dhowells@redhat.com, "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-nvme@lists.infradead.org, linux-sctp@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        drbd-dev@lists.linbit.com, linux-cifs@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org,
+        cluster-devel@redhat.com, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, Neil Horman <nhorman@tuxdriver.com>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        netdev@vger.kernel.org, Vlad Yasevich <vyasevich@gmail.com>,
+        linux-kernel@vger.kernel.org, Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>, ocfs2-devel@oss.oracle.com
+Subject: Re: [PATCH 29/33] rxrpc_sock_set_min_security_level
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <128581.1589555639.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 15 May 2020 16:13:59 +0100
+Message-ID: <128582.1589555639@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looking at __sys_setsockopt() I noticed that the BPF intercept
-can also cause set_fs(KERNEL_DS) be set in order to pass a
-modified buffer into the actual setsockopt() code.
+Christoph Hellwig <hch@lst.de> wrote:
 
-If that functionality is to be kept then the underlying
-protocol specific code needs changing to accept a kernel buffer.
+> > Looks good - but you do need to add this to Documentation/networking/r=
+xrpc.txt
+> > also, thanks.
+> =
 
-The 32bit compat code would also be a lot simpler if it could
-pass an kernel buffer through.
-At the moment it copies the modified buffer back out onto the
-user stack.
+> That file doesn't exist, instead we now have a
+> cumentation/networking/rxrpc.rst in weird markup.
 
-I'm sure there have been suggestions to remove that complete hack.
-Fixing the compat code would leave a kernel_[sg]et_sockopt() that
-still worked.
+Yeah - that's only in net/next thus far.
 
-	David
+> Where do you want this to be added, and with what text?  Remember I don'=
+t
+> really know what this thing does, I just provide a shortcut.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+The document itself describes what each rxrpc sockopt does.  Just look for
+RXRPC_MIN_SECURITY_LEVEL in there;-)
+
+Anyway, see the attached.  This also fixes a couple of errors in the doc t=
+hat
+I noticed.
+
+David
+---
+diff --git a/Documentation/networking/rxrpc.rst b/Documentation/networking=
+/rxrpc.rst
+index 5ad35113d0f4..68552b92dc44 100644
+--- a/Documentation/networking/rxrpc.rst
++++ b/Documentation/networking/rxrpc.rst
+@@ -477,7 +477,7 @@ AF_RXRPC sockets support a few socket options at the S=
+OL_RXRPC level:
+ 	 Encrypted checksum plus packet padded and first eight bytes of packet
+ 	 encrypted - which includes the actual packet length.
+ =
+
+-     (c) RXRPC_SECURITY_ENCRYPTED
++     (c) RXRPC_SECURITY_ENCRYPT
+ =
+
+ 	 Encrypted checksum plus entire packet padded and encrypted, including
+ 	 actual packet length.
+@@ -578,7 +578,7 @@ A client would issue an operation by:
+      This issues a request_key() to get the key representing the security
+      context.  The minimum security level can be set::
+ =
+
+-	unsigned int sec =3D RXRPC_SECURITY_ENCRYPTED;
++	unsigned int sec =3D RXRPC_SECURITY_ENCRYPT;
+ 	setsockopt(client, SOL_RXRPC, RXRPC_MIN_SECURITY_LEVEL,
+ 		   &sec, sizeof(sec));
+ =
+
+@@ -1090,6 +1090,15 @@ The kernel interface functions are as follows:
+      jiffies).  In the event of the timeout occurring, the call will be
+      aborted and -ETIME or -ETIMEDOUT will be returned.
+ =
+
++ (#) Apply the RXRPC_MIN_SECURITY_LEVEL sockopt to a socket from within i=
+n the
++     kernel::
++
++       int rxrpc_sock_set_min_security_level(struct sock *sk,
++					     unsigned int val);
++
++     This specifies the minimum security level required for calls on this
++     socket.
++
+ =
+
+ Configurable Parameters
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
+index 7dfcbd58da85..e313dae01674 100644
+--- a/fs/afs/rxrpc.c
++++ b/fs/afs/rxrpc.c
+@@ -57,7 +57,7 @@ int afs_open_socket(struct afs_net *net)
+ 	srx.transport.sin6.sin6_port	=3D htons(AFS_CM_PORT);
+ =
+
+ 	ret =3D rxrpc_sock_set_min_security_level(socket->sk,
+-			RXRPC_SECURITY_ENCRYPT);
++						RXRPC_SECURITY_ENCRYPT);
+ 	if (ret < 0)
+ 		goto error_2;
+ =
 
