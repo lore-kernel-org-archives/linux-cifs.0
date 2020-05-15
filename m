@@ -1,103 +1,107 @@
-Return-Path: <SRS0=e0WW=64=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=idcP=65=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EAD7C433E2
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 May 2020 22:13:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA13C433E0
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 May 2020 08:14:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F86A2065D
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 May 2020 22:13:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="edkk4V+k"
+	by mail.kernel.org (Postfix) with ESMTP id 6DF0C206B6
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 May 2020 08:14:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727082AbgENWN0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 May 2020 18:13:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51648 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726046AbgENWNZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 May 2020 18:13:25 -0400
-Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60CE7C061A0C
-        for <linux-cifs@vger.kernel.org>; Thu, 14 May 2020 15:13:24 -0700 (PDT)
-Received: by mail-ed1-x543.google.com with SMTP id r7so224593edo.11
-        for <linux-cifs@vger.kernel.org>; Thu, 14 May 2020 15:13:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Orc2q6coF3KR8uDrJEfkpD2+hbuz8HrAvPtSTw7mlUk=;
-        b=edkk4V+kAdEL/y+Y6mqVbiaFnAsR6RP217Qj3vryv/Jj/RmjgZT89NgXqzIGXF2WAV
-         N+6HOHkf2C9KPyjyU+ExbAyQk3tYcbTlUwNAoH3yWI4pU5yNCGSGdaPL4UgvSqDJmEF9
-         vd0dbIjmz9XQAjgpjFzOyLXEUXzbNxlL+yg+6Pt6la+uWIoVKW/aFjrK/aMNA7emOPBz
-         d0B5qO67KfL+4PzivIw6I6FtgQQj8RX+UOIHNNsuR6jOzSYBTZ6aFwiu/KD9b4+J3hGZ
-         gHEJAgZ+Nz+YCnIzF1LyWUytVbZ6HjyMGov8d7QvP39qP0F8QsgMG+g1Wpj8yvKabaOH
-         lP5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Orc2q6coF3KR8uDrJEfkpD2+hbuz8HrAvPtSTw7mlUk=;
-        b=czbpc+VsP6dItFzWmfr2nHs16D9pyBTHqzLHWRy5v0jNmetDHFqoRpI60vZelojjFh
-         XQegUdwsbUpWOQRqm6J8hAFeDhHpLmq+BQoJUDq8PbgmOKPiqQlkQY/Bq3F5jXTPj1LI
-         SA0YHqD+94wwB0K41LJOw0nn++3Gi4hn3s2t+Qm/AN6IezvskDz4YrN3vr4VPZVjFKDo
-         zaq/4MW5HukqtfqDgPinp5pXnigE8e8Cuw/Z9V8SggcE1cHFY4Eo+EHt9cxTMbWKXf+2
-         LLJZWVQlG+vJbmK45w5jVkb9uPc9rmTPN50jcClqNf9tieTsltZVmOsRx0N0t+d9z3qV
-         Ag6g==
-X-Gm-Message-State: AOAM533XSkAY8fBVx0J6Q4FlFSwYMqs34qp50vIpbssN8rDRIff9+ytl
-        /+85k0dhRg18dF+WjssJnrNcmPuArqcIHCWBaQ==
-X-Google-Smtp-Source: ABdhPJzp/PHtjh4TZOd9pct+xh4R1CqSljzLsyG5XLgAcAt/dxSAWREWp2bAqf/3B5zA4krse353FbymJAbfcB0hgc4=
-X-Received: by 2002:a50:fb09:: with SMTP id d9mr188388edq.129.1589494402981;
- Thu, 14 May 2020 15:13:22 -0700 (PDT)
+        id S1727924AbgEOIOO convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 15 May 2020 04:14:14 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:58855 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727882AbgEOION (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 15 May 2020 04:14:13 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-135-kgvmV9-GP7CT7oWXwAS8yw-1; Fri, 15 May 2020 09:14:08 +0100
+X-MC-Unique: kgvmV9-GP7CT7oWXwAS8yw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Fri, 15 May 2020 09:14:07 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Fri, 15 May 2020 09:14:07 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Miller' <davem@davemloft.net>
+CC:     "hch@lst.de" <hch@lst.de>, "joe@perches.com" <joe@perches.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuznet@ms2.inr.ac.ru" <kuznet@ms2.inr.ac.ru>,
+        "yoshfuji@linux-ipv6.org" <yoshfuji@linux-ipv6.org>,
+        "vyasevich@gmail.com" <vyasevich@gmail.com>,
+        "nhorman@tuxdriver.com" <nhorman@tuxdriver.com>,
+        "marcelo.leitner@gmail.com" <marcelo.leitner@gmail.com>,
+        "jmaloy@redhat.com" <jmaloy@redhat.com>,
+        "ying.xue@windriver.com" <ying.xue@windriver.com>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
+        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>
+Subject: RE: remove kernel_setsockopt and kernel_getsockopt
+Thread-Topic: remove kernel_setsockopt and kernel_getsockopt
+Thread-Index: AQHWKU15LJmP4mOGDE2/GHhLszFt9KinP7aQgAAO/ACAABIowIAAkWGAgADbQOA=
+Date:   Fri, 15 May 2020 08:14:07 +0000
+Message-ID: <29428bc7a5344412be9f632bced8888d@AcuMS.aculab.com>
+References: <756758e8f0e34e2e97db470609f5fbba@AcuMS.aculab.com>
+        <20200514101838.GA12548@lst.de>
+        <a76440f7305c4653877ff2abff499f4e@AcuMS.aculab.com>
+ <20200514.130357.1683454520750761365.davem@davemloft.net>
+In-Reply-To: <20200514.130357.1683454520750761365.davem@davemloft.net>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-References: <20200513115330.5187-1-adam@forsedomani.com> <CAH2r5ms14KKspfjv7rc_vkWGMantAxoTE7p0bi66NmMzcex+tg@mail.gmail.com>
- <CAH2r5mtWeqZjHroapXKiN7XxYnt4XjxWuhaPSzRwNcVgrP6g+g@mail.gmail.com> <20200514011748.GB5964@bionicboi>
-In-Reply-To: <20200514011748.GB5964@bionicboi>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 14 May 2020 15:13:11 -0700
-Message-ID: <CAKywueRRLGdpzjDMVh5DJzMO-AzzLNDWOZor5YstGenboi+Gpw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix leaked reference on requeued write
-To:     Adam McCoy <adam@forsedomani.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D1=81=D1=80, 13 =D0=BC=D0=B0=D1=8F 2020 =D0=B3. =D0=B2 18:18, Adam McCoy <=
-adam@forsedomani.com>:
->
-> > Part of this makes sense Pavel reminded me:
-> >       in cifs_writepages() we don't need to reference wdata because we
-> > are leaving the function. in cifs_write_from_iter() we put all wdatas
-> > in the list and that's why we need an extra reference there
->
-> Yes, this looks right. cifs_writev_requeue() seems to work like
-> cifs_writepages() in that the wdata2 reference disappears when the loop
-> exits. If the loop iterates a new struct is created each time.
->
-> > and wouldn't there be an underrun if a retryable error with your patch
-> > with it getting called twice?
->
-> There shouldn't be any difference if there is any kind of write error
-> (rc !=3D 0), since the put call is just moving. The only difference
-> should be that the put call will happen if the write succeeds.
->
+Looking at __sys_setsockopt() I noticed that the BPF intercept
+can also cause set_fs(KERNEL_DS) be set in order to pass a
+modified buffer into the actual setsockopt() code.
 
-Thanks for the patch! Good catch!
+If that functionality is to be kept then the underlying
+protocol specific code needs changing to accept a kernel buffer.
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+The 32bit compat code would also be a lot simpler if it could
+pass an kernel buffer through.
+At the moment it copies the modified buffer back out onto the
+user stack.
 
-This is the old code and the problem is important to fix, so, stable
-tag is needed.
+I'm sure there have been suggestions to remove that complete hack.
+Fixing the compat code would leave a kernel_[sg]et_sockopt() that
+still worked.
 
---
-Best regards,
-Pavel Shilovsky
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
