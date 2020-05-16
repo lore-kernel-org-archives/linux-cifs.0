@@ -1,65 +1,98 @@
-Return-Path: <SRS0=idcP=65=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=UqfD=66=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A920C433E5
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 May 2020 15:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D56CC433E2
+	for <linux-cifs@archiver.kernel.org>; Sat, 16 May 2020 15:11:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 477AA20643
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 May 2020 15:25:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E780D206F4
+	for <linux-cifs@archiver.kernel.org>; Sat, 16 May 2020 15:11:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726304AbgEOPZH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 15 May 2020 11:25:07 -0400
-Received: from verein.lst.de ([213.95.11.211]:57262 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726188AbgEOPZG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 15 May 2020 11:25:06 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id DCFD868C65; Fri, 15 May 2020 17:24:59 +0200 (CEST)
-Date:   Fri, 15 May 2020 17:24:59 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        id S1727111AbgEPPLq convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 16 May 2020 11:11:46 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:29931 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726948AbgEPPLo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 16 May 2020 11:11:44 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-182-psAgggZzN62zzCab8iGYhQ-1; Sat, 16 May 2020 16:11:41 +0100
+X-MC-Unique: psAgggZzN62zzCab8iGYhQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Sat, 16 May 2020 16:11:40 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Sat, 16 May 2020 16:11:40 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'David Howells' <dhowells@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+CC:     Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
         Eric Dumazet <edumazet@google.com>,
-        linux-nvme@lists.infradead.org, linux-sctp@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        drbd-dev@lists.linbit.com, linux-cifs@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org,
-        cluster-devel@redhat.com, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        linux-block@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        ceph-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
         Neil Horman <nhorman@tuxdriver.com>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        netdev@vger.kernel.org, Vlad Yasevich <vyasevich@gmail.com>,
-        linux-kernel@vger.kernel.org, Jon Maloy <jmaloy@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Jon Maloy <jmaloy@redhat.com>,
         Ying Xue <ying.xue@windriver.com>,
-        "David S. Miller" <davem@davemloft.net>, ocfs2-devel@oss.oracle.com
-Subject: Re: [PATCH 27/33] sctp: export sctp_setsockopt_bindx
-Message-ID: <20200515152459.GA28995@lst.de>
-References: <20200514062820.GC8564@lst.de> <20200513062649.2100053-1-hch@lst.de> <20200513062649.2100053-28-hch@lst.de> <20200513180058.GB2491@localhost.localdomain> <129070.1589556002@warthog.procyon.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+        "David S. Miller" <davem@davemloft.net>,
+        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>
+Subject: RE: [PATCH 27/33] sctp: export sctp_setsockopt_bindx
+Thread-Topic: [PATCH 27/33] sctp: export sctp_setsockopt_bindx
+Thread-Index: AQHWKsxNyiOODFVfBEqdWGEpseVc56iq0duQ
+Date:   Sat, 16 May 2020 15:11:40 +0000
+Message-ID: <05d946ae948946158dbfcbc07939b799@AcuMS.aculab.com>
+References: <20200514062820.GC8564@lst.de>
+ <20200513062649.2100053-1-hch@lst.de> <20200513062649.2100053-28-hch@lst.de>
+ <20200513180058.GB2491@localhost.localdomain>
+ <129070.1589556002@warthog.procyon.org.uk>
 In-Reply-To: <129070.1589556002@warthog.procyon.org.uk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, May 15, 2020 at 04:20:02PM +0100, David Howells wrote:
+From: David Howells
+> Sent: 15 May 2020 16:20
 > Christoph Hellwig <hch@lst.de> wrote:
 > 
 > > > The advantage on using kernel_setsockopt here is that sctp module will
 > > > only be loaded if dlm actually creates a SCTP socket.  With this
 > > > change, sctp will be loaded on setups that may not be actually using
 > > > it. It's a quite big module and might expose the system.
-> > 
+> >
 > > True.  Not that the intent is to kill kernel space callers of setsockopt,
 > > as I plan to remove the set_fs address space override used for it.
 > 
@@ -71,7 +104,39 @@ On Fri, May 15, 2020 at 04:20:02PM +0100, David Howells wrote:
 > by the user inside the kernel and pass it into the driver, then copy the data
 > back afterwards.
 
-I did look into that initially.  The problem is that tons of sockopts
-entirely ignore optlen and just use a fixed size.  So I fear that there
-could be tons of breakage if we suddently respect it.  Otherwise that
-would be a pretty nice way to handle the situation.
+Yes, it also simplifies all the compat code.
+And there is a BPF test in setsockopt that also wants to
+pass on a kernel buffer.
+
+I'm willing to sit and write the patch.
+Quoting from a post I made later on Friday.
+
+Basically:
+
+This patch sequence (to be written) does the following:
+
+Patch 1: Change __sys_setsockopt() to allocate a kernel buffer,
+         copy the data into it then call set_fs(KERNEL_DS).
+         An on-stack buffer (say 64 bytes) will be used for
+         small transfers.
+
+Patch 2: The same for __sys_getsockopt().
+
+Patch 3: Compat setsockopt.
+
+Patch 4: Compat getsockopt.
+
+Patch 5: Remove the user copies from the global socket options code.
+
+Patches 6 to n-1; Remove the user copies from the per-protocol code.
+
+Patch n: Remove the set_fs(KERNEL_DS) from the entry points.
+
+This should be bisectable.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
