@@ -1,138 +1,108 @@
-Return-Path: <SRS0=UqfD=66=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=C+hr=67=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CDBC433E1
-	for <linux-cifs@archiver.kernel.org>; Sat, 16 May 2020 15:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CE8C433E0
+	for <linux-cifs@archiver.kernel.org>; Sun, 17 May 2020 02:46:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6233720756
-	for <linux-cifs@archiver.kernel.org>; Sat, 16 May 2020 15:37:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBB66206D5
+	for <linux-cifs@archiver.kernel.org>; Sun, 17 May 2020 02:46:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RnggIlJM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ORsaqp0/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727012AbgEPPhC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 16 May 2020 11:37:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45182 "EHLO
+        id S1726908AbgEQCqK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 16 May 2020 22:46:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726695AbgEPPhB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 16 May 2020 11:37:01 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E25CC061A0C;
-        Sat, 16 May 2020 08:37:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=TG5YZgmRlXVS7HvhJz7DOFxKZzjqL5DT1HxTsi4ato4=; b=RnggIlJMvxkkVJkInT4pqpaVSA
-        SmN+fQmJr6rXEhoA27zDDtoVe3MfLbqyOGnjbFroFdUEa2bz7T8LXqJhdZ04Kn8zUaw7zqnqucvEE
-        jylJg+5o3OTrPcU/9WnNB5DHJG6s2r/4zP/X7rBAVxQdC6M19CKb7CjJPN7ckvsf+3VEUSWXTjPOs
-        h4KyUBqEslvU/z84GxRvc0uH9xKOs7/moDDDKZUR3/JC6le8XeM7SlwM6eCF1D2ew/AfzjZ81WeGR
-        TID2vSDI6gItLhZe+n8N/K+Igbx6wbsz1MCCu7X4o5NOmt5PKestOUG7qfbgkfaJZ9h4Kw4hb2rBr
-        xNF175SA==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jZyrs-000842-U1; Sat, 16 May 2020 15:36:52 +0000
-Date:   Sat, 16 May 2020 08:36:52 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     'David Howells' <dhowells@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
-        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
-        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>
-Subject: Re: [Ocfs2-devel] [PATCH 27/33] sctp: export sctp_setsockopt_bindx
-Message-ID: <20200516153652.GM16070@bombadil.infradead.org>
-References: <20200514062820.GC8564@lst.de>
- <20200513062649.2100053-1-hch@lst.de>
- <20200513062649.2100053-28-hch@lst.de>
- <20200513180058.GB2491@localhost.localdomain>
- <129070.1589556002@warthog.procyon.org.uk>
- <05d946ae948946158dbfcbc07939b799@AcuMS.aculab.com>
+        with ESMTP id S1726880AbgEQCqK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 16 May 2020 22:46:10 -0400
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5348C061A0C
+        for <linux-cifs@vger.kernel.org>; Sat, 16 May 2020 19:46:09 -0700 (PDT)
+Received: by mail-yb1-xb32.google.com with SMTP id x15so3341057ybr.10
+        for <linux-cifs@vger.kernel.org>; Sat, 16 May 2020 19:46:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=M2uEvE5h9pbJzBgl8QgYK8mz1lNvTFs+wgziCEgILJU=;
+        b=ORsaqp0/BsiDhuCA+yg2liTo/8Zu/QgTn7ZwkNuMOFos3+ImZbl7oUVxy5SXXnjuIC
+         Tf3qYXDbnDBA1ydpY9jenbHgS4cBZPWz0OC+KMRUeguto8QrqXCYDCcLnaZ//8mEoEGi
+         RlCpTTc11BaSpMSzYH7FfWgJ12iEVUzqWq9GhyXczJApBuYfjZb9dIC7nt33YyDcuWvN
+         HezjAjDNTDViFlP3un+llNKIzyDpAep+h88SZ0v+1leRF1G60T/qaEac1UlMpivwluYd
+         2tVGuyBsgqUYGRrdhl7X2obr+KyVefkiAuEdvbDWfyx+L8Boy+jFNNURzkPW7PQpNdZw
+         aMCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=M2uEvE5h9pbJzBgl8QgYK8mz1lNvTFs+wgziCEgILJU=;
+        b=oIheU+uX9MOoCsSUdxSurPTVTzPYdw94242O5beltAcY941djsqUKh0WhJq5QBV8b8
+         RWlUAz/Bc57MxenOgqvgj0EFOM2Ys5apWC6gt3DZblR5ZzTqbp5Eu1xEU/+/wBGhmrP2
+         E8LeEafYnhj0gKFpXR1Fq1tHOFEy1ToY7PRaa8JCt2svOAr0sIGFqDRyTmkGBjvaHdlm
+         cxa4T2ZSAU6fqOGaHzFQJlk3YnRCWu1RRsHhShUx+M1RY8kjWutD1DGW72RTzunqpm3F
+         43D727IdkbmlYItTOnUbValGyA5cFKT1ak2qB+hOJRoue7A6/lmUa3lhGkFLqqY78/sT
+         GUtQ==
+X-Gm-Message-State: AOAM530sJ7YD/oc1d0gWJ/pDW6sWS8A4DqFn9Zjrx/VlSglsCwP+gf5+
+        LfrcC1M5Ov7zBogFYqych1aeOUiPJRGecJsC6AGoH7nDVtY=
+X-Google-Smtp-Source: ABdhPJy+8uUcd/BIbgBUAx2+1Y55WYTE0hpas9onfltyx1NvJrAphlxT7WL883AVIAo/cW/Qhfld6kTnftzaBp87MNg=
+X-Received: by 2002:a25:cfc4:: with SMTP id f187mr15515951ybg.167.1589683568183;
+ Sat, 16 May 2020 19:46:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <05d946ae948946158dbfcbc07939b799@AcuMS.aculab.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 16 May 2020 21:45:57 -0500
+Message-ID: <CAH2r5mtJLcARTXSEjNjWnDacyr4MEcJk6TxZCu2mFy-_38uQng@mail.gmail.com>
+Subject: [GIT PULL] CIFS Fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, May 16, 2020 at 03:11:40PM +0000, David Laight wrote:
-> From: David Howells
-> > Sent: 15 May 2020 16:20
-> > Christoph Hellwig <hch@lst.de> wrote:
-> > 
-> > > > The advantage on using kernel_setsockopt here is that sctp module will
-> > > > only be loaded if dlm actually creates a SCTP socket.  With this
-> > > > change, sctp will be loaded on setups that may not be actually using
-> > > > it. It's a quite big module and might expose the system.
-> > >
-> > > True.  Not that the intent is to kill kernel space callers of setsockopt,
-> > > as I plan to remove the set_fs address space override used for it.
-> > 
-> > For getsockopt, does it make sense to have the core kernel load optval/optlen
-> > into a buffer before calling the protocol driver?  Then the driver need not
-> > see the userspace pointer at all.
-> > 
-> > Similar could be done for setsockopt - allocate a buffer of the size requested
-> > by the user inside the kernel and pass it into the driver, then copy the data
-> > back afterwards.
-> 
-> Yes, it also simplifies all the compat code.
-> And there is a BPF test in setsockopt that also wants to
-> pass on a kernel buffer.
-> 
-> I'm willing to sit and write the patch.
-> Quoting from a post I made later on Friday.
-> 
-> Basically:
-> 
-> This patch sequence (to be written) does the following:
-> 
-> Patch 1: Change __sys_setsockopt() to allocate a kernel buffer,
->          copy the data into it then call set_fs(KERNEL_DS).
->          An on-stack buffer (say 64 bytes) will be used for
->          small transfers.
-> 
-> Patch 2: The same for __sys_getsockopt().
-> 
-> Patch 3: Compat setsockopt.
-> 
-> Patch 4: Compat getsockopt.
-> 
-> Patch 5: Remove the user copies from the global socket options code.
-> 
-> Patches 6 to n-1; Remove the user copies from the per-protocol code.
-> 
-> Patch n: Remove the set_fs(KERNEL_DS) from the entry points.
-> 
-> This should be bisectable.
+Please pull the following changes since commit
+dc56c5acd8505e1e7f776d62650f3850ad2ce8e7:
 
-I appreciate your dedication to not publishing the source code to
-your kernel module, but Christoph's patch series is actually better.
-It's typesafe rather than passing void pointers around.
+  Merge tag 'platform-drivers-x86-v5.7-2' of
+git://git.infradead.org/linux-platform-drivers-x86 (2020-05-05
+16:29:03 -0700)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.7-rc5-smb3-fixes
+
+for you to fetch changes up to a48137996063d22ffba77e077425f49873856ca5:
+
+  cifs: fix leaked reference on requeued write (2020-05-14 17:47:01 -0500)
+
+----------------------------------------------------------------
+three small cifs/smb3 fixes, two trivial fixes and one open refcount
+leak fix marked for stable
+
+Regression Test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/347
+----------------------------------------------------------------
+Adam McCoy (1):
+      cifs: fix leaked reference on requeued write
+
+Geert Uytterhoeven (1):
+      CIFS: Spelling s/EACCESS/EACCES/
+
+Steve French (1):
+      cifs: Fix null pointer check in cifs_read
+
+ fs/cifs/cifssmb.c | 2 +-
+ fs/cifs/file.c    | 2 +-
+ fs/cifs/inode.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+
+-- 
+Thanks,
+
+Steve
