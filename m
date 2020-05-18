@@ -2,180 +2,102 @@ Return-Path: <SRS0=5fY1=7A=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F25C433DF
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 May 2020 15:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F22CAC433E0
+	for <linux-cifs@archiver.kernel.org>; Mon, 18 May 2020 16:01:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7DC08207D8
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 May 2020 15:51:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4AF620758
+	for <linux-cifs@archiver.kernel.org>; Mon, 18 May 2020 16:01:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benboeckel.net header.i=@benboeckel.net header.b="NuHvEljJ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="2Dsh/SQK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fplYaMNW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728267AbgERPvw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 18 May 2020 11:51:52 -0400
-Received: from wout5-smtp.messagingengine.com ([64.147.123.21]:34445 "EHLO
-        wout5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727005AbgERPvv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 18 May 2020 11:51:51 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
-        by mailout.west.internal (Postfix) with ESMTP id 5654D846;
-        Mon, 18 May 2020 11:51:50 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute7.internal (MEProxy); Mon, 18 May 2020 11:51:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
-         h=date:from:to:cc:subject:message-id:reply-to:references
-        :mime-version:content-type:in-reply-to; s=fm1; bh=/k6Uxefv5KR5De
-        o3sESOUjXzq3bRzNHWL0Vw3jNx8TM=; b=NuHvEljJ+d74MxbNbt0IcdDN9xc84T
-        EHDdvqt6RshgLbRFK11KxarFQSg70p+Yxu84qM7lnNczEPSpda/54k4frRshT1R+
-        mnvd5x6t3qobpjBelcWkpRa220yT/HRfma6Uo7cne5YZd9kg2UskjsSamJs1sH8/
-        JA8PHE6IGQsj7w5iehy6XA6qqldh2z8dIDZ8tMH6dCoTen95zf4fyT3AoBX/H2TP
-        fCEdNzyqF8ix2q6KA+CadEgziyKc7NsWnwou7E8pez7bukRDTTksrMlIu43yMg50
-        xPfJuXBPHqLh1kUt3LS0y7vRAi5+geDedxdo18mrnN3LYqPx+no2BH3g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:reply-to:subject:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; bh=/k6Uxefv5KR5Deo3sESOUjXzq3bRzNHWL0Vw3jNx8TM=; b=2Dsh/SQK
-        jh0rMCyIN1dsj3q/pvM29qDgAKEEn8qBwoQ96CGb8MnYpgoslHQ2lqii4qza6FOO
-        fQ4zj69L+Huv3c0qwZSv16LSAKj70prQQVwTH4TmAbaPDalmNBXEKRebbpubvS5y
-        s1HNJ7FuOsaSS9hmClcDd7exNhAR1r+2e6pYalGRVDSqLkYQb+zqsT6JLPjA4HK1
-        7voixJCaR5FeomBF3To98M0vSKj4GFyl4xhBX6GtzU6JcjslkY4KGUXI/JkL+QGL
-        FuaE5Uz9vF/urYEUQfXhcJO52sQ5zE9dQawtHWClo9AA9nyBQlBfdyoGgVjzwvxI
-        3lGaBlAV/65V8g==
-X-ME-Sender: <xms:Fa_CXqMd_B97yruaVQXL4CFEm8jLzuxkrixrkxh8qou0A-fq4XGR9w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduhedruddthedgledvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhrfhggtggujggfsehttdertddtreejnecuhfhrohhmpeeuvghn
-    uceuohgvtghkvghluceomhgvsegsvghnsghovggtkhgvlhdrnhgvtheqnecuggftrfgrth
-    htvghrnhepjedtvdffheetgfektdehvefgieelgeefheejvdehtdduieetgedtfedtleev
-    vdffnecukfhppeeiledrvddtgedrudeikedrvdeffeenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvgessggvnhgsohgvtghkvghlrdhnvght
-X-ME-Proxy: <xmx:Fa_CXo8sMxWTUWmv33PUjhTxoMuKU7rvHqc7EWQ3INq8FFxQT8gMCA>
-    <xmx:Fa_CXhTLBg6uuY7B0m3xh1NPwmYx5ciDsH2XpqWXAyxcwKgI56REtg>
-    <xmx:Fa_CXqvbq-ZBzOBW1yy4gEEI5foZBb09cHJZ5ra5EvuEcWddAG6ugQ>
-    <xmx:Fa_CXvFsXzihHcpc90fzRH_BtU5FWd7GCiMfwYd9AqDrbQI68lNZ0A>
-Received: from localhost (cpe-69-204-168-233.nycap.res.rr.com [69.204.168.233])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 77A3730663FD;
-        Mon, 18 May 2020 11:51:49 -0400 (EDT)
-Date:   Mon, 18 May 2020 11:51:48 -0400
-From:   Ben Boeckel <me@benboeckel.net>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        keyrings@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, fweimer@redhat.com
-Subject: Re: [PATCH] dns: Apply a default TTL to records obtained from
- getaddrinfo()
-Message-ID: <20200518155148.GA2595638@erythro.dev.benboeckel.internal>
-Reply-To: me@benboeckel.net
-References: <158981176590.872823.11683683537698750702.stgit@warthog.procyon.org.uk>
+        id S1727035AbgERQB3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 18 May 2020 12:01:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21630 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727006AbgERQB3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 18 May 2020 12:01:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1589817688;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:  in-reply-to:in-reply-to;
+        bh=uYBnaMWy2YH4TQYzQo1K+g3jodJVjamQ4AgPvqTBNfw=;
+        b=fplYaMNWIf0hUq2XELg1dH9qSBf46eeZ/Q4jSJmy0sfZpJjAaZqKTtZzsTZNzUPpYj7B08
+        8374KnZSYOxErPPYJ/8bmBXXKlkNMpSEtHY+Jz3ziv5pX7lCkI3iF2YaE3/OM7ZSRoY0l9
+        ugmeR+K914C1zMj9Nw3+n24DzzaGXPc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-Q5ITFaZ5PYirvSm-kUIb5Q-1; Mon, 18 May 2020 12:01:26 -0400
+X-MC-Unique: Q5ITFaZ5PYirvSm-kUIb5Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 002F7EC1AA
+        for <linux-cifs@vger.kernel.org>; Mon, 18 May 2020 16:01:26 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EEE7B5C1B5
+        for <linux-cifs@vger.kernel.org>; Mon, 18 May 2020 16:01:25 +0000 (UTC)
+Received: from zmail23.collab.prod.int.phx2.redhat.com (zmail23.collab.prod.int.phx2.redhat.com [10.5.83.28])
+        by colo-mx.corp.redhat.com (Postfix) with ESMTP id E8DE418095FF
+        for <linux-cifs@vger.kernel.org>; Mon, 18 May 2020 16:01:25 +0000 (UTC)
+Date:   Mon, 18 May 2020 12:01:25 -0400 (EDT)
+From:   Xiaoli Feng <xifeng@redhat.com>
+To:     linux-cifs@vger.kernel.org
+Message-ID: <1628934597.29140043.1589817685407.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1371710722.29134084.1589816497911.JavaMail.zimbra@redhat.com>
+Subject: How to verify multichannel
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <158981176590.872823.11683683537698750702.stgit@warthog.procyon.org.uk>
-User-Agent: Mutt/1.13.3 (2020-01-12)
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [10.72.13.235, 10.4.195.14]
+Thread-Topic: How to verify multichannel
+Thread-Index: /5UGMD25vIxKqA9lgpMTA7jR2qYWog==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, May 18, 2020 at 15:22:45 +0100, David Howells wrote:
-> Address records obtained from getaddrinfo() don't come with any TTL
-> information, even if they're obtained from the DNS, with the result that
-> key.dns_resolver upcall program doesn't set an expiry time on dns_resolver
-> records unless they include a component obtained directly from the DNS,
-> such as an SRV or AFSDB record.
-> 
-> Fix this to apply a default TTL of 10mins in the event that we haven't got
-> one.  This can be configured in /etc/keyutils/key.dns_resolver.conf by
-> adding the line:
-> 
-> 	default_ttl: <number-of-seconds>
-> 
-> to the file.
+Hello,
 
-Is there precedent for this config file format? It looks like possible
-YAML, but this patch doesn't mention that anywhere. Is there a good
-reason to not be using an existing format (ini, toml, json, shell-alike,
-anything)? I have no preference for anything other than a format that
-already exists out there. Maybe one that supports comments too so that
-these settings can have context associated with them in real
-deployments (which effectively rules out json)?
+When I test multichannel. I don't know how to verify if it works. I just ca=
+tch network
+packages to see if server and client communicate with multiple IP. But from=
+ my test, it
+doesn't. Does any one know how to verify multichannel?
 
-> +	while (fgets(buf, sizeof(buf) - 1, f)) {
-> +		line++;
-> +		if (buf[0] == '#')
-> +			continue;
+Setup:
+server is samba server in linux upstream.
+client is linux upstream.
+smb.conf is:
+[global]
+interfaces =3D eth1, eth2, team0
+server multi channel support =3D yes
+vfs objects =3D recycle aio_pthread
+aio read size =3D 1
+aio write size =3D 1
+[cifs]
+path=3D/mnt/cifs
+writeable=3Dyes
 
-So it does support comments...
+Create network team in server and client. eth1 and eth2 work as team slave.=
+ Mount with=20
+multichannel option(use one of team ip to mount). Then use "dd" to create 1=
+G file. The
+used time are the same for multichannel and no multichannel. Compare the ti=
+me for=20
+copying 1G file. The result are also the same. By the way, network team run=
+ning mode=20
+is round-robin.
 
-> +		p = strchr(buf, '\n');
-> +		if (!p)
-> +			error("%s:%u: line missing newline or too long", config_file, line);
-> +		while (p > buf && isspace(p[-1]))
-> +			p--;
-> +		*p = 0;
-> +
-> +		if (strncmp(buf, "default_ttl:", 12) == 0) {
-> +			p = buf + 12;
-> +			while (isspace(*p))
-> +				p++;
 
-...but not if it starts with whitespace. So if one does indent the
-`default_ttl` setting for whatever reason, the comment is stuck at the
-first column.
+Thanks.
 
-> +			if (sscanf(p, "%u%n", &u, &n) != 1)
-> +				error("%s:%u: default_ttl: Bad value",
-> +				      config_file, line);
-> +			if (p[n])
-> +				error("%s:%u: default_ttl: Extra data supplied",
-> +				      config_file, line);
+--=20
+Best regards!
+XiaoLi Feng =E5=86=AF=E5=B0=8F=E4=B8=BD
 
-But no trailing whitespace is allowed?
-
-> +			if (u < 1 || u > INT_MAX)
-> +				error("%s:%u: default_ttl: Out of range",
-> +				      config_file, line);
-
-The valid range should be mentioned in the docs (basically that 0 is not
-allowed and has no special meaning (it could mean leaving off the TTL as
-previously done)).
-
-> +			key_expiry = u;
-> +		} else {
-> +			error("%s:%u: Unknown option", config_file, line);
-
-Forwards compatibility is hard with such behavior. Is there any reason
-this can't be a warning?
-
-> @@ -24,6 +26,21 @@ It can be called in debugging mode to test its functionality by passing a
->  \fB\-D\fR flag on the command line.  For this to work, the key description and
->  the callout information must be supplied.  Verbosity can be increased by
->  supplying one or more \fB\-v\fR flags.
-> +.P
-> +A configuration file can be supplied to adjust various parameters.  The file
-> +is looked for at:
-> +.IP
-> +/etc/keyutils/key.dns_resolver.conf
-> +.P
-> +unless otherwise specified with the \fB\-c\fR flag.
-> +.P
-> +Configuration options include:
-> +.TP
-> +.B default_ttl: <number>
-> +The number of seconds to set as the expiration on a cached record.  This will
-> +be overridden if the program manages to retrieve TTL information along with
-> +the addresses (if, for example, it accesses the DNS directly).  The default is
-> +600 seconds.
-
-There's no mention of the leading whitespace support or comments here.
-Does the file deserve its own manpage?
-
---Ben
