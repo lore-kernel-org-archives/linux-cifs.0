@@ -2,87 +2,142 @@ Return-Path: <SRS0=BTJv=7B=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E45CC433DF
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 May 2020 16:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD6AC433E0
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 May 2020 18:39:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C9542075F
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 May 2020 16:54:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9AE7207D3
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 May 2020 18:39:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="dZ1k9LLF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728725AbgESQyQ convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 May 2020 12:54:16 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34798 "EHLO mx2.suse.de"
+        id S1726721AbgESSjB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 May 2020 14:39:01 -0400
+Received: from mx.cjr.nz ([51.158.111.142]:15636 "EHLO mx.cjr.nz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728689AbgESQyQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 19 May 2020 12:54:16 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id AD5C0ADD2;
-        Tue, 19 May 2020 16:54:17 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Xiaoli Feng <xifeng@redhat.com>
-Cc:     linux-cifs@vger.kernel.org
-Subject: Re: How to verify multichannel
-In-Reply-To: <2024477496.29432550.1589904923298.JavaMail.zimbra@redhat.com>
-References: <1628934597.29140043.1589817685407.JavaMail.zimbra@redhat.com> <87k119maco.fsf@suse.com> <2024477496.29432550.1589904923298.JavaMail.zimbra@redhat.com>
-Date:   Tue, 19 May 2020 18:54:13 +0200
-Message-ID: <878shnn9vu.fsf@suse.com>
+        id S1726643AbgESSjA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 19 May 2020 14:39:00 -0400
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id AD90780345;
+        Tue, 19 May 2020 18:38:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1589913538;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=p8jGa/Q6j9cDpGw4xrDbGdNoIBPHyou4UR0io0xTwIY=;
+        b=dZ1k9LLF/XRyQfPeO7Eek924NLOmczN//WjW9cZFtUBGl8/ABVQhoRgEE3TnovJ4eeWY0l
+        i9e06K8nBDTLXaHIEitPhHsieIqf3UmyhMycMQDIh3TWUgL+xiZwk2nU6PoL7Pdp7fN/FT
+        nczgs86yFoW2o54ICcScifM9vwqTTNU2kJ68woEPrbuB/1zJZ5JzCIqnD8am/3GwKKZEC7
+        0h+yDK+nmAZN3epZawzlOb8TiNuTX69HBXN8Q5cIctxGyC/zw6Ocvxey1H98uXjqkOXK7I
+        REJwaeuR3qeOsL7LpDVt4fAfwYPaLN+GehhTESMAP8qUOYuGSdFyXXw4/el9jg==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
+Cc:     Paulo Alcantara <pc@cjr.nz>
+Subject: [PATCH 1/3] cifs: set up next DFS target before generic_ip_connect()
+Date:   Tue, 19 May 2020 15:38:27 -0300
+Message-Id: <20200519183829.5512-1-pc@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Xiaoli Feng <xifeng@redhat.com> writes:
-> Now I can see the multiple channel info in network package when mount with
-> option "max_channel=2". If doesn't specify it. Client will only open one 
-> channel.
+If we mount a very specific DFS link
 
-That's correct.
+    \\FS0.FOO.COM\dfs\link -> \FS0\share1, \FS1\share2
 
-> And my smb.conf setup below can work for multichannel. Seems server
-> and client don't require multiple network interfaces. And also don't need 
-> network team.
+where its target list contains NB names ("FS0" & "FS1") rather than
+FQDN ones ("FS0.FOO.COM" & "FS1.FOO.COM"), we end up connecting to
+\FOO\share1 but server->hostname will have "FOO.COM".  The reason is
+because both "FS0" and "FS0.FOO.COM" resolve to same IP address and
+they share same TCP server connection, but "FS0.FOO.COM" was the first
+hostname set -- which is OK.
 
-The client will try to reuse the same server interface if it has the RSS
-capability flag set.
+However, if the echo thread timeouts and we still have a good
+connection to "FS0", in cifs_reconnect()
 
-https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/fcd862d1-1b85-42df-92b1-e103199f531f
+    rc = generic_ip_connect(server) -> success
+    if (rc) {
+            ...
+            reconn_inval_dfs_target(server, cifs_sb, &tgt_list,
+	                            &tgt_it);
+            ...
+     }
+     ...
 
-RSS flag means that this server interface can handle things in parallel
-efficiently.
+it successfully reconnects to "FS0" server but does not set up next
+DFS target - which should be the same target server "\FS0\share1" -
+and server->hostname remains set to "FS0.FOO.COM" rather than "FS0",
+as reconn_inval_dfs_target() would have it set to "FS0" if called
+earlier.
 
-> But When test seedup, it isn't change. I use two vm in the same host. And
-> each have 4 cpu and 1G memory. Maybe it's the problem.
+Finally, in __smb2_reconnect(), the reconnect of tcons would fail
+because tcon->ses->server->hostname (FS0.FOO.COM) does not match DFS
+target's hostname (FS0).
 
-Maybe the problem is not the number of CPU but the virtual network bus
-bandwidth.
+Fix that by calling reconn_inval_dfs_target() before
+generic_ip_connect() so server->hostname will get updated correctly
+prior to reconnecting its tcons in __smb2_reconnect().
 
-Let me explain: forget SMB and measure network speed (with iperf)
-between 2 VMs. Let's say you get 1GB/s.
+With "cifs: handle hostnames that resolve to same ip in failover"
+patch
 
-Now you add a virtual interface to the server VM and measure again on the 2
-interfaces *at the same time*. You will see at most 500MB/s on each.
+    - The above problem would not occur.
+    - We could save an DNS query to find out that they both resolve to
+      the same ip address.
 
-If you want to measure speedup, you need to limit the bandwidth of the
-server interfaces with tc so that when you max out the server interface
-bandwidth, you don't also max out the total virtual bus bandwidth.
-If you limit 1MB/s on each, 1+1 = 2MB/s which is still << 1GB/s but you
-will get speedup of 2.
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+---
+ fs/cifs/connect.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-> Thanks so much.
-
-No problem :)
-
-Cheers,
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 28268ed461b8..47b9fbb70bf5 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -572,26 +572,26 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		try_to_freeze();
+ 
+ 		mutex_lock(&server->srv_mutex);
++#ifdef CONFIG_CIFS_DFS_UPCALL
+ 		/*
+ 		 * Set up next DFS target server (if any) for reconnect. If DFS
+ 		 * feature is disabled, then we will retry last server we
+ 		 * connected to before.
+ 		 */
++		reconn_inval_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
++#endif
++		rc = reconn_set_ipaddr(server);
++		if (rc) {
++			cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
++				 __func__, rc);
++		}
++
+ 		if (cifs_rdma_enabled(server))
+ 			rc = smbd_reconnect(server);
+ 		else
+ 			rc = generic_ip_connect(server);
+ 		if (rc) {
+ 			cifs_dbg(FYI, "reconnect error %d\n", rc);
+-#ifdef CONFIG_CIFS_DFS_UPCALL
+-			reconn_inval_dfs_target(server, cifs_sb, &tgt_list,
+-						&tgt_it);
+-#endif
+-			rc = reconn_set_ipaddr(server);
+-			if (rc) {
+-				cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
+-					 __func__, rc);
+-			}
+ 			mutex_unlock(&server->srv_mutex);
+ 			msleep(3000);
+ 		} else {
 -- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
+2.26.2
+
