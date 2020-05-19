@@ -1,151 +1,98 @@
-Return-Path: <SRS0=5fY1=7A=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=BTJv=7B=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3780BC433E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 May 2020 17:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B95C433E0
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 May 2020 06:57:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 138D620829
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 May 2020 17:17:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3069020758
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 May 2020 06:57:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="d5cIqdxc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728213AbgERRRO convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 18 May 2020 13:17:14 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36560 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727006AbgERRRO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 18 May 2020 13:17:14 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 5ABF2B184;
-        Mon, 18 May 2020 17:17:15 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Xiaoli Feng <xifeng@redhat.com>, linux-cifs@vger.kernel.org
-Subject: Re: How to verify multichannel
-In-Reply-To: <1628934597.29140043.1589817685407.JavaMail.zimbra@redhat.com>
-References: <1628934597.29140043.1589817685407.JavaMail.zimbra@redhat.com>
-Date:   Mon, 18 May 2020 19:17:11 +0200
-Message-ID: <87k119maco.fsf@suse.com>
+        id S1728361AbgESG5j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 May 2020 02:57:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42560 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726881AbgESG5j (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 May 2020 02:57:39 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42FFC061A0C;
+        Mon, 18 May 2020 23:57:38 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 49R6C35ks6z9sPK;
+        Tue, 19 May 2020 16:57:35 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1589871456;
+        bh=IxBXL6U6L4IxYEayNUyM3xRdVe8j9U+f97iPpjKQK/Q=;
+        h=Date:From:To:Cc:Subject:From;
+        b=d5cIqdxc1kDoa8gfu4qUrgeKsHIKZ7nAcwAxtx5L/ut0atkhrw4iZAHUUW6uHKzUw
+         jTqz829ph/vzH+av19uQwaE9QgbImS0Vh0KpG8gofVsEZSP64m72aD9PiuY2RXMeLM
+         PERpwbcDUG6H/JwBTY3LDMDTxcsLPgCSmaHvX2uol7qmIr7njY0tR4R6oyMqjr0iDd
+         KeTVIkeupmi4tPcYULkiOe/RNbXGkkIt/oyDU+x6fghWhyZrv3jCDiwZiyyczUpQ2s
+         PsIpYKkKO2hDMV0Dt+Jqmcdwzq5TF9tNnz9XzFDE29X/VVFV2vWvn835i9UJYMJ0yZ
+         /Y9qsYadJQMHw==
+Date:   Tue, 19 May 2020 16:57:34 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@elte.hu>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: linux-next: build warning after merge of the tip tree
+Message-ID: <20200519165734.79d0c3a3@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: multipart/signed; boundary="Sig_/NTxEosSAH2jF3h/=xPOfI7y";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Xiaoli,
+--Sig_/NTxEosSAH2jF3h/=xPOfI7y
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Xiaoli Feng <xifeng@redhat.com> writes:
-> Hello,
->
-> When I test multichannel. I don't know how to verify if it works. I just catch network
-> packages to see if server and client communicate with multiple IP. But from my test, it
-> doesn't. Does any one know how to verify multichannel?
+Hi all,
 
-Testing if it works vs checking speed improvement are 2 different
-things unfortunately.
+After merging the tip tree, today's linux-next build (x86_64 allmodconfig)
+produced this warning:
 
-Source code
-===========
+fs/cifs/smb2inode.c: In function 'smb2_compound_op':
+fs/cifs/smb2inode.c:424:1: warning: the frame size of 2736 bytes is larger =
+than 2048 bytes [-Wframe-larger-than=3D]
+  424 | }
+      | ^
 
-First you need the latest patchset which is available on my github remote:
+I have no idea what caused this.
 
-    https://github.com/aaptel/linux.git
-
-You can use the "multichan-page" branch or you can extract the last
-patches of it (with "multichannel:" in the title). These patches add the
-multichannel support to the main read/write codepaths from memory pages.
-
-Client setup
-============
-
-Then you need to mount with "vers=3.11,multichannel,max_channels=N" where N
-will be the total number of channels the client will try to open.
-
-Do a network capture of the mount and run couple of commands in the
-mount point (ls, cat, stat, ...).
-
-If the client also has multiple interface, make sure you capture all
-interfaces traffic (otherwise you might ignore the other channels).
-
-Interface list check
-====================
-
-Look at the trace in wireshark and use "smb2" filter.
-
-Look for "Ioctl Response FSCTL_QUERY_NETWORK_INTERFACE_INFO", if the
-server has multiple interfaces you should see a list.
-
-You can also look at /proc/fs/cifs/DebugDate to see the list of
-interfaces the client saw and has connected to.
-
-Multichannel check
-==================
-
-Still in wireshark:
-- right-click on the first "Negotiate protocol" packet
-- "Colorize conversation" > "F5 TCP"
-
-You can repeat this for each channel to see clearly different colors for
-each channels.
-
-I have made some screenshots, maybe this can help:
-
-https://imgur.com/a/j3IBewF
-
-You can see the alternating colors in my traces that shows different
-channels being used.
-
-Speedup check
-=============
-
-Now this is the hard part.
-
-If you test with VMs and the interface are "virtual", when you make 2
-channels you are actually just dividing by 2 the bandwidth of the
-virtual bus, so you won't see much speedup. 
-
-To see a speedup you need to limit the bandwidth of the server
-interface, for example 1MB/s to each, so that together with 2 channel
-you might see 2MB/s.
-
-You can look into iperf to check raw bandwidth and tc to limit it:
-- https://iperf.fr/
-- https://netbeez.net/blog/how-to-use-the-linux-traffic-control/
-
-Also similarly if the VM only has 1 CPU you might not see much
-improvement as it will switch from one NIC to the other sequentially
-instead of in parallel.
-
-This gets tricky very quick...
-
-
-> Setup:
-> server is samba server in linux upstream.
-> client is linux upstream.
-> smb.conf is:
-> [global]
-> interfaces = eth1, eth2, team0
-> server multi channel support = yes
-> vfs objects = recycle aio_pthread
-> aio read size = 1
-> aio write size = 1
-> [cifs]
-> path=/mnt/cifs
-> writeable=yes
-
-This looks ok but I've mostly used Windows Server 2019 in my test.
-
-Let me know how it goes.
-
+--=20
 Cheers,
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
+Stephen Rothwell
+
+--Sig_/NTxEosSAH2jF3h/=xPOfI7y
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7Dg14ACgkQAVBC80lX
+0GznOwgAnCzYIEnj/kJJV5yqM8jXBNyygHuHGJpWPShzEv4hF0OV/qOgujVAS9wy
+VfnOyHcFWmErwwmiNXdzk/ctbtJhrOkU31+hUJDzO8JH0poRBx0XeomKKdCae5D7
+GWoz5jv1nEzcZ/bLdXPKJ7Q9LydfBd+hXbWAh0kp50p28HPKa0MFe8Oa5/s7wwbV
+Gtykq9yOyneZXoOo6ouGW4a1FmUV89PyIntj+LtEp1S3ieF67WfZFi87M3yC0jlx
+YUw5uR3VOZm7Kg02frhjHgXpBXlJ8eyYzO+OKI2mmqwog3EiD2MhiuClTyA5L9E2
++VvrxpxEaZfhvRi1zQKOVaZtKlZ4VQ==
+=PKGY
+-----END PGP SIGNATURE-----
+
+--Sig_/NTxEosSAH2jF3h/=xPOfI7y--
