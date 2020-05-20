@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD37DC433DF
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 19:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17EABC433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 19:58:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD530207E8
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 19:58:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC09F207F9
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 19:58:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HH+wGkzd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cvjj3wtY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727969AbgETT6E (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 May 2020 15:58:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51250 "EHLO
+        id S1726801AbgETT6c (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 May 2020 15:58:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728370AbgETT5B (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 May 2020 15:57:01 -0400
+        with ESMTP id S1728330AbgETT4y (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 May 2020 15:56:54 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E97C061A0E;
-        Wed, 20 May 2020 12:57:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FAC8C061A0E;
+        Wed, 20 May 2020 12:56:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=4zl9s8rnUUlSiLugt9UUpRFE7SII0U4bymRrouDV/L8=; b=HH+wGkzdpG1+DRbPMs9ZL0Kq0T
-        3DAArtZUPTApFHFEcgiMxRa+uBx0iHEc2FXltUZSMdW8pi48KXv/STi/eyOznkQu+lCZDNWUCXwXF
-        wG/KA2SiyS9Q/XhhY89Vb1G/G6pTgDSlYJpo0zMXDscCLZORLnErmAsUGYH7yX3p/Ydave7SdqCJQ
-        ozPcOdJ8C2G4WJE+QKg/TJcqfneENN9GO0o9eA9xj1PZ18cQ4CVPTxaxGxkHeekQUhkT7RJjz/xtx
-        J0k4R9qVx8RbAmfG2wzFJnSQPt3eDsesC8R57DgubzqgrBdx8GRtMhGWCWVAv/GntNRO45rc8NfLN
-        o65VVWwQ==;
+        bh=RnAQjt8YrLm0l+RA3dZnnjcBplWXlBix8gtAcWbW64Y=; b=cvjj3wtYfZZlYP/EvPeGheMTTP
+        L9IUmLKcRowdlnOA95n5Q31JwA7qjT08h9wqPdbZaPhzknVqcsv4FsCZWHcYYo29LWEgmLaoI2RGx
+        ynzlY86Pg2NrLCj1FFbq+cwAhRFJp9J4ONrA7qY7FUAEKYzLNrvUTGifqloKoypI99D3t/m/V8pus
+        Cpe+j2BF2nS+3ITe8G6sKv3A2lfiIis2whOLHIMLIZnIEVVRasN0Q79YAeg0AJV/Fi8QI2zUMavxE
+        BiVpMTDtiEBGAXBZ+Vd2zmYrw71ZbAuw2qyZG0ffOGwoY/LGfUespd59yLEzP6BhtuSuKChY9fnIh
+        6eTA1Iuw==;
 Received: from [2001:4bb8:188:1506:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jbUpE-0003GO-Kx; Wed, 20 May 2020 19:56:25 +0000
+        id 1jbUp6-00036I-Rj; Wed, 20 May 2020 19:56:17 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -55,9 +55,9 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         netdev@vger.kernel.org, linux-sctp@vger.kernel.org,
         ceph-devel@vger.kernel.org, rds-devel@oss.oracle.com,
         linux-nfs@vger.kernel.org, David Howells <dhowells@redhat.com>
-Subject: [PATCH 26/33] ipv6: add ip6_sock_set_recverr
-Date:   Wed, 20 May 2020 21:55:02 +0200
-Message-Id: <20200520195509.2215098-27-hch@lst.de>
+Subject: [PATCH 23/33] ipv4: add ip_sock_set_mtu_discover
+Date:   Wed, 20 May 2020 21:54:59 +0200
+Message-Id: <20200520195509.2215098-24-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200520195509.2215098-1-hch@lst.de>
 References: <20200520195509.2215098-1-hch@lst.de>
@@ -69,60 +69,107 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper to directly set the IPV6_RECVERR sockopt from kernel space
-without going through a fake uaccess.
+Add a helper to directly set the IP_MTU_DISCOVER sockopt from kernel
+space without going through a fake uaccess.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: David Howells <dhowells@redhat.com>
+Reviewed-by: David Howells <dhowells@redhat.com> [rxrpc bits]
 ---
- include/net/ipv6.h       |  7 +++++++
- net/rxrpc/local_object.c | 10 ++--------
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ include/net/ip.h         |  1 +
+ net/ipv4/ip_sockglue.c   | 11 +++++++++++
+ net/rxrpc/local_object.c |  8 +-------
+ net/rxrpc/output.c       | 14 +++++---------
+ 4 files changed, 18 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index 7d1cb9f0f5388..3b02049d2e582 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -1187,4 +1187,11 @@ static inline int ip6_sock_set_v6only(struct sock *sk)
- 	return 0;
+diff --git a/include/net/ip.h b/include/net/ip.h
+index f063a491b9063..d3649c49dd333 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -766,6 +766,7 @@ static inline bool inetdev_valid_mtu(unsigned int mtu)
  }
  
-+static inline void ip6_sock_set_recverr(struct sock *sk)
+ void ip_sock_set_freebind(struct sock *sk);
++int ip_sock_set_mtu_discover(struct sock *sk, int val);
+ void ip_sock_set_recverr(struct sock *sk);
+ void ip_sock_set_tos(struct sock *sk, int val);
+ 
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index 9a6a65b66f9d3..a3c46ec95a756 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -597,6 +597,17 @@ void ip_sock_set_recverr(struct sock *sk)
+ }
+ EXPORT_SYMBOL(ip_sock_set_recverr);
+ 
++int ip_sock_set_mtu_discover(struct sock *sk, int val)
 +{
++	if (val < IP_PMTUDISC_DONT || val > IP_PMTUDISC_OMIT)
++		return -EINVAL;
 +	lock_sock(sk);
-+	inet6_sk(sk)->recverr = true;
++	inet_sk(sk)->pmtudisc = val;
 +	release_sock(sk);
++	return 0;
 +}
++EXPORT_SYMBOL(ip_sock_set_mtu_discover);
 +
- #endif /* _NET_IPV6_H */
+ /*
+  *	Socket option code for IP. This is the end of the line after any
+  *	TCP,UDP etc options on an IP socket.
 diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 6f4e6b4817cf2..c8b2097f499c0 100644
+index 4c0e8fe5ec1fb..6f4e6b4817cf2 100644
 --- a/net/rxrpc/local_object.c
 +++ b/net/rxrpc/local_object.c
-@@ -107,7 +107,7 @@ static struct rxrpc_local *rxrpc_alloc_local(struct rxrpc_net *rxnet,
- static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
- {
- 	struct sock *usk;
--	int ret, opt;
-+	int ret;
+@@ -174,13 +174,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
+ 		ip_sock_set_recverr(local->socket->sk);
  
- 	_enter("%p{%d,%d}",
- 	       local, local->srx.transport_type, local->srx.transport.family);
-@@ -157,13 +157,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
- 	switch (local->srx.transport.family) {
- 	case AF_INET6:
- 		/* we want to receive ICMPv6 errors */
--		opt = 1;
--		ret = kernel_setsockopt(local->socket, SOL_IPV6, IPV6_RECVERR,
+ 		/* we want to set the don't fragment bit */
+-		opt = IP_PMTUDISC_DO;
+-		ret = kernel_setsockopt(local->socket, SOL_IP, IP_MTU_DISCOVER,
 -					(char *) &opt, sizeof(opt));
 -		if (ret < 0) {
 -			_debug("setsockopt failed");
 -			goto error;
 -		}
-+		ip6_sock_set_recverr(local->socket->sk);
++		ip_sock_set_mtu_discover(local->socket->sk, IP_PMTUDISC_DO);
  
- 		/* Fall through and set IPv4 options too otherwise we don't get
- 		 * errors from IPv4 packets sent through the IPv6 socket.
+ 		/* We want receive timestamps. */
+ 		sock_enable_timestamps(local->socket->sk);
+diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+index 90e263c6aa69e..ad0234e1e1713 100644
+--- a/net/rxrpc/output.c
++++ b/net/rxrpc/output.c
+@@ -321,7 +321,7 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct sk_buff *skb,
+ 	struct kvec iov[2];
+ 	rxrpc_serial_t serial;
+ 	size_t len;
+-	int ret, opt;
++	int ret;
+ 
+ 	_enter(",{%d}", skb->len);
+ 
+@@ -476,18 +476,14 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct sk_buff *skb,
+ 	switch (conn->params.local->srx.transport.family) {
+ 	case AF_INET6:
+ 	case AF_INET:
+-		opt = IP_PMTUDISC_DONT;
+-		kernel_setsockopt(conn->params.local->socket,
+-				  SOL_IP, IP_MTU_DISCOVER,
+-				  (char *)&opt, sizeof(opt));
++		ip_sock_set_mtu_discover(conn->params.local->socket->sk,
++				IP_PMTUDISC_DONT);
+ 		ret = kernel_sendmsg(conn->params.local->socket, &msg,
+ 				     iov, 2, len);
+ 		conn->params.peer->last_tx_at = ktime_get_seconds();
+ 
+-		opt = IP_PMTUDISC_DO;
+-		kernel_setsockopt(conn->params.local->socket,
+-				  SOL_IP, IP_MTU_DISCOVER,
+-				  (char *)&opt, sizeof(opt));
++		ip_sock_set_mtu_discover(conn->params.local->socket->sk,
++				IP_PMTUDISC_DO);
+ 		break;
+ 
+ 	default:
 -- 
 2.26.2
 
