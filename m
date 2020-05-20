@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4DE5C433E0
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 19:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE08C433E1
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 19:59:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE3D1207F9
+	by mail.kernel.org (Postfix) with ESMTP id EF049207F9
 	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 19:59:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DpkuAcdR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MWpU3zeQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728306AbgETT4u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 May 2020 15:56:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51204 "EHLO
+        id S1728101AbgETT7J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 May 2020 15:59:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726823AbgETT4s (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 May 2020 15:56:48 -0400
+        with ESMTP id S1728308AbgETT4u (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 May 2020 15:56:50 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1DBC061A0E;
-        Wed, 20 May 2020 12:56:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D899AC061A0F;
+        Wed, 20 May 2020 12:56:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=gnA7+jJn2EzdItRqBuzPEJaaaUKccHwFvREFWvcVmhA=; b=DpkuAcdRsnsqtip653y2m6dR5w
-        i1/78GO4FCYa4PdaA27XbYV9F8rKDeNIe4bTLMLYPdABG0WXbbcTUM2FLZnhhQNs8H57lqPy+GbRe
-        Ic/CBhIzgjhfD7vzXtm+7M/+BD3R1Rodg+GFQutDjHJAVrXXAYsKVVTYptB28qY2g5dXoZLvJIFXy
-        qIVet2hwuIjwF8p6g22e+iCdC4+3zfLIeClHz4APXs6W3pWLs9Q0QzEMYWftwls1zfiHEDKCTWCO7
-        YB/JxF2qtOnFBGZmaTVK6oBw4ORxXaa49TMer6DE/T1YMAK0VsB0VKdLLqIrA81j5U0FMr9U0VrRz
-        +K/7LDoQ==;
+        bh=vMk78OZOCGeuqFhgy6znIonFFjP8WPcQrbTXb90IKtU=; b=MWpU3zeQfVo1tFXlKbU/K6AEOv
+        LOCKbJCDFYon6GoPvgvuxhDMrvvj7w3bpApE8eds44GMc6dIrKFFbBGamcWMW3bXUTiiHLwkDgg/N
+        6Q0HHNaXFxXzALzBiIb14Q2OmjGi3rCnNBkP1NaOCCI/vfojtkZNESLaXTz+G7zRFR5SfHGcL9eZ+
+        RYMTSH5y0uLFwd+HAuB+NZde2jFi5Iqnd4u1I/z8zSaX3v15PMUec6I7FmzpFD0mwrDUv9uCLNyny
+        y760WcCXnH2us/q0FWKC7+Ixas5nlUVJ38uB4mu64np474fKxS3KXwte4pUogzMdGHwg8KSMw0z5c
+        5udWxzXA==;
 Received: from [2001:4bb8:188:1506:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jbUor-0002sW-0Y; Wed, 20 May 2020 19:56:01 +0000
+        id 1jbUp3-00033J-OD; Wed, 20 May 2020 19:56:14 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -54,10 +54,10 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         cluster-devel@redhat.com, ocfs2-devel@oss.oracle.com,
         netdev@vger.kernel.org, linux-sctp@vger.kernel.org,
         ceph-devel@vger.kernel.org, rds-devel@oss.oracle.com,
-        linux-nfs@vger.kernel.org
-Subject: [PATCH 18/33] tcp: add tcp_sock_set_keepintvl
-Date:   Wed, 20 May 2020 21:54:54 +0200
-Message-Id: <20200520195509.2215098-19-hch@lst.de>
+        linux-nfs@vger.kernel.org, David Howells <dhowells@redhat.com>
+Subject: [PATCH 22/33] ipv4: add ip_sock_set_recverr
+Date:   Wed, 20 May 2020 21:54:58 +0200
+Message-Id: <20200520195509.2215098-23-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200520195509.2215098-1-hch@lst.de>
 References: <20200520195509.2215098-1-hch@lst.de>
@@ -69,84 +69,67 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper to directly set the TCP_KEEPINTVL sockopt from kernel space
+Add a helper to directly set the IP_RECVERR sockopt from kernel space
 without going through a fake uaccess.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: David Howells <dhowells@redhat.com>
 ---
- include/linux/tcp.h   |  1 +
- net/ipv4/tcp.c        | 12 ++++++++++++
- net/rds/tcp_listen.c  |  4 +---
- net/sunrpc/xprtsock.c |  3 +--
- 4 files changed, 15 insertions(+), 5 deletions(-)
+ include/net/ip.h         | 1 +
+ net/ipv4/ip_sockglue.c   | 8 ++++++++
+ net/rxrpc/local_object.c | 8 +-------
+ 3 files changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 5724dd84a85ed..1f9bada00faab 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -499,6 +499,7 @@ int tcp_skb_shift(struct sk_buff *to, struct sk_buff *from, int pcount,
- 
- void tcp_sock_set_cork(struct sock *sk, bool on);
- int tcp_sock_set_keepidle(struct sock *sk, int val);
-+int tcp_sock_set_keepintvl(struct sock *sk, int val);
- void tcp_sock_set_nodelay(struct sock *sk);
- void tcp_sock_set_quickack(struct sock *sk, int val);
- int tcp_sock_set_syncnt(struct sock *sk, int val);
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index bdf0ff9333514..7eb083e09786a 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2934,6 +2934,18 @@ int tcp_sock_set_keepidle(struct sock *sk, int val)
+diff --git a/include/net/ip.h b/include/net/ip.h
+index 5f5d8226b6abc..f063a491b9063 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -766,6 +766,7 @@ static inline bool inetdev_valid_mtu(unsigned int mtu)
  }
- EXPORT_SYMBOL(tcp_sock_set_keepidle);
  
-+int tcp_sock_set_keepintvl(struct sock *sk, int val)
+ void ip_sock_set_freebind(struct sock *sk);
++void ip_sock_set_recverr(struct sock *sk);
+ void ip_sock_set_tos(struct sock *sk, int val);
+ 
+ #endif	/* _IP_H */
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index 62e642ab80126..9a6a65b66f9d3 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -589,6 +589,14 @@ void ip_sock_set_freebind(struct sock *sk)
+ }
+ EXPORT_SYMBOL(ip_sock_set_freebind);
+ 
++void ip_sock_set_recverr(struct sock *sk)
 +{
-+	if (val < 1 || val > MAX_TCP_KEEPINTVL)
-+		return -EINVAL;
-+
 +	lock_sock(sk);
-+	tcp_sk(sk)->keepalive_intvl = val * HZ;
++	inet_sk(sk)->recverr = true;
 +	release_sock(sk);
-+	return 0;
 +}
-+EXPORT_SYMBOL(tcp_sock_set_keepintvl);
++EXPORT_SYMBOL(ip_sock_set_recverr);
 +
  /*
-  *	Socket option code for TCP.
-  */
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index 79f9adc008114..9ad555c48d15d 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -53,12 +53,10 @@ int rds_tcp_keepalive(struct socket *sock)
- 		goto bail;
+  *	Socket option code for IP. This is the end of the line after any
+  *	TCP,UDP etc options on an IP socket.
+diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
+index 5ea2bd01fdd59..4c0e8fe5ec1fb 100644
+--- a/net/rxrpc/local_object.c
++++ b/net/rxrpc/local_object.c
+@@ -171,13 +171,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
+ 		/* Fall through */
+ 	case AF_INET:
+ 		/* we want to receive ICMP errors */
+-		opt = 1;
+-		ret = kernel_setsockopt(local->socket, SOL_IP, IP_RECVERR,
+-					(char *) &opt, sizeof(opt));
+-		if (ret < 0) {
+-			_debug("setsockopt failed");
+-			goto error;
+-		}
++		ip_sock_set_recverr(local->socket->sk);
  
- 	tcp_sock_set_keepidle(sock->sk, keepidle);
--
- 	/* KEEPINTVL is the interval between successive probes. We follow
- 	 * the model in xs_tcp_finish_connecting() and re-use keepidle.
- 	 */
--	ret = kernel_setsockopt(sock, IPPROTO_TCP, TCP_KEEPINTVL,
--				(char *)&keepidle, sizeof(keepidle));
-+	tcp_sock_set_keepintvl(sock->sk, keepidle);
- bail:
- 	return ret;
- }
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index 473290f7c5c0a..5ca64e12af0c5 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -2108,8 +2108,7 @@ static void xs_tcp_set_socket_timeouts(struct rpc_xprt *xprt,
- 	/* TCP Keepalive options */
- 	sock_set_keepalive(sock->sk);
- 	tcp_sock_set_keepidle(sock->sk, keepidle);
--	kernel_setsockopt(sock, SOL_TCP, TCP_KEEPINTVL,
--			(char *)&keepidle, sizeof(keepidle));
-+	tcp_sock_set_keepintvl(sock->sk, keepidle);
- 	kernel_setsockopt(sock, SOL_TCP, TCP_KEEPCNT,
- 			(char *)&keepcnt, sizeof(keepcnt));
- 
+ 		/* we want to set the don't fragment bit */
+ 		opt = IP_PMTUDISC_DO;
 -- 
 2.26.2
 
