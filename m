@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73282C433DF
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 20:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42E9C433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 20:01:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 514CE207E8
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 20:01:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93503207E8
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 20:01:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IA1nCq53"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CdXPAUVR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727885AbgETT4H (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S1727046AbgETT4H (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Wed, 20 May 2020 15:56:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51066 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726860AbgETT4G (ORCPT
+        with ESMTP id S1726837AbgETT4G (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 May 2020 15:56:06 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9AA2C08C5C2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7D80C061A0E;
         Wed, 20 May 2020 12:56:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=RS3LTvliBGxyGsnnvxZgDr4L9B5S1/4iYu+vJVezXGg=; b=IA1nCq5387FDZyPHwQSHibUr1/
-        CT/pQ8Y8GNTneQCNiXZ9KBQ4yjdLFbYZFxIB6Tfyb7D4QTdFOK/o4kw4gwVgy5S/ZkREyErzJAnOR
-        i01FLml+PjMqNs8nDgbcDYUf/SSA/WCWP7F4U/AsS3vqGHB8MwZyfqWZbHp2OLMwLVNuRLdi++WUu
-        a7+3MH7Xpz/v+9TTm/NiAVRL+fpr5wPbDv88+1MRVSMVdD6PMFgky6/E1SICQf9+MnSmH+cd7RR30
-        FKS2Xm1gzdYW7d8wR9H7+rveKj4+Z6ni4falzXtAE3UpwenhCou7XXCvS1uVMo/w/U/aEpo29VtXD
-        wOuEI/gQ==;
+        bh=LnylUFmE6LGjXbTh/304lIDcSEDmTsi7Z0jAT1kL31A=; b=CdXPAUVRNHUd4djUXKzygY6eqY
+        pddYRAuSDCjKp5OLMvV5HFWp4+1lnoX+ce1HqqmdjML9v7HulBDUQiiS8N9RR3VhaHOVH38CeV1Hd
+        7vMQxFQ8UF/Ls3XjtwWajwKgAUY5Stczl7TojeRxwxl0vSDd8MAt8Orwg8ea/rwWafbJoOUpqFgf2
+        15nXAAHDd2ojx+DTSyebVz7TaPqLOz6dNV6vfzQQONLM4L9Aiy6XYCo6Nr77PHrYECfy6ErFSuvsI
+        23bogPEg1gNuVFfIzjo7W+dOfZWQgPOv3UOqQmHorx1wuqcokze0WXWraldOcl6Z3ugZc5nHsYKPU
+        iKLCwkTQ==;
 Received: from [2001:4bb8:188:1506:c70:4a89:bc61:2] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jbUo8-0001ss-Fg; Wed, 20 May 2020 19:55:16 +0000
+        id 1jbUoD-0001yn-Ef; Wed, 20 May 2020 19:55:22 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -54,10 +54,10 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         cluster-devel@redhat.com, ocfs2-devel@oss.oracle.com,
         netdev@vger.kernel.org, linux-sctp@vger.kernel.org,
         ceph-devel@vger.kernel.org, rds-devel@oss.oracle.com,
-        linux-nfs@vger.kernel.org
-Subject: [PATCH 02/33] net: remove kernel_getsockopt
-Date:   Wed, 20 May 2020 21:54:38 +0200
-Message-Id: <20200520195509.2215098-3-hch@lst.de>
+        linux-nfs@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>
+Subject: [PATCH 04/33] net: add sock_no_linger
+Date:   Wed, 20 May 2020 21:54:40 +0200
+Message-Id: <20200520195509.2215098-5-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200520195509.2215098-1-hch@lst.de>
 References: <20200520195509.2215098-1-hch@lst.de>
@@ -69,72 +69,186 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-No users left.
+Add a helper to directly set the SO_LINGER sockopt from kernel space
+with onoff set to true and a linger time of 0 without going through a
+fake uaccess.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- include/linux/net.h |  2 --
- net/socket.c        | 34 ----------------------------------
- 2 files changed, 36 deletions(-)
+ drivers/nvme/host/tcp.c   |  9 +--------
+ drivers/nvme/target/tcp.c |  6 +-----
+ include/net/sock.h        |  1 +
+ net/core/sock.c           |  9 +++++++++
+ net/rds/tcp.h             |  1 -
+ net/rds/tcp_connect.c     |  2 +-
+ net/rds/tcp_listen.c      | 13 +------------
+ net/sunrpc/svcsock.c      | 12 ++----------
+ 8 files changed, 16 insertions(+), 37 deletions(-)
 
-diff --git a/include/linux/net.h b/include/linux/net.h
-index 6451425e828f5..74ef5d7315f70 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -303,8 +303,6 @@ int kernel_connect(struct socket *sock, struct sockaddr *addr, int addrlen,
- 		   int flags);
- int kernel_getsockname(struct socket *sock, struct sockaddr *addr);
- int kernel_getpeername(struct socket *sock, struct sockaddr *addr);
--int kernel_getsockopt(struct socket *sock, int level, int optname, char *optval,
--		      int *optlen);
- int kernel_setsockopt(struct socket *sock, int level, int optname, char *optval,
- 		      unsigned int optlen);
- int kernel_sendpage(struct socket *sock, struct page *page, int offset,
-diff --git a/net/socket.c b/net/socket.c
-index 80422fc3c836e..81a98b6cbd087 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -3624,40 +3624,6 @@ int kernel_getpeername(struct socket *sock, struct sockaddr *addr)
- }
- EXPORT_SYMBOL(kernel_getpeername);
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index c15a92163c1f7..e72d87482eb78 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -1313,7 +1313,6 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl,
+ {
+ 	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
+ 	struct nvme_tcp_queue *queue = &ctrl->queues[qid];
+-	struct linger sol = { .l_onoff = 1, .l_linger = 0 };
+ 	int ret, opt, rcv_pdu_size;
  
--/**
-- *	kernel_getsockopt - get a socket option (kernel space)
-- *	@sock: socket
-- *	@level: API level (SOL_SOCKET, ...)
-- *	@optname: option tag
-- *	@optval: option value
-- *	@optlen: option length
-- *
-- *	Assigns the option length to @optlen.
-- *	Returns 0 or an error.
-- */
--
--int kernel_getsockopt(struct socket *sock, int level, int optname,
--			char *optval, int *optlen)
+ 	queue->ctrl = ctrl;
+@@ -1361,13 +1360,7 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl,
+ 	 * close. This is done to prevent stale data from being sent should
+ 	 * the network connection be restored before TCP times out.
+ 	 */
+-	ret = kernel_setsockopt(queue->sock, SOL_SOCKET, SO_LINGER,
+-			(char *)&sol, sizeof(sol));
+-	if (ret) {
+-		dev_err(nctrl->device,
+-			"failed to set SO_LINGER sock opt %d\n", ret);
+-		goto err_sock;
+-	}
++	sock_no_linger(queue->sock->sk);
+ 
+ 	if (so_priority > 0) {
+ 		ret = kernel_setsockopt(queue->sock, SOL_SOCKET, SO_PRIORITY,
+diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+index 40757a63f4553..e0801494b097f 100644
+--- a/drivers/nvme/target/tcp.c
++++ b/drivers/nvme/target/tcp.c
+@@ -1429,7 +1429,6 @@ static int nvmet_tcp_set_queue_sock(struct nvmet_tcp_queue *queue)
+ {
+ 	struct socket *sock = queue->sock;
+ 	struct inet_sock *inet = inet_sk(sock->sk);
+-	struct linger sol = { .l_onoff = 1, .l_linger = 0 };
+ 	int ret;
+ 
+ 	ret = kernel_getsockname(sock,
+@@ -1447,10 +1446,7 @@ static int nvmet_tcp_set_queue_sock(struct nvmet_tcp_queue *queue)
+ 	 * close. This is done to prevent stale data from being sent should
+ 	 * the network connection be restored before TCP times out.
+ 	 */
+-	ret = kernel_setsockopt(sock, SOL_SOCKET, SO_LINGER,
+-			(char *)&sol, sizeof(sol));
+-	if (ret)
+-		return ret;
++	sock_no_linger(sock->sk);
+ 
+ 	if (so_priority > 0) {
+ 		ret = kernel_setsockopt(sock, SOL_SOCKET, SO_PRIORITY,
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 2ec085044790c..6ed00bf009bbe 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2688,6 +2688,7 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
+ 
+ void sock_def_readable(struct sock *sk);
+ 
++void sock_no_linger(struct sock *sk);
+ void sock_set_reuseaddr(struct sock *sk);
+ 
+ #endif	/* _SOCK_H */
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 18eb84fdf5fbe..f0f09524911c8 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -720,6 +720,15 @@ void sock_set_reuseaddr(struct sock *sk)
+ }
+ EXPORT_SYMBOL(sock_set_reuseaddr);
+ 
++void sock_no_linger(struct sock *sk)
++{
++	lock_sock(sk);
++	sk->sk_lingertime = 0;
++	sock_set_flag(sk, SOCK_LINGER);
++	release_sock(sk);
++}
++EXPORT_SYMBOL(sock_no_linger);
++
+ /*
+  *	This is meant for all protocols to use and covers goings on
+  *	at the socket level. Everything here is generic.
+diff --git a/net/rds/tcp.h b/net/rds/tcp.h
+index 3c69361d21c73..d640e210b97b6 100644
+--- a/net/rds/tcp.h
++++ b/net/rds/tcp.h
+@@ -73,7 +73,6 @@ void rds_tcp_listen_data_ready(struct sock *sk);
+ int rds_tcp_accept_one(struct socket *sock);
+ int rds_tcp_keepalive(struct socket *sock);
+ void *rds_tcp_listen_sock_def_readable(struct net *net);
+-void rds_tcp_set_linger(struct socket *sock);
+ 
+ /* tcp_recv.c */
+ int rds_tcp_recv_init(void);
+diff --git a/net/rds/tcp_connect.c b/net/rds/tcp_connect.c
+index 008f50fb25dd2..4e64598176b05 100644
+--- a/net/rds/tcp_connect.c
++++ b/net/rds/tcp_connect.c
+@@ -207,7 +207,7 @@ void rds_tcp_conn_path_shutdown(struct rds_conn_path *cp)
+ 
+ 	if (sock) {
+ 		if (rds_destroy_pending(cp->cp_conn))
+-			rds_tcp_set_linger(sock);
++			sock_no_linger(sock->sk);
+ 		sock->ops->shutdown(sock, RCV_SHUTDOWN | SEND_SHUTDOWN);
+ 		lock_sock(sock->sk);
+ 		rds_tcp_restore_callbacks(sock, tc); /* tc->tc_sock = NULL */
+diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+index 810a3a49e9474..bbb31b9c0b391 100644
+--- a/net/rds/tcp_listen.c
++++ b/net/rds/tcp_listen.c
+@@ -111,17 +111,6 @@ struct rds_tcp_connection *rds_tcp_accept_one_path(struct rds_connection *conn)
+ 	return NULL;
+ }
+ 
+-void rds_tcp_set_linger(struct socket *sock)
 -{
--	mm_segment_t oldfs = get_fs();
--	char __user *uoptval;
--	int __user *uoptlen;
--	int err;
+-	struct linger no_linger = {
+-		.l_onoff = 1,
+-		.l_linger = 0,
+-	};
 -
--	uoptval = (char __user __force *) optval;
--	uoptlen = (int __user __force *) optlen;
--
--	set_fs(KERNEL_DS);
--	if (level == SOL_SOCKET)
--		err = sock_getsockopt(sock, level, optname, uoptval, uoptlen);
--	else
--		err = sock->ops->getsockopt(sock, level, optname, uoptval,
--					    uoptlen);
--	set_fs(oldfs);
--	return err;
+-	kernel_setsockopt(sock, SOL_SOCKET, SO_LINGER,
+-			  (char *)&no_linger, sizeof(no_linger));
 -}
--EXPORT_SYMBOL(kernel_getsockopt);
 -
- /**
-  *	kernel_setsockopt - set a socket option (kernel space)
-  *	@sock: socket
+ int rds_tcp_accept_one(struct socket *sock)
+ {
+ 	struct socket *new_sock = NULL;
+@@ -241,7 +230,7 @@ int rds_tcp_accept_one(struct socket *sock)
+ 	 * be pending on it. By setting linger, we achieve the side-effect
+ 	 * of avoiding TIME_WAIT state on new_sock.
+ 	 */
+-	rds_tcp_set_linger(new_sock);
++	sock_no_linger(new_sock->sk);
+ 	kernel_sock_shutdown(new_sock, SHUT_RDWR);
+ 	ret = 0;
+ out:
+diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+index 023514e392b31..6773dacc64d8e 100644
+--- a/net/sunrpc/svcsock.c
++++ b/net/sunrpc/svcsock.c
+@@ -323,17 +323,9 @@ static int svc_tcp_has_wspace(struct svc_xprt *xprt)
+ 
+ static void svc_tcp_kill_temp_xprt(struct svc_xprt *xprt)
+ {
+-	struct svc_sock *svsk;
+-	struct socket *sock;
+-	struct linger no_linger = {
+-		.l_onoff = 1,
+-		.l_linger = 0,
+-	};
++	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
+ 
+-	svsk = container_of(xprt, struct svc_sock, sk_xprt);
+-	sock = svsk->sk_sock;
+-	kernel_setsockopt(sock, SOL_SOCKET, SO_LINGER,
+-			  (char *)&no_linger, sizeof(no_linger));
++	sock_no_linger(svsk->sk_sock->sk);
+ }
+ 
+ /*
 -- 
 2.26.2
 
