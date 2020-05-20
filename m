@@ -2,50 +2,73 @@ Return-Path: <SRS0=DK+6=7C=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C42E9C433E0
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 20:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FA0AC433DF
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 23:00:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93503207E8
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 20:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEEC720874
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 23:00:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CdXPAUVR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ABmm/w5Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727046AbgETT4H (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 May 2020 15:56:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51062 "EHLO
+        id S1728615AbgETXAb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 May 2020 19:00:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726837AbgETT4G (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 May 2020 15:56:06 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7D80C061A0E;
-        Wed, 20 May 2020 12:56:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=LnylUFmE6LGjXbTh/304lIDcSEDmTsi7Z0jAT1kL31A=; b=CdXPAUVRNHUd4djUXKzygY6eqY
-        pddYRAuSDCjKp5OLMvV5HFWp4+1lnoX+ce1HqqmdjML9v7HulBDUQiiS8N9RR3VhaHOVH38CeV1Hd
-        7vMQxFQ8UF/Ls3XjtwWajwKgAUY5Stczl7TojeRxwxl0vSDd8MAt8Orwg8ea/rwWafbJoOUpqFgf2
-        15nXAAHDd2ojx+DTSyebVz7TaPqLOz6dNV6vfzQQONLM4L9Aiy6XYCo6Nr77PHrYECfy6ErFSuvsI
-        23bogPEg1gNuVFfIzjo7W+dOfZWQgPOv3UOqQmHorx1wuqcokze0WXWraldOcl6Z3ugZc5nHsYKPU
-        iKLCwkTQ==;
-Received: from [2001:4bb8:188:1506:c70:4a89:bc61:2] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jbUoD-0001yn-Ef; Wed, 20 May 2020 19:55:22 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     Eric Dumazet <edumazet@google.com>,
+        with ESMTP id S1728019AbgETXAb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 May 2020 19:00:31 -0400
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61E8FC061A0E;
+        Wed, 20 May 2020 16:00:30 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id g185so5432220qke.7;
+        Wed, 20 May 2020 16:00:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=bxPhNLxEeIp1FyAEAyOXcpXoJGhcJI/9VkWQHjEBJu8=;
+        b=ABmm/w5ZxLmgIKDfTHVrUH4+roya8bvoORLSIFi8ftfcLjr/+lUQIQg1vCqbqW2lg9
+         Edg16ZlpvA+2Dlf7bVNlBaLPK1ZbW70B9d+eMKWgRWHc1obMDOhnkMACk5lCyH6afilN
+         oBX31hIJND3KTy6XaW00DzljepVXjloOTwRxZRLvAQKsNjUgvnW+LRhTtQZ8hzDo3kC9
+         nEaiPcTs5/ymUk2QJuXYVy0Cj6FQBr1kL/y4jcDd4Z/5qbXOnV8biHoU/FvLL+veSFMP
+         /oXIdwd3BivEoo89WKHE8GPd4JLIstozB1RtSZSt9AsbvQu1QY701U/rpBAvWqVzLnB2
+         HhPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=bxPhNLxEeIp1FyAEAyOXcpXoJGhcJI/9VkWQHjEBJu8=;
+        b=DPTNrEX9Paf6GhhsUzeFW8moIK4q0vqcsilRqDEDWukfuWkXCFRkDZTFS2zT4wSE2m
+         e4LGi8g7eLVaICULAHzL6IOIbFGhctNhgYUUw0JhJgEJTyk2pe5ZnnaJ/tthUPzck8pY
+         SoyOsFqQkAJPjUejKhn+Tyx9kisqYUqijc5n+C6PgBjc1v1/mJRQIQJ1irBy4lOSGS3m
+         q/De2L7FodBOnil+UxiRjaVv4GbmOEnsH7wn3FHuoTiFEFPsO4qXZhkdCh9yjLQKJ3lP
+         qnFhOR+9zoglz+6BrAKfH/ep4ddK2gN3iLXaXShxEbMj1LH1bLarTH0fOjVyojQ/B52n
+         HqMw==
+X-Gm-Message-State: AOAM533mXAv4/APXY6OpJ56TlwZn/dXJstukW4IiXyA19Nh18x4xuk33
+        B0yZdBQASNlbr4EtUFtCEDU=
+X-Google-Smtp-Source: ABdhPJz4+N4OAMnIZUpFPrMKKpxZ5ipr9THKmBgVoh+NUJRSoyJQeFfxBAyAvgR9uTfieJGBqFR7qw==
+X-Received: by 2002:a37:b244:: with SMTP id b65mr7801054qkf.329.1590015629321;
+        Wed, 20 May 2020 16:00:29 -0700 (PDT)
+Received: from localhost.localdomain ([168.181.48.225])
+        by smtp.gmail.com with ESMTPSA id n68sm3102877qkb.58.2020.05.20.16.00.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 May 2020 16:00:28 -0700 (PDT)
+Received: by localhost.localdomain (Postfix, from userid 1000)
+        id 889A9C0DAC; Wed, 20 May 2020 20:00:25 -0300 (-03)
+Date:   Wed, 20 May 2020 20:00:25 -0300
+From:   Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
         Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
         Vlad Yasevich <vyasevich@gmail.com>,
         Neil Horman <nhorman@tuxdriver.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
         Jon Maloy <jmaloy@redhat.com>,
         Ying Xue <ying.xue@windriver.com>, drbd-dev@lists.linbit.com,
         linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
@@ -54,201 +77,177 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         cluster-devel@redhat.com, ocfs2-devel@oss.oracle.com,
         netdev@vger.kernel.org, linux-sctp@vger.kernel.org,
         ceph-devel@vger.kernel.org, rds-devel@oss.oracle.com,
-        linux-nfs@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 04/33] net: add sock_no_linger
-Date:   Wed, 20 May 2020 21:54:40 +0200
-Message-Id: <20200520195509.2215098-5-hch@lst.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200520195509.2215098-1-hch@lst.de>
+        linux-nfs@vger.kernel.org
+Subject: Re: [PATCH 32/33] net: add a new bind_add method
+Message-ID: <20200520230025.GT2491@localhost.localdomain>
 References: <20200520195509.2215098-1-hch@lst.de>
+ <20200520195509.2215098-33-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200520195509.2215098-33-hch@lst.de>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper to directly set the SO_LINGER sockopt from kernel space
-with onoff set to true and a linger time of 0 without going through a
-fake uaccess.
+On Wed, May 20, 2020 at 09:55:08PM +0200, Christoph Hellwig wrote:
+> The SCTP protocol allows to bind multiple address to a socket.  That
+> feature is currently only exposed as a socket option.  Add a bind_add
+> method struct proto that allows to bind additional addresses, and
+> switch the dlm code to use the method instead of going through the
+> socket option from kernel space.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/dlm/lowcomms.c  |  9 +++------
+>  include/net/sock.h |  6 +++++-
+>  net/core/sock.c    |  8 ++++++++
+>  net/sctp/socket.c  | 23 +++++++++++++++++++++++
+>  4 files changed, 39 insertions(+), 7 deletions(-)
+> 
+> diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
+> index 9f1c3cdc9d653..3543a8fec9075 100644
+> --- a/fs/dlm/lowcomms.c
+> +++ b/fs/dlm/lowcomms.c
+> @@ -882,6 +882,7 @@ static void writequeue_entry_complete(struct writequeue_entry *e, int completed)
+>  static int sctp_bind_addrs(struct connection *con, uint16_t port)
+>  {
+>  	struct sockaddr_storage localaddr;
+> +	struct sockaddr *addr = (struct sockaddr *)&localaddr;
+>  	int i, addr_len, result = 0;
+>  
+>  	for (i = 0; i < dlm_local_count; i++) {
+> @@ -889,13 +890,9 @@ static int sctp_bind_addrs(struct connection *con, uint16_t port)
+>  		make_sockaddr(&localaddr, port, &addr_len);
+>  
+>  		if (!i)
+> -			result = kernel_bind(con->sock,
+> -					     (struct sockaddr *)&localaddr,
+> -					     addr_len);
+> +			result = kernel_bind(con->sock, addr, addr_len);
+>  		else
+> -			result = kernel_setsockopt(con->sock, SOL_SCTP,
+> -						   SCTP_SOCKOPT_BINDX_ADD,
+> -						   (char *)&localaddr, addr_len);
+> +			result = sock_bind_add(con->sock->sk, addr, addr_len);
+>  
+>  		if (result < 0) {
+>  			log_print("Can't bind to %d addr number %d, %d.\n",
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index d994daa418ec2..6e9f713a78607 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -1156,7 +1156,9 @@ struct proto {
+>  	int			(*sendpage)(struct sock *sk, struct page *page,
+>  					int offset, size_t size, int flags);
+>  	int			(*bind)(struct sock *sk,
+> -					struct sockaddr *uaddr, int addr_len);
+> +					struct sockaddr *addr, int addr_len);
+> +	int			(*bind_add)(struct sock *sk,
+> +					struct sockaddr *addr, int addr_len);
+>  
+>  	int			(*backlog_rcv) (struct sock *sk,
+>  						struct sk_buff *skb);
+> @@ -2698,4 +2700,6 @@ void sock_set_reuseaddr(struct sock *sk);
+>  void sock_set_reuseport(struct sock *sk);
+>  void sock_set_sndtimeo(struct sock *sk, s64 secs);
+>  
+> +int sock_bind_add(struct sock *sk, struct sockaddr *addr, int addr_len);
+> +
+>  #endif	/* _SOCK_H */
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 2ca3425b519c0..61ec573221a60 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3712,3 +3712,11 @@ bool sk_busy_loop_end(void *p, unsigned long start_time)
+>  }
+>  EXPORT_SYMBOL(sk_busy_loop_end);
+>  #endif /* CONFIG_NET_RX_BUSY_POLL */
+> +
+> +int sock_bind_add(struct sock *sk, struct sockaddr *addr, int addr_len)
+> +{
+> +	if (!sk->sk_prot->bind_add)
+> +		return -EOPNOTSUPP;
+> +	return sk->sk_prot->bind_add(sk, addr, addr_len);
+> +}
+> +EXPORT_SYMBOL(sock_bind_add);
+> diff --git a/net/sctp/socket.c b/net/sctp/socket.c
+> index 827a9903ee288..8a0b9258f65c0 100644
+> --- a/net/sctp/socket.c
+> +++ b/net/sctp/socket.c
+> @@ -1057,6 +1057,27 @@ static int sctp_setsockopt_bindx(struct sock *sk,
+>  	return err;
+>  }
+>  
+> +static int sctp_bind_add(struct sock *sk, struct sockaddr *addr,
+> +		int addrlen)
+> +{
+> +	struct sctp_af *af = sctp_get_af_specific(addr->sa_family);
+> +	int err;
+> +
+> +	if (!af || af->sockaddr_len > addrlen)
+> +		return -EINVAL;
+> +	err = security_sctp_bind_connect(sk, SCTP_SOCKOPT_BINDX_ADD, addr,
+> +			addrlen);
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/tcp.c   |  9 +--------
- drivers/nvme/target/tcp.c |  6 +-----
- include/net/sock.h        |  1 +
- net/core/sock.c           |  9 +++++++++
- net/rds/tcp.h             |  1 -
- net/rds/tcp_connect.c     |  2 +-
- net/rds/tcp_listen.c      | 13 +------------
- net/sunrpc/svcsock.c      | 12 ++----------
- 8 files changed, 16 insertions(+), 37 deletions(-)
+The security_ call above is done today within the sock lock.
+I couldn't find any issue through a code review, though, so I'm fine
+with leaving it as is. Just highlighting it..
 
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index c15a92163c1f7..e72d87482eb78 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -1313,7 +1313,6 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl,
- {
- 	struct nvme_tcp_ctrl *ctrl = to_tcp_ctrl(nctrl);
- 	struct nvme_tcp_queue *queue = &ctrl->queues[qid];
--	struct linger sol = { .l_onoff = 1, .l_linger = 0 };
- 	int ret, opt, rcv_pdu_size;
- 
- 	queue->ctrl = ctrl;
-@@ -1361,13 +1360,7 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl,
- 	 * close. This is done to prevent stale data from being sent should
- 	 * the network connection be restored before TCP times out.
- 	 */
--	ret = kernel_setsockopt(queue->sock, SOL_SOCKET, SO_LINGER,
--			(char *)&sol, sizeof(sol));
--	if (ret) {
--		dev_err(nctrl->device,
--			"failed to set SO_LINGER sock opt %d\n", ret);
--		goto err_sock;
--	}
-+	sock_no_linger(queue->sock->sk);
- 
- 	if (so_priority > 0) {
- 		ret = kernel_setsockopt(queue->sock, SOL_SOCKET, SO_PRIORITY,
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index 40757a63f4553..e0801494b097f 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -1429,7 +1429,6 @@ static int nvmet_tcp_set_queue_sock(struct nvmet_tcp_queue *queue)
- {
- 	struct socket *sock = queue->sock;
- 	struct inet_sock *inet = inet_sk(sock->sk);
--	struct linger sol = { .l_onoff = 1, .l_linger = 0 };
- 	int ret;
- 
- 	ret = kernel_getsockname(sock,
-@@ -1447,10 +1446,7 @@ static int nvmet_tcp_set_queue_sock(struct nvmet_tcp_queue *queue)
- 	 * close. This is done to prevent stale data from being sent should
- 	 * the network connection be restored before TCP times out.
- 	 */
--	ret = kernel_setsockopt(sock, SOL_SOCKET, SO_LINGER,
--			(char *)&sol, sizeof(sol));
--	if (ret)
--		return ret;
-+	sock_no_linger(sock->sk);
- 
- 	if (so_priority > 0) {
- 		ret = kernel_setsockopt(sock, SOL_SOCKET, SO_PRIORITY,
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 2ec085044790c..6ed00bf009bbe 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2688,6 +2688,7 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
- 
- void sock_def_readable(struct sock *sk);
- 
-+void sock_no_linger(struct sock *sk);
- void sock_set_reuseaddr(struct sock *sk);
- 
- #endif	/* _SOCK_H */
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 18eb84fdf5fbe..f0f09524911c8 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -720,6 +720,15 @@ void sock_set_reuseaddr(struct sock *sk)
- }
- EXPORT_SYMBOL(sock_set_reuseaddr);
- 
-+void sock_no_linger(struct sock *sk)
-+{
-+	lock_sock(sk);
-+	sk->sk_lingertime = 0;
-+	sock_set_flag(sk, SOCK_LINGER);
-+	release_sock(sk);
-+}
-+EXPORT_SYMBOL(sock_no_linger);
-+
- /*
-  *	This is meant for all protocols to use and covers goings on
-  *	at the socket level. Everything here is generic.
-diff --git a/net/rds/tcp.h b/net/rds/tcp.h
-index 3c69361d21c73..d640e210b97b6 100644
---- a/net/rds/tcp.h
-+++ b/net/rds/tcp.h
-@@ -73,7 +73,6 @@ void rds_tcp_listen_data_ready(struct sock *sk);
- int rds_tcp_accept_one(struct socket *sock);
- int rds_tcp_keepalive(struct socket *sock);
- void *rds_tcp_listen_sock_def_readable(struct net *net);
--void rds_tcp_set_linger(struct socket *sock);
- 
- /* tcp_recv.c */
- int rds_tcp_recv_init(void);
-diff --git a/net/rds/tcp_connect.c b/net/rds/tcp_connect.c
-index 008f50fb25dd2..4e64598176b05 100644
---- a/net/rds/tcp_connect.c
-+++ b/net/rds/tcp_connect.c
-@@ -207,7 +207,7 @@ void rds_tcp_conn_path_shutdown(struct rds_conn_path *cp)
- 
- 	if (sock) {
- 		if (rds_destroy_pending(cp->cp_conn))
--			rds_tcp_set_linger(sock);
-+			sock_no_linger(sock->sk);
- 		sock->ops->shutdown(sock, RCV_SHUTDOWN | SEND_SHUTDOWN);
- 		lock_sock(sock->sk);
- 		rds_tcp_restore_callbacks(sock, tc); /* tc->tc_sock = NULL */
-diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
-index 810a3a49e9474..bbb31b9c0b391 100644
---- a/net/rds/tcp_listen.c
-+++ b/net/rds/tcp_listen.c
-@@ -111,17 +111,6 @@ struct rds_tcp_connection *rds_tcp_accept_one_path(struct rds_connection *conn)
- 	return NULL;
- }
- 
--void rds_tcp_set_linger(struct socket *sock)
--{
--	struct linger no_linger = {
--		.l_onoff = 1,
--		.l_linger = 0,
--	};
--
--	kernel_setsockopt(sock, SOL_SOCKET, SO_LINGER,
--			  (char *)&no_linger, sizeof(no_linger));
--}
--
- int rds_tcp_accept_one(struct socket *sock)
- {
- 	struct socket *new_sock = NULL;
-@@ -241,7 +230,7 @@ int rds_tcp_accept_one(struct socket *sock)
- 	 * be pending on it. By setting linger, we achieve the side-effect
- 	 * of avoiding TIME_WAIT state on new_sock.
- 	 */
--	rds_tcp_set_linger(new_sock);
-+	sock_no_linger(new_sock->sk);
- 	kernel_sock_shutdown(new_sock, SHUT_RDWR);
- 	ret = 0;
- out:
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 023514e392b31..6773dacc64d8e 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -323,17 +323,9 @@ static int svc_tcp_has_wspace(struct svc_xprt *xprt)
- 
- static void svc_tcp_kill_temp_xprt(struct svc_xprt *xprt)
- {
--	struct svc_sock *svsk;
--	struct socket *sock;
--	struct linger no_linger = {
--		.l_onoff = 1,
--		.l_linger = 0,
--	};
-+	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
- 
--	svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	sock = svsk->sk_sock;
--	kernel_setsockopt(sock, SOL_SOCKET, SO_LINGER,
--			  (char *)&no_linger, sizeof(no_linger));
-+	sock_no_linger(svsk->sk_sock->sk);
- }
- 
- /*
--- 
-2.26.2
+> +	if (err)
+> +		return err;
+> +
+> +	lock_sock(sk);
+> +	err = sctp_do_bind(sk, (union sctp_addr *)addr, af->sockaddr_len);
+> +	if (!err)
+> +		err = sctp_send_asconf_add_ip(sk, addr, 1);
 
+Some problems here.
+- addr may contain a list of addresses
+- the addresses, then, are not being validated
+- sctp_do_bind may fail, on which it requires some undoing
+  (like sctp_bindx_add does)
+- code duplication with sctp_setsockopt_bindx.
+
+This patch will conflict with David's one,
+[PATCH net-next] sctp: Pull the user copies out of the individual sockopt functions.
+(I'll finish reviewing it in the sequence)
+
+AFAICT, this patch could reuse/build on his work in there. The goal is
+pretty much the same and would avoid the issues above.
+
+This patch could, then, point the new bind_add proto op to the updated
+sctp_setsockopt_bindx almost directly.
+
+Question then is: dlm never removes an addr from the bind list. Do we
+want to add ops for both? Or one that handles both operations?
+Anyhow, having the add operation but not the del seems very weird to
+me.
+
+> +	release_sock(sk);
+> +	return err;
+> +}
+> +
+>  static int sctp_connect_new_asoc(struct sctp_endpoint *ep,
+>  				 const union sctp_addr *daddr,
+>  				 const struct sctp_initmsg *init,
+> @@ -9625,6 +9646,7 @@ struct proto sctp_prot = {
+>  	.sendmsg     =	sctp_sendmsg,
+>  	.recvmsg     =	sctp_recvmsg,
+>  	.bind        =	sctp_bind,
+> +	.bind_add    =  sctp_bind_add,
+>  	.backlog_rcv =	sctp_backlog_rcv,
+>  	.hash        =	sctp_hash,
+>  	.unhash      =	sctp_unhash,
+> @@ -9667,6 +9689,7 @@ struct proto sctpv6_prot = {
+>  	.sendmsg	= sctp_sendmsg,
+>  	.recvmsg	= sctp_recvmsg,
+>  	.bind		= sctp_bind,
+> +	.bind_add	= sctp_bind_add,
+>  	.backlog_rcv	= sctp_backlog_rcv,
+>  	.hash		= sctp_hash,
+>  	.unhash		= sctp_unhash,
+> -- 
+> 2.26.2
+> 
