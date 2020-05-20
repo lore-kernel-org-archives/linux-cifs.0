@@ -2,147 +2,149 @@ Return-Path: <SRS0=DK+6=7C=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B70C9C433E0
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 15:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57338C433E1
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 19:56:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85494206B6
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 15:07:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589987279;
-	bh=8VBA9kFdjdfRlKPEK46ZtWpmUq8WEwLqJ2P0szY8vsc=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
-	b=NTGhkapepbivqsEef/SZopu6nIuctV1sTp2vIv+UI0bdIQmXNnH1ctDzEohU0IHHx
-	 a1KuDaZw1G4m3cWneu5GUZL3MRQTDavUCYSe9Bc24aTib4yYADYENotxgQy5fxwD46
-	 DoH0apAnykk2bRrk7lu3gcI8oBqrm2ij+rJMeG8c=
+	by mail.kernel.org (Postfix) with ESMTP id 23071207D8
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 May 2020 19:56:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jtn3jNEE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726560AbgETPHx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 May 2020 11:07:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47738 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726436AbgETPHx (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 20 May 2020 11:07:53 -0400
-Received: from tleilax.poochiereds.net (68-20-15-154.lightspeed.rlghnc.sbcglobal.net [68.20.15.154])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5A08D2054F;
-        Wed, 20 May 2020 15:07:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589987272;
-        bh=8VBA9kFdjdfRlKPEK46ZtWpmUq8WEwLqJ2P0szY8vsc=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=voKh9N8h0YWJaND3rq5MWEC8Rwr72Xt5vuNq4vxv3cM7Rz1qfbpYifGnlVTc3C3NH
-         MzFn2Gm9/+GWRTFQAtI9aWJ3zn3CV3ZGdBlFlx3SOhGxKiDn1SK/zmDBpIgGtlYTZK
-         HB+enmZ/sw8Bh5MCBehK5tFyI5XLFC7AIqKhiD0o=
-Message-ID: <ed3d0ebdeabe53c6cfc0c6fd185dc50f4055a0e6.camel@kernel.org>
-Subject: Re: [PATCH] dns: Apply a default TTL to records obtained from
- getaddrinfo()
-From:   Jeff Layton <jlayton@kernel.org>
-To:     David Howells <dhowells@redhat.com>, me@benboeckel.net,
-        fweimer@redhat.com
-Cc:     linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        keyrings@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 20 May 2020 11:07:50 -0400
-In-Reply-To: <1512927.1589904409@warthog.procyon.org.uk>
-References: <20200519141432.GA2949457@erythro.dev.benboeckel.internal>
-         <20200518155148.GA2595638@erythro.dev.benboeckel.internal>
-         <158981176590.872823.11683683537698750702.stgit@warthog.procyon.org.uk>
-         <1080378.1589895580@warthog.procyon.org.uk>
-         <1512927.1589904409@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.2 (3.36.2-1.fc32) 
+        id S1728144AbgETT41 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 May 2020 15:56:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51132 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728136AbgETT4Y (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 May 2020 15:56:24 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DEC8C05BD43;
+        Wed, 20 May 2020 12:56:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=lR78mSGloKOw4Rm59o11Y3p0CvdJlgBCc0uACk8cE6g=; b=jtn3jNEE5JKB2rLfC6PmvfXfCK
+        hxeycbY7L0KsI6dZFdQOPF/zTctqZgERT1qUejSclpw/Em5BB7WXobICh5/jETDWFMGUO2psK7JBt
+        6GzG4XT3cb/VwjwxyhPFaQx0cHwzxNugnGpnIOhQzcoWrZAOufcGMphhLyCsae9yad5p7okpJKGbV
+        MUaQ9HmWzKkszOyz3krbemb53bLjSGol/suoI2Zua0PsUfh39Og76MMLxmNzFmamn/1VVSVHfPv+z
+        dLeohnc4OgWL6YYFyOTljKkjhfWmweh3jhUUsUB6JoTcocjV2TbpiHGmEHP11TKLF0OiwSak7yirN
+        Dt1+y/QQ==;
+Received: from [2001:4bb8:188:1506:c70:4a89:bc61:2] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jbUoX-0002Uf-Ph; Wed, 20 May 2020 19:55:42 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     Eric Dumazet <edumazet@google.com>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>, drbd-dev@lists.linbit.com,
+        linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-nvme@lists.infradead.org, target-devel@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+        cluster-devel@redhat.com, ocfs2-devel@oss.oracle.com,
+        netdev@vger.kernel.org, linux-sctp@vger.kernel.org,
+        ceph-devel@vger.kernel.org, rds-devel@oss.oracle.com,
+        linux-nfs@vger.kernel.org
+Subject: [PATCH 11/33] net: add sock_set_reuseport
+Date:   Wed, 20 May 2020 21:54:47 +0200
+Message-Id: <20200520195509.2215098-12-hch@lst.de>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200520195509.2215098-1-hch@lst.de>
+References: <20200520195509.2215098-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, 2020-05-19 at 17:06 +0100, David Howells wrote:
-> Okay, how about this incremental change, then?  If fixes the typo, only prints
-> the "READ CONFIG" line in verbose mode, filters escape chars in the config
-> file and reduces the expiration time to 5s.
-> 
-> David
-> ---
-> diff --git a/key.dns_resolver.c b/key.dns_resolver.c
-> index c241eda3..7a7ec424 100644
-> --- a/key.dns_resolver.c
-> +++ b/key.dns_resolver.c
-> @@ -52,7 +52,7 @@ key_serial_t key;
->  static int verbose;
->  int debug_mode;
->  unsigned mask = INET_ALL;
-> -unsigned int key_expiry = 10 * 60;
-> +unsigned int key_expiry = 5;
->  
->  
->  /*
-> @@ -109,7 +109,7 @@ void _error(const char *fmt, ...)
->  }
->  
->  /*
-> - * Pring a warning to stderr or the syslog
-> + * Print a warning to stderr or the syslog
->   */
->  void warning(const char *fmt, ...)
->  {
-> @@ -454,7 +454,7 @@ static void read_config(void)
->  	unsigned int line = 0, u;
->  	int n;
->  
-> -	printf("READ CONFIG %s\n", config_file);
-> +	info("READ CONFIG %s", config_file);
->  
->  	f = fopen(config_file, "r");
->  	if (!f) {
-> @@ -514,6 +514,16 @@ static void read_config(void)
->  			v = p = b;
->  			while (*b) {
->  				if (esc) {
-> +					switch (*b) {
-> +					case ' ':
-> +					case '\t':
-> +					case '"':
-> +					case '\'':
-> +					case '\\':
-> +						break;
-> +					default:
-> +						goto invalid_escape_char;
-> +					}
->  					esc = false;
->  					*p++ = *b++;
->  					continue;
-> @@ -563,6 +573,8 @@ static void read_config(void)
->  
->  missing_value:
->  	error("%s:%u: %s: Missing value", config_file, line, k);
-> +invalid_escape_char:
-> +	error("%s:%u: %s: Invalid char in escape", config_file, line, k);
->  post_quote_data:
->  	error("%s:%u: %s: Data after closing quote", config_file, line, k);
->  bad_value:
-> diff --git a/man/key.dns_resolver.conf.5 b/man/key.dns_resolver.conf.5
-> index 03d04049..c944ad55 100644
-> --- a/man/key.dns_resolver.conf.5
-> +++ b/man/key.dns_resolver.conf.5
-> @@ -34,7 +34,7 @@ Available options include:
->  The number of seconds to set as the expiration on a cached record.  This will
->  be overridden if the program manages to retrieve TTL information along with
->  the addresses (if, for example, it accesses the DNS directly).  The default is
-> -600 seconds.  The value must be in the range 1 to INT_MAX.
-> +5 seconds.  The value must be in the range 1 to INT_MAX.
->  .P
->  The file can also include comments beginning with a '#' character unless
->  otherwise suppressed by being inside a quoted value or being escaped with a
-> 
+Add a helper to directly set the SO_REUSEPORT sockopt from kernel space
+without going through a fake uaccess.
 
-This looks good to me.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ include/net/sock.h    |  1 +
+ net/core/sock.c       |  8 ++++++++
+ net/sunrpc/xprtsock.c | 17 +----------------
+ 3 files changed, 10 insertions(+), 16 deletions(-)
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+diff --git a/include/net/sock.h b/include/net/sock.h
+index c997289aabbf9..d994daa418ec2 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2695,6 +2695,7 @@ void sock_set_keepalive(struct sock *sk);
+ void sock_set_priority(struct sock *sk, u32 priority);
+ void sock_set_rcvbuf(struct sock *sk, int val);
+ void sock_set_reuseaddr(struct sock *sk);
++void sock_set_reuseport(struct sock *sk);
+ void sock_set_sndtimeo(struct sock *sk, s64 secs);
+ 
+ #endif	/* _SOCK_H */
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 3c6ebf952e9ad..2ca3425b519c0 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -729,6 +729,14 @@ void sock_set_reuseaddr(struct sock *sk)
+ }
+ EXPORT_SYMBOL(sock_set_reuseaddr);
+ 
++void sock_set_reuseport(struct sock *sk)
++{
++	lock_sock(sk);
++	sk->sk_reuseport = true;
++	release_sock(sk);
++}
++EXPORT_SYMBOL(sock_set_reuseport);
++
+ void sock_no_linger(struct sock *sk)
+ {
+ 	lock_sock(sk);
+diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
+index 30082cd039960..399848c2bcb29 100644
+--- a/net/sunrpc/xprtsock.c
++++ b/net/sunrpc/xprtsock.c
+@@ -1594,21 +1594,6 @@ static int xs_get_random_port(void)
+ 	return rand + min;
+ }
+ 
+-/**
+- * xs_set_reuseaddr_port - set the socket's port and address reuse options
+- * @sock: socket
+- *
+- * Note that this function has to be called on all sockets that share the
+- * same port, and it must be called before binding.
+- */
+-static void xs_sock_set_reuseport(struct socket *sock)
+-{
+-	int opt = 1;
+-
+-	kernel_setsockopt(sock, SOL_SOCKET, SO_REUSEPORT,
+-			(char *)&opt, sizeof(opt));
+-}
+-
+ static unsigned short xs_sock_getport(struct socket *sock)
+ {
+ 	struct sockaddr_storage buf;
+@@ -1801,7 +1786,7 @@ static struct socket *xs_create_sock(struct rpc_xprt *xprt,
+ 	xs_reclassify_socket(family, sock);
+ 
+ 	if (reuseport)
+-		xs_sock_set_reuseport(sock);
++		sock_set_reuseport(sock->sk);
+ 
+ 	err = xs_bind(transport, sock);
+ 	if (err) {
+-- 
+2.26.2
 
