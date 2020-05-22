@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E7AC433DF
-	for <linux-cifs@archiver.kernel.org>; Fri, 22 May 2020 14:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D4F7C433DF
+	for <linux-cifs@archiver.kernel.org>; Fri, 22 May 2020 14:52:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32A9820756
-	for <linux-cifs@archiver.kernel.org>; Fri, 22 May 2020 14:51:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D90452145D
+	for <linux-cifs@archiver.kernel.org>; Fri, 22 May 2020 14:52:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1590159118;
-	bh=bHFNpJmKmHKprftzIGOaRHADYjg7o8+IY4OvdCrstTs=;
+	s=default; t=1590159162;
+	bh=GXXj6hQz+sGwSms1JwSKF7z36WZ+ep/aZfuObAE5nbM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=B/KRrQgihg/JzX9Q/6z/nNisJ+hMA1zOUwzISQLO7lmCP/17HuXvvYdkG2CctZAGn
-	 DLrZdfie7gJ1GZfIpkd2kO5b/NO6ROtCYmFKcO/cA+t5mT7ZxsD7lSMu1wWY24Wvva
-	 4VRyUK6rNYaiNlrYNsdVtH1Uq9hcDHbZ874YzkUs=
+	b=XaVKhBodcuouNZX/v0/vuiSDWr2ggMFvyi3KY59JQNFpQTdmvXBIbukfL/SLTxqc4
+	 C0ie65JnHVznwGRaP1YSF69dmVAvlWINxIJBuop+I8+bfSNye+2fc9dJHYPmzPZLcc
+	 NnP53Y6iTP6WHA+8FmCAsCue9WIzV1kdCiECSdCc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731142AbgEVOv5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 22 May 2020 10:51:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54036 "EHLO mail.kernel.org"
+        id S1731224AbgEVOwO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 22 May 2020 10:52:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54782 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731135AbgEVOv4 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 22 May 2020 10:51:56 -0400
+        id S1730312AbgEVOwN (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 22 May 2020 10:52:13 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 27D392072C;
-        Fri, 22 May 2020 14:51:55 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7625320756;
+        Fri, 22 May 2020 14:52:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1590159116;
-        bh=bHFNpJmKmHKprftzIGOaRHADYjg7o8+IY4OvdCrstTs=;
+        s=default; t=1590159133;
+        bh=GXXj6hQz+sGwSms1JwSKF7z36WZ+ep/aZfuObAE5nbM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KNXL0oMD9uh+HNJbXQ1nqy09QPQVGiCNgaLlPuSYTUSLJDCVeJx/a8Zuujp0c/E0I
-         eUxTll7y6/VvivYHx52C6blwHyiodcARAnxI2dYc4TjBdZctapz3EKKLo5BmrTsAiy
-         Ex9ZUwOXdLqVDh4zcjduZD1z+llty4CX5US7xUv4=
+        b=SB/+8pWGLGFHhc+UrPdIZbJDz1T41O88voLp8zwpNnNBrfseS5Mfc5Umg7xiDTjJG
+         xCb8KTbMn8RA2EiYyB/XdEDRaf75vcXRHX46f+2AgbSo3LAqGjuDmgW4XtJUb41ZB9
+         EU68TOXtLnKyOtmbIZqFmVRe0fYDxK8KpD/Qa8Fk=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Steve French <stfrench@microsoft.com>,
@@ -45,12 +45,12 @@ Cc:     Steve French <stfrench@microsoft.com>,
         Shyam Prasad N <nspmangalore@gmail.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.14 12/13] cifs: Fix null pointer check in cifs_read
-Date:   Fri, 22 May 2020 10:51:41 -0400
-Message-Id: <20200522145142.435086-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 5/5] cifs: Fix null pointer check in cifs_read
+Date:   Fri, 22 May 2020 10:52:07 -0400
+Message-Id: <20200522145207.435314-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200522145142.435086-1-sashal@kernel.org>
-References: <20200522145142.435086-1-sashal@kernel.org>
+In-Reply-To: <20200522145207.435314-1-sashal@kernel.org>
+References: <20200522145207.435314-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 662977b8d6ae..72e7cbfb325a 100644
+index 2ffdaedca7e9..b5a05092f862 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -3496,7 +3496,7 @@ cifs_read(struct file *file, char *read_data, size_t read_size, loff_t *offset)
+@@ -3230,7 +3230,7 @@ cifs_read(struct file *file, char *read_data, size_t read_size, loff_t *offset)
  			 * than it negotiated since it will refuse the read
  			 * then.
  			 */
