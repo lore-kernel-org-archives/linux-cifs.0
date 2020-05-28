@@ -2,41 +2,41 @@ Return-Path: <SRS0=wwpQ=7K=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3734CC433E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 05:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AEA6C433DF
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 05:13:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E7FF2084C
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 05:13:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C26A2089D
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 05:13:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ioj04R1R"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lsl2L2U0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725808AbgE1FNM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 May 2020 01:13:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40354 "EHLO
+        id S1727794AbgE1FNW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 May 2020 01:13:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725298AbgE1FNM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 May 2020 01:13:12 -0400
+        with ESMTP id S1725298AbgE1FNV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 May 2020 01:13:21 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0498BC05BD1E;
-        Wed, 27 May 2020 22:13:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBCF0C05BD1E;
+        Wed, 27 May 2020 22:13:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=9xOqzrCxNtxuit01AXUXzcEccsdTiA/8eNviWpVQUhs=; b=Ioj04R1RREtEzCEgjxdGyZ5TP1
-        t7IWlKs1hd/sVt40NVr62d5dtqH/tnxww5HN76uwfAl2pGIctusRH4aynVRX7vjCLc3FVCEyT2f90
-        BfNOPlrS3y6wONd8J1z0ZDSeA84JnmSVvXsv5wVfeVHwSEIkTljVDsiR1ezjYV8+/Z0RL9Y4VvZMP
-        rqL23uGJsN60sMI/i6ZUmTx6bKBk7ongWne1ULqLktDZ+zcra3SR8Iu6fAHEA1+rvds2xIxqwnQRT
-        dq8jAkEiuUvtwrV7g4ky/aZK43duCEkh8lfOfBkzybZiO+qQfIA1b1EBhJGppoN4gIUuzXtZVfhD+
-        jR761tdQ==;
+        bh=bFc06nkT4FLmdckI/QoiIg4+DXV/rA+vbPFs8K7W3Gk=; b=lsl2L2U0MAiec+xrHAT/9GlF/O
+        0i4C8rzCTJYTsZ7ovhY99PGCOQN8oiHp6krmqwhaH8augLzNrGiW58+XyefYa/G+U2LXTDOYNGZ9k
+        c5OJa9zs7o0i9SpMhh/QwnBka+Z6EafmlCNdxgsnH5AdNkkj9B2z/RvpKWs2Ruek4PPWxDg53K3+7
+        U/ZCdwxxNSlQrdPMkcsu6zXF00k+gdlFxD1FQfPxL7WYUMsUteiruBkoYMGAM2J5BmHLytbTxfNXY
+        pyPp33UjoDOGWQ7A1+6zpoXU/Cv/zbjgq7BgoLvhslzlDwcgtaMXRJ8YvEcCAffTUuDJcmh+CpWRz
+        yEnieGNA==;
 Received: from p4fdb1ad2.dip0.t-ipconnect.de ([79.219.26.210] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jeAqQ-0001QX-Nf; Thu, 28 May 2020 05:12:43 +0000
+        id 1jeAqZ-0001VO-HO; Thu, 28 May 2020 05:12:52 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -51,11 +51,10 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         cluster-devel@redhat.com, ocfs2-devel@oss.oracle.com,
         netdev@vger.kernel.org, ceph-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 01/28] net: add sock_set_reuseaddr
-Date:   Thu, 28 May 2020 07:12:09 +0200
-Message-Id: <20200528051236.620353-2-hch@lst.de>
+        tipc-discussion@lists.sourceforge.net
+Subject: [PATCH 04/28] net: add sock_set_sndtimeo
+Date:   Thu, 28 May 2020 07:12:12 +0200
+Message-Id: <20200528051236.620353-5-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200528051236.620353-1-hch@lst.de>
 References: <20200528051236.620353-1-hch@lst.de>
@@ -67,177 +66,75 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper to directly set the SO_REUSEADDR sockopt from kernel space
-without going through a fake uaccess.
-
-For this the iscsi target now has to formally depend on inet to avoid
-a mostly theoretical compile failure.  For actual operation it already
-did depend on having ipv4 or ipv6 support.
+Add a helper to directly set the SO_SNDTIMEO_NEW sockopt from kernel
+space without going through a fake uaccess.  The interface is
+simplified to only pass the seconds value, as that is the only
+thing needed at the moment.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/infiniband/sw/siw/siw_cm.c        | 18 +++++-------------
- drivers/nvme/target/tcp.c                 |  8 +-------
- drivers/target/iscsi/Kconfig              |  2 +-
- drivers/target/iscsi/iscsi_target_login.c |  9 +--------
- fs/dlm/lowcomms.c                         |  6 +-----
- include/net/sock.h                        |  2 ++
- net/core/sock.c                           |  8 ++++++++
- 7 files changed, 19 insertions(+), 34 deletions(-)
+ fs/dlm/lowcomms.c  |  8 ++------
+ include/net/sock.h |  1 +
+ net/core/sock.c    | 11 +++++++++++
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/infiniband/sw/siw/siw_cm.c b/drivers/infiniband/sw/siw/siw_cm.c
-index 559e5fd3bad8b..d1860f3e87401 100644
---- a/drivers/infiniband/sw/siw/siw_cm.c
-+++ b/drivers/infiniband/sw/siw/siw_cm.c
-@@ -1312,17 +1312,14 @@ static void siw_cm_llp_state_change(struct sock *sk)
- static int kernel_bindconnect(struct socket *s, struct sockaddr *laddr,
- 			      struct sockaddr *raddr)
- {
--	int rv, flags = 0, s_val = 1;
-+	int rv, flags = 0;
- 	size_t size = laddr->sa_family == AF_INET ?
- 		sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6);
- 
- 	/*
- 	 * Make address available again asap.
- 	 */
--	rv = kernel_setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&s_val,
--			       sizeof(s_val));
--	if (rv < 0)
--		return rv;
-+	sock_set_reuseaddr(s->sk);
- 
- 	rv = s->ops->bind(s, laddr, size);
- 	if (rv < 0)
-@@ -1781,7 +1778,7 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
- 	struct siw_cep *cep = NULL;
- 	struct siw_device *sdev = to_siw_dev(id->device);
- 	int addr_family = id->local_addr.ss_family;
--	int rv = 0, s_val;
-+	int rv = 0;
- 
- 	if (addr_family != AF_INET && addr_family != AF_INET6)
- 		return -EAFNOSUPPORT;
-@@ -1793,13 +1790,8 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
- 	/*
- 	 * Allow binding local port when still in TIME_WAIT from last close.
- 	 */
--	s_val = 1;
--	rv = kernel_setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&s_val,
--			       sizeof(s_val));
--	if (rv) {
--		siw_dbg(id->device, "setsockopt error: %d\n", rv);
--		goto error;
--	}
-+	sock_set_reuseaddr(s->sk);
-+
- 	if (addr_family == AF_INET) {
- 		struct sockaddr_in *laddr = &to_sockaddr_in(id->local_addr);
- 
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index f0da04e960f40..40757a63f4553 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -1632,6 +1632,7 @@ static int nvmet_tcp_add_port(struct nvmet_port *nport)
- 	port->sock->sk->sk_user_data = port;
- 	port->data_ready = port->sock->sk->sk_data_ready;
- 	port->sock->sk->sk_data_ready = nvmet_tcp_listen_data_ready;
-+	sock_set_reuseaddr(port->sock->sk);
- 
- 	opt = 1;
- 	ret = kernel_setsockopt(port->sock, IPPROTO_TCP,
-@@ -1641,13 +1642,6 @@ static int nvmet_tcp_add_port(struct nvmet_port *nport)
- 		goto err_sock;
- 	}
- 
--	ret = kernel_setsockopt(port->sock, SOL_SOCKET, SO_REUSEADDR,
--			(char *)&opt, sizeof(opt));
--	if (ret) {
--		pr_err("failed to set SO_REUSEADDR sock opt %d\n", ret);
--		goto err_sock;
--	}
--
- 	if (so_priority > 0) {
- 		ret = kernel_setsockopt(port->sock, SOL_SOCKET, SO_PRIORITY,
- 				(char *)&so_priority, sizeof(so_priority));
-diff --git a/drivers/target/iscsi/Kconfig b/drivers/target/iscsi/Kconfig
-index 1f93ea3813536..922484ea4e304 100644
---- a/drivers/target/iscsi/Kconfig
-+++ b/drivers/target/iscsi/Kconfig
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- config ISCSI_TARGET
- 	tristate "Linux-iSCSI.org iSCSI Target Mode Stack"
--	depends on NET
-+	depends on INET
- 	select CRYPTO
- 	select CRYPTO_CRC32C
- 	select CRYPTO_CRC32C_INTEL if X86
-diff --git a/drivers/target/iscsi/iscsi_target_login.c b/drivers/target/iscsi/iscsi_target_login.c
-index 731ee67fe914b..91acb3f07b4cc 100644
---- a/drivers/target/iscsi/iscsi_target_login.c
-+++ b/drivers/target/iscsi/iscsi_target_login.c
-@@ -909,14 +909,7 @@ int iscsit_setup_np(
- 		}
- 	}
- 
--	/* FIXME: Someone please explain why this is endian-safe */
--	ret = kernel_setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
--			(char *)&opt, sizeof(opt));
--	if (ret < 0) {
--		pr_err("kernel_setsockopt() for SO_REUSEADDR"
--			" failed\n");
--		goto fail;
--	}
-+	sock_set_reuseaddr(sock->sk);
- 
- 	ret = kernel_setsockopt(sock, IPPROTO_IP, IP_FREEBIND,
- 			(char *)&opt, sizeof(opt));
 diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
-index cdfaf4f0e11a0..b801e77e3e596 100644
+index b801e77e3e596..b4d491122814b 100644
 --- a/fs/dlm/lowcomms.c
 +++ b/fs/dlm/lowcomms.c
-@@ -1244,12 +1244,8 @@ static struct socket *tcp_create_listen_sock(struct connection *con,
- 	kernel_setsockopt(sock, SOL_TCP, TCP_NODELAY, (char *)&one,
- 			  sizeof(one));
+@@ -1035,7 +1035,6 @@ static void sctp_connect_to_sock(struct connection *con)
+ 	int result;
+ 	int addr_len;
+ 	struct socket *sock;
+-	struct __kernel_sock_timeval tv = { .tv_sec = 5, .tv_usec = 0 };
  
--	result = kernel_setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
--				   (char *)&one, sizeof(one));
-+	sock_set_reuseaddr(sock->sk);
+ 	if (con->nodeid == 0) {
+ 		log_print("attempt to connect sock 0 foiled");
+@@ -1087,13 +1086,10 @@ static void sctp_connect_to_sock(struct connection *con)
+ 	 * since O_NONBLOCK argument in connect() function does not work here,
+ 	 * then, we should restore the default value of this attribute.
+ 	 */
+-	kernel_setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO_NEW, (char *)&tv,
+-			  sizeof(tv));
++	sock_set_sndtimeo(sock->sk, 5);
+ 	result = sock->ops->connect(sock, (struct sockaddr *)&daddr, addr_len,
+ 				   0);
+-	memset(&tv, 0, sizeof(tv));
+-	kernel_setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO_NEW, (char *)&tv,
+-			  sizeof(tv));
++	sock_set_sndtimeo(sock->sk, 0);
  
--	if (result < 0) {
--		log_print("Failed to set SO_REUSEADDR on socket: %d", result);
--	}
- 	write_lock_bh(&sock->sk->sk_callback_lock);
- 	sock->sk->sk_user_data = con;
- 	save_listen_callbacks(sock);
+ 	if (result == -EINPROGRESS)
+ 		result = 0;
 diff --git a/include/net/sock.h b/include/net/sock.h
-index 3e8c6d4b4b59f..2ec085044790c 100644
+index a3a43141a4be2..9a7b9e98685ac 100644
 --- a/include/net/sock.h
 +++ b/include/net/sock.h
-@@ -2688,4 +2688,6 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
+@@ -2691,5 +2691,6 @@ void sock_def_readable(struct sock *sk);
+ void sock_no_linger(struct sock *sk);
+ void sock_set_priority(struct sock *sk, u32 priority);
+ void sock_set_reuseaddr(struct sock *sk);
++void sock_set_sndtimeo(struct sock *sk, s64 secs);
  
- void sock_def_readable(struct sock *sk);
- 
-+void sock_set_reuseaddr(struct sock *sk);
-+
  #endif	/* _SOCK_H */
 diff --git a/net/core/sock.c b/net/core/sock.c
-index fd85e651ce284..18eb84fdf5fbe 100644
+index ceda1a9248b3e..d3b1d61e4f768 100644
 --- a/net/core/sock.c
 +++ b/net/core/sock.c
-@@ -712,6 +712,14 @@ bool sk_mc_loop(struct sock *sk)
+@@ -737,6 +737,17 @@ void sock_set_priority(struct sock *sk, u32 priority)
  }
- EXPORT_SYMBOL(sk_mc_loop);
+ EXPORT_SYMBOL(sock_set_priority);
  
-+void sock_set_reuseaddr(struct sock *sk)
++void sock_set_sndtimeo(struct sock *sk, s64 secs)
 +{
 +	lock_sock(sk);
-+	sk->sk_reuse = SK_CAN_REUSE;
++	if (secs && secs < MAX_SCHEDULE_TIMEOUT / HZ - 1)
++		sk->sk_sndtimeo = secs * HZ;
++	else
++		sk->sk_sndtimeo = MAX_SCHEDULE_TIMEOUT;
 +	release_sock(sk);
 +}
-+EXPORT_SYMBOL(sock_set_reuseaddr);
++EXPORT_SYMBOL(sock_set_sndtimeo);
 +
  /*
   *	This is meant for all protocols to use and covers goings on
