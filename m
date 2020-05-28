@@ -6,45 +6,65 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B71F9C433E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 15:30:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 270B2C433DF
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 18:12:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0E2120776
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 15:30:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A033207D3
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 18:12:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404297AbgE1PaR convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 May 2020 11:30:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48662 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404272AbgE1PaO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 28 May 2020 11:30:14 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 0BF4AB145;
-        Thu, 28 May 2020 15:30:12 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Paulo Alcantara <pc@cjr.nz>, linux-cifs@vger.kernel.org,
-        smfrench@gmail.com
-Cc:     Paulo Alcantara <pc@cjr.nz>
-Subject: Re: [PATCH 3/3] cifs: get rid of unused parameter in reconn_setup_dfs_targets()
-In-Reply-To: <20200519183829.5512-3-pc@cjr.nz>
-References: <20200519183829.5512-1-pc@cjr.nz> <20200519183829.5512-3-pc@cjr.nz>
-Date:   Thu, 28 May 2020 17:30:12 +0200
-Message-ID: <87o8q8jcvv.fsf@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+        id S2405683AbgE1SML (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 May 2020 14:12:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48544 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405688AbgE1SMK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 May 2020 14:12:10 -0400
+Received: from shards.monkeyblade.net (shards.monkeyblade.net [IPv6:2620:137:e000::1:9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127E2C08C5C6;
+        Thu, 28 May 2020 11:12:09 -0700 (PDT)
+Received: from localhost (unknown [IPv6:2601:601:9f00:477::3d5])
+        (using TLSv1 with cipher AES256-SHA (256/256 bits))
+        (Client did not present a certificate)
+        (Authenticated sender: davem-davemloft)
+        by shards.monkeyblade.net (Postfix) with ESMTPSA id 8FA40129191D0;
+        Thu, 28 May 2020 11:12:06 -0700 (PDT)
+Date:   Thu, 28 May 2020 11:12:05 -0700 (PDT)
+Message-Id: <20200528.111205.608949763790224771.davem@davemloft.net>
+To:     hch@lst.de
+Cc:     kuba@kernel.org, edumazet@google.com, kuznet@ms2.inr.ac.ru,
+        yoshfuji@linux-ipv6.org, jmaloy@redhat.com, ying.xue@windriver.com,
+        drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
+        target-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
+        ocfs2-devel@oss.oracle.com, netdev@vger.kernel.org,
+        ceph-devel@vger.kernel.org, rds-devel@oss.oracle.com,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
+Subject: Re: remove most callers of kernel_setsockopt v3
+From:   David Miller <davem@davemloft.net>
+In-Reply-To: <20200528051236.620353-1-hch@lst.de>
+References: <20200528051236.620353-1-hch@lst.de>
+X-Mailer: Mew version 6.8 on Emacs 26.3
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Thu, 28 May 2020 11:12:07 -0700 (PDT)
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+From: Christoph Hellwig <hch@lst.de>
+Date: Thu, 28 May 2020 07:12:08 +0200
 
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+> this series removes most callers of the kernel_setsockopt functions, and
+> instead switches their users to small functions that implement setting a
+> sockopt directly using a normal kernel function call with type safety and
+> all the other benefits of not having a function call.
+> 
+> In some cases these functions seem pretty heavy handed as they do
+> a lock_sock even for just setting a single variable, but this mirrors
+> the real setsockopt implementation unlike a few drivers that just set
+> set the fields directly.
+ ...
 
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
+Series applied, thanks Christoph.
