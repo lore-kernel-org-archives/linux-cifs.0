@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0917C433E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 15:30:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B71F9C433E0
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 15:30:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEC5820888
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 15:30:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0E2120776
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 15:30:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404434AbgE1PaA convert rfc822-to-8bit (ORCPT
+        id S2404297AbgE1PaR convert rfc822-to-8bit (ORCPT
         <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 May 2020 11:30:00 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48470 "EHLO mx2.suse.de"
+        Thu, 28 May 2020 11:30:17 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48662 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404272AbgE1P37 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 28 May 2020 11:29:59 -0400
+        id S2404272AbgE1PaO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 28 May 2020 11:30:14 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx2.suse.de (Postfix) with ESMTP id 630E5B145;
-        Thu, 28 May 2020 15:29:57 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 0BF4AB145;
+        Thu, 28 May 2020 15:30:12 +0000 (UTC)
 From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
 To:     Paulo Alcantara <pc@cjr.nz>, linux-cifs@vger.kernel.org,
         smfrench@gmail.com
 Cc:     Paulo Alcantara <pc@cjr.nz>
-Subject: Re: [PATCH 2/3] cifs: handle hostnames that resolve to same ip in failover
-In-Reply-To: <20200519183829.5512-2-pc@cjr.nz>
-References: <20200519183829.5512-1-pc@cjr.nz> <20200519183829.5512-2-pc@cjr.nz>
-Date:   Thu, 28 May 2020 17:29:56 +0200
-Message-ID: <87r1v4jcwb.fsf@suse.com>
+Subject: Re: [PATCH 3/3] cifs: get rid of unused parameter in reconn_setup_dfs_targets()
+In-Reply-To: <20200519183829.5512-3-pc@cjr.nz>
+References: <20200519183829.5512-1-pc@cjr.nz> <20200519183829.5512-3-pc@cjr.nz>
+Date:   Thu, 28 May 2020 17:30:12 +0200
+Message-ID: <87o8q8jcvv.fsf@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
