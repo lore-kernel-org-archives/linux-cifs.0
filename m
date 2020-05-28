@@ -4,39 +4,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 968FDC433E1
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 05:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5BCC433E0
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 05:14:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76C0B2084C
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 05:13:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE3CA21475
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 May 2020 05:14:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Hfyc3f3k"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PDqBDHw+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727087AbgE1FNO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 May 2020 01:13:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40366 "EHLO
+        id S1728093AbgE1FOI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 May 2020 01:14:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725298AbgE1FNO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 May 2020 01:13:14 -0400
+        with ESMTP id S1728091AbgE1FOG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 May 2020 01:14:06 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D53B2C05BD1E;
-        Wed, 27 May 2020 22:13:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64B16C08C5C3;
+        Wed, 27 May 2020 22:14:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Io53oiUYmuqiLEcJhawAHM3/CUXeG0e+cdSPzGhQq5w=; b=Hfyc3f3k/XdgrkK1eG1P7V7b3X
-        KQNAiGUgx1VKqquEIPejFXE5v1rtzGTYQmdNDOKE90n4pnoSDARlTovbn+5yuCaqX3Cp2nmatj/8L
-        9E9bpX9lLlOVlF2PMw9gS1SxsKzvRrynvd1go+99+PQYKkdROotWSLFtVYJkkx+6gPAUaqT47SmXL
-        uBFzqpY7tPAzfaKJ/vjcBQDiE4JLMXuysi2z+R2jlpKlRLFygT4eEhUF0eH0X9KSTfXFIVkHdSMlZ
-        DFy+8zK04ZEp0FOsptEmQVhEDaCUuxMd2/9bUB960RXSTbWHswfO0gNJwRLL/5Jp2Adp6X/2VosLa
-        jewaRBmg==;
+        bh=s5P8I+qDHIZ/6iUO4TEOGR9CrquN2CHg5VKnkbYqBBQ=; b=PDqBDHw+GyA0Zp32SfM+eOUtmz
+        qkyp3WcbI8bpn/T1XS+tvP94o5Ct7TNmNvf8a+I07BnAkw2mjrK48EPVcUWTvtS2AhuuEXPlmks87
+        1qqPzw9OSjpt0+77yM1YQuvswXJVEW6QeaHGco7ni+zKjQseI0rruDG0v/AyVppdi7DpLUcDANAkV
+        UdF33etczp7so57cEjkfpYhm11zxzeqB07jLtYg00dy7oCEgVjb6KkbiF5onrOfBJGh3YXUWT4kYi
+        bcOKAiMQBImCjF6xqAMFNsxsVLp0z9UADpzzRPRr1RSTohjlnrVwdf1VoBLoO/txr/b3KAnjqSKUS
+        rhpZVKuw==;
 Received: from p4fdb1ad2.dip0.t-ipconnect.de ([79.219.26.210] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jeAqW-0001R3-Lf; Thu, 28 May 2020 05:12:49 +0000
+        id 1jeArR-0002NG-Cy; Thu, 28 May 2020 05:13:46 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
@@ -52,10 +52,10 @@ Cc:     Eric Dumazet <edumazet@google.com>,
         netdev@vger.kernel.org, ceph-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org,
         tipc-discussion@lists.sourceforge.net,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: [PATCH 03/28] net: add sock_set_priority
-Date:   Thu, 28 May 2020 07:12:11 +0200
-Message-Id: <20200528051236.620353-4-hch@lst.de>
+        David Howells <dhowells@redhat.com>
+Subject: [PATCH 20/28] ipv4: add ip_sock_set_recverr
+Date:   Thu, 28 May 2020 07:12:28 +0200
+Message-Id: <20200528051236.620353-21-hch@lst.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200528051236.620353-1-hch@lst.de>
 References: <20200528051236.620353-1-hch@lst.de>
@@ -67,108 +67,67 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper to directly set the SO_PRIORITY sockopt from kernel space
+Add a helper to directly set the IP_RECVERR sockopt from kernel space
 without going through a fake uaccess.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Sagi Grimberg <sagi@grimberg.me>
+Reviewed-by: David Howells <dhowells@redhat.com>
 ---
- drivers/nvme/host/tcp.c   | 12 ++----------
- drivers/nvme/target/tcp.c | 18 ++++--------------
- include/net/sock.h        |  1 +
- net/core/sock.c           |  8 ++++++++
- 4 files changed, 15 insertions(+), 24 deletions(-)
+ include/net/ip.h         | 1 +
+ net/ipv4/ip_sockglue.c   | 8 ++++++++
+ net/rxrpc/local_object.c | 8 +-------
+ 3 files changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index e72d87482eb78..a307972d33a02 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -1362,16 +1362,8 @@ static int nvme_tcp_alloc_queue(struct nvme_ctrl *nctrl,
- 	 */
- 	sock_no_linger(queue->sock->sk);
- 
--	if (so_priority > 0) {
--		ret = kernel_setsockopt(queue->sock, SOL_SOCKET, SO_PRIORITY,
--				(char *)&so_priority, sizeof(so_priority));
--		if (ret) {
--			dev_err(ctrl->ctrl.device,
--				"failed to set SO_PRIORITY sock opt, ret %d\n",
--				ret);
--			goto err_sock;
--		}
--	}
-+	if (so_priority > 0)
-+		sock_set_priority(queue->sock->sk, so_priority);
- 
- 	/* Set socket type of service */
- 	if (nctrl->opts->tos >= 0) {
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index e0801494b097f..f3088156d01da 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -1448,12 +1448,8 @@ static int nvmet_tcp_set_queue_sock(struct nvmet_tcp_queue *queue)
- 	 */
- 	sock_no_linger(sock->sk);
- 
--	if (so_priority > 0) {
--		ret = kernel_setsockopt(sock, SOL_SOCKET, SO_PRIORITY,
--				(char *)&so_priority, sizeof(so_priority));
--		if (ret)
--			return ret;
--	}
-+	if (so_priority > 0)
-+		sock_set_priority(sock->sk, so_priority);
- 
- 	/* Set socket type of service */
- 	if (inet->rcv_tos > 0) {
-@@ -1638,14 +1634,8 @@ static int nvmet_tcp_add_port(struct nvmet_port *nport)
- 		goto err_sock;
- 	}
- 
--	if (so_priority > 0) {
--		ret = kernel_setsockopt(port->sock, SOL_SOCKET, SO_PRIORITY,
--				(char *)&so_priority, sizeof(so_priority));
--		if (ret) {
--			pr_err("failed to set SO_PRIORITY sock opt %d\n", ret);
--			goto err_sock;
--		}
--	}
-+	if (so_priority > 0)
-+		sock_set_priority(port->sock->sk, so_priority);
- 
- 	ret = kernel_bind(port->sock, (struct sockaddr *)&port->addr,
- 			sizeof(port->addr));
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 6ed00bf009bbe..a3a43141a4be2 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2689,6 +2689,7 @@ static inline bool sk_dev_equal_l3scope(struct sock *sk, int dif)
- void sock_def_readable(struct sock *sk);
- 
- void sock_no_linger(struct sock *sk);
-+void sock_set_priority(struct sock *sk, u32 priority);
- void sock_set_reuseaddr(struct sock *sk);
- 
- #endif	/* _SOCK_H */
-diff --git a/net/core/sock.c b/net/core/sock.c
-index f0f09524911c8..ceda1a9248b3e 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -729,6 +729,14 @@ void sock_no_linger(struct sock *sk)
+diff --git a/include/net/ip.h b/include/net/ip.h
+index 5f5d8226b6abc..f063a491b9063 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -766,6 +766,7 @@ static inline bool inetdev_valid_mtu(unsigned int mtu)
  }
- EXPORT_SYMBOL(sock_no_linger);
  
-+void sock_set_priority(struct sock *sk, u32 priority)
+ void ip_sock_set_freebind(struct sock *sk);
++void ip_sock_set_recverr(struct sock *sk);
+ void ip_sock_set_tos(struct sock *sk, int val);
+ 
+ #endif	/* _IP_H */
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index 767838d2030d8..aca6b81da9bae 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -589,6 +589,14 @@ void ip_sock_set_freebind(struct sock *sk)
+ }
+ EXPORT_SYMBOL(ip_sock_set_freebind);
+ 
++void ip_sock_set_recverr(struct sock *sk)
 +{
 +	lock_sock(sk);
-+	sk->sk_priority = priority;
++	inet_sk(sk)->recverr = true;
 +	release_sock(sk);
 +}
-+EXPORT_SYMBOL(sock_set_priority);
++EXPORT_SYMBOL(ip_sock_set_recverr);
 +
  /*
-  *	This is meant for all protocols to use and covers goings on
-  *	at the socket level. Everything here is generic.
+  *	Socket option code for IP. This is the end of the line after any
+  *	TCP,UDP etc options on an IP socket.
+diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
+index 5ea2bd01fdd59..4c0e8fe5ec1fb 100644
+--- a/net/rxrpc/local_object.c
++++ b/net/rxrpc/local_object.c
+@@ -171,13 +171,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local, struct net *net)
+ 		/* Fall through */
+ 	case AF_INET:
+ 		/* we want to receive ICMP errors */
+-		opt = 1;
+-		ret = kernel_setsockopt(local->socket, SOL_IP, IP_RECVERR,
+-					(char *) &opt, sizeof(opt));
+-		if (ret < 0) {
+-			_debug("setsockopt failed");
+-			goto error;
+-		}
++		ip_sock_set_recverr(local->socket->sk);
+ 
+ 		/* we want to set the don't fragment bit */
+ 		opt = IP_PMTUDISC_DO;
 -- 
 2.26.2
 
