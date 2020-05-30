@@ -7,111 +7,114 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D696CC433E0
-	for <linux-cifs@archiver.kernel.org>; Sat, 30 May 2020 22:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16804C433DF
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 May 2020 22:31:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0B1D206F0
-	for <linux-cifs@archiver.kernel.org>; Sat, 30 May 2020 22:13:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD7D320722
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 May 2020 22:31:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gMoW8EnT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fO4blw5v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729183AbgE3WNv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 30 May 2020 18:13:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54472 "EHLO
+        id S1729356AbgE3Wbk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 30 May 2020 18:31:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729083AbgE3WNu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 May 2020 18:13:50 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6127C03E969
-        for <linux-cifs@vger.kernel.org>; Sat, 30 May 2020 15:13:49 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id y13so1001051ybj.10
-        for <linux-cifs@vger.kernel.org>; Sat, 30 May 2020 15:13:49 -0700 (PDT)
+        with ESMTP id S1729350AbgE3Wbj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 May 2020 18:31:39 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 470DEC03E969
+        for <linux-cifs@vger.kernel.org>; Sat, 30 May 2020 15:31:38 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id p123so3129738yba.6
+        for <linux-cifs@vger.kernel.org>; Sat, 30 May 2020 15:31:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=Xv8kKKg/z6tYKPlyvVwWQTDcY+FWSdDFJ4coDTSzcv0=;
-        b=gMoW8EnTlwjDqxHwNw623mFHhPy3vZwdDJcf187l1jH47Zddp2KvSe00ZQRT+Lbaak
-         xp5ePrWunc29uB+qJnLqEaZxnkGaWZW8dPgzhHTZJ4y8e0Xipwht/n1H1QDrgEF69HNl
-         0HGVvBgIdxmoI2DFHiPLU/L4ARe5POg3wHxqR6wE8CppADsBJyv4/YJgIjhNQDupJXEq
-         8YUvIw4mAwxqqxNfG6duN3KBTf65o1hVoUHnhVGNoRt0/GjkQeCQKt4X3IV1N3fRrHKN
-         WCIKuqV8vfL4zSKjntEEeFPRHR5xVcBhCbseuZ8XGqyEfudLF9ViulJGqYW0rHxC/XoS
-         GJRw==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=vZ4KrYugh9MqNQxxMHY/sBjG3fV6eFcp5W+laxT3CkM=;
+        b=fO4blw5vxhI83NOwXIpqwB/ahZMklw2g9w2QU+VV1BgIHEiwHFg4T/X0GEUCZRbF8z
+         F2sF/xNB53NRhXfMt7xgSuuEDYIGUsKseEQ/xVeEFoxHhAWI7I/EDLyRNXL2rfod/Ztc
+         kcigwc2xpLh8de0HuUSBy39QY9mzc9SFSP4lTnszVIag4qOwuHmTH5ApY/D8JT5R8q0o
+         1A5bqpxwERvA677Rvw/pTqzvOL5/awvSVbxFxO3f57lmQ21wQZMBkkspJkjWjsuTj3FH
+         KQbgEIDDutLPBwoJSfl4RTkVUmwYGKxAtLY0pY1GJUNzCCH+/O6bs3Y8uXTK/YQpw4TF
+         GGYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=Xv8kKKg/z6tYKPlyvVwWQTDcY+FWSdDFJ4coDTSzcv0=;
-        b=jAUBNqiTR81ugj/e9yjC8yRh488gJUbsaI4ipfKraDYhvtVayRNwrVbejhc6h4P+7o
-         rqIUicnOpuszxAWztX7/E2/Mnj2NihGBWtMaXNdFwrt9Lw5aMUYlHbwNpCP2OW9brjND
-         LVFIBrVPcKYig33CSz6z7dgMPBekvtanGhio1a1UgIUVyXCMJtiTOKaVLb3f+QhcGZu+
-         yJOedOH4XZ1FOsW1/323Sk8VxkRghHSMUp1soF+Yoy3fTvUUW7JBGj4z8FPvmvRq5G1b
-         zVc2Ijkp/bJzSquEMg2voc+sVaZ6oUw1frWSCK+p6En/H0n+2QjP2yaxY9HcjDwyFeIc
-         bkJw==
-X-Gm-Message-State: AOAM5332ZGm7Anlc+UX6pWdPLmPi0tXiBZkXdSfLqUpPWg8chvqoc1D6
-        X7skl6SJ0N9deBp6vKLbQ+2h5ZbqgFsvjryc7EC+rNnNCYQ=
-X-Google-Smtp-Source: ABdhPJxWkBFE7En1mDyCtp/NW13ukTw3z/JC07L55HgTHhJo3Vp4iBW1mn9kz3GtfAlcP9lofiHnJ2L5aghZg2+5XmI=
-X-Received: by 2002:a25:6c6:: with SMTP id 189mr13036293ybg.375.1590876828739;
- Sat, 30 May 2020 15:13:48 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=vZ4KrYugh9MqNQxxMHY/sBjG3fV6eFcp5W+laxT3CkM=;
+        b=QlqBrG4Xv11UG4R4/KktR05BM67tIPbVVNsts/y+pkqHRyq1cK524DuvK9vWLlyYjD
+         cPwrtaMHY6vobFKy+MWZO7tJRu90r1S8/19Ji7Qis53wasaZScZAoyOqR/ai1OWEDwl9
+         4rgFr/LDtkNhr/0rUB+Qw4Wzx8BhwzJ7HMYeIn2oiflUwfHQ5iJhlX3/f4x7iDwI+LlX
+         1ixoKr1aaJIpvgbQL86SZp7dPAVMtYZ7/SmLgzteuI+KgU6pHb1ndNy9rlMa2PQcWv9h
+         2bbRgX22jZckm335SlTSebiqR1NN9aDtiKUTIuLHPTrYXUTH/EEI6I6zPa+Wzh52yT8f
+         pQ9w==
+X-Gm-Message-State: AOAM530tT+yzETd8R6L3esv4/jK6bL/4rl0lCnmVWploVqkv0tILx5IX
+        mHDW0perEZ3w0gQP8ARLJmxqhhWkv3EwMgsyBupzWBkNx78=
+X-Google-Smtp-Source: ABdhPJyN023HNJLQDD1bfYNYYc33ZJk9gxnZBziEj+cWQ1uRPkfcxmQaScSF0Mn5XS+RvlAPB/a+2/fTimN77uJiZSU=
+X-Received: by 2002:a25:f309:: with SMTP id c9mr21793764ybs.364.1590877896892;
+ Sat, 30 May 2020 15:31:36 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 30 May 2020 17:13:37 -0500
-Message-ID: <CAH2r5muo=fPArSDa_8AEk0dT-3zA17N9HL7wCb=jP77RHQQQQQ@mail.gmail.com>
-Subject: [PATCH][smb3] minor update to compression header definitions
+Date:   Sat, 30 May 2020 17:31:26 -0500
+Message-ID: <CAH2r5mvFSWgEgoyaEH5W7x55Nc1HP3udqDrrid_BdOyWm66RKQ@mail.gmail.com>
+Subject: [PATCH][CIFS] fix minor typos in comments and log messages
 To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     samba-technical <samba-technical@lists.samba.org>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Content-Type: multipart/mixed; boundary="00000000000042446805a6e4e042"
+Content-Type: multipart/mixed; boundary="000000000000ed124605a6e51fcb"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000042446805a6e4e042
+--000000000000ed124605a6e51fcb
 Content-Type: text/plain; charset="UTF-8"
 
-MS-SMB2 specification was updated in March.  Make minor additions
-    and corrections to compression related definitions in smb2pdu.h
+Fix four minor typos in comments and log messages
 
 -- 
 Thanks,
 
 Steve
 
---00000000000042446805a6e4e042
+--000000000000ed124605a6e51fcb
 Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-minor-update-to-compression-header-definitions.patch"
+	name="0001-cifs-fix-minor-typos-in-comments-and-log-messages.patch"
 Content-Disposition: attachment; 
-	filename="0001-smb3-minor-update-to-compression-header-definitions.patch"
+	filename="0001-cifs-fix-minor-typos-in-comments-and-log-messages.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_kau6z5wn0>
-X-Attachment-Id: f_kau6z5wn0
+Content-ID: <f_kau7m7gc0>
+X-Attachment-Id: f_kau7m7gc0
 
-RnJvbSBiNzk5ZjhmZDcyYmI0OTE5MjgwYmFiOTg4ZjllNWU5YzljYzdiMjFmIE1vbiBTZXAgMTcg
+RnJvbSA4OWRkNmRhNTYzZDY3YjRjZTMwNzZmNDM2NmNlZmQ1NWM2MTY4ZWRlIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFNhdCwgMzAgTWF5IDIwMjAgMTc6MTA6MTYgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiBtaW5vciB1cGRhdGUgdG8gY29tcHJlc3Npb24gaGVhZGVyIGRlZmluaXRpb25zCgpNUy1T
-TUIyIHNwZWNpZmljYXRpb24gd2FzIHVwZGF0ZWQgaW4gTWFyY2guICBNYWtlIG1pbm9yIGFkZGl0
-aW9ucwphbmQgY29ycmVjdGlvbnMgdG8gY29tcHJlc3Npb24gcmVsYXRlZCBkZWZpbml0aW9ucyBp
-biBzbWIycGR1LmgKClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9z
-b2Z0LmNvbT4KLS0tCiBmcy9jaWZzL3NtYjJwZHUuaCB8IDEzICsrKysrKysrKysrLS0KIDEgZmls
-ZSBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBh
-L2ZzL2NpZnMvc21iMnBkdS5oIGIvZnMvY2lmcy9zbWIycGR1LmgKaW5kZXggMTBhY2Y5MGY4NThk
-Li4zYjBlNmFjZjlkN2QgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBkdS5oCisrKyBiL2ZzL2Np
-ZnMvc21iMnBkdS5oCkBAIC0xNDMsOCArMTQzLDE3IEBAIHN0cnVjdCBzbWIyX3RyYW5zZm9ybV9o
-ZHIgewogCV9fdTY0ICBTZXNzaW9uSWQ7CiB9IF9fcGFja2VkOwogCisvKiBTZWUgTVMtU01CMiAy
-LjIuNDIgKi8KK3N0cnVjdCBzbWIyX2NvbXByZXNzaW9uX3RyYW5zZm9ybV9oZHIgeworCV9fbGUz
-MiBQcm90b2NvbElkOwkvKiAweEZDICdTJyAnTScgJ0InICovCisJX19sZTMyIE9yaWdpbmFsQ29t
-cHJlc3NlZFNlZ21lbnRTaXplOworCV9fbGUxNiBDb21wcmVzc2lvbkFsZ29yaXRobTsKKwlfX2xl
-MTYgRmxhZ3M7CisJX19sZTE2IExlbmd0aDsgLyogaWYgY2hhaW5lZCBpdCBpcyBsZW5ndGgsIGVs
-c2Ugb2Zmc2V0ICovCit9IF9fcGFja2VkOworCiAvKiBTZWUgTVMtU01CMiAyLjIuNDIuMSAqLwot
-c3RydWN0IGNvbXByZXNzaW9uX3BsYXlsb2FkX2hlYWRlciB7CitzdHJ1Y3QgY29tcHJlc3Npb25f
-cGF5bG9hZF9oZWFkZXIgewogCV9fbGUxNglBbGdvcml0aG1JZDsKIAlfX2xlMTYJUmVzZXJ2ZWQ7
-CiAJX19sZTMyCUxlbmd0aDsKQEAgLTMzMyw3ICszNDIsNyBAQCBzdHJ1Y3Qgc21iMl9lbmNyeXB0
-aW9uX25lZ19jb250ZXh0IHsKICNkZWZpbmUgU01CM19DT01QUkVTU19MWjc3CWNwdV90b19sZTE2
-KDB4MDAwMikKICNkZWZpbmUgU01CM19DT01QUkVTU19MWjc3X0hVRkYJY3B1X3RvX2xlMTYoMHgw
-MDAzKQogLyogUGF0dGVybiBzY2FubmluZyBhbGdvcml0aG0gU2VlIE1TLVNNQjIgMy4xLjQuNC4x
-ICovCi0jZGVmaW5lIFNNQjNfQ09NUFJFU1NfUEFUVEVSTgljcHVfdG9fbGUxNigweDAwMDQpCisj
-ZGVmaW5lIFNNQjNfQ09NUFJFU1NfUEFUVEVSTgljcHVfdG9fbGUxNigweDAwMDQpIC8qIFBhdHRl
-cm5fVjEgKi8KIAogLyogQ29tcHJlc3Npb24gRmxhZ3MgKi8KICNkZWZpbmUgU01CMl9DT01QUkVT
-U0lPTl9DQVBBQklMSVRJRVNfRkxBR19OT05FCQljcHVfdG9fbGUzMigweDAwMDAwMDAwKQotLSAK
-Mi4yNS4xCgo=
---00000000000042446805a6e4e042--
+CkRhdGU6IFNhdCwgMzAgTWF5IDIwMjAgMTc6Mjk6NTAgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBmaXggbWlub3IgdHlwb3MgaW4gY29tbWVudHMgYW5kIGxvZyBtZXNzYWdlcwoKRml4IGZv
+dXIgbWlub3IgdHlwb3MgaW4gY29tbWVudHMgYW5kIGxvZyBtZXNzYWdlcwoKU2lnbmVkLW9mZi1i
+eTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvc2Vz
+cy5jIHwgOCArKysrLS0tLQogMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgNCBkZWxl
+dGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3Nlc3MuYyBiL2ZzL2NpZnMvc2Vzcy5jCmlu
+ZGV4IDNmOGI0M2U3NzUzOS4uMGFlMjVjYzc3ZmMwIDEwMDY0NAotLS0gYS9mcy9jaWZzL3Nlc3Mu
+YworKysgYi9mcy9jaWZzL3Nlc3MuYwpAQCAtMTIyLDcgKzEyMiw3IEBAIGludCBjaWZzX3RyeV9h
+ZGRpbmdfY2hhbm5lbHMoc3RydWN0IGNpZnNfc2VzICpzZXMpCiAKIAkJdHJpZXMrKzsKIAkJaWYg
+KHRyaWVzID4gMypzZXMtPmNoYW5fbWF4KSB7Ci0JCQljaWZzX2RiZyhGWUksICJ0b28gbWFueSBh
+dHRlbXB0IGF0IG9wZW5pbmcgY2hhbm5lbHMgKCVkIGNoYW5uZWxzIGxlZnQgdG8gb3BlbilcbiIs
+CisJCQljaWZzX2RiZyhGWUksICJ0b28gbWFueSBjaGFubmVsIG9wZW4gYXR0ZW1wdHMgKCVkIGNo
+YW5uZWxzIGxlZnQgdG8gb3BlbilcbiIsCiAJCQkJIGxlZnQpOwogCQkJYnJlYWs7CiAJCX0KQEAg
+LTIwMCw3ICsyMDAsNyBAQCBjaWZzX3Nlc19hZGRfY2hhbm5lbChzdHJ1Y3QgY2lmc19zZXMgKnNl
+cywgc3RydWN0IGNpZnNfc2VydmVyX2lmYWNlICppZmFjZSkKIAl2b2wuVU5DID0gdW5jOwogCXZv
+bC5wcmVwYXRoID0gIiI7CiAKLQkvKiBSZS11c2Ugc2FtZSB2ZXJzaW9uIGFzIG1hc3RlciBjb25u
+ZWN0aW9uICovCisJLyogUmV1c2Ugc2FtZSB2ZXJzaW9uIGFzIG1hc3RlciBjb25uZWN0aW9uICov
+CiAJdm9sLnZhbHMgPSBzZXMtPnNlcnZlci0+dmFsczsKIAl2b2wub3BzID0gc2VzLT5zZXJ2ZXIt
+Pm9wczsKIApAQCAtMjYzLDcgKzI2Myw3IEBAIGNpZnNfc2VzX2FkZF9jaGFubmVsKHN0cnVjdCBj
+aWZzX3NlcyAqc2VzLCBzdHJ1Y3QgY2lmc19zZXJ2ZXJfaWZhY2UgKmlmYWNlKQogCQlnb3RvIG91
+dDsKIAogCS8qIHN1Y2Nlc3MsIHB1dCBpdCBvbiB0aGUgbGlzdAotCSAqIFhYWDogc2hhcmluZyBz
+ZXMgYmV0d2VlbiAyIHRjcCBzZXJ2ZXIgaXMgbm90IHBvc3NpYmxlLCB0aGUKKwkgKiBYWFg6IHNo
+YXJpbmcgc2VzIGJldHdlZW4gMiB0Y3Agc2VydmVycyBpcyBub3QgcG9zc2libGUsIHRoZQogCSAq
+IHdheSAiaW50ZXJuYWwiIGxpbmtlZCBsaXN0cyB3b3JrcyBpbiBsaW51eCBtYWtlcyBlbGVtZW50
+CiAJICogb25seSBhYmxlIHRvIGJlbG9uZyB0byBvbmUgbGlzdAogCSAqCkBAIC05NzIsNyArOTcy
+LDcgQEAgc2Vzc19hdXRoX2xhbm1hbihzdHJ1Y3Qgc2Vzc19kYXRhICpzZXNzX2RhdGEpCiAKIAkJ
+LyogQ2FsY3VsYXRlIGhhc2ggd2l0aCBwYXNzd29yZCBhbmQgY29weSBpbnRvIGJjY19wdHIuCiAJ
+CSAqIEVuY3J5cHRpb24gS2V5IChzdG9yZWQgYXMgaW4gY3J5cHRrZXkpIGdldHMgdXNlZCBpZiB0
+aGUKLQkJICogc2VjdXJpdHkgbW9kZSBiaXQgaW4gTmVnb3R0aWF0ZSBQcm90b2NvbCByZXNwb25z
+ZSBzdGF0ZXMKKwkJICogc2VjdXJpdHkgbW9kZSBiaXQgaW4gTmVnb3RpYXRlIFByb3RvY29sIHJl
+c3BvbnNlIHN0YXRlcwogCQkgKiB0byB1c2UgY2hhbGxlbmdlL3Jlc3BvbnNlIG1ldGhvZCAoaS5l
+LiBQYXNzd29yZCBiaXQgaXMgMSkuCiAJCSAqLwogCQlyYyA9IGNhbGNfbGFubWFuX2hhc2goc2Vz
+LT5wYXNzd29yZCwgc2VzLT5zZXJ2ZXItPmNyeXB0a2V5LAotLSAKMi4yNS4xCgo=
+--000000000000ed124605a6e51fcb--
