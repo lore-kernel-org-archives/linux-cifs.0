@@ -2,118 +2,106 @@ Return-Path: <SRS0=0I05=7S=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8E26C433DF
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jun 2020 15:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC4DC433E0
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jun 2020 15:20:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4EBD206DB
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jun 2020 15:17:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28D1320663
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Jun 2020 15:20:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bniJkoK9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b3ZSVBJr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726893AbgFEPR6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 Jun 2020 11:17:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23757 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726675AbgFEPR6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Jun 2020 11:17:58 -0400
+        id S1726893AbgFEPUr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Jun 2020 11:20:47 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56988 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726601AbgFEPUr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Jun 2020 11:20:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1591370276;
+        s=mimecast20190719; t=1591370446;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=b6oaoc9BFGC0KbruyF/VyfbgSlVPGz9/S7qC1xpplAs=;
-        b=bniJkoK93JxzrIh0aYP+9XfegxYN1tJJqggd8NPpWHSg/JRlxnln3o9SZGhRS74o2xs5Et
-        XQdEIcv8E+b3uvTo/qAp/p8aI7vSQ1BUfNRBKFuVdQXHkCQAlTl8/eZPHgENBWzfbJe8F/
-        63saROl+0PYVG9Yls+02NyHruqXjCZc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-Nea1pxbjMEO7BDzAsfnrHA-1; Fri, 05 Jun 2020 11:17:55 -0400
-X-MC-Unique: Nea1pxbjMEO7BDzAsfnrHA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28212107ACCA;
-        Fri,  5 Jun 2020 15:17:54 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.74.9.212])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DF31D5C6DE;
-        Fri,  5 Jun 2020 15:17:50 +0000 (UTC)
-From:   Kenneth D'souza <kdsouza@redhat.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, kdsouza@redhat.com, rbergant@redhat.com
-Subject: [PATCH v3] cifs: dump Security Type info in DebugData
-Date:   Fri,  5 Jun 2020 20:47:46 +0530
-Message-Id: <20200605151746.18743-1-kdsouza@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5rWX1KqozTs9+owaDqHyvwWWbSHRmWFIMNq0TLHbRpY=;
+        b=b3ZSVBJr6FYWG+1+hImR1cHq9WZBByDgI9Kxnqqe7L7UogFHoTs+jQsJ7d8Pyl8IxMAKZ0
+        sPu3NkoxjNHWIQSK0XGDrJOhCwBlXn0dcw5UOiog3l3LyqLdUYzSDw9f117CyQ3zOCIxaR
+        gPvVuv7fZEsnj2tPSXm/frnVr12TZiY=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-5-H-3uGDURNji-olFzpndC_g-1; Fri, 05 Jun 2020 11:20:43 -0400
+X-MC-Unique: H-3uGDURNji-olFzpndC_g-1
+Received: by mail-qt1-f200.google.com with SMTP id e8so8747948qtq.22
+        for <linux-cifs@vger.kernel.org>; Fri, 05 Jun 2020 08:20:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=5rWX1KqozTs9+owaDqHyvwWWbSHRmWFIMNq0TLHbRpY=;
+        b=ixXptn8dq8A2oEhFJkjiC4splBt0Q54+ot2yz1O4557tpg+ZgG0FOYjtJ2syslVZQh
+         A7g9kdJActLR2Olu+TLw+XR5uplmrsqAChci8Mm/ZxtTSTa5WMDu7VYyO6Iz52X0XW0P
+         BuzAip3CzM42kVHJ1n29ADwATyKBPvBQ44WRpNrRqiiwtD/fd07tlIQMCIYfOoYNl6aj
+         0+pVEIy/e5u8cwgNT/x+m4ARA3zcE2ypJtmD7by/p/eSpFg6KqEFszaWIfmuct4gTXIG
+         08LLU0MqHDGKQs+h6DE3I2G8B0m/HbUdjp1dX5FZ9N1if7rBjbq3AR65S+zX2B+73U8S
+         J8YA==
+X-Gm-Message-State: AOAM533jIajBJvXXW4s+wD9XVzQgBb3OKUApyipmtN6CNbpenEK4AYdN
+        bYtSPSQxGmuNbCeHbHDlv9U9qKz7h/2P/hi5hSgE93Rd7wU68z1UIqL6BsFezC5B0+688YpLX5s
+        qcOq0TzvnQ6GjyWEV+KRj2/BDsRSbOkMnk98t+w==
+X-Received: by 2002:a37:b95:: with SMTP id 143mr8973768qkl.99.1591370442344;
+        Fri, 05 Jun 2020 08:20:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxiRKoFyC7+KSUu0bTebumqj6H+GYJeqn0Vi9YXshBMYhgEJ+0LiFtl0JPhVCBEQS7trbUoaGP+WVFd8T+McQY=
+X-Received: by 2002:a37:b95:: with SMTP id 143mr8973743qkl.99.1591370441971;
+ Fri, 05 Jun 2020 08:20:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20200604154441.23822-1-kdsouza@redhat.com> <878sh2iw63.fsf@suse.com>
+In-Reply-To: <878sh2iw63.fsf@suse.com>
+From:   Kenneth Dsouza <kdsouza@redhat.com>
+Date:   Fri, 5 Jun 2020 20:50:30 +0530
+Message-ID: <CAA_-hQ+NU_3AXvjpvu=Bhd4fH8guktZ-+_NNVvQhBRhsZSzi5Q@mail.gmail.com>
+Subject: Re: [PATCH v2] cifs: dump Security Type info in DebugData
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Roberto Bergantinos Corpas <rbergant@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Currently the end user is unaware with what sec type the
-cifs share is mounted if no sec=<type> option is parsed.
-With this patch one can easily check from DebugData.
+Aur=C3=A9lien, Implemented your suggestion.
+Sent v3 for the same.
 
-Example:
-1) Name: x.x.x.x Uses: 1 Capability: 0x8001f3fc Session Status: 1 Security type: RawNTLMSSP
-
-Signed-off-by: Kenneth D'souza <kdsouza@redhat.com>
-Signed-off-by: Roberto Bergantinos Corpas <rbergant@redhat.com>
----
- fs/cifs/cifs_debug.c |  4 ++++
- fs/cifs/cifsglob.h   | 18 ++++++++++++++++++
- 2 files changed, 22 insertions(+)
-
-diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
-index 916567d770f5..9caca784376b 100644
---- a/fs/cifs/cifs_debug.c
-+++ b/fs/cifs/cifs_debug.c
-@@ -375,6 +375,10 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 				ses->ses_count, ses->serverOS, ses->serverNOS,
- 				ses->capabilities, ses->status);
- 			}
-+
-+			seq_printf(m,"Security type: %s\n",
-+					get_security_type_str(server->ops->select_sectype(server, ses->sectype)));
-+
- 			if (server->rdma)
- 				seq_printf(m, "RDMA\n\t");
- 			seq_printf(m, "TCP status: %d Instance: %d\n\tLocal Users To "
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 39b708d9d86d..d8ef01039e71 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1994,6 +1994,24 @@ extern struct smb_version_values smb302_values;
- extern struct smb_version_operations smb311_operations;
- extern struct smb_version_values smb311_values;
- 
-+static inline char *get_security_type_str(enum securityEnum sectype)
-+{
-+       switch (sectype) {
-+       case RawNTLMSSP:
-+               return "RawNTLMSSP";
-+       case Kerberos:
-+               return "Kerberos";
-+       case NTLMv2:
-+               return "NTLMv2";
-+       case NTLM:
-+               return "NTLM";
-+       case LANMAN:
-+               return "LANMAN";
-+       default:
-+               return "Unknown";
-+       }
-+}
-+
- static inline bool is_smb1_server(struct TCP_Server_Info *server)
- {
- 	return strcmp(server->vals->version_string, SMB1_VERSION_STRING) == 0;
--- 
-2.21.1
+On Thu, Jun 4, 2020 at 10:51 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
+:
+>
+> Kenneth D'souza <kdsouza@redhat.com> writes:
+> > Currently the end user is unaware with what sec type the
+> > cifs share is mounted if no sec=3D<type> option is parsed.
+> > With this patch one can easily check from DebugData.
+>
+> LGTM but I would move the security_types next to the enum definition in
+> cifsglob.h somehow, so that it will be harder to forget to update one if
+> the other changes.
+>
+> Since it is in a header, maybe via an inline func with a
+> switch... simple but more verbose. Or X-macros [1] magic (might be
+> overkill).
+>
+> 1: https://www.geeksforgeeks.org/x-macros-in-c/
+>
+> Cheers,
+> --
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
+ DE
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
+=BCnchen)
+>
 
