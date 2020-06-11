@@ -1,109 +1,159 @@
-Return-Path: <SRS0=41bt=7X=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=oymv=7Y=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A20A5C433DF
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Jun 2020 17:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3462EC433DF
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jun 2020 02:26:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6EF3D206F4
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Jun 2020 17:28:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 098DA20747
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Jun 2020 02:26:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F3Y0ghWF"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="gIa3Z0sm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726307AbgFJR2b (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Jun 2020 13:28:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34926 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726322AbgFJR2a (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Jun 2020 13:28:30 -0400
-Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74680C03E96B
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Jun 2020 10:28:30 -0700 (PDT)
-Received: by mail-yb1-xb41.google.com with SMTP id y13so1553302ybj.10
-        for <linux-cifs@vger.kernel.org>; Wed, 10 Jun 2020 10:28:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ck9JiIjjUN+vYI7kEd1vy4Kf+gkVWNHYz7bn9/Rg9FY=;
-        b=F3Y0ghWFGuHkfCW/p9cyiVLnE/UqQjkAxMuDSMZ8XaQHsrItfzwp/2miINIdQIqOMw
-         tGVXQRSuOq6hAl/Qz7wagn/I89IRzdE/YET8bVPOlOmycluqRFnJgCokyOdJqCz0Xz8b
-         Wfgo7RiuMWbYkDd1RcjCs7VxIauYjme4JdPMoHzbrss99nuPitArIiV+s0/qRm83SIyO
-         mWvPBcqswdm/5ecqzHwhUvXEmILiHYFf00qCcGnwfQOtLOx/wUtTeKL6n8hNa/EuWZh6
-         MlUSc811Nbxwev/nK+cN+b4tnMGUVy+TnexSWmvrCDHVVdyKWYqvKx4J0qBVDMiQp0AD
-         O/hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ck9JiIjjUN+vYI7kEd1vy4Kf+gkVWNHYz7bn9/Rg9FY=;
-        b=b/ZuOB4fLVYUXzRLxv+WexuTPYNJb0XHMkKoQindnN5yl5B/enmSHmfMLy5ocN3vbw
-         KLcROVFg/lyaHIGk2odJB0P5TM8Qmr+fxLZ53dP2xD7+1gxjNSvpUfpfQZdvbuaTFxbU
-         mAybF9BNxOFY/XItmUkZEIGjWVNegenZyChqWcCV4FzXnSSBDeXXgx39wgADeRv5xr0S
-         jytzM3lnaNVIRHrD2FiIVEnuQWWp4jQdEpPWQNs1QL/VhPFlr/PM6gXIi5ehPsbB7FbM
-         By/isteYf1yruOAAuMiy9Kaq9JDrUPh/2HXPoc9zLBiN7FhdbdSg1xoUUFfLOoHhPJhA
-         83Fw==
-X-Gm-Message-State: AOAM533ZjQQqbRjOIizMwRsKIESlhSKqJnzrm1+QnEybZKaqt/o+ZjIa
-        mwmFErQffvk68WjYj99tscT36gCqLsds703E4qjW/Y3JMiM=
-X-Google-Smtp-Source: ABdhPJxFwP3bck31YOHjt1zZGRurReciGH4AQGaBCX37ymZewBPIsV83K+WOJk3i0wFoAmDdSp8M+rsDc7U5FU+/bzc=
-X-Received: by 2002:a25:73c3:: with SMTP id o186mr6596238ybc.230.1591810109126;
- Wed, 10 Jun 2020 10:28:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAH2r5mv-BZbqsDaTu+PX7Q+zxcosn=N5mM28Thr0LGyAKi9MRQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mv-BZbqsDaTu+PX7Q+zxcosn=N5mM28Thr0LGyAKi9MRQ@mail.gmail.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Wed, 10 Jun 2020 22:58:18 +0530
-Message-ID: <CANT5p=r1gmrU3R6=TrmDMd8=wWp3n9WwG27=+VSgtD2ZQGyc4A@mail.gmail.com>
-Subject: Re: [PATCH] smb3: fix typo in mount options displayed in /proc/mounts
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726290AbgFKC01 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Jun 2020 22:26:27 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:62277 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726163AbgFKC0Z (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Jun 2020 22:26:25 -0400
+Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20200611022621epoutp04024714d5a12320456dbdac3f45f48658~XXDZNXSAm1115911159epoutp049
+        for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2020 02:26:21 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20200611022621epoutp04024714d5a12320456dbdac3f45f48658~XXDZNXSAm1115911159epoutp049
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1591842381;
+        bh=fBKyV3l/gqu0fqM1IfprJo2DLtP0K5DetVQ3tnGKVfg=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=gIa3Z0smTzLFCQWtGXCA7PGF0zDWCutW2ADng36Y5SG/7L5gEkp41e04UYvun9SOW
+         lnYmde1qD55EeidpYOTfiFtJjaGzHmLMWMB2xOL2H57YEnlB0cg5YQvnwW/1ADQhpX
+         vHoO/7nQmkrwmYMx6EgT+twX3NxUMrPDm9oLc5bY=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20200611022621epcas1p23387ad0ba15c5052c1ce3675dd906588~XXDY_zQIf2268522685epcas1p2-;
+        Thu, 11 Jun 2020 02:26:21 +0000 (GMT)
+Received: from epsmges1p5.samsung.com (unknown [182.195.40.165]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 49j75S2tbwzMqYm3; Thu, 11 Jun
+        2020 02:26:20 +0000 (GMT)
+Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
+        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
+        8C.C2.28578.B4691EE5; Thu, 11 Jun 2020 11:26:19 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
+        20200611022619epcas1p46fd9d1d54396f0a4206b550949377d99~XXDXG4U3p2623526235epcas1p4b;
+        Thu, 11 Jun 2020 02:26:19 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20200611022619epsmtrp20a4eafa9091b25fa77161a88a728af10~XXDXGOz600085200852epsmtrp2_;
+        Thu, 11 Jun 2020 02:26:19 +0000 (GMT)
+X-AuditID: b6c32a39-8dfff70000006fa2-32-5ee1964b9b55
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        B8.3B.08303.B4691EE5; Thu, 11 Jun 2020 11:26:19 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.88.103.87]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20200611022619epsmtip1ed4d948064c3f1fcb3f98a0949d7988d~XXDW8jgFo3014530145epsmtip1R;
+        Thu, 11 Jun 2020 02:26:19 +0000 (GMT)
+From:   Namjae Jeon <namjae.jeon@samsung.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     linkinjeon@kernel.org, Namjae Jeon <namjae.jeon@samsung.com>,
+        Stable <stable@vger.kernel.org>,
+        Aurelien Aptel <aaptel@suse.com>,
+        Steve French <smfrench@gmail.com>
+Subject: [PATCH] smb3: add indatalen that can be a non-zero value to
+ calculation of credit charge in smb2 ioctl
+Date:   Thu, 11 Jun 2020 11:21:19 +0900
+Message-Id: <20200611022119.31506-1-namjae.jeon@samsung.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJKsWRmVeSWpSXmKPExsWy7bCmvq73tIdxBre+qFg0vj3NYjFx2lJm
+        ixf/dzFb/Jheb/HmxWE2iwUbHzE6sHnsnHWX3WPTqk42j74tqxg91m+5yuLxeZNcAGtUjk1G
+        amJKapFCal5yfkpmXrqtkndwvHO8qZmBoa6hpYW5kkJeYm6qrZKLT4CuW2YO0AFKCmWJOaVA
+        oYDE4mIlfTubovzSklSFjPziElul1IKUnAJDgwK94sTc4tK8dL3k/FwrQwMDI1OgyoScjBXb
+        L7MUfOCtmNM/iamB8Tl3FyMnh4SAicSW+d1MXYxcHEICOxglbp18zwzhfGKUOLpqJxtIlZDA
+        Z0aJ4w/5YDoONjxhhSjaxSjR2bWXFa5jevMDxi5GDg42AW2JP1tEQRpEBOQk1m46yQJSwyyw
+        Cmjqks3MIAlhgUKJ9ev/MoLYLAKqEnOPnQWL8wrYSOxY/5wVYpu8xOoNB8BOkhBYxS5x9nIn
+        G0TCReLW8aksELawxKvjW9ghbCmJz+/2soEcISFQLfFxPzNEuINR4sV3WwjbWOLm+g2sICXM
+        ApoS63fpQ4QVJXb+ngt2DrMAn8S7rz2sEFN4JTrahCBKVCX6Lh1mgrClJbraP0At9ZD4PamL
+        BRJWsRLnWpexTmCUnYWwYAEj4ypGsdSC4tz01GLDAlPkONrECE5TWpY7GKe//aB3iJGJg/EQ
+        owQHs5IIr6D4wzgh3pTEyqrUovz4otKc1OJDjKbA4JrILCWanA9MlHkl8YamRsbGxhYmZuZm
+        psZK4rxO1hfihATSE0tSs1NTC1KLYPqYODilGpi4fddOufW+cuuV3VOWsrUHeBZa/rPJ5hHn
+        2/whR95Z2WZh5Mqq7zLSly8d0Sjy+cX71Py2VtHfBfEJ0UKSfokFG8/4i/Ne/K6ycc6pVdMr
+        F3dWzNlYUP5cNdCub/K51jNlyte97qx+K1V8pnKl0pzT337OTfnptvwkh4L0H3et+c9kzSca
+        bjA36Cg5fun/tmk3Hxl+mZ6b3vXR4kH8o5SltXvOcK9kXV+3MlZ7ocaXSROe/J0ZHho3YcN1
+        r4Zik30iX+ekdzyuLvNt9xWxs3l2q+Y2q7DgMs0DpRP9Gjx2J6wPlVjy8O9M26Wzt+5b6eB1
+        eXLhLz213QEO1Y0n+XsXJZ5gmnJu6pfwprfZn5LvKrEUZyQaajEXFScCAOzoSD7cAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrBJMWRmVeSWpSXmKPExsWy7bCSnK73tIdxBn3v+S0a355msZg4bSmz
+        xYv/u5gtfkyvt3jz4jCbxYKNjxgd2Dx2zrrL7rFpVSebR9+WVYwe67dcZfH4vEkugDWKyyYl
+        NSezLLVI3y6BK2PF9sssBR94K+b0T2JqYHzO3cXIySEhYCJxsOEJaxcjF4eQwA5GiQVvutkh
+        EtISx06cYe5i5ACyhSUOHy6GqPnAKLGst4UJJM4moC3xZ4soSLmIgJzE2k0nWUBqmAXWMUo8
+        OPqHFSQhLJAvcXvqEmYQm0VAVWLusbNgNq+AjcSO9c9ZIXbJS6zecIB5AiPPAkaGVYySqQXF
+        uem5xYYFRnmp5XrFibnFpXnpesn5uZsYwYGjpbWDcc+qD3qHGJk4GA8xSnAwK4nwCoo/jBPi
+        TUmsrEotyo8vKs1JLT7EKM3BoiTO+3XWwjghgfTEktTs1NSC1CKYLBMHp1QDU1J48uULrV/8
+        nTTOnEuz/BB1+JOWQ0XP6aVHGvI+blu8kPuAaClDtqyoZfXapFnMfWxvWK2ZuS4Y3rz9eb99
+        huvktgny3lECcqdXX89d/kioUdi0LX7nkdKIOR8Mdt1jnXz79sb70g/rJnO8q2A4lPNZY+rG
+        e/HL+ZLmvTT9dmXGJ0Yux34LZZa+C8fbld7N/CPunH3u3rSEwCMq2x0CD0bf2eIXHrzepyUw
+        7mMe2yRpRX2W5pXL/y60/33HVXJpx5rmcOfFJWYXbq2I3rAkJ3SR96yG6Fd27JkcDbpClXOu
+        9RwK2jCRUzvE5906p6niAX+i5r/7Kndq8uzTEqe2borv7mteKiG46swUTV+HU0osxRmJhlrM
+        RcWJAPhBMK+LAgAA
+X-CMS-MailID: 20200611022619epcas1p46fd9d1d54396f0a4206b550949377d99
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20200611022619epcas1p46fd9d1d54396f0a4206b550949377d99
+References: <CGME20200611022619epcas1p46fd9d1d54396f0a4206b550949377d99@epcas1p4.samsung.com>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good to me.
+Some of tests in xfstests failed with cifsd kernel server since commit
+e80ddeb2f70e. cifsd kernel server validates credit charge from client
+by calculating it base on max((InputCount + OutputCount) and
+(MaxInputResponse + MaxOutputResponse)) according to specification.
 
-Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+MS-SMB2 specification describe credit charge calculation of smb2 ioctl :
 
+If Connection.SupportsMultiCredit is TRUE, the server MUST validate
+CreditCharge based on the maximum of (InputCount + OutputCount) and
+(MaxInputResponse + MaxOutputResponse), as specified in section 3.3.5.2.5.
+If the validation fails, it MUST fail the IOCTL request with
+STATUS_INVALID_PARAMETER.
 
-On Wed, Jun 10, 2020 at 6:25 AM Steve French <smfrench@gmail.com> wrote:
->
-> Missing the final 's' in "max_channels" mount option when displayed in
-> /proc/mounts (or by mount command)
->
-> CC: Stable <stable@vger.kernel.org>
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> ---
->  fs/cifs/cifsfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 889f9c71049b..0fb99d25e8a8 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -623,7 +623,7 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
->   seq_printf(s, ",actimeo=%lu", cifs_sb->actimeo / HZ);
->
->   if (tcon->ses->chan_max > 1)
-> - seq_printf(s, ",multichannel,max_channel=%zu",
-> + seq_printf(s, ",multichannel,max_channels=%zu",
->      tcon->ses->chan_max);
->
->   return 0;
->
-> --
-> Thanks,
->
-> Steve
+This patch add indatalen that can be a non-zero value to calculation of
+credit charge in SMB2_ioctl_init().
 
+Fixes: e80ddeb2f70e ("smb3: fix incorrect number of credits when ioctl
+MaxOutputResponse > 64K")
+Cc: Stable <stable@vger.kernel.org>
+Cc: Aurelien Aptel <aaptel@suse.com>
+Cc: Steve French <smfrench@gmail.com>
+Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
+---
+ fs/cifs/smb2pdu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index ded96b529a4d..86d894499fbb 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -2973,7 +2973,9 @@ SMB2_ioctl_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+ 	 * response size smaller.
+ 	 */
+ 	req->MaxOutputResponse = cpu_to_le32(max_response_size);
+-	req->sync_hdr.CreditCharge = cpu_to_le16(DIV_ROUND_UP(max_response_size, SMB2_MAX_BUFFER_SIZE));
++	req->sync_hdr.CreditCharge =
++		cpu_to_le16(DIV_ROUND_UP(max(indatalen, max_response_size),
++					 SMB2_MAX_BUFFER_SIZE));
+ 	if (is_fsctl)
+ 		req->Flags = cpu_to_le32(SMB2_0_IOCTL_IS_FSCTL);
+ 	else
 -- 
--Shyam
+2.17.1
+
