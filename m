@@ -2,156 +2,93 @@ Return-Path: <SRS0=PSEl=75=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67585C433E1
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jun 2020 18:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A98EC433DF
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jun 2020 18:43:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 47AB8207C4
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jun 2020 18:36:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B7BC2082F
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jun 2020 18:43:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VsbTXqwl"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aGv9Om6O"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729794AbgFPSge (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Jun 2020 14:36:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31125 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729861AbgFPSgd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 Jun 2020 14:36:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592332591;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7/6v2jfN6UIDhJeosnSs1R4UAP7mOiLuFVPEnJvGTnM=;
-        b=VsbTXqwl7xxf+MUWbnJM4vCOVIS/iCxA1SAjzyA8FsjzrodShKHnZfMLXBOQL/GHNJH8vC
-        OuxP6I6blTXluNjdUqYdGiIeMKVM7wFH4inGVQHpTaw8gw2uwB0FCvyIBJbPEBsvhu17TV
-        Bbxsdyz8zlcvC51jFF/xVTwdyLhzHT8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-AXrSOJCONRyyvrghDqFtvA-1; Tue, 16 Jun 2020 14:36:27 -0400
-X-MC-Unique: AXrSOJCONRyyvrghDqFtvA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2578680332A;
-        Tue, 16 Jun 2020 18:36:22 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-114-156.rdu2.redhat.com [10.10.114.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B77519C71;
-        Tue, 16 Jun 2020 18:36:16 +0000 (UTC)
-Subject: Re: [PATCH v5 2/2] mm, treewide: Rename kzfree() to kfree_sensitive()
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Joe Perches <joe@perches.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
-        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
-        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        ecryptfs@vger.kernel.org, kasan-dev@googlegroups.com,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-References: <20200616154311.12314-1-longman@redhat.com>
- <20200616154311.12314-3-longman@redhat.com>
- <20200616110944.c13f221e5c3f54e775190afe@linux-foundation.org>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <65002c1e-5e31-1f4e-283c-186e06e55ef0@redhat.com>
-Date:   Tue, 16 Jun 2020 14:36:15 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S1728014AbgFPSnq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Jun 2020 14:43:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45636 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726805AbgFPSnq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 Jun 2020 14:43:46 -0400
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247DCC06174E
+        for <linux-cifs@vger.kernel.org>; Tue, 16 Jun 2020 11:43:46 -0700 (PDT)
+Received: by mail-pj1-x1041.google.com with SMTP id i4so2009869pjd.0
+        for <linux-cifs@vger.kernel.org>; Tue, 16 Jun 2020 11:43:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jQRkR7McObJFQyLrKaEvXEWgrNkrjo6daR1hjZ5rIUg=;
+        b=aGv9Om6OtQxg3xs0G6MCndunFofM9NkscGXm8UQatgIx5QpFMqn3s52ln98T0M4HpX
+         5kYwgyH5LAhdYSYBtFxmUWOfkqVLksFx9tRc3dH8CHI0VqIKXrkk8yIWvBfKFeUy+231
+         rXjhY93RauL3WQ3NFrpmjWHZayqrY/ilrKMrM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jQRkR7McObJFQyLrKaEvXEWgrNkrjo6daR1hjZ5rIUg=;
+        b=gRosW8jVbNAgT0Lgz4Gq7SdgcCG8w6Pzrqxo79lLCDOHdVSI1QgfvzdgDwVoSZPDjz
+         slXvjxP+UYVJKcbevyo6bPQ+KTaJn8IQSR1ddDvsvc6326G2tRs/rGDWLwILyFjPwhKe
+         iYdTu6azi0NLAlLwihJAWIRZ826AxYOkgbJLxTi/7+I+sgdeCDVcwj7RMO5n8kEmTMRv
+         OHY4TAwLh96tTDyc7Nz1LYFjMtX0mwBQZ8BXTUU2fosU16ZzDtdI69NYP0pBUjRjcBFr
+         YcuAzbnp98n5MxIxiyxnGhejzLmG8mRUTblVt/dP5I3yFHjmCIHkofiBwM21BAVDD9a3
+         Yupw==
+X-Gm-Message-State: AOAM5330++EwJiFqXrnUdAEq+W3SwrEkuOYbUAERtTMZJpQueup4WzJK
+        sLPB7vy2XZJtlRq4Np4x7RasBg==
+X-Google-Smtp-Source: ABdhPJxA4+z6TtVV0+DvTH5XeX29TqiO/aEuQqXeIYyFm21Prg7/V3OnPdBDGg2xoDLYY7Z4PWkDlQ==
+X-Received: by 2002:a17:90a:e387:: with SMTP id b7mr4511819pjz.176.1592333025739;
+        Tue, 16 Jun 2020 11:43:45 -0700 (PDT)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id f14sm15445770pgj.62.2020.06.16.11.43.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jun 2020 11:43:44 -0700 (PDT)
+Date:   Tue, 16 Jun 2020 11:43:43 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: Re: [PATCH] cifs: misc: Use array_size() in if-statement controlling
+ expression
+Message-ID: <202006161143.5A4226EC3A@keescook>
+References: <20200615224112.GA12307@embeddedor>
 MIME-Version: 1.0
-In-Reply-To: <20200616110944.c13f221e5c3f54e775190afe@linux-foundation.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200615224112.GA12307@embeddedor>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 6/16/20 2:09 PM, Andrew Morton wrote:
-> On Tue, 16 Jun 2020 11:43:11 -0400 Waiman Long <longman@redhat.com> wrote:
->
->> As said by Linus:
->>
->>    A symmetric naming is only helpful if it implies symmetries in use.
->>    Otherwise it's actively misleading.
->>
->>    In "kzalloc()", the z is meaningful and an important part of what the
->>    caller wants.
->>
->>    In "kzfree()", the z is actively detrimental, because maybe in the
->>    future we really _might_ want to use that "memfill(0xdeadbeef)" or
->>    something. The "zero" part of the interface isn't even _relevant_.
->>
->> The main reason that kzfree() exists is to clear sensitive information
->> that should not be leaked to other future users of the same memory
->> objects.
->>
->> Rename kzfree() to kfree_sensitive() to follow the example of the
->> recently added kvfree_sensitive() and make the intention of the API
->> more explicit. In addition, memzero_explicit() is used to clear the
->> memory to make sure that it won't get optimized away by the compiler.
->>
->> The renaming is done by using the command sequence:
->>
->>    git grep -w --name-only kzfree |\
->>    xargs sed -i 's/\bkzfree\b/kfree_sensitive/'
->>
->> followed by some editing of the kfree_sensitive() kerneldoc and adding
->> a kzfree backward compatibility macro in slab.h.
->>
->> ...
->>
->> --- a/include/linux/slab.h
->> +++ b/include/linux/slab.h
->> @@ -186,10 +186,12 @@ void memcg_deactivate_kmem_caches(struct mem_cgroup *, struct mem_cgroup *);
->>    */
->>   void * __must_check krealloc(const void *, size_t, gfp_t);
->>   void kfree(const void *);
->> -void kzfree(const void *);
->> +void kfree_sensitive(const void *);
->>   size_t __ksize(const void *);
->>   size_t ksize(const void *);
->>   
->> +#define kzfree(x)	kfree_sensitive(x)	/* For backward compatibility */
->> +
-> What was the thinking here?  Is this really necessary?
->
-> I suppose we could keep this around for a while to ease migration.  But
-> not for too long, please.
->
-It should be there just for 1 release cycle. I have broken out the btrfs 
-patch to the btrfs list and I didn't make the kzfree to kfree_sensitive 
-conversion there as that patch was in front in my patch list. So 
-depending on which one lands first, there can be a window where the 
-compilation may fail without this workaround. I am going to send out 
-another patch in the next release cycle to remove it.
+On Mon, Jun 15, 2020 at 05:41:12PM -0500, Gustavo A. R. Silva wrote:
+> Use array_size() instead of the open-coded version in the controlling
+> expression of the if statement.
+> 
+> Also, while there, use the preferred form for passing a size of a struct.
+> The alternative form where struct name is spelled out hurts readability
+> and introduces an opportunity for a bug when the pointer variable type is
+> changed but the corresponding sizeof that is passed as argument is not.
+> 
+> This issue was found with the help of Coccinelle and, audited and fixed
+> manually.
+> 
+> Addresses-KSPP-ID: https://github.com/KSPP/linux/issues/83
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-Cheers,
-Longman
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
+-- 
+Kees Cook
