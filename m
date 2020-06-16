@@ -2,93 +2,114 @@ Return-Path: <SRS0=PSEl=75=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A98EC433DF
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jun 2020 18:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B13C433DF
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jun 2020 18:54:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B7BC2082F
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jun 2020 18:43:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aGv9Om6O"
+	by mail.kernel.org (Postfix) with ESMTP id F14EE207E8
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Jun 2020 18:54:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728014AbgFPSnq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Jun 2020 14:43:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726805AbgFPSnq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 Jun 2020 14:43:46 -0400
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247DCC06174E
-        for <linux-cifs@vger.kernel.org>; Tue, 16 Jun 2020 11:43:46 -0700 (PDT)
-Received: by mail-pj1-x1041.google.com with SMTP id i4so2009869pjd.0
-        for <linux-cifs@vger.kernel.org>; Tue, 16 Jun 2020 11:43:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jQRkR7McObJFQyLrKaEvXEWgrNkrjo6daR1hjZ5rIUg=;
-        b=aGv9Om6OtQxg3xs0G6MCndunFofM9NkscGXm8UQatgIx5QpFMqn3s52ln98T0M4HpX
-         5kYwgyH5LAhdYSYBtFxmUWOfkqVLksFx9tRc3dH8CHI0VqIKXrkk8yIWvBfKFeUy+231
-         rXjhY93RauL3WQ3NFrpmjWHZayqrY/ilrKMrM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jQRkR7McObJFQyLrKaEvXEWgrNkrjo6daR1hjZ5rIUg=;
-        b=gRosW8jVbNAgT0Lgz4Gq7SdgcCG8w6Pzrqxo79lLCDOHdVSI1QgfvzdgDwVoSZPDjz
-         slXvjxP+UYVJKcbevyo6bPQ+KTaJn8IQSR1ddDvsvc6326G2tRs/rGDWLwILyFjPwhKe
-         iYdTu6azi0NLAlLwihJAWIRZ826AxYOkgbJLxTi/7+I+sgdeCDVcwj7RMO5n8kEmTMRv
-         OHY4TAwLh96tTDyc7Nz1LYFjMtX0mwBQZ8BXTUU2fosU16ZzDtdI69NYP0pBUjRjcBFr
-         YcuAzbnp98n5MxIxiyxnGhejzLmG8mRUTblVt/dP5I3yFHjmCIHkofiBwM21BAVDD9a3
-         Yupw==
-X-Gm-Message-State: AOAM5330++EwJiFqXrnUdAEq+W3SwrEkuOYbUAERtTMZJpQueup4WzJK
-        sLPB7vy2XZJtlRq4Np4x7RasBg==
-X-Google-Smtp-Source: ABdhPJxA4+z6TtVV0+DvTH5XeX29TqiO/aEuQqXeIYyFm21Prg7/V3OnPdBDGg2xoDLYY7Z4PWkDlQ==
-X-Received: by 2002:a17:90a:e387:: with SMTP id b7mr4511819pjz.176.1592333025739;
-        Tue, 16 Jun 2020 11:43:45 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id f14sm15445770pgj.62.2020.06.16.11.43.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jun 2020 11:43:44 -0700 (PDT)
-Date:   Tue, 16 Jun 2020 11:43:43 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: Re: [PATCH] cifs: misc: Use array_size() in if-statement controlling
- expression
-Message-ID: <202006161143.5A4226EC3A@keescook>
-References: <20200615224112.GA12307@embeddedor>
+        id S1727114AbgFPSyA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Jun 2020 14:54:00 -0400
+Received: from smtprelay0159.hostedemail.com ([216.40.44.159]:58294 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726805AbgFPSyA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 16 Jun 2020 14:54:00 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay01.hostedemail.com (Postfix) with ESMTP id 1290410050792;
+        Tue, 16 Jun 2020 18:53:58 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: cent55_291055a26e01
+X-Filterd-Recvd-Size: 3364
+Received: from XPS-9350.home (unknown [47.151.136.130])
+        (Authenticated sender: joe@perches.com)
+        by omf13.hostedemail.com (Postfix) with ESMTPA;
+        Tue, 16 Jun 2020 18:53:51 +0000 (UTC)
+Message-ID: <fe3b9a437be4aeab3bac68f04193cb6daaa5bee4.camel@perches.com>
+Subject: Re: [PATCH v4 0/3] mm, treewide: Rename kzfree() to
+ kfree_sensitive()
+From:   Joe Perches <joe@perches.com>
+To:     Waiman Long <longman@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>
+Cc:     Michal Hocko <mhocko@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Sterba <dsterba@suse.cz>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Date:   Tue, 16 Jun 2020 11:53:50 -0700
+In-Reply-To: <20200616015718.7812-1-longman@redhat.com>
+References: <20200616015718.7812-1-longman@redhat.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.36.2-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200615224112.GA12307@embeddedor>
+Content-Transfer-Encoding: 7bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jun 15, 2020 at 05:41:12PM -0500, Gustavo A. R. Silva wrote:
-> Use array_size() instead of the open-coded version in the controlling
-> expression of the if statement.
-> 
-> Also, while there, use the preferred form for passing a size of a struct.
-> The alternative form where struct name is spelled out hurts readability
-> and introduces an opportunity for a bug when the pointer variable type is
-> changed but the corresponding sizeof that is passed as argument is not.
-> 
-> This issue was found with the help of Coccinelle and, audited and fixed
-> manually.
-> 
-> Addresses-KSPP-ID: https://github.com/KSPP/linux/issues/83
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+On Mon, 2020-06-15 at 21:57 -0400, Waiman Long wrote:
+>  v4:
+>   - Break out the memzero_explicit() change as suggested by Dan Carpenter
+>     so that it can be backported to stable.
+>   - Drop the "crypto: Remove unnecessary memzero_explicit()" patch for
+>     now as there can be a bit more discussion on what is best. It will be
+>     introduced as a separate patch later on after this one is merged.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+To this larger audience and last week without reply:
+https://lore.kernel.org/lkml/573b3fbd5927c643920e1364230c296b23e7584d.camel@perches.com/
 
--- 
-Kees Cook
+Are there _any_ fastpath uses of kfree or vfree?
+
+Many patches have been posted recently to fix mispairings
+of specific types of alloc and free functions.
+
+To eliminate these mispairings at a runtime cost of four
+comparisons, should the kfree/vfree/kvfree/kfree_const
+functions be consolidated into a single kfree?
+
+Something like the below:
+
+   void kfree(const void *addr)
+   {
+   	if (is_kernel_rodata((unsigned long)addr))
+   		return;
+
+   	if (is_vmalloc_addr(addr))
+   		_vfree(addr);
+   	else
+   		_kfree(addr);
+   }
+
+   #define kvfree		kfree
+   #define vfree		kfree
+   #define kfree_const	kfree
+
+
