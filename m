@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC30C433E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Jun 2020 01:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A19C433DF
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Jun 2020 02:23:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20B0221D95
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Jun 2020 01:10:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5929F214DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Jun 2020 02:23:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592442601;
-	bh=LOq9WDryFQBQbvgVCaB1OKHLeNMRXnbcTegbuYzqQAY=;
+	s=default; t=1592447009;
+	bh=2D3kzws+KYsBXtr3Gt9Fxj/LRF9q8n+ybKuM2O2Gmxc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=BeCnaJ73jNrMSJib4S80yoPgTXyswd0dyj6nBWiEBlDGugpmY6xVHZh+yorEdAlxq
-	 XUhhyan9/9qSbRkHxuJ3qKxOMp10NxLMqKdS2oCxwVJGyXOwWMNoKxqeIKQHAQwlKV
-	 FsGIxO4h9AbGEO1KS4A/m2GBwXJAPzOhm15fu0bI=
+	b=MPqhib45yTsEVD/IE6NkD85CubVuy1E/A1dFjNkUKeYmgWA7UfI30BPxJHQ/FgRWB
+	 UaLJpxle/6gxq+twgbc1hNaKnyQuRoJsZUhQxIlHB3Yo+5g01mBTdDK/wVluUsX23q
+	 /ptcRLJO0Zk5GLOQjtu0Rrk6u97RjRrsX8x1Ukkg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728356AbgFRBJ7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Jun 2020 21:09:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36706 "EHLO mail.kernel.org"
+        id S1729866AbgFRBSD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 Jun 2020 21:18:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49328 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728343AbgFRBJ4 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:09:56 -0400
+        id S1729862AbgFRBSA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 17 Jun 2020 21:18:00 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DCB4221D92;
-        Thu, 18 Jun 2020 01:09:54 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3B063206F1;
+        Thu, 18 Jun 2020 01:17:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592442595;
-        bh=LOq9WDryFQBQbvgVCaB1OKHLeNMRXnbcTegbuYzqQAY=;
+        s=default; t=1592443080;
+        bh=2D3kzws+KYsBXtr3Gt9Fxj/LRF9q8n+ybKuM2O2Gmxc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Ii3/40K02JKSed7s3eqJNmXksE8hBl7aS2hoX0UxhNZTvD6ryV+vNXr4LXAnZsbYT
-         C0GZiGSLfAXdz/HFp+P2tkaVlBYIUNjdXtLk1YfG6SiccSgj8CalYUvAHLj1uqa8m1
-         bsCL8SIfFZqkdTqfSN8r5JVurMnEOhLkI6l7W2yA=
+        b=JwKxBux1K36WCMOs9+PLFhe/dd9MqHMl+C3aBVq9jxgXR8lCnSbM/OBFMaHR0Oy2U
+         iO9M0HFXdfHPhLmBPVuWVRlJ3bi3Rty9gjjcpyAnbbB9tN8uEf11CQeO3+QUER/TAu
+         8Sa0xH5cOqNtwI+nZrogbb0/vVpuNdI3BZIcnV6k=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Paulo Alcantara <pc@cjr.nz>, Aurelien Aptel <aaptel@suse.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.7 084/388] cifs: set up next DFS target before generic_ip_connect()
-Date:   Wed, 17 Jun 2020 21:03:01 -0400
-Message-Id: <20200618010805.600873-84-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 066/266] cifs: set up next DFS target before generic_ip_connect()
+Date:   Wed, 17 Jun 2020 21:13:11 -0400
+Message-Id: <20200618011631.604574-66-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200618010805.600873-1-sashal@kernel.org>
-References: <20200618010805.600873-1-sashal@kernel.org>
+In-Reply-To: <20200618011631.604574-1-sashal@kernel.org>
+References: <20200618011631.604574-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -116,10 +116,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 28268ed461b8..47b9fbb70bf5 100644
+index 721b2560caa7..947c4aad5d6a 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -572,26 +572,26 @@ cifs_reconnect(struct TCP_Server_Info *server)
+@@ -614,26 +614,26 @@ cifs_reconnect(struct TCP_Server_Info *server)
  		try_to_freeze();
  
  		mutex_lock(&server->srv_mutex);
