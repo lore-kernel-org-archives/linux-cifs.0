@@ -1,160 +1,77 @@
-Return-Path: <SRS0=dUM4=77=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=VA5C=AB=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A19C433DF
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Jun 2020 02:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8854BC433DF
+	for <linux-cifs@archiver.kernel.org>; Sat, 20 Jun 2020 03:05:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5929F214DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Jun 2020 02:23:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1592447009;
-	bh=2D3kzws+KYsBXtr3Gt9Fxj/LRF9q8n+ybKuM2O2Gmxc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=MPqhib45yTsEVD/IE6NkD85CubVuy1E/A1dFjNkUKeYmgWA7UfI30BPxJHQ/FgRWB
-	 UaLJpxle/6gxq+twgbc1hNaKnyQuRoJsZUhQxIlHB3Yo+5g01mBTdDK/wVluUsX23q
-	 /ptcRLJO0Zk5GLOQjtu0Rrk6u97RjRrsX8x1Ukkg=
+	by mail.kernel.org (Postfix) with ESMTP id 6B4DC22EBE
+	for <linux-cifs@archiver.kernel.org>; Sat, 20 Jun 2020 03:05:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729866AbgFRBSD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Jun 2020 21:18:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49328 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729862AbgFRBSA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 17 Jun 2020 21:18:00 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3B063206F1;
-        Thu, 18 Jun 2020 01:17:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1592443080;
-        bh=2D3kzws+KYsBXtr3Gt9Fxj/LRF9q8n+ybKuM2O2Gmxc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JwKxBux1K36WCMOs9+PLFhe/dd9MqHMl+C3aBVq9jxgXR8lCnSbM/OBFMaHR0Oy2U
-         iO9M0HFXdfHPhLmBPVuWVRlJ3bi3Rty9gjjcpyAnbbB9tN8uEf11CQeO3+QUER/TAu
-         8Sa0xH5cOqNtwI+nZrogbb0/vVpuNdI3BZIcnV6k=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paulo Alcantara <pc@cjr.nz>, Aurelien Aptel <aaptel@suse.com>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 066/266] cifs: set up next DFS target before generic_ip_connect()
-Date:   Wed, 17 Jun 2020 21:13:11 -0400
-Message-Id: <20200618011631.604574-66-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200618011631.604574-1-sashal@kernel.org>
-References: <20200618011631.604574-1-sashal@kernel.org>
+        id S1732243AbgFTDFC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 Jun 2020 23:05:02 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:6295 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732074AbgFTDFB (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 19 Jun 2020 23:05:01 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id B538410D1797047E1A5D;
+        Sat, 20 Jun 2020 10:49:12 +0800 (CST)
+Received: from localhost.localdomain (10.175.101.6) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 20 Jun 2020 10:49:03 +0800
+From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+To:     <zhangxiaoxu5@huawei.com>, <sfrench@samba.org>
+CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>
+Subject: [PATCH] cifs/smb3: Fix data inconsistent when zero file range
+Date:   Fri, 19 Jun 2020 22:50:33 -0400
+Message-ID: <20200620025033.4180077-1-zhangxiaoxu5@huawei.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Paulo Alcantara <pc@cjr.nz>
+CIFS implements the fallocate(FALLOC_FL_ZERO_RANGE) with send SMB
+ioctl(FSCTL_SET_ZERO_DATA) to server. It just set the range of the
+remote file to zero, but local page cache not update, then the data
+inconsistent with server, which leads the xfstest generic/008 failed.
 
-[ Upstream commit aaa3aef34d3ab9499a5c7633823429f7a24e6dff ]
+So we need to remove the local page caches before send SMB
+ioctl(FSCTL_SET_ZERO_DATA) to server. After next read, it will
+re-cache it.
 
-If we mount a very specific DFS link
-
-    \\FS0.FOO.COM\dfs\link -> \FS0\share1, \FS1\share2
-
-where its target list contains NB names ("FS0" & "FS1") rather than
-FQDN ones ("FS0.FOO.COM" & "FS1.FOO.COM"), we end up connecting to
-\FOO\share1 but server->hostname will have "FOO.COM".  The reason is
-because both "FS0" and "FS0.FOO.COM" resolve to same IP address and
-they share same TCP server connection, but "FS0.FOO.COM" was the first
-hostname set -- which is OK.
-
-However, if the echo thread timeouts and we still have a good
-connection to "FS0", in cifs_reconnect()
-
-    rc = generic_ip_connect(server) -> success
-    if (rc) {
-            ...
-            reconn_inval_dfs_target(server, cifs_sb, &tgt_list,
-	                            &tgt_it);
-            ...
-     }
-     ...
-
-it successfully reconnects to "FS0" server but does not set up next
-DFS target - which should be the same target server "\FS0\share1" -
-and server->hostname remains set to "FS0.FOO.COM" rather than "FS0",
-as reconn_inval_dfs_target() would have it set to "FS0" if called
-earlier.
-
-Finally, in __smb2_reconnect(), the reconnect of tcons would fail
-because tcon->ses->server->hostname (FS0.FOO.COM) does not match DFS
-target's hostname (FS0).
-
-Fix that by calling reconn_inval_dfs_target() before
-generic_ip_connect() so server->hostname will get updated correctly
-prior to reconnecting its tcons in __smb2_reconnect().
-
-With "cifs: handle hostnames that resolve to same ip in failover"
-patch
-
-    - The above problem would not occur.
-    - We could save an DNS query to find out that they both resolve to
-      the same ip address.
-
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
 ---
- fs/cifs/connect.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ fs/cifs/smb2ops.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 721b2560caa7..947c4aad5d6a 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -614,26 +614,26 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 		try_to_freeze();
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 736d86b8a910..250b51aca514 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -3187,6 +3187,11 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 	trace_smb3_zero_enter(xid, cfile->fid.persistent_fid, tcon->tid,
+ 			      ses->Suid, offset, len);
  
- 		mutex_lock(&server->srv_mutex);
-+#ifdef CONFIG_CIFS_DFS_UPCALL
- 		/*
- 		 * Set up next DFS target server (if any) for reconnect. If DFS
- 		 * feature is disabled, then we will retry last server we
- 		 * connected to before.
- 		 */
-+		reconn_inval_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
-+#endif
-+		rc = reconn_set_ipaddr(server);
-+		if (rc) {
-+			cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
-+				 __func__, rc);
-+		}
-+
- 		if (cifs_rdma_enabled(server))
- 			rc = smbd_reconnect(server);
- 		else
- 			rc = generic_ip_connect(server);
- 		if (rc) {
- 			cifs_dbg(FYI, "reconnect error %d\n", rc);
--#ifdef CONFIG_CIFS_DFS_UPCALL
--			reconn_inval_dfs_target(server, cifs_sb, &tgt_list,
--						&tgt_it);
--#endif
--			rc = reconn_set_ipaddr(server);
--			if (rc) {
--				cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
--					 __func__, rc);
--			}
- 			mutex_unlock(&server->srv_mutex);
- 			msleep(3000);
- 		} else {
++	/*
++	 * We zero the range through ioctl, so we need remove the page caches
++	 * first, otherwise the data may be inconsistent with the server.
++	 */
++	truncate_pagecache_range(inode, offset, offset + len - 1);
+ 
+ 	/* if file not oplocked can't be sure whether asking to extend size */
+ 	if (!CIFS_CACHE_READ(cifsi))
 -- 
-2.25.1
+2.25.4
 
