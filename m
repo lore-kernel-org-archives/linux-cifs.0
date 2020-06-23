@@ -3,97 +3,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA417C433DF
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jun 2020 19:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D272C433E0
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jun 2020 22:47:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CBEB207F9
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jun 2020 19:02:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E5CC2078A
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jun 2020 22:47:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LeJIgsST"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="ki9HSLMe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387446AbgFWTCB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Jun 2020 15:02:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40238 "EHLO
+        id S2388370AbgFWWr2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Jun 2020 18:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733302AbgFWTCB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Jun 2020 15:02:01 -0400
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A32C061573
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2020 12:02:00 -0700 (PDT)
-Received: by mail-ej1-x642.google.com with SMTP id y10so8321401eje.1
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2020 12:02:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=6bTjlis/JQxZZYEX63I+IFlfqIZ3AlM1gGPkUH9Y0xY=;
-        b=LeJIgsSTyhtxyRT7ufDl18n/squxHPhhWXtI+KsbA+nXXFFNm7YdMBZfv9noe/fViT
-         PCWcybK0LmOioHKb7iE4b3YIoEw88BNZu0dSP+4J62yJi1NFdA0/MP24STsVNLI4yyyh
-         20ORv/+74i+18JqLHGnKQtq4OQeCvzmHGOf+zIxmQ4px9iM3qgCz65XdOEr+YR8JKYv3
-         vpKI3FKMaiL5KzjGO9dl81+Cj06t7UtR0MvsnvIIrnGwiL/BG9ftaB4/br/akY4hvv+5
-         +Su0ghjshvTU9D/UkXwk3o6szB45AdKzbq5Th+gDJ5AztUu4WrUkevikmbarR6XVzY3U
-         TlPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=6bTjlis/JQxZZYEX63I+IFlfqIZ3AlM1gGPkUH9Y0xY=;
-        b=q0y8GBBixM5oHpcngjgtejQZT8gE2cZn09CJle71ZeAauZ746g+q4C4izy5npAorUP
-         ib31ysrGhgF61G4NpHh+IX/2SZ3g42cODwp+bTKjcIkfpFbZLvNMYM73b7QJBOq2CtGe
-         Z+tsSX8s0AkWyA6WCwYVVh2qRz8+YsaCMAXyhflANo2IJgP9XCmE9XW1f6iUplOCPhaL
-         XvYFCZzR/EG1jHkunaHvd37wyTL5xILcsjF5gMAtlHw2ZFm8TRSEAG6hegIQ71Dm5MYV
-         UTgvdG5KOxwK+CIn4EwVhupHdEthKCCVCZd3K/96ZNntm72GP7OU4gdeuDJeLiosQ0Bt
-         JDxQ==
-X-Gm-Message-State: AOAM531kxvYQCJcpYReU82aYDdn7/L3atQEc4adKPPD4ZUUe5XCYoBor
-        r0LjEyXe7A40eianWoIGsn0SsRPTwPkcyNUL+A==
-X-Google-Smtp-Source: ABdhPJwCSc6O5p71X4RctvdCXd5SGwSqeT8Kru9BCBBkm8WHi7UJodgV1B81sB9P4QDnZgA5D0YBZEQGt1OydMaXWMk=
-X-Received: by 2002:a17:906:b748:: with SMTP id fx8mr781819ejb.341.1592938919478;
- Tue, 23 Jun 2020 12:01:59 -0700 (PDT)
+        with ESMTP id S2388029AbgFWWrW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Jun 2020 18:47:22 -0400
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A6AEC0617BA;
+        Tue, 23 Jun 2020 15:31:36 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 49s1GZ6tMcz9sSJ;
+        Wed, 24 Jun 2020 08:31:34 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1592951495;
+        bh=/R9YlfsojdA+nZJbfZR9i9Sn9k6rGyYEMGin+U9bi4o=;
+        h=Date:From:To:Cc:Subject:From;
+        b=ki9HSLMepAGPmudDwr955gO/awj4HkD6pKyZXW8kHxZcY6RK4zCZuwZYLmSso0f6X
+         NzctgY+CFFT1i2cC+UryVYQS2Hkb7gC/liDDKmfZJwNMx8xvm8s+YLHLtkpsXamiqF
+         LWNYw2lS9aw/gC+/YHupKaIWRi4L8xGe2oa5ZlOrxhNoY+noqaHopdaBQ8MDticMxv
+         X+EqTQL1A6FMHpEseatBEhOOPBalKGe/Qb2lGSR9VXW8miyFHQIQPtN/1+5XY4u7vK
+         zRVSBqtyMLhE2G6eTaj8+5hYJZcTa2rcxEyVC8tr71WeeRVYFRFNuL2ThH3aRBJPRI
+         M8pEIkqZ9uq+Q==
+Date:   Wed, 24 Jun 2020 08:31:33 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: linux-next: Signed-off-by missing for commits in the cifs tree
+Message-ID: <20200624083133.466f1f19@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20200623113154.2629513-1-zhangxiaoxu5@huawei.com>
-In-Reply-To: <20200623113154.2629513-1-zhangxiaoxu5@huawei.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Tue, 23 Jun 2020 12:01:46 -0700
-Message-ID: <CAKywueRq=kAVK86DSLQRRREvND7z8sQ1prv60Y_eTRp3Vd0J7g@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] cifs: Fix data insonsistent when fallocate
-To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-Cc:     Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="Sig_/QegfP0ojC2H66AsTbavcfx+";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=B2=D1=82, 23 =D0=B8=D1=8E=D0=BD. 2020 =D0=B3. =D0=B2 04:30, Zhang Xiaox=
-u <zhangxiaoxu5@huawei.com>:
->
-> *** BLURB HERE ***
-> v1->v2:
->   1. add fixes and cc:stable
->   2. punch hole fix address xfstests generic/316 failed
->
-> Zhang Xiaoxu (2):
->   cifs/smb3: Fix data inconsistent when punch hole
->   cifs/smb3: Fix data inconsistent when zero file range
->
->  fs/cifs/smb2ops.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->
-> --
-> 2.25.4
->
+--Sig_/QegfP0ojC2H66AsTbavcfx+
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for fixing the punch hole code path too!
+Hi all,
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+Commits
 
---
-Best regards,
-Pavel Shilovsky
+  52e2b5b30cee ("cifs/smb3: Fix data inconsistent when punch hole")
+  76f77967b39e ("cifs/smb3: Fix data inconsistent when zero file range")
+
+are missing a Signed-off-by from their committer.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/QegfP0ojC2H66AsTbavcfx+
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7ygsUACgkQAVBC80lX
+0GxZUAf/cm3si5j2g7L7itcUjroqYTA4vz/l9uKvNtAL7HkbWuN0vPV2AJAk9CSa
++N75nejGCUuKV1an4GhAS6+GYCvZPU/FbVnPWubZoF+hTfS6VJTVq/ZSNTLUsfjT
+3lYSgz08yPZSPPGjYsZLgbhO4dh1VUFIVzcbYbbwuy6RTLIucvrqiQKM4/NumNwF
+fhtSjsy1H5e7fDUIv8hOqpeL0Fv6gJTE8SXsfThIT0q46DUqfz+MNC3mO+ZO8Vt6
+aIZrLC/BcV55I9/VXJ9hFgovAj6bJqfpIalmCcUlOlYCBg5KUd3UDLmDFKFWS4Ws
+XBq7dFnCuZ1lBWfAdUE1gJP12SoFkA==
+=2qJU
+-----END PGP SIGNATURE-----
+
+--Sig_/QegfP0ojC2H66AsTbavcfx+--
