@@ -2,98 +2,84 @@ Return-Path: <SRS0=Ae4a=AF=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A44CCC433E0
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jun 2020 00:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE127C433E1
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jun 2020 07:09:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68F5820B80
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jun 2020 00:07:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGmPGFa4"
+	by mail.kernel.org (Postfix) with ESMTP id C0A1B20823
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jun 2020 07:09:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387970AbgFXAHi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Jun 2020 20:07:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387951AbgFXAHh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Jun 2020 20:07:37 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3630EC061573;
-        Tue, 23 Jun 2020 17:07:36 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id d13so122250ybk.8;
-        Tue, 23 Jun 2020 17:07:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qShZDIcN/jFhOwqO29jMZXeHqEdC9ZyhtPQiroLvjyE=;
-        b=KGmPGFa43fZf/V6c02MbxHTWqoEWeu62GfXnZr/qc/Kkh1U50EtgVcf1OXjEKiMzFR
-         poq0vb9AjdMXC8ioDD2mE1IctXXgXcrM53zgZ2zw0OyuX7c2Dg4+lqt1+mc4lEu3kqfD
-         7YJjM4yMbt6xJBc9tL2JD0idrIuosv/hTWPKkKPOv63iy8kiPP7hdkWJjpXeNxLiKGmA
-         RvcEssXEpJUW02vNJ2xAu4GRKjdFKHbH31C8R0kFEBPXR+8DMnvBWtQIVhAaVn+3l0va
-         J6BU4QHtV6m07YnbMZ5Z+I/3Dl3beqB+31QRC0Zz/HVb7rLxl3iuuVyden+8C8Day4rO
-         70BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qShZDIcN/jFhOwqO29jMZXeHqEdC9ZyhtPQiroLvjyE=;
-        b=tbys6K/W5l1qVeaC/YQC3jtc0R/FLEqZrjOiP5UIHlLD9FENqWuVmYDCxaDKBQNV2/
-         SmjHaDBvgxFB5E2r4TZJXVrMrYwu/c24pnP3sE0cIzYgAc1SzMl1vo7uvUbXti9pAtfe
-         2Ct3+DHAhRzuwd61qjQvKoLNvVY+8tOwHJaqGST1OcA89XURnoWrMuubnlKCMxR9zF9j
-         +y/uuTHFEdMuvmd0sSTulRwdpNm3kP0t5EmHEjAzx/+YYx+s7GfkMIbkTWtoXgyNO846
-         TO4t+25ZYlc2hoTiyos41jCIECwPLjbH6UlKGExQ0+2NB5umsq5HTPsTCAcMY3mxQX2b
-         aC4A==
-X-Gm-Message-State: AOAM533+JqeAssLVLxDAL7BD1KWJ/+7hi1MEQVdVHhPXSF/rMtxgmg6J
-        CiohidaXLt/zFBeuc7EF9goXwU+E0m3bZ55LSdNWtQ==
-X-Google-Smtp-Source: ABdhPJyTrja1DJ79D22qD1X1gM/+avVVqpHjXFElnVgpFom29/W+s7ljUPvZyduZ5Mi9RQMl2NreT3cr4NzgwI97g8E=
-X-Received: by 2002:a25:bc81:: with SMTP id e1mr37206935ybk.375.1592957255400;
- Tue, 23 Jun 2020 17:07:35 -0700 (PDT)
+        id S2389613AbgFXHJz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Jun 2020 03:09:55 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:6313 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387849AbgFXHJz (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 24 Jun 2020 03:09:55 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 0FC079EA5E84B35BDD1F;
+        Wed, 24 Jun 2020 15:09:53 +0800 (CST)
+Received: from code-website.localdomain (10.175.127.227) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 24 Jun 2020 15:09:49 +0800
+From:   yangerkun <yangerkun@huawei.com>
+To:     <sfrench@samba.org>, <jlayton@kernel.org>, <neilb@suse.de>,
+        <neilb@suse.com>
+CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+        <linux-fsdevel@vger.kernel.org>
+Subject: [PATCH] cifs: remove the retry in cifs_poxis_lock_set
+Date:   Wed, 24 Jun 2020 15:10:53 +0800
+Message-ID: <20200624071053.993784-1-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-References: <20200624083133.466f1f19@canb.auug.org.au>
-In-Reply-To: <20200624083133.466f1f19@canb.auug.org.au>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 23 Jun 2020 19:07:24 -0500
-Message-ID: <CAH2r5muqFH6zxt+uNt=ySeATj9CGtzpAX1TNFPLzqbJg2uaWoA@mail.gmail.com>
-Subject: Re: linux-next: Signed-off-by missing for commits in the cifs tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-CFilter-Loop: Reflected
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-fixed
+The caller of cifs_posix_lock_set will do retry(like
+fcntl_setlk64->do_lock_file_wait) if we will wait for any file_lock.
+So the retry in cifs_poxis_lock_set seems duplicated, remove it to
+make a cleanup.
 
-cifs-2.6.git for-next updated
+Signed-off-by: yangerkun <yangerkun@huawei.com>
+---
+ fs/cifs/file.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-thx
-
-On Tue, Jun 23, 2020 at 5:31 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> Commits
->
->   52e2b5b30cee ("cifs/smb3: Fix data inconsistent when punch hole")
->   76f77967b39e ("cifs/smb3: Fix data inconsistent when zero file range")
->
-> are missing a Signed-off-by from their committer.
->
-> --
-> Cheers,
-> Stephen Rothwell
-
-
-
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 9b0f8f33f832..2c9c24b1805d 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -1162,7 +1162,6 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
+ 	if ((flock->fl_flags & FL_POSIX) == 0)
+ 		return rc;
+ 
+-try_again:
+ 	cifs_down_write(&cinode->lock_sem);
+ 	if (!cinode->can_cache_brlcks) {
+ 		up_write(&cinode->lock_sem);
+@@ -1171,13 +1170,6 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
+ 
+ 	rc = posix_lock_file(file, flock, NULL);
+ 	up_write(&cinode->lock_sem);
+-	if (rc == FILE_LOCK_DEFERRED) {
+-		rc = wait_event_interruptible(flock->fl_wait,
+-					list_empty(&flock->fl_blocked_member));
+-		if (!rc)
+-			goto try_again;
+-		locks_delete_block(flock);
+-	}
+ 	return rc;
+ }
+ 
 -- 
-Thanks,
+2.25.4
 
-Steve
