@@ -1,91 +1,99 @@
-Return-Path: <SRS0=n4et=AE=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Ae4a=AF=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D272C433E0
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jun 2020 22:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A44CCC433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jun 2020 00:07:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E5CC2078A
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Jun 2020 22:47:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68F5820B80
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Jun 2020 00:07:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="ki9HSLMe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGmPGFa4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388370AbgFWWr2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Jun 2020 18:47:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46742 "EHLO
+        id S2387970AbgFXAHi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Jun 2020 20:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388029AbgFWWrW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Jun 2020 18:47:22 -0400
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A6AEC0617BA;
-        Tue, 23 Jun 2020 15:31:36 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 49s1GZ6tMcz9sSJ;
-        Wed, 24 Jun 2020 08:31:34 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1592951495;
-        bh=/R9YlfsojdA+nZJbfZR9i9Sn9k6rGyYEMGin+U9bi4o=;
-        h=Date:From:To:Cc:Subject:From;
-        b=ki9HSLMepAGPmudDwr955gO/awj4HkD6pKyZXW8kHxZcY6RK4zCZuwZYLmSso0f6X
-         NzctgY+CFFT1i2cC+UryVYQS2Hkb7gC/liDDKmfZJwNMx8xvm8s+YLHLtkpsXamiqF
-         LWNYw2lS9aw/gC+/YHupKaIWRi4L8xGe2oa5ZlOrxhNoY+noqaHopdaBQ8MDticMxv
-         X+EqTQL1A6FMHpEseatBEhOOPBalKGe/Qb2lGSR9VXW8miyFHQIQPtN/1+5XY4u7vK
-         zRVSBqtyMLhE2G6eTaj8+5hYJZcTa2rcxEyVC8tr71WeeRVYFRFNuL2ThH3aRBJPRI
-         M8pEIkqZ9uq+Q==
-Date:   Wed, 24 Jun 2020 08:31:33 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commits in the cifs tree
-Message-ID: <20200624083133.466f1f19@canb.auug.org.au>
+        with ESMTP id S2387951AbgFXAHh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Jun 2020 20:07:37 -0400
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3630EC061573;
+        Tue, 23 Jun 2020 17:07:36 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id d13so122250ybk.8;
+        Tue, 23 Jun 2020 17:07:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qShZDIcN/jFhOwqO29jMZXeHqEdC9ZyhtPQiroLvjyE=;
+        b=KGmPGFa43fZf/V6c02MbxHTWqoEWeu62GfXnZr/qc/Kkh1U50EtgVcf1OXjEKiMzFR
+         poq0vb9AjdMXC8ioDD2mE1IctXXgXcrM53zgZ2zw0OyuX7c2Dg4+lqt1+mc4lEu3kqfD
+         7YJjM4yMbt6xJBc9tL2JD0idrIuosv/hTWPKkKPOv63iy8kiPP7hdkWJjpXeNxLiKGmA
+         RvcEssXEpJUW02vNJ2xAu4GRKjdFKHbH31C8R0kFEBPXR+8DMnvBWtQIVhAaVn+3l0va
+         J6BU4QHtV6m07YnbMZ5Z+I/3Dl3beqB+31QRC0Zz/HVb7rLxl3iuuVyden+8C8Day4rO
+         70BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qShZDIcN/jFhOwqO29jMZXeHqEdC9ZyhtPQiroLvjyE=;
+        b=tbys6K/W5l1qVeaC/YQC3jtc0R/FLEqZrjOiP5UIHlLD9FENqWuVmYDCxaDKBQNV2/
+         SmjHaDBvgxFB5E2r4TZJXVrMrYwu/c24pnP3sE0cIzYgAc1SzMl1vo7uvUbXti9pAtfe
+         2Ct3+DHAhRzuwd61qjQvKoLNvVY+8tOwHJaqGST1OcA89XURnoWrMuubnlKCMxR9zF9j
+         +y/uuTHFEdMuvmd0sSTulRwdpNm3kP0t5EmHEjAzx/+YYx+s7GfkMIbkTWtoXgyNO846
+         TO4t+25ZYlc2hoTiyos41jCIECwPLjbH6UlKGExQ0+2NB5umsq5HTPsTCAcMY3mxQX2b
+         aC4A==
+X-Gm-Message-State: AOAM533+JqeAssLVLxDAL7BD1KWJ/+7hi1MEQVdVHhPXSF/rMtxgmg6J
+        CiohidaXLt/zFBeuc7EF9goXwU+E0m3bZ55LSdNWtQ==
+X-Google-Smtp-Source: ABdhPJyTrja1DJ79D22qD1X1gM/+avVVqpHjXFElnVgpFom29/W+s7ljUPvZyduZ5Mi9RQMl2NreT3cr4NzgwI97g8E=
+X-Received: by 2002:a25:bc81:: with SMTP id e1mr37206935ybk.375.1592957255400;
+ Tue, 23 Jun 2020 17:07:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/QegfP0ojC2H66AsTbavcfx+";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+References: <20200624083133.466f1f19@canb.auug.org.au>
+In-Reply-To: <20200624083133.466f1f19@canb.auug.org.au>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 23 Jun 2020 19:07:24 -0500
+Message-ID: <CAH2r5muqFH6zxt+uNt=ySeATj9CGtzpAX1TNFPLzqbJg2uaWoA@mail.gmail.com>
+Subject: Re: linux-next: Signed-off-by missing for commits in the cifs tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/QegfP0ojC2H66AsTbavcfx+
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+fixed
 
-Hi all,
+cifs-2.6.git for-next updated
 
-Commits
+thx
 
-  52e2b5b30cee ("cifs/smb3: Fix data inconsistent when punch hole")
-  76f77967b39e ("cifs/smb3: Fix data inconsistent when zero file range")
+On Tue, Jun 23, 2020 at 5:31 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> Hi all,
+>
+> Commits
+>
+>   52e2b5b30cee ("cifs/smb3: Fix data inconsistent when punch hole")
+>   76f77967b39e ("cifs/smb3: Fix data inconsistent when zero file range")
+>
+> are missing a Signed-off-by from their committer.
+>
+> --
+> Cheers,
+> Stephen Rothwell
 
-are missing a Signed-off-by from their committer.
 
---=20
-Cheers,
-Stephen Rothwell
 
---Sig_/QegfP0ojC2H66AsTbavcfx+
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+-- 
+Thanks,
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl7ygsUACgkQAVBC80lX
-0GxZUAf/cm3si5j2g7L7itcUjroqYTA4vz/l9uKvNtAL7HkbWuN0vPV2AJAk9CSa
-+N75nejGCUuKV1an4GhAS6+GYCvZPU/FbVnPWubZoF+hTfS6VJTVq/ZSNTLUsfjT
-3lYSgz08yPZSPPGjYsZLgbhO4dh1VUFIVzcbYbbwuy6RTLIucvrqiQKM4/NumNwF
-fhtSjsy1H5e7fDUIv8hOqpeL0Fv6gJTE8SXsfThIT0q46DUqfz+MNC3mO+ZO8Vt6
-aIZrLC/BcV55I9/VXJ9hFgovAj6bJqfpIalmCcUlOlYCBg5KUd3UDLmDFKFWS4Ws
-XBq7dFnCuZ1lBWfAdUE1gJP12SoFkA==
-=2qJU
------END PGP SIGNATURE-----
-
---Sig_/QegfP0ojC2H66AsTbavcfx+--
+Steve
