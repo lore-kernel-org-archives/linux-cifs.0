@@ -2,124 +2,89 @@ Return-Path: <SRS0=t+Ft=AK=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D501C433E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jun 2020 01:43:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 552C0C433DF
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jun 2020 01:44:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6606C206C3
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jun 2020 01:43:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 292BD20760
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jun 2020 01:44:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BWEGavXB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZyWSNBWT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726490AbgF2Bno (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 28 Jun 2020 21:43:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51348 "EHLO
+        id S1726465AbgF2Boe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 28 Jun 2020 21:44:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726465AbgF2Bnn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 28 Jun 2020 21:43:43 -0400
-Received: from mail-yb1-xb42.google.com (mail-yb1-xb42.google.com [IPv6:2607:f8b0:4864:20::b42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF860C03E979
-        for <linux-cifs@vger.kernel.org>; Sun, 28 Jun 2020 18:43:43 -0700 (PDT)
-Received: by mail-yb1-xb42.google.com with SMTP id j202so7651943ybg.6
-        for <linux-cifs@vger.kernel.org>; Sun, 28 Jun 2020 18:43:43 -0700 (PDT)
+        with ESMTP id S1726395AbgF2Boe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 28 Jun 2020 21:44:34 -0400
+Received: from mail-yb1-xb44.google.com (mail-yb1-xb44.google.com [IPv6:2607:f8b0:4864:20::b44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C666C03E979
+        for <linux-cifs@vger.kernel.org>; Sun, 28 Jun 2020 18:44:34 -0700 (PDT)
+Received: by mail-yb1-xb44.google.com with SMTP id d13so7643609ybk.8
+        for <linux-cifs@vger.kernel.org>; Sun, 28 Jun 2020 18:44:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=0Km95PiXvt8YcjjLHTYKyBvq8nZQm142W8W3bUFdbOY=;
-        b=BWEGavXBU0qUU7OX/lznbolM1MSz1XPKiHiQsl9RCK6ctAgZoAhRwcmHeyOv/fz171
-         x6dKGWnSwqM7mDEnnzBNv+l1iq9WGPHEhHJZNFCgaCQ7QgHz4Nvm4V88lxiXRFwgq3R+
-         A3YdJak6gqO5Bl537Vn0H0Rjzu16XzYEwUoBwQa0IarOIaSItTU5E2cdmLhsKgw2KjYA
-         /PYzovcJL+RLgLnAt2P4+zROskz8BiuVUht7+9kFYPIC7kv6/HXpQFZMawW8sS8MAuk/
-         YIfOmUm8FgzVTVNofMvYIyXmqdsmicciu1Ni7gKm/KSeXs457AgSLORtBV3aGktwCUf7
-         Naag==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zxVLG+5Sy4XBijldAAhiNFBSBENhbng8ggVK2VWnpok=;
+        b=ZyWSNBWT/dBruZ7toT2nnzD44iG1UrBIKckZjngw1y8pQct06z+dzk6PI05VEJg5GY
+         miTwF9DKMVbTl/fwRlDSN4hbUBb73OXTkZOPN9E3D966JGQM0a4WMrD20MiTh/yzLQcA
+         Qn8xx4GxShgwbYuMpOs/NgEsPmGcfxoB7QzFLNsk4OVIMgcrvwTN/SMIRquMpLZQP45x
+         zZngOeb6pscpwxGznm6aUcuKZEZnBjyCdGPIAK7AFDRDcqxMCYCo3+rtmraYpDYs3mqb
+         rW5fkWfNaOzVEARyMWHewUunoedCN7C8sM/umSgbPwW5xDYs0evgeERkf5W2yA+MXOUP
+         OqEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=0Km95PiXvt8YcjjLHTYKyBvq8nZQm142W8W3bUFdbOY=;
-        b=exAadrsD3clPs7rmUkiMhOsa1Kseg6xHRqbFf60UDDJsEj++or152c0eA7g1tnIU+U
-         k/C6xczO4qof19IrW/6ub3bzsG1C0S3llYF1k1lMFxmsfbp+3YUavthLOmzCexO9r5oH
-         qO9L0EhHpICpabUqS+5OFXC0gdSD12XdW7u9+WNhQyp7WF4lKynU06UgjJJ8mI3d0YN9
-         Oxtj0hpwGMddiTWoujhQhL7fZGwb/DaEmRSBreGgxotjnrgxhjgcTODGNu/4peiktjeM
-         jX+1E7uMSAlD8LockRiaURlNMKeIhW/MTHQm5uDiwyF3Tj6xZn7pzbJXN+WXRG7zTII0
-         L9hQ==
-X-Gm-Message-State: AOAM532r+M6E+HKO3Y9TpwEesdRJmxx22v6TLZiyB7hEt+pQfo8xVEKi
-        N6iAvRpfLBpKXVWgVIEaivgtKARP2Erdinmbls0=
-X-Google-Smtp-Source: ABdhPJzvHWVDUuDCP7xrMK2Cuid5Na4OYZevAkx9QlaBb2Zm7bLdgShRLjLE7P9Yz04wsiYIuxE1is6tSyL+qg/7ofE=
-X-Received: by 2002:a25:d217:: with SMTP id j23mr22422400ybg.85.1593395022855;
- Sun, 28 Jun 2020 18:43:42 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=zxVLG+5Sy4XBijldAAhiNFBSBENhbng8ggVK2VWnpok=;
+        b=oO+MU5T3E3Inw+1FfeFXy982QLDasbD+en/86eiy2UdDuzcXhkFIS/R8vFq/RBnBR+
+         RUhuAuOsmILjhHySRxlPs7eA9L+VQj3fmxsO+7LXWg0Y51QIYP8Ptk3Trk+nwuEl+a8R
+         GUA/JGA25JhdtaKsB7sXBGsVWPA0kKdiExlhk86s1d9vg4CyfMNU22q7ufTZiysOJfzu
+         ArZQKcBMX/FTXG0plpDOQh4LNNDKTCOYiE6EB9NgduqAAzxOZw662VUKBUN//MdOmxEa
+         wK9lEqTyKubCvbVw4l1F1QSX73ulnWky5jW7Kdx3rk5r7OV1GE0WobqU9Zc351UGZMM9
+         2tsg==
+X-Gm-Message-State: AOAM532eEe8W5xl+vpYHKBC+Q62qWYhucJcTg3ZdfzPQ1SNqaNCRIDRP
+        rUWxLPK9RelAlNZE6af5QyIPypNQLYjodUKD/5htGLjwvk8=
+X-Google-Smtp-Source: ABdhPJwVbD5//cBk/paDOkDGYaBqcX2VqnGvNznf7BqjtGKOBiO/PL3XICV25Rk72C4UA9eafg1Kyc3JoHp2Z5zA1UU=
+X-Received: by 2002:a25:e41:: with SMTP id 62mr23520629ybo.91.1593395073613;
+ Sun, 28 Jun 2020 18:44:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200629010638.3418176-1-zhangxiaoxu5@huawei.com>
-In-Reply-To: <20200629010638.3418176-1-zhangxiaoxu5@huawei.com>
+References: <20200626195809.429507-1-paul@darkrain42.org>
+In-Reply-To: <20200626195809.429507-1-paul@darkrain42.org>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 28 Jun 2020 20:43:32 -0500
-Message-ID: <CAH2r5msXBPpGzFfYY+R7RB5XxrFmw5kJTFEwVL4-tKZGcb6YLw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Fix the target file was deleted when rename failed.
-To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
-        CIFS <linux-cifs@vger.kernel.org>
+Date:   Sun, 28 Jun 2020 20:44:23 -0500
+Message-ID: <CAH2r5mtLgvE=0R_d3oUPTvcB_O0e-j3WX91O8QrvMTGSN+bmFQ@mail.gmail.com>
+Subject: Re: [PATCH 0/6] Various fixes for multiuser SMB mounts
+To:     Paul Aurich <paul@darkrain42.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git pending review and testing
+these and the two others (one from one) recently posted tentatively
+merged into cifs-2.6.git for-next pending review and testing
 
 http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/5/builds/73
 
-On Sun, Jun 28, 2020 at 8:05 PM Zhang Xiaoxu <zhangxiaoxu5@huawei.com> wrote:
+On Fri, Jun 26, 2020 at 3:07 PM Paul Aurich <paul@darkrain42.org> wrote:
 >
-> When xfstest generic/035, we found the target file was deleted
-> if the rename return -EACESS.
+> Ensure several mount parameters work properly on multiuser mounts for non-root
+> users, and add the user ID / credentials user ID to the session output in
+> DebugData.
 >
-> In cifs_rename2, we unlink the positive target dentry if rename
-> failed with EACESS or EEXIST, even if the target dentry is positived
-> before rename. Then the existing file was deleted.
+> Note that the 'posix' fix is speculative, as I don't currently have a server
+> instance that supports SMB2 posix extensions.
 >
-> We should just delete the target file which created during the
-> rename.
+> Regards,
+> ~Paul
 >
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-> Cc: stable@vger.kernel.org
-> ---
->  fs/cifs/inode.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index ce95801e9b66..49c3ea8aa845 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -2044,6 +2044,7 @@ cifs_rename2(struct inode *source_dir, struct dentry *source_dentry,
->         FILE_UNIX_BASIC_INFO *info_buf_target;
->         unsigned int xid;
->         int rc, tmprc;
-> +       bool new_target = d_really_is_negative(target_dentry);
->
->         if (flags & ~RENAME_NOREPLACE)
->                 return -EINVAL;
-> @@ -2120,8 +2121,13 @@ cifs_rename2(struct inode *source_dir, struct dentry *source_dentry,
->          */
->
->  unlink_target:
-> -       /* Try unlinking the target dentry if it's not negative */
-> -       if (d_really_is_positive(target_dentry) && (rc == -EACCES || rc == -EEXIST)) {
-> +       /*
-> +        * If the target dentry was created during the rename, try
-> +        * unlinking it if it's not negative
-> +        */
-> +       if (new_target &&
-> +           d_really_is_positive(target_dentry) &&
-> +           (rc == -EACCES || rc == -EEXIST)) {
->                 if (d_is_dir(target_dentry))
->                         tmprc = cifs_rmdir(target_dir, target_dentry);
->                 else
-> --
-> 2.25.4
 >
 
 
