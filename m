@@ -1,63 +1,197 @@
-Return-Path: <SRS0=t+Ft=AK=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=S3IA=AL=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 965F4C433DF
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jun 2020 21:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E672C433E0
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Jun 2020 02:30:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F29C214F1
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Jun 2020 21:23:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D774F206A1
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Jun 2020 02:30:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=darkrain42.org header.i=@darkrain42.org header.b="kKuH2zjz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730771AbgF2VXV convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Jun 2020 17:23:21 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44618 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729592AbgF2SvY (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 29 Jun 2020 14:51:24 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id A5372AC40;
-        Mon, 29 Jun 2020 09:39:03 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Steve French <smfrench@gmail.com>,
-        Paul Aurich <paul@darkrain42.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH 0/6] Various fixes for multiuser SMB mounts
-In-Reply-To: <CAH2r5mtLgvE=0R_d3oUPTvcB_O0e-j3WX91O8QrvMTGSN+bmFQ@mail.gmail.com>
-References: <20200626195809.429507-1-paul@darkrain42.org>
- <CAH2r5mtLgvE=0R_d3oUPTvcB_O0e-j3WX91O8QrvMTGSN+bmFQ@mail.gmail.com>
-Date:   Mon, 29 Jun 2020 11:39:02 +0200
-Message-ID: <87zh8mgqix.fsf@suse.com>
+        id S1726288AbgF3CaT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Jun 2020 22:30:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55744 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726158AbgF3CaT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Jun 2020 22:30:19 -0400
+Received: from mail.darkrain42.org (o-chul.darkrain42.org [IPv6:2600:3c01::f03c:91ff:fe96:292c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CA4CC061755
+        for <linux-cifs@vger.kernel.org>; Mon, 29 Jun 2020 19:30:19 -0700 (PDT)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by o-chul.darkrain42.org (Postfix) with ESMTPSA id 0A22280F1;
+        Mon, 29 Jun 2020 19:30:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=darkrain42.org; s=a;
+        t=1593484218; bh=boAtugMEhDJ9IgIvEjQxOUZM2QDafhXj7S6XfYKT6aI=;
+        h=From:To:Cc:Subject:Date:From;
+        b=kKuH2zjzhPdBZUbQfCVq9Q6nx8zmK0gUfNossEmwObzdENbl3I90FgrLYi75IJcgM
+         Hh16CsE6lc7FKJyhgYQY9Ee+u7Rk7MA0+vB66NQ57wIoZeQcAPhYqZ1pvoQZrvodzA
+         W8CWuhk7Rab0tbkZzfObUJJDbKKCB9qxQs/3PwZudfAZOF4yxfoR3nDZG0oCH1tLfp
+         ckuzeU8HFaOFG28AMixliL5y69PBlyiGbMCJ2Uw7YNQr0Jnbdh7Xm/RRnhPm5uDSRX
+         a0C01syJkJshkbJ3rCmL6nuNpLGvnjt8HpU1hf0E/BnXzwd6qCQUIe8w6s0YfqjYTR
+         JC3Ao65Rcn35Q==
+From:   Paul Aurich <paul@darkrain42.org>
+To:     linux-cifs@vger.kernel.org, sfrench@samba.org
+Cc:     paul@darkrain42.org, Ronnie Sahlberg <lsahlber@redhat.com>,
+        =?UTF-8?q?Aur=C3=A9lien=20Aptel?= <aaptel@suse.com>
+Subject: [PATCH v2] cifs: Fix leak when handling lease break for cached root fid
+Date:   Mon, 29 Jun 2020 19:30:03 -0700
+Message-Id: <20200630023003.1858066-1-paul@darkrain42.org>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Thanks Paul!
+Handling a lease break for the cached root didn't free the
+smb2_lease_break_work allocation, resulting in a leak:
 
-All changes looks good to me and I think could be squashed into 1
-commit: they are all adjusting the volume info used to mount from the master
-tcon, all in the same func.
+    unreferenced object 0xffff98383a5af480 (size 128):
+      comm "cifsd", pid 684, jiffies 4294936606 (age 534.868s)
+      hex dump (first 32 bytes):
+        c0 ff ff ff 1f 00 00 00 88 f4 5a 3a 38 98 ff ff  ..........Z:8...
+        88 f4 5a 3a 38 98 ff ff 80 88 d6 8a ff ff ff ff  ..Z:8...........
+      backtrace:
+        [<0000000068957336>] smb2_is_valid_oplock_break+0x1fa/0x8c0
+        [<0000000073b70b9e>] cifs_demultiplex_thread+0x73d/0xcc0
+        [<00000000905fa372>] kthread+0x11c/0x150
+        [<0000000079378e4e>] ret_from_fork+0x22/0x30
 
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+Avoid this leak by only allocating when necessary.
 
-Steve French <smfrench@gmail.com> writes:
-> these and the two others (one from one) recently posted tentatively
-> merged into cifs-2.6.git for-next pending review and testing
+Fixes: a93864d93977 ("cifs: add lease tracking to the cached root fid")
+Signed-off-by: Paul Aurich <paul@darkrain42.org>
+CC: Stable <stable@vger.kernel.org> # v4.18+
+---
+ fs/cifs/smb2misc.c | 47 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 20 deletions(-)
 
-I don't think we have any multiuser tests, sadly :(
-
-Cheers,
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 6a39451973f8..570c0521fc3c 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -505,8 +505,7 @@ cifs_ses_oplock_break(struct work_struct *work)
+ }
+ 
+ static bool
+-smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+-		    struct smb2_lease_break_work *lw)
++smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp)
+ {
+ 	bool found;
+ 	__u8 lease_state;
+@@ -516,9 +515,13 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+ 	struct cifsInodeInfo *cinode;
+ 	int ack_req = le32_to_cpu(rsp->Flags &
+ 				  SMB2_NOTIFY_BREAK_LEASE_FLAG_ACK_REQUIRED);
++	struct smb2_lease_break_work *lw;
++	struct tcon_link *tlink;
++	__u8 lease_key[SMB2_LEASE_KEY_SIZE];
+ 
+ 	lease_state = le32_to_cpu(rsp->NewLeaseState);
+ 
++	spin_lock(&tcon->open_file_lock);
+ 	list_for_each(tmp, &tcon->openFileList) {
+ 		cfile = list_entry(tmp, struct cifsFileInfo, tlist);
+ 		cinode = CIFS_I(d_inode(cfile->dentry));
+@@ -542,7 +545,8 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+ 		cfile->oplock_level = lease_state;
+ 
+ 		cifs_queue_oplock_break(cfile);
+-		kfree(lw);
++		spin_unlock(&tcon->open_file_lock);
++		spin_unlock(&cifs_tcp_ses_lock);
+ 		return true;
+ 	}
+ 
+@@ -554,10 +558,9 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+ 
+ 		if (!found && ack_req) {
+ 			found = true;
+-			memcpy(lw->lease_key, open->lease_key,
++			memcpy(lease_key, open->lease_key,
+ 			       SMB2_LEASE_KEY_SIZE);
+-			lw->tlink = cifs_get_tlink(open->tlink);
+-			queue_work(cifsiod_wq, &lw->lease_break);
++			tlink = cifs_get_tlink(open->tlink);
+ 		}
+ 
+ 		cifs_dbg(FYI, "found in the pending open list\n");
+@@ -567,6 +570,23 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+ 		open->oplock = lease_state;
+ 	}
+ 
++	spin_unlock(&tcon->open_file_lock);
++	if (found) {
++		spin_unlock(&cifs_tcp_ses_lock);
++
++		lw = kmalloc(sizeof(struct smb2_lease_break_work), GFP_KERNEL);
++		if (!lw) {
++			cifs_put_tlink(tlink);
++			return true;
++		}
++
++		INIT_WORK(&lw->lease_break, cifs_ses_oplock_break);
++		lw->tlink = tlink;
++		lw->lease_state = rsp->NewLeaseState;
++		memcpy(lw->lease_key, lease_key, SMB2_LEASE_KEY_SIZE);
++		queue_work(cifsiod_wq, &lw->lease_break);
++	}
++
+ 	return found;
+ }
+ 
+@@ -578,14 +598,6 @@ smb2_is_valid_lease_break(char *buffer)
+ 	struct TCP_Server_Info *server;
+ 	struct cifs_ses *ses;
+ 	struct cifs_tcon *tcon;
+-	struct smb2_lease_break_work *lw;
+-
+-	lw = kmalloc(sizeof(struct smb2_lease_break_work), GFP_KERNEL);
+-	if (!lw)
+-		return false;
+-
+-	INIT_WORK(&lw->lease_break, cifs_ses_oplock_break);
+-	lw->lease_state = rsp->NewLeaseState;
+ 
+ 	cifs_dbg(FYI, "Checking for lease break\n");
+ 
+@@ -600,15 +612,11 @@ smb2_is_valid_lease_break(char *buffer)
+ 			list_for_each(tmp2, &ses->tcon_list) {
+ 				tcon = list_entry(tmp2, struct cifs_tcon,
+ 						  tcon_list);
+-				spin_lock(&tcon->open_file_lock);
+ 				cifs_stats_inc(
+ 				    &tcon->stats.cifs_stats.num_oplock_brks);
+-				if (smb2_tcon_has_lease(tcon, rsp, lw)) {
+-					spin_unlock(&tcon->open_file_lock);
+-					spin_unlock(&cifs_tcp_ses_lock);
++				if (smb2_tcon_has_lease(tcon, rsp)) {
+ 					return true;
+ 				}
+-				spin_unlock(&tcon->open_file_lock);
+ 
+ 				if (tcon->crfid.is_valid &&
+ 				    !memcmp(rsp->LeaseKey,
+@@ -625,7 +633,6 @@ smb2_is_valid_lease_break(char *buffer)
+ 		}
+ 	}
+ 	spin_unlock(&cifs_tcp_ses_lock);
+-	kfree(lw);
+ 	cifs_dbg(FYI, "Can not process lease break - no lease matched\n");
+ 	return false;
+ }
 -- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
+2.27.0
+
