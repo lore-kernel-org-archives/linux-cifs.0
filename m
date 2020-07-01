@@ -2,124 +2,52 @@ Return-Path: <SRS0=ODO6=AM=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFEFC433DF
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Jul 2020 01:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E62D7C433E0
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Jul 2020 13:13:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 562A920771
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Jul 2020 01:24:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCBB620772
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Jul 2020 13:13:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725988AbgGABYz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Jun 2020 21:24:55 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7321 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725868AbgGABYz (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 30 Jun 2020 21:24:55 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id F3812A17D93A4122CF33;
-        Wed,  1 Jul 2020 09:24:52 +0800 (CST)
-Received: from [127.0.0.1] (10.174.179.106) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Wed, 1 Jul 2020
- 09:24:49 +0800
-Subject: Re: [PATCH] cifs: remove the retry in cifs_poxis_lock_set
-To:     NeilBrown <neilb@suse.de>, <sfrench@samba.org>,
-        <jlayton@kernel.org>, <neilb@suse.com>
-CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-        <linux-fsdevel@vger.kernel.org>
-References: <20200624071053.993784-1-yangerkun@huawei.com>
- <62b291ab-291c-339f-e8e8-ba7b0c4f6670@huawei.com>
- <878sg42nf1.fsf@notabene.neil.brown.name>
-From:   yangerkun <yangerkun@huawei.com>
-Message-ID: <a08a0eb9-1021-c72d-afee-690036bf57d5@huawei.com>
-Date:   Wed, 1 Jul 2020 09:24:48 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1728392AbgGANNP convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Jul 2020 09:13:15 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47162 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728159AbgGANNP (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 1 Jul 2020 09:13:15 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 5723BAF69;
+        Wed,  1 Jul 2020 13:13:14 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Paul Aurich <paul@darkrain42.org>, linux-cifs@vger.kernel.org,
+        sfrench@samba.org
+Cc:     paul@darkrain42.org, Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: Re: [PATCH v2] cifs: Fix leak when handling lease break for cached
+ root fid
+In-Reply-To: <20200630023003.1858066-1-paul@darkrain42.org>
+References: <20200630023003.1858066-1-paul@darkrain42.org>
+Date:   Wed, 01 Jul 2020 15:13:13 +0200
+Message-ID: <87zh8jxtsm.fsf@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <878sg42nf1.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.106]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Great, thanks.
 
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 
-在 2020/7/1 6:34, NeilBrown 写道:
-> On Tue, Jun 30 2020, yangerkun wrote:
-> 
->> Ping...
->>
->> 在 2020/6/24 15:10, yangerkun 写道:
->>> The caller of cifs_posix_lock_set will do retry(like
->>> fcntl_setlk64->do_lock_file_wait) if we will wait for any file_lock.
->>> So the retry in cifs_poxis_lock_set seems duplicated, remove it to
->>> make a cleanup.
-> 
-> If cifs_posix_try_lock() returns FILE_LOCK_DEFERRED (which it might
-> after your patch), then cifs_setlk() will check the return value:
-> 
-> 		if (!rc || rc < 0)
-> 			return rc;
-> 
-> These tests will fail (as FILE_LOCK_DEFERRED is 1) and so it will
-> continue on as though the lock was granted.
-> 
-> So I think your patch is wrong.
-> However I think your goal is correct.  cifs shouldn't be waiting.
-> No other filesystem waits when it gets FILE_LOCK_DEFERRED.
-> 
-> So maybe try to fix up your patch.
-
-Yes, we should check FILE_LOCK_DEFERRED in cifs_setlk after this patch.
-Also we may change 'int rc = 1;' exists in cifs_posix_lock_set since
-FILE_LOCK_DEFERRED equals to 1.
-
-I will send a v2 and thanks a lot for your review!
-
-Thanks,
-Kun.
-
-> Thanks,
-> NeilBrown
-> 
-> 
->>>
->>> Signed-off-by: yangerkun <yangerkun@huawei.com>
->>> ---
->>>    fs/cifs/file.c | 8 --------
->>>    1 file changed, 8 deletions(-)
->>>
->>> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
->>> index 9b0f8f33f832..2c9c24b1805d 100644
->>> --- a/fs/cifs/file.c
->>> +++ b/fs/cifs/file.c
->>> @@ -1162,7 +1162,6 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
->>>    	if ((flock->fl_flags & FL_POSIX) == 0)
->>>    		return rc;
->>>    
->>> -try_again:
->>>    	cifs_down_write(&cinode->lock_sem);
->>>    	if (!cinode->can_cache_brlcks) {
->>>    		up_write(&cinode->lock_sem);
->>> @@ -1171,13 +1170,6 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
->>>    
->>>    	rc = posix_lock_file(file, flock, NULL);
->>>    	up_write(&cinode->lock_sem);
->>> -	if (rc == FILE_LOCK_DEFERRED) {
->>> -		rc = wait_event_interruptible(flock->fl_wait,
->>> -					list_empty(&flock->fl_blocked_member));
->>> -		if (!rc)
->>> -			goto try_again;
->>> -		locks_delete_block(flock);
->>> -	}
->>>    	return rc;
->>>    }
->>>    
->>>
-
+Cheers,
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
