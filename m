@@ -2,113 +2,184 @@ Return-Path: <SRS0=xLh5=AN=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F07C433DF
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jul 2020 07:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F051C433DF
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jul 2020 16:09:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DA9F20884
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jul 2020 07:24:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDC5D20836
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jul 2020 16:08:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYCgLK9q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728062AbgGBHYo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 2 Jul 2020 03:24:44 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:6798 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727938AbgGBHYo (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 2 Jul 2020 03:24:44 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id CA90E34D9277EB53D136;
-        Thu,  2 Jul 2020 15:24:39 +0800 (CST)
-Received: from code-website.localdomain (10.175.127.227) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 2 Jul 2020 15:24:34 +0800
-From:   yangerkun <yangerkun@huawei.com>
-To:     <sfrench@samba.org>, <jlayton@kernel.org>, <neilb@suse.de>
-CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-        <linux-fsdevel@vger.kernel.org>
-Subject: [PATCH v2] cifs: remove the retry in cifs_poxis_lock_set
-Date:   Thu, 2 Jul 2020 15:25:26 +0800
-Message-ID: <20200702072526.1442138-1-yangerkun@huawei.com>
-X-Mailer: git-send-email 2.25.4
+        id S1726199AbgGBQI7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 2 Jul 2020 12:08:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34834 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726068AbgGBQI7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Jul 2020 12:08:59 -0400
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7638C08C5C1;
+        Thu,  2 Jul 2020 09:08:58 -0700 (PDT)
+Received: by mail-ed1-x541.google.com with SMTP id e22so24538550edq.8;
+        Thu, 02 Jul 2020 09:08:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=8Kfuc5CARnznbS/qlVEzSK3r70q6/7pjU8+G3Y0ONZI=;
+        b=ZYCgLK9qiGagOawdqT3P3TYcEgNthQX8uAwqYFVMVmhWg4mEBJcJcfKopH1dxnFCZG
+         d06E7zXNUBwOlwmjbZJlzAHFAr4h7440/Na31kpFSlzojkZCQG5q92KcXyBVc0MZgB4w
+         Hp6Cy8oBy3wYmwaBlXQ/Ij84Bf6swq+s4cxM9Z87KrrhWpgFfHqLByP3fpkuoac/2dyM
+         R+FgZQ/14l38ozg7gzJj02rfIErZMvdmqeOGEbuvqyD2C7aXi1FZkt8kWNptfgWzKt8t
+         BVm2N7Mu1QZkfD6NN05GifskD6BlfGDJD0rWKI2V+/6mixyLm/w8rsPFnbg1/TqnLPG9
+         fRQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=8Kfuc5CARnznbS/qlVEzSK3r70q6/7pjU8+G3Y0ONZI=;
+        b=lC9mTbppVQYxIgJ9yWc6lBminlTRfP6lD5Vydp+u+2GCYsMUOrN2nQYRj//mnPPNzp
+         nYG+k7rALDjeOJX2snmPAJVD53aEGlP/TadzGg33Q4JFYXL0P5YanHRfGBfH4oJPQ3cp
+         O4PXAZh8R0w6tl3lpAq9JzzPUFz47iya3Q/adhl6Ipia6VhxwfGmrmm2TefvE1qSGzPU
+         KXIOSatJTihVnJmvz5kvkUdwu8nBPPSPHq3dkCO2OY541cRKPQ2FUu+QiJkRQkBWqFXa
+         syNfhdmGr+wgZj1uys9cshOAb9xYY3GKcC4gtxb62/AP6rDK6WCMlmxFilySnsbZCqrx
+         yxIg==
+X-Gm-Message-State: AOAM532H1xQ/LVrYPb9XKJDmWeT65Wm2UQE4/ceZaS3FVrf7JVsa53um
+        WTCKvGKuS19auMvCc/L8TWo5gcKqO1shTw6PQw==
+X-Google-Smtp-Source: ABdhPJy0waChbv7GcIB7p+vu56ctYGZl91rMkT00jMJlYf9qe5Yl7H0hV7JxcPSfML8h0lgVzwXZWnf2is39PO0vCDU=
+X-Received: by 2002:a50:cbcd:: with SMTP id l13mr19086813edi.384.1593706137348;
+ Thu, 02 Jul 2020 09:08:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-CFilter-Loop: Reflected
+References: <20200702012202.2700645-1-sashal@kernel.org> <20200702012202.2700645-37-sashal@kernel.org>
+In-Reply-To: <20200702012202.2700645-37-sashal@kernel.org>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Thu, 2 Jul 2020 09:08:45 -0700
+Message-ID: <CAKywueRGSriwuMGtG53i3Bm_ek_k1LMAK0fojf9++7=ar+6u8Q@mail.gmail.com>
+Subject: Re: [PATCH AUTOSEL 5.7 37/53] cifs: Fix double add page to memcg when cifs_readpages
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Stable <stable@vger.kernel.org>,
+        Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
+        Hulk Robot <hulkci@huawei.com>,
+        Steve French <stfrench@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The caller of cifs_posix_lock_set will do retry(like
-fcntl_setlk64->do_lock_file_wait) if we will wait for any file_lock.
-So the retry in cifs_poxis_lock_set seems duplicated, remove it to
-make a cleanup.
+=D1=81=D1=80, 1 =D0=B8=D1=8E=D0=BB. 2020 =D0=B3. =D0=B2 18:35, Sasha Levin =
+<sashal@kernel.org>:
+>
+> From: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+>
+> [ Upstream commit 95a3d8f3af9b0d63b43f221b630beaab9739d13a ]
+>
+> When xfstests generic/451, there is an BUG at mm/memcontrol.c:
+>   page:ffffea000560f2c0 refcount:2 mapcount:0 mapping:000000008544e0ea
+>        index:0xf
+>   mapping->aops:cifs_addr_ops dentry name:"tst-aio-dio-cycle-write.451"
+>   flags: 0x2fffff80000001(locked)
+>   raw: 002fffff80000001 ffffc90002023c50 ffffea0005280088 ffff88815cda021=
+0
+>   raw: 000000000000000f 0000000000000000 00000002ffffffff ffff88817287d00=
+0
+>   page dumped because: VM_BUG_ON_PAGE(page->mem_cgroup)
+>   page->mem_cgroup:ffff88817287d000
+>   ------------[ cut here ]------------
+>   kernel BUG at mm/memcontrol.c:2659!
+>   invalid opcode: 0000 [#1] SMP
+>   CPU: 2 PID: 2038 Comm: xfs_io Not tainted 5.8.0-rc1 #44
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_
+>     073836-buildvm-ppc64le-16.ppc.4
+>   RIP: 0010:commit_charge+0x35/0x50
+>   Code: 0d 48 83 05 54 b2 02 05 01 48 89 77 38 c3 48 c7
+>         c6 78 4a ea ba 48 83 05 38 b2 02 05 01 e8 63 0d9
+>   RSP: 0018:ffffc90002023a50 EFLAGS: 00010202
+>   RAX: 0000000000000000 RBX: ffff88817287d000 RCX: 0000000000000000
+>   RDX: 0000000000000000 RSI: ffff88817ac97ea0 RDI: ffff88817ac97ea0
+>   RBP: ffffea000560f2c0 R08: 0000000000000203 R09: 0000000000000005
+>   R10: 0000000000000030 R11: ffffc900020237a8 R12: 0000000000000000
+>   R13: 0000000000000001 R14: 0000000000000001 R15: ffff88815a1272c0
+>   FS:  00007f5071ab0800(0000) GS:ffff88817ac80000(0000) knlGS:00000000000=
+00000
+>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>   CR2: 000055efcd5ca000 CR3: 000000015d312000 CR4: 00000000000006e0
+>   DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>   DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>   Call Trace:
+>    mem_cgroup_charge+0x166/0x4f0
+>    __add_to_page_cache_locked+0x4a9/0x710
+>    add_to_page_cache_locked+0x15/0x20
+>    cifs_readpages+0x217/0x1270
+>    read_pages+0x29a/0x670
+>    page_cache_readahead_unbounded+0x24f/0x390
+>    __do_page_cache_readahead+0x3f/0x60
+>    ondemand_readahead+0x1f1/0x470
+>    page_cache_async_readahead+0x14c/0x170
+>    generic_file_buffered_read+0x5df/0x1100
+>    generic_file_read_iter+0x10c/0x1d0
+>    cifs_strict_readv+0x139/0x170
+>    new_sync_read+0x164/0x250
+>    __vfs_read+0x39/0x60
+>    vfs_read+0xb5/0x1e0
+>    ksys_pread64+0x85/0xf0
+>    __x64_sys_pread64+0x22/0x30
+>    do_syscall_64+0x69/0x150
+>    entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>   RIP: 0033:0x7f5071fcb1af
+>   Code: Bad RIP value.
+>   RSP: 002b:00007ffde2cdb8e0 EFLAGS: 00000293 ORIG_RAX: 0000000000000011
+>   RAX: ffffffffffffffda RBX: 00007ffde2cdb990 RCX: 00007f5071fcb1af
+>   RDX: 0000000000001000 RSI: 000055efcd5ca000 RDI: 0000000000000003
+>   RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
+>   R10: 0000000000001000 R11: 0000000000000293 R12: 0000000000000001
+>   R13: 000000000009f000 R14: 0000000000000000 R15: 0000000000001000
+>   Modules linked in:
+>   ---[ end trace 725fa14a3e1af65c ]---
+>
+> Since commit 3fea5a499d57 ("mm: memcontrol: convert page cache to a new
+> mem_cgroup_charge() API") not cancel the page charge, the pages maybe
+> double add to pagecache:
+> thread1                       | thread2
+> cifs_readpages
+> readpages_get_pages
+>  add_to_page_cache_locked(head,index=3Dn)=3D0
+>                               | readpages_get_pages
+>                               | add_to_page_cache_locked(head,index=3Dn+1=
+)=3D0
+>  add_to_page_cache_locked(head, index=3Dn+1)=3D-EEXIST
+>  then, will next loop with list head page's
+>  index=3Dn+1 and the page->mapping not NULL
+> readpages_get_pages
+> add_to_page_cache_locked(head, index=3Dn+1)
+>  commit_charge
+>   VM_BUG_ON_PAGE
+>
+> So, we should not do the next loop when any page add to page cache
+> failed.
+>
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
 
-Signed-off-by: yangerkun <yangerkun@huawei.com>
----
- fs/cifs/file.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+Hi Sasha,
 
-v1->v2:
-check FILE_LOCK_DEFERRED in cifs_setlk
+The patch description mentions the commit 3fea5a499d57 that changed
+the behavior and was introduced in v5.8-rc1. I noticed that you are
+targeting this patch for 4.9, 4.14, 4.19, 5.4 and 5.7 stable branches.
+Are you going to backport the commit 3fea5a499d57 as well?
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 9b0f8f33f832..be46fab4c96d 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -1149,20 +1149,20 @@ cifs_posix_lock_test(struct file *file, struct file_lock *flock)
- 
- /*
-  * Set the byte-range lock (posix style). Returns:
-- * 1) 0, if we set the lock and don't need to request to the server;
-- * 2) 1, if we need to request to the server;
-- * 3) <0, if the error occurs while setting the lock.
-+ * 1) <0, if the error occurs while setting the lock;
-+ * 2) 0, if we set the lock and don't need to request to the server;
-+ * 3) FILE_LOCK_DEFERRED, if we will wait for some other file_lock;
-+ * 4) FILE_LOCK_DEFERRED + 1, if we need to request to the server.
-  */
- static int
- cifs_posix_lock_set(struct file *file, struct file_lock *flock)
- {
- 	struct cifsInodeInfo *cinode = CIFS_I(file_inode(file));
--	int rc = 1;
-+	int rc = FILE_LOCK_DEFERRED + 1;
- 
- 	if ((flock->fl_flags & FL_POSIX) == 0)
- 		return rc;
- 
--try_again:
- 	cifs_down_write(&cinode->lock_sem);
- 	if (!cinode->can_cache_brlcks) {
- 		up_write(&cinode->lock_sem);
-@@ -1171,13 +1171,6 @@ cifs_posix_lock_set(struct file *file, struct file_lock *flock)
- 
- 	rc = posix_lock_file(file, flock, NULL);
- 	up_write(&cinode->lock_sem);
--	if (rc == FILE_LOCK_DEFERRED) {
--		rc = wait_event_interruptible(flock->fl_wait,
--					list_empty(&flock->fl_blocked_member));
--		if (!rc)
--			goto try_again;
--		locks_delete_block(flock);
--	}
- 	return rc;
- }
- 
-@@ -1652,7 +1645,7 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
- 		int posix_lock_type;
- 
- 		rc = cifs_posix_lock_set(file, flock);
--		if (!rc || rc < 0)
-+		if (rc <= FILE_LOCK_DEFERRED)
- 			return rc;
- 
- 		if (type & server->vals->shared_lock_type)
--- 
-2.25.4
-
+--
+Best regards,
+Pavel Shilovsky
