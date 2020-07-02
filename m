@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A44CCC433E1
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jul 2020 01:30:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A984C433DF
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jul 2020 01:31:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74A17206BE
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jul 2020 01:30:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55F82206BE
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Jul 2020 01:31:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1593653410;
-	bh=eFhRPRS1FL4uJ/mBvvcoF15MxKSfnVCWh/qsVZ7Z2Pc=;
+	s=default; t=1593653470;
+	bh=OA5u6xscy9t2k46JPnu2Yt95OyMmpfiU8Xnxkh0UXNE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=HnMmr3kjOjag2Sc/cAyhL4K9Oiwo89T68+C2mTkyf0xpnOe9TYjVh4gmNX98vzh5j
-	 cxDpxvQ9i1n9CNWaUuJ3ZmLdJblvk5ksDtYEzoIm3DqZqKYc98TnSqCDV4MyPbPu5R
-	 dGsn4gpHFTXttvVqjo04yPu8/ZmjbqR8CeySEaCc=
+	b=ABTMGMa5Z/AsuJZ1PVLBkYQK1Ibmk7rhd1OIB6QTPXdSMx/okOzRDq8WYK5R5KymN
+	 wLCjdXHzLWqXu2b2bT3MqzTF9eoOM43jcPDcfg1t00TaFr91xt/4ANZsq3u98qc2VZ
+	 kKnZGnrhWEjgOPoEuqpfX6l8TNAyoJXc/hS07QqM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728686AbgGBBaC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Jul 2020 21:30:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58876 "EHLO mail.kernel.org"
+        id S1729234AbgGBB0l (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Jul 2020 21:26:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58150 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729152AbgGBB1F (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 1 Jul 2020 21:27:05 -0400
+        id S1729105AbgGBB0k (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 1 Jul 2020 21:26:40 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 99CF82083E;
-        Thu,  2 Jul 2020 01:27:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A8E1D20884;
+        Thu,  2 Jul 2020 01:26:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1593653225;
-        bh=eFhRPRS1FL4uJ/mBvvcoF15MxKSfnVCWh/qsVZ7Z2Pc=;
+        s=default; t=1593653200;
+        bh=OA5u6xscy9t2k46JPnu2Yt95OyMmpfiU8Xnxkh0UXNE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rhVk1JZzds7dg1ZxjA0eCeHZ8ZUqQJiruRPKK4FntgighBs/aL500Pr2XF6ONFTx5
-         D1FVOJ7yZ24WQpLPf2bdA+WPyTMrbU6jGiYJP7ti2lWL6gMULDEmzoNEumkFxy2bpd
-         lHHKedz3Hoy0bYJV7dtw+mi+V2kzyG5RhBqAsSRQ=
+        b=wUNCvvzyKj7wFlvsMs7OROdturAz5F1TzkM1todLVLxTxL2TXghjYZGsw6mw7ZSOC
+         32Iai7LFqsUGxJbBckglb8FVKyeNfjrYav0A6ioeD04YqP8uXp1xD7TmRnouv1ZhYq
+         Z90zTVOSEUUxY4W8qnk2BPEM477QtvJYp0o+0JUw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
@@ -45,12 +45,12 @@ Cc:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.14 12/17] cifs: update ctime and mtime during truncate
-Date:   Wed,  1 Jul 2020 21:26:44 -0400
-Message-Id: <20200702012649.2701799-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 20/27] cifs: update ctime and mtime during truncate
+Date:   Wed,  1 Jul 2020 21:26:08 -0400
+Message-Id: <20200702012615.2701532-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200702012649.2701799-1-sashal@kernel.org>
-References: <20200702012649.2701799-1-sashal@kernel.org>
+In-Reply-To: <20200702012615.2701532-1-sashal@kernel.org>
+References: <20200702012615.2701532-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -82,10 +82,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+)
 
 diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index bdce714e94489..b76e733952997 100644
+index 51d410c6f6a47..4a38f16d944db 100644
 --- a/fs/cifs/inode.c
 +++ b/fs/cifs/inode.c
-@@ -2210,6 +2210,15 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
+@@ -2219,6 +2219,15 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
  	if (rc == 0) {
  		cifsInode->server_eof = attrs->ia_size;
  		cifs_setsize(inode, attrs->ia_size);
