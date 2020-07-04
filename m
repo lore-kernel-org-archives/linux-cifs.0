@@ -1,140 +1,113 @@
-Return-Path: <SRS0=eFbg=AO=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=8YYZ=AP=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D97DC433DF
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Jul 2020 09:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F8AC433DF
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Jul 2020 03:44:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63D7320826
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Jul 2020 09:29:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2BFA208C7
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Jul 2020 03:44:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WhcJxmGm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCQdG3Sm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726178AbgGCJ3j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 3 Jul 2020 05:29:39 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30433 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725796AbgGCJ3i (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Jul 2020 05:29:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1593768577;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=lQpWf5TX9QVHOrdyvWflfSMJMbleJhB7ByB8NJFPiFI=;
-        b=WhcJxmGmGq/vRwuvvN9AtU5hV7i51TVoGYzLHWBJU0rgwZxxtIMqJTRmDVNCWG9aHFGTba
-        bDtetPOxUS6FBtddvYBiKTF4es3pF7EGWct75UqhAVoPhD9J1ynZy+qW23zF7R2QOCtgam
-        dS0WrNxTFAk05GSDNfugeUTLwCqdYdk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-ZFmql5YhMtCnN-Hbw8fzhQ-1; Fri, 03 Jul 2020 05:29:35 -0400
-X-MC-Unique: ZFmql5YhMtCnN-Hbw8fzhQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB3F218A8221;
-        Fri,  3 Jul 2020 09:29:34 +0000 (UTC)
-Received: from idlethread.redhat.com (ovpn-114-21.ams2.redhat.com [10.36.114.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A5C3C73FF7;
-        Fri,  3 Jul 2020 09:29:33 +0000 (UTC)
-From:   Roberto Bergantinos Corpas <rbergant@redhat.com>
-To:     sfrench@samba.org
-Cc:     linux-cifs@vger.kernel.org
-Subject: [PATCH] cifs : handle ERRBaduid for SMB1
-Date:   Fri,  3 Jul 2020 11:29:32 +0200
-Message-Id: <20200703092932.18967-1-rbergant@redhat.com>
+        id S1726909AbgGDDoV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 3 Jul 2020 23:44:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52370 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726746AbgGDDoV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Jul 2020 23:44:21 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0300EC061794;
+        Fri,  3 Jul 2020 20:44:21 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id y13so16316907ybj.10;
+        Fri, 03 Jul 2020 20:44:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=yOpzu2a4BTeDbI4M3JEE9Dpc5QS3zg/zl2GIwbh4czo=;
+        b=LCQdG3SmuHJBrZG2CCpfB02smzGeQvQYGKkMRJcPvA9WkmmmIoxEQc7SglHM7bW6rA
+         NvXvrz+0EEq49zDX/Vxs04zvUszC61eIZHe8F0SVHUZISdtugsMJh7H3EVN2m/JBV8Dp
+         F9mAJz0ktePlY4I8N+hUQ04RsXZSbXT3AXlZh1Me1+Aswd4wrxEiHXzT/nl6RTxfsTrz
+         kgcus+FYmHKGjlkcWhYG+RlJ8hAgdqkQYE8ntnr2YyqltIVRkkaZ0AkWMk2o0Prc/CSb
+         n4hqu8C+wl5Ob62cho6jTQ1I5RQ5+ZVFTCI5P/YHbGJenyBp2SmLEIb+OkasYac4+QpM
+         5i9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=yOpzu2a4BTeDbI4M3JEE9Dpc5QS3zg/zl2GIwbh4czo=;
+        b=qS4FGACHlb87F/pv9zsoEzxZhtCk/5WUyNo0opzv9xWMXzDKr+3qx6VSA6mNi1V29u
+         hjvAl12YgDGxdsbNBcrxaCPcobA/eGirL8BU2wAfnACPS0H4/2NSYhAxkSuuzx/FZZc9
+         XlTU/edl9+mBjT/uB5ij62M0PtDBmIVOJeQd9CPZ9z/lUalg5JbI/ynRkmo0R7sCDmUc
+         IBLlPSbRPiBq3QPFzQHP4XlRQOUkdY65nAqci/UThbo7eTGvdVP7CV/yEHj4nBkjz9JF
+         AoQQpN/r/uDkghPwSAF3v5jQLb8HGHV0AmcZD6k7wyhwjCUg7uCyndYe3NgzSHo/KYVM
+         TZmw==
+X-Gm-Message-State: AOAM533D2wnMVtnuvx+4CfSL9/Wb5RgJpQS00Pp78wpW8IxrdIb8706K
+        WMpT80PnSkycC1SZgSdqyZSTFabml6Z0TEDNWD2hifc7
+X-Google-Smtp-Source: ABdhPJwzp9uvAMJY4gSmmPjGFRYuQyjDwbG99DjKonKdkshT0ZIxPuEcaWCEhiam+4QgKud2rGM7x2Bnzp7az318Noo=
+X-Received: by 2002:a25:bc81:: with SMTP id e1mr60463450ybk.375.1593834260097;
+ Fri, 03 Jul 2020 20:44:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 3 Jul 2020 22:44:08 -0500
+Message-ID: <CAH2r5msVSYHHt5y9eCrXJCBiNJEmpkVEF+iHuqTfsM9vQxw+5Q@mail.gmail.com>
+Subject: [GIT PULL] CIFS/SMB3 Fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If server returns ERRBaduid but does not reset transport connection,
-we'll keep sending command with a non-valid UID for the server as long
-as transport is healthy, without actually recovering. This have been
-observed on the field.
+Please pull the following changes since commit
+9ebcfadb0610322ac537dd7aa5d9cbc2b2894c68:
 
-This patch adds ERRBaduid handling so that we set CifsNeedReconnect.
+  Linux 5.8-rc3 (2020-06-28 15:00:24 -0700)
 
-map_and_check_smb_error() can be modified to extend use cases.
+are available in the Git repository at:
 
-Signed-off-by: Roberto Bergantinos Corpas <rbergant@redhat.com>
----
- fs/cifs/cifsproto.h |  1 +
- fs/cifs/netmisc.c   | 27 +++++++++++++++++++++++++++
- fs/cifs/transport.c |  2 +-
- 3 files changed, 29 insertions(+), 1 deletion(-)
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.8-rc3-smb3-fixes
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 948bf3474db1..d72cf20ab048 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -149,6 +149,7 @@ extern int decode_negTokenInit(unsigned char *security_blob, int length,
- extern int cifs_convert_address(struct sockaddr *dst, const char *src, int len);
- extern void cifs_set_port(struct sockaddr *addr, const unsigned short int port);
- extern int map_smb_to_linux_error(char *buf, bool logErr);
-+extern int map_and_check_smb_error(struct mid_q_entry *mid, bool logErr);
- extern void header_assemble(struct smb_hdr *, char /* command */ ,
- 			    const struct cifs_tcon *, int /* length of
- 			    fixed section (word count) in two byte units */);
-diff --git a/fs/cifs/netmisc.c b/fs/cifs/netmisc.c
-index 9b41436fb8db..ae9679a27181 100644
---- a/fs/cifs/netmisc.c
-+++ b/fs/cifs/netmisc.c
-@@ -881,6 +881,33 @@ map_smb_to_linux_error(char *buf, bool logErr)
- 	return rc;
- }
- 
-+int
-+map_and_check_smb_error(struct mid_q_entry *mid, bool logErr)
-+{
-+	int rc;
-+	struct smb_hdr *smb = (struct smb_hdr *)mid->resp_buf;
-+
-+	rc = map_smb_to_linux_error((char *)smb, logErr);
-+	if (rc == -EACCES && !(smb->Flags2 & SMBFLG2_ERR_STATUS)) {
-+		/* possible ERRBaduid */
-+		__u8 class = smb->Status.DosError.ErrorClass;
-+		__u16 code = le16_to_cpu(smb->Status.DosError.Error);
-+
-+		/* switch can be used to handle different errors */
-+		if (class == ERRSRV && code == ERRbaduid) {
-+			cifs_dbg(FYI, "Server returned 0x%x, reconnecting session...\n",
-+				code);
-+			spin_lock(&GlobalMid_Lock);
-+			if (mid->server->tcpStatus != CifsExiting)
-+				mid->server->tcpStatus = CifsNeedReconnect;
-+			spin_unlock(&GlobalMid_Lock);
-+		}
-+	}
-+
-+	return rc;
-+}
-+
-+
- /*
-  * calculate the size of the SMB message based on the fixed header
-  * portion, the number of word parameters and the data portion of the message
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index cb3ee916f527..e8dbd6b55559 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -935,7 +935,7 @@ cifs_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
- 	}
- 
- 	/* BB special case reconnect tid and uid here? */
--	return map_smb_to_linux_error(mid->resp_buf, log_error);
-+	return map_and_check_smb_error(mid, log_error);
- }
- 
- struct mid_q_entry *
--- 
-2.21.0
+for you to fetch changes up to 19e888678bac8c82206eb915eaf72741b2a2615c:
 
+  cifs: prevent truncation from long to int in wait_for_free_credits
+(2020-07-01 20:01:26 -0500)
+
+----------------------------------------------------------------
+8 cifs/smb3 fixes, most for when specifying the multiuser mount flag,
+5 of the fixes for stable.
+
+Regression test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/364
+----------------------------------------------------------------
+Paul Aurich (6):
+      cifs: Display local UID details for SMB sessions in DebugData
+      SMB3: Honor 'seal' flag for multiuser mounts
+      SMB3: Honor persistent/resilient handle flags for multiuser mounts
+      SMB3: Honor lease disabling for multiuser mounts
+      SMB3: Honor 'handletimeout' flag for multiuser mounts
+      SMB3: Honor 'posix' flag for multiuser mounts
+
+Ronnie Sahlberg (1):
+      cifs: prevent truncation from long to int in wait_for_free_credits
+
+Zhang Xiaoxu (1):
+      cifs: Fix the target file was deleted when rename failed.
+
+ fs/cifs/cifs_debug.c |  6 +++++-
+ fs/cifs/connect.c    | 10 ++++++----
+ fs/cifs/inode.c      | 10 ++++++++--
+ fs/cifs/transport.c  |  2 +-
+ 4 files changed, 20 insertions(+), 8 deletions(-)
+
+--
+Thanks,
+
+Steve
