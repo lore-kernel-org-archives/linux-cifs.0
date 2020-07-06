@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FDDEC433E5
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Jul 2020 15:32:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BB3C433DF
+	for <linux-cifs@archiver.kernel.org>; Mon,  6 Jul 2020 15:32:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 801202073E
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Jul 2020 15:32:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6092120708
+	for <linux-cifs@archiver.kernel.org>; Mon,  6 Jul 2020 15:32:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="s40uIvBV"
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="b0//zrd8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729338AbgGFPcF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 6 Jul 2020 11:32:05 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:53950 "EHLO mx.cjr.nz"
+        id S1729197AbgGFPcH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 6 Jul 2020 11:32:07 -0400
+Received: from mx.cjr.nz ([51.158.111.142]:53954 "EHLO mx.cjr.nz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729248AbgGFPcE (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 6 Jul 2020 11:32:04 -0400
+        id S1729316AbgGFPcG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 6 Jul 2020 11:32:06 -0400
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id D60C47FF33;
-        Mon,  6 Jul 2020 15:25:17 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id B1D2A807DC;
+        Mon,  6 Jul 2020 15:25:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1594049119;
+        t=1594049132;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=zYpPOt4NU3XQ+Ma5SjTLNkzkWT+LtpJcGEoCEJhNgCs=;
-        b=s40uIvBVOytPlGasdc1U/5emA+iRwKmJ6tYIJpN8ayGleFBTfE80THxxEXHQaPji0oduI/
-        lcqoJtpVdWoI/AXvHCmaNN4liSjtoodnlFZXGOwFit3ucF/9CpqDmXOKs685yqy/Fv7q+5
-        1tOd7//+TEFPFJW/4jhuGE+efccQFeoPlGzgCqykn+rAWbobeAkjvdGRVI7jZbcJslrWST
-        YoZFJVMvREwA6SnNZt/4AFHuZmbgHw7+OSN77z5sd6wNFJa/gEMNH9+g9mUXkTYeAeCJ+4
-        yj7bvk95FtiE9HrzwHkZbTM7HB48PUVsIQMIQ2q1e2UrOdgxynSwLaJZYK4+cg==
+        bh=khx/ikBjNFF4muTODgLmr+YcOKgU3lbzwu/iv16FiPI=;
+        b=b0//zrd8B2ewkL+kCMNyy08a8t/aDRaFxHjL+XlkcGTzUHEnwCzdvs7L7KuOPNmYKc+hI1
+        L05zkbsYbmJAK9A3X8DZetCyqbDDQ4z4Sk5btb4EH/APpo8SNSliIekpJ8vuJ8bqtE6+Zl
+        xTDdnbAHZzVLVZrk5uZ+RE23M0wQWy844TteMLWpTNrdS9Dhzg3NhyAeignpt3Kr/U5C4t
+        c84j3jM0rq4aoVnNSLYEk4GqGDrT/wOJfiuYkZbLjcAsXbJ1nm2dP/5jg3Gm9GIpvgxuNh
+        Mgm9yN6BgU6+AF5AHHPjHZ4NvVFGo//iuj9Md5R+uOfkRw1u8GBXyUkiWg/ZTA==
 From:   Paulo Alcantara <pc@cjr.nz>
 To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
-Cc:     Stefan Metzmacher <metze@samba.org>, Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH 1/7] cifs: merge __{cifs,smb2}_reconnect[_tcon]() into cifs_tree_connect()
-Date:   Mon,  6 Jul 2020 12:23:56 -0300
-Message-Id: <20200706152402.5721-2-pc@cjr.nz>
+Cc:     Paulo Alcantara <pc@cjr.nz>
+Subject: [PATCH 7/7] cifs: document and cleanup dfs mount
+Date:   Mon,  6 Jul 2020 12:24:02 -0300
+Message-Id: <20200706152402.5721-8-pc@cjr.nz>
 In-Reply-To: <20200706152402.5721-1-pc@cjr.nz>
 References: <20200706152402.5721-1-pc@cjr.nz>
 MIME-Version: 1.0
@@ -55,403 +55,516 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Stefan Metzmacher <metze@samba.org>
+cifs_mount() for DFS mounts is for a long time way too complex to
+follow, mostly because it lacks some documentation, does a lot of
+operations like resolving DFS roots and links, checking for path
+components, perform failover, crap code, etc.
 
-They were identical execpt to CIFSTCon() vs. SMB2_tcon().
-These are also available via ops->tree_connect().
+Besides adding some documentation to it, do some cleanup and ensure
+that the following is implemented and supported:
 
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
+    * non-DFS mounts
+    * DFS failover
+    * DFS root mounts
+        - tcon and cifs_sb must contain DFS path (NOT including prefix)
+        - if prefix path, then save it in cifs_sb and it must not be
+	  changed
+    * DFS link mounts
+      - tcon and cifs_sb must contain DFS path (including prefix)
+      - if prefix path, then save it in cifs_sb and it may be changed
+    * prevent recursion on broken link referrals (MAX_NESTED_LINKS)
+    * check every path component of the currently resolved
+      target (including prefix), and chase them accordingly
+    * make sure that DFS referrals go through newly resolved root
+      servers
+
 Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
 ---
- fs/cifs/cifsproto.h |   3 ++
- fs/cifs/cifssmb.c   | 112 +------------------------------------------
- fs/cifs/connect.c   | 100 +++++++++++++++++++++++++++++++++++++++
- fs/cifs/smb2pdu.c   | 113 +-------------------------------------------
- 4 files changed, 105 insertions(+), 223 deletions(-)
+ fs/cifs/connect.c | 371 +++++++++++++++++++++++-----------------------
+ 1 file changed, 182 insertions(+), 189 deletions(-)
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 7a836ec0438e..93b018723abf 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -271,6 +271,9 @@ extern void cifs_move_llist(struct list_head *source, struct list_head *dest);
- extern void cifs_free_llist(struct list_head *llist);
- extern void cifs_del_lock_waiters(struct cifsLockInfo *lock);
- 
-+extern int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon,
-+			     const struct nls_table *nlsc);
-+
- extern int cifs_negotiate_protocol(const unsigned int xid,
- 				   struct cifs_ses *ses);
- extern int cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index bf41ee048396..a6ea7e7b18cd 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -124,116 +124,6 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
- 	 */
- }
- 
--#ifdef CONFIG_CIFS_DFS_UPCALL
--static int __cifs_reconnect_tcon(const struct nls_table *nlsc,
--				 struct cifs_tcon *tcon)
--{
--	int rc;
--	struct TCP_Server_Info *server = tcon->ses->server;
--	struct dfs_cache_tgt_list tl;
--	struct dfs_cache_tgt_iterator *it = NULL;
--	char *tree;
--	const char *tcp_host;
--	size_t tcp_host_len;
--	const char *dfs_host;
--	size_t dfs_host_len;
--
--	tree = kzalloc(MAX_TREE_SIZE, GFP_KERNEL);
--	if (!tree)
--		return -ENOMEM;
--
--	if (!tcon->dfs_path) {
--		if (tcon->ipc) {
--			scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$",
--				  server->hostname);
--			rc = CIFSTCon(0, tcon->ses, tree, tcon, nlsc);
--		} else {
--			rc = CIFSTCon(0, tcon->ses, tcon->treeName, tcon, nlsc);
--		}
--		goto out;
--	}
--
--	rc = dfs_cache_noreq_find(tcon->dfs_path + 1, NULL, &tl);
--	if (rc)
--		goto out;
--
--	extract_unc_hostname(server->hostname, &tcp_host, &tcp_host_len);
--
--	for (it = dfs_cache_get_tgt_iterator(&tl); it;
--	     it = dfs_cache_get_next_tgt(&tl, it)) {
--		const char *share, *prefix;
--		size_t share_len, prefix_len;
--		bool target_match;
--
--		rc = dfs_cache_get_tgt_share(it, &share, &share_len, &prefix,
--					     &prefix_len);
--		if (rc) {
--			cifs_dbg(VFS, "%s: failed to parse target share %d\n",
--				 __func__, rc);
--			continue;
--		}
--
--		extract_unc_hostname(share, &dfs_host, &dfs_host_len);
--
--		if (dfs_host_len != tcp_host_len
--		    || strncasecmp(dfs_host, tcp_host, dfs_host_len) != 0) {
--			cifs_dbg(FYI, "%s: %.*s doesn't match %.*s\n",
--				 __func__,
--				 (int)dfs_host_len, dfs_host,
--				 (int)tcp_host_len, tcp_host);
--
--			rc = match_target_ip(server, dfs_host, dfs_host_len,
--					     &target_match);
--			if (rc) {
--				cifs_dbg(VFS, "%s: failed to match target ip: %d\n",
--					 __func__, rc);
--				break;
--			}
--
--			if (!target_match) {
--				cifs_dbg(FYI, "%s: skipping target\n", __func__);
--				continue;
--			}
--		}
--
--		if (tcon->ipc) {
--			scnprintf(tree, MAX_TREE_SIZE, "\\\\%.*s\\IPC$",
--				  (int)share_len, share);
--			rc = CIFSTCon(0, tcon->ses, tree, tcon, nlsc);
--		} else {
--			scnprintf(tree, MAX_TREE_SIZE, "\\%.*s", (int)share_len,
--				  share);
--			rc = CIFSTCon(0, tcon->ses, tree, tcon, nlsc);
--			if (!rc) {
--				rc = update_super_prepath(tcon, prefix,
--							  prefix_len);
--				break;
--			}
--		}
--		if (rc == -EREMOTE)
--			break;
--	}
--
--	if (!rc) {
--		if (it)
--			rc = dfs_cache_noreq_update_tgthint(tcon->dfs_path + 1,
--							    it);
--		else
--			rc = -ENOENT;
--	}
--	dfs_cache_free_tgts(&tl);
--out:
--	kfree(tree);
--	return rc;
--}
--#else
--static inline int __cifs_reconnect_tcon(const struct nls_table *nlsc,
--					struct cifs_tcon *tcon)
--{
--	return CIFSTCon(0, tcon->ses, tcon->treeName, tcon, nlsc);
--}
--#endif
--
- /* reconnect the socket, tcon, and smb session if needed */
- static int
- cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
-@@ -338,7 +228,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
- 	}
- 
- 	cifs_mark_open_files_invalid(tcon);
--	rc = __cifs_reconnect_tcon(nls_codepage, tcon);
-+	rc = cifs_tree_connect(0, tcon, nls_codepage);
- 	mutex_unlock(&ses->session_mutex);
- 	cifs_dbg(FYI, "reconnect tcon rc = %d\n", rc);
- 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index a61abde09ffe..5c3c65265478 100644
+index af0c19495626..1e1f84316faa 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -5533,3 +5533,103 @@ cifs_prune_tlinks(struct work_struct *work)
- 	queue_delayed_work(cifsiod_wq, &cifs_sb->prune_tlinks,
- 				TLINK_IDLE_EXPIRE);
+@@ -4423,11 +4423,11 @@ build_unc_path_to_root(const struct smb_vol *vol,
+ static int
+ expand_dfs_referral(const unsigned int xid, struct cifs_ses *ses,
+ 		    struct smb_vol *volume_info, struct cifs_sb_info *cifs_sb,
+-		    int check_prefix)
++		    char *ref_path)
+ {
+ 	int rc;
+ 	struct dfs_info3_param referral = {0};
+-	char *full_path = NULL, *ref_path = NULL, *mdata = NULL;
++	char *full_path = NULL, *mdata = NULL;
+ 
+ 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS)
+ 		return -EREMOTE;
+@@ -4436,9 +4436,6 @@ expand_dfs_referral(const unsigned int xid, struct cifs_ses *ses,
+ 	if (IS_ERR(full_path))
+ 		return PTR_ERR(full_path);
+ 
+-	/* For DFS paths, skip the first '\' of the UNC */
+-	ref_path = check_prefix ? full_path + 1 : volume_info->UNC + 1;
+-
+ 	rc = dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb),
+ 			    ref_path, &referral, NULL);
+ 	if (!rc) {
+@@ -4501,13 +4498,10 @@ static int update_vol_info(const struct dfs_cache_tgt_iterator *tgt_it,
+ 	return 0;
  }
+ 
+-static int setup_dfs_tgt_conn(const char *path,
++static int setup_dfs_tgt_conn(const char *path, const char *full_path,
+ 			      const struct dfs_cache_tgt_iterator *tgt_it,
+-			      struct cifs_sb_info *cifs_sb,
+-			      struct smb_vol *vol,
+-			      unsigned int *xid,
+-			      struct TCP_Server_Info **server,
+-			      struct cifs_ses **ses,
++			      struct cifs_sb_info *cifs_sb, struct smb_vol *vol, unsigned int *xid,
++			      struct TCP_Server_Info **server, struct cifs_ses **ses,
+ 			      struct cifs_tcon **tcon)
+ {
+ 	int rc;
+@@ -4521,8 +4515,7 @@ static int setup_dfs_tgt_conn(const char *path,
+ 	if (rc)
+ 		return rc;
+ 
+-	mdata = cifs_compose_mount_options(cifs_sb->mountdata, path, &ref,
+-					   &fake_devname);
++	mdata = cifs_compose_mount_options(cifs_sb->mountdata, full_path + 1, &ref, &fake_devname);
+ 	free_dfs_info_param(&ref);
+ 
+ 	if (IS_ERR(mdata)) {
+@@ -4545,7 +4538,7 @@ static int setup_dfs_tgt_conn(const char *path,
+ 		mount_put_conns(cifs_sb, *xid, *server, *ses, *tcon);
+ 		rc = mount_get_conns(&fake_vol, cifs_sb, xid, server, ses,
+ 				     tcon);
+-		if (!rc) {
++		if (!rc || (*server && *ses)) {
+ 			/*
+ 			 * We were able to connect to new target server.
+ 			 * Update current volume info with new target server.
+@@ -4557,14 +4550,10 @@ static int setup_dfs_tgt_conn(const char *path,
+ 	return rc;
+ }
+ 
+-static int mount_do_dfs_failover(const char *path,
+-				 struct cifs_sb_info *cifs_sb,
+-				 struct smb_vol *vol,
+-				 struct cifs_ses *root_ses,
+-				 unsigned int *xid,
+-				 struct TCP_Server_Info **server,
+-				 struct cifs_ses **ses,
+-				 struct cifs_tcon **tcon)
++static int do_dfs_failover(const char *path, const char *full_path, struct cifs_sb_info *cifs_sb,
++			   struct smb_vol *vol, struct cifs_ses *root_ses, unsigned int *xid,
++			   struct TCP_Server_Info **server, struct cifs_ses **ses,
++			   struct cifs_tcon **tcon)
+ {
+ 	int rc;
+ 	struct dfs_cache_tgt_list tgt_list;
+@@ -4583,9 +4572,9 @@ static int mount_do_dfs_failover(const char *path,
+ 		if (rc)
+ 			break;
+ 		/* Connect to next DFS target */
+-		rc = setup_dfs_tgt_conn(path, tgt_it, cifs_sb, vol, xid, server,
+-					ses, tcon);
+-		if (!rc || rc == -EACCES || rc == -EOPNOTSUPP)
++		rc = setup_dfs_tgt_conn(path, full_path, tgt_it, cifs_sb, vol, xid, server, ses,
++					tcon);
++		if (!rc || (*server && *ses))
+ 			break;
+ 	}
+ 	if (!rc) {
+@@ -4755,207 +4744,209 @@ static int is_path_remote(struct cifs_sb_info *cifs_sb, struct smb_vol *vol,
+ }
+ 
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-static inline void set_root_tcon(struct cifs_sb_info *cifs_sb,
+-				 struct cifs_tcon *tcon,
+-				 struct cifs_tcon **root)
++static void set_root_ses(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses,
++			 struct cifs_ses **root_ses)
+ {
+-	spin_lock(&cifs_tcp_ses_lock);
+-	tcon->tc_count++;
+-	tcon->remap = cifs_remap(cifs_sb);
+-	spin_unlock(&cifs_tcp_ses_lock);
+-	*root = tcon;
++	if (ses) {
++		spin_lock(&cifs_tcp_ses_lock);
++		ses->ses_count++;
++		ses->tcon_ipc->remap = cifs_remap(cifs_sb);
++		spin_unlock(&cifs_tcp_ses_lock);
++	}
++	*root_ses = ses;
++}
 +
-+#ifdef CONFIG_CIFS_DFS_UPCALL
-+int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const struct nls_table *nlsc)
++static void put_root_ses(struct cifs_ses *ses)
 +{
-+	int rc;
-+	struct TCP_Server_Info *server = tcon->ses->server;
-+	const struct smb_version_operations *ops = server->ops;
-+	struct dfs_cache_tgt_list tl;
-+	struct dfs_cache_tgt_iterator *it = NULL;
-+	char *tree;
-+	const char *tcp_host;
-+	size_t tcp_host_len;
-+	const char *dfs_host;
-+	size_t dfs_host_len;
++	if (ses)
++		cifs_put_smb_ses(ses);
++}
 +
-+	tree = kzalloc(MAX_TREE_SIZE, GFP_KERNEL);
-+	if (!tree)
++/* Check if a path component is remote and then update @dfs_path accordingly */
++static int check_dfs_prepath(struct cifs_sb_info *cifs_sb, struct smb_vol *vol,
++			     const unsigned int xid, struct TCP_Server_Info *server,
++			     struct cifs_tcon *tcon, char **dfs_path)
++{
++	char *path, *s;
++	char sep = CIFS_DIR_SEP(cifs_sb), tmp;
++	char *npath;
++	int rc = 0;
++	int added_treename = tcon->Flags & SMB_SHARE_IS_IN_DFS;
++	int skip = added_treename;
++
++	path = cifs_build_path_to_root(vol, cifs_sb, tcon, added_treename);
++	if (!path)
 +		return -ENOMEM;
 +
-+	if (!tcon->dfs_path) {
-+		if (tcon->ipc) {
-+			scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$", server->hostname);
-+			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
-+		} else {
-+			rc = ops->tree_connect(xid, tcon->ses, tcon->treeName, tcon, nlsc);
-+		}
-+		goto out;
-+	}
-+
-+	rc = dfs_cache_noreq_find(tcon->dfs_path + 1, NULL, &tl);
-+	if (rc)
-+		goto out;
-+
-+	extract_unc_hostname(server->hostname, &tcp_host, &tcp_host_len);
-+
-+	for (it = dfs_cache_get_tgt_iterator(&tl); it; it = dfs_cache_get_next_tgt(&tl, it)) {
-+		const char *share, *prefix;
-+		size_t share_len, prefix_len;
-+		bool target_match;
-+
-+		rc = dfs_cache_get_tgt_share(it, &share, &share_len, &prefix, &prefix_len);
-+		if (rc) {
-+			cifs_dbg(VFS, "%s: failed to parse target share %d\n",
-+				 __func__, rc);
++	/*
++	 * Walk through the path components in @path and check if they're accessible. In case any of
++	 * the components is -EREMOTE, then update @dfs_path with the next DFS referral request path
++	 * (NOT including the remaining components).
++	 */
++	s = path;
++	do {
++		/* skip separators */
++		while (*s && *s == sep)
++			s++;
++		if (!*s)
++			break;
++		/* next separator */
++		while (*s && *s != sep)
++			s++;
++		/*
++		 * if the treename is added, we then have to skip the first
++		 * part within the separators
++		 */
++		if (skip) {
++			skip = 0;
 +			continue;
 +		}
-+
-+		extract_unc_hostname(share, &dfs_host, &dfs_host_len);
-+
-+		if (dfs_host_len != tcp_host_len
-+		    || strncasecmp(dfs_host, tcp_host, dfs_host_len) != 0) {
-+			cifs_dbg(FYI, "%s: %.*s doesn't match %.*s\n", __func__, (int)dfs_host_len,
-+				 dfs_host, (int)tcp_host_len, tcp_host);
-+
-+			rc = match_target_ip(server, dfs_host, dfs_host_len, &target_match);
-+			if (rc) {
-+				cifs_dbg(VFS, "%s: failed to match target ip: %d\n", __func__, rc);
++		tmp = *s;
++		*s = 0;
++		rc = server->ops->is_path_accessible(xid, tcon, cifs_sb, path);
++		if (rc && rc == -EREMOTE) {
++			struct smb_vol v = {NULL};
++			/* if @path contains a tree name, skip it in the prefix path */
++			if (added_treename) {
++				rc = cifs_parse_devname(path, &v);
++				if (rc)
++					break;
++				rc = -EREMOTE;
++				npath = build_unc_path_to_root(&v, cifs_sb, true);
++				cifs_cleanup_volume_info_contents(&v);
++			} else {
++				v.UNC = vol->UNC;
++				v.prepath = path + 1;
++				npath = build_unc_path_to_root(&v, cifs_sb, true);
++			}
++			if (IS_ERR(npath)) {
++				rc = PTR_ERR(npath);
 +				break;
 +			}
-+
-+			if (!target_match) {
-+				cifs_dbg(FYI, "%s: skipping target\n", __func__);
-+				continue;
-+			}
++			kfree(*dfs_path);
++			*dfs_path = npath;
 +		}
++		*s = tmp;
++	} while (rc == 0);
 +
-+		if (tcon->ipc) {
-+			scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$", share);
-+			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
-+		} else {
-+			scnprintf(tree, MAX_TREE_SIZE, "\\%s", share);
-+			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
-+			if (!rc) {
-+				rc = update_super_prepath(tcon, prefix, prefix_len);
-+				break;
-+			}
-+		}
-+		if (rc == -EREMOTE)
-+			break;
-+	}
-+
-+	if (!rc) {
-+		if (it)
-+			rc = dfs_cache_noreq_update_tgthint(tcon->dfs_path + 1, it);
-+		else
-+			rc = -ENOENT;
-+	}
-+	dfs_cache_free_tgts(&tl);
-+out:
-+	kfree(tree);
++	kfree(path);
 +	return rc;
-+}
-+#else
-+int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const struct nls_table *nlsc)
-+{
-+	const struct smb_version_operations *ops = tcon->ses->server->ops;
-+
-+	return ops->tree_connect(xid, tcon->ses, tcon->treeName, tcon, nlsc);
-+}
-+#endif
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 2f4cdd290c46..c03e5b79a969 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -152,117 +152,6 @@ smb2_hdr_assemble(struct smb2_sync_hdr *shdr, __le16 smb2_cmd,
- 	return;
  }
  
--#ifdef CONFIG_CIFS_DFS_UPCALL
--static int __smb2_reconnect(const struct nls_table *nlsc,
--			    struct cifs_tcon *tcon)
--{
--	int rc;
--	struct TCP_Server_Info *server = tcon->ses->server;
--	struct dfs_cache_tgt_list tl;
--	struct dfs_cache_tgt_iterator *it = NULL;
--	char *tree;
--	const char *tcp_host;
--	size_t tcp_host_len;
--	const char *dfs_host;
--	size_t dfs_host_len;
--
--	tree = kzalloc(MAX_TREE_SIZE, GFP_KERNEL);
--	if (!tree)
--		return -ENOMEM;
--
--	if (!tcon->dfs_path) {
--		if (tcon->ipc) {
--			scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$",
--				  server->hostname);
--			rc = SMB2_tcon(0, tcon->ses, tree, tcon, nlsc);
--		} else {
--			rc = SMB2_tcon(0, tcon->ses, tcon->treeName, tcon,
--				       nlsc);
--		}
--		goto out;
--	}
--
--	rc = dfs_cache_noreq_find(tcon->dfs_path + 1, NULL, &tl);
--	if (rc)
--		goto out;
--
--	extract_unc_hostname(server->hostname, &tcp_host, &tcp_host_len);
--
--	for (it = dfs_cache_get_tgt_iterator(&tl); it;
--	     it = dfs_cache_get_next_tgt(&tl, it)) {
--		const char *share, *prefix;
--		size_t share_len, prefix_len;
--		bool target_match;
--
--		rc = dfs_cache_get_tgt_share(it, &share, &share_len, &prefix,
--					     &prefix_len);
+ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
+ {
+ 	int rc = 0;
+ 	unsigned int xid;
+-	struct cifs_ses *ses;
+-	struct cifs_tcon *root_tcon = NULL;
++	struct TCP_Server_Info *server = NULL;
++	struct cifs_ses *ses = NULL, *root_ses = NULL;
+ 	struct cifs_tcon *tcon = NULL;
+-	struct TCP_Server_Info *server;
+-	char *root_path = NULL, *full_path = NULL;
+-	char *old_mountdata, *origin_mountdata = NULL;
+-	int count;
++	int count = 0;
++	char *ref_path = NULL, *full_path = NULL;
++	char *oldmnt = NULL;
++	char *mntdata = NULL;
+ 
+ 	rc = mount_get_conns(vol, cifs_sb, &xid, &server, &ses, &tcon);
+-	if (!rc && tcon) {
+-		/* If not a standalone DFS root, then check if path is remote */
+-		rc = dfs_cache_find(xid, ses, cifs_sb->local_nls,
+-				    cifs_remap(cifs_sb), vol->UNC + 1, NULL,
+-				    NULL);
 -		if (rc) {
--			cifs_dbg(VFS, "%s: failed to parse target share %d\n",
--				 __func__, rc);
--			continue;
+-			rc = is_path_remote(cifs_sb, vol, xid, server, tcon);
+-			if (!rc)
+-				goto out;
+-			if (rc != -EREMOTE)
+-				goto error;
 -		}
+-	}
+ 	/*
+-	 * If first DFS target server went offline and we failed to connect it,
+-	 * server and ses pointers are NULL at this point, though we still have
+-	 * chance to get a cached DFS referral in expand_dfs_referral() and
+-	 * retry next target available in it.
++	 * Unconditionally try to get an DFS referral (even cached) to determine whether it is an
++	 * DFS mount.
+ 	 *
+-	 * If a NULL ses ptr is passed to dfs_cache_find(), a lookup will be
+-	 * performed against DFS path and *no* requests will be sent to server
+-	 * for any new DFS referrals. Hence it's safe to skip checking whether
+-	 * server or ses ptr is NULL.
++	 * Skip prefix path to provide support for DFS referrals from w2k8 servers which don't seem
++	 * to respond with PATH_NOT_COVERED to requests that include the prefix.
+ 	 */
+-	if (rc == -EACCES || rc == -EOPNOTSUPP)
+-		goto error;
 -
--		extract_unc_hostname(share, &dfs_host, &dfs_host_len);
+-	root_path = build_unc_path_to_root(vol, cifs_sb, false);
+-	if (IS_ERR(root_path)) {
+-		rc = PTR_ERR(root_path);
+-		root_path = NULL;
+-		goto error;
+-	}
 -
--		if (dfs_host_len != tcp_host_len
--		    || strncasecmp(dfs_host, tcp_host, dfs_host_len) != 0) {
--			cifs_dbg(FYI, "%s: %.*s doesn't match %.*s\n",
--				 __func__,
--				 (int)dfs_host_len, dfs_host,
--				 (int)tcp_host_len, tcp_host);
+-	full_path = build_unc_path_to_root(vol, cifs_sb, true);
+-	if (IS_ERR(full_path)) {
+-		rc = PTR_ERR(full_path);
+-		full_path = NULL;
+-		goto error;
+-	}
+-	/*
+-	 * Perform an unconditional check for whether there are DFS
+-	 * referrals for this path without prefix, to provide support
+-	 * for DFS referrals from w2k8 servers which don't seem to respond
+-	 * with PATH_NOT_COVERED to requests that include the prefix.
+-	 * Chase the referral if found, otherwise continue normally.
+-	 */
+-	old_mountdata = cifs_sb->mountdata;
+-	(void)expand_dfs_referral(xid, ses, vol, cifs_sb, false);
 -
--			rc = match_target_ip(server, dfs_host, dfs_host_len,
--					     &target_match);
--			if (rc) {
--				cifs_dbg(VFS, "%s: failed to match target ip: %d\n",
--					 __func__, rc);
+-	if (cifs_sb->mountdata == NULL) {
+-		rc = -ENOENT;
+-		goto error;
+-	}
+-
+-	/* Save DFS root volume information for DFS refresh worker */
+-	origin_mountdata = kstrndup(cifs_sb->mountdata,
+-				    strlen(cifs_sb->mountdata), GFP_KERNEL);
+-	if (!origin_mountdata) {
+-		rc = -ENOMEM;
+-		goto error;
+-	}
+-
+-	if (cifs_sb->mountdata != old_mountdata) {
+-		/* If we were redirected, reconnect to new target server */
+-		mount_put_conns(cifs_sb, xid, server, ses, tcon);
+-		rc = mount_get_conns(vol, cifs_sb, &xid, &server, &ses, &tcon);
+-	}
+-	if (rc) {
+-		if (rc == -EACCES || rc == -EOPNOTSUPP)
+-			goto error;
+-		/* Perform DFS failover to any other DFS targets */
+-		rc = mount_do_dfs_failover(root_path + 1, cifs_sb, vol, NULL,
+-					   &xid, &server, &ses, &tcon);
++	if (dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb), vol->UNC + 1, NULL,
++			   NULL)) {
++		/* No DFS referral was returned.  Looks like a regular share. */
+ 		if (rc)
+ 			goto error;
++		/* Check if it is fully accessible and then mount it */
++		rc = is_path_remote(cifs_sb, vol, xid, server, tcon);
++		if (!rc)
++			goto out;
++		if (rc != -EREMOTE)
++			goto error;
+ 	}
+-
+-	kfree(root_path);
+-	root_path = build_unc_path_to_root(vol, cifs_sb, false);
+-	if (IS_ERR(root_path)) {
+-		rc = PTR_ERR(root_path);
+-		root_path = NULL;
++	/* Save mount options */
++	mntdata = kstrndup(cifs_sb->mountdata, strlen(cifs_sb->mountdata), GFP_KERNEL);
++	if (!mntdata) {
++		rc = -ENOMEM;
++		goto error;
++	}
++	/* Get path of DFS root */
++	ref_path = build_unc_path_to_root(vol, cifs_sb, false);
++	if (IS_ERR(ref_path)) {
++		rc = PTR_ERR(ref_path);
++		ref_path = NULL;
+ 		goto error;
+ 	}
+-	/* Cache out resolved root server */
+-	(void)dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb),
+-			     root_path + 1, NULL, NULL);
+-	kfree(root_path);
+-	root_path = NULL;
+-
+-	set_root_tcon(cifs_sb, tcon, &root_tcon);
+-
+-	for (count = 1; ;) {
+-		if (!rc && tcon) {
+-			rc = is_path_remote(cifs_sb, vol, xid, server, tcon);
+-			if (!rc || rc != -EREMOTE)
 -				break;
--			}
--
--			if (!target_match) {
--				cifs_dbg(FYI, "%s: skipping target\n", __func__);
--				continue;
--			}
 -		}
--
--		if (tcon->ipc) {
--			scnprintf(tree, MAX_TREE_SIZE, "\\\\%.*s\\IPC$",
--				  (int)share_len, share);
--			rc = SMB2_tcon(0, tcon->ses, tree, tcon, nlsc);
--		} else {
--			scnprintf(tree, MAX_TREE_SIZE, "\\%.*s", (int)share_len,
--				  share);
--			rc = SMB2_tcon(0, tcon->ses, tree, tcon, nlsc);
--			if (!rc) {
--				rc = update_super_prepath(tcon, prefix,
--							  prefix_len);
--				break;
--			}
--		}
--		if (rc == -EREMOTE)
+-		/*
+-		 * BB: when we implement proper loop detection,
+-		 *     we will remove this check. But now we need it
+-		 *     to prevent an indefinite loop if 'DFS tree' is
+-		 *     misconfigured (i.e. has loops).
+-		 */
+-		if (count++ > MAX_NESTED_LINKS) {
+-			rc = -ELOOP;
 -			break;
--	}
--
--	if (!rc) {
--		if (it)
--			rc = dfs_cache_noreq_update_tgthint(tcon->dfs_path + 1,
--							    it);
--		else
--			rc = -ENOENT;
--	}
--	dfs_cache_free_tgts(&tl);
--out:
--	kfree(tree);
--	return rc;
--}
--#else
--static inline int __smb2_reconnect(const struct nls_table *nlsc,
--				   struct cifs_tcon *tcon)
--{
--	return SMB2_tcon(0, tcon->ses, tcon->treeName, tcon, nlsc);
--}
--#endif
--
- static int
- smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	       struct TCP_Server_Info *server)
-@@ -409,7 +298,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	if (tcon->use_persistent)
- 		tcon->need_reopen_files = true;
+-		}
  
--	rc = __smb2_reconnect(nls_codepage, tcon);
-+	rc = cifs_tree_connect(0, tcon, nls_codepage);
- 	mutex_unlock(&tcon->ses->session_mutex);
++	set_root_ses(cifs_sb, ses, &root_ses);
++	do {
++		/* Save full path of last DFS path we used to resolve final target server */
+ 		kfree(full_path);
+-		full_path = build_unc_path_to_root(vol, cifs_sb, true);
++		full_path = build_unc_path_to_root(vol, cifs_sb, !!count);
+ 		if (IS_ERR(full_path)) {
+ 			rc = PTR_ERR(full_path);
+-			full_path = NULL;
+ 			break;
+ 		}
+-
+-		old_mountdata = cifs_sb->mountdata;
+-		rc = expand_dfs_referral(xid, root_tcon->ses, vol, cifs_sb,
+-					 true);
++		/* Chase referral */
++		oldmnt = cifs_sb->mountdata;
++		rc = expand_dfs_referral(xid, root_ses, vol, cifs_sb, ref_path + 1);
+ 		if (rc)
+ 			break;
+-
+-		if (cifs_sb->mountdata != old_mountdata) {
++		/* Connect to new DFS target only if we were redirected */
++		if (oldmnt != cifs_sb->mountdata) {
+ 			mount_put_conns(cifs_sb, xid, server, ses, tcon);
+-			rc = mount_get_conns(vol, cifs_sb, &xid, &server, &ses,
+-					     &tcon);
+-			/*
+-			 * Ensure that DFS referrals go through new root server.
+-			 */
+-			if (!rc && tcon &&
+-			    (tcon->share_flags & (SHI1005_FLAGS_DFS |
+-						  SHI1005_FLAGS_DFS_ROOT))) {
+-				cifs_put_tcon(root_tcon);
+-				set_root_tcon(cifs_sb, tcon, &root_tcon);
+-			}
++			rc = mount_get_conns(vol, cifs_sb, &xid, &server, &ses, &tcon);
+ 		}
+-		if (rc) {
+-			if (rc == -EACCES || rc == -EOPNOTSUPP)
+-				break;
+-			/* Perform DFS failover to any other DFS targets */
+-			rc = mount_do_dfs_failover(full_path + 1, cifs_sb, vol,
+-						   root_tcon->ses, &xid,
+-						   &server, &ses, &tcon);
+-			if (rc == -EACCES || rc == -EOPNOTSUPP || !server ||
+-			    !ses)
+-				goto error;
++		if (rc && !server && !ses) {
++			/* Failed to connect. Try to connect to other targets in the referral. */
++			rc = do_dfs_failover(ref_path + 1, full_path, cifs_sb, vol, root_ses, &xid,
++					     &server, &ses, &tcon);
+ 		}
+-	}
+-	cifs_put_tcon(root_tcon);
++		if (rc == -EACCES || rc == -EOPNOTSUPP || !server || !ses)
++			break;
++		if (!tcon)
++			continue;
++		/* Make sure that requests go through new root servers */
++		if (tcon->share_flags & (SHI1005_FLAGS_DFS | SHI1005_FLAGS_DFS_ROOT)) {
++			put_root_ses(root_ses);
++			set_root_ses(cifs_sb, ses, &root_ses);
++		}
++		/* Check for remaining path components and then continue chasing them (-EREMOTE) */
++		rc = check_dfs_prepath(cifs_sb, vol, xid, server, tcon, &ref_path);
++		/* Prevent recursion on broken link referrals */
++		if (rc == -EREMOTE && ++count > MAX_NESTED_LINKS)
++			rc = -ELOOP;
++	} while (rc == -EREMOTE);
  
- 	cifs_dbg(FYI, "reconnect tcon rc = %d\n", rc);
+ 	if (rc)
+ 		goto error;
+-
+-	spin_lock(&cifs_tcp_ses_lock);
+-	if (!tcon->dfs_path) {
+-		/* Save full path in new tcon to do failover when reconnecting tcons */
+-		tcon->dfs_path = full_path;
+-		full_path = NULL;
+-		tcon->remap = cifs_remap(cifs_sb);
+-	}
+-	cifs_sb->origin_fullpath = kstrndup(tcon->dfs_path,
+-					    strlen(tcon->dfs_path),
+-					    GFP_ATOMIC);
++	put_root_ses(root_ses);
++	root_ses = NULL;
++	kfree(ref_path);
++	ref_path = NULL;
++	/* Store DFS full path in both superblock and tree connect structures.
++	 *
++	 * For DFS root mounts, the prefix path (cifs_sb->prepath) is preversed during reconnect so
++	 * only the root path is set in cifs_sb->origin_fullpath and tcon->dfs_path. And for DFS
++	 * links, the prefix path is included in both and may be changed during reconnect.  See
++	 * cifs_tree_connect().
++	 */
++	cifs_sb->origin_fullpath = kstrndup(full_path, strlen(full_path), GFP_KERNEL);
+ 	if (!cifs_sb->origin_fullpath) {
+-		spin_unlock(&cifs_tcp_ses_lock);
+ 		rc = -ENOMEM;
+ 		goto error;
+ 	}
++	spin_lock(&cifs_tcp_ses_lock);
++	tcon->dfs_path = full_path;
++	full_path = NULL;
++	tcon->remap = cifs_remap(cifs_sb);
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 
+-	rc = dfs_cache_add_vol(origin_mountdata, vol, cifs_sb->origin_fullpath);
+-	if (rc) {
+-		kfree(cifs_sb->origin_fullpath);
++	/* Add original volume information for DFS cache to be used when refreshing referrals */
++	rc = dfs_cache_add_vol(mntdata, vol, cifs_sb->origin_fullpath);
++	if (rc)
+ 		goto error;
+-	}
+ 	/*
+ 	 * After reconnecting to a different server, unique ids won't
+ 	 * match anymore, so we disable serverino. This prevents
+@@ -4977,9 +4968,11 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
+ 	return mount_setup_tlink(cifs_sb, ses, tcon);
+ 
+ error:
++	kfree(ref_path);
+ 	kfree(full_path);
+-	kfree(root_path);
+-	kfree(origin_mountdata);
++	kfree(mntdata);
++	kfree(cifs_sb->origin_fullpath);
++	put_root_ses(root_ses);
+ 	mount_put_conns(cifs_sb, xid, server, ses, tcon);
+ 	return rc;
+ }
 -- 
 2.27.0
 
