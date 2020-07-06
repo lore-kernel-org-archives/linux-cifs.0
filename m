@@ -6,89 +6,81 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78652C433E0
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Jul 2020 16:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1693C433E1
+	for <linux-cifs@archiver.kernel.org>; Mon,  6 Jul 2020 18:16:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2642C206DF
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Jul 2020 16:45:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A656C206E2
+	for <linux-cifs@archiver.kernel.org>; Mon,  6 Jul 2020 18:16:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="S/symbeH"
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="ArxOe51v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729420AbgGFQpx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 6 Jul 2020 12:45:53 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:2366 "EHLO mx.cjr.nz"
+        id S1729657AbgGFSQd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 6 Jul 2020 14:16:33 -0400
+Received: from mx.cjr.nz ([51.158.111.142]:20616 "EHLO mx.cjr.nz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729384AbgGFQpx (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 6 Jul 2020 12:45:53 -0400
+        id S1729647AbgGFSQd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 6 Jul 2020 14:16:33 -0400
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id DF2637FD17;
-        Mon,  6 Jul 2020 16:45:50 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 0CD167FD17;
+        Mon,  6 Jul 2020 18:16:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1594053951;
+        t=1594059391;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=G7JOJxANU69tkiH1tczdrrVLKZBAGSmUYAxmpxmRYp0=;
-        b=S/symbeH/M33GJV4QPvFkYian3F8lU32LjKI5Gy2LrZ4j4nBpsuCbxInc6WUcRV0vL0qWV
-        ycmDZ+OIA0U/LV7oRTqbwZTIIQ18Wc5zvCOFLExC5hpRJSUc+LN3YPwvaGl1JoO+0x7lAq
-        hfQ8/vjWKmBixzejZSL466RNM0WaVpxgbepj9B9cAmIWmPNMgiXYgkYfH6PH8ftM0R0T9y
-        eFmetgXz9wy2PueFq/d3iKhMqdzcn3ngR5ncssfWDG+qVi+UxRHJHO34jMSI/y4301OWMU
-        j5kqhQD+IdMmAHlb9Jz2i6Mc6d5h4KcaSqOiZkK0tSQfIHXpupbO0hWNkBRhtw==
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=UkV7uofn6W3hAbnqxtSu0N6d34wrEhxJWG1g0/rEvS4=;
+        b=ArxOe51vp2pWq08lD04LNp5LcP0Isc0JwiyheKisMPR5O6zSwibhmQ50nrJnBYA2pe7XIA
+        AKm5AllrVxBJT5wSdsIcic/VGSe+WAIv1eFlFdNf5oT95bj3jpnBHLGucxr/uO1zxlPitD
+        jDTT5n+vv3Nq8oUa9w9dnywuvN8lA1w4Q4iCpzDLzUsSeSKxSjBYlB10nIh1n+CzngqQkJ
+        js7fKqz76tRRxMU/md+IbluhH8Omux6IPXrFMgbLaBENDK6ZXAjy1Diw00Ce8lfffs+BJe
+        XykIQ1KN9DbIlpIDjBQyecZzWS1pQD+zp96CXGZ1yMQF/MW7ZzgB52qXzwl7PQ==
 From:   Paulo Alcantara <pc@cjr.nz>
-To:     Stefan Metzmacher <metze@samba.org>, linux-cifs@vger.kernel.org,
-        smfrench@gmail.com
-Subject: Re: [PATCH 1/7] cifs: merge __{cifs,smb2}_reconnect[_tcon]() into
- cifs_tree_connect()
-In-Reply-To: <87wo3gsl15.fsf@cjr.nz>
-References: <20200706152402.5721-1-pc@cjr.nz>
- <20200706152402.5721-2-pc@cjr.nz>
- <03f472c0-3c36-a28d-41bc-5b064b4ea16f@samba.org> <87wo3gsl15.fsf@cjr.nz>
-Date:   Mon, 06 Jul 2020 13:45:46 -0300
-Message-ID: <87tuyksibp.fsf@cjr.nz>
+To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
+Cc:     Paulo Alcantara <pc@cjr.nz>
+Subject: [PATCH v2 0/7] DFS fixes
+Date:   Mon,  6 Jul 2020 15:16:02 -0300
+Message-Id: <20200706181609.19480-1-pc@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Paulo Alcantara <pc@cjr.nz> writes:
+Hi Steve,
 
-> Stefan Metzmacher <metze@samba.org> writes:
->
->>> +		if (tcon->ipc) {
->>> +			scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$", share);
->>> +			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
->>> +		} else {
->>> +			scnprintf(tree, MAX_TREE_SIZE, "\\%s", share);
->>> +			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
->>> +			if (!rc) {
->>> +				rc = update_super_prepath(tcon, prefix, prefix_len);
->>> +				break;
->>> +			}
->>> +		}
->>
->> The original code used:
->>
->> -		scnprintf(tree, MAX_TREE_SIZE, "\\%.*s", (int)share_len,
->> -			  share);
->>
->> So it's no longer identical.
->>
->> Was the share_len code added after my initial patch?
->
-> Yep.  See
->
->       e4af35fa55b0 (cifs: handle hostnames that resolve to same ip in failover)
->       bacd704a95ad (cifs: handle prefix paths in reconnect)
+Follow some fixes, cleanups and documentation for DFS.
 
-Oh, that's really wrong, sorry.  I should have kept the usage of
-"share_len" in scnprintf() for this commit.  So, in patch 6/7, it should
-use directly "share" instead.
+All DFS failover tests passed with this series in our local buildbot.
 
-Thanks for pointing that out.  I'll send v2 with that fix.
+v1 -> v2:
+  * fix bad rebase that removed usage of "share_len" in scnprintf()
+    (Metze)
+
+Paulo Alcantara (6):
+  cifs: reduce number of referral requests in DFS link lookups
+  cifs: rename reconn_inval_dfs_target()
+  cifs: handle empty list of targets in cifs_reconnect()
+  cifs: handle RESP_GET_DFS_REFERRAL.PathConsumed in reconnect
+  cifs: only update prefix path of DFS links in cifs_tree_connect()
+  cifs: document and cleanup dfs mount
+
+Stefan Metzmacher (1):
+  cifs: merge __{cifs,smb2}_reconnect[_tcon]() into cifs_tree_connect()
+
+ fs/cifs/cifsproto.h |   6 +-
+ fs/cifs/cifssmb.c   | 112 +---------
+ fs/cifs/connect.c   | 504 ++++++++++++++++++++++++++------------------
+ fs/cifs/dfs_cache.c | 136 +++++++++---
+ fs/cifs/dfs_cache.h |   7 +-
+ fs/cifs/misc.c      |   7 +-
+ fs/cifs/smb2pdu.c   | 113 +---------
+ 7 files changed, 428 insertions(+), 457 deletions(-)
+
+-- 
+2.27.0
 
