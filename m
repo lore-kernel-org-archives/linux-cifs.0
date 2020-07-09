@@ -2,124 +2,170 @@ Return-Path: <SRS0=36sk=AU=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E9EC433E0
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jul 2020 16:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D206C433E1
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jul 2020 23:49:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74E97207F9
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jul 2020 16:28:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHhICDma"
+	by mail.kernel.org (Postfix) with ESMTP id EF2EF20720
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Jul 2020 23:49:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1594338582;
+	bh=AzXu3c72rcQmjaWFefYfgiSM/p782Co8EQspHadBs2E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=wI1G8C9trA6cxBF8gEkTddybYgTj8kGz3qTP7C0KAYeJtw6D7TBPGZyV3KIf6N1U+
+	 ecHrTaPdckGSxffYEeMJPhTztK9KgpX1a0qKXLoCU7aGLlKklBn9d9nUuX1KIqFSzT
+	 9WjQv4HOw9xxUDtnYXC7rGoIh3lzy295lTR7IBwc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726890AbgGIQ2t (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 9 Jul 2020 12:28:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726519AbgGIQ2s (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Jul 2020 12:28:48 -0400
-Received: from mail-yb1-xb43.google.com (mail-yb1-xb43.google.com [IPv6:2607:f8b0:4864:20::b43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8648C08C5CE
-        for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2020 09:28:48 -0700 (PDT)
-Received: by mail-yb1-xb43.google.com with SMTP id 187so1314458ybq.2
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2020 09:28:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+SPUZnqGGjdLP+rG1DqReELXlPzGAnp6VG9PW5FEWHE=;
-        b=IHhICDmaSJucKDG0RVJf5/BoUQe/wnoHuXxSua+w+NDqhH+yju9u+6EjAp1AaOYnZQ
-         zQnj+EwPL/TOwUVZ2qJbuEzOc5aKI51whD73hOw71PqY8n19Zk3IuGpo5JOkTWDEItiA
-         dfE/wLarWGSiDelZxcdkTtmD37qacGDJyrqeq6zL054SlrNv19uP/eNhIBThRnT51Ji2
-         Vs39j4AsI1X/9WHS3rYszc8dV3vq+sLG1rKBg0xUGfXN4Gv0gKXbvAdLk+/AdOWfNHAJ
-         8GkCSM47vkpZM3G77tUINp1PL00KnM5KJaTR0eiImHrr1dXDqryoWnY5Jfy1HX9vQGT5
-         nHEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+SPUZnqGGjdLP+rG1DqReELXlPzGAnp6VG9PW5FEWHE=;
-        b=erJU06hvPARn4e8/hUEwwAkVj8m2dAlVzIK5vsh/rFNMNsX6eNzhL+2k5WauEL7LVv
-         68JuRoBwS0vca2W5y4++HemuturSCvirv4XaH7ieD73c5kpR2UOsDKn7v6lg95xj7FdB
-         wxBBx1OeHqAZAslV/HQ23SwYGYzPw5pbuRZyxo3EQNkDXGAAci5misavrSOQ8kwMLRqz
-         jcVHW1F9q+3r8FIF2ZnqO5AWXdeI2lN3eqFonwLVRrMHnQFCwKyEUu5tko8PqLjuoPZ9
-         u8thKJgZai2dvsvuM3FOQUvXNVucxqpyx2bYG1XYoVHoriT7xVzkARFy42F0o4hrXOnD
-         78yw==
-X-Gm-Message-State: AOAM531bEBhZRF1348Xla49L02HAPF8JE+TQ1rWWEWleZfAz2YCLWuB+
-        xorRSz4L5sbBI4lKvFcccZy3rIEnjKeuWrLkXKo=
-X-Google-Smtp-Source: ABdhPJztqAU0r4oeaktbHZxYnYVBZ3n8DZmrJmFJBMw2ineRtDSoyMW+UO8XQ7d1hn3ABv9rl9J9e/j7PD1T91jt5dU=
-X-Received: by 2002:a25:56c3:: with SMTP id k186mr78414123ybb.183.1594312127989;
- Thu, 09 Jul 2020 09:28:47 -0700 (PDT)
+        id S1726272AbgGIXtl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 9 Jul 2020 19:49:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49690 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726269AbgGIXtl (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 9 Jul 2020 19:49:41 -0400
+Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2D0B62070E;
+        Thu,  9 Jul 2020 23:49:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1594338580;
+        bh=AzXu3c72rcQmjaWFefYfgiSM/p782Co8EQspHadBs2E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=CZFNAlYR79C7aQjMjGPPoyc/KUEvRwf9EpYnYLiugzjAQlDJW1D6/FSz/Wx7tbmip
+         Y7cg2Zm6mLl4gOnIbsiivv0QlzXV2O1TVRb7yBIg3TvoqJw+T+ERdgY855R81jWlpo
+         5A/94AlR4UfYswXBPFy1pQp2IxPAfIY0eVtxJQSU=
+Date:   Thu, 9 Jul 2020 19:49:39 -0400
+From:   Sasha Levin <sashal@kernel.org>
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Stable <stable@vger.kernel.org>,
+        Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
+        Hulk Robot <hulkci@huawei.com>,
+        Steve French <stfrench@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Subject: Re: [PATCH AUTOSEL 5.7 37/53] cifs: Fix double add page to memcg
+ when cifs_readpages
+Message-ID: <20200709234939.GD2722994@sasha-vm>
+References: <20200702012202.2700645-1-sashal@kernel.org>
+ <20200702012202.2700645-37-sashal@kernel.org>
+ <CAKywueRGSriwuMGtG53i3Bm_ek_k1LMAK0fojf9++7=ar+6u8Q@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200709103949.29944-1-lsahlber@redhat.com>
-In-Reply-To: <20200709103949.29944-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 9 Jul 2020 11:28:36 -0500
-Message-ID: <CAH2r5muBVTkbJjQz6ELB_a-WU9Vcq=cNzAcAtpzY64Pxt0tvDw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix reference leak for tlink
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKywueRGSriwuMGtG53i3Bm_ek_k1LMAK0fojf9++7=ar+6u8Q@mail.gmail.com>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/367
-running regression tests with this and the other 3 patches
+On Thu, Jul 02, 2020 at 09:08:45AM -0700, Pavel Shilovsky wrote:
+>ср, 1 июл. 2020 г. в 18:35, Sasha Levin <sashal@kernel.org>:
+>>
+>> From: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+>>
+>> [ Upstream commit 95a3d8f3af9b0d63b43f221b630beaab9739d13a ]
+>>
+>> When xfstests generic/451, there is an BUG at mm/memcontrol.c:
+>>   page:ffffea000560f2c0 refcount:2 mapcount:0 mapping:000000008544e0ea
+>>        index:0xf
+>>   mapping->aops:cifs_addr_ops dentry name:"tst-aio-dio-cycle-write.451"
+>>   flags: 0x2fffff80000001(locked)
+>>   raw: 002fffff80000001 ffffc90002023c50 ffffea0005280088 ffff88815cda0210
+>>   raw: 000000000000000f 0000000000000000 00000002ffffffff ffff88817287d000
+>>   page dumped because: VM_BUG_ON_PAGE(page->mem_cgroup)
+>>   page->mem_cgroup:ffff88817287d000
+>>   ------------[ cut here ]------------
+>>   kernel BUG at mm/memcontrol.c:2659!
+>>   invalid opcode: 0000 [#1] SMP
+>>   CPU: 2 PID: 2038 Comm: xfs_io Not tainted 5.8.0-rc1 #44
+>>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_
+>>     073836-buildvm-ppc64le-16.ppc.4
+>>   RIP: 0010:commit_charge+0x35/0x50
+>>   Code: 0d 48 83 05 54 b2 02 05 01 48 89 77 38 c3 48 c7
+>>         c6 78 4a ea ba 48 83 05 38 b2 02 05 01 e8 63 0d9
+>>   RSP: 0018:ffffc90002023a50 EFLAGS: 00010202
+>>   RAX: 0000000000000000 RBX: ffff88817287d000 RCX: 0000000000000000
+>>   RDX: 0000000000000000 RSI: ffff88817ac97ea0 RDI: ffff88817ac97ea0
+>>   RBP: ffffea000560f2c0 R08: 0000000000000203 R09: 0000000000000005
+>>   R10: 0000000000000030 R11: ffffc900020237a8 R12: 0000000000000000
+>>   R13: 0000000000000001 R14: 0000000000000001 R15: ffff88815a1272c0
+>>   FS:  00007f5071ab0800(0000) GS:ffff88817ac80000(0000) knlGS:0000000000000000
+>>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>   CR2: 000055efcd5ca000 CR3: 000000015d312000 CR4: 00000000000006e0
+>>   DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>   DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>   Call Trace:
+>>    mem_cgroup_charge+0x166/0x4f0
+>>    __add_to_page_cache_locked+0x4a9/0x710
+>>    add_to_page_cache_locked+0x15/0x20
+>>    cifs_readpages+0x217/0x1270
+>>    read_pages+0x29a/0x670
+>>    page_cache_readahead_unbounded+0x24f/0x390
+>>    __do_page_cache_readahead+0x3f/0x60
+>>    ondemand_readahead+0x1f1/0x470
+>>    page_cache_async_readahead+0x14c/0x170
+>>    generic_file_buffered_read+0x5df/0x1100
+>>    generic_file_read_iter+0x10c/0x1d0
+>>    cifs_strict_readv+0x139/0x170
+>>    new_sync_read+0x164/0x250
+>>    __vfs_read+0x39/0x60
+>>    vfs_read+0xb5/0x1e0
+>>    ksys_pread64+0x85/0xf0
+>>    __x64_sys_pread64+0x22/0x30
+>>    do_syscall_64+0x69/0x150
+>>    entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>>   RIP: 0033:0x7f5071fcb1af
+>>   Code: Bad RIP value.
+>>   RSP: 002b:00007ffde2cdb8e0 EFLAGS: 00000293 ORIG_RAX: 0000000000000011
+>>   RAX: ffffffffffffffda RBX: 00007ffde2cdb990 RCX: 00007f5071fcb1af
+>>   RDX: 0000000000001000 RSI: 000055efcd5ca000 RDI: 0000000000000003
+>>   RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
+>>   R10: 0000000000001000 R11: 0000000000000293 R12: 0000000000000001
+>>   R13: 000000000009f000 R14: 0000000000000000 R15: 0000000000001000
+>>   Modules linked in:
+>>   ---[ end trace 725fa14a3e1af65c ]---
+>>
+>> Since commit 3fea5a499d57 ("mm: memcontrol: convert page cache to a new
+>> mem_cgroup_charge() API") not cancel the page charge, the pages maybe
+>> double add to pagecache:
+>> thread1                       | thread2
+>> cifs_readpages
+>> readpages_get_pages
+>>  add_to_page_cache_locked(head,index=n)=0
+>>                               | readpages_get_pages
+>>                               | add_to_page_cache_locked(head,index=n+1)=0
+>>  add_to_page_cache_locked(head, index=n+1)=-EEXIST
+>>  then, will next loop with list head page's
+>>  index=n+1 and the page->mapping not NULL
+>> readpages_get_pages
+>> add_to_page_cache_locked(head, index=n+1)
+>>  commit_charge
+>>   VM_BUG_ON_PAGE
+>>
+>> So, we should not do the next loop when any page add to page cache
+>> failed.
+>>
+>> Reported-by: Hulk Robot <hulkci@huawei.com>
+>> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+>> Signed-off-by: Steve French <stfrench@microsoft.com>
+>> Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>
+>Hi Sasha,
+>
+>The patch description mentions the commit 3fea5a499d57 that changed
+>the behavior and was introduced in v5.8-rc1. I noticed that you are
+>targeting this patch for 4.9, 4.14, 4.19, 5.4 and 5.7 stable branches.
+>Are you going to backport the commit 3fea5a499d57 as well?
 
-On Thu, Jul 9, 2020 at 5:41 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> Don't leak a reference to tlink during the NOTIFY ioctl
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/ioctl.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
-> index 4a73e63c4d43..dcde44ff6cf9 100644
-> --- a/fs/cifs/ioctl.c
-> +++ b/fs/cifs/ioctl.c
-> @@ -169,6 +169,7 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
->         unsigned int xid;
->         struct cifsFileInfo *pSMBFile = filep->private_data;
->         struct cifs_tcon *tcon;
-> +       struct tcon_link *tlink;
->         struct cifs_sb_info *cifs_sb;
->         __u64   ExtAttrBits = 0;
->         __u64   caps;
-> @@ -307,13 +308,19 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
->                                 break;
->                         }
->                         cifs_sb = CIFS_SB(inode->i_sb);
-> -                       tcon = tlink_tcon(cifs_sb_tlink(cifs_sb));
-> +                       tlink = cifs_sb_tlink(cifs_sb);
-> +                       if (IS_ERR(tlink)) {
-> +                               rc = PTR_ERR(tlink);
-> +                               break;
-> +                       }
-> +                       tcon = tlink_tcon(tlink);
->                         if (tcon && tcon->ses->server->ops->notify) {
->                                 rc = tcon->ses->server->ops->notify(xid,
->                                                 filep, (void __user *)arg);
->                                 cifs_dbg(FYI, "ioctl notify rc %d\n", rc);
->                         } else
->                                 rc = -EOPNOTSUPP;
-> +                       cifs_put_tlink(tlink);
->                         break;
->                 default:
->                         cifs_dbg(FYI, "unsupported ioctl\n");
-> --
-> 2.13.6
->
-
+Nope, I'll drop this one. Thanks!
 
 -- 
 Thanks,
-
-Steve
+Sasha
