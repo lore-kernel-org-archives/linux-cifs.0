@@ -7,49 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08259C433F7
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6EF8C433E5
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:33:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7DD3206F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:32:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7F972065F
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:33:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F6lu5B0g"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dFDrs7x1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730572AbgGMQc6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 13 Jul 2020 12:32:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40391 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730573AbgGMQcz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 13 Jul 2020 12:32:55 -0400
+        id S1730151AbgGMQct (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 13 Jul 2020 12:32:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48478 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730552AbgGMQco (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 13 Jul 2020 12:32:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594657974;
+        s=mimecast20190719; t=1594657963;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tP6l1C0alH26x13TIIslzPNEfR9MrU1nOyotTY1c1j0=;
-        b=F6lu5B0gYOFqVxtYDen2eFKDnsUXkzG2CUIf5T8GkTJFWdkqpYXfCB8ZNYExc1l8bIZjrY
-        hQAYrb8Nqv9wc1cDaZyuNxLQqwAVwRMWVKW5zYw23L/z35hFNwHAvONxqflJcqd1A3rlS4
-        rkO0VzDhmL8NZbP2U0KEfozQe/ZtTa4=
+        bh=D1wPsoBbNSccmnM5FewiFx0xZyD377Fb6Hp+rWU3DnI=;
+        b=dFDrs7x13G3yiGpJLZuYd9j+Ci6nkLywiRgZS2DO6YXFgbHYMeWnaSYepDggPDGXMbqM/O
+        DR4z2f0zRNXK5MwilIYrfoiSIopSyNkNQvtSUZX6tz0/N40uOjxRR2x69SNbzPhizhePfz
+        Widj8+CWh78QZ1fitKk7Jzz6GAdxu00=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-MC_DnXy_Nt2kzlCaveItmw-1; Mon, 13 Jul 2020 12:32:51 -0400
-X-MC-Unique: MC_DnXy_Nt2kzlCaveItmw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-236-aVjucGd_MIeHprorq-cBOQ-1; Mon, 13 Jul 2020 12:32:39 -0400
+X-MC-Unique: aVjucGd_MIeHprorq-cBOQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B68611902EA2;
-        Mon, 13 Jul 2020 16:32:49 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97D8110059B5;
+        Mon, 13 Jul 2020 16:32:37 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-112-113.rdu2.redhat.com [10.10.112.113])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA436724C3;
-        Mon, 13 Jul 2020 16:32:43 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 25C8760BF3;
+        Mon, 13 Jul 2020 16:32:32 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 11/32] fscache: Keep track of size of a file last set
- independently on the server
+Subject: [PATCH 10/32] fscache: Remove fscache_wait_on_invalidate()
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
@@ -62,130 +60,89 @@ Cc:     Jeff Layton <jlayton@redhat.com>,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 13 Jul 2020 17:32:42 +0100
-Message-ID: <159465796283.1376674.15372489386955555864.stgit@warthog.procyon.org.uk>
+Date:   Mon, 13 Jul 2020 17:32:31 +0100
+Message-ID: <159465795136.1376674.599056208279354471.stgit@warthog.procyon.org.uk>
 In-Reply-To: <159465784033.1376674.18106463693989811037.stgit@warthog.procyon.org.uk>
 References: <159465784033.1376674.18106463693989811037.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.22
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Keep track of the size of a file that we're caching as last set
-independently on the server by another client.  As long as this does not
-change, we can make the assumption that anything over that boundary, if not
-represented in the local cache, will not be represented on the server
-either and can be just cleared rather than being read, thereby saving a
-trip to the server.
-
-This only works if we make space in the cache by zapping whole files and
-not just punching bits out of them as if we write to the server but don't
-keep a copy in the cache, the assumption mentioned above no longer holds
-true.
-
-We also need to update this size when invalidation occurs.
+Remove fscache_wait_on_invalidate() as the invalidation wait is now built into
+the I/O path.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- fs/afs/inode.c          |    2 +-
- fs/fscache/cookie.c     |    8 +++++++-
- include/linux/fscache.h |    8 +++++---
- 3 files changed, 13 insertions(+), 5 deletions(-)
+ fs/fscache/cookie.c     |   14 --------------
+ include/linux/fscache.h |   17 -----------------
+ 2 files changed, 31 deletions(-)
 
-diff --git a/fs/afs/inode.c b/fs/afs/inode.c
-index 49d897437998..b0772e64a844 100644
---- a/fs/afs/inode.c
-+++ b/fs/afs/inode.c
-@@ -569,7 +569,7 @@ static void afs_zap_data(struct afs_vnode *vnode)
- 	_enter("{%llx:%llu}", vnode->fid.vid, vnode->fid.vnode);
- 
- #ifdef CONFIG_AFS_FSCACHE
--	fscache_invalidate(vnode->cache);
-+	fscache_invalidate(vnode->cache, i_size_read(&vnode->vfs_inode));
- #endif
- 
- 	/* nuke all the non-dirty pages that aren't locked, mapped or being
 diff --git a/fs/fscache/cookie.c b/fs/fscache/cookie.c
-index a1eba3be9ce8..5c53027d3f53 100644
+index a8aa1639e93b..a1eba3be9ce8 100644
 --- a/fs/fscache/cookie.c
 +++ b/fs/fscache/cookie.c
-@@ -159,6 +159,7 @@ struct fscache_cookie *fscache_alloc_cookie(
- 	cookie->key_len = index_key_len;
- 	cookie->aux_len = aux_data_len;
- 	cookie->object_size = object_size;
-+	cookie->zero_point = object_size;
- 	strlcpy(cookie->type_name, type_name, sizeof(cookie->type_name));
+@@ -492,20 +492,6 @@ void __fscache_invalidate(struct fscache_cookie *cookie)
+ }
+ EXPORT_SYMBOL(__fscache_invalidate);
  
- 	if (fscache_set_key(cookie, index_key, index_key_len) < 0)
-@@ -473,7 +474,7 @@ void fscache_set_cookie_stage(struct fscache_cookie *cookie,
+-/*
+- * Wait for object invalidation to complete.
+- */
+-void __fscache_wait_on_invalidate(struct fscache_cookie *cookie)
+-{
+-	_enter("%p", cookie);
+-
+-	wait_on_bit(&cookie->flags, FSCACHE_COOKIE_INVALIDATING,
+-		    TASK_UNINTERRUPTIBLE);
+-
+-	_leave("");
+-}
+-EXPORT_SYMBOL(__fscache_wait_on_invalidate);
+-
  /*
-  * Invalidate an object.  Callable with spinlocks held.
+  * Update the index entries backing a cookie.  The writeback is done lazily.
   */
--void __fscache_invalidate(struct fscache_cookie *cookie)
-+void __fscache_invalidate(struct fscache_cookie *cookie, loff_t new_size)
- {
- 	_enter("{%s}", cookie->type_name);
- 
-@@ -486,6 +487,11 @@ void __fscache_invalidate(struct fscache_cookie *cookie)
- 	 */
- 	ASSERTCMP(cookie->type, ==, FSCACHE_COOKIE_TYPE_DATAFILE);
- 
-+	spin_lock(&cookie->lock);
-+	cookie->object_size = new_size;
-+	cookie->zero_point = new_size;
-+	spin_unlock(&cookie->lock);
-+
- 	if (!hlist_empty(&cookie->backing_objects) &&
- 	    test_and_set_bit(FSCACHE_COOKIE_INVALIDATING, &cookie->flags))
- 		fscache_dispatch(cookie, NULL, 0, fscache_invalidate_object);
 diff --git a/include/linux/fscache.h b/include/linux/fscache.h
-index 56fdd0e74a88..bfb28cebfcfd 100644
+index aec75fc0d297..56fdd0e74a88 100644
 --- a/include/linux/fscache.h
 +++ b/include/linux/fscache.h
-@@ -102,6 +102,7 @@ struct fscache_cookie {
- 	struct list_head		proc_link;	/* Link in proc list */
- 	char				type_name[8];	/* Cookie type name */
- 	loff_t				object_size;	/* Size of the netfs object */
-+	loff_t				zero_point;	/* Size after which no data on server */
- 
- 	unsigned long			flags;
- #define FSCACHE_COOKIE_INVALIDATING	4	/* T if cookie is being invalidated */
-@@ -216,8 +217,8 @@ extern void __fscache_use_cookie(struct fscache_cookie *, bool);
- extern void __fscache_unuse_cookie(struct fscache_cookie *, const void *, const loff_t *);
+@@ -217,7 +217,6 @@ extern void __fscache_unuse_cookie(struct fscache_cookie *, const void *, const
  extern void __fscache_relinquish_cookie(struct fscache_cookie *, bool);
  extern void __fscache_update_cookie(struct fscache_cookie *, const void *, const loff_t *);
--extern void __fscache_invalidate(struct fscache_cookie *);
+ extern void __fscache_invalidate(struct fscache_cookie *);
+-extern void __fscache_wait_on_invalidate(struct fscache_cookie *);
  extern void __fscache_shape_request(struct fscache_cookie *, struct fscache_request_shape *);
-+extern void __fscache_invalidate(struct fscache_cookie *, loff_t);
  extern void __fscache_init_io_request(struct fscache_io_request *,
  				      struct fscache_cookie *);
- extern void __fscache_free_io_request(struct fscache_io_request *);
-@@ -448,6 +449,7 @@ void fscache_unpin_cookie(struct fscache_cookie *cookie)
- /**
-  * fscache_invalidate - Notify cache that an object needs invalidation
-  * @cookie: The cookie representing the cache object
-+ * @size: The revised size of the object.
-  *
-  * Notify the cache that an object is needs to be invalidated and that it
-  * should abort any retrievals or stores it is doing on the cache.  The object
-@@ -459,10 +461,10 @@ void fscache_unpin_cookie(struct fscache_cookie *cookie)
-  * description.
-  */
- static inline
--void fscache_invalidate(struct fscache_cookie *cookie)
-+void fscache_invalidate(struct fscache_cookie *cookie, loff_t size)
- {
- 	if (fscache_cookie_valid(cookie))
--		__fscache_invalidate(cookie);
-+		__fscache_invalidate(cookie, size);
+@@ -466,22 +465,6 @@ void fscache_invalidate(struct fscache_cookie *cookie)
+ 		__fscache_invalidate(cookie);
  }
  
+-/**
+- * fscache_wait_on_invalidate - Wait for invalidation to complete
+- * @cookie: The cookie representing the cache object
+- *
+- * Wait for the invalidation of an object to complete.
+- *
+- * See Documentation/filesystems/caching/netfs-api.rst for a complete
+- * description.
+- */
+-static inline
+-void fscache_wait_on_invalidate(struct fscache_cookie *cookie)
+-{
+-	if (fscache_cookie_valid(cookie))
+-		__fscache_wait_on_invalidate(cookie);
+-}
+-
  /**
+  * fscache_init_io_request - Initialise an I/O request
+  * @req: The I/O request to initialise
 
 
