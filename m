@@ -7,49 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85ED8C433E4
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:35:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21059C433E0
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:36:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6641620771
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:35:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9A29206F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:36:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KcEfADtG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EuUjptJS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730714AbgGMQfe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 13 Jul 2020 12:35:34 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48221 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730711AbgGMQfd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 13 Jul 2020 12:35:33 -0400
+        id S1730347AbgGMQgA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 13 Jul 2020 12:36:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41176 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730557AbgGMQgA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 13 Jul 2020 12:36:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594658131;
+        s=mimecast20190719; t=1594658157;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=wQkmMwKqdoqPES4EgtSnMTmwzuuUgpaX2PYBWluvNRQ=;
-        b=KcEfADtGP9yOrQqOQnz5o1b51hxzLhZR+da10RwFfeijMFDwcy0JHt9rPAeii4q+Sz2hVj
-        6f7Rq+PaECk0qbuDOjedjIpHdxd3E6V8mTWbhLfUKzYU0w+7FDaif1cVH4RI2V80Q3fRK4
-        8IDADu6Sv8yIyVDZEEtPHzncNFKFE1Q=
+        bh=8uBgeBrOUUnKfxtv55796AFwjNnsDy70aj5ixeVep7k=;
+        b=EuUjptJSgXTbIylMgsaAkhYahYV2HZWTIE2hazLaYvW/l6e4ZiVaAqwcZSaStjB6Lw8vFf
+        Tl9HkOEemaJi4t7bJmwdwvgQa2bRFzyCg+uc/HwnMRGtcX1fYIkA7doNJMJ4Bn5UxrHPqN
+        owFwBmhnpDxJaJa/vWTdMo3Iy7/ZebA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-FznXJ4y8M4qbT_ZvwuEGwg-1; Mon, 13 Jul 2020 12:35:28 -0400
-X-MC-Unique: FznXJ4y8M4qbT_ZvwuEGwg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-299-PQAz-ha4Od-Kn70DbuelAA-1; Mon, 13 Jul 2020 12:35:52 -0400
+X-MC-Unique: PQAz-ha4Od-Kn70DbuelAA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07B1E107ACCA;
-        Mon, 13 Jul 2020 16:35:27 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73EB980572E;
+        Mon, 13 Jul 2020 16:35:50 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-112-113.rdu2.redhat.com [10.10.112.113])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E22B60CD0;
-        Mon, 13 Jul 2020 16:35:21 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CCA0878A45;
+        Mon, 13 Jul 2020 16:35:44 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 25/32] fscache: Display cache-specific data in
- /proc/fs/fscache/objects
+Subject: [PATCH 27/32] fscache: New stats
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
@@ -62,193 +60,377 @@ Cc:     Jeff Layton <jlayton@redhat.com>,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 13 Jul 2020 17:35:20 +0100
-Message-ID: <159465812047.1376674.773368234437370021.stgit@warthog.procyon.org.uk>
+Date:   Mon, 13 Jul 2020 17:35:44 +0100
+Message-ID: <159465814408.1376674.14594678302267796541.stgit@warthog.procyon.org.uk>
 In-Reply-To: <159465784033.1376674.18106463693989811037.stgit@warthog.procyon.org.uk>
 References: <159465784033.1376674.18106463693989811037.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.22
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Allow the cache to add information in /proc/fs/fscache/objects instead of
-displaying cookie key and aux data - which can be seen in the cookies file.
+Create some new stat counters appropriate to the new routines and display
+them in /proc/fs/fscache/stats.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- fs/cachefiles/content-map.c   |   41 +++++++++++++++++++++++++++++++++++++++++
- fs/cachefiles/interface.c     |    1 +
- fs/cachefiles/internal.h      |    1 +
- fs/fscache/object-list.c      |   33 +++------------------------------
- include/linux/fscache-cache.h |    4 ++++
- 5 files changed, 50 insertions(+), 30 deletions(-)
+ fs/fscache/dispatcher.c  |    6 ++++
+ fs/fscache/internal.h    |   25 +++++++++++++++++
+ fs/fscache/io.c          |    2 +
+ fs/fscache/read_helper.c |   38 +++++++++++++++++++++++--
+ fs/fscache/stats.c       |   69 ++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 137 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cachefiles/content-map.c b/fs/cachefiles/content-map.c
-index 91c44bb39a93..f2a10e8d8d6d 100644
---- a/fs/cachefiles/content-map.c
-+++ b/fs/cachefiles/content-map.c
-@@ -396,3 +396,44 @@ void cachefiles_save_content_map(struct cachefiles_object *object)
+diff --git a/fs/fscache/dispatcher.c b/fs/fscache/dispatcher.c
+index fba71b99c951..489b8ab8cccd 100644
+--- a/fs/fscache/dispatcher.c
++++ b/fs/fscache/dispatcher.c
+@@ -41,6 +41,8 @@ void fscache_dispatch(struct fscache_cookie *cookie,
+ 	struct fscache_work *work;
+ 	bool queued = false;
  
- 	_leave(" = %zd", ret);
- }
++	fscache_stat(&fscache_n_dispatch_count);
 +
-+/*
-+ * Display object information in proc.
-+ */
-+int cachefiles_display_object(struct seq_file *m, struct fscache_object *_object)
-+{
-+	struct cachefiles_object *object =
-+		container_of(_object, struct cachefiles_object, fscache);
-+
-+	if (object->fscache.cookie->type == FSCACHE_COOKIE_TYPE_INDEX) {
-+		if (object->content_info != CACHEFILES_CONTENT_NO_DATA)
-+			seq_printf(m, " ???%u???", object->content_info);
-+	} else {
-+		switch (object->content_info) {
-+		case CACHEFILES_CONTENT_NO_DATA:
-+			seq_puts(m, " <n>");
-+			break;
-+		case CACHEFILES_CONTENT_SINGLE:
-+			seq_puts(m, " <s>");
-+			break;
-+		case CACHEFILES_CONTENT_ALL:
-+			seq_puts(m, " <a>");
-+			break;
-+		case CACHEFILES_CONTENT_MAP:
-+			read_lock_bh(&object->content_map_lock);
-+			if (object->content_map) {
-+				seq_printf(m, " %*phN",
-+					   object->content_map_size,
-+					   object->content_map);
-+			}
-+			read_unlock_bh(&object->content_map_lock);
-+			break;
-+		default:
-+			seq_printf(m, " <%u>", object->content_info);
-+			break;
-+		}
-+	}
-+
-+	seq_putc(m, '\n');
-+	return 0;
-+}
-diff --git a/fs/cachefiles/interface.c b/fs/cachefiles/interface.c
-index e73de62d0e73..78180d269c5f 100644
---- a/fs/cachefiles/interface.c
-+++ b/fs/cachefiles/interface.c
-@@ -491,4 +491,5 @@ const struct fscache_cache_ops cachefiles_cache_ops = {
- 	.shape_request		= cachefiles_shape_request,
- 	.read			= cachefiles_read,
- 	.write			= cachefiles_write,
-+	.display_object		= cachefiles_display_object,
- };
-diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
-index 2ea469b77712..c91a9b3c5bd5 100644
---- a/fs/cachefiles/internal.h
-+++ b/fs/cachefiles/internal.h
-@@ -132,6 +132,7 @@ extern void cachefiles_expand_content_map(struct cachefiles_object *object, loff
- extern void cachefiles_shorten_content_map(struct cachefiles_object *object, loff_t new_size);
- extern bool cachefiles_load_content_map(struct cachefiles_object *object);
- extern void cachefiles_save_content_map(struct cachefiles_object *object);
-+extern int cachefiles_display_object(struct seq_file *m, struct fscache_object *object);
- 
- /*
-  * daemon.c
-diff --git a/fs/fscache/object-list.c b/fs/fscache/object-list.c
-index 5777f909d31a..361610e124bd 100644
---- a/fs/fscache/object-list.c
-+++ b/fs/fscache/object-list.c
-@@ -155,7 +155,6 @@ static int fscache_objlist_show(struct seq_file *m, void *v)
- 	struct fscache_cookie *cookie;
- 	unsigned long config = data->config;
- 	char _type[3], *type;
--	u8 *p;
- 
- 	if ((unsigned long) v == 1) {
- 		seq_puts(m, "OBJECT   PARENT   USE CHLDN OPS FL  S"
-@@ -201,8 +200,6 @@ static int fscache_objlist_show(struct seq_file *m, void *v)
- 		   obj->stage);
- 
- 	if (obj->cookie) {
--		uint16_t keylen = 0, auxlen = 0;
--
- 		switch (cookie->type) {
- 		case 0:
- 			type = "IX";
-@@ -211,8 +208,7 @@ static int fscache_objlist_show(struct seq_file *m, void *v)
- 			type = "DT";
- 			break;
- 		default:
--			snprintf(_type, sizeof(_type), "%02u",
--				 cookie->type);
-+			snprintf(_type, sizeof(_type), "%02x", cookie->type);
- 			type = _type;
- 			break;
+ 	work = kzalloc(sizeof(struct fscache_work), GFP_KERNEL);
+ 	if (work) {
+ 		work->cookie = cookie;
+@@ -57,10 +59,13 @@ void fscache_dispatch(struct fscache_cookie *cookie,
+ 			queued = true;
  		}
-@@ -223,34 +219,11 @@ static int fscache_objlist_show(struct seq_file *m, void *v)
- 			   type,
- 			   cookie->stage,
- 			   cookie->flags);
--
--		if (config & FSCACHE_OBJLIST_CONFIG_KEY)
--			keylen = cookie->key_len;
--
--		if (config & FSCACHE_OBJLIST_CONFIG_AUX)
--			auxlen = cookie->aux_len;
--
--		if (keylen > 0 || auxlen > 0) {
--			seq_puts(m, " ");
--			p = keylen <= sizeof(cookie->inline_key) ?
--				cookie->inline_key : cookie->key;
--			for (; keylen > 0; keylen--)
--				seq_printf(m, "%02x", *p++);
--			if (auxlen > 0) {
--				if (config & FSCACHE_OBJLIST_CONFIG_KEY)
--					seq_puts(m, ", ");
--				p = auxlen <= sizeof(cookie->inline_aux) ?
--					cookie->inline_aux : cookie->aux;
--				for (; auxlen > 0; auxlen--)
--					seq_printf(m, "%02x", *p++);
--			}
--		}
--
--		seq_puts(m, "\n");
- 	} else {
- 		seq_puts(m, "<no_netfs>\n");
+ 		spin_unlock(&fscache_work_lock);
++		if (queued)
++			fscache_stat(&fscache_n_dispatch_deferred);
  	}
--	return 0;
-+
-+	return obj->cache->ops->display_object(m, obj);
+ 
+ 	if (!queued) {
+ 		kfree(work);
++		fscache_stat(&fscache_n_dispatch_inline);
+ 		func(cookie, object, param);
+ 	}
  }
+@@ -86,6 +91,7 @@ static int fscache_dispatcher(void *data)
  
- static const struct seq_operations fscache_objlist_ops = {
-diff --git a/include/linux/fscache-cache.h b/include/linux/fscache-cache.h
-index 81a41e37f07b..1357c44d371b 100644
---- a/include/linux/fscache-cache.h
-+++ b/include/linux/fscache-cache.h
-@@ -19,6 +19,7 @@
+ 			if (work) {
+ 				work->func(work->cookie, work->object, work->param);
++				fscache_stat(&fscache_n_dispatch_in_pool);
+ 				fscache_cookie_put(work->cookie, fscache_cookie_put_work);
+ 				kfree(work);
+ 			}
+diff --git a/fs/fscache/internal.h b/fs/fscache/internal.h
+index d2b856aa5f0e..d9391d3974d1 100644
+--- a/fs/fscache/internal.h
++++ b/fs/fscache/internal.h
+@@ -209,6 +209,30 @@ extern atomic_t fscache_n_cache_stale_objects;
+ extern atomic_t fscache_n_cache_retired_objects;
+ extern atomic_t fscache_n_cache_culled_objects;
  
- #define NR_MAXCACHES BITS_PER_LONG
- 
-+struct seq_file;
- struct fscache_cache;
- struct fscache_cache_ops;
- struct fscache_object;
-@@ -151,6 +152,9 @@ struct fscache_cache_ops {
- 	int (*write)(struct fscache_object *object,
- 		     struct fscache_io_request *req,
- 		     struct iov_iter *iter);
++extern atomic_t fscache_n_dispatch_count;
++extern atomic_t fscache_n_dispatch_deferred;
++extern atomic_t fscache_n_dispatch_inline;
++extern atomic_t fscache_n_dispatch_in_pool;
 +
-+	/* Display object info in /proc/fs/fscache/objects */
-+	int (*display_object)(struct seq_file *m, struct fscache_object *object);
- };
++extern atomic_t fscache_n_read;
++extern atomic_t fscache_n_write;
++
++extern atomic_t fscache_n_read_helper;
++extern atomic_t fscache_n_read_helper_stop_nomem;
++extern atomic_t fscache_n_read_helper_stop_uptodate;
++extern atomic_t fscache_n_read_helper_stop_exist;
++extern atomic_t fscache_n_read_helper_stop_kill;
++extern atomic_t fscache_n_read_helper_read;
++extern atomic_t fscache_n_read_helper_download;
++extern atomic_t fscache_n_read_helper_zero;
++extern atomic_t fscache_n_read_helper_beyond_eof;
++extern atomic_t fscache_n_read_helper_reissue;
++extern atomic_t fscache_n_read_helper_read_done;
++extern atomic_t fscache_n_read_helper_read_failed;
++extern atomic_t fscache_n_read_helper_copy;
++extern atomic_t fscache_n_read_helper_copy_done;
++extern atomic_t fscache_n_read_helper_copy_failed;
++
+ static inline void fscache_stat(atomic_t *stat)
+ {
+ 	atomic_inc(stat);
+@@ -256,6 +280,7 @@ void fscache_update_aux(struct fscache_cookie *cookie,
  
- extern struct fscache_cookie fscache_fsdef_index;
+ #else /* CONFIG_FSCACHE */
+ 
++#define fscache_stat(stat) do {} while(0)
+ #define fscache_op_wq system_wq
+ 
+ #endif /* CONFIG_FSCACHE */
+diff --git a/fs/fscache/io.c b/fs/fscache/io.c
+index 8d7f79551699..d38101d77d27 100644
+--- a/fs/fscache/io.c
++++ b/fs/fscache/io.c
+@@ -138,6 +138,7 @@ int __fscache_read(struct fscache_io_request *req, struct iov_iter *iter)
+ 		fscache_begin_io_operation(req->cookie, FSCACHE_WANT_READ, req);
+ 
+ 	if (!IS_ERR(object)) {
++		fscache_stat(&fscache_n_read);
+ 		req->object = object;
+ 		return object->cache->ops->read(object, req, iter);
+ 	} else {
+@@ -158,6 +159,7 @@ int __fscache_write(struct fscache_io_request *req, struct iov_iter *iter)
+ 		fscache_begin_io_operation(req->cookie, FSCACHE_WANT_WRITE, req);
+ 
+ 	if (!IS_ERR(object)) {
++		fscache_stat(&fscache_n_write);
+ 		req->object = object;
+ 		return object->cache->ops->write(object, req, iter);
+ 	} else {
+diff --git a/fs/fscache/read_helper.c b/fs/fscache/read_helper.c
+index 62fed27aa938..227b326a54e2 100644
+--- a/fs/fscache/read_helper.c
++++ b/fs/fscache/read_helper.c
+@@ -68,6 +68,11 @@ static void fscache_read_copy_done(struct fscache_io_request *req)
+ 
+ 	_enter("%lx,%x,%llx", index, req->nr_pages, req->transferred);
+ 
++	if (req->error == 0)
++		fscache_stat(&fscache_n_read_helper_copy_done);
++	else
++		fscache_stat(&fscache_n_read_helper_copy_failed);
++
+ 	/* Clear PG_fscache on the pages that were being written out. */
+ 	rcu_read_lock();
+ 	xas_for_each(&xas, page, last) {
+@@ -90,6 +95,8 @@ static void fscache_do_read_copy_to_cache(struct work_struct *work)
+ 
+ 	_enter("");
+ 
++	fscache_stat(&fscache_n_read_helper_copy);
++
+ 	iov_iter_mapping(&iter, WRITE, req->mapping, req->pos,
+ 			 round_up(req->len, req->dio_block_size));
+ 
+@@ -142,6 +149,11 @@ static void fscache_read_done(struct fscache_io_request *req)
+ 	_enter("%lx,%x,%llx,%d",
+ 	       start, req->nr_pages, req->transferred, req->error);
+ 
++	if (req->error == 0)
++		fscache_stat(&fscache_n_read_helper_read_done);
++	else
++		fscache_stat(&fscache_n_read_helper_read_failed);
++
+ 	if (req->transferred < req->len)
+ 		fscache_clear_unread(req);
+ 
+@@ -195,6 +207,7 @@ static void fscache_file_read_maybe_reissue(struct fscache_io_request *req)
+ 	if (req->error == 0) {
+ 		fscache_read_done(req);
+ 	} else {
++		fscache_stat(&fscache_n_read_helper_reissue);
+ 		INIT_WORK(&req->work, fscache_reissue_read);
+ 		fscache_get_io_request(req);
+ 		queue_work(fscache_op_wq, &req->work);
+@@ -279,6 +292,8 @@ static int fscache_read_helper(struct fscache_io_request *req,
+ 	loff_t new_size;
+ 	int ret;
+ 
++	fscache_stat(&fscache_n_read_helper);
++
+ 	shape.granularity	= 1;
+ 	shape.max_io_pages	= max_pages;
+ 	shape.i_size		= i_size_read(mapping->host);
+@@ -341,8 +356,10 @@ static int fscache_read_helper(struct fscache_io_request *req,
+ 		while (cursor < shape.proposed_start) {
+ 			page = find_or_create_page(mapping, cursor,
+ 						   readahead_gfp_mask(mapping));
+-			if (!page)
++			if (!page) {
++				fscache_stat(&fscache_n_read_helper_stop_nomem);
+ 				goto nomem;
++			}
+ 			if (!PageUptodate(page)) {
+ 				req->nr_pages++; /* Add to the reading list */
+ 				cursor++;
+@@ -355,6 +372,7 @@ static int fscache_read_helper(struct fscache_io_request *req,
+ 			 */
+ 			notes |= FSCACHE_RHLP_NOTE_U2D_IN_PREFACE;
+ 			notes &= ~FSCACHE_RHLP_NOTE_DO_WRITE_TO_CACHE;
++			fscache_stat(&fscache_n_read_helper_stop_uptodate);
+ 			fscache_ignore_pages(mapping, start, cursor + 1);
+ 			start = cursor = shape.proposed_start;
+ 			req->nr_pages = 0;
+@@ -378,18 +396,23 @@ static int fscache_read_helper(struct fscache_io_request *req,
+ 			_debug("prewrite req %lx", cursor);
+ 			page = *requested_page;
+ 			ret = -ERESTARTSYS;
+-			if (lock_page_killable(page) < 0)
++			if (lock_page_killable(page) < 0) {
++				fscache_stat(&fscache_n_read_helper_stop_kill);
+ 				goto dont;
++			}
+ 		} else {
+ 			_debug("prewrite new %lx %lx", cursor, eof);
+ 			page = grab_cache_page_write_begin(mapping, shape.proposed_start,
+ 							   aop_flags);
+-			if (!page)
++			if (!page) {
++				fscache_stat(&fscache_n_read_helper_stop_nomem);
+ 				goto nomem;
++			}
+ 			*requested_page = page;
+ 		}
+ 
+ 		if (PageUptodate(page)) {
++			fscache_stat(&fscache_n_read_helper_stop_uptodate);
+ 			notes |= FSCACHE_RHLP_NOTE_LIST_U2D;
+ 
+ 			trace_fscache_read_helper(req->cookie,
+@@ -450,12 +473,14 @@ static int fscache_read_helper(struct fscache_io_request *req,
+ 							   readahead_gfp_mask(mapping));
+ 				if (!page) {
+ 					notes |= FSCACHE_RHLP_NOTE_LIST_NOMEM;
++					fscache_stat(&fscache_n_read_helper_stop_nomem);
+ 					goto stop;
+ 				}
+ 
+ 				if (PageUptodate(page)) {
+ 					unlock_page(page);
+ 					put_page(page); /* Avoid overwriting */
++					fscache_stat(&fscache_n_read_helper_stop_exist);
+ 					ret = 0;
+ 					notes |= FSCACHE_RHLP_NOTE_LIST_U2D;
+ 					goto stop;
+@@ -468,6 +493,7 @@ static int fscache_read_helper(struct fscache_io_request *req,
+ 			default:
+ 				_debug("add fail %lx %d", cursor, ret);
+ 				put_page(page);
++				fscache_stat(&fscache_n_read_helper_stop_nomem);
+ 				page = NULL;
+ 				notes |= FSCACHE_RHLP_NOTE_LIST_ERROR;
+ 				goto stop;
+@@ -500,12 +526,14 @@ static int fscache_read_helper(struct fscache_io_request *req,
+ 						   readahead_gfp_mask(mapping));
+ 			if (!page) {
+ 				notes |= FSCACHE_RHLP_NOTE_TRAILER_NOMEM;
++				fscache_stat(&fscache_n_read_helper_stop_nomem);
+ 				goto stop;
+ 			}
+ 			if (PageUptodate(page)) {
+ 				unlock_page(page);
+ 				put_page(page); /* Avoid overwriting */
+ 				notes |= FSCACHE_RHLP_NOTE_TRAILER_U2D;
++				fscache_stat(&fscache_n_read_helper_stop_uptodate);
+ 				goto stop;
+ 			}
+ 
+@@ -587,18 +615,22 @@ static int fscache_read_helper(struct fscache_io_request *req,
+ 		 * the pages.
+ 		 */
+ 		_debug("SKIP READ: %llu", req->len);
++		fscache_stat(&fscache_n_read_helper_beyond_eof);
+ 		fscache_read_done(req);
+ 		break;
+ 	case fscache_read_helper_zero:
+ 		_debug("ZERO READ: %llu", req->len);
++		fscache_stat(&fscache_n_read_helper_zero);
+ 		fscache_read_done(req);
+ 		break;
+ 	case fscache_read_helper_read:
++		fscache_stat(&fscache_n_read_helper_read);
+ 		req->io_done = fscache_file_read_maybe_reissue;
+ 		fscache_read_from_cache(req);
+ 		break;
+ 	case fscache_read_helper_download:
+ 		_debug("DOWNLOAD: %llu", req->len);
++		fscache_stat(&fscache_n_read_helper_download);
+ 		req->io_done = fscache_read_done;
+ 		fscache_read_from_server(req);
+ 		break;
+diff --git a/fs/fscache/stats.c b/fs/fscache/stats.c
+index ccca0016fd26..63fb4d831f4d 100644
+--- a/fs/fscache/stats.c
++++ b/fs/fscache/stats.c
+@@ -58,6 +58,46 @@ atomic_t fscache_n_cache_stale_objects;
+ atomic_t fscache_n_cache_retired_objects;
+ atomic_t fscache_n_cache_culled_objects;
+ 
++atomic_t fscache_n_dispatch_count;
++atomic_t fscache_n_dispatch_deferred;
++atomic_t fscache_n_dispatch_inline;
++atomic_t fscache_n_dispatch_in_pool;
++
++atomic_t fscache_n_read;
++atomic_t fscache_n_write;
++
++atomic_t fscache_n_read_helper;
++atomic_t fscache_n_read_helper_stop_nomem;
++atomic_t fscache_n_read_helper_stop_uptodate;
++atomic_t fscache_n_read_helper_stop_exist;
++atomic_t fscache_n_read_helper_stop_kill;
++atomic_t fscache_n_read_helper_read;
++atomic_t fscache_n_read_helper_download;
++atomic_t fscache_n_read_helper_zero;
++atomic_t fscache_n_read_helper_beyond_eof;
++atomic_t fscache_n_read_helper_reissue;
++atomic_t fscache_n_read_helper_read_done;
++atomic_t fscache_n_read_helper_read_failed;
++atomic_t fscache_n_read_helper_copy;
++atomic_t fscache_n_read_helper_copy_done;
++atomic_t fscache_n_read_helper_copy_failed;
++
++EXPORT_SYMBOL(fscache_n_read_helper);
++EXPORT_SYMBOL(fscache_n_read_helper_stop_nomem);
++EXPORT_SYMBOL(fscache_n_read_helper_stop_uptodate);
++EXPORT_SYMBOL(fscache_n_read_helper_stop_exist);
++EXPORT_SYMBOL(fscache_n_read_helper_stop_kill);
++EXPORT_SYMBOL(fscache_n_read_helper_read);
++EXPORT_SYMBOL(fscache_n_read_helper_download);
++EXPORT_SYMBOL(fscache_n_read_helper_zero);
++EXPORT_SYMBOL(fscache_n_read_helper_beyond_eof);
++EXPORT_SYMBOL(fscache_n_read_helper_reissue);
++EXPORT_SYMBOL(fscache_n_read_helper_read_done);
++EXPORT_SYMBOL(fscache_n_read_helper_read_failed);
++EXPORT_SYMBOL(fscache_n_read_helper_copy);
++EXPORT_SYMBOL(fscache_n_read_helper_copy_done);
++EXPORT_SYMBOL(fscache_n_read_helper_copy_failed);
++
+ /*
+  * display the general statistics
+  */
+@@ -117,5 +157,34 @@ int fscache_stats_show(struct seq_file *m, void *v)
+ 		   atomic_read(&fscache_n_cache_stale_objects),
+ 		   atomic_read(&fscache_n_cache_retired_objects),
+ 		   atomic_read(&fscache_n_cache_culled_objects));
++
++	seq_printf(m, "Disp   : n=%u il=%u df=%u pl=%u\n",
++		   atomic_read(&fscache_n_dispatch_count),
++		   atomic_read(&fscache_n_dispatch_inline),
++		   atomic_read(&fscache_n_dispatch_deferred),
++		   atomic_read(&fscache_n_dispatch_in_pool));
++
++	seq_printf(m, "IO     : rd=%u wr=%u\n",
++		   atomic_read(&fscache_n_read),
++		   atomic_read(&fscache_n_write));
++
++	seq_printf(m, "RdHelp : nm=%u ud=%u ex=%u kl=%u\n",
++		   atomic_read(&fscache_n_read_helper_stop_nomem),
++		   atomic_read(&fscache_n_read_helper_stop_uptodate),
++		   atomic_read(&fscache_n_read_helper_stop_exist),
++		   atomic_read(&fscache_n_read_helper_stop_kill));
++	seq_printf(m, "RdHelp : n=%u rd=%u dl=%u zr=%u eo=%u\n",
++		   atomic_read(&fscache_n_read_helper),
++		   atomic_read(&fscache_n_read_helper_read),
++		   atomic_read(&fscache_n_read_helper_download),
++		   atomic_read(&fscache_n_read_helper_zero),
++		   atomic_read(&fscache_n_read_helper_beyond_eof));
++	seq_printf(m, "RdHelp : ri=%u dn=%u fl=%u cp=%u cd=%u cf=%u\n",
++		   atomic_read(&fscache_n_read_helper_reissue),
++		   atomic_read(&fscache_n_read_helper_read_done),
++		   atomic_read(&fscache_n_read_helper_read_failed),
++		   atomic_read(&fscache_n_read_helper_copy),
++		   atomic_read(&fscache_n_read_helper_copy_done),
++		   atomic_read(&fscache_n_read_helper_copy_failed));
+ 	return 0;
+ }
 
 
