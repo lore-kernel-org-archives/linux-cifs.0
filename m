@@ -2,48 +2,53 @@ Return-Path: <SRS0=Z3Qp=AY=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F600C433E3
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58638C433EC
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:28:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5256A206F0
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:28:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CECE2065E
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:28:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ergay/3F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QUnlh9Yt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729593AbgGMQ16 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 13 Jul 2020 12:27:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40467 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729846AbgGMQ15 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 13 Jul 2020 12:27:57 -0400
+        id S1729933AbgGMQ2T (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 13 Jul 2020 12:28:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30350 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729969AbgGMQ2T (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 13 Jul 2020 12:28:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594657676;
+        s=mimecast20190719; t=1594657697;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=GPqCyKmxk5bmr4GI6eZ9r8X5VU2eAhQ5GXlXXDbYfyQ=;
-        b=Ergay/3FG9dJRs6g+g1nklu1911xcNDVFRocLoiAbfbEYWHq7fgd8drdBw3QYNFjxlu6JF
-        qTqAdAXEhJBiTNACfLxkpXjePhc56Nm1g2PbguoInaPk96ML9Jip1+JCBa4QyXQTtsSDOK
-        CiI8Rr2O3BAvzC4+BmzpZ7hqyhRyr+8=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CzhoXrwmUTmhS6Qbraw9VIGFBFp5Q5ckc0AuIlZv+m0=;
+        b=QUnlh9YtZZDm6sudWAlUWYCDhK+T+ezUUeWd0GEkemU6i33J1aV2nyPu4MEnUv2stmygXO
+        0/nu5ttYEj8eIQBG5kE8cfvxY708qDZGAgnCmC0l2we4BQ2TxAZdBK8/954eQcMBSMDMIu
+        I4CYfHr3vVsRbQlPkirin7Kd+dE9HfQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-UbkhdcJiO76QhtJmUg1Lqw-1; Mon, 13 Jul 2020 12:27:53 -0400
-X-MC-Unique: UbkhdcJiO76QhtJmUg1Lqw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-48-kvL2WFVkOLWy1WEuvOWXEQ-1; Mon, 13 Jul 2020 12:28:15 -0400
+X-MC-Unique: kvL2WFVkOLWy1WEuvOWXEQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EF7D18FF665;
-        Mon, 13 Jul 2020 16:27:50 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CD89800FED;
+        Mon, 13 Jul 2020 16:28:13 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-112-113.rdu2.redhat.com [10.10.112.113])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A6DCE1CA;
-        Mon, 13 Jul 2020 16:27:44 +0000 (UTC)
-Subject: [PATCH 00/14] fscache: Rewrite 1: Disable and clean in preparation
- for rewrite
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E519E5D9D7;
+        Mon, 13 Jul 2020 16:28:07 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH 02/14] afs: Disable use of the fscache I/O routines
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
@@ -56,127 +61,323 @@ Cc:     Jeff Layton <jlayton@redhat.com>,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 13 Jul 2020 17:27:43 +0100
-Message-ID: <159465766378.1376105.11619976251039287525.stgit@warthog.procyon.org.uk>
+Date:   Mon, 13 Jul 2020 17:28:07 +0100
+Message-ID: <159465768717.1376105.2229314852486665807.stgit@warthog.procyon.org.uk>
+In-Reply-To: <159465766378.1376105.11619976251039287525.stgit@warthog.procyon.org.uk>
+References: <159465766378.1376105.11619976251039287525.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.22
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Disable use of the fscache I/O routined by the AFS filesystem.  It's about
+to transition to passing iov_iters down and fscache is about to have its
+I/O path to use iov_iter, so all that needs to change.
 
-Here's a set of patches that disables the network filesystems that use
-fscache and then remove a whole chunk of the fscache codebase pending it
-being rewritten.
-
-The following parts of fscache have been removed:
-
-    - The object state machine
-    - The I/O operation manager
-    - All non-transient references from fscache to the netfs's data
-    - All non-transient callbacks from fscache to the netfs
-    - The backing page I/O monitoring
-    - The tracking of netfs pages that fscache knows about
-    - The tracking of netfs pages that need writing to the cache
-    - The use of bmap to work out if a page is stored in the cache
-    - The copy of data to/from backing pages to netfs pages.
-
-The corresponding cachefiles bits have also been removed.
-
-These patches can be found as part of the branch here:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=fscache-iter
-
-David
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: linux-afs@lists.infradead.org
 ---
-David Howells (1):
-      fscache: Remove the I/O operation manager
 
+ fs/afs/file.c  |  196 ++++++++++----------------------------------------------
+ fs/afs/write.c |   10 ---
+ 2 files changed, 35 insertions(+), 171 deletions(-)
 
- fs/9p/Kconfig                          |    2 +-
- fs/Makefile                            |    2 +-
- fs/afs/Kconfig                         |    1 +
- fs/afs/cache.c                         |   54 --
- fs/afs/cell.c                          |    9 +-
- fs/afs/dir.c                           |  242 +++++--
- fs/afs/file.c                          |  575 +++++++--------
- fs/afs/fs_operation.c                  |    4 +-
- fs/afs/fsclient.c                      |  154 ++--
- fs/afs/inode.c                         |   57 +-
- fs/afs/internal.h                      |   58 +-
- fs/afs/rxrpc.c                         |  150 ++--
- fs/afs/volume.c                        |    9 +-
- fs/afs/write.c                         |  413 +++++++----
- fs/afs/yfsclient.c                     |  113 ++-
- fs/cachefiles/Makefile                 |    3 +-
- fs/cachefiles/bind.c                   |   11 +-
- fs/cachefiles/content-map.c            |  476 ++++++++++++
- fs/cachefiles/daemon.c                 |   10 +-
- fs/cachefiles/interface.c              |  564 ++++++++-------
- fs/cachefiles/internal.h               |  139 ++--
- fs/cachefiles/io.c                     |  279 +++++++
- fs/cachefiles/main.c                   |   12 +-
- fs/cachefiles/namei.c                  |  508 +++++--------
- fs/cachefiles/rdwr.c                   |  974 -------------------------
- fs/cachefiles/xattr.c                  |  263 +++----
- fs/ceph/Kconfig                        |    2 +-
- fs/cifs/Kconfig                        |    2 +-
- fs/fscache/Kconfig                     |    8 +
- fs/fscache/Makefile                    |   10 +-
- fs/fscache/cache.c                     |  136 ++--
- fs/fscache/cookie.c                    |  769 ++++++++------------
- fs/fscache/dispatcher.c                |  150 ++++
- fs/fscache/fsdef.c                     |   56 +-
- fs/fscache/histogram.c                 |    2 +-
- fs/fscache/internal.h                  |  260 +++----
- fs/fscache/io.c                        |  201 +++++
- fs/fscache/main.c                      |   35 +-
- fs/fscache/netfs.c                     |   10 +-
- fs/fscache/obj.c                       |  345 +++++++++
- fs/fscache/object-list.c               |  129 +---
- fs/fscache/object.c                    | 1133 -----------------------------
- fs/fscache/object_bits.c               |  120 +++
- fs/fscache/operation.c                 |  633 ----------------
- fs/fscache/page.c                      | 1248 --------------------------------
- fs/fscache/proc.c                      |   13 +-
- fs/fscache/read_helper.c               |  688 ++++++++++++++++++
- fs/fscache/stats.c                     |  265 +++----
- fs/internal.h                          |    5 -
- fs/nfs/Kconfig                         |    2 +-
- fs/nfs/fscache-index.c                 |    4 +-
- fs/read_write.c                        |    1 +
- include/linux/fs.h                     |    2 +
- include/linux/fscache-cache.h          |  508 +++----------
- include/linux/fscache-obsolete.h       |   13 +
- include/linux/fscache.h                |  814 ++++++++-------------
- include/linux/mm.h                     |    1 +
- include/linux/pagemap.h                |   14 +
- include/linux/uio.h                    |   11 +
- include/net/af_rxrpc.h                 |    2 +-
- include/trace/events/afs.h             |   51 +-
- include/trace/events/cachefiles.h      |  285 ++++++--
- include/trace/events/fscache.h         |  421 ++---------
- include/trace/events/fscache_support.h |   91 +++
- lib/iov_iter.c                         |  286 +++++++-
- mm/filemap.c                           |   27 +-
- net/rxrpc/recvmsg.c                    |    9 +-
- 67 files changed, 5598 insertions(+), 8246 deletions(-)
- create mode 100644 fs/cachefiles/content-map.c
- create mode 100644 fs/cachefiles/io.c
- delete mode 100644 fs/cachefiles/rdwr.c
- create mode 100644 fs/fscache/dispatcher.c
- create mode 100644 fs/fscache/io.c
- create mode 100644 fs/fscache/obj.c
- delete mode 100644 fs/fscache/object.c
- create mode 100644 fs/fscache/object_bits.c
- delete mode 100644 fs/fscache/operation.c
- delete mode 100644 fs/fscache/page.c
- create mode 100644 fs/fscache/read_helper.c
- create mode 100644 include/linux/fscache-obsolete.h
- create mode 100644 include/trace/events/fscache_support.h
+diff --git a/fs/afs/file.c b/fs/afs/file.c
+index 6f6ed1605cfe..13f078111bad 100644
+--- a/fs/afs/file.c
++++ b/fs/afs/file.c
+@@ -202,24 +202,6 @@ void afs_put_read(struct afs_read *req)
+ 	}
+ }
+ 
+-#ifdef CONFIG_AFS_FSCACHE
+-/*
+- * deal with notification that a page was read from the cache
+- */
+-static void afs_file_readpage_read_complete(struct page *page,
+-					    void *data,
+-					    int error)
+-{
+-	_enter("%p,%p,%d", page, data, error);
+-
+-	/* if the read completes with an error, we just unlock the page and let
+-	 * the VM reissue the readpage */
+-	if (!error)
+-		SetPageUptodate(page);
+-	unlock_page(page);
+-}
+-#endif
+-
+ static void afs_fetch_data_success(struct afs_operation *op)
+ {
+ 	struct afs_vnode *vnode = op->file[0].vnode;
+@@ -287,89 +269,46 @@ int afs_page_filler(void *data, struct page *page)
+ 	if (test_bit(AFS_VNODE_DELETED, &vnode->flags))
+ 		goto error;
+ 
+-	/* is it cached? */
+-#ifdef CONFIG_AFS_FSCACHE
+-	ret = fscache_read_or_alloc_page(vnode->cache,
+-					 page,
+-					 afs_file_readpage_read_complete,
+-					 NULL,
+-					 GFP_KERNEL);
+-#else
+-	ret = -ENOBUFS;
+-#endif
+-	switch (ret) {
+-		/* read BIO submitted (page in cache) */
+-	case 0:
+-		break;
+-
+-		/* page not yet cached */
+-	case -ENODATA:
+-		_debug("cache said ENODATA");
+-		goto go_on;
+-
+-		/* page will not be cached */
+-	case -ENOBUFS:
+-		_debug("cache said ENOBUFS");
+-
+-		/* fall through */
+-	default:
+-	go_on:
+-		req = kzalloc(struct_size(req, array, 1), GFP_KERNEL);
+-		if (!req)
+-			goto enomem;
+-
+-		/* We request a full page.  If the page is a partial one at the
+-		 * end of the file, the server will return a short read and the
+-		 * unmarshalling code will clear the unfilled space.
+-		 */
+-		refcount_set(&req->usage, 1);
+-		req->pos = (loff_t)page->index << PAGE_SHIFT;
+-		req->len = PAGE_SIZE;
+-		req->nr_pages = 1;
+-		req->pages = req->array;
+-		req->pages[0] = page;
+-		get_page(page);
+-
+-		/* read the contents of the file from the server into the
+-		 * page */
+-		ret = afs_fetch_data(vnode, key, req);
+-		afs_put_read(req);
+-
+-		if (ret < 0) {
+-			if (ret == -ENOENT) {
+-				_debug("got NOENT from server"
+-				       " - marking file deleted and stale");
+-				set_bit(AFS_VNODE_DELETED, &vnode->flags);
+-				ret = -ESTALE;
+-			}
+-
+-#ifdef CONFIG_AFS_FSCACHE
+-			fscache_uncache_page(vnode->cache, page);
+-#endif
+-			BUG_ON(PageFsCache(page));
+-
+-			if (ret == -EINTR ||
+-			    ret == -ENOMEM ||
+-			    ret == -ERESTARTSYS ||
+-			    ret == -EAGAIN)
+-				goto error;
+-			goto io_error;
+-		}
++	req = kzalloc(struct_size(req, array, 1), GFP_KERNEL);
++	if (!req)
++		goto enomem;
++
++	/* We request a full page.  If the page is a partial one at the
++	 * end of the file, the server will return a short read and the
++	 * unmarshalling code will clear the unfilled space.
++	 */
++	refcount_set(&req->usage, 1);
++	req->pos = (loff_t)page->index << PAGE_SHIFT;
++	req->len = PAGE_SIZE;
++	req->nr_pages = 1;
++	req->pages = req->array;
++	req->pages[0] = page;
++	get_page(page);
+ 
+-		SetPageUptodate(page);
++	/* read the contents of the file from the server into the
++	 * page */
++	ret = afs_fetch_data(vnode, key, req);
++	afs_put_read(req);
+ 
+-		/* send the page to the cache */
+-#ifdef CONFIG_AFS_FSCACHE
+-		if (PageFsCache(page) &&
+-		    fscache_write_page(vnode->cache, page, vnode->status.size,
+-				       GFP_KERNEL) != 0) {
+-			fscache_uncache_page(vnode->cache, page);
+-			BUG_ON(PageFsCache(page));
++	if (ret < 0) {
++		if (ret == -ENOENT) {
++			_debug("got NOENT from server"
++			       " - marking file deleted and stale");
++			set_bit(AFS_VNODE_DELETED, &vnode->flags);
++			ret = -ESTALE;
+ 		}
+-#endif
+-		unlock_page(page);
++
++		if (ret == -EINTR ||
++		    ret == -ENOMEM ||
++		    ret == -ERESTARTSYS ||
++		    ret == -EAGAIN)
++			goto error;
++		goto io_error;
+ 	}
+ 
++	SetPageUptodate(page);
++	unlock_page(page);
++
+ 	_leave(" = 0");
+ 	return 0;
+ 
+@@ -415,23 +354,10 @@ static int afs_readpage(struct file *file, struct page *page)
+  */
+ static void afs_readpages_page_done(struct afs_read *req)
+ {
+-#ifdef CONFIG_AFS_FSCACHE
+-	struct afs_vnode *vnode = req->vnode;
+-#endif
+ 	struct page *page = req->pages[req->index];
+ 
+ 	req->pages[req->index] = NULL;
+ 	SetPageUptodate(page);
+-
+-	/* send the page to the cache */
+-#ifdef CONFIG_AFS_FSCACHE
+-	if (PageFsCache(page) &&
+-	    fscache_write_page(vnode->cache, page, vnode->status.size,
+-			       GFP_KERNEL) != 0) {
+-		fscache_uncache_page(vnode->cache, page);
+-		BUG_ON(PageFsCache(page));
+-	}
+-#endif
+ 	unlock_page(page);
+ 	put_page(page);
+ }
+@@ -490,9 +416,6 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+ 		index = page->index;
+ 		if (add_to_page_cache_lru(page, mapping, index,
+ 					  readahead_gfp_mask(mapping))) {
+-#ifdef CONFIG_AFS_FSCACHE
+-			fscache_uncache_page(vnode->cache, page);
+-#endif
+ 			put_page(page);
+ 			break;
+ 		}
+@@ -525,9 +448,6 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+ 	for (i = 0; i < req->nr_pages; i++) {
+ 		page = req->pages[i];
+ 		if (page) {
+-#ifdef CONFIG_AFS_FSCACHE
+-			fscache_uncache_page(vnode->cache, page);
+-#endif
+ 			SetPageError(page);
+ 			unlock_page(page);
+ 		}
+@@ -559,37 +479,6 @@ static int afs_readpages(struct file *file, struct address_space *mapping,
+ 	}
+ 
+ 	/* attempt to read as many of the pages as possible */
+-#ifdef CONFIG_AFS_FSCACHE
+-	ret = fscache_read_or_alloc_pages(vnode->cache,
+-					  mapping,
+-					  pages,
+-					  &nr_pages,
+-					  afs_file_readpage_read_complete,
+-					  NULL,
+-					  mapping_gfp_mask(mapping));
+-#else
+-	ret = -ENOBUFS;
+-#endif
+-
+-	switch (ret) {
+-		/* all pages are being read from the cache */
+-	case 0:
+-		BUG_ON(!list_empty(pages));
+-		BUG_ON(nr_pages != 0);
+-		_leave(" = 0 [reading all]");
+-		return 0;
+-
+-		/* there were pages that couldn't be read from the cache */
+-	case -ENODATA:
+-	case -ENOBUFS:
+-		break;
+-
+-		/* other error */
+-	default:
+-		_leave(" = %d", ret);
+-		return ret;
+-	}
+-
+ 	while (!list_empty(pages)) {
+ 		ret = afs_readpages_one(file, mapping, pages);
+ 		if (ret < 0)
+@@ -617,14 +506,6 @@ static void afs_invalidatepage(struct page *page, unsigned int offset,
+ 
+ 	/* we clean up only if the entire page is being invalidated */
+ 	if (offset == 0 && length == PAGE_SIZE) {
+-#ifdef CONFIG_AFS_FSCACHE
+-		if (PageFsCache(page)) {
+-			struct afs_vnode *vnode = AFS_FS_I(page->mapping->host);
+-			fscache_wait_on_page_write(vnode->cache, page);
+-			fscache_uncache_page(vnode->cache, page);
+-		}
+-#endif
+-
+ 		if (PagePrivate(page)) {
+ 			priv = page_private(page);
+ 			trace_afs_page_dirty(vnode, tracepoint_string("inval"),
+@@ -652,13 +533,6 @@ static int afs_releasepage(struct page *page, gfp_t gfp_flags)
+ 
+ 	/* deny if page is being written to the cache and the caller hasn't
+ 	 * elected to wait */
+-#ifdef CONFIG_AFS_FSCACHE
+-	if (!fscache_maybe_release_page(vnode->cache, page, gfp_flags)) {
+-		_leave(" = F [cache busy]");
+-		return 0;
+-	}
+-#endif
+-
+ 	if (PagePrivate(page)) {
+ 		priv = page_private(page);
+ 		trace_afs_page_dirty(vnode, tracepoint_string("rel"),
+diff --git a/fs/afs/write.c b/fs/afs/write.c
+index 7437806332d9..abfc8d3dc20c 100644
+--- a/fs/afs/write.c
++++ b/fs/afs/write.c
+@@ -828,9 +828,6 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
+ 	/* Wait for the page to be written to the cache before we allow it to
+ 	 * be modified.  We then assume the entire page will need writing back.
+ 	 */
+-#ifdef CONFIG_AFS_FSCACHE
+-	fscache_wait_on_page_write(vnode->cache, vmf->page);
+-#endif
+ 
+ 	if (PageWriteback(vmf->page) &&
+ 	    wait_on_page_bit_killable(vmf->page, PG_writeback) < 0)
+@@ -916,12 +913,5 @@ int afs_launder_page(struct page *page)
+ 			     page->index, priv);
+ 	set_page_private(page, 0);
+ 	ClearPagePrivate(page);
+-
+-#ifdef CONFIG_AFS_FSCACHE
+-	if (PageFsCache(page)) {
+-		fscache_wait_on_page_write(vnode->cache, page);
+-		fscache_uncache_page(vnode->cache, page);
+-	}
+-#endif
+ 	return ret;
+ }
 
 
