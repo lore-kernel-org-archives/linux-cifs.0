@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F305C433F4
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E4AC433E5
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:31:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E99562065F
-	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:31:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C2FF206F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:31:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1TCCQSj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kkx+SPRZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729700AbgGMQbY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 13 Jul 2020 12:31:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34716 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730225AbgGMQbX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 13 Jul 2020 12:31:23 -0400
+        id S1730511AbgGMQbr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 13 Jul 2020 12:31:47 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31221 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730508AbgGMQbq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 13 Jul 2020 12:31:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1594657882;
+        s=mimecast20190719; t=1594657905;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3hEyWi8czD3M2ZNrh9uxJa2z5WTZcojM78ypRlIZeMs=;
-        b=i1TCCQSjvFFMn+h6LDrjHGgNYj6iI2XXTzYkUMY54uA3ROMPBBrN1y0MCaq1fB7WOgwZhy
-        A71WnWw/PUC8Y0uKCmvg3LzxqyBK/PBNEdwjpk8lTHguok0JWHZgtWta3UrZtlE6JCskys
-        pXaT4q6fmdlgkI6VddxgSEm/PNdUmj0=
+        bh=xY8bHMAAYMuhdLzdE9CY5HGi5hz2/1pR5v57pe/8g3I=;
+        b=Kkx+SPRZBlh74znkEXwcaAe4npuUCyP92qL399whifYqqA1lJvSCLhSToedN2880EIBc8s
+        SiiCWoRh9350qILkxwTp21wVkzusz3mGMgXs3U4gNDnCf4W8ZvsuOeJ5kqANUB8v0cRDt+
+        3ew7mwAA78FNoovSkptRWnQTkVfsInk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-ieiKC1Z0Mcu9j4SJGfHcug-1; Mon, 13 Jul 2020 12:31:20 -0400
-X-MC-Unique: ieiKC1Z0Mcu9j4SJGfHcug-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-19-x9G9ssjJP3ucHZsk_1l_bA-1; Mon, 13 Jul 2020 12:31:41 -0400
+X-MC-Unique: x9G9ssjJP3ucHZsk_1l_bA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 018F8108A;
-        Mon, 13 Jul 2020 16:31:19 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8716218FF669;
+        Mon, 13 Jul 2020 16:31:39 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-112-113.rdu2.redhat.com [10.10.112.113])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7AFAB10013C0;
-        Mon, 13 Jul 2020 16:31:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 299BF7621B;
+        Mon, 13 Jul 2020 16:31:34 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 03/32] vfs: Export rw_verify_area() for use by cachefiles
+Subject: [PATCH 05/32] mm: Provide lru_to_last_page() to get last of a page
+ list
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
@@ -60,71 +61,40 @@ Cc:     Jeff Layton <jlayton@redhat.com>,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 13 Jul 2020 17:31:12 +0100
-Message-ID: <159465787270.1376674.9709773455326854521.stgit@warthog.procyon.org.uk>
+Date:   Mon, 13 Jul 2020 17:31:33 +0100
+Message-ID: <159465789337.1376674.4843292427395367970.stgit@warthog.procyon.org.uk>
 In-Reply-To: <159465784033.1376674.18106463693989811037.stgit@warthog.procyon.org.uk>
 References: <159465784033.1376674.18106463693989811037.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.22
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Export rw_verify_area() for so that cachefiles can use it before issuing
-call_read_iter() and call_write_iter() to effect async DIO operations
-against the cache.
+Provide a macro, lru_to_last_page(), to find the last page in a page list
+(the opposite of lru_to_page()).
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- fs/internal.h      |    5 -----
- fs/read_write.c    |    1 +
- include/linux/fs.h |    1 +
- 3 files changed, 2 insertions(+), 5 deletions(-)
+ include/linux/mm.h |    1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/internal.h b/fs/internal.h
-index 9b863a7bd708..8213a29a972f 100644
---- a/fs/internal.h
-+++ b/fs/internal.h
-@@ -156,11 +156,6 @@ extern char *simple_dname(struct dentry *, char *, int);
- extern void dput_to_list(struct dentry *, struct list_head *);
- extern void shrink_dentry_list(struct list_head *);
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index dc7b87310c10..9692b9b58b06 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -216,6 +216,7 @@ int overcommit_kbytes_handler(struct ctl_table *, int, void *, size_t *,
+ #define PAGE_ALIGNED(addr)	IS_ALIGNED((unsigned long)(addr), PAGE_SIZE)
  
--/*
-- * read_write.c
-- */
--extern int rw_verify_area(int, struct file *, const loff_t *, size_t);
--
+ #define lru_to_page(head) (list_entry((head)->prev, struct page, lru))
++#define lru_to_last_page(head) (list_entry((head)->next, struct page, lru))
+ 
  /*
-  * pipe.c
-  */
-diff --git a/fs/read_write.c b/fs/read_write.c
-index bbfa9b12b15e..eb18270a1e14 100644
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -400,6 +400,7 @@ int rw_verify_area(int read_write, struct file *file, const loff_t *ppos, size_t
- 	return security_file_permission(file,
- 				read_write == READ ? MAY_READ : MAY_WRITE);
- }
-+EXPORT_SYMBOL(rw_verify_area);
- 
- static ssize_t new_sync_read(struct file *filp, char __user *buf, size_t len, loff_t *ppos)
- {
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 3f881a892ea7..aa3e3af92220 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2905,6 +2905,7 @@ extern int notify_change(struct dentry *, struct iattr *, struct inode **);
- extern int inode_permission(struct inode *, int);
- extern int generic_permission(struct inode *, int);
- extern int __check_sticky(struct inode *dir, struct inode *inode);
-+extern int rw_verify_area(int, struct file *, const loff_t *, size_t);
- 
- static inline bool execute_ok(struct inode *inode)
- {
+  * Linux kernel virtual memory manager primitives.
 
 
