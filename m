@@ -1,244 +1,170 @@
-Return-Path: <SRS0=3VLN=AW=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Z3Qp=AY=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFED0C433E0
-	for <linux-cifs@archiver.kernel.org>; Sat, 11 Jul 2020 16:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 955C7C433E7
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:28:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA3BE20786
-	for <linux-cifs@archiver.kernel.org>; Sat, 11 Jul 2020 16:41:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72E2E2065E
+	for <linux-cifs@archiver.kernel.org>; Mon, 13 Jul 2020 16:28:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JD0sVUbP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J1fnlEy2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728441AbgGKQlj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 11 Jul 2020 12:41:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59322 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728412AbgGKQlj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 11 Jul 2020 12:41:39 -0400
-Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA7A1C08C5DD
-        for <linux-cifs@vger.kernel.org>; Sat, 11 Jul 2020 09:41:38 -0700 (PDT)
-Received: by mail-yb1-xb41.google.com with SMTP id x9so4261817ybd.4
-        for <linux-cifs@vger.kernel.org>; Sat, 11 Jul 2020 09:41:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QVEZwSimitIoKKBU/1PkUd547wwMMzOk2W/jcJeBTzc=;
-        b=JD0sVUbPmPJtdUHzF0f98iNWZbS+OCUy3Sa5f8B5NGRQX9RMd2BXtPBy+gKXVw5pHP
-         dXDVdl63LPHSu6JSUiuD2ccsWzrqY+pADjV0Zyds0Z6SBioPB4Ml1pH+dPpyZiR3k0Jz
-         V9AkEjQZeXlsy1dRLa4zl9+88VfFwiw6WbkQgl44xmBjDcrsoZ83HB7J5Hn2ELrTAYkP
-         TiM2+UBABiq9GbvXUi5gARCMFhHefFiR+xOEQnvABGv/nKnKhYju/0fIxfTLKNeOlYp6
-         6bYawRjVO/AaIbzfzer0PP9xDfA6jC0wfXXZCvGVdJSCn67996sGlJ4f41X9eMwyi5z8
-         hLcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QVEZwSimitIoKKBU/1PkUd547wwMMzOk2W/jcJeBTzc=;
-        b=mwyQ+/AIpW8NJ6+0OmnmhX0otHEwmjF8h3tnXN8n7K5Ret0vGU1r82ztXw4evhlHsz
-         mlOOjerwmxWE7qi1CtlB/zY8W4uLGJpUp/8b/y0Dq5TN1nCCgYA9YR+XUsLyNsUJtUPt
-         R/bNrTpfxElK3oMHXE3RYx1XJBAZWVnSYRjUraJb4lsq8xnSeGM/iqP5+UCs7EbkdH+4
-         nPrgyvQx8nAELN6aAfVVzynArJ5uScm+eS9BA3Ok8cczj2lqHaT/4Ov7aQDoFM8Y4QwL
-         2ZlllJoUfEwaFA4JuzHflx4Jemxww5GP8FjmECYmLKltyGsIG4Czf/yBkNkOIQNtE4IB
-         GaoQ==
-X-Gm-Message-State: AOAM532h2uZGa/dRqFLtcycaQdlrG2kIxSNCvRzq3r8ZeP0uys3FXrQQ
-        yEdEzzwA3sBHtFevodD/zM6/mDus9OXB2i7DCQ8=
-X-Google-Smtp-Source: ABdhPJzrw9tjUSSRj5mA4SVFNdIyoO5KxjuEPQnvyASdV8tzTmWxsWpt12bCqKWlW++sysX+ddqYXS7XdASiW5ZCDIY=
-X-Received: by 2002:a25:23c7:: with SMTP id j190mr54490271ybj.167.1594485697608;
- Sat, 11 Jul 2020 09:41:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200710050116.623540-1-paul@darkrain42.org>
-In-Reply-To: <20200710050116.623540-1-paul@darkrain42.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 11 Jul 2020 11:41:26 -0500
-Message-ID: <CAH2r5muo=Z63jP0045u0O=pnE9mc2uwMy13_g4fsKx3Stw0-6g@mail.gmail.com>
-Subject: Re: [PATCH v4] cifs: Fix leak when handling lease break for cached
- root fid
-To:     Paul Aurich <paul@darkrain42.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        id S1729946AbgGMQ2H (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 13 Jul 2020 12:28:07 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49601 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729826AbgGMQ2G (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 13 Jul 2020 12:28:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594657685;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zUR6LgVy3tJ5Aru7BEe9LDKC493wPE1LbzcKrd1qSRs=;
+        b=J1fnlEy28NIgSks+mpmxsmIgZ1y8wjsxGVNQXBTJ7D8sg0MkSzWmIBhjgS3/j3P+3hBgbh
+        ASNj31xhN1o6yDinHby456RUUms36aoyp61dygFIFgtDenrPaudlElhwzSA0+2c+PPuomk
+        dkyIxRNsS67zVZvVl3Fsyq3RV9JPteg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-495-9tQ7GDpLNT2w3pz8pxgaAg-1; Mon, 13 Jul 2020 12:28:03 -0400
+X-MC-Unique: 9tQ7GDpLNT2w3pz8pxgaAg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED86380183C;
+        Mon, 13 Jul 2020 16:28:01 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-112-113.rdu2.redhat.com [10.10.112.113])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A9CCC60C87;
+        Mon, 13 Jul 2020 16:27:56 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH 01/14] nfs, cifs, ceph,
+ 9p: Disable use of fscache prior to its rewrite
+From:   David Howells <dhowells@redhat.com>
+To:     Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     Jeff Layton <jlayton@redhat.com>,
+        Dave Wysochanski <dwysocha@redhat.com>, dhowells@redhat.com,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 13 Jul 2020 17:27:55 +0100
+Message-ID: <159465767588.1376105.11762011193210440208.stgit@warthog.procyon.org.uk>
+In-Reply-To: <159465766378.1376105.11619976251039287525.stgit@warthog.procyon.org.uk>
+References: <159465766378.1376105.11619976251039287525.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.22
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending review and testing
+Temporarily disable the use of fscache by the various Linux network
+filesystems, apart from afs, so that the fscache core can be rewritten.
 
-On Fri, Jul 10, 2020 at 12:01 AM Paul Aurich <paul@darkrain42.org> wrote:
->
-> Handling a lease break for the cached root didn't free the
-> smb2_lease_break_work allocation, resulting in a leak:
->
->     unreferenced object 0xffff98383a5af480 (size 128):
->       comm "cifsd", pid 684, jiffies 4294936606 (age 534.868s)
->       hex dump (first 32 bytes):
->         c0 ff ff ff 1f 00 00 00 88 f4 5a 3a 38 98 ff ff  ..........Z:8...
->         88 f4 5a 3a 38 98 ff ff 80 88 d6 8a ff ff ff ff  ..Z:8...........
->       backtrace:
->         [<0000000068957336>] smb2_is_valid_oplock_break+0x1fa/0x8c0
->         [<0000000073b70b9e>] cifs_demultiplex_thread+0x73d/0xcc0
->         [<00000000905fa372>] kthread+0x11c/0x150
->         [<0000000079378e4e>] ret_from_fork+0x22/0x30
->
-> Avoid this leak by only allocating when necessary.
->
-> Fixes: a93864d93977 ("cifs: add lease tracking to the cached root fid")
-> Signed-off-by: Paul Aurich <paul@darkrain42.org>
-> CC: Stable <stable@vger.kernel.org> # v4.18+
-> ---
-> Changes from v3:
->   - refactor pending open lease handling into separate functions so that the
->     core spinlock handling can occur all in smb2_is_valid_lease_break
->
->  fs/cifs/smb2misc.c | 73 +++++++++++++++++++++++++++++++++-------------
->  1 file changed, 52 insertions(+), 21 deletions(-)
->
-> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-> index 6a39451973f8..865cd248c605 100644
-> --- a/fs/cifs/smb2misc.c
-> +++ b/fs/cifs/smb2misc.c
-> @@ -504,15 +504,31 @@ cifs_ses_oplock_break(struct work_struct *work)
->         kfree(lw);
->  }
->
-> +static void
-> +smb2_queue_pending_open_break(struct tcon_link *tlink, __u8 *lease_key,
-> +                             __le32 new_lease_state)
-> +{
-> +       struct smb2_lease_break_work *lw;
-> +
-> +       lw = kmalloc(sizeof(struct smb2_lease_break_work), GFP_KERNEL);
-> +       if (!lw) {
-> +               cifs_put_tlink(tlink);
-> +               return;
-> +       }
-> +
-> +       INIT_WORK(&lw->lease_break, cifs_ses_oplock_break);
-> +       lw->tlink = tlink;
-> +       lw->lease_state = new_lease_state;
-> +       memcpy(lw->lease_key, lease_key, SMB2_LEASE_KEY_SIZE);
-> +       queue_work(cifsiod_wq, &lw->lease_break);
-> +}
-> +
->  static bool
-> -smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
-> -                   struct smb2_lease_break_work *lw)
-> +smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp)
->  {
-> -       bool found;
->         __u8 lease_state;
->         struct list_head *tmp;
->         struct cifsFileInfo *cfile;
-> -       struct cifs_pending_open *open;
->         struct cifsInodeInfo *cinode;
->         int ack_req = le32_to_cpu(rsp->Flags &
->                                   SMB2_NOTIFY_BREAK_LEASE_FLAG_ACK_REQUIRED);
-> @@ -542,22 +558,29 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
->                 cfile->oplock_level = lease_state;
->
->                 cifs_queue_oplock_break(cfile);
-> -               kfree(lw);
->                 return true;
->         }
->
-> -       found = false;
-> +       return false;
-> +}
-> +
-> +static struct cifs_pending_open *
-> +smb2_tcon_find_pending_open_lease(struct cifs_tcon *tcon,
-> +                                 struct smb2_lease_break *rsp)
-> +{
-> +       __u8 lease_state = le32_to_cpu(rsp->NewLeaseState);
-> +       int ack_req = le32_to_cpu(rsp->Flags &
-> +                                 SMB2_NOTIFY_BREAK_LEASE_FLAG_ACK_REQUIRED);
-> +       struct cifs_pending_open *open;
-> +       struct cifs_pending_open *found = NULL;
-> +
->         list_for_each_entry(open, &tcon->pending_opens, olist) {
->                 if (memcmp(open->lease_key, rsp->LeaseKey,
->                            SMB2_LEASE_KEY_SIZE))
->                         continue;
->
->                 if (!found && ack_req) {
-> -                       found = true;
-> -                       memcpy(lw->lease_key, open->lease_key,
-> -                              SMB2_LEASE_KEY_SIZE);
-> -                       lw->tlink = cifs_get_tlink(open->tlink);
-> -                       queue_work(cifsiod_wq, &lw->lease_break);
-> +                       found = open;
->                 }
->
->                 cifs_dbg(FYI, "found in the pending open list\n");
-> @@ -578,14 +601,7 @@ smb2_is_valid_lease_break(char *buffer)
->         struct TCP_Server_Info *server;
->         struct cifs_ses *ses;
->         struct cifs_tcon *tcon;
-> -       struct smb2_lease_break_work *lw;
-> -
-> -       lw = kmalloc(sizeof(struct smb2_lease_break_work), GFP_KERNEL);
-> -       if (!lw)
-> -               return false;
-> -
-> -       INIT_WORK(&lw->lease_break, cifs_ses_oplock_break);
-> -       lw->lease_state = rsp->NewLeaseState;
-> +       struct cifs_pending_open *open;
->
->         cifs_dbg(FYI, "Checking for lease break\n");
->
-> @@ -603,11 +619,27 @@ smb2_is_valid_lease_break(char *buffer)
->                                 spin_lock(&tcon->open_file_lock);
->                                 cifs_stats_inc(
->                                     &tcon->stats.cifs_stats.num_oplock_brks);
-> -                               if (smb2_tcon_has_lease(tcon, rsp, lw)) {
-> +                               if (smb2_tcon_has_lease(tcon, rsp)) {
->                                         spin_unlock(&tcon->open_file_lock);
->                                         spin_unlock(&cifs_tcp_ses_lock);
->                                         return true;
->                                 }
-> +                               open = smb2_tcon_find_pending_open_lease(tcon,
-> +                                                                        rsp);
-> +                               if (open) {
-> +                                       __u8 lease_key[SMB2_LEASE_KEY_SIZE];
-> +                                       struct tcon_link *tlink;
-> +
-> +                                       tlink = cifs_get_tlink(open->tlink);
-> +                                       memcpy(lease_key, open->lease_key,
-> +                                              SMB2_LEASE_KEY_SIZE);
-> +                                       spin_unlock(&tcon->open_file_lock);
-> +                                       spin_unlock(&cifs_tcp_ses_lock);
-> +                                       smb2_queue_pending_open_break(tlink,
-> +                                                                     lease_key,
-> +                                                                     rsp->NewLeaseState);
-> +                                       return true;
-> +                               }
->                                 spin_unlock(&tcon->open_file_lock);
->
->                                 if (tcon->crfid.is_valid &&
-> @@ -625,7 +657,6 @@ smb2_is_valid_lease_break(char *buffer)
->                 }
->         }
->         spin_unlock(&cifs_tcp_ses_lock);
-> -       kfree(lw);
->         cifs_dbg(FYI, "Can not process lease break - no lease matched\n");
->         return false;
->  }
-> --
-> 2.27.0
->
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Dave Wysochanski <dwysocha@redhat.com>
+cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+cc: Anna Schumaker <anna.schumaker@netapp.com>
+cc: linux-nfs@vger.kernel.org
+cc: Jeff Layton <jlayton@kernel.org>
+cc: Ilya Dryomov <idryomov@gmail.com>
+cc: ceph-devel@vger.kernel.org
+cc: Steve French <sfrench@samba.org>
+cc: linux-cifs@vger.kernel.org
+cc: Eric Van Hensbergen <ericvh@gmail.com>
+cc: Latchesar Ionkov <lucho@ionkov.net>
+cc: Dominique Martinet <asmadeus@codewreck.org>
+cc: v9fs-developer@lists.sourceforge.net
+---
+
+ fs/9p/Kconfig      |    2 +-
+ fs/ceph/Kconfig    |    2 +-
+ fs/cifs/Kconfig    |    2 +-
+ fs/fscache/Kconfig |    4 ++++
+ fs/nfs/Kconfig     |    2 +-
+ 5 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/fs/9p/Kconfig b/fs/9p/Kconfig
+index 09fd4a185fd2..66ca72422961 100644
+--- a/fs/9p/Kconfig
++++ b/fs/9p/Kconfig
+@@ -13,7 +13,7 @@ config 9P_FS
+ if 9P_FS
+ config 9P_FSCACHE
+ 	bool "Enable 9P client caching support"
+-	depends on 9P_FS=m && FSCACHE || 9P_FS=y && FSCACHE=y
++	depends on 9P_FS=m && FSCACHE_OLD || 9P_FS=y && FSCACHE_OLD=y
+ 	help
+ 	  Choose Y here to enable persistent, read-only local
+ 	  caching support for 9p clients using FS-Cache
+diff --git a/fs/ceph/Kconfig b/fs/ceph/Kconfig
+index cf235f6eacf9..9aee341392a2 100644
+--- a/fs/ceph/Kconfig
++++ b/fs/ceph/Kconfig
+@@ -20,7 +20,7 @@ config CEPH_FS
+ if CEPH_FS
+ config CEPH_FSCACHE
+ 	bool "Enable Ceph client caching support"
+-	depends on CEPH_FS=m && FSCACHE || CEPH_FS=y && FSCACHE=y
++	depends on CEPH_FS=m && FSCACHE_OLD || CEPH_FS=y && FSCACHE_OLD=y
+ 	help
+ 	  Choose Y here to enable persistent, read-only local
+ 	  caching support for Ceph clients using FS-Cache
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index 604f65f4b6c5..441f24bff49c 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -206,7 +206,7 @@ config CIFS_SMB_DIRECT
+ 
+ config CIFS_FSCACHE
+ 	bool "Provide CIFS client caching support"
+-	depends on CIFS=m && FSCACHE || CIFS=y && FSCACHE=y
++	depends on CIFS=m && FSCACHE_OLD || CIFS=y && FSCACHE_OLD=y
+ 	help
+ 	  Makes CIFS FS-Cache capable. Say Y here if you want your CIFS data
+ 	  to be cached locally on disk through the general filesystem cache
+diff --git a/fs/fscache/Kconfig b/fs/fscache/Kconfig
+index 5e796e6c38e5..ce6f731065d0 100644
+--- a/fs/fscache/Kconfig
++++ b/fs/fscache/Kconfig
+@@ -60,3 +60,7 @@ config FSCACHE_OBJECT_LIST
+ 	help
+ 	  Maintain a global list of active fscache objects that can be
+ 	  retrieved through /proc/fs/fscache/objects for debugging purposes
++
++config FSCACHE_OLD
++	bool
++	default n
+diff --git a/fs/nfs/Kconfig b/fs/nfs/Kconfig
+index 88e1763e02f3..8909ef506073 100644
+--- a/fs/nfs/Kconfig
++++ b/fs/nfs/Kconfig
+@@ -170,7 +170,7 @@ config ROOT_NFS
+ 
+ config NFS_FSCACHE
+ 	bool "Provide NFS client caching support"
+-	depends on NFS_FS=m && FSCACHE || NFS_FS=y && FSCACHE=y
++	depends on NFS_FS=m && FSCACHE_OLD || NFS_FS=y && FSCACHE_OLD=y
+ 	help
+ 	  Say Y here if you want NFS data to be cached locally on disc through
+ 	  the general filesystem cache manager
 
 
--- 
-Thanks,
-
-Steve
