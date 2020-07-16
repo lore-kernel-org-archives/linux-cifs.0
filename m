@@ -2,95 +2,192 @@ Return-Path: <SRS0=Z9xR=A3=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 415A3C433DF
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jul 2020 05:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DCAC433DF
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jul 2020 20:34:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C41B206F4
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jul 2020 05:40:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B51F207FB
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Jul 2020 20:34:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YXof61Mm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GxLEMNFf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725921AbgGPFkn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Jul 2020 01:40:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50630 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725844AbgGPFkn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jul 2020 01:40:43 -0400
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B9BCC061755
-        for <linux-cifs@vger.kernel.org>; Wed, 15 Jul 2020 22:40:43 -0700 (PDT)
-Received: by mail-yb1-xb32.google.com with SMTP id y17so2261202ybm.12
-        for <linux-cifs@vger.kernel.org>; Wed, 15 Jul 2020 22:40:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=oTFmU6rH05c0yc/EFCCNRAx1y5jjOSqu8GlE/6Ao2Ew=;
-        b=YXof61MmqwSd7EINqsROPksbO5ZnsvPgn3EieoA2jADXI1hlk78b0gWcmx7A9r6M64
-         cDcatIgXSzWmPrhbmK9YbVfYKJ0EhkdoPscxiaK5+1l0oxOGjbmiUgFm93v6NyabeNLD
-         n0ApR62CR5OY65gaYO7CyraRCs7kwu+YKyqO7VWvL9IG5q9J/Y1qdgEFnWyPP/hqC9L1
-         AP+jBA3cnpLM+PKH3EGhU/4+em9kfJ6/m7zjYXH1n5ZrWV5lCxXShVBDAL96hlj1Xzpq
-         hWhh6/fLAm2XGXhbWxZ4Pm7qeAKwuE26SPZQPcLRskuwgXxwOFpn3iMGiHVlwvmA21/O
-         Z9gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=oTFmU6rH05c0yc/EFCCNRAx1y5jjOSqu8GlE/6Ao2Ew=;
-        b=A6g4IJE9qamczwhTE35vSbJrfhr2IUvngkmLMMCq5ha+o9AOPsDSqzDjilxIRG34vz
-         tvditTroCNhyAevhy9TlxMv9UQ4ElFF7I9S6Tt5MElS4iHoETzBjnAfA76JJo23Jr9ua
-         Lk1dL1X5TVSyBlgoWjzvJ2ojo0H3cd9BinZ3qEiEYOv7fb9WUH++zfoida5FFfUm1Vfg
-         tTx/4iJAhBOnvO/ZeYf656UoMK34X+7JwWfAZq2Ecp3wbaU6mkWs+2us+XU83lyA1jNa
-         cEJOv3e1ODyDBCyi7oR9385Hfp5HSm9H75ot9t1/slEr49B0DdR2E340QW1nhQpScyBI
-         39/Q==
-X-Gm-Message-State: AOAM532z2QtN/Lol9XzdXcxs17PldRITp1qCtArIhJSki8zi+HmiRdJ7
-        35yV/PJq7xhmr+61Ele7I1Wenvqu2uCA4OPuuulnrk+MKjI=
-X-Google-Smtp-Source: ABdhPJwbHlkTVA97LK55eN+rZq5zp69gOcgEs0q9mFWpfdl0UKe9tUFdJOJHz0Y/1iECjhEUpsKKws+qtnFUJlMOlmU=
-X-Received: by 2002:a5b:808:: with SMTP id x8mr3814737ybp.375.1594878042086;
- Wed, 15 Jul 2020 22:40:42 -0700 (PDT)
+        id S1725926AbgGPUev (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Jul 2020 16:34:51 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48109 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725933AbgGPUev (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Jul 2020 16:34:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1594931689;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=c/r4tdsrz9c/t7kzUXM6V6dGDNFnWeX/dhq9J93jq+c=;
+        b=GxLEMNFf9dpshNTE7UqKAbH0Di5LkCRyW+Oe8LNJ/dXMlkQMxeUP0NVk4MZ8lShz869hrT
+        p3HZ98FYJiic/gX79Z9CeVWGh9/zI9k+MwJj910uvKAB7FeU84H9lgRU/mnkS0o7aFgZDk
+        lpXNMC3A715s40AW8hneFlBSTUZuklM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-jL_sknZ9MgK7gGliAT6NIg-1; Thu, 16 Jul 2020 16:34:47 -0400
+X-MC-Unique: jL_sknZ9MgK7gGliAT6NIg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D40A81080;
+        Thu, 16 Jul 2020 20:34:44 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-112-113.rdu2.redhat.com [10.10.112.113])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8957319C58;
+        Thu, 16 Jul 2020 20:34:38 +0000 (UTC)
+Subject: [RFC PATCH 0/5] keys: Security changes, ACLs and Container keyring
+From:   David Howells <dhowells@redhat.com>
+To:     Stephen Smalley <stephen.smalley.work@gmail.com>,
+        Casey Schaufler <casey@schaufler-ca.com>
+Cc:     keyrings@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        Paul Moore <paul@paul-moore.com>, selinux@vger.kernel.org,
+        dhowells@redhat.com,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        Eric Biederman <ebiederm@xmission.com>, jlayton@redhat.com,
+        christian@brauner.io, selinux@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, containers@lists.linux-foundation.org
+Date:   Thu, 16 Jul 2020 21:34:37 +0100
+Message-ID: <159493167778.3249370.8145886688150701997.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.22
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 16 Jul 2020 00:40:31 -0500
-Message-ID: <CAH2r5mvKTwGa0W_LcfgNwNQ6QY=pXSBkURV7MtnDz-hfArPTcQ@mail.gmail.com>
-Subject: [PATCH][SMB3] warn on confusing error scenario with sec=krb5
-To:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-    When mounting with Kerberos, users have been confused about the
-    default error returned in scenarios in which either keyutils is
-    not installed or the user did not properly acquire a krb5 ticket.
-    Log a warning message in the case that "ENOKEY" is returned
-    from the get_spnego_key upcall so that users can better understand
-    why mount failed in those two cases.
 
-    CC: Stable <stable@vger.kernel.org>
-    Signed-off-by: Steve French <stfrench@microsoft.com>
+Here are some patches to provide some security changes and some container
+support:
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 2f4cdd290c46..492688764004 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -1387,6 +1387,8 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
-        spnego_key = cifs_get_spnego_key(ses);
-        if (IS_ERR(spnego_key)) {
-                rc = PTR_ERR(spnego_key);
-+               if (rc == -ENOKEY)
-+                       cifs_dbg(VFS, "Verify user has a krb5 ticket
-and keyutils is installed\n");
-                spnego_key = NULL;
-                goto out;
-        }
+ (1) The mapping from KEY_NEED_* symbols to what is permitted is pushed
+     further down into the general permissions checking routines and the
+     LSMs.
+
+     More KEY_NEED_* symbols are provided to give finer grained control in
+     the mapping.
+
+ (2) The permissions mask is replaced internally with an ACL that contains
+     a list of ACEs, each with a specific subject and granted permissions
+     mask.  Potted default ACLs are available for new keys and keyrings.
+
+     ACE subjects include:
+
+	- The owner of the key (uid)
+	- The key's group (gid)
+	- Anyone who possesses the key
+	- Everyone
+	- Containers (ie. user_namespaces)
+
+ (3) The ACE permissions are split to give finer control.  Examples include
+     splitting the revocation permit from the change-attributes permit,
+     thereby allowing someone to be granted permission to revoke a key
+     without allowing them to change the owner; also the ability to join a
+     keyring is split from the ability to link to it, thereby stopping a
+     process accessing a keyring by joining it and thus acquiring use of
+     possessor permits.
+
+     This is only accessible through the ACL interface; the old setperm
+     interface concocts an ACL from what it is given.
+
+ (4) A keyctl is provided to grant or remove a grant of one or more permits
+     to a specific subject.  Direct access to the ACL is not permitted, and
+     the ACL cannot be viewed.
+
+ (5) A container keyring is made available on the user-namespace and
+     created when needed.  This is searched by request_key() after it has
+     searched the normal thread/process/session keyrings, but it can't
+     normally be accessed from inside the container.  The container
+     manager, however, *can* manipulate the contents of the keyring.
+
+     This allows the manager to push keys into the container to allow the
+     use of authenticated network filesystems without any need for the
+     denizens inside the container to do anything as the manager can add
+     and refresh the keys.
+
+The patches can be found on the following branch:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-acl
+
+David
+---
+David Howells (1):
+      keys: Implement a 'container' keyring
 
 
--- 
-Thanks,
+ Documentation/security/keys/core.rst               | 128 ++++-
+ Documentation/security/keys/request-key.rst        |   9 +-
+ certs/blacklist.c                                  |   9 +-
+ certs/system_keyring.c                             |  12 +-
+ crypto/asymmetric_keys/asymmetric_type.c           |   2 +-
+ drivers/md/dm-crypt.c                              |   2 +-
+ drivers/md/dm-verity-verify-sig.c                  |   3 +-
+ drivers/nvdimm/security.c                          |   2 +-
+ fs/afs/security.c                                  |   2 +-
+ fs/cifs/cifs_spnego.c                              |  25 +-
+ fs/cifs/cifsacl.c                                  |  28 +-
+ fs/cifs/connect.c                                  |   4 +-
+ fs/crypto/keyring.c                                |  29 +-
+ fs/crypto/keysetup_v1.c                            |   2 +-
+ fs/ecryptfs/ecryptfs_kernel.h                      |   2 +-
+ fs/ecryptfs/keystore.c                             |   2 +-
+ fs/fscache/object-list.c                           |   2 +-
+ fs/nfs/nfs4idmap.c                                 |  30 +-
+ fs/ubifs/auth.c                                    |   2 +-
+ fs/verity/signature.c                              |  14 +-
+ include/linux/key.h                                | 142 +++--
+ include/linux/lsm_hook_defs.h                      |   2 +-
+ include/linux/lsm_hooks.h                          |   8 +
+ include/linux/security.h                           |   9 +-
+ include/linux/user_namespace.h                     |   7 +
+ include/uapi/linux/keyctl.h                        |  69 +++
+ lib/digsig.c                                       |   2 +-
+ net/ceph/ceph_common.c                             |   2 +-
+ net/dns_resolver/dns_key.c                         |  12 +-
+ net/dns_resolver/dns_query.c                       |  15 +-
+ net/rxrpc/key.c                                    |  19 +-
+ net/rxrpc/security.c                               |   2 +-
+ net/wireless/reg.c                                 |   6 +-
+ security/integrity/digsig.c                        |  31 +-
+ security/integrity/digsig_asymmetric.c             |   2 +-
+ security/integrity/evm/evm_crypto.c                |   2 +-
+ security/integrity/ima/ima_mok.c                   |  13 +-
+ security/integrity/integrity.h                     |   6 +-
+ .../integrity/platform_certs/platform_keyring.c    |  14 +-
+ security/keys/Kconfig                              |  11 +
+ security/keys/compat.c                             |   5 +
+ security/keys/dh.c                                 |   7 +-
+ security/keys/encrypted-keys/encrypted.c           |   2 +-
+ security/keys/encrypted-keys/masterkey_trusted.c   |   2 +-
+ security/keys/gc.c                                 |   2 +-
+ security/keys/internal.h                           |  41 +-
+ security/keys/key.c                                |  98 ++--
+ security/keys/keyctl.c                             | 580 +++++++++++---------
+ security/keys/keyctl_pkey.c                        |  17 +-
+ security/keys/keyring.c                            |  47 +-
+ security/keys/permission.c                         | 600 +++++++++++++++++++--
+ security/keys/persistent.c                         |  29 +-
+ security/keys/proc.c                               |  27 +-
+ security/keys/process_keys.c                       | 137 +++--
+ security/keys/request_key.c                        |  49 +-
+ security/keys/request_key_auth.c                   |  23 +-
+ security/security.c                                |   4 +-
+ security/selinux/hooks.c                           | 163 ++++--
+ security/smack/smack_lsm.c                         |  90 +++-
+ 59 files changed, 1885 insertions(+), 721 deletions(-)
 
-Steve
+
