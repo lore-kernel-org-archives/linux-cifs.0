@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34814C433E8
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jul 2020 12:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA1DC433E3
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jul 2020 12:37:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 165AA2077D
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jul 2020 12:37:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C593120717
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jul 2020 12:37:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="tXgSEVXU"
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="fgZygBl4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727106AbgGUMhr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Jul 2020 08:37:47 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:37016 "EHLO mx.cjr.nz"
+        id S1728037AbgGUMhl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Jul 2020 08:37:41 -0400
+Received: from mx.cjr.nz ([51.158.111.142]:36926 "EHLO mx.cjr.nz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728209AbgGUMhr (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 21 Jul 2020 08:37:47 -0400
+        id S1727106AbgGUMhl (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 21 Jul 2020 08:37:41 -0400
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 99EDD7FEAD;
-        Tue, 21 Jul 2020 12:37:44 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 2AB097FEAD;
+        Tue, 21 Jul 2020 12:37:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1595335066;
+        t=1595335059;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iW9xnn99/V73gNVIYLzhHSmVHQECit90ZLe5SFmjiKk=;
-        b=tXgSEVXUkDsU++EMKxeAwAGxHyKXJDo7u23TnALYpMerUkKd1eWjYoL3gaHzkfJbeifMjM
-        1NHtqhRJDJzz6EQSFJQO6eDR1Yj5GsMeLeV7CJ1qjd4PzJADYoRNkg0SnoM35HCBpqMyh2
-        HPqjwEo5M37zUJVEDTKMjonZrWyGMd/l1DFoUfuDhYaFPE7cbaN9O03mSPqqcB+JmfgGFo
-        6ouOTk32+G7SCzkm+6QGcq/3MUUou6JYXtxRBIFoM0pZi+94BYE0Pgt0aYaRjsSGJpM0BJ
-        V7VElAaMRiiTRl2Bm8coNBn34AF1g+DGFr/RJ5UteZ65JOKNoCWI5uT63b0ylw==
+        bh=dM8DqT4Js/tBZGNhl2Q4XbeCyGaAX+FLSoXL3OejGqM=;
+        b=fgZygBl481hLqqiNoN0igO4NBQLy7oPXa/cqsKzbuKVfQ5SqmuLAYIvykxCfSpITOWVSAH
+        p6p+rEi9EeI+2hQLQyRfhE88n+42L+ctPh9QpTe+BlgfiVNf1h0RM7XdfMw4ta+NN57Nzn
+        MTgqWAin3NtEaAA8WztkwKaeFzmITztv9SOS8P48pPiaTKWpSq6Xn+S8mFTyEuqNllbj/i
+        BgPl2iO6I1WgYLK76NK52XP7iMAdKClq5lf9mlotiJmsh88Mk7bBSoJsdWQsNjXog0b9BQ
+        Zza68HhItEzp7x54lobzsTo81TnXyzSMN5NmnLG44RI+M9z7345KWuag0tdR5A==
 From:   Paulo Alcantara <pc@cjr.nz>
 To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
-Cc:     Paulo Alcantara <pc@cjr.nz>
-Subject: [PATCH v3 6/7] cifs: only update prefix path of DFS links in cifs_tree_connect()
-Date:   Tue, 21 Jul 2020 09:36:43 -0300
-Message-Id: <20200721123644.14728-7-pc@cjr.nz>
+Cc:     Paulo Alcantara <pc@cjr.nz>, Aurelien Aptel <aaptel@suse.com>
+Subject: [PATCH v3 3/7] cifs: rename reconn_inval_dfs_target()
+Date:   Tue, 21 Jul 2020 09:36:40 -0300
+Message-Id: <20200721123644.14728-4-pc@cjr.nz>
 In-Reply-To: <20200721123644.14728-1-pc@cjr.nz>
 References: <20200721123644.14728-1-pc@cjr.nz>
 MIME-Version: 1.0
@@ -55,71 +55,52 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-For DFS root mounts that contain a prefix path, do not change them
-after failover.
+This function has nothing to do with *invalidation* but setting up the
+next target server from a cached referral.
 
-E.g., if the user mounts
-
-	//srvA/root/dir1
-
-and then lost connection to srvA, it will reconnect to
-
-	//srvB/root/dir1
-
-In case of DFS links, which may resolve to different prefix paths
-depending on their list of targets, the following must be supported:
-
-	- mount //srvA/root/link/bar
-	- connect to //srvA/share
-	- set prefix path to "bar"
-	- lost connection to srvA
-	- reconnect to next target: //srvB/share/foo
-	- set new prefix path to "foo/bar"
-
-In cifs_tree_connect(), check the server_type field of the cached DFS
-referral to determine whether or not prefix path should be updated.
+Rename it to reconn_set_next_dfs_target().  While at it, get rid of
+some meaningless checks.
 
 Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/connect.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ fs/cifs/connect.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 2abef1c8feb3..af0c19495626 100644
+index 632978db2dbd..9582f63b8ebc 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -5549,6 +5549,8 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
- 	const char *dfs_host;
- 	size_t dfs_host_len;
- 	char *share = NULL, *prefix = NULL;
-+	struct dfs_info3_param ref = {0};
-+	bool isroot;
+@@ -393,15 +393,14 @@ static inline int reconn_set_ipaddr(struct TCP_Server_Info *server)
  
- 	tree = kzalloc(MAX_TREE_SIZE, GFP_KERNEL);
- 	if (!tree)
-@@ -5564,9 +5566,11 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
- 		goto out;
- 	}
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ /* These functions must be called with server->srv_mutex held */
+-static void reconn_inval_dfs_target(struct TCP_Server_Info *server,
+-				    struct cifs_sb_info *cifs_sb,
+-				    struct dfs_cache_tgt_list *tgt_list,
+-				    struct dfs_cache_tgt_iterator **tgt_it)
++static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
++				       struct cifs_sb_info *cifs_sb,
++				       struct dfs_cache_tgt_list *tgt_list,
++				       struct dfs_cache_tgt_iterator **tgt_it)
+ {
+ 	const char *name;
  
--	rc = dfs_cache_noreq_find(tcon->dfs_path + 1, NULL, &tl);
-+	rc = dfs_cache_noreq_find(tcon->dfs_path + 1, &ref, &tl);
- 	if (rc)
- 		goto out;
-+	isroot = ref.server_type == DFS_TYPE_ROOT;
-+	free_dfs_info_param(&ref);
+-	if (!cifs_sb || !cifs_sb->origin_fullpath || !tgt_list ||
+-	    !server->nr_targets)
++	if (!cifs_sb || !cifs_sb->origin_fullpath)
+ 		return;
  
- 	extract_unc_hostname(server->hostname, &tcp_host, &tcp_host_len);
- 
-@@ -5608,7 +5612,8 @@ int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const stru
- 		} else {
- 			scnprintf(tree, MAX_TREE_SIZE, "\\%s", share);
- 			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
--			if (!rc) {
-+			/* Only handle prefix paths of DFS link targets */
-+			if (!rc && !isroot) {
- 				rc = update_super_prepath(tcon, prefix);
- 				break;
- 			}
+ 	if (!*tgt_it) {
+@@ -578,7 +577,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		 * feature is disabled, then we will retry last server we
+ 		 * connected to before.
+ 		 */
+-		reconn_inval_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
++		reconn_set_next_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
+ #endif
+ 		rc = reconn_set_ipaddr(server);
+ 		if (rc) {
 -- 
 2.27.0
 
