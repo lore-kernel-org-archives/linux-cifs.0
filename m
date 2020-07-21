@@ -7,45 +7,46 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA1DC433E3
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jul 2020 12:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6CABC433DF
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jul 2020 12:37:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C593120717
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jul 2020 12:37:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC61C20717
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Jul 2020 12:37:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="fgZygBl4"
+	dkim=pass (2048-bit key) header.d=cjr.nz header.i=@cjr.nz header.b="XLPUbAYq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728037AbgGUMhl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Jul 2020 08:37:41 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:36926 "EHLO mx.cjr.nz"
+        id S1727916AbgGUMhi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Jul 2020 08:37:38 -0400
+Received: from mx.cjr.nz ([51.158.111.142]:36708 "EHLO mx.cjr.nz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727106AbgGUMhl (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 21 Jul 2020 08:37:41 -0400
+        id S1726636AbgGUMhi (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 21 Jul 2020 08:37:38 -0400
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 2AB097FEAD;
-        Tue, 21 Jul 2020 12:37:37 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 03EBF7FEA6;
+        Tue, 21 Jul 2020 12:37:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1595335059;
+        t=1595335055;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dM8DqT4Js/tBZGNhl2Q4XbeCyGaAX+FLSoXL3OejGqM=;
-        b=fgZygBl481hLqqiNoN0igO4NBQLy7oPXa/cqsKzbuKVfQ5SqmuLAYIvykxCfSpITOWVSAH
-        p6p+rEi9EeI+2hQLQyRfhE88n+42L+ctPh9QpTe+BlgfiVNf1h0RM7XdfMw4ta+NN57Nzn
-        MTgqWAin3NtEaAA8WztkwKaeFzmITztv9SOS8P48pPiaTKWpSq6Xn+S8mFTyEuqNllbj/i
-        BgPl2iO6I1WgYLK76NK52XP7iMAdKClq5lf9mlotiJmsh88Mk7bBSoJsdWQsNjXog0b9BQ
-        Zza68HhItEzp7x54lobzsTo81TnXyzSMN5NmnLG44RI+M9z7345KWuag0tdR5A==
+        bh=J7Tfs9VgnAd6pZPADuVJR+ArAeInUrS2sl1ySsaODBw=;
+        b=XLPUbAYqbHr9XldABupTfxiZIVHX7lMyso3cgfuNQdRN2fzWHnadXOJMUVCrywi5ipUbpw
+        lCAg/95pmdDWfg5PmVhf472B7xHyIOGCcLXDZ8UU3JZ/DxLpi1alungQdEqo/nHuijGKZ+
+        tnbIArPtRmvfpdlLMVeJizyQ3GOLKbAzlx+7c0/9+bsNlZO1edptnV3DoHAhh4EKvq1wXd
+        II84TpUzfqdf7yeeB1yKYgceh4F6J86QrcFBb/gtskNv0u+0W2Sv87nyEBv0/0PPY6QQq0
+        jc4lnAYxwEPY7IBnYBXcF/nFjQPr3YD9cHIUjwAy8nimA9mX/xiEMcF7WVOmxw==
 From:   Paulo Alcantara <pc@cjr.nz>
 To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
-Cc:     Paulo Alcantara <pc@cjr.nz>, Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH v3 3/7] cifs: rename reconn_inval_dfs_target()
-Date:   Tue, 21 Jul 2020 09:36:40 -0300
-Message-Id: <20200721123644.14728-4-pc@cjr.nz>
+Cc:     Stefan Metzmacher <metze@samba.org>, Paulo Alcantara <pc@cjr.nz>,
+        Aurelien Aptel <aaptel@suse.com>
+Subject: [PATCH v3 1/7] cifs: merge __{cifs,smb2}_reconnect[_tcon]() into cifs_tree_connect()
+Date:   Tue, 21 Jul 2020 09:36:38 -0300
+Message-Id: <20200721123644.14728-2-pc@cjr.nz>
 In-Reply-To: <20200721123644.14728-1-pc@cjr.nz>
 References: <20200721123644.14728-1-pc@cjr.nz>
 MIME-Version: 1.0
@@ -55,52 +56,404 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This function has nothing to do with *invalidation* but setting up the
-next target server from a cached referral.
+From: Stefan Metzmacher <metze@samba.org>
 
-Rename it to reconn_set_next_dfs_target().  While at it, get rid of
-some meaningless checks.
+They were identical execpt to CIFSTCon() vs. SMB2_tcon().
+These are also available via ops->tree_connect().
 
+Signed-off-by: Stefan Metzmacher <metze@samba.org>
 Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
 Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 ---
- fs/cifs/connect.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ fs/cifs/cifsproto.h |   3 ++
+ fs/cifs/cifssmb.c   | 112 +------------------------------------------
+ fs/cifs/connect.c   | 100 +++++++++++++++++++++++++++++++++++++++
+ fs/cifs/smb2pdu.c   | 113 +-------------------------------------------
+ 4 files changed, 105 insertions(+), 223 deletions(-)
 
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 336feff99c93..c2ab937a7048 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -272,6 +272,9 @@ extern void cifs_move_llist(struct list_head *source, struct list_head *dest);
+ extern void cifs_free_llist(struct list_head *llist);
+ extern void cifs_del_lock_waiters(struct cifsLockInfo *lock);
+ 
++extern int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon,
++			     const struct nls_table *nlsc);
++
+ extern int cifs_negotiate_protocol(const unsigned int xid,
+ 				   struct cifs_ses *ses);
+ extern int cifs_setup_session(const unsigned int xid, struct cifs_ses *ses,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index dc62e2620cc8..0e763d2dcf16 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -124,116 +124,6 @@ cifs_mark_open_files_invalid(struct cifs_tcon *tcon)
+ 	 */
+ }
+ 
+-#ifdef CONFIG_CIFS_DFS_UPCALL
+-static int __cifs_reconnect_tcon(const struct nls_table *nlsc,
+-				 struct cifs_tcon *tcon)
+-{
+-	int rc;
+-	struct TCP_Server_Info *server = tcon->ses->server;
+-	struct dfs_cache_tgt_list tl;
+-	struct dfs_cache_tgt_iterator *it = NULL;
+-	char *tree;
+-	const char *tcp_host;
+-	size_t tcp_host_len;
+-	const char *dfs_host;
+-	size_t dfs_host_len;
+-
+-	tree = kzalloc(MAX_TREE_SIZE, GFP_KERNEL);
+-	if (!tree)
+-		return -ENOMEM;
+-
+-	if (!tcon->dfs_path) {
+-		if (tcon->ipc) {
+-			scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$",
+-				  server->hostname);
+-			rc = CIFSTCon(0, tcon->ses, tree, tcon, nlsc);
+-		} else {
+-			rc = CIFSTCon(0, tcon->ses, tcon->treeName, tcon, nlsc);
+-		}
+-		goto out;
+-	}
+-
+-	rc = dfs_cache_noreq_find(tcon->dfs_path + 1, NULL, &tl);
+-	if (rc)
+-		goto out;
+-
+-	extract_unc_hostname(server->hostname, &tcp_host, &tcp_host_len);
+-
+-	for (it = dfs_cache_get_tgt_iterator(&tl); it;
+-	     it = dfs_cache_get_next_tgt(&tl, it)) {
+-		const char *share, *prefix;
+-		size_t share_len, prefix_len;
+-		bool target_match;
+-
+-		rc = dfs_cache_get_tgt_share(it, &share, &share_len, &prefix,
+-					     &prefix_len);
+-		if (rc) {
+-			cifs_dbg(VFS, "%s: failed to parse target share %d\n",
+-				 __func__, rc);
+-			continue;
+-		}
+-
+-		extract_unc_hostname(share, &dfs_host, &dfs_host_len);
+-
+-		if (dfs_host_len != tcp_host_len
+-		    || strncasecmp(dfs_host, tcp_host, dfs_host_len) != 0) {
+-			cifs_dbg(FYI, "%s: %.*s doesn't match %.*s\n",
+-				 __func__,
+-				 (int)dfs_host_len, dfs_host,
+-				 (int)tcp_host_len, tcp_host);
+-
+-			rc = match_target_ip(server, dfs_host, dfs_host_len,
+-					     &target_match);
+-			if (rc) {
+-				cifs_dbg(VFS, "%s: failed to match target ip: %d\n",
+-					 __func__, rc);
+-				break;
+-			}
+-
+-			if (!target_match) {
+-				cifs_dbg(FYI, "%s: skipping target\n", __func__);
+-				continue;
+-			}
+-		}
+-
+-		if (tcon->ipc) {
+-			scnprintf(tree, MAX_TREE_SIZE, "\\\\%.*s\\IPC$",
+-				  (int)share_len, share);
+-			rc = CIFSTCon(0, tcon->ses, tree, tcon, nlsc);
+-		} else {
+-			scnprintf(tree, MAX_TREE_SIZE, "\\%.*s", (int)share_len,
+-				  share);
+-			rc = CIFSTCon(0, tcon->ses, tree, tcon, nlsc);
+-			if (!rc) {
+-				rc = update_super_prepath(tcon, prefix,
+-							  prefix_len);
+-				break;
+-			}
+-		}
+-		if (rc == -EREMOTE)
+-			break;
+-	}
+-
+-	if (!rc) {
+-		if (it)
+-			rc = dfs_cache_noreq_update_tgthint(tcon->dfs_path + 1,
+-							    it);
+-		else
+-			rc = -ENOENT;
+-	}
+-	dfs_cache_free_tgts(&tl);
+-out:
+-	kfree(tree);
+-	return rc;
+-}
+-#else
+-static inline int __cifs_reconnect_tcon(const struct nls_table *nlsc,
+-					struct cifs_tcon *tcon)
+-{
+-	return CIFSTCon(0, tcon->ses, tcon->treeName, tcon, nlsc);
+-}
+-#endif
+-
+ /* reconnect the socket, tcon, and smb session if needed */
+ static int
+ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+@@ -338,7 +228,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+ 	}
+ 
+ 	cifs_mark_open_files_invalid(tcon);
+-	rc = __cifs_reconnect_tcon(nls_codepage, tcon);
++	rc = cifs_tree_connect(0, tcon, nls_codepage);
+ 	mutex_unlock(&ses->session_mutex);
+ 	cifs_dbg(FYI, "reconnect tcon rc = %d\n", rc);
+ 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 632978db2dbd..9582f63b8ebc 100644
+index a61abde09ffe..632978db2dbd 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -393,15 +393,14 @@ static inline int reconn_set_ipaddr(struct TCP_Server_Info *server)
+@@ -5533,3 +5533,103 @@ cifs_prune_tlinks(struct work_struct *work)
+ 	queue_delayed_work(cifsiod_wq, &cifs_sb->prune_tlinks,
+ 				TLINK_IDLE_EXPIRE);
+ }
++
++#ifdef CONFIG_CIFS_DFS_UPCALL
++int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const struct nls_table *nlsc)
++{
++	int rc;
++	struct TCP_Server_Info *server = tcon->ses->server;
++	const struct smb_version_operations *ops = server->ops;
++	struct dfs_cache_tgt_list tl;
++	struct dfs_cache_tgt_iterator *it = NULL;
++	char *tree;
++	const char *tcp_host;
++	size_t tcp_host_len;
++	const char *dfs_host;
++	size_t dfs_host_len;
++
++	tree = kzalloc(MAX_TREE_SIZE, GFP_KERNEL);
++	if (!tree)
++		return -ENOMEM;
++
++	if (!tcon->dfs_path) {
++		if (tcon->ipc) {
++			scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$", server->hostname);
++			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
++		} else {
++			rc = ops->tree_connect(xid, tcon->ses, tcon->treeName, tcon, nlsc);
++		}
++		goto out;
++	}
++
++	rc = dfs_cache_noreq_find(tcon->dfs_path + 1, NULL, &tl);
++	if (rc)
++		goto out;
++
++	extract_unc_hostname(server->hostname, &tcp_host, &tcp_host_len);
++
++	for (it = dfs_cache_get_tgt_iterator(&tl); it; it = dfs_cache_get_next_tgt(&tl, it)) {
++		const char *share, *prefix;
++		size_t share_len, prefix_len;
++		bool target_match;
++
++		rc = dfs_cache_get_tgt_share(it, &share, &share_len, &prefix, &prefix_len);
++		if (rc) {
++			cifs_dbg(VFS, "%s: failed to parse target share %d\n",
++				 __func__, rc);
++			continue;
++		}
++
++		extract_unc_hostname(share, &dfs_host, &dfs_host_len);
++
++		if (dfs_host_len != tcp_host_len
++		    || strncasecmp(dfs_host, tcp_host, dfs_host_len) != 0) {
++			cifs_dbg(FYI, "%s: %.*s doesn't match %.*s\n", __func__, (int)dfs_host_len,
++				 dfs_host, (int)tcp_host_len, tcp_host);
++
++			rc = match_target_ip(server, dfs_host, dfs_host_len, &target_match);
++			if (rc) {
++				cifs_dbg(VFS, "%s: failed to match target ip: %d\n", __func__, rc);
++				break;
++			}
++
++			if (!target_match) {
++				cifs_dbg(FYI, "%s: skipping target\n", __func__);
++				continue;
++			}
++		}
++
++		if (tcon->ipc) {
++			scnprintf(tree, MAX_TREE_SIZE, "\\\\%.*s\\IPC$", (int)share_len, share);
++			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
++		} else {
++			scnprintf(tree, MAX_TREE_SIZE, "\\%.*s", (int)share_len, share);
++			rc = ops->tree_connect(xid, tcon->ses, tree, tcon, nlsc);
++			if (!rc) {
++				rc = update_super_prepath(tcon, prefix, prefix_len);
++				break;
++			}
++		}
++		if (rc == -EREMOTE)
++			break;
++	}
++
++	if (!rc) {
++		if (it)
++			rc = dfs_cache_noreq_update_tgthint(tcon->dfs_path + 1, it);
++		else
++			rc = -ENOENT;
++	}
++	dfs_cache_free_tgts(&tl);
++out:
++	kfree(tree);
++	return rc;
++}
++#else
++int cifs_tree_connect(const unsigned int xid, struct cifs_tcon *tcon, const struct nls_table *nlsc)
++{
++	const struct smb_version_operations *ops = tcon->ses->server->ops;
++
++	return ops->tree_connect(xid, tcon->ses, tcon->treeName, tcon, nlsc);
++}
++#endif
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 492688764004..24c2ac360591 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -152,117 +152,6 @@ smb2_hdr_assemble(struct smb2_sync_hdr *shdr, __le16 smb2_cmd,
+ 	return;
+ }
  
- #ifdef CONFIG_CIFS_DFS_UPCALL
- /* These functions must be called with server->srv_mutex held */
--static void reconn_inval_dfs_target(struct TCP_Server_Info *server,
--				    struct cifs_sb_info *cifs_sb,
--				    struct dfs_cache_tgt_list *tgt_list,
--				    struct dfs_cache_tgt_iterator **tgt_it)
-+static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
-+				       struct cifs_sb_info *cifs_sb,
-+				       struct dfs_cache_tgt_list *tgt_list,
-+				       struct dfs_cache_tgt_iterator **tgt_it)
- {
- 	const char *name;
+-#ifdef CONFIG_CIFS_DFS_UPCALL
+-static int __smb2_reconnect(const struct nls_table *nlsc,
+-			    struct cifs_tcon *tcon)
+-{
+-	int rc;
+-	struct TCP_Server_Info *server = tcon->ses->server;
+-	struct dfs_cache_tgt_list tl;
+-	struct dfs_cache_tgt_iterator *it = NULL;
+-	char *tree;
+-	const char *tcp_host;
+-	size_t tcp_host_len;
+-	const char *dfs_host;
+-	size_t dfs_host_len;
+-
+-	tree = kzalloc(MAX_TREE_SIZE, GFP_KERNEL);
+-	if (!tree)
+-		return -ENOMEM;
+-
+-	if (!tcon->dfs_path) {
+-		if (tcon->ipc) {
+-			scnprintf(tree, MAX_TREE_SIZE, "\\\\%s\\IPC$",
+-				  server->hostname);
+-			rc = SMB2_tcon(0, tcon->ses, tree, tcon, nlsc);
+-		} else {
+-			rc = SMB2_tcon(0, tcon->ses, tcon->treeName, tcon,
+-				       nlsc);
+-		}
+-		goto out;
+-	}
+-
+-	rc = dfs_cache_noreq_find(tcon->dfs_path + 1, NULL, &tl);
+-	if (rc)
+-		goto out;
+-
+-	extract_unc_hostname(server->hostname, &tcp_host, &tcp_host_len);
+-
+-	for (it = dfs_cache_get_tgt_iterator(&tl); it;
+-	     it = dfs_cache_get_next_tgt(&tl, it)) {
+-		const char *share, *prefix;
+-		size_t share_len, prefix_len;
+-		bool target_match;
+-
+-		rc = dfs_cache_get_tgt_share(it, &share, &share_len, &prefix,
+-					     &prefix_len);
+-		if (rc) {
+-			cifs_dbg(VFS, "%s: failed to parse target share %d\n",
+-				 __func__, rc);
+-			continue;
+-		}
+-
+-		extract_unc_hostname(share, &dfs_host, &dfs_host_len);
+-
+-		if (dfs_host_len != tcp_host_len
+-		    || strncasecmp(dfs_host, tcp_host, dfs_host_len) != 0) {
+-			cifs_dbg(FYI, "%s: %.*s doesn't match %.*s\n",
+-				 __func__,
+-				 (int)dfs_host_len, dfs_host,
+-				 (int)tcp_host_len, tcp_host);
+-
+-			rc = match_target_ip(server, dfs_host, dfs_host_len,
+-					     &target_match);
+-			if (rc) {
+-				cifs_dbg(VFS, "%s: failed to match target ip: %d\n",
+-					 __func__, rc);
+-				break;
+-			}
+-
+-			if (!target_match) {
+-				cifs_dbg(FYI, "%s: skipping target\n", __func__);
+-				continue;
+-			}
+-		}
+-
+-		if (tcon->ipc) {
+-			scnprintf(tree, MAX_TREE_SIZE, "\\\\%.*s\\IPC$",
+-				  (int)share_len, share);
+-			rc = SMB2_tcon(0, tcon->ses, tree, tcon, nlsc);
+-		} else {
+-			scnprintf(tree, MAX_TREE_SIZE, "\\%.*s", (int)share_len,
+-				  share);
+-			rc = SMB2_tcon(0, tcon->ses, tree, tcon, nlsc);
+-			if (!rc) {
+-				rc = update_super_prepath(tcon, prefix,
+-							  prefix_len);
+-				break;
+-			}
+-		}
+-		if (rc == -EREMOTE)
+-			break;
+-	}
+-
+-	if (!rc) {
+-		if (it)
+-			rc = dfs_cache_noreq_update_tgthint(tcon->dfs_path + 1,
+-							    it);
+-		else
+-			rc = -ENOENT;
+-	}
+-	dfs_cache_free_tgts(&tl);
+-out:
+-	kfree(tree);
+-	return rc;
+-}
+-#else
+-static inline int __smb2_reconnect(const struct nls_table *nlsc,
+-				   struct cifs_tcon *tcon)
+-{
+-	return SMB2_tcon(0, tcon->ses, tcon->treeName, tcon, nlsc);
+-}
+-#endif
+-
+ static int
+ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	       struct TCP_Server_Info *server)
+@@ -409,7 +298,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	if (tcon->use_persistent)
+ 		tcon->need_reopen_files = true;
  
--	if (!cifs_sb || !cifs_sb->origin_fullpath || !tgt_list ||
--	    !server->nr_targets)
-+	if (!cifs_sb || !cifs_sb->origin_fullpath)
- 		return;
+-	rc = __smb2_reconnect(nls_codepage, tcon);
++	rc = cifs_tree_connect(0, tcon, nls_codepage);
+ 	mutex_unlock(&tcon->ses->session_mutex);
  
- 	if (!*tgt_it) {
-@@ -578,7 +577,7 @@ cifs_reconnect(struct TCP_Server_Info *server)
- 		 * feature is disabled, then we will retry last server we
- 		 * connected to before.
- 		 */
--		reconn_inval_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
-+		reconn_set_next_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
- #endif
- 		rc = reconn_set_ipaddr(server);
- 		if (rc) {
+ 	cifs_dbg(FYI, "reconnect tcon rc = %d\n", rc);
 -- 
 2.27.0
 
