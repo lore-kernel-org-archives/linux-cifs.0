@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4301DC433E4
-	for <linux-cifs@archiver.kernel.org>; Thu, 23 Jul 2020 12:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 666D3C433E4
+	for <linux-cifs@archiver.kernel.org>; Thu, 23 Jul 2020 12:39:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FE84206D7
-	for <linux-cifs@archiver.kernel.org>; Thu, 23 Jul 2020 12:32:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3130320768
+	for <linux-cifs@archiver.kernel.org>; Thu, 23 Jul 2020 12:39:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="ot75SLCi"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="PPBYxnIm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728426AbgGWMcm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 23 Jul 2020 08:32:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59438 "EHLO
+        id S1728632AbgGWMjT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 23 Jul 2020 08:39:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727859AbgGWMcm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Jul 2020 08:32:42 -0400
+        with ESMTP id S1726109AbgGWMjT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Jul 2020 08:39:19 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5375EC0619DC
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2020 05:32:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63BA6C0619DC
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2020 05:39:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Message-ID:Date:To:From:CC;
-        bh=CL70rOAxpVzdRUZ5B+YockZGzKEfLPxEh6lXfFZ1JuE=; b=ot75SLCiPVNfYHdydmjhHyoTXp
-        ve8E0SLb5jZgLwrOo9T+RQzT8gprzB3zF6qv1xhocq/7j74wF35dXd9wW8s69MFkUssdlMK2zfm76
-        WwtlXsL1o6H2G3Qs9KX97h1tDo/sPvkL3qhxyDd7IWW0L8FUK2uiRCrCI91q6QcWZlmkSYTYq0XGW
-        nMUuRroqgPFQSSNzyoBHPC55mT23+vQcOBTSiUdQeszk1WMnbz/ioPhPU5e1ZJkQts1ZbTX2+SGAl
-        hf/hoeB1wqFAMMiBEL00173OiLkQvsmXhOWtXCuJ7TfalV0d0g9UhKhDzVNED2vscuCgmyDp0PrUn
-        T9CqK3Lxblp0otoSZbNWhNdyOG3q8PrnPqTOuBMsDwESZ/CGL4qlpMOWB2u/qWiMwQ8Duz67NOQHX
-        Zykb0eZrqtZpOeeFAXiiHyswDg/yWf3yGJ/2v3n6W//ZD/G1e5GP5fKrghld+qc72Ew7T4yFMvBz4
-        des46zD9l8ZqsFSVYvFOszph;
-Received: from [2a01:4f8:192:486::6:0] (port=43246 helo=hr6.samba.org) 
+        bh=vik6E1ZhTd3yArnJY+4b9VGJECZEcDDvtNxnwk7m81o=; b=PPBYxnImd5VnbU4aHg5Shojs3f
+        fxParBgn2rhHunj4CFt7lKVivhN/5msdDAf5rqL4gkAYNMzpOo+AKvaSe2SaipzBMlICnbMw5dU6L
+        dl4CKYCmQmJcM9ATwcyqNzjZHefypSjYkWw06fXK6EYRTVZuUAV5snkTCqEWGPdnbyqqteMCpmJQB
+        2vZ0bgxDbcYP7x9Nxp0DhXP6jyO5OAyTXZ8iNQIy3SmgbEuc06DEf09uW2Cvux/ILbiw1NgEfOUDO
+        eavz7gTknA3/7Fihg+AEXvQRMJhwRilda/TDsfAoO7sebR1uRwx1ViUcE4L0BG/DhRmeVReBPGWTU
+        M9Gc/dE7PAxLT1HBk3z24U8maV9/Otg+ZcuKW9KDHKeIkRKWKpeSJEdznuqhwXmO3j8OD/nbo1BtQ
+        i0PwirQ2wPoipYzSvD+Lx2cbhGuCoCZYfeRDe0LzDipzzUJF2sXuNLN17NWiTI5CIRth714/h1Lye
+        Bge0h0sAWXO2UrmZJ8tRidS+;
+Received: from [2a01:4f8:192:486::6:0] (port=43256 helo=hr6.samba.org) 
         by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1jyaOu-0004Fg-Dc
-        for cifs-qa@samba.org; Thu, 23 Jul 2020 12:32:40 +0000
-Received: from [::1] (port=29206 helo=bugzilla.samba.org)
+        id 1jyaVI-0004Kv-TV
+        for cifs-qa@samba.org; Thu, 23 Jul 2020 12:39:17 +0000
+Received: from [::1] (port=29214 helo=bugzilla.samba.org)
         by hr6.samba.org with esmtp (Exim 4.93)
         (envelope-from <samba-bugs@samba.org>)
-        id 1jyaOu-007176-6N
-        for cifs-qa@samba.org; Thu, 23 Jul 2020 12:32:40 +0000
+        id 1jyaVF-00717T-By
+        for cifs-qa@samba.org; Thu, 23 Jul 2020 12:39:13 +0000
 From:   samba-bugs@samba.org
 To:     cifs-qa@samba.org
-Subject: [Bug 13470] DFS mounted shares do not allow to go subdirectories
-Date:   Thu, 23 Jul 2020 12:32:40 +0000
+Subject: [Bug 12951] mount.cifs fails on DFS share with smb protocol version
+ >= 2.0
+Date:   Thu, 23 Jul 2020 12:39:12 +0000
 X-Bugzilla-Reason: QAcontact
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -56,16 +57,16 @@ X-Bugzilla-Version: 3.x
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
 X-Bugzilla-Who: aaptel@samba.org
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: DUPLICATE
 X-Bugzilla-Priority: P5
 X-Bugzilla-Assigned-To: sfrench@samba.org
 X-Bugzilla-Target-Milestone: ---
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc bug_status
-Message-ID: <bug-13470-10630-zvcnD6ASXt@https.bugzilla.samba.org/>
-In-Reply-To: <bug-13470-10630@https.bugzilla.samba.org/>
-References: <bug-13470-10630@https.bugzilla.samba.org/>
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-12951-10630-1GHhrUPwcQ@https.bugzilla.samba.org/>
+In-Reply-To: <bug-12951-10630@https.bugzilla.samba.org/>
+References: <bug-12951-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.samba.org/
@@ -76,18 +77,19 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-https://bugzilla.samba.org/show_bug.cgi?id=3D13470
+https://bugzilla.samba.org/show_bug.cgi?id=3D12951
 
 Aur=C3=A9lien Aptel <aaptel@samba.org> changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-                 CC|                            |aaptel@samba.org
-             Status|NEW                         |NEEDINFO
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |DUPLICATE
 
---- Comment #1 from Aur=C3=A9lien Aptel <aaptel@samba.org> ---
-Have you tried a recent kernel? Lot of DFS changes went in the last few yea=
-rs.
+--- Comment #2 from Aur=C3=A9lien Aptel <aaptel@samba.org> ---
+
+
+*** This bug has been marked as a duplicate of bug 12917 ***
 
 --=20
 You are receiving this mail because:
