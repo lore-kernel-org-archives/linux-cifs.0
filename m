@@ -1,4 +1,4 @@
-Return-Path: <SRS0=JAQl=BB=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=laBL=BC=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,80 +7,83 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E28C433DF
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jul 2020 05:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8194AC433E0
+	for <linux-cifs@archiver.kernel.org>; Thu, 23 Jul 2020 05:23:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 838F720771
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Jul 2020 05:08:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53C9520768
+	for <linux-cifs@archiver.kernel.org>; Thu, 23 Jul 2020 05:23:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEMpVKuF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RGuFtM3m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726253AbgGVFIA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 22 Jul 2020 01:08:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49526 "EHLO
+        id S1725858AbgGWFX5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 23 Jul 2020 01:23:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726147AbgGVFIA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Jul 2020 01:08:00 -0400
-Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA409C061794
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Jul 2020 22:07:59 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id d14so822583qke.13
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Jul 2020 22:07:59 -0700 (PDT)
+        with ESMTP id S1725849AbgGWFX4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Jul 2020 01:23:56 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A96E0C0619DC
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2020 22:23:56 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id i18so3308798ilk.10
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2020 22:23:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=70yCi0FEAOU3112o2JYk+gRGnM2935HzsnfIsc/CW2g=;
-        b=VEMpVKuF+PUHyBSnTnBwmOnqeB4PdcJAfKaqMd4vephBU8n7/iKcpn7Pm99LWByLoo
-         XxMS7Tgu6YAQFecaIItsID+lVkuC2B/qyrgD5o3lTegWkSqNdfe+6qUvB0r0C/hibHUz
-         tTq8GMl/jz53Isyee4nx85iZ9g99EOF81H/WCUlgL+bjJtgtFpI2sT/ZyEbLQFN8w5TI
-         F0BNo16pWxKzptEiHqSlnZMIOrEJfZU9FKd2XseW+o9lKDOzhCC0JsJAJCvT8/I0CXPx
-         DrVG7zL1+okY4DgyZs+7mpAf6Lw9IwUNC/nNY8yTSNwtTDL8YeP0VOC3XPDawkDgF+9R
-         CHJg==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=WpMBGot8puTiMlmSpFVXBB0Q4QQ82yXT6C9rA9c3WHg=;
+        b=RGuFtM3m8tx6EEtosK/nMI/nBTOkvWXUMT1l9IlcpiHaj+Qf/Ijg7UJ2TWtlaPWkjT
+         YJqmqpq9LcQLI08MmWtoKmwLo3jWcsWaV8ffTNQgefrNqKXq6u2t8gNWrm4T+qYHK7IE
+         MnPPwlw8WpYH4YMF82HOoe6e7DFBi/lg1jXca8M5WgH3EGpnu93H74jg3ND6NCSdG7uE
+         6bOefmooTCzGdHdJJxmXiPfcQCRxFKtmu9poZBInsdRKoRH9jd9VINV1lh3GOZWDUvnT
+         k18GZjky5t01DVfRqHnx1YDuq+pWor7rH9Hqr+tSf3dTwe05InyhxSP/61zKuyQMCBxE
+         R3Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=70yCi0FEAOU3112o2JYk+gRGnM2935HzsnfIsc/CW2g=;
-        b=W598QWcJFI54xGw5ch607uPPwJuLK/zguH+ev8wFhdMfOZ3uom9DRsr4238YwjnPBC
-         S6GD67vkYOgNTPLGvJIhfT98lqRue4Rii7drbSAX2/0q/a0pZ+bKg2mxVqAaaXq7jbMn
-         SW3jkbpGM+Uje0J8enHCBK4K8mYYkV1k0OBjRaomt/40QmV+ygVCRAskyd6xIFhOq8ND
-         rTT82SoPh6EjESNTQb0pVKdgsw7paaPwllyQgzhmJulgnnCF5MdicixIyPSwDGVLqKpX
-         c1MDUey2OhtNXi0ZtJdEyL8Xv9fdqHu667aELpESAfh4VQGKG5c0U+QlsuyelnDCAcUL
-         qEsw==
-X-Gm-Message-State: AOAM532wg4Zo8y5lZqwlBsVF29oxB1kJDyWSs7It/jKs/v2xdvxrMG50
-        H2b4HzIxKSZ/wvEqcSdDsYUnxw8xVXKiIGwERaNUmBNP5aY=
-X-Google-Smtp-Source: ABdhPJzMLTpHBB4E7yPvmVdYX7CNwpb/ef29ix+UdNlIXxTdw59iQviYgpfD7phZRf9/hbTIzo+R9XsfQAZtShXGFXk=
-X-Received: by 2002:a37:458f:: with SMTP id s137mr22712420qka.129.1595394478825;
- Tue, 21 Jul 2020 22:07:58 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=WpMBGot8puTiMlmSpFVXBB0Q4QQ82yXT6C9rA9c3WHg=;
+        b=UFGE+eJo3KWnxItyk86cmVUXxPcombA8MxjU6jOMS51yGwXvNbEflIVFRbCpjggyi/
+         nv0tcw4xkrCaWfruezLS9vTdgIECR2AfW1pxpwTue4JPNMbOep1rIbt2rA0Nk1fhe65G
+         liIQInLi5YqTlhRW6UMnNtV14N10VM4be9BA5uwgQWRHiTv5W8W9RrGdSEQttjf22eF5
+         lPNAAGzLYXliUTQQQb3d0JNv85VrhxPtMgdKG5+sl3vgLYyJc6R8d8TMHxGOaAREE66d
+         EGFe2+LzVBIkQdTeqUPKK4e7P7CVzbcA0yR/KL3IMVK7sO2wb0hLEiBfinvz4FeeqI4j
+         1yDQ==
+X-Gm-Message-State: AOAM532U6iW2UZYhthqRou6qLKmrVYeX2LOH6PEMa6zISJjTYkcPcAgG
+        be8EHSbzVgsAk6UWRX2JCHLTpZ6yfft9GhDZ3HSK0Gw1W1Y=
+X-Google-Smtp-Source: ABdhPJwdbodK/Av+yJlue/WJjtwYGhr+2fFwJPeY5AeK8Vy4f42TY5ezdS/3/dnV0K0BPFkFonlm5m3otdf/SSOBuw8=
+X-Received: by 2002:a92:d6d2:: with SMTP id z18mr3303661ilp.272.1595481835824;
+ Wed, 22 Jul 2020 22:23:55 -0700 (PDT)
 MIME-Version: 1.0
-References: <b14432a4-bb8c-7a0f-4339-b7e6ddec9b4a@arrl.org>
- <CAH2r5msj3KMMonyhjDeyAweHEBezOHFkJwCUXpJ4Gv59Q=S9bQ@mail.gmail.com>
- <752d5d05-7b91-b119-b5a6-7fcdeb1f0ced@arrl.org> <CAH2r5muNtwm3V-0GpaRBXmrptGDO9w1vDSWN9Wrf_eebuevg6A@mail.gmail.com>
- <61450b64-ed70-6b8f-2beb-57267ddcb8c5@arrl.org> <CAH2r5mu-g-RrR9Q4ghmqjkd-mbXbfeJE=HgVSaEEosCyBNoO8Q@mail.gmail.com>
- <119a0298-4099-c65e-30db-746814e36cce@arrl.org>
-In-Reply-To: <119a0298-4099-c65e-30db-746814e36cce@arrl.org>
-From:   Isaac Boukris <iboukris@gmail.com>
-Date:   Wed, 22 Jul 2020 07:07:47 +0200
-Message-ID: <CAC-fF8TB7C2TOv9-mT68teA7hJJ0jY5YG0vW6A2OcnD_wmqTpQ@mail.gmail.com>
-Subject: Re: issue -- cifs automounts stopped working
-To:     "Michael Keane, K1MK" <mkeane@arrl.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Upstream Samba Technical Mailing list 
-        <samba-technical@lists.samba.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 23 Jul 2020 00:23:45 -0500
+Message-ID: <CAH2r5muh5W-OtXEKg7Ji7jBZa1h3-XVvHBn3izkyMrrWAbfrcQ@mail.gmail.com>
+Subject: xfstest 129 slowness
+To:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Jul 22, 2020 at 5:48 AM Michael Keane, K1MK <mkeane@arrl.org> wrote:
->
-> Tried setting KRB5_CCNAME to KEYRING:persistent:1000 with no change
-> (Also tried KRB5CCNAME  as well, as that's the environment variable
+In trying to debug xfstest 129 I noticed odd behavior to Windows server
 
-Indeed KRB5CCNAME is the right variable name, you can also run the
-upcall with KRB5_TRACE=/logfile to get more insights what the krb5
-libs are doing.
+test 129 does 4 steps, and the second one is the very slow step
+
+$here/src/looptest -i 100000 -r -w -b 8192 -s
+$SCRATCH_MNT/looptest/looptest1.tst
+$here/src/looptest -i 10000 -t -r -w -s -b 102400
+$SCRATCH_MNT/looptest/looptest2.tst
+$here/src/looptest -i 50000 -r -w -b 256 -s $SCRATCH_MNT/looptest/looptest3.tst
+$here/src/looptest -i 2000 -o -r -w -b 8192 -s
+$SCRATCH_MNT/looptest/looptest4.tst
+
+
+So the problem is the second invocation of looptest - when it is doing
+10,000 102,400 byte sequential writes and reads passing in the
+truncate flag.  What I see in the network trace (at least to Windows
+server) that is troubling is lots of "STATUS_PENDING" errors in the
+write responses.
+
+It appears that the test runs much faster to Samba
+-- 
+Thanks,
+
+Steve
