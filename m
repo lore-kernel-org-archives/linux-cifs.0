@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 832B9C433E4
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jul 2020 15:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E06C433E0
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jul 2020 15:56:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3084B2078E
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jul 2020 15:56:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BE4E2053B
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jul 2020 15:56:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="iO5WpySU"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="XQjBe2hd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731080AbgG1P4Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Jul 2020 11:56:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49092 "EHLO
+        id S1730963AbgG1P4w (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Jul 2020 11:56:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730963AbgG1P4Q (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Jul 2020 11:56:16 -0400
+        with ESMTP id S1730679AbgG1P4v (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Jul 2020 11:56:51 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B61EC061794
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2020 08:56:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67616C061794
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2020 08:56:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Message-ID:Date:To:From:CC;
-        bh=nV++CxA7bKa1cGy/XcbHdLWDO1YsSw2BAmDOw5jNQYY=; b=iO5WpySUtyJgn/AsyBQHz1RN9+
-        nKEcoo1WBeQyQ7MFeR6OYMRa+RN9YWlRcMJFzudDfA1OnBWSiz7JbEvNW4wq3DESYv/g1CCJORmT4
-        IRhkAsJ04JqxYhxhWr1lP8aC+KgB/StqEjPgQqYUKlulm4NiQR9bW7q68YPbZ2Lj6qfYnTqqNgVLB
-        1CPOjOao5VYxWOF4mhP5mv47U5nWWn2ZSHMLLWD4Y0QioTFttuVPikz88H8BthAB1487THxNYQEnp
-        eaUTKxgMMWkiWiPgzn21UCoRfejx2uQYR0GrTh60F2SmbcMpRNbwIDSsjpzh3TY7Mh5jBojE07LsM
-        f0OSvlL2ZdpHl+TIXePetvknenvn7EE5vZOVbk0c/8ME4MAZXu1aXSjccPGueBk+FYb8bvF5ETh+w
-        bFui76tDISjUqxm7++f9nobLmGOG1/+EIGkWBqOT1W3QyKGjhUkDTqfdb78xOu8e+oxYzsOfqUDTs
-        4AI8DBvCPQYfX/YYdRgW2pYj;
-Received: from [2a01:4f8:192:486::6:0] (port=46416 helo=hr6.samba.org) 
+        bh=DJi3P3f4L3dTV3yUC7JT3h9eO5LWiaH+md3pK4kRLHs=; b=XQjBe2hdT9cB2Vd+DqFfGO+Bp3
+        7TiDPcAcELtE0/AKeZD1fgrTuaQtTAgT2SlCj8PS5gtsQAxhGwTmW6svV6sZm9RCN+f/evTlufS6n
+        /rXzcHUfdzWD/WDGBWS9hOB7VjqvwEVYnbRVZB9VEu8pBxG2X584cxNlrQGoPptiR3AXosGl4fNEG
+        KMf70/QrJP2KFjc2ohqfJEPWgW3iLswej1esMRS6FEyAuOxwqF22TiDWzL3I+6yz2hnWSLjked+io
+        kJ98vUhn4bEVCVSQz/FCO7XzpyLa82ZfoVhc/LEAHuP+XZNm951CFI8+4pHTtizmXLKumLEYWwhs+
+        zfw1cxjdiePI2gDc3MaPK1hiDqqyZXqnO3Pqy8j4tLH6fpFpfQR3blRuf55O84i8Pbo3v4rDtQ0Mr
+        S8pz/4J9mk632CYtE8gpfQsspfxx7e6tTRuVAGMA7/wdf+JxdBqOV2XF1ff01T8N+kjUV952ACbh4
+        LDbWFOufezue9dMQuj7Q6G3X;
+Received: from [2a01:4f8:192:486::6:0] (port=46434 helo=hr6.samba.org) 
         by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1k0Rxd-0007n6-F8
-        for cifs-qa@samba.org; Tue, 28 Jul 2020 15:56:13 +0000
-Received: from [::1] (port=32370 helo=bugzilla.samba.org)
+        id 1k0RyD-0007o4-EX
+        for cifs-qa@samba.org; Tue, 28 Jul 2020 15:56:49 +0000
+Received: from [::1] (port=32388 helo=bugzilla.samba.org)
         by hr6.samba.org with esmtp (Exim 4.93)
         (envelope-from <samba-bugs@samba.org>)
-        id 1k0RxT-007fBk-Gw
-        for cifs-qa@samba.org; Tue, 28 Jul 2020 15:56:03 +0000
+        id 1k0RyB-007fCA-Cq
+        for cifs-qa@samba.org; Tue, 28 Jul 2020 15:56:47 +0000
 From:   samba-bugs@samba.org
 To:     cifs-qa@samba.org
 Subject: [Bug 14442] CVE-2020-14342: Shell command injection vulnerability in
  mount.cifs
-Date:   Tue, 28 Jul 2020 15:56:02 +0000
+Date:   Tue, 28 Jul 2020 15:56:46 +0000
 X-Bugzilla-Reason: QAcontact
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -65,7 +65,7 @@ X-Bugzilla-Assigned-To: sfrench@samba.org
 X-Bugzilla-Target-Milestone: ---
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: attachments.isobsolete attachments.created
-Message-ID: <bug-14442-10630-OGhybn1bpS@https.bugzilla.samba.org/>
+Message-ID: <bug-14442-10630-fai1LR6FNE@https.bugzilla.samba.org/>
 In-Reply-To: <bug-14442-10630@https.bugzilla.samba.org/>
 References: <bug-14442-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -84,15 +84,13 @@ Aur=C3=A9lien Aptel <aaptel@samba.org> changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-  Attachment #16138|0                           |1
+  Attachment #16139|0                           |1
         is obsolete|                            |
 
---- Comment #18 from Aur=C3=A9lien Aptel <aaptel@samba.org> ---
-Created attachment 16148
-  --> https://bugzilla.samba.org/attachment.cgi?id=3D16148&action=3Dedit
-patch v3 for 6.2-6.10
-
-add two memset() to handle empty input and/or bad systemd-ask-password call
+--- Comment #19 from Aur=C3=A9lien Aptel <aaptel@samba.org> ---
+Created attachment 16149
+  --> https://bugzilla.samba.org/attachment.cgi?id=3D16149&action=3Dedit
+patch v3 for 5.6-6.1
 
 --=20
 You are receiving this mail because:
