@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46656C433EC
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jul 2020 18:09:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 978DEC433E1
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jul 2020 19:34:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2314A2070B
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jul 2020 18:09:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7686A20656
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Jul 2020 19:34:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="uypXU1cL"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="3eEMfapR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732208AbgG1SJT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Jul 2020 14:09:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41500 "EHLO
+        id S1732842AbgG1Teo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Jul 2020 15:34:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728452AbgG1SJS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Jul 2020 14:09:18 -0400
+        with ESMTP id S1729646AbgG1Ten (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Jul 2020 15:34:43 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51F42C061794
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2020 11:09:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C5DC061794
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2020 12:34:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Message-ID:Date:To:From:CC;
-        bh=ZsXRNo+I9NMwyLylQZDrvIQmL2boeT4ESwZMAYgDk7I=; b=uypXU1cLxzmPK4z3dUhvt5MX9j
-        W51eASaXPM/GjcdeDAyxDoJ7QO9ldXZVviD0eXrd+To7qjB789PLBsZY2KpC1zSnTWvd0Hp3Awej4
-        PFU/0EZ6bqdWdopLbDATAO9w/y37XdplHrbZYwU3M9dXPrPoHAxrsORBAecyNgKGV9538A71+yTSb
-        5woiaxbTeoC0HV97RzyyAd6sYS4c9CrZicui/U71koa4C+WO60541FNp21uDhZwhqhYqc+FvF1TN6
-        29TtGtnKdvrO0gl1tQpkf+F+S3wu4CrKh/v95Nm3ZpqMpTVP0Yu9DDYyEnZ8TvPfY0ocpRozxlJWv
-        E4OtyPUcvU8obHt9ooCW+uu7TfGcDVKvy9rjjM5ouUAzG3ABYS27ZZi4/Mo6D4AXU2+keImg1nYXV
-        0Ei0aP1SurgVTJGdlXAWdDs8d7NQESIWNHh0DOMeuPNUw1L3qSpqYF+hCY1GmAyIZeVusvD5rWmIJ
-        G+QlxhTnISAbxRsy97gqELp4;
-Received: from [2a01:4f8:192:486::6:0] (port=46540 helo=hr6.samba.org) 
+        bh=LvT1mIp8tK68V9x/tA0nC6FSJm3nEB1/KdYrhKD0tlA=; b=3eEMfapRAUJm8z9YZ2JF5uOOCS
+        fHSvGQTIVv1NIjze7A4BpyfbPrI6kCr5d/nOmdpujAd1PmrnqPNnzJNwQiQJYvUO3JTfauuZaETQ3
+        POCyhlrcrnplZVK9K6TWESTnZ5Ksc0/DcJTfmsA3dzPYWDqAtO1wGFWtaGvK8cz5QIXBifXYmRNjn
+        4Wbvw8vp6FedoiT60u9w8Dw6Kpz1ClnNXXUJUjmhw7hLSda1i+MRiXqAmuxo0jIctxTja0F4IvVix
+        ztdZFHFlnotzTyGq1TOhFootsVJHqTEhkOz8YSzcbvEUPFVXxVA7cyNs10EREvhT8DRAtCk4uzDjN
+        jFI3SGzC0WMIs4YIszadregNYM0wRKwClQNC60RKTAEJPBwlIwm7DhuUFKUy5Sqm1NbKAt/EYopCX
+        G20sWwB2IRi1ixsngsL3raTJJorgwtSNtOGTC2CQ59O7QCcpadiWAMkyF8ItHmsoB2o8gDoUvXQYU
+        w9IdTbKFO4qKuDjlTEh7zYPE;
+Received: from [2a01:4f8:192:486::6:0] (port=46558 helo=hr6.samba.org) 
         by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1k0U2N-0000L6-Sn
-        for cifs-qa@samba.org; Tue, 28 Jul 2020 18:09:16 +0000
-Received: from [::1] (port=32496 helo=bugzilla.samba.org)
+        id 1k0VN3-0000uy-89
+        for cifs-qa@samba.org; Tue, 28 Jul 2020 19:34:41 +0000
+Received: from [::1] (port=32516 helo=bugzilla.samba.org)
         by hr6.samba.org with esmtp (Exim 4.93)
         (envelope-from <samba-bugs@samba.org>)
-        id 1k0U2N-007fLn-1x
-        for cifs-qa@samba.org; Tue, 28 Jul 2020 18:09:15 +0000
+        id 1k0VN2-007fSA-Qt
+        for cifs-qa@samba.org; Tue, 28 Jul 2020 19:34:40 +0000
 From:   samba-bugs@samba.org
 To:     cifs-qa@samba.org
 Subject: [Bug 13470] DFS mounted shares do not allow to go subdirectories
-Date:   Tue, 28 Jul 2020 18:09:14 +0000
+Date:   Tue, 28 Jul 2020 19:34:40 +0000
 X-Bugzilla-Reason: QAcontact
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -56,7 +56,7 @@ X-Bugzilla-Component: kernel fs
 X-Bugzilla-Version: 3.x
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: sergey_ilinykh@epam.com
+X-Bugzilla-Who: aaptel@samba.org
 X-Bugzilla-Status: NEEDINFO
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P5
@@ -64,7 +64,7 @@ X-Bugzilla-Assigned-To: sfrench@samba.org
 X-Bugzilla-Target-Milestone: ---
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-13470-10630-CUJs0BEogP@https.bugzilla.samba.org/>
+Message-ID: <bug-13470-10630-B55hyfQKU4@https.bugzilla.samba.org/>
 In-Reply-To: <bug-13470-10630@https.bugzilla.samba.org/>
 References: <bug-13470-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -79,15 +79,56 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 https://bugzilla.samba.org/show_bug.cgi?id=3D13470
 
---- Comment #2 from Sergey <sergey_ilinykh@epam.com> ---
-Hi Aur=C3=A9lien Aptel,
+--- Comment #3 from Aur=C3=A9lien Aptel <aaptel@samba.org> ---
+Regarding 1)
 
-Following my scenario above I couldn't reproduce it anymore. Seems to work.
+You can put multiple nameservers in /etc/resolv.conf but that might not have
+the effect you want.
 
-btw I have a couple of questions unrelated to this issue:
-1. Is it possible to force smbclient/cifs mount to try all nameservers from
-/etc/resolv.conf?=20
-2. Is it possible to mount dfs root? In my case it's //epam.com
+If you have 2 nameserver A and B, it will try to resolve by contacting A fi=
+rst.
+But if A is *up* and replies that the the domain cannot be found it will st=
+op
+there.
+The nameserver B will only be tried if A is down, not if A replies "doesn't
+exist".
+
+What I would suggest you do is setup dnsmasq. It's a tiny dns server proxy
+daemon.
+
+You can tell it to forward all domain request for epam.com and any subdomain
+(e.g. a.epam.com, a.b.c.epam.com etc) to nameserver A, and forward all the
+other request to nameserver B.
+
+To use it, install dnsmasq, and put this in the config file (usually
+/etc/dnsmasq.conf)
+
+    # forward *.epam.com requests to 10.0.0.1
+    server=3D/epam.com/10.0.0.1
+    # forward the rest to 8.8.8.8
+    server=3D/#/8.8.8.8
+
+You will also need to set your system dns server to point to the local dnsm=
+asq.
+This can be done by putting 127.0.0.1 in /etc/resolv.conf (and only one). T=
+here
+might be cleaner ways to do this depending on your distro as resolv.conf mi=
+ght
+be overwritten by the system each time you connect to some Wifi network for
+example.
+
+----
+
+Alternatively, if setting up dnsmasq is too much and you don't mind hardcod=
+ing
+the IP of each host used in the DFS namespace, you can simply list them in
+/etc/hosts
+
+Regarding 2)
+
+It should be possible to mount the dfs root yes. Once you have DNS working =
+it
+should all be ok, assuming your kernel is recent enough.
 
 --=20
 You are receiving this mail because:
