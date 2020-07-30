@@ -2,57 +2,94 @@ Return-Path: <SRS0=e1Ds=BJ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92124C433E1
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jul 2020 12:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 666A1C433E1
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jul 2020 12:16:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C8DF2074B
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jul 2020 12:16:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 437C420838
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Jul 2020 12:16:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="a7GCCI+S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727837AbgG3MQX convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 30 Jul 2020 08:16:23 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44834 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726631AbgG3MQW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 30 Jul 2020 08:16:22 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 32C8FAF52;
-        Thu, 30 Jul 2020 12:16:34 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Paulo Alcantara <pc@cjr.nz>, linux-cifs@vger.kernel.org,
-        smfrench@gmail.com
-Cc:     Paulo Alcantara <pc@cjr.nz>
-Subject: Re: [PATCH v3 0/7] DFS fixes
-In-Reply-To: <20200721123644.14728-1-pc@cjr.nz>
-References: <20200721123644.14728-1-pc@cjr.nz>
-Date:   Thu, 30 Jul 2020 14:16:20 +0200
-Message-ID: <87zh7h9p0r.fsf@suse.com>
+        id S1727889AbgG3MQm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 30 Jul 2020 08:16:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34738 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726631AbgG3MQm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Jul 2020 08:16:42 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FD88C061794;
+        Thu, 30 Jul 2020 05:16:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=GuSgBCY5Dc+vZPEZj8RCz93A4JYgZmNr3NqXQV1PNYU=; b=a7GCCI+Sq/NXl6y3iQLleRnLms
+        4p1ZsjInJKj/tAsDpcjI9usZM2vENPG03Df+sSsNojrv4V1EBT3j/wFU5/RBzQbJ3/l7PJs6gs6wF
+        KvMrbG1qCvxYYQzyjA+rd2mVdNqtu69fgGCmUxDcA0RgS0og/RM9yM94JvkDJKFpuRee0vYNFOCsj
+        eIut78fgYXyBEr7Kb1rNIa6xqLVa4ibM/5Ak08hEKjq3YHCiAEjyb2MEXtAZyXxOh9m0FVN6dax9i
+        2yquBpLaOry0D0qgZd4Jj4uVCYZwyhrpcaUPuA9nI+bcdLL3RQRs7hH1muyyDrTPpdvxlanB3eUMs
+        K6nwbsWA==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1k17Ty-0003OY-Jv; Thu, 30 Jul 2020 12:16:22 +0000
+Date:   Thu, 30 Jul 2020 13:16:22 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     torvalds@linux-foundation.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>,
+        Jeff Layton <jlayton@redhat.com>,
+        Dave Wysochanski <dwysocha@redhat.com>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Upcoming: fscache rewrite
+Message-ID: <20200730121622.GB23808@casper.infradead.org>
+References: <447452.1596109876@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <447452.1596109876@warthog.procyon.org.uk>
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I'm not sure I fully understand what is going on in patch 6 & 7 but we
-have tested this locally and seems to work properly. These changes make
-edge cases DFS link targets work, fixes reconnection/failover where
-there are mixups between netbios/fqdn host from mount call or link
-targets, and other things (null ptr deref?).
+On Thu, Jul 30, 2020 at 12:51:16PM +0100, David Howells wrote:
+>  (3) Al has objections to the ITER_MAPPING iov_iter type that I added
+> 
+> 	https://lore.kernel.org/linux-fsdevel/20200719014436.GG2786714@ZenIV.linux.org.uk/
+> 
+>      but note that iov_iter_for_each_range() is not actually used by anything.
+> 
+>      However, Willy likes it and would prefer to make it ITER_XARRAY instead
+>      as he might be able to use it in other places, though there's an issue
+>      where I'm calling find_get_pages_contig() which takes a mapping (though
+>      all it does is then get the xarray out of it).
 
-So AFAIC you can merge with
+I suspect you don't need to call find_get_pages_contig().  If you look
+at __readahead_batch() in pagemap.h, it does basically what you want
+(other than being wrapped up inside the readahead iterator).  You require
+the pages already be pinned in the xarray, so there's no need for the
+page_cache_get_speculative() dance that find_get_pages_contig) does,
+nor the check for xa_is_value().
 
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+My main concern with your patchset is that it introduces a new page flag
+to sleep on which basically means "I am writing this page to the fscache".
+I don't understand why you need it; you've elevated the refcount on
+the pages so they're not going to get reused for another purpose.
+All it does (as far as I can tell) is make a task calling truncate()
+wait for the page to finish being written to cache, which isn't actually
+necessary.
 
-Cheers,
--- 
-Aurélien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
+Overall, I do like the patch series!  It's a big improvement over what we
+currently have and will make it easier to finish the readpages->readahead
+conversion.
