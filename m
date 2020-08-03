@@ -2,152 +2,131 @@ Return-Path: <SRS0=CZtn=BN=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2854C433E0
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Aug 2020 22:45:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD5CC433DF
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Aug 2020 12:19:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3DC9208C7
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Aug 2020 22:45:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22C5C2064B
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Aug 2020 12:19:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CBkOjCzA"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="SOXgjXyK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726805AbgHCWpP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 3 Aug 2020 18:45:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53096 "EHLO
+        id S1726007AbgHCMT2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 3 Aug 2020 08:19:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726548AbgHCWpP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Aug 2020 18:45:15 -0400
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03AF9C06174A;
-        Mon,  3 Aug 2020 15:45:15 -0700 (PDT)
-Received: by mail-il1-x141.google.com with SMTP id t4so32531769iln.1;
-        Mon, 03 Aug 2020 15:45:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=Agoua9JCHDPZSVu/sgTJ3ZU4j6VJQrjmmUvDnV2Qjzo=;
-        b=CBkOjCzArEuy1db7VIr7ilDZMooH0FRSZha2I7WOWv6I6Cl5GVhk/zzoc1ZwXipk57
-         eD1UgSp3wbMEyVbSDGILO6scmVJXSjC9m/cnhjaOymlrJwaUEisuniYncjGAH1AzioQ1
-         qaPRtSf6EVf69mGDKwbwscwgIjquUzPB/xX2dIUo0SueLtilcWZb89OPUmhFwLEd2wo3
-         SkWFAnoQ8Hk5+E8Ok73qcKL/nT3kfduxM3wkO3XHf+GyAYrhAIiA5FTnXUDBY3hYxya7
-         mmCKNqn8DTH/KTjxEXgxKiVl1oydrTyRAtQCCqrQ6hJt9NG5yZdK/F6QvNDN4bWUEeL0
-         SaTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=Agoua9JCHDPZSVu/sgTJ3ZU4j6VJQrjmmUvDnV2Qjzo=;
-        b=dSnQUgUMKcsOS4uJCuTGQD6BaewpmE4xLYMOcJlj/o6au5ZUiZBQySfjp89lAPCFnF
-         XkConIWRpeFWf9ZpE3VNC1lpuJzv4JBky8nJgL4QMQ9ycWl7yVwWWMlkPIB1Pp6YiDEB
-         BijGRDTRDA/3mGqx2r+fJpIQUcBJ/QgOWF7GTXcUanFgKx/i3MZakgCWQy3QabMLGPQ7
-         MnBPos/aHEoiLJYHNzrDYRz1qDP2H3/KX7gXGc8YfE9pW45u6oGUStM6E8ZDl3PDZH//
-         cxvdjQkGo+Hpl8mt1MQaL1mdYHXN+YlbH2fnXR2GniZqmqFn6+df9MfbnYSNFVR3yI0a
-         txZQ==
-X-Gm-Message-State: AOAM530T4aR1bgrg7+YqJWrVMadZuawJBau1AQ5hnx3qMzStMsQ53R1x
-        /mdhtxnJVqLPOurHe+D0X1NIxSrgmfalDUf+0zbxZ1hvylc=
-X-Google-Smtp-Source: ABdhPJyzb8qVkdEYKl/XUdRE8YTD5IEvET3KySG34H8fI1nLVSIeQ7QvA32FtfnyH9fXtRAoQTT5aN/scC56YizPF9Q=
-X-Received: by 2002:a92:849b:: with SMTP id y27mr1759650ilk.173.1596494714333;
- Mon, 03 Aug 2020 15:45:14 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 3 Aug 2020 17:45:03 -0500
-Message-ID: <CAH2r5mvA7xqmqPMmYRrU+Jc8SbF-YG=GH9OjvR+Upx_q6aH3jA@mail.gmail.com>
-Subject: [GIT PULL] CIFS/SMB3 Fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        with ESMTP id S1725933AbgHCMTZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Aug 2020 08:19:25 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E85C0C06174A
+        for <linux-cifs@vger.kernel.org>; Mon,  3 Aug 2020 05:19:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42; h=Message-ID:Date:To:From:CC;
+        bh=3NUkXRrxfrXHFFuZaL5KVph5YZDi760IDrRUJOJkgMk=; b=SOXgjXyKu6/3HRiC1mfqkXe1NP
+        ul4V7+9mV2S7HwrK5E+vtR/Pr/iaVOCv1ZskO9t3hoPJiQ5UupYvRPtvYxdRGSWtPsIn3vhRa7FLg
+        6pmEMVYwwDu9Lkr9zlcLs6+ZvgJXt9/Fj+YPCM5tDFqrUJbG0gmarlT7UuEdf6eULDIooeOeLTJFr
+        JEmwh/Q816YTIH8mGdWQMAyW50gjJD1x3mX8hoNvkx3ZXpOVL/9Cn7E9VSby3a5cZwQ/fUcrUUrs5
+        cc5x3M3PkhA53/XFIhEtFJmP5HDLKujoQ1yaSClvl9IULXjqD4Oub5DhU4xbSOwnXAMtYo82lrKpO
+        cuwvLDvOGcHhlcH21L5f5wkdncO2TfMw+B5svWYnS2IsbD7n773ZJ9TqqtCrkiXsfXzen7lnuYUpW
+        l2Cl66TlG9sqZ/FUxP+xySbtoAF+sHEKcAkWUOw5dJiYeeuvMQDpksJvpyNuv7/+J8PB/GbUB9Dwp
+        vBWuWuB9YeWUp9wSc4E6qhEu;
+Received: from [2a01:4f8:192:486::6:0] (port=49310 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1k2ZR3-0007wX-1J
+        for cifs-qa@samba.org; Mon, 03 Aug 2020 12:19:21 +0000
+Received: from [::1] (port=35268 helo=bugzilla.samba.org)
+        by hr6.samba.org with esmtp (Exim 4.93)
+        (envelope-from <samba-bugs@samba.org>)
+        id 1k2ZR2-008Cbn-PE
+        for cifs-qa@samba.org; Mon, 03 Aug 2020 12:19:20 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 14454] New: cannot get symlink file attributes and target with
+ cifsacl mount option
+Date:   Mon, 03 Aug 2020 12:19:20 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 3.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: aaptel@samba.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: sfrench@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ qa_contact target_milestone
+Message-ID: <bug-14454-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-bcf876870b95592b52519ed4aafcf9d95999bc9c:
+https://bugzilla.samba.org/show_bug.cgi?id=3D14454
 
-  Linux 5.8 (2020-08-02 14:21:45 -0700)
+            Bug ID: 14454
+           Summary: cannot get symlink file attributes and target with
+                    cifsacl mount option
+           Product: CifsVFS
+           Version: 3.x
+          Hardware: All
+                OS: All
+            Status: NEW
+          Severity: normal
+          Priority: P5
+         Component: kernel fs
+          Assignee: sfrench@samba.org
+          Reporter: aaptel@samba.org
+        QA Contact: cifs-qa@samba.org
+  Target Milestone: ---
 
-are available in the Git repository at:
+On a Windows Server 2019 share with symlinks:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/5.9-rc-smb3-fixes-part1
+    C:\shares\data> dir
+    ...
+    12/16/2019  08:04 AM    <SYMLINKD>     DIR [sub\dir]
+    12/16/2019  08:04 AM    <SYMLINK>      foolink.txt [sub\dir\foo.txt]
+    ...
 
-for you to fetch changes up to 7efd081582619e7c270d1c0a422385dcaa99fa9f:
+Mounting without cifsacl kind of works (still missing mode bits):
 
-  cifs: document and cleanup dfs mount (2020-08-02 18:00:26 -0500)
+    # mount //nuc.test/data /mnt -o username=3Duser1,password=3Duser1,vers=
+=3D3.0
+    # ls -la /mnt
+    total 3148410
+    ...
+    l---------  1 root root          0 Dec 16  2019 DIR -> sub/dir
+    l---------  1 root root          0 Dec 16  2019 foolink.txt ->
+sub/dir/foo.txt
 
-----------------------------------------------------------------
-16 cifs/smb3 fixes, about half DFS related, 2 fixes for stable
+Mounting with cifsacl (with working idmap):
 
-Still working on and testing an additional set of fixes (including
-updates to mount, and some fallocate scenario improvements) for later
-in the merge window.
+    # mount //nuc.test/data /mnt -o
+username=3Duser1,password=3Duser1,vers=3D3.0,cifsacl
+    # ls -la /mnt
+    ls: cannot access '/mnt/DIR': Operation not supported
+    ls: cannot access '/mnt/foolink.txt': Operation not supported
+    ...
+    d?????????  ? ?         ?                         ?            ? DIR
+    -?????????  ? ?         ?                         ?            ?
+foolink.txt
 
-Build verification test results:
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/379
-----------------------------------------------------------------
-Colin Ian King (1):
-      cifs: fix double free error on share and prefix
-
-Liao Pingfang (1):
-      cifs: Remove the superfluous break
-
-Paul Aurich (1):
-      cifs: Fix leak when handling lease break for cached root fid
-
-Paulo Alcantara (6):
-      cifs: reduce number of referral requests in DFS link lookups
-      cifs: rename reconn_inval_dfs_target()
-      cifs: handle empty list of targets in cifs_reconnect()
-      cifs: handle RESP_GET_DFS_REFERRAL.PathConsumed in reconnect
-      cifs: only update prefix path of DFS links in cifs_tree_connect()
-      cifs: document and cleanup dfs mount
-
-Qinglang Miao (1):
-      cifs: convert to use be32_add_cpu()
-
-Randy Dunlap (1):
-      cifs: delete duplicated words in header files
-
-Roberto Bergantinos Corpas (1):
-      cifs`: handle ERRBaduid for SMB1
-
-Ronnie Sahlberg (1):
-      cifs: smb1: Try failing back to SetFileInfo if SetPathInfo fails
-
-Stefan Metzmacher (1):
-      cifs: merge __{cifs,smb2}_reconnect[_tcon]() into cifs_tree_connect()
-
-Steve French (1):
-      smb3: warn on confusing error scenario with sec=krb5
-
-Wei Yongjun (1):
-      cifs: remove unused variable 'server'
-
- fs/cifs/cifsacl.h   |   4 +-
- fs/cifs/cifsglob.h  |   2 +-
- fs/cifs/cifsproto.h |   9 +-
- fs/cifs/cifssmb.c   | 151 ++++++++---------------------
- fs/cifs/connect.c   | 508
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--------------------------------------
- fs/cifs/dfs_cache.c | 136 +++++++++++++++++++++-----
- fs/cifs/dfs_cache.h |   7 +-
- fs/cifs/inode.c     |   2 -
- fs/cifs/misc.c      |   7 +-
- fs/cifs/netmisc.c   |  27 ++++++
- fs/cifs/sess.c      |   4 +-
- fs/cifs/smb1ops.c   |   4 +-
- fs/cifs/smb2misc.c  |  73 ++++++++++----
- fs/cifs/smb2pdu.c   | 115 +---------------------
- fs/cifs/smb2pdu.h   |   2 +-
- fs/cifs/transport.c |   2 +-
- 16 files changed, 560 insertions(+), 493 deletions(-)
-
-
--- 
-Thanks,
-
-Steve
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
