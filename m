@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A069C433E0
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Aug 2020 12:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B323AC433DF
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Aug 2020 12:21:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 782D1204EC
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Aug 2020 12:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F03720738
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Aug 2020 12:21:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="RXm71EmD"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="1o97qi/K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726189AbgHCMUo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 3 Aug 2020 08:20:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41420 "EHLO
+        id S1726007AbgHCMVO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 3 Aug 2020 08:21:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725933AbgHCMUn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Aug 2020 08:20:43 -0400
+        with ESMTP id S1725933AbgHCMVM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Aug 2020 08:21:12 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0F2C06174A
-        for <linux-cifs@vger.kernel.org>; Mon,  3 Aug 2020 05:20:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96007C06174A
+        for <linux-cifs@vger.kernel.org>; Mon,  3 Aug 2020 05:21:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Message-ID:Date:To:From:CC;
-        bh=u0hheG/BA1R2EuvTv9rXxGD7qUPrDqBThYjFSUFNxuE=; b=RXm71EmDqjFMKM3NhAUzz8pqsp
-        MrPybdc2oDrjhybFdOasiVWxJQMAylcdftV6M3mGz9yRnZcWbdNg8l87EbvyjXRehb0DEYdGgWsjY
-        fVmIBJ8ftl7YYnun+dYovhWTudBId0w0uysorvMegFHMJVJOvhIHr+Du9xvzryyBnDUYzLOOO+d9Z
-        RSbtRULDeMWnsDf6RHqJ4YUCe3EiPwYp6X7AFSv8L95uP1X1Hqfp5namg+xx4w1lT7leDFFS1qcZ3
-        EAOL7h0eZW998ioPq/99pF0aorEjWyWDPHWr7h2a/Xf8ESSqab9WNhaElNWtudivZj5rFyFrjYi6N
-        kN6IoSNynHFq11t611R17paVUpikkUSqPGGFuBpfGQ85UCTYlY+qxF031Bh/sume6srFnkAw7j2xE
-        nsTUmx2Qemg16UFBlBBfWwU2J426tbpwFuK3eIvZab9Nu6A8W92zrCOPXBXUSuTT+oexIIYurSJEq
-        YfCIBl7WuXwgqpoLIZrpuWgu;
-Received: from [2a01:4f8:192:486::6:0] (port=49322 helo=hr6.samba.org) 
+        bh=qN1NjSx5im30OB1I5oLiTCwq+z4BpRhDmkBK4CwW9T8=; b=1o97qi/Kv0jG18UfT6c7sUH/c0
+        u5/x0i3Bq2h60CsDxWQc8D+b9GA7CkdNkPEU+dVlGbkKAi3FB6gN415aUFDUNoxZaVnRY6GH3LSdi
+        W98ngnDb9vbasUONR4FIv2/4Yq9jmFfGTfVIHGhEZXPE1SZbaSNwVSQC0xhjk5SMf3/i1kXaqXzZc
+        JxbfnkHXiifgn8qA7yzeNB22WWzmu0cuqcD3mggxUS9MZAHEGCGDg5q5Pidgrm1wqWy3kRzRN3liq
+        CtbhduoqiyPjW7wCmDir3ZE7Xu8huJDN3S7uD8eiiKG3vbVTPbD/DxuiBTe8n+0UQtHkN9MYDbzWb
+        TY44jgteEr9zpinfStb2GgfISrcv/6nrbbpMJ66fC01za5pwvUj1/8KhzyGT4zze43mMhY8lkm4Sy
+        7kzF+Rao1uLVm6CCOWoJ7m67H+YNjeeErNaXGQNZ/trWw8y4cVi3Jee5o77OABqDsBk//Vjlfeeo6
+        EyIyG+5snNhFXeYwRq1BBarM;
+Received: from [2a01:4f8:192:486::6:0] (port=49328 helo=hr6.samba.org) 
         by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1k2ZSI-0007xK-Hx
-        for cifs-qa@samba.org; Mon, 03 Aug 2020 12:20:38 +0000
-Received: from [::1] (port=35280 helo=bugzilla.samba.org)
+        id 1k2ZSo-0007xd-BH
+        for cifs-qa@samba.org; Mon, 03 Aug 2020 12:21:10 +0000
+Received: from [::1] (port=35286 helo=bugzilla.samba.org)
         by hr6.samba.org with esmtp (Exim 4.93)
         (envelope-from <samba-bugs@samba.org>)
-        id 1k2ZSI-008Cc2-Ch
-        for cifs-qa@samba.org; Mon, 03 Aug 2020 12:20:38 +0000
+        id 1k2ZSo-008CcC-38
+        for cifs-qa@samba.org; Mon, 03 Aug 2020 12:21:10 +0000
 From:   samba-bugs@samba.org
 To:     cifs-qa@samba.org
 Subject: [Bug 14454] cannot get symlink file attributes and target with
  cifsacl mount option
-Date:   Mon, 03 Aug 2020 12:20:38 +0000
+Date:   Mon, 03 Aug 2020 12:21:09 +0000
 X-Bugzilla-Reason: QAcontact
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -65,7 +65,7 @@ X-Bugzilla-Assigned-To: sfrench@samba.org
 X-Bugzilla-Target-Milestone: ---
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-14454-10630-zmfyb3A7C4@https.bugzilla.samba.org/>
+Message-ID: <bug-14454-10630-OhP4Zrljfo@https.bugzilla.samba.org/>
 In-Reply-To: <bug-14454-10630@https.bugzilla.samba.org/>
 References: <bug-14454-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -80,10 +80,10 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 https://bugzilla.samba.org/show_bug.cgi?id=3D14454
 
---- Comment #2 from Aur=C3=A9lien Aptel <aaptel@samba.org> ---
-Created attachment 16159
-  --> https://bugzilla.samba.org/attachment.cgi?id=3D16159&action=3Dedit
-capture smb3.0 with cifsacl
+--- Comment #3 from Aur=C3=A9lien Aptel <aaptel@samba.org> ---
+Created attachment 16160
+  --> https://bugzilla.samba.org/attachment.cgi?id=3D16160&action=3Dedit
+dmesg smb3.0 without cifsacl
 
 --=20
 You are receiving this mail because:
