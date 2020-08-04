@@ -1,103 +1,89 @@
-Return-Path: <SRS0=uUT6=BP=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=wT+4=BO=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBECFC433DF
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Aug 2020 09:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE7AFC433DF
+	for <linux-cifs@archiver.kernel.org>; Tue,  4 Aug 2020 23:01:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A86442076E
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 Aug 2020 09:54:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9513320792
+	for <linux-cifs@archiver.kernel.org>; Tue,  4 Aug 2020 23:01:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cGr8Cb6V"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="irAe9p2u"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727801AbgHEJyU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Aug 2020 05:54:20 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:37084 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726707AbgHEJxD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Aug 2020 05:53:03 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0759qKUc058845;
-        Wed, 5 Aug 2020 09:52:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=gP37RsrMGaMF6BzssPUZ8VhQW8vT8S6L5/66gaCLThs=;
- b=cGr8Cb6VWuOPVIQ5y7FcEXR83vpJFUkHr/91b/E8gbZPo+/LvuXc6fsGM+PXPSB61fgh
- MFZJPAiJQyx/27ZdKdiVUylq+/gP+4KIbS3x/CHAFG9G3e25Bn1g7l4YbKMsm9UG8+YV
- If1FeSCNgRFRaFj7enuqwe1uJYRLZUpv8qinyaP1TchNrlWPMV25WvB4msXOX48e6F5z
- DNXLy0fdcm56vQkMUmmjPHyCKyHm9rfF4mLXR0BEqvYyuNYb6BDn/MSSZcyPEfUyOOdx
- s/AAGDIRSFMNWaDNGmpxG71e2M00cz27Rm/59DmQ1jwX4g5TXy8DISKLStQGFGqKgXYn LA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 32qnd41c9q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 05 Aug 2020 09:52:20 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0759mtDI068676;
-        Wed, 5 Aug 2020 09:52:20 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 32pdnsv8uu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 05 Aug 2020 09:52:20 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0759qFNj018545;
-        Wed, 5 Aug 2020 09:52:16 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 05 Aug 2020 02:52:14 -0700
-Date:   Wed, 5 Aug 2020 12:52:07 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Steve French <sfrench@samba.org>, Paulo Alcantara <pc@cjr.nz>
-Cc:     Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] cifs: Fix an error pointer dereference in cifs_mount()
-Message-ID: <20200805095207.GC483832@mwanda>
+        id S1727005AbgHDXBI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 4 Aug 2020 19:01:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51408 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726955AbgHDXBG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 4 Aug 2020 19:01:06 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2FDC06174A
+        for <linux-cifs@vger.kernel.org>; Tue,  4 Aug 2020 16:01:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42; h=Message-ID:Date:To:From:CC;
+        bh=BjIPXPsEY1+fBfym6eKtVHOmUukMG9y+tzxk4WidEQ4=; b=irAe9p2utg2KNankSP2+sxcfIH
+        Ljr9e650RAAFjo7PRA27Vk4rUhyAg2vcn4pbTZno0TcDN2f6kFv7ulAEXRoSst7ZJNuBccEwJCoEK
+        B+Wg3LUyJcqNlzdeFoysfwla2QinGCO6P1PwQX7xhPPBQcI18iSjK8GeGkxP9eNcGJg8H4XjEWuCH
+        Mm/WzV1Nr5qkQ4deZNI76GBWV05yAS6PplFzkefCFCHQDNRJA2wS2W0PjU77TTkHJfHQPeosMaNSI
+        vE652ILCi9gsmg2tgvAeOpZrMUi0QwLTN2prJ1LURgE47+QjIXzfyBy88wcWM+51HA3lBVTMy+frC
+        33SSbRH/Vjhnk/eKoxOYTyk0X6/VeDtxvmGAT7ggVGEHqDNt/XKzolCSt5bWB48wMq0P331cE8hD1
+        LB5sl+CgmqNsShvpXXsuh1xfl0k1JZ4Jl8FChHusawQpUZ1HayuV+EB+Ddo8J3wXlhY+oOvjkOfvo
+        5UsCeSOho0sAcMAiFhGqnNBC;
+Received: from [2a01:4f8:192:486::6:0] (port=49880 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1k35vX-0005j2-0K
+        for cifs-qa@samba.org; Tue, 04 Aug 2020 23:00:59 +0000
+Received: from [::1] (port=35840 helo=bugzilla.samba.org)
+        by hr6.samba.org with esmtp (Exim 4.93)
+        (envelope-from <samba-bugs@samba.org>)
+        id 1k35vW-008ISB-Gd
+        for cifs-qa@samba.org; Tue, 04 Aug 2020 23:00:58 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 13795] Race condition in fs/cifs/connect.c causing "has not
+ responded in 120 seconds. Reconnecting..."
+Date:   Tue, 04 Aug 2020 23:00:58 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 3.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: piastryyy@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: sfrench@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-13795-10630-3TIbXgD7ZQ@https.bugzilla.samba.org/>
+In-Reply-To: <bug-13795-10630@https.bugzilla.samba.org/>
+References: <bug-13795-10630@https.bugzilla.samba.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9703 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0 mlxscore=0
- bulkscore=0 adultscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008050081
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9703 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 clxscore=1011 mlxscore=0
- priorityscore=1501 mlxlogscore=999 malwarescore=0 adultscore=0
- lowpriorityscore=0 spamscore=0 bulkscore=0 phishscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008050082
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The error handling calls kfree(full_path) so we can't let it be a NULL
-pointer.  There used to be a NULL assignment here but we accidentally
-deleted it.  Add it back.
+https://bugzilla.samba.org/show_bug.cgi?id=3D13795
 
-Fixes: 7efd08158261 ("cifs: document and cleanup dfs mount")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- fs/cifs/connect.c | 1 +
- 1 file changed, 1 insertion(+)
+--- Comment #3 from Pavel Shilovsky <piastryyy@gmail.com> ---
+The fix went into 5.3-rc1 (mainline) and 5.2.7, 4.19.65,  4.14.137, 4.9.224,
+4.4.224 (stable) kernel versions.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 0ad1309e88d3..a275ee399dce 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -4886,6 +4886,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
- 		full_path = build_unc_path_to_root(vol, cifs_sb, !!count);
- 		if (IS_ERR(full_path)) {
- 			rc = PTR_ERR(full_path);
-+			full_path = NULL;
- 			break;
- 		}
- 		/* Chase referral */
--- 
-2.27.0
-
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
