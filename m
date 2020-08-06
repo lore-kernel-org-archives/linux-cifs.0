@@ -1,125 +1,91 @@
-Return-Path: <SRS0=3GXq=BU=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=f6oI=BQ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCB8C433E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Aug 2020 17:08:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CB9C433E0
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Aug 2020 21:47:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52A8220885
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Aug 2020 17:08:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D7F72173E
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Aug 2020 21:47:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4odPv7P"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="aYbt6io5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727055AbgHJRI2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Aug 2020 13:08:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51566 "EHLO
+        id S1726159AbgHFVrK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 6 Aug 2020 17:47:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726910AbgHJRI2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Aug 2020 13:08:28 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D070C061756;
-        Mon, 10 Aug 2020 10:08:28 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id g19so9691239ioh.8;
-        Mon, 10 Aug 2020 10:08:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EV/Inn1yIq80k4xTWqNtB11Yxfxj2hvMoKBR9JcOwIo=;
-        b=D4odPv7PmDBTv8Fr4bfErHYxqALMVwFsfFMmqsp82assrut3e69ZNXKmR+KDkxZRWG
-         YHKA9IhaMldTiRLhsg500chNRM/ou501nJfjU3npvH1nZRX3900zmodkNGZi3mN8tIoC
-         HG16jK4Jnd2ViNjtQv+rUQGWNzryHDcq8vAjZlzkA/BsTBqYxrVOPg6fwdiMCiUvEEre
-         Oe23p+rdRhbdZd1C1OouJkp9juFnW93XUHKeSWiIVWd3wShY2JzsDi5U6LMui2hesChO
-         FdLfAuwk/X5i0ZDdCJEU6MnAh5Emt7tb8nDx2Ia3X5f0BIpeXi+UQ5A/NvmrXqPKBFmF
-         /5Hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EV/Inn1yIq80k4xTWqNtB11Yxfxj2hvMoKBR9JcOwIo=;
-        b=RjV6xbUPCA8Y0sOFoSobXIzpE2fpS1s5OuqNvyER7BmLjUj6EB+Hqr5CXCCrU2BXWl
-         KH3Wb6yb0XxHZuLE69mcgPB726SRP6AS1Jgwl9SuVUShONp9aGhSBzw1j07NPcd7gBsw
-         4gHirGSOWwHpGaRcGuSWIswQnUEGu3z49Dl/kVv1PDpsYTyjaGS8IsQ7ROJHEqw7jxMZ
-         pFA8ZnZkP000424P+64GQ15dUEn5oXhOpg82wx0tI/qGnFmX+NfVjhjrre7jB7XBD2Uv
-         9Xov+7d9y5NU4FCb4hrzhPaxxIRgGKap0m2I5xxHEYTX6c1GkvRVdQYAttfaRNb1ajI7
-         XVcg==
-X-Gm-Message-State: AOAM531YmzisXUL1fufAltKF67um1nMpv7wg0sGMqckP084dZD10v+RQ
-        f7+j/vKKAkBtMSUUl6icy7gPNqQXECSaLU2Cv70=
-X-Google-Smtp-Source: ABdhPJzz4KKqCWD8DewPuuMqNyLgFicLPDFscAPkzIrLXWdzhAtY0bnr7EccVxuIqigNWXrcGkoPoLjwlE3xYY1EmEg=
-X-Received: by 2002:a05:6638:2604:: with SMTP id m4mr21271201jat.76.1597079306859;
- Mon, 10 Aug 2020 10:08:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <1596875797-22710-1-git-send-email-linmiaohe@huawei.com>
-In-Reply-To: <1596875797-22710-1-git-send-email-linmiaohe@huawei.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 10 Aug 2020 12:08:15 -0500
-Message-ID: <CAH2r5mstN6P_kU_Riobdv5NJPL-pF6=oZoAh6k9qj1+nz9Z8Cw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Convert to use the fallthrough macro
-To:     linmiaohe <linmiaohe@huawei.com>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        with ESMTP id S1725812AbgHFVrJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Aug 2020 17:47:09 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 051DCC061574
+        for <linux-cifs@vger.kernel.org>; Thu,  6 Aug 2020 14:47:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42; h=Message-ID:Date:To:From:CC;
+        bh=xraF0eb9AhOp4J8oZWNneh4RwFwPxxMMFR0FGCHNDJQ=; b=aYbt6io5Vg539lT6JbMB2KbKB3
+        lwzE/ahxNO+6GqssyW0mCfE53G7MQq3m3Enq1jZ1zPR7GwcviYKiY+rt4JVBI1a39JhahQw85Zwk5
+        /+DdPHCADK5QtFhBHPppUd4enaFWM54Yt/7WbzvbDTmVTTm5gvBnY85HsxExVPu+RJvmiTkSiNm/T
+        ORNgF7MLa8HoEFUNw9AYLHmUcUuZLuFoGDLEi2vOTMUNE3zu20Xh2IL53asdnPPfNroWkPEYcb3UL
+        WvGsYr762i6Xj1ibYw7lTG0bbnFjZgch9HJj5Ggs0K4Omcdl0SV4L6X/AR6p0DCMZkw33eFHnWK1U
+        OZ86luGyxDrNqHf2aW449wK8rN0PYDmYWoBG5RArdCEAckKUDqTOwORxZjUWqCa8wWZOvWuP5bHAs
+        kXM5dtQkMMLskFDB0FbZR+W2yAIHZ2eVc1xXfqQpabHxF0z6hsyPKoYi1Mn49y1N3jWhdJAyXNdSW
+        J+/5l9tAqqK8McpAfm8qov+5;
+Received: from [2a01:4f8:192:486::6:0] (port=50938 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1k3nj6-0004Tr-3r
+        for cifs-qa@samba.org; Thu, 06 Aug 2020 21:47:04 +0000
+Received: from [::1] (port=36890 helo=bugzilla.samba.org)
+        by hr6.samba.org with esmtp (Exim 4.93)
+        (envelope-from <samba-bugs@samba.org>)
+        id 1k3nj5-008TU4-IU
+        for cifs-qa@samba.org; Thu, 06 Aug 2020 21:47:03 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 13795] Race condition in fs/cifs/connect.c causing "has not
+ responded in 120 seconds. Reconnecting..."
+Date:   Thu, 06 Aug 2020 21:47:02 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 3.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: piastryyy@gmail.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: FIXED
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: sfrench@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: resolution bug_status
+Message-ID: <bug-13795-10630-VdjZ1FKL0s@https.bugzilla.samba.org/>
+In-Reply-To: <bug-13795-10630@https.bugzilla.samba.org/>
+References: <bug-13795-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+https://bugzilla.samba.org/show_bug.cgi?id=3D13795
 
-(but note that most places in fs directory other than cifs and btrfs
-have not been updated), and I noticed another 8 places in fs/cifs that
-you didn't change in your patch (ie change from the older way of
-indicating fallthrough   /* Fallthrough */ as a comment to the newer
-fallthrough macro.
+Pavel Shilovsky <piastryyy@gmail.com> changed:
 
-On Sat, Aug 8, 2020 at 3:34 AM linmiaohe <linmiaohe@huawei.com> wrote:
->
-> From: Miaohe Lin <linmiaohe@huawei.com>
->
-> Convert the uses of fallthrough comments to fallthrough macro.
->
-> Signed-off-by: Hongxiang Lou <louhongxiang@huawei.com>
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
->  fs/cifs/smb2pdu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 24c2ac360591..667d70aa335f 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -3913,7 +3913,7 @@ smb2_readv_callback(struct mid_q_entry *mid)
->         case MID_RESPONSE_MALFORMED:
->                 credits.value = le16_to_cpu(shdr->CreditRequest);
->                 credits.instance = server->reconnect_instance;
-> -               /* fall through */
-> +               fallthrough;
->         default:
->                 rdata->result = -EIO;
->         }
-> @@ -4146,7 +4146,7 @@ smb2_writev_callback(struct mid_q_entry *mid)
->         case MID_RESPONSE_MALFORMED:
->                 credits.value = le16_to_cpu(rsp->sync_hdr.CreditRequest);
->                 credits.instance = server->reconnect_instance;
-> -               /* fall through */
-> +               fallthrough;
->         default:
->                 wdata->result = -EIO;
->                 break;
-> --
-> 2.19.1
->
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+         Resolution|---                         |FIXED
+             Status|NEW                         |RESOLVED
 
-
--- 
-Thanks,
-
-Steve
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
