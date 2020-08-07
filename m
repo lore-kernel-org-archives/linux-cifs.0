@@ -2,67 +2,109 @@ Return-Path: <SRS0=D4D1=BR=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F4DC433E0
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Aug 2020 02:39:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E33C433E0
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Aug 2020 11:49:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B6B6122CBB
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Aug 2020 02:39:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1596767975;
-	bh=P556asfZU0fv6PfTTcVU1bTzaYkGV5iaaVAZr7fseew=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=byWzrU5X8pLaJvBaKMMavYp6zl9APsPcyDUYvsD4tNn1ARlonq3DoxmrbTOIZRFGQ
-	 OlIehU8tzKCDPXGC6UxDxsvgaWSZZgD4lYIffLd33YeRlOl76e+p8rnqFEpBSSFv2H
-	 0FOrQ4lRgNXVyKMFK1iZPn4h/eld8CsPYkgQ4Ks8=
+	by mail.kernel.org (Postfix) with ESMTP id 600342075D
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Aug 2020 11:49:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EyXbU6S1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726360AbgHGCj3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 6 Aug 2020 22:39:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38690 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726049AbgHGCj1 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 6 Aug 2020 22:39:27 -0400
-Subject: Re: [GIT PULL] CIFS/SMB3 Fixes
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1596767967;
-        bh=P556asfZU0fv6PfTTcVU1bTzaYkGV5iaaVAZr7fseew=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=v7mK7iRsfnghH1Af6iYwCOJQ7L0xeQ5NCD5tN98XlJApUAnb+MAi4Oqf/Gnp2iNjG
-         CqFPfxTIp/07h0nJsvGpl1PFX44WmRxiNzzs07xK/FuIvTP01LsWAkRITTp3wo1c2l
-         YJBf+qkh4WKxySMLWt/ceJFJaLrkFzIw8D7/1z4E=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvA7xqmqPMmYRrU+Jc8SbF-YG=GH9OjvR+Upx_q6aH3jA@mail.gmail.com>
-References: <CAH2r5mvA7xqmqPMmYRrU+Jc8SbF-YG=GH9OjvR+Upx_q6aH3jA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvA7xqmqPMmYRrU+Jc8SbF-YG=GH9OjvR+Upx_q6aH3jA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.9-rc-smb3-fixes-part1
-X-PR-Tracked-Commit-Id: 7efd081582619e7c270d1c0a422385dcaa99fa9f
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 327a8d76b1ac2037f87bf041f3bc076407284ffc
-Message-Id: <159676796725.23087.18320063482019258045.pr-tracker-bot@kernel.org>
-Date:   Fri, 07 Aug 2020 02:39:27 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        id S1728298AbgHGLts (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 7 Aug 2020 07:49:48 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:38804 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728159AbgHGLtr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Aug 2020 07:49:47 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 077BmPa7042504;
+        Fri, 7 Aug 2020 11:49:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=MApzyHnmExjGWQNHHBlWhBsaX3jE1XvA21fvZMpg+Tc=;
+ b=EyXbU6S1jX+nqFMrDAOn7yPjSHibQN8ptMgf24gZCVhRBsNLttyN6Ktya5KkD6OOQCjX
+ iZmGInCQRpd6azqf8EmUCwPoKWtw3JloS+wYNVkgID22rsfh++hBE9eIoADJOkSlPJat
+ v0A2bVhiasKTsJXeOg4d7Dvq3kmS8T+Et8Zktt+gDRc6JDrPmKa0IiuCjED/Afj3VaG9
+ AW5t6yNS3Ajv/vhqjUzN6o6rySc7yy2krB+hUfguSTSBwaKW/hvpFqcnMm3LCwRmnjLA
+ N/lGQOeFbKVwv37o2fc6RS8iYrbbQfS4IgpSikNSc95RYnL+MM/ZfjFKKbCrf0k/Y3Jm /A== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 32r6fxr3jf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 07 Aug 2020 11:49:36 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 077BlwOw028894;
+        Fri, 7 Aug 2020 11:49:36 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 32r6cxggpd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 07 Aug 2020 11:49:36 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 077BnZF4013749;
+        Fri, 7 Aug 2020 11:49:35 GMT
+Received: from kadam (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 07 Aug 2020 04:49:34 -0700
+Date:   Fri, 7 Aug 2020 14:49:27 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
+Message-ID: <20200807114927.GY5493@kadam>
+References: <20200806164505.0eada105@canb.auug.org.au>
+ <CAH2r5mvGD3ftLDfwrpx61kaJQnPpspupdDHD8NOjnF-q-ByTfg@mail.gmail.com>
+ <20200807083342.6977153b@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200807083342.6977153b@canb.auug.org.au>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9705 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0 bulkscore=0
+ spamscore=0 adultscore=0 mlxlogscore=999 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008070085
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9705 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 impostorscore=0 adultscore=0
+ bulkscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
+ lowpriorityscore=0 suspectscore=0 spamscore=0 clxscore=1011 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008070085
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Mon, 3 Aug 2020 17:45:03 -0500:
+On Fri, Aug 07, 2020 at 08:33:42AM +1000, Stephen Rothwell wrote:
+> Hi Steve,
+> 
+> Thanks for fixing this up.
+> 
+> On Thu, 6 Aug 2020 10:31:33 -0500 Steve French <smfrench@gmail.com> wrote:
+> >
+> > I just fixed the Author tag in this patch to match your email address
+> > but seems like the author email address gets mangled when sent through
+> > some mailing lists.  Any ideas how to avoid this.
+> 
+> You may need to ask people to add an explicit From: line at the start
+> of the body for patches sent via the samba.org mailing lists (since
+> they mangle addresses to get around DKIM checks, I assume).
+> 
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.9-rc-smb3-fixes-part1
+I wonder why it affects me in particular and only now...
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/327a8d76b1ac2037f87bf041f3bc076407284ffc
+Steve, could you send me a copy of the patch that you recieved or
+something?
 
-Thank you!
+regards,
+dan carpenter
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+
