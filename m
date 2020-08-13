@@ -2,79 +2,107 @@ Return-Path: <SRS0=jY8V=BX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D8CC433DF
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 Aug 2020 15:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F299FC433DF
+	for <linux-cifs@archiver.kernel.org>; Thu, 13 Aug 2020 17:44:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CDFE20781
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 Aug 2020 15:32:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9B1520791
+	for <linux-cifs@archiver.kernel.org>; Thu, 13 Aug 2020 17:44:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HH61uerQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A29Iym1n"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbgHMPcV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 13 Aug 2020 11:32:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57452 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726253AbgHMPcU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 13 Aug 2020 11:32:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1597332739;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rI+VkqySahTGBo+LZ6196lJmvR/3YlmhnUdKT+7qOco=;
-        b=HH61uerQdQ0JXMLrUtjwbumRYJ5x59DUNLNVuv5/mV5GFgNi0hy2hKrf4WujXjDthsHgkj
-        ePw9eevWTbKI/pmX+KHR4+a/5QSc82kPOqVF7oCFY7ydjuI5ZIomWRI5nK8yUe5kjy/rwn
-        X7mZLHHV3yGPif7kayKi+TDigtoGc1Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-363-jDTk2fcrN4qB8i1FYCNzRA-1; Thu, 13 Aug 2020 11:32:17 -0400
-X-MC-Unique: jDTk2fcrN4qB8i1FYCNzRA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 817C01DDE0;
-        Thu, 13 Aug 2020 15:32:16 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-127.rdu2.redhat.com [10.10.120.127])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8CC515C1A3;
-        Thu, 13 Aug 2020 15:32:15 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <87tux64mns.fsf@suse.com>
-References: <87tux64mns.fsf@suse.com> <1097808468.45751159.1597108422888.JavaMail.zimbra@redhat.com> <3704067.45751512.1597109127904.JavaMail.zimbra@redhat.com> <CAH2r5mt389QPfeZPSTun9qkc=88ehFC1NzayewCoKU=qv+Epaw@mail.gmail.com>
-To:     =?us-ascii?Q?=3D=3Futf-8=3FQ=3FAur=3DC3=3DA9lien=3F=3D?= Aptel 
-        <aaptel@suse.com>
-Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-        Xiaoli Feng <xifeng@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: FS-Cache for cifs
+        id S1726334AbgHMRoc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 13 Aug 2020 13:44:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726167AbgHMRoc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 13 Aug 2020 13:44:32 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25CEBC061757
+        for <linux-cifs@vger.kernel.org>; Thu, 13 Aug 2020 10:44:32 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id t4so6274082iln.1
+        for <linux-cifs@vger.kernel.org>; Thu, 13 Aug 2020 10:44:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=0NvUBAxpwY9jLqU7UP+ur67fA7ah0X6B2GiOdMW3lvs=;
+        b=A29Iym1nZAv1N0AnlyFviset6wr+pizwAZ7n2FJZYNTXP3/FarUZnZ+QtIjCV3rAbM
+         9r8uvJ4fZpY+pzMVYc4hLDXgG7WHfHFQv9V68yTrPmHJHtN/bQqJFsRouGshWjyy+yrT
+         t4i17zqyjNy0cZEHY18y5bQeSFWezvt3Lotq0HSTcjHBfQrqQUrr9RNU1lbwPD4tuRKN
+         6gcTnXr5mv8H4UKjXtMNILgbHlqMajvAfCi6tf4ZHYKWgj6Alsyd1R8hqFNcnbcyVTq5
+         GbxEn3tsCIkFAV+TEdWZDyWFsTIIcjTjWbPGrXTB5Vu4lU0t3aBZ0SKv5z6rdq4Yp+sj
+         o44Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=0NvUBAxpwY9jLqU7UP+ur67fA7ah0X6B2GiOdMW3lvs=;
+        b=mGkSbkUeQfb3ljNqeUuMzzcmmmxreqgL3W45vVXXUN0qd0B5c5XnLUbbHcxW1AzmDT
+         SKgncn8XK+0EttzCaGNiamvpSX73h1n1n/B/QfzMUcz7L1VkwMlU/DG2r6Lpi930d8bV
+         k4MbyAWDvHwqVheoniRe4mhQdv9XeJ29stQ8p8jVEWMkLkhfHD5h8Oh5hRF+//ZIAO48
+         bEWy5D6idYyzSRxFc61vvWXh4+QNhw7JzdFyDNEJaOR3Z6z55Q7kuwo7TCd2yzql/+xF
+         jH76ZSb2ednI5BUUNzQwVu4gLAvPLiMSOvUZhbjIoqrE0DmUhabAaPUu/x2f1oNoYPGP
+         ITrw==
+X-Gm-Message-State: AOAM5332xsFgJRrZJiUX8DjdRmDsDTdiIBRSZe6dUhoJd9MwTLruEdiL
+        WLCd2NI/F9ITcknFtZYakXwxKt/XcWPEMUYvGPwTlB3K174=
+X-Google-Smtp-Source: ABdhPJx9O+uNkcRXuqaO6e0CjTRygVnuHCo+ykmVbA9ji8j0h/Gh5pIWi/sEiDqi4UjQfPKjdbsT/XNuFyRG9dvvz5E=
+X-Received: by 2002:a92:849b:: with SMTP id y27mr5944654ilk.173.1597340670126;
+ Thu, 13 Aug 2020 10:44:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 13 Aug 2020 16:32:14 +0100
-Message-ID: <322210.1597332734@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 13 Aug 2020 12:44:19 -0500
+Message-ID: <CAH2r5ms-cXJzTqbTuE8_095aUssB8RvaqBTkfY2gHROjg7GsAQ@mail.gmail.com>
+Subject: [PATCH][SMB3] Fix mkdir when idsfromsid configured on mount
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000003a968405acc5db9e"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
+--0000000000003a968405acc5db9e
+Content-Type: text/plain; charset="UTF-8"
 
-> Is there an overview document somewhere that describe what fscache does?
-> We are seeing some warnings about duplicated entries in some scenarios
-> but I'd like to understand better what it does before changing what goes
-> in the key.
+    mkdir uses a compounded create operation which was not setting
+    the security descriptor on create of a directory. Fix so
+    mkdir now sets the mode and owner info properly when idsfromsid
+    and modefromsid are configured on the mount.
 
-Documentation/filesystems/caching/* in the kernel.
 
-David
+-- 
+Thanks,
 
+Steve
+
+--0000000000003a968405acc5db9e
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-SMB3-Fix-mkdir-when-idsfromsid-configured-on-mount.patch"
+Content-Disposition: attachment; 
+	filename="0001-SMB3-Fix-mkdir-when-idsfromsid-configured-on-mount.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kdt3dv670>
+X-Attachment-Id: f_kdt3dv670
+
+RnJvbSBjOGUyZDk1OWRkYWM4OWVlNDRmMTcwYjJmMjU0OWU3NDk1ODFlYzU1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFRodSwgMTMgQXVnIDIwMjAgMTI6Mzg6MDggLTA1MDAKU3ViamVjdDogW1BBVENIXSBT
+TUIzOiBGaXggbWtkaXIgd2hlbiBpZHNmcm9tc2lkIGNvbmZpZ3VyZWQgb24gbW91bnQKCm1rZGly
+IHVzZXMgYSBjb21wb3VuZGVkIGNyZWF0ZSBvcGVyYXRpb24gd2hpY2ggd2FzIG5vdCBzZXR0aW5n
+CnRoZSBzZWN1cml0eSBkZXNjcmlwdG9yIG9uIGNyZWF0ZSBvZiBhIGRpcmVjdG9yeS4gRml4IHNv
+Cm1rZGlyIG5vdyBzZXRzIHRoZSBtb2RlIGFuZCBvd25lciBpbmZvIHByb3Blcmx5IHdoZW4gaWRz
+ZnJvbXNpZAphbmQgbW9kZWZyb21zaWQgYXJlIGNvbmZpZ3VyZWQgb24gdGhlIG1vdW50LgoKU2ln
+bmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgpDQzogU3Rh
+YmxlIDxzdGFibGVAdmdlci5rZXJuZWwub3JnPiAjIHY1LjgKLS0tCiBmcy9jaWZzL3NtYjJpbm9k
+ZS5jIHwgMSArCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykKCmRpZmYgLS1naXQgYS9m
+cy9jaWZzL3NtYjJpbm9kZS5jIGIvZnMvY2lmcy9zbWIyaW5vZGUuYwppbmRleCBiOWRiNzM2ODdl
+YWEuLmViYTAxZDA5MDhkZCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIyaW5vZGUuYworKysgYi9m
+cy9jaWZzL3NtYjJpbm9kZS5jCkBAIC0xMTUsNiArMTE1LDcgQEAgc21iMl9jb21wb3VuZF9vcChj
+b25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgY2lmc190Y29uICp0Y29uLAogCXZhcnMtPm9w
+YXJtcy5maWQgPSAmZmlkOwogCXZhcnMtPm9wYXJtcy5yZWNvbm5lY3QgPSBmYWxzZTsKIAl2YXJz
+LT5vcGFybXMubW9kZSA9IG1vZGU7CisJdmFycy0+b3Bhcm1zLmNpZnNfc2IgPSBjaWZzX3NiOwog
+CiAJcnFzdFtudW1fcnFzdF0ucnFfaW92ID0gJnZhcnMtPm9wZW5faW92WzBdOwogCXJxc3RbbnVt
+X3Jxc3RdLnJxX252ZWMgPSBTTUIyX0NSRUFURV9JT1ZfU0laRTsKLS0gCjIuMjUuMQoK
+--0000000000003a968405acc5db9e--
