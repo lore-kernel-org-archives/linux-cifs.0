@@ -1,122 +1,82 @@
-Return-Path: <SRS0=M6PW=B3=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=r6gO=B4=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3358C433E4
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Aug 2020 19:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19FCBC433DF
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Aug 2020 16:23:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D781320758
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Aug 2020 19:25:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E53F52067C
+	for <linux-cifs@archiver.kernel.org>; Tue, 18 Aug 2020 16:23:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="SYqByI9p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zm+u7wCD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732030AbgHQTZQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Aug 2020 15:25:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42442 "EHLO
+        id S1726793AbgHRQXs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 18 Aug 2020 12:23:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732025AbgHQTZM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Aug 2020 15:25:12 -0400
-X-Greylist: delayed 1039 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 17 Aug 2020 12:25:11 PDT
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5DD6C061389;
-        Mon, 17 Aug 2020 12:25:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42; h=Date:Message-ID:From:Cc:To;
-        bh=CIJRHx355gNSCr+djNZUa3YwUOfj5baupHLNqczQwkI=; b=SYqByI9pwq1dlpVLlp3gloDq+b
-        nCykLXBu97LNWMWl+wfkSgqjOBYcveKWR4QhzUPWTrfSf79t30xNBkfyILCdm6f/EBO3rDLFzoGmK
-        aJ3JTx9mrmP1tBjlJFzphvk2OS8SSRWnkxuRcg4Wu5HELLq6KJYdQI22nF6MpAAlyAlZu2czMWjKE
-        cvh/rmtRllfdBscpciPs2gIsp/7lX+nhnUFAyZlmZrsfP7PV9gl3bv1H9KQnBmD3zIEB2egK92m9S
-        AZ8AnroaxXhfmFGvZhIkVqVl3xxSHWxROBdozzjgYL+KgniiKF0cTV8zsqAe68npX++StWb4n98II
-        LcjxaAHuLIPRtlmrWhfNo0d84y3JyTcPHqz3IaRhDeHqSqV7T39ctR0bSyvyUqjUpkV3FNjQyeAyx
-        sG59QyhuRi/A+tV9Tx+ZR6BZZYxZLIERCxB7WTFBsKvp3iPwoUxa0xBWYtyhhT5OSTZhCz2lw/Bfx
-        soqBKVojTBrXhsXpzdrTzMFu;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
-        (Exim)
-        id 1k7kU0-0005ga-CN; Mon, 17 Aug 2020 19:07:48 +0000
-Subject: Re: [GIT PULL] fscache rewrite -- please drop for now
-To:     Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        David Howells <dhowells@redhat.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <447452.1596109876@warthog.procyon.org.uk>
- <1851200.1596472222@warthog.procyon.org.uk>
- <667820.1597072619@warthog.procyon.org.uk>
- <CAH2r5msKipj1exNUDaSUN7h0pjanOenhSg2=EWYMv_h15yKtxg@mail.gmail.com>
- <672169.1597074488@warthog.procyon.org.uk>
- <CALF+zO=DkGmNDrrr-WxU6L1Xw8MA4+NrqVbvNMctwSKjy0Yh_w@mail.gmail.com>
- <fecc577d696f9cd58bbb2fae437c8acea170f7bf.camel@redhat.com>
-From:   Steven French <sfrench@samba.org>
-Message-ID: <dfa2aede-3a42-2b04-1d31-93a670a785cc@samba.org>
-Date:   Mon, 17 Aug 2020 14:07:42 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S1726398AbgHRQXq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 18 Aug 2020 12:23:46 -0400
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9438CC061389
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2020 09:23:46 -0700 (PDT)
+Received: by mail-yb1-xb34.google.com with SMTP id i10so11661543ybt.11
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2020 09:23:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=iPBgFopQ3+bMRXYoduwmftt10LHiXfbg4VtRn0dy1ws=;
+        b=Zm+u7wCDhR0eyJukkPg2HHp39X7HgvnZ+VvTZni5X/L8Do950deJ4Nkz57ux5+BiEc
+         q4zhQBUXKGXadhfP09KnzoR4F6DwxenIDgx8FD1h+npQ2/qNn3qL++R9Sb2tsCIAs4r0
+         kRXh68j5zedKt3TbbZoPzk8eGb/HSUQpYE5MCi2N8YMPTKVeB69IyLsywMZOfwBc9AQj
+         1eZJsyEiHLRz+Y4uolP88VI59W6vnWfuuLFjt9tfM8Nn+Lp2YdQGh8ULObac7wR5C0zl
+         5KSFuvX4B+L/z2N4Zvnk15RqrHdRC4Rbthg7zoAcSKG/BW7stXGdDMBMDj1POjlvRRZ1
+         OAaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=iPBgFopQ3+bMRXYoduwmftt10LHiXfbg4VtRn0dy1ws=;
+        b=BZoQiXefITspAWqY/L6im0FVCBc232PiYzdd5qyLNR3VVUuZOvtXXu16nUjSqm66lC
+         mJzHoptpczinnBE7nIXNZSS+aMBWucI+suVf9d/AKzGXUc5SaqjlVV8OUUnb5Nk+coRr
+         63f19KYQIOuw7vYaAT5S3mDIVtg29TjITEMpwnbGCTMUpFD6OKvG/6d10G592sAxsTcx
+         yfRJVh7GcpeF4LNLQU7EURv4QWBSh+WQdJtJ5PkOg98GFAvf0thTOhHOUCji9Zvv3amK
+         zI4Zf2OQgL7CTqbc7eUZbe7X7FjkeT8zTDpePt7j7A42S8ICZYmKZUeT8pKtfyu3Wkcj
+         j1eg==
+X-Gm-Message-State: AOAM532/OUOxHmgImhfGxTGnIyc8yyfRORzN2l00cfAu5ZOJOMdG6azz
+        n/GkgbhnkqquE6fD3vsCsLSpeXm30h0uHU+OwG/lMSSCAWs=
+X-Google-Smtp-Source: ABdhPJyuHEb57UNUufL/WP8XoROq9NubvDQeJ7MiN3K6lXbu22BWQzTHCplLr/YWihvUGR8LI7FX7ZqiRuuwwja+WIU=
+X-Received: by 2002:a25:2b89:: with SMTP id r131mr27689025ybr.131.1597767825650;
+ Tue, 18 Aug 2020 09:23:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <fecc577d696f9cd58bbb2fae437c8acea170f7bf.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Tue, 18 Aug 2020 21:53:34 +0530
+Message-ID: <CANT5p=p55m0D2VsoXUPDw3qQmVHWKTVtcyZuf7sNAbsFCqEn2Q@mail.gmail.com>
+Subject: [PATCH][SMB3] cifs: Fix unix perm bits to cifsacl conversion for
+ "other" bits.
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Hi all,
 
-On 8/10/20 12:06 PM, Jeff Layton wrote:
-> On Mon, 2020-08-10 at 12:35 -0400, David Wysochanski wrote:
->> On Mon, Aug 10, 2020 at 11:48 AM David Howells <dhowells@redhat.com> wrote:
->>> Steve French <smfrench@gmail.com> wrote:
->>>
->>>> cifs.ko also can set rsize quite small (even 1K for example, although
->>>> that will be more than 10x slower than the default 4MB so hopefully no
->>>> one is crazy enough to do that).
->>> You can set rsize < PAGE_SIZE?
->>>
->>>> I can't imagine an SMB3 server negotiating an rsize or wsize smaller than
->>>> 64K in today's world (and typical is 1MB to 8MB) but the user can specify a
->>>> much smaller rsize on mount.  If 64K is an adequate minimum, we could change
->>>> the cifs mount option parsing to require a certain minimum rsize if fscache
->>>> is selected.
->>> I've borrowed the 256K granule size used by various AFS implementations for
->>> the moment.  A 512-byte xattr can thus hold a bitmap covering 1G of file
->>> space.
->>>
->>>
->> Is it possible to make the granule size configurable, then reject a
->> registration if the size is too small or not a power of 2?  Then a
->> netfs using the API could try to set equal to rsize, and then error
->> out with a message if the registration was rejected.
->>
-> ...or maybe we should just make fscache incompatible with an
-> rsize that isn't an even multiple of 256k? You need to set mount options
-> for both, typically, so it would be fairly trivial to check this at
-> mount time, I'd think.
+Recently, I hit a bug while testing out the cifsacl mount option. The
+"other" bits were getting replicated to "owner" and "group" bits,
+after sometime (I'm thinking after actimeo expires).
 
+Attaching patch with fixes for perm bits to DACL mapping and reverse mapping.
+Please review and let me know what you think.
 
-Yes - if fscache is specified on mount it would be easy to round rsize 
-up (or down), at least for cifs.ko (perhaps simply in the mount.cifs 
-helper so a warning could be returned to the user) to whatever boundary 
-you prefer in fscache.   The default of 4MB (or 1MB for mounts to some 
-older servers) should be fine.  Similarly if the user requested the 
-default but the server negotiated an unusual size, not a multiple of 
-256K, we could round try to round it down if possible (or fail the mount 
-if not possible to round it down to 256K).
-
+As indicated in the commit message, there could be further
+optimizations to reduce the number of ACEs in the file DACL. I've not
+yet figured out a good way to figure out the more "restrictive" perm.
+-- 
+-Shyam
