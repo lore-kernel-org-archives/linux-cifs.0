@@ -1,59 +1,66 @@
-Return-Path: <SRS0=vo2T=CD=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=fN8F=CE=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	PI_IMPORTANCE_HIGH,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67765C433DF
-	for <linux-cifs@archiver.kernel.org>; Tue, 25 Aug 2020 21:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F46C433E1
+	for <linux-cifs@archiver.kernel.org>; Wed, 26 Aug 2020 07:57:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CB742074A
-	for <linux-cifs@archiver.kernel.org>; Tue, 25 Aug 2020 21:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA6AF20707
+	for <linux-cifs@archiver.kernel.org>; Wed, 26 Aug 2020 07:57:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=komprise.com header.i=@komprise.com header.b="xfaCZ5To"
+	dkim=pass (1024-bit key) header.d=komprise.com header.i=@komprise.com header.b="t2/t+acm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726180AbgHYVQy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 25 Aug 2020 17:16:54 -0400
-Received: from mail-dm6nam12on2069.outbound.protection.outlook.com ([40.107.243.69]:16448
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        id S1726698AbgHZH5T (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 26 Aug 2020 03:57:19 -0400
+Received: from mail-co1nam11on2050.outbound.protection.outlook.com ([40.107.220.50]:13741
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726158AbgHYVQx (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 25 Aug 2020 17:16:53 -0400
+        id S1726016AbgHZH5R (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 26 Aug 2020 03:57:17 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YtnVNdwGGSvKm+IVVaQGBxJubhLVL7B9A09n+HxI1mo0WxBBxEwFbuckoCzEuWTR9jBkvWqydpoB0+wuPcsqC+icb6KSofofw3Dy9dPYYAytN4NKpH2ZLljbXp+vIvRVN1WE9Eb9R6zVdMeFX7TDNjERJknrEY966jOPSF15lWuOB3EkWrh3c/OKWjxl+PYBCw3caLdc3WU5Xvqh3tdpQbAjBGnWx4lPWbw0rkR9mYgPjUy08kYknWz4C+d6njz7bZjrIrWJLpwDyzK+NmLydiX8pAB+NwsHcAsZM/yNzip7aB0g6HG1q+ojVmk7Po07romLDr6Z6Wb3SbcpHQe3eA==
+ b=k7hmk1gD5RGrSIvBayCK335miUJXNauY/XTvZZkmSh5iqTVED1c6nmbskYnO2zKcjOx1YuTvI9rgM4jhOri/eNff8kvGTIyTzF3Zl59iQsDU0loG038sllx1SFRJCuf7Gu+7DgjHho0I4ALrZV2gE2r0uOJ+Ubl8eYH4qxk4GjnG+99NbenRs23aMSuZMBdbL6WYtmi0FInnsCAoMzHwufuIynxDdgb8NCg6wpszH+uzrsx9i4rrMgvSdjloEDaaWWoEEpePEY1nUGdAtFk9t2yB4KJDLFUwczRA9rKbEjDKET25+NekqkMT9AEDgeLSpUr1s52QAeqaM9dKf89yug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SOGPJXqaS5xvyRfpsF4GlBqMZl8PplEpAgMVp7oIB7w=;
- b=AYxPmPVluMr6NdMCpvJ2d2H4K/rFlQYlfGJd7W5wclXbF6qZ34d8sonYze3+VfjW6P48gVYa5/mIEuki9Q4qfc7oI/7nzhjcgLxwgSXz1XngpLRtaF+NodAcDX+lzeQ4kRG80d7E2FUGKy9LR2b2otyu3juPaD8jf0ZN1rmX1cjBroehGtaR5/3vA1TEEVO4ZtDQd8lNslzla/lP+PZu2HzZNmpoxDa+oSUFsep9T/s33tetAOgW01cRouRJSvpyERCdD9AsKUX6T+kmkRjShxxiebc1jgCBASkuCYDJb/U7A/aZiqptcPT+E63yiPJzzYm8jVv3EDuYFWm/PW29tA==
+ bh=oQYvt5py6ujsJcTe5/7dK3/78yI8l4Xu0XQTJZVJx/k=;
+ b=FwV18fBRRAyPKjqHY2FKBCmBOJ8Ou3c4zlimrPEKeDJLOa+EdX3E4Pm66t0pItEx6JFusS7oD9md/i8O9EwB3eZMLXt25jTgU8P0FSP4aC2I8d1bE9bEwbfmnTvkb7Ed4edpHzUO7iQs2k7cYc9chvVePuyWTWBnpd1+e9wHLUE6GuZiabLSLU56ATF2f/RnedtiVTgHDXcVvdiN89U4JuhgeftpP+f1lOkyXmYF/VoB3sZ+NmGH8LOCZz5xcDP4sq8IAJjhdyvyDn7pF52nHuFUPxO+lznUqsODZDBsCnaLV1+Yx+CuUprITlJkKVrPLTTyDsUKbNR3ENz62GgdyA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=komprise.com; dmarc=pass action=none header.from=komprise.com;
  dkim=pass header.d=komprise.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=komprise.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SOGPJXqaS5xvyRfpsF4GlBqMZl8PplEpAgMVp7oIB7w=;
- b=xfaCZ5Tou8vZfmvL0UA1tccXvkbKyQcBAiPnkM06VXAYhitabemhdVB1W/TWeTHUwJa+ONNf/M5OvqUAiCQTvBQ37kd/V9Bg8Emej9att28IrMIMexDiwBWR1Q1GKzcBklyS1iqVhJS5uul6GC+edf8/bOVihPqYeWH+J+ZCd2c=
+ bh=oQYvt5py6ujsJcTe5/7dK3/78yI8l4Xu0XQTJZVJx/k=;
+ b=t2/t+acmUwt8FitsRk4IrL2iD8j/yZVNTwHpvc+yRUy8HsWKep+Vpjsus56bIP9uikb0gX4C6pShSJTxgpKW0ixRXW8uSZfcyMaOctwulsXa7erGaid+amRElMURA2AQ/rg68FmdXxop/Lkn2E1vaUsLDeOvZ42HV8Jpzi6lVTc=
 Received: from BYAPR16MB2615.namprd16.prod.outlook.com (2603:10b6:a03:8f::17)
- by BYAPR16MB2806.namprd16.prod.outlook.com (2603:10b6:a03:e6::14) with
+ by BY5PR16MB3222.namprd16.prod.outlook.com (2603:10b6:a03:18d::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Tue, 25 Aug
- 2020 21:16:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25; Wed, 26 Aug
+ 2020 07:57:14 +0000
 Received: from BYAPR16MB2615.namprd16.prod.outlook.com
  ([fe80::b108:7150:bd4d:5cc4]) by BYAPR16MB2615.namprd16.prod.outlook.com
- ([fe80::b108:7150:bd4d:5cc4%6]) with mapi id 15.20.3305.026; Tue, 25 Aug 2020
- 21:16:49 +0000
+ ([fe80::b108:7150:bd4d:5cc4%6]) with mapi id 15.20.3305.026; Wed, 26 Aug 2020
+ 07:57:14 +0000
 From:   Vidhesh Ramesh <vidhesh.ramesh@komprise.com>
-To:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Subject: Re: Oops in cifs_reconnect - linux kernel 4.16.2-1.el7.elrepo.x86_64
-Thread-Topic: Oops in cifs_reconnect - linux kernel 4.16.2-1.el7.elrepo.x86_64
-Thread-Index: AQHWdPXYF6AGBDNprEenJbDpWCgEcqlJYAf7
-Date:   Tue, 25 Aug 2020 21:16:49 +0000
-Message-ID: <BYAPR16MB2615945959907C39B0BB1BF1E2570@BYAPR16MB2615.namprd16.prod.outlook.com>
-References: <BYAPR16MB2615D74ECD5670CFD3CD7860E25C0@BYAPR16MB2615.namprd16.prod.outlook.com>
-In-Reply-To: <BYAPR16MB2615D74ECD5670CFD3CD7860E25C0@BYAPR16MB2615.namprd16.prod.outlook.com>
+To:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
+Subject: Re: Oops in cifs_negotiate_protocol - linux kernel
+ 4.16.2-1.el7.elrepo.x86_64
+Thread-Topic: Oops in cifs_negotiate_protocol - linux kernel
+ 4.16.2-1.el7.elrepo.x86_64
+Thread-Index: AQHWdPUttde7I4ogoE2xW8+tLiwFcKlJX4pvgACzFq4=
+Importance: high
+X-Priority: 1
+Date:   Wed, 26 Aug 2020 07:57:14 +0000
+Message-ID: <BYAPR16MB26157E1CB90FE26A50E8DED6E2540@BYAPR16MB2615.namprd16.prod.outlook.com>
+References: <BYAPR16MB2615BE259AC55E3F8D26EBF4E25C0@BYAPR16MB2615.namprd16.prod.outlook.com>,<BYAPR16MB2615101D857F6A55AF5A39BFE2570@BYAPR16MB2615.namprd16.prod.outlook.com>
+In-Reply-To: <BYAPR16MB2615101D857F6A55AF5A39BFE2570@BYAPR16MB2615.namprd16.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -63,15 +70,15 @@ authentication-results: vger.kernel.org; dkim=none (message not signed)
  header.from=komprise.com;
 x-originating-ip: [24.5.193.179]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a621c696-9fa3-4fa0-fe5d-08d8493c2e2b
-x-ms-traffictypediagnostic: BYAPR16MB2806:
-x-microsoft-antispam-prvs: <BYAPR16MB28061CCADB9B601DBA26ED95E2570@BYAPR16MB2806.namprd16.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: ca823104-af35-4092-1150-08d84995a55f
+x-ms-traffictypediagnostic: BY5PR16MB3222:
+x-microsoft-antispam-prvs: <BY5PR16MB3222FB3D980938956134C0B6E2540@BY5PR16MB3222.namprd16.prod.outlook.com>
 x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: h6sOrTgJJUGAxatjNTT3t1GQe6Ly2ppqNbHiVaTq04rCNrSId2jRelaskhWr8UWLbCplsZbbUUwh9r9EP+uAkqnb5hzs8OrFEKf/xmLRiPhsVaht1H5EOYGsuq+9ZDd6Ko0XkYtuLffmzI4Z5kL3lDtYYGUgihrv9WQueMQSE9JkKpjLGNQdrsPH3/8V3CMn9kjL74Rjvbc3S2xu8HIdAjb5FBEDDrU7tNcHU/K4+uOzKxtuTbEZ/nPqPakM/yDbIK8uy8935tU79u4pEp5lELTdoOjaBTHSsfe4EpQmqshcOJaZ08zh8ezL/QOQF0cF2rpdTgjpQktUB1a29l3EfA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR16MB2615.namprd16.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(366004)(396003)(346002)(376002)(39830400003)(186003)(316002)(6916009)(83380400001)(26005)(8936002)(66946007)(6506007)(91956017)(66446008)(2906002)(66556008)(52536014)(66476007)(76116006)(64756008)(45080400002)(53546011)(5660300002)(86362001)(44832011)(8676002)(9686003)(478600001)(71200400001)(7696005)(33656002)(55016002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: wVRJrktZbFt9LAvWw6nUYDhQbYCuwcNtuv7iPywtupgqMrgjM2q7gJXtUPvuNH5ijLxjceRzj+b+nSjV19rnp4gNl19N1kWLnnpDa6wNR++d47Knh1p7ARyQW8uDv7VaFHkj2YUrGR7HeDpBvHmZ6Asjb+V2HOmO9F9vWobueJTC1stqJdwbyIG1gTJolK0am8GzfRVERpMaZV3cA05CKwl4TXCIChAQE00y8Po8poaJbTOl3D0XpR9n/m/orFHInBbUyTqVeWaKeaVLi8aDnvjy6bHnIOAJdX6MFQcilL2JDA/awv565QyuCs5ZR0/lFwad8wcUQvZLvoFrKHsG+AZdrnPaR1NxLqnVcgWNuB9KmU6+KGxOJ2l2YJOthdslzNvvGe+/D9U9ehjxvaEeWLVIH303Ia/X2KX3rlbqC5AEJhWyWbQXOljo8ZumawPP0ErdWER5NzsypY8zTSoGa2LOBaaB/J3nsunpoz9pz/H6ZejD3n8iUjK5d1o8A9IxokB3flIctGC2ghgfGy9prvAYng6f7tmxcWilaGv/DNek0yQJrh2GXY7ADXbdcvtckpkmOVQsvl8dXznFOAYKAvgZ9J0Q5LnT2R4gLJdR1PAwVRTL8YPgKwiwrCaHh3Vat0pVplDcAt77JPFQRZoIYw==
+x-microsoft-antispam-message-info: odC8WkvKBgatmFpCBg/ClONKy8ezoIFa5pTCwrnr25L6XSNQVK320L95+OiV0cCHsHFqOOitGSfFV8Smg3fu7Cn2vr/F1YU6NBn7+WtgIfijo2LnnbDkBonnl47d9isoyh5EC3fY/EqMmrLm2iJEIcbF2d1TWsk89QpzE4DpsgaF264+q1HUoG4rU54ujhjwLKULidX76DzrV6ztmMcEroZAYZieYnNI61bqceW1CQTVN8rNhZvYn+LMYB+9SRM0r3npYCluCJ/qURnQV1eN6RF/P2TvHWMCqPp32RqSDs6BFdCoNDFfL4Hp490cfRQ2
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR16MB2615.namprd16.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(376002)(396003)(136003)(346002)(39840400004)(86362001)(7696005)(71200400001)(5660300002)(66946007)(9686003)(52536014)(64756008)(186003)(478600001)(76116006)(83380400001)(66476007)(66556008)(66446008)(91956017)(8676002)(26005)(44832011)(33656002)(45080400002)(2906002)(8936002)(55016002)(110136005)(53546011)(6506007)(316002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: iSt/N1CDnUUpc3GT+h/vGJC1Ypal1jOuXl76iPNsWRyR9TgthAfVxLdJ83vbQ1OEdlRp3aFyRSqCVKzs1WK5kf9sUokixTYOTe9dk/9JIKUjkV0WJCtbthQ3xlMZCWwGD8pWYcKvj48//haUJ0DJ1CWMjspUR4iRbc7FG4bG6OJDsT6K7F1Py9mw6izRvQwz7pj7Hdzz5fmvbZZTWzjvxk2XBzrlVTPyEr3URzycYuZqxugON4kxwyVmBDnu2WiT7g8QIpSE45esNROOpxpG2FQaHsv4hjS8/vpzTQYWvVXiP8fZpdafvx3oeV6ZPz05NgY28eEUdaA01oY3L1Ea4bpa6RcxltlTc7AxBBSXiPrhAiw3uyFZfxOqpDdAzWlMlpGrezW0lJsPKQesyzDq+4t0wtnX7LW3jIFZ6d37uOxYW1ruyL1te+FNkfgqpgQcuEvAF/X/rN40A+GY6K09EQT7Qf99hJ8bsESMFX351yACBExeMP2BxqWLMguPiUbIjtbxRfiLTk79gEadjy82vq7M4qdQOqdAXzAwLAtLvKczerXA++cD0luW7KZ80RPnM+gfUWIua8VnEbo8scWNpFygBN+Z0AaHfiI114O9zA72ot/38M56KD8YVU8b8rs0OwXpUub/OFiRLTwTZY3GAQ==
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
@@ -79,29 +86,39 @@ MIME-Version: 1.0
 X-OriginatorOrg: komprise.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR16MB2615.namprd16.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a621c696-9fa3-4fa0-fe5d-08d8493c2e2b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2020 21:16:49.2906
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca823104-af35-4092-1150-08d84995a55f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Aug 2020 07:57:14.4561
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 7a5a9d78-0afb-4c20-b729-756d332680db
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: j9raDUxi60o3/5oCiieWPgIubeUiH8QmeNsmqKMFLyRqpXiPB6JYBz5bYbj18DLyz6Ffam6JIunBnvCoGnpiJeJ2a5e86b8cS7Tkd11BL+Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR16MB2806
+X-MS-Exchange-CrossTenant-userprincipalname: fxtRhQJ9chOVmmBmRNPsi6Jwt1SnrpY2dtJdx2BeM/gbAE1ljiznPknGiUrLBIUHJQuvaoio1NMcpJNaggz1rbxYmLfk1/WP/oNSaEiOdW4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR16MB3222
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Adding Steve and samba-technical.=0A=
+=0A=
+Vidhesh Ramesh=0A=
+=0A=
+From: Vidhesh Ramesh <vidhesh.ramesh@komprise.com>=0A=
+Sent: Tuesday, August 25, 2020 2:16 PM=0A=
+To: linux-cifs@vger.kernel.org <linux-cifs@vger.kernel.org>=0A=
+Subject: Re: Oops in cifs_negotiate_protocol - linux kernel 4.16.2-1.el7.el=
+repo.x86_64 =0A=
+=A0=0A=
 Resending again. This is OOPS seen on centos running kernel 4.16. I wanted =
 to check and see if this has been fixed in kernel 4.19 ?=0A=
 =0A=
 Vidhesh Ramesh=0A=
 =0A=
 From: Vidhesh Ramesh=0A=
-Sent: Monday, August 17, 2020 5:26 PM=0A=
+Sent: Monday, August 17, 2020 5:23 PM=0A=
 To: linux-cifs@vger.kernel.org <linux-cifs@vger.kernel.org>=0A=
-Subject: Oops in cifs_reconnect - linux kernel 4.16.2-1.el7.elrepo.x86_64 =
-=0A=
+Subject: Oops in cifs_negotiate_protocol - linux kernel 4.16.2-1.el7.elrepo=
+.x86_64 =0A=
 =A0=0A=
 [1.] One line summary of the problem:=0A=
 oops kernel panic=0A=
@@ -122,13 +139,13 @@ Please check the file uploaded=0A=
 [5.] Most recent kernel version which did not have the bug:=0A=
 [6.] Output of Oops.. message (if applicable) with symbolic information=0A=
 =A0=A0=A0=A0 resolved (see Documentation/admin-guide/oops-tracing.rst)=0A=
-[366603.058360] BUG: unable to handle kernel NULL pointer dereference at 00=
-00000000000000=0A=
-[366603.058730] IP: cifs_reconnect+0x286/0x620 [cifs]=0A=
-[366603.059062] PGD 8000000426291067 P4D 8000000426291067 PUD 42af59067 PMD=
+[255120.498118] BUG: unable to handle kernel NULL pointer dereference at 00=
+00000000000038=0A=
+[255120.498520] IP: cifs_negotiate_protocol+0x15/0xd0 [cifs]=0A=
+[255120.498805] PGD 800000042a54c067 P4D 800000042a54c067 PUD 4276f0067 PMD=
  0=0A=
-[366603.059418] Oops: 0000 [#1] SMP PTI=0A=
-[366603.059803] Modules linked in: rpcsec_gss_krb5 nfsv4 nfs cmac fscache a=
+[255120.499119] Oops: 0000 [#1] SMP PTI=0A=
+[255120.499398] Modules linked in: rpcsec_gss_krb5 cmac nfsv4 nfs fscache a=
 rc4 md4 nls_utf8 cifs ccm dns_resolver nf_conntrack_netbios_ns nf_conntrack=
 _broadcast xt_CT ip6t_rpfilter ipt_REJECT nf_reject_ipv4 ip6t_REJECT nf_rej=
 ect_ipv6 xt_conntrack ip_set nfnetlink ebtable_nat ebtable_broute ip6table_=
@@ -136,51 +153,67 @@ nat nf_conntrack_ipv6 nf_defrag_ipv6 nf_nat_ipv6 ip6table_mangle ip6table_s=
 ecurity ip6table_raw iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ip=
 v4 nf_nat nf_conntrack iptable_mangle iptable_security iptable_raw ebtable_=
 filter ebtables ip6table_filter ip6_tables iptable_filter vmw_vsock_vmci_tr=
-ansport vsock sb_edac crct10dif_pclmul crc32_pclmul ghash_clmulni_intel pcb=
-c ppdev aesni_intel crypto_simd glue_helper cryptd vmw_balloon intel_rapl_p=
-erf pcspkr joydev input_leds sg parport_pc parport i2c_piix4=0A=
-[366603.064108]=A0 vmw_vmci shpchp nfsd nfs_acl lockd auth_rpcgss grace sun=
-rpc ip_tables xfs libcrc32c sr_mod cdrom sd_mod ata_generic pata_acpi crc32=
-c_intel serio_raw vmxnet3 mptspi mptscsih mptbase scsi_transport_spi vmwgfx=
- ata_piix drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm =
-libata drm floppy dm_mirror dm_region_hash dm_log dm_mod dax=0A=
-[366603.066558] CPU: 6 PID: 5920 Comm: cifsd Tainted: G=A0=A0=A0=A0=A0=A0=
-=A0 W=A0=A0=A0=A0=A0=A0=A0 4.16.2-1.el7.elrepo.x86_64 #1=0A=
-[366603.067888] Hardware name: VMware, Inc. VMware Virtual Platform/440BX D=
+ansport vsock ppdev sb_edac crct10dif_pclmul crc32_pclmul ghash_clmulni_int=
+el pcbc vmw_balloon aesni_intel crypto_simd glue_helper cryptd intel_rapl_p=
+erf joydev input_leds pcspkr sg parport_pc parport vmw_vmci shpchp=0A=
+[255120.503180]=A0 i2c_piix4 nfsd nfs_acl lockd auth_rpcgss grace sunrpc ip=
+_tables xfs libcrc32c sr_mod cdrom sd_mod ata_generic pata_acpi serio_raw c=
+rc32c_intel floppy vmxnet3 vmwgfx drm_kms_helper syscopyarea sysfillrect sy=
+simgblt fb_sys_fops ttm ata_piix drm libata mptspi mptscsih mptbase scsi_tr=
+ansport_spi dm_mirror dm_region_hash dm_log dm_mod dax=0A=
+[255120.505469] CPU: 0 PID: 6419 Comm: kworker/0:0 Not tainted 4.16.2-1.el7=
+.elrepo.x86_64 #1=0A=
+[255120.506098] Hardware name: VMware, Inc. VMware Virtual Platform/440BX D=
 esktop Reference Platform, BIOS 6.00 04/05/2016=0A=
-[366603.069252] RIP: 0010:cifs_reconnect+0x286/0x620 [cifs]=0A=
-[366603.069947] RSP: 0018:ffffc90005a53d70 EFLAGS: 00010203=0A=
-[366603.070641] RAX: 0000000000000001 RBX: ffff88042b599c00 RCX: 0000000000=
+[255120.507412] Workqueue: cifsiod smb2_reconnect_server [cifs]=0A=
+[255120.508111] RIP: 0010:cifs_negotiate_protocol+0x15/0xd0 [cifs]=0A=
+[255120.508827] RSP: 0018:ffffc900113e7d40 EFLAGS: 00010246=0A=
+[255120.509536] RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffffa0=
+61a340=0A=
+[255120.510256] RDX: ffff88042d725d00 RSI: ffff88042bb9ae00 RDI: 0000000000=
 000000=0A=
-[366603.071413] RDX: 0000000000000000 RSI: 0000000000000246 RDI: 0000000000=
-000246=0A=
-[366603.072144] RBP: ffffc90005a53dc0 R08: 0000000000000005 R09: ffff88042d=
-6c8000=0A=
-[366603.072934] R10: 00000000000002d4 R11: 000000000000b6bf R12: 0000000000=
+[255120.510987] RBP: ffffc900113e7d58 R08: 0000000000000271 R09: 0000000000=
 000000=0A=
-[366603.073669] R13: ffffc90005a53d80 R14: ffff88035d086680 R15: ffff88035d=
-086f00=0A=
-[366603.074406] FS:=A0 0000000000000000(0000) GS:ffff88043fd80000(0000) knl=
+[255120.511724] R10: 0000000000000001 R11: 000000000000026b R12: ffff88042b=
+b9ae00=0A=
+[255120.512476] R13: ffff880399229568 R14: ffffffffa061a000 R15: 0000000000=
+000001=0A=
+[255120.513246] FS:=A0 0000000000000000(0000) GS:ffff88043fc00000(0000) knl=
 GS:0000000000000000=0A=
-[366603.075162] CS:=A0 0010 DS: 0000 ES: 0000 CR0: 0000000080050033=0A=
-[366603.076031] CR2: 0000000000000000 CR3: 0000000427c88000 CR4: 0000000000=
-0406e0=0A=
-[366603.076896] Call Trace:=0A=
-[366603.077706]=A0 cifs_readv_from_socket+0x1b4/0x200 [cifs]=0A=
-[366603.078621]=A0 cifs_read_from_socket+0x52/0x70 [cifs]=0A=
-[366603.079458]=A0 cifs_demultiplex_thread+0x11b/0xa90 [cifs]=0A=
-[366603.080313]=A0 kthread+0x105/0x140=0A=
-[366603.081182]=A0 ? cifs_handle_standard+0x190/0x190 [cifs]=0A=
-[366603.082048]=A0 ? kthread_bind+0x20/0x20=0A=
-[366603.082896]=A0 ? do_syscall_64+0x79/0x1b0=0A=
-[366603.083716]=A0 ret_from_fork+0x35/0x40=0A=
-[366603.084541] Code: e7 da e0 84 c0 74 0e 49 8b 17 49 8b 47 08 48 89 42 08=
- 48 89 10 49 8b 47 38 4d 89 3f 4c 89 ff 4d 89 7f 08 e8 4d 3f 5e e1 4d 39 ec=
- <49> 8b 04 24 75 c4 65 4c 8b 2c 25 40 5c 01 00 eb 31 f6 05 66 0a=0A=
-[366603.087050] RIP: cifs_reconnect+0x286/0x620 [cifs] RSP: ffffc90005a53d7=
-0=0A=
-[366603.087856] CR2: 0000000000000000=0A=
+[255120.514048] CS:=A0 0010 DS: 0000 ES: 0000 CR0: 0000000080050033=0A=
+[255120.514832] CR2: 0000000000000038 CR3: 000000042a5b2000 CR4: 0000000000=
+0406f0=0A=
+[255120.515696] Call Trace:=0A=
+[255120.516545]=A0 smb2_reconnect+0x108/0x420 [cifs]=0A=
+[255120.517410]=A0 ? remove_wait_queue+0x60/0x60=0A=
+[255120.518249]=A0 smb2_reconnect_server+0x1d4/0x340 [cifs]=0A=
+[255120.519102]=A0 process_one_work+0x15f/0x370=0A=
+[255120.519962]=A0 worker_thread+0x4d/0x3e0=0A=
+[255120.520808]=A0 kthread+0x105/0x140=0A=
+[255120.521642]=A0 ? max_active_store+0x80/0x80=0A=
+[255120.522456]=A0 ? kthread_bind+0x20/0x20=0A=
+[255120.523254]=A0 ? do_syscall_64+0x79/0x1b0=0A=
+[255120.524035]=A0 ret_from_fork+0x35/0x40=0A=
+[255120.524791] Code: 64 a0 e8 ff 08 ab e0 5b 41 5c 41 5d 5d c3 0f 1f 84 00=
+ 00 00 00 00 66 66 66 66 90 55 48 89 e5 41 55 41 54 49 89 f4 53 48 8b 5e 48=
+ <48> 8b 43 38 48 8b 90 b8 00 00 00 48 85 d2 0f 84 97 00 00 00 48=0A=
+[255120.527052] RIP: cifs_negotiate_protocol+0x15/0xd0 [cifs] RSP: ffffc900=
+113e7d40=0A=
+[255120.527807] CR2: 0000000000000038=0A=
 [7.] A small shell script or example program which triggers the=0A=
 =A0=A0=A0=A0 problem (if possible)=0A=
 =0A=
-Vidhesh Ramesh=
+Vidhesh Ramesh=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
