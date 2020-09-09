@@ -1,92 +1,89 @@
 Return-Path: <SRS0=T1K2=CU=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.7 required=3.0 tests=BAYES_40,
+	HEADER_FROM_DIFFERENT_DOMAINS,LOTS_OF_MONEY,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,T_DEAR_BENEFICIARY,UNCLAIMED_MONEY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D9FDC2BC11
-	for <linux-cifs@archiver.kernel.org>; Fri, 11 Sep 2020 03:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58151C433E2
+	for <linux-cifs@archiver.kernel.org>; Fri, 11 Sep 2020 07:42:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BCA52078D
-	for <linux-cifs@archiver.kernel.org>; Fri, 11 Sep 2020 03:59:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A931214F1
+	for <linux-cifs@archiver.kernel.org>; Fri, 11 Sep 2020 07:42:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725782AbgIKD65 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 10 Sep 2020 23:58:57 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59474 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725283AbgIKD64 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 10 Sep 2020 23:58:56 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 60F004CED601D85B6576;
-        Fri, 11 Sep 2020 11:58:54 +0800 (CST)
-Received: from huawei.com (10.90.53.225) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Fri, 11 Sep 2020
- 11:58:46 +0800
-From:   Zheng Bin <zhengbin13@huawei.com>
-To:     <sfrench@samba.org>, <linux-cifs@vger.kernel.org>,
-        <samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>
-CC:     <yi.zhang@huawei.com>, <zhengbin13@huawei.com>
-Subject: [PATCH -next 4/5] cifs: fix comparison to bool warning in connect.c
-Date:   Fri, 11 Sep 2020 12:05:38 +0800
-Message-ID: <20200911040539.113307-5-zhengbin13@huawei.com>
-X-Mailer: git-send-email 2.26.0.106.g9fadedd
-In-Reply-To: <20200911040539.113307-1-zhengbin13@huawei.com>
-References: <20200911040539.113307-1-zhengbin13@huawei.com>
+        id S1725764AbgIKHml convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 11 Sep 2020 03:42:41 -0400
+Received: from mail.flex.co.jp ([211.8.82.123]:60540 "EHLO www.flex.co.jp"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725613AbgIKHmk (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 11 Sep 2020 03:42:40 -0400
+Received: from live.com.mx ([103.89.89.225])
+        (authenticated bits=0)
+        by www.flex.co.jp (MTA) with ESMTP id 0898njWG009557
+        for <linux-cifs@vger.kernel.org>; Wed, 9 Sep 2020 17:49:49 +0900
+Reply-To: powerinthewords@yahoo.co.jp
+From:   piyin.crhe@live.com.mx
+To:     linux-cifs@vger.kernel.org
+Subject: =?utf-8?Q?=5BSpam=5D?=
+ We are still waiting for your email...
+Date:   09 Sep 2020 01:49:47 -0700
+Message-ID: <20200909014947.D7F94276C6292AD4@live.com.mx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+X-SpamInfo: FortiGuard-AntiSpam ip, connection black ip 103.89.89.225
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fixes coccicheck warning:
+Dear Beneficiary,
 
-fs/cifs/connect.c:2478:5-16: WARNING: Comparison to bool
-fs/cifs/connect.c:3560:10-35: WARNING: Comparison to bool
-fs/cifs/connect.c:4297:6-21: WARNING: Comparison to bool
+We wish to inform you that a power of attorney was forwarded to 
+our office  by two gentlemen regarding your unclaimed fund of $56 
+Million Dollar. One of them is an American citizen named Mr. 
+Robert Porter and the other is Mr. Wilhelm Berg a Swedish 
+citizen.We have be waiting for you to contact us since last year.
 
-Signed-off-by: Zheng Bin <zhengbin13@huawei.com>
----
- fs/cifs/connect.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+The document claims these gentlemen to be your authorized 
+representatives, and the power of attorney states that you are 
+already deceased.  It further states that your death was due to 
+lung cancer, with your date of death being January 27th, 2020.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index a5731dd6e656..4d2651b9f019 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2475,7 +2475,7 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 	else if (override_gid == 1)
- 		pr_notice("ignoring forcegid mount option specified with no gid= option\n");
+They have now submitted a new account to replace the receiving 
+account that was in the original claim of funds. These funds have 
+remained unclaimed for quite some time and the need for 
+resolution is pressing. Below is the new account they have 
+submitted.
 
--	if (got_version == false)
-+	if (!got_version)
- 		pr_warn_once("No dialect specified on mount. Default has changed to a more secure dialect, SMB2.1 or later (e.g. SMB3.1.1), from CIFS (SMB1). To use the less secure SMB1 dialect to access old servers which do not support SMB3.1.1 (or even SMB3 or SMB2.1) specify vers=1.0 on mount.\n");
+Account Name's :  Robert Porter /Wilhelm Berg
+Account: 5007-29 438 66
+IBAN-nr: SE4150000000050072943866
+Bic-kod: ESSESESS
+Skandinaviska Enskilda Banken. (SEB :)
+SWEDEN .
 
- 	kfree(mountdata_copy);
-@@ -3557,7 +3557,7 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		}
- 	} else if ((tcon->capabilities & SMB2_SHARE_CAP_CONTINUOUS_AVAILABILITY)
- 	     && (ses->server->capabilities & SMB2_GLOBAL_CAP_PERSISTENT_HANDLES)
--	     && (volume_info->nopersistent == false)) {
-+	     && !volume_info->nopersistent) {
- 		cifs_dbg(FYI, "enabling persistent handles\n");
- 		tcon->use_persistent = true;
- 	} else if (volume_info->resilient) {
-@@ -4294,7 +4294,7 @@ static int mount_get_conns(struct smb_vol *vol, struct cifs_sb_info *cifs_sb,
+In the event that you are in fact still alive, we ask that you 
+confirm your existence by responding to this email. You are to 
+view this as a matter requiring immediate attention and response. 
+We have 48 hr monitoring of all activities within Federal Reserve 
+Bank.On this regard,you will be directed to any of our office 
+center that you will go in person to sign the final papers,
+because we have our payment center in Europe,Asia,America and 
+Canada.You will go to any of the office that you will be directed 
+to with the copy of the documents of your fund.
 
- 	*nses = ses;
+We have contacted the bank in the Sweden asking them to wait for 
+further directives from Federal Reserve Bank, prior to 
+authorizing any withdrawals in any form.  Our request is based 
+entirely on our attempt to verify that you are in fact deceased, 
+before money is wrongly disbursed.
 
--	if ((vol->persistent == true) && (!(ses->server->capabilities &
-+	if (vol->persistent && (!(ses->server->capabilities &
- 					    SMB2_GLOBAL_CAP_PERSISTENT_HANDLES))) {
- 		cifs_server_dbg(VFS, "persistent handles not supported by server\n");
- 		return -EOPNOTSUPP;
---
-2.26.0.106.g9fadedd
+Your in Service,
 
+Robert Steven Kaplan
+2200 N Pearl St, Dallas, TX 75201, United States
