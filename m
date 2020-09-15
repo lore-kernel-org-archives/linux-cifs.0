@@ -1,108 +1,118 @@
-Return-Path: <SRS0=hVAP=CX=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=AHfl=CY=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FF5C43461
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Sep 2020 17:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E65BC433E2
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Sep 2020 08:25:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83654206F4
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Sep 2020 17:08:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600103330;
-	bh=/TgvuTtu3dB+kip6pfwy4beQVD01+cDItXjAMGkkd/U=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=kPgpFjxO2Qntcd7IL8ZDicCrORkDM7/UbMlHampTRnRsVw7o+zNQBUscM2TCnUtKv
-	 72RaBLCw9ozA6jL5bG/2QA4f74olUJlns0Z4VsgxwaRerhiq9Pv5faIK0n+P76fEL9
-	 4vGTaS09fFLBYSrU7ENVtddO4Y2dkk9L/TQxGc1A=
+	by mail.kernel.org (Postfix) with ESMTP id 4B85A206BE
+	for <linux-cifs@archiver.kernel.org>; Tue, 15 Sep 2020 08:25:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VFRvKmxw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726280AbgINRIt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 14 Sep 2020 13:08:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60114 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726372AbgINNFF (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 14 Sep 2020 09:05:05 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 001C1221E7;
-        Mon, 14 Sep 2020 13:04:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600088657;
-        bh=/TgvuTtu3dB+kip6pfwy4beQVD01+cDItXjAMGkkd/U=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qYXdKhyR4nDLwcJUEk8geGl+ddqxHWDkH43EkCPXYxfgbVsbwVIEnhbkFHkJcvcev
-         mqW95GrGc00RMD7yzh5OslsyLaF5U5bGK7+/qT/9WT+k63BUtr+uSW1WwO8gBvO/px
-         xNZJ2wPNPRGUykqDG7aOiOvyukFEEKFs2SWI9cf4=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>, Paulo Alcantara <pc@cjr.nz>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.8 16/29] cifs: fix DFS mount with cifsacl/modefromsid
-Date:   Mon, 14 Sep 2020 09:03:45 -0400
-Message-Id: <20200914130358.1804194-16-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200914130358.1804194-1-sashal@kernel.org>
-References: <20200914130358.1804194-1-sashal@kernel.org>
+        id S1726397AbgIOIZO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 15 Sep 2020 04:25:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60860 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726217AbgIOIO6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Sep 2020 04:14:58 -0400
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5949EC061788
+        for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2020 01:14:42 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id s19so1984841ybc.5
+        for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2020 01:14:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=3z4hdmUKTqraBA0Uq6EwHsoH2Zas08kdcwUINGeFTp0=;
+        b=VFRvKmxwDBFLXc2VP0MBILbQ1NNLgSHR3PK/NQruokyFBGLk7cU83wES9w1ViQO6z5
+         K2Wdqt2H/PzJDbdaPoNWQSPWhrDjSnRODRofAzQquHc1YTCKaNXNyrg2ydm3TR/TTxyv
+         QZrNmp/6JjHf2F5GG5TLnPFtvTxWw+0Ca0n9EhoZZJjrW+Btlm01/PckeSkdFYrJR021
+         bplpejUh9meTodMMVRoAv1ILhGdxEME+1R3jNTwiwSOpmNbg5UbeMOgtuPiyiKffnIal
+         qY8wjaQTZhdKZP52/lQJwgHyzgDRRavVzWnY8e4Yu55eFL+YRmT3/wlA7Xjz6t5ygIQr
+         vfLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=3z4hdmUKTqraBA0Uq6EwHsoH2Zas08kdcwUINGeFTp0=;
+        b=sFjAQxdU1daQ27f5j8C3j5aHh+wR8kcwCY0te5RlVoI19wrWMNrs4ctbfmquOTnFiI
+         kZvOfO2yq08KwPnaaw8hcWy7R/ETYCU6HC63Diw02VGb1msCeaNOuRiV0HVtMXDz80TV
+         mtD9IpFJguI/iAabmbPxz2u21hjygIg3sDCAI8gLGlzXo4mc8e7DXLz8cruvoUGIRDya
+         aItDMJQowGb1skaXnoHVlwksOopJlojAZEEcBZk3j9FlF4yNL4bfWbI4fwrGZefP5TpS
+         m976pMTD0KaCDQDRAyYgPta+35tZd0jO5xlBFaXM65hiVqoHtzKr0Zm17sNHu6iYWbXm
+         tQPg==
+X-Gm-Message-State: AOAM531YET8kgCYMlo7QNeHDj3QtZYJg73vh4nyguIHJtkRuu9/tNo2A
+        TEWvxmCldAjpTMFJGXOPjTSWvz6m2P6pkUO/aPI=
+X-Google-Smtp-Source: ABdhPJyIXNfgPDc1G/C5R/4/Gh/9/d3vFvK1V5hEIDgPEeBrlAS6i3sUP7hcc/Y2O9ZhjYr9E29pjwYzaGvRiAXlI0c=
+X-Received: by 2002:a25:aca3:: with SMTP id x35mr24418717ybi.3.1600157680689;
+ Tue, 15 Sep 2020 01:14:40 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Tue, 15 Sep 2020 13:44:29 +0530
+Message-ID: <CANT5p=rNZoOqt59zaX_C6vnm-a_wFMsEVgAf7_Kemwabfs-a0Q@mail.gmail.com>
+Subject: Use case for init_cc_from_keytab
+To:     Jeff Layton <jlayton@redhat.com>,
+        Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Ronnie Sahlberg <lsahlber@redhat.com>
+Hi Jeff,
 
-[ Upstream commit 01ec372cef1e5afa4ab843bbaf88a6fcb64dc14c ]
+Recently, I've been spending some time with the cifs.upcall code which
+does a "kinit" for a user using the system keytab file. git blame
+shows that you were the author of this function init_cc_from_keytab().
 
-RHBZ: 1871246
+I want to understand these patches mainly:
 
-If during cifs_lookup()/get_inode_info() we encounter a DFS link
-and we use the cifsacl or modefromsid mount options we must suppress
-any -EREMOTE errors that triggers or else we will not be able to follow
-the DFS link and automount the target.
+commit 2dcecd21262513a0866c321643fc33d3d0135915
+Author: Jeff Layton <jlayton@samba.org>
+Date:   Thu Feb 23 18:28:24 2017 -0500
 
-This fixes an issue with modefromsid/cifsacl where these mountoptions
-would break DFS and we would no longer be able to access the share.
+    cifs.upcall: unset $KRB5CCNAME when creating new credcache from keytab
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/cifs/inode.c | 4 ++++
- 1 file changed, 4 insertions(+)
+    We don't want to trust $KRB5CCNAME when creating or updating a new
+    credcache since we could be operating under the wrong credentials.
+    Always create new credcaches in the default location instead.
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index ce95801e9b664..7708175062eba 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1017,6 +1017,8 @@ cifs_get_inode_info(struct inode **inode,
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MODE_FROM_SID) {
- 		rc = cifs_acl_to_fattr(cifs_sb, &fattr, *inode, true,
- 				       full_path, fid);
-+		if (rc == -EREMOTE)
-+			rc = 0;
- 		if (rc) {
- 			cifs_dbg(FYI, "%s: Get mode from SID failed. rc=%d\n",
- 				 __func__, rc);
-@@ -1025,6 +1027,8 @@ cifs_get_inode_info(struct inode **inode,
- 	} else if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) {
- 		rc = cifs_acl_to_fattr(cifs_sb, &fattr, *inode, false,
- 				       full_path, fid);
-+		if (rc == -EREMOTE)
-+			rc = 0;
- 		if (rc) {
- 			cifs_dbg(FYI, "%s: Getting ACL failed with error: %d\n",
- 				 __func__, rc);
+    Reported-by: Chad William Seys <cwseys@physics.wisc.edu>
+    Signed-off-by: Jeff Layton <jlayton@samba.org>
+
+commit 69949ba0086ac7a4f07ade7558fbe5c537220ebb
+Author: Jeff Layton <jlayton@samba.org>
+Date:   Fri Feb 24 10:48:57 2017 -0500
+
+    cifs.upcall: use a MEMORY: ccache when instantiating from a keytab
+
+    Using a more permanent ccache is potentially problematic when we're
+    instantiating a new one. We might be operating under different creds
+    than expected. Just use a MEMORY: ccache since we don't need it to
+    last longer than the life of the upcall anyway.
+
+    Reported-and-Tested-by: Chad William Seys <cwseys@physics.wisc.edu>
+    Signed-off-by: Jeff Layton <jlayton@samba.org>
+
+Few things I want to understand about this:
+1. What was the purpose of this code path in the first place? i.e.
+init_cc_from_keytab
+2. It looks like we read the cred cache file at it's default location.
+Why can't we write the cred cache file as indicated by the env as
+well? Why do we want to create an in-memory cache here, and not dump
+the TGT in the default cc as indicated by env? Why waste the
+authentication which was already done?
+
+The reason why I ask this is because I'm exploring the possibility of
+populating the keytab file in mount.cifs, and let cifs.upcall acquire
+tickets when needed.
+
 -- 
-2.25.1
-
+-Shyam
