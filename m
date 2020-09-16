@@ -2,193 +2,164 @@ Return-Path: <SRS0=zmi3=CZ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B440DC43461
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Sep 2020 20:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1930DC43461
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Sep 2020 17:46:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57EAA2087D
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Sep 2020 20:49:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UEA51e3C"
+	by mail.kernel.org (Postfix) with ESMTP id CD9AA206B6
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Sep 2020 17:46:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726756AbgIPUt2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 16 Sep 2020 16:49:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55618 "EHLO
+        id S1727336AbgIPRpv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 16 Sep 2020 13:45:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726668AbgIPQ6x (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Sep 2020 12:58:53 -0400
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD6E1C035433
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2020 09:17:37 -0700 (PDT)
-Received: by mail-yb1-xb34.google.com with SMTP id s19so5825580ybc.5
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2020 09:17:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=QvqMZZbehGU480XHJh/s30Ptd76/W0ORw+Qbz/0V5Qo=;
-        b=UEA51e3CxfA7556R/xsloNZAAG96Lg369ezJw7V82WOCXZgwac2iXEEtokXTOVvAx5
-         zo+3KkVmeg0lzB+DfpnmcRTMTyJkPjZxvlcY1eP2yX7dA2s5V9Bp995TYggtu1nYQYnn
-         EEoHC1XLqOlOAz2dGzVjI6LBgB1QhjgQJLkAx0EikFjESXHJejbdp8gBvpbMOjy660Gp
-         NiEqgrWAtE4AkeGRtD29Tdn0qq1R1+1Rw7wDUWmprDWcUSLiGirHKvcOuvJsnLNuHHuZ
-         3k3ajAGSSalEZ1ttOkc5kin/meCv3wrk8rJLjKDBDX5uBUqyiErdhjmUBJ5NFI9xt9fV
-         CkmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QvqMZZbehGU480XHJh/s30Ptd76/W0ORw+Qbz/0V5Qo=;
-        b=LbCvxvV8UhdUFxubQgL/ZVmmHPfbdc67qKC10Czo+c23vPxvQPG795cFu6/EuMV4k9
-         sFaWzXJMNkzZ++nigsNzna8HlR61tUKfiWsEWhhM7/EOd97PjzvNcM3SSgLSSvNpHSDM
-         VtWGj16w3uWQ/Pkl+EZgqpgly662JNyWTLNFMWLoKSCTh/XoMoRTE9SDfu72RS8FaHw3
-         2wLJFsn3q1H+e0BYhtpSN0gsjlmWMt/Q7VOKF2Ea4nZXuL99d5Q3RzeW0wEy4VXDzdPS
-         zzeb+FIyJMyF6rr2/oMb7JZDdKzCadMtEvWWg5YsNw8ETXwKcaIMm4ahEikrhhhLil1z
-         iz9A==
-X-Gm-Message-State: AOAM5316VoysdnteTrXu8caefeqYqFs6U3Bew2uhKBGtWThTD1aJ9OMB
-        939VndQIrjMnLC2WTN6TikKtcuYZ9G8zuIFfm9nadpG64U6RQQ==
-X-Google-Smtp-Source: ABdhPJyyL0OhXI+3KzTYmMrNSp9UM1maWxc6Ubj1OVHjjAba2NvJSAyhOAItyYiT5GvlA2KvS5uKTKYC3j1eXCQTF3k=
-X-Received: by 2002:a25:54d:: with SMTP id 74mr34669758ybf.331.1600273056634;
- Wed, 16 Sep 2020 09:17:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <CANT5p=oiTY63d5yVyywiTrCqpAmvaugMVVpQRV7RT7ZA9HU2+Q@mail.gmail.com>
- <87r1r2ugzw.fsf@suse.com>
-In-Reply-To: <87r1r2ugzw.fsf@suse.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Wed, 16 Sep 2020 21:47:25 +0530
-Message-ID: <CANT5p=qV6BWojwBET+kYUwJf7tQDFoRtUb8O+pWHrqWMw5e5LQ@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] mount.cifs: use SUDO_UID env variable for cruid
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com
+        with ESMTP id S1726492AbgIPRpi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Sep 2020 13:45:38 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED36C06178B
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2020 10:45:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42; h=Message-ID:Date:To:From:CC;
+        bh=co+aE86MQ1OwE6c4K6MlweQ1WffNPTpkviewRQB67TE=; b=UbfGFvO7C/9ZFHqR/L1/lR4W2a
+        LwLPQG6XwvO1IxH8LPjFDCqPv7uDgZVGv/QpWhNR6QPgFXT5G1Uxtos7QXQvkMHcQ+82dkvOEI988
+        EX8964/VnX+gQHUwMPD9w7Dxkh7w6f3RGY/DcV4Vi+CCHBAS2pMzS3029XkHlxuuGs8VOAPOoG2y1
+        7OZFlPv/CFS9ZefOEhio+KHBq90hW4D6vlvprxDNJ1qzStYp9c2zNHEBzHN1norczZSh+j69ud+gv
+        na1VBTAwEcImWdZm1/CM8o5qwjzny9O/L/6wt56EHFGmn49hynzmOYRq8NHkEqsn0WiGhTQw8bI1v
+        tKJKBhy2b8SPoE6Ret1+YKadrxL4naxMQdB8tnqfFgAEgl7H09ca3xypQjv4QpwF/CEkhAyUGrKOT
+        eWqHjyl5WyeOsYlRsazSZmen4x+j19ZG55XGNp4GL/IEvjvRs+aZnAgfOiEz4JQ1IVo0qYOCZff4P
+        Q23lFjdl5vOvrSkyYUjLmUxn;
+Received: from [2a01:4f8:192:486::6:0] (port=61614 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1kIbUb-0007RM-Af
+        for cifs-qa@samba.org; Wed, 16 Sep 2020 17:45:17 +0000
+Received: from [::1] (port=26756 helo=bugzilla.samba.org)
+        by hr6.samba.org with esmtp (Exim 4.93)
+        (envelope-from <samba-bugs@samba.org>)
+        id 1kIbUa-002T1c-K6
+        for cifs-qa@samba.org; Wed, 16 Sep 2020 17:45:16 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 14498] New: Why is mount -a is not detecting an already mounted
+ DFS share endpoint
+Date:   Wed, 16 Sep 2020 17:45:15 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: user space tools
+X-Bugzilla-Version: 3.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: Chris@craftypenguins.net
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: jlayton@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ qa_contact target_milestone
+Message-ID: <bug-14498-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Aur=C3=A9lien,
+https://bugzilla.samba.org/show_bug.cgi?id=3D14498
 
-Thanks for the review. Please read my responses inline below.
+            Bug ID: 14498
+           Summary: Why is mount -a is not detecting an already mounted
+                    DFS share endpoint
+           Product: CifsVFS
+           Version: 3.x
+          Hardware: x64
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P5
+         Component: user space tools
+          Assignee: jlayton@samba.org
+          Reporter: Chris@craftypenguins.net
+        QA Contact: cifs-qa@samba.org
+  Target Milestone: ---
 
-On Wed, Sep 16, 2020 at 4:26 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
-:
->
-> Shyam Prasad N <nspmangalore@gmail.com> writes:
-> > This is a fix for the scenario of a krb5 user running a "sudo mount".
-> > Even if the user has cred cache populated, when the mount is run using
-> > sudo, uid switches to 0. So cred cache for the root user will be
-> > searched for, unless cruid is specified explicitly. This fix checks
-> > for cruid=3D$SUDO_UID as a fallback option, when the mount fails with
-> > ENOKEY.
->
-> The idea seems good.
-This was Pavel's suggestion. :)
+I am trying to figure out why mount -a is not detecting an already mounted =
+DFS
+share endpoint. It works as expected on mount.cifs version 5.5 but not 6.7
 
->
-> > @@ -2053,7 +2066,24 @@ int main(int argc, char **argv)
-> >               parsed_info =3D NULL;
-> >               fprintf(stderr, "Unable to allocate memory: %s\n",
-> >                               strerror(errno));
-> > -             return EX_SYSERR;
-> > +             rc =3D EX_SYSERR;
-> > +             goto mount_exit;
-> > +     }
-> > +
-> > +     reinit_parsed_info =3D
-> > +             (struct parsed_mount_info *) malloc(sizeof(*reinit_parsed=
-_info));
-> > +     if (reinit_parsed_info =3D=3D NULL) {
-> > +             fprintf(stderr, "Unable to allocate memory: %s\n",
-> > +                             strerror(errno));
-> > +             rc =3D EX_SYSERR;
-> > +             goto mount_exit;
-> > +     }
-> > +
-> > +     options =3D calloc(options_size, 1);
-> > +     if (!options) {
-> > +             fprintf(stderr, "Unable to allocate memory.\n");
-> > +             rc =3D EX_SYSERR;
-> > +             goto mount_exit;
->
-> This function later forks, so if you allocate before the fork, you need
-> to free in parent and in the child.
+Distributor ID: Debian
+Description:    Debian GNU/Linux 9.13 (stretch)
+Release:        9.13
+Codename:       stretch
 
-Good point.
-I think I'm doing it right though. I allocate all that I need at the beginn=
-ing.
-And the function always terminates in mount_exit, both for parent and
-child. That is where the allocations are freed.
-I know the child will have the options buffer unnecessarily allocated,
-but isn't the code flow simpler this way?
-Please let me know if you see an issue there.
+Mount.cifs version 6.7.=20
 
-> > @@ -2228,6 +2252,7 @@ mount_retry:
-> >                               if (nextaddress)
-> >                                       *nextaddress++ =3D '\0';
-> >                       }
-> > +                     memset(options, 0, sizeof(*options));
-> >                       goto mount_retry;
->
-> Altho not wrong this is a bit misleading as options is a char*. If you
-> do a memset do it option_size, or do options[0] =3D 0;
+/etc/fstab=20
+//ctserver6/ops_apps    /mnt/ops_apps cifs=20=20
+defaults,credentials=3D/root/.smbcredentials,rw,users,_netdev,soft   0 0=20
+//ctserverbc/Public     /mnt/ctserverbc cifs=20=20=20
+defaults,credentials=3D/root/.smbcredentials,rw,users,_netdev,soft 0 0=20
+#//ctserver3/ops         /mnt/ops cifs=20=20=20=20=20=20=20=20=20=20=20=20=
+=20
+defaults,credentials=3D/root/.smbcredentials,rw,users,_netdev,soft   0 0=20
+#//ctserver3/public      /mnt/public cifs=20=20=20=20=20=20=20=20
+defaults,credentials=3D/root/.smbcredentials,rw,users,_netdev,soft 0 0=20
+//ctdomain.local/DFS_OPS/OPS       /mnt/ops cifs=20=20=20=20=20=20=20
+vers=3D2.1,credentials=3D/root/.smbcredentials,rw,users,_netdev,soft   0 0=
+=20
+//ctdomain.local/DFS_OPS/Public    /mnt/public cifs=20=20=20
+vers=3D2.1,credentials=3D/root/.smbcredentials,rw,users,_netdev,soft   0 0=
+=20
 
-Got it. Will do.
+If I leave off the vers=3D2.1 option it will create a new mount process and
+duplicate in /proc/mounts :
+/mnt/ops_apps            : already mounted
+/mnt/ctserverbc          : already mounted
+mount.cifs kernel mount options:
+ip=3D192.168.111.10,unc=3D\\ctdomain.local\DFS_OPS,soft,user=3Dctlinux,pref=
+ixpath=3DOPS,pass=3D********
+/mnt/ops                 : successfully mounted
+mount.cifs kernel mount options:
+ip=3D192.168.111.20,unc=3D\\ctdomain.local\DFS_OPS,soft,user=3Dctlinux,pref=
+ixpath=3DPublic,pass=3D********
+/mnt/public              : successfully mounted
 
->
-> >               case ENODEV:
-> >                       fprintf(stderr,
-> > @@ -2250,6 +2275,21 @@ mount_retry:
-> >                               already_uppercased =3D 1;
-> >                               goto mount_retry;
-> >                       }
->
-> Need to reset options again before goto I guess. Maybe reset option
-> after the retry label?
+With vers=3D2.1 I get:
 
-Good catch. This code existed before my changes, and I had noted this
-bug. But forgot it during my changes. :)
-I was actually confused if I should reset after the label, or before the go=
-to.
-After the label is an added overhead in the "happy" code path, so went
-with this. But it does reduce the chances of missing out a reset.
-For now I'll reset options before each goto mount_retry. Please let me
-know if you feel the other approach is better.
+/mnt/ops_apps            : already mounted=20
+/mnt/ctserverbc          : already mounted=20
+mount.cifs kernel mount options:
+ip=3D192.168.111.20,unc=3D\\ctdomain.local\DFS_OPS,vers=3D2.1,soft,user=3Dc=
+tlinux,prefixpath=3DOPS,pass=3D********=20
+mount error(16): Device or resource busy Refer to the mount.cifs(8) manual =
+page
+(e.g. man mount.cifs)=20
+mount.cifs kernel mount options:
+ip=3D192.168.111.20,unc=3D\\ctdomain.local\DFS_OPS,vers=3D2.1,soft,user=3Dc=
+tlinux,prefixpath=3DPublic,pass=3D********=20
+mount error(16): Device or resource busy Refer to the mount.cifs(8) manual =
+page
+(e.g. man mount.cifs)=20
 
->
-> >       }
-> > -     free(options);
-> > -     free(orgoptions);
-> > -     free(mountpoint);
-> > +     if (reinit_parsed_info)
-> > +             free(reinit_parsed_info);
-> > +     if (options)
-> > +             free(options);
-> > +     if (orgoptions)
-> > +             free(orgoptions);
-> > +     if (mountpoint)
-> > +             free(mountpoint);
-> >       return rc;
->
-> free(NULL) is defined to be a no-op, you don't need the checks.
-Sure. Will do.
-
->
-> Cheers,
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
-
-
+On 5.5 it will detect the DFS share is mounted already
 
 --=20
--Shyam
+
+
+Chris Pickett |
+Linux Systems Engineer
+
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
