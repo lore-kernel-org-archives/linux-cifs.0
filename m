@@ -1,87 +1,121 @@
-Return-Path: <SRS0=AHfl=CY=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=zmi3=CZ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 831FFC433E2
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Sep 2020 18:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CDCC43461
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Sep 2020 18:25:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 230EC206DB
-	for <linux-cifs@archiver.kernel.org>; Tue, 15 Sep 2020 18:28:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01CD620936
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Sep 2020 18:25:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727978AbgIOS1h (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 15 Sep 2020 14:27:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43192 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727804AbgIOS1U (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 15 Sep 2020 14:27:20 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1489CC06174A
-        for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2020 11:27:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42; h=Message-ID:Date:To:From:CC;
-        bh=ajhWPqMPABc7JVPLiJ6fjvd2rzSoPSkLmchFxeBWqCE=; b=AcdJLfA5HWj1xMUDOZECC8UXnc
-        MNVCHs7/gTQDtrtRN5oWvBGDMudi1YolC9OxEqYassKf+8vaxv+yK0tjU1TiwdAeEhrot3xN/6wEM
-        WD+6/xPL3/8BL3j7AYsgNV+vaskzFLxqrFqrzY3sgXvB3+1msjX91PkS2dMLpuQzJcU9qT+2biGn/
-        UBQSh9uihm7dUqKLGXokpLr2kgHxV2zgVynBuAPTW19eI9Kc3dn7N0gZD429PCpNfeLln3rko544h
-        mvaPUCy5Vm4F2fBiRn9Qs6wLWRJE6P4F9ilYPlfuI0Rd6hIdVFeeqhH8lB4QSY13uNXi5etCD6Nxx
-        zX2cfOXUdG76L9OGfv8JrtfDNOnVMjtRsWTrNWbD/4ACERIIBbS7WgQYh0mwhzeX6oLB8h0WA1bOD
-        Uox4F+p0l1dhMqGldUuicN0grpqUxk1r7lRXpLiBAfXPSjd+EZ5gzv9qAONkUTdLEusfiU9qEaqmN
-        UY6qEivoaPd3I6u7x8kYz4iN;
-Received: from [2a01:4f8:192:486::6:0] (port=61064 helo=hr6.samba.org) 
-        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
-        (Exim)
-        id 1kIFfh-0003KC-El
-        for cifs-qa@samba.org; Tue, 15 Sep 2020 18:27:17 +0000
-Received: from [::1] (port=26204 helo=bugzilla.samba.org)
-        by hr6.samba.org with esmtp (Exim 4.93)
-        (envelope-from <samba-bugs@samba.org>)
-        id 1kIFff-002LJz-Ii
-        for cifs-qa@samba.org; Tue, 15 Sep 2020 18:27:15 +0000
-From:   samba-bugs@samba.org
-To:     cifs-qa@samba.org
-Subject: [Bug 14492] Minshall-French symlinks cannot be searched for with
- "find . -type l"
-Date:   Tue, 15 Sep 2020 18:27:15 +0000
-X-Bugzilla-Reason: QAcontact
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: CifsVFS
-X-Bugzilla-Component: kernel fs
-X-Bugzilla-Version: 3.x
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: sfrench@samba.org
-X-Bugzilla-Status: ASSIGNED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P5
-X-Bugzilla-Assigned-To: sfrench@samba.org
-X-Bugzilla-Target-Milestone: ---
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-14492-10630-b4a3uPAED5@https.bugzilla.samba.org/>
-In-Reply-To: <bug-14492-10630@https.bugzilla.samba.org/>
-References: <bug-14492-10630@https.bugzilla.samba.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.samba.org/
-Auto-Submitted: auto-generated
+        id S1728000AbgIPSZW convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 16 Sep 2020 14:25:22 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37850 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727929AbgIPSXo (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 16 Sep 2020 14:23:44 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 7B7EFACE3;
+        Wed, 16 Sep 2020 10:57:07 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Shyam Prasad N <nspmangalore@gmail.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com
+Subject: Re: [PATCH][SMB3] mount.cifs: use SUDO_UID env variable for cruid
+In-Reply-To: <CANT5p=oiTY63d5yVyywiTrCqpAmvaugMVVpQRV7RT7ZA9HU2+Q@mail.gmail.com>
+References: <CANT5p=oiTY63d5yVyywiTrCqpAmvaugMVVpQRV7RT7ZA9HU2+Q@mail.gmail.com>
+Date:   Wed, 16 Sep 2020 12:56:51 +0200
+Message-ID: <87r1r2ugzw.fsf@suse.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-https://bugzilla.samba.org/show_bug.cgi?id=3D14492
+Shyam Prasad N <nspmangalore@gmail.com> writes:
+> This is a fix for the scenario of a krb5 user running a "sudo mount".
+> Even if the user has cred cache populated, when the mount is run using
+> sudo, uid switches to 0. So cred cache for the root user will be
+> searched for, unless cruid is specified explicitly. This fix checks
+> for cruid=$SUDO_UID as a fallback option, when the mount fails with
+> ENOKEY.
 
---- Comment #2 from Steve French <sfrench@samba.org> ---
-Presumably have to flag files which are 1067 bytes with an additional check
-before returning their file type in readdir
+The idea seems good.
 
---=20
-You are receiving this mail because:
-You are the QA Contact for the bug.=
+> @@ -2053,7 +2066,24 @@ int main(int argc, char **argv)
+>  		parsed_info = NULL;
+>  		fprintf(stderr, "Unable to allocate memory: %s\n",
+>  				strerror(errno));
+> -		return EX_SYSERR;
+> +		rc = EX_SYSERR;
+> +		goto mount_exit;
+> +	}
+> +
+> +	reinit_parsed_info = 
+> +		(struct parsed_mount_info *) malloc(sizeof(*reinit_parsed_info));
+> +	if (reinit_parsed_info == NULL) {
+> +		fprintf(stderr, "Unable to allocate memory: %s\n",
+> +				strerror(errno));
+> +		rc = EX_SYSERR;
+> +		goto mount_exit;
+> +	}
+> +
+> +	options = calloc(options_size, 1);
+> +	if (!options) {
+> +		fprintf(stderr, "Unable to allocate memory.\n");
+> +		rc = EX_SYSERR;
+> +		goto mount_exit;
+
+This function later forks, so if you allocate before the fork, you need
+to free in parent and in the child.
+> @@ -2228,6 +2252,7 @@ mount_retry:
+>  				if (nextaddress)
+>  					*nextaddress++ = '\0';
+>  			}
+> +			memset(options, 0, sizeof(*options));
+>  			goto mount_retry;
+
+Altho not wrong this is a bit misleading as options is a char*. If you
+do a memset do it option_size, or do options[0] = 0;
+
+>  		case ENODEV:
+>  			fprintf(stderr,
+> @@ -2250,6 +2275,21 @@ mount_retry:
+>  				already_uppercased = 1;
+>  				goto mount_retry;
+>  			}
+
+Need to reset options again before goto I guess. Maybe reset option
+after the retry label?
+
+>  	}
+> -	free(options);
+> -	free(orgoptions);
+> -	free(mountpoint);
+> +	if (reinit_parsed_info)
+> +		free(reinit_parsed_info);
+> +	if (options)
+> +		free(options);
+> +	if (orgoptions)
+> +		free(orgoptions);
+> +	if (mountpoint)
+> +		free(mountpoint);
+>  	return rc;
+
+free(NULL) is defined to be a no-op, you don't need the checks.
+
+Cheers,
+-- 
+Aurélien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
