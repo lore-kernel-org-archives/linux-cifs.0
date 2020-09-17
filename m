@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9ED4C43461
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 19:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8053C3526A
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 19:42:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E91C221EC
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 19:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0ABA22208
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 19:42:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="V0mCKcOW"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ab937xav"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728040AbgIQPNu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Sep 2020 11:13:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37456 "EHLO
+        id S1727914AbgIQPNe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Sep 2020 11:13:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727958AbgIQPLm (ORCPT
+        with ESMTP id S1727960AbgIQPLm (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Sep 2020 11:11:42 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBDD2C061356;
-        Thu, 17 Sep 2020 08:10:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE7FC0612F2;
+        Thu, 17 Sep 2020 08:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=VYle+Dy78vGTLJwXqjetxI7H6ckJt5lDFPp8DD2uNGg=; b=V0mCKcOWAD8LZwIpL8pYZJAODz
-        ks+ksIQuf2jXnakiEJa2r+1ydB3o4OV0U8IbKATo2l/9ikpsHf1fkR+V3rxyB66/wQOUhBaLbMdLj
-        6ndjrHb5ife/voKvoE6tbqaARAJh8rBEPWbqNhl4pM+DcKaPCG+C1d+1eawTVjva18TxCLbTbPxvN
-        VlX+BF7sHG36BMaf3mqJvTuHegLCTJaT1VK/d0j1mqUuF6P2GH1tGCTjYNgYtaAh9FTNOwnYoIozA
-        P+PcpgZmeJGFJRA/lFJknTpeXa2yh/EVHrCtzQ9dV1oP9s1Oc75pRO5fPsB43W7ntB/iyA0nyqwco
-        DGNIOLZA==;
+        bh=7bp7tBDREj0/quRwoGKFhcM4IA6X+ak+6znUWRbIy7w=; b=Ab937xavvtVmodPI2thUSGdAlk
+        XIba4t3pVWHQS6GXPdgChNV++4m2pWszb+TrwGgDuHl9lLSuinZjp2hFDRXec+62BpUjm82laGwbh
+        JN/W0bXPQaaE0Q5jmTXDfMNCxo+N33xx38Z5TH1Ekmq6LWsMu3AaAKlJNv2F36kXaJ1bzo4y69HPF
+        L+XH8pTHAvL0tRdG4imOcEeu6JMtw6zPlA/0bm/X/VAPExraituJ0c+ceD9lLq4MB6OiwXHjnFLZM
+        JeoXS++sD/pEEDMkBpD7WdUDOHe1HIUOdAEJpCDDg19BRjFTtuPDBSOja8O+dcKYbSjRiBIs5WHms
+        Nj8/IOiw==;
 Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kIvYl-0001Qk-4V; Thu, 17 Sep 2020 15:10:55 +0000
+        id 1kIvYl-0001Qv-Jz; Thu, 17 Sep 2020 15:10:55 +0000
 From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To:     linux-fsdevel@vger.kernel.org
 Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
@@ -44,9 +44,9 @@ Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
         ecryptfs@vger.kernel.org, linux-um@lists.infradead.org,
         linux-mtd@lists.infradead.org, Richard Weinberger <richard@nod.at>
-Subject: [PATCH 12/13] udf: Tell the VFS that readpage was synchronous
-Date:   Thu, 17 Sep 2020 16:10:49 +0100
-Message-Id: <20200917151050.5363-13-willy@infradead.org>
+Subject: [PATCH 13/13] vboxsf: Tell the VFS that readpage was synchronous
+Date:   Thu, 17 Sep 2020 16:10:50 +0100
+Message-Id: <20200917151050.5363-14-willy@infradead.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200917151050.5363-1-willy@infradead.org>
 References: <20200917151050.5363-1-willy@infradead.org>
@@ -56,29 +56,27 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The udf inline data readpage implementation was already synchronous,
+The vboxsf inline data readpage implementation was already synchronous,
 so use AOP_UPDATED_PAGE to avoid cycling the page lock.
 
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- fs/udf/file.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ fs/vboxsf/file.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/fs/udf/file.c b/fs/udf/file.c
-index 628941a6b79a..52bbe92d7c43 100644
---- a/fs/udf/file.c
-+++ b/fs/udf/file.c
-@@ -61,9 +61,8 @@ static int udf_adinicb_readpage(struct file *file, struct page *page)
- {
- 	BUG_ON(!PageLocked(page));
- 	__udf_adinicb_readpage(page);
--	unlock_page(page);
+diff --git a/fs/vboxsf/file.c b/fs/vboxsf/file.c
+index c4ab5996d97a..c2a144e5cb5a 100644
+--- a/fs/vboxsf/file.c
++++ b/fs/vboxsf/file.c
+@@ -228,6 +228,8 @@ static int vboxsf_readpage(struct file *file, struct page *page)
+ 	}
  
--	return 0;
-+	return AOP_UPDATED_PAGE;
+ 	kunmap(page);
++	if (!err)
++		return AOP_UPDATED_PAGE;
+ 	unlock_page(page);
+ 	return err;
  }
- 
- static int udf_adinicb_writepage(struct page *page,
 -- 
 2.28.0
 
