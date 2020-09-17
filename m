@@ -1,89 +1,92 @@
-Return-Path: <SRS0=zmi3=CZ=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=/4jl=C2=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 490E1C43461
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Sep 2020 19:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0611BC433E2
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 02:18:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A01D9205F4
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Sep 2020 19:01:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C3D12072E
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 02:18:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PhQ+u5UL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728173AbgIPTBi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 16 Sep 2020 15:01:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35764 "EHLO
+        id S1725987AbgIQCSB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 16 Sep 2020 22:18:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727535AbgIPRsy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Sep 2020 13:48:54 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02EDDC06178B
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2020 10:48:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42; h=Message-ID:Date:To:From:CC;
-        bh=77NnYH5ZvfIFIyHiyKvHOrWUv8EGAZcGimAFJnZWzB8=; b=hNPjPb2owcJgsLEBfDu9+Y8hlr
-        UhcCxqMgtUSrntJm9IJC6sPAP13i5IjbF+rD4Q+tSFNTqDVgUiPaD1Pth5TbZV9llWoTzBjsgubF4
-        GYLEZp9iLJlY0wrjNzUu+E3oWR3pxcgeqZQg6v3OPDKuZA9BePYdbQN4uJzEhK5tdoD60mloUb+np
-        UDgwXwYUhuH3tZ+rjYp6vNmQk2fSA3Y6vlEb44erDJ7/6XA4oSnK14dapH69TXF/xMWO43XyuTxEl
-        A70gKSdg2FofjVAduByLDNP0vykK18feTniyoAMvKlo1Kw9j4DL51Nj5JxzcLc1y1Pth32Zo6BvzR
-        dAnN+5JC8EturkMWrX/xJ2C/FQAn0NXn1Sa0HA9hKYCClcw6pnk+pXF887j5wl/2/s78h6R/f9ZK5
-        BlGaZ/TN0EFUXIvsNlggBHqmy5uJOkEhUtBV08dnnlfaHhIzBfnr3aQGY2egNYbK82L0ZlmJUCb+S
-        We8TkwzyldWQF10mGiusAXzv;
-Received: from [2a01:4f8:192:486::6:0] (port=61620 helo=hr6.samba.org) 
-        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
-        (Exim)
-        id 1kIbXi-0007W8-Mp
-        for cifs-qa@samba.org; Wed, 16 Sep 2020 17:48:30 +0000
-Received: from [::1] (port=26762 helo=bugzilla.samba.org)
-        by hr6.samba.org with esmtp (Exim 4.93)
-        (envelope-from <samba-bugs@samba.org>)
-        id 1kIbXi-002T1l-I0
-        for cifs-qa@samba.org; Wed, 16 Sep 2020 17:48:30 +0000
-From:   samba-bugs@samba.org
-To:     cifs-qa@samba.org
-Subject: [Bug 14498] Why is mount -a is not detecting an already mounted DFS
- share endpoint
-Date:   Wed, 16 Sep 2020 17:48:30 +0000
-X-Bugzilla-Reason: QAcontact
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: CifsVFS
-X-Bugzilla-Component: user space tools
-X-Bugzilla-Version: 3.x
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: Chris@craftypenguins.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P5
-X-Bugzilla-Assigned-To: jlayton@samba.org
-X-Bugzilla-Target-Milestone: ---
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-14498-10630-yVEtJfx7Uv@https.bugzilla.samba.org/>
-In-Reply-To: <bug-14498-10630@https.bugzilla.samba.org/>
-References: <bug-14498-10630@https.bugzilla.samba.org/>
+        with ESMTP id S1725267AbgIQCSA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Sep 2020 22:18:00 -0400
+X-Greylist: delayed 597 seconds by postgrey-1.27 at vger.kernel.org; Wed, 16 Sep 2020 22:18:00 EDT
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3194C06178B
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2020 19:08:01 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id x20so503599ybs.8
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2020 19:08:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=JHnHkJ2uopug0Es0IzDJr1dgkC5qx7eXuHCd1M02iX8=;
+        b=PhQ+u5UL+55fhl7fAWZVNUFqxJKA+H1P2GnxGonofPnFtyPiRLfdGkZ8Y2JQ28eatP
+         /gKSCxS486U/CylmX1HGjr5nI8Sdy5f0gD1H2/HjJpT00XhfY8Q5RzLc076uKGttPY8h
+         WDCWZKRXyQ6vwLzucfk1T1vIE+DMuDiq/0jL5Si6OAztB6082uFk74xRsUkuZGfkoDVd
+         ks009IOhGkgWcyszupCznJxY+X4TwTjxxq7DOaRvf0GWD0Zff3w5W2JJUESKhhcDvXmr
+         otOj0YZMQlHe4jUXXwlB/YputdeC0TWowv+d2eQ21+dbLYlmtgicHi5lL1VnIOOv13sq
+         EpXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=JHnHkJ2uopug0Es0IzDJr1dgkC5qx7eXuHCd1M02iX8=;
+        b=V0UR5Bf3yCallHp3G4IGW6EBT0IF/yudGShPHojyfK7nYYJnU10nBb7K0q76JcStpo
+         mIS2wZvQP4/eJ3bUSpgMl/9kmmi7AVnT1Dz6c47jHS89Ey/chzxCwzOGTakB6Eb5qH5e
+         iUWBdkaN+Us9EcNYZSyKbEiITa1W96BWjr1Wbo5lRSUBXi4q6wWGyeTAUkrQOkFTMZPg
+         q/JYx34Th3dC8/p2JG6ribdYiS6YEIXZWwmyjPSI3xx36RptNqYhFXrLrZw1XMeQ6CAD
+         hIsnVOPAEUdOIHWPLb3cd2mbK1b2AHtLxAzmbdRWsO1fQXKWuOwhVqfbDibWn31wrhcx
+         TkLA==
+X-Gm-Message-State: AOAM5322xA8FW0KMSPYFE6KSVdlO3vK0S/FeunPLvyZcaWhP2wQSsVA6
+        dIIR3KxrwG5IDLes1m/teDF2zIUQREutJacDBfU=
+X-Google-Smtp-Source: ABdhPJzvlc4q9trvVKdS9DzFUu1uhcU5oiWkUk/LJvr+XKVd7YaLxAqPqnDZb4FtUBNdn40NFJouDJhiqS/9RaNmNQ4=
+X-Received: by 2002:a25:5f4c:: with SMTP id h12mr37314503ybm.97.1600308480669;
+ Wed, 16 Sep 2020 19:08:00 -0700 (PDT)
+MIME-Version: 1.0
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Thu, 17 Sep 2020 07:37:50 +0530
+Message-ID: <CANT5p=qTXPkjqBuR9cvwQoRZFb72gY4M22tMG5Q_1XC9vvKZcg@mail.gmail.com>
+Subject: mutiuser request_key in both ntlmssp and krb5
+To:     Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.samba.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-Sender: linux-cifs-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-https://bugzilla.samba.org/show_bug.cgi?id=3D14498
+Hi,
 
---- Comment #1 from Chris Pickett <Chris@craftypenguins.net> ---
-The result is duplicate mount processes created for every mount -a attempte=
-d.
-We had a cron that was calling mount -a every 5 min so we were building up
-quite a few entries in /proc/mounts.
+I was going through the code path in cifs.ko where we get the
+credentials of an user using request_key mechanism. And I think there
+may be an issue in both ntlmssp and krb5 case.
+
+1. For ntlmssp, I see that the credentials are stored in the keyring
+with IPv4 or IPv6 address as the key. Suppose the mount was initially
+done using hostname, and IP address changes (more likely in Azure
+scenario), we may end up looking for credentials with the wrong key.
+
+2. For ntlmssp, if I add another user credentials to the keyring using
+cifscreds, doesn=E2=80=99t that overwrite the prev user=E2=80=99s credentia=
+ls? Or is
+there a way to store multiple credentials for the same server?
+
+3. For krb5, and multiuser mount, how should cifs.ko get the username
+for a user? Currently, I don=E2=80=99t think we read the username from
+anywhere.
 
 --=20
-You are receiving this mail because:
-You are the QA Contact for the bug.=
+-Shyam
