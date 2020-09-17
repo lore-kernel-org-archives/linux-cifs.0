@@ -2,96 +2,92 @@ Return-Path: <SRS0=/4jl=C2=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB58C43461
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 16:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D571C433E2
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 19:42:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5788221D7B
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 16:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600361428;
-	bh=sF5GNWOZkQ3nf3+Th5gnQt2xcpsdwKBCS7zrVGfmbVw=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
-	b=yWqNCsQfNIwc9tFJzmbplgCLy3h59s4Tz8mKdS2NLU7MFl7x6A0HaAbOt7WcO5ynb
-	 ceubz+qHD+ilQvIowTp65iE+etEGLzY/g1yvhQx5I9q90hgJT7yuf1pNyagBrWlY/b
-	 hFGbo/PIF3ShpsIwgAtoHtZXpZqq0tI1KJE45gPk=
+	by mail.kernel.org (Postfix) with ESMTP id E94B321D92
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Sep 2020 19:42:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="D645jx3+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728668AbgIQQt7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Sep 2020 12:49:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54870 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728640AbgIQQtn (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 17 Sep 2020 12:49:43 -0400
-Received: from tleilax.poochiereds.net (68-20-15-154.lightspeed.rlghnc.sbcglobal.net [68.20.15.154])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 650562220E;
-        Thu, 17 Sep 2020 16:49:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600361382;
-        bh=sF5GNWOZkQ3nf3+Th5gnQt2xcpsdwKBCS7zrVGfmbVw=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=y+iGlgpCeM9xb9d27IMJV7+wkEMiK0mQoV9W7l5UCg8sFTmZkgM99uNvIc2+GWqlH
-         0ZPlY/toTe9JazTgGCZZDIpYPmlLHd2V1m/PsaZcDqBuvctHhOeuwFRx8Pao5bfxG/
-         9CS6yNA1rBp1Aud48qlKW00CelvRgOeuZ6WNzkHg=
-Message-ID: <57d35fdb5ea646f96b70fd8b8a29434761c3f1d3.camel@kernel.org>
-Subject: Re: [PATCH 04/13] ceph: Tell the VFS that readpage was synchronous
-From:   Jeff Layton <jlayton@kernel.org>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-fsdevel@vger.kernel.org
-Cc:     linux-mm@kvack.org, v9fs-developer@lists.sourceforge.net,
+        id S1727803AbgIQPNt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Sep 2020 11:13:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727961AbgIQPLm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Sep 2020 11:11:42 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50087C06121C;
+        Thu, 17 Sep 2020 08:10:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=7PovnjudVvfMFRelS0S3FBS5rSwGm8lIgwb2+HktnS4=; b=D645jx3+cFCsRRamnPvY93SEZp
+        5idHKpebB8d3ADFC2w4jUoevXr+eTIRxNa5kP7rmXI6dNgJMDifFkNUwyxkfzlOpmnvRWxVU5jou6
+        Xw3Ux6iN9o3h3kHwgElGrUzy3LHDgVNd3s5BPl5exxvz1fUpq9hJvXiR37faoM+sF3w8SWjVVHpn7
+        XgSvgnOD/jvaGa9gFE7xBAHrq5dHmW9PfWz6ML6kWQtUWTATDyCEZSzBC/OaokwaNH9edWskgRnmd
+        ND+y1E4RMQjT3HXerG2yb2g3MloOlpPyn3rFXB+gng2IT5jOzDOkDYvVy7UnUbP3VIkuuaEa5JGWf
+        4qy4un+Q==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kIvYi-0001PN-HJ; Thu, 17 Sep 2020 15:10:52 +0000
+From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        linux-mm@kvack.org, v9fs-developer@lists.sourceforge.net,
         linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
         ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
         ecryptfs@vger.kernel.org, linux-um@lists.infradead.org,
         linux-mtd@lists.infradead.org, Richard Weinberger <richard@nod.at>
-Date:   Thu, 17 Sep 2020 12:49:40 -0400
-In-Reply-To: <20200917151050.5363-5-willy@infradead.org>
+Subject: [PATCH 02/13] 9p: Tell the VFS that readpage was synchronous
+Date:   Thu, 17 Sep 2020 16:10:39 +0100
+Message-Id: <20200917151050.5363-3-willy@infradead.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200917151050.5363-1-willy@infradead.org>
 References: <20200917151050.5363-1-willy@infradead.org>
-         <20200917151050.5363-5-willy@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, 2020-09-17 at 16:10 +0100, Matthew Wilcox (Oracle) wrote:
-> The ceph readpage implementation was already synchronous, so use
-> AOP_UPDATED_PAGE to avoid cycling the page lock.
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> ---
->  fs/ceph/addr.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
-> index 6ea761c84494..b2bf8bf7a312 100644
-> --- a/fs/ceph/addr.c
-> +++ b/fs/ceph/addr.c
-> @@ -291,10 +291,11 @@ static int ceph_do_readpage(struct file *filp, struct page *page)
->  static int ceph_readpage(struct file *filp, struct page *page)
->  {
->  	int r = ceph_do_readpage(filp, page);
-> -	if (r != -EINPROGRESS)
-> -		unlock_page(page);
-> -	else
-> -		r = 0;
-> +	if (r == -EINPROGRESS)
-> +		return 0;
-> +	if (r == 0)
-> +		return AOP_UPDATED_PAGE;
-> +	unlock_page(page);
->  	return r;
->  }
->  
+The 9p readpage implementation was already synchronous, so use
+AOP_UPDATED_PAGE to avoid cycling the page lock.
 
-Looks good to me. I assume you'll merge all of these as a set since the
-early ones are a prerequisite?
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+---
+ fs/9p/vfs_addr.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+index cce9ace651a2..506ca0ba2ec7 100644
+--- a/fs/9p/vfs_addr.c
++++ b/fs/9p/vfs_addr.c
+@@ -65,7 +65,7 @@ static int v9fs_fid_readpage(void *data, struct page *page)
+ 	SetPageUptodate(page);
+ 
+ 	v9fs_readpage_to_fscache(inode, page);
+-	retval = 0;
++	return AOP_UPDATED_PAGE;
+ 
+ done:
+ 	unlock_page(page);
+@@ -280,6 +280,10 @@ static int v9fs_write_begin(struct file *filp, struct address_space *mapping,
+ 		goto out;
+ 
+ 	retval = v9fs_fid_readpage(v9inode->writeback_fid, page);
++	if (retval == AOP_UPDATED_PAGE) {
++		retval = 0;
++		goto out;
++	}
+ 	put_page(page);
+ 	if (!retval)
+ 		goto start;
+-- 
+2.28.0
 
