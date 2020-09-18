@@ -4,51 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B39F6C43466
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD41C43464
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:37:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A41123770
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:30:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52CB623770
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:37:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600396220;
-	bh=BxAR5DR8sOCt1ML4LtPIcTgM9jluZ75FBve6Fih/zyY=;
+	s=default; t=1600396625;
+	bh=xnlrAQoUpREOaEJQKveMN0N7XoxXsjo1W1a7sQ+pTog=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=OjjwGqp8JjWIsN9g/RsGiNqOEaQmHVhDiL6RbqQCwnXF2gDOhiYHFLklHeM3hvBrW
-	 SYV5/LVvqzBM2WTVPZ38hWocUqYHb9XwTjuIxXYi/XOmSpSf027ghPrD2sA+yGwejE
-	 8s0G08XUYkUUxc0fzbnMp8/fuw4aiHZk1Wz21rvA=
+	b=NohVqOSxp3SbuwE05gFpDeyD03d1hwc0Cx91s+ruxKaGFtOaGKmI2zmBORLhXDkVP
+	 F2TLeyi6ByW9N8BbVX566PYH++u/53aqaASKDzllszNc5q74QevbACdiE+3KFuTDt0
+	 fVo90Hyz9VoAUkjopOsNrwlLJDYvNqDkEGxi8YQs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727708AbgIRCaL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Sep 2020 22:30:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43188 "EHLO mail.kernel.org"
+        id S1728825AbgIRCMr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Sep 2020 22:12:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39418 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729109AbgIRCOs (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:14:48 -0400
+        id S1727945AbgIRCMr (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:12:47 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BEE8423976;
-        Fri, 18 Sep 2020 02:14:46 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 95DEC235F9;
+        Fri, 18 Sep 2020 02:12:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395287;
-        bh=BxAR5DR8sOCt1ML4LtPIcTgM9jluZ75FBve6Fih/zyY=;
+        s=default; t=1600395165;
+        bh=xnlrAQoUpREOaEJQKveMN0N7XoxXsjo1W1a7sQ+pTog=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KFs2VtC35OuO1YGPgb56uqssuAlIw4OFxU445n689IGYelBMj+3UKyphpoFR30JhU
-         gDxJ1j1wvKrORBZVvuhaQx0LMreNfJGqaM+i/5VZKusdHv7cnUWW5VMKsKLV+LNU0x
-         QgmEorDJNsIbVW9Mv55Dm9eqq2Oh8Pj1ftERoSJA=
+        b=m8aGO9CpM7AV5XiG5HZ8qSjHgkG3b6VdMYkzTU+l1nt+nyA/M/bG0Vt6vwxzuGhp+
+         WJnAYLZlGfsQGiJb9ABWGCOsoeMzHPuWiPU6y9qaV1F6CKHg/tnYY1BxATOwP8QElw
+         P4VrOaC0eBXzX7HNbNTvdqZqQdjvCIT0Ute8CZUM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
-        Hulk Robot <hulkci@huawei.com>,
+Cc:     Pavel Shilovsky <pshilov@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.14 122/127] cifs: Fix double add page to memcg when cifs_readpages
-Date:   Thu, 17 Sep 2020 22:12:15 -0400
-Message-Id: <20200918021220.2066485-122-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 022/127] CIFS: Properly process SMB3 lease breaks
+Date:   Thu, 17 Sep 2020 22:10:35 -0400
+Message-Id: <20200918021220.2066485-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200918021220.2066485-1-sashal@kernel.org>
 References: <20200918021220.2066485-1-sashal@kernel.org>
@@ -60,143 +58,320 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+From: Pavel Shilovsky <pshilov@microsoft.com>
 
-[ Upstream commit 95a3d8f3af9b0d63b43f221b630beaab9739d13a ]
+[ Upstream commit 9bd4540836684013aaad6070a65d6fcdd9006625 ]
 
-When xfstests generic/451, there is an BUG at mm/memcontrol.c:
-  page:ffffea000560f2c0 refcount:2 mapcount:0 mapping:000000008544e0ea
-       index:0xf
-  mapping->aops:cifs_addr_ops dentry name:"tst-aio-dio-cycle-write.451"
-  flags: 0x2fffff80000001(locked)
-  raw: 002fffff80000001 ffffc90002023c50 ffffea0005280088 ffff88815cda0210
-  raw: 000000000000000f 0000000000000000 00000002ffffffff ffff88817287d000
-  page dumped because: VM_BUG_ON_PAGE(page->mem_cgroup)
-  page->mem_cgroup:ffff88817287d000
-  ------------[ cut here ]------------
-  kernel BUG at mm/memcontrol.c:2659!
-  invalid opcode: 0000 [#1] SMP
-  CPU: 2 PID: 2038 Comm: xfs_io Not tainted 5.8.0-rc1 #44
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_
-    073836-buildvm-ppc64le-16.ppc.4
-  RIP: 0010:commit_charge+0x35/0x50
-  Code: 0d 48 83 05 54 b2 02 05 01 48 89 77 38 c3 48 c7
-        c6 78 4a ea ba 48 83 05 38 b2 02 05 01 e8 63 0d9
-  RSP: 0018:ffffc90002023a50 EFLAGS: 00010202
-  RAX: 0000000000000000 RBX: ffff88817287d000 RCX: 0000000000000000
-  RDX: 0000000000000000 RSI: ffff88817ac97ea0 RDI: ffff88817ac97ea0
-  RBP: ffffea000560f2c0 R08: 0000000000000203 R09: 0000000000000005
-  R10: 0000000000000030 R11: ffffc900020237a8 R12: 0000000000000000
-  R13: 0000000000000001 R14: 0000000000000001 R15: ffff88815a1272c0
-  FS:  00007f5071ab0800(0000) GS:ffff88817ac80000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 000055efcd5ca000 CR3: 000000015d312000 CR4: 00000000000006e0
-  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-  Call Trace:
-   mem_cgroup_charge+0x166/0x4f0
-   __add_to_page_cache_locked+0x4a9/0x710
-   add_to_page_cache_locked+0x15/0x20
-   cifs_readpages+0x217/0x1270
-   read_pages+0x29a/0x670
-   page_cache_readahead_unbounded+0x24f/0x390
-   __do_page_cache_readahead+0x3f/0x60
-   ondemand_readahead+0x1f1/0x470
-   page_cache_async_readahead+0x14c/0x170
-   generic_file_buffered_read+0x5df/0x1100
-   generic_file_read_iter+0x10c/0x1d0
-   cifs_strict_readv+0x139/0x170
-   new_sync_read+0x164/0x250
-   __vfs_read+0x39/0x60
-   vfs_read+0xb5/0x1e0
-   ksys_pread64+0x85/0xf0
-   __x64_sys_pread64+0x22/0x30
-   do_syscall_64+0x69/0x150
-   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-  RIP: 0033:0x7f5071fcb1af
-  Code: Bad RIP value.
-  RSP: 002b:00007ffde2cdb8e0 EFLAGS: 00000293 ORIG_RAX: 0000000000000011
-  RAX: ffffffffffffffda RBX: 00007ffde2cdb990 RCX: 00007f5071fcb1af
-  RDX: 0000000000001000 RSI: 000055efcd5ca000 RDI: 0000000000000003
-  RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
-  R10: 0000000000001000 R11: 0000000000000293 R12: 0000000000000001
-  R13: 000000000009f000 R14: 0000000000000000 R15: 0000000000001000
-  Modules linked in:
-  ---[ end trace 725fa14a3e1af65c ]---
+Currenly we doesn't assume that a server may break a lease
+from RWH to RW which causes us setting a wrong lease state
+on a file and thus mistakenly flushing data and byte-range
+locks and purging cached data on the client. This leads to
+performance degradation because subsequent IOs go directly
+to the server.
 
-Since commit 3fea5a499d57 ("mm: memcontrol: convert page cache to a new
-mem_cgroup_charge() API") not cancel the page charge, the pages maybe
-double add to pagecache:
-thread1                       | thread2
-cifs_readpages
-readpages_get_pages
- add_to_page_cache_locked(head,index=n)=0
-                              | readpages_get_pages
-                              | add_to_page_cache_locked(head,index=n+1)=0
- add_to_page_cache_locked(head, index=n+1)=-EEXIST
- then, will next loop with list head page's
- index=n+1 and the page->mapping not NULL
-readpages_get_pages
-add_to_page_cache_locked(head, index=n+1)
- commit_charge
-  VM_BUG_ON_PAGE
+Fix this by propagating new lease state and epoch values
+to the oplock break handler through cifsFileInfo structure
+and removing the use of cifsInodeInfo flags for that. It
+allows to avoid some races of several lease/oplock breaks
+using those flags in parallel.
 
-So, we should not do the next loop when any page add to page cache
-failed.
-
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/file.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ fs/cifs/cifsglob.h |  9 ++++++---
+ fs/cifs/file.c     | 10 +++++++---
+ fs/cifs/misc.c     | 17 +++--------------
+ fs/cifs/smb1ops.c  |  8 +++-----
+ fs/cifs/smb2misc.c | 32 +++++++-------------------------
+ fs/cifs/smb2ops.c  | 44 ++++++++++++++++++++++++++++++--------------
+ fs/cifs/smb2pdu.h  |  2 +-
+ 7 files changed, 57 insertions(+), 65 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 600bb838c15b8..f166fcb48ac0e 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -246,8 +246,9 @@ struct smb_version_operations {
+ 	int (*check_message)(char *, unsigned int, struct TCP_Server_Info *);
+ 	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
+ 	int (*handle_cancelled_mid)(char *, struct TCP_Server_Info *);
+-	void (*downgrade_oplock)(struct TCP_Server_Info *,
+-					struct cifsInodeInfo *, bool);
++	void (*downgrade_oplock)(struct TCP_Server_Info *server,
++				 struct cifsInodeInfo *cinode, __u32 oplock,
++				 unsigned int epoch, bool *purge_cache);
+ 	/* process transaction2 response */
+ 	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
+ 			     char *, int);
+@@ -1092,6 +1093,8 @@ struct cifsFileInfo {
+ 	unsigned int f_flags;
+ 	bool invalidHandle:1;	/* file closed via session abend */
+ 	bool oplock_break_cancelled:1;
++	unsigned int oplock_epoch; /* epoch from the lease break */
++	__u32 oplock_level; /* oplock/lease level from the lease break */
+ 	int count;
+ 	spinlock_t file_info_lock; /* protects four flag/count fields above */
+ 	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
+@@ -1223,7 +1226,7 @@ struct cifsInodeInfo {
+ 	unsigned int epoch;		/* used to track lease state changes */
+ #define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) /* oplock break in progress */
+ #define CIFS_INODE_PENDING_WRITERS	  (1) /* Writes in progress */
+-#define CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2 (2) /* Downgrade oplock to L2 */
++#define CIFS_INODE_FLAG_UNUSED		  (2) /* Unused flag */
+ #define CIFS_INO_DELETE_PENDING		  (3) /* delete pending on server */
+ #define CIFS_INO_INVALID_MAPPING	  (4) /* pagecache is invalid */
+ #define CIFS_INO_LOCK			  (5) /* lock bit for synchronization */
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 0981731132ec0..6c77a96437e61 100644
+index 72e7cbfb325a6..0981731132ec0 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -3753,7 +3753,8 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 			break;
+@@ -4135,12 +4135,13 @@ void cifs_oplock_break(struct work_struct *work)
+ 	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 	int rc = 0;
++	bool purge_cache = false;
  
- 		__SetPageLocked(page);
--		if (add_to_page_cache_locked(page, mapping, page->index, gfp)) {
-+		rc = add_to_page_cache_locked(page, mapping, page->index, gfp);
-+		if (rc) {
- 			__ClearPageLocked(page);
- 			break;
+ 	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
+ 			TASK_UNINTERRUPTIBLE);
+ 
+-	server->ops->downgrade_oplock(server, cinode,
+-		test_bit(CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2, &cinode->flags));
++	server->ops->downgrade_oplock(server, cinode, cfile->oplock_level,
++				      cfile->oplock_epoch, &purge_cache);
+ 
+ 	if (!CIFS_CACHE_WRITE(cinode) && CIFS_CACHE_READ(cinode) &&
+ 						cifs_has_mand_locks(cinode)) {
+@@ -4155,18 +4156,21 @@ void cifs_oplock_break(struct work_struct *work)
+ 		else
+ 			break_lease(inode, O_WRONLY);
+ 		rc = filemap_fdatawrite(inode->i_mapping);
+-		if (!CIFS_CACHE_READ(cinode)) {
++		if (!CIFS_CACHE_READ(cinode) || purge_cache) {
+ 			rc = filemap_fdatawait(inode->i_mapping);
+ 			mapping_set_error(inode->i_mapping, rc);
+ 			cifs_zap_mapping(inode);
  		}
-@@ -3769,6 +3770,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 	struct list_head *page_list, unsigned num_pages)
+ 		cifs_dbg(FYI, "Oplock flush inode %p rc %d\n", inode, rc);
++		if (CIFS_CACHE_WRITE(cinode))
++			goto oplock_break_ack;
+ 	}
+ 
+ 	rc = cifs_push_locks(cfile);
+ 	if (rc)
+ 		cifs_dbg(VFS, "Push locks rc = %d\n", rc);
+ 
++oplock_break_ack:
+ 	/*
+ 	 * releasing stale oplock after recent reconnect of smb session using
+ 	 * a now incorrect file handle is not a data integrity issue but do
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 76f1649ab444f..d0e024856c0d4 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -473,21 +473,10 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
+ 				set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK,
+ 					&pCifsInode->flags);
+ 
+-				/*
+-				 * Set flag if the server downgrades the oplock
+-				 * to L2 else clear.
+-				 */
+-				if (pSMB->OplockLevel)
+-					set_bit(
+-					   CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+-					   &pCifsInode->flags);
+-				else
+-					clear_bit(
+-					   CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+-					   &pCifsInode->flags);
+-
+-				cifs_queue_oplock_break(netfile);
++				netfile->oplock_epoch = 0;
++				netfile->oplock_level = pSMB->OplockLevel;
+ 				netfile->oplock_break_cancelled = false;
++				cifs_queue_oplock_break(netfile);
+ 
+ 				spin_unlock(&tcon->open_file_lock);
+ 				spin_unlock(&cifs_tcp_ses_lock);
+diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
+index 483458340b10c..9b271ae641c19 100644
+--- a/fs/cifs/smb1ops.c
++++ b/fs/cifs/smb1ops.c
+@@ -379,12 +379,10 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
+ 
+ static void
+ cifs_downgrade_oplock(struct TCP_Server_Info *server,
+-			struct cifsInodeInfo *cinode, bool set_level2)
++		      struct cifsInodeInfo *cinode, __u32 oplock,
++		      unsigned int epoch, bool *purge_cache)
  {
- 	int rc;
-+	int err = 0;
- 	struct list_head tmplist;
- 	struct cifsFileInfo *open_file = file->private_data;
- 	struct cifs_sb_info *cifs_sb = CIFS_FILE_SB(file);
-@@ -3809,7 +3811,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 	 * the order of declining indexes. When we put the pages in
- 	 * the rdata->pages, then we want them in increasing order.
- 	 */
--	while (!list_empty(page_list)) {
-+	while (!list_empty(page_list) && !err) {
- 		unsigned int i, nr_pages, bytes, rsize;
- 		loff_t offset;
- 		struct page *page, *tpage;
-@@ -3832,9 +3834,10 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
- 			return 0;
- 		}
+-	if (set_level2)
+-		cifs_set_oplock_level(cinode, OPLOCK_READ);
+-	else
+-		cifs_set_oplock_level(cinode, 0);
++	cifs_set_oplock_level(cinode, oplock);
+ }
  
--		rc = readpages_get_pages(mapping, page_list, rsize, &tmplist,
-+		nr_pages = 0;
-+		err = readpages_get_pages(mapping, page_list, rsize, &tmplist,
- 					 &nr_pages, &offset, &bytes);
--		if (rc) {
-+		if (!nr_pages) {
- 			add_credits_and_wake_if(server, credits, 0);
- 			break;
- 		}
+ static bool
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index ff2ad15f67d63..0c6e5450ff765 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -496,7 +496,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+ 
+ 		cifs_dbg(FYI, "found in the open list\n");
+ 		cifs_dbg(FYI, "lease key match, lease break 0x%x\n",
+-			 le32_to_cpu(rsp->NewLeaseState));
++			 lease_state);
+ 
+ 		if (ack_req)
+ 			cfile->oplock_break_cancelled = false;
+@@ -505,17 +505,8 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+ 
+ 		set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK, &cinode->flags);
+ 
+-		/*
+-		 * Set or clear flags depending on the lease state being READ.
+-		 * HANDLE caching flag should be added when the client starts
+-		 * to defer closing remote file handles with HANDLE leases.
+-		 */
+-		if (lease_state & SMB2_LEASE_READ_CACHING_HE)
+-			set_bit(CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+-				&cinode->flags);
+-		else
+-			clear_bit(CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+-				  &cinode->flags);
++		cfile->oplock_epoch = le16_to_cpu(rsp->Epoch);
++		cfile->oplock_level = lease_state;
+ 
+ 		cifs_queue_oplock_break(cfile);
+ 		kfree(lw);
+@@ -538,7 +529,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+ 
+ 		cifs_dbg(FYI, "found in the pending open list\n");
+ 		cifs_dbg(FYI, "lease key match, lease break 0x%x\n",
+-			 le32_to_cpu(rsp->NewLeaseState));
++			 lease_state);
+ 
+ 		open->oplock = lease_state;
+ 	}
+@@ -650,18 +641,9 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
+ 				set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK,
+ 					&cinode->flags);
+ 
+-				/*
+-				 * Set flag if the server downgrades the oplock
+-				 * to L2 else clear.
+-				 */
+-				if (rsp->OplockLevel)
+-					set_bit(
+-					   CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+-					   &cinode->flags);
+-				else
+-					clear_bit(
+-					   CIFS_INODE_DOWNGRADE_OPLOCK_TO_L2,
+-					   &cinode->flags);
++				cfile->oplock_epoch = 0;
++				cfile->oplock_level = rsp->OplockLevel;
++
+ 				spin_unlock(&cfile->file_info_lock);
+ 
+ 				cifs_queue_oplock_break(cfile);
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index b46fdb2b8d349..90d4288907a61 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1935,22 +1935,38 @@ static long smb3_fallocate(struct file *file, struct cifs_tcon *tcon, int mode,
+ 
+ static void
+ smb2_downgrade_oplock(struct TCP_Server_Info *server,
+-			struct cifsInodeInfo *cinode, bool set_level2)
++		      struct cifsInodeInfo *cinode, __u32 oplock,
++		      unsigned int epoch, bool *purge_cache)
+ {
+-	if (set_level2)
+-		server->ops->set_oplock_level(cinode, SMB2_OPLOCK_LEVEL_II,
+-						0, NULL);
+-	else
+-		server->ops->set_oplock_level(cinode, 0, 0, NULL);
++	server->ops->set_oplock_level(cinode, oplock, 0, NULL);
+ }
+ 
+ static void
+-smb21_downgrade_oplock(struct TCP_Server_Info *server,
+-		       struct cifsInodeInfo *cinode, bool set_level2)
++smb21_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
++		       unsigned int epoch, bool *purge_cache);
++
++static void
++smb3_downgrade_oplock(struct TCP_Server_Info *server,
++		       struct cifsInodeInfo *cinode, __u32 oplock,
++		       unsigned int epoch, bool *purge_cache)
+ {
+-	server->ops->set_oplock_level(cinode,
+-				      set_level2 ? SMB2_LEASE_READ_CACHING_HE :
+-				      0, 0, NULL);
++	unsigned int old_state = cinode->oplock;
++	unsigned int old_epoch = cinode->epoch;
++	unsigned int new_state;
++
++	if (epoch > old_epoch) {
++		smb21_set_oplock_level(cinode, oplock, 0, NULL);
++		cinode->epoch = epoch;
++	}
++
++	new_state = cinode->oplock;
++	*purge_cache = false;
++
++	if ((old_state & CIFS_CACHE_READ_FLG) != 0 &&
++	    (new_state & CIFS_CACHE_READ_FLG) == 0)
++		*purge_cache = true;
++	else if (old_state == new_state && (epoch - old_epoch > 1))
++		*purge_cache = true;
+ }
+ 
+ static void
+@@ -2953,7 +2969,7 @@ struct smb_version_operations smb21_operations = {
+ 	.print_stats = smb2_print_stats,
+ 	.is_oplock_break = smb2_is_valid_oplock_break,
+ 	.handle_cancelled_mid = smb2_handle_cancelled_mid,
+-	.downgrade_oplock = smb21_downgrade_oplock,
++	.downgrade_oplock = smb2_downgrade_oplock,
+ 	.need_neg = smb2_need_neg,
+ 	.negotiate = smb2_negotiate,
+ 	.negotiate_wsize = smb2_negotiate_wsize,
+@@ -3048,7 +3064,7 @@ struct smb_version_operations smb30_operations = {
+ 	.dump_share_caps = smb2_dump_share_caps,
+ 	.is_oplock_break = smb2_is_valid_oplock_break,
+ 	.handle_cancelled_mid = smb2_handle_cancelled_mid,
+-	.downgrade_oplock = smb21_downgrade_oplock,
++	.downgrade_oplock = smb3_downgrade_oplock,
+ 	.need_neg = smb2_need_neg,
+ 	.negotiate = smb2_negotiate,
+ 	.negotiate_wsize = smb2_negotiate_wsize,
+@@ -3153,7 +3169,7 @@ struct smb_version_operations smb311_operations = {
+ 	.dump_share_caps = smb2_dump_share_caps,
+ 	.is_oplock_break = smb2_is_valid_oplock_break,
+ 	.handle_cancelled_mid = smb2_handle_cancelled_mid,
+-	.downgrade_oplock = smb21_downgrade_oplock,
++	.downgrade_oplock = smb3_downgrade_oplock,
+ 	.need_neg = smb2_need_neg,
+ 	.negotiate = smb2_negotiate,
+ 	.negotiate_wsize = smb2_negotiate_wsize,
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index bad458a2b579e..f8baa54c83008 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -1046,7 +1046,7 @@ struct smb2_oplock_break {
+ struct smb2_lease_break {
+ 	struct smb2_hdr hdr;
+ 	__le16 StructureSize; /* Must be 44 */
+-	__le16 Reserved;
++	__le16 Epoch;
+ 	__le32 Flags;
+ 	__u8   LeaseKey[16];
+ 	__le32 CurrentLeaseState;
 -- 
 2.25.1
 
