@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E345C43464
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF3FAC43465
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:24:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 643B723447
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:12:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9431623119
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:24:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600395131;
-	bh=w9/dF34yqfD0gfq1T/vSXrp3nYlmGnFhMvWOctXiNpc=;
+	s=default; t=1600395843;
+	bh=owqMCSq/juuzMI9jS1ARy6GjOUuI6uienC/99N+q3/w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=QUifGcjMSw17ca14k26bqJfx76Rrml4RTsswnXV1SY5HYyCxpwcre+g9iNXNHRXM3
-	 UuLSL/z+NiAdWcy/ezniSFcyF8vIh3EcplMckRss78RdCv8Gf52aaR+GJNCGtJK0uG
-	 ensMvoJmlV44PcLRs3NlwXtPI36vuzQhSMc5xdVU=
+	b=wCBjyHLUhly2t2WRQUlQohiyVZ+Ch1RdP2E/Gd6+zJ4IpawZekUMwBi1a4ed8qtDZ
+	 R9vcW17J80yQDtPwKhcoH6NMdabSV1Dcmk1aDSEIXiYz1/r+7n/E8NOw22KODdkeSN
+	 Q5kvI+nIlsK6EbTSfmTlG2hS2WTyeDmIEVct0aV4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728741AbgIRCMK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Sep 2020 22:12:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38188 "EHLO mail.kernel.org"
+        id S1728852AbgIRCYD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Sep 2020 22:24:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46564 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728689AbgIRCMG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:12:06 -0400
+        id S1729423AbgIRCQl (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:16:41 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5D9B423447;
-        Fri, 18 Sep 2020 02:12:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3B58523976;
+        Fri, 18 Sep 2020 02:16:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395125;
-        bh=w9/dF34yqfD0gfq1T/vSXrp3nYlmGnFhMvWOctXiNpc=;
+        s=default; t=1600395400;
+        bh=owqMCSq/juuzMI9jS1ARy6GjOUuI6uienC/99N+q3/w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YAuI3cjnKRM2aHJa4pyu5WpzY4qFbuYg5uSFH0qXDYpBzNgYXEGa9ZOjHUfFBlNEs
-         lKYacr1TuAxqKX1vQWDJflX2hJOReZjBs5nkC7hnFlevOK97DQGQ6b36qI8ej5qyUw
-         OVXDM4yp6cgkevLbiQjZ2VCGO9FWPeAAfTv0sils=
+        b=fsSmsWPrcCBQ5WUZYcBv1nG5DxvPzG3N+mh9Yf6NKI1ZrtqXC6ZSZhe5V6t4xBLRE
+         PCBlmsI4G5nYqbzn3H61a4uVy2S8KzRuTCASR+d5eyxKs6ujme5ozBKqNfbG85nD33
+         3QGdF1JdPUpSvHEaoEu5kShhs9lnDhpOXOB6DejU=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
@@ -46,12 +46,12 @@ Cc:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.19 196/206] cifs: Fix double add page to memcg when cifs_readpages
-Date:   Thu, 17 Sep 2020 22:07:52 -0400
-Message-Id: <20200918020802.2065198-196-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 88/90] cifs: Fix double add page to memcg when cifs_readpages
+Date:   Thu, 17 Sep 2020 22:14:53 -0400
+Message-Id: <20200918021455.2067301-88-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200918020802.2065198-1-sashal@kernel.org>
-References: <20200918020802.2065198-1-sashal@kernel.org>
+In-Reply-To: <20200918021455.2067301-1-sashal@kernel.org>
+References: <20200918021455.2067301-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -154,10 +154,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index e78b52c582f18..5cb15649adb07 100644
+index dca78b6e9ea32..24508b69e78b7 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -3804,7 +3804,8 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
+@@ -3531,7 +3531,8 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
  			break;
  
  		__SetPageLocked(page);
@@ -167,7 +167,7 @@ index e78b52c582f18..5cb15649adb07 100644
  			__ClearPageLocked(page);
  			break;
  		}
-@@ -3820,6 +3821,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+@@ -3547,6 +3548,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
  	struct list_head *page_list, unsigned num_pages)
  {
  	int rc;
@@ -175,7 +175,7 @@ index e78b52c582f18..5cb15649adb07 100644
  	struct list_head tmplist;
  	struct cifsFileInfo *open_file = file->private_data;
  	struct cifs_sb_info *cifs_sb = CIFS_FILE_SB(file);
-@@ -3860,7 +3862,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+@@ -3587,7 +3589,7 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
  	 * the order of declining indexes. When we put the pages in
  	 * the rdata->pages, then we want them in increasing order.
  	 */
@@ -184,7 +184,7 @@ index e78b52c582f18..5cb15649adb07 100644
  		unsigned int i, nr_pages, bytes, rsize;
  		loff_t offset;
  		struct page *page, *tpage;
-@@ -3883,9 +3885,10 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
+@@ -3610,9 +3612,10 @@ static int cifs_readpages(struct file *file, struct address_space *mapping,
  			return 0;
  		}
  
