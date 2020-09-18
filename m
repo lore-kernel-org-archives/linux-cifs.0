@@ -7,65 +7,64 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D76EC43466
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 04:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A8EC43463
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 08:40:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D3AB23600
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 04:08:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF681206FC
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 08:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726149AbgIREIs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Sep 2020 00:08:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
+        id S1726306AbgIRIkp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Sep 2020 04:40:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726117AbgIREIs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Sep 2020 00:08:48 -0400
+        with ESMTP id S1726201AbgIRIkp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Sep 2020 04:40:45 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAE34C06174A
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Sep 2020 21:08:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AFC0C06174A
+        for <linux-cifs@vger.kernel.org>; Fri, 18 Sep 2020 01:40:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Message-ID:Date:To:From:CC;
-        bh=30kW5YumiHdhELPwG+A5BpDyoHcfx0ILrm2nWPfQ9cU=; b=XYifAyuOdPpz8Z/jwEGW1jOHbo
-        VdkmB//x7NUwKXKrrIbJtxyIptBUgGqVEZ50cI/Fq2z/4SAkjcC+cUmlY8pr+Id4/Ey5d4/bskTeg
-        f0NQs3ET2IXmqH0o+9swGQB3ZGY/Jyfopx99Jzquk25Xd5iC1xpCdH/6RiPVuMuinPS1/vYYOMV2d
-        nnS6igFD0Y+kly69Vx01JWIDkRAGH0yJgqYFN416BsFmX5lhKinqI9PYnLGU/H1vyBqmLAz3QDCBK
-        bczbCyTAa3ZLzZX8RIuyeTf1Ihrmd/9z12mF3rAmoSV3ewxDKhw3OH0zWP/aVmSzLB6QXYvxNNAb1
-        qO1ItcJ4DLAo0WKKks5QlOxCEH1aybC8UtYYYME5cy9xTb/Mrx5Dl7/9g3zJM1RrFjHaG4BsgvyNn
-        MPLPpcod0KqFEDH2gyw8p0z2WJNGLd8CgPBAzUa1lV4nKNMVeQm5DKW+R7Ye57aWkwc8oBSKH6YrF
-        t2XNZNoy+TrVf8z7cmq4N/2/;
-Received: from [2a01:4f8:192:486::6:0] (port=62748 helo=hr6.samba.org) 
+        bh=Fi+XjWa4Hv7FDzAUXQBkH7efRJKAZpcrreZbMM79ysk=; b=e9Mc7Oj7Bvi4ge66EpMJzwSrvw
+        vlynT+sFz/4nQA+ZOXFs9Wc0QHKRqefkVs/6xu3brX000zRanj7yEwKlokU8lYRJ9Otqj3A/Yu0Jg
+        ZE0qFd1VngJiM60XhANGu9NfBRNeMO+JKgiRdMNS+MPo3MIRFeXREG5CjhRCVbmLnuiImPVH41ffW
+        ZVMokKTDIAEkvb5SSYYv+lCvb96CVQKc/heGLWXecX5mCAvLjA6jv7RyIDE3BvBZzeTAS7uZaXZB7
+        A3TD675HuwxRXN+4o3nglKD0oyoPD6RRFAP6B6R1KzNltypJ5TDEODeEH2jKRr61WCYAGOkaoSAcZ
+        LedlWA5+VPra9g6zFWcgqW3jUitffYHzYI8+uq522K3ROvcILrVg/KRgu5lEIkgc5gdD6XdysKuNM
+        Q4J3Gpx23QnsrHerDl3pi+jG3iQPuvTSkJP8QASooydqfYW68NpY0J2Ten+yc4FkU4zfMUDOjlN6G
+        9JKiCm82JL6DNHuaOJRkA4vH;
+Received: from [2a01:4f8:192:486::6:0] (port=63960 helo=hr6.samba.org) 
         by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1kJ7hS-0001SH-4x
-        for cifs-qa@samba.org; Fri, 18 Sep 2020 04:08:42 +0000
-Received: from [::1] (port=27892 helo=bugzilla.samba.org)
+        id 1kJBwh-000781-AF
+        for cifs-qa@samba.org; Fri, 18 Sep 2020 08:40:43 +0000
+Received: from [::1] (port=29102 helo=bugzilla.samba.org)
         by hr6.samba.org with esmtp (Exim 4.93)
         (envelope-from <samba-bugs@samba.org>)
-        id 1kJ7hR-002d6n-Lg
-        for cifs-qa@samba.org; Fri, 18 Sep 2020 04:08:41 +0000
+        id 1kJBwc-002e82-8f
+        for cifs-qa@samba.org; Fri, 18 Sep 2020 08:40:38 +0000
 From:   samba-bugs@samba.org
 To:     cifs-qa@samba.org
-Subject: [Bug 14498] Why is mount -a is not detecting an already mounted DFS
- share endpoint
-Date:   Fri, 18 Sep 2020 04:08:41 +0000
+Subject: [Bug 14499] New: expose NT ACLs via system.nfs4_acl EA
+Date:   Fri, 18 Sep 2020 08:40:37 +0000
 X-Bugzilla-Reason: QAcontact
-X-Bugzilla-Type: changed
+X-Bugzilla-Type: new
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: CifsVFS
-X-Bugzilla-Component: user space tools
-X-Bugzilla-Version: 3.x
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 5.x
 X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: sfrench@samba.org
+X-Bugzilla-Severity: enhancement
+X-Bugzilla-Who: bjacke@samba.org
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P5
-X-Bugzilla-Assigned-To: jlayton@samba.org
+X-Bugzilla-Assigned-To: sfrench@samba.org
 X-Bugzilla-Target-Milestone: ---
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-14498-10630-uilgvv6mCS@https.bugzilla.samba.org/>
-In-Reply-To: <bug-14498-10630@https.bugzilla.samba.org/>
-References: <bug-14498-10630@https.bugzilla.samba.org/>
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ qa_contact target_milestone
+Message-ID: <bug-14499-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.samba.org/
@@ -75,10 +74,33 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-https://bugzilla.samba.org/show_bug.cgi?id=3D14498
+https://bugzilla.samba.org/show_bug.cgi?id=3D14499
 
---- Comment #2 from Steve French <sfrench@samba.org> ---
-What is the kernel version on the two (the failing and working kernels)?
+            Bug ID: 14499
+           Summary: expose NT ACLs via system.nfs4_acl EA
+           Product: CifsVFS
+           Version: 5.x
+          Hardware: All
+                OS: All
+            Status: NEW
+          Severity: enhancement
+          Priority: P5
+         Component: kernel fs
+          Assignee: sfrench@samba.org
+          Reporter: bjacke@samba.org
+        QA Contact: cifs-qa@samba.org
+  Target Milestone: ---
+
+At SambaXP 2020 the idea came up to expose the NT ACLs via the more commonly
+used extended attribute system.nfs4_acl - which is the default attribute al=
+so
+for NFS4. Those ACLs can be managed with the well known toolset of
+nfs4-acl-tools and those ACLs could even be managed by Samba through the
+nfs4acl_xattr module. This would improve overall cifs ACL management a lot.
+
+This bug is to folow the status of this idea, is there some rough eta for t=
+his,
+Steve?
 
 --=20
 You are receiving this mail because:
