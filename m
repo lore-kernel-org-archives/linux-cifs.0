@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD41C43464
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCB0C43463
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:50:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52CB623770
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:37:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF2F323444
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 02:50:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600396625;
-	bh=xnlrAQoUpREOaEJQKveMN0N7XoxXsjo1W1a7sQ+pTog=;
+	s=default; t=1600397423;
+	bh=LxKu2WkpVM3J9IA/sp1w9CnFzV9RiFAoZ/oGfdiXLWc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=NohVqOSxp3SbuwE05gFpDeyD03d1hwc0Cx91s+ruxKaGFtOaGKmI2zmBORLhXDkVP
-	 F2TLeyi6ByW9N8BbVX566PYH++u/53aqaASKDzllszNc5q74QevbACdiE+3KFuTDt0
-	 fVo90Hyz9VoAUkjopOsNrwlLJDYvNqDkEGxi8YQs=
+	b=Gz8IKo91NUNTCp0hsNQ0LrOyk7oMVMFxJ/BmqMtCoc7+WLWIXyR0J0Ayu6qtxikkU
+	 CaIeQtVAbNzfG4zq4DILzMWgkDgdiy+ZtZPi6uJF/Ha65aQtaWKnEy6UXXXqa+1Zzn
+	 UzXqR80olPSL4LlfpfpCplqpyGJSUm8CdStj2YNg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728825AbgIRCMr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Sep 2020 22:12:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39418 "EHLO mail.kernel.org"
+        id S1728301AbgIRCuS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Sep 2020 22:50:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60328 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727945AbgIRCMr (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:12:47 -0400
+        id S1728156AbgIRCIs (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 17 Sep 2020 22:08:48 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 95DEC235F9;
-        Fri, 18 Sep 2020 02:12:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9E65F2389E;
+        Fri, 18 Sep 2020 02:08:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600395165;
-        bh=xnlrAQoUpREOaEJQKveMN0N7XoxXsjo1W1a7sQ+pTog=;
+        s=default; t=1600394927;
+        bh=LxKu2WkpVM3J9IA/sp1w9CnFzV9RiFAoZ/oGfdiXLWc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=m8aGO9CpM7AV5XiG5HZ8qSjHgkG3b6VdMYkzTU+l1nt+nyA/M/bG0Vt6vwxzuGhp+
-         WJnAYLZlGfsQGiJb9ABWGCOsoeMzHPuWiPU6y9qaV1F6CKHg/tnYY1BxATOwP8QElw
-         P4VrOaC0eBXzX7HNbNTvdqZqQdjvCIT0Ute8CZUM=
+        b=TmFd2XFfeJ4qCw+FjET0PMmXfVcFecpMYwhroUBNS9WhQ7nDSq4FkePCJteItLc41
+         ZjIC+ga3+zneNvrtHIWioGO7zOqNSo1xblRsnaUgyp3iADyD/+FeipprcKeB06u3Cx
+         A1FbXvOtw7Hs08B8OSmHTJ3fDH7DfMawVEPDXJ24=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Pavel Shilovsky <pshilov@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.14 022/127] CIFS: Properly process SMB3 lease breaks
-Date:   Thu, 17 Sep 2020 22:10:35 -0400
-Message-Id: <20200918021220.2066485-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 038/206] CIFS: Properly process SMB3 lease breaks
+Date:   Thu, 17 Sep 2020 22:05:14 -0400
+Message-Id: <20200918020802.2065198-38-sashal@kernel.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200918021220.2066485-1-sashal@kernel.org>
-References: <20200918021220.2066485-1-sashal@kernel.org>
+In-Reply-To: <20200918020802.2065198-1-sashal@kernel.org>
+References: <20200918020802.2065198-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -89,10 +89,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  7 files changed, 57 insertions(+), 65 deletions(-)
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 600bb838c15b8..f166fcb48ac0e 100644
+index 71c2dd0c7f038..2c632793c88c5 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -246,8 +246,9 @@ struct smb_version_operations {
+@@ -259,8 +259,9 @@ struct smb_version_operations {
  	int (*check_message)(char *, unsigned int, struct TCP_Server_Info *);
  	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
  	int (*handle_cancelled_mid)(char *, struct TCP_Server_Info *);
@@ -104,7 +104,7 @@ index 600bb838c15b8..f166fcb48ac0e 100644
  	/* process transaction2 response */
  	bool (*check_trans2)(struct mid_q_entry *, struct TCP_Server_Info *,
  			     char *, int);
-@@ -1092,6 +1093,8 @@ struct cifsFileInfo {
+@@ -1160,6 +1161,8 @@ struct cifsFileInfo {
  	unsigned int f_flags;
  	bool invalidHandle:1;	/* file closed via session abend */
  	bool oplock_break_cancelled:1;
@@ -113,7 +113,7 @@ index 600bb838c15b8..f166fcb48ac0e 100644
  	int count;
  	spinlock_t file_info_lock; /* protects four flag/count fields above */
  	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
-@@ -1223,7 +1226,7 @@ struct cifsInodeInfo {
+@@ -1300,7 +1303,7 @@ struct cifsInodeInfo {
  	unsigned int epoch;		/* used to track lease state changes */
  #define CIFS_INODE_PENDING_OPLOCK_BREAK   (0) /* oplock break in progress */
  #define CIFS_INODE_PENDING_WRITERS	  (1) /* Writes in progress */
@@ -123,10 +123,10 @@ index 600bb838c15b8..f166fcb48ac0e 100644
  #define CIFS_INO_INVALID_MAPPING	  (4) /* pagecache is invalid */
  #define CIFS_INO_LOCK			  (5) /* lock bit for synchronization */
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 72e7cbfb325a6..0981731132ec0 100644
+index 128cbd69911b4..e78b52c582f18 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
-@@ -4135,12 +4135,13 @@ void cifs_oplock_break(struct work_struct *work)
+@@ -4185,12 +4185,13 @@ void cifs_oplock_break(struct work_struct *work)
  	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
  	struct TCP_Server_Info *server = tcon->ses->server;
  	int rc = 0;
@@ -142,7 +142,7 @@ index 72e7cbfb325a6..0981731132ec0 100644
  
  	if (!CIFS_CACHE_WRITE(cinode) && CIFS_CACHE_READ(cinode) &&
  						cifs_has_mand_locks(cinode)) {
-@@ -4155,18 +4156,21 @@ void cifs_oplock_break(struct work_struct *work)
+@@ -4205,18 +4206,21 @@ void cifs_oplock_break(struct work_struct *work)
  		else
  			break_lease(inode, O_WRONLY);
  		rc = filemap_fdatawrite(inode->i_mapping);
@@ -166,10 +166,10 @@ index 72e7cbfb325a6..0981731132ec0 100644
  	 * releasing stale oplock after recent reconnect of smb session using
  	 * a now incorrect file handle is not a data integrity issue but do
 diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 76f1649ab444f..d0e024856c0d4 100644
+index e45f8e321371c..dd67f56ea61e5 100644
 --- a/fs/cifs/misc.c
 +++ b/fs/cifs/misc.c
-@@ -473,21 +473,10 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
+@@ -477,21 +477,10 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
  				set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK,
  					&pCifsInode->flags);
  
@@ -195,10 +195,10 @@ index 76f1649ab444f..d0e024856c0d4 100644
  				spin_unlock(&tcon->open_file_lock);
  				spin_unlock(&cifs_tcp_ses_lock);
 diff --git a/fs/cifs/smb1ops.c b/fs/cifs/smb1ops.c
-index 483458340b10c..9b271ae641c19 100644
+index c7f0c85664425..0b7f924512848 100644
 --- a/fs/cifs/smb1ops.c
 +++ b/fs/cifs/smb1ops.c
-@@ -379,12 +379,10 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
+@@ -381,12 +381,10 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
  
  static void
  cifs_downgrade_oplock(struct TCP_Server_Info *server,
@@ -215,10 +215,10 @@ index 483458340b10c..9b271ae641c19 100644
  
  static bool
 diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index ff2ad15f67d63..0c6e5450ff765 100644
+index 2fc96f7923ee5..7d875a47d0226 100644
 --- a/fs/cifs/smb2misc.c
 +++ b/fs/cifs/smb2misc.c
-@@ -496,7 +496,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+@@ -550,7 +550,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp)
  
  		cifs_dbg(FYI, "found in the open list\n");
  		cifs_dbg(FYI, "lease key match, lease break 0x%x\n",
@@ -227,7 +227,7 @@ index ff2ad15f67d63..0c6e5450ff765 100644
  
  		if (ack_req)
  			cfile->oplock_break_cancelled = false;
-@@ -505,17 +505,8 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+@@ -559,17 +559,8 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp)
  
  		set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK, &cinode->flags);
  
@@ -246,8 +246,8 @@ index ff2ad15f67d63..0c6e5450ff765 100644
 +		cfile->oplock_level = lease_state;
  
  		cifs_queue_oplock_break(cfile);
- 		kfree(lw);
-@@ -538,7 +529,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp,
+ 		return true;
+@@ -599,7 +590,7 @@ smb2_tcon_find_pending_open_lease(struct cifs_tcon *tcon,
  
  		cifs_dbg(FYI, "found in the pending open list\n");
  		cifs_dbg(FYI, "lease key match, lease break 0x%x\n",
@@ -256,7 +256,7 @@ index ff2ad15f67d63..0c6e5450ff765 100644
  
  		open->oplock = lease_state;
  	}
-@@ -650,18 +641,9 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
+@@ -732,18 +723,9 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
  				set_bit(CIFS_INODE_PENDING_OPLOCK_BREAK,
  					&cinode->flags);
  
@@ -279,10 +279,10 @@ index ff2ad15f67d63..0c6e5450ff765 100644
  
  				cifs_queue_oplock_break(cfile);
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index b46fdb2b8d349..90d4288907a61 100644
+index 2a523139a05fb..947a40069d246 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -1935,22 +1935,38 @@ static long smb3_fallocate(struct file *file, struct cifs_tcon *tcon, int mode,
+@@ -2358,22 +2358,38 @@ static long smb3_fallocate(struct file *file, struct cifs_tcon *tcon, int mode,
  
  static void
  smb2_downgrade_oplock(struct TCP_Server_Info *server,
@@ -332,7 +332,7 @@ index b46fdb2b8d349..90d4288907a61 100644
  }
  
  static void
-@@ -2953,7 +2969,7 @@ struct smb_version_operations smb21_operations = {
+@@ -3449,7 +3465,7 @@ struct smb_version_operations smb21_operations = {
  	.print_stats = smb2_print_stats,
  	.is_oplock_break = smb2_is_valid_oplock_break,
  	.handle_cancelled_mid = smb2_handle_cancelled_mid,
@@ -341,7 +341,7 @@ index b46fdb2b8d349..90d4288907a61 100644
  	.need_neg = smb2_need_neg,
  	.negotiate = smb2_negotiate,
  	.negotiate_wsize = smb2_negotiate_wsize,
-@@ -3048,7 +3064,7 @@ struct smb_version_operations smb30_operations = {
+@@ -3546,7 +3562,7 @@ struct smb_version_operations smb30_operations = {
  	.dump_share_caps = smb2_dump_share_caps,
  	.is_oplock_break = smb2_is_valid_oplock_break,
  	.handle_cancelled_mid = smb2_handle_cancelled_mid,
@@ -350,7 +350,7 @@ index b46fdb2b8d349..90d4288907a61 100644
  	.need_neg = smb2_need_neg,
  	.negotiate = smb2_negotiate,
  	.negotiate_wsize = smb2_negotiate_wsize,
-@@ -3153,7 +3169,7 @@ struct smb_version_operations smb311_operations = {
+@@ -3651,7 +3667,7 @@ struct smb_version_operations smb311_operations = {
  	.dump_share_caps = smb2_dump_share_caps,
  	.is_oplock_break = smb2_is_valid_oplock_break,
  	.handle_cancelled_mid = smb2_handle_cancelled_mid,
@@ -360,12 +360,12 @@ index b46fdb2b8d349..90d4288907a61 100644
  	.negotiate = smb2_negotiate,
  	.negotiate_wsize = smb2_negotiate_wsize,
 diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index bad458a2b579e..f8baa54c83008 100644
+index 308c682fa4d3b..44501f8cbd75e 100644
 --- a/fs/cifs/smb2pdu.h
 +++ b/fs/cifs/smb2pdu.h
-@@ -1046,7 +1046,7 @@ struct smb2_oplock_break {
+@@ -1209,7 +1209,7 @@ struct smb2_oplock_break {
  struct smb2_lease_break {
- 	struct smb2_hdr hdr;
+ 	struct smb2_sync_hdr sync_hdr;
  	__le16 StructureSize; /* Must be 44 */
 -	__le16 Reserved;
 +	__le16 Epoch;
