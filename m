@@ -1,81 +1,85 @@
-Return-Path: <SRS0=z3C/=C6=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=kqF3=C3=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FAEFC43463
-	for <linux-cifs@archiver.kernel.org>; Mon, 21 Sep 2020 09:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D76EC43466
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 04:08:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1D6921789
-	for <linux-cifs@archiver.kernel.org>; Mon, 21 Sep 2020 09:49:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ft5Vancq"
+	by mail.kernel.org (Postfix) with ESMTP id 0D3AB23600
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 04:08:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726384AbgIUJty (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 21 Sep 2020 05:49:54 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57108 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726333AbgIUJty (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 21 Sep 2020 05:49:54 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1600681793;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FBm2H2GCFlplthkyhYpDb0vxg81ycvjt+IhwCnQrRj4=;
-        b=ft5VancqcLvlhKwzI69fK+pStMD68sYlon4wQGRFmRVuEIGowzbZk9wZtbe2D5Yz4NSkfX
-        gVRHYrqJy0s7HmY8lnSUlC68ybPpXavJNcP0YtYrfdfiSVzzYAdSZkuTjb2OdAUmueDZNW
-        +LjfObroabWel3eSN6UxjX6tFwQ3WSg=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 8920FAD83;
-        Mon, 21 Sep 2020 09:50:29 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Steve French <smfrench@gmail.com>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: mutiuser request_key in both ntlmssp and krb5
-In-Reply-To: <87imc7lblm.fsf@suse.com>
-References: <CANT5p=qTXPkjqBuR9cvwQoRZFb72gY4M22tMG5Q_1XC9vvKZcg@mail.gmail.com>
- <87tuvwlpto.fsf@suse.com> <87r1r0lp9s.fsf@suse.com>
- <CAH2r5muiYZGr=1rZHobpKXAtG+OCDORZok_acOkL6TQssVrm3Q@mail.gmail.com>
- <CANT5p=ob6gSFkdy+k0Hera9mLQVhZ743RUiGk7gHbTGwuu7KEw@mail.gmail.com>
- <87imc7lblm.fsf@suse.com>
-Date:   Mon, 21 Sep 2020 11:49:52 +0200
-Message-ID: <87ft7blarj.fsf@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        id S1726149AbgIREIs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Sep 2020 00:08:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44714 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726117AbgIREIs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Sep 2020 00:08:48 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAE34C06174A
+        for <linux-cifs@vger.kernel.org>; Thu, 17 Sep 2020 21:08:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42; h=Message-ID:Date:To:From:CC;
+        bh=30kW5YumiHdhELPwG+A5BpDyoHcfx0ILrm2nWPfQ9cU=; b=XYifAyuOdPpz8Z/jwEGW1jOHbo
+        VdkmB//x7NUwKXKrrIbJtxyIptBUgGqVEZ50cI/Fq2z/4SAkjcC+cUmlY8pr+Id4/Ey5d4/bskTeg
+        f0NQs3ET2IXmqH0o+9swGQB3ZGY/Jyfopx99Jzquk25Xd5iC1xpCdH/6RiPVuMuinPS1/vYYOMV2d
+        nnS6igFD0Y+kly69Vx01JWIDkRAGH0yJgqYFN416BsFmX5lhKinqI9PYnLGU/H1vyBqmLAz3QDCBK
+        bczbCyTAa3ZLzZX8RIuyeTf1Ihrmd/9z12mF3rAmoSV3ewxDKhw3OH0zWP/aVmSzLB6QXYvxNNAb1
+        qO1ItcJ4DLAo0WKKks5QlOxCEH1aybC8UtYYYME5cy9xTb/Mrx5Dl7/9g3zJM1RrFjHaG4BsgvyNn
+        MPLPpcod0KqFEDH2gyw8p0z2WJNGLd8CgPBAzUa1lV4nKNMVeQm5DKW+R7Ye57aWkwc8oBSKH6YrF
+        t2XNZNoy+TrVf8z7cmq4N/2/;
+Received: from [2a01:4f8:192:486::6:0] (port=62748 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1kJ7hS-0001SH-4x
+        for cifs-qa@samba.org; Fri, 18 Sep 2020 04:08:42 +0000
+Received: from [::1] (port=27892 helo=bugzilla.samba.org)
+        by hr6.samba.org with esmtp (Exim 4.93)
+        (envelope-from <samba-bugs@samba.org>)
+        id 1kJ7hR-002d6n-Lg
+        for cifs-qa@samba.org; Fri, 18 Sep 2020 04:08:41 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 14498] Why is mount -a is not detecting an already mounted DFS
+ share endpoint
+Date:   Fri, 18 Sep 2020 04:08:41 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: user space tools
+X-Bugzilla-Version: 3.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: sfrench@samba.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: jlayton@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-14498-10630-uilgvv6mCS@https.bugzilla.samba.org/>
+In-Reply-To: <bug-14498-10630@https.bugzilla.samba.org/>
+References: <bug-14498-10630@https.bugzilla.samba.org/>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Aur=C3=A9lien Aptel <aaptel@suse.com> writes:
->> Ah, I see. So I'm wondering how the multiuser mounts for ntlmssp work?
->> On each login, does the user have to populate the keyring with his/her
->> credentials?
->
-> I think that was the idea yes, or maybe integrate with PAM somehow? But
-> you'll have to do some archeological work with Jeff Layton to get to the
-> bottom of this :)
+https://bugzilla.samba.org/show_bug.cgi?id=3D14498
 
-If you were asking *how* can the user populate it at this moment, then
-the answer is with the cifscreds program. But I don't know what was the
-planned scenario for users (login once, then manually call cifscreds a
-to login a 2nd time?)
+--- Comment #2 from Steve French <sfrench@samba.org> ---
+What is the kernel version on the two (the failing and working kernels)?
 
-https://github.com/piastry/cifs-utils/blob/master/cifscreds.c
-
-Cheers,
 --=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, DE
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+You are receiving this mail because:
+You are the QA Contact for the bug.=
