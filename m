@@ -2,148 +2,83 @@ Return-Path: <SRS0=kqF3=C3=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CBFC43463
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 03:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D1DC43463
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 03:18:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 546522083B
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 03:11:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1600398688;
-	bh=uLyab3reV9Cbu2r3VvlqvXJIVfiUsg5LorqQCGrHO9U=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=bb6mx5nqMPOXOPv3yBZkMuLcdaPHXoblufs9fFkA4tgF40hi2YysW/6SOeHaBBSAp
-	 4Fgzr+EzAulo3YbQArZbPpIoPnv6jwaI+SDImIAXsEbsDz6ji1Zp09dvtsQjxcumOm
-	 p2ZTKCZum3Z014wIHXwTn6cznOoM0EtKdi6fQuwA=
+	by mail.kernel.org (Postfix) with ESMTP id 08DA721582
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Sep 2020 03:18:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mjd/T38S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726765AbgIRCCa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Sep 2020 22:02:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47698 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726752AbgIRCCa (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 17 Sep 2020 22:02:30 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        id S1726249AbgIRDSX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Sep 2020 23:18:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60725 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726201AbgIRDSX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 17 Sep 2020 23:18:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1600399102;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=B7QZN5bB1ODEfpgdiy0j8chyOajh/Pya1JzNV03v1jw=;
+        b=Mjd/T38ShaffP9mX2KHimRRxs6Ktzy2Ly5cdFtqH30P116JPfSP1+jKhm58i/RFang+d0g
+        9qfnHLad/VrdtTHoa517e7lB8WvFzme9qkIbHOiYbGFaSvHniS6zrYbUuaR5Zt7JEkW9xq
+        nbCOKRZmHJG/h8pNzWfE/VYfIDbTL18=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-FEGNzavJPuey-S0FoEE3Tg-1; Thu, 17 Sep 2020 23:18:20 -0400
+X-MC-Unique: FEGNzavJPuey-S0FoEE3Tg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4746F2371F;
-        Fri, 18 Sep 2020 02:02:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1600394545;
-        bh=uLyab3reV9Cbu2r3VvlqvXJIVfiUsg5LorqQCGrHO9U=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=C7u4CnfpBS7T6jYpzgHQzWelVgo5zboB+DB6Dq5o7kSy/4JKiXWfIwkp30Hwq/8cu
-         vRVCDOZPrqa7ihBKIqdU3TMgO+XZzFTPsCSfOPku77h9eAGGxmOAf3+9P1PfUC+r8O
-         OMKptyNRMQA2PMi0DzEtBpaFY0PC/pk1bgP12op0=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Markus Elfring <elfring@users.sourceforge.net>,
-        Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 062/330] CIFS: Use common error handling code in smb2_ioctl_query_info()
-Date:   Thu, 17 Sep 2020 21:56:42 -0400
-Message-Id: <20200918020110.2063155-62-sashal@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200918020110.2063155-1-sashal@kernel.org>
-References: <20200918020110.2063155-1-sashal@kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA8401006717;
+        Fri, 18 Sep 2020 03:18:18 +0000 (UTC)
+Received: from test1103.test.redhat.com (vpn2-54-64.bne.redhat.com [10.64.54.64])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 88E1D7880F;
+        Fri, 18 Sep 2020 03:18:18 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: treat password/account expired as -EACCES
+Date:   Fri, 18 Sep 2020 13:18:12 +1000
+Message-Id: <20200918031812.20578-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Markus Elfring <elfring@users.sourceforge.net>
+These two errors both require admin changes to the server before they can
+be resolved so there is no point in looping to try to reconnect
+indefinitely. Change the mapping to -EACCES so that we will quickly
+terminate the reconnect for these threads and return an error back to userland.
 
-[ Upstream commit 2b1116bbe898aefdf584838448c6869f69851e0f ]
+RHBZ: 1798031
 
-Move the same error code assignments so that such exception handling
-can be better reused at the end of this function.
-
-This issue was detected by using the Coccinelle software.
-
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/cifs/smb2ops.c | 45 +++++++++++++++++++++++----------------------
- 1 file changed, 23 insertions(+), 22 deletions(-)
+ fs/cifs/smb2maperror.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 7ccbfc6564787..318d805e74d40 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -1565,35 +1565,32 @@ smb2_ioctl_query_info(const unsigned int xid,
- 		if (le32_to_cpu(io_rsp->OutputCount) < qi.input_buffer_length)
- 			qi.input_buffer_length = le32_to_cpu(io_rsp->OutputCount);
- 		if (qi.input_buffer_length > 0 &&
--		    le32_to_cpu(io_rsp->OutputOffset) + qi.input_buffer_length > rsp_iov[1].iov_len) {
--			rc = -EFAULT;
--			goto iqinf_exit;
--		}
--		if (copy_to_user(&pqi->input_buffer_length, &qi.input_buffer_length,
--				 sizeof(qi.input_buffer_length))) {
--			rc = -EFAULT;
--			goto iqinf_exit;
--		}
-+		    le32_to_cpu(io_rsp->OutputOffset) + qi.input_buffer_length
-+		    > rsp_iov[1].iov_len)
-+			goto e_fault;
-+
-+		if (copy_to_user(&pqi->input_buffer_length,
-+				 &qi.input_buffer_length,
-+				 sizeof(qi.input_buffer_length)))
-+			goto e_fault;
-+
- 		if (copy_to_user((void __user *)pqi + sizeof(struct smb_query_info),
- 				 (const void *)io_rsp + le32_to_cpu(io_rsp->OutputOffset),
--				 qi.input_buffer_length)) {
--			rc = -EFAULT;
--			goto iqinf_exit;
--		}
-+				 qi.input_buffer_length))
-+			goto e_fault;
- 	} else {
- 		pqi = (struct smb_query_info __user *)arg;
- 		qi_rsp = (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
- 		if (le32_to_cpu(qi_rsp->OutputBufferLength) < qi.input_buffer_length)
- 			qi.input_buffer_length = le32_to_cpu(qi_rsp->OutputBufferLength);
--		if (copy_to_user(&pqi->input_buffer_length, &qi.input_buffer_length,
--				 sizeof(qi.input_buffer_length))) {
--			rc = -EFAULT;
--			goto iqinf_exit;
--		}
--		if (copy_to_user(pqi + 1, qi_rsp->Buffer, qi.input_buffer_length)) {
--			rc = -EFAULT;
--			goto iqinf_exit;
--		}
-+		if (copy_to_user(&pqi->input_buffer_length,
-+				 &qi.input_buffer_length,
-+				 sizeof(qi.input_buffer_length)))
-+			goto e_fault;
-+
-+		if (copy_to_user(pqi + 1, qi_rsp->Buffer,
-+				 qi.input_buffer_length))
-+			goto e_fault;
- 	}
- 
-  iqinf_exit:
-@@ -1609,6 +1606,10 @@ smb2_ioctl_query_info(const unsigned int xid,
- 	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
- 	free_rsp_buf(resp_buftype[2], rsp_iov[2].iov_base);
- 	return rc;
-+
-+e_fault:
-+	rc = -EFAULT;
-+	goto iqinf_exit;
- }
- 
- static ssize_t
+diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
+index 7fde3775cb57..9cd231486af4 100644
+--- a/fs/cifs/smb2maperror.c
++++ b/fs/cifs/smb2maperror.c
+@@ -409,8 +409,8 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
+ 	{STATUS_ACCOUNT_RESTRICTION, -EACCES, "STATUS_ACCOUNT_RESTRICTION"},
+ 	{STATUS_INVALID_LOGON_HOURS, -EACCES, "STATUS_INVALID_LOGON_HOURS"},
+ 	{STATUS_INVALID_WORKSTATION, -EACCES, "STATUS_INVALID_WORKSTATION"},
+-	{STATUS_PASSWORD_EXPIRED, -EKEYEXPIRED, "STATUS_PASSWORD_EXPIRED"},
+-	{STATUS_ACCOUNT_DISABLED, -EKEYREVOKED, "STATUS_ACCOUNT_DISABLED"},
++	{STATUS_PASSWORD_EXPIRED, -EACCES, "STATUS_PASSWORD_EXPIRED"},
++	{STATUS_ACCOUNT_DISABLED, -EACCES, "STATUS_ACCOUNT_DISABLED"},
+ 	{STATUS_NONE_MAPPED, -EIO, "STATUS_NONE_MAPPED"},
+ 	{STATUS_TOO_MANY_LUIDS_REQUESTED, -EIO,
+ 	"STATUS_TOO_MANY_LUIDS_REQUESTED"},
 -- 
-2.25.1
+2.13.6
 
