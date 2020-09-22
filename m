@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 633D4C4363D
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Sep 2020 14:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A772EC4363D
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Sep 2020 15:02:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE2962395C
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Sep 2020 14:45:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 402062395C
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Sep 2020 15:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726706AbgIVOpG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Sep 2020 10:45:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40168 "EHLO
+        id S1726640AbgIVPCI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Sep 2020 11:02:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726620AbgIVOpF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Sep 2020 10:45:05 -0400
+        with ESMTP id S1726566AbgIVPCI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Sep 2020 11:02:08 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92ACEC061755
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2020 07:45:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82BDCC061755
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2020 08:02:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Message-ID:Date:To:From:CC;
-        bh=6BclYkMsq/qUQWwD9DZEviJpjQXhjyK36P9D3dFRGFo=; b=eUGwGd4jml21q2NPAq8W5rcb6I
-        gHnhzWCWmVBKMOgPDreiE2pHiUUgF8c36/olRFY3ymwQYromFZg6JO3DIXRiCvcRIN99r/hJ10Oy9
-        GVrVUyTY/vA7ViSrWnIBDixQpE5255Dj7VvoRm5A3kLg+EYpdwlm6vE1lZpoxwVY9/1KiFjmeeIoa
-        1R3c8gXTMlibNFJwvP5FzjkfzNgC6oOQU1Dx1Ef6LN2Y0zkma6pxZggSAYiJZnk8c8oXoiNyteH58
-        7/Mq6M4JELO6Qarik1akkXwqTJug+gw4LjHWESeAlN7IHX9SKqNBTQcarWh7xn46bXth5N59r9kbx
-        AoJX4l+v3JotrXqUkDN40cKLn81eFse0jo/wNDXpPvP+umTQBOd8bfdLT7Y4+PAzXLH8PmAG4KeiP
-        Jt9nRyt/BITYJC5+ef0oa+VMzr88hM4uRddsyyl7aQxaGFLBsS7j9c4EEWfiU8lHczzBiS2ZmP4aD
-        5PVkXndH9VlQBTTzXqFeyg3q;
-Received: from [2a01:4f8:192:486::6:0] (port=18898 helo=hr6.samba.org) 
+        bh=o39ki/g35mrfOENgzZm/5Bl8EL+6jA+x/EO/8/xZ0Rg=; b=yumCR3p228QVctbt2vQ6ndrvdM
+        ewto4F7MHhLnaXx4M2csQzP0hJi/mR7JRqRfmqbN5tM6iOxUsFMVyEaihXhPFUvK99H6Q55rp8ImN
+        PLAK+CFXgIPhSsURnRy8NUgLLAHbfSqQ+EDFEatz9zq2OulnNh4ooVVbKY4i4MnALX3TYmbVCYYeh
+        Zawut8UOMvDIv4xlPAGBkz6nfqXNoDeZjwyqyCAWYZKJHwlwhieoqY0iVFB4xpDe0Fc/aiMUOP3lD
+        AnzpbwFzrA4bISF6mBU9bOxCcAh1pFWH+F+eBaZGlYF3lJRKyXlWFsdh/N++6kBIQfPn6eRxFWdiU
+        QqFcx68wf87oH05KI5IJONKxnpN3SW9ucVOh5C1aA/W4XP58PRhFQdDxwQmS8SrZdO+pQIrkxu4vm
+        RUC0QNbouSoEeAyCZn8Zec4GBMgTxUeWvtDP/ahY0pZcW1hxaZR7F5bv8NY294mNvFBYpfWJ9kF7z
+        5qjW/uu+SiDoRct9FO7ioG+6;
+Received: from [2a01:4f8:192:486::6:0] (port=18906 helo=hr6.samba.org) 
         by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1kKjXS-0000Lu-9j
-        for cifs-qa@samba.org; Tue, 22 Sep 2020 14:45:02 +0000
-Received: from [::1] (port=31574 helo=bugzilla.samba.org)
+        id 1kKjny-0000Tq-Df
+        for cifs-qa@samba.org; Tue, 22 Sep 2020 15:02:06 +0000
+Received: from [::1] (port=31584 helo=bugzilla.samba.org)
         by hr6.samba.org with esmtp (Exim 4.93)
         (envelope-from <samba-bugs@samba.org>)
-        id 1kKjXR-0032AM-RR
-        for cifs-qa@samba.org; Tue, 22 Sep 2020 14:45:01 +0000
+        id 1kKjny-0032BX-11
+        for cifs-qa@samba.org; Tue, 22 Sep 2020 15:02:06 +0000
 From:   samba-bugs@samba.org
 To:     cifs-qa@samba.org
 Subject: [Bug 14509] Interworking Problem OpenVMS Samba Server 4.6.5 with
  Linux Samba Client 4.7.6
-Date:   Tue, 22 Sep 2020 14:45:01 +0000
+Date:   Tue, 22 Sep 2020 15:02:05 +0000
 X-Bugzilla-Reason: QAcontact
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -55,15 +55,15 @@ X-Bugzilla-Component: kernel fs
 X-Bugzilla-Version: 5.x
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: minor
-X-Bugzilla-Who: slow@samba.org
+X-Bugzilla-Who: bjacke@samba.org
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P5
 X-Bugzilla-Assigned-To: sfrench@samba.org
 X-Bugzilla-Target-Milestone: ---
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: version assigned_to qa_contact product component
-Message-ID: <bug-14509-10630-QJ7ApQSjOz@https.bugzilla.samba.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-14509-10630-MXnQiWF2tm@https.bugzilla.samba.org/>
 In-Reply-To: <bug-14509-10630@https.bugzilla.samba.org/>
 References: <bug-14509-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -77,20 +77,13 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 https://bugzilla.samba.org/show_bug.cgi?id=3D14509
 
-Ralph B=C3=B6hme <slow@samba.org> changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-            Version|4.7.6                       |5.x
-           Assignee|samba-qa@samba.org          |sfrench@samba.org
-         QA Contact|samba-qa@samba.org          |cifs-qa@samba.org
-            Product|Samba 4.1 and newer         |CifsVFS
-          Component|libsmbclient                |kernel fs
-
---- Comment #2 from Ralph B=C3=B6hme <slow@samba.org> ---
-Chaning to product to cifs vfs as this seems to be a bug with the Linux ker=
-nel
-SMB client.
+--- Comment #3 from Bj=C3=B6rn Jacke <bjacke@samba.org> ---
+file name length of 0 looks very weird. I think you forgot to mention the
+important point that you are using a OpenVMS port of Samba, don't you? Is t=
+here
+any point in listing a file that has 0 file name lenght? It would be
+interesting if the the protocol specs say anything about such a weird case
+also.
 
 --=20
 You are receiving this mail because:
