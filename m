@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 385BAC2D0E2
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Sep 2020 21:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A91C2D0E2
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Sep 2020 21:53:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1CE82371F
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Sep 2020 21:26:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06BDE20773
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Sep 2020 21:53:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbgIVV0S (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Sep 2020 17:26:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45416 "EHLO
+        id S1726614AbgIVVxV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Sep 2020 17:53:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726179AbgIVV0S (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Sep 2020 17:26:18 -0400
+        with ESMTP id S1726179AbgIVVxV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Sep 2020 17:53:21 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 083BEC061755
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2020 14:26:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CDABC061755
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2020 14:53:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Message-ID:Date:To:From:CC;
-        bh=DA6pTWiQ9DVxT349jKhM33TI0P3cul9W3kWuaku74Zw=; b=nG3EB0H0A4sDU1ZuDQ7BUxDtkm
-        PX1ewIfsfupvSn3Mkxf9pRsyQWs/kQqecWnOhnt7/xheyhjGyEPKF53z38tIlvhNkdH8jv7BehoQP
-        WyJPytqCeyMKDg8gEQMeDyia65Lo981aIBeiESi93g2VeVD26qStrJaV9qjKHWHUSlVA4jI9KQJKV
-        ms2hUHNw+aQb7mjyX3x2UFDVOWJuE7LUoPy+2eFiP5LzMCfQy/YFwT8OsMGYNlLsx3LkjeRNs81On
-        zxoz0gTkMMv8XqwBMOg1m3rbzFl962sppqKhrHrHAJMWJw95mhfSTEYZpk1iGpdhImy+8rwJxx1HW
-        sk5fGpORE6TCTWDn+yE2qAMcOkcgftNheB/avreOHaw5DJf20X2pphrm3arowoEVIkUzHoalTifkV
-        s2TjswfXiZ10nww0n/EP1YsCEQfZZhSNF1g9pIxaI13xIYhwrzrrJFN2h7kmVj4PW54V1a3HCz2Tx
-        ZofYq3Z6ypsELKcW7CMESTik;
-Received: from [2a01:4f8:192:486::6:0] (port=19004 helo=hr6.samba.org) 
+        bh=daH3BDEH5oZShlEsxL4ACiAQ5E6fFkDfSnXa+4KaQLM=; b=jAVMc+pzYqIR7nxVTuTvNI8LSj
+        SptfrvRlvfRugXbA7oHrWVxidUKcc8qWURMU4j4h4Jw2IOW4IQFNsGNmLxzb1KTo9l8b8T9wy9n32
+        YqY7tGBaGDXuGPavlpDcp4aWLmcFpIY3arq3m1pcfyIb43u4JuaFG/QC1/0PihJNUkC/gtFD/gzx4
+        OxcSKhiQ/vQKqxanXNuvJ3YrbyVNtR8tM6Mo/AbRW8dvMPDPJOVwTXucsH9LZl00I/vx34ctPZa6s
+        S0ocTE9opiTaCdIWpJHnOxl/LpAr8Y+sztlptRvkHV3gECwdCHf+urKJDFYHtcgIEVwTZERsMEvCp
+        CoDiTnzAx4M3FO74+icmRsx/ZCfbQA4VMa5xBy7em8XfeE4u9xsytKaxjuB3JwZ6LOccXz2zMBoDp
+        EYBhhpbTySzPX5s95yfjurhwJ34CgEYYfv0Ain30xj7EnYNEuQQXbJqJzmv8wsI+H2ezq6QdMJYjA
+        qSov13/FF3NssJekjPc5buGu;
+Received: from [2a01:4f8:192:486::6:0] (port=19022 helo=hr6.samba.org) 
         by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1kKpni-00038H-JS
-        for cifs-qa@samba.org; Tue, 22 Sep 2020 21:26:14 +0000
-Received: from [::1] (port=31682 helo=bugzilla.samba.org)
+        id 1kKqDu-0003Kj-Hu
+        for cifs-qa@samba.org; Tue, 22 Sep 2020 21:53:18 +0000
+Received: from [::1] (port=31700 helo=bugzilla.samba.org)
         by hr6.samba.org with esmtp (Exim 4.93)
         (envelope-from <samba-bugs@samba.org>)
-        id 1kKpnX-0032Yq-Os
-        for cifs-qa@samba.org; Tue, 22 Sep 2020 21:26:03 +0000
+        id 1kKqDt-0032a2-UC
+        for cifs-qa@samba.org; Tue, 22 Sep 2020 21:53:17 +0000
 From:   samba-bugs@samba.org
 To:     cifs-qa@samba.org
 Subject: [Bug 14509] Interworking Problem OpenVMS Samba Server 4.6.5 with
  Linux Samba Client 4.7.6
-Date:   Tue, 22 Sep 2020 21:26:03 +0000
+Date:   Tue, 22 Sep 2020 21:53:17 +0000
 X-Bugzilla-Reason: QAcontact
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -55,7 +55,7 @@ X-Bugzilla-Component: kernel fs
 X-Bugzilla-Version: 5.x
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: minor
-X-Bugzilla-Who: bjacke@samba.org
+X-Bugzilla-Who: sfrench@samba.org
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P5
@@ -63,7 +63,7 @@ X-Bugzilla-Assigned-To: sfrench@samba.org
 X-Bugzilla-Target-Milestone: ---
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-14509-10630-UislFxlEmJ@https.bugzilla.samba.org/>
+Message-ID: <bug-14509-10630-ndK3e9IsI8@https.bugzilla.samba.org/>
 In-Reply-To: <bug-14509-10630@https.bugzilla.samba.org/>
 References: <bug-14509-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -77,19 +77,13 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 https://bugzilla.samba.org/show_bug.cgi?id=3D14509
 
---- Comment #5 from Bj=C3=B6rn Jacke <bjacke@samba.org> ---
-https://docs.microsoft.com/de-de/openspecs/windows_protocols/ms-fscc/2917da=
-5c-253c-4c0e-aaf6-9dddc37d2e6e
-
-2.1.5.2 Filename
- A filename MUST be at least one character but no more than 255 characters =
-in
-length.
-
-Also if Windows 10 ignores such an illegal file with 0 character filename
-length, I'm not sure if this is better than returning an I/O error in that
-case. I tend to say, the I/O error is the better choice. You should get the
-people doing that samba port to fix it.
+--- Comment #6 from Steve French <sfrench@samba.org> ---
+So to be precise:
+"DIR" on Windows skips the corrupted (zero length filename) entry in the qu=
+ery
+directory results, but does not return an error to the user?   That could b=
+e a
+Windows client bug or it could be preferred behavior - there are tradeoffs.
 
 --=20
 You are receiving this mail because:
