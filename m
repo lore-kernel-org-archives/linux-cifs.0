@@ -2,60 +2,94 @@ Return-Path: <SRS0=Llk7=DC=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.1 required=3.0 tests=BAYES_50,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEB9C4363D
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Sep 2020 09:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C874C4363D
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Sep 2020 10:33:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 245A420738
-	for <linux-cifs@archiver.kernel.org>; Fri, 25 Sep 2020 09:29:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2917321D91
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Sep 2020 10:33:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="LI//GL0E"
+	dkim=pass (1024-bit key) header.d=imperialcapgroup.com header.i=@imperialcapgroup.com header.b="XP3SRFo+";
+	dkim=pass (1024-bit key) header.d=imperialcapgroup.com header.i=@imperialcapgroup.com header.b="XP3SRFo+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726255AbgIYJ36 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 25 Sep 2020 05:29:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:45566 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727521AbgIYJ36 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 25 Sep 2020 05:29:58 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1601026197;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rf+ADsETQPxtUBFxemVlyzFi2DjhK4OmkHkQUxXsGn8=;
-        b=LI//GL0EpbAKsJdBc6P82sHLyuO+huA60PYaNpvIaqRJ02O+XnUe8VynAMb91pqAOyjt9Y
-        iOh4rCYoDgv/nQpuz5Ews7N30uVs9UCbLkNqlwR0vkxVi/c6N4lsPomz+uufaLXi/JTLvE
-        8N6oTlZGH6bZIQ9gi2qPECfbfkqNxqw=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 9040EB190;
-        Fri, 25 Sep 2020 09:29:57 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Martin Schwenke <martin@meltin.net>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] mount.cifs: ignore comment mount option
-In-Reply-To: <20200925113200.371db298@martins.ozlabs.org>
-References: <20200925113200.371db298@martins.ozlabs.org>
-Date:   Fri, 25 Sep 2020 11:29:56 +0200
-Message-ID: <87o8lujjaj.fsf@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        id S1728149AbgIYKd2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Sep 2020 06:33:28 -0400
+Received: from [46.166.185.98] ([46.166.185.98]:44826 "EHLO
+        host.imperialcapgroup.com" rhost-flags-FAIL-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727151AbgIYKd2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 25 Sep 2020 06:33:28 -0400
+X-Greylist: delayed 6460 seconds by postgrey-1.27 at vger.kernel.org; Fri, 25 Sep 2020 06:33:27 EDT
+Received: from imperialcapgroup.com (unknown [185.236.203.204])
+        by host.imperialcapgroup.com (Postfix) with ESMTPA id 9B2E494278
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Sep 2020 05:13:31 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.imperialcapgroup.com 9B2E494278
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=imperialcapgroup.com; s=default; t=1601003613;
+        bh=6CXuz3tZVwV0sLbV3HksYvK1Xzbh6nLYCrrWqAmLkHM=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=XP3SRFo++rqU4EisKgQ81s35gec7PmWIPvAAcJ4eNPIJn/+0BBl6/CfdpRqZYrbhm
+         GXv7Q+sT9c/1em9MTgq/CXn8JbQpeOW0nWVMII8/ehu1mIvJgATJo3VnJK8qP3fUoX
+         snTJWxzjUKCtIsR9mJZCp4a4C5R47GhEz8RRE+Ug=
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.imperialcapgroup.com 9B2E494278
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=imperialcapgroup.com; s=default; t=1601003613;
+        bh=6CXuz3tZVwV0sLbV3HksYvK1Xzbh6nLYCrrWqAmLkHM=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=XP3SRFo++rqU4EisKgQ81s35gec7PmWIPvAAcJ4eNPIJn/+0BBl6/CfdpRqZYrbhm
+         GXv7Q+sT9c/1em9MTgq/CXn8JbQpeOW0nWVMII8/ehu1mIvJgATJo3VnJK8qP3fUoX
+         snTJWxzjUKCtIsR9mJZCp4a4C5R47GhEz8RRE+Ug=
+Reply-To: laghoulli22@secsuremail.com
+From:   L A <laghoulli299@imperialcapgroup.com>
+To:     linux-cifs@vger.kernel.org
+Subject: Co-Operation Required
+Date:   24 Sep 2020 20:13:33 -0700
+Message-ID: <20200924201333.A8C4F0119C5EFFBD@imperialcapgroup.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+        charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Hello there,
 
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+I am Laghouili Abdellatif. I am contacting you because I have a=20
+proposal that I think may be interested in. I represent the=20
+interest of my brother in-law who was a minister in the Syrian=20
+Government. As you probably know, there is a lot of crisis going=20
+on currently in Syria and my brother in-law has fallen out with=20
+the ruling Junta and the president because of his foreign=20
+policies and the senseless war and killings that has been going=20
+on for a while. Everybody in Syria is fed up and want a change=20
+but the president is too powerfull and he simply kills anyone=20
+that tries to oppose him. My brother in-law belives that he is at=20
+risk and he is now very scared for the safety of his family=20
+especially his kids. In order to ensure that his family is taken=20
+care of and protected incase anything happens to him, he has=20
+asked me to help him find a foreign investor who can help him=20
+accommodate and invest 100 MUSD privately that he has secured in=20
+Europe. He wants these funds safely invested so that the future=20
+and safety of his family can be secured.
 
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, DE
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+I am contacting you with the hope that you will be interested in=20
+helping us. We need your help to accommodate the funds in the=20
+banking system in your country and also invest it in lucrative=20
+projects that will yeild good profits. We will handle all the=20
+logistics involved in the movement of the funds to you. The funds=20
+is already in Europe so you have nothing to worry about because=20
+this transaction will be executed in a legal way. My brother in-=20
+law has also promised to compensate you for your help. He wants=20
+this to be done discretely so I will be acting as his eyes and=20
+ears during the course of this transaction.
+
+If this proposal interests you, please kindly respond so that I=20
+can give you more details.
+
+Regards,
+
+Laghouili.
