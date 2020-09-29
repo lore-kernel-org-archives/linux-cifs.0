@@ -2,85 +2,92 @@ Return-Path: <SRS0=6FgL=DG=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A65C4727C
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Sep 2020 22:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB64CC47423
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Sep 2020 22:43:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C9D88206CA
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Sep 2020 22:31:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8756C20756
+	for <linux-cifs@archiver.kernel.org>; Tue, 29 Sep 2020 22:43:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="YSLnM2rN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1ihDVJG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728199AbgI2WbY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 29 Sep 2020 18:31:24 -0400
-Received: from ozlabs.org ([203.11.71.1]:53597 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728124AbgI2WbY (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 29 Sep 2020 18:31:24 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4C1Dd50D5Tz9sSC;
-        Wed, 30 Sep 2020 08:31:21 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1601418681;
-        bh=W3Lg61ZUw1qk3MQEiHZDuvayLSkktmrH1/ZJeHsKV7Y=;
-        h=Date:From:To:Cc:Subject:From;
-        b=YSLnM2rNMjoOa+ttzwYf2aNDQnj+/IBUoYhl72snbC79HP4BDjAyVzhRnDRbmv8cm
-         ZDc4HTv8oQOYNn/Vj6SKbEsV81V7vqSW9RWKzao0mJH2s+ondBUw+MM2WC0vuA3BK7
-         akr8jnszyL83SyStlDZypM1jWcfAa7VBOgvR0G5+o1xI8q6g4v/HuHrG1jmakJEgQO
-         DXfYAXQR8zqW39QS+j3yPhu1xLeOCZgCio0hlADpgAqP/kFqFc5C3VN43hw3RZdbdD
-         iZCLKBlkQWAfK5Rp9O5bZ4PVndfvMaLlto7IaArgZlzEpFA4RWpUoyzxKW0q4aRu5Z
-         ba4NwXKHD4lxg==
-Date:   Wed, 30 Sep 2020 08:31:20 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commit in the cifs tree
-Message-ID: <20200930083120.6b969c8c@canb.auug.org.au>
+        id S1728384AbgI2WnA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 29 Sep 2020 18:43:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57042 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728124AbgI2Wm7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Sep 2020 18:42:59 -0400
+Received: from mail-yb1-xb42.google.com (mail-yb1-xb42.google.com [IPv6:2607:f8b0:4864:20::b42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E6A6C061755;
+        Tue, 29 Sep 2020 15:42:58 -0700 (PDT)
+Received: by mail-yb1-xb42.google.com with SMTP id x20so4856880ybs.8;
+        Tue, 29 Sep 2020 15:42:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8Uzp0mbaDszk4+DW+KjTjHRU3IuMkydHeAh8AYBMQC4=;
+        b=Q1ihDVJGMcmGgokcLCYYkQYPU9KeaYFCXnc+QgKy4eqoziuhyzRkLSvHcpKyK9009p
+         PF+gxQ+uoqzwaIcZVBRaKivcKDI01ryz2oykrOGoQZQlDPqxMkZ0Dl19+1YQiKm9VATs
+         eoGxRASnHgiDHkXdtJpePVRBU38c96/XAAONMG9mAtVet0lyOjkD8gHYPIG33WImTR3o
+         afdrIddQuVkPAJ/JFA5MLUvv19v4lsDhvbL24UBtX5bG+u3bvT9SLt7sB0xp41cnNfNm
+         AdRMg6W23+/KI2D2irV8TWc6wC38naQ2c21upraF4JZu6zWG1HxQpvSnfWyr1xtd3Jyq
+         gkhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8Uzp0mbaDszk4+DW+KjTjHRU3IuMkydHeAh8AYBMQC4=;
+        b=a+1mXeKkFLeD0Hfa1z5REyyORyZeiHk1v3r4OPYMgsCRaIURW3n46P9R8+GXjd7lEo
+         yzYtE3TKz+XE91ip6abo121mAAWiCBfObiFeHouWmxs82khVB+49VwqF4MG+KHH1Xl5f
+         gqtZrjvGSCvVXlQhbw3sMD/Dq1OxJbsAal4BSLFvN4UTdcCT1tpgPI7jyfC7mCGRKHr2
+         gGyFMQtj+braXo5AnCZfED5sT6Bc5pASbKMYSyPcAIQInTTJNz53P9iniV9DEqW2TycW
+         JAgKDfNy2Okm8k2PjoW4QelOoSu2cgkeFSB1TTmhGdWw14MbTGIo9SJzgvORqpWfxrH0
+         yoGw==
+X-Gm-Message-State: AOAM5325wR6BLGODVADUxYc92WdUY/n4AtJ936Wyr5eEjUL10YKojqyQ
+        TdCh6cha9fw9MnZmxgZzsO9cUYY+ouNCG0s/fCv7mUbitb0=
+X-Google-Smtp-Source: ABdhPJzUbfFoYw22pNhJEoKzH7dhAwYSkX18z6yiPiKX2FigwmnpapCglVbEwnP3QeiMNaqFQeKUpVGiT8RnaBQlekY=
+X-Received: by 2002:a25:9c82:: with SMTP id y2mr8603291ybo.364.1601419377394;
+ Tue, 29 Sep 2020 15:42:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/+zrm8fnmFoK4Q=bf7T5Jo4D";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+References: <20200930083120.6b969c8c@canb.auug.org.au>
+In-Reply-To: <20200930083120.6b969c8c@canb.auug.org.au>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 29 Sep 2020 17:42:46 -0500
+Message-ID: <CAH2r5mu6mSDQ5STUoFKYnDqyyQTY9jfdFiq6J0YwcxOuBd6y_w@mail.gmail.com>
+Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/+zrm8fnmFoK4Q=bf7T5Jo4D
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+fixed
 
-Hi all,
+On Tue, Sep 29, 2020 at 5:31 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> Hi all,
+>
+> Commit
+>
+>   87505cefd88d ("Convert trailing spaces and periods in path components")
+>
+> is missing a Signed-off-by from its committer.
+>
+> --
+> Cheers,
+> Stephen Rothwell
 
-Commit
 
-  87505cefd88d ("Convert trailing spaces and periods in path components")
 
-is missing a Signed-off-by from its committer.
+-- 
+Thanks,
 
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/+zrm8fnmFoK4Q=bf7T5Jo4D
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl9ztbgACgkQAVBC80lX
-0Gyy3gf/bnrB4ISrmgHTaY+2jZVc51owFvlTe99kQQcmxYyCniN9DNZ+bZZ0/w6W
-ec4K+ta51bFc1l2cL+C3jbv6ZJfP7qh6UiDrvr7K+Xown7q9cd0YwhUXiDo/hXa4
-4zTB8AJIVtliZZhA5jJrtmkQ72HgXXqXKYcXqDEe6T8R2Iv7IkY4VQYRPetqerpR
-VwqQgLik+qCVyczJi20NMhBe1W8boOuFF9oV+TpZIZtJOEws6lWtdyEcqY9yWYLx
-Yne2EIzgmEewvVSe+KcfU+wHLNetUGnf8uhLQjPfnRNQLEdSHxn9fmb2c2pWbkS1
-qY5WQkoT4+m9SPwiTVOKauhY9oIsyw==
-=NgTT
------END PGP SIGNATURE-----
-
---Sig_/+zrm8fnmFoK4Q=bf7T5Jo4D--
+Steve
