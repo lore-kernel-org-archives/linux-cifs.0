@@ -2,146 +2,126 @@ Return-Path: <SRS0=H1OG=DH=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF4DC4727E
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Sep 2020 15:58:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 516F9C4363D
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Sep 2020 21:13:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FC2C206F7
-	for <linux-cifs@archiver.kernel.org>; Wed, 30 Sep 2020 15:58:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11DC12071E
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Sep 2020 21:13:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O8mgV3OJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tP+asR19"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725799AbgI3P6E (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 30 Sep 2020 11:58:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46764 "EHLO
+        id S1725799AbgI3VNt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 30 Sep 2020 17:13:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730858AbgI3P54 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 30 Sep 2020 11:57:56 -0400
-Received: from mail-yb1-xb44.google.com (mail-yb1-xb44.google.com [IPv6:2607:f8b0:4864:20::b44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5469AC061755
-        for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2020 08:57:55 -0700 (PDT)
-Received: by mail-yb1-xb44.google.com with SMTP id 67so1656331ybt.6
-        for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2020 08:57:55 -0700 (PDT)
+        with ESMTP id S1725355AbgI3VNt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 30 Sep 2020 17:13:49 -0400
+Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B5C0C061755
+        for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2020 14:13:49 -0700 (PDT)
+Received: by mail-yb1-xb41.google.com with SMTP id j76so2371599ybg.3
+        for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2020 14:13:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=QRYbhq4WJ1cXhPiCR9E4mjM6g3lUrGRalJgt95r3sIQ=;
-        b=O8mgV3OJm9P35A7L4rojU/NzAlIgqKBVWo0y0jYO/eAKp2L+G9GKQ7SrDepWIN95Ck
-         IuX7mpTqVwnAULCom4FgI+4v0QRDHsMN7iJp3Exm5IdDarLxa1WNmOpsVTpyc7ATcr2G
-         WQ6zwGSGJo94yLCfMXyIlm0PxlnZWtMRVCAj7uWEJDiZclbVl3KH/CZqqEXbqH72f0pB
-         KHeHhDhEgBxYKUfbIsXzF4/OC0OStQaPkcf6PMpxlxO0TXK6I9s49jPaPk3Mk8UDXRWt
-         kY/dA0w/vUh9bP2sTLaJp2pWS0aMnEoLPP5khc7bTL7TzSeq32MyhrfLzjiET+0p+Tig
-         9ZvQ==
+        bh=XWZh5TTaZL/JrxLQE+ezAnN/H7M7/IC6XwTfxTqFzRI=;
+        b=tP+asR19jcPp5z85eNY42vq7Ac4Fp/v5ip3wzLOM/VENyffArJpvcxuLuk9MjU8uyV
+         ytrpB5iLJEtGCICSfzRZJoWNAMk2E38f7D+/ubUu/Q0kVEKYgxoV73XcXREJPd7RRwFM
+         mIgOOhrjC0048i5Yx+36fgRK8/NOXP+atC8rbolvpYjscxYpk0W7AGaTCQySEQvfNKsF
+         +2u4Fih0xS2KOfmYJX4JUdcNtgUpsJHE8MOsSfa2AvEfD5qrjm4nvb625E1+Jw/Is56Z
+         QwpwuS1ZL01r/ucaDagaRsTGqcrM7Zapl4wpsUZzzuyp4+ypyqXPCujc76+M2BfiGty9
+         itUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QRYbhq4WJ1cXhPiCR9E4mjM6g3lUrGRalJgt95r3sIQ=;
-        b=QQ3cZLPWIVBOWE6ILXozIqv0OoMIPvcIrxiZJnSokwG+GszwNLIjJ4LF7CgK/IkOIL
-         tHftDYcvqGq238AWVY4oFOozGNMisrRkPi+hX2tRyMf826XQAYKZ5ophzVg8K/8iPT8+
-         jBOMBPPOILYzQHeahr6GAPMKzCAU2RYE4Yu6abgmkQ+gdVSIK57Pq3UIPv/fB8e8qVtQ
-         ZUrYoTiU0fxvLdIrwax+70KZparKexbIPEtpsvSkwcCsFFV4dGHU5XzOqHgmAMFnqdu9
-         e5sVeiZP9PvRoxc2Aa/Vw4TYP9IIa5TJeFw2LUOTYXFKUrM7dgqg7Lr3UkCdc93NlY7u
-         gCYw==
-X-Gm-Message-State: AOAM533Wu41SFETk5pkTOcS8fV9f6SAVDANr9RsqqSYBB3ouayJ++EGY
-        8F9ry6TLI7HJwpsUmXqenK5fgCgGJFsilaJnoX/7aTXwjFuPoVPm
-X-Google-Smtp-Source: ABdhPJxCy4bT4VupmikucrEWIs12HrHCBipsdKrTk2yeGQep4Wq14JGfu/r9+SsFrbSx9W691lfQ6ftrLCAg/pXLnzc=
-X-Received: by 2002:a25:6193:: with SMTP id v141mr4300843ybb.34.1601481474534;
- Wed, 30 Sep 2020 08:57:54 -0700 (PDT)
+        bh=XWZh5TTaZL/JrxLQE+ezAnN/H7M7/IC6XwTfxTqFzRI=;
+        b=UfB6SrzCksx1CnuvprrErboAPr9iS4Ioh1Z+0Y1u6TxkOpBRwQv0Ii1YPCQZ9aqabR
+         NAsJztWsJlGTJMTHU20fYxe/lzW3Y+bgVpDvLjxmYDHadECRjK7/pBcT8agar/F2eiwc
+         G6dD6wB8aIPLD3AO+HC1AIKPUiz2HtcwreuxnKodK6SGDHFKplelEXJqebrFfgYokL2q
+         3HsIOU5k9HguE3cKdbenqVK6AUu/8XaCLLADArYxz5D4WSx7ei6xEAyQlHHdyA4IkCBd
+         44ufwP3nhgjTYLv15ytDAWToBqu4LpnPdhnIEHPC5ImhM853LtpXbLomm+Z187kGzckT
+         sCEQ==
+X-Gm-Message-State: AOAM533q48RtAuI2T+2pmXqR27AXYVmgrWzhvIaR4lhcb2Z0tujTvrym
+        j5JrC/Ea3jPRJLWFSaYP/gDJjvt9+COCz6IytyA=
+X-Google-Smtp-Source: ABdhPJxODx2Gttwh3UuHrM8KO9fZTyEEqXr6ujtwWxYPtyzvBgszN/1y5xPdD4DoRgG8P60XOdFutimZSe6gTo+3HTg=
+X-Received: by 2002:a25:b98b:: with SMTP id r11mr6515596ybg.70.1601500428684;
+ Wed, 30 Sep 2020 14:13:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <CANT5p=ojR_Aac4bWSBqb3_FmzzjA6sHQBdN5z4o6c4nFDKmNDQ@mail.gmail.com>
- <87blhok9jd.fsf@suse.com> <CAH2r5murtQh0Mvp53bc_DRh7AwuMNPq=dqPq=gh3ESsQ0Lkwsg@mail.gmail.com>
- <CANT5p=q=8MLgWogmUiGUCRX53qNOsg_tRyXP_YMDjfrfai7awQ@mail.gmail.com>
-In-Reply-To: <CANT5p=q=8MLgWogmUiGUCRX53qNOsg_tRyXP_YMDjfrfai7awQ@mail.gmail.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Wed, 30 Sep 2020 21:27:44 +0530
-Message-ID: <CANT5p=rWSgB77Q-L_8YMUqzaVWsCLbguq7z4moN63cNKqgdHiA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Return the appropriate error in cifs_sb_tlink
- instead of a generic error.
-To:     Steve French <smfrench@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com,
-        rohiths msft <rohiths.msft@gmail.com>
+References: <20200924003638.2668-1-pboris@amazon.com> <CAHhKpQ4UFhtfRhByRiAm6KPy=KAzttYzZADLfakbMwpsp5GjpA@mail.gmail.com>
+ <CAH2r5mvWZSPjtg1g2FhZ+gZNpakdaFnugw=FhFV92Ed83VzAuQ@mail.gmail.com> <878scrk45e.fsf@suse.com>
+In-Reply-To: <878scrk45e.fsf@suse.com>
+From:   Boris Protopopov <boris.v.protopopov@gmail.com>
+Date:   Wed, 30 Sep 2020 17:13:38 -0400
+Message-ID: <CAHhKpQ5pVuxAW8=znu1oYReSE-KOrO=5g=BP1T-VzhQW7EZkJg@mail.gmail.com>
+Subject: Re: [PATCH] Convert trailing spaces and periods in path components
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ok. Checked the test. It does a multiuser mount of a file share. (I'm
-assuming this is using sec=3Dntlmssp)
-Then does an "ls" on the mount point as another user. Expects EACCES
-as the output.
-With this change, the command returns an ENOKEY.
-With the credentials added to keyring using cifscreds, the ls command works=
-.
+I agree with testing, but also, looking at the comments:
 
-Now the question is: Is the right error to return here EACCES or
-ENOKEY? Even if the expected error here should be EACCES, I'd say that
-the error returned by cifs_set_cifscreds should return that error.
+/*
+ * Convert 16 bit Unicode pathname to wire format from string in
+current code
+ * page. Conversion may involve remapping up the six characters that
+are
+ * only legal in POSIX-like OS (if they are present in the string).
+Path
+ * names are little endian 16 bit Unicode on the wire
+ */
+int
+cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
+                 const struct nls_table *cp, int map_chars)
+{
+        int i, charlen;
+        int j =3D 0;
+        char src_char;
+        __le16 dst_char;
+        wchar_t tmp;
+        wchar_t *wchar_to;      /* UTF-16 */
+        int ret;
+        unicode_t u;
 
-Regards,
-Shyam
+        if (map_chars =3D=3D NO_MAP_UNI_RSVD)
+                return cifs_strtoUTF16(target, source, PATH_MAX, cp);
 
-On Wed, Sep 30, 2020 at 8:48 PM Shyam Prasad N <nspmangalore@gmail.com> wro=
-te:
+...
+
+it would seem that as long as the correct map_chars is picked, it
+should work correctly? The latter, if not automatically determined,
+can be controlled with mount options, I believe.
+
+Boris.
+
+On Wed, Sep 30, 2020 at 5:25 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
+:
 >
-> It looks like xfstests smb3 multiuser cifsutils-101 and cifs-101 are fail=
-ing.
-> Maybe they were written keeping in mind the current error code
-> returned by cifs.ko in this situation? Let me take a look.
-> I guess @ronnie sahlberg will be able to debug the failing tests
-> faster. The failing test has his name in the code. :)
->
-> On Tue, Sep 29, 2020 at 11:16 PM Steve French <smfrench@gmail.com> wrote:
-> >
+> Steve French <smfrench@gmail.com> writes:
 > > tentatively merged ... running the usual functional tests
 > > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2=
 /builds/399
-> >
-> > On Tue, Sep 29, 2020 at 8:16 AM Aur=C3=A9lien Aptel <aaptel@suse.com> w=
-rote:
-> > >
-> > > Shyam Prasad N <nspmangalore@gmail.com> writes:
-> > > > One of the cases where this behaviour is confusing is where a
-> > > > new tcon needs to be constructed, but it fails due to
-> > > > expired keys. cifs_construct_tcon then returns ENOKEY,
-> > > > but we end up returning a EACCES to the user.
-> > > >
-> > > > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> > >
-> > > LGTM
-> > >
-> > > Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-> > >
-> > > Cheers,
-> > > --
-> > > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> > > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> > > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnb=
-erg, DE
-> > > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
-=C3=BCnchen)
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
 >
+> We need to make sure it works with samba smb1&smb2 posix extensions.
+> In smb1 posix extensions the paths are sent with / and \ is a valid
+> component (and no restrictions on file name endings).
 >
->
+> Cheers,
 > --
-> -Shyam
-
-
-
---=20
--Shyam
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
+ DE
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
+=BCnchen)
