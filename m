@@ -1,93 +1,71 @@
-Return-Path: <SRS0=6FgL=DG=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=H1OG=DH=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB64CC47423
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Sep 2020 22:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A55FC4727F
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Sep 2020 09:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8756C20756
-	for <linux-cifs@archiver.kernel.org>; Tue, 29 Sep 2020 22:43:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C676B20754
+	for <linux-cifs@archiver.kernel.org>; Wed, 30 Sep 2020 09:25:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1ihDVJG"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ICHRn55w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728384AbgI2WnA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 29 Sep 2020 18:43:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57042 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728124AbgI2Wm7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 29 Sep 2020 18:42:59 -0400
-Received: from mail-yb1-xb42.google.com (mail-yb1-xb42.google.com [IPv6:2607:f8b0:4864:20::b42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E6A6C061755;
-        Tue, 29 Sep 2020 15:42:58 -0700 (PDT)
-Received: by mail-yb1-xb42.google.com with SMTP id x20so4856880ybs.8;
-        Tue, 29 Sep 2020 15:42:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8Uzp0mbaDszk4+DW+KjTjHRU3IuMkydHeAh8AYBMQC4=;
-        b=Q1ihDVJGMcmGgokcLCYYkQYPU9KeaYFCXnc+QgKy4eqoziuhyzRkLSvHcpKyK9009p
-         PF+gxQ+uoqzwaIcZVBRaKivcKDI01ryz2oykrOGoQZQlDPqxMkZ0Dl19+1YQiKm9VATs
-         eoGxRASnHgiDHkXdtJpePVRBU38c96/XAAONMG9mAtVet0lyOjkD8gHYPIG33WImTR3o
-         afdrIddQuVkPAJ/JFA5MLUvv19v4lsDhvbL24UBtX5bG+u3bvT9SLt7sB0xp41cnNfNm
-         AdRMg6W23+/KI2D2irV8TWc6wC38naQ2c21upraF4JZu6zWG1HxQpvSnfWyr1xtd3Jyq
-         gkhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8Uzp0mbaDszk4+DW+KjTjHRU3IuMkydHeAh8AYBMQC4=;
-        b=a+1mXeKkFLeD0Hfa1z5REyyORyZeiHk1v3r4OPYMgsCRaIURW3n46P9R8+GXjd7lEo
-         yzYtE3TKz+XE91ip6abo121mAAWiCBfObiFeHouWmxs82khVB+49VwqF4MG+KHH1Xl5f
-         gqtZrjvGSCvVXlQhbw3sMD/Dq1OxJbsAal4BSLFvN4UTdcCT1tpgPI7jyfC7mCGRKHr2
-         gGyFMQtj+braXo5AnCZfED5sT6Bc5pASbKMYSyPcAIQInTTJNz53P9iniV9DEqW2TycW
-         JAgKDfNy2Okm8k2PjoW4QelOoSu2cgkeFSB1TTmhGdWw14MbTGIo9SJzgvORqpWfxrH0
-         yoGw==
-X-Gm-Message-State: AOAM5325wR6BLGODVADUxYc92WdUY/n4AtJ936Wyr5eEjUL10YKojqyQ
-        TdCh6cha9fw9MnZmxgZzsO9cUYY+ouNCG0s/fCv7mUbitb0=
-X-Google-Smtp-Source: ABdhPJzUbfFoYw22pNhJEoKzH7dhAwYSkX18z6yiPiKX2FigwmnpapCglVbEwnP3QeiMNaqFQeKUpVGiT8RnaBQlekY=
-X-Received: by 2002:a25:9c82:: with SMTP id y2mr8603291ybo.364.1601419377394;
- Tue, 29 Sep 2020 15:42:57 -0700 (PDT)
+        id S1725836AbgI3JZT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 30 Sep 2020 05:25:19 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57182 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725823AbgI3JZT (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 30 Sep 2020 05:25:19 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1601457918;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=amZ77wDXvioG8jRJEGnYXQRY1yhplZyFN9RFKu4KJ2U=;
+        b=ICHRn55wNiVZLNDZyG2wwdp72wel60JE70CDMxpTk7iRqkXTXUW0482cVzfmed1+Lhr+Zi
+        vT4KiyMTFbcqe29vb4fptU4ar+C5bw+V2T5FxOKrINJYmcPDlxvzSAANjzz5XNWGnsZrPI
+        BCyIuPeSWVeNZF1rthVnjdM1Xp7FBtg=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 43DF3AD1B;
+        Wed, 30 Sep 2020 09:25:18 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Steve French <smfrench@gmail.com>,
+        Boris Protopopov <boris.v.protopopov@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH] Convert trailing spaces and periods in path components
+In-Reply-To: <CAH2r5mvWZSPjtg1g2FhZ+gZNpakdaFnugw=FhFV92Ed83VzAuQ@mail.gmail.com>
+References: <20200924003638.2668-1-pboris@amazon.com>
+ <CAHhKpQ4UFhtfRhByRiAm6KPy=KAzttYzZADLfakbMwpsp5GjpA@mail.gmail.com>
+ <CAH2r5mvWZSPjtg1g2FhZ+gZNpakdaFnugw=FhFV92Ed83VzAuQ@mail.gmail.com>
+Date:   Wed, 30 Sep 2020 11:25:17 +0200
+Message-ID: <878scrk45e.fsf@suse.com>
 MIME-Version: 1.0
-References: <20200930083120.6b969c8c@canb.auug.org.au>
-In-Reply-To: <20200930083120.6b969c8c@canb.auug.org.au>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 29 Sep 2020 17:42:46 -0500
-Message-ID: <CAH2r5mu6mSDQ5STUoFKYnDqyyQTY9jfdFiq6J0YwcxOuBd6y_w@mail.gmail.com>
-Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-fixed
+Steve French <smfrench@gmail.com> writes:
+> tentatively merged ... running the usual functional tests
+> http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/b=
+uilds/399
 
-On Tue, Sep 29, 2020 at 5:31 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> Commit
->
->   87505cefd88d ("Convert trailing spaces and periods in path components")
->
-> is missing a Signed-off-by from its committer.
->
-> --
-> Cheers,
-> Stephen Rothwell
+We need to make sure it works with samba smb1&smb2 posix extensions.
+In smb1 posix extensions the paths are sent with / and \ is a valid
+component (and no restrictions on file name endings).
 
-
-
--- 
-Thanks,
-
-Steve
+Cheers,
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, DE
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
+nchen)
