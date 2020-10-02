@@ -2,162 +2,439 @@ Return-Path: <SRS0=klGs=DJ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0177C4363D
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Oct 2020 14:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C12C4363C
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Oct 2020 15:29:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 70202206DD
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Oct 2020 14:13:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98EED206DC
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Oct 2020 15:29:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bKJUldMK"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="RlNx2u17"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388036AbgJBONc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 2 Oct 2020 10:13:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52012 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387908AbgJBONb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 2 Oct 2020 10:13:31 -0400
-Received: from mail-yb1-xb41.google.com (mail-yb1-xb41.google.com [IPv6:2607:f8b0:4864:20::b41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 356D0C0613D0
-        for <linux-cifs@vger.kernel.org>; Fri,  2 Oct 2020 07:13:30 -0700 (PDT)
-Received: by mail-yb1-xb41.google.com with SMTP id a2so1277854ybj.2
-        for <linux-cifs@vger.kernel.org>; Fri, 02 Oct 2020 07:13:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AQFJfBYRWWE6gvRV2VQEDB3MthtDPgekQ5csz9LPSHk=;
-        b=bKJUldMKoVeJh7N8YU5nbh00y9hmvlxxXU24ZJvHn/nFOAPYThkUMp3QIN1xMbTrIs
-         zycnAOrfdD8ZFpIkPGMF0Vn9BgSoVm4CWCTso3oVZjJiNv18OF4vY364Rtyn9Jm/u4Sj
-         /ElOHYFb1cIElLsbuqjgtOQPPw3hr+/cCUQ/Kx+91ZnORz6Pv4a7/CyNC8cDZb6akp1K
-         95DmotUKQMfXUsTsLYhAYjey5csEJtccf5wHISni5O3eHb/XmoWnZYrZ2I3zEhHmOkdK
-         BWjol1VVJ2u80wVwnf4daWt63uxMUXdxNfUbNLsd0uorg3zrRIbeS+VTPnRtUKf3QlVY
-         jcJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AQFJfBYRWWE6gvRV2VQEDB3MthtDPgekQ5csz9LPSHk=;
-        b=kp3euWAqUUfVjBflbZ+yDtZvx48jg1lHiIVmEvjNO6pXf03aiIupoAeAQ2swnwnBfD
-         bxAdV5sqTOl1qxqdcyxy7BQWmUI07LepaMhNQhwv+Isdd5HBretgilAZXv14yvSRlj7Z
-         elhcW8POt9zfJnDoB+UT5Hg0jdz65yanASmFoET+4fRnUXn9wDdAkGt0nKRmdAnAB2RD
-         haBXs5qAKAAYdC1yJmanCwSJFWpRb6swSyO6WA45Uj73cykoLzTJeXYRZQ6HQ2L5vUKS
-         S8l13GK6nP6PmWZwtJD/Oh3deoCfqdAHOSdby15rXs63vOlbKPkvEoArgdPlY8vDzG/3
-         Yw2A==
-X-Gm-Message-State: AOAM532MjW4HUafWzV4j8BzyQmjKGbuLiDBXcAaH3pti4UPps4Td2nWw
-        Pkw4ugatNgAQKURH6maGeyDflqikA6vv6MfVbLc=
-X-Google-Smtp-Source: ABdhPJyYhnbeCz+za60pveoNs50HlzSWI5+6+qK5MvKivrI5Dir+en2U6Lkp288p5QavcdDoUjPq7mXS/4rj7CWTV3Y=
-X-Received: by 2002:a25:9c82:: with SMTP id y2mr2842581ybo.364.1601648009246;
- Fri, 02 Oct 2020 07:13:29 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201001205026.8808-1-lsahlber@redhat.com> <CAH2r5mvu0MkosfCnCp4jO1=aYVrOaigwoiV09zmTsZtqGL9nVw@mail.gmail.com>
- <CAN05THROtDP98i7UGKgYqHmQQd5RF0+0OdD8q4xhR41QLa3+wA@mail.gmail.com> <CAN05THQHSRr37D3v+LTZcdhbOsvq4WG1DuDKzbSrJDPgTipPGg@mail.gmail.com>
-In-Reply-To: <CAN05THQHSRr37D3v+LTZcdhbOsvq4WG1DuDKzbSrJDPgTipPGg@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 2 Oct 2020 09:13:18 -0500
-Message-ID: <CAH2r5mvE8tSeBb5RJEd_71_dVMYyQmfznbJxN+rPrM2z0WmK6Q@mail.gmail.com>
-Subject: Re: [PATCH 0/3] cifs: cache directory content for shroot
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        id S2388169AbgJBP3p (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 2 Oct 2020 11:29:45 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59706 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387984AbgJBP3p (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 2 Oct 2020 11:29:45 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1601652583;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zd2gf63+FWfeaFpRDh6SBUsDJu6Igw3jjc9dxr+BEK8=;
+        b=RlNx2u17DPBsHfytbK/KqruknFe1ARKP4MquLzO0O3TAbrDawVF/FeXGd3ilKzvUoXJnk7
+        5HXB6OtvwWC8qPj0h1l+rrX7nomVGRl2sZWD3VoPpM86ssSpWvlmJUIFGiLhzNFDI8y90l
+        qG76o0AmkwdLubMk38RQwHxW7h+qakQ=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id F3E1AAD46;
+        Fri,  2 Oct 2020 15:29:42 +0000 (UTC)
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Ronnie Sahlberg <lsahlber@redhat.com>,
         linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH 3/3] cifs: cache the directory content for shroot
+In-Reply-To: <20201001205026.8808-4-lsahlber@redhat.com>
+References: <20201001205026.8808-1-lsahlber@redhat.com>
+ <20201001205026.8808-4-lsahlber@redhat.com>
+Date:   Fri, 02 Oct 2020 17:29:42 +0200
+Message-ID: <87sgawir2x.fsf@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-query dir is doing a FIND_ID_FULL_DIRECTORY_INFO and stat is doing a
-FILE_ALL_INFO?  What are we missing from the query dir response that
-we would get from FILE_ALL_INFO in the query info one by one?
+Hi Ronnie,
 
-On Fri, Oct 2, 2020 at 3:07 AM ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
+The more we isolate code with clear opaque interfaces, the less we have
+to understand about their low-level implementation.
+
+I was thinking we could move all dir cache related code to a new dcache.c
+file or something like that.
+
+One question: when does the cache gets cleared? We dont want to have the
+same stale content every time we query the root. Should it be time based?
+
+Comments on code below:
+
+Ronnie Sahlberg <lsahlber@redhat.com> writes:
+>  fs/cifs/cifsglob.h |  21 +++++++
+>  fs/cifs/misc.c     |   2 +
+>  fs/cifs/readdir.c  | 173 +++++++++++++++++++++++++++++++++++++++++++++++=
++++---
+>  fs/cifs/smb2ops.c  |  14 +++++
+>  4 files changed, 203 insertions(+), 7 deletions(-)
+
+
 >
-> On Fri, Oct 2, 2020 at 6:04 PM ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
-> >
-> > On Fri, Oct 2, 2020 at 3:08 PM Steve French <smfrench@gmail.com> wrote:
-> > >
-> > > My initial test of this was to Windows 10, doing ls of the root directory.
-> > >
-> > > During mount as expected I see the initial compounded smb3.1.1
-> > > create/query(file_all_info) work and get a directory lease (read
-> > > lease) on the root directory
-> > >
-> > > Then doing the ls
-> > > I see the expected ls of the root directory query dir return
-> > > successfully, but it is a compounded open/query-dir (no lease
-> > > requested) not a query dir using the already open root file handle.
-> > > We should find a way to allow it to use the root file handle if
-> > > possible although perhaps less important when the caching code is
-> > > fully working as it will only be requested once.
-> >
-> > That is something we can improve as aesthetics. Yes, we should try to
-> > use already open directory handles if ones are available.
-> > Right now this is probably low priority as we only cache the root directory.
-> > When we expand this to other directories as well,   maybe cashe with a
-> > lease the last n directories? and not just ""
-> > we can do this and likely see improvements.
-> >
-> > >
-> > > The next ls though does an open/query but then does stat of all the
-> > > files (which is bad, lots of compounded open/query-info/close).  Then
-> > > the next ls will do open/query-dir
-> >
-> > I don't think we can avoid this. The directory lease AFAIK only
-> > triggers and breaks on when the directory itself is modified,
-> > i.e. dirents are added/deleted/renamed   but not is pre-existing
-> > direntries have changes to their inodes.
-> >
-> > I.e. does a directory lease break just because an existing file in it
-> > was extended? Does the lease break if an immediate subdirectory have
-> > files added/removed, i.e. st_nlink changes, not for the directory we
-> > have a lease on but a subdirectory where we do not  have a lease?
->
-> I mean, even with directory caching ls -l would still need to stat()
-> each dirent ?
->
-> > >
-> > > So the patch set is promising but currently isn't caching the root
-> > > directory contents in a way that is recognized by the subsequent ls
-> > > commands.   I will try to look at this more this weekend - but let me
-> > > know if updated version of the patchset - it will be very, very useful
-> > > when we can get this working - very exciting.
-> > >
-> > > On Thu, Oct 1, 2020 at 3:50 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
-> > > >
-> > > > Steve, List
-> > > >
-> > > > See initial implementation of a mechanism to cache the directory entries for
-> > > > a shared cache handle (shroot).
-> > > > We cache all the entries during the initial readdir() scan, using the context
-> > > > from the vfs layer as the key to handle if there are multiple concurrent readir() scans
-> > > > of the same directory.
-> > > > Then if/when we have successfully cached the entire direcotry we will server any
-> > > > subsequent readdir() from out of cache, avoinding making any query direcotry calls to the server.
-> > > >
-> > > > As with all of shroot, the cache is kept until the direcotry lease is broken.
-> > > >
-> > > >
-> > > > The first two patches are small and just a preparation for the third patch. They go as separate
-> > > > patches to make review easier.
-> > > > The third patch adds the actual meat of the dirent caching .
-> > > >
-> > > >
-> > > > For now this might not be too exciting because the only cache the root handle.
-> > > > I hope in the future we will expand the directory caching to handle any/many direcotries.
-> > > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index b565d83ba89e..e8f2b4a642d4 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1073,6 +1073,26 @@ cap_unix(struct cifs_ses *ses)
+>  	return ses->server->vals->cap_unix & ses->capabilities;
+>  }
+>=20=20
+> +struct cached_dirent {
+> +	struct list_head entry;
+> +	char *name;
+> +	int namelen;
+> +	loff_t pos;
+> +	u64 ino;
+> +	unsigned type;
+> +};
+> +
+> +struct cached_dirents {
+> +	bool is_valid:1;
+> +	bool is_failed:1;
+> +	struct dir_context *ctx; /* Only used to make sure we only take entries
+> +				  * from a single context. Never dereferenced.
+> +				  */
+
+This type of comments are not in the kernel coding style. First comment
+line with "/*" shouldnt have text.
+
+> +	struct mutex de_mutex;
+> +	int pos;		 /* Expected ctx->pos */
+> +	struct list_head entries;
+> +};
+> +
+>  struct cached_fid {
+>  	bool is_valid:1;	/* Do we have a useable root fid */
+>  	bool file_all_info_is_valid:1;
+> @@ -1083,6 +1103,7 @@ struct cached_fid {
+>  	struct cifs_tcon *tcon;
+>  	struct work_struct lease_break;
+>  	struct smb2_file_all_info file_all_info;
+> +	struct cached_dirents dirents;
+>  };
+
+>  	}
+> +	INIT_LIST_HEAD(&ret_buf->crfid.dirents.entries);
+> +	mutex_init(&ret_buf->crfid.dirents.de_mutex);
+>=20=20
+>  	atomic_inc(&tconInfoAllocCount);
+>  	ret_buf->tidStatus =3D CifsNew;
+> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> index 31a18aae5e64..17861c3d2e08 100644
+> --- a/fs/cifs/readdir.c
+> +++ b/fs/cifs/readdir.c
+> @@ -811,9 +811,119 @@ find_cifs_entry(const unsigned int xid, struct cifs=
+_tcon *tcon, loff_t pos,
+>  	return rc;
+>  }
+>=20=20
+> +static void init_cached_dirents(struct cached_dirents *cde,
+> +				struct dir_context *ctx)
+> +{
+> +	if (ctx->pos =3D=3D 2 && cde->ctx =3D=3D NULL) {
+> +		cde->ctx =3D ctx;
+> +		cde->pos =3D 2;
+> +	}
+> +}
+
+2 is for "." and ".."? Can you add more comments to document this?
+
+Can you document which functions are expecting to be called with a lock
+held?
+
+> +
+> +static bool emit_cached_dirents(struct cached_dirents *cde,
+> +				struct dir_context *ctx)
+> +{
+> +	struct list_head *tmp;
+> +	struct cached_dirent *dirent;
+> +	int rc;
+> +
+> +	list_for_each(tmp, &cde->entries) {
+> +		dirent =3D list_entry(tmp, struct cached_dirent, entry);
+> +		if (ctx->pos >=3D dirent->pos)
+> +			continue;
+> +		ctx->pos =3D dirent->pos;
+> +		rc =3D dir_emit(ctx, dirent->name, dirent->namelen,
+> +			      dirent->ino, dirent->type);
+> +		if (!rc)
+> +			return rc;
+> +	}
+> +	return true;
+> +}
+> +
+> +static void update_cached_dirents_count(struct cached_dirents *cde,
+> +					struct dir_context *ctx)
+> +{
+> +	if (cde->ctx !=3D ctx)
+> +		return;
+> +	if (cde->is_valid || cde->is_failed)
+> +		return;
+> +
+> +	cde->pos++;
+> +}
+> +
+> +static void finished_cached_dirents_count(struct cached_dirents *cde,
+> +					struct dir_context *ctx)
+> +{
+> +	if (cde->ctx !=3D ctx)
+> +		return;
+> +	if (cde->is_valid || cde->is_failed)
+> +		return;
+> +	if (ctx->pos !=3D cde->pos)
+> +		return;
+> +
+> +	cde->is_valid =3D 1;
+> +}
+> +
+> +static void add_cached_dirent(struct cached_dirents *cde,
+> +			      struct dir_context *ctx,
+> +			      const char *name, int namelen,
+> +			      u64 ino, unsigned type)
+> +{
+> +	struct cached_dirent *de;
+> +
+> +	if (cde->ctx !=3D ctx)
+> +		return;
+> +	if (cde->is_valid || cde->is_failed)
+> +		return;
+> +	if (ctx->pos !=3D cde->pos) {
+> +		cde->is_failed =3D 1;
+> +		return;
+> +	}
+> +	de =3D kzalloc(sizeof(*de), GFP_ATOMIC);
+> +	if (de =3D=3D NULL) {
+> +		cde->is_failed =3D 1;
+> +		return;
+> +	}
+> +	de->name =3D kzalloc(namelen, GFP_ATOMIC);
+> +	if (de->name =3D=3D NULL) {
+> +		kfree(de);
+> +		cde->is_failed =3D 1;
+> +		return;
+> +	}
+> +	memcpy(de->name, name, namelen);
+> +	de->namelen =3D namelen;
+> +	de->pos =3D ctx->pos;
+> +	de->ino =3D ino;
+> +	de->type =3D type;
+> +
+> +	list_add_tail(&de->entry, &cde->entries);
+> +}
+> +
+> +static bool cifs_dir_emit(struct dir_context *ctx,
+> +			  const char *name, int namelen,
+> +			  u64 ino, unsigned type,
+> +			  struct cached_fid *cfid)
+> +{
+> +	bool rc;
+> +
+> +	rc =3D dir_emit(ctx, name, namelen, ino, type);
+> +	if (!rc)
+> +		return rc;
+> +
+> +	if (cfid) {
+> +		mutex_lock(&cfid->dirents.de_mutex);
+> +		add_cached_dirent(&cfid->dirents, ctx, name, namelen, ino,
+> +				  type);
+> +		mutex_unlock(&cfid->dirents.de_mutex);
+> +	}
+> +
+> +	return rc;
+> +}
+> +
+>  static int cifs_filldir(char *find_entry, struct file *file,
+> -		struct dir_context *ctx,
+> -		char *scratch_buf, unsigned int max_len)
+> +			struct dir_context *ctx,
+> +			char *scratch_buf, unsigned int max_len,
+> +			struct cached_fid *cfid)
+>  {
+>  	struct cifsFileInfo *file_info =3D file->private_data;
+>  	struct super_block *sb =3D file_inode(file)->i_sb;
+> @@ -903,10 +1013,10 @@ static int cifs_filldir(char *find_entry, struct f=
+ile *file,
+>  	cifs_prime_dcache(file_dentry(file), &name, &fattr);
+>=20=20
+>  	ino =3D cifs_uniqueid_to_ino_t(fattr.cf_uniqueid);
+> -	return !dir_emit(ctx, name.name, name.len, ino, fattr.cf_dtype);
+> +	return !cifs_dir_emit(ctx, name.name, name.len, ino, fattr.cf_dtype,
+> +			      cfid);
+>  }
+>=20=20
+> -
+>  int cifs_readdir(struct file *file, struct dir_context *ctx)
+>  {
+>  	int rc =3D 0;
+> @@ -920,6 +1030,8 @@ int cifs_readdir(struct file *file, struct dir_conte=
+xt *ctx)
+>  	char *end_of_smb;
+>  	unsigned int max_len;
+>  	char *full_path =3D NULL;
+> +	struct cached_fid *cfid =3D NULL;
+> +	struct cifs_sb_info *cifs_sb =3D CIFS_FILE_SB(file);
+>=20=20
+>  	xid =3D get_xid();
+>=20=20
+> @@ -928,7 +1040,6 @@ int cifs_readdir(struct file *file, struct dir_conte=
+xt *ctx)
+>  		rc =3D -ENOMEM;
+>  		goto rddir2_exit;
+>  	}
+> -
+>  	/*
+>  	 * Ensure FindFirst doesn't fail before doing filldir() for '.' and
+>  	 * '..'. Otherwise we won't be able to notify VFS in case of failure.
+> @@ -949,6 +1060,31 @@ int cifs_readdir(struct file *file, struct dir_cont=
+ext *ctx)
+>  		if after then keep searching till find it */
+>=20=20
+>  	cifsFile =3D file->private_data;
+> +	tcon =3D tlink_tcon(cifsFile->tlink);
+> +	if (tcon->ses->server->vals->header_preamble_size =3D=3D 0 &&
+
+header_preamble_size =3D=3D 0 is a test for smb1? we have is_smb1_server()
+
+> +		!strcmp(full_path, "")) {
+> +		rc =3D open_shroot(xid, tcon, cifs_sb, &cfid);
+> +		if (rc)
+> +			goto cache_not_found;
+> +
+> +		mutex_lock(&cfid->dirents.de_mutex);
+> +		/* if this was reading from the start of the directory
+> +		 * we might need to initialize scanning and storing the
+> +		 * directory content.
+> +		 */
+> +		init_cached_dirents(&cfid->dirents, ctx);
+> +		/* If we already have the entire directory cached then
+> +		 * we cna just serve the cache.
+> +		 */
+
+comment style
+
+> +		if (cfid->dirents.is_valid) {
+> +			emit_cached_dirents(&cfid->dirents, ctx);
+> +			mutex_unlock(&cfid->dirents.de_mutex);
+> +			goto rddir2_exit;
+> +		}
+> +		mutex_unlock(&cfid->dirents.de_mutex);
+> +	}
+> + cache_not_found:
+> +
+>  	if (cifsFile->srch_inf.endOfSearch) {
+>  		if (cifsFile->srch_inf.emptyDir) {
+>  			cifs_dbg(FYI, "End of search, empty dir\n");
+> @@ -960,15 +1096,30 @@ int cifs_readdir(struct file *file, struct dir_con=
+text *ctx)
+>  		tcon->ses->server->close(xid, tcon, &cifsFile->fid);
+>  	} */
+>=20=20
+> -	tcon =3D tlink_tcon(cifsFile->tlink);
+> +	/* Drop the cache while calling find_cifs_entry in case there will
+> +	 * be reconnects during query_directory.
+> +	 */
+
+comment style
+
+> +	if (cfid) {
+> +		close_shroot(cfid);
+> +		cfid =3D NULL;
+> +	}
+>  	rc =3D find_cifs_entry(xid, tcon, ctx->pos, file, full_path,
+>  			     &current_entry, &num_to_fill);
+> +	if (tcon->ses->server->vals->header_preamble_size =3D=3D 0 &&
+> +		!strcmp(full_path, "")) {
+> +		open_shroot(xid, tcon, cifs_sb, &cfid);
+> +	}
+>  	if (rc) {
+>  		cifs_dbg(FYI, "fce error %d\n", rc);
+>  		goto rddir2_exit;
+>  	} else if (current_entry !=3D NULL) {
+>  		cifs_dbg(FYI, "entry %lld found\n", ctx->pos);
+>  	} else {
+> +		if (cfid) {
+> +			mutex_lock(&cfid->dirents.de_mutex);
+> +			finished_cached_dirents_count(&cfid->dirents, ctx);
+> +			mutex_unlock(&cfid->dirents.de_mutex);
+> +		}
+>  		cifs_dbg(FYI, "Could not find entry\n");
+>  		goto rddir2_exit;
+>  	}
+> @@ -998,7 +1149,7 @@ int cifs_readdir(struct file *file, struct dir_conte=
+xt *ctx)
+>  		 */
+>  		*tmp_buf =3D 0;
+>  		rc =3D cifs_filldir(current_entry, file, ctx,
+> -				  tmp_buf, max_len);
+> +				  tmp_buf, max_len, cfid);
+>  		if (rc) {
+>  			if (rc > 0)
+>  				rc =3D 0;
+> @@ -1006,6 +1157,12 @@ int cifs_readdir(struct file *file, struct dir_con=
+text *ctx)
+>  		}
+>=20=20
+>  		ctx->pos++;
+> +		if (cfid) {
+> +			mutex_lock(&cfid->dirents.de_mutex);
+> +			update_cached_dirents_count(&cfid->dirents, ctx);
+> +			mutex_unlock(&cfid->dirents.de_mutex);
+> +		}
+> +
+>  		if (ctx->pos =3D=3D
+>  			cifsFile->srch_inf.index_of_last_entry) {
+>  			cifs_dbg(FYI, "last entry in buf at pos %lld %s\n",
+> @@ -1020,6 +1177,8 @@ int cifs_readdir(struct file *file, struct dir_cont=
+ext *ctx)
+>  	kfree(tmp_buf);
+>=20=20
+>  rddir2_exit:
+> +	if (cfid)
+> +		close_shroot(cfid);
+>  	kfree(full_path);
+>  	free_xid(xid);
+>  	return rc;
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index fd6c136066df..280464e21a5f 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -605,6 +605,8 @@ smb2_close_cached_fid(struct kref *ref)
+>  {
+>  	struct cached_fid *cfid =3D container_of(ref, struct cached_fid,
+>  					       refcount);
+> +	struct list_head *pos, *q;
+> +	struct cached_dirent *dirent;
+>=20=20
+>  	if (cfid->is_valid) {
+>  		cifs_dbg(FYI, "clear cached root file handle\n");
+> @@ -613,6 +615,18 @@ smb2_close_cached_fid(struct kref *ref)
+>  		cfid->is_valid =3D false;
+>  		cfid->file_all_info_is_valid =3D false;
+>  		cfid->has_lease =3D false;
+> +		mutex_lock(&cfid->dirents.de_mutex);
+> +		list_for_each_safe(pos, q, &cfid->dirents.entries) {
+> +			dirent =3D list_entry(pos, struct cached_dirent, entry);
+> +			list_del(pos);
+> +			kfree(dirent->name);
+> +			kfree(dirent);
+> +		}
+> +		cfid->dirents.is_valid =3D 0;
+> +		cfid->dirents.is_failed =3D 0;
+> +		cfid->dirents.ctx =3D NULL;
+> +		cfid->dirents.pos =3D 0;
+> +		mutex_unlock(&cfid->dirents.de_mutex);
+>  	}
+>  }
 
 
-
--- 
-Thanks,
-
-Steve
+Cheers,
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, DE
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
+nchen)
