@@ -2,192 +2,492 @@ Return-Path: <SRS0=6i8E=DL=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD687C4363C
-	for <linux-cifs@archiver.kernel.org>; Sun,  4 Oct 2020 22:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8743C47095
+	for <linux-cifs@archiver.kernel.org>; Sun,  4 Oct 2020 23:20:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E10B2067B
-	for <linux-cifs@archiver.kernel.org>; Sun,  4 Oct 2020 22:48:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7320D20757
+	for <linux-cifs@archiver.kernel.org>; Sun,  4 Oct 2020 23:20:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="juF7cN9M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRWwkwRo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725836AbgJDWsA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 4 Oct 2020 18:48:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35526 "EHLO
+        id S1725838AbgJDXUI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 4 Oct 2020 19:20:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725834AbgJDWsA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 4 Oct 2020 18:48:00 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BECC0613CE
-        for <linux-cifs@vger.kernel.org>; Sun,  4 Oct 2020 15:47:58 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id p15so1393889ljj.8
-        for <linux-cifs@vger.kernel.org>; Sun, 04 Oct 2020 15:47:58 -0700 (PDT)
+        with ESMTP id S1725836AbgJDXUH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 4 Oct 2020 19:20:07 -0400
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C07FC0613CE
+        for <linux-cifs@vger.kernel.org>; Sun,  4 Oct 2020 16:20:07 -0700 (PDT)
+Received: by mail-il1-x144.google.com with SMTP id u9so6208009ilj.7
+        for <linux-cifs@vger.kernel.org>; Sun, 04 Oct 2020 16:20:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=pMnBbCePh/4+eo6N49GviXm6Kl/5L2NkhG4mqS3bcgw=;
-        b=juF7cN9M7twL8wFpHKiKM4MW3h/lsEBYe9/2TexVS6b2bCYrwnYgRTn1g+q594CzHo
-         Cxc7Y4ZoGUwKkihV9GuDsMbWRLqewvUTVsyVdh1M6w70TRc/KHBNf/8lZ6zs7sJbB/3p
-         C1vs62gZQt5VbJiPNFqsL57kWikKnW3d1nGxDuFism8yBdy08azfw2+B3MqcUNKHxpAQ
-         ZFhbZYD1UtOugKeWM15KdLE+w52V2Nvby3/cSoN3vlAPrt7e7JjcZDTInIopHlD2s9wI
-         X5GasWhIKsAl4OThKMAZpOkVUEAq7q+h3eVt8v2EiKOc1ZHMmhOVhha6m8MatwUZXMrm
-         oEng==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=hSVYyTYm3wuI0Qmct5eWOTHAt8AaCxbIeZNntYrQNN4=;
+        b=GRWwkwRo6VVN7Qy49exl5NVq5166N4nRo2/RRFBc6xTvh3oqiV15XTQXaJMzcR0w//
+         QMmKvWdo3bZ4z+SQdUczerzZrZwzWjBxaeed75zhXAJOECvGTw1x1YMz0DCCg9XZZnOW
+         SBgew+Lrm1xSPpKX14CNLWmUxoeIdb5+5d86M8jRNSKb//q69fdPU8k4HXBgL3+C4HYB
+         YI3g87FYaDK5JKze3V+l7sy0GbVQplC17eZywRhXC63t+LF1CVnAnlHCGaBOSkoD/H+O
+         42y3sIyhj7J1CLDx23wqhgmeocV0NpzbT70XzbV+p45I21FeYYLaQS2tkrVOZY2IWjre
+         wg9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=pMnBbCePh/4+eo6N49GviXm6Kl/5L2NkhG4mqS3bcgw=;
-        b=rg+h6RCrIPm8LseTpiEri5JvLYVAzxBa5PloEN6953aqZU2hbOFP9TcYPP3sQ6cqwf
-         LpoUdUoPQNoZPYsbNAjtoAsFNmy29XvH8TC3Qx3FXwLsxGMqitxvJ17W57oc+l7j889V
-         VoPhz+8ixEGBnOMGsbVyjb4kSVAFCDMtjWwT7gekM/STr6Qq7gZaEnL2hrkqVEdikUWU
-         MPLE7wVHMjBI4MW0X27Z3kBd+C4Rjt0OVAfGUDFteSoc6hwppGywOZ0HqNDDsIuCKaHp
-         /xNkWQbZMIW0+09shKQuqtmI6F1GN+/4NTpVzd1uIx5O7JskVBTRgu//xNC5naosL7Ex
-         rsMQ==
-X-Gm-Message-State: AOAM5314Mt4miFsVj3KGGkGVs1CePuXnGAGIoMZpnuHBFtzqFoxk5lUp
-        Bl/8/wYfgI60LZquKdJUezvLxsGjfS8vMz9sDxAJN3lzgAk=
-X-Google-Smtp-Source: ABdhPJxB1itGCo0o2stYmcsKwCD12iy2+kIFvJgGA+1lHRaQCnOzkD0eME5IkYIDQCrZIA7jd0VdZ59GUi9vV1zpImw=
-X-Received: by 2002:a2e:a376:: with SMTP id i22mr1012152ljn.325.1601851676341;
- Sun, 04 Oct 2020 15:47:56 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=hSVYyTYm3wuI0Qmct5eWOTHAt8AaCxbIeZNntYrQNN4=;
+        b=uf9/s3uMwQWL4VW1cxnMtd0ud6jIWZEtbHub1H+gCk9dFNjTEnQz2DKqe+HxlWHyF4
+         X6te3lrap193J3+N4QQoLow/lYYvwD7coqhOsrjO2v62kVIwmoCyF80L/ZIv2UawX1gP
+         SwdLQ/wAtYHuLX3CEXtMh0QA5Rz13UUqNPxSCKhRIUlU53o9kamho4JPMjKkUZWu75nn
+         oNDjx55ZVNIhCGslzRU09wC61m/KpsvSgs0ei44cDDhYvn2iPJ+YG6V9HOy9O41j3reM
+         5QGj6n9WCnM4fpP09hZDpmN5NjC2j+db5VBYhQjpATYgIEhP+snrJ8xXK+5J61SzdGv5
+         9sKQ==
+X-Gm-Message-State: AOAM5302YaHpzQf8RqH+NNKGaPiwFTrdDEq2ErSwStmrkDdcEBp/sEci
+        eHkp4e8gZkF0MWlXWY5/G7rS70LSkaJDpkjIsYs=
+X-Google-Smtp-Source: ABdhPJwGq2USHn/bOnSSiI4AH/RFtlDOM5qx3Z7xqgf1ulW0584Yse7fg0DUNySh6AoQ+Qow41YNTQuOWdftYZKuT+g=
+X-Received: by 2002:a92:b50b:: with SMTP id f11mr9385105ile.109.1601853606622;
+ Sun, 04 Oct 2020 16:20:06 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 4 Oct 2020 17:47:45 -0500
-Message-ID: <CAH2r5mvZ1FKOorZ6QH-ozH09EWO-EcQvqRRmQ-K9GuR2qA2BVA@mail.gmail.com>
-Subject: [SMB3.1.1][PATCHES] update protocol definitions from recent MS-SMB2
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000026da7c05b0e0284c"
+References: <20201001205026.8808-1-lsahlber@redhat.com> <20201001205026.8808-4-lsahlber@redhat.com>
+ <87sgawir2x.fsf@suse.com>
+In-Reply-To: <87sgawir2x.fsf@suse.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Mon, 5 Oct 2020 09:19:55 +1000
+Message-ID: <CAN05THR4J0JPkmK5ib9PnZu1n2Gd7uhycbedJecjimPq-BkfUw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] cifs: cache the directory content for shroot
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000026da7c05b0e0284c
-Content-Type: text/plain; charset="UTF-8"
+Thanks Aurelien,
 
-Patches to updated smb2pdu.h to match the changes released in MS-SMB2
-protocol documentation.
+On Sat, Oct 3, 2020 at 1:30 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
+>
+> Hi Ronnie,
+>
+> The more we isolate code with clear opaque interfaces, the less we have
+> to understand about their low-level implementation.
+>
+> I was thinking we could move all dir cache related code to a new dcache.c
+> file or something like that.
 
+Lets do that as a follow up.
+I would also like to expand the caching from not just "" but, say, the
+n latest directories we have used.
 
--- 
-Thanks,
+>
+> One question: when does the cache gets cleared? We dont want to have the
+> same stale content every time we query the root. Should it be time based?
 
-Steve
+Right now it still depends on the lease break.
+We can add a timeout value to it as well.
+Let's do that as a separate patch. I will do that once this is done.
 
---00000000000026da7c05b0e0284c
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-add-defines-for-new-crypto-algorithms.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-add-defines-for-new-crypto-algorithms.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kfvp43u70>
-X-Attachment-Id: f_kfvp43u70
+>
+> Comments on code below:
+>
+> Ronnie Sahlberg <lsahlber@redhat.com> writes:
+> >  fs/cifs/cifsglob.h |  21 +++++++
+> >  fs/cifs/misc.c     |   2 +
+> >  fs/cifs/readdir.c  | 173 +++++++++++++++++++++++++++++++++++++++++++++=
++++++---
+> >  fs/cifs/smb2ops.c  |  14 +++++
+> >  4 files changed, 203 insertions(+), 7 deletions(-)
+>
+>
+> >
+> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> > index b565d83ba89e..e8f2b4a642d4 100644
+> > --- a/fs/cifs/cifsglob.h
+> > +++ b/fs/cifs/cifsglob.h
+> > @@ -1073,6 +1073,26 @@ cap_unix(struct cifs_ses *ses)
+> >       return ses->server->vals->cap_unix & ses->capabilities;
+> >  }
+> >
+> > +struct cached_dirent {
+> > +     struct list_head entry;
+> > +     char *name;
+> > +     int namelen;
+> > +     loff_t pos;
+> > +     u64 ino;
+> > +     unsigned type;
+> > +};
+> > +
+> > +struct cached_dirents {
+> > +     bool is_valid:1;
+> > +     bool is_failed:1;
+> > +     struct dir_context *ctx; /* Only used to make sure we only take e=
+ntries
+> > +                               * from a single context. Never derefere=
+nced.
+> > +                               */
+>
+> This type of comments are not in the kernel coding style. First comment
+> line with "/*" shouldnt have text.
 
-RnJvbSAzZjFjZjhmZThkMTczZTJhNTdkYzEzMGU4NWJjMWE0ZTg4MzQ5YzMxIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFdlZCwgMTggTWFyIDIwMjAgMDA6NTE6NDggLTA1MDAKU3ViamVjdDogW1BBVENIIDEv
-Ml0gc21iMzogYWRkIGRlZmluZXMgZm9yIG5ldyBjcnlwdG8gYWxnb3JpdGhtcwoKSW4gZW5jcnlw
-dGlvbiBjYXBhYmlsaXRpZXMgbmVnb3RpYXRlIGNvbnRleHQgY2FuIG5vdyByZXF1ZXN0CkFFUzI1
-NiBHQ00gb3IgQ0NNCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jv
-c29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIycGR1LmggfCAyICsrCiAxIGZpbGUgY2hhbmdlZCwg
-MiBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIycGR1LmggYi9mcy9jaWZz
-L3NtYjJwZHUuaAppbmRleCBjM2YxYmFmNWJkZTIuLjdiNmRiMTYyZjUxNiAxMDA2NDQKLS0tIGEv
-ZnMvY2lmcy9zbWIycGR1LmgKKysrIGIvZnMvY2lmcy9zbWIycGR1LmgKQEAgLTMyNSw2ICszMjUs
-OCBAQCBzdHJ1Y3Qgc21iMl9wcmVhdXRoX25lZ19jb250ZXh0IHsKIC8qIEVuY3J5cHRpb24gQWxn
-b3JpdGhtcyBDaXBoZXJzICovCiAjZGVmaW5lIFNNQjJfRU5DUllQVElPTl9BRVMxMjhfQ0NNCWNw
-dV90b19sZTE2KDB4MDAwMSkKICNkZWZpbmUgU01CMl9FTkNSWVBUSU9OX0FFUzEyOF9HQ00JY3B1
-X3RvX2xlMTYoMHgwMDAyKQorI2RlZmluZSBTTUIyX0VOQ1JZUFRJT05fQUVTMjU2X0NDTSAgICAg
-IGNwdV90b19sZTE2KDB4MDAwMykKKyNkZWZpbmUgU01CMl9FTkNSWVBUSU9OX0FFUzI1Nl9HQ00g
-ICAgICBjcHVfdG9fbGUxNigweDAwMDQpCiAKIC8qIE1pbiBlbmNyeXB0IGNvbnRleHQgZGF0YSBp
-cyBvbmUgY2lwaGVyIHNvIDIgYnl0ZXMgKyAyIGJ5dGUgY291bnQgZmllbGQgKi8KICNkZWZpbmUg
-TUlOX0VOQ1JZUFRfQ1RYVF9EQVRBX0xFTgk0Ci0tIAoyLjI1LjEKCg==
---00000000000026da7c05b0e0284c
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0002-smb3.1.1-update-structure-definitions-from-updated-p.patch"
-Content-Disposition: attachment; 
-	filename="0002-smb3.1.1-update-structure-definitions-from-updated-p.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kfvp43up1>
-X-Attachment-Id: f_kfvp43up1
+Will fix and resubmit.
 
-RnJvbSBhYzk4YzU2NDJmZjI0YzA3ZWM5ODc5MWI0YTMyNTNkZTIzODIxNDQ5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFN1biwgNCBPY3QgMjAyMCAxNzo0MjoyNyAtMDUwMApTdWJqZWN0OiBbUEFUQ0ggMi8y
-XSBbc21iMy4xLjFdIHVwZGF0ZSBzdHJ1Y3R1cmUgZGVmaW5pdGlvbnMgZnJvbSB1cGRhdGVkCiBw
-cm90b2NvbCBkb2N1bWVudGF0aW9uCgpNUy1TTUIyIHdhcyB1cGRhdGVkIHJlY2VudGx5IHRvIGlu
-Y2x1ZGUgbmV3IHByb3RvY29sIGRlZmluaXRpb25zIGZvcgp1cGRhdGVkIGNvbXByZXNzaW9uIHBh
-eWxvYWQgaGVhZGVyIGFuZCBuZXcgUkRNQSB0cmFuc2Zvcm0gY2FwYWJpbGl0aWVzClVwZGF0ZSBz
-dHJ1Y3R1cmUgZGVmaW5pdGlvbnMgaW4gc21iMnBkdS5oIHRvIG1hdGNoCgpTaWduZWQtb2ZmLWJ5
-OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIy
-cGR1LmggfCA2NCArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0t
-LQogMSBmaWxlIGNoYW5nZWQsIDU3IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pCgpkaWZm
-IC0tZ2l0IGEvZnMvY2lmcy9zbWIycGR1LmggYi9mcy9jaWZzL3NtYjJwZHUuaAppbmRleCA3YjZk
-YjE2MmY1MTYuLjU2ZDk4M2M4YWZhZCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIycGR1LmgKKysr
-IGIvZnMvY2lmcy9zbWIycGR1LmgKQEAgLTE1MywxMCArMTUzLDE0IEBAIHN0cnVjdCBzbWIyX2Nv
-bXByZXNzaW9uX3RyYW5zZm9ybV9oZHIgewogfSBfX3BhY2tlZDsKIAogLyogU2VlIE1TLVNNQjIg
-Mi4yLjQyLjEgKi8KKyNkZWZpbmUgU01CMl9DT01QUkVTU0lPTl9GTEFHX05PTkUJMHgwMDAwCisj
-ZGVmaW5lIFNNQjJfQ09NUFJFU1NJT05fRkxBR19DSEFJTkRFRAkweDAwMDEKKwogc3RydWN0IGNv
-bXByZXNzaW9uX3BheWxvYWRfaGVhZGVyIHsKLQlfX2xlMTYJQWxnb3JpdGhtSWQ7Ci0JX19sZTE2
-CVJlc2VydmVkOwotCV9fbGUzMglMZW5ndGg7CisJX19sZTE2CUNvbXByZXNzaW9uQWxnb3JpdGht
-OworCV9fbGUxNglGbGFnczsKKwlfX2xlMzIJTGVuZ3RoOyAvKiBsZW5ndGggb2YgY29tcHJlc3Nl
-ZCBwbGF5bG9hZCBpbmNsdWRpbmcgZmllbGQgYmVsb3cgaWYgcHJlc2VudCAqLworCS8qIF9fbGUz
-MiBPcmlnaW5hbFBheWxvYWRTaXplOyAqLyAvKiBvcHRpb25hbCAqLwogfSBfX3BhY2tlZDsKIAog
-LyogU2VlIE1TLVNNQjIgMi4yLjQyLjIgKi8KQEAgLTE2Nyw2ICsxNzEsMjYgQEAgc3RydWN0IGNv
-bXByZXNzaW9uX3BhdHRlcm5fcGF5bG9hZF92MSB7CiAJX19sZTMyCVJlcGV0aXRpb25zOwogfSBf
-X3BhY2tlZDsKIAorLyogU2VlIE1TLVNNQjIgMi4yLjQzICovCitzdHJ1Y3Qgc21iMl9yZG1hX3Ry
-YW5zZm9ybSB7CisJX19sZTE2IFJkbWFEZXNjcmlwdG9yT2Zmc2V0OworCV9fbGUxNiBSZG1hRGVz
-Y3JpcHRvckxlbmd0aDsKKwlfX2xlMzIgQ2hhbm5lbDsgLyogZm9yIHZhbHVlcyBzZWUgY2hhbm5l
-bCBkZXNjcmlwdGlvbiBpbiBzbWIyIHJlYWQgYWJvdmUgKi8KKwlfX2xlMTYgVHJhbnNmb3JtQ291
-bnQ7CisJX19sZTE2IFJlc2VydmVkMTsKKwlfX2xlMzIgUmVzZXJ2ZWQyOworfSBfX3BhY2tlZDsK
-Kworc3RydWN0IHNtYjJfcmRtYV9lbmNyeXB0aW9uX3RyYW5zZm9ybSB7CisJX19sZTE2CVRyYW5z
-Zm9ybVR5cGU7OworCV9fbGUxNglTaWduYXR1cmVMZW5ndGg7CisJX19sZTE2CU5vbmNlTGVuZ3Ro
-OworCV9fdTE2CVJlc2VydmVkOworCV9fdTgJU2lnbmF0dXJlW107IC8qIHZhcmlhYmxlIGxlbmd0
-aCAqLworCS8qIHU4IE5vbmNlW10gKi8KKwkvKiBmb2xsb3dlZCBieSBwYWRkaW5nICovCit9IF9f
-cGFja2VkOworCiAvKgogICoJU01CMiBmbGFnIGRlZmluaXRpb25zCiAgKi8KQEAgLTI5Nyw2ICsz
-MjEsOCBAQCBzdHJ1Y3Qgc21iMl9uZWdvdGlhdGVfcmVxIHsKICNkZWZpbmUgU01CMl9FTkNSWVBU
-SU9OX0NBUEFCSUxJVElFUwkJY3B1X3RvX2xlMTYoMikKICNkZWZpbmUgU01CMl9DT01QUkVTU0lP
-Tl9DQVBBQklMSVRJRVMJCWNwdV90b19sZTE2KDMpCiAjZGVmaW5lIFNNQjJfTkVUTkFNRV9ORUdP
-VElBVEVfQ09OVEVYVF9JRAljcHVfdG9fbGUxNig1KQorI2RlZmluZSBTTUIyX1RSQU5TUE9SVF9D
-QVBBQklMSVRJRVMJCWNwdV90b19sZTE2KDYpCisjZGVmaW5lIFNNQjJfUkRNQV9UUkFOU0ZPUk1f
-Q0FQQUJJTElUSUVTCWNwdV90b19sZTE2KDcpCiAjZGVmaW5lIFNNQjJfUE9TSVhfRVhURU5TSU9O
-U19BVkFJTEFCTEUJCWNwdV90b19sZTE2KDB4MTAwKQogCiBzdHJ1Y3Qgc21iMl9uZWdfY29udGV4
-dCB7CkBAIC0zNTMsMTAgKzM3OSwxMCBAQCBzdHJ1Y3Qgc21iMl9lbmNyeXB0aW9uX25lZ19jb250
-ZXh0IHsKIHN0cnVjdCBzbWIyX2NvbXByZXNzaW9uX2NhcGFiaWxpdGllc19jb250ZXh0IHsKIAlf
-X2xlMTYJQ29udGV4dFR5cGU7IC8qIDMgKi8KIAlfX2xlMTYgIERhdGFMZW5ndGg7Ci0JX191MzIJ
-RmxhZ3M7CisJX191MzIJUmVzZXJ2ZWQ7CiAJX19sZTE2CUNvbXByZXNzaW9uQWxnb3JpdGhtQ291
-bnQ7CiAJX191MTYJUGFkZGluZzsKLQlfX3UzMglSZXNlcnZlZDE7CisJX191MzIJRmxhZ3M7CiAJ
-X19sZTE2CUNvbXByZXNzaW9uQWxnb3JpdGhtc1szXTsKIH0gX19wYWNrZWQ7CiAKQEAgLTM2NSwx
-MiArMzkxLDMxIEBAIHN0cnVjdCBzbWIyX2NvbXByZXNzaW9uX2NhcGFiaWxpdGllc19jb250ZXh0
-IHsKICAqIEl0cyBzdHJ1Y3Qgc2ltcGx5IGNvbnRhaW5zIE5ldE5hbWUsIGFuIGFycmF5IG9mIFVu
-aWNvZGUgY2hhcmFjdGVycwogICovCiBzdHJ1Y3Qgc21iMl9uZXRuYW1lX25lZ19jb250ZXh0IHsK
-LQlfX2xlMTYJQ29udGV4dFR5cGU7IC8qIDB4MTAwICovCisJX19sZTE2CUNvbnRleHRUeXBlOyAv
-KiA1ICovCiAJX19sZTE2CURhdGFMZW5ndGg7CiAJX19sZTMyCVJlc2VydmVkOwogCV9fbGUxNglO
-ZXROYW1lW107IC8qIGhvc3RuYW1lIG9mIHRhcmdldCBjb252ZXJ0ZWQgdG8gVUNTLTIgKi8KIH0g
-X19wYWNrZWQ7CiAKKy8qCisgKiBGb3IgcmRtYSB0cmFuc2Zvcm0gY2FwYWJpbGl0aWVzIGNvbnRl
-eHQgc2VlIE1TLVNNQjIgMi4yLjMuMS42CisgKiBhbmQgMi4yLjQuMS41CisgKi8KKworLyogUkRN
-QSBUcmFuc2Zvcm0gSURzICovCisjZGVmaW5lIFNNQjJfUkRNQV9UUkFOU0ZPUk1fTk9ORQkweDAw
-MDAKKyNkZWZpbmUgU01CMl9SRE1BX1RSQU5TRk9STV9FTkNSWVBUSU9OCTB4MDAwMQorCitzdHJ1
-Y3Qgc21iMl9yZG1hX3RyYW5zZm9ybV9jYXBhYmlsaXRpZXNfY29udGV4dCB7CisJX19sZTE2CUNv
-bnRleHRUeXBlOyAvKiA3ICovCisJX19sZTE2ICBEYXRhTGVuZ3RoOworCV9fdTMyCVJlc2VydmVk
-OworCV9fbGUxNglUcmFuc2Zvcm1Db3VudDsKKwlfX3UxNglSZXNlcnZlZDE7CisJX191MzIJUmVz
-ZXJ2ZWQyOworCV9fbGUxNglSRE1BVHJhbnNmb3JtSWRzWzFdOworfSBfX3BhY2tlZDsKKwogI2Rl
-ZmluZSBQT1NJWF9DVFhUX0RBVEFfTEVOCTE2CiBzdHJ1Y3Qgc21iMl9wb3NpeF9uZWdfY29udGV4
-dCB7CiAJX19sZTE2CUNvbnRleHRUeXBlOyAvKiAweDEwMCAqLwpAQCAtMTE4MCw2ICsxMjI1LDcg
-QEAgc3RydWN0IHNtYjJfZmx1c2hfcnNwIHsKICNkZWZpbmUgU01CMl9DSEFOTkVMX05PTkUJY3B1
-X3RvX2xlMzIoMHgwMDAwMDAwMCkKICNkZWZpbmUgU01CMl9DSEFOTkVMX1JETUFfVjEJY3B1X3Rv
-X2xlMzIoMHgwMDAwMDAwMSkgLyogU01CMyBvciBsYXRlciAqLwogI2RlZmluZSBTTUIyX0NIQU5O
-RUxfUkRNQV9WMV9JTlZBTElEQVRFIGNwdV90b19sZTMyKDB4MDAwMDAwMDIpIC8qID49IFNNQjMu
-MDIgKi8KKyNkZWZpbmUgU01CMl9DSEFOTkVMX1JETUFfVFJBTlNGT1JNIGNwdV90b19sZTMyKDB4
-MDAwMDAwMDMpIC8qID49IFNNQjMuMDIsIG9ubHkgdXNlZCBvbiB3cml0ZSAqLwogCiAvKiBTTUIy
-IHJlYWQgcmVxdWVzdCB3aXRob3V0IFJGQzEwMDEgbGVuZ3RoIGF0IHRoZSBiZWdpbm5pbmcgKi8K
-IHN0cnVjdCBzbWIyX3JlYWRfcGxhaW5fcmVxIHsKQEAgLTExOTksNiArMTI0NSwxMCBAQCBzdHJ1
-Y3Qgc21iMl9yZWFkX3BsYWluX3JlcSB7CiAJX191OCAgIEJ1ZmZlclsxXTsKIH0gX19wYWNrZWQ7
-CiAKKy8qIFJlYWQgZmxhZ3MgKi8KKyNkZWZpbmUgU01CMl9SRUFERkxBR19SRVNQT05TRV9OT05F
-CTB4MDAwMDAwMDAKKyNkZWZpbmUgU01CMl9SRUFERkxBR19SRVNQT05TRV9SRE1BX1RSQU5TRk9S
-TQkweDAwMDAwMDAxCisKIHN0cnVjdCBzbWIyX3JlYWRfcnNwIHsKIAlzdHJ1Y3Qgc21iMl9zeW5j
-X2hkciBzeW5jX2hkcjsKIAlfX2xlMTYgU3RydWN0dXJlU2l6ZTsgLyogTXVzdCBiZSAxNyAqLwpA
-QCAtMTIwNiw3ICsxMjU2LDcgQEAgc3RydWN0IHNtYjJfcmVhZF9yc3AgewogCV9fdTggICBSZXNl
-cnZlZDsKIAlfX2xlMzIgRGF0YUxlbmd0aDsKIAlfX2xlMzIgRGF0YVJlbWFpbmluZzsKLQlfX3Uz
-MiAgUmVzZXJ2ZWQyOworCV9fdTMyICBGbGFnczsKIAlfX3U4ICAgQnVmZmVyWzFdOwogfSBfX3Bh
-Y2tlZDsKIAotLSAKMi4yNS4xCgo=
---00000000000026da7c05b0e0284c--
+>
+> > +     struct mutex de_mutex;
+> > +     int pos;                 /* Expected ctx->pos */
+> > +     struct list_head entries;
+> > +};
+> > +
+> >  struct cached_fid {
+> >       bool is_valid:1;        /* Do we have a useable root fid */
+> >       bool file_all_info_is_valid:1;
+> > @@ -1083,6 +1103,7 @@ struct cached_fid {
+> >       struct cifs_tcon *tcon;
+> >       struct work_struct lease_break;
+> >       struct smb2_file_all_info file_all_info;
+> > +     struct cached_dirents dirents;
+> >  };
+>
+> >       }
+> > +     INIT_LIST_HEAD(&ret_buf->crfid.dirents.entries);
+> > +     mutex_init(&ret_buf->crfid.dirents.de_mutex);
+> >
+> >       atomic_inc(&tconInfoAllocCount);
+> >       ret_buf->tidStatus =3D CifsNew;
+> > diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> > index 31a18aae5e64..17861c3d2e08 100644
+> > --- a/fs/cifs/readdir.c
+> > +++ b/fs/cifs/readdir.c
+> > @@ -811,9 +811,119 @@ find_cifs_entry(const unsigned int xid, struct ci=
+fs_tcon *tcon, loff_t pos,
+> >       return rc;
+> >  }
+> >
+> > +static void init_cached_dirents(struct cached_dirents *cde,
+> > +                             struct dir_context *ctx)
+> > +{
+> > +     if (ctx->pos =3D=3D 2 && cde->ctx =3D=3D NULL) {
+> > +             cde->ctx =3D ctx;
+> > +             cde->pos =3D 2;
+> > +     }
+> > +}
+>
+> 2 is for "." and ".."? Can you add more comments to document this?
+>
+> Can you document which functions are expecting to be called with a lock
+> held?
+
+Yes, I will clarify that pos=3D=3D2 is due to dir_emit_dots() and it means
+we have just started a
+fresh scan.
+
+>
+> > +
+> > +static bool emit_cached_dirents(struct cached_dirents *cde,
+> > +                             struct dir_context *ctx)
+> > +{
+> > +     struct list_head *tmp;
+> > +     struct cached_dirent *dirent;
+> > +     int rc;
+> > +
+> > +     list_for_each(tmp, &cde->entries) {
+> > +             dirent =3D list_entry(tmp, struct cached_dirent, entry);
+> > +             if (ctx->pos >=3D dirent->pos)
+> > +                     continue;
+> > +             ctx->pos =3D dirent->pos;
+> > +             rc =3D dir_emit(ctx, dirent->name, dirent->namelen,
+> > +                           dirent->ino, dirent->type);
+> > +             if (!rc)
+> > +                     return rc;
+> > +     }
+> > +     return true;
+> > +}
+> > +
+> > +static void update_cached_dirents_count(struct cached_dirents *cde,
+> > +                                     struct dir_context *ctx)
+> > +{
+> > +     if (cde->ctx !=3D ctx)
+> > +             return;
+> > +     if (cde->is_valid || cde->is_failed)
+> > +             return;
+> > +
+> > +     cde->pos++;
+> > +}
+> > +
+> > +static void finished_cached_dirents_count(struct cached_dirents *cde,
+> > +                                     struct dir_context *ctx)
+> > +{
+> > +     if (cde->ctx !=3D ctx)
+> > +             return;
+> > +     if (cde->is_valid || cde->is_failed)
+> > +             return;
+> > +     if (ctx->pos !=3D cde->pos)
+> > +             return;
+> > +
+> > +     cde->is_valid =3D 1;
+> > +}
+> > +
+> > +static void add_cached_dirent(struct cached_dirents *cde,
+> > +                           struct dir_context *ctx,
+> > +                           const char *name, int namelen,
+> > +                           u64 ino, unsigned type)
+> > +{
+> > +     struct cached_dirent *de;
+> > +
+> > +     if (cde->ctx !=3D ctx)
+> > +             return;
+> > +     if (cde->is_valid || cde->is_failed)
+> > +             return;
+> > +     if (ctx->pos !=3D cde->pos) {
+> > +             cde->is_failed =3D 1;
+> > +             return;
+> > +     }
+> > +     de =3D kzalloc(sizeof(*de), GFP_ATOMIC);
+> > +     if (de =3D=3D NULL) {
+> > +             cde->is_failed =3D 1;
+> > +             return;
+> > +     }
+> > +     de->name =3D kzalloc(namelen, GFP_ATOMIC);
+> > +     if (de->name =3D=3D NULL) {
+> > +             kfree(de);
+> > +             cde->is_failed =3D 1;
+> > +             return;
+> > +     }
+> > +     memcpy(de->name, name, namelen);
+> > +     de->namelen =3D namelen;
+> > +     de->pos =3D ctx->pos;
+> > +     de->ino =3D ino;
+> > +     de->type =3D type;
+> > +
+> > +     list_add_tail(&de->entry, &cde->entries);
+> > +}
+> > +
+> > +static bool cifs_dir_emit(struct dir_context *ctx,
+> > +                       const char *name, int namelen,
+> > +                       u64 ino, unsigned type,
+> > +                       struct cached_fid *cfid)
+> > +{
+> > +     bool rc;
+> > +
+> > +     rc =3D dir_emit(ctx, name, namelen, ino, type);
+> > +     if (!rc)
+> > +             return rc;
+> > +
+> > +     if (cfid) {
+> > +             mutex_lock(&cfid->dirents.de_mutex);
+> > +             add_cached_dirent(&cfid->dirents, ctx, name, namelen, ino=
+,
+> > +                               type);
+> > +             mutex_unlock(&cfid->dirents.de_mutex);
+> > +     }
+> > +
+> > +     return rc;
+> > +}
+> > +
+> >  static int cifs_filldir(char *find_entry, struct file *file,
+> > -             struct dir_context *ctx,
+> > -             char *scratch_buf, unsigned int max_len)
+> > +                     struct dir_context *ctx,
+> > +                     char *scratch_buf, unsigned int max_len,
+> > +                     struct cached_fid *cfid)
+> >  {
+> >       struct cifsFileInfo *file_info =3D file->private_data;
+> >       struct super_block *sb =3D file_inode(file)->i_sb;
+> > @@ -903,10 +1013,10 @@ static int cifs_filldir(char *find_entry, struct=
+ file *file,
+> >       cifs_prime_dcache(file_dentry(file), &name, &fattr);
+> >
+> >       ino =3D cifs_uniqueid_to_ino_t(fattr.cf_uniqueid);
+> > -     return !dir_emit(ctx, name.name, name.len, ino, fattr.cf_dtype);
+> > +     return !cifs_dir_emit(ctx, name.name, name.len, ino, fattr.cf_dty=
+pe,
+> > +                           cfid);
+> >  }
+> >
+> > -
+> >  int cifs_readdir(struct file *file, struct dir_context *ctx)
+> >  {
+> >       int rc =3D 0;
+> > @@ -920,6 +1030,8 @@ int cifs_readdir(struct file *file, struct dir_con=
+text *ctx)
+> >       char *end_of_smb;
+> >       unsigned int max_len;
+> >       char *full_path =3D NULL;
+> > +     struct cached_fid *cfid =3D NULL;
+> > +     struct cifs_sb_info *cifs_sb =3D CIFS_FILE_SB(file);
+> >
+> >       xid =3D get_xid();
+> >
+> > @@ -928,7 +1040,6 @@ int cifs_readdir(struct file *file, struct dir_con=
+text *ctx)
+> >               rc =3D -ENOMEM;
+> >               goto rddir2_exit;
+> >       }
+> > -
+> >       /*
+> >        * Ensure FindFirst doesn't fail before doing filldir() for '.' a=
+nd
+> >        * '..'. Otherwise we won't be able to notify VFS in case of fail=
+ure.
+> > @@ -949,6 +1060,31 @@ int cifs_readdir(struct file *file, struct dir_co=
+ntext *ctx)
+> >               if after then keep searching till find it */
+> >
+> >       cifsFile =3D file->private_data;
+> > +     tcon =3D tlink_tcon(cifsFile->tlink);
+> > +     if (tcon->ses->server->vals->header_preamble_size =3D=3D 0 &&
+>
+> header_preamble_size =3D=3D 0 is a test for smb1? we have is_smb1_server(=
+)
+>
+> > +             !strcmp(full_path, "")) {
+> > +             rc =3D open_shroot(xid, tcon, cifs_sb, &cfid);
+> > +             if (rc)
+> > +                     goto cache_not_found;
+> > +
+> > +             mutex_lock(&cfid->dirents.de_mutex);
+> > +             /* if this was reading from the start of the directory
+> > +              * we might need to initialize scanning and storing the
+> > +              * directory content.
+> > +              */
+> > +             init_cached_dirents(&cfid->dirents, ctx);
+> > +             /* If we already have the entire directory cached then
+> > +              * we cna just serve the cache.
+> > +              */
+>
+> comment style
+>
+> > +             if (cfid->dirents.is_valid) {
+> > +                     emit_cached_dirents(&cfid->dirents, ctx);
+> > +                     mutex_unlock(&cfid->dirents.de_mutex);
+> > +                     goto rddir2_exit;
+> > +             }
+> > +             mutex_unlock(&cfid->dirents.de_mutex);
+> > +     }
+> > + cache_not_found:
+> > +
+> >       if (cifsFile->srch_inf.endOfSearch) {
+> >               if (cifsFile->srch_inf.emptyDir) {
+> >                       cifs_dbg(FYI, "End of search, empty dir\n");
+> > @@ -960,15 +1096,30 @@ int cifs_readdir(struct file *file, struct dir_c=
+ontext *ctx)
+> >               tcon->ses->server->close(xid, tcon, &cifsFile->fid);
+> >       } */
+> >
+> > -     tcon =3D tlink_tcon(cifsFile->tlink);
+> > +     /* Drop the cache while calling find_cifs_entry in case there wil=
+l
+> > +      * be reconnects during query_directory.
+> > +      */
+>
+> comment style
+>
+> > +     if (cfid) {
+> > +             close_shroot(cfid);
+> > +             cfid =3D NULL;
+> > +     }
+> >       rc =3D find_cifs_entry(xid, tcon, ctx->pos, file, full_path,
+> >                            &current_entry, &num_to_fill);
+> > +     if (tcon->ses->server->vals->header_preamble_size =3D=3D 0 &&
+> > +             !strcmp(full_path, "")) {
+> > +             open_shroot(xid, tcon, cifs_sb, &cfid);
+> > +     }
+> >       if (rc) {
+> >               cifs_dbg(FYI, "fce error %d\n", rc);
+> >               goto rddir2_exit;
+> >       } else if (current_entry !=3D NULL) {
+> >               cifs_dbg(FYI, "entry %lld found\n", ctx->pos);
+> >       } else {
+> > +             if (cfid) {
+> > +                     mutex_lock(&cfid->dirents.de_mutex);
+> > +                     finished_cached_dirents_count(&cfid->dirents, ctx=
+);
+> > +                     mutex_unlock(&cfid->dirents.de_mutex);
+> > +             }
+> >               cifs_dbg(FYI, "Could not find entry\n");
+> >               goto rddir2_exit;
+> >       }
+> > @@ -998,7 +1149,7 @@ int cifs_readdir(struct file *file, struct dir_con=
+text *ctx)
+> >                */
+> >               *tmp_buf =3D 0;
+> >               rc =3D cifs_filldir(current_entry, file, ctx,
+> > -                               tmp_buf, max_len);
+> > +                               tmp_buf, max_len, cfid);
+> >               if (rc) {
+> >                       if (rc > 0)
+> >                               rc =3D 0;
+> > @@ -1006,6 +1157,12 @@ int cifs_readdir(struct file *file, struct dir_c=
+ontext *ctx)
+> >               }
+> >
+> >               ctx->pos++;
+> > +             if (cfid) {
+> > +                     mutex_lock(&cfid->dirents.de_mutex);
+> > +                     update_cached_dirents_count(&cfid->dirents, ctx);
+> > +                     mutex_unlock(&cfid->dirents.de_mutex);
+> > +             }
+> > +
+> >               if (ctx->pos =3D=3D
+> >                       cifsFile->srch_inf.index_of_last_entry) {
+> >                       cifs_dbg(FYI, "last entry in buf at pos %lld %s\n=
+",
+> > @@ -1020,6 +1177,8 @@ int cifs_readdir(struct file *file, struct dir_co=
+ntext *ctx)
+> >       kfree(tmp_buf);
+> >
+> >  rddir2_exit:
+> > +     if (cfid)
+> > +             close_shroot(cfid);
+> >       kfree(full_path);
+> >       free_xid(xid);
+> >       return rc;
+> > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> > index fd6c136066df..280464e21a5f 100644
+> > --- a/fs/cifs/smb2ops.c
+> > +++ b/fs/cifs/smb2ops.c
+> > @@ -605,6 +605,8 @@ smb2_close_cached_fid(struct kref *ref)
+> >  {
+> >       struct cached_fid *cfid =3D container_of(ref, struct cached_fid,
+> >                                              refcount);
+> > +     struct list_head *pos, *q;
+> > +     struct cached_dirent *dirent;
+> >
+> >       if (cfid->is_valid) {
+> >               cifs_dbg(FYI, "clear cached root file handle\n");
+> > @@ -613,6 +615,18 @@ smb2_close_cached_fid(struct kref *ref)
+> >               cfid->is_valid =3D false;
+> >               cfid->file_all_info_is_valid =3D false;
+> >               cfid->has_lease =3D false;
+> > +             mutex_lock(&cfid->dirents.de_mutex);
+> > +             list_for_each_safe(pos, q, &cfid->dirents.entries) {
+> > +                     dirent =3D list_entry(pos, struct cached_dirent, =
+entry);
+> > +                     list_del(pos);
+> > +                     kfree(dirent->name);
+> > +                     kfree(dirent);
+> > +             }
+> > +             cfid->dirents.is_valid =3D 0;
+> > +             cfid->dirents.is_failed =3D 0;
+> > +             cfid->dirents.ctx =3D NULL;
+> > +             cfid->dirents.pos =3D 0;
+> > +             mutex_unlock(&cfid->dirents.de_mutex);
+> >       }
+> >  }
+>
+>
+> Cheers,
+> --
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
+ DE
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
+=BCnchen)
