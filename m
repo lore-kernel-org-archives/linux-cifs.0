@@ -2,101 +2,201 @@ Return-Path: <SRS0=BNow=DM=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9B83C4727D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73225C4363C
 	for <linux-cifs@archiver.kernel.org>; Mon,  5 Oct 2020 02:38:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D06A2072D
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Oct 2020 02:38:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C3EB2078E
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Oct 2020 02:38:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VDJts2pE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IJLNmhpI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725841AbgJECiJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 4 Oct 2020 22:38:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31926 "EHLO
+        id S1725846AbgJECiI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 4 Oct 2020 22:38:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36923 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725845AbgJECiI (ORCPT
+        by vger.kernel.org with ESMTP id S1725841AbgJECiI (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Sun, 4 Oct 2020 22:38:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601865487;
+        s=mimecast20190719; t=1601865486;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=PLT9xkJZqdA+iq1rxeQzQK/E3lHiHYAB/brP5YuU1qA=;
-        b=VDJts2pEHAd93cJY50O9L29iCM3PxhmdR0t4GjoGjouA0hRctt0aQPJIUIqY/IlSOSU7NS
-        okMH8zIOnQSLOjHS6iTz2AVs2nvCWjZiTdb7CBGit3nKslM8IpaQ7ovpw/V3qKAYxiYKz7
-        2FAMWUoDp4MSyKai2zbg5ETeuX2NQRw=
+         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
+        bh=UkqRAdB0wpUIuXLers+tFvBNSTD/ZxG1lUcX/i6DpM8=;
+        b=IJLNmhpIx+eCtNM4DAyO5DW8kWZNY//+PyTbZfiC7BFD7inI3Qj3xHJcaUZjRSaNAuwhyP
+        bVs0+MR+R20VR1gQ3h0pdvBKl6z55aXFHw6Yv3Wf0nFW70EFj1mhcN/pGoSTlX7xg2kt0T
+        ZPXFW4z6yhsuMJ5DTchP7BZH3g0BMvU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-eNEe0yrvNMK66sAtvrPkqA-1; Sun, 04 Oct 2020 22:38:06 -0400
-X-MC-Unique: eNEe0yrvNMK66sAtvrPkqA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-315-yY3CBSJ4M1uK_nHTcF33oA-1; Sun, 04 Oct 2020 22:38:04 -0400
+X-MC-Unique: yY3CBSJ4M1uK_nHTcF33oA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36F951074662;
-        Mon,  5 Oct 2020 02:38:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E0CD801ADB;
+        Mon,  5 Oct 2020 02:38:03 +0000 (UTC)
 Received: from test1103.test.redhat.com (vpn2-54-124.bne.redhat.com [10.64.54.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8BCE15D9CD;
-        Mon,  5 Oct 2020 02:38:04 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B62C25576E;
+        Mon,  5 Oct 2020 02:38:02 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH 0/3 V1] cifs: cache the directory content for shroot
-Date:   Mon,  5 Oct 2020 12:37:51 +1000
-Message-Id: <20201005023754.13604-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Subject: [PATCH 1/3] cifs: return cached_fid from open_shroot
+Date:   Mon,  5 Oct 2020 12:37:52 +1000
+Message-Id: <20201005023754.13604-2-lsahlber@redhat.com>
+In-Reply-To: <20201005023754.13604-1-lsahlber@redhat.com>
+References: <20201005023754.13604-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve, Aurelien, List
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/smb2inode.c | 11 ++++++-----
+ fs/cifs/smb2ops.c   | 22 +++++++++++++++-------
+ fs/cifs/smb2proto.h |  3 ++-
+ 3 files changed, 23 insertions(+), 13 deletions(-)
 
-Please find updated version.
-With these patches we now server readdir() out of cache for shroot
-which eliminates at least three roundtrips:
-* the initial Create+QueryDirectory
-* the Query_Directory that fails with no more files
-* the Close
-
-Since we only cache name, inode and type we will still have the 
-Create/GetInfo/Close calls for every direcotry member.
-To solve that and eliminate those calls I chatted with Steve
-and we could cache all information about those child objects for ~1 second.
-
-That would not plug into cifs_readdir() but in parts different parts of
-the cifs.ko code so it should into its own patch for
-"fetch stat() data for objects from the directory cache, if available".
-That would be a different patch series.
-
-
-V3:
-* always take out shroot on the master tcon
-* fix bug where we would still do one FindFirst even if we had everything cached
-
-V2: addressing Aureliens comments
-* Fix comment style
-* Describe what ctx->pos == 2 means
-* use is_smb1_server()
-
-
-See initial implementation of a mechanism to cache the directory entries for
-a shared cache handle (shroot).
-We cache all the entries during the initial readdir() scan, using the context
-from the vfs layer as the key to handle if there are multiple concurrent readir() scans
-of the same directory.
-Then if/when we have successfully cached the entire direcotry we will server any
-subsequent readdir() from out of cache, avoinding making any query direcotry calls to the server.
-
-As with all of shroot, the cache is kept until the direcotry lease is broken.
-
-
-The first two patches are small and just a preparation for the third patch. They go as separate
-patches to make review easier.
-The third patch adds the actual meat of the dirent caching .
-
-
-For now this might not be too exciting because the only cache the root handle.
-I hope in the future we will expand the directory caching to handle any/many direcotries.
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index eba01d0908dd..df6212e55e10 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -511,9 +511,9 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 	int rc;
+ 	struct smb2_file_all_info *smb2_data;
+ 	__u32 create_options = 0;
+-	struct cifs_fid fid;
+ 	bool no_cached_open = tcon->nohandlecache;
+ 	struct cifsFileInfo *cfile;
++	struct cached_fid *cfid = NULL;
+ 
+ 	*adjust_tz = false;
+ 	*symlink = false;
+@@ -525,7 +525,7 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	/* If it is a root and its handle is cached then use it */
+ 	if (!strlen(full_path) && !no_cached_open) {
+-		rc = open_shroot(xid, tcon, cifs_sb, &fid);
++		rc = open_shroot(xid, tcon, cifs_sb, &cfid);
+ 		if (rc)
+ 			goto out;
+ 
+@@ -533,12 +533,13 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 			move_smb2_info_to_cifs(data,
+ 					       &tcon->crfid.file_all_info);
+ 		} else {
+-			rc = SMB2_query_info(xid, tcon, fid.persistent_fid,
+-					     fid.volatile_fid, smb2_data);
++			rc = SMB2_query_info(xid, tcon,
++					     cfid->fid->persistent_fid,
++					     cfid->fid->volatile_fid, smb2_data);
+ 			if (!rc)
+ 				move_smb2_info_to_cifs(data, smb2_data);
+ 		}
+-		close_shroot(&tcon->crfid);
++		close_shroot(cfid);
+ 		goto out;
+ 	}
+ 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 32f90dc82c84..fd6c136066df 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -651,7 +651,8 @@ smb2_cached_lease_break(struct work_struct *work)
+  * Open the directory at the root of a share
+  */
+ int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
+-		struct cifs_sb_info *cifs_sb, struct cifs_fid *pfid)
++		struct cifs_sb_info *cifs_sb,
++		struct cached_fid **cfid)
+ {
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct TCP_Server_Info *server = ses->server;
+@@ -666,11 +667,12 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
+ 	int rc, flags = 0;
+ 	__le16 utf16_path = 0; /* Null - since an open of top of share */
+ 	u8 oplock = SMB2_OPLOCK_LEVEL_II;
++	struct cifs_fid *pfid;
+ 
+ 	mutex_lock(&tcon->crfid.fid_mutex);
+ 	if (tcon->crfid.is_valid) {
+ 		cifs_dbg(FYI, "found a cached root file handle\n");
+-		memcpy(pfid, tcon->crfid.fid, sizeof(struct cifs_fid));
++		*cfid = &tcon->crfid;
+ 		kref_get(&tcon->crfid.refcount);
+ 		mutex_unlock(&tcon->crfid.fid_mutex);
+ 		return 0;
+@@ -691,6 +693,7 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
+ 	if (!server->ops->new_lease_key)
+ 		return -EIO;
+ 
++	pfid = tcon->crfid.fid;
+ 	server->ops->new_lease_key(pfid);
+ 
+ 	memset(rqst, 0, sizeof(rqst));
+@@ -820,6 +823,8 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
+ 	SMB2_query_info_free(&rqst[1]);
+ 	free_rsp_buf(resp_buftype[0], rsp_iov[0].iov_base);
+ 	free_rsp_buf(resp_buftype[1], rsp_iov[1].iov_base);
++	if (rc == 0)
++		*cfid = &tcon->crfid;
+ 	return rc;
+ }
+ 
+@@ -833,6 +838,7 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_fid fid;
+ 	bool no_cached_open = tcon->nohandlecache;
++	struct cached_fid *cfid = NULL;
+ 
+ 	oparms.tcon = tcon;
+ 	oparms.desired_access = FILE_READ_ATTRIBUTES;
+@@ -841,12 +847,14 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.fid = &fid;
+ 	oparms.reconnect = false;
+ 
+-	if (no_cached_open)
++	if (no_cached_open) {
+ 		rc = SMB2_open(xid, &oparms, &srch_path, &oplock, NULL, NULL,
+ 			       NULL, NULL);
+-	else
+-		rc = open_shroot(xid, tcon, cifs_sb, &fid);
+-
++	} else {
++		rc = open_shroot(xid, tcon, cifs_sb, &cfid);
++		if (rc == 0)
++			memcpy(&fid, cfid->fid, sizeof(struct cifs_fid));
++	}
+ 	if (rc)
+ 		return;
+ 
+@@ -863,7 +871,7 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (no_cached_open)
+ 		SMB2_close(xid, tcon, fid.persistent_fid, fid.volatile_fid);
+ 	else
+-		close_shroot(&tcon->crfid);
++		close_shroot(cfid);
+ }
+ 
+ static void
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 2f8ecbf54214..67c50d78caa1 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -70,7 +70,8 @@ extern int smb3_handle_read_data(struct TCP_Server_Info *server,
+ 				 struct mid_q_entry *mid);
+ 
+ extern int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
+-		       struct cifs_sb_info *cifs_sb, struct cifs_fid *pfid);
++		       struct cifs_sb_info *cifs_sb,
++		       struct cached_fid **cfid);
+ extern void close_shroot(struct cached_fid *cfid);
+ extern void close_shroot_lease(struct cached_fid *cfid);
+ extern void close_shroot_lease_locked(struct cached_fid *cfid);
+-- 
+2.13.6
 
