@@ -1,180 +1,112 @@
-Return-Path: <SRS0=bDWC=DO=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Y/WD=DN=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5A0C4363D
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Oct 2020 12:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CE9C41604
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 09:01:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18B94206D9
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Oct 2020 12:21:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="BRzrpiUj"
+	by mail.kernel.org (Postfix) with ESMTP id 7FDE62075A
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 09:01:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727927AbgJGMVo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 7 Oct 2020 08:21:44 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38750 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727253AbgJGMVo (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 7 Oct 2020 08:21:44 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1602073303;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6zxoIqWpwie/Kgg0D/Thz9Sv8wollP1erwCjwjWsQik=;
-        b=BRzrpiUjYbzrMriAEkx3cZSBAXwlt8Cvax1gCMklWdom6t9R+Q81/39eC7P8DI72PPAzVH
-        eD3z1WQO2/ktuYDom2jVQrpCoixYnMgFeqGdXnlaI/AA4hGzGYQ/xVxC5cZ9657Og8h9U+
-        0pJHdbiGNsdv1yeWTpYqExnGlkqFfrI=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 66AC0ABBE;
-        Wed,  7 Oct 2020 12:21:43 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH 3/3] cifs: cache the directory content for shroot
-In-Reply-To: <20201005211622.18097-1-lsahlber@redhat.com>
-References: <20201005211622.18097-1-lsahlber@redhat.com>
-Date:   Wed, 07 Oct 2020 14:21:42 +0200
-Message-ID: <878scii5ux.fsf@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+        id S1725977AbgJFJBe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Oct 2020 05:01:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41584 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbgJFJBd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Oct 2020 05:01:33 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA91C061755
+        for <linux-cifs@vger.kernel.org>; Tue,  6 Oct 2020 02:01:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42; h=Message-ID:Date:To:From:CC;
+        bh=lL0kU8GOzcDDkzzntwsuzgRICyn5HY4p5XHbEo7Fc3M=; b=mMe7u4R/wdKUfJ5DYeRlcOxAZ5
+        VnLqUuY4Gp3ucqfLL+4VprBjZtqCGIAKmPpwJKqToLDQo764mL+gczUObuJv6iiUQ38AvjHHV4wzd
+        NRBkmtsS481WsDPHD27Ij5OiuMrCAHCCveIuO8w0ZeuPMeVz3WlVLMq/k3kxnOJ/O9250S6/tfEC2
+        oe2WI6LcV1W7au91BK8OQB2RxXcJdQACWE/akDtvnVBUPPuXSLp/vFbpS7LGUWpuRCXW+MYpmDsG2
+        /1/Sk7hI+0EHjXsfitoHrfcnya8eIhpYgxZby8yppVCc9tbpgvDluf1vraOiyUoTUE95kOCjAemX2
+        TLxh8sc2mhRdeKUqHtIhhOfSOhdxCrP3DiVBjZyeXVkZ6DBb6ET8Vn3vdxODh48ccknC2iapzzDxI
+        /x3Ux0jNVyuijVWGmbCCvGwUns5T837fNjjZv6WT3RkTLEp6ghO7ei72YEPnyERc2IfusAMmulnB5
+        QVSQRMW2OtfqsVfigggMOSXL;
+Received: from [2a01:4f8:192:486::6:0] (port=23136 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1kPiqh-0005S9-3q
+        for cifs-qa@samba.org; Tue, 06 Oct 2020 09:01:31 +0000
+Received: from [::1] (port=35816 helo=bugzilla.samba.org)
+        by hr6.samba.org with esmtp (Exim 4.93)
+        (envelope-from <samba-bugs@samba.org>)
+        id 1kPiqd-004D2n-0M
+        for cifs-qa@samba.org; Tue, 06 Oct 2020 09:01:27 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 14521] CIFS mount shows only "vers=default" instead of specific
+ SMB version
+Date:   Tue, 06 Oct 2020 09:01:26 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 4.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: aaptel@samba.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: sfrench@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-14521-10630-HcneHh3BAi@https.bugzilla.samba.org/>
+In-Reply-To: <bug-14521-10630@https.bugzilla.samba.org/>
+References: <bug-14521-10630@https.bugzilla.samba.org/>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Ronnie,
+https://bugzilla.samba.org/show_bug.cgi?id=3D14521
 
-I'm assuming this is the latest V4:
+Aur=C3=A9lien Aptel <aaptel@samba.org> changed:
 
-Can you document which functions require a lock to be held when calling?
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |aaptel@samba.org
 
-Would it work properly if in any of the patched functions we have this scen=
-ario:
+--- Comment #1 from Aur=C3=A9lien Aptel <aaptel@samba.org> ---
+Just to make sure I get this right:
 
-TASK A                              DEMULTIPLEX THREAD
-------                              ------------------
-open_shroot()=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20
-...                                    oplock break on shroot
-                                       ...close/reopen shroot, fid and ptr =
-gets updated...
-...=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-do stuff with dirents (with old fid/ptr?)
-...
-close_shroot()
+With the same version of the kernel (openSUSE-LEAP-15.2 with Linux-5.3), wh=
+en
+you mount with vers=3Ddefault:
+- a Windows Server 2012 share you see vers=3D3.11 in /proc/mounts
+- anything else you see vers=3Ddefault in /proc/mounts
 
-More comments below:
-
-Ronnie Sahlberg <lsahlber@redhat.com> writes:
-> +
-> +static bool cifs_dir_emit(struct dir_context *ctx,
-> +			  const char *name, int namelen,
-> +			  u64 ino, unsigned type,
-> +			  struct cached_fid *cfid)
-> +{
-> +	bool rc;
-> +
-> +	rc =3D dir_emit(ctx, name, namelen, ino, type);
-> +	if (!rc)
-> +		return rc;
-> +
-> +	if (cfid) {
-> +		mutex_lock(&cfid->dirents.de_mutex);
-> +		add_cached_dirent(&cfid->dirents, ctx, name, namelen, ino,
-> +				  type);
-> +		mutex_unlock(&cfid->dirents.de_mutex);
-> +	}
-> +
-> +	return rc;
-> +}
-
-Should return cfid->dirents.is_failed?
-
-> -
->  int cifs_readdir(struct file *file, struct dir_context *ctx)
->  {
->  	int rc =3D 0;
->  	unsigned int xid;
->  	int i;
-> -	struct cifs_tcon *tcon;
-> +	struct cifs_tcon *tcon, *mtcon;
->  	struct cifsFileInfo *cifsFile =3D NULL;
->  	char *current_entry;
->  	int num_to_fill =3D 0;
-> @@ -920,15 +1021,59 @@ int cifs_readdir(struct file *file, struct dir_con=
-text *ctx)
->  	char *end_of_smb;
->  	unsigned int max_len;
->  	char *full_path =3D NULL;
-> +	struct cached_fid *cfid =3D NULL;
-> +	struct cifs_sb_info *cifs_sb =3D CIFS_FILE_SB(file);
->=20=20
->  	xid =3D get_xid();
-> -
->  	full_path =3D build_path_from_dentry(file_dentry(file));
->  	if (full_path =3D=3D NULL) {
->  		rc =3D -ENOMEM;
->  		goto rddir2_exit;
->  	}
->=20=20
-> +	mtcon =3D cifs_sb_master_tcon(cifs_sb);
-
-Why using the master tcon? The rest of the code is using the user
-tcon.
+And you are expecting the see the explicit version instead of default. Is t=
+hat
+right?
 
 
-> +	if (!is_smb1_server(mtcon->ses->server) && !strcmp(full_path, "")) {
-> +		rc =3D open_shroot(xid, mtcon, cifs_sb, &cfid);
-> +		if (rc)
-> +			goto cache_not_found;
-> +
-> +		mutex_lock(&cfid->dirents.de_mutex);
-> +		/*
-> +		 * If this was reading from the start of the directory
-> +		 * we need to initialize scanning and storing the
-> +		 * directory content.
-> +		 */
-> +		if (ctx->pos =3D=3D 0 && cfid->dirents.ctx =3D=3D NULL) {
-> +			cfid->dirents.ctx =3D ctx;
-> +			cfid->dirents.pos =3D 2;
-> +		}
-> +		/*
-> +		 * If we already have the entire directory cached then
-> +		 * we can just serve the cache.
-> +		 */
-> +		if (cfid->dirents.is_valid) {
-> +			if (!dir_emit_dots(file, ctx)){
-> +				mutex_unlock(&cfid->dirents.de_mutex);
-> +				goto rddir2_exit;
-> +			}
-> +			emit_cached_dirents(&cfid->dirents, ctx);
-> +			mutex_unlock(&cfid->dirents.de_mutex);
-> +			goto rddir2_exit;
-> +		}
-> +		mutex_unlock(&cfid->dirents.de_mutex);
-> +	}
-> + cache_not_found:
-> +
-> +	/* Drop the cache while calling initiate_cifs_search and
-> +	 * find_cifs_entry in case there will be reconnects during
-> +	 * query_directory.
-> +	 */
+As a side note, if you just need to version you can look at
+/proc/fs/cifs/DebugData. It will list all currently active connections along
+with their version as "Dialect":
 
-comment style
+    # mount.cifs //foo/bar ....
+    # grep Dialect /proc/fs/cifs/DebugData=20
+    Number of credits: 407 Dialect 0x311 signed
 
-Cheers,
+=3D> 0x311 is 3.1.1
+
 --=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, DE
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+You are receiving this mail because:
+You are the QA Contact for the bug.=
