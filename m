@@ -2,85 +2,98 @@ Return-Path: <SRS0=Y/WD=DN=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79031C41604
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 05:25:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF99AC41604
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 05:26:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 283B520870
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 05:25:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E47520870
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 05:26:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ejGCdQu3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iv1TlRZH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725997AbgJFFZk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Oct 2020 01:25:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36380 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725922AbgJFFZk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Oct 2020 01:25:40 -0400
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 441CAC0613A7
-        for <linux-cifs@vger.kernel.org>; Mon,  5 Oct 2020 22:25:40 -0700 (PDT)
-Received: by mail-yb1-xb34.google.com with SMTP id v60so8097020ybi.10
-        for <linux-cifs@vger.kernel.org>; Mon, 05 Oct 2020 22:25:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=IdvxR362jmTvknVMRRpQ9VymqxsvGU5//5/U9HJ7+a0=;
-        b=ejGCdQu3UH0JAujZoHuGa45TlCijMXyd41RgWbURWL3DYRK80ydh0QUKxpm0pAT1Qs
-         LlgRrIgjrx8VGepkpKvYSK0ORpKg//fCxbsgWjgwNNOhHB9x5vQv59cSkXDTaPqzWnf1
-         yDUQfp5kY/Vsq189jQZwaALxA11k7NKsslzMOUQTHfjSUYHpplQ/kOPYncMKrFl6AcRy
-         pjPg7K8AbNBcbGc9SjFmgSZSzh23Xy/s4QKxdGlvb3yxqo3GG/iZmPRc49ghUaEMVQKd
-         49eYAerwkoiK5yzt9nzuzODxtUSmSItF6JcYb/wGYg2Qjwk/Oq6r0PigwlT+LYqQCDbp
-         0g7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=IdvxR362jmTvknVMRRpQ9VymqxsvGU5//5/U9HJ7+a0=;
-        b=tVlOWcB8z9a552uytYjfQcqA7OuB78Or3TdqOnLjtlUgFibr2pdnQSgK0oWddF9+im
-         447k26UJlQX81GM4OAqDVGPmXTeXAONl7Z4uudw06wy36CQHRjHKFI3IwustNQlpvICn
-         l9GIbicWdgysP5jIhR85H20qTACcLZCiQAF1ccGVoThNT4mv+f4F+o6oHAWJmVI0a/06
-         ku7J/Gc9QKonsKdOeFNSd8d1RGi32XpM1Wq50xwNQbsROtkZVon55INBbcGfLp9sXINv
-         UghjlSjjXm3BFrj2awC4unTXWvPJ2VYCscI9ZBvOD+q8IlMMJ4AU2aILgUcVCe3AJ4FI
-         g1Og==
-X-Gm-Message-State: AOAM530YwOEwb8IbPeeJbKGg6waQikLwN1a7sXJ3paKq/40sEWxCV4mk
-        acvKMq8E9A/RXV9TWr5+qhayli2ujDa1oGUrqCVPpD/ylw2Sbg==
-X-Google-Smtp-Source: ABdhPJyYWGo4Iuoc70JyH1hNwMEIYxO+QcA15a8OxL9QBnWieoiYhsFd7TnzZmGt36eWTlydDh6no0Tr5Zwx+00T3IU=
-X-Received: by 2002:a25:1405:: with SMTP id 5mr4521328ybu.97.1601961939332;
- Mon, 05 Oct 2020 22:25:39 -0700 (PDT)
-MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Tue, 6 Oct 2020 10:55:32 +0530
-Message-ID: <CANT5p=oUOsR---hHYF2k0smsq+qu7K4W3hUYXD2-c3D_cCsf1g@mail.gmail.com>
-Subject: ENOTSUPP to userspace
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1725922AbgJFF0y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Oct 2020 01:26:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55187 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725912AbgJFF0y (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Oct 2020 01:26:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1601962013;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=zvlwfGXcBK422+Q8iINBtZMI3UsLReypmtHnvwXCzJI=;
+        b=iv1TlRZHP8jmrF9FRwwA2TEXuyEGQ4q3QuRytF1TER1XiTEuGELbm3PJVKdTbMtkrKfHVa
+        o9qoCfC6ODazqp2x96myw6OknUZgjEL+HOVzQKk7zmZCtiqI8LMQygP7k8XHJY9I/KFn03
+        2d7OAEbLYqe0zdE23tBTrX5jVUX7pr0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-aIYAOfjjPHy9gO0CgwoxVg-1; Tue, 06 Oct 2020 01:26:51 -0400
+X-MC-Unique: aIYAOfjjPHy9gO0CgwoxVg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B77A10060C0;
+        Tue,  6 Oct 2020 05:26:50 +0000 (UTC)
+Received: from test1103.test.redhat.com (vpn2-54-124.bne.redhat.com [10.64.54.124])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0854755789;
+        Tue,  6 Oct 2020 05:26:49 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: handle -EINTR in cifs_setattr
+Date:   Tue,  6 Oct 2020 15:26:43 +1000
+Message-Id: <20201006052643.6298-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
+RHBZ: 1848178
 
-Recently, we saw one customer hitting an error during file I/O with
-error "Unknown error" 524. Since this error does not translate to any
-error using strerror(), it was quite confusing. Only when I saw that
-in errno.h in Linux kernel, I could see that this error corresponds to
-ENOTSUPP, which we return in a few places in our code.
+Some calls that set attributes, like utimensat(), are not supposed to return
+-EINTR and thus do not have handlers for this in glibc which causes us
+to leak -EINTR to the applications which are also unprepared to handle it.
 
-I also noticed that there's an error ENOTSUP, which does translate to
-a userspace error.
+For example tar will break if utimensat() return -EINTR and abort unpacking
+the archive. Other applications may break too.
 
-My question here are:
-1. What's the purpose of these two error codes which look similar?
-2. Who should we talk to about having corresponding translation in strerror?
-3. Should we be returning ENOTSUPP to userspace at all? The open man
-page says that for ENOTSUPP: The filesystem containing pathname does
-not support O_TMPFILE. Is this the only reason where we return
-ENOTSUPP?
+To handle this we add checks, and retry, for -EINTR in cifs_setattr()
 
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/inode.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 3989d08396ac..2dd6e7902ff4 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -2879,13 +2879,18 @@ cifs_setattr(struct dentry *direntry, struct iattr *attrs)
+ {
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
+ 	struct cifs_tcon *pTcon = cifs_sb_master_tcon(cifs_sb);
++	int rc, retries = 0;
+ 
+-	if (pTcon->unix_ext)
+-		return cifs_setattr_unix(direntry, attrs);
+-
+-	return cifs_setattr_nounix(direntry, attrs);
++	do {
++		if (pTcon->unix_ext)
++			rc = cifs_setattr_unix(direntry, attrs);
++		else
++			rc = cifs_setattr_nounix(direntry, attrs);
++		retries++;
++	} while (rc == -EINTR && retries < 4);
+ 
+ 	/* BB: add cifs_setattr_legacy for really old servers */
++	return rc;
+ }
+ 
+ #if 0
 -- 
--Shyam
+2.13.6
+
