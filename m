@@ -2,98 +2,116 @@ Return-Path: <SRS0=Y/WD=DN=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF99AC41604
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 05:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1ED4C47095
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 05:54:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E47520870
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 05:26:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A35C2078A
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Oct 2020 05:54:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iv1TlRZH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oNsCy8g6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725922AbgJFF0y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Oct 2020 01:26:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55187 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725912AbgJFF0y (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Oct 2020 01:26:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1601962013;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=zvlwfGXcBK422+Q8iINBtZMI3UsLReypmtHnvwXCzJI=;
-        b=iv1TlRZHP8jmrF9FRwwA2TEXuyEGQ4q3QuRytF1TER1XiTEuGELbm3PJVKdTbMtkrKfHVa
-        o9qoCfC6ODazqp2x96myw6OknUZgjEL+HOVzQKk7zmZCtiqI8LMQygP7k8XHJY9I/KFn03
-        2d7OAEbLYqe0zdE23tBTrX5jVUX7pr0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-aIYAOfjjPHy9gO0CgwoxVg-1; Tue, 06 Oct 2020 01:26:51 -0400
-X-MC-Unique: aIYAOfjjPHy9gO0CgwoxVg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B77A10060C0;
-        Tue,  6 Oct 2020 05:26:50 +0000 (UTC)
-Received: from test1103.test.redhat.com (vpn2-54-124.bne.redhat.com [10.64.54.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0854755789;
-        Tue,  6 Oct 2020 05:26:49 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH] cifs: handle -EINTR in cifs_setattr
-Date:   Tue,  6 Oct 2020 15:26:43 +1000
-Message-Id: <20201006052643.6298-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        id S1726875AbgJFFyG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Oct 2020 01:54:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40792 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726007AbgJFFyF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Oct 2020 01:54:05 -0400
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94CD5C0613A7
+        for <linux-cifs@vger.kernel.org>; Mon,  5 Oct 2020 22:54:05 -0700 (PDT)
+Received: by mail-io1-xd42.google.com with SMTP id n6so5296899ioc.12
+        for <linux-cifs@vger.kernel.org>; Mon, 05 Oct 2020 22:54:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NpCrmllG71Cw+19EzjfgNasiTicD2S0gRmtQXvQeCWk=;
+        b=oNsCy8g6LXt6CCbSnIawPxwBDSQhaqL86RTRcMYe+XwVHaw8VCmsRmxQNO3ErsREgG
+         xYp7lVRXPKjAuoaXmeveMASZ4ViXefKqwzZJUw8TnvyMrq54+0PC5PALTiAgxHRQfmGV
+         HcSHGHVjqTdYhCU+CnYEXn1VnMesvI5pd/4QrQLiY9Cb3thHan7Km/TN15Ks3tQFwcBV
+         iawXnu8AslZ2bzwIx26vDvvybXWZK19wOn99Sy4m6oPg1s6suQaJmZZ8Ir1Ij42t6YkQ
+         DMA7DNAsnvjK/Dc/mRW6UhdNBIeRnPb2mYCvxdYTyHvCJv6FqNfwk+I5S6SQJcuwRHnD
+         cEiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NpCrmllG71Cw+19EzjfgNasiTicD2S0gRmtQXvQeCWk=;
+        b=ip6y/KchP4xZECqeazbSUH1T2Gy0792eX5sHucwKbwi9wqxG9TnYOMvyZ1a5qxZEon
+         4ylSRbvBJOPUY0feEFP+my2XZ2PE6IRaOtPWGKWYtoOoYs/INg8oYOt90A6HgQX6zcuc
+         hk8wvWxQLj1gWax1hu8JiyuKySsB+4valFW6Gm92fNgYqgyTlw0kncNa6wpi2TRcvNnG
+         0GI73/RMcuAfOIfTA//Wj2Xk4tw02ryD14ZWy8UjnBt5qimzwPSBZssKfU5oBgDHXykE
+         t18qCSuGgsQGw5yeAreD1gHZ0zzK7yV/+hnzx+k9VOweCWdlM3xwFlwxmtfWMrwL//nM
+         XQAQ==
+X-Gm-Message-State: AOAM533I4a8dorglqvM5mw2NQWD0jPiuyn3+zm6c4+CAgXkK5sFptav1
+        6rgxjc+Qplrtpe452NcIUGr+ZxLa7di/X3Jj79A=
+X-Google-Smtp-Source: ABdhPJzXhjKqftv6+KAmsqu9mBfUQ34AEq0pz+5ZPq9HrutLkrWBcENhn+antI7hP2FoqEgZVyMpkw7gX5EnEq/VG74=
+X-Received: by 2002:a5e:9613:: with SMTP id a19mr2681975ioq.116.1601963644898;
+ Mon, 05 Oct 2020 22:54:04 -0700 (PDT)
+MIME-Version: 1.0
+References: <CANT5p=oUOsR---hHYF2k0smsq+qu7K4W3hUYXD2-c3D_cCsf1g@mail.gmail.com>
+In-Reply-To: <CANT5p=oUOsR---hHYF2k0smsq+qu7K4W3hUYXD2-c3D_cCsf1g@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Tue, 6 Oct 2020 15:53:53 +1000
+Message-ID: <CAN05THSL9WBtaKaWVn7NJtzV90dtxghqHiGU4NBCB71ms_JNvg@mail.gmail.com>
+Subject: Re: ENOTSUPP to userspace
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-RHBZ: 1848178
+On Tue, Oct 6, 2020 at 3:25 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+>
+> Hi,
+>
+> Recently, we saw one customer hitting an error during file I/O with
+> error "Unknown error" 524. Since this error does not translate to any
+> error using strerror(), it was quite confusing. Only when I saw that
+> in errno.h in Linux kernel, I could see that this error corresponds to
+> ENOTSUPP, which we return in a few places in our code.
+>
+> I also noticed that there's an error ENOTSUP, which does translate to
+> a userspace error.
 
-Some calls that set attributes, like utimensat(), are not supposed to return
--EINTR and thus do not have handlers for this in glibc which causes us
-to leak -EINTR to the applications which are also unprepared to handle it.
+After a quick look, we do not use ENOTSUPP a lot.
+But there are three places in transport.c that look suspicious.
+They all trigger if we run out of credits for an extended period and
+from a brief glance it might be able to leak ENOTSUPP to userspace for
+almost any syscall.
 
-For example tar will break if utimensat() return -EINTR and abort unpacking
-the archive. Other applications may break too.
+I think this needs to be audited. The places are
+wait_for_compound_request() and wait_for_free_request().
 
-To handle this we add checks, and retry, for -EINTR in cifs_setattr()
+What to do here is not obvious. We could retry in cifs.ko but we can't
+do this indefinitely since when we have no credits
+for an extended time, every syscall will become a new thread that gets
+stuck in cifs.ko waiting for credits that might never become
+available.
+So maybe we should rework this and return -EAGAIN here, push it to
+userspace right away and hope userspace can deal with it?
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/inode.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+And if we decide to push -EAGAIN to userspace we might do that right
+away without any retries in cifs.ko since if we have been at zero
+credits for a long long time already chances are that retry will not
+work and we will remain at zero credits for a long time more.
 
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 3989d08396ac..2dd6e7902ff4 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -2879,13 +2879,18 @@ cifs_setattr(struct dentry *direntry, struct iattr *attrs)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
- 	struct cifs_tcon *pTcon = cifs_sb_master_tcon(cifs_sb);
-+	int rc, retries = 0;
- 
--	if (pTcon->unix_ext)
--		return cifs_setattr_unix(direntry, attrs);
--
--	return cifs_setattr_nounix(direntry, attrs);
-+	do {
-+		if (pTcon->unix_ext)
-+			rc = cifs_setattr_unix(direntry, attrs);
-+		else
-+			rc = cifs_setattr_nounix(direntry, attrs);
-+		retries++;
-+	} while (rc == -EINTR && retries < 4);
- 
- 	/* BB: add cifs_setattr_legacy for really old servers */
-+	return rc;
- }
- 
- #if 0
--- 
-2.13.6
 
+
+> My question here are:
+> 1. What's the purpose of these two error codes which look similar?
+> 2. Who should we talk to about having corresponding translation in strerror?
+> 3. Should we be returning ENOTSUPP to userspace at all? The open man
+> page says that for ENOTSUPP: The filesystem containing pathname does
+> not support O_TMPFILE. Is this the only reason where we return
+> ENOTSUPP?
+>
+> --
+> -Shyam
