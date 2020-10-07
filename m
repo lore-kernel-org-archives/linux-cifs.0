@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1C1C3279D
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Oct 2020 01:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96583C4363D
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Oct 2020 02:48:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67ACC20782
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Oct 2020 01:44:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A298207EA
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Oct 2020 02:48:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FDTqmZqH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H78cLiUK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726604AbgJGBop (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Oct 2020 21:44:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55046 "EHLO
+        id S1726096AbgJGCsa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Oct 2020 22:48:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727257AbgJGBoo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Oct 2020 21:44:44 -0400
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17DF9C0613D2
-        for <linux-cifs@vger.kernel.org>; Tue,  6 Oct 2020 18:44:43 -0700 (PDT)
-Received: by mail-lf1-x144.google.com with SMTP id b12so410482lfp.9
-        for <linux-cifs@vger.kernel.org>; Tue, 06 Oct 2020 18:44:43 -0700 (PDT)
+        with ESMTP id S1727005AbgJGCs3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Oct 2020 22:48:29 -0400
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58545C061755
+        for <linux-cifs@vger.kernel.org>; Tue,  6 Oct 2020 19:48:29 -0700 (PDT)
+Received: by mail-lf1-x143.google.com with SMTP id z8so521240lfd.11
+        for <linux-cifs@vger.kernel.org>; Tue, 06 Oct 2020 19:48:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=2Vq2ha87oH3peVHcyOOP3ZM8i7oNofOpXIV1SVxdCTI=;
-        b=FDTqmZqHsy4F4g7NqFgEmVJZB0fdDqnHXWiX2y9FJyBegZJIvXLezPGbip6KdFuUEg
-         MtilgGVP15iUcAkdHtDaJBS+Tb9Lea80xxn9HdYzG0U5fA+ZHJbWu2ljxwTgA0jwckf8
-         ZKfL9llOstSNkSaAH+AiRM/0BxJJZnnx1cgy/v1UX1yyvPVjK+iSDoxCAQ/EM/+0uTvM
-         hZwXBwDiiJKdaebPgO1aGHmgMyGks58MSW7X9kMc/zq1v2hIEIAvyOz2x8xRg8I910EE
-         V+w51DYw3aK0KSXBTNdhqqPcOMBtA7dCfNq/vD2CWXPoipoHa5bDDJ7NwyRgqA6Utg8j
-         nExw==
+        bh=KCsZOvnnkn4pzCTFdj25qgSKDx14zPxN7zlKZET527w=;
+        b=H78cLiUKlfqAiuQQIIJpcb0MrKTQT68d77PQycZFqsoV6anFv0xaeBVyxLag2sGCIX
+         ltrGGtqc9ki5DmQbevnZ6eRCSmm0E/2+JeEwvpK7w+a5GX0LU08CodyKSN9mzGyQaO46
+         j8JNKQK4bMgL8TsGeEgydUzFwsRRwTaBXKBS8wvg2yaUshB+a/BR81OConKcEPFGHNH6
+         SSB1Qx80Rv9mA5eVsARUmS23dQBOAXhsuT7O+apwQooA+gvZwNgxaHCE9XP+Iqpq+Pt9
+         7VdAstyiXQssPk007LbFw9xD/sMj1ifZqnAdhnzIxblmvtW1HQ53UqY9xBPUABFfmmlD
+         xhmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2Vq2ha87oH3peVHcyOOP3ZM8i7oNofOpXIV1SVxdCTI=;
-        b=ewlY1ti6XtDQ3XXSYtYTj7WgsMfqgtsi+TtwCW5bHEcS8g1fX0z/Oo03Q5fNBYWTbn
-         a49Nr7JXR/IZkD5PbK1KTj475+7bCHcReKGMeT1JYRr2b6gvTEWAGXb8Z+twNos7DjQr
-         XDTG0+prXua9COFQskokZWDAiLbTidjgw0erpVsCUwhZdTe1lkbQK0RIOFU1/fI4H9Z+
-         xX68bQCnfRyHd6yLV9lFwluKYuzsolRNXb0plR32Ncl6W059ZjdKy0UZ3NGjIMlV8Bdc
-         rtv2XWtu4sVNcsdDH7Jxu03VcIrP19tnBIz54jaxvbfd69uZFxjLpgdnU/+lGt0s2dQS
-         HluQ==
-X-Gm-Message-State: AOAM533sxmF4QlD7bpbWzJel+eiHwcu8feLHsY+cLIS0Z816cq+2tb7n
-        T7MY56bUj07GjynnKf2erTqb0p2+pOvpO1LTXuA=
-X-Google-Smtp-Source: ABdhPJy0QKO5ZPf9qfUsbvdWufv4CinoOhAvglEYbeGjPORoGhEfLlt9+RZc18CsDhdGJQm32P8WQbsnTrvTsNYyZKQ=
-X-Received: by 2002:a05:6512:36cd:: with SMTP id e13mr183321lfs.165.1602035081445;
- Tue, 06 Oct 2020 18:44:41 -0700 (PDT)
+        bh=KCsZOvnnkn4pzCTFdj25qgSKDx14zPxN7zlKZET527w=;
+        b=TC6KjXlSuemRvRzfYfOxKlpgBgSifHmbZVdW9xH1E/8hfAakt7+Aj47cfJXZDZuP29
+         5qjzs5uHHiAG97/K5Tl9Wo1QTwAz9mcCGWewFN9mZjg9buakSOIPwL4BSTWqG6DkXvxc
+         jHK0g71XtTaU1pRpvRGr9RHAII1lqe1iX14A9pnq5EN6zVMVk+s/zs+jIXLv2CHNpNQz
+         9oROkssxXuGRLvj403m7CSHM1xju8A6sTs+vwj4dZuBRE3fKz3xikp6x+iU2IHmkkxut
+         OuVt0ywiODOIM6GJmGwXVjsBd1CyVJyc4iA2Zzh6q8p8uE0IPgGjkQtT/po/d6mf6Yxe
+         0t0w==
+X-Gm-Message-State: AOAM531oLQdX8qHgyQ1KSXZJEEdHbs7/akCPO1JdxFw3FDEHkCBnv1Cc
+        9TeyMcABz5NvA9bnwh9PMddqhrZ4D3rWiiUigso1UTlLRoM=
+X-Google-Smtp-Source: ABdhPJxeZ/Ip132tO8EImmFEKX7cjMqW799XzdnayGL1F92uvDnoKpT2B4yfFiQR1vzCugWxKrmyFuF/qTsrRPWJAEs=
+X-Received: by 2002:a19:c68a:: with SMTP id w132mr221668lff.106.1602038906993;
+ Tue, 06 Oct 2020 19:48:26 -0700 (PDT)
 MIME-Version: 1.0
 References: <20201006052643.6298-1-lsahlber@redhat.com> <87ft6ripw9.fsf@suse.com>
- <CAN05THRzdzc7Xy0fi2pF4jEs=QfsS-GSG_LEz_YwbexesRHvhw@mail.gmail.com>
-In-Reply-To: <CAN05THRzdzc7Xy0fi2pF4jEs=QfsS-GSG_LEz_YwbexesRHvhw@mail.gmail.com>
+ <CAN05THRzdzc7Xy0fi2pF4jEs=QfsS-GSG_LEz_YwbexesRHvhw@mail.gmail.com> <CAH2r5muszEqf9zbv6Xv8UzAmcPq6gvhYEhb5LBPEbPfW61tRGA@mail.gmail.com>
+In-Reply-To: <CAH2r5muszEqf9zbv6Xv8UzAmcPq6gvhYEhb5LBPEbPfW61tRGA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 6 Oct 2020 20:44:30 -0500
-Message-ID: <CAH2r5muszEqf9zbv6Xv8UzAmcPq6gvhYEhb5LBPEbPfW61tRGA@mail.gmail.com>
+Date:   Tue, 6 Oct 2020 21:48:15 -0500
+Message-ID: <CAH2r5mvkS_x9zoWt_REx5TyPWuWQqxZ2YYx8aoQPChOB3ZRfoA@mail.gmail.com>
 Subject: Re: [PATCH] cifs: handle -EINTR in cifs_setattr
 To:     ronnie sahlberg <ronniesahlberg@gmail.com>
 Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
@@ -71,61 +71,74 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Tentatively merged updated version of this patch into cifs-2.6.git
-for-next pending more testing and reviews
+Also FYI- I made a minor modification after discussing with Ronnie,
+reducing the retry count
 
-On Tue, Oct 6, 2020 at 5:22 PM ronnie sahlberg <ronniesahlberg@gmail.com> w=
-rote:
+On Tue, Oct 6, 2020 at 8:44 PM Steve French <smfrench@gmail.com> wrote:
 >
-> On Tue, Oct 6, 2020 at 8:57 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wrot=
-e:
-> >
-> > Hi Ronnie,
-> >
-> > Ronnie Sahlberg <lsahlber@redhat.com> writes:
-> > > Some calls that set attributes, like utimensat(), are not supposed to=
- return
-> > > -EINTR and thus do not have handlers for this in glibc which causes u=
-s
-> > > to leak -EINTR to the applications which are also unprepared to handl=
-e it.
-> >
-> > EINTR happens when the task receives a signal right?
-> >
-> > https://www.gnu.org/software/libc/manual/html_node/Interrupted-Primitiv=
-es.html
-> >
-> > Given what you said and what the glibc doc reads it seems like the fix
-> > should go in glibc. Otherwise we need to care about every single syscal=
-l.
+> Tentatively merged updated version of this patch into cifs-2.6.git
+> for-next pending more testing and reviews
 >
-> glibc have handling for EINTR in most places, but not in for example utim=
-ensat()
-> because this function is not supposed to be able to return this error.
-> Similarly we have functions like chmod and chown that also come into cifs=
-.ko
-> via the same entrypoint: cifs_setattr()
-> I think all of these "update inode data" are never supposed to be
-> interruptible since
-> they were classically just updating the in-memory inode and the thread
-> would never hit d-state.
->
-> Anyway, for these functions EINTR is not a valid return code so I
-> think we should take care to not
-> return it. Even if we change glibc adn the very very thin wrapper for
-> this functions there are applications
-> that might call the systemcall directly or via a different c-library.
->
->
+> On Tue, Oct 6, 2020 at 5:22 PM ronnie sahlberg <ronniesahlberg@gmail.com>=
+ wrote:
 > >
-> > Cheers,
-> > --
-> > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnber=
-g, DE
-> > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
+> > On Tue, Oct 6, 2020 at 8:57 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wr=
+ote:
+> > >
+> > > Hi Ronnie,
+> > >
+> > > Ronnie Sahlberg <lsahlber@redhat.com> writes:
+> > > > Some calls that set attributes, like utimensat(), are not supposed =
+to return
+> > > > -EINTR and thus do not have handlers for this in glibc which causes=
+ us
+> > > > to leak -EINTR to the applications which are also unprepared to han=
+dle it.
+> > >
+> > > EINTR happens when the task receives a signal right?
+> > >
+> > > https://www.gnu.org/software/libc/manual/html_node/Interrupted-Primit=
+ives.html
+> > >
+> > > Given what you said and what the glibc doc reads it seems like the fi=
+x
+> > > should go in glibc. Otherwise we need to care about every single sysc=
+all.
+> >
+> > glibc have handling for EINTR in most places, but not in for example ut=
+imensat()
+> > because this function is not supposed to be able to return this error.
+> > Similarly we have functions like chmod and chown that also come into ci=
+fs.ko
+> > via the same entrypoint: cifs_setattr()
+> > I think all of these "update inode data" are never supposed to be
+> > interruptible since
+> > they were classically just updating the in-memory inode and the thread
+> > would never hit d-state.
+> >
+> > Anyway, for these functions EINTR is not a valid return code so I
+> > think we should take care to not
+> > return it. Even if we change glibc adn the very very thin wrapper for
+> > this functions there are applications
+> > that might call the systemcall directly or via a different c-library.
+> >
+> >
+> > >
+> > > Cheers,
+> > > --
+> > > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> > > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> > > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnb=
+erg, DE
+> > > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
 =C3=BCnchen)
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
 
 
