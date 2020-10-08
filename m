@@ -2,110 +2,98 @@ Return-Path: <SRS0=9bed=DP=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D42C433E7
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Oct 2020 23:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC76BC433E7
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Oct 2020 23:33:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF85D221FD
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Oct 2020 23:31:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 435D42224D
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Oct 2020 23:33:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="of7SYsZS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NQ6HJThr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730185AbgJHXbN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 8 Oct 2020 19:31:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55826 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725969AbgJHXbN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Oct 2020 19:31:13 -0400
-Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 125EAC0613D2
-        for <linux-cifs@vger.kernel.org>; Thu,  8 Oct 2020 16:31:13 -0700 (PDT)
-Received: by mail-io1-xd41.google.com with SMTP id g7so8211592iov.13
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2020 16:31:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=QPY5AdWgnawEqEy9/lCwyYdAG+08r5KYJtfc0B2WMes=;
-        b=of7SYsZSgvLjETiQcRKRMbcT9JqzBrAcgai3BaiLJ76z7MGr6vRGbZ39HK7KbHcfop
-         mEX9ePCCKVPRi8IVhShtnbxZ/y8Or1el/mortTnhx3SjFewNC5osJ46u7osZmAU29Ber
-         qQs7sfpWqWiCmZBs9ThjYa1aCoPMHMqM6yEidsrt1hCpR96D8xnB4YMvxV4ck0E2AQMy
-         f9KKTTcxEr8/1Z696DrMhMkm7o3O8S594uNkhMG1ANyKIxnHWi+tEqv4cuG2hPG1v0kz
-         RSc6CClhifW6IkPEdZYk1+FKKnTtbyrqPVogRA3mzy7scuc0jOtJ7WuTItVDzmWh2P0r
-         T3kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QPY5AdWgnawEqEy9/lCwyYdAG+08r5KYJtfc0B2WMes=;
-        b=Dfbpw4Zi1Qm0QXdDFpQNfeB5nD+hn/4v9fNbfQv6Bp02Qva8VL2L2vSTbjYiuCFDx+
-         G7T+hJaN+CTfBqu9xMbx11JY/Pjakb3or6eeIAd6tvdPz0aoUmfKebQUqXRDSx1CM7R1
-         HN7ZrAj3Zavnn4xmIgRBrf2V4qH5E9C1bWo4BAYX1j+gmr1DFNrosBl4qA4l4+TLWl1O
-         e9EcxO7DcgILaCcxSkj0axV4YJ1anyfXM4UfUHo2vYBsKzsgm+6CSgOz25LwXxQc54QP
-         H9EG+xHPPgiYyuIaE6xTCxiD2BWDhgJeZsnxcmOukSibS2e46n6hAMQm74fbVZaaMSbk
-         ezJA==
-X-Gm-Message-State: AOAM531xSrgjKYassqwxkzXQO0L2tSVjfJCjUzbBkZxelUZGge235jHf
-        oYOFfZpM2zQ6ni+vBAsEozkv3OGahVU8Aex8qnY=
-X-Google-Smtp-Source: ABdhPJxrkAsSvbREPcI3x3MWosmXRWB7x2be8Pa7qypeXgkLOtOOHzFcCCAO89vB9j3VZqeNSWwFAP31RmMxddu4KZQ=
-X-Received: by 2002:a6b:610c:: with SMTP id v12mr7610642iob.101.1602199872301;
- Thu, 08 Oct 2020 16:31:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201006052643.6298-1-lsahlber@redhat.com> <87ft6ripw9.fsf@suse.com>
- <CAN05THRzdzc7Xy0fi2pF4jEs=QfsS-GSG_LEz_YwbexesRHvhw@mail.gmail.com> <87d01uiaaz.fsf@suse.com>
-In-Reply-To: <87d01uiaaz.fsf@suse.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 9 Oct 2020 09:31:00 +1000
-Message-ID: <CAN05THR-CrNZBJ99xCuztQd+LGuxb9uyEZDS89zJmxonnyKVOg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: handle -EINTR in cifs_setattr
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S1731041AbgJHXdH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 8 Oct 2020 19:33:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59893 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731038AbgJHXdH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Oct 2020 19:33:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1602199986;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=W6oDj369FztKeuKjIX5m0CpSUTrPJcnnqxF/C3vTxlo=;
+        b=NQ6HJThrx5EZxzL+SX0tMpNlpGfd3nM+46YJfF7K1KhqKMMiVT+Mm9FbsR9dLuDZ5C2Vkr
+        eOmgHUDRJOf00eZ15dp44u+qE5medbXyBcUsCUU4YdMVo5kgUSC4rPfUZrHXalRsc3cQyK
+        ZghWCinVFeCMgKJto7t5w8tAA53OltM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-12-GHHDJPCGrm4Uyn8bOrA-1; Thu, 08 Oct 2020 19:33:04 -0400
+X-MC-Unique: 12-GHHDJPCGrm4Uyn8bOrA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C53A7835B48;
+        Thu,  8 Oct 2020 23:33:03 +0000 (UTC)
+Received: from test1103.test.redhat.com (vpn2-54-124.bne.redhat.com [10.64.54.124])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 622CF100238C;
+        Thu,  8 Oct 2020 23:33:03 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: handle -EINTR in cifs_setattr
+Date:   Fri,  9 Oct 2020 09:32:56 +1000
+Message-Id: <20201008233256.27472-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Oct 7, 2020 at 8:45 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
->
-> ronnie sahlberg <ronniesahlberg@gmail.com> writes:
-> > glibc have handling for EINTR in most places, but not in for example ut=
-imensat()
-> > because this function is not supposed to be able to return this error.
-> > Similarly we have functions like chmod and chown that also come into ci=
-fs.ko
-> > via the same entrypoint: cifs_setattr()
-> > I think all of these "update inode data" are never supposed to be
-> > interruptible since
-> > they were classically just updating the in-memory inode and the thread
-> > would never hit d-state.
->
-> I see, thanks for the explanation.
->
-> > Anyway, for these functions EINTR is not a valid return code so I
-> > think we should take care to not
-> > return it. Even if we change glibc adn the very very thin wrapper for
-> > this functions there are applications
-> > that might call the systemcall directly or via a different c-library.
->
-> Should we use is_retryable_error() to check for the errcode?
+RHBZ: 1848178
 
+Some calls that set attributes, like utimensat(), are not supposed to return
+-EINTR and thus do not have handlers for this in glibc which causes us
+to leak -EINTR to the applications which are also unprepared to handle it.
 
-That is probably a good idea.
-I will resend the patch with that suggestion.
+For example tar will break if utimensat() return -EINTR and abort unpacking
+the archive. Other applications may break too.
 
-Thanks!
->
-> Cheers,
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
+To handle this we add checks, and retry, for -EINTR in cifs_setattr()
+
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/inode.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 3989d08396ac..0bd22c41a623 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -2879,13 +2879,18 @@ cifs_setattr(struct dentry *direntry, struct iattr *attrs)
+ {
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
+ 	struct cifs_tcon *pTcon = cifs_sb_master_tcon(cifs_sb);
++	int rc, retries = 0;
+ 
+-	if (pTcon->unix_ext)
+-		return cifs_setattr_unix(direntry, attrs);
+-
+-	return cifs_setattr_nounix(direntry, attrs);
++	do {
++		if (pTcon->unix_ext)
++			rc = cifs_setattr_unix(direntry, attrs);
++		else
++			rc = cifs_setattr_nounix(direntry, attrs);
++		retries++;
++	} while (is_retryable_error(rc) && retries < 2);
+ 
+ 	/* BB: add cifs_setattr_legacy for really old servers */
++	return rc;
+ }
+ 
+ #if 0
+-- 
+2.13.6
+
