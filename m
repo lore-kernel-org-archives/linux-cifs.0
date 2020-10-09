@@ -2,124 +2,113 @@ Return-Path: <SRS0=sO7z=DQ=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E1EDC433DF
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 05:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1EEBC433E7
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 14:31:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08A202222F
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 05:44:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 780C52225D
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 14:31:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgVeU4i2"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OpgwA4h4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725908AbgJIFn7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Oct 2020 01:43:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56606 "EHLO
+        id S2388736AbgJIObJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Oct 2020 10:31:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729877AbgJIFnW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Oct 2020 01:43:22 -0400
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC1E0C0613D2
-        for <linux-cifs@vger.kernel.org>; Thu,  8 Oct 2020 22:43:21 -0700 (PDT)
-Received: by mail-lf1-x144.google.com with SMTP id a7so8308108lfk.9
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2020 22:43:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kXHPFApdekDliC8bum5h3hXT8xq7ASeAt/aknliLe6M=;
-        b=XgVeU4i23u7KoC5AlMlWGdTKBjn8V7rUCuMmv/f1kQl4CnfSyAxyBpBP8rvwUqj2k9
-         RkPkwa+Ugwqk+yiAFIPZ8kJLaWjngTiTM4/ATEQ7S1mNIv3PTDmumJMK9nQWUj6n+FbM
-         YQJj2FcblqwYS1Etnzxe8+88PgxZIxbdBElKqJbSDF3GmvICOA0ww6b9BZyATv8JRyHI
-         C+sGog6Hf39Tv+wpev84RHkleDPGNLmR9P9W0HgOX1voQWV24OMU1muS3TJJaN5vlIsy
-         BohGWGJzVdXAMguIARpS0xCGf6KlfbgUFoD5hP+jnTpq+/vMyVWsxvtZvCWjp/3bBgsx
-         UzDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kXHPFApdekDliC8bum5h3hXT8xq7ASeAt/aknliLe6M=;
-        b=mjrPBFNpbqPTUIksS+gO10d1BKAudC/9iTL2l40jLzWV/OC5uRgmF2ypoaBqieB490
-         xGPnBQI2yU/UbBRhH3SsQT4tm0Fx5601IdqbtmF5IrgkYF/3zvY6d0Gc+g53w/CryitI
-         4Xq35TPUtu+eQtF25bz9ex8T0IIwe3G+JzVjVOgUMsUlYct0JyhqTDWhYJyDRXEQAVZz
-         nfZPcWU9zREGoCbDBhFG+EQLb4tUIhKiEhMUTfNpS6EVoIYx+LFPonvw/Hd4vbb7slKP
-         4VA5oPU6J2a7oy8P7I3XwtI0M9U0C/emtwJFsBl9w1nmCJxOzh9r5/CeaKLuq+aF6zR/
-         PkJw==
-X-Gm-Message-State: AOAM5304dwdQs97N3UWYAneyFpxiBWadJR5QjeVkHCdjDirX0TRKb/rQ
-        7X6GoDLwdsYnjaGgcQbxNRJVc+pa6m1PQ1BduLE=
-X-Google-Smtp-Source: ABdhPJxGL3nLjxGFS+QuT7NDSMSBxRUJJoEJa3f1wBhPF24/Ili9K1h05cwBHTmWMvJd2RDfoMo7w2xkya1ceVdBUZ4=
-X-Received: by 2002:a05:6512:717:: with SMTP id b23mr3907905lfs.165.1602222198511;
- Thu, 08 Oct 2020 22:43:18 -0700 (PDT)
+        with ESMTP id S1731698AbgJIObI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Oct 2020 10:31:08 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D40CC0613D2;
+        Fri,  9 Oct 2020 07:31:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=9pnCDQD7BT3wSOEmQ/ujAa+Hm2ir7A48RB79T7IxK0Q=; b=OpgwA4h4sqP1jU/IETGKZCdM+Q
+        i2z3mUNTVaNMrPcKu/kIEUukM1dt974qFSZx4F1PJP3u9M1SgxVKgcIonjd/aNrK8oJYJJN4oHRk1
+        obdU0/M9Ik9JMH/nzkWE8D3yho4lKnaBpftYWxPJpDwLQo52xiQnfV7kpYc8EtYGLGmDorJ9y8V5N
+        CJcX+ugzQELTPBZdvOkJejfwb3L1y6UeR3FiWZL/sICMMOlGRRiA2qGYtu0wV9jkbIzwzA2oq/dOd
+        H5aqicfp9nwOgncn7C7ET7kxAk5rWlkDprT8RSZwKu9U+B7N0o7spekfqopBUVo/2X+R5nO4vA99R
+        nxNxhJxw==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kQtQI-0005uX-P8; Fri, 09 Oct 2020 14:31:06 +0000
+From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        linux-mm@kvack.org, v9fs-developer@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org, linux-afs@lists.infradead.org,
+        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ecryptfs@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-mtd@lists.infradead.org, Richard Weinberger <richard@nod.at>,
+        linux-xfs@vger.kernel.org
+Subject: [PATCH v2 02/16] mm: Inline wait_on_page_read into its one caller
+Date:   Fri,  9 Oct 2020 15:30:50 +0100
+Message-Id: <20201009143104.22673-3-willy@infradead.org>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20201009143104.22673-1-willy@infradead.org>
+References: <20201009143104.22673-1-willy@infradead.org>
 MIME-Version: 1.0
-References: <20201008233256.27472-1-lsahlber@redhat.com>
-In-Reply-To: <20201008233256.27472-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 9 Oct 2020 00:43:07 -0500
-Message-ID: <CAH2r5ms0w1zZwo85RL8CbZKR40QMOPEvkf2iKeHXaHh0HYnagw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: handle -EINTR in cifs_setattr
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged updated patch into cifs-2.6.git for-next
+Having this code inline helps the function read more easily.
 
-On Thu, Oct 8, 2020 at 6:33 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> RHBZ: 1848178
->
-> Some calls that set attributes, like utimensat(), are not supposed to return
-> -EINTR and thus do not have handlers for this in glibc which causes us
-> to leak -EINTR to the applications which are also unprepared to handle it.
->
-> For example tar will break if utimensat() return -EINTR and abort unpacking
-> the archive. Other applications may break too.
->
-> To handle this we add checks, and retry, for -EINTR in cifs_setattr()
->
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/inode.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 3989d08396ac..0bd22c41a623 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -2879,13 +2879,18 @@ cifs_setattr(struct dentry *direntry, struct iattr *attrs)
->  {
->         struct cifs_sb_info *cifs_sb = CIFS_SB(direntry->d_sb);
->         struct cifs_tcon *pTcon = cifs_sb_master_tcon(cifs_sb);
-> +       int rc, retries = 0;
->
-> -       if (pTcon->unix_ext)
-> -               return cifs_setattr_unix(direntry, attrs);
-> -
-> -       return cifs_setattr_nounix(direntry, attrs);
-> +       do {
-> +               if (pTcon->unix_ext)
-> +                       rc = cifs_setattr_unix(direntry, attrs);
-> +               else
-> +                       rc = cifs_setattr_nounix(direntry, attrs);
-> +               retries++;
-> +       } while (is_retryable_error(rc) && retries < 2);
->
->         /* BB: add cifs_setattr_legacy for really old servers */
-> +       return rc;
->  }
->
->  #if 0
-> --
-> 2.13.6
->
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+---
+ mm/filemap.c | 20 ++++----------------
+ 1 file changed, 4 insertions(+), 16 deletions(-)
 
-
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 95b68ec1f22c..0ef06d515532 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -2834,18 +2834,6 @@ EXPORT_SYMBOL(filemap_page_mkwrite);
+ EXPORT_SYMBOL(generic_file_mmap);
+ EXPORT_SYMBOL(generic_file_readonly_mmap);
+ 
+-static struct page *wait_on_page_read(struct page *page)
+-{
+-	if (!IS_ERR(page)) {
+-		wait_on_page_locked(page);
+-		if (!PageUptodate(page)) {
+-			put_page(page);
+-			page = ERR_PTR(-EIO);
+-		}
+-	}
+-	return page;
+-}
+-
+ static struct page *do_read_cache_page(struct address_space *mapping,
+ 				pgoff_t index,
+ 				int (*filler)(void *, struct page *),
+@@ -2876,7 +2864,10 @@ static struct page *do_read_cache_page(struct address_space *mapping,
+ 			err = mapping->a_ops->readpage(data, page);
+ 		if (err == AOP_UPDATED_PAGE) {
+ 			unlock_page(page);
+-			goto out;
++		} else if (!err) {
++			wait_on_page_locked(page);
++			if (!PageUptodate(page))
++				err = -EIO;
+ 		}
+ 
+ 		if (err < 0) {
+@@ -2884,9 +2875,6 @@ static struct page *do_read_cache_page(struct address_space *mapping,
+ 			return ERR_PTR(err);
+ 		}
+ 
+-		page = wait_on_page_read(page);
+-		if (IS_ERR(page))
+-			return page;
+ 		goto out;
+ 	}
+ 	if (PageUptodate(page))
 -- 
-Thanks,
+2.28.0
 
-Steve
