@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3482C43457
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 20:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84279C2D0A4
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 20:07:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65DF820732
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 20:06:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3597D215A4
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 20:07:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391374AbgJIUGW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Oct 2020 16:06:22 -0400
-Received: from mga12.intel.com ([192.55.52.136]:29217 "EHLO mga12.intel.com"
+        id S2389855AbgJIUGy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Oct 2020 16:06:54 -0400
+Received: from mga02.intel.com ([134.134.136.20]:57645 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388470AbgJITwN (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 9 Oct 2020 15:52:13 -0400
-IronPort-SDR: hgwRDFPMEy9cMXUfN0Yw/6uAAnvmeC6yf9qQgiFQaKECYh9Nrc+ugxAC9EbcOXEraZgvADmSBT
- 8gykOvVZg+cA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9769"; a="144850837"
+        id S2390898AbgJITwA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 9 Oct 2020 15:52:00 -0400
+IronPort-SDR: 5+LUY2Awrr9j/tUQIAvjFtQA09wGVszIUmNQ5L2DFU9VGy9iI/QOZXZ6nS089EMR6yn+dOlt80
+ BHiurkWZK9Mw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9769"; a="152450896"
 X-IronPort-AV: E=Sophos;i="5.77,355,1596524400"; 
-   d="scan'208";a="144850837"
+   d="scan'208";a="152450896"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 12:52:10 -0700
-IronPort-SDR: zRSzmM1HZFGhzQcGhWxIWUdt7PON477D2ysFpCnQTUxdw9Z8VdaNQXVN+6ixBePqleDwfFxfgw
- K58aOn7YePQQ==
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 12:51:59 -0700
+IronPort-SDR: eWSKFRksQmWHvS1j4lFouXjU/VQ78asIZFlodYo3aryNHFOArT/TLAMBqja15iBonRYEaVT+Tm
+ vvSyZvytK3gg==
 X-IronPort-AV: E=Sophos;i="5.77,355,1596524400"; 
-   d="scan'208";a="317147210"
+   d="scan'208";a="462300719"
 Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 12:52:08 -0700
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 12:51:57 -0700
 From:   ira.weiny@intel.com
 To:     Andrew Morton <akpm@linux-foundation.org>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -41,7 +41,8 @@ To:     Andrew Morton <akpm@linux-foundation.org>,
         Andy Lutomirski <luto@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>
 Cc:     Ira Weiny <ira.weiny@intel.com>,
-        Miklos Szeredi <miklos@szeredi.hu>, x86@kernel.org,
+        David Woodhouse <dwmw2@infradead.org>,
+        Richard Weinberger <richard@nod.at>, x86@kernel.org,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Dan Williams <dan.j.williams@intel.com>,
         Fenghua Yu <fenghua.yu@intel.com>, linux-doc@vger.kernel.org,
@@ -67,9 +68,9 @@ Cc:     Ira Weiny <ira.weiny@intel.com>,
         drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
         xen-devel@lists.xenproject.org, linux-cachefs@redhat.com,
         samba-technical@lists.samba.org, intel-wired-lan@lists.osuosl.org
-Subject: [PATCH RFC PKS/PMEM 23/58] fs/fuse: Utilize new kmap_thread()
-Date:   Fri,  9 Oct 2020 12:49:58 -0700
-Message-Id: <20201009195033.3208459-24-ira.weiny@intel.com>
+Subject: [PATCH RFC PKS/PMEM 20/58] fs/jffs2: Utilize new kmap_thread()
+Date:   Fri,  9 Oct 2020 12:49:55 -0700
+Message-Id: <20201009195033.3208459-21-ira.weiny@intel.com>
 X-Mailer: git-send-email 2.28.0.rc0.12.gb6a658bd00c9
 In-Reply-To: <20201009195033.3208459-1-ira.weiny@intel.com>
 References: <20201009195033.3208459-1-ira.weiny@intel.com>
@@ -84,28 +85,58 @@ From: Ira Weiny <ira.weiny@intel.com>
 The kmap() calls in this FS are localized to a single thread.  To avoid
 the over head of global PKRS updates use the new kmap_thread() call.
 
-Cc: Miklos Szeredi <miklos@szeredi.hu>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: Richard Weinberger <richard@nod.at>
 Signed-off-by: Ira Weiny <ira.weiny@intel.com>
 ---
- fs/fuse/readdir.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/jffs2/file.c | 4 ++--
+ fs/jffs2/gc.c   | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/fs/fuse/readdir.c b/fs/fuse/readdir.c
-index 90e3f01bd796..953ffe6f56e3 100644
---- a/fs/fuse/readdir.c
-+++ b/fs/fuse/readdir.c
-@@ -536,9 +536,9 @@ static int fuse_readdir_cached(struct file *file, struct dir_context *ctx)
- 	 * Contents of the page are now protected against changing by holding
- 	 * the page lock.
- 	 */
--	addr = kmap(page);
-+	addr = kmap_thread(page);
- 	res = fuse_parse_cache(ff, addr, size, ctx);
+diff --git a/fs/jffs2/file.c b/fs/jffs2/file.c
+index f8fb89b10227..3e6d54f9b011 100644
+--- a/fs/jffs2/file.c
++++ b/fs/jffs2/file.c
+@@ -88,7 +88,7 @@ static int jffs2_do_readpage_nolock (struct inode *inode, struct page *pg)
+ 
+ 	BUG_ON(!PageLocked(pg));
+ 
+-	pg_buf = kmap(pg);
++	pg_buf = kmap_thread(pg);
+ 	/* FIXME: Can kmap fail? */
+ 
+ 	ret = jffs2_read_inode_range(c, f, pg_buf, pg->index << PAGE_SHIFT,
+@@ -103,7 +103,7 @@ static int jffs2_do_readpage_nolock (struct inode *inode, struct page *pg)
+ 	}
+ 
+ 	flush_dcache_page(pg);
+-	kunmap(pg);
++	kunmap_thread(pg);
+ 
+ 	jffs2_dbg(2, "readpage finished\n");
+ 	return ret;
+diff --git a/fs/jffs2/gc.c b/fs/jffs2/gc.c
+index 373b3b7c9f44..a7259783ab84 100644
+--- a/fs/jffs2/gc.c
++++ b/fs/jffs2/gc.c
+@@ -1335,7 +1335,7 @@ static int jffs2_garbage_collect_dnode(struct jffs2_sb_info *c, struct jffs2_era
+ 		return PTR_ERR(page);
+ 	}
+ 
+-	pg_ptr = kmap(page);
++	pg_ptr = kmap_thread(page);
+ 	mutex_lock(&f->sem);
+ 
+ 	offset = start;
+@@ -1400,7 +1400,7 @@ static int jffs2_garbage_collect_dnode(struct jffs2_sb_info *c, struct jffs2_era
+ 		}
+ 	}
+ 
 -	kunmap(page);
 +	kunmap_thread(page);
- 	unlock_page(page);
  	put_page(page);
- 
+ 	return ret;
+ }
 -- 
 2.28.0.rc0.12.gb6a658bd00c9
 
