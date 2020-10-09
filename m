@@ -7,40 +7,41 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F6D5C8A850
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 19:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64576C83027
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 19:53:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10BD322512
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 19:53:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 420EB2255F
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Oct 2020 19:53:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391095AbgJITx1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Oct 2020 15:53:27 -0400
-Received: from mga14.intel.com ([192.55.52.115]:15570 "EHLO mga14.intel.com"
+        id S2391172AbgJITxr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Oct 2020 15:53:47 -0400
+Received: from mga11.intel.com ([192.55.52.93]:40655 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391073AbgJITxW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 9 Oct 2020 15:53:22 -0400
-IronPort-SDR: 7KkidwkDSmKI3kwWlMria/Sju91b/R21i0w1kLrwQYSn3K4W1EsDTLeZ7OuYero5ReiYzcFEEs
- JOGLzwSLgu9Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9769"; a="164744016"
+        id S2389472AbgJITxk (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 9 Oct 2020 15:53:40 -0400
+IronPort-SDR: ALSFHBkR/52rttPjScavW0L6HaNv2mpe0XISWaZZJAY4d3ezNEk8iVejYdgcm7+PBdVjuPXNU0
+ 7YZwbayMJGWA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9769"; a="162068148"
 X-IronPort-AV: E=Sophos;i="5.77,355,1596524400"; 
-   d="scan'208";a="164744016"
+   d="scan'208";a="162068148"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 12:53:09 -0700
-IronPort-SDR: FciD93oXa6TN5PQF74JzeuCyRYkWBlT2lC/7ncntBELjkiuqMo1u2JSAhMViBtfJLu9YdFEYCB
- Wo/5PMHidIaw==
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 12:53:38 -0700
+IronPort-SDR: 77OyjRxsHRqLdlwGyIEmSTWShPVNVQULX7LnGcMeG3NkwcCC4UbesWRkZ9bTTqcjV6t6jmiGf4
+ lDgqS7BTpvKw==
 X-IronPort-AV: E=Sophos;i="5.77,355,1596524400"; 
-   d="scan'208";a="317147397"
+   d="scan'208";a="389237394"
 Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 12:53:08 -0700
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2020 12:53:37 -0700
 From:   ira.weiny@intel.com
 To:     Andrew Morton <akpm@linux-foundation.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Andy Lutomirski <luto@kernel.org>,
         Peter Zijlstra <peterz@infradead.org>
-Cc:     Ira Weiny <ira.weiny@intel.com>, x86@kernel.org,
+Cc:     Ira Weiny <ira.weiny@intel.com>, Coly Li <colyli@suse.de>,
+        Kent Overstreet <kent.overstreet@gmail.com>, x86@kernel.org,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Dan Williams <dan.j.williams@intel.com>,
         Fenghua Yu <fenghua.yu@intel.com>, linux-doc@vger.kernel.org,
@@ -66,9 +67,9 @@ Cc:     Ira Weiny <ira.weiny@intel.com>, x86@kernel.org,
         drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
         xen-devel@lists.xenproject.org, linux-cachefs@redhat.com,
         samba-technical@lists.samba.org, intel-wired-lan@lists.osuosl.org
-Subject: [PATCH RFC PKS/PMEM 39/58] fs/jffs2: Utilize new kmap_thread()
-Date:   Fri,  9 Oct 2020 12:50:14 -0700
-Message-Id: <20201009195033.3208459-40-ira.weiny@intel.com>
+Subject: [PATCH RFC PKS/PMEM 48/58] drivers/md: Utilize new kmap_thread()
+Date:   Fri,  9 Oct 2020 12:50:23 -0700
+Message-Id: <20201009195033.3208459-49-ira.weiny@intel.com>
 X-Mailer: git-send-email 2.28.0.rc0.12.gb6a658bd00c9
 In-Reply-To: <20201009195033.3208459-1-ira.weiny@intel.com>
 References: <20201009195033.3208459-1-ira.weiny@intel.com>
@@ -80,34 +81,33 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 From: Ira Weiny <ira.weiny@intel.com>
 
-These kmap() calls are localized to a single thread.  To avoid the over head of
-global PKRS updates use the new kmap_thread() call.
+These kmap() calls are localized to a single thread.  To avoid the over
+head of global PKRS updates use the new kmap_thread() call.
 
+Cc: Coly Li <colyli@suse.de> (maintainer:BCACHE (BLOCK LAYER CACHE))
+Cc: Kent Overstreet <kent.overstreet@gmail.com> (maintainer:BCACHE (BLOCK LAYER CACHE))
 Signed-off-by: Ira Weiny <ira.weiny@intel.com>
 ---
- fs/jffs2/file.c | 4 ++--
+ drivers/md/bcache/request.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/jffs2/file.c b/fs/jffs2/file.c
-index 3e6d54f9b011..14dd2b18cc16 100644
---- a/fs/jffs2/file.c
-+++ b/fs/jffs2/file.c
-@@ -287,13 +287,13 @@ static int jffs2_write_end(struct file *filp, struct address_space *mapping,
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index c7cadaafa947..a4571f6d09dd 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -44,10 +44,10 @@ static void bio_csum(struct bio *bio, struct bkey *k)
+ 	uint64_t csum = 0;
  
- 	/* In 2.4, it was already kmapped by generic_file_write(). Doesn't
- 	   hurt to do it again. The alternative is ifdefs, which are ugly. */
--	kmap(pg);
-+	kmap_thread(pg);
+ 	bio_for_each_segment(bv, bio, iter) {
+-		void *d = kmap(bv.bv_page) + bv.bv_offset;
++		void *d = kmap_thread(bv.bv_page) + bv.bv_offset;
  
- 	ret = jffs2_write_inode_range(c, f, ri, page_address(pg) + aligned_start,
- 				      (pg->index << PAGE_SHIFT) + aligned_start,
- 				      end - aligned_start, &writtenlen);
+ 		csum = bch_crc64_update(csum, d, bv.bv_len);
+-		kunmap(bv.bv_page);
++		kunmap_thread(bv.bv_page);
+ 	}
  
--	kunmap(pg);
-+	kunmap_thread(pg);
- 
- 	if (ret) {
- 		/* There was an error writing. */
+ 	k->ptr[KEY_PTRS(k)] = csum & (~0ULL >> 1);
 -- 
 2.28.0.rc0.12.gb6a658bd00c9
 
