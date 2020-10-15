@@ -2,126 +2,68 @@ Return-Path: <SRS0=foj0=DW=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3833AC433DF
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 08:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB692C433DF
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 09:02:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D565E218AC
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 08:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 742092222E
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 09:02:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="J9DqBIcE"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TssziCuK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388297AbgJOItX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Oct 2020 04:49:23 -0400
-Received: from mx2.suse.de ([195.135.220.15]:54874 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388282AbgJOItW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 15 Oct 2020 04:49:22 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1602751761;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=o6Mp6AN/mQn8I3/lOKadTPpPQZD84cpZKP7zgTme/VE=;
-        b=J9DqBIcE880umWHruO0XJHZrfoexQGHZvnDvSsXXis1bhmlvQy7bL64OxYkBLamtN4sMTE
-        XmQtkweXVgTOAH48SqZmCo/1PnQgrqkFAZ14/5tYwCSSqOANMsTnJlcE9Mkiub/3tYA3uC
-        lxmNegPgyNFFMDFDovGAU6Lg+aYwwMs=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 2DE2FAD03;
-        Thu, 15 Oct 2020 08:49:21 +0000 (UTC)
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Add support for GCM256 encryption
-In-Reply-To: <CAH2r5mtAOxF=PCndMTXxj_dZVLc-NQJfoawOvMeS3FbxiCU6xw@mail.gmail.com>
-References: <CAH2r5mtAOxF=PCndMTXxj_dZVLc-NQJfoawOvMeS3FbxiCU6xw@mail.gmail.com>
-Date:   Thu, 15 Oct 2020 10:49:20 +0200
-Message-ID: <87eelzho1b.fsf@suse.com>
+        id S2387848AbgJOJCp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Oct 2020 05:02:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34728 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726329AbgJOJCp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Oct 2020 05:02:45 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC623C061755;
+        Thu, 15 Oct 2020 02:02:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=i5I/+cL4/3BlrD1oU/6ksmOSk/qvKfKsTAdChNORLE8=; b=TssziCuKhu+1FMQTF7TdAznCvs
+        3wf31mB6br60aOA10fFjnjz4zucQawjaIVi98uQAWJL9cvAPmO0RKUN0GouLWSsCKTdUPVBNDFsoV
+        Mrb0xKHkx5KR4TiHECNhtTiMIpRWqOvyG37o7YZ46NC49Q0H4l2nLmxuQ1H+5sXI87bLV4g7q0iCI
+        aoXAla6IHi7PZ0gXRmx/1Oq0q50C+8whZA3Xn7UtIX1RuFhVZUcoBR/xTryh3MZKY2GykxNywq8Lk
+        mgsPo2UmbVGDUTfrZAykSKaR2GERVG6hhr3SXMVN11kl7JWWBl894lOhZnBVM28hUwQeEtWELGDCv
+        af1DTZLQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kSz9m-0003Pp-UN; Thu, 15 Oct 2020 09:02:42 +0000
+Date:   Thu, 15 Oct 2020 10:02:42 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ecryptfs@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
+        Richard Weinberger <richard@nod.at>, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH v2 00/16] Allow readpage to return a locked page
+Message-ID: <20201015090242.GA12879@infradead.org>
+References: <20201009143104.22673-1-willy@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201009143104.22673-1-willy@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Steve,
+On Fri, Oct 09, 2020 at 03:30:48PM +0100, Matthew Wilcox (Oracle) wrote:
+> Ideally all filesystems would return from ->readpage with the page
+> Uptodate and Locked, but it's a bit painful to convert all the
+> asynchronous readpage implementations to synchronous.  The first 14
+> filesystems converted are already synchronous.  The last two patches
+> convert iomap to synchronous readpage.
 
-Patch 2:
+Is it really that bad?  It seems like a lot of the remainig file systems
+use the generic mpage/buffer/nobh helpers.
 
-> From 3897b440fd14dfc7b2ad2b0a922302ea7705b5d9 Mon Sep 17 00:00:00 2001
-> From: Steve French <stfrench@microsoft.com>
-> Date: Wed, 14 Oct 2020 20:24:09 -0500
-> Subject: [PATCH 2/5] smb3.1.1: add new module load parm enable_gcm_256
-> --- a/fs/cifs/smb2pdu.h
-> +++ b/fs/cifs/smb2pdu.h
-> @@ -361,8 +361,9 @@ struct smb2_encryption_neg_context {
->  	__le16	ContextType; /* 2 */
->  	__le16	DataLength;
->  	__le32	Reserved;
-> -	__le16	CipherCount; /* AES-128-GCM and AES-128-CCM */
-> -	__le16	Ciphers[2];
-> +	/* CipherCount usally 2, but can be 3 when AES256-GCM enabled */
-> +	__le16	CipherCount; /* AES128-GCM and AES128-CCM by defalt */
-
-Typo defalt =3D> default
-
-> +	__le16	Ciphers[3];
->  } __packed;
->=20=20
->  /* See MS-SMB2 2.2.3.1.3 */
-> --=20
-> 2.25.1
->
-
-Patch 5:
-
-> From 314d7476e404c37acb77c3f9ecc142122e7afbfd Mon Sep 17 00:00:00 2001
-> From: Steve French <stfrench@microsoft.com>
-> Date: Fri, 11 Sep 2020 16:47:09 -0500
-> Subject: [PATCH 5/5] smb3.1.1: set gcm256 when requested
->
-> update code to set 32 byte key length and to set gcm256 when requested
-> on mount.
->
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> ---
->  fs/cifs/smb2glob.h      |  1 +
->  fs/cifs/smb2ops.c       | 20 ++++++++++++--------
->  fs/cifs/smb2transport.c | 16 ++++++++--------
->  3 files changed, 21 insertions(+), 16 deletions(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index dd1edabec328..d8e74954d101 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -3954,7 +3954,12 @@ crypt_message(struct TCP_Server_Info *server, int =
-num_rqst,
->=20=20
->  	tfm =3D enc ? server->secmech.ccmaesencrypt :
->  						server->secmech.ccmaesdecrypt;
-> -	rc =3D crypto_aead_setkey(tfm, key, SMB3_SIGN_KEY_SIZE);
-> +
-> +	if (require_gcm_256)
-> +		rc =3D crypto_aead_setkey(tfm, key, SMB3_GCM256_CRYPTKEY_SIZE);
-
-Shouldn't the check be on server->cipher_type?
-
-> +	else
-> +		rc =3D crypto_aead_setkey(tfm, key, SMB3_SIGN_KEY_SIZE);
-> +
->  	if (rc) {
->  		cifs_server_dbg(VFS, "%s: Failed to set aead key %d\n", __func__, rc);
->  		return rc;
-
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, DE
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+But I guess this series is a good first step.
