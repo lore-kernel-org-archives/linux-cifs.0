@@ -2,105 +2,96 @@ Return-Path: <SRS0=foj0=DW=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B130C433DF
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 18:22:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BACCCC433E7
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 19:03:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA30120760
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 18:22:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 571E4218AC
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 19:03:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NX+4sGxW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727684AbgJOSWv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Oct 2020 14:22:51 -0400
-Received: from p3plsmtpa07-05.prod.phx3.secureserver.net ([173.201.192.234]:54762
-        "EHLO p3plsmtpa07-05.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727197AbgJOSWv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 15 Oct 2020 14:22:51 -0400
-X-Greylist: delayed 438 seconds by postgrey-1.27 at vger.kernel.org; Thu, 15 Oct 2020 14:22:51 EDT
-Received: from [192.168.0.116] ([71.184.94.153])
-        by :SMTPAUTH: with ESMTPSA
-        id T7mlk50kils90T7mmkWp2O; Thu, 15 Oct 2020 11:15:32 -0700
-X-CMAE-Analysis: v=2.3 cv=QfEYQfTv c=1 sm=1 tr=0
- a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
- a=IkcTkHD0fZMA:10 a=iox4zFpeAAAA:8 a=hGzw-44bAAAA:8 a=yMhMjlubAAAA:8
- a=hNOTfydlAAAA:8 a=NA896NxhSAy2TpZPZw8A:9 a=QEXdDO2ut3YA:10
- a=WzC6qhA0u3u7Ye7llzcV:22 a=HvKuF1_PTVFglORKqfwH:22 a=fZunMKNLB757I4m4HZ3M:22
-X-SECURESERVER-ACCT: tom@talpey.com
-Subject: Re: [PATCH][SMB3.1.1] Add defines for new signing context
-To:     =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     samba-technical <samba-technical@lists.samba.org>
-References: <CAH2r5mtwBHTk-Xoeuo+RbgNwiNw-cWTAhdy1YG5y+vXnNDSv4w@mail.gmail.com>
- <bd8f21ed-5fd4-0974-f15a-16d2f3ee607f@samba.org> <87r1q3hixr.fsf@suse.com>
-From:   Tom Talpey <tom@talpey.com>
-Message-ID: <827fd43f-40a9-9480-a6b9-aea1fa69090c@talpey.com>
-Date:   Thu, 15 Oct 2020 14:15:32 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        id S2391266AbgJOTDQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Oct 2020 15:03:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729674AbgJOTDP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Oct 2020 15:03:15 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F31BC061755;
+        Thu, 15 Oct 2020 12:03:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=oNJXIe6ApwnR4LV/FIl4/BNaWNi8NSTj4mgOrmFnzuk=; b=NX+4sGxWbcObdfGwkGyOjAO42I
+        RwmquKATXBHbPE8QSMBRvqg3SOeDdcTChlMCCwoXnLis0DLRnkhZ9SBCeMdxlmrOEU5T31XnSKdna
+        8BJnB9a8evpDeuTlBno2NyNtBFQ3rhK5+DQAIo0aSwxVOlbPXbe1xBNJP+/BLP07zrDu8t86RMeAH
+        /PjljktE1B37EED9rYHkhPumMrgN299CGCffnkM19ZidMR2ViOe3nCfbLb380F9gIBfoc1CJNWBEM
+        pVilSrRr9k6B9lRS2zCnqwquGo2pBX6mLt0eMBFVmNSqr+ihKMHE6zdFkrlbS40ju3J1wa+nt0m9O
+        xHvnTZKg==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kT8Wu-00055X-Dw; Thu, 15 Oct 2020 19:03:12 +0000
+Date:   Thu, 15 Oct 2020 20:03:12 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ecryptfs@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
+        Richard Weinberger <richard@nod.at>, linux-xfs@vger.kernel.org
+Subject: Re: [PATCH v2 16/16] iomap: Make readpage synchronous
+Message-ID: <20201015190312.GB20115@casper.infradead.org>
+References: <20201009143104.22673-1-willy@infradead.org>
+ <20201009143104.22673-17-willy@infradead.org>
+ <20201015094203.GA21420@infradead.org>
+ <20201015164333.GA20115@casper.infradead.org>
+ <20201015175848.GA4145@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <87r1q3hixr.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4wfLmTpx9naniZReK859+SV7OpWXmKk90o0qW9Iu8lGA2lvvOTOIOQ+XwLwLRalM3IYh9oay3wogCYDv5OOZy7qcJSI7rd0lc//8EQNhRk5/gPvbJt6H7Y
- iz0P9B3TRA6Yu6gIG/x17OL/9X4WaRVbzV2iOBjOWX3nKu7S9Im0sMEsn07BguCFXjUtwRU/1U03J4aWFxozvYCm9OG7/uyq738uDthRjCXIPrqd8cLCoa8o
- kkusUjwzblO6ohdqFaOGc7ehIh30uFz/JZIbk0OB3NM+54siHMlRvoW/dbe4BkXn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201015175848.GA4145@infradead.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10/12/2020 5:50 AM, Aurélien Aptel wrote:
-> Patch LGTM
+On Thu, Oct 15, 2020 at 06:58:48PM +0100, Christoph Hellwig wrote:
+> On Thu, Oct 15, 2020 at 05:43:33PM +0100, Matthew Wilcox wrote:
+> > I prefer assigning ctx conditionally to propagating the knowledge
+> > that !rac means synchronous.  I've gone with this:
 > 
-> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+> And I really hate these kinds of conditional assignments.  If the
+> ->rac check is too raw please just add an explicit
 > 
-> Stefan Metzmacher via samba-technical <samba-technical@lists.samba.org>
->> This isn't in MS-SMB2 yet.
->>
->> Is this AES_128?
+> 	bool synchronous : 1;
 > 
-> This is returned in latest Windows Server Insider builds but it's not
-> documented yet.
-> 
-> https://www.microsoft.com/en-us/software-download/windowsinsiderpreviewserver
-> 
-> I've asked dochelp about it during the SDC plugfest and they gave me
-> this:
-> 
->      The new ContextType is:
->      SMB2_SIGNING_CAPABILITIES 0x0008
->      The Data field contains a list of signing algorithms.
->      •    It adds a new negotiate context, which enables SMB to decouple signing algorithms from dialects. E.g. if both client and server supports it, a session may use HMAC-SHA256 with SMB 3.1.1.
->      •    It adds the AES-GMAC algorithm.
->       
->      SigningAlgorithmCount (2 bytes): Count of signing algorithms
->      SigningAlgorithms (variable): An array of SigningAlgorithmCount 16-bit integer IDs specifying the supported signing algorithms.
->       
->      The following IDs are assigned:
->      0 = HMAC-SHA256
->      1 = AES-CMAC
->      2 = AES-GMAC
-> 
-> 
-> I've been CCed in a Microsoft email thread later on and it seems to be
-> unclear why this was missed/wasn't documented. Maybe this is subject to
-> change so take with a grain of salt.
+> flag.
 
-Just curious if you've heard back on this. Insider builds will sometimes
-support things that don't make it to the release. Even Preview docs can
-change. However, AES_GMAC has been on the radar since 2015 (*) so
-perhaps the time has come!
+I honestly don't see the problem.  We have to assign the status
+conditionally anyway so we don't overwrite an error with a subsequent
+success.
 
-I'd suggest wrapping this context and the integrity algs in some kind of
-conditional, in case this is delayed...
+> True.  I'd still prefer the AOP_UPDATED_PAGE as the fallthrough case
+> and an explicit goto out_unlock, though.
 
-Tom.
+So this?
 
-(*) slide 29+ 
-https://www.snia.org/sites/default/files/SDC15_presentations/smb/GregKramer_%20SMB_3-1-1_rev.pdf
+        if (ctx.bio) {
+                submit_bio(ctx.bio);
+                wait_for_completion(&ctx.done);
+                if (ret < 0)
+                        goto err;
+                ret = blk_status_to_errno(ctx.status);
+        }
+
+        if (ret < 0)
+                goto err;
+        return AOP_UPDATED_PAGE;
+err:
+        unlock_page(page);
+        return ret;
+
