@@ -2,104 +2,85 @@ Return-Path: <SRS0=foj0=DW=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E27C433DF
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 17:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F95C433E7
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 18:17:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D17322280
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 17:59:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89C1E20760
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Oct 2020 18:17:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="m21slifx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VSHUWrxK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732166AbgJOR6u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Oct 2020 13:58:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33356 "EHLO
+        id S1732889AbgJOSR0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Oct 2020 14:17:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732156AbgJOR6u (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Oct 2020 13:58:50 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40A34C061755;
-        Thu, 15 Oct 2020 10:58:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=x+XQ7VEyYNfvRvizRGPoAdTEAMGVk8qPQWatjzYSgQw=; b=m21slifxK1bGUo9NkuLnasLmGW
-        W7j1mSzLsl8lqkNcmNBEmyamMl2n/iSza8Fv9vJdGtVQIw2/kDlRcMmM4PWbe5eP6FTvI4xm0WOWP
-        4Adx+LchNEcYX2u8R/hnI8+L4xfRz5R7/ZW9gYaZ59Wva288nDtTL0QGvEDQcyQNBdTqXo87Bl3HW
-        E62GWuauRw2KoIGK3HW5V9LXG8lMy3MQUVaq3gY0yr4/hMeSjIpZfqFbIV5olX2c1do/vAiTNpYlO
-        890vukb4WHYvxnqK7wVoxPPIDsWceSIRHULvymZsZRjmZLVpToKJoS//KCJAy1r/TgDXANhlomCkj
-        PpgfwI1A==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kT7Wa-00018B-31; Thu, 15 Oct 2020 17:58:48 +0000
-Date:   Thu, 15 Oct 2020 18:58:48 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ecryptfs@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
-        Richard Weinberger <richard@nod.at>, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH v2 16/16] iomap: Make readpage synchronous
-Message-ID: <20201015175848.GA4145@infradead.org>
-References: <20201009143104.22673-1-willy@infradead.org>
- <20201009143104.22673-17-willy@infradead.org>
- <20201015094203.GA21420@infradead.org>
- <20201015164333.GA20115@casper.infradead.org>
+        with ESMTP id S1726053AbgJOSR0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Oct 2020 14:17:26 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B786C061755
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Oct 2020 11:17:25 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id x7so4947937eje.8
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Oct 2020 11:17:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=hBtp0DyG8eFF/S0AqGIqg6ssVhlEsEHSnWa7/gUQAYs=;
+        b=VSHUWrxKdir/ay3gZ4bx5yVI7TX5Iv+YjS9m7DQWym5TJNijSgu0tX0e2tRwTXt54r
+         XvMR6Ky6CjhXfU7mVa9elMReaM0//HctvkJ75d1KS9iVdgXnLcWNhq/6R/iDexYtiJ6Z
+         /pNIsz/urmcZYMKCe0EhQ9PkqF7OI+V86oagUXdp35pxuylxQBs/xiQTadQqgBlcgCVl
+         fOM59HiHs3lYtr8vksOhwEb1A+6jtHhbbfzC1dbz9X437elEKwKUeTBt9tqrPuxAAgTy
+         BM0uJyD5pFbgNVwDrTgS2PFtBXoIQygwfS2CiC85O8TFX7DseigGODJq2uctrGHzFM0H
+         1JUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=hBtp0DyG8eFF/S0AqGIqg6ssVhlEsEHSnWa7/gUQAYs=;
+        b=bPt86JDmjDdOECIOTTv8Lug+9PxGmS+xRb2hVad+1Nj6gaGrbCUYaqN9Siyb/hTDrj
+         q51ThIHJ3VflzwfYjnP3gbNeQ133uU6vAF8pWymnyIcVajXkq1nLFVKIpk9yiXtFTDF0
+         qSqqzCAaNUH2bi8vEMtmB6ytHE7E+gIHyv77x6RAwc1bCWlbXKxi93x0K3OC1iXivhiK
+         q8FXdYXDhOELED6sJy4R4m+M7x78aK8oayF4YrnVgS+4piES89Vgg+RWnIga9J4HFrDd
+         eGA5MSN5hsGfuAP3tFR63c546yWX7bjKC5XelufMSUT8FTT475TR8oBiXO6qsOvAX2wK
+         xFiw==
+X-Gm-Message-State: AOAM5300rH9okfc/Qm97LeLcpUvVHUlJZTrEgLT6kmNLS/IqHMRHZQBJ
+        8SwLJBwgqMDVdAE17iGK+4nR78/uHJJh0u3Pcw==
+X-Google-Smtp-Source: ABdhPJxwDC4W/BR9tgWbGzLMSIDVp0tPVKi1EJd3XjJgqQZJE81qjVvxByGiYLWfmTMxGe0klf8K5WWrBSaJCqpgeYY=
+X-Received: by 2002:a17:906:2e0e:: with SMTP id n14mr5707056eji.120.1602785843812;
+ Thu, 15 Oct 2020 11:17:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201015164333.GA20115@casper.infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+References: <CANT5p=rkeg0w67RcdKhRzGRD_iHA-eB9cBPOO-6BxZz+iyRp3g@mail.gmail.com>
+In-Reply-To: <CANT5p=rkeg0w67RcdKhRzGRD_iHA-eB9cBPOO-6BxZz+iyRp3g@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Thu, 15 Oct 2020 11:17:12 -0700
+Message-ID: <CAKywueQuxKPiGs2GDTL3h_Kn2Y0pjuZc=b-g1RV-xgmZo=VAXA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Return the error from crypt_message when enc/dec
+ key not found.
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Oct 15, 2020 at 05:43:33PM +0100, Matthew Wilcox wrote:
-> On Thu, Oct 15, 2020 at 10:42:03AM +0100, Christoph Hellwig wrote:
-> > > +static void iomap_read_page_end_io(struct bio_vec *bvec,
-> > > +		struct completion *done, bool error)
-> > 
-> > I really don't like the parameters here.  Part of the problem is
-> > that ctx is only assigned to bi_private conditionally, which can
-> > easily be fixed.  The other part is the strange bool error when
-> > we can just pass on bi_stats.  See the patch at the end of what
-> > I'd do intead.
-> 
-> I prefer assigning ctx conditionally to propagating the knowledge
-> that !rac means synchronous.  I've gone with this:
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+--
+Best regards,
+Pavel Shilovsky
 
-And I really hate these kinds of conditional assignments.  If the
-->rac check is too raw please just add an explicit
-
-	bool synchronous : 1;
-
-flag.
-
-> @@ -340,16 +335,12 @@ iomap_readpage(struct page *page, const struct iomap_ops *
-> ops)
->  
->         if (ctx.bio) {
->                 submit_bio(ctx.bio);
-> +               if (ret > 0)
-> +                       ret = blk_status_to_errno(ctx.status);
->         }
->  
-> -       wait_for_completion(&ctx.done);
->         if (ret >= 0)
-> -               ret = blk_status_to_errno(ctx.status);
-> -       if (ret == 0)
->                 return AOP_UPDATED_PAGE;
->         unlock_page(page);
->         return ret;
-> 
-> 
-> ... there's no need to call blk_status_to_errno if we never submitted a bio.
-
-True.  I'd still prefer the AOP_UPDATED_PAGE as the fallthrough case
-and an explicit goto out_unlock, though.
+=D1=87=D1=82, 15 =D0=BE=D0=BA=D1=82. 2020 =D0=B3. =D0=B2 10:56, Shyam Prasa=
+d N <nspmangalore@gmail.com>:
+>
+> Fixes bug:
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D209669
+>
+> Please review.
+>
+> --
+> -Shyam
