@@ -2,148 +2,137 @@ Return-Path: <SRS0=R2WM=DX=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3373FC433DF
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Oct 2020 04:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D15DC433E7
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Oct 2020 05:14:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B62062073A
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Oct 2020 04:51:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05A7D20760
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Oct 2020 05:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jNBSvhF8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IfyJzuIV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387993AbgJPEvC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 16 Oct 2020 00:51:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49334 "EHLO
+        id S1732396AbgJPFOo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 16 Oct 2020 01:14:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726305AbgJPEvC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 16 Oct 2020 00:51:02 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBD40C061755
-        for <linux-cifs@vger.kernel.org>; Thu, 15 Oct 2020 21:51:00 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id p15so1073045ljj.8
-        for <linux-cifs@vger.kernel.org>; Thu, 15 Oct 2020 21:51:00 -0700 (PDT)
+        with ESMTP id S1732369AbgJPFOo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 16 Oct 2020 01:14:44 -0400
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58AD6C061755
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Oct 2020 22:14:42 -0700 (PDT)
+Received: by mail-lj1-x243.google.com with SMTP id d24so1100179ljg.10
+        for <linux-cifs@vger.kernel.org>; Thu, 15 Oct 2020 22:14:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=El1d4udlKsuJARiEY0oHwCh1PN6hfU+sP+g7/+dmgHc=;
-        b=jNBSvhF8/fQKgJr/hqZbwqg7UsSSzJJWzpXOlGyVKS+LoL0A1FFEeEXFf5uINoc2Cq
-         sMwYUIcLGO5xINiKaQNK8tN800bJTSx4H8g9RQB3FEHjsXGKbVAZyNvnLZrP4dwJrJ21
-         Iz3v9CEuKEF+Y430BqyrUz7yzSNPv64WP8cc2vcGPEInOrBANhmpmkiFppD2MbPLrp0Z
-         cGj0goRGNtbewLnzppQSYAxZ28s7A8rGhJfutfKYlC3gQVQyzSKpTKnZfINy7UqoLxxM
-         kIcwuWBSwyjK4052PutCokp29wudJexEAyCi+udQlnF9fl6ww2HTcnKAKoT+OFsyM/2L
-         5JEA==
+         :cc;
+        bh=sHSm2fA2JSYPrBPLlGU71EEnGldLd8HcWzw016cqfXw=;
+        b=IfyJzuIV03VWises3Kd1QemR8dB8Q9MAS4kszn9DLhYFQMQ5eV96hNMC9l99dlM7dk
+         hpa+1ge0rt2o2ZPU3P+IYOy+H3FskYAhxGyBttv6zrjdQqBZGQVyud1c3u6wjy3vUYww
+         yWd4i2sDk+JnLj7oXLqUufhQ7vTI1wJMnm3ps2rCdHMEnVePMS0YHQ8HuWo0+KsD39ih
+         XR/bkJGyfH4u1xtXrRP0Qu7vmSIMlpePtuZ2zWZBn8jL9fN+PNHdkBhC23X2jMUebbmU
+         vaKsZTE4TC4pfJQdUc2C8Jq5q+3w5KtlDT1ZkppsYT/WF9D3xIoSfoF1mtkLJpSvxZ68
+         HOYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=El1d4udlKsuJARiEY0oHwCh1PN6hfU+sP+g7/+dmgHc=;
-        b=oH8KzIJ0FPja6bLZ/LyYfxjUTb+hv8zBVubWv3gfcqMzXA3kpZlFVSDLQlvsk7Heho
-         mkcepgiQZZsbGiD+KV8YbOWXaeTIY13ehbcGBE4jVKI5IK30UI39eqZBlX2zYCbznWke
-         qSQprPMe21qJU/C5DJnkCphY0LBIk1R/qdAhcuFV364ZfFZnytvl5tpfzP1PZWZcebD/
-         X/O+r8VHlEvHF3SD7n9T7gP+8oIKU3Rip8SPN1qxsw++FcJsZPpLcxAPFqY8UOZpHaWo
-         q3lZ0/N81udDK7/J6aD4DFFYnQeHTnGNcYfSoRx5d6/BjLydHNji9g8e+f9wcVyClrPm
-         BOuA==
-X-Gm-Message-State: AOAM532Q248oJge39lQE1kL9YF43oBzrq0C3W5xpV9akSalgkdW6wEjt
-        XFuyc3FELtmGzCUKxnpZp5lPD8ufNEN8EiqHswFxKs6bCxIvBA==
-X-Google-Smtp-Source: ABdhPJwyuHIMsMJycZcJaXGrCm8C8VeMpnCnzOUqM1mmf0Bo9qbGQlruiK85myct2elANvJJkc47V75E5RgGEz9i1Tc=
-X-Received: by 2002:a2e:a376:: with SMTP id i22mr769000ljn.325.1602823859357;
- Thu, 15 Oct 2020 21:50:59 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=sHSm2fA2JSYPrBPLlGU71EEnGldLd8HcWzw016cqfXw=;
+        b=GK9coTaugY3M+0k5906qZ/UJ4e6qcMXWWDfpQTlum7gly2QClDx2zmkvbzB9mwY0lV
+         ObQyuffxcSoc6/cM73KPrOwLnyLNZ/FjX6c1zCgAnPSUatH6eSLybc1gt0wdAZAY3hLX
+         YpnV770sJ1XcKcx7Ol7FNQre+E+awrfEIaU5Ut7OVwG/LEV1mK2nvlafebuuvKvVjb2D
+         7GwOCnzPUKd6jKPdLYyS7E2P+5NyhlXdN7gV/+HbNLCQh4B62RBu1HHt2OfwVN6XrjCj
+         9F6JNDw+U+pHhb4JY/VXu6TfT+4UdQK6mZoBkH3vdax12qex+Vkwy1a+ufs6Y9Yi508b
+         70DA==
+X-Gm-Message-State: AOAM532ZVAydDe+6wveTqgIGC1gLMT8F0KooT1LTV7dkC9MGo+hxGQZl
+        +JOIC7aQgw4ZfM6Z06TQiCJ5k0pTbbf5CP/kTNY=
+X-Google-Smtp-Source: ABdhPJyPHvXYNLD0x6arrNr6tSIcHRrSMM7EQcAjjlya6DwfQ71xgmiwt7R2pdGLqZPHAQ9SmBjjhcXCawEr7ItepxI=
+X-Received: by 2002:a05:651c:130d:: with SMTP id u13mr843061lja.265.1602825280700;
+ Thu, 15 Oct 2020 22:14:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mtwBHTk-Xoeuo+RbgNwiNw-cWTAhdy1YG5y+vXnNDSv4w@mail.gmail.com>
- <bd8f21ed-5fd4-0974-f15a-16d2f3ee607f@samba.org> <87r1q3hixr.fsf@suse.com> <827fd43f-40a9-9480-a6b9-aea1fa69090c@talpey.com>
-In-Reply-To: <827fd43f-40a9-9480-a6b9-aea1fa69090c@talpey.com>
+References: <CANT5p=rkeg0w67RcdKhRzGRD_iHA-eB9cBPOO-6BxZz+iyRp3g@mail.gmail.com>
+ <CAN05THQ7XMF63-u1SLoRa-KZJS_u36M3Sb+ku6FsrUpvHx3doA@mail.gmail.com>
+In-Reply-To: <CAN05THQ7XMF63-u1SLoRa-KZJS_u36M3Sb+ku6FsrUpvHx3doA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 15 Oct 2020 23:50:48 -0500
-Message-ID: <CAH2r5mt3t=FHVd8RtCyrzY6TUKb+rGENENXbKJBgUdq4T4Qe6Q@mail.gmail.com>
-Subject: Re: [PATCH][SMB3.1.1] Add defines for new signing context
-To:     Tom Talpey <tom@talpey.com>
-Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        Stefan Metzmacher <metze@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 16 Oct 2020 00:14:29 -0500
+Message-ID: <CAH2r5mvMdBpq9uYrmtYPPMuzFqV5ZQpaWNCi1hcQ8wA91ppv2g@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Return the error from crypt_message when enc/dec
+ key not found.
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com
+Content-Type: multipart/mixed; boundary="0000000000007e586705b1c2d74b"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-> suggest wrapping this context and the integrity algs in some kind of cond=
-itional
+--0000000000007e586705b1c2d74b
+Content-Type: text/plain; charset="UTF-8"
 
-I have a couple patches to send the context (which I haven't merged
-yet, because, similar to what you suggested, I wanted to make sure
-they were disabled by default).
+updated patch with call stack and added cc:stable and merged into
+cifs-2.6.git for-next
 
-Tentative plan was to have them disabled by default, and sending the
-new context can be enabled for testing by a module parameter (e.g.
-"echo 1 >  /sys/modules/cifs/parameters/enable_signing_context"  or
-some similar config variable name)
 
-On Thu, Oct 15, 2020 at 1:15 PM Tom Talpey <tom@talpey.com> wrote:
+On Thu, Oct 15, 2020 at 5:25 PM ronnie sahlberg
+<ronniesahlberg@gmail.com> wrote:
 >
-> On 10/12/2020 5:50 AM, Aur=C3=A9lien Aptel wrote:
-> > Patch LGTM
+> On Fri, Oct 16, 2020 at 4:02 AM Shyam Prasad N <nspmangalore@gmail.com> wrote:
 > >
-> > Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+> > Fixes bug:
+> > https://bugzilla.kernel.org/show_bug.cgi?id=209669
 > >
-> > Stefan Metzmacher via samba-technical <samba-technical@lists.samba.org>
-> >> This isn't in MS-SMB2 yet.
-> >>
-> >> Is this AES_128?
-> >
-> > This is returned in latest Windows Server Insider builds but it's not
-> > documented yet.
-> >
-> > https://www.microsoft.com/en-us/software-download/windowsinsiderpreview=
-server
-> >
-> > I've asked dochelp about it during the SDC plugfest and they gave me
-> > this:
-> >
-> >      The new ContextType is:
-> >      SMB2_SIGNING_CAPABILITIES 0x0008
-> >      The Data field contains a list of signing algorithms.
-> >      =E2=80=A2    It adds a new negotiate context, which enables SMB to=
- decouple signing algorithms from dialects. E.g. if both client and server =
-supports it, a session may use HMAC-SHA256 with SMB 3.1.1.
-> >      =E2=80=A2    It adds the AES-GMAC algorithm.
-> >
-> >      SigningAlgorithmCount (2 bytes): Count of signing algorithms
-> >      SigningAlgorithms (variable): An array of SigningAlgorithmCount 16=
--bit integer IDs specifying the supported signing algorithms.
-> >
-> >      The following IDs are assigned:
-> >      0 =3D HMAC-SHA256
-> >      1 =3D AES-CMAC
-> >      2 =3D AES-GMAC
-> >
-> >
-> > I've been CCed in a Microsoft email thread later on and it seems to be
-> > unclear why this was missed/wasn't documented. Maybe this is subject to
-> > change so take with a grain of salt.
+> > Please review.
 >
-> Just curious if you've heard back on this. Insider builds will sometimes
-> support things that don't make it to the release. Even Preview docs can
-> change. However, AES_GMAC has been on the radar since 2015 (*) so
-> perhaps the time has come!
+> Since it is an oops, can you add the stack backtrace to the commit message ?
 >
-> I'd suggest wrapping this context and the integrity algs in some kind of
-> conditional, in case this is delayed...
->
-> Tom.
->
-> (*) slide 29+
-> https://www.snia.org/sites/default/files/SDC15_presentations/smb/GregKram=
-er_%20SMB_3-1-1_rev.pdf
+> >
+> > --
+> > -Shyam
 
 
 
---=20
+-- 
 Thanks,
 
 Steve
+
+--0000000000007e586705b1c2d74b
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-Return-the-error-from-crypt_message-when-enc-de.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-Return-the-error-from-crypt_message-when-enc-de.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kgbslh5w0>
+X-Attachment-Id: f_kgbslh5w0
+
+RnJvbSA5ZDA1ZmMyNGIzM2JmMjg1MjYwZDU4YjkzN2I4MzhiMzY1MzBlYTZkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
+PgpEYXRlOiBUaHUsIDE1IE9jdCAyMDIwIDEwOjQxOjMxIC0wNzAwClN1YmplY3Q6IFtQQVRDSF0g
+Y2lmczogUmV0dXJuIHRoZSBlcnJvciBmcm9tIGNyeXB0X21lc3NhZ2Ugd2hlbiBlbmMvZGVjIGtl
+eQogbm90IGZvdW5kLgoKSW4gY3J5cHRfbWVzc2FnZSwgd2hlbiBzbWIyX2dldF9lbmNfa2V5IHJl
+dHVybnMgZXJyb3IsIHdlIG5lZWQgdG8KcmV0dXJuIHRoZSBlcnJvciBiYWNrIHRvIHRoZSBjYWxs
+ZXIuIElmIG5vdCwgd2UgZW5kIHVwIHByb2Nlc3NpbmcKdGhlIG1lc3NhZ2UgZnVydGhlciwgY2F1
+c2luZyBhIGtlcm5lbCBvb3BzIGR1ZSB0byB1bndhcnJhbnRlZCBhY2Nlc3MKb2YgbWVtb3J5LgoK
+Q2FsbCBUcmFjZToKc21iM19yZWNlaXZlX3RyYW5zZm9ybSsweDEyMC8weDg3MCBbY2lmc10KY2lm
+c19kZW11bHRpcGxleF90aHJlYWQrMHhiNTMvMHhjMjAgW2NpZnNdCj8gY2lmc19oYW5kbGVfc3Rh
+bmRhcmQrMHgxOTAvMHgxOTAgW2NpZnNdCmt0aHJlYWQrMHgxMTYvMHgxMzAKPyBrdGhyZWFkX3Bh
+cmsrMHg4MC8weDgwCnJldF9mcm9tX2ZvcmsrMHgxZi8weDMwCgpTaWduZWQtb2ZmLWJ5OiBTaHlh
+bSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29tPgpSZXZpZXdlZC1ieTogUGF2ZWwgU2hp
+bG92c2t5IDxwc2hpbG92QG1pY3Jvc29mdC5jb20+ClJldmlld2VkLWJ5OiBSb25uaWUgU2FobGJl
+cmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+CkNDOiBTdGFibGUgPHN0YWJsZUB2Z2VyLmtlcm5lbC5v
+cmc+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4K
+LS0tCiBmcy9jaWZzL3NtYjJvcHMuYyB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlv
+bigrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvc21iMm9wcy5jIGIvZnMv
+Y2lmcy9zbWIyb3BzLmMKaW5kZXggNDg2NTdkZGJkNzVlLi4wZGZhODMyYTNkZTAgMTAwNjQ0Ci0t
+LSBhL2ZzL2NpZnMvc21iMm9wcy5jCisrKyBiL2ZzL2NpZnMvc21iMm9wcy5jCkBAIC0zOTQ0LDcg
+KzM5NDQsNyBAQCBjcnlwdF9tZXNzYWdlKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwg
+aW50IG51bV9ycXN0LAogCWlmIChyYykgewogCQljaWZzX3NlcnZlcl9kYmcoVkZTLCAiJXM6IENv
+dWxkIG5vdCBnZXQgJXNjcnlwdGlvbiBrZXlcbiIsIF9fZnVuY19fLAogCQkJIGVuYyA/ICJlbiIg
+OiAiZGUiKTsKLQkJcmV0dXJuIDA7CisJCXJldHVybiByYzsKIAl9CiAKIAlyYyA9IHNtYjNfY3J5
+cHRvX2FlYWRfYWxsb2NhdGUoc2VydmVyKTsKLS0gCjIuMjUuMQoK
+--0000000000007e586705b1c2d74b--
