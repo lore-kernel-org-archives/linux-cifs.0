@@ -2,137 +2,120 @@ Return-Path: <SRS0=ZNV/=D4=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34328C4363D
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Oct 2020 03:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA269C4363D
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Oct 2020 04:03:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B945E22253
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Oct 2020 03:25:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7404621D6C
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Oct 2020 04:03:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQ7zCHAM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SA4hdklV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2411739AbgJUDZ3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Oct 2020 23:25:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47082 "EHLO
+        id S1725782AbgJUEDo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 21 Oct 2020 00:03:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2411737AbgJUDZ2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Oct 2020 23:25:28 -0400
-Received: from mail-yb1-xb43.google.com (mail-yb1-xb43.google.com [IPv6:2607:f8b0:4864:20::b43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B448BC0613CE;
-        Tue, 20 Oct 2020 20:25:28 -0700 (PDT)
-Received: by mail-yb1-xb43.google.com with SMTP id o70so551655ybc.1;
-        Tue, 20 Oct 2020 20:25:28 -0700 (PDT)
+        with ESMTP id S1725274AbgJUEDo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 21 Oct 2020 00:03:44 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B20FC0613CE
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2020 21:03:44 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id c141so1114613lfg.5
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2020 21:03:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=BgMVuB2N5ltBtKxokUkl8GedhrK39u21aX6B4sBRZa0=;
-        b=ZQ7zCHAMvVC/scvMvJZs/aSkZ5Tr2Gm5YWdPIj6/F4rz6Rv2WsRzDBYlhMS8R4Y+15
-         H6EGCPHelu+nL7TS2pAamJ+he771sRFp27cboqDGFjO7j809rx9ti/f34BP+9rUpJ6TN
-         6psz8AtRovaTxSY/ROnTKGST3G4weu/AblR4vGndPSW9VanopOs5fZOYC0kNfahdvmOI
-         Nogx6u16tDmHlVWM5I6LwJjZo2UCiIuFRBX+CfCoBuTxlWq8URJr8kU+jGLpEIzIS3wU
-         pE6GQkPpdd+3HyaB+O1QkZuXXLTjz39BBJzywky3NsGKxjRsyrFXYG8rhw+TRQYMepaC
-         0OQA==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=NNk8LRssaqazn1wXk6uTM5muK8cWXjM1KrI2CzX5ITY=;
+        b=SA4hdklVZTpZ13GcktHfxVVop4A/J/9h24QQNRz7dfss55GqxE3qYgFNAUxT6VHaya
+         4Y6ueJiPS6uayhuiOLbcWIyEgVe6bT7TEgJ8awMaWKOYAnt3UKimAsjcLJVV05tpiNUu
+         JOUF5+xR6FU4qHsMZRJ/K+Pn+dWc/vo3klhqeiRnNNJEwrNwh4eWC9sBXR4NGS4OoDzq
+         rUtZuiGRl1K+oRHIxuMSd80trAHI3bnR3IDUd4Qh3OKIZzR0SEZNi24zzqt1hFIJQzA/
+         JbR7RCo5JShp8efWFefyJeurNfI6VyMjzWeambCeOYVYP05ZimHroWkVgz2kB3vCKkNa
+         WMwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=BgMVuB2N5ltBtKxokUkl8GedhrK39u21aX6B4sBRZa0=;
-        b=Noc5OZHyWEW+woAwvUZNpqKWw3TTdskXJs79usS0oHca78/Vs7ObvMP6aT1zAhlHoe
-         1qRkWSQm3Ip9ds4AGl3akNoEIVcXQ/PmwQnF9zKSR0+dG3Ollu+kYqqZucOpd2LeGPxe
-         4kPBIAk7HIUIOX4lQ3tiuiPezlAF9hXYz/AGQH4tv4b8nKd0QUEIDV2AtfL+KNr4i02c
-         J10/B4Vi6fwWbMnN3SLNWPj9Bc6cQhOxl1yagZwfelHeVgYcSmFPIukC4fvqBz4QKj6q
-         hH9Eqmz3D9X4hdGhvArE3Zpmg5mOFHmXrMboB5rN0f9xJrhDVuQ8ss/4//Kg95DZ73p7
-         WonQ==
-X-Gm-Message-State: AOAM533X1cvnLMvmH9tAWwvHESNJHbTM6rx0oI29IkaaulKF8Ype7gNH
-        zoHqgXwfVKHG6LhU3kRjw8bC/rd2cQs8VCzt9O8=
-X-Google-Smtp-Source: ABdhPJziw2B1ToW4twWYZcXqsXgezDcik3rjW5Z/C62EOwsTefLgSWBsPy2+tyKAOFze15PJvfYiv9o410uuPYcXRVI=
-X-Received: by 2002:a25:a468:: with SMTP id f95mr2136912ybi.327.1603250727770;
- Tue, 20 Oct 2020 20:25:27 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=NNk8LRssaqazn1wXk6uTM5muK8cWXjM1KrI2CzX5ITY=;
+        b=MRboBuEDE3anvFSwqbftXas/2eekgQM94sw0/7j3sDY9lekWfYK9MgHaETvo5wsbfN
+         vfkOXgLcoWNvNK/Nk5A2xLY19u+SMcmplnaRrRdw/cBkPvKb9b+k6xZz/iv21ngi3/6Q
+         OUPABNCIoY1tA6t5/CJzMLv3GH/fvOJtotaOJzRxkWlr6bdsIh6sWTfCz/Xq8aSGXcCL
+         RMCZGKTrxAmSbrYp2EVWecux+fH/r5RCCJOnHZGMTda6ZDxQX7xrwy3uV59mKYiDb/bx
+         X7WPKZwPV9tkK9V/KoMRFu7eT7DVoeafuNFg9EUkALcWqutLFGC+ojbxcxhsudrpcfOw
+         yXkA==
+X-Gm-Message-State: AOAM530Gy3ci/ElSFFenGEJ41r5tnzUVBEzGylbAi45bHOw84jRGTLtW
+        ur4BtSZ9fG7la1tAlnXW5wtrFDk6TPyM45/QefZI/iRqJKbpgQ==
+X-Google-Smtp-Source: ABdhPJwnyzNztBeW809vxMgFmnm35Wkfcn55N99/KgenvjcmCbHeAPizsnekNxwMNfwvGMt5VJaxGEh6LxE2/X14azs=
+X-Received: by 2002:a19:83c1:: with SMTP id f184mr364549lfd.97.1603253022188;
+ Tue, 20 Oct 2020 21:03:42 -0700 (PDT)
 MIME-Version: 1.0
-References: <CANT5p=pwCHvNbQSqQpH3rdp39ESCXMfxnh9wWrqMaSk9xkdq1g@mail.gmail.com>
- <20201021022118.GH20115@casper.infradead.org>
-In-Reply-To: <20201021022118.GH20115@casper.infradead.org>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Wed, 21 Oct 2020 08:55:17 +0530
-Message-ID: <CANT5p=qQ19iND_54Esj7buyWdJdh5EHFs5uuRYnecsnjKizA=g@mail.gmail.com>
-Subject: Re: Linux-cifs readdir behaviour when dir modified
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>, linux-fsdevel@vger.kernel.org,
-        Steve French <smfrench@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 20 Oct 2020 23:03:31 -0500
+Message-ID: <CAH2r5mu2s3Fu+_mWTiXFp+JYTAWZZrPCDyDNtWAhit2DjB890g@mail.gmail.com>
+Subject: [PATCH][SMB3] fix stat when special device file and mounted with modefromsid
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     samba-technical <samba-technical@lists.samba.org>
+Content-Type: multipart/mixed; boundary="000000000000df8dd105b2266e80"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Matthew,
+--000000000000df8dd105b2266e80
+Content-Type: text/plain; charset="UTF-8"
 
-Thanks for the reply.
-Sorry if it was unclear in my earlier email. I'm the engineer working
-on cifs.ko, who's now trying to understand what's the "standard" way
-of handling this which the VFS expects from the underlying filesystem.
-And it sounds to me like there's no such standard way. I read this
-codepath in a couple of popular filesystems, and each one seems to
-have it's own way of handling this.
+When mounting with modefromsid mount option, it was possible to
+get the error on stat of a fifo or char or block device:
+        "cannot stat <filename>: Operation not supported"
 
-I wanted to reconfirm that the main issue is in the implementation of
-the rm command on this distro, and the way it's using libc.
-
-Regards,
-Shyam
-
-On Wed, Oct 21, 2020 at 7:51 AM Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Tue, Oct 20, 2020 at 11:14:11AM +0530, Shyam Prasad N wrote:
-> > A summary of the issue:
-> > With alpine linux containers (which uses the musl implementation of
-> > libc), the "rm -Rf" command could fail depending upon the dir size.
-> > The Linux cifs client filesystem behaviour is compared against ext4
-> > behaviour.
-> [...]
-> > Now the question is whether cifs.ko is doing anything wrong?
-> > @Steve French pointed me to this readdir documentation:
-> > https://pubs.opengroup.org/onlinepubs/9699919799/functions/readdir_r.html
-> >
-> > If a file is removed from or added to the directory after the most
-> > recent call to opendir() or rewinddir(), whether a subsequent call to
-> > readdir() returns an entry for that file is unspecified.
-> >
-> > So I guess the documents don't specify the behaviour in this case.
->
-> Or rather, your implementation of 'rm' is relying on unspecified
-> behaviour.  If it's doing rm -rf, it can keep calling readdir() [1]
-> but before it tries to unlink() the directory, it should rewinddir()
-> and see if it can find any more entries.  It shouldn't rely on the kernel
-> to fix this up.  ie:
->
->         DIR *dirp = opendir(n);
->         bool first = true;
->
->         for (;;) {
->                 struct dirent *de = readdir(dirp);
->
->                 if (!de) {
->                         if first)
->                                 break;
->                         rewinddir(dirp);
->                         continue;
->                 }
->                 first = false;
->                 unlink(de.d_name);
->         }
->         unlink(n);
->
-> ... only with error checking and so on.
->
-> [1] Use readdir() rather than readdir_r() -- see the glibc 2.24+
-> documentation for details.
+Special devices can be stored as reparse points by some servers
+(e.g. Windows NFS server and when using the SMB3.1.1 POSIX
+Extensions) but when the modefromsid mount option is used
+the client attempts to get the ACL for the file which requires
+opening with OPEN_REPARSE_POINT create option.
 
 
 
--- 
--Shyam
+--
+Thanks,
+
+Steve
+
+--000000000000df8dd105b2266e80
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-fix-stat-when-special-device-file-and-mounted-w.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-fix-stat-when-special-device-file-and-mounted-w.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kgivfgvb0>
+X-Attachment-Id: f_kgivfgvb0
+
+RnJvbSBkZTNmZTE4NjYzODAxZGRlZDY5ODc0NDE2NjRjZDU0YjMyNzY3MDNhIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgMjAgT2N0IDIwMjAgMjI6NTM6NTcgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBmaXggc3RhdCB3aGVuIHNwZWNpYWwgZGV2aWNlIGZpbGUgYW5kIG1vdW50ZWQgd2l0aAog
+bW9kZWZyb21zaWQKCldoZW4gbW91bnRpbmcgd2l0aCBtb2RlZnJvbXNpZCBtb3VudCBvcHRpb24s
+IGl0IHdhcyBwb3NzaWJsZSB0bwpnZXQgdGhlIGVycm9yIG9uIHN0YXQgb2YgYSBmaWZvIG9yIGNo
+YXIgb3IgYmxvY2sgZGV2aWNlOgogICAgICAgICJjYW5ub3Qgc3RhdCA8ZmlsZW5hbWU+OiBPcGVy
+YXRpb24gbm90IHN1cHBvcnRlZCIKClNwZWNpYWwgZGV2aWNlcyBjYW4gYmUgc3RvcmVkIGFzIHJl
+cGFyc2UgcG9pbnRzIGJ5IHNvbWUgc2VydmVycwooZS5nLiBXaW5kb3dzIE5GUyBzZXJ2ZXIgYW5k
+IHdoZW4gdXNpbmcgdGhlIFNNQjMuMS4xIFBPU0lYCkV4dGVuc2lvbnMpIGJ1dCB3aGVuIHRoZSBt
+b2RlZnJvbXNpZCBtb3VudCBvcHRpb24gaXMgdXNlZAp0aGUgY2xpZW50IGF0dGVtcHRzIHRvIGdl
+dCB0aGUgQUNMIGZvciB0aGUgZmlsZSB3aGljaCByZXF1aXJlcwpvcGVuaW5nIHdpdGggT1BFTl9S
+RVBBUlNFX1BPSU5UIGNyZWF0ZSBvcHRpb24uCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2gg
+PHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIyb3BzLmMgfCA2ICsrKysr
+KwogMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMv
+c21iMm9wcy5jIGIvZnMvY2lmcy9zbWIyb3BzLmMKaW5kZXggMmMzY2ZiMmU4ZTcyLi43ZTNlZGNk
+YTA1NGUgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMm9wcy5jCisrKyBiL2ZzL2NpZnMvc21iMm9w
+cy5jCkBAIC0zMDk5LDYgKzMwOTksMTIgQEAgZ2V0X3NtYjJfYWNsX2J5X3BhdGgoc3RydWN0IGNp
+ZnNfc2JfaW5mbyAqY2lmc19zYiwKIAogCXJjID0gU01CMl9vcGVuKHhpZCwgJm9wYXJtcywgdXRm
+MTZfcGF0aCwgJm9wbG9jaywgTlVMTCwgTlVMTCwgTlVMTCwKIAkJICAgICAgIE5VTEwpOworCWlm
+IChyYyA9PSAtRU9QTk9UU1VQUCkgeworCQlvcGFybXMuY3JlYXRlX29wdGlvbnMgfD0gT1BFTl9S
+RVBBUlNFX1BPSU5UOworCQlyYyA9IFNNQjJfb3Blbih4aWQsICZvcGFybXMsIHV0ZjE2X3BhdGgs
+ICZvcGxvY2ssIE5VTEwsIE5VTEwsCisJCQkJTlVMTCwgTlVMTCk7CisJCWNpZnNfZGJnKFZGUywg
+Im9wZW4gcmV0cnkgcmMgJWRcbiIsIHJjKTsgLyogQkIgcmVtb3ZlbWUgKi8KKwl9CiAJa2ZyZWUo
+dXRmMTZfcGF0aCk7CiAJaWYgKCFyYykgewogCQlyYyA9IFNNQjJfcXVlcnlfYWNsKHhpZCwgdGxp
+bmtfdGNvbih0bGluayksIGZpZC5wZXJzaXN0ZW50X2ZpZCwKLS0gCjIuMjUuMQoK
+--000000000000df8dd105b2266e80--
