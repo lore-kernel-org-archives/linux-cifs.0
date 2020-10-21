@@ -2,129 +2,72 @@ Return-Path: <SRS0=ZNV/=D4=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBBE3C4363A
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Oct 2020 19:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61DF2C4363A
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Oct 2020 20:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76FEC21531
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Oct 2020 19:58:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E331C24182
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Oct 2020 20:51:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JzRhrs9B"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SDHQZqm9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440850AbgJUT5y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 21 Oct 2020 15:57:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59652 "EHLO
+        id S2505521AbgJUUvh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 21 Oct 2020 16:51:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390855AbgJUT5y (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 21 Oct 2020 15:57:54 -0400
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF5BC0613CE;
-        Wed, 21 Oct 2020 12:57:54 -0700 (PDT)
-Received: by mail-qk1-x744.google.com with SMTP id q199so3295865qke.10;
-        Wed, 21 Oct 2020 12:57:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=0YC4BvPBquELqN4U/yt26xXMXATDVMvfJgJXMoN9ZLc=;
-        b=JzRhrs9BWFo54og2fzNKayxe9JH5sc6cl1mWPbqnlRWqLhXr0Xq/XHTsQOT6qFYOGs
-         DIWo8XMQ4qV3ZaW0HGEa86Q22eeZ33E8UpZXk+7Ns1KYEjfL+K6RQmoqHT6LccIiu1Eo
-         Hfd3iNc0zRDRyXZbee0s1s2FoEgcOMqNbznq6jBclCx9vKFMNiNGisa3ssZRLU2jpzxB
-         3q3ObZ/EncApGdzANbR5K//epn+dr6lwVqA5VkUeybrCw8ZjFQGJGvoiZk/5x7WaW2Qa
-         p52m/wVQ2SipNnFUhrnjWxhdgOkkVFSEfiVv5CFUSe/rT1onh1wW0VqHM1AM+SdfoRm9
-         4Xfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=0YC4BvPBquELqN4U/yt26xXMXATDVMvfJgJXMoN9ZLc=;
-        b=qvw3oHgzhUdka94sbBDapYdjVDhWTH1wGDnSupnK7CSZXSZKh7vMf9Mo1AL/fzly7W
-         fmAsM+drP46D2mVVguxcTDfOTXGOpyBzPIGimjLmnhF1rLzavraUmeiaEP65J0RlHAbd
-         EF09GqJXQs++fDMhLzbcx5ekgMwacrF7+LIGxAtabx5k/i0LOHmQsCjHGlwMOawll8gI
-         kDDqsry8NM3G3obwuJdCpE06UTWl0WL/KPRMRGzLAMZ4N92fUmPrj1elxwrcHRkaqda7
-         sTgvZbTIJJ11iponPAx8pfpt9LxjQKhAWAHSHvx12ZI5Bt1Gi/znznjCcX5hj3aZHmyv
-         s+4A==
-X-Gm-Message-State: AOAM531c7XWYPGZTyZRwPPdYlWN/H4xj5nc0pA56neB2TcIsMRIGjMY7
-        t58baOnsplM6D9RhP642jshiTDR/o7J9
-X-Google-Smtp-Source: ABdhPJxFXEbZzBU8mDHF3y4OF+jDAQZ41i9EYVh5wk8WNBYjX3oOuf8ABwhancXDrGDae2pig2kxnA==
-X-Received: by 2002:a37:6285:: with SMTP id w127mr4933366qkb.454.1603310273364;
-        Wed, 21 Oct 2020 12:57:53 -0700 (PDT)
-Received: from moria.home.lan ([2601:19b:c500:a1:7285:c2ff:fed5:c918])
-        by smtp.gmail.com with ESMTPSA id 124sm1867603qkn.47.2020.10.21.12.57.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2020 12:57:52 -0700 (PDT)
-From:   Kent Overstreet <kent.overstreet@gmail.com>
-To:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        with ESMTP id S2505515AbgJUUvh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 21 Oct 2020 16:51:37 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E6E1C0613CE;
+        Wed, 21 Oct 2020 13:51:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=sUEKBUAgZWe3dgX0PdompQ/peEr+G2xBZ/JEYSmVRNw=; b=SDHQZqm9jNTGspFAwjWM2vK06V
+        Wvd/oDJmdYiuaj498Fk6KTsX3RSViI3YOZDmjYuG0ZtxZYIHVZUS5wY6DHX2NMuqXUuEkXLRRpNl1
+        nfd+NwruUsH5bjS0q3X5P62ISeslUTPD5SL4LM17NBpiuqeJ4BD7pOQHJX4PONEFrMaQdrahjkPrV
+        5BaYHgzjZza7h3Pkbf7x0jaHhBhv9bKTmMFflsNeRXHUGK+wzmvpAkKZDQe6ivATu7xnnKVSAfy0a
+        x4REeIgXNeXys7KcfEHYy2ujCQDgmYng5Uhg1OEcUtt/7RFuVrnvAcNyFVbgMAXX5BcOfm9pY20i1
+        VwpxpxkQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kVL55-0006pM-7n; Wed, 21 Oct 2020 20:51:35 +0000
+Date:   Wed, 21 Oct 2020 21:51:35 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Kent Overstreet <kent.overstreet@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         akpm@linux-foundation.org, sfrench@samba.org,
         linux-cifs@vger.kernel.org
-Cc:     Kent Overstreet <kent.overstreet@gmail.com>
-Subject: [PATCH v2 1/2] cifs: convert to add_to_page_cache()
-Date:   Wed, 21 Oct 2020 15:57:44 -0400
-Message-Id: <20201021195745.3420101-2-kent.overstreet@gmail.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201021195745.3420101-1-kent.overstreet@gmail.com>
+Subject: Re: [PATCH v2 2/2] fs: kill add_to_page_cache_locked()
+Message-ID: <20201021205135.GO20115@casper.infradead.org>
 References: <20201021195745.3420101-1-kent.overstreet@gmail.com>
+ <20201021195745.3420101-3-kent.overstreet@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201021195745.3420101-3-kent.overstreet@gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is just open coding add_to_page_cache(), and the next patch will
-delete add_to_page_cache_locked().
+On Wed, Oct 21, 2020 at 03:57:45PM -0400, Kent Overstreet wrote:
+>  }
+> -ALLOW_ERROR_INJECTION(__add_to_page_cache_locked, ERRNO);
+> +ALLOW_ERROR_INJECTION(__add_to_page_cache, ERRNO);
+[..]
+> +int add_to_page_cache(struct page *page, struct address_space *mapping,
+> +		      pgoff_t offset, gfp_t gfp_mask)
+>  {
+> -	return __add_to_page_cache_locked(page, mapping, offset,
+> -					  gfp_mask, NULL);
+> +	return __add_to_page_cache(page, mapping, offset, gfp_mask, NULL);
+>  }
+> -EXPORT_SYMBOL(add_to_page_cache_locked);
+> +EXPORT_SYMBOL(add_to_page_cache);
+> +ALLOW_ERROR_INJECTION(add_to_page_cache, ERRNO);
 
-Signed-off-by: Kent Overstreet <kent.overstreet@gmail.com>
----
- fs/cifs/file.c | 20 ++++----------------
- 1 file changed, 4 insertions(+), 16 deletions(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index be46fab4c9..b3ee790532 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -4296,20 +4296,11 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 
- 	page = lru_to_page(page_list);
- 
--	/*
--	 * Lock the page and put it in the cache. Since no one else
--	 * should have access to this page, we're safe to simply set
--	 * PG_locked without checking it first.
--	 */
--	__SetPageLocked(page);
--	rc = add_to_page_cache_locked(page, mapping,
--				      page->index, gfp);
-+	rc = add_to_page_cache(page, mapping, page->index, gfp);
- 
- 	/* give up if we can't stick it in the cache */
--	if (rc) {
--		__ClearPageLocked(page);
-+	if (rc)
- 		return rc;
--	}
- 
- 	/* move first page to the tmplist */
- 	*offset = (loff_t)page->index << PAGE_SHIFT;
-@@ -4328,12 +4319,9 @@ readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
- 		if (*bytes + PAGE_SIZE > rsize)
- 			break;
- 
--		__SetPageLocked(page);
--		rc = add_to_page_cache_locked(page, mapping, page->index, gfp);
--		if (rc) {
--			__ClearPageLocked(page);
-+		rc = add_to_page_cache(page, mapping, page->index, gfp);
-+		if (rc)
- 			break;
--		}
- 		list_move_tail(&page->lru, tmplist);
- 		(*bytes) += PAGE_SIZE;
- 		expected_index++;
--- 
-2.28.0
-
+I don't think you need this second one since __add_to_page_cache can be
+used for the same purpose.
