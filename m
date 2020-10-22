@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A0AC5DF9D
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77FCCC5DF9E
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0E09223BF
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CFDB2225F
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2506218AbgJVSNv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Oct 2020 14:13:51 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58774 "EHLO mx2.suse.de"
+        id S2901668AbgJVSNw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Oct 2020 14:13:52 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58860 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2505941AbgJVSNv (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 22 Oct 2020 14:13:51 -0400
+        id S2898343AbgJVSNw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 22 Oct 2020 14:13:52 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 3088BB305
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2020 18:13:49 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 6C3C0B818
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2020 18:13:50 +0000 (UTC)
 From:   Samuel Cabrero <scabrero@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     Samuel Cabrero <scabrero@suse.de>
-Subject: [PATCH 03/11] cifs: Register generic netlink family
-Date:   Thu, 22 Oct 2020 20:13:31 +0200
-Message-Id: <20201022181339.30771-4-scabrero@suse.de>
+Subject: [PATCH 07/11] cifs: Add witness information to debug data dump
+Date:   Thu, 22 Oct 2020 20:13:35 +0200
+Message-Id: <20201022181339.30771-8-scabrero@suse.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201022181339.30771-1-scabrero@suse.de>
 References: <20201022181339.30771-1-scabrero@suse.de>
@@ -39,243 +39,119 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Register a new generic netlink family to talk to the witness service
-userspace daemon.
++ Indicate if witness feature is supported
++ Indicate if witness is used when dumping tcons
++ Dumps witness registrations. Example:
+  Witness registrations:
+  Id: 1 Refs: 1 Network name: 'fs.fover.ad'(y) Share name: 'share1'(y) \
+    Ip address: 192.168.103.200(n)
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 ---
- fs/cifs/Kconfig                        | 11 +++++
- fs/cifs/Makefile                       |  2 +
- fs/cifs/cifsfs.c                       | 17 ++++++-
- fs/cifs/netlink.c                      | 68 ++++++++++++++++++++++++++
- fs/cifs/netlink.h                      | 16 ++++++
- include/uapi/linux/cifs/cifs_netlink.h | 31 ++++++++++++
- 6 files changed, 144 insertions(+), 1 deletion(-)
- create mode 100644 fs/cifs/netlink.c
- create mode 100644 fs/cifs/netlink.h
- create mode 100644 include/uapi/linux/cifs/cifs_netlink.h
+ fs/cifs/cifs_debug.c | 13 +++++++++++++
+ fs/cifs/cifs_swn.c   | 35 +++++++++++++++++++++++++++++++++++
+ fs/cifs/cifs_swn.h   |  2 ++
+ 3 files changed, 50 insertions(+)
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index 604f65f4b6c5..664ac5c63d39 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -190,6 +190,17 @@ config CIFS_DFS_UPCALL
- 	  servers if their addresses change or for implicit mounts of
- 	  DFS junction points. If unsure, say Y.
- 
-+config CIFS_SWN_UPCALL
-+	bool "SWN feature support"
-+	depends on CIFS
-+	help
-+	  The Service Witness Protocol (SWN) is used to get notifications
-+	  from a highly available server of resource state changes. This
-+	  feature enables an upcall mechanism for CIFS which contacts an
-+	  userspace daemon to establish the DCE/RPC connection to retrieve
-+	  the cluster available interfaces and resource change notifications.
-+	  If unsure, say Y.
-+
- config CIFS_NFSD_EXPORT
- 	bool "Allow nfsd to export CIFS file system"
- 	depends on CIFS && BROKEN
-diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
-index cd17d0e50f2a..b88fd46ac597 100644
---- a/fs/cifs/Makefile
-+++ b/fs/cifs/Makefile
-@@ -18,6 +18,8 @@ cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
- 
- cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o dfs_cache.o
- 
-+cifs-$(CONFIG_CIFS_SWN_UPCALL) += netlink.o
-+
- cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
- 
- cifs-$(CONFIG_CIFS_SMB_DIRECT) += smbdirect.o
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 472cb7777e3e..8111d0109a2e 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -55,6 +55,9 @@
- #ifdef CONFIG_CIFS_DFS_UPCALL
- #include "dfs_cache.h"
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 53588d7517b4..b231dcf1d1f9 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -23,6 +23,9 @@
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ #include "smbdirect.h"
  #endif
 +#ifdef CONFIG_CIFS_SWN_UPCALL
-+#include "netlink.h"
++#include "cifs_swn.h"
 +#endif
  
- /*
-  * DOS dates from 1980/1/1 through 2107/12/31
-@@ -1617,10 +1620,15 @@ init_cifs(void)
- 	if (rc)
- 		goto out_destroy_dfs_cache;
- #endif /* CONFIG_CIFS_UPCALL */
+ void
+ cifs_dump_mem(char *label, void *data, int length)
+@@ -115,6 +118,10 @@ static void cifs_debug_tcon(struct seq_file *m, struct cifs_tcon *tcon)
+ 		seq_printf(m, " POSIX Extensions");
+ 	if (tcon->ses->server->ops->dump_share_caps)
+ 		tcon->ses->server->ops->dump_share_caps(m, tcon);
 +#ifdef CONFIG_CIFS_SWN_UPCALL
-+	rc = cifs_genl_init();
-+	if (rc)
-+		goto out_register_key_type;
-+#endif /* CONFIG_CIFS_SWN_UPCALL */
- 
- 	rc = init_cifs_idmap();
- 	if (rc)
--		goto out_register_key_type;
-+		goto out_cifs_swn_init;
- 
- 	rc = register_filesystem(&cifs_fs_type);
- 	if (rc)
-@@ -1636,7 +1644,11 @@ init_cifs(void)
- 
- out_init_cifs_idmap:
- 	exit_cifs_idmap();
-+out_cifs_swn_init:
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	cifs_genl_exit();
- out_register_key_type:
++	if (tcon->use_witness)
++		seq_puts(m, " Witness");
 +#endif
- #ifdef CONFIG_CIFS_UPCALL
- 	exit_cifs_spnego();
- out_destroy_dfs_cache:
-@@ -1673,6 +1685,9 @@ exit_cifs(void)
- 	unregister_filesystem(&smb3_fs_type);
- 	cifs_dfs_release_automount_timer();
- 	exit_cifs_idmap();
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	cifs_genl_exit();
-+#endif
- #ifdef CONFIG_CIFS_UPCALL
- 	exit_cifs_spnego();
+ 
+ 	if (tcon->need_reconnect)
+ 		seq_puts(m, "\tDISCONNECTED ");
+@@ -262,6 +269,9 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 	seq_printf(m, ",XATTR");
  #endif
-diff --git a/fs/cifs/netlink.c b/fs/cifs/netlink.c
-new file mode 100644
-index 000000000000..5cd5dfee1132
---- /dev/null
-+++ b/fs/cifs/netlink.c
-@@ -0,0 +1,68 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Netlink routines for CIFS
-+ *
-+ * Copyright (c) 2020 Samuel Cabrero <scabrero@suse.de>
-+ */
+ 	seq_printf(m, ",ACL");
++#ifdef CONFIG_CIFS_SWN_UPCALL
++	seq_puts(m, ",WITNESS");
++#endif
+ 	seq_putc(m, '\n');
+ 	seq_printf(m, "CIFSMaxBufSize: %d\n", CIFSMaxBufSize);
+ 	seq_printf(m, "Active VFS Requests: %d\n", GlobalTotalActiveXid);
+@@ -462,6 +472,9 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 	seq_putc(m, '\n');
+ 
++#ifdef CONFIG_CIFS_SWN_UPCALL
++	cifs_swn_dump(m);
++#endif
+ 	/* BB add code to dump additional info such as TCP session info now */
+ 	return 0;
+ }
+diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
+index 501d84893262..4396e21ef228 100644
+--- a/fs/cifs/cifs_swn.c
++++ b/fs/cifs/cifs_swn.c
+@@ -501,3 +501,38 @@ int cifs_swn_unregister(struct cifs_tcon *tcon)
+ 
+ 	return 0;
+ }
 +
-+#include <net/genetlink.h>
-+#include <uapi/linux/cifs/cifs_netlink.h>
-+
-+#include "cifsglob.h"
-+#include "cifs_debug.h"
-+
-+static const struct nla_policy cifs_genl_policy[CIFS_GENL_ATTR_MAX + 1] = {
-+};
-+
-+static struct genl_ops cifs_genl_ops[] = {
-+};
-+
-+static const struct genl_multicast_group cifs_genl_mcgrps[] = {
-+	[CIFS_GENL_MCGRP_SWN] = { .name = CIFS_GENL_MCGRP_SWN_NAME },
-+};
-+
-+struct genl_family cifs_genl_family = {
-+	.name		= CIFS_GENL_NAME,
-+	.version	= CIFS_GENL_VERSION,
-+	.hdrsize	= 0,
-+	.maxattr	= CIFS_GENL_ATTR_MAX,
-+	.module		= THIS_MODULE,
-+	.policy		= cifs_genl_policy,
-+	.ops		= cifs_genl_ops,
-+	.n_ops		= ARRAY_SIZE(cifs_genl_ops),
-+	.mcgrps		= cifs_genl_mcgrps,
-+	.n_mcgrps	= ARRAY_SIZE(cifs_genl_mcgrps),
-+};
-+
-+/**
-+ * cifs_genl_init - Register generic netlink family
-+ *
-+ * Return zero if initialized successfully, otherwise non-zero.
-+ */
-+int cifs_genl_init(void)
++void cifs_swn_dump(struct seq_file *m)
 +{
-+	int ret;
++	struct cifs_swn_reg *swnreg;
++	struct sockaddr_in *sa;
++	struct sockaddr_in6 *sa6;
++	int id;
 +
-+	ret = genl_register_family(&cifs_genl_family);
-+	if (ret < 0) {
-+		cifs_dbg(VFS, "%s: failed to register netlink family\n",
-+				__func__);
-+		return ret;
++	seq_puts(m, "Witness registrations:");
++
++	mutex_lock(&cifs_swnreg_idr_mutex);
++	idr_for_each_entry(&cifs_swnreg_idr, swnreg, id) {
++		seq_printf(m, "\nId: %u Refs: %u Network name: '%s'%s Share name: '%s'%s Ip address: ",
++				id, kref_read(&swnreg->ref_count),
++				swnreg->net_name, swnreg->net_name_notify ? "(y)" : "(n)",
++				swnreg->share_name, swnreg->share_name_notify ? "(y)" : "(n)");
++		switch (swnreg->tcon->ses->server->dstaddr.ss_family) {
++		case AF_INET:
++			sa = (struct sockaddr_in *) &swnreg->tcon->ses->server->dstaddr;
++			seq_printf(m, "%pI4", &sa->sin_addr.s_addr);
++			break;
++		case AF_INET6:
++			sa6 = (struct sockaddr_in6 *) &swnreg->tcon->ses->server->dstaddr;
++			seq_printf(m, "%pI6", &sa6->sin6_addr.s6_addr);
++			if (sa6->sin6_scope_id)
++				seq_printf(m, "%%%u", sa6->sin6_scope_id);
++			break;
++		default:
++			seq_puts(m, "(unknown)");
++		}
++		seq_printf(m, "%s", swnreg->ip_notify ? "(y)" : "(n)");
 +	}
-+
-+	return 0;
++	mutex_unlock(&cifs_swnreg_idr_mutex);
++	seq_puts(m, "\n");
 +}
+diff --git a/fs/cifs/cifs_swn.h b/fs/cifs/cifs_swn.h
+index 7ef9ecedbd05..13b25cdc9295 100644
+--- a/fs/cifs/cifs_swn.h
++++ b/fs/cifs/cifs_swn.h
+@@ -18,4 +18,6 @@ extern int cifs_swn_unregister(struct cifs_tcon *tcon);
+ 
+ extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
+ 
++extern void cifs_swn_dump(struct seq_file *m);
 +
-+/**
-+ * cifs_genl_exit - Unregister generic netlink family
-+ */
-+void cifs_genl_exit(void)
-+{
-+	int ret;
-+
-+	ret = genl_unregister_family(&cifs_genl_family);
-+	if (ret < 0) {
-+		cifs_dbg(VFS, "%s: failed to unregister netlink family\n",
-+				__func__);
-+	}
-+}
-diff --git a/fs/cifs/netlink.h b/fs/cifs/netlink.h
-new file mode 100644
-index 000000000000..e2fa8ed24c54
---- /dev/null
-+++ b/fs/cifs/netlink.h
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Netlink routines for CIFS
-+ *
-+ * Copyright (c) 2020 Samuel Cabrero <scabrero@suse.de>
-+ */
-+
-+#ifndef _CIFS_NETLINK_H
-+#define _CIFS_NETLINK_H
-+
-+extern struct genl_family cifs_genl_family;
-+
-+extern int cifs_genl_init(void);
-+extern void cifs_genl_exit(void);
-+
-+#endif /* _CIFS_NETLINK_H */
-diff --git a/include/uapi/linux/cifs/cifs_netlink.h b/include/uapi/linux/cifs/cifs_netlink.h
-new file mode 100644
-index 000000000000..2332a3c3f268
---- /dev/null
-+++ b/include/uapi/linux/cifs/cifs_netlink.h
-@@ -0,0 +1,31 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Netlink routines for CIFS
-+ *
-+ * Copyright (c) 2020 Samuel Cabrero <scabrero@suse.de>
-+ */
-+
-+
-+#ifndef _UAPILINUX_CIFS_NETLINK_H
-+#define _UAPILINUX_CIFS_NETLINK_H
-+
-+#define CIFS_GENL_NAME			"cifs"
-+#define CIFS_GENL_VERSION		0x1
-+
-+#define CIFS_GENL_MCGRP_SWN_NAME	"cifs_mcgrp_swn"
-+
-+enum cifs_genl_multicast_groups {
-+	CIFS_GENL_MCGRP_SWN,
-+};
-+
-+enum cifs_genl_attributes {
-+	__CIFS_GENL_ATTR_MAX,
-+};
-+#define CIFS_GENL_ATTR_MAX (__CIFS_GENL_ATTR_MAX - 1)
-+
-+enum cifs_genl_commands {
-+	__CIFS_GENL_CMD_MAX
-+};
-+#define CIFS_GENL_CMD_MAX (__CIFS_GENL_CMD_MAX - 1)
-+
-+#endif /* _UAPILINUX_CIFS_NETLINK_H */
+ #endif /* _CIFS_SWN_H */
 -- 
 2.28.0
 
