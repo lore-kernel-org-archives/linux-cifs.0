@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05387C4363A
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2DCC63697
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC734223BF
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D76642225F
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2901742AbgJVSNw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Oct 2020 14:13:52 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58850 "EHLO mx2.suse.de"
+        id S2897861AbgJVSNx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Oct 2020 14:13:53 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58806 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2901668AbgJVSNv (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 22 Oct 2020 14:13:51 -0400
+        id S2505941AbgJVSNx (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 22 Oct 2020 14:13:53 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 211D0B815
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2020 18:13:50 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 5070FB90F
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2020 18:13:51 +0000 (UTC)
 From:   Samuel Cabrero <scabrero@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     Samuel Cabrero <scabrero@suse.de>
-Subject: [PATCH 06/11] cifs: Set witness notification handler for messages from userspace daemon
-Date:   Thu, 22 Oct 2020 20:13:34 +0200
-Message-Id: <20201022181339.30771-7-scabrero@suse.de>
+Subject: [PATCH 10/11] cifs: Handle witness client move notification
+Date:   Thu, 22 Oct 2020 20:13:38 +0200
+Message-Id: <20201022181339.30771-11-scabrero@suse.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201022181339.30771-1-scabrero@suse.de>
 References: <20201022181339.30771-1-scabrero@suse.de>
@@ -39,203 +39,248 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-+ Set a handler for the witness notification messages received from the
-  userspace daemon.
-
-+ Handle the resource state change notification. When the resource
-  becomes unavailable or available set the tcp status to
-  CifsNeedReconnect for all channels.
+This message is sent to tell a client to close its current connection
+and connect to the specified address.
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 ---
- fs/cifs/cifs_swn.c                     | 86 ++++++++++++++++++++++++++
- fs/cifs/cifs_swn.h                     |  4 ++
- fs/cifs/netlink.c                      |  9 +++
- include/uapi/linux/cifs/cifs_netlink.h | 17 +++++
- 4 files changed, 116 insertions(+)
+ fs/cifs/cifs_swn.c | 140 ++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/cifsglob.h |   4 ++
+ fs/cifs/connect.c  |  26 +++++++--
+ 3 files changed, 162 insertions(+), 8 deletions(-)
 
 diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
-index c7d70e28341e..501d84893262 100644
+index 93e31e4a9d99..b71b05638b1c 100644
 --- a/fs/cifs/cifs_swn.c
 +++ b/fs/cifs/cifs_swn.c
-@@ -379,6 +379,92 @@ static void cifs_put_swn_reg(struct cifs_swn_reg *swnreg)
- 	mutex_unlock(&cifs_swnreg_idr_mutex);
+@@ -78,6 +78,7 @@ static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
+ 	struct sk_buff *skb;
+ 	struct genlmsghdr *hdr;
+ 	enum securityEnum authtype;
++	struct sockaddr_storage *addr;
+ 	int ret;
+ 
+ 	skb = genlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+@@ -104,8 +105,18 @@ static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
+ 	if (ret < 0)
+ 		goto nlmsg_fail;
+ 
+-	ret = nla_put(skb, CIFS_GENL_ATTR_SWN_IP, sizeof(struct sockaddr_storage),
+-			&swnreg->tcon->ses->server->dstaddr);
++	/*
++	 * If there is an address stored use it instead of the server address, because we are
++	 * in the process of reconnecting to it after a share has been moved or we have been
++	 * told to switch to it (client move message). In these cases we unregister from the
++	 * server address and register to the new address when we receive the notification.
++	 */
++	if (swnreg->tcon->ses->server->use_swn_dstaddr)
++		addr = &swnreg->tcon->ses->server->swn_dstaddr;
++	else
++		addr = &swnreg->tcon->ses->server->dstaddr;
++
++	ret = nla_put(skb, CIFS_GENL_ATTR_SWN_IP, sizeof(struct sockaddr_storage), addr);
+ 	if (ret < 0)
+ 		goto nlmsg_fail;
+ 
+@@ -409,6 +420,120 @@ static int cifs_swn_resource_state_changed(struct cifs_swn_reg *swnreg, const ch
+ 	return 0;
  }
  
-+static int cifs_swn_resource_state_changed(struct cifs_swn_reg *swnreg, const char *name, int state)
++static bool cifs_sockaddr_equal(struct sockaddr_storage *addr1, struct sockaddr_storage *addr2)
 +{
-+	int i;
++	if (addr1->ss_family != addr2->ss_family)
++		return false;
 +
-+	switch (state) {
-+	case CIFS_SWN_RESOURCE_STATE_UNAVAILABLE:
-+		cifs_dbg(FYI, "%s: resource name '%s' become unavailable\n", __func__, name);
-+		for (i = 0; i < swnreg->tcon->ses->chan_count; i++) {
-+			spin_lock(&GlobalMid_Lock);
-+			if (swnreg->tcon->ses->chans[i].server->tcpStatus != CifsExiting)
-+				swnreg->tcon->ses->chans[i].server->tcpStatus = CifsNeedReconnect;
-+			spin_unlock(&GlobalMid_Lock);
-+		}
-+		break;
-+	case CIFS_SWN_RESOURCE_STATE_AVAILABLE:
-+		cifs_dbg(FYI, "%s: resource name '%s' become available\n", __func__, name);
-+		for (i = 0; i < swnreg->tcon->ses->chan_count; i++) {
-+			spin_lock(&GlobalMid_Lock);
-+			if (swnreg->tcon->ses->chans[i].server->tcpStatus != CifsExiting)
-+				swnreg->tcon->ses->chans[i].server->tcpStatus = CifsNeedReconnect;
-+			spin_unlock(&GlobalMid_Lock);
-+		}
-+		break;
-+	case CIFS_SWN_RESOURCE_STATE_UNKNOWN:
-+		cifs_dbg(FYI, "%s: resource name '%s' changed to unknown state\n", __func__, name);
-+		break;
++	if (addr1->ss_family == AF_INET) {
++		return (memcmp(&((const struct sockaddr_in *)addr1)->sin_addr,
++				&((const struct sockaddr_in *)addr2)->sin_addr,
++				sizeof(struct in_addr)) == 0);
 +	}
-+	return 0;
++
++	if (addr1->ss_family == AF_INET6) {
++		return (memcmp(&((const struct sockaddr_in6 *)addr1)->sin6_addr,
++				&((const struct sockaddr_in6 *)addr2)->sin6_addr,
++				sizeof(struct in6_addr)) == 0);
++	}
++
++	return false;
 +}
 +
-+int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info)
++static int cifs_swn_store_swn_addr(const struct sockaddr_storage *new,
++				   const struct sockaddr_storage *old,
++				   struct sockaddr_storage *dst)
 +{
-+	struct cifs_swn_reg *swnreg;
-+	char name[256];
-+	int type;
++	__be16 port;
 +
-+	if (info->attrs[CIFS_GENL_ATTR_SWN_REGISTRATION_ID]) {
-+		int swnreg_id;
++	if (old->ss_family == AF_INET) {
++		struct sockaddr_in *ipv4 = (struct sockaddr_in *)old;
 +
-+		swnreg_id = nla_get_u32(info->attrs[CIFS_GENL_ATTR_SWN_REGISTRATION_ID]);
-+		mutex_lock(&cifs_swnreg_idr_mutex);
-+		swnreg = idr_find(&cifs_swnreg_idr, swnreg_id);
-+		mutex_unlock(&cifs_swnreg_idr_mutex);
-+		if (swnreg == NULL) {
-+			cifs_dbg(FYI, "%s: registration id %d not found\n", __func__, swnreg_id);
-+			return -EINVAL;
-+		}
-+	} else {
-+		cifs_dbg(FYI, "%s: missing registration id attribute\n", __func__);
-+		return -EINVAL;
++		port = ipv4->sin_port;
 +	}
 +
-+	if (info->attrs[CIFS_GENL_ATTR_SWN_NOTIFICATION_TYPE]) {
-+		type = nla_get_u32(info->attrs[CIFS_GENL_ATTR_SWN_NOTIFICATION_TYPE]);
-+	} else {
-+		cifs_dbg(FYI, "%s: missing notification type attribute\n", __func__);
-+		return -EINVAL;
++	if (old->ss_family == AF_INET6) {
++		struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)old;
++
++		port = ipv6->sin6_port;
 +	}
 +
-+	switch (type) {
-+	case CIFS_SWN_NOTIFICATION_RESOURCE_CHANGE: {
-+		int state;
++	if (new->ss_family == AF_INET) {
++		struct sockaddr_in *ipv4 = (struct sockaddr_in *)new;
 +
-+		if (info->attrs[CIFS_GENL_ATTR_SWN_RESOURCE_NAME]) {
-+			nla_strlcpy(name, info->attrs[CIFS_GENL_ATTR_SWN_RESOURCE_NAME],
-+					sizeof(name));
-+		} else {
-+			cifs_dbg(FYI, "%s: missing resource name attribute\n", __func__);
-+			return -EINVAL;
-+		}
-+		if (info->attrs[CIFS_GENL_ATTR_SWN_RESOURCE_STATE]) {
-+			state = nla_get_u32(info->attrs[CIFS_GENL_ATTR_SWN_RESOURCE_STATE]);
-+		} else {
-+			cifs_dbg(FYI, "%s: missing resource state attribute\n", __func__);
-+			return -EINVAL;
-+		}
-+		return cifs_swn_resource_state_changed(swnreg, name, state);
++		ipv4->sin_port = port;
 +	}
-+	default:
-+		cifs_dbg(FYI, "%s: unknown notification type %d\n", __func__, type);
-+		break;
++
++	if (new->ss_family == AF_INET6) {
++		struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)new;
++
++		ipv6->sin6_port = port;
 +	}
++
++	*dst = *new;
 +
 +	return 0;
 +}
 +
- int cifs_swn_register(struct cifs_tcon *tcon)
++static int cifs_swn_reconnect(struct cifs_tcon *tcon, struct sockaddr_storage *addr)
++{
++	/* Store the reconnect address */
++	mutex_lock(&tcon->ses->server->srv_mutex);
++	if (!cifs_sockaddr_equal(&tcon->ses->server->dstaddr, addr)) {
++		int ret;
++
++		ret = cifs_swn_store_swn_addr(addr, &tcon->ses->server->dstaddr,
++				&tcon->ses->server->swn_dstaddr);
++		if (ret < 0) {
++			cifs_dbg(VFS, "%s: failed to store address: %d\n", __func__, ret);
++			return ret;
++		}
++		tcon->ses->server->use_swn_dstaddr = true;
++
++		/*
++		 * Unregister to stop receiving notifications for the old IP address.
++		 */
++		ret = cifs_swn_unregister(tcon);
++		if (ret < 0) {
++			cifs_dbg(VFS, "%s: Failed to unregister for witness notifications: %d\n",
++					__func__, ret);
++			return ret;
++		}
++
++		/*
++		 * And register to receive notifications for the new IP address now that we have
++		 * stored the new address.
++		 */
++		ret = cifs_swn_register(tcon);
++		if (ret < 0) {
++			cifs_dbg(VFS, "%s: Failed to register for witness notifications: %d\n",
++					__func__, ret);
++			return ret;
++		}
++
++		spin_lock(&GlobalMid_Lock);
++		if (tcon->ses->server->tcpStatus != CifsExiting)
++			tcon->ses->server->tcpStatus = CifsNeedReconnect;
++		spin_unlock(&GlobalMid_Lock);
++	}
++	mutex_unlock(&tcon->ses->server->srv_mutex);
++
++	return 0;
++}
++
++static int cifs_swn_client_move(struct cifs_swn_reg *swnreg, struct sockaddr_storage *addr)
++{
++	struct sockaddr_in *ipv4 = (struct sockaddr_in *)addr;
++	struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)addr;
++
++	if (addr->ss_family == AF_INET)
++		cifs_dbg(FYI, "%s: move to %pI4\n", __func__, &ipv4->sin_addr);
++	else if (addr->ss_family == AF_INET6)
++		cifs_dbg(FYI, "%s: move to %pI6\n", __func__, &ipv6->sin6_addr);
++
++	return cifs_swn_reconnect(swnreg->tcon, addr);
++}
++
+ int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info)
  {
  	struct cifs_swn_reg *swnreg;
-diff --git a/fs/cifs/cifs_swn.h b/fs/cifs/cifs_swn.h
-index 69c7bd1035da..7ef9ecedbd05 100644
---- a/fs/cifs/cifs_swn.h
-+++ b/fs/cifs/cifs_swn.h
-@@ -9,9 +9,13 @@
- #define _CIFS_SWN_H
- 
- struct cifs_tcon;
-+struct sk_buff;
-+struct genl_info;
- 
- extern int cifs_swn_register(struct cifs_tcon *tcon);
- 
- extern int cifs_swn_unregister(struct cifs_tcon *tcon);
- 
-+extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
+@@ -457,6 +582,17 @@ int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info)
+ 		}
+ 		return cifs_swn_resource_state_changed(swnreg, name, state);
+ 	}
++	case CIFS_SWN_NOTIFICATION_CLIENT_MOVE: {
++		struct sockaddr_storage addr;
 +
- #endif /* _CIFS_SWN_H */
-diff --git a/fs/cifs/netlink.c b/fs/cifs/netlink.c
-index 169ac4aacdbb..1b0862ac345b 100644
---- a/fs/cifs/netlink.c
-+++ b/fs/cifs/netlink.c
-@@ -10,6 +10,7 @@
- 
- #include "cifsglob.h"
- #include "cifs_debug.h"
-+#include "cifs_swn.h"
- 
- static const struct nla_policy cifs_genl_policy[CIFS_GENL_ATTR_MAX + 1] = {
- 	[CIFS_GENL_ATTR_SWN_REGISTRATION_ID]	= { .type = NLA_U32 },
-@@ -23,9 +24,17 @@ static const struct nla_policy cifs_genl_policy[CIFS_GENL_ATTR_MAX + 1] = {
- 	[CIFS_GENL_ATTR_SWN_USER_NAME]		= { .type = NLA_STRING },
- 	[CIFS_GENL_ATTR_SWN_PASSWORD]		= { .type = NLA_STRING },
- 	[CIFS_GENL_ATTR_SWN_DOMAIN_NAME]	= { .type = NLA_STRING },
-+	[CIFS_GENL_ATTR_SWN_NOTIFICATION_TYPE]	= { .type = NLA_U32 },
-+	[CIFS_GENL_ATTR_SWN_RESOURCE_STATE]	= { .type = NLA_U32 },
-+	[CIFS_GENL_ATTR_SWN_RESOURCE_NAME]	= { .type = NLA_STRING},
++		if (info->attrs[CIFS_GENL_ATTR_SWN_IP]) {
++			nla_memcpy(&addr, info->attrs[CIFS_GENL_ATTR_SWN_IP], sizeof(addr));
++		} else {
++			cifs_dbg(FYI, "%s: missing IP address attribute\n", __func__);
++			return -EINVAL;
++		}
++		return cifs_swn_client_move(swnreg, &addr);
++	}
+ 	default:
+ 		cifs_dbg(FYI, "%s: unknown notification type %d\n", __func__, type);
+ 		break;
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 5ca3a5568ac5..4a9089f9948c 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -775,6 +775,10 @@ struct TCP_Server_Info {
+ 	int nr_targets;
+ 	bool noblockcnt; /* use non-blocking connect() */
+ 	bool is_channel; /* if a session channel */
++#ifdef CONFIG_CIFS_SWN_UPCALL
++	bool use_swn_dstaddr;
++	struct sockaddr_storage swn_dstaddr;
++#endif
  };
  
- static struct genl_ops cifs_genl_ops[] = {
-+	{
-+		.cmd = CIFS_GENL_CMD_SWN_NOTIFY,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = cifs_swn_notify,
-+	},
- };
+ struct cifs_credits {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 14bbec0aeccf..0da10d199f47 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -520,13 +520,24 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		try_to_freeze();
  
- static const struct genl_multicast_group cifs_genl_mcgrps[] = {
-diff --git a/include/uapi/linux/cifs/cifs_netlink.h b/include/uapi/linux/cifs/cifs_netlink.h
-index 4a2a41de1496..22107fc39926 100644
---- a/include/uapi/linux/cifs/cifs_netlink.h
-+++ b/include/uapi/linux/cifs/cifs_netlink.h
-@@ -31,6 +31,9 @@ enum cifs_genl_attributes {
- 	CIFS_GENL_ATTR_SWN_USER_NAME,
- 	CIFS_GENL_ATTR_SWN_PASSWORD,
- 	CIFS_GENL_ATTR_SWN_DOMAIN_NAME,
-+	CIFS_GENL_ATTR_SWN_NOTIFICATION_TYPE,
-+	CIFS_GENL_ATTR_SWN_RESOURCE_STATE,
-+	CIFS_GENL_ATTR_SWN_RESOURCE_NAME,
- 	__CIFS_GENL_ATTR_MAX,
- };
- #define CIFS_GENL_ATTR_MAX (__CIFS_GENL_ATTR_MAX - 1)
-@@ -39,8 +42,22 @@ enum cifs_genl_commands {
- 	CIFS_GENL_CMD_UNSPEC,
- 	CIFS_GENL_CMD_SWN_REGISTER,
- 	CIFS_GENL_CMD_SWN_UNREGISTER,
-+	CIFS_GENL_CMD_SWN_NOTIFY,
- 	__CIFS_GENL_CMD_MAX
- };
- #define CIFS_GENL_CMD_MAX (__CIFS_GENL_CMD_MAX - 1)
- 
-+enum cifs_swn_notification_type {
-+	CIFS_SWN_NOTIFICATION_RESOURCE_CHANGE = 0x01,
-+	CIFS_SWN_NOTIFICATION_CLIENT_MOVE	 = 0x02,
-+	CIFS_SWN_NOTIFICATION_SHARE_MOVE	 = 0x03,
-+	CIFS_SWN_NOTIFICATION_IP_CHANGE	 = 0x04,
-+};
+ 		mutex_lock(&server->srv_mutex);
 +
-+enum cifs_swn_resource_state {
-+	CIFS_SWN_RESOURCE_STATE_UNKNOWN     = 0x00,
-+	CIFS_SWN_RESOURCE_STATE_AVAILABLE   = 0x01,
-+	CIFS_SWN_RESOURCE_STATE_UNAVAILABLE = 0xFF
-+};
++#ifdef CONFIG_CIFS_SWN_UPCALL
++		if (server->use_swn_dstaddr) {
++			server->dstaddr = server->swn_dstaddr;
++		} else {
++#endif
 +
- #endif /* _UAPILINUX_CIFS_NETLINK_H */
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-		/*
+-		 * Set up next DFS target server (if any) for reconnect. If DFS
+-		 * feature is disabled, then we will retry last server we
+-		 * connected to before.
+-		 */
+-		reconn_set_next_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
++			/*
++			 * Set up next DFS target server (if any) for reconnect. If DFS
++			 * feature is disabled, then we will retry last server we
++			 * connected to before.
++			 */
++			reconn_set_next_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
++#endif
++
++#ifdef CONFIG_CIFS_SWN_UPCALL
++		}
+ #endif
+ 
+ 		if (cifs_rdma_enabled(server))
+@@ -544,6 +555,9 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 			if (server->tcpStatus != CifsExiting)
+ 				server->tcpStatus = CifsNeedNegotiate;
+ 			spin_unlock(&GlobalMid_Lock);
++#ifdef CONFIG_CIFS_SWN_UPCALL
++			server->use_swn_dstaddr = false;
++#endif
+ 			mutex_unlock(&server->srv_mutex);
+ 		}
+ 	} while (server->tcpStatus == CifsNeedReconnect);
 -- 
 2.28.0
 
