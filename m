@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E93BC388F9
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C82C56202
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 129F12225F
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 795EC2225F
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 18:13:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2901735AbgJVSNu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Oct 2020 14:13:50 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58760 "EHLO mx2.suse.de"
+        id S2901781AbgJVSNw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Oct 2020 14:13:52 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58878 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2898343AbgJVSNu (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 22 Oct 2020 14:13:50 -0400
+        id S2901742AbgJVSNv (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 22 Oct 2020 14:13:51 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id D899BAE3A
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2020 18:13:48 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id B452FAE3A
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2020 18:13:50 +0000 (UTC)
 From:   Samuel Cabrero <scabrero@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     Samuel Cabrero <scabrero@suse.de>
-Subject: [PATCH 02/11] cifs: Make extract_sharename function public
-Date:   Thu, 22 Oct 2020 20:13:30 +0200
-Message-Id: <20201022181339.30771-3-scabrero@suse.de>
+Subject: [PATCH 08/11] cifs: Send witness register messages to userspace daemon in echo task
+Date:   Thu, 22 Oct 2020 20:13:36 +0200
+Message-Id: <20201022181339.30771-9-scabrero@suse.de>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201022181339.30771-1-scabrero@suse.de>
 References: <20201022181339.30771-1-scabrero@suse.de>
@@ -39,120 +39,66 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Move the function to misc.c
+If the daemon starts after mounting a share, or if it crashes, this
+provides a mechanism to register again.
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 ---
- fs/cifs/cache.c     | 24 ------------------------
- fs/cifs/cifsproto.h |  1 +
- fs/cifs/fscache.c   |  1 +
- fs/cifs/fscache.h   |  1 -
- fs/cifs/misc.c      | 24 ++++++++++++++++++++++++
- 5 files changed, 26 insertions(+), 25 deletions(-)
+ fs/cifs/cifs_swn.c | 15 +++++++++++++++
+ fs/cifs/cifs_swn.h |  2 ++
+ fs/cifs/connect.c  |  5 +++++
+ 3 files changed, 22 insertions(+)
 
-diff --git a/fs/cifs/cache.c b/fs/cifs/cache.c
-index 0f2adecb94f2..488fe0ffc1ef 100644
---- a/fs/cifs/cache.c
-+++ b/fs/cifs/cache.c
-@@ -53,30 +53,6 @@ const struct fscache_cookie_def cifs_fscache_server_index_def = {
- 	.type = FSCACHE_COOKIE_TYPE_INDEX,
- };
- 
--char *extract_sharename(const char *treename)
--{
--	const char *src;
--	char *delim, *dst;
--	int len;
--
--	/* skip double chars at the beginning */
--	src = treename + 2;
--
--	/* share name is always preceded by '\\' now */
--	delim = strchr(src, '\\');
--	if (!delim)
--		return ERR_PTR(-EINVAL);
--	delim++;
--	len = strlen(delim);
--
--	/* caller has to free the memory */
--	dst = kstrndup(delim, len, GFP_KERNEL);
--	if (!dst)
--		return ERR_PTR(-ENOMEM);
--
--	return dst;
--}
--
- static enum
- fscache_checkaux cifs_fscache_super_check_aux(void *cookie_netfs_data,
- 					      const void *data,
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index d716e81d86fa..5f997a01fb45 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -621,6 +621,7 @@ struct super_block *cifs_get_tcp_super(struct TCP_Server_Info *server);
- void cifs_put_tcp_super(struct super_block *sb);
- int update_super_prepath(struct cifs_tcon *tcon, char *prefix);
- char *extract_hostname(const char *unc);
-+char *extract_sharename(const char *unc);
- 
- #ifdef CONFIG_CIFS_DFS_UPCALL
- static inline int get_dfs_path(const unsigned int xid, struct cifs_ses *ses,
-diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-index da688185403c..20d24af33ee2 100644
---- a/fs/cifs/fscache.c
-+++ b/fs/cifs/fscache.c
-@@ -22,6 +22,7 @@
- #include "cifsglob.h"
- #include "cifs_debug.h"
- #include "cifs_fs_sb.h"
-+#include "cifsproto.h"
- 
- /*
-  * Key layout of CIFS server cache index object
-diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-index 1091633d2adb..e811f2dd7619 100644
---- a/fs/cifs/fscache.h
-+++ b/fs/cifs/fscache.h
-@@ -57,7 +57,6 @@ extern const struct fscache_cookie_def cifs_fscache_inode_object_def;
- 
- extern int cifs_fscache_register(void);
- extern void cifs_fscache_unregister(void);
--extern char *extract_sharename(const char *);
- 
- /*
-  * fscache.c
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 3d5cc25c167f..f0a1c24751b2 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -1227,3 +1227,27 @@ char *extract_hostname(const char *unc)
- 
- 	return dst;
+diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
+index 4396e21ef228..93e31e4a9d99 100644
+--- a/fs/cifs/cifs_swn.c
++++ b/fs/cifs/cifs_swn.c
+@@ -536,3 +536,18 @@ void cifs_swn_dump(struct seq_file *m)
+ 	mutex_unlock(&cifs_swnreg_idr_mutex);
+ 	seq_puts(m, "\n");
  }
 +
-+char *extract_sharename(const char *unc)
++void cifs_swn_check(void)
 +{
-+	const char *src;
-+	char *delim, *dst;
-+	int len;
++	struct cifs_swn_reg *swnreg;
++	int id;
++	int ret;
 +
-+	/* skip double chars at the beginning */
-+	src = unc + 2;
-+
-+	/* share name is always preceded by '\\' now */
-+	delim = strchr(src, '\\');
-+	if (!delim)
-+		return ERR_PTR(-EINVAL);
-+	delim++;
-+	len = strlen(delim);
-+
-+	/* caller has to free the memory */
-+	dst = kstrndup(delim, len, GFP_KERNEL);
-+	if (!dst)
-+		return ERR_PTR(-ENOMEM);
-+
-+	return dst;
++	mutex_lock(&cifs_swnreg_idr_mutex);
++	idr_for_each_entry(&cifs_swnreg_idr, swnreg, id) {
++		ret = cifs_swn_send_register_message(swnreg);
++		if (ret < 0)
++			cifs_dbg(FYI, "%s: Failed to send register message: %d\n", __func__, ret);
++	}
++	mutex_unlock(&cifs_swnreg_idr_mutex);
 +}
+diff --git a/fs/cifs/cifs_swn.h b/fs/cifs/cifs_swn.h
+index 13b25cdc9295..236ecd4959d5 100644
+--- a/fs/cifs/cifs_swn.h
++++ b/fs/cifs/cifs_swn.h
+@@ -20,4 +20,6 @@ extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
+ 
+ extern void cifs_swn_dump(struct seq_file *m);
+ 
++extern void cifs_swn_check(void);
++
+ #endif /* _CIFS_SWN_H */
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 0e3a88932560..cb9ca4238ae9 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -613,6 +613,11 @@ cifs_echo_request(struct work_struct *work)
+ 		cifs_dbg(FYI, "Unable to send echo request to server: %s\n",
+ 			 server->hostname);
+ 
++#ifdef CONFIG_CIFS_SWN_UPCALL
++	/* Check witness registrations */
++	cifs_swn_check();
++#endif
++
+ requeue_echo:
+ 	queue_delayed_work(cifsiod_wq, &server->echo, server->echo_interval);
+ }
 -- 
 2.28.0
 
