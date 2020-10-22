@@ -7,112 +7,111 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53E1FC4363A
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 10:15:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29760C4363A
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 10:35:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0EDA22248
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 10:15:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9949C22267
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Oct 2020 10:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="EEIC/Cr1"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="KyaqKYYy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2896438AbgJVKPa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Oct 2020 06:15:30 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:46630 "EHLO
+        id S2896559AbgJVKfe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Oct 2020 06:35:34 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([51.163.158.102]:23361 "EHLO
         de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2896412AbgJVKP3 (ORCPT
+        by vger.kernel.org with ESMTP id S2896551AbgJVKfd (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 22 Oct 2020 06:15:29 -0400
+        Thu, 22 Oct 2020 06:35:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1603361726;
+        t=1603362930;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=P+0y1WNEma5hgL9mDETZOkST2hs/DZhKu47TPUVDB+E=;
-        b=EEIC/Cr1iJi/33TvDWI6BaAhVWSlmcR/mO1WS8IzY6GX+xKQiJk6IWmk3rgF7Mnzg8XA8z
-        GbTpvr0zSnjKznjPxKqipoHB9pHIZUaHM+xbjMU2jDEr7uS+Ff8V39ZaE8OzMol4yagemp
-        qABNjZf4+Nt33in0gHFZExiJrUEDVcw=
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com
- (mail-he1eur04lp2059.outbound.protection.outlook.com [104.47.13.59]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-16-HWZytwdmNcS2f1tdVe__eQ-1; Thu, 22 Oct 2020 12:15:24 +0200
-X-MC-Unique: HWZytwdmNcS2f1tdVe__eQ-1
+        bh=irPpszwIbVKex4o1GaVfw1Ex5iXYQwqHC80vKSPvuJI=;
+        b=KyaqKYYyHrdMzwTRgRs0G093Aen8aInxbQUClLORvFVELypqD+lcab9FRv2lzgv4S97mSI
+        4o7MSKlEKNdkz6AQfcYMfY6l95Ij/OdvU4/8v4iOoCRJL4kzShVG3K+dn0QVEtK0170Ifv
+        1kUcaMdI/jauMLhSNOOs1LVEa/AkNSo=
+Received: from EUR02-HE1-obe.outbound.protection.outlook.com
+ (mail-he1eur02lp2054.outbound.protection.outlook.com [104.47.5.54]) (Using
+ TLS) by relay.mimecast.com with ESMTP id de-mta-9-8viZV_8mML-khzSQGa8y_g-1;
+ Thu, 22 Oct 2020 12:35:28 +0200
+X-MC-Unique: 8viZV_8mML-khzSQGa8y_g-1
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bCSvgAFJvJpgpTkaoCF+UBZYn5LGVhasy01LgxlfqYtGaJ/AD8cCeGb1VUqaibOM5Ei+SbSCz1pvfMmyp569V6afcnlO48nutNB5lQTuakyrGq/0Ro6O36Qj5XCj1CgKPuUC6VMcEfHKemrIeVvrCGwb4AEY8GlMgOYxJBufTvC+0YLpkCUxT702PeaZTW8zvbQFeeGayOcHRKKoDyFdh50oNaaraPyBdzynZl1iFk13y4rsR5d12plXoMrsiT1QJNoDwc0Ua/FNVXLSYLJZUMwdWBoAxBdDQQjocXmV4HRpL4NPxWBOf/JwGyHFDWYHPtk9190KBauAkhOvlgcEKQ==
+ b=esOA2gTICiUuOOp8IBzAE3b9xUc1uh9StbcElFnb3I+UUkXwTpF5qne5CLshaRU3ErsBNFWyQQ4ynUnWt12WBRD1Rb7zZOeTTbAv8P9ZPozvSi7C3aBykj+LSMU33pgNWoPN43B6/zjRD6dBvJTKUAtwlAO3KBgjoCwWjh0Ykf9qx4007u+bno/x8I9M6r8SkT7QvmQ9Lyfm3lO3uA9RHxfQjkfV016h78Vqgw/QrlBTRBtqYTD+EewTHp/Vy9Eg+UsmDJ1MIvOljGWdoDYlTB0c2o2f1iy7LC6esVCIUGh+CHo0VFcZtJTv98L1DWtbgHiboH6Te+3jhiFSo5CWrw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P+0y1WNEma5hgL9mDETZOkST2hs/DZhKu47TPUVDB+E=;
- b=InJId7MZMSt1ylEMPx54YhbAiOgik1h2mNv04I0BjQ9B4SU3157VqRvfV6RlFQH2ZYzbN1W0lmRIu2zmoK1VbeoDQ90aD2wVy7lEGsWMZQVnlKcVsNQjNWEzmUD3ObPEvmJTCIJVqERV4uyaxnSYWmkflnu0xIgMfwdKoXO+r89id2feJksWzoPudjgmwXbmuvbYLhG54T8Se3uYgeZCVX5oX1aoONP8QV2VrUr13DIr0yFkps9VIjLRUQX/4qP0Wk8LSpiKfxk6Po15IGzXcivdqEKegFd2uawRNQlogqPVic+WkIM0GBHHovXBPyKS8K3abP9mIkN7E0uUubp/qQ==
+ bh=irPpszwIbVKex4o1GaVfw1Ex5iXYQwqHC80vKSPvuJI=;
+ b=FdExlh7ytSTAEd+1/w0y2/VRs+Qk324Kn2cOjFYm/GJ8FQ6l9FqwM49oE128T8Hd/6MCVAy85gzeXJbC2gYjUQU/QpHQV5CNC9uki6AYYlTd9uQBynuuE9w10Rugu2VJqQoMlFcX85vuJ68kgF2/o4wET5iEg03BQVisvqa2Erdicp4sB/Ig8muNTYBEffisMJdT4Tc7guzAqLgiHhaJ+s/IUyPfp5JvNOKOyIbKpwLqpoClhS9EJPRkN7fLmPD9zpr5eYPCLMjF+j2kXbqG1BWIfHMF+m4rubFZ81hPb+ASiUDDEkymoKF6xppLjLDxJu+vVjJpowQIJFreu+srtg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
  dkim=pass header.d=suse.com; arc=none
 Authentication-Results: gmail.com; dkim=none (message not signed)
  header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
 Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR04MB5760.eurprd04.prod.outlook.com (2603:10a6:803:e6::18) with
+ by VI1PR0402MB3358.eurprd04.prod.outlook.com (2603:10a6:803:11::32) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Thu, 22 Oct
- 2020 10:15:23 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.28; Thu, 22 Oct
+ 2020 10:35:27 +0000
 Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
  ([fe80::e01c:2732:554a:608e]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
  ([fe80::e01c:2732:554a:608e%6]) with mapi id 15.20.3499.018; Thu, 22 Oct 2020
- 10:15:22 +0000
+ 10:35:27 +0000
 From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
 To:     Steve French <smfrench@gmail.com>,
-        David Howells <dhowells@redhat.com>,
         CIFS <linux-cifs@vger.kernel.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Subject: Re: Updated cifs new mount API prep patches
-In-Reply-To: <CAH2r5muuy22vvUvJuz8njz3ymkign0BpNv=Xgj6jG7zqXhAZmA@mail.gmail.com>
-References: <CAH2r5muuy22vvUvJuz8njz3ymkign0BpNv=Xgj6jG7zqXhAZmA@mail.gmail.com>
-Date:   Thu, 22 Oct 2020 12:15:20 +0200
-Message-ID: <875z72woqv.fsf@suse.com>
+        samba-technical <samba-technical@lists.samba.org>
+Subject: Re: [PATCH]SMB3] Add support for WSL reparse tags
+In-Reply-To: <CAH2r5mvWqz2bMX9ut0bT4ZQH8WQNAc8Cjg3bM1TKeXgzupOZMQ@mail.gmail.com>
+References: <CAH2r5mvWqz2bMX9ut0bT4ZQH8WQNAc8Cjg3bM1TKeXgzupOZMQ@mail.gmail.com>
+Date:   Thu, 22 Oct 2020 12:35:24 +0200
+Message-ID: <873626wntf.fsf@suse.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-Originating-IP: [2003:fa:705:6807:8347:7696:25d3:a22f]
-X-ClientProxiedBy: AM0PR07CA0005.eurprd07.prod.outlook.com
- (2603:10a6:208:ac::18) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AM3PR07CA0116.eurprd07.prod.outlook.com
+ (2603:10a6:207:7::26) To VI1PR0402MB3359.eurprd04.prod.outlook.com
  (2603:10a6:803:3::28)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:705:6807:8347:7696:25d3:a22f) by AM0PR07CA0005.eurprd07.prod.outlook.com (2603:10a6:208:ac::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.9 via Frontend Transport; Thu, 22 Oct 2020 10:15:22 +0000
+Received: from localhost (2003:fa:705:6807:8347:7696:25d3:a22f) by AM3PR07CA0116.eurprd07.prod.outlook.com (2603:10a6:207:7::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.7 via Frontend Transport; Thu, 22 Oct 2020 10:35:26 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d3dbedb1-e431-4231-3fc4-08d8767362e0
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5760:
-X-Microsoft-Antispam-PRVS: <VI1PR04MB5760E1E7D830A58039FC7685A81D0@VI1PR04MB5760.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Office365-Filtering-Correlation-Id: d5b05db0-f0fc-4cb1-d2f0-08d8767630ca
+X-MS-TrafficTypeDiagnostic: VI1PR0402MB3358:
+X-Microsoft-Antispam-PRVS: <VI1PR0402MB33586A441BC35F19F5A23B5AA81D0@VI1PR0402MB3358.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xEXEWjjr4P6URt2NhmLKFDp/iA+Kj9VQBLRyOAnjgGoQca3tSS4Da23mQH+JEkQJKta/7YrYAkD0IR29UW4OlrQ3H/Wm8bVOuSbLQ3275C4lePC0V8M5s+QPyo2Hr/0sdqqNTQ4oU1lJWGvQ9y2fwfXMuKV4RQ3uvo1XvggW4la4LeS4wyJmot6nFQuBVGsTFiDA5UJAi1Gl2hzKIcyR1jM8DhMO8GBZbYUzxGyhmtmFvElGBXi/NukBrDlLybAnRGaysu/ruAjHx2Gee5LvpFenAqWBUIDcOfeJBWLV9SYhWHXl5Szab52dMP8DALl4Pi10eXFo0r6YIs74SsYVsg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(346002)(376002)(366004)(39860400002)(136003)(8676002)(2616005)(36756003)(6486002)(186003)(316002)(2906002)(16526019)(8936002)(478600001)(52116002)(6496006)(66574015)(66556008)(66946007)(66476007)(4744005)(86362001)(5660300002)(110136005)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: RPuNeMBBSTYuO4hEj3EF922nFDtn1c2ZHxREYurGIMHHD3FB6Y1Jua03lrF3HsUCU/rMraAmVqf0uBJ8RXdidoj2eYFA4Nwj32G9byi0aWcpWruHOBLwqQiQ/7lwru61MsfL47TE6cBIQXuk95z2od/OzTEGZMn5GpcyApbCsLNFypBfWyDfiIUB2SDAiQGqMOz7S75EF+bBlFxBGJ+gc2dItBp21MdfccYGVRkMmcYJLFTfCH63eaDc5nX397W3pVIXAHnoK2Y/04/FfYp6jXXizhI9z55OVMtvJqYe5kVZhOjLi5JNRJu2hfRUTEYuJlyBO775Aa0Tx+WYXTqh2UwBEhX/kxuLNlVMsGzzTD2doBXHOvVrocZRW4r5ZmL64w/jjaXoyJfuS4sdE5pDL+T6WjtWWmIkzkYy2I38oVmgNXYG1naZSrSIqrJGIIa2g056cnuirohmIRot0amPZOZfndCrG/xLPkX/Ij9oy5JC6WSDT3H3ItTHGAzlu9EIVklAJ6YYwJ3CNXZMM4jLWgruk/1fS44J0YaHg5FtVYvzY8gFZvXfbjrMYwhRJDTDNB3o+xqK3sY6CghlKNQHfW2WEoX8D37b8PfyygEdsiId6920l2cq/r39Amy2YqLp0wtiRlfc9w0eHGl1De7HkOj/sKKJcFVumUvMCIemMmTyvlyWZVLS6npFAiXoN1W4TPil6C/wB7b2ee3mVRM/rQ==
+X-Microsoft-Antispam-Message-Info: G6LtcqqLC1YKRWEyP4dYEsAn7wYguq/86ZLfa1FZVTKT6kvjZiFD2m8smVuxipeDty4SzxDKVT7ombbM1+PFaFCJuLDLE03/DmF62FaDxRvRNif0K/1st4WfI+EOzLOv20nMPH+YxR5UwQNflegZb5623Bhmt5Zt3cyvUSi7ida5kU5g8AHg5uzBr8a1EHmRl5uCdJoFdHhCU33SBaoy19nFuMFuFCVUH2sJe5C0pd42lh1P7xTO6zb1MoyC+KG2usN8w1dPkzJgR5Wk2Nz8VrER4iSYMMs0XKQxtYOHFSOU+cDKKmRGhqQ2Fd49uHpPhhGm+Xsk6Wh2noCirUdSPA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(396003)(136003)(366004)(346002)(39860400002)(6486002)(2906002)(66476007)(66946007)(110136005)(86362001)(316002)(66556008)(2616005)(4744005)(186003)(16526019)(478600001)(8676002)(36756003)(6496006)(52116002)(5660300002)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: MUBktffjhDYxnSLm8cxa4adGLCs1J3BmOeqgjQzg7lS2l3uiKvgLviNZsOwwV9qAFWz32iJeZTvvNlLjh1x0Z+jICibteiwYF5vIlItORQnXs11MBWQjH0g8vSrbKxF3jpvogAjIbzYl8Ps5UgyXqa2Fn1pwMrZ9jnDIlSFSDdyET3m9fbscZtpynWaFFVai0phQaKRpNiz2AQRQk8xbI1U9DzL7xtMvigRPF6Vt0RDy0QgBvMmXrBQY7ovIGOQmNoQc9G+Z3R50dm3MJ/bKvQ3zabBqwx8FCjw6d0ZGR9bRNgb23dgmWrTu7UO2zw8QD6N6aMzadI3AfmHzsqXQwN9vu6Mz6kRCDkXj/N2gp+8mc9sNIu9Et+aBDPTTosFIa2FAsO4xt0iupBrcBy6aa8yn8bQk1hloIuAfEpPJpIhyGOqGoHPxWkjWqJONuRsM+g3x6SpczPVmqhWFTw4DbjKbdI4/L2YeqG5NenKYLxeBRLA1MW0rmZgGoMIRVsJ09kwNFe60rC/0n0YnhlDp5ictQKK8f/YBWtyUIUuOXSXhtK1ABwMV1tnw3yDK5CZ3bHLisFX0DYOfgdg8qacTE0U2Fzf0aH9QdXgNFoAtrl1P4hfo8iW2kSJFEp3FBT710/KIV7mkLmhG97wzHRFwb2fYknwRRdLIislOT/mk9FWPqh+fJy12heRtkTsAsT90HhvL6Jij11s4zyVv8gfDmA==
 X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3dbedb1-e431-4231-3fc4-08d8767362e0
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5b05db0-f0fc-4cb1-d2f0-08d8767630ca
 X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 10:15:22.6754
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 10:35:27.1041
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Vrxf5ZXNMMsp2eRP6aEkjD36h7D0o/7gGAfHlXeP2zOGMOfmX6Gm/BOk4AQlCwHV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5760
+X-MS-Exchange-CrossTenant-UserPrincipalName: nLM6QwkB5HCVjJhYgeOjGleCayva15pNOL6f5MJyfgtLAqINBtAnK/9dnR/nS9MA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3358
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 Steve French <smfrench@gmail.com> writes:
-> As Aurelien and others had mentioned, shrinking fs/cifs/connect.c by
-> moving mount related functions (to fs_context.c and fs_context.h)
-> helps make fs/cifs/connect.c more readable (see attached patch series)
-> but also will make it easier to review the future patches to move
-> cifs.ko to the new API.   These are low risk and will make the mount
-> code easier to maintain. These four don't change any existing
-> function.
+> Prior to this patch all of the special files would show up
+> as being of type 'file' but with this patch they can be seen
+> with the correct file type as can be seen below:
+
+TODO: Still cannot read the symlink target and the device major/minor numbe=
+rs.
 
 Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 
+Cheers,
 --=20
 Aur=C3=A9lien Aptel / SUSE Labs Samba Team
 GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
