@@ -1,66 +1,210 @@
-Return-Path: <SRS0=++Ox=EA=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <SRS0=Ugv5=EB=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4E5C55178
-	for <linux-cifs@archiver.kernel.org>; Sun, 25 Oct 2020 18:35:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2076C4363A
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Oct 2020 23:54:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DECAF21D41
-	for <linux-cifs@archiver.kernel.org>; Sun, 25 Oct 2020 18:35:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B0E92151B
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Oct 2020 23:54:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1603650920;
-	bh=rwCwrfCIyCPZU1EXyTmYe+A1dBk/8A7ESdD3EBFh5JM=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=utfPvcKxDGSet88KcjB+yJG2n5UzdvR9BRVevBP73OonYWnA1FkjnG2Qfo8E1Lt4q
-	 ORjGGcHprge7YgfDRnGchEVTJKhKcQj6SH1u5lIo0xVzPJ940gqCfhjwCpSNN9VHDz
-	 vhb4yEZUvncYMwzHzj7osP5Gnn4a8t6PgtBYRq04=
+	s=default; t=1603756474;
+	bh=CMqgyNtbhAujyPsyGMaZa7yHDs/2JuC0PbGLu45tKfU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=oly+5K0IZhBk+SstgwvuYB1zeQnWu7ZNem4lQqNrmkylQuu4tU33L/omSHoQIYg7d
+	 DVM3HEgslx+Vk3YmA0EoK+ogaVErqoLHpXaNOkaHgyoZ2RgsRpyrBM2uUM/2CsMvSk
+	 QaWbJ2hHtRF9opTTLMU1KKMmObnBaW+SxT1/VHbQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1418131AbgJYSfS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 25 Oct 2020 14:35:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46372 "EHLO mail.kernel.org"
+        id S2410482AbgJZXyd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Oct 2020 19:54:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60478 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1418126AbgJYSfS (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 25 Oct 2020 14:35:18 -0400
-Subject: Re: [GIT PULL] cifs/smb3 fixes
+        id S2410474AbgJZXyd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 26 Oct 2020 19:54:33 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 42FBE20770;
+        Mon, 26 Oct 2020 23:54:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1603650917;
-        bh=rwCwrfCIyCPZU1EXyTmYe+A1dBk/8A7ESdD3EBFh5JM=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=VeIocOoCR7SyJXZemZsdzLHMrgtq8g25ItPfEVCr9+OyaihpcViT/LmNAZ/CINQHn
-         0Tl9xjEFPfs39okXEwqJyiaO9A9MoLHz7jy7YzTNV7nwBcUXIHswlWF6zd9puI8gxI
-         7/Ce+7ncm7KIF5eRdjWacstibA4MoBv+sAvDj2aE=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvTDPJLQQLWaUUvFdMj4sOv4VKWG3JhVw=CwcxV6NhY+A@mail.gmail.com>
-References: <CAH2r5mvTDPJLQQLWaUUvFdMj4sOv4VKWG3JhVw=CwcxV6NhY+A@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvTDPJLQQLWaUUvFdMj4sOv4VKWG3JhVw=CwcxV6NhY+A@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.10-rc-smb3-fixes-part2
-X-PR-Tracked-Commit-Id: aef0388aa92c5583eeac401710e16db48be4c9ac
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: c10037f8323d2a94acb4fc6ecfbab0cda152fdd6
-Message-Id: <160365091767.20889.4161370901400195229.pr-tracker-bot@kernel.org>
-Date:   Sun, 25 Oct 2020 18:35:17 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        s=default; t=1603756472;
+        bh=CMqgyNtbhAujyPsyGMaZa7yHDs/2JuC0PbGLu45tKfU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Qv7c2Tu1/CZw2FLKZ+khkGlwujudpZUn8NnQu894aC0Q9ivOob4Ab0mX9JXCfG8Ia
+         7U84Asg/Ku7QFzr29wNSVJgmeOUxaGsyj/XoU0RKH+qfbK7lFFeHrGftP9aLqe1ECf
+         5s8X2rCJyWE3F+FXFzWdQ8FuhlS8GjG8pfcgJ+qU=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Rohith Surabattula <rohiths@microsoft.com>,
+        Aurelien Aptel <aaptel@suse.com>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 5.8 118/132] Handle STATUS_IO_TIMEOUT gracefully
+Date:   Mon, 26 Oct 2020 19:51:50 -0400
+Message-Id: <20201026235205.1023962-118-sashal@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201026235205.1023962-1-sashal@kernel.org>
+References: <20201026235205.1023962-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 24 Oct 2020 17:21:23 -0500:
+From: Rohith Surabattula <rohiths@microsoft.com>
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.10-rc-smb3-fixes-part2
+[ Upstream commit 8e670f77c4a55013db6d23b962f9bf6673a5e7b6 ]
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/c10037f8323d2a94acb4fc6ecfbab0cda152fdd6
+Currently STATUS_IO_TIMEOUT is not treated as retriable error.
+It is currently mapped to ETIMEDOUT and returned to userspace
+for most system calls. STATUS_IO_TIMEOUT is returned by server
+in case of unavailability or throttling errors.
 
-Thank you!
+This patch will map the STATUS_IO_TIMEOUT to EAGAIN, so that it
+can be retried. Also, added a check to drop the connection to
+not overload the server in case of ongoing unavailability.
 
+Signed-off-by: Rohith Surabattula <rohiths@microsoft.com>
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/cifsglob.h     |  2 ++
+ fs/cifs/connect.c      | 15 ++++++++++++++-
+ fs/cifs/smb2maperror.c |  2 +-
+ fs/cifs/smb2ops.c      | 15 +++++++++++++++
+ 4 files changed, 32 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index fad37d61910aa..c330028fd1702 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -510,6 +510,8 @@ struct smb_version_operations {
+ 		      struct fiemap_extent_info *, u64, u64);
+ 	/* version specific llseek implementation */
+ 	loff_t (*llseek)(struct file *, struct cifs_tcon *, loff_t, int);
++	/* Check for STATUS_IO_TIMEOUT */
++	bool (*is_status_io_timeout)(char *buf);
+ };
+ 
+ struct smb_version_values {
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index a61abde09ffe1..f36b548786ea5 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -69,6 +69,9 @@ extern bool disable_legacy_dialects;
+ #define TLINK_ERROR_EXPIRE	(1 * HZ)
+ #define TLINK_IDLE_EXPIRE	(600 * HZ)
+ 
++/* Drop the connection to not overload the server */
++#define NUM_STATUS_IO_TIMEOUT   5
++
+ enum {
+ 	/* Mount options that take no arguments */
+ 	Opt_user_xattr, Opt_nouser_xattr,
+@@ -1116,7 +1119,7 @@ cifs_demultiplex_thread(void *p)
+ 	struct task_struct *task_to_wake = NULL;
+ 	struct mid_q_entry *mids[MAX_COMPOUND];
+ 	char *bufs[MAX_COMPOUND];
+-	unsigned int noreclaim_flag;
++	unsigned int noreclaim_flag, num_io_timeout = 0;
+ 
+ 	noreclaim_flag = memalloc_noreclaim_save();
+ 	cifs_dbg(FYI, "Demultiplex PID: %d\n", task_pid_nr(current));
+@@ -1212,6 +1215,16 @@ cifs_demultiplex_thread(void *p)
+ 			continue;
+ 		}
+ 
++		if (server->ops->is_status_io_timeout &&
++		    server->ops->is_status_io_timeout(buf)) {
++			num_io_timeout++;
++			if (num_io_timeout > NUM_STATUS_IO_TIMEOUT) {
++				cifs_reconnect(server);
++				num_io_timeout = 0;
++				continue;
++			}
++		}
++
+ 		server->lstrp = jiffies;
+ 
+ 		for (i = 0; i < num_mids; i++) {
+diff --git a/fs/cifs/smb2maperror.c b/fs/cifs/smb2maperror.c
+index 7fde3775cb574..b004cf87692a7 100644
+--- a/fs/cifs/smb2maperror.c
++++ b/fs/cifs/smb2maperror.c
+@@ -488,7 +488,7 @@ static const struct status_to_posix_error smb2_error_map_table[] = {
+ 	{STATUS_PIPE_CONNECTED, -EIO, "STATUS_PIPE_CONNECTED"},
+ 	{STATUS_PIPE_LISTENING, -EIO, "STATUS_PIPE_LISTENING"},
+ 	{STATUS_INVALID_READ_MODE, -EIO, "STATUS_INVALID_READ_MODE"},
+-	{STATUS_IO_TIMEOUT, -ETIMEDOUT, "STATUS_IO_TIMEOUT"},
++	{STATUS_IO_TIMEOUT, -EAGAIN, "STATUS_IO_TIMEOUT"},
+ 	{STATUS_FILE_FORCED_CLOSED, -EIO, "STATUS_FILE_FORCED_CLOSED"},
+ 	{STATUS_PROFILING_NOT_STARTED, -EIO, "STATUS_PROFILING_NOT_STARTED"},
+ 	{STATUS_PROFILING_NOT_STOPPED, -EIO, "STATUS_PROFILING_NOT_STOPPED"},
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index d44df8f95bcd4..8c3b997e718a0 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -2346,6 +2346,17 @@ smb2_is_session_expired(char *buf)
+ 	return true;
+ }
+ 
++static bool
++smb2_is_status_io_timeout(char *buf)
++{
++	struct smb2_sync_hdr *shdr = (struct smb2_sync_hdr *)buf;
++
++	if (shdr->Status == STATUS_IO_TIMEOUT)
++		return true;
++	else
++		return false;
++}
++
+ static int
+ smb2_oplock_response(struct cifs_tcon *tcon, struct cifs_fid *fid,
+ 		     struct cifsInodeInfo *cinode)
+@@ -4809,6 +4820,7 @@ struct smb_version_operations smb20_operations = {
+ 	.make_node = smb2_make_node,
+ 	.fiemap = smb3_fiemap,
+ 	.llseek = smb3_llseek,
++	.is_status_io_timeout = smb2_is_status_io_timeout,
+ };
+ 
+ struct smb_version_operations smb21_operations = {
+@@ -4909,6 +4921,7 @@ struct smb_version_operations smb21_operations = {
+ 	.make_node = smb2_make_node,
+ 	.fiemap = smb3_fiemap,
+ 	.llseek = smb3_llseek,
++	.is_status_io_timeout = smb2_is_status_io_timeout,
+ };
+ 
+ struct smb_version_operations smb30_operations = {
+@@ -5019,6 +5032,7 @@ struct smb_version_operations smb30_operations = {
+ 	.make_node = smb2_make_node,
+ 	.fiemap = smb3_fiemap,
+ 	.llseek = smb3_llseek,
++	.is_status_io_timeout = smb2_is_status_io_timeout,
+ };
+ 
+ struct smb_version_operations smb311_operations = {
+@@ -5130,6 +5144,7 @@ struct smb_version_operations smb311_operations = {
+ 	.make_node = smb2_make_node,
+ 	.fiemap = smb3_fiemap,
+ 	.llseek = smb3_llseek,
++	.is_status_io_timeout = smb2_is_status_io_timeout,
+ };
+ 
+ struct smb_version_values smb20_values = {
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.25.1
+
