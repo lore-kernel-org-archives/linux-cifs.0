@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7030FC5DF9E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A303CC61DD8
 	for <linux-cifs@archiver.kernel.org>; Tue, 27 Oct 2020 10:08:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21EC621D24
+	by mail.kernel.org (Postfix) with ESMTP id 4C0A52225C
 	for <linux-cifs@archiver.kernel.org>; Tue, 27 Oct 2020 10:08:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2897390AbgJ0KId (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S2897386AbgJ0KId (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Tue, 27 Oct 2020 06:08:33 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59758 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:59698 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2897386AbgJ0KIc (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        id S2897392AbgJ0KIc (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
         Tue, 27 Oct 2020 06:08:32 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 43D4BAD0D
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2020 10:08:31 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id B25BAB2E1
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2020 10:08:30 +0000 (UTC)
 From:   Samuel Cabrero <scabrero@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     Samuel Cabrero <scabrero@suse.de>
-Subject: [PATCH v2 11/11] cifs: Handle witness share moved notification
-Date:   Tue, 27 Oct 2020 11:08:07 +0100
-Message-Id: <20201027100807.21510-12-scabrero@suse.de>
+Subject: [PATCH v2 09/11] cifs: Simplify reconnect code when dfs upcall is enabled
+Date:   Tue, 27 Oct 2020 11:08:05 +0100
+Message-Id: <20201027100807.21510-10-scabrero@suse.de>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20201027100807.21510-1-scabrero@suse.de>
 References: <20201027100807.21510-1-scabrero@suse.de>
@@ -39,68 +39,77 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Just log a message as it is not clear enough what this notification
-means. It is received for example when a node belonging to a scale-out
-file server dies, but it is also received as soon as a client registers
-for notifications (w2k12r2) when the server is scale-out.
+Some witness notifications, like client move, tell the client to
+reconnect to a specific IP address. In this situation the DFS failover
+code path has to be skipped so clean up as much as possible the
+cifs_reconnect() code.
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 ---
- fs/cifs/cifs_swn.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ fs/cifs/connect.c | 21 ++++++++-------------
+ 1 file changed, 8 insertions(+), 13 deletions(-)
 
-diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
-index b71b05638b1c..ab079533dc24 100644
---- a/fs/cifs/cifs_swn.c
-+++ b/fs/cifs/cifs_swn.c
-@@ -534,6 +534,29 @@ static int cifs_swn_client_move(struct cifs_swn_reg *swnreg, struct sockaddr_sto
- 	return cifs_swn_reconnect(swnreg->tcon, addr);
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index cb9ca4238ae9..14bbec0aeccf 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -296,7 +296,7 @@ static void cifs_prune_tlinks(struct work_struct *work);
+  * This should be called with server->srv_mutex held.
+  */
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-static int reconn_set_ipaddr(struct TCP_Server_Info *server)
++static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
+ {
+ 	int rc;
+ 	int len;
+@@ -331,14 +331,7 @@ static int reconn_set_ipaddr(struct TCP_Server_Info *server)
+ 
+ 	return !rc ? -1 : 0;
+ }
+-#else
+-static inline int reconn_set_ipaddr(struct TCP_Server_Info *server)
+-{
+-	return 0;
+-}
+-#endif
+ 
+-#ifdef CONFIG_CIFS_DFS_UPCALL
+ /* These functions must be called with server->srv_mutex held */
+ static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
+ 				       struct cifs_sb_info *cifs_sb,
+@@ -346,6 +339,7 @@ static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
+ 				       struct dfs_cache_tgt_iterator **tgt_it)
+ {
+ 	const char *name;
++	int rc;
+ 
+ 	if (!cifs_sb || !cifs_sb->origin_fullpath)
+ 		return;
+@@ -370,6 +364,12 @@ static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
+ 			 "%s: failed to extract hostname from target: %ld\n",
+ 			 __func__, PTR_ERR(server->hostname));
+ 	}
++
++	rc = reconn_set_ipaddr_from_hostname(server);
++	if (rc) {
++		cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
++			 __func__, rc);
++	}
  }
  
-+static int cifs_swn_share_moved(struct cifs_swn_reg *swnreg, struct sockaddr_storage *addr)
-+{
-+	struct sockaddr_in *ipv4 = (struct sockaddr_in *)addr;
-+	struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)addr;
-+
-+	if (addr->ss_family == AF_INET)
-+		cifs_dbg(FYI, "%s: share '%s' from '%s' moved to %pI4\n",
-+				__func__, swnreg->share_name, swnreg->net_name,
-+				&ipv4->sin_addr);
-+	else if (addr->ss_family == AF_INET6)
-+		cifs_dbg(FYI, "%s: share '%s' from '%s' moved to %pI6\n",
-+				__func__, swnreg->share_name, swnreg->net_name,
-+				&ipv6->sin6_addr);
-+
-+	/*
-+	 * FIXME It is not clear enough how to handle this notification and what does it mean.
-+	 * It is received for example when a node belonging to a scale-out file server dies, but
-+	 * it is also received as soon as a client registers for notifications (w2k12r2) when the
-+	 * share is scale-out and all nodes are working fine. Just log for now.
-+	 */
-+	return 0;
-+}
-+
- int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct cifs_swn_reg *swnreg;
-@@ -593,6 +616,17 @@ int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info)
- 		}
- 		return cifs_swn_client_move(swnreg, &addr);
- 	}
-+	case CIFS_SWN_NOTIFICATION_SHARE_MOVE: {
-+		struct sockaddr_storage addr;
-+
-+		if (info->attrs[CIFS_GENL_ATTR_SWN_IP]) {
-+			nla_memcpy(&addr, info->attrs[CIFS_GENL_ATTR_SWN_IP], sizeof(addr));
-+		} else {
-+			cifs_dbg(FYI, "%s: missing IP address attribute\n", __func__);
-+			return -EINVAL;
-+		}
-+		return cifs_swn_share_moved(swnreg, &addr);
-+	}
- 	default:
- 		cifs_dbg(FYI, "%s: unknown notification type %d\n", __func__, type);
- 		break;
+ static inline int reconn_setup_dfs_targets(struct cifs_sb_info *cifs_sb,
+@@ -528,11 +528,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		 */
+ 		reconn_set_next_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
+ #endif
+-		rc = reconn_set_ipaddr(server);
+-		if (rc) {
+-			cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
+-				 __func__, rc);
+-		}
+ 
+ 		if (cifs_rdma_enabled(server))
+ 			rc = smbd_reconnect(server);
 -- 
 2.29.0
 
