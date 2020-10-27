@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5235C5DF9D
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Oct 2020 10:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10238C56201
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Oct 2020 10:08:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F5582225C
+	by mail.kernel.org (Postfix) with ESMTP id B99DB2225C
 	for <linux-cifs@archiver.kernel.org>; Tue, 27 Oct 2020 10:08:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2897388AbgJ0KIc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 27 Oct 2020 06:08:32 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59646 "EHLO mx2.suse.de"
+        id S2897381AbgJ0KId (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 27 Oct 2020 06:08:33 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59594 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2897383AbgJ0KIb (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        id S2897390AbgJ0KIb (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
         Tue, 27 Oct 2020 06:08:31 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6F447B2DB
+        by mx2.suse.de (Postfix) with ESMTP id 29ADAAC3F
         for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2020 10:08:30 +0000 (UTC)
 From:   Samuel Cabrero <scabrero@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     Samuel Cabrero <scabrero@suse.de>
-Subject: [PATCH v2 08/11] cifs: Send witness register messages to userspace daemon in echo task
-Date:   Tue, 27 Oct 2020 11:08:04 +0100
-Message-Id: <20201027100807.21510-9-scabrero@suse.de>
+Subject: [PATCH v2 07/11] cifs: Add witness information to debug data dump
+Date:   Tue, 27 Oct 2020 11:08:03 +0100
+Message-Id: <20201027100807.21510-8-scabrero@suse.de>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20201027100807.21510-1-scabrero@suse.de>
 References: <20201027100807.21510-1-scabrero@suse.de>
@@ -39,66 +39,119 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If the daemon starts after mounting a share, or if it crashes, this
-provides a mechanism to register again.
++ Indicate if witness feature is supported
++ Indicate if witness is used when dumping tcons
++ Dumps witness registrations. Example:
+  Witness registrations:
+  Id: 1 Refs: 1 Network name: 'fs.fover.ad'(y) Share name: 'share1'(y) \
+    Ip address: 192.168.103.200(n)
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 ---
- fs/cifs/cifs_swn.c | 15 +++++++++++++++
- fs/cifs/cifs_swn.h |  2 ++
- fs/cifs/connect.c  |  5 +++++
- 3 files changed, 22 insertions(+)
+ fs/cifs/cifs_debug.c | 13 +++++++++++++
+ fs/cifs/cifs_swn.c   | 35 +++++++++++++++++++++++++++++++++++
+ fs/cifs/cifs_swn.h   |  2 ++
+ 3 files changed, 50 insertions(+)
 
+diff --git a/fs/cifs/cifs_debug.c b/fs/cifs/cifs_debug.c
+index 53588d7517b4..b231dcf1d1f9 100644
+--- a/fs/cifs/cifs_debug.c
++++ b/fs/cifs/cifs_debug.c
+@@ -23,6 +23,9 @@
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ #include "smbdirect.h"
+ #endif
++#ifdef CONFIG_CIFS_SWN_UPCALL
++#include "cifs_swn.h"
++#endif
+ 
+ void
+ cifs_dump_mem(char *label, void *data, int length)
+@@ -115,6 +118,10 @@ static void cifs_debug_tcon(struct seq_file *m, struct cifs_tcon *tcon)
+ 		seq_printf(m, " POSIX Extensions");
+ 	if (tcon->ses->server->ops->dump_share_caps)
+ 		tcon->ses->server->ops->dump_share_caps(m, tcon);
++#ifdef CONFIG_CIFS_SWN_UPCALL
++	if (tcon->use_witness)
++		seq_puts(m, " Witness");
++#endif
+ 
+ 	if (tcon->need_reconnect)
+ 		seq_puts(m, "\tDISCONNECTED ");
+@@ -262,6 +269,9 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 	seq_printf(m, ",XATTR");
+ #endif
+ 	seq_printf(m, ",ACL");
++#ifdef CONFIG_CIFS_SWN_UPCALL
++	seq_puts(m, ",WITNESS");
++#endif
+ 	seq_putc(m, '\n');
+ 	seq_printf(m, "CIFSMaxBufSize: %d\n", CIFSMaxBufSize);
+ 	seq_printf(m, "Active VFS Requests: %d\n", GlobalTotalActiveXid);
+@@ -462,6 +472,9 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 	seq_putc(m, '\n');
+ 
++#ifdef CONFIG_CIFS_SWN_UPCALL
++	cifs_swn_dump(m);
++#endif
+ 	/* BB add code to dump additional info such as TCP session info now */
+ 	return 0;
+ }
 diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
-index 4396e21ef228..93e31e4a9d99 100644
+index 501d84893262..4396e21ef228 100644
 --- a/fs/cifs/cifs_swn.c
 +++ b/fs/cifs/cifs_swn.c
-@@ -536,3 +536,18 @@ void cifs_swn_dump(struct seq_file *m)
- 	mutex_unlock(&cifs_swnreg_idr_mutex);
- 	seq_puts(m, "\n");
+@@ -501,3 +501,38 @@ int cifs_swn_unregister(struct cifs_tcon *tcon)
+ 
+ 	return 0;
  }
 +
-+void cifs_swn_check(void)
++void cifs_swn_dump(struct seq_file *m)
 +{
 +	struct cifs_swn_reg *swnreg;
++	struct sockaddr_in *sa;
++	struct sockaddr_in6 *sa6;
 +	int id;
-+	int ret;
++
++	seq_puts(m, "Witness registrations:");
 +
 +	mutex_lock(&cifs_swnreg_idr_mutex);
 +	idr_for_each_entry(&cifs_swnreg_idr, swnreg, id) {
-+		ret = cifs_swn_send_register_message(swnreg);
-+		if (ret < 0)
-+			cifs_dbg(FYI, "%s: Failed to send register message: %d\n", __func__, ret);
++		seq_printf(m, "\nId: %u Refs: %u Network name: '%s'%s Share name: '%s'%s Ip address: ",
++				id, kref_read(&swnreg->ref_count),
++				swnreg->net_name, swnreg->net_name_notify ? "(y)" : "(n)",
++				swnreg->share_name, swnreg->share_name_notify ? "(y)" : "(n)");
++		switch (swnreg->tcon->ses->server->dstaddr.ss_family) {
++		case AF_INET:
++			sa = (struct sockaddr_in *) &swnreg->tcon->ses->server->dstaddr;
++			seq_printf(m, "%pI4", &sa->sin_addr.s_addr);
++			break;
++		case AF_INET6:
++			sa6 = (struct sockaddr_in6 *) &swnreg->tcon->ses->server->dstaddr;
++			seq_printf(m, "%pI6", &sa6->sin6_addr.s6_addr);
++			if (sa6->sin6_scope_id)
++				seq_printf(m, "%%%u", sa6->sin6_scope_id);
++			break;
++		default:
++			seq_puts(m, "(unknown)");
++		}
++		seq_printf(m, "%s", swnreg->ip_notify ? "(y)" : "(n)");
 +	}
 +	mutex_unlock(&cifs_swnreg_idr_mutex);
++	seq_puts(m, "\n");
 +}
 diff --git a/fs/cifs/cifs_swn.h b/fs/cifs/cifs_swn.h
-index 13b25cdc9295..236ecd4959d5 100644
+index 7ef9ecedbd05..13b25cdc9295 100644
 --- a/fs/cifs/cifs_swn.h
 +++ b/fs/cifs/cifs_swn.h
-@@ -20,4 +20,6 @@ extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
+@@ -18,4 +18,6 @@ extern int cifs_swn_unregister(struct cifs_tcon *tcon);
  
- extern void cifs_swn_dump(struct seq_file *m);
+ extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
  
-+extern void cifs_swn_check(void);
++extern void cifs_swn_dump(struct seq_file *m);
 +
  #endif /* _CIFS_SWN_H */
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 0e3a88932560..cb9ca4238ae9 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -613,6 +613,11 @@ cifs_echo_request(struct work_struct *work)
- 		cifs_dbg(FYI, "Unable to send echo request to server: %s\n",
- 			 server->hostname);
- 
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	/* Check witness registrations */
-+	cifs_swn_check();
-+#endif
-+
- requeue_echo:
- 	queue_delayed_work(cifsiod_wq, &server->echo, server->echo_interval);
- }
 -- 
 2.29.0
 
