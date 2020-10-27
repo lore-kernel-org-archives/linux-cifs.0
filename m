@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45BC3C4363A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5235C5DF9D
 	for <linux-cifs@archiver.kernel.org>; Tue, 27 Oct 2020 10:08:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F159422281
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Oct 2020 10:08:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F5582225C
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Oct 2020 10:08:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2897384AbgJ0KIb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 27 Oct 2020 06:08:31 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59544 "EHLO mx2.suse.de"
+        id S2897388AbgJ0KIc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 27 Oct 2020 06:08:32 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59646 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2897386AbgJ0KIb (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        id S2897383AbgJ0KIb (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
         Tue, 27 Oct 2020 06:08:31 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 4B061B03E
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2020 10:08:29 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 6F447B2DB
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2020 10:08:30 +0000 (UTC)
 From:   Samuel Cabrero <scabrero@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     Samuel Cabrero <scabrero@suse.de>
-Subject: [PATCH v2 04/11] cifs: add witness mount option and data structs
-Date:   Tue, 27 Oct 2020 11:08:00 +0100
-Message-Id: <20201027100807.21510-5-scabrero@suse.de>
+Subject: [PATCH v2 08/11] cifs: Send witness register messages to userspace daemon in echo task
+Date:   Tue, 27 Oct 2020 11:08:04 +0100
+Message-Id: <20201027100807.21510-9-scabrero@suse.de>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20201027100807.21510-1-scabrero@suse.de>
 References: <20201027100807.21510-1-scabrero@suse.de>
@@ -39,134 +39,66 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add 'witness' mount option to register for witness notifications.
+If the daemon starts after mounting a share, or if it crashes, this
+provides a mechanism to register again.
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 ---
- fs/cifs/cifsfs.c   |  5 +++++
- fs/cifs/cifsglob.h |  4 ++++
- fs/cifs/connect.c  | 35 ++++++++++++++++++++++++++++++++++-
- 3 files changed, 43 insertions(+), 1 deletion(-)
+ fs/cifs/cifs_swn.c | 15 +++++++++++++++
+ fs/cifs/cifs_swn.h |  2 ++
+ fs/cifs/connect.c  |  5 +++++
+ 3 files changed, 22 insertions(+)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 8111d0109a2e..c2bbc444b463 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -637,6 +637,11 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 		seq_printf(s, ",multichannel,max_channels=%zu",
- 			   tcon->ses->chan_max);
- 
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	if (tcon->use_witness)
-+		seq_puts(s, ",witness");
-+#endif
-+
- 	return 0;
+diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
+index 4396e21ef228..93e31e4a9d99 100644
+--- a/fs/cifs/cifs_swn.c
++++ b/fs/cifs/cifs_swn.c
+@@ -536,3 +536,18 @@ void cifs_swn_dump(struct seq_file *m)
+ 	mutex_unlock(&cifs_swnreg_idr_mutex);
+ 	seq_puts(m, "\n");
  }
++
++void cifs_swn_check(void)
++{
++	struct cifs_swn_reg *swnreg;
++	int id;
++	int ret;
++
++	mutex_lock(&cifs_swnreg_idr_mutex);
++	idr_for_each_entry(&cifs_swnreg_idr, swnreg, id) {
++		ret = cifs_swn_send_register_message(swnreg);
++		if (ret < 0)
++			cifs_dbg(FYI, "%s: Failed to send register message: %d\n", __func__, ret);
++	}
++	mutex_unlock(&cifs_swnreg_idr_mutex);
++}
+diff --git a/fs/cifs/cifs_swn.h b/fs/cifs/cifs_swn.h
+index 13b25cdc9295..236ecd4959d5 100644
+--- a/fs/cifs/cifs_swn.h
++++ b/fs/cifs/cifs_swn.h
+@@ -20,4 +20,6 @@ extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
  
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 484ec2d8c5c9..f45b7c0fbceb 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -619,6 +619,7 @@ struct smb_vol {
- 	unsigned int max_channels;
- 	__u16 compression; /* compression algorithm 0xFFFF default 0=disabled */
- 	bool rootfs:1; /* if it's a SMB root file system */
-+	bool witness:1; /* use witness protocol */
- };
+ extern void cifs_swn_dump(struct seq_file *m);
  
- /**
-@@ -1177,6 +1178,9 @@ struct cifs_tcon {
- 	int remap:2;
- 	struct list_head ulist; /* cache update list */
- #endif
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	bool use_witness:1; /* use witness protocol */
-+#endif
- };
- 
- /*
++extern void cifs_swn_check(void);
++
+ #endif /* _CIFS_SWN_H */
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 5aadc4632097..ed749e978ad8 100644
+index 0e3a88932560..cb9ca4238ae9 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -102,7 +102,7 @@ enum {
- 	Opt_resilient, Opt_noresilient,
- 	Opt_domainauto, Opt_rdma, Opt_modesid, Opt_rootfs,
- 	Opt_multichannel, Opt_nomultichannel,
--	Opt_compress,
-+	Opt_compress, Opt_witness,
- 
- 	/* Mount options which take numeric value */
- 	Opt_backupuid, Opt_backupgid, Opt_uid,
-@@ -276,6 +276,7 @@ static const match_table_t cifs_mount_option_tokens = {
- 	{ Opt_ignore, "relatime" },
- 	{ Opt_ignore, "_netdev" },
- 	{ Opt_rootfs, "rootfs" },
-+	{ Opt_witness, "witness" },
- 
- 	{ Opt_err, NULL }
- };
-@@ -1538,6 +1539,13 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			vol->rootfs = true;
- #endif
- 			break;
-+		case Opt_witness:
-+#ifndef CONFIG_CIFS_SWN_UPCALL
-+			cifs_dbg(VFS, "Witness support needs CONFIG_CIFS_SWN_UPCALL kernel config option set\n");
-+			goto cifs_parse_mount_err;
-+#endif
-+			vol->witness = true;
-+			break;
- 		case Opt_posixpaths:
- 			vol->posix_paths = 1;
- 			break;
-@@ -3158,6 +3166,8 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 		return;
- 	}
- 
-+	/* TODO witness unregister */
-+
- 	list_del_init(&tcon->tcon_list);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
-@@ -3319,6 +3329,26 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		tcon->use_resilient = true;
- 	}
+@@ -613,6 +613,11 @@ cifs_echo_request(struct work_struct *work)
+ 		cifs_dbg(FYI, "Unable to send echo request to server: %s\n",
+ 			 server->hostname);
  
 +#ifdef CONFIG_CIFS_SWN_UPCALL
-+	tcon->use_witness = false;
-+	if (volume_info->witness) {
-+		if (ses->server->vals->protocol_id >= SMB30_PROT_ID) {
-+			if (tcon->capabilities & SMB2_SHARE_CAP_CLUSTER) {
-+				/* TODO witness register */
-+				tcon->use_witness = true;
-+			} else {
-+				cifs_dbg(VFS, "witness requested on mount but no CLUSTER capability on share\n");
-+				rc = -EOPNOTSUPP;
-+				goto out_fail;
-+			}
-+		} else {
-+			cifs_dbg(VFS, "SMB3 or later required for witness option\n");
-+			rc = -EOPNOTSUPP;
-+			goto out_fail;
-+		}
-+	}
++	/* Check witness registrations */
++	cifs_swn_check();
 +#endif
 +
- 	/* If the user really knows what they are doing they can override */
- 	if (tcon->share_flags & SMB2_SHAREFLAG_NO_CACHING) {
- 		if (volume_info->cache_ro)
-@@ -5070,6 +5100,9 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
- 	vol_info->sectype = master_tcon->ses->sectype;
- 	vol_info->sign = master_tcon->ses->sign;
- 	vol_info->seal = master_tcon->seal;
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	vol_info->witness = master_tcon->use_witness;
-+#endif
- 
- 	rc = cifs_set_vol_auth(vol_info, master_tcon->ses);
- 	if (rc) {
+ requeue_echo:
+ 	queue_delayed_work(cifsiod_wq, &server->echo, server->echo_interval);
+ }
 -- 
 2.29.0
 
