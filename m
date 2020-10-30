@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB69C00A89
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Oct 2020 11:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3185C4742C
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Oct 2020 11:53:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B5D620706
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Oct 2020 11:53:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6827F20706
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Oct 2020 11:53:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726430AbgJ3Lw7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 30 Oct 2020 07:52:59 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47486 "EHLO mx2.suse.de"
+        id S1726110AbgJ3Lww (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 30 Oct 2020 07:52:52 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47082 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725993AbgJ3Lwx (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 30 Oct 2020 07:52:53 -0400
+        id S1726072AbgJ3Lww (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 30 Oct 2020 07:52:52 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 337BFAED7
-        for <linux-cifs@vger.kernel.org>; Fri, 30 Oct 2020 11:52:24 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 2123EAE02
+        for <linux-cifs@vger.kernel.org>; Fri, 30 Oct 2020 11:52:23 +0000 (UTC)
 From:   Samuel Cabrero <scabrero@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     Samuel Cabrero <scabrero@suse.de>
-Subject: [PATCH v3 06/11] cifs: Set witness notification handler for messages from userspace daemon
-Date:   Fri, 30 Oct 2020 12:52:05 +0100
-Message-Id: <20201030115210.8888-7-scabrero@suse.de>
+Subject: [PATCH v3 02/11] cifs: Make extract_sharename function public
+Date:   Fri, 30 Oct 2020 12:52:01 +0100
+Message-Id: <20201030115210.8888-3-scabrero@suse.de>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20201030115210.8888-1-scabrero@suse.de>
 References: <20201030115210.8888-1-scabrero@suse.de>
@@ -39,203 +39,120 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-+ Set a handler for the witness notification messages received from the
-  userspace daemon.
-
-+ Handle the resource state change notification. When the resource
-  becomes unavailable or available set the tcp status to
-  CifsNeedReconnect for all channels.
+Move the function to misc.c
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 ---
- fs/cifs/cifs_swn.c                     | 86 ++++++++++++++++++++++++++
- fs/cifs/cifs_swn.h                     |  4 ++
- fs/cifs/netlink.c                      |  9 +++
- include/uapi/linux/cifs/cifs_netlink.h | 17 +++++
- 4 files changed, 116 insertions(+)
+ fs/cifs/cache.c     | 24 ------------------------
+ fs/cifs/cifsproto.h |  1 +
+ fs/cifs/fscache.c   |  1 +
+ fs/cifs/fscache.h   |  1 -
+ fs/cifs/misc.c      | 24 ++++++++++++++++++++++++
+ 5 files changed, 26 insertions(+), 25 deletions(-)
 
-diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
-index c7d70e28341e..501d84893262 100644
---- a/fs/cifs/cifs_swn.c
-+++ b/fs/cifs/cifs_swn.c
-@@ -379,6 +379,92 @@ static void cifs_put_swn_reg(struct cifs_swn_reg *swnreg)
- 	mutex_unlock(&cifs_swnreg_idr_mutex);
- }
+diff --git a/fs/cifs/cache.c b/fs/cifs/cache.c
+index 0f2adecb94f2..488fe0ffc1ef 100644
+--- a/fs/cifs/cache.c
++++ b/fs/cifs/cache.c
+@@ -53,30 +53,6 @@ const struct fscache_cookie_def cifs_fscache_server_index_def = {
+ 	.type = FSCACHE_COOKIE_TYPE_INDEX,
+ };
  
-+static int cifs_swn_resource_state_changed(struct cifs_swn_reg *swnreg, const char *name, int state)
-+{
-+	int i;
-+
-+	switch (state) {
-+	case CIFS_SWN_RESOURCE_STATE_UNAVAILABLE:
-+		cifs_dbg(FYI, "%s: resource name '%s' become unavailable\n", __func__, name);
-+		for (i = 0; i < swnreg->tcon->ses->chan_count; i++) {
-+			spin_lock(&GlobalMid_Lock);
-+			if (swnreg->tcon->ses->chans[i].server->tcpStatus != CifsExiting)
-+				swnreg->tcon->ses->chans[i].server->tcpStatus = CifsNeedReconnect;
-+			spin_unlock(&GlobalMid_Lock);
-+		}
-+		break;
-+	case CIFS_SWN_RESOURCE_STATE_AVAILABLE:
-+		cifs_dbg(FYI, "%s: resource name '%s' become available\n", __func__, name);
-+		for (i = 0; i < swnreg->tcon->ses->chan_count; i++) {
-+			spin_lock(&GlobalMid_Lock);
-+			if (swnreg->tcon->ses->chans[i].server->tcpStatus != CifsExiting)
-+				swnreg->tcon->ses->chans[i].server->tcpStatus = CifsNeedReconnect;
-+			spin_unlock(&GlobalMid_Lock);
-+		}
-+		break;
-+	case CIFS_SWN_RESOURCE_STATE_UNKNOWN:
-+		cifs_dbg(FYI, "%s: resource name '%s' changed to unknown state\n", __func__, name);
-+		break;
-+	}
-+	return 0;
-+}
-+
-+int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct cifs_swn_reg *swnreg;
-+	char name[256];
-+	int type;
-+
-+	if (info->attrs[CIFS_GENL_ATTR_SWN_REGISTRATION_ID]) {
-+		int swnreg_id;
-+
-+		swnreg_id = nla_get_u32(info->attrs[CIFS_GENL_ATTR_SWN_REGISTRATION_ID]);
-+		mutex_lock(&cifs_swnreg_idr_mutex);
-+		swnreg = idr_find(&cifs_swnreg_idr, swnreg_id);
-+		mutex_unlock(&cifs_swnreg_idr_mutex);
-+		if (swnreg == NULL) {
-+			cifs_dbg(FYI, "%s: registration id %d not found\n", __func__, swnreg_id);
-+			return -EINVAL;
-+		}
-+	} else {
-+		cifs_dbg(FYI, "%s: missing registration id attribute\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	if (info->attrs[CIFS_GENL_ATTR_SWN_NOTIFICATION_TYPE]) {
-+		type = nla_get_u32(info->attrs[CIFS_GENL_ATTR_SWN_NOTIFICATION_TYPE]);
-+	} else {
-+		cifs_dbg(FYI, "%s: missing notification type attribute\n", __func__);
-+		return -EINVAL;
-+	}
-+
-+	switch (type) {
-+	case CIFS_SWN_NOTIFICATION_RESOURCE_CHANGE: {
-+		int state;
-+
-+		if (info->attrs[CIFS_GENL_ATTR_SWN_RESOURCE_NAME]) {
-+			nla_strlcpy(name, info->attrs[CIFS_GENL_ATTR_SWN_RESOURCE_NAME],
-+					sizeof(name));
-+		} else {
-+			cifs_dbg(FYI, "%s: missing resource name attribute\n", __func__);
-+			return -EINVAL;
-+		}
-+		if (info->attrs[CIFS_GENL_ATTR_SWN_RESOURCE_STATE]) {
-+			state = nla_get_u32(info->attrs[CIFS_GENL_ATTR_SWN_RESOURCE_STATE]);
-+		} else {
-+			cifs_dbg(FYI, "%s: missing resource state attribute\n", __func__);
-+			return -EINVAL;
-+		}
-+		return cifs_swn_resource_state_changed(swnreg, name, state);
-+	}
-+	default:
-+		cifs_dbg(FYI, "%s: unknown notification type %d\n", __func__, type);
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
- int cifs_swn_register(struct cifs_tcon *tcon)
- {
- 	struct cifs_swn_reg *swnreg;
-diff --git a/fs/cifs/cifs_swn.h b/fs/cifs/cifs_swn.h
-index 69c7bd1035da..7ef9ecedbd05 100644
---- a/fs/cifs/cifs_swn.h
-+++ b/fs/cifs/cifs_swn.h
-@@ -9,9 +9,13 @@
- #define _CIFS_SWN_H
+-char *extract_sharename(const char *treename)
+-{
+-	const char *src;
+-	char *delim, *dst;
+-	int len;
+-
+-	/* skip double chars at the beginning */
+-	src = treename + 2;
+-
+-	/* share name is always preceded by '\\' now */
+-	delim = strchr(src, '\\');
+-	if (!delim)
+-		return ERR_PTR(-EINVAL);
+-	delim++;
+-	len = strlen(delim);
+-
+-	/* caller has to free the memory */
+-	dst = kstrndup(delim, len, GFP_KERNEL);
+-	if (!dst)
+-		return ERR_PTR(-ENOMEM);
+-
+-	return dst;
+-}
+-
+ static enum
+ fscache_checkaux cifs_fscache_super_check_aux(void *cookie_netfs_data,
+ 					      const void *data,
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index d716e81d86fa..5f997a01fb45 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -621,6 +621,7 @@ struct super_block *cifs_get_tcp_super(struct TCP_Server_Info *server);
+ void cifs_put_tcp_super(struct super_block *sb);
+ int update_super_prepath(struct cifs_tcon *tcon, char *prefix);
+ char *extract_hostname(const char *unc);
++char *extract_sharename(const char *unc);
  
- struct cifs_tcon;
-+struct sk_buff;
-+struct genl_info;
- 
- extern int cifs_swn_register(struct cifs_tcon *tcon);
- 
- extern int cifs_swn_unregister(struct cifs_tcon *tcon);
- 
-+extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
-+
- #endif /* _CIFS_SWN_H */
-diff --git a/fs/cifs/netlink.c b/fs/cifs/netlink.c
-index 83008a56def5..5aaabe4cc0a7 100644
---- a/fs/cifs/netlink.c
-+++ b/fs/cifs/netlink.c
-@@ -11,6 +11,7 @@
- #include "netlink.h"
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ static inline int get_dfs_path(const unsigned int xid, struct cifs_ses *ses,
+diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
+index da688185403c..20d24af33ee2 100644
+--- a/fs/cifs/fscache.c
++++ b/fs/cifs/fscache.c
+@@ -22,6 +22,7 @@
  #include "cifsglob.h"
  #include "cifs_debug.h"
-+#include "cifs_swn.h"
+ #include "cifs_fs_sb.h"
++#include "cifsproto.h"
  
- static const struct nla_policy cifs_genl_policy[CIFS_GENL_ATTR_MAX + 1] = {
- 	[CIFS_GENL_ATTR_SWN_REGISTRATION_ID]	= { .type = NLA_U32 },
-@@ -24,9 +25,17 @@ static const struct nla_policy cifs_genl_policy[CIFS_GENL_ATTR_MAX + 1] = {
- 	[CIFS_GENL_ATTR_SWN_USER_NAME]		= { .type = NLA_STRING },
- 	[CIFS_GENL_ATTR_SWN_PASSWORD]		= { .type = NLA_STRING },
- 	[CIFS_GENL_ATTR_SWN_DOMAIN_NAME]	= { .type = NLA_STRING },
-+	[CIFS_GENL_ATTR_SWN_NOTIFICATION_TYPE]	= { .type = NLA_U32 },
-+	[CIFS_GENL_ATTR_SWN_RESOURCE_STATE]	= { .type = NLA_U32 },
-+	[CIFS_GENL_ATTR_SWN_RESOURCE_NAME]	= { .type = NLA_STRING},
- };
+ /*
+  * Key layout of CIFS server cache index object
+diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
+index 1091633d2adb..e811f2dd7619 100644
+--- a/fs/cifs/fscache.h
++++ b/fs/cifs/fscache.h
+@@ -57,7 +57,6 @@ extern const struct fscache_cookie_def cifs_fscache_inode_object_def;
  
- static struct genl_ops cifs_genl_ops[] = {
-+	{
-+		.cmd = CIFS_GENL_CMD_SWN_NOTIFY,
-+		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
-+		.doit = cifs_swn_notify,
-+	},
- };
+ extern int cifs_fscache_register(void);
+ extern void cifs_fscache_unregister(void);
+-extern char *extract_sharename(const char *);
  
- static const struct genl_multicast_group cifs_genl_mcgrps[] = {
-diff --git a/include/uapi/linux/cifs/cifs_netlink.h b/include/uapi/linux/cifs/cifs_netlink.h
-index 5662e2774513..da3107582f49 100644
---- a/include/uapi/linux/cifs/cifs_netlink.h
-+++ b/include/uapi/linux/cifs/cifs_netlink.h
-@@ -31,6 +31,9 @@ enum cifs_genl_attributes {
- 	CIFS_GENL_ATTR_SWN_USER_NAME,
- 	CIFS_GENL_ATTR_SWN_PASSWORD,
- 	CIFS_GENL_ATTR_SWN_DOMAIN_NAME,
-+	CIFS_GENL_ATTR_SWN_NOTIFICATION_TYPE,
-+	CIFS_GENL_ATTR_SWN_RESOURCE_STATE,
-+	CIFS_GENL_ATTR_SWN_RESOURCE_NAME,
- 	__CIFS_GENL_ATTR_MAX,
- };
- #define CIFS_GENL_ATTR_MAX (__CIFS_GENL_ATTR_MAX - 1)
-@@ -39,8 +42,22 @@ enum cifs_genl_commands {
- 	CIFS_GENL_CMD_UNSPEC,
- 	CIFS_GENL_CMD_SWN_REGISTER,
- 	CIFS_GENL_CMD_SWN_UNREGISTER,
-+	CIFS_GENL_CMD_SWN_NOTIFY,
- 	__CIFS_GENL_CMD_MAX
- };
- #define CIFS_GENL_CMD_MAX (__CIFS_GENL_CMD_MAX - 1)
+ /*
+  * fscache.c
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 3d5cc25c167f..f0a1c24751b2 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1227,3 +1227,27 @@ char *extract_hostname(const char *unc)
  
-+enum cifs_swn_notification_type {
-+	CIFS_SWN_NOTIFICATION_RESOURCE_CHANGE = 0x01,
-+	CIFS_SWN_NOTIFICATION_CLIENT_MOVE	 = 0x02,
-+	CIFS_SWN_NOTIFICATION_SHARE_MOVE	 = 0x03,
-+	CIFS_SWN_NOTIFICATION_IP_CHANGE	 = 0x04,
-+};
+ 	return dst;
+ }
 +
-+enum cifs_swn_resource_state {
-+	CIFS_SWN_RESOURCE_STATE_UNKNOWN     = 0x00,
-+	CIFS_SWN_RESOURCE_STATE_AVAILABLE   = 0x01,
-+	CIFS_SWN_RESOURCE_STATE_UNAVAILABLE = 0xFF
-+};
++char *extract_sharename(const char *unc)
++{
++	const char *src;
++	char *delim, *dst;
++	int len;
 +
- #endif /* _UAPILINUX_CIFS_NETLINK_H */
++	/* skip double chars at the beginning */
++	src = unc + 2;
++
++	/* share name is always preceded by '\\' now */
++	delim = strchr(src, '\\');
++	if (!delim)
++		return ERR_PTR(-EINVAL);
++	delim++;
++	len = strlen(delim);
++
++	/* caller has to free the memory */
++	dst = kstrndup(delim, len, GFP_KERNEL);
++	if (!dst)
++		return ERR_PTR(-ENOMEM);
++
++	return dst;
++}
 -- 
 2.29.0
 
