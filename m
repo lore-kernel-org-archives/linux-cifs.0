@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E063C4742C
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Oct 2020 11:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3099C00A89
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Oct 2020 11:52:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BABCD20723
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Oct 2020 11:52:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ACDC207DE
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Oct 2020 11:52:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726433AbgJ3Lwx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 30 Oct 2020 07:52:53 -0400
-Received: from mx2.suse.de ([195.135.220.15]:47108 "EHLO mx2.suse.de"
+        id S1725975AbgJ3Lwz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 30 Oct 2020 07:52:55 -0400
+Received: from mx2.suse.de ([195.135.220.15]:47504 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726083AbgJ3Lww (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 30 Oct 2020 07:52:52 -0400
+        id S1726424AbgJ3Lwy (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 30 Oct 2020 07:52:54 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id A1920AE0B
-        for <linux-cifs@vger.kernel.org>; Fri, 30 Oct 2020 11:52:23 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 31552AF31
+        for <linux-cifs@vger.kernel.org>; Fri, 30 Oct 2020 11:52:25 +0000 (UTC)
 From:   Samuel Cabrero <scabrero@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     Samuel Cabrero <scabrero@suse.de>
-Subject: [PATCH v3 04/11] cifs: add witness mount option and data structs
-Date:   Fri, 30 Oct 2020 12:52:03 +0100
-Message-Id: <20201030115210.8888-5-scabrero@suse.de>
+Subject: [PATCH v3 10/11] cifs: Handle witness client move notification
+Date:   Fri, 30 Oct 2020 12:52:09 +0100
+Message-Id: <20201030115210.8888-11-scabrero@suse.de>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20201030115210.8888-1-scabrero@suse.de>
 References: <20201030115210.8888-1-scabrero@suse.de>
@@ -39,134 +39,248 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add 'witness' mount option to register for witness notifications.
+This message is sent to tell a client to close its current connection
+and connect to the specified address.
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 ---
- fs/cifs/cifsfs.c   |  5 +++++
- fs/cifs/cifsglob.h |  4 ++++
- fs/cifs/connect.c  | 35 ++++++++++++++++++++++++++++++++++-
- 3 files changed, 43 insertions(+), 1 deletion(-)
+ fs/cifs/cifs_swn.c | 140 ++++++++++++++++++++++++++++++++++++++++++++-
+ fs/cifs/cifsglob.h |   4 ++
+ fs/cifs/connect.c  |  26 +++++++--
+ 3 files changed, 162 insertions(+), 8 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 8111d0109a2e..c2bbc444b463 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -637,6 +637,11 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 		seq_printf(s, ",multichannel,max_channels=%zu",
- 			   tcon->ses->chan_max);
+diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
+index 93e31e4a9d99..b71b05638b1c 100644
+--- a/fs/cifs/cifs_swn.c
++++ b/fs/cifs/cifs_swn.c
+@@ -78,6 +78,7 @@ static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
+ 	struct sk_buff *skb;
+ 	struct genlmsghdr *hdr;
+ 	enum securityEnum authtype;
++	struct sockaddr_storage *addr;
+ 	int ret;
  
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	if (tcon->use_witness)
-+		seq_puts(s, ",witness");
-+#endif
+ 	skb = genlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
+@@ -104,8 +105,18 @@ static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
+ 	if (ret < 0)
+ 		goto nlmsg_fail;
+ 
+-	ret = nla_put(skb, CIFS_GENL_ATTR_SWN_IP, sizeof(struct sockaddr_storage),
+-			&swnreg->tcon->ses->server->dstaddr);
++	/*
++	 * If there is an address stored use it instead of the server address, because we are
++	 * in the process of reconnecting to it after a share has been moved or we have been
++	 * told to switch to it (client move message). In these cases we unregister from the
++	 * server address and register to the new address when we receive the notification.
++	 */
++	if (swnreg->tcon->ses->server->use_swn_dstaddr)
++		addr = &swnreg->tcon->ses->server->swn_dstaddr;
++	else
++		addr = &swnreg->tcon->ses->server->dstaddr;
 +
++	ret = nla_put(skb, CIFS_GENL_ATTR_SWN_IP, sizeof(struct sockaddr_storage), addr);
+ 	if (ret < 0)
+ 		goto nlmsg_fail;
+ 
+@@ -409,6 +420,120 @@ static int cifs_swn_resource_state_changed(struct cifs_swn_reg *swnreg, const ch
  	return 0;
  }
  
++static bool cifs_sockaddr_equal(struct sockaddr_storage *addr1, struct sockaddr_storage *addr2)
++{
++	if (addr1->ss_family != addr2->ss_family)
++		return false;
++
++	if (addr1->ss_family == AF_INET) {
++		return (memcmp(&((const struct sockaddr_in *)addr1)->sin_addr,
++				&((const struct sockaddr_in *)addr2)->sin_addr,
++				sizeof(struct in_addr)) == 0);
++	}
++
++	if (addr1->ss_family == AF_INET6) {
++		return (memcmp(&((const struct sockaddr_in6 *)addr1)->sin6_addr,
++				&((const struct sockaddr_in6 *)addr2)->sin6_addr,
++				sizeof(struct in6_addr)) == 0);
++	}
++
++	return false;
++}
++
++static int cifs_swn_store_swn_addr(const struct sockaddr_storage *new,
++				   const struct sockaddr_storage *old,
++				   struct sockaddr_storage *dst)
++{
++	__be16 port;
++
++	if (old->ss_family == AF_INET) {
++		struct sockaddr_in *ipv4 = (struct sockaddr_in *)old;
++
++		port = ipv4->sin_port;
++	}
++
++	if (old->ss_family == AF_INET6) {
++		struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)old;
++
++		port = ipv6->sin6_port;
++	}
++
++	if (new->ss_family == AF_INET) {
++		struct sockaddr_in *ipv4 = (struct sockaddr_in *)new;
++
++		ipv4->sin_port = port;
++	}
++
++	if (new->ss_family == AF_INET6) {
++		struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)new;
++
++		ipv6->sin6_port = port;
++	}
++
++	*dst = *new;
++
++	return 0;
++}
++
++static int cifs_swn_reconnect(struct cifs_tcon *tcon, struct sockaddr_storage *addr)
++{
++	/* Store the reconnect address */
++	mutex_lock(&tcon->ses->server->srv_mutex);
++	if (!cifs_sockaddr_equal(&tcon->ses->server->dstaddr, addr)) {
++		int ret;
++
++		ret = cifs_swn_store_swn_addr(addr, &tcon->ses->server->dstaddr,
++				&tcon->ses->server->swn_dstaddr);
++		if (ret < 0) {
++			cifs_dbg(VFS, "%s: failed to store address: %d\n", __func__, ret);
++			return ret;
++		}
++		tcon->ses->server->use_swn_dstaddr = true;
++
++		/*
++		 * Unregister to stop receiving notifications for the old IP address.
++		 */
++		ret = cifs_swn_unregister(tcon);
++		if (ret < 0) {
++			cifs_dbg(VFS, "%s: Failed to unregister for witness notifications: %d\n",
++					__func__, ret);
++			return ret;
++		}
++
++		/*
++		 * And register to receive notifications for the new IP address now that we have
++		 * stored the new address.
++		 */
++		ret = cifs_swn_register(tcon);
++		if (ret < 0) {
++			cifs_dbg(VFS, "%s: Failed to register for witness notifications: %d\n",
++					__func__, ret);
++			return ret;
++		}
++
++		spin_lock(&GlobalMid_Lock);
++		if (tcon->ses->server->tcpStatus != CifsExiting)
++			tcon->ses->server->tcpStatus = CifsNeedReconnect;
++		spin_unlock(&GlobalMid_Lock);
++	}
++	mutex_unlock(&tcon->ses->server->srv_mutex);
++
++	return 0;
++}
++
++static int cifs_swn_client_move(struct cifs_swn_reg *swnreg, struct sockaddr_storage *addr)
++{
++	struct sockaddr_in *ipv4 = (struct sockaddr_in *)addr;
++	struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)addr;
++
++	if (addr->ss_family == AF_INET)
++		cifs_dbg(FYI, "%s: move to %pI4\n", __func__, &ipv4->sin_addr);
++	else if (addr->ss_family == AF_INET6)
++		cifs_dbg(FYI, "%s: move to %pI6\n", __func__, &ipv6->sin6_addr);
++
++	return cifs_swn_reconnect(swnreg->tcon, addr);
++}
++
+ int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct cifs_swn_reg *swnreg;
+@@ -457,6 +582,17 @@ int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info)
+ 		}
+ 		return cifs_swn_resource_state_changed(swnreg, name, state);
+ 	}
++	case CIFS_SWN_NOTIFICATION_CLIENT_MOVE: {
++		struct sockaddr_storage addr;
++
++		if (info->attrs[CIFS_GENL_ATTR_SWN_IP]) {
++			nla_memcpy(&addr, info->attrs[CIFS_GENL_ATTR_SWN_IP], sizeof(addr));
++		} else {
++			cifs_dbg(FYI, "%s: missing IP address attribute\n", __func__);
++			return -EINVAL;
++		}
++		return cifs_swn_client_move(swnreg, &addr);
++	}
+ 	default:
+ 		cifs_dbg(FYI, "%s: unknown notification type %d\n", __func__, type);
+ 		break;
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 484ec2d8c5c9..f45b7c0fbceb 100644
+index f45b7c0fbceb..d7f43cec0f13 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -619,6 +619,7 @@ struct smb_vol {
- 	unsigned int max_channels;
- 	__u16 compression; /* compression algorithm 0xFFFF default 0=disabled */
- 	bool rootfs:1; /* if it's a SMB root file system */
-+	bool witness:1; /* use witness protocol */
- };
- 
- /**
-@@ -1177,6 +1178,9 @@ struct cifs_tcon {
- 	int remap:2;
- 	struct list_head ulist; /* cache update list */
- #endif
+@@ -779,6 +779,10 @@ struct TCP_Server_Info {
+ 	int nr_targets;
+ 	bool noblockcnt; /* use non-blocking connect() */
+ 	bool is_channel; /* if a session channel */
 +#ifdef CONFIG_CIFS_SWN_UPCALL
-+	bool use_witness:1; /* use witness protocol */
++	bool use_swn_dstaddr;
++	struct sockaddr_storage swn_dstaddr;
 +#endif
  };
  
- /*
+ struct cifs_credits {
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 5aadc4632097..ed749e978ad8 100644
+index 14bbec0aeccf..0da10d199f47 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -102,7 +102,7 @@ enum {
- 	Opt_resilient, Opt_noresilient,
- 	Opt_domainauto, Opt_rdma, Opt_modesid, Opt_rootfs,
- 	Opt_multichannel, Opt_nomultichannel,
--	Opt_compress,
-+	Opt_compress, Opt_witness,
+@@ -520,13 +520,24 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 		try_to_freeze();
  
- 	/* Mount options which take numeric value */
- 	Opt_backupuid, Opt_backupgid, Opt_uid,
-@@ -276,6 +276,7 @@ static const match_table_t cifs_mount_option_tokens = {
- 	{ Opt_ignore, "relatime" },
- 	{ Opt_ignore, "_netdev" },
- 	{ Opt_rootfs, "rootfs" },
-+	{ Opt_witness, "witness" },
- 
- 	{ Opt_err, NULL }
- };
-@@ -1538,6 +1539,13 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			vol->rootfs = true;
- #endif
- 			break;
-+		case Opt_witness:
-+#ifndef CONFIG_CIFS_SWN_UPCALL
-+			cifs_dbg(VFS, "Witness support needs CONFIG_CIFS_SWN_UPCALL kernel config option set\n");
-+			goto cifs_parse_mount_err;
-+#endif
-+			vol->witness = true;
-+			break;
- 		case Opt_posixpaths:
- 			vol->posix_paths = 1;
- 			break;
-@@ -3158,6 +3166,8 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 		return;
- 	}
- 
-+	/* TODO witness unregister */
+ 		mutex_lock(&server->srv_mutex);
 +
- 	list_del_init(&tcon->tcon_list);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
-@@ -3319,6 +3329,26 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		tcon->use_resilient = true;
- 	}
- 
 +#ifdef CONFIG_CIFS_SWN_UPCALL
-+	tcon->use_witness = false;
-+	if (volume_info->witness) {
-+		if (ses->server->vals->protocol_id >= SMB30_PROT_ID) {
-+			if (tcon->capabilities & SMB2_SHARE_CAP_CLUSTER) {
-+				/* TODO witness register */
-+				tcon->use_witness = true;
-+			} else {
-+				cifs_dbg(VFS, "witness requested on mount but no CLUSTER capability on share\n");
-+				rc = -EOPNOTSUPP;
-+				goto out_fail;
-+			}
++		if (server->use_swn_dstaddr) {
++			server->dstaddr = server->swn_dstaddr;
 +		} else {
-+			cifs_dbg(VFS, "SMB3 or later required for witness option\n");
-+			rc = -EOPNOTSUPP;
-+			goto out_fail;
-+		}
-+	}
 +#endif
 +
- 	/* If the user really knows what they are doing they can override */
- 	if (tcon->share_flags & SMB2_SHAREFLAG_NO_CACHING) {
- 		if (volume_info->cache_ro)
-@@ -5070,6 +5100,9 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
- 	vol_info->sectype = master_tcon->ses->sectype;
- 	vol_info->sign = master_tcon->ses->sign;
- 	vol_info->seal = master_tcon->seal;
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	vol_info->witness = master_tcon->use_witness;
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+-		/*
+-		 * Set up next DFS target server (if any) for reconnect. If DFS
+-		 * feature is disabled, then we will retry last server we
+-		 * connected to before.
+-		 */
+-		reconn_set_next_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
++			/*
++			 * Set up next DFS target server (if any) for reconnect. If DFS
++			 * feature is disabled, then we will retry last server we
++			 * connected to before.
++			 */
++			reconn_set_next_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
 +#endif
++
++#ifdef CONFIG_CIFS_SWN_UPCALL
++		}
+ #endif
  
- 	rc = cifs_set_vol_auth(vol_info, master_tcon->ses);
- 	if (rc) {
+ 		if (cifs_rdma_enabled(server))
+@@ -544,6 +555,9 @@ cifs_reconnect(struct TCP_Server_Info *server)
+ 			if (server->tcpStatus != CifsExiting)
+ 				server->tcpStatus = CifsNeedNegotiate;
+ 			spin_unlock(&GlobalMid_Lock);
++#ifdef CONFIG_CIFS_SWN_UPCALL
++			server->use_swn_dstaddr = false;
++#endif
+ 			mutex_unlock(&server->srv_mutex);
+ 		}
+ 	} while (server->tcpStatus == CifsNeedReconnect);
 -- 
 2.29.0
 
