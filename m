@@ -7,67 +7,62 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15106C4741F
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Nov 2020 23:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D78C2D0A3
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Nov 2020 23:46:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9F65206ED
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Nov 2020 23:43:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADD0D20679
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Nov 2020 23:46:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HY/9JC21"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="thuIKJtP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730178AbgKIXnf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 9 Nov 2020 18:43:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36628 "EHLO
+        id S1729648AbgKIXqS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 9 Nov 2020 18:46:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730171AbgKIXne (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Nov 2020 18:43:34 -0500
+        with ESMTP id S1729452AbgKIXqS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Nov 2020 18:46:18 -0500
 Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B340C0613CF
-        for <linux-cifs@vger.kernel.org>; Mon,  9 Nov 2020 15:43:33 -0800 (PST)
-Received: by mail-ej1-x630.google.com with SMTP id za3so14839218ejb.5
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Nov 2020 15:43:33 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E472FC0613CF
+        for <linux-cifs@vger.kernel.org>; Mon,  9 Nov 2020 15:46:17 -0800 (PST)
+Received: by mail-ej1-x630.google.com with SMTP id w13so14813227eju.13
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Nov 2020 15:46:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=9oJh2bFbehkEpQjnGhjVScK/dBeawbJgeaMHEbQDuJM=;
-        b=HY/9JC21cYSdoOBw4LBJjs5lrE41wg8wNSKTtIc+gPy6mrUKHp85p+CZXRZXgNP5eE
-         M9NFXgUJyzKsWNZFEbATjHUNZVD+P5485s8mYsIMBEKdeFXlIhPt8TOy5oJsE78/rTtn
-         m77jx2nRgx1NdYMSkNEqn1SyQOjrG7g36QeFMBmG0cEwd9N3n9uG0VhiNyrlWnZZQGIj
-         Ek5MFoZ/RgWcaPTb6uyJjWz1JcNU1x/Tj5+n/Dg1Kp5O7GT9YWTfnDWy7MRHCEckGNbc
-         P0zxA+DDBhbsxrtaa/KD3WLJEpKNh3D7+3+BxyReRcDlR6o4Es7UYdwb4WWPZOfhTS5H
-         PPug==
+        bh=dS+8rGshrXbBUplAsZNgqe6MUeLm5wMMMVMzkX9haag=;
+        b=thuIKJtP3ZLz/O0NxPUxofxQz23fQLQnyNdxCKfjiOliW9I1G2mZhy6XFcFlnKmp+5
+         jAyVMIsCGZvccVKHqNZ8tYE1iUW3cxOZZKXVzQ/Ja0/wIxOnSudm+L6+iXAgoxC2NkVP
+         TQFsk64F9vNfhboKUpYXTYFisTmtmUhiZMSBfyvaUtSlBOnNMyr7DoC4mY0SZxrV5s4D
+         jYChj8iOQ0rWedu/zj6RruT+0/QTDg0BpAm0R9WDHL77mt5+92PXEGSq9X5R5lcR2S1Q
+         mMCxAcjhcDfy0hFRfDUeLoHufdgxjhZl1zhLRQDSCXKBIKkycvMpsVbJvmdTPwqFwbcp
+         0fKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=9oJh2bFbehkEpQjnGhjVScK/dBeawbJgeaMHEbQDuJM=;
-        b=YJm15xkXdPzYJzidX2gXwaKocryZiopmiBRDTPVbW8+6uu3wafX0peiHG+AwKLEVnH
-         qafbVAbFkBODkWLEbW5GEYD9/Ud0uL07tyMVWT09af4A5FpEUwiJ5/XCH+ovuPxuspFR
-         efeniJIXBVNN5TSRS3HLRt19l+MBBdZsAeN3/3AP6J9TAsog3ZbFs2Km/4ciFaj9kYHc
-         23pymFg0NaKq5aG8M9Yj/owbL8NkFC2/z7RWa4saSaBb0D+y/j5LTUZjTXWIs//mhp8o
-         xKviZFadNRA0F4gEZLwmIqLwQwTAP/VfYhix56q62IMQo9geVn41sPAcMIbJw+7RZ6JL
-         y38w==
-X-Gm-Message-State: AOAM532ucNJt+0eRKqI8gCSmHUR/AG0/VJSZRwmShs6muE3ugYFNpaSM
-        +3uHhacAPQ0/Nc91N4ndMIwokj5a3LGEXzW+TQ==
-X-Google-Smtp-Source: ABdhPJw6QU71ipbGy6nEYpINAF3vS1BULf3Z1NCRb9Z4qZSV5quYmENHcORVBhDY4buMEdD32itym1y0oTMrVS/IsyM=
-X-Received: by 2002:a17:906:f753:: with SMTP id jp19mr17073701ejb.280.1604965411288;
- Mon, 09 Nov 2020 15:43:31 -0800 (PST)
+        bh=dS+8rGshrXbBUplAsZNgqe6MUeLm5wMMMVMzkX9haag=;
+        b=U/byN1i8b0xDRJruvE3mAVFuhi8ZJEP3UhMvLbeVnVKK4gayEj0TlF8opSXSg1+7fG
+         h78LJ+4/JgNCbAALsNLxC/1wg8QhMIYQUjMy64bZbAmhpyYEtuwEDPxHBlgaITEEXE6L
+         0UppaVJ4RAw5Zx8byjIOyxQEGC74OvZkurHtD88GQWJYYvz7mqnhV5tYXblJTNmYVtEI
+         CwlcpMPR8RPdVfzYRxWv3AU6AGY9W9DkdPN5ISGDvaTeju6FvfbM5ftETY3F2OyUjZEr
+         pHoCt9+AqJla8d1Rf6gMlHEhFFemJBKXCNXpHjlaHdCvySEpbr7ij8nCXd/hxmOo4Kcr
+         OQ0Q==
+X-Gm-Message-State: AOAM530i+URUuazVtf4IR1JDFazyIvN2rs12Fcg8Z0A8H4TYmWOoOrm6
+        YWNYHr/gsW2npAmO5Sv91LSCVewyzVNXv3J4K73JubI=
+X-Google-Smtp-Source: ABdhPJzsQCRY0OBg+ELpcTOzRgw/Tjmbe6SvD98rsZTLcYoiS5tneEVLpoOtQjEYsL7wKlfxIIdYaP8BeBS4TeQ2a8c=
+X-Received: by 2002:a17:907:42cf:: with SMTP id nz23mr17261770ejb.138.1604965576699;
+ Mon, 09 Nov 2020 15:46:16 -0800 (PST)
 MIME-Version: 1.0
-References: <CANT5p=oiTY63d5yVyywiTrCqpAmvaugMVVpQRV7RT7ZA9HU2+Q@mail.gmail.com>
- <87r1r2ugzw.fsf@suse.com> <CANT5p=qV6BWojwBET+kYUwJf7tQDFoRtUb8O+pWHrqWMw5e5LQ@mail.gmail.com>
- <87wo0slr0c.fsf@suse.com> <CANT5p=rarYr0bErP77GF5QOu8=xx7Ovfy2dWdUNxnOTGkLXMKQ@mail.gmail.com>
- <87o8m4lnig.fsf@suse.com> <CANT5p=rKKZeS+HqonXQF4eaKFTod0rhb56GM4dXkYKhCcDhftw@mail.gmail.com>
- <87lfh3lexw.fsf@suse.com>
-In-Reply-To: <87lfh3lexw.fsf@suse.com>
+References: <20200925113200.371db298@martins.ozlabs.org> <87o8lujjaj.fsf@suse.com>
+In-Reply-To: <87o8lujjaj.fsf@suse.com>
 From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Mon, 9 Nov 2020 15:43:20 -0800
-Message-ID: <CAKywueRcmWYOJ748Tc4jmAD+8HRpNBUG9AtAKhKvm5OmmsT=pw@mail.gmail.com>
-Subject: Re: [PATCH][SMB3] mount.cifs: use SUDO_UID env variable for cruid
+Date:   Mon, 9 Nov 2020 15:46:05 -0800
+Message-ID: <CAKywueT_PAarufhVe=A2ZiJETNQnYTGGNP_FRU+r-97y2Jet9w@mail.gmail.com>
+Subject: Re: [PATCH] mount.cifs: ignore comment mount option
 To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com
+Cc:     Martin Schwenke <martin@meltin.net>,
+        linux-cifs <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -79,14 +74,9 @@ Merged. Thanks!
 Best regards,
 Pavel Shilovsky
 
-=D0=BF=D0=BD, 21 =D1=81=D0=B5=D0=BD=D1=82. 2020 =D0=B3. =D0=B2 01:19, Aur=
+=D0=BF=D1=82, 25 =D1=81=D0=B5=D0=BD=D1=82. 2020 =D0=B3. =D0=B2 02:30, Aur=
 =C3=A9lien Aptel <aaptel@suse.com>:
 >
->
-> Thanks Shyam, looks good to me :)
->
-> Shyam Prasad N <nspmangalore@gmail.com> writes:
-> > Here's the updated patch.
 >
 > Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 >
