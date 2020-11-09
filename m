@@ -2,154 +2,113 @@ Return-Path: <SRS0=X6Po=EP=vger.kernel.org=linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D67BC2D0A3
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Nov 2020 08:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CEB3C388F7
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Nov 2020 14:25:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A387206ED
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Nov 2020 08:42:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4101820674
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Nov 2020 14:25:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="o1oqgqqv"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="igdl7Pdd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727959AbgKIImb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 9 Nov 2020 03:42:31 -0500
-Received: from mailout1.samsung.com ([203.254.224.24]:55529 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726176AbgKIIma (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Nov 2020 03:42:30 -0500
-Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20201109084227epoutp011da3402ce4a0debd793a7c7df964066f~Fyl4fIMqu0040500405epoutp01W
-        for <linux-cifs@vger.kernel.org>; Mon,  9 Nov 2020 08:42:27 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20201109084227epoutp011da3402ce4a0debd793a7c7df964066f~Fyl4fIMqu0040500405epoutp01W
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1604911347;
-        bh=hnFYwtXuO8MJM/pIWWZpjBvGRy1uzP3Ew6oWUOUIP0A=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=o1oqgqqvIacRO83P9FYsx1Gsu1vK9fir6OKk1e/Rydx+fHI5Aqw6H8Jkk/SSE9sPA
-         EX/v4PNtSySXLy6zE1+Vuhare4uZfuubFfVPlcAkynes05T1IPluqLxkp2SZTd1h6r
-         +oG86s9asj7Y03G+idayokQ0hkC38PyFdk8A9IYY=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20201109084227epcas1p29f6f1eef646ef1c010aa70e3adb688ea~Fyl4CYj4B1667516675epcas1p29;
-        Mon,  9 Nov 2020 08:42:27 +0000 (GMT)
-Received: from epsmges1p5.samsung.com (unknown [182.195.40.166]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4CV4Hk124DzMqYm6; Mon,  9 Nov
-        2020 08:42:26 +0000 (GMT)
-Received: from epcas1p2.samsung.com ( [182.195.41.46]) by
-        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
-        18.47.09577.2F009AF5; Mon,  9 Nov 2020 17:42:26 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
-        20201109084225epcas1p3522cb6e6b277e76055403b83f6b55a2b~Fyl2jT7rt0434404344epcas1p33;
-        Mon,  9 Nov 2020 08:42:25 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20201109084225epsmtrp2fd55965dcd03c7f8e9dd6b0af6c23a3b~Fyl2iqcp12492624926epsmtrp2k;
-        Mon,  9 Nov 2020 08:42:25 +0000 (GMT)
-X-AuditID: b6c32a39-bfdff70000002569-65-5fa900f2bf59
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        EB.73.08745.1F009AF5; Mon,  9 Nov 2020 17:42:25 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.88.103.87]) by
-        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20201109084225epsmtip172f3f84cf83d4486341af96529009f13~Fyl2aRu0_1932319323epsmtip1J;
-        Mon,  9 Nov 2020 08:42:25 +0000 (GMT)
-From:   Namjae Jeon <namjae.jeon@samsung.com>
-To:     linux-cifs@vger.kernel.org
+        id S1729974AbgKIOZH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 9 Nov 2020 09:25:07 -0500
+Received: from de-smtp-delivery-52.mimecast.com ([51.163.158.52]:52985 "EHLO
+        de-smtp-delivery-52.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730084AbgKIOZG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Nov 2020 09:25:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1604931903;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+amwX91qfqnpD7Xyvvrf0STJs1n2fCZ0yszSKBxxPBU=;
+        b=igdl7Pddzh5vH3WhBOWNDVQ9sA/u14Mw5ZShvHfRcHaa7yVrSG+tTbKk/bKhS4ceQ/3+gT
+        AwwWkjKWmgvh/SA8NA2Kylb+HQsONwHQip2NbfFtYLqJpSHoLRpPEdjXU0et7MhIgj8qyE
+        DKyLhr+r/RMmSQVH2IJeUPMX9885UYg=
+Received: from EUR01-DB5-obe.outbound.protection.outlook.com
+ (mail-db5eur01lp2052.outbound.protection.outlook.com [104.47.2.52]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ de-mta-10-LEARBd4NOW-hojehEPpNPQ-1; Mon, 09 Nov 2020 15:18:47 +0100
+X-MC-Unique: LEARBd4NOW-hojehEPpNPQ-1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A+LmwWKCq8Iv9VCkmaK58/E8UL5fuvQDoeI03KR8DNbcIMAT72UxgH/ESnh+JCI6nd9sXaq8z2dKJXiRTKeSD2w8Lz9gKVt1wGyRqostMaUi7ScJjyEDX5+jVY0Iiq+QlrVfiQ3maT679qtyaRllcfrOf4xAAJP51OmN8m9cy4ikshyvCC2F/Rza5fYo30AgO7NUYmjrzXE18cMmhexKtyhplNr6fNJVxN2Z6SqYIz8CPB8tU9xu/DClHPVWyrwBiyeva2QNleXsY9G8ydPPeo1Mi6edjtiRR3t4kAAsv9hsku+Ggj5Dh4fZnwlUzZa0ZLTyo6GvFx1U4mgsCtVPvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+amwX91qfqnpD7Xyvvrf0STJs1n2fCZ0yszSKBxxPBU=;
+ b=FHsCwdYgCbsDwxDwUEXd7CA79cRl+LYvOqjUMmKZHygnEy8KzicXQZMHr9b1J+cJvZ+TUy7DGM4HXbvFQzvQgP5aAmqag8D5GotzlbKWr1D2VdFhG2UHZFnbp0/jZ5L2LzVo2OXZP8uttxKvazTNfnHX1FJWAzBvRPECjgi0Qvc09QQY5gFU5aLSJWGhJiYNp37gcJxnwLPHB8qWsS1yrF2bEzd2h+AC0GeDNaqiTLnsg+BEfoM/YTrPrRGBwf/BIsv21Qokl0YPfUMC1U8ghUHfLPfxzOkVahpPr9QqBwPlaZ7gLToLdLrV6LpqKLYhJqpj4/n4x6VU5aDTMRdTnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: samsung.com; dkim=none (message not signed)
+ header.d=none;samsung.com; dmarc=none action=none header.from=suse.com;
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
+ by VI1PR0401MB2384.eurprd04.prod.outlook.com (2603:10a6:800:25::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.25; Mon, 9 Nov
+ 2020 14:18:45 +0000
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::4dad:a2d3:5076:54f0]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::4dad:a2d3:5076:54f0%5]) with mapi id 15.20.3541.025; Mon, 9 Nov 2020
+ 14:18:45 +0000
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Namjae Jeon <namjae.jeon@samsung.com>, linux-cifs@vger.kernel.org
 Cc:     smfrench@gmail.com, Namjae Jeon <namjae.jeon@samsung.com>,
         Stable <stable@vger.kernel.org>
-Subject: [PATCH] cifs: fix a memleak with modefromsid
-Date:   Mon,  9 Nov 2020 17:35:33 +0900
-Message-Id: <20201109083533.2701-1-namjae.jeon@samsung.com>
-X-Mailer: git-send-email 2.17.1
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMKsWRmVeSWpSXmKPExsWy7bCmnu4nhpXxBrs3s1q8+L+L2eLH9HqL
-        Ny8Os1ks2PiI0YHFY+esu+wefVtWMXp83iQXwByVY5ORmpiSWqSQmpecn5KZl26r5B0c7xxv
-        amZgqGtoaWGupJCXmJtqq+TiE6DrlpkDtExJoSwxpxQoFJBYXKykb2dTlF9akqqQkV9cYquU
-        WpCSU2BoUKBXnJhbXJqXrpecn2tlaGBgZApUmZCTce+AasEsvooX8/ewNjA28nQxcnJICJhI
-        zN4xkamLkYtDSGAHo8T37l5mCOcTo8SteT2MEM5nRon9bU/ZYFreNq9nh0jsYpR4tvoAC1xL
-        e1sT0DAODjYBbYk/W0RBGkQE5CTWbjrJAmIzCyRI7F2zFWyQsICpxLEbu9hBbBYBVYnJvy+w
-        g7TyClhL7JtjCrFLXmL1hgNgF0kItLNLLPkFch5IwkVix8EVrBC2sMSr41vYIWwpic/v9rKB
-        zJEQqJb4uB+qvINR4sV3WwjbWOLm+g2sICXMApoS63fpQ4QVJXb+nssIcSWfxLuvPawQU3gl
-        OtqEIEpUJfouHWaCsKUluto/QC31kGhftAfsQSGBWImNa7+yTWCUnYWwYAEj4ypGsdSC4tz0
-        1GLDAlPkGNrECE49WpY7GKe//aB3iJGJg/EQowQHs5IIr9O/FfFCvCmJlVWpRfnxRaU5qcWH
-        GE2BoTWRWUo0OR+Y/PJK4g1NjYyNjS1MzMzNTI2VxHn/aHfECwmkJ5akZqemFqQWwfQxcXBK
-        NTBtW6fxafXmWs+AKXltrhXtXittmw8GhAf//lLWzG0zwTrC3uzBE/YDR1JerV0XFms/OcZu
-        UeNupW93Y/uX/0maJ1H7VqBLcGvIzj1xP7o/n72cKvt2abe2GotDw4aV3/fkuP8/XRMu5ff3
-        +Fzbxs+MqoJTfAMkjVI3JYSnHf8t0MK1cOfGFx0coiWp76Z7GtwoXWyVVq3uprvS68Sa4KfL
-        Dn2Y/FDmQbRC3XHZD/P9Yz+rHY8PrA2e5ii7fGbhG8+7t858ub1W6crpbwlHD9273r3tZUPv
-        rvMNYe9SSgs53NdfrF6mbsjV0Xd091SPg9cPnj9dsuNn746JcrYfE+YoVQhu3Hs0xfnKf6d9
-        G7r3KLEUZyQaajEXFScCAIjjBJvGAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrAJMWRmVeSWpSXmKPExsWy7bCSnO5HhpXxBhs3a1q8+L+L2eLH9HqL
-        Ny8Os1ks2PiI0YHFY+esu+wefVtWMXp83iQXwBzFZZOSmpNZllqkb5fAlXHvgGrBLL6KF/P3
-        sDYwNvJ0MXJySAiYSLxtXs/excjFISSwg1Hi/dkt7BAJaYljJ84wdzFyANnCEocPF0PUfGCU
-        2LnpDhtInE1AW+LPFlGQchEBOYm1m06ygISZBZIkZl+sAgkLC5hKHLuxC2wii4CqxOTfF9hB
-        SngFrCX2zTGFWCQvsXrDAeYJjDwLGBlWMUqmFhTnpucWGxYY5aWW6xUn5haX5qXrJefnbmIE
-        B4KW1g7GPas+6B1iZOJgPMQowcGsJMLr9G9FvBBvSmJlVWpRfnxRaU5q8SFGaQ4WJXHer7MW
-        xgkJpCeWpGanphakFsFkmTg4pRqYpr06ujaCSVRu/QKdQ+sNN7GVcz9Jfzgv6/2MsBPLy36f
-        8Vh8oT9BxeT02Qo91secYRGTu+atYmM69/T7xcAkY57a6ovttjsjfqv9W+JU6ZF8RiWEq5LD
-        Zkv3+j1vP69fXBu3cIJAYDTDES3pw8k8q9+ezkxUr4tZpfHExDLNfVsuBydjfOvJVz4PeOK0
-        G++XOHo1/55QfJ79/5SVrPqS65qrmpO3hU3/tkE72eBX1EfBGQGlKtO9d+ckP1rIl+21rVRY
-        qNgzya/PpqhW/uL+/OUT3k62P3rcmHm6hNhxt9kG5vcKLuvZC3n6sovoeDMZ8s+e0HXm8aaD
-        p48Geyxd+4bvtcTmJz6Zc+3fOc9WYinOSDTUYi4qTgQAYEtEsXMCAAA=
-X-CMS-MailID: 20201109084225epcas1p3522cb6e6b277e76055403b83f6b55a2b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20201109084225epcas1p3522cb6e6b277e76055403b83f6b55a2b
+Subject: Re: [PATCH] cifs: fix a memleak with modefromsid
+In-Reply-To: <20201109083533.2701-1-namjae.jeon@samsung.com>
 References: <CGME20201109084225epcas1p3522cb6e6b277e76055403b83f6b55a2b@epcas1p3.samsung.com>
+ <20201109083533.2701-1-namjae.jeon@samsung.com>
+Date:   Mon, 09 Nov 2020 15:18:43 +0100
+Message-ID: <87v9eetxz0.fsf@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [2003:fa:705:6850:d332:5221:af3c:2ef8]
+X-ClientProxiedBy: ZR0P278CA0022.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:1c::9) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+ (2603:10a6:803:3::28)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (2003:fa:705:6850:d332:5221:af3c:2ef8) by ZR0P278CA0022.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:1c::9) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3541.21 via Frontend Transport; Mon, 9 Nov 2020 14:18:45 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9ff2cbb8-8091-4b8c-7796-08d884ba5e76
+X-MS-TrafficTypeDiagnostic: VI1PR0401MB2384:
+X-Microsoft-Antispam-PRVS: <VI1PR0401MB23844B4DB5D7770C0E6845C5A8EA0@VI1PR0401MB2384.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1728;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2cNEossZI89zVGYTCVuCmVXme4LA/con3QfX3cEc3D6liruSw0nuC90ZHV2ZnL8BsMkS9swaD8uanXELeXviOei1aRY4P2epXuxNU8QszI0Tvk1zdVnuBk8eHPWj+eZzAAl4EvZZGKwqr4PoiFr7eObeK6sxykYM23vsWAPiBcG8ENWuXgI96X7KlQ6YLKlTkQdWY+p2R+c9gJcrgfEFuFdi/Fr0BKKdDoPP+n29D4lYVSmlm83q6uqS7G66WHPaQ8CpySrirICwysluDWuKe3vgVpcfixw5fAFKB4uYrdCgHYEPmruUnx9tzgzPWDfBAX2tPOnp95wMiT8F5MjFEA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(346002)(136003)(376002)(366004)(396003)(2906002)(478600001)(52116002)(6496006)(2616005)(8676002)(54906003)(5660300002)(8936002)(4326008)(86362001)(36756003)(316002)(6486002)(66946007)(66476007)(66556008)(16526019)(558084003)(186003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: SfsPf5ezUIppEsPAlCeWX3HgVnWgtQH0jnvwUcukJyLObw3Wx9CDnoKRam+Rc8kw39hjYGo67a+CsToGur9+mnwgoeGc89zyXgLBq4thY1EcDRoy+Ao62Q149Rfvv0T2aWv7RnMrfFk3sShpU7UDwaOeJmmuTx3rmf5W4Mdf9JOPIkde5MpNOnTSCIInxIwbT1AfwduNPLBU3LJbMuW+fcbN4xsbNe2jFPZnmceKt/3W3C9HM9paR+QegvPW/N4mBFR42H922GX9TMSAYzqVqStt5zJVOVt65An7g2y3h6JQ7HdLBIGMOfdSMyQOqLFUtbVlBaVgW2omBpfh6oPfcztVU7dpUj/zIl70vlq9WdbSy5WSr6ZfnldbOwVLXJ9VPecJTvW6bakjTdG0DsLyr4ykX2Rl8TgPSbrSdpVUOirXNsjL5MwPePItAjQwX+8KlBTuQ+3H+g9DkedVvKEAoQh/Sf8kD3EASTxbRUo3hdsoCG6gqH7Sey3Zyb6MyVSvTa0UrXyoF142neDM0TlWlN0pUkermuHWMoOTAnKPnB866wrvIgNgPU4QZ+0CqNLF2i/iEGfz56CE6PPjET6Gwf9LfaX6dNV5QP15VpEKtOQ3vj2Vy1n+L9zy3zL45LD/CGHYkoCLaRIOU+56cKhE/uFWGW0BuYRyO6rgT+IE+WyGvAvvd7UBG6XeAPtjxsQOY0i9UB0GgdhvGBqjy9vkxA==
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9ff2cbb8-8091-4b8c-7796-08d884ba5e76
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2020 14:18:45.8579
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: K80/VnEhy4ic+QzNLIsVOYLPoWPF9CHU/LhUcT2Iuwo2DgOQ24SU7LQR3cCWKu0g
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0401MB2384
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-kmemleak reported a memory leak allocated in query_info() when cifs is
-working with modefromsid.
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 
-  backtrace:
-    [<00000000aeef6a1e>] slab_post_alloc_hook+0x58/0x510
-    [<00000000b2f7a440>] __kmalloc+0x1a0/0x390
-    [<000000006d470ebc>] query_info+0x5b5/0x700 [cifs]
-    [<00000000bad76ce0>] SMB2_query_acl+0x2b/0x30 [cifs]
-    [<000000001fa09606>] get_smb2_acl_by_path+0x2f3/0x720 [cifs]
-    [<000000001b6ebab7>] get_smb2_acl+0x75/0x90 [cifs]
-    [<00000000abf43904>] cifs_acl_to_fattr+0x13b/0x1d0 [cifs]
-    [<00000000a5372ec3>] cifs_get_inode_info+0x4cd/0x9a0 [cifs]
-    [<00000000388e0a04>] cifs_revalidate_dentry_attr+0x1cd/0x510 [cifs]
-    [<0000000046b6b352>] cifs_getattr+0x8a/0x260 [cifs]
-    [<000000007692c95e>] vfs_getattr_nosec+0xa1/0xc0
-    [<00000000cbc7d742>] vfs_getattr+0x36/0x40
-    [<00000000de8acf67>] vfs_statx_fd+0x4a/0x80
-    [<00000000a58c6adb>] __do_sys_newfstat+0x31/0x70
-    [<00000000300b3b4e>] __x64_sys_newfstat+0x16/0x20
-    [<000000006d8e9c48>] do_syscall_64+0x37/0x80
-
-This patch add missing kfree for pntsd when mounting modefromsid option.
-
-Cc: Stable <stable@vger.kernel.org>
-Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
----
- fs/cifs/cifsacl.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 23b21e943652..ef4784e72b1d 100644
---- a/fs/cifs/cifsacl.c
-+++ b/fs/cifs/cifsacl.c
-@@ -1266,6 +1266,7 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
- 		cifs_dbg(VFS, "%s: error %d getting sec desc\n", __func__, rc);
- 	} else if (mode_from_special_sid) {
- 		rc = parse_sec_desc(cifs_sb, pntsd, acllen, fattr, true);
-+		kfree(pntsd);
- 	} else {
- 		/* get approximated mode from ACL */
- 		rc = parse_sec_desc(cifs_sb, pntsd, acllen, fattr, false);
--- 
-2.17.1
+Cheers,
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
+E
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
+nchen)
 
