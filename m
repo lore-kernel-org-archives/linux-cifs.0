@@ -2,203 +2,184 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0043AC5519F
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 16:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15595C2D0E4
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 18:37:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 894AA206FA
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 16:54:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50EC320637
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 18:37:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GsapZQbL"
+	dkim=pass (1024-bit key) header.d=fieldses.org header.i=@fieldses.org header.b="NSOjEa8O"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728770AbgKLQyR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 12 Nov 2020 11:54:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28006 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727739AbgKLQyR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 12 Nov 2020 11:54:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605200054;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HGrk85a0VZVfDIo9MNpIfHt62UYe1QlF3HTUKbfYRUc=;
-        b=GsapZQbL8DVm/n5mMrRMSm11HLSKYL2+OHEB5eI0QdhW9i2a5mFpArmN8fFQw7GikGPCcm
-        iQZDtzhrp946POy5pZprJ/UmW7PVgYrL5su/xAt7dnVEpayjTinvvvo6m6qSLWo3iLAP1V
-        RJHoW7srkbhl5Sgsq1hRAnzE20IikEw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-Qnmvm0OEMaqqpFKUqCkxbg-1; Thu, 12 Nov 2020 11:54:11 -0500
-X-MC-Unique: Qnmvm0OEMaqqpFKUqCkxbg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77D7A6D254;
-        Thu, 12 Nov 2020 16:54:09 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-47.rdu2.redhat.com [10.10.115.47])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D55EB5D993;
-        Thu, 12 Nov 2020 16:54:06 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <22138FE2-9E79-4E24-99FC-74A35651B0C1@oracle.com>
-References: <22138FE2-9E79-4E24-99FC-74A35651B0C1@oracle.com> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com> <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk> <2380561.1605195776@warthog.procyon.org.uk>
-To:     Chuck Lever <chuck.lever@oracle.com>
-Cc:     dhowells@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Bruce Fields <bfields@fieldses.org>,
-        linux-crypto@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-afs@lists.infradead.org
+        id S1726194AbgKLShS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 12 Nov 2020 13:37:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41202 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726148AbgKLShS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Nov 2020 13:37:18 -0500
+Received: from fieldses.org (fieldses.org [IPv6:2600:3c00:e000:2f7::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AD0CC0613D1;
+        Thu, 12 Nov 2020 10:37:18 -0800 (PST)
+Received: by fieldses.org (Postfix, from userid 2815)
+        id CB93C1E3B; Thu, 12 Nov 2020 13:37:17 -0500 (EST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 fieldses.org CB93C1E3B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fieldses.org;
+        s=default; t=1605206237;
+        bh=Ig7MoAhTLZXaNQ4E5S7TOqyF6MAcb4TbDz8tkp3ULV4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NSOjEa8OJOqemBTKNSUMH9tbkGbtDT33jE35eFxfkaA1/Mw7Zp4fMtsBEgZEbjYef
+         te6bVwm4WSrBylhHkrZB84kR006+dyyCR722LipKqxYjqxeg113qWIhK8d0WDegYXa
+         Ds9Ls2BVkx3HxWMmt1Mqd1EhSspO9o9DQ1Qa9ZmQ=
+Date:   Thu, 12 Nov 2020 13:37:17 -0500
+From:   "J. Bruce Fields" <bfields@fieldses.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     herbert@gondor.apana.org.au, trond.myklebust@hammerspace.com,
+        linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Subject: Re: [RFC][PATCH 00/18] crypto: Add generic Kerberos library
+Message-ID: <20201112183717.GH9243@fieldses.org>
+References: <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2422486.1605200046.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 12 Nov 2020 16:54:06 +0000
-Message-ID: <2422487.1605200046@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Chuck Lever <chuck.lever@oracle.com> wrote:
+On Thu, Nov 12, 2020 at 12:57:45PM +0000, David Howells wrote:
+> 
+> Hi Herbert, Bruce,
+> 
+> Here's my first cut at a generic Kerberos crypto library in the kernel so
+> that I can share code between rxrpc and sunrpc (and cifs?).
+> 
+> I derived some of the parts from the sunrpc gss library and added more
+> advanced AES and Camellia crypto.  I haven't ported across the DES-based
+> crypto yet - I figure that can wait a bit till the interface is sorted.
+> 
+> Whilst I have put it into a directory under crypto/, I haven't made an
+> interface that goes and loads it (analogous to crypto_alloc_skcipher,
+> say).  Instead, you call:
+> 
+>         const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
+> 
+> to go and get a handler table and then use a bunch of accessor functions to
+> jump through the hoops.  This is basically the way the sunrpc gsslib does
+> things.  It might be worth making it so you do something like:
+> 
+> 	struct crypto_mech *ctx = crypto_mech_alloc("krb5(18)");
+> 
+> to get enctype 18, but I'm not sure if it's worth the effort.  Also, I'm
+> not sure if there are any alternatives to kerberos we will need to support.
 
-> Really? My understanding of the Linux kernel SUNRPC implementation is
-> that it uses asynchronous, even for small data items. Maybe I'm using
-> the terminology incorrectly.
+We did have code for a non-krb5 mechanism at some point, but it was torn
+out.  So I don't think that's a priority.
 
-Seems to be synchronous, at least in its use of skcipher:
+(Chuck, will RPC-over-SSL need a new non-krb5 mechanism?)
 
-grep -e skcipher *
-gss_krb5_crypto.c:#include <crypto/skcipher.h>
-gss_krb5_crypto.c:	struct crypto_sync_skcipher *tfm,
-gss_krb5_crypto.c:	if (length % crypto_sync_skcipher_blocksize(tfm) !=3D 0=
-)
-gss_krb5_crypto.c:	if (crypto_sync_skcipher_ivsize(tfm) > GSS_KRB5_MAX_BLO=
-CKSIZE) {
-gss_krb5_crypto.c:			crypto_sync_skcipher_ivsize(tfm));
-gss_krb5_crypto.c:		memcpy(local_iv, iv, crypto_sync_skcipher_ivsize(tfm))=
-;
-gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, tfm);
-gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
-gss_krb5_crypto.c:	skcipher_request_set_crypt(req, sg, sg, length, local_i=
-v);
-gss_krb5_crypto.c:	ret =3D crypto_skcipher_encrypt(req);
-gss_krb5_crypto.c:	skcipher_request_zero(req);
-gss_krb5_crypto.c:     struct crypto_sync_skcipher *tfm,
-gss_krb5_crypto.c:	if (length % crypto_sync_skcipher_blocksize(tfm) !=3D 0=
-)
-gss_krb5_crypto.c:	if (crypto_sync_skcipher_ivsize(tfm) > GSS_KRB5_MAX_BLO=
-CKSIZE) {
-gss_krb5_crypto.c:			crypto_sync_skcipher_ivsize(tfm));
-gss_krb5_crypto.c:		memcpy(local_iv, iv, crypto_sync_skcipher_ivsize(tfm))=
-;
-gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, tfm);
-gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
-gss_krb5_crypto.c:	skcipher_request_set_crypt(req, sg, sg, length, local_i=
-v);
-gss_krb5_crypto.c:	ret =3D crypto_skcipher_decrypt(req);
-gss_krb5_crypto.c:	skcipher_request_zero(req);
-gss_krb5_crypto.c:	struct skcipher_request *req;
-gss_krb5_crypto.c:	struct crypto_sync_skcipher *tfm =3D
-gss_krb5_crypto.c:		crypto_sync_skcipher_reqtfm(desc->req);
-gss_krb5_crypto.c:	fraglen =3D thislen & (crypto_sync_skcipher_blocksize(t=
-fm) - 1);
-gss_krb5_crypto.c:	skcipher_request_set_crypt(desc->req, desc->infrags, de=
-sc->outfrags,
-gss_krb5_crypto.c:	ret =3D crypto_skcipher_encrypt(desc->req);
-gss_krb5_crypto.c:gss_encrypt_xdr_buf(struct crypto_sync_skcipher *tfm, st=
-ruct xdr_buf *buf,
-gss_krb5_crypto.c:	BUG_ON((buf->len - offset) % crypto_sync_skcipher_block=
-size(tfm) !=3D 0);
-gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, tfm);
-gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
-gss_krb5_crypto.c:	skcipher_request_zero(req);
-gss_krb5_crypto.c:	struct skcipher_request *req;
-gss_krb5_crypto.c:	struct crypto_sync_skcipher *tfm =3D
-gss_krb5_crypto.c:		crypto_sync_skcipher_reqtfm(desc->req);
-gss_krb5_crypto.c:	fraglen =3D thislen & (crypto_sync_skcipher_blocksize(t=
-fm) - 1);
-gss_krb5_crypto.c:	skcipher_request_set_crypt(desc->req, desc->frags, desc=
-->frags,
-gss_krb5_crypto.c:	ret =3D crypto_skcipher_decrypt(desc->req);
-gss_krb5_crypto.c:gss_decrypt_xdr_buf(struct crypto_sync_skcipher *tfm, st=
-ruct xdr_buf *buf,
-gss_krb5_crypto.c:	BUG_ON((buf->len - offset) % crypto_sync_skcipher_block=
-size(tfm) !=3D 0);
-gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, tfm);
-gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
-gss_krb5_crypto.c:	skcipher_request_zero(req);
-gss_krb5_crypto.c:gss_krb5_cts_crypt(struct crypto_sync_skcipher *cipher, =
-struct xdr_buf *buf,
-gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, cipher);
-gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
-gss_krb5_crypto.c:	skcipher_request_set_crypt(req, sg, sg, len, iv);
-gss_krb5_crypto.c:		ret =3D crypto_skcipher_encrypt(req);
-gss_krb5_crypto.c:		ret =3D crypto_skcipher_decrypt(req);
-gss_krb5_crypto.c:	skcipher_request_zero(req);
-gss_krb5_crypto.c:	struct crypto_sync_skcipher *cipher, *aux_cipher;
-gss_krb5_crypto.c:	blocksize =3D crypto_sync_skcipher_blocksize(cipher);
-gss_krb5_crypto.c:		skcipher_request_set_sync_tfm(req, aux_cipher);
-gss_krb5_crypto.c:		skcipher_request_set_callback(req, 0, NULL, NULL);
-gss_krb5_crypto.c:		skcipher_request_zero(req);
-gss_krb5_crypto.c:	struct crypto_sync_skcipher *cipher, *aux_cipher;
-gss_krb5_crypto.c:	blocksize =3D crypto_sync_skcipher_blocksize(cipher);
-gss_krb5_crypto.c:		skcipher_request_set_sync_tfm(req, aux_cipher);
-gss_krb5_crypto.c:		skcipher_request_set_callback(req, 0, NULL, NULL);
-gss_krb5_crypto.c:		skcipher_request_zero(req);
-gss_krb5_keys.c:#include <crypto/skcipher.h>
-gss_krb5_keys.c:	struct crypto_sync_skcipher *cipher;
-gss_krb5_keys.c:	cipher =3D crypto_alloc_sync_skcipher(gk5e->encrypt_name,=
- 0, 0);
-gss_krb5_keys.c:	if (crypto_sync_skcipher_setkey(cipher, inkey->data, inke=
-y->len))
-gss_krb5_keys.c:	crypto_free_sync_skcipher(cipher);
-gss_krb5_mech.c:#include <crypto/skcipher.h>
-gss_krb5_mech.c:	struct krb5_ctx *ctx, struct crypto_sync_skcipher **res)
-gss_krb5_mech.c:	*res =3D crypto_alloc_sync_skcipher(ctx->gk5e->encrypt_na=
-me, 0, 0);
-gss_krb5_mech.c:	if (crypto_sync_skcipher_setkey(*res, key.data, key.len))=
- {
-gss_krb5_mech.c:	crypto_free_sync_skcipher(*res);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->seq);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->enc);
-gss_krb5_mech.c:static struct crypto_sync_skcipher *
-gss_krb5_mech.c:	struct crypto_sync_skcipher *cp;
-gss_krb5_mech.c:	cp =3D crypto_alloc_sync_skcipher(cname, 0, 0);
-gss_krb5_mech.c:	if (crypto_sync_skcipher_setkey(cp, key, ctx->gk5e->keyle=
-ngth)) {
-gss_krb5_mech.c:		crypto_free_sync_skcipher(cp);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->enc);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->seq);
-gss_krb5_mech.c:			crypto_free_sync_skcipher(ctx->initiator_enc_aux);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->acceptor_enc);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->initiator_enc);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->seq);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->enc);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->acceptor_enc);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->initiator_enc);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->acceptor_enc_aux);
-gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->initiator_enc_aux);
-gss_krb5_seqnum.c:#include <crypto/skcipher.h>
-gss_krb5_seqnum.c:		struct crypto_sync_skcipher *key,
-gss_krb5_seqnum.c:	struct crypto_sync_skcipher *key =3D kctx->seq;
-gss_krb5_wrap.c:#include <crypto/skcipher.h>
-gss_krb5_wrap.c:	blocksize =3D crypto_sync_skcipher_blocksize(kctx->enc);
-gss_krb5_wrap.c:	blocksize =3D crypto_sync_skcipher_blocksize(kctx->enc);
+> There are three main interfaces to it:
+> 
+>  (*) I/O crypto: encrypt, decrypt, get_mic and verify_mic.
+> 
+>      These all do in-place crypto, using an sglist to define the buffer
+>      with the data in it.  Is it necessary to make it able to take separate
+>      input and output buffers?
 
-David
+I don't know.  My memory is that the buffer management in the existing
+rpcsec_gss code is complex and fragile.  See e.g. the long comment in
+gss_krb5_remove_padding.
 
+--b.
+
+>  (*) PRF+ calculation for key derivation.
+>  (*) Kc, Ke, Ki derivation.
+> 
+>      These use krb5_buffer structs to pass objects around.  This is akin to
+>      the xdr_netobj, but has a void* instead of a u8* data pointer.
+> 
+> In terms of rxrpc's rxgk, there's another step in key derivation that isn't
+> part of the kerberos standard, but uses the PRF+ function to generate a key
+> that is then used to generate Kc, Ke and Ki.  Is it worth putting this into
+> the directory or maybe having a callout to insert an intermediate step in
+> key derivation?
+> 
+> Note that, for purposes of illustration, I've included some rxrpc patches
+> that use this interface to implement the rxgk Rx security class.  The
+> branch also is based on some rxrpc patches that are a prerequisite for
+> this, but the crypto patches don't need it.
+> 
+> ---
+> The patches can be found here also:
+> 
+> 	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=crypto-krb5
+> 
+> David
+> ---
+> David Howells (18):
+>       crypto/krb5: Implement Kerberos crypto core
+>       crypto/krb5: Add some constants out of sunrpc headers
+>       crypto/krb5: Provide infrastructure and key derivation
+>       crypto/krb5: Implement the Kerberos5 rfc3961 key derivation
+>       crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt functions
+>       crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic
+>       crypto/krb5: Implement the AES enctypes from rfc3962
+>       crypto/krb5: Implement crypto self-testing
+>       crypto/krb5: Implement the AES enctypes from rfc8009
+>       crypto/krb5: Implement the AES encrypt/decrypt from rfc8009
+>       crypto/krb5: Add the AES self-testing data from rfc8009
+>       crypto/krb5: Implement the Camellia enctypes from rfc6803
+>       rxrpc: Add the security index for yfs-rxgk
+>       rxrpc: Add YFS RxGK (GSSAPI) security class
+>       rxrpc: rxgk: Provide infrastructure and key derivation
+>       rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)
+>       rxrpc: rxgk: Implement connection rekeying
+>       rxgk: Support OpenAFS's rxgk implementation
+> 
+> 
+>  crypto/krb5/Kconfig              |    9 +
+>  crypto/krb5/Makefile             |   11 +-
+>  crypto/krb5/internal.h           |  101 +++
+>  crypto/krb5/kdf.c                |  223 ++++++
+>  crypto/krb5/main.c               |  190 +++++
+>  crypto/krb5/rfc3961_simplified.c |  732 ++++++++++++++++++
+>  crypto/krb5/rfc3962_aes.c        |  140 ++++
+>  crypto/krb5/rfc6803_camellia.c   |  249 ++++++
+>  crypto/krb5/rfc8009_aes2.c       |  440 +++++++++++
+>  crypto/krb5/selftest.c           |  543 +++++++++++++
+>  crypto/krb5/selftest_data.c      |  289 +++++++
+>  fs/afs/misc.c                    |   13 +
+>  include/crypto/krb5.h            |  100 +++
+>  include/keys/rxrpc-type.h        |   17 +
+>  include/trace/events/rxrpc.h     |    4 +
+>  include/uapi/linux/rxrpc.h       |   17 +
+>  net/rxrpc/Kconfig                |   10 +
+>  net/rxrpc/Makefile               |    5 +
+>  net/rxrpc/ar-internal.h          |   20 +
+>  net/rxrpc/conn_object.c          |    2 +
+>  net/rxrpc/key.c                  |  319 ++++++++
+>  net/rxrpc/rxgk.c                 | 1232 ++++++++++++++++++++++++++++++
+>  net/rxrpc/rxgk_app.c             |  424 ++++++++++
+>  net/rxrpc/rxgk_common.h          |  164 ++++
+>  net/rxrpc/rxgk_kdf.c             |  271 +++++++
+>  net/rxrpc/security.c             |    6 +
+>  26 files changed, 5530 insertions(+), 1 deletion(-)
+>  create mode 100644 crypto/krb5/kdf.c
+>  create mode 100644 crypto/krb5/rfc3961_simplified.c
+>  create mode 100644 crypto/krb5/rfc3962_aes.c
+>  create mode 100644 crypto/krb5/rfc6803_camellia.c
+>  create mode 100644 crypto/krb5/rfc8009_aes2.c
+>  create mode 100644 crypto/krb5/selftest.c
+>  create mode 100644 crypto/krb5/selftest_data.c
+>  create mode 100644 net/rxrpc/rxgk.c
+>  create mode 100644 net/rxrpc/rxgk_app.c
+>  create mode 100644 net/rxrpc/rxgk_common.h
+>  create mode 100644 net/rxrpc/rxgk_kdf.c
+> 
