@@ -4,60 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C021C56202
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 15:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0043AC5519F
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 16:54:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEA87221E9
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 15:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 894AA206FA
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 16:54:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="I+c7hO+b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GsapZQbL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728512AbgKLPtZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 12 Nov 2020 10:49:25 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:49316 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728032AbgKLPtX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Nov 2020 10:49:23 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0ACFTOcY091503;
-        Thu, 12 Nov 2020 15:49:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to;
- s=corp-2020-01-29; bh=bD1V5q95i6+ADV+YeAFQt2s8ENYs/W7Au47fsVzm170=;
- b=I+c7hO+bjcs00L2rQ4D9vhfLswmZuCqk8qj2Zy513vtnws9SiGwmfaAz+zOmv0gRqTSo
- Yl2cnvrFzhNjuZychmZGau0YrII9Ro+yhj+BD2XvIQ+khyK+s8kZ+LbbXgL8halL1px4
- Uozki8PMlSG60yqLJDKEeExb45H4jKL8F8e8CVFlIpylUYUQhAAO2n3uUgyiR65IY0Bw
- TpBPXFKJYSvkWq96Y3iegUx8Y9eBA+2p/DtC+CcSWXdUxvEDxhPS00SUB980D+1QtW21
- X6pMiCC78K0BL7hJ9vVX1vWNaN38N0iuyxkfBrnUeVA8evI2IPwpe0JcterNmlbbCs5p uA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 34p72ev7f9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 12 Nov 2020 15:49:09 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0ACFVCnl133264;
-        Thu, 12 Nov 2020 15:49:08 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 34rt5686x6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Nov 2020 15:49:08 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0ACFn5ll005827;
-        Thu, 12 Nov 2020 15:49:05 GMT
-Received: from anon-dhcp-152.1015granger.net (/68.61.232.219)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 12 Nov 2020 07:49:05 -0800
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.4\))
-Subject: Re: [RFC][PATCH 00/18] crypto: Add generic Kerberos library
-From:   Chuck Lever <chuck.lever@oracle.com>
-In-Reply-To: <2380561.1605195776@warthog.procyon.org.uk>
-Date:   Thu, 12 Nov 2020 10:49:03 -0500
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        id S1728770AbgKLQyR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 12 Nov 2020 11:54:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28006 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727739AbgKLQyR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 12 Nov 2020 11:54:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605200054;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HGrk85a0VZVfDIo9MNpIfHt62UYe1QlF3HTUKbfYRUc=;
+        b=GsapZQbL8DVm/n5mMrRMSm11HLSKYL2+OHEB5eI0QdhW9i2a5mFpArmN8fFQw7GikGPCcm
+        iQZDtzhrp946POy5pZprJ/UmW7PVgYrL5su/xAt7dnVEpayjTinvvvo6m6qSLWo3iLAP1V
+        RJHoW7srkbhl5Sgsq1hRAnzE20IikEw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-359-Qnmvm0OEMaqqpFKUqCkxbg-1; Thu, 12 Nov 2020 11:54:11 -0500
+X-MC-Unique: Qnmvm0OEMaqqpFKUqCkxbg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77D7A6D254;
+        Thu, 12 Nov 2020 16:54:09 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-47.rdu2.redhat.com [10.10.115.47])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D55EB5D993;
+        Thu, 12 Nov 2020 16:54:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <22138FE2-9E79-4E24-99FC-74A35651B0C1@oracle.com>
+References: <22138FE2-9E79-4E24-99FC-74A35651B0C1@oracle.com> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com> <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk> <2380561.1605195776@warthog.procyon.org.uk>
+To:     Chuck Lever <chuck.lever@oracle.com>
+Cc:     dhowells@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
         Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
@@ -67,97 +62,143 @@ Cc:     CIFS <linux-cifs@vger.kernel.org>,
         linux-crypto@vger.kernel.org,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         linux-afs@lists.infradead.org
+Subject: Re: [RFC][PATCH 00/18] crypto: Add generic Kerberos library
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2422486.1605200046.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <22138FE2-9E79-4E24-99FC-74A35651B0C1@oracle.com>
-References: <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com>
- <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
- <2380561.1605195776@warthog.procyon.org.uk>
-To:     David Howells <dhowells@redhat.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.4)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9802 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 mlxscore=0
- mlxlogscore=999 suspectscore=0 adultscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011120093
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9802 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999 mlxscore=0
- malwarescore=0 suspectscore=0 lowpriorityscore=0 adultscore=0 phishscore=0
- priorityscore=1501 spamscore=0 impostorscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2011120093
+Date:   Thu, 12 Nov 2020 16:54:06 +0000
+Message-ID: <2422487.1605200046@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Chuck Lever <chuck.lever@oracle.com> wrote:
 
+> Really? My understanding of the Linux kernel SUNRPC implementation is
+> that it uses asynchronous, even for small data items. Maybe I'm using
+> the terminology incorrectly.
 
-> On Nov 12, 2020, at 10:42 AM, David Howells <dhowells@redhat.com> =
-wrote:
->=20
-> Chuck Lever <chuck.lever@oracle.com> wrote:
->=20
->>> There are three main interfaces to it:
->>>=20
->>> (*) I/O crypto: encrypt, decrypt, get_mic and verify_mic.
->>>=20
->>>    These all do in-place crypto, using an sglist to define the =
-buffer
->>>    with the data in it.  Is it necessary to make it able to take =
-separate
->>>    input and output buffers?
->>=20
->> Hi David, Wondering if these "I/O" APIs use synchronous or async
->> crypto under the covers. For small data items like MICs, synchronous
->> might be a better choice, especially if asynchronous crypto could
->> result in incoming requests getting re-ordered and falling out of
->> the GSS sequence number window.
->>=20
->> What say ye?
->=20
-> For the moment I'm using synchronous APIs as that's what sunrpc is =
-using (I
-> borrowed the basic code from there).
+Seems to be synchronous, at least in its use of skcipher:
 
-Really? My understanding of the Linux kernel SUNRPC implementation is
-that it uses asynchronous, even for small data items. Maybe I'm using
-the terminology incorrectly.
+grep -e skcipher *
+gss_krb5_crypto.c:#include <crypto/skcipher.h>
+gss_krb5_crypto.c:	struct crypto_sync_skcipher *tfm,
+gss_krb5_crypto.c:	if (length % crypto_sync_skcipher_blocksize(tfm) !=3D 0=
+)
+gss_krb5_crypto.c:	if (crypto_sync_skcipher_ivsize(tfm) > GSS_KRB5_MAX_BLO=
+CKSIZE) {
+gss_krb5_crypto.c:			crypto_sync_skcipher_ivsize(tfm));
+gss_krb5_crypto.c:		memcpy(local_iv, iv, crypto_sync_skcipher_ivsize(tfm))=
+;
+gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, tfm);
+gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
+gss_krb5_crypto.c:	skcipher_request_set_crypt(req, sg, sg, length, local_i=
+v);
+gss_krb5_crypto.c:	ret =3D crypto_skcipher_encrypt(req);
+gss_krb5_crypto.c:	skcipher_request_zero(req);
+gss_krb5_crypto.c:     struct crypto_sync_skcipher *tfm,
+gss_krb5_crypto.c:	if (length % crypto_sync_skcipher_blocksize(tfm) !=3D 0=
+)
+gss_krb5_crypto.c:	if (crypto_sync_skcipher_ivsize(tfm) > GSS_KRB5_MAX_BLO=
+CKSIZE) {
+gss_krb5_crypto.c:			crypto_sync_skcipher_ivsize(tfm));
+gss_krb5_crypto.c:		memcpy(local_iv, iv, crypto_sync_skcipher_ivsize(tfm))=
+;
+gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, tfm);
+gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
+gss_krb5_crypto.c:	skcipher_request_set_crypt(req, sg, sg, length, local_i=
+v);
+gss_krb5_crypto.c:	ret =3D crypto_skcipher_decrypt(req);
+gss_krb5_crypto.c:	skcipher_request_zero(req);
+gss_krb5_crypto.c:	struct skcipher_request *req;
+gss_krb5_crypto.c:	struct crypto_sync_skcipher *tfm =3D
+gss_krb5_crypto.c:		crypto_sync_skcipher_reqtfm(desc->req);
+gss_krb5_crypto.c:	fraglen =3D thislen & (crypto_sync_skcipher_blocksize(t=
+fm) - 1);
+gss_krb5_crypto.c:	skcipher_request_set_crypt(desc->req, desc->infrags, de=
+sc->outfrags,
+gss_krb5_crypto.c:	ret =3D crypto_skcipher_encrypt(desc->req);
+gss_krb5_crypto.c:gss_encrypt_xdr_buf(struct crypto_sync_skcipher *tfm, st=
+ruct xdr_buf *buf,
+gss_krb5_crypto.c:	BUG_ON((buf->len - offset) % crypto_sync_skcipher_block=
+size(tfm) !=3D 0);
+gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, tfm);
+gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
+gss_krb5_crypto.c:	skcipher_request_zero(req);
+gss_krb5_crypto.c:	struct skcipher_request *req;
+gss_krb5_crypto.c:	struct crypto_sync_skcipher *tfm =3D
+gss_krb5_crypto.c:		crypto_sync_skcipher_reqtfm(desc->req);
+gss_krb5_crypto.c:	fraglen =3D thislen & (crypto_sync_skcipher_blocksize(t=
+fm) - 1);
+gss_krb5_crypto.c:	skcipher_request_set_crypt(desc->req, desc->frags, desc=
+->frags,
+gss_krb5_crypto.c:	ret =3D crypto_skcipher_decrypt(desc->req);
+gss_krb5_crypto.c:gss_decrypt_xdr_buf(struct crypto_sync_skcipher *tfm, st=
+ruct xdr_buf *buf,
+gss_krb5_crypto.c:	BUG_ON((buf->len - offset) % crypto_sync_skcipher_block=
+size(tfm) !=3D 0);
+gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, tfm);
+gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
+gss_krb5_crypto.c:	skcipher_request_zero(req);
+gss_krb5_crypto.c:gss_krb5_cts_crypt(struct crypto_sync_skcipher *cipher, =
+struct xdr_buf *buf,
+gss_krb5_crypto.c:	skcipher_request_set_sync_tfm(req, cipher);
+gss_krb5_crypto.c:	skcipher_request_set_callback(req, 0, NULL, NULL);
+gss_krb5_crypto.c:	skcipher_request_set_crypt(req, sg, sg, len, iv);
+gss_krb5_crypto.c:		ret =3D crypto_skcipher_encrypt(req);
+gss_krb5_crypto.c:		ret =3D crypto_skcipher_decrypt(req);
+gss_krb5_crypto.c:	skcipher_request_zero(req);
+gss_krb5_crypto.c:	struct crypto_sync_skcipher *cipher, *aux_cipher;
+gss_krb5_crypto.c:	blocksize =3D crypto_sync_skcipher_blocksize(cipher);
+gss_krb5_crypto.c:		skcipher_request_set_sync_tfm(req, aux_cipher);
+gss_krb5_crypto.c:		skcipher_request_set_callback(req, 0, NULL, NULL);
+gss_krb5_crypto.c:		skcipher_request_zero(req);
+gss_krb5_crypto.c:	struct crypto_sync_skcipher *cipher, *aux_cipher;
+gss_krb5_crypto.c:	blocksize =3D crypto_sync_skcipher_blocksize(cipher);
+gss_krb5_crypto.c:		skcipher_request_set_sync_tfm(req, aux_cipher);
+gss_krb5_crypto.c:		skcipher_request_set_callback(req, 0, NULL, NULL);
+gss_krb5_crypto.c:		skcipher_request_zero(req);
+gss_krb5_keys.c:#include <crypto/skcipher.h>
+gss_krb5_keys.c:	struct crypto_sync_skcipher *cipher;
+gss_krb5_keys.c:	cipher =3D crypto_alloc_sync_skcipher(gk5e->encrypt_name,=
+ 0, 0);
+gss_krb5_keys.c:	if (crypto_sync_skcipher_setkey(cipher, inkey->data, inke=
+y->len))
+gss_krb5_keys.c:	crypto_free_sync_skcipher(cipher);
+gss_krb5_mech.c:#include <crypto/skcipher.h>
+gss_krb5_mech.c:	struct krb5_ctx *ctx, struct crypto_sync_skcipher **res)
+gss_krb5_mech.c:	*res =3D crypto_alloc_sync_skcipher(ctx->gk5e->encrypt_na=
+me, 0, 0);
+gss_krb5_mech.c:	if (crypto_sync_skcipher_setkey(*res, key.data, key.len))=
+ {
+gss_krb5_mech.c:	crypto_free_sync_skcipher(*res);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->seq);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->enc);
+gss_krb5_mech.c:static struct crypto_sync_skcipher *
+gss_krb5_mech.c:	struct crypto_sync_skcipher *cp;
+gss_krb5_mech.c:	cp =3D crypto_alloc_sync_skcipher(cname, 0, 0);
+gss_krb5_mech.c:	if (crypto_sync_skcipher_setkey(cp, key, ctx->gk5e->keyle=
+ngth)) {
+gss_krb5_mech.c:		crypto_free_sync_skcipher(cp);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->enc);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->seq);
+gss_krb5_mech.c:			crypto_free_sync_skcipher(ctx->initiator_enc_aux);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->acceptor_enc);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(ctx->initiator_enc);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->seq);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->enc);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->acceptor_enc);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->initiator_enc);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->acceptor_enc_aux);
+gss_krb5_mech.c:	crypto_free_sync_skcipher(kctx->initiator_enc_aux);
+gss_krb5_seqnum.c:#include <crypto/skcipher.h>
+gss_krb5_seqnum.c:		struct crypto_sync_skcipher *key,
+gss_krb5_seqnum.c:	struct crypto_sync_skcipher *key =3D kctx->seq;
+gss_krb5_wrap.c:#include <crypto/skcipher.h>
+gss_krb5_wrap.c:	blocksize =3D crypto_sync_skcipher_blocksize(kctx->enc);
+gss_krb5_wrap.c:	blocksize =3D crypto_sync_skcipher_blocksize(kctx->enc);
 
-The problem that arises is on the server. The asynchronous API can
-schedule, and if the server has other work to do, that can delay a
-verify_mic long enough that the request drops out of the GSS sequence
-number window (even a large window).
-
-Whatever the mechanism, we need to have deterministic ordering, at
-least on the server-side.
-
-
-> It would be interesting to consider using async, but there's a =
-potential
-> issue.  For the simplified profile, encryption and integrity checksum
-> generation can be done simultaneously, but decryption and verification =
-can't.
-> For the AES-2 profile, the reverse is true.
->=20
-> For my purposes in rxrpc, async mode isn't actually that useful since =
-I'm only
-> doing the contents of a UDP packet at a time.  Either I'm encrypting =
-with the
-> intention of immediate transmission or decrypting with the intention =
-of
-> immediately using the data, so I'm in a context where I can wait =
-anyway.
->=20
-> What might get me more of a boost would be to encrypt the app data =
-directly
-> into a UDP packet and decrypt the UDP packet directly into the app =
-buffers.
-> This is easier said than done, though, as there's typically security =
-metadata
-> inserted into the packet inside the encrypted region.
-
-
---
-Chuck Lever
-
-
+David
 
