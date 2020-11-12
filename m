@@ -2,96 +2,181 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB329C388F9
-	for <linux-cifs@archiver.kernel.org>; Wed, 11 Nov 2020 21:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D48C56201
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 12:58:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6185420825
-	for <linux-cifs@archiver.kernel.org>; Wed, 11 Nov 2020 21:39:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E954D21D91
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Nov 2020 12:57:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JjVirHVq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vaxpt1SU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725959AbgKKVj0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 11 Nov 2020 16:39:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44690 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725933AbgKKVjZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 11 Nov 2020 16:39:25 -0500
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7822BC0613D1
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2020 13:39:25 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id v144so5213539lfa.13
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2020 13:39:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JD/6RIDWszapLupngD31qX+0LOdMilCh5M3HEteGA/c=;
-        b=JjVirHVqAtBsxDtXH1iu7dIjOSrzpsQoUhdsKH36BSjrZ1JCFBkIakTMFITtuSPs0o
-         O2ZRD3BbrHi4woJixniNeJjGQaJYrp+uyGJ19tyAe3tLBN4HqIr/vJlxSBzT8BFsKGL8
-         90KIEWIRg8CQeprwbUuZm43khcodeSO0Iz917CSfz0LIFG1mJcPZCiWE6DmxsSoS7/d3
-         Njf7b8rqhTSOjQwXVSl2hyWrmGQ5pbU7xrhQi0e/LWSZCpx/cFyBKs0ooXZu5EI4XeCJ
-         bg8JuLXC0b2tNS+xyHcdcMSi3OnE6WJ8FMXfj0DOAZm3ll8LJyv/0Qcp+lNR60E9uhIE
-         VL8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JD/6RIDWszapLupngD31qX+0LOdMilCh5M3HEteGA/c=;
-        b=S43G0xa3j46QcTZqxNXTPyC/n1Jj+v5iBI//EuFsSq5wMZT+VHd297HEsf4y+OCtA8
-         iuzmM4F6Iv+D1xMVTm8KumQtEFE6tOvS4Zv6e5suBP3iazi+EEmmZCfViCplGqGX0M+I
-         k0+w9iQtilmvGITa70vYiRHidjYIno2q3ibj5sfsib4BSGNKTmnNNdfkWyD76v1oQkjt
-         n4BTg9TnO1ItPeKZYfFwOax0eCWORiMbLZNOCohCamv55wjR9wpsoy6Q80YjKQX/m4cC
-         rBgQloVg+4xZC6xLzYKAktIhezfrbumzPgV8mwnyzd76D408prq2HXI0rG52goCU79/D
-         RjUQ==
-X-Gm-Message-State: AOAM5326kgAg55iLjK2TMmRWk0pQ80ZKQ3qwDIOfgCf5XTBZuEVc+m2z
-        aN7pNgmfNYw0FOSRvWIxEaLv3QFflLhuggL5aL3/+Z1McBE=
-X-Google-Smtp-Source: ABdhPJzwmXkvGK9iT+pBlommbtvBhl6qQJEmW5eUxFQ54sWyAlbpGJgOHebiCQuWVbQzokn9QrtSe1YCr0k+bOcNeIo=
-X-Received: by 2002:ac2:5cc8:: with SMTP id f8mr8295888lfq.334.1605130763739;
- Wed, 11 Nov 2020 13:39:23 -0800 (PST)
+        id S1728210AbgKLM57 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 12 Nov 2020 07:57:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55190 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727863AbgKLM54 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 12 Nov 2020 07:57:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605185874;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=KApSY4n0QrJwiU60IUmc5BIOxVfBJ4BfZCyb2aGAlK4=;
+        b=Vaxpt1SUZv9xukXoyAbb097DXNNTjb7S5jPGkJSiLuDVRZlwbIIttTJhoUTtSZVJERfX6r
+        3+uwHJtxgeXPQz+FsC0Wr8Azx+mdzs1gep0XIdkj7ezMnOkrPpRdnyzXBd5t1IAQa1f/ex
+        WVQgjttSXk3ebFpfW8Z0yqRcq+BOtyQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-128-LTVl2aaZOp-mAJ7msfQEwQ-1; Thu, 12 Nov 2020 07:57:50 -0500
+X-MC-Unique: LTVl2aaZOp-mAJ7msfQEwQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BAE51882FAB;
+        Thu, 12 Nov 2020 12:57:48 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-47.rdu2.redhat.com [10.10.115.47])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4335A5D9E4;
+        Thu, 12 Nov 2020 12:57:46 +0000 (UTC)
+Subject: [RFC][PATCH 00/18] crypto: Add generic Kerberos library
+From:   David Howells <dhowells@redhat.com>
+To:     herbert@gondor.apana.org.au, bfields@fieldses.org
+Cc:     dhowells@redhat.com, trond.myklebust@hammerspace.com,
+        linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 12 Nov 2020 12:57:45 +0000
+Message-ID: <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-References: <CACdtm0YUmSx27NFh7KRwafY+agdTgubZ22QGrx=k8ZmyZit_Ww@mail.gmail.com>
-In-Reply-To: <CACdtm0YUmSx27NFh7KRwafY+agdTgubZ22QGrx=k8ZmyZit_Ww@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 11 Nov 2020 15:39:12 -0600
-Message-ID: <CAH2r5msm0Xbosxk6siMO8EVB_KeLq8skbt-Ngcu5a0qhcP25cQ@mail.gmail.com>
-Subject: Re: Handling race conditions during read offload path
-To:     Rohith Surabattula <rohiths.msft@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Pavel Shilovsky <piastryyy@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        sribhat.msa@outlook.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Updated patch descriptions with a little more info about the problem
-fixed.  Added cc:stable 5.4+ and merged into cifs-2.6.git for-next
-(pending a little more testing - buildbot etc. - but looks good)
 
-On Tue, Nov 10, 2020 at 2:35 AM Rohith Surabattula
-<rohiths.msft@gmail.com> wrote:
->
-> Hi All,
->
-> 1) During cifs reconnect, there is possibility of MID pending list
-> corruption when both offload and demultiplex thread tries to dequeue
-> MID from the list.
-> 2) Mid callback needs to be called only when valid data is read from socket.
->
-> So, I have addressed the above issues and attached the patches.
->
-> Regards,
-> Rohith
+Hi Herbert, Bruce,
+
+Here's my first cut at a generic Kerberos crypto library in the kernel so
+that I can share code between rxrpc and sunrpc (and cifs?).
+
+I derived some of the parts from the sunrpc gss library and added more
+advanced AES and Camellia crypto.  I haven't ported across the DES-based
+crypto yet - I figure that can wait a bit till the interface is sorted.
+
+Whilst I have put it into a directory under crypto/, I haven't made an
+interface that goes and loads it (analogous to crypto_alloc_skcipher,
+say).  Instead, you call:
+
+        const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
+
+to go and get a handler table and then use a bunch of accessor functions to
+jump through the hoops.  This is basically the way the sunrpc gsslib does
+things.  It might be worth making it so you do something like:
+
+	struct crypto_mech *ctx = crypto_mech_alloc("krb5(18)");
+
+to get enctype 18, but I'm not sure if it's worth the effort.  Also, I'm
+not sure if there are any alternatives to kerberos we will need to support.
+
+There are three main interfaces to it:
+
+ (*) I/O crypto: encrypt, decrypt, get_mic and verify_mic.
+
+     These all do in-place crypto, using an sglist to define the buffer
+     with the data in it.  Is it necessary to make it able to take separate
+     input and output buffers?
+
+ (*) PRF+ calculation for key derivation.
+ (*) Kc, Ke, Ki derivation.
+
+     These use krb5_buffer structs to pass objects around.  This is akin to
+     the xdr_netobj, but has a void* instead of a u8* data pointer.
+
+In terms of rxrpc's rxgk, there's another step in key derivation that isn't
+part of the kerberos standard, but uses the PRF+ function to generate a key
+that is then used to generate Kc, Ke and Ki.  Is it worth putting this into
+the directory or maybe having a callout to insert an intermediate step in
+key derivation?
+
+Note that, for purposes of illustration, I've included some rxrpc patches
+that use this interface to implement the rxgk Rx security class.  The
+branch also is based on some rxrpc patches that are a prerequisite for
+this, but the crypto patches don't need it.
+
+---
+The patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=crypto-krb5
+
+David
+---
+David Howells (18):
+      crypto/krb5: Implement Kerberos crypto core
+      crypto/krb5: Add some constants out of sunrpc headers
+      crypto/krb5: Provide infrastructure and key derivation
+      crypto/krb5: Implement the Kerberos5 rfc3961 key derivation
+      crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt functions
+      crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic
+      crypto/krb5: Implement the AES enctypes from rfc3962
+      crypto/krb5: Implement crypto self-testing
+      crypto/krb5: Implement the AES enctypes from rfc8009
+      crypto/krb5: Implement the AES encrypt/decrypt from rfc8009
+      crypto/krb5: Add the AES self-testing data from rfc8009
+      crypto/krb5: Implement the Camellia enctypes from rfc6803
+      rxrpc: Add the security index for yfs-rxgk
+      rxrpc: Add YFS RxGK (GSSAPI) security class
+      rxrpc: rxgk: Provide infrastructure and key derivation
+      rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)
+      rxrpc: rxgk: Implement connection rekeying
+      rxgk: Support OpenAFS's rxgk implementation
 
 
+ crypto/krb5/Kconfig              |    9 +
+ crypto/krb5/Makefile             |   11 +-
+ crypto/krb5/internal.h           |  101 +++
+ crypto/krb5/kdf.c                |  223 ++++++
+ crypto/krb5/main.c               |  190 +++++
+ crypto/krb5/rfc3961_simplified.c |  732 ++++++++++++++++++
+ crypto/krb5/rfc3962_aes.c        |  140 ++++
+ crypto/krb5/rfc6803_camellia.c   |  249 ++++++
+ crypto/krb5/rfc8009_aes2.c       |  440 +++++++++++
+ crypto/krb5/selftest.c           |  543 +++++++++++++
+ crypto/krb5/selftest_data.c      |  289 +++++++
+ fs/afs/misc.c                    |   13 +
+ include/crypto/krb5.h            |  100 +++
+ include/keys/rxrpc-type.h        |   17 +
+ include/trace/events/rxrpc.h     |    4 +
+ include/uapi/linux/rxrpc.h       |   17 +
+ net/rxrpc/Kconfig                |   10 +
+ net/rxrpc/Makefile               |    5 +
+ net/rxrpc/ar-internal.h          |   20 +
+ net/rxrpc/conn_object.c          |    2 +
+ net/rxrpc/key.c                  |  319 ++++++++
+ net/rxrpc/rxgk.c                 | 1232 ++++++++++++++++++++++++++++++
+ net/rxrpc/rxgk_app.c             |  424 ++++++++++
+ net/rxrpc/rxgk_common.h          |  164 ++++
+ net/rxrpc/rxgk_kdf.c             |  271 +++++++
+ net/rxrpc/security.c             |    6 +
+ 26 files changed, 5530 insertions(+), 1 deletion(-)
+ create mode 100644 crypto/krb5/kdf.c
+ create mode 100644 crypto/krb5/rfc3961_simplified.c
+ create mode 100644 crypto/krb5/rfc3962_aes.c
+ create mode 100644 crypto/krb5/rfc6803_camellia.c
+ create mode 100644 crypto/krb5/rfc8009_aes2.c
+ create mode 100644 crypto/krb5/selftest.c
+ create mode 100644 crypto/krb5/selftest_data.c
+ create mode 100644 net/rxrpc/rxgk.c
+ create mode 100644 net/rxrpc/rxgk_app.c
+ create mode 100644 net/rxrpc/rxgk_common.h
+ create mode 100644 net/rxrpc/rxgk_kdf.c
 
--- 
-Thanks,
 
-Steve
