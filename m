@@ -4,75 +4,94 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67ADEC63697
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFEAAC63798
 	for <linux-cifs@archiver.kernel.org>; Sat, 21 Nov 2020 11:18:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E83122224A
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Nov 2020 11:18:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4703920732
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Nov 2020 11:18:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727433AbgKULS2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S1727316AbgKULS2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Sat, 21 Nov 2020 06:18:28 -0500
-Received: from mail.archlinux.org ([95.216.189.61]:35414 "EHLO
+Received: from mail.archlinux.org ([95.216.189.61]:35416 "EHLO
         mail.archlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727316AbgKULS1 (ORCPT
+        with ESMTP id S1727403AbgKULS1 (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Sat, 21 Nov 2020 06:18:27 -0500
-X-Greylist: delayed 380 seconds by postgrey-1.27 at vger.kernel.org; Sat, 21 Nov 2020 06:18:26 EST
 Received: from mail.archlinux.org (localhost [127.0.0.1])
-        by mail.archlinux.org (Postfix) with ESMTP id 47F7523A909;
-        Sat, 21 Nov 2020 11:12:01 +0000 (UTC)
+        by mail.archlinux.org (Postfix) with ESMTP id B638F23A90B;
+        Sat, 21 Nov 2020 11:12:03 +0000 (UTC)
 From:   Jonas Witschel <diabonas@archlinux.org>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=archlinux.org;
-        s=mail; t=1605957121;
-        bh=RSetouJqjoB4R2XXbsAv84dFoGTvpmZd1c4v4uYrzpU=;
-        h=From:To:Cc:Subject:Date;
-        b=P1kTHBpVRE6m14+z8HBvFUBrS1mDjGMrd6rcnref3sK7DBw0G4ylUg275Y81wOsef
-         E5IJ2pIeVagOeUptCDq/ZZCYB6zR/LTWOEnjtbQD2Xhd8J4OYR0NA1X8l0sObs1xYb
-         JR66EVWrNqCegGPM0purQOblmM0sJk8jWfkFnelOoSJYLEhrEkcLU4brlt9gdl2ldt
-         uu4LexISiwD8pkukB1nIPB8TtmHZwE9UAVn8s5RAfMV4kkNVaRjD9O1jWlSGlVyeFp
-         iIUMA6wSAplx+Oei98ov7qe859UZcSKeeB0Y1DaO1MMbuwGPqnUKp11W17kdw/M0Zt
-         crho5J6y4G6QVMSzD8cVvhMm2GO5LPVO0XPTkaQOTSQkA1b2WzqjnlRmQb5UlsHqKG
-         h/sAbPWvZw0NpVreoMK/K6TBOVuAoI6vHY2SyelTRKAYmm4QAM5rePkwtS/I56yW2y
-         981DletlNoH7ka1NFOVd78NeR8HCzFDL7Zz+kMI4AS683RIsqNeSGYtnf3ld5QyIfe
-         Ipgrhmc+XlG9Oqqvc7dFn1xUrXskgEqz5dEVm/L+C4WkXaRVBztX9QlLI+j1NHYvi8
-         +/V8iiYy1/iefxrFTg2Xv1qUgQD8gIbSst0yDR8QKeC1NFs/5wNZ0fJlW5x6Q4Iiaf
-         L+Dbb5ifBNIqMPwTQrxcIMGY=
+        s=mail; t=1605957123;
+        bh=6Ez5xiGffkXtY4sphIeiOXlt8trqEHcBIKN3+5R6cSI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References;
+        b=Nia0xPaGQ05DbfQYg9xfH1pbExJHPV2RAvh+A7uTuHwmiMsoL1xYAM4yqgvwudF19
+         apoV8BvkNg+hCtt23iZ0oq1AX49zFB+8NxRMEJ66J+sdgUG6N8PZGMGiBAKlsLE1i0
+         O5Xow8unPRFXy/tBwZEHh7DnkYlVGt72xuHRyFZJ9JbNHaHogRmJ7Yb5ak26DhHNpT
+         z/Yduic0KUSI9oznhS/4SL/vmP3sVFvE1Shs3xh0Gdii3GPKA/Cp7urE0RshJT+kvs
+         06kPf1wQRDOHpTKNjZ+78g4BKJoqxTXfEJ/qH/rC+zikN4xJtb4w8mrCqz42LRn42V
+         ROiifXxEtRM5c8jD8ms2FSSBRjVldSBgLG++fx8Qv25x2fRG/vp+LO93dZ4jMEd2sG
+         vxB+b/LYvRiRA4pvjSbvQwZzSRvK5rlEgQBGCl5PHQsSt1SvnJr32RhIJIVV5524+A
+         expIQdiZcIpRn9dcssWrz/2qzHOmw/bpJc2SiRPhRvpjikrSTOdQWK+APyJMSDyi5K
+         Qj5+SCPySO0PRepURNYYqbNFiu+WyP7yOufkbhta6pitlo+588P5bzHoH3dM7XVLxJ
+         2OFedogPz3UKoX9D4uZD4KKE2Hq9jm75SB5Q0pjoWWTyv6jM69BFkjiAhyHpSx6Tio
+         sdcYkNKm6Q5vq/Ikh6zzpqTQ=
 To:     linux-cifs@vger.kernel.org
 Cc:     Jonas Witschel <diabonas@archlinux.org>
-Subject: [PATCH 0/2] cifs-utils: update the cap bounding set only when CAP_SETPCAP is given
-Date:   Sat, 21 Nov 2020 12:11:43 +0100
-Message-Id: <20201121111145.24975-1-diabonas@archlinux.org>
+Subject: [PATCH 1/2] mount.cifs: update the cap bounding set only when CAP_SETPCAP is given
+Date:   Sat, 21 Nov 2020 12:11:44 +0100
+Message-Id: <20201121111145.24975-2-diabonas@archlinux.org>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201121111145.24975-1-diabonas@archlinux.org>
+References: <20201121111145.24975-1-diabonas@archlinux.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-libcap-ng 0.8.1 tightened the error checking on capng_apply [1], returning an
-error of -4 [2] when trying to update the capability bounding set without
-having the CAP_SETPCAP capability to be able to do so.
+libcap-ng 0.8.1 tightened the error checking on capng_apply, returning an error
+of -4 when trying to update the capability bounding set without having the
+CAP_SETPCAP capability to be able to do so. Previous versions of libcap-ng
+silently skipped updating the bounding set and only updated the normal
+CAPNG_SELECT_CAPS capabilities instead.
 
-Existing applications need to accommodate these changes [3], see e.g. the
-corresponding changes in GNOME Keyring [4].
+Check beforehand whether we have CAP_SETPCAP, in which case we can use
+CAPNG_SELECT_BOTH to update both the normal capabilities and the bounding set.
+Otherwise, we can at least update the normal capabilities, but refrain from
+trying to update the bounding set to avoid getting an error.
 
-This patch series fixes mount.cifs and cifs.upall to work with libcapn-ng
-0.8.1, while maintaining backwards compatibility with previous versions.
+Signed-off-by: Jonas Witschel <diabonas@archlinux.org>
+---
+ mount.cifs.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-[1] https://github.com/stevegrubb/libcap-ng/commit/6a24a9c5e2f3af1d56430417ee8c9a04ead38e6c
-[2] https://github.com/stevegrubb/libcap-ng/commit/2ab6a03b78cfa7620641c772d13ddbf3b405576b
-[3] https://github.com/stevegrubb/libcap-ng/issues/21
-[4] https://gitlab.gnome.org/GNOME/gnome-keyring/-/commit/ebc7bc9efacc17049e54da8d96a4a29943621113
-
-Jonas Witschel (2):
-  mount.cifs: update the cap bounding set only when CAP_SETPCAP is given
-  cifs.upall: update the cap bounding set only when CAP_SETPCAP is given
-
- cifs.upcall.c | 7 ++++++-
- mount.cifs.c  | 7 ++++++-
- 2 files changed, 12 insertions(+), 2 deletions(-)
-
+diff --git a/mount.cifs.c b/mount.cifs.c
+index 4feb397..88b8b69 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -338,6 +338,8 @@ static int set_password(struct parsed_mount_info *parsed_info, const char *src)
+ static int
+ drop_capabilities(int parent)
+ {
++	capng_select_t set = CAPNG_SELECT_CAPS;
++
+ 	capng_setpid(getpid());
+ 	capng_clear(CAPNG_SELECT_BOTH);
+ 	if (parent) {
+@@ -355,7 +357,10 @@ drop_capabilities(int parent)
+ 			return EX_SYSERR;
+ 		}
+ 	}
+-	if (capng_apply(CAPNG_SELECT_BOTH)) {
++	if (capng_have_capability(CAPNG_EFFECTIVE, CAP_SETPCAP)) {
++		set = CAPNG_SELECT_BOTH;
++	}
++	if (capng_apply(set)) {
+ 		fprintf(stderr, "Unable to apply new capability set.\n");
+ 		return EX_SYSERR;
+ 	}
 -- 
 2.29.2
