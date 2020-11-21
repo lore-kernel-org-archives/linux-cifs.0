@@ -2,135 +2,100 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07E50C63798
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Nov 2020 22:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25427C388F9
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Nov 2020 11:18:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97FAC2240C
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Nov 2020 22:21:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="th/UjqVc"
+	by mail.kernel.org (Postfix) with ESMTP id A116020732
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Nov 2020 11:18:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728643AbgKTWVa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 20 Nov 2020 17:21:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49258 "EHLO
+        id S1727445AbgKULS2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 21 Nov 2020 06:18:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728362AbgKTWV3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Nov 2020 17:21:29 -0500
-Received: from mail-yb1-xb43.google.com (mail-yb1-xb43.google.com [IPv6:2607:f8b0:4864:20::b43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ED15C061A04;
-        Fri, 20 Nov 2020 14:21:29 -0800 (PST)
-Received: by mail-yb1-xb43.google.com with SMTP id 10so9964113ybx.9;
-        Fri, 20 Nov 2020 14:21:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=29/AaAKKWIjlxKBDiu42mXe16/c3LUzQvTdn0Wctw9g=;
-        b=th/UjqVcversiy9gEUr46cKRrhHywr0iTgf9mzUejm+T3/Jtu2c6ftjob7N1dnOe2S
-         rGVMit/4Gqy7ZDqW+do8x9wI8RCPt/cmuWncILsoBuux3CBAtfG8gT+eTL8wiBVSM5EH
-         rDgxqkIvK+vUXnfhgj71GxYIUQH1hInVNMbCl5+3prik9RGhi+hsmul85xXuf9uJVr2L
-         NGLQGWDmOXXHg4l9XujW0HrVyacbE3Q1QSLAkLJ0BjE5AdFqhLyeU3T8/6+nJ9hH0JSR
-         o1vAVeqr6Bt+/W6rGIwrn7PuvAvMGRmk1Avx4k6vjCg8etglRiDTMnimrqKcX/KEsNCP
-         0CAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=29/AaAKKWIjlxKBDiu42mXe16/c3LUzQvTdn0Wctw9g=;
-        b=g6dF/T3IXVX8QT4MfDxe+zp+ZIZ9xHCuMvUBvTX6zqjs95vMoZCWRjOR8ZvnplwSFE
-         MpW7FRJ+Cocr8Ai+2u86hCuhUCXhzTl/KKj91vXaqYUhzxnR9kkROQOnLFCEmRZKla1D
-         /TWlHYZvWd31yby8t+xuOaetfQfCA2rnKbYtvImZQoEgF4bMcyOH0wDgheWTNO/AQcgq
-         vKJHu61yvY4IK3yHPMgnP62czhvJ3I6HVNj4LuPzgNFrgnx06uPJAt0tvxIYKvpgGW+N
-         wvCFfMuDeRyb4r/j+b87COnXbi+be8kDhPqdSYEtYbeDyH//DWkZBm0w3V06nDyXNEdi
-         ds0A==
-X-Gm-Message-State: AOAM533E6x8M4HleYo3hGWOidsXyMY+wptATrgMwyVNBk+Ieg+ndwvCB
-        qvPHidvB8XuYLS48BjmsDU0X4FK8+hiPxZdptxg=
-X-Google-Smtp-Source: ABdhPJzYUhkcjTyH5GIcOV5fWMsl+OUdzem471zLY9usW3RhV8izQIRbyESMTmZwFikqgbfOQQqVvSSQCZzBPJX4q90=
-X-Received: by 2002:a5b:40e:: with SMTP id m14mr22113400ybp.33.1605910888617;
- Fri, 20 Nov 2020 14:21:28 -0800 (PST)
+        with ESMTP id S1727433AbgKULS1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 21 Nov 2020 06:18:27 -0500
+X-Greylist: delayed 380 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 21 Nov 2020 03:18:27 PST
+Received: from mail.archlinux.org (mail.archlinux.org [IPv6:2a01:4f9:c010:3052::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D632C0613CF
+        for <linux-cifs@vger.kernel.org>; Sat, 21 Nov 2020 03:18:27 -0800 (PST)
+Received: from mail.archlinux.org (localhost [127.0.0.1])
+        by mail.archlinux.org (Postfix) with ESMTP id 58D6B23A911;
+        Sat, 21 Nov 2020 11:12:06 +0000 (UTC)
+From:   Jonas Witschel <diabonas@archlinux.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=archlinux.org;
+        s=mail; t=1605957126;
+        bh=Sc1q0JViwidBv8pj7NcKF86KTr1AD+dIct32kmAbf+g=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References;
+        b=nP96ONqMyrGXhKxWlGKcwG1fz9hLJXTGEjj3qx4v440IuerDriv2YKSpV0iR9Q5ng
+         q1bzYnsGXlqXpYAgsQLhcWeDBWFilNiqaY2OU3i6te7PZ4TJVIFyuqxtZMRcFwAsI0
+         uVweNqCk2+zGR+aQl4V5nZVx6bgGDxSaEEBN3T2fZqk1+GfAVIJNYQ/yUMRlrxmq6c
+         rbDwUy3PTNhhOsrGVWMCZf7wFAc4/kpur0rGt9kTst8YRP4LKI4WekRJETuRvD5adm
+         8KLlJFVxPoN+joBlxma3aPHTI2tw1JUPxF3LZM/GWL8bQ+0ARmAhp0RaXfU64Oqs1L
+         GonECAOK2GWXukfJhPaWWkdWmb76epYk3DOBGKAviGoJ8WnSBtxVpHMlTflnXcbb9V
+         2MVnJURssBjFQCK7ErejGLfwVaFYK5Vm29T5cbUAOWpzzDIeFsvxIzrM3UOlZObwGS
+         8LX7G+ezViDTbMqguRk5EhaW1AhvtSOxQfowkXdhbwvpZf0zWGQrAaWjfYOOReAs7w
+         +Jj9csl9vHyFs8W6wRH5Tc7QDHlm79QdjHAjlu9PiMhHmm7OObTsTKGKFQLjAX3gDq
+         ysU4GKKTXgki4li0Vbli6EOISmbfRQl4Zd5Ya7S9C90xhB/71HV/jaZE25GQ2ltTYK
+         proJFynWUfwV9moFpo86bjqE=
+To:     linux-cifs@vger.kernel.org
+Cc:     Jonas Witschel <diabonas@archlinux.org>
+Subject: [PATCH 2/2] cifs.upall: update the cap bounding set only when CAP_SETPCAP is given
+Date:   Sat, 21 Nov 2020 12:11:45 +0100
+Message-Id: <20201121111145.24975-3-diabonas@archlinux.org>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201121111145.24975-1-diabonas@archlinux.org>
+References: <20201121111145.24975-1-diabonas@archlinux.org>
 MIME-Version: 1.0
-References: <cover.1605896059.git.gustavoars@kernel.org>
-In-Reply-To: <cover.1605896059.git.gustavoars@kernel.org>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Fri, 20 Nov 2020 23:21:17 +0100
-Message-ID: <CANiq72=E_gEVvqUUTSqU4zegC2=yZSTM4b=4G-iofp6d3=UgWQ@mail.gmail.com>
-Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
-        alsa-devel@alsa-project.org, amd-gfx@lists.freedesktop.org,
-        bridge@lists.linux-foundation.org, ceph-devel@vger.kernel.org,
-        cluster-devel@redhat.com, coreteam@netfilter.org,
-        devel@driverdev.osuosl.org, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
-        GR-everest-linux-l2@marvell.com, GR-Linux-NIC-Dev@marvell.com,
-        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
-        keyrings@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-acpi@vger.kernel.org, linux-afs@lists.infradead.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-arm-msm@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-cifs@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-decnet-user@lists.sourceforge.net,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        linux-fbdev@vger.kernel.org, linux-geode@lists.infradead.org,
-        linux-gpio@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-i3c@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-input <linux-input@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        linux-mmc@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
-        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
-        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
-        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
-        selinux@vger.kernel.org, target-devel@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        usb-storage@lists.one-eyed-alien.net,
-        virtualization@lists.linux-foundation.org,
-        wcn36xx@lists.infradead.org,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>,
-        Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Gustavo,
+libcap-ng 0.8.1 tightened the error checking on capng_apply, returning an error
+of -4 when trying to update the capability bounding set without having the
+CAP_SETPCAP capability to be able to do so. Previous versions of libcap-ng
+silently skipped updating the bounding set and only updated the normal
+CAPNG_SELECT_CAPS capabilities instead.
 
-On Fri, Nov 20, 2020 at 7:21 PM Gustavo A. R. Silva
-<gustavoars@kernel.org> wrote:
->
-> Hi all,
->
-> This series aims to fix almost all remaining fall-through warnings in
-> order to enable -Wimplicit-fallthrough for Clang.
+Check beforehand whether we have CAP_SETPCAP, in which case we can use
+CAPNG_SELECT_BOTH to update both the normal capabilities and the bounding set.
+Otherwise, we can at least update the normal capabilities, but refrain from
+trying to update the bounding set to avoid getting an error.
 
-Thanks for this.
+Signed-off-by: Jonas Witschel <diabonas@archlinux.org>
+---
+ cifs.upcall.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Since this warning is reliable in both/all compilers and we are
-eventually getting rid of all the cases, what about going even further
-and making it an error right after?
-
-Cheers,
-Miguel
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index 1559434..af1a0b0 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -88,6 +88,8 @@ typedef enum _sectype {
+ static int
+ trim_capabilities(bool need_environ)
+ {
++	capng_select_t set = CAPNG_SELECT_CAPS;
++
+ 	capng_clear(CAPNG_SELECT_BOTH);
+ 
+ 	/* SETUID and SETGID to change uid, gid, and grouplist */
+@@ -105,7 +107,10 @@ trim_capabilities(bool need_environ)
+ 		return 1;
+ 	}
+ 
+-	if (capng_apply(CAPNG_SELECT_BOTH)) {
++	if (capng_have_capability(CAPNG_EFFECTIVE, CAP_SETPCAP)) {
++		set = CAPNG_SELECT_BOTH;
++	}
++	if (capng_apply(set)) {
+ 		syslog(LOG_ERR, "%s: Unable to apply capability set: %m\n", __func__);
+ 		return 1;
+ 	}
+-- 
+2.29.2
