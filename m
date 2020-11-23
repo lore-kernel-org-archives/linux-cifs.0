@@ -2,129 +2,150 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE962C2D0E4
-	for <linux-cifs@archiver.kernel.org>; Mon, 23 Nov 2020 10:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3FEC83012
+	for <linux-cifs@archiver.kernel.org>; Mon, 23 Nov 2020 13:04:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E52821741
-	for <linux-cifs@archiver.kernel.org>; Mon, 23 Nov 2020 10:11:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51C3B21D91
+	for <linux-cifs@archiver.kernel.org>; Mon, 23 Nov 2020 13:04:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="huMDpxd3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727070AbgKWKLf convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 23 Nov 2020 05:11:35 -0500
-Received: from us-smtp-delivery-128.mimecast.com ([216.205.24.128]:35210 "EHLO
-        us-smtp-delivery-128.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726891AbgKWKLe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 23 Nov 2020 05:11:34 -0500
-Received: from pyro.gresearch.co.uk (pyro.gresearch.co.uk [185.31.13.5])
- (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-t2nw5beKOImaWEzczzZczg-1; Mon, 23 Nov 2020 05:11:31 -0500
-X-MC-Unique: t2nw5beKOImaWEzczzZczg-1
-X-IronPort-AV: E=McAfee;i="6000,8403,9813"; a="12441889"
-X-IronPort-AV: E=Sophos;i="5.78,363,1599519600"; 
-   d="scan'208";a="12441889"
-From:   Robert Smith <Robert.Smith@gresearch.co.uk>
-To:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Subject: CIFS mounts hanging after CIFS server restart
-Thread-Topic: CIFS mounts hanging after CIFS server restart
-Thread-Index: AdbBgP/3UOCxMLekQc24gBf1Kc6XTQ==
-Date:   Mon, 23 Nov 2020 10:11:26 +0000
-Message-ID: <CWXP123MB36224A8710D868C597AFF129CFFC0@CWXP123MB3622.GBRP123.PROD.OUTLOOK.COM>
-Accept-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9e6d6232-760d-49a6-24a2-08d88f982382
-x-ms-traffictypediagnostic: CWXP123MB3462:
-x-microsoft-antispam-prvs: <CWXP123MB3462551C37D7B96507346D57CFFC0@CWXP123MB3462.GBRP123.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:7691
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0
-x-microsoft-antispam-message-info: wzoVHPrPRCS+k53chawRS47ddPDsRi9oy5ugVMJloUBgOoojSoAnnaO8aQpPWXy7F2SwEbbDhQdRcOOxmAhLL9uV5mCKo3qqtySO8Ut35ujPi4z5mTrUEFawyLIzceLupen/qASf+c5qbYUM3hG6F1rP36fQqBOdf1mNiW731u+6WZocZud2gIbz/L2cQLbgh/dVLNdmpiXrZwGLzdJuXZyzL/5511IC2q2yvox2pzHz0HOAv2Ip6yt51ruFYOYe/+1w5NiDpw7tPp3wai1PcDegmZt2KuLzyEAqsIpv7IrPtITmRIR0qerx2ShUnkwZhTOL8htQe9wsFeXtdJPx2Q==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;
-    IPV:NLI;SFV:NSPM;H:CWXP123MB3622.GBRP123.PROD.OUTLOOK.COM;PTR:;
-    CAT:NONE;
-    SFS:(4636009)(136003)(396003)(39840400004)(346002)(366004)(376002)(6916009)(66556008)(2906002)(76116006)(64756008)(478600001)(52536014)(33656002)(66946007)(66476007)(71200400001)(66446008)(86362001)(9686003)(6506007)(7696005)(316002)(8936002)(5660300002)(26005)(186003)(83380400001)(55016002)(8676002);
-    DIR:OUT;SFP:1101
-x-ms-exchange-antispam-messagedata: f0iF3mw6+5csVFH9/rYQsR8Xg4lhja8jr+h57/pUrN6NOwWLrLy/yu+qgY7TGr17iv/1SAnaYpNwJTRqN97jNo8ItXP64ikNviKYDbnfCg81l63IaxHBXspjaggSUuq7j5CwddNNV++Et+g7/DAPu37jKsBkdy+fXgdRTdkqBIjoScPOukfLoiDETlXg07aHfi5qeJsoCJVOzMgbr+mXFmII2hfLyhqrqiAnzOlwBOvNRcSvmhtET6pN4quaKAF3v5+LlI8pTp/iGAgj/qf5e9PUbrFu2IEVzp9MPYiMtHNYLSbw7dhEr1TEu/FiHh8cxrrH1eCtKaEvmFNDEhOKRvXMWyiawUjaK5nlVB09gZ6+4yXVQmUOAW4kxAndK9fB17e0BW9+j8LP4tBiGTPADO7CY/n67um2dIzXwJBqD32ofnbLsoSIgj46YeMraHSgEG1XiTXFqSa5XUevvIdhp/5ZIrrat8m/Plc4TT26aNq22/awuIUMDuN1vqURKR+MqC095ShY1GDTg5TyBMzfuqslbbdEbIpxPzeqhy+jQTad1WOM9bL3X3DObR/pYrQY46O31F54xTV1SP2EZVulJEu4JDE+beDhMDXtkwm6yAXQ/bnXaeEK4Ux80NgbSnKc1EQJqejReiO0Mdk8zV5PQQ==
-x-ms-exchange-transport-forked: True
+        id S2388369AbgKWNDq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 23 Nov 2020 08:03:46 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40738 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388335AbgKWNDp (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 23 Nov 2020 08:03:45 -0500
+Received: from embeddedor (187-162-31-110.static.axtel.net [187.162.31.110])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 191D120758;
+        Mon, 23 Nov 2020 13:03:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1606136621;
+        bh=J/TET3MqSRKQBkZDLmw3offBuTNq8xblR6VPj5c7KTQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=huMDpxd34lY8zl81VJt6WrkzA8VbZ3WZKfCc+01YUsnQkEm+dvBfrNL343ZTscxgS
+         4cn7RRAIuR/6lyK6TO0qxACy3TNrSBuTodAx+s4Q2YpvApK9inZpqsbsSdtJmbV9Zx
+         YwwBYqtSxUH9kHvWkiEz2t98c4vnYVnAJ6qqQTEg=
+Date:   Mon, 23 Nov 2020 07:03:48 -0600
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     Joe Perches <joe@perches.com>, Kees Cook <keescook@chromium.org>,
+        Jakub Kicinski <kuba@kernel.org>, alsa-devel@alsa-project.org,
+        linux-atm-general@lists.sourceforge.net,
+        reiserfs-devel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        linux-ide@vger.kernel.org, dm-devel@redhat.com,
+        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
+        GR-everest-linux-l2@marvell.com, wcn36xx@lists.infradead.org,
+        samba-technical@lists.samba.org, linux-i3c@lists.infradead.org,
+        linux1394-devel@lists.sourceforge.net,
+        linux-afs@lists.infradead.org,
+        usb-storage@lists.one-eyed-alien.net, drbd-dev@lists.linbit.com,
+        devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
+        rds-devel@oss.oracle.com,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-scsi@vger.kernel.org, linux-rdma@vger.kernel.org,
+        oss-drivers@netronome.com, bridge@lists.linux-foundation.org,
+        linux-security-module@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        linux-stm32@st-md-mailman.stormreply.com, cluster-devel@redhat.com,
+        linux-acpi@vger.kernel.org, coreteam@netfilter.org,
+        intel-wired-lan@lists.osuosl.org, linux-input@vger.kernel.org,
+        Miguel Ojeda <ojeda@kernel.org>,
+        tipc-discussion@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        selinux@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, linux-geode@lists.infradead.org,
+        linux-can@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-gpio@vger.kernel.org, op-tee@lists.trustedfirmware.org,
+        linux-mediatek@lists.infradead.org, xen-devel@lists.xenproject.org,
+        nouveau@lists.freedesktop.org, linux-hams@vger.kernel.org,
+        ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org, linux-hwmon@vger.kernel.org,
+        x86@kernel.org, linux-nfs@vger.kernel.org,
+        GR-Linux-NIC-Dev@marvell.com, linux-mm@kvack.org,
+        netdev@vger.kernel.org, linux-decnet-user@lists.sourceforge.net,
+        linux-mmc@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        linux-sctp@vger.kernel.org, linux-usb@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        patches@opensource.cirrus.com, linux-integrity@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [Intel-wired-lan] [PATCH 000/141] Fix fall-through warnings for
+ Clang
+Message-ID: <20201123130348.GA3119@embeddedor>
+References: <cover.1605896059.git.gustavoars@kernel.org>
+ <20201120105344.4345c14e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <202011201129.B13FDB3C@keescook>
+ <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <202011220816.8B6591A@keescook>
+ <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
+ <ca071decb87cc7e905411423c05a48f9fd2f58d7.camel@perches.com>
+ <0147972a72bc13f3629de8a32dee6f1f308994b5.camel@HansenPartnership.com>
+ <d8d1e9add08cdd4158405e77762d4946037208f8.camel@perches.com>
+ <dbd2cb703ed9eefa7dde9281ea26ab0f7acc8afe.camel@HansenPartnership.com>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CWXP123MB3622.GBRP123.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e6d6232-760d-49a6-24a2-08d88f982382
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Nov 2020 10:11:26.5392 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0d1f3186-4993-4dc6-b52e-1ae2754e975d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WtIPlgXNU2UnzuenE4y0bMWA4/DgiH8YAAfLa82QdWT0bB1+8QIVNJ9KiC9g2vaDoIWsWFBepzIskORfYhSdYmbZ1h/nnUnqV8BM06RUGZ0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP123MB3462
-X-OriginatorOrg: gresearch.co.uk
-x-msw-jemd-newsletter: false
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=CUSA28A279 smtp.mailfrom=robert.smith@gresearch.co.uk
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: gresearch.co.uk
-Content-Language: en-US
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbd2cb703ed9eefa7dde9281ea26ab0f7acc8afe.camel@HansenPartnership.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
+On Sun, Nov 22, 2020 at 11:53:55AM -0800, James Bottomley wrote:
+> On Sun, 2020-11-22 at 11:22 -0800, Joe Perches wrote:
+> > On Sun, 2020-11-22 at 11:12 -0800, James Bottomley wrote:
+> > > On Sun, 2020-11-22 at 10:25 -0800, Joe Perches wrote:
+> > > > On Sun, 2020-11-22 at 10:21 -0800, James Bottomley wrote:
+> > > > > Please tell me our reward for all this effort isn't a single
+> > > > > missing error print.
+> > > > 
+> > > > There were quite literally dozens of logical defects found
+> > > > by the fallthrough additions.  Very few were logging only.
+> > > 
+> > > So can you give us the best examples (or indeed all of them if
+> > > someone is keeping score)?  hopefully this isn't a US election
+> > > situation ...
+> > 
+> > Gustavo?  Are you running for congress now?
+> > 
+> > https://lwn.net/Articles/794944/
+> 
+> That's 21 reported fixes of which about 50% seem to produce no change
+> in code behaviour at all, a quarter seem to have no user visible effect
+> with the remaining quarter producing unexpected errors on obscure
+> configuration parameters, which is why no-one really noticed them
+> before.
 
-We have seen an issue where a CIFS server restarting has caused client processes to hang.
+The really important point here is the number of bugs this has prevented
+and will prevent in the future. See an example of this, below:
 
-Server:
-Dell Isilon NAS (accessed via DFS)
+https://lore.kernel.org/linux-iio/20190813135802.GB27392@kroah.com/
 
-Client: 
-Flatcar Container Linux by Kinvolk 2605.4.0 (Oklo)
-Kernel: 5.4.65-flatcar
+This work is still relevant, even if the total number of issues/bugs
+we find in the process is zero (which is not the case).
 
-On the client, we run "touch --no-create /mnt/cfs/.cifskeepalive" regularly to keep the CIFS connections alive (workaround for another issue where idle connections die). These touch commands started hanging (along with all other users of CIFS). I sampled /proc/*/stack for several of the touch cmds, all gave the stacktrace below. We ended up with around 700 hung touch processes.
+"The sucky thing about doing hard work to deploy hardening is that the
+result is totally invisible by definition (things not happening) [..]"
+- Dmitry Vyukov
 
-[<0>] d_alloc_parallel+0x420/0x480
-[<0>] __lookup_slow+0x6e/0x150
-[<0>] lookup_slow+0x35/0x50
-[<0>] walk_component+0x1bf/0x330
-[<0>] path_lookupat.isra.50+0x6d/0x220
-[<0>] filename_lookup.part.66+0xa0/0x170
-[<0>] do_utimes+0xd9/0x160
-[<0>] __x64_sys_utimensat+0x7a/0xc0
-[<0>] do_syscall_64+0x4e/0x120
-[<0>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Also sampled a few cifs processes, these were all in
-
-Robert Smith  1 day ago
-# cat /proc/2477052/stack
-[<0>] iterate_supers_type+0x6d/0xf0
-[<0>] cifs_reconnect+0x8e/0xfd0 [cifs]
-[<0>] cifs_reconnect+0xeed/0xfd0 [cifs]
-[<0>] cifs_read_from_socket+0x4a/0x70 [cifs]
-[<0>] cifs_handle_standard+0x298/0xd60 [cifs]
-[<0>] kthread+0x112/0x130
-[<0>] ret_from_fork+0x35/0x40
-
-Sampling a few minutes apart showed voluntary_ctxt_switches increasing for a few of the 700 touch processes, so may not be totally hung.
-
-Any ideas what's causing this?
-
-Thanks for your help,
-
-Rob
+Thanks
+--
+Gustavo
 
 
---------------
-G-RESEARCH believes the information provided herein is reliable. While every care has been taken to ensure accuracy, the information is furnished to the recipients with no warranty as to the completeness and accuracy of its contents and on condition that any errors or omissions shall not be made the basis of any claim, demand or cause of action.
-The information in this email is intended only for the named recipient.  If you are not the intended recipient please notify us immediately and do not copy, distribute or take action based on this e-mail.
-All messages sent to and from this e-mail address will be logged by G-RESEARCH and are subject to archival storage, monitoring, review and disclosure. For information about how G-RESEARCH uses your personal data, please refer to our Privacy Policy at https://www.gresearch.co.uk/privacy-policy/.
-G-RESEARCH is the trading name of Trenchant Limited, 5th Floor, Whittington House, 19-30 Alfred Place, London WC1E 7EA.
-Trenchant Limited is a company registered in England with company number 08127121.
---------------
+
+
 
