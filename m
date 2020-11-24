@@ -2,62 +2,122 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE50C6379D
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Nov 2020 23:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAAE7C6379D
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Nov 2020 23:53:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACD772100A
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Nov 2020 23:48:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="uP131fcw"
+	by mail.kernel.org (Postfix) with ESMTP id 859782151B
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Nov 2020 23:53:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389690AbgKXXrg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 24 Nov 2020 18:47:36 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43644 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389688AbgKXXrg (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 24 Nov 2020 18:47:36 -0500
-Subject: Re: [GIT PULL] SMB3 Fixes
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606261655;
-        bh=75iVrFW8JETWV6JpVwwtosnIHY3TQJTqBN43wtI8E1g=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=uP131fcws6U/rSqdsFCBemhW1ESq2eIX1jdixaLXetuIoZyV2IQmvnkERxI14S/Qr
-         YDpPEiCQzAp1+Y7hSZXPN/Z+B/9rTFzdR9u88VYX2amS9RKencL/ppF/Ad7F0SdBLg
-         gQrOT0qWOWrNxokefGMMCXdsB15em4bTIXyAqgBI=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvPQWxW2feT+ELLpNR2fNCHqqchauuVoadiGpCwu2bAQg@mail.gmail.com>
-References: <CAH2r5mvPQWxW2feT+ELLpNR2fNCHqqchauuVoadiGpCwu2bAQg@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvPQWxW2feT+ELLpNR2fNCHqqchauuVoadiGpCwu2bAQg@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.10-rc5-smb3-fixes
-X-PR-Tracked-Commit-Id: 1254100030b3377e8302f9c75090ab191d73ee7c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 127c501a03d5db8b833e953728d3bcf53c8832a9
-Message-Id: <160626165553.526.12141216753579579480.pr-tracker-bot@kernel.org>
-Date:   Tue, 24 Nov 2020 23:47:35 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        id S1726742AbgKXXxV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 24 Nov 2020 18:53:21 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:43356 "EHLO
+        kvm5.telegraphics.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725989AbgKXXxU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Nov 2020 18:53:20 -0500
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by kvm5.telegraphics.com.au (Postfix) with ESMTP id DCBBC2AA63;
+        Tue, 24 Nov 2020 18:53:13 -0500 (EST)
+Date:   Wed, 25 Nov 2020 10:53:13 +1100 (AEDT)
+From:   Finn Thain <fthain@telegraphics.com.au>
+To:     Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+cc:     Kees Cook <keescook@chromium.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Joe Perches <joe@perches.com>,
+        Jakub Kicinski <kuba@kernel.org>, alsa-devel@alsa-project.org,
+        linux-atm-general@lists.sourceforge.net,
+        reiserfs-devel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        linux-ide@vger.kernel.org, dm-devel@redhat.com,
+        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
+        GR-everest-linux-l2@marvell.com, wcn36xx@lists.infradead.org,
+        samba-technical@lists.samba.org, linux-i3c@lists.infradead.org,
+        linux1394-devel@lists.sourceforge.net,
+        linux-afs@lists.infradead.org,
+        usb-storage@lists.one-eyed-alien.net, drbd-dev@lists.linbit.com,
+        devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
+        rds-devel@oss.oracle.com,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-scsi@vger.kernel.org, linux-rdma@vger.kernel.org,
+        oss-drivers@netronome.com, bridge@lists.linux-foundation.org,
+        linux-security-module@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        linux-stm32@st-md-mailman.stormreply.com, cluster-devel@redhat.com,
+        linux-acpi@vger.kernel.org, coreteam@netfilter.org,
+        intel-wired-lan@lists.osuosl.org,
+        linux-input <linux-input@vger.kernel.org>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        tipc-discussion@lists.sourceforge.net,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        linux-watchdog@vger.kernel.org, selinux@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        linux-geode@lists.infradead.org, linux-can@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-gpio@vger.kernel.org,
+        op-tee@lists.trustedfirmware.org,
+        linux-mediatek@lists.infradead.org, xen-devel@lists.xenproject.org,
+        nouveau@lists.freedesktop.org, linux-hams@vger.kernel.org,
+        ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-hwmon@vger.kernel.org,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-nfs@vger.kernel.org, GR-Linux-NIC-Dev@marvell.com,
+        Linux-MM <linux-mm@kvack.org>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-decnet-user@lists.sourceforge.net, linux-mmc@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-usb@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        patches@opensource.cirrus.com, linux-integrity@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-hardening@vger.kernel.org,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [Intel-wired-lan] [PATCH 000/141] Fix fall-through warnings for
+ Clang
+In-Reply-To: <CANiq72nUt57u5DG9rH=DB0DzQH7U6-QbG-2Ou+PyCY=p=_Ggag@mail.gmail.com>
+Message-ID: <alpine.LNX.2.23.453.2011251022550.14@nippy.intranet>
+References: <202011201129.B13FDB3C@keescook> <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com> <202011220816.8B6591A@keescook> <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com> <ca071decb87cc7e905411423c05a48f9fd2f58d7.camel@perches.com>
+ <0147972a72bc13f3629de8a32dee6f1f308994b5.camel@HansenPartnership.com> <d8d1e9add08cdd4158405e77762d4946037208f8.camel@perches.com> <dbd2cb703ed9eefa7dde9281ea26ab0f7acc8afe.camel@HansenPartnership.com> <20201123130348.GA3119@embeddedor>
+ <8f5611bb015e044fa1c0a48147293923c2d904e4.camel@HansenPartnership.com> <202011241327.BB28F12F6@keescook> <alpine.LNX.2.23.453.2011250859290.15@nippy.intranet> <CANiq72nUt57u5DG9rH=DB0DzQH7U6-QbG-2Ou+PyCY=p=_Ggag@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Tue, 24 Nov 2020 16:00:10 -0600:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.10-rc5-smb3-fixes
+On Wed, 25 Nov 2020, Miguel Ojeda wrote:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/127c501a03d5db8b833e953728d3bcf53c8832a9
+> 
+> The C standard has nothing to do with this. We use compiler extensions 
+> of several kinds, for many years. Even discounting those extensions, the 
+> kernel is not even conforming to C due to e.g. strict aliasing. I am not 
+> sure what you are trying to argue here.
+> 
 
-Thank you!
+I'm saying that supporting the official language spec makes more sense 
+than attempting to support a multitude of divergent interpretations of the 
+spec (i.e. gcc, clang, coverity etc.)
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+I'm also saying that the reason why we use -std=gnu89 is that existing 
+code was written in that language, not in ad hoc languages comprised of 
+collections of extensions that change with every release.
+
+> But, since you insist: yes, the `fallthrough` attribute is in the 
+> current C2x draft.
+> 
+
+Thank you for checking. I found a free version that's only 6 weeks old:
+
+http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2583.pdf
+
+It will be interesting to see whether 6.7.11.5 changes once the various 
+implementations reach agreement.
