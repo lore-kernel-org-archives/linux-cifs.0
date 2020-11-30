@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B906C83011
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC3DC71155
 	for <linux-cifs@archiver.kernel.org>; Mon, 30 Nov 2020 18:04:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5793E206F9
+	by mail.kernel.org (Postfix) with ESMTP id 25E43207F7
 	for <linux-cifs@archiver.kernel.org>; Mon, 30 Nov 2020 18:04:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387905AbgK3SDx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Nov 2020 13:03:53 -0500
-Received: from mx2.suse.de ([195.135.220.15]:45330 "EHLO mx2.suse.de"
+        id S2387903AbgK3SDw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 30 Nov 2020 13:03:52 -0500
+Received: from mx2.suse.de ([195.135.220.15]:45300 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387902AbgK3SDx (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 30 Nov 2020 13:03:53 -0500
+        id S1728571AbgK3SDw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 30 Nov 2020 13:03:52 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 389AAAF1B
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Nov 2020 18:03:11 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 7031FACF9
+        for <linux-cifs@vger.kernel.org>; Mon, 30 Nov 2020 18:03:10 +0000 (UTC)
 From:   Samuel Cabrero <scabrero@suse.de>
 To:     linux-cifs@vger.kernel.org
 Cc:     Samuel Cabrero <scabrero@suse.de>
-Subject: [PATCH v4 04/11] cifs: add witness mount option and data structs
-Date:   Mon, 30 Nov 2020 19:02:50 +0100
-Message-Id: <20201130180257.31787-5-scabrero@suse.de>
+Subject: [PATCH v4 01/11] cifs: Make extract_hostname function public
+Date:   Mon, 30 Nov 2020 19:02:47 +0100
+Message-Id: <20201130180257.31787-2-scabrero@suse.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201130180257.31787-1-scabrero@suse.de>
 References: <20201130180257.31787-1-scabrero@suse.de>
@@ -39,134 +39,119 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add 'witness' mount option to register for witness notifications.
+Move the function to misc.c and give it a public header.
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 ---
- fs/cifs/cifsfs.c   |  5 +++++
- fs/cifs/cifsglob.h |  4 ++++
- fs/cifs/connect.c  | 35 ++++++++++++++++++++++++++++++++++-
- 3 files changed, 43 insertions(+), 1 deletion(-)
+ fs/cifs/cifsproto.h |  1 +
+ fs/cifs/connect.c   | 34 ----------------------------------
+ fs/cifs/misc.c      | 32 ++++++++++++++++++++++++++++++++
+ 3 files changed, 33 insertions(+), 34 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 8111d0109a2e..c2bbc444b463 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -637,6 +637,11 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 		seq_printf(s, ",multichannel,max_channels=%zu",
- 			   tcon->ses->chan_max);
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index 24c6f36177ba..d716e81d86fa 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -620,6 +620,7 @@ int smb2_parse_query_directory(struct cifs_tcon *tcon, struct kvec *rsp_iov,
+ struct super_block *cifs_get_tcp_super(struct TCP_Server_Info *server);
+ void cifs_put_tcp_super(struct super_block *sb);
+ int update_super_prepath(struct cifs_tcon *tcon, char *prefix);
++char *extract_hostname(const char *unc);
  
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	if (tcon->use_witness)
-+		seq_puts(s, ",witness");
-+#endif
-+
- 	return 0;
- }
- 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 484ec2d8c5c9..f45b7c0fbceb 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -619,6 +619,7 @@ struct smb_vol {
- 	unsigned int max_channels;
- 	__u16 compression; /* compression algorithm 0xFFFF default 0=disabled */
- 	bool rootfs:1; /* if it's a SMB root file system */
-+	bool witness:1; /* use witness protocol */
- };
- 
- /**
-@@ -1177,6 +1178,9 @@ struct cifs_tcon {
- 	int remap:2;
- 	struct list_head ulist; /* cache update list */
- #endif
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	bool use_witness:1; /* use witness protocol */
-+#endif
- };
- 
- /*
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ static inline int get_dfs_path(const unsigned int xid, struct cifs_ses *ses,
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index a938371af6ef..22d46c8acc7f 100644
+index 28c1459fb0fc..a938371af6ef 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -102,7 +102,7 @@ enum {
- 	Opt_resilient, Opt_noresilient,
- 	Opt_domainauto, Opt_rdma, Opt_modesid, Opt_rootfs,
- 	Opt_multichannel, Opt_nomultichannel,
--	Opt_compress,
-+	Opt_compress, Opt_witness,
+@@ -284,7 +284,6 @@ static int ip_connect(struct TCP_Server_Info *server);
+ static int generic_ip_connect(struct TCP_Server_Info *server);
+ static void tlink_rb_insert(struct rb_root *root, struct tcon_link *new_tlink);
+ static void cifs_prune_tlinks(struct work_struct *work);
+-static char *extract_hostname(const char *unc);
  
- 	/* Mount options which take numeric value */
- 	Opt_backupuid, Opt_backupgid, Opt_uid,
-@@ -276,6 +276,7 @@ static const match_table_t cifs_mount_option_tokens = {
- 	{ Opt_ignore, "relatime" },
- 	{ Opt_ignore, "_netdev" },
- 	{ Opt_rootfs, "rootfs" },
-+	{ Opt_witness, "witness" },
+ /*
+  * Resolve hostname and set ip addr in tcp ses. Useful for hostnames that may
+@@ -1232,39 +1231,6 @@ cifs_demultiplex_thread(void *p)
+ 	module_put_and_exit(0);
+ }
  
- 	{ Opt_err, NULL }
- };
-@@ -1540,6 +1541,13 @@ cifs_parse_mount_options(const char *mountdata, const char *devname,
- 			vol->rootfs = true;
- #endif
- 			break;
-+		case Opt_witness:
-+#ifndef CONFIG_CIFS_SWN_UPCALL
-+			cifs_dbg(VFS, "Witness support needs CONFIG_CIFS_SWN_UPCALL kernel config option set\n");
-+			goto cifs_parse_mount_err;
-+#endif
-+			vol->witness = true;
-+			break;
- 		case Opt_posixpaths:
- 			vol->posix_paths = 1;
- 			break;
-@@ -3160,6 +3168,8 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 		return;
- 	}
- 
-+	/* TODO witness unregister */
+-/* extract the host portion of the UNC string */
+-static char *
+-extract_hostname(const char *unc)
+-{
+-	const char *src;
+-	char *dst, *delim;
+-	unsigned int len;
+-
+-	/* skip double chars at beginning of string */
+-	/* BB: check validity of these bytes? */
+-	if (strlen(unc) < 3)
+-		return ERR_PTR(-EINVAL);
+-	for (src = unc; *src && *src == '\\'; src++)
+-		;
+-	if (!*src)
+-		return ERR_PTR(-EINVAL);
+-
+-	/* delimiter between hostname and sharename is always '\\' now */
+-	delim = strchr(src, '\\');
+-	if (!delim)
+-		return ERR_PTR(-EINVAL);
+-
+-	len = delim - src;
+-	dst = kmalloc((len + 1), GFP_KERNEL);
+-	if (dst == NULL)
+-		return ERR_PTR(-ENOMEM);
+-
+-	memcpy(dst, src, len);
+-	dst[len] = '\0';
+-
+-	return dst;
+-}
+-
+ static int get_option_ul(substring_t args[], unsigned long *option)
+ {
+ 	int rc;
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 1c14cf01dbef..3d5cc25c167f 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -1195,3 +1195,35 @@ int update_super_prepath(struct cifs_tcon *tcon, char *prefix)
+ 	cifs_put_tcon_super(sb);
+ 	return rc;
+ }
 +
- 	list_del_init(&tcon->tcon_list);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
-@@ -3321,6 +3331,26 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb_vol *volume_info)
- 		tcon->use_resilient = true;
- 	}
- 
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	tcon->use_witness = false;
-+	if (volume_info->witness) {
-+		if (ses->server->vals->protocol_id >= SMB30_PROT_ID) {
-+			if (tcon->capabilities & SMB2_SHARE_CAP_CLUSTER) {
-+				/* TODO witness register */
-+				tcon->use_witness = true;
-+			} else {
-+				cifs_dbg(VFS, "witness requested on mount but no CLUSTER capability on share\n");
-+				rc = -EOPNOTSUPP;
-+				goto out_fail;
-+			}
-+		} else {
-+			cifs_dbg(VFS, "SMB3 or later required for witness option\n");
-+			rc = -EOPNOTSUPP;
-+			goto out_fail;
-+		}
-+	}
-+#endif
++/* extract the host portion of the UNC string */
++char *extract_hostname(const char *unc)
++{
++	const char *src;
++	char *dst, *delim;
++	unsigned int len;
 +
- 	/* If the user really knows what they are doing they can override */
- 	if (tcon->share_flags & SMB2_SHAREFLAG_NO_CACHING) {
- 		if (volume_info->cache_ro)
-@@ -5072,6 +5102,9 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
- 	vol_info->sectype = master_tcon->ses->sectype;
- 	vol_info->sign = master_tcon->ses->sign;
- 	vol_info->seal = master_tcon->seal;
-+#ifdef CONFIG_CIFS_SWN_UPCALL
-+	vol_info->witness = master_tcon->use_witness;
-+#endif
- 
- 	rc = cifs_set_vol_auth(vol_info, master_tcon->ses);
- 	if (rc) {
++	/* skip double chars at beginning of string */
++	/* BB: check validity of these bytes? */
++	if (strlen(unc) < 3)
++		return ERR_PTR(-EINVAL);
++	for (src = unc; *src && *src == '\\'; src++)
++		;
++	if (!*src)
++		return ERR_PTR(-EINVAL);
++
++	/* delimiter between hostname and sharename is always '\\' now */
++	delim = strchr(src, '\\');
++	if (!delim)
++		return ERR_PTR(-EINVAL);
++
++	len = delim - src;
++	dst = kmalloc((len + 1), GFP_KERNEL);
++	if (dst == NULL)
++		return ERR_PTR(-ENOMEM);
++
++	memcpy(dst, src, len);
++	dst[len] = '\0';
++
++	return dst;
++}
 -- 
 2.29.2
 
