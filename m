@@ -2,216 +2,134 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA68C64E7A
-	for <linux-cifs@archiver.kernel.org>; Tue,  1 Dec 2020 04:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E030BC8301A
+	for <linux-cifs@archiver.kernel.org>; Tue,  1 Dec 2020 05:54:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A395520658
-	for <linux-cifs@archiver.kernel.org>; Tue,  1 Dec 2020 04:20:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E6FD2087D
+	for <linux-cifs@archiver.kernel.org>; Tue,  1 Dec 2020 05:54:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vNwS6odc"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="emDPbOhP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728212AbgLAEUT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 30 Nov 2020 23:20:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36146 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728157AbgLAEUT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 30 Nov 2020 23:20:19 -0500
-Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92459C0613CF
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Nov 2020 20:19:38 -0800 (PST)
-Received: by mail-lf1-x142.google.com with SMTP id s30so1324084lfc.4
-        for <linux-cifs@vger.kernel.org>; Mon, 30 Nov 2020 20:19:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SqthT00C8G9wYlKBC93irsFsgJuNDuoFIFv/kr3eAOQ=;
-        b=vNwS6odcIfzR8wVFpLb10sXRiUsHFh8Jt7D05BEneClNeJypHSvaoidAUK9i6w8Zue
-         y32fDdDAxtKEU02z+HnAw3kfMDClrkAMzuZlpicUiQyintp4o506SiWUi6q/lS37LoxD
-         DDovuxS9FugdjoKnglCvHCgfTZ4W8hBL2ex9c/5OnrdgikIQw7dDVEzhnhWdf5dDegZe
-         eJ4akjDSYjlFuSxA8FgxeSk018bgZRsv0UEjmErIVZJMlZAZASP5+XmNhy5ae0fXq4Tr
-         s5IhuGEyc+VR80FBmtyYIBzaCeWeBcAX2c68JkJ9m2C4QhkVFp0FFjaiNTQ6LTQm0Q3p
-         Ezhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SqthT00C8G9wYlKBC93irsFsgJuNDuoFIFv/kr3eAOQ=;
-        b=c3toGzkRQfEDmgbaQ/eNpWFhZI0rphmDjiD6o88qZMvehL6L5cerRcBBqKPuZuFMFP
-         TzJ+AK2TFPcS9NDa3xnT9vleKUhTEQAjzRyhBXU0wHebMxfHn2eufwSDHmBFkGUa+OcJ
-         cxzkrCWur4qDLeJOqmAns5Rq0QALyRdfJy1utMaZDis8Oxl255yMFdGh4uBKMUq4UOco
-         Vqp/4FYPn+5zYDWlMCXp39tfj0ivld0Aa0kjwHIftQe1Q0QAXtd/wYuyE6mdrzZGu1IK
-         ZCeDKmYLzlbkxgHl/UkXxE8xOd5lzjEircdDoe7+d6p4y5dNfBkfB2nj9/Kwxzi8LgCH
-         B09g==
-X-Gm-Message-State: AOAM530a4qzmu5NwfHkBzdO/4OKdmmQjd+8wQnQtK789ApCYUjJYmd0y
-        Apir+g2sUA555E2L/0dUtTxL8ylSt1N2rctLzNbYmKuHqIU=
-X-Google-Smtp-Source: ABdhPJwyFrIoPRGdpfFg8iQ8c7ZxWn5OyCRu2866Y0DWO1Qu1vQRQsi8263ArVYebOKFeBT9fuJ36SKNwYuhEWFTCWk=
-X-Received: by 2002:ac2:57c7:: with SMTP id k7mr365646lfo.20.1606796376762;
- Mon, 30 Nov 2020 20:19:36 -0800 (PST)
+        id S1726713AbgLAFyt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 1 Dec 2020 00:54:49 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:58724 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725859AbgLAFyt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 1 Dec 2020 00:54:49 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B15n67q107471;
+        Tue, 1 Dec 2020 05:53:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=l9ihS9O8ty7fvCGsyg6t+FL2UWzq+Pp7wI7g9M3fu94=;
+ b=emDPbOhPomsDJ0NVhkgalKaWcDmTVt43uxmasZhRdsIKDAK5SyUn3ZBbDT0tfjc2Ub+G
+ pwnVB+2L6jYArSQUwoKsFjxw+gIeAIQd1agInCI9m5zu6sstYek99cFlGrF83pfAMoYp
+ 7h3VW08t/kH06cHx+UsVCvNai9zlonapT50haza8ExqU3V0ifCJ/7nW0lmA/qRSavM+P
+ eE0d7ezZdfPLepa71ISDd/u3VXj3GbiZhoaxq0dsKdiEuu46H687kMfk2k9ooRtVL0+n
+ yN1cC747fo++ObKGg9Es3E0DMkXRjQCXCIESHdIfuri0sdDNQNO6hiI2IHC3bOw+gche Nw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 353c2aru96-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 01 Dec 2020 05:53:05 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B15oGDF104852;
+        Tue, 1 Dec 2020 05:53:04 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by userp3020.oracle.com with ESMTP id 3540arqfy6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 01 Dec 2020 05:53:04 +0000
+Received: from userp3020.oracle.com (userp3020.oracle.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B15r2KY111063;
+        Tue, 1 Dec 2020 05:53:02 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 3540arqfwj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 01 Dec 2020 05:53:02 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B15qbsa005213;
+        Tue, 1 Dec 2020 05:52:40 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 30 Nov 2020 21:52:37 -0800
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org,
+        amd-gfx@lists.freedesktop.org, bridge@lists.linux-foundation.org,
+        ceph-devel@vger.kernel.org, cluster-devel@redhat.com,
+        coreteam@netfilter.org, devel@driverdev.osuosl.org,
+        dm-devel@redhat.com, drbd-dev@tron.linbit.com,
+        dri-devel@lists.freedesktop.org, GR-everest-linux-l2@marvell.com,
+        GR-Linux-NIC-Dev@marvell.com, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
+        linux-afs@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net,
+        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-ext4@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-geode@lists.infradead.org, linux-gpio@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-i3c@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
+        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
+        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
+        selinux@vger.kernel.org, target-devel@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net,
+        usb-storage@lists.one-eyed-alien.net,
+        virtualization@lists.linux-foundation.org,
+        wcn36xx@lists.infradead.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>,
+        Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1h7p6gjkk.fsf@ca-mkp.ca.oracle.com>
+References: <cover.1605896059.git.gustavoars@kernel.org>
+Date:   Tue, 01 Dec 2020 00:52:27 -0500
+In-Reply-To: <cover.1605896059.git.gustavoars@kernel.org> (Gustavo
+        A. R. Silva's message of "Fri, 20 Nov 2020 12:21:39 -0600")
 MIME-Version: 1.0
-References: <CAH2r5mtkt6-ezyTC6zoi+DBjYQ3qFwW3UneF0_4qETEt51Tm9w@mail.gmail.com>
-In-Reply-To: <CAH2r5mtkt6-ezyTC6zoi+DBjYQ3qFwW3UneF0_4qETEt51Tm9w@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 30 Nov 2020 22:19:25 -0600
-Message-ID: <CAH2r5mt+=ELCwSASFsPPjET=qf80_1tOTMPN-gG9cF=BQd-VBg@mail.gmail.com>
-Subject: Re: [SMB3][PATCH] ifs: refactor create_sd_buf() and and avoid
- corrupting the buffer
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        rohiths msft <rohiths.msft@gmail.com>
-Content-Type: multipart/mixed; boundary="0000000000004381ea05b55f6fd7"
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9821 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 lowpriorityscore=0
+ clxscore=1011 bulkscore=0 mlxlogscore=289 phishscore=0 malwarescore=0
+ spamscore=0 adultscore=0 mlxscore=0 priorityscore=1501 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012010039
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000004381ea05b55f6fd7
-Content-Type: text/plain; charset="UTF-8"
 
-Updated patch with fixes for various endian sparse warnings
+Gustavo,
 
+> This series aims to fix almost all remaining fall-through warnings in
+> order to enable -Wimplicit-fallthrough for Clang.
 
-On Mon, Nov 30, 2020 at 12:02 AM Steve French <smfrench@gmail.com> wrote:
->
-> When mounting with "idsfromsid" mount option, Azure
-> corrupted the owner SIDs due to excessive padding
-> caused by placing the owner fields at the end of the
-> security descriptor on create.  Placing owners at the
-> front of the security descriptor (rather than the end)
-> is also safer, as the number of ACEs (that follow it)
-> are variable.
->
-> --
-> Thanks,
->
-> Steve
-
-
+Applied 20-22,54,120-124 to 5.11/scsi-staging, thanks.
 
 -- 
-Thanks,
-
-Steve
-
---0000000000004381ea05b55f6fd7
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-refactor-create_sd_buf-and-and-avoid-corrupting.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-refactor-create_sd_buf-and-and-avoid-corrupting.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ki5h25ks0>
-X-Attachment-Id: f_ki5h25ks0
-
-RnJvbSBmNmNhOGQ1NTMyNzljN2UyMDU0ZjM2YWUxMzAwNjZmZGY4YWVjYzM1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+
-CkRhdGU6IE1vbiwgMzAgTm92IDIwMjAgMTE6Mjk6MjAgKzEwMDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiByZWZhY3RvciBjcmVhdGVfc2RfYnVmKCkgYW5kIGFuZCBhdm9pZCBjb3JydXB0aW5nIHRo
-ZQogYnVmZmVyCgpXaGVuIG1vdW50aW5nIHdpdGggImlkc2Zyb21zaWQiIG1vdW50IG9wdGlvbiwg
-QXp1cmUKY29ycnVwdGVkIHRoZSBvd25lciBTSURzIGR1ZSB0byBleGNlc3NpdmUgcGFkZGluZwpj
-YXVzZWQgYnkgcGxhY2luZyB0aGUgb3duZXIgZmllbGRzIGF0IHRoZSBlbmQgb2YgdGhlCnNlY3Vy
-aXR5IGRlc2NyaXB0b3Igb24gY3JlYXRlLiAgUGxhY2luZyBvd25lcnMgYXQgdGhlCmZyb250IG9m
-IHRoZSBzZWN1cml0eSBkZXNjcmlwdG9yIChyYXRoZXIgdGhhbiB0aGUgZW5kKQppcyBhbHNvIHNh
-ZmVyLCBhcyB0aGUgbnVtYmVyIG9mIEFDRXMgKHRoYXQgZm9sbG93IGl0KQphcmUgdmFyaWFibGUu
-CgpTaWduZWQtb2ZmLWJ5OiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+ClN1
-Z2dlc3RlZC1ieTogUm9oaXRoIFN1cmFiYXR0dWxhIDxyb2hpdGhzQG1pY3Jvc29mdC5jb20+CkND
-OiBTdGFibGUgPHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmc+ICMgdjUuOApTaWduZWQtb2ZmLWJ5OiBT
-dGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIycGR1
-LmMgfCA2OCArKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQog
-ZnMvY2lmcy9zbWIycGR1LmggfCAgMiAtLQogMiBmaWxlcyBjaGFuZ2VkLCAzNiBpbnNlcnRpb25z
-KCspLCAzNCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3NtYjJwZHUuYyBiL2Zz
-L2NpZnMvc21iMnBkdS5jCmluZGV4IDQ0NWU4MDg2Mjg2NS4uMGZhZWE3MTdmZTQ2IDEwMDY0NAot
-LS0gYS9mcy9jaWZzL3NtYjJwZHUuYworKysgYi9mcy9jaWZzL3NtYjJwZHUuYwpAQCAtMjI3Miwx
-NyArMjI3MiwxNSBAQCBzdGF0aWMgc3RydWN0IGNydF9zZF9jdHh0ICoKIGNyZWF0ZV9zZF9idWYo
-dW1vZGVfdCBtb2RlLCBib29sIHNldF9vd25lciwgdW5zaWduZWQgaW50ICpsZW4pCiB7CiAJc3Ry
-dWN0IGNydF9zZF9jdHh0ICpidWY7Ci0Jc3RydWN0IGNpZnNfYWNlICpwYWNlOwotCXVuc2lnbmVk
-IGludCBzZGxlbiwgYWNlbGVuOworCV9fdTggKnB0ciwgKmFjbHB0cjsKKwl1bnNpZ25lZCBpbnQg
-YWNlbGVuOwogCXVuc2lnbmVkIGludCBvd25lcl9vZmZzZXQgPSAwOwogCXVuc2lnbmVkIGludCBn
-cm91cF9vZmZzZXQgPSAwOworCXN0cnVjdCBzbWIzX2FjbCBhY2w7CiAKLQkqbGVuID0gcm91bmR1
-cChzaXplb2Yoc3RydWN0IGNydF9zZF9jdHh0KSArIChzaXplb2Yoc3RydWN0IGNpZnNfYWNlKSAq
-IDIpLCA4KTsKKwkqbGVuID0gcm91bmR1cChzaXplb2Yoc3RydWN0IGNydF9zZF9jdHh0KSArIChz
-aXplb2Yoc3RydWN0IGNpZnNfYWNlKSAqIDQpLCA4KTsKIAogCWlmIChzZXRfb3duZXIpIHsKLQkJ
-Lyogb2Zmc2V0IGZpZWxkcyBhcmUgZnJvbSBiZWdpbm5pbmcgb2Ygc2VjdXJpdHkgZGVzY3JpcHRv
-ciBub3Qgb2YgY3JlYXRlIGNvbnRleHQgKi8KLQkJb3duZXJfb2Zmc2V0ID0gc2l6ZW9mKHN0cnVj
-dCBzbWIzX2FjbCkgKyAoc2l6ZW9mKHN0cnVjdCBjaWZzX2FjZSkgKiAyKTsKLQogCQkvKiBzaXpl
-b2Yoc3RydWN0IG93bmVyX2dyb3VwX3NpZHMpIGlzIGFscmVhZHkgbXVsdGlwbGUgb2YgOCBzbyBu
-byBuZWVkIHRvIHJvdW5kICovCiAJCSpsZW4gKz0gc2l6ZW9mKHN0cnVjdCBvd25lcl9ncm91cF9z
-aWRzKTsKIAl9CkBAIC0yMjkxLDI2ICsyMjg5LDIyIEBAIGNyZWF0ZV9zZF9idWYodW1vZGVfdCBt
-b2RlLCBib29sIHNldF9vd25lciwgdW5zaWduZWQgaW50ICpsZW4pCiAJaWYgKGJ1ZiA9PSBOVUxM
-KQogCQlyZXR1cm4gYnVmOwogCisJcHRyID0gKF9fdTggKikmYnVmWzFdOwogCWlmIChzZXRfb3du
-ZXIpIHsKKwkJLyogb2Zmc2V0IGZpZWxkcyBhcmUgZnJvbSBiZWdpbm5pbmcgb2Ygc2VjdXJpdHkg
-ZGVzY3JpcHRvciBub3Qgb2YgY3JlYXRlIGNvbnRleHQgKi8KKwkJb3duZXJfb2Zmc2V0ID0gcHRy
-IC0gKF9fdTggKikmYnVmLT5zZDsKIAkJYnVmLT5zZC5PZmZzZXRPd25lciA9IGNwdV90b19sZTMy
-KG93bmVyX29mZnNldCk7Ci0JCWdyb3VwX29mZnNldCA9IG93bmVyX29mZnNldCArIHNpemVvZihz
-dHJ1Y3Qgb3duZXJfc2lkKTsKKwkJZ3JvdXBfb2Zmc2V0ID0gb3duZXJfb2Zmc2V0ICsgb2Zmc2V0
-b2Yoc3RydWN0IG93bmVyX2dyb3VwX3NpZHMsIGdyb3VwKTsKIAkJYnVmLT5zZC5PZmZzZXRHcm91
-cCA9IGNwdV90b19sZTMyKGdyb3VwX29mZnNldCk7CisKKwkJc2V0dXBfb3duZXJfZ3JvdXBfc2lk
-cyhwdHIpOworCQlwdHIgKz0gc2l6ZW9mKHN0cnVjdCBvd25lcl9ncm91cF9zaWRzKTsKIAl9IGVs
-c2UgewogCQlidWYtPnNkLk9mZnNldE93bmVyID0gMDsKIAkJYnVmLT5zZC5PZmZzZXRHcm91cCA9
-IDA7CiAJfQogCi0Jc2RsZW4gPSBzaXplb2Yoc3RydWN0IHNtYjNfc2QpICsgc2l6ZW9mKHN0cnVj
-dCBzbWIzX2FjbCkgKwotCQkgMiAqIHNpemVvZihzdHJ1Y3QgY2lmc19hY2UpOwotCWlmIChzZXRf
-b3duZXIpIHsKLQkJc2RsZW4gKz0gc2l6ZW9mKHN0cnVjdCBvd25lcl9ncm91cF9zaWRzKTsKLQkJ
-c2V0dXBfb3duZXJfZ3JvdXBfc2lkcyhvd25lcl9vZmZzZXQgKyBzaXplb2Yoc3RydWN0IGNyZWF0
-ZV9jb250ZXh0KSArIDggLyogbmFtZSAqLwotCQkJKyAoY2hhciAqKWJ1Zik7Ci0JfQotCi0JYnVm
-LT5jY29udGV4dC5EYXRhT2Zmc2V0ID0gY3B1X3RvX2xlMTYob2Zmc2V0b2YKLQkJCQkJKHN0cnVj
-dCBjcnRfc2RfY3R4dCwgc2QpKTsKLQlidWYtPmNjb250ZXh0LkRhdGFMZW5ndGggPSBjcHVfdG9f
-bGUzMihzZGxlbik7CisJYnVmLT5jY29udGV4dC5EYXRhT2Zmc2V0ID0gY3B1X3RvX2xlMTYob2Zm
-c2V0b2Yoc3RydWN0IGNydF9zZF9jdHh0LCBzZCkpOwogCWJ1Zi0+Y2NvbnRleHQuTmFtZU9mZnNl
-dCA9IGNwdV90b19sZTE2KG9mZnNldG9mKHN0cnVjdCBjcnRfc2RfY3R4dCwgTmFtZSkpOwogCWJ1
-Zi0+Y2NvbnRleHQuTmFtZUxlbmd0aCA9IGNwdV90b19sZTE2KDQpOwogCS8qIFNNQjJfQ1JFQVRF
-X1NEX0JVRkZFUl9UT0tFTiBpcyAiU2VjRCIgKi8KQEAgLTIzMTksNiArMjMxMyw3IEBAIGNyZWF0
-ZV9zZF9idWYodW1vZGVfdCBtb2RlLCBib29sIHNldF9vd25lciwgdW5zaWduZWQgaW50ICpsZW4p
-CiAJYnVmLT5OYW1lWzJdID0gJ2MnOwogCWJ1Zi0+TmFtZVszXSA9ICdEJzsKIAlidWYtPnNkLlJl
-dmlzaW9uID0gMTsgIC8qIE11c3QgYmUgb25lIHNlZSBNUy1EVFlQIDIuNC42ICovCisKIAkvKgog
-CSAqIEFDTCBpcyAic2VsZiByZWxhdGl2ZSIgaWUgQUNMIGlzIHN0b3JlZCBpbiBjb250aWd1b3Vz
-IGJsb2NrIG9mIG1lbW9yeQogCSAqIGFuZCAiRFAiIGllIHRoZSBEQUNMIGlzIHByZXNlbnQKQEAg
-LTIzMjYsMjggKzIzMjEsMzcgQEAgY3JlYXRlX3NkX2J1Zih1bW9kZV90IG1vZGUsIGJvb2wgc2V0
-X293bmVyLCB1bnNpZ25lZCBpbnQgKmxlbikKIAlidWYtPnNkLkNvbnRyb2wgPSBjcHVfdG9fbGUx
-NihBQ0xfQ09OVFJPTF9TUiB8IEFDTF9DT05UUk9MX0RQKTsKIAogCS8qIG9mZnNldCBvd25lciwg
-Z3JvdXAgYW5kIFNiejEgYW5kIFNBQ0wgYXJlIGFsbCB6ZXJvICovCi0JYnVmLT5zZC5PZmZzZXRE
-YWNsID0gY3B1X3RvX2xlMzIoc2l6ZW9mKHN0cnVjdCBzbWIzX3NkKSk7Ci0JYnVmLT5hY2wuQWNs
-UmV2aXNpb24gPSBBQ0xfUkVWSVNJT047IC8qIFNlZSAyLjQuNC4xIG9mIE1TLURUWVAgKi8KKwli
-dWYtPnNkLk9mZnNldERhY2wgPSBjcHVfdG9fbGUzMihwdHIgLSAoX191OCAqKSZidWYtPnNkKTsK
-KwkvKiBTaGlwIHRoZSBBQ0wgZm9yIG5vdy4gd2Ugd2lsbCBjb3B5IGl0IGludG8gYnVmIGxhdGVy
-LiAqLworCWFjbHB0ciA9IHB0cjsKKwlwdHIgKz0gc2l6ZW9mKHN0cnVjdCBjaWZzX2FjbCk7CisK
-KwlhY2wuQWNsUmV2aXNpb24gPSBBQ0xfUkVWSVNJT047IC8qIFNlZSAyLjQuNC4xIG9mIE1TLURU
-WVAgKi8KIAogCS8qIGNyZWF0ZSBvbmUgQUNFIHRvIGhvbGQgdGhlIG1vZGUgZW1iZWRkZWQgaW4g
-cmVzZXJ2ZWQgc3BlY2lhbCBTSUQgKi8KLQlwYWNlID0gKHN0cnVjdCBjaWZzX2FjZSAqKShzaXpl
-b2Yoc3RydWN0IGNydF9zZF9jdHh0KSArIChjaGFyICopYnVmKTsKLQlhY2VsZW4gPSBzZXR1cF9z
-cGVjaWFsX21vZGVfQUNFKHBhY2UsIChfX3U2NCltb2RlKTsKKwlhY2VsZW4gPSBzZXR1cF9zcGVj
-aWFsX21vZGVfQUNFKChzdHJ1Y3QgY2lmc19hY2UgKilwdHIsIChfX3U2NCltb2RlKTsKKwlwdHIg
-Kz0gYWNlbGVuOworCWFjbC5BY2xTaXplID0gY3B1X3RvX2xlMTYoYWNlbGVuICsgc2l6ZW9mKHN0
-cnVjdCBzbWIzX2FjbCkpOworCWFjbC5BY2VDb3VudCA9IGNwdV90b19sZTE2KDEpOwogCiAJaWYg
-KHNldF9vd25lcikgewogCQkvKiB3ZSBkbyBub3QgbmVlZCB0byByZWFsbG9jYXRlIGJ1ZmZlciB0
-byBhZGQgdGhlIHR3byBtb3JlIEFDRXMuIHBsZW50eSBvZiBzcGFjZSAqLwotCQlwYWNlID0gKHN0
-cnVjdCBjaWZzX2FjZSAqKShhY2VsZW4gKyAoc2l6ZW9mKHN0cnVjdCBjcnRfc2RfY3R4dCkgKyAo
-Y2hhciAqKWJ1ZikpOwotCQlhY2VsZW4gKz0gc2V0dXBfc3BlY2lhbF91c2VyX293bmVyX0FDRShw
-YWNlKTsKLQkJLyogaXQgZG9lcyBub3QgYXBwZWFyIG5lY2Vzc2FyeSB0byBhZGQgYW4gQUNFIGZv
-ciB0aGUgTkZTIGdyb3VwIFNJRCAqLwotCQlidWYtPmFjbC5BY2VDb3VudCA9IGNwdV90b19sZTE2
-KDMpOwotCX0gZWxzZQotCQlidWYtPmFjbC5BY2VDb3VudCA9IGNwdV90b19sZTE2KDIpOworCQlh
-Y2VsZW4gPSBzZXR1cF9zcGVjaWFsX3VzZXJfb3duZXJfQUNFKChzdHJ1Y3QgY2lmc19hY2UgKilw
-dHIpOworCQlwdHIgKz0gYWNlbGVuOworCQlhY2wuQWNsU2l6ZSA9IGNwdV90b19sZTE2KGxlMTZf
-dG9fY3B1KGFjbC5BY2xTaXplKSArIGFjZWxlbik7CisJCWFjbC5BY2VDb3VudCA9IGNwdV90b19s
-ZTE2KGxlMTZfdG9fY3B1KGFjbC5BY2VDb3VudCkgKyAxKTsKKwl9CiAKIAkvKiBhbmQgb25lIG1v
-cmUgQUNFIHRvIGFsbG93IGFjY2VzcyBmb3IgYXV0aGVudGljYXRlZCB1c2VycyAqLwotCXBhY2Ug
-PSAoc3RydWN0IGNpZnNfYWNlICopKGFjZWxlbiArIChzaXplb2Yoc3RydWN0IGNydF9zZF9jdHh0
-KSArCi0JCShjaGFyICopYnVmKSk7Ci0JYWNlbGVuICs9IHNldHVwX2F1dGh1c2Vyc19BQ0UocGFj
-ZSk7CisJYWNlbGVuID0gc2V0dXBfYXV0aHVzZXJzX0FDRSgoc3RydWN0IGNpZnNfYWNlICopcHRy
-KTsKKwlwdHIgKz0gYWNlbGVuOworCWFjbC5BY2xTaXplID0gY3B1X3RvX2xlMTYobGUxNl90b19j
-cHUoYWNsLkFjbFNpemUpICsgYWNlbGVuKTsKKwlhY2wuQWNlQ291bnQgPSBjcHVfdG9fbGUxNihs
-ZTE2X3RvX2NwdShhY2wuQWNlQ291bnQpICsgMSk7CisKKwltZW1jcHkoYWNscHRyLCAmYWNsLCBz
-aXplb2Yoc3RydWN0IGNpZnNfYWNsKSk7CiAKLQlidWYtPmFjbC5BY2xTaXplID0gY3B1X3RvX2xl
-MTYoc2l6ZW9mKHN0cnVjdCBjaWZzX2FjbCkgKyBhY2VsZW4pOworCWJ1Zi0+Y2NvbnRleHQuRGF0
-YUxlbmd0aCA9IGNwdV90b19sZTMyKHB0ciAtIChfX3U4ICopJmJ1Zi0+c2QpOworCSpsZW4gPSBw
-dHIgLSAoX191OCAqKWJ1ZjsKIAogCXJldHVybiBidWY7CiB9CmRpZmYgLS1naXQgYS9mcy9jaWZz
-L3NtYjJwZHUuaCBiL2ZzL2NpZnMvc21iMnBkdS5oCmluZGV4IGYwNWY5YjEyZjY4OS4uZmE1N2Iw
-M2NhOThjIDEwMDY0NAotLS0gYS9mcy9jaWZzL3NtYjJwZHUuaAorKysgYi9mcy9jaWZzL3NtYjJw
-ZHUuaApAQCAtOTYzLDggKzk2Myw2IEBAIHN0cnVjdCBjcnRfc2RfY3R4dCB7CiAJc3RydWN0IGNy
-ZWF0ZV9jb250ZXh0IGNjb250ZXh0OwogCV9fdTgJTmFtZVs4XTsKIAlzdHJ1Y3Qgc21iM19zZCBz
-ZDsKLQlzdHJ1Y3Qgc21iM19hY2wgYWNsOwotCS8qIEZvbGxvd2VkIGJ5IGF0IGxlYXN0IDQgQUNF
-cyAqLwogfSBfX3BhY2tlZDsKIAogCi0tIAoyLjI3LjAKCg==
---0000000000004381ea05b55f6fd7--
+Martin K. Petersen	Oracle Linux Engineering
