@@ -2,108 +2,141 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,PI_IMPORTANCE_HIGH,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E1CC64E7C
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Dec 2020 10:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E0DFC64E7C
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Dec 2020 20:15:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79193221FC
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Dec 2020 10:44:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D67D22249
+	for <linux-cifs@archiver.kernel.org>; Wed,  2 Dec 2020 20:15:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728186AbgLBKod (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Dec 2020 05:44:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36048 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725885AbgLBKob (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Dec 2020 05:44:31 -0500
-Received: from mail-yb1-xb44.google.com (mail-yb1-xb44.google.com [IPv6:2607:f8b0:4864:20::b44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BECDC0613CF;
-        Wed,  2 Dec 2020 02:43:51 -0800 (PST)
-Received: by mail-yb1-xb44.google.com with SMTP id r127so1158279yba.10;
-        Wed, 02 Dec 2020 02:43:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9DFjZAdrwyZk2YQ7OkLyRHwrSQpCncG9hZ9zBWhHgDs=;
-        b=QIAwqiQ3gUySWZAon+96z2Ae9kQK44KBS3BjTABbfgEKg/sDjKNpA6BZKS6Ps1WjA9
-         KQsZJ4nFJo7+1yhSL2zBmjWLVE/QF87ObQCKkj6XXKLuXn37YeKfgyL0nIJ66nsmEqlm
-         HgFqjYKCDA/RWTgjnvckXczJGJVmPWSBLtItAsaOyw7mUyKOHD4DbuKzzr7kL1xyOyYx
-         maaB430hfG+3FClPEQ/xI6UGw9YzRdcFL3HQrrItcmP/PSlv++yKqIQ5ZaCPJnR9HjVs
-         UUuSywkxsAZ0OoA+sf13P9ie45F45Z6Q8vrMD+dAxfGmOiV8nDkM485Gy4PwPtryW1zb
-         rmbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9DFjZAdrwyZk2YQ7OkLyRHwrSQpCncG9hZ9zBWhHgDs=;
-        b=PbWNldiYMk6OHQ1QxNI8sibRgzHyGgH08vfs9OVpDdPTi6YKhTilfI8g9xb8+iCDQu
-         gXUTC1ZCFikuyxkt52l4r+MiWvPkTMogGctc8GWenL0qiKtxICeYsAUYABlAbwflWpKd
-         CXWimPZcToeSvelyxKM8JKN8piWFC+1L7BYS5yV3xY2FujSmBRG4lbK6vZ3NrIn2jNNO
-         oElpfjRAv24OsZBNMm5dwAq/pLIZljcyvv7T+WluBqr0xkzdIS7YB3824gxYnvrNgBaq
-         Poqs547rWwbjtcq6YaerBdA5Ho5VHDyeNA5x2pVXM7xHIZWkJBqXZBSqc59DDAHQixXF
-         oAiA==
-X-Gm-Message-State: AOAM532jy6XRxlRyKHwSj3dB2VeHEl4Jd94WKyqkiL32SW/DM7g4btER
-        jclY75r42pOXiGUQ5cAfRD+70ANJOI1QlrXyL0J8JGg7FzUIMD5PByU=
-X-Google-Smtp-Source: ABdhPJz8v6Ej1xn7oEpvOSGtJ0kNYG3CoGEc8UoAwv1aFk2K7PXt92btzvd9mqyFZfcZkr9mx0yrlLEw6aVO3eOXjpk=
-X-Received: by 2002:a5b:149:: with SMTP id c9mr2369419ybp.3.1606905830376;
- Wed, 02 Dec 2020 02:43:50 -0800 (PST)
+        id S1728846AbgLBUPA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Dec 2020 15:15:00 -0500
+Received: from mail-eopbgr760052.outbound.protection.outlook.com ([40.107.76.52]:6528
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728868AbgLBUPA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 2 Dec 2020 15:15:00 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mQYpC5g16MON+xF/WEb9m9wjDPU+6NsecJ+X49lZSV5dpdz+hThBp5l2gGdM0ddCIY9zK4jrkSg6PstCmXNG5tqTxTxEwBNqtrR/mlC8E0lnMcfOEE/y/wLSYUDdewr0x/HK7YVc1uqfPgQ+aS+4VB5HWAXMgQ+ZMBOyiQONXSzGzuQa8Eys6PWRLVedRrxyaH3NA8xfunS80tD81f5HULlsVV5OnSUzlMpluDDPa3vz4RBbJ3I1wkd/PXFccMq4oSbgj5RAGUM7+7v6uutMtr5MB8etJjcdKz/QidJs2/oR7UOqMW6ABJWViTMXfxNffSh3C0i0RiBhcgmFPch2pQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fWgviIM/kh6A4olBYyIeaG8QUFnj1BTrZadN544BQ2o=;
+ b=AbUP0cWKeaHB2h1W/9ux8GqBpQ49NH/S5n2mnFVYG9w6Du9ivlo+epckFKVF+3rDPdC0t37QwHPHYpdZNY/1cfvzfd4V4zTLcCI7OKVYGGRF8SWPjsMVUby3x6NEJou1BgUAYXWHRH9sMvygin7V1tm6yYnTtc0CBGGsFkZxHct3g8L8k6WjVhaTl4FXtrxfsIcBkZ2l6Pu2IKyFXIufG2tptxaWjLs1H87ScLxahD7PwM6HYc85QBnYBoR1bGAU2QryyKtcHOCj1J0osHY3mYnvQUs0lRZX7JqWnvRuyzAtey+C5mMRZlQ8UK9kCFseYUOItW76NlWBD9syYlj/HA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=komprise.com; dmarc=pass action=none header.from=komprise.com;
+ dkim=pass header.d=komprise.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=komprise.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fWgviIM/kh6A4olBYyIeaG8QUFnj1BTrZadN544BQ2o=;
+ b=N+0RBf0E0+B/Jb/DEy8m0HMzIUcjnmTkZDgCpIZXkAskd1QRK+xfVme3fhiW+3XrDF0AylR7IbioCWrOA/vcFi++n60GMl0rS9gZhuzqfx7GQP0EFM7JUvYyLgyvnzwYe93cjRYlemryyNP7lvbzqO5xB26qB1PF6vnwLIbx1AI=
+Received: from BYAPR16MB2615.namprd16.prod.outlook.com (2603:10b6:a03:8f::17)
+ by BYAPR16MB2743.namprd16.prod.outlook.com (2603:10b6:a03:ea::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Wed, 2 Dec
+ 2020 20:14:11 +0000
+Received: from BYAPR16MB2615.namprd16.prod.outlook.com
+ ([fe80::116d:161c:4a50:e9bc]) by BYAPR16MB2615.namprd16.prod.outlook.com
+ ([fe80::116d:161c:4a50:e9bc%6]) with mapi id 15.20.3611.031; Wed, 2 Dec 2020
+ 20:14:11 +0000
+From:   Vidhesh Ramesh <vidhesh.ramesh@komprise.com>
+To:     Steve French <sfrench@samba.org>,
+        Steve French <smfrench@gmail.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
+CC:     Nahush Bhanage <nahush.bhanage@komprise.com>
+Subject: Merge commits to v4.19 from 4.20 & 5.6 for cifs backupid fixes
+Thread-Topic: Merge commits to v4.19 from 4.20 & 5.6 for cifs backupid fixes
+Thread-Index: AQHWyOXkpLlUzO54vUW55IcwP/u2Qw==
+Importance: high
+X-Priority: 1
+Date:   Wed, 2 Dec 2020 20:14:11 +0000
+Message-ID: <BYAPR16MB26150D5743AEE86BA8D1B095E2F30@BYAPR16MB2615.namprd16.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: samba.org; dkim=none (message not signed)
+ header.d=none;samba.org; dmarc=none action=none header.from=komprise.com;
+x-originating-ip: [24.5.2.128]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f8215c75-3479-42f3-d5bb-08d896fed54e
+x-ms-traffictypediagnostic: BYAPR16MB2743:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR16MB27435835EFC1DE51F2343D2EE2F30@BYAPR16MB2743.namprd16.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2582;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: MjeMEXYVMmxXLBRkhWcCEgON+boLzmaPGc11CJtUgiwzmAJyE4tcLDUeSqBhq+ohGU0KnmqdqLAIFtdQh6nD1hMi3q1VE3NISGVNAMYgEqueoB0z7pPoDunA18d7zS5MxaLAQgQdnCYskGKiqdTSvu+WatrEk0DIftS8BNLUyaYFhaGdI3ZjV6pdBdAs/rQKCs3k2AuuYvR98ORPe5/sXuqz6ccr3whC5xwS332KqoRQ8P3FFS5Y/Q/Non9zLY6h6OTdm6/KKhQfYVzWFEcOV7WgU9yrDlSlOJYGFWr4xP6WTvdqrwi8Kqlebjdaw4k4nRiXAs7CAOtuiUDWCBY/J9t5oxWh6433OA96xnlAY0XcoRHumcsWMHJK3abYVaK4KEmFgzF6gUCGmNTIV79FEA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR16MB2615.namprd16.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(136003)(366004)(39850400004)(346002)(376002)(44832011)(966005)(9686003)(26005)(33656002)(4744005)(4326008)(91956017)(52536014)(478600001)(186003)(5660300002)(55016002)(71200400001)(8936002)(66446008)(8676002)(2906002)(110136005)(66556008)(107886003)(64756008)(6506007)(86362001)(66476007)(7696005)(66946007)(76116006)(316002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: =?iso-8859-1?Q?hv64pVN9bfBhDyvJHmBisr53l6mdSA265IRIddymSdFFPyyqGcR6GYkDtx?=
+ =?iso-8859-1?Q?2YLyFWK2UT7wesLBi+r4aQ3JACrMR2Cn6T3eHbGDgJZw6L6d0n4eg7eQ12?=
+ =?iso-8859-1?Q?SRFQQy4949aw/5pTIiDx/cyWQ6IPZV11C4VlvNjkXNIXRTP7ySr1zpRn+a?=
+ =?iso-8859-1?Q?L7ep5jYpBEJB35IMtObIczD6SyD9ZAl2oH9zyFKOEOkn2cMvppAnTecl5g?=
+ =?iso-8859-1?Q?TT2aMmt2/pRthdyZqGPyDUJO9dWRrVoMTNsbKGb+l21U4Rqq1W6HY1OUXe?=
+ =?iso-8859-1?Q?L5XsbIPKGkpD8J1Pere88gmNSkNvwZ2+QXlxPjTS7r1MqAkmtaFcBPJxSh?=
+ =?iso-8859-1?Q?J7WhGU1q4A2S94X9gSTzSvWBs2fIehnRlPyWdxZ1X0S+RQJNIli6nosAIE?=
+ =?iso-8859-1?Q?IHy0qSU7nNk4UQZXo7qmesuzSvGhe6MSxU15vTvWkJjjj6UBZHhOIAIFll?=
+ =?iso-8859-1?Q?0s1nINHRayS5apD/G7scsWIsUlI99U3saqFJdKf/fpBV8htA2MTcN6yaZC?=
+ =?iso-8859-1?Q?WPfil64a+3h0h4S8VE/Efg7WAnwechkO2Lf/G2li/feAlAd9uNMVZKWyRx?=
+ =?iso-8859-1?Q?PLavwrRiTv2iDZ1ksa9+lXjBMaHUwtj8EslyTI+8ZiNkWvgFotV3nqPKBs?=
+ =?iso-8859-1?Q?cOsyz+6KFhW0VWNSGegWinPAtwo1DoMytMCfXTjUCrlKmZCZ28oQDsV/ti?=
+ =?iso-8859-1?Q?mhZih0VlZK/VQD1JGMPQBLbMp+cDFfHayt8l/3fOIoLDQ5iEgok5+Mxp9g?=
+ =?iso-8859-1?Q?DVMiUy60/+y3+R0UTp1sHNahoobbprOw2yXOUszNRBYSI8xSjX2zAvn1aB?=
+ =?iso-8859-1?Q?xrzkbrCajq8wadNFB8zF4KXlmQFTTlaadnmeM4ZLA2Sromxe6+iGQLHhfC?=
+ =?iso-8859-1?Q?RkFOsNxq/iGBKGrMMFYFhqufNj/YpfojB6SQhwC2tuSDJWy6Vo+CJT9V75?=
+ =?iso-8859-1?Q?xQF1EH/v58Nh1FooL9X9W37eNkCJA9m60qauLI+iEwNZdPsi4KK1ZWvClQ?=
+ =?iso-8859-1?Q?JjBlM6beJ8viKRV/c=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20201027204226.26906-1-pboris@amazon.com> <CAHhKpQ7v_nPwBx2czk7rVXK3ZrmsZrAkcxDFOgq0ABTOVc7iSA@mail.gmail.com>
-In-Reply-To: <CAHhKpQ7v_nPwBx2czk7rVXK3ZrmsZrAkcxDFOgq0ABTOVc7iSA@mail.gmail.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Wed, 2 Dec 2020 16:13:39 +0530
-Message-ID: <CANT5p=q2YvkEOEa4bS=-nbPOc9Xwa=4gnc09csCcszMmMjYSPg@mail.gmail.com>
-Subject: Re: [PATCH] Add support for getting and setting SACLs
-To:     Boris Protopopov <boris.v.protopopov@gmail.com>
-Cc:     Boris Protopopov <pboris@amazon.com>,
-        Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: komprise.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR16MB2615.namprd16.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8215c75-3479-42f3-d5bb-08d896fed54e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2020 20:14:11.6209
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 7a5a9d78-0afb-4c20-b729-756d332680db
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ZlheesKEntFmKUO/2wvHcMB+DdnV9YwHxq5v4PiXDGPT1gCtk3bA/q2gtgLHMDvOpFzsebc012349cGgI6yZVBt+xaNGeb9z2ZoMORUP8A4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR16MB2743
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Boris,
-
-At a high level, the changes look good to me. Will go through the
-changes in more detail tomorrow morning.
-
-On a related note, we may need more test coverage in this area.
-Can you please share your testing output against your changes?
-Or even better, if you can contribute some xfstests for this use case:
-https://wiki.samba.org/index.php/Xfstesting-cifs
-
-Regards,
-Shyam
-
-On Wed, Dec 2, 2020 at 12:24 AM Boris Protopopov
-<boris.v.protopopov@gmail.com> wrote:
->
-> Hello,
-> I am checking in to see if anyone had a chance to take a look at this
-> patch. I would appreciate any feedback.
-> Thanks!
->
-> On Tue, Oct 27, 2020 at 5:01 PM Boris Protopopov via samba-technical
-> <samba-technical@lists.samba.org> wrote:
-> >
-> > Add SYSTEM_SECURITY access flag and use with smb2 when opening
-> > files for getting/setting SACLs. Add "system.cifs_ntsd_full"
-> > extended attribute to allow user-space access to the functionality.
-> > Avoid multiple server calls when setting owner, DACL, and SACL.
-> >
-> > Signed-off-by: Boris Protopopov <pboris@amazon.com>
-> > ---
-> ...
-
-
-
--- 
--Shyam
+Hi Steve,=0A=
+=0A=
+We mount cifs shares on our centos machines running kernel v4.19 using back=
+upoperator privileges using backupid, however we do not see that the backup=
+ intent is used for all calls. We did find fixes for them in 4.20 & 5.6 but=
+ not in 4.19. Would it be able to merge these commits to 4.19 as well ?=0A=
+=0A=
+Here are the commits of interest.=0A=
+1. https://github.com/torvalds/linux/commit/5e19697b56a64004e2d0ff1bb952ea0=
+5493c088f - v4.19.rc1=0A=
+2. https://github.com/torvalds/linux/commit/61351d6d54e651ec4098445afa5ddc2=
+092c4741a - v4.20.rc1=0A=
+3. https://github.com/torvalds/linux/commit/4d5bdf28690a304e089ce750efc8b7d=
+d718945c7 - v4.20.rc1=0A=
+4. https://github.com/torvalds/linux/commit/0f060936e490c6279dfe773d75d526d=
+3d3d77111 - v5.6-rc1=0A=
+=0A=
+Vidhesh Ramesh=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
+=0A=
