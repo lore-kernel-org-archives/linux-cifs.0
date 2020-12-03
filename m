@@ -2,141 +2,134 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,PI_IMPORTANCE_HIGH,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E0DFC64E7C
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Dec 2020 20:15:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F216AC64E7C
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 03:39:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D67D22249
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Dec 2020 20:15:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CD4A208A9
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 03:39:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728846AbgLBUPA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Dec 2020 15:15:00 -0500
-Received: from mail-eopbgr760052.outbound.protection.outlook.com ([40.107.76.52]:6528
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728868AbgLBUPA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 2 Dec 2020 15:15:00 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mQYpC5g16MON+xF/WEb9m9wjDPU+6NsecJ+X49lZSV5dpdz+hThBp5l2gGdM0ddCIY9zK4jrkSg6PstCmXNG5tqTxTxEwBNqtrR/mlC8E0lnMcfOEE/y/wLSYUDdewr0x/HK7YVc1uqfPgQ+aS+4VB5HWAXMgQ+ZMBOyiQONXSzGzuQa8Eys6PWRLVedRrxyaH3NA8xfunS80tD81f5HULlsVV5OnSUzlMpluDDPa3vz4RBbJ3I1wkd/PXFccMq4oSbgj5RAGUM7+7v6uutMtr5MB8etJjcdKz/QidJs2/oR7UOqMW6ABJWViTMXfxNffSh3C0i0RiBhcgmFPch2pQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fWgviIM/kh6A4olBYyIeaG8QUFnj1BTrZadN544BQ2o=;
- b=AbUP0cWKeaHB2h1W/9ux8GqBpQ49NH/S5n2mnFVYG9w6Du9ivlo+epckFKVF+3rDPdC0t37QwHPHYpdZNY/1cfvzfd4V4zTLcCI7OKVYGGRF8SWPjsMVUby3x6NEJou1BgUAYXWHRH9sMvygin7V1tm6yYnTtc0CBGGsFkZxHct3g8L8k6WjVhaTl4FXtrxfsIcBkZ2l6Pu2IKyFXIufG2tptxaWjLs1H87ScLxahD7PwM6HYc85QBnYBoR1bGAU2QryyKtcHOCj1J0osHY3mYnvQUs0lRZX7JqWnvRuyzAtey+C5mMRZlQ8UK9kCFseYUOItW76NlWBD9syYlj/HA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=komprise.com; dmarc=pass action=none header.from=komprise.com;
- dkim=pass header.d=komprise.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=komprise.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fWgviIM/kh6A4olBYyIeaG8QUFnj1BTrZadN544BQ2o=;
- b=N+0RBf0E0+B/Jb/DEy8m0HMzIUcjnmTkZDgCpIZXkAskd1QRK+xfVme3fhiW+3XrDF0AylR7IbioCWrOA/vcFi++n60GMl0rS9gZhuzqfx7GQP0EFM7JUvYyLgyvnzwYe93cjRYlemryyNP7lvbzqO5xB26qB1PF6vnwLIbx1AI=
-Received: from BYAPR16MB2615.namprd16.prod.outlook.com (2603:10b6:a03:8f::17)
- by BYAPR16MB2743.namprd16.prod.outlook.com (2603:10b6:a03:ea::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Wed, 2 Dec
- 2020 20:14:11 +0000
-Received: from BYAPR16MB2615.namprd16.prod.outlook.com
- ([fe80::116d:161c:4a50:e9bc]) by BYAPR16MB2615.namprd16.prod.outlook.com
- ([fe80::116d:161c:4a50:e9bc%6]) with mapi id 15.20.3611.031; Wed, 2 Dec 2020
- 20:14:11 +0000
-From:   Vidhesh Ramesh <vidhesh.ramesh@komprise.com>
-To:     Steve French <sfrench@samba.org>,
-        Steve French <smfrench@gmail.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
-CC:     Nahush Bhanage <nahush.bhanage@komprise.com>
-Subject: Merge commits to v4.19 from 4.20 & 5.6 for cifs backupid fixes
-Thread-Topic: Merge commits to v4.19 from 4.20 & 5.6 for cifs backupid fixes
-Thread-Index: AQHWyOXkpLlUzO54vUW55IcwP/u2Qw==
-Importance: high
-X-Priority: 1
-Date:   Wed, 2 Dec 2020 20:14:11 +0000
-Message-ID: <BYAPR16MB26150D5743AEE86BA8D1B095E2F30@BYAPR16MB2615.namprd16.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: samba.org; dkim=none (message not signed)
- header.d=none;samba.org; dmarc=none action=none header.from=komprise.com;
-x-originating-ip: [24.5.2.128]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f8215c75-3479-42f3-d5bb-08d896fed54e
-x-ms-traffictypediagnostic: BYAPR16MB2743:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR16MB27435835EFC1DE51F2343D2EE2F30@BYAPR16MB2743.namprd16.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2582;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: MjeMEXYVMmxXLBRkhWcCEgON+boLzmaPGc11CJtUgiwzmAJyE4tcLDUeSqBhq+ohGU0KnmqdqLAIFtdQh6nD1hMi3q1VE3NISGVNAMYgEqueoB0z7pPoDunA18d7zS5MxaLAQgQdnCYskGKiqdTSvu+WatrEk0DIftS8BNLUyaYFhaGdI3ZjV6pdBdAs/rQKCs3k2AuuYvR98ORPe5/sXuqz6ccr3whC5xwS332KqoRQ8P3FFS5Y/Q/Non9zLY6h6OTdm6/KKhQfYVzWFEcOV7WgU9yrDlSlOJYGFWr4xP6WTvdqrwi8Kqlebjdaw4k4nRiXAs7CAOtuiUDWCBY/J9t5oxWh6433OA96xnlAY0XcoRHumcsWMHJK3abYVaK4KEmFgzF6gUCGmNTIV79FEA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR16MB2615.namprd16.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(136003)(366004)(39850400004)(346002)(376002)(44832011)(966005)(9686003)(26005)(33656002)(4744005)(4326008)(91956017)(52536014)(478600001)(186003)(5660300002)(55016002)(71200400001)(8936002)(66446008)(8676002)(2906002)(110136005)(66556008)(107886003)(64756008)(6506007)(86362001)(66476007)(7696005)(66946007)(76116006)(316002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: =?iso-8859-1?Q?hv64pVN9bfBhDyvJHmBisr53l6mdSA265IRIddymSdFFPyyqGcR6GYkDtx?=
- =?iso-8859-1?Q?2YLyFWK2UT7wesLBi+r4aQ3JACrMR2Cn6T3eHbGDgJZw6L6d0n4eg7eQ12?=
- =?iso-8859-1?Q?SRFQQy4949aw/5pTIiDx/cyWQ6IPZV11C4VlvNjkXNIXRTP7ySr1zpRn+a?=
- =?iso-8859-1?Q?L7ep5jYpBEJB35IMtObIczD6SyD9ZAl2oH9zyFKOEOkn2cMvppAnTecl5g?=
- =?iso-8859-1?Q?TT2aMmt2/pRthdyZqGPyDUJO9dWRrVoMTNsbKGb+l21U4Rqq1W6HY1OUXe?=
- =?iso-8859-1?Q?L5XsbIPKGkpD8J1Pere88gmNSkNvwZ2+QXlxPjTS7r1MqAkmtaFcBPJxSh?=
- =?iso-8859-1?Q?J7WhGU1q4A2S94X9gSTzSvWBs2fIehnRlPyWdxZ1X0S+RQJNIli6nosAIE?=
- =?iso-8859-1?Q?IHy0qSU7nNk4UQZXo7qmesuzSvGhe6MSxU15vTvWkJjjj6UBZHhOIAIFll?=
- =?iso-8859-1?Q?0s1nINHRayS5apD/G7scsWIsUlI99U3saqFJdKf/fpBV8htA2MTcN6yaZC?=
- =?iso-8859-1?Q?WPfil64a+3h0h4S8VE/Efg7WAnwechkO2Lf/G2li/feAlAd9uNMVZKWyRx?=
- =?iso-8859-1?Q?PLavwrRiTv2iDZ1ksa9+lXjBMaHUwtj8EslyTI+8ZiNkWvgFotV3nqPKBs?=
- =?iso-8859-1?Q?cOsyz+6KFhW0VWNSGegWinPAtwo1DoMytMCfXTjUCrlKmZCZ28oQDsV/ti?=
- =?iso-8859-1?Q?mhZih0VlZK/VQD1JGMPQBLbMp+cDFfHayt8l/3fOIoLDQ5iEgok5+Mxp9g?=
- =?iso-8859-1?Q?DVMiUy60/+y3+R0UTp1sHNahoobbprOw2yXOUszNRBYSI8xSjX2zAvn1aB?=
- =?iso-8859-1?Q?xrzkbrCajq8wadNFB8zF4KXlmQFTTlaadnmeM4ZLA2Sromxe6+iGQLHhfC?=
- =?iso-8859-1?Q?RkFOsNxq/iGBKGrMMFYFhqufNj/YpfojB6SQhwC2tuSDJWy6Vo+CJT9V75?=
- =?iso-8859-1?Q?xQF1EH/v58Nh1FooL9X9W37eNkCJA9m60qauLI+iEwNZdPsi4KK1ZWvClQ?=
- =?iso-8859-1?Q?JjBlM6beJ8viKRV/c=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: komprise.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR16MB2615.namprd16.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8215c75-3479-42f3-d5bb-08d896fed54e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2020 20:14:11.6209
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 7a5a9d78-0afb-4c20-b729-756d332680db
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZlheesKEntFmKUO/2wvHcMB+DdnV9YwHxq5v4PiXDGPT1gCtk3bA/q2gtgLHMDvOpFzsebc012349cGgI6yZVBt+xaNGeb9z2ZoMORUP8A4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR16MB2743
+        id S1727929AbgLCDjQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 2 Dec 2020 22:39:16 -0500
+Received: from mailout1.samsung.com ([203.254.224.24]:34709 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727449AbgLCDjP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Dec 2020 22:39:15 -0500
+Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20201203033834epoutp01fddd3d9c88a7d55b4243be7ef819032b~NF7ZaJ0_a2692226922epoutp01o
+        for <linux-cifs@vger.kernel.org>; Thu,  3 Dec 2020 03:38:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20201203033834epoutp01fddd3d9c88a7d55b4243be7ef819032b~NF7ZaJ0_a2692226922epoutp01o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1606966714;
+        bh=a8dyW+RvKaxdeJypkQi3io5tkQJjlX67BbEByU7p5Ag=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=X3xXWWAr8KzMq5K9wGRg+8+TZ1Vjw5iQvZ5/MoTypMdOL4aE0X2MzgzUGiVdKB4n3
+         NA7ETO0GQLaqjGD/h7hPGGYr2jiy4NG6p2Ou2Ns8DnkPrghajiK42ic7Dn8GamSpGP
+         aH0S86GytISJSh+NkR7wZmNfd5XPfxRmUOE8hlic=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20201203033833epcas1p1e0b0f58c45c956aa9cacae362f144e11~NF7Y_x1dV0778007780epcas1p10;
+        Thu,  3 Dec 2020 03:38:33 +0000 (GMT)
+Received: from epsmges1p2.samsung.com (unknown [182.195.40.160]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4CmhQ02GDFzMqYkd; Thu,  3 Dec
+        2020 03:38:32 +0000 (GMT)
+Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
+        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        81.19.63458.7BD58CF5; Thu,  3 Dec 2020 12:38:31 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
+        20201203033831epcas1p4c69684156cd4e393f048472a24238e6c~NF7XLYbVl0652106521epcas1p4f;
+        Thu,  3 Dec 2020 03:38:31 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20201203033831epsmtrp1ac84970e702b68f67e877f30670f9393~NF7XK0NS40264702647epsmtrp1-;
+        Thu,  3 Dec 2020 03:38:31 +0000 (GMT)
+X-AuditID: b6c32a36-6c9ff7000000f7e2-ab-5fc85db743b9
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        D7.40.08745.7BD58CF5; Thu,  3 Dec 2020 12:38:31 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.88.103.87]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20201203033831epsmtip219d0b180b3d4077c431e33b4f80b0c48~NF7W-FIq62288122881epsmtip2i;
+        Thu,  3 Dec 2020 03:38:31 +0000 (GMT)
+From:   Namjae Jeon <namjae.jeon@samsung.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     aaptel@suse.com, ronniesahlberg@gmail.com, smfrench@gmail.com,
+        Namjae Jeon <namjae.jeon@samsung.com>
+Subject: [PATCH] smb3: set COMPOUND_FID to FileID field of subsequent
+ compound request
+Date:   Thu,  3 Dec 2020 12:31:36 +0900
+Message-Id: <20201203033136.16375-1-namjae.jeon@samsung.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrHKsWRmVeSWpSXmKPExsWy7bCmge722BPxBpO6bCwa355msXjxfxez
+        xY/p9Ra9fZ9YLd68OMzmwOqxc9Zddo++LasYPdZvucri8XmTXABLVI5NRmpiSmqRQmpecn5K
+        Zl66rZJ3cLxzvKmZgaGuoaWFuZJCXmJuqq2Si0+ArltmDtBaJYWyxJxSoFBAYnGxkr6dTVF+
+        aUmqQkZ+cYmtUmpBSk6BoUGBXnFibnFpXrpecn6ulaGBgZEpUGVCTsafl38ZC1rYK77tbmVq
+        YDzP2sXIySEhYCIx8/oOIJuLQ0hgB6NEx552KOcTo0Rb70oWCOczo0Tv3BlMMC0tUzayQSR2
+        MUpcW7KPCa5lyfVbQA4HB5uAtsSfLaIgDSICchJrN51kAbGZBbIk9l/ZzgxiCwtESEz89B/M
+        ZhFQlXj6vpcFpJVXwEbiyGxRiF3yEqs3HGAGGS8hMJ1dYunfS1B3u0hcuPAAyhaWeHV8CzuE
+        LSXxsr+NHWSOhEC1xMf9zBDhDkaJF99tIWxjiZvrN7CClDALaEqs36UPEVaU2Pl7LiPElXwS
+        7772sEJM4ZXoaBOCKFGV6Lt0GBoK0hJd7R+glnpItB+YxQZiCwnESjyc38Q8gVF2FsKCBYyM
+        qxjFUguKc9NTiw0LjJCjaBMjOCFpme1gnPT2g94hRiYOxkOMEhzMSiK8LP+OxAvxpiRWVqUW
+        5ccXleakFh9iNAWG1kRmKdHkfGBKzCuJNzQ1MjY2tjAxMzczNVYS5/2j3REvJJCeWJKanZpa
+        kFoE08fEwSnVwFRjFbP7z2KVYz+5v0j7BUTMtXg1W6k9MmFribq78YuyZTqJ2t0s/2X4jnNd
+        SXTg+KJ4Ozj0vMrxrU/FNy6wmXp76qenWwt97udN6/df5Fy3RDlj9Xvh+YbvRQ7IG1itn2vZ
+        cva1wIorTR9+JqrO9l0fXtCjqvNARnQ1b+on1yiO+/GRk/vPfui4uylgwfaT0rL+msfYqvZ3
+        uMya0vIvkq9JzaFI7plJZF7DhzMpEQW3zx5I7Wf9tPWm6Ymr3x5LPjMSWZ4Q+eX0s4t86lWb
+        ZiavDmd/FG/Ld6nlsKxYck8Ay+WnLSWmyxZ7nLFnn7xe19TWuNPXqmOfxgWjK+Kzbtwt2dYt
+        ISXhHcsY6Krup8RSnJFoqMVcVJwIAICu8dfRAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNJMWRmVeSWpSXmKPExsWy7bCSvO722BPxBr8nK1g0vj3NYvHi/y5m
+        ix/T6y16+z6xWrx5cZjNgdVj56y77B59W1YxeqzfcpXF4/MmuQCWKC6blNSczLLUIn27BK6M
+        Py//Mha0sFd8293K1MB4nrWLkZNDQsBEomXKRrYuRi4OIYEdjBKnW04wQySkJY6dOANkcwDZ
+        whKHDxdD1HxglOj+PIENJM4moC3xZ4soSLmIgJzE2k0nWUDCzAJ5El1z7UHCwgJhEr8XLWMB
+        sVkEVCWevu8FK+EVsJE4MlsUYpG8xOoNB5gnMPIsYGRYxSiZWlCcm55bbFhglJdarlecmFtc
+        mpeul5yfu4kRHB5aWjsY96z6oHeIkYmD8RCjBAezkggvy78j8UK8KYmVValF+fFFpTmpxYcY
+        pTlYlMR5v85aGCckkJ5YkpqdmlqQWgSTZeLglGpgunxj8YSEiTu6mvxe/lBT/RB6qOi68lGF
+        q/8W/JxRrVQsd9zWbf8t15D4ztcSehdtz5Rt3aW66t+cCa+Tjn09l3Z1hsHlYqfeO7kl8bJF
+        K5/P0rKtrV70gXVyhNHU3FnyJZ4PHv4/Ijxdzs7t9baLVUur73mnrgieoLRpx7r2FfqMixdK
+        vTzA0RPvNX1XmxSTImfLj9upT7dbZRzOmndl48v1zqv1ZIN+HfvUPllq9vuTFxZlxjnPNL6s
+        3NKx9lFXx1d3dwXtTGbWtJ9FJ8RKfN1rWGe2WJ+4rbkp9r3DbMUb1dIXTTfHz/i79OIURsMX
+        B38KHW+YsyVU8HHdFW5Lvcudz27Wxx0oX7nu4vVFCyyUWIozEg21mIuKEwGETri1fgIAAA==
+X-CMS-MailID: 20201203033831epcas1p4c69684156cd4e393f048472a24238e6c
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20201203033831epcas1p4c69684156cd4e393f048472a24238e6c
+References: <CGME20201203033831epcas1p4c69684156cd4e393f048472a24238e6c@epcas1p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Steve,=0A=
-=0A=
-We mount cifs shares on our centos machines running kernel v4.19 using back=
-upoperator privileges using backupid, however we do not see that the backup=
- intent is used for all calls. We did find fixes for them in 4.20 & 5.6 but=
- not in 4.19. Would it be able to merge these commits to 4.19 as well ?=0A=
-=0A=
-Here are the commits of interest.=0A=
-1. https://github.com/torvalds/linux/commit/5e19697b56a64004e2d0ff1bb952ea0=
-5493c088f - v4.19.rc1=0A=
-2. https://github.com/torvalds/linux/commit/61351d6d54e651ec4098445afa5ddc2=
-092c4741a - v4.20.rc1=0A=
-3. https://github.com/torvalds/linux/commit/4d5bdf28690a304e089ce750efc8b7d=
-d718945c7 - v4.20.rc1=0A=
-4. https://github.com/torvalds/linux/commit/0f060936e490c6279dfe773d75d526d=
-3d3d77111 - v5.6-rc1=0A=
-=0A=
-Vidhesh Ramesh=0A=
-=0A=
-=0A=
-=0A=
-=0A=
-=0A=
-=0A=
-=0A=
-=0A=
-=0A=
-=0A=
-=0A=
-=0A=
+For an operation compounded with an SMB2 CREATE request, client must set
+COMPOUND_FID(0xFFFFFFFFFFFFFFFF) to FileID field of smb2 ioctl.
+
+Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
+---
+ fs/cifs/smb2ops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 504766cb6c19..3ca632bb6be9 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -3098,8 +3098,8 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+ 	rqst[1].rq_nvec = SMB2_IOCTL_IOV_SIZE;
+ 
+ 	rc = SMB2_ioctl_init(tcon, server,
+-			     &rqst[1], fid.persistent_fid,
+-			     fid.volatile_fid, FSCTL_GET_REPARSE_POINT,
++			     &rqst[1], COMPOUND_FID,
++			     COMPOUND_FID, FSCTL_GET_REPARSE_POINT,
+ 			     true /* is_fctl */, NULL, 0,
+ 			     CIFSMaxBufSize -
+ 			     MAX_SMB2_CREATE_RESPONSE_SIZE -
+-- 
+2.17.1
+
