@@ -2,74 +2,112 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5393AC4361A
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 22:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57755C4361A
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 22:09:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0AEF82220F
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 22:07:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA9C62220F
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 22:09:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729226AbgLCWHv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 3 Dec 2020 17:07:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46882 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727832AbgLCWHv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Dec 2020 17:07:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607033185;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type;
-        bh=iYDvFu7oq+VNXfinrxVzBP1V7iQyhHiGi7O53/9TY2E=;
-        b=CGv378sjySzU6hViSXWgMMjWwncxxMUiX7lc0k9i7FhdAOtwJnDiYK4VYYh/An4mIethJb
-        xTKotz/WF7NkrDdb3HlUTLXAmo+D+2NCqbgnTj3f8TtOg9jS8Hzxik4sK65LJlCwUCGeQ/
-        YTlgoOCMAXcmmjhov+gICOb/t5r7M6Y=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-mNJiXPKRN1eiepXcakIS-A-1; Thu, 03 Dec 2020 17:06:23 -0500
-X-MC-Unique: mNJiXPKRN1eiepXcakIS-A-1
-Received: by mail-pl1-f200.google.com with SMTP id 1so1964641plb.4
-        for <linux-cifs@vger.kernel.org>; Thu, 03 Dec 2020 14:06:23 -0800 (PST)
+        id S1729563AbgLCWJI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 3 Dec 2020 17:09:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727832AbgLCWJI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Dec 2020 17:09:08 -0500
+Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4714BC061A51
+        for <linux-cifs@vger.kernel.org>; Thu,  3 Dec 2020 14:08:22 -0800 (PST)
+Received: by mail-il1-x141.google.com with SMTP id z14so3395460ilm.10
+        for <linux-cifs@vger.kernel.org>; Thu, 03 Dec 2020 14:08:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2h2mQHXLwpxsyBlfs24p1gLIXHr/MzxnR4HCzKk7DFU=;
+        b=fMTNLHgZBY9eVZc4Oaq+BQIdra5x3iPtc6Isghi5iiqZBNFhqqRZOnYXT1cCKPVLWZ
+         FmEgYLi1B1L1jMROjlEt7brN5L4m7qcKyAvx5321YT6cekYslbJNyC2F5OkmyhLzxgpj
+         1661FAB6X+CPDLGPTLneTR8sOIcpPXQ6qiDsKK/miblnjxP4JqwdMvZlkCY5xK7+RRDT
+         QPpkTFKzkHm22DJexlW4xJT4oHih4G4lAkHkdfp09V0XDH5oL8g4m6RVzE4Qvx6mcoyF
+         w1BfWtB2EeCCRk0Oz/IT9embJMnpIt69i1D2AcBcQtVWKl5RW6qMVY050McyVpCzVIxl
+         RtAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=iYDvFu7oq+VNXfinrxVzBP1V7iQyhHiGi7O53/9TY2E=;
-        b=jf2o0B5YaP4tRq8goUqLlxBk0x1Zw2J6WbWRi7u9PelxMteE5dGIen0g/WKg/+JnjF
-         SfoLQVZdDcUQf8/D7jKgoexjGGZ2I5BtV+V3p2ie6uVvnE4CdDRWLAE7rW5GIhKTIkqA
-         SxzeaOpJL7PWFDbDfRkBg5zH9aJkSKjDMo1sh09Np6k5/EWl71PE2d41UHP+07Ac2Gr6
-         7eWWnCfGbiyjoBKhjtEpkcWqYeN7LhBwX4+qr6jegeNjK87CY7prwaUMZbzttfW8TkJ+
-         B6xvFp5ZLcaDqSt+x8hxBSpRd6SVLOlXYB2W2P2iC3HmvTOgDMLYm9cdMdaiwPUCbcWf
-         nQ9Q==
-X-Gm-Message-State: AOAM531ARppivfT6XRsMpAuECF1wGXnpEGHHM9cUrmSkr2uPBnVuhXHg
-        OU4Lvg0Mve/hcwTvoZU0SDP25vA+aVw+38DAnY9Dcpg3U6WjOMuLYeHGoX9YWYutBJK0pizUnaH
-        H5Dvcd9zWJGDUo54NgR4YG+O/6ZeMoXEoEffIgg==
-X-Received: by 2002:a17:902:ee83:b029:da:3483:3957 with SMTP id a3-20020a170902ee83b02900da34833957mr929062pld.38.1607033182120;
-        Thu, 03 Dec 2020 14:06:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz/fwijaLT/55TFevq6vVCLbmVpu2xD88bOwa1k0syU/KzRJi44jwV+UvxZJ5hU5tCMaSAgkDjhiR1b9KrAWNw=
-X-Received: by 2002:a17:902:ee83:b029:da:3483:3957 with SMTP id
- a3-20020a170902ee83b02900da34833957mr929043pld.38.1607033181840; Thu, 03 Dec
- 2020 14:06:21 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2h2mQHXLwpxsyBlfs24p1gLIXHr/MzxnR4HCzKk7DFU=;
+        b=adQC+VkWzr7b7SZLbKaOfZsKO8QNJshnKBgKxqwewM04yp7NcdJX+F38RtdALrYy4n
+         ryl67bnO0DKVbIRpkSnhibmVcmqpMg2nHE0u/Lczjv5oEIDzMdFQ+HiZNtHtnyHqfWXY
+         BA4RNv+YHBmTQVM4kE8W0UOlLDZpUOboteF70f1RuoSWCM/IeNICQCqjZgLojn7bJVra
+         okAr47c8kZlFuymjaPQyAebyOxY7es82E+1eoibpw1btpgAicn4HrrWsug3NXbn7PLVZ
+         jyABwekaJBV1XMQBRSuQ297KZru5sXa3eza5jEfdz6yv1UQDhYVyxJ+Fo+MeQa3wOq0x
+         nBiQ==
+X-Gm-Message-State: AOAM5332noOH1at34YFoDSfjQDHruNXe3vFTwNnENkU5zLcZEkI+JyXo
+        dcnjlff1xktOMaEDEteE44g1+LlIOpnxKbXVOeE=
+X-Google-Smtp-Source: ABdhPJyuH+2zrQL2o9sZZiiOSp8+lFmTh9Ie/H/eMj62Oon/OyUmhGWrTGYKqcuOV17T40nC1TEVYJfaA1dQSfQpc+Y=
+X-Received: by 2002:a92:c5a7:: with SMTP id r7mr1718962ilt.219.1607033301671;
+ Thu, 03 Dec 2020 14:08:21 -0800 (PST)
 MIME-Version: 1.0
-From:   Jacob Shivers <jshivers@redhat.com>
-Date:   Thu, 3 Dec 2020 17:05:45 -0500
-Message-ID: <CALe0_76k-ZTbQLMBNzKg+ZB8a2NxQ_Kf+Q9b5fovOv2svY8KjA@mail.gmail.com>
-Subject: cifs.ko and gssproxy
-To:     CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5mtkt6-ezyTC6zoi+DBjYQ3qFwW3UneF0_4qETEt51Tm9w@mail.gmail.com>
+ <CAH2r5mt+=ELCwSASFsPPjET=qf80_1tOTMPN-gG9cF=BQd-VBg@mail.gmail.com> <CAH2r5mv9_gvVtmBNSBDdnqkMAZMo9+fQExdgYEb+jEAMY4ad3A@mail.gmail.com>
+In-Reply-To: <CAH2r5mv9_gvVtmBNSBDdnqkMAZMo9+fQExdgYEb+jEAMY4ad3A@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Fri, 4 Dec 2020 08:08:10 +1000
+Message-ID: <CAN05THQuT8wf=-z1z5ERmEdfS4Nf72gHJiFUF_wbopR7FX-VQQ@mail.gmail.com>
+Subject: Re: [SMB3][PATCH] ifs: refactor create_sd_buf() and and avoid
+ corrupting the buffer
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        rohiths msft <rohiths.msft@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello all,
+LGTM.
 
-Is anyone working on modifying cifs.ko to work with gssproxy directly?
+Maybe move acl.AclRevision down to where the other fields are assigned
+so they are all assigned in the same place?
 
-There were comments a few years ago about such an endeavor, but I have
-not seen any further discussion in recent years.
-
-Thanks for any information,
-Jacob
-
+On Fri, Dec 4, 2020 at 2:46 AM Steve French <smfrench@gmail.com> wrote:
+>
+> updated the patch slightly by creating local variable for ace_count
+> and acl_size to avoid excessive endian conversions
+>
+> On Mon, Nov 30, 2020 at 10:19 PM Steve French <smfrench@gmail.com> wrote:
+> >
+> > Updated patch with fixes for various endian sparse warnings
+> >
+> >
+> > On Mon, Nov 30, 2020 at 12:02 AM Steve French <smfrench@gmail.com> wrote:
+> > >
+> > > When mounting with "idsfromsid" mount option, Azure
+> > > corrupted the owner SIDs due to excessive padding
+> > > caused by placing the owner fields at the end of the
+> > > security descriptor on create.  Placing owners at the
+> > > front of the security descriptor (rather than the end)
+> > > is also safer, as the number of ACEs (that follow it)
+> > > are variable.
+> > >
+> > > --
+> > > Thanks,
+> > >
+> > > Steve
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
