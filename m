@@ -2,112 +2,120 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57755C4361A
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 22:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E771FC4167B
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 23:06:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA9C62220F
-	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 22:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9484B2245C
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Dec 2020 23:06:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729563AbgLCWJI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 3 Dec 2020 17:09:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
+        id S1728502AbgLCXGm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 3 Dec 2020 18:06:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727832AbgLCWJI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Dec 2020 17:09:08 -0500
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4714BC061A51
-        for <linux-cifs@vger.kernel.org>; Thu,  3 Dec 2020 14:08:22 -0800 (PST)
-Received: by mail-il1-x141.google.com with SMTP id z14so3395460ilm.10
-        for <linux-cifs@vger.kernel.org>; Thu, 03 Dec 2020 14:08:22 -0800 (PST)
+        with ESMTP id S1726179AbgLCXGm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Dec 2020 18:06:42 -0500
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42B6C061A52
+        for <linux-cifs@vger.kernel.org>; Thu,  3 Dec 2020 15:05:55 -0800 (PST)
+Received: by mail-lf1-x144.google.com with SMTP id s27so5165120lfp.5
+        for <linux-cifs@vger.kernel.org>; Thu, 03 Dec 2020 15:05:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=2h2mQHXLwpxsyBlfs24p1gLIXHr/MzxnR4HCzKk7DFU=;
-        b=fMTNLHgZBY9eVZc4Oaq+BQIdra5x3iPtc6Isghi5iiqZBNFhqqRZOnYXT1cCKPVLWZ
-         FmEgYLi1B1L1jMROjlEt7brN5L4m7qcKyAvx5321YT6cekYslbJNyC2F5OkmyhLzxgpj
-         1661FAB6X+CPDLGPTLneTR8sOIcpPXQ6qiDsKK/miblnjxP4JqwdMvZlkCY5xK7+RRDT
-         QPpkTFKzkHm22DJexlW4xJT4oHih4G4lAkHkdfp09V0XDH5oL8g4m6RVzE4Qvx6mcoyF
-         w1BfWtB2EeCCRk0Oz/IT9embJMnpIt69i1D2AcBcQtVWKl5RW6qMVY050McyVpCzVIxl
-         RtAA==
+        bh=gPW6ADOscTvoFGGv+PY85+kFAHW62TzEPZAwbYhY3Wk=;
+        b=M9CKwoM7joh4IVUhQGI8US46dBZtpMKo4rTTJHDCvKEftOSUb1vNr1MRCQ8ZhjLglS
+         qrXOv4bZJRhre7aZWR8Dho5IxmVGKsaImlWo9Neehf62y2123Ux6EUbJT3hn0HpowvIc
+         7QC65tiFlXbxf5mvYEudqcgUsWvgi16M2gPA2JkPQkfbeZbt09gfK+OijG6hLg7jxU5B
+         bduoO8j1XuHeNKCp26cuhEo1sHK8IPmKk5dK1a1sSZzW+8KaPM03OdpbBB1IZPH2xPbt
+         d2M+2s9ysqbUsDX9LTyjW/tUUxV7hZXaEfKr0SDcXILTvCHHAemqpgM2KWL99IXQMfvP
+         PWkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=2h2mQHXLwpxsyBlfs24p1gLIXHr/MzxnR4HCzKk7DFU=;
-        b=adQC+VkWzr7b7SZLbKaOfZsKO8QNJshnKBgKxqwewM04yp7NcdJX+F38RtdALrYy4n
-         ryl67bnO0DKVbIRpkSnhibmVcmqpMg2nHE0u/Lczjv5oEIDzMdFQ+HiZNtHtnyHqfWXY
-         BA4RNv+YHBmTQVM4kE8W0UOlLDZpUOboteF70f1RuoSWCM/IeNICQCqjZgLojn7bJVra
-         okAr47c8kZlFuymjaPQyAebyOxY7es82E+1eoibpw1btpgAicn4HrrWsug3NXbn7PLVZ
-         jyABwekaJBV1XMQBRSuQ297KZru5sXa3eza5jEfdz6yv1UQDhYVyxJ+Fo+MeQa3wOq0x
-         nBiQ==
-X-Gm-Message-State: AOAM5332noOH1at34YFoDSfjQDHruNXe3vFTwNnENkU5zLcZEkI+JyXo
-        dcnjlff1xktOMaEDEteE44g1+LlIOpnxKbXVOeE=
-X-Google-Smtp-Source: ABdhPJyuH+2zrQL2o9sZZiiOSp8+lFmTh9Ie/H/eMj62Oon/OyUmhGWrTGYKqcuOV17T40nC1TEVYJfaA1dQSfQpc+Y=
-X-Received: by 2002:a92:c5a7:: with SMTP id r7mr1718962ilt.219.1607033301671;
- Thu, 03 Dec 2020 14:08:21 -0800 (PST)
+        bh=gPW6ADOscTvoFGGv+PY85+kFAHW62TzEPZAwbYhY3Wk=;
+        b=F2hND2g/sOpAS8aJsnvSUZzuFQgjfC4uT//zcoIQHYdOxgvHveIE/h2XohZGh3Xj4+
+         gJWHXWBPG3QEoH6qRqbHrVemv0w6GZOyiDvTXr0JQhTtb+CZOs5jSzowFKCi12XC6m4D
+         taeu/Xz4UAjSDVw+pdodEFwCKmoUHBTKBvrGmbc3dHRPFnNyaAURynrhQ4Ap86iiZubN
+         wtpDXsJNI9yao8hrt0ECcrVvrGE5lZea8RJZ65pk7V1aMATaKAmTCjim1mtO9iZNb9X1
+         LAnu28yRXbtMeRI0rUtNB/1iw+yVf6ZbF4zazsM3No+F0W3SNSH9KSi+8opKKr3YFUy6
+         ekOQ==
+X-Gm-Message-State: AOAM533CZs5L8HN1nGcVdDIK9KYLLuwMRCAsgBEiJ/bS3D1Ite4MkyPT
+        gwF4lK8Vbonwt+yvKzVi9r2Skz1xgz0nufO6EYA=
+X-Google-Smtp-Source: ABdhPJw2WBGoSAGFtm9o/3/hLjajIBrDMe82yp5OXZdu7igfLIB24Ojbt1FUL3z9yOvkgYlmNFFncum+QL4KnG+3Z4w=
+X-Received: by 2002:a19:228f:: with SMTP id i137mr2059162lfi.477.1607036754367;
+ Thu, 03 Dec 2020 15:05:54 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5mtkt6-ezyTC6zoi+DBjYQ3qFwW3UneF0_4qETEt51Tm9w@mail.gmail.com>
- <CAH2r5mt+=ELCwSASFsPPjET=qf80_1tOTMPN-gG9cF=BQd-VBg@mail.gmail.com> <CAH2r5mv9_gvVtmBNSBDdnqkMAZMo9+fQExdgYEb+jEAMY4ad3A@mail.gmail.com>
-In-Reply-To: <CAH2r5mv9_gvVtmBNSBDdnqkMAZMo9+fQExdgYEb+jEAMY4ad3A@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 4 Dec 2020 08:08:10 +1000
-Message-ID: <CAN05THQuT8wf=-z1z5ERmEdfS4Nf72gHJiFUF_wbopR7FX-VQQ@mail.gmail.com>
-Subject: Re: [SMB3][PATCH] ifs: refactor create_sd_buf() and and avoid
- corrupting the buffer
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        rohiths msft <rohiths.msft@gmail.com>
+References: <CGME20201203033831epcas1p4c69684156cd4e393f048472a24238e6c@epcas1p4.samsung.com>
+ <20201203033136.16375-1-namjae.jeon@samsung.com> <CAN05THQdg9XQH2kNh43G60WkhUNFpbGA7P=x++kHtTRVprM5DQ@mail.gmail.com>
+In-Reply-To: <CAN05THQdg9XQH2kNh43G60WkhUNFpbGA7P=x++kHtTRVprM5DQ@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 3 Dec 2020 17:05:42 -0600
+Message-ID: <CAH2r5musGCUknmciO+KzZSVkec7f0gxbupG201oMvfDGqjTpRg@mail.gmail.com>
+Subject: Re: [PATCH] smb3: set COMPOUND_FID to FileID field of subsequent
+ compound request
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Namjae Jeon <namjae.jeon@samsung.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-LGTM.
+updated ... also just noticed that no need for cc:stable since this
+was added after 5.9
 
-Maybe move acl.AclRevision down to where the other fields are assigned
-so they are all assigned in the same place?
-
-On Fri, Dec 4, 2020 at 2:46 AM Steve French <smfrench@gmail.com> wrote:
+On Thu, Dec 3, 2020 at 3:23 PM ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
 >
-> updated the patch slightly by creating local variable for ace_count
-> and acl_size to avoid excessive endian conversions
+> Looks good to me,
+> please add "Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>"
 >
-> On Mon, Nov 30, 2020 at 10:19 PM Steve French <smfrench@gmail.com> wrote:
+> (How could this ever have worked?)
+>
+>
+> Can you add a line :
+> Fixes: 2e4564b31b645 ("smb3: add support ....
+>
+> On Thu, Dec 3, 2020 at 1:38 PM Namjae Jeon <namjae.jeon@samsung.com> wrote:
 > >
-> > Updated patch with fixes for various endian sparse warnings
+> > For an operation compounded with an SMB2 CREATE request, client must set
+> > COMPOUND_FID(0xFFFFFFFFFFFFFFFF) to FileID field of smb2 ioctl.
 > >
+> > Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
+> > ---
+> >  fs/cifs/smb2ops.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
 > >
-> > On Mon, Nov 30, 2020 at 12:02 AM Steve French <smfrench@gmail.com> wrote:
-> > >
-> > > When mounting with "idsfromsid" mount option, Azure
-> > > corrupted the owner SIDs due to excessive padding
-> > > caused by placing the owner fields at the end of the
-> > > security descriptor on create.  Placing owners at the
-> > > front of the security descriptor (rather than the end)
-> > > is also safer, as the number of ACEs (that follow it)
-> > > are variable.
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
+> > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> > index 504766cb6c19..3ca632bb6be9 100644
+> > --- a/fs/cifs/smb2ops.c
+> > +++ b/fs/cifs/smb2ops.c
+> > @@ -3098,8 +3098,8 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+> >         rqst[1].rq_nvec = SMB2_IOCTL_IOV_SIZE;
 > >
-> >
-> >
+> >         rc = SMB2_ioctl_init(tcon, server,
+> > -                            &rqst[1], fid.persistent_fid,
+> > -                            fid.volatile_fid, FSCTL_GET_REPARSE_POINT,
+> > +                            &rqst[1], COMPOUND_FID,
+> > +                            COMPOUND_FID, FSCTL_GET_REPARSE_POINT,
+> >                              true /* is_fctl */, NULL, 0,
+> >                              CIFSMaxBufSize -
+> >                              MAX_SMB2_CREATE_RESPONSE_SIZE -
 > > --
-> > Thanks,
+> > 2.17.1
 > >
-> > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
+
+
+
+-- 
+Thanks,
+
+Steve
