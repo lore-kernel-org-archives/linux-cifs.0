@@ -2,83 +2,77 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A72F3C4361A
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Dec 2020 18:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD7D7C433FE
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Dec 2020 21:09:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78E0322B2E
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Dec 2020 18:15:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A496229C7
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Dec 2020 21:09:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729081AbgLDSO2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 4 Dec 2020 13:14:28 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:47966 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726775AbgLDSO1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Dec 2020 13:14:27 -0500
-Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 0B4IDIuo007813
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 4 Dec 2020 13:13:18 -0500
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id DA510420136; Fri,  4 Dec 2020 13:13:17 -0500 (EST)
-Date:   Fri, 4 Dec 2020 13:13:17 -0500
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Chuck Lever <chuck.lever@oracle.com>,
+        id S1729256AbgLDVJ5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 4 Dec 2020 16:09:57 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33832 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726021AbgLDVJ4 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 4 Dec 2020 16:09:56 -0500
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.92 #5 (Debian))
+        id 1klIJz-0006K8-Lg; Sat, 05 Dec 2020 08:08:56 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Dec 2020 08:08:55 +1100
+Date:   Sat, 5 Dec 2020 08:08:55 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     David Howells <dhowells@redhat.com>,
         Bruce Fields <bfields@fieldses.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
         CIFS <linux-cifs@vger.kernel.org>,
         Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
+        <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Trond Myklebust <trond.myklebust@hammerspace.com>,
-        linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-afs@lists.infradead.org
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
 Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
-Message-ID: <20201204181317.GD577125@mit.edu>
-References: <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com>
+Message-ID: <20201204210855.GA3412@gondor.apana.org.au>
+References: <20201204154626.GA26255@fieldses.org>
+ <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com>
  <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk>
  <118876.1607093975@warthog.procyon.org.uk>
+ <122997.1607097713@warthog.procyon.org.uk>
+ <20201204160347.GA26933@fieldses.org>
+ <125709.1607100601@warthog.procyon.org.uk>
+ <CAMj1kXEOm_yh478i+dqPiz0eoBxp4eag3j2qHm5eBLe+2kihoQ@mail.gmail.com>
+ <127458.1607102368@warthog.procyon.org.uk>
+ <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <118876.1607093975@warthog.procyon.org.uk>
+In-Reply-To: <CAMj1kXFe50HvZLxG6Kh-oYBCf5uu51hhuh7mW5UQ62ZSqmu_xA@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Dec 04, 2020 at 02:59:35PM +0000, David Howells wrote:
-> Hi Chuck, Bruce,
-> 
-> Why is gss_krb5_crypto.c using an auxiliary cipher?  For reference, the
-> gss_krb5_aes_encrypt() code looks like the attached.
-> 
-> From what I can tell, in AES mode, the difference between the main cipher and
-> the auxiliary cipher is that the latter is "cbc(aes)" whereas the former is
-> "cts(cbc(aes))" - but they have the same key.
-> 
-> Reading up on CTS, I'm guessing the reason it's like this is that CTS is the
-> same as the non-CTS, except for the last two blocks, but the non-CTS one is
-> more efficient.
+On Fri, Dec 04, 2020 at 06:35:48PM +0100, Ard Biesheuvel wrote:
+>
+> Herbert recently made some changes for MSG_MORE support in the AF_ALG
+> code, which permits a skcipher encryption to be split into several
+> invocations of the skcipher layer without the need for this complexity
+> on the side of the caller. Maybe there is a way to reuse that here.
+> Herbert?
 
-The reason to use CTS is if you don't want to expand the size of the
-cipher text to the cipher block size.  e.g., if you have a 53 byte
-plaintext, and you can't afford to let the ciphertext be 56 bytes, the
-cryptographic engineer will reach for CTS instead of CBC.
+Yes this was one of the reasons I was persuing the continuation
+work.  It should allow us to kill the special case for CTS in the
+krb5 code.
 
-So that probably explains the explanation to use CTS (and it's
-required by the spec in any case).  As far as why CBC is being used
-instead of CTS, the only reason I can think of is the one you posted.
-Perhaps there was some hardware or software configureation where
-cbc(aes) was hardware accelerated, and cts(cbc(aes)) would not be?
+Hopefully I can get some time to restart work on this soon.
 
-In any case, using cbc(aes) for all but the last two blocks, and using
-cts(cbc(aes)) for the last two blocks, is identical to using
-cts(cbc(aes)) for the whole encryption.  So the only reason to do this
-in the more complex way would be because for performance reasons.
-
-       	    	    	      	 	 - Ted
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
