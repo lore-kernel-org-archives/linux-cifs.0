@@ -7,292 +7,200 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EF34C4361B
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Dec 2020 23:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A324EC4361B
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Dec 2020 23:40:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4575B23998
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Dec 2020 23:40:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7319423998
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Dec 2020 23:40:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725885AbgLGXk2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Dec 2020 18:40:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24666 "EHLO
+        id S1726563AbgLGXkf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 7 Dec 2020 18:40:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36577 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726483AbgLGXk1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Dec 2020 18:40:27 -0500
+        by vger.kernel.org with ESMTP id S1726556AbgLGXkf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Dec 2020 18:40:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607384341;
+        s=mimecast20190719; t=1607384348;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=Mc9zIymQToMUr0naBMRhP345ums+CF5bOQ6jvQIE8fI=;
-        b=XEqD5nhQhUGXv1UiI7JbxyxOyKflSOIlAB+Is0QZdYRJJa0kzNzvNBmDqP5qxYAA5/bEbI
-        L4vNJmCNmv6YG3Vi9nN/Yl7NGG9/9I6qUAMtd589p8BU1pWvHsGEnqHMzuq3mByZJQt0GA
-        r9SI+O52E3TB4AvUipt/TFrp033nH/g=
+        bh=fwQKYghYQ0RwvWZbB4I3CGcAWxKfbR1AGJSty4+jm3w=;
+        b=U5BT0RjvSiGGGMcoDUT+ILjaluzPCjDARnW2lQriS9hkALNzVMncTXIJcT33LBySd5OQ+X
+        CFpv0856NR0GMH+HfU+7Mp6Y8Gu5LB11GSICXP6vAy6L7yVLolWmNvMM8/WfWJGqBeoWLf
+        7mdBu5pbY2ezk57GEGSbEJKBPL77Wkw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-ByzPApGXOJugh1K7ORe32w-1; Mon, 07 Dec 2020 18:38:57 -0500
-X-MC-Unique: ByzPApGXOJugh1K7ORe32w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-409-0sZaN_AcPZ-EZwRxHPg94Q-1; Mon, 07 Dec 2020 18:39:06 -0500
+X-MC-Unique: 0sZaN_AcPZ-EZwRxHPg94Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F876107ACE3;
-        Mon,  7 Dec 2020 23:38:56 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC0CF809DD4;
+        Mon,  7 Dec 2020 23:39:04 +0000 (UTC)
 Received: from test1103.test.redhat.com (vpn2-54-107.bne.redhat.com [10.64.54.107])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8D08D5C1A1;
-        Mon,  7 Dec 2020 23:38:55 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BBE4D19C59;
+        Mon,  7 Dec 2020 23:39:03 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH 11/21] cifs: move cifs_cleanup_volume_info[_content] to fs_context.c
-Date:   Tue,  8 Dec 2020 09:36:36 +1000
-Message-Id: <20201207233646.29823-11-lsahlber@redhat.com>
+Subject: [PATCH 06/21] cifs: remove the devname argument to cifs_compose_mount_options
+Date:   Tue,  8 Dec 2020 09:36:31 +1000
+Message-Id: <20201207233646.29823-6-lsahlber@redhat.com>
 In-Reply-To: <20201207233646.29823-1-lsahlber@redhat.com>
 References: <20201207233646.29823-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-and rename it to smb3_cleanup_fs_context[_content]
+none of the callers use this argument any more.
 
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/cifs/cifsfs.c     |  2 +-
- fs/cifs/cifsproto.h  |  3 ---
- fs/cifs/connect.c    | 47 ++++-------------------------------------------
- fs/cifs/dfs_cache.c  |  4 ++--
- fs/cifs/fs_context.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
- fs/cifs/fs_context.h |  2 ++
- 6 files changed, 51 insertions(+), 52 deletions(-)
+ fs/cifs/cifs_dfs_ref.c | 11 +++--------
+ fs/cifs/cifsproto.h    |  3 +--
+ fs/cifs/connect.c      | 11 +++--------
+ fs/cifs/dfs_cache.c    |  6 ++----
+ 4 files changed, 9 insertions(+), 22 deletions(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index e432de7c6ca1..0288632233f6 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -866,7 +866,7 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
- out:
- 	if (cifs_sb) {
- 		kfree(cifs_sb->prepath);
--		cifs_cleanup_volume_info(cifs_sb->ctx);
-+		smb3_cleanup_fs_context(cifs_sb->ctx);
- 		kfree(cifs_sb);
- 	}
- 	return root;
+diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
+index 4b0b9cfe2ab1..81f6066d5865 100644
+--- a/fs/cifs/cifs_dfs_ref.c
++++ b/fs/cifs/cifs_dfs_ref.c
+@@ -124,7 +124,6 @@ cifs_build_devname(char *nodename, const char *prepath)
+  * @sb_mountdata:	parent/root DFS mount options (template)
+  * @fullpath:		full path in UNC format
+  * @ref:		optional server's referral
+- * @devname:		optional pointer for saving device name
+  *
+  * creates mount options for submount based on template options sb_mountdata
+  * and replacing unc,ip,prefixpath options with ones we've got form ref_unc.
+@@ -134,8 +133,7 @@ cifs_build_devname(char *nodename, const char *prepath)
+  */
+ char *cifs_compose_mount_options(const char *sb_mountdata,
+ 				   const char *fullpath,
+-				   const struct dfs_info3_param *ref,
+-				   char **devname)
++				   const struct dfs_info3_param *ref)
+ {
+ 	int rc;
+ 	char *name;
+@@ -232,10 +230,7 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
+ 	strcat(mountdata, "ip=");
+ 	strcat(mountdata, srvIP);
+ 
+-	if (devname)
+-		*devname = name;
+-	else
+-		kfree(name);
++	kfree(name);
+ 
+ 	/*cifs_dbg(FYI, "%s: parent mountdata: %s\n", __func__, sb_mountdata);*/
+ 	/*cifs_dbg(FYI, "%s: submount mountdata: %s\n", __func__, mountdata );*/
+@@ -281,7 +276,7 @@ static struct vfsmount *cifs_dfs_do_mount(struct dentry *mntpt,
+ 
+ 	/* strip first '\' from fullpath */
+ 	mountdata = cifs_compose_mount_options(cifs_sb->mountdata,
+-					       fullpath + 1, NULL, NULL);
++					       fullpath + 1, NULL);
+ 	if (IS_ERR(mountdata)) {
+ 		kfree(devname);
+ 		return (struct vfsmount *)mountdata;
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 19ee76f3a96f..b04f7270e04a 100644
+index 49a122978772..19ee76f3a96f 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -237,7 +237,6 @@ extern int cifs_read_page_from_socket(struct TCP_Server_Info *server,
- extern int cifs_setup_cifs_sb(struct smb3_fs_context *ctx,
- 			       struct cifs_sb_info *cifs_sb);
- extern int cifs_match_super(struct super_block *, void *);
--extern void cifs_cleanup_volume_info(struct smb3_fs_context *ctx);
- extern int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx);
- extern void cifs_umount(struct cifs_sb_info *);
- extern void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
-@@ -552,8 +551,6 @@ extern int SMBencrypt(unsigned char *passwd, const unsigned char *c8,
- 
- extern int
- cifs_setup_volume_info(struct smb3_fs_context *ctx);
--extern void
--cifs_cleanup_volume_info_contents(struct smb3_fs_context *ctx);
- 
- extern struct TCP_Server_Info *
- cifs_find_tcp_session(struct smb3_fs_context *ctx);
+@@ -78,8 +78,7 @@ extern char *cifs_build_path_to_root(struct smb3_fs_context *ctx,
+ 				     int add_treename);
+ extern char *build_wildcard_path_from_dentry(struct dentry *direntry);
+ extern char *cifs_compose_mount_options(const char *sb_mountdata,
+-		const char *fullpath, const struct dfs_info3_param *ref,
+-		char **devname);
++		const char *fullpath, const struct dfs_info3_param *ref);
+ /* extern void renew_parental_timestamps(struct dentry *direntry);*/
+ extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
+ 					struct TCP_Server_Info *server);
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 47e2fe8c19a2..054cb09b8087 100644
+index 081e61a212cd..dd7c2058ecf6 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -2777,45 +2777,6 @@ int cifs_setup_cifs_sb(struct smb3_fs_context *ctx,
- 	return 0;
- }
+@@ -3019,11 +3019,8 @@ expand_dfs_referral(const unsigned int xid, struct cifs_ses *ses,
+ 	rc = dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb),
+ 			    ref_path, &referral, NULL);
+ 	if (!rc) {
+-		char *fake_devname = NULL;
+-
+ 		mdata = cifs_compose_mount_options(cifs_sb->mountdata,
+-						   full_path + 1, &referral,
+-						   &fake_devname);
++						   full_path + 1, &referral);
+ 		free_dfs_info_param(&referral);
  
--void
--cifs_cleanup_volume_info_contents(struct smb3_fs_context *ctx)
--{
--	if (ctx == NULL)
--		return;
--
--	/*
--	 * Make sure this stays in sync with smb3_fs_context_dup()
--	 */
--	kfree(ctx->mount_options);
--	ctx->mount_options = NULL;
--	kfree(ctx->username);
--	ctx->username = NULL;
--	kfree_sensitive(ctx->password);
--	ctx->password = NULL;
--	kfree(ctx->UNC);
--	ctx->UNC = NULL;
--	kfree(ctx->domainname);
--	ctx->domainname = NULL;
--	kfree(ctx->nodename);
--	ctx->nodename = NULL;
--	kfree(ctx->iocharset);
--	ctx->iocharset = NULL;
--	kfree(ctx->prepath);
--	ctx->prepath = NULL;
--
--	unload_nls(ctx->local_nls);
--	ctx->local_nls = NULL;
--}
--
--void
--cifs_cleanup_volume_info(struct smb3_fs_context *ctx)
--{
--	if (!ctx)
--		return;
--	cifs_cleanup_volume_info_contents(ctx);
--	kfree(ctx);
--}
--
- /* Release all succeed connections */
- static inline void mount_put_conns(struct cifs_sb_info *cifs_sb,
- 				   unsigned int xid,
-@@ -3027,7 +2988,7 @@ expand_dfs_referral(const unsigned int xid, struct cifs_ses *ses,
- 			rc = PTR_ERR(mdata);
- 			mdata = NULL;
- 		} else {
--			cifs_cleanup_volume_info_contents(ctx);
-+			smb3_cleanup_fs_context_contents(ctx);
+ 		if (IS_ERR(mdata)) {
+@@ -3033,7 +3030,6 @@ expand_dfs_referral(const unsigned int xid, struct cifs_ses *ses,
+ 			cifs_cleanup_volume_info_contents(ctx);
  			rc = cifs_setup_volume_info(ctx);
  		}
- 		kfree(cifs_sb->ctx->mount_options);
-@@ -3119,7 +3080,7 @@ static int setup_dfs_tgt_conn(const char *path, const char *full_path,
- 			rc = update_vol_info(tgt_it, &fake_ctx, ctx);
- 		}
+-		kfree(fake_devname);
+ 		kfree(cifs_sb->mountdata);
+ 		cifs_sb->mountdata = mdata;
  	}
--	cifs_cleanup_volume_info_contents(&fake_ctx);
-+	smb3_cleanup_fs_context_contents(&fake_ctx);
- 	return rc;
- }
- 
-@@ -3366,7 +3327,7 @@ static int check_dfs_prepath(struct cifs_sb_info *cifs_sb, struct smb3_fs_contex
- 					break;
- 				rc = -EREMOTE;
- 				npath = build_unc_path_to_root(&v, cifs_sb, true);
--				cifs_cleanup_volume_info_contents(&v);
-+				smb3_cleanup_fs_context_contents(&v);
- 			} else {
- 				v.UNC = ctx->UNC;
- 				v.prepath = path + 1;
-@@ -3729,7 +3690,7 @@ static void delayed_free(struct rcu_head *p)
+@@ -3085,7 +3081,7 @@ static int setup_dfs_tgt_conn(const char *path, const char *full_path,
  {
- 	struct cifs_sb_info *cifs_sb = container_of(p, struct cifs_sb_info, rcu);
- 	unload_nls(cifs_sb->local_nls);
--	cifs_cleanup_volume_info(cifs_sb->ctx);
-+	smb3_cleanup_fs_context(cifs_sb->ctx);
- 	kfree(cifs_sb);
- }
+ 	int rc;
+ 	struct dfs_info3_param ref = {0};
+-	char *mdata = NULL, *fake_devname = NULL;
++	char *mdata = NULL;
+ 	struct smb3_fs_context fake_ctx = {NULL};
  
+ 	cifs_dbg(FYI, "%s: dfs path: %s\n", __func__, path);
+@@ -3094,7 +3090,7 @@ static int setup_dfs_tgt_conn(const char *path, const char *full_path,
+ 	if (rc)
+ 		return rc;
+ 
+-	mdata = cifs_compose_mount_options(cifs_sb->mountdata, full_path + 1, &ref, &fake_devname);
++	mdata = cifs_compose_mount_options(cifs_sb->mountdata, full_path + 1, &ref);
+ 	free_dfs_info_param(&ref);
+ 
+ 	if (IS_ERR(mdata)) {
+@@ -3104,7 +3100,6 @@ static int setup_dfs_tgt_conn(const char *path, const char *full_path,
+ 		rc = cifs_setup_volume_info(&fake_ctx);
+ 	}
+ 	kfree(mdata);
+-	kfree(fake_devname);
+ 
+ 	if (!rc) {
+ 		/*
 diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-index 6bccff4596bf..6ad6ba5f6ebe 100644
+index dde859c21f1a..6bccff4596bf 100644
 --- a/fs/cifs/dfs_cache.c
 +++ b/fs/cifs/dfs_cache.c
-@@ -587,7 +587,7 @@ static void __vol_release(struct vol_info *vi)
- {
- 	kfree(vi->fullpath);
- 	kfree(vi->mntdata);
--	cifs_cleanup_volume_info_contents(&vi->ctx);
-+	smb3_cleanup_fs_context_contents(&vi->ctx);
- 	kfree(vi);
- }
+@@ -1416,7 +1416,7 @@ static struct cifs_ses *find_root_ses(struct vol_info *vi,
+ 	int rc;
+ 	struct cache_entry *ce;
+ 	struct dfs_info3_param ref = {0};
+-	char *mdata = NULL, *devname = NULL;
++	char *mdata = NULL;
+ 	struct TCP_Server_Info *server;
+ 	struct cifs_ses *ses;
+ 	struct smb3_fs_context ctx = {NULL};
+@@ -1443,8 +1443,7 @@ static struct cifs_ses *find_root_ses(struct vol_info *vi,
  
-@@ -1468,7 +1468,7 @@ static struct cifs_ses *find_root_ses(struct vol_info *vi,
- 	ses = cifs_get_smb_ses(server, &ctx);
+ 	up_read(&htable_rw_lock);
  
- out:
--	cifs_cleanup_volume_info_contents(&ctx);
-+	smb3_cleanup_fs_context_contents(&ctx);
- 	kfree(mdata);
- 	kfree(rpath);
+-	mdata = cifs_compose_mount_options(vi->mntdata, rpath, &ref,
+-					   &devname);
++	mdata = cifs_compose_mount_options(vi->mntdata, rpath, &ref);
+ 	free_dfs_info_param(&ref);
  
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index 1e69fdbe76d8..8b74b87d7af7 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -288,7 +288,7 @@ do {									\
- 	if (ctx->field) {						\
- 		new_ctx->field = kstrdup(ctx->field, GFP_ATOMIC);	\
- 		if (new_ctx->field == NULL) {				\
--			cifs_cleanup_volume_info_contents(new_ctx);	\
-+			smb3_cleanup_fs_context_contents(new_ctx);	\
- 			return -ENOMEM;					\
- 		}							\
- 	}								\
-@@ -311,7 +311,7 @@ smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx
- 	new_ctx->iocharset = NULL;
+ 	if (IS_ERR(mdata)) {
+@@ -1454,7 +1453,6 @@ static struct cifs_ses *find_root_ses(struct vol_info *vi,
+ 	}
  
- 	/*
--	 * Make sure to stay in sync with cifs_cleanup_volume_info_contents()
-+	 * Make sure to stay in sync with smb3_cleanup_fs_context_contents()
- 	 */
- 	DUP_CTX_STR(prepath);
- 	DUP_CTX_STR(mount_options);
-@@ -615,7 +615,7 @@ static void smb3_fs_context_free(struct fs_context *fc)
- {
- 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
+ 	rc = cifs_setup_volume_info(&ctx);
+-	kfree(devname);
  
--	cifs_cleanup_volume_info(ctx);		
-+	smb3_cleanup_fs_context(ctx);
- }
- 
- static int smb3_reconfigure(struct fs_context *fc)
-@@ -1231,3 +1231,42 @@ int smb3_init_fs_context(struct fs_context *fc)
- 	fc->ops = &smb3_fs_context_ops;
- 	return 0;
- }
-+
-+void
-+smb3_cleanup_fs_context_contents(struct smb3_fs_context *ctx)
-+{
-+	if (ctx == NULL)
-+		return;
-+
-+	/*
-+	 * Make sure this stays in sync with smb3_fs_context_dup()
-+	 */
-+	kfree(ctx->mount_options);
-+	ctx->mount_options = NULL;
-+	kfree(ctx->username);
-+	ctx->username = NULL;
-+	kfree_sensitive(ctx->password);
-+	ctx->password = NULL;
-+	kfree(ctx->UNC);
-+	ctx->UNC = NULL;
-+	kfree(ctx->domainname);
-+	ctx->domainname = NULL;
-+	kfree(ctx->nodename);
-+	ctx->nodename = NULL;
-+	kfree(ctx->iocharset);
-+	ctx->iocharset = NULL;
-+	kfree(ctx->prepath);
-+	ctx->prepath = NULL;
-+
-+	unload_nls(ctx->local_nls);
-+	ctx->local_nls = NULL;
-+}
-+
-+void
-+smb3_cleanup_fs_context(struct smb3_fs_context *ctx)
-+{
-+	if (!ctx)
-+		return;
-+	smb3_cleanup_fs_context_contents(ctx);
-+	kfree(ctx);
-+}
-diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
-index 6e98ef526895..bb3fdce6d7f2 100644
---- a/fs/cifs/fs_context.h
-+++ b/fs/cifs/fs_context.h
-@@ -252,6 +252,8 @@ extern int cifs_parse_cache_flavor(char *value,
- extern int cifs_parse_security_flavors(char *value,
- 				       struct smb3_fs_context *ctx);
- extern int smb3_init_fs_context(struct fs_context *fc);
-+extern void smb3_cleanup_fs_context_contents(struct smb3_fs_context *ctx);
-+extern void smb3_cleanup_fs_context(struct smb3_fs_context *ctx);
- 
- static inline struct smb3_fs_context *smb3_fc2context(const struct fs_context *fc \
- 						    )
+ 	if (rc) {
+ 		ses = ERR_PTR(rc);
 -- 
 2.13.6
 
