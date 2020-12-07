@@ -7,94 +7,108 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 400D3C4361B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65986C433FE
 	for <linux-cifs@archiver.kernel.org>; Mon,  7 Dec 2020 23:39:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1925223998
+	by mail.kernel.org (Postfix) with ESMTP id 30A4B23A21
 	for <linux-cifs@archiver.kernel.org>; Mon,  7 Dec 2020 23:39:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728167AbgLGXj1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Dec 2020 18:39:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45712 "EHLO
+        id S1727370AbgLGXjh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 7 Dec 2020 18:39:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44798 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727370AbgLGXj1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Dec 2020 18:39:27 -0500
+        by vger.kernel.org with ESMTP id S1726402AbgLGXjh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Dec 2020 18:39:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607384281;
+        s=mimecast20190719; t=1607384291;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=nso3ZmLzvLmVThqX0dJy3RvTRrceGcqDwUOafCWGRZw=;
-        b=TE7MI8N+6fSFXcdczxv56HdjNUM0NTYJCoofDY6gytgkh9ESA0yssyFCxVgI0DKCqdP0KD
-        gvQJBRJq+ZvINaXReQfvxcLfv8tQsQ3jSfGOlOHH9Jw/woXrN1FiRUx2C9tFt7Nhv9K/mW
-        Sg5Lii1p5WTODmQxbfIFMiS/mJlC9AM=
+        bh=DemcIf6OozsIBSCHCq7Ihx0PfHtD62K3XLE5x+ZTVMI=;
+        b=OLf39NaF+hwWZEHbcawE5JO0wbAwiIHfcBAe9bUIe7ZRDx/mWwZy0xR5OaVEbzcilObcpd
+        0RVVNRM59y0GCt7QfSH9ORv1G1ArvPUGn4PRxwLouwEgGmL+tazALiVpeyquXVdrvClUAr
+        4ewKwZP9hF6VGZC9MvcCnmCCxJWQRi8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-GRwJXl2LP3ejwx2JheyEsw-1; Mon, 07 Dec 2020 18:37:59 -0500
-X-MC-Unique: GRwJXl2LP3ejwx2JheyEsw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-212-jb2RFvV2MyGJDDdPTkKM8Q-1; Mon, 07 Dec 2020 18:38:07 -0500
+X-MC-Unique: jb2RFvV2MyGJDDdPTkKM8Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BEE9107ACE3;
-        Mon,  7 Dec 2020 23:37:58 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D8EE107ACE4;
+        Mon,  7 Dec 2020 23:38:06 +0000 (UTC)
 Received: from test1103.test.redhat.com (vpn2-54-107.bne.redhat.com [10.64.54.107])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B006F5D9C6;
-        Mon,  7 Dec 2020 23:37:57 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B1621F471;
+        Mon,  7 Dec 2020 23:38:05 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH 16/21] cifs: don't create a temp nls in cifs_setup_ipc
-Date:   Tue,  8 Dec 2020 09:36:41 +1000
-Message-Id: <20201207233646.29823-16-lsahlber@redhat.com>
+Subject: [PATCH 13/21] cifs: add initial reconfigure support
+Date:   Tue,  8 Dec 2020 09:36:38 +1000
+Message-Id: <20201207233646.29823-13-lsahlber@redhat.com>
 In-Reply-To: <20201207233646.29823-1-lsahlber@redhat.com>
 References: <20201207233646.29823-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-just use the one that is already available in ctx
-
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/cifs/connect.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ fs/cifs/fs_context.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index f2698090b39a..22b5f3544947 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1493,7 +1493,6 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- {
- 	int rc = 0, xid;
- 	struct cifs_tcon *tcon;
--	struct nls_table *nls_codepage;
- 	char unc[SERVER_NAME_LENGTH + sizeof("//x/IPC$")] = {0};
- 	bool seal = false;
- 	struct TCP_Server_Info *server = ses->server;
-@@ -1518,14 +1517,11 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 
- 	scnprintf(unc, sizeof(unc), "\\\\%s\\IPC$", server->hostname);
- 
--	/* cannot fail */
--	nls_codepage = load_nls_default();
--
- 	xid = get_xid();
- 	tcon->ses = ses;
- 	tcon->ipc = true;
- 	tcon->seal = seal;
--	rc = server->ops->tree_connect(xid, ses, unc, tcon, nls_codepage);
-+	rc = server->ops->tree_connect(xid, ses, unc, tcon, ctx->local_nls);
- 	free_xid(xid);
- 
- 	if (rc) {
-@@ -1538,7 +1534,6 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 
- 	ses->tcon_ipc = tcon;
- out:
--	unload_nls(nls_codepage);
- 	return rc;
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 752b7da43f4c..edfdea129fcc 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -618,14 +618,44 @@ static void smb3_fs_context_free(struct fs_context *fc)
+ 	smb3_cleanup_fs_context(ctx);
  }
  
+-static int smb3_reconfigure(struct fs_context *fc)
++/*
++ * Compare the old and new proposed context during reconfigure
++ * and check if the changes are compatible.
++ */
++static int smb3_verify_reconfigure_ctx(struct smb3_fs_context *new_ctx,
++				       struct smb3_fs_context *old_ctx)
+ {
+-	// TODO:  struct smb3_fs_context *ctx = smb3_fc2context(fc);
++	if (new_ctx->sectype != old_ctx->sectype) {
++		cifs_dbg(VFS, "can not change sec during remount\n");
++		return -EINVAL;
++	}
+ 
+-	/* FIXME : add actual reconfigure */
+ 	return 0;
+ }
+ 
++static int smb3_reconfigure(struct fs_context *fc)
++{
++	struct smb3_fs_context *ctx = smb3_fc2context(fc);
++	struct dentry *root = fc->root;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(root->d_sb);
++	int rc;
++
++	rc = smb3_verify_reconfigure_ctx(ctx, cifs_sb->ctx);
++	if (rc)
++		return rc;
++
++	/*
++	 * Steal the UNC from the old and to be destroyed context.
++	 */
++	ctx->UNC = cifs_sb->ctx->UNC;
++	cifs_sb->ctx->UNC = NULL;
++
++	smb3_cleanup_fs_context_contents(cifs_sb->ctx);
++	rc = smb3_fs_context_dup(cifs_sb->ctx, ctx);
++
++	return rc;
++}
++
+ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 				      struct fs_parameter *param)
+ {
 -- 
 2.13.6
 
