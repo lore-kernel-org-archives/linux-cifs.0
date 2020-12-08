@@ -2,141 +2,208 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03138C2BBCF
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Dec 2020 04:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE2CC433FE
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Dec 2020 05:07:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C877C23A61
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Dec 2020 04:54:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8E6723A5E
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Dec 2020 05:07:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727589AbgLHEyH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Dec 2020 23:54:07 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:58200 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727485AbgLHEyD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Dec 2020 23:54:03 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B84nPNV064006;
-        Tue, 8 Dec 2020 04:52:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=1e3cV7XKyt5cBPHNeWYhYMHu3W87CKppja6U1Jvw5F4=;
- b=V+G180Fh0lHbcmydQJqS5i+cerb42SoRrRI9QCXlQMjyWKKfj0acXqExTQUiK+7OEtft
- OuMy/8L57grCegXY4FPi2mfpdUD9NETOrjU6XyLEGnB6yCKU9e30d2WSgQTsYBxq/cMN
- 5junVfgiRpfFB5rc1EfDtZHP43anCs3FIrUtz16u4yPsKG0NCInMT5yeMTaPCX1MMJeq
- qZ1GHIcbwNatFRQ/tELhwJDJybfqjlIskC/pDoCLpTPJ2KTrod7PX9rst5aaRTC3xIQA
- veh/+mbPHLjYXfePq5oiUCHv2+7Gowf8M2KKiHFzojpZKSSSQD2meZy2nTRpI8CVh6TQ Yg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 35825m0srq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 08 Dec 2020 04:52:35 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B84ocw5155469;
-        Tue, 8 Dec 2020 04:52:34 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by userp3020.oracle.com with ESMTP id 358kys9m8s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 08 Dec 2020 04:52:34 +0000
-Received: from userp3020.oracle.com (userp3020.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0B84qX4M159553;
-        Tue, 8 Dec 2020 04:52:33 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3020.oracle.com with ESMTP id 358kys9m7s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 08 Dec 2020 04:52:33 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B84qDZf015901;
-        Tue, 8 Dec 2020 04:52:15 GMT
-Received: from ca-mkp.ca.oracle.com (/10.156.108.201)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 07 Dec 2020 20:52:13 -0800
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-To:     linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        coreteam@netfilter.org, selinux@vger.kernel.org,
-        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>,
-        linux-hardening@vger.kernel.org, reiserfs-devel@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org, patches@opensource.cirrus.com,
-        linux-fbdev@vger.kernel.org, keyrings@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-geode@lists.infradead.org, linux-gpio@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-ext4@vger.kernel.org,
-        wcn36xx@lists.infradead.org, GR-everest-linux-l2@marvell.com,
-        x86@kernel.org, linux-watchdog@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-usb@vger.kernel.org, devel@driverdev.osuosl.org,
-        linux-atm-general@lists.sourceforge.net,
-        linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        netfilter-devel@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-mediatek@lists.infradead.org,
-        Kees Cook <keescook@chromium.org>,
-        samba-technical@lists.samba.org, ceph-devel@vger.kernel.org,
-        drbd-dev@tron.linbit.com, intel-gfx@lists.freedesktop.org,
-        dm-devel@redhat.com, linux-acpi@vger.kernel.org,
-        linux-ide@vger.kernel.org, xen-devel@lists.xenproject.org,
-        op-tee@lists.trustedfirmware.org, linux-hwmon@vger.kernel.org,
-        linux-sctp@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-mtd@lists.infradead.org, linux-input@vger.kernel.org,
-        linux-can@vger.kernel.org, rds-devel@oss.oracle.com,
-        oss-drivers@netronome.com, tipc-discussion@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-rdma@vger.kernel.org,
-        dri-devel@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-        usb-storage@lists.one-eyed-alien.net,
-        linux1394-devel@lists.sourceforge.net, alsa-devel@alsa-project.org,
-        linux-i3c@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-afs@lists.infradead.org, nouveau@lists.freedesktop.org,
-        GR-Linux-NIC-Dev@marvell.com, netdev@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com, linux-mm@kvack.org,
-        intel-wired-lan@lists.osuosl.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: (subset) [PATCH 000/141] Fix fall-through warnings for Clang
-Date:   Mon,  7 Dec 2020 23:52:01 -0500
-Message-Id: <160740299787.710.4201881220590518200.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <cover.1605896059.git.gustavoars@kernel.org>
-References: <cover.1605896059.git.gustavoars@kernel.org>
+        id S1725818AbgLHFHE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Dec 2020 00:07:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35510 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725768AbgLHFHE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Dec 2020 00:07:04 -0500
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1843C061749
+        for <linux-cifs@vger.kernel.org>; Mon,  7 Dec 2020 21:06:23 -0800 (PST)
+Received: by mail-lj1-x243.google.com with SMTP id e7so7402866ljg.10
+        for <linux-cifs@vger.kernel.org>; Mon, 07 Dec 2020 21:06:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zhbI3YSVbGqM+N3HMsMJjXfsY8EoduA9XkxNSCKTWWE=;
+        b=ChpJHhgpL6N/9R8zcu7FzngljCW1/NSISydl2cHHkUqmUHRcYDQ7fLS/v2DQh6lw+l
+         sgHozD/bQ0bb5vuPKDBCsQFTK+8dvn6dj4cjj5yjbl6yiim7JAoUg4m+11u7ng4uSDua
+         MeZQIoKEQuSQGL5pdxVgVkHzfLUkYeOpNiy5NDr0Xah2TL33lI/PbbqN2aZIR1yu35XI
+         7Y6HPJlbZ4IYrZT8dR5vzwv3xE7Ukakj3mxJMafJISWA4Ge5fSZtZg+nwrw5qLXwF9EC
+         adPFMrvmJIYPUZHS1lghipbQLhn1BVJS2VTncuqaI45UtrTj1PqN6gTM5dMNMNJRjuFw
+         vL6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zhbI3YSVbGqM+N3HMsMJjXfsY8EoduA9XkxNSCKTWWE=;
+        b=mn00OUvV7PUYIWpdPsyDpXtjsxCuF/YphsSGAa0JSP39o1Alie4NWH+sl0JcwQzywf
+         6I3R1s+/mgP8P+hv9wHhf2kbyr0qTwReMFxFHje8lXvA43BnO+a8jVMtZ/Xr8MnEKBIX
+         q5l0BPDRPQCLwle4/n7AZRoWijH72yaVjvxKg0G3P4b40aFattYo/Ln4L73wDqQB3rO5
+         k/tR68Qr70sA4g/oKneFqUlK8QYe1nOBr5MitoSyauAw/4t0qc7Nu/BCEmA9BDoz6ICJ
+         g8JDOn7PXKuY6B2NqGtEQ/q7ZwauxA3PolOBBGEZg6w8kdUbRys/lFHCG6NjUbATgckX
+         xeNQ==
+X-Gm-Message-State: AOAM531v1ReNXVTbn427NQI9otkq6ZObFYA/0xMgNucQmecy1mAq8c6v
+        AWPqy6xGYzMdbncNdPlWDrF+Dn3829D2O4Cp5AFPu8XlRHMKgA==
+X-Google-Smtp-Source: ABdhPJxV9M83k4It+pUodFNmv5CJqCTk2w95I+d1fBYv9ErLwKBxXX4czPbTwrdka8pVvJHim5GpYjf9Dr0/wOqCX84=
+X-Received: by 2002:a2e:8096:: with SMTP id i22mr5632107ljg.403.1607403982284;
+ Mon, 07 Dec 2020 21:06:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9828 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0 bulkscore=0
- phishscore=0 mlxlogscore=380 clxscore=1015 priorityscore=1501 mlxscore=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012080029
+References: <20201207233646.29823-1-lsahlber@redhat.com> <20201207233646.29823-14-lsahlber@redhat.com>
+In-Reply-To: <20201207233646.29823-14-lsahlber@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 7 Dec 2020 23:06:08 -0600
+Message-ID: <CAH2r5mu_AGjT6T-gNOn5Z7eb7zXgm44Br+AES_=FVUdi6WnPSQ@mail.gmail.com>
+Subject: Re: [PATCH 14/21] cifs: we do not allow changing username/password/unc/...
+ during remount
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 20 Nov 2020 12:21:39 -0600, Gustavo A. R. Silva wrote:
+Minor nits pointed out by checkpatch:
 
-> This series aims to fix almost all remaining fall-through warnings in
-> order to enable -Wimplicit-fallthrough for Clang.
-> 
-> In preparation to enable -Wimplicit-fallthrough for Clang, explicitly
-> add multiple break/goto/return/fallthrough statements instead of just
-> letting the code fall through to the next case.
-> 
-> [...]
+0015-cifs-we-do-not-allow-changing-username-password-unc-.patch
+---------------------------------------------------------------
+WARNING: Missing commit description - Add an appropriate one
 
-Applied to 5.11/scsi-queue, thanks!
+WARNING: kfree(NULL) is safe and this check is probably not required
+#76: FILE: fs/cifs/fs_context.c:673:
++ if (ctx->field) { \
++ kfree(ctx->field);
 
-[054/141] target: Fix fall-through warnings for Clang
-          https://git.kernel.org/mkp/scsi/c/492096ecfa39
+On Mon, Dec 7, 2020 at 5:37 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+>
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/cifsfs.c     |  2 +-
+>  fs/cifs/fs_context.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++---
+>  fs/cifs/fs_context.h |  2 +-
+>  3 files changed, 54 insertions(+), 5 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 80117e9d35f9..13d7f4a3c836 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -490,7 +490,7 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
+>
+>         if (tcon->no_lease)
+>                 seq_puts(s, ",nolease");
+> -       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER)
+> +       if (cifs_sb->ctx->multiuser)
+>                 seq_puts(s, ",multiuser");
+>         else if (tcon->ses->user_name)
+>                 seq_show_option(s, "username", tcon->ses->user_name);
+> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+> index edfdea129fcc..542fa75b74aa 100644
+> --- a/fs/cifs/fs_context.c
+> +++ b/fs/cifs/fs_context.c
+> @@ -629,10 +629,53 @@ static int smb3_verify_reconfigure_ctx(struct smb3_fs_context *new_ctx,
+>                 cifs_dbg(VFS, "can not change sec during remount\n");
+>                 return -EINVAL;
+>         }
+> +       if (new_ctx->multiuser != old_ctx->multiuser) {
+> +               cifs_dbg(VFS, "can not change multiuser during remount\n");
+> +               return -EINVAL;
+> +       }
+> +       if (new_ctx->UNC &&
+> +           (!old_ctx->UNC || strcmp(new_ctx->UNC, old_ctx->UNC))) {
+> +               cifs_dbg(VFS, "can not change UNC during remount\n");
+> +               return -EINVAL;
+> +       }
+> +       if (new_ctx->username &&
+> +           (!old_ctx->username || strcmp(new_ctx->username, old_ctx->username))) {
+> +               cifs_dbg(VFS, "can not change username during remount\n");
+> +               return -EINVAL;
+> +       }
+> +       if (new_ctx->password &&
+> +           (!old_ctx->password || strcmp(new_ctx->password, old_ctx->password))) {
+> +               cifs_dbg(VFS, "can not change password during remount\n");
+> +               return -EINVAL;
+> +       }
+> +       if (new_ctx->domainname &&
+> +           (!old_ctx->domainname || strcmp(new_ctx->domainname, old_ctx->domainname))) {
+> +               cifs_dbg(VFS, "can not change domainname during remount\n");
+> +               return -EINVAL;
+> +       }
+> +       if (new_ctx->nodename &&
+> +           (!old_ctx->nodename || strcmp(new_ctx->nodename, old_ctx->nodename))) {
+> +               cifs_dbg(VFS, "can not change nodename during remount\n");
+> +               return -EINVAL;
+> +       }
+> +       if (new_ctx->iocharset &&
+> +           (!old_ctx->iocharset || strcmp(new_ctx->iocharset, old_ctx->iocharset))) {
+> +               cifs_dbg(VFS, "can not change iocharset during remount\n");
+> +               return -EINVAL;
+> +       }
+>
+>         return 0;
+>  }
+>
+> +#define STEAL_STRING(cifs_sb, ctx, field)                              \
+> +do {                                                                   \
+> +       if (ctx->field) {                                               \
+> +               kfree(ctx->field);                                      \
+> +               ctx->field = cifs_sb->ctx->field;                       \
+> +               cifs_sb->ctx->field = NULL;                             \
+> +       }                                                               \
+> +} while (0)
+> +
+>  static int smb3_reconfigure(struct fs_context *fc)
+>  {
+>         struct smb3_fs_context *ctx = smb3_fc2context(fc);
+> @@ -645,10 +688,16 @@ static int smb3_reconfigure(struct fs_context *fc)
+>                 return rc;
+>
+>         /*
+> -        * Steal the UNC from the old and to be destroyed context.
+> +        * We can not change UNC/username/password/domainname/nodename/iocharset
+> +        * during reconnect so ignore what we have in the new context and
+> +        * just use what we already have in cifs_sb->ctx.
+>          */
+> -       ctx->UNC = cifs_sb->ctx->UNC;
+> -       cifs_sb->ctx->UNC = NULL;
+> +       STEAL_STRING(cifs_sb, ctx, UNC);
+> +       STEAL_STRING(cifs_sb, ctx, username);
+> +       STEAL_STRING(cifs_sb, ctx, password);
+> +       STEAL_STRING(cifs_sb, ctx, domainname);
+> +       STEAL_STRING(cifs_sb, ctx, nodename);
+> +       STEAL_STRING(cifs_sb, ctx, iocharset);
+>
+>         smb3_cleanup_fs_context_contents(cifs_sb->ctx);
+>         rc = smb3_fs_context_dup(cifs_sb->ctx, ctx);
+> diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
+> index aa1d952fd5ce..62f5a8d98df6 100644
+> --- a/fs/cifs/fs_context.h
+> +++ b/fs/cifs/fs_context.h
+> @@ -148,7 +148,6 @@ struct smb3_fs_context {
+>         bool uid_specified;
+>         bool gid_specified;
+>         bool sloppy;
+> -       char *nodename;
+>         bool got_ip;
+>         bool got_version;
+>         bool got_rsize;
+> @@ -160,6 +159,7 @@ struct smb3_fs_context {
+>         char *password;
+>         char *domainname;
+>         char *UNC;
+> +       char *nodename;
+>         char *iocharset;  /* local code page for mapping to and from Unicode */
+>         char source_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* clnt nb name */
+>         char target_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* srvr nb name */
+> --
+> 2.13.6
+>
+
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Thanks,
+
+Steve
