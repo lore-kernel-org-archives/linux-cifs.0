@@ -2,91 +2,191 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69138C4361B
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Dec 2020 14:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C07C433FE
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Dec 2020 20:43:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 384D923A33
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Dec 2020 14:15:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A0A9206EC
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Dec 2020 20:43:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729564AbgLHOPV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 8 Dec 2020 09:15:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21057 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729457AbgLHOPV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Dec 2020 09:15:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607436835;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tffr6g9iDgmcI1vdIiaVq+38gJQDylZk+4muqW+tsNE=;
-        b=IJTpaHRCryhPZRPUjIJCq324nsns++Zv4yT18skVPHM7i0XQVOXz6RWw8OM/bmKJ2EZxXE
-        p0Nh0t+Wcu3JL4We+A4qu8TNFA9Wyxe64jU/0NdLUJoriCdPSFsLKU3mq8u3rync1dhc+a
-        /oQI2KML24M2ie9Fw4EDurIWg+mXtnA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-_6Jn5BKhNzC6LVuO_YUIoQ-1; Tue, 08 Dec 2020 09:13:53 -0500
-X-MC-Unique: _6Jn5BKhNzC6LVuO_YUIoQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DADC19611AE;
-        Tue,  8 Dec 2020 14:13:51 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5E13960BE2;
-        Tue,  8 Dec 2020 14:13:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAMj1kXE+oi2Q7OE8o0xP4XabZt-y61NMG3Q3eyRzSG6cG9i4Kg@mail.gmail.com>
-References: <CAMj1kXE+oi2Q7OE8o0xP4XabZt-y61NMG3Q3eyRzSG6cG9i4Kg@mail.gmail.com> <2F96670A-58DC-43A6-A20E-696803F0BFBA@oracle.com> <160518586534.2277919.14475638653680231924.stgit@warthog.procyon.org.uk> <118876.1607093975@warthog.procyon.org.uk> <955415.1607433903@warthog.procyon.org.uk>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     dhowells@redhat.com, Chuck Lever <chuck.lever@oracle.com>,
-        Bruce Fields <bfields@fieldses.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:BPF JIT for MIPS (32-BIT AND 64-BIT)" 
-        <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org
-Subject: Re: Why the auxiliary cipher in gss_krb5_crypto.c?
+        id S1728064AbgLHUnZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Dec 2020 15:43:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41406 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726226AbgLHUnZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Dec 2020 15:43:25 -0500
+Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B924C0613CF
+        for <linux-cifs@vger.kernel.org>; Tue,  8 Dec 2020 12:42:39 -0800 (PST)
+Received: by mail-lj1-x243.google.com with SMTP id s11so13214981ljp.4
+        for <linux-cifs@vger.kernel.org>; Tue, 08 Dec 2020 12:42:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Ft01ixDjhdMXYC7Mgsod0M++OXFzXUTcyJAuNtzcj70=;
+        b=M2vRBqyC+SNxzdDbjKQdrgSdhld8cFgPZkIp9nsf8Epp8gHnFQBoIAjEVXhnntqLwz
+         z3YY4tdrh+olh5qftyl+TR92xTWZf3L+KkM8O3qnIEGKIMu+W1zs92QGalKckj8TxPpl
+         iyV6dY13RznL739jOa6PLnYN29uyP8XNC700gNfH62fWc8ogV9BNkXILMUb8tWevUWZU
+         ZtziSZna1f89P1z4XT2U0pBepXu9wog4/fw9rRbPjXdY/7aoKQi+2m60AKCF0zZnVbCF
+         puFW0VS8Nstz0B6DuxAMYRSm13fDVBfyck+BFuuzGyBfLTZ+UnY9z+nZbFsKX4nlUwZG
+         I3yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Ft01ixDjhdMXYC7Mgsod0M++OXFzXUTcyJAuNtzcj70=;
+        b=lFzRarnsTP926eojlTC3Ebp0sun6LrTt73kXX5hFScNVC+PY2SAHSLwYktLfkd/3sz
+         u1kByFQoWlmumjpPMm+Ld2sUsLiXJYukRF/uLyCMtiEZAvYZOelKDKcDy7TlzL2BxHVo
+         EMu9Y5ZCRyrtWzHhQGu4Kyf/0fbbOs0Yb9NoFhpYyotEfVgkys1IQ9f9By+Mz2XW+41u
+         pWsxSsyi6Lj+MAjDTqtEhZm/OS7U/7VGwJPhOrZmQ7gtNjC2AM2lK9m2P7rS7YZhwsk0
+         OQYdaqfzlOpmJM8Ky2setj7Aj1jO7jxZPunlMN5XtZXaCo6FEsbqNpyBTrGm68js+z05
+         t0Xg==
+X-Gm-Message-State: AOAM530KXq6zhV8kru7UBOZW3g5fyGaZeyUJt9E4f68eiAI+LWMlVLdj
+        JBxz2EIj7xVk4GZ+3pb1aMCS2E2EEZDWxq0lc3oN8E/axZY8
+X-Google-Smtp-Source: ABdhPJyLwp9dpfr2BumVlPiJpl6Fl16bY3dHNe7RCsvDoAfJ8AC+sIR4NwEZlq00gCECm+zXD/wC4J40l8hQ41VeFk0=
+X-Received: by 2002:a17:906:2582:: with SMTP id m2mr23886483ejb.271.1607452936024;
+ Tue, 08 Dec 2020 10:42:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <960648.1607436828.1@warthog.procyon.org.uk>
-Date:   Tue, 08 Dec 2020 14:13:48 +0000
-Message-ID: <960649.1607436828@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20201207233646.29823-1-lsahlber@redhat.com> <20201207233646.29823-14-lsahlber@redhat.com>
+ <CAH2r5mu_AGjT6T-gNOn5Z7eb7zXgm44Br+AES_=FVUdi6WnPSQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mu_AGjT6T-gNOn5Z7eb7zXgm44Br+AES_=FVUdi6WnPSQ@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Tue, 8 Dec 2020 10:42:04 -0800
+Message-ID: <CAKywueRVB96NKx89Te0OD_O1GcZjbZO+utDN9Lx2A=tGSKeGAA@mail.gmail.com>
+Subject: Re: [PATCH 14/21] cifs: we do not allow changing username/password/unc/...
+ during remount
+To:     Steve French <smfrench@gmail.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ard Biesheuvel <ardb@kernel.org> wrote:
+=D0=BF=D0=BD, 7 =D0=B4=D0=B5=D0=BA. 2020 =D0=B3. =D0=B2 21:07, Steve French=
+ <smfrench@gmail.com>:
+>
+> Minor nits pointed out by checkpatch:
+>
+> 0015-cifs-we-do-not-allow-changing-username-password-unc-.patch
+> ---------------------------------------------------------------
+> WARNING: Missing commit description - Add an appropriate one
+>
+> WARNING: kfree(NULL) is safe and this check is probably not required
+> #76: FILE: fs/cifs/fs_context.c:673:
+> + if (ctx->field) { \
+> + kfree(ctx->field);
+>
+> On Mon, Dec 7, 2020 at 5:37 PM Ronnie Sahlberg <lsahlber@redhat.com> wrot=
+e:
+> >
+> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > ---
+> >  fs/cifs/cifsfs.c     |  2 +-
+> >  fs/cifs/fs_context.c | 55 ++++++++++++++++++++++++++++++++++++++++++++=
++++++---
+> >  fs/cifs/fs_context.h |  2 +-
+> >  3 files changed, 54 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> > index 80117e9d35f9..13d7f4a3c836 100644
+> > --- a/fs/cifs/cifsfs.c
+> > +++ b/fs/cifs/cifsfs.c
+> > @@ -490,7 +490,7 @@ cifs_show_options(struct seq_file *s, struct dentry=
+ *root)
+> >
+> >         if (tcon->no_lease)
+> >                 seq_puts(s, ",nolease");
+> > -       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER)
+> > +       if (cifs_sb->ctx->multiuser)
+> >                 seq_puts(s, ",multiuser");
+> >         else if (tcon->ses->user_name)
+> >                 seq_show_option(s, "username", tcon->ses->user_name);
+> > diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+> > index edfdea129fcc..542fa75b74aa 100644
+> > --- a/fs/cifs/fs_context.c
+> > +++ b/fs/cifs/fs_context.c
+> > @@ -629,10 +629,53 @@ static int smb3_verify_reconfigure_ctx(struct smb=
+3_fs_context *new_ctx,
+> >                 cifs_dbg(VFS, "can not change sec during remount\n");
+> >                 return -EINVAL;
+> >         }
+> > +       if (new_ctx->multiuser !=3D old_ctx->multiuser) {
+> > +               cifs_dbg(VFS, "can not change multiuser during remount\=
+n");
+> > +               return -EINVAL;
+> > +       }
+> > +       if (new_ctx->UNC &&
+> > +           (!old_ctx->UNC || strcmp(new_ctx->UNC, old_ctx->UNC))) {
+> > +               cifs_dbg(VFS, "can not change UNC during remount\n");
+> > +               return -EINVAL;
+> > +       }
+> > +       if (new_ctx->username &&
+> > +           (!old_ctx->username || strcmp(new_ctx->username, old_ctx->u=
+sername))) {
+> > +               cifs_dbg(VFS, "can not change username during remount\n=
+");
+> > +               return -EINVAL;
+> > +       }
+> > +       if (new_ctx->password &&
+> > +           (!old_ctx->password || strcmp(new_ctx->password, old_ctx->p=
+assword))) {
+> > +               cifs_dbg(VFS, "can not change password during remount\n=
+");
+> > +               return -EINVAL;
+> > +       }
+> > +       if (new_ctx->domainname &&
+> > +           (!old_ctx->domainname || strcmp(new_ctx->domainname, old_ct=
+x->domainname))) {
+> > +               cifs_dbg(VFS, "can not change domainname during remount=
+\n");
+> > +               return -EINVAL;
+> > +       }
+> > +       if (new_ctx->nodename &&
+> > +           (!old_ctx->nodename || strcmp(new_ctx->nodename, old_ctx->n=
+odename))) {
+> > +               cifs_dbg(VFS, "can not change nodename during remount\n=
+");
+> > +               return -EINVAL;
+> > +       }
+> > +       if (new_ctx->iocharset &&
+> > +           (!old_ctx->iocharset || strcmp(new_ctx->iocharset, old_ctx-=
+>iocharset))) {
+> > +               cifs_dbg(VFS, "can not change iocharset during remount\=
+n");
+> > +               return -EINVAL;
+> > +       }
+> >
+> >         return 0;
+> >  }
+> >
+> > +#define STEAL_STRING(cifs_sb, ctx, field)                             =
+ \
+> > +do {                                                                  =
+ \
+> > +       if (ctx->field) {                                              =
+ \
+> > +               kfree(ctx->field);                                     =
+ \
+> > +               ctx->field =3D cifs_sb->ctx->field;                    =
+   \
+> > +               cifs_sb->ctx->field =3D NULL;                          =
+   \
+> > +       }                                                              =
+ \
+> > +} while (0)
 
-> Apparently, it is permitted for gss_krb5_cts_crypt() to do a
-> kmalloc(GFP_NOFS) in the context from where gss_krb5_aes_encrypt() is
-> being invoked, and so I don't see why it wouldn't be possible to
-> simply kmalloc() a scatterlist[] of the appropriate size, populate it
-> with all the pages, bufs and whatever else gets passed into the
-> skcipher, and pass it into the skcipher in one go.
+If ctx->field is NULL we won't assign new value from
+cifs_sb->ctx->field and the procedure will become no-op. Is this an
+intent?
 
-I never said it wasn't possible.  But doing a pair of order-1 allocations from
-there might have a significant detrimental effect on performance - in which
-case Trond and co. will say "no".
-
-Remember: to crypt 1MiB of data on a 64-bit machine requires 2 x minimum 8KiB
-scatterlist arrays.  That's assuming the pages in the middle are contiguous,
-which might not be the case for a direct I/O read/write.  So for the DIO case,
-it could be involve an order-2 allocation (or chaining of single pages).
-
-David
-
+--
+Best regards,
+Pavel Shilovsky
