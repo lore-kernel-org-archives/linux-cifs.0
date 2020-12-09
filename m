@@ -2,169 +2,134 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F88C4361B
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 03:17:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B59C433FE
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 03:22:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01426238E3
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 03:17:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2524823A1D
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 03:22:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725871AbgLIDR1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 8 Dec 2020 22:17:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31098 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725789AbgLIDR1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Dec 2020 22:17:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607483760;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=wY7B9xiIIVyW99toTz+8OvxkZ0dwAoR/6BiosZ6qMfc=;
-        b=fj7E0jKzbSPKY2rJjVLzz4xEs9NxkVZci8WVsE+HKCMnBUHHNfiJEPkmQPv3yyYR2KHs9k
-        p0ZWZclWzARzVailIxq6RGaTCidkCVKy2B2keCVmr0sVpq0CK7zi/xT1CXusb6IpPSOUzB
-        b8pVRP0ssEljh3vsCoVNarj6/7xhBMs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-ucT0zWNdOHuGdZkXgRIoMg-1; Tue, 08 Dec 2020 22:15:58 -0500
-X-MC-Unique: ucT0zWNdOHuGdZkXgRIoMg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01EED1015949;
-        Wed,  9 Dec 2020 03:15:58 +0000 (UTC)
-Received: from test1103.test.redhat.com (vpn2-54-107.bne.redhat.com [10.64.54.107])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 558365C1B4;
-        Wed,  9 Dec 2020 03:15:57 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH 14/21] cifs: we do not allow changing username/password/unc/... during remount
-Date:   Wed,  9 Dec 2020 13:15:50 +1000
-Message-Id: <20201209031550.29102-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S1727008AbgLIDWD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Dec 2020 22:22:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46672 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725789AbgLIDWC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Dec 2020 22:22:02 -0500
+Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1C1C0613CF
+        for <linux-cifs@vger.kernel.org>; Tue,  8 Dec 2020 19:21:22 -0800 (PST)
+Received: by mail-lf1-x144.google.com with SMTP id m12so735668lfo.7
+        for <linux-cifs@vger.kernel.org>; Tue, 08 Dec 2020 19:21:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=G0KPx2aADKGuH/YUBK7w7NQszfpM/k6DdeKwHEl9hJ0=;
+        b=QMJ95IkvLkqDfU022DSJf7VxJatw+e4uYiLOThay178nhVAGrDOwCa9xAS1ya/Zgwy
+         VwtBN5v0DYj20TS1/Hb/+rGOgodrQAMkxbKFDi2OsDaygatYZ6krO2UQz2T32hmEen1r
+         QnzWqcAv+U+k8QW2DC+as2ojIVJCh1JQcWT4baOo70RccRrOeo3qEds4nzf4McptXFtH
+         gz/PaR+mnSnxYwAcgLjtOmeexfnsWRor1ixg6wV4vfliDky+FsajXqO2iBqVjjMd62Ld
+         3k3InXL3SK42vpyA77lKXzJxUYHUaOhMK04JqH2DqfgF0MUxRrYpJASqO/PK9xco9fnX
+         c3Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=G0KPx2aADKGuH/YUBK7w7NQszfpM/k6DdeKwHEl9hJ0=;
+        b=B+JDNSNblM61FE01rhSJl5GQvmg1eSewYVcIS+8Rr0cPT6Yl1APOkOhUgIhgxyBlaP
+         2D/H3/s5FpgEOR0P2P306ULOO7WMZEgtYYaJX/7sSIk9rkvwocAZjT69nUKN50uvxy6d
+         VSXIUvazCBanwvz2jYdYU2EVYjAAWxRVJGoXSKa00PvtpqWwK++kEQ7Cc4KUD4w6PNP8
+         nm+sfyNkMG7IdZSr49IWo6h4j0q5hdblaO59TvymJb9wheADvX8zLbppAOhyDVLc31sZ
+         q6877dhU+oiNnU5q4VkBZ7NWkdy5tlSIaacvg/NsXiyR805337IGxXu/Tmt2v++TEpom
+         TIeg==
+X-Gm-Message-State: AOAM5330UG5cdZodnFxz5DgV4LVGzqZ96CQ1YDdqHiS93SPAR0/FbjTa
+        Mu1Ra3VHnd8UYPcHyDYx7ggTs4HfnywFx7GiZt4DqAeyWvokAw==
+X-Google-Smtp-Source: ABdhPJx3ORDu2fwDDBhTLh5eSw9ciSo1GN9PzlwMEXJRpXH9p+hjU6lgP75FQZkBC1G+9z4EOWhe1HV127Y6I56bdUE=
+X-Received: by 2002:ac2:48b2:: with SMTP id u18mr249100lfg.313.1607484080285;
+ Tue, 08 Dec 2020 19:21:20 -0800 (PST)
+MIME-Version: 1.0
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 8 Dec 2020 21:21:08 -0600
+Message-ID: <CAH2r5mtx6zWZ2T_Erb=6JQ3mHJxh=bHydww-F52ts3zsvgd8Jw@mail.gmail.com>
+Subject: [SMB3][Multichannel] avoid confusing warning message on mount to Azure
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000009695f805b5ff8df5"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+--0000000000009695f805b5ff8df5
+Content-Type: text/plain; charset="UTF-8"
+
+Mounts to Azure cause an unneeded warning message in dmesg
+   "CIFS: VFS: parse_server_interfaces: incomplete interface info"
+
+Azure rounds up the size (by 8 additional bytes, to a
+16 byte boundary) of the structure returned on the query
+of the server interfaces at mount time.  This is permissible
+even though different than other servers so do not log a warning
+if query network interfaces response is only rounded up by 8
+bytes or fewer.
+
+CC: Stable <stable@vger.kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/cifs/cifsfs.c     |  2 +-
- fs/cifs/fs_context.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++---
- fs/cifs/fs_context.h |  2 +-
- 3 files changed, 52 insertions(+), 5 deletions(-)
+ fs/cifs/smb2ops.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 80117e9d35f9..13d7f4a3c836 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -490,7 +490,7 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 
- 	if (tcon->no_lease)
- 		seq_puts(s, ",nolease");
--	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER)
-+	if (cifs_sb->ctx->multiuser)
- 		seq_puts(s, ",multiuser");
- 	else if (tcon->ses->user_name)
- 		seq_show_option(s, "username", tcon->ses->user_name);
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index edfdea129fcc..b7873b63159f 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -629,10 +629,51 @@ static int smb3_verify_reconfigure_ctx(struct smb3_fs_context *new_ctx,
- 		cifs_dbg(VFS, "can not change sec during remount\n");
- 		return -EINVAL;
- 	}
-+	if (new_ctx->multiuser != old_ctx->multiuser) {
-+		cifs_dbg(VFS, "can not change multiuser during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->UNC &&
-+	    (!old_ctx->UNC || strcmp(new_ctx->UNC, old_ctx->UNC))) {
-+		cifs_dbg(VFS, "can not change UNC during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->username &&
-+	    (!old_ctx->username || strcmp(new_ctx->username, old_ctx->username))) {
-+		cifs_dbg(VFS, "can not change username during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->password &&
-+	    (!old_ctx->password || strcmp(new_ctx->password, old_ctx->password))) {
-+		cifs_dbg(VFS, "can not change password during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->domainname &&
-+	    (!old_ctx->domainname || strcmp(new_ctx->domainname, old_ctx->domainname))) {
-+		cifs_dbg(VFS, "can not change domainname during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->nodename &&
-+	    (!old_ctx->nodename || strcmp(new_ctx->nodename, old_ctx->nodename))) {
-+		cifs_dbg(VFS, "can not change nodename during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->iocharset &&
-+	    (!old_ctx->iocharset || strcmp(new_ctx->iocharset, old_ctx->iocharset))) {
-+		cifs_dbg(VFS, "can not change iocharset during remount\n");
-+		return -EINVAL;
-+	}
- 
- 	return 0;
- }
- 
-+#define STEAL_STRING(cifs_sb, ctx, field)				\
-+do {									\
-+	kfree(ctx->field);						\
-+	ctx->field = cifs_sb->ctx->field;				\
-+	cifs_sb->ctx->field = NULL;					\
-+} while (0)
-+
- static int smb3_reconfigure(struct fs_context *fc)
- {
- 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
-@@ -645,10 +686,16 @@ static int smb3_reconfigure(struct fs_context *fc)
- 		return rc;
- 
- 	/*
--	 * Steal the UNC from the old and to be destroyed context.
-+	 * We can not change UNC/username/password/domainname/nodename/iocharset
-+	 * during reconnect so ignore what we have in the new context and
-+	 * just use what we already have in cifs_sb->ctx.
- 	 */
--	ctx->UNC = cifs_sb->ctx->UNC;
--	cifs_sb->ctx->UNC = NULL;
-+	STEAL_STRING(cifs_sb, ctx, UNC);
-+	STEAL_STRING(cifs_sb, ctx, username);
-+	STEAL_STRING(cifs_sb, ctx, password);
-+	STEAL_STRING(cifs_sb, ctx, domainname);
-+	STEAL_STRING(cifs_sb, ctx, nodename);
-+	STEAL_STRING(cifs_sb, ctx, iocharset);
- 
- 	smb3_cleanup_fs_context_contents(cifs_sb->ctx);
- 	rc = smb3_fs_context_dup(cifs_sb->ctx, ctx);
-diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
-index aa1d952fd5ce..62f5a8d98df6 100644
---- a/fs/cifs/fs_context.h
-+++ b/fs/cifs/fs_context.h
-@@ -148,7 +148,6 @@ struct smb3_fs_context {
- 	bool uid_specified;
- 	bool gid_specified;
- 	bool sloppy;
--	char *nodename;
- 	bool got_ip;
- 	bool got_version;
- 	bool got_rsize;
-@@ -160,6 +159,7 @@ struct smb3_fs_context {
- 	char *password;
- 	char *domainname;
- 	char *UNC;
-+	char *nodename;
- 	char *iocharset;  /* local code page for mapping to and from Unicode */
- 	char source_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* clnt nb name */
- 	char target_rfc1001_name[RFC1001_NAME_LEN_WITH_NULL]; /* srvr nb name */
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 3d914d7d0d11..22f1d8dc12b0 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -477,7 +477,8 @@ parse_server_interfaces(struct
+network_interface_info_ioctl_rsp *buf,
+  goto out;
+  }
+
+- if (bytes_left || p->Next)
++ /* Azure rounds the buffer size up 8, to a 16 byte boundary */
++ if ((bytes_left > 8) || p->Next)
+  cifs_dbg(VFS, "%s: incomplete interface info\n", __func__);
+
+
 -- 
-2.13.6
+Thanks,
 
+Steve
+
+--0000000000009695f805b5ff8df5
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-SMB3-avoid-confusing-warning-message-on-mount-to-Azu.patch"
+Content-Disposition: attachment; 
+	filename="0001-SMB3-avoid-confusing-warning-message-on-mount-to-Azu.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kiguiapr0>
+X-Attachment-Id: f_kiguiapr0
+
+RnJvbSBjZTg2ZTM1ZTg4ZGY2OWYyODkwZWQyYWI2OTllMjkyYzczOTBlZjJjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgOCBEZWMgMjAyMCAyMToxMzozMSAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIFNN
+QjM6IGF2b2lkIGNvbmZ1c2luZyB3YXJuaW5nIG1lc3NhZ2Ugb24gbW91bnQgdG8gQXp1cmUKCk1v
+dW50cyB0byBBenVyZSBjYXVzZSBhbiB1bm5lZWRlZCB3YXJuaW5nIG1lc3NhZ2UgaW4gZG1lc2cK
+ICAgIkNJRlM6IFZGUzogcGFyc2Vfc2VydmVyX2ludGVyZmFjZXM6IGluY29tcGxldGUgaW50ZXJm
+YWNlIGluZm8iCgpBenVyZSByb3VuZHMgdXAgdGhlIHNpemUgKGJ5IDggYWRkaXRpb25hbCBieXRl
+cywgdG8gYQoxNiBieXRlIGJvdW5kYXJ5KSBvZiB0aGUgc3RydWN0dXJlIHJldHVybmVkIG9uIHRo
+ZSBxdWVyeQpvZiB0aGUgc2VydmVyIGludGVyZmFjZXMgYXQgbW91bnQgdGltZS4gIFRoaXMgaXMg
+cGVybWlzc2libGUKZXZlbiB0aG91Z2ggZGlmZmVyZW50IHRoYW4gb3RoZXIgc2VydmVycyBzbyBk
+byBub3QgbG9nIGEgd2FybmluZwppZiBxdWVyeSBuZXR3b3JrIGludGVyZmFjZXMgcmVzcG9uc2Ug
+aXMgb25seSByb3VuZGVkIHVwIGJ5IDgKYnl0ZXMgb3IgZmV3ZXIuCgpDQzogU3RhYmxlIDxzdGFi
+bGVAdmdlci5rZXJuZWwub3JnPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNo
+QG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIyb3BzLmMgfCAzICsrLQogMSBmaWxlIGNo
+YW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL2Np
+ZnMvc21iMm9wcy5jIGIvZnMvY2lmcy9zbWIyb3BzLmMKaW5kZXggM2Q5MTRkN2QwZDExLi4yMmYx
+ZDhkYzEyYjAgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMm9wcy5jCisrKyBiL2ZzL2NpZnMvc21i
+Mm9wcy5jCkBAIC00NzcsNyArNDc3LDggQEAgcGFyc2Vfc2VydmVyX2ludGVyZmFjZXMoc3RydWN0
+IG5ldHdvcmtfaW50ZXJmYWNlX2luZm9faW9jdGxfcnNwICpidWYsCiAJCWdvdG8gb3V0OwogCX0K
+IAotCWlmIChieXRlc19sZWZ0IHx8IHAtPk5leHQpCisJLyogQXp1cmUgcm91bmRzIHRoZSBidWZm
+ZXIgc2l6ZSB1cCA4LCB0byBhIDE2IGJ5dGUgYm91bmRhcnkgKi8KKwlpZiAoKGJ5dGVzX2xlZnQg
+PiA4KSB8fCBwLT5OZXh0KQogCQljaWZzX2RiZyhWRlMsICIlczogaW5jb21wbGV0ZSBpbnRlcmZh
+Y2UgaW5mb1xuIiwgX19mdW5jX18pOwogCiAKLS0gCjIuMjcuMAoK
+--0000000000009695f805b5ff8df5--
