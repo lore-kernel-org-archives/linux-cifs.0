@@ -2,85 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A012C4361B
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 13:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9B9C4361B
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 15:07:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF60823B1F
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 13:50:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A39D23AC4
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 15:07:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732047AbgLINuR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 9 Dec 2020 08:50:17 -0500
-Received: from p3plsmtpa08-01.prod.phx3.secureserver.net ([173.201.193.102]:38755
-        "EHLO p3plsmtpa08-01.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732005AbgLINuR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Dec 2020 08:50:17 -0500
-X-Greylist: delayed 533 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Dec 2020 08:50:17 EST
-Received: from [192.168.0.116] ([71.184.94.153])
-        by :SMTPAUTH: with ESMTPSA
-        id mzhukpj6c16zBmzhukaUn1; Wed, 09 Dec 2020 06:40:39 -0700
-X-CMAE-Analysis: v=2.4 cv=IO7HtijG c=1 sm=1 tr=0 ts=5fd0d3d7
- a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
- a=IkcTkHD0fZMA:10 a=VwQbUJbxAAAA:8 a=yMhMjlubAAAA:8 a=b8R4eSf-EADCyHu-sRcA:9
- a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22
-X-SECURESERVER-ACCT: tom@talpey.com
-Subject: Re: [SMB3][Multichannel] avoid confusing warning message on mount to
- Azure
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-References: <CAH2r5mtx6zWZ2T_Erb=6JQ3mHJxh=bHydww-F52ts3zsvgd8Jw@mail.gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-Message-ID: <472d2c7d-3e78-a570-0c0f-aab6ebfeb90b@talpey.com>
-Date:   Wed, 9 Dec 2020 08:40:37 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        id S1727559AbgLIPG5 convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 9 Dec 2020 10:06:57 -0500
+Received: from mx2.suse.de ([195.135.220.15]:57894 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726008AbgLIPG5 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 9 Dec 2020 10:06:57 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 456F7ACF4;
+        Wed,  9 Dec 2020 15:06:15 +0000 (UTC)
+From:   Paulo Alcantara <palcantara@suse.de>
+To:     =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.de>, scabrero@suse.de,
+        linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>
+Subject: Re: [PATCH v4 00/11] Witness protocol support for transparent failover
+In-Reply-To: <87a6undum4.fsf@suse.com>
+References: <20201130180257.31787-1-scabrero@suse.de> <87a6undum4.fsf@suse.com>
+Date:   Wed, 09 Dec 2020 12:06:11 -0300
+Message-ID: <87tusvow7w.fsf@cjr.nz>
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5mtx6zWZ2T_Erb=6JQ3mHJxh=bHydww-F52ts3zsvgd8Jw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4xfGQBlUao8CoSYCH3E9evJMLEl3x5k0HeTdx+GfK5sCfBYXJzZni5fyPnyFnwbCFcYw1gLuCJSLd8sPANrXIsAVYO6AjI7q/Nhi+W6GJMQqJqFqmxYb42
- IyL/t2+FTyqD9s7G6QeFGInpCm71MycNtYJiqyaUwJAFyDNzoXIV1Cbl3KIPJN9MEUZt6dtz0xYrzFw4BJi6TJ+vWSpnswV74ge2pc5IAvBNGRsZYO5VN3b1
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Why not just delete the splat? It isn't causing a failure, and
-appears to be legal protocol behavior.
+Aurélien Aptel <aaptel@suse.de> writes:
 
-On 12/8/2020 10:21 PM, Steve French wrote:
-> Mounts to Azure cause an unneeded warning message in dmesg
->     "CIFS: VFS: parse_server_interfaces: incomplete interface info"
-> 
-> Azure rounds up the size (by 8 additional bytes, to a
-> 16 byte boundary) of the structure returned on the query
-> of the server interfaces at mount time.  This is permissible
-> even though different than other servers so do not log a warning
-> if query network interfaces response is only rounded up by 8
-> bytes or fewer.
-> 
-> CC: Stable <stable@vger.kernel.org>
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> ---
->   fs/cifs/smb2ops.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 3d914d7d0d11..22f1d8dc12b0 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -477,7 +477,8 @@ parse_server_interfaces(struct
-> network_interface_info_ioctl_rsp *buf,
->    goto out;
->    }
-> 
-> - if (bytes_left || p->Next)
-> + /* Azure rounds the buffer size up 8, to a 16 byte boundary */
-> + if ((bytes_left > 8) || p->Next)
->    cifs_dbg(VFS, "%s: incomplete interface info\n", __func__);
-> 
-> 
+> I've added a "failover" test group to the buildbot that mounts a
+> "regular" (non-scaleout) cluster and switches the fileserver to another
+> cluster node live and it looks like it's working: you can keep on using
+> the mount.
+>
+> In non-scale-out, the file server has its own virtual IP that both node
+> share. So when you "move" the fileserver to a different node, it doesn't
+> actually change IP. After doing that we realized that this actually
+> works already without -o witness since it's reconnecting to the same IP.
+>
+> Now we need to add a scale-out cluster fileserver in buildbot where,
+> IIUC (please correct me Samuel) the fileserver is actually using the
+> node IP instead of this virtual-IP shared by nodes. So that when we move
+> the fileserver, it actually changes its IP address and we can test this
+> properly.
+>
+> As for the code, I'm not an expert on reconnection but it looks for
+> merging I think. It doesn't handle multichannel but multchannel doesn't
+> handle reconnection well anyway. There is an issue which pops up in
+> other parts of the code as well.
+>
+> If you run a command too quickly after the transition, they will fail
+> with EIO so it's not completely failing over but I think there can be
+> the same issue with DFS (Paulo, any ideas/comments?)  which is why we do
+> 2 times ls and we ignore the result of the first in the DFS tests.
+>
+> the dfs test code:
+>
+>     def io_reco_test(unc, opts, cwd, expected):
+>         try:
+>             lsdir = '.'
+>             cddir = os.path.join(ARGS.mnt, cwd)
+>             info(("TEST: mount {unc} , cd {cddir} , ls {lsdir}, expect:[{expect}]\n"+
+>                   "      disconnect {cddir} , ls#1 {lsdir} (fail here is ok),  ls#2 (fail here NOT ok)").format(
+>                       unc=unc, cddir=cddir, lsdir=lsdir, expect=" ".join(['"%s"'%x for x in expected])
+>                   ))
+
+For soft mounts, it is OK ignoring the first ls.  But for hard mounts,
+we shouldn't ignore the first ls as it must retry forever until failover
+is done.
