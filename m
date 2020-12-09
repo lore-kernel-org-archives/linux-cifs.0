@@ -2,85 +2,115 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E723C4361B
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 21:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D75C4361B
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 21:27:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B54320793
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 21:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE38620793
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Dec 2020 21:27:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727369AbgLIVYA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 9 Dec 2020 16:24:00 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:48509 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726877AbgLIVXw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 9 Dec 2020 16:23:52 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Crqlf1bzfz9sW8;
-        Thu, 10 Dec 2020 08:23:10 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1607548990;
-        bh=tgGr41qygwR/e2OuK8KeseYB6sxiXzwtlgnDC8O/mL8=;
-        h=Date:From:To:Cc:Subject:From;
-        b=JTf/lRas+/Q0DsXHAidmBXdDuOZ3IkseHdeg99NHWpaBA+5h9eM/It3nbwd60L3rt
-         ZThC98G71gN7xFc3v7Az2bvhiG92Z7lVq89ZnVHKOBVASOs1S5wRL/DatbTcP+aoNS
-         /LW3E6GsKjIsNC9CODzBN/t68uOyCm/z7Kvtzx2QUwr42vSha1V6esZZgaU+3aif6Q
-         N0Sd7OrEkCyPnuTu9ufQTYZBtGUPU/HpjHT7WhVdP7G5KwCUSnDv40O+kvtEYp6h9X
-         nqi51XVHnD5bYC6Saola5CjfrHvwiVChlFGMSiV5Upog8OZGEJIOsPYptGoTw1rEb7
-         Gbi76OAK+WqNg==
-Date:   Thu, 10 Dec 2020 08:23:09 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commits in the cifs tree
-Message-ID: <20201210082309.73935d33@canb.auug.org.au>
+        id S1729913AbgLIV1B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 9 Dec 2020 16:27:01 -0500
+Received: from p3plsmtpa09-06.prod.phx3.secureserver.net ([173.201.193.235]:48310
+        "EHLO p3plsmtpa09-06.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388140AbgLIV1B (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Dec 2020 16:27:01 -0500
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id n6yTk10fok95Hn6yTk57z6; Wed, 09 Dec 2020 14:26:14 -0700
+X-CMAE-Analysis: v=2.4 cv=YMFadTKx c=1 sm=1 tr=0 ts=5fd140f6
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=yMhMjlubAAAA:8 a=pGLkceISAAAA:8 a=VwQbUJbxAAAA:8
+ a=75wEK7pLCa57f_mAP2QA:9 a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [PATCH][SMB3.1.1] remove confusing mount warning when no SPNEGO
+ info on negprot rsp
+To:     Pavel Shilovsky <piastryyy@gmail.com>,
+        Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5mvr6JebH9cr9dO-XbiXdsfBjs=C4WhqkqXUwDCmOY20zA@mail.gmail.com>
+ <CAKywueRMTMy7shp_qT3Cu6E1EZ0AwdSvjsWF=MU4KQWkw+YL-A@mail.gmail.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <c885d7a2-4f41-d2c0-51ae-43e8ef9cc2d6@talpey.com>
+Date:   Wed, 9 Dec 2020 16:26:13 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/VQo8NBrrP/lqE6/YL_4ejtL";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <CAKywueRMTMy7shp_qT3Cu6E1EZ0AwdSvjsWF=MU4KQWkw+YL-A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfEDmNCkMocyg/1PlhYul4yBZ3S1wpJJnQ4TWBaQDKusdCnW4Vl3fWlb7PCy9nhzfW8lxxzJMKQCYPloUJrcYUTJwobKSHir4pF+9/jvjY0rjt39tz3X7
+ wULQ3GpQ+pVNbYSLniwUrGXdGJG3GBdwy/Q+D/onrOJW6M6hd+UmgKBvWVencq/p8KjocJ4hVeFX3HAppgBu6FScURq3tnljsfVfsa7eFevZm+j9WYxVY/oP
+ w9CQcwCQiV88ce+xXSVMeA==
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/VQo8NBrrP/lqE6/YL_4ejtL
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The protocol allows omitting the SPNEGO blob altogether, btw. That
+leads to the client deciding how to authenticate, although the Windows
+server doesn't offer that.
 
-Hi all,
+So I'd suggest removing the comment, too:
 
-Commits
+ >> /* Make sure that negotiate contexts start after gss security blob */
 
-  d24e661920cb ("cifs: Enable sticky bit with cifsacl mount option.")
-  4bcfb51f82f0 ("cifs: Fix unix perm bits to cifsacl conversion for "other"=
- bits.")
 
-are missing a Signed-off-by from their committer.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/VQo8NBrrP/lqE6/YL_4ejtL
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl/RQD0ACgkQAVBC80lX
-0GwAYgf+LTMpU2FrX45msVb/bclME60XH44G8K8n37PWw7I5V5mZDWRxZI0cU5dK
-5t5ZofhQXZLVLRmKo/fHG6tXl+7+03Wx9iJOasXV0p0LIzkZ7bA2uu9VYKRlsxjf
-78ytDAdGB4OcMmyIMcnik7SK/jyGPcpBXQWfaU0TZEKXJe48D7WWONjRjbi6RR9j
-nSquQgRBhpK9HkM81fExJUdr2muV1kCqZvweIhgzeuiP+7tbBdL/0q8FXzDZPMr1
-VHLuT3OE8KbuLJ0gbOl13XQBerMY49vOMdUbMpxW5hQvNTqrEgDeSHBvBGX87W1O
-avmMANGfo8N0oypMYNBnaZ6ZCDsA7g==
-=4v4E
------END PGP SIGNATURE-----
-
---Sig_/VQo8NBrrP/lqE6/YL_4ejtL--
+On 12/9/2020 12:39 PM, Pavel Shilovsky wrote:
+> Looks good.
+> 
+> Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+> 
+> --
+> Best regards,
+> Pavel Shilovsky
+> 
+> вт, 8 дек. 2020 г. в 23:23, Steve French <smfrench@gmail.com>:
+>>
+>> Azure does not send an SPNEGO blob in the negotiate protocol response,
+>> so we shouldn't assume that it is there when validating the location
+>> of the first negotiate context.  This avoids the potential confusing
+>> mount warning:
+>>
+>>     CIFS: Invalid negotiate context offset
+>>
+>> CC: Stable <stable@vger.kernel.org>
+>> Signed-off-by: Steve French <stfrench@microsoft.com>
+>> ---
+>>   fs/cifs/smb2misc.c | 11 +++++++----
+>>   1 file changed, 7 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+>> index d88e2683626e..513507e4c4ad 100644
+>> --- a/fs/cifs/smb2misc.c
+>> +++ b/fs/cifs/smb2misc.c
+>> @@ -109,11 +109,14 @@ static __u32 get_neg_ctxt_len(struct
+>> smb2_sync_hdr *hdr, __u32 len,
+>>
+>>    /* Make sure that negotiate contexts start after gss security blob */
+>>    nc_offset = le32_to_cpu(pneg_rsp->NegotiateContextOffset);
+>> - if (nc_offset < non_ctxlen) {
+>> - pr_warn_once("Invalid negotiate context offset\n");
+>> + if (nc_offset + 1 < non_ctxlen) {
+>> + pr_warn_once("Invalid negotiate context offset %d\n", nc_offset);
+>>    return 0;
+>> - }
+>> - size_of_pad_before_neg_ctxts = nc_offset - non_ctxlen;
+>> + } else if (nc_offset + 1 == non_ctxlen) {
+>> + cifs_dbg(FYI, "no SPNEGO security blob in negprot rsp\n");
+>> + size_of_pad_before_neg_ctxts = 0;
+>> + } else
+>> + size_of_pad_before_neg_ctxts = nc_offset - non_ctxlen;
+>>
+>>    /* Verify that at least minimal negotiate contexts fit within frame */
+>>    if (len < nc_offset + (neg_count * sizeof(struct smb2_neg_context))) {
+>>
+>> --
+>> Thanks,
+>>
+>> Steve
+> 
