@@ -2,152 +2,90 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.9 required=3.0 tests=BAYES_50,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5F0C4361B
-	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 06:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA015C4361B
+	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 13:31:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3F2521707
-	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 06:09:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7EA8F206A5
+	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 13:31:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405496AbgLLGIS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 12 Dec 2020 01:08:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47724 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404022AbgLLGHz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Dec 2020 01:07:55 -0500
-Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E4CC0613CF
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 22:07:12 -0800 (PST)
-Received: by mail-lf1-x141.google.com with SMTP id l11so17015127lfg.0
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 22:07:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=eIhg+l0XA+1Iy1vHXdUnH1WaEZ8EeUeywxQRxzCDmCE=;
-        b=H0h+cPnRHJ+U4NVV6ZX3NbuWAGn8rjHQbCknAxwtEo0AAmKEj4E7YfWGC+tp2PTRHL
-         YXTcVJv1cdWYv9zuuDgyTBeZ1Ls0BE3+JhPVE0hKz1Qf4LNVJHllBVq+TpH6gIoVpSO0
-         KFjD+weNTWHRvqG/XHLm7loDCDInY048pY/G2QFOVpQIeYBQ7hH3aBWJOdzGu0rR96jK
-         xYV4AT5DRK/LtWILe/SbkQQWoSrcrHYMUo3631nFAbbtnEHxCDOFiG9OokOqVyY6uXAm
-         bn7CXlCs0dtA371ZkDbaWbezDqteCA8q4GjybFCCCtt4jFhusLSAwo0akrYexK15Z17a
-         FiJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=eIhg+l0XA+1Iy1vHXdUnH1WaEZ8EeUeywxQRxzCDmCE=;
-        b=tkUsNCW2XSqXesy7+XfPaXPlc/RDnbYwyh+CyQAxvH0WSfXaQTMsdr2dhB4sasnCoa
-         Ls0zAo3VuzpOvCj8EiFR9HSWIrs6eqSD8VWNSIY/z8vytLWn+3vsceDZ2uY6QGJNWDcq
-         KHF17w698w9ZvB51ys96JHreDV27kIi+t4sRMHjiXvTSLegP0067XRv64KQXGA6cgQrN
-         DTx8/WkZyxOydQ3DNfjFpWJqj20uNpXg+zNY2LVCZDHovhZtUtG1SxVK/v8uOfAi26Y0
-         egufLllYasGNzAdM1lH0BHAgT4lTnxGJhilpI7QCYpYcwhWsywSYytdRjI1NBTLEsURz
-         IrZA==
-X-Gm-Message-State: AOAM531p9BQW6eXYUEvietc5qWj3NQOxOY+SwijSOkMVtozw9LeMorgI
-        qvvFCzucSg5im4MgRGNpjQm5KnGgdWnNKwqLO5o=
-X-Google-Smtp-Source: ABdhPJxq52qNPt06UxnmTPUoDamU5Gndf8i9o6j/K/xZyMq2+CA+3RHgkyIoXzrPwDyi8qnlnD/dDB0e2cQNeWaiZtY=
-X-Received: by 2002:a19:950:: with SMTP id 77mr5491976lfj.133.1607753231353;
- Fri, 11 Dec 2020 22:07:11 -0800 (PST)
-MIME-Version: 1.0
-References: <20201130180257.31787-1-scabrero@suse.de> <20201130180257.31787-10-scabrero@suse.de>
-In-Reply-To: <20201130180257.31787-10-scabrero@suse.de>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 12 Dec 2020 00:07:00 -0600
-Message-ID: <CAH2r5msgsAwUX3d9FhQukJdO4DuqTG6OodgoOU-vi6FaAv=r4g@mail.gmail.com>
-Subject: Re: [PATCH v4 09/11] cifs: Simplify reconnect code when dfs upcall is enabled
-To:     Samuel Cabrero <scabrero@suse.de>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726215AbgLLNay (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 12 Dec 2020 08:30:54 -0500
+Received: from master.hostvps.net ([85.234.128.110]:45292 "EHLO
+        host.sysriacomms.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+        with ESMTP id S2407436AbgLLNas (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Dec 2020 08:30:48 -0500
+Received: from sysriacomms.com (ec2-3-129-59-77.us-east-2.compute.amazonaws.com [3.129.59.77])
+        by host.sysriacomms.com (Postfix) with ESMTPA id C4AAA34B0CDA
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 20:26:36 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.sysriacomms.com C4AAA34B0CDA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sysriacomms.com;
+        s=default; t=1607718398;
+        bh=TyDrvEeEFdXlR/MshqaTYzQ7nnR7m/zs1uM19XkvmD0=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=Q6SN2D3/ziYmyeJNqd5ug7b1qexJ/twTCKRRoYO/TDEeQoetZxkxOqp83AtVjqNfm
+         3D7dT/I6Oj+K53b8RZSgU82Zfhv3UdSroLB3X+ANiYhrhbxcRVSXV3NqX1jUfEfd5Y
+         GzSe/TUZzld3ZFe1ukAF2cM1EibjukU+EIg55EzU=
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.sysriacomms.com C4AAA34B0CDA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sysriacomms.com;
+        s=default; t=1607718398;
+        bh=TyDrvEeEFdXlR/MshqaTYzQ7nnR7m/zs1uM19XkvmD0=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=Q6SN2D3/ziYmyeJNqd5ug7b1qexJ/twTCKRRoYO/TDEeQoetZxkxOqp83AtVjqNfm
+         3D7dT/I6Oj+K53b8RZSgU82Zfhv3UdSroLB3X+ANiYhrhbxcRVSXV3NqX1jUfEfd5Y
+         GzSe/TUZzld3ZFe1ukAF2cM1EibjukU+EIg55EzU=
+Reply-To: moutraore02@syriservas.com
+From:   Moussa <moutraore02@sysriacomms.com>
+To:     linux-cifs@vger.kernel.org
+Subject: Get Back To Me
+Date:   11 Dec 2020 20:26:49 +0000
+Message-ID: <20201211202649.D4C13E3D127EF6D0@sysriacomms.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next, let me know if any
-changes need to be made to it.
+Greeetings from Mali. I am sorry for contacting you like this but=20
+I do have a very urgent matter that I want to discuss with you.=20
+Before I proceed, I want you to keep an open mind while reading=20
+this proposal. My name is Moussa Traore, I am the Personal=20
+Assistant to Mr. Issa Saley Maiga who was the head of the civil=20
+aviation agency in Mali during the tenure of Ibrahim Boubacar=20
+Ke=C3=AFta, the former president of Mali. His tenure was overtaken by=20
+the military during a coup d'etat. I am sure you would have read=20
+about this in your country because it was covered by the=20
+international news agencies worldwide. 
 
-On Mon, Nov 30, 2020 at 12:05 PM Samuel Cabrero <scabrero@suse.de> wrote:
->
-> Some witness notifications, like client move, tell the client to
-> reconnect to a specific IP address. In this situation the DFS failover
-> code path has to be skipped so clean up as much as possible the
-> cifs_reconnect() code.
->
-> Signed-off-by: Samuel Cabrero <scabrero@suse.de>
-> ---
->  fs/cifs/connect.c | 21 ++++++++-------------
->  1 file changed, 8 insertions(+), 13 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index a298518bebb2..3af88711643b 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -296,7 +296,7 @@ static void cifs_prune_tlinks(struct work_struct *work);
->   * This should be called with server->srv_mutex held.
->   */
->  #ifdef CONFIG_CIFS_DFS_UPCALL
-> -static int reconn_set_ipaddr(struct TCP_Server_Info *server)
-> +static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
->  {
->         int rc;
->         int len;
-> @@ -331,14 +331,7 @@ static int reconn_set_ipaddr(struct TCP_Server_Info *server)
->
->         return !rc ? -1 : 0;
->  }
-> -#else
-> -static inline int reconn_set_ipaddr(struct TCP_Server_Info *server)
-> -{
-> -       return 0;
-> -}
-> -#endif
->
-> -#ifdef CONFIG_CIFS_DFS_UPCALL
->  /* These functions must be called with server->srv_mutex held */
->  static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
->                                        struct cifs_sb_info *cifs_sb,
-> @@ -346,6 +339,7 @@ static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
->                                        struct dfs_cache_tgt_iterator **tgt_it)
->  {
->         const char *name;
-> +       int rc;
->
->         if (!cifs_sb || !cifs_sb->origin_fullpath)
->                 return;
-> @@ -370,6 +364,12 @@ static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
->                          "%s: failed to extract hostname from target: %ld\n",
->                          __func__, PTR_ERR(server->hostname));
->         }
-> +
-> +       rc = reconn_set_ipaddr_from_hostname(server);
-> +       if (rc) {
-> +               cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
-> +                        __func__, rc);
-> +       }
->  }
->
->  static inline int reconn_setup_dfs_targets(struct cifs_sb_info *cifs_sb,
-> @@ -528,11 +528,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
->                  */
->                 reconn_set_next_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
->  #endif
-> -               rc = reconn_set_ipaddr(server);
-> -               if (rc) {
-> -                       cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
-> -                                __func__, rc);
-> -               }
->
->                 if (cifs_rdma_enabled(server))
->                         rc = smbd_reconnect(server);
-> --
-> 2.29.2
->
+Anyway, my boss was also affected by the coup d'etat and he was=20
+arrested along with other high profile politicians. Also, all of=20
+his local assets (bother property and financial assets) were=20
+seized by the Government. Due to this situation, my boss belives=20
+that he is at risk and he is now very scared for the safety of=20
+his family especially his wife and kids. In order to ensure that=20
+his family is taken care of and protected incase anything happens=20
+to him, he has asked me to help him find a foreign investor who=20
+can help him accommodate and manage the finanical assets that he=20
+has in Europe. These assets was secured with the help of a proxy=20
+and it is currently held with an offshore financial bank so it is=20
+safe so secure. Also, the Government of his country do not know=20
+of this asset hence why they are unable to seize it as they have=20
+done his other assets.
 
+My proposal to you is for you to help us manage these funds, and=20
+invest it in lucrative projects in your country that will yeild=20
+good profits. You also do not have to worry about if this is safe=20
+or not because everything will be handled in a legal and=20
+transparent manner. You will also be handosmely rewarded for your=20
+help if you decide to work with us. If this proposal interests=20
+you, please kindly respond so that I can give you more details. I=20
+hope to hear from you soon.
 
--- 
-Thanks,
+Regards,
 
-Steve
+Moussa.
