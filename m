@@ -8,278 +8,99 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFA4C433FE
-	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 18:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D707AC433FE
+	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 18:56:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51B1222571
-	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 18:20:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5FFF21D46
+	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 18:56:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726410AbgLLSTr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 12 Dec 2020 13:19:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34594 "EHLO
+        id S2407782AbgLLS4g (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 12 Dec 2020 13:56:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726408AbgLLSTr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Dec 2020 13:19:47 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 599D9C0613CF
-        for <linux-cifs@vger.kernel.org>; Sat, 12 Dec 2020 10:19:07 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id u18so19818458lfd.9
-        for <linux-cifs@vger.kernel.org>; Sat, 12 Dec 2020 10:19:07 -0800 (PST)
+        with ESMTP id S2407792AbgLLS4U (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Dec 2020 13:56:20 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 533D2C0613D3
+        for <linux-cifs@vger.kernel.org>; Sat, 12 Dec 2020 10:55:40 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id m19so19990864lfb.1
+        for <linux-cifs@vger.kernel.org>; Sat, 12 Dec 2020 10:55:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to;
-        bh=fKMkucoBRDIh5iwxzgvQLkxbtFm4JF40421eha9nmQ4=;
-        b=fTMopcv22GKDnyYwjoKtvTDcDL3ZBu+FH+kUIYYkXV5y5szlgHWx2tOc4xXI2BwTOX
-         Viaro71Zohpw9PHvdG1y8lbWDryKc+LJunyquIqk0ZAK6fVMmEuXgbuVdla79X0UH9Tp
-         CADSnpGyDrMbeeAn4/nuBV0UOdcthCKgswYgHA5fuhL9/Ogus/NJPv+UIIIdaYzDwU9l
-         2ToNHQKmNLmpbBvLjYyTJPadB5ESc03MrPYnD+rTsP/heU+e7S8MfPGMf9OSbjYEtyqZ
-         x+BYtwW0vgzikHQU7FqTlZJftOZKn2T44v2GFF2Q2ccCnS1Jg+wW5/X1YmUF9UeELe2+
-         H7EA==
+        bh=fd0g+XXwihf2XB3TtPMoykutpHFQulXdycRX8btCSAY=;
+        b=fENPdOouPihDKHQNjdObNKChHezA3zJDQ7nj4caKg2ECuEpGZ5mHWRGS8dO1R7EmGu
+         PcwqR6omNZexFQneXVb1bU23rSsQ+oCKdVgLTc7Aa8BNrLtn5of7HyqTBDTQbTapRdtQ
+         NFHQLcxB0MiOqKYlgDCHiewDS+Z0IEsX2F8tw4vKFHM0klCAZ22jTDx47/temBj7bR8F
+         YgR/3ggdlID53tTAo0CeTPZfXlpcBQ18VfBojI/NdUqqv/rCq5w0HKbk9s6pHjpjj3Ri
+         nOpH17Q3P0jEFVbCcgIIgmN6C05MMzG0tzTyhzOSz9j6lf2KN0Z9k3gOT8YYcEYt0veZ
+         EDpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=fKMkucoBRDIh5iwxzgvQLkxbtFm4JF40421eha9nmQ4=;
-        b=Zr9A14lmchhWNJ31OmAyapDvvN8O65F1vtSST7RLIf0n4iQFVNMuh3hRuRAdiXhvEk
-         t+YPizu2J4iPFEwJg8FwU1TBMLzDfgTJXaJXV4Qn7lQ33YZfW7z6r+Orfhx1BqqHfjSw
-         LL7c01aNLynL6+PKKvVGkmtqUirpcm+gOl7HwWEngSgmUwpypLu8Uic7wrUX8mTY68bF
-         QsWbM7KxD99fG/tW0vZCimE282QJDDR9IEBjeJ7cto7bMW29hLMXZdLzHO3NQ+aaAkiL
-         kKD54UcJfKixKSDoQyOyD8aLwUU29OmXjthAnZQOEK4AuPrPYMhUE0CzNinYk2Jhrvzj
-         dIvw==
-X-Gm-Message-State: AOAM531XVN1T/bLp7nkuPbLYrfBiLHhYsp3OewTZo8iWa3+HCI6pddEd
-        888jjSHwniOAfwB80IAGz6IL60r/YQkwnSAichZKg+XFeP3ooQ==
-X-Google-Smtp-Source: ABdhPJwcOEG8IQT5tRouPZ0Fg588jrN/n8dtf3Q0zHnfe5Kl/CsATkyrHeOXxHl3hdCzWl1ubX1ebOlL7VpEBln7814=
-X-Received: by 2002:a19:6a11:: with SMTP id u17mr6608lfu.184.1607797145024;
- Sat, 12 Dec 2020 10:19:05 -0800 (PST)
+        bh=fd0g+XXwihf2XB3TtPMoykutpHFQulXdycRX8btCSAY=;
+        b=mweouQorVAErPiEJr6SgYxiVFIePm7UOQt2kXQZFnXierAXFhzeCQMZE0AMvwA9s9z
+         m39GRQ4WyhznE5grIMhK1ydAz9PKaHEbRlLqekxUc+lY2Eadh1NJFoKvRPEQMQL1URwM
+         9FOSyVNfK44xWwUK5pH06bpzpN3MeHbSpQ4Y35OpHGs5EAoh1PG7we4qA0TyPjMYVSs6
+         tG8r3iXGK6Kyc/jiKotJ83GKDX8g6ZkFGMj98tiEpHgNEHf4EpJze+BHjZsOlRZq3wrI
+         zUmtA2bu5Y+aKhfgXHcGDCGiPbVb8+iiT0G7xFYYtXm9Sqe9PkTyTj0/wn9FiKluHLd1
+         g07g==
+X-Gm-Message-State: AOAM5313WshBsAvHNJ9/Jsf3BmCKIdyyej0kbpCGHEX+yIM2lBBFapRp
+        JBsXwCA/Cws8F/huINYan5ZmVKMENvtzmkKcKjYDW9dcVtQ=
+X-Google-Smtp-Source: ABdhPJzwRuOcs47WWheOSwM1Q9JUYnnJllfOc2Z9SK8CBzaCa2PDhR3H9QeoEx2q12W5WE8vErPXl6ZsioVsX4Fjwbw=
+X-Received: by 2002:a2e:968d:: with SMTP id q13mr1115618lji.406.1607799338414;
+ Sat, 12 Dec 2020 10:55:38 -0800 (PST)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 12 Dec 2020 12:18:53 -0600
-Message-ID: <CAH2r5mueeQZHmzffOT=5z7FyENgK+0J_gjTuEVWRj=p1qe-gTQ@mail.gmail.com>
-Subject: [PATCH] cifs: remove various function description warnings
+Date:   Sat, 12 Dec 2020 12:55:27 -0600
+Message-ID: <CAH2r5mtuzxmutODFMpm8OncBk3o13m0DQok+VGLjy1Ei7P9vtg@mail.gmail.com>
+Subject: [PATCH][CIFS] update headers included by new file unc.c
 To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed; boundary="0000000000006fcef305b648f4a4"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When compiling with W=1 I noticed various functions that
-did not follow proper style in describing (in the comments)
-the parameters passed in to the function. For example:
+--0000000000006fcef305b648f4a4
+Content-Type: text/plain; charset="UTF-8"
 
-fs/cifs/inode.c:2236: warning: Function parameter or member 'mode' not
-described in 'cifs_wait_bit_killable'
+Avoids trivial warnings that kernel test robot reports on compile
 
-I did not address the style warnings in two of the six files
-(connect.c and misc.c) in order to reduce risk of merge
-conflict with pending patches. We can update those later.
 
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/cifs/cifs_dfs_ref.c |  1 +
- fs/cifs/file.c         |  9 +++++++--
- fs/cifs/inode.c        | 16 +++++++++++-----
- fs/cifs/smb2misc.c     |  4 ++++
- 4 files changed, 23 insertions(+), 7 deletions(-)
-
-diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index 6f7187b90fda..e4c6ae47a796 100644
---- a/fs/cifs/cifs_dfs_ref.c
-+++ b/fs/cifs/cifs_dfs_ref.c
-@@ -254,6 +254,7 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
-  * to perform failover in case we failed to connect to the first target in the
-  * referral.
-  *
-+ * @mntpt: directory entry for the path we are trying to automount
-  * @cifs_sb: parent/root superblock
-  * @fullpath: full path in UNC format
-  */
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index be46fab4c96d..29176a56229f 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -416,6 +416,8 @@ static void cifsFileInfo_put_work(struct work_struct *work)
-  * cifsFileInfo_put - release a reference of file priv data
-  *
-  * Always potentially wait for oplock handler. See _cifsFileInfo_put().
-+ *
-+ * @cifs_file: cifs/smb3 specific info (eg refcounts) for an open file
-  */
- void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
- {
-@@ -431,8 +433,11 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
-  *
-  * If @wait_for_oplock_handler is true and we are releasing the last
-  * reference, wait for any running oplock break handler of the file
-- * and cancel any pending one. If calling this function from the
-- * oplock break handler, you need to pass false.
-+ * and cancel any pending one.
-+ *
-+ * @cifs_file: cifs/smb3 specific info (eg refcounts) for an open file
-+ * @wait_oplock_handler: must be false if called from oplock_break_handler
-+ * @offload: not offloaded on close and oplock breaks
-  *
-  */
- void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 8debd4c18faf..2a5c4fef9b59 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -804,11 +804,15 @@ static __u64 simple_hashstr(const char *str)
-  * cifs_backup_query_path_info - SMB1 fallback code to get ino
-  *
-  * Fallback code to get file metadata when we don't have access to
-- * @full_path (EACCES) and have backup creds.
-+ * full_path (EACCES) and have backup creds.
-  *When compiling with W=1 I noticed various functions that
-did not follow proper style in describing (in the comments)
-the parameters passed in to the function. For example:
-
-fs/cifs/inode.c:2236: warning: Function parameter or member 'mode' not
-described in 'cifs_wait_bit_killable'
-
-I did not address the style warnings in two of the six files
-(connect.c and misc.c) in order to reduce risk of merge
-conflict with pending patches. We can update those later.
-
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/cifs/cifs_dfs_ref.c |  1 +
- fs/cifs/file.c         |  9 +++++++--
- fs/cifs/inode.c        | 16 +++++++++++-----
- fs/cifs/smb2misc.c     |  4 ++++
- 4 files changed, 23 insertions(+), 7 deletions(-)
-
-diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index 6f7187b90fda..e4c6ae47a796 100644
---- a/fs/cifs/cifs_dfs_ref.c
-+++ b/fs/cifs/cifs_dfs_ref.c
-@@ -254,6 +254,7 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
-  * to perform failover in case we failed to connect to the first target in the
-  * referral.
-  *
-+ * @mntpt: directory entry for the path we are trying to automount
-  * @cifs_sb: parent/root superblock
-  * @fullpath: full path in UNC format
-  */
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index be46fab4c96d..29176a56229f 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -416,6 +416,8 @@ static void cifsFileInfo_put_work(struct work_struct *work)
-  * cifsFileInfo_put - release a reference of file priv data
-  *
-  * Always potentially wait for oplock handler. See _cifsFileInfo_put().
-+ *
-+ * @cifs_file: cifs/smb3 specific info (eg refcounts) for an open file
-  */
- void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
- {
-@@ -431,8 +433,11 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
-  *
-  * If @wait_for_oplock_handler is true and we are releasing the last
-  * reference, wait for any running oplock break handler of the file
-- * and cancel any pending one. If calling this function from the
-- * oplock break handler, you need to pass false.
-+ * and cancel any pending one.
-+ *
-+ * @cifs_file: cifs/smb3 specific info (eg refcounts) for an open file
-+ * @wait_oplock_handler: must be false if called from oplock_break_handler
-+ * @offload: not offloaded on close and oplock breaks
-  *
-  */
- void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 8debd4c18faf..2a5c4fef9b59 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -804,11 +804,15 @@ static __u64 simple_hashstr(const char *str)
-  * cifs_backup_query_path_info - SMB1 fallback code to get ino
-  *
-  * Fallback code to get file metadata when we don't have access to
-- * @full_path (EACCES) and have backup creds.
-+ * full_path (EACCES) and have backup creds.
-  *
-- * @data will be set to search info result buffer
-- * @resp_buf will be set to cifs resp buf and needs to be freed with
-- * cifs_buf_release() when done with @data.
-+ * @xid: transaction id used to identify original request in logs
-+ * @tcon: information about the server share we have mounted
-+ * @sb: the superblock stores info such as disk space available
-+ * @full_path: name of the file we are getting the metadata for
-+ * @resp_buf: will be set to cifs resp buf and needs to be freed with
-+ * cifs_buf_release() when done with @data
-+ * @data: will be set to search info result buffer
-  */
- static int
- cifs_backup_query_path_info(int xid,
-@@ -2229,7 +2233,9 @@ cifs_invalidate_mapping(struct inode *inode)
-
- /**
-  * cifs_wait_bit_killable - helper for functions that are sleeping on bit locks
-- * @word: long word containing the bit lock
-+ *
-+ * @key: currently unused
-+ * @mode: the task state to sleep in
-  */
- static int
- cifs_wait_bit_killable(struct wait_bit_key *key, int mode)
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index a82008a7cffb..99a4e40a2532 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -876,6 +876,10 @@ smb2_handle_cancelled_mid(char *buffer, struct
-TCP_Server_Info *server)
-  *
-  * Assumes @iov does not contain the rfc1002 length and iov[0] has the
-  * SMB2 header.
-+ *
-+ * @ses: server session structure
-+ * @iov: array containing the SMB request we will send to the server
-+ * @nvec: number of array entries for the iov
-  */
- int
- smb311_update_preauth_hash(struct cifs_ses *ses, struct kvec *iov, int nvec)
-- * @data will be set to search info result buffer
-- * @resp_buf will be set to cifs resp buf and needs to be freed with
-- * cifs_buf_release() when done with @data.
-+ * @xid: transaction id used to identify original request in logs
-+ * @tcon: information about the server share we have mounted
-+ * @sb: the superblock stores info such as disk space available
-+ * @full_path: name of the file we are getting the metadata for
-+ * @resp_buf: will be set to cifs resp buf and needs to be freed with
-+ * cifs_buf_release() when done with @data
-+ * @data: will be set to search info result buffer
-  */
- static int
- cifs_backup_query_path_info(int xid,
-@@ -2229,7 +2233,9 @@ cifs_invalidate_mapping(struct inode *inode)
-
- /**
-  * cifs_wait_bit_killable - helper for functions that are sleeping on bit locks
-- * @word: long word containing the bit lock
-+ *
-+ * @key: currently unused
-+ * @mode: the task state to sleep in
-  */
- static int
- cifs_wait_bit_killable(struct wait_bit_key *key, int mode)
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index a82008a7cffb..99a4e40a2532 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -876,6 +876,10 @@ smb2_handle_cancelled_mid(char *buffer, struct
-TCP_Server_Info *server)
-  *
-  * Assumes @iov does not contain the rfc1002 length and iov[0] has the
-  * SMB2 header.
-+ *
-+ * @ses: server session structure
-+ * @iov: array containing the SMB request we will send to the server
-+ * @nvec: number of array entries for the iov
-  */
- int
- smb311_update_preauth_hash(struct cifs_ses *ses, struct kvec *iov, int nvec)
 
 -- 
 Thanks,
 
 Steve
+
+--0000000000006fcef305b648f4a4
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-remove-some-minor-warnings-pointed-out-by-kerne.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-remove-some-minor-warnings-pointed-out-by-kerne.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kim27c9n0>
+X-Attachment-Id: f_kim27c9n0
+
+RnJvbSAxMDQ4MzM0MTkxMjJmMDYwOGQ3ZDM2NTE5NDRhOWU3YjFmMWZkNGU5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFNhdCwgMTIgRGVjIDIwMjAgMTI6NDk6MjggLTA2MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiByZW1vdmUgc29tZSBtaW5vciB3YXJuaW5ncyBwb2ludGVkIG91dCBieSBrZXJuZWwgdGVz
+dAogcm9ib3QKCkNvcnJlY3Qgc29tZSB0cml2aWFsIHdhcm5pbmdzIGNhdXNlZCB3aGVuIG5ldyBm
+aWxlIHVuYy5jCndhcyBjcmVhdGVkLiBGb3IgZXhhbXBsZToKCiAgIEluIGZpbGUgaW5jbHVkZWQg
+ZnJvbSBmcy9jaWZzL3VuYy5jOjExOgo+PiBmcy9jaWZzL2NpZnNwcm90by5oOjQ0OjI4OiB3YXJu
+aW5nOiAnc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbycgZGVjbGFyZWQgaW5zaWRlIHBhcmFtZXRlciBs
+aXN0IHdpbGwgbm90IGJlIHZpc2libGUgb3V0c2lkZSBvZiB0aGlzIGRlZmluaXRpb24gb3IgZGVj
+bGFyYXRpb24KICAgICAgNDQgfCBleHRlcm4gaW50IHNtYl9zZW5kKHN0cnVjdCBUQ1BfU2VydmVy
+X0luZm8gKiwgc3RydWN0IHNtYl9oZHIgKiwKClJlcG9ydGVkLWJ5OiBrZXJuZWwgdGVzdCByb2Jv
+dCA8bGtwQGludGVsLmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBt
+aWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvdW5jLmMgfCA0ICsrKysKIDEgZmlsZSBjaGFuZ2Vk
+LCA0IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9mcy9jaWZzL3VuYy5jIGIvZnMvY2lmcy91
+bmMuYwppbmRleCAyYzU2NjVmNTU0M2EuLjM5NGFhMDBjZWE0MCAxMDA2NDQKLS0tIGEvZnMvY2lm
+cy91bmMuYworKysgYi9mcy9jaWZzL3VuYy5jCkBAIC03LDcgKzcsMTEgQEAKICAqICAgICAgICAg
+ICAgICBKZWZmIExheXRvbiA8amxheXRvbkBrZXJuZWwub3JnPgogICovCiAKKyNpbmNsdWRlIDxs
+aW51eC9mcy5oPgogI2luY2x1ZGUgPGxpbnV4L3NsYWIuaD4KKyNpbmNsdWRlIDxsaW51eC9pbmV0
+Lmg+CisjaW5jbHVkZSA8bGludXgvY3R5cGUuaD4KKyNpbmNsdWRlICJjaWZzZ2xvYi5oIgogI2lu
+Y2x1ZGUgImNpZnNwcm90by5oIgogCiAvKiBleHRyYWN0IHRoZSBob3N0IHBvcnRpb24gb2YgdGhl
+IFVOQyBzdHJpbmcgKi8KLS0gCjIuMjcuMAoK
+--0000000000006fcef305b648f4a4--
