@@ -8,186 +8,310 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C1D6C4361B
-	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 05:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AECC4361B
+	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 05:53:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B575C2313B
-	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 05:52:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDB212313B
+	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 05:53:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727909AbgLLFvp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 12 Dec 2020 00:51:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45180 "EHLO
+        id S1728500AbgLLFwS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 12 Dec 2020 00:52:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727097AbgLLFvY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Dec 2020 00:51:24 -0500
+        with ESMTP id S1727097AbgLLFwB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Dec 2020 00:52:01 -0500
 Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 255F3C0613CF
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 21:50:44 -0800 (PST)
-Received: by mail-lf1-x141.google.com with SMTP id r24so16910392lfm.8
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 21:50:44 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA1B2C0613D3
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 21:51:20 -0800 (PST)
+Received: by mail-lf1-x141.google.com with SMTP id 23so16920920lfg.10
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 21:51:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=TOQBxEL8r7ee7dBkhtK74Rn5CNQ1s+sTQ++IrGzESfU=;
-        b=WlR7+iVuP4LgGY00FWkh1TSy655GtZ/kcYkctrdIl5fepN73MC8g4TbP5eXz5ouizV
-         IbCHxDogxW6ZAqcdnSFHa2mz7oje3G4+/COlAg0eg4wqw4A19G2/WmlOPO7R4HTuIvek
-         ZBUqS97mYPJ3YIuxvgSudql0jRG4l0iRzHoWTUIcY6z6AWA7JpUV6SCESdZt4C8LcQBm
-         1I8mtAhxTAlMk7mSDpH8iPWQhyNNoL3McRV5BgpZ+zPra2hRnXRXx4qi4BYFgGeNrm9X
-         CmhUx71SmtIg4mvgEFPH9ArKtKkoBrV0U3xIWB4mlLQA80E/c8YRodxZd1Ps6s8bi1uj
-         I+Lg==
+        bh=xiVbAc9OQamHJFtChm/oCMTr/tKNbgbOcSCIa9tZdt0=;
+        b=JhPjlAxOjnGKxWN/QJh//zq+LxQBk0aXEdFkzgPkcXeFM8PCFGITOPo2AL7B2Cls0u
+         hU9g5lcJ1ZX3IxR9RUy8oIcRxG+iUSU9rqtLputuoqk86bRrPhYxsxabuE555tfYEMP9
+         FT8IeZH0qoLK0Fu8qRoZSc68ntGvhpkGtOgQ5ELhAa9xVZd4hUum7B3mUNUajAWNfC7h
+         6lB5xm+RMXg83mfobNUF5D/N40RwbOFYEwhsX+PkqQNOnDTZctXLXk/SiYwiiWahhAUt
+         Y0XbzLTWiM/uu2M5cmGPcbvrCFfZrVxI5drIOpT6mjQ26wu9AWXc2luJdvhRtad7TCaa
+         E2GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=TOQBxEL8r7ee7dBkhtK74Rn5CNQ1s+sTQ++IrGzESfU=;
-        b=dhdWJGF/SSLqHex5OaYizO0S5NUPbderrwiSj4WcIKwI5/W2qRY08GKQ9i8yQadZcA
-         wcRAdd4L36LG1pGFdSSyj6h41lO/jxf+pAN29tdrOAmk0q4iPX+F1cceF1tnVyTF3Rno
-         G16v9zp1/BibGXeq4gt94PRK4STT/QXlj3vQgBem/AJSpu2A5Z0RazVr+s0B0FhFXieE
-         yUs+u8JqDT5MLDLVowZJymg7egFUjG11gREAqFgSrknHeLyI1kZ28ItTvHYrsiuCpI4W
-         cmw675M6y5/cliNGgi9i7eTsAlQaQz7zxrgKNCcG4ipfqb0QSagTBSaao+QoV/Ag9hJZ
-         u6mg==
-X-Gm-Message-State: AOAM530OIsOaEgLDVhqKzx/qzwL9SoJLf5KH/DUv36n+N9ibG/Zz49SP
-        TWKndv+E9rINgGu0fa0nelV55sx6XTHh7IJ1bhs=
-X-Google-Smtp-Source: ABdhPJz8ZuIBf9j+T1LAsUVp2sRB0GTJF6XAcPFOdHlrrsdgjKl39nT6mnyc6blRBncDy76BUDmUDT0l12ew0Jm/6PY=
-X-Received: by 2002:a2e:88c8:: with SMTP id a8mr6278647ljk.148.1607752242557;
- Fri, 11 Dec 2020 21:50:42 -0800 (PST)
+        bh=xiVbAc9OQamHJFtChm/oCMTr/tKNbgbOcSCIa9tZdt0=;
+        b=gDIhZYCGW7kNrFH7nO8IackdESsP43bAgxqiUvP/oeZ/TxQ+Uuz47plaEMmm9ilKP0
+         OwcnC8RPMJowSM5PXMCUBSOoIvZZ/xlY+bWa4+PLagjyFbpF5dZgWBwIDInHtXp17Tdp
+         uQLpcN6q2Vapo4emgwoWqH/+GQ0Zubd5p/xulzLbcz+CdbKo+Q37FQ+0FymrG9METdhS
+         89OGgWQ4AI4hlFRFTa3EnV8M+MqAYhOW5Qukrdngpc7wSUepyFupv4xHYCFPPclisIRr
+         gvjQNmEgUyAU1Z3abcOgL9+B2qYUnPS067Nh97qH2jbyySEMaaAvsgvqiLN/3CGV9xER
+         Qzhw==
+X-Gm-Message-State: AOAM532qXCrDdSrqz4OZkuiXTvAUb/+Prr49/nDUoluk/uzJh+E+LQzi
+        LUTbFIk6I2+93YDkWF9GBf0zG6aNhkqvWqoDRbGkSy+ve3uwOw==
+X-Google-Smtp-Source: ABdhPJyQ6VohovA0V0OTQzsMgEMkG/23DpCwG3UhMTwPGi1AJPgAO8p62Vt7B3PBDTOqtR44lvj4UsHJ0Dx0zpN9MxQ=
+X-Received: by 2002:a19:6f01:: with SMTP id k1mr5470281lfc.184.1607752279253;
+ Fri, 11 Dec 2020 21:51:19 -0800 (PST)
 MIME-Version: 1.0
-References: <20201130180257.31787-1-scabrero@suse.de> <20201130180257.31787-3-scabrero@suse.de>
-In-Reply-To: <20201130180257.31787-3-scabrero@suse.de>
+References: <20201130180257.31787-1-scabrero@suse.de> <20201130180257.31787-4-scabrero@suse.de>
+In-Reply-To: <20201130180257.31787-4-scabrero@suse.de>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 11 Dec 2020 23:50:31 -0600
-Message-ID: <CAH2r5mv5daRXYqGcXJTJh1QfmT-PjtY3TRHG7HDqMRZWgzQSvg@mail.gmail.com>
-Subject: Re: [PATCH v4 02/11] cifs: Make extract_sharename function public
+Date:   Fri, 11 Dec 2020 23:51:08 -0600
+Message-ID: <CAH2r5mvs+3VX+nZhuqUi3FVjwdd7b9rVk0q89q6eW_ZA3fEFyw@mail.gmail.com>
+Subject: Re: [PATCH v4 03/11] cifs: Register generic netlink family
 To:     Samuel Cabrero <scabrero@suse.de>
 Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000004e0bca05b63dfd0e"
+Content-Type: multipart/mixed; boundary="0000000000007e046905b63dffa1"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000004e0bca05b63dfd0e
+--0000000000007e046905b63dffa1
 Content-Type: text/plain; charset="UTF-8"
 
 updated version of the patch attached (rebased on current for-next).
-Tenatively merged into cifs-2.6.git for-next
+Tentatively merged into cifs-2.6.git for-next
 
 On Mon, Nov 30, 2020 at 12:05 PM Samuel Cabrero <scabrero@suse.de> wrote:
 >
-> Move the function to misc.c
+> Register a new generic netlink family to talk to the witness service
+> userspace daemon.
 >
 > Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 > ---
->  fs/cifs/cache.c     | 24 ------------------------
->  fs/cifs/cifsproto.h |  1 +
->  fs/cifs/fscache.c   |  1 +
->  fs/cifs/fscache.h   |  1 -
->  fs/cifs/misc.c      | 24 ++++++++++++++++++++++++
->  5 files changed, 26 insertions(+), 25 deletions(-)
+>  fs/cifs/Kconfig                        | 11 ++++
+>  fs/cifs/Makefile                       |  2 +
+>  fs/cifs/cifsfs.c                       | 17 ++++++-
+>  fs/cifs/netlink.c                      | 69 ++++++++++++++++++++++++++
+>  fs/cifs/netlink.h                      | 16 ++++++
+>  include/uapi/linux/cifs/cifs_netlink.h | 31 ++++++++++++
+>  6 files changed, 145 insertions(+), 1 deletion(-)
+>  create mode 100644 fs/cifs/netlink.c
+>  create mode 100644 fs/cifs/netlink.h
+>  create mode 100644 include/uapi/linux/cifs/cifs_netlink.h
 >
-> diff --git a/fs/cifs/cache.c b/fs/cifs/cache.c
-> index 0f2adecb94f2..488fe0ffc1ef 100644
-> --- a/fs/cifs/cache.c
-> +++ b/fs/cifs/cache.c
-> @@ -53,30 +53,6 @@ const struct fscache_cookie_def cifs_fscache_server_index_def = {
->         .type = FSCACHE_COOKIE_TYPE_INDEX,
->  };
+> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+> index 604f65f4b6c5..664ac5c63d39 100644
+> --- a/fs/cifs/Kconfig
+> +++ b/fs/cifs/Kconfig
+> @@ -190,6 +190,17 @@ config CIFS_DFS_UPCALL
+>           servers if their addresses change or for implicit mounts of
+>           DFS junction points. If unsure, say Y.
 >
-> -char *extract_sharename(const char *treename)
-> -{
-> -       const char *src;
-> -       char *delim, *dst;
-> -       int len;
-> -
-> -       /* skip double chars at the beginning */
-> -       src = treename + 2;
-> -
-> -       /* share name is always preceded by '\\' now */
-> -       delim = strchr(src, '\\');
-> -       if (!delim)
-> -               return ERR_PTR(-EINVAL);
-> -       delim++;
-> -       len = strlen(delim);
-> -
-> -       /* caller has to free the memory */
-> -       dst = kstrndup(delim, len, GFP_KERNEL);
-> -       if (!dst)
-> -               return ERR_PTR(-ENOMEM);
-> -
-> -       return dst;
-> -}
-> -
->  static enum
->  fscache_checkaux cifs_fscache_super_check_aux(void *cookie_netfs_data,
->                                               const void *data,
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index d716e81d86fa..5f997a01fb45 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -621,6 +621,7 @@ struct super_block *cifs_get_tcp_super(struct TCP_Server_Info *server);
->  void cifs_put_tcp_super(struct super_block *sb);
->  int update_super_prepath(struct cifs_tcon *tcon, char *prefix);
->  char *extract_hostname(const char *unc);
-> +char *extract_sharename(const char *unc);
+> +config CIFS_SWN_UPCALL
+> +       bool "SWN feature support"
+> +       depends on CIFS
+> +       help
+> +         The Service Witness Protocol (SWN) is used to get notifications
+> +         from a highly available server of resource state changes. This
+> +         feature enables an upcall mechanism for CIFS which contacts an
+> +         userspace daemon to establish the DCE/RPC connection to retrieve
+> +         the cluster available interfaces and resource change notifications.
+> +         If unsure, say Y.
+> +
+>  config CIFS_NFSD_EXPORT
+>         bool "Allow nfsd to export CIFS file system"
+>         depends on CIFS && BROKEN
+> diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
+> index cd17d0e50f2a..b88fd46ac597 100644
+> --- a/fs/cifs/Makefile
+> +++ b/fs/cifs/Makefile
+> @@ -18,6 +18,8 @@ cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
 >
+>  cifs-$(CONFIG_CIFS_DFS_UPCALL) += dns_resolve.o cifs_dfs_ref.o dfs_cache.o
+>
+> +cifs-$(CONFIG_CIFS_SWN_UPCALL) += netlink.o
+> +
+>  cifs-$(CONFIG_CIFS_FSCACHE) += fscache.o cache.o
+>
+>  cifs-$(CONFIG_CIFS_SMB_DIRECT) += smbdirect.o
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 472cb7777e3e..8111d0109a2e 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -55,6 +55,9 @@
 >  #ifdef CONFIG_CIFS_DFS_UPCALL
->  static inline int get_dfs_path(const unsigned int xid, struct cifs_ses *ses,
-> diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-> index da688185403c..20d24af33ee2 100644
-> --- a/fs/cifs/fscache.c
-> +++ b/fs/cifs/fscache.c
-> @@ -22,6 +22,7 @@
->  #include "cifsglob.h"
->  #include "cifs_debug.h"
->  #include "cifs_fs_sb.h"
-> +#include "cifsproto.h"
+>  #include "dfs_cache.h"
+>  #endif
+> +#ifdef CONFIG_CIFS_SWN_UPCALL
+> +#include "netlink.h"
+> +#endif
 >
 >  /*
->   * Key layout of CIFS server cache index object
-> diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-> index 1091633d2adb..e811f2dd7619 100644
-> --- a/fs/cifs/fscache.h
-> +++ b/fs/cifs/fscache.h
-> @@ -57,7 +57,6 @@ extern const struct fscache_cookie_def cifs_fscache_inode_object_def;
+>   * DOS dates from 1980/1/1 through 2107/12/31
+> @@ -1617,10 +1620,15 @@ init_cifs(void)
+>         if (rc)
+>                 goto out_destroy_dfs_cache;
+>  #endif /* CONFIG_CIFS_UPCALL */
+> +#ifdef CONFIG_CIFS_SWN_UPCALL
+> +       rc = cifs_genl_init();
+> +       if (rc)
+> +               goto out_register_key_type;
+> +#endif /* CONFIG_CIFS_SWN_UPCALL */
 >
->  extern int cifs_fscache_register(void);
->  extern void cifs_fscache_unregister(void);
-> -extern char *extract_sharename(const char *);
+>         rc = init_cifs_idmap();
+>         if (rc)
+> -               goto out_register_key_type;
+> +               goto out_cifs_swn_init;
 >
->  /*
->   * fscache.c
-> diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-> index 3d5cc25c167f..f0a1c24751b2 100644
-> --- a/fs/cifs/misc.c
-> +++ b/fs/cifs/misc.c
-> @@ -1227,3 +1227,27 @@ char *extract_hostname(const char *unc)
+>         rc = register_filesystem(&cifs_fs_type);
+>         if (rc)
+> @@ -1636,7 +1644,11 @@ init_cifs(void)
 >
->         return dst;
->  }
+>  out_init_cifs_idmap:
+>         exit_cifs_idmap();
+> +out_cifs_swn_init:
+> +#ifdef CONFIG_CIFS_SWN_UPCALL
+> +       cifs_genl_exit();
+>  out_register_key_type:
+> +#endif
+>  #ifdef CONFIG_CIFS_UPCALL
+>         exit_cifs_spnego();
+>  out_destroy_dfs_cache:
+> @@ -1673,6 +1685,9 @@ exit_cifs(void)
+>         unregister_filesystem(&smb3_fs_type);
+>         cifs_dfs_release_automount_timer();
+>         exit_cifs_idmap();
+> +#ifdef CONFIG_CIFS_SWN_UPCALL
+> +       cifs_genl_exit();
+> +#endif
+>  #ifdef CONFIG_CIFS_UPCALL
+>         exit_cifs_spnego();
+>  #endif
+> diff --git a/fs/cifs/netlink.c b/fs/cifs/netlink.c
+> new file mode 100644
+> index 000000000000..b9154661fa85
+> --- /dev/null
+> +++ b/fs/cifs/netlink.c
+> @@ -0,0 +1,69 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Netlink routines for CIFS
+> + *
+> + * Copyright (c) 2020 Samuel Cabrero <scabrero@suse.de>
+> + */
 > +
-> +char *extract_sharename(const char *unc)
+> +#include <net/genetlink.h>
+> +#include <uapi/linux/cifs/cifs_netlink.h>
+> +
+> +#include "netlink.h"
+> +#include "cifsglob.h"
+> +#include "cifs_debug.h"
+> +
+> +static const struct nla_policy cifs_genl_policy[CIFS_GENL_ATTR_MAX + 1] = {
+> +};
+> +
+> +static struct genl_ops cifs_genl_ops[] = {
+> +};
+> +
+> +static const struct genl_multicast_group cifs_genl_mcgrps[] = {
+> +       [CIFS_GENL_MCGRP_SWN] = { .name = CIFS_GENL_MCGRP_SWN_NAME },
+> +};
+> +
+> +struct genl_family cifs_genl_family = {
+> +       .name           = CIFS_GENL_NAME,
+> +       .version        = CIFS_GENL_VERSION,
+> +       .hdrsize        = 0,
+> +       .maxattr        = CIFS_GENL_ATTR_MAX,
+> +       .module         = THIS_MODULE,
+> +       .policy         = cifs_genl_policy,
+> +       .ops            = cifs_genl_ops,
+> +       .n_ops          = ARRAY_SIZE(cifs_genl_ops),
+> +       .mcgrps         = cifs_genl_mcgrps,
+> +       .n_mcgrps       = ARRAY_SIZE(cifs_genl_mcgrps),
+> +};
+> +
+> +/**
+> + * cifs_genl_init - Register generic netlink family
+> + *
+> + * Return zero if initialized successfully, otherwise non-zero.
+> + */
+> +int cifs_genl_init(void)
 > +{
-> +       const char *src;
-> +       char *delim, *dst;
-> +       int len;
+> +       int ret;
 > +
-> +       /* skip double chars at the beginning */
-> +       src = unc + 2;
+> +       ret = genl_register_family(&cifs_genl_family);
+> +       if (ret < 0) {
+> +               cifs_dbg(VFS, "%s: failed to register netlink family\n",
+> +                               __func__);
+> +               return ret;
+> +       }
 > +
-> +       /* share name is always preceded by '\\' now */
-> +       delim = strchr(src, '\\');
-> +       if (!delim)
-> +               return ERR_PTR(-EINVAL);
-> +       delim++;
-> +       len = strlen(delim);
-> +
-> +       /* caller has to free the memory */
-> +       dst = kstrndup(delim, len, GFP_KERNEL);
-> +       if (!dst)
-> +               return ERR_PTR(-ENOMEM);
-> +
-> +       return dst;
+> +       return 0;
 > +}
+> +
+> +/**
+> + * cifs_genl_exit - Unregister generic netlink family
+> + */
+> +void cifs_genl_exit(void)
+> +{
+> +       int ret;
+> +
+> +       ret = genl_unregister_family(&cifs_genl_family);
+> +       if (ret < 0) {
+> +               cifs_dbg(VFS, "%s: failed to unregister netlink family\n",
+> +                               __func__);
+> +       }
+> +}
+> diff --git a/fs/cifs/netlink.h b/fs/cifs/netlink.h
+> new file mode 100644
+> index 000000000000..e2fa8ed24c54
+> --- /dev/null
+> +++ b/fs/cifs/netlink.h
+> @@ -0,0 +1,16 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Netlink routines for CIFS
+> + *
+> + * Copyright (c) 2020 Samuel Cabrero <scabrero@suse.de>
+> + */
+> +
+> +#ifndef _CIFS_NETLINK_H
+> +#define _CIFS_NETLINK_H
+> +
+> +extern struct genl_family cifs_genl_family;
+> +
+> +extern int cifs_genl_init(void);
+> +extern void cifs_genl_exit(void);
+> +
+> +#endif /* _CIFS_NETLINK_H */
+> diff --git a/include/uapi/linux/cifs/cifs_netlink.h b/include/uapi/linux/cifs/cifs_netlink.h
+> new file mode 100644
+> index 000000000000..cdb1bd78fbc7
+> --- /dev/null
+> +++ b/include/uapi/linux/cifs/cifs_netlink.h
+> @@ -0,0 +1,31 @@
+> +/* SPDX-License-Identifier: LGPL-2.1+ WITH Linux-syscall-note */
+> +/*
+> + * Netlink routines for CIFS
+> + *
+> + * Copyright (c) 2020 Samuel Cabrero <scabrero@suse.de>
+> + */
+> +
+> +
+> +#ifndef _UAPILINUX_CIFS_NETLINK_H
+> +#define _UAPILINUX_CIFS_NETLINK_H
+> +
+> +#define CIFS_GENL_NAME                 "cifs"
+> +#define CIFS_GENL_VERSION              0x1
+> +
+> +#define CIFS_GENL_MCGRP_SWN_NAME       "cifs_mcgrp_swn"
+> +
+> +enum cifs_genl_multicast_groups {
+> +       CIFS_GENL_MCGRP_SWN,
+> +};
+> +
+> +enum cifs_genl_attributes {
+> +       __CIFS_GENL_ATTR_MAX,
+> +};
+> +#define CIFS_GENL_ATTR_MAX (__CIFS_GENL_ATTR_MAX - 1)
+> +
+> +enum cifs_genl_commands {
+> +       __CIFS_GENL_CMD_MAX
+> +};
+> +#define CIFS_GENL_CMD_MAX (__CIFS_GENL_CMD_MAX - 1)
+> +
+> +#endif /* _UAPILINUX_CIFS_NETLINK_H */
 > --
 > 2.29.2
 >
@@ -198,72 +322,127 @@ Thanks,
 
 Steve
 
---0000000000004e0bca05b63dfd0e
+--0000000000007e046905b63dffa1
 Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0002-cifs-Make-extract_sharename-function-public.patch"
+	name="0005-cifs-Register-generic-netlink-family.patch"
 Content-Disposition: attachment; 
-	filename="0002-cifs-Make-extract_sharename-function-public.patch"
+	filename="0005-cifs-Register-generic-netlink-family.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_kila5yfs0>
-X-Attachment-Id: f_kila5yfs0
+Content-ID: <f_kila6nbj0>
+X-Attachment-Id: f_kila6nbj0
 
-RnJvbSA3NDk3NjVlMjYwNzIwZDMzMmViOGYwM2MzYmUyODU1N2I4Y2ViOTU0IE1vbiBTZXAgMTcg
+RnJvbSBjZjZhNmMwODQxYmMxMjVhOWVkZTUwMDAwYzIyZjAxMTBlZWE4MDViIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTYW11ZWwgQ2FicmVybyA8c2NhYnJlcm9Ac3VzZS5kZT4KRGF0
-ZTogTW9uLCAzMCBOb3YgMjAyMCAxOTowMjo0OCArMDEwMApTdWJqZWN0OiBbUEFUQ0ggMi84XSBj
-aWZzOiBNYWtlIGV4dHJhY3Rfc2hhcmVuYW1lIGZ1bmN0aW9uIHB1YmxpYwoKTW92ZSB0aGUgZnVu
-Y3Rpb24gdG8gbWlzYy5jCgpTaWduZWQtb2ZmLWJ5OiBTYW11ZWwgQ2FicmVybyA8c2NhYnJlcm9A
-c3VzZS5kZT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQu
-Y29tPgotLS0KIGZzL2NpZnMvY2FjaGUuYyAgICAgfCAyNCAtLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0KIGZzL2NpZnMvY2lmc3Byb3RvLmggfCAgMSArCiBmcy9jaWZzL2ZzY2FjaGUuYyAgIHwgIDEg
-KwogZnMvY2lmcy9mc2NhY2hlLmggICB8ICAxIC0KIGZzL2NpZnMvbWlzYy5jICAgICAgfCAyNCAr
-KysrKysrKysrKysrKysrKysrKysrKysKIDUgZmlsZXMgY2hhbmdlZCwgMjYgaW5zZXJ0aW9ucygr
-KSwgMjUgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jYWNoZS5jIGIvZnMvY2lm
-cy9jYWNoZS5jCmluZGV4IDBmMmFkZWNiOTRmMi4uNDg4ZmUwZmZjMWVmIDEwMDY0NAotLS0gYS9m
-cy9jaWZzL2NhY2hlLmMKKysrIGIvZnMvY2lmcy9jYWNoZS5jCkBAIC01MywzMCArNTMsNiBAQCBj
-b25zdCBzdHJ1Y3QgZnNjYWNoZV9jb29raWVfZGVmIGNpZnNfZnNjYWNoZV9zZXJ2ZXJfaW5kZXhf
-ZGVmID0gewogCS50eXBlID0gRlNDQUNIRV9DT09LSUVfVFlQRV9JTkRFWCwKIH07CiAKLWNoYXIg
-KmV4dHJhY3Rfc2hhcmVuYW1lKGNvbnN0IGNoYXIgKnRyZWVuYW1lKQotewotCWNvbnN0IGNoYXIg
-KnNyYzsKLQljaGFyICpkZWxpbSwgKmRzdDsKLQlpbnQgbGVuOwotCi0JLyogc2tpcCBkb3VibGUg
-Y2hhcnMgYXQgdGhlIGJlZ2lubmluZyAqLwotCXNyYyA9IHRyZWVuYW1lICsgMjsKLQotCS8qIHNo
-YXJlIG5hbWUgaXMgYWx3YXlzIHByZWNlZGVkIGJ5ICdcXCcgbm93ICovCi0JZGVsaW0gPSBzdHJj
-aHIoc3JjLCAnXFwnKTsKLQlpZiAoIWRlbGltKQotCQlyZXR1cm4gRVJSX1BUUigtRUlOVkFMKTsK
-LQlkZWxpbSsrOwotCWxlbiA9IHN0cmxlbihkZWxpbSk7Ci0KLQkvKiBjYWxsZXIgaGFzIHRvIGZy
-ZWUgdGhlIG1lbW9yeSAqLwotCWRzdCA9IGtzdHJuZHVwKGRlbGltLCBsZW4sIEdGUF9LRVJORUwp
-OwotCWlmICghZHN0KQotCQlyZXR1cm4gRVJSX1BUUigtRU5PTUVNKTsKLQotCXJldHVybiBkc3Q7
-Ci19Ci0KIHN0YXRpYyBlbnVtCiBmc2NhY2hlX2NoZWNrYXV4IGNpZnNfZnNjYWNoZV9zdXBlcl9j
-aGVja19hdXgodm9pZCAqY29va2llX25ldGZzX2RhdGEsCiAJCQkJCSAgICAgIGNvbnN0IHZvaWQg
-KmRhdGEsCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNwcm90by5oIGIvZnMvY2lmcy9jaWZzcHJv
-dG8uaAppbmRleCAzZmUwYzRhMGQzNmQuLmI4MGI1N2E2NjgwNCAxMDA2NDQKLS0tIGEvZnMvY2lm
-cy9jaWZzcHJvdG8uaAorKysgYi9mcy9jaWZzL2NpZnNwcm90by5oCkBAIC02MTgsNiArNjE4LDcg
-QEAgc3RydWN0IHN1cGVyX2Jsb2NrICpjaWZzX2dldF90Y3Bfc3VwZXIoc3RydWN0IFRDUF9TZXJ2
-ZXJfSW5mbyAqc2VydmVyKTsKIHZvaWQgY2lmc19wdXRfdGNwX3N1cGVyKHN0cnVjdCBzdXBlcl9i
-bG9jayAqc2IpOwogaW50IHVwZGF0ZV9zdXBlcl9wcmVwYXRoKHN0cnVjdCBjaWZzX3Rjb24gKnRj
-b24sIGNoYXIgKnByZWZpeCk7CiBjaGFyICpleHRyYWN0X2hvc3RuYW1lKGNvbnN0IGNoYXIgKnVu
-Yyk7CitjaGFyICpleHRyYWN0X3NoYXJlbmFtZShjb25zdCBjaGFyICp1bmMpOwogCiAjaWZkZWYg
-Q09ORklHX0NJRlNfREZTX1VQQ0FMTAogc3RhdGljIGlubGluZSBpbnQgZ2V0X2Rmc19wYXRoKGNv
-bnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3NlcyAqc2VzLApkaWZmIC0tZ2l0IGEv
-ZnMvY2lmcy9mc2NhY2hlLmMgYi9mcy9jaWZzL2ZzY2FjaGUuYwppbmRleCBkYTY4ODE4NTQwM2Mu
-LjIwZDI0YWYzM2VlMiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9mc2NhY2hlLmMKKysrIGIvZnMvY2lm
-cy9mc2NhY2hlLmMKQEAgLTIyLDYgKzIyLDcgQEAKICNpbmNsdWRlICJjaWZzZ2xvYi5oIgogI2lu
-Y2x1ZGUgImNpZnNfZGVidWcuaCIKICNpbmNsdWRlICJjaWZzX2ZzX3NiLmgiCisjaW5jbHVkZSAi
-Y2lmc3Byb3RvLmgiCiAKIC8qCiAgKiBLZXkgbGF5b3V0IG9mIENJRlMgc2VydmVyIGNhY2hlIGlu
-ZGV4IG9iamVjdApkaWZmIC0tZ2l0IGEvZnMvY2lmcy9mc2NhY2hlLmggYi9mcy9jaWZzL2ZzY2Fj
-aGUuaAppbmRleCAxMDkxNjMzZDJhZGIuLmU4MTFmMmRkNzYxOSAxMDA2NDQKLS0tIGEvZnMvY2lm
-cy9mc2NhY2hlLmgKKysrIGIvZnMvY2lmcy9mc2NhY2hlLmgKQEAgLTU3LDcgKzU3LDYgQEAgZXh0
-ZXJuIGNvbnN0IHN0cnVjdCBmc2NhY2hlX2Nvb2tpZV9kZWYgY2lmc19mc2NhY2hlX2lub2RlX29i
-amVjdF9kZWY7CiAKIGV4dGVybiBpbnQgY2lmc19mc2NhY2hlX3JlZ2lzdGVyKHZvaWQpOwogZXh0
-ZXJuIHZvaWQgY2lmc19mc2NhY2hlX3VucmVnaXN0ZXIodm9pZCk7Ci1leHRlcm4gY2hhciAqZXh0
-cmFjdF9zaGFyZW5hbWUoY29uc3QgY2hhciAqKTsKIAogLyoKICAqIGZzY2FjaGUuYwpkaWZmIC0t
-Z2l0IGEvZnMvY2lmcy9taXNjLmMgYi9mcy9jaWZzL21pc2MuYwppbmRleCAzZDVjYzI1YzE2N2Yu
-LmYwYTFjMjQ3NTFiMiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9taXNjLmMKKysrIGIvZnMvY2lmcy9t
-aXNjLmMKQEAgLTEyMjcsMyArMTIyNywyNyBAQCBjaGFyICpleHRyYWN0X2hvc3RuYW1lKGNvbnN0
-IGNoYXIgKnVuYykKIAogCXJldHVybiBkc3Q7CiB9CisKK2NoYXIgKmV4dHJhY3Rfc2hhcmVuYW1l
-KGNvbnN0IGNoYXIgKnVuYykKK3sKKwljb25zdCBjaGFyICpzcmM7CisJY2hhciAqZGVsaW0sICpk
-c3Q7CisJaW50IGxlbjsKKworCS8qIHNraXAgZG91YmxlIGNoYXJzIGF0IHRoZSBiZWdpbm5pbmcg
-Ki8KKwlzcmMgPSB1bmMgKyAyOworCisJLyogc2hhcmUgbmFtZSBpcyBhbHdheXMgcHJlY2VkZWQg
-YnkgJ1xcJyBub3cgKi8KKwlkZWxpbSA9IHN0cmNocihzcmMsICdcXCcpOworCWlmICghZGVsaW0p
-CisJCXJldHVybiBFUlJfUFRSKC1FSU5WQUwpOworCWRlbGltKys7CisJbGVuID0gc3RybGVuKGRl
-bGltKTsKKworCS8qIGNhbGxlciBoYXMgdG8gZnJlZSB0aGUgbWVtb3J5ICovCisJZHN0ID0ga3N0
-cm5kdXAoZGVsaW0sIGxlbiwgR0ZQX0tFUk5FTCk7CisJaWYgKCFkc3QpCisJCXJldHVybiBFUlJf
-UFRSKC1FTk9NRU0pOworCisJcmV0dXJuIGRzdDsKK30KLS0gCjIuMjcuMAoK
---0000000000004e0bca05b63dfd0e--
+ZTogTW9uLCAzMCBOb3YgMjAyMCAxOTowMjo0OSArMDEwMApTdWJqZWN0OiBbUEFUQ0ggNS84XSBj
+aWZzOiBSZWdpc3RlciBnZW5lcmljIG5ldGxpbmsgZmFtaWx5CgpSZWdpc3RlciBhIG5ldyBnZW5l
+cmljIG5ldGxpbmsgZmFtaWx5IHRvIHRhbGsgdG8gdGhlIHdpdG5lc3Mgc2VydmljZQp1c2Vyc3Bh
+Y2UgZGFlbW9uLgoKU2lnbmVkLW9mZi1ieTogU2FtdWVsIENhYnJlcm8gPHNjYWJyZXJvQHN1c2Uu
+ZGU+Ci0tLQogZnMvY2lmcy9LY29uZmlnICAgICAgICAgICAgICAgICAgICAgICAgfCAxMSArKysr
+CiBmcy9jaWZzL01ha2VmaWxlICAgICAgICAgICAgICAgICAgICAgICB8ICAyICsKIGZzL2NpZnMv
+Y2lmc2ZzLmMgICAgICAgICAgICAgICAgICAgICAgIHwgMTcgKysrKysrLQogZnMvY2lmcy9uZXRs
+aW5rLmMgICAgICAgICAgICAgICAgICAgICAgfCA2OSArKysrKysrKysrKysrKysrKysrKysrKysr
+KwogZnMvY2lmcy9uZXRsaW5rLmggICAgICAgICAgICAgICAgICAgICAgfCAxNiArKysrKysKIGlu
+Y2x1ZGUvdWFwaS9saW51eC9jaWZzL2NpZnNfbmV0bGluay5oIHwgMzEgKysrKysrKysrKysrCiA2
+IGZpbGVzIGNoYW5nZWQsIDE0NSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCiBjcmVhdGUg
+bW9kZSAxMDA2NDQgZnMvY2lmcy9uZXRsaW5rLmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBmcy9jaWZz
+L25ldGxpbmsuaAogY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUvdWFwaS9saW51eC9jaWZzL2Np
+ZnNfbmV0bGluay5oCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9LY29uZmlnIGIvZnMvY2lmcy9LY29u
+ZmlnCmluZGV4IDYwNGY2NWY0YjZjNS4uNjY0YWM1YzYzZDM5IDEwMDY0NAotLS0gYS9mcy9jaWZz
+L0tjb25maWcKKysrIGIvZnMvY2lmcy9LY29uZmlnCkBAIC0xOTAsNiArMTkwLDE3IEBAIGNvbmZp
+ZyBDSUZTX0RGU19VUENBTEwKIAkgIHNlcnZlcnMgaWYgdGhlaXIgYWRkcmVzc2VzIGNoYW5nZSBv
+ciBmb3IgaW1wbGljaXQgbW91bnRzIG9mCiAJICBERlMganVuY3Rpb24gcG9pbnRzLiBJZiB1bnN1
+cmUsIHNheSBZLgogCitjb25maWcgQ0lGU19TV05fVVBDQUxMCisJYm9vbCAiU1dOIGZlYXR1cmUg
+c3VwcG9ydCIKKwlkZXBlbmRzIG9uIENJRlMKKwloZWxwCisJICBUaGUgU2VydmljZSBXaXRuZXNz
+IFByb3RvY29sIChTV04pIGlzIHVzZWQgdG8gZ2V0IG5vdGlmaWNhdGlvbnMKKwkgIGZyb20gYSBo
+aWdobHkgYXZhaWxhYmxlIHNlcnZlciBvZiByZXNvdXJjZSBzdGF0ZSBjaGFuZ2VzLiBUaGlzCisJ
+ICBmZWF0dXJlIGVuYWJsZXMgYW4gdXBjYWxsIG1lY2hhbmlzbSBmb3IgQ0lGUyB3aGljaCBjb250
+YWN0cyBhbgorCSAgdXNlcnNwYWNlIGRhZW1vbiB0byBlc3RhYmxpc2ggdGhlIERDRS9SUEMgY29u
+bmVjdGlvbiB0byByZXRyaWV2ZQorCSAgdGhlIGNsdXN0ZXIgYXZhaWxhYmxlIGludGVyZmFjZXMg
+YW5kIHJlc291cmNlIGNoYW5nZSBub3RpZmljYXRpb25zLgorCSAgSWYgdW5zdXJlLCBzYXkgWS4K
+KwogY29uZmlnIENJRlNfTkZTRF9FWFBPUlQKIAlib29sICJBbGxvdyBuZnNkIHRvIGV4cG9ydCBD
+SUZTIGZpbGUgc3lzdGVtIgogCWRlcGVuZHMgb24gQ0lGUyAmJiBCUk9LRU4KZGlmZiAtLWdpdCBh
+L2ZzL2NpZnMvTWFrZWZpbGUgYi9mcy9jaWZzL01ha2VmaWxlCmluZGV4IDg0OGViYWQ2YWY3ZC4u
+OWUzOThkMjI3YjBlIDEwMDY0NAotLS0gYS9mcy9jaWZzL01ha2VmaWxlCisrKyBiL2ZzL2NpZnMv
+TWFrZWZpbGUKQEAgLTE4LDYgKzE4LDggQEAgY2lmcy0kKENPTkZJR19DSUZTX1VQQ0FMTCkgKz0g
+Y2lmc19zcG5lZ28ubwogCiBjaWZzLSQoQ09ORklHX0NJRlNfREZTX1VQQ0FMTCkgKz0gZG5zX3Jl
+c29sdmUubyBjaWZzX2Rmc19yZWYubyBkZnNfY2FjaGUubwogCitjaWZzLSQoQ09ORklHX0NJRlNf
+U1dOX1VQQ0FMTCkgKz0gbmV0bGluay5vCisKIGNpZnMtJChDT05GSUdfQ0lGU19GU0NBQ0hFKSAr
+PSBmc2NhY2hlLm8gY2FjaGUubwogCiBjaWZzLSQoQ09ORklHX0NJRlNfU01CX0RJUkVDVCkgKz0g
+c21iZGlyZWN0Lm8KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2ZzLmMgYi9mcy9jaWZzL2NpZnNm
+cy5jCmluZGV4IDRmMjdmNzdkMzA1My4uNWQzMjU2MWFlMmVkIDEwMDY0NAotLS0gYS9mcy9jaWZz
+L2NpZnNmcy5jCisrKyBiL2ZzL2NpZnMvY2lmc2ZzLmMKQEAgLTU1LDYgKzU1LDkgQEAKICNpZmRl
+ZiBDT05GSUdfQ0lGU19ERlNfVVBDQUxMCiAjaW5jbHVkZSAiZGZzX2NhY2hlLmgiCiAjZW5kaWYK
+KyNpZmRlZiBDT05GSUdfQ0lGU19TV05fVVBDQUxMCisjaW5jbHVkZSAibmV0bGluay5oIgorI2Vu
+ZGlmCiAjaW5jbHVkZSAiZnNfY29udGV4dC5oIgogCiAvKgpAQCAtMTYwMSwxMCArMTYwNCwxNSBA
+QCBpbml0X2NpZnModm9pZCkKIAlpZiAocmMpCiAJCWdvdG8gb3V0X2Rlc3Ryb3lfZGZzX2NhY2hl
+OwogI2VuZGlmIC8qIENPTkZJR19DSUZTX1VQQ0FMTCAqLworI2lmZGVmIENPTkZJR19DSUZTX1NX
+Tl9VUENBTEwKKwlyYyA9IGNpZnNfZ2VubF9pbml0KCk7CisJaWYgKHJjKQorCQlnb3RvIG91dF9y
+ZWdpc3Rlcl9rZXlfdHlwZTsKKyNlbmRpZiAvKiBDT05GSUdfQ0lGU19TV05fVVBDQUxMICovCiAK
+IAlyYyA9IGluaXRfY2lmc19pZG1hcCgpOwogCWlmIChyYykKLQkJZ290byBvdXRfcmVnaXN0ZXJf
+a2V5X3R5cGU7CisJCWdvdG8gb3V0X2NpZnNfc3duX2luaXQ7CiAKIAlyYyA9IHJlZ2lzdGVyX2Zp
+bGVzeXN0ZW0oJmNpZnNfZnNfdHlwZSk7CiAJaWYgKHJjKQpAQCAtMTYyMCw3ICsxNjI4LDExIEBA
+IGluaXRfY2lmcyh2b2lkKQogCiBvdXRfaW5pdF9jaWZzX2lkbWFwOgogCWV4aXRfY2lmc19pZG1h
+cCgpOworb3V0X2NpZnNfc3duX2luaXQ6CisjaWZkZWYgQ09ORklHX0NJRlNfU1dOX1VQQ0FMTAor
+CWNpZnNfZ2VubF9leGl0KCk7CiBvdXRfcmVnaXN0ZXJfa2V5X3R5cGU6CisjZW5kaWYKICNpZmRl
+ZiBDT05GSUdfQ0lGU19VUENBTEwKIAlleGl0X2NpZnNfc3BuZWdvKCk7CiBvdXRfZGVzdHJveV9k
+ZnNfY2FjaGU6CkBAIC0xNjU3LDYgKzE2NjksOSBAQCBleGl0X2NpZnModm9pZCkKIAl1bnJlZ2lz
+dGVyX2ZpbGVzeXN0ZW0oJnNtYjNfZnNfdHlwZSk7CiAJY2lmc19kZnNfcmVsZWFzZV9hdXRvbW91
+bnRfdGltZXIoKTsKIAlleGl0X2NpZnNfaWRtYXAoKTsKKyNpZmRlZiBDT05GSUdfQ0lGU19TV05f
+VVBDQUxMCisJY2lmc19nZW5sX2V4aXQoKTsKKyNlbmRpZgogI2lmZGVmIENPTkZJR19DSUZTX1VQ
+Q0FMTAogCWV4aXRfY2lmc19zcG5lZ28oKTsKICNlbmRpZgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9u
+ZXRsaW5rLmMgYi9mcy9jaWZzL25ldGxpbmsuYwpuZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAw
+MDAwMDAwMDAwMDAuLmI5MTU0NjYxZmE4NQotLS0gL2Rldi9udWxsCisrKyBiL2ZzL2NpZnMvbmV0
+bGluay5jCkBAIC0wLDAgKzEsNjkgQEAKKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwt
+Mi4wCisvKgorICogTmV0bGluayByb3V0aW5lcyBmb3IgQ0lGUworICoKKyAqIENvcHlyaWdodCAo
+YykgMjAyMCBTYW11ZWwgQ2FicmVybyA8c2NhYnJlcm9Ac3VzZS5kZT4KKyAqLworCisjaW5jbHVk
+ZSA8bmV0L2dlbmV0bGluay5oPgorI2luY2x1ZGUgPHVhcGkvbGludXgvY2lmcy9jaWZzX25ldGxp
+bmsuaD4KKworI2luY2x1ZGUgIm5ldGxpbmsuaCIKKyNpbmNsdWRlICJjaWZzZ2xvYi5oIgorI2lu
+Y2x1ZGUgImNpZnNfZGVidWcuaCIKKworc3RhdGljIGNvbnN0IHN0cnVjdCBubGFfcG9saWN5IGNp
+ZnNfZ2VubF9wb2xpY3lbQ0lGU19HRU5MX0FUVFJfTUFYICsgMV0gPSB7Cit9OworCitzdGF0aWMg
+c3RydWN0IGdlbmxfb3BzIGNpZnNfZ2VubF9vcHNbXSA9IHsKK307CisKK3N0YXRpYyBjb25zdCBz
+dHJ1Y3QgZ2VubF9tdWx0aWNhc3RfZ3JvdXAgY2lmc19nZW5sX21jZ3Jwc1tdID0geworCVtDSUZT
+X0dFTkxfTUNHUlBfU1dOXSA9IHsgLm5hbWUgPSBDSUZTX0dFTkxfTUNHUlBfU1dOX05BTUUgfSwK
+K307CisKK3N0cnVjdCBnZW5sX2ZhbWlseSBjaWZzX2dlbmxfZmFtaWx5ID0geworCS5uYW1lCQk9
+IENJRlNfR0VOTF9OQU1FLAorCS52ZXJzaW9uCT0gQ0lGU19HRU5MX1ZFUlNJT04sCisJLmhkcnNp
+emUJPSAwLAorCS5tYXhhdHRyCT0gQ0lGU19HRU5MX0FUVFJfTUFYLAorCS5tb2R1bGUJCT0gVEhJ
+U19NT0RVTEUsCisJLnBvbGljeQkJPSBjaWZzX2dlbmxfcG9saWN5LAorCS5vcHMJCT0gY2lmc19n
+ZW5sX29wcywKKwkubl9vcHMJCT0gQVJSQVlfU0laRShjaWZzX2dlbmxfb3BzKSwKKwkubWNncnBz
+CQk9IGNpZnNfZ2VubF9tY2dycHMsCisJLm5fbWNncnBzCT0gQVJSQVlfU0laRShjaWZzX2dlbmxf
+bWNncnBzKSwKK307CisKKy8qKgorICogY2lmc19nZW5sX2luaXQgLSBSZWdpc3RlciBnZW5lcmlj
+IG5ldGxpbmsgZmFtaWx5CisgKgorICogUmV0dXJuIHplcm8gaWYgaW5pdGlhbGl6ZWQgc3VjY2Vz
+c2Z1bGx5LCBvdGhlcndpc2Ugbm9uLXplcm8uCisgKi8KK2ludCBjaWZzX2dlbmxfaW5pdCh2b2lk
+KQoreworCWludCByZXQ7CisKKwlyZXQgPSBnZW5sX3JlZ2lzdGVyX2ZhbWlseSgmY2lmc19nZW5s
+X2ZhbWlseSk7CisJaWYgKHJldCA8IDApIHsKKwkJY2lmc19kYmcoVkZTLCAiJXM6IGZhaWxlZCB0
+byByZWdpc3RlciBuZXRsaW5rIGZhbWlseVxuIiwKKwkJCQlfX2Z1bmNfXyk7CisJCXJldHVybiBy
+ZXQ7CisJfQorCisJcmV0dXJuIDA7Cit9CisKKy8qKgorICogY2lmc19nZW5sX2V4aXQgLSBVbnJl
+Z2lzdGVyIGdlbmVyaWMgbmV0bGluayBmYW1pbHkKKyAqLwordm9pZCBjaWZzX2dlbmxfZXhpdCh2
+b2lkKQoreworCWludCByZXQ7CisKKwlyZXQgPSBnZW5sX3VucmVnaXN0ZXJfZmFtaWx5KCZjaWZz
+X2dlbmxfZmFtaWx5KTsKKwlpZiAocmV0IDwgMCkgeworCQljaWZzX2RiZyhWRlMsICIlczogZmFp
+bGVkIHRvIHVucmVnaXN0ZXIgbmV0bGluayBmYW1pbHlcbiIsCisJCQkJX19mdW5jX18pOworCX0K
+K30KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvbmV0bGluay5oIGIvZnMvY2lmcy9uZXRsaW5rLmgKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKaW5kZXggMDAwMDAwMDAwMDAwLi5lMmZhOGVkMjRjNTQKLS0tIC9k
+ZXYvbnVsbAorKysgYi9mcy9jaWZzL25ldGxpbmsuaApAQCAtMCwwICsxLDE2IEBACisvKiBTUERY
+LUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMCAqLworLyoKKyAqIE5ldGxpbmsgcm91dGluZXMg
+Zm9yIENJRlMKKyAqCisgKiBDb3B5cmlnaHQgKGMpIDIwMjAgU2FtdWVsIENhYnJlcm8gPHNjYWJy
+ZXJvQHN1c2UuZGU+CisgKi8KKworI2lmbmRlZiBfQ0lGU19ORVRMSU5LX0gKKyNkZWZpbmUgX0NJ
+RlNfTkVUTElOS19ICisKK2V4dGVybiBzdHJ1Y3QgZ2VubF9mYW1pbHkgY2lmc19nZW5sX2ZhbWls
+eTsKKworZXh0ZXJuIGludCBjaWZzX2dlbmxfaW5pdCh2b2lkKTsKK2V4dGVybiB2b2lkIGNpZnNf
+Z2VubF9leGl0KHZvaWQpOworCisjZW5kaWYgLyogX0NJRlNfTkVUTElOS19IICovCmRpZmYgLS1n
+aXQgYS9pbmNsdWRlL3VhcGkvbGludXgvY2lmcy9jaWZzX25ldGxpbmsuaCBiL2luY2x1ZGUvdWFw
+aS9saW51eC9jaWZzL2NpZnNfbmV0bGluay5oCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAw
+MDAwMDAwMDAwMC4uY2RiMWJkNzhmYmM3Ci0tLSAvZGV2L251bGwKKysrIGIvaW5jbHVkZS91YXBp
+L2xpbnV4L2NpZnMvY2lmc19uZXRsaW5rLmgKQEAgLTAsMCArMSwzMSBAQAorLyogU1BEWC1MaWNl
+bnNlLUlkZW50aWZpZXI6IExHUEwtMi4xKyBXSVRIIExpbnV4LXN5c2NhbGwtbm90ZSAqLworLyoK
+KyAqIE5ldGxpbmsgcm91dGluZXMgZm9yIENJRlMKKyAqCisgKiBDb3B5cmlnaHQgKGMpIDIwMjAg
+U2FtdWVsIENhYnJlcm8gPHNjYWJyZXJvQHN1c2UuZGU+CisgKi8KKworCisjaWZuZGVmIF9VQVBJ
+TElOVVhfQ0lGU19ORVRMSU5LX0gKKyNkZWZpbmUgX1VBUElMSU5VWF9DSUZTX05FVExJTktfSAor
+CisjZGVmaW5lIENJRlNfR0VOTF9OQU1FCQkJImNpZnMiCisjZGVmaW5lIENJRlNfR0VOTF9WRVJT
+SU9OCQkweDEKKworI2RlZmluZSBDSUZTX0dFTkxfTUNHUlBfU1dOX05BTUUJImNpZnNfbWNncnBf
+c3duIgorCitlbnVtIGNpZnNfZ2VubF9tdWx0aWNhc3RfZ3JvdXBzIHsKKwlDSUZTX0dFTkxfTUNH
+UlBfU1dOLAorfTsKKworZW51bSBjaWZzX2dlbmxfYXR0cmlidXRlcyB7CisJX19DSUZTX0dFTkxf
+QVRUUl9NQVgsCit9OworI2RlZmluZSBDSUZTX0dFTkxfQVRUUl9NQVggKF9fQ0lGU19HRU5MX0FU
+VFJfTUFYIC0gMSkKKworZW51bSBjaWZzX2dlbmxfY29tbWFuZHMgeworCV9fQ0lGU19HRU5MX0NN
+RF9NQVgKK307CisjZGVmaW5lIENJRlNfR0VOTF9DTURfTUFYIChfX0NJRlNfR0VOTF9DTURfTUFY
+IC0gMSkKKworI2VuZGlmIC8qIF9VQVBJTElOVVhfQ0lGU19ORVRMSU5LX0ggKi8KLS0gCjIuMjcu
+MAoK
+--0000000000007e046905b63dffa1--
