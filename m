@@ -8,58 +8,57 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 722DDC4361B
-	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 06:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5F0C4361B
+	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 06:09:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 250D12313F
-	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 06:02:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3F2521707
+	for <linux-cifs@archiver.kernel.org>; Sat, 12 Dec 2020 06:09:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733264AbgLLGBz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 12 Dec 2020 01:01:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46804 "EHLO
+        id S2405496AbgLLGIS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 12 Dec 2020 01:08:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725819AbgLLGBs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Dec 2020 01:01:48 -0500
-Received: from mail-lf1-x142.google.com (mail-lf1-x142.google.com [IPv6:2a00:1450:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99879C0613CF
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 22:01:07 -0800 (PST)
-Received: by mail-lf1-x142.google.com with SMTP id h19so16915352lfc.12
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 22:01:07 -0800 (PST)
+        with ESMTP id S2404022AbgLLGHz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 12 Dec 2020 01:07:55 -0500
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E4CC0613CF
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 22:07:12 -0800 (PST)
+Received: by mail-lf1-x141.google.com with SMTP id l11so17015127lfg.0
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Dec 2020 22:07:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ARbCF+lpCVaMl56G991jWAFTbkzyHdwBoH6nSF4ptS0=;
-        b=ezIUULhB7sCOYqJQz/+VXB044Bozk9uGR3vdOlTIfaErAbIl/1yPg1TpjH/9hXGdUr
-         En5BUfH7vYFORklnkHHlo3y2PPzu+aYCtP9sjCwJZ2Yf1RGd7AguoFSmqtXm/7Y4tq/f
-         pofqgBXCEZCXA81MJTP/ueb7MOJnn7oqw4lHbI1oLmaXq5BVj910E2wjh184RJNBwO4W
-         GKn62N114xle4xvAwacwXR7NhqpcXcPhRQy6u2MWV6CpLF9JByQMmcDd0G/n8nr7lBUv
-         Axug/+VttpHVn0EN6+IXJYAhAfapXWMRkgBAeG6TXGoebNoR97+/JLEVEej3tEaqS9LZ
-         s2WA==
+        bh=eIhg+l0XA+1Iy1vHXdUnH1WaEZ8EeUeywxQRxzCDmCE=;
+        b=H0h+cPnRHJ+U4NVV6ZX3NbuWAGn8rjHQbCknAxwtEo0AAmKEj4E7YfWGC+tp2PTRHL
+         YXTcVJv1cdWYv9zuuDgyTBeZ1Ls0BE3+JhPVE0hKz1Qf4LNVJHllBVq+TpH6gIoVpSO0
+         KFjD+weNTWHRvqG/XHLm7loDCDInY048pY/G2QFOVpQIeYBQ7hH3aBWJOdzGu0rR96jK
+         xYV4AT5DRK/LtWILe/SbkQQWoSrcrHYMUo3631nFAbbtnEHxCDOFiG9OokOqVyY6uXAm
+         bn7CXlCs0dtA371ZkDbaWbezDqteCA8q4GjybFCCCtt4jFhusLSAwo0akrYexK15Z17a
+         FiJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ARbCF+lpCVaMl56G991jWAFTbkzyHdwBoH6nSF4ptS0=;
-        b=HMdoQsrJa2Sj3cwRpAM2HuQs66UHtDbOhhhqrSSuA8tKiUVULI02I3nYu+dOQ3PF7r
-         iG4m9Sl2qJ1+cvZSZXWwdGdsUefIAbqayiT5RR2KxGbGdozgiJwQDnwUfSVmFeVTErhk
-         lP1b/2lps5WnuEHGFVpUwqizai1xDxdXAKxvVJn2+F+dxn/xTEF+Nc2quxfXBulkClM0
-         6p5djCLQzNEECtXbnUbMYtaeM8w9v/7DNo8OMvmKvSW0rLZiFD27MzMTZjAlStrRQBpl
-         U9+Vwh6hCka0Bxs4ZxMCYiNrr24nBTxx1HoayevNkt/MNm93BD4FOGt6agWcekBL3jZs
-         zZ1w==
-X-Gm-Message-State: AOAM530bCTO4bwx+oTSqV5R1kmWJusSoCuVygh1xqQ5eKeRp3QJ/YGaD
-        uqZAZGEvR0AiV8Y4SR31qwkdWx1D30/EISUjxAlsHcxtuZ8=
-X-Google-Smtp-Source: ABdhPJyJljee9L8v5end0PaRDrpvc6HeKqPHSPveMnivqIY6QC656j6shy3p4EOrBnudgg0A4fuZYcbPZ3iiRSTZPzo=
-X-Received: by 2002:a2e:87cb:: with SMTP id v11mr6250980ljj.218.1607752866086;
- Fri, 11 Dec 2020 22:01:06 -0800 (PST)
+        bh=eIhg+l0XA+1Iy1vHXdUnH1WaEZ8EeUeywxQRxzCDmCE=;
+        b=tkUsNCW2XSqXesy7+XfPaXPlc/RDnbYwyh+CyQAxvH0WSfXaQTMsdr2dhB4sasnCoa
+         Ls0zAo3VuzpOvCj8EiFR9HSWIrs6eqSD8VWNSIY/z8vytLWn+3vsceDZ2uY6QGJNWDcq
+         KHF17w698w9ZvB51ys96JHreDV27kIi+t4sRMHjiXvTSLegP0067XRv64KQXGA6cgQrN
+         DTx8/WkZyxOydQ3DNfjFpWJqj20uNpXg+zNY2LVCZDHovhZtUtG1SxVK/v8uOfAi26Y0
+         egufLllYasGNzAdM1lH0BHAgT4lTnxGJhilpI7QCYpYcwhWsywSYytdRjI1NBTLEsURz
+         IrZA==
+X-Gm-Message-State: AOAM531p9BQW6eXYUEvietc5qWj3NQOxOY+SwijSOkMVtozw9LeMorgI
+        qvvFCzucSg5im4MgRGNpjQm5KnGgdWnNKwqLO5o=
+X-Google-Smtp-Source: ABdhPJxq52qNPt06UxnmTPUoDamU5Gndf8i9o6j/K/xZyMq2+CA+3RHgkyIoXzrPwDyi8qnlnD/dDB0e2cQNeWaiZtY=
+X-Received: by 2002:a19:950:: with SMTP id 77mr5491976lfj.133.1607753231353;
+ Fri, 11 Dec 2020 22:07:11 -0800 (PST)
 MIME-Version: 1.0
-References: <20201130180257.31787-1-scabrero@suse.de> <20201130180257.31787-9-scabrero@suse.de>
-In-Reply-To: <20201130180257.31787-9-scabrero@suse.de>
+References: <20201130180257.31787-1-scabrero@suse.de> <20201130180257.31787-10-scabrero@suse.de>
+In-Reply-To: <20201130180257.31787-10-scabrero@suse.de>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 12 Dec 2020 00:00:54 -0600
-Message-ID: <CAH2r5mu5Tqy_NTBXNgjjKWUXHyCO-befGT6DCwDdJGGtuQ+FuQ@mail.gmail.com>
-Subject: Re: [PATCH v4 08/11] cifs: Send witness register messages to
- userspace daemon in echo task
+Date:   Sat, 12 Dec 2020 00:07:00 -0600
+Message-ID: <CAH2r5msgsAwUX3d9FhQukJdO4DuqTG6OodgoOU-vi6FaAv=r4g@mail.gmail.com>
+Subject: Re: [PATCH v4 09/11] cifs: Simplify reconnect code when dfs upcall is enabled
 To:     Samuel Cabrero <scabrero@suse.de>
 Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -67,71 +66,82 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next. Let me know if any
-changes need to be made to it
+tentatively merged into cifs-2.6.git for-next, let me know if any
+changes need to be made to it.
 
-On Mon, Nov 30, 2020 at 12:06 PM Samuel Cabrero <scabrero@suse.de> wrote:
+On Mon, Nov 30, 2020 at 12:05 PM Samuel Cabrero <scabrero@suse.de> wrote:
 >
-> If the daemon starts after mounting a share, or if it crashes, this
-> provides a mechanism to register again.
+> Some witness notifications, like client move, tell the client to
+> reconnect to a specific IP address. In this situation the DFS failover
+> code path has to be skipped so clean up as much as possible the
+> cifs_reconnect() code.
 >
 > Signed-off-by: Samuel Cabrero <scabrero@suse.de>
 > ---
->  fs/cifs/cifs_swn.c | 15 +++++++++++++++
->  fs/cifs/cifs_swn.h |  2 ++
->  fs/cifs/connect.c  |  5 +++++
->  3 files changed, 22 insertions(+)
+>  fs/cifs/connect.c | 21 ++++++++-------------
+>  1 file changed, 8 insertions(+), 13 deletions(-)
 >
-> diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
-> index 140a53a19aa0..642c9eedc8ab 100644
-> --- a/fs/cifs/cifs_swn.c
-> +++ b/fs/cifs/cifs_swn.c
-> @@ -540,3 +540,18 @@ void cifs_swn_dump(struct seq_file *m)
->         mutex_unlock(&cifs_swnreg_idr_mutex);
->         seq_puts(m, "\n");
->  }
-> +
-> +void cifs_swn_check(void)
-> +{
-> +       struct cifs_swn_reg *swnreg;
-> +       int id;
-> +       int ret;
-> +
-> +       mutex_lock(&cifs_swnreg_idr_mutex);
-> +       idr_for_each_entry(&cifs_swnreg_idr, swnreg, id) {
-> +               ret = cifs_swn_send_register_message(swnreg);
-> +               if (ret < 0)
-> +                       cifs_dbg(FYI, "%s: Failed to send register message: %d\n", __func__, ret);
-> +       }
-> +       mutex_unlock(&cifs_swnreg_idr_mutex);
-> +}
-> diff --git a/fs/cifs/cifs_swn.h b/fs/cifs/cifs_swn.h
-> index 13b25cdc9295..236ecd4959d5 100644
-> --- a/fs/cifs/cifs_swn.h
-> +++ b/fs/cifs/cifs_swn.h
-> @@ -20,4 +20,6 @@ extern int cifs_swn_notify(struct sk_buff *skb, struct genl_info *info);
->
->  extern void cifs_swn_dump(struct seq_file *m);
->
-> +extern void cifs_swn_check(void);
-> +
->  #endif /* _CIFS_SWN_H */
 > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 7fbb201b42c3..a298518bebb2 100644
+> index a298518bebb2..3af88711643b 100644
 > --- a/fs/cifs/connect.c
 > +++ b/fs/cifs/connect.c
-> @@ -613,6 +613,11 @@ cifs_echo_request(struct work_struct *work)
->                 cifs_dbg(FYI, "Unable to send echo request to server: %s\n",
->                          server->hostname);
+> @@ -296,7 +296,7 @@ static void cifs_prune_tlinks(struct work_struct *work);
+>   * This should be called with server->srv_mutex held.
+>   */
+>  #ifdef CONFIG_CIFS_DFS_UPCALL
+> -static int reconn_set_ipaddr(struct TCP_Server_Info *server)
+> +static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
+>  {
+>         int rc;
+>         int len;
+> @@ -331,14 +331,7 @@ static int reconn_set_ipaddr(struct TCP_Server_Info *server)
 >
-> +#ifdef CONFIG_CIFS_SWN_UPCALL
-> +       /* Check witness registrations */
-> +       cifs_swn_check();
-> +#endif
-> +
->  requeue_echo:
->         queue_delayed_work(cifsiod_wq, &server->echo, server->echo_interval);
+>         return !rc ? -1 : 0;
 >  }
+> -#else
+> -static inline int reconn_set_ipaddr(struct TCP_Server_Info *server)
+> -{
+> -       return 0;
+> -}
+> -#endif
+>
+> -#ifdef CONFIG_CIFS_DFS_UPCALL
+>  /* These functions must be called with server->srv_mutex held */
+>  static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
+>                                        struct cifs_sb_info *cifs_sb,
+> @@ -346,6 +339,7 @@ static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
+>                                        struct dfs_cache_tgt_iterator **tgt_it)
+>  {
+>         const char *name;
+> +       int rc;
+>
+>         if (!cifs_sb || !cifs_sb->origin_fullpath)
+>                 return;
+> @@ -370,6 +364,12 @@ static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
+>                          "%s: failed to extract hostname from target: %ld\n",
+>                          __func__, PTR_ERR(server->hostname));
+>         }
+> +
+> +       rc = reconn_set_ipaddr_from_hostname(server);
+> +       if (rc) {
+> +               cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
+> +                        __func__, rc);
+> +       }
+>  }
+>
+>  static inline int reconn_setup_dfs_targets(struct cifs_sb_info *cifs_sb,
+> @@ -528,11 +528,6 @@ cifs_reconnect(struct TCP_Server_Info *server)
+>                  */
+>                 reconn_set_next_dfs_target(server, cifs_sb, &tgt_list, &tgt_it);
+>  #endif
+> -               rc = reconn_set_ipaddr(server);
+> -               if (rc) {
+> -                       cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
+> -                                __func__, rc);
+> -               }
+>
+>                 if (cifs_rdma_enabled(server))
+>                         rc = smbd_reconnect(server);
 > --
 > 2.29.2
 >
