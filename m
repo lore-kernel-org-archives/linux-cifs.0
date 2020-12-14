@@ -2,106 +2,120 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C578AC4361B
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 11:40:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E3CDC4361B
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 12:00:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F37622AB0
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 11:40:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D88F7239FF
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 12:00:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392388AbgLNLj6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 14 Dec 2020 06:39:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47174 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390134AbgLNLjj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Dec 2020 06:39:39 -0500
-Received: from mail-lf1-x144.google.com (mail-lf1-x144.google.com [IPv6:2a00:1450:4864:20::144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B6BBC0613D6;
-        Mon, 14 Dec 2020 03:38:59 -0800 (PST)
-Received: by mail-lf1-x144.google.com with SMTP id o19so3722417lfo.1;
-        Mon, 14 Dec 2020 03:38:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wyanV3OD/vmZQFo0fBeUL6ZC0A4CxUv9H3iKrx2fgN0=;
-        b=GUzMGcUabkpWvZceMy2irnTVWGX1IbJQtr8dAkOwo214EcGn4KxrFc/vVBWbx9DLO4
-         K02Z0IPrQv54EHXhZf7Szd4jP3D4oH+QMm+9NkCjz8Gtne8Jy8nycGZrnozR8MJLW/Sb
-         Z5pfGn2zlK2yF2F1cGDYLznLOUH37kV3ZCV726UsyyEHfx7wuVgtGuCHf6Uuq8BtiL2l
-         6MtIK1VjfOkFfbHjfZtMeql7abfpaYqGfhsg2YSRgo9bI+THbK77N9pgUUigeQE0PWYo
-         UKr2yxc7bvJU55JboF9QpPakSIylJsfYmTv/BLtCui8nr4bIIJopz3iuQINcnr9tqxNN
-         hyfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wyanV3OD/vmZQFo0fBeUL6ZC0A4CxUv9H3iKrx2fgN0=;
-        b=QFHdI+bEVQ1rsrgNjuGZNR3gM9f3B31CjLVVeB3WfB5IytAY8sdtNYOEzEx78JdSYi
-         Q2Lh6yb7PEwfupFVaWPu1cs0ti8kTZiKmb2eBBn8E1AbsSP26ZJFg0EJIikdHPyemF3c
-         dPOuZaq0gdsj219cngrfT/zC+5qBL8tQe7LDqSTKnzAHGUfyxCkaredOWT0qlItHCv2/
-         74w67n+omaU59q2AW6D0Cd9i7XhaR0abs5jTzYPsC+N/Xn5rlXCWR1qP4vfPv8WrsE9J
-         9qq7C3eQodrWSfm6oJq5Zj+tlRN/caVx4ekHbIrglrkkcrsdBMK8HnRiKQSBgmT0Ptu0
-         2Ciw==
-X-Gm-Message-State: AOAM5332YVBV29cwaw9xRKc7gGpqTvhvv0bpoUt6Qlx42anbSaQcBwFm
-        Soz4W/izYPl/AbgRBGk62VoD1Rgnqzo=
-X-Google-Smtp-Source: ABdhPJw9goUNMusTW3LnjziUAi8F9Dn2a3gvhLw5Phy451txKKGJx4E2IkdyuIFfKQJd58CHpH6GNg==
-X-Received: by 2002:a2e:9006:: with SMTP id h6mr10248999ljg.268.1607945937902;
-        Mon, 14 Dec 2020 03:38:57 -0800 (PST)
-Received: from localhost.localdomain (109-252-193-205.dynamic.spd-mgts.ru. [109.252.193.205])
-        by smtp.gmail.com with ESMTPSA id t21sm1031686lfl.124.2020.12.14.03.38.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Dec 2020 03:38:57 -0800 (PST)
-From:   Dmitry Osipenko <digetx@gmail.com>
+        id S2389880AbgLNL7l (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 14 Dec 2020 06:59:41 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:41428 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407507AbgLNL7c (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Dec 2020 06:59:32 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEBngC7194587;
+        Mon, 14 Dec 2020 11:58:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=UuekPZIlBB8apOvaVN0thQDKnr9CjPtIATVlLQNcSv8=;
+ b=g3P4f8Sa81Ivf45JnH6VLLhfb6lfhala6q9dpheZErdk1arZ0btf7pmKDXTTmfu1+jgX
+ JabIN4Nhzuv+ZqvusF3c+jM0L5y7hGu4G9RnScG1zmjuibYSEi6cTlmU/rk71GHAG2sX
+ 9egICkRGUkZ1+BLAx9bQq9StZ1I+eqrR4qeCnDxpdaeQvmQQY4TU/lkr2vFodC1V+dLD
+ HTpid23cq167cfDO0Dmq3gPtH/c83cluve8pebYv6X/V/W82AOZpTEnRBZGUzPdx/keY
+ fNP7uiS1RJBwJWojIQS9FgmeKeCnYqagYINaUmGFu7MowrdcOMM4uEO47rVVLS5VJGBo Ww== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 35ckcb4xab-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 14 Dec 2020 11:58:17 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BEBt4go191900;
+        Mon, 14 Dec 2020 11:56:16 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 35e6jpabr4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Dec 2020 11:56:16 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0BEBuCl7012797;
+        Mon, 14 Dec 2020 11:56:12 GMT
+Received: from mwanda (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 14 Dec 2020 03:56:11 -0800
+Date:   Mon, 14 Dec 2020 14:56:04 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
 To:     Steve French <sfrench@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v1] cifs: Add missing sentinel to smb3_fs_parameters
-Date:   Mon, 14 Dec 2020 14:37:45 +0300
-Message-Id: <20201214113745.7909-1-digetx@gmail.com>
-X-Mailer: git-send-email 2.29.2
+        Shyam Prasad N <sprasad@microsoft.com>
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        kernel-janitors@vger.kernel.org
+Subject: [PATCH] cifs: Fix uninitialized variable in set_chmod_dacl()
+Message-ID: <X9dS1EllbQhuX7/C@mwanda>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9834 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 bulkscore=0
+ malwarescore=0 adultscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012140085
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9834 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999
+ priorityscore=1501 mlxscore=0 suspectscore=0 adultscore=0 phishscore=0
+ malwarescore=0 impostorscore=0 lowpriorityscore=0 clxscore=1011
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012140084
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add missing sentinel to smb3_fs_parameters. This fixes ARM32 kernel
-crashing once CIFS is registered.
+Initialize the "nmode" variable earlier to prevent an uninitialized
+variable bug when we do "size += setup_special_mode_ACE(pntace, nmode);"
 
- Unable to handle kernel paging request at virtual address 33626d73
-...
- (strcmp) from (fs_validate_description)
- (fs_validate_description) from (register_filesystem)
- (register_filesystem) from (init_cifs [cifs])
- (init_cifs [cifs]) from (do_one_initcall)
- (do_one_initcall) from (do_init_module)
- (do_init_module) from (load_module)
- (load_module) from (sys_finit_module)
- (sys_finit_module) from (ret_fast_syscal)
-
-Fixes: e07724d1cf38 ("cifs: switch to new mount api")
-Signed-off-by: Dmitry Osipenko <digetx@gmail.com>
+Fixes: 253374f7557e ("cifs: Fix unix perm bits to cifsacl conversion for "other" bits.")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
- fs/cifs/fs_context.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/cifs/cifsacl.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index fe5cc60f4393..c41e87af77b6 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -173,6 +173,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 	fsparam_flag_no("mand", Opt_ignore),
- 	fsparam_string("cred", Opt_ignore),
- 	fsparam_string("credentials", Opt_ignore),
-+	{}
- };
+diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
+index d7a6d0f533bf..8410db328e5e 100644
+--- a/fs/cifs/cifsacl.c
++++ b/fs/cifs/cifsacl.c
+@@ -920,6 +920,13 @@ static int set_chmod_dacl(struct cifs_acl *pndacl, struct cifs_sid *pownersid,
+ 	__u64 deny_group_mode = 0;
+ 	bool sticky_set = false;
  
- int
++	/*
++	 * We'll try to keep the mode as requested by the user.
++	 * But in cases where we cannot meaningfully convert that
++	 * into ACL, return back the updated mode, so that it is
++	 * updated in the inode.
++	 */
++	nmode = *pnmode;
+ 	pnndacl = (struct cifs_acl *)((char *)pndacl + sizeof(struct cifs_acl));
+ 
+ 	if (modefromsid) {
+@@ -931,14 +938,6 @@ static int set_chmod_dacl(struct cifs_acl *pndacl, struct cifs_sid *pownersid,
+ 		goto set_size;
+ 	}
+ 
+-	/*
+-	 * We'll try to keep the mode as requested by the user.
+-	 * But in cases where we cannot meaningfully convert that
+-	 * into ACL, return back the updated mode, so that it is
+-	 * updated in the inode.
+-	 */
+-	nmode = *pnmode;
+-
+ 	if (!memcmp(pownersid, pgrpsid, sizeof(struct cifs_sid))) {
+ 		/*
+ 		 * Case when owner and group SIDs are the same.
 -- 
 2.29.2
 
