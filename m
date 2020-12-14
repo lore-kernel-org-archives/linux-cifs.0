@@ -2,333 +2,139 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755B3C4361B
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 06:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3058CC4361B
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 10:29:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38D4222583
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 06:42:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C276122AB0
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 10:29:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438797AbgLNGmh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 14 Dec 2020 01:42:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37299 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2438787AbgLNGmh (ORCPT
+        id S1727840AbgLNK3J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 14 Dec 2020 05:29:09 -0500
+Received: from de-smtp-delivery-102.mimecast.com ([51.163.158.102]:59724 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725798AbgLNK3J (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 14 Dec 2020 01:42:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607928070;
+        Mon, 14 Dec 2020 05:29:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1607941680;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=ZXUx85e9fdKtKvSHRNkblw9ZiVahNJOQtDu/cvZz/OE=;
-        b=gVKGlF/Cryjp+zzzCdlrxks3sC5Xh621lxgczRze+sgazqTXDm9AmTeMpHY2m1SYLUfa9z
-        ITxfBB5I8wEKbbdphYB2ERs6hujYmcY2d2CVwLqUmJEDUbSvK9wR5j6F6Ik0C31ey8s5u4
-        JTMvObgU+190rWJS8dfzi8wGbfjjXSo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-wKj6gmWjMG6l-vgHgFYoOg-1; Mon, 14 Dec 2020 01:41:07 -0500
-X-MC-Unique: wKj6gmWjMG6l-vgHgFYoOg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68B531006C81;
-        Mon, 14 Dec 2020 06:41:06 +0000 (UTC)
-Received: from test1103.test.redhat.com (vpn2-54-107.bne.redhat.com [10.64.54.107])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E5CF10023BC;
-        Mon, 14 Dec 2020 06:41:05 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH 10/12] cifs: move update of flags into a separate function
-Date:   Mon, 14 Dec 2020 16:40:25 +1000
-Message-Id: <20201214064027.2885-10-lsahlber@redhat.com>
-In-Reply-To: <20201214064027.2885-1-lsahlber@redhat.com>
-References: <20201214064027.2885-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UB6la+y9HouvY7y8Mq708WE2yYT3W+L8kJY7+2l6Ne0=;
+        b=cp1bWxKuGS12drFYweTbG2CH8C10Q8loz8+Nj+LgjQFibyox71XlbU02ho4gh6mklyZzaa
+        TOzZwY1FJKLj4GOX/hcK/AEZ2ntkZ0W3v/A+r4KrbmIhB2w0OAKSl+NLIv8WQsdkgu4pIA
+        i05mZhrviAmel51gC1VW1QLFrVr2ezg=
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com
+ (mail-ve1eur01lp2059.outbound.protection.outlook.com [104.47.1.59]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ de-mta-33-n5eydkENPGqzGnCkk1TawQ-1; Mon, 14 Dec 2020 11:27:59 +0100
+X-MC-Unique: n5eydkENPGqzGnCkk1TawQ-1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F5luvfgS751g3PqUE2hTTFIpGoTmhnCUwCfRae0AiKiNAhZwh531lbRNCVC6cNXXsRDW701XwKDgf7mttuEAYkTOuEoCHbDSLKvNQRhxDk17rz3U2Hb/cJeOdv7fcwzqnymVfNps/1AYNIGakAy/Vm6wk57Hskh8trQKt/4ox7C6iP86GZi+vPD+07Ka/ebZV9gvkTl/0m7yjUXvonOx9yXIoJJRrlAfAdQK0tzS1Oecq3FZ23PfjacfKd3hMjESLcxGRWIolzvQaGCpfT3yaMgVsQkS8rmy2SYb3y4AGuEej5SIk5eDeGFG6ILfgWjdxcJi6ZqrnNLjnOYz46hJtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UB6la+y9HouvY7y8Mq708WE2yYT3W+L8kJY7+2l6Ne0=;
+ b=jmdtqO/ZcHm/WlYxqTp6GoDW0Ba8NvAEbjyEeGuSIH0McvVIBprUwnNLWHWbdJdNrOB86N0tKU3DHcp1nyV8AshCzdpThHrl79oCRLsg2yDw+8r2zUh8g1W0TddyDp0oLxi32zGeVWtA6xyHhbZucErujr/ZywlQsEdApU6Q3Yi9ZknE2SRkj02JKQUHSNgf79tRS62RSpLUCzp4EHbgyVfT1gesQV3MRzFaSO9zpJD1bnOsee7iFtONYhXK/cEwrQU4qq+iAL3EL74HaZssk1NHAmtBsF5wGFS7XJjRSz3uIWXFh02XN1IYawtWgnBHk5uGIwXl/uTLlqoKzAJnKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
+ by VI1PR04MB6224.eurprd04.prod.outlook.com (2603:10a6:803:100::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.17; Mon, 14 Dec
+ 2020 10:27:58 +0000
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::4dad:a2d3:5076:54f0]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::4dad:a2d3:5076:54f0%5]) with mapi id 15.20.3654.024; Mon, 14 Dec 2020
+ 10:27:58 +0000
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH][CIFS] minor updates to Kconfig
+In-Reply-To: <CAH2r5mvT6X-R-E+vFVUuGXYzh4BtWCefFsvhJK5EVEZhQt4YWQ@mail.gmail.com>
+References: <CAH2r5mvT6X-R-E+vFVUuGXYzh4BtWCefFsvhJK5EVEZhQt4YWQ@mail.gmail.com>
+Date:   Mon, 14 Dec 2020 11:27:55 +0100
+Message-ID: <87a6ugd6ms.fsf@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [2003:fa:705:9f63:f5bd:7a8d:a064:3118]
+X-ClientProxiedBy: ZR0P278CA0030.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:1c::17) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+ (2603:10a6:803:3::28)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (2003:fa:705:9f63:f5bd:7a8d:a064:3118) by ZR0P278CA0030.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:1c::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12 via Frontend Transport; Mon, 14 Dec 2020 10:27:58 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6243142a-1c1f-490e-8bfb-08d8a01aed7c
+X-MS-TrafficTypeDiagnostic: VI1PR04MB6224:
+X-Microsoft-Antispam-PRVS: <VI1PR04MB6224FCB5014D261419CE9268A8C70@VI1PR04MB6224.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ST3rpjWLGM69yQSkQ3zxqnlNorwVzL2/oF9010eDVbEtVwNto7BqVFIpHtBK6ddpgXx5HouqJGMSlII0qPyGsLX1+vKyZy0YKrSoW0gz0GcZwWXE+oIRAr/WkgrOQ7fq11v0zi429HRgtzSV9IuwHLNKeT4Nu+J/yYUWTcAhN1VnDxAuaY6Eptt/eANRpG5+3xvHFtI0KWJmiyHHCVGYtDBjpdDCoPkvi4+m6IslEFsJGVyjUViej3mlJKzpCbKdqyMgUJaHi6tFtWj5EV2t/5Jzz2YqPc3yEk4AAJASNyHW5CjU7J+g4xDbF941ejl9Nmpnos2JD3VuPODO884zmA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(39860400002)(136003)(376002)(366004)(396003)(83380400001)(5660300002)(8676002)(4744005)(478600001)(86362001)(110136005)(66476007)(52116002)(6496006)(186003)(6486002)(6666004)(8936002)(66556008)(36756003)(316002)(2906002)(16526019)(66946007)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?VXRWaUk0UkZBYWF0M0xielRaZmZtZEhWWVlIRGtMa2J0MkZRblhhMHc4bmZr?=
+ =?utf-8?B?ak5pbHZvalAyRWxCekxPQmNsSlVOd29oNjAzWHkyb2N0TkVkaC91eDdQbVRq?=
+ =?utf-8?B?U0MzVkNxN0pZajFOTFlsYkpQOGhqTWlkaklnVlVkeERhVEJ1YnBpekFzSTRh?=
+ =?utf-8?B?dFBIZnJHS1JTL1VjQmdhMjdTN2xGMjFFam1jSXlIWllFZUJtYUI4TXdpMUh2?=
+ =?utf-8?B?M09ZWGxlVldCSDg4cUI2WkIwZnVpZ3U1VW94Ykh2azIvaXVHMzNwMEx4eWRH?=
+ =?utf-8?B?YmNoakJHY2hqdzgrbVFETVNVUFZuN1phWkRUcmxDMlhvRytDVkpiOE52Z1dq?=
+ =?utf-8?B?TDdaV0tEaFF6QnByaFF0ZHNRUmlNU0t4SkFncUJ4OVpsVmM0MVBzRFptRktK?=
+ =?utf-8?B?R2JZVVBRU05KSjZ5bGErZTM4em5PMlgvdVd2S2JiZlA0amZlZWpiU0dnaEQx?=
+ =?utf-8?B?Q0xuT1Fmd3JvVlZlZVBPcXU1cEFUanJFUDJtS25adklqYTd5SmpIVHRuMWVz?=
+ =?utf-8?B?V0NGa2M0Tm1UWXhWN1dvaXgzd0w3NjhiZVlFczhIQlZrZklxNVhpMk40aGYv?=
+ =?utf-8?B?N3dXbWpjVlpPYWFaSmkxdm8rNml6WE83Yk5iVFRQYXQxMkNIMm9JR0JjdkxZ?=
+ =?utf-8?B?WVBybkFTbHo2YnB4UE5PQk15M0R6TGZFd0lnbWNaSHM4RU1Kd1ViSFNlNWNt?=
+ =?utf-8?B?U0FWc2xMV3BZdXFRNkh3QWdva1BuRFlsWFdqbER2enlDMVlsQlV2TjdVV0V4?=
+ =?utf-8?B?ZFlRbFNWM3FZa0xjZ1Q1TThJQm9wR2V2N2Fad3p4VkhmUjJCdm1QREI0UlJS?=
+ =?utf-8?B?MnJ5UFBHblF0aVhXUStvM1BibXAxNVhGLzhxQjQ5UkxQZHhISDkzbytxQklL?=
+ =?utf-8?B?SkdmMjd0UEprTjRRT291M012TUNReVdtVldJMW5BeFd5VXY2SkRIUU1rUzVM?=
+ =?utf-8?B?M0xVeXNMR0dlbGYrOGlvUHFYTExDMVlncmZ4MWU4QUxZUS8wWWQ5VXgvQzU5?=
+ =?utf-8?B?eGhRblN1MVl5SGlnU3liZVdGemFhSHVjZ0pkZ1RjanJ4WXNKSmRzK003cjdn?=
+ =?utf-8?B?cjdScnJTajkyZzN3amVqUnROYkRWbUZXNmRFdnFGVEVQL280aE9DZWUrRnRQ?=
+ =?utf-8?B?V2F2N3Joek1CQXIrcjk1WDhaQzYwU2pNdUNDWmVmbThOZU5NTG5EVFBXcTE5?=
+ =?utf-8?B?bXRwYXBENWxrbW83QVFUejc5YnhxdXk3bU9tQVZFR1dSSjhvSlNPc0dYV1RS?=
+ =?utf-8?B?dWg3SlBYMFdkMXRtYlc2cGN4Z3VlTnVJbFZtZHVTV3AwYm9Ra2JyNXdpTWJH?=
+ =?utf-8?B?aVIweXpsQjJZUmEzdVlqem94V0dDUTJVKy9iVDZwR2JwMmJZUjFyaGJIZ2Y1?=
+ =?utf-8?Q?ZsCmID+ycuxGO4EHIiafIVFpDkOfTFpw=3D?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2020 10:27:58.6331
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6243142a-1c1f-490e-8bfb-08d8a01aed7c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MKPDNdlyqhfPVgtQFmhhyR41E5MC0FqAdPcHk7iC72Rc3inkm7vunL6bV3kx94J5
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6224
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This funciton will set/clear flags that can be changed during mount or remount
+Steve French <smfrench@gmail.com> writes:
+> Correct references to fs/cifs/README which has been replaced by
+> Documentation/filesystems/admin-guide/cifs/usage.rst, and also
+> correct a typo.
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/connect.c    |  74 +-----------------------
- fs/cifs/fs_context.c | 155 +++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/fs_context.h |   1 +
- 3 files changed, 159 insertions(+), 71 deletions(-)
+Looks good to me.
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 606f36322c60..592cc6e365af 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2713,61 +2713,10 @@ int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb)
- 	}
- 	ctx->local_nls = cifs_sb->local_nls;
- 
--	if (ctx->nodfs)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_DFS;
--	if (ctx->noperm)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_PERM;
--	if (ctx->setuids)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_SET_UID;
--	if (ctx->setuidfromacl)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_UID_FROM_ACL;
--	if (ctx->server_ino)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_SERVER_INUM;
--	if (ctx->remap)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MAP_SFM_CHR;
--	if (ctx->sfu_remap)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MAP_SPECIAL_CHR;
--	if (ctx->no_xattr)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_XATTR;
--	if (ctx->sfu_emul)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_UNX_EMUL;
--	if (ctx->nobrl)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_BRL;
--	if (ctx->nohandlecache)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_HANDLE_CACHE;
--	if (ctx->nostrictsync)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOSSYNC;
--	if (ctx->mand_lock)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOPOSIXBRL;
--	if (ctx->rwpidforward)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_RWPIDFORWARD;
--	if (ctx->mode_ace)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MODE_FROM_SID;
--	if (ctx->cifs_acl)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_ACL;
--	if (ctx->backupuid_specified) {
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_BACKUPUID;
--	}
--	if (ctx->backupgid_specified) {
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_BACKUPGID;
--	}
--	if (ctx->override_uid)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_UID;
--	if (ctx->override_gid)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_GID;
--	if (ctx->dynperm)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DYNPERM;
--	if (ctx->fsc)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_FSCACHE;
--	if (ctx->multiuser)
--		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_MULTIUSER |
--					    CIFS_MOUNT_NO_PERM);
--	if (ctx->strict_io)
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_STRICT_IO;
--	if (ctx->direct_io) {
-+	smb3_update_mnt_flags(cifs_sb);
-+
-+	if (ctx->direct_io)
- 		cifs_dbg(FYI, "mounting share using direct i/o\n");
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
--	}
- 	if (ctx->cache_ro) {
- 		cifs_dbg(VFS, "mounting share with read only caching. Ensure that the share will not be modified while in use.\n");
- 		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_RO_CACHE;
-@@ -2776,23 +2725,6 @@ int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb)
- 		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_RO_CACHE |
- 					    CIFS_MOUNT_RW_CACHE);
- 	}
--	if (ctx->mfsymlinks) {
--		if (ctx->sfu_emul) {
--			/*
--			 * Our SFU ("Services for Unix" emulation does not allow
--			 * creating symlinks but does allow reading existing SFU
--			 * symlinks (it does allow both creating and reading SFU
--			 * style mknod and FIFOs though). When "mfsymlinks" and
--			 * "sfu" are both enabled at the same time, it allows
--			 * reading both types of symlinks, but will only create
--			 * them with mfsymlinks format. This allows better
--			 * Apple compatibility (probably better for Samba too)
--			 * while still recognizing old Windows style symlinks.
--			 */
--			cifs_dbg(VFS, "mount options mfsymlinks and sfu both enabled\n");
--		}
--		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MF_SYMLINKS;
--	}
- 
- 	if ((ctx->cifs_acl) && (ctx->dynperm))
- 		cifs_dbg(VFS, "mount option dynperm ignored if cifsacl mount option supported\n");
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index 4995082b7285..c1e53121526d 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -1362,3 +1362,158 @@ smb3_cleanup_fs_context(struct smb3_fs_context *ctx)
- 	smb3_cleanup_fs_context_contents(ctx);
- 	kfree(ctx);
- }
-+
-+void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb)
-+{
-+	struct smb3_fs_context *ctx = cifs_sb->ctx;
-+
-+	if (ctx->nodfs)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_DFS;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_DFS;
-+
-+	if (ctx->noperm)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_PERM;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_PERM;
-+
-+	if (ctx->setuids)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_SET_UID;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SET_UID;
-+
-+	if (ctx->setuidfromacl)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_UID_FROM_ACL;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_UID_FROM_ACL;
-+
-+	if (ctx->server_ino)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_SERVER_INUM;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SERVER_INUM;
-+
-+	if (ctx->remap)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MAP_SFM_CHR;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_MAP_SFM_CHR;
-+
-+	if (ctx->sfu_remap)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MAP_SPECIAL_CHR;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_MAP_SPECIAL_CHR;
-+
-+	if (ctx->no_xattr)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_XATTR;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_XATTR;
-+
-+	if (ctx->sfu_emul)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_UNX_EMUL;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_UNX_EMUL;
-+
-+	if (ctx->nobrl)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_BRL;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_BRL;
-+
-+	if (ctx->nohandlecache)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_HANDLE_CACHE;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_HANDLE_CACHE;
-+
-+	if (ctx->nostrictsync)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOSSYNC;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NOSSYNC;
-+
-+	if (ctx->mand_lock)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOPOSIXBRL;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NOPOSIXBRL;
-+
-+	if (ctx->rwpidforward)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_RWPIDFORWARD;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_RWPIDFORWARD;
-+
-+	if (ctx->mode_ace)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MODE_FROM_SID;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_MODE_FROM_SID;
-+
-+	if (ctx->cifs_acl)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_ACL;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_CIFS_ACL;
-+
-+	if (ctx->backupuid_specified)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_BACKUPUID;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_CIFS_BACKUPUID;
-+
-+	if (ctx->backupgid_specified)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_BACKUPGID;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_CIFS_BACKUPGID;
-+
-+	if (ctx->override_uid)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_UID;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_OVERR_UID;
-+
-+	if (ctx->override_gid)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_GID;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_OVERR_GID;
-+
-+	if (ctx->dynperm)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DYNPERM;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_DYNPERM;
-+
-+	if (ctx->fsc)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_FSCACHE;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_FSCACHE;
-+
-+	if (ctx->multiuser)
-+		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_MULTIUSER |
-+					    CIFS_MOUNT_NO_PERM);
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~(CIFS_MOUNT_MULTIUSER |
-+					     CIFS_MOUNT_NO_PERM);
-+
-+	if (ctx->strict_io)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_STRICT_IO;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_STRICT_IO;
-+
-+	if (ctx->direct_io)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_DIRECT_IO;
-+
-+	if (ctx->mfsymlinks)
-+		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MF_SYMLINKS;
-+	else
-+		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_MF_SYMLINKS;
-+	if (ctx->mfsymlinks) {
-+		if (ctx->sfu_emul) {
-+			/*
-+			 * Our SFU ("Services for Unix" emulation does not allow
-+			 * creating symlinks but does allow reading existing SFU
-+			 * symlinks (it does allow both creating and reading SFU
-+			 * style mknod and FIFOs though). When "mfsymlinks" and
-+			 * "sfu" are both enabled at the same time, it allows
-+			 * reading both types of symlinks, but will only create
-+			 * them with mfsymlinks format. This allows better
-+			 * Apple compatibility (probably better for Samba too)
-+			 * while still recognizing old Windows style symlinks.
-+			 */
-+			cifs_dbg(VFS, "mount options mfsymlinks and sfu both enabled\n");
-+		}
-+	}
-+
-+	return;
-+}
-diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
-index 2519108eeb29..3358b33abcd0 100644
---- a/fs/cifs/fs_context.h
-+++ b/fs/cifs/fs_context.h
-@@ -266,5 +266,6 @@ static inline struct smb3_fs_context *smb3_fc2context(const struct fs_context *f
- }
- 
- extern int smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx);
-+extern void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
- 
- #endif
--- 
-2.13.6
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
+E
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
+nchen)
 
