@@ -3,44 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD35C2BB9A
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 17:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BD0C4361B
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 18:04:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2271D21D7F
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 17:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ABA12246B
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 18:04:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408818AbgLNRry (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 14 Dec 2020 12:47:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47358 "EHLO
+        id S2408753AbgLNSEc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 14 Dec 2020 13:04:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2408748AbgLNRq4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Dec 2020 12:46:56 -0500
+        with ESMTP id S2395074AbgLNSEZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Dec 2020 13:04:25 -0500
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4231C0617A7
-        for <linux-cifs@vger.kernel.org>; Mon, 14 Dec 2020 09:46:01 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCBA3C0613D3
+        for <linux-cifs@vger.kernel.org>; Mon, 14 Dec 2020 10:03:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Date:Message-ID:From:Cc:To;
-        bh=S1kiC1ut+mhFCRAhcsLAeVn8gYDEYs9XFKw5gyZy4oE=; b=Juy8/UH7Sz7tcqnk5fs+Mnk93D
-        bgaYK7SzJe3vqV7/6C/vv/QO3eU7ioQNOeih0ubsRVqm54uEcdNLxKl6iSGbp5FVgW5t7Ys7AiVJ2
-        wfjkCi3lDatIW7cEAXO3de8NrZLgWdvPO3kwK1FHXTigAv0LUTGwFSCB848MQq8kw9bQawAa0sLLN
-        Dy/T7YfbES+f7WjwIDhH6rwE7wZKplPOmeUXbyP3OeCzPnkRstRpFzofmgRXKAiwy6zS/GNuuTo0O
-        CWdSQwDTB4yxzhK3clqXtB9jhvICmL1n6Bgcn3+1y8y40sH2OJezqBhasOGJwaB8a4npxts2D5hBm
-        hlr4ylzmqQeH7rid1BuGxRqPaY/f5LY7bEZRUJ0/txPfL9phpk4KkkLbjD8jMY3t0/jJ1hsIDn+53
-        WiPb+YHFN77MEseAR4gLhx3ZMFd2N3VL7+Kh3vqQ7ITewZTFr5Qc7GA3WRZm01IvnVE7g/ZTl4qZu
-        jdfVhh6BJs57rBCH7BaPC0p1;
+        bh=mbOkms2bIfwbVp/wtblren48OsCLoObIdHPns8KVsIo=; b=dfWyNzyYVsPhnq2fYXEujvFKDX
+        B8heJafG2y2AXYBU+TmZGEwt9HrzsMFVXNBDpKtNECgF4KNBGFDTcgzAX9sYqE/36qPq8k6p7KTHt
+        tKW6UceAOscBBml0arJCXP5cv4EVbQFFNk+EJa9S+uLagkZBhfAm9zS7QKwHy0zmYpr6hn3TPbFqR
+        beqZtCfsqezFNo5nZcqqD4xNpcSm3XS4nPOcWU8jdSablkjqhk6TSkfZ62UBbYA+qgluHSIqjMTvX
+        2J30qLKCDtRyFYC86cKsexPYKN9L+fm//NeElc9Y8r2aBdM/3+lSxhnuF429rGXSWsLXYhg4SCIUi
+        wYB0rnGFlAwW6AVUKyBToSqFVTsUVVzD2I5XR2Z2m2/B43YXgTK6DOfAkcvZ1bzKTAH7vwK+V0mUj
+        O/zl4tsNUDRWWZ7Fn5+isXsqo9kwLosbLlFmOl6AC84t4/bvQvS9G0YcdN/AGzWO5SOdyW8gh/OwC
+        a1uurbJPmux40jBLS0LzqxvX;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1korv5-0001a4-Rp; Mon, 14 Dec 2020 17:45:59 +0000
-To:     Steve French <smfrench@gmail.com>,
-        Namjae Jeon <namjae.jeon@samsung.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-References: <CAH2r5muRCUzvKOv1xWRZL4t-7Pifz-nsL_Sn4qmbX0o127tnGA@mail.gmail.com>
+        id 1kosCE-0001nM-O5; Mon, 14 Dec 2020 18:03:42 +0000
+To:     Shyam Prasad N <nspmangalore@gmail.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com,
+        samba-technical <samba-technical@lists.samba.org>,
+        =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+        Steve French <smfrench@gmail.com>
+References: <CANT5p=pxPsBwAv3oJX6Ae9wjpZoEjLvyfGM1sM9DEhS11RNgog@mail.gmail.com>
+ <87pn7t4kr9.fsf@suse.com>
+ <CANT5p=oeY91u17DPe6WO75Eq_bjzrVC0kmAErrZ=h3S1qh-Wxw@mail.gmail.com>
+ <87eeo54q0i.fsf@suse.com>
+ <CANT5p=rxp3iQMgxaM_mn3RE3B+zezWr3o8zpkFyWUR27CpeVCA@mail.gmail.com>
+ <CANT5p=qMHxq_L5RpXAixzrQztjMr8-P_aO4aPg5uqfPSLNUiTA@mail.gmail.com>
+ <874ko7vy0z.fsf@suse.com>
+ <CANT5p=o07RqmMkcFoLeUVTeQHhzh5MmFYpfAdv0755iiGbp1ZA@mail.gmail.com>
+ <87mu1yc6gw.fsf@suse.com>
+ <CANT5p=r0Jix9EuuF8gJzQBGHLp0Y-Oogxzju7_2cJog_jF2fjg@mail.gmail.com>
+ <874knolhpw.fsf@suse.com>
+ <CANT5p=oTTErJk240GKc+k6Cihqks+9Nnurh=MdrvgC7gqKu1ww@mail.gmail.com>
+ <CAKywueTr9GHbzg65s12BRKNB_L881wFLmHcb5boFxGX2AoN40g@mail.gmail.com>
+ <CANT5p=rECwTZgskdXUr3VAHWA-PkYHEXX=qwO8PpVZRc0=pOKA@mail.gmail.com>
+ <CAKywueTuGuqT8QN-8Jn1QNHT+HPKysLDhdp1gPsm6+Q0tQnbGA@mail.gmail.com>
+ <CANT5p=pUVucG6NhzfziAjsjDnimHCWDUiJP46DYoRqjpXHegsA@mail.gmail.com>
 From:   Stefan Metzmacher <metze@samba.org>
 Autocrypt: addr=metze@samba.org; prefer-encrypt=mutual; keydata=
  xsNNBFYI3MgBIACtBo6mgqbCv5vkv8GSjJH607nvXIT65moPUe6qAm2lYPP6oZUI5SNLhbO3
@@ -406,104 +423,388 @@ Autocrypt: addr=metze@samba.org; prefer-encrypt=mutual; keydata=
  3DQg6tCVq4kJtuPNDHY+MP02Bl9haogBSijePuphG21k2LOQa07Sg4yA/nNjoRQNmaKvElmz
  auYcwkOQPAK30K3drs2Ompu4At/lz8OT8Lo/dhOAUE7emFHIHSsHyCS1gpuoxdZRA0i7PmJt
  uAMlsTqBMFOwuvAcYAj2bwl7QQU6yhU=
-Subject: Re: updated ksmbd (cifsd)
-Message-ID: <3bf45223-484a-e86a-279a-619a779ceabd@samba.org>
-Date:   Mon, 14 Dec 2020 18:45:51 +0100
+Subject: Re: [PATCH][SMB3] mount.cifs integration with PAM
+Message-ID: <0b80c61e-3953-e627-9818-8a8c6c50499e@samba.org>
+Date:   Mon, 14 Dec 2020 19:03:36 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5muRCUzvKOv1xWRZL4t-7Pifz-nsL_Sn4qmbX0o127tnGA@mail.gmail.com>
+In-Reply-To: <CANT5p=pUVucG6NhzfziAjsjDnimHCWDUiJP46DYoRqjpXHegsA@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="gxgJCBOBRIyAZHwatUnd02dKxfxuPOr1p"
+ boundary="WVok18ZpRnhUe0wQWbS7zKkrgFe6Ihm26"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gxgJCBOBRIyAZHwatUnd02dKxfxuPOr1p
-Content-Type: multipart/mixed; boundary="1FhrrPgeO6ROvl6OCmLZfSnqR3io7hrih";
+--WVok18ZpRnhUe0wQWbS7zKkrgFe6Ihm26
+Content-Type: multipart/mixed; boundary="Ya0VbTHzYwiuMuPCRJ81VNSD05MxAQzdx";
  protected-headers="v1"
 From: Stefan Metzmacher <metze@samba.org>
-To: Steve French <smfrench@gmail.com>, Namjae Jeon <namjae.jeon@samsung.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>,
- samba-technical <samba-technical@lists.samba.org>
-Message-ID: <3bf45223-484a-e86a-279a-619a779ceabd@samba.org>
-Subject: Re: updated ksmbd (cifsd)
-References: <CAH2r5muRCUzvKOv1xWRZL4t-7Pifz-nsL_Sn4qmbX0o127tnGA@mail.gmail.com>
-In-Reply-To: <CAH2r5muRCUzvKOv1xWRZL4t-7Pifz-nsL_Sn4qmbX0o127tnGA@mail.gmail.com>
+To: Shyam Prasad N <nspmangalore@gmail.com>,
+ Pavel Shilovsky <piastryyy@gmail.com>
+Cc: CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com,
+ samba-technical <samba-technical@lists.samba.org>,
+ =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+ Steve French <smfrench@gmail.com>
+Message-ID: <0b80c61e-3953-e627-9818-8a8c6c50499e@samba.org>
+Subject: Re: [PATCH][SMB3] mount.cifs integration with PAM
+References: <CANT5p=pxPsBwAv3oJX6Ae9wjpZoEjLvyfGM1sM9DEhS11RNgog@mail.gmail.com>
+ <87pn7t4kr9.fsf@suse.com>
+ <CANT5p=oeY91u17DPe6WO75Eq_bjzrVC0kmAErrZ=h3S1qh-Wxw@mail.gmail.com>
+ <87eeo54q0i.fsf@suse.com>
+ <CANT5p=rxp3iQMgxaM_mn3RE3B+zezWr3o8zpkFyWUR27CpeVCA@mail.gmail.com>
+ <CANT5p=qMHxq_L5RpXAixzrQztjMr8-P_aO4aPg5uqfPSLNUiTA@mail.gmail.com>
+ <874ko7vy0z.fsf@suse.com>
+ <CANT5p=o07RqmMkcFoLeUVTeQHhzh5MmFYpfAdv0755iiGbp1ZA@mail.gmail.com>
+ <87mu1yc6gw.fsf@suse.com>
+ <CANT5p=r0Jix9EuuF8gJzQBGHLp0Y-Oogxzju7_2cJog_jF2fjg@mail.gmail.com>
+ <874knolhpw.fsf@suse.com>
+ <CANT5p=oTTErJk240GKc+k6Cihqks+9Nnurh=MdrvgC7gqKu1ww@mail.gmail.com>
+ <CAKywueTr9GHbzg65s12BRKNB_L881wFLmHcb5boFxGX2AoN40g@mail.gmail.com>
+ <CANT5p=rECwTZgskdXUr3VAHWA-PkYHEXX=qwO8PpVZRc0=pOKA@mail.gmail.com>
+ <CAKywueTuGuqT8QN-8Jn1QNHT+HPKysLDhdp1gPsm6+Q0tQnbGA@mail.gmail.com>
+ <CANT5p=pUVucG6NhzfziAjsjDnimHCWDUiJP46DYoRqjpXHegsA@mail.gmail.com>
+In-Reply-To: <CANT5p=pUVucG6NhzfziAjsjDnimHCWDUiJP46DYoRqjpXHegsA@mail.gmail.com>
 
---1FhrrPgeO6ROvl6OCmLZfSnqR3io7hrih
+--Ya0VbTHzYwiuMuPCRJ81VNSD05MxAQzdx
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-Am 14.12.20 um 02:20 schrieb Steve French via samba-technical:
-> I just rebased https://github.com/smfrench/smb3-kernel/tree/cifsd-for-n=
-ext
-> ontop of 5.10 kernel. Let me know if you see any problems.   xfstest
-> results (and recent improvements) running Linux cifs.ko->ksmbd look
-> very promising.
+Hi Shyam,
 
-I just looked briefly, but I'm wondering about a few things:
+in what way is this specific to kerberos?
 
-1. The xattr's to store additional meta data are not compatible with
-   Samba's way of storing things:
-   https://git.samba.org/?p=3Dsamba.git;a=3Dblob;f=3Dlibrpc/idl/xattr.idl=
+Would it make sense to call the configure option just --enable-pam?
+And also remove the 'krb5' from other variables?
 
+PAM_CIFS_SERVICE "cifs" seems to be unspecific,
+"mount.cifs" or "cifs.mount". Maybe even "mount.smb3"?
 
-   In order to make it possible to use the same filesystem with both serv=
-ers
-   it would be great if the well established way used in Samba would be u=
-sed
-   as well.
+Can you fix the indentation of the patch? There seems to be
+a strange mix of leading tabs and whitespaces, which make it hard to
+read the patch.
 
-2. Why does smb2_set_info_sec() have fp->saccess |=3D FILE_SHARE_DELETE_L=
-E; ?
+With force_pam I would not expect a failure to be ignored.
 
-3. Why does ksmbd_override_fsids() only reset cred->fs[g|u]id, but group_=
-info
-   is kept unchanged, I guess at least the groups array should be set to =
-be empty.
-
-4. What is work->saved_cred_level used for in ksmbd_override_fsids()?
-   It seems to be unused and adds a lot of complexity.
-
-5. Documentation/filesystems/cifsd.rst and fs/cifsd/Kconfig still referen=
-ces https://github.com/cifsd-team/cifsd-tools
-   instead of https://github.com/cifsd-team/ksmbd-tools
-
-6. Why is SMB_SERVER_CHECK_CAP_NET_ADMIN an compile time option and why i=
-s it off by default?
-   I think the behavior should be enforced without a switch.
-
-These are just some initial thoughts.
+Why can this only be used with sec=3Dkrb5? Wouldn't it be possible
+to fetch the password from the pam stack in order to pass it to
+the kernel?
 
 metze
 
+Am 27.11.20 um 11:43 schrieb Shyam Prasad N via samba-technical:
+> Discussed this with Aurelien today.
+>=20
+> With the patch last sent, users are authenticated using the PAM stack.
+> However, there's no call to cleanup the PAM credentials. Which could
+> leave the kerberos tickets around, even after the umount.
+>=20
+> To complete this fix, we need a mechanism to tell the umount helper
+> umount.cifs (a new executable to be created) that PAM authentication
+> was used for the mount.
+>=20
+> There are two possible approaches which I could think of:
+> 1. Add a new mount option in cifs.ko. Inside cifs.ko, this option
+> would be non-functional. But will be used by umount.cifs to call PAM
+> for cleanup.
+> 2. In mount.cifs, keep this info in a temporary file (maybe
+> /var/run/cifs/). umount.cifs will read this and call PAM for cleanup.
+>=20
+> I feel approach 1 is a cleaner approach to take. Aurelien seems to
+> favour option 1 as well.
+> Please feel free to comment if you feel otherwise.
+> Once we agree on the right approach, I'll send a patch for the changes.=
 
---1FhrrPgeO6ROvl6OCmLZfSnqR3io7hrih--
+>=20
+> Regards,
+> Shyam
+>=20
+> On Wed, Nov 11, 2020 at 12:53 AM Pavel Shilovsky <piastryyy@gmail.com> =
+wrote:
+>>
+>> Sure. Removed the patch and updated the next branch.
+>> --
+>> Best regards,
+>> Pavel Shilovsky
+>>
+>> =D0=B2=D1=82, 10 =D0=BD=D0=BE=D1=8F=D0=B1. 2020 =D0=B3. =D0=B2 05:20, =
+Shyam Prasad N <nspmangalore@gmail.com>:
+>>>
+>>> Hi Pavel,
+>>>
+>>> There is more that needs to be done on this item. Otherwise, this wil=
+l
+>>> depend on user behaviour to cleanup unused krb5 tickets.
+>>> The pending items on this is to propagate this mount option to cifs.k=
+o
+>>> and write an umount.cifs utility to read that mount option to do PAM
+>>> logoff.
+>>> So please rollback this patch for now.
+>>>
+>>> Regards,
+>>> Shyam
+>>>
+>>> On Tue, Nov 10, 2020 at 5:12 AM Pavel Shilovsky <piastryyy@gmail.com>=
+ wrote:
+>>>>
+>>>> Merged into next. Please let me know if something needs to be fixed.=
+ Thanks!
+>>>> --
+>>>> Best regards,
+>>>> Pavel Shilovsky
+>>>>
+>>>> =D1=87=D1=82, 24 =D1=81=D0=B5=D0=BD=D1=82. 2020 =D0=B3. =D0=B2 03:39=
+, Shyam Prasad N <nspmangalore@gmail.com>:
+>>>>>
+>>>>> Hi Aur=C3=A9lien,
+>>>>>
+>>>>> I've implemented most of your review comments. Also fixed the issue=
+=2E
+>>>>>
+>>>>> On Wed, Sep 23, 2020 at 7:26 PM Aur=C3=A9lien Aptel <aaptel@suse.co=
+m> wrote:
+>>>>>>
+>>>>>> Shyam Prasad N <nspmangalore@gmail.com> writes:
+>>>>>>> Also, I'll test this out with DFS once I figure out how to set it=
+ up. :)
+>>>>>>> Re-attaching the patch with some minor changes with just the
+>>>>>>> "force_pam" mount option.
+>>>>>>
+>>>>>> You will need 2 Windows VM. DFS is basically symlinks across
+>>>>>> servers. The DFS root VM will host the links (standalone namespace=
+) and
+>>>>>> you have to make them point to shares on the 2nd VM. You don't nee=
+d to
+>>>>>> setup replication to test.
+>>>>>>
+>>>>>> When you mount the root in cifs.ko and access a link, the server w=
+ill
+>>>>>> reply that the file is remote. cifs.ko then does an FSCTL on the l=
+ink to
+>>>>>> resolve the target it points to and then connects to the target an=
+d
+>>>>>> mounts it under the link seemlessly.
+>>>>>>
+>>>>>>
+>>>>>> Regarding the patch:
+>>>>>>
+>>>>>> * need to update the man page with option and explanation
+>>>>>>
+>>>>>> I have some comments with the style, I know it's annoying.. but it=
 
---gxgJCBOBRIyAZHwatUnd02dKxfxuPOr1p
+>>>>>> would be best to keep the same across the code.
+>>>>>>
+>>>>>> * use the existing indent style (tabs) and avoid adding trailing w=
+hitespaces.
+>>>>>> * no () for return statements
+>>>>>> * no casting for memory allocation
+>>>>>> * if (X) free(X)  =3D> free(X)
+>>>>>>
+>>>>>> Below some comments about pam_auth_krb5_conv():
+>>>>>>
+>>>>>>> @@ -1809,6 +1824,119 @@ get_password(const char *prompt, char *in=
+put, int capacity)
+>>>>>>>       return input;
+>>>>>>>  }
+>>>>>>>
+>>>>>>> +#ifdef HAVE_KRB5PAM
+>>>>>>> +#define PAM_CIFS_SERVICE "cifs"
+>>>>>>> +
+>>>>>>> +static int
+>>>>>>> +pam_auth_krb5_conv(int n, const struct pam_message **msg,
+>>>>>>> +    struct pam_response **resp, void *data)
+>>>>>>> +{
+>>>>>>> +    struct parsed_mount_info *parsed_info;
+>>>>>>> +     struct pam_response *reply;
+>>>>>>> +     int i;
+>>>>>>> +
+>>>>>>> +     *resp =3D NULL;
+>>>>>>> +
+>>>>>>> +    parsed_info =3D data;
+>>>>>>> +    if (parsed_info =3D=3D NULL)
+>>>>>>> +             return (PAM_CONV_ERR);
+>>>>>>> +     if (n <=3D 0 || n > PAM_MAX_NUM_MSG)
+>>>>>>> +             return (PAM_CONV_ERR);
+>>>>>>> +
+>>>>>>> +     if ((reply =3D calloc(n, sizeof(*reply))) =3D=3D NULL)
+>>>>>>> +             return (PAM_CONV_ERR);
+>>>>>>> +
+>>>>>>> +     for (i =3D 0; i < n; ++i) {
+>>>>>>> +             switch (msg[i]->msg_style) {
+>>>>>>> +             case PAM_PROMPT_ECHO_OFF:
+>>>>>>> +            if ((reply[i].resp =3D (char *) malloc(MOUNT_PASSWD_=
+SIZE + 1)) =3D=3D NULL)
+>>>>>>> +                goto fail;
+>>>>>>> +
+>>>>>>> +            if (parsed_info->got_password && parsed_info->passwo=
+rd !=3D NULL) {
+>>>>>>> +                strncpy(reply[i].resp, parsed_info->password, MO=
+UNT_PASSWD_SIZE + 1);
+>>>>>>> +            } else if (get_password(msg[i]->msg, reply[i].resp, =
+MOUNT_PASSWD_SIZE + 1) =3D=3D NULL) {
+>>>>>>> +                goto fail;
+>>>>>>> +            }
+>>>>>>> +            reply[i].resp[MOUNT_PASSWD_SIZE] =3D '\0';
+>>>>>>> +
+>>>>>>> +                     reply[i].resp_retcode =3D PAM_SUCCESS;
+>>>>>>> +                     break;
+>>>>>>> +             case PAM_PROMPT_ECHO_ON:
+>>>>>>> +                     fprintf(stderr, "%s: ", msg[i]->msg);
+>>>>>>> +            if ((reply[i].resp =3D (char *) malloc(MOUNT_PASSWD_=
+SIZE + 1)) =3D=3D NULL)
+>>>>>>> +                goto fail;
+>>>>>>> +
+>>>>>>> +                     if (fgets(reply[i].resp, MOUNT_PASSWD_SIZE =
++ 1, stdin) =3D=3D NULL)
+>>>>>>
+>>>>>> Do we need to remove the trailing \n from the buffer?
+>>>>>>
+>>>>>>> +                goto fail;
+>>>>>>> +
+>>>>>>> +            reply[i].resp[MOUNT_PASSWD_SIZE] =3D '\0';
+>>>>>>> +
+>>>>>>> +                     reply[i].resp_retcode =3D PAM_SUCCESS;
+>>>>>>> +                     break;
+>>>>>>> +             case PAM_ERROR_MSG:
+>>>>>>
+>>>>>> Shouldn't this PAM_ERROR_MSG case goto fail?
+>>>>>>
+>>>>>>> +             case PAM_TEXT_INFO:
+>>>>>>> +                     fprintf(stderr, "%s: ", msg[i]->msg);
+>>>>>>> +
+>>>>>>> +                     reply[i].resp_retcode =3D PAM_SUCCESS;
+>>>>>>> +                     break;
+>>>>>>> +             default:
+>>>>>>> +                     goto fail;
+>>>>>>> +             }
+>>>>>>> +     }
+>>>>>>> +     *resp =3D reply;
+>>>>>>> +     return (PAM_SUCCESS);
+>>>>>>> +
+>>>>>>> + fail:
+>>>>>>> +     for(i =3D 0; i < n; i++) {
+>>>>>>> +        if (reply[i].resp)
+>>>>>>> +            free(reply[i].resp);
+>>>>>>
+>>>>>> free(NULL) is a no-op, remove the checks.
+>>>>>>
+>>>>>>> +     }
+>>>>>>> +     free(reply);
+>>>>>>> +     return (PAM_CONV_ERR);
+>>>>>>> +}
+>>>>>>
+>>>>>> I gave this a try with a properly configured system joined to AD f=
+rom
+>>>>>> local root account:
+>>>>>>
+>>>>>> aaptel$ ./configure
+>>>>>> ...
+>>>>>> checking krb5.h usability... yes
+>>>>>> checking krb5.h presence... yes
+>>>>>> checking for krb5.h... yes
+>>>>>> checking krb5/krb5.h usability... yes
+>>>>>> checking krb5/krb5.h presence... yes
+>>>>>> checking for krb5/krb5.h... yes
+>>>>>> checking for keyvalue in krb5_keyblock... no
+>>>>>> ...
+>>>>>> checking keyutils.h usability... yes
+>>>>>> checking keyutils.h presence... yes
+>>>>>> checking for keyutils.h... yes
+>>>>>> checking for krb5_init_context in -lkrb5... yes
+>>>>>> ...
+>>>>>> checking for WBCLIENT... yes
+>>>>>> checking for wbcSidsToUnixIds in -lwbclient... yes
+>>>>>> ...
+>>>>>> checking for keyutils.h... (cached) yes
+>>>>>> checking security/pam_appl.h usability... yes
+>>>>>> checking security/pam_appl.h presence... yes
+>>>>>> checking for security/pam_appl.h... yes
+>>>>>> checking for pam_start in -lpam... yes
+>>>>>> checking for security/pam_appl.h... (cached) yes
+>>>>>> checking for krb5_auth_con_getsendsubkey... yes
+>>>>>> checking for krb5_principal_get_realm... no
+>>>>>> checking for krb5_free_unparsed_name... yes
+>>>>>> checking for krb5_auth_con_setaddrs... yes
+>>>>>> checking for krb5_auth_con_set_req_cksumtype... yes
+>>>>>> ...
+>>>>>> aaptel$ make
+>>>>>> ....(ok)
+>>>>>>
+>>>>>> Without force_pam:
+>>>>>>
+>>>>>> root# ./mount.cifs -v //adnuc.nuc.test/data /x -o sec=3Dkrb5,usern=
+ame=3Dadministrator,domain=3DNUC
+>>>>>> mount.cifs kernel mount options: ip=3D192.168.2.111,unc=3D\\adnuc.=
+nuc.test\data,sec=3Dkrb5,user=3Dadministrator,domain=3DNUC
+>>>>>> mount error(2): No such file or directory
+>>>>>> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs) and k=
+ernel log messages (dmesg)
+>>>>>>
+>>>>>> With force_pam:
+>>>>>>
+>>>>>> root# ./mount.cifs -v //adnuc.nuc.test/data /x -o sec=3Dkrb5,usern=
+ame=3Dadministrator,domain=3DNUC,force_pam
+>>>>>> Authenticating as user: administrator
+>>>>>> Error in authenticating user with PAM: Authentication failure
+>>>>>> Attempt to authenticate user with PAM unsuccessful. Still, proceed=
+ing with mount.
+>>>>>>
+>>>>>> =3D> no further message but mount failed and no msg in dmesg, it d=
+idn't
+>>>>>>    reach the mount() call
+>>>>>>
+>>>>>> Not sure what is going on. Does the domain need to be passed to PA=
+M?
+>>>>>>
+>>>>>> Cheers,
+>>>>>> --
+>>>>>> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+>>>>>> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+>>>>>> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BC=
+rnberg, DE
+>>>>>> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (A=
+G M=C3=BCnchen)
+>>>>>
+>>>>>
+>>>>>
+>>>>> --
+>>>>> -Shyam
+>>>
+>>>
+>>>
+>>> --
+>>> -Shyam
+>=20
+>=20
+>=20
+
+
+
+--Ya0VbTHzYwiuMuPCRJ81VNSD05MxAQzdx--
+
+--WVok18ZpRnhUe0wQWbS7zKkrgFe6Ihm26
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEfFbGo3YXpfgryIw9DbX1YShpvVYFAl/XpM8ACgkQDbX1YShp
-vVaBSA/+MqbIrA/jiGpW6HYhD1IdKGNvlRnJErWMsIe0CjtGXiQhlutSDqMcHkic
-Uaa/8D59S4rrXIbbcKFj51vvvvg3SZ0j1CNeu7sDOZFJbI3o6UtaC9rX/2tXW3Fz
-zAhSBw01mD2Fs/EfQi3clLPIMW6pSwk7NRUot0CV5vY1LaVm8NFjeQMskw7ewI7Y
-bSrwZUoHzWT2zidD0XEpCymlS5FiK+H3FjMw8J6DhqxPn6r+HAQ3iO3BRhH6M1iF
-+DSDhLgSrysoutnViy9dtwyQQPj+YtT3bZnYJy0SmnaWzVbkrVKBeYdfoKDFQjDp
-LXE4N0ikYpcycHXeCAsaBAsS9wbnQ5hl9O654sCtSommyJKdG7J3mfvT5TOQITS1
-9IV8aZ9S3oks6EX8gp/FintbxGm5dG3vHrr1YDXICg1sBE5WonRS9TdhlsEkNJ45
-BR5/b035Mcwiqmi5sSTGAVWDTic9YRRNkWwLz+NZ7h2rMgVd4MAhNk7bDRC8yhb8
-vWhrbMhRhd5R/C0GUXeCnie/y8rcL3N7mLS6VGNYYYjCDGrP7cMz6PmSEI9kyPJY
-rfRYuqTQbGVSGuH3SbGGKpmxN/nFTr3F6UDEm/g6WY8Ja/m54Yclxr/evXjlLfef
-JKAXGoHjcj6mOdXZ1cYs7Vz3zxkcejsF4C0PZJ/FQzf9r8nSElw=
-=+sXE
+iQIzBAEBCgAdFiEEfFbGo3YXpfgryIw9DbX1YShpvVYFAl/XqPgACgkQDbX1YShp
+vVZkzQ/9Fwgs0URZOGwZ3jE7fJ4RfM0KEIZrGCB/O7zaJCxvuLHqqo3VdCTPK2cw
+RgU7mYiWjHJE01BcYNs+tDOfYE1VvNscUf61tNkT2djS8JNW7tjqysNLHXqFX6TG
+ngIAurRZxTAyj689siG/nc1p/8+rdaC2/YxM9reOtAp/Ffk4CVN3wiLeoyHtm6yy
+GCoHRDxOSvr6zpqjSWdiqezPZDd5dIGpdi1bEFPkOAZM8nDTMtJVpqNYA+68IpUG
+buvGVDW3YDUssXY8YHoXBrDEfz5nNbryYdzY2wRX/7DK+hz3LIwDkZWBm9bAu14h
+BNSsxZANKKuIr7OmORS9T+AeR0piK3SV34F7r3m6FDkBBMxInLJHp72BmSmywf25
+4lGpYYdIyv/iOHuAy3kQEq9c0/bhR2FMx5/swa8WLKrVQWgVjmfHYZyHaTFWVK3C
+jCBYE8OmGahBusuU+LZOuXJUhvt1lnknmh3kRhwHLtF7HRLVMsvOli438PX/mPjG
+/4H0aKKSNWzKfYpL6XUNAKuceFLN4KxT4sJKmNP4M+ieXeZGVRh8VfS2VJ/QHDvM
+ML5fudCcynpPWImLnoGvnuudEtDfCdho15NKGJ26TtjYUkbfcDxBrzuhG7w4P5TV
+pZm4FgsPHaKFnPBpHklBQKMGOTeVijZPpvD5Dmu23l3FdtPCgvI=
+=wk5i
 -----END PGP SIGNATURE-----
 
---gxgJCBOBRIyAZHwatUnd02dKxfxuPOr1p--
+--WVok18ZpRnhUe0wQWbS7zKkrgFe6Ihm26--
