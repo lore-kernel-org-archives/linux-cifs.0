@@ -2,80 +2,88 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D9BC4361B
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 19:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B37C7C2BB48
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 19:33:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 158B3223C8
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 19:26:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 786E722509
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Dec 2020 19:33:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440560AbgLNT0A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 14 Dec 2020 14:26:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34866 "EHLO
+        id S2502479AbgLNTdb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 14 Dec 2020 14:33:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2438470AbgLNTZv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Dec 2020 14:25:51 -0500
-X-Greylist: delayed 2205 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 14 Dec 2020 11:25:10 PST
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA53CC0613D3
-        for <linux-cifs@vger.kernel.org>; Mon, 14 Dec 2020 11:25:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42; h=Message-ID:Cc:To:From:Date;
-        bh=frpW80Hpx5l6OmjqXebgV8JKMs05hfI6Ocqax9b855o=; b=mumy/bJUowl/pPwDy+RiATE8fH
-        EPLxLI6bbd7iypsT9Dk+OnIzXigyUVoQezA+/bsmTM19hM3XY64tk+6n/R7oCG3WyOFf2MWx3h3gR
-        MCdCQSc4h8zt5yHOfPAh9gQLJuOcp2URtoWhz/F1jPL55M1IM7VircFOU14MrqdB+V/5rRaJzXeoi
-        +IH1Zdmf6OrmnPSEJlPdvG33BacEeBkq0R9vs4/DM4hdHCVn8nzzTUgA3ggNV+r9XoaVvMz+VIlqE
-        N4mVU/1WvSKOuAyOxWLf6cvAKuOl00dMEivjm2xZwaZrnWkBrkjJLf1WLGK1aZ+fnLlDBAibshWDr
-        n2bWuE5gAmrbb9SYYdFVJcAhoZGcC90CxScdQGSAIIHhZRsL04InrAVb5I8H6JZ+lKvGae8M2Mr+I
-        tN8Q1DtrPvZdX151kFGS29wwRDuJFpixrh43G0d1goiyKJs9XuYd6Oaz/+0nDV0sqztEoY1o1uhXo
-        77/Kh1FZaWNwQ8u8HuyifRfH;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
-        (Exim)
-        id 1kostT-00027B-AJ; Mon, 14 Dec 2020 18:48:23 +0000
-Date:   Mon, 14 Dec 2020 10:48:20 -0800
-From:   Jeremy Allison <jra@samba.org>
-To:     Stefan Metzmacher <metze@samba.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Namjae Jeon <namjae.jeon@samsung.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Subject: Re: updated ksmbd (cifsd)
-Message-ID: <20201214184820.GB56567@jeremy-acer>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <CAH2r5muRCUzvKOv1xWRZL4t-7Pifz-nsL_Sn4qmbX0o127tnGA@mail.gmail.com>
- <3bf45223-484a-e86a-279a-619a779ceabd@samba.org>
+        with ESMTP id S2502472AbgLNTd2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Dec 2020 14:33:28 -0500
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CFCC0613D3;
+        Mon, 14 Dec 2020 11:32:47 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Cvs3w1ZMTz9sSC;
+        Tue, 15 Dec 2020 06:32:44 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1607974364;
+        bh=/jVB/V0DgR/mC21PqfU+xY2yhAVJaq1lmG28ELTV330=;
+        h=Date:From:To:Cc:Subject:From;
+        b=JQoJtLXE8iHGwL2WO5QoIl44ztwHSHpKNVD9oQ0guXpgxsGEP83zjvDeGdn9FKqqA
+         glJRQ9Op7tlnQQRxxSMUFR/cVYieb/FCRgR6emOa+6YzW+EA00daLVe/6ypzVlu6rJ
+         PAupWGVzQ+vIoxacEn//yfoqijwiOJZX+kzbH67goAHK43qIG+DxfWufDOB4tiuLp8
+         fHYe5npSvw9QygZCghzHs4raa9kFXCLrbLA22EgH8Owe/ttUyKB/lYYTEs7+d2MuOy
+         wQkieEkH5rYelltQPwOcvsHFV0Ynt0f2/YFp4EiFpY3Rb/LF6eCP6IDeeNULF/Dy99
+         /0BfxrofzqlOw==
+Date:   Tue, 15 Dec 2020 06:32:43 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Signed-off-by missing for commit in the cifs tree
+Message-ID: <20201215063243.236b2a60@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <3bf45223-484a-e86a-279a-619a779ceabd@samba.org>
+Content-Type: multipart/signed; boundary="Sig_/bl5fLCs4uxLaiAfXUEzkEeX";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Dec 14, 2020 at 06:45:51PM +0100, Stefan Metzmacher via samba-technical wrote:
->Am 14.12.20 um 02:20 schrieb Steve French via samba-technical:
->> I just rebased https://github.com/smfrench/smb3-kernel/tree/cifsd-for-next
->> ontop of 5.10 kernel. Let me know if you see any problems.   xfstest
->> results (and recent improvements) running Linux cifs.ko->ksmbd look
->> very promising.
->
->I just looked briefly, but I'm wondering about a few things:
->
->1. The xattr's to store additional meta data are not compatible with
->   Samba's way of storing things:
->   https://git.samba.org/?p=samba.git;a=blob;f=librpc/idl/xattr.idl
->
->   In order to make it possible to use the same filesystem with both servers
->   it would be great if the well established way used in Samba would be used
->   as well.
+--Sig_/bl5fLCs4uxLaiAfXUEzkEeX
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-A thousand times this ! If cifs.ko->ksmbd adds a differnt way
-of storing the extra meta-data that is incompatible with Samba
-this would be a disaster for users.
+Hi all,
 
-Please fix this before proposing any merge.
+Commits
+
+  425f40482491 ("cifs: fix uninitialized variable in smb3_fs_context_parse_=
+param")
+  8cc9a66ea70e ("cifs: update mnt_cifs_flags during reconfigure")
+
+are missing a Signed-off-by from their committer.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/bl5fLCs4uxLaiAfXUEzkEeX
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl/XvdsACgkQAVBC80lX
+0Gzyzwf/dEr9OkL4x7O3ckJFjVWs8Hwr9rHyhygVuWwhyXv3WDHHT4W9L1jrWuBx
+Txsj9fvNB4hdJC2G0g3vmS7a9a3k+ZAOaJfGTA2RzMbYB0jnnj4jzmMCpHGS0v9U
+nUOEmkuuMPaC1tkmZ+ub3YUt6UqKRkvBrr/HPMtKIKeze/bCLyKmjB5W36afgDl5
+qcM4/jY0KnltKzZFBZPQWBllhM6QB+1lo5BEUkC0oVRLN7XEAhtNxtFdjbo7Uk1O
+yRO3U1sJME232QmB+FFpSE/NO1iApqRj/OVE9JxMesJOEGktoPcGFtxnmjXF9oMu
+61bhavUHB+V7Ynum0R+3RyoPr7JMug==
+=iGUD
+-----END PGP SIGNATURE-----
+
+--Sig_/bl5fLCs4uxLaiAfXUEzkEeX--
