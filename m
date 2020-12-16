@@ -2,140 +2,178 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70606C2BB9A
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Dec 2020 22:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C51C4361B
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Dec 2020 22:44:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40D732342C
-	for <linux-cifs@archiver.kernel.org>; Wed, 16 Dec 2020 22:42:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77280233FB
+	for <linux-cifs@archiver.kernel.org>; Wed, 16 Dec 2020 22:44:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727837AbgLPWma (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 16 Dec 2020 17:42:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60078 "EHLO
+        id S1730281AbgLPWok (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 16 Dec 2020 17:44:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727167AbgLPWma (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Dec 2020 17:42:30 -0500
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E00B3C061794
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Dec 2020 14:41:49 -0800 (PST)
-Received: by mail-ej1-x630.google.com with SMTP id q22so17361364eja.2
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Dec 2020 14:41:49 -0800 (PST)
+        with ESMTP id S1730280AbgLPWoj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 16 Dec 2020 17:44:39 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D499C0617A6
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Dec 2020 14:43:59 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id y19so52432785lfa.13
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Dec 2020 14:43:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=/roba0oaCn8lBSdxjK38UauGgCbvn7c7Anak2m4UNNc=;
-        b=d+BSUIkw8njvAoPHDsgjd8zZxRZYAUgIMG4JZhPwTn2K1ksltf4Fiq3LzBe1DTtIhL
-         fp52dAfz5qTXnehgwyZDfNyOo0nmMb+G9hkyj8MD4zV+WbafCEP1w7/F6BWCcjR69NAy
-         Yye15mtHh1Fi2A2dNd3iOJWzmAMYe+Gso8P/GexYotoqQBbYEny68Q5M3pWYMxcHuGFV
-         NqKn9exenm10BKH/YoALXvHR6wG2tMNm21hOt3IGnEcGl5buYhC611Q38mZHBs2HITpx
-         3eLznixTOPKwagaDxTlQUdnYng4SMyjsC26IG+wt3sJVvbkco0pMSrhpJreEZpeHTShI
-         sejg==
+        bh=RraQxFubWkLaRPHcHp7s5FxOjPyXlZWojEueGaT6yF4=;
+        b=N1IsJG7dCLsFwFYwWeQH2K1yP5v+WHU38XUruZVceRELQhlz2p17vqa2Sc+UaJlI95
+         2RyCFIAeAHVGi53NA1rYSFCT5pL1EbHYc13eammS/nfjyMy+mrbw3cM4bDIk/Z0WUamW
+         X/opNFJ3edshVD0WPs2uJOYKFU05EtaxxNwu0YL/k2MJ7Qqi43gyuP/P+DLI6epvy3CM
+         RnYrZHkMZi5+m2Gs9+Cm1I6zmrMYXpD9t40zEM/8VSUpX+biouf57krWIM19xoXA1E85
+         qs5GoHwqUOXDnUH2RsRY5ezbyWLZMJ/nG2MjD+BhFayAqNQh2KhPnhVpVY7DJji3OkSK
+         vu3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=/roba0oaCn8lBSdxjK38UauGgCbvn7c7Anak2m4UNNc=;
-        b=iBxD7IaOTdHcWGre/a4+Q4CehNFMuYOemuz0tHdvDQeCZ7WH6/0vlTT1jvudTHqaFf
-         Rkleb7wrOO1FC9W8nqRAJOjWgE8ubNrFIoipqxqePiciR644g2qHpqsHIxH74mgQTgCx
-         EjmgDXO5WJU/mWYlEBm/CtV5HeW23p4316CGo6c2A8Ay23S6lXQ74taXdKgxRTWVFgPe
-         /5hA7MOf0NfDw6B8luoTu4jiLWxjruArHDiezA6m2pe3BigYgw/Iy8fywfXh8UOgUwkB
-         xVGtugS9RbcbdoeqsFgAU5lBOzPRFQ+94b8aA79IwcqFjXWjI3lpevocID+7xR9n+M5q
-         mpxw==
-X-Gm-Message-State: AOAM531LS7MT6Yukmh9WH/2eq9Ty52Tu+b67v1HKW5tn6t/Azil3SyPe
-        0GL9OggpAxC8rL7ziTwW0BeWi1rriQoxOIvUMA==
-X-Google-Smtp-Source: ABdhPJy4Iv55I+n87wG4OcNYTQxUB3515Jyq+BV5mXwhsFgnosvhSYGPfy1RasGI5MAk6jSN6SOB3l844lIt3RPM89k=
-X-Received: by 2002:a17:906:4146:: with SMTP id l6mr13237999ejk.341.1608158508626;
- Wed, 16 Dec 2020 14:41:48 -0800 (PST)
+        bh=RraQxFubWkLaRPHcHp7s5FxOjPyXlZWojEueGaT6yF4=;
+        b=B4ZzF2Nj5bKNcwOYjKHYiwMZpOSl/W+7h7vJC1ka1U0md6seCsFP1Q0ulOf6+36s+h
+         adXbSiMsNbNWL7EXo1l+Gyg4IVU9vIllB1gZ0mK0lf2Q9OWarS4Ww8i2+ZP/shgEj/s6
+         hu3/F6id73wYIgEyIqpVwU/tBNothFJv3ztZF88/mAkcbtYl2MNIW4si+PSc61PgDldL
+         fulUXYaG3A/8CDRt1G7jD6tcQcr1C64IKgofrWR5V3w/qcdGO1/g6DSI5KPaRguzSXYK
+         hshvDrs9Y98NJsF7vyqTWPBCAiwsqWs1vFRUmVW+5SGqOWcLtftFUTuRKw13v7qu/qup
+         ACoQ==
+X-Gm-Message-State: AOAM530+wvF0HTLLJLzrQVlFZczyDu/2fOWgnpXp1JpPu/XzgpfHXRvm
+        kxhKaERIIIdBsYllugOSZpLcxgqKl8RXStE0oNXQ7dcMlAg=
+X-Google-Smtp-Source: ABdhPJyEnvKmClQ5NoxTj0vrx8rbNsdtQ3PSNJUp4fUU3Ct4hWYm2LmiepyO9tQPq7+q3D48Ei6VQ9CD4RJE7GuYkXs=
+X-Received: by 2002:a2e:6a14:: with SMTP id f20mr2223949ljc.6.1608158637870;
+ Wed, 16 Dec 2020 14:43:57 -0800 (PST)
 MIME-Version: 1.0
-References: <20201216214455.41251-1-diabonas@archlinux.org>
-In-Reply-To: <20201216214455.41251-1-diabonas@archlinux.org>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 16 Dec 2020 14:41:37 -0800
-Message-ID: <CAKywueRpm7Y2NYr89AK7iVxTitAS9VOFT7cpfJnRnFwiZSdG-Q@mail.gmail.com>
-Subject: Re: [PATCH] cifs.upcall: drop bounding capabilities only if
- CAP_SETPCAP is given
-To:     Jonas Witschel <diabonas@archlinux.org>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Alexander Koch <mail@alexanderkoch.net>
+References: <2e241ceaece6485289b1cddb84ec77ca@atos.net> <04d24a21a7a462b3dc316959c3a3b1c8be8caac3.camel@redhat.com>
+In-Reply-To: <04d24a21a7a462b3dc316959c3a3b1c8be8caac3.camel@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 16 Dec 2020 16:43:46 -0600
+Message-ID: <CAH2r5mt9r6nWop_ekbe1CsinztUiGhP2-bxWFkRqHXOP=MXcVQ@mail.gmail.com>
+Subject: Re: [gssproxy] cifs-utils, Linux cifs kernel client and gssproxy
+To:     Simo Sorce <simo@redhat.com>
+Cc:     The GSS-Proxy developers and users mailing list 
+        <gss-proxy@lists.fedorahosted.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Merged. Thanks!
+generally I would feel more comfortable using something (library or
+utility) in Samba (if needed) for additional SPNEGO support if
+something is missing (in what the kernel drivers are doing to
+encapsulate Active Directory or Samba AD krb5 tickets in SPNEGO) as
+Samba is better maintained/tested etc. than most components.  Is there
+something in Samba that could be used here instead of having a
+dependency on another project - Samba has been doing Kerberos/SPNEGO
+longer than most ...?   There are probably others (jra, Metze etc.)
+that have would know more about gssproxy vs. Samba equivalents though
+and would defer to them ...
 
---
-Best regards,
-Pavel Shilovsky
-
-=D1=81=D1=80, 16 =D0=B4=D0=B5=D0=BA. 2020 =D0=B3. =D0=B2 13:47, Jonas Witsc=
-hel <diabonas@archlinux.org>:
+On Wed, Dec 16, 2020 at 8:33 AM Simo Sorce <simo@redhat.com> wrote:
 >
-> From: Alexander Koch <mail@alexanderkoch.net>
+> Hi Michael,
+> as you say the best course of action would be for cifs.ko to move to
+> use the RPC interface we defined for knfsd (with any extensions that
+> may  be needed), and we had discussions in the past with cifs upstream
+> developers about it. But nothing really materialized.
 >
-> Make drop_call_capabilities() in cifs.upcall update the bounding capabili=
-ties
-> only if CAP_SETCAP is present.
+> If something is needed in the short term, I thjink the quickest course
+> of action is indeed to change the userspace helper to use gssapi
+> function calls, so that they can be intercepted like we do for rpc.gssd
+> (nfs client's userspace helper).
 >
-> This is an addendum to the patch recently provided in [1]. Without this
-> additional change, cifs.upcall can still fail while trying to mount a CIF=
-S
-> network share with krb5:
+> Unfortunately I do not have the cycles to work on that myself at this
+> time :-(
 >
->   kernel: CIFS: Attempting to mount //server.domain.lan/myshare
->   cifs.upcall[39484]: key description: cifs.spnego;0;0;39010000;ver=3D0x2=
-;host=3Dserver.domain.lan>
->   cifs.upcall[39484]: ver=3D2
->   cifs.upcall[39484]: host=3Dserver.domain.lan
->   cifs.upcall[39484]: ip=3D172.22.3.14
->   cifs.upcall[39484]: sec=3D1
->   cifs.upcall[39484]: uid=3D1000
->   cifs.upcall[39484]: creduid=3D1000
->   cifs.upcall[39484]: user=3Dusername
->   cifs.upcall[39484]: pid=3D39481
->   cifs.upcall[39484]: get_cachename_from_process_env: pathname=3D/proc/39=
-481/environ
->   cifs.upcall[39484]: get_cachename_from_process_env: cachename =3D FILE:=
-/tmp/.krb5cc_1000
->   cifs.upcall[39484]: drop_all_capabilities: Unable to apply capability s=
-et: Success
->   cifs.upcall[39484]: Exit status 1
+> HTH,
+> Simo.
 >
-> [1] https://marc.info/?l=3Dlinux-cifs&m=3D160595758021261
+> On Wed, 2020-12-16 at 10:01 +0000, Weiser, Michael wrote:
+> > Hello,
+> >
+> > I have a use-case for authentication of Linux cifs client mounts withou=
+t the user being present (e.g. from batch jobs) using gssproxy's impersonat=
+ion feature with Kerberos Constrained Delegation similar to how it can be d=
+one for NFS[1].
+> >
+> > My understanding is that currently neither the Linux cifs kernel client=
+ nor cifs-utils userland tools support acquiring credentials using gssproxy=
+. The former uses a custom upcall interface to talk to cifs.spnego from cif=
+s-utils. The latter then goes looking for Kerberos ticket caches using libk=
+rb5 functions, not GSSAPI, which prevents gssproxy from interacting with it=
+.[2]
+> >
+> > From what I understand, the preferred method would be to switch the Lin=
+ux kernel client upcall to the RPC protocol defined by gssproxy[3] (as has =
+been done for the Linux kernel NFS server already replacing rpc.svcgssd[4])=
+. The kernel could then, at least optionally, talk to gssproxy directly to =
+try and obtain credentials.
+> >
+> > Failing that, cifs-utils' cifs.spnego could be switched to GSSAPI so th=
+at gssproxy's interposer plugin could intercept GSSAPI calls and provide th=
+em with the required credentials (similar to the NFS client rpc.gssd[5]).
+> >
+> > Assuming my understanding is correct so far:
+> >
+> > Is anyone doing any work on this and could use some help (testing, codi=
+ng)?
+> > What would be expected complexity and possible roadblocks when trying t=
+o make a start at implementing this?
+> > Or is the idea moot due to some constraint or recent development I'm no=
+t aware of?
+> >
+> > I have found a recent discussion of the topic on linux-cifs[6] which pr=
+ovided no definite answer though.
+> >
+> > As a crude attempt at an explicit userspace workaround I tried but fail=
+ed to trick smbclient into initialising a ticket cache using gssproxy for c=
+ifs.spnego to find later on.
+> > Is this something that could be implemented without too much redundant =
+effort (or should already work, perhaps using a different tool)?
+> >
+> > [1] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#user-imper=
+sonation-via-constrained-delegation
+> > [2] https://pagure.io/gssproxy/issue/56
+> > [3] https://github.com/gssapi/gssproxy/blob/main/docs/ProtocolDocumenta=
+tion.md
+> > [4] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#nfs-server
+> > [5] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#nfs-client
+> > [6] https://www.spinics.net/lists/linux-cifs/msg20182.html
+> > --
+> > Thanks,
+> > Michael
+> > _______________________________________________
+> > gss-proxy mailing list -- gss-proxy@lists.fedorahosted.org
+> > To unsubscribe send an email to gss-proxy-leave@lists.fedorahosted.org
+> > Fedora Code of Conduct: https://docs.fedoraproject.org/en-US/project/co=
+de-of-conduct/
+> > List Guidelines: https://fedoraproject.org/wiki/Mailing_list_guidelines
+> > List Archives: https://lists.fedorahosted.org/archives/list/gss-proxy@l=
+ists.fedorahosted.org
 >
-> Signed-off-by: Alexander Koch <mail@alexanderkoch.net>
-> Signed-off-by: Jonas Witschel <diabonas@archlinux.org>
-> ---
->  cifs.upcall.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/cifs.upcall.c b/cifs.upcall.c
-> index 1559434..b62ab50 100644
-> --- a/cifs.upcall.c
-> +++ b/cifs.upcall.c
-> @@ -115,8 +115,13 @@ trim_capabilities(bool need_environ)
->  static int
->  drop_all_capabilities(void)
->  {
-> +       capng_select_t set =3D CAPNG_SELECT_CAPS;
-> +
->         capng_clear(CAPNG_SELECT_BOTH);
-> -       if (capng_apply(CAPNG_SELECT_BOTH)) {
-> +       if (capng_have_capability(CAPNG_EFFECTIVE, CAP_SETPCAP)) {
-> +               set =3D CAPNG_SELECT_BOTH;
-> +       }
-> +       if (capng_apply(set)) {
->                 syslog(LOG_ERR, "%s: Unable to apply capability set: %m\n=
-", __func__);
->                 return 1;
->         }
 > --
-> 2.29.2
+> Simo Sorce
+> RHEL Crypto Team
+> Red Hat, Inc
 >
+>
+>
+>
+
+
+--=20
+Thanks,
+
+Steve
