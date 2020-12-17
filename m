@@ -2,193 +2,282 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 748B6C4361B
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Dec 2020 20:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 574B9C4361B
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Dec 2020 21:24:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41E5723A31
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Dec 2020 20:58:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A3F92360D
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Dec 2020 21:24:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731462AbgLQU65 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Dec 2020 15:58:57 -0500
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:57785 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726917AbgLQU65 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Dec 2020 15:58:57 -0500
+        id S1727769AbgLQVXx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Dec 2020 16:23:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43902 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726689AbgLQVXx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Dec 2020 16:23:53 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08F3C0617A7
+        for <linux-cifs@vger.kernel.org>; Thu, 17 Dec 2020 13:23:12 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id o13so93945lfr.3
+        for <linux-cifs@vger.kernel.org>; Thu, 17 Dec 2020 13:23:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1608238737; x=1639774737;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=YmPKlh6Z7zQjy5YM3miO0QALbeMXWiJWpI/BK+viLiI=;
-  b=s0m6L6RoORwRO4oT/Jl9Y0fI1eexuumxbri+BrV9iK2aaVuvduXV2j+I
-   ujPrNjDimhgoFIjNROAnd+UoKLe9aD4XRBIHty9aIwd0kw0AHsMKPQaYS
-   mFNDILz1LE1jGFuXjRFybDT8UxVn0dpd7CvZuveSgKHQEf4NLM8OlUtot
-   E=;
-X-IronPort-AV: E=Sophos;i="5.78,428,1599523200"; 
-   d="scan'208";a="104011435"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO email-inbound-relay-1a-e34f1ddc.us-east-1.amazon.com) ([10.47.23.38])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 17 Dec 2020 20:58:16 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-1a-e34f1ddc.us-east-1.amazon.com (Postfix) with ESMTPS id 89702A1DA7;
-        Thu, 17 Dec 2020 20:58:14 +0000 (UTC)
-Received: from EX13D01UWB004.ant.amazon.com (10.43.161.157) by
- EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 17 Dec 2020 20:58:13 +0000
-Received: from EX13MTAUWB001.ant.amazon.com (10.43.161.207) by
- EX13d01UWB004.ant.amazon.com (10.43.161.157) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 17 Dec 2020 20:58:13 +0000
-Received: from dev-dsk-pboris-1f-f9682a47.us-east-1.amazon.com (10.1.57.236)
- by mail-relay.amazon.com (10.43.161.249) with Microsoft SMTP Server id
- 15.0.1497.2 via Frontend Transport; Thu, 17 Dec 2020 20:58:13 +0000
-Received: by dev-dsk-pboris-1f-f9682a47.us-east-1.amazon.com (Postfix, from userid 5360108)
-        id 4C8C3A8C36; Thu, 17 Dec 2020 20:58:12 +0000 (UTC)
-From:   Boris Protopopov <pboris@amazon.com>
-To:     <pboris@amazon.com>
-CC:     <sfrench@samba.org>, <linux-cifs@vger.kernel.org>,
-        <samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
-        <samjonas@amazon.com>
-Subject: [PATCH 2/2] Add SMB 2 support for getting and setting SACLs
-Date:   Thu, 17 Dec 2020 20:58:08 +0000
-Message-ID: <20201217205808.14756-1-pboris@amazon.com>
-X-Mailer: git-send-email 2.15.3.AMZN
-In-Reply-To: <20201027204226.26906-1-pboris@amazon.com>
-References: <20201027204226.26906-1-pboris@amazon.com>
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=DmMUK+QXW2KkulLakiYCBygpvxxHlBl3K/yPf/mEUco=;
+        b=mco18n5AYK1sb5Xve1KIvIGcexD0C7yOcOIe+35bWPRl4+XFO3x+DFzxfvj6k2Zs20
+         7jWKZ3B/5dMcQUKeINQizoWgzlUHkTxH/Dq2Hn6V6p2E7hrz5pEZRCRYW8YDFvs9zsbv
+         p/vdnbdiGz8XHK3pY1c2nVvPmzQDAEPtzutrwG1m/zzK62WWkVeKg9aTUhcg8PUqlCT/
+         z8oDrhDDAKGHPqfS7GWKMzESQdm0H8KQ4V4fOyVBYXdkHLxApY7tGgcTVPeujqvGrQok
+         dXo7UPwiLLJuq938YdLi78zoPDtf3FDu/J2+dHnwtqwKq+C+gU75Ci6VMkh6BmgfZqU7
+         /PUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=DmMUK+QXW2KkulLakiYCBygpvxxHlBl3K/yPf/mEUco=;
+        b=lRPlEG+j0MgU9WN7twULggSVFasjQ5otv15xrgBanZptmvuQzVin3iOmEQUVaEElZT
+         nA74t7ra5l5xUAk1Pr+81WROTciRXde2K39IwWp40PrKle15PAxoT4IE8ilH6TuPe+x3
+         Rgw2m2qWwG1Sxv4zAGGgAibnDuqfTO+k352F0N/CiMB5dVssV+7HNjDtmNXGNLdlzhrZ
+         aZXnC+7z8DMLj6cLelt9rkNs/N9zh/VH3PxI2U6kZjMiRA7G/JbMsJA3y1lz36sl8WZZ
+         ixFzn6YQ0eF8IHJyA4fs41rikLLfFD9ax/YdP23HDN4GPAxN5wIkYB7rmPVVFanH7CjK
+         eyHw==
+X-Gm-Message-State: AOAM5310LGJ6Fc/WGw7n3gyBpqgld2bu6M/lP3C1a8EjseOdkHLbw8/M
+        JPWwZZMRNL0IGFLnkSw2obTkU8lFvUnLyNuhvXk=
+X-Google-Smtp-Source: ABdhPJxHS68aQOlMMU4X9sPaxufYeQT8nFGwsvwuXJpih1f7ghDIdvYYY8ScyeMrPZAb/s6B/c/e+odhA8NyW9+SVJU=
+X-Received: by 2002:a19:f11e:: with SMTP id p30mr244444lfh.395.1608240191074;
+ Thu, 17 Dec 2020 13:23:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <2e241ceaece6485289b1cddb84ec77ca@atos.net> <04d24a21a7a462b3dc316959c3a3b1c8be8caac3.camel@redhat.com>
+ <CAH2r5mt9r6nWop_ekbe1CsinztUiGhP2-bxWFkRqHXOP=MXcVQ@mail.gmail.com> <c49c0a18c228e6aa43dbb2cbab7e0a266d1c0371.camel@redhat.com>
+In-Reply-To: <c49c0a18c228e6aa43dbb2cbab7e0a266d1c0371.camel@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 17 Dec 2020 15:22:59 -0600
+Message-ID: <CAH2r5muOOL-MWojyKK55vcnKfS9w5N-cLGCNw0v04JDVrGsPTQ@mail.gmail.com>
+Subject: Re: [gssproxy] cifs-utils, Linux cifs kernel client and gssproxy
+To:     Simo Sorce <simo@redhat.com>
+Cc:     The GSS-Proxy developers and users mailing list 
+        <gss-proxy@lists.fedorahosted.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fix passing of the additional security info via version
-operations. Force new open when getting SACL and avoid
-reuse of files that were previously open without
-sufficient privileges to access SACLs.
+A couple of more specific questions:
 
-Signed-off-by: Boris Protopopov <pboris@amazon.com>
----
+1) Do you have a link to how the various user space tools that would
+often need to use kerberos (e.g. "smbclient" and "smbcacls") integrate
+with this so I could see some examples of how they tie into your
+proxy?
 
-After further testing, I found that the security info was not being
-passed correctly to opts->get_acl and opts->get_acl_by_fid(). Also,
-it turned out that files open for read were being used to fetch
-SACL without proper privileges. This patch fixes these issues, and
-is meant to be squashed (comments dropped) with the earlier patch.
+2) Does it use the kernel keyring to store credentials or rely on the
+traditional kerberos key cache?  Presumably there continues to be a
+drive to keep as many credentials as possible in the kernel for
+maximal security in this very challenging recent security landscape.
 
-fs/cifs/cifsacl.c | 10 +++++-----
- fs/cifs/smb2ops.c |  4 ++--
- fs/cifs/smb2pdu.c |  4 +++-
- fs/cifs/xattr.c   | 10 ++++------
- 4 files changed, 14 insertions(+), 14 deletions(-)
+3) Besides Kerberos and NTLMSSP what other auth protocols do you
+support in gssproxy (e.g. PKU2U is one I see commonly in the list of
+SPNEGO OIDs during auth).   There has been a push recently to move
+away from NTLMv2/NTLMSSP (which is often encapsulated in SPNEGO) to
+stronger 'peer to peer' protocols.   Macs IIRC have peer to peer
+Kerberos and presumably PKU2U (see
+https://tools.ietf.org/id/draft-zhu-pku2u-07.html) is reasonably
+common in Windows.    It would be useful if you already have support
+for PKU2U in your libraries or know how to tie them in so we would not
+have to rely on NTLMSSP/NTLMv2 for peer to peer (systems that are
+joined to a domain like Samba AD or Active Directory or AAD) and could
+improve security in non domain joined cases.
 
-diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 353394d9ada8..6baa121952ce 100644
---- a/fs/cifs/cifsacl.c
-+++ b/fs/cifs/cifsacl.c
-@@ -1245,7 +1245,7 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
- 	int rc = 0;
- 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
- 	struct smb_version_operations *ops;
--	const u32 unused = 0;
-+	const u32 info = 0;
- 
- 	cifs_dbg(NOISY, "converting ACL to mode for %s\n", path);
- 
-@@ -1255,9 +1255,9 @@ cifs_acl_to_fattr(struct cifs_sb_info *cifs_sb, struct cifs_fattr *fattr,
- 	ops = tlink_tcon(tlink)->ses->server->ops;
- 
- 	if (pfid && (ops->get_acl_by_fid))
--		pntsd = ops->get_acl_by_fid(cifs_sb, pfid, &acllen, unused);
-+		pntsd = ops->get_acl_by_fid(cifs_sb, pfid, &acllen, info);
- 	else if (ops->get_acl)
--		pntsd = ops->get_acl(cifs_sb, inode, path, &acllen, unused);
-+		pntsd = ops->get_acl(cifs_sb, inode, path, &acllen, info);
- 	else {
- 		cifs_put_tlink(tlink);
- 		return -EOPNOTSUPP;
-@@ -1295,7 +1295,7 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 nmode,
- 	struct tcon_link *tlink = cifs_sb_tlink(cifs_sb);
- 	struct smb_version_operations *ops;
- 	bool mode_from_sid, id_from_sid;
--	const u32 unused = 0;
-+	const u32 info = 0;
- 
- 	if (IS_ERR(tlink))
- 		return PTR_ERR(tlink);
-@@ -1311,7 +1311,7 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 nmode,
- 		return -EOPNOTSUPP;
- 	}
- 
--	pntsd = ops->get_acl(cifs_sb, inode, path, &secdesclen, unused);
-+	pntsd = ops->get_acl(cifs_sb, inode, path, &secdesclen, info);
- 	if (IS_ERR(pntsd)) {
- 		rc = PTR_ERR(pntsd);
- 		cifs_dbg(VFS, "%s: error %d getting sec desc\n", __func__, rc);
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index d28a29728fb1..f5e198860c16 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -3315,9 +3315,9 @@ get_smb2_acl(struct cifs_sb_info *cifs_sb,
- 	struct cifs_ntsd *pntsd = NULL;
- 	struct cifsFileInfo *open_file = NULL;
- 
--	if (inode)
-+	if (inode && !(info & SACL_SECINFO))
- 		open_file = find_readable_file(CIFS_I(inode), true);
--	if (!open_file)
-+	if (!open_file || (info & SACL_SECINFO))
- 		return get_smb2_acl_by_path(cifs_sb, path, pacllen, info);
- 
- 	pntsd = get_smb2_acl_by_fid(cifs_sb, &open_file->fid, pacllen, info);
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 0aeb63694306..b207e1eb6803 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3472,8 +3472,10 @@ SMB311_posix_query_info(const unsigned int xid, struct cifs_tcon *tcon,
- int
- SMB2_query_acl(const unsigned int xid, struct cifs_tcon *tcon,
- 	       u64 persistent_fid, u64 volatile_fid,
--	       void **data, u32 *plen, u32 additional_info)
-+	       void **data, u32 *plen, u32 extra_info)
- {
-+	__u32 additional_info = OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO |
-+				extra_info;
- 	*plen = 0;
- 
- 	return query_info(xid, tcon, persistent_fid, volatile_fid,
-diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
-index 9318a2acf4ee..6b658a1172ef 100644
---- a/fs/cifs/xattr.c
-+++ b/fs/cifs/xattr.c
-@@ -340,21 +340,19 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
- 		 * fetch owner, DACL, and SACL if asked for full descriptor,
- 		 * fetch owner and DACL otherwise
- 		 */
--		u32 acllen, additional_info = 0;
-+		u32 acllen, extra_info;
- 		struct cifs_ntsd *pacl;
- 
- 		if (pTcon->ses->server->ops->get_acl == NULL)
- 			goto out; /* rc already EOPNOTSUPP */
- 
- 		if (handler->flags == XATTR_CIFS_NTSD_FULL) {
--			additional_info = OWNER_SECINFO | GROUP_SECINFO |
--				DACL_SECINFO | SACL_SECINFO;
-+			extra_info = SACL_SECINFO;
- 		} else {
--			additional_info = OWNER_SECINFO | GROUP_SECINFO |
--				DACL_SECINFO;
-+			extra_info = 0;
- 		}
- 		pacl = pTcon->ses->server->ops->get_acl(cifs_sb,
--				inode, full_path, &acllen, additional_info);
-+				inode, full_path, &acllen, extra_info);
- 		if (IS_ERR(pacl)) {
- 			rc = PTR_ERR(pacl);
- 			cifs_dbg(VFS, "%s: error %zd getting sec desc\n",
--- 
-2.18.4
+4) Does gssproxy integrate in any way with Samba server?  There would
+be strong interest in having easy ways to plug in additional security
+protocols transparently into the client (cifs.ko and user space tools
+like smbclient and smbcacls and Ronnie's libsmb3 etc.) and servers
+(Samba and ksmbd) - so e.g. if O_AUTH became useful for file sharing,
+could gssproxy help transparently enable this on the client and server
+(since the SPNEGO flows, at least for SMB3 are fairly opaque and the
+client and server don't really care what auth is negotiated as long as
+the underlying libraries send the right list of auth protocols and
+negotiate the correct 'preferred' one that was requested on mount or
+in the /etc config files).
 
+On Thu, Dec 17, 2020 at 7:39 AM Simo Sorce <simo@redhat.com> wrote:
+>
+> Hi Steve,
+>
+> GSSAPI and krb5 as implemented in system krb5 libraries exists from
+> longer than Samba has implemented those capabilities, I do not think it
+> make sense to reason along those lines.
+>
+> GSS-Proxy has been built with a protocol to talk from the kernel that
+> resolved a number of issues for knfsd (eg big packet sizes when a MS-
+> PAC is present).
+>
+> And Samba uses internally exactly the same krb5 mechanism as it defers
+> to the kerberos libraries as well.
+>
+> Additionally GSS-Proxy can be very easily extended to also do NTLMSSP
+> using the same interface as I have built the gssntlmssp long ago from
+> the MS spec, and is probably the most correct NTLMSSP implementation
+> you can find around.
+>
+> Gssntlmssp also has a Winbind backend so you get automaticaly access to
+> whatever cached credentials Winbindd has for users as a bonus (although
+> the integration can be improved there), yet you *can* use it w/o
+> Winbindd just fine providing a credential file (smbpasswd format
+> compatible).
+>
+> GSS-Proxy is already integrated in distributions because it is used by
+> knfsd, and can be as easily used by cifsd, and you *should* really use
+> it there, so we can have a single, consistent, maintained, mechanism
+> for server side GSS authentication, and not have to repeat and reinvent
+> kernel to userspace mechanisms.
+>
+> And if you add it for cifsd you have yet another reason to do it for
+> cifs.ko as well.
+>
+> Finally the GSS-Proxy mechanism is namespace compatible, so you also
+> get the ability to define different auth daemons per different
+> containers, no need to invent new mechanisms for that or change yet
+> again protocols/userspace to obtain container capabilities.
+>
+> For the client we'll need to add some XDR parsing functions in kernel,
+> they were omitted from my original patches because there was no client
+> side kernel consumer back then, but it i an easy, mechanical change.
+>
+> HTH,
+> Simo.
+>
+> On Wed, 2020-12-16 at 16:43 -0600, Steve French wrote:
+> > generally I would feel more comfortable using something (library or
+> > utility) in Samba (if needed) for additional SPNEGO support if
+> > something is missing (in what the kernel drivers are doing to
+> > encapsulate Active Directory or Samba AD krb5 tickets in SPNEGO) as
+> > Samba is better maintained/tested etc. than most components.  Is there
+> > something in Samba that could be used here instead of having a
+> > dependency on another project - Samba has been doing Kerberos/SPNEGO
+> > longer than most ...?   There are probably others (jra, Metze etc.)
+> > that have would know more about gssproxy vs. Samba equivalents though
+> > and would defer to them ...
+> >
+> > On Wed, Dec 16, 2020 at 8:33 AM Simo Sorce <simo@redhat.com> wrote:
+> > > Hi Michael,
+> > > as you say the best course of action would be for cifs.ko to move to
+> > > use the RPC interface we defined for knfsd (with any extensions that
+> > > may  be needed), and we had discussions in the past with cifs upstrea=
+m
+> > > developers about it. But nothing really materialized.
+> > >
+> > > If something is needed in the short term, I thjink the quickest cours=
+e
+> > > of action is indeed to change the userspace helper to use gssapi
+> > > function calls, so that they can be intercepted like we do for rpc.gs=
+sd
+> > > (nfs client's userspace helper).
+> > >
+> > > Unfortunately I do not have the cycles to work on that myself at this
+> > > time :-(
+> > >
+> > > HTH,
+> > > Simo.
+> > >
+> > > On Wed, 2020-12-16 at 10:01 +0000, Weiser, Michael wrote:
+> > > > Hello,
+> > > >
+> > > > I have a use-case for authentication of Linux cifs client mounts wi=
+thout the user being present (e.g. from batch jobs) using gssproxy's impers=
+onation feature with Kerberos Constrained Delegation similar to how it can =
+be done for NFS[1].
+> > > >
+> > > > My understanding is that currently neither the Linux cifs kernel cl=
+ient nor cifs-utils userland tools support acquiring credentials using gssp=
+roxy. The former uses a custom upcall interface to talk to cifs.spnego from=
+ cifs-utils. The latter then goes looking for Kerberos ticket caches using =
+libkrb5 functions, not GSSAPI, which prevents gssproxy from interacting wit=
+h it.[2]
+> > > >
+> > > > From what I understand, the preferred method would be to switch the=
+ Linux kernel client upcall to the RPC protocol defined by gssproxy[3] (as =
+has been done for the Linux kernel NFS server already replacing rpc.svcgssd=
+[4]). The kernel could then, at least optionally, talk to gssproxy directly=
+ to try and obtain credentials.
+> > > >
+> > > > Failing that, cifs-utils' cifs.spnego could be switched to GSSAPI s=
+o that gssproxy's interposer plugin could intercept GSSAPI calls and provid=
+e them with the required credentials (similar to the NFS client rpc.gssd[5]=
+).
+> > > >
+> > > > Assuming my understanding is correct so far:
+> > > >
+> > > > Is anyone doing any work on this and could use some help (testing, =
+coding)?
+> > > > What would be expected complexity and possible roadblocks when tryi=
+ng to make a start at implementing this?
+> > > > Or is the idea moot due to some constraint or recent development I'=
+m not aware of?
+> > > >
+> > > > I have found a recent discussion of the topic on linux-cifs[6] whic=
+h provided no definite answer though.
+> > > >
+> > > > As a crude attempt at an explicit userspace workaround I tried but =
+failed to trick smbclient into initialising a ticket cache using gssproxy f=
+or cifs.spnego to find later on.
+> > > > Is this something that could be implemented without too much redund=
+ant effort (or should already work, perhaps using a different tool)?
+> > > >
+> > > > [1] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#user-i=
+mpersonation-via-constrained-delegation
+> > > > [2] https://pagure.io/gssproxy/issue/56
+> > > > [3] https://github.com/gssapi/gssproxy/blob/main/docs/ProtocolDocum=
+entation.md
+> > > > [4] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#nfs-se=
+rver
+> > > > [5] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#nfs-cl=
+ient
+> > > > [6] https://www.spinics.net/lists/linux-cifs/msg20182.html
+> > > > --
+> > > > Thanks,
+> > > > Michael
+> > > > _______________________________________________
+> > > > gss-proxy mailing list -- gss-proxy@lists.fedorahosted.org
+> > > > To unsubscribe send an email to gss-proxy-leave@lists.fedorahosted.=
+org
+> > > > Fedora Code of Conduct: https://docs.fedoraproject.org/en-US/projec=
+t/code-of-conduct/
+> > > > List Guidelines: https://fedoraproject.org/wiki/Mailing_list_guidel=
+ines
+> > > > List Archives: https://lists.fedorahosted.org/archives/list/gss-pro=
+xy@lists.fedorahosted.org
+> > >
+> > > --
+> > > Simo Sorce
+> > > RHEL Crypto Team
+> > > Red Hat, Inc
+> > >
+> > >
+> > >
+> > >
+> >
+> >
+>
+> --
+> Simo Sorce
+> RHEL Crypto Team
+> Red Hat, Inc
+>
+>
+>
+>
+
+
+--=20
+Thanks,
+
+Steve
