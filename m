@@ -2,132 +2,197 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,BIGNUM_EMAILS,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D77C4361B
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Dec 2020 12:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6660FC4361B
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Dec 2020 13:41:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48D77206D5
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Dec 2020 12:22:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20D3F238EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Dec 2020 13:41:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727260AbgLQMWk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Dec 2020 07:22:40 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:50618 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727647AbgLQMWk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Dec 2020 07:22:40 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BHCEkDJ050327;
-        Thu, 17 Dec 2020 12:21:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=os7HSh3TrqMQhL4Kqdceu+f1OMhxMalIlzlxIlQ+z/I=;
- b=lasrow5vPFMzvpoZ3Do7G5ctpC2xQ+Go0epII02FukAso0pboa2p1kXN/93UFnlspblC
- YXw4fTKl/Ep5cG03Rf+gRXUH5oWSjNUjw1bDQad4FHAmWG4vC8D5b4yNMj5p7vOehPVK
- KR4HgTgg3VcnoiVP6P2JhG1WD5WerQiEOIBs8/YlGXVCZ0DxlH+rNhJr9h+2YTqqA686
- e9KxfU9sHGzjSU6aq0Ke0nu3hfOuBA1L+aDAM6v5yFGCUwTZtsfSyTTjD+XekREsRIb+
- oMGpS+wArZTD/6SIu8xir8sOaF4lT4Mfq/1WA8uG7/06H1drtG2GavzfdPz95wEaKI2V Lw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 35cn9rn45w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 17 Dec 2020 12:21:56 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BHCAHiX001523;
-        Thu, 17 Dec 2020 12:21:56 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 35d7t095df-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 17 Dec 2020 12:21:56 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0BHCLrIx007803;
-        Thu, 17 Dec 2020 12:21:55 GMT
-Received: from mwanda (/102.36.221.92)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 17 Dec 2020 04:21:53 -0800
-Date:   Thu, 17 Dec 2020 15:21:48 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     scabrero@suse.de
-Cc:     linux-cifs@vger.kernel.org
-Subject: [bug report] cifs: Simplify reconnect code when dfs upcall is enabled
-Message-ID: <X9tNXBJunTCYCoSw@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9837 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0
- mlxlogscore=999 spamscore=0 mlxscore=0 suspectscore=0 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012170089
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9837 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- impostorscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
- malwarescore=0 priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012170089
+        id S1727368AbgLQNlJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Dec 2020 08:41:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34012 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727354AbgLQNlJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 17 Dec 2020 08:41:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608212382;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8wlz3/0iQnzzkXl44dSRZEBGu1Ze6Jd85KeRi2ZTwsI=;
+        b=J5YQUTp090WKzFdpm9FJOadmnIIE8tI3WrcJrbN2JkZIZVuGSaFPHqAVJp7bogWtNSK5sL
+        Bejhvt01qMfXdpPCJMIFRR1F7QMvBuyTWZ3fvv3/o3Ck0JeUHczsOvFPgVlmAwZqrsJiUt
+        YriXoZE2TkmtshcRxhYY4jIbakIEmTo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-bc2x_AJMNyuf3drEAx29Tg-1; Thu, 17 Dec 2020 08:39:39 -0500
+X-MC-Unique: bc2x_AJMNyuf3drEAx29Tg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 735FD800D55;
+        Thu, 17 Dec 2020 13:39:38 +0000 (UTC)
+Received: from ovpn-112-247.phx2.redhat.com (ovpn-112-247.phx2.redhat.com [10.3.112.247])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EB5DE60BE5;
+        Thu, 17 Dec 2020 13:39:37 +0000 (UTC)
+Message-ID: <c49c0a18c228e6aa43dbb2cbab7e0a266d1c0371.camel@redhat.com>
+Subject: Re: [gssproxy] cifs-utils, Linux cifs kernel client and gssproxy
+From:   Simo Sorce <simo@redhat.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     The GSS-Proxy developers and users mailing list 
+        <gss-proxy@lists.fedorahosted.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>
+Date:   Thu, 17 Dec 2020 08:39:36 -0500
+In-Reply-To: <CAH2r5mt9r6nWop_ekbe1CsinztUiGhP2-bxWFkRqHXOP=MXcVQ@mail.gmail.com>
+References: <2e241ceaece6485289b1cddb84ec77ca@atos.net>
+         <04d24a21a7a462b3dc316959c3a3b1c8be8caac3.camel@redhat.com>
+         <CAH2r5mt9r6nWop_ekbe1CsinztUiGhP2-bxWFkRqHXOP=MXcVQ@mail.gmail.com>
+Organization: Red Hat, Inc.
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello Samuel Cabrero,
+Hi Steve,
 
-The patch 7d6535b72042: "cifs: Simplify reconnect code when dfs
-upcall is enabled" from Nov 30, 2020, leads to the following static
-checker warning:
+GSSAPI and krb5 as implemented in system krb5 libraries exists from
+longer than Samba has implemented those capabilities, I do not think it
+make sense to reason along those lines.
 
-	fs/cifs/connect.c:160 reconn_set_next_dfs_target()
-	error: 'server->hostname' dereferencing possible ERR_PTR()
+GSS-Proxy has been built with a protocol to talk from the kernel that
+resolved a number of issues for knfsd (eg big packet sizes when a MS-
+PAC is present).
 
-fs/cifs/connect.c
-   128  static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
-   129                                         struct cifs_sb_info *cifs_sb,
-   130                                         struct dfs_cache_tgt_list *tgt_list,
-   131                                         struct dfs_cache_tgt_iterator **tgt_it)
-   132  {
-   133          const char *name;
-   134          int rc;
-   135  
-   136          if (!cifs_sb || !cifs_sb->origin_fullpath)
-   137                  return;
-   138  
-   139          if (!*tgt_it) {
-   140                  *tgt_it = dfs_cache_get_tgt_iterator(tgt_list);
-   141          } else {
-   142                  *tgt_it = dfs_cache_get_next_tgt(tgt_list, *tgt_it);
-   143                  if (!*tgt_it)
-   144                          *tgt_it = dfs_cache_get_tgt_iterator(tgt_list);
-   145          }
-   146  
-   147          cifs_dbg(FYI, "%s: UNC: %s\n", __func__, cifs_sb->origin_fullpath);
-   148  
-   149          name = dfs_cache_get_tgt_name(*tgt_it);
-   150  
-   151          kfree(server->hostname);
-   152  
-   153          server->hostname = extract_hostname(name);
-   154          if (IS_ERR(server->hostname)) {
-                           ^^^^^^^^^^^^^^^^
+And Samba uses internally exactly the same krb5 mechanism as it defers
+to the kerberos libraries as well.
 
-   155                  cifs_dbg(FYI,
-   156                           "%s: failed to extract hostname from target: %ld\n",
-   157                           __func__, PTR_ERR(server->hostname));
+Additionally GSS-Proxy can be very easily extended to also do NTLMSSP
+using the same interface as I have built the gssntlmssp long ago from
+the MS spec, and is probably the most correct NTLMSSP implementation
+you can find around.
 
-This should probably just return here.  I don't totally understand why
-this is a void function...
+Gssntlmssp also has a Winbind backend so you get automaticaly access to
+whatever cached credentials Winbindd has for users as a bonus (although
+the integration can be improved there), yet you *can* use it w/o
+Winbindd just fine providing a credential file (smbpasswd format
+compatible).
 
-   158          }
-   159  
-   160          rc = reconn_set_ipaddr_from_hostname(server);
-                                                     ^^^^^^
-"server->hostname" is dereferenced inside the function.
+GSS-Proxy is already integrated in distributions because it is used by
+knfsd, and can be as easily used by cifsd, and you *should* really use
+it there, so we can have a single, consistent, maintained, mechanism
+for server side GSS authentication, and not have to repeat and reinvent
+kernel to userspace mechanisms.
 
-   161          if (rc) {
-   162                  cifs_dbg(FYI, "%s: failed to resolve hostname: %d\n",
-   163                           __func__, rc);
-   164          }
-   165  }
+And if you add it for cifsd you have yet another reason to do it for
+cifs.ko as well.
 
-regards,
-dan carpenter
+Finally the GSS-Proxy mechanism is namespace compatible, so you also
+get the ability to define different auth daemons per different
+containers, no need to invent new mechanisms for that or change yet
+again protocols/userspace to obtain container capabilities.
+
+For the client we'll need to add some XDR parsing functions in kernel,
+they were omitted from my original patches because there was no client
+side kernel consumer back then, but it i an easy, mechanical change.
+
+HTH,
+Simo.
+
+On Wed, 2020-12-16 at 16:43 -0600, Steve French wrote:
+> generally I would feel more comfortable using something (library or
+> utility) in Samba (if needed) for additional SPNEGO support if
+> something is missing (in what the kernel drivers are doing to
+> encapsulate Active Directory or Samba AD krb5 tickets in SPNEGO) as
+> Samba is better maintained/tested etc. than most components.  Is there
+> something in Samba that could be used here instead of having a
+> dependency on another project - Samba has been doing Kerberos/SPNEGO
+> longer than most ...?   There are probably others (jra, Metze etc.)
+> that have would know more about gssproxy vs. Samba equivalents though
+> and would defer to them ...
+> 
+> On Wed, Dec 16, 2020 at 8:33 AM Simo Sorce <simo@redhat.com> wrote:
+> > Hi Michael,
+> > as you say the best course of action would be for cifs.ko to move to
+> > use the RPC interface we defined for knfsd (with any extensions that
+> > may  be needed), and we had discussions in the past with cifs upstream
+> > developers about it. But nothing really materialized.
+> > 
+> > If something is needed in the short term, I thjink the quickest course
+> > of action is indeed to change the userspace helper to use gssapi
+> > function calls, so that they can be intercepted like we do for rpc.gssd
+> > (nfs client's userspace helper).
+> > 
+> > Unfortunately I do not have the cycles to work on that myself at this
+> > time :-(
+> > 
+> > HTH,
+> > Simo.
+> > 
+> > On Wed, 2020-12-16 at 10:01 +0000, Weiser, Michael wrote:
+> > > Hello,
+> > > 
+> > > I have a use-case for authentication of Linux cifs client mounts without the user being present (e.g. from batch jobs) using gssproxy's impersonation feature with Kerberos Constrained Delegation similar to how it can be done for NFS[1].
+> > > 
+> > > My understanding is that currently neither the Linux cifs kernel client nor cifs-utils userland tools support acquiring credentials using gssproxy. The former uses a custom upcall interface to talk to cifs.spnego from cifs-utils. The latter then goes looking for Kerberos ticket caches using libkrb5 functions, not GSSAPI, which prevents gssproxy from interacting with it.[2]
+> > > 
+> > > From what I understand, the preferred method would be to switch the Linux kernel client upcall to the RPC protocol defined by gssproxy[3] (as has been done for the Linux kernel NFS server already replacing rpc.svcgssd[4]). The kernel could then, at least optionally, talk to gssproxy directly to try and obtain credentials.
+> > > 
+> > > Failing that, cifs-utils' cifs.spnego could be switched to GSSAPI so that gssproxy's interposer plugin could intercept GSSAPI calls and provide them with the required credentials (similar to the NFS client rpc.gssd[5]).
+> > > 
+> > > Assuming my understanding is correct so far:
+> > > 
+> > > Is anyone doing any work on this and could use some help (testing, coding)?
+> > > What would be expected complexity and possible roadblocks when trying to make a start at implementing this?
+> > > Or is the idea moot due to some constraint or recent development I'm not aware of?
+> > > 
+> > > I have found a recent discussion of the topic on linux-cifs[6] which provided no definite answer though.
+> > > 
+> > > As a crude attempt at an explicit userspace workaround I tried but failed to trick smbclient into initialising a ticket cache using gssproxy for cifs.spnego to find later on.
+> > > Is this something that could be implemented without too much redundant effort (or should already work, perhaps using a different tool)?
+> > > 
+> > > [1] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#user-impersonation-via-constrained-delegation
+> > > [2] https://pagure.io/gssproxy/issue/56
+> > > [3] https://github.com/gssapi/gssproxy/blob/main/docs/ProtocolDocumentation.md
+> > > [4] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#nfs-server
+> > > [5] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#nfs-client
+> > > [6] https://www.spinics.net/lists/linux-cifs/msg20182.html
+> > > --
+> > > Thanks,
+> > > Michael
+> > > _______________________________________________
+> > > gss-proxy mailing list -- gss-proxy@lists.fedorahosted.org
+> > > To unsubscribe send an email to gss-proxy-leave@lists.fedorahosted.org
+> > > Fedora Code of Conduct: https://docs.fedoraproject.org/en-US/project/code-of-conduct/
+> > > List Guidelines: https://fedoraproject.org/wiki/Mailing_list_guidelines
+> > > List Archives: https://lists.fedorahosted.org/archives/list/gss-proxy@lists.fedorahosted.org
+> > 
+> > --
+> > Simo Sorce
+> > RHEL Crypto Team
+> > Red Hat, Inc
+> > 
+> > 
+> > 
+> > 
+> 
+> 
+
+-- 
+Simo Sorce
+RHEL Crypto Team
+Red Hat, Inc
+
+
+
+
