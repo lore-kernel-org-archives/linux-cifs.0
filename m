@@ -2,98 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D79C2BBD4
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Dec 2020 06:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 391A5C4361B
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Dec 2020 09:31:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EFC1123A62
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Dec 2020 06:05:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E723823A7B
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Dec 2020 09:31:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731527AbgLRGFL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Dec 2020 01:05:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39088 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726521AbgLRGFK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Dec 2020 01:05:10 -0500
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BD3CC0617A7;
-        Thu, 17 Dec 2020 22:04:30 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id 23so2457418lfg.10;
-        Thu, 17 Dec 2020 22:04:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XRqPmQD3TzPPUKo5nQdR6sJALqfnUOhMjLgcKy+rsBY=;
-        b=lmBdVFzPLi4TZUNiJyUJFDl1Rv4QKckjC3DV2nXeBiYA3tPrNbtJzOQ8WAJp7B15Xo
-         9m7F7LceC5st3Wcz9IScozKbYJ6Gce0gvppclSrdq4hJNTCSncq2KueRMZkAN1Y4saJN
-         NgVRaYoHaV//DWENvJKP8MNPjbtzYAxONM8MHt72NlPktJUOyh/OjgHwHQcJh69R2x7q
-         AQFTT4MqesLuSbv8o5eQGfOCv3LKjEw04UsaiFJzZKV4a3OByqO8PnRB2U/iYiQlbgPD
-         rCjHlSNv22bRQikoQNJANDx79o+KR7RH9Rs6jferG6kXPiEC6qlVcmboEAA5EFUKfK95
-         TwcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XRqPmQD3TzPPUKo5nQdR6sJALqfnUOhMjLgcKy+rsBY=;
-        b=hlwk+0xe5GxpkEzyi36hdMkKamVswcTFFkr0F/72LDLNVKQkF64G89G9gTv833uTgl
-         ivtKhTAberCeq+7d4xT30TFoFCI38SiNUl6Ag89WRy/QW3vIbMxGkpkg3ENW5lhNcLF8
-         8ZENvrlJOmPAZHC9liryUhvk5DeyrXNPMilNGsHMUc4a9O5OonTa9SZ27kIwSG0M9pTP
-         ELt099DEW/kUlCDO31dsWpfEPnsbP9b33/FweaLF2ewnFNeqKzp9KbU//rBHPEre39C0
-         9sjI9Juybvwvk6PpnvwrMViyNvohgC2p5IBpGF8vJe8VkEyib9YAwci83QvCoXDmucU+
-         bX3g==
-X-Gm-Message-State: AOAM532z/C4ahFEG1gh+jQkbIXYCBE+lJohgLpiPHijAF2qO6ePj2yI6
-        ENQ+wg7xkzahxu/U7JuzLYPXhN7rPKkPc7F9HrRlCgZYVp8=
-X-Google-Smtp-Source: ABdhPJzVHraVZE0q5zTUVSQQyqG/JzRrzB9neauc16U32F09tC+KasPEcyxBdMa5UlaaKUr2kJL2QEMtyj9iPXHXp9U=
-X-Received: by 2002:a2e:9250:: with SMTP id v16mr1161484ljg.256.1608271468787;
- Thu, 17 Dec 2020 22:04:28 -0800 (PST)
+        id S1727098AbgLRJb3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Dec 2020 04:31:29 -0500
+Received: from mx2.suse.de ([195.135.220.15]:48592 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726798AbgLRJb3 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 18 Dec 2020 04:31:29 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 6E188ABC6;
+        Fri, 18 Dec 2020 09:30:47 +0000 (UTC)
+From:   Samuel Cabrero <scabrero@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     palcantara@suse.de, Samuel Cabrero <scabrero@suse.de>,
+        Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH] cifs: Avoid error pointer dereference
+Date:   Fri, 18 Dec 2020 10:29:49 +0100
+Message-Id: <20201218092949.1767-1-scabrero@suse.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <X9tNXBJunTCYCoSw@mwanda>
+References: <X9tNXBJunTCYCoSw@mwanda>
 MIME-Version: 1.0
-References: <20201218165737.0759162a@canb.auug.org.au>
-In-Reply-To: <20201218165737.0759162a@canb.auug.org.au>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 18 Dec 2020 00:04:17 -0600
-Message-ID: <CAH2r5mtbRwrExGOJBqDxnEQ=6WDtN_z3_dqes3HFWozCnOst3w@mail.gmail.com>
-Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I have now amended the patches to have the correct author and repushed
+The patch 7d6535b72042: "cifs: Simplify reconnect code when dfs
+upcall is enabled" leads to the following static checker warning:
 
-On Thu, Dec 17, 2020 at 11:57 PM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->
-> Hi all,
->
-> Commits
->
->   ee04fe87f4d0 ("cifs: Re-indent cifs_swn_reconnect()")
->   2c6dd2f9742d ("cifs: Unlock on errors in cifs_swn_reconnect()")
->   fb2356b3739b ("cifs: Delete a stray unlock in cifs_swn_reconnect()")
->
-> are missing a Signed-off-by from their author.
->
-> This is the problem with the mailing list again :-(  The
-> author has been recorded as
->
-> "Dan Carpenter via samba-technical <samba-technical@lists.samba.org>"
->
-> --
-> Cheers,
-> Stephen Rothwell
+	fs/cifs/connect.c:160 reconn_set_next_dfs_target()
+	error: 'server->hostname' dereferencing possible ERR_PTR()
 
+Avoid dereferencing the error pointer by early returning on error
+condition.
 
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Samuel Cabrero <scabrero@suse.de>
+---
+ fs/cifs/connect.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 509a41ff56b8..b9df85506938 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -155,6 +155,7 @@ static void reconn_set_next_dfs_target(struct TCP_Server_Info *server,
+ 		cifs_dbg(FYI,
+ 			 "%s: failed to extract hostname from target: %ld\n",
+ 			 __func__, PTR_ERR(server->hostname));
++		return;
+ 	}
+ 
+ 	rc = reconn_set_ipaddr_from_hostname(server);
 -- 
-Thanks,
+2.29.2
 
-Steve
