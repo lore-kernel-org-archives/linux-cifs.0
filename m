@@ -2,147 +2,115 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6654CC4361B
-	for <linux-cifs@archiver.kernel.org>; Sat, 19 Dec 2020 07:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 759C5C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 21 Dec 2020 04:30:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B8A723B7E
-	for <linux-cifs@archiver.kernel.org>; Sat, 19 Dec 2020 07:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D03F22AAA
+	for <linux-cifs@archiver.kernel.org>; Mon, 21 Dec 2020 04:30:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726334AbgLSHFH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 19 Dec 2020 02:05:07 -0500
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:13548 "EHLO
-        hqnvemgate25.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726311AbgLSHFG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 19 Dec 2020 02:05:06 -0500
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
-        id <B5fdda5f80000>; Fri, 18 Dec 2020 23:04:24 -0800
-Received: from [10.2.61.104] (172.20.145.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 19 Dec
- 2020 07:04:23 +0000
-Subject: Re: set_page_dirty vs truncate
-To:     Matthew Wilcox <willy@infradead.org>
-CC:     <linux-fsdevel@vger.kernel.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        <v9fs-developer@lists.sourceforge.net>,
-        Steve French <sfrench@samba.org>, <linux-cifs@vger.kernel.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        <linux-um@lists.infradead.org>, Dave Kleikamp <shaggy@kernel.org>,
-        <jfs-discussion@lists.sourceforge.net>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        <linux-nfs@vger.kernel.org>, Anton Altaparmakov <anton@tuxera.com>,
-        <linux-ntfs-dev@lists.sourceforge.net>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Martin Brandenburg <martin@omnibond.com>,
-        <devel@lists.orangefs.org>, Hans de Goede <hdegoede@redhat.com>
-References: <20201218160531.GL15600@casper.infradead.org>
- <20201218220316.GO15600@casper.infradead.org>
- <20201219051852.GP15600@casper.infradead.org>
- <7a7c3052-74c7-c63b-5fe3-65d692c1c5d1@nvidia.com>
- <20201219065057.GR15600@casper.infradead.org>
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <43f05a8f-25ce-a400-5825-d8fa159ee7f6@nvidia.com>
-Date:   Fri, 18 Dec 2020 23:04:23 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101
- Thunderbird/84.0
+        id S1727079AbgLUEaB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 20 Dec 2020 23:30:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34770 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726999AbgLUEaB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 20 Dec 2020 23:30:01 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB649C061248;
+        Sun, 20 Dec 2020 20:29:20 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id o19so20583617lfo.1;
+        Sun, 20 Dec 2020 20:29:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=JStI0xuBpGOpI7zOXq96FMvyiG0GeAUhmCc26uKz+8E=;
+        b=nRKQkOkfpm0DSmD7tBUTQ5tj0sg5VPPkCpku0w8AzpGCblQeTcACj9XeFlfaaO/UQR
+         /OXjLBElmt5NJRP9tCpa4h/L7C+hxsSiMH6yEj3IWwUxTtvUxleUri7SQGJoZEAdYtWs
+         vFlawncSBfANYYsMoJwZiL/doP/4pwBPHXGsJJ/4F+/OhamMf+vDa99oPc31FoXsd0BO
+         yW47vtAiIJ9I+EFM1KyEHQTo0O46nyGKW0zati+ddUmDaOh8pVm9VxhrR/gQ+dXghkHV
+         yYhiS0pkkpgbuOcSaV3ZtjPzgcgNXpUozKJPy+w/hAEjm2BcI2h2wZIoGlGTEfhV06rs
+         rpEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=JStI0xuBpGOpI7zOXq96FMvyiG0GeAUhmCc26uKz+8E=;
+        b=SVQV2SZ9MUSE510l27LwpbN/nZ+CaIpKvM6FvQWEEVY33x9P2A81kBdBk3n6VKmQjV
+         BhhT/na+79HaT26BsHvzFzOjk+xrlH+jOoh01mNyFn2In+kfJSVujg+P6FdxjXbTWdk+
+         lqjG3JKVKmAaV32LlnKfsVFwk1tNRXDbdA688DDaXVo3cO0U7ESI5tCJUDUcqeNKzf2B
+         AY7fUsXSK3Wdz+NlJvcS8wrcruHX+N6McnNxGBpugE2hfRfI8swDN8b1f9aeloj0DHw8
+         d9zjqNlN7nGodvj1SwTn2p8Wc3gKEIq3bZE80epM6kr206gPbErpFy0CxsGO2RIQFsgp
+         j+Kw==
+X-Gm-Message-State: AOAM530TXt08ihiRzgvKbW0a4cMOAaX6CMWkY9mecPlWMrFOuWcMLtEU
+        3BnHO7FKQ32xevespbZ3gr6pJKJBKncy67gA9bKwr/b/p+iChw==
+X-Google-Smtp-Source: ABdhPJxoeUhcF3LxV/HGTKG2P5NAiDFsKLXfyLHX1HlUizxqRFhem4HsHZaTMLmk/1EKkKcyPvqoBI5T6HTvNxlTwpQ=
+X-Received: by 2002:a2e:8eda:: with SMTP id e26mr5708607ljl.272.1608493663741;
+ Sun, 20 Dec 2020 11:47:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201219065057.GR15600@casper.infradead.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.20.145.6]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1608361464; bh=A9fBx0IN5qsLyTEaO2K4aLwibDOVSe+bKLpimCocLwU=;
-        h=Subject:To:CC:References:From:Message-ID:Date:User-Agent:
-         MIME-Version:In-Reply-To:Content-Type:Content-Language:
-         Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
-        b=Bgc3aR4z753YGJlW70WoLrtQ1KN8IbRzq31juKs6PfBN2zkSGHtinWPesncivbs4W
-         VzTsGi5zW6I314mN0sALuVKM7eV85d/U7RnCFRj/tuktF25zg4GPCpkEmzSS3hoUHK
-         PP07gVgvL8A0z77WSBOvwn20T/s6MvL8eDcowYD4Rs6BCV3hJUYhWaiMpxkCZoQAqY
-         RxKeghrOfimP4wXYxSRuO2xATbM6n5/MhNO06xr/el270Y+5EbFgXIlop0FK1iDT07
-         VWPAhXQlelzCRLSGyvDrtBjTpyiR5AjbZTqDfGwl3tId3hrMABj+K1hpMKyp1AXgv6
-         lwMu3rKNfv89A==
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 20 Dec 2020 13:47:32 -0600
+Message-ID: <CAH2r5muaG6M=S-E5xXvTTVUJ4_gXR7MA_aDQfOqLprcWMbBYLw@mail.gmail.com>
+Subject: [GIT PULL] CIFS/SMB3 Fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 12/18/20 10:50 PM, Matthew Wilcox wrote:
-...
->>> Hmmm ... looks like __set_page_dirty_nobuffers() has a similar problem:
->>>
->>> {
->>>           lock_page_memcg(page);
->>>           if (!TestSetPageDirty(page)) {
->>>                   struct address_space *mapping = page_mapping(page);
->>>                   unsigned long flags;
->>>
->>>                   if (!mapping) {
->>>                           unlock_page_memcg(page);
->>>                           return 1;
->>>                   }
->>>
->>>                   xa_lock_irqsave(&mapping->i_pages, flags);
->>>                   BUG_ON(page_mapping(page) != mapping);
->>>
->>> sure, we check that the page wasn't truncated between set_page_dirty()
->>> and the call to TestSetPageDirty(), but we can truncate dirty pages
->>> with no problem.  So between the call to TestSetPageDirty() and
->>> the call to xa_lock_irqsave(), the page can be truncated, and the
->>> BUG_ON should fire.
->>>
->>> I haven't been able to find any examples of this, but maybe it's just a very
->>> narrow race.  Does anyone recognise this signature?  Adding the filesystems
->>> which use __set_page_dirty_nobuffers() directly without extra locking.
->>
->>
->> That sounds like the same *kind* of failure that Jan Kara and I were
->> seeing on live systems[1], that led eventually to the gup-to-pup
->> conversion exercise.
->>
->> That crash happened due to calling set_page_dirty() on pages that had no
->> buffers on them [2]. And that sounds like *exactly* the same thing as
->> calling __set_page_dirty_nobuffers() without extra locking. So I'd
->> expect that it's Just Wrong To Do, for the same reasons as Jan spells
->> out very clearly in [1].
-> 
-> Interesting.  It's a bit different, *but* Jan's race might be what's
-> causing this symptom.  The reason is that the backtrace contains
-> set_page_dirty_lock() which holds the page lock.  So there can't be
-> a truncation race because truncate holds the page lock when calling
-> ->invalidatepage.
-> 
-> That said, the syzbot reproducer doesn't have any O_DIRECT in it
-> either.  So maybe this is some other race?
+Please pull the following changes since commit
+e13300bdaa68f5487000e66baed1ff69bcb510bf:
 
-Jan's race can be also be reproduced *without* O_DIRECT. I first saw
-it via a program that just did these steps on a normal ext4 filesystem:
+  Merge tag '5.11-rc-smb3' of git://git.samba.org/sfrench/cifs-2.6
+(2020-12-17 17:41:37 -0800)
 
-a) pin ext4 file-backed pages, via get_user_pages(). Actually the way
-it got here was due to using what *looked* like anonymous RAM to the
-program, but was really file-backed RAM, because the admin had it
-set up to mount ext4 on /tmp, instead of using tmpfs, to "save RAM",
-but I digress. :)
+are available in the Git repository at:
 
-b) wait a while, optionally do some DMA on the pages from a GPU, drink
-coffee...
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.11-rc-smb3-part2
 
-c) call set_pages_dirty()
+for you to fetch changes up to 9541b81322e60120b299222919957becd7a13683:
 
-d) unpin the pages
+  Add SMB 2 support for getting and setting SACLs (2020-12-18 23:32:04 -0600)
 
-e) BUG_ON() in page_buffers().
+----------------------------------------------------------------
+Four small CIFS/SMB3 fixes (witness protocol and reconnect related),
+and two that add ability to get and set auditing information in the
+security descriptor (SACL), which can be helpful not just for backup
+scenarios ("smbinfo secdesc" etc.) but also for improving security.
 
+Testing results:
+      http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/466
+----------------------------------------------------------------
+Boris Protopopov (2):
+      SMB3: Add support for getting and setting SACLs
+      Add SMB 2 support for getting and setting SACLs
 
-thanks,
+Dan Carpenter (3):
+      cifs: Delete a stray unlock in cifs_swn_reconnect()
+      cifs: Unlock on errors in cifs_swn_reconnect()
+      cifs: Re-indent cifs_swn_reconnect()
+
+Samuel Cabrero (1):
+      cifs: Avoid error pointer dereference
+
+ fs/cifs/cifs_swn.c  | 73 +++++++++++++++++++++++------------------------
+ fs/cifs/cifsacl.c   | 15 ++++++----
+ fs/cifs/cifsglob.h  |  4 +--
+ fs/cifs/cifspdu.h   |  2 ++
+ fs/cifs/cifsproto.h |  4 +--
+ fs/cifs/connect.c   |  1 +
+ fs/cifs/smb2ops.c   | 35 ++++++++++++++---------
+ fs/cifs/smb2pdu.c   |  7 +++--
+ fs/cifs/smb2proto.h |  4 +--
+ fs/cifs/xattr.c     | 81 +++++++++++++++++++++++++++++++++++++++--------------
+ 10 files changed, 140 insertions(+), 86 deletions(-)
+
 -- 
-John Hubbard
-NVIDIA
+Thanks,
+
+Steve
