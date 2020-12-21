@@ -2,89 +2,110 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D28C3526C
-	for <linux-cifs@archiver.kernel.org>; Sat, 19 Dec 2020 16:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D0A0C433E6
+	for <linux-cifs@archiver.kernel.org>; Mon, 21 Dec 2020 22:53:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08DCF23A7B
-	for <linux-cifs@archiver.kernel.org>; Sat, 19 Dec 2020 16:21:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CF06229CA
+	for <linux-cifs@archiver.kernel.org>; Mon, 21 Dec 2020 22:53:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726878AbgLSQVk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 19 Dec 2020 11:21:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43082 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726752AbgLSQVj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 19 Dec 2020 11:21:39 -0500
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B38C0613CF
-        for <linux-cifs@vger.kernel.org>; Sat, 19 Dec 2020 08:20:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42; h=Message-ID:Date:To:From:CC;
-        bh=DljRb5pgAb3NZs1X4X+k5n5azPt2sMegWuuG42isDYs=; b=vt0A95Zi7q9s3LZu3ChuVXq9zp
-        J2LQpPkTe2kyyY8Sej1pGxEURZHsHopN2oE6UYjxlyQjR7Jnuwx+AfjoExR7E7m7LTS8TQL8mjT1P
-        9r9Z45J336zpWWACQJRShUvfo+2vL/LWKTM6zruIgglTa3afs237VKLwkyIxznI6PpoLPlOUq7Sm1
-        kZZq6Fnb/523bNpagqL88L9DW3RXyZN/fLUiva0QSioLLvjyCbb4wD9rEu9fBnwQeHiQ65EZXUyTI
-        Liex949Lv5/N/UsxxMXd29tFgAILI4cT2YnHgwc+I774OCPBS21OfbG6Iws8XFahLMf+iUj+bqq5T
-        MnJklwIaokbEOiOiFma5CX+tv1+rfuwZ1U3zRkxTInWjcYYHVWl2l6/BicOfQZZfiQYaeAqVD6UZX
-        aHOklMF70CHFAX79skqjrVKbtZmgb8aFmZobiJ/sjwVS7gD7v7faenvzXOMwaFNAbduHIHDZKeir0
-        CYNfr9ikPXYwxwAQq3C6I53w;
-Received: from [2a01:4f8:192:486::6:0] (port=51394 helo=hr6.samba.org) 
-        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
-        (Exim)
-        id 1kqeyX-0004uY-FO
-        for cifs-qa@samba.org; Sat, 19 Dec 2020 16:20:57 +0000
-Received: from [::1] (port=20824 helo=bugzilla.samba.org)
-        by hr6.samba.org with esmtp (Exim 4.93)
-        (envelope-from <samba-bugs@samba.org>)
-        id 1kqeyW-001IYD-Tk
-        for cifs-qa@samba.org; Sat, 19 Dec 2020 16:20:57 +0000
-From:   samba-bugs@samba.org
-To:     cifs-qa@samba.org
-Subject: [Bug 9346] Directories on CIFS shares shown as ordinary files
-Date:   Sat, 19 Dec 2020 16:20:55 +0000
-X-Bugzilla-Reason: QAcontact
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: CifsVFS
-X-Bugzilla-Component: kernel fs
-X-Bugzilla-Version: 3.x
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: major
-X-Bugzilla-Who: bjacke@samba.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P5
-X-Bugzilla-Assigned-To: sfrench@samba.org
-X-Bugzilla-Target-Milestone: ---
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: product version qa_contact component
-Message-ID: <bug-9346-10630-S2t7G5vJMV@https.bugzilla.samba.org/>
-In-Reply-To: <bug-9346-10630@https.bugzilla.samba.org/>
-References: <bug-9346-10630@https.bugzilla.samba.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.samba.org/
-Auto-Submitted: auto-generated
+        id S1726232AbgLUWx0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 21 Dec 2020 17:53:26 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:38090 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725961AbgLUWxZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 21 Dec 2020 17:53:25 -0500
+Received: from mail-qk1-f197.google.com ([209.85.222.197])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <sergio.durigan@canonical.com>)
+        id 1krU2k-0002zE-NP
+        for linux-cifs@vger.kernel.org; Mon, 21 Dec 2020 22:52:42 +0000
+Received: by mail-qk1-f197.google.com with SMTP id n190so9949648qkf.18
+        for <linux-cifs@vger.kernel.org>; Mon, 21 Dec 2020 14:52:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:references:date:in-reply-to
+         :message-id:user-agent:mime-version;
+        bh=ztDo0Tvsi1+V8rQ/rPZZeoJWxZBaDcxlV8+/nx7XrOE=;
+        b=U1XP+oAIrwtRoho6wrZMolmDJihPN0Oz2+K4m504aE7WXvWSmrs3OsR1TxKdF4Te4/
+         u66FKTce7gsPRqgmkG+d8Zi7eHUpn/i+cXoQ6toLkWpSrQfrM9s3ngfLoXLo9NdYH24O
+         FakNxcmPpUxdCOPXwvZ3gMNINW25ayUs7XPCH1unA7s7nhoA7yxNQtMrPEiA5iCQSs5P
+         JlEEy1xERii3ns/NlGUttffJrodJ24zVY7UaohSWy2aQakP1VSxdnGlPMxgGfD/hO4JE
+         8y2NQ6M2DaagbBMiZMJYWm4p3+6kLJnE64ALb/IUSoqfMVmPpY444n0aFm5X9jDx+GqT
+         hCrQ==
+X-Gm-Message-State: AOAM5324t/hDD8tIqEAyhIjukOKOR7LkqcIgRaqxl2wHW/EEauXoVN6h
+        nvNuCsyHjE4Z8Tu4iCTRlQUrPDr6IUcJqoiJhZ0FloJoKrUjp83cGYoEu4W8YJB+qJYUFpVPQV3
+        MEH2Hay6Yb9LYXnjTyd0gaqpG7gPD0oxXxWYtMv0=
+X-Received: by 2002:ac8:58d2:: with SMTP id u18mr17966924qta.235.1608591161860;
+        Mon, 21 Dec 2020 14:52:41 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzNfKoODIVfQLccrluRLJXlVuf8R+ByZDUjn/6RDlI7wfyEux+oF7L4LKHvjkszgEDXzRBtSA==
+X-Received: by 2002:ac8:58d2:: with SMTP id u18mr17966908qta.235.1608591161538;
+        Mon, 21 Dec 2020 14:52:41 -0800 (PST)
+Received: from localhost (bras-base-toroon1016w-grc-29-76-64-118-63.dsl.bell.ca. [76.64.118.63])
+        by smtp.gmail.com with ESMTPSA id n5sm3354730qkh.126.2020.12.21.14.52.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Dec 2020 14:52:40 -0800 (PST)
+From:   Sergio Durigan Junior <sergio.durigan@canonical.com>
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH] Separate binary names using comma in mount.cifs.rst
+References: <20200609180044.500230-1-sergio.durigan@canonical.com>
+        <CAKywueTDHV112-y125ROPK2aa+w6A1Fd_4x82YVEU6LauaAS9g@mail.gmail.com>
+X-URL:  http://blog.sergiodj.net
+Date:   Mon, 21 Dec 2020 17:52:38 -0500
+In-Reply-To: <CAKywueTDHV112-y125ROPK2aa+w6A1Fd_4x82YVEU6LauaAS9g@mail.gmail.com>
+        (Pavel Shilovsky's message of "Fri, 28 Aug 2020 17:22:46 -0700")
+Message-ID: <875z4ug4ax.fsf@canonical.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha512; protocol="application/pgp-signature"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-https://bugzilla.samba.org/show_bug.cgi?id=3D9346
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Bj=C3=B6rn Jacke <bjacke@samba.org> changed:
+On Friday, August 28 2020, Pavel Shilovsky wrote:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-            Product|Samba 3.6                   |CifsVFS
-            Version|unspecified                 |3.x
-         QA Contact|samba-qa@samba.org          |cifs-qa@samba.org
-          Component|File services               |kernel fs
+> Merged. Thanks!
 
---=20
-You are receiving this mail because:
-You are the QA Contact for the bug.=
+Thanks for the reply, Pavel!
+
+I'm writing because I don't see my patch merged in the git repository.
+I noticed that there was a cifs-utils release recently, and
+unfortunately the patch wasn't included.  Can you double-check this,
+please?
+
+Thanks!
+
+=2D-=20
+Sergio
+GPG key ID: E92F D0B3 6B14 F1F4 D8E0  EB2F 106D A1C8 C3CB BF14
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE6S/Qs2sU8fTY4OsvEG2hyMPLvxQFAl/hJzYACgkQEG2hyMPL
+vxQBag/+PM4zSkkqk2g/lpEYZnVqqH2mml3Uy2T2DUWIAM49vTMWnkfuZpvrpphw
+WKK39RJq+A+pXVjsJwWVecqgX/gGra1rU6avBCKN9Slxsm6fIJsGatw0fXs3MOe5
+eWhES9Y/Rg1HigcZ5IeqUku+w0sd8GZfadBgNzL/hT+9TwA+qANwaTEAWcfG5XWy
+zA3Xuj1Y7BWEGMsNIRFKJ+D0YvX3NTIGkeQFm9MVeuZRlUwuoBD7Ko4buC8KLlC+
+7yDQTT4oIAEintoeC4gAgJhUZJJ/p9ml5gzxayjKbAMuU2r3HMWpoUof/dPvtDns
+w/8B3PNWxh330tyXSjcqm+3KSkYm472rwpw+sx21X2w4PVTH3gatluCHvlkokd7W
+YrKEdK0aFNBIQsVJ8K/wvf3b3BhHeKxfmYI+cQIJdjcEatvtA9J7Ob32DoJK7ZH7
+fjKNogcaq2OUdNH3touGNcUcIdVNiKh9Lb68iKjoTdfGspVcmQ1rF+MjpmnApm2W
+rllVO2KiA1NnIR+J4VFI7+TkS23U8Hj4Jsh/74QptPGsW0M+gXyAXnkcfC5qV96E
+1RVcAwrqcUd9lG4P7IeVtHNu2ouXUyuhf/CwGuLMmcO9H5c92qnyMgerdXW7lcQ9
+HI9OyFE2gxIFrgecmEOPi6Z7dx1Ugf6mbZX0raTWn9lL7b5VjNQ=
+=M8fF
+-----END PGP SIGNATURE-----
+--=-=-=--
