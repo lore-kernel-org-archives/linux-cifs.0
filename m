@@ -2,110 +2,105 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D0A0C433E6
-	for <linux-cifs@archiver.kernel.org>; Mon, 21 Dec 2020 22:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC72C433E0
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Dec 2020 18:09:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6CF06229CA
-	for <linux-cifs@archiver.kernel.org>; Mon, 21 Dec 2020 22:53:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A35E229EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 28 Dec 2020 18:09:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726232AbgLUWx0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 21 Dec 2020 17:53:26 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:38090 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725961AbgLUWxZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 21 Dec 2020 17:53:25 -0500
-Received: from mail-qk1-f197.google.com ([209.85.222.197])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <sergio.durigan@canonical.com>)
-        id 1krU2k-0002zE-NP
-        for linux-cifs@vger.kernel.org; Mon, 21 Dec 2020 22:52:42 +0000
-Received: by mail-qk1-f197.google.com with SMTP id n190so9949648qkf.18
-        for <linux-cifs@vger.kernel.org>; Mon, 21 Dec 2020 14:52:42 -0800 (PST)
+        id S1728901AbgL1SJA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 28 Dec 2020 13:09:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40244 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728900AbgL1SJA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 28 Dec 2020 13:09:00 -0500
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D62B0C0613D6
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Dec 2020 10:08:19 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id qw4so15158004ejb.12
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Dec 2020 10:08:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=XdjCWsVqKTptkSYnh95GnXpWGsLEAU7BneOLOcIK1qY=;
+        b=hNzueuh5XWVqGUJH25OR2mBMKMuFPCC0iiSPkB/j1tyXp1xOm4ww7qIvoPg+7zS69R
+         uJRHrDjIUoC3y0wYwPV3YZ9AQlCTd0D1QrMncnSzS6rVIiwe2RPjC14nKOurwC4HrtE4
+         pgxbEyAYPJISM3V7SASfn4U8JZs63ui5DDTJn1Wrm4llH78YcYfVJLf0RTrHqFi765kn
+         U3mWPebjsLx+lxFn4NcbUl1asVe/LDV35tZ4fmHmkYDa6zAvJ/FdFU3Whd40Mms1VEsr
+         LHAYOi9itMtFdLpNqpJWTbWcqU/NQbFJZqrMbSNUWpzZsRwkglm2/EPE+aWxjUOoH/Zl
+         +hTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:references:date:in-reply-to
-         :message-id:user-agent:mime-version;
-        bh=ztDo0Tvsi1+V8rQ/rPZZeoJWxZBaDcxlV8+/nx7XrOE=;
-        b=U1XP+oAIrwtRoho6wrZMolmDJihPN0Oz2+K4m504aE7WXvWSmrs3OsR1TxKdF4Te4/
-         u66FKTce7gsPRqgmkG+d8Zi7eHUpn/i+cXoQ6toLkWpSrQfrM9s3ngfLoXLo9NdYH24O
-         FakNxcmPpUxdCOPXwvZ3gMNINW25ayUs7XPCH1unA7s7nhoA7yxNQtMrPEiA5iCQSs5P
-         JlEEy1xERii3ns/NlGUttffJrodJ24zVY7UaohSWy2aQakP1VSxdnGlPMxgGfD/hO4JE
-         8y2NQ6M2DaagbBMiZMJYWm4p3+6kLJnE64ALb/IUSoqfMVmPpY444n0aFm5X9jDx+GqT
-         hCrQ==
-X-Gm-Message-State: AOAM5324t/hDD8tIqEAyhIjukOKOR7LkqcIgRaqxl2wHW/EEauXoVN6h
-        nvNuCsyHjE4Z8Tu4iCTRlQUrPDr6IUcJqoiJhZ0FloJoKrUjp83cGYoEu4W8YJB+qJYUFpVPQV3
-        MEH2Hay6Yb9LYXnjTyd0gaqpG7gPD0oxXxWYtMv0=
-X-Received: by 2002:ac8:58d2:: with SMTP id u18mr17966924qta.235.1608591161860;
-        Mon, 21 Dec 2020 14:52:41 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzNfKoODIVfQLccrluRLJXlVuf8R+ByZDUjn/6RDlI7wfyEux+oF7L4LKHvjkszgEDXzRBtSA==
-X-Received: by 2002:ac8:58d2:: with SMTP id u18mr17966908qta.235.1608591161538;
-        Mon, 21 Dec 2020 14:52:41 -0800 (PST)
-Received: from localhost (bras-base-toroon1016w-grc-29-76-64-118-63.dsl.bell.ca. [76.64.118.63])
-        by smtp.gmail.com with ESMTPSA id n5sm3354730qkh.126.2020.12.21.14.52.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Dec 2020 14:52:40 -0800 (PST)
-From:   Sergio Durigan Junior <sergio.durigan@canonical.com>
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH] Separate binary names using comma in mount.cifs.rst
-References: <20200609180044.500230-1-sergio.durigan@canonical.com>
-        <CAKywueTDHV112-y125ROPK2aa+w6A1Fd_4x82YVEU6LauaAS9g@mail.gmail.com>
-X-URL:  http://blog.sergiodj.net
-Date:   Mon, 21 Dec 2020 17:52:38 -0500
-In-Reply-To: <CAKywueTDHV112-y125ROPK2aa+w6A1Fd_4x82YVEU6LauaAS9g@mail.gmail.com>
-        (Pavel Shilovsky's message of "Fri, 28 Aug 2020 17:22:46 -0700")
-Message-ID: <875z4ug4ax.fsf@canonical.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=XdjCWsVqKTptkSYnh95GnXpWGsLEAU7BneOLOcIK1qY=;
+        b=c+cCon4llwOCRUL2GS9UryD2vap/KPawvXtqNo8i3LhKlimpJzMM8B2IX6QUZBqAM0
+         7pkTAvfNYGizwQKCtAY6qaE7AQPxZxXSnYLOPdax2aQ3NS+jqm5IOEznWLkrLihIh3QT
+         HVnj02J1uI3wxf/eP1qQzwEieNeCYneUi4QtU+AxbSKTECU+tLoVptGKssGTNtQQegHm
+         OFHMMrgquOgAto4hRRBghts/GrF+jlofrPlcKelHzXavdVGC68xsQCzL/1HQs0d1BHCa
+         OQhYnxzCHt3ljkOy8H2WRcHfaX89zFaNjkjAoxK7Vz6yYyzVdizMXdw61EvbeMhuQ7Z/
+         phQQ==
+X-Gm-Message-State: AOAM531wfS9kmor8X1kY/FkOT220+YDecveA9sDB2ZRPzK3uBjx/3bhi
+        qhZ3JtXPvn+yWCmNpuIVxm0VvmTU6R8D7/9wxJMoELQEvZKy
+X-Google-Smtp-Source: ABdhPJyGTXEoup+YwzvoPMaUmGhpzl9bKNVgK+0Cs22cIu0OrTsCEh+rod9FV2Zn+i+WF7caklOv8gFb8OesOqyuLHs=
+X-Received: by 2002:a17:906:4146:: with SMTP id l6mr43089771ejk.341.1609178898482;
+ Mon, 28 Dec 2020 10:08:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha512; protocol="application/pgp-signature"
+References: <20200609180044.500230-1-sergio.durigan@canonical.com>
+ <CAKywueTDHV112-y125ROPK2aa+w6A1Fd_4x82YVEU6LauaAS9g@mail.gmail.com> <875z4ug4ax.fsf@canonical.com>
+In-Reply-To: <875z4ug4ax.fsf@canonical.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Mon, 28 Dec 2020 10:08:07 -0800
+Message-ID: <CAKywueR6hUyUt+RWbQi6rBDLWYun08aXgPa3VyXD+V5u-w5ZkA@mail.gmail.com>
+Subject: Re: [PATCH] Separate binary names using comma in mount.cifs.rst
+To:     Sergio Durigan Junior <sergio.durigan@canonical.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Hi Sergio,
 
-On Friday, August 28 2020, Pavel Shilovsky wrote:
+The recent release included only a security fix -- see details below:
 
-> Merged. Thanks!
+https://lists.samba.org/archive/samba-technical/2020-September/135747.html
 
-Thanks for the reply, Pavel!
+I am planning to make another release soon which will contain all
+patches merged into next branch:
 
-I'm writing because I don't see my patch merged in the git repository.
-I noticed that there was a cifs-utils release recently, and
-unfortunately the patch wasn't included.  Can you double-check this,
-please?
+https://github.com/piastry/cifs-utils/commits/next
 
-Thanks!
+Your patch is already there, so it will be included into 6.12.
 
-=2D-=20
-Sergio
-GPG key ID: E92F D0B3 6B14 F1F4 D8E0  EB2F 106D A1C8 C3CB BF14
+--
+Best regards,
+Pavel Shilovsky
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE6S/Qs2sU8fTY4OsvEG2hyMPLvxQFAl/hJzYACgkQEG2hyMPL
-vxQBag/+PM4zSkkqk2g/lpEYZnVqqH2mml3Uy2T2DUWIAM49vTMWnkfuZpvrpphw
-WKK39RJq+A+pXVjsJwWVecqgX/gGra1rU6avBCKN9Slxsm6fIJsGatw0fXs3MOe5
-eWhES9Y/Rg1HigcZ5IeqUku+w0sd8GZfadBgNzL/hT+9TwA+qANwaTEAWcfG5XWy
-zA3Xuj1Y7BWEGMsNIRFKJ+D0YvX3NTIGkeQFm9MVeuZRlUwuoBD7Ko4buC8KLlC+
-7yDQTT4oIAEintoeC4gAgJhUZJJ/p9ml5gzxayjKbAMuU2r3HMWpoUof/dPvtDns
-w/8B3PNWxh330tyXSjcqm+3KSkYm472rwpw+sx21X2w4PVTH3gatluCHvlkokd7W
-YrKEdK0aFNBIQsVJ8K/wvf3b3BhHeKxfmYI+cQIJdjcEatvtA9J7Ob32DoJK7ZH7
-fjKNogcaq2OUdNH3touGNcUcIdVNiKh9Lb68iKjoTdfGspVcmQ1rF+MjpmnApm2W
-rllVO2KiA1NnIR+J4VFI7+TkS23U8Hj4Jsh/74QptPGsW0M+gXyAXnkcfC5qV96E
-1RVcAwrqcUd9lG4P7IeVtHNu2ouXUyuhf/CwGuLMmcO9H5c92qnyMgerdXW7lcQ9
-HI9OyFE2gxIFrgecmEOPi6Z7dx1Ugf6mbZX0raTWn9lL7b5VjNQ=
-=M8fF
------END PGP SIGNATURE-----
---=-=-=--
+=D0=BF=D0=BD, 21 =D0=B4=D0=B5=D0=BA. 2020 =D0=B3. =D0=B2 14:52, Sergio Duri=
+gan Junior
+<sergio.durigan@canonical.com>:
+>
+> On Friday, August 28 2020, Pavel Shilovsky wrote:
+>
+> > Merged. Thanks!
+>
+> Thanks for the reply, Pavel!
+>
+> I'm writing because I don't see my patch merged in the git repository.
+> I noticed that there was a cifs-utils release recently, and
+> unfortunately the patch wasn't included.  Can you double-check this,
+> please?
+>
+> Thanks!
+>
+> --
+> Sergio
+> GPG key ID: E92F D0B3 6B14 F1F4 D8E0  EB2F 106D A1C8 C3CB BF14
