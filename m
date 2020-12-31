@@ -2,112 +2,174 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4221DC433DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Dec 2020 19:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF02CC433DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Dec 2020 20:09:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03F2D207C8
-	for <linux-cifs@archiver.kernel.org>; Thu, 31 Dec 2020 19:50:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61B9620855
+	for <linux-cifs@archiver.kernel.org>; Thu, 31 Dec 2020 20:09:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726302AbgLaTtu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 31 Dec 2020 14:49:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40264 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725968AbgLaTtu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Dec 2020 14:49:50 -0500
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BC7BC061573;
-        Thu, 31 Dec 2020 11:49:09 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id m12so45849562lfo.7;
-        Thu, 31 Dec 2020 11:49:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=q4GADhOM3Di9puOis0bQoYcmPc7qddXCQPPvPPHyXN8=;
-        b=TZit+ZzpGhp+HstDglk2xvwufzq5vwAD6YVTIeLC2EKa9ovWoXhOWSQzksvKm5hyeW
-         vv83RGbTT/RXmmG2g6Ao7bAw9T89m4iw1QX3t1ltaidvjLLPd/eIPJg00O4pk4ZWMfkW
-         0j8qwoeWcgMFPMxyUxdmHFGjjlELv2XhIZhJ3ulNIiYYLgomEpfT9/P4KJD7pp89CDXU
-         vcFI2xJjz+h1eTZ1My73fFvYH16TPO3xiFA4+/byi90kuhM+JYN5/Cf/uHzBiUGPIls6
-         jCCDXPajjR8yuai/Jfj12ITdIONkO6rBZv1ytpqNZ36pJnnZ9o1I1/biHqbfXwNDNC7K
-         mgyQ==
+        id S1726673AbgLaUJJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 31 Dec 2020 15:09:09 -0500
+Received: from mail-ed1-f54.google.com ([209.85.208.54]:42259 "EHLO
+        mail-ed1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726423AbgLaUJJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 31 Dec 2020 15:09:09 -0500
+Received: by mail-ed1-f54.google.com with SMTP id g24so18973720edw.9
+        for <linux-cifs@vger.kernel.org>; Thu, 31 Dec 2020 12:08:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=q4GADhOM3Di9puOis0bQoYcmPc7qddXCQPPvPPHyXN8=;
-        b=lL5Gbqrk3x/nzk5CHn3QNxAu/N4BT2ohp7AVtmdD0SOd1ud21w0w6+myLHzjVIIeo3
-         ExzEHHKAmfSqwi9oyzGpsXuG8qRqUQVENWIndNoarj5CoAEqsxkOwJs4IZQZTifL4FUZ
-         Jo9dfmWueRgWpgoiMF7LCmQE91rcHiB+wzdmCLiyMj8qRMJ5M4RzlJ8bu5yVFJ4Ew5dk
-         fBKPryTt03Yjevf6YodveYkw6ThFZkme60t6VwWrtoOcUuMyNqc4+6lsMUvj6VDI9anS
-         m7BPJzM93SFj5vePTfI7WD93BMD6rFv3QpYRreTO8dKWAxz890P3G/jDHlY0jfPLUbGn
-         J37w==
-X-Gm-Message-State: AOAM533SEJgEa5354LG8HNEbsYOGa8zTeLo7qKGLTodbaBcvq3IAWPKX
-        Z9nf9P+Wv+c/69EFESbmysoJEr/i7RGiMEXVIOy2yrZ2GEM=
-X-Google-Smtp-Source: ABdhPJzh0FiWoAo5nbILBFboXjTjGWuHbZudk/ItyhPYbOzhyw2Yoeia6xoE5mC6mbYqHLE1SMbO3mrJ6DyMaHBpaZI=
-X-Received: by 2002:ac2:5689:: with SMTP id 9mr26659052lfr.175.1609444147846;
- Thu, 31 Dec 2020 11:49:07 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=3qjojYqJjWiq2QQdPJtZl0cxzUMaT76U9P8AUbsxFeE=;
+        b=lJ92eGdMbPg75+vtg1aS0jlzgOAOxFBYAiSihvcjslaftAo/ZaJDEts2QQLJB1SxGk
+         yyDZttZqaSHBNb1pDalP22mbz/i3dtoh6Bab11onEZqd1+iZ71ks5BKpDD5NVnvMBXL3
+         0lKP9Q+xA6qlDQNHLnTBdvaaghHqR0Jzy6dbzfKIuDzecmbuLx2vkqCyzT8bSRlAkZoM
+         YsCjdYXJzRoVisY5feapqe7v6ZAMe8g9NdNIlJF1Kray6VGkpUuw7UenCtUK6TWpQDKz
+         Ind7i55APsLGpZh0m9ePu3heiboHI3p0FZGJBH8ANcBTfnDhx8pkpBF6gHlb7aoTjpN0
+         OPjQ==
+X-Gm-Message-State: AOAM531dyk/y5+eW5QRLhNxzzVb8VFzKC+wsSBmKZLSrhkC8tO2+3ADr
+        vIF/XQM5BRzMf6eDbdn39Gj4f4FwfSnB3DzLHsdxiTg/Rr/3
+X-Google-Smtp-Source: ABdhPJyQNfgXeiOBFoEBO6DsQpvA3LPa99vz1fymtEV2grZIOk8mCfzMiKU+bdAdC7K/axpLzigqPrNwuAD2mSd5Wb0=
+X-Received: by 2002:a50:8b66:: with SMTP id l93mr55163346edl.384.1609445306785;
+ Thu, 31 Dec 2020 12:08:26 -0800 (PST)
 MIME-Version: 1.0
-References: <1609310145-75787-1-git-send-email-abaci-bugfix@linux.alibaba.com>
-In-Reply-To: <1609310145-75787-1-git-send-email-abaci-bugfix@linux.alibaba.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 31 Dec 2020 13:48:56 -0600
-Message-ID: <CAH2r5mtvuz+Ro2Y7upQQcmSk2Q2sgxykYrKgq0wmhGPKjEeJvw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: style: replace one-element array with flexible-array
-To:     YANG LI <abaci-bugfix@linux.alibaba.com>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
+From:   Pavel Shilovsky <pshilovsky@samba.org>
+Date:   Thu, 31 Dec 2020 12:08:15 -0800
+Message-ID: <CAKywueSZyJtH_V8MVa5bznPN=RdjbphY7xo74ABWn=bMAud+ZQ@mail.gmail.com>
+Subject: [ANNOUNCE] cifs-utils release 6.12 ready for download
+To:     linux-cifs <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        samba@lists.samba.org,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Boris Protopopov <pboris@amazon.com>,
+        Steve French <stfrench@microsoft.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Rohith Surabattula <rohiths.msft@gmail.com>,
+        Pavel Shilovskiy <pshilov@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+New version 6.12 of cifs-utils has been released today.
 
-On Wed, Dec 30, 2020 at 12:37 AM YANG LI <abaci-bugfix@linux.alibaba.com> wrote:
->
-> There is a regular need in the kernel to provide a way to declare
-> having a dynamically sized set of trailing elements in a structure.
-> Kernel code should always use "flexible array members"[1] for these
-> cases. The older style of one-element or zero-length arrays should
-> no longer be used[2].
->
-> [1] https://en.wikipedia.org/wiki/Flexible_array_member
-> [2] https://www.kernel.org/doc/html/v5.9/process/
->     deprecated.html#zero-length-and-one-element-arrays
->
-> Signed-off-by: YANG LI <abaci-bugfix@linux.alibaba.com>
-> Reported-by: Abaci <abaci@linux.alibaba.com>
-> ---
->  fs/cifs/smb2pdu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-> index 204a622..d85edf5 100644
-> --- a/fs/cifs/smb2pdu.h
-> +++ b/fs/cifs/smb2pdu.h
-> @@ -424,7 +424,7 @@ struct smb2_rdma_transform_capabilities_context {
->         __le16  TransformCount;
->         __u16   Reserved1;
->         __u32   Reserved2;
-> -       __le16  RDMATransformIds[1];
-> +       __le16  RDMATransformIds[];
->  } __packed;
->
->  /* Signing algorithms */
-> --
-> 1.8.3.1
->
+Highlighted changes:
 
+- get/setcifsacl tools are improved to support changing owner, group and SACLs
+- mount.cifs is enhanced to use SUDO_UID env variable for cruid
+- smbinfo is re-written in Python language
 
--- 
-Thanks,
+webpage: https://wiki.samba.org/index.php/LinuxCIFS_utils
+tarball: https://download.samba.org/pub/linux-cifs/cifs-utils/
+git: git://git.samba.org/cifs-utils.git
+gitweb: http://git.samba.org/?p=cifs-utils.git;a=summary
 
-Steve
+Detailed list of changes since 6.11 was released:
+
+73008e3 cifs-utils: bump version to 6.12
+16af2c4 smbinfo: fix fsctl-getobjid output
+85a7865 smbinfo: fix list-snapshots output and installation
+207f192 cifs.upcall: drop bounding capabilities only if CAP_SETPCAP is given
+1a15076 mount.cifs: use SUDO_UID env variable for cruid
+7156c6e mount.cifs: fix max buffer size when parsing snapshot option
+8f46aaa Add missing position handling to mount parameters
+gid/backup_gid/snapshot
+4205fdc cifs.upcall: update the cap bounding set only when CAP_SETPCAP is given
+e406fb1 mount.cifs: update the cap bounding set only when CAP_SETPCAP is given
+c3f8e81 Extend cifs acl utilities to handle SACLs
+6da2dd3 getcifsacl: return error if input path doesn't exist
+1f37d9c Fix mount error when mount point has an extra trailing slash.
+1252355 mount.cifs: ignore comment mount option
+ff54e6f setcifsacl: fix quoting of backslash in man page
+c6507ce Separate binary names using comma in mount.cifs.rst
+aeaa786 cifs-utils: fix probabilistic compiling error
+c608a7f cifs-utils: Don't create symlinks for mans if mans are disabled
+a00e843 cifs-utils: Respect DESTDIR when installing smb3 stuff
+b9d94cd mount.cifs.rst: add nolease mount option
+3d399e4 Add support for setting owner and group in ntsd
+a138fd1 Convert owner and group SID offsets to LE format
+9bd8c8d smbinfo: remove invalid arguments to ioctl method
+422f0e9 smbinfo: rewrite in python
+
+Summary:
+
+Alexander Koch (1):
+      cifs.upcall: drop bounding capabilities only if CAP_SETPCAP is given
+
+Aurelien Aptel (1):
+      smbinfo: rewrite in python
+
+Bjoern Jacke (1):
+      setcifsacl: fix quoting of backslash in man page
+
+Boris Protopopov (3):
+      Convert owner and group SID offsets to LE format
+      Add support for setting owner and group in ntsd
+      Extend cifs acl utilities to handle SACLs
+
+Jonas Witschel (2):
+      mount.cifs: update the cap bounding set only when CAP_SETPCAP is given
+      cifs.upcall: update the cap bounding set only when CAP_SETPCAP is given
+
+Martin Schwenke (1):
+      mount.cifs: ignore comment mount option
+
+Mikhail Novosyolov (2):
+      cifs-utils: Respect DESTDIR when installing smb3 stuff
+      cifs-utils: Don't create symlinks for mans if mans are disabled
+
+Pavel Shilovsky (6):
+      mount.cifs.rst: add nolease mount option
+      getcifsacl: return error if input path doesn't exist
+      mount.cifs: fix max buffer size when parsing snapshot option
+      smbinfo: fix list-snapshots output and installation
+      smbinfo: fix fsctl-getobjid output
+      cifs-utils: bump version to 6.12
+
+Rohith Surabattula (1):
+      Fix mount error when mount point has an extra trailing slash.
+
+Ronnie Sahlberg (1):
+      smbinfo: remove invalid arguments to ioctl method
+
+Sergio Durigan Junior (1):
+      Separate binary names using comma in mount.cifs.rst
+
+Shyam Prasad N (1):
+      mount.cifs: use SUDO_UID env variable for cruid
+
+Simon Arlott (1):
+      Add missing position handling to mount parameters gid/backup_gid/snapshot
+
+lizhe (1):
+      cifs-utils: fix probabilistic compiling error
+
+ Makefile.am       |   15 +-
+ cifs.upcall.c     |   14 +-
+ cifsacl.h         |   55 +++++--
+ configure.ac      |    2 +-
+ getcifsacl.c      |  239 +++++++++++++++++++++---------
+ getcifsacl.rst.in |    4 +-
+ mount.cifs.c      |  106 +++++++++++---
+ mount.cifs.rst    |   12 +-
+ setcifsacl.c      |  848
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------------------------
+ setcifsacl.rst.in |   58 ++++++--
+ smbinfo           |  792
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ smbinfo.c         | 1296
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 12 files changed, 1827 insertions(+), 1614 deletions(-)
+ create mode 100755 smbinfo
+ delete mode 100644 smbinfo.c
+
+Thanks to everyone who contributed to the release!
+
+Best regards,
+Pavel Shilovsky
