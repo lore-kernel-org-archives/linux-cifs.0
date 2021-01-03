@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E58C433DB
-	for <linux-cifs@archiver.kernel.org>; Sun,  3 Jan 2021 01:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D496C433E0
+	for <linux-cifs@archiver.kernel.org>; Sun,  3 Jan 2021 01:26:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2745D2078E
-	for <linux-cifs@archiver.kernel.org>; Sun,  3 Jan 2021 01:22:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FC83207AA
+	for <linux-cifs@archiver.kernel.org>; Sun,  3 Jan 2021 01:26:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726867AbhACBWE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 2 Jan 2021 20:22:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56852 "EHLO
+        id S1726919AbhACBZ5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 2 Jan 2021 20:25:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726864AbhACBWE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Jan 2021 20:22:04 -0500
+        with ESMTP id S1726864AbhACBZ5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Jan 2021 20:25:57 -0500
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24043C061573
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Jan 2021 17:21:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1213C061573
+        for <linux-cifs@vger.kernel.org>; Sat,  2 Jan 2021 17:25:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42; h=Message-ID:Cc:To:From:Date;
-        bh=AmrtMhwOE08jj+9ACyWNKhbh+Veh3K5d8FAJN7NwnDs=; b=C9H+ijbMp4XiAzhFLjzf1mGgq9
-        lRyTDY/wt9MTYJ30lai9hGem7MV59yklm0TX21ir1sTUSX64w8DazHCYz9UKeAfHkmvVNxwBy4i4n
-        9durNxZiDnP6eSRJley2DwuA97UaLzeUDUcyCKtC0MAwka12V4wwoQ7mJit8cz1i9sCzSiGLxiGdU
-        hScwdePOMjSaok9Um2/mP83U9NAwZXCKvIK8fAVF+fMbHGF/VEvSw2iPo4BG0ZTi/MmRcxwanZGWf
-        tb2r/wqldkXdyud41CHWFKOnCQxJenWDxTyWCRedPpacHdG9YHcJcumZqJXlL2ROfVs+0XYTmkiVX
-        SiJPF4dcrvxVpz7ONn34lTgyQpKSbbj0PVXe0WcqrhksbkAoZWdDsPCUAtbCOGTqcu8DXL6flc/GI
-        ZcRvxItYylS7QxVqQwu3cE/muoB0yTdGbg5zo7v+gq27kHmm3VK0Ow8uwWJIpRhwGexa1Vc+EOqUn
-        jUH03KPzwyFv1n0SP9thMeE7;
+         s=42; h=Message-ID:To:From:Date:CC;
+        bh=IYoMenPQ75c9f3stiFW+Wo0tHXzrNB9ehkeehzlmNOs=; b=fw994qPbX1hEQsFBq3eOeHFyos
+        tZnUm8UhfwGgN07DXben1oG7G/MXfmGKGD2I0BBDEECf/jgikoK40+HnT2g5W2aQuAqJUjd95/7+L
+        YgpziV1lSdZTbl6nU9338eHuNnzAtyJCX8OU6fJVZ4NKYeXa76unAm47WIlDYNpIoI94E0s2fKK/e
+        3iCQ3Z0yVj3LgVWHbs6exWV1DDZqfEgFnyCIP5DwpJu9Mg6e0aZod1n4nKD3VLwUejHoFaikFxK3s
+        DOYyOKnHBx4cXpRv07KJs/JBqMPvVG46npqck0P2annqZXRlY09jHVrXMzUYhbvY1Pxn+vNwCEno3
+        DXw+SVXUVZwLuOH3h7gUHvGj6B9kEvFqAE9/7a04AK3dLoGDhT5QD0j//igx+jdwazE3HW3baG3mE
+        R4UsgLj65NcQ8WcsslYM3G0H66Zzgg7TbB9Lm8zCOi84uSvYk2CLw8iRtb/ZUJgapp7dh5YSQw9PO
+        lrqd4Zw1a56HCO8FDuCPS954;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1kvs58-00052J-Tp; Sun, 03 Jan 2021 01:21:19 +0000
-Date:   Sat, 2 Jan 2021 17:21:16 -0800
+        id 1kvs8w-00055d-1J; Sun, 03 Jan 2021 01:25:14 +0000
+Date:   Sat, 2 Jan 2021 17:25:11 -0800
 From:   Jeremy Allison <jra@samba.org>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Xiaoli Feng <xifeng@redhat.com>, CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
+To:     Steve French <smfrench@gmail.com>, Xiaoli Feng <xifeng@redhat.com>,
+        samba-technical <samba-technical@lists.samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Subject: Re: [PATCH][SMB3] allow files to be created with backslash in file
  name
-Message-ID: <20210103012116.GA117067@jeremy-acer>
+Message-ID: <20210103012511.GC117067@jeremy-acer>
 Reply-To: Jeremy Allison <jra@samba.org>
 References: <CAH2r5msH3LZuF69UFcfgtG7XXurMDc=-Ab7Ct4XwfARR8d+wRA@mail.gmail.com>
  <20210101060050.GA1892237@jeremy-acer>
@@ -53,36 +53,28 @@ References: <CAH2r5msH3LZuF69UFcfgtG7XXurMDc=-Ab7Ct4XwfARR8d+wRA@mail.gmail.com>
  <CAH2r5ms1V2KKb6T3ELQ-JsQ3fniOScTE2654_xLwnPruiekzEw@mail.gmail.com>
  <20210102052524.GA67422@jeremy-acer>
  <CAH2r5msZt0UZG5r5Z7=_jQf=-xgNz8zW7fZOnqncqeJHB=mOmA@mail.gmail.com>
+ <20210103012116.GA117067@jeremy-acer>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <CAH2r5msZt0UZG5r5Z7=_jQf=-xgNz8zW7fZOnqncqeJHB=mOmA@mail.gmail.com>
+In-Reply-To: <20210103012116.GA117067@jeremy-acer>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, Jan 02, 2021 at 06:19:39PM -0600, Steve French wrote:
->I agree with the idea of being safe (in the smbclient in this case),
->and not returning potentially dangerous file names (even if a very
->remote danger to the tool, smbclient in this case), but I am not
->convinced that the "user friendly" behavior is to reject the names
->with the rather confusing message - especially as it would mean that
->inserting a single file with an odd name into a server could make the
->whole share unusable for smbclient (e.g. in a backup scenario).  I
->agree with rejecting (or perhaps better skipping) it, but ... not sure
->any user would understand what SMBecho has to do with a server file
->name.
+On Sat, Jan 02, 2021 at 05:21:16PM -0800, Jeremy Allison via samba-technical wrote:
+>On Sat, Jan 02, 2021 at 06:19:39PM -0600, Steve French wrote:
+>>I agree with the idea of being safe (in the smbclient in this case),
+>>and not returning potentially dangerous file names (even if a very
+>>remote danger to the tool, smbclient in this case), but I am not
+>>convinced that the "user friendly" behavior is to reject the names
+>>with the rather confusing message - especially as it would mean that
+>>inserting a single file with an odd name into a server could make the
+>>whole share unusable for smbclient (e.g. in a backup scenario).  I
 
-Dropping the connection on receipt of an invalid
-name is the only safe response. We know the server
-is insane and dangerous at that point and sending
-invalid protocol responses.
+FYI, as I pointed out this only happens if you *explicitly*
+set a server parameter that is only expected to be set on
+a share with "clean" (no non-Windows) names.
 
-Safer not to continue.
-
->"NT_STATUS_INVALID_NETWORK_RESPONSE listing \*
->smb: \> SMBecho failed (NT_STATUS_CONNECTION_DISCONNECTED). The
->connection is disconnected now"
-
-The SMBecho is due to the keepalive failing once
-the connection was dropped.
+So just creating a file containing : \ etc. doesn't do
+this - you have to misconfigure the server FIRST.
