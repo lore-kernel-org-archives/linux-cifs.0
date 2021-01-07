@@ -2,252 +2,296 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A454C433E6
-	for <linux-cifs@archiver.kernel.org>; Thu,  7 Jan 2021 11:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0D4C433E6
+	for <linux-cifs@archiver.kernel.org>; Thu,  7 Jan 2021 13:52:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C63723333
-	for <linux-cifs@archiver.kernel.org>; Thu,  7 Jan 2021 11:09:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F74322D6F
+	for <linux-cifs@archiver.kernel.org>; Thu,  7 Jan 2021 13:52:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727927AbhAGLJd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 7 Jan 2021 06:09:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53366 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726822AbhAGLJa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Jan 2021 06:09:30 -0500
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EBE0C0612F5;
-        Thu,  7 Jan 2021 03:09:10 -0800 (PST)
-Received: by mail-qv1-xf36.google.com with SMTP id p5so2569983qvs.7;
-        Thu, 07 Jan 2021 03:09:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=QiltxrUYrf0bVMIP9HbxN9GwYp1fqxWzzhDW62N0l4g=;
-        b=bgGA8ztjwm3ylYzmfMPM6NzTYvXhpm7nBg4TwZqz7KzmyjG31owyDiHTLUiFH33jx/
-         hinW2w0KkZ7EFqEo8WAzze6E3RspiV6KNvVioAh8tKwRNkQBGdA66UPPhpq0aZhKuKjf
-         IZfxbgQ32y1gf7by80iesraxDgI1DESKe+jPAw97cqLZPSbEy59NfMlZp+GQDB0NAPbc
-         bJ85Av/txRKjz4zwP4t1oilqoR+3tirxqlUFmQWBn+VUmVQBNY73VOmua0etFoeUMWJV
-         5krh/7zjBul9cxqkPHkMFljRWsdSfBdculZY2hHRfVHnYBbNN1BdZ2z5xrnnedA3cbyJ
-         AZCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QiltxrUYrf0bVMIP9HbxN9GwYp1fqxWzzhDW62N0l4g=;
-        b=PsqfnHLkdwy49iMpjyvU0XGm/lcHY8gIVeXBsDDE9h8joB3A13yU6PNYspyGSfHouh
-         ScKw991lYJGCy1cLSYFBotTpiyNC1n810nZEjobFDD04N6UNobytvn/VceXIiy87L8qH
-         jmuJFtbHiDIBpv5D943FQR2zYzIcxF9j/hz2UFvu/bPcGlOdtqkB8xIzWIWVxBPZlZMk
-         psp5nc50yTQC5Y8gpqS21gLKxIFxK2j5mabrWTpoBjPQDgMHvTQlymbURs6tPPoIB5vv
-         go/erLYaM3SROHy1iniLtfyS1+ogqxcD6WGrwDDrfAZPpc3CoPmgtT6ZYraDgHmHKaNI
-         9Nrw==
-X-Gm-Message-State: AOAM530ks/Hu/PpFLbv1VC0ATzAQbIUcB/Qsd2pIF3XVuzk4ffj1V9Pl
-        xRxB3ELuAMmddpYrLIr9tH9aR2+eRcVN+Vyuz1PFJm5tw4uFUg==
-X-Google-Smtp-Source: ABdhPJyUjXJKjT4naI60958bxVTPxbguSzBomuXj5zZv+dhfjxE/I7o/wzGKuPPtAqpxuEJPi3dxK8S7Zt3guWXXZLs=
-X-Received: by 2002:a0c:f1ce:: with SMTP id u14mr1393819qvl.24.1610017749417;
- Thu, 07 Jan 2021 03:09:09 -0800 (PST)
-MIME-Version: 1.0
-References: <1607591258-13865-1-git-send-email-yejune.deng@gmail.com> <CAH2r5mvgjFWwEcqt8nfiU_1GJQUU7jN=eNT-t6SBEK8jke0Msg@mail.gmail.com>
-In-Reply-To: <CAH2r5mvgjFWwEcqt8nfiU_1GJQUU7jN=eNT-t6SBEK8jke0Msg@mail.gmail.com>
-From:   Yejune Deng <yejune.deng@gmail.com>
-Date:   Thu, 7 Jan 2021 19:08:58 +0800
-Message-ID: <CABWKuGUj41Qa-y_cApNNvLfTQPLJi2adr+ZKN6RpwFoemskoKg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix msleep() is imprecise
-To:     Steve French <smfrench@gmail.com>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        id S1728537AbhAGNwf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 7 Jan 2021 08:52:35 -0500
+Received: from mail.fioriti.org ([95.216.23.138]:33540 "EHLO mail.fioriti.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728539AbhAGNwf (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 7 Jan 2021 08:52:35 -0500
+X-Greylist: delayed 397 seconds by postgrey-1.27 at vger.kernel.org; Thu, 07 Jan 2021 08:52:33 EST
+Received: from pico.ipa.ssimo.org (cpe-158-222-141-151.nyc.res.rr.com [158.222.141.151])
+        by mail.fioriti.org (Postfix) with ESMTPSA id C429B260085;
+        Thu,  7 Jan 2021 08:45:13 -0500 (EST)
+Message-ID: <34f05c896fc95047e2cee8252441ec3420cf06e2.camel@ssimo.org>
+Subject: Re: [gssproxy] Re: cifs-utils, Linux cifs kernel client and gssproxy
+From:   Simo <simo@ssimo.org>
+To:     samba-technical@lists.samba.org
+Cc:     "Weiser, Michael" <michael.weiser@atos.net>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        The GSS-Proxy developers and users mailing list 
+        <gss-proxy@lists.fedorahosted.org>
+Date:   Thu, 07 Jan 2021 08:45:11 -0500
+In-Reply-To: <2d5a7cf3b6e8e31db010f6a3d159109ca48ca998.camel@samba.org>
+References: <2e241ceaece6485289b1cddb84ec77ca@atos.net>
+         , <04d24a21a7a462b3dc316959c3a3b1c8be8caac3.camel@redhat.com>
+         <e562d3fb430e4c87b0700a70267ef930@atos.net>
+         <2d5a7cf3b6e8e31db010f6a3d159109ca48ca998.camel@samba.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-No=E3=80=82I just see Documentation/timers/timers-howto.rst and don't
-recommend using msleep() for (1ms - 20ms). It recommends using
-usleep_range(). And fsleep() is flexible sleeping.
+Adding back missing people in CC, as I incorrectly pressed reply-to-
+list and lost them.
 
+On Thu, 2021-01-07 at 08:37 -0500, Simo via samba-technical wrote:
+> On Thu, 2021-01-07 at 11:04 +0000, Weiser, Michael via samba-
+> technical
+> wrote:
+> > Hello Simo,
+> > Hello Steve,
+> > 
+> > > If something is needed in the short term, I thjink the quickest
+> > > course
+> > > of action is indeed to change the userspace helper to use gssapi
+> > > function calls, so that they can be intercepted like we do for
+> > > rpc.gssd
+> > > (nfs client's userspace helper).
+> > 
+> > To get the ball rolling and give people (including myself and
+> > client)
+> > something to play with I went that route and extended cifs.upcall
+> > to
+> > fall back to GSS-API if no ticket cache nor keytab can be found for
+> > the user. An unpolished PoC patch is attached. (Sorry, for not
+> > putting it inline, have to rock the groupware at work. I will try
+> > to
+> > sort that once we've agreed this is the/a way to go.)
+> > 
+> > With that patch applied,  I can do a multiuser cifs mount using the
+> > system keytab and machine identity as usual and then have users
+> > access the mount using impersonated credentials from gssproxy.
+> > Quick
+> > demo:
+> > 
+> > [root@fedora33 ~]# umount /mnt
+> > [root@fedora33 ~]# mount -o sec=krb5,multiuser,user=FEDORA33\$
+> > //dc/share /mnt
+> > [root@fedora33 ~]# ls -la /mnt
+> > total 0
+> > drwxr-xr-x.  2 root root   0 Jan  7 10:20 .
+> > dr-xr-xr-x. 18 root root 238 Jan  6 13:59 ..
+> > -rwxr-xr-x.  1 root root   0 Jan  5 17:02 bar
+> > [root@fedora33 ~]# klist
+> > klist: Credentials cache keyring 'persistent:0:krb_ccache_WZh7W8n'
+> > not found
+> > [root@fedora33 ~]#
+> > 
+> > [adsuser@fedora33 ~]$ kdestroy
+> > [adsuser@fedora33 ~]$ echo test > /mnt/test
+> > [adsuser@fedora33 ~]$ cat /mnt/test
+> > test
+> > [adsuser@fedora33 ~]$ klist
+> > klist: Credentials cache keyring
+> > 'persistent:1618201110:krb_ccache_SrGqT3F' not found
+> > [adsuser@fedora33 ~]$
+> > 
+> > Server-side permissions are enforced:
+> > 
+> > [m@fedora33 ~]$ cat /mnt/test
+> > test
+> > [m@fedora33 ~]$ echo mytest > /mnt/test
+> > -bash: /mnt/test: Permission denied
+> > [m@fedora33 ~]$ klist
+> > klist: Credentials cache keyring 'persistent:1000:1000' not found
+> > [m@fedora33 ~]$
+> > 
+> > The gssproxy config for this configures a cifs-specific socket and
+> > enables impersonation for any user id:
+> > 
+> > [root@fedora33 ~]# cat /etc/gssproxy/99-cifs.conf
+> > [service/cifs]
+> > mechs = krb5
+> > socket = /var/lib/gssproxy/cifs.sock
+> > cred_store = keytab:/etc/krb5.keytab
+> > cred_usage = initiate
+> > euid = 0
+> > impersonate = yes
+> > allow_any_uid = yes
+> > 
+> > And request-key config for cifs.spnego enables use of gssproxy and
+> > the service-specific socket through environment variables:
+> > 
+> > [root@fedora33 ~]# cat /etc/request-key.d/cifs.spnego.conf
+> > create  cifs.spnego    * *  /usr/bin/env GSS_USE_PROXY=yes
+> > GSSPROXY_SOCKET=/var/lib/gssproxy/cifs.sock /usr/sbin/cifs.upcall
+> > %k
+> > 
+> > (I see that nfs-utils' gssd does the same by setting the variables
+> > itself based on command line options. That could easily be done
+> > here
+> > as well.)
+> >  
+> > User FEDORA33$ (the computer object) needs to be enabled for
+> > delegation to service cifs. I've tested with a Fedora 33 client and
+> > Windows 2016 Active Directory server.
+> > 
+> > The patch is against current cifs-utils HEAD. It is lacking all the
+> > autoconf trimmings and intentionally forgoes reindents of existing
+> > code for clarity of what's being touched.
+> > 
+> > What do you think?
+> 
+> Sounds great!
+> 
+> > > Unfortunately I do not have the cycles to work on that myself at
+> > > this
+> > > time :-(
+> > 
+> > I have a client in very tangible need of this functionality who is
+> > a
+> > RedHat customer. Would it be helpful if they were to open a case
+> > with
+> > Redhat on this?
+> 
+> Yes!
+> CC me if you need to.
+> 
+> > As an extension the above (but not to distract from the focus of
+> > getting something to work at all first):
+> > 
+> > I rather accidentally also played around with delegating retrieval
+> > of
+> > the mount credentials into gssproxy as well (due to not realising
+> > that username=FEDORA33$ would just activate the keytab codepath in
+> > cifs.upcall).
+> > 
+> > This can be done by leaving out the username from the mount
+> > command,
+> > marking euid 0 as trusted for access to the keytab in gssproxy and
+> > adding a fallback principal to the gssproxy config (because
+> > cifs.upcall in this case does not submit a desired name for the
+> > credential):
+> > 
+> > [root@fedora33 ~]# mount -o sec=krb5,multiuser //dc/share /mnt
+> > [root@fedora33 ~]# cat /etc/gssproxy/99-cifs.conf
+> > [service/cifs]
+> > mechs = krb5
+> > socket = /var/lib/gssproxy/cifs.sock
+> > cred_store = keytab:/etc/krb5.keytab
+> > cred_usage = initiate
+> > euid = 0
+> > trusted = yes
+> > impersonate = yes
+> > krb5_principal = cifs-mount
+> > allow_any_uid = yes
+> > 
+> > While this works, it requires a separate user who would then
+> > carefully need to be kept out of any sensitive file access groups.
+> > 
+> > When trying to use the machine identity FEDORA33$ instead, I ran
+> > into
+> > a peculiar error from the AD KDC:
+> > 
+> > [root@fedora33 ~]# cat /etc/gssproxy/99-cifs.conf
+> > [service/cifs]
+> > mechs = krb5
+> > socket = /var/lib/gssproxy/cifs.sock
+> > cred_store = keytab:/etc/krb5.keytab
+> > cred_usage = initiate
+> > euid = 0
+> > trusted = yes
+> > impersonate = yes
+> > krb5_principal = FEDORA33$
+> > allow_any_uid = yes
+> > [root@fedora33 ~]# gssproxy -i -d &
+> > [2] 3814
+> > [root@fedora33 ~]# [2021/01/07 10:01:10]: Debug Enabled (level: 1)
+> > [2021/01/07 10:01:10]: Service: nfs-server, Keytab:
+> > /etc/krb5.keytab,
+> > Enctype: 17
+> > [2021/01/07 10:01:10]: Service: cifs, Keytab: /etc/krb5.keytab,
+> > Enctype: 17
+> > [2021/01/07 10:01:10]: Service: nfs-client, Keytab:
+> > /etc/krb5.keytab,
+> > Enctype: 17
+> > [2021/01/07 10:01:10]: Client [2021/01/07 10:01:10]:
+> > (/usr/sbin/gssproxy) [2021/01/07 10:01:10]:  connected (fd =
+> > 11)[2021/01/07 10:01:10]:  (pid = 3814) (uid = 0) (gid =
+> > 0)[2021/01/07 10:01:10]:  (context =
+> > system_u:system_r:kernel_t:s0)[2021/01/07 10:01:10]:
+> > 
+> > [root@fedora33 ~]# mount -o sec=krb5,multiuser //dc/share /mnt
+> > [2021/01/07 10:01:13]: Client [2021/01/07 10:01:13]:
+> > (/usr/sbin/cifs.upcall) [2021/01/07 10:01:13]:  connected (fd =
+> > 12)[2021/01/07 10:01:13]:  (pid = 3824) (uid = 0) (gid =
+> > 0)[2021/01/07 10:01:13]:  (context =
+> > system_u:system_r:kernel_t:s0)[2021/01/07 10:01:13]:
+> > [CID 12][2021/01/07 10:01:13]: gp_rpc_execute: executing 6
+> > (GSSX_ACQUIRE_CRED) for service "cifs", euid: 0,socket:
+> > /var/lib/gssproxy/cifs.sock
+> > gssproxy[3814]: (OID: { 1 2 840 113554 1 2 2 }) Unspecified GSS
+> > failure.  Minor code may provide more information, KDC has no
+> > support
+> > for padata type
+> > [CID 12][2021/01/07 10:01:13]: gp_rpc_execute: executing 8
+> > (GSSX_INIT_SEC_CONTEXT) for service "cifs", euid: 0,socket:
+> > /var/lib/gssproxy/cifs.sock
+> > gssproxy[3814]: (OID: { 1 2 840 113554 1 2 2 }) Unspecified GSS
+> > failure.  Minor code may provide more information, KDC has no
+> > support
+> > for padata type
+> > [CID 12][2021/01/07 10:01:13]: gp_rpc_execute: executing 6
+> > (GSSX_ACQUIRE_CRED) for service "cifs", euid: 0,socket:
+> > /var/lib/gssproxy/cifs.sock
+> > gssproxy[3814]: (OID: { 1 2 840 113554 1 2 2 }) Unspecified GSS
+> > failure.  Minor code may provide more information, KDC has no
+> > support
+> > for padata type
+> > [CID 12][2021/01/07 10:01:13]: gp_rpc_execute: executing 8
+> > (GSSX_INIT_SEC_CONTEXT) for service "cifs", euid: 0,socket:
+> > /var/lib/gssproxy/cifs.sock
+> > gssproxy[3814]: (OID: { 1 2 840 113554 1 2 2 }) Unspecified GSS
+> > failure.  Minor code may provide more information, KDC has no
+> > support
+> > for padata type
+> > mount error(126): Required key not available
+> > Refer to the mount.cifs(8) manual page (e.g. man mount.cifs) and
+> > kernel log messages (dmesg)
+> > 
+> > With more debugging it appears that gssproxy tries to impersonate
+> > user FEDORA33$ with a credential which is also for FEDORA33$. After
+> > further testing it seems this is generally not allowed or just not
+> > working due to never being tested because it is unnecessary: If we
+> > can acquire a impersonation credential for that identity we should
+> > also be able to get the actual access credential as well.
+> 
+> Sounds like a bug in gss-proxy, can you file a github issue/PR ?
+> We should certainly shortcut the impersonation if we already have a
+> valid credential.
+> 
+> > From looking at the nfs-utils gssd code it appears the only reason
+> > it
+> > hasn't run into this case yet is because it handles the machine
+> > credentials itself using krb5 functions.
+> > 
+> > The second attached patch against current gssproxy HEAD adds that
+> > distinction and makes this case work as an optional extension with
+> > fallback into the default codepath on error.
+> > 
+> > Does that make sense?
+> 
+> Yes the patch looks good!
+> 
+> > Is it sane, security wise, do you think?
+> 
+> Sane, you are just avoiding a useless call in a special case.
+> 
+> Simo.
+> 
+> 
 
-On Wed, Jan 6, 2021 at 12:27 PM Steve French <smfrench@gmail.com> wrote:
->
-> This patch seems reasonable at first glance, but I was a little
-> concerned that we don't see many users yet of fsleep.  Has there been
-> pushback on converting "yield" situations from using msleep to fsleep?
->
-> On Thu, Dec 10, 2020 at 3:09 AM Yejune Deng <yejune.deng@gmail.com> wrote=
-:
-> >
-> > See Documentation/timers/timers-howto.rst, msleep() is not
-> > for (1ms - 20ms), There is a more advanced API is used.
-> >
-> > Signed-off-by: Yejune Deng <yejune.deng@gmail.com>
-> > ---
-> >  fs/cifs/cifsfs.c    |  4 ++--
-> >  fs/cifs/connect.c   | 14 +++++++-------
-> >  fs/cifs/file.c      |  6 +++---
-> >  fs/cifs/smbdirect.c |  2 +-
-> >  4 files changed, 13 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> > index 472cb77..d35ce52 100644
-> > --- a/fs/cifs/cifsfs.c
-> > +++ b/fs/cifs/cifsfs.c
-> > @@ -664,10 +664,10 @@ static void cifs_umount_begin(struct super_block =
-*sb)
-> >                 cifs_dbg(FYI, "wake up tasks now - umount begin not com=
-plete\n");
-> >                 wake_up_all(&tcon->ses->server->request_q);
-> >                 wake_up_all(&tcon->ses->server->response_q);
-> > -               msleep(1); /* yield */
-> > +               fsleep(1000); /* yield */
-> >                 /* we have to kick the requests once more */
-> >                 wake_up_all(&tcon->ses->server->response_q);
-> > -               msleep(1);
-> > +               fsleep(1000);
-> >         }
-> >
-> >         return;
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index 44f9cce..62a9c64 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -538,7 +538,7 @@ static inline int reconn_setup_dfs_targets(struct c=
-ifs_sb_info *cifs_sb,
-> >                 if (rc) {
-> >                         cifs_dbg(FYI, "reconnect error %d\n", rc);
-> >                         mutex_unlock(&server->srv_mutex);
-> > -                       msleep(3000);
-> > +                       ssleep(3);
-> >                 } else {
-> >                         atomic_inc(&tcpSesReconnectCount);
-> >                         set_credits(server, 1);
-> > @@ -621,7 +621,7 @@ static inline int reconn_setup_dfs_targets(struct c=
-ifs_sb_info *cifs_sb,
-> >                 server->bigbuf =3D (char *)cifs_buf_get();
-> >                 if (!server->bigbuf) {
-> >                         cifs_server_dbg(VFS, "No memory for large SMB r=
-esponse\n");
-> > -                       msleep(3000);
-> > +                       ssleep(3);
-> >                         /* retry will check if exiting */
-> >                         return false;
-> >                 }
-> > @@ -634,7 +634,7 @@ static inline int reconn_setup_dfs_targets(struct c=
-ifs_sb_info *cifs_sb,
-> >                 server->smallbuf =3D (char *)cifs_small_buf_get();
-> >                 if (!server->smallbuf) {
-> >                         cifs_server_dbg(VFS, "No memory for SMB respons=
-e\n");
-> > -                       msleep(1000);
-> > +                       ssleep(1);
-> >                         /* retry will check if exiting */
-> >                         return false;
-> >                 }
-> > @@ -729,7 +729,7 @@ static inline int reconn_setup_dfs_targets(struct c=
-ifs_sb_info *cifs_sb,
-> >                          * to clear and app threads to set tcpStatus
-> >                          * CifsNeedReconnect if server hung.
-> >                          */
-> > -                       usleep_range(1000, 2000);
-> > +                       fsleep(1000);
-> >                         length =3D 0;
-> >                         continue;
-> >                 }
-> > @@ -790,7 +790,7 @@ static inline int reconn_setup_dfs_targets(struct c=
-ifs_sb_info *cifs_sb,
-> >                  */
-> >                 cifs_dbg(FYI, "RFC 1002 negative session response\n");
-> >                 /* give server a second to clean up */
-> > -               msleep(1000);
-> > +               ssleep(1);
-> >                 /*
-> >                  * Always try 445 first on reconnect since we get NACK
-> >                  * on some if we ever connected to port 139 (the NACK
-> > @@ -944,7 +944,7 @@ static void clean_demultiplex_info(struct TCP_Serve=
-r_Info *server)
-> >                  * response and going ahead and killing cifsd.
-> >                  */
-> >                 cifs_dbg(FYI, "Wait for exit from demultiplex thread\n"=
-);
-> > -               msleep(46000);
-> > +               ssleep(46);
-> >                 /*
-> >                  * If threads still have not exited they are probably n=
-ever
-> >                  * coming home not much else we can do but free the mem=
-ory.
-> > @@ -3655,7 +3655,7 @@ static void rfc1002mangle(char *target, char *sou=
-rce, unsigned int length)
-> >                  * significant slowing down on mount
-> >                  * for everyone else
-> >                  */
-> > -               usleep_range(1000, 2000);
-> > +               fsleep(1000);
-> >         }
-> >         /*
-> >          * else the negprot may still work without this
-> > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> > index be46fab..75538a8 100644
-> > --- a/fs/cifs/file.c
-> > +++ b/fs/cifs/file.c
-> > @@ -283,7 +283,7 @@ int cifs_posix_open(char *full_path, struct inode *=
-*pinode,
-> >  cifs_down_write(struct rw_semaphore *sem)
-> >  {
-> >         while (!down_write_trylock(sem))
-> > -               msleep(10);
-> > +               fsleep(10000);
-> >  }
-> >
-> >  static void cifsFileInfo_put_work(struct work_struct *work);
-> > @@ -2828,7 +2828,7 @@ size_t get_numpages(const size_t wsize, const siz=
-e_t len, size_t *cur_len)
-> >
-> >                         if (wsize < wdata->bytes) {
-> >                                 add_credits_and_wake_if(server, &credit=
-s, 0);
-> > -                               msleep(1000);
-> > +                               ssleep(1);
-> >                         }
-> >                 } while (wsize < wdata->bytes);
-> >                 wdata->credits =3D credits;
-> > @@ -3563,7 +3563,7 @@ static int cifs_resend_rdata(struct cifs_readdata=
- *rdata,
-> >
-> >                         if (rsize < rdata->bytes) {
-> >                                 add_credits_and_wake_if(server, &credit=
-s, 0);
-> > -                               msleep(1000);
-> > +                               ssleep(1);
-> >                         }
-> >                 } while (rsize < rdata->bytes);
-> >                 rdata->credits =3D credits;
-> > diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-> > index b029ed3..84f97f8 100644
-> > --- a/fs/cifs/smbdirect.c
-> > +++ b/fs/cifs/smbdirect.c
-> > @@ -1372,7 +1372,7 @@ void smbd_destroy(struct TCP_Server_Info *server)
-> >         wake_up_interruptible_all(&info->wait_mr);
-> >         while (atomic_read(&info->mr_used_count)) {
-> >                 mutex_unlock(&server->srv_mutex);
-> > -               msleep(1000);
-> > +               ssleep(1);
-> >                 mutex_lock(&server->srv_mutex);
-> >         }
-> >         destroy_mr_list(info);
-> > --
-> > 1.9.1
-> >
->
->
-> --
-> Thanks,
->
-> Steve
