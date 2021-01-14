@@ -4,106 +4,103 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E721CC433E0
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Jan 2021 18:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17FC1C433E0
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Jan 2021 07:33:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1EB6205CA
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Jan 2021 18:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1B442389E
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Jan 2021 07:33:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728357AbhAMSg3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 Jan 2021 13:36:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34258 "EHLO
+        id S1726677AbhANHdj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Jan 2021 02:33:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728356AbhAMSg3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Jan 2021 13:36:29 -0500
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79009C061575
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Jan 2021 10:35:48 -0800 (PST)
-Received: by mail-ej1-x629.google.com with SMTP id jx16so4477427ejb.10
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Jan 2021 10:35:48 -0800 (PST)
+        with ESMTP id S1726162AbhANHdj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Jan 2021 02:33:39 -0500
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92796C061794;
+        Wed, 13 Jan 2021 23:32:58 -0800 (PST)
+Received: by mail-qk1-x729.google.com with SMTP id z11so6180251qkj.7;
+        Wed, 13 Jan 2021 23:32:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=gEkwJcHyR3ZXyJRE3E33422bzejHLFH9jF0iThOVE/0=;
-        b=ZaoBjAcqy0m3+9+KUCXVCAdsv9FLzovjqAUSWTW6nhnghRPoC6UVYJdSzzGFSics+C
-         mmW6bmP9siuaqGhQq14lvIX+DSGPXOBR1tam5N1h9/fvrdvYo2Hf2q67XeFzzF3Qi8Gu
-         OP1KPkQsm2ZcVJIlG+3aYAke3tkYSienVXKSGmMWUQMYRXqfiRHkSptMqE/VSiRtoe2v
-         BmPxzHa2fzVQqG3ngMTDYQKgReUr31oaU/EaF8W7XLzwi7akrK0betbmpvsZUQL8E8w7
-         5/0/cevAs3YzpXAuNjcRt1bO9Atgblo/s0pszfVKuQgub6XKmLDiDzNNvkwDn8gFz1BU
-         wo+A==
+        bh=YluTp1iiC4qK4Zr758wnPdW/p9IlI0aWMEdgx+CBnY0=;
+        b=IHPl9EqawBrLzdqgHRmShS6uq4OHTiMefYeV0VN9fm8X1a+IGfICxYMUKepAoj16c3
+         Pk1sUoDjbMby8Yyoou4oPorWTa+MHmx6LyHkALDsL2g1HOADU4LBn/mQxtlCIgYMZCKc
+         oE/Eah27Wh2l8qb7AQle6achSlApYVfS/mLWo1D1Iv7YTiGeTescwiay0itj55vZvIhJ
+         CiFSJNqu83LG7adNhFLjEDlVyZo5X2eOoa+cgAbHW0MkN3USj54irN+TM5SCSV2F8XbK
+         LXWbu6TH7tDM6oab1UQhOn/zGvT8JYvdC0lXQ8oREHqI7iYlGEFfM+TCHyQ3YY3apPVw
+         W5Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=gEkwJcHyR3ZXyJRE3E33422bzejHLFH9jF0iThOVE/0=;
-        b=fmirGgCrsEtj+mzPsNB7dztwZnWWUcV9inZzc2pY/FU2pWA6Gm94qMh/SeVIWXGVKW
-         Xw7DPUxGJGJWqkKBH6GX07xJZ1RxrdN20toQGXNHZ10xjsiYbau3qhOKvFlmwy2yOzme
-         yf0xdHzLQRrXERSAIg8leUoJATkt3Spy4BH+iGSY2mjDvsLFsu0a0r5OXOzEqw7Weia9
-         MykqDk4UDUFAgaull8f+swT6FqTqGiWNx55Hc8eFof+tuMVZBo2KwYSYp4Ij78IvAxo2
-         DmA0+uogDfvhqY3LAmO57RslqvmmnC6HmfcIu4pkn4QFlCqaPI7mH3dd1dGRmPnhGjnM
-         fL9g==
-X-Gm-Message-State: AOAM530YCqvQYo/SNFBnEmvLeTXZ5GSvuDYLh4V+fOya5zIpp3KUMwlx
-        gEfUOOAl76uDssLmbq4kA8x7c2levAiz2b/pTw==
-X-Google-Smtp-Source: ABdhPJwihl5EHtlVVC0cA1paY2e+6phk3zE9+Lnu39lbvLLw7HX1GqzlaghTP6luInp0wrMxLcUZpfx9SAlfS0doRNY=
-X-Received: by 2002:a17:906:971a:: with SMTP id k26mr2634099ejx.515.1610562947234;
- Wed, 13 Jan 2021 10:35:47 -0800 (PST)
+        bh=YluTp1iiC4qK4Zr758wnPdW/p9IlI0aWMEdgx+CBnY0=;
+        b=jq+Y4l78+UBnd0ufhSR7AztUbUxGK+qQO4JEb3j3Q7IZHdxisF3soCgNK7JHVUijAB
+         9Xy2RTQVRRbuSOq0ScSnlba3/HTp6K+C2/4PMI9s5WJPVemlmzgO7EkxfROm2CpY902r
+         cfpGI9StxDi137h1B7qttsFOH6rrsy0QAT+Mcr2v6JDKofZkczzuA7YUQv2MmLoP5KUc
+         aAM4gp15f504v0PanjmZfBW9sHP+NxeasinRxJ/YrsyBy92L9+WaxVIijNLCNkKPdOqD
+         i8euqrHAXFMV1087i7C54LVyB9h5dNkpFUsCK7X5SWzK4s6ZYEmav1fHVlrU3uK7nqlH
+         IUlA==
+X-Gm-Message-State: AOAM531dlqEEgjURKBZJGo953yh9ub/ItJoNUvFhKc6CziUM6iwDSiuc
+        k/esNAFvnbOmtWnEuSZIbJsaza0BBIFKKHRUsVU=
+X-Google-Smtp-Source: ABdhPJwsFDL41WRD/AAFiY/z7zxaMXRJZSK3cEAdBYilL7w8Bh7kISXiUa9N9GKMcClfjQqwvv0zwA9WrU5h8QtpD6Y=
+X-Received: by 2002:a05:6902:20a:: with SMTP id j10mr9082339ybs.293.1610609577685;
+ Wed, 13 Jan 2021 23:32:57 -0800 (PST)
 MIME-Version: 1.0
-References: <CAE-Mgq2kwwZJicbU9oenD4M5SQhbErhXovGX+LKtcnRbLC4xSg@mail.gmail.com>
- <87ft35kojo.fsf@suse.com> <CAKywueQ9jmyTaKqR2x0nL-Q8A=-V1fP_1L2n=b+OdUzVhV083Q@mail.gmail.com>
- <87h7nk6art.fsf@cjr.nz> <CAH2r5msvYs4nLbje4vP+XNF_7SR=b5QehQ=t1WT4o=Ki6imPxg@mail.gmail.com>
-In-Reply-To: <CAH2r5msvYs4nLbje4vP+XNF_7SR=b5QehQ=t1WT4o=Ki6imPxg@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 13 Jan 2021 10:35:35 -0800
-Message-ID: <CAKywueT0U3+t3RdC452ZiqVpg1n1KFi_HK=83yGmS__2gALpJg@mail.gmail.com>
-Subject: Re: [bug report] Inconsistent state with CIFS mount after interrupted
- process in Linux 5.10
-To:     Steve French <smfrench@gmail.com>
+References: <CAH2r5msvYs4nLbje4vP+XNF_7SR=b5QehQ=t1WT4o=Ki6imPxg@mail.gmail.com>
+ <20210113171616.11730-1-pc@cjr.nz> <CAKywueSoG8zCqmVgaOtvG5AM4fi47+bFJ3VdHPAa=sJa+v2duA@mail.gmail.com>
+In-Reply-To: <CAKywueSoG8zCqmVgaOtvG5AM4fi47+bFJ3VdHPAa=sJa+v2duA@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Thu, 14 Jan 2021 13:02:46 +0530
+Message-ID: <CANT5p=pBS9=Dd+=1dEtfV_9=reVgMqRcpv7rODxm6e8K3xBPOg@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix interrupted close commands
+To:     Pavel Shilovsky <piastryyy@gmail.com>
 Cc:     Paulo Alcantara <pc@cjr.nz>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
         =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
         Duncan Findlay <duncf@duncf.ca>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Stable <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D1=81=D1=80, 13 =D1=8F=D0=BD=D0=B2. 2021 =D0=B3. =D0=B2 09:03, Steve Frenc=
-h <smfrench@gmail.com>:
+Hi Paulo,
+
+Does is_interrupt_error contain a list of all errors for which server
+can leave the file handle open?
+What about EAGAIN? I see that the server error STATUS_RETRY maps to EAGAIN.
+
+Regards,
+Shyam
+
+On Thu, Jan 14, 2021 at 12:01 AM Pavel Shilovsky <piastryyy@gmail.com> wrot=
+e:
 >
-> On Wed, Jan 13, 2021 at 10:51 AM Paulo Alcantara <pc@cjr.nz> wrote:
+> =D1=81=D1=80, 13 =D1=8F=D0=BD=D0=B2. 2021 =D0=B3. =D0=B2 09:16, Paulo Alc=
+antara <pc@cjr.nz>:
 > >
-> > Pavel Shilovsky <piastryyy@gmail.com> writes:
+> > Retry close command if it gets interrupted to not leak open handles on
+> > the server.
 > >
-> > > Thanks for reporting the issue.
-> > >
-> > > The problem is with the recent fix which changes the error code from
-> > > -EINTR to -ERESTARTSYS:
-> > >
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
-mmit/fs/cifs/transport.c?id=3D6988a619f5b79e4efadea6e19dcfe75fbcd350b5
-> > >
-> > > and this problem happens here:
-> > >
-> > > https://git.samba.org/sfrench/?p=3Dsfrench/cifs-2.6.git;a=3Dblob;f=3D=
-fs/cifs/smb2pdu.c;h=3D067eb44c7baa863c1e7ccd2c2f599be0b067f320;hb=3D236237a=
-b6de1cde004b0ab3e348fc530334270d5#l3251
-> > >
-> > > So, interrupted close commands don't get restarted by the client and
-> > > the client leaks open handles on the server. The offending patch was
-> > > tagged stable, so the fix seems quite urgent. The fix itself should b=
-e
-> > > simple: replace -EINTR with -ERESTARTSYS in the IF condition or even
-> > > amend it with "||".
-> >
-> > Yes, makes sense.
-> >
-> > Maybe we should do something like below
+> > Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+> > Reported-by: Duncan Findlay <duncf@duncf.ca>
+> > Suggested-by: Pavel Shilovsky <pshilov@microsoft.com>
+> > Fixes: 6988a619f5b7 ("cifs: allow syscalls to be restarted in __smb_sen=
+d_rqst()")
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  fs/cifs/smb2pdu.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > >
 > > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
 > > index 067eb44c7baa..794fc3b68b4f 100644
@@ -120,34 +117,19 @@ tcon *tcon,
 > >
 > >                 tmp_rc =3D smb2_handle_cancelled_close(tcon, persistent=
 _fid,
+> > --
+> > 2.29.2
+> >
 >
-> Seems reasonable, the other two conditions (ERESTARTRNOHAND e.g.) are
-> not explicitly set by cifs.ko but may come back from other libraries
-> so could be worth checking for, and it seems a little safer to use
-> is_interrupt_error.
+> Thanks for the fix!
 >
-> Paulo,
-> If you can do a patch quickly I will run the buildbot on it and the
-> other two patches currently in for-next and try to send in the next
-> couple days.
->
-> (I do have a fourth patch, not currently in for-next, that I am
-> debugging ... the '\' handling patch ... which I can send if we can
-> figure out what is missing in it).  I may also include the two trivial
-> one line style patches recently submitted to list.
+> Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
 >
 > --
-> Thanks,
->
-> Steve
+> Best regards,
+> Pavel Shilovsky
 
-Paulo,
-Yes, is_interrupt_error() is cleaner here to eliminate other potential
-issues. Thanks!
 
-Steve,
-Agree - we should send this ASAP with other non-controversial patches.
 
---
-Best regards,
-Pavel Shilovsky
+--=20
+-Shyam
