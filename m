@@ -2,86 +2,107 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 329A9C433E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Jan 2021 16:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07DB3C433E0
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Jan 2021 17:11:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF05D23B40
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Jan 2021 16:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDA6723B31
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Jan 2021 17:11:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726287AbhANQUk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Jan 2021 11:20:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60706 "EHLO
+        id S1726473AbhANRLC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Jan 2021 12:11:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726212AbhANQUk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Jan 2021 11:20:40 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3F13C061575;
-        Thu, 14 Jan 2021 08:19:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=L957m6SCsm4YfRvwt1RQwkHpsqdoGDsxSLN6pjGCXjg=; b=SwgoX4biWiRfNIkgGKBzF1hThh
-        fgohm23xOlFZxJhSLZKiwJXvlpOT7mQ1aERIfxlbDnMSz8cAhA501/6QBLnf5vxFq+Kvg8w7lNzGu
-        lKsu5VUh30ZpNT1bDp4PgQQDOAF2zDky3QBOcd8dN/XGAqJ/p2C2tMdWALZA6gQ+xCzpv+dn065rk
-        2TTrQt7lGJCVnnHfj+gY6z8VUTG1gzIwprxJtAF5iFkyufA4tU7Q2Fuvhh6wXdjjz4/2sT9ZCH6eX
-        Aa9Hq52wo/tTnFG/QpwZVj0ONsXxVxsjndY/W8xQ7Zm0pIhz05bcYui4M6gozuphqFgWnJ9k7MeB2
-        tBm+E3uQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l05LN-007mRF-WF; Thu, 14 Jan 2021 16:19:41 +0000
-Date:   Thu, 14 Jan 2021 16:19:29 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-cachefs@redhat.com,
-        jlayton@redhat.com, dwysocha@redhat.com,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Christoph Hellwig <hch@lst.de>, dchinner@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: Redesigning and modernising fscache
-Message-ID: <20210114161929.GQ35215@casper.infradead.org>
-References: <2758811.1610621106@warthog.procyon.org.uk>
+        with ESMTP id S1726440AbhANRLB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Jan 2021 12:11:01 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61278C061574
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Jan 2021 09:10:21 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id g24so6476550edw.9
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Jan 2021 09:10:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=R03Q6f+F7ZyjvvZuBDIMKXAMOubig/aHfjcAooIoFgc=;
+        b=fAJYnz8zAMwlPEullZTrwoWF5y292NX/Ixg2/O8L5t2m/l/zMVr72kE3Rpp7Oy8fbq
+         8TWAld5lc9pC3+WMxRivoV1ZIZdCnD6M4sfs8uqa5P0HXBrBznOX2o+aRFT+YC9MhBAJ
+         5qaj7e9mOSQDQRTkorbqHxxTiKvsUrO8XaqulOlMbIm0ory1U1ZHT2xRmTHDsZo3jtHL
+         krKPf7WnhkOz4Q5kNXO/u/Lz+8fQpYMe0mqcZvNGzoxkcxsfDcs725Q14J8HeRQM+Mko
+         xQ7nEWFIY4aMO6r/R/UDta/r1v8O0o1myw6Xw2BE5lKItlWAt0lZvo4AdMUlsnofWgR8
+         d9Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=R03Q6f+F7ZyjvvZuBDIMKXAMOubig/aHfjcAooIoFgc=;
+        b=SZZpcoSwOqq8Y4FMPCeFvx/nmxIgoRgUs1z5lBcXgUaz4lwqkbkTpnbDro/XAE0USw
+         Z1w9I4DZWdj0TgG7/K1GV9QtNixIHmoYaUditrO7u+bz6kvXd2BbbvCUgjwXquBjFvTe
+         ejxHy6y3fGCJe6q5buUP38dP940OfSNgq79G8RQwvHt2BPjk7ZgdfhBB7i0AagmvvGky
+         xymeU5fR5fNOpQVNoclh/OZkfgoYiPPPNQrlnskFj3zfz/Jl9JN57pT6nhGPDtBVcJVd
+         x4S4R1AV6QFyBnP3ehjxu30R8XSCfpL1zgi0dCRV5v8IklNoFCmGdhtHJ/f8LN3drDx0
+         8X8A==
+X-Gm-Message-State: AOAM531HpJwXxpIfmQRzP38AwdSjhgNj1Yggo5w0BMdMY6paVB4hD7cJ
+        BCbE69+ORc5KPOaAMd/D84drAfJsMZmw9Dvhfg==
+X-Google-Smtp-Source: ABdhPJz6W81EzGnm5fFGOyu6MO6Wn9xckSoonQLdo4xn4yCJHsEaj5B8f9rXO7tZEV3ilChzWvIGApntGTQvt7T58KM=
+X-Received: by 2002:a05:6402:310f:: with SMTP id dc15mr6419087edb.225.1610644220145;
+ Thu, 14 Jan 2021 09:10:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2758811.1610621106@warthog.procyon.org.uk>
+References: <CAE-Mgq2kwwZJicbU9oenD4M5SQhbErhXovGX+LKtcnRbLC4xSg@mail.gmail.com>
+ <87ft35kojo.fsf@suse.com> <CAKywueQ9jmyTaKqR2x0nL-Q8A=-V1fP_1L2n=b+OdUzVhV083Q@mail.gmail.com>
+ <87h7nk6art.fsf@cjr.nz> <CAH2r5msvYs4nLbje4vP+XNF_7SR=b5QehQ=t1WT4o=Ki6imPxg@mail.gmail.com>
+ <CAKywueT0U3+t3RdC452ZiqVpg1n1KFi_HK=83yGmS__2gALpJg@mail.gmail.com> <87a6tblf25.fsf@suse.com>
+In-Reply-To: <87a6tblf25.fsf@suse.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Thu, 14 Jan 2021 09:10:09 -0800
+Message-ID: <CAKywueRAwZOvG3PJaQdPXi2=aLeNWx9zfaUvoN-aR67XOPD-WA@mail.gmail.com>
+Subject: Re: [bug report] Inconsistent state with CIFS mount after interrupted
+ process in Linux 5.10
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
+        Duncan Findlay <duncf@duncf.ca>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jan 14, 2021 at 10:45:06AM +0000, David Howells wrote:
-> However, there've been some objections to the approach I've taken to
-> implementing this.  The way I've done it is to disable the use of fscache by
-> the five network filesystems that use it, remove much of the old code, put in
-> the reimplementation, then cut the filesystems over.  I.e. rip-and-replace.
-> It leaves unported filesystems unable to use it - but three of the five are
-> done (afs, ceph, nfs), and I've supplied partially-done patches for the other
-> two (9p, cifs).
-> 
-> It's been suggested that it's too hard to review this way and that either I
-> should go for a gradual phasing in or build the new one in parallel.  The
-> first is difficult because I want to change how almost everything in there
-> works - but the parts are tied together; the second is difficult because there
-> are areas that would *have* to overlap (the UAPI device file, the cache
-> storage, the cache size limits and at least some state for managing these), so
-> there would have to be interaction between the two variants.  One refinement
-> of the latter would be to make the two implementations mutually exclusive: you
-> can build one or the other, but not both.
+Great, thanks for adding the test!
+--
+Best regards,
+Pavel Shilovsky
 
-My reservation with "build fscache2" is that it's going to take some
-time to do, and I really want rid of ->readpages as soon as possible.
-
-What I'd like to see is netfs_readahead() existing as soon as possible,
-built on top of the current core.  Then filesystems can implement
-netfs_read_request_ops one by one, and they become insulated from the
-transition.
+=D1=87=D1=82, 14 =D1=8F=D0=BD=D0=B2. 2021 =D0=B3. =D0=B2 07:21, Aur=C3=A9li=
+en Aptel <aaptel@suse.com>:
+>
+> Thanks Paulo and Pavel for the quick fix and review.
+>
+> I've added an xfstest test for it on the buildbot. It's essentially
+> doing this:
+>
+>     set -e
+>     rm -f x
+>     sleep 5 > x &
+>     pid=3D$!
+>     sleep 1
+>     kill $pid
+>     wait $pid &> /dev/null || true
+>     timeout 2 stat x > /dev/null
+>     timeout 2 rm  x
+>
+> this fails without the fix
+>
+> Cheers,
+> --
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
+ DE
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
+=BCnchen)
+>
