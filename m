@@ -2,103 +2,136 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9110EC433E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 Jan 2021 02:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8346EC433E6
+	for <linux-cifs@archiver.kernel.org>; Mon, 18 Jan 2021 23:38:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DF12224DF
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 Jan 2021 02:09:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40C4F23100
+	for <linux-cifs@archiver.kernel.org>; Mon, 18 Jan 2021 23:38:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730523AbhARCJP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 17 Jan 2021 21:09:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36274 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730458AbhARCJO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 17 Jan 2021 21:09:14 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1933C061573;
-        Sun, 17 Jan 2021 18:08:33 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id v24so15169617lfr.7;
-        Sun, 17 Jan 2021 18:08:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UCNr++Ssi+GCJXfceKYWtjuCgckAsDZ7Hj+PCOxiPFI=;
-        b=Wk1tFUMhMF6+naycYPO5gIKoQs44ym7L+cXKP2iv6fsgQkelky9y5Y9OVGM1P4yfTl
-         /RoxHrZ/ZrPlYJ3wP+lUMsmPfwbDCLvoeS26f0b+6SAdG2TwIkmWho2Zb/PwAWx5jY9S
-         0oOFpc05VzN4dyPOFoyBZDZVXfCgUok/9CqiOfZdWwIjrYFyVlhtwk+J30tzVrUxND32
-         rfnZ0DX1GVMyi5fnD/ePq+8Njwh68TqQKt1YmwTF5D2ra4kyhR8vwlZKDQX4Ou4s2HtR
-         bNgl1gDjrcgsSh4DG1BY7r6/4jlUmCi3lbROe8f3U77auAMgRLLXzjsvG1zPxVyLxSYh
-         RhGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UCNr++Ssi+GCJXfceKYWtjuCgckAsDZ7Hj+PCOxiPFI=;
-        b=S/bPIt9L0a/EDC8TI0Bi553ZQpV8hzWEL1/6qVMWprg5nZnZbKcpUh9dqfk1tbktlT
-         WyUDjsWShPSA0mDIAp+6O9kRRBD2+ccbkxYlvG4Rqkk2zW32fX9BN97R+0Zsj4wX8h2P
-         Y9enxKL/Qq8KVIYDn1kGkD6vRrlccorLvU7ARWWa5K7KKDnvtNn9oIneMJlmFf8+5KCU
-         uw5JTGtcGoLbMnWHcQb2D6bVyfBm5BGWxGumSV9ZKjeLRXI/1GY9UDOF6NrYk6p/qAJK
-         sJ0qxW46XcoOnzAp44QmTGxoLvN52WZK2oYS1pgfpHC1X/sQN7eExxBIsS1/PfWoj7Sy
-         gJcQ==
-X-Gm-Message-State: AOAM532YWJ8VjYo1IW2MuoTJGAXBhVZ0E5MMnn3TN6IBtE5HOiJlmoAx
-        TequX/meZOFZaZYtsdPdjO9qVKRSHvLcTyU9YgZAiDAVBiY=
-X-Google-Smtp-Source: ABdhPJy1F7PzMeYmUBqKJFwc+OMyBL9Qjt2TMLg2k5TKElN6wCIQIQXXiSfFrAe/V1nyxKQqvyrpCeqNeJ3jhJIIhmE=
-X-Received: by 2002:ac2:5689:: with SMTP id 9mr10870086lfr.175.1610935712208;
- Sun, 17 Jan 2021 18:08:32 -0800 (PST)
-MIME-Version: 1.0
-References: <1610615171-68296-1-git-send-email-abaci-bugfix@linux.alibaba.com>
- <87czy7lvjy.fsf@suse.com> <CAH2r5mvjDAgB6-kE=AOAwrETVk+R79z6Gd8gMnOTWqG-6Mnybw@mail.gmail.com>
- <20210118000152.GH3579531@ZenIV.linux.org.uk>
-In-Reply-To: <20210118000152.GH3579531@ZenIV.linux.org.uk>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 17 Jan 2021 20:08:21 -0600
-Message-ID: <CAH2r5mtaf6Kmg2RAxawsV9o=VHyu9hosqa4fZw5QDHLH-tacfg@mail.gmail.com>
-Subject: Re: [PATCH] fs/cifs: Replace one-element array with flexible-array member.
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>,
+        id S1732138AbhARXiS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 18 Jan 2021 18:38:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23716 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731602AbhARXiR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 18 Jan 2021 18:38:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611013010;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=evmA0OdyD5M8kY9qOkiMZu9GD1M5IQ2ieILxxBsie0w=;
+        b=NECGjpltR2w1zuBKhoVxpcc6//binQYjgCgF3OhBJsayl5MKDoTySHhN9Lzx0ZgG70q7cR
+        rm+Vx/5uuoAKa7jEWxujaSkonCmfhsymMzF6IrDEIuVGrlQ9abf/c+DolD7tfyJ/zWPXmm
+        AxIijtwewgvy6DBnUbNn+L8OlMc+7ZI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-7qf1DA_HP76SP8BqpolMWQ-1; Mon, 18 Jan 2021 18:36:49 -0500
+X-MC-Unique: 7qf1DA_HP76SP8BqpolMWQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7CA1359;
+        Mon, 18 Jan 2021 23:36:46 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B6B365D9CD;
+        Mon, 18 Jan 2021 23:36:39 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <2758811.1610621106@warthog.procyon.org.uk>
+References: <2758811.1610621106@warthog.procyon.org.uk>
+To:     linux-fsdevel@vger.kernel.org, linux-cachefs@redhat.com
+Cc:     dhowells@redhat.com, jlayton@redhat.com, dwysocha@redhat.com,
+        Matthew Wilcox <willy@infradead.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
         Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Christoph Hellwig <hch@lst.de>, dchinner@redhat.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Cut down implementation of fscache new API
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <160654.1611012999.1@warthog.procyon.org.uk>
+Date:   Mon, 18 Jan 2021 23:36:39 +0000
+Message-ID: <160655.1611012999@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sun, Jan 17, 2021 at 6:02 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
->
-> On Sun, Jan 17, 2021 at 03:58:23PM -0600, Steve French wrote:
-> > Jiapeng,
-> > Aurelien is correct, you should respin this patch and correct for
-> > where it breaks the sizeof calculation.  For example your change:
-> >
-> > struct smb2_lock_rsp {
-> > @@ -1434,7 +1434,7 @@ struct smb2_query_directory_req {
-> >         __le16 FileNameOffset;
-> >         __le16 FileNameLength;
-> >         __le32 OutputBufferLength;
-> > -       __u8   Buffer[1];
-> > +       __u8   Buffer[];
-> >  } __packed;
-> >
-> > would have the side effect of making the file name off by one:
-> >
-> > smb2pdu.c-4654- req->FileNameOffset =
-> > smb2pdu.c:4655:         cpu_to_le16(sizeof(struct
-> > smb2_query_directory_req) - 1);
->
-> FWIW, that sizeof() - 1 should've been offsetof()...
+Take a look at:
 
-agreed
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/
 
--- 
-Thanks,
+I've extracted the netfs helper library from my patch set and built an
+alternative cut-down I/O API for the existing fscache code as a bridge to
+moving to a new fscache implementation.  With this, a netfs now has two
+choices: use the existing API as is or use the netfs lib and the alternative
+API.  You can't mix the two APIs - a netfs has to use one or the other.
 
-Steve
+It works with AFS, at least for reading data through a cache, and without a
+cache, xfstests is quite happy.  I was able to take a bunch of the AFS patches
+from my fscache-iter branch (the full rewrite) and apply them with minimal
+changes.  Since it goes through the new I/O API in both cases, those changes
+should be the same.  The main differences are in the cookie wrangling API.
+
+The alternative API is different from the current in the following ways:
+
+ (1) It uses kiocbs to do async DIO rather than using readpage() with page
+     wake queue snooping and vfs_write().
+
+ (2) It uses SEEK_HOLE/SEEK_DATA rather than bmap() to determine the location
+     of data in the file.  This is still broken because we can't rely on this
+     information in the backing filesystem.
+
+ (3) It completely changes how PG_fscache is used.  As for the new API, it's
+     used to indicate an in progress write to the cache from a page rather
+     than a page the cache knows about.
+
+ (4) It doesn't keep track of the netfs's pages beyond the termination of an
+     I/O operation.  The old API added pages that have outstanding writes to
+     the cache to a radix three for a background writer; now an async kiocb is
+     dispatched.
+
+ (5) The netfs needs to call fscache_begin_read_operation() from its
+     ->begin_cache_operation() handler as passed to the netfs helper lib.
+     This tells the netfs helpers how to access the cache.
+
+ (6) It relies on the netfs helper lib to reissue a failed cache read to the
+     server.
+
+ (7) Handles THPs.
+
+ (8) Implements completely ->readahead() and ->readpage() and implements a
+     chunk of ->write_begin().
+
+Things it doesn't address:
+
+ (1) Mapping the content independently of the backing filesystem's metadata.
+
+ (2) Getting rid of the backpointers into the netfs.
+
+ (3) Simplifying the management of cookies and objects and their processing.
+
+ (4) Holding an open file to the cache for any great length of time.  It gets
+     a new file struct for each read op it does on the cache and drops it
+     again afterwards.
+
+ (5) Pinning the cache context/state required to handle a deferred write to
+     the cache from ->write_begin() as performed by, say, ->writepages().
+
+David
+
