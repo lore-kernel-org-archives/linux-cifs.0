@@ -2,102 +2,357 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3F2C433E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 03:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C59C43381
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 06:13:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 047E92071C
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 03:52:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C51B423976
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 06:13:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728197AbhAUDwD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Jan 2021 22:52:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46426 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730601AbhAUAy1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Jan 2021 19:54:27 -0500
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BE71C061575
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Jan 2021 16:52:13 -0800 (PST)
-Received: by mail-lj1-x230.google.com with SMTP id m13so564668ljo.11
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Jan 2021 16:52:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SQLpMWb32I+pgu6K7NeJ8tP7Bp8SDoZc25yztIWiDzc=;
-        b=bldRs2d7aQ+g9KQ9pw3rs+FS8NLq1fpz4KTDiFvf6iIcO7nTbdvGVRp2Jp0mol8x4z
-         EH7SqYwRvlAAiGNX6DcQkVRoOsbV0N+mEB7R3g7cvAKmq5C+4BsGJN3wo2B74V5+53LG
-         EMCjKRa/sKmeJbePAS2FEiek6LQa80kgLe5wqUKjeT5dgXE3wFQTlPnvfO6+s1r1URkq
-         qmlqMJEL8mgDOJ6/dh7ckXi9TcRiTPdXhHysZAYsPkxHBgZ7VqMthTaUleb3/x2E/M+p
-         G5fxmtMXe+9anPDxANwFPtRB9vkXRLGIRdNzU2LFS8mUjUZqkTf+rZB5pFF5Tt0P54at
-         YDkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SQLpMWb32I+pgu6K7NeJ8tP7Bp8SDoZc25yztIWiDzc=;
-        b=OIPW+ZI/yUmBExmW7LoGNNPThgj50ZWhst1OTkimWw3NwcnQXwNSrqSqFN6ieUIXQ6
-         w7eT7Ak88tdF6rFN5ZbAV+UhZeEa26KMe6wGYe+SysUkLXXuIQpT7VGN3aV8PxoJKETQ
-         7cbE0r/DV4K3R4cUPxhg102hy3pjDWIxOzRe+lUAtm+u5GgYmRstySiGTvZ1JAlm1TyN
-         P0Wx1wtQZrjudpem/gzjxIMP6YZwr3PhqwC9hFy7x6HYxp4jcGmKxiSt6bp39x8LN4hz
-         J50NjPyIKWdKQIh7q2ESOLloEpnCxbqUqJL3HhbzQc/hKYChwkLKk8Eyu74wDZNnzWM9
-         Vu0w==
-X-Gm-Message-State: AOAM532HMHcpa7VcW/50jR0iN62Qahk2kqoDUzLPcVRKPo/1UGTlKpzl
-        pLKCSpte1Mon2NupmDELaAhGXAsFtGsqk/0V+v5XFKTIzpE=
-X-Google-Smtp-Source: ABdhPJxBJiJd5KL7onDzngSkIPmJ/fu47W/zvbko2ZjnyjBIrc6UVCABUHHOem6F7bKNS8vXkcFNJC9g9Nux9/gUYLQ=
-X-Received: by 2002:a2e:88c8:: with SMTP id a8mr5507132ljk.148.1611190331503;
- Wed, 20 Jan 2021 16:52:11 -0800 (PST)
+        id S1731696AbhATXqy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Jan 2021 18:46:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58579 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731873AbhATWYt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 20 Jan 2021 17:24:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611181401;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U4TzQhkQUMUsgQqVDfduaWESOp8N+csFxZi9CuGcDKM=;
+        b=LVTUI5un2ZJylaJwu83W4Ptw5fmv3zx6k8QXHQXjHo8GrnbPaaUeAE8CS3xim69LNvSr3L
+        vrFxTUQl+zWUa08FIs+RQzdld0j1jD/B1mtttG9k+jinBGEooJXvITMezrFlJQ76b5G+pt
+        Z1W2lfxG+ZHa8scRD6H2MyTuChWzNTw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-11-PmuiEkvkN7KRxUZsQHG8tw-1; Wed, 20 Jan 2021 17:23:18 -0500
+X-MC-Unique: PmuiEkvkN7KRxUZsQHG8tw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 696D5180A095;
+        Wed, 20 Jan 2021 22:23:16 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 504A39CA0;
+        Wed, 20 Jan 2021 22:23:13 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH 09/25] netfs: Gather stats
+From:   David Howells <dhowells@redhat.com>
+To:     Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>
+Cc:     dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 20 Jan 2021 22:23:12 +0000
+Message-ID: <161118139247.1232039.10556850937548511068.stgit@warthog.procyon.org.uk>
+In-Reply-To: <161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk>
+References: <161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-References: <20210120222248.22994-1-lsahlber@redhat.com>
-In-Reply-To: <20210120222248.22994-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 20 Jan 2021 18:52:00 -0600
-Message-ID: <CAH2r5muKWC8f=_HTPn+NcRq8iGAYDgAzyQ-3yJx66NVZYi54GA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: do not fail __smb_send_rqst if non-fatal signals
- are pending
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next
+Gather statistics from the netfs interface that can be exported through a
+seqfile.  This is intended to be called by a later patch when viewing
+/proc/fs/fscache/stats.
 
-On Wed, Jan 20, 2021 at 4:22 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> RHBZ 1848178
->
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/transport.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> index d629d3c03a9e..283e9022f049 100644
-> --- a/fs/cifs/transport.c
-> +++ b/fs/cifs/transport.c
-> @@ -339,7 +339,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
->         if (ssocket == NULL)
->                 return -EAGAIN;
->
-> -       if (signal_pending(current)) {
-> +       if (fatal_signal_pending(current)) {
->                 cifs_dbg(FYI, "signal pending before send request\n");
->                 return -ERESTARTSYS;
->         }
-> --
-> 2.13.6
->
+Signed-off-by: David Howells <dhowells@redhat.com>
+---
+
+ fs/netfs/Kconfig       |   15 ++++++++++++++
+ fs/netfs/Makefile      |    3 +--
+ fs/netfs/internal.h    |   34 +++++++++++++++++++++++++++++++
+ fs/netfs/read_helper.c |   23 +++++++++++++++++++++
+ fs/netfs/stats.c       |   53 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/netfs.h  |    1 +
+ 6 files changed, 127 insertions(+), 2 deletions(-)
+ create mode 100644 fs/netfs/stats.c
+
+diff --git a/fs/netfs/Kconfig b/fs/netfs/Kconfig
+index 2ebf90e6ca95..578112713703 100644
+--- a/fs/netfs/Kconfig
++++ b/fs/netfs/Kconfig
+@@ -6,3 +6,18 @@ config NETFS_SUPPORT
+ 	  This option enables support for network filesystems, including
+ 	  helpers for high-level buffered I/O, abstracting out read
+ 	  segmentation, local caching and transparent huge page support.
++
++config NETFS_STATS
++	bool "Gather statistical information on local caching"
++	depends on NETFS_SUPPORT && PROC_FS
++	help
++	  This option causes statistical information to be gathered on local
++	  caching and exported through file:
++
++		/proc/fs/fscache/stats
++
++	  The gathering of statistics adds a certain amount of overhead to
++	  execution as there are a quite a few stats gathered, and on a
++	  multi-CPU system these may be on cachelines that keep bouncing
++	  between CPUs.  On the other hand, the stats are very useful for
++	  debugging purposes.  Saying 'Y' here is recommended.
+diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
+index 4b4eff2ba369..c15bfc966d96 100644
+--- a/fs/netfs/Makefile
++++ b/fs/netfs/Makefile
+@@ -1,6 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-netfs-y := \
+-	read_helper.o
++netfs-y := read_helper.o stats.o
+ 
+ obj-$(CONFIG_NETFS_SUPPORT) := netfs.o
+diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+index b07f43f9130e..d83317b1eb9d 100644
+--- a/fs/netfs/internal.h
++++ b/fs/netfs/internal.h
+@@ -16,8 +16,42 @@
+  */
+ extern unsigned int netfs_debug;
+ 
++/*
++ * stats.c
++ */
++#ifdef CONFIG_NETFS_STATS
++extern atomic_t netfs_n_rh_readahead;
++extern atomic_t netfs_n_rh_readpage;
++extern atomic_t netfs_n_rh_rreq;
++extern atomic_t netfs_n_rh_sreq;
++extern atomic_t netfs_n_rh_download;
++extern atomic_t netfs_n_rh_download_done;
++extern atomic_t netfs_n_rh_download_failed;
++extern atomic_t netfs_n_rh_download_instead;
++extern atomic_t netfs_n_rh_read;
++extern atomic_t netfs_n_rh_read_done;
++extern atomic_t netfs_n_rh_read_failed;
++extern atomic_t netfs_n_rh_zero;
++extern atomic_t netfs_n_rh_short_read;
++extern atomic_t netfs_n_rh_write;
++extern atomic_t netfs_n_rh_write_done;
++extern atomic_t netfs_n_rh_write_failed;
++
++
++static inline void netfs_stat(atomic_t *stat)
++{
++	atomic_inc(stat);
++}
++
++static inline void netfs_stat_d(atomic_t *stat)
++{
++	atomic_dec(stat);
++}
++
++#else
+ #define netfs_stat(x) do {} while(0)
+ #define netfs_stat_d(x) do {} while(0)
++#endif
+ 
+ /*****************************************************************************/
+ /*
+diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
+index 2a90314ea36f..275ac37e2834 100644
+--- a/fs/netfs/read_helper.c
++++ b/fs/netfs/read_helper.c
+@@ -55,6 +55,7 @@ static struct netfs_read_request *netfs_alloc_read_request(
+ 		refcount_set(&rreq->usage, 1);
+ 		__set_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
+ 		ops->init_rreq(rreq, file);
++		netfs_stat(&netfs_n_rh_rreq);
+ 	}
+ 
+ 	return rreq;
+@@ -86,6 +87,7 @@ static void netfs_free_read_request(struct work_struct *work)
+ 		rreq->netfs_ops->cleanup(rreq->mapping, rreq->netfs_priv);
+ 	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
+ 	kfree(rreq);
++	netfs_stat_d(&netfs_n_rh_rreq);
+ }
+ 
+ static void netfs_put_read_request(struct netfs_read_request *rreq)
+@@ -114,6 +116,7 @@ static struct netfs_read_subrequest *netfs_alloc_subrequest(
+ 		INIT_LIST_HEAD(&subreq->rreq_link);
+ 		refcount_set(&subreq->usage, 2);
+ 		subreq->rreq = rreq;
++		netfs_stat(&netfs_n_rh_sreq);
+ 	}
+ 
+ 	return subreq;
+@@ -129,6 +132,7 @@ static void __netfs_put_subrequest(struct netfs_read_subrequest *subreq)
+ 	trace_netfs_sreq(subreq, netfs_sreq_trace_free);
+ 	netfs_put_read_request(subreq->rreq);
+ 	kfree(subreq);
++	netfs_stat_d(&netfs_n_rh_sreq);
+ }
+ 
+ /*
+@@ -150,6 +154,7 @@ static void netfs_clear_unread(struct netfs_read_subrequest *subreq)
+ static void netfs_fill_with_zeroes(struct netfs_read_request *rreq,
+ 				   struct netfs_read_subrequest *subreq)
+ {
++	netfs_stat(&netfs_n_rh_zero);
+ 	__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+ 	netfs_subreq_terminated(subreq, 0);
+ }
+@@ -173,6 +178,7 @@ static void netfs_fill_with_zeroes(struct netfs_read_request *rreq,
+ static void netfs_read_from_server(struct netfs_read_request *rreq,
+ 				   struct netfs_read_subrequest *subreq)
+ {
++	netfs_stat(&netfs_n_rh_download);
+ 	rreq->netfs_ops->issue_op(subreq);
+ }
+ 
+@@ -278,6 +284,7 @@ static void netfs_rreq_short_read(struct netfs_read_request *rreq,
+ 	__clear_bit(NETFS_SREQ_SHORT_READ, &subreq->flags);
+ 	__set_bit(NETFS_SREQ_SEEK_DATA_READ, &subreq->flags);
+ 
++	netfs_stat(&netfs_n_rh_short_read);
+ 	trace_netfs_sreq(subreq, netfs_sreq_trace_resubmit_short);
+ 
+ 	netfs_get_read_subrequest(subreq);
+@@ -309,6 +316,7 @@ static bool netfs_rreq_perform_resubmissions(struct netfs_read_request *rreq)
+ 				break;
+ 			subreq->source = NETFS_DOWNLOAD_FROM_SERVER;
+ 			subreq->error = 0;
++			netfs_stat(&netfs_n_rh_download_instead);
+ 			trace_netfs_sreq(subreq, netfs_sreq_trace_download_instead);
+ 			netfs_get_read_subrequest(subreq);
+ 			atomic_inc(&rreq->nr_rd_ops);
+@@ -399,6 +407,17 @@ void netfs_subreq_terminated(struct netfs_read_subrequest *subreq,
+ 	       subreq->debug_index, subreq->start, subreq->flags,
+ 	       transferred_or_error);
+ 
++	switch (subreq->source) {
++	case NETFS_READ_FROM_CACHE:
++		netfs_stat(&netfs_n_rh_read_done);
++		break;
++	case NETFS_DOWNLOAD_FROM_SERVER:
++		netfs_stat(&netfs_n_rh_download_done);
++		break;
++	default:
++		break;
++	}
++
+ 	if (IS_ERR_VALUE(transferred_or_error)) {
+ 		subreq->error = transferred_or_error;
+ 		goto failed;
+@@ -452,8 +471,10 @@ void netfs_subreq_terminated(struct netfs_read_subrequest *subreq,
+ 
+ failed:
+ 	if (subreq->source == NETFS_READ_FROM_CACHE) {
++		netfs_stat(&netfs_n_rh_read_failed);
+ 		set_bit(NETFS_RREQ_INCOMPLETE_IO, &rreq->flags);
+ 	} else {
++		netfs_stat(&netfs_n_rh_download_failed);
+ 		set_bit(NETFS_RREQ_FAILED, &rreq->flags);
+ 		rreq->error = subreq->error;
+ 	}
+@@ -636,6 +657,7 @@ void netfs_readahead(struct readahead_control *ractl,
+ 	rreq->start	= readahead_pos(ractl);
+ 	rreq->len	= readahead_length(ractl);
+ 
++	netfs_stat(&netfs_n_rh_readahead);
+ 	trace_netfs_read(rreq, readahead_pos(ractl), readahead_length(ractl),
+ 			 netfs_read_trace_readahead);
+ 
+@@ -710,6 +732,7 @@ int netfs_readpage(struct file *file,
+ 	rreq->start	= page->index * PAGE_SIZE;
+ 	rreq->len	= thp_size(page);
+ 
++	netfs_stat(&netfs_n_rh_readpage);
+ 	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_readpage);
+ 
+ 	netfs_get_read_request(rreq);
+diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
+new file mode 100644
+index 000000000000..3a7a3c10e1cd
+--- /dev/null
++++ b/fs/netfs/stats.c
+@@ -0,0 +1,53 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Netfs support statistics
++ *
++ * Copyright (C) 2020 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++
++#include <linux/seq_file.h>
++#include <linux/netfs.h>
++#include "internal.h"
++
++atomic_t netfs_n_rh_readahead;
++atomic_t netfs_n_rh_readpage;
++atomic_t netfs_n_rh_rreq;
++atomic_t netfs_n_rh_sreq;
++atomic_t netfs_n_rh_download;
++atomic_t netfs_n_rh_download_done;
++atomic_t netfs_n_rh_download_failed;
++atomic_t netfs_n_rh_download_instead;
++atomic_t netfs_n_rh_read;
++atomic_t netfs_n_rh_read_done;
++atomic_t netfs_n_rh_read_failed;
++atomic_t netfs_n_rh_zero;
++atomic_t netfs_n_rh_short_read;
++atomic_t netfs_n_rh_write;
++atomic_t netfs_n_rh_write_done;
++atomic_t netfs_n_rh_write_failed;
++
++void netfs_stats_show(struct seq_file *m)
++{
++	seq_printf(m, "RdHelp : RA=%u RP=%u rr=%u sr=%u\n",
++		   atomic_read(&netfs_n_rh_readahead),
++		   atomic_read(&netfs_n_rh_readpage),
++		   atomic_read(&netfs_n_rh_rreq),
++		   atomic_read(&netfs_n_rh_sreq));
++	seq_printf(m, "RdHelp : ZR=%u sh=%u\n",
++		   atomic_read(&netfs_n_rh_zero),
++		   atomic_read(&netfs_n_rh_short_read));
++	seq_printf(m, "RdHelp : DL=%u ds=%u df=%u di=%u\n",
++		   atomic_read(&netfs_n_rh_download),
++		   atomic_read(&netfs_n_rh_download_done),
++		   atomic_read(&netfs_n_rh_download_failed),
++		   atomic_read(&netfs_n_rh_download_instead));
++	seq_printf(m, "RdHelp : RD=%u rs=%u rf=%u\n",
++		   atomic_read(&netfs_n_rh_read),
++		   atomic_read(&netfs_n_rh_read_done),
++		   atomic_read(&netfs_n_rh_read_failed));
++	seq_printf(m, "RdHelp : WR=%u ws=%u wf=%u\n",
++		   atomic_read(&netfs_n_rh_write),
++		   atomic_read(&netfs_n_rh_write_done),
++		   atomic_read(&netfs_n_rh_write_failed));
++}
++EXPORT_SYMBOL(netfs_stats_show);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 606fd6512b4a..9a262eb36b0f 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -106,5 +106,6 @@ extern int netfs_readpage(struct file *,
+ 			  void *);
+ 
+ extern void netfs_subreq_terminated(struct netfs_read_subrequest *, ssize_t);
++extern void netfs_stats_show(struct seq_file *);
+ 
+ #endif /* _LINUX_NETFS_H */
 
 
--- 
-Thanks,
-
-Steve
