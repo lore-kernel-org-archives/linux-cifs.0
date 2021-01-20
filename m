@@ -2,161 +2,128 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA5E5C433E6
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Jan 2021 19:58:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D78FC433DB
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Jan 2021 23:46:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8D8A238EB
-	for <linux-cifs@archiver.kernel.org>; Wed, 20 Jan 2021 19:58:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 555C62368A
+	for <linux-cifs@archiver.kernel.org>; Wed, 20 Jan 2021 23:46:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728714AbhATRfo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Jan 2021 12:35:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389952AbhATRbs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Jan 2021 12:31:48 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5782FC061575
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Jan 2021 09:31:07 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id b2so26707041edm.3
-        for <linux-cifs@vger.kernel.org>; Wed, 20 Jan 2021 09:31:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=zg4raflhD/45J7XaO5ytOC6TtbZZyRh+LJ2ibRSHN/8=;
-        b=kYPp6MmJhU9Us0DDFe/hx+qh/hjij/ovAi3hP8hkRacdfWHMVDsYCq9o1Xu8JrFgjT
-         jXd9dc8pBbPsAjuFAr+vP3PA6M8NqzTRI48R9nus4+wP9sotHnedpWnKEMfFZyCD6dz8
-         MQ+2v2tXPe6WZeIozsaIfwrcTBe/NF/Tgrvbo2gRGx9KM6W7rWVJ7twWqXQxGAzCzOZp
-         hFZzj1hRvsovyjbigM2twdAgEbS1zyOPx6eTdIYaIyVflZ9wyajQ6WsOBJS6H2UHYLUo
-         lSElW0FiBapUE74BorIdlk4dGZOUNleiLDvYlQAPesbx9AAxTzcsmLCDnJvs2ShUl129
-         ocjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=zg4raflhD/45J7XaO5ytOC6TtbZZyRh+LJ2ibRSHN/8=;
-        b=VNk20l7UIwagT2YguLehq2mLzqvYGXWxcVOJypFnp9Ec5Vq4PkyEEOSNhx6dIncFa5
-         IQ79rpDNBh2RzMJurP1EnZC6TctHrjQWbGhGIz0/fr+s9F++IJoG97u9r8Rb6+WN0I+7
-         9+Z2bxpBuPU7uhMpwX7PBZg3Id7vuB8soMNAQECzXzNsy8tN4wQQrrmtNdbwayDLvBCH
-         r29JajYBhJAF2atXJd7BWFwMAZOe3cfDDAsD0UzphiASkH2HTOy8MNlXdXzcrzcJlJAe
-         FaLE2wNRBPeAyA4YIApaOzenDI90i3tcn0nlyb1Nqy5Peq9feJCyXrRk5OPJWP7VxXhb
-         CQ/g==
-X-Gm-Message-State: AOAM531jTpEg15/XQBtsGtEVcxCW1RXvIxZ4FL1boibxGqaRt7vB/O3v
-        ID2S54OkjtEoWj27eICpq9cw9hcA6+3uJzqatg==
-X-Google-Smtp-Source: ABdhPJy+6YsVjMy7QizbXRa0LDqf/37QDcMlXNl4/oMTPvuc4c910dA3Xrm5ZHI7s+k5Zd+w/ZimJY3+QGc04NwSkm4=
-X-Received: by 2002:a50:fc8c:: with SMTP id f12mr8138337edq.225.1611163865970;
- Wed, 20 Jan 2021 09:31:05 -0800 (PST)
+        id S1726310AbhATXqC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Jan 2021 18:46:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20944 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728706AbhATWYH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 20 Jan 2021 17:24:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611181345;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=seHfPkWJgWtlglmjT0RaV4SzsvsdViNEADyqU/Qqi74=;
+        b=FCRmDeX7FGsSkri5or9+Kx8KvrKhhnehazBzDBa90saO21jQI5SsmTzy/uyJIu5bPl8cPp
+        V5k5KAk2ocXVV2gWj2jr/ozEC8K54Rx4XSw+OBDxvCAN0/5ZLieD9ZL2GmtfuMw824QgYB
+        XjsjDTyOJkFmhJ7v2ce3ym3Mu1mdyUc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-603-Fw6FIRyZM4Kx_cOXY1cKtQ-1; Wed, 20 Jan 2021 17:22:21 -0500
+X-MC-Unique: Fw6FIRyZM4Kx_cOXY1cKtQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4005B107ACE8;
+        Wed, 20 Jan 2021 22:22:19 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4CAB36F998;
+        Wed, 20 Jan 2021 22:22:12 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH 04/25] vfs: Export rw_verify_area() for use by cachefiles
+From:   David Howells <dhowells@redhat.com>
+To:     Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>
+Cc:     dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 20 Jan 2021 22:22:12 +0000
+Message-ID: <161118133204.1232039.70595719156846825.stgit@warthog.procyon.org.uk>
+In-Reply-To: <161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk>
+References: <161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-References: <20210120043209.27786-1-lsahlber@redhat.com> <CAH2r5mvmCG2SN0nO8uZftTRMOkN8jgbfYrO1E5_A=5FpK9H0bQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mvmCG2SN0nO8uZftTRMOkN8jgbfYrO1E5_A=5FpK9H0bQ@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 20 Jan 2021 09:30:54 -0800
-Message-ID: <CAKywueRWJxk9KuuZe6Ovb7MhxXsbsE-_7WJG05hAPTZ2o5m7mg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: do not fail __smb_send_rqst if non-fatal signals
- are pending
-To:     Steve French <smfrench@gmail.com>
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=B2=D1=82, 19 =D1=8F=D0=BD=D0=B2. 2021 =D0=B3. =D0=B2 22:38, Steve Frenc=
-h <smfrench@gmail.com>:
->
-> The patch won't merge (also has some text corruptions in it).  This
-> line of code is different due to commit 6988a619f5b79
->
-> 6988a619f5b79 (Paulo Alcantara 2020-11-28 15:57:06 -0300 342)
->  cifs_dbg(FYI, "signal pending before send request\n");
-> 6988a619f5b79 (Paulo Alcantara 2020-11-28 15:57:06 -0300 343)
->  return -ERESTARTSYS;
->
->         if (signal_pending(current)) {
->                 cifs_dbg(FYI, "signal pending before send request\n");
->                 return -ERESTARTSYS;
->         }
->
-> See:
->
-> Author: Paulo Alcantara <pc@cjr.nz>
-> Date:   Sat Nov 28 15:57:06 2020 -0300
->
->     cifs: allow syscalls to be restarted in __smb_send_rqst()
->
->     A customer has reported that several files in their multi-threaded ap=
-p
->     were left with size of 0 because most of the read(2) calls returned
->     -EINTR and they assumed no bytes were read.  Obviously, they could
->     have fixed it by simply retrying on -EINTR.
->
->     We noticed that most of the -EINTR on read(2) were due to real-time
->     signals sent by glibc to process wide credential changes (SIGRT_1),
->     and its signal handler had been established with SA_RESTART, in which
->     case those calls could have been automatically restarted by the
->     kernel.
->
->     Let the kernel decide to whether or not restart the syscalls when
->     there is a signal pending in __smb_send_rqst() by returning
->     -ERESTARTSYS.  If it can't, it will return -EINTR anyway.
->
->     Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
->     CC: Stable <stable@vger.kernel.org>
->     Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
->     Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
->
-> On Tue, Jan 19, 2021 at 10:32 PM Ronnie Sahlberg <lsahlber@redhat.com> wr=
-ote:
-> >
-> > RHBZ 1848178
-> >
-> > There is no need to fail this function if non-fatal signals are
-> > pending when we enter it.
-> >
-> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/transport.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> > index c42bda5a5008..98752f7d2cd2 100644
-> > --- a/fs/cifs/transport.c
-> > +++ b/fs/cifs/transport.c
-> > @@ -339,7 +339,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, int=
- num_rqst,
-> >         if (ssocket =3D=3D NULL)
-> >                 return -EAGAIN;
-> >
-> > -       if (signal_pending(current)) {
-> > +       if (fatal_signal_pending(current)) {
-> >                 cifs_dbg(FYI, "signal is pending before sending any dat=
-a\n");
-> >                 return -EINTR;
-> >         }
+Export rw_verify_area() for so that cachefiles can use it before issuing
+call_read_iter() and call_write_iter() to effect async DIO operations
+against the cache.
 
-I have been thinking around the same lines. The original intent of
-failing the function here was to avoid interrupting packet send in the
-middle of the packet and not breaking an SMB connection.
-That's also why signals are blocked around smb_send_kvec() calls. I
-guess most of the time a socket buffer is not full, so, those
-functions immediately return success without waiting internally and
-checking for pending signals. With this change the code may break SMB
-packets and cause reconnections if a non-fatal signal is pending
-before we block signals but this is still better than failing the
-function in the very beginning.
+Signed-off-by: David Howells <dhowells@redhat.com>
+---
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+ fs/internal.h      |    5 -----
+ fs/read_write.c    |    1 +
+ include/linux/fs.h |    1 +
+ 3 files changed, 2 insertions(+), 5 deletions(-)
 
-I think this patch should go to stable too. Steve, Ronnie, thoughts?
+diff --git a/fs/internal.h b/fs/internal.h
+index 77c50befbfbe..92e686249c40 100644
+--- a/fs/internal.h
++++ b/fs/internal.h
+@@ -164,11 +164,6 @@ extern char *simple_dname(struct dentry *, char *, int);
+ extern void dput_to_list(struct dentry *, struct list_head *);
+ extern void shrink_dentry_list(struct list_head *);
+ 
+-/*
+- * read_write.c
+- */
+-extern int rw_verify_area(int, struct file *, const loff_t *, size_t);
+-
+ /*
+  * pipe.c
+  */
+diff --git a/fs/read_write.c b/fs/read_write.c
+index 75f764b43418..fe84e11245bd 100644
+--- a/fs/read_write.c
++++ b/fs/read_write.c
+@@ -400,6 +400,7 @@ int rw_verify_area(int read_write, struct file *file, const loff_t *ppos, size_t
+ 	return security_file_permission(file,
+ 				read_write == READ ? MAY_READ : MAY_WRITE);
+ }
++EXPORT_SYMBOL(rw_verify_area);
+ 
+ static ssize_t new_sync_read(struct file *filp, char __user *buf, size_t len, loff_t *ppos)
+ {
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index fd47deea7c17..493804856ab3 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2760,6 +2760,7 @@ extern int notify_change(struct dentry *, struct iattr *, struct inode **);
+ extern int inode_permission(struct inode *, int);
+ extern int generic_permission(struct inode *, int);
+ extern int __check_sticky(struct inode *dir, struct inode *inode);
++extern int rw_verify_area(int, struct file *, const loff_t *, size_t);
+ 
+ static inline bool execute_ok(struct inode *inode)
+ {
 
---
-Best regards,
-Pavel Shilovsky
+
