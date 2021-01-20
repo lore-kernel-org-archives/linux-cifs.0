@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB1CFC433DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 02:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C32D8C43331
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 02:45:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 853D323788
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 02:36:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 917CD23788
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 02:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388591AbhATXs5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Jan 2021 18:48:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41945 "EHLO
+        id S2387959AbhATXrO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Jan 2021 18:47:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59205 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732590AbhATW00 (ORCPT
+        by vger.kernel.org with ESMTP id S1731975AbhATWY7 (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 20 Jan 2021 17:26:26 -0500
+        Wed, 20 Jan 2021 17:24:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611181498;
+        s=mimecast20190719; t=1611181412;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=J0mEKGhee35FXVNWRVgD7YgCv26NnA0Z4kX0/0iSIo4=;
-        b=dAmaiFzhGdpg3HYAb/1yFR4zGyUHDz2Yxf4mLbbpOJuaH2C+pNFUCzP46yfw2eu0Okf2bA
-        2AS1Hy3SzFPCeNXoqNiplMOIrb2QNjCIVxKequFVxgYgpyZqWFD/o+9GMMfcQnp2gUvkib
-        P9vk82Sf42WqbddsbllkfI7i6PWUwxc=
+        bh=KCq7HLtzy63U3IOjR9kN+69ryqciEf0rO0Fm2voNC/E=;
+        b=Z3WN2m76IxrmCnbBCIafcRQZA6Dk6+ypD1U1Spmowdi3n6uGINUGqypJvQvk7sfAMUQRQo
+        28jkpDp65QzxTai5j8Hzu6JGgJPvKFrqNJrNHnooqC8JKydSbP4nrCffv43kX3wlwP98Ap
+        ANH8SDMDrZcvCgMJhCjM19gXi6PAmkQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-QbVgL6xLPei8UaAQVy3yDQ-1; Wed, 20 Jan 2021 17:24:54 -0500
-X-MC-Unique: QbVgL6xLPei8UaAQVy3yDQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-40-yy0zbZjtN3670UWJ7CXR9w-1; Wed, 20 Jan 2021 17:23:29 -0500
+X-MC-Unique: yy0zbZjtN3670UWJ7CXR9w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40D8681DFAA;
-        Wed, 20 Jan 2021 22:24:52 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 063E8180A092;
+        Wed, 20 Jan 2021 22:23:28 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6539210074EE;
-        Wed, 20 Jan 2021 22:24:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2943D6EF56;
+        Wed, 20 Jan 2021 22:23:22 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 17/25] afs: Don't truncate iter during data fetch
+Subject: [PATCH 10/25] netfs: Add write_begin helper
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
@@ -60,244 +60,303 @@ Cc:     dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 20 Jan 2021 22:24:45 +0000
-Message-ID: <161118148567.1232039.13380313332292947956.stgit@warthog.procyon.org.uk>
+Date:   Wed, 20 Jan 2021 22:23:21 +0000
+Message-ID: <161118140165.1232039.16418853874312234477.stgit@warthog.procyon.org.uk>
 In-Reply-To: <161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk>
 References: <161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Don't truncate the iterator to correspond to the actual data size when
-fetching the data from the server - rather, pass the length we want to read
-to rxrpc.
-
-This will allow the clear-after-read code in future to simply clear the
-remaining iterator capacity rather than having to reinitialise the
-iterator.
+Add a helper to do the pre-reading work for the netfs write_begin address
+space op.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- fs/afs/fsclient.c      |    6 ++++--
- fs/afs/internal.h      |    6 ++++++
- fs/afs/rxrpc.c         |   13 +++++++++----
- fs/afs/yfsclient.c     |    6 ++++--
- include/net/af_rxrpc.h |    2 +-
- net/rxrpc/recvmsg.c    |    9 +++++----
- 6 files changed, 29 insertions(+), 13 deletions(-)
+ fs/netfs/internal.h          |    2 +
+ fs/netfs/read_helper.c       |  165 ++++++++++++++++++++++++++++++++++++++++++
+ fs/netfs/stats.c             |   10 ++-
+ include/linux/netfs.h        |    8 ++
+ include/trace/events/netfs.h |    4 +
+ 5 files changed, 185 insertions(+), 4 deletions(-)
 
-diff --git a/fs/afs/fsclient.c b/fs/afs/fsclient.c
-index 1d95ed9dd86e..4a57c6c6f12b 100644
---- a/fs/afs/fsclient.c
-+++ b/fs/afs/fsclient.c
-@@ -305,8 +305,9 @@ static int afs_deliver_fs_fetch_data(struct afs_call *call)
- 	unsigned int size;
- 	int ret;
+diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+index d83317b1eb9d..3d7ab3ab5743 100644
+--- a/fs/netfs/internal.h
++++ b/fs/netfs/internal.h
+@@ -34,8 +34,10 @@ extern atomic_t netfs_n_rh_read_failed;
+ extern atomic_t netfs_n_rh_zero;
+ extern atomic_t netfs_n_rh_short_read;
+ extern atomic_t netfs_n_rh_write;
++extern atomic_t netfs_n_rh_write_begin;
+ extern atomic_t netfs_n_rh_write_done;
+ extern atomic_t netfs_n_rh_write_failed;
++extern atomic_t netfs_n_rh_write_zskip;
  
--	_enter("{%u,%zu/%llu}",
--	       call->unmarshall, iov_iter_count(call->iter), req->actual_len);
-+	_enter("{%u,%zu,%zu/%llu}",
-+	       call->unmarshall, call->iov_len, iov_iter_count(call->iter),
-+	       req->actual_len);
  
- 	switch (call->unmarshall) {
- 	case 0:
-@@ -343,6 +344,7 @@ static int afs_deliver_fs_fetch_data(struct afs_call *call)
- 			size = PAGE_SIZE - req->offset;
- 		else
- 			size = req->remain;
-+		call->iov_len = size;
- 		call->bvec[0].bv_len = size;
- 		call->bvec[0].bv_offset = req->offset;
- 		call->bvec[0].bv_page = req->pages[req->index];
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 4b255d10f726..1badc7ed0487 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -104,6 +104,7 @@ struct afs_call {
- 	struct afs_server	*server;	/* The fileserver record if fs op (pins ref) */
- 	struct afs_vlserver	*vlserver;	/* The vlserver record if vl op */
- 	void			*request;	/* request data (first part) */
-+	size_t			iov_len;	/* Size of *iter to be used */
- 	struct iov_iter		def_iter;	/* Default buffer/data iterator */
- 	struct iov_iter		*iter;		/* Iterator currently in use */
- 	union {	/* Convenience for ->def_iter */
-@@ -1270,6 +1271,7 @@ static inline void afs_make_op_call(struct afs_operation *op, struct afs_call *c
- 
- static inline void afs_extract_begin(struct afs_call *call, void *buf, size_t size)
- {
-+	call->iov_len = size;
- 	call->kvec[0].iov_base = buf;
- 	call->kvec[0].iov_len = size;
- 	iov_iter_kvec(&call->def_iter, READ, call->kvec, 1, size);
-@@ -1277,21 +1279,25 @@ static inline void afs_extract_begin(struct afs_call *call, void *buf, size_t si
- 
- static inline void afs_extract_to_tmp(struct afs_call *call)
- {
-+	call->iov_len = sizeof(call->tmp);
- 	afs_extract_begin(call, &call->tmp, sizeof(call->tmp));
+ static inline void netfs_stat(atomic_t *stat)
+diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
+index 275ac37e2834..eb34c368617d 100644
+--- a/fs/netfs/read_helper.c
++++ b/fs/netfs/read_helper.c
+@@ -760,3 +760,168 @@ int netfs_readpage(struct file *file,
+ 	return ret;
  }
+ EXPORT_SYMBOL(netfs_readpage);
++
++static void netfs_clear_thp(struct page *page)
++{
++	unsigned int i;
++
++	for (i = 0; i < thp_nr_pages(page); i++)
++		clear_highpage(page + i);
++}
++
++/**
++ * netfs_write_begin - Helper to prepare for writing
++ * @file: The file to read from
++ * @mapping: The mapping to read from
++ * @pos: File position at which the write will begin
++ * @len: The length of the write in this page
++ * @flags: AOP_* flags
++ * @_page: Where to put the resultant page
++ * @_fsdata: Place for the netfs to store a cookie
++ * @ops: The network filesystem's operations for the helper to use
++ * @netfs_priv: Private netfs data to be retained in the request
++ *
++ * Pre-read data for a write-begin request by drawing data from the cache if
++ * possible, or the netfs if not.  Space beyond the EOF is zero-filled.
++ * Multiple I/O requests from different sources will get munged together.  If
++ * necessary, the readahead window can be expanded in either direction to a
++ * more convenient alighment for RPC efficiency or to make storage in the cache
++ * feasible.
++ *
++ * The calling netfs must provide a table of operations, only one of which,
++ * issue_op, is mandatory.
++ *
++ * The check_write_begin() operation can be provided to check for and flush
++ * conflicting writes once the page is grabbed and locked.  It is passed a
++ * pointer to the fsdata cookie that gets returned to the VM to be passed to
++ * write_end.  It is permitted to sleep.  It should return 0 if the request
++ * should go ahead; unlock the page and return -EAGAIN to cause the page to be
++ * regot; or return an error.
++ *
++ * This is usable whether or not caching is enabled.
++ */
++int netfs_write_begin(struct file *file, struct address_space *mapping,
++		      loff_t pos, unsigned int len, unsigned int flags,
++		      struct page **_page, void **_fsdata,
++		      const struct netfs_read_request_ops *ops,
++		      void *netfs_priv)
++{
++	struct netfs_read_request *rreq;
++	struct page *page, *xpage;
++	struct inode *inode = file_inode(file);
++	unsigned int debug_index = 0;
++	pgoff_t index = pos >> PAGE_SHIFT;
++	int pos_in_page = pos & ~PAGE_MASK;
++	loff_t size;
++	int ret;
++
++	struct readahead_control ractl = {
++		.file		= file,
++		.mapping	= mapping,
++		._index		= index,
++		._nr_pages	= 0,
++	};
++
++retry:
++	page = grab_cache_page_write_begin(mapping, index, 0);
++	if (!page)
++		return -ENOMEM;
++
++	if (ops->check_write_begin) {
++		/* Allow the netfs (eg. ceph) to flush conflicts. */
++		ret = ops->check_write_begin(file, pos, len, page, _fsdata);
++		if (ret < 0) {
++			if (ret == -EAGAIN)
++				goto retry;
++			goto error;
++		}
++	}
++
++	if (PageUptodate(page))
++		goto have_page;
++
++	/* If the page is beyond the EOF, we want to clear it - unless it's
++	 * within the cache granule containing the EOF, in which case we need
++	 * to preload the granule.
++	 */
++	size = i_size_read(inode);
++	if (!ops->is_cache_enabled(inode) &&
++	    ((pos_in_page == 0 && len == thp_size(page)) ||
++	     (pos >= size) ||
++	     (pos_in_page == 0 && (pos + len) >= size))) {
++		netfs_clear_thp(page);
++		SetPageUptodate(page);
++		netfs_stat(&netfs_n_rh_write_zskip);
++		goto have_page_no_wait;
++	}
++
++	ret = -ENOMEM;
++	rreq = netfs_alloc_read_request(ops, netfs_priv, file);
++	if (!rreq)
++		goto error;
++	rreq->mapping		= page->mapping;
++	rreq->start		= page->index * PAGE_SIZE;
++	rreq->len		= thp_size(page);
++	rreq->no_unlock_page	= page->index;
++	__set_bit(NETFS_RREQ_NO_UNLOCK_PAGE, &rreq->flags);
++	netfs_priv = NULL;
++
++	netfs_stat(&netfs_n_rh_write_begin);
++	trace_netfs_read(rreq, pos, len, netfs_read_trace_write_begin);
++
++	/* Expand the request to meet caching requirements and download
++	 * preferences.
++	 */
++	ractl._nr_pages = thp_nr_pages(page);
++	netfs_rreq_expand(rreq, &ractl);
++	netfs_get_read_request(rreq);
++
++	/* We hold the page locks, so we can drop the references */
++	while ((xpage = readahead_page(&ractl)))
++		if (xpage != page)
++			put_page(xpage);
++
++	atomic_set(&rreq->nr_rd_ops, 1);
++	do {
++		if (!netfs_rreq_submit_slice(rreq, &debug_index))
++			break;
++
++	} while (rreq->submitted < rreq->len);
++
++	// TODO: If we didn't submit enough readage, we need to clean up
++
++	/* Keep nr_rd_ops incremented so that the ref always belongs to us, and
++	 * the service code isn't punted off to a random thread pool to
++	 * process.
++	 */
++	for (;;) {
++		wait_var_event(&rreq->nr_rd_ops, atomic_read(&rreq->nr_rd_ops) == 1);
++		netfs_rreq_assess(rreq);
++		if (!test_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags))
++			break;
++		cond_resched();
++	}
++
++	ret = rreq->error;
++	netfs_put_read_request(rreq);
++	if (ret < 0)
++		goto error;
++
++have_page:
++	wait_on_page_fscache(page);
++have_page_no_wait:
++	if (netfs_priv)
++		ops->cleanup(netfs_priv, mapping);
++	*_page = page;
++	_leave(" = 0");
++	return 0;
++
++error:
++	unlock_page(page);
++	put_page(page);
++	if (netfs_priv)
++		ops->cleanup(netfs_priv, mapping);
++	_leave(" = %d", ret);
++	return ret;
++}
++EXPORT_SYMBOL(netfs_write_begin);
+diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
+index 3a7a3c10e1cd..cdd09e30ce75 100644
+--- a/fs/netfs/stats.c
++++ b/fs/netfs/stats.c
+@@ -23,19 +23,23 @@ atomic_t netfs_n_rh_read_failed;
+ atomic_t netfs_n_rh_zero;
+ atomic_t netfs_n_rh_short_read;
+ atomic_t netfs_n_rh_write;
++atomic_t netfs_n_rh_write_begin;
+ atomic_t netfs_n_rh_write_done;
+ atomic_t netfs_n_rh_write_failed;
++atomic_t netfs_n_rh_write_zskip;
  
- static inline void afs_extract_to_tmp64(struct afs_call *call)
+ void netfs_stats_show(struct seq_file *m)
  {
-+	call->iov_len = sizeof(call->tmp64);
- 	afs_extract_begin(call, &call->tmp64, sizeof(call->tmp64));
- }
- 
- static inline void afs_extract_discard(struct afs_call *call, size_t size)
- {
-+	call->iov_len = size;
- 	iov_iter_discard(&call->def_iter, READ, size);
- }
- 
- static inline void afs_extract_to_buf(struct afs_call *call, size_t size)
- {
-+	call->iov_len = size;
- 	afs_extract_begin(call, call->buffer, size);
- }
- 
-diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-index 8be709cb8542..0ec38b758f29 100644
---- a/fs/afs/rxrpc.c
-+++ b/fs/afs/rxrpc.c
-@@ -363,6 +363,7 @@ void afs_make_call(struct afs_addr_cursor *ac, struct afs_call *call, gfp_t gfp)
- 	struct rxrpc_call *rxcall;
- 	struct msghdr msg;
- 	struct kvec iov[1];
-+	size_t len;
- 	s64 tx_total_len;
- 	int ret;
- 
-@@ -466,9 +467,10 @@ void afs_make_call(struct afs_addr_cursor *ac, struct afs_call *call, gfp_t gfp)
- 		rxrpc_kernel_abort_call(call->net->socket, rxcall,
- 					RX_USER_ABORT, ret, "KSD");
- 	} else {
-+		len = 0;
- 		iov_iter_kvec(&msg.msg_iter, READ, NULL, 0, 0);
- 		rxrpc_kernel_recv_data(call->net->socket, rxcall,
--				       &msg.msg_iter, false,
-+				       &msg.msg_iter, &len, false,
- 				       &call->abort_code, &call->service_id);
- 		ac->abort_code = call->abort_code;
- 		ac->responded = true;
-@@ -504,6 +506,7 @@ void afs_make_call(struct afs_addr_cursor *ac, struct afs_call *call, gfp_t gfp)
- static void afs_deliver_to_call(struct afs_call *call)
- {
- 	enum afs_call_state state;
-+	size_t len;
- 	u32 abort_code, remote_abort = 0;
- 	int ret;
- 
-@@ -516,10 +519,11 @@ static void afs_deliver_to_call(struct afs_call *call)
- 	       state == AFS_CALL_SV_AWAIT_ACK
- 	       ) {
- 		if (state == AFS_CALL_SV_AWAIT_ACK) {
-+			len = 0;
- 			iov_iter_kvec(&call->def_iter, READ, NULL, 0, 0);
- 			ret = rxrpc_kernel_recv_data(call->net->socket,
- 						     call->rxcall, &call->def_iter,
--						     false, &remote_abort,
-+						     &len, false, &remote_abort,
- 						     &call->service_id);
- 			trace_afs_receive_data(call, &call->def_iter, false, ret);
- 
-@@ -929,10 +933,11 @@ int afs_extract_data(struct afs_call *call, bool want_more)
- 	u32 remote_abort = 0;
- 	int ret;
- 
--	_enter("{%s,%zu},%d", call->type->name, iov_iter_count(iter), want_more);
-+	_enter("{%s,%zu,%zu},%d",
-+	       call->type->name, call->iov_len, iov_iter_count(iter), want_more);
- 
- 	ret = rxrpc_kernel_recv_data(net->socket, call->rxcall, iter,
--				     want_more, &remote_abort,
-+				     &call->iov_len, want_more, &remote_abort,
- 				     &call->service_id);
- 	if (ret == 0 || ret == -EAGAIN)
- 		return ret;
-diff --git a/fs/afs/yfsclient.c b/fs/afs/yfsclient.c
-index bd787e71a657..6c45d32da13c 100644
---- a/fs/afs/yfsclient.c
-+++ b/fs/afs/yfsclient.c
-@@ -363,8 +363,9 @@ static int yfs_deliver_fs_fetch_data64(struct afs_call *call)
- 	unsigned int size;
- 	int ret;
- 
--	_enter("{%u,%zu/%llu}",
--	       call->unmarshall, iov_iter_count(call->iter), req->actual_len);
-+	_enter("{%u,%zu, %zu/%llu}",
-+	       call->unmarshall, call->iov_len, iov_iter_count(call->iter),
-+	       req->actual_len);
- 
- 	switch (call->unmarshall) {
- 	case 0:
-@@ -396,6 +397,7 @@ static int yfs_deliver_fs_fetch_data64(struct afs_call *call)
- 			size = PAGE_SIZE - req->offset;
- 		else
- 			size = req->remain;
-+		call->iov_len = size;
- 		call->bvec[0].bv_len = size;
- 		call->bvec[0].bv_offset = req->offset;
- 		call->bvec[0].bv_page = req->pages[req->index];
-diff --git a/include/net/af_rxrpc.h b/include/net/af_rxrpc.h
-index f6abcc0bbd6e..cee5f83c0f11 100644
---- a/include/net/af_rxrpc.h
-+++ b/include/net/af_rxrpc.h
-@@ -53,7 +53,7 @@ int rxrpc_kernel_send_data(struct socket *, struct rxrpc_call *,
- 			   struct msghdr *, size_t,
- 			   rxrpc_notify_end_tx_t);
- int rxrpc_kernel_recv_data(struct socket *, struct rxrpc_call *,
--			   struct iov_iter *, bool, u32 *, u16 *);
-+			   struct iov_iter *, size_t *, bool, u32 *, u16 *);
- bool rxrpc_kernel_abort_call(struct socket *, struct rxrpc_call *,
- 			     u32, int, const char *);
- void rxrpc_kernel_end_call(struct socket *, struct rxrpc_call *);
-diff --git a/net/rxrpc/recvmsg.c b/net/rxrpc/recvmsg.c
-index fef3573fdc8b..eca6dda26c77 100644
---- a/net/rxrpc/recvmsg.c
-+++ b/net/rxrpc/recvmsg.c
-@@ -669,6 +669,7 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-  * @sock: The socket that the call exists on
-  * @call: The call to send data through
-  * @iter: The buffer to receive into
-+ * @_len: The amount of data we want to receive (decreased on return)
-  * @want_more: True if more data is expected to be read
-  * @_abort: Where the abort code is stored if -ECONNABORTED is returned
-  * @_service: Where to store the actual service ID (may be upgraded)
-@@ -684,7 +685,7 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-  * *_abort should also be initialised to 0.
+-	seq_printf(m, "RdHelp : RA=%u RP=%u rr=%u sr=%u\n",
++	seq_printf(m, "RdHelp : RA=%u RP=%u WB=%u rr=%u sr=%u\n",
+ 		   atomic_read(&netfs_n_rh_readahead),
+ 		   atomic_read(&netfs_n_rh_readpage),
++		   atomic_read(&netfs_n_rh_write_begin),
+ 		   atomic_read(&netfs_n_rh_rreq),
+ 		   atomic_read(&netfs_n_rh_sreq));
+-	seq_printf(m, "RdHelp : ZR=%u sh=%u\n",
++	seq_printf(m, "RdHelp : ZR=%u sh=%u sk=%u\n",
+ 		   atomic_read(&netfs_n_rh_zero),
+-		   atomic_read(&netfs_n_rh_short_read));
++		   atomic_read(&netfs_n_rh_short_read),
++		   atomic_read(&netfs_n_rh_write_zskip));
+ 	seq_printf(m, "RdHelp : DL=%u ds=%u df=%u di=%u\n",
+ 		   atomic_read(&netfs_n_rh_download),
+ 		   atomic_read(&netfs_n_rh_download_done),
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 9a262eb36b0f..1a81baecb182 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -87,11 +87,14 @@ struct netfs_read_request {
+  * Operations the network filesystem can/must provide to the helpers.
   */
- int rxrpc_kernel_recv_data(struct socket *sock, struct rxrpc_call *call,
--			   struct iov_iter *iter,
-+			   struct iov_iter *iter, size_t *_len,
- 			   bool want_more, u32 *_abort, u16 *_service)
- {
- 	size_t offset = 0;
-@@ -692,7 +693,7 @@ int rxrpc_kernel_recv_data(struct socket *sock, struct rxrpc_call *call,
+ struct netfs_read_request_ops {
++	bool (*is_cache_enabled)(struct inode *inode);
+ 	void (*init_rreq)(struct netfs_read_request *rreq, struct file *file);
+ 	void (*expand_readahead)(struct netfs_read_request *rreq);
+ 	bool (*clamp_length)(struct netfs_read_subrequest *subreq);
+ 	void (*issue_op)(struct netfs_read_subrequest *subreq);
+ 	bool (*is_still_valid)(struct netfs_read_request *rreq);
++	int (*check_write_begin)(struct file *file, loff_t pos, unsigned len,
++				 struct page *page, void **_fsdata);
+ 	void (*done)(struct netfs_read_request *rreq);
+ 	void (*cleanup)(struct address_space *mapping, void *netfs_priv);
+ };
+@@ -104,6 +107,11 @@ extern int netfs_readpage(struct file *,
+ 			  struct page *,
+ 			  const struct netfs_read_request_ops *,
+ 			  void *);
++extern int netfs_write_begin(struct file *, struct address_space *,
++			     loff_t, unsigned int, unsigned int, struct page **,
++			     void **,
++			     const struct netfs_read_request_ops *,
++			     void *);
  
- 	_enter("{%d,%s},%zu,%d",
- 	       call->debug_id, rxrpc_call_states[call->state],
--	       iov_iter_count(iter), want_more);
-+	       *_len, want_more);
+ extern void netfs_subreq_terminated(struct netfs_read_subrequest *, ssize_t);
+ extern void netfs_stats_show(struct seq_file *);
+diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
+index 7044c981349d..ed54de2ed14d 100644
+--- a/include/trace/events/netfs.h
++++ b/include/trace/events/netfs.h
+@@ -22,6 +22,7 @@ enum netfs_read_trace {
+ 	netfs_read_trace_expanded,
+ 	netfs_read_trace_readahead,
+ 	netfs_read_trace_readpage,
++	netfs_read_trace_write_begin,
+ };
  
- 	ASSERTCMP(call->state, !=, RXRPC_CALL_SERVER_SECURING);
+ enum netfs_rreq_trace {
+@@ -50,7 +51,8 @@ enum netfs_sreq_trace {
+ #define netfs_read_traces					\
+ 	EM(netfs_read_trace_expanded,		"EXPANDED ")	\
+ 	EM(netfs_read_trace_readahead,		"READAHEAD")	\
+-	E_(netfs_read_trace_readpage,		"READPAGE ")
++	EM(netfs_read_trace_readpage,		"READPAGE ")	\
++	E_(netfs_read_trace_write_begin,	"WRITEBEGN")
  
-@@ -703,8 +704,8 @@ int rxrpc_kernel_recv_data(struct socket *sock, struct rxrpc_call *call,
- 	case RXRPC_CALL_SERVER_RECV_REQUEST:
- 	case RXRPC_CALL_SERVER_ACK_REQUEST:
- 		ret = rxrpc_recvmsg_data(sock, call, NULL, iter,
--					 iov_iter_count(iter), 0,
--					 &offset);
-+					 *_len, 0, &offset);
-+		*_len -= offset;
- 		if (ret < 0)
- 			goto out;
- 
+ #define netfs_rreq_traces					\
+ 	EM(netfs_rreq_trace_assess,		"ASSESS")	\
 
 
