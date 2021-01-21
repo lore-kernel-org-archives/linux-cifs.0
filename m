@@ -2,361 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C32D8C43331
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 02:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3F2C433E0
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 03:52:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 917CD23788
-	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 02:45:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 047E92071C
+	for <linux-cifs@archiver.kernel.org>; Thu, 21 Jan 2021 03:52:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387959AbhATXrO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 20 Jan 2021 18:47:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59205 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731975AbhATWY7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 20 Jan 2021 17:24:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611181412;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KCq7HLtzy63U3IOjR9kN+69ryqciEf0rO0Fm2voNC/E=;
-        b=Z3WN2m76IxrmCnbBCIafcRQZA6Dk6+ypD1U1Spmowdi3n6uGINUGqypJvQvk7sfAMUQRQo
-        28jkpDp65QzxTai5j8Hzu6JGgJPvKFrqNJrNHnooqC8JKydSbP4nrCffv43kX3wlwP98Ap
-        ANH8SDMDrZcvCgMJhCjM19gXi6PAmkQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-yy0zbZjtN3670UWJ7CXR9w-1; Wed, 20 Jan 2021 17:23:29 -0500
-X-MC-Unique: yy0zbZjtN3670UWJ7CXR9w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 063E8180A092;
-        Wed, 20 Jan 2021 22:23:28 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2943D6EF56;
-        Wed, 20 Jan 2021 22:23:22 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 10/25] netfs: Add write_begin helper
-From:   David Howells <dhowells@redhat.com>
-To:     Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>
-Cc:     dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 20 Jan 2021 22:23:21 +0000
-Message-ID: <161118140165.1232039.16418853874312234477.stgit@warthog.procyon.org.uk>
-In-Reply-To: <161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk>
-References: <161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/0.23
+        id S1728197AbhAUDwD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 20 Jan 2021 22:52:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46426 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730601AbhAUAy1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 20 Jan 2021 19:54:27 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BE71C061575
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Jan 2021 16:52:13 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id m13so564668ljo.11
+        for <linux-cifs@vger.kernel.org>; Wed, 20 Jan 2021 16:52:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SQLpMWb32I+pgu6K7NeJ8tP7Bp8SDoZc25yztIWiDzc=;
+        b=bldRs2d7aQ+g9KQ9pw3rs+FS8NLq1fpz4KTDiFvf6iIcO7nTbdvGVRp2Jp0mol8x4z
+         EH7SqYwRvlAAiGNX6DcQkVRoOsbV0N+mEB7R3g7cvAKmq5C+4BsGJN3wo2B74V5+53LG
+         EMCjKRa/sKmeJbePAS2FEiek6LQa80kgLe5wqUKjeT5dgXE3wFQTlPnvfO6+s1r1URkq
+         qmlqMJEL8mgDOJ6/dh7ckXi9TcRiTPdXhHysZAYsPkxHBgZ7VqMthTaUleb3/x2E/M+p
+         G5fxmtMXe+9anPDxANwFPtRB9vkXRLGIRdNzU2LFS8mUjUZqkTf+rZB5pFF5Tt0P54at
+         YDkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SQLpMWb32I+pgu6K7NeJ8tP7Bp8SDoZc25yztIWiDzc=;
+        b=OIPW+ZI/yUmBExmW7LoGNNPThgj50ZWhst1OTkimWw3NwcnQXwNSrqSqFN6ieUIXQ6
+         w7eT7Ak88tdF6rFN5ZbAV+UhZeEa26KMe6wGYe+SysUkLXXuIQpT7VGN3aV8PxoJKETQ
+         7cbE0r/DV4K3R4cUPxhg102hy3pjDWIxOzRe+lUAtm+u5GgYmRstySiGTvZ1JAlm1TyN
+         P0Wx1wtQZrjudpem/gzjxIMP6YZwr3PhqwC9hFy7x6HYxp4jcGmKxiSt6bp39x8LN4hz
+         J50NjPyIKWdKQIh7q2ESOLloEpnCxbqUqJL3HhbzQc/hKYChwkLKk8Eyu74wDZNnzWM9
+         Vu0w==
+X-Gm-Message-State: AOAM532HMHcpa7VcW/50jR0iN62Qahk2kqoDUzLPcVRKPo/1UGTlKpzl
+        pLKCSpte1Mon2NupmDELaAhGXAsFtGsqk/0V+v5XFKTIzpE=
+X-Google-Smtp-Source: ABdhPJxBJiJd5KL7onDzngSkIPmJ/fu47W/zvbko2ZjnyjBIrc6UVCABUHHOem6F7bKNS8vXkcFNJC9g9Nux9/gUYLQ=
+X-Received: by 2002:a2e:88c8:: with SMTP id a8mr5507132ljk.148.1611190331503;
+ Wed, 20 Jan 2021 16:52:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <20210120222248.22994-1-lsahlber@redhat.com>
+In-Reply-To: <20210120222248.22994-1-lsahlber@redhat.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 20 Jan 2021 18:52:00 -0600
+Message-ID: <CAH2r5muKWC8f=_HTPn+NcRq8iGAYDgAzyQ-3yJx66NVZYi54GA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: do not fail __smb_send_rqst if non-fatal signals
+ are pending
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a helper to do the pre-reading work for the netfs write_begin address
-space op.
+tentatively merged into cifs-2.6.git for-next
 
-Signed-off-by: David Howells <dhowells@redhat.com>
----
-
- fs/netfs/internal.h          |    2 +
- fs/netfs/read_helper.c       |  165 ++++++++++++++++++++++++++++++++++++++++++
- fs/netfs/stats.c             |   10 ++-
- include/linux/netfs.h        |    8 ++
- include/trace/events/netfs.h |    4 +
- 5 files changed, 185 insertions(+), 4 deletions(-)
-
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index d83317b1eb9d..3d7ab3ab5743 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -34,8 +34,10 @@ extern atomic_t netfs_n_rh_read_failed;
- extern atomic_t netfs_n_rh_zero;
- extern atomic_t netfs_n_rh_short_read;
- extern atomic_t netfs_n_rh_write;
-+extern atomic_t netfs_n_rh_write_begin;
- extern atomic_t netfs_n_rh_write_done;
- extern atomic_t netfs_n_rh_write_failed;
-+extern atomic_t netfs_n_rh_write_zskip;
- 
- 
- static inline void netfs_stat(atomic_t *stat)
-diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
-index 275ac37e2834..eb34c368617d 100644
---- a/fs/netfs/read_helper.c
-+++ b/fs/netfs/read_helper.c
-@@ -760,3 +760,168 @@ int netfs_readpage(struct file *file,
- 	return ret;
- }
- EXPORT_SYMBOL(netfs_readpage);
-+
-+static void netfs_clear_thp(struct page *page)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < thp_nr_pages(page); i++)
-+		clear_highpage(page + i);
-+}
-+
-+/**
-+ * netfs_write_begin - Helper to prepare for writing
-+ * @file: The file to read from
-+ * @mapping: The mapping to read from
-+ * @pos: File position at which the write will begin
-+ * @len: The length of the write in this page
-+ * @flags: AOP_* flags
-+ * @_page: Where to put the resultant page
-+ * @_fsdata: Place for the netfs to store a cookie
-+ * @ops: The network filesystem's operations for the helper to use
-+ * @netfs_priv: Private netfs data to be retained in the request
-+ *
-+ * Pre-read data for a write-begin request by drawing data from the cache if
-+ * possible, or the netfs if not.  Space beyond the EOF is zero-filled.
-+ * Multiple I/O requests from different sources will get munged together.  If
-+ * necessary, the readahead window can be expanded in either direction to a
-+ * more convenient alighment for RPC efficiency or to make storage in the cache
-+ * feasible.
-+ *
-+ * The calling netfs must provide a table of operations, only one of which,
-+ * issue_op, is mandatory.
-+ *
-+ * The check_write_begin() operation can be provided to check for and flush
-+ * conflicting writes once the page is grabbed and locked.  It is passed a
-+ * pointer to the fsdata cookie that gets returned to the VM to be passed to
-+ * write_end.  It is permitted to sleep.  It should return 0 if the request
-+ * should go ahead; unlock the page and return -EAGAIN to cause the page to be
-+ * regot; or return an error.
-+ *
-+ * This is usable whether or not caching is enabled.
-+ */
-+int netfs_write_begin(struct file *file, struct address_space *mapping,
-+		      loff_t pos, unsigned int len, unsigned int flags,
-+		      struct page **_page, void **_fsdata,
-+		      const struct netfs_read_request_ops *ops,
-+		      void *netfs_priv)
-+{
-+	struct netfs_read_request *rreq;
-+	struct page *page, *xpage;
-+	struct inode *inode = file_inode(file);
-+	unsigned int debug_index = 0;
-+	pgoff_t index = pos >> PAGE_SHIFT;
-+	int pos_in_page = pos & ~PAGE_MASK;
-+	loff_t size;
-+	int ret;
-+
-+	struct readahead_control ractl = {
-+		.file		= file,
-+		.mapping	= mapping,
-+		._index		= index,
-+		._nr_pages	= 0,
-+	};
-+
-+retry:
-+	page = grab_cache_page_write_begin(mapping, index, 0);
-+	if (!page)
-+		return -ENOMEM;
-+
-+	if (ops->check_write_begin) {
-+		/* Allow the netfs (eg. ceph) to flush conflicts. */
-+		ret = ops->check_write_begin(file, pos, len, page, _fsdata);
-+		if (ret < 0) {
-+			if (ret == -EAGAIN)
-+				goto retry;
-+			goto error;
-+		}
-+	}
-+
-+	if (PageUptodate(page))
-+		goto have_page;
-+
-+	/* If the page is beyond the EOF, we want to clear it - unless it's
-+	 * within the cache granule containing the EOF, in which case we need
-+	 * to preload the granule.
-+	 */
-+	size = i_size_read(inode);
-+	if (!ops->is_cache_enabled(inode) &&
-+	    ((pos_in_page == 0 && len == thp_size(page)) ||
-+	     (pos >= size) ||
-+	     (pos_in_page == 0 && (pos + len) >= size))) {
-+		netfs_clear_thp(page);
-+		SetPageUptodate(page);
-+		netfs_stat(&netfs_n_rh_write_zskip);
-+		goto have_page_no_wait;
-+	}
-+
-+	ret = -ENOMEM;
-+	rreq = netfs_alloc_read_request(ops, netfs_priv, file);
-+	if (!rreq)
-+		goto error;
-+	rreq->mapping		= page->mapping;
-+	rreq->start		= page->index * PAGE_SIZE;
-+	rreq->len		= thp_size(page);
-+	rreq->no_unlock_page	= page->index;
-+	__set_bit(NETFS_RREQ_NO_UNLOCK_PAGE, &rreq->flags);
-+	netfs_priv = NULL;
-+
-+	netfs_stat(&netfs_n_rh_write_begin);
-+	trace_netfs_read(rreq, pos, len, netfs_read_trace_write_begin);
-+
-+	/* Expand the request to meet caching requirements and download
-+	 * preferences.
-+	 */
-+	ractl._nr_pages = thp_nr_pages(page);
-+	netfs_rreq_expand(rreq, &ractl);
-+	netfs_get_read_request(rreq);
-+
-+	/* We hold the page locks, so we can drop the references */
-+	while ((xpage = readahead_page(&ractl)))
-+		if (xpage != page)
-+			put_page(xpage);
-+
-+	atomic_set(&rreq->nr_rd_ops, 1);
-+	do {
-+		if (!netfs_rreq_submit_slice(rreq, &debug_index))
-+			break;
-+
-+	} while (rreq->submitted < rreq->len);
-+
-+	// TODO: If we didn't submit enough readage, we need to clean up
-+
-+	/* Keep nr_rd_ops incremented so that the ref always belongs to us, and
-+	 * the service code isn't punted off to a random thread pool to
-+	 * process.
-+	 */
-+	for (;;) {
-+		wait_var_event(&rreq->nr_rd_ops, atomic_read(&rreq->nr_rd_ops) == 1);
-+		netfs_rreq_assess(rreq);
-+		if (!test_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags))
-+			break;
-+		cond_resched();
-+	}
-+
-+	ret = rreq->error;
-+	netfs_put_read_request(rreq);
-+	if (ret < 0)
-+		goto error;
-+
-+have_page:
-+	wait_on_page_fscache(page);
-+have_page_no_wait:
-+	if (netfs_priv)
-+		ops->cleanup(netfs_priv, mapping);
-+	*_page = page;
-+	_leave(" = 0");
-+	return 0;
-+
-+error:
-+	unlock_page(page);
-+	put_page(page);
-+	if (netfs_priv)
-+		ops->cleanup(netfs_priv, mapping);
-+	_leave(" = %d", ret);
-+	return ret;
-+}
-+EXPORT_SYMBOL(netfs_write_begin);
-diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
-index 3a7a3c10e1cd..cdd09e30ce75 100644
---- a/fs/netfs/stats.c
-+++ b/fs/netfs/stats.c
-@@ -23,19 +23,23 @@ atomic_t netfs_n_rh_read_failed;
- atomic_t netfs_n_rh_zero;
- atomic_t netfs_n_rh_short_read;
- atomic_t netfs_n_rh_write;
-+atomic_t netfs_n_rh_write_begin;
- atomic_t netfs_n_rh_write_done;
- atomic_t netfs_n_rh_write_failed;
-+atomic_t netfs_n_rh_write_zskip;
- 
- void netfs_stats_show(struct seq_file *m)
- {
--	seq_printf(m, "RdHelp : RA=%u RP=%u rr=%u sr=%u\n",
-+	seq_printf(m, "RdHelp : RA=%u RP=%u WB=%u rr=%u sr=%u\n",
- 		   atomic_read(&netfs_n_rh_readahead),
- 		   atomic_read(&netfs_n_rh_readpage),
-+		   atomic_read(&netfs_n_rh_write_begin),
- 		   atomic_read(&netfs_n_rh_rreq),
- 		   atomic_read(&netfs_n_rh_sreq));
--	seq_printf(m, "RdHelp : ZR=%u sh=%u\n",
-+	seq_printf(m, "RdHelp : ZR=%u sh=%u sk=%u\n",
- 		   atomic_read(&netfs_n_rh_zero),
--		   atomic_read(&netfs_n_rh_short_read));
-+		   atomic_read(&netfs_n_rh_short_read),
-+		   atomic_read(&netfs_n_rh_write_zskip));
- 	seq_printf(m, "RdHelp : DL=%u ds=%u df=%u di=%u\n",
- 		   atomic_read(&netfs_n_rh_download),
- 		   atomic_read(&netfs_n_rh_download_done),
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 9a262eb36b0f..1a81baecb182 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -87,11 +87,14 @@ struct netfs_read_request {
-  * Operations the network filesystem can/must provide to the helpers.
-  */
- struct netfs_read_request_ops {
-+	bool (*is_cache_enabled)(struct inode *inode);
- 	void (*init_rreq)(struct netfs_read_request *rreq, struct file *file);
- 	void (*expand_readahead)(struct netfs_read_request *rreq);
- 	bool (*clamp_length)(struct netfs_read_subrequest *subreq);
- 	void (*issue_op)(struct netfs_read_subrequest *subreq);
- 	bool (*is_still_valid)(struct netfs_read_request *rreq);
-+	int (*check_write_begin)(struct file *file, loff_t pos, unsigned len,
-+				 struct page *page, void **_fsdata);
- 	void (*done)(struct netfs_read_request *rreq);
- 	void (*cleanup)(struct address_space *mapping, void *netfs_priv);
- };
-@@ -104,6 +107,11 @@ extern int netfs_readpage(struct file *,
- 			  struct page *,
- 			  const struct netfs_read_request_ops *,
- 			  void *);
-+extern int netfs_write_begin(struct file *, struct address_space *,
-+			     loff_t, unsigned int, unsigned int, struct page **,
-+			     void **,
-+			     const struct netfs_read_request_ops *,
-+			     void *);
- 
- extern void netfs_subreq_terminated(struct netfs_read_subrequest *, ssize_t);
- extern void netfs_stats_show(struct seq_file *);
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index 7044c981349d..ed54de2ed14d 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -22,6 +22,7 @@ enum netfs_read_trace {
- 	netfs_read_trace_expanded,
- 	netfs_read_trace_readahead,
- 	netfs_read_trace_readpage,
-+	netfs_read_trace_write_begin,
- };
- 
- enum netfs_rreq_trace {
-@@ -50,7 +51,8 @@ enum netfs_sreq_trace {
- #define netfs_read_traces					\
- 	EM(netfs_read_trace_expanded,		"EXPANDED ")	\
- 	EM(netfs_read_trace_readahead,		"READAHEAD")	\
--	E_(netfs_read_trace_readpage,		"READPAGE ")
-+	EM(netfs_read_trace_readpage,		"READPAGE ")	\
-+	E_(netfs_read_trace_write_begin,	"WRITEBEGN")
- 
- #define netfs_rreq_traces					\
- 	EM(netfs_rreq_trace_assess,		"ASSESS")	\
+On Wed, Jan 20, 2021 at 4:22 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+>
+> RHBZ 1848178
+>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/transport.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index d629d3c03a9e..283e9022f049 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -339,7 +339,7 @@ __smb_send_rqst(struct TCP_Server_Info *server, int num_rqst,
+>         if (ssocket == NULL)
+>                 return -EAGAIN;
+>
+> -       if (signal_pending(current)) {
+> +       if (fatal_signal_pending(current)) {
+>                 cifs_dbg(FYI, "signal pending before send request\n");
+>                 return -ERESTARTSYS;
+>         }
+> --
+> 2.13.6
+>
 
 
+-- 
+Thanks,
+
+Steve
