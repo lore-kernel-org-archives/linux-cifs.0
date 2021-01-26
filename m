@@ -2,39 +2,38 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D94C433DB
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Jan 2021 20:42:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 828D0C433DB
+	for <linux-cifs@archiver.kernel.org>; Tue, 26 Jan 2021 20:42:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D17B22B3B
-	for <linux-cifs@archiver.kernel.org>; Tue, 26 Jan 2021 20:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47C3122B3B
+	for <linux-cifs@archiver.kernel.org>; Tue, 26 Jan 2021 20:42:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727674AbhAZFGl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:06:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52164 "EHLO
+        id S1726900AbhAZFGL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 26 Jan 2021 00:06:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726865AbhAZEHB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 25 Jan 2021 23:07:01 -0500
+        with ESMTP id S1730365AbhAZBmy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 25 Jan 2021 20:42:54 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21C99C06174A;
-        Mon, 25 Jan 2021 20:06:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F71C061224;
+        Mon, 25 Jan 2021 17:38:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=jq3N/pNATTXIAMrmJ6obiwvtVc5gjKpBnS3S5QeZ+pY=; b=k5jINKlmfQbKVkIc/QXlhf3x+a
-        KKgGtH3mPaUaM/OfdSzQ+q/lrTQwHicbG/JKAJXzk0VSiUhlqqPvKPVFRLaBTrRuO1/yfo8oXx4H7
-        l5bG5GO4+RnFNJfsM67J/D3YIEbQJo/k3q5HfWbJUgK5sd+tFUMejnRDHyDxk4LZuWyvCQDnB+gjq
-        zOKsiZ2Lv5B5lLMYuuMKn/gA2xwSBl2THbsXjL87EiEHQ8EhQ2ImbIqpEatXX2aFYhUkw9YYNfLrv
-        aarEqm3k+Xt/QvaRlG8bjW49UmSAtOfxlmHpnv165FYQ6iMzlCp2siLkBG/QSBVFjVvAWTbVZmcGv
-        JFMI27LA==;
+        bh=I4QtGGdUD49OQbpnA/+iW6hZGEJcEQdxNTE3QJXFu+k=; b=th6+D7onHmuxEzk677tybiCqfY
+        hhGc9w/VT61khYhuxx2E1kXIsOZGSF8+E1JP2Cvik6UBR/5b9Nw1Gin/GJ/RDDPaHQuwd8aX3Z5R6
+        LuJpCUqsZxHBgVXAyJOFwvagUUVKqq/2tD0/zQ5NLUIocvQ3sFd+r65lKsnAv70oMOdY65n7/vmc0
+        5u4hBE/tFpodrVaPe+lRr8QseonmbE9ty/7mie8ThsqBBqlrcHJgYHdXAyo8VhXZYJeq+djp+RU1Z
+        bkG5n7D1xoNHEi6ZrSR5P+ndK11HLCtkbsp86N94CxpjEcmp6tYmalu5GJ74rGgTmoQ4gK9HCOanm
+        TCWQ7O8g==;
 Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l4Fbo-0053Bl-Gu; Tue, 26 Jan 2021 04:05:43 +0000
-Date:   Tue, 26 Jan 2021 04:05:40 +0000
+        id 1l4DH9-004uVe-DU; Tue, 26 Jan 2021 01:36:32 +0000
+Date:   Tue, 26 Jan 2021 01:36:11 +0000
 From:   Matthew Wilcox <willy@infradead.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     Trond Myklebust <trondmy@hammerspace.com>,
@@ -48,34 +47,67 @@ Cc:     Trond Myklebust <trondmy@hammerspace.com>,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 27/32] NFS: Refactor nfs_readpage() and
- nfs_readpage_async() to use nfs_readdesc
-Message-ID: <20210126040540.GK308988@casper.infradead.org>
+Subject: Re: [PATCH 32/32] NFS: Convert readpage to readahead and use
+ netfs_readahead for fscache
+Message-ID: <20210126013611.GI308988@casper.infradead.org>
 References: <161161025063.2537118.2009249444682241405.stgit@warthog.procyon.org.uk>
- <161161057357.2537118.6542184374596533032.stgit@warthog.procyon.org.uk>
+ <161161064956.2537118.3354798147866150631.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <161161057357.2537118.6542184374596533032.stgit@warthog.procyon.org.uk>
+In-Reply-To: <161161064956.2537118.3354798147866150631.stgit@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 09:36:13PM +0000, David Howells wrote:
-> +int nfs_readpage_async(void *data, struct inode *inode,
->  		       struct page *page)
+
+For Subject: s/readpage/readpages/
+
+On Mon, Jan 25, 2021 at 09:37:29PM +0000, David Howells wrote:
+> +int __nfs_readahead_from_fscache(struct nfs_readdesc *desc,
+> +				 struct readahead_control *rac)
+
+I thought you wanted it called ractl instead of rac?  That's what I've
+been using in new code.
+
+> -	dfprintk(FSCACHE, "NFS: nfs_getpages_from_fscache (0x%p/%u/0x%p)\n",
+> -		 nfs_i_fscache(inode), npages, inode);
+> +	dfprintk(FSCACHE, "NFS: nfs_readahead_from_fscache (0x%p/0x%p)\n",
+> +		 nfs_i_fscache(inode), inode);
+
+We do have readahead_count() if this is useful information to be logging.
+
+> +static inline int nfs_readahead_from_fscache(struct nfs_readdesc *desc,
+> +					     struct readahead_control *rac)
 >  {
-> +	struct nfs_readdesc *desc = (struct nfs_readdesc *)data;
+> -	if (NFS_I(inode)->fscache)
+> -		return __nfs_readpages_from_fscache(ctx, inode, mapping, pages,
+> -						    nr_pages);
+> +	if (NFS_I(rac->mapping->host)->fscache)
+> +		return __nfs_readahead_from_fscache(desc, rac);
+>  	return -ENOBUFS;
+>  }
 
-You don't need a cast to cast from void.
+Not entirely sure that it's worth having the two functions separated any more.
 
-> @@ -440,17 +439,16 @@ int nfs_readpages(struct file *filp, struct address_space *mapping,
+>  	/* attempt to read as many of the pages as possible from the cache
+>  	 * - this returns -ENOBUFS immediately if the cookie is negative
+>  	 */
+> -	ret = nfs_readpages_from_fscache(desc.ctx, inode, mapping,
+> -					 pages, &nr_pages);
+> +	ret = nfs_readahead_from_fscache(&desc, rac);
 >  	if (ret == 0)
 >  		goto read_complete; /* all pages were read */
 >  
-> -	desc.pgio = &pgio;
-> -	nfs_pageio_init_read(&pgio, inode, false,
-> +	nfs_pageio_init_read(&desc.pgio, inode, false,
+>  	nfs_pageio_init_read(&desc.pgio, inode, false,
+>  			     &nfs_async_read_completion_ops);
+>  
+> -	ret = read_cache_pages(mapping, pages, readpage_async_filler, &desc);
+> +	while ((page = readahead_page(rac))) {
+> +		ret = readpage_async_filler(&desc, page);
+> +		put_page(page);
+> +	}
 
-I like what you've done here, embedding the pgio in the desc.
-
+I thought with the new API we didn't need to do this kind of thing
+any more?  ie no matter whether fscache is configured in or not, it'll
+submit the I/Os.
