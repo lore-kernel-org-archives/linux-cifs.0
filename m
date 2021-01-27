@@ -2,127 +2,94 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8E8C433E6
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jan 2021 06:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A48C433DB
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jan 2021 07:19:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A61D720715
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jan 2021 06:07:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A71620729
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jan 2021 07:19:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233175AbhA0GHm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Jan 2021 01:07:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42780 "EHLO
+        id S231737AbhA0HS2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Jan 2021 02:18:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231279AbhA0FlT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Jan 2021 00:41:19 -0500
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEFA0C061573
-        for <linux-cifs@vger.kernel.org>; Tue, 26 Jan 2021 21:37:39 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id a1so673097ilr.5
-        for <linux-cifs@vger.kernel.org>; Tue, 26 Jan 2021 21:37:39 -0800 (PST)
+        with ESMTP id S232728AbhA0HMS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Jan 2021 02:12:18 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 112B3C061573
+        for <linux-cifs@vger.kernel.org>; Tue, 26 Jan 2021 23:11:38 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id gx1so777083pjb.1
+        for <linux-cifs@vger.kernel.org>; Tue, 26 Jan 2021 23:11:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=xGArUN0r4AnIMNv0f1t7IZbJIJZ927oUl6WKm0Y2Vk4=;
-        b=u8qOrj0ujhExxMmaqsd/DSWGogcuR/FNUisDEp315MTfrMNPO3iN95pORHIT/Wtxru
-         rFPmB4lYzrgADZ0WjE5iKq9Y9/VyBHqQP9ULW+7bT/8ig/u2qH6ynelWqkf63liUP1FN
-         HtewQn9IV2Uj9lfhSIL+S6REFTn6nZKB0KlTAHnOybKGcF77zZu2rpelr3/aVSJJW5Oy
-         /l7DF6u8R6KncCdvN+frccj4Njp7qeyFlktO2tStKJbCUgX8b2mWeChgMuhFXBMRNWcu
-         8lUdZq24GwwiZSxITyUtjqGTuQkDI0ogamypb0NKRj6S+IYCxZBX/kY2WYbyMrLtBHuu
-         Ercw==
+        d=adamharvey.name; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qzgNAxWAFXQXQLx4F173JnptpMxwPuWoS6nBfBndQi0=;
+        b=cUOpYY4H2KllHu8VHdOnH5ELBn6cHINbSscnoJwKBypU1anFHuvOIRc5fvKyVz7K2d
+         IpC08hR7j3JA0k5svYN7t4G7KNgykWALtcBCBux7Yca1K9FL9qiKxBkSrglP50vCnj3o
+         XgrXcwsxjS+Ng2W3ypyBf/BY9ccZWqLCL7aVY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=xGArUN0r4AnIMNv0f1t7IZbJIJZ927oUl6WKm0Y2Vk4=;
-        b=a8+hQyNLo3cRX8P9o5sG9LVx+hTqrEHTlCPYEr7FyY2qZwlDXyj6fzQcwKMz3qbW1J
-         PSBW7kY5gfj/uG9jPzKURuQkzHqGP0Z6jDoJD9KwEWMHDu3utyHTq0g8LBM2IeBZ0mz8
-         wutBlzWV7bVDO+4VGq80+EEz39IBCXKBjP8XsbWMFgd+nRhQEk3PT1oq2aqlXPF/HzvJ
-         frICdRKMqOHeWhbuy54dvgZHRO9rn1oX+kmBhBv7tcuAm0Yk6PTnOcWUbhHiN+rh7V4Q
-         rtGM9iJFTnE8N1INEXCkbCEQ+kmVU17AsU3ASPXysfs4tU+QRkGLUwXBqA2Y34I1+He0
-         1/tw==
-X-Gm-Message-State: AOAM5306Y2P+TaAv2q7Xl8xSgvT5+nVpBg7BEHs8ZOvqxWiFEQeWTIMl
-        eQc0B+5pzAr2oLLQf59JHaKnbA+m87CMzoHGxJQPF0g5afY=
-X-Google-Smtp-Source: ABdhPJw0FwohIX8EkUN2IyV6anpLYaXprTa4RNfKik42OYQ553Ead/5EG+3OwwkVsmkhopp90/d+mG5gQW3Ti19GdhM=
-X-Received: by 2002:a05:6e02:ca9:: with SMTP id 9mr7512878ilg.159.1611725859048;
- Tue, 26 Jan 2021 21:37:39 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qzgNAxWAFXQXQLx4F173JnptpMxwPuWoS6nBfBndQi0=;
+        b=fCVxVQ4I5QdfL/tBeE+HAeXX8JQyfbnrZJz50GctKtYs4XHl2nC4DMmTepgvxoudaa
+         lIX2IBAOTnu0bn4zMAo50MczWgU4vPqe6cm+ScYA2umYCNdpodZqozzWc7to0rH4B3V3
+         zuhGbl2gKY/5sO6O3/66a093XJjRSC0lG6TFAfRoT9dPFCFmdX90dkbVmkyJ+ieqohRO
+         Xkj9N++D7JtNmM+0beib+wouyJ6Sc44qBbQ7hIkfZdc1QqH2RhgQUhXc8ji9oP7ncnu2
+         z6MGGCMvTtyIeBj4QU9GjmKamq1GPKnjSseamzLLx0qbk7UOBynYU99EXa1V2b3wKdtK
+         SNEg==
+X-Gm-Message-State: AOAM532mrpiC30tR8Na9YuviSQCKEIDLevhUFIw3Liz0ciIK0RRWqgHh
+        43H+TYczWzMvIH8oE7zHKPbTdk2RwU51opMv
+X-Google-Smtp-Source: ABdhPJw8qxW9upFZ9YKxNakjYpgW3nrOxoJVUz7kb4c7bM8aO0PuJEAX0Gm1ozFSMs997yXV8g1I7g==
+X-Received: by 2002:a17:90a:7891:: with SMTP id x17mr4159318pjk.91.1611731497541;
+        Tue, 26 Jan 2021 23:11:37 -0800 (PST)
+Received: from nosecam.localdomain (node-1w7jr9qw9msspx5ewy5tkdyef.ipv6.telus.net. [2001:569:7eea:3500:ca69:1f75:9176:e767])
+        by smtp.gmail.com with ESMTPSA id t6sm1148757pfc.64.2021.01.26.23.11.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jan 2021 23:11:36 -0800 (PST)
+From:   Adam Harvey <adam@adamharvey.name>
+To:     sfrench@samba.org, linux-cifs@vger.kernel.org
+Cc:     samba-technical@lists.samba.org, Adam Harvey <adam@adamharvey.name>
+Subject: [PATCH] cifs: ignore the noauto option if it is provided
+Date:   Tue, 26 Jan 2021 23:10:21 -0800
+Message-Id: <20210127071020.18052-1-adam@adamharvey.name>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-References: <1415900995.66272053.1611639038067.JavaMail.zimbra@redhat.com> <1593727848.66273087.1611640555370.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1593727848.66273087.1611640555370.JavaMail.zimbra@redhat.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Wed, 27 Jan 2021 15:37:27 +1000
-Message-ID: <CAN05THSrMzaMd+_yf1BYWw4oW2RJNhDR1Ao+9JmOLf9e=N3ksg@mail.gmail.com>
-Subject: Re: mount dfs share failed becaus e of missing username
-To:     Xiaoli Feng <xifeng@redhat.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Yeah, there are a few bugs with dfs in the new mount api.
-One bug is in connect.c:expand_dfs_referrals() where we should remove
-the call to
-smb3_cleanup_fs_context_content().  But it is not sufficient.
-as we will just loop and never resolve the actual DFS referral.
+In 24e0a1eff9e2, the noauto option was missed when migrating to the new
+mount API. As a result, users with noauto in their fstab mount options
+are now unable to mount cifs filesystems, as they'll receive an "Unknown
+parameter" error.
 
-I am trying to find where we lost that.
+This restores the old behaviour of ignoring noauto if it's given.
 
-On Wed, Jan 27, 2021 at 10:45 AM Xiaoli Feng <xifeng@redhat.com> wrote:
->
-> Hello guys,
->
-> I met a bug. Mount dfs root share failed on v5.11.0-rc5. But It's success=
- on v5.10.
->
-> [root@ibm-x3650m4-01-vm-14 ~]# mount -vvv  //localhost/dfsroot cifs -o us=
-er=3Droot,password=3Dredhat
-> mount.cifs kernel mount options: ip=3D::1,unc=3D\\localhost\dfsroot,user=
-=3Droot,pass=3D********
-> mount error(22): Invalid argument
->
-> dmesg log:
-> [ 1648.025424] CIFS: fs/cifs/connect.c: build_unc_path_to_root: full_path=
-=3D\\localhost\dfsroot
-> [ 1648.025427] CIFS: fs/cifs/connect.c: build_unc_path_to_root: full_path=
-=3D\\localhost\dfsroot
-> [ 1648.025429] CIFS: fs/cifs/connect.c: build_unc_path_to_root: full_path=
-=3D\\localhost\dfsroot
-> [ 1648.025434] CIFS: fs/cifs/dfs_cache.c: __dfs_cache_find: search path: =
-\localhost\dfsroot
-> [ 1648.025437] CIFS: fs/cifs/dfs_cache.c: setup_referral: set up new ref
-> [ 1648.026760] CIFS: fs/cifs/dns_resolve.c: dns_resolve_server_name_to_ip=
-: resolved: localhost to 127.0.0.1
-> [ 1648.026773] CIFS: VFS: No username specified
-> [ 1648.028008] CIFS: fs/cifs/connect.c: cifs_put_smb_ses: ses_count=3D3
-> [ 1648.028012] CIFS: fs/cifs/connect.c: cifs_put_tcon: tc_count=3D1
-> [ 1648.028014] CIFS: fs/cifs/connect.c: VFS: in cifs_put_tcon as Xid: 32 =
-with uid: 0
-> [ 1648.028017] CIFS: fs/cifs/smb2pdu.c: Tree Disconnect
-> [ 1648.028385] CIFS: fs/cifs/connect.c: cifs_put_smb_ses: ses_count=3D2
-> [ 1648.028390] CIFS: fs/cifs/connect.c: VFS: leaving mount_put_conns (xid=
- =3D 29) rc =3D 0
-> [ 1648.028393] CIFS: VFS: cifs_mount failed w/return code =3D -22
->
->
-> More info please look https://bugzilla.kernel.org/show_bug.cgi?id=3D21134=
-5.
->
-> Thanks.
->
-> --
-> Best regards!
-> XiaoLi Feng =E5=86=AF=E5=B0=8F=E4=B8=BD
->
-> Red Hat Software (Beijing) Co.,Ltd
-> filesystem-qe Team
-> IRC:xifeng=EF=BC=8C#channel: fs-qe
-> Tel:+86-10-8388112
-> 9/F, Raycom
->
+Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
+Signed-off-by: Adam Harvey <adam@adamharvey.name>
+---
+ fs/cifs/fs_context.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 076bcadc756a..0edde5c66985 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -171,6 +171,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
+ 	fsparam_flag("noatime", Opt_ignore),
+ 	fsparam_flag("relatime", Opt_ignore),
+ 	fsparam_flag("_netdev", Opt_ignore),
++	fsparam_flag("noauto", Opt_ignore),
+ 	fsparam_flag_no("suid", Opt_ignore),
+ 	fsparam_flag_no("exec", Opt_ignore),
+ 	fsparam_flag_no("dev", Opt_ignore),
+-- 
+2.30.0
+
