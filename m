@@ -2,125 +2,127 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41FD0C433E0
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jan 2021 00:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8E8C433E6
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jan 2021 06:07:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11EF7206B2
-	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jan 2021 00:37:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A61D720715
+	for <linux-cifs@archiver.kernel.org>; Wed, 27 Jan 2021 06:07:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391237AbhA0AfE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 26 Jan 2021 19:35:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58576 "EHLO
+        id S233175AbhA0GHm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 27 Jan 2021 01:07:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389836AbhA0AKH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 26 Jan 2021 19:10:07 -0500
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D91C0698CA
-        for <linux-cifs@vger.kernel.org>; Tue, 26 Jan 2021 15:57:49 -0800 (PST)
-Received: by mail-il1-x12a.google.com with SMTP id e7so87877ili.2
-        for <linux-cifs@vger.kernel.org>; Tue, 26 Jan 2021 15:57:49 -0800 (PST)
+        with ESMTP id S231279AbhA0FlT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Jan 2021 00:41:19 -0500
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEFA0C061573
+        for <linux-cifs@vger.kernel.org>; Tue, 26 Jan 2021 21:37:39 -0800 (PST)
+Received: by mail-il1-x132.google.com with SMTP id a1so673097ilr.5
+        for <linux-cifs@vger.kernel.org>; Tue, 26 Jan 2021 21:37:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=kA8HkogeUyPU6EiJMdYbIhKNQplNA/8tzMXXNR/35gI=;
-        b=BK0IVakEQ05hz8+X76bs8/9Ae5VGGQ0v/2wvV7VT+bR8VQypKTe/OhboKJorWtfeN8
-         eTmgVydX0a3HneUy9XIg4YYgh8ccfXM8x75+aYGieUyTSfc0VgukCodMz3YV45OsRuDU
-         ESRPnN+qeVgbFIaiLUrcD+WMasm6iyPChvxVX+1w34hRxINNtvru+uz2AFKQ2dZx3TUU
-         +LXEgFvPioMVPtKs3Y9VRLGQm6Fz+5S4UEfNYoBHan3SnKzYv6Cr7TEjOC4kRWNq4/fs
-         wDDDbVLHb3+N9KydmuLc41BogV72GXCe84yb7g4iv9T6vOa+eFPPSYk6sr/zy4M8ysEx
-         LQqQ==
+        bh=xGArUN0r4AnIMNv0f1t7IZbJIJZ927oUl6WKm0Y2Vk4=;
+        b=u8qOrj0ujhExxMmaqsd/DSWGogcuR/FNUisDEp315MTfrMNPO3iN95pORHIT/Wtxru
+         rFPmB4lYzrgADZ0WjE5iKq9Y9/VyBHqQP9ULW+7bT/8ig/u2qH6ynelWqkf63liUP1FN
+         HtewQn9IV2Uj9lfhSIL+S6REFTn6nZKB0KlTAHnOybKGcF77zZu2rpelr3/aVSJJW5Oy
+         /l7DF6u8R6KncCdvN+frccj4Njp7qeyFlktO2tStKJbCUgX8b2mWeChgMuhFXBMRNWcu
+         8lUdZq24GwwiZSxITyUtjqGTuQkDI0ogamypb0NKRj6S+IYCxZBX/kY2WYbyMrLtBHuu
+         Ercw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=kA8HkogeUyPU6EiJMdYbIhKNQplNA/8tzMXXNR/35gI=;
-        b=H6+zHH2tNAhWOCLJk4WzS68ROLy3/QhK3q/Z+4efFxpUx/vz/drKkZbm2vnjTScapT
-         7E+KCWyvRTBRBFzKBmkCN18+9HHOKWGInDYxZzticd/cHCEokbYesh0f57egQVHnxHC/
-         /QjKG56M45qmQUdS7EK4fmfTqGeeR84wkjCkIJXK5Fo8gA3RMz0xXdmjztxCZRmYgVw9
-         28zOoKrrUyAIZBbwxrcU1GYoBfi18an62LBa7HzE8dCTrIWjN7LYW8R50ZLRDZuRp99T
-         RXaoWlfY/Ds6Qp5dqMjL7jaWLuEbEWALW3XkyRQ9SvQO54azFsDZID+rcb8o2SUGG7aM
-         nrqw==
-X-Gm-Message-State: AOAM532zncecM2XTuDNIzKWj92pbBYY6ewJ6XwUlgURHXgWrSCCeLMNA
-        I+O6ArsLzPSiceD1NTqA+XwVaNWX7Xq7wmx+Sx4=
-X-Google-Smtp-Source: ABdhPJy1UPwmNoDkCqCEigk9B537dPg01+vgsL3XA1xO/XIKQwGL0fN0Exbspn2JVIGkzgzmvauPhD2o5OWPWuV/m90=
-X-Received: by 2002:a92:3f12:: with SMTP id m18mr6725773ila.109.1611705469155;
- Tue, 26 Jan 2021 15:57:49 -0800 (PST)
+        bh=xGArUN0r4AnIMNv0f1t7IZbJIJZ927oUl6WKm0Y2Vk4=;
+        b=a8+hQyNLo3cRX8P9o5sG9LVx+hTqrEHTlCPYEr7FyY2qZwlDXyj6fzQcwKMz3qbW1J
+         PSBW7kY5gfj/uG9jPzKURuQkzHqGP0Z6jDoJD9KwEWMHDu3utyHTq0g8LBM2IeBZ0mz8
+         wutBlzWV7bVDO+4VGq80+EEz39IBCXKBjP8XsbWMFgd+nRhQEk3PT1oq2aqlXPF/HzvJ
+         frICdRKMqOHeWhbuy54dvgZHRO9rn1oX+kmBhBv7tcuAm0Yk6PTnOcWUbhHiN+rh7V4Q
+         rtGM9iJFTnE8N1INEXCkbCEQ+kmVU17AsU3ASPXysfs4tU+QRkGLUwXBqA2Y34I1+He0
+         1/tw==
+X-Gm-Message-State: AOAM5306Y2P+TaAv2q7Xl8xSgvT5+nVpBg7BEHs8ZOvqxWiFEQeWTIMl
+        eQc0B+5pzAr2oLLQf59JHaKnbA+m87CMzoHGxJQPF0g5afY=
+X-Google-Smtp-Source: ABdhPJw0FwohIX8EkUN2IyV6anpLYaXprTa4RNfKik42OYQ553Ead/5EG+3OwwkVsmkhopp90/d+mG5gQW3Ti19GdhM=
+X-Received: by 2002:a05:6e02:ca9:: with SMTP id 9mr7512878ilg.159.1611725859048;
+ Tue, 26 Jan 2021 21:37:39 -0800 (PST)
 MIME-Version: 1.0
-References: <20210120043209.27786-1-lsahlber@redhat.com> <CAH2r5mvmCG2SN0nO8uZftTRMOkN8jgbfYrO1E5_A=5FpK9H0bQ@mail.gmail.com>
- <CAKywueRWJxk9KuuZe6Ovb7MhxXsbsE-_7WJG05hAPTZ2o5m7mg@mail.gmail.com>
- <87y2gmk3ap.fsf@suse.com> <877do6zdqp.fsf@cjr.nz> <CAN05THQjj04sQpcjvLqs+fmbdeu=jftM+GdeJnQMg33OEq6xEg@mail.gmail.com>
- <CAKywueSTX9hq5Vun3V6foQeLJ8Fngye0__U-gj73evKDwNLEKg@mail.gmail.com>
- <CAN05THQGBvLy6c+DK1eOuj2VKXTXONZkk8Je+iLM2DZFmHsPBA@mail.gmail.com>
- <CAH2r5mttuSULg0UvKuNRydtkNAP1QRZVXQuNaaHGFLRrvfSnfQ@mail.gmail.com>
- <CANT5p=o5pjCLUzLv2=i+T+7XE=0Wxcg3p_TSbAeARAWNzmmgEw@mail.gmail.com>
- <CANT5p=qrRVaN4yrqHz5fS2fC6_K1XqAiR4Bv9rTX6oxgg3j8gg@mail.gmail.com> <CAKywueTPG-Qc2J5QOugTD4Agt1A_p8ek4wpBVqn-qtLooLH+Pw@mail.gmail.com>
-In-Reply-To: <CAKywueTPG-Qc2J5QOugTD4Agt1A_p8ek4wpBVqn-qtLooLH+Pw@mail.gmail.com>
+References: <1415900995.66272053.1611639038067.JavaMail.zimbra@redhat.com> <1593727848.66273087.1611640555370.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1593727848.66273087.1611640555370.JavaMail.zimbra@redhat.com>
 From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Wed, 27 Jan 2021 09:57:37 +1000
-Message-ID: <CAN05THSb_ooX9TiJC7Y5HT1WrpUnm0chGqYaRyoXPJUmbayf0w@mail.gmail.com>
-Subject: Re: [PATCH] cifs: do not fail __smb_send_rqst if non-fatal signals
- are pending
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+Date:   Wed, 27 Jan 2021 15:37:27 +1000
+Message-ID: <CAN05THSrMzaMd+_yf1BYWw4oW2RJNhDR1Ao+9JmOLf9e=N3ksg@mail.gmail.com>
+Subject: Re: mount dfs share failed becaus e of missing username
+To:     Xiaoli Feng <xifeng@redhat.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Jan 27, 2021 at 9:34 AM Pavel Shilovsky <piastryyy@gmail.com> wrote=
-:
->
-> =D0=BF=D0=BD, 25 =D1=8F=D0=BD=D0=B2. 2021 =D0=B3. =D0=B2 09:07, Shyam Pra=
-sad N <nspmangalore@gmail.com>:
-> >
-> > From my readings so far, -ERESTARTSYS assumes that the syscall is idemp=
-otent.
-> > Can we safely make such assumptions for all VFS file operations? For
-> > example, what happens if a close gets restarted, and we already
-> > scheduled a delayed close because the original close failed with
-> > ERESTARTSYS?
->
-> I don't think we can assume all system calls to be idempotent. We
-> should probably examine them one-by-one and return -ERESTARTSYS for
-> some and -EINTR for the others.
->
-> >
-> > Also, I ran a quick grep for EINTR, and it looks like __cifs_readv and
-> > __cifs_writev return EINTR too. Should those be replaced by
-> > ERESTARTSYS too?
-> >
->
-> They return -EINTR after receiving a kill signal (see
-> wait_for_completion_killable around those lines). It doesn't seem
-> there is any point in returning -ERESTARTSYS after a kill signal
-> anyway, so, I think the code is correct there.
+Yeah, there are a few bugs with dfs in the new mount api.
+One bug is in connect.c:expand_dfs_referrals() where we should remove
+the call to
+smb3_cleanup_fs_context_content().  But it is not sufficient.
+as we will just loop and never resolve the actual DFS referral.
 
-We have to be careful with -ERESTARTSYS especially in the context of
-doing it when signals are pending.
-I was just thinking about how signals are cleared and how this might
-matter for -EINTR versus -ERESTARTSYS
+I am trying to find where we lost that.
 
-As far as I know signals will only become "un"-pending once we hit the
-signal handler down in userspace.
-So, if we do -ERESTARTSYS because signals are pending, then the kernel
-just retries without bouncing down into userspace first
-and thus we never hit the signal handler so when we get back to the
-if (signal_penging) return -ERESTARTSYS
-the signal will still be pending and we risk looping?
-
-
+On Wed, Jan 27, 2021 at 10:45 AM Xiaoli Feng <xifeng@redhat.com> wrote:
+>
+> Hello guys,
+>
+> I met a bug. Mount dfs root share failed on v5.11.0-rc5. But It's success=
+ on v5.10.
+>
+> [root@ibm-x3650m4-01-vm-14 ~]# mount -vvv  //localhost/dfsroot cifs -o us=
+er=3Droot,password=3Dredhat
+> mount.cifs kernel mount options: ip=3D::1,unc=3D\\localhost\dfsroot,user=
+=3Droot,pass=3D********
+> mount error(22): Invalid argument
+>
+> dmesg log:
+> [ 1648.025424] CIFS: fs/cifs/connect.c: build_unc_path_to_root: full_path=
+=3D\\localhost\dfsroot
+> [ 1648.025427] CIFS: fs/cifs/connect.c: build_unc_path_to_root: full_path=
+=3D\\localhost\dfsroot
+> [ 1648.025429] CIFS: fs/cifs/connect.c: build_unc_path_to_root: full_path=
+=3D\\localhost\dfsroot
+> [ 1648.025434] CIFS: fs/cifs/dfs_cache.c: __dfs_cache_find: search path: =
+\localhost\dfsroot
+> [ 1648.025437] CIFS: fs/cifs/dfs_cache.c: setup_referral: set up new ref
+> [ 1648.026760] CIFS: fs/cifs/dns_resolve.c: dns_resolve_server_name_to_ip=
+: resolved: localhost to 127.0.0.1
+> [ 1648.026773] CIFS: VFS: No username specified
+> [ 1648.028008] CIFS: fs/cifs/connect.c: cifs_put_smb_ses: ses_count=3D3
+> [ 1648.028012] CIFS: fs/cifs/connect.c: cifs_put_tcon: tc_count=3D1
+> [ 1648.028014] CIFS: fs/cifs/connect.c: VFS: in cifs_put_tcon as Xid: 32 =
+with uid: 0
+> [ 1648.028017] CIFS: fs/cifs/smb2pdu.c: Tree Disconnect
+> [ 1648.028385] CIFS: fs/cifs/connect.c: cifs_put_smb_ses: ses_count=3D2
+> [ 1648.028390] CIFS: fs/cifs/connect.c: VFS: leaving mount_put_conns (xid=
+ =3D 29) rc =3D 0
+> [ 1648.028393] CIFS: VFS: cifs_mount failed w/return code =3D -22
+>
+>
+> More info please look https://bugzilla.kernel.org/show_bug.cgi?id=3D21134=
+5.
+>
+> Thanks.
 >
 > --
-> Best regards,
-> Pavel Shilovsky
+> Best regards!
+> XiaoLi Feng =E5=86=AF=E5=B0=8F=E4=B8=BD
+>
+> Red Hat Software (Beijing) Co.,Ltd
+> filesystem-qe Team
+> IRC:xifeng=EF=BC=8C#channel: fs-qe
+> Tel:+86-10-8388112
+> 9/F, Raycom
+>
