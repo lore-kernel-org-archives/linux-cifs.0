@@ -5,109 +5,118 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C4FC433DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Jan 2021 01:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C507C433DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Jan 2021 22:55:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32ECD64DD1
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Jan 2021 01:26:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAC7964DE8
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Jan 2021 22:55:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbhA1B0B (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 27 Jan 2021 20:26:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44540 "EHLO
+        id S231671AbhA1WzE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Jan 2021 17:55:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbhA1BZ6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 27 Jan 2021 20:25:58 -0500
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D66BC061573
-        for <linux-cifs@vger.kernel.org>; Wed, 27 Jan 2021 17:25:18 -0800 (PST)
-Received: by mail-lj1-x233.google.com with SMTP id c18so4385134ljd.9
-        for <linux-cifs@vger.kernel.org>; Wed, 27 Jan 2021 17:25:18 -0800 (PST)
+        with ESMTP id S231774AbhA1Wwq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Jan 2021 17:52:46 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58783C061574
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Jan 2021 14:52:31 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id u4so6810652ljh.6
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Jan 2021 14:52:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WLd3m2anYlo17qAtsO8VgbCYDsIU6XiczphB8GO6huw=;
-        b=SoKadgDRoNoj6UGC70fPujkcwFTJbTZfdsCRUZ7zFqhFFp9pN/Vfepmhlr+k6H8BdN
-         YCfzmtJlJOvlwg4zd2SEGF+Q/MLsexpz89EyBqjVpiWMszoNWHYD7cZmOl7tHdLcQrN2
-         TwYn6jMVIAnJRn+H2gHlW8G9kbdSJuq2CcJeofCMiQja+n4vMXBdR6XjYK0x8TWbieUg
-         C8bCJDZPtBIG8vrFgYyQyq//qeeKqTDDPhEVOmseAzuoh8Wx8Hs4HrTmYxtwvhUFjZQZ
-         SHMUrHc4vk8pjq6Gqka2r7r0v3/ELIF2eIh1Uv7rWTQgM0n7xDyeHwPG3NgAKS4ILkdV
-         AecQ==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=PTuCVZBm6h+0ElCYdoSvc+REUGWHTAVr6T8/qEMHZ4U=;
+        b=UNt/L1hAjtyltp+/dTRtAlDm1tFNvmn0liy28JM6Jed9WF8548Y2MAinlhV9eTN+Nb
+         ulnpxaVeZIA6VxejBfHXMbA+mLrwDz0zrULrvpQcc8+hYxciWl+DNAqJzKn39h8DVIKp
+         PIL6eKg/HTLVto88NHIcFoACTvlkKTeICDozE/FW2j5S/5caXpBiNoZj8CXBwNveeUmi
+         bJOc7lX2asZN/hO8BYpddYO8DOa6WO2JmKcmVfhcl39sqlYqgVScMl9Abs/X+k+rNvXZ
+         u6MKWaMxASeIbUABK5LbuCOk6ufUxDNpoig4c9ZiNZSDIkGZpTfsdnmI7Ph5pACmFC+6
+         2TIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WLd3m2anYlo17qAtsO8VgbCYDsIU6XiczphB8GO6huw=;
-        b=VM0Mo4zHmM8X+zSlhJpouO2x1pMo2tfbNmIULixI+/TqAf4bUJDOWVGSRxY49w7gYn
-         39knbHYjYm7XwqHrsssb5HY3YaQ0YIpgIHd993P5NV68rfSq6eEtq2wmgQF7UPTPWJRv
-         BMlatGhmqa+HP2VBdbs925NbOBEj0YmxGBwt5UqOzDdfWgY+PbNebNvLw9wn6PWCloQ7
-         FNO5d04s+/S+Ft5Lig7L2zX5maghgsqHa6fFQp5ISDM90aJUWtjpv/PmjqUIOuoLytP0
-         QGVWiRVVKpsLEeZxkMIc+XWCU5uMsoyGrMdh2oHhQS/cO2xGjsIlxbIyHDKi1ifRFo0S
-         hsag==
-X-Gm-Message-State: AOAM533vHAZ9O9kMaA5++VBrO62vBzVbG8SEiW/eJ2kMH8/YpifbFNFh
-        xkSuHWkxuUR77/PeAK7iivE/vX2LTDPPAZn7ciTUGdsX24Y=
-X-Google-Smtp-Source: ABdhPJxWx9kEFeFSk0sDQudKK0YOVgZ5UA6BjqHXogEnSCpCA4PfEhO0jaEzg5vJiwYvrIo13R0FVIpivr56+A03XGQ=
-X-Received: by 2002:a2e:86c1:: with SMTP id n1mr138735ljj.148.1611797116842;
- Wed, 27 Jan 2021 17:25:16 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=PTuCVZBm6h+0ElCYdoSvc+REUGWHTAVr6T8/qEMHZ4U=;
+        b=GKGYOOYdy2KginvLqzaHSGwuMD67EQkcvddqgTwnkVNPXyUcPSs5Uwyn19+zFBsd3l
+         bikMsFVFicZ6lkYvNjXQCSihoTXFmgYnt3ay0W5BoWjE746NRU+rkWllCAj5zMu/4pBO
+         b1MgxQGCvotvchAUxtMI52sxPSy/FtYsUDIRTu5ranrg2n+zjwSQQAUasBY1yj3j0ILO
+         wRrjXDRCoepsbUralMSo+h0aDHzUe7+2SYdCLAkQzHZko+O0rL2Ss/Ik/SBfDsyn21ci
+         PlormUSuPkvyG8Xpn2SMjSIC0s0oLYEr8Kz9DizLIVh5qmorsIVidOBYUblLo5SJmB47
+         wv1A==
+X-Gm-Message-State: AOAM530Z0hsDVXK7r7/wan6fA44w0Df2ktKNowK62+duwdqfENcAJ1YP
+        /X/sI2eA8ZtKKGbEZKiRPuO4Emb5CPEUcDps2VTQeWr+NW0FKA==
+X-Google-Smtp-Source: ABdhPJyQ916BxAa5mCKu4MLlIPPaI2hWN0ncgUgMQaVY7T0r+XrzJH0JhoDqs8+H7eLxe0Wkih7hN7B7MtiN3CfHRJI=
+X-Received: by 2002:a05:651c:14a:: with SMTP id c10mr835729ljd.272.1611874349476;
+ Thu, 28 Jan 2021 14:52:29 -0800 (PST)
 MIME-Version: 1.0
-References: <CADajX4DzoNehHZGqpd+3Bh0yM2U=B6AwL6bJ2EM6t6hkvr7L4Q@mail.gmail.com>
- <20210127214434.3882-1-adam@adamharvey.name>
-In-Reply-To: <20210127214434.3882-1-adam@adamharvey.name>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 27 Jan 2021 19:25:05 -0600
-Message-ID: <CAH2r5muXg8-8vQGXXq_4JO_HgnUkvzkPcOpU3FsBJC9YsbJvxA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: ignore auto and noauto options if given
-To:     Adam Harvey <adam@adamharvey.name>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        samba-technical <samba-technical@lists.samba.org>
+Date:   Thu, 28 Jan 2021 16:52:18 -0600
+Message-ID: <CAH2r5muGrzDP9FWNed44XpYs3NNbmRt7kzGrwX_+h=Xje8qUfg@mail.gmail.com>
+Subject: [PATCH] cifs: returning mount parm processing errors correctly
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Merged into cifs-2.6.git (seems harmless, and probably slightly safer
-to include this - even though currently I can't reproduce the reported
-problem).
+    During additional testing of the updated cifs.ko with the
+    new mount API support, we found a few additional cases where
+    we were logging errors, but not returning them to the user.
 
-Let me know if anyone else has been able to reproduce it - even with
-Adam's suggested /etc/fstab line, I wasn't able to repro it.
+    For example:
+       a) invalid security mechanisms
+       b) invalid cache options
+       c) unsupported rdma
+       d) invalid smb dialect requested
 
-On Wed, Jan 27, 2021 at 3:44 PM Adam Harvey <adam@adamharvey.name> wrote:
->
-> In 24e0a1eff9e2, the noauto and auto options were missed when migrating
-> to the new mount API. As a result, users with noauto in their fstab
-> mount options are now unable to mount cifs filesystems, as they'll
-> receive an "Unknown parameter" error.
->
-> This restores the old behaviour of ignoring noauto and auto if they're
-> given.
->
-> Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
-> Signed-off-by: Adam Harvey <adam@adamharvey.name>
-> ---
->  fs/cifs/fs_context.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index 076bcadc756a..62818b142e2e 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -175,6 +175,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
->         fsparam_flag_no("exec", Opt_ignore),
->         fsparam_flag_no("dev", Opt_ignore),
->         fsparam_flag_no("mand", Opt_ignore),
-> +       fsparam_flag_no("auto", Opt_ignore),
->         fsparam_string("cred", Opt_ignore),
->         fsparam_string("credentials", Opt_ignore),
->         {}
-> --
-> 2.30.0
->
+    Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
+    Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
+    Signed-off-by: Steve French <stfrench@microsoft.com>
+
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 818c413db82d..27354417e988 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -533,7 +533,7 @@ static int smb3_fs_context_validate(struct fs_context *fc)
+
+        if (ctx->rdma && ctx->vals->protocol_id < SMB30_PROT_ID) {
+                cifs_dbg(VFS, "SMB Direct requires Version >=3.0\n");
+-               return -1;
++               return -EOPNOTSUPP;
+        }
+
+ #ifndef CONFIG_KEYS
+@@ -556,7 +556,7 @@ static int smb3_fs_context_validate(struct fs_context *fc)
+        /* make sure UNC has a share name */
+        if (strlen(ctx->UNC) < 3 || !strchr(ctx->UNC + 3, '\\')) {
+                cifs_dbg(VFS, "Malformed UNC. Unable to find share name.\n");
+-               return -1;
++               return -ENOENT;
+        }
+
+        if (!ctx->got_ip) {
+@@ -570,7 +570,7 @@ static int smb3_fs_context_validate(struct fs_context *fc)
+                if (!cifs_convert_address((struct sockaddr *)&ctx->dstaddr,
+                                          &ctx->UNC[2], len)) {
+                        pr_err("Unable to determine destination address\n");
+-                       return -1;
++                       return -EHOSTUNREACH;
+                }
+        }
+
+@@ -1265,7 +1265,7 @@ static int smb3_fs_context_parse_param(struct
+fs_context *fc,
+        return 0;
+
+  cifs_parse_mount_err:
+-       return 1;
++       return -EINVAL;
+ }
+
+ int smb3_init_fs_context(struct fs_context *fc)
 
 
 -- 
