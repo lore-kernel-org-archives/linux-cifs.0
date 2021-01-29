@@ -2,520 +2,252 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F56AC433DB
-	for <linux-cifs@archiver.kernel.org>; Fri, 29 Jan 2021 03:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D7CC433E6
+	for <linux-cifs@archiver.kernel.org>; Fri, 29 Jan 2021 06:47:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B105764E00
-	for <linux-cifs@archiver.kernel.org>; Fri, 29 Jan 2021 03:45:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2BD964E0C
+	for <linux-cifs@archiver.kernel.org>; Fri, 29 Jan 2021 06:47:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229786AbhA2DpT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Jan 2021 22:45:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44386 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbhA2DpS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Jan 2021 22:45:18 -0500
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99DABC061573
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Jan 2021 19:44:37 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id m22so10572274lfg.5
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Jan 2021 19:44:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=8udyT3BcMxT6mSw0BNcjrdpUFUQkm64PYmtNRAXOD1c=;
-        b=jR+UTsN/ZNXUdK0O1nDIjIleef5YWfeMbfO5tkoNyfuivO0mGBgk0hsTrNdmCYRQw5
-         1awHA6Tra0VrfNwPLLyeIUTKPnAh+ECE83PrrF8EU+TItuqwaO5+e3DJbnBZ5rs87+2K
-         NedJT7AOboBDGGi3SLKopkjqYooDw/M5UfJdIfRKgBLNkgzlI8z3QTurtIKSQuZL+CW4
-         o3Rrpf8ZoKmTGxC1qWEGAOi4P1UrgbWkvE1Tn0tyxc0Y+nlpc0Gt1EE7h4zKrkpCYjA0
-         Z0Y2AGc7fTn4X/IGRd2Rg6bwgAZLJXO/y969tj+bVYCnWHyAFOmtz7X+qn0e039R3TjC
-         EI9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=8udyT3BcMxT6mSw0BNcjrdpUFUQkm64PYmtNRAXOD1c=;
-        b=MCnXPjcj0DpIxCU1Mz6h4Ge3P9vLr9is1qPqKuf3HrI20Gp91M8Wl63fhpUMotsAT3
-         IP4lF0DMhjnbnJEzL3RMJ/Ahd6UAvXFuv+Nv3wnrAGMaSSYHwNtb/jp5VT4VomjzyMfg
-         xduYpaTOiFR+wrCF6HiYEFqGAXxz8eHiL/U7JYmiB9orrdYeBe/8xsaycdDvIvxggH1H
-         sEjOAOoVcgHeqU7UBTNtoWPvesZXQb2g+07dJoznNdEjBvcvD2Ev508LO+xmjfPSQYlR
-         0ESQCuBn/OdN6+B+x4ttmSK4pyA86ycv/gadO/C6DhvuSCDzGgD7ehnk93TMi60aMLIE
-         6onw==
-X-Gm-Message-State: AOAM532pOjMzDJ2zHbSiZIQoKFgyUuh8KMZbUnRknSKoQKDC0txXfrdy
-        au5n6cvoGUU8eKlaoGSGxp8prq3MDDlySgsGWzH21qdC2l7nuQ==
-X-Google-Smtp-Source: ABdhPJx/W7F1dvhk+PMLGeTiIgCqrkceirMS0aURjfeHqFXwSzvamDdiclFODIXo+ddKz5UQusH60kr7tsPvjt5muXw=
-X-Received: by 2002:a05:6512:3254:: with SMTP id c20mr1138847lfr.282.1611891875585;
- Thu, 28 Jan 2021 19:44:35 -0800 (PST)
+        id S231887AbhA2GrQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 29 Jan 2021 01:47:16 -0500
+Received: from mailout4.samsung.com ([203.254.224.34]:10373 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232088AbhA2GrI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 29 Jan 2021 01:47:08 -0500
+Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20210129064624epoutp04e6ee075f200a4c05a8e6bcd84998622e~eoQrHahgd0423904239epoutp046
+        for <linux-cifs@vger.kernel.org>; Fri, 29 Jan 2021 06:46:24 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20210129064624epoutp04e6ee075f200a4c05a8e6bcd84998622e~eoQrHahgd0423904239epoutp046
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1611902784;
+        bh=RXd25SRWfoY2nTbt+u1KDBqLf/DWCOJY1dsYxRcd2qo=;
+        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+        b=Z9psCGxOOX8SGYB8PgWUF/7sATRKeWblDBF/3S44o4Td7txn7BNYOtr9ByYKaynji
+         eUphrB7zxDVDZzpXFLdkRgOIFn86Qa1ji4THH8E9oJLys1NIULdKttZxCcmZISF8mP
+         zMPdlSlkj2KMsGGqgDyu5oU1aIR0ASZaK/bDlfn8=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
+        20210129064623epcas1p381ded6577598a37b9b6eef076ac82ceb~eoQqoIyKm1789917899epcas1p3N;
+        Fri, 29 Jan 2021 06:46:23 +0000 (GMT)
+Received: from epsmges1p4.samsung.com (unknown [182.195.40.166]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4DRntQ5C3mz4x9Q0; Fri, 29 Jan
+        2021 06:46:22 +0000 (GMT)
+Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
+        epsmges1p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        65.CF.10463.D3FA3106; Fri, 29 Jan 2021 15:46:21 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
+        20210129064621epcas1p4cdd0c443d35f6769eb27896c4023c68b~eoQoYgIQg0860108601epcas1p4F;
+        Fri, 29 Jan 2021 06:46:21 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210129064621epsmtrp296c4537205e526252337eb05c4fef409~eoQoX2yZ11898818988epsmtrp2g;
+        Fri, 29 Jan 2021 06:46:21 +0000 (GMT)
+X-AuditID: b6c32a38-f11ff700000028df-d6-6013af3d630e
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        7F.BE.13470.D3FA3106; Fri, 29 Jan 2021 15:46:21 +0900 (KST)
+Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20210129064621epsmtip26e7ef18149891bea2f4ccd3e0fd8ec41~eoQoJpBvc2371123711epsmtip2T;
+        Fri, 29 Jan 2021 06:46:21 +0000 (GMT)
+From:   "Namjae Jeon" <namjae.jeon@samsung.com>
+To:     "'Steve French'" <smfrench@gmail.com>
+Cc:     "'CIFS'" <linux-cifs@vger.kernel.org>,
+        "'samba-technical'" <samba-technical@lists.samba.org>
+In-Reply-To: <CAH2r5mtUEYDyFGesXGsK_rP2007EP3X58i9-NFUY=ZMZR-hU1g@mail.gmail.com>
+Subject: RE: [smfrench/smb3-kernel] Cifsd fixes (#21)
+Date:   Fri, 29 Jan 2021 15:46:21 +0900
+Message-ID: <065901d6f60a$74250f60$5c6f2e20$@samsung.com>
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 28 Jan 2021 21:44:24 -0600
-Message-ID: <CAH2r5mtDTSFSXeoOvowsDv0yBjQ-xnpz7XUVBoVC2-8u4CBFfg@mail.gmail.com>
-Subject: [PATCH] cifs: fix dfs domain referrals
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Paulo Alcantara <pc@cjr.nz>
-Content-Type: multipart/mixed; boundary="000000000000a9692905ba01d21f"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQKO2sTUpITPh+sHKLzlg7jsYYbg1AIhnnAyAet98GaorfYJMA==
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrKKsWRmVeSWpSXmKPExsWy7bCmvq7teuEEg46N2hYv/u9itvizZD+7
+        xZsXh9kcmD12zrrL7jF/9iwmj8+b5AKYo3JsMlITU1KLFFLzkvNTMvPSbZW8g+Od403NDAx1
+        DS0tzJUU8hJzU22VXHwCdN0yc4AWKSmUJeaUAoUCEouLlfTtbIryS0tSFTLyi0tslVILUnIK
+        DA0K9IoTc4tL89L1kvNzrQwNDIxMgSoTcjJeP25hLtjuW3H2eVgD4wevLkZODgkBE4kdc5qZ
+        QWwhgR2MEhfm13UxcgHZnxglZkw9ygjhfGOUuN70ja2LkQOs4/6TeIj4XkaJ+8d2sEE4Lxkl
+        lk59xAoyik1AV+Lfn/1sILaIgKbEm92TmEGamQWSJOYc8gUJcwoESmz82ApWLixgKtG7cT4r
+        SAmLgKrEnj4mkDCvgKXE95uL2SFsQYmTM5+wgNjMAtoSyxa+ZoZ4QEHi59NlrBCbnCTWXfzP
+        DlEjIjG7s40Z5DQJgUfsEgcaJ7JBNLhIXDp6nxHCFpZ4dXwLO4QtJfH53V6oH6slPu6Hmt/B
+        KPHiuy2EbSxxc/0GVohPNCXW79KHCCtK7Pw9lxFiLZ/Eu689rBBTeCU62oQgSlQl+i4dZoKw
+        pSW62j+wT2BUmoXksVlIHpuF5IFZCMsWMLKsYhRLLSjOTU8tNiwwQY7nTYzg9KdlsYNx7tsP
+        eocYmTgYDzFKcDArifC+nSOUIMSbklhZlVqUH19UmpNafIjRFBjSE5mlRJPzgQk4ryTe0NTI
+        2NjYwsTM3MzUWEmcN8ngQbyQQHpiSWp2ampBahFMHxMHp1QDk83upkWJZTtPv01+PYtR+ExO
+        4y7LuhaxCVYFf0vX315fu3WtaIx6iXpjbd3CaJb045vVHq6Vd3kceUcs06NSaHr2XzOO9m3X
+        c+ZwLtkWUvwi9NSzMlmGd9vzLq+x1NxSwZTypCNWfJv6nOTL1sIWiicWOLz6psX7JebG24dy
+        zQ5fZSN37anm+9DnVRe/5PympYLsy/O7/27WbzwVKrb2X6XOcob3T1k55fecSr63/kTG5G1x
+        N8t2P8v7aLM2+In5tjW1vs3u3YuPsR3YusrgGVt6Ac/L21e0bDpva4rG79i7wKNQT2ath1fx
+        cm9O06KZ5hsjV9RKn14+rXz6fk+xsxNvmzyMr3rX+0AlkTN+jxJLcUaioRZzUXEiAAgiKpcI
+        BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrELMWRmVeSWpSXmKPExsWy7bCSvK7teuEEg5WreC1e/N/FbPFnyX52
+        izcvDrM5MHvsnHWX3WP+7FlMHp83yQUwR3HZpKTmZJalFunbJXBlLLrGVXDFo2LCtyuMDYwf
+        nbsYOTgkBEwk7j+J72Lk4hAS2M0osWnXDuYuRk6guLTEsRNnmCFqhCUOHy6GqHnOKNH48AtY
+        DZuArsS/P/vZQGwRAU2JN7sngcWZBZIkVu1+wgLRcIZRouPhNrAEp0CgxMaPrawgtrCAqUTv
+        xvmsIAtYBFQl9vQxgYR5BSwlvt9czA5hC0qcnAkyB2SmtsTTm0/h7GULX0PdqSDx8+kyVogb
+        nCTWXfzPDlEjIjG7s415AqPwLCSjZiEZNQvJqFlIWhYwsqxilEwtKM5Nzy02LDDMSy3XK07M
+        LS7NS9dLzs/dxAiOBi3NHYzbV33QO8TIxMF4iFGCg1lJhPftHKEEId6UxMqq1KL8+KLSnNTi
+        Q4zSHCxK4rwXuk7GCwmkJ5akZqemFqQWwWSZODilGpi2m/7NfCGbxZ9vEJN+4cQ8YcEtLoz3
+        +vqy/vZssObj2HpHljNj76lkx7PsNxPXrlD4p3t7gvIDcQduHQXR5SrLJlz6rLrxSqztg0PT
+        jxy3mJcw8/NUhtI8k4rJHIzNmRuv78tbIPzpnF/Kz65zjiYTij1kH9w8ECX+9i5/7e2NlUuT
+        BRckfKp17AkK3vbO0/r41JBUicM1er2c9TZat2Pubaza+6vNer9Rv3zlru2Kex+e/3tkSVaI
+        ZWvFG/YHRyccPqOw9qIlZ2pdkiEjR+oV81lmiv257dq9KwSP3epPffxJWz7p/N4z1T/3fmRY
+        v+r2KrF7kUGVPZaMLlq/JVhK5n8z4TzAImVbdf/WtvlKLMUZiYZazEXFiQATiYok9QIAAA==
+X-CMS-MailID: 20210129064621epcas1p4cdd0c443d35f6769eb27896c4023c68b
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210129062124epcas1p206df70947094d8b785d03038414a8fbf
+References: <smfrench/smb3-kernel/pull/21@github.com>
+        <CGME20210129062124epcas1p206df70947094d8b785d03038414a8fbf@epcas1p2.samsung.com>
+        <CAH2r5mtUEYDyFGesXGsK_rP2007EP3X58i9-NFUY=ZMZR-hU1g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000a9692905ba01d21f
-Content-Type: text/plain; charset="UTF-8"
+Hi Steve,
 
-Lightly updated patch from Ronnie/Paulo tentatively merged to
-cifs-2.6.git for-next (still waiting on the 2nd half of this - to fix
-DFS links, but this should fix some DFS problems - see below).
+> Merged into smb3-kernel github tree, and rebased on 5.11-rc5 pending more=
+ testing (will try to kick off more testing this weekend).
+Okay=21 Let me know if there is any issue.
 
-The new mount API requires additional changes to how DFS
-is handled. Additional testing of DFS uncovered problems
-with domain based DFS referrals (a follow on patch addresses
-DFS links) which this patch addresses.
+Thanks=21
+---------- Forwarded message ---------
+From: Namjae Jeon <mailto:notifications=40github.com>
+Date: Wed, Jan 27, 2021 at 11:25 PM
+Subject: =5Bsmfrench/smb3-kernel=5D Cifsd fixes (=2321)
+To: smfrench/smb3-kernel <mailto:smb3-kernel=40noreply.github.com>
+Cc: Subscribed <mailto:subscribed=40noreply.github.com>
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/cifs/cifs_dfs_ref.c | 12 ++++++++----
- fs/cifs/cifsfs.c       |  2 +-
- fs/cifs/cifsproto.h    |  6 ++++--
- fs/cifs/connect.c      | 32 ++++++++++++++++++++++++++------
- fs/cifs/dfs_cache.c    |  8 +++++---
- fs/cifs/fs_context.c   | 31 +++++++++++++++++++++++++++++++
- 6 files changed, 75 insertions(+), 16 deletions(-)
-
-diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index e4c6ae47a796..6b1ce4efb591 100644
---- a/fs/cifs/cifs_dfs_ref.c
-+++ b/fs/cifs/cifs_dfs_ref.c
-@@ -133,8 +133,9 @@ cifs_build_devname(char *nodename, const char *prepath)
-  * Caller is responsible for freeing returned value if it is not error.
-  */
- char *cifs_compose_mount_options(const char *sb_mountdata,
--    const char *fullpath,
--    const struct dfs_info3_param *ref)
-+ const char *fullpath,
-+ const struct dfs_info3_param *ref,
-+ char **devname)
- {
-  int rc;
-  char *name;
-@@ -231,7 +232,10 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
-  strcat(mountdata, "ip=");
-  strcat(mountdata, srvIP);
-
-- kfree(name);
-+ if (devname)
-+ *devname = name;
-+ else
-+ kfree(name);
-
-  /*cifs_dbg(FYI, "%s: parent mountdata: %s\n", __func__, sb_mountdata);*/
-  /*cifs_dbg(FYI, "%s: submount mountdata: %s\n", __func__, mountdata );*/
-@@ -278,7 +282,7 @@ static struct vfsmount *cifs_dfs_do_mount(struct
-dentry *mntpt,
-
-  /* strip first '\' from fullpath */
-  mountdata = cifs_compose_mount_options(cifs_sb->ctx->mount_options,
--        fullpath + 1, NULL);
-+        fullpath + 1, NULL, NULL);
-  if (IS_ERR(mountdata)) {
-  kfree(devname);
-  return (struct vfsmount *)mountdata;
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index ce0d0037fd0a..e46da536ed33 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -822,7 +822,7 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
-  goto out;
-  }
-
-- rc = cifs_setup_volume_info(cifs_sb->ctx);
-+ rc = cifs_setup_volume_info(cifs_sb->ctx, NULL, old_ctx->UNC);
-  if (rc) {
-  root = ERR_PTR(rc);
-  goto out;
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 340ff81ee87b..32f7a013402e 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -78,7 +78,8 @@ extern char *cifs_build_path_to_root(struct
-smb3_fs_context *ctx,
-       int add_treename);
- extern char *build_wildcard_path_from_dentry(struct dentry *direntry);
- extern char *cifs_compose_mount_options(const char *sb_mountdata,
-- const char *fullpath, const struct dfs_info3_param *ref);
-+ const char *fullpath, const struct dfs_info3_param *ref,
-+ char **devname);
- /* extern void renew_parental_timestamps(struct dentry *direntry);*/
- extern struct mid_q_entry *AllocMidQEntry(const struct smb_hdr *smb_buffer,
-  struct TCP_Server_Info *server);
-@@ -89,6 +90,7 @@ extern void cifs_wake_up_task(struct mid_q_entry *mid);
- extern int cifs_handle_standard(struct TCP_Server_Info *server,
-  struct mid_q_entry *mid);
- extern int smb3_parse_devname(const char *devname, struct
-smb3_fs_context *ctx);
-+extern int smb3_parse_opt(const char *options, const char *key, char **val);
- extern bool cifs_match_ipaddr(struct sockaddr *srcaddr, struct sockaddr *rhs);
- extern int cifs_discard_remaining_data(struct TCP_Server_Info *server);
- extern int cifs_call_async(struct TCP_Server_Info *server,
-@@ -549,7 +551,7 @@ extern int SMBencrypt(unsigned char *passwd, const
-unsigned char *c8,
-  unsigned char *p24);
-
- extern int
--cifs_setup_volume_info(struct smb3_fs_context *ctx);
-+cifs_setup_volume_info(struct smb3_fs_context *ctx, const char
-*mntopts, const char *devname);
-
- extern struct TCP_Server_Info *
- cifs_find_tcp_session(struct smb3_fs_context *ctx);
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index c8ef24bac94f..10fe6d6d2dee 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -2972,17 +2972,20 @@ expand_dfs_referral(const unsigned int xid,
-struct cifs_ses *ses,
-  rc = dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb),
-      ref_path, &referral, NULL);
-  if (!rc) {
-+ char *fake_devname = NULL;
-+
-  mdata = cifs_compose_mount_options(cifs_sb->ctx->mount_options,
--    full_path + 1, &referral);
-+    full_path + 1, &referral,
-+    &fake_devname);
-  free_dfs_info_param(&referral);
-
-  if (IS_ERR(mdata)) {
-  rc = PTR_ERR(mdata);
-  mdata = NULL;
-  } else {
-- smb3_cleanup_fs_context_contents(ctx);
-- rc = cifs_setup_volume_info(ctx);
-+ rc = cifs_setup_volume_info(ctx, mdata, fake_devname);
-  }
-+ kfree(fake_devname);
-  kfree(cifs_sb->ctx->mount_options);
-  cifs_sb->ctx->mount_options = mdata;
-  }
-@@ -3036,6 +3039,7 @@ static int setup_dfs_tgt_conn(const char *path,
-const char *full_path,
-  struct dfs_info3_param ref = {0};
-  char *mdata = NULL;
-  struct smb3_fs_context fake_ctx = {NULL};
-+ char *fake_devname = NULL;
-
-  cifs_dbg(FYI, "%s: dfs path: %s\n", __func__, path);
-
-@@ -3044,16 +3048,18 @@ static int setup_dfs_tgt_conn(const char
-*path, const char *full_path,
-  return rc;
-
-  mdata = cifs_compose_mount_options(cifs_sb->ctx->mount_options,
--    full_path + 1, &ref);
-+    full_path + 1, &ref,
-+    &fake_devname);
-  free_dfs_info_param(&ref);
-
-  if (IS_ERR(mdata)) {
-  rc = PTR_ERR(mdata);
-  mdata = NULL;
-  } else
-- rc = cifs_setup_volume_info(&fake_ctx);
-+ rc = cifs_setup_volume_info(&fake_ctx, mdata, fake_devname);
-
-  kfree(mdata);
-+ kfree(fake_devname);
-
-  if (!rc) {
-  /*
-@@ -3122,10 +3128,24 @@ static int do_dfs_failover(const char *path,
-const char *full_path, struct cifs_
-  * we should pass a clone of the original context?
-  */
- int
--cifs_setup_volume_info(struct smb3_fs_context *ctx)
-+cifs_setup_volume_info(struct smb3_fs_context *ctx, const char
-*mntopts, const char *devname)
- {
-  int rc = 0;
-
-+ smb3_parse_devname(devname, ctx);
-+
-+ if (mntopts) {
-+ char *ip;
-+
-+ cifs_dbg(FYI, "%s: mntopts=%s\n", __func__, mntopts);
-+ rc = smb3_parse_opt(mntopts, "ip", &ip);
-+ if (!rc && !cifs_convert_address((struct sockaddr *)&ctx->dstaddr, ip,
-+ strlen(ip))) {
-+ cifs_dbg(VFS, "%s: failed to convert ip address\n", __func__);
-+ return -EINVAL;
-+ }
-+ }
-+
-  if (ctx->nullauth) {
-  cifs_dbg(FYI, "Anonymous login\n");
-  kfree(ctx->username);
-diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
-index 0fdb0de7ff86..4950ab0486ae 100644
---- a/fs/cifs/dfs_cache.c
-+++ b/fs/cifs/dfs_cache.c
-@@ -1417,7 +1417,7 @@ static struct cifs_ses *find_root_ses(struct vol_info *vi,
-  int rc;
-  struct cache_entry *ce;
-  struct dfs_info3_param ref = {0};
-- char *mdata = NULL;
-+ char *mdata = NULL, *devname = NULL;
-  struct TCP_Server_Info *server;
-  struct cifs_ses *ses;
-  struct smb3_fs_context ctx = {NULL};
-@@ -1444,7 +1444,8 @@ static struct cifs_ses *find_root_ses(struct vol_info *vi,
-
-  up_read(&htable_rw_lock);
-
-- mdata = cifs_compose_mount_options(vi->mntdata, rpath, &ref);
-+ mdata = cifs_compose_mount_options(vi->mntdata, rpath, &ref,
-+    &devname);
-  free_dfs_info_param(&ref);
-
-  if (IS_ERR(mdata)) {
-@@ -1453,7 +1454,7 @@ static struct cifs_ses *find_root_ses(struct vol_info *vi,
-  goto out;
-  }
-
-- rc = cifs_setup_volume_info(&ctx);
-+ rc = cifs_setup_volume_info(&ctx, NULL, devname);
-
-  if (rc) {
-  ses = ERR_PTR(rc);
-@@ -1472,6 +1473,7 @@ static struct cifs_ses *find_root_ses(struct vol_info *vi,
-  smb3_cleanup_fs_context_contents(&ctx);
-  kfree(mdata);
-  kfree(rpath);
-+ kfree(devname);
-
-  return ses;
- }
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index 27354417e988..5111aadfdb6b 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -401,6 +401,37 @@ cifs_parse_smb_version(char *value, struct
-smb3_fs_context *ctx, bool is_smb3)
-  return 0;
- }
-
-+int smb3_parse_opt(const char *options, const char *key, char **val)
-+{
-+ int rc = -ENOENT;
-+ char *opts, *orig, *p;
-+
-+ orig = opts = kstrdup(options, GFP_KERNEL);
-+ if (!opts)
-+ return -ENOMEM;
-+
-+ while ((p = strsep(&opts, ","))) {
-+ char *nval;
-+
-+ if (!*p)
-+ continue;
-+ if (strncasecmp(p, key, strlen(key)))
-+ continue;
-+ nval = strchr(p, '=');
-+ if (nval) {
-+ if (nval == p)
-+ continue;
-+ *nval++ = 0;
-+ *val = kstrndup(nval, strlen(nval), GFP_KERNEL);
-+ rc = !*val ? -ENOMEM : 0;
-+ goto out;
-+ }
-+ }
-+out:
-+ kfree(orig);
-+ return rc;
-+}
-+
- /*
-  * Parse a devname into substrings and populate the ctx->UNC and ctx->prepath
-  * fields with the result. Returns 0 on success and an error otherwise
---
-
-
--- 
-Thanks,
-
-Steve
-
---000000000000a9692905ba01d21f
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-fix-dfs-domain-referrals.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-fix-dfs-domain-referrals.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kkhqqror0>
-X-Attachment-Id: f_kkhqqror0
-
-RnJvbSAwZDQ4NzNmOWFhNGZmOGZjMWQ2M2E1NzU1Mzk1Yjc5NGQzMmNlMDQ2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+
-CkRhdGU6IFRodSwgMjggSmFuIDIwMjEgMjE6MzU6MTAgLTA2MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBmaXggZGZzIGRvbWFpbiByZWZlcnJhbHMKClRoZSBuZXcgbW91bnQgQVBJIHJlcXVpcmVz
-IGFkZGl0aW9uYWwgY2hhbmdlcyB0byBob3cgREZTCmlzIGhhbmRsZWQuIEFkZGl0aW9uYWwgdGVz
-dGluZyBvZiBERlMgdW5jb3ZlcmVkIHByb2JsZW1zCndpdGggZG9tYWluIGJhc2VkIERGUyByZWZl
-cnJhbHMgKGEgZm9sbG93IG9uIHBhdGNoIGFkZHJlc3NlcwpERlMgbGlua3MpIHdoaWNoIHRoaXMg
-cGF0Y2ggYWRkcmVzc2VzLgoKU2lnbmVkLW9mZi1ieTogUm9ubmllIFNhaGxiZXJnIDxsc2FobGJl
-ckByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBQYXVsbyBBbGNhbnRhcmEgKFNVU0UpIDxwY0Bj
-anIubno+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNv
-bT4KLS0tCiBmcy9jaWZzL2NpZnNfZGZzX3JlZi5jIHwgMTIgKysrKysrKystLS0tCiBmcy9jaWZz
-L2NpZnNmcy5jICAgICAgIHwgIDIgKy0KIGZzL2NpZnMvY2lmc3Byb3RvLmggICAgfCAgNiArKysr
-LS0KIGZzL2NpZnMvY29ubmVjdC5jICAgICAgfCAzMiArKysrKysrKysrKysrKysrKysrKysrKysr
-Ky0tLS0tLQogZnMvY2lmcy9kZnNfY2FjaGUuYyAgICB8ICA4ICsrKysrLS0tCiBmcy9jaWZzL2Zz
-X2NvbnRleHQuYyAgIHwgMzEgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogNiBmaWxl
-cyBjaGFuZ2VkLCA3NSBpbnNlcnRpb25zKCspLCAxNiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQg
-YS9mcy9jaWZzL2NpZnNfZGZzX3JlZi5jIGIvZnMvY2lmcy9jaWZzX2Rmc19yZWYuYwppbmRleCBl
-NGM2YWU0N2E3OTYuLjZiMWNlNGVmYjU5MSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZzX2Rmc19y
-ZWYuYworKysgYi9mcy9jaWZzL2NpZnNfZGZzX3JlZi5jCkBAIC0xMzMsOCArMTMzLDkgQEAgY2lm
-c19idWlsZF9kZXZuYW1lKGNoYXIgKm5vZGVuYW1lLCBjb25zdCBjaGFyICpwcmVwYXRoKQogICog
-Q2FsbGVyIGlzIHJlc3BvbnNpYmxlIGZvciBmcmVlaW5nIHJldHVybmVkIHZhbHVlIGlmIGl0IGlz
-IG5vdCBlcnJvci4KICAqLwogY2hhciAqY2lmc19jb21wb3NlX21vdW50X29wdGlvbnMoY29uc3Qg
-Y2hhciAqc2JfbW91bnRkYXRhLAotCQkJCSAgIGNvbnN0IGNoYXIgKmZ1bGxwYXRoLAotCQkJCSAg
-IGNvbnN0IHN0cnVjdCBkZnNfaW5mbzNfcGFyYW0gKnJlZikKKwkJCQkgY29uc3QgY2hhciAqZnVs
-bHBhdGgsCisJCQkJIGNvbnN0IHN0cnVjdCBkZnNfaW5mbzNfcGFyYW0gKnJlZiwKKwkJCQkgY2hh
-ciAqKmRldm5hbWUpCiB7CiAJaW50IHJjOwogCWNoYXIgKm5hbWU7CkBAIC0yMzEsNyArMjMyLDEw
-IEBAIGNoYXIgKmNpZnNfY29tcG9zZV9tb3VudF9vcHRpb25zKGNvbnN0IGNoYXIgKnNiX21vdW50
-ZGF0YSwKIAlzdHJjYXQobW91bnRkYXRhLCAiaXA9Iik7CiAJc3RyY2F0KG1vdW50ZGF0YSwgc3J2
-SVApOwogCi0Ja2ZyZWUobmFtZSk7CisJaWYgKGRldm5hbWUpCisJCSpkZXZuYW1lID0gbmFtZTsK
-KwllbHNlCisJCWtmcmVlKG5hbWUpOwogCiAJLypjaWZzX2RiZyhGWUksICIlczogcGFyZW50IG1v
-dW50ZGF0YTogJXNcbiIsIF9fZnVuY19fLCBzYl9tb3VudGRhdGEpOyovCiAJLypjaWZzX2RiZyhG
-WUksICIlczogc3VibW91bnQgbW91bnRkYXRhOiAlc1xuIiwgX19mdW5jX18sIG1vdW50ZGF0YSAp
-OyovCkBAIC0yNzgsNyArMjgyLDcgQEAgc3RhdGljIHN0cnVjdCB2ZnNtb3VudCAqY2lmc19kZnNf
-ZG9fbW91bnQoc3RydWN0IGRlbnRyeSAqbW50cHQsCiAKIAkvKiBzdHJpcCBmaXJzdCAnXCcgZnJv
-bSBmdWxscGF0aCAqLwogCW1vdW50ZGF0YSA9IGNpZnNfY29tcG9zZV9tb3VudF9vcHRpb25zKGNp
-ZnNfc2ItPmN0eC0+bW91bnRfb3B0aW9ucywKLQkJCQkJICAgICAgIGZ1bGxwYXRoICsgMSwgTlVM
-TCk7CisJCQkJCSAgICAgICBmdWxscGF0aCArIDEsIE5VTEwsIE5VTEwpOwogCWlmIChJU19FUlIo
-bW91bnRkYXRhKSkgewogCQlrZnJlZShkZXZuYW1lKTsKIAkJcmV0dXJuIChzdHJ1Y3QgdmZzbW91
-bnQgKiltb3VudGRhdGE7CmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIvZnMvY2lmcy9j
-aWZzZnMuYwppbmRleCBjZTBkMDAzN2ZkMGEuLmU0NmRhNTM2ZWQzMyAxMDA2NDQKLS0tIGEvZnMv
-Y2lmcy9jaWZzZnMuYworKysgYi9mcy9jaWZzL2NpZnNmcy5jCkBAIC04MjIsNyArODIyLDcgQEAg
-Y2lmc19zbWIzX2RvX21vdW50KHN0cnVjdCBmaWxlX3N5c3RlbV90eXBlICpmc190eXBlLAogCQln
-b3RvIG91dDsKIAl9CiAKLQlyYyA9IGNpZnNfc2V0dXBfdm9sdW1lX2luZm8oY2lmc19zYi0+Y3R4
-KTsKKwlyYyA9IGNpZnNfc2V0dXBfdm9sdW1lX2luZm8oY2lmc19zYi0+Y3R4LCBOVUxMLCBvbGRf
-Y3R4LT5VTkMpOwogCWlmIChyYykgewogCQlyb290ID0gRVJSX1BUUihyYyk7CiAJCWdvdG8gb3V0
-OwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzcHJvdG8uaCBiL2ZzL2NpZnMvY2lmc3Byb3RvLmgK
-aW5kZXggMzQwZmY4MWVlODdiLi4zMmY3YTAxMzQwMmUgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lm
-c3Byb3RvLmgKKysrIGIvZnMvY2lmcy9jaWZzcHJvdG8uaApAQCAtNzgsNyArNzgsOCBAQCBleHRl
-cm4gY2hhciAqY2lmc19idWlsZF9wYXRoX3RvX3Jvb3Qoc3RydWN0IHNtYjNfZnNfY29udGV4dCAq
-Y3R4LAogCQkJCSAgICAgaW50IGFkZF90cmVlbmFtZSk7CiBleHRlcm4gY2hhciAqYnVpbGRfd2ls
-ZGNhcmRfcGF0aF9mcm9tX2RlbnRyeShzdHJ1Y3QgZGVudHJ5ICpkaXJlbnRyeSk7CiBleHRlcm4g
-Y2hhciAqY2lmc19jb21wb3NlX21vdW50X29wdGlvbnMoY29uc3QgY2hhciAqc2JfbW91bnRkYXRh
-LAotCQljb25zdCBjaGFyICpmdWxscGF0aCwgY29uc3Qgc3RydWN0IGRmc19pbmZvM19wYXJhbSAq
-cmVmKTsKKwkJY29uc3QgY2hhciAqZnVsbHBhdGgsIGNvbnN0IHN0cnVjdCBkZnNfaW5mbzNfcGFy
-YW0gKnJlZiwKKwkJY2hhciAqKmRldm5hbWUpOwogLyogZXh0ZXJuIHZvaWQgcmVuZXdfcGFyZW50
-YWxfdGltZXN0YW1wcyhzdHJ1Y3QgZGVudHJ5ICpkaXJlbnRyeSk7Ki8KIGV4dGVybiBzdHJ1Y3Qg
-bWlkX3FfZW50cnkgKkFsbG9jTWlkUUVudHJ5KGNvbnN0IHN0cnVjdCBzbWJfaGRyICpzbWJfYnVm
-ZmVyLAogCQkJCQlzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIpOwpAQCAtODksNiArOTAs
-NyBAQCBleHRlcm4gdm9pZCBjaWZzX3dha2VfdXBfdGFzayhzdHJ1Y3QgbWlkX3FfZW50cnkgKm1p
-ZCk7CiBleHRlcm4gaW50IGNpZnNfaGFuZGxlX3N0YW5kYXJkKHN0cnVjdCBUQ1BfU2VydmVyX0lu
-Zm8gKnNlcnZlciwKIAkJCQlzdHJ1Y3QgbWlkX3FfZW50cnkgKm1pZCk7CiBleHRlcm4gaW50IHNt
-YjNfcGFyc2VfZGV2bmFtZShjb25zdCBjaGFyICpkZXZuYW1lLCBzdHJ1Y3Qgc21iM19mc19jb250
-ZXh0ICpjdHgpOworZXh0ZXJuIGludCBzbWIzX3BhcnNlX29wdChjb25zdCBjaGFyICpvcHRpb25z
-LCBjb25zdCBjaGFyICprZXksIGNoYXIgKip2YWwpOwogZXh0ZXJuIGJvb2wgY2lmc19tYXRjaF9p
-cGFkZHIoc3RydWN0IHNvY2thZGRyICpzcmNhZGRyLCBzdHJ1Y3Qgc29ja2FkZHIgKnJocyk7CiBl
-eHRlcm4gaW50IGNpZnNfZGlzY2FyZF9yZW1haW5pbmdfZGF0YShzdHJ1Y3QgVENQX1NlcnZlcl9J
-bmZvICpzZXJ2ZXIpOwogZXh0ZXJuIGludCBjaWZzX2NhbGxfYXN5bmMoc3RydWN0IFRDUF9TZXJ2
-ZXJfSW5mbyAqc2VydmVyLApAQCAtNTQ5LDcgKzU1MSw3IEBAIGV4dGVybiBpbnQgU01CZW5jcnlw
-dCh1bnNpZ25lZCBjaGFyICpwYXNzd2QsIGNvbnN0IHVuc2lnbmVkIGNoYXIgKmM4LAogCQkJdW5z
-aWduZWQgY2hhciAqcDI0KTsKIAogZXh0ZXJuIGludAotY2lmc19zZXR1cF92b2x1bWVfaW5mbyhz
-dHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgpOworY2lmc19zZXR1cF92b2x1bWVfaW5mbyhzdHJ1
-Y3Qgc21iM19mc19jb250ZXh0ICpjdHgsIGNvbnN0IGNoYXIgKm1udG9wdHMsIGNvbnN0IGNoYXIg
-KmRldm5hbWUpOwogCiBleHRlcm4gc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqCiBjaWZzX2ZpbmRf
-dGNwX3Nlc3Npb24oc3RydWN0IHNtYjNfZnNfY29udGV4dCAqY3R4KTsKZGlmZiAtLWdpdCBhL2Zz
-L2NpZnMvY29ubmVjdC5jIGIvZnMvY2lmcy9jb25uZWN0LmMKaW5kZXggYzhlZjI0YmFjOTRmLi4x
-MGZlNmQ2ZDJkZWUgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMv
-Y29ubmVjdC5jCkBAIC0yOTcyLDE3ICsyOTcyLDIwIEBAIGV4cGFuZF9kZnNfcmVmZXJyYWwoY29u
-c3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpzZXMsCiAJcmMgPSBkZnNfY2Fj
-aGVfZmluZCh4aWQsIHNlcywgY2lmc19zYi0+bG9jYWxfbmxzLCBjaWZzX3JlbWFwKGNpZnNfc2Ip
-LAogCQkJICAgIHJlZl9wYXRoLCAmcmVmZXJyYWwsIE5VTEwpOwogCWlmICghcmMpIHsKKwkJY2hh
-ciAqZmFrZV9kZXZuYW1lID0gTlVMTDsKKwogCQltZGF0YSA9IGNpZnNfY29tcG9zZV9tb3VudF9v
-cHRpb25zKGNpZnNfc2ItPmN0eC0+bW91bnRfb3B0aW9ucywKLQkJCQkJCSAgIGZ1bGxfcGF0aCAr
-IDEsICZyZWZlcnJhbCk7CisJCQkJCQkgICBmdWxsX3BhdGggKyAxLCAmcmVmZXJyYWwsCisJCQkJ
-CQkgICAmZmFrZV9kZXZuYW1lKTsKIAkJZnJlZV9kZnNfaW5mb19wYXJhbSgmcmVmZXJyYWwpOwog
-CiAJCWlmIChJU19FUlIobWRhdGEpKSB7CiAJCQlyYyA9IFBUUl9FUlIobWRhdGEpOwogCQkJbWRh
-dGEgPSBOVUxMOwogCQl9IGVsc2UgewotCQkJc21iM19jbGVhbnVwX2ZzX2NvbnRleHRfY29udGVu
-dHMoY3R4KTsKLQkJCXJjID0gY2lmc19zZXR1cF92b2x1bWVfaW5mbyhjdHgpOworCQkJcmMgPSBj
-aWZzX3NldHVwX3ZvbHVtZV9pbmZvKGN0eCwgbWRhdGEsIGZha2VfZGV2bmFtZSk7CiAJCX0KKwkJ
-a2ZyZWUoZmFrZV9kZXZuYW1lKTsKIAkJa2ZyZWUoY2lmc19zYi0+Y3R4LT5tb3VudF9vcHRpb25z
-KTsKIAkJY2lmc19zYi0+Y3R4LT5tb3VudF9vcHRpb25zID0gbWRhdGE7CiAJfQpAQCAtMzAzNiw2
-ICszMDM5LDcgQEAgc3RhdGljIGludCBzZXR1cF9kZnNfdGd0X2Nvbm4oY29uc3QgY2hhciAqcGF0
-aCwgY29uc3QgY2hhciAqZnVsbF9wYXRoLAogCXN0cnVjdCBkZnNfaW5mbzNfcGFyYW0gcmVmID0g
-ezB9OwogCWNoYXIgKm1kYXRhID0gTlVMTDsKIAlzdHJ1Y3Qgc21iM19mc19jb250ZXh0IGZha2Vf
-Y3R4ID0ge05VTEx9OworCWNoYXIgKmZha2VfZGV2bmFtZSA9IE5VTEw7CiAKIAljaWZzX2RiZyhG
-WUksICIlczogZGZzIHBhdGg6ICVzXG4iLCBfX2Z1bmNfXywgcGF0aCk7CiAKQEAgLTMwNDQsMTYg
-KzMwNDgsMTggQEAgc3RhdGljIGludCBzZXR1cF9kZnNfdGd0X2Nvbm4oY29uc3QgY2hhciAqcGF0
-aCwgY29uc3QgY2hhciAqZnVsbF9wYXRoLAogCQlyZXR1cm4gcmM7CiAKIAltZGF0YSA9IGNpZnNf
-Y29tcG9zZV9tb3VudF9vcHRpb25zKGNpZnNfc2ItPmN0eC0+bW91bnRfb3B0aW9ucywKLQkJCQkJ
-ICAgZnVsbF9wYXRoICsgMSwgJnJlZik7CisJCQkJCSAgIGZ1bGxfcGF0aCArIDEsICZyZWYsCisJ
-CQkJCSAgICZmYWtlX2Rldm5hbWUpOwogCWZyZWVfZGZzX2luZm9fcGFyYW0oJnJlZik7CiAKIAlp
-ZiAoSVNfRVJSKG1kYXRhKSkgewogCQlyYyA9IFBUUl9FUlIobWRhdGEpOwogCQltZGF0YSA9IE5V
-TEw7CiAJfSBlbHNlCi0JCXJjID0gY2lmc19zZXR1cF92b2x1bWVfaW5mbygmZmFrZV9jdHgpOwor
-CQlyYyA9IGNpZnNfc2V0dXBfdm9sdW1lX2luZm8oJmZha2VfY3R4LCBtZGF0YSwgZmFrZV9kZXZu
-YW1lKTsKIAogCWtmcmVlKG1kYXRhKTsKKwlrZnJlZShmYWtlX2Rldm5hbWUpOwogCiAJaWYgKCFy
-YykgewogCQkvKgpAQCAtMzEyMiwxMCArMzEyOCwyNCBAQCBzdGF0aWMgaW50IGRvX2Rmc19mYWls
-b3Zlcihjb25zdCBjaGFyICpwYXRoLCBjb25zdCBjaGFyICpmdWxsX3BhdGgsIHN0cnVjdCBjaWZz
-XwogICogd2Ugc2hvdWxkIHBhc3MgYSBjbG9uZSBvZiB0aGUgb3JpZ2luYWwgY29udGV4dD8KICAq
-LwogaW50Ci1jaWZzX3NldHVwX3ZvbHVtZV9pbmZvKHN0cnVjdCBzbWIzX2ZzX2NvbnRleHQgKmN0
-eCkKK2NpZnNfc2V0dXBfdm9sdW1lX2luZm8oc3RydWN0IHNtYjNfZnNfY29udGV4dCAqY3R4LCBj
-b25zdCBjaGFyICptbnRvcHRzLCBjb25zdCBjaGFyICpkZXZuYW1lKQogewogCWludCByYyA9IDA7
-CiAKKwlzbWIzX3BhcnNlX2Rldm5hbWUoZGV2bmFtZSwgY3R4KTsKKworCWlmIChtbnRvcHRzKSB7
-CisJCWNoYXIgKmlwOworCisJCWNpZnNfZGJnKEZZSSwgIiVzOiBtbnRvcHRzPSVzXG4iLCBfX2Z1
-bmNfXywgbW50b3B0cyk7CisJCXJjID0gc21iM19wYXJzZV9vcHQobW50b3B0cywgImlwIiwgJmlw
-KTsKKwkJaWYgKCFyYyAmJiAhY2lmc19jb252ZXJ0X2FkZHJlc3MoKHN0cnVjdCBzb2NrYWRkciAq
-KSZjdHgtPmRzdGFkZHIsIGlwLAorCQkJCQkJIHN0cmxlbihpcCkpKSB7CisJCQljaWZzX2RiZyhW
-RlMsICIlczogZmFpbGVkIHRvIGNvbnZlcnQgaXAgYWRkcmVzc1xuIiwgX19mdW5jX18pOworCQkJ
-cmV0dXJuIC1FSU5WQUw7CisJCX0KKwl9CisKIAlpZiAoY3R4LT5udWxsYXV0aCkgewogCQljaWZz
-X2RiZyhGWUksICJBbm9ueW1vdXMgbG9naW5cbiIpOwogCQlrZnJlZShjdHgtPnVzZXJuYW1lKTsK
-ZGlmZiAtLWdpdCBhL2ZzL2NpZnMvZGZzX2NhY2hlLmMgYi9mcy9jaWZzL2Rmc19jYWNoZS5jCmlu
-ZGV4IDBmZGIwZGU3ZmY4Ni4uNDk1MGFiMDQ4NmFlIDEwMDY0NAotLS0gYS9mcy9jaWZzL2Rmc19j
-YWNoZS5jCisrKyBiL2ZzL2NpZnMvZGZzX2NhY2hlLmMKQEAgLTE0MTcsNyArMTQxNyw3IEBAIHN0
-YXRpYyBzdHJ1Y3QgY2lmc19zZXMgKmZpbmRfcm9vdF9zZXMoc3RydWN0IHZvbF9pbmZvICp2aSwK
-IAlpbnQgcmM7CiAJc3RydWN0IGNhY2hlX2VudHJ5ICpjZTsKIAlzdHJ1Y3QgZGZzX2luZm8zX3Bh
-cmFtIHJlZiA9IHswfTsKLQljaGFyICptZGF0YSA9IE5VTEw7CisJY2hhciAqbWRhdGEgPSBOVUxM
-LCAqZGV2bmFtZSA9IE5VTEw7CiAJc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyOwogCXN0
-cnVjdCBjaWZzX3NlcyAqc2VzOwogCXN0cnVjdCBzbWIzX2ZzX2NvbnRleHQgY3R4ID0ge05VTEx9
-OwpAQCAtMTQ0NCw3ICsxNDQ0LDggQEAgc3RhdGljIHN0cnVjdCBjaWZzX3NlcyAqZmluZF9yb290
-X3NlcyhzdHJ1Y3Qgdm9sX2luZm8gKnZpLAogCiAJdXBfcmVhZCgmaHRhYmxlX3J3X2xvY2spOwog
-Ci0JbWRhdGEgPSBjaWZzX2NvbXBvc2VfbW91bnRfb3B0aW9ucyh2aS0+bW50ZGF0YSwgcnBhdGgs
-ICZyZWYpOworCW1kYXRhID0gY2lmc19jb21wb3NlX21vdW50X29wdGlvbnModmktPm1udGRhdGEs
-IHJwYXRoLCAmcmVmLAorCQkJCQkgICAmZGV2bmFtZSk7CiAJZnJlZV9kZnNfaW5mb19wYXJhbSgm
-cmVmKTsKIAogCWlmIChJU19FUlIobWRhdGEpKSB7CkBAIC0xNDUzLDcgKzE0NTQsNyBAQCBzdGF0
-aWMgc3RydWN0IGNpZnNfc2VzICpmaW5kX3Jvb3Rfc2VzKHN0cnVjdCB2b2xfaW5mbyAqdmksCiAJ
-CWdvdG8gb3V0OwogCX0KIAotCXJjID0gY2lmc19zZXR1cF92b2x1bWVfaW5mbygmY3R4KTsKKwly
-YyA9IGNpZnNfc2V0dXBfdm9sdW1lX2luZm8oJmN0eCwgTlVMTCwgZGV2bmFtZSk7CiAKIAlpZiAo
-cmMpIHsKIAkJc2VzID0gRVJSX1BUUihyYyk7CkBAIC0xNDcyLDYgKzE0NzMsNyBAQCBzdGF0aWMg
-c3RydWN0IGNpZnNfc2VzICpmaW5kX3Jvb3Rfc2VzKHN0cnVjdCB2b2xfaW5mbyAqdmksCiAJc21i
-M19jbGVhbnVwX2ZzX2NvbnRleHRfY29udGVudHMoJmN0eCk7CiAJa2ZyZWUobWRhdGEpOwogCWtm
-cmVlKHJwYXRoKTsKKwlrZnJlZShkZXZuYW1lKTsKIAogCXJldHVybiBzZXM7CiB9CmRpZmYgLS1n
-aXQgYS9mcy9jaWZzL2ZzX2NvbnRleHQuYyBiL2ZzL2NpZnMvZnNfY29udGV4dC5jCmluZGV4IDI3
-MzU0NDE3ZTk4OC4uNTExMWFhZGZkYjZiIDEwMDY0NAotLS0gYS9mcy9jaWZzL2ZzX2NvbnRleHQu
-YworKysgYi9mcy9jaWZzL2ZzX2NvbnRleHQuYwpAQCAtNDAxLDYgKzQwMSwzNyBAQCBjaWZzX3Bh
-cnNlX3NtYl92ZXJzaW9uKGNoYXIgKnZhbHVlLCBzdHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgs
-IGJvb2wgaXNfc21iMykKIAlyZXR1cm4gMDsKIH0KIAoraW50IHNtYjNfcGFyc2Vfb3B0KGNvbnN0
-IGNoYXIgKm9wdGlvbnMsIGNvbnN0IGNoYXIgKmtleSwgY2hhciAqKnZhbCkKK3sKKwlpbnQgcmMg
-PSAtRU5PRU5UOworCWNoYXIgKm9wdHMsICpvcmlnLCAqcDsKKworCW9yaWcgPSBvcHRzID0ga3N0
-cmR1cChvcHRpb25zLCBHRlBfS0VSTkVMKTsKKwlpZiAoIW9wdHMpCisJCXJldHVybiAtRU5PTUVN
-OworCisJd2hpbGUgKChwID0gc3Ryc2VwKCZvcHRzLCAiLCIpKSkgeworCQljaGFyICpudmFsOwor
-CisJCWlmICghKnApCisJCQljb250aW51ZTsKKwkJaWYgKHN0cm5jYXNlY21wKHAsIGtleSwgc3Ry
-bGVuKGtleSkpKQorCQkJY29udGludWU7CisJCW52YWwgPSBzdHJjaHIocCwgJz0nKTsKKwkJaWYg
-KG52YWwpIHsKKwkJCWlmIChudmFsID09IHApCisJCQkJY29udGludWU7CisJCQkqbnZhbCsrID0g
-MDsKKwkJCSp2YWwgPSBrc3RybmR1cChudmFsLCBzdHJsZW4obnZhbCksIEdGUF9LRVJORUwpOwor
-CQkJcmMgPSAhKnZhbCA/IC1FTk9NRU0gOiAwOworCQkJZ290byBvdXQ7CisJCX0KKwl9CitvdXQ6
-CisJa2ZyZWUob3JpZyk7CisJcmV0dXJuIHJjOworfQorCiAvKgogICogUGFyc2UgYSBkZXZuYW1l
-IGludG8gc3Vic3RyaW5ncyBhbmQgcG9wdWxhdGUgdGhlIGN0eC0+VU5DIGFuZCBjdHgtPnByZXBh
-dGgKICAqIGZpZWxkcyB3aXRoIHRoZSByZXN1bHQuIFJldHVybnMgMCBvbiBzdWNjZXNzIGFuZCBh
-biBlcnJvciBvdGhlcndpc2UKLS0gCjIuMjcuMAoK
---000000000000a9692905ba01d21f--
+Description for this pull request:
+=E2=80=A2=20Avoid=20calling=20ksmbd_override_fsids=20recursively.=0D=0A=E2=
+=80=A2=20Make=20xattr=20format=20of=20ksmbd=20compatible=20with=20samba's=
+=20one.=0D=0A=E2=80=A2=20Use=20netdevice_notifier=20to=20configure=20TCP=20=
+listeners.=0D=0A=E2=80=A2=20Fix=20a=20build=20break=20with=20linux-5.11=20k=
+ernel.=0D=0A________________________________________=0D=0AYou=20can=20view,=
+=20comment=20on,=20or=20merge=20this=20pull=20request=20online=20at:=0D=0A=
+=20=20https://protect2.fireeye.com/v1/url?k=3D18f3920f-4768ab42-18f21940-0c=
+c47aa8f5ba-ab8c74262ebe1a56&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&=
+u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21=0D=0AComm=
+it=20Summary=0D=0A=E2=80=A2=20cifsd:=20set=20supplementary=20groups=20when=
+=20overriding=20credentials=0D=0A=E2=80=A2=20cifsd:=20avoid=20calling=20ksm=
+bd_override_fsids=20recursively=0D=0A=E2=80=A2=20cifsd:=20Change=20alloc_if=
+ace()=20return=20type=20in=20transport_tcp.c=0D=0A=E2=80=A2=20cifsd:=20Use=
+=20netdevice_notifier=20to=20configure=20TCP=20listeners=0D=0A=E2=80=A2=20c=
+ifsd:=20fix=20a=20memleak=20from=20netdevice_notifier=0D=0A=E2=80=A2=20cifs=
+d:=20make=20xattr=20format=20of=20ksmbd=20compatible=20with=20samba's=20one=
+=0D=0A=E2=80=A2=20cifsd:=20macros=20with=20complex=20values=20should=20be=
+=20enclosed=20in=20parentheses=0D=0A=E2=80=A2=20cifsd:=20fix=20build=20brea=
+k=20with=20linux-5.11=20kernel=0D=0AFile=20Changes=0D=0A=E2=80=A2=20M=20htt=
+ps://protect2.fireeye.com/v1/url?k=3Dbf9741e7-e00c78aa-bf96caa8-0cc47aa8f5b=
+a-9454fbda87bb8569&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps=
+%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%23diff-13a=
+1445bc5afcf91b3135cfc53c83b546ff6741cd17902937b4030162990820e=20(2)=20=0D=
+=0A=E2=80=A2=20M=20https://protect2.fireeye.com/v1/url?k=3D0c02a494-53999dd=
+9-0c032fdb-0cc47aa8f5ba-d9e8ed4b3ee97c82&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-=
+89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2=
+F21%2Ffiles%23diff-381fb3a09da3451eeea4ae3029730c1c92bbed381327f311fd1e153a=
+d96590aa=20(34)=20=0D=0A=E2=80=A2=20M=20https://protect2.fireeye.com/v1/url=
+?k=3D43e265ba-1c795cf7-43e3eef5-0cc47aa8f5ba-4b5da940e32670cf&q=3D1&e=3D881=
+cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2=
+Fsmb3-kernel%2Fpull%2F21%2Ffiles%23diff-9ee6f94aa7c97acc87330571f4974c284e3=
+638682d8662419067ac7049bca740=20(2)=20=0D=0A=E2=80=A2=20M=20https://protect=
+2.fireeye.com/v1/url?k=3D21bbebe9-7e20d2a4-21ba60a6-0cc47aa8f5ba-c4f159256e=
+410848&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgit=
+hub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%23diff-731c968a66f944d=
+f8c362587d30f683400c61aa40b827b15837afcf329c27c32=20(8)=20=0D=0A=E2=80=A2=
+=20M=20https://protect2.fireeye.com/v1/url?k=3Da3393309-fca20a44-a338b846-0=
+cc47aa8f5ba-4608bd15a0e40d60&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a=
+&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%=
+23diff-44f4e94b5520200e7003e947b70571dec5d1f91b0fefe60cc24b84a56d192a5a=20(=
+4)=20=0D=0A=E2=80=A2=20M=20https://protect2.fireeye.com/v1/url?k=3D015efcd7=
+-5ec5c59a-015f7798-0cc47aa8f5ba-bd28bc3df7ba5881&q=3D1&e=3D881cbf7d-2565-4c=
+41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%=
+2Fpull%2F21%2Ffiles%23diff-d7a6189bb902920845f1b16b60b23dc6e5b79619426ce81f=
+ec051cd575b2321b=20(2)=20=0D=0A=E2=80=A2=20M=20https://protect2.fireeye.com=
+/v1/url?k=3D2b95d7fa-740eeeb7-2b945cb5-0cc47aa8f5ba-6b35b3097a525ba6&q=3D1&=
+e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmf=
+rench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%23diff-45cdbce20e00968980ab5b673840=
+997b7db3ef1ceb01959136146eed28efd756=20(2)=20=0D=0A=E2=80=A2=20M=20https://=
+protect2.fireeye.com/v1/url?k=3Da0fd3c65-ff660528-a0fcb72a-0cc47aa8f5ba-134=
+6696391247558&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2=
+F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%23diff-28da00cf=
+886c7c49441c784bace3139cdacc95987b46216d81c512f676fcf54d=20(5)=20=0D=0A=E2=
+=80=A2=20A=20https://protect2.fireeye.com/v1/url?k=3D5bc42f98-045f16d5-5bc5=
+a4d7-0cc47aa8f5ba-c7331ba7875dd512&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0=
+f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2F=
+files%23diff-fef259d09b45f87954b831ea54e078f4518f5c4417515873344c0de23921de=
+ea=20(337)=20=0D=0A=E2=80=A2=20A=20https://protect2.fireeye.com/v1/url?k=3D=
+430dbace-1c968383-430c3181-0cc47aa8f5ba-a123a0a6aa5af5d8&q=3D1&e=3D881cbf7d=
+-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3=
+-kernel%2Fpull%2F21%2Ffiles%23diff-a96203b39f53284684579596723fe5b0035eb91c=
+f9856de440a84d55bdea5f17=20(21)=20=0D=0A=E2=80=A2=20M=20https://protect2.fi=
+reeye.com/v1/url?k=3D61d519f6-3e4e20bb-61d492b9-0cc47aa8f5ba-394558376d6247=
+1b&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.=
+com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%23diff-f7433629c8584faf417=
+2019089efd7cde0f325939807b2b0a6120b2258f74715=20(294)=20=0D=0A=E2=80=A2=20M=
+=20https://protect2.fireeye.com/v1/url?k=3D99cf53ee-c6546aa3-99ced8a1-0cc47=
+aa8f5ba-e8999629106265e8&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=
+=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%23=
+diff-441aeb0c7e6999addc85a93c33c950ea637323e8d3eb79f19919033308dbb05b=20(36=
+)=20=0D=0A=E2=80=A2=20M=20https://protect2.fireeye.com/v1/url?k=3Db55ddc83-=
+eac6e5ce-b55c57cc-0cc47aa8f5ba-a9d96673636133a5&q=3D1&e=3D881cbf7d-2565-4c4=
+1-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2=
+Fpull%2F21%2Ffiles%23diff-3d348fb0b8bd1408076e13cf84a5160305faa8af1d6a69d74=
+0fd36036b5b914c=20(545)=20=0D=0A=E2=80=A2=20M=20https://protect2.fireeye.co=
+m/v1/url?k=3D0f56e0bf-50cdd9f2-0f576bf0-0cc47aa8f5ba-53320ca4f3bc6123&q=3D1=
+&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsm=
+french%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%23diff-a1e66e03b569d8088f2c4266607=
+a2b6c2589ab8813741e3c36210d6e4cd6bcb4=20(35)=20=0D=0A=E2=80=A2=20M=20https:=
+//protect2.fireeye.com/v1/url?k=3Dc15889e8-9ec3b0a5-c15902a7-0cc47aa8f5ba-8=
+5f00cc25e680ffd&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A=
+%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%23diff-70b141=
+042a80072dba68db2b1456a183505658908438038fffdc0266c64413cf=20(4)=20=0D=0A=
+=E2=80=A2=20M=20https://protect2.fireeye.com/v1/url?k=3D0bd71e7a-544c2737-0=
+bd69535-0cc47aa8f5ba-a4841969ab90e53f&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b=
+1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21=
+%2Ffiles%23diff-db0aa3a6adeabfd54633c447b9beaf27fbb46f6b1ecd8c72aef4fb72581=
+a04b1=20(126)=20=0D=0A=E2=80=A2=20M=20https://protect2.fireeye.com/v1/url?k=
+=3D7e8ab03d-21118970-7e8b3b72-0cc47aa8f5ba-277d3188b8f549ae&q=3D1&e=3D881cb=
+f7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fs=
+mb3-kernel%2Fpull%2F21%2Ffiles%23diff-2bd5af44e29b547dd9fda5b3d24352adacbb8=
+b8080e33241d6641a4f3df69ef0=20(2)=20=0D=0A=E2=80=A2=20M=20https://protect2.=
+fireeye.com/v1/url?k=3Dc3701dd7-9ceb249a-c3719698-0cc47aa8f5ba-8a94e0c7b2dc=
+bb14&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithu=
+b.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%23diff-249654a638ec41b36=
+4ee6977b6a0d3ad3f06e5a711f7f53d1d8e743acc276b8b=20(462)=20=0D=0A=E2=80=A2=
+=20M=20https://protect2.fireeye.com/v1/url?k=3D56ce1c31-0955257c-56cf977e-0=
+cc47aa8f5ba-985a80c4a4f48bf3&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a=
+&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21%2Ffiles%=
+23diff-ba6b2ac156d80a0d1650305ffe6147b0ab677fa20a5083df7bae9fc299822d35=20(=
+100)=20=0D=0A=E2=80=A2=20M=20https://protect2.fireeye.com/v1/url?k=3Ddb5fb8=
+9c-84c481d1-db5e33d3-0cc47aa8f5ba-1071fc074a7ad555&q=3D1&e=3D881cbf7d-2565-=
+4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kerne=
+l%2Fpull%2F21%2Ffiles%23diff-004686895854dcd4630e0991bb4eea14bf87d8056b6351=
+516840ed6435112956=20(2)=20=0D=0APatch=20Links:=0D=0A=E2=80=A2=20https://pr=
+otect2.fireeye.com/v1/url?k=3D4093e9b4-1f08d0f9-409262fb-0cc47aa8f5ba-d96b6=
+f47d700bc08&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%=
+2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21.patch=0D=0A=E2=80=A2=20ht=
+tps://protect2.fireeye.com/v1/url?k=3Deb50f6a2-b4cbcfef-eb517ded-0cc47aa8f5=
+ba-c7bf722bf139c09c&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttp=
+s%3A%2F%2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21.diff=0D=0A=E2=80=
+=94=0D=0AYou=20are=20receiving=20this=20because=20you=20are=20subscribed=20=
+to=20this=20thread.=0D=0AReply=20to=20this=20email=20directly,=20https://pr=
+otect2.fireeye.com/v1/url?k=3D64cd01ff-3b5638b2-64cc8ab0-0cc47aa8f5ba-53ea2=
+4818e736d7c&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%=
+2Fgithub.com%2Fsmfrench%2Fsmb3-kernel%2Fpull%2F21,=20or=20https://protect2.=
+fireeye.com/v1/url?k=3D1f9e06a2-40053fef-1f9f8ded-0cc47aa8f5ba-2adf7ca05ae5=
+6371&q=3D1&e=3D881cbf7d-2565-4c41-bb9f-89b1f0f8bc1a&u=3Dhttps%3A%2F%2Fgithu=
+b.com%2Fnotifications%2Funsubscribe-auth%2FADSTN5QP7UMTO6WHMMIMZ5TS4DYMNANC=
+NFSM4WWNZCFQ.=0D=0A=0D=0A=0D=0A=0D=0A--=20=0D=0AThanks,=0D=0A=0D=0ASteve=0D=
+=0A=0D=0A
