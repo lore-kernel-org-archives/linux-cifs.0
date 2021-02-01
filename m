@@ -2,223 +2,151 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FD9C433DB
-	for <linux-cifs@archiver.kernel.org>; Sun, 31 Jan 2021 09:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE809C433E0
+	for <linux-cifs@archiver.kernel.org>; Mon,  1 Feb 2021 10:33:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E308F64E11
-	for <linux-cifs@archiver.kernel.org>; Sun, 31 Jan 2021 09:29:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5A4664E94
+	for <linux-cifs@archiver.kernel.org>; Mon,  1 Feb 2021 10:33:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230038AbhAaJ3Z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 31 Jan 2021 04:29:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54532 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230016AbhAaJ3P (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 31 Jan 2021 04:29:15 -0500
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4DEC061574;
-        Sun, 31 Jan 2021 01:28:34 -0800 (PST)
-Received: by mail-yb1-xb2f.google.com with SMTP id e67so13654818ybc.12;
-        Sun, 31 Jan 2021 01:28:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=S5yV9i6jWuCebpjraSAPH2dm0s2WjtRDuSW/WMDSU4Q=;
-        b=Nn+oAEcphb1SqSRAvX2eZRkwdhPnuIUpvdpIEGiLCt+cpa5+lgu0q/8cGF+MjFRf5z
-         NBxrQVdbym8zfkbEEfe56N+BNoq1oTamq68fxDA4YFJDBGUEU/86AYVjymmghQ+MmmHc
-         uTIGhrTKu5EebKiCHxxyyFKbHLqBCeuEQmVh+VNMaGVf5+s+bRHZoFHoShUTaUkr4VoE
-         JqUYIbJBLhYNR3D0Md76w7quSEDFFljfXd5RjXEdlKQVVF2mgU8QVePrFV7b3JmfNObk
-         4F0kR6j9FUutfkcJEmH0OR1tIIcQXMk2JyhSrQvkT8zInnHeL4m4H4VjdYt9ImoSRUQK
-         AOkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=S5yV9i6jWuCebpjraSAPH2dm0s2WjtRDuSW/WMDSU4Q=;
-        b=EMkOUYN5BOJrCfiDtBjiP6jlC6qKOKl5/BZdFUpLYMzxy/4SwiBJ42byyDPv1c87iq
-         NKBOrJ0aZ+aLHRZ/QIQApl0hW19f17rjYzPyUdAK77NZ4Abf0Qh+alFbIeQH8YV5Q3T0
-         dt8qfLwKh3hydJwarsQYO9Aj8DPYwjzFJga5ohq17vlbr7+7Bfs2K1dowqcwMcXBSIo2
-         MDfG3iO4UezoxP8XDRfMI6bcfL1bS1KNeQghzu+ejV4UggvfXBByqZ3a2agtMdKmkJ42
-         s7LGRmm8CsmFvI+ip9HsZo3JqPOyhkBdIHWrhJOKJRJ3V3SgB1KkUKAuPD3lWoOFLzk1
-         ItBw==
-X-Gm-Message-State: AOAM533wk2Cor4C4fDxTP/kNdEV64K3Yq39tYol0YwQsYTbHY49uNuMp
-        WHiSHFRARsmmmedlZDVO96OPa7yKZRWwbtX13Mg=
-X-Google-Smtp-Source: ABdhPJwP3s9Ka/9ThbCixT02PWzw4SascfKxDb+K4HJZsvfJQUw67CW7BpCe449eAyrBIUEGSodpn5HJGdb8eGtoB/g=
-X-Received: by 2002:a25:aa70:: with SMTP id s103mr8097957ybi.131.1612085313120;
- Sun, 31 Jan 2021 01:28:33 -0800 (PST)
-MIME-Version: 1.0
-References: <20210129171316.13160-1-aaptel@suse.com>
-In-Reply-To: <20210129171316.13160-1-aaptel@suse.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Sun, 31 Jan 2021 01:28:22 -0800
-Message-ID: <CANT5p=ofvpimU9Z7jwj4cPXXa1E4KkcijYrxbVKQZf5JDiR-1g@mail.gmail.com>
-Subject: Re: [PATCH v1] cifs: make nested cifs mount point dentries always
- valid to deal with signaled 'df'
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+        id S233184AbhBAKdC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 1 Feb 2021 05:33:02 -0500
+Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:37837 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233016AbhBAKdA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 1 Feb 2021 05:33:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1612175511;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k+M7Q1CnqP86CHAkLEEHGEGXuEq0C2Ximm+9ASMR5Yg=;
+        b=hRGSYoPi7V6kJ82LAj4WlNk+wX4L/cNLQM4ySy+fpy0zNyMlBAYYo6eTAhh+086ZhF2D6m
+        k5DPVPCpfPD++aZZbl3Ui1UFuLm8gGjrWZ/0aoOA94rRFASSaoIWTT6zp61WRoaAOgflDn
+        1EmBVj0aaf8QQZ9TxclJqkzCnC1ZmHQ=
+Received: from EUR03-VE1-obe.outbound.protection.outlook.com
+ (mail-ve1eur03lp2054.outbound.protection.outlook.com [104.47.9.54]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ de-mta-34-a8ilU4f6Nz-kaQhy7GgBDw-1; Mon, 01 Feb 2021 11:31:50 +0100
+X-MC-Unique: a8ilU4f6Nz-kaQhy7GgBDw-1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QSxrJs6D/6mj6HbkQxeEzjoTJY1hwXBP/SN8gj4ia08AdA2UGV+qUw1wqUWN9UaNMXyFKlNENaFZFg9IE63w+DO5/ZZKAwx4K2zSMe5FQQzHPN8LszOg1IxWLJT3G665/QmeZVQYprAC8qIaq1Knv6vhpDFbzcSb+1onldqQg8tvzmMHOMtbX6Oh3xoYrrAyQrl2Ij1UWHnCGL31DkGceu4PO6oPGgN3NdrGP+FmbJWsYX9L+K53wIPCZ0a6prBumke3gqqFxWVCTgbWAP+uCLHQCPqF+Dn4YOBOVSEo97+GDuF+iEo/OEgV9oZek0XoldyVZv7mUxX2kVlxCLQI4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k+M7Q1CnqP86CHAkLEEHGEGXuEq0C2Ximm+9ASMR5Yg=;
+ b=CbrMk/KTiWmxWHn9ko3lS8uY4SO1/cLSNYuSyLYMWxplZpS0aHF49oo3paA32QP6/SxN53CeUudSdbZW6xfOvP8ZrRmMg/VWLSu73Whtna0xoy3ULqyNky0XOD5Qb2S8wwedOHqRzjVz1qnV4/2hQINBt6qJi/OZXEMtXpmCQQ4Le5Gqn70XjV1AXXjRBofiiPlPRpNUgj+8rketMKtdMnrbs0NNIqSVXVT9lx8202LAgjuB+zMVTisffQ+fMwhdh/nf7Dvm92zkqVKusCBuhuJdbg4lIx6nD63JD03kAf8xvK7hvTo62yD6EJSWc0a87rS/rsR6Avbm3t2tZGaoFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
+ by VI1PR04MB5920.eurprd04.prod.outlook.com (2603:10a6:803:ed::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Mon, 1 Feb
+ 2021 10:31:48 +0000
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3805.022; Mon, 1 Feb 2021
+ 10:31:48 +0000
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
 Cc:     CIFS <linux-cifs@vger.kernel.org>, linux-fsdevel@vger.kernel.org,
         Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v1] cifs: make nested cifs mount point dentries always
+ valid to deal with signaled 'df'
+In-Reply-To: <CANT5p=ofvpimU9Z7jwj4cPXXa1E4KkcijYrxbVKQZf5JDiR-1g@mail.gmail.com>
+References: <20210129171316.13160-1-aaptel@suse.com>
+ <CANT5p=ofvpimU9Z7jwj4cPXXa1E4KkcijYrxbVKQZf5JDiR-1g@mail.gmail.com>
+Date:   Mon, 01 Feb 2021 11:31:45 +0100
+Message-ID: <877dns9izy.fsf@suse.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [2003:fa:705:9f12:fb7a:e8aa:e796:34d1]
+X-ClientProxiedBy: GV0P278CA0020.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:710:28::7) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+ (2603:10a6:803:3::28)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (2003:fa:705:9f12:fb7a:e8aa:e796:34d1) by GV0P278CA0020.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:28::7) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17 via Frontend Transport; Mon, 1 Feb 2021 10:31:47 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 7b80d334-8cbf-4aae-8850-08d8c69c9471
+X-MS-TrafficTypeDiagnostic: VI1PR04MB5920:
+X-Microsoft-Antispam-PRVS: <VI1PR04MB59207875CD187A8ADCA87A51A8B69@VI1PR04MB5920.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dbbSQUTvSCFVY5gh9wr12qUc+tjkkHwCjyhI0pEp5ztEW/bZsqtSQw8mP/g7gKDDBkzeZymdm4xfQw2XeFQP/wVXUB1rpf+kwxQgzeFYanXBJrhZudSQecWnrOUo9A4MPXV35QgCYRMTqJl3fs5GU2eo7X7APwXDDjVD5ncv5hiJrx/2jHVLnqBJ0Gut9SPcx61K2Efx8sZqcMUhL24tXjEwTrc06K3CKw13NIXj+qawZR8Z67vuSYdPPq53gbBXRH4O9/0zKCjGOp6ZsU8C/EeJV5TJFaxJRDEcJWWJ4t6pWJ8NoLggq+4ZAik1CwhIhmSUaiLgqFzRgBujrTGYH4In35EPM/phUeLMLJy2L6LUa+WJb3HdfQV+QDe86XzYRX9d2hvDOwJ4wQ8JMYZBV4hpAvQ282E5bNMlm7VEypJ+SBlLInwEf6/jU1vnd/siJRhAKV+va9rjJtosIFeuePyW/J52Nv92jWQsWZgS/m0kT+wbjcj551rZ6xedCjQGYxpbRejt3Sbx+cYKg+CVew==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(346002)(136003)(366004)(376002)(39860400002)(54906003)(2906002)(8936002)(6916009)(2616005)(36756003)(6496006)(52116002)(4326008)(8676002)(316002)(66556008)(66476007)(66946007)(86362001)(5660300002)(6486002)(16526019)(186003)(478600001)(83380400001)(66574015)(4744005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?MUlmY293WG1iQ3pkUzhaaGhtRFZDY1NJK3c5T3R2MWxPZWJYNGVGb0djOW1N?=
+ =?utf-8?B?R3VSbmp6SklzaEFhVG5melRTeTA2YU44MUg4OXpSdERtbGpMakI1QmJqVWRF?=
+ =?utf-8?B?NWRQb25uQ2NxakRmMEZpNS9vM3NDUWlOb1BHL3p2MUIvRHdWdW1jWGJzU3lI?=
+ =?utf-8?B?a21uN3FJeTBuQVhROHhIeENGcko5d1NEd0RqdkUwOUxaNEhRdmVpUEZFeURI?=
+ =?utf-8?B?a2ZYQlg4WGp4Qm5ocTFYbXBVbDk1eGp1RzNRa1RQenFFNDBSd3JqdDV3elZ6?=
+ =?utf-8?B?Qzl4MWRIL2NHODN5SlRYUURUMDMwSXJjSS9ONDhwdittMUdsZTlWcjlld1Rk?=
+ =?utf-8?B?YnRSNEVhRnZ6MVNxaUpsZW85ZGJhMzJzbW0vdU5MZ3JsMWdybTdNSmwxaGx3?=
+ =?utf-8?B?UHpGQUxmRDNveHBLM0crSHNzTlBxd0hIWG5PWnY3b2I2cWRDUW5MdjdhOExH?=
+ =?utf-8?B?ZzR0T0Y5T2NzMXN3eFd6UXBTL2UzK3lRcWphd3F1NGRRUTJUalRIWkwveUp2?=
+ =?utf-8?B?Z2tST28xYlB3dXA1ZmhvWFNPZXNuRDFYNTRaQWFoTmsySXI1QysvUUhabFZP?=
+ =?utf-8?B?WVNmVERMcld4MStMeTl4VVZsNXNUSU0yL0xMMXVZY0NSai82bk0zZXZuNDRQ?=
+ =?utf-8?B?SFpYa0Nib2lEUzFuVVFBSFhKQmFCcVRhY2hlZ205eFlVMXhuUFVGVzcvQUMv?=
+ =?utf-8?B?WDlLU2dORTEwbTRmQnBoaHZIWnYzQnREZ0ltODhwWmdjVHJuUVlTeUlOUkhw?=
+ =?utf-8?B?TDlnMllyU2svUkFpaWVzN3VYaVJWLytrOStsL0tSYklwU29tQWYxUC9nWHFm?=
+ =?utf-8?B?Rlp6V1RIYVUxWnVvYzdNS0hIQTRHU1NpYlBrMjJvZTFMc3BuNXNkeTRYTG5W?=
+ =?utf-8?B?UklkTGlyNHB0Nlhtb01RREtiZWZiZWZ4eGlDd3l2Z29XRmhCZGxrbVlORWg4?=
+ =?utf-8?B?MGluQllGUTlvcWtxeUZFaEgzT3hoVmU3NnBjTnN4OTNXdkVxcytadjdkeWtP?=
+ =?utf-8?B?azNySzhuWHNxMWczaVpBaUcxTmlLa2MxdkN5UTl3UTBEUVllZFV4M2ZpQ1Zh?=
+ =?utf-8?B?Vk95b3M3NWVZSDZ1Q2YzVW9jbU9ZU0hKVVhHcTZtSkIwcWJGZDJ0eCtTTXhH?=
+ =?utf-8?B?L1ltM3RYVkh6b1d0YitHL2JlalVvODdCRFFPMDlXV2dEekl6WklkUDVMdVNE?=
+ =?utf-8?B?cmpZMVA0bVlaWC9TaGhCREVGbm5qVVA5UnBETFJQcFZ5djFpRGwrVElUR1p3?=
+ =?utf-8?B?MGFmbXQ5WE1FUkgyblpOcTZkY0U3TlpHNTBjMFlJN2F4Z0tCUTVlQk5XZmor?=
+ =?utf-8?B?ampQNVFWa1oyRFlFV0k4enRNMmVlOUZFUEs3MnkvLzVSV293THd2akxVTS9z?=
+ =?utf-8?B?WGFYMVRTUmxHTmVKbzhWczFESEovQVFZQW9aalpPcmNZVzZISmF3RWtIZEtW?=
+ =?utf-8?B?U281ZFJ2cFRtclVRd1JKajZtQTV2ZitwR1NnV2lrZ0t5MnFoZW91QURvRG4v?=
+ =?utf-8?Q?dtyyvZZ50BXYWQIKYlRPIhWYo3W?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b80d334-8cbf-4aae-8850-08d8c69c9471
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2021 10:31:48.2340
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oAXAk0rSwzmaz4Dg5z3gOeypmIGsGd9C96dUThBkcTXa8ou/bPdc29BMeAbVzYBI
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5920
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I'm assuming that the revalidation is failing in
-cifs_revalidate_dentry, because it returns -ERESTARTSYS.
+Shyam Prasad N <nspmangalore@gmail.com> writes:
+> Going by the documentation of d_revalidate:
+>> This function should return a positive value if the dentry is still
+>> valid, and zero or a negative error code if it isn't.
+>
+> In case of error, can we try returning the rc itself (rather than 0),
+> and see if VFS avoids a dentry put?
+> Because theoretically, the call execution has failed, and the dentry
+> is not found to be invalid.
 
-Going by the documentation of d_revalidate:
-> This function should return a positive value if the dentry is still
-> valid, and zero or a negative error code if it isn't.
+AFAIK mount points are pinned, you cannot rm or mv them so it seems we
+could make them always valid. I don't know if there are deeper and more
+subtle implications.
 
-In case of error, can we try returning the rc itself (rather than 0),
-and see if VFS avoids a dentry put?
-Because theoretically, the call execution has failed, and the dentry
-is not found to be invalid.
+The recent signal fixes are not fixing this issue.
 
-Regards,
-Shyam
-
-On Fri, Jan 29, 2021 at 9:16 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
-:
->
-> From: Aurelien Aptel <aaptel@suse.com>
->
-> Assuming
-> - //HOST/a is mounted on /mnt
-> - //HOST/b is mounted on /mnt/b
->
-> On a slow connection, running 'df' and killing it while it's
-> processing /mnt/b can make cifs_get_inode_info() returns -ERESTARTSYS.
->
-> This triggers the following chain of events:
-> =3D> the dentry revalidation fail
-> =3D> dentry is put and released
-> =3D> superblock associated with the dentry is put
-> =3D> /mnt/b is unmounted
->
-> This quick fix makes cifs_d_revalidate() always succeed (mark as
-> valid) on cifs dentries which are also mount points.
->
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-> ---
->
-> I have managed to reproduce this bug with the following script.  It
-> uses tc with netem discipline (CONFIG_NET_SCH_NETEM=3Dy) to simulate
-> network delays.
->
-> #!/bin/bash
->
-> #
-> # reproducing bsc#1177440
-> #
-> # nested mount point gets unmounted when process is signaled
-> #
-> set -e
->
-> share1=3D//192.168.2.110/scratch
-> share2=3D//192.168.2.110/test
-> opts=3D"username=3Dadministrator,password=3Daaptel-42,vers=3D1.0,actimeo=
-=3D0"
->
-> cleanup() {
->     # reset delay
->     tc qdisc del dev eth0 root
->     mount|grep -q /mnt/nest/a && umount /mnt/nest/a
->     mount|grep -q /mnt/nest && umount /mnt/nest
->
->     echo 'module cifs -p' > /sys/kernel/debug/dynamic_debug/control
->     echo 'file fs/cifs/* -p' > /sys/kernel/debug/dynamic_debug/control
->     echo 0 > /proc/fs/cifs/cifsFYI
->     echo 0 > /sys/module/dns_resolver/parameters/debug
->     echo 1 > /proc/sys/kernel/printk_ratelimit
->
-> }
->
-> trap cleanup EXIT
->
-> nbcifs() {
->     mount|grep cifs|wc -l
-> }
->
-> reset() {
->     echo "unmounting and reloading cifs.ko"
->     mount|grep -q /mnt/nest/a && umount /mnt/nest/a
->     mount|grep -q /mnt/nest && umount /mnt/nest
->     sleep 1
->     lsmod|grep -q cifs && ( modprobe -r cifs &> /dev/null || true )
->     lsmod|grep -q cifs || ( modprobe cifs &> /dev/null  || true )
-> }
->
-> mnt() {
->     dmesg --clear
->     echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
->     echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
->     echo 1 > /proc/fs/cifs/cifsFYI
->     echo 1 > /sys/module/dns_resolver/parameters/debug
->     echo 0 > /proc/sys/kernel/printk_ratelimit
->
->     echo "mounting"
->     mkdir -p /mnt/nest
->     mount.cifs $share1 /mnt/nest -o "$opts"
->     mkdir -p /mnt/nest/a
->     mount.cifs $share2 /mnt/nest/a -o "$opts"
-> }
->
-> # add fake delay
-> tc qdisc add dev eth0 root netem delay 300ms
->
-> while :; do
->     reset
->     mnt
->     n=3D$(nbcifs)
->     echo "starting df with $n mounts"
->     df &
->     pid=3D$!
->     sleep 1.5
->     kill $pid || true
->     x=3D$(nbcifs)
->     echo "stopping with $x mounts"
->     if [ $x -lt $n ]; then
->         echo "lost mounts"
->         dmesg > kernel.log
->         exit 1
->     fi
-> done
->
->
->
-> fs/cifs/dir.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index 68900f1629bff..876ef01628538 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -741,6 +741,10 @@ cifs_d_revalidate(struct dentry *direntry, unsigned =
-int flags)
->         if (flags & LOOKUP_RCU)
->                 return -ECHILD;
->
-> +       /* nested cifs mount point are always valid */
-> +       if (d_mountpoint(direntry))
-> +               return 1;
-> +
->         if (d_really_is_positive(direntry)) {
->                 inode =3D d_inode(direntry);
->                 if ((flags & LOOKUP_REVAL) && !CIFS_CACHE_READ(CIFS_I(ino=
-de)))
-> --
-> 2.29.2
->
-
-
+Cheers,
 --=20
-Regards,
-Shyam
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
+E
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
+nchen)
+
