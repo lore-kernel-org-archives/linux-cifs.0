@@ -2,145 +2,145 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4801FC433DB
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E8F9C433E0
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 19:13:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 152CD64F92
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:37:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A16764E0A
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 19:13:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234624AbhBBShV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 Feb 2021 13:37:21 -0500
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:38384 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238630AbhBBSgD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 13:36:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1612290892;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jiiDOpFntu83b5XdDkP7UbqlS+JaMPdLMTFraEnPpFo=;
-        b=k11WidkHLlpixord1QtrSyiCYLGRJFKnSXTEQsoSBu3pOQHzhIvO9B60aHrtgjUfLIc/BN
-        lNU4ZYYeTqAVQayd4v9cKkWrcOY9vqIZ85FweOdIc2Xap59YpeKDY35X/aulquj0FRaj6n
-        8t1SExek5sokzEfGZBDOB1DOdF6qitw=
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com
- (mail-vi1eur04lp2057.outbound.protection.outlook.com [104.47.14.57]) (Using
- TLS) by relay.mimecast.com with ESMTP id de-mta-8-ghh-CacKO8GI2U0JSdDoew-1;
- Tue, 02 Feb 2021 19:34:51 +0100
-X-MC-Unique: ghh-CacKO8GI2U0JSdDoew-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RhAlBVyqyEQbzvgdW658x7OR6M944aAXwsZJ6JcQyc6WLELFr4QlNNHy2CA3HGSP2owAlRoWoElX0a38m60P9HIE44Rz0X6g9lKrQCZq6hfs8WmYjgRw4Rx3uTscDZOlLcaD+l1KJfCysysMnNLpvTkYj01Drq5qtbefMtxk8OX+3yuQrpGLXmUmN2Cqb1HzjpXaoXLDPzGFnEIxQrVPnyd4iP7UIewdaZxTqlgK+x3sI3Q+5oJXEVJx24tR+tUT6zJ/asc4UbPCXHU8e/o2EZzQlWD+D1KoOT99R0FSApLMglzM7VKRqD1trtGvWcpiGpgNq6l4P016JRy0cUi15A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jiiDOpFntu83b5XdDkP7UbqlS+JaMPdLMTFraEnPpFo=;
- b=AFBxjgyRK6phMAnCePKOqMQThLWp2Ulsm7WAC3ponYY7EgrdAmb1JY0HCX0pIZIMEF+QUXVsnk7KOPqqM1Blc/4LpZYk50VTklKT0v9ZkPEKsMCibRczxiaHc/2/zDjexn/VZ7mLJ3GpUUWoy2lKgjiAwHUKA9hp5j/GkVq74N/TosPOJ5BysJ3tcgOlSOg3eiQbAk5LfqVetFMlzA5sFvdQFG6JqEbP5QAqkLcctsRZTK1MAikpe7Sn28u7TEDKC4h9YKCZmODn8t/EcdSCO1pky4u4g04aGjsYrGtMkq2YCzGvQFb+9WexOVAYcOnk6fkK9PZ2rSB9O9pn63Kx0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR0402MB2910.eurprd04.prod.outlook.com (2603:10a6:800:b6::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Tue, 2 Feb
- 2021 18:34:50 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3805.022; Tue, 2 Feb 2021
- 18:34:50 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>, linux-fsdevel@vger.kernel.org,
-        Steve French <smfrench@gmail.com>
-Subject: Re: [PATCH v3] cifs: report error instead of invalid when
- revalidating a dentry fails
-In-Reply-To: <CANT5p=qpnLH_3UrOv9wKGbxa6D8RUSzbY+uposEbAeVaObjbHg@mail.gmail.com>
-References: <CANT5p=pK3hQNTvsR-WUmtrQFuKngx+A1iYfd0JXyb0WHqpfKMA@mail.gmail.com>
- <20210202174255.4269-1-aaptel@suse.com>
- <CANT5p=qpnLH_3UrOv9wKGbxa6D8RUSzbY+uposEbAeVaObjbHg@mail.gmail.com>
-Date:   Tue, 02 Feb 2021 19:34:48 +0100
-Message-ID: <87o8h28gjb.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:705:9f33:33e3:4e11:8cc3:3b4d]
-X-ClientProxiedBy: ZR0P278CA0104.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:23::19) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+        id S238039AbhBBTND (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Feb 2021 14:13:03 -0500
+Received: from p3plsmtpa08-08.prod.phx3.secureserver.net ([173.201.193.109]:45146
+        "EHLO p3plsmtpa08-08.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239362AbhBBTGC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 14:06:02 -0500
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id 70z9l1JAqHMLa70z9lA9T7; Tue, 02 Feb 2021 12:05:12 -0700
+X-CMAE-Analysis: v=2.4 cv=eq0acqlX c=1 sm=1 tr=0 ts=6019a268
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=SEc3moZ4AAAA:8 a=VwQbUJbxAAAA:8 a=yMhMjlubAAAA:8
+ a=yLneV2YlTdIBTJ7mUKcA:9 a=lwB08IF-Vn_DRAte:21 a=d9CYx2sHN4TzE1CL:21
+ a=QEXdDO2ut3YA:10 a=5oRCH6oROnRZc2VpWJZ3:22 a=AjGcO6oz07-iQ99wixmX:22
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [PATCH] CIFS: Wait for credits if at least one request is in
+ flight
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+References: <20210202010105.236700-1-pshilov@microsoft.com>
+ <40f473ff-bdd5-059c-36f1-d181eaa71200@talpey.com>
+ <CAKywueRkvEjaZ+u4QhG+aVKFKUf-smWRqLmeeRC-2=4xU=zmDA@mail.gmail.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <578dfbe3-18cd-3193-828f-54ddfdb9ffea@talpey.com>
+Date:   Tue, 2 Feb 2021 14:05:12 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:705:9f33:33e3:4e11:8cc3:3b4d) by ZR0P278CA0104.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:23::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.17 via Frontend Transport; Tue, 2 Feb 2021 18:34:49 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a26ddb3d-d394-470f-9342-08d8c7a9395b
-X-MS-TrafficTypeDiagnostic: VI1PR0402MB2910:
-X-Microsoft-Antispam-PRVS: <VI1PR0402MB2910334E670FFEBE7685625CA8B59@VI1PR0402MB2910.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9a94VmZ8TU6D7NprPcEwESob9+uPGOp/cwTLAMIkhXnVDILs324gB0r+dZqNM7m6dZXTQ2ILakYevzsoMSnNQ2lGmcw3XZoMUVuQDv5NqLI/JI26RP4m08621sTji7YM9S4Kv4vJgJcl2Mi8cqliBJR2hxByi5e6YbqLtyfjB/PClBpcWLSE7YDO1t0lWTmoqVGi6hgjL311+AJmC5NkMMOmS5JL53AJWLfJNUhI53B7z48uUQ5DbQrxrb1iPzL06nvz7Fq88g3uodW+bqHqkSL0gumL7owbmp8tAwrRnsR0K9AVgBn2uWGQRV9cQ4Yl4VA5drGZBucXyTAhCDEc2K6G/uNfIUrq1bDfkWYpUQkYW4DzgtZOSF8wd+w8xo2SOtK66DthcnlMqIgIOUD6aPFSLi9pFJF+ob96ygUNhvUaGYHnmsqI1S7jvSZbUnpkgCn0x1knsHDHMiwM0EWrDuYBVZTf6teU3rL9C65FUI0GD17vHi2uq/96YXXDmi/0aeepOz0s0vS+A1iiSNrWAw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(366004)(346002)(39860400002)(136003)(376002)(54906003)(36756003)(66476007)(86362001)(8936002)(52116002)(2616005)(4744005)(6496006)(2906002)(478600001)(66946007)(316002)(8676002)(16526019)(5660300002)(83380400001)(6916009)(6486002)(66556008)(4326008)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?UlA0Qlk3VDRhcWtqVlNLQU5jM0FmSHlxUnBqYy9SOEp5cEFBTk5ORGthYzNk?=
- =?utf-8?B?SE93dTNVSG1FbGdvc1YwbGNma0ZYVlpkNWExYUtMQURBK21QdlhYOW5TS2xM?=
- =?utf-8?B?RjJWRHI2VmNXdC8xNjBLTDliR0FxUnptT2lFaTVMcy91Vi96enlaQ1N1M2lR?=
- =?utf-8?B?U2JwcTVnNFpJVk5wb3BYWTJxVzN5azU3UEVoS0w2dXFvYjBpaVRyWUZYQXlP?=
- =?utf-8?B?RlBhc3BFWlFKV0s2T2kydkhiOFNDNWg3KzVSZ094WHdmbHBIS0RpVjR0N2Iv?=
- =?utf-8?B?V05YMU5HWFN6SXd1NmEweFJDdUV0N0NVVktmMmkyMHVOamI3QXBQWlppRy9m?=
- =?utf-8?B?V1RCUjFWWHhmLzhtekVIL00yUnZhUlREbFdEdEZpZnpaTEZhdDNNMXErV1Q0?=
- =?utf-8?B?d0x6aEdrNkNQQmhxNXpLWVZoRXhJVExvZlpZVGZkYlhvSVFScWJ4SkkwRHlE?=
- =?utf-8?B?bnlBaWttdGxvMzVvd0hrTTFlTGFSdWNUMmJULzNmTjhRTU16N0FybmRiRUFZ?=
- =?utf-8?B?QUNINHF1YVhJb0VKMTlCc0JvRVdmRUp3Umo3ZDZYOUUvZmVMaHZHNEZ1K3la?=
- =?utf-8?B?ZjBoSmFrd1pCRWpnR0JDUVpxZDFEQ0xxU2dEVXdtZmdybkVMSkU5bzVjcEU2?=
- =?utf-8?B?aUVjK29Sb1dsVVhCemg3ajE4dFFOTm1mMEVKTEpKamEvWUpWODRIVm5heUlz?=
- =?utf-8?B?cTJ2TFJ0aDZUbGUxNnNjOFRiQk5NQzh2ckRGUkRuS1c1RlpxQS80UVVpWnJL?=
- =?utf-8?B?TU9ZSU55SlZEbHNDZVZoTXMvWHJwb3ZybDBWcTdEMWNnUVhXeXRHRlRCU1Z0?=
- =?utf-8?B?ZjI4U3QrazZvU3RKTWdwMllpVWlwanBWK0ZVUzNNczFIMm4vZkhlSHRLWVN2?=
- =?utf-8?B?VGFtMzRMZU1MRW0rZ2Ftc0V4Z3B2dDlXaWRiUW5jYk4yVkhtbE5qWnB0c3Bz?=
- =?utf-8?B?b1NrTW5pa0MzeHM5REJHdDBpZHp3VlRnZFc3N2R2RjlaQVNTL3doeitrNDht?=
- =?utf-8?B?MkVwblpPd3VLbDFOZVNuS1UzbldHVkY5enB2MVQ0d3B1ZWFLWjYyZE9JNE5P?=
- =?utf-8?B?YVZsMy9ldGlLditGOEl3WEZ6cWVrdm9odEY5MUhVdFhWY2RoUHY4V2hwNXJ5?=
- =?utf-8?B?NGQ3eFpzbG5TYUE5QXhrTmlYRWpPa01SOXR5M2w5SHUwc1c0citONmJ0UGFy?=
- =?utf-8?B?NnhiWGQ4QnJ6K0VxeXJaL2lUMVJmQXl5Zk4vWGlIWnBGRHdGZmVRWjZIelRY?=
- =?utf-8?B?bzdPaE1DMy91U1lDejBXaC9FTFp2emdWZ1lZVmgybW9IMDBvRTBaS0hDcmxZ?=
- =?utf-8?B?UjlPOGNRTnRjODFqeXUxczd5OXVMd2Ira21ycXAxRFM1TlpTWkVyOFlKOGxC?=
- =?utf-8?B?ZTZ5MmlzTWF5VXR3RG83S3NUcUtXQTRzSDIrWUdRS3NTb2NzSHdZMWVzekx0?=
- =?utf-8?B?UjBnTnM4QStKbE9pZHFCY1Y1eS9BUnN1b3R6QTBDRlFaWWs5UHhId3dxYnVm?=
- =?utf-8?Q?E6GYHsEuWwMQEXeBLz7IvNqdrJa?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a26ddb3d-d394-470f-9342-08d8c7a9395b
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2021 18:34:50.0437
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tt+0sgGUuk9V2YvdWMHHp4L0JuVxJOY4631hpzd86R3/6WLXwtPMdQRRES/6XYB/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2910
+In-Reply-To: <CAKywueRkvEjaZ+u4QhG+aVKFKUf-smWRqLmeeRC-2=4xU=zmDA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfM+VnYvEMaQd3hbPavAaZQdNjBBM3jAMc2Yiy+03ga0PkqFVY6u5gXWsFJot/iDibAuuJE0QsZEHiz0UhxnFXozbP1MpRgBJS3uJRhKqBHOaGJeLag3T
+ /lP4oFPdNXZf+zEz26GLWOOeuLLvOH7Vkxmg3yI0OHFTH/wBZFmnvZqnbmpB/Kdl4bZjnIg7MVeW/cYKHQ1P2rIXVGisg7vjoh5k4ZfieWks3y8e/63Ye5Dr
+ 1v3sLV3gGLphK6113Him2QhzeyLbEh+sgubK44r1h1gXMoYU8MD+9phCJvxTjggTF3iaQpvQ+sbubbVca7YwbA==
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
-> This looks good to me.
-> Let me know if you get a chance to test it out. If not, I'll test it
-> on my setup tomorrow.
+On 2/2/2021 1:17 PM, Pavel Shilovsky wrote:
+> I agree that the error code may not be ideal. Shyam has a WIPto
+> replace it with EBUSY but EDEADLK may be a good alternative too. For
+> this patch I would prefer not to change the error code and only fix
+> the bug to allow less ricky backporting.
 
-I've done some tests: the reproducer cannot trigger the bug, accessing a
-deleted file invalidates, accessing an existing file revalidates. It looks
-ok.
+Sounds good to consider separately.
 
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+> Yes. If the server is tight on resources or just gives us less credits
+> for other reasons (e.g. requests are coming out of order and the
+> server delays granting more credits until it receives a missing mid)
+> and we exhausted most available credits there may be situations when
+> we try to send a compound request but we don't have enough credits. At
+> this point the client needs to decide if it should wait for credits or
+> fail a request. If at least one request is in flight there is a high
+> probability that the server returns enough credits to satisfy the
+> compound request (which are usually 3-4 credits long). So, we don't
+> want to fail the request in this case.
 
+Ah, yes it's true that with no requests in flight, the wait would be
+unbounded, and uncertain to gain credits even then. I think that is
+well worth capturing in a code comment where the failure is returned.
+
+It's still a concern that large requests may fall victim to being
+locked out by small ones, in the low-credit case. A "scheduler", or
+at least a credit reservation, would seem important in future. Or,
+as mentioned, modifying the requests to consume fewer credits each.
+
+It's easy to envision a situation where a low-credit server can be
+up, but a credit-greedy client might refuse to send it any requests
+at all.
+
+Tom.
+
+> --
+> Best regards,
+> Pavel Shilovsky
+> 
+> пн, 1 февр. 2021 г. в 19:39, Tom Talpey <tom@talpey.com>:
+>>
+>> It's reasonable to fail a request that can never have sufficient
+>> credits to send, but EOPNOTSUPP is a really strange error to return.
+>> The operation might work if the payload were smaller, right? So,
+>> would a resource error such as EDEADLK be more meaningful, and allow
+>> the caller to recover, even?
+>>
+>> Also, can you elaborate on why this is only triggered when no
+>> requests at all are in flight? Or is this some kind of corner
+>> case for requests that need every credit the server currently
+>> is offering?
+>>
+>> Tom.
+>>
+>> On 2/1/2021 8:01 PM, Pavel Shilovsky wrote:
+>>> Currently we try to guess if a compound request is going to succeed
+>>> waiting for credits or not based on the number of requests in flight.
+>>> This approach doesn't work correctly all the time because there may
+>>> be only one request in flight which is going to bring multiple credits
+>>> satisfying the compound request.
+>>>
+>>> Change the behavior to fail a request only if there are no requests
+>>> in flight at all and proceed waiting for credits otherwise.
+>>>
+>>> Cc: <stable@vger.kernel.org> # 5.1+
+>>> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+>>> ---
+>>>    fs/cifs/transport.c | 6 +++---
+>>>    1 file changed, 3 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+>>> index 4ffbf8f965814..84f33fdd1f4e0 100644
+>>> --- a/fs/cifs/transport.c
+>>> +++ b/fs/cifs/transport.c
+>>> @@ -659,10 +659,10 @@ wait_for_compound_request(struct TCP_Server_Info *server, int num,
+>>>        spin_lock(&server->req_lock);
+>>>        if (*credits < num) {
+>>>                /*
+>>> -              * Return immediately if not too many requests in flight since
+>>> -              * we will likely be stuck on waiting for credits.
+>>> +              * Return immediately if no requests in flight since
+>>> +              * we will be stuck on waiting for credits.
+>>>                 */
+>>> -             if (server->in_flight < num - *credits) {
+>>> +             if (server->in_flight == 0) {
+>>>                        spin_unlock(&server->req_lock);
+>>>                        return -ENOTSUPP;
+>>>                }
+>>>
+> 
