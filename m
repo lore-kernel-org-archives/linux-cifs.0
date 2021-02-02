@@ -2,106 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB45C433DB
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 02:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 263C0C433DB
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 03:49:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 363DA64E9C
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 02:37:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBA3464DDB
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 03:49:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230178AbhBBChi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 1 Feb 2021 21:37:38 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59278 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229822AbhBBChh (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 1 Feb 2021 21:37:37 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A93AE64DDC;
-        Tue,  2 Feb 2021 02:36:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612233417;
-        bh=aYaNKfCnYiSwQ0Jqq2pVkFBGnbFVGwDNv4yn576p31Q=;
-        h=Date:From:To:Cc:Subject:From;
-        b=CfapMaxXNMeg8aiNbpOFcHczkEMgpE1MjlaviMKqweOtGZGP+Hj6zt7reHB51vSkT
-         197C10/3oRRuTSk95F3SY/7IK2ZIMRP0LUlUYQUE7R35yr/sSHDx3jxGpGwIGeYCJR
-         DGWzXc2L84ihlAuaMaITeYrbihax7s2houJ43nbpP1K6KQjee7kXWS5bTK6HFhWsmc
-         njPbh/wOvNwTpDKd/uMFgxlavoScyAlAGr6a+Q9f0iiQLa9YimlYDfBjhjt7VGnRzX
-         1oLhE16NBH6RtTnmwG7lJwtsuTXZIjTuSCK2uwQ3hN5oZ65u9bByKIH+g345+yeleg
-         1iNtvIPYu2anA==
-Date:   Mon, 1 Feb 2021 20:36:54 -0600
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Steve French <sfrench@samba.org>,
-        Pavel Shilovsky <pshilov@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        linux-hardening@vger.kernel.org
-Subject: [PATCH] smb3: Fix out-of-bounds bug in SMB2_negotiate()
-Message-ID: <20210202023654.GA265921@embeddedor>
+        id S229819AbhBBDtQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 1 Feb 2021 22:49:16 -0500
+Received: from p3plsmtpa08-06.prod.phx3.secureserver.net ([173.201.193.107]:39287
+        "EHLO p3plsmtpa08-06.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229677AbhBBDtP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 1 Feb 2021 22:49:15 -0500
+X-Greylist: delayed 533 seconds by postgrey-1.27 at vger.kernel.org; Mon, 01 Feb 2021 22:49:15 EST
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id 6mXQlaHCvyy0q6mXRlLQC6; Mon, 01 Feb 2021 20:39:37 -0700
+X-CMAE-Analysis: v=2.4 cv=AskrYMxP c=1 sm=1 tr=0 ts=6018c979
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=VwQbUJbxAAAA:8 a=yMhMjlubAAAA:8 a=7Jr-j7xVvhaDlciuaIMA:9
+ a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [PATCH] CIFS: Wait for credits if at least one request is in
+ flight
+To:     Pavel Shilovsky <piastryyy@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs@vger.kernel.org
+References: <20210202010105.236700-1-pshilov@microsoft.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <40f473ff-bdd5-059c-36f1-d181eaa71200@talpey.com>
+Date:   Mon, 1 Feb 2021 22:39:37 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210202010105.236700-1-pshilov@microsoft.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfDzuO96CXOErBaJegBjpBb7jt7DBUleZ04W0hZYyEbDYS5tGs17H4I13tNfPMsoQgNZSzagtIWAVb2tQl6HHD84HYzFUTrmXjetm9tip8IqvuW59gGtW
+ cKhb0LMsA8d1dJjo4xapXWmg9+/oT3G+XFA/vyXnr/3/H2HZu5T+zPvopsDXzBuQGHCmsnuNMxfqAhQkm+6tXuWfGMFbPgEiBQVq29q+bHbzyyX9gsZOpqUP
+ qW3TUQGd0L2HY6+G8aA8RMmIzUTNvWOX5USdYDv2dAs2t/fyde1CJp0JeRnWP+o69SdBjt9O/aFXBmZdR2rCPw==
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-While addressing some warnings generated by -Warray-bounds, I found this
-bug that was introduced back in 2017:
+It's reasonable to fail a request that can never have sufficient
+credits to send, but EOPNOTSUPP is a really strange error to return.
+The operation might work if the payload were smaller, right? So,
+would a resource error such as EDEADLK be more meaningful, and allow
+the caller to recover, even?
 
-  CC [M]  fs/cifs/smb2pdu.o
-fs/cifs/smb2pdu.c: In function ‘SMB2_negotiate’:
-fs/cifs/smb2pdu.c:822:16: warning: array subscript 1 is above array bounds
-of ‘__le16[1]’ {aka ‘short unsigned int[1]’} [-Warray-bounds]
-  822 |   req->Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
-      |   ~~~~~~~~~~~~~^~~
-fs/cifs/smb2pdu.c:823:16: warning: array subscript 2 is above array bounds
-of ‘__le16[1]’ {aka ‘short unsigned int[1]’} [-Warray-bounds]
-  823 |   req->Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
-      |   ~~~~~~~~~~~~~^~~
-fs/cifs/smb2pdu.c:824:16: warning: array subscript 3 is above array bounds
-of ‘__le16[1]’ {aka ‘short unsigned int[1]’} [-Warray-bounds]
-  824 |   req->Dialects[3] = cpu_to_le16(SMB311_PROT_ID);
-      |   ~~~~~~~~~~~~~^~~
-fs/cifs/smb2pdu.c:816:16: warning: array subscript 1 is above array bounds
-of ‘__le16[1]’ {aka ‘short unsigned int[1]’} [-Warray-bounds]
-  816 |   req->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
-      |   ~~~~~~~~~~~~~^~~
+Also, can you elaborate on why this is only triggered when no
+requests at all are in flight? Or is this some kind of corner
+case for requests that need every credit the server currently
+is offering?
 
-At the time, the size of array _Dialects_ was changed from 1 to 3 in struct
-validate_negotiate_info_req, and then in 2019 it was changed from 3 to 4,
-but those changes were never made in struct smb2_negotiate_req, which has
-led to a 3 and a half years old out-of-bounds bug in function
-SMB2_negotiate() (fs/cifs/smb2pdu.c).
+Tom.
 
-Fix this by increasing the size of array _Dialects_ in struct
-smb2_negotiate_req to 4.
-
-Fixes: 9764c02fcbad ("SMB3: Add support for multidialect negotiate (SMB2.1 and later)")
-Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
- fs/cifs/smb2pdu.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index d85edf5d1429..a5a9e33c0d73 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -286,7 +286,7 @@ struct smb2_negotiate_req {
- 	__le32 NegotiateContextOffset; /* SMB3.1.1 only. MBZ earlier */
- 	__le16 NegotiateContextCount;  /* SMB3.1.1 only. MBZ earlier */
- 	__le16 Reserved2;
--	__le16 Dialects[1]; /* One dialect (vers=) at a time for now */
-+	__le16 Dialects[4]; /* BB expand this if autonegotiate > 4 dialects */
- } __packed;
- 
- /* Dialects */
--- 
-2.27.0
-
+On 2/1/2021 8:01 PM, Pavel Shilovsky wrote:
+> Currently we try to guess if a compound request is going to succeed
+> waiting for credits or not based on the number of requests in flight.
+> This approach doesn't work correctly all the time because there may
+> be only one request in flight which is going to bring multiple credits
+> satisfying the compound request.
+> 
+> Change the behavior to fail a request only if there are no requests
+> in flight at all and proceed waiting for credits otherwise.
+> 
+> Cc: <stable@vger.kernel.org> # 5.1+
+> Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+> ---
+>   fs/cifs/transport.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+> index 4ffbf8f965814..84f33fdd1f4e0 100644
+> --- a/fs/cifs/transport.c
+> +++ b/fs/cifs/transport.c
+> @@ -659,10 +659,10 @@ wait_for_compound_request(struct TCP_Server_Info *server, int num,
+>   	spin_lock(&server->req_lock);
+>   	if (*credits < num) {
+>   		/*
+> -		 * Return immediately if not too many requests in flight since
+> -		 * we will likely be stuck on waiting for credits.
+> +		 * Return immediately if no requests in flight since
+> +		 * we will be stuck on waiting for credits.
+>   		 */
+> -		if (server->in_flight < num - *credits) {
+> +		if (server->in_flight == 0) {
+>   			spin_unlock(&server->req_lock);
+>   			return -ENOTSUPP;
+>   		}
+> 
