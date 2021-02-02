@@ -5,141 +5,141 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA2DC433DB
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D874C433E6
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:30:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4933064F6A
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:20:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11EE564F6A
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:30:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238414AbhBBSUf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 Feb 2021 13:20:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48672 "EHLO
+        id S238566AbhBBSaK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Feb 2021 13:30:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238470AbhBBSSs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 13:18:48 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73D13C0613ED
-        for <linux-cifs@vger.kernel.org>; Tue,  2 Feb 2021 10:18:08 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id g10so5729993eds.2
-        for <linux-cifs@vger.kernel.org>; Tue, 02 Feb 2021 10:18:08 -0800 (PST)
+        with ESMTP id S238658AbhBBS2S (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 13:28:18 -0500
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36C7C0613ED;
+        Tue,  2 Feb 2021 10:27:10 -0800 (PST)
+Received: by mail-yb1-xb31.google.com with SMTP id w204so18561043ybg.2;
+        Tue, 02 Feb 2021 10:27:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=T9gj7OIrcg4lBNUAaeh50TT0hOOC1PeFaOKk618aYA0=;
-        b=XdKY9wg3RbeHs4QwexiuHUVySSkXEM+9HGt1ry8LylirKDSlwC1gWywqj4Hpv/ZYOc
-         RbrepXaV9lxTAs57cZ/5G84XbevRh9YLrgydx7xWAYD/+iQ5SH2XhXDQm9Wa7bGUftDY
-         gWoar2U1K5ohBoDYKWBlzGbyLfEoa5UyD0DUB3Eepb1q84lnb3yOm0CYeW67MHuqWvQn
-         uREZPBTym5o7LykfjujQAvKb4GtHLBwi5v9cA+2XUs7flelce5ti7kNrZJDim25UjVCc
-         9P2EgeOdfyPrlUfPRN5VsoH9fWJn1OU9UOXo9taux9Im29ETftjuNblp/58lPvOzHvJq
-         nwuw==
+        bh=2m+4pyELxLE13nsixgO1GZFaxwadXVMCGTsY4w3OVJY=;
+        b=iH/hjlSTcK/WUrScRZ1W4uKC/2RW7YgB2I67slCiw+J7L74m92cTOCFUEhYt6GPPYJ
+         TNrVi9YOPsXDEe1q0M3jzm0BbUK9YvhQEQ0iDXS8RlECMaTnWvZ8G+MiUvMTLzZ94rGY
+         uCxHE6ynRkaSzQlvjKoAsvHjjMefNDJOUomB2Xy54sCOcUeRP/Q7eQ+zAIBgws9LCVEI
+         4DJc7v0k6hbWdrnNrNjXNQfZhtBEgPnmSkgiXjdY2QOqUsiEv1Lfllkii2XkJ5f32EZA
+         KzZA2bR83F+/Zwrhat3pyq7wv4YcgtlLs4im8V7I1HnY3IzW+irqD7yt/l373H3+kBKL
+         5REw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=T9gj7OIrcg4lBNUAaeh50TT0hOOC1PeFaOKk618aYA0=;
-        b=Z/VQzpHiHm1fiUzGMzQzdb2B7e5AtMPAF/tjuWhxqpPY+53NoUDwTVGAObxhvrYnUS
-         2ka/8ZUXjU0WHKJR57IQe0Vk+/8ln7/sl8NO8tVXEYYATd7x4o1bwhFCWpjQ/WK1kC7m
-         /SdSwOmKa8s+Elv4+mEDWY5o7OmQ3W0Y7k5zzrvFMCgOFnzTh+Vu9iahNhPfH/XhWpLB
-         ljoG7vn1jL2Ob7dQvqsFw8nTzH8YFExST77L+CTyHmdrAyrEm0ovrffnYgwZ+6ZYTWCY
-         ZwP79XIqXxA/9fpVVVakn2Uow/CLunV94d3ftt9ODJUrT201yei+0RT4q+ZU26oCOKSc
-         dZQw==
-X-Gm-Message-State: AOAM531/X6cUJVpHCpATPEQnY8p6BgMv8hSJZcMp6KzCjFGuEgCqt4f8
-        JZ9qPlCsU4w0RGXmiUbzqmyEQW/11BTQaqUPPw==
-X-Google-Smtp-Source: ABdhPJyCzPC5x/ea1IhmEPFQ6pgabpt+wsz+/oE4HzettxMPaFfoip1Uq1Ilo7nPVx7avbnk5vwkDZZ7IPDIk3yF4Ao=
-X-Received: by 2002:a50:fd84:: with SMTP id o4mr219047edt.340.1612289886924;
- Tue, 02 Feb 2021 10:18:06 -0800 (PST)
+        bh=2m+4pyELxLE13nsixgO1GZFaxwadXVMCGTsY4w3OVJY=;
+        b=Q+RBZsfI5jtJrcJrHrOVYcsTtkGxTAn694174s4tAr0KjvscaX9ASc1b8gDDctbPFJ
+         f6nLCvhs6+NRv4xfNfOJr/ORez3N/MqU2SlVjp44MC7srl9ZPpANFtIYeIVOf8ze1kKj
+         ODXRa+ZoTcOQ2qYAtz+AAGHLNz68tuYWY/6cdWVn0hEd5bPhEmjo3nF+7GvNeeueXujo
+         bAKOd0+M0MlZNkbnvp5MvdiaXlyHRtmypq9i2e8Tg1kc0etBwQO+qEGgKAk/d9Q7enSp
+         P/WnDlMNvptTTVQtHf1TOLsUJpZPzI+pbEhAyq2guPUEno/TN5ER3ojxPD0wJwSzF6jw
+         MrJw==
+X-Gm-Message-State: AOAM5339Fejg9ZyEBZxtNvgUGEkxz8dmFIZKe9XRpUQL1ym0SHiT6TCi
+        v8B/lwObOW7PvkpSt62e6YSxzevC1Ik+aO6B51A=
+X-Google-Smtp-Source: ABdhPJztICRpjgAeo6h64EPn9Ac6G58x7ZYmJHnfsUg329dBjTiOByo9yfCXxe2/kgukd88fYDdN9lO+ZDVjzOmmpxA=
+X-Received: by 2002:a25:aa70:: with SMTP id s103mr25192741ybi.131.1612290429960;
+ Tue, 02 Feb 2021 10:27:09 -0800 (PST)
 MIME-Version: 1.0
-References: <20210202010105.236700-1-pshilov@microsoft.com> <40f473ff-bdd5-059c-36f1-d181eaa71200@talpey.com>
-In-Reply-To: <40f473ff-bdd5-059c-36f1-d181eaa71200@talpey.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Tue, 2 Feb 2021 10:17:55 -0800
-Message-ID: <CAKywueRkvEjaZ+u4QhG+aVKFKUf-smWRqLmeeRC-2=4xU=zmDA@mail.gmail.com>
-Subject: Re: [PATCH] CIFS: Wait for credits if at least one request is in flight
-To:     Tom Talpey <tom@talpey.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
+References: <CANT5p=pK3hQNTvsR-WUmtrQFuKngx+A1iYfd0JXyb0WHqpfKMA@mail.gmail.com>
+ <20210202174255.4269-1-aaptel@suse.com>
+In-Reply-To: <20210202174255.4269-1-aaptel@suse.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Tue, 2 Feb 2021 23:56:58 +0530
+Message-ID: <CANT5p=qpnLH_3UrOv9wKGbxa6D8RUSzbY+uposEbAeVaObjbHg@mail.gmail.com>
+Subject: Re: [PATCH v3] cifs: report error instead of invalid when
+ revalidating a dentry fails
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, linux-fsdevel@vger.kernel.org,
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I agree that the error code may not be ideal. Shyam has a WIPto
-replace it with EBUSY but EDEADLK may be a good alternative too. For
-this patch I would prefer not to change the error code and only fix
-the bug to allow less ricky backporting.
+This looks good to me.
+Let me know if you get a chance to test it out. If not, I'll test it
+on my setup tomorrow.
 
-Yes. If the server is tight on resources or just gives us less credits
-for other reasons (e.g. requests are coming out of order and the
-server delays granting more credits until it receives a missing mid)
-and we exhausted most available credits there may be situations when
-we try to send a compound request but we don't have enough credits. At
-this point the client needs to decide if it should wait for credits or
-fail a request. If at least one request is in flight there is a high
-probability that the server returns enough credits to satisfy the
-compound request (which are usually 3-4 credits long). So, we don't
-want to fail the request in this case.
+Regards,
+Shyam
 
---
-Best regards,
-Pavel Shilovsky
+On Tue, Feb 2, 2021 at 11:13 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
+:
+>
+> From: Aurelien Aptel <aaptel@suse.com>
+>
+> Assuming
+> - //HOST/a is mounted on /mnt
+> - //HOST/b is mounted on /mnt/b
+>
+> On a slow connection, running 'df' and killing it while it's
+> processing /mnt/b can make cifs_get_inode_info() returns -ERESTARTSYS.
+>
+> This triggers the following chain of events:
+> =3D> the dentry revalidation fail
+> =3D> dentry is put and released
+> =3D> superblock associated with the dentry is put
+> =3D> /mnt/b is unmounted
+>
+> This patch makes cifs_d_revalidate() return the error instead of
+> 0 (invalid) when cifs_revalidate_dentry() fails, except for ENOENT
+> where that error means the dentry is invalid.
+>
+> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+> Suggested-by: Shyam Prasad N <nspmangalore@gmail.com>
+> ---
+>  fs/cifs/dir.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index 68900f1629bff..868c0b7263ec0 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -737,6 +737,7 @@ static int
+>  cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
+>  {
+>         struct inode *inode;
+> +       int rc;
+>
+>         if (flags & LOOKUP_RCU)
+>                 return -ECHILD;
+> @@ -746,8 +747,11 @@ cifs_d_revalidate(struct dentry *direntry, unsigned =
+int flags)
+>                 if ((flags & LOOKUP_REVAL) && !CIFS_CACHE_READ(CIFS_I(ino=
+de)))
+>                         CIFS_I(inode)->time =3D 0; /* force reval */
+>
+> -               if (cifs_revalidate_dentry(direntry))
+> -                       return 0;
+> +               rc =3D cifs_revalidate_dentry(direntry);
+> +               if (rc) {
+> +                       cifs_dbg(FYI, "cifs_revalidate_dentry failed with=
+ rc=3D%d", rc);
+> +                       return rc =3D=3D -ENOENT ? 0 : rc;
+> +               }
+>                 else {
+>                         /*
+>                          * If the inode wasn't known to be a dfs entry wh=
+en
+> --
+> 2.29.2
+>
 
-=D0=BF=D0=BD, 1 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 19:39, Tom Ta=
-lpey <tom@talpey.com>:
->
-> It's reasonable to fail a request that can never have sufficient
-> credits to send, but EOPNOTSUPP is a really strange error to return.
-> The operation might work if the payload were smaller, right? So,
-> would a resource error such as EDEADLK be more meaningful, and allow
-> the caller to recover, even?
->
-> Also, can you elaborate on why this is only triggered when no
-> requests at all are in flight? Or is this some kind of corner
-> case for requests that need every credit the server currently
-> is offering?
->
-> Tom.
->
-> On 2/1/2021 8:01 PM, Pavel Shilovsky wrote:
-> > Currently we try to guess if a compound request is going to succeed
-> > waiting for credits or not based on the number of requests in flight.
-> > This approach doesn't work correctly all the time because there may
-> > be only one request in flight which is going to bring multiple credits
-> > satisfying the compound request.
-> >
-> > Change the behavior to fail a request only if there are no requests
-> > in flight at all and proceed waiting for credits otherwise.
-> >
-> > Cc: <stable@vger.kernel.org> # 5.1+
-> > Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
-> > ---
-> >   fs/cifs/transport.c | 6 +++---
-> >   1 file changed, 3 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-> > index 4ffbf8f965814..84f33fdd1f4e0 100644
-> > --- a/fs/cifs/transport.c
-> > +++ b/fs/cifs/transport.c
-> > @@ -659,10 +659,10 @@ wait_for_compound_request(struct TCP_Server_Info =
-*server, int num,
-> >       spin_lock(&server->req_lock);
-> >       if (*credits < num) {
-> >               /*
-> > -              * Return immediately if not too many requests in flight =
-since
-> > -              * we will likely be stuck on waiting for credits.
-> > +              * Return immediately if no requests in flight since
-> > +              * we will be stuck on waiting for credits.
-> >                */
-> > -             if (server->in_flight < num - *credits) {
-> > +             if (server->in_flight =3D=3D 0) {
-> >                       spin_unlock(&server->req_lock);
-> >                       return -ENOTSUPP;
-> >               }
-> >
+
+--=20
+Regards,
+Shyam
