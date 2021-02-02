@@ -2,176 +2,185 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A539C4332B
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 17:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5619C433DB
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:01:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5EA464DA3
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 17:46:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8926D64E3E
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:01:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237858AbhBBRp7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 Feb 2021 12:45:59 -0500
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:41492 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237822AbhBBRoL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 12:44:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1612287781;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HGcnKVUALzGGga4EVprl6Cu07r8GRqHpwFmuqLlvnO4=;
-        b=TUn3v9hZvDpGfUPmqDZ7iGI7IkHkpWVDQP8KY4E8XRNFy0YRKnlS7ysfMVxSt1C+9lbBMj
-        Bgj2NXgvJuK0XW+GruY70aTSkUgDgbBBNml0GhUDxvtkGZqLuuT7jcwQuHMnT5jDQAoV5M
-        q8JBF29all685DySoNWNf6dcAwM7RrM=
-Received: from EUR03-DB5-obe.outbound.protection.outlook.com
- (mail-db5eur03lp2057.outbound.protection.outlook.com [104.47.10.57]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-13-qgW0Yw_LMTqSbqH4mzKAhw-1; Tue, 02 Feb 2021 18:43:00 +0100
-X-MC-Unique: qgW0Yw_LMTqSbqH4mzKAhw-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HgKgWn/43czZANi5B39mzKnFyCYwTr60sxrcYKAJdaAxaUKY+H7PZuegEfmoYDAwCD/3psW12gM6t9GDQsErURWcfc7eEU0x1Js4F02FxlLtSNIDXzeOr8ZPqwPjtdh3o1ucZLdjx9oupXV/axrgTmwiV9A8tiu7ZdDTw9tUMOMTqk0enhbwDL15GID2ckTBgume9G5bmyfPyz73TwvBp61wlk6EPHN8ukRIwYWI4UxrlgNIXy8oo5RByYArx3a1tbXccE6ILGj3DCLc/0aMy5VixuAME7eU8BSv7/HQnRmPSXLeMWBEmX0s7P+HT3C5l48cB23dg8rN6zZR2LNF7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PJsEHSSTZ6DgO8gx+SOhxzgHvw7aWzR1qoEfzaMA2Vk=;
- b=S/r/uGniVmSbOQhlj3ynyPdDeQmuezI9SKLLy0zwUToa5vCwLu6CSvPd52oo3myq/r7DcfRdFISfyoGCbd2OWLarSVc4WzV/rRHLAKMm5tt+RM7o03z71AtRo09TkkAbHVgeiOxBcLSyxUl55nOdy1cULBVWGazCUt2zKUV0NJS/bdK/7jW65b6dOmlk5EglNFiF2FTsHscgbaoD2071l1lTIwH7PUvwICQSJdoxJhe4rzKY37MHVwP4pwE1Gth/4RhsS+ZU3eFh4dDIfc5D8KrHKW23S3Vb4ujDMf0wwdcYOZMLSxgUbuVacj6f5e8+bkrqoeKRe+JQ2t2YiQU5FA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR04MB5215.eurprd04.prod.outlook.com (2603:10a6:803:59::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Tue, 2 Feb
- 2021 17:42:57 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3805.022; Tue, 2 Feb 2021
- 17:42:57 +0000
-From:   =?UTF-8?q?Aur=C3=A9lien=20Aptel?= <aaptel@suse.com>
-To:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-CC:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>
-Subject: [PATCH v3] cifs: report error instead of invalid when revalidating a dentry fails
-Date:   Tue,  2 Feb 2021 18:42:55 +0100
-Message-ID: <20210202174255.4269-1-aaptel@suse.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <CANT5p=pK3hQNTvsR-WUmtrQFuKngx+A1iYfd0JXyb0WHqpfKMA@mail.gmail.com>
-References: <CANT5p=pK3hQNTvsR-WUmtrQFuKngx+A1iYfd0JXyb0WHqpfKMA@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-Originating-IP: [2003:fa:705:9f33:33e3:4e11:8cc3:3b4d]
-X-ClientProxiedBy: ZR0P278CA0016.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:16::26) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+        id S237949AbhBBSBE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Feb 2021 13:01:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44436 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238110AbhBBR7K (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 12:59:10 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C5FC061788
+        for <linux-cifs@vger.kernel.org>; Tue,  2 Feb 2021 09:58:30 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id d2so23959335edz.3
+        for <linux-cifs@vger.kernel.org>; Tue, 02 Feb 2021 09:58:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=1Fg9Cg1bRF7U4QfGthw1dSAbOWbWjadgBrlqJMHuQ4c=;
+        b=PXU4JXGpfeGWjz162LIQsTXmR2OsYh2/MmdUeccD0188PH2b17KeX7HyA2NigrJsYL
+         Gkz9f1ggvNujtu0fDo9fqmFcMH4arcDAlBQ+ryuWk8ykqgVvmt132MJ+/u/+lAKq3m5i
+         Zfbg+s3rXC6E7/Ugb3mI7ejFpf9lNz82SjBjCkqg+94yiKmz03LdMCRvbHanYZh3t0VL
+         eGTnxYo0xjm6E3wyCws4IptTALeaKQWLnJV0UK0RfPQ6QE6kHBk2+0aiZqxVpidDzZBC
+         ZSAu4wbc1UroiESAT+IsnD4uGFUP14sNh8664dxBtfoTie/oe/vqSpoS4NcEMQ2aesPJ
+         38hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=1Fg9Cg1bRF7U4QfGthw1dSAbOWbWjadgBrlqJMHuQ4c=;
+        b=aahe5xKsJGUV+kp+PAFcCl4dwehlilcpm+VTcnYOmpltcaOLSBGCSGQc7DIX+/9oWC
+         xLnMQeVf7TakAIp7U4bYy3Sc5yEwIFOHH+tU/cF4FJBBia0fGBKsTy8YACC7IJXuhGXL
+         R2ZMGC8Ge/MXAEfnrihI65i/uya8zuPJd8ucZK1QZK/UD/bePAn2b3mUz2pbfvjFCb4h
+         ukWT7HZMCEyPvGIuFVcM969iiOLSEC31BfBkUGcfKTwPkQ21/H8o85PWTgOIjAk1l8lC
+         SWCGkjpdwW4mCOIT2reu6F5Yuxj6AMpjdZxupo1RU2j54fFDpX+L+UknpwMfDxfHC0SF
+         lSDQ==
+X-Gm-Message-State: AOAM531tazc/Pof12JQmuFiGwi8013CGA4/bKoV5LtO1zj0W13KayvBd
+        hNDioXiE5nemAqtjVdEf2mYnAL6yKk5mVh4pzA==
+X-Google-Smtp-Source: ABdhPJwIWMLIu7JcHLqXSP830Fx9KJmkrjVxo72YzV1O7VRhIUX/bwn867Ns6cQjQQlzHJViGkw2HPAaBnAwpgtkoXk=
+X-Received: by 2002:a50:8b66:: with SMTP id l93mr123387edl.384.1612288708881;
+ Tue, 02 Feb 2021 09:58:28 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:705:9f33:33e3:4e11:8cc3:3b4d) by ZR0P278CA0016.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:16::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.17 via Frontend Transport; Tue, 2 Feb 2021 17:42:57 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c3f6c55c-df9f-4d8c-b251-08d8c7a1fa33
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5215:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR04MB52152115A2EDAB82FD41F8A2A8B59@VI1PR04MB5215.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1775;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E6tCMpCgpm+HFLsmvVgPwGGRY/oZv6xEUwznIzyr4fdTrp/g7/TNaQXB9jVmp3vUpq+D1iA8rGMqBaP7/4KO+9X3vlvQx03ULuEe3xbBQm+USQcdFWhbRWIyMZqTNkYwWhpibW1gRh3qeP3OcsQYgluiR4b0i3zUQ2zslrdwwI5HoQ6+S8KEsF5+xBhBdQ+VferGCTeuWPb2JnUfeyiHQMIzzyLVg6TLI0yd8eeIMbA+5Q7ri/1jsJCn9V7JhX15tZ/Q6nvMojJPtDLWSiwQ8MPInsfWc6ek6YBH5YaaOJRdiqY14gWY3vLScakuxLJoAyuScjk8vtJBgwFGeAG3Or8pcCDOdRvXvcAk76omp+UCN+QvKo1dTv9K+n2eSbLzRQpHRqNiAaoQDmqDAoc/xxF0yPRJoWvq7r65+wIl3XV/jHlcYtJD1Y4i7MYdgh7SIYoLya2Qn8YlF9fheIyQ9MePiz2cRwzz21/qGZ9rMMWwqgs4DZYxMAK+2yCYaslv7bKZ0W2ZUhklstVyUBkupNotdjl0Rdae6kAt8/29a/MjBc1EvXFO4E4sJVsO4IkyaJD12sQFBqqtL21JKe/deo47G2dCL+xVhSmUZqMJFOgulOxS1JAXLTlWFMGE6GML2RFnR9PcV8vDIELuQYhGheg/6ZFqtDH4LwQnXayiAOOZx7nV8mF2tCD0HB+SteDTcEA+7yCAL3Lxz/1UPBahTpS4Y9ZUDk7DFcwjDKhXRK7wEtUYGhDFnCPrD1fzEcJWSnygoEotKu3aZGXJsGuaN6oxUcpoQIyEQbIHfG/I1+39rcg+VOykKP26tbc6Y0i3UThuIMBE4hx+ZRWj8pe2O2z7P4HWJ2W0V8jF01XoBGZ06GVfgZ8mKGW1FeRDBQ2yirwVs3zFn7E7cwlHDD/kZQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:OSPM;SFS:(366004)(136003)(396003)(39860400002)(346002)(376002)(316002)(54906003)(83380400001)(478600001)(2616005)(6486002)(36756003)(8936002)(6496006)(52116002)(8676002)(66946007)(86362001)(2906002)(1076003)(186003)(66556008)(66476007)(16526019)(5660300002)(4326008)(23200700001);DIR:OUT;SFP:1501;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?kx2MnQgyIvDzKKVo182nNTKtJ7ui0pzyNZMaFC9/IlfVx2tFT0aBwE2XOsoT?=
- =?us-ascii?Q?UvBvuJDgQ1yAWgSeQCyinPU9pAJVU5NHi6jecwGyD17hrpZJQfBlW83k0d4X?=
- =?us-ascii?Q?Qi5YWA45U+xjQ5vngfUqlkTFBScJHRBvA7TYkgJeefCE2iJbs/bw/GcvEMF2?=
- =?us-ascii?Q?SQNPIYX6D85cAxwE5vitGGIiP8qcUOtYCbCah7WZRObnGQTpqxFlxONsorqk?=
- =?us-ascii?Q?nyPeyRdDEZlid0xnOqleUKL0Kr7R+EP3PcslHam2ydfdJaZzu0fQ2eRZY6BS?=
- =?us-ascii?Q?uBeezserujpovCuWvPed79HwwlqNJxT+d8MagUyiMsMbSjqTg+S3Qo3pPVSU?=
- =?us-ascii?Q?rcLZFynK8jzB6iI4WSlDeDyEwuKmHtZzDhosS5KGBLUoBpMSzta9Et17m8XI?=
- =?us-ascii?Q?zsIOSTf4UjnCxcorsKobTjPRPBituOuFVPYosh35A7EyTdbPTS+Sn272wGfI?=
- =?us-ascii?Q?dKHjze5OrPFJlcMomNCWwEUsZ/At0oxTv1wqxsrsZcCVQbApl+SOO8U33sqH?=
- =?us-ascii?Q?LS51FrndQqeCmEv83vhd9KEjRUhsiEMWviM/9SaKdlkuUKf0fPUDJcf3PhiW?=
- =?us-ascii?Q?//kHGcoxjiHLJHkQ2XRNpWhx7H2wOcneuCLOqOtIdtHRWjdICw5skkQ/Frez?=
- =?us-ascii?Q?4PWYXje4DqP56xn3wAxxTG7A4mn4CUPs3/yvRAv4SYZLGZkkh235otdTUAW4?=
- =?us-ascii?Q?l55ceAu3OykkydrdLiuSsgGTJDk+CB70O/MFd19eVwDbavhwRvr/RpI6nfN3?=
- =?us-ascii?Q?uYcrvX7pfT3AC9nAwU5RJZF3C/Ehx2JnmdZ1fxb+Q5ES8FGJXpWZkV0DO4r2?=
- =?us-ascii?Q?PL75llUue8q6A3BoxgNXR5hEnEHQFtLy34v0JlNeddtshXuBRn57JWbOmoG0?=
- =?us-ascii?Q?b8BeGCcQJE2M6Yzukrxo/ArBveYMoMfBF1nBjCnM+0CeRoyTx48pnctzffPY?=
- =?us-ascii?Q?dRrQ8TMDHjzEzQARmkgLtTNMBlHj3rpta28BZ4zWez+f1OGLeQUFMtoi7iJt?=
- =?us-ascii?Q?FEYazTtZzmyru7Spsx75PEHqVwz45bVK1Nx5qXq04RAMOLq+ZIJz+NPfmV74?=
- =?us-ascii?Q?W/yLjskGRsixpbk7hbCNt3ySzYzfmfO0iUgUmTapYr9Y2HBlIHPIRw9jAs5j?=
- =?us-ascii?Q?8ngXsjPd9ObG?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3f6c55c-df9f-4d8c-b251-08d8c7a1fa33
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2021 17:42:57.5358
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mYViI+c6CdK9qrlAFOAhqseN8rR66Cd0ExQlxoFwKB4mQnXAUygPV01XD2NCbQLv
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5215
+References: <CAH2r5mt7Z2wJTLFp1T0qtsrJb95FPKoffBN9WBM=JAi=HcyiOg@mail.gmail.com>
+In-Reply-To: <CAH2r5mt7Z2wJTLFp1T0qtsrJb95FPKoffBN9WBM=JAi=HcyiOg@mail.gmail.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Tue, 2 Feb 2021 09:58:17 -0800
+Message-ID: <CAKywueTvFL7GA3he21XjX8fig73iT5OCAd=JjBq6OOwOavcehA@mail.gmail.com>
+Subject: Re: PATCH] smb3: include current dialect (SMB3.1.1) when version 3 or
+ greater requested on mount
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Aurelien Aptel <aaptel@suse.com>
+=D0=BF=D0=BD, 1 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 22:15, Steve =
+French <smfrench@gmail.com>:
+>
+> SMB3.1.1 is the newest, and preferred dialect, and is included in
+> the requested dialect list by default (ie if no vers=3D is specified
+> on mount) but it should also be requested if SMB3 or later is requested
+> (vers=3D3 instead of a specific dialect: vers=3D2.1, vers=3D3.02 or vers=
+=3D3.0).
+>
+> Currently specifying "vers=3D3" only requests smb3.0 and smb3.02 but this
+> patch fixes it to also request smb3.1.1 dialect, as it is the newest
+> and most secure dialect and is a "version 3 or later" dialect (the intent
+> of "vers=3D3").
+>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> Suggested-by: Pavel Shilovsky <pshilov@microsoft.com>
+> ---
+>  fs/cifs/fs_context.c |  2 +-
+>  fs/cifs/smb2pdu.c    | 19 +++++++++++++------
+>  2 files changed, 14 insertions(+), 7 deletions(-)
+>
+> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+> index 5111aadfdb6b..479c24695281 100644
+> --- a/fs/cifs/fs_context.c
+> +++ b/fs/cifs/fs_context.c
+> @@ -391,7 +391,7 @@ cifs_parse_smb_version(char *value, struct
+> smb3_fs_context *ctx, bool is_smb3)
+>   ctx->vals =3D &smb3any_values;
+>   break;
+>   case Smb_default:
+> - ctx->ops =3D &smb30_operations; /* currently identical with 3.0 */
+> + ctx->ops =3D &smb30_operations;
+>   ctx->vals =3D &smbdefault_values;
+>   break;
+>   default:
+> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> index 794fc3b68b4f..52625549c3b5 100644
+> --- a/fs/cifs/smb2pdu.c
+> +++ b/fs/cifs/smb2pdu.c
+> @@ -814,8 +814,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_se=
+s *ses)
+>      SMB3ANY_VERSION_STRING) =3D=3D 0) {
+>   req->Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
+>   req->Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
+> - req->DialectCount =3D cpu_to_le16(2);
+> - total_len +=3D 4;
+> + req->Dialects[2] =3D cpu_to_le16(SMB311_PROT_ID);
+> + req->DialectCount =3D cpu_to_le16(3);
+> + total_len +=3D 6;
+>   } else if (strcmp(server->vals->version_string,
+>      SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
+>   req->Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
+> @@ -848,6 +849,8 @@ SMB2_negotiate(const unsigned int xid, struct cifs_se=
+s *ses)
+>   memcpy(req->ClientGUID, server->client_guid,
+>   SMB2_CLIENT_GUID_SIZE);
+>   if ((server->vals->protocol_id =3D=3D SMB311_PROT_ID) ||
+> +     (strcmp(server->vals->version_string,
+> +      SMB3ANY_VERSION_STRING) =3D=3D 0) ||
+>       (strcmp(server->vals->version_string,
+>        SMBDEFAULT_VERSION_STRING) =3D=3D 0))
+>   assemble_neg_contexts(req, server, &total_len);
+> @@ -883,6 +886,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_se=
+s *ses)
+>   cifs_server_dbg(VFS,
+>   "SMB2.1 dialect returned but not requested\n");
+>   return -EIO;
+> + } else if (rsp->DialectRevision =3D=3D cpu_to_le16(SMB311_PROT_ID)) {
 
-Assuming
-- //HOST/a is mounted on /mnt
-- //HOST/b is mounted on /mnt/b
+I think we should include comment "/* ops set to 3.0 by default for
+default so update */" as in smbdefault case to improve readability.
 
-On a slow connection, running 'df' and killing it while it's
-processing /mnt/b can make cifs_get_inode_info() returns -ERESTARTSYS.
+> + server->ops =3D &smb311_operations;
+> + server->vals =3D &smb311_values;
+>   }
+>   } else if (strcmp(server->vals->version_string,
+>      SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
+> @@ -1042,10 +1048,11 @@ int smb3_validate_negotiate(const unsigned int
+> xid, struct cifs_tcon *tcon)
+>   SMB3ANY_VERSION_STRING) =3D=3D 0) {
+>   pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
+>   pneg_inbuf->Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
+> - pneg_inbuf->DialectCount =3D cpu_to_le16(2);
+> - /* structure is big enough for 3 dialects, sending only 2 */
+> + pneg_inbuf->Dialects[2] =3D cpu_to_le16(SMB311_PROT_ID);
+> + pneg_inbuf->DialectCount =3D cpu_to_le16(3);
+> + /* SMB 2.1 not included so subtract one dialect from len */
+>   inbuflen =3D sizeof(*pneg_inbuf) -
+> - (2 * sizeof(pneg_inbuf->Dialects[0]));
+> + (sizeof(pneg_inbuf->Dialects[0]));
+>   } else if (strcmp(server->vals->version_string,
+>   SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
+>   pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
+> @@ -1053,7 +1060,7 @@ int smb3_validate_negotiate(const unsigned int
+> xid, struct cifs_tcon *tcon)
+>   pneg_inbuf->Dialects[2] =3D cpu_to_le16(SMB302_PROT_ID);
+>   pneg_inbuf->Dialects[3] =3D cpu_to_le16(SMB311_PROT_ID);
+>   pneg_inbuf->DialectCount =3D cpu_to_le16(4);
+> - /* structure is big enough for 3 dialects */
+> + /* structure is big enough for 4 dialects */
+>   inbuflen =3D sizeof(*pneg_inbuf);
+>   } else {
+>   /* otherwise specific dialect was requested */
+>
+> --
+> Thanks,
+>
+> Steve
 
-This triggers the following chain of events:
-=3D> the dentry revalidation fail
-=3D> dentry is put and released
-=3D> superblock associated with the dentry is put
-=3D> /mnt/b is unmounted
+Looks good overall.
 
-This patch makes cifs_d_revalidate() return the error instead of
-0 (invalid) when cifs_revalidate_dentry() fails, except for ENOENT
-where that error means the dentry is invalid.
-
-Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-Suggested-by: Shyam Prasad N <nspmangalore@gmail.com>
----
- fs/cifs/dir.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 68900f1629bff..868c0b7263ec0 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -737,6 +737,7 @@ static int
- cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
- {
- 	struct inode *inode;
-+	int rc;
-=20
- 	if (flags & LOOKUP_RCU)
- 		return -ECHILD;
-@@ -746,8 +747,11 @@ cifs_d_revalidate(struct dentry *direntry, unsigned in=
-t flags)
- 		if ((flags & LOOKUP_REVAL) && !CIFS_CACHE_READ(CIFS_I(inode)))
- 			CIFS_I(inode)->time =3D 0; /* force reval */
-=20
--		if (cifs_revalidate_dentry(direntry))
--			return 0;
-+		rc =3D cifs_revalidate_dentry(direntry);
-+		if (rc) {
-+			cifs_dbg(FYI, "cifs_revalidate_dentry failed with rc=3D%d", rc);
-+			return rc =3D=3D -ENOENT ? 0 : rc;
-+		}
- 		else {
- 			/*
- 			 * If the inode wasn't known to be a dfs entry when
---=20
-2.29.2
-
+Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+--
+Best regards,
+Pavel Shilovsky
