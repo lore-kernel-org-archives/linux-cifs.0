@@ -5,182 +5,137 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5619C433DB
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CF4EC433DB
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:02:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8926D64E3E
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:01:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 549EA64F96
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 18:02:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237949AbhBBSBE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 Feb 2021 13:01:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44436 "EHLO
+        id S237976AbhBBSBp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Feb 2021 13:01:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238110AbhBBR7K (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 12:59:10 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C5FC061788
-        for <linux-cifs@vger.kernel.org>; Tue,  2 Feb 2021 09:58:30 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id d2so23959335edz.3
-        for <linux-cifs@vger.kernel.org>; Tue, 02 Feb 2021 09:58:30 -0800 (PST)
+        with ESMTP id S237958AbhBBR4S (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 12:56:18 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC507C06174A
+        for <linux-cifs@vger.kernel.org>; Tue,  2 Feb 2021 09:55:38 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id f2so24987103ljp.11
+        for <linux-cifs@vger.kernel.org>; Tue, 02 Feb 2021 09:55:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=1Fg9Cg1bRF7U4QfGthw1dSAbOWbWjadgBrlqJMHuQ4c=;
-        b=PXU4JXGpfeGWjz162LIQsTXmR2OsYh2/MmdUeccD0188PH2b17KeX7HyA2NigrJsYL
-         Gkz9f1ggvNujtu0fDo9fqmFcMH4arcDAlBQ+ryuWk8ykqgVvmt132MJ+/u/+lAKq3m5i
-         Zfbg+s3rXC6E7/Ugb3mI7ejFpf9lNz82SjBjCkqg+94yiKmz03LdMCRvbHanYZh3t0VL
-         eGTnxYo0xjm6E3wyCws4IptTALeaKQWLnJV0UK0RfPQ6QE6kHBk2+0aiZqxVpidDzZBC
-         ZSAu4wbc1UroiESAT+IsnD4uGFUP14sNh8664dxBtfoTie/oe/vqSpoS4NcEMQ2aesPJ
-         38hg==
+         :content-transfer-encoding;
+        bh=MppbbXzJ0digsWPG2GM5CfCZPDAoLJBBZ6Gid6/7IIQ=;
+        b=PL5Re/GONLGjrymoF3l0SAHN5WFFWMCciZBZArV/7iVY2DaTJ2TrZIzKqXiDxT1LcQ
+         sGx60q48HPwi2d9VHgPj5D8g4S7oF0w7X6Xh8znKN4YWR578wVgTlj9QQj4WL3DuSeeH
+         RwX1wdxJ0hS/roVmAT3JxzxjVnZbBgIBgOeSpI90RR0yamrk80wT/LiPiHNdef4yQHnP
+         9zYULSKMnnYMGCo3bi67ivNESHrTPAH4Go4DfDYAN44geOu7Zh5KTwTNKKYiCH4MaHL1
+         f9WAt+QU20xC5qMxLUVeF5ff2aqg+GIer+mFRAn9lPFeaD5ERGVhtSVOWXjBa4QSHb8i
+         C22A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=1Fg9Cg1bRF7U4QfGthw1dSAbOWbWjadgBrlqJMHuQ4c=;
-        b=aahe5xKsJGUV+kp+PAFcCl4dwehlilcpm+VTcnYOmpltcaOLSBGCSGQc7DIX+/9oWC
-         xLnMQeVf7TakAIp7U4bYy3Sc5yEwIFOHH+tU/cF4FJBBia0fGBKsTy8YACC7IJXuhGXL
-         R2ZMGC8Ge/MXAEfnrihI65i/uya8zuPJd8ucZK1QZK/UD/bePAn2b3mUz2pbfvjFCb4h
-         ukWT7HZMCEyPvGIuFVcM969iiOLSEC31BfBkUGcfKTwPkQ21/H8o85PWTgOIjAk1l8lC
-         SWCGkjpdwW4mCOIT2reu6F5Yuxj6AMpjdZxupo1RU2j54fFDpX+L+UknpwMfDxfHC0SF
-         lSDQ==
-X-Gm-Message-State: AOAM531tazc/Pof12JQmuFiGwi8013CGA4/bKoV5LtO1zj0W13KayvBd
-        hNDioXiE5nemAqtjVdEf2mYnAL6yKk5mVh4pzA==
-X-Google-Smtp-Source: ABdhPJwIWMLIu7JcHLqXSP830Fx9KJmkrjVxo72YzV1O7VRhIUX/bwn867Ns6cQjQQlzHJViGkw2HPAaBnAwpgtkoXk=
-X-Received: by 2002:a50:8b66:: with SMTP id l93mr123387edl.384.1612288708881;
- Tue, 02 Feb 2021 09:58:28 -0800 (PST)
+         :message-id:subject:to:content-transfer-encoding;
+        bh=MppbbXzJ0digsWPG2GM5CfCZPDAoLJBBZ6Gid6/7IIQ=;
+        b=IQVxVL9kMA3IksZmQOI/XABCczHVKyp4B2XNFaIoJ3e31ay2cTodgS7LVFeA6cvnrO
+         27ScJzD28AHRpcXCA3eUtQXhr6h2bY1o/Q0kPs9AIyHcv84uOP+9pmmeJKsMb9Omp/4Z
+         4TapjTW1Twv9+vh23w33GmqGC7FRmwYm3DXVOL3/zGBS1Jz1SWd2OiN2aFILQQTpewab
+         v0qbCf/mbjU44cQxw0ZDvvio3of7mcQ1L3yguBXSOdwp3CUHP9PbfLDs1tKnrsHIXXhh
+         6+7chOvGnymYsYHamOA/SqClq0POMEa31PghQxbDsr2kGWP7Qo/BGdfdiYS5sbHyFDIK
+         CLxw==
+X-Gm-Message-State: AOAM530g0qIL7/+UN5uF2xHAI+o3LCVm386chRoPcqBjgUSht1reYN3M
+        dW3ijKj/DMFrCTn+lCCpWC1UtZLlf1yzMaUnlaScPX5tAK4=
+X-Google-Smtp-Source: ABdhPJyWitcjU1huZdzKXmdZw80s+tdef59LlRyoPZKa6eGEnd4p4u5GKbGSijmfhxRcYcjZLGsAjgyNbv4uHDWqUcE=
+X-Received: by 2002:a2e:9d8e:: with SMTP id c14mr14212694ljj.477.1612288537179;
+ Tue, 02 Feb 2021 09:55:37 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5mt7Z2wJTLFp1T0qtsrJb95FPKoffBN9WBM=JAi=HcyiOg@mail.gmail.com>
-In-Reply-To: <CAH2r5mt7Z2wJTLFp1T0qtsrJb95FPKoffBN9WBM=JAi=HcyiOg@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Tue, 2 Feb 2021 09:58:17 -0800
-Message-ID: <CAKywueTvFL7GA3he21XjX8fig73iT5OCAd=JjBq6OOwOavcehA@mail.gmail.com>
-Subject: Re: PATCH] smb3: include current dialect (SMB3.1.1) when version 3 or
- greater requested on mount
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
+References: <CANT5p=pK3hQNTvsR-WUmtrQFuKngx+A1iYfd0JXyb0WHqpfKMA@mail.gmail.com>
+ <20210202174255.4269-1-aaptel@suse.com>
+In-Reply-To: <20210202174255.4269-1-aaptel@suse.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 2 Feb 2021 11:55:26 -0600
+Message-ID: <CAH2r5muLRXp_VhaPRVYZNpYoRc9Qpyko9doSmzMm4JgE1bAoSg@mail.gmail.com>
+Subject: Re: [PATCH v3] cifs: report error instead of invalid when
+ revalidating a dentry fails
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D0=BD, 1 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 22:15, Steve =
-French <smfrench@gmail.com>:
+presumably cc:stable?
+
+On Tue, Feb 2, 2021 at 11:43 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
+:
 >
-> SMB3.1.1 is the newest, and preferred dialect, and is included in
-> the requested dialect list by default (ie if no vers=3D is specified
-> on mount) but it should also be requested if SMB3 or later is requested
-> (vers=3D3 instead of a specific dialect: vers=3D2.1, vers=3D3.02 or vers=
-=3D3.0).
+> From: Aurelien Aptel <aaptel@suse.com>
 >
-> Currently specifying "vers=3D3" only requests smb3.0 and smb3.02 but this
-> patch fixes it to also request smb3.1.1 dialect, as it is the newest
-> and most secure dialect and is a "version 3 or later" dialect (the intent
-> of "vers=3D3").
+> Assuming
+> - //HOST/a is mounted on /mnt
+> - //HOST/b is mounted on /mnt/b
 >
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> Suggested-by: Pavel Shilovsky <pshilov@microsoft.com>
+> On a slow connection, running 'df' and killing it while it's
+> processing /mnt/b can make cifs_get_inode_info() returns -ERESTARTSYS.
+>
+> This triggers the following chain of events:
+> =3D> the dentry revalidation fail
+> =3D> dentry is put and released
+> =3D> superblock associated with the dentry is put
+> =3D> /mnt/b is unmounted
+>
+> This patch makes cifs_d_revalidate() return the error instead of
+> 0 (invalid) when cifs_revalidate_dentry() fails, except for ENOENT
+> where that error means the dentry is invalid.
+>
+> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+> Suggested-by: Shyam Prasad N <nspmangalore@gmail.com>
 > ---
->  fs/cifs/fs_context.c |  2 +-
->  fs/cifs/smb2pdu.c    | 19 +++++++++++++------
->  2 files changed, 14 insertions(+), 7 deletions(-)
+>  fs/cifs/dir.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 >
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index 5111aadfdb6b..479c24695281 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -391,7 +391,7 @@ cifs_parse_smb_version(char *value, struct
-> smb3_fs_context *ctx, bool is_smb3)
->   ctx->vals =3D &smb3any_values;
->   break;
->   case Smb_default:
-> - ctx->ops =3D &smb30_operations; /* currently identical with 3.0 */
-> + ctx->ops =3D &smb30_operations;
->   ctx->vals =3D &smbdefault_values;
->   break;
->   default:
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 794fc3b68b4f..52625549c3b5 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -814,8 +814,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_se=
-s *ses)
->      SMB3ANY_VERSION_STRING) =3D=3D 0) {
->   req->Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
->   req->Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
-> - req->DialectCount =3D cpu_to_le16(2);
-> - total_len +=3D 4;
-> + req->Dialects[2] =3D cpu_to_le16(SMB311_PROT_ID);
-> + req->DialectCount =3D cpu_to_le16(3);
-> + total_len +=3D 6;
->   } else if (strcmp(server->vals->version_string,
->      SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
->   req->Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
-> @@ -848,6 +849,8 @@ SMB2_negotiate(const unsigned int xid, struct cifs_se=
-s *ses)
->   memcpy(req->ClientGUID, server->client_guid,
->   SMB2_CLIENT_GUID_SIZE);
->   if ((server->vals->protocol_id =3D=3D SMB311_PROT_ID) ||
-> +     (strcmp(server->vals->version_string,
-> +      SMB3ANY_VERSION_STRING) =3D=3D 0) ||
->       (strcmp(server->vals->version_string,
->        SMBDEFAULT_VERSION_STRING) =3D=3D 0))
->   assemble_neg_contexts(req, server, &total_len);
-> @@ -883,6 +886,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_se=
-s *ses)
->   cifs_server_dbg(VFS,
->   "SMB2.1 dialect returned but not requested\n");
->   return -EIO;
-> + } else if (rsp->DialectRevision =3D=3D cpu_to_le16(SMB311_PROT_ID)) {
-
-I think we should include comment "/* ops set to 3.0 by default for
-default so update */" as in smbdefault case to improve readability.
-
-> + server->ops =3D &smb311_operations;
-> + server->vals =3D &smb311_values;
->   }
->   } else if (strcmp(server->vals->version_string,
->      SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
-> @@ -1042,10 +1048,11 @@ int smb3_validate_negotiate(const unsigned int
-> xid, struct cifs_tcon *tcon)
->   SMB3ANY_VERSION_STRING) =3D=3D 0) {
->   pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB30_PROT_ID);
->   pneg_inbuf->Dialects[1] =3D cpu_to_le16(SMB302_PROT_ID);
-> - pneg_inbuf->DialectCount =3D cpu_to_le16(2);
-> - /* structure is big enough for 3 dialects, sending only 2 */
-> + pneg_inbuf->Dialects[2] =3D cpu_to_le16(SMB311_PROT_ID);
-> + pneg_inbuf->DialectCount =3D cpu_to_le16(3);
-> + /* SMB 2.1 not included so subtract one dialect from len */
->   inbuflen =3D sizeof(*pneg_inbuf) -
-> - (2 * sizeof(pneg_inbuf->Dialects[0]));
-> + (sizeof(pneg_inbuf->Dialects[0]));
->   } else if (strcmp(server->vals->version_string,
->   SMBDEFAULT_VERSION_STRING) =3D=3D 0) {
->   pneg_inbuf->Dialects[0] =3D cpu_to_le16(SMB21_PROT_ID);
-> @@ -1053,7 +1060,7 @@ int smb3_validate_negotiate(const unsigned int
-> xid, struct cifs_tcon *tcon)
->   pneg_inbuf->Dialects[2] =3D cpu_to_le16(SMB302_PROT_ID);
->   pneg_inbuf->Dialects[3] =3D cpu_to_le16(SMB311_PROT_ID);
->   pneg_inbuf->DialectCount =3D cpu_to_le16(4);
-> - /* structure is big enough for 3 dialects */
-> + /* structure is big enough for 4 dialects */
->   inbuflen =3D sizeof(*pneg_inbuf);
->   } else {
->   /* otherwise specific dialect was requested */
+> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> index 68900f1629bff..868c0b7263ec0 100644
+> --- a/fs/cifs/dir.c
+> +++ b/fs/cifs/dir.c
+> @@ -737,6 +737,7 @@ static int
+>  cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
+>  {
+>         struct inode *inode;
+> +       int rc;
 >
+>         if (flags & LOOKUP_RCU)
+>                 return -ECHILD;
+> @@ -746,8 +747,11 @@ cifs_d_revalidate(struct dentry *direntry, unsigned =
+int flags)
+>                 if ((flags & LOOKUP_REVAL) && !CIFS_CACHE_READ(CIFS_I(ino=
+de)))
+>                         CIFS_I(inode)->time =3D 0; /* force reval */
+>
+> -               if (cifs_revalidate_dentry(direntry))
+> -                       return 0;
+> +               rc =3D cifs_revalidate_dentry(direntry);
+> +               if (rc) {
+> +                       cifs_dbg(FYI, "cifs_revalidate_dentry failed with=
+ rc=3D%d", rc);
+> +                       return rc =3D=3D -ENOENT ? 0 : rc;
+> +               }
+>                 else {
+>                         /*
+>                          * If the inode wasn't known to be a dfs entry wh=
+en
 > --
-> Thanks,
+> 2.29.2
 >
-> Steve
 
-Looks good overall.
 
-Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
---
-Best regards,
-Pavel Shilovsky
+--=20
+Thanks,
+
+Steve
