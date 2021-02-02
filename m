@@ -2,110 +2,106 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D182C4332D
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 01:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB45C433DB
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 02:37:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 166F164EDB
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 01:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 363DA64E9C
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 02:37:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbhBBBBy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 1 Feb 2021 20:01:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51812 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229704AbhBBBBx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 1 Feb 2021 20:01:53 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6239C061573
-        for <linux-cifs@vger.kernel.org>; Mon,  1 Feb 2021 17:01:12 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id d2so1287545pjs.4
-        for <linux-cifs@vger.kernel.org>; Mon, 01 Feb 2021 17:01:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=V0izvOuTNUtald5IcD/J2tYB96vc7/LLzt4ew9Ak4hQ=;
-        b=txx7Qe/qTRpke0lYFwUZS6C7YZpw2G7fR38IoagAjJiRj/o7lF1A6ycyF2jXkZzoPm
-         Y1Aoei1PdEUi5NRhF5nniOThtudjCR8HVLf0Q3MuqPJrXJxbuEpfM1J+4wmCVC2Q8rh1
-         5OlGaOc/pvB5xghRiBVLAG/aVwY7y+IovjwxIfuIJovYUWIxfuqP8jYHixdtQRX94pzc
-         ZO0h85YaYamHbwETuXEty3EmoC6+llBfxQjxxhm5+GtYCOeiKjFtagwP5r3ukKZOyx6J
-         PdIovFIhHXHpN8f9p+i9IQBEaN0XDqRpBu6xN9tH0hqIOfPiSpvkRfibRkNxg7TpsDE7
-         95TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=V0izvOuTNUtald5IcD/J2tYB96vc7/LLzt4ew9Ak4hQ=;
-        b=Kgxz/0YhOFAfxc3Ujsjbk77nBiKtDoh0iBiBGnPRLkTIln+8OZKXCevo4KhYFJDLcR
-         lLs/3zlE+zohgB54CCRo0h/TR9d2/dtGg3i8GPVNFSHvyy3ia4Wepxsb0PVx4KNOwVeC
-         fTl5re0JIdwxfNJOM8WYY9i9qUjbJVpqnQoEHdH5mFwSuxFCsbsYYSoP2LwJKJy20e4/
-         aRt8ryW5PEY1BiZ743uyId/wYk7rj9RyVxz6hmSqzVU6ypTsgzs9E0FjmgxysqRVS77n
-         JKB+Qey++JBkEOz5wFXtPJGU03bdY1/Ed2Z+4GyTm+APgQH+JuWfy9mXefz2LO75OFCX
-         1YeQ==
-X-Gm-Message-State: AOAM533STPjPzeb0fVu2fmNy4r92mV0dC4ECYldnZjcfjOD6AdXkeZYc
-        Dz6c9LK0vDVt7vVfYg7ZJw==
-X-Google-Smtp-Source: ABdhPJxPbMeTUZDblpkYuqp7LWBoK0Yl5RuxnFiUCv7rTtQy2AK/M0ldXS5BLfPxLUYR04Q1jtWyqw==
-X-Received: by 2002:a17:902:12c:b029:e1:aac:e6f4 with SMTP id 41-20020a170902012cb02900e10aace6f4mr20163008plb.26.1612227671632;
-        Mon, 01 Feb 2021 17:01:11 -0800 (PST)
-Received: from ubuntu-vm.mshome.net ([131.107.159.234])
-        by smtp.gmail.com with ESMTPSA id h190sm19730080pfe.158.2021.02.01.17.01.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Feb 2021 17:01:10 -0800 (PST)
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-X-Google-Original-From: Pavel Shilovsky <pshilov@microsoft.com>
-To:     Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs@vger.kernel.org
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>
-Subject: [PATCH] CIFS: Wait for credits if at least one request is in flight
-Date:   Mon,  1 Feb 2021 17:01:05 -0800
-Message-Id: <20210202010105.236700-1-pshilov@microsoft.com>
-X-Mailer: git-send-email 2.25.1
+        id S230178AbhBBChi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 1 Feb 2021 21:37:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59278 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229822AbhBBChh (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 1 Feb 2021 21:37:37 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A93AE64DDC;
+        Tue,  2 Feb 2021 02:36:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612233417;
+        bh=aYaNKfCnYiSwQ0Jqq2pVkFBGnbFVGwDNv4yn576p31Q=;
+        h=Date:From:To:Cc:Subject:From;
+        b=CfapMaxXNMeg8aiNbpOFcHczkEMgpE1MjlaviMKqweOtGZGP+Hj6zt7reHB51vSkT
+         197C10/3oRRuTSk95F3SY/7IK2ZIMRP0LUlUYQUE7R35yr/sSHDx3jxGpGwIGeYCJR
+         DGWzXc2L84ihlAuaMaITeYrbihax7s2houJ43nbpP1K6KQjee7kXWS5bTK6HFhWsmc
+         njPbh/wOvNwTpDKd/uMFgxlavoScyAlAGr6a+Q9f0iiQLa9YimlYDfBjhjt7VGnRzX
+         1oLhE16NBH6RtTnmwG7lJwtsuTXZIjTuSCK2uwQ3hN5oZ65u9bByKIH+g345+yeleg
+         1iNtvIPYu2anA==
+Date:   Mon, 1 Feb 2021 20:36:54 -0600
+From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To:     Steve French <sfrench@samba.org>,
+        Pavel Shilovsky <pshilov@microsoft.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-hardening@vger.kernel.org
+Subject: [PATCH] smb3: Fix out-of-bounds bug in SMB2_negotiate()
+Message-ID: <20210202023654.GA265921@embeddedor>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Currently we try to guess if a compound request is going to succeed
-waiting for credits or not based on the number of requests in flight.
-This approach doesn't work correctly all the time because there may
-be only one request in flight which is going to bring multiple credits
-satisfying the compound request.
+While addressing some warnings generated by -Warray-bounds, I found this
+bug that was introduced back in 2017:
 
-Change the behavior to fail a request only if there are no requests
-in flight at all and proceed waiting for credits otherwise.
+  CC [M]  fs/cifs/smb2pdu.o
+fs/cifs/smb2pdu.c: In function ‘SMB2_negotiate’:
+fs/cifs/smb2pdu.c:822:16: warning: array subscript 1 is above array bounds
+of ‘__le16[1]’ {aka ‘short unsigned int[1]’} [-Warray-bounds]
+  822 |   req->Dialects[1] = cpu_to_le16(SMB30_PROT_ID);
+      |   ~~~~~~~~~~~~~^~~
+fs/cifs/smb2pdu.c:823:16: warning: array subscript 2 is above array bounds
+of ‘__le16[1]’ {aka ‘short unsigned int[1]’} [-Warray-bounds]
+  823 |   req->Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
+      |   ~~~~~~~~~~~~~^~~
+fs/cifs/smb2pdu.c:824:16: warning: array subscript 3 is above array bounds
+of ‘__le16[1]’ {aka ‘short unsigned int[1]’} [-Warray-bounds]
+  824 |   req->Dialects[3] = cpu_to_le16(SMB311_PROT_ID);
+      |   ~~~~~~~~~~~~~^~~
+fs/cifs/smb2pdu.c:816:16: warning: array subscript 1 is above array bounds
+of ‘__le16[1]’ {aka ‘short unsigned int[1]’} [-Warray-bounds]
+  816 |   req->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
+      |   ~~~~~~~~~~~~~^~~
 
-Cc: <stable@vger.kernel.org> # 5.1+
-Signed-off-by: Pavel Shilovsky <pshilov@microsoft.com>
+At the time, the size of array _Dialects_ was changed from 1 to 3 in struct
+validate_negotiate_info_req, and then in 2019 it was changed from 3 to 4,
+but those changes were never made in struct smb2_negotiate_req, which has
+led to a 3 and a half years old out-of-bounds bug in function
+SMB2_negotiate() (fs/cifs/smb2pdu.c).
+
+Fix this by increasing the size of array _Dialects_ in struct
+smb2_negotiate_req to 4.
+
+Fixes: 9764c02fcbad ("SMB3: Add support for multidialect negotiate (SMB2.1 and later)")
+Fixes: d5c7076b772a ("smb3: add smb3.1.1 to default dialect list")
+Cc: stable@vger.kernel.org
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
- fs/cifs/transport.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/cifs/smb2pdu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index 4ffbf8f965814..84f33fdd1f4e0 100644
---- a/fs/cifs/transport.c
-+++ b/fs/cifs/transport.c
-@@ -659,10 +659,10 @@ wait_for_compound_request(struct TCP_Server_Info *server, int num,
- 	spin_lock(&server->req_lock);
- 	if (*credits < num) {
- 		/*
--		 * Return immediately if not too many requests in flight since
--		 * we will likely be stuck on waiting for credits.
-+		 * Return immediately if no requests in flight since
-+		 * we will be stuck on waiting for credits.
- 		 */
--		if (server->in_flight < num - *credits) {
-+		if (server->in_flight == 0) {
- 			spin_unlock(&server->req_lock);
- 			return -ENOTSUPP;
- 		}
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index d85edf5d1429..a5a9e33c0d73 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -286,7 +286,7 @@ struct smb2_negotiate_req {
+ 	__le32 NegotiateContextOffset; /* SMB3.1.1 only. MBZ earlier */
+ 	__le16 NegotiateContextCount;  /* SMB3.1.1 only. MBZ earlier */
+ 	__le16 Reserved2;
+-	__le16 Dialects[1]; /* One dialect (vers=) at a time for now */
++	__le16 Dialects[4]; /* BB expand this if autonegotiate > 4 dialects */
+ } __packed;
+ 
+ /* Dialects */
 -- 
-2.25.1
+2.27.0
 
