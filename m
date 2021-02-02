@@ -2,251 +2,230 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4167DC433E0
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 06:16:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B7CC433E0
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 11:01:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE26864DA3
-	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 06:16:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 540CC64F45
+	for <linux-cifs@archiver.kernel.org>; Tue,  2 Feb 2021 11:01:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231776AbhBBGQU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 2 Feb 2021 01:16:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34510 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230369AbhBBGQT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 01:16:19 -0500
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A2DC061573
-        for <linux-cifs@vger.kernel.org>; Mon,  1 Feb 2021 22:15:39 -0800 (PST)
-Received: by mail-lj1-x233.google.com with SMTP id v15so19621600ljk.13
-        for <linux-cifs@vger.kernel.org>; Mon, 01 Feb 2021 22:15:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=BTE1iqfSPceS+T0i+0NmWJq2vzQT5uns+yuR1Nzh6SQ=;
-        b=Ju5sYp3YeHe5SQNr4FWRLGFSQc2+uy9ohFDYhSemt4I5O6gPZ4zX1xXBMg/PcR+elT
-         NImctbpNLLylgD8YKjfkNyecxJcUAW7+aI68Cze5DECZfsi7KERc+2pEcCNKi8dduh1q
-         MiEdiUsBWECT0XcLYadxW2w7EHGWXY8PKiLi/p+IgegjklgppxQAT4F60ukKgX329xpL
-         9Vne8VMeHjTTznNOq5ICB4dpetVLnRsv+1rtHYBAWjYuZ7i0BH/vZOSNn6a8jpbT//0b
-         SjHeiZQom6JoLgwj8NL9uGxbEwwuKlTukZ+Jy1TIuzKoaw6rE9aqaO4ekjbkNWLruSge
-         opkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=BTE1iqfSPceS+T0i+0NmWJq2vzQT5uns+yuR1Nzh6SQ=;
-        b=gJ/a2kUiOCW1TAwLdpQtsg/kPiMg9BM0/J94MB4FoEJqHth6RrPMTJglNVhAz7Lqa7
-         2fkVCVhoQ11NNY9LE46dNszaAD5hzv7yJbcjkDUnMHagsh/+pILAHyg2K6uG6OL1sunx
-         LKmJb6Vxb/5mSW6tZF3gZrUaU/2jHwKC9c37TWu93VzBhq4ZXHt/6HvA5Ox4+eFhMGDz
-         LyMRfmbxrsWb88ymgBCuHqPUTIp/RT+ZVWbkCm2wdgurLrCveL7bL7ItsalS3EKEXYzD
-         fosLS9aknFezeUweEi/WzpKLIkEPPtFGtNkefGCAVhEYku9baYOizDQ4ezIy4Po40Nzx
-         +5zg==
-X-Gm-Message-State: AOAM533faBluSfdTOC8F3B1HSg0sYKIX0/UiB3S8QyKCPOYkDzakOjY0
-        ib7IoQeX57TXdOhJlci9R9WawrHeSCmiHOy/XaYuBLOcfwio0A==
-X-Google-Smtp-Source: ABdhPJzMATBFRaKWZIo/xOi0PQfC3P8bS0u9fP29n0ae+m+abdN7qbdNBe+Cld1ak63iERN5dFcyKXpU6HaCkpEycCI=
-X-Received: by 2002:a05:651c:14a:: with SMTP id c10mr12212809ljd.272.1612246537251;
- Mon, 01 Feb 2021 22:15:37 -0800 (PST)
+        id S229611AbhBBLBi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 2 Feb 2021 06:01:38 -0500
+Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:29628 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229606AbhBBLBb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 2 Feb 2021 06:01:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1612263623;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1OdgJ9khXU7ttVvL+UtYdyAjH928ArYWWWtcH0nF4UY=;
+        b=XWsqs9Txg8HOnOo8DoD6BN/xhmT34Sp9HXVuHaV0ZJWYqqRZLLOiN5RkghPjkzM2C/Chho
+        3Q/np3L8Y7N58tzszD5PIVEjFbXUQqnNXdNqkao5hRm3JJ5g4ozPRMcXIdRSgoJ8CqvvOu
+        gOAN41K5PAECwKS+bAek3JVn/1u7uw8=
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com
+ (mail-vi1eur05lp2175.outbound.protection.outlook.com [104.47.17.175])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ de-mta-32-tbpjQc1ePxqh8bH65Eyerw-1; Tue, 02 Feb 2021 12:00:20 +0100
+X-MC-Unique: tbpjQc1ePxqh8bH65Eyerw-1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SzJ/isSdyxY6VIiea1/EmzRi3FDL7/vWiKTJyXjjFfzD5H7XGrq3j97NveZ3JkuspQQqaOUrS/RINLbjJkaD+ERosehKvCuMJV7X9rvLcOlBPA2v3fnqINTyvb4hcl4BWyuVPC7tO8mTvz5S3wyO4ioCFwu1Y6CYlEuh1zVeI9RoicJYeLphbAaM4i9KQVH/kBX86cIwL8V/mkQQpPBjFlMx2/581Jv+dXQlMWN2bgDahkTKoaEc1f3GaByVCDKKRzNOhajGlz85Lm4AbhHzHyKFy0jeMytFNREw0dDVJnHNfnw2+BXtPa9d24Zgdld9xbtbY1htgJRXl/4Lr/rvmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1OdgJ9khXU7ttVvL+UtYdyAjH928ArYWWWtcH0nF4UY=;
+ b=PBwD0MZkLXDHrXB/zE33r8AZ/UvBi/9aPuOFo+iXRKHURuSvJ/5i8OqVixbrvwd2mbtz0G23uU25gbpWDvgRffTUZBL8yZdFjnuZ9gYlKfy+Pmjj/OYamLpIj/d7yJrQZFM6yl4quawc57sJ2CuwQbt8H5lsuoIoCWfE/uVDErOKShsmGTNE8zD19ZnwdYAoGax7ufd68Y4fk16+Y1Lo2YjiKKlgZzs5Q/dEQq3k1yWYFKigIHggi3ZBoqqs+fgBrtiKQDkMdQ9Pf35AhaEJKRtmjPy1CFTTjiw4RIcezvYMrohKrqToNybTb06ARhc7Bg/daGCvRkWuPdPHEbegYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
+ by VI1PR0401MB2381.eurprd04.prod.outlook.com (2603:10a6:800:2a::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16; Tue, 2 Feb
+ 2021 11:00:18 +0000
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3805.022; Tue, 2 Feb 2021
+ 11:00:18 +0000
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, linux-fsdevel@vger.kernel.org,
+        Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>
+Subject: Re: [PATCH v1] cifs: make nested cifs mount point dentries always
+ valid to deal with signaled 'df'
+In-Reply-To: <CANT5p=oSrrCbCdXZSbjmPDM4P=z=1c=kj9w1DDTJO5UhtREo8g@mail.gmail.com>
+References: <20210129171316.13160-1-aaptel@suse.com>
+ <CANT5p=ofvpimU9Z7jwj4cPXXa1E4KkcijYrxbVKQZf5JDiR-1g@mail.gmail.com>
+ <877dns9izy.fsf@suse.com>
+ <CANT5p=oSrrCbCdXZSbjmPDM4P=z=1c=kj9w1DDTJO5UhtREo8g@mail.gmail.com>
+Date:   Tue, 02 Feb 2021 12:00:16 +0100
+Message-ID: <87v9ba91kv.fsf@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [2003:fa:705:9f17:137b:35ab:5b49:10f1]
+X-ClientProxiedBy: ZR0P278CA0008.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:16::18) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+ (2603:10a6:803:3::28)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 2 Feb 2021 00:15:26 -0600
-Message-ID: <CAH2r5mt7Z2wJTLFp1T0qtsrJb95FPKoffBN9WBM=JAi=HcyiOg@mail.gmail.com>
-Subject: PATCH] smb3: include current dialect (SMB3.1.1) when version 3 or
- greater requested on mount
-To:     CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
-Cc:     Pavel Shilovsky <piastryyy@gmail.com>
-Content-Type: multipart/mixed; boundary="00000000000024c97405ba546660"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (2003:fa:705:9f17:137b:35ab:5b49:10f1) by ZR0P278CA0008.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:16::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.16 via Frontend Transport; Tue, 2 Feb 2021 11:00:17 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 899a6d7c-756b-4078-8b12-08d8c769b9e3
+X-MS-TrafficTypeDiagnostic: VI1PR0401MB2381:
+X-Microsoft-Antispam-PRVS: <VI1PR0401MB238167F701AD3DD38BC9BE52A8B59@VI1PR0401MB2381.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2733;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Rbph6AiGSqjomoJCjORPDT3f/JrShk0oYleA+buTN/vdFDRhy58ZuCMbpeT64BVQHBus12kL/GRj5HO/lroKXRS6S0O+Ky3QWR7EjpnSnIFw19ZKbbgZj0oaD/JBpf6mNIBu4JGLzZ1L0lFwqW6Lh2ftqYI5G3zpgH25afWkyXBcoXI6hrQ/WqQWyiJ91xp6DCPJlw5Vnmb1Pmi7OMppTwhor46gjoTwccYP7xN17UjTbwxlVxMHaNtdgB7NbmTi0GNSZUnZ1ISUq9fDlvSNmjKlFCjmWoOuGDfvowpI+E1NcjBfSUFiLjxh+q4tY08AyOseEzLX9vyUEX9IWuJTqJ1f6lRfopCr3HXgRZ3GKGsllXM9XIrGQtf4KE0+FmeSNrAAp4M2wDrVdi84M5hvE+unjvZUh/qJ8u7u0CE15fLQo6tHxDcXylvLwTUmKrD5YvEkUuhQ2t7AfYyfZ17+ZwWdw5k/DC9jOLaiAn4tWShZ1GQ203h2R+jKrSVYged93g0a+EwUyYLQe26zzsUj3hW0lfpBTdjyfRPVWcMBungznXVnF9QnBFVZM/ZnyYU+7J2jhWD4H4FdVFWpSVuf7QwBIV95WcTorBbwR6v2rkw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(54906003)(52116002)(4326008)(36756003)(966005)(186003)(498600001)(66556008)(66476007)(66574015)(86362001)(83380400001)(2616005)(8936002)(16526019)(8676002)(2906002)(66946007)(6916009)(6486002)(6496006)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?YWp4aGozdzYvUDIxNjYyd0VxKzk1L0JIUHFHZDBWMFV0amFNcEhQY3N4V0o1?=
+ =?utf-8?B?UWZZdWlzanl4MjJFc2NTbk43Zi82V1lEMUhzN0s0OGg0cjdUYkFNTEhxeG96?=
+ =?utf-8?B?alprZ1I2R2dhckNrLzV3QmRQWk9iVkVvZ21wK3NuU2NSQWR4azBidDYydHVh?=
+ =?utf-8?B?ZnBKaVRNbm9MR001Q1FXSXJLTm9pVnRHaGxwSnJWQnkvVHUwTVppb1hJOG95?=
+ =?utf-8?B?TkllR1BsaVFVRWp1T1ZCTzlCWmlVdFRjZXQrc1YxTUR3aVh4N1JGNzQrcE9y?=
+ =?utf-8?B?RmNaQ0VoUCt4cU02TnJXVk9OQ0h5V0RrNjlxTW5UVE5yb2NxYXRVL2dIbUp2?=
+ =?utf-8?B?YlpXOVBMaGY5cCsxSEpTdGhxaGx4N25vTGxUeGIwVUoyTStKYmpyZDJ0bXVw?=
+ =?utf-8?B?MmF5V05mNkh5ekx6UThVV3VKZEJkazdNSzVKQm5WVnpBaHVoU3hlNUJaL2xp?=
+ =?utf-8?B?eVhpbFdwNVZmVWZXeHE2dmg2djF0Qmpxa0JRVGZLeEh3SFhGckdzeG9NYzVs?=
+ =?utf-8?B?R2tJWTYvWFJZajVzWEVoYlZSVWc3d0loeEhoYk5yazRrT2NNYjBGMEhNc2FX?=
+ =?utf-8?B?V0szUThONEZjK3NwcmN3L29CMXY5TTFwWGJmckdNNXc1REgvTjVqNmVDZDNK?=
+ =?utf-8?B?UG9xbUJsRUo5T2JrOEhPVjBsaFFDbWtwdFNXeVRQaXowZno2Wmh2Q0dDYWxh?=
+ =?utf-8?B?NVpEYXBZYzNzYThpamYyZEVoK1RvN2E0MktXcWQ5SE8rd3dmZld0elBEQU94?=
+ =?utf-8?B?U1BGazdtTnRGR0NsYktVQXVTTGJRNXladVVXQ1FERG90bUEwNE9EKzE3TkZk?=
+ =?utf-8?B?OWQ2UUNXT2NjQ1NTZHNjU3J6VEwrdTI5bjR3T296WTBkbStXem9vREpLSllY?=
+ =?utf-8?B?WnJtY3YwVGlGMnRPblgrUjNYNkRXb2d6RlhjZVFIMGtUWkFpNDZ3b0Y0VTVY?=
+ =?utf-8?B?WjhsNmRkZ2F1dGY4OEVZVjFoTWpaK09tM1ErQ0tyYm5SaDZUNVptZkpwdnZS?=
+ =?utf-8?B?VlRWY3BIQWVtYmxQc3Q3NU9IdmxnR0p3NmFMVjBFVFYxNnl1ZlVzKzUxcUM0?=
+ =?utf-8?B?L2hJT2Rld0c2RlFzdS8vdTR5L212YktJZjEvYldDNHFSRnFYZHkvWW53MlIr?=
+ =?utf-8?B?VlRXZ01CWlFMMGp2WFpQaDFqWENWMW1uZGhhU1diZXJ2WkN0dlNEUk5SK0tx?=
+ =?utf-8?B?Qkd4MWdzaVZnYitmUnhONHIxQlpzWWZoTGNaQUp0TldWQzJDNnRWWjdQVkFk?=
+ =?utf-8?B?TzBkOU9CN3BxWko5bUt6VnR5WTVFNXZNU1doa1lZTGVpYk9SZHkxRFhNdTNX?=
+ =?utf-8?B?RkY4ZkhZSTFqcHVaOUtYeW10emNEVjlZNk5Bc2dZU0x6V1k3Z3Q0WEhNWDJ5?=
+ =?utf-8?B?OHgvSmpnM0kzZmViUVozU1k0UmZXZ1ZhWEZBTzVZREh1YVp1ck16TS9saUdP?=
+ =?utf-8?B?b200alI0ZFA5cjFRQ3o2UllqSjBnWUttQkRpbGUyVlp1REI4RjF5amFpKzhR?=
+ =?utf-8?Q?CrwX/LwJSzcUQGR+lDo9IprcgMv?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 899a6d7c-756b-4078-8b12-08d8c769b9e3
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2021 11:00:18.0174
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1mS7yHUR3cOxxMtUEvBYpOeULxxOuRHIyietpsWjEHXpJB/tXEdhO8Ec1s2mQE8o
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0401MB2381
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000024c97405ba546660
-Content-Type: text/plain; charset="UTF-8"
+Shyam Prasad N <nspmangalore@gmail.com> writes:
+> But the point that I'm trying to make here is that VFS reacts
+> differently when d_validate returns an error VS when it just returns
+> invalid:
+> https://elixir.bootlin.com/linux/latest/source/fs/namei.c#L1409
 
-SMB3.1.1 is the newest, and preferred dialect, and is included in
-the requested dialect list by default (ie if no vers= is specified
-on mount) but it should also be requested if SMB3 or later is requested
-(vers=3 instead of a specific dialect: vers=2.1, vers=3.02 or vers=3.0).
+I've tried returning the error with the repro script and it also worked.
 
-Currently specifying "vers=3" only requests smb3.0 and smb3.02 but this
-patch fixes it to also request smb3.1.1 dialect, as it is the newest
-and most secure dialect and is a "version 3 or later" dialect (the intent
-of "vers=3").
+> Notice how it calls d_invalidate only when there's no error. And
+> d_invalidate seems to have detach_mounts.
+> It is likely that the umount happens there.
 
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Suggested-by: Pavel Shilovsky <pshilov@microsoft.com>
----
- fs/cifs/fs_context.c |  2 +-
- fs/cifs/smb2pdu.c    | 19 +++++++++++++------
- 2 files changed, 14 insertions(+), 7 deletions(-)
+I've dumped call stacks, the revalidation is triggered by filename_lookup()
 
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index 5111aadfdb6b..479c24695281 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -391,7 +391,7 @@ cifs_parse_smb_version(char *value, struct
-smb3_fs_context *ctx, bool is_smb3)
-  ctx->vals = &smb3any_values;
-  break;
-  case Smb_default:
-- ctx->ops = &smb30_operations; /* currently identical with 3.0 */
-+ ctx->ops = &smb30_operations;
-  ctx->vals = &smbdefault_values;
-  break;
-  default:
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 794fc3b68b4f..52625549c3b5 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -814,8 +814,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
-     SMB3ANY_VERSION_STRING) == 0) {
-  req->Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
-  req->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
-- req->DialectCount = cpu_to_le16(2);
-- total_len += 4;
-+ req->Dialects[2] = cpu_to_le16(SMB311_PROT_ID);
-+ req->DialectCount = cpu_to_le16(3);
-+ total_len += 6;
-  } else if (strcmp(server->vals->version_string,
-     SMBDEFAULT_VERSION_STRING) == 0) {
-  req->Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
-@@ -848,6 +849,8 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
-  memcpy(req->ClientGUID, server->client_guid,
-  SMB2_CLIENT_GUID_SIZE);
-  if ((server->vals->protocol_id == SMB311_PROT_ID) ||
-+     (strcmp(server->vals->version_string,
-+      SMB3ANY_VERSION_STRING) == 0) ||
-      (strcmp(server->vals->version_string,
-       SMBDEFAULT_VERSION_STRING) == 0))
-  assemble_neg_contexts(req, server, &total_len);
-@@ -883,6 +886,9 @@ SMB2_negotiate(const unsigned int xid, struct cifs_ses *ses)
-  cifs_server_dbg(VFS,
-  "SMB2.1 dialect returned but not requested\n");
-  return -EIO;
-+ } else if (rsp->DialectRevision == cpu_to_le16(SMB311_PROT_ID)) {
-+ server->ops = &smb311_operations;
-+ server->vals = &smb311_values;
-  }
-  } else if (strcmp(server->vals->version_string,
-     SMBDEFAULT_VERSION_STRING) == 0) {
-@@ -1042,10 +1048,11 @@ int smb3_validate_negotiate(const unsigned int
-xid, struct cifs_tcon *tcon)
-  SMB3ANY_VERSION_STRING) == 0) {
-  pneg_inbuf->Dialects[0] = cpu_to_le16(SMB30_PROT_ID);
-  pneg_inbuf->Dialects[1] = cpu_to_le16(SMB302_PROT_ID);
-- pneg_inbuf->DialectCount = cpu_to_le16(2);
-- /* structure is big enough for 3 dialects, sending only 2 */
-+ pneg_inbuf->Dialects[2] = cpu_to_le16(SMB311_PROT_ID);
-+ pneg_inbuf->DialectCount = cpu_to_le16(3);
-+ /* SMB 2.1 not included so subtract one dialect from len */
-  inbuflen = sizeof(*pneg_inbuf) -
-- (2 * sizeof(pneg_inbuf->Dialects[0]));
-+ (sizeof(pneg_inbuf->Dialects[0]));
-  } else if (strcmp(server->vals->version_string,
-  SMBDEFAULT_VERSION_STRING) == 0) {
-  pneg_inbuf->Dialects[0] = cpu_to_le16(SMB21_PROT_ID);
-@@ -1053,7 +1060,7 @@ int smb3_validate_negotiate(const unsigned int
-xid, struct cifs_tcon *tcon)
-  pneg_inbuf->Dialects[2] = cpu_to_le16(SMB302_PROT_ID);
-  pneg_inbuf->Dialects[3] = cpu_to_le16(SMB311_PROT_ID);
-  pneg_inbuf->DialectCount = cpu_to_le16(4);
-- /* structure is big enough for 3 dialects */
-+ /* structure is big enough for 4 dialects */
-  inbuflen = sizeof(*pneg_inbuf);
-  } else {
-  /* otherwise specific dialect was requested */
+[   31.913092]  [<ffffffff8133e3d1>] ? SendReceive+0x2b1/0x2d0
+[   31.913093]  [<ffffffff8132cbd2>] ? CIFSSMBQPathInfo+0x152/0x260
+[   31.913096]  [<ffffffff81343c9f>] ? cifs_query_path_info+0x6f/0x1a0
+[   31.913098]  [<ffffffff81366953>] ? cifs_get_inode_info.cold+0x44f/0x6bb
+[   31.913100]  [<ffffffff810bf935>] ? wake_up_process+0x15/0x20
+[   31.913102]  [<ffffffff810e9c30>] ? vprintk_emit+0x200/0x500
+[   31.913103]  [<ffffffff810ea099>] ? vprintk_default+0x29/0x40
+[   31.913105]  [<ffffffff811a896f>] ? printk+0x50/0x52
+[   31.913107]  [<ffffffff813678c1>] ? cifs_revalidate_dentry_attr.cold+0x7=
+1/0x79
+[   31.913109]  [<ffffffff8133b194>] ? cifs_revalidate_dentry+0x14/0x30
+[   31.913110]  [<ffffffff813327e5>] ? cifs_d_revalidate+0x25/0xb0
+[   31.913112]  [<ffffffff812404ff>] ? lookup_fast+0x1bf/0x220
+[   31.913113]  [<ffffffff812407bc>] ? walk_component+0x3c/0x3f0
+[   31.913114]  [<ffffffff8123fe5b>] ? path_init+0x23b/0x450
+[   31.913116]  [<ffffffff812412bf>] ? path_lookupat+0x7f/0x110
+[   31.913118]  [<ffffffff81242ae7>] ? filename_lookup+0x97/0x190
+[   31.913120]  [<ffffffff811e1e39>] ? handle_pte_fault+0x1d9/0x240
+[   31.913122]  [<ffffffff81242cc9>] ? user_path_at_empty+0x59/0x90
+[   31.913124]  [<ffffffff8126ab59>] ? user_statfs+0x39/0xa0
+[   31.913125]  [<ffffffff8126abd6>] ? SYSC_statfs+0x16/0x40
+[   31.913127]  [<ffffffff8106de53>] ? trace_do_page_fault+0x43/0x150
+[   31.913130]  [<ffffffff8180359c>] ? async_page_fault+0x3c/0x60
+[   31.913131]  [<ffffffff8126ad6e>] ? SyS_statfs+0xe/0x10
+[   31.913132]  [<ffffffff81800021>] ? entry_SYSCALL_64_fastpath+0x20/0xee
 
--- 
-Thanks,
 
-Steve
+d_invalidate()->...->drop_mountpoint() adds a callback to unmount at later =
+times:
 
---00000000000024c97405ba546660
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-negotiate-current-dialect-SMB3.1.1-when-version.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-negotiate-current-dialect-SMB3.1.1-when-version.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kknlxjp90>
-X-Attachment-Id: f_kknlxjp90
+[   31.913246]  [<ffffffff812554da>] ? drop_mountpoint+0x6a/0x70
+[   31.913247]  [<ffffffff8126b0b8>] ? pin_kill+0x88/0x160
+[   31.913249]  [<ffffffff810d6a20>] ? prepare_to_wait_event+0x100/0x100
+[   31.913250]  [<ffffffff810d6a20>] ? prepare_to_wait_event+0x100/0x100
+[   31.913252]  [<ffffffff8126b205>] ? group_pin_kill+0x25/0x50
+[   31.913253]  [<ffffffff812564fa>] ? __detach_mounts+0x13a/0x140
+[   31.913255]  [<ffffffff8124bf24>] ? d_invalidate+0xa4/0x100
+[   31.913256]  [<ffffffff812404cd>] ? lookup_fast+0x18d/0x220
+[   31.913257]  [<ffffffff812407bc>] ? walk_component+0x3c/0x3f0
+[   31.913258]  [<ffffffff8123fe5b>] ? path_init+0x23b/0x450
+[   31.913259]  [<ffffffff812412bf>] ? path_lookupat+0x7f/0x110
+[   31.913261]  [<ffffffff81242ae7>] ? filename_lookup+0x97/0x190
+[   31.913262]  [<ffffffff811e1e39>] ? handle_pte_fault+0x1d9/0x240
+[   31.913263]  [<ffffffff81242cc9>] ? user_path_at_empty+0x59/0x90
+[   31.913265]  [<ffffffff8126ab59>] ? user_statfs+0x39/0xa0
+[   31.913266]  [<ffffffff8126abd6>] ? SYSC_statfs+0x16/0x40
+[   31.913268]  [<ffffffff8106de53>] ? trace_do_page_fault+0x43/0x150
+[   31.913269]  [<ffffffff8180359c>] ? async_page_fault+0x3c/0x60
+[   31.913270]  [<ffffffff8126ad6e>] ? SyS_statfs+0xe/0x10
+[   31.913272]  [<ffffffff81800021>] ? entry_SYSCALL_64_fastpath+0x20/0xee
 
-RnJvbSBlNzA1NWNkY2EwM2VhNTUyMjk5MjM0NWM5MjQ4Y2RiZmVkNWM5ZDZhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgMiBGZWIgMjAyMSAwMDowMzo1OCAtMDYwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjM6IG5lZ290aWF0ZSBjdXJyZW50IGRpYWxlY3QgKFNNQjMuMS4xKSB3aGVuIHZlcnNpb24gMyBv
-cgogZ3JlYXRlciByZXF1ZXN0ZWQKClNNQjMuMS4xIGlzIHRoZSBuZXdlc3QsIGFuZCBwcmVmZXJy
-ZWQgZGlhbGVjdCwgYW5kIGlzIGluY2x1ZGVkIGluCnRoZSByZXF1ZXN0ZWQgZGlhbGVjdCBsaXN0
-IGJ5IGRlZmF1bHQgKGllIGlmIG5vIHZlcnM9IGlzIHNwZWNpZmllZApvbiBtb3VudCkgYnV0IGl0
-IHNob3VsZCBhbHNvIGJlIHJlcXVlc3RlZCBpZiBTTUIzIG9yIGxhdGVyIGlzIHJlcXVlc3RlZAoo
-dmVycz0zIGluc3RlYWQgb2YgYSBzcGVjaWZpYyBkaWFsZWN0OiB2ZXJzPTIuMSwgdmVycz0zLjAy
-IG9yIHZlcnM9My4wKS4KCkN1cnJlbnRseSBzcGVjaWZ5aW5nICJ2ZXJzPTMiIG9ubHkgcmVxdWVz
-dHMgc21iMy4wIGFuZCBzbWIzLjAyIGJ1dCB0aGlzCnBhdGNoIGZpeGVzIGl0IHRvIGFsc28gcmVx
-dWVzdCBzbWIzLjEuMSBkaWFsZWN0LCBhcyBpdCBpcyB0aGUgbmV3ZXN0CmFuZCBtb3N0IHNlY3Vy
-ZSBkaWFsZWN0IGFuZCBpcyBhICJ2ZXJzaW9uIDMgb3IgbGF0ZXIiIGRpYWxlY3QgKHRoZSBpbnRl
-bnQKb2YgInZlcnM9MyIgZGlhbGVjdCkuCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0
-ZnJlbmNoQG1pY3Jvc29mdC5jb20+ClN1Z2dlc3RlZC1ieTogUGF2ZWwgU2hpbG92c2t5IDxwc2hp
-bG92QG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9mc19jb250ZXh0LmMgfCAgMiArLQogZnMv
-Y2lmcy9zbWIycGR1LmMgICAgfCAxOSArKysrKysrKysrKysrLS0tLS0tCiAyIGZpbGVzIGNoYW5n
-ZWQsIDE0IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lm
-cy9mc19jb250ZXh0LmMgYi9mcy9jaWZzL2ZzX2NvbnRleHQuYwppbmRleCA1MTExYWFkZmRiNmIu
-LjQ3OWMyNDY5NTI4MSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9mc19jb250ZXh0LmMKKysrIGIvZnMv
-Y2lmcy9mc19jb250ZXh0LmMKQEAgLTM5MSw3ICszOTEsNyBAQCBjaWZzX3BhcnNlX3NtYl92ZXJz
-aW9uKGNoYXIgKnZhbHVlLCBzdHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgsIGJvb2wgaXNfc21i
-MykKIAkJY3R4LT52YWxzID0gJnNtYjNhbnlfdmFsdWVzOwogCQlicmVhazsKIAljYXNlIFNtYl9k
-ZWZhdWx0OgotCQljdHgtPm9wcyA9ICZzbWIzMF9vcGVyYXRpb25zOyAvKiBjdXJyZW50bHkgaWRl
-bnRpY2FsIHdpdGggMy4wICovCisJCWN0eC0+b3BzID0gJnNtYjMwX29wZXJhdGlvbnM7CiAJCWN0
-eC0+dmFscyA9ICZzbWJkZWZhdWx0X3ZhbHVlczsKIAkJYnJlYWs7CiAJZGVmYXVsdDoKZGlmZiAt
-LWdpdCBhL2ZzL2NpZnMvc21iMnBkdS5jIGIvZnMvY2lmcy9zbWIycGR1LmMKaW5kZXggNzk0ZmMz
-YjY4YjRmLi41MjYyNTU0OWMzYjUgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBkdS5jCisrKyBi
-L2ZzL2NpZnMvc21iMnBkdS5jCkBAIC04MTQsOCArODE0LDkgQEAgU01CMl9uZWdvdGlhdGUoY29u
-c3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpzZXMpCiAJCSAgIFNNQjNBTllf
-VkVSU0lPTl9TVFJJTkcpID09IDApIHsKIAkJcmVxLT5EaWFsZWN0c1swXSA9IGNwdV90b19sZTE2
-KFNNQjMwX1BST1RfSUQpOwogCQlyZXEtPkRpYWxlY3RzWzFdID0gY3B1X3RvX2xlMTYoU01CMzAy
-X1BST1RfSUQpOwotCQlyZXEtPkRpYWxlY3RDb3VudCA9IGNwdV90b19sZTE2KDIpOwotCQl0b3Rh
-bF9sZW4gKz0gNDsKKwkJcmVxLT5EaWFsZWN0c1syXSA9IGNwdV90b19sZTE2KFNNQjMxMV9QUk9U
-X0lEKTsKKwkJcmVxLT5EaWFsZWN0Q291bnQgPSBjcHVfdG9fbGUxNigzKTsKKwkJdG90YWxfbGVu
-ICs9IDY7CiAJfSBlbHNlIGlmIChzdHJjbXAoc2VydmVyLT52YWxzLT52ZXJzaW9uX3N0cmluZywK
-IAkJICAgU01CREVGQVVMVF9WRVJTSU9OX1NUUklORykgPT0gMCkgewogCQlyZXEtPkRpYWxlY3Rz
-WzBdID0gY3B1X3RvX2xlMTYoU01CMjFfUFJPVF9JRCk7CkBAIC04NDgsNiArODQ5LDggQEAgU01C
-Ml9uZWdvdGlhdGUoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpzZXMp
-CiAJCW1lbWNweShyZXEtPkNsaWVudEdVSUQsIHNlcnZlci0+Y2xpZW50X2d1aWQsCiAJCQlTTUIy
-X0NMSUVOVF9HVUlEX1NJWkUpOwogCQlpZiAoKHNlcnZlci0+dmFscy0+cHJvdG9jb2xfaWQgPT0g
-U01CMzExX1BST1RfSUQpIHx8CisJCSAgICAoc3RyY21wKHNlcnZlci0+dmFscy0+dmVyc2lvbl9z
-dHJpbmcsCisJCSAgICAgU01CM0FOWV9WRVJTSU9OX1NUUklORykgPT0gMCkgfHwKIAkJICAgIChz
-dHJjbXAoc2VydmVyLT52YWxzLT52ZXJzaW9uX3N0cmluZywKIAkJICAgICBTTUJERUZBVUxUX1ZF
-UlNJT05fU1RSSU5HKSA9PSAwKSkKIAkJCWFzc2VtYmxlX25lZ19jb250ZXh0cyhyZXEsIHNlcnZl
-ciwgJnRvdGFsX2xlbik7CkBAIC04ODMsNiArODg2LDkgQEAgU01CMl9uZWdvdGlhdGUoY29uc3Qg
-dW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpzZXMpCiAJCQljaWZzX3NlcnZlcl9k
-YmcoVkZTLAogCQkJCSJTTUIyLjEgZGlhbGVjdCByZXR1cm5lZCBidXQgbm90IHJlcXVlc3RlZFxu
-Iik7CiAJCQlyZXR1cm4gLUVJTzsKKwkJfSBlbHNlIGlmIChyc3AtPkRpYWxlY3RSZXZpc2lvbiA9
-PSBjcHVfdG9fbGUxNihTTUIzMTFfUFJPVF9JRCkpIHsKKwkJCXNlcnZlci0+b3BzID0gJnNtYjMx
-MV9vcGVyYXRpb25zOworCQkJc2VydmVyLT52YWxzID0gJnNtYjMxMV92YWx1ZXM7CiAJCX0KIAl9
-IGVsc2UgaWYgKHN0cmNtcChzZXJ2ZXItPnZhbHMtPnZlcnNpb25fc3RyaW5nLAogCQkgICBTTUJE
-RUZBVUxUX1ZFUlNJT05fU1RSSU5HKSA9PSAwKSB7CkBAIC0xMDQyLDEwICsxMDQ4LDExIEBAIGlu
-dCBzbWIzX3ZhbGlkYXRlX25lZ290aWF0ZShjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3Qg
-Y2lmc190Y29uICp0Y29uKQogCQlTTUIzQU5ZX1ZFUlNJT05fU1RSSU5HKSA9PSAwKSB7CiAJCXBu
-ZWdfaW5idWYtPkRpYWxlY3RzWzBdID0gY3B1X3RvX2xlMTYoU01CMzBfUFJPVF9JRCk7CiAJCXBu
-ZWdfaW5idWYtPkRpYWxlY3RzWzFdID0gY3B1X3RvX2xlMTYoU01CMzAyX1BST1RfSUQpOwotCQlw
-bmVnX2luYnVmLT5EaWFsZWN0Q291bnQgPSBjcHVfdG9fbGUxNigyKTsKLQkJLyogc3RydWN0dXJl
-IGlzIGJpZyBlbm91Z2ggZm9yIDMgZGlhbGVjdHMsIHNlbmRpbmcgb25seSAyICovCisJCXBuZWdf
-aW5idWYtPkRpYWxlY3RzWzJdID0gY3B1X3RvX2xlMTYoU01CMzExX1BST1RfSUQpOworCQlwbmVn
-X2luYnVmLT5EaWFsZWN0Q291bnQgPSBjcHVfdG9fbGUxNigzKTsKKwkJLyogU01CIDIuMSBub3Qg
-aW5jbHVkZWQgc28gc3VidHJhY3Qgb25lIGRpYWxlY3QgZnJvbSBsZW4gKi8KIAkJaW5idWZsZW4g
-PSBzaXplb2YoKnBuZWdfaW5idWYpIC0KLQkJCQkoMiAqIHNpemVvZihwbmVnX2luYnVmLT5EaWFs
-ZWN0c1swXSkpOworCQkJCShzaXplb2YocG5lZ19pbmJ1Zi0+RGlhbGVjdHNbMF0pKTsKIAl9IGVs
-c2UgaWYgKHN0cmNtcChzZXJ2ZXItPnZhbHMtPnZlcnNpb25fc3RyaW5nLAogCQlTTUJERUZBVUxU
-X1ZFUlNJT05fU1RSSU5HKSA9PSAwKSB7CiAJCXBuZWdfaW5idWYtPkRpYWxlY3RzWzBdID0gY3B1
-X3RvX2xlMTYoU01CMjFfUFJPVF9JRCk7CkBAIC0xMDUzLDcgKzEwNjAsNyBAQCBpbnQgc21iM192
-YWxpZGF0ZV9uZWdvdGlhdGUoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfdGNv
-biAqdGNvbikKIAkJcG5lZ19pbmJ1Zi0+RGlhbGVjdHNbMl0gPSBjcHVfdG9fbGUxNihTTUIzMDJf
-UFJPVF9JRCk7CiAJCXBuZWdfaW5idWYtPkRpYWxlY3RzWzNdID0gY3B1X3RvX2xlMTYoU01CMzEx
-X1BST1RfSUQpOwogCQlwbmVnX2luYnVmLT5EaWFsZWN0Q291bnQgPSBjcHVfdG9fbGUxNig0KTsK
-LQkJLyogc3RydWN0dXJlIGlzIGJpZyBlbm91Z2ggZm9yIDMgZGlhbGVjdHMgKi8KKwkJLyogc3Ry
-dWN0dXJlIGlzIGJpZyBlbm91Z2ggZm9yIDQgZGlhbGVjdHMgKi8KIAkJaW5idWZsZW4gPSBzaXpl
-b2YoKnBuZWdfaW5idWYpOwogCX0gZWxzZSB7CiAJCS8qIG90aGVyd2lzZSBzcGVjaWZpYyBkaWFs
-ZWN0IHdhcyByZXF1ZXN0ZWQgKi8KLS0gCjIuMjcuMAoK
---00000000000024c97405ba546660--
+The actual unmount call:
+
+[   31.913594]  [<ffffffff81362248>] ? cifs_put_tcon.part.0+0x71/0x123
+[   31.913597]  [<ffffffff81362309>] ? cifs_put_tlink.cold+0x5/0xa
+[   31.913599]  [<ffffffff813318a5>] ? cifs_umount+0x65/0xd0
+[   31.913601]  [<ffffffff8132976f>] ? cifs_kill_sb+0x1f/0x30
+[   31.913603]  [<ffffffff8123527a>] ? deactivate_locked_super+0x4a/0xd0
+[   31.913605]  [<ffffffff81235344>] ? deactivate_super+0x44/0x50
+[   31.913609]  [<ffffffff81253adb>] ? cleanup_mnt+0x3b/0x90
+[   31.913610]  [<ffffffff81253b82>] ? __cleanup_mnt+0x12/0x20
+[   31.913613]  [<ffffffff810af9eb>] ? task_work_run+0x7b/0xb0
+[   31.913616]  [<ffffffff810a0a3a>] ? get_signal+0x4ea/0x4f0
+[   31.913618]  [<ffffffff811e1e39>] ? handle_pte_fault+0x1d9/0x240
+[   31.913621]  [<ffffffff810185d1>] ? do_signal+0x21/0x100
+[   31.913624]  [<ffffffff81242cc9>] ? user_path_at_empty+0x59/0x90
+[   31.913626]  [<ffffffff8126ab59>] ? user_statfs+0x39/0xa0
+[   31.913628]  [<ffffffff8126abd6>] ? SYSC_statfs+0x16/0x40
+[   31.913630]  [<ffffffff81003517>] ? exit_to_usermode_loop+0x87/0xc0
+[   31.913632]  [<ffffffff81003bed>] ? syscall_return_slowpath+0xed/0x180
+[   31.913634]  [<ffffffff818001b1>] ? int_ret_from_sys_call+0x8/0x6d
+
+
+> I'm suggesting that we should return errors inside d_validate
+> handlers, rather than just 0 or 1.
+> Makes sense?
+
+Yes that worked too. I'll send v2.
+
+Cheers,
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
+E
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
+nchen)
+
