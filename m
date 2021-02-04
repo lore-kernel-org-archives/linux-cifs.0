@@ -8,194 +8,212 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58346C433E6
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 06:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D5BC433E0
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 06:50:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2B1064DE9
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 06:26:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E7BC64E4B
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 06:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232109AbhBDG0K (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 Feb 2021 01:26:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35312 "EHLO
+        id S232907AbhBDGuV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 Feb 2021 01:50:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231878AbhBDG0J (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Feb 2021 01:26:09 -0500
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C3E1C061573;
-        Wed,  3 Feb 2021 22:25:29 -0800 (PST)
-Received: by mail-lj1-x22b.google.com with SMTP id a25so2099349ljn.0;
-        Wed, 03 Feb 2021 22:25:29 -0800 (PST)
+        with ESMTP id S232796AbhBDGuV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Feb 2021 01:50:21 -0500
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42BDC061573;
+        Wed,  3 Feb 2021 22:49:40 -0800 (PST)
+Received: by mail-lj1-x234.google.com with SMTP id a17so2132726ljq.2;
+        Wed, 03 Feb 2021 22:49:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to:cc;
-        bh=8BCgyPWgryxP/tPOgkCVquqADpYLO+SLhESdmPZvlaU=;
-        b=ljb68kfuT/kr/btK4c2jNN/ZQGrslJp9V1MUyd6iUGTD97wQsU+E9fdpmi98w7moN8
-         mGrJGrqE7KgG2wPeC5//KGSatul99XyOCi8H4bOBMTKBRQVsTz87bjQa4/k2E4C98OKm
-         1my04kQjPKHHCl5+Ui7z317CnWI6yPD3yb2rzKkobHj3LvtHtQtsuzUmWAPDTY4R2/9j
-         EnKCAJenT51+X9aUO2HzDBg4vGvY3NuXmTLydvPrh9WxHbC/AVaBCLpv2+321w4nJeAm
-         gRyWH6KfdAykkrdiB3qnuW0SXdd8v2Y+8x+fjLqX7VATNeFeyI2kEiH/EvCNkW75SNtj
-         p2eg==
+        bh=hn55GUfhyq3P6czDbmvqar/cddItmhmrdCEeqddMYkw=;
+        b=pfvG25T+N9DqU/VW0LyV25J+UlhzUnPyOADcTb2WKw/ZH4M4cF7hfUxN5JcxolHk7b
+         OocHSTR038ZMC0kCFaJi1KTFPBaTpKaLwVUI3pxptphmjIcR2HIQW9AxCpwdfm5VyqKx
+         kaYwBr2FhmNhFvaBz47PAc/ZIZMEy+gFTyRkDc9Pt7SmT313P8Z4TEqz2RLqHM+rnaYZ
+         C8bpe/IyfutaaRrNT51kXujB1r40POIvyjtu4OJhsPw5vmOrnwuX36/hJlDORzPOyuef
+         /j8vchmcQqEZDzMW6/xKk+7L+afleiUUfNh3L2wsM1vHpRyQ0iou7pAn6AT0bQBpJoPz
+         96pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=8BCgyPWgryxP/tPOgkCVquqADpYLO+SLhESdmPZvlaU=;
-        b=F5ebyqEozYDUoBBnxKJXkR2F2jcQh1jCRQA9YUc039o5LCHXmqFhwFaqEuLTzAohg3
-         xqvTYTzucbCn2bhN//45+y0G0NUTPbPw68TBcNu3bhDkw+eaTq2Iu5TuDwDwDLO1xNIk
-         PruHbHQHxIMSjVoj5es66DEY0/F+7pRbgIGApNtLAp88XyYh+GqQjVrwwmjyAucDav24
-         tc45QWFBhHxaYQQTLSq3A2afTqyMR4x1j8yf2s3F4YvpTOiiaqfxH10t95ntBSrWv5LY
-         4fFFNKe3fzE6GecmJXJ+js7+XWIaLfEiRAiWPDfhP+3LTGxlnM0tSS3pIfy6WGYqICLl
-         unGw==
-X-Gm-Message-State: AOAM533uZxSx9EBDkL+CX+63ZQiH6zvqsi2TkHLxs7HEFwqY6SUdV0aX
-        U2OYyewmDlybD5v3x78QNu3/3XUKbMJtIHLyYKNpAJf5JEmItw==
-X-Google-Smtp-Source: ABdhPJyzO2OIf3a6lVmDASi9DdnGK5WUD7GDjWFDEFM7ERU54E02H5CQ0z6lhLr00EdoyjOLxsQOFEy85PpHqTN8dzM=
-X-Received: by 2002:a2e:9d8e:: with SMTP id c14mr4005423ljj.477.1612419927349;
- Wed, 03 Feb 2021 22:25:27 -0800 (PST)
+        bh=hn55GUfhyq3P6czDbmvqar/cddItmhmrdCEeqddMYkw=;
+        b=ZCUYlwpwb8kCJitMrOnzkw6Dvm86ISugEgH9sA5+0vhJkDn/88KLgXBFnue9MWSwFr
+         YYIO0dSCD1YOjL9xMYP78/SRYi/12kiOUbrix5XkSWEGcR/OLB070FR8Fcq5WkuHTW63
+         btNLmw4UxwrZ5ks5kGjUjSGfg3fETuTS5m/MbgWrIB3q5ewf6djQ+kBw9cCYxgn1ymYo
+         SGt2gXfM18B8sBF156K8OCwDWykXqo2O65UEqVQoGQHuHjD/PaZacEAbR8VWJ8WCYiX3
+         2DNDPm0bdL1GcmyuoNxipKLGkWqC4MfItzuzpjr1cNylryZM/QtAORX6WWRswGtr37Ye
+         8VAQ==
+X-Gm-Message-State: AOAM5326A751X72Nmr2dQHAJEwZ0L5NoqMsEsUcoDzzX54bGjNSltO2j
+        XDvuUnjF0/gYpu+NY/dXIjBOVUIaojaCEXncG1N4JRzPoQcRWw==
+X-Google-Smtp-Source: ABdhPJyhAg6Nk5M4s4pthONsgcqhKhg+bwk2gWQPhGG8wXdyGk4DaUYCdYVPBq3TiQ2NxkLVlvd1lCKT7n7+XEb7S9Y=
+X-Received: by 2002:a05:651c:548:: with SMTP id q8mr3884690ljp.256.1612421378506;
+ Wed, 03 Feb 2021 22:49:38 -0800 (PST)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 4 Feb 2021 00:25:16 -0600
-Message-ID: <CAH2r5ms9dJ3RW=_+c0HApLyUC=LD5ACp_nhE2jJQuS-121kV=w@mail.gmail.com>
-Subject: [PATCH] cifs: use discard iterator to discard unneeded network data
- more efficiently
+Date:   Thu, 4 Feb 2021 00:49:27 -0600
+Message-ID: <CAH2r5mt+69AZFh_2OOd2JHLtqG9jo7=O7HF4bTGbSjhgi=M53g@mail.gmail.com>
+Subject: [PATCH] cifs: convert readpages_fill_pages to use iter
 To:     CIFS <linux-cifs@vger.kernel.org>
 Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         David Howells <dhowells@redhat.com>
-Content-Type: multipart/mixed; boundary="000000000000ffb93d05ba7cc4f3"
+Content-Type: multipart/mixed; boundary="0000000000007e9f1405ba7d1b61"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000ffb93d05ba7cc4f3
+--0000000000007e9f1405ba7d1b61
 Content-Type: text/plain; charset="UTF-8"
 
-(cleanup patch, to make netfs merge easier)
+(Another patch to make conversion to new netfs interfaces easier)
 
-The iterator, ITER_DISCARD, that can only be used in READ mode and
-just discards any data copied to it, was added to allow a network
-filesystem to discard any unwanted data sent by a server.
-Convert cifs_discard_from_socket() to use this.
+Optimize read_page_from_socket by using an iov_iter
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/cifs/cifsproto.h |  2 ++
- fs/cifs/cifssmb.c   |  6 +++---
- fs/cifs/connect.c   | 10 ++++++++++
- 3 files changed, 15 insertions(+), 3 deletions(-)
+ fs/cifs/cifsglob.h  |  1 +
+ fs/cifs/cifsproto.h |  3 +++
+ fs/cifs/connect.c   | 16 ++++++++++++++++
+ fs/cifs/file.c      |  3 +--
+ 4 files changed, 21 insertions(+), 2 deletions(-)
 
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 50fcb65920e8..73f80cc38316 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -1301,6 +1301,7 @@ struct cifs_readdata {
+  int (*copy_into_pages)(struct TCP_Server_Info *server,
+  struct cifs_readdata *rdata,
+  struct iov_iter *iter);
++ struct iov_iter iter;
+  struct kvec iov[2];
+  struct TCP_Server_Info *server;
+ #ifdef CONFIG_CIFS_SMB_DIRECT
 diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 32f7a013402e..75ce6f742b8d 100644
+index 75ce6f742b8d..64eb5c817712 100644
 --- a/fs/cifs/cifsproto.h
 +++ b/fs/cifs/cifsproto.h
-@@ -232,6 +232,8 @@ extern unsigned int
-setup_special_user_owner_ACE(struct cifs_ace *pace);
- extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
- extern int cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
-           unsigned int to_read);
-+extern ssize_t cifs_discard_from_socket(struct TCP_Server_Info *server,
-+ size_t to_read);
- extern int cifs_read_page_from_socket(struct TCP_Server_Info *server,
-  struct page *page,
+@@ -239,6 +239,9 @@ extern int cifs_read_page_from_socket(struct
+TCP_Server_Info *server,
   unsigned int page_offset,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 0496934feecb..c279527aae92 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1451,9 +1451,9 @@ cifs_discard_remaining_data(struct
-TCP_Server_Info *server)
-  while (remaining > 0) {
-  int length;
-
-- length = cifs_read_from_socket(server, server->bigbuf,
-- min_t(unsigned int, remaining,
--     CIFSMaxBufSize + MAX_HEADER_SIZE(server)));
-+ length = cifs_discard_from_socket(server,
-+ min_t(size_t, remaining,
-+       CIFSMaxBufSize + MAX_HEADER_SIZE(server)));
-  if (length < 0)
-  return length;
-  server->total_read += length;
+  unsigned int to_read);
+ extern int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb);
++extern int cifs_read_iter_from_socket(struct TCP_Server_Info *server,
++       struct iov_iter *iter,
++       unsigned int to_read);
+ extern int cifs_match_super(struct super_block *, void *);
+ extern int cifs_mount(struct cifs_sb_info *cifs_sb, struct
+smb3_fs_context *ctx);
+ extern void cifs_umount(struct cifs_sb_info *);
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 10fe6d6d2dee..943f4eba027d 100644
+index 943f4eba027d..7c8db233fba4 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -564,6 +564,16 @@ cifs_read_from_socket(struct TCP_Server_Info
-*server, char *buf,
+@@ -585,6 +585,22 @@ cifs_read_page_from_socket(struct TCP_Server_Info
+*server, struct page *page,
   return cifs_readv_from_socket(server, &smb_msg);
  }
 
-+ssize_t
-+cifs_discard_from_socket(struct TCP_Server_Info *server, size_t to_read)
++int
++cifs_read_iter_from_socket(struct TCP_Server_Info *server, struct
+iov_iter *iter,
++    unsigned int to_read)
 +{
 + struct msghdr smb_msg;
++ int ret;
 +
-+ iov_iter_discard(&smb_msg.msg_iter, READ, to_read);
-+
-+ return cifs_readv_from_socket(server, &smb_msg);
++ smb_msg.msg_iter = *iter;
++ if (smb_msg.msg_iter.count > to_read)
++ smb_msg.msg_iter.count = to_read;
++ ret = cifs_readv_from_socket(server, &smb_msg);
++ if (ret > 0)
++ iov_iter_advance(iter, ret);
++ return ret;
 +}
 +
- int
- cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *page,
-  unsigned int page_offset, unsigned int to_read)
+ static bool
+ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+ {
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 6d001905c8e5..4b8c1ac58f00 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -4261,8 +4261,7 @@ readpages_fill_pages(struct TCP_Server_Info *server,
+  result = n;
+ #endif
+  else
+- result = cifs_read_page_from_socket(
+- server, page, page_offset, n);
++ result = cifs_read_iter_from_socket(server, &rdata->iter, n);
+  if (result < 0)
+  break;
+
 
 -- 
 Thanks,
 
 Steve
 
---000000000000ffb93d05ba7cc4f3
+--0000000000007e9f1405ba7d1b61
 Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-use-discard-iterator-to-discard-unneeded-networ.patch"
+	name="0001-cifs-convert-readpages_fill_pages-to-use-iter.patch"
 Content-Disposition: attachment; 
-	filename="0001-cifs-use-discard-iterator-to-discard-unneeded-networ.patch"
+	filename="0001-cifs-convert-readpages_fill_pages-to-use-iter.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_kkqh5tsv0>
-X-Attachment-Id: f_kkqh5tsv0
+Content-ID: <f_kkqi1q1t0>
+X-Attachment-Id: f_kkqi1q1t0
 
-RnJvbSBjM2E0NjIxZjU2ZGI4MDM4YjE5ODQ0ZmE5ZDVmMzk1MWFmYWFjNGZkIE1vbiBTZXAgMTcg
+RnJvbSBhNGM5NjM4MDNkZGY4YzE3ZjM2OTEzMDg5OTY1ZjAzNDhlNTM2MzMwIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPgpE
-YXRlOiBUaHUsIDQgRmViIDIwMjEgMDA6MTU6MjEgLTA2MDAKU3ViamVjdDogW1BBVENIXSBjaWZz
-OiB1c2UgZGlzY2FyZCBpdGVyYXRvciB0byBkaXNjYXJkIHVubmVlZGVkIG5ldHdvcmsgZGF0YQog
-bW9yZSBlZmZpY2llbnRseQoKVGhlIGl0ZXJhdG9yLCBJVEVSX0RJU0NBUkQsIHRoYXQgY2FuIG9u
-bHkgYmUgdXNlZCBpbiBSRUFEIG1vZGUgYW5kCmp1c3QgZGlzY2FyZHMgYW55IGRhdGEgY29waWVk
-IHRvIGl0LCB3YXMgYWRkZWQgdG8gYWxsb3cgYSBuZXR3b3JrCmZpbGVzeXN0ZW0gdG8gZGlzY2Fy
-ZCBhbnkgdW53YW50ZWQgZGF0YSBzZW50IGJ5IGEgc2VydmVyLgpDb252ZXJ0IGNpZnNfZGlzY2Fy
-ZF9mcm9tX3NvY2tldCgpIHRvIHVzZSB0aGlzLgoKU2lnbmVkLW9mZi1ieTogRGF2aWQgSG93ZWxs
-cyA8ZGhvd2VsbHNAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZy
-ZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc3Byb3RvLmggfCAgMiArKwogZnMv
-Y2lmcy9jaWZzc21iLmMgICB8ICA2ICsrKy0tLQogZnMvY2lmcy9jb25uZWN0LmMgICB8IDEwICsr
-KysrKysrKysKIDMgZmlsZXMgY2hhbmdlZCwgMTUgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMo
-LSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNwcm90by5oIGIvZnMvY2lmcy9jaWZzcHJvdG8u
-aAppbmRleCAzMmY3YTAxMzQwMmUuLjc1Y2U2Zjc0MmI4ZCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9j
-aWZzcHJvdG8uaAorKysgYi9mcy9jaWZzL2NpZnNwcm90by5oCkBAIC0yMzIsNiArMjMyLDggQEAg
-ZXh0ZXJuIHVuc2lnbmVkIGludCBzZXR1cF9zcGVjaWFsX3VzZXJfb3duZXJfQUNFKHN0cnVjdCBj
-aWZzX2FjZSAqcGFjZSk7CiBleHRlcm4gdm9pZCBkZXF1ZXVlX21pZChzdHJ1Y3QgbWlkX3FfZW50
-cnkgKm1pZCwgYm9vbCBtYWxmb3JtZWQpOwogZXh0ZXJuIGludCBjaWZzX3JlYWRfZnJvbV9zb2Nr
-ZXQoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBjaGFyICpidWYsCiAJCQkgICAgICAg
-ICB1bnNpZ25lZCBpbnQgdG9fcmVhZCk7CitleHRlcm4gc3NpemVfdCBjaWZzX2Rpc2NhcmRfZnJv
-bV9zb2NrZXQoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLAorCQkJCQlzaXplX3QgdG9f
-cmVhZCk7CiBleHRlcm4gaW50IGNpZnNfcmVhZF9wYWdlX2Zyb21fc29ja2V0KHN0cnVjdCBUQ1Bf
-U2VydmVyX0luZm8gKnNlcnZlciwKIAkJCQkJc3RydWN0IHBhZ2UgKnBhZ2UsCiAJCQkJCXVuc2ln
-bmVkIGludCBwYWdlX29mZnNldCwKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3NtYi5jIGIvZnMv
-Y2lmcy9jaWZzc21iLmMKaW5kZXggMDQ5NjkzNGZlZWNiLi5jMjc5NTI3YWFlOTIgMTAwNjQ0Ci0t
-LSBhL2ZzL2NpZnMvY2lmc3NtYi5jCisrKyBiL2ZzL2NpZnMvY2lmc3NtYi5jCkBAIC0xNDUxLDkg
-KzE0NTEsOSBAQCBjaWZzX2Rpc2NhcmRfcmVtYWluaW5nX2RhdGEoc3RydWN0IFRDUF9TZXJ2ZXJf
-SW5mbyAqc2VydmVyKQogCXdoaWxlIChyZW1haW5pbmcgPiAwKSB7CiAJCWludCBsZW5ndGg7CiAK
-LQkJbGVuZ3RoID0gY2lmc19yZWFkX2Zyb21fc29ja2V0KHNlcnZlciwgc2VydmVyLT5iaWdidWYs
-Ci0JCQkJbWluX3QodW5zaWduZWQgaW50LCByZW1haW5pbmcsCi0JCQkJICAgIENJRlNNYXhCdWZT
-aXplICsgTUFYX0hFQURFUl9TSVpFKHNlcnZlcikpKTsKKwkJbGVuZ3RoID0gY2lmc19kaXNjYXJk
-X2Zyb21fc29ja2V0KHNlcnZlciwKKwkJCQltaW5fdChzaXplX3QsIHJlbWFpbmluZywKKwkJCQkg
-ICAgICBDSUZTTWF4QnVmU2l6ZSArIE1BWF9IRUFERVJfU0laRShzZXJ2ZXIpKSk7CiAJCWlmIChs
-ZW5ndGggPCAwKQogCQkJcmV0dXJuIGxlbmd0aDsKIAkJc2VydmVyLT50b3RhbF9yZWFkICs9IGxl
-bmd0aDsKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5jIGIvZnMvY2lmcy9jb25uZWN0LmMK
-aW5kZXggMTBmZTZkNmQyZGVlLi45NDNmNGViYTAyN2QgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY29u
-bmVjdC5jCisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC01NjQsNiArNTY0LDE2IEBAIGNpZnNf
-cmVhZF9mcm9tX3NvY2tldChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIGNoYXIgKmJ1
-ZiwKIAlyZXR1cm4gY2lmc19yZWFkdl9mcm9tX3NvY2tldChzZXJ2ZXIsICZzbWJfbXNnKTsKIH0K
-IAorc3NpemVfdAorY2lmc19kaXNjYXJkX2Zyb21fc29ja2V0KHN0cnVjdCBUQ1BfU2VydmVyX0lu
-Zm8gKnNlcnZlciwgc2l6ZV90IHRvX3JlYWQpCit7CisJc3RydWN0IG1zZ2hkciBzbWJfbXNnOwor
-CisJaW92X2l0ZXJfZGlzY2FyZCgmc21iX21zZy5tc2dfaXRlciwgUkVBRCwgdG9fcmVhZCk7CisK
-KwlyZXR1cm4gY2lmc19yZWFkdl9mcm9tX3NvY2tldChzZXJ2ZXIsICZzbWJfbXNnKTsKK30KKwog
-aW50CiBjaWZzX3JlYWRfcGFnZV9mcm9tX3NvY2tldChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpz
-ZXJ2ZXIsIHN0cnVjdCBwYWdlICpwYWdlLAogCXVuc2lnbmVkIGludCBwYWdlX29mZnNldCwgdW5z
-aWduZWQgaW50IHRvX3JlYWQpCi0tIAoyLjI3LjAKCg==
---000000000000ffb93d05ba7cc4f3--
+YXRlOiBUaHUsIDQgRmViIDIwMjEgMDA6NDQ6MDQgLTA2MDAKU3ViamVjdDogW1BBVENIXSBjaWZz
+OiBjb252ZXJ0IHJlYWRwYWdlc19maWxsX3BhZ2VzIHRvIHVzZSBpdGVyCgpPcHRpbWl6ZSByZWFk
+X3BhZ2VfZnJvbV9zb2NrZXQgYnkgdXNpbmcgYW4gaW92X2l0ZXIKClNpZ25lZC1vZmYtYnk6IERh
+dmlkIEhvd2VsbHMgPGRob3dlbGxzQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZy
+ZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNnbG9iLmggIHwg
+IDEgKwogZnMvY2lmcy9jaWZzcHJvdG8uaCB8ICAzICsrKwogZnMvY2lmcy9jb25uZWN0LmMgICB8
+IDE2ICsrKysrKysrKysrKysrKysKIGZzL2NpZnMvZmlsZS5jICAgICAgfCAgMyArLS0KIDQgZmls
+ZXMgY2hhbmdlZCwgMjEgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQg
+YS9mcy9jaWZzL2NpZnNnbG9iLmggYi9mcy9jaWZzL2NpZnNnbG9iLmgKaW5kZXggNTBmY2I2NTky
+MGU4Li43M2Y4MGNjMzgzMTYgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc2dsb2IuaAorKysgYi9m
+cy9jaWZzL2NpZnNnbG9iLmgKQEAgLTEzMDEsNiArMTMwMSw3IEBAIHN0cnVjdCBjaWZzX3JlYWRk
+YXRhIHsKIAlpbnQgKCpjb3B5X2ludG9fcGFnZXMpKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNl
+cnZlciwKIAkJCQlzdHJ1Y3QgY2lmc19yZWFkZGF0YSAqcmRhdGEsCiAJCQkJc3RydWN0IGlvdl9p
+dGVyICppdGVyKTsKKwlzdHJ1Y3QgaW92X2l0ZXIJCQlpdGVyOwogCXN0cnVjdCBrdmVjCQkJaW92
+WzJdOwogCXN0cnVjdCBUQ1BfU2VydmVyX0luZm8JCSpzZXJ2ZXI7CiAjaWZkZWYgQ09ORklHX0NJ
+RlNfU01CX0RJUkVDVApkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzcHJvdG8uaCBiL2ZzL2NpZnMv
+Y2lmc3Byb3RvLmgKaW5kZXggNzVjZTZmNzQyYjhkLi42NGViNWM4MTc3MTIgMTAwNjQ0Ci0tLSBh
+L2ZzL2NpZnMvY2lmc3Byb3RvLmgKKysrIGIvZnMvY2lmcy9jaWZzcHJvdG8uaApAQCAtMjM5LDYg
+KzIzOSw5IEBAIGV4dGVybiBpbnQgY2lmc19yZWFkX3BhZ2VfZnJvbV9zb2NrZXQoc3RydWN0IFRD
+UF9TZXJ2ZXJfSW5mbyAqc2VydmVyLAogCQkJCQl1bnNpZ25lZCBpbnQgcGFnZV9vZmZzZXQsCiAJ
+CQkJCXVuc2lnbmVkIGludCB0b19yZWFkKTsKIGV4dGVybiBpbnQgY2lmc19zZXR1cF9jaWZzX3Ni
+KHN0cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2IpOworZXh0ZXJuIGludCBjaWZzX3JlYWRfaXRl
+cl9mcm9tX3NvY2tldChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsCisJCQkJICAgICAg
+c3RydWN0IGlvdl9pdGVyICppdGVyLAorCQkJCSAgICAgIHVuc2lnbmVkIGludCB0b19yZWFkKTsK
+IGV4dGVybiBpbnQgY2lmc19tYXRjaF9zdXBlcihzdHJ1Y3Qgc3VwZXJfYmxvY2sgKiwgdm9pZCAq
+KTsKIGV4dGVybiBpbnQgY2lmc19tb3VudChzdHJ1Y3QgY2lmc19zYl9pbmZvICpjaWZzX3NiLCBz
+dHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgpOwogZXh0ZXJuIHZvaWQgY2lmc191bW91bnQoc3Ry
+dWN0IGNpZnNfc2JfaW5mbyAqKTsKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5jIGIvZnMv
+Y2lmcy9jb25uZWN0LmMKaW5kZXggOTQzZjRlYmEwMjdkLi43YzhkYjIzM2ZiYTQgMTAwNjQ0Ci0t
+LSBhL2ZzL2NpZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC01ODUsNiAr
+NTg1LDIyIEBAIGNpZnNfcmVhZF9wYWdlX2Zyb21fc29ja2V0KHN0cnVjdCBUQ1BfU2VydmVyX0lu
+Zm8gKnNlcnZlciwgc3RydWN0IHBhZ2UgKnBhZ2UsCiAJcmV0dXJuIGNpZnNfcmVhZHZfZnJvbV9z
+b2NrZXQoc2VydmVyLCAmc21iX21zZyk7CiB9CiAKK2ludAorY2lmc19yZWFkX2l0ZXJfZnJvbV9z
+b2NrZXQoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBzdHJ1Y3QgaW92X2l0ZXIgKml0
+ZXIsCisJCQkgICB1bnNpZ25lZCBpbnQgdG9fcmVhZCkKK3sKKwlzdHJ1Y3QgbXNnaGRyIHNtYl9t
+c2c7CisJaW50IHJldDsKKworCXNtYl9tc2cubXNnX2l0ZXIgPSAqaXRlcjsKKwlpZiAoc21iX21z
+Zy5tc2dfaXRlci5jb3VudCA+IHRvX3JlYWQpCisJCXNtYl9tc2cubXNnX2l0ZXIuY291bnQgPSB0
+b19yZWFkOworCXJldCA9IGNpZnNfcmVhZHZfZnJvbV9zb2NrZXQoc2VydmVyLCAmc21iX21zZyk7
+CisJaWYgKHJldCA+IDApCisJCWlvdl9pdGVyX2FkdmFuY2UoaXRlciwgcmV0KTsKKwlyZXR1cm4g
+cmV0OworfQorCiBzdGF0aWMgYm9vbAogaXNfc21iX3Jlc3BvbnNlKHN0cnVjdCBUQ1BfU2VydmVy
+X0luZm8gKnNlcnZlciwgdW5zaWduZWQgY2hhciB0eXBlKQogewpkaWZmIC0tZ2l0IGEvZnMvY2lm
+cy9maWxlLmMgYi9mcy9jaWZzL2ZpbGUuYwppbmRleCA2ZDAwMTkwNWM4ZTUuLjRiOGMxYWM1OGYw
+MCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9maWxlLmMKKysrIGIvZnMvY2lmcy9maWxlLmMKQEAgLTQy
+NjEsOCArNDI2MSw3IEBAIHJlYWRwYWdlc19maWxsX3BhZ2VzKHN0cnVjdCBUQ1BfU2VydmVyX0lu
+Zm8gKnNlcnZlciwKIAkJCXJlc3VsdCA9IG47CiAjZW5kaWYKIAkJZWxzZQotCQkJcmVzdWx0ID0g
+Y2lmc19yZWFkX3BhZ2VfZnJvbV9zb2NrZXQoCi0JCQkJCXNlcnZlciwgcGFnZSwgcGFnZV9vZmZz
+ZXQsIG4pOworCQkJcmVzdWx0ID0gY2lmc19yZWFkX2l0ZXJfZnJvbV9zb2NrZXQoc2VydmVyLCAm
+cmRhdGEtPml0ZXIsIG4pOwogCQlpZiAocmVzdWx0IDwgMCkKIAkJCWJyZWFrOwogCi0tIAoyLjI3
+LjAKCg==
+--0000000000007e9f1405ba7d1b61--
