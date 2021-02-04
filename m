@@ -2,179 +2,134 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBAF6C433E0
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 07:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 864C3C433E0
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 07:46:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D5B264F64
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 07:29:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35A4E64F4D
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 07:46:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232941AbhBDH3t (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 Feb 2021 02:29:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48926 "EHLO
+        id S234568AbhBDHqe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 Feb 2021 02:46:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234397AbhBDH3n (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Feb 2021 02:29:43 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B31AC061573;
-        Wed,  3 Feb 2021 23:29:03 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id f1so3092037lfu.3;
-        Wed, 03 Feb 2021 23:29:03 -0800 (PST)
+        with ESMTP id S233789AbhBDHqc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Feb 2021 02:46:32 -0500
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84090C0613D6
+        for <linux-cifs@vger.kernel.org>; Wed,  3 Feb 2021 23:45:52 -0800 (PST)
+Received: by mail-yb1-xb2d.google.com with SMTP id r2so2235388ybk.11
+        for <linux-cifs@vger.kernel.org>; Wed, 03 Feb 2021 23:45:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=XTW6XCLvu1Ll2k8vkPwt+sB3B3vlqjNFERMspX4Qlhc=;
-        b=h+FH8S+d2uHTg5TZ56C+GddfMlFudvAtGSOlJrwRI686KZHBEy3YjszukFMn3UbQYX
-         IOr9wwuEC0QENX6iRIRYitvS/CjmbY1Qt2IUgcjBt1zzIzAIy8GDuw+yF8PUuim+0Lzv
-         GvP1fM9yLAiBdaNO6ajl+kgu5xbpiULRFB03jRVL/+rIe8dYc9eIegooC0xbxrFjjPec
-         u1PSd4TJDetKi03YSVtjnSDqDZU5PInaGTWfdXaNG0WYEroB2uCXYzIYyN+x6BVOgg+O
-         e1hhlUc8BRymveSUrCH/xLPWWsL+++S8K1LVOP2kIK27+ywtioBssnN6DxWmTKP1U925
-         SOPg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=iLcUJdrs52W/hZid9oz/FacsNne9vdbJbV42t64F0Aw=;
+        b=YIy6eSaQCKRABjGAJmjLjMeT2noEKBrBc+GiGgbLQfZ+2b2CxW0S2ye78WrQBUBwU1
+         8Dvtx+kWU9bokvCpjI2U/rBRjmbW8yK34ls0EOYn5pr0L4ORQR43Q2CXnFKu92gtxRzu
+         x/5C/Qcn+XAvwZPMnBT6fH/rhNDoHfsBHPDVNHZHyNsYu8LhZGAt2Oe8d8dQg1XMmajJ
+         GSoZtCihHei5jN+CE+wk69q0aG3QVlH9Kx/LfPGHzT5JONxkbyjTPDki/gzagQ/AYwTe
+         B8UsI2zNWSs41OV+xnlLw4XyyFH+7tG4naxk1Qtz4FalDLr/ajG7K3vPjMCbBcssoOVY
+         YLdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=XTW6XCLvu1Ll2k8vkPwt+sB3B3vlqjNFERMspX4Qlhc=;
-        b=mDNysx6m08LeLbdi4kVxPWZn3ZuwRE6qxSzllnbJumEeVXWiuk4qj74w2eveW0FV47
-         EtJe28d1qVyWtFqe4H8TLg8svlt5nz3M1HRwSE6xCOgnJi0+VxrVcoNIrUZyxkuE+wl/
-         nJJEMXqRk7XxHsoCZT6oO9DfFWCxM4M70UJbudgInL+OU0blG9Is0dxzoZH3MkrjFo+C
-         6XpZWvyxto61HlHsH7AosC/9ElWryoGTZekiuBTTipFqHHUDTTWZFd9rfMV5rNrssQ/I
-         HmVBYZp/e1eaRvt5kSj9b7iu+ngZXYOXgVkn23RKf1XeFmppPX2VVejUAtJMa9R+0pdP
-         sfZg==
-X-Gm-Message-State: AOAM533dUuykcon53iZWNJf3tVN/b4NG3w2PgzOE/38Hg23C+Naovzaf
-        ucI4hMOrwQLmkCQsDDgZn/Hx8x/lB5nxRl1ikLVdL/hVYQotlA==
-X-Google-Smtp-Source: ABdhPJwNe5DjZP/tZNFGYcoB1VdvGXCsEtlBN2qb+JzjpsNr008jQ+DIEngdRsUHWD/ndkF43QjOfQUuNEZVnCTdOR4=
-X-Received: by 2002:a05:6512:1311:: with SMTP id x17mr3920249lfu.307.1612423741679;
- Wed, 03 Feb 2021 23:29:01 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=iLcUJdrs52W/hZid9oz/FacsNne9vdbJbV42t64F0Aw=;
+        b=dF6XG0JVJcCgonOeL1G0CZVI1NaP9DlmvJVddbQRiFYO5CE4wZhpPnl5YrFjAlG7vy
+         12eYI3ksWMmSyFxXD0rymg8ydBX74vt6nA+KzH/kDU+8xiZZvAwQZCPlNtosAVd2ipMC
+         MMr4qjOvo46fQy4+LB6jbKg2ZF0Cnfjp4NUyt0qKwL4yV8V+OZLIcsJi03VIm6Au9mCD
+         XWYJ7L7Lv4jfak44Cw5rYpbgiYl/bXMuaJs7Ckv+IfarwgPWIjmSEg6iHPkmn9b+L3JK
+         Lqx/J6qzODEOECD97Exy1U65Mgfad6pqjNvq91iOZ6hTk/n0RPOV+Verg45OadLwg0WE
+         zpbQ==
+X-Gm-Message-State: AOAM531AGsKymIm17tAhixaW0u8VE7QPerPeSYg9YL2S5gzl6oG9+Sgx
+        Ie8CPZb2Dn+zlbO2zd/8VGbVld/WCh12KIBFJfA=
+X-Google-Smtp-Source: ABdhPJwOeTLKN8YpKLnkJZFUhvyxQRI5+GP/+JuEibEXrNFCRF/07ZnFA1LGGAOAt6nw20b8HTyb/tfbUw237JShgFc=
+X-Received: by 2002:a25:380e:: with SMTP id f14mr10238494yba.185.1612424751804;
+ Wed, 03 Feb 2021 23:45:51 -0800 (PST)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 4 Feb 2021 01:28:50 -0600
-Message-ID: <CAH2r5mstbTOReFCejkvp0qrhjOywDUbdcO_U2wEUwatfrZ9PYA@mail.gmail.com>
-Subject: [PATCH] cifs: add new helper function for fscache conversion
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
-Content-Type: multipart/mixed; boundary="00000000000059c84405ba7da8dd"
+References: <CANT5p=p60ahfnrxU=sazMszPaxWWp4YLKiDWkZs0mf8iie-TbQ@mail.gmail.com>
+ <874kiw9ih7.fsf@suse.com>
+In-Reply-To: <874kiw9ih7.fsf@suse.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 3 Feb 2021 23:45:40 -0800
+Message-ID: <CANT5p=p4OsxafPLiOfpY6JWVr1-sSB+nFgmY33fhybjtihW_HQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Changes made to crediting code to make debugging easier.
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>,
+        Pavel Shilovsky <piastryyy@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        sribhat.msa@outlook.com,
+        samba-technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000059c84405ba7da8dd
-Content-Type: text/plain; charset="UTF-8"
+Thanks Aur=C3=A9lien. Will test it out with 3.1.1.
 
-Add new helper to check if fscache enabled for cifs inode
+Steve asked me to resend this as separate patches, so that it becomes
+easier for the reviewer.
+Will send out the updated set of patches soon.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/cifs/file.c    | 7 +++++++
- fs/cifs/fscache.h | 5 +++++
- 2 files changed, 12 insertions(+)
+Regards,
+Shyam
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 4b8c1ac58f00..49e7cf701b3e 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -4287,6 +4287,13 @@ cifs_readpages_copy_into_pages(struct
-TCP_Server_Info *server,
-  return readpages_fill_pages(server, rdata, iter, iter->count);
- }
+On Mon, Feb 1, 2021 at 2:43 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
+>
+> Shyam Prasad N <nspmangalore@gmail.com> writes:
+> > Specifically, I keen on your views on the following:
+> > @@ -1159,7 +1181,9 @@ compound_send_recv(const unsigned int xid,
+> > struct cifs_ses *ses,
+> >         /*
+> >          * Compounding is never used during session establish.
+> >          */
+> > -       if ((ses->status =3D=3D CifsNew) || (optype & CIFS_NEG_OP))
+> > +       if ((ses->status =3D=3D CifsNew) ||
+> > +                       (optype & CIFS_NEG_OP) ||
+> > +                       (optype & CIFS_SESS_OP))
+> >                 smb311_update_preauth_hash(ses, rqst[0].rq_iov,
+> >                                            rqst[0].rq_nvec);
+> >
+> > @@ -1224,7 +1248,9 @@ compound_send_recv(const unsigned int xid,
+> > struct cifs_ses *ses,
+> >         /*
+> >          * Compounding is never used during session establish.
+> >          */
+> > -       if ((ses->status =3D=3D CifsNew) || (optype & CIFS_NEG_OP)) {
+> > +       if ((ses->status =3D=3D CifsNew) ||
+> > +                       (optype & CIFS_NEG_OP) ||
+> > +                       (optype & CIFS_SESS_OP)) {
+> >                 struct kvec iov =3D {
+> >                         .iov_base =3D resp_iov[0].iov_base,
+> >                         .iov_len =3D resp_iov[0].iov_len
+>
+> preauth should be updated for both negprot and sess_setup (except last
+> response from server) so that looks correct. But ses->status will be
+> CifsNew until its fully established (covering the SESS scenario) so this
+> shouldn't change anything. You can test this code path by mounting with
+> vers=3D3.1.1 with and without multichannel.
+>
+> Also there are no 80 columns limit anymore, I think it's more readable
+> as 1 line.
+>
+> Cheers,
+> --
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
+ DE
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
+=BCnchen)
+>
 
-+static bool cifs_is_cache_enabled(struct inode *inode)
-+{
-+ struct fscache_cookie *cookie = cifs_inode_cookie(inode);
-+
-+ return fscache_cookie_enabled(cookie) &&
-!hlist_empty(&cookie->backing_objects);
-+}
-+
- static int
- readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
-      unsigned int rsize, struct list_head *tmplist,
-diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-index e811f2dd7619..713c0da1bad0 100644
---- a/fs/cifs/fscache.h
-+++ b/fs/cifs/fscache.h
-@@ -70,6 +70,10 @@ extern void
-cifs_fscache_release_inode_cookie(struct inode *);
- extern void cifs_fscache_set_inode_cookie(struct inode *, struct file *);
- extern void cifs_fscache_reset_inode_cookie(struct inode *);
 
-+static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inode)
-+{
-+ return CIFS_I(inode)->fscache;
-+}
- extern void __cifs_fscache_invalidate_page(struct page *, struct inode *);
- extern int cifs_fscache_release_page(struct page *page, gfp_t gfp);
- extern int __cifs_readpage_from_fscache(struct inode *, struct page *);
-@@ -138,6 +142,7 @@ static inline void
-cifs_fscache_release_inode_cookie(struct inode *inode) {}
- static inline void cifs_fscache_set_inode_cookie(struct inode *inode,
-  struct file *filp) {}
- static inline void cifs_fscache_reset_inode_cookie(struct inode *inode) {}
-+static inline struct fscache_cookie *cifs_inode_cookie(struct inode
-*inode) { return NULL; }
- static inline int cifs_fscache_release_page(struct page *page, gfp_t gfp)
- {
-  return 1; /* May release page */
-
--- 
-Thanks,
-
-Steve
-
---00000000000059c84405ba7da8dd
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-add-new-helper-function-for-fscache-conversion.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-add-new-helper-function-for-fscache-conversion.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kkqjgd700>
-X-Attachment-Id: f_kkqjgd700
-
-RnJvbSAwZjk0ODhmNjhlZGJhZjYzZGI5ZjU2ZTI0MWQwMzg2ODU5MjE2MzBkIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPgpE
-YXRlOiBUaHUsIDQgRmViIDIwMjEgMDE6MjM6MDQgLTA2MDAKU3ViamVjdDogW1BBVENIXSBjaWZz
-OiBhZGQgbmV3IGhlbHBlciBmdW5jdGlvbiBmb3IgZnNjYWNoZSBjb252ZXJzaW9uCgpBZGQgbmV3
-IGhlbHBlciB0byBjaGVjayBpZiBmc2NhY2hlIGVuYWJsZWQgZm9yIGNpZnMgaW5vZGUKClNpZ25l
-ZC1vZmYtYnk6IERhdmlkIEhvd2VsbHMgPGRob3dlbGxzQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYt
-Ynk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2Zp
-bGUuYyAgICB8IDcgKysrKysrKwogZnMvY2lmcy9mc2NhY2hlLmggfCA1ICsrKysrCiAyIGZpbGVz
-IGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2ZpbGUuYyBi
-L2ZzL2NpZnMvZmlsZS5jCmluZGV4IDRiOGMxYWM1OGYwMC4uNDllN2NmNzAxYjNlIDEwMDY0NAot
-LS0gYS9mcy9jaWZzL2ZpbGUuYworKysgYi9mcy9jaWZzL2ZpbGUuYwpAQCAtNDI4Nyw2ICs0Mjg3
-LDEzIEBAIGNpZnNfcmVhZHBhZ2VzX2NvcHlfaW50b19wYWdlcyhzdHJ1Y3QgVENQX1NlcnZlcl9J
-bmZvICpzZXJ2ZXIsCiAJcmV0dXJuIHJlYWRwYWdlc19maWxsX3BhZ2VzKHNlcnZlciwgcmRhdGEs
-IGl0ZXIsIGl0ZXItPmNvdW50KTsKIH0KIAorc3RhdGljIGJvb2wgY2lmc19pc19jYWNoZV9lbmFi
-bGVkKHN0cnVjdCBpbm9kZSAqaW5vZGUpCit7CisJc3RydWN0IGZzY2FjaGVfY29va2llICpjb29r
-aWUgPSBjaWZzX2lub2RlX2Nvb2tpZShpbm9kZSk7CisKKwlyZXR1cm4gZnNjYWNoZV9jb29raWVf
-ZW5hYmxlZChjb29raWUpICYmICFobGlzdF9lbXB0eSgmY29va2llLT5iYWNraW5nX29iamVjdHMp
-OworfQorCiBzdGF0aWMgaW50CiByZWFkcGFnZXNfZ2V0X3BhZ2VzKHN0cnVjdCBhZGRyZXNzX3Nw
-YWNlICptYXBwaW5nLCBzdHJ1Y3QgbGlzdF9oZWFkICpwYWdlX2xpc3QsCiAJCSAgICB1bnNpZ25l
-ZCBpbnQgcnNpemUsIHN0cnVjdCBsaXN0X2hlYWQgKnRtcGxpc3QsCmRpZmYgLS1naXQgYS9mcy9j
-aWZzL2ZzY2FjaGUuaCBiL2ZzL2NpZnMvZnNjYWNoZS5oCmluZGV4IGU4MTFmMmRkNzYxOS4uNzEz
-YzBkYTFiYWQwIDEwMDY0NAotLS0gYS9mcy9jaWZzL2ZzY2FjaGUuaAorKysgYi9mcy9jaWZzL2Zz
-Y2FjaGUuaApAQCAtNzAsNiArNzAsMTAgQEAgZXh0ZXJuIHZvaWQgY2lmc19mc2NhY2hlX3JlbGVh
-c2VfaW5vZGVfY29va2llKHN0cnVjdCBpbm9kZSAqKTsKIGV4dGVybiB2b2lkIGNpZnNfZnNjYWNo
-ZV9zZXRfaW5vZGVfY29va2llKHN0cnVjdCBpbm9kZSAqLCBzdHJ1Y3QgZmlsZSAqKTsKIGV4dGVy
-biB2b2lkIGNpZnNfZnNjYWNoZV9yZXNldF9pbm9kZV9jb29raWUoc3RydWN0IGlub2RlICopOwog
-CitzdGF0aWMgaW5saW5lIHN0cnVjdCBmc2NhY2hlX2Nvb2tpZSAqY2lmc19pbm9kZV9jb29raWUo
-c3RydWN0IGlub2RlICppbm9kZSkKK3sKKwlyZXR1cm4gQ0lGU19JKGlub2RlKS0+ZnNjYWNoZTsK
-K30KIGV4dGVybiB2b2lkIF9fY2lmc19mc2NhY2hlX2ludmFsaWRhdGVfcGFnZShzdHJ1Y3QgcGFn
-ZSAqLCBzdHJ1Y3QgaW5vZGUgKik7CiBleHRlcm4gaW50IGNpZnNfZnNjYWNoZV9yZWxlYXNlX3Bh
-Z2Uoc3RydWN0IHBhZ2UgKnBhZ2UsIGdmcF90IGdmcCk7CiBleHRlcm4gaW50IF9fY2lmc19yZWFk
-cGFnZV9mcm9tX2ZzY2FjaGUoc3RydWN0IGlub2RlICosIHN0cnVjdCBwYWdlICopOwpAQCAtMTM4
-LDYgKzE0Miw3IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBjaWZzX2ZzY2FjaGVfcmVsZWFzZV9pbm9k
-ZV9jb29raWUoc3RydWN0IGlub2RlICppbm9kZSkge30KIHN0YXRpYyBpbmxpbmUgdm9pZCBjaWZz
-X2ZzY2FjaGVfc2V0X2lub2RlX2Nvb2tpZShzdHJ1Y3QgaW5vZGUgKmlub2RlLAogCQkJCQkJIHN0
-cnVjdCBmaWxlICpmaWxwKSB7fQogc3RhdGljIGlubGluZSB2b2lkIGNpZnNfZnNjYWNoZV9yZXNl
-dF9pbm9kZV9jb29raWUoc3RydWN0IGlub2RlICppbm9kZSkge30KK3N0YXRpYyBpbmxpbmUgc3Ry
-dWN0IGZzY2FjaGVfY29va2llICpjaWZzX2lub2RlX2Nvb2tpZShzdHJ1Y3QgaW5vZGUgKmlub2Rl
-KSB7IHJldHVybiBOVUxMOyB9CiBzdGF0aWMgaW5saW5lIGludCBjaWZzX2ZzY2FjaGVfcmVsZWFz
-ZV9wYWdlKHN0cnVjdCBwYWdlICpwYWdlLCBnZnBfdCBnZnApCiB7CiAJcmV0dXJuIDE7IC8qIE1h
-eSByZWxlYXNlIHBhZ2UgKi8KLS0gCjIuMjcuMAoK
---00000000000059c84405ba7da8dd--
+--=20
+Regards,
+Shyam
