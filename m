@@ -2,90 +2,181 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B548C433E6
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 22:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E48C1C433DB
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Feb 2021 19:26:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA53064FA7
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Feb 2021 22:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 972B064E36
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Feb 2021 19:26:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229706AbhBDWwV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 Feb 2021 17:52:21 -0500
-Received: from ozlabs.org ([203.11.71.1]:45635 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229684AbhBDWwV (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 4 Feb 2021 17:52:21 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4DWv1R1yX5z9sXG;
-        Fri,  5 Feb 2021 09:51:39 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1612479099;
-        bh=Qmcs7wXaK/oiVBstKKQx3GA71VxIeBSpvxwpqhN+qvg=;
-        h=Date:From:To:Cc:Subject:From;
-        b=okKSkFUqaBnQOaM3pY4rY3XWgNEV74EE5ca6If+DIof/ycddM7elj1RmQ6gTSjVDq
-         wrhKKmuIPh/2mST4RSRsiHCZpoLWBUdmCQd9pjJMynQ+fmrdCmPOBiBS/7LrZrpsQy
-         0nMdlDXi9EyWxj8VWG0wJUJKPh/nXNZUKwSCeCiuysgwsaCgt4nJj5pq17+JW4a0Lv
-         5CleyvGMxxsD7s0Olpi3Ug4Fav5dMjGqHDkmwMgrXLuFYW/qv7Toj7KN3G0VhOFir6
-         yV8NrOxSn45odbcDrnwxzAh1yF7Gz+NliZC7yMHQbqY5Ph5BE3EL3TQ5/FbTmu6EWr
-         gCUFM9m6tY5yA==
-Date:   Fri, 5 Feb 2021 09:51:38 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: build warning after merge of the cifs tree
-Message-ID: <20210205095138.317922cb@canb.auug.org.au>
+        id S231524AbhBERnh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Feb 2021 12:43:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57042 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233256AbhBERlB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Feb 2021 12:41:01 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E807C061756;
+        Fri,  5 Feb 2021 11:22:44 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id m22so9101539ljj.4;
+        Fri, 05 Feb 2021 11:22:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=F2vsApDg2B3glC5E0j7mMjIzbTbx0EI6gxSiyVDvcXs=;
+        b=W22aY6M+qGPtyiVVqnBVYKVgtdw8bg69xFcMto8ut4LKn3xDVhzCR714TEkDUZXB65
+         bG2twq0QG0IKmid7s7ZNeokWEJVYdt/YSzTtG9itWlktL5XtlTGb4Suvhu4ogXa01jWL
+         UYAQsbkp2sR65Nicgitdi4gll5bLLvuIekoTjiabCbqg4ouVvYkGbkw5bVl+DIvepOCF
+         1XdA7rHWSM6kiBa9Vuc9UOZQkXC649rqNtu3vXhSGrsq95gRA7EiukfMtstvjOEECL5F
+         bQ0O36VQn9GZphlbZ9gd+UFwwGIJvfZ4IR5PTe+b585bTwJ1M8U9qyJzPYcpNR3BBfb9
+         K1cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=F2vsApDg2B3glC5E0j7mMjIzbTbx0EI6gxSiyVDvcXs=;
+        b=DO4V1gT+pI00VdWQM1UaYrkLmI8nQFwc7C0evbeA0uxo59/5oYSILkpTn0g1p14N7I
+         SCK/fxuRoMHaUi6LKvQv/I47OOkYnrtU8D8DGmaVyNl8u5Gxti2XlBUBO82rwoQbYLnu
+         eXrN+zO+JWOZ/ScsJyW+ecuZgvmi8yWsqq7k4MrtkqleijpaseCLQrYDgTqMrYR+qsJx
+         VPOyLFtMuEdm2A2RhLS63K08yjYAhl79P8UTHtoMJCz0eRdmfXHzP7ylENCaKLtL2UQ9
+         IcNRma6Ahlagz2Toml1I9pk9KsJujc9QwoxcuM/SOHBpiGL50fHRqZJ7uC3P0iIIOu4W
+         /jAA==
+X-Gm-Message-State: AOAM5313merIjgcFJhp6qytIopLndhInYoOJYXbzSlbWEbiUK+0vn0Fq
+        3Ngvad++wobR/fv56NRM4toYSsBOkCmGIw4kMz0=
+X-Google-Smtp-Source: ABdhPJwKZiAP0rDyEetgcQRONiYE9BR58NzkRwu0TdURLwmIuytVyytmgBSQc+49PP5p/SjusMD/upEJyzLW111sk8Q=
+X-Received: by 2002:a05:651c:548:: with SMTP id q8mr3501352ljp.256.1612552962974;
+ Fri, 05 Feb 2021 11:22:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/HRuqvG8r_mQd+PPpTzVyH_F";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+References: <CANT5p=o4b9RfQ5omd911pLH3WFbiC1-ghF43kRZ5-4SV+PeS=g@mail.gmail.com>
+ <20210205144248.13508-1-aaptel@suse.com> <CANT5p=p7Ah_yFsmpj7VCzuoszpf6WiU+G8jws24njXgM_gv_mQ@mail.gmail.com>
+In-Reply-To: <CANT5p=p7Ah_yFsmpj7VCzuoszpf6WiU+G8jws24njXgM_gv_mQ@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 5 Feb 2021 13:22:31 -0600
+Message-ID: <CAH2r5mvzQa4B2c-=F5f5x=XMxXTius4J=oyHXBGbMAnsxCr2mQ@mail.gmail.com>
+Subject: Re: [PATCH v4] cifs: report error instead of invalid when
+ revalidating a dentry fails
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/HRuqvG8r_mQd+PPpTzVyH_F
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Fri, Feb 5, 2021 at 8:52 AM Shyam Prasad N <nspmangalore@gmail.com> wrot=
+e:
+>
+> Looks good to me.
 
-Hi all,
+We do need to find out how a single client test could generate ESTALE
+though (perhaps we forgot to drop a dentry on delete or rmdir).
+The test is doing fsstress, so should be easy enough to shorten it
+and repro and find out exactly why the ESTALE is coming.
 
-After merging the cifs tree, today's linux-next build (powerpc
-ppc64_defconfig) produced this warning:
 
-fs/cifs/file.c:4290:13: warning: 'cifs_is_cache_enabled' defined but not us=
-ed [-Wunused-function]
- 4290 | static bool cifs_is_cache_enabled(struct inode *inode)
-      |             ^~~~~~~~~~~~~~~~~~~~~
+> Maybe change the FYI in the cifs_dbg line above to VFS?
 
-Introduced by commit
+Probably safer to put a dynamic trace point there in case EACCES or other r=
+c
+becomes too common in some scenario.
 
-  6941febc7309 ("cifs: add new helper function for fscache conversion")
+> On Fri, Feb 5, 2021 at 6:42 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrot=
+e:
+> >
+> > From: Aurelien Aptel <aaptel@suse.com>
+> >
+> > Assuming
+> > - //HOST/a is mounted on /mnt
+> > - //HOST/b is mounted on /mnt/b
+> >
+> > On a slow connection, running 'df' and killing it while it's
+> > processing /mnt/b can make cifs_get_inode_info() returns -ERESTARTSYS.
+> >
+> > This triggers the following chain of events:
+> > =3D> the dentry revalidation fail
+> > =3D> dentry is put and released
+> > =3D> superblock associated with the dentry is put
+> > =3D> /mnt/b is unmounted
+> >
+> > This patch makes cifs_d_revalidate() return the error instead of 0
+> > (invalid) when cifs_revalidate_dentry() fails, except for ENOENT (file
+> > deleted) and ESTALE (file recreated).
+> >
+> > Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+> > Suggested-by: Shyam Prasad N <nspmangalore@gmail.com>
+> > CC: stable@vger.kernel.org
+> >
+> > ---
+> >  fs/cifs/dir.c | 22 ++++++++++++++++++++--
+> >  1 file changed, 20 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+> > index 68900f1629bff..97ac363b5df16 100644
+> > --- a/fs/cifs/dir.c
+> > +++ b/fs/cifs/dir.c
+> > @@ -737,6 +737,7 @@ static int
+> >  cifs_d_revalidate(struct dentry *direntry, unsigned int flags)
+> >  {
+> >         struct inode *inode;
+> > +       int rc;
+> >
+> >         if (flags & LOOKUP_RCU)
+> >                 return -ECHILD;
+> > @@ -746,8 +747,25 @@ cifs_d_revalidate(struct dentry *direntry, unsigne=
+d int flags)
+> >                 if ((flags & LOOKUP_REVAL) && !CIFS_CACHE_READ(CIFS_I(i=
+node)))
+> >                         CIFS_I(inode)->time =3D 0; /* force reval */
+> >
+> > -               if (cifs_revalidate_dentry(direntry))
+> > -                       return 0;
+> > +               rc =3D cifs_revalidate_dentry(direntry);
+> > +               if (rc) {
+> > +                       cifs_dbg(FYI, "cifs_revalidate_dentry failed wi=
+th rc=3D%d", rc);
+> > +                       switch (rc) {
+> > +                       case -ENOENT:
+> > +                       case -ESTALE:
+> > +                               /*
+> > +                                * Those errors mean the dentry is inva=
+lid
+> > +                                * (file was deleted or recreated)
+> > +                                */
+> > +                               return 0;
+> > +                       default:
+> > +                               /*
+> > +                                * Otherwise some unexpected error happ=
+ened
+> > +                                * report it as-is to VFS layer
+> > +                                */
+> > +                               return rc;
+> > +                       }
+> > +               }
+> >                 else {
+> >                         /*
+> >                          * If the inode wasn't known to be a dfs entry =
+when
+> > --
+> > 2.29.2
+> >
+>
+>
+> --
+> Regards,
+> Shyam
+
+
 
 --=20
-Cheers,
-Stephen Rothwell
+Thanks,
 
---Sig_/HRuqvG8r_mQd+PPpTzVyH_F
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmAcenoACgkQAVBC80lX
-0GyB2gf+O1hhydmt4EtK1N/61FDlC/EP11uMSsvoAIobjKPi7ZMoim3C9DytcFt7
-Wo45GFABqoNNoIEl212tfQsXEgtU+mWwTr/VzDL19aBCHfsO78t308Q6vjLQvrP1
-hqQIU8hKA8alwcY9OdeMxm+m0M0HPA33ECdStnLuCJ4GZIwqWPeN02taQoLbuzVX
-BCUl7v6JszAUfrKDiI/8YEDPFLVeqCznEv5Mb1XXt1vxXEjUHDsnqMoooVc/MGMy
-SMwuooq9b0S3uSaCkYGQ2vD3ibQrHsaRFOpuNU7ogz0KlYatbXBE9ypIm30LXn5I
-u/PvzBIBEOtcZJgFugQ/cR5z0T9oxQ==
-=UMMb
------END PGP SIGNATURE-----
-
---Sig_/HRuqvG8r_mQd+PPpTzVyH_F--
+Steve
