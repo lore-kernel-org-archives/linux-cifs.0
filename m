@@ -7,93 +7,160 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF90C433DB
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Feb 2021 23:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7592FC433DB
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Feb 2021 23:42:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBDF164E42
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Feb 2021 23:42:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37E2E64E3F
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Feb 2021 23:42:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233657AbhBIXlu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 Feb 2021 18:41:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44091 "EHLO
+        id S233595AbhBIXly (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 Feb 2021 18:41:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25402 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234128AbhBIWOy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Feb 2021 17:14:54 -0500
+        by vger.kernel.org with ESMTP id S233868AbhBIWoP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Feb 2021 17:44:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612908799;
+        s=mimecast20190719; t=1612910565;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=njyj2XCXYGtI5AX/JV14IYXR8Ipi7RDaSVkhJ8oSglg=;
-        b=UefyHNbYqf67ArC+LWa8eLd98C3qghKmJwIrkefcPmete97BHKJ8kVaCMYTUlVKaKp6JDm
-        4lxRpzoN4OOZBsbR6GWx29Hw1owF5xXPS/OD4rB8zFQCBoCyTfCQLpyAPtcXjtXwjDWKFs
-        lLYV+clM+k6eG4raJ1cb+/XmpjJVLnI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-Ez0mEz_fP32izAfxafFp3w-1; Tue, 09 Feb 2021 16:25:32 -0500
-X-MC-Unique: Ez0mEz_fP32izAfxafFp3w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7E8FCC626;
-        Tue,  9 Feb 2021 21:25:30 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E044519C78;
-        Tue,  9 Feb 2021 21:25:23 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20210209202134.GA308988@casper.infradead.org>
-References: <20210209202134.GA308988@casper.infradead.org> <591237.1612886997@warthog.procyon.org.uk> <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
+        bh=GZ7uCNlA2uIi2Zywr96bupyWhGmv/tkzQj/R8fIDK/I=;
+        b=c79CMMqXTroewiGPEZ2YdcW1087MhjRQva3KlhBnM6uCX02vN/FbCKqpjfsXBVgaajf030
+        A9CAQZIEt+eyaTNCIVTvRRMQVXS/gp7gY8V1tvb7bdm+3HxXtrdrkQx7UI7FA/Ah6MozoV
+        /A1TearfBSMSdd/OMD/CfOxj5WtVeCI=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-OonVfQ94M8KXsTi2yaC--w-1; Tue, 09 Feb 2021 17:42:41 -0500
+X-MC-Unique: OonVfQ94M8KXsTi2yaC--w-1
+Received: by mail-ej1-f70.google.com with SMTP id 7so270983ejh.10
+        for <linux-cifs@vger.kernel.org>; Tue, 09 Feb 2021 14:42:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GZ7uCNlA2uIi2Zywr96bupyWhGmv/tkzQj/R8fIDK/I=;
+        b=rJi+FExFNwPCpTYi++aLfDx1tOY0kB/PcEBZ3L+r8uDZcCJs9X8qaSkt1uny4QU1dR
+         nikiv+0Tjj0szrXg/8HkylH+GbEq63j3dc0KJVYm/emrpseBH3WcAlBcScvFL//gYkT+
+         KUr8n64m0w2pHqUu926n0OWva7gt+hEsbWJ9jLep4Nb+NTw2WmTF8HERYrGiXLjXzHMx
+         sKvsmi6O5VE6Ev8fGX3i9OzWLB610xQ0n0j/J90bBK1rPp+HenRu5X4W+ZNF7MOlSTtU
+         7CoTvECkdqkt1/VrxyaIzztzyuHESxoNZs6PaDkXT7AUJc4Ohw9T3AlDNpqWvfe/vpMS
+         WzVQ==
+X-Gm-Message-State: AOAM532jkDMvuTT2uuQIj81fMuezRzq8gO8mdxJ5gfsMTD2e525esZNs
+        nERsr9DwsQwah8B3Qf6sYUgyLoJxoMYQBmmFh10o4WulyQDBlB6tE8MAEqboo3kT7bT2kdpfSdT
+        URfGRsfUBD6dYhSpXoJS5ofoZXwu6drlHWKmzDg==
+X-Received: by 2002:a17:906:b351:: with SMTP id cd17mr24871295ejb.110.1612910560580;
+        Tue, 09 Feb 2021 14:42:40 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxWZ/SxMb2EYr3Wx/r9tLm+ytvzx5rNbM3Mu7nYLvi+QXirS/jRZBjDCWHtM3Wa2pEsJ4PdxjPocMuO52GFZ9o=
+X-Received: by 2002:a17:906:b351:: with SMTP id cd17mr24871281ejb.110.1612910560352;
+ Tue, 09 Feb 2021 14:42:40 -0800 (PST)
+MIME-Version: 1.0
+References: <591237.1612886997@warthog.procyon.org.uk> <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com>
+In-Reply-To: <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com>
+From:   David Wysochanski <dwysocha@redhat.com>
+Date:   Tue, 9 Feb 2021 17:42:04 -0500
+Message-ID: <CALF+zOkMKqvidLf8WZD889PUN-KofdiRPOcbO4hxboVmUGiOgw@mail.gmail.com>
+Subject: Re: [GIT PULL] fscache: I/O API modernisation and netfs helper library
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
         Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Trond Myklebust <trondmy@hammerspace.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cachefs@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
+        linux-cachefs <linux-cachefs@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
         v9fs-developer@lists.sourceforge.net,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [GIT PULL] fscache: I/O API modernisation and netfs helper library
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <618608.1612905923.1@warthog.procyon.org.uk>
-Date:   Tue, 09 Feb 2021 21:25:23 +0000
-Message-ID: <618609.1612905923@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
+On Tue, Feb 9, 2021 at 2:07 PM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> So I'm looking at this early, because I have more time now than I will
+> have during the merge window, and honestly, your pull requests have
+> been problematic in the past.
+>
+> The PG_fscache bit waiting functions are completely crazy. The comment
+> about "this will wake up others" is actively wrong, and the waiting
+> function looks insane, because you're mixing the two names for
+> "fscache" which makes the code look totally incomprehensible. Why
+> would we wait for PF_fscache, when PG_private_2 was set? Yes, I know
+> why, but the code looks entirely nonsensical.
+>
+> So just looking at the support infrastructure changes, I get a big "Hmm".
+>
+> But the thing that makes me go "No, I won't pull this", is that it has
+> all the same hallmark signs of trouble that I've complained about
+> before: I see absolutely zero sign of "this has more developers
+> involved".
+>
+> There's not a single ack from a VM person for the VM changes. There's
+> no sign that this isn't yet another "David Howells went off alone and
+> did something that absolutely nobody else cared about".
+>
 
-> Yeah, I have trouble with the private2 vs fscache bit too.  I've been
-> trying to persuade David that he doesn't actually need an fscache
-> bit at all; he can just increment the page's refcount to prevent it
-> from being freed while he writes data to the cache.
+I care about it.
 
-That's not what the bit is primarily being used for.  It's being used to
-prevent the starting of a second write to the cache whilst the first is in
-progress and also to prevent modification whilst DMA to the cache is in
-progress.  This isn't so obvious in this cut-down patchset, but comes more in
-to play with full caching of local writes in my fscache-iter branch.
+I cannot speak to your concerns about the infrastructure changes, nor
+can I comment about a given maintainers involvement or lack thereof.
+However, I can tell you what my involvement has been.  I got involved
+with it because some of our customers use fscache with NFS and I've
+supported it.  I saw dhowells rewriting it to greatly simplify the
+code and make it easier to debug and wanted to support the effort.
 
-I can't easily share PG_writeback for this because each bit covers a write to
-a different place.  PG_writeback covers the write to the server and PG_fscache
-the write to the cache.  These writes may get split up differently and will
-most likely finish at different times.
+I have been working on the NFS conversion as dhowells has been
+evolving the fscache-iter API.  David first posted the series I think
+in Dec 2019 and I started with NFS about mid-year 2020, and had my
+first post of NFS patches in July:
+https://marc.info/?l=linux-nfs&m=159482591232752&w=2
 
-If I have to share PG_writeback, that will mean storing both states for each
-page somewhere else and then "OR'ing" them together to drive PG_writeback.
+One thing that came out of the earlier iterations as a result of my
+testing was the need for the network filesystem to be able to 'cap'
+the IO size based on its parameters, hence the "clamp_length()"
+function.  So the next iteration dhowells further evolved it into a
+'netfs' API and a 'fscache' API, and my November post was based on
+that:
+https://marc.info/?l=linux-nfs&m=160596540022461&w=2
 
-David
+Each iteration has greatly simplified the interface to the network
+filesystem until today where the API is pretty simple.  I have done
+extensive tests with each iteration with all the main NFS versions,
+specific unit tests, xfstests, etc.  However my test matrix did not
+hit enough fscache + pNFS servers, and I found a problem too late to
+include in his pull request.  This is mostly why my patches were not
+included to convert NFS to the new fscache API, but I intend to work
+out the remaining issues for the next merge window, and I'll have an
+opportunity to do more testing last week of Feb with the NFS "remote
+bakeathon".  My most recent post was at the end of Jan, and Anna is
+taking the first 5 refactoring patches in the next merge window:
+https://marc.info/?l=linux-nfs&m=161184595127618&w=2
+
+I do not have the skills of a Trond or Anna NFS developers, but I have
+worked in this in earnest and intend to see it through to completion
+and support NFS and fscache work.  I have received some feedback on
+the NFS patches though it's not been a lot, I do know I have some
+things to address still.  With open source, no feedback is hard to
+draw conclusions other than it's not "super popular" area, but we
+always knew that about fscache - it's an "add on" that some customers
+require but not everyone. I know Trond speaks up when I make a mistake
+and/or something will cause a problem, so I consider the silence
+mostly a positive sign.
+
+
+
+> See my problem? I need to be convinced that this makes sense outside
+> of your world, and it's not yet another thing that will cause problems
+> down the line because nobody else really ever used it or cared about
+> it until we hit a snag.
+>
+>                   Linus
+>
 
