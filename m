@@ -2,108 +2,111 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D0DC433E0
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Feb 2021 22:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E07EDC433E0
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Feb 2021 23:42:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D787664E56
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Feb 2021 22:22:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D93364E3F
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Feb 2021 23:42:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234303AbhBIWVt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 Feb 2021 17:21:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57464 "EHLO
+        id S233560AbhBIXlh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 Feb 2021 18:41:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233500AbhBIWPw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Feb 2021 17:15:52 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EF9BC061A2A
-        for <linux-cifs@vger.kernel.org>; Tue,  9 Feb 2021 11:58:32 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id jj19so33872481ejc.4
-        for <linux-cifs@vger.kernel.org>; Tue, 09 Feb 2021 11:58:32 -0800 (PST)
+        with ESMTP id S233657AbhBIWHM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Feb 2021 17:07:12 -0500
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC84BC061788
+        for <linux-cifs@vger.kernel.org>; Tue,  9 Feb 2021 13:19:19 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id v5so28390466lft.13
+        for <linux-cifs@vger.kernel.org>; Tue, 09 Feb 2021 13:19:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=4BZ08gZDuYzKG5eIuFN6xwxS5+LQ5I4Q6MVmw1iqtII=;
-        b=cZUBlsaFoDUSKQLdDTibQVXnOsouvdeXxwCBwARFizbswJeHKShNH1Y2tsxJoecwxv
-         rCjUq5uQn7nHjx7y+dBJpL7mpmRZxAbZDmAgMACrg4XwZrmNGrrLmACjYaVDtwyIxZVj
-         06sC1b0KlA3K0ga0KjcP9emNpz1QJfJ2Xi+lljx2m8/mzxCESoOf+Bc8S8wD6f0igPRb
-         ugdxa7hvYwF7h8Y5tBdXKSLbofxgSyhQpjNBiNtzY1VF4co4W8wuqmFX2+zn4Ncz/Ssi
-         DGH6ADIA6aTz6/En9EDGbPPWaTFx07KBhmvfXmxrQTGIFzQeCLmN7R6muB+VzA/vHXuJ
-         TuuA==
+         :cc;
+        bh=5NXrj70SaJJJRtMQWC0+3w4cmGywCfZjtndBL9rb8Bo=;
+        b=g8n7RWB/hph+MNS6KsfC0GffC4feoLtbwfzXkMDO5VGlvyK682yT02RPRIOW6hieUR
+         nxG1Mlzbyp5mtI1Do4dwBB4pr2NfNtLSNxuXGIfX+Az+7iAT6uxAH+/kuEuPZoNDiHrT
+         JX8A9+J4I4DIw7KDC1ACDk8XTP+nwuXWBZL+g=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=4BZ08gZDuYzKG5eIuFN6xwxS5+LQ5I4Q6MVmw1iqtII=;
-        b=h/vmopavVMes44KroP/QBHF/wS2RS6ZSDmce3/sPqwZyOUjVS8u5McY/r0jwFSU4ow
-         JeOAAXk4W0UK6Jxn/RqBJ9UXPiYpDRDcQsVOijZGI0SYyAPRhay49fNVz6KnyRV4Mwcl
-         QLc8Rf+FPBkn+2lEX7Y05i2rWnHQyE2L/wp5ZpA3webw/9LKqhfM+DIiM3alOxkquhC0
-         r4ZafkBJsMhto+7FedKvhJzru41utX0BxjZ8DRzZBH4AS117APo3rVz4XkZ5/2FEMFPU
-         tmw6GcYvEa7NhAwCLdsca7gzWCpURjLSyqqKRcCn+DgVfrWHQTnPS66XirOyV+aVeZld
-         5r+Q==
-X-Gm-Message-State: AOAM532q2Agn112JDYygJoG41kYbue9C1w1pNRmK09cFP6BtPLpubdsu
-        u3qBnju9veW52SsHjCX69SN8TgOxejXv3SSWjw==
-X-Google-Smtp-Source: ABdhPJx3wMGsOe6qQld89l1MH0cxzG6FCbwoykTSxxFEauhGgCpbllGMSIplpcZ4frBXM4F4fN8zpAdSovMJoiNFLpw=
-X-Received: by 2002:a17:907:9483:: with SMTP id dm3mr23860738ejc.120.1612900710844;
- Tue, 09 Feb 2021 11:58:30 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=5NXrj70SaJJJRtMQWC0+3w4cmGywCfZjtndBL9rb8Bo=;
+        b=HeoMfQJ9uttZlKAIutKCIfnukzqmaq+yB6Nu86MRcwPw12Jj975J82MbZWojD4I1pp
+         ay8v6oSYIpUT+escA8WNy03AlzK3BsgLkMv4sOIAWPl3lpbPRlFwG8aGHG2wnip/dY1F
+         0QJDnYrbrVYuzx+VvYvVHi+4hGaqF1KDI23HqeohN0gHk7/39Ax93G3trJZ1U1VROPv/
+         NGyXWyvpvc/ytzdcMpzIh0LugQxmCNiIbbrG7QC6T1UNxUfsOFigjAOxvB3SZra6Wg4J
+         NCLOR2WrPbSr0TEH+qSkYv9zta7DxuzMO3nyBIV/Ou8Vdvh4hQjJH8E01fDldP+84Vf6
+         3poA==
+X-Gm-Message-State: AOAM532rttzGdgqlWLW+IYVtCvFltjZC18YXE3eH1PdR5wd09ZoInNfs
+        Zbae89ft7vGJn9Lh7PCMfpom2RexYezwvA==
+X-Google-Smtp-Source: ABdhPJxrtHl1eKIiU6c5vHi7IqgsUWnRVRSk3kYaz/kOFmC+MNXnPWlP0EtpHe3eNHHE6f6kA3rt4g==
+X-Received: by 2002:a05:6512:358d:: with SMTP id m13mr14114353lfr.648.1612905558449;
+        Tue, 09 Feb 2021 13:19:18 -0800 (PST)
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com. [209.85.208.176])
+        by smtp.gmail.com with ESMTPSA id v68sm1043315lfa.137.2021.02.09.13.19.17
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Feb 2021 13:19:18 -0800 (PST)
+Received: by mail-lj1-f176.google.com with SMTP id a22so5280ljp.10
+        for <linux-cifs@vger.kernel.org>; Tue, 09 Feb 2021 13:19:17 -0800 (PST)
+X-Received: by 2002:a2e:b1c8:: with SMTP id e8mr15253931lja.251.1612905557284;
+ Tue, 09 Feb 2021 13:19:17 -0800 (PST)
 MIME-Version: 1.0
-References: <CANT5p=qrx1bKAcJGG=hGBkvwHjQWLgTH3kJ+g-YdZL0yfBtA9A@mail.gmail.com>
- <87mtwkno7q.fsf@suse.com> <CANT5p=qeEBwivE_Fc-Y4gj17d9nkU+ROPnZL=0BD3v_yRNBFtA@mail.gmail.com>
- <87blctmqo0.fsf@suse.com>
-In-Reply-To: <87blctmqo0.fsf@suse.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Tue, 9 Feb 2021 11:58:19 -0800
-Message-ID: <CAKywueRd1u_7F6qRkSRCtg5exPeNBSXANUiFTrUfcigJGMeP3Q@mail.gmail.com>
-Subject: Re: [PATCH 1/4] cifs: New optype for session operations.
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
+References: <591237.1612886997@warthog.procyon.org.uk> <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com>
+ <20210209202134.GA308988@casper.infradead.org>
+In-Reply-To: <20210209202134.GA308988@casper.infradead.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 9 Feb 2021 13:19:01 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wh+2gbF7XEjYc=HV9w_2uVzVf7vs60BPz0gFA=+pUm3ww@mail.gmail.com>
+Message-ID: <CAHk-=wh+2gbF7XEjYc=HV9w_2uVzVf7vs60BPz0gFA=+pUm3ww@mail.gmail.com>
+Subject: Re: [GIT PULL] fscache: I/O API modernisation and netfs helper library
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cachefs@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
+        v9fs-developer@lists.sourceforge.net,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 50fcb65920e8..1a1f9f4ae80a 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1704,7 +1704,8 @@ static inline bool is_retryable_error(int error)
- #define   CIFS_ECHO_OP      0x080    /* echo request */
- #define   CIFS_OBREAK_OP   0x0100    /* oplock break request */
- #define   CIFS_NEG_OP      0x0200    /* negotiate request */
--#define   CIFS_OP_MASK     0x0380    /* mask request type */
-+#define   CIFS_SESS_OP     0x2000    /* session setup request */
-+#define   CIFS_OP_MASK     0x2380    /* mask request type */
+On Tue, Feb 9, 2021 at 12:21 PM Matthew Wilcox <willy@infradead.org> wrote:
+>
+> Yeah, I have trouble with the private2 vs fscache bit too.  I've been
+> trying to persuade David that he doesn't actually need an fscache
+> bit at all; he can just increment the page's refcount to prevent it
+> from being freed while he writes data to the cache.
 
-Why skipping 0x400, 0x800 and 0x1000 flags?
+Does the code not hold a refcount already?
 
---
-Best regards,
-Pavel Shilovsky
+Honestly, the fact that writeback doesn't take a refcount, and then
+has magic "if writeback is set, don't free" code in other parts of the
+VM layer has been a problem already, when the wakeup ended up
+"leaking" from a previous page to a new allocation.
 
-=D0=B2=D1=82, 9 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 03:22, Aur=C3=
-=A9lien Aptel <aaptel@suse.com>:
->
-> Shyam Prasad N <nspmangalore@gmail.com> writes:
->
-> > I had missed one check where CIFS_SESS_OP also had to be checked. Not
-> > doing so would disable echoes and oplocks.
->
-> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
->
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
->
+I very much hope the fscache bit does not make similar mistakes,
+because the rest of the VM will _not_ have special "if fscache is set,
+then we won't do X" the way we do for writeback.
+
+So I think the fscache code needs to hold a refcount regardless, and
+that the fscache bit is set the page has to have a reference.
+
+So what are the current lifetime rules for the fscache bit?
+
+             Linus
