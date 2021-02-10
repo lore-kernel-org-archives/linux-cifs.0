@@ -7,55 +7,60 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16068C433DB
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Feb 2021 01:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2953C433E9
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Feb 2021 01:58:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD0B264E05
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Feb 2021 01:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F75E64E56
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Feb 2021 01:58:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234682AbhBJBQM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 Feb 2021 20:16:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40372 "EHLO
+        id S233657AbhBJB6A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 Feb 2021 20:58:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234512AbhBJBOK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Feb 2021 20:14:10 -0500
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773A6C06174A
-        for <linux-cifs@vger.kernel.org>; Tue,  9 Feb 2021 17:13:29 -0800 (PST)
-Received: by mail-vs1-xe29.google.com with SMTP id u127so268329vsc.10
-        for <linux-cifs@vger.kernel.org>; Tue, 09 Feb 2021 17:13:29 -0800 (PST)
+        with ESMTP id S235172AbhBJB5P (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Feb 2021 20:57:15 -0500
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25986C06174A
+        for <linux-cifs@vger.kernel.org>; Tue,  9 Feb 2021 17:56:35 -0800 (PST)
+Received: by mail-il1-x134.google.com with SMTP id y15so419560ilj.11
+        for <linux-cifs@vger.kernel.org>; Tue, 09 Feb 2021 17:56:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=kAjTSovJCoMxG4OvEV05URfeIyx7H7PF8m+xWUNSFek=;
-        b=Q0alT5GlcvArUg+uG3yfzGf3j+150wZpmKeIyIy7Oh1oshuXPfQBsTn+gaZ1rJH6EB
-         7SEajAwdpHwHHLVFpukV8yhiFnFi4Y7fSHTMv8tviyDQ0lCMNyfvaaslpcxRNsv3mnTN
-         d7RCViEDxGb9ALxXFI2qGcMgyib2iC1IidYWt9CM6f63fxPW3q1yC3xNrL0JRon2BOv9
-         LOT3Cjnqlm/xp3Q9FbGFqiFAqPkS7TiIahaiZsOABEbrW9R/cIypYPXyiF2S1fE64HK1
-         LJsW/HjQgwFjOlywWhzRjwkKAWOmWYbVYGSuAPw6RF0dapsN1hBGSDTcZLJwLyVzik1F
-         5NbQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nleXgW17AJHqREXLYFNkwgLH6JyE5ibh8zBSmp+WBHs=;
+        b=OJ7PR10jratWIqpz4in4uZ9k3xYvWG5TeE3Qk9VLVDyvK9JVeSPLsMFjpGPnfgZDlg
+         P10vXDy7AbZyZXnc11WTWF731y89F5H0NLnOOkji72Qtub4MwsCrQCk8+lV9jjop0cnz
+         HpRmpzPrRNI6RN5sOgL165c5jIULiK+XIwoKvrvSn2sfpa+BL2J/yimz2qT1s7MrmydD
+         BqT78vM3qSrBvDsfn93pZ19cZGeA/utTW33PSkbooL/OR2dOy3WjnvopHDKn2EYv2fy4
+         UPQtcJHeziI1owlkZRJWmQ8+eb1R9MyefFuJwxISlaI14zMJHC64Y3bcBpFPsEqrdAJp
+         ZyxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=kAjTSovJCoMxG4OvEV05URfeIyx7H7PF8m+xWUNSFek=;
-        b=Dlnd07rxjQoOXZ1zqzB3a7G/sEhcEdevAOLKFEPFRaQ0ueGR8OMi6DRxtsYkjZbqZs
-         rQ3bEYwLBTfhhJW/RJ/U8CHQitre9qZ3v6b07u0qFYFHCeJQ6PFeT8ySxU5hZDToTw0e
-         +9tGFIEXZy610vePt9vn8oIkEZQQ0dyN5Zcgr/3G9SGY8+iEaL9efaXM/yR1Cv7ywSjD
-         qWvzH1V62iptf3K9gEDOybdvhzeI/NnZVppRT2IICCsV6vduqv8NZFjLNjVxTxS/2dkD
-         1q69Zmgh0RKUimO18vScSTlAztkB9lGqqF/+ZAANzomemkuG8qyONVVUbWLRakVE0YSk
-         9Adg==
-X-Gm-Message-State: AOAM533Nl2tC329Tciun37ykiReIcHaAa+IvGxPwU9MQnR+3HOs6LPH3
-        BsMVFeJvARPgS/OQ5CgZzI5FSoHwH2mfOMGV4s4=
-X-Google-Smtp-Source: ABdhPJy7fGACZ+JIFoiN9Qpzf81APvm2RtG6E+YRz2XSl8fm5ALsq0kfunp0Zdg3XfOWCWWMqbxAELtnYIxMMlTPPxs=
-X-Received: by 2002:a67:ecd5:: with SMTP id i21mr400697vsp.18.1612919608765;
- Tue, 09 Feb 2021 17:13:28 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nleXgW17AJHqREXLYFNkwgLH6JyE5ibh8zBSmp+WBHs=;
+        b=mo55LoWQqEH79RyN74CbyCfUqFdxo0GoPNuVnXSS5N8XN/gFhulqDOEMz0vqy2imDj
+         uDfLR7zaoddxlkSymUwuvwzZFLcOahkrLaYYXEktKthWVBovAF8tgMzI6wUUMf36IliY
+         fe66AVEh0W/lQHcKitc0q9ZEQIx/dmappovsbZQz5MUcu5735A8PL54jSVkKrKZ6WFW/
+         pOAeOoqX1EAU+oWfQ4V/dYmafPTzzw3phIAFkNiPj6ANqejzuMG6rm6D4NA8EpJeieCj
+         MXcKo6DZgzsCa1hD6dHoli5ZYnY6l2mDm7/NzPzrhefDUJdZkuaNHbE5gNxEcpKN5Uei
+         yo4w==
+X-Gm-Message-State: AOAM531YWz/MPIc3Uf0ye2uAneVzGwoWJ8m2yk6xo2EVz0EBU+g9ODg8
+        rqgOkM9cHouZbuWOM+KDJaj5dceXortvvPya/EA=
+X-Google-Smtp-Source: ABdhPJyevcw+87wgqxAPzgw6fShur3AEGouO8NQNBKAbxP68xcoDdQVhMX23KZou9IbD1Ka7zBJZmnxtOx9H4c0tHo0=
+X-Received: by 2002:a92:ce50:: with SMTP id a16mr757412ilr.219.1612922194629;
+ Tue, 09 Feb 2021 17:56:34 -0800 (PST)
 MIME-Version: 1.0
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Wed, 10 Feb 2021 10:13:17 +0900
-Message-ID: <CANFS6ba33DORg99OYHwaD9yJ+r6rt8A7v_R36_Uf_hHkw=agyw@mail.gmail.com>
-Subject: "noperm" mount option not working
-To:     lsahlber@redhat.com
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+References: <CANFS6ba33DORg99OYHwaD9yJ+r6rt8A7v_R36_Uf_hHkw=agyw@mail.gmail.com>
+In-Reply-To: <CANFS6ba33DORg99OYHwaD9yJ+r6rt8A7v_R36_Uf_hHkw=agyw@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Wed, 10 Feb 2021 11:56:22 +1000
+Message-ID: <CAN05THQyVJ_4CN41Ep1Wn93BuFYgqUZ1fqCVnqiUebHtobu1tg@mail.gmail.com>
+Subject: Re: "noperm" mount option not working
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
         Steve French <smfrench@gmail.com>,
         Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -63,13 +68,19 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello Ronnie,
+On Wed, Feb 10, 2021 at 11:18 AM Hyunchul Lee <hyc.lee@gmail.com> wrote:
+>
+> Hello Ronnie,
+>
+> from the commit 2d39f50c2b15 ("cifs: move update of flags into a
+> separate function"),
+> "noperm" is disabled if "multiuser" is not given. this happens even if
+> "noperm" is given.
+> Could you explain why this is required?
 
-from the commit 2d39f50c2b15 ("cifs: move update of flags into a
-separate function"),
-"noperm" is disabled if "multiuser" is not given. this happens even if
-"noperm" is given.
-Could you explain why this is required?
+That was a bug. Thanks for spotting this.
 
-Thank you,
-Hyunchul
+I have sent a patch to fix this to the list.
+>
+> Thank you,
+> Hyunchul
