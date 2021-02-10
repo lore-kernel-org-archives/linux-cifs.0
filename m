@@ -2,215 +2,222 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C20C433E0
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Feb 2021 06:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0882C433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Feb 2021 16:31:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DF8D64E2E
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Feb 2021 06:17:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B35ED64E63
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Feb 2021 16:31:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231590AbhBJGRP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Feb 2021 01:17:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48764 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231596AbhBJGRF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Feb 2021 01:17:05 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FE94C06174A
-        for <linux-cifs@vger.kernel.org>; Tue,  9 Feb 2021 22:09:40 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id p193so903469yba.4
-        for <linux-cifs@vger.kernel.org>; Tue, 09 Feb 2021 22:09:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/XraRbxSOnPM2jhJ3YBWG9fNzpcQJ13OYSd1WAOoyY0=;
-        b=UQuPQp4RAf9goiqkvVe3vnidOKtxAx9UCHwy2Roq6rr9aYeA8dJtWrvvLzTpldDyhL
-         MwsotdtxVLs8GuBWXDuFjpHe7f4d3OyzSvt6WX8n7TknT2uD7O0xjF+C4AYPT7dNM+0d
-         l6/o1Ow9qKvejXKPmVgZasQzTWPdlAMqXCt+wUas4L8NYDNlFD8NDhzn/SUQSnxk8VyW
-         dGcdttMAEjTReTqzLV8HQQuCggVJEqxjT4F3NNomroJ7a6G3KDJs6qMx4ksCizudbu32
-         z3Zf6qs3Dp8JPJ8RcAZPxQMZHsPgJLKQGdnai0kJr+CmvjSzeqCb5Dy6DmT8yQep5eY4
-         S0TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/XraRbxSOnPM2jhJ3YBWG9fNzpcQJ13OYSd1WAOoyY0=;
-        b=Lvnjco389XQkd3aJ1+iYZ7rEojEyiDUoa8PbnZZ9wE7NDwGLiwzCltsTG4G5X/jX0B
-         jWM2LshWPxv3Vd1Zy6wjyCvdSkDKHG612HbOcXw5IWlYPW88uk2ee4iS0+SzegRZo9Jc
-         X77r2dBRgz+mQgVn88KiksQ7/e4oqrM+Lw0ft3Dn8m6e8u8iAkzo2VAVuJweOIGo9m2L
-         2QGSLDheUJsENProqYEqhEM9Z8q8RqvcQI6SpFrji0BzaOCp1XoHcnBfFaPnh+CPeV4Q
-         Vq3/cepZYuYCmyqkx+6MJ7jwwQxiHzcL2WGSv2MaYC8X9VWj4WjHWIbuFBBGLT+bIKfB
-         SgxQ==
-X-Gm-Message-State: AOAM533vqY58wmA13cDhR4AO0xxwhjnw0R3M0Yxr5c+BFMgu9p39D89V
-        LJ1T/aCOL16YiPFxCSqbcRtBVB3rYtCJg7OZYe8=
-X-Google-Smtp-Source: ABdhPJyjFugkPUIOO3YFuDHJFGyKnlIfznj3uTWINWkRVBNBBYRPbychH9wR0rT87/wQV6Hoz3j2Fwt2hvg+MYNRGFo=
-X-Received: by 2002:a25:442:: with SMTP id 63mr2105478ybe.131.1612937379392;
- Tue, 09 Feb 2021 22:09:39 -0800 (PST)
+        id S232554AbhBJQbI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Feb 2021 11:31:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42328 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232462AbhBJQar (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 10 Feb 2021 11:30:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612974560;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MizTFqaPr9s83orSxyP4M9HI4/HyznwEJQAwf0cC91A=;
+        b=TmZibWHbb7DvB6E0/P/SyloUADQuyFpEB2ikHXEYPUl447OJcJTRxpoNJyAYTZt6GlOXV/
+        hhLh2wJxNr4sKglGtV4R7JwBuQa61U6oK8dKR+5oizUDHYRuAhwWJsnroiwVQmXERC1nNG
+        SwILLMkkdgqtVJabFs94/Szktn2Htdc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-416-IuDV1FoyPIq_VD0rQY5azw-1; Wed, 10 Feb 2021 11:29:16 -0500
+X-MC-Unique: IuDV1FoyPIq_VD0rQY5azw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F6421005501;
+        Wed, 10 Feb 2021 16:29:14 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-115-23.rdu2.redhat.com [10.10.115.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4622660C0F;
+        Wed, 10 Feb 2021 16:29:08 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com>
+References: <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com> <591237.1612886997@warthog.procyon.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cachefs@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
+        v9fs-developer@lists.sourceforge.net,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [GIT PULL] fscache: I/O API modernisation and netfs helper library
 MIME-Version: 1.0
-References: <CANT5p=qrx1bKAcJGG=hGBkvwHjQWLgTH3kJ+g-YdZL0yfBtA9A@mail.gmail.com>
- <87mtwkno7q.fsf@suse.com> <CANT5p=qeEBwivE_Fc-Y4gj17d9nkU+ROPnZL=0BD3v_yRNBFtA@mail.gmail.com>
- <87blctmqo0.fsf@suse.com> <CAKywueRd1u_7F6qRkSRCtg5exPeNBSXANUiFTrUfcigJGMeP3Q@mail.gmail.com>
- <CAH2r5msowQaXTi+3K0UeyFdVVzHz_LLk-Cdr5XBANYz6SmqymQ@mail.gmail.com>
- <CAKywueTxA6URL-2YEkuJAr1=XXPtA1PTzqwioFR6k47Y2Rri-A@mail.gmail.com> <CANT5p=qSaXShm0_iZmWJzUNkSc=xSjtr-w43UQVJnvoiFsFeHg@mail.gmail.com>
-In-Reply-To: <CANT5p=qSaXShm0_iZmWJzUNkSc=xSjtr-w43UQVJnvoiFsFeHg@mail.gmail.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Tue, 9 Feb 2021 22:09:28 -0800
-Message-ID: <CANT5p=rcNAWY-yj_-z0F1NCvRp9+sp6K86MvWoH5iYUXevX01Q@mail.gmail.com>
-Subject: Re: [PATCH 1/4] cifs: New optype for session operations.
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000008b8aba05baf53fd5"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1330472.1612974547.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 10 Feb 2021 16:29:07 +0000
+Message-ID: <1330473.1612974547@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000008b8aba05baf53fd5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-Attaching updated patch.
+> The PG_fscache bit waiting functions are completely crazy. The comment
+> about "this will wake up others" is actively wrong, and the waiting
+> function looks insane, because you're mixing the two names for
+> "fscache" which makes the code look totally incomprehensible. Why
+> would we wait for PF_fscache, when PG_private_2 was set? Yes, I know
+> why, but the code looks entirely nonsensical.
 
-On Tue, Feb 9, 2021 at 9:47 PM Shyam Prasad N <nspmangalore@gmail.com> wrot=
-e:
->
-> Yes. I'll put a comment to avoid confusion.
->
-> Regards,
-> Shyam
->
-> On Tue, Feb 9, 2021 at 12:08 PM Pavel Shilovsky <piastryyy@gmail.com> wro=
-te:
-> >
-> > Yes, missed them in the first place. Then I would suggest to list them
-> > in order to avoid confusion.
-> > --
-> > Best regards,
-> > Pavel Shilovsky
-> >
-> > =D0=B2=D1=82, 9 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 12:06, St=
-eve French <smfrench@gmail.com>:
-> > >
-> > > On Tue, Feb 9, 2021 at 1:58 PM Pavel Shilovsky <piastryyy@gmail.com> =
-wrote:
-> > > >
-> > > > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> > > > index 50fcb65920e8..1a1f9f4ae80a 100644
-> > > > --- a/fs/cifs/cifsglob.h
-> > > > +++ b/fs/cifs/cifsglob.h
-> > > > @@ -1704,7 +1704,8 @@ static inline bool is_retryable_error(int err=
-or)
-> > > >  #define   CIFS_ECHO_OP      0x080    /* echo request */
-> > > >  #define   CIFS_OBREAK_OP   0x0100    /* oplock break request */
-> > > >  #define   CIFS_NEG_OP      0x0200    /* negotiate request */
-> > > > -#define   CIFS_OP_MASK     0x0380    /* mask request type */
-> > > > +#define   CIFS_SESS_OP     0x2000    /* session setup request */
-> > > > +#define   CIFS_OP_MASK     0x2380    /* mask request type */
-> > > >
-> > > > Why skipping 0x400, 0x800 and 0x1000 flags?
-> > >
-> > > They were already reserved.  See cifsglob.h
-> > >
-> > > #define   CIFS_HAS_CREDITS 0x0400    /* already has credits */
-> > > #define   CIFS_TRANSFORM_REQ 0x0800    /* transform request before se=
-nding */
-> > > #define   CIFS_NO_SRV_RSP    0x1000    /* there is no server response=
- */
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
->
->
->
-> --
-> Regards,
-> Shyam
+How about the attached change to make it more coherent and fix the doc
+comment?
 
+David
+---
+commit 9a28f7e68602193ce020a41f855f71cc55f693b9
+Author: David Howells <dhowells@redhat.com>
+Date:   Wed Feb 10 10:53:02 2021 +0000
 
+    netfs: Rename unlock_page_fscache() and wait_on_page_fscache()
+    =
 
---=20
-Regards,
-Shyam
+    Rename unlock_page_fscache() to unlock_page_private_2() and
+    wait_on_page_fscache() to wait_on_page_private_2() and change the
+    references to PG_fscache to PG_private_2 also.  This makes these funct=
+ions
+    look more generic and doesn't mix the terminology.
+    =
 
---0000000000008b8aba05baf53fd5
-Content-Type: application/octet-stream; 
-	name="0001-cifs-New-optype-for-session-operations.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-New-optype-for-session-operations.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kkz19ead0>
-X-Attachment-Id: f_kkz19ead0
+    Fix the kdoc comment as the wake up mechanism doesn't wake up all the
+    sleepers.  Note the example usage case for the functions in conjunctio=
+n
+    with the cache also.
+    =
 
-RnJvbSA3NTE3ZjU1ZWExYzY5YmE1ZDRkMGRiZDhlZDg5NTJjMzBjZDExMmNmIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
-PgpEYXRlOiBXZWQsIDMgRmViIDIwMjEgMjI6NDk6NTIgLTA4MDAKU3ViamVjdDogW1BBVENIIDEv
-NF0gY2lmczogTmV3IG9wdHlwZSBmb3Igc2Vzc2lvbiBvcGVyYXRpb25zLgoKV2UgdXNlZCB0byBz
-aGFyZSB0aGUgQ0lGU19ORUdfT1AgZmxhZyBiZXR3ZWVuIG5lZ290aWF0ZSBhbmQKc2Vzc2lvbiBh
-dXRoZW50aWNhdGlvbi4gVGhlcmUgd2FzIGFuIGFzc3VtcHRpb24gaW4gdGhlIGNvZGUgdGhhdApD
-SUZTX05FR19PUCBpcyB1c2VkIGJ5IG5lZ290aWF0ZSBvbmx5LiBTbyBpbnRyb2N1ZGVkIENJRlNf
-U0VTU19PUAphbmQgdXNlZCBpdCBmb3Igc2Vzc2lvbiBzZXR1cCBvcHR5cGVzLgoKU2lnbmVkLW9m
-Zi1ieTogU2h5YW0gUHJhc2FkIE4gPHNwcmFzYWRAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZz
-L2NpZnNnbG9iLmggIHwgNCArKystCiBmcy9jaWZzL3NtYjJvcHMuYyAgIHwgMiArLQogZnMvY2lm
-cy9zbWIycGR1LmMgICB8IDIgKy0KIGZzL2NpZnMvdHJhbnNwb3J0LmMgfCA0ICsrLS0KIDQgZmls
-ZXMgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBh
-L2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lmc2dsb2IuaAppbmRleCA1MGZjYjY1OTIw
-ZTguLjMxNTI2MDFhNjA4YiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZzZ2xvYi5oCisrKyBiL2Zz
-L2NpZnMvY2lmc2dsb2IuaApAQCAtMTcwNCw3ICsxNzA0LDkgQEAgc3RhdGljIGlubGluZSBib29s
-IGlzX3JldHJ5YWJsZV9lcnJvcihpbnQgZXJyb3IpCiAjZGVmaW5lICAgQ0lGU19FQ0hPX09QICAg
-ICAgMHgwODAgICAgLyogZWNobyByZXF1ZXN0ICovCiAjZGVmaW5lICAgQ0lGU19PQlJFQUtfT1Ag
-ICAweDAxMDAgICAgLyogb3Bsb2NrIGJyZWFrIHJlcXVlc3QgKi8KICNkZWZpbmUgICBDSUZTX05F
-R19PUCAgICAgIDB4MDIwMCAgICAvKiBuZWdvdGlhdGUgcmVxdWVzdCAqLwotI2RlZmluZSAgIENJ
-RlNfT1BfTUFTSyAgICAgMHgwMzgwICAgIC8qIG1hc2sgcmVxdWVzdCB0eXBlICovCisvKiBMb3dl
-ciBiaXRtYXNrIHZhbHVlcyBhcmUgcmVzZXJ2ZWQgYnkgb3RoZXJzIGJlbG93LiAqLworI2RlZmlu
-ZSAgIENJRlNfU0VTU19PUCAgICAgMHgyMDAwICAgIC8qIHNlc3Npb24gc2V0dXAgcmVxdWVzdCAq
-LworI2RlZmluZSAgIENJRlNfT1BfTUFTSyAgICAgMHgyMzgwICAgIC8qIG1hc2sgcmVxdWVzdCB0
-eXBlICovCiAKICNkZWZpbmUgICBDSUZTX0hBU19DUkVESVRTIDB4MDQwMCAgICAvKiBhbHJlYWR5
-IGhhcyBjcmVkaXRzICovCiAjZGVmaW5lICAgQ0lGU19UUkFOU0ZPUk1fUkVRIDB4MDgwMCAgICAv
-KiB0cmFuc2Zvcm0gcmVxdWVzdCBiZWZvcmUgc2VuZGluZyAqLwpkaWZmIC0tZ2l0IGEvZnMvY2lm
-cy9zbWIyb3BzLmMgYi9mcy9jaWZzL3NtYjJvcHMuYwppbmRleCBmMTkyNzQ4NTcyOTIuLjQzMzMx
-NTU1ZmNjNSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIyb3BzLmMKKysrIGIvZnMvY2lmcy9zbWIy
-b3BzLmMKQEAgLTg0LDcgKzg0LDcgQEAgc21iMl9hZGRfY3JlZGl0cyhzdHJ1Y3QgVENQX1NlcnZl
-cl9JbmZvICpzZXJ2ZXIsCiAJCXByX3dhcm5fb25jZSgic2VydmVyIG92ZXJmbG93ZWQgU01CMyBj
-cmVkaXRzXG4iKTsKIAl9CiAJc2VydmVyLT5pbl9mbGlnaHQtLTsKLQlpZiAoc2VydmVyLT5pbl9m
-bGlnaHQgPT0gMCAmJiAob3B0eXBlICYgQ0lGU19PUF9NQVNLKSAhPSBDSUZTX05FR19PUCkKKwlp
-ZiAoc2VydmVyLT5pbl9mbGlnaHQgPT0gMCAmJiAob3B0eXBlICYgQ0lGU19PUF9NQVNLKSAhPSBD
-SUZTX05FR19PUCAmJiAob3B0eXBlICYgQ0lGU19PUF9NQVNLKSAhPSBDSUZTX1NFU1NfT1ApCiAJ
-CXJjID0gY2hhbmdlX2NvbmYoc2VydmVyKTsKIAkvKgogCSAqIFNvbWV0aW1lcyBzZXJ2ZXIgcmV0
-dXJucyAwIGNyZWRpdHMgb24gb3Bsb2NrIGJyZWFrIGFjayAtIHdlIG5lZWQgdG8KZGlmZiAtLWdp
-dCBhL2ZzL2NpZnMvc21iMnBkdS5jIGIvZnMvY2lmcy9zbWIycGR1LmMKaW5kZXggZTEzOTFiZDky
-NzY4Li40YmJiNjEyNmIxNGQgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnBkdS5jCisrKyBiL2Zz
-L2NpZnMvc21iMnBkdS5jCkBAIC0xMjYxLDcgKzEyNjEsNyBAQCBTTUIyX3Nlc3Nfc2VuZHJlY2Vp
-dmUoc3RydWN0IFNNQjJfc2Vzc19kYXRhICpzZXNzX2RhdGEpCiAJCQkgICAgY2lmc19zZXNfc2Vy
-dmVyKHNlc3NfZGF0YS0+c2VzKSwKIAkJCSAgICAmcnFzdCwKIAkJCSAgICAmc2Vzc19kYXRhLT5i
-dWYwX3R5cGUsCi0JCQkgICAgQ0lGU19MT0dfRVJST1IgfCBDSUZTX05FR19PUCwgJnJzcF9pb3Yp
-OworCQkJICAgIENJRlNfTE9HX0VSUk9SIHwgQ0lGU19TRVNTX09QLCAmcnNwX2lvdik7CiAJY2lm
-c19zbWFsbF9idWZfcmVsZWFzZShzZXNzX2RhdGEtPmlvdlswXS5pb3ZfYmFzZSk7CiAJbWVtY3B5
-KCZzZXNzX2RhdGEtPmlvdlswXSwgJnJzcF9pb3YsIHNpemVvZihzdHJ1Y3Qga3ZlYykpOwogCmRp
-ZmYgLS1naXQgYS9mcy9jaWZzL3RyYW5zcG9ydC5jIGIvZnMvY2lmcy90cmFuc3BvcnQuYwppbmRl
-eCA0YTJiODM2ZWIwMTcuLjQxMjIzYTllZTA4NiAxMDA2NDQKLS0tIGEvZnMvY2lmcy90cmFuc3Bv
-cnQuYworKysgYi9mcy9jaWZzL3RyYW5zcG9ydC5jCkBAIC0xMTcxLDcgKzExNzEsNyBAQCBjb21w
-b3VuZF9zZW5kX3JlY3YoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpz
-ZXMsCiAJLyoKIAkgKiBDb21wb3VuZGluZyBpcyBuZXZlciB1c2VkIGR1cmluZyBzZXNzaW9uIGVz
-dGFibGlzaC4KIAkgKi8KLQlpZiAoKHNlcy0+c3RhdHVzID09IENpZnNOZXcpIHx8IChvcHR5cGUg
-JiBDSUZTX05FR19PUCkpCisJaWYgKChzZXMtPnN0YXR1cyA9PSBDaWZzTmV3KSB8fCAob3B0eXBl
-ICYgQ0lGU19ORUdfT1ApIHx8IChvcHR5cGUgJiBDSUZTX1NFU1NfT1ApKQogCQlzbWIzMTFfdXBk
-YXRlX3ByZWF1dGhfaGFzaChzZXMsIHJxc3RbMF0ucnFfaW92LAogCQkJCQkgICBycXN0WzBdLnJx
-X252ZWMpOwogCkBAIC0xMjM2LDcgKzEyMzYsNyBAQCBjb21wb3VuZF9zZW5kX3JlY3YoY29uc3Qg
-dW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNpZnNfc2VzICpzZXMsCiAJLyoKIAkgKiBDb21wb3Vu
-ZGluZyBpcyBuZXZlciB1c2VkIGR1cmluZyBzZXNzaW9uIGVzdGFibGlzaC4KIAkgKi8KLQlpZiAo
-KHNlcy0+c3RhdHVzID09IENpZnNOZXcpIHx8IChvcHR5cGUgJiBDSUZTX05FR19PUCkpIHsKKwlp
-ZiAoKHNlcy0+c3RhdHVzID09IENpZnNOZXcpIHx8IChvcHR5cGUgJiBDSUZTX05FR19PUCkgfHwg
-KG9wdHlwZSAmIENJRlNfU0VTU19PUCkpIHsKIAkJc3RydWN0IGt2ZWMgaW92ID0gewogCQkJLmlv
-dl9iYXNlID0gcmVzcF9pb3ZbMF0uaW92X2Jhc2UsCiAJCQkuaW92X2xlbiA9IHJlc3BfaW92WzBd
-Lmlvdl9sZW4KLS0gCjIuMjUuMQoK
---0000000000008b8aba05baf53fd5--
+    Alias the functions in linux/netfs.h.
+    =
+
+    Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: David Howells <dhowells@redhat.com>
+
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 2ffdef1ded91..d4cb6e6f704c 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -24,6 +24,8 @@
+ #define ClearPageFsCache(page)		ClearPagePrivate2((page))
+ #define TestSetPageFsCache(page)	TestSetPagePrivate2((page))
+ #define TestClearPageFsCache(page)	TestClearPagePrivate2((page))
++#define wait_on_page_fscache(page)	wait_on_page_private_2((page))
++#define unlock_page_fscache(page)	unlock_page_private_2((page))
+ =
+
+ enum netfs_read_source {
+ 	NETFS_FILL_WITH_ZEROES,
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 4935ad6171c1..a88ccc9ab0b1 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -591,7 +591,7 @@ extern int __lock_page_async(struct page *page, struct=
+ wait_page_queue *wait);
+ extern int __lock_page_or_retry(struct page *page, struct mm_struct *mm,
+ 				unsigned int flags);
+ extern void unlock_page(struct page *page);
+-extern void unlock_page_fscache(struct page *page);
++extern void unlock_page_private_2(struct page *page);
+ =
+
+ /*
+  * Return true if the page was successfully locked
+@@ -683,16 +683,17 @@ static inline int wait_on_page_locked_killable(struc=
+t page *page)
+ }
+ =
+
+ /**
+- * wait_on_page_fscache - Wait for PG_fscache to be cleared on a page
++ * wait_on_page_private_2 - Wait for PG_private_2 to be cleared on a page
+  * @page: The page
+  *
+- * Wait for the fscache mark to be removed from a page, usually signifyin=
+g the
+- * completion of a write from that page to the cache.
++ * Wait for the PG_private_2 page bit to be removed from a page.  This is=
+, for
++ * example, used to handle a netfs page being written to a local disk cac=
+he,
++ * thereby allowing writes to the cache for the same page to be serialise=
+d.
+  */
+-static inline void wait_on_page_fscache(struct page *page)
++static inline void wait_on_page_private_2(struct page *page)
+ {
+ 	if (PagePrivate2(page))
+-		wait_on_page_bit(compound_head(page), PG_fscache);
++		wait_on_page_bit(compound_head(page), PG_private_2);
+ }
+ =
+
+ extern void put_and_wait_on_page_locked(struct page *page);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 91fcae006d64..7d321152d579 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1467,22 +1467,24 @@ void unlock_page(struct page *page)
+ EXPORT_SYMBOL(unlock_page);
+ =
+
+ /**
+- * unlock_page_fscache - Unlock a page pinned with PG_fscache
++ * unlock_page_private_2 - Unlock a page that's locked with PG_private_2
+  * @page: The page
+  *
+- * Unlocks the page and wakes up sleepers in wait_on_page_fscache().  Als=
+o
+- * wakes those waiting for the lock and writeback bits because the wakeup
+- * mechanism is shared.  But that's OK - those sleepers will just go back=
+ to
+- * sleep.
++ * Unlocks a page that's locked with PG_private_2 and wakes up sleepers i=
+n
++ * wait_on_page_private_2().
++ *
++ * This is, for example, used when a netfs page is being written to a loc=
+al
++ * disk cache, thereby allowing writes to the cache for the same page to =
+be
++ * serialised.
+  */
+-void unlock_page_fscache(struct page *page)
++void unlock_page_private_2(struct page *page)
+ {
+ 	page =3D compound_head(page);
+ 	VM_BUG_ON_PAGE(!PagePrivate2(page), page);
+-	clear_bit_unlock(PG_fscache, &page->flags);
+-	wake_up_page_bit(page, PG_fscache);
++	clear_bit_unlock(PG_private_2, &page->flags);
++	wake_up_page_bit(page, PG_private_2);
+ }
+-EXPORT_SYMBOL(unlock_page_fscache);
++EXPORT_SYMBOL(unlock_page_private_2);
+ =
+
+ /**
+  * end_page_writeback - end writeback against a page
+
