@@ -2,120 +2,291 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA39DC433E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Feb 2021 19:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB92DC433DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Feb 2021 22:40:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9489564DAD
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Feb 2021 19:42:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61FE764DCD
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Feb 2021 22:40:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231362AbhBKTmj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 11 Feb 2021 14:42:39 -0500
-Received: from p3plsmtpa08-07.prod.phx3.secureserver.net ([173.201.193.108]:60317
-        "EHLO p3plsmtpa08-07.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229965AbhBKTmh (ORCPT
+        id S229763AbhBKWkg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 Feb 2021 17:40:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47885 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229693AbhBKWkg (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 11 Feb 2021 14:42:37 -0500
-Received: from [192.168.0.116] ([71.184.94.153])
-        by :SMTPAUTH: with ESMTPSA
-        id AHqWlkLRo2xvDAHqYlrrXW; Thu, 11 Feb 2021 12:41:51 -0700
-X-CMAE-Analysis: v=2.4 cv=HqCzp2fS c=1 sm=1 tr=0 ts=6025887f
- a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
- a=IkcTkHD0fZMA:10 a=iox4zFpeAAAA:8 a=pGLkceISAAAA:8 a=tAOjvO-xAm6PYSth-vMA:9
- a=QEXdDO2ut3YA:10 a=WzC6qhA0u3u7Ye7llzcV:22
-X-SECURESERVER-ACCT: tom@talpey.com
-Subject: Re: [PATCH 4/4] cifs: Reformat DebugData and index connections by
- conn_id.
-To:     Pavel Shilovsky <piastryyy@gmail.com>,
-        =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-References: <CANT5p=o9Tw9E+o3PWytsNh5eDKxswJ+YPLZLWac7QwR_u-UJaw@mail.gmail.com>
- <87h7msnnme.fsf@suse.com>
- <CANT5p=qGTC4E4Rf_-t9xXOo4yf3W=xtk97J1jg-WRLhwf0juBA@mail.gmail.com>
- <87a6sjopsc.fsf@suse.com>
- <CANT5p=qQJwvF11MJpiuV7S1GpH9=HZ-g=hmfOV-a07N9xkYqnA@mail.gmail.com>
- <CAH2r5mv0TzWpYi38HtuVG2gtYvW60-RDOri3a1FUUtprn19Dzw@mail.gmail.com>
- <87lfbyn647.fsf@suse.com>
- <CANT5p=qJjeVk1HDhvaiAQSYH3mj-rNBNA-j2TAUnoqQVTOQ_Ww@mail.gmail.com>
- <875z2yn0lx.fsf@suse.com>
- <CAKywueRoFL17DiMzmorZcd=OJvDY_8+P8WxGqKDx-tdnJrr_HQ@mail.gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-Message-ID: <6aad7fc3-3c3f-848c-4d65-e5c7f1dd8107@talpey.com>
-Date:   Thu, 11 Feb 2021 14:41:48 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Thu, 11 Feb 2021 17:40:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613083148;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VYs247Vg8x8v4v1gOC6IwE7LU/hjMIBgbsTS7aY+7Aw=;
+        b=ejxn5GkZRNmoUQk+kxwnk1flyo1UCI3mgdAjt8j+va5B791TNk8btmaCvCL3MfLtPNMuNv
+        M9q3vUXQOJ6wt3NJ5ecL047sVMw0WwyTAxLgFJsGICWpGsnb+hCRQhnbR1I5L96puy5Jsx
+        4fsMpVIvPSHgoX2Ja0M+IH4MXmqUah8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-10-d0Hylm1TP6OLgGOOr-pMng-1; Thu, 11 Feb 2021 17:39:06 -0500
+X-MC-Unique: d0Hylm1TP6OLgGOOr-pMng-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F430107ACE8;
+        Thu, 11 Feb 2021 22:39:04 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 981F710013D7;
+        Thu, 11 Feb 2021 22:38:57 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wjgA-74ddehziVk=XAEMTKswPu1Yw4uaro1R3ibs27ztw@mail.gmail.com>
+References: <CAHk-=wjgA-74ddehziVk=XAEMTKswPu1Yw4uaro1R3ibs27ztw@mail.gmail.com> <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com> <591237.1612886997@warthog.procyon.org.uk> <1330473.1612974547@warthog.procyon.org.uk> <1330751.1612974783@warthog.procyon.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cachefs@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
+        v9fs-developer@lists.sourceforge.net,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [GIT PULL] fscache: I/O API modernisation and netfs helper library
 MIME-Version: 1.0
-In-Reply-To: <CAKywueRoFL17DiMzmorZcd=OJvDY_8+P8WxGqKDx-tdnJrr_HQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfMfsbUcTS0LswLwTo/7JuNS2yLTh++qaX8G9kO5tPZNHjkMGuQ6MrQ5DeVhCoiP6TVwg27Hi/AabQ9E1Agoqh9YVqaxHDFRs512FWd5Q98+MxmGsC6oY
- 00WGYT/oiaELt1+n3HDnfFm7o0K6ORF3njdv8e4U5ftJyxqAFebtlFbNzzb1cEyzyjlS3OkhEGACxzKKniId1gGnEKQXSbB5Ibsmn4b13v0/u3fboQ6d8hlE
- Jwbv4MUzbJLrKmSrrMGXXlLbadp8hBcMYNGtQSH84tW33sRPjcf9+yJoDcJyvRpZOoPln1vLGxwykqwfjmaN+PeXv2JtcA3E1crez1il3fElh44a/GT4YkWT
- qh+/Rcp2
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <25540.1613083136.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Thu, 11 Feb 2021 22:38:56 +0000
+Message-ID: <25541.1613083136@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 2/11/2021 12:12 PM, Pavel Shilovsky wrote:
-> Hi Shyam,
-> 
-> The output looks very informative! I have one comment:
-> 
-> Servers:
-> 1) ConnectionId: 0x1
-> Number of credits: 326 Dialect 0x311
-> TCP status: 1 Instance: 1
-> Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0
-> In Send: 0 In MaxReq Wait: 0
-> 
-> Sessions:
-> 1) Name: 10.229.158.38 Uses: 1 Capability: 0x300077 Session Status: 1
->                       ^^^^
-> Isn't this name (or hostname) a property of the connection? I would
-> expect an IP or a hostname to be printed in the connection settings
-> above.
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-The servername is a property of the session, in this case since the
-mount specified a dotted quad, it would correctly appear as the
-servername at this level.
+> ...
+> IOW, I'm not against "wait_on_page_fscache()" as a function, but I
+> *am* against the odd _mixing_ of things without a big explanation,
+> where the code itself looks very odd and questionable.
+> =
 
-However, I definitely agree that an IP address is important in the
-per-connection (channel) stanzas. Multichannel, multihoming, witness
-redirects, and any number of things can vary among them. It would
-be useful indeed to display them.
+> And I think the "fscache" waiting functions should not be visible to
+> any core VM or filesystem code - it should be limited explicitly to
+> those filesystems that use fscache, and include that header file.
 
-Including the transport type (TCP, RDMA...) and multichannel attributes
-(link speed, RSS count, ...) would be useful too.
+Okay...  How about the attached then?
 
-Tom.
+I've also discarded the patch that just moves towards completely getting r=
+id
+of PG_fscache and adjusted the third patch that takes a ref on the page fo=
+r
+the duration to handle the change of names.
 
-> 
-> --
-> Best regards,
-> Pavel Shilovsky
-> 
-> чт, 11 февр. 2021 г. в 06:24, Aurélien Aptel <aaptel@suse.com>:
->>
->> Shyam Prasad N <nspmangalore@gmail.com> writes:
->>> I noticed that the output looks rather odd when used with multichannel.
->>> Attaching a revised patch with the changes.
->>>
->>> Also attached a sample of new output.
->>
->> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
->>
->> --
->> Aurélien Aptel / SUSE Labs Samba Team
->> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
->> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
->> GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
->>
-> 
+Speaking of the ref-taking patch, is the one I posted yesterday the sort o=
+f
+thing you wanted for that?  I wonder if I should drop the ref in the unloc=
+k
+function, though doing it afterwards does allow for the possibility of usi=
+ng a
+pagevec to do mass-release.
+
+> Wouldn't that make sense?
+
+Well, that's the current principle, but I was wondering if the alias was
+causing confusion.
+
+David
+---
+commit c723f0232c9f8928b3b15786499637bda3121f41
+Author: David Howells <dhowells@redhat.com>
+Date:   Wed Feb 10 10:53:02 2021 +0000
+
+    netfs: Rename unlock_page_fscache() and move wait_on_page_fscache()
+    =
+
+    Rename unlock_page_fscache() to unlock_page_private_2() and change the
+    references to PG_fscache to PG_private_2 also.  This makes it look mor=
+e
+    generic and doesn't mix the terminology.
+    =
+
+    Fix the kdoc comment on the above as the wake up mechanism doesn't wak=
+e up
+    all the sleepers.  Note the example usage case for the function in
+    conjunction with the cache also.
+    =
+
+    Place unlock_page_fscache() as an alias in linux/netfs.h.
+    =
+
+    Move wait_on_page_fscache() to linux/netfs.h.
+    =
+
+    [v2: Implement suggestion by Linus to move the wait function into netf=
+s.h]
+    =
+
+    Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: David Howells <dhowells@redhat.com>
+    Tested-by: Jeff Layton <jlayton@kernel.org>
+    Link: https://lore.kernel.org/linux-fsdevel/1330473.1612974547@warthog=
+.procyon.org.uk/
+    Link: https://lore.kernel.org/linux-fsdevel/CAHk-=3DwjgA-74ddehziVk=3D=
+XAEMTKswPu1Yw4uaro1R3ibs27ztw@mail.gmail.com/
+
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 2ffdef1ded91..59c2623dc408 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -14,6 +14,7 @@
+ =
+
+ #include <linux/workqueue.h>
+ #include <linux/fs.h>
++#include <linux/pagemap.h>
+ =
+
+ /*
+  * Overload PG_private_2 to give us PG_fscache - this is used to indicate=
+ that
+@@ -25,6 +26,35 @@
+ #define TestSetPageFsCache(page)	TestSetPagePrivate2((page))
+ #define TestClearPageFsCache(page)	TestClearPagePrivate2((page))
+ =
+
++/**
++ * unlock_page_fscache - Unlock a page that's locked with PG_fscache
++ * @page: The page
++ *
++ * Unlocks a page that's locked with PG_fscache and wakes up sleepers in
++ * wait_on_page_fscache().  This page bit is used by the netfs helpers wh=
+en a
++ * netfs page is being written to a local disk cache, thereby allowing wr=
+ites
++ * to the cache for the same page to be serialised.
++ */
++static inline void unlock_page_fscache(struct page *page)
++{
++	unlock_page_private_2(page);
++}
++
++/**
++ * wait_on_page_fscache - Wait for PG_fscache to be cleared on a page
++ * @page: The page
++ *
++ * Wait for the PG_fscache (PG_private_2) page bit to be removed from a p=
+age.
++ * This is, for example, used to handle a netfs page being written to a l=
+ocal
++ * disk cache, thereby allowing writes to the cache for the same page to =
+be
++ * serialised.
++ */
++static inline void wait_on_page_fscache(struct page *page)
++{
++	if (PageFsCache(page))
++		wait_on_page_bit(compound_head(page), PG_fscache);
++}
++
+ enum netfs_read_source {
+ 	NETFS_FILL_WITH_ZEROES,
+ 	NETFS_DOWNLOAD_FROM_SERVER,
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index 4935ad6171c1..d2786607d297 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -591,7 +591,7 @@ extern int __lock_page_async(struct page *page, struct=
+ wait_page_queue *wait);
+ extern int __lock_page_or_retry(struct page *page, struct mm_struct *mm,
+ 				unsigned int flags);
+ extern void unlock_page(struct page *page);
+-extern void unlock_page_fscache(struct page *page);
++extern void unlock_page_private_2(struct page *page);
+ =
+
+ /*
+  * Return true if the page was successfully locked
+@@ -682,19 +682,6 @@ static inline int wait_on_page_locked_killable(struct=
+ page *page)
+ 	return wait_on_page_bit_killable(compound_head(page), PG_locked);
+ }
+ =
+
+-/**
+- * wait_on_page_fscache - Wait for PG_fscache to be cleared on a page
+- * @page: The page
+- *
+- * Wait for the fscache mark to be removed from a page, usually signifyin=
+g the
+- * completion of a write from that page to the cache.
+- */
+-static inline void wait_on_page_fscache(struct page *page)
+-{
+-	if (PagePrivate2(page))
+-		wait_on_page_bit(compound_head(page), PG_fscache);
+-}
+-
+ extern void put_and_wait_on_page_locked(struct page *page);
+ =
+
+ void wait_on_page_writeback(struct page *page);
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 91fcae006d64..7d321152d579 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1467,22 +1467,24 @@ void unlock_page(struct page *page)
+ EXPORT_SYMBOL(unlock_page);
+ =
+
+ /**
+- * unlock_page_fscache - Unlock a page pinned with PG_fscache
++ * unlock_page_private_2 - Unlock a page that's locked with PG_private_2
+  * @page: The page
+  *
+- * Unlocks the page and wakes up sleepers in wait_on_page_fscache().  Als=
+o
+- * wakes those waiting for the lock and writeback bits because the wakeup
+- * mechanism is shared.  But that's OK - those sleepers will just go back=
+ to
+- * sleep.
++ * Unlocks a page that's locked with PG_private_2 and wakes up sleepers i=
+n
++ * wait_on_page_private_2().
++ *
++ * This is, for example, used when a netfs page is being written to a loc=
+al
++ * disk cache, thereby allowing writes to the cache for the same page to =
+be
++ * serialised.
+  */
+-void unlock_page_fscache(struct page *page)
++void unlock_page_private_2(struct page *page)
+ {
+ 	page =3D compound_head(page);
+ 	VM_BUG_ON_PAGE(!PagePrivate2(page), page);
+-	clear_bit_unlock(PG_fscache, &page->flags);
+-	wake_up_page_bit(page, PG_fscache);
++	clear_bit_unlock(PG_private_2, &page->flags);
++	wake_up_page_bit(page, PG_private_2);
+ }
+-EXPORT_SYMBOL(unlock_page_fscache);
++EXPORT_SYMBOL(unlock_page_private_2);
+ =
+
+ /**
+  * end_page_writeback - end writeback against a page
+
