@@ -2,165 +2,111 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3186AC433E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Feb 2021 06:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 379E9C433E6
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Feb 2021 11:30:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0798B64E3C
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Feb 2021 06:07:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D9EC64DCF
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Feb 2021 11:30:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbhBKGH4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 11 Feb 2021 01:07:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53027 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229505AbhBKGH4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 11 Feb 2021 01:07:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613023587;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc; bh=asbVJogg9+5ydnhkzvggexuJvEs5fx1Amr0p8eSV1Ss=;
-        b=VEVX4UwXrR9RdLBg7T1qDNWErKNyAKJz0jBErdPuX6+7RMZoXdivA6bEgKLP0qfeKm2ONk
-        sdS7JdwVG3BKVdBlcAoP8j7nPPxJj1pNu6GUBeXIOHbparB3Ly+OhUL3yNSlsyqqcVGuFX
-        SygV8nEkBFoKzThY23h/EJ/QwTVMzgk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-559-ZvfKduqYNji9_7SCKoSbTQ-1; Thu, 11 Feb 2021 01:06:24 -0500
-X-MC-Unique: ZvfKduqYNji9_7SCKoSbTQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6317801962;
-        Thu, 11 Feb 2021 06:06:23 +0000 (UTC)
-Received: from test1103.test.redhat.com (vpn2-54-42.bne.redhat.com [10.64.54.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C9E75C1BD;
-        Thu, 11 Feb 2021 06:06:22 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH] cifs: In the new mount api we get the full devname as source=
-Date:   Thu, 11 Feb 2021 16:06:16 +1000
-Message-Id: <20210211060616.21672-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        id S231359AbhBKL3z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 Feb 2021 06:29:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57590 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231551AbhBKL1u (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 Feb 2021 06:27:50 -0500
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C902BC061574
+        for <linux-cifs@vger.kernel.org>; Thu, 11 Feb 2021 03:27:06 -0800 (PST)
+Received: by mail-yb1-xb2b.google.com with SMTP id l8so5187467ybe.12
+        for <linux-cifs@vger.kernel.org>; Thu, 11 Feb 2021 03:27:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=OmGXDfRX3iRbwv4sBVpi+Bn1sMBT0LYjDll9EEvWzAk=;
+        b=g3TNkm2WqxX5nAarosFqmaJOs1Y0v7Jlqr+MSRMvdgONCPB/0E93MtT5q2M8c/9Bsc
+         EKv9A1Dc7KXDUXQECrUK7Luay/lxmJMCOrDG928rTWLVbIcj7j8dmc3scZzD89e7TVYP
+         hPVYEw0+USEPEO8cakHCHks2q6n8AEzvrmPjzZ95BML5lO5Oar2WBIlwoepUVAUShKgm
+         MzMaYqyjkB/yLlLJkX+P/eAWxbGnM+Yp3ypeC4C3Mx592JvVNZ2qDpd+wxXJsAEiPQyN
+         zHZW15nNeUGLgcUguvyEqj5knAKt3b6KX4ASvmXLY2GE002pHyyJf0drr7FOV8S8qG7X
+         595w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=OmGXDfRX3iRbwv4sBVpi+Bn1sMBT0LYjDll9EEvWzAk=;
+        b=eEp+Znu+P60hOU6iXRNIMMA8KKBefDIBYHEeC5ajdzX44aVlGZ3fal9ccAqzrwLljd
+         cFiRzfl+GxUcr3/nQuOeRC6hwkQhokOrqLSHHp/rd5lwJuqBkX2mOPJA3CdX4z1Lc6jR
+         fuhMPBTTZEEaPa4/tihmDpzBLNbvr/+4RSJQoO2qETW4pxXzl33Zr3t6tzcZSQwRkLRd
+         ivLd2DR8n5/bV3ZXJTqFQ5PWvYB37kCCL/KNK0gBQX+pnoUOgMAdV0asDu8hcxkwr+5X
+         KCt+gKwgwCvkqb6w8vjaDlboInFBydGwPZg+91eK7tKKLiRfkgDIIR2GMnptqAoP9MUV
+         pd0A==
+X-Gm-Message-State: AOAM531LcWTUr/2Z1cW+yiFFBJEWXtgAn5jAUoFiCZR/dNt6knv3E4AL
+        TdP1zLFGZN83X0uKLtCOjGGk982rd12eJ30Si1w=
+X-Google-Smtp-Source: ABdhPJyT0j9q8MC9D6l61z6Yrtf9sL18dRViARiBsRqlF8WI9Yrynrfrf6P6FmgNJTKtuR/6FFli9VaQEK6cppYDryY=
+X-Received: by 2002:a25:380e:: with SMTP id f14mr10930243yba.185.1613042825946;
+ Thu, 11 Feb 2021 03:27:05 -0800 (PST)
+MIME-Version: 1.0
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Thu, 11 Feb 2021 03:26:54 -0800
+Message-ID: <CANT5p=qNNFqeZnegrYZa0s_=KwmMVvQE3bbbGk60Y=WYvmiHOQ@mail.gmail.com>
+Subject: [PATCH] cifs: Set CIFS_MOUNT_USE_PREFIX_PATH flag on setting cifs_sb->prepath.
+To:     Steve French <smfrench@gmail.com>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000a5fe7805bb0dccfa"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-so we no longer need to handle or parse the UNC= and prefixpath=
-options that mount.cifs are generating.
+--000000000000a5fe7805bb0dccfa
+Content-Type: text/plain; charset="UTF-8"
 
-This also fixes a bug in the mount command option where the devname
-would be truncated into just //server/share because we were looking
-at the truncated UNC value and not the full path.
+While debugging another issue today, Steve and I noticed that if a
+subdir for a file share is already mounted on the client, any new
+mount of any other subdir (or the file share root) results in sharing
+the cifs superblock.
+This could likely result in issues in other code paths as well.
 
-I.e.  in the mount command output the devive //server/share/path
-would show up as just //server/share
+Based on cursory code review, I think the CIFS_MOUNT_USE_PREFIX_PATH
+flag is always used in conjunction with the cifs_sb->prepath field.
+Attached patch sets this flag as soon as the prepath field is set in cifs_sb.
 
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/cifsfs.c     |  2 +-
- fs/cifs/fs_context.c | 16 +++++++++++++++-
- fs/cifs/fs_context.h |  1 +
- 3 files changed, 17 insertions(+), 2 deletions(-)
+Please let me know if any of the above assumptions are wrong, or if
+more needs to be done as a part of this fix.
 
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index e46da536ed33..ab883e84e116 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -469,7 +469,7 @@ cifs_show_cache_flavor(struct seq_file *s, struct cifs_sb_info *cifs_sb)
- static int cifs_show_devname(struct seq_file *m, struct dentry *root)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(root->d_sb);
--	char *devname = kstrdup(cifs_sb->ctx->UNC, GFP_KERNEL);
-+	char *devname = kstrdup(cifs_sb->ctx->source, GFP_KERNEL);
- 
- 	if (devname == NULL)
- 		seq_puts(m, "none");
-diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-index 1b1c56e52395..12a5da0230b5 100644
---- a/fs/cifs/fs_context.c
-+++ b/fs/cifs/fs_context.c
-@@ -148,7 +148,6 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 
- 	/* Mount options which take string value */
- 	fsparam_string("source", Opt_source),
--	fsparam_string("unc", Opt_source),
- 	fsparam_string("user", Opt_user),
- 	fsparam_string("username", Opt_user),
- 	fsparam_string("pass", Opt_pass),
-@@ -178,6 +177,11 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 	fsparam_flag_no("auto", Opt_ignore),
- 	fsparam_string("cred", Opt_ignore),
- 	fsparam_string("credentials", Opt_ignore),
-+	/*
-+	 * UNC and prefixpath is now extracted from Opt_source
-+	 * in the new mount API so we can just ignore them going forward.
-+	 */
-+	fsparam_string("unc", Opt_ignore),
- 	fsparam_string("prefixpath", Opt_ignore),
- 	{}
- };
-@@ -313,6 +317,7 @@ smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx
- 	new_ctx->password = NULL;
- 	new_ctx->domainname = NULL;
- 	new_ctx->UNC = NULL;
-+	new_ctx->source = NULL;
- 	new_ctx->iocharset = NULL;
- 
- 	/*
-@@ -323,6 +328,7 @@ smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx
- 	DUP_CTX_STR(username);
- 	DUP_CTX_STR(password);
- 	DUP_CTX_STR(UNC);
-+	DUP_CTX_STR(source);
- 	DUP_CTX_STR(domainname);
- 	DUP_CTX_STR(nodename);
- 	DUP_CTX_STR(iocharset);
-@@ -732,6 +738,7 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	 * just use what we already have in cifs_sb->ctx.
- 	 */
- 	STEAL_STRING(cifs_sb, ctx, UNC);
-+	STEAL_STRING(cifs_sb, ctx, source);
- 	STEAL_STRING(cifs_sb, ctx, username);
- 	STEAL_STRING(cifs_sb, ctx, password);
- 	STEAL_STRING(cifs_sb, ctx, domainname);
-@@ -974,6 +981,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 			cifs_dbg(VFS, "Unknown error parsing devname\n");
- 			goto cifs_parse_mount_err;
- 		}
-+		ctx->source = kstrdup(param->string, GFP_KERNEL);
-+		if (ctx->source == NULL) {
-+			cifs_dbg(VFS, "OOM when copying UNC string\n");
-+			goto cifs_parse_mount_err;
-+		}
- 		fc->source = kstrdup(param->string, GFP_KERNEL);
- 		if (fc->source == NULL) {
- 			cifs_dbg(VFS, "OOM when copying UNC string\n");
-@@ -1396,6 +1408,8 @@ smb3_cleanup_fs_context_contents(struct smb3_fs_context *ctx)
- 	ctx->password = NULL;
- 	kfree(ctx->UNC);
- 	ctx->UNC = NULL;
-+	kfree(ctx->source);
-+	ctx->source = NULL;
- 	kfree(ctx->domainname);
- 	ctx->domainname = NULL;
- 	kfree(ctx->nodename);
-diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
-index 3358b33abcd0..1c44a460e2c0 100644
---- a/fs/cifs/fs_context.h
-+++ b/fs/cifs/fs_context.h
-@@ -159,6 +159,7 @@ struct smb3_fs_context {
- 	char *username;
- 	char *password;
- 	char *domainname;
-+	char *source;
- 	char *UNC;
- 	char *nodename;
- 	char *iocharset;  /* local code page for mapping to and from Unicode */
 -- 
-2.13.6
+Regards,
+Shyam
 
+--000000000000a5fe7805bb0dccfa
+Content-Type: application/octet-stream; 
+	name="0001-cifs-Set-CIFS_MOUNT_USE_PREFIX_PATH-flag-on-setting-.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-Set-CIFS_MOUNT_USE_PREFIX_PATH-flag-on-setting-.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kl0rjxwy0>
+X-Attachment-Id: f_kl0rjxwy0
+
+RnJvbSAzYTEzNzRmMDJkNzY4NjY0NzQ5NTg2MjRlMmM1MTJhMGZlYTM5M2JjIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
+PgpEYXRlOiBUaHUsIDExIEZlYiAyMDIxIDAzOjA3OjEzIC0wODAwClN1YmplY3Q6IFtQQVRDSF0g
+Y2lmczogU2V0IENJRlNfTU9VTlRfVVNFX1BSRUZJWF9QQVRIIGZsYWcgb24gc2V0dGluZwogY2lm
+c19zYi0+cHJlcGF0aC4KCldoaWxlIHNldHRpbmcgcHJlZml4IHBhdGggZm9yIHRoZSByb290IG9m
+IGEgY2lmc19zYiwgQ0lGU19NT1VOVF9VU0VfUFJFRklYX1BBVEgKZmxhZyBzaG91bGQgYWxzbyBi
+ZSBzZXQuIFdpdGhvdXQgaXQsIHByZXBhdGggaXMgbm90IGV2ZW4gY29uc2lkZXJlZCBpbiBzb21l
+IHBsYWNlcy4KClNpZ25lZC1vZmYtYnk6IFNoeWFtIFByYXNhZCBOIDxzcHJhc2FkQG1pY3Jvc29m
+dC5jb20+Ci0tLQogZnMvY2lmcy9jb25uZWN0LmMgfCAxICsKIDEgZmlsZSBjaGFuZ2VkLCAxIGlu
+c2VydGlvbigrKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5jIGIvZnMvY2lmcy9jb25u
+ZWN0LmMKaW5kZXggNzZlNGQ4ZDhiM2E2Li40YmI5ZGVjYmJmMjcgMTAwNjQ0Ci0tLSBhL2ZzL2Np
+ZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC0yNzU2LDYgKzI3NTYsNyBA
+QCBpbnQgY2lmc19zZXR1cF9jaWZzX3NiKHN0cnVjdCBjaWZzX3NiX2luZm8gKmNpZnNfc2IpCiAJ
+CWNpZnNfc2ItPnByZXBhdGggPSBrc3RyZHVwKGN0eC0+cHJlcGF0aCwgR0ZQX0tFUk5FTCk7CiAJ
+CWlmIChjaWZzX3NiLT5wcmVwYXRoID09IE5VTEwpCiAJCQlyZXR1cm4gLUVOT01FTTsKKwkJY2lm
+c19zYi0+bW50X2NpZnNfZmxhZ3MgfD0gQ0lGU19NT1VOVF9VU0VfUFJFRklYX1BBVEg7CiAJfQog
+CiAJcmV0dXJuIDA7Ci0tIAoyLjI1LjEKCg==
+--000000000000a5fe7805bb0dccfa--
