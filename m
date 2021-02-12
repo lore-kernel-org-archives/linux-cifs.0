@@ -2,178 +2,107 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0941FC433E0
-	for <linux-cifs@archiver.kernel.org>; Fri, 12 Feb 2021 16:44:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B69C433E0
+	for <linux-cifs@archiver.kernel.org>; Fri, 12 Feb 2021 18:16:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C487564E56
-	for <linux-cifs@archiver.kernel.org>; Fri, 12 Feb 2021 16:44:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 978A264E99
+	for <linux-cifs@archiver.kernel.org>; Fri, 12 Feb 2021 18:16:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231248AbhBLQnh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 12 Feb 2021 11:43:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55673 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231256AbhBLQmr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 12 Feb 2021 11:42:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613148078;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ft1B0dmqfZyPUoyDvwnAfTze1mns3d3CFcFjBHQ5YEA=;
-        b=aNRt9Ee3sV2xdj2/G38YJVresg4eVETnPdP9xDWtHOPJMqJe0efT11qDj6gc7WEQExSZGP
-        N7/Y+Gsts8Ww7CUbqTDLJqyaxZ5vprO30+olfCn9kIjcjU4OnFYwHGeWme5ErQJOdiPEfT
-        cJJ9GTyWMLNlBxzi8f30HU2JxnQJd9A=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-B-RQRYovMoqRaRE_jNVVCw-1; Fri, 12 Feb 2021 11:41:16 -0500
-X-MC-Unique: B-RQRYovMoqRaRE_jNVVCw-1
-Received: by mail-ed1-f70.google.com with SMTP id m16so272144edd.21
-        for <linux-cifs@vger.kernel.org>; Fri, 12 Feb 2021 08:41:15 -0800 (PST)
+        id S230053AbhBLSQw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 12 Feb 2021 13:16:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58350 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231335AbhBLSQu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 12 Feb 2021 13:16:50 -0500
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4E4C061574;
+        Fri, 12 Feb 2021 10:16:10 -0800 (PST)
+Received: by mail-lj1-x235.google.com with SMTP id u4so130167ljh.6;
+        Fri, 12 Feb 2021 10:16:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=AoTuhu3DlTVK1aUQYYk55qO6vEl1oKyV3T843XUxhck=;
+        b=Glv51Ob/vsn4WWmCNaOWmJeCG5COQtvDaEMOiAWSzzLAFDNuj6yTgJqNGG3T/jM7Fe
+         35YXPG08WR7kYrJywdGs21orfFlWsZl4TA+x2xANT+BaGWq/j+o61DeIGm+PkgnqJygY
+         oMFJyuE1JSuEu64A2yolqQCX/w4Wx3XtuA5roDKz/nE2najy8XM//q5p4ZKY4mMpc7EK
+         DsCI+S3cZKRvueL0Vpvi66EHGX5vwsRilVW+l12fgHPQCEpga3e9PJpaGoKeaD9HK4eu
+         X9M5blKlafBPGjpybG4n7BBsd+spI/gDcS5mHPGt2Ly8DM+8PGNR4b6Jy9aCNzuk/ArI
+         axHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ft1B0dmqfZyPUoyDvwnAfTze1mns3d3CFcFjBHQ5YEA=;
-        b=eh4svss+T1mdHRJR/FcHzqyfvHGus3lG2Tky9eAzZtwVDlJrIWZ6eqRte31bSselIp
-         hNJJZ0X9+i+RgfTBAx9DbrgHh21b9oq7HhjmQXCQ6uFCKj1JwJwOCkT3eyhhiXmMj4Eb
-         zr8sGkE5oNAU6ZeV1D0G7S4DE3sMx5UPIZnQ1VCFYfe8PPQIP9dm70extxXkkSN9Sowj
-         L6Ck070k9YwCgA3K3TaiXqzWjQtOzCnhINtbSHc9WA0LggoOV7jDB7exauzfcsKgR+yv
-         lx5smW7CA7lqjn1ij0AMs+TtgXsQhvNSBvZjV8jyaaKLMo7RVF39b+q8I/hlJs2vBCG1
-         il+A==
-X-Gm-Message-State: AOAM530G8R/FPoSUWzy2fmNyRuCtysvIkD0sDzCASfUu6iP1Tr2X5Vqj
-        VfAFKex9ksQMAOlTWmvzSFPBsIM/cp9milqbN4VofMC7mRki/WKq8/0QkHDHNcLcVOBKavUO8KP
-        dlecqpkNERx00DOHaZ5ixL8h4JNJoqzNGgUA89Q==
-X-Received: by 2002:a17:906:1681:: with SMTP id s1mr3897285ejd.229.1613148074944;
-        Fri, 12 Feb 2021 08:41:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwTIgnx7LJiTFOW+mhqlshoZww0YFi52MiJxBqcnsY+RGcoAoY9xA8AY8Yu0JSD5ZHRlga8wGOKDsNd1QerD6Y=
-X-Received: by 2002:a17:906:1681:: with SMTP id s1mr3897262ejd.229.1613148074745;
- Fri, 12 Feb 2021 08:41:14 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=AoTuhu3DlTVK1aUQYYk55qO6vEl1oKyV3T843XUxhck=;
+        b=tDQtfpdCnQdEi7v0AYVHbAI8mkLaC3z0LW17OwrbVANUV/EW6Jxm/2Z1lCdgAXwb9s
+         Ym5/K9B0lNZfaXjxTjfx1xqoxnz3LmiFwc7wv7Yk1VNKofVEHFa8Nl63Wb8ubj+MC4er
+         dHQA2hgS7g26vMH1cGNwHHtm++MVdHYM53qjOA+DliuLA2tV0AEIkiJo0NmifvfGUUJE
+         YG/muoNK80sXrn9FdpXJBROIJUia+aAHMBlOZPoRRpITsAysEn4CTU9m5rJLR3T/GxZJ
+         +6y3jvUFUccz4Aywwvr/vK2hPr2NcllGMlrXLa3ZYPVVNiYSHkrxEht511zJW3HUoGPd
+         UieQ==
+X-Gm-Message-State: AOAM533k9ZaOgP55k0kP2VQ2mG98rOA0GkQ9G/YmpmSDYXreFTK0litp
+        4DsRYsopFZTRCn0Kc/AC1cn/g8R6Z0sdXAM24EY6LF17MQ3ung==
+X-Google-Smtp-Source: ABdhPJw2ieYrBRiUpSOzCXO9nQhTYw2BCM3LWRvVolDUXAFenFap0CJ9KrCxbRlx5K71i9LzJJXb3LVYP4DzHSxI7tU=
+X-Received: by 2002:a05:651c:548:: with SMTP id q8mr2348931ljp.256.1613153768589;
+ Fri, 12 Feb 2021 10:16:08 -0800 (PST)
 MIME-Version: 1.0
-References: <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com>
- <591237.1612886997@warthog.procyon.org.uk> <1330473.1612974547@warthog.procyon.org.uk>
- <1330751.1612974783@warthog.procyon.org.uk> <CAHk-=wjgA-74ddehziVk=XAEMTKswPu1Yw4uaro1R3ibs27ztw@mail.gmail.com>
- <27816.1613085646@warthog.procyon.org.uk>
-In-Reply-To: <27816.1613085646@warthog.procyon.org.uk>
-From:   David Wysochanski <dwysocha@redhat.com>
-Date:   Fri, 12 Feb 2021 11:40:38 -0500
-Message-ID: <CALF+zOkRhZ6SfotHbWFMDYJ-qJxxOSMd8SUbrXd4w7rpOMoPKw@mail.gmail.com>
-Subject: Re: [GIT PULL] fscache: I/O API modernisation and netfs helper library
-To:     David Howells <dhowells@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cachefs <linux-cachefs@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 12 Feb 2021 12:15:57 -0600
+Message-ID: <CAH2r5mtYEj+WLy+oPSXEwS5sZ8+TNk_dU3PVx3ieBz2DFS94Sg@mail.gmail.com>
+Subject: [GIT PULL] cifs fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Feb 11, 2021 at 6:20 PM David Howells <dhowells@redhat.com> wrote:
->
-> Linus Torvalds <torvalds@linux-foundation.org> wrote:
->
-> > Also, honestly, I really *REALLY* want your commit messages to talk
-> > about who has been cc'd, who has been part of development, and point
-> > to the PUBLIC MAILING LISTS WHERE THAT DISCUSSION WAS TAKING PLACE, so
-> > that I can actually see that "yes, other people were involved"
->
-> Most of the development discussion took place on IRC and waving snippets of
-> code about in pastebin rather than email - the latency of email is just too
-> high.  There's not a great deal I can do about that now as I haven't kept IRC
-> logs.  I can do that in future if you want.
->
-> > No, I don't require this in general, but exactly because of the
-> > history we have, I really really want to see that. I want to see a
-> >
-> >    Link: https://lore.kernel.org/r/....
->
-> I can add links to where I've posted the stuff for review.  Do you want this
-> on a per-patch basis or just in the cover for now?
->
-> Also, do you want things like these:
->
->  https://lore.kernel.org/linux-fsdevel/3326.1579019665@warthog.procyon.org.uk/
->  https://lore.kernel.org/linux-fsdevel/4467.1579020509@warthog.procyon.org.uk/
->
-> which pertain to the overall fscache rewrite, but where the relevant changes
-> didn't end up included in this particular patchset?  Or this:
->
->  https://listman.redhat.com/archives/linux-cachefs/2020-December/msg00000.html
->
-> where someone was testing the overall patchset of which this is a subset?
->
-> > and the Cc's - or better yet, the Reviewed-by's etc - so that when I
-> > get a pull request, it really is very obvious to me when I look at it
-> > that others really have been involved.
-> >
-> > So if I continue to see just
-> >
-> >     Signed-off-by: David Howells <dhowells@redhat.com>
-> >
-> > at the end of the commit messages, I will not pull.
-> >
-> > Yes, in this thread a couple of people have piped up and said that
-> > they were part of the discussion and that they are interested, but if
-> > I have to start asking around just to see that, then it's too little,
-> > too late.
-> >
-> > No more of this "it looks like David Howells did things in private". I
-> > want links I can follow to see the discussion, and I really want to
-> > see that others really have been involved.
-> >
-> > Ok?
->
-> Sure.
->
-> I can go and edit in link pointers into the existing patches if you want and
-> add Jeff's Review-and-tested-by into the appropriate ones.  You would be able
-> to compare against the existing tag, so it wouldn't entirely invalidate the
-> testing.
->
-You can add my Tested-by for your fscache-next branch series ending at
-commit  235299002012 netfs: Hold a ref on a page when PG_private_2 is set
-This series includes your commit c723f0232c9f8928b3b15786499637bda3121f41
-discussed a little earlier in this email thread.
+Please pull the following changes since commit
+92bf22614b21a2706f4993b278017e437f7785b3:
 
-I ran over 24 hours of NFS tests (unit, connectathon, xfstests,
-various servers and all NFS versions) on your latest series
-and it looks good.  Note I did not run against pNFS servers
-due to known issue, and I did not do more advanced tests like
-error injections.  I did get one OOM on xfstest generic/551 on
-one testbed, but that same' test passed on another testbed,
-so it's not clear what is happening there and it could very
-well be testbed or NFS related.
+  Linux 5.11-rc7 (2021-02-07 13:57:38 -0800)
 
-In addition, I reviewed various patches in the series, especially the
-API portions of the netfs patches, so for those, Reviewed-by is
-appropriate as well. I have also reviewed some of the internals
-of the other infrastructure patches, but my review is more limited
-there.
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.11-rc7-smb3
+
+for you to fetch changes up to a738c93fb1c17e386a09304b517b1c6b2a6a5a8b:
+
+  cifs: Set CIFS_MOUNT_USE_PREFIX_PATH flag on setting
+cifs_sb->prepath. (2021-02-11 11:08:32 -0600)
+
+----------------------------------------------------------------
+4 small cifs fixes for the implementation of the new mount API (including
+a particularly important one for DFS links) that were found in
+additional testing
+this week of additional DFS scenarios, and a user testing of an apache container
+problem.
+
+Regression test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/501
+----------------------------------------------------------------
+Ronnie Sahlberg (3):
+      cifs: fix dfs-links
+      cifs: do not disable noperm if multiuser mount option is not provided
+      cifs: In the new mount api we get the full devname as source=
+
+Shyam Prasad N (1):
+      cifs: Set CIFS_MOUNT_USE_PREFIX_PATH flag on setting cifs_sb->prepath.
+
+ fs/cifs/cifsfs.c     |  2 +-
+ fs/cifs/connect.c    |  9 +++++++++
+ fs/cifs/fs_context.c | 20 +++++++++++++++++---
+ fs/cifs/fs_context.h |  1 +
+ 4 files changed, 28 insertions(+), 4 deletions(-)
 
 
+--
+Thanks,
 
-
-
-> Also, do you want links inserting into all the patches of the two keyrings
-> pull requests I've sent you?
->
-> David
->
-
+Steve
