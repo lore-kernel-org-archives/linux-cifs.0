@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4EC7C433DB
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 18:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9893C43331
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 18:38:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C7B360C40
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 18:37:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A418A64E26
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 18:38:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230375AbhBOShk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Feb 2021 13:37:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33784 "EHLO mail.kernel.org"
+        id S231136AbhBOSin (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Feb 2021 13:38:43 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34106 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230243AbhBOShh (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 15 Feb 2021 13:37:37 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2BD9E64E0F;
-        Mon, 15 Feb 2021 18:36:56 +0000 (UTC)
+        id S230468AbhBOSiQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 15 Feb 2021 13:38:16 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BBDB564E25;
+        Mon, 15 Feb 2021 18:37:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1613414217;
-        bh=QCU3pzLQ0hRpTMsZSfrMYcsdc4VS2H5Y1JGXc2aBxTs=;
+        s=k20201202; t=1613414224;
+        bh=/wGOeZzOWLx4B9iOccDB08VpQRLxgPY3+sVDTQkG1rU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=mPUPDRRIbI/AME6kp+JS8WT+IEK3YkFvwpjWY0Urpp1rg1plswbg+GD4xsieSCR2q
-         JTCkfOOWTA/V9YkMCTMv8IGvA8dT5nYIf++BJDnpi7pTcn1EJoj7odZz+XrXw7H5l1
-         JBdbxGaBnts/kubPaQvZ9uoRkqmwD9mlNc2WXfYpvIs8RoW+e00vjpHCaYqNuNsjnj
-         BLAYn/fTL8LcZ9fN+OaMCwKTLM/2btoQRZyiPJrrdGorDlLPAM6OLbia1D8Q2HkQn2
-         GnFM93ZGbWIx4mLh9ggkOFDeERDcjoCyz6txVl4JaDG07kTINpcsWhL/P6Pc5tTWYc
-         yH6Xsx5TWS27A==
+        b=W1ceJLLe84wKjlB+EKJg6WA3jtQ2AOf7RvToJvGJuG9FqXM/Xi/sGfUKIaGJdppsR
+         G69+k5OTM3iZXLe4HqRGdl5F1C8mnEvs9NCT36z1Oa6aNwpzt4nGzGZhHFWdmrAceM
+         SZryD0wkHSc2CQAjA1UGeglNMaPMBiKvkCZCtR2nM8FMmii9MmD8WjmnBCHaLMzRoV
+         fNDVj17H8YspVBtX08sUaGLvn82qhE/ty/8ZZN3wbXBYhsslTD2vuToOM+6HLjtAJh
+         aY3nr5b4ulb9WI2HsSQ2PjuCM7PV9sBSW9libCJU2a+Tz7V7aMX+k1G2ayK5OiDiTh
+         dzfblpzpfT5KA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Shyam Prasad N <sprasad@microsoft.com>,
@@ -38,12 +38,12 @@ Cc:     Shyam Prasad N <sprasad@microsoft.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.10 4/6] cifs: Set CIFS_MOUNT_USE_PREFIX_PATH flag on setting cifs_sb->prepath.
-Date:   Mon, 15 Feb 2021 13:36:49 -0500
-Message-Id: <20210215183651.122001-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 3/4] cifs: Set CIFS_MOUNT_USE_PREFIX_PATH flag on setting cifs_sb->prepath.
+Date:   Mon, 15 Feb 2021 13:36:59 -0500
+Message-Id: <20210215183700.122100-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210215183651.122001-1-sashal@kernel.org>
-References: <20210215183651.122001-1-sashal@kernel.org>
+In-Reply-To: <20210215183700.122100-1-sashal@kernel.org>
+References: <20210215183700.122100-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -77,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 44f9cce570995..ad3ecda1314d9 100644
+index ab9eeb5ff8e57..67c2e6487479a 100644
 --- a/fs/cifs/connect.c
 +++ b/fs/cifs/connect.c
-@@ -4007,6 +4007,7 @@ int cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
+@@ -4198,6 +4198,7 @@ int cifs_setup_cifs_sb(struct smb_vol *pvolume_info,
  		cifs_sb->prepath = kstrdup(pvolume_info->prepath, GFP_KERNEL);
  		if (cifs_sb->prepath == NULL)
  			return -ENOMEM;
