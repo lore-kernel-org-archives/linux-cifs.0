@@ -5,56 +5,60 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C0FC433E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:56:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D882BC433E9
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 16:10:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7ED264DDA
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:56:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D6CF64DF0
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 16:10:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232405AbhBOP40 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Feb 2021 10:56:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35074 "EHLO
+        id S232557AbhBOQJe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Feb 2021 11:09:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25781 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232186AbhBOPwa (ORCPT
+        by vger.kernel.org with ESMTP id S231807AbhBOPru (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 15 Feb 2021 10:52:30 -0500
+        Mon, 15 Feb 2021 10:47:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613404262;
+        s=mimecast20190719; t=1613403982;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Fmgf+tcMqzC/2gfieTJn+guScR8ScdKM/VUQCCobjQw=;
-        b=Nk28SSq2gauaJKCiAL1Tn9k1PtOHVYJxerJYXJI+xETfg8uO2iM8phesUMEEuJdpFLDm1w
-        v6IWfgJyivllifxH3+p9fGPOuu35xaEuSFcjCZKlg6snX5d+yb1eQVSQ7G47ZnXBgVGibL
-        XHgnlBNClPYz+B17WB5KyMVqLb+KgqA=
+        bh=FSeGQPRgQOfnLZQYeacjhtBI6uVsAcX8IrVMZtVQC4Q=;
+        b=VMkHXAoJ96/f4Uu4E2pznKEEyYn+1nwX8wTY/8bbjB/BKDIE2B+1cZFOAVApNCFQAhnW8H
+        u3YBq/RM7VpJvsJ+GYVPPBQywPHxuhPDzjZETnfk/Vz7Z5AGSbe1RlgFZ96AgpNZ3s/aXv
+        5k9d4igA9AQKyFSDMeXe8tGlBg6vMj4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-_xmxmVd0NIede5R-gqhy4g-1; Mon, 15 Feb 2021 10:50:58 -0500
-X-MC-Unique: _xmxmVd0NIede5R-gqhy4g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-75-RR9oVwJCMjih5l2RF-Fw4Q-1; Mon, 15 Feb 2021 10:46:20 -0500
+X-MC-Unique: RR9oVwJCMjih5l2RF-Fw4Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1C8D801962;
-        Mon, 15 Feb 2021 15:50:56 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 711A479EC2;
+        Mon, 15 Feb 2021 15:46:18 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93EC960BE2;
-        Mon, 15 Feb 2021 15:50:50 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F32BB5D9C0;
+        Mon, 15 Feb 2021 15:46:11 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 32/33] ceph: plug write_begin into read helper
+Subject: [PATCH 10/33] netfs: Gather stats
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>
-Cc:     Jeff Layton <jlayton@kernel.org>, ceph-devel@vger.kernel.org,
-        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
-        dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
+Cc:     Jeff Layton <jlayton@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, dhowells@redhat.com,
+        Jeff Layton <jlayton@redhat.com>,
         David Wysochanski <dwysocha@redhat.com>,
         "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
@@ -62,263 +66,310 @@ Cc:     Jeff Layton <jlayton@kernel.org>, ceph-devel@vger.kernel.org,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 15 Feb 2021 15:50:49 +0000
-Message-ID: <161340424973.1303470.6253467365270537258.stgit@warthog.procyon.org.uk>
+Date:   Mon, 15 Feb 2021 15:46:11 +0000
+Message-ID: <161340397101.1303470.17581910581108378458.stgit@warthog.procyon.org.uk>
 In-Reply-To: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
 References: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Jeff Layton <jlayton@kernel.org>
+Gather statistics from the netfs interface that can be exported through a
+seqfile.  This is intended to be called by a later patch when viewing
+/proc/fs/fscache/stats.
 
-Convert ceph_write_begin to use the netfs_write_begin helper. Most of
-the ops we need for it are already in place from the readpage conversion
-but we do add a new check_write_begin op since ceph needs to be able to
-vet whether there is an incompatible writeback already in flight before
-reading in the page.
-
-With this, we can also remove the old ceph_do_readpage helper.
-
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: ceph-devel@vger.kernel.org
+Reviewed-by: Jeff Layton <jlayton@redhat.com>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-mm@kvack.org
 cc: linux-cachefs@redhat.com
+cc: linux-afs@lists.infradead.org
+cc: linux-nfs@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: ceph-devel@vger.kernel.org
+cc: v9fs-developer@lists.sourceforge.net
 cc: linux-fsdevel@vger.kernel.org
 ---
 
- fs/ceph/addr.c |  187 ++++++++++++++++++--------------------------------------
- 1 file changed, 61 insertions(+), 126 deletions(-)
+ fs/netfs/Kconfig       |   15 +++++++++++++
+ fs/netfs/Makefile      |    3 +--
+ fs/netfs/internal.h    |   34 ++++++++++++++++++++++++++++++
+ fs/netfs/read_helper.c |   23 ++++++++++++++++++++
+ fs/netfs/stats.c       |   54 ++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/netfs.h  |    1 +
+ 6 files changed, 128 insertions(+), 2 deletions(-)
+ create mode 100644 fs/netfs/stats.c
 
-diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
-index 95f39ff9bb24..18f660611ba1 100644
---- a/fs/ceph/addr.c
-+++ b/fs/ceph/addr.c
-@@ -322,76 +322,6 @@ static int ceph_readpage(struct file *file, struct page *page)
- 	return netfs_readpage(file, page, &ceph_readpage_netfs_ops, NULL);
- }
+diff --git a/fs/netfs/Kconfig b/fs/netfs/Kconfig
+index 2ebf90e6ca95..578112713703 100644
+--- a/fs/netfs/Kconfig
++++ b/fs/netfs/Kconfig
+@@ -6,3 +6,18 @@ config NETFS_SUPPORT
+ 	  This option enables support for network filesystems, including
+ 	  helpers for high-level buffered I/O, abstracting out read
+ 	  segmentation, local caching and transparent huge page support.
++
++config NETFS_STATS
++	bool "Gather statistical information on local caching"
++	depends on NETFS_SUPPORT && PROC_FS
++	help
++	  This option causes statistical information to be gathered on local
++	  caching and exported through file:
++
++		/proc/fs/fscache/stats
++
++	  The gathering of statistics adds a certain amount of overhead to
++	  execution as there are a quite a few stats gathered, and on a
++	  multi-CPU system these may be on cachelines that keep bouncing
++	  between CPUs.  On the other hand, the stats are very useful for
++	  debugging purposes.  Saying 'Y' here is recommended.
+diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
+index 4b4eff2ba369..c15bfc966d96 100644
+--- a/fs/netfs/Makefile
++++ b/fs/netfs/Makefile
+@@ -1,6 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
  
--/* read a single page, without unlocking it. */
--static int ceph_do_readpage(struct file *filp, struct page *page)
--{
--	struct inode *inode = file_inode(filp);
--	struct ceph_inode_info *ci = ceph_inode(inode);
--	struct ceph_fs_client *fsc = ceph_inode_to_client(inode);
--	struct ceph_osd_client *osdc = &fsc->client->osdc;
--	struct ceph_osd_request *req;
--	struct ceph_vino vino = ceph_vino(inode);
--	int err = 0;
--	u64 off = page_offset(page);
--	u64 len = PAGE_SIZE;
--
--	if (off >= i_size_read(inode)) {
--		zero_user_segment(page, 0, PAGE_SIZE);
--		SetPageUptodate(page);
--		return 0;
--	}
--
--	if (ci->i_inline_version != CEPH_INLINE_NONE) {
--		/*
--		 * Uptodate inline data should have been added
--		 * into page cache while getting Fcr caps.
--		 */
--		if (off == 0)
--			return -EINVAL;
--		zero_user_segment(page, 0, PAGE_SIZE);
--		SetPageUptodate(page);
--		return 0;
--	}
--
--	dout("readpage ino %llx.%llx file %p off %llu len %llu page %p index %lu\n",
--	     vino.ino, vino.snap, filp, off, len, page, page->index);
--	req = ceph_osdc_new_request(osdc, &ci->i_layout, vino, off, &len, 0, 1,
--				    CEPH_OSD_OP_READ, CEPH_OSD_FLAG_READ, NULL,
--				    ci->i_truncate_seq, ci->i_truncate_size,
--				    false);
--	if (IS_ERR(req))
--		return PTR_ERR(req);
--
--	osd_req_op_extent_osd_data_pages(req, 0, &page, len, 0, false, false);
--
--	err = ceph_osdc_start_request(osdc, req, false);
--	if (!err)
--		err = ceph_osdc_wait_request(osdc, req);
--
--	ceph_update_read_latency(&fsc->mdsc->metric, req->r_start_latency,
--				 req->r_end_latency, err);
--
--	ceph_osdc_put_request(req);
--	dout("readpage result %d\n", err);
--
--	if (err == -ENOENT)
--		err = 0;
--	if (err < 0) {
--		if (err == -EBLOCKLISTED)
--			fsc->blocklisted = true;
--		goto out;
--	}
--	if (err < PAGE_SIZE)
--		/* zero fill remainder of page */
--		zero_user_segment(page, err, PAGE_SIZE);
--	else
--		flush_dcache_page(page);
--
--	SetPageUptodate(page);
--out:
--	return err < 0 ? err : 0;
--}
--
- /*
-  * Finish an async read(ahead) op.
+-netfs-y := \
+-	read_helper.o
++netfs-y := read_helper.o stats.o
+ 
+ obj-$(CONFIG_NETFS_SUPPORT) := netfs.o
+diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+index ee665c0e7dc8..98b6f4516da1 100644
+--- a/fs/netfs/internal.h
++++ b/fs/netfs/internal.h
+@@ -16,8 +16,42 @@
   */
-@@ -1411,6 +1341,40 @@ ceph_find_incompatible(struct page *page)
- 	return NULL;
- }
+ extern unsigned int netfs_debug;
  
-+static int ceph_netfs_check_write_begin(struct file *file, loff_t pos, unsigned int len,
-+					struct page *page, void **_fsdata)
++/*
++ * stats.c
++ */
++#ifdef CONFIG_NETFS_STATS
++extern atomic_t netfs_n_rh_readahead;
++extern atomic_t netfs_n_rh_readpage;
++extern atomic_t netfs_n_rh_rreq;
++extern atomic_t netfs_n_rh_sreq;
++extern atomic_t netfs_n_rh_download;
++extern atomic_t netfs_n_rh_download_done;
++extern atomic_t netfs_n_rh_download_failed;
++extern atomic_t netfs_n_rh_download_instead;
++extern atomic_t netfs_n_rh_read;
++extern atomic_t netfs_n_rh_read_done;
++extern atomic_t netfs_n_rh_read_failed;
++extern atomic_t netfs_n_rh_zero;
++extern atomic_t netfs_n_rh_short_read;
++extern atomic_t netfs_n_rh_write;
++extern atomic_t netfs_n_rh_write_done;
++extern atomic_t netfs_n_rh_write_failed;
++
++
++static inline void netfs_stat(atomic_t *stat)
 +{
-+	struct inode *inode = file_inode(file);
-+	struct ceph_inode_info *ci = ceph_inode(inode);
-+	struct ceph_snap_context *snapc;
-+
-+	snapc = ceph_find_incompatible(page);
-+	if (snapc) {
-+		int r;
-+
-+		unlock_page(page);
-+		put_page(page);
-+		if (IS_ERR(snapc))
-+			return PTR_ERR(snapc);
-+
-+		ceph_queue_writeback(inode);
-+		r = wait_event_killable(ci->i_cap_wq,
-+					context_is_writeable_or_written(inode, snapc));
-+		ceph_put_snap_context(snapc);
-+		return r == 0 ? -EAGAIN : r;
-+	}
-+	return 0;
++	atomic_inc(stat);
 +}
 +
-+const struct netfs_read_request_ops ceph_netfs_write_begin_ops = {
-+	.init_rreq		= ceph_init_rreq,
-+	.is_cache_enabled	= ceph_is_cache_enabled,
-+	.begin_cache_operation	= ceph_begin_cache_operation,
-+	.issue_op		= ceph_netfs_issue_op,
-+	.clamp_length		= ceph_netfs_clamp_length,
-+	.check_write_begin	= ceph_netfs_check_write_begin,
-+};
++static inline void netfs_stat_d(atomic_t *stat)
++{
++	atomic_dec(stat);
++}
 +
++#else
+ #define netfs_stat(x) do {} while(0)
+ #define netfs_stat_d(x) do {} while(0)
++#endif
+ 
+ /*****************************************************************************/
  /*
-  * We are only allowed to write into/dirty the page if the page is
-  * clean, or already dirty within the same snap context.
-@@ -1421,75 +1385,46 @@ static int ceph_write_begin(struct file *file, struct address_space *mapping,
+diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
+index 53b04b105179..4f6f708f8f18 100644
+--- a/fs/netfs/read_helper.c
++++ b/fs/netfs/read_helper.c
+@@ -55,6 +55,7 @@ static struct netfs_read_request *netfs_alloc_read_request(
+ 		refcount_set(&rreq->usage, 1);
+ 		__set_bit(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
+ 		ops->init_rreq(rreq, file);
++		netfs_stat(&netfs_n_rh_rreq);
+ 	}
+ 
+ 	return rreq;
+@@ -86,6 +87,7 @@ static void netfs_free_read_request(struct work_struct *work)
+ 		rreq->netfs_ops->cleanup(rreq->mapping, rreq->netfs_priv);
+ 	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
+ 	kfree(rreq);
++	netfs_stat_d(&netfs_n_rh_rreq);
+ }
+ 
+ static void netfs_put_read_request(struct netfs_read_request *rreq)
+@@ -115,6 +117,7 @@ static struct netfs_read_subrequest *netfs_alloc_subrequest(
+ 		refcount_set(&subreq->usage, 2);
+ 		subreq->rreq = rreq;
+ 		netfs_get_read_request(rreq);
++		netfs_stat(&netfs_n_rh_sreq);
+ 	}
+ 
+ 	return subreq;
+@@ -130,6 +133,7 @@ static void __netfs_put_subrequest(struct netfs_read_subrequest *subreq)
+ 	trace_netfs_sreq(subreq, netfs_sreq_trace_free);
+ 	netfs_put_read_request(subreq->rreq);
+ 	kfree(subreq);
++	netfs_stat_d(&netfs_n_rh_sreq);
+ }
+ 
+ /*
+@@ -151,6 +155,7 @@ static void netfs_clear_unread(struct netfs_read_subrequest *subreq)
+ static void netfs_fill_with_zeroes(struct netfs_read_request *rreq,
+ 				   struct netfs_read_subrequest *subreq)
  {
- 	struct inode *inode = file_inode(file);
- 	struct ceph_inode_info *ci = ceph_inode(inode);
--	struct ceph_snap_context *snapc;
- 	struct page *page = NULL;
- 	pgoff_t index = pos >> PAGE_SHIFT;
--	int pos_in_page = pos & ~PAGE_MASK;
--	int r = 0;
--
--	dout("write_begin file %p inode %p page %p %d~%d\n", file, inode, page, (int)pos, (int)len);
--
--	for (;;) {
--		page = grab_cache_page_write_begin(mapping, index, flags);
--		if (!page) {
--			r = -ENOMEM;
--			break;
--		}
--
--		snapc = ceph_find_incompatible(page);
--		if (snapc) {
--			if (IS_ERR(snapc)) {
--				r = PTR_ERR(snapc);
--				break;
--			}
--			unlock_page(page);
--			put_page(page);
--			page = NULL;
--			ceph_queue_writeback(inode);
--			r = wait_event_killable(ci->i_cap_wq,
--						context_is_writeable_or_written(inode, snapc));
--			ceph_put_snap_context(snapc);
--			if (r != 0)
--				break;
--			continue;
--		}
--
--		if (PageUptodate(page)) {
--			dout(" page %p already uptodate\n", page);
--			break;
--		}
-+	int r;
++	netfs_stat(&netfs_n_rh_zero);
+ 	__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
+ 	netfs_subreq_terminated(subreq, 0);
+ }
+@@ -174,6 +179,7 @@ static void netfs_fill_with_zeroes(struct netfs_read_request *rreq,
+ static void netfs_read_from_server(struct netfs_read_request *rreq,
+ 				   struct netfs_read_subrequest *subreq)
+ {
++	netfs_stat(&netfs_n_rh_download);
+ 	rreq->netfs_ops->issue_op(subreq);
+ }
  
-+	if (ci->i_inline_version != CEPH_INLINE_NONE) {
- 		/*
--		 * In some cases we don't need to read at all:
--		 * - full page write
--		 * - write that lies completely beyond EOF
--		 * - write that covers the the page from start to EOF or beyond it
-+		 * In principle, we should never get here, as the inode should have been uninlined
-+		 * before we're allowed to write to the page (in write_iter or page_mkwrite).
- 		 */
--		if ((pos_in_page == 0 && len == PAGE_SIZE) ||
--		    (pos >= i_size_read(inode)) ||
--		    (pos_in_page == 0 && (pos + len) >= i_size_read(inode))) {
--			zero_user_segments(page, 0, pos_in_page,
--					   pos_in_page + len, PAGE_SIZE);
--			break;
--		}
-+		WARN_ONCE(1, "ceph: write_begin called on still-inlined inode!\n");
+@@ -283,6 +289,7 @@ static void netfs_rreq_short_read(struct netfs_read_request *rreq,
+ 	__clear_bit(NETFS_SREQ_SHORT_READ, &subreq->flags);
+ 	__set_bit(NETFS_SREQ_SEEK_DATA_READ, &subreq->flags);
  
- 		/*
--		 * We need to read it. If we get back -EINPROGRESS, then the page was
--		 * handed off to fscache and it will be unlocked when the read completes.
--		 * Refind the page in that case so we can reacquire the page lock. Otherwise
--		 * we got a hard error or the read was completed synchronously.
-+		 * Uptodate inline data should have been added
-+		 * into page cache while getting Fcr caps.
- 		 */
--		r = ceph_do_readpage(file, page);
--		if (r != -EINPROGRESS)
--			break;
-+		if (index == 0) {
-+			r = -EINVAL;
-+			goto out;
-+		}
++	netfs_stat(&netfs_n_rh_short_read);
+ 	trace_netfs_sreq(subreq, netfs_sreq_trace_resubmit_short);
+ 
+ 	netfs_get_read_subrequest(subreq);
+@@ -314,6 +321,7 @@ static bool netfs_rreq_perform_resubmissions(struct netfs_read_request *rreq)
+ 				break;
+ 			subreq->source = NETFS_DOWNLOAD_FROM_SERVER;
+ 			subreq->error = 0;
++			netfs_stat(&netfs_n_rh_download_instead);
+ 			trace_netfs_sreq(subreq, netfs_sreq_trace_download_instead);
+ 			netfs_get_read_subrequest(subreq);
+ 			atomic_inc(&rreq->nr_rd_ops);
+@@ -406,6 +414,17 @@ void netfs_subreq_terminated(struct netfs_read_subrequest *subreq,
+ 	       subreq->debug_index, subreq->start, subreq->flags,
+ 	       transferred_or_error);
+ 
++	switch (subreq->source) {
++	case NETFS_READ_FROM_CACHE:
++		netfs_stat(&netfs_n_rh_read_done);
++		break;
++	case NETFS_DOWNLOAD_FROM_SERVER:
++		netfs_stat(&netfs_n_rh_download_done);
++		break;
++	default:
++		break;
++	}
 +
-+		page = grab_cache_page_write_begin(mapping, index, flags);
-+		if (!page)
-+			return -ENOMEM;
-+
-+		zero_user_segment(page, 0, PAGE_SIZE);
-+		SetPageUptodate(page);
-+		r = 0;
-+		goto out;
- 	}
+ 	if (IS_ERR_VALUE(transferred_or_error)) {
+ 		subreq->error = transferred_or_error;
+ 		goto failed;
+@@ -459,8 +478,10 @@ void netfs_subreq_terminated(struct netfs_read_subrequest *subreq,
  
-+	r = netfs_write_begin(file, inode->i_mapping, pos, len, 0, &page, NULL,
-+			      &ceph_netfs_write_begin_ops, NULL);
-+out:
-+	if (r == 0)
-+		wait_on_page_fscache(page);
- 	if (r < 0) {
--		if (page) {
--			unlock_page(page);
-+		if (page)
- 			put_page(page);
--		}
+ failed:
+ 	if (subreq->source == NETFS_READ_FROM_CACHE) {
++		netfs_stat(&netfs_n_rh_read_failed);
+ 		set_bit(NETFS_RREQ_INCOMPLETE_IO, &rreq->flags);
  	} else {
-+		WARN_ON_ONCE(!PageLocked(page));
- 		*pagep = page;
++		netfs_stat(&netfs_n_rh_download_failed);
+ 		set_bit(NETFS_RREQ_FAILED, &rreq->flags);
+ 		rreq->error = subreq->error;
  	}
- 	return r;
+@@ -642,6 +663,7 @@ void netfs_readahead(struct readahead_control *ractl,
+ 	rreq->start	= readahead_pos(ractl);
+ 	rreq->len	= readahead_length(ractl);
+ 
++	netfs_stat(&netfs_n_rh_readahead);
+ 	trace_netfs_read(rreq, readahead_pos(ractl), readahead_length(ractl),
+ 			 netfs_read_trace_readahead);
+ 
+@@ -716,6 +738,7 @@ int netfs_readpage(struct file *file,
+ 	rreq->start	= page->index * PAGE_SIZE;
+ 	rreq->len	= thp_size(page);
+ 
++	netfs_stat(&netfs_n_rh_readpage);
+ 	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_readpage);
+ 
+ 	netfs_get_read_request(rreq);
+diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
+new file mode 100644
+index 000000000000..df6ff5718f25
+--- /dev/null
++++ b/fs/netfs/stats.c
+@@ -0,0 +1,54 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Netfs support statistics
++ *
++ * Copyright (C) 2021 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++
++#include <linux/export.h>
++#include <linux/seq_file.h>
++#include <linux/netfs.h>
++#include "internal.h"
++
++atomic_t netfs_n_rh_readahead;
++atomic_t netfs_n_rh_readpage;
++atomic_t netfs_n_rh_rreq;
++atomic_t netfs_n_rh_sreq;
++atomic_t netfs_n_rh_download;
++atomic_t netfs_n_rh_download_done;
++atomic_t netfs_n_rh_download_failed;
++atomic_t netfs_n_rh_download_instead;
++atomic_t netfs_n_rh_read;
++atomic_t netfs_n_rh_read_done;
++atomic_t netfs_n_rh_read_failed;
++atomic_t netfs_n_rh_zero;
++atomic_t netfs_n_rh_short_read;
++atomic_t netfs_n_rh_write;
++atomic_t netfs_n_rh_write_done;
++atomic_t netfs_n_rh_write_failed;
++
++void netfs_stats_show(struct seq_file *m)
++{
++	seq_printf(m, "RdHelp : RA=%u RP=%u rr=%u sr=%u\n",
++		   atomic_read(&netfs_n_rh_readahead),
++		   atomic_read(&netfs_n_rh_readpage),
++		   atomic_read(&netfs_n_rh_rreq),
++		   atomic_read(&netfs_n_rh_sreq));
++	seq_printf(m, "RdHelp : ZR=%u sh=%u\n",
++		   atomic_read(&netfs_n_rh_zero),
++		   atomic_read(&netfs_n_rh_short_read));
++	seq_printf(m, "RdHelp : DL=%u ds=%u df=%u di=%u\n",
++		   atomic_read(&netfs_n_rh_download),
++		   atomic_read(&netfs_n_rh_download_done),
++		   atomic_read(&netfs_n_rh_download_failed),
++		   atomic_read(&netfs_n_rh_download_instead));
++	seq_printf(m, "RdHelp : RD=%u rs=%u rf=%u\n",
++		   atomic_read(&netfs_n_rh_read),
++		   atomic_read(&netfs_n_rh_read_done),
++		   atomic_read(&netfs_n_rh_read_failed));
++	seq_printf(m, "RdHelp : WR=%u ws=%u wf=%u\n",
++		   atomic_read(&netfs_n_rh_write),
++		   atomic_read(&netfs_n_rh_write_done),
++		   atomic_read(&netfs_n_rh_write_failed));
++}
++EXPORT_SYMBOL(netfs_stats_show);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index 24083dc0adfa..b8237b6f17cb 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -134,5 +134,6 @@ extern int netfs_readpage(struct file *,
+ 			  void *);
+ 
+ extern void netfs_subreq_terminated(struct netfs_read_subrequest *, ssize_t);
++extern void netfs_stats_show(struct seq_file *);
+ 
+ #endif /* _LINUX_NETFS_H */
 
 
