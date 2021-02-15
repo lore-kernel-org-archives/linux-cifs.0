@@ -2,194 +2,170 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F076C433DB
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 01:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5126C433E6
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 01:02:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04A4964E52
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 01:00:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F6F764E52
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 01:02:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229928AbhBOBAQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 14 Feb 2021 20:00:16 -0500
-Received: from mailout3.samsung.com ([203.254.224.33]:39529 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbhBOBAO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 14 Feb 2021 20:00:14 -0500
-Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210215005931epoutp031a1de999ebc30ae4c5704f9fc97ddf8a~jxfqGsf312782127821epoutp03S
-        for <linux-cifs@vger.kernel.org>; Mon, 15 Feb 2021 00:59:31 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210215005931epoutp031a1de999ebc30ae4c5704f9fc97ddf8a~jxfqGsf312782127821epoutp03S
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1613350771;
-        bh=SfYFblpSib/Vr1j+2XMm6Ietkk5NSHooqY/HQ7G8Seg=;
-        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-        b=qjRJ6JvYwv4kyFTLcgTY54xwRqTZVKtiy0S0FmkTXhwmmKyUpaSHMaCuPtIA/V8PI
-         3e/m3IiCuXE501L+XsVLruYPmhTxE/T85QiywB3ZeFZagorxjUm/KT9DcWlpxdUoe/
-         QZc7MzKUYXoieXnYuw3GxstWBX03owzfqABywJc0=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
-        20210215005930epcas1p435d4e6cbf44db980cfdde7571e36cb95~jxfpmMTOW0985009850epcas1p4L;
-        Mon, 15 Feb 2021 00:59:30 +0000 (GMT)
-Received: from epsmges1p1.samsung.com (unknown [182.195.40.160]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4Df5NK6Pt3z4x9QF; Mon, 15 Feb
-        2021 00:59:29 +0000 (GMT)
-Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
-        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        03.EF.02418.177C9206; Mon, 15 Feb 2021 09:59:29 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
-        20210215005929epcas1p49aacc3d06efa8e70eb99c745d15fa839~jxfoD3GLQ2852528525epcas1p4h;
-        Mon, 15 Feb 2021 00:59:29 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20210215005929epsmtrp1403ed34dc7aa307dc04c0ed1b2b6dbb2~jxfoDMw4y0077500775epsmtrp1G;
-        Mon, 15 Feb 2021 00:59:29 +0000 (GMT)
-X-AuditID: b6c32a35-c0dff70000010972-b0-6029c771b154
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        87.11.13470.077C9206; Mon, 15 Feb 2021 09:59:29 +0900 (KST)
-Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20210215005928epsmtip1c6861c2e6ea205f3c2dccb3ed76e5ce6~jxfn324LX1862218622epsmtip18;
-        Mon, 15 Feb 2021 00:59:28 +0000 (GMT)
-From:   "Namjae Jeon" <namjae.jeon@samsung.com>
-To:     "'Stefan Metzmacher'" <metze@samba.org>
-Cc:     "'Namjae Jeon'" <linkinjeon@kernel.org>,
-        <linux-cifsd-devel@lists.sourceforge.net>,
-        "'Samba Technical'" <samba-technical@lists.samba.org>,
-        <linux-cifs@vger.kernel.org>
-In-Reply-To: <adf41e69-5915-06aa-6f8b-8ffc073fc8a7@samba.org>
-Subject: RE: ksmbd ABI for ksmbd-tools...
-Date:   Mon, 15 Feb 2021 09:59:29 +0900
-Message-ID: <009101d70335$d02bcb40$708361c0$@samsung.com>
+        id S229959AbhBOBCh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 14 Feb 2021 20:02:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229818AbhBOBCg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 14 Feb 2021 20:02:36 -0500
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79779C061756
+        for <linux-cifs@vger.kernel.org>; Sun, 14 Feb 2021 17:01:56 -0800 (PST)
+Received: by mail-lj1-x22e.google.com with SMTP id k22so5256583ljg.3
+        for <linux-cifs@vger.kernel.org>; Sun, 14 Feb 2021 17:01:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8oLEqXUvdqy1QH/cRggvF58640ngzAUjBT8Tfk3Wjwg=;
+        b=eb+VDAyVwB6RZ6vXNDSIXjjY5/KGJonBZpcw4InpSNpoqcKC9wCYBknhMsgf9sPklg
+         GzCvnbIRKgTg7gtA7teRfKAGGFk9BR9qw3HHsG7GJ3+trFjsmHXqEUXRQMhyaGXIHFPG
+         +BYG0bBsO6r2Y7DOTssLQQLnPqsDN5e1ysQAo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8oLEqXUvdqy1QH/cRggvF58640ngzAUjBT8Tfk3Wjwg=;
+        b=dI/gOED36akxO1Stfl1HWpETCSYbhExKFGIIurXWvjMR7Kt11MXz+uuRBNHzFtLUn1
+         Ru7W1voS3jIbB37JHEO/zHopPPY+jGC0EFwQXM4lMgJZkoOWrmCYYzaJYvMYKqspwKoh
+         WzoTNdmILcjX46KmpecfRiXa22HwQkCBGvXY7xmUoWrXE1p99ZnNEbH68mqRODWg4fUF
+         qEeYrQTQXKiD3Yw1dmtCvJnkZXrobXL2frudia2D9oY5VK7cPt2Dh1fVcfXqMKxnZDdY
+         VbBH5ddXTjP6GsOTuOaOeZ+PnFA3XTeLcrKMCVC7C33FQ8rQfTg1mDW4c4ZWjWcqPtfs
+         rKvQ==
+X-Gm-Message-State: AOAM530nwsepV//raF1cF4RYKm7k/+BWj56cdlyXlQ9s3mqK0D7dd8XK
+        ALz28NouVv9OeA9z8j4XFdORMe0pY3ho1A==
+X-Google-Smtp-Source: ABdhPJxUJqVlG7so+zbvRnHEWYXpAA8Oeh0PmQqFRnRkhr9TVCdy0/jGGm2daLl8VokVQUIqKjWx9A==
+X-Received: by 2002:a2e:9047:: with SMTP id n7mr8039354ljg.221.1613350914331;
+        Sun, 14 Feb 2021 17:01:54 -0800 (PST)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
+        by smtp.gmail.com with ESMTPSA id i28sm2646780lfg.210.2021.02.14.17.01.52
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Feb 2021 17:01:53 -0800 (PST)
+Received: by mail-lj1-f170.google.com with SMTP id x1so5871985ljj.11
+        for <linux-cifs@vger.kernel.org>; Sun, 14 Feb 2021 17:01:52 -0800 (PST)
+X-Received: by 2002:a05:651c:112:: with SMTP id a18mr8181174ljb.465.1613350911576;
+ Sun, 14 Feb 2021 17:01:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQLNkXaegPBuGsSfX03ExGj/IX/q7QD54CbSqGNkVFA=
-Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuplk+LIzCtJLcpLzFFi42LZdljTQLfwuGaCwcG5ehYTpy1ltnjxfxez
-        xc//3xktLi77yWLxZ8l+dgdWj02rOtk85s+exeSxe8FnJo+5u/oYPT5vkgtgjcqxyUhNTEkt
-        UkjNS85PycxLt1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAFarqRQlphTChQKSCwu
-        VtK3synKLy1JVcjILy6xVUotSMkpMDQo0CtOzC0uzUvXS87PtTI0MDAyBapMyMl4/L2XueCo
-        XEX3vlaWBsZL4l2MnBwSAiYSf6ZcY+1i5OIQEtjBKLHl/n82kISQwCdGiTOnXCES3xglVh8/
-        xATT8fXqYmaIxF5GiffP57JAOC8ZJeYsfgjWziagK/Hvz34wW0RAW+LQqzvsIEXMAusZJeZv
-        uMsCkuAUsJU4M3EFM4gtLKAp8fftOVYQm0VAVeLqoQ1gNbwClhJfXn1ghbAFJU7OfAIWZxaQ
-        l9j+dg4zxEkKEj+fLmOFWGYl8eE+xExmARGJ2Z1tUDWdHBJ/9vpB2C4Sd9YuZ4WwhSVeHd/C
-        DmFLSbzsbwOyOYDsaomP+6FaOxglXny3hbCNJW6u38AKUsIMdPL6XfoQYUWJnb/nMkJs5ZN4
-        97WHFWIKr0RHmxBEiapE36XD0DCUluhq/8A+gVFpFpK/ZiH5axaS+2chLFvAyLKKUSy1oDg3
-        PbXYsMAQOa43MYLTpZbpDsaJbz/oHWJk4mA8xCjBwawkwntVQiNBiDclsbIqtSg/vqg0J7X4
-        EKMpMKQnMkuJJucDE3ZeSbyhqZGxsbGFiZm5mamxkjhvksGDeCGB9MSS1OzU1ILUIpg+Jg5O
-        qQYmsWaL5PvqDcGW8xZ06jRWRMSKhM+RkmLy+8sVxtJde2DXquol33qqlv+LKpew5hGM43Z/
-        8O6A1LQgh0sv/9awT0m+2sQdxXTHf3frf7ML/ofZj2w1uCoS27lr41P/pQIbVMyM6274rd76
-        fF2qSPgZgwPLjv/9kfnGpmbmRdkDd/UfPFq/WOuCRqXCoVJbp7p5a1g35MlU5CqYHy3+vHHi
-        N0XeLM7stl+OB9cn2SUyP+RdLHjvkMn3eSG3Z+rF37e482P1t64zvj4WBh+8oq/NXSpW/ilR
-        /G/nWe99apVzfOfHmXtcWebi1iS9aOK3zXyr9YQndOnX+WWdkPh59sKVm7emn0vKiL2Qp2cU
-        eX6KEktxRqKhFnNRcSIAukSr8iAEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrFLMWRmVeSWpSXmKPExsWy7bCSnG7hcc0Egx1TGC0mTlvKbPHi/y5m
-        i5//vzNaXFz2k8Xiz5L97A6sHptWdbJ5zJ89i8lj94LPTB5zd/UxenzeJBfAGsVlk5Kak1mW
-        WqRvl8CV8fh7L3PBUbmK7n2tLA2Ml8S7GDk5JARMJL5eXczcxcjFISSwm1Gi5dFnFoiEtMSx
-        E2eAEhxAtrDE4cPFEDXPGSWmPugCq2ET0JX492c/G4gtIqAtcejVHXaQImaBjYwShxbOZYLo
-        6GOU2LPyPVgHp4CtxJmJK5hBbGEBTYm/b8+xgtgsAqoSVw9tAKvhFbCU+PLqAyuELShxcuYT
-        sDgz0Ibeh62MELa8xPa3c5ghLlWQ+Pl0GSvEFVYSH+5DzGcWEJGY3dnGPIFReBaSUbOQjJqF
-        ZNQsJC0LGFlWMUqmFhTnpucWGxYY5qWW6xUn5haX5qXrJefnbmIER4+W5g7G7as+6B1iZOJg
-        PMQowcGsJMJ7VUIjQYg3JbGyKrUoP76oNCe1+BCjNAeLkjjvha6T8UIC6YklqdmpqQWpRTBZ
-        Jg5OqQammO1ecr7nWOQOfzA//Ff8dbRBnrd9nGVCMePan6d83izcnZ0kcmSJdmy3ne+1v7mX
-        4zcXnKn1cra203O46qJwb/pU7tD2xfXqntN/FD+J2OPyXDbKVrlb4vcqgQlNOrOCm2Z999EI
-        +PTsxLTVDR/KT52vkpvacdv4t7xPo0/gnqvuavaVc5/UXdnvXDh16Xr9j3wveLZzflrXcv7u
-        7/s9p17M0HefM908TTn+g5Pyu1sZ/3dEJh8p37bS5OKBL3bxP/xkbyYyrap3UTg60Wpi7s+s
-        O++eb1BK0G5Jcv9drH3ihIXZ6v1/dRsaA6oscxs6dz9RTbjMc5s/7YTvOqcV0gYH7m6X4QyN
-        mSU2/0a8EktxRqKhFnNRcSIAyFYPuA0DAAA=
-X-CMS-MailID: 20210215005929epcas1p49aacc3d06efa8e70eb99c745d15fa839
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210212143813epcas1p1dcbff2491a1c7cf052c03e57f54e1474
-References: <CGME20210212143813epcas1p1dcbff2491a1c7cf052c03e57f54e1474@epcas1p1.samsung.com>
-        <adf41e69-5915-06aa-6f8b-8ffc073fc8a7@samba.org>
+References: <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com>
+ <591237.1612886997@warthog.procyon.org.uk> <1330473.1612974547@warthog.procyon.org.uk>
+ <1330751.1612974783@warthog.procyon.org.uk> <CAHk-=wjgA-74ddehziVk=XAEMTKswPu1Yw4uaro1R3ibs27ztw@mail.gmail.com>
+ <27816.1613085646@warthog.procyon.org.uk> <CAHk-=wi68OpbwBm6RCodhNUyg6x8N7vi5ufjRtosQSPy_EYqLA@mail.gmail.com>
+ <860729.1613348577@warthog.procyon.org.uk>
+In-Reply-To: <860729.1613348577@warthog.procyon.org.uk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun, 14 Feb 2021 17:01:35 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wh7xY3UF7zEc0BNVNjOox59jYBW-Gfi7=emm+BXPWc6nQ@mail.gmail.com>
+Message-ID: <CAHk-=wh7xY3UF7zEc0BNVNjOox59jYBW-Gfi7=emm+BXPWc6nQ@mail.gmail.com>
+Subject: Re: [GIT PULL] fscache: I/O API modernisation and netfs helper library
+To:     David Howells <dhowells@redhat.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cachefs@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
+        v9fs-developer@lists.sourceforge.net,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-> Hi Namjae,
-Hi Metze,
-> 
-> I looked through the interfaces used between userspace (ksmbd.mountd and ksmbd.control) and the kernel
-> module.
-> 
-> After loading the ksmbd.ko module and calling 'ksmbd.mountd', I see the following related
-> proceses/kernel-threads:
-> 
->   12200 ?        I      0:00 [kworker/0:0-ksmbd-io]
->   12247 ?        Ss     0:00 ksmbd.mountd
->   12248 ?        S      0:00 ksmbd.mountd
->   12249 ?        S      0:00 [ksmbd-lo]
->   12250 ?        S      0:00 [ksmbd-enp0s3]
->   12251 ?        S      0:00 [ksmbd-enp0s8]
->   12252 ?        S      0:00 [ksmbd-enp0s9]
->   12253 ?        S      0:00 [ksmbd-enp0s10]
->   12254 ?        I<     0:00 [ksmbd-smb_direc]
->   12255 ?        S      0:00 [ksmbd:38794]
->   12257 ?        S      0:00 [ksmbd:51579]
-> 
-> I haven't found the exact place, but ksmbd.mountd starts the kernel-part.
-> 
-> ksmbd.mountd also acts as some kind of upcall, for the server part, that takes care of authentication
-> and some basic DCERPC calls.
-> 
-> I'm wondering why there are two separate ways to kill the running server, 'killall ksmbd.mountd' for
-> the userspace part and 'ksmbd.control -s' (which is just a wrapper for 'echo -n "hard" >
-> /sys/class/ksmbd-control/kill_server') to shutdown the server part.
-Hm.. We can add the code that kill ksmbd.mountd in ksmbd.control -s.
-> 
-> As it's not useful to run any of these two components on its own, so I'm wondering why there's no
-> stronger relationship.
-Sergey answered.
-> 
-> As naive admin I'd assume that the kernel part would detect the exit of ksmbd.mountd and shutdown
-> itself.
-Sergey answered.
-> 
-> It would also be great to bind to specific ip addresses instead of devices and allow to run more than
-> one instance of ksmbd.mountd (with different config files and or within containers). That's why I
-> think single global hardcoded path like '/sys/class/ksmbd-control/kill_server' should be avoided,
-> something like:
-> '/sys/class/ksmbd-control/<pid-of-ksmbd.mountd>/kill_server' would be better (if it's needed at all).
-Could you please elaborate more why we should do this ?
+On Sun, Feb 14, 2021 at 4:23 PM David Howells <dhowells@redhat.com> wrote:
+>
+> Anyway, I have posted my fscache modernisation patches multiple times for
+> public review, I have tried to involve the wider community in aspects of the
+> development on public mailing lists and I have been including the maintainers
+> in to/cc.
 
-> 
-> I also have ideas how ksmbd{.ok,.mountd} could make use of Samba's winbindd (or authentication) and
-> Samba's rpc services, but this would require a few changes in the netlink protocol between ksmbd.ko
-> and ksmbd.mountd. It would be great if a Samba smb.conf option could cause smbd to start ksmbd.mountd
-> in the background and delegate all raw SMB handling to the kernel.
-It's what I plan to do in the long run. It would be great for ksmbd to fully support the function
-using samba's library. But I don't think ksmbd should have dependency on such samba's libraries.
-i.e. If we change the existing netlink protocol in ksmbd to use samba's winbindd and librpc,
-The current users using ksmbd on closed systems may not be able to use ksmbd due to GPLv3. So, This
-should be a new netlink protocol addition or extension, not change the existing ones.
+So then add those links and the cc's to the commit logs, so that I can
+*see* them.
 
-> 
-> So my main big question is how stable would the userspace interface to ksmbd.ko be treated?
-Sergey answered. If his answer is not enough, Let me know it.
-> 
-> Would it be possible to change the netlink protocol or /sys/class/* behavior in future in order to
-> improve things?
-Yes.
-> 
-> Can we require that the userspace tool matches the kernel version for a while?
-Sergey answered. If there is a better way than now, please give me your opinion.
-> 
-> I think iproute2 creates a version for each stable kernel tree and tools like bpftool, perf even come
-> with each single kernel release.
-Ah. Even if there is no change in source, Does it release according to the kernel version?
-It would be better that ksmbd-tools also is merged into kernel/tools like bfptool or perf,
-but I am not sure if it is possible. nfs-utils seems to be managed well apart from the kernel version.
-> 
-Thanks!
+I'm done with this discussion.
 
+If I see a pull request from you, I DO NOT WANT TO HAVE TO HAVE A
+WEEK-LONG EMAIL THREAD ABOUT HOW I CANNOT SEE THAT IT HAS EVER SEEN
+ANY REVIEW.
+
+So if all I see is "Signed-off-by:" from you, I will promptly throw
+that pull request into the garbage, because it's just not worth my
+time to try to have to get you kicking and screaming to show that
+others have been involved.
+
+Can you not understand that?
+
+When I get that pull request, I need to see that yes, this has been
+reviewed, people have been involved, and yes, it's been in linux-next.
+
+I want to see "reviewed-by" and "tested-by", I want to see "cc", and I
+want to see links to submission threads with discussion showing that
+others actually were involved.
+
+I do *not* want to see just a single signed-off-by line from you, and
+then have to ask for "has anybody else actually seen this and reviewed
+it".
+
+Look, here's an entirely unrelated example from a single fairly recent
+trivial one-liner memory leak fix:
+
+    Fixes: 87c715dcde63 ("scsi: scsi_debug: Add per_host_store option")
+    Link: https://lore.kernel.org/r/20210208111734.34034-1-mlombard@redhat.com
+    Acked-by: Douglas Gilbert <dgilbert@interlog.com>
+    Signed-off-by: Maurizio Lombardi <mlombard@redhat.com>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+that's from a quite a trivial commit. Yes, it's trivial, but it could
+still be wrong, of course. And if somebody ever reports that it causes
+problems despite how simple it was, look at what I have: I have three
+people to contact, and I have a pointer to the actual original
+submission of the patch.
+
+Do we have that for all our commits? No. But it's also not at all
+unusual any more, and in fact many commits have even more, with
+testing etc.
+
+And yes, sometimes the test results and acks come back later after
+you've already pushed the changes out etc, and no, it's generally not
+worth rebasing for that - maybe others have now started to rely on
+whatever public branch you have. Which is why the "Link:" is useful,
+so that if things come in later, the discussion can still be found.
+But quite often, you shouldn't have pushed out some final branch
+before you've gotten at least *some* positive response from people, so
+I do kind of expect some "Acked-by" etc in the commit itself.
+
+THAT is what you need to aim for.
+
+And yes, I'm picking on you. Because we've had this problem before.
+I've complained when you've sent me pull requests that don't even
+build, that you in fact had been told by linux-next didn't build, and
+you still sent them to me.
+
+And as a result, I've asked for more involvement from other people before.
+
+So now I'm clarifying that requirement - I  absolutely need to see
+that it has actually seen testing, that it has seen other people being
+involved, and that it isn't just you throwing spaghetti at the wall to
+see what sticks.
+
+And I'm not going to do that for every pull request. I want to see
+that data *in* the pull request itself.
+
+            Linus
