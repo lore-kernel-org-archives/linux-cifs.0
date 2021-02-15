@@ -5,48 +5,48 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95022C433E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1055C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A17064DE0
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:54:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB34D61494
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231218AbhBOPyC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Feb 2021 10:54:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37852 "EHLO
+        id S231736AbhBOPy1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Feb 2021 10:54:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55084 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231736AbhBOPuT (ORCPT
+        by vger.kernel.org with ESMTP id S232067AbhBOPvJ (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 15 Feb 2021 10:50:19 -0500
+        Mon, 15 Feb 2021 10:51:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613404129;
+        s=mimecast20190719; t=1613404176;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UJBQGd/AU8ksVts5NhJpZ4+cnksJzI7R9KX0GL2BxEw=;
-        b=a10EPjUTTs3fXgYHWILkzOE1kqAweTUxNhtTRnEgBOOpXPm4Fb7qcNUmRXNp+TZpYujSGO
-        dvTW25YrFCknOm09ttTEgiAZIXwpKWOnAFpMTcPBSsOSB97agotCEALTc8WIPNcnPKacJI
-        cq3dGQf57tOUn4VDkmNF7DS7GCn4alY=
+        bh=kBwzGZNZQ+UMM3OydMQqHdTFW8MF6HNUwB3N2ow9wp4=;
+        b=LYTVOMkB4hRydWdllWYwrFgLSGCetR5p1C/kI9GtN1NeOc/lsfMD+JCxJcRS2PN0FI0FI1
+        3hKNojQYWRUSWMLVyEl/D+TBC54Ze1XaWh2lFR5RAkA7XGXhCnIZ1+nJ9JLtsmBYPr9vA2
+        R3ZECs+wkkSkmN9PFd9wpi3I92I3emk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-PtVA4hlnNkSHiJJFmOxHDw-1; Mon, 15 Feb 2021 10:48:45 -0500
-X-MC-Unique: PtVA4hlnNkSHiJJFmOxHDw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-365-jjTxv7DAMUWhACU5ApinfA-1; Mon, 15 Feb 2021 10:49:28 -0500
+X-MC-Unique: jjTxv7DAMUWhACU5ApinfA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C34BC107ACC7;
-        Mon, 15 Feb 2021 15:48:43 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD2108030D0;
+        Mon, 15 Feb 2021 15:49:25 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DDA345D9CC;
-        Mon, 15 Feb 2021 15:48:36 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 84CAD5C233;
+        Mon, 15 Feb 2021 15:49:19 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 22/33] afs: Use ITER_XARRAY for writing
+Subject: [PATCH 25/33] afs: Prepare for use of THPs
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
@@ -62,28 +62,24 @@ Cc:     linux-afs@lists.infradead.org, linux-cachefs@redhat.com,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 15 Feb 2021 15:48:36 +0000
-Message-ID: <161340411602.1303470.4661108879482218408.stgit@warthog.procyon.org.uk>
+Date:   Mon, 15 Feb 2021 15:49:18 +0000
+Message-ID: <161340415869.1303470.6040191748634322355.stgit@warthog.procyon.org.uk>
 In-Reply-To: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
 References: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Use a single ITER_XARRAY iterator to describe the portion of a file to be
-transmitted to the server rather than generating a series of small
-ITER_BVEC iterators on the fly.  This will make it easier to implement AIO
-in afs.
+As a prelude to supporting transparent huge pages, use thp_size() and
+similar rather than PAGE_SIZE/SHIFT.
 
-In theory we could maybe use one giant ITER_BVEC, but that means
-potentially allocating a huge array of bio_vec structs (max 256 per page)
-when in fact the pagecache already has a structure listing all the relevant
-pages (radix_tree/xarray) that can be walked over.
+Further, try and frame everything in terms of file positions and lengths
+rather than page indices and numbers of pages.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: linux-afs@lists.infradead.org
@@ -91,635 +87,854 @@ cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
 ---
 
- fs/afs/fsclient.c          |   50 +++++++++------------
- fs/afs/internal.h          |   15 +++---
- fs/afs/rxrpc.c             |  103 ++++++--------------------------------------
- fs/afs/write.c             |  100 ++++++++++++++++++++++++-------------------
- fs/afs/yfsclient.c         |   25 +++--------
- include/trace/events/afs.h |   51 ++++++++--------------
- 6 files changed, 126 insertions(+), 218 deletions(-)
+ fs/afs/dir.c      |    2 
+ fs/afs/file.c     |    8 -
+ fs/afs/internal.h |    2 
+ fs/afs/write.c    |  436 +++++++++++++++++++++++++++++------------------------
+ 4 files changed, 245 insertions(+), 203 deletions(-)
 
-diff --git a/fs/afs/fsclient.c b/fs/afs/fsclient.c
-index 897b37301851..31e6b3635541 100644
---- a/fs/afs/fsclient.c
-+++ b/fs/afs/fsclient.c
-@@ -1055,8 +1055,7 @@ static const struct afs_call_type afs_RXFSStoreData64 = {
- /*
-  * store a set of pages to a very large file
-  */
--static void afs_fs_store_data64(struct afs_operation *op,
--				loff_t pos, loff_t size, loff_t i_size)
-+static void afs_fs_store_data64(struct afs_operation *op)
- {
- 	struct afs_vnode_param *vp = &op->file[0];
- 	struct afs_call *call;
-@@ -1071,7 +1070,7 @@ static void afs_fs_store_data64(struct afs_operation *op,
- 	if (!call)
- 		return afs_op_nomem(op);
+diff --git a/fs/afs/dir.c b/fs/afs/dir.c
+index 526a49889dff..d547891af63d 100644
+--- a/fs/afs/dir.c
++++ b/fs/afs/dir.c
+@@ -2082,6 +2082,6 @@ static void afs_dir_invalidatepage(struct page *page, unsigned int offset,
+ 		afs_stat_v(dvnode, n_inval);
  
--	call->send_pages = true;
-+	call->write_iter = op->store.write_iter;
+ 	/* we clean up only if the entire page is being invalidated */
+-	if (offset == 0 && length == PAGE_SIZE)
++	if (offset == 0 && length == thp_size(page))
+ 		detach_page_private(page);
+ }
+diff --git a/fs/afs/file.c b/fs/afs/file.c
+index acbc21a8c80e..f6282ac0d222 100644
+--- a/fs/afs/file.c
++++ b/fs/afs/file.c
+@@ -330,8 +330,8 @@ static int afs_page_filler(struct key *key, struct page *page)
+ 	req->vnode		= vnode;
+ 	req->key		= key_get(key);
+ 	req->pos		= (loff_t)page->index << PAGE_SHIFT;
+-	req->len		= PAGE_SIZE;
+-	req->nr_pages		= 1;
++	req->len		= thp_size(page);
++	req->nr_pages		= thp_nr_pages(page);
+ 	req->done		= afs_file_read_done;
+ 	req->cleanup		= afs_file_read_cleanup;
  
- 	/* marshall the parameters */
- 	bp = call->request;
-@@ -1087,47 +1086,38 @@ static void afs_fs_store_data64(struct afs_operation *op,
- 	*bp++ = 0; /* unix mode */
- 	*bp++ = 0; /* segment size */
- 
--	*bp++ = htonl(upper_32_bits(pos));
--	*bp++ = htonl(lower_32_bits(pos));
--	*bp++ = htonl(upper_32_bits(size));
--	*bp++ = htonl(lower_32_bits(size));
--	*bp++ = htonl(upper_32_bits(i_size));
--	*bp++ = htonl(lower_32_bits(i_size));
-+	*bp++ = htonl(upper_32_bits(op->store.pos));
-+	*bp++ = htonl(lower_32_bits(op->store.pos));
-+	*bp++ = htonl(upper_32_bits(op->store.size));
-+	*bp++ = htonl(lower_32_bits(op->store.size));
-+	*bp++ = htonl(upper_32_bits(op->store.i_size));
-+	*bp++ = htonl(lower_32_bits(op->store.i_size));
- 
- 	trace_afs_make_fs_call(call, &vp->fid);
- 	afs_make_op_call(op, call, GFP_NOFS);
+@@ -575,8 +575,8 @@ static void afs_invalidate_dirty(struct page *page, unsigned int offset,
+ 	trace_afs_page_dirty(vnode, tracepoint_string("undirty"), page);
+ 	clear_page_dirty_for_io(page);
+ full_invalidate:
+-	detach_page_private(page);
+ 	trace_afs_page_dirty(vnode, tracepoint_string("inval"), page);
++	detach_page_private(page);
  }
  
  /*
-- * store a set of pages
-+ * Write data to a file on the server.
-  */
- void afs_fs_store_data(struct afs_operation *op)
- {
- 	struct afs_vnode_param *vp = &op->file[0];
- 	struct afs_call *call;
--	loff_t size, pos, i_size;
- 	__be32 *bp;
+@@ -621,8 +621,8 @@ static int afs_releasepage(struct page *page, gfp_t gfp_flags)
+ #endif
  
- 	_enter(",%x,{%llx:%llu},,",
- 	       key_serial(op->key), vp->fid.vid, vp->fid.vnode);
+ 	if (PagePrivate(page)) {
+-		detach_page_private(page);
+ 		trace_afs_page_dirty(vnode, tracepoint_string("rel"), page);
++		detach_page_private(page);
+ 	}
  
--	size = (loff_t)op->store.last_to - (loff_t)op->store.first_offset;
--	if (op->store.first != op->store.last)
--		size += (loff_t)(op->store.last - op->store.first) << PAGE_SHIFT;
--	pos = (loff_t)op->store.first << PAGE_SHIFT;
--	pos += op->store.first_offset;
--
--	i_size = i_size_read(&vp->vnode->vfs_inode);
--	if (pos + size > i_size)
--		i_size = size + pos;
--
- 	_debug("size %llx, at %llx, i_size %llx",
--	       (unsigned long long) size, (unsigned long long) pos,
--	       (unsigned long long) i_size);
-+	       (unsigned long long)op->store.size,
-+	       (unsigned long long)op->store.pos,
-+	       (unsigned long long)op->store.i_size);
- 
--	if (upper_32_bits(pos) || upper_32_bits(i_size) || upper_32_bits(size) ||
--	    upper_32_bits(pos + size))
--		return afs_fs_store_data64(op, pos, size, i_size);
-+	if (upper_32_bits(op->store.pos) ||
-+	    upper_32_bits(op->store.size) ||
-+	    upper_32_bits(op->store.i_size))
-+		return afs_fs_store_data64(op);
- 
- 	call = afs_alloc_flat_call(op->net, &afs_RXFSStoreData,
- 				   (4 + 6 + 3) * 4,
-@@ -1135,7 +1125,7 @@ void afs_fs_store_data(struct afs_operation *op)
- 	if (!call)
- 		return afs_op_nomem(op);
- 
--	call->send_pages = true;
-+	call->write_iter = op->store.write_iter;
- 
- 	/* marshall the parameters */
- 	bp = call->request;
-@@ -1151,9 +1141,9 @@ void afs_fs_store_data(struct afs_operation *op)
- 	*bp++ = 0; /* unix mode */
- 	*bp++ = 0; /* segment size */
- 
--	*bp++ = htonl(lower_32_bits(pos));
--	*bp++ = htonl(lower_32_bits(size));
--	*bp++ = htonl(lower_32_bits(i_size));
-+	*bp++ = htonl(lower_32_bits(op->store.pos));
-+	*bp++ = htonl(lower_32_bits(op->store.size));
-+	*bp++ = htonl(lower_32_bits(op->store.i_size));
- 
- 	trace_afs_make_fs_call(call, &vp->fid);
- 	afs_make_op_call(op, call, GFP_NOFS);
+ 	/* indicate that the page can be released */
 diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 6f1e6badf391..d4163f9babfd 100644
+index d4163f9babfd..daf5339ae316 100644
 --- a/fs/afs/internal.h
 +++ b/fs/afs/internal.h
-@@ -107,6 +107,7 @@ struct afs_call {
- 	void			*request;	/* request data (first part) */
- 	size_t			iov_len;	/* Size of *iter to be used */
- 	struct iov_iter		def_iter;	/* Default buffer/data iterator */
-+	struct iov_iter		*write_iter;	/* Iterator defining write to be made */
- 	struct iov_iter		*iter;		/* Iterator currently in use */
- 	union {	/* Convenience for ->def_iter */
- 		struct kvec	kvec[1];
-@@ -133,7 +134,6 @@ struct afs_call {
- 	unsigned char		unmarshall;	/* unmarshalling phase */
- 	unsigned char		addr_ix;	/* Address in ->alist */
- 	bool			drop_ref;	/* T if need to drop ref for incoming call */
--	bool			send_pages;	/* T if data from mapping should be sent */
- 	bool			need_attention;	/* T if RxRPC poked us */
- 	bool			async;		/* T if asynchronous */
- 	bool			upgrade;	/* T to request service upgrade */
-@@ -811,12 +811,13 @@ struct afs_operation {
- 			afs_lock_type_t type;
- 		} lock;
- 		struct {
--			struct address_space *mapping;	/* Pages being written from */
--			pgoff_t		first;		/* first page in mapping to deal with */
--			pgoff_t		last;		/* last page in mapping to deal with */
--			unsigned	first_offset;	/* offset into mapping[first] */
--			unsigned	last_to;	/* amount of mapping[last] */
--			bool		laundering;	/* Laundering page, PG_writeback not set */
-+			struct iov_iter	*write_iter;
-+			loff_t	pos;
-+			loff_t	size;
-+			loff_t	i_size;
-+			pgoff_t	first;		/* first page in mapping to deal with */
-+			pgoff_t	last;		/* last page in mapping to deal with */
-+			bool	laundering;	/* Laundering page, PG_writeback not set */
+@@ -815,8 +815,6 @@ struct afs_operation {
+ 			loff_t	pos;
+ 			loff_t	size;
+ 			loff_t	i_size;
+-			pgoff_t	first;		/* first page in mapping to deal with */
+-			pgoff_t	last;		/* last page in mapping to deal with */
+ 			bool	laundering;	/* Laundering page, PG_writeback not set */
  		} store;
  		struct {
- 			struct iattr	*attr;
-diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-index ae68576f822f..23a1a92d64bb 100644
---- a/fs/afs/rxrpc.c
-+++ b/fs/afs/rxrpc.c
-@@ -271,40 +271,6 @@ void afs_flat_call_destructor(struct afs_call *call)
- 	call->buffer = NULL;
- }
- 
--#define AFS_BVEC_MAX 8
--
--/*
-- * Load the given bvec with the next few pages.
-- */
--static void afs_load_bvec(struct afs_call *call, struct msghdr *msg,
--			  struct bio_vec *bv, pgoff_t first, pgoff_t last,
--			  unsigned offset)
--{
--	struct afs_operation *op = call->op;
--	struct page *pages[AFS_BVEC_MAX];
--	unsigned int nr, n, i, to, bytes = 0;
--
--	nr = min_t(pgoff_t, last - first + 1, AFS_BVEC_MAX);
--	n = find_get_pages_contig(op->store.mapping, first, nr, pages);
--	ASSERTCMP(n, ==, nr);
--
--	msg->msg_flags |= MSG_MORE;
--	for (i = 0; i < nr; i++) {
--		to = PAGE_SIZE;
--		if (first + i >= last) {
--			to = op->store.last_to;
--			msg->msg_flags &= ~MSG_MORE;
--		}
--		bv[i].bv_page = pages[i];
--		bv[i].bv_len = to - offset;
--		bv[i].bv_offset = offset;
--		bytes += to - offset;
--		offset = 0;
--	}
--
--	iov_iter_bvec(&msg->msg_iter, WRITE, bv, nr, bytes);
--}
--
- /*
-  * Advance the AFS call state when the RxRPC call ends the transmit phase.
-  */
-@@ -317,42 +283,6 @@ static void afs_notify_end_request_tx(struct sock *sock,
- 	afs_set_call_state(call, AFS_CALL_CL_REQUESTING, AFS_CALL_CL_AWAIT_REPLY);
- }
- 
--/*
-- * attach the data from a bunch of pages on an inode to a call
-- */
--static int afs_send_pages(struct afs_call *call, struct msghdr *msg)
--{
--	struct afs_operation *op = call->op;
--	struct bio_vec bv[AFS_BVEC_MAX];
--	unsigned int bytes, nr, loop, offset;
--	pgoff_t first = op->store.first, last = op->store.last;
--	int ret;
--
--	offset = op->store.first_offset;
--	op->store.first_offset = 0;
--
--	do {
--		afs_load_bvec(call, msg, bv, first, last, offset);
--		trace_afs_send_pages(call, msg, first, last, offset);
--
--		offset = 0;
--		bytes = msg->msg_iter.count;
--		nr = msg->msg_iter.nr_segs;
--
--		ret = rxrpc_kernel_send_data(op->net->socket, call->rxcall, msg,
--					     bytes, afs_notify_end_request_tx);
--		for (loop = 0; loop < nr; loop++)
--			put_page(bv[loop].bv_page);
--		if (ret < 0)
--			break;
--
--		first += nr;
--	} while (first <= last);
--
--	trace_afs_sent_pages(call, op->store.first, last, first, ret);
--	return ret;
--}
--
- /*
-  * Initiate a call and synchronously queue up the parameters for dispatch.  Any
-  * error is stored into the call struct, which the caller must check for.
-@@ -384,21 +314,8 @@ void afs_make_call(struct afs_addr_cursor *ac, struct afs_call *call, gfp_t gfp)
- 	 * after the initial fixed part.
- 	 */
- 	tx_total_len = call->request_size;
--	if (call->send_pages) {
--		struct afs_operation *op = call->op;
--
--		if (op->store.last == op->store.first) {
--			tx_total_len += op->store.last_to - op->store.first_offset;
--		} else {
--			/* It looks mathematically like you should be able to
--			 * combine the following lines with the ones above, but
--			 * unsigned arithmetic is fun when it wraps...
--			 */
--			tx_total_len += PAGE_SIZE - op->store.first_offset;
--			tx_total_len += op->store.last_to;
--			tx_total_len += (op->store.last - op->store.first - 1) * PAGE_SIZE;
--		}
--	}
-+	if (call->write_iter)
-+		tx_total_len += iov_iter_count(call->write_iter);
- 
- 	/* If the call is going to be asynchronous, we need an extra ref for
- 	 * the call to hold itself so the caller need not hang on to its ref.
-@@ -440,7 +357,7 @@ void afs_make_call(struct afs_addr_cursor *ac, struct afs_call *call, gfp_t gfp)
- 	iov_iter_kvec(&msg.msg_iter, WRITE, iov, 1, call->request_size);
- 	msg.msg_control		= NULL;
- 	msg.msg_controllen	= 0;
--	msg.msg_flags		= MSG_WAITALL | (call->send_pages ? MSG_MORE : 0);
-+	msg.msg_flags		= MSG_WAITALL | (call->write_iter ? MSG_MORE : 0);
- 
- 	ret = rxrpc_kernel_send_data(call->net->socket, rxcall,
- 				     &msg, call->request_size,
-@@ -448,8 +365,18 @@ void afs_make_call(struct afs_addr_cursor *ac, struct afs_call *call, gfp_t gfp)
- 	if (ret < 0)
- 		goto error_do_abort;
- 
--	if (call->send_pages) {
--		ret = afs_send_pages(call, &msg);
-+	if (call->write_iter) {
-+		msg.msg_iter = *call->write_iter;
-+		msg.msg_flags &= ~MSG_MORE;
-+		trace_afs_send_data(call, &msg);
-+
-+		ret = rxrpc_kernel_send_data(call->net->socket,
-+					     call->rxcall, &msg,
-+					     iov_iter_count(&msg.msg_iter),
-+					     afs_notify_end_request_tx);
-+		*call->write_iter = msg.msg_iter;
-+
-+		trace_afs_sent_data(call, &msg, ret);
- 		if (ret < 0)
- 			goto error_do_abort;
- 	}
 diff --git a/fs/afs/write.c b/fs/afs/write.c
-index e78a9bc3b02d..dd4dc1c868b5 100644
+index 89c804bfe253..e672833c99bc 100644
 --- a/fs/afs/write.c
 +++ b/fs/afs/write.c
-@@ -325,36 +325,27 @@ static void afs_redirty_pages(struct writeback_control *wbc,
- /*
-  * completion of write to server
-  */
--static void afs_pages_written_back(struct afs_vnode *vnode,
--				   pgoff_t first, pgoff_t last)
-+static void afs_pages_written_back(struct afs_vnode *vnode, pgoff_t start, pgoff_t last)
- {
--	struct pagevec pv;
--	unsigned count, loop;
-+	struct address_space *mapping = vnode->vfs_inode.i_mapping;
-+	struct page *page;
+@@ -94,15 +94,15 @@ int afs_write_begin(struct file *file, struct address_space *mapping,
+ 	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
+ 	struct page *page;
+ 	unsigned long priv;
+-	unsigned f, from = pos & (PAGE_SIZE - 1);
+-	unsigned t, to = from + len;
+-	pgoff_t index = pos >> PAGE_SHIFT;
++	unsigned f, from;
++	unsigned t, to;
++	pgoff_t index;
+ 	int ret;
+ 
+-	_enter("{%llx:%llu},{%lx},%u,%u",
+-	       vnode->fid.vid, vnode->fid.vnode, index, from, to);
++	_enter("{%llx:%llu},%llx,%x",
++	       vnode->fid.vid, vnode->fid.vnode, pos, len);
+ 
+-	page = grab_cache_page_write_begin(mapping, index, flags);
++	page = grab_cache_page_write_begin(mapping, pos / PAGE_SIZE, flags);
+ 	if (!page)
+ 		return -ENOMEM;
+ 
+@@ -121,19 +121,20 @@ int afs_write_begin(struct file *file, struct address_space *mapping,
+ 	wait_on_page_fscache(page);
+ #endif
+ 
++	index = page->index;
++	from = pos - index * PAGE_SIZE;
++	to = from + len;
 +
-+	XA_STATE(xas, &mapping->i_pages, start);
+ try_again:
+ 	/* See if this page is already partially written in a way that we can
+ 	 * merge the new write with.
+ 	 */
+-	t = f = 0;
+ 	if (PagePrivate(page)) {
+ 		priv = page_private(page);
+ 		f = afs_page_dirty_from(page, priv);
+ 		t = afs_page_dirty_to(page, priv);
+ 		ASSERTCMP(f, <=, t);
+-	}
  
- 	_enter("{%llx:%llu},{%lx-%lx}",
+-	if (f != t) {
+ 		if (PageWriteback(page)) {
+ 			trace_afs_page_dirty(vnode, tracepoint_string("alrdy"), page);
+ 			goto flush_conflicting_write;
+@@ -180,7 +181,7 @@ int afs_write_end(struct file *file, struct address_space *mapping,
+ {
+ 	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
+ 	unsigned long priv;
+-	unsigned int f, from = pos & (PAGE_SIZE - 1);
++	unsigned int f, from = pos & (thp_size(page) - 1);
+ 	unsigned int t, to = from + copied;
+ 	loff_t i_size, maybe_i_size;
+ 	int ret = 0;
+@@ -233,9 +234,8 @@ int afs_write_end(struct file *file, struct address_space *mapping,
+ 		trace_afs_page_dirty(vnode, tracepoint_string("dirty"), page);
+ 	}
+ 
+-	set_page_dirty(page);
+-	if (PageDirty(page))
+-		_debug("dirtied");
++	if (set_page_dirty(page))
++		_debug("dirtied %lx", page->index);
+ 	ret = copied;
+ 
+ out:
+@@ -248,40 +248,43 @@ int afs_write_end(struct file *file, struct address_space *mapping,
+  * kill all the pages in the given range
+  */
+ static void afs_kill_pages(struct address_space *mapping,
+-			   pgoff_t first, pgoff_t last)
++			   loff_t start, loff_t len)
+ {
+ 	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
+ 	struct pagevec pv;
+-	unsigned count, loop;
++	unsigned int loop, psize;
+ 
+-	_enter("{%llx:%llu},%lx-%lx",
 -	       vnode->fid.vid, vnode->fid.vnode, first, last);
-+	       vnode->fid.vid, vnode->fid.vnode, start, last);
++	_enter("{%llx:%llu},%llx @%llx",
++	       vnode->fid.vid, vnode->fid.vnode, len, start);
  
--	pagevec_init(&pv);
-+	rcu_read_lock();
+ 	pagevec_init(&pv);
  
--	do {
--		_debug("done %lx-%lx", first, last);
-+	xas_for_each(&xas, page, last) {
-+		ASSERT(PageWriteback(page));
+ 	do {
+-		_debug("kill %lx-%lx", first, last);
++		_debug("kill %llx @%llx", len, start);
  
 -		count = last - first + 1;
 -		if (count > PAGEVEC_SIZE)
 -			count = PAGEVEC_SIZE;
--		pv.nr = find_get_pages_contig(vnode->vfs_inode.i_mapping,
--					      first, count, pv.pages);
+-		pv.nr = find_get_pages_contig(mapping, first, count, pv.pages);
 -		ASSERTCMP(pv.nr, ==, count);
-+		detach_page_private(page);
-+		trace_afs_page_dirty(vnode, tracepoint_string("clear"), page);
-+		page_endio(page, true, 0);
-+	}
++		pv.nr = find_get_pages_contig(mapping, start / PAGE_SIZE,
++					      PAGEVEC_SIZE, pv.pages);
++		if (pv.nr == 0)
++			break;
  
 -		for (loop = 0; loop < count; loop++) {
--			detach_page_private(pv.pages[loop]);
--			trace_afs_page_dirty(vnode, tracepoint_string("clear"),
--					     pv.pages[loop]);
--			end_page_writeback(pv.pages[loop]);
--		}
--		first += count;
--		__pagevec_release(&pv);
++		for (loop = 0; loop < pv.nr; loop++) {
+ 			struct page *page = pv.pages[loop];
++
++			if (page->index * PAGE_SIZE >= start + len)
++				break;
++
++			psize = thp_size(page);
++			start += psize;
++			len -= psize;
+ 			ClearPageUptodate(page);
+-			SetPageError(page);
+ 			end_page_writeback(page);
+-			if (page->index >= first)
+-				first = page->index + 1;
+ 			lock_page(page);
+ 			generic_error_remove_page(mapping, page);
+ 			unlock_page(page);
+ 		}
+ 
+ 		__pagevec_release(&pv);
 -	} while (first <= last);
-+	rcu_read_unlock();
++	} while (len > 0);
  
- 	afs_prune_wb_keys(vnode);
  	_leave("");
-@@ -411,9 +402,7 @@ static void afs_store_data_success(struct afs_operation *op)
- 		if (!op->store.laundering)
- 			afs_pages_written_back(vnode, op->store.first, op->store.last);
- 		afs_stat_v(vnode, n_stores);
--		atomic_long_add((op->store.last * PAGE_SIZE + op->store.last_to) -
--				(op->store.first * PAGE_SIZE + op->store.first_offset),
--				&afs_v2net(vnode)->n_store_bytes);
-+		atomic_long_add(op->store.size, &afs_v2net(vnode)->n_store_bytes);
- 	}
  }
+@@ -291,37 +294,40 @@ static void afs_kill_pages(struct address_space *mapping,
+  */
+ static void afs_redirty_pages(struct writeback_control *wbc,
+ 			      struct address_space *mapping,
+-			      pgoff_t first, pgoff_t last)
++			      loff_t start, loff_t len)
+ {
+ 	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
+ 	struct pagevec pv;
+-	unsigned count, loop;
++	unsigned int loop, psize;
  
-@@ -426,21 +415,21 @@ static const struct afs_operation_ops afs_store_data_operation = {
+-	_enter("{%llx:%llu},%lx-%lx",
+-	       vnode->fid.vid, vnode->fid.vnode, first, last);
++	_enter("{%llx:%llu},%llx @%llx",
++	       vnode->fid.vid, vnode->fid.vnode, len, start);
+ 
+ 	pagevec_init(&pv);
+ 
+ 	do {
+-		_debug("redirty %lx-%lx", first, last);
++		_debug("redirty %llx @%llx", len, start);
+ 
+-		count = last - first + 1;
+-		if (count > PAGEVEC_SIZE)
+-			count = PAGEVEC_SIZE;
+-		pv.nr = find_get_pages_contig(mapping, first, count, pv.pages);
+-		ASSERTCMP(pv.nr, ==, count);
++		pv.nr = find_get_pages_contig(mapping, start / PAGE_SIZE,
++					      PAGEVEC_SIZE, pv.pages);
++		if (pv.nr == 0)
++			break;
+ 
+-		for (loop = 0; loop < count; loop++) {
++		for (loop = 0; loop < pv.nr; loop++) {
+ 			struct page *page = pv.pages[loop];
+ 
++			if (page->index * PAGE_SIZE >= start + len)
++				break;
++
++			psize = thp_size(page);
++			start += psize;
++			len -= psize;
+ 			redirty_page_for_writepage(wbc, page);
+ 			end_page_writeback(page);
+-			if (page->index >= first)
+-				first = page->index + 1;
+ 		}
+ 
+ 		__pagevec_release(&pv);
+-	} while (first <= last);
++	} while (len > 0);
+ 
+ 	_leave("");
+ }
+@@ -329,23 +335,28 @@ static void afs_redirty_pages(struct writeback_control *wbc,
+ /*
+  * completion of write to server
+  */
+-static void afs_pages_written_back(struct afs_vnode *vnode, pgoff_t start, pgoff_t last)
++static void afs_pages_written_back(struct afs_vnode *vnode, loff_t start, unsigned int len)
+ {
+ 	struct address_space *mapping = vnode->vfs_inode.i_mapping;
+ 	struct page *page;
++	pgoff_t end;
+ 
+-	XA_STATE(xas, &mapping->i_pages, start);
++	XA_STATE(xas, &mapping->i_pages, start / PAGE_SIZE);
+ 
+-	_enter("{%llx:%llu},{%lx-%lx}",
+-	       vnode->fid.vid, vnode->fid.vnode, start, last);
++	_enter("{%llx:%llu},{%x @%llx}",
++	       vnode->fid.vid, vnode->fid.vnode, len, start);
+ 
+ 	rcu_read_lock();
+ 
+-	xas_for_each(&xas, page, last) {
+-		ASSERT(PageWriteback(page));
++	end = (start + len - 1) / PAGE_SIZE;
++	xas_for_each(&xas, page, end) {
++		if (!PageWriteback(page)) {
++			kdebug("bad %x @%llx page %lx %lx", len, start, page->index, end);
++			ASSERT(PageWriteback(page));
++		}
+ 
+-		detach_page_private(page);
+ 		trace_afs_page_dirty(vnode, tracepoint_string("clear"), page);
++		detach_page_private(page);
+ 		page_endio(page, true, 0);
+ 	}
+ 
+@@ -404,7 +415,7 @@ static void afs_store_data_success(struct afs_operation *op)
+ 	afs_vnode_commit_status(op, &op->file[0]);
+ 	if (op->error == 0) {
+ 		if (!op->store.laundering)
+-			afs_pages_written_back(vnode, op->store.first, op->store.last);
++			afs_pages_written_back(vnode, op->store.pos, op->store.size);
+ 		afs_stat_v(vnode, n_stores);
+ 		atomic_long_add(op->store.size, &afs_v2net(vnode)->n_store_bytes);
+ 	}
+@@ -419,8 +430,7 @@ static const struct afs_operation_ops afs_store_data_operation = {
  /*
   * write to a file
   */
--static int afs_store_data(struct address_space *mapping,
--			  pgoff_t first, pgoff_t last,
--			  unsigned offset, unsigned to, bool laundering)
-+static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter,
-+			  loff_t pos, pgoff_t first, pgoff_t last,
-+			  bool laundering)
+-static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter,
+-			  loff_t pos, pgoff_t first, pgoff_t last,
++static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter, loff_t pos,
+ 			  bool laundering)
  {
--	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
  	struct afs_operation *op;
- 	struct afs_wb_key *wbk = NULL;
--	int ret;
-+	loff_t size = iov_iter_count(iter), i_size;
-+	int ret = -ENOKEY;
- 
--	_enter("%s{%llx:%llu.%u},%lx,%lx,%x,%x",
-+	_enter("%s{%llx:%llu.%u},%llx,%llx",
- 	       vnode->volume->name,
- 	       vnode->fid.vid,
- 	       vnode->fid.vnode,
- 	       vnode->fid.unique,
--	       first, last, offset, to);
-+	       size, pos);
- 
- 	ret = afs_get_writeback_key(vnode, &wbk);
- 	if (ret) {
-@@ -454,13 +443,16 @@ static int afs_store_data(struct address_space *mapping,
- 		return -ENOMEM;
- 	}
- 
-+	i_size = i_size_read(&vnode->vfs_inode);
-+
- 	afs_op_set_vnode(op, 0, vnode);
+@@ -453,8 +463,6 @@ static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter,
  	op->file[0].dv_delta = 1;
--	op->store.mapping = mapping;
-+	op->store.write_iter = iter;
-+	op->store.pos = pos;
- 	op->store.first = first;
- 	op->store.last = last;
--	op->store.first_offset = offset;
--	op->store.last_to = to;
-+	op->store.size = size;
-+	op->store.i_size = max(pos + size, i_size);
+ 	op->store.write_iter = iter;
+ 	op->store.pos = pos;
+-	op->store.first = first;
+-	op->store.last = last;
+ 	op->store.size = size;
+ 	op->store.i_size = max(pos + size, i_size);
  	op->store.laundering = laundering;
- 	op->mtime = vnode->vfs_inode.i_mtime;
- 	op->flags |= AFS_OPERATION_UNINTR;
-@@ -503,11 +495,12 @@ static int afs_write_back_from_locked_page(struct address_space *mapping,
- 					   pgoff_t final_page)
+@@ -499,40 +507,49 @@ static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter,
+ static void afs_extend_writeback(struct address_space *mapping,
+ 				 struct afs_vnode *vnode,
+ 				 long *_count,
+-				 pgoff_t start,
+-				 pgoff_t final_page,
+-				 unsigned *_offset,
+-				 unsigned *_to,
+-				 bool new_content)
++				 loff_t start,
++				 loff_t max_len,
++				 bool new_content,
++				 unsigned int *_len)
  {
- 	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
-+	struct iov_iter iter;
- 	struct page *pages[8], *page;
- 	unsigned long count, priv;
- 	unsigned n, offset, to, f, t;
- 	pgoff_t start, first, last;
--	loff_t i_size, end;
-+	loff_t i_size, pos, end;
- 	int loop, ret;
- 
- 	_enter(",%lx", primary_page->index);
-@@ -604,15 +597,28 @@ static int afs_write_back_from_locked_page(struct address_space *mapping,
- 
- 	first = primary_page->index;
- 	last = first + count - 1;
-+	_debug("write back %lx[%u..] to %lx[..%u]", first, offset, last, to);
- 
--	end = (loff_t)last * PAGE_SIZE + to;
--	i_size = i_size_read(&vnode->vfs_inode);
-+	pos = first;
-+	pos <<= PAGE_SHIFT;
-+	pos += offset;
-+	end = last;
-+	end <<= PAGE_SHIFT;
-+	end += to;
- 
--	_debug("write back %lx[%u..] to %lx[..%u]", first, offset, last, to);
-+	/* Trim the actual write down to the EOF */
-+	i_size = i_size_read(&vnode->vfs_inode);
- 	if (end > i_size)
--		to = i_size & ~PAGE_MASK;
-+		end = i_size;
+-	struct page *pages[8], *page;
+-	unsigned long count = *_count, priv;
+-	unsigned offset = *_offset, to = *_to, n, f, t;
+-	int loop;
++	struct pagevec pvec;
++	struct page *page;
++	unsigned long priv;
++	unsigned int psize, filler = 0;
++	unsigned int f, t;
++	loff_t len = *_len;
++	pgoff_t index = (start + len) / PAGE_SIZE;
++	bool stop = true;
++	unsigned int i;
 +
-+	if (pos < i_size) {
-+		iov_iter_xarray(&iter, WRITE, &mapping->i_pages, pos, end - pos);
-+		ret = afs_store_data(vnode, &iter, pos, first, last, false);
-+	} else {
-+		/* The dirty region was entirely beyond the EOF. */
-+		ret = 0;
-+	}
++	XA_STATE(xas, &mapping->i_pages, index);
++	pagevec_init(&pvec);
  
--	ret = afs_store_data(mapping, first, last, offset, to, false);
- 	switch (ret) {
- 	case 0:
- 		ret = count;
-@@ -913,6 +919,8 @@ int afs_launder_page(struct page *page)
- {
- 	struct address_space *mapping = page->mapping;
- 	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
-+	struct iov_iter iter;
-+	struct bio_vec bv[1];
- 	unsigned long priv;
- 	unsigned int f, t;
- 	int ret = 0;
-@@ -928,8 +936,14 @@ int afs_launder_page(struct page *page)
+-	start++;
+ 	do {
+-		_debug("more %lx [%lx]", start, count);
+-		n = final_page - start + 1;
+-		if (n > ARRAY_SIZE(pages))
+-			n = ARRAY_SIZE(pages);
+-		n = find_get_pages_contig(mapping, start, ARRAY_SIZE(pages), pages);
+-		_debug("fgpc %u", n);
+-		if (n == 0)
+-			goto no_more;
+-		if (pages[0]->index != start) {
+-			do {
+-				put_page(pages[--n]);
+-			} while (n > 0);
+-			goto no_more;
+-		}
++		/* Firstly, we gather up a batch of contiguous dirty pages
++		 * under the RCU read lock - but we can't clear the dirty flags
++		 * there if any of those pages are mapped.
++		 */
++		rcu_read_lock();
+ 
+-		for (loop = 0; loop < n; loop++) {
+-			page = pages[loop];
+-			if (to != PAGE_SIZE && !new_content)
++		xas_for_each(&xas, page, ULONG_MAX) {
++			stop = true;
++			if (xas_retry(&xas, page))
++				continue;
++			if (xa_is_value(page))
++				break;
++			if (page->index != index)
+ 				break;
+-			if (page->index > final_page)
++
++			if (!page_cache_get_speculative(page)) {
++				xas_reset(&xas);
++				continue;
++			}
++
++			/* Has the page moved or been split? */
++			if (unlikely(page != xas_reload(&xas)))
+ 				break;
++
+ 			if (!trylock_page(page))
+ 				break;
+ 			if (!PageDirty(page) || PageWriteback(page)) {
+@@ -540,6 +557,7 @@ static void afs_extend_writeback(struct address_space *mapping,
+ 				break;
+ 			}
+ 
++			psize = thp_size(page);
+ 			priv = page_private(page);
+ 			f = afs_page_dirty_from(page, priv);
  			t = afs_page_dirty_to(page, priv);
+@@ -547,110 +565,126 @@ static void afs_extend_writeback(struct address_space *mapping,
+ 				unlock_page(page);
+ 				break;
+ 			}
+-			to = t;
+ 
++			len += filler + t;
++			filler = psize - t;
++			if (len >= max_len || *_count <= 0)
++				stop = true;
++			else if (t == psize || new_content)
++				stop = false;
++
++			index += thp_nr_pages(page);
++			if (!pagevec_add(&pvec, page))
++				break;
++			if (stop)
++				break;
++		}
++
++		if (!stop)
++			xas_pause(&xas);
++		rcu_read_unlock();
++
++		/* Now, if we obtained any pages, we can shift them to being
++		 * writable and mark them for caching.
++		 */
++		if (!pagevec_count(&pvec))
++			break;
++
++		for (i = 0; i < pagevec_count(&pvec); i++) {
++			page = pvec.pages[i];
+ 			trace_afs_page_dirty(vnode, tracepoint_string("store+"), page);
+ 
+ 			if (!clear_page_dirty_for_io(page))
+ 				BUG();
+ 			if (test_set_page_writeback(page))
+ 				BUG();
++
++			*_count -= thp_nr_pages(page);
+ 			unlock_page(page);
+-			put_page(page);
+-		}
+-		count += loop;
+-		if (loop < n) {
+-			for (; loop < n; loop++)
+-				put_page(pages[loop]);
+-			goto no_more;
  		}
  
-+		bv[0].bv_page = page;
-+		bv[0].bv_offset = f;
-+		bv[0].bv_len = t - f;
-+		iov_iter_bvec(&iter, WRITE, bv, 1, bv[0].bv_len);
+-		start += loop;
+-	} while (start <= final_page && count < 65536);
++		pagevec_release(&pvec);
++		cond_resched();
++	} while (!stop);
+ 
+-no_more:
+-	*_count = count;
+-	*_offset = offset;
+-	*_to = to;
++	*_len = len;
+ }
+ 
+ /*
+  * Synchronously write back the locked page and any subsequent non-locked dirty
+  * pages.
+  */
+-static int afs_write_back_from_locked_page(struct address_space *mapping,
+-					   struct writeback_control *wbc,
+-					   struct page *primary_page,
+-					   pgoff_t final_page)
++static ssize_t afs_write_back_from_locked_page(struct address_space *mapping,
++					       struct writeback_control *wbc,
++					       struct page *page,
++					       loff_t start, loff_t end)
+ {
+ 	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
+ 	struct iov_iter iter;
+-	unsigned long count, priv;
+-	unsigned offset, to;
+-	pgoff_t start, first, last;
+-	loff_t i_size, pos, end;
++	unsigned long priv;
++	unsigned int offset, to, len, max_len;
++	loff_t i_size = i_size_read(&vnode->vfs_inode);
+ 	bool new_content = test_bit(AFS_VNODE_NEW_CONTENT, &vnode->flags);
++	long count = wbc->nr_to_write;
+ 	int ret;
+ 
+-	_enter(",%lx", primary_page->index);
++	_enter(",%lx,%llx-%llx", page->index, start, end);
+ 
+-	count = 1;
+-	if (test_set_page_writeback(primary_page))
++	if (test_set_page_writeback(page))
+ 		BUG();
+ 
++	count -= thp_nr_pages(page);
 +
- 		trace_afs_page_dirty(vnode, tracepoint_string("launder"), page);
--		ret = afs_store_data(mapping, page->index, page->index, t, f, true);
-+		ret = afs_store_data(vnode, &iter, (loff_t)page->index << PAGE_SHIFT,
-+				     page->index, page->index, true);
+ 	/* Find all consecutive lockable dirty pages that have contiguous
+ 	 * written regions, stopping when we find a page that is not
+ 	 * immediately lockable, is not dirty or is missing, or we reach the
+ 	 * end of the range.
+ 	 */
+-	start = primary_page->index;
+-	priv = page_private(primary_page);
+-	offset = afs_page_dirty_from(primary_page, priv);
+-	to = afs_page_dirty_to(primary_page, priv);
+-	trace_afs_page_dirty(vnode, tracepoint_string("store"), primary_page);
+-
+-	WARN_ON(offset == to);
+-	if (offset == to)
+-		trace_afs_page_dirty(vnode, tracepoint_string("WARN"), primary_page);
+-
+-	if (start < final_page &&
+-	    (to == PAGE_SIZE || new_content))
+-		afs_extend_writeback(mapping, vnode, &count, start, final_page,
+-				     &offset, &to, new_content);
++	priv = page_private(page);
++	offset = afs_page_dirty_from(page, priv);
++	to = afs_page_dirty_to(page, priv);
++	trace_afs_page_dirty(vnode, tracepoint_string("store"), page);
++
++	len = to - offset;
++	start += offset;
++	if (start < i_size) {
++		/* Trim the write to the EOF; the extra data is ignored.  Also
++		 * put an upper limit on the size of a single storedata op.
++		 */
++		max_len = 65536 * 4096;
++		max_len = min_t(unsigned long long, max_len, end - start + 1);
++		max_len = min_t(unsigned long long, max_len, i_size - start);
++
++		if (len < max_len &&
++		    (to == thp_size(page) || new_content))
++			afs_extend_writeback(mapping, vnode, &count,
++					     start, max_len, new_content, &len);
++		len = min_t(loff_t, len, max_len);
++	}
+ 
+ 	/* We now have a contiguous set of dirty pages, each with writeback
+ 	 * set; the first page is still locked at this point, but all the rest
+ 	 * have been unlocked.
+ 	 */
+-	unlock_page(primary_page);
+-
+-	first = primary_page->index;
+-	last = first + count - 1;
+-	_debug("write back %lx[%u..] to %lx[..%u]", first, offset, last, to);
+-
+-	pos = first;
+-	pos <<= PAGE_SHIFT;
+-	pos += offset;
+-	end = last;
+-	end <<= PAGE_SHIFT;
+-	end += to;
++	unlock_page(page);
+ 
+-	/* Trim the actual write down to the EOF */
+-	i_size = i_size_read(&vnode->vfs_inode);
+-	if (end > i_size)
+-		end = i_size;
++	if (start < i_size) {
++		_debug("write back %x @%llx [%llx]", len, start, i_size);
+ 
+-	if (pos < i_size) {
+-		iov_iter_xarray(&iter, WRITE, &mapping->i_pages, pos, end - pos);
+-		ret = afs_store_data(vnode, &iter, pos, first, last, false);
++		iov_iter_xarray(&iter, WRITE, &mapping->i_pages, start, len);
++		ret = afs_store_data(vnode, &iter, start, false);
+ 	} else {
++		_debug("write discard %x @%llx [%llx]", len, start, i_size);
++
+ 		/* The dirty region was entirely beyond the EOF. */
++		afs_pages_written_back(vnode, start, len);
+ 		ret = 0;
  	}
  
- 	detach_page_private(page);
-diff --git a/fs/afs/yfsclient.c b/fs/afs/yfsclient.c
-index abcec145db4b..363d6dd276c0 100644
---- a/fs/afs/yfsclient.c
-+++ b/fs/afs/yfsclient.c
-@@ -1078,25 +1078,15 @@ void yfs_fs_store_data(struct afs_operation *op)
+ 	switch (ret) {
+ 	case 0:
+-		ret = count;
++		wbc->nr_to_write = count;
++		ret = len;
+ 		break;
+ 
+ 	default:
+@@ -662,13 +696,13 @@ static int afs_write_back_from_locked_page(struct address_space *mapping,
+ 	case -EKEYEXPIRED:
+ 	case -EKEYREJECTED:
+ 	case -EKEYREVOKED:
+-		afs_redirty_pages(wbc, mapping, first, last);
++		afs_redirty_pages(wbc, mapping, start, len);
+ 		mapping_set_error(mapping, ret);
+ 		break;
+ 
+ 	case -EDQUOT:
+ 	case -ENOSPC:
+-		afs_redirty_pages(wbc, mapping, first, last);
++		afs_redirty_pages(wbc, mapping, start, len);
+ 		mapping_set_error(mapping, -ENOSPC);
+ 		break;
+ 
+@@ -680,7 +714,7 @@ static int afs_write_back_from_locked_page(struct address_space *mapping,
+ 	case -ENOMEDIUM:
+ 	case -ENXIO:
+ 		trace_afs_file_error(vnode, ret, afs_file_error_writeback_fail);
+-		afs_kill_pages(mapping, first, last);
++		afs_kill_pages(mapping, start, len);
+ 		mapping_set_error(mapping, ret);
+ 		break;
+ 	}
+@@ -695,19 +729,19 @@ static int afs_write_back_from_locked_page(struct address_space *mapping,
+  */
+ int afs_writepage(struct page *page, struct writeback_control *wbc)
  {
- 	struct afs_vnode_param *vp = &op->file[0];
- 	struct afs_call *call;
--	loff_t size, pos, i_size;
- 	__be32 *bp;
+-	int ret;
++	ssize_t ret;
++	loff_t start;
  
- 	_enter(",%x,{%llx:%llu},,",
- 	       key_serial(op->key), vp->fid.vid, vp->fid.vnode);
+ 	_enter("{%lx},", page->index);
  
--	size = (loff_t)op->store.last_to - (loff_t)op->store.first_offset;
--	if (op->store.first != op->store.last)
--		size += (loff_t)(op->store.last - op->store.first) << PAGE_SHIFT;
--	pos = (loff_t)op->store.first << PAGE_SHIFT;
--	pos += op->store.first_offset;
++	start = page->index * PAGE_SIZE;
+ 	ret = afs_write_back_from_locked_page(page->mapping, wbc, page,
+-					      wbc->range_end >> PAGE_SHIFT);
++					      start, LLONG_MAX - start);
+ 	if (ret < 0) {
+-		_leave(" = %d", ret);
+-		return 0;
++		_leave(" = %zd", ret);
++		return ret;
+ 	}
+ 
+-	wbc->nr_to_write -= ret;
 -
--	i_size = i_size_read(&vp->vnode->vfs_inode);
--	if (pos + size > i_size)
--		i_size = size + pos;
--
- 	_debug("size %llx, at %llx, i_size %llx",
--	       (unsigned long long)size, (unsigned long long)pos,
--	       (unsigned long long)i_size);
-+	       (unsigned long long)op->store.size,
-+	       (unsigned long long)op->store.pos,
-+	       (unsigned long long)op->store.i_size);
+ 	_leave(" = 0");
+ 	return 0;
+ }
+@@ -717,35 +751,46 @@ int afs_writepage(struct page *page, struct writeback_control *wbc)
+  */
+ static int afs_writepages_region(struct address_space *mapping,
+ 				 struct writeback_control *wbc,
+-				 pgoff_t index, pgoff_t end, pgoff_t *_next)
++				 loff_t start, loff_t end, loff_t *_next)
+ {
+ 	struct page *page;
+-	int ret, n;
++	ssize_t ret;
++	int n;
  
- 	call = afs_alloc_flat_call(op->net, &yfs_RXYFSStoreData64,
- 				   sizeof(__be32) +
-@@ -1109,8 +1099,7 @@ void yfs_fs_store_data(struct afs_operation *op)
- 	if (!call)
- 		return afs_op_nomem(op);
+-	_enter(",,%lx,%lx,", index, end);
++	_enter("%llx,%llx,", start, end);
  
--	call->key = op->key;
--	call->send_pages = true;
-+	call->write_iter = op->store.write_iter;
+ 	do {
+-		n = find_get_pages_range_tag(mapping, &index, end,
+-					PAGECACHE_TAG_DIRTY, 1, &page);
++		pgoff_t index = start / PAGE_SIZE;
++
++		n = find_get_pages_range_tag(mapping, &index, end / PAGE_SIZE,
++					     PAGECACHE_TAG_DIRTY, 1, &page);
+ 		if (!n)
+ 			break;
  
- 	/* marshall the parameters */
- 	bp = call->request;
-@@ -1118,9 +1107,9 @@ void yfs_fs_store_data(struct afs_operation *op)
- 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
- 	bp = xdr_encode_YFSFid(bp, &vp->fid);
- 	bp = xdr_encode_YFSStoreStatus_mtime(bp, &op->mtime);
--	bp = xdr_encode_u64(bp, pos);
--	bp = xdr_encode_u64(bp, size);
--	bp = xdr_encode_u64(bp, i_size);
-+	bp = xdr_encode_u64(bp, op->store.pos);
-+	bp = xdr_encode_u64(bp, op->store.size);
-+	bp = xdr_encode_u64(bp, op->store.i_size);
- 	yfs_check_req(call, bp);
++		start = (loff_t)page->index * PAGE_SIZE; /* May regress with THPs */
++
+ 		_debug("wback %lx", page->index);
  
- 	trace_afs_make_fs_call(call, &vp->fid);
-diff --git a/include/trace/events/afs.h b/include/trace/events/afs.h
-index 9203cf6a8c53..3ccf591b2374 100644
---- a/include/trace/events/afs.h
-+++ b/include/trace/events/afs.h
-@@ -886,65 +886,52 @@ TRACE_EVENT(afs_call_done,
- 		      __entry->rx_call)
- 	    );
+-		/*
+-		 * at this point we hold neither the i_pages lock nor the
++		/* At this point we hold neither the i_pages lock nor the
+ 		 * page lock: the page may be truncated or invalidated
+ 		 * (changing page->mapping to NULL), or even swizzled
+ 		 * back from swapper_space to tmpfs file mapping
+ 		 */
+-		ret = lock_page_killable(page);
+-		if (ret < 0) {
+-			put_page(page);
+-			_leave(" = %d", ret);
+-			return ret;
++		if (wbc->sync_mode != WB_SYNC_NONE) {
++			ret = lock_page_killable(page);
++			if (ret < 0) {
++				put_page(page);
++				return ret;
++			}
++		} else {
++			if (!trylock_page(page)) {
++				put_page(page);
++				return 0;
++			}
+ 		}
  
--TRACE_EVENT(afs_send_pages,
--	    TP_PROTO(struct afs_call *call, struct msghdr *msg,
--		     pgoff_t first, pgoff_t last, unsigned int offset),
-+TRACE_EVENT(afs_send_data,
-+	    TP_PROTO(struct afs_call *call, struct msghdr *msg),
+ 		if (page->mapping != mapping || !PageDirty(page)) {
++			start += thp_size(page);
+ 			unlock_page(page);
+ 			put_page(page);
+ 			continue;
+@@ -761,20 +806,20 @@ static int afs_writepages_region(struct address_space *mapping,
  
--	    TP_ARGS(call, msg, first, last, offset),
-+	    TP_ARGS(call, msg),
+ 		if (!clear_page_dirty_for_io(page))
+ 			BUG();
+-		ret = afs_write_back_from_locked_page(mapping, wbc, page, end);
++		ret = afs_write_back_from_locked_page(mapping, wbc, page, start, end);
+ 		put_page(page);
+ 		if (ret < 0) {
+-			_leave(" = %d", ret);
++			_leave(" = %zd", ret);
+ 			return ret;
+ 		}
  
- 	    TP_STRUCT__entry(
- 		    __field(unsigned int,		call		)
--		    __field(pgoff_t,			first		)
--		    __field(pgoff_t,			last		)
--		    __field(unsigned int,		nr		)
--		    __field(unsigned int,		bytes		)
--		    __field(unsigned int,		offset		)
- 		    __field(unsigned int,		flags		)
-+		    __field(loff_t,			offset		)
-+		    __field(loff_t,			count		)
- 			     ),
+-		wbc->nr_to_write -= ret;
++		start += ret * PAGE_SIZE;
  
- 	    TP_fast_assign(
- 		    __entry->call = call->debug_id;
--		    __entry->first = first;
--		    __entry->last = last;
--		    __entry->nr = msg->msg_iter.nr_segs;
--		    __entry->bytes = msg->msg_iter.count;
--		    __entry->offset = offset;
- 		    __entry->flags = msg->msg_flags;
-+		    __entry->offset = msg->msg_iter.xarray_start + msg->msg_iter.iov_offset;
-+		    __entry->count = iov_iter_count(&msg->msg_iter);
- 			   ),
+ 		cond_resched();
+-	} while (index < end && wbc->nr_to_write > 0);
++	} while (wbc->nr_to_write > 0);
  
--	    TP_printk(" c=%08x %lx-%lx-%lx b=%x o=%x f=%x",
--		      __entry->call,
--		      __entry->first, __entry->first + __entry->nr - 1, __entry->last,
--		      __entry->bytes, __entry->offset,
-+	    TP_printk(" c=%08x o=%llx n=%llx f=%x",
-+		      __entry->call, __entry->offset, __entry->count,
- 		      __entry->flags)
- 	    );
+-	*_next = index;
+-	_leave(" = 0 [%lx]", *_next);
++	*_next = start;
++	_leave(" = 0 [%llx]", *_next);
+ 	return 0;
+ }
  
--TRACE_EVENT(afs_sent_pages,
--	    TP_PROTO(struct afs_call *call, pgoff_t first, pgoff_t last,
--		     pgoff_t cursor, int ret),
-+TRACE_EVENT(afs_sent_data,
-+	    TP_PROTO(struct afs_call *call, struct msghdr *msg, int ret),
+@@ -785,7 +830,7 @@ int afs_writepages(struct address_space *mapping,
+ 		   struct writeback_control *wbc)
+ {
+ 	struct afs_vnode *vnode = AFS_FS_I(mapping->host);
+-	pgoff_t start, end, next;
++	loff_t start, next;
+ 	int ret;
  
--	    TP_ARGS(call, first, last, cursor, ret),
-+	    TP_ARGS(call, msg, ret),
+ 	_enter("");
+@@ -800,22 +845,19 @@ int afs_writepages(struct address_space *mapping,
+ 		return 0;
  
- 	    TP_STRUCT__entry(
- 		    __field(unsigned int,		call		)
--		    __field(pgoff_t,			first		)
--		    __field(pgoff_t,			last		)
--		    __field(pgoff_t,			cursor		)
- 		    __field(int,			ret		)
-+		    __field(loff_t,			offset		)
-+		    __field(loff_t,			count		)
- 			     ),
+ 	if (wbc->range_cyclic) {
+-		start = mapping->writeback_index;
+-		end = -1;
+-		ret = afs_writepages_region(mapping, wbc, start, end, &next);
++		start = mapping->writeback_index * PAGE_SIZE;
++		ret = afs_writepages_region(mapping, wbc, start, LLONG_MAX, &next);
+ 		if (start > 0 && wbc->nr_to_write > 0 && ret == 0)
+ 			ret = afs_writepages_region(mapping, wbc, 0, start,
+ 						    &next);
+-		mapping->writeback_index = next;
++		mapping->writeback_index = next / PAGE_SIZE;
+ 	} else if (wbc->range_start == 0 && wbc->range_end == LLONG_MAX) {
+-		end = (pgoff_t)(LLONG_MAX >> PAGE_SHIFT);
+-		ret = afs_writepages_region(mapping, wbc, 0, end, &next);
++		ret = afs_writepages_region(mapping, wbc, 0, LLONG_MAX, &next);
+ 		if (wbc->nr_to_write > 0)
+ 			mapping->writeback_index = next;
+ 	} else {
+-		start = wbc->range_start >> PAGE_SHIFT;
+-		end = wbc->range_end >> PAGE_SHIFT;
+-		ret = afs_writepages_region(mapping, wbc, start, end, &next);
++		ret = afs_writepages_region(mapping, wbc,
++					    wbc->range_start, wbc->range_end, &next);
+ 	}
  
- 	    TP_fast_assign(
- 		    __entry->call = call->debug_id;
--		    __entry->first = first;
--		    __entry->last = last;
--		    __entry->cursor = cursor;
- 		    __entry->ret = ret;
-+		    __entry->offset = msg->msg_iter.xarray_start + msg->msg_iter.iov_offset;
-+		    __entry->count = iov_iter_count(&msg->msg_iter);
- 			   ),
+ 	up_read(&vnode->validate_lock);
+@@ -873,13 +915,13 @@ int afs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+  */
+ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
+ {
++	struct page *page = thp_head(vmf->page);
+ 	struct file *file = vmf->vma->vm_file;
+ 	struct inode *inode = file_inode(file);
+ 	struct afs_vnode *vnode = AFS_FS_I(inode);
+ 	unsigned long priv;
  
--	    TP_printk(" c=%08x %lx-%lx c=%lx r=%d",
--		      __entry->call,
--		      __entry->first, __entry->last,
--		      __entry->cursor, __entry->ret)
-+	    TP_printk(" c=%08x o=%llx n=%llx r=%x",
-+		      __entry->call, __entry->offset, __entry->count,
-+		      __entry->ret)
- 	    );
+-	_enter("{{%llx:%llu}},{%lx}",
+-	       vnode->fid.vid, vnode->fid.vnode, vmf->page->index);
++	_enter("{{%llx:%llu}},{%lx}", vnode->fid.vid, vnode->fid.vnode, page->index);
  
- TRACE_EVENT(afs_dir_check_failed,
+ 	sb_start_pagefault(inode->i_sb);
+ 
+@@ -887,31 +929,33 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
+ 	 * be modified.  We then assume the entire page will need writing back.
+ 	 */
+ #ifdef CONFIG_AFS_FSCACHE
+-	if (PageFsCache(vmf->page) &&
+-	    wait_on_page_bit_killable(vmf->page, PG_fscache) < 0)
++	if (PageFsCache(page) &&
++	    wait_on_page_bit_killable(page, PG_fscache) < 0)
+ 		return VM_FAULT_RETRY;
+ #endif
+ 
+-	if (PageWriteback(vmf->page) &&
+-	    wait_on_page_bit_killable(vmf->page, PG_writeback) < 0)
++	if (PageWriteback(page) &&
++	    wait_on_page_bit_killable(page, PG_writeback) < 0)
+ 		return VM_FAULT_RETRY;
+ 
+-	if (lock_page_killable(vmf->page) < 0)
++	if (lock_page_killable(page) < 0)
+ 		return VM_FAULT_RETRY;
+ 
+ 	/* We mustn't change page->private until writeback is complete as that
+ 	 * details the portion of the page we need to write back and we might
+ 	 * need to redirty the page if there's a problem.
+ 	 */
+-	wait_on_page_writeback(vmf->page);
++	wait_on_page_writeback(page);
+ 
+-	priv = afs_page_dirty(vmf->page, 0, PAGE_SIZE);
++	priv = afs_page_dirty(page, 0, thp_size(page));
+ 	priv = afs_page_dirty_mmapped(priv);
+-	if (PagePrivate(vmf->page))
+-		set_page_private(vmf->page, priv);
+-	else
+-		attach_page_private(vmf->page, (void *)priv);
+-	trace_afs_page_dirty(vnode, tracepoint_string("mkwrite"), vmf->page);
++	if (PagePrivate(page)) {
++		set_page_private(page, priv);
++		trace_afs_page_dirty(vnode, tracepoint_string("mkwrite+"), page);
++	} else {
++		attach_page_private(page, (void *)priv);
++		trace_afs_page_dirty(vnode, tracepoint_string("mkwrite"), page);
++	}
+ 	file_update_time(file);
+ 
+ 	sb_end_pagefault(inode->i_sb);
+@@ -964,7 +1008,7 @@ int afs_launder_page(struct page *page)
+ 	priv = page_private(page);
+ 	if (clear_page_dirty_for_io(page)) {
+ 		f = 0;
+-		t = PAGE_SIZE;
++		t = thp_size(page);
+ 		if (PagePrivate(page)) {
+ 			f = afs_page_dirty_from(page, priv);
+ 			t = afs_page_dirty_to(page, priv);
+@@ -976,12 +1020,12 @@ int afs_launder_page(struct page *page)
+ 		iov_iter_bvec(&iter, WRITE, bv, 1, bv[0].bv_len);
+ 
+ 		trace_afs_page_dirty(vnode, tracepoint_string("launder"), page);
+-		ret = afs_store_data(vnode, &iter, (loff_t)page->index << PAGE_SHIFT,
+-				     page->index, page->index, true);
++		ret = afs_store_data(vnode, &iter, (loff_t)page->index * PAGE_SIZE,
++				     true);
+ 	}
+ 
+-	detach_page_private(page);
+ 	trace_afs_page_dirty(vnode, tracepoint_string("laundered"), page);
++	detach_page_private(page);
+ 	wait_on_page_fscache(page);
+ 	return ret;
+ }
 
 
