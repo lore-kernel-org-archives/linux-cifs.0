@@ -2,153 +2,355 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE76CC433E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 16:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B36BC43381
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 16:10:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD7CF64DEE
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 16:10:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0933464DF0
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 16:10:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232313AbhBOQKP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Feb 2021 11:10:15 -0500
-Received: from mail-eopbgr770090.outbound.protection.outlook.com ([40.107.77.90]:9518
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232747AbhBOQDN (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 15 Feb 2021 11:03:13 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N6aLwAVfdxMZjAsWo265D0wP6AioUyOPQkeEqDOnTFyuiXuISZiINRRlpg3KUQbNc6Q66S4Pti2dBKaq1JsW80GXeSq0aszNXdlAOZSEvkY6Jq8KYO4MVeW4VlDAGD4IQQzZxyz+oERyrN6VI1EWUeOVx/pEDfScTFzfr3J7RlK1SCceD63Oh4cdjr/riaUj+X+udEgAfTG7HkXv8E+wUKjUWaWdVRMnvPo4orio6FoDCczhuPCEtV5KnVsRmS+D6Y3oGZpDL1LuEZ85TTS+fNp/btK0SEIjsiwnn/zkW+XLFEc228e+h3rAkFIzvQ3dA/9JwtZ/FEIep9lDFb7d7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LaGNQARnwpEkL1xtIrvWd4c7lfcd0NMUQPoWZ/HnLps=;
- b=RLZbs5mpRkBfBX4bB86c9enmyXl+53IHw/3vuQd2fyBauKG1Go+RkQ/6+v2fJGJKq177pEJzGXbDbaHjAv/oHq6uB2OOjJGZf5eFdZVeslF1GZpG0BCn8brEDEU+mhKnGbuRB5t9T3vmuD7VPxnAxPX76ruGFKyxCj5K41pB4TwxRBRnGNpRYtqeCrKEZsIKtStLQt/EdHnC887w6jxqIIe6z+XyYZE6421NS5/XCnJJ5Z7oWiNlPoWtGRYptfwmltD+K8p9g8EHWER/JUpd1RdAWNR5UAoydlN97MlctNigZVMU535SaCUDif0q9kdOEJz8kWQiDr9rdArLXiPXvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hammerspace.com; dmarc=pass action=none
- header.from=hammerspace.com; dkim=pass header.d=hammerspace.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hammerspace.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LaGNQARnwpEkL1xtIrvWd4c7lfcd0NMUQPoWZ/HnLps=;
- b=P3eOoel3tAJ+g7XCd82wEpMt+y1KxGExfelQrJRWJgT+ZbOy4SxbK+s0uui1jXcgpJHVNMc+GzIVxtgIKNk1fzmwka5Z9pmCTpQ5y+EVJvIcz+kUHs3eKuEt7qH+n3NkInrbaQ+H4ARIRmMV8z0yEmOIygiC28Xb7SB64Dog+1w=
-Received: from CH2PR13MB3525.namprd13.prod.outlook.com (2603:10b6:610:21::29)
- by CH2PR13MB3847.namprd13.prod.outlook.com (2603:10b6:610:99::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.11; Mon, 15 Feb
- 2021 16:02:20 +0000
-Received: from CH2PR13MB3525.namprd13.prod.outlook.com
- ([fe80::f453:2dd2:675:d063]) by CH2PR13MB3525.namprd13.prod.outlook.com
- ([fe80::f453:2dd2:675:d063%3]) with mapi id 15.20.3868.025; Mon, 15 Feb 2021
- 16:02:20 +0000
-From:   Trond Myklebust <trondmy@hammerspace.com>
-To:     "drinkcat@chromium.org" <drinkcat@chromium.org>,
-        "anna.schumaker@netapp.com" <anna.schumaker@netapp.com>,
-        "iant@google.com" <iant@google.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "dchinner@redhat.com" <dchinner@redhat.com>,
-        "llozano@chromium.org" <llozano@chromium.org>,
-        "lhenriques@suse.de" <lhenriques@suse.de>,
-        "sfrench@samba.org" <sfrench@samba.org>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "jlayton@kernel.org" <jlayton@kernel.org>,
-        "amir73il@gmail.com" <amir73il@gmail.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "miklos@szeredi.hu" <miklos@szeredi.hu>
-CC:     "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH v2] vfs: prevent copy_file_range to copy across devices
-Thread-Topic: [PATCH v2] vfs: prevent copy_file_range to copy across devices
-Thread-Index: AQHXA7EmiAMwHAQV80CDyBR44E7wi6pZYHkA
-Date:   Mon, 15 Feb 2021 16:02:20 +0000
-Message-ID: <ec3a5337b9da71a7bc9527728067a4a3d027419b.camel@hammerspace.com>
-References: <CAOQ4uxiFGjdvX2-zh5o46pn7RZhvbGHH0wpzLPuPOom91FwWeQ@mail.gmail.com>
-         <20210215154317.8590-1-lhenriques@suse.de>
-In-Reply-To: <20210215154317.8590-1-lhenriques@suse.de>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: chromium.org; dkim=none (message not signed)
- header.d=none;chromium.org; dmarc=none action=none
- header.from=hammerspace.com;
-x-originating-ip: [68.36.133.222]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cce1c63a-bf40-438b-352a-08d8d1cb1335
-x-ms-traffictypediagnostic: CH2PR13MB3847:
-x-microsoft-antispam-prvs: <CH2PR13MB3847F931D8B7941CA1C3D946B8889@CH2PR13MB3847.namprd13.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: p9ABEgRiSzR5EEdXJSG8JT3ZqLuy+vYu6QX0oSH8q3s9gde3nmI0dwlJ7XtvwWzA8lKsi4NTrLuk9cCPiLGHfLsp5d16JtwYwywovDXcVVPQvZ1H9h88m1PjFoABw2ijX6MXqTt6EAMtjPj7Gp92MWYaCgXUWF/9ZLI5VJIGDKNs1fxx8SJ2BDrGHInDS+jfwrJUOH6v9JC8UdsDu2skR3FxtbzL36H9kpJI0u3nhTp1mNxRfF3KOZ6w9HE0/KrcM8o+1+k6bjncbzCwBioUZNN4AFr6kj/kvY4lnkooxsQnnoXFlZd67m7fxW09A0my3RtZTGPFMpdE7Sw4uPVpg0mewkteToc2ddCk13ujAfpmBvwTAfhwq7sSyEU+8I8jqUgOpzl4XYoGqjmI1BL3fJ2f0gwfpoeUYD39dKIIGsV/DWP0HR0MzTC2Z2CW/MOd2+8a0ejA8MKdzoadpa5c4MJNAGluOYK14Tz0dKz3moSoSBjfObQvjR8eHvSwMeISJ1vpRO+UCWntjwykhaCqnvJ6xOSelb0yEyh5uzpMaRUeFz02hPVsMPGgE25IPKcM
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR13MB3525.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(136003)(376002)(396003)(39830400003)(346002)(4744005)(5660300002)(8676002)(76116006)(66476007)(2616005)(66556008)(71200400001)(921005)(66946007)(64756008)(66446008)(478600001)(8936002)(6512007)(36756003)(2906002)(316002)(186003)(26005)(7416002)(86362001)(4326008)(6506007)(110136005)(6486002)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?utf-8?B?bXRMME1vZW1YZkR6eXBPaXl0U2hGYkdNQ2FKRmFmZExNYk1mTEptc0kvSUFx?=
- =?utf-8?B?OU5EYkdBY0VtaElCZ2QzeW50cTB2elgwNE9EaTY4aDVpZkd2MzZVM1lhQzgx?=
- =?utf-8?B?ei9kM3RsY2V5M3V0bkkvTW5zTlVidjRKZlA3TVhVd1BEdmtUMXJIdGdCaTh4?=
- =?utf-8?B?SURja3J0N0d2Y09seW4zZUFwWWk2NU9uMlZlUHBrcFN3dXJoY0FXN21BamhJ?=
- =?utf-8?B?eExxR2VhaCtNYXVrYXplL2RsYlZJbTQ0TmloNHZnRkF2UzdwTmh4bC9sYUs5?=
- =?utf-8?B?MWI2cU1VNEMrUEwrU2lHblNhb1F5OXdsL3FoVGJTODF5cU8vR3NOK1hvOHJI?=
- =?utf-8?B?UVcycWN3Y3NYd091TzBEbmhRdTdpeHdYRDdtRFlvaGZtN2E0RGp4ZFBmNndH?=
- =?utf-8?B?Tk9sckY2cVI1eG0rSWFvaE92VHJrb3A0V0VqZHRQOGp6RG12bXlvTFRVaTJS?=
- =?utf-8?B?bmNxS2dyQW43QmdXWEZ5aXhzWDFla2ZIdWdlWDROdzVaaWxyMjVmU2lrYy9a?=
- =?utf-8?B?VHJlc2U2TVNNVzVFTTNiT01DRzEydWR4clkxUndoejc1MGZVSlRHYThDZzRt?=
- =?utf-8?B?M2VRUk1zT3ppMjBjOWFzbjlURkliU0poZTVVRkNCQ0pXTWNFSUpvQ2sza1Q2?=
- =?utf-8?B?UHNZczY5WHdRb20zaXlGRGM3OFh1ZklhdnRseU9nT2g3OEVsVTRRbURGbmlY?=
- =?utf-8?B?aWZQMlhZbHR2bG1rMUZyeW0ybU9FVzgvOExCcXNlYUt6eTNVSFZSNG14dEVp?=
- =?utf-8?B?ekkzWDV1dHM2akdqY2FDZG1lVHVTS3VZUzA4ek1PNjJnNmwxdDdURFpiTW5D?=
- =?utf-8?B?eWJicklKSmZSa2dMcEYrNzF1YlFpbjNQRmZFTkhuWTRsdEhVa0EyUkpQcGdz?=
- =?utf-8?B?U3hSYndFeHRsdEQ2Qjc1dFdaZ0QzbGJLbTVGQWtmWDdINWQvaWtSV1FEc0lV?=
- =?utf-8?B?QkErOVVuR0tSYUgvYjBxd2ZHK1lPRTVzSGd0SHV1aWs1YUl0M09zTW1DK3Bx?=
- =?utf-8?B?ZTZPZHdaYk9lR2dVaFBzTGlzajlvdmdzQmhIczFGVEtrVDNxSGgzMmZLTjE2?=
- =?utf-8?B?bWFSUTVSYkg1RGk5RlhJbWlKMnRDMHl5UzlJTFpyT0dyUEhtTDkvVzErZTNS?=
- =?utf-8?B?UDN0Ykk5R2RwMTI0N29rSS9LazNZMTdXa0pNcFVOaDdZNU5TWGZvWDJ1OU1o?=
- =?utf-8?B?RGRJa3JWNTh4WklFQWM4QmIzYVV0VlIvUFUzcGppdXVVaU10a2l3cmpEenV0?=
- =?utf-8?B?aExqWG92eWFRNWdOY3h6YlpNL0F6WWdsdUg0Wlc4VU9BVndXOHhxVFY0YS9r?=
- =?utf-8?B?NUhNN1dUdnIwQnBhS1E2Uk4waVZZSkF3Vit1VDVqeXQ2b2lQaHlFWGZCVWRN?=
- =?utf-8?B?Z0ZNdDJsTHA2bWVrWGlsQWg2SUpNeWszdnhVNGc4UjNsdVlsYkF4aEFQS3Vw?=
- =?utf-8?B?SG9CMzNnSmNuaWhNSTZpL29TR0ptYzdyck9qTHE1UUZuaWFacTJ3dkFIalM3?=
- =?utf-8?B?YzJmdUdDbkFYb2JiWElUcW1nM0JmcTNPUFVBWTNKU0pwSUF4OEszVlJLN2U5?=
- =?utf-8?B?NzBEYnhSM0ZuV0ZmYjJSYk9nYmdSWkxyR2RKRjhodEZ2QnIrakN4M2ZxN1Fj?=
- =?utf-8?B?c2ZBY2VwOFVnR1FNNzRtSU83MDc4VGE4OXEveld5VE9DNHB0eFJmQUdlWkwr?=
- =?utf-8?B?SmxLaW5nd2NGcWkyaDdLTnhrN2NUY1E3Sy96MFRxc1MyMEcrMjYwdlFLdm5Q?=
- =?utf-8?Q?hprbA0Zf+DathyxUfrHvC9JYCcmmNR2LzsEvJA6?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F8AFBCC046D0CD4A93A0E77383E79F0E@namprd13.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        id S232590AbhBOQKG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Feb 2021 11:10:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35728 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232165AbhBOPwS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 15 Feb 2021 10:52:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613404250;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=i23Y6XBbqwJr+Ohumn3S8L8ookBPJg2JgRa5YCIVlco=;
+        b=cy9wx0K+VCjENfYoRJP8rBpozZKhhcwM9tGtX3GfCXeaYe7Z7aFy9XmSpoisaRvGCZYAP3
+        yPhlhtxoeWvDzoHMxhgVPNQKQTZ0PmpYmrd6ihQdte+/sbYPMJLHKxClldc+i7AWvpDtQq
+        PlIWGR/VWRqB5eULOB1JusFsm6MEFRU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-202-n89a_FXhMS6-glZrfdazRg-1; Mon, 15 Feb 2021 10:50:46 -0500
+X-MC-Unique: n89a_FXhMS6-glZrfdazRg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A2F080196C;
+        Mon, 15 Feb 2021 15:50:44 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8105F19D9F;
+        Mon, 15 Feb 2021 15:50:37 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH 31/33] ceph: convert readpage to fscache read helper
+From:   David Howells <dhowells@redhat.com>
+To:     Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>
+Cc:     Jeff Layton <jlayton@kernel.org>, ceph-devel@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
+        dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 15 Feb 2021 15:50:36 +0000
+Message-ID: <161340423660.1303470.13303522357511686909.stgit@warthog.procyon.org.uk>
+In-Reply-To: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
+References: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-X-OriginatorOrg: hammerspace.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR13MB3525.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cce1c63a-bf40-438b-352a-08d8d1cb1335
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Feb 2021 16:02:20.2906
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0d4fed5c-3a70-46fe-9430-ece41741f59e
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vrWcB+/NEhJ3P1I1hOJLlJrWrtegOKOwavZ0CVt3PhhrjSwet3yO53mLpJ8hxYIIvOZZap6EQDa4v4wqISs1Gw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB3847
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-T24gTW9uLCAyMDIxLTAyLTE1IGF0IDE1OjQzICswMDAwLCBMdWlzIEhlbnJpcXVlcyB3cm90ZToN
-Cj4gTmljb2xhcyBCb2ljaGF0IHJlcG9ydGVkIGFuIGlzc3VlIHdoZW4gdHJ5aW5nIHRvIHVzZSB0
-aGUNCj4gY29weV9maWxlX3JhbmdlDQo+IHN5c2NhbGwgb24gYSB0cmFjZWZzIGZpbGUuwqAgSXQg
-ZmFpbGVkIHNpbGVudGx5IGJlY2F1c2UgdGhlIGZpbGUNCj4gY29udGVudCBpcw0KPiBnZW5lcmF0
-ZWQgb24tdGhlLWZseSAocmVwb3J0aW5nIGEgc2l6ZSBvZiB6ZXJvKSBhbmQgY29weV9maWxlX3Jh
-bmdlDQo+IG5lZWRzDQo+IHRvIGtub3cgaW4gYWR2YW5jZSBob3cgbXVjaCBkYXRhIGlzIHByZXNl
-bnQuDQoNClRoYXQgZXhwbGFuYXRpb24gbWFrZXMgbm8gc2Vuc2Ugd2hhdHNvZXZlci4gY29weV9m
-aWxlX3JhbmdlIGlzIGEgbm9uLQ0KYXRvbWljIG9wZXJhdGlvbiBhbmQgc28gdGhlIGZpbGUgY2Fu
-IGNoYW5nZSB3aGlsZSBiZWluZyBjb3BpZWQuIEFueQ0KZGV0ZXJtaW5hdGlvbiBvZiAnaG93IG11
-Y2ggZGF0YSBpcyBwcmVzZW50JyB0aGF0IGlzIG1hZGUgaW4gYWR2YW5jZQ0Kd291bGQgdGhlcmVm
-b3JlIGJlIGEgZmxhdyBpbiB0aGUgY29weSBwcm9jZXNzIGJlaW5nIHVzZWQgKGkuZS4NCmRvX3Nw
-bGljZV9kaXJlY3QoKSkuIERvZXMgc2VuZGZpbGUoKSBhbHNvICdpc3N1ZScgaW4gdGhlIHNhbWUg
-d2F5Pw0KDQoNCi0tIA0KVHJvbmQgTXlrbGVidXN0DQpMaW51eCBORlMgY2xpZW50IG1haW50YWlu
-ZXIsIEhhbW1lcnNwYWNlDQp0cm9uZC5teWtsZWJ1c3RAaGFtbWVyc3BhY2UuY29tDQoNCg0K
+From: Jeff Layton <jlayton@kernel.org>
+
+Have the ceph KConfig select NETFS_SUPPORT. Add a new netfs ops
+structure and the operations for it. Convert ceph_readpage to use
+the new netfs_readpage helper.
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: ceph-devel@vger.kernel.org
+cc: linux-cachefs@redhat.com
+cc: linux-fsdevel@vger.kernel.org
+---
+
+ fs/ceph/Kconfig |    1 
+ fs/ceph/addr.c  |  149 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ fs/ceph/cache.h |   36 +++++++++++++
+ 3 files changed, 176 insertions(+), 10 deletions(-)
+
+diff --git a/fs/ceph/Kconfig b/fs/ceph/Kconfig
+index 471e40156065..94df854147d3 100644
+--- a/fs/ceph/Kconfig
++++ b/fs/ceph/Kconfig
+@@ -6,6 +6,7 @@ config CEPH_FS
+ 	select LIBCRC32C
+ 	select CRYPTO_AES
+ 	select CRYPTO
++	select NETFS_SUPPORT
+ 	default n
+ 	help
+ 	  Choose Y or M here to include support for mounting the
+diff --git a/fs/ceph/addr.c b/fs/ceph/addr.c
+index fbfa49db06fd..95f39ff9bb24 100644
+--- a/fs/ceph/addr.c
++++ b/fs/ceph/addr.c
+@@ -12,6 +12,7 @@
+ #include <linux/signal.h>
+ #include <linux/iversion.h>
+ #include <linux/ktime.h>
++#include <linux/netfs.h>
+ 
+ #include "super.h"
+ #include "mds_client.h"
+@@ -183,6 +184,144 @@ static int ceph_releasepage(struct page *page, gfp_t gfp_flags)
+ 	return !PagePrivate(page);
+ }
+ 
++static bool ceph_netfs_clamp_length(struct netfs_read_subrequest *subreq)
++{
++	struct inode *inode = subreq->rreq->mapping->host;
++	struct ceph_inode_info *ci = ceph_inode(inode);
++	u64 objno, objoff;
++	u32 xlen;
++
++	/* Truncate the extent at the end of the current object */
++	ceph_calc_file_object_mapping(&ci->i_layout, subreq->start, subreq->len,
++				      &objno, &objoff, &xlen);
++	subreq->len = xlen;
++	return true;
++}
++
++static void finish_netfs_read(struct ceph_osd_request *req)
++{
++	struct ceph_fs_client *fsc = ceph_inode_to_client(req->r_inode);
++	struct ceph_osd_data *osd_data = osd_req_op_extent_osd_data(req, 0);
++	struct netfs_read_subrequest *subreq = req->r_priv;
++	int num_pages;
++	int err = req->r_result;
++
++	ceph_update_read_latency(&fsc->mdsc->metric, req->r_start_latency,
++				 req->r_end_latency, err);
++
++	dout("%s: result %d subreq->len=%zu i_size=%lld\n", __func__, req->r_result,
++	     subreq->len, i_size_read(req->r_inode));
++
++	/* no object means success but no data */
++	if (err == -ENOENT)
++		err = 0;
++	else if (err == -EBLOCKLISTED)
++		fsc->blocklisted = true;
++
++	if (err >= 0 && err < subreq->len)
++		__set_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags);
++
++	netfs_subreq_terminated(subreq, err);
++
++	num_pages = calc_pages_for(osd_data->alignment, osd_data->length);
++	ceph_put_page_vector(osd_data->pages, num_pages, false);
++	iput(req->r_inode);
++}
++
++static void ceph_netfs_issue_op(struct netfs_read_subrequest *subreq)
++{
++	struct netfs_read_request *rreq = subreq->rreq;
++	struct inode *inode = rreq->mapping->host;
++	struct ceph_inode_info *ci = ceph_inode(inode);
++	struct ceph_fs_client *fsc = ceph_inode_to_client(inode);
++	struct ceph_osd_request *req;
++	struct ceph_vino vino = ceph_vino(inode);
++	struct iov_iter iter;
++	struct page **pages;
++	size_t page_off;
++	int err = 0;
++	u64 len = subreq->len;
++
++	req = ceph_osdc_new_request(&fsc->client->osdc, &ci->i_layout, vino, subreq->start, &len,
++			0, 1, CEPH_OSD_OP_READ,
++			CEPH_OSD_FLAG_READ | fsc->client->osdc.client->options->read_from_replica,
++			NULL, ci->i_truncate_seq, ci->i_truncate_size, false);
++	if (IS_ERR(req)) {
++		err = PTR_ERR(req);
++		req = NULL;
++		goto out;
++	}
++
++	dout("%s: pos=%llu orig_len=%zu len=%llu\n", __func__, subreq->start, subreq->len, len);
++	iov_iter_xarray(&iter, READ, &rreq->mapping->i_pages, subreq->start, len);
++	err = iov_iter_get_pages_alloc(&iter, &pages, len, &page_off);
++	if (err < 0) {
++		dout("%s: iov_ter_get_pages_alloc returned %d\n", __func__, err);
++		goto out;
++	}
++
++	/* should always give us a page-aligned read */
++	WARN_ON_ONCE(page_off);
++	len = err;
++
++	osd_req_op_extent_osd_data_pages(req, 0, pages, len, 0, false, false);
++	req->r_callback = finish_netfs_read;
++	req->r_priv = subreq;
++	req->r_inode = inode;
++	ihold(inode);
++
++	err = ceph_osdc_start_request(req->r_osdc, req, false);
++	if (err)
++		iput(inode);
++out:
++	ceph_osdc_put_request(req);
++	if (err)
++		netfs_subreq_terminated(subreq, err);
++	dout("%s: result %d\n", __func__, err);
++}
++
++static void ceph_init_rreq(struct netfs_read_request *rreq, struct file *file)
++{
++}
++
++const struct netfs_read_request_ops ceph_readpage_netfs_ops = {
++	.init_rreq		= ceph_init_rreq,
++	.is_cache_enabled	= ceph_is_cache_enabled,
++	.begin_cache_operation	= ceph_begin_cache_operation,
++	.issue_op		= ceph_netfs_issue_op,
++	.clamp_length		= ceph_netfs_clamp_length,
++};
++
++/* read a single page, without unlocking it. */
++static int ceph_readpage(struct file *file, struct page *page)
++{
++	struct inode *inode = file_inode(file);
++	struct ceph_inode_info *ci = ceph_inode(inode);
++	struct ceph_vino vino = ceph_vino(inode);
++	u64 off = page_offset(page);
++	u64 len = PAGE_SIZE;
++
++	if (ci->i_inline_version != CEPH_INLINE_NONE) {
++		/*
++		 * Uptodate inline data should have been added
++		 * into page cache while getting Fcr caps.
++		 */
++		if (off == 0) {
++			unlock_page(page);
++			return -EINVAL;
++		}
++		zero_user_segment(page, 0, PAGE_SIZE);
++		SetPageUptodate(page);
++		unlock_page(page);
++		return 0;
++	}
++
++	dout("readpage ino %llx.%llx file %p off %llu len %llu page %p index %lu\n",
++	     vino.ino, vino.snap, file, off, len, page, page->index);
++
++	return netfs_readpage(file, page, &ceph_readpage_netfs_ops, NULL);
++}
++
+ /* read a single page, without unlocking it. */
+ static int ceph_do_readpage(struct file *filp, struct page *page)
+ {
+@@ -253,16 +392,6 @@ static int ceph_do_readpage(struct file *filp, struct page *page)
+ 	return err < 0 ? err : 0;
+ }
+ 
+-static int ceph_readpage(struct file *filp, struct page *page)
+-{
+-	int r = ceph_do_readpage(filp, page);
+-	if (r != -EINPROGRESS)
+-		unlock_page(page);
+-	else
+-		r = 0;
+-	return r;
+-}
+-
+ /*
+  * Finish an async read(ahead) op.
+  */
+diff --git a/fs/ceph/cache.h b/fs/ceph/cache.h
+index 10c21317b62f..1409d6149281 100644
+--- a/fs/ceph/cache.h
++++ b/fs/ceph/cache.h
+@@ -9,6 +9,8 @@
+ #ifndef _CEPH_CACHE_H
+ #define _CEPH_CACHE_H
+ 
++#include <linux/netfs.h>
++
+ #ifdef CONFIG_CEPH_FSCACHE
+ 
+ extern struct fscache_netfs ceph_cache_netfs;
+@@ -35,11 +37,31 @@ static inline void ceph_fscache_inode_init(struct ceph_inode_info *ci)
+ 	ci->fscache = NULL;
+ }
+ 
++static inline struct fscache_cookie *ceph_fscache_cookie(struct ceph_inode_info *ci)
++{
++	return ci->fscache;
++}
++
+ static inline void ceph_fscache_invalidate(struct inode *inode)
+ {
+ 	fscache_invalidate(ceph_inode(inode)->fscache);
+ }
+ 
++static inline bool ceph_is_cache_enabled(struct inode *inode)
++{
++	struct fscache_cookie *cookie = ceph_fscache_cookie(ceph_inode(inode));
++
++	if (!cookie)
++		return false;
++	return fscache_cookie_enabled(cookie);
++}
++
++static inline int ceph_begin_cache_operation(struct netfs_read_request *rreq)
++{
++	struct fscache_cookie *cookie = ceph_fscache_cookie(ceph_inode(rreq->inode));
++
++	return fscache_begin_read_operation(rreq, cookie);
++}
+ #else
+ 
+ static inline int ceph_fscache_register(void)
+@@ -65,6 +87,11 @@ static inline void ceph_fscache_inode_init(struct ceph_inode_info *ci)
+ {
+ }
+ 
++static inline struct fscache_cookie *ceph_fscache_cookie(struct ceph_inode_info *ci)
++{
++	return NULL;
++}
++
+ static inline void ceph_fscache_register_inode_cookie(struct inode *inode)
+ {
+ }
+@@ -82,6 +109,15 @@ static inline void ceph_fscache_invalidate(struct inode *inode)
+ {
+ }
+ 
++static inline bool ceph_is_cache_enabled(struct inode *inode)
++{
++	return false;
++}
++
++static inline int ceph_begin_cache_operation(struct netfs_read_request *rreq)
++{
++	return -ENOBUFS;
++}
+ #endif
+ 
+ #endif /* _CEPH_CACHE_H */
+
+
