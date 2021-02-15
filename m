@@ -7,186 +7,189 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA228C433DB
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 00:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F076C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 01:00:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80F7F64E52
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 00:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04A4964E52
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 01:00:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229899AbhBOAYh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 14 Feb 2021 19:24:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55729 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229837AbhBOAYh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 14 Feb 2021 19:24:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613348589;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=icyirenyNVPQ/6+Zc420o3Iw7zjp69we48horNqQpPg=;
-        b=PaFpoL9gjXjZSdWXJwxt0RShkpE9i6bNrqrFBLBLQ/2PQhBKTRFA63tlbF1zB/mGyNk2Sj
-        7txn+36m/u/5Xz+ieCS1/ENOCzLh1u4jf/NFE2Ulaj93Gtk41AuCohbKuEbg4cDp2VqI+2
-        CzYWEmPTHT7PpmVGu32R7KW0QB85+4w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-xtPvx-7lP1aR-4qYcHimfw-1; Sun, 14 Feb 2021 19:23:07 -0500
-X-MC-Unique: xtPvx-7lP1aR-4qYcHimfw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FB8D1005501;
-        Mon, 15 Feb 2021 00:23:05 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 013BD6F986;
-        Mon, 15 Feb 2021 00:22:57 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wi68OpbwBm6RCodhNUyg6x8N7vi5ufjRtosQSPy_EYqLA@mail.gmail.com>
-References: <CAHk-=wi68OpbwBm6RCodhNUyg6x8N7vi5ufjRtosQSPy_EYqLA@mail.gmail.com> <CAHk-=wj-k86FOqAVQ4ScnBkX3YEKuMzqTEB2vixdHgovJpHc9w@mail.gmail.com> <591237.1612886997@warthog.procyon.org.uk> <1330473.1612974547@warthog.procyon.org.uk> <1330751.1612974783@warthog.procyon.org.uk> <CAHk-=wjgA-74ddehziVk=XAEMTKswPu1Yw4uaro1R3ibs27ztw@mail.gmail.com> <27816.1613085646@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cachefs@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [GIT PULL] fscache: I/O API modernisation and netfs helper library
+        id S229928AbhBOBAQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 14 Feb 2021 20:00:16 -0500
+Received: from mailout3.samsung.com ([203.254.224.33]:39529 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229848AbhBOBAO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 14 Feb 2021 20:00:14 -0500
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210215005931epoutp031a1de999ebc30ae4c5704f9fc97ddf8a~jxfqGsf312782127821epoutp03S
+        for <linux-cifs@vger.kernel.org>; Mon, 15 Feb 2021 00:59:31 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210215005931epoutp031a1de999ebc30ae4c5704f9fc97ddf8a~jxfqGsf312782127821epoutp03S
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1613350771;
+        bh=SfYFblpSib/Vr1j+2XMm6Ietkk5NSHooqY/HQ7G8Seg=;
+        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+        b=qjRJ6JvYwv4kyFTLcgTY54xwRqTZVKtiy0S0FmkTXhwmmKyUpaSHMaCuPtIA/V8PI
+         3e/m3IiCuXE501L+XsVLruYPmhTxE/T85QiywB3ZeFZagorxjUm/KT9DcWlpxdUoe/
+         QZc7MzKUYXoieXnYuw3GxstWBX03owzfqABywJc0=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
+        20210215005930epcas1p435d4e6cbf44db980cfdde7571e36cb95~jxfpmMTOW0985009850epcas1p4L;
+        Mon, 15 Feb 2021 00:59:30 +0000 (GMT)
+Received: from epsmges1p1.samsung.com (unknown [182.195.40.160]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4Df5NK6Pt3z4x9QF; Mon, 15 Feb
+        2021 00:59:29 +0000 (GMT)
+Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
+        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        03.EF.02418.177C9206; Mon, 15 Feb 2021 09:59:29 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
+        20210215005929epcas1p49aacc3d06efa8e70eb99c745d15fa839~jxfoD3GLQ2852528525epcas1p4h;
+        Mon, 15 Feb 2021 00:59:29 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20210215005929epsmtrp1403ed34dc7aa307dc04c0ed1b2b6dbb2~jxfoDMw4y0077500775epsmtrp1G;
+        Mon, 15 Feb 2021 00:59:29 +0000 (GMT)
+X-AuditID: b6c32a35-c0dff70000010972-b0-6029c771b154
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        87.11.13470.077C9206; Mon, 15 Feb 2021 09:59:29 +0900 (KST)
+Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20210215005928epsmtip1c6861c2e6ea205f3c2dccb3ed76e5ce6~jxfn324LX1862218622epsmtip18;
+        Mon, 15 Feb 2021 00:59:28 +0000 (GMT)
+From:   "Namjae Jeon" <namjae.jeon@samsung.com>
+To:     "'Stefan Metzmacher'" <metze@samba.org>
+Cc:     "'Namjae Jeon'" <linkinjeon@kernel.org>,
+        <linux-cifsd-devel@lists.sourceforge.net>,
+        "'Samba Technical'" <samba-technical@lists.samba.org>,
+        <linux-cifs@vger.kernel.org>
+In-Reply-To: <adf41e69-5915-06aa-6f8b-8ffc073fc8a7@samba.org>
+Subject: RE: ksmbd ABI for ksmbd-tools...
+Date:   Mon, 15 Feb 2021 09:59:29 +0900
+Message-ID: <009101d70335$d02bcb40$708361c0$@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <860728.1613348577.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Mon, 15 Feb 2021 00:22:57 +0000
-Message-ID: <860729.1613348577@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQLNkXaegPBuGsSfX03ExGj/IX/q7QD54CbSqGNkVFA=
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuplk+LIzCtJLcpLzFFi42LZdljTQLfwuGaCwcG5ehYTpy1ltnjxfxez
+        xc//3xktLi77yWLxZ8l+dgdWj02rOtk85s+exeSxe8FnJo+5u/oYPT5vkgtgjcqxyUhNTEkt
+        UkjNS85PycxLt1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAFarqRQlphTChQKSCwu
+        VtK3synKLy1JVcjILy6xVUotSMkpMDQo0CtOzC0uzUvXS87PtTI0MDAyBapMyMl4/L2XueCo
+        XEX3vlaWBsZL4l2MnBwSAiYSf6ZcY+1i5OIQEtjBKLHl/n82kISQwCdGiTOnXCES3xglVh8/
+        xATT8fXqYmaIxF5GiffP57JAOC8ZJeYsfgjWziagK/Hvz34wW0RAW+LQqzvsIEXMAusZJeZv
+        uMsCkuAUsJU4M3EFM4gtLKAp8fftOVYQm0VAVeLqoQ1gNbwClhJfXn1ghbAFJU7OfAIWZxaQ
+        l9j+dg4zxEkKEj+fLmOFWGYl8eE+xExmARGJ2Z1tUDWdHBJ/9vpB2C4Sd9YuZ4WwhSVeHd/C
+        DmFLSbzsbwOyOYDsaomP+6FaOxglXny3hbCNJW6u38AKUsIMdPL6XfoQYUWJnb/nMkJs5ZN4
+        97WHFWIKr0RHmxBEiapE36XD0DCUluhq/8A+gVFpFpK/ZiH5axaS+2chLFvAyLKKUSy1oDg3
+        PbXYsMAQOa43MYLTpZbpDsaJbz/oHWJk4mA8xCjBwawkwntVQiNBiDclsbIqtSg/vqg0J7X4
+        EKMpMKQnMkuJJucDE3ZeSbyhqZGxsbGFiZm5mamxkjhvksGDeCGB9MSS1OzU1ILUIpg+Jg5O
+        qQYmsWaL5PvqDcGW8xZ06jRWRMSKhM+RkmLy+8sVxtJde2DXquol33qqlv+LKpew5hGM43Z/
+        8O6A1LQgh0sv/9awT0m+2sQdxXTHf3frf7ML/ofZj2w1uCoS27lr41P/pQIbVMyM6274rd76
+        fF2qSPgZgwPLjv/9kfnGpmbmRdkDd/UfPFq/WOuCRqXCoVJbp7p5a1g35MlU5CqYHy3+vHHi
+        N0XeLM7stl+OB9cn2SUyP+RdLHjvkMn3eSG3Z+rF37e482P1t64zvj4WBh+8oq/NXSpW/ilR
+        /G/nWe99apVzfOfHmXtcWebi1iS9aOK3zXyr9YQndOnX+WWdkPh59sKVm7emn0vKiL2Qp2cU
+        eX6KEktxRqKhFnNRcSIAukSr8iAEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrFLMWRmVeSWpSXmKPExsWy7bCSnG7hcc0Egx1TGC0mTlvKbPHi/y5m
+        i5//vzNaXFz2k8Xiz5L97A6sHptWdbJ5zJ89i8lj94LPTB5zd/UxenzeJBfAGsVlk5Kak1mW
+        WqRvl8CV8fh7L3PBUbmK7n2tLA2Ml8S7GDk5JARMJL5eXczcxcjFISSwm1Gi5dFnFoiEtMSx
+        E2eAEhxAtrDE4cPFEDXPGSWmPugCq2ET0JX492c/G4gtIqAtcejVHXaQImaBjYwShxbOZYLo
+        6GOU2LPyPVgHp4CtxJmJK5hBbGEBTYm/b8+xgtgsAqoSVw9tAKvhFbCU+PLqAyuELShxcuYT
+        sDgz0Ibeh62MELa8xPa3c5ghLlWQ+Pl0GSvEFVYSH+5DzGcWEJGY3dnGPIFReBaSUbOQjJqF
+        ZNQsJC0LGFlWMUqmFhTnpucWGxYY5qWW6xUn5haX5qXrJefnbmIER4+W5g7G7as+6B1iZOJg
+        PMQowcGsJMJ7VUIjQYg3JbGyKrUoP76oNCe1+BCjNAeLkjjvha6T8UIC6YklqdmpqQWpRTBZ
+        Jg5OqQammO1ecr7nWOQOfzA//Ff8dbRBnrd9nGVCMePan6d83izcnZ0kcmSJdmy3ne+1v7mX
+        4zcXnKn1cra203O46qJwb/pU7tD2xfXqntN/FD+J2OPyXDbKVrlb4vcqgQlNOrOCm2Z999EI
+        +PTsxLTVDR/KT52vkpvacdv4t7xPo0/gnqvuavaVc5/UXdnvXDh16Xr9j3wveLZzflrXcv7u
+        7/s9p17M0HefM908TTn+g5Pyu1sZ/3dEJh8p37bS5OKBL3bxP/xkbyYyrap3UTg60Wpi7s+s
+        O++eb1BK0G5Jcv9drH3ihIXZ6v1/dRsaA6oscxs6dz9RTbjMc5s/7YTvOqcV0gYH7m6X4QyN
+        mSU2/0a8EktxRqKhFnNRcSIAyFYPuA0DAAA=
+X-CMS-MailID: 20210215005929epcas1p49aacc3d06efa8e70eb99c745d15fa839
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210212143813epcas1p1dcbff2491a1c7cf052c03e57f54e1474
+References: <CGME20210212143813epcas1p1dcbff2491a1c7cf052c03e57f54e1474@epcas1p1.samsung.com>
+        <adf41e69-5915-06aa-6f8b-8ffc073fc8a7@samba.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+> Hi Namjae,
+Hi Metze,
+> 
+> I looked through the interfaces used between userspace (ksmbd.mountd and ksmbd.control) and the kernel
+> module.
+> 
+> After loading the ksmbd.ko module and calling 'ksmbd.mountd', I see the following related
+> proceses/kernel-threads:
+> 
+>   12200 ?        I      0:00 [kworker/0:0-ksmbd-io]
+>   12247 ?        Ss     0:00 ksmbd.mountd
+>   12248 ?        S      0:00 ksmbd.mountd
+>   12249 ?        S      0:00 [ksmbd-lo]
+>   12250 ?        S      0:00 [ksmbd-enp0s3]
+>   12251 ?        S      0:00 [ksmbd-enp0s8]
+>   12252 ?        S      0:00 [ksmbd-enp0s9]
+>   12253 ?        S      0:00 [ksmbd-enp0s10]
+>   12254 ?        I<     0:00 [ksmbd-smb_direc]
+>   12255 ?        S      0:00 [ksmbd:38794]
+>   12257 ?        S      0:00 [ksmbd:51579]
+> 
+> I haven't found the exact place, but ksmbd.mountd starts the kernel-part.
+> 
+> ksmbd.mountd also acts as some kind of upcall, for the server part, that takes care of authentication
+> and some basic DCERPC calls.
+> 
+> I'm wondering why there are two separate ways to kill the running server, 'killall ksmbd.mountd' for
+> the userspace part and 'ksmbd.control -s' (which is just a wrapper for 'echo -n "hard" >
+> /sys/class/ksmbd-control/kill_server') to shutdown the server part.
+Hm.. We can add the code that kill ksmbd.mountd in ksmbd.control -s.
+> 
+> As it's not useful to run any of these two components on its own, so I'm wondering why there's no
+> stronger relationship.
+Sergey answered.
+> 
+> As naive admin I'd assume that the kernel part would detect the exit of ksmbd.mountd and shutdown
+> itself.
+Sergey answered.
+> 
+> It would also be great to bind to specific ip addresses instead of devices and allow to run more than
+> one instance of ksmbd.mountd (with different config files and or within containers). That's why I
+> think single global hardcoded path like '/sys/class/ksmbd-control/kill_server' should be avoided,
+> something like:
+> '/sys/class/ksmbd-control/<pid-of-ksmbd.mountd>/kill_server' would be better (if it's needed at all).
+Could you please elaborate more why we should do this ?
 
-> But no, it's not a replacement for actual code review after the fact.
-> =
+> 
+> I also have ideas how ksmbd{.ok,.mountd} could make use of Samba's winbindd (or authentication) and
+> Samba's rpc services, but this would require a few changes in the netlink protocol between ksmbd.ko
+> and ksmbd.mountd. It would be great if a Samba smb.conf option could cause smbd to start ksmbd.mountd
+> in the background and delegate all raw SMB handling to the kernel.
+It's what I plan to do in the long run. It would be great for ksmbd to fully support the function
+using samba's library. But I don't think ksmbd should have dependency on such samba's libraries.
+i.e. If we change the existing netlink protocol in ksmbd to use samba's winbindd and librpc,
+The current users using ksmbd on closed systems may not be able to use ksmbd due to GPLv3. So, This
+should be a new netlink protocol addition or extension, not change the existing ones.
 
-> If you think email has too long latency for review, and can't use
-> public mailing lists and cc the people who are maintainers, then I
-> simply don't want your patches.
-
-I think we were talking at cross-purposes by the term "development" here. =
- I
-was referring to the discussion of how the implementation should be done a=
-nd
-working closely with colleagues - both inside and outside Red Hat - to get
-things working, not specifically the public review side of things.  It's j=
-ust
-that I don't have a complete record of the how-to-implement-it, the
-how-to-get-various-bits-working-together and the why-is-it-not-working?
-discussions.
-
-Anyway, I have posted my fscache modernisation patches multiple times for
-public review, I have tried to involve the wider community in aspects of t=
-he
-development on public mailing lists and I have been including the maintain=
-ers
-in to/cc.
-
-I've posted the more full patchset for public review a number of times:
-
-4th May 2020:
-https://lore.kernel.org/linux-fsdevel/158861203563.340223.7585359869938129=
-395.stgit@warthog.procyon.org.uk/
-
-13th Jul (split into three subsets):
-https://lore.kernel.org/linux-fsdevel/159465766378.1376105.116199762510392=
-87525.stgit@warthog.procyon.org.uk/
-https://lore.kernel.org/linux-fsdevel/159465784033.1376674.181064636939898=
-11037.stgit@warthog.procyon.org.uk/
-https://lore.kernel.org/linux-fsdevel/159465821598.1377938.204636227022500=
-8168.stgit@warthog.procyon.org.uk/
-
-20th Nov:
-https://lore.kernel.org/linux-fsdevel/160588455242.3465195.321473385827301=
-9178.stgit@warthog.procyon.org.uk/
-
-I then cut it down and posted that publically a couple of times:
-
-20th Jan:
-https://lore.kernel.org/linux-fsdevel/161118128472.1232039.117467998330664=
-25131.stgit@warthog.procyon.org.uk/
-
-25th Jan:
-https://lore.kernel.org/linux-fsdevel/161161025063.2537118.200924944468224=
-1405.stgit@warthog.procyon.org.uk/
-
-I let you know what was coming here:
-https://lore.kernel.org/linux-fsdevel/447452.1596109876@warthog.procyon.or=
-g.uk/
-https://lore.kernel.org/linux-fsdevel/2522190.1612544534@warthog.procyon.o=
-rg.uk/
-
-to try and find out whether you were going to have any objections to the
-design in advance, rather than at the last minute.
-
-I've apprised people of what I was up to:
-https://lore.kernel.org/lkml/24942.1573667720@warthog.procyon.org.uk/
-https://lore.kernel.org/linux-fsdevel/2758811.1610621106@warthog.procyon.o=
-rg.uk/
-https://lore.kernel.org/linux-fsdevel/1441311.1598547738@warthog.procyon.o=
-rg.uk/
-https://lore.kernel.org/linux-fsdevel/160655.1611012999@warthog.procyon.or=
-g.uk/
-
-Asked for consultation on parts of what I wanted to do:
-https://lore.kernel.org/linux-fsdevel/3326.1579019665@warthog.procyon.org.=
-uk/
-https://lore.kernel.org/linux-fsdevel/4467.1579020509@warthog.procyon.org.=
-uk/
-https://lore.kernel.org/linux-fsdevel/3577430.1579705075@warthog.procyon.o=
-rg.uk/
-
-Asked someone who is actually using fscache in production to test the rewr=
-ite:
-https://listman.redhat.com/archives/linux-cachefs/2020-December/msg00000.h=
-tml
-
-I've posted partial patches to try and help 9p and cifs along:
-https://lore.kernel.org/linux-fsdevel/1514086.1605697347@warthog.procyon.o=
-rg.uk/
-https://lore.kernel.org/linux-cifs/1794123.1605713481@warthog.procyon.org.=
-uk/
-https://lore.kernel.org/linux-fsdevel/241017.1612263863@warthog.procyon.or=
-g.uk/
-https://lore.kernel.org/linux-cifs/270998.1612265397@warthog.procyon.org.u=
-k/
-
-(Jeff has been handling Ceph and Dave NFS).
-
-Proposed conference topics related to this:
-https://lore.kernel.org/linux-fsdevel/9608.1575900019@warthog.procyon.org.=
-uk/
-https://lore.kernel.org/linux-fsdevel/14196.1575902815@warthog.procyon.org=
-.uk/
-https://lore.kernel.org/linux-fsdevel/364531.1579265357@warthog.procyon.or=
-g.uk/
-
-though the lockdown put paid to that:-(
-
-Willy has discussed it too:
-https://lore.kernel.org/linux-fsdevel/20200826193116.GU17456@casper.infrad=
-ead.org/
-
-David
+> 
+> So my main big question is how stable would the userspace interface to ksmbd.ko be treated?
+Sergey answered. If his answer is not enough, Let me know it.
+> 
+> Would it be possible to change the netlink protocol or /sys/class/* behavior in future in order to
+> improve things?
+Yes.
+> 
+> Can we require that the userspace tool matches the kernel version for a while?
+Sergey answered. If there is a better way than now, please give me your opinion.
+> 
+> I think iproute2 creates a version for each stable kernel tree and tools like bpftool, perf even come
+> with each single kernel release.
+Ah. Even if there is no change in source, Does it release according to the kernel version?
+It would be better that ksmbd-tools also is merged into kernel/tools like bfptool or perf,
+but I am not sure if it is possible. nfs-utils seems to be managed well apart from the kernel version.
+> 
+Thanks!
 
