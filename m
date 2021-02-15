@@ -4,60 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1268C43381
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 499E1C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:49:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FC2A64DE0
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:48:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1505364DDA
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Feb 2021 15:49:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231579AbhBOPsH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Feb 2021 10:48:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58226 "EHLO
+        id S231487AbhBOPsc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Feb 2021 10:48:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41576 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231522AbhBOPqE (ORCPT
+        by vger.kernel.org with ESMTP id S231338AbhBOPqR (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 15 Feb 2021 10:46:04 -0500
+        Mon, 15 Feb 2021 10:46:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613403866;
+        s=mimecast20190719; t=1613403890;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=OUcau2RScLJC1sbBhCFeWAqe5oOjO8CLqdBwSyrKW/k=;
-        b=CPkujOIuGFUtXC/fZg6OE5tIXxwCrMswbQeLFJ76pOuwS8x1Gl8Lv8sa6rXhemy7xy6TcO
-        u0NwCLrzGFcqiR6VWNxL53/QAxw4SPyvYbr4PwY/uIsUkV8EewjCVISsGXQjC0a9XO7aMG
-        jzR/BliLdo7/f0aq/vhx7IWW+xz+U6g=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eRjZtsA5zhSS/WW5VYasjVbQdw0rYUOiOpY9AmwMNHQ=;
+        b=i47rPONr3SPATkRDe9UWHj5Z1nez118tvZzzo6Y4u1GBA8bySc46UekOr3CUQVNCmgB+go
+        ai+CGTZvzhrgudImHTTH7+g2HmL+KPPzHOOtYnxg5U49mpp7SfiV/fyD4mAnaITEqIlRaw
+        +ePfve4w7ULA6m8I2ARVv8UVz1sqXK4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-TJr8slT8P9GEspE4LilBZQ-1; Mon, 15 Feb 2021 10:44:24 -0500
-X-MC-Unique: TJr8slT8P9GEspE4LilBZQ-1
+ us-mta-448-MqlpGAkWNeC56cKekoPN7Q-1; Mon, 15 Feb 2021 10:44:49 -0500
+X-MC-Unique: MqlpGAkWNeC56cKekoPN7Q-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 736BB79EC2;
-        Mon, 15 Feb 2021 15:44:21 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFEF1107ACC7;
+        Mon, 15 Feb 2021 15:44:46 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 38F3B608DB;
-        Mon, 15 Feb 2021 15:44:14 +0000 (UTC)
-Subject: [PATCH 00/33] Network fs helper library & fscache kiocb API [ver #3]
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 462C060CEF;
+        Mon, 15 Feb 2021 15:44:40 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH 02/33] mm: Add an unlock function for PG_private_2/PG_fscache
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>
-Cc:     linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        Jeff Layton <jlayton@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, linux-cachefs@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>, linux-mm@kvack.org,
-        linux-afs@lists.infradead.org,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        v9fs-developer@lists.sourceforge.net,
-        Christoph Hellwig <hch@lst.de>, linux-fsdevel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, Jeff Layton <jlayton@kernel.org>,
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, dhowells@redhat.com,
+        Jeff Layton <jlayton@redhat.com>,
         David Wysochanski <dwysocha@redhat.com>,
         "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
@@ -65,8 +69,10 @@ Cc:     linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 15 Feb 2021 15:44:13 +0000
-Message-ID: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
+Date:   Mon, 15 Feb 2021 15:44:39 +0000
+Message-ID: <161340387944.1303470.7944159520278177652.stgit@warthog.procyon.org.uk>
+In-Reply-To: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
+References: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
@@ -76,232 +82,80 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Add a function, unlock_page_private_2(), to unlock PG_private_2 analogous
+to that of PG_lock.  Add a kerneldoc banner to that indicating the example
+usage case.
 
-Here's a set of patches to do two things:
+A wrapper will need to be placed in the netfs header in the patch that adds
+that.
 
- (1) Add a helper library to handle the new VM readahead interface.  This
-     is intended to be used unconditionally by the filesystem (whether or
-     not caching is enabled) and provides a common framework for doing
-     caching, transparent huge pages and, in the future, possibly fscrypt
-     and read bandwidth maximisation.  It also allows the netfs and the
-     cache to align, expand and slice up a read request from the VM in
-     various ways; the netfs need only provide a function to read a stretch
-     of data to the pagecache and the helper takes care of the rest.
+[This implements a suggestion by Linus to not mix the terminology of
+ PG_private_2 and PG_fscache in the mm core function]
 
- (2) Add an alternative fscache/cachfiles I/O API that uses the kiocb
-     facility to do async DIO to transfer data to/from the netfs's pages,
-     rather than using readpage with wait queue snooping on one side and
-     vfs_write() on the other.  It also uses less memory, since it doesn't
-     do buffered I/O on the backing file.
-
-     Note that this uses SEEK_HOLE/SEEK_DATA to locate the data available
-     to be read from the cache.  Whilst this is an improvement from the
-     bmap interface, it still has a problem with regard to a modern
-     extent-based filesystem inserting or removing bridging blocks of
-     zeros.  Fixing that requires a much greater overhaul.
-
-This is a step towards overhauling the fscache API.  The change is opt-in
-on the part of the network filesystem.  A netfs should not try to mix the
-old and the new API because of conflicting ways of handling pages and the
-PG_fscache page flag and because it would be mixing DIO with buffered I/O.
-Further, the helper library can't be used with the old API.
-
-This does not change any of the fscache cookie handling APIs or the way
-invalidation is done.
-
-In the near term, I intend to deprecate and remove the old I/O API
-(fscache_allocate_page{,s}(), fscache_read_or_alloc_page{,s}(),
-fscache_write_page() and fscache_uncache_page()) and eventually replace
-most of fscache/cachefiles with something simpler and easier to follow.
-
-The patchset contains five parts:
-
- (1) Some helper patches, including provision of an ITER_XARRAY iov
-     iterator and a function to do readahead expansion.
-
- (2) Patches to add the netfs helper library.
-
- (3) A patch to add the fscache/cachefiles kiocb API.
-
- (4) Patches to add support in AFS for this.
-
- (5) Patches from Jeff Layton to add support in Ceph for this.
-
-Dave Wysochanski also has patches for NFS for this, though they're not
-included on this branch as there's an issue with PNFS.
-
-With this, AFS without a cache passes all expected xfstests; with a cache,
-there's an extra failure, but that's also there before these patches.
-Fixing that probably requires a greater overhaul.  Ceph and NFS also pass
-the expected tests.
-
-These patches can be found also on:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=fscache-netfs-lib
-
-For diffing reference, the tag for the 9th Feb pull request is
-fscache-ioapi-20210203 and can be found in the same repository.
-
-
-
-Changes
-=======
-
- (v3) Rolled in the bug fixes.
-
-      Adjusted the functions that unlock and wait for PG_fscache according
-      to Linus's suggestion.
-
-      Hold a ref on a page when PG_fscache is set as per Linus's
-      suggestion.
-
-      Dropped NFS support and added Ceph support.
-
- (v2) Fixed some bugs and added NFS support.
-
-
-References
-==========
-
-These patches have been published for review before, firstly as part of a
-larger set:
-
-Link: https://lore.kernel.org/linux-fsdevel/158861203563.340223.7585359869938129395.stgit@warthog.procyon.org.uk/
-
-Link: https://lore.kernel.org/linux-fsdevel/159465766378.1376105.11619976251039287525.stgit@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-fsdevel/159465784033.1376674.18106463693989811037.stgit@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-fsdevel/159465821598.1377938.2046362270225008168.stgit@warthog.procyon.org.uk/
-
-Link: https://lore.kernel.org/linux-fsdevel/160588455242.3465195.3214733858273019178.stgit@warthog.procyon.org.uk/
-
-Then as a cut-down set:
-
-Link: https://lore.kernel.org/linux-fsdevel/161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk/
-
-Link: https://lore.kernel.org/linux-fsdevel/161161025063.2537118.2009249444682241405.stgit@warthog.procyon.org.uk/
-
-
-Proposals/information about the design has been published here:
-
-Link: https://lore.kernel.org/lkml/24942.1573667720@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-fsdevel/2758811.1610621106@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-fsdevel/1441311.1598547738@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-fsdevel/160655.1611012999@warthog.procyon.org.uk/
-
-And requests for information:
-
-Link: https://lore.kernel.org/linux-fsdevel/3326.1579019665@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-fsdevel/4467.1579020509@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-fsdevel/3577430.1579705075@warthog.procyon.org.uk/
-
-The NFS parts, though not included here, have been tested by someone who's
-using fscache in production:
-
-Link: https://listman.redhat.com/archives/linux-cachefs/2020-December/msg00000.html
-
-I've posted partial patches to try and help 9p and cifs along:
-
-Link: https://lore.kernel.org/linux-fsdevel/1514086.1605697347@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-cifs/1794123.1605713481@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-fsdevel/241017.1612263863@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/linux-cifs/270998.1612265397@warthog.procyon.org.uk/
-
-David
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Linus Torvalds <torvalds@linux-foundation.org>
+cc: Matthew Wilcox (Oracle) <willy@infradead.org>
+cc: Alexander Viro <viro@zeniv.linux.org.uk>
+cc: Christoph Hellwig <hch@lst.de>
+cc: linux-mm@kvack.org
+cc: linux-cachefs@redhat.com
+cc: linux-afs@lists.infradead.org
+cc: linux-nfs@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: ceph-devel@vger.kernel.org
+cc: v9fs-developer@lists.sourceforge.net
+cc: linux-fsdevel@vger.kernel.org
+Link: https://lore.kernel.org/linux-fsdevel/1330473.1612974547@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/linux-fsdevel/CAHk-=wjgA-74ddehziVk=XAEMTKswPu1Yw4uaro1R3ibs27ztw@mail.gmail.com/
 ---
-David Howells (27):
-      iov_iter: Add ITER_XARRAY
-      mm: Add an unlock function for PG_private_2/PG_fscache
-      mm: Implement readahead_control pageset expansion
-      vfs: Export rw_verify_area() for use by cachefiles
-      netfs: Make a netfs helper module
-      netfs, mm: Move PG_fscache helper funcs to linux/netfs.h
-      netfs, mm: Add unlock_page_fscache() and wait_on_page_fscache()
-      netfs: Provide readahead and readpage netfs helpers
-      netfs: Add tracepoints
-      netfs: Gather stats
-      netfs: Add write_begin helper
-      netfs: Define an interface to talk to a cache
-      netfs: Hold a ref on a page when PG_private_2 is set
-      fscache, cachefiles: Add alternate API to use kiocb for read/write to cache
-      afs: Disable use of the fscache I/O routines
-      afs: Pass page into dirty region helpers to provide THP size
-      afs: Print the operation debug_id when logging an unexpected data version
-      afs: Move key to afs_read struct
-      afs: Don't truncate iter during data fetch
-      afs: Log remote unmarshalling errors
-      afs: Set up the iov_iter before calling afs_extract_data()
-      afs: Use ITER_XARRAY for writing
-      afs: Wait on PG_fscache before modifying/releasing a page
-      afs: Extract writeback extension into its own function
-      afs: Prepare for use of THPs
-      afs: Use the fs operation ops to handle FetchData completion
-      afs: Use new fscache read helper API
 
-Jeff Layton (6):
-      ceph: disable old fscache readpage handling
-      ceph: rework PageFsCache handling
-      ceph: fix fscache invalidation
-      ceph: convert readpage to fscache read helper
-      ceph: plug write_begin into read helper
-      ceph: convert ceph_readpages to ceph_readahead
+ include/linux/pagemap.h |    1 +
+ mm/filemap.c            |   20 ++++++++++++++++++++
+ 2 files changed, 21 insertions(+)
 
-
- fs/Kconfig                    |    1 +
- fs/Makefile                   |    1 +
- fs/afs/Kconfig                |    1 +
- fs/afs/dir.c                  |  225 ++++---
- fs/afs/file.c                 |  470 ++++---------
- fs/afs/fs_operation.c         |    4 +-
- fs/afs/fsclient.c             |  108 +--
- fs/afs/inode.c                |    7 +-
- fs/afs/internal.h             |   58 +-
- fs/afs/rxrpc.c                |  150 ++---
- fs/afs/write.c                |  610 +++++++++--------
- fs/afs/yfsclient.c            |   82 +--
- fs/cachefiles/Makefile        |    1 +
- fs/cachefiles/interface.c     |    5 +-
- fs/cachefiles/internal.h      |    9 +
- fs/cachefiles/rdwr2.c         |  412 ++++++++++++
- fs/ceph/Kconfig               |    1 +
- fs/ceph/addr.c                |  535 ++++++---------
- fs/ceph/cache.c               |  125 ----
- fs/ceph/cache.h               |  101 +--
- fs/ceph/caps.c                |   10 +-
- fs/ceph/inode.c               |    1 +
- fs/ceph/super.h               |    1 +
- fs/fscache/Kconfig            |    1 +
- fs/fscache/Makefile           |    3 +-
- fs/fscache/internal.h         |    3 +
- fs/fscache/page.c             |    2 +-
- fs/fscache/page2.c            |  117 ++++
- fs/fscache/stats.c            |    1 +
- fs/internal.h                 |    5 -
- fs/netfs/Kconfig              |   23 +
- fs/netfs/Makefile             |    5 +
- fs/netfs/internal.h           |   97 +++
- fs/netfs/read_helper.c        | 1169 +++++++++++++++++++++++++++++++++
- fs/netfs/stats.c              |   59 ++
- fs/read_write.c               |    1 +
- include/linux/fs.h            |    1 +
- include/linux/fscache-cache.h |    4 +
- include/linux/fscache.h       |   40 +-
- include/linux/netfs.h         |  195 ++++++
- include/linux/pagemap.h       |    3 +
- include/net/af_rxrpc.h        |    2 +-
- include/trace/events/afs.h    |   74 +--
- include/trace/events/netfs.h  |  201 ++++++
- mm/filemap.c                  |   20 +
- mm/readahead.c                |   70 ++
- net/rxrpc/recvmsg.c           |    9 +-
- 47 files changed, 3473 insertions(+), 1550 deletions(-)
- create mode 100644 fs/cachefiles/rdwr2.c
- create mode 100644 fs/fscache/page2.c
- create mode 100644 fs/netfs/Kconfig
- create mode 100644 fs/netfs/Makefile
- create mode 100644 fs/netfs/internal.h
- create mode 100644 fs/netfs/read_helper.c
- create mode 100644 fs/netfs/stats.c
- create mode 100644 include/linux/netfs.h
- create mode 100644 include/trace/events/netfs.h
+diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+index d5570deff400..365a28ece763 100644
+--- a/include/linux/pagemap.h
++++ b/include/linux/pagemap.h
+@@ -591,6 +591,7 @@ extern int __lock_page_async(struct page *page, struct wait_page_queue *wait);
+ extern int __lock_page_or_retry(struct page *page, struct mm_struct *mm,
+ 				unsigned int flags);
+ extern void unlock_page(struct page *page);
++extern void unlock_page_private_2(struct page *page);
+ 
+ /*
+  * Return true if the page was successfully locked
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 5c9d564317a5..7d321152d579 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1466,6 +1466,26 @@ void unlock_page(struct page *page)
+ }
+ EXPORT_SYMBOL(unlock_page);
+ 
++/**
++ * unlock_page_private_2 - Unlock a page that's locked with PG_private_2
++ * @page: The page
++ *
++ * Unlocks a page that's locked with PG_private_2 and wakes up sleepers in
++ * wait_on_page_private_2().
++ *
++ * This is, for example, used when a netfs page is being written to a local
++ * disk cache, thereby allowing writes to the cache for the same page to be
++ * serialised.
++ */
++void unlock_page_private_2(struct page *page)
++{
++	page = compound_head(page);
++	VM_BUG_ON_PAGE(!PagePrivate2(page), page);
++	clear_bit_unlock(PG_private_2, &page->flags);
++	wake_up_page_bit(page, PG_private_2);
++}
++EXPORT_SYMBOL(unlock_page_private_2);
++
+ /**
+  * end_page_writeback - end writeback against a page
+  * @page: the page
 
 
