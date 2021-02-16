@@ -2,238 +2,167 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90077C433DB
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Feb 2021 12:09:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D88C433DB
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Feb 2021 12:30:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3876664DA5
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Feb 2021 12:09:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3E9664DDA
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Feb 2021 12:30:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbhBPMJW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Feb 2021 07:09:22 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46222 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229807AbhBPMJV (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 16 Feb 2021 07:09:21 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2D4FD64DEC;
-        Tue, 16 Feb 2021 12:08:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1613477319;
-        bh=N6IPz8XGOy0RF1NT74Z7eRigRqaB8x6X5g527PxF5RQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Ue+XGyHFzpeClX9mdf4W19RMMHxIBgpWc3l2p8ZY+Miiixo5HvUv2TgXfsJDH3hix
-         rUzDtieqzYLWFVkOub4X2EO1pFXRRxQ6Aawh6BGDbZCrdurRSxGvJUmBmWXVRwiCSZ
-         3xyfXFRIQMeWuBHdZQGk3mY8kK9tUcNlVd+55GC0=
-Date:   Tue, 16 Feb 2021 13:08:37 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Luis Henriques <lhenriques@suse.de>
-Cc:     Amir Goldstein <amir73il@gmail.com>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "drinkcat@chromium.org" <drinkcat@chromium.org>,
-        "iant@google.com" <iant@google.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "jlayton@kernel.org" <jlayton@kernel.org>,
-        "anna.schumaker@netapp.com" <anna.schumaker@netapp.com>,
-        "llozano@chromium.org" <llozano@chromium.org>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        "miklos@szeredi.hu" <miklos@szeredi.hu>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "dchinner@redhat.com" <dchinner@redhat.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "sfrench@samba.org" <sfrench@samba.org>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>
-Subject: Re: [PATCH v2] vfs: prevent copy_file_range to copy across devices
-Message-ID: <YCu1xe9PLVhmFMEM@kroah.com>
-References: <CAOQ4uxiFGjdvX2-zh5o46pn7RZhvbGHH0wpzLPuPOom91FwWeQ@mail.gmail.com>
- <20210215154317.8590-1-lhenriques@suse.de>
- <CAOQ4uxgjcCrzDkj-0ukhvHRgQ-D+A3zU5EAe0A=s1Gw2dnTJSA@mail.gmail.com>
- <73ab4951f48d69f0183548c7a82f7ae37e286d1c.camel@hammerspace.com>
- <CAOQ4uxgPtqG6eTi2AnAV4jTAaNDbeez+Xi2858mz1KLGMFntfg@mail.gmail.com>
- <92d27397479984b95883197d90318ee76995b42e.camel@hammerspace.com>
- <CAOQ4uxjUf15fDjz11pCzT3GkFmw=2ySXR_6XF-Bf-TfUwpj77Q@mail.gmail.com>
- <87r1lgjm7l.fsf@suse.de>
- <YCuseTMyjL+9sWum@kroah.com>
- <87k0r8jk6r.fsf@suse.de>
+        id S229827AbhBPMaJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Feb 2021 07:30:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54418 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229780AbhBPMaH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 Feb 2021 07:30:07 -0500
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1316C061786
+        for <linux-cifs@vger.kernel.org>; Tue, 16 Feb 2021 04:29:26 -0800 (PST)
+Received: by mail-yb1-xb2e.google.com with SMTP id p186so10302637ybg.2
+        for <linux-cifs@vger.kernel.org>; Tue, 16 Feb 2021 04:29:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Dk/kmP4YEEjwvgLxXa/bzqD/OCSIumYVTeoGpXoNCzI=;
+        b=UGJZzUFV9ZY1ve1cQDhZnnct/LPQj6DhcG0A9RLJi2f5ZD67H1pdm8gKqOo4OqGl0f
+         RDAc+2OLfglv3vXNGaxCMmFvzn/wo0H0TZtLXnPEN/Abfr0O9wgw0YXNuCN/lVnM3yR/
+         k0D3GVvvkx3S4s2Z6b3BvwWUcnJ6RHff3kL8H9DY8PYhFhBgqK5G/ecG1cEAsiSsbeJ8
+         k9ZbDym18nQGdVoAqFihSR1q3BS2Oyni2iJYa2Kw+Di4byixEjZzjObYSgmik8lOFNoS
+         lIkA/RNwGG/UcjBevxzErdRHFDa7wStsAJG4DdeG2m4pOZ68TimqLNELHsQZZelm3m4W
+         tHtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Dk/kmP4YEEjwvgLxXa/bzqD/OCSIumYVTeoGpXoNCzI=;
+        b=D1mYd01OC5wo3rOhF5LzyJxbH3BFWes50cOEUNK2BIob24JgQsg2jM1z9hlKsITN2/
+         5Hzs2BiJpn+YpRd6yuG6iq1LDlCcWG1wZjivPDP48j1ZKk2+J+JPVNH2NY5zXYQgT58s
+         7rAJpUrRelXCqoV87LV3kH7tXXtR5Rjsh6LXfJLAjrlNH8tYF3wsLWtJIU6pH2Usmb1E
+         thCPx9JQObMyYjg7OsSwaXDhxeIzBbQDY+rgYtIRzf5LE5RKBGRhiFzVzvA1mu64Eap/
+         UgnI+aJ4L9udWNpmixZpa/WlNEqFJApXaFHhX2tjNLTvqSp+XGTX4WhmxeEWKxs3Umar
+         FLsg==
+X-Gm-Message-State: AOAM530ZBkvUWdMoMsLvlN0imTUd0crm3MfTtDlLL2fJfi09gTudN7Xw
+        xQlKSGhLlv4Asara9eVmtk5HzAlZPQd9X+H3QUi/3uPR9iE7sw==
+X-Google-Smtp-Source: ABdhPJwWdioCjxIIaK76G4KCxZ/YQd/NSgB9cncm87m7RU5lAp62CsHAJtB3rWJ5RsskpVNmL2BlZ1F5g4UyYDGpoYg=
+X-Received: by 2002:a25:ab82:: with SMTP id v2mr16493621ybi.97.1613478565972;
+ Tue, 16 Feb 2021 04:29:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87k0r8jk6r.fsf@suse.de>
+References: <CANT5p=o9Tw9E+o3PWytsNh5eDKxswJ+YPLZLWac7QwR_u-UJaw@mail.gmail.com>
+ <87h7msnnme.fsf@suse.com> <CANT5p=qGTC4E4Rf_-t9xXOo4yf3W=xtk97J1jg-WRLhwf0juBA@mail.gmail.com>
+ <87a6sjopsc.fsf@suse.com> <CANT5p=qQJwvF11MJpiuV7S1GpH9=HZ-g=hmfOV-a07N9xkYqnA@mail.gmail.com>
+ <CAH2r5mv0TzWpYi38HtuVG2gtYvW60-RDOri3a1FUUtprn19Dzw@mail.gmail.com>
+ <87lfbyn647.fsf@suse.com> <CANT5p=qJjeVk1HDhvaiAQSYH3mj-rNBNA-j2TAUnoqQVTOQ_Ww@mail.gmail.com>
+ <875z2yn0lx.fsf@suse.com> <CAKywueRoFL17DiMzmorZcd=OJvDY_8+P8WxGqKDx-tdnJrr_HQ@mail.gmail.com>
+ <6aad7fc3-3c3f-848c-4d65-e5c7f1dd8107@talpey.com>
+In-Reply-To: <6aad7fc3-3c3f-848c-4d65-e5c7f1dd8107@talpey.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Tue, 16 Feb 2021 04:29:15 -0800
+Message-ID: <CANT5p=o4=uy8HV4L_nXfPUJ=bUO5Oyf8p6=Y7dY5PxsabHxJYQ@mail.gmail.com>
+Subject: Re: [PATCH 4/4] cifs: Reformat DebugData and index connections by conn_id.
+To:     Tom Talpey <tom@talpey.com>
+Cc:     Pavel Shilovsky <piastryyy@gmail.com>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Feb 16, 2021 at 12:01:16PM +0000, Luis Henriques wrote:
-> "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org> writes:
-> 
-> > On Tue, Feb 16, 2021 at 11:17:34AM +0000, Luis Henriques wrote:
-> >> Amir Goldstein <amir73il@gmail.com> writes:
-> >> 
-> >> > On Mon, Feb 15, 2021 at 8:57 PM Trond Myklebust <trondmy@hammerspace.com> wrote:
-> >> >>
-> >> >> On Mon, 2021-02-15 at 19:24 +0200, Amir Goldstein wrote:
-> >> >> > On Mon, Feb 15, 2021 at 6:53 PM Trond Myklebust <
-> >> >> > trondmy@hammerspace.com> wrote:
-> >> >> > >
-> >> >> > > On Mon, 2021-02-15 at 18:34 +0200, Amir Goldstein wrote:
-> >> >> > > > On Mon, Feb 15, 2021 at 5:42 PM Luis Henriques <
-> >> >> > > > lhenriques@suse.de>
-> >> >> > > > wrote:
-> >> >> > > > >
-> >> >> > > > > Nicolas Boichat reported an issue when trying to use the
-> >> >> > > > > copy_file_range
-> >> >> > > > > syscall on a tracefs file.  It failed silently because the file
-> >> >> > > > > content is
-> >> >> > > > > generated on-the-fly (reporting a size of zero) and
-> >> >> > > > > copy_file_range
-> >> >> > > > > needs
-> >> >> > > > > to know in advance how much data is present.
-> >> >> > > > >
-> >> >> > > > > This commit restores the cross-fs restrictions that existed
-> >> >> > > > > prior
-> >> >> > > > > to
-> >> >> > > > > 5dae222a5ff0 ("vfs: allow copy_file_range to copy across
-> >> >> > > > > devices")
-> >> >> > > > > and
-> >> >> > > > > removes generic_copy_file_range() calls from ceph, cifs, fuse,
-> >> >> > > > > and
-> >> >> > > > > nfs.
-> >> >> > > > >
-> >> >> > > > > Fixes: 5dae222a5ff0 ("vfs: allow copy_file_range to copy across
-> >> >> > > > > devices")
-> >> >> > > > > Link:
-> >> >> > > > > https://lore.kernel.org/linux-fsdevel/20210212044405.4120619-1-drinkcat@chromium.org/
-> >> >> > > > > Cc: Nicolas Boichat <drinkcat@chromium.org>
-> >> >> > > > > Signed-off-by: Luis Henriques <lhenriques@suse.de>
-> >> >> > > >
-> >> >> > > > Code looks ok.
-> >> >> > > > You may add:
-> >> >> > > >
-> >> >> > > > Reviewed-by: Amir Goldstein <amir73il@gmail.com>
-> >> >> > > >
-> >> >> > > > I agree with Trond that the first paragraph of the commit message
-> >> >> > > > could
-> >> >> > > > be improved.
-> >> >> > > > The purpose of this change is to fix the change of behavior that
-> >> >> > > > caused the regression.
-> >> >> > > >
-> >> >> > > > Before v5.3, behavior was -EXDEV and userspace could fallback to
-> >> >> > > > read.
-> >> >> > > > After v5.3, behavior is zero size copy.
-> >> >> > > >
-> >> >> > > > It does not matter so much what makes sense for CFR to do in this
-> >> >> > > > case (generic cross-fs copy).  What matters is that nobody asked
-> >> >> > > > for
-> >> >> > > > this change and that it caused problems.
-> >> >> > > >
-> >> >> > >
-> >> >> > > No. I'm saying that this patch should be NACKed unless there is a
-> >> >> > > real
-> >> >> > > explanation for why we give crap about this tracefs corner case and
-> >> >> > > why
-> >> >> > > it can't be fixed.
-> >> >> > >
-> >> >> > > There are plenty of reasons why copy offload across filesystems
-> >> >> > > makes
-> >> >> > > sense, and particularly when you're doing NAS. Clone just doesn't
-> >> >> > > cut
-> >> >> > > it when it comes to disaster recovery (whereas backup to a
-> >> >> > > different
-> >> >> > > storage unit does). If the client has to do the copy, then you're
-> >> >> > > effectively doubling the load on the server, and you're adding
-> >> >> > > potentially unnecessary network traffic (or at the very least you
-> >> >> > > are
-> >> >> > > doubling that traffic).
-> >> >> > >
-> >> >> >
-> >> >> > I don't understand the use case you are describing.
-> >> >> >
-> >> >> > Which filesystem types are you talking about for source and target
-> >> >> > of copy_file_range()?
-> >> >> >
-> >> >> > To be clear, the original change was done to support NFS/CIFS server-
-> >> >> > side
-> >> >> > copy and those should not be affected by this change.
-> >> >> >
-> >> >>
-> >> >> That is incorrect:
-> >> >>
-> >> >> ssize_t nfsd_copy_file_range(struct file *src, u64 src_pos, struct file
-> >> >> *dst,
-> >> >>  u64 dst_pos, u64 count)
-> >> >> {
-> >> >>
-> >> >>  /*
-> >> >>  * Limit copy to 4MB to prevent indefinitely blocking an nfsd
-> >> >>  * thread and client rpc slot. The choice of 4MB is somewhat
-> >> >>  * arbitrary. We might instead base this on r/wsize, or make it
-> >> >>  * tunable, or use a time instead of a byte limit, or implement
-> >> >>  * asynchronous copy. In theory a client could also recognize a
-> >> >>  * limit like this and pipeline multiple COPY requests.
-> >> >>  */
-> >> >>  count = min_t(u64, count, 1 << 22);
-> >> >>  return vfs_copy_file_range(src, src_pos, dst, dst_pos, count, 0);
-> >> >> }
-> >> >>
-> >> >> You are now explicitly changing the behaviour of knfsd when the source
-> >> >> and destination filesystem differ.
-> >> >>
-> >> >> For one thing, you are disallowing the NFSv4.2 copy offload use case of
-> >> >> copying from a local filesystem to a remote NFS server. However you are
-> >> >> also disallowing the copy from, say, an XFS formatted partition to an
-> >> >> ext4 partition.
-> >> >>
-> >> >
-> >> > Got it.
-> >> 
-> >> Ugh.  And I guess overlayfs may have a similar problem.
-> >> 
-> >> > This is easy to solve with a flag COPY_FILE_SPLICE (or something) that
-> >> > is internal to kernel users.
-> >> >
-> >> > FWIW, you may want to look at the loop in ovl_copy_up_data()
-> >> > for improvements to nfsd_copy_file_range().
-> >> >
-> >> > We can move the check out to copy_file_range syscall:
-> >> >
-> >> >         if (flags != 0)
-> >> >                 return -EINVAL;
-> >> >
-> >> > Leave the fallback from all filesystems and check for the
-> >> > COPY_FILE_SPLICE flag inside generic_copy_file_range().
-> >> 
-> >> Ok, the diff bellow is just to make sure I understood your suggestion.
-> >> 
-> >> The patch will also need to:
-> >> 
-> >>  - change nfs and overlayfs calls to vfs_copy_file_range() so that they
-> >>    use the new flag.
-> >> 
-> >>  - check flags in generic_copy_file_checks() to make sure only valid flags
-> >>    are used (COPY_FILE_SPLICE at the moment).
-> >> 
-> >> Also, where should this flag be defined?  include/uapi/linux/fs.h?
+Hi Pavel,
+
+Thanks for the review.
+As Tom pointed out, the server name is currently a field in
+TCP_Session_Info struct.
+We do store the struct sockaddr_storage, which I'm guessing holds the
+IP address in binary format, and we could use that. And may need to
+consider IPv4 vs IPv6 when we do it.
+I'll submit that as a new patch later on.
+
+Hi Tom,
+
+> Including the transport type (TCP, RDMA...) and multichannel attributes
+> (link speed, RSS count, ...) would be useful too.
+Can you please clarify this for me?
+From what I can see from the code, RDMA connection DebugData is a
+superset of TCP connection. The RDMA specific details get printed only
+when server->rdma is set.
+
+Regards,
+Shyam
+
+On Thu, Feb 11, 2021 at 11:41 AM Tom Talpey <tom@talpey.com> wrote:
+>
+> On 2/11/2021 12:12 PM, Pavel Shilovsky wrote:
+> > Hi Shyam,
 > >
-> > Why would userspace want/need this flag?
-> 
-> In fact, my question sort of implied yours :-)
-> 
-> What I wanted to know was whether we would like to allow userspace to
-> _explicitly_ revert to the current behaviour (i.e. use the flag to allow
-> cross-fs copies) or to continue to return -EINVAL to userspace if flags
-> are != 0 (in which case this check would need to move to the syscall
-> definition).
+> > The output looks very informative! I have one comment:
+> >
+> > Servers:
+> > 1) ConnectionId: 0x1
+> > Number of credits: 326 Dialect 0x311
+> > TCP status: 1 Instance: 1
+> > Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0
+> > In Send: 0 In MaxReq Wait: 0
+> >
+> > Sessions:
+> > 1) Name: 10.229.158.38 Uses: 1 Capability: 0x300077 Session Status: 1
+> >                       ^^^^
+> > Isn't this name (or hostname) a property of the connection? I would
+> > expect an IP or a hostname to be printed in the connection settings
+> > above.
+>
+> The servername is a property of the session, in this case since the
+> mount specified a dotted quad, it would correctly appear as the
+> servername at this level.
+>
+> However, I definitely agree that an IP address is important in the
+> per-connection (channel) stanzas. Multichannel, multihoming, witness
+> redirects, and any number of things can vary among them. It would
+> be useful indeed to display them.
+>
+> Including the transport type (TCP, RDMA...) and multichannel attributes
+> (link speed, RSS count, ...) would be useful too.
+>
+> Tom.
+>
+> >
+> > --
+> > Best regards,
+> > Pavel Shilovsky
+> >
+> > =D1=87=D1=82, 11 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 06:24, A=
+ur=C3=A9lien Aptel <aaptel@suse.com>:
+> >>
+> >> Shyam Prasad N <nspmangalore@gmail.com> writes:
+> >>> I noticed that the output looks rather odd when used with multichanne=
+l.
+> >>> Attaching a revised patch with the changes.
+> >>>
+> >>> Also attached a sample of new output.
+> >>
+> >> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+> >>
+> >> --
+> >> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> >> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> >> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnbe=
+rg, DE
+> >> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
+=C3=BCnchen)
+> >>
+> >
 
-No, don't try to mess with userspace that way, the kernel should "just
-work".  Well, in this case "work as best as it can, not always
-successful...", it's an odd syscall.
 
-thanks,
 
-greg k-h
+--=20
+Regards,
+Shyam
