@@ -2,83 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA05EC433E6
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Feb 2021 11:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC36C433E0
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Feb 2021 11:52:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FF2B64DA5
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Feb 2021 11:35:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E11D364DA5
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Feb 2021 11:52:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230184AbhBPLfc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Feb 2021 06:35:32 -0500
-Received: from ozlabs.org ([203.11.71.1]:33215 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230187AbhBPLei (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 16 Feb 2021 06:34:38 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S230394AbhBPLwG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Feb 2021 06:52:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26651 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230280AbhBPLuF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 16 Feb 2021 06:50:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613476119;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=coH4C7xdrmgBE3/XsHGmHJNC7rb47IS/kJchI+NLx3A=;
+        b=PZu8BxFFewks0etlybQeiktQl+i6Xz/jRF/+xQTJ7TjNDaEArVTpxtScVkmwoRkNdlkzHQ
+        6aVfHudJJ986oTWKbTmeSN4HUFUhPAaWFVTnt2Br6njEN/AnRnbnTiLUDwwr96iUltiG4k
+        TaolSFXKZWu2V5aKBlhS7XeZ5f0yl70=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-jKcmJhrLMwullgSDWVKkPg-1; Tue, 16 Feb 2021 06:48:35 -0500
+X-MC-Unique: jKcmJhrLMwullgSDWVKkPg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4DfzPY3L0yz9sVr;
-        Tue, 16 Feb 2021 22:33:37 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1613475217;
-        bh=ridY0eMRba4pufvR09nWyO9lCwHPviWyxj1awfCeJrg=;
-        h=Date:From:To:Cc:Subject:From;
-        b=iFeLbxYtWSjPKP7AARi09VMfeVHJ6VRtNSPAPl/Bn8Ryg+qLPkAcaO5XOrd8VYdYF
-         CxHNc13lLeJYp0/39jN6o+B9Is16+hm2I7z9l9ZuovsSi+jB/JIdwgUBLYixDwZ8av
-         NPq6OIMNiANVLr+n2s88v2GhD4hVO3QSlBpETdMs0AA4kLF+WQ+Z3qYyymAN/abFNv
-         03Vob9eiEDqXFedC1Z8Q86ZitwOX4y6USbLHfHbpbYSxzDn8yZ63GFcpLKZAJ+7LXa
-         v7Iej1Vq8Rmp70g59KDFlLWeIxCzB+qFNni528kNQOobA7DXCZE9q74HDa8ZVvWYtE
-         oDFRv+WjpiAqQ==
-Date:   Tue, 16 Feb 2021 22:33:36 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Signed-off-by missing for commit in the cifs tree
-Message-ID: <20210216223336.67fc77ad@canb.auug.org.au>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B44BE801977;
+        Tue, 16 Feb 2021 11:48:32 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EDB605C1B4;
+        Tue, 16 Feb 2021 11:48:24 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210216103215.GB27714@lst.de>
+References: <20210216103215.GB27714@lst.de> <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk> <161340389201.1303470.14353807284546854878.stgit@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@lst.de>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>, linux-mm@kvack.org,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 03/33] mm: Implement readahead_control pageset expansion
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/vn_DtRKDb6QCnPHVTsv1n0T";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1429174.1613476104.1@warthog.procyon.org.uk>
+Date:   Tue, 16 Feb 2021 11:48:24 +0000
+Message-ID: <1429175.1613476104@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/vn_DtRKDb6QCnPHVTsv1n0T
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Christoph Hellwig <hch@lst.de> wrote:
 
-Hi all,
+> On Mon, Feb 15, 2021 at 03:44:52PM +0000, David Howells wrote:
+> > Provide a function, readahead_expand(), that expands the set of pages
+> > specified by a readahead_control object to encompass a revised area with a
+> > proposed size and length.
+> ...
+> So looking at linux-next this seems to have a user, but that user is
+> dead wood given that nothing implements ->expand_readahead.
 
-Commit
+Interesting question.  Code on my fscache-iter branch does implement this, but
+I was asked to split the patchset up, so that's not in this subset.
 
-  f204a0ab8c4f ("cifs: update internal version number")
+> Looking at the code structure I think netfs_readahead and
+> netfs_rreq_expand is a complete mess and needs to be turned upside
+> down, that is instead of calling back from netfs_readahead to the
+> calling file system, split it into a few helpers called by the
+> caller.
+> 
+> But even after this can't we just expose the cache granule boundary
+> to the VM so that the read-ahead request gets setup correctly from
+> the very beginning?
 
-is missing a Signed-off-by from its author and committer.
+You need to argue this one with Willy.  In my opinion, the VM should ask the
+filesystem and the expansion be done before ->readahead() is called.  Willy
+disagrees, however.
 
---=20
-Cheers,
-Stephen Rothwell
+David
 
---Sig_/vn_DtRKDb6QCnPHVTsv1n0T
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmArrZAACgkQAVBC80lX
-0Gygvwf+P2rKO9JojCL4NCYM4J7WkX0c+5G+OrYur0jv4kuIYyHSzimRG28i6tAo
-KOGM95N94o0pXty8X2iGSvjIh8J6RVCLP9ROfXn1eS9dSUWwzlTWKl/CmTWOc4Mj
-kfQsK/ww+laqVdWRXOO/HZGfWWzHuO9XB7aIZOhbtq2/iOp1egOI9WD3IJhTV6ey
-pKwTHKGbWQAdygvia6PdjbEtXuN255HDTXkuYP4VPESSrfqSnbgKSKc994TKFtVK
-5OqfySpm5qatwFWNacslgDmaIU9ZAaBfbQxtT4nMU807jCGZWjZefFqCdRjgtFkM
-fmqkDrI142yf19Ik87zqAW8DzhCr/Q==
-=RLmd
------END PGP SIGNATURE-----
-
---Sig_/vn_DtRKDb6QCnPHVTsv1n0T--
