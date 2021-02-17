@@ -2,66 +2,55 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6923C433DB
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Feb 2021 14:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB67AC433E6
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Feb 2021 15:44:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 888AD64E2E
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Feb 2021 14:38:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99C2864D9A
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Feb 2021 15:44:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233416AbhBQOiT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Feb 2021 09:38:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50118 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233044AbhBQOiR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 Feb 2021 09:38:17 -0500
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7754FC06178A
-        for <linux-cifs@vger.kernel.org>; Wed, 17 Feb 2021 06:37:08 -0800 (PST)
-Received: by mail-ot1-x32a.google.com with SMTP id s6so4500096otk.4
-        for <linux-cifs@vger.kernel.org>; Wed, 17 Feb 2021 06:37:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=omnibond-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KRNZjZzTqfrWLRx1QJmelJFfxfPUcehdqwqj+L7mkPQ=;
-        b=R8hCb4eKqdCpoFdkYTrVn7FoN33zUtyi/ljWByVLrm0nNn3tup4D+Hft33LDzdElis
-         n16SrG3viJflBxrjVIN2QmmXO/BgPFSDWJe1ljVa2OopffyUF0+G8Fh9aoQpou3/MlTR
-         6lOKbNE6+B3j4d5dwhv33gPtGhtt8L27dc4EMEm0vGnJ/TAunXib+QvZcOCi9i0mwM86
-         k3prqX0Oe/sUpTqzEgE3HcERBdh4YwNsSjrGveT+xsSircuhGURdlWmXiZnYI5Mz2W8Z
-         jNhEhauvpFlyX/F69JD4IZFRmykIsAN3vuO7r6enaGZ5EvFYprDuRwGgQKV+8pJmk5aD
-         UJew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KRNZjZzTqfrWLRx1QJmelJFfxfPUcehdqwqj+L7mkPQ=;
-        b=iBbYlL7G7oGtEjdE0MVyHIN8NYkprrq5mkHCHrwZBSeeP8xF/SKlRxaajWiSMYrdkb
-         fqQmBtLGfUEUqrOTenxEnZ2rwuE8uOr9BtdxGMnnt9iYGGdGlPmj4kaoGX1Xa95CLYLV
-         omfGWZJsiECfEVRJru3LlQHHOCAygjeDSSl/w5cRRErudJqOZ1WapFN6kqqkGkt7u/68
-         eVlg8N/q7ZjL02X501HJ1e8BLlUJjGNYKiNoZJxKoODW3pzXSSOCNk7FMk5npaCaXIZU
-         z4iCQFpU9JC+MWuCPOpnR01UIZkOgsJod2DhWs5OIZrXTV23IRDLlkPkkn6ZiafHb2Zc
-         I7/w==
-X-Gm-Message-State: AOAM531PhPonTygk4dy02B4unutEvJ6ZUQ/gi0YyS0jplJlPhUnRTEX3
-        90Ebu/nBUTlBHLutDuXNIdeSffJ5a+bWLP/dv1VHSQ==
-X-Google-Smtp-Source: ABdhPJy4hyW/PUrDPGqVg3UI4ZfJfCb8Vr2cdTNl0Mc8udn+hWDu9ZRGdP0xDV4oyRaIVmDhAucDgP/5yXuHdlUvdPs=
-X-Received: by 2002:a05:6830:2424:: with SMTP id k4mr7412732ots.352.1613572627726;
- Wed, 17 Feb 2021 06:37:07 -0800 (PST)
-MIME-Version: 1.0
-References: <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk>
- <161340389201.1303470.14353807284546854878.stgit@warthog.procyon.org.uk>
- <20210216103215.GB27714@lst.de> <20210216132251.GI2858050@casper.infradead.org>
-In-Reply-To: <20210216132251.GI2858050@casper.infradead.org>
-From:   Mike Marshall <hubcap@omnibond.com>
-Date:   Wed, 17 Feb 2021 09:36:56 -0500
-Message-ID: <CAOg9mSQYBjnMsDj5pMd6MOGTY5w_ZR=pw7VRYKfP5ZwmHBj2=Q@mail.gmail.com>
-Subject: Re: [PATCH 03/33] mm: Implement readahead_control pageset expansion
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        David Howells <dhowells@redhat.com>,
+        id S233758AbhBQPoV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 Feb 2021 10:44:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22154 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233774AbhBQPoM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 17 Feb 2021 10:44:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613576566;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZcLEsH31tuwsh/4DX1Q5nBlV7w+3XG/SIyqKK0hnVM0=;
+        b=hkCVrxYUxXy06vRNVMxv1Fe9AOz4nJxocpvzEXRlhKSZTgq9xmFv4Yn96u44yaWdxPL2UE
+        OhhtxCgpjhoS0s9lZfqQRY7WsyeUTGamajmRrCRSYdejb37vQNfR9AxvQ4JrsuX2V7nl9V
+        deUnwuB8t8KSAsHTys7fGq72LeQr7kA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-droMoF7zMQSpyOmj-QQ_fw-1; Wed, 17 Feb 2021 10:42:42 -0500
+X-MC-Unique: droMoF7zMQSpyOmj-QQ_fw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D0E76A0BC8;
+        Wed, 17 Feb 2021 15:42:40 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 35BDC5C3E4;
+        Wed, 17 Feb 2021 15:42:34 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAOg9mSQYBjnMsDj5pMd6MOGTY5w_ZR=pw7VRYKfP5ZwmHBj2=Q@mail.gmail.com>
+References: <CAOg9mSQYBjnMsDj5pMd6MOGTY5w_ZR=pw7VRYKfP5ZwmHBj2=Q@mail.gmail.com> <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk> <161340389201.1303470.14353807284546854878.stgit@warthog.procyon.org.uk> <20210216103215.GB27714@lst.de> <20210216132251.GI2858050@casper.infradead.org>
+To:     Mike Marshall <hubcap@omnibond.com>
+Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
         Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
@@ -77,52 +66,23 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Jeff Layton <jlayton@redhat.com>,
         David Wysochanski <dwysocha@redhat.com>,
         LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 03/33] mm: Implement readahead_control pageset expansion
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1586930.1613576553.1@warthog.procyon.org.uk>
+Date:   Wed, 17 Feb 2021 15:42:33 +0000
+Message-ID: <1586931.1613576553@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I plan to try and use readahead_expand in Orangefs...
+Mike Marshall <hubcap@omnibond.com> wrote:
 
--Mike
+> I plan to try and use readahead_expand in Orangefs...
 
-On Tue, Feb 16, 2021 at 8:28 AM Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Tue, Feb 16, 2021 at 11:32:15AM +0100, Christoph Hellwig wrote:
-> > On Mon, Feb 15, 2021 at 03:44:52PM +0000, David Howells wrote:
-> > > Provide a function, readahead_expand(), that expands the set of pages
-> > > specified by a readahead_control object to encompass a revised area with a
-> > > proposed size and length.
-> > >
-> > > The proposed area must include all of the old area and may be expanded yet
-> > > more by this function so that the edges align on (transparent huge) page
-> > > boundaries as allocated.
-> > >
-> > > The expansion will be cut short if a page already exists in either of the
-> > > areas being expanded into.  Note that any expansion made in such a case is
-> > > not rolled back.
-> > >
-> > > This will be used by fscache so that reads can be expanded to cache granule
-> > > boundaries, thereby allowing whole granules to be stored in the cache, but
-> > > there are other potential users also.
-> >
-> > So looking at linux-next this seems to have a user, but that user is
-> > dead wood given that nothing implements ->expand_readahead.
-> >
-> > Looking at the code structure I think netfs_readahead and
-> > netfs_rreq_expand is a complete mess and needs to be turned upside
-> > down, that is instead of calling back from netfs_readahead to the
-> > calling file system, split it into a few helpers called by the
-> > caller.
->
-> That's funny, we modelled it after iomap.
->
-> > But even after this can't we just expose the cache granule boundary
-> > to the VM so that the read-ahead request gets setup correctly from
-> > the very beginning?
->
-> The intent is that this be usable by filesystems which want to (for
-> example) compress variable sized blocks.  So they won't know which pages
-> they want to readahead until they're in their iomap actor routine,
-> see that the extent they're in is compressed, and find out how large
-> the extent is.
+Would it help if I shuffled the readahead_expand patch to the bottom of the
+pack?
+
+David
+
