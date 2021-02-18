@@ -2,91 +2,111 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF49C433E9
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 19:08:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF2AC433DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 20:43:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 66D6564EB8
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 19:08:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89E3F64E4B
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 20:43:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232032AbhBRTIX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Feb 2021 14:08:23 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27594 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234545AbhBRRsi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 18 Feb 2021 12:48:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613670431;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vh8JVeAq553dnjUjXxpSp+/x6fHtJkixwlI1e+/bfY8=;
-        b=RqkATTCPSeb2gmGwoVHNHMlg3AkybgX2FvMGHiylUP5xD09ZQ7zHPKMzsqZxZ9EZg5Vtum
-        MgQf8Mx/bMnwHRi0RtVkY/jE0/MT7ZAddj6DU98C0X39/2LrZqSBZ5w7Dyb2ojxiIdh+sP
-        99WeNUegsnNW/3Tyn6/2BPOPr7n5BKk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-qum9-M-dOJ-dh4Cpmuan6A-1; Thu, 18 Feb 2021 12:47:10 -0500
-X-MC-Unique: qum9-M-dOJ-dh4Cpmuan6A-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C51CF107ACF4;
-        Thu, 18 Feb 2021 17:47:07 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C64060877;
-        Thu, 18 Feb 2021 17:47:01 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20210217161358.GM2858050@casper.infradead.org>
-References: <20210217161358.GM2858050@casper.infradead.org> <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk> <161340389201.1303470.14353807284546854878.stgit@warthog.procyon.org.uk>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/33] mm: Implement readahead_control pageset expansion
+        id S230053AbhBRUnu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Feb 2021 15:43:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40926 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230209AbhBRUlp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Feb 2021 15:41:45 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31AEC0617AA;
+        Thu, 18 Feb 2021 12:41:22 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id r23so8224156ljh.1;
+        Thu, 18 Feb 2021 12:41:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cFyQNASifwQpMLri08Ol4P6yp5dFeoJ6Rz1w04iex40=;
+        b=ad9xrVWwPRJ0Op7IrKvZt0bJXunRvSzb1OGuouK5C/8+63N00msV3K1hURk0ID3R/t
+         ssl6CA+hTMPJX/9Sr62yXSmtN/nkX7ytk1DTXwRHAplmTCj+7VQfEoFCAngSsig6xVOM
+         wafKbDXUw5R9Ib/vN/DgZ2ijnRTaOkMnqgYalC2c0B/3kC9SpKIHNqQGWw3lnfYzPieO
+         zac3ULzHVUiS/CzUScmj8giO7bJNLSWKbHHHzOKPKI6SH4VnXmkz+2bIatpm+3JaeGTu
+         0WNWTxias5zgTTvhLwQyhUtog6ElixtiMQk/UqeRbfJJotEBLzgTg1hkhOl8WsdwHQQR
+         dQIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cFyQNASifwQpMLri08Ol4P6yp5dFeoJ6Rz1w04iex40=;
+        b=IMF8hs1ANiNwmmUFisKxbbZcTs+pQ+kfsHDs8++sSHLy/jlSsBwAJoXyzvygKN+heD
+         k+xnaHDu6WxjomuAF89rbDswEt8YRHMi/rzHMFoxNihgeo03580KMcnRFQm+XPUsZsvB
+         2vKG6iVHYzUJbCAtD9E1Qr/is0AGu04GiW4oFA2KfVh/iOj6E+rdqxaOopRkl6Gr4G2Z
+         ENEYiOSD6HFdvw219NDo/Q9MyM0NsRpAbu/fDEFooX8tlNZIAQwrD0oWmU0ZGrKmfxA9
+         RLCIFSzAXDRgeKagtGf8R24L8RjrT8lCOk5w1Bwq7G+Vs8MKHf6zo98MlhLFAty61GLN
+         DggA==
+X-Gm-Message-State: AOAM531vCEE26Ho44XL5x4SyY5MZW0KrH/EtrzKIbal+7RsaaZuBdQTz
+        OYUTeMBfZ33cqzpEbuC64J7PZmHD+PAtw7b4WZI=
+X-Google-Smtp-Source: ABdhPJzIe4u7R8N9hXZ7mZlqZtsMdthHDVWh1IqsLqv46KHoPGGXza+HzvNxYxde5rbeiZfOPb400z4NE3Ei7y3Na8A=
+X-Received: by 2002:a05:6512:1311:: with SMTP id x17mr3289191lfu.307.1613680881337;
+ Thu, 18 Feb 2021 12:41:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2083367.1613670420.1@warthog.procyon.org.uk>
-Date:   Thu, 18 Feb 2021 17:47:00 +0000
-Message-ID: <2083368.1613670420@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <CAOQ4uxiFGjdvX2-zh5o46pn7RZhvbGHH0wpzLPuPOom91FwWeQ@mail.gmail.com>
+ <20210215154317.8590-1-lhenriques@suse.de> <20210218074207.GA329605@infradead.org>
+ <CAOQ4uxgreB=TywvWQXfcHYMBcFm5OKSdwUC8YJY1WuVja6PccQ@mail.gmail.com>
+In-Reply-To: <CAOQ4uxgreB=TywvWQXfcHYMBcFm5OKSdwUC8YJY1WuVja6PccQ@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 18 Feb 2021 14:41:10 -0600
+Message-ID: <CAH2r5ms46x-XviHDKRJEsPt64+qW+zDKwHHSO15gxsZ+a0-ToQ@mail.gmail.com>
+Subject: Re: [PATCH v2] vfs: prevent copy_file_range to copy across devices
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Luis Henriques <lhenriques@suse.de>,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Nicolas Boichat <drinkcat@chromium.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
+On Thu, Feb 18, 2021 at 4:03 AM Amir Goldstein <amir73il@gmail.com> wrote:
+>
+> On Thu, Feb 18, 2021 at 9:42 AM Christoph Hellwig <hch@infradead.org> wrote:
+> >
+> > Looks good:
+> >
+> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> >
+> > This whole idea of cross-device copie has always been a horrible idea,
+> > and I've been arguing against it since the patches were posted.
+>
+> Ok. I'm good with this v2 as well, but need to add the fallback to
+> do_splice_direct()
+> in nfsd_copy_file_range(), because this patch breaks it.
 
-> So readahead_expand() needs to adjust the file's f_ra so that when the
-> application gets to 64kB, it kicks off the readahead of 4MB-8MB chunk (and
-> then when we get to 4MB+256kB, it kicks off the readahead of 8MB-12MB,
-> and so on).
+Interestingly, for ksmbd (cifsd) looks like they already do splice not
+copy_file_range
 
-Ummm...  Two questions:
 
-Firstly, how do I do that?  Set ->async_size?  And to what?  The expansion
-could be 2MB from a ceph stripe, 256k from the cache.  Just to add to the fun,
-the leading edge of the window might also be rounded downwards and the RA
-trigger could be before where the app is going to start reading.
+-- 
+Thanks,
 
-Secondly, what happens if, say, a 4MB read is covered by a single 4MB THP?
-
-David
-
+Steve
