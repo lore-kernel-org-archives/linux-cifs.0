@@ -2,59 +2,62 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D58A6C4332B
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 00:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EE22C433E6
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 05:36:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8B0364D74
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 00:58:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0AD764DF0
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 05:36:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230443AbhBRA56 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Feb 2021 19:57:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41998 "EHLO
+        id S231175AbhBRFgI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Feb 2021 00:36:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230386AbhBRA5q (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 17 Feb 2021 19:57:46 -0500
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDBF2C0617A9
-        for <linux-cifs@vger.kernel.org>; Wed, 17 Feb 2021 16:56:53 -0800 (PST)
-Received: by mail-vs1-xe32.google.com with SMTP id t23so120892vsk.2
-        for <linux-cifs@vger.kernel.org>; Wed, 17 Feb 2021 16:56:53 -0800 (PST)
+        with ESMTP id S230267AbhBRFdu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Feb 2021 00:33:50 -0500
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDDE2C061574;
+        Wed, 17 Feb 2021 21:33:09 -0800 (PST)
+Received: by mail-ej1-x633.google.com with SMTP id jt13so2493731ejb.0;
+        Wed, 17 Feb 2021 21:33:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=umich.edu; s=google-2016-06-03;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=vxbhVU+xTpR/weyN8SH71YwtBih0U9RJGA2ufjhtKjc=;
-        b=g8/QVJ74cfotfG8qjNXNZcf5Nh6F+ELqL/wtkEy0CyrdhNLL5khAwWaALJrLkxgDdk
-         oKTxEco26A1bZquNH/Wat87qVlSuvYIypnjlub2NvU+NohZ2qmWMXd5GLfq93+Uqk3hg
-         oOnuoWRw3sxKcrSnUH9rFAnPLm+rG0L5LJwxQ=
+        bh=bfuOJS8lgxWZH7dJ+1WGdaYmsVNg/21G79qyhVcWBw0=;
+        b=Ueks7CYqVzJYz+c0+PKlVY/ToJAlyyI2wtwHTUxPVS1ccWyVEFDH+EU8LnSY9KQ90G
+         3yx4MQGp3Zfn1Q0+k+rfVQ5tBU+2nQ2XoJGJbJQYi31SQS7Rq4pnrTJof6lNLpNWfUr/
+         npULIjoEVo5StEJWeSN4KyY9ZQLSLMQE1Nq9bVK4pGNzeMTn35EkWGpVs4WIJyg6gZfB
+         vaGqJHRd9aH6iNh0ZnwXHL6K5I0OOijrOVnyPEdxXo+6+IE0a6iX1mtwadyoT7IO6Md1
+         FFvv6OoXr+3SS9XZMoFBLNFamgr2cqwU9lCjBEOwCY7v4W2etziMDwG6ZctE410OPrfo
+         KJkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=vxbhVU+xTpR/weyN8SH71YwtBih0U9RJGA2ufjhtKjc=;
-        b=kA76ucPR+qtiKnVDJLhWzozbZTc+dfUWnQz/NLkxflUpOBNXb+2mBrMuxrBXE+1wla
-         bZalYFp7SqYhMxZlYzEqi9rkKlNHIEdw7zs5Gzk3QWWdHOvHoys/nekQE2H1kn9wZ7tL
-         3pIoeYxsBT3cF2JP/82RkxP3T9cMq7GdYznnFSIZNHqFewv3h/KoHUIyBb+Q3mwdvwGc
-         DflYityBk1LqZYCLE71bs42nEcKYY9o2YwyhkQG0RKw00msnLGIPB6KKQde8r/uwrB9q
-         JfFYmZYRoHbDYzfZiaTLjQ7moKI7XoYhLop4/CRbyGSG7ewxagpi05B1rjx9WOOQOsu0
-         kNzw==
-X-Gm-Message-State: AOAM5321/yiyxJ+MowzlD/9wlIIhCCiCVG7rIQukm/rYKRcKKjyv5FFl
-        tN+pqlG8+J0SX5mhr8SZFmK73/5+Cf7W06M9agg7QA==
-X-Google-Smtp-Source: ABdhPJyfWilBqai79/3FsuxGekzh4hohRVDm1mI1p7cFrLhpzd3K4urHUiCM3//wo1TO60uq90QjF0JN9lXE526kC4E=
-X-Received: by 2002:a05:6102:350:: with SMTP id e16mr1308067vsa.16.1613609812885;
- Wed, 17 Feb 2021 16:56:52 -0800 (PST)
+        bh=bfuOJS8lgxWZH7dJ+1WGdaYmsVNg/21G79qyhVcWBw0=;
+        b=g2lxWAGdyaBa+tjwFQC+ni4QEgNsqfoL6zC28OiVjZwOqhMulAC8vObPB8xZ8WgDcV
+         CJYXhILpYd2bgOIHC6j9petwyI1W3Pf+J5YgaxjnuPb24j/azEkyrYEx+Mlp4KNGa1BN
+         bpudxZ/IBlMvbrUyl4KMj7LHKMRquOrwUo3tekKPf0LzycIQx4ryZzJ68PDMH2d+lPeu
+         Qgi0UyWKS++M6oCbm7OEvV4ank3hgQO5Wd/br41uya/v4FWrQjVUHbLQpFjWLQInpz9N
+         pi8Ej4nO4CDEheq1WeIyoJZGGHbjSWBDG3WYbPaKcBwxFDYYX7fRREzJOLiKh55k4y9U
+         SiiA==
+X-Gm-Message-State: AOAM532UyCpjj2QvcMPoBLAyHFTFMjKhjzWlXQh9kXM3Ti0EClrSro9R
+        1kkYIXmDbMRVteiXS/xLu3Ria5V6c4o+IoHLgXg=
+X-Google-Smtp-Source: ABdhPJw/Cq1bIa8QFXppx4jN2cleBQ6HDRXCuE1WMvNNkIhUy7kGKdaiPdys7q0uX0vXbfTX3ew8Q2h1LOtKD0bfLF0=
+X-Received: by 2002:a17:907:35ca:: with SMTP id ap10mr2288228ejc.451.1613626388452;
+ Wed, 17 Feb 2021 21:33:08 -0800 (PST)
 MIME-Version: 1.0
 References: <CAOQ4uxii=7KUKv1w32VbjkwS+Z1a0ge0gezNzpn_BiY6MFWkpA@mail.gmail.com>
  <20210217172654.22519-1-lhenriques@suse.de>
 In-Reply-To: <20210217172654.22519-1-lhenriques@suse.de>
-From:   Nicolas Boichat <drinkcat@chromium.org>
-Date:   Thu, 18 Feb 2021 08:56:41 +0800
-Message-ID: <CANMq1KCU2LXuU98QZzhMhg0A_XuYDSi90mnadZi+ySM59e3-OQ@mail.gmail.com>
+From:   Olga Kornievskaia <aglo@umich.edu>
+Date:   Thu, 18 Feb 2021 00:32:57 -0500
+Message-ID: <CAN-5tyHVOphSkp3n+V=1gGQ40WNZGHQURSMMdFBS3jRVGfEXhA@mail.gmail.com>
 Subject: Re: [PATCH v3] vfs: fix copy_file_range regression in cross-fs copies
 To:     Luis Henriques <lhenriques@suse.de>
 Cc:     Amir Goldstein <amir73il@gmail.com>,
@@ -67,17 +70,19 @@ Cc:     Amir Goldstein <amir73il@gmail.com>,
         "Darrick J. Wong" <darrick.wong@oracle.com>,
         Dave Chinner <dchinner@redhat.com>,
         Greg KH <gregkh@linuxfoundation.org>,
+        Nicolas Boichat <drinkcat@chromium.org>,
         Ian Lance Taylor <iant@google.com>,
         Luis Lozano <llozano@chromium.org>, ceph-devel@vger.kernel.org,
-        lkml <linux-kernel@vger.kernel.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-fsdevel@vger.kernel.org,
-        linux-nfs@vger.kernel.org
+        linux-kernel@vger.kernel.org, CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical@lists.samba.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-nfs <linux-nfs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Feb 18, 2021 at 1:25 AM Luis Henriques <lhenriques@suse.de> wrote:
+On Wed, Feb 17, 2021 at 3:30 PM Luis Henriques <lhenriques@suse.de> wrote:
 >
 > A regression has been reported by Nicolas Boichat, found while using the
 > copy_file_range syscall to copy a tracefs file.  Before commit
@@ -89,30 +94,15 @@ On Thu, Feb 18, 2021 at 1:25 AM Luis Henriques <lhenriques@suse.de> wrote:
 >
 > This patch restores some cross-filesystems copy restrictions that existed
 > prior to commit 5dae222a5ff0 ("vfs: allow copy_file_range to copy across
-> devices").
-
-Note that you also fix intra-filesystem copy_file_range on these
-generated filesystems. This is IMHO great, but needs to be mentioned
-in the commit message.
-
->  It also introduces a flag (COPY_FILE_SPLICE) that can be used
+> devices").  It also introduces a flag (COPY_FILE_SPLICE) that can be used
 > by filesystems calling directly into the vfs copy_file_range to override
 > these restrictions.  Right now, only NFS needs to set this flag.
 >
 > Fixes: 5dae222a5ff0 ("vfs: allow copy_file_range to copy across devices")
-
-So technically this fixes something much older, presumably ever since
-copy_file_range was introduced.
-
 > Link: https://lore.kernel.org/linux-fsdevel/20210212044405.4120619-1-drinkcat@chromium.org/
 > Link: https://lore.kernel.org/linux-fsdevel/CANMq1KDZuxir2LM5jOTm0xx+BnvW=ZmpsG47CyHFJwnw7zSX6Q@mail.gmail.com/
 > Link: https://lore.kernel.org/linux-fsdevel/20210126135012.1.If45b7cdc3ff707bc1efa17f5366057d60603c45f@changeid/
 > Reported-by: Nicolas Boichat <drinkcat@chromium.org>
-
-Tested-by: Nicolas Boichat <drinkcat@chromium.org>
-but I guess you should not add to the next revision, I'll keep testing
-further revisions ,-)
-
 > Signed-off-by: Luis Henriques <lhenriques@suse.de>
 > ---
 > Ok, I've tried to address all the issues and comments.  Hopefully this v3
@@ -128,6 +118,9 @@ further revisions ,-)
 > - restored do_copy_file_range() helper
 > - return -EOPNOTSUPP if fs doesn't implement CFR
 > - updated commit description
+
+In my testing, this patch breaks NFS server-to-server copy file.
+
 >
 >  fs/nfsd/vfs.c      |  3 ++-
 >  fs/read_write.c    | 44 +++++++++++++++++++++++++++++++++++++++++---
@@ -163,9 +156,6 @@ further revisions ,-)
 > + * In-kernel callers may set COPY_FILE_SPLICE to override these checks.
 > + */
 > +static int fops_copy_file_checks(struct file *file_in, struct file *file_out,
-
-fops_copy_file_range_checks ?
-
 > +                                unsigned int flags)
 > +{
 > +       if (WARN_ON_ONCE(flags & ~COPY_FILE_SPLICE))
@@ -179,14 +169,8 @@ fops_copy_file_range_checks ?
 > +        */
 > +       if (!file_out->f_op->copy_file_range)
 > +               return -EOPNOTSUPP;
-
-After this is merged, should this be added as an error code to the man page?
-
 > +       else if (file_out->f_op->copy_file_range !=
 > +                file_in->f_op->copy_file_range)
-
-Just note, this could be a cross-fs copy (just not a cross-fs_type copy).
-
 > +               return -EXDEV;
 > +
 > +       return 0;
@@ -254,10 +238,6 @@ Just note, this could be a cross-fs copy (just not a cross-fs_type copy).
 > + * source and destination filesystems are different.
 > + */
 > +#define COPY_FILE_SPLICE               (1 << 0)
-
-nit: BIT(0) ?
-
-
 > +
 >  struct iov_iter;
 >
