@@ -2,125 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46078C433DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 07:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BE9C433DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 10:18:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E938F64EB7
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 07:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 720FC64E92
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 10:18:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231136AbhBRHtk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Feb 2021 02:49:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39566 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231317AbhBRHqH (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 18 Feb 2021 02:46:07 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4722D64DE0;
-        Thu, 18 Feb 2021 07:34:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1613633693;
-        bh=sjajRiTXns4+pD+gjYTsvSp91C0M53TJNj6vUwdi4zI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nuuVLco0VtpvNqIZUSpPN0Ndt0DVjY30kFF+9i7jVsea7VCkByEQacOwl8C/FiWbo
-         FAQIIojb/4410HMJVvN09W/dBS/mXtuK9ged/kDsSbarIJ8WOWygRjS6MWt6G9iLLX
-         tPfsDE0sq+g/EQLfVZFTi7Ki/t5dWuwfstyBgdTw=
-Date:   Thu, 18 Feb 2021 08:34:49 +0100
-From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To:     Andreas Dilger <adilger@dilger.ca>
-Cc:     Amir Goldstein <amir73il@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Luis Henriques <lhenriques@suse.de>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "drinkcat@chromium.org" <drinkcat@chromium.org>,
-        "iant@google.com" <iant@google.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "darrick.wong@oracle.com" <darrick.wong@oracle.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "jlayton@kernel.org" <jlayton@kernel.org>,
-        "llozano@chromium.org" <llozano@chromium.org>,
-        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        "miklos@szeredi.hu" <miklos@szeredi.hu>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "dchinner@redhat.com" <dchinner@redhat.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "sfrench@samba.org" <sfrench@samba.org>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>
-Subject: Re: [PATCH v2] vfs: prevent copy_file_range to copy across devices
-Message-ID: <YC4YmTWtIgeyjZ6h@kroah.com>
-References: <87blckj75z.fsf@suse.de>
- <CAOQ4uxiiy_Jdi3V1ait56=zfDQRBu_5gb+UsCo8GjMZ6XRhozw@mail.gmail.com>
- <874kibkflh.fsf@suse.de>
- <CAOQ4uxgRK3vXH8uAJKy8cFLL8siKnMMN8h6hx4yZeA5Fe0ZZYA@mail.gmail.com>
- <CAFX2Jfk0X=jKBpOzjq7k-U6SEwFn1Atw62BK2DzavM8XgeLUaQ@mail.gmail.com>
- <CAH2r5mvybG3mRUfHUub9B+nk5WrQ5Fvzu5pZ+ZynqZg4c4ct2A@mail.gmail.com>
- <CAOQ4uxhqaTUwD8Lw+9HWWj61EXRv4X-eE3u4DFeWnv_VOUZF5A@mail.gmail.com>
- <CAH2r5msmtuk0f8FuZxdRBQ2d_VKXexctcP0OmnLXoDEBien-nQ@mail.gmail.com>
- <CAOQ4uxii=7KUKv1w32VbjkwS+Z1a0ge0gezNzpn_BiY6MFWkpA@mail.gmail.com>
- <216103D5-0575-4BFC-9802-2C21A1B12DF9@dilger.ca>
+        id S232346AbhBRKFW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Feb 2021 05:05:22 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:12557 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231750AbhBRJ3k (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Feb 2021 04:29:40 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Dh8Vb5CWBzMYJS;
+        Thu, 18 Feb 2021 17:27:03 +0800 (CST)
+Received: from localhost (10.174.179.96) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.498.0; Thu, 18 Feb 2021
+ 17:28:48 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <sfrench@samba.org>, <scabrero@suse.de>,
+        <dan.carpenter@oracle.com>, <aaptel@suse.com>
+CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+        <linux-kernel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH] cifs: Fix inconsistent IS_ERR and PTR_ERR
+Date:   Thu, 18 Feb 2021 17:28:12 +0800
+Message-ID: <20210218092812.20004-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <216103D5-0575-4BFC-9802-2C21A1B12DF9@dilger.ca>
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.96]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Feb 17, 2021 at 05:50:35PM -0700, Andreas Dilger wrote:
-> On Feb 17, 2021, at 1:08 AM, Amir Goldstein <amir73il@gmail.com> wrote:
-> > 
-> > You are missing my point.
-> > Never mind which server. The server does not *need* to rely on
-> > vfs_copy_file_range() to copy files from XFS to ext4.
-> > The server is very capable of implementing the fallback generic copy
-> > in case source/target fs do not support native {copy,remap}_file_range().
-> > 
-> > w.r.t semantics of copy_file_range() syscall vs. the fallback to userespace
-> > 'cp' tool (check source file size before copy or not), please note that the
-> > semantics of CIFS_IOC_COPYCHUNK_FILE are that of the former:
-> > 
-> >        rc = cifs_file_copychunk_range(xid, src_file.file, 0, dst_file, 0,
-> >                                        src_inode->i_size, 0);
-> > 
-> > It will copy zero bytes if advertised source file size if zero.
-> > 
-> > NFS server side copy semantics are currently de-facto the same
-> > because both the client and the server will have to pass through this
-> > line in vfs_copy_file_range():
-> > 
-> >        if (len == 0)
-> >                return 0;
-> > 
-> > IMO, and this opinion was voiced by several other filesystem developers,
-> > the shortend copy semantics are the correct semantics for copy_file_range()
-> > syscall as well as for vfs_copy_file_range() for internal kernel users.
-> > 
-> > I guess what this means is that if the 'cp' tool ever tries an opportunistic
-> > copy_file_range() syscall (e.g. --cfr=auto), it may result in zero size copy.
-> 
-> Having a syscall that does the "wrong thing" when called on two files
-> doesn't make sense.  Expecting userspace to check whether source/target
-> files supports CFR is also not practical.  This is trivial for the
-> kernel to determine and return -EOPNOTSUPP to the caller if the source
-> file (procfs/sysfs/etc) does not work with CFR properly.
+Fix inconsistent IS_ERR and PTR_ERR in cifs_find_swn_reg(). The proper
+pointer to be passed as argument to PTR_ERR() is share_name.
 
-How does the kernel "know" that a specific file in a specific filesystem
-will not work with CFR "properly"?  That goes back to the original patch
-which tried to label each and every filesystem type with a
-"supported/not supported" type of flag, which was going to be a mess,
-especially as it seems that this might be a file-specific thing, not a
-filesystem-specific thing.
+This bug was detected with the help of Coccinelle.
 
-The goal of the patch _should_ be that the kernel figure it out itself,
-but so far no one seems to be able to explain how that can be done :(
+Fixes: bf80e5d4259a ("cifs: Send witness register and unregister commands to userspace daemon")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ fs/cifs/cifs_swn.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So, any hints?
+diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
+index d35f599aa00e..f2d730fffccb 100644
+--- a/fs/cifs/cifs_swn.c
++++ b/fs/cifs/cifs_swn.c
+@@ -272,7 +272,7 @@ static struct cifs_swn_reg *cifs_find_swn_reg(struct cifs_tcon *tcon)
+ 	if (IS_ERR(share_name)) {
+ 		int ret;
+ 
+-		ret = PTR_ERR(net_name);
++		ret = PTR_ERR(share_name);
+ 		cifs_dbg(VFS, "%s: failed to extract share name from target '%s': %d\n",
+ 				__func__, tcon->treeName, ret);
+ 		kfree(net_name);
+-- 
+2.22.0
 
-thanks,
-
-greg k-h
