@@ -2,70 +2,103 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BE9C433DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 10:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7991DC433E9
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 10:19:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 720FC64E92
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 10:18:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3928C60235
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Feb 2021 10:19:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232346AbhBRKFW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Feb 2021 05:05:22 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12557 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231750AbhBRJ3k (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Feb 2021 04:29:40 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Dh8Vb5CWBzMYJS;
-        Thu, 18 Feb 2021 17:27:03 +0800 (CST)
-Received: from localhost (10.174.179.96) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.498.0; Thu, 18 Feb 2021
- 17:28:48 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <sfrench@samba.org>, <scabrero@suse.de>,
-        <dan.carpenter@oracle.com>, <aaptel@suse.com>
-CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-        <linux-kernel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH] cifs: Fix inconsistent IS_ERR and PTR_ERR
-Date:   Thu, 18 Feb 2021 17:28:12 +0800
-Message-ID: <20210218092812.20004-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        id S229953AbhBRJ70 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Feb 2021 04:59:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34404 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231450AbhBRJMu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Feb 2021 04:12:50 -0500
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E849C061756;
+        Thu, 18 Feb 2021 01:10:12 -0800 (PST)
+Received: by mail-il1-x12f.google.com with SMTP id a16so852681ilq.5;
+        Thu, 18 Feb 2021 01:10:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OgQOiOPnq0DRvI2eZdQvsHnaIaMA+0qyu71WaKASe+E=;
+        b=KIj9uV247HXRj8/OdXi7y7ObktVMiQkfY1zBawc3yoqptXXOeQTlt477Lr0LhrSGE9
+         8E18Bxidf9al2BaaL4xQC/16sB1fQQ8/NXtUzgFeb2Tl+lMz/7TeP3pg/dihjZBohG7+
+         Se3QMaNt+hpWGzO7FbyL236gNrhjqG1KqA1QlNO2w/DwML7TfhYsXFaNCZB4laQDaY+F
+         oZkmK4iDfnSJRr1w54d303Bkhc5/PFzSLgJ4odjLMS35jswywGq2QGEUU14unumiNnAN
+         qpHtfXb5gITTwAbd5vZpb18FanWx4e2pmi6XDDLIZ6epHqg+bRzfy3Pt7kKhL+hAezW9
+         +e+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OgQOiOPnq0DRvI2eZdQvsHnaIaMA+0qyu71WaKASe+E=;
+        b=kSJOO/Y2azAc3u998nFl7nQ5qNLFNurdH8g+1BiNILdwFp3z/Cbg78Ec3DCYtGUTkW
+         G6TzrJ0qfnjiMtaLJB1p0nZTfLWl5xll32yNzUn9mekD6hDBSvR4+N6ZtNozRa5BeH+D
+         w1SuBK6ayuobWjB6Z0AK5RkI2a5d+yAAx5Vv7QlOvQUZfs03XWVp2Zud57dUClRjg31g
+         PjowJCqgQp9j2ZW+3OKKMQ3KrS5Xrclw6lIdYTSdGpYc/0Fhnm9+tLiE6TXD5jIjyJ7L
+         M0RAANv/Hzs9Uim4X99ye5dx1RKvxfvr0kplb7o0Csom3MGhMJ5N2XaNUQM+2URgCZOa
+         JOtA==
+X-Gm-Message-State: AOAM530FXwNwJvZiX1Idh5R0/zAXMxrgje0AjryZmgQmZWm9alLI+PHZ
+        5vQd2MnwpuMmkt2hwpITPklgq8+0qjAuO5FYR6o=
+X-Google-Smtp-Source: ABdhPJwxXq4k2yVJ6n1V7pcmcKjBIF0kyD/ZKAbc2Dz8lUF9r8GD81APTW8Ak1u3Tadv0KMLHxr+7GYAW078rcvAOLg=
+X-Received: by 2002:a92:8b89:: with SMTP id i131mr2975061ild.9.1613639411616;
+ Thu, 18 Feb 2021 01:10:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.96]
-X-CFilter-Loop: Reflected
+References: <CAOQ4uxiFGjdvX2-zh5o46pn7RZhvbGHH0wpzLPuPOom91FwWeQ@mail.gmail.com>
+ <20210215154317.8590-1-lhenriques@suse.de> <20210218074207.GA329605@infradead.org>
+In-Reply-To: <20210218074207.GA329605@infradead.org>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Thu, 18 Feb 2021 11:10:00 +0200
+Message-ID: <CAOQ4uxgreB=TywvWQXfcHYMBcFm5OKSdwUC8YJY1WuVja6PccQ@mail.gmail.com>
+Subject: Re: [PATCH v2] vfs: prevent copy_file_range to copy across devices
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Luis Henriques <lhenriques@suse.de>,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Nicolas Boichat <drinkcat@chromium.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fix inconsistent IS_ERR and PTR_ERR in cifs_find_swn_reg(). The proper
-pointer to be passed as argument to PTR_ERR() is share_name.
+On Thu, Feb 18, 2021 at 9:42 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> Looks good:
+>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>
+> This whole idea of cross-device copie has always been a horrible idea,
+> and I've been arguing against it since the patches were posted.
 
-This bug was detected with the help of Coccinelle.
+Ok. I'm good with this v2 as well, but need to add the fallback to
+do_splice_direct()
+in nfsd_copy_file_range(), because this patch breaks it.
 
-Fixes: bf80e5d4259a ("cifs: Send witness register and unregister commands to userspace daemon")
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- fs/cifs/cifs_swn.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+And the commit message of v3 is better in describing the reported issue.
 
-diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
-index d35f599aa00e..f2d730fffccb 100644
---- a/fs/cifs/cifs_swn.c
-+++ b/fs/cifs/cifs_swn.c
-@@ -272,7 +272,7 @@ static struct cifs_swn_reg *cifs_find_swn_reg(struct cifs_tcon *tcon)
- 	if (IS_ERR(share_name)) {
- 		int ret;
- 
--		ret = PTR_ERR(net_name);
-+		ret = PTR_ERR(share_name);
- 		cifs_dbg(VFS, "%s: failed to extract share name from target '%s': %d\n",
- 				__func__, tcon->treeName, ret);
- 		kfree(net_name);
--- 
-2.22.0
-
+Thanks,
+Amir.
