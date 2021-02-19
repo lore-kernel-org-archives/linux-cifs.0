@@ -2,283 +2,486 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B295C433E0
-	for <linux-cifs@archiver.kernel.org>; Fri, 19 Feb 2021 13:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A79C433E0
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Feb 2021 14:17:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 165D764E28
-	for <linux-cifs@archiver.kernel.org>; Fri, 19 Feb 2021 13:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D354064EDF
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Feb 2021 14:17:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbhBSNYx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 19 Feb 2021 08:24:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57560 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbhBSNYw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Feb 2021 08:24:52 -0500
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 920CEC061756
-        for <linux-cifs@vger.kernel.org>; Fri, 19 Feb 2021 05:24:11 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id b10so5530426ybn.3
-        for <linux-cifs@vger.kernel.org>; Fri, 19 Feb 2021 05:24:11 -0800 (PST)
+        id S230014AbhBSORL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 Feb 2021 09:17:11 -0500
+Received: from smtppost.atos.net ([193.56.114.176]:21523 "EHLO
+        smarthost1.atos.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S229804AbhBSORK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Feb 2021 09:17:10 -0500
+X-Greylist: delayed 316 seconds by postgrey-1.27 at vger.kernel.org; Fri, 19 Feb 2021 09:17:08 EST
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=6s7xibgS2f84ch0Mi2tBf9HQBG7isi/G6blr9spjbkg=;
-        b=m3OmjNB0g0zgzGV45xDlHw8/TESPbErCxAAe0tWf4EMjyJpTGHedx2VbWrxCbpJGv7
-         zoKTI8RS5nHWm3+tACSnjMhT9vt9nCmnBae3SMXqidBkZn+lXsLfzUy+BwdBvbt53Onn
-         EAUvgoD/h9LTALw97hTc9UB8UZAxs1yBnu79JpxS4FQStOb6nPTNxQ1nz2qPRNP2moq4
-         /VexqQmxsjsLMiAPkBBT1JptNQ0QQZxjBnVak1kq5UEsiLudo92xig/+g1QFdYT/yLlN
-         kH8tLTJW27kCuD22mWPCFLCcIW2h6Vb7BQLRn6fOCuxOyqG0PfEsLMdryfMyfj373iNG
-         Rn5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=6s7xibgS2f84ch0Mi2tBf9HQBG7isi/G6blr9spjbkg=;
-        b=pNLiQHkmsLPgDRQnVXnBMskd3q/MiACJKYJ6ATE13HtQpdIy68vomq5v/LFrANpytp
-         +ugUH3ugo3Rdc30sjCXCvFuWo2hlFWrzxXxIJpqssVpgjTORfgRluqAJZ0Tr2zs2AcU0
-         y9EROg9/Sw63U6FktqK8w15SwnXK1SOzwQP34y2hd99iMEFuJJYGxtm/h4BQE8Qlyqqb
-         6jcNEBPAKarhTEiobAWz66qGgyB5SYb/ZIjUr1Ykrsl6cYVmwmWDOiDGhxFrA9EsfLNE
-         Fit/a+OQsvKV5GmAZkucaPbXtHyjtrDoy2gb5Gd0ECxZU/prjX6g23R0s4p2HIyMdsuO
-         teKA==
-X-Gm-Message-State: AOAM532isd79H13HGRr+HrVBuu5JTtog8hi1Yb5GnzOSbHH+evwyXze3
-        69K8y58jtB3QAhZkuWlb22/QDOoeOmOZb9+BlJc=
-X-Google-Smtp-Source: ABdhPJwhqcg9HApmUfTC4Uo7zE58UBf4/mbn9WiDU0Hou3kJ52b4W7+bWyiNn6dvQSmGbzyvJRaubhClXF5KL7WjwLA=
-X-Received: by 2002:a25:442:: with SMTP id 63mr13937250ybe.131.1613741050371;
- Fri, 19 Feb 2021 05:24:10 -0800 (PST)
+  d=atos.net; i=@atos.net; q=dns/txt; s=mail;
+  t=1613744228; x=1645280228;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=EJNTDq7qApAAwz/ACEw4RVp5c1ZBLKVTvWccgfaiXIw=;
+  b=siR09jRSgukz/VNgbmYIgfrNa8OZCqXN8d6QdHgJJRdAsB4J3vshjEQB
+   vJlaB3o+RI99EPHdW0+3L68bpfmS42WKnA51xPQ/9MMuLJ/ldRJFPQktg
+   GYxvhpoCTJ6yhIQWsJGTRF3sdl/aa8cn9BuI9c5M+1ylAiAowKXO49fEs
+   U=;
+X-IronPort-AV: E=Sophos;i="5.81,189,1610406000"; 
+   d="scan'208";a="216021951"
+X-MGA-submission: =?us-ascii?q?MDH5TTuEvCVUh63gaRZ5nsNOPbXZfWTHaWO2ar?=
+ =?us-ascii?q?IXX0nCRXNj57attouui/AqbEg5A11x9WV11AeW90K6WBrwTog3PFVmSI?=
+ =?us-ascii?q?SeteZwb5AGiSo8tKMQEeJluuTzSn6eGhOn+nl75xFfovxlssXzCjUlaw?=
+ =?us-ascii?q?Lg?=
+Received: from mail.sis.atos.net (HELO GITEXCPRDMB12.ww931.my-it-solutions.net) ([10.89.28.142])
+  by smarthost1.atos.net with ESMTP/TLS/AES256-GCM-SHA384; 19 Feb 2021 15:10:39 +0100
+Received: from GITEXCPRDMB14.ww931.my-it-solutions.net (10.89.28.144) by
+ GITEXCPRDMB12.ww931.my-it-solutions.net (10.89.28.142) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 19 Feb 2021 15:10:37 +0100
+Received: from GITEXCPRDMB14.ww931.my-it-solutions.net ([10.89.28.144]) by
+ GITEXCPRDMB14.ww931.my-it-solutions.net ([10.89.28.144]) with mapi id
+ 15.01.2176.002; Fri, 19 Feb 2021 15:10:37 +0100
+From:   "Weiser, Michael" <michael.weiser@atos.net>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+CC:     Steve French <smfrench@gmail.com>,
+        "The GSS-Proxy developers and users mailing list" 
+        <gss-proxy@lists.fedorahosted.org>, Simo Sorce <simo@redhat.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Subject: Re: [gssproxy] Re: cifs-utils, Linux cifs kernel client and gssproxy
+Thread-Topic: [gssproxy] Re: cifs-utils, Linux cifs kernel client and gssproxy
+Thread-Index: AQHW0tgPe397r8v2v0y1SGaypM9pOan5ueIAgCJKLuGAQ6m6gIAALzfK
+Date:   Fri, 19 Feb 2021 14:10:37 +0000
+Message-ID: <7ac6d12d9ff1406faa2b39567a95647a@atos.net>
+References: <2e241ceaece6485289b1cddb84ec77ca@atos.net>
+ <04d24a21a7a462b3dc316959c3a3b1c8be8caac3.camel@redhat.com>
+ <e562d3fb430e4c87b0700a70267ef930@atos.net>,<CANT5p=rOJO6s7Ro9bQG4DN70m-=Eb4Ax9A+jJe7oBdj9Xm_EYQ@mail.gmail.com>
+In-Reply-To: <CANT5p=rOJO6s7Ro9bQG4DN70m-=Eb4Ax9A+jJe7oBdj9Xm_EYQ@mail.gmail.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-GB
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [160.92.209.239]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Fri, 19 Feb 2021 05:23:59 -0800
-Message-ID: <CANT5p=rU-DteGZi19OoAWc3cR9qJZ9pxvB5QcpGT3aq=5C8qiw@mail.gmail.com>
-Subject: [PATCH 2/2] cifs: Change SIDs in ACEs while transferring file ownership.
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000011424c05bbb05e87"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000011424c05bbb05e87
-Content-Type: text/plain; charset="UTF-8"
+Hi Shyam,
 
-Here's the other one. Below is the test output:
-linuxadmin@linuxvm20:/mnt/TestShare/Feb18$ touch file11
-linuxadmin@linuxvm20:/mnt/TestShare/Feb18$ chmod 0727 file11
-linuxadmin@linuxvm20:/mnt/TestShare/Feb18$ getcifsacl file11
-# filename: file11
-REVISION:0x1
-CONTROL:0x8004
-OWNER:LINUXDOMAIN\linuxadmin <<<
-GROUP:LINUXDOMAIN\Domain Users
-ACL:NT Authority\SYSTEM:ALLOWED/0x0/FULL
-ACL:BUILTIN\Users:ALLOWED/0x0/READ
-ACL:LINUXDOMAIN\linuxadmin:ALLOWED/0x0/FULL <<<
-ACL:LINUXDOMAIN\Domain Users:DENIED/0x0/0xd0131
-ACL:LINUXDOMAIN\Domain Users:ALLOWED/0x0/0x1f01de
-ACL:\Everyone:ALLOWED/0x0/FULL
+> What happens when credentials are not supplied in keytab files? Is
+> there a way to supply the credentials from other sources in that case?
 
-linuxadmin@linuxvm20:/mnt/TestShare/Feb18$ chown lxsmbrw file11
-linuxadmin@linuxvm20:/mnt/TestShare/Feb18$ getcifsacl file11
-# filename: file11
-REVISION:0x1
-CONTROL:0x8004
-OWNER:LINUXDOMAIN\lxsmbrw <<< new owner
-GROUP:LINUXDOMAIN\Domain Users
-ACL:NT Authority\SYSTEM:ALLOWED/0x0/FULL
-ACL:BUILTIN\Users:ALLOWED/0x0/READ
-ACL:LINUXDOMAIN\lxsmbrw:ALLOWED/0x0/FULL <<< ACE updated with new owner
-ACL:LINUXDOMAIN\Domain Users:DENIED/0x0/0xd0131
-ACL:LINUXDOMAIN\Domain Users:ALLOWED/0x0/0x1f01de
-ACL:\Everyone:ALLOWED/0x0/FULL
+In my scenario, gssproxy has a single keytab with its own machine/service i=
+dentity (actually just /etc/krb5.keytab and machine$@REALM) that is allowed=
+ to impersonate users, i.e. retrieve service tickets made out to user ident=
+ities without obtaining a TGT for the respective user identity first.
 
--- 
+When dealing with end-users, the option of having user-specific keytabs is =
+IMO quite impractical because the keytabs would need updating on every pass=
+word change.
+
+For machine-to-machine communication accounts with static passwords could h=
+ave keytabs and those could be under gssproxy's supervision and with additi=
+onal hardening (SELinux?) cifs.upcall could even be prevented from having d=
+irect access to them and only ever get the cifs service ticket it actually =
+needs to function.
+
+> The reason why I'm asking this is that this same code can be used by
+> cifscreds (or a new executable) to perform the authentication, and
+> collect the krb5 tickets.
+
+I understand cifscreds "pushes" credentials, i.e. the user's password, into=
+ the kernel so it can log on to services as that user at any given point in=
+ time. This works because the password is valid for days or weeks at a time=
+ and works with multiple servers. Kerberos tickets usually expire after som=
+e hours and need to be made out to specific target services/servers. So cif=
+screds (or the new executable) would also need an option to specify the ser=
+vice for which the user wants to push a credential into the kernel for and =
+it'd need to be called repeatedly to refresh that ticket. This would somewh=
+at limits its usefulness, IMO.
+
+The benefit would be that users could explicitly specify the identity they =
+wanted to use - so long as the user is actually doing the retrieving of the=
+ credential and needs to authenticate for that.
+In the case of impersonation by gssproxy this becomes tricky because gsspro=
+xy needs to make sure that users can't just claim any identity. So the user=
+ would need to authenticate to gssproxy somehow which (due to the ephemeral=
+ nature of Kerberos tickets) would likely require it to become more statefu=
+l or configurable, i.e. somehow know that uid 10012 is allowed to use ident=
+ities alice@REALM and bob@REALM.
+
+> Also, in the cifs.upcall changes, you could check for the
+> GSS_USE_PROXY env variable. In the absence of which, fallback to the
+> older code. If that is done, it gives the user an option to go for one
+> option or the other.
+
+I was thinking about that as well and am still somewhat unsure how to best =
+do it. rpc.gssd is going at it the other way around[2]: A config file optio=
+n lets the user explicitly enable usage of gssproxy and rpc.gssd sets the v=
+ariable to enable the functionality. cifs.upcall could have a command line =
+option for that (and another to optionally specify a non-default socket).
+
+The advantage would be that there's no cryptic variable-setting syntax to b=
+e added to request-key's cifs.spnego.conf but just additional straightforwa=
+rd command-line option(s). The downside is that it cements the GSS_USE_PROX=
+Y variable into yet another executable.
+
+I wonder, how the gssproxy team had intended this to be done. Simo?
+
+[2] http://git.linux-nfs.org/?p=3Dsteved/nfs-utils.git;a=3Dblob;f=3Dutils/g=
+ssd/gssd.c;h=3D85bc4b07bebde05eabdce9b85a1da8bbd82bcede;hb=3DHEAD#l1030
+
+> Other than that, the changes look fine to me.
+
+Thanks for your feedback!
+--
+Thanks,
+Michael
+________________________________________
+From: samba-technical <samba-technical-bounces@lists.samba.org> on behalf o=
+f Shyam Prasad N via samba-technical <samba-technical@lists.samba.org>
+Sent: 19 February 2021 12:26:53
+To: Weiser, Michael
+Cc: Steve French; The GSS-Proxy developers and users mailing list; samba-te=
+chnical@lists.samba.org; Simo Sorce; linux-cifs@vger.kernel.org
+Subject: Re: [gssproxy] Re: cifs-utils, Linux cifs kernel client and gsspro=
+xy
+
+Caution! External email. Do not open attachments or click links, unless thi=
+s email comes from a known sender and you know the content is safe.
+
+Hi Michael,
+
+What happens when credentials are not supplied in keytab files? Is
+there a way to supply the credentials from other sources in that case?
+The reason why I'm asking this is that this same code can be used by
+cifscreds (or a new executable) to perform the authentication, and
+collect the krb5 tickets.
+
+Also, in the cifs.upcall changes, you could check for the
+GSS_USE_PROXY env variable. In the absence of which, fallback to the
+older code. If that is done, it gives the user an option to go for one
+option or the other.
+Other than that, the changes look fine to me.
+
 Regards,
 Shyam
 
---00000000000011424c05bbb05e87
-Content-Type: application/octet-stream; 
-	name="0002-cifs-Change-SIDs-in-ACEs-while-transferring-file-own.patch"
-Content-Disposition: attachment; 
-	filename="0002-cifs-Change-SIDs-in-ACEs-while-transferring-file-own.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_klcbqw0z0>
-X-Attachment-Id: f_klcbqw0z0
+On Thu, Jan 7, 2021 at 3:08 AM Weiser, Michael <michael.weiser@atos.net> wr=
+ote:
+>
+> Hello Simo,
+> Hello Steve,
+>
+> > If something is needed in the short term, I thjink the quickest course
+> > of action is indeed to change the userspace helper to use gssapi
+> > function calls, so that they can be intercepted like we do for rpc.gssd
+> > (nfs client's userspace helper).
+>
+> To get the ball rolling and give people (including myself and client) som=
+ething to play with I went that route and extended cifs.upcall to fall back=
+ to GSS-API if no ticket cache nor keytab can be found for the user. An unp=
+olished PoC patch is attached. (Sorry, for not putting it inline, have to r=
+ock the groupware at work. I will try to sort that once we've agreed this i=
+s the/a way to go.)
+>
+> With that patch applied,  I can do a multiuser cifs mount using the syste=
+m keytab and machine identity as usual and then have users access the mount=
+ using impersonated credentials from gssproxy. Quick demo:
+>
+> [root@fedora33 ~]# umount /mnt
+> [root@fedora33 ~]# mount -o sec=3Dkrb5,multiuser,user=3DFEDORA33\$ //dc/s=
+hare /mnt
+> [root@fedora33 ~]# ls -la /mnt
+> total 0
+> drwxr-xr-x.  2 root root   0 Jan  7 10:20 .
+> dr-xr-xr-x. 18 root root 238 Jan  6 13:59 ..
+> -rwxr-xr-x.  1 root root   0 Jan  5 17:02 bar
+> [root@fedora33 ~]# klist
+> klist: Credentials cache keyring 'persistent:0:krb_ccache_WZh7W8n' not fo=
+und
+> [root@fedora33 ~]#
+>
+> [adsuser@fedora33 ~]$ kdestroy
+> [adsuser@fedora33 ~]$ echo test > /mnt/test
+> [adsuser@fedora33 ~]$ cat /mnt/test
+> test
+> [adsuser@fedora33 ~]$ klist
+> klist: Credentials cache keyring 'persistent:1618201110:krb_ccache_SrGqT3=
+F' not found
+> [adsuser@fedora33 ~]$
+>
+> Server-side permissions are enforced:
+>
+> [m@fedora33 ~]$ cat /mnt/test
+> test
+> [m@fedora33 ~]$ echo mytest > /mnt/test
+> -bash: /mnt/test: Permission denied
+> [m@fedora33 ~]$ klist
+> klist: Credentials cache keyring 'persistent:1000:1000' not found
+> [m@fedora33 ~]$
+>
+> The gssproxy config for this configures a cifs-specific socket and enable=
+s impersonation for any user id:
+>
+> [root@fedora33 ~]# cat /etc/gssproxy/99-cifs.conf
+> [service/cifs]
+> mechs =3D krb5
+> socket =3D /var/lib/gssproxy/cifs.sock
+> cred_store =3D keytab:/etc/krb5.keytab
+> cred_usage =3D initiate
+> euid =3D 0
+> impersonate =3D yes
+> allow_any_uid =3D yes
+>
+> And request-key config for cifs.spnego enables use of gssproxy and the se=
+rvice-specific socket through environment variables:
+>
+> [root@fedora33 ~]# cat /etc/request-key.d/cifs.spnego.conf
+> create  cifs.spnego    * *  /usr/bin/env GSS_USE_PROXY=3Dyes GSSPROXY_SOC=
+KET=3D/var/lib/gssproxy/cifs.sock /usr/sbin/cifs.upcall %k
+>
+> (I see that nfs-utils' gssd does the same by setting the variables itself=
+ based on command line options. That could easily be done here as well.)
+>
+> User FEDORA33$ (the computer object) needs to be enabled for delegation t=
+o service cifs. I've tested with a Fedora 33 client and Windows 2016 Active=
+ Directory server.
+>
+> The patch is against current cifs-utils HEAD. It is lacking all the autoc=
+onf trimmings and intentionally forgoes reindents of existing code for clar=
+ity of what's being touched.
+>
+> What do you think?
+>
+> > Unfortunately I do not have the cycles to work on that myself at this
+> > time :-(
+>
+> I have a client in very tangible need of this functionality who is a RedH=
+at customer. Would it be helpful if they were to open a case with Redhat on=
+ this?
+>
+> As an extension the above (but not to distract from the focus of getting =
+something to work at all first):
+>
+> I rather accidentally also played around with delegating retrieval of the=
+ mount credentials into gssproxy as well (due to not realising that usernam=
+e=3DFEDORA33$ would just activate the keytab codepath in cifs.upcall).
+>
+> This can be done by leaving out the username from the mount command, mark=
+ing euid 0 as trusted for access to the keytab in gssproxy and adding a fal=
+lback principal to the gssproxy config (because cifs.upcall in this case do=
+es not submit a desired name for the credential):
+>
+> [root@fedora33 ~]# mount -o sec=3Dkrb5,multiuser //dc/share /mnt
+> [root@fedora33 ~]# cat /etc/gssproxy/99-cifs.conf
+> [service/cifs]
+> mechs =3D krb5
+> socket =3D /var/lib/gssproxy/cifs.sock
+> cred_store =3D keytab:/etc/krb5.keytab
+> cred_usage =3D initiate
+> euid =3D 0
+> trusted =3D yes
+> impersonate =3D yes
+> krb5_principal =3D cifs-mount
+> allow_any_uid =3D yes
+>
+> While this works, it requires a separate user who would then carefully ne=
+ed to be kept out of any sensitive file access groups.
+>
+> When trying to use the machine identity FEDORA33$ instead, I ran into a p=
+eculiar error from the AD KDC:
+>
+> [root@fedora33 ~]# cat /etc/gssproxy/99-cifs.conf
+> [service/cifs]
+> mechs =3D krb5
+> socket =3D /var/lib/gssproxy/cifs.sock
+> cred_store =3D keytab:/etc/krb5.keytab
+> cred_usage =3D initiate
+> euid =3D 0
+> trusted =3D yes
+> impersonate =3D yes
+> krb5_principal =3D FEDORA33$
+> allow_any_uid =3D yes
+> [root@fedora33 ~]# gssproxy -i -d &
+> [2] 3814
+> [root@fedora33 ~]# [2021/01/07 10:01:10]: Debug Enabled (level: 1)
+> [2021/01/07 10:01:10]: Service: nfs-server, Keytab: /etc/krb5.keytab, Enc=
+type: 17
+> [2021/01/07 10:01:10]: Service: cifs, Keytab: /etc/krb5.keytab, Enctype: =
+17
+> [2021/01/07 10:01:10]: Service: nfs-client, Keytab: /etc/krb5.keytab, Enc=
+type: 17
+> [2021/01/07 10:01:10]: Client [2021/01/07 10:01:10]: (/usr/sbin/gssproxy)=
+ [2021/01/07 10:01:10]:  connected (fd =3D 11)[2021/01/07 10:01:10]:  (pid =
+=3D 3814) (uid =3D 0) (gid =3D 0)[2021/01/07 10:01:10]:  (context =3D syste=
+m_u:system_r:kernel_t:s0)[2021/01/07 10:01:10]:
+>
+> [root@fedora33 ~]# mount -o sec=3Dkrb5,multiuser //dc/share /mnt
+> [2021/01/07 10:01:13]: Client [2021/01/07 10:01:13]: (/usr/sbin/cifs.upca=
+ll) [2021/01/07 10:01:13]:  connected (fd =3D 12)[2021/01/07 10:01:13]:  (p=
+id =3D 3824) (uid =3D 0) (gid =3D 0)[2021/01/07 10:01:13]:  (context =3D sy=
+stem_u:system_r:kernel_t:s0)[2021/01/07 10:01:13]:
+> [CID 12][2021/01/07 10:01:13]: gp_rpc_execute: executing 6 (GSSX_ACQUIRE_=
+CRED) for service "cifs", euid: 0,socket: /var/lib/gssproxy/cifs.sock
+> gssproxy[3814]: (OID: { 1 2 840 113554 1 2 2 }) Unspecified GSS failure. =
+ Minor code may provide more information, KDC has no support for padata typ=
+e
+> [CID 12][2021/01/07 10:01:13]: gp_rpc_execute: executing 8 (GSSX_INIT_SEC=
+_CONTEXT) for service "cifs", euid: 0,socket: /var/lib/gssproxy/cifs.sock
+> gssproxy[3814]: (OID: { 1 2 840 113554 1 2 2 }) Unspecified GSS failure. =
+ Minor code may provide more information, KDC has no support for padata typ=
+e
+> [CID 12][2021/01/07 10:01:13]: gp_rpc_execute: executing 6 (GSSX_ACQUIRE_=
+CRED) for service "cifs", euid: 0,socket: /var/lib/gssproxy/cifs.sock
+> gssproxy[3814]: (OID: { 1 2 840 113554 1 2 2 }) Unspecified GSS failure. =
+ Minor code may provide more information, KDC has no support for padata typ=
+e
+> [CID 12][2021/01/07 10:01:13]: gp_rpc_execute: executing 8 (GSSX_INIT_SEC=
+_CONTEXT) for service "cifs", euid: 0,socket: /var/lib/gssproxy/cifs.sock
+> gssproxy[3814]: (OID: { 1 2 840 113554 1 2 2 }) Unspecified GSS failure. =
+ Minor code may provide more information, KDC has no support for padata typ=
+e
+> mount error(126): Required key not available
+> Refer to the mount.cifs(8) manual page (e.g. man mount.cifs) and kernel l=
+og messages (dmesg)
+>
+> With more debugging it appears that gssproxy tries to impersonate user FE=
+DORA33$ with a credential which is also for FEDORA33$. After further testin=
+g it seems this is generally not allowed or just not working due to never b=
+eing tested because it is unnecessary: If we can acquire a impersonation cr=
+edential for that identity we should also be able to get the actual access =
+credential as well.
+>
+> From looking at the nfs-utils gssd code it appears the only reason it has=
+n't run into this case yet is because it handles the machine credentials it=
+self using krb5 functions.
+>
+> The second attached patch against current gssproxy HEAD adds that distinc=
+tion and makes this case work as an optional extension with fallback into t=
+he default codepath on error.
+>
+> Does that make sense?
+> Is it sane, security wise, do you think?
+> --
+> Thanks,
+> Michael
+> ________________________________________
+> From: Simo Sorce <simo@redhat.com>
+> Sent: 16 December 2020 15:31:40
+> To: The GSS-Proxy developers and users mailing list; linux-cifs@vger.kern=
+el.org
+> Cc: samba-technical@lists.samba.org
+> Subject: [gssproxy] Re: cifs-utils, Linux cifs kernel client and gssproxy
+>
+> Caution! External email. Do not open attachments or click links, unless t=
+his email comes from a known sender and you know the content is safe.
+>
+> Hi Michael,
+> as you say the best course of action would be for cifs.ko to move to
+> use the RPC interface we defined for knfsd (with any extensions that
+> may  be needed), and we had discussions in the past with cifs upstream
+> developers about it. But nothing really materialized.
+>
+> If something is needed in the short term, I thjink the quickest course
+> of action is indeed to change the userspace helper to use gssapi
+> function calls, so that they can be intercepted like we do for rpc.gssd
+> (nfs client's userspace helper).
+>
+> Unfortunately I do not have the cycles to work on that myself at this
+> time :-(
+>
+> HTH,
+> Simo.
+>
+> On Wed, 2020-12-16 at 10:01 +0000, Weiser, Michael wrote:
+> > Hello,
+> >
+> > I have a use-case for authentication of Linux cifs client mounts withou=
+t the user being present (e.g. from batch jobs) using gssproxy's impersonat=
+ion feature with Kerberos Constrained Delegation similar to how it can be d=
+one for NFS[1].
+> >
+> > My understanding is that currently neither the Linux cifs kernel client=
+ nor cifs-utils userland tools support acquiring credentials using gssproxy=
+. The former uses a custom upcall interface to talk to cifs.spnego from cif=
+s-utils. The latter then goes looking for Kerberos ticket caches using libk=
+rb5 functions, not GSSAPI, which prevents gssproxy from interacting with it=
+.[2]
+> >
+> > From what I understand, the preferred method would be to switch the Lin=
+ux kernel client upcall to the RPC protocol defined by gssproxy[3] (as has =
+been done for the Linux kernel NFS server already replacing rpc.svcgssd[4])=
+. The kernel could then, at least optionally, talk to gssproxy directly to =
+try and obtain credentials.
+> >
+> > Failing that, cifs-utils' cifs.spnego could be switched to GSSAPI so th=
+at gssproxy's interposer plugin could intercept GSSAPI calls and provide th=
+em with the required credentials (similar to the NFS client rpc.gssd[5]).
+> >
+> > Assuming my understanding is correct so far:
+> >
+> > Is anyone doing any work on this and could use some help (testing, codi=
+ng)?
+> > What would be expected complexity and possible roadblocks when trying t=
+o make a start at implementing this?
+> > Or is the idea moot due to some constraint or recent development I'm no=
+t aware of?
+> >
+> > I have found a recent discussion of the topic on linux-cifs[6] which pr=
+ovided no definite answer though.
+> >
+> > As a crude attempt at an explicit userspace workaround I tried but fail=
+ed to trick smbclient into initialising a ticket cache using gssproxy for c=
+ifs.spnego to find later on.
+> > Is this something that could be implemented without too much redundant =
+effort (or should already work, perhaps using a different tool)?
+> >
+> > [1] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#user-imper=
+sonation-via-constrained-delegation
+> > [2] https://pagure.io/gssproxy/issue/56
+> > [3] https://github.com/gssapi/gssproxy/blob/main/docs/ProtocolDocumenta=
+tion.md
+> > [4] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#nfs-server
+> > [5] https://github.com/gssapi/gssproxy/blob/main/docs/NFS.md#nfs-client
+> > [6] https://www.spinics.net/lists/linux-cifs/msg20182.html
+> > --
+> > Thanks,
+> > Michael
+> > _______________________________________________
+> > gss-proxy mailing list -- gss-proxy@lists.fedorahosted.org
+> > To unsubscribe send an email to gss-proxy-leave@lists.fedorahosted.org
+> > Fedora Code of Conduct: https://docs.fedoraproject.org/en-US/project/co=
+de-of-conduct/
+> > List Guidelines: https://fedoraproject.org/wiki/Mailing_list_guidelines
+> > List Archives: https://lists.fedorahosted.org/archives/list/gss-proxy@l=
+ists.fedorahosted.org
+>
+> --
+> Simo Sorce
+> RHEL Crypto Team
+> Red Hat, Inc
+>
+>
+>
+> _______________________________________________
+> gss-proxy mailing list -- gss-proxy@lists.fedorahosted.org
+> To unsubscribe send an email to gss-proxy-leave@lists.fedorahosted.org
+> Fedora Code of Conduct: https://docs.fedoraproject.org/en-US/project/code=
+-of-conduct/
+> List Guidelines: https://fedoraproject.org/wiki/Mailing_list_guidelines
+> List Archives: https://lists.fedorahosted.org/archives/list/gss-proxy@lis=
+ts.fedorahosted.org
 
-RnJvbSBmMDVmYmMzMjJjMjljZTYzZjM3MjkxMmE2ZTY0M2RlYWIzYmQ1NDI1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
-PgpEYXRlOiBUaHUsIDE4IEZlYiAyMDIxIDEzOjAzOjIzICswMDAwClN1YmplY3Q6IFtQQVRDSCAy
-LzJdIGNpZnM6IENoYW5nZSBTSURzIGluIEFDRXMgd2hpbGUgdHJhbnNmZXJyaW5nIGZpbGUKIG93
-bmVyc2hpcC4KCldpdGggY2lmc2FjbCwgd2hlbiBhIGZpbGUvZGlyIG93bmVyc2hpcCBpcyB0cmFu
-c2ZlcnJlZCAoY2hvd24vY2hncnApLAp0aGUgQUNFcyBpbiB0aGUgREFDTCBmb3IgdGhhdCBmaWxl
-IHdpbGwgbmVlZCB0byByZXBsYWNlIHRoZSBvbGQgb3duZXIKU0lEcyB3aXRoIHRoZSBuZXcgb3du
-ZXIgU0lELgoKU2lnbmVkLW9mZi1ieTogU2h5YW0gUHJhc2FkIE4gPHNwcmFzYWRAbWljcm9zb2Z0
-LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNhY2wuYyB8IDEzNyArKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKystLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgOTEgaW5zZXJ0aW9ucygr
-KSwgNDYgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzYWNsLmMgYi9mcy9j
-aWZzL2NpZnNhY2wuYwppbmRleCBjZmQ0ZGE2MTMxNjAuLjQ5ZWJhODI0OTk4ZiAxMDA2NDQKLS0t
-IGEvZnMvY2lmcy9jaWZzYWNsLmMKKysrIGIvZnMvY2lmcy9jaWZzYWNsLmMKQEAgLTUyNSw4ICs1
-MjUsMTEgQEAgZXhpdF9jaWZzX2lkbWFwKHZvaWQpCiB9CiAKIC8qIGNvcHkgbnRzZCwgb3duZXIg
-c2lkLCBhbmQgZ3JvdXAgc2lkIGZyb20gYSBzZWN1cml0eSBkZXNjcmlwdG9yIHRvIGFub3RoZXIg
-Ki8KLXN0YXRpYyB2b2lkIGNvcHlfc2VjX2Rlc2MoY29uc3Qgc3RydWN0IGNpZnNfbnRzZCAqcG50
-c2QsCi0JCQkJc3RydWN0IGNpZnNfbnRzZCAqcG5udHNkLCBfX3UzMiBzaWRzb2Zmc2V0KQorc3Rh
-dGljIF9fdTMyIGNvcHlfc2VjX2Rlc2MoY29uc3Qgc3RydWN0IGNpZnNfbnRzZCAqcG50c2QsCisJ
-CQkJc3RydWN0IGNpZnNfbnRzZCAqcG5udHNkLAorCQkJCV9fdTMyIHNpZHNvZmZzZXQsCisJCQkJ
-c3RydWN0IGNpZnNfc2lkICpwb3duZXJzaWQsCisJCQkJc3RydWN0IGNpZnNfc2lkICpwZ3Jwc2lk
-KQogewogCXN0cnVjdCBjaWZzX3NpZCAqb3duZXJfc2lkX3B0ciwgKmdyb3VwX3NpZF9wdHI7CiAJ
-c3RydWN0IGNpZnNfc2lkICpub3duZXJfc2lkX3B0ciwgKm5ncm91cF9zaWRfcHRyOwpAQCAtNTQw
-LDE5ICs1NDMsMjUgQEAgc3RhdGljIHZvaWQgY29weV9zZWNfZGVzYyhjb25zdCBzdHJ1Y3QgY2lm
-c19udHNkICpwbnRzZCwKIAlwbm50c2QtPmdzaWRvZmZzZXQgPSBjcHVfdG9fbGUzMihzaWRzb2Zm
-c2V0ICsgc2l6ZW9mKHN0cnVjdCBjaWZzX3NpZCkpOwogCiAJLyogY29weSBvd25lciBzaWQgKi8K
-LQlvd25lcl9zaWRfcHRyID0gKHN0cnVjdCBjaWZzX3NpZCAqKSgoY2hhciAqKXBudHNkICsKKwlp
-ZiAocG93bmVyc2lkKQorCQlvd25lcl9zaWRfcHRyID0gcG93bmVyc2lkOworCWVsc2UKKwkJb3du
-ZXJfc2lkX3B0ciA9IChzdHJ1Y3QgY2lmc19zaWQgKikoKGNoYXIgKilwbnRzZCArCiAJCQkJbGUz
-Ml90b19jcHUocG50c2QtPm9zaWRvZmZzZXQpKTsKIAlub3duZXJfc2lkX3B0ciA9IChzdHJ1Y3Qg
-Y2lmc19zaWQgKikoKGNoYXIgKilwbm50c2QgKyBzaWRzb2Zmc2V0KTsKIAljaWZzX2NvcHlfc2lk
-KG5vd25lcl9zaWRfcHRyLCBvd25lcl9zaWRfcHRyKTsKIAogCS8qIGNvcHkgZ3JvdXAgc2lkICov
-Ci0JZ3JvdXBfc2lkX3B0ciA9IChzdHJ1Y3QgY2lmc19zaWQgKikoKGNoYXIgKilwbnRzZCArCisJ
-aWYgKHBncnBzaWQpCisJCWdyb3VwX3NpZF9wdHIgPSBwZ3Jwc2lkOworCWVsc2UKKwkJZ3JvdXBf
-c2lkX3B0ciA9IChzdHJ1Y3QgY2lmc19zaWQgKikoKGNoYXIgKilwbnRzZCArCiAJCQkJbGUzMl90
-b19jcHUocG50c2QtPmdzaWRvZmZzZXQpKTsKIAluZ3JvdXBfc2lkX3B0ciA9IChzdHJ1Y3QgY2lm
-c19zaWQgKikoKGNoYXIgKilwbm50c2QgKyBzaWRzb2Zmc2V0ICsKIAkJCQkJc2l6ZW9mKHN0cnVj
-dCBjaWZzX3NpZCkpOwogCWNpZnNfY29weV9zaWQobmdyb3VwX3NpZF9wdHIsIGdyb3VwX3NpZF9w
-dHIpOwogCi0JcmV0dXJuOworCXJldHVybiBzaWRzb2Zmc2V0ICsgKDIgKiBzaXplb2Yoc3RydWN0
-IGNpZnNfc2lkKSk7CiB9CiAKIApAQCAtNjY3LDE1ICs2NzYsMjEgQEAgc3RhdGljIHZvaWQgbW9k
-ZV90b19hY2Nlc3NfZmxhZ3ModW1vZGVfdCBtb2RlLCB1bW9kZV90IGJpdHNfdG9fdXNlLAogCXJl
-dHVybjsKIH0KIAotc3RhdGljIF9fdTE2IGNpZnNfY29weV9hY2Uoc3RydWN0IGNpZnNfYWNlICpk
-c3QsIHN0cnVjdCBjaWZzX2FjZSAqc3JjKQorc3RhdGljIF9fdTE2IGNpZnNfY29weV9hY2Uoc3Ry
-dWN0IGNpZnNfYWNlICpkc3QsIHN0cnVjdCBjaWZzX2FjZSAqc3JjLCBzdHJ1Y3QgY2lmc19zaWQg
-KnBzaWQpCiB7CiAJX191MTYgc2l6ZSA9IDEgKyAxICsgMiArIDQ7CiAKIAlkc3QtPnR5cGUgPSBz
-cmMtPnR5cGU7CiAJZHN0LT5mbGFncyA9IHNyYy0+ZmxhZ3M7Ci0JZHN0LT5zaXplID0gc3JjLT5z
-aXplOwogCWRzdC0+YWNjZXNzX3JlcSA9IHNyYy0+YWNjZXNzX3JlcTsKLQlzaXplICs9IGNpZnNf
-Y29weV9zaWQoJmRzdC0+c2lkLCAmc3JjLT5zaWQpOworCisJLyogQ2hlY2sgaWYgdGhlcmUncyBh
-IHJlcGxhY2VtZW50IHNpZCBzcGVjaWZpZWQgKi8KKwlpZiAocHNpZCkKKwkJc2l6ZSArPSBjaWZz
-X2NvcHlfc2lkKCZkc3QtPnNpZCwgcHNpZCk7CisJZWxzZQorCQlzaXplICs9IGNpZnNfY29weV9z
-aWQoJmRzdC0+c2lkLCAmc3JjLT5zaWQpOworCisJZHN0LT5zaXplID0gY3B1X3RvX2xlMTYoc2l6
-ZSk7CiAKIAlyZXR1cm4gc2l6ZTsKIH0KQEAgLTEwMjYsNyArMTA0MSw3IEBAIHN0YXRpYyB2b2lk
-IHBvcHVsYXRlX25ld19hY2VzKGNoYXIgKm5hY2xfYmFzZSwKIAkqcG5zaXplID0gbnNpemU7CiB9
-CiAKLXN0YXRpYyBfX3UxNiByZXBsYWNlX3NpZHNfYW5kX2NvcHlfYWNlcyhzdHJ1Y3QgY2lmc19h
-Y2wgKnBkYWNsLCBzdHJ1Y3QgY2lmc19hY2wgKnBuZGFjbCwgCitzdGF0aWMgX191MTYgcmVwbGFj
-ZV9zaWRzX2FuZF9jb3B5X2FjZXMoc3RydWN0IGNpZnNfYWNsICpwZGFjbCwgc3RydWN0IGNpZnNf
-YWNsICpwbmRhY2wsCiAJCXN0cnVjdCBjaWZzX3NpZCAqcG93bmVyc2lkLCBzdHJ1Y3QgY2lmc19z
-aWQgKnBncnBzaWQsCiAJCXN0cnVjdCBjaWZzX3NpZCAqcG5vd25lcnNpZCwgc3RydWN0IGNpZnNf
-c2lkICpwbmdycHNpZCkKIHsKQEAgLTExMjQsNyArMTEzOSw3IEBAIHN0YXRpYyBpbnQgc2V0X2No
-bW9kX2RhY2woc3RydWN0IGNpZnNfYWNsICpwZGFjbCwgc3RydWN0IGNpZnNfYWNsICpwbmRhY2ws
-CiAJCQlnb3RvIG5leHRfYWNlOwogCQl9CiAKLQkJbnNpemUgKz0gY2lmc19jb3B5X2FjZShwbm50
-YWNlLCBwbnRhY2UpOworCQluc2l6ZSArPSBjaWZzX2NvcHlfYWNlKHBubnRhY2UsIHBudGFjZSwg
-TlVMTCk7CiAJCW51bV9hY2VzKys7CiAKIG5leHRfYWNlOgpAQCAtMTI1MCwyOCArMTI2NSwzMCBA
-QCBzdGF0aWMgaW50IGJ1aWxkX3NlY19kZXNjKHN0cnVjdCBjaWZzX250c2QgKnBudHNkLCBzdHJ1
-Y3QgY2lmc19udHNkICpwbm50c2QsCiAJX191MzIgbmRhY2xvZmZzZXQ7CiAJX191MzIgc2lkc29m
-ZnNldDsKIAlzdHJ1Y3QgY2lmc19zaWQgKm93bmVyX3NpZF9wdHIsICpncm91cF9zaWRfcHRyOwot
-CXN0cnVjdCBjaWZzX3NpZCAqbm93bmVyX3NpZF9wdHIsICpuZ3JvdXBfc2lkX3B0cjsKKwlzdHJ1
-Y3QgY2lmc19zaWQgKm5vd25lcl9zaWRfcHRyID0gTlVMTCwgKm5ncm91cF9zaWRfcHRyID0gTlVM
-TDsKIAlzdHJ1Y3QgY2lmc19hY2wgKmRhY2xfcHRyID0gTlVMTDsgIC8qIG5vIG5lZWQgZm9yIFNB
-Q0wgcHRyICovCiAJc3RydWN0IGNpZnNfYWNsICpuZGFjbF9wdHIgPSBOVUxMOyAvKiBubyBuZWVk
-IGZvciBTQUNMIHB0ciAqLwogCWNoYXIgKmVuZF9vZl9hY2wgPSAoKGNoYXIgKilwbnRzZCkgKyBz
-ZWNkZXNjbGVuOworCXUxNiBzaXplID0gMDsKIAotCWlmIChwbm1vZGUgJiYgKnBubW9kZSAhPSBO
-T19DSEFOR0VfNjQpIHsgLyogY2htb2QgKi8KLQkJb3duZXJfc2lkX3B0ciA9IChzdHJ1Y3QgY2lm
-c19zaWQgKikoKGNoYXIgKilwbnRzZCArCi0JCQkJbGUzMl90b19jcHUocG50c2QtPm9zaWRvZmZz
-ZXQpKTsKLQkJZ3JvdXBfc2lkX3B0ciA9IChzdHJ1Y3QgY2lmc19zaWQgKikoKGNoYXIgKilwbnRz
-ZCArCi0JCQkJbGUzMl90b19jcHUocG50c2QtPmdzaWRvZmZzZXQpKTsKLQkJZGFjbG9mZnNldCA9
-IGxlMzJfdG9fY3B1KHBudHNkLT5kYWNsb2Zmc2V0KTsKLQkJaWYgKGRhY2xvZmZzZXQpIHsKLQkJ
-CWRhY2xfcHRyID0gKHN0cnVjdCBjaWZzX2FjbCAqKSgoY2hhciAqKXBudHNkICsgZGFjbG9mZnNl
-dCk7Ci0JCQlpZiAoZW5kX29mX2FjbCA8IChjaGFyICopZGFjbF9wdHIgKyBsZTE2X3RvX2NwdShk
-YWNsX3B0ci0+c2l6ZSkpIHsKLQkJCQljaWZzX2RiZyhWRlMsICJFeGlzdGluZyBBQ0wgc2l6ZSBp
-cyB3cm9uZy4gRGlzY2FyZGluZyBvbGQgQUNMXG4iKTsKLQkJCQlkYWNsX3B0ciA9IE5VTEw7Ci0J
-CQl9CisJZGFjbG9mZnNldCA9IGxlMzJfdG9fY3B1KHBudHNkLT5kYWNsb2Zmc2V0KTsKKwlpZiAo
-ZGFjbG9mZnNldCkgeworCQlkYWNsX3B0ciA9IChzdHJ1Y3QgY2lmc19hY2wgKikoKGNoYXIgKilw
-bnRzZCArIGRhY2xvZmZzZXQpOworCQlpZiAoZW5kX29mX2FjbCA8IChjaGFyICopZGFjbF9wdHIg
-KyBsZTE2X3RvX2NwdShkYWNsX3B0ci0+c2l6ZSkpIHsKKwkJCWNpZnNfZGJnKFZGUywgIkV4aXN0
-aW5nIEFDTCBzaXplIGlzIHdyb25nLiBEaXNjYXJkaW5nIG9sZCBBQ0xcbiIpOworCQkJZGFjbF9w
-dHIgPSBOVUxMOwogCQl9CisJfQorCisJb3duZXJfc2lkX3B0ciA9IChzdHJ1Y3QgY2lmc19zaWQg
-KikoKGNoYXIgKilwbnRzZCArCisJCQlsZTMyX3RvX2NwdShwbnRzZC0+b3NpZG9mZnNldCkpOwor
-CWdyb3VwX3NpZF9wdHIgPSAoc3RydWN0IGNpZnNfc2lkICopKChjaGFyICopcG50c2QgKworCQkJ
-bGUzMl90b19jcHUocG50c2QtPmdzaWRvZmZzZXQpKTsKIAorCWlmIChwbm1vZGUgJiYgKnBubW9k
-ZSAhPSBOT19DSEFOR0VfNjQpIHsgLyogY2htb2QgKi8KIAkJbmRhY2xvZmZzZXQgPSBzaXplb2Yo
-c3RydWN0IGNpZnNfbnRzZCk7CiAJCW5kYWNsX3B0ciA9IChzdHJ1Y3QgY2lmc19hY2wgKikoKGNo
-YXIgKilwbm50c2QgKyBuZGFjbG9mZnNldCk7Ci0JCW5kYWNsX3B0ci0+cmV2aXNpb24gPSAKKwkJ
-bmRhY2xfcHRyLT5yZXZpc2lvbiA9CiAJCQlkYWNsb2Zmc2V0ID8gZGFjbF9wdHItPnJldmlzaW9u
-IDogY3B1X3RvX2xlMTYoQUNMX1JFVklTSU9OKTsKIAogCQluZGFjbF9wdHItPnNpemUgPSBjcHVf
-dG9fbGUzMigwKTsKQEAgLTEyNzksMTEgKzEyOTYsMTMgQEAgc3RhdGljIGludCBidWlsZF9zZWNf
-ZGVzYyhzdHJ1Y3QgY2lmc19udHNkICpwbnRzZCwgc3RydWN0IGNpZnNfbnRzZCAqcG5udHNkLAog
-CiAJCXJjID0gc2V0X2NobW9kX2RhY2woZGFjbF9wdHIsIG5kYWNsX3B0ciwgb3duZXJfc2lkX3B0
-ciwgZ3JvdXBfc2lkX3B0ciwKIAkJCQkgICAgcG5tb2RlLCBtb2RlX2Zyb21fc2lkKTsKKwogCQlz
-aWRzb2Zmc2V0ID0gbmRhY2xvZmZzZXQgKyBsZTE2X3RvX2NwdShuZGFjbF9wdHItPnNpemUpOwot
-CQkvKiBjb3B5IHNlYyBkZXNjIGNvbnRyb2wgcG9ydGlvbiAmIG93bmVyIGFuZCBncm91cCBzaWRz
-ICovCi0JCWNvcHlfc2VjX2Rlc2MocG50c2QsIHBubnRzZCwgc2lkc29mZnNldCk7Ci0JCSpwbnNl
-Y2Rlc2NsZW4gPSBzaWRzb2Zmc2V0ICsgKDIgKiBzaXplb2Yoc3RydWN0IGNpZnNfc2lkKSk7Ci0J
-CSphY2xmbGFnID0gQ0lGU19BQ0xfREFDTDsKKwkJLyogY29weSB0aGUgbm9uLWRhY2wgcG9ydGlv
-biBvZiBzZWNkZXNjICovCisJCSpwbnNlY2Rlc2NsZW4gPSBjb3B5X3NlY19kZXNjKHBudHNkLCBw
-bm50c2QsIHNpZHNvZmZzZXQsCisJCQkJTlVMTCwgTlVMTCk7CisKKwkJKmFjbGZsYWcgfD0gQ0lG
-U19BQ0xfREFDTDsKIAl9IGVsc2UgewogCQluZGFjbG9mZnNldCA9IHNpemVvZihzdHJ1Y3QgY2lm
-c19udHNkKTsKIAkJbmRhY2xfcHRyID0gKHN0cnVjdCBjaWZzX2FjbCAqKSgoY2hhciAqKXBubnRz
-ZCArIG5kYWNsb2Zmc2V0KTsKQEAgLTEyOTMsMTIgKzEzMTIsMTIgQEAgc3RhdGljIGludCBidWls
-ZF9zZWNfZGVzYyhzdHJ1Y3QgY2lmc19udHNkICpwbnRzZCwgc3RydWN0IGNpZnNfbnRzZCAqcG5u
-dHNkLAogCiAJCWlmICh1aWRfdmFsaWQodWlkKSkgeyAvKiBjaG93biAqLwogCQkJdWlkX3QgaWQ7
-Ci0JCQlvd25lcl9zaWRfcHRyID0gKHN0cnVjdCBjaWZzX3NpZCAqKSgoY2hhciAqKXBubnRzZCAr
-Ci0JCQkJCWxlMzJfdG9fY3B1KHBubnRzZC0+b3NpZG9mZnNldCkpOwogCQkJbm93bmVyX3NpZF9w
-dHIgPSBrbWFsbG9jKHNpemVvZihzdHJ1Y3QgY2lmc19zaWQpLAogCQkJCQkJCQlHRlBfS0VSTkVM
-KTsKLQkJCWlmICghbm93bmVyX3NpZF9wdHIpCi0JCQkJcmV0dXJuIC1FTk9NRU07CisJCQlpZiAo
-IW5vd25lcl9zaWRfcHRyKSB7CisJCQkJcmMgPSAtRU5PTUVNOworCQkJCWdvdG8gY2hvd25fY2hn
-cnBfZXhpdDsKKwkJCX0KIAkJCWlkID0gZnJvbV9rdWlkKCZpbml0X3VzZXJfbnMsIHVpZCk7CiAJ
-CQlpZiAoaWRfZnJvbV9zaWQpIHsKIAkJCQlzdHJ1Y3Qgb3duZXJfc2lkICpvc2lkID0gKHN0cnVj
-dCBvd25lcl9zaWQgKilub3duZXJfc2lkX3B0cjsKQEAgLTEzMDksMjcgKzEzMjgsMjUgQEAgc3Rh
-dGljIGludCBidWlsZF9zZWNfZGVzYyhzdHJ1Y3QgY2lmc19udHNkICpwbnRzZCwgc3RydWN0IGNp
-ZnNfbnRzZCAqcG5udHNkLAogCQkJCW9zaWQtPlN1YkF1dGhvcml0aWVzWzBdID0gY3B1X3RvX2xl
-MzIoODgpOwogCQkJCW9zaWQtPlN1YkF1dGhvcml0aWVzWzFdID0gY3B1X3RvX2xlMzIoMSk7CiAJ
-CQkJb3NpZC0+U3ViQXV0aG9yaXRpZXNbMl0gPSBjcHVfdG9fbGUzMihpZCk7CisKIAkJCX0gZWxz
-ZSB7IC8qIGxvb2t1cCBzaWQgd2l0aCB1cGNhbGwgKi8KIAkJCQlyYyA9IGlkX3RvX3NpZChpZCwg
-U0lET1dORVIsIG5vd25lcl9zaWRfcHRyKTsKIAkJCQlpZiAocmMpIHsKIAkJCQkJY2lmc19kYmco
-RllJLCAiJXM6IE1hcHBpbmcgZXJyb3IgJWQgZm9yIG93bmVyIGlkICVkXG4iLAogCQkJCQkJIF9f
-ZnVuY19fLCByYywgaWQpOwotCQkJCQlrZnJlZShub3duZXJfc2lkX3B0cik7Ci0JCQkJCXJldHVy
-biByYzsKKwkJCQkJZ290byBjaG93bl9jaGdycF9leGl0OwogCQkJCX0KIAkJCX0KLQkJCWNpZnNf
-Y29weV9zaWQob3duZXJfc2lkX3B0ciwgbm93bmVyX3NpZF9wdHIpOwotCQkJa2ZyZWUobm93bmVy
-X3NpZF9wdHIpOwotCQkJKmFjbGZsYWcgPSBDSUZTX0FDTF9PV05FUjsKKwkJCSphY2xmbGFnIHw9
-IENJRlNfQUNMX09XTkVSOwogCQl9CiAJCWlmIChnaWRfdmFsaWQoZ2lkKSkgeyAvKiBjaGdycCAq
-LwogCQkJZ2lkX3QgaWQ7Ci0JCQlncm91cF9zaWRfcHRyID0gKHN0cnVjdCBjaWZzX3NpZCAqKSgo
-Y2hhciAqKXBubnRzZCArCi0JCQkJCWxlMzJfdG9fY3B1KHBubnRzZC0+Z3NpZG9mZnNldCkpOwog
-CQkJbmdyb3VwX3NpZF9wdHIgPSBrbWFsbG9jKHNpemVvZihzdHJ1Y3QgY2lmc19zaWQpLAogCQkJ
-CQkJCQlHRlBfS0VSTkVMKTsKLQkJCWlmICghbmdyb3VwX3NpZF9wdHIpCi0JCQkJcmV0dXJuIC1F
-Tk9NRU07CisJCQlpZiAoIW5ncm91cF9zaWRfcHRyKSB7CisJCQkJcmMgPSAtRU5PTUVNOworCQkJ
-CWdvdG8gY2hvd25fY2hncnBfZXhpdDsKKwkJCX0KIAkJCWlkID0gZnJvbV9rZ2lkKCZpbml0X3Vz
-ZXJfbnMsIGdpZCk7CiAJCQlpZiAoaWRfZnJvbV9zaWQpIHsKIAkJCQlzdHJ1Y3Qgb3duZXJfc2lk
-ICpnc2lkID0gKHN0cnVjdCBvd25lcl9zaWQgKiluZ3JvdXBfc2lkX3B0cjsKQEAgLTEzNDAsMTkg
-KzEzNTcsMzUgQEAgc3RhdGljIGludCBidWlsZF9zZWNfZGVzYyhzdHJ1Y3QgY2lmc19udHNkICpw
-bnRzZCwgc3RydWN0IGNpZnNfbnRzZCAqcG5udHNkLAogCQkJCWdzaWQtPlN1YkF1dGhvcml0aWVz
-WzBdID0gY3B1X3RvX2xlMzIoODgpOwogCQkJCWdzaWQtPlN1YkF1dGhvcml0aWVzWzFdID0gY3B1
-X3RvX2xlMzIoMik7CiAJCQkJZ3NpZC0+U3ViQXV0aG9yaXRpZXNbMl0gPSBjcHVfdG9fbGUzMihp
-ZCk7CisKIAkJCX0gZWxzZSB7IC8qIGxvb2t1cCBzaWQgd2l0aCB1cGNhbGwgKi8KIAkJCQlyYyA9
-IGlkX3RvX3NpZChpZCwgU0lER1JPVVAsIG5ncm91cF9zaWRfcHRyKTsKIAkJCQlpZiAocmMpIHsK
-IAkJCQkJY2lmc19kYmcoRllJLCAiJXM6IE1hcHBpbmcgZXJyb3IgJWQgZm9yIGdyb3VwIGlkICVk
-XG4iLAogCQkJCQkJIF9fZnVuY19fLCByYywgaWQpOwotCQkJCQlrZnJlZShuZ3JvdXBfc2lkX3B0
-cik7Ci0JCQkJCXJldHVybiByYzsKKwkJCQkJZ290byBjaG93bl9jaGdycF9leGl0OwogCQkJCX0K
-IAkJCX0KLQkJCWNpZnNfY29weV9zaWQoZ3JvdXBfc2lkX3B0ciwgbmdyb3VwX3NpZF9wdHIpOwot
-CQkJa2ZyZWUobmdyb3VwX3NpZF9wdHIpOwotCQkJKmFjbGZsYWcgPSBDSUZTX0FDTF9HUk9VUDsK
-KwkJCSphY2xmbGFnIHw9IENJRlNfQUNMX0dST1VQOwogCQl9CisKKwkJaWYgKGRhY2xvZmZzZXQp
-IHsKKwkJCS8qIFJlcGxhY2UgQUNFcyBmb3Igb2xkIG93bmVyIHdpdGggbmV3IG9uZSAqLworCQkJ
-c2l6ZSA9IHJlcGxhY2Vfc2lkc19hbmRfY29weV9hY2VzKGRhY2xfcHRyLCBuZGFjbF9wdHIsCisJ
-CQkJCW93bmVyX3NpZF9wdHIsIGdyb3VwX3NpZF9wdHIsCisJCQkJCW5vd25lcl9zaWRfcHRyLCBu
-Z3JvdXBfc2lkX3B0cik7CisJCQluZGFjbF9wdHItPnNpemUgPSBjcHVfdG9fbGUxNihzaXplKTsK
-KwkJfQorCisJCXNpZHNvZmZzZXQgPSBuZGFjbG9mZnNldCArIGxlMTZfdG9fY3B1KG5kYWNsX3B0
-ci0+c2l6ZSk7CisJCS8qIGNvcHkgdGhlIG5vbi1kYWNsIHBvcnRpb24gb2Ygc2VjZGVzYyAqLwor
-CQkqcG5zZWNkZXNjbGVuID0gY29weV9zZWNfZGVzYyhwbnRzZCwgcG5udHNkLCBzaWRzb2Zmc2V0
-LAorCQkJCW5vd25lcl9zaWRfcHRyLCBuZ3JvdXBfc2lkX3B0cik7CisKK2Nob3duX2NoZ3JwX2V4
-aXQ6CisJCS8qIGVycm9ycyBjb3VsZCBqdW1wIGhlcmUuIFNvIG1ha2Ugc3VyZSB3ZSByZXR1cm4g
-c29vbiBhZnRlciB0aGlzICovCisJCWtmcmVlKG5vd25lcl9zaWRfcHRyKTsKKwkJa2ZyZWUobmdy
-b3VwX3NpZF9wdHIpOwogCX0KIAogCXJldHVybiByYzsKQEAgLTE1OTgsNiArMTYzMSwxOCBAQCBp
-ZF9tb2RlX3RvX2NpZnNfYWNsKHN0cnVjdCBpbm9kZSAqaW5vZGUsIGNvbnN0IGNoYXIgKnBhdGgs
-IF9fdTY0ICpwbm1vZGUsCiAJCQluc2VjZGVzY2xlbiArPSBzaXplb2Yoc3RydWN0IGNpZnNfYWNl
-KTsKIAkJZWxzZSAvKiBjaWZzYWNsICovCiAJCQluc2VjZGVzY2xlbiArPSA1ICogc2l6ZW9mKHN0
-cnVjdCBjaWZzX2FjZSk7CisJfSBlbHNlIHsgLyogY2hvd24gKi8KKwkJLyogV2hlbiBvd25lcnNo
-aXAgY2hhbmdlcywgY2hhbmdlcyBuZXcgb3duZXIgc2lkIGxlbmd0aCBjb3VsZCBiZSBkaWZmZXJl
-bnQgKi8KKwkJbnNlY2Rlc2NsZW4gPSBzaXplb2Yoc3RydWN0IGNpZnNfbnRzZCkgKyAoc2l6ZW9m
-KHN0cnVjdCBjaWZzX3NpZCkgKiAyKTsKKwkJZGFjbG9mZnNldCA9IGxlMzJfdG9fY3B1KHBudHNk
-LT5kYWNsb2Zmc2V0KTsKKwkJaWYgKGRhY2xvZmZzZXQpIHsKKwkJCWRhY2xfcHRyID0gKHN0cnVj
-dCBjaWZzX2FjbCAqKSgoY2hhciAqKXBudHNkICsgZGFjbG9mZnNldCk7CisJCQlpZiAobW9kZV9m
-cm9tX3NpZCkKKwkJCQluc2VjZGVzY2xlbiArPQorCQkJCQlsZTE2X3RvX2NwdShkYWNsX3B0ci0+
-bnVtX2FjZXMpICogc2l6ZW9mKHN0cnVjdCBjaWZzX2FjZSk7CisJCQllbHNlIC8qIGNpZnNhY2wg
-Ki8KKwkJCQluc2VjZGVzY2xlbiArPSBsZTE2X3RvX2NwdShkYWNsX3B0ci0+c2l6ZSk7CisJCX0K
-IAl9CiAKIAkvKgotLSAKMi4yNS4xCgo=
---00000000000011424c05bbb05e87--
+
+
+--
+Regards,
+Shyam
+
