@@ -2,574 +2,220 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C49BC433E0
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 18:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D449C433E6
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 18:28:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A55864DD3
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 18:14:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1B6864E6B
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 18:28:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231591AbhBWSOd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Feb 2021 13:14:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49336 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232810AbhBWSOc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Feb 2021 13:14:32 -0500
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E18E7C061574
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Feb 2021 10:13:51 -0800 (PST)
-Received: by mail-ej1-x629.google.com with SMTP id g5so36016856ejt.2
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Feb 2021 10:13:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=dqj3ux69i8p3+mim61rIuXf5Vg2sSO6cjUo4u3cq0fU=;
-        b=SXFqFW5eRcfZCxmkkFg7oX+oeoYN9of3z1AiCDvdKtH00zl+KWa6L4QqLQ/jbCOod0
-         ydANZXndJVHH215/Av4BidI62Hxj1ZZNeZoIQPHfAoQzKaJOhEUIzNHPfyrTFFxFkSCi
-         GITNKFrVxtWYksO/GEeP+3K7KmIpzXVLreMyCyxviyMy0vPuzsQvIuyTaWrZDscNjtRW
-         I+gngzUb3jWTvGDXEQPq5OgnV4BzJGKiK0QF4PyaVZnlUQvuMWndhf8AIBi86J8La4Ye
-         +yDZXZKlE4VYQ2Ub0rpBKGjerh9Z6j+PI4lFAbjmaXSDirGyoqvd1O0PI8QAhrSVnPJO
-         vADQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=dqj3ux69i8p3+mim61rIuXf5Vg2sSO6cjUo4u3cq0fU=;
-        b=dAhvUaXR/k53nRWO1JUiULAp5pIF3YM7xp+hqSeEIhnnfc/r/vq7HXoFuuRJO0vI6e
-         RfD/GoTgHlztCpqThE0k1vVxk5F95KdsF68QzxVCfBby/6KF6voHYWCRF09JVuZ2A8Cb
-         gDf8pcL8pp+92lUk17ae7CvCXKAAAC12gowGfzzdL7X8oEAQ223g1F0sT+eWK1vRFdi0
-         rX0/3DVgwz68FOCpiMD/kYeyDxfTxJXztnZn3mPyT9ITXF6C9WDYM7Auu0aTiWKpiX7V
-         GPqYAUaePtxno6x/Bnf8w4VAqqyWieBGtgjMuURMaDjZ+G5VMvJsCkp42gLxSEWg8w1z
-         qUgw==
-X-Gm-Message-State: AOAM532/ZUrRKDKTJdRV6iT1FcGDy3/dJ03/fdIVyfAdzStt6NLQVdlY
-        6+UpdZpKWlBP291TSa409/vatT3vWMSKEvhJ0A==
-X-Google-Smtp-Source: ABdhPJzuAIsVY4n1mdfjEdkja31U+qSoUTMCllB3IBMVafn1n0/MsXiBeO0kOLy5PXhnTIatZ89+YO7H2vb9Lj/l660=
-X-Received: by 2002:a17:907:373:: with SMTP id rs19mr14788874ejb.341.1614104030631;
- Tue, 23 Feb 2021 10:13:50 -0800 (PST)
-MIME-Version: 1.0
-References: <1A318EB9-A257-4A11-B319-EA3F2628C8B7@hxcore.ol>
- <CAKywueROT6yAn6Eer4sncxsaZZyih3kApKmLacb3xsxDJfWfMQ@mail.gmail.com>
- <80BC289A-88D1-45CB-A751-0382211ED4B8@hxcore.ol> <CAKywueRuwHXG65i6XQknXgqtQ+=AdrLCCqft+vwE5XFLWwo=Gw@mail.gmail.com>
- <CAH2r5mv-QHyhdCTyB=uXsyQkMm1fi5vOn6dF=H3quwPg9ek=VA@mail.gmail.com>
- <CAH2r5muFUkL3Bexv-VxK_WKSKXvGq9Bs5CZU0CA0t_SufpkguA@mail.gmail.com>
- <F0563410-2F65-4259-8298-B0669CDD1C8B@hxcore.ol> <CAKywueQgF1LaYW17NS_e71TdSyVffTPUy5JgsQOF+Frkj1TDKA@mail.gmail.com>
- <CANT5p=rv7qTqmBL03tdmKmn5zUfNABf0=pQ3=3i63S7c_4X11w@mail.gmail.com>
- <AEF3AF95-9738-4A43-8618-D78C01BC8714@hxcore.ol> <CAH2r5msJ8HwNn3B3EBif3Fm83PQ9thX3vB9dQccVFc8_jAiEew@mail.gmail.com>
-In-Reply-To: <CAH2r5msJ8HwNn3B3EBif3Fm83PQ9thX3vB9dQccVFc8_jAiEew@mail.gmail.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Tue, 23 Feb 2021 10:13:39 -0800
-Message-ID: <CAKywueRTE5=MESiQPuGqOfwWjjhYUZQ4s+ETynVrD5hxZf=5qg@mail.gmail.com>
-Subject: Re: TCON reconnect during STATUS_NETWORK_NAME_DELETED
-To:     Steve French <smfrench@gmail.com>
-Cc:     Rohith <rohiths.msft@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "sribhat.msa@outlook.com" <sribhat.msa@outlook.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S233128AbhBWS2r (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Feb 2021 13:28:47 -0500
+Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:30300 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233900AbhBWS2q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 23 Feb 2021 13:28:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1614104851;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=anpaLtEcd3qtkAoA/Wm8hrwTV46F/traBfj2tarUVHU=;
+        b=RUKRrfb2QN2wX+X2a9+v6XvEQ4kAw1JEDSVllk/k8/HbqCtktgvuaNNoTrsKaC4FsiE5gi
+        A/E45yxA3qqAGV4oGWyj0yjPB3QpfWeyeu607SnwDORutf0bDV3dOaDGwZRM7TgJ7oj7Ev
+        2iar3+vqoe5FidlT7UbYhCm4gna+wqU=
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com
+ (mail-db3eur04lp2058.outbound.protection.outlook.com [104.47.12.58]) (Using
+ TLS) by relay.mimecast.com with ESMTP id de-mta-9-U9RgydIDOl6GTeJjcfNK2w-1;
+ Tue, 23 Feb 2021 19:27:30 +0100
+X-MC-Unique: U9RgydIDOl6GTeJjcfNK2w-1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U9XfZHdjDBpfa1TIhdkbXSMBbrvqJputfyHFgMjJnIUXWKYt2/cFAJezkTI2O33y5O0Favv5um4DJG54fTu5PIhRWS7ZhiVaNrMGetGWuz3Watrrh8rlbDGAK1szqaWxvUltbdADoDp2oQTT3EgHs2lo5kDU/EbPgAcEjo+j8H8oKpY/rfWbs+nE0PiIV+Kp2Okcel0ddTD+00EpRynlax21+/Z0//yp7YXy5Xh2cUOo+9VDac99CnuEI8+UQAjKIi6uTF8yckg1cccTaCbsesiOij0/z6fPTv4JLy4QJJnMHmXGBdav7hN/i8x8U7pWj7ZpC6/RatMbwzEuEqDBMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fJhH+wC6DS/hHrW/UeAnXR7v5GsP377h4BKSIAVDhAU=;
+ b=FJmtIASCv97u1T5GPvSvfnJUM9MPy1+XIP7sDh/8Gi2FiwXrFSt8s1JBCWjgPHxvg13F5It9jZ0Msnw14nZUMpAgAHqi1gSx9jXBWVXQSYro9uUFwWo/xELOaTm7O/9Yzreh83hyK5WLgS1GkZYk4k1wkjT/iOTGaxgwwh2r7MjWjNrpJPvQE9Quzu5PGNoFVw4gmbiKDWyC4IgKW9sEJNvciJKWTk5nPF/zL/ULH2JF9y41bogdiyBi5MLET1abkQgerwWhlPVuP/6c01aRAnkFmvol5SqLCZx84Inf7A0qvbhZnK+0G4wl2tp8s0yaZFxDS8kdyM7KVBCJA24P4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=suse.com;
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
+ by VE1PR04MB7277.eurprd04.prod.outlook.com (2603:10a6:800:1b3::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.32; Tue, 23 Feb
+ 2021 18:27:29 +0000
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3868.032; Tue, 23 Feb 2021
+ 18:27:29 +0000
+From:   =?UTF-8?q?Aur=C3=A9lien=20Aptel?= <aaptel@suse.com>
+To:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+CC:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
+Subject: [PATCH] cifs: ignore FL_FLOCK locks in read/write
+Date:   Tue, 23 Feb 2021 19:27:26 +0100
+Message-ID: <20210223182726.31763-1-aaptel@suse.com>
+X-Mailer: git-send-email 2.30.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [2003:fa:705:9b31:db:7402:52ee:d004]
+X-ClientProxiedBy: ZRAP278CA0002.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:10::12) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+ (2603:10a6:803:3::28)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (2003:fa:705:9b31:db:7402:52ee:d004) by ZRAP278CA0002.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:10::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.19 via Frontend Transport; Tue, 23 Feb 2021 18:27:29 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e4d39ac5-f496-403d-d92a-08d8d828ad5e
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7277:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VE1PR04MB72777155B3DD57CEF683AB3CA8809@VE1PR04MB7277.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qdxyfE8Jh6BMAAnN+t+B//uIGGS3sf19F/8sT1nv8rVcWuZymVWnbunVJ2Bl/KdNSYlJNXEoi98Kx47PEyTnl1x8M2dsWocTs5h+uSheq588GqC3ueWJTT2atT1lDBfjFRMWrGjOVbUVM++/VyWFb7siZf1Y8eIBlZBpanFDCAs94kC9Zmbx0QKxPYZi1j/XJ5m3FpZkkaHnAkx4+SGLa4+kZPKYYqIXPAxztsH7hNtP8zWXxPQ4iGGhzEXDo2MOmin4lUyGlPm4M5DAtEPZtDr/gpmp7evyADVDghlJNJ5g1YVQNaCLwbPXZAoz/YPML6mrt78XNyDHx8C7N7yfnvlWsr4jHvEI3uc50ti2BDFzIhRzLeoVt+JAYwTqNBgzvec/2PBMWzii1N6tj/1YfWIt817+g9FZDWGENKd9OZSzUdiw9dr6phJraxSVTxBhGoAg5Cp2itRutLLEAcO9N9sHU6DsesE4rcq76Nx2z/D4LNB9R68ZcthAY9d9f9N3r9W2/YRd+ZwiwZJVm3EDmBfnvtlvHRJAz1TabjJWNfV/ELuHjABIbvprTx63qPVaL/fho1JEXc6Dw7QmPEZUyyJqsmzQ6hGD/DNnoMTGpXe1Zy97z2I8UD+VRRPNEFE6oDx8EIVw/ax4P5km4gjwV3OvXSaAG6exBMewHmhnthAAY9lCUtbRPqh9A62TZvLdnZsahLuZr5p9wbb9AYLuQCzKFgNW6GqD88f2nibYL+SSOpHjTp5wk6G9AQ9KzIDkLQs7RMWimRxCXtauu7fhs18uNvDwWBR8C7EoRsY2BMs8BiKY1vqfqQFtZ0EEhy3MpBwZ+X8JRp0N72kr0oGXvYU7mjBPepTb80Bn6/qYo/XtjRQKxn0Nlm1Wm/decnp9De5O53JD1XWyeHwf/ecXYg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:OSPM;SFS:(396003)(39850400004)(366004)(346002)(136003)(376002)(6666004)(66476007)(2906002)(4326008)(8676002)(6486002)(66556008)(186003)(16526019)(478600001)(8936002)(66946007)(6496006)(316002)(5660300002)(107886003)(52116002)(2616005)(1076003)(86362001)(83380400001)(36756003)(23200700001);DIR:OUT;SFP:1501;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?P6eGyymz+ngnS4L3Rebl2bMRmki2e1shlKOl/yKhLSdLQPNIe5lXBnfvz0SD?=
+ =?us-ascii?Q?lLbz09e//btaxzblOUQfrSvV2lQ5JDE0zplKd7g9fTOUmv0wC90FsMxpj90h?=
+ =?us-ascii?Q?0KceexsMbLkDmD7T3bZ0K0fPTfe0GVON3L3m1jysqAPO73+lJLmAGpXy3rC7?=
+ =?us-ascii?Q?LDei3TVEDA6e0HGe1KknUP9+UFLf3Y6MMqz66ihMmvpEdo+V4mJ9cVb/5zrq?=
+ =?us-ascii?Q?g2d5PBZEhHwL71KxAU+Et3ngwtxh5pgcxceG8iQNN2GriO2RnYnXdv9DrYUL?=
+ =?us-ascii?Q?54r86yVJm/10suV7KnWJBvgdSlYVeHO7jPu6P+NVi/6ltxMrdHeNjiE+9ps6?=
+ =?us-ascii?Q?8yd3FNi8O+V+Y754xdlEZ93XXZDwfyln2j8OyU9+VOmiqEqqkQwtwGnYHWry?=
+ =?us-ascii?Q?mmR2JVjIZwdinXD/TF0sxLLSHMHtXJzSU1S00BXT21F9b5YG+MGU1exxS4+2?=
+ =?us-ascii?Q?+gApGK08kzI3HOIVDSoCm99dzNnrtRydogJlSwv0c9v2rsq2ZwZcLnin6SP6?=
+ =?us-ascii?Q?KlDOWx2fQH4BXcg6tdd9iJhvJ4ERzZTTnP1swD4C/MM+JIUng+wXsyCLROk+?=
+ =?us-ascii?Q?6MErEF1jqfsj/6wS9yrIh/Aa8Vrxi1o/1dOscgyIBGFrRqeQKxIloU7+OX1L?=
+ =?us-ascii?Q?q10udADnbTariFt6kfzUSBnwR4j6Y6/yPy0r/vnsPD+j8vYQu9oc57+9St7p?=
+ =?us-ascii?Q?S4ZEH4ySjj/V3gReHX9NDmJ3F77AU+vfCOeuXeJaBc/7K/XzkRgFxuSJzlBJ?=
+ =?us-ascii?Q?IHtS6yDgR5TadZ+ls8q++ncyBsEItXbBpqkFxvnBCQ1bj7ktI1eaaU1IbrFP?=
+ =?us-ascii?Q?rTC0qkIAhEjNtCVTC0/TJpq3QlC+1g5qWDpgx1Yc0ydQno6nwLHKsYUkP/bX?=
+ =?us-ascii?Q?fTiv0JHeTs3ULuHHSMHauBTRSDwsrGKtEXMPXM0dtk5bOAAoKT1p3t3T8zTP?=
+ =?us-ascii?Q?sSqf4R4oUPXkvmgTw/Pr4fasFk04OwMwK0/c4bE18BzlRKS1BPZa91i/bgxI?=
+ =?us-ascii?Q?Xypti7md1V5C7S0etNw3xc3+o4QUimf7AEQXek4IeCaJW6rwt04MZAv3oYn/?=
+ =?us-ascii?Q?/FgNxD5lJAcNIvnc/Hg1+n83OgO6oi+YRAB4Yz2IfpYH+VONSZewhG9eVk0W?=
+ =?us-ascii?Q?Qbs+44IuJCBOIF9ZYTDvtCng0VmABMsFftqTNjXqzDxbMBkeq25e4BZ7Vmcv?=
+ =?us-ascii?Q?LPAX/KHZv0LSlwPo57XjZSAdO8Jtpq0GIl8Rm0nTUuqWQD6eoeOEWY1K12Dr?=
+ =?us-ascii?Q?ZWEATuYRfyL723j2DS5BdvGiZlLlsKkVdYpuVYYvIjNbKypDhYDjFD85hl4y?=
+ =?us-ascii?Q?8U/OnlGIXsOQd+DDtXOmp11gwzTYTa5+f7/cbIW58eoyJJBA+DTWKTWz939i?=
+ =?us-ascii?Q?0/VN49SOy5T74eFRsoyfhkghtALS?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e4d39ac5-f496-403d-d92a-08d8d828ad5e
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2021 18:27:29.2930
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JzLyX9nSkVMmAQequ1gasUbTU2LNgkqoEM7mn7qRZCx1Up0vqfot/3DnAz3uaLnQ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7277
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The fix looks correct. Thanks!
---
-Best regards,
-Pavel Shilovsky
+From: Aurelien Aptel <aaptel@suse.com>
 
-=D0=B2=D1=82, 23 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 02:21, Steve=
- French <smfrench@gmail.com>:
->
-> merged this patch in with the one it fixes and pushed to cifs-2.6.git for=
--next
->
-> Running buildbot on them now:
->
-> http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/b=
-uilds/509
->
-> On Tue, Feb 23, 2021 at 3:49 AM Rohith <rohiths.msft@gmail.com> wrote:
-> >
-> > Hi Steve,
-> >
-> >
-> >
-> > Please find the attached patch which will fix the regression caused by =
-previous patch.
-> >
-> > During read path when pdu length is greater than CIFSMaxBufSize, =E2=80=
-=9Cbufs=E2=80=9D pointer is not updated during =E2=80=9Creceive_transform=
-=E2=80=9D. So, oops occurred while accessing =E2=80=9Cbufs=E2=80=9D pointer=
-.
-> >
-> >
-> >
-> > I ran cifs/100 test on my local machine:
-> >
-> > dd if=3D/dev/zero of=3D$TEST_DIR/$$/big-file bs=3D4M count=3D1
-> > dd if=3D$TEST_DIR/$$/big-file of=3D/dev/null bs=3D4M count=3D1
-> >
-> >
-> >
-> >
-> >
-> > Regards,
-> >
-> > Rohith
-> >
-> >
-> >
-> > Sent from Mail for Windows 10
-> >
-> >
-> >
-> > From: Shyam Prasad N
-> > Sent: Monday, February 22, 2021 10:53 PM
-> > To: Pavel Shilovsky
-> > Cc: Rohith; Steve French; linux-cifs@vger.kernel.org; sribhat.msa@outlo=
-ok.com
-> > Subject: Re: TCON reconnect during STATUS_NETWORK_NAME_DELETED
-> >
-> >
-> >
-> > Looks good to me.
-> >
-> > Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
-> >
-> >
-> >
-> > On Mon, Feb 22, 2021 at 9:21 AM Pavel Shilovsky <piastryyy@gmail.com> w=
-rote:
-> >
-> > >
-> >
-> > > Both patches look good. Thanks!
-> >
-> > >
-> >
-> > > Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
-> >
-> > > --
-> >
-> > > Best regards,
-> >
-> > > Pavel Shilovsky
-> >
-> > >
-> >
-> > > =D0=B2=D1=81, 21 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 22:44,=
- Rohith <rohiths.msft@gmail.com>:
-> >
-> > > >
-> >
-> > > > Thanks Steve. Will make sure to run checkpatch for further patches.
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > Regards,
-> >
-> > > >
-> >
-> > > > Rohith
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > Sent from Mail for Windows 10
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > From: Steve French
-> >
-> > > > Sent: Sunday, February 21, 2021 6:26 AM
-> >
-> > > > To: Pavel Shilovsky
-> >
-> > > > Cc: Rohith; linux-cifs@vger.kernel.org; Shyam Prasad N; sribhat.msa=
-@outlook.com
-> >
-> > > > Subject: Re: TCON reconnect during STATUS_NETWORK_NAME_DELETED
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > The remaining suggestion of Pavel's is included in this trivial cle=
-anup.
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > Trivial change to clarify code in smb2_is_network_name_deleted
-> >
-> > > >
-> >
-> > > > Suggested-by: Pavel Shilovsky <pshilov@microsoft.com>
-> >
-> > > > Signed-off-by: Steve French <stfrench@microsoft.com>
-> >
-> > > > ---
-> >
-> > > >  fs/cifs/smb2ops.c | 29 +++++++++++++++--------------
-> >
-> > > >  1 file changed, 15 insertions(+), 14 deletions(-)
-> >
-> > > >
-> >
-> > > > diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> >
-> > > > index aee9da88a333..b2191babce26 100644
-> >
-> > > > --- a/fs/cifs/smb2ops.c
-> >
-> > > > +++ b/fs/cifs/smb2ops.c
-> >
-> > > > @@ -2459,23 +2459,24 @@ smb2_is_network_name_deleted(char *buf, str=
-uct TCP_Server_Info *server)
-> >
-> > > >   struct cifs_ses *ses;
-> >
-> > > >   struct cifs_tcon *tcon;
-> >
-> > > >
-> >
-> > > > - if (shdr->Status =3D=3D STATUS_NETWORK_NAME_DELETED) {
-> >
-> > > > - spin_lock(&cifs_tcp_ses_lock);
-> >
-> > > > - list_for_each(tmp, &server->smb_ses_list) {
-> >
-> > > > - ses =3D list_entry(tmp, struct cifs_ses, smb_ses_list);
-> >
-> > > > - list_for_each(tmp1, &ses->tcon_list) {
-> >
-> > > > - tcon =3D list_entry(tmp1, struct cifs_tcon, tcon_list);
-> >
-> > > > - if (tcon->tid =3D=3D shdr->TreeId) {
-> >
-> > > > - tcon->need_reconnect =3D true;
-> >
-> > > > - spin_unlock(&cifs_tcp_ses_lock);
-> >
-> > > > - pr_warn_once("Server share %s deleted.\n",
-> >
-> > > > -     tcon->treeName);
-> >
-> > > > - return;
-> >
-> > > > - }
-> >
-> > > > + if (shdr->Status !=3D STATUS_NETWORK_NAME_DELETED)
-> >
-> > > > + return;
-> >
-> > > > +
-> >
-> > > > + spin_lock(&cifs_tcp_ses_lock);
-> >
-> > > > + list_for_each(tmp, &server->smb_ses_list) {
-> >
-> > > > + ses =3D list_entry(tmp, struct cifs_ses, smb_ses_list);
-> >
-> > > > + list_for_each(tmp1, &ses->tcon_list) {
-> >
-> > > > + tcon =3D list_entry(tmp1, struct cifs_tcon, tcon_list);
-> >
-> > > > + if (tcon->tid =3D=3D shdr->TreeId) {
-> >
-> > > > + tcon->need_reconnect =3D true;
-> >
-> > > > + spin_unlock(&cifs_tcp_ses_lock);
-> >
-> > > > + pr_warn_once("Server share %s deleted.\n",
-> >
-> > > > +     tcon->treeName);
-> >
-> > > > + return;
-> >
-> > > >   }
-> >
-> > > >   }
-> >
-> > > > - spin_unlock(&cifs_tcp_ses_lock);
-> >
-> > > >   }
-> >
-> > > > + spin_unlock(&cifs_tcp_ses_lock);
-> >
-> > > >  }
-> >
-> > > >
-> >
-> > > >  static int
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > On Sat, Feb 20, 2021 at 5:38 PM Steve French <smfrench@gmail.com> w=
-rote:
-> >
-> > > >
-> >
-> > > > I corrected various checkpatch errors - including two of those Pave=
-l noted, and tentatively merged into cifs-2.6.git for-next.  See attached u=
-pdated patch.
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > Will fix the indentation next.
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > On Sat, Feb 20, 2021 at 12:18 PM Pavel Shilovsky <piastryyy@gmail.c=
-om> wrote:
-> >
-> > > >
-> >
-> > > > =D1=87=D1=82, 18 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 08:1=
-0, Rohith <rohiths.msft@gmail.com>:
-> >
-> > > > >
-> >
-> > > > > Hi Pavel,
-> >
-> > > > >
-> >
-> > > > >
-> >
-> > > > >
-> >
-> > > > > Addressed review comments. Can you please take a look.
-> >
-> > > > >
-> >
-> > > > >
-> >
-> > > > >
-> >
-> > > > > >> Btw, I think is_status_io timeout should be called in this loo=
-p for
-> >
-> > > > >
-> >
-> > > > > >> every mid not outside the loop (sorry, missed that in the orig=
-inal
-> >
-> > > > >
-> >
-> > > > > >> review). Could you please fix that separately?
-> >
-> > > > >
-> >
-> > > > >
-> >
-> > > > >
-> >
-> > > > > Yes, will send out different patch for status_io_timeout.
-> >
-> > > >
-> >
-> > > > Thanks!
-> >
-> > > >
-> >
-> > > > The patch looks good. Please find my minor comments below:
-> >
-> > > >
-> >
-> > > > 1.
-> >
-> > > > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> >
-> > > > index 10fe6d6d2dee..b2f51546c2ef 100644
-> >
-> > > > --- a/fs/cifs/connect.c
-> >
-> > > > +++ b/fs/cifs/connect.c
-> >
-> > > > @@ -993,6 +993,10 @@ cifs_demultiplex_thread(void *p)
-> >
-> > > >   if (mids[i] !=3D NULL) {
-> >
-> > > >   mids[i]->resp_buf_size =3D server->pdu_size;
-> >
-> > > >
-> >
-> > > > + if (server->ops->is_network_name_deleted) {
-> >
-> > > > +         server->ops->is_network_name_deleted(bufs[i],
-> >
-> > > > +                              server);
-> >
-> > > > + }
-> >
-> > > >
-> >
-> > > > ^^^
-> >
-> > > > remove extra {}
-> >
-> > > >
-> >
-> > > > 2.
-> >
-> > > > +static void
-> >
-> > > > +smb2_is_network_name_deleted(char *buf, struct TCP_Server_Info *se=
-rver)
-> >
-> > > > +{
-> >
-> > > > + struct smb2_sync_hdr *shdr =3D (struct smb2_sync_hdr *)buf;
-> >
-> > > >
-> >
-> > > > + struct list_head *tmp, *tmp1;
-> >
-> > > > + struct cifs_ses *ses;
-> >
-> > > > + struct cifs_tcon *tcon;
-> >
-> > > > +
-> >
-> > > > + if (shdr->Status =3D=3D STATUS_NETWORK_NAME_DELETED) {
-> >
-> > > >
-> >
-> > > > ^^^
-> >
-> > > > let's do the opposite check: if status is not
-> >
-> > > > STATUS_NETWORK_NAME_DELETED then return immediately from the functi=
-on.
-> >
-> > > > This will remove overall indentation for the nested for loops.
-> >
-> > > >
-> >
-> > > > 3.
-> >
-> > > > @@ -4605,6 +4632,10 @@ static void smb2_decrypt_offload(struct
-> >
-> > > > work_struct *work)
-> >
-> > > >  #ifdef CONFIG_CIFS_STATS2
-> >
-> > > >   mid->when_received =3D jiffies;
-> >
-> > > >  #endif
-> >
-> > > > + if (dw->server->ops->is_network_name_deleted) {
-> >
-> > > > +         dw->server->ops->is_network_name_deleted(dw->buf,
-> >
-> > > > +                                  dw->server);
-> >
-> > > > + }
-> >
-> > > >
-> >
-> > > > ^^^
-> >
-> > > > remove extra {}
-> >
-> > > >
-> >
-> > > > --
-> >
-> > > > Best regards,
-> >
-> > > > Pavel Shilovsky
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > --
-> >
-> > > >
-> >
-> > > > Thanks,
-> >
-> > > >
-> >
-> > > > Steve
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > >
-> >
-> > > > --
-> >
-> > > >
-> >
-> > > > Thanks,
-> >
-> > > >
-> >
-> > > > Steve
-> >
-> > > >
-> >
-> > > >
-> >
-> >
-> >
-> >
-> >
-> >
-> >
-> > --
-> >
-> > Regards,
-> >
-> > Shyam
-> >
-> >
->
->
->
-> --
-> Thanks,
->
-> Steve
+flock(2)-type locks are advisory, they are not supposed to prevent IO
+if mode would otherwise allow it. From man page:
+
+   flock()  places  advisory  locks  only; given suitable permissions on a
+   file, a process is free to ignore the use of flock() and perform I/O on
+   the file.
+
+Simple reproducer:
+
+	#include <stdlib.h>
+	#include <stdio.h>
+	#include <errno.h>
+	#include <sys/file.h>
+	#include <sys/types.h>
+	#include <sys/wait.h>
+	#include <unistd.h>
+
+	int main(int argc, char** argv)
+	{
+		const char* fn =3D argv[1] ? argv[1] : "aaa";
+		int fd, status, rc;
+		pid_t pid;
+
+		fd =3D open(fn, O_RDWR|O_CREAT, S_IRWXU);
+		pid =3D fork();
+
+		if (pid =3D=3D 0) {
+			flock(fd, LOCK_SH);
+			exit(0);
+		}
+
+		waitpid(pid, &status, 0);
+		rc =3D write(fd, "xxx\n", 4);
+		if (rc < 0) {
+			perror("write");
+			return 1;
+		}
+
+		puts("ok");
+		return 0;
+	}
+
+If the locks are advisory the write() call is supposed to work
+otherwise we are trying to write with only a read lock (aka shared
+lock) so it fails.
+
+Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+---
+ fs/cifs/file.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 6d001905c8e5..3e351a534720 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -3242,6 +3242,7 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from=
+)
+ 	struct inode *inode =3D file->f_mapping->host;
+ 	struct cifsInodeInfo *cinode =3D CIFS_I(inode);
+ 	struct TCP_Server_Info *server =3D tlink_tcon(cfile->tlink)->ses->server;
++	struct cifsLockInfo *lock;
+ 	ssize_t rc;
+=20
+ 	inode_lock(inode);
+@@ -3257,7 +3258,7 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from=
+)
+=20
+ 	if (!cifs_find_lock_conflict(cfile, iocb->ki_pos, iov_iter_count(from),
+ 				     server->vals->exclusive_lock_type, 0,
+-				     NULL, CIFS_WRITE_OP))
++				     &lock, CIFS_WRITE_OP) || (lock->flags & FL_FLOCK))
+ 		rc =3D __generic_file_write_iter(iocb, from);
+ 	else
+ 		rc =3D -EACCES;
+@@ -3975,6 +3976,7 @@ cifs_strict_readv(struct kiocb *iocb, struct iov_iter=
+ *to)
+ 	struct cifsFileInfo *cfile =3D (struct cifsFileInfo *)
+ 						iocb->ki_filp->private_data;
+ 	struct cifs_tcon *tcon =3D tlink_tcon(cfile->tlink);
++	struct cifsLockInfo *lock;
+ 	int rc =3D -EACCES;
+=20
+ 	/*
+@@ -4000,7 +4002,7 @@ cifs_strict_readv(struct kiocb *iocb, struct iov_iter=
+ *to)
+ 	down_read(&cinode->lock_sem);
+ 	if (!cifs_find_lock_conflict(cfile, iocb->ki_pos, iov_iter_count(to),
+ 				     tcon->ses->server->vals->shared_lock_type,
+-				     0, NULL, CIFS_READ_OP))
++				     0, &lock, CIFS_READ_OP) || (lock->flags & FL_FLOCK))
+ 		rc =3D generic_file_read_iter(iocb, to);
+ 	up_read(&cinode->lock_sem);
+ 	return rc;
+--=20
+2.30.0
+
