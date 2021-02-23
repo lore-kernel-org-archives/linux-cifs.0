@@ -2,220 +2,188 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D449C433E6
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 18:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C85C433DB
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 18:40:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D1B6864E6B
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 18:28:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A470A64E20
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 18:40:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233128AbhBWS2r (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Feb 2021 13:28:47 -0500
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:30300 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233900AbhBWS2q (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 23 Feb 2021 13:28:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1614104851;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=anpaLtEcd3qtkAoA/Wm8hrwTV46F/traBfj2tarUVHU=;
-        b=RUKRrfb2QN2wX+X2a9+v6XvEQ4kAw1JEDSVllk/k8/HbqCtktgvuaNNoTrsKaC4FsiE5gi
-        A/E45yxA3qqAGV4oGWyj0yjPB3QpfWeyeu607SnwDORutf0bDV3dOaDGwZRM7TgJ7oj7Ev
-        2iar3+vqoe5FidlT7UbYhCm4gna+wqU=
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com
- (mail-db3eur04lp2058.outbound.protection.outlook.com [104.47.12.58]) (Using
- TLS) by relay.mimecast.com with ESMTP id de-mta-9-U9RgydIDOl6GTeJjcfNK2w-1;
- Tue, 23 Feb 2021 19:27:30 +0100
-X-MC-Unique: U9RgydIDOl6GTeJjcfNK2w-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U9XfZHdjDBpfa1TIhdkbXSMBbrvqJputfyHFgMjJnIUXWKYt2/cFAJezkTI2O33y5O0Favv5um4DJG54fTu5PIhRWS7ZhiVaNrMGetGWuz3Watrrh8rlbDGAK1szqaWxvUltbdADoDp2oQTT3EgHs2lo5kDU/EbPgAcEjo+j8H8oKpY/rfWbs+nE0PiIV+Kp2Okcel0ddTD+00EpRynlax21+/Z0//yp7YXy5Xh2cUOo+9VDac99CnuEI8+UQAjKIi6uTF8yckg1cccTaCbsesiOij0/z6fPTv4JLy4QJJnMHmXGBdav7hN/i8x8U7pWj7ZpC6/RatMbwzEuEqDBMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fJhH+wC6DS/hHrW/UeAnXR7v5GsP377h4BKSIAVDhAU=;
- b=FJmtIASCv97u1T5GPvSvfnJUM9MPy1+XIP7sDh/8Gi2FiwXrFSt8s1JBCWjgPHxvg13F5It9jZ0Msnw14nZUMpAgAHqi1gSx9jXBWVXQSYro9uUFwWo/xELOaTm7O/9Yzreh83hyK5WLgS1GkZYk4k1wkjT/iOTGaxgwwh2r7MjWjNrpJPvQE9Quzu5PGNoFVw4gmbiKDWyC4IgKW9sEJNvciJKWTk5nPF/zL/ULH2JF9y41bogdiyBi5MLET1abkQgerwWhlPVuP/6c01aRAnkFmvol5SqLCZx84Inf7A0qvbhZnK+0G4wl2tp8s0yaZFxDS8kdyM7KVBCJA24P4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VE1PR04MB7277.eurprd04.prod.outlook.com (2603:10a6:800:1b3::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.32; Tue, 23 Feb
- 2021 18:27:29 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3868.032; Tue, 23 Feb 2021
- 18:27:29 +0000
-From:   =?UTF-8?q?Aur=C3=A9lien=20Aptel?= <aaptel@suse.com>
-To:     linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-CC:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH] cifs: ignore FL_FLOCK locks in read/write
-Date:   Tue, 23 Feb 2021 19:27:26 +0100
-Message-ID: <20210223182726.31763-1-aaptel@suse.com>
-X-Mailer: git-send-email 2.30.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-Originating-IP: [2003:fa:705:9b31:db:7402:52ee:d004]
-X-ClientProxiedBy: ZRAP278CA0002.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:10::12) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+        id S233101AbhBWSkD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Feb 2021 13:40:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54792 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232986AbhBWSkC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Feb 2021 13:40:02 -0500
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E75C6C061574;
+        Tue, 23 Feb 2021 10:39:21 -0800 (PST)
+Received: by mail-lj1-x22c.google.com with SMTP id o16so59642607ljj.11;
+        Tue, 23 Feb 2021 10:39:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=/dQXAMhErQFcRRic9fceFXsYd4MlrVmyK0wct060mNk=;
+        b=rlzPzfrapjnCOS5qgF1o4BIHsbdajD23mpRwqNg8yX8jhg9zt0YLmx7MrSP8pj99Fx
+         dYZ0f693+NOFJudqrypWjZRsMv63DMO9AxJswLW7TbIUlVckQC/y4wBz44/azL+SKz6j
+         cfxFngUwm+6Faz/C7c+KiHGrJXyp3cL7BNkNvun5ujBCJ5kl7w0R/NSh8sgJVNXXTCFv
+         plKmd7yQHmJQo20RBrTEWrbVJeBu5Hpvh29u5g7JRuvY8xC1t8cG2RnyqgMQsAEUOjKQ
+         dEkRWeW8iDRS7VRshaorEK8XWQSDf51fg0mMONBMK7ySWwxRRmrOH9auEH76DW2kahIQ
+         4aZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=/dQXAMhErQFcRRic9fceFXsYd4MlrVmyK0wct060mNk=;
+        b=KFfAltbJg6qx7AAumNHiJHID4NhQ8zkajKf2sOlxLXJVAICuDQ2iAfQUgUdNtXrcG2
+         IiE07ZG0V+2rLNYWViySN8TNPKaswnLb/d1wAoIwwOXBerTJONi80pu14rB83xaoXTm0
+         KwC2K4F9RkZDdqLwB3wNZ09VgYbZ7gcfcCSwIArW7SrdzMtP2zoia48Fxj6ZOuB3XhOh
+         a3bxhRaF7vGhctZmlRWBxm1bi0UUsTTdyVneD3CpzVTnVlTqTW0J/WI2cJqy6620py19
+         zVZrSMnj4EUL1JDsErNIErSLdefEqrDk12HIGRk3+RxvfQK1UZL5v7ni0tc6xAMrDX9k
+         Mb/w==
+X-Gm-Message-State: AOAM5315vyXhdbkhY4LDg1HVhUl2CMT8PVzEqMq86Qgg8rKVCF9WFgxk
+        BmLsQKkffkb5pGDGcadjNYa5/mov/UYpy9C2gQnlkButEOM=
+X-Google-Smtp-Source: ABdhPJzJJC4HP+w+ZoCJWy7EJcF2+ktQ3WjfswK8JMeAiFq2VEXwpOaCPuW0JIzaED8eqmYffj6AOoaZgZ9W8RWpQ4Y=
+X-Received: by 2002:a2e:a36d:: with SMTP id i13mr4788221ljn.148.1614105560304;
+ Tue, 23 Feb 2021 10:39:20 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:705:9b31:db:7402:52ee:d004) by ZRAP278CA0002.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:10::12) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.19 via Frontend Transport; Tue, 23 Feb 2021 18:27:29 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e4d39ac5-f496-403d-d92a-08d8d828ad5e
-X-MS-TrafficTypeDiagnostic: VE1PR04MB7277:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VE1PR04MB72777155B3DD57CEF683AB3CA8809@VE1PR04MB7277.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qdxyfE8Jh6BMAAnN+t+B//uIGGS3sf19F/8sT1nv8rVcWuZymVWnbunVJ2Bl/KdNSYlJNXEoi98Kx47PEyTnl1x8M2dsWocTs5h+uSheq588GqC3ueWJTT2atT1lDBfjFRMWrGjOVbUVM++/VyWFb7siZf1Y8eIBlZBpanFDCAs94kC9Zmbx0QKxPYZi1j/XJ5m3FpZkkaHnAkx4+SGLa4+kZPKYYqIXPAxztsH7hNtP8zWXxPQ4iGGhzEXDo2MOmin4lUyGlPm4M5DAtEPZtDr/gpmp7evyADVDghlJNJ5g1YVQNaCLwbPXZAoz/YPML6mrt78XNyDHx8C7N7yfnvlWsr4jHvEI3uc50ti2BDFzIhRzLeoVt+JAYwTqNBgzvec/2PBMWzii1N6tj/1YfWIt817+g9FZDWGENKd9OZSzUdiw9dr6phJraxSVTxBhGoAg5Cp2itRutLLEAcO9N9sHU6DsesE4rcq76Nx2z/D4LNB9R68ZcthAY9d9f9N3r9W2/YRd+ZwiwZJVm3EDmBfnvtlvHRJAz1TabjJWNfV/ELuHjABIbvprTx63qPVaL/fho1JEXc6Dw7QmPEZUyyJqsmzQ6hGD/DNnoMTGpXe1Zy97z2I8UD+VRRPNEFE6oDx8EIVw/ax4P5km4gjwV3OvXSaAG6exBMewHmhnthAAY9lCUtbRPqh9A62TZvLdnZsahLuZr5p9wbb9AYLuQCzKFgNW6GqD88f2nibYL+SSOpHjTp5wk6G9AQ9KzIDkLQs7RMWimRxCXtauu7fhs18uNvDwWBR8C7EoRsY2BMs8BiKY1vqfqQFtZ0EEhy3MpBwZ+X8JRp0N72kr0oGXvYU7mjBPepTb80Bn6/qYo/XtjRQKxn0Nlm1Wm/decnp9De5O53JD1XWyeHwf/ecXYg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:OSPM;SFS:(396003)(39850400004)(366004)(346002)(136003)(376002)(6666004)(66476007)(2906002)(4326008)(8676002)(6486002)(66556008)(186003)(16526019)(478600001)(8936002)(66946007)(6496006)(316002)(5660300002)(107886003)(52116002)(2616005)(1076003)(86362001)(83380400001)(36756003)(23200700001);DIR:OUT;SFP:1501;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?P6eGyymz+ngnS4L3Rebl2bMRmki2e1shlKOl/yKhLSdLQPNIe5lXBnfvz0SD?=
- =?us-ascii?Q?lLbz09e//btaxzblOUQfrSvV2lQ5JDE0zplKd7g9fTOUmv0wC90FsMxpj90h?=
- =?us-ascii?Q?0KceexsMbLkDmD7T3bZ0K0fPTfe0GVON3L3m1jysqAPO73+lJLmAGpXy3rC7?=
- =?us-ascii?Q?LDei3TVEDA6e0HGe1KknUP9+UFLf3Y6MMqz66ihMmvpEdo+V4mJ9cVb/5zrq?=
- =?us-ascii?Q?g2d5PBZEhHwL71KxAU+Et3ngwtxh5pgcxceG8iQNN2GriO2RnYnXdv9DrYUL?=
- =?us-ascii?Q?54r86yVJm/10suV7KnWJBvgdSlYVeHO7jPu6P+NVi/6ltxMrdHeNjiE+9ps6?=
- =?us-ascii?Q?8yd3FNi8O+V+Y754xdlEZ93XXZDwfyln2j8OyU9+VOmiqEqqkQwtwGnYHWry?=
- =?us-ascii?Q?mmR2JVjIZwdinXD/TF0sxLLSHMHtXJzSU1S00BXT21F9b5YG+MGU1exxS4+2?=
- =?us-ascii?Q?+gApGK08kzI3HOIVDSoCm99dzNnrtRydogJlSwv0c9v2rsq2ZwZcLnin6SP6?=
- =?us-ascii?Q?KlDOWx2fQH4BXcg6tdd9iJhvJ4ERzZTTnP1swD4C/MM+JIUng+wXsyCLROk+?=
- =?us-ascii?Q?6MErEF1jqfsj/6wS9yrIh/Aa8Vrxi1o/1dOscgyIBGFrRqeQKxIloU7+OX1L?=
- =?us-ascii?Q?q10udADnbTariFt6kfzUSBnwR4j6Y6/yPy0r/vnsPD+j8vYQu9oc57+9St7p?=
- =?us-ascii?Q?S4ZEH4ySjj/V3gReHX9NDmJ3F77AU+vfCOeuXeJaBc/7K/XzkRgFxuSJzlBJ?=
- =?us-ascii?Q?IHtS6yDgR5TadZ+ls8q++ncyBsEItXbBpqkFxvnBCQ1bj7ktI1eaaU1IbrFP?=
- =?us-ascii?Q?rTC0qkIAhEjNtCVTC0/TJpq3QlC+1g5qWDpgx1Yc0ydQno6nwLHKsYUkP/bX?=
- =?us-ascii?Q?fTiv0JHeTs3ULuHHSMHauBTRSDwsrGKtEXMPXM0dtk5bOAAoKT1p3t3T8zTP?=
- =?us-ascii?Q?sSqf4R4oUPXkvmgTw/Pr4fasFk04OwMwK0/c4bE18BzlRKS1BPZa91i/bgxI?=
- =?us-ascii?Q?Xypti7md1V5C7S0etNw3xc3+o4QUimf7AEQXek4IeCaJW6rwt04MZAv3oYn/?=
- =?us-ascii?Q?/FgNxD5lJAcNIvnc/Hg1+n83OgO6oi+YRAB4Yz2IfpYH+VONSZewhG9eVk0W?=
- =?us-ascii?Q?Qbs+44IuJCBOIF9ZYTDvtCng0VmABMsFftqTNjXqzDxbMBkeq25e4BZ7Vmcv?=
- =?us-ascii?Q?LPAX/KHZv0LSlwPo57XjZSAdO8Jtpq0GIl8Rm0nTUuqWQD6eoeOEWY1K12Dr?=
- =?us-ascii?Q?ZWEATuYRfyL723j2DS5BdvGiZlLlsKkVdYpuVYYvIjNbKypDhYDjFD85hl4y?=
- =?us-ascii?Q?8U/OnlGIXsOQd+DDtXOmp11gwzTYTa5+f7/cbIW58eoyJJBA+DTWKTWz939i?=
- =?us-ascii?Q?0/VN49SOy5T74eFRsoyfhkghtALS?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4d39ac5-f496-403d-d92a-08d8d828ad5e
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Feb 2021 18:27:29.2930
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JzLyX9nSkVMmAQequ1gasUbTU2LNgkqoEM7mn7qRZCx1Up0vqfot/3DnAz3uaLnQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7277
+References: <20210223182726.31763-1-aaptel@suse.com>
+In-Reply-To: <20210223182726.31763-1-aaptel@suse.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 23 Feb 2021 12:39:09 -0600
+Message-ID: <CAH2r5mvsWr6F7yZmVQw_b9EegH13y6eOiky-LPxe-_0sKup8dQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: ignore FL_FLOCK locks in read/write
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Aurelien Aptel <aaptel@suse.com>
+Would be great if we had some simple reproducer like this in xfstests.
 
-flock(2)-type locks are advisory, they are not supposed to prevent IO
-if mode would otherwise allow it. From man page:
+On Tue, Feb 23, 2021 at 12:27 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wrot=
+e:
+>
+> From: Aurelien Aptel <aaptel@suse.com>
+>
+> flock(2)-type locks are advisory, they are not supposed to prevent IO
+> if mode would otherwise allow it. From man page:
+>
+>    flock()  places  advisory  locks  only; given suitable permissions on =
+a
+>    file, a process is free to ignore the use of flock() and perform I/O o=
+n
+>    the file.
+>
+> Simple reproducer:
+>
+>         #include <stdlib.h>
+>         #include <stdio.h>
+>         #include <errno.h>
+>         #include <sys/file.h>
+>         #include <sys/types.h>
+>         #include <sys/wait.h>
+>         #include <unistd.h>
+>
+>         int main(int argc, char** argv)
+>         {
+>                 const char* fn =3D argv[1] ? argv[1] : "aaa";
+>                 int fd, status, rc;
+>                 pid_t pid;
+>
+>                 fd =3D open(fn, O_RDWR|O_CREAT, S_IRWXU);
+>                 pid =3D fork();
+>
+>                 if (pid =3D=3D 0) {
+>                         flock(fd, LOCK_SH);
+>                         exit(0);
+>                 }
+>
+>                 waitpid(pid, &status, 0);
+>                 rc =3D write(fd, "xxx\n", 4);
+>                 if (rc < 0) {
+>                         perror("write");
+>                         return 1;
+>                 }
+>
+>                 puts("ok");
+>                 return 0;
+>         }
+>
+> If the locks are advisory the write() call is supposed to work
+> otherwise we are trying to write with only a read lock (aka shared
+> lock) so it fails.
+>
+> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+> ---
+>  fs/cifs/file.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 6d001905c8e5..3e351a534720 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -3242,6 +3242,7 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *fr=
+om)
+>         struct inode *inode =3D file->f_mapping->host;
+>         struct cifsInodeInfo *cinode =3D CIFS_I(inode);
+>         struct TCP_Server_Info *server =3D tlink_tcon(cfile->tlink)->ses-=
+>server;
+> +       struct cifsLockInfo *lock;
+>         ssize_t rc;
+>
+>         inode_lock(inode);
+> @@ -3257,7 +3258,7 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *fr=
+om)
+>
+>         if (!cifs_find_lock_conflict(cfile, iocb->ki_pos, iov_iter_count(=
+from),
+>                                      server->vals->exclusive_lock_type, 0=
+,
+> -                                    NULL, CIFS_WRITE_OP))
+> +                                    &lock, CIFS_WRITE_OP) || (lock->flag=
+s & FL_FLOCK))
+>                 rc =3D __generic_file_write_iter(iocb, from);
+>         else
+>                 rc =3D -EACCES;
+> @@ -3975,6 +3976,7 @@ cifs_strict_readv(struct kiocb *iocb, struct iov_it=
+er *to)
+>         struct cifsFileInfo *cfile =3D (struct cifsFileInfo *)
+>                                                 iocb->ki_filp->private_da=
+ta;
+>         struct cifs_tcon *tcon =3D tlink_tcon(cfile->tlink);
+> +       struct cifsLockInfo *lock;
+>         int rc =3D -EACCES;
+>
+>         /*
+> @@ -4000,7 +4002,7 @@ cifs_strict_readv(struct kiocb *iocb, struct iov_it=
+er *to)
+>         down_read(&cinode->lock_sem);
+>         if (!cifs_find_lock_conflict(cfile, iocb->ki_pos, iov_iter_count(=
+to),
+>                                      tcon->ses->server->vals->shared_lock=
+_type,
+> -                                    0, NULL, CIFS_READ_OP))
+> +                                    0, &lock, CIFS_READ_OP) || (lock->fl=
+ags & FL_FLOCK))
+>                 rc =3D generic_file_read_iter(iocb, to);
+>         up_read(&cinode->lock_sem);
+>         return rc;
+> --
+> 2.30.0
+>
 
-   flock()  places  advisory  locks  only; given suitable permissions on a
-   file, a process is free to ignore the use of flock() and perform I/O on
-   the file.
 
-Simple reproducer:
-
-	#include <stdlib.h>
-	#include <stdio.h>
-	#include <errno.h>
-	#include <sys/file.h>
-	#include <sys/types.h>
-	#include <sys/wait.h>
-	#include <unistd.h>
-
-	int main(int argc, char** argv)
-	{
-		const char* fn =3D argv[1] ? argv[1] : "aaa";
-		int fd, status, rc;
-		pid_t pid;
-
-		fd =3D open(fn, O_RDWR|O_CREAT, S_IRWXU);
-		pid =3D fork();
-
-		if (pid =3D=3D 0) {
-			flock(fd, LOCK_SH);
-			exit(0);
-		}
-
-		waitpid(pid, &status, 0);
-		rc =3D write(fd, "xxx\n", 4);
-		if (rc < 0) {
-			perror("write");
-			return 1;
-		}
-
-		puts("ok");
-		return 0;
-	}
-
-If the locks are advisory the write() call is supposed to work
-otherwise we are trying to write with only a read lock (aka shared
-lock) so it fails.
-
-Signed-off-by: Aurelien Aptel <aaptel@suse.com>
----
- fs/cifs/file.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 6d001905c8e5..3e351a534720 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -3242,6 +3242,7 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from=
-)
- 	struct inode *inode =3D file->f_mapping->host;
- 	struct cifsInodeInfo *cinode =3D CIFS_I(inode);
- 	struct TCP_Server_Info *server =3D tlink_tcon(cfile->tlink)->ses->server;
-+	struct cifsLockInfo *lock;
- 	ssize_t rc;
-=20
- 	inode_lock(inode);
-@@ -3257,7 +3258,7 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from=
-)
-=20
- 	if (!cifs_find_lock_conflict(cfile, iocb->ki_pos, iov_iter_count(from),
- 				     server->vals->exclusive_lock_type, 0,
--				     NULL, CIFS_WRITE_OP))
-+				     &lock, CIFS_WRITE_OP) || (lock->flags & FL_FLOCK))
- 		rc =3D __generic_file_write_iter(iocb, from);
- 	else
- 		rc =3D -EACCES;
-@@ -3975,6 +3976,7 @@ cifs_strict_readv(struct kiocb *iocb, struct iov_iter=
- *to)
- 	struct cifsFileInfo *cfile =3D (struct cifsFileInfo *)
- 						iocb->ki_filp->private_data;
- 	struct cifs_tcon *tcon =3D tlink_tcon(cfile->tlink);
-+	struct cifsLockInfo *lock;
- 	int rc =3D -EACCES;
-=20
- 	/*
-@@ -4000,7 +4002,7 @@ cifs_strict_readv(struct kiocb *iocb, struct iov_iter=
- *to)
- 	down_read(&cinode->lock_sem);
- 	if (!cifs_find_lock_conflict(cfile, iocb->ki_pos, iov_iter_count(to),
- 				     tcon->ses->server->vals->shared_lock_type,
--				     0, NULL, CIFS_READ_OP))
-+				     0, &lock, CIFS_READ_OP) || (lock->flags & FL_FLOCK))
- 		rc =3D generic_file_read_iter(iocb, to);
- 	up_read(&cinode->lock_sem);
- 	return rc;
 --=20
-2.30.0
+Thanks,
 
+Steve
