@@ -2,128 +2,108 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC8CC433E6
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 15:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25114C433E9
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 15:11:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8411164ECE
+	by mail.kernel.org (Postfix) with ESMTP id CECE460241
 	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 15:11:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230386AbhBXPKR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Feb 2021 10:10:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30547 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233871AbhBXNgo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 24 Feb 2021 08:36:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614173669;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=FGAEWcqi7R+QLdnM9l4hJ0vRCcM6Gnle1kdY4AuWCGU=;
-        b=CMCSsSwcliHumXcoRFNUW/z3PKPpK/QPmlEVkvMDTWW4wfb1fH2MVnhNpXmYsXuT+2ksVn
-        YUIOZ6AmYLr/jrBZmI6pdZYJcfhC3S/SgGL1w1gQf7lBbg/zuSw0bh7WMJhzZ/jA2wrqJD
-        rqrs58uU65aUHxBiDdjD6YPFfNycddQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-540-3MKbxeFLOOeiKKs9HaYL0w-1; Wed, 24 Feb 2021 08:33:46 -0500
-X-MC-Unique: 3MKbxeFLOOeiKKs9HaYL0w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82D3BD547E;
-        Wed, 24 Feb 2021 13:32:07 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 320E35D9F1;
-        Wed, 24 Feb 2021 13:32:03 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAH2r5mv=PZk_wn2=b0VQcaom9TEw1MGLz+qB_Ktxxm2bnV9Nig@mail.gmail.com>
-References: <CAH2r5mv=PZk_wn2=b0VQcaom9TEw1MGLz+qB_Ktxxm2bnV9Nig@mail.gmail.com> <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk> <9e49f96cd80eaf9c8ed267a7fbbcb4c6467ee790.camel@redhat.com> <CAH2r5mvPLivjuE=cbijzGSHOvx-hkWSWbcxpoBnJX-BR9pBskQ@mail.gmail.com> <20210216021015.GH2858050@casper.infradead.org>
-To:     Steve French <smfrench@gmail.com>
-Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
+        id S234947AbhBXPLB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Feb 2021 10:11:01 -0500
+Received: from mx2.suse.de ([195.135.220.15]:33460 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236564AbhBXOW6 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 24 Feb 2021 09:22:58 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 99E5BADCD;
+        Wed, 24 Feb 2021 14:22:04 +0000 (UTC)
+Received: from localhost (brahms [local])
+        by brahms (OpenSMTPD) with ESMTPA id 1f03fb81;
+        Wed, 24 Feb 2021 14:23:09 +0000 (UTC)
+From:   Luis Henriques <lhenriques@suse.de>
+To:     Alejandro Colomar <alx.manpages@gmail.com>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Amir Goldstein <amir73il@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>,
         Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org,
-        linux-cachefs@redhat.com, Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-mm <linux-mm@kvack.org>, linux-afs@lists.infradead.org,
-        v9fs-developer@lists.sourceforge.net,
-        Christoph Hellwig <hch@lst.de>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-nfs <linux-nfs@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        David Wysochanski <dwysocha@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        William Kucharski <william.kucharski@oracle.com>
-Subject: Re: [PATCH 00/33] Network fs helper library & fscache kiocb API [ver #3]
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Nicolas Boichat <drinkcat@chromium.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        Andreas Dilger <adilger@dilger.ca>,
+        Olga Kornievskaia <aglo@umich.edu>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     ceph-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-man@vger.kernel.org, Luis Henriques <lhenriques@suse.de>
+Subject: [PATCH] copy_file_range.2: Kernel v5.12 updates
+Date:   Wed, 24 Feb 2021 14:23:07 +0000
+Message-Id: <20210224142307.7284-1-lhenriques@suse.de>
+In-Reply-To: <20210222102456.6692-1-lhenriques@suse.de>
+References: <20210222102456.6692-1-lhenriques@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3743318.1614173522.1@warthog.procyon.org.uk>
-Date:   Wed, 24 Feb 2021 13:32:02 +0000
-Message-ID: <3743319.1614173522@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve French <smfrench@gmail.com> wrote:
+Update man-page with recent changes to this syscall.
 
-> This (readahead behavior improvements in Linux, on single large file
-> sequential read workloads like cp or grep) gets particularly interesting
-> with SMB3 as multichannel becomes more common.  With one channel having one
-> readahead request pending on the network is suboptimal - but not as bad as
-> when multichannel is negotiated. Interestingly in most cases two network
-> connections to the same server (different TCP sockets,but the same mount,
-> even in cases where only network adapter) can achieve better performance -
-> but still significantly lags Windows (and probably other clients) as in
-> Linux we don't keep multiple I/Os in flight at one time (unless different
-> files are being read at the same time by different threads).
+Signed-off-by: Luis Henriques <lhenriques@suse.de>
+---
+Hi!
 
-I think it should be relatively straightforward to make the netfs_readahead()
-function generate multiple read requests.  If I wasn't handed sufficient pages
-by the VM upfront to do two or more read requests, I would need to do extra
-expansion.  There are a couple of ways this could be done:
+Here's a suggestion for fixing the manpage for copy_file_range().  Note that
+I've assumed the fix will hit 5.12.
 
- (1) I could expand the readahead_control after fully starting a read request
-     and then create another independent read request, and another for how
-     ever many we want.
+ man2/copy_file_range.2 | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
- (2) I could expand the readahead_control first to cover however many requests
-     I'm going to generate, then chop it up into individual read requests.
-
-However, generating larger requests means we're more likely to run into a
-problem for the cache: if we can't allocate enough pages to fill out a cache
-block, we don't have enough data to write to the cache.  Further, if the pages
-are just unlocked and abandoned, readpage will be called to read them
-individually - which means they likely won't get cached unless the cache
-granularity is PAGE_SIZE.  But that's probably okay if ENOMEM occurred.
-
-There are some other considerations too:
-
- (*) I would need to query the filesystem to find out if I should create
-     another request.  The fs would have to keep track of how many I/O reqs
-     are in flight and what the limit is.
-
- (*) How and where should the readahead triggers be emplaced?  I'm guessing
-     that each block would need a trigger and that this should cause more
-     requests to be generated until we hit the limit.
-
- (*) I would probably need to shuffle the request generation for the second
-     and subsequent blocks in a single netfs_readahead() call to a worker
-     thread because it'll probably be in a userspace kernel-side context and
-     blocking an application from proceeding and consuming the pages already
-     committed.
-
-David
-
+diff --git a/man2/copy_file_range.2 b/man2/copy_file_range.2
+index 611a39b8026b..b0fd85e2631e 100644
+--- a/man2/copy_file_range.2
++++ b/man2/copy_file_range.2
+@@ -169,6 +169,9 @@ Out of memory.
+ .B ENOSPC
+ There is not enough space on the target filesystem to complete the copy.
+ .TP
++.B EOPNOTSUPP
++The filesystem does not support this operation.
++.TP
+ .B EOVERFLOW
+ The requested source or destination range is too large to represent in the
+ specified data types.
+@@ -187,7 +190,7 @@ refers to an active swap file.
+ .B EXDEV
+ The files referred to by
+ .IR fd_in " and " fd_out
+-are not on the same mounted filesystem (pre Linux 5.3).
++are not on the same mounted filesystem (pre Linux 5.3 and post Linux 5.12).
+ .SH VERSIONS
+ The
+ .BR copy_file_range ()
+@@ -202,6 +205,11 @@ Applications should target the behaviour and requirements of 5.3 kernels.
+ .PP
+ First support for cross-filesystem copies was introduced in Linux 5.3.
+ Older kernels will return -EXDEV when cross-filesystem copies are attempted.
++.PP
++After Linux 5.12, support for copies between different filesystems was dropped.
++However, individual filesystems may still provide
++.BR copy_file_range ()
++implementations that allow copies across different devices.
+ .SH CONFORMING TO
+ The
+ .BR copy_file_range ()
