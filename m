@@ -2,221 +2,470 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F5DC433E0
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 22:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB55C433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 01:09:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CFCE614A7
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Feb 2021 22:23:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E885564DBD
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 01:09:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232029AbhBWWX0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Feb 2021 17:23:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46468 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231978AbhBWWXZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Feb 2021 17:23:25 -0500
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40ED5C061574
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Feb 2021 14:22:45 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id q14so74829ljp.4
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Feb 2021 14:22:45 -0800 (PST)
+        id S233489AbhBXBIm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Feb 2021 20:08:42 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:54714 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233896AbhBXASd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Feb 2021 19:18:33 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11O08UX6004592;
+        Wed, 24 Feb 2021 00:13:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2020-01-29;
+ bh=+Ne8CYPzPQdf5wdDrRYtSqZ8q7MyyTT/Unft49OssfA=;
+ b=EEGe1LHG6n7TAeUw+8iPsxlsuM/jQlAZz6nJsoYGdMv2Y87I7TV/DZ1SrQw5hLpVk3Sc
+ RHRKgY8i90THMT8mNt6i5w0fHrj+0M0f4W1mq6EYu7aePyEwjlHAGGqoEq67+ZO0Y/7I
+ vfkxuSq59jhmGzfARVetwbq5Sbd5r08viJdoVbuibo6tMz8jbmrPE1jHVYy5tSTLwLiv
+ /EH/yU4YjFhZzm96bf3AEI4bMBXqvsm7EzFIDR+eihisuLRu4zqlasf58Zlo6h6cWb/5
+ /LQ28gov+UbG2STk11nyuZyW8FnHPav1SpeYGAatU2+O0Ke++jLh7lCzBP3lA5VJr0rz NA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 36ugq3g3wr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Feb 2021 00:13:09 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11O0AZ6w033855;
+        Wed, 24 Feb 2021 00:13:08 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2174.outbound.protection.outlook.com [104.47.56.174])
+        by aserp3020.oracle.com with ESMTP id 36ucb02f6h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Feb 2021 00:13:08 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WNc94tI4ve0zUNb9+hJRg4Q3l/zFcWPORNWyz3bAhPgdcUKNuvqkCHsez+GD44VtJH2iE512/P2Z0fX+QO//wN70U9/zVEc0pXPnD2o8onfG25QWEMGf0L1AdZOQX/NE1JAvv2UisX7M+5EPWcI0ZfH5uZc4zaDXgratYAzYtcnqpl9ttUJqvAoJgBU8oHVB+ZeAANRo5x+KQi87wAMv3OrY+eMu+2WsfgvhCvu8uztg7lk4usKJ0ot/yYXV2Ota9kij6lfPaJyWm3LTOLO/JN2ldNKISW1aAfj1+M8Y8rTntHZsI0u9IhMBIOAuLnrOtAa1PNRR9XQmiiSSEEwKBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+Ne8CYPzPQdf5wdDrRYtSqZ8q7MyyTT/Unft49OssfA=;
+ b=gOjqcSGHoxTpF/4CbJ54tB7nXCRm/9iYeEYolSw92OhOoZwqDhrpYgMp51GaM9aSK2VCvK+7oSsK9dHdumSgrndL1b+Ukx5aS2BWq7r3+jXZ6UgOOcZQ2/isue4TH7y4Ovh2ixc257bTC2SngZ9+pEpJp54u1lCMUSowmKEgtj7HvH7l4aQoFGmuUTuZcg/Yywj8dnWld1Njwj9T3GmagiJ++LXJ31u0msbv5V7x3198MzgIscax3Nzcumq21/uDjZWZmYVF9c+nWcD7uAVHCc4PagucIXbCbKy8ZnuZQeYpf9n4l1DHZQM9kJ1QWmQqm0WZEl85j/+QOCKfG1OGhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=d1yC+WVgL2olp+V5fEP8Dv6k11wypUl9Ht9IO+Mjf7Y=;
-        b=r+tSLTR1p5RmvWixlpdthyOKPRD25w69Ua3/ulqNnMgIuC6badmLwLZ2jah5IfwMiq
-         W6FW3PuxDSEafeZIyJOgEmjj94LSAsHHnklVUk7EaQbm5EF+V1+ZLgBuIADu1GnysTBN
-         XpwWe5pU9ncSJ/2d3K7TU/IK828JyEaNwZ4FiP/TXHP5jqwWeqUXJfAiUNQ1xDrw5YQl
-         N/okF9HomfKruqmtLw5URcAJ3YHGgsGkE16ZnYuVHF78vqOOk7pZs6JYIG/4GfMods6g
-         qBR5gbLxa/FnNpzGGTqqN+HH/y2yYKHUb0L9JAOij2GTHZQsq0tRoiMyl+eNuJXAvseK
-         PmIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=d1yC+WVgL2olp+V5fEP8Dv6k11wypUl9Ht9IO+Mjf7Y=;
-        b=a2Q3XgExb3TcVTHDL2ylQRm8n8Ao6uM82cyumF2SBZAtMaNQoFhBEbd50YT0y1JJdQ
-         iO0++rLUogcw1btWnV93fZwMU4PQ+TrYOEKbs3659F2oPVuwiMtnuG1YLAOsXU5eNio3
-         +UM7vczkssdy/vVWVTMxCmwBcyzY3ABJDTvNFPgg/p7/1TioQgs5VFTUnO4W8TeV9G7C
-         U8TGHqDCdOV7At7nfI5WVGKfMDiJ9BGvPKLf/mavenYFPNT7kGrQ09jjaE8F23xA/ylv
-         swIvYSKHGZA+mbHENBmUcHEUxyu35xUA607iyvUmYI+YwAyD2VO4WuqNc19EMt4oZvwD
-         N+dg==
-X-Gm-Message-State: AOAM531UrXBqwfe4FO2WIOE5JvNBOvR4C9oUayeXWsSFG/7Z3PQN7FZy
-        Up65SrzDwIao/mHsfTAbqA11xGVvmtZ5OppgBmvu7j9D7GC/PA==
-X-Google-Smtp-Source: ABdhPJzN3O/k2NY5ppB4kEDMhRssL2AijU3fx7zN2ajkhP99AwpI9nA/J9c/YY4rbo4qnALfaDVNX/gL+6+1XcT1QKQ=
-X-Received: by 2002:a2e:7e11:: with SMTP id z17mr1624611ljc.477.1614118963429;
- Tue, 23 Feb 2021 14:22:43 -0800 (PST)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+Ne8CYPzPQdf5wdDrRYtSqZ8q7MyyTT/Unft49OssfA=;
+ b=Yr28eUdnWbg0aQVvRUevdcLtgM6PUgoveBXy96szHySD7CET2CzP0wwssUlg+LXW+1p9ZU8Tm5qVRUs+Pgk4PCATGst8vhMZch8iaqreV0PmRUyV7SNRi/g/PA7983VDJR87cO6LDPlSNRFsw+Jo9MYy3KVskQ/8++maB4kX8jQ=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
+Received: from BY5PR10MB4257.namprd10.prod.outlook.com (2603:10b6:a03:211::21)
+ by SJ0PR10MB4558.namprd10.prod.outlook.com (2603:10b6:a03:2d8::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.32; Wed, 24 Feb
+ 2021 00:13:04 +0000
+Received: from BY5PR10MB4257.namprd10.prod.outlook.com
+ ([fe80::a5bc:c1ab:3bf1:1fe8]) by BY5PR10MB4257.namprd10.prod.outlook.com
+ ([fe80::a5bc:c1ab:3bf1:1fe8%6]) with mapi id 15.20.3868.033; Wed, 24 Feb 2021
+ 00:13:04 +0000
+Subject: Re: [PATCH v8] vfs: fix copy_file_range regression in cross-fs copies
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     Luis Henriques <lhenriques@suse.de>,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Nicolas Boichat <drinkcat@chromium.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        Andreas Dilger <adilger@dilger.ca>,
+        Olga Kornievskaia <aglo@umich.edu>,
+        Christoph Hellwig <hch@infradead.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>
+References: <20210221195833.23828-1-lhenriques@suse.de>
+ <20210222102456.6692-1-lhenriques@suse.de>
+ <26a22719-427a-75cf-92eb-dda10d442ded@oracle.com> <YDTZwH7xv41Wimax@suse.de>
+ <7cc69c24-80dd-0053-24b9-3a28b0153f7e@oracle.com>
+ <7c12e6a3-e4a6-5210-1b57-09072eac3270@oracle.com>
+ <CAOQ4uxh2E2oJjHoOBY3GU__6UcjE67E7qR1uMus7f_xhQyM54g@mail.gmail.com>
+ <72c41310-85e4-16fe-8d9c-d42abe0566a9@oracle.com>
+ <e3eed18b-fc7e-e687-608b-7f662017329c@oracle.com>
+ <CAOQ4uxg4diJwpdhUydZ4rtCo2vv0uKwXmr1QiybLt0XVFOB8Eg@mail.gmail.com>
+From:   dai.ngo@oracle.com
+Message-ID: <55606452-b4f6-a42e-faff-796fdd295730@oracle.com>
+Date:   Tue, 23 Feb 2021 16:13:01 -0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
+In-Reply-To: <CAOQ4uxg4diJwpdhUydZ4rtCo2vv0uKwXmr1QiybLt0XVFOB8Eg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [72.219.112.78]
+X-ClientProxiedBy: SJ0PR05CA0132.namprd05.prod.outlook.com
+ (2603:10b6:a03:33d::17) To BY5PR10MB4257.namprd10.prod.outlook.com
+ (2603:10b6:a03:211::21)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 23 Feb 2021 16:22:32 -0600
-Message-ID: <CAH2r5msdUQ=CVM6s7ENeH7SP-teYAOioOGq7zY5sDXZFrFYiCA@mail.gmail.com>
-Subject: [PATCH] convert revalidate of directories to using directory metadata
- cache timeout
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000070e27d05bc085bad"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from dhcp-10-154-141-126.vpn.oracle.com (72.219.112.78) by SJ0PR05CA0132.namprd05.prod.outlook.com (2603:10b6:a03:33d::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.13 via Frontend Transport; Wed, 24 Feb 2021 00:13:02 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a7489838-15d0-47dc-4be2-08d8d858f415
+X-MS-TrafficTypeDiagnostic: SJ0PR10MB4558:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SJ0PR10MB4558D43A157E5B0159F977A4879F9@SJ0PR10MB4558.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Do+Pt6cAINzZGGryimNoYo1w1YQrMVPM1KpQZ2xXeXA6pqyjCQj+xQaGc5GQRrDiFwx+Mict3w86SAOh9C4SC8f4ySDs8XUu8nn/tfPH7NjG748j3kg0gkBkRreg95fXcqNY/kTZSYVq7JEqCTc49Js5q2R7klDxofCzQOp2vjyKmymscAa86z5sJaskELFpEA8gclE0UnSyy6BsGAy6D8RWyEdslX7g9t+HflbNJi58HXryIW4CRHB5jlVRf+/ymLyrBzUs3/R6kQtaOMP+peBayKKHUB+ehGtGq85XLeuYPh6jjG/hH6gqbCdsXax/iyLRkAP9eZVaYSNvDyF9YuI45xF1xu+g4a8a6Nj98TnRhA0HED0bByzm+BnsrgceWetDHlnKZNoTklvgUn6hWpR+GcaiqqvmU5VpSOh2D9IXxx9HlvU4lQEJVPes0OKyB9sEo6nf09rRcaBUiLaCQueYISwD9VbuclIjQdbNfqgAFzp2oASODI1t5Fi6ua/aiFV2kKGZc/SYCgRpK8TWq1mLnx5PEPC73vG+8PSG7yDH9o/wWozJQOLsf3nuzY/qEXL5RW8T/EfT3Avp1C/lB1gj5jXojthUXMosJQ4jz8XBn96SzPnbTXNbdCJGUkqsXChLClLffq5PefdYH5QyTraV+JP1vUuqXcSKSSAHlQM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR10MB4257.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(39860400002)(396003)(136003)(346002)(366004)(8676002)(53546011)(8936002)(6486002)(16526019)(9686003)(4326008)(5660300002)(478600001)(186003)(26005)(966005)(54906003)(956004)(2616005)(66946007)(66556008)(36756003)(30864003)(7696005)(66476007)(31686004)(86362001)(316002)(7416002)(2906002)(83380400001)(31696002)(6916009)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?YmNxVi9HWG14QXB3VXJrY2xaVm1DNmEwYTR5bHpqeVRMVHk2MVZ6WjFjSlIv?=
+ =?utf-8?B?RXZZWGtZS2Mvem5UU09aRWl6ZUNOdTRTNTdqTU4rblZJNzJlSW9IclliZUxD?=
+ =?utf-8?B?bGV2blNRWUZ2NU0rczFpc3h6anVBbnlYMDdYM3pqZnphRVluQ3dxSmhpY1dP?=
+ =?utf-8?B?aEZLcktuTUZHT3VnbkdZY1hyckN1TE8vUGljQ2VOdHNqNVJVZFE2YlBaYjh5?=
+ =?utf-8?B?d2FKbFdsUFU3d3RLcnU5dmREYStqd1FyZ1YySDdTWmxkNDl1RmwzZnV5dUlk?=
+ =?utf-8?B?UVluNzR3WS9UQ2NJbkl1L0dEZW54UGlkZm5ibXFQMGxjcnhWOXNheUQwQVVm?=
+ =?utf-8?B?dFFxTjRhcnV1NHVqbE5DNTlPNXU0Vmh1bm9qMUt4UVo1NjBKVjdYK2JTTGg0?=
+ =?utf-8?B?cFBBSW5JOVJWOTMxR0NqTGVBZHhua2JNSGVSdTBmWnN5M3RSU1Zrbkc0aW9S?=
+ =?utf-8?B?L1Q3MTRiY2VkQzVjdWR3UmVRYXFyaFhHU29najhsSzZlRkp4VnJUekMvcWtz?=
+ =?utf-8?B?ckhDOVpjVXFib3lXUGNBbUs4T1NiMDV3NGZ3Z0hlcVhvUDUwUVhEdU0zNW5F?=
+ =?utf-8?B?Y1czNHJld2huL0Q3TW9OMDhaVWtrYW1DdlQ5bzc4TnpSUVB4UFEzZjRUaEhl?=
+ =?utf-8?B?QmhrTThwNU5wSVBWbmkvcnUxVkpEMFNKK2R4SlMzaG1EdExPbXNoSnZralk3?=
+ =?utf-8?B?MFZWNFNKWXZCNDFnREttVnlFUXkvYzhzMEViTWxhTmtHbUhWNTZzbVRrcVF5?=
+ =?utf-8?B?dFdUU3NqRlE1ZldkcEFXNjVVcnFZa1pCN2ZQQnVVaExoVEVURHhFeUJLbmI2?=
+ =?utf-8?B?TXJ0Z010UWoxWDRZQ0VZUFNMWC94V3ByYmZKMU40NnJkMWNTelBwekpZWmN0?=
+ =?utf-8?B?SVdVMFNpVGRRblpZY1B3cjN1RVR6cVhXbm5hbXV3NEdGOFRHZi94TkUwYUJN?=
+ =?utf-8?B?WjNMU3JzaUpQU0xodUsrZWc3TDBQY3B0eHB6R09BWW5UUjdrTnJJTldkdGxa?=
+ =?utf-8?B?WW5BVU4zUitVRlp3UElhc2YxT1hWdEFnN2FzdVJBNE1jL2N6T25QSUk2VkZQ?=
+ =?utf-8?B?ZldaSkFwNHJsNXYvSXU5aGxzZDE2cVdERXczSFV0Y2NqUzZsYzExTDNjY096?=
+ =?utf-8?B?VjlqMUtOSUNRdDZ4UG13T0Q5NW9obDlGY1J4ZWNnbnpVUlpUWW41cVMxMWh0?=
+ =?utf-8?B?WkhWVUdKN3pSWnQ1YXhxQkRyUURGbEM5NEpCSDZ6cnFsMnA5d3htM3JySG1P?=
+ =?utf-8?B?NXJwdDZwL0pQQnR4SHBwWlN6eEdZanZOS1VJakV1c0FaeXFrVHFIL0ttRHZD?=
+ =?utf-8?B?TUkwa3FuZmhYTFE2V3NaeEVrUURoUUpsQmc3eSswSTRKSXNMdjlmdlhVODJ2?=
+ =?utf-8?B?cVV1OFVWTStOR3hjWjZRVlNabEp5Y05aeGZ3ekZueVVMdFhVVWU2T01YaUxV?=
+ =?utf-8?B?SUtOVjBxd0VKZmFxc05Ua3BtQWJCd0QwdS9ydlFpUHRJdUVqR213NTF5Vlpa?=
+ =?utf-8?B?LzNPTW0xS1RaUzhJMWFtaVJkYUpwNUN6c1NER0lkenAvbXpvTmJMaVJvRE5M?=
+ =?utf-8?B?RzhqNkdZQWp4aVJLMUV5RHFCVk1YcXoxaXNYUU9iZ3B6SkpMSnBzbVd4cG5l?=
+ =?utf-8?B?Z0xiRVhSa244dmV2cUJiT1ZnWXdGVDdENy9vbnlCN2JKNjlnUmVqVFpzR3M0?=
+ =?utf-8?B?TkFnM1FHZ3d4Vm16MDFhUXdFd25nOHFMTFpWVmNOckE0REVmZFIxWkx3TGtV?=
+ =?utf-8?Q?1Wpp3oX9RxYSpjhwRs2Gfhyrv0U6ppGwsVsilDh?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7489838-15d0-47dc-4be2-08d8d858f415
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB4257.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Feb 2021 00:13:03.9998
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9smeMEWDlLbEHFoskgH83GhobxRTplVSUfM00N7sTkbw9o4wjDXU9vcGCY0FEE/uXgzNh8R23xPorEyqAQpymg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4558
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9904 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0
+ malwarescore=0 mlxlogscore=999 adultscore=0 bulkscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102240000
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9904 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
+ malwarescore=0 spamscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
+ clxscore=1015 impostorscore=0 lowpriorityscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2102240000
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000070e27d05bc085bad
-Content-Type: text/plain; charset="UTF-8"
+On 2/23/21 9:33 AM, Amir Goldstein wrote:
+> On Tue, Feb 23, 2021 at 7:31 PM <dai.ngo@oracle.com> wrote:
+>> On 2/23/21 8:57 AM, dai.ngo@oracle.com wrote:
+>>
+>>
+>> On 2/23/21 8:47 AM, Amir Goldstein wrote:
+>>
+>> On Tue, Feb 23, 2021 at 6:02 PM <dai.ngo@oracle.com> wrote:
+>>
+>>
+>> On 2/23/21 7:29 AM, dai.ngo@oracle.com wrote:
+>>
+>> On 2/23/21 2:32 AM, Luis Henriques wrote:
+>>
+>> On Mon, Feb 22, 2021 at 08:25:27AM -0800, dai.ngo@oracle.com wrote:
+>>
+>> On 2/22/21 2:24 AM, Luis Henriques wrote:
+>>
+>> A regression has been reported by Nicolas Boichat, found while
+>> using the
+>> copy_file_range syscall to copy a tracefs file.  Before commit
+>> 5dae222a5ff0 ("vfs: allow copy_file_range to copy across devices") the
+>> kernel would return -EXDEV to userspace when trying to copy a file
+>> across
+>> different filesystems.  After this commit, the syscall doesn't fail
+>> anymore
+>> and instead returns zero (zero bytes copied), as this file's
+>> content is
+>> generated on-the-fly and thus reports a size of zero.
+>>
+>> This patch restores some cross-filesystem copy restrictions that
+>> existed
+>> prior to commit 5dae222a5ff0 ("vfs: allow copy_file_range to copy
+>> across
+>> devices").  Filesystems are still allowed to fall-back to the VFS
+>> generic_copy_file_range() implementation, but that has now to be done
+>> explicitly.
+>>
+>> nfsd is also modified to fall-back into generic_copy_file_range()
+>> in case
+>> vfs_copy_file_range() fails with -EOPNOTSUPP or -EXDEV.
+>>
+>> Fixes: 5dae222a5ff0 ("vfs: allow copy_file_range to copy across
+>> devices")
+>> Link:
+>> https://urldefense.com/v3/__https://lore.kernel.org/linux-fsdevel/20210212044405.4120619-1-drinkcat@chromium.org/__;!!GqivPVa7Brio!P1UWThiSkxbjfjFQWNYJmCxGEkiLFyvHjH6cS-G1ZTt1z-TeqwGQgQmi49dC6w$
+>> Link:
+>> https://urldefense.com/v3/__https://lore.kernel.org/linux-fsdevel/CANMq1KDZuxir2LM5jOTm0xx*BnvW=ZmpsG47CyHFJwnw7zSX6Q@mail.gmail.com/__;Kw!!GqivPVa7Brio!P1UWThiSkxbjfjFQWNYJmCxGEkiLFyvHjH6cS-G1ZTt1z-TeqwGQgQmgCmMHzA$
+>> Link:
+>> https://urldefense.com/v3/__https://lore.kernel.org/linux-fsdevel/20210126135012.1.If45b7cdc3ff707bc1efa17f5366057d60603c45f@changeid/__;!!GqivPVa7Brio!P1UWThiSkxbjfjFQWNYJmCxGEkiLFyvHjH6cS-G1ZTt1z-TeqwGQgQmzqItkrQ$
+>> Reported-by: Nicolas Boichat <drinkcat@chromium.org>
+>> Signed-off-by: Luis Henriques <lhenriques@suse.de>
+>> ---
+>> Changes since v7
+>> - set 'ret' to '-EOPNOTSUPP' before the clone 'if' statement so
+>> that the
+>>       error returned is always related to the 'copy' operation
+>> Changes since v6
+>> - restored i_sb checks for the clone operation
+>> Changes since v5
+>> - check if ->copy_file_range is NULL before calling it
+>> Changes since v4
+>> - nfsd falls-back to generic_copy_file_range() only *if* it gets
+>> -EOPNOTSUPP
+>>       or -EXDEV.
+>> Changes since v3
+>> - dropped the COPY_FILE_SPLICE flag
+>> - kept the f_op's checks early in generic_copy_file_checks,
+>> implementing
+>>       Amir's suggestions
+>> - modified nfsd to use generic_copy_file_range()
+>> Changes since v2
+>> - do all the required checks earlier, in generic_copy_file_checks(),
+>>       adding new checks for ->remap_file_range
+>> - new COPY_FILE_SPLICE flag
+>> - don't remove filesystem's fallback to generic_copy_file_range()
+>> - updated commit changelog (and subject)
+>> Changes since v1 (after Amir review)
+>> - restored do_copy_file_range() helper
+>> - return -EOPNOTSUPP if fs doesn't implement CFR
+>> - updated commit description
+>>
+>>      fs/nfsd/vfs.c   |  8 +++++++-
+>>      fs/read_write.c | 49
+>> ++++++++++++++++++++++++-------------------------
+>>      2 files changed, 31 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
+>> index 04937e51de56..23dab0fa9087 100644
+>> --- a/fs/nfsd/vfs.c
+>> +++ b/fs/nfsd/vfs.c
+>> @@ -568,6 +568,7 @@ __be32 nfsd4_clone_file_range(struct nfsd_file
+>> *nf_src, u64 src_pos,
+>>      ssize_t nfsd_copy_file_range(struct file *src, u64 src_pos,
+>> struct file *dst,
+>>                       u64 dst_pos, u64 count)
+>>      {
+>> +    ssize_t ret;
+>>          /*
+>>           * Limit copy to 4MB to prevent indefinitely blocking an nfsd
+>> @@ -578,7 +579,12 @@ ssize_t nfsd_copy_file_range(struct file *src,
+>> u64 src_pos, struct file *dst,
+>>           * limit like this and pipeline multiple COPY requests.
+>>           */
+>>          count = min_t(u64, count, 1 << 22);
+>> -    return vfs_copy_file_range(src, src_pos, dst, dst_pos, count, 0);
+>> +    ret = vfs_copy_file_range(src, src_pos, dst, dst_pos, count, 0);
+>> +
+>> +    if (ret == -EOPNOTSUPP || ret == -EXDEV)
+>> +        ret = generic_copy_file_range(src, src_pos, dst, dst_pos,
+>> +                          count, 0);
+>> +    return ret;
+>>      }
+>>      __be32 nfsd4_vfs_fallocate(struct svc_rqst *rqstp, struct svc_fh
+>> *fhp,
+>> diff --git a/fs/read_write.c b/fs/read_write.c
+>> index 75f764b43418..5a26297fd410 100644
+>> --- a/fs/read_write.c
+>> +++ b/fs/read_write.c
+>> @@ -1388,28 +1388,6 @@ ssize_t generic_copy_file_range(struct file
+>> *file_in, loff_t pos_in,
+>>      }
+>>      EXPORT_SYMBOL(generic_copy_file_range);
+>> -static ssize_t do_copy_file_range(struct file *file_in, loff_t
+>> pos_in,
+>> -                  struct file *file_out, loff_t pos_out,
+>> -                  size_t len, unsigned int flags)
+>> -{
+>> -    /*
+>> -     * Although we now allow filesystems to handle cross sb copy,
+>> passing
+>> -     * a file of the wrong filesystem type to filesystem driver
+>> can result
+>> -     * in an attempt to dereference the wrong type of
+>> ->private_data, so
+>> -     * avoid doing that until we really have a good reason.  NFS
+>> defines
+>> -     * several different file_system_type structures, but they all
+>> end up
+>> -     * using the same ->copy_file_range() function pointer.
+>> -     */
+>> -    if (file_out->f_op->copy_file_range &&
+>> -        file_out->f_op->copy_file_range ==
+>> file_in->f_op->copy_file_range)
+>> -        return file_out->f_op->copy_file_range(file_in, pos_in,
+>> -                               file_out, pos_out,
+>> -                               len, flags);
+>> -
+>> -    return generic_copy_file_range(file_in, pos_in, file_out,
+>> pos_out, len,
+>> -                       flags);
+>> -}
+>> -
+>>      /*
+>>       * Performs necessary checks before doing a file copy
+>>       *
+>> @@ -1427,6 +1405,25 @@ static int generic_copy_file_checks(struct
+>> file *file_in, loff_t pos_in,
+>>          loff_t size_in;
+>>          int ret;
+>> +    /*
+>> +     * Although we now allow filesystems to handle cross sb copy,
+>> passing
+>> +     * a file of the wrong filesystem type to filesystem driver
+>> can result
+>> +     * in an attempt to dereference the wrong type of
+>> ->private_data, so
+>> +     * avoid doing that until we really have a good reason.  NFS
+>> defines
+>> +     * several different file_system_type structures, but they all
+>> end up
+>> +     * using the same ->copy_file_range() function pointer.
+>> +     */
+>> +    if (file_out->f_op->copy_file_range) {
+>> +        if (file_in->f_op->copy_file_range !=
+>> +            file_out->f_op->copy_file_range)
+>> +            return -EXDEV;
+>> +    } else if (file_in->f_op->remap_file_range) {
+>> +        if (file_inode(file_in)->i_sb != file_inode(file_out)->i_sb)
+>> +            return -EXDEV;
+>>
+>> I think this check is redundant, it's done in vfs_copy_file_range.
+>> If this check is removed then the else clause below should be removed
+>> also. Once this check and the else clause are removed then might as
+>> well move the the check of copy_file_range from here to
+>> vfs_copy_file_range.
+>>
+>> I don't think it's really redundant, although I agree is messy due to
+>> the
+>> fact we try to clone first instead of copying them.
+>>
+>> So, in the clone path, this is the only place where we return -EXDEV if:
+>>
+>> 1) we don't have ->copy_file_range *and*
+>> 2) we have ->remap_file_range but the i_sb are different.
+>>
+>> The check in vfs_copy_file_range() is only executed if:
+>>
+>> 1) we have *valid* ->copy_file_range ops and/or
+>> 2) we have *valid* ->remap_file_range
+>>
+>> So... if we remove the check in generic_copy_file_checks() as you
+>> suggest
+>> and:
+>> - we don't have ->copy_file_range,
+>> - we have ->remap_file_range but
+>> - the i_sb are different
+>>
+>> we'll return the -EOPNOTSUPP (the one set in line "ret =
+>> -EOPNOTSUPP;" in
+>> function vfs_copy_file_range() ) instead of -EXDEV.
+>>
+>> Yes, this is the different.The NFS code handles both -EOPNOTSUPP and
+>> -EXDEVV by doing generic_copy_file_range.  Do any other consumers of
+>> vfs_copy_file_range rely on -EXDEV and not -EOPNOTSUPP and which is
+>> the correct error code for this case? It seems to me that -EOPNOTSUPP
+>> is more appropriate than EXDEV when (sb1 != sb2).
+>>
+>> EXDEV is the right code for:
+>> filesystem supports the operation but not for sb1 != sb1.
+>>
+>> So with the current patch, for a clone operation across 2 filesystems:
+>>
+>>      . if src and dst filesystem support both copy_file_range and
+>>        map_file_range then the code returns -ENOTSUPPORT.
+>>
+>> Why do you say that?
+>> Which code are you referring to exactly?
+>>
+>>
+>> If the filesystems support both copy_file_range and map_file_range,
+>> it passes the check in generic_file_check but it fails with the
+>> check in vfs_copy_file_range and returns -ENOTSUPPORT (added by
+>> the v8 patch)
+>>
+>> Ok, I misread the code here. If it passes the check in generic_copy_file_checks
+>> and it fails the sb check in vfs_copy_file_range then it tries copy_file_range
+>> so it's ok.
+>>
+>> I think having the check in both generic_copy_file_checks and vfs_copy_file_range
+>> making the code hard to read. What's the reason not to do the check only in
+>> vfs_copy_file_range?
+>>
+> You are going in circles.
+> I already answered that.
+> Please re-read the entire thread on all patch versions before commenting.
 
-nfs and cifs on Linux currently have a mount parameter "actimeo" to
-control metadata (attribute) caching but cifs does not have additional
-mount parameters to allow distinguishing between caching directory
-metadata (e.g. needed to revalidate paths) and that for files.
+I'm fine with the patch as it is, as long as it does not break NFS.
 
-Add new mount parameter "acdirmax" to allow caching metadata for
-directories more loosely than file data.  NFS adjusts metadata
-caching from acdirmin to acdirmax (and another two mount parms
-for files) but to reduce complexity, it is safer to just introduce
-the one mount parm to allow caching directories longer (30 seconds
-vs. the 1 second default for file metadata) which is still more
-conservative than other Linux filesystems (e.g. NFS sets acdirmax
-to 60 seconds)
+I just think it's easier to read if the checks are done in
+vfs_copy_file_range such as:
 
--- 
+@@ -1495,6 +1473,11 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
+  
+         file_start_write(file_out);
+  
++       if (file_out->f_op->copy_file_range == NULL &&
++           file_in->f_op->remap_file_range == NULL)
++               return -EOPNOTSUPP;     /* not sure this error is needed */
++
++       ret = -EXDEV;
+         /*
+          * Try cloning first, this is supported by more file systems, and
+          * more efficient if both clone and copy are supported (e.g. NFS).
+@@ -1513,9 +1496,10 @@ ssize_t vfs_copy_file_range(struct file *file_in, loff_t pos_in,
+                 }
+         }
+  
+-       ret = do_copy_file_range(file_in, pos_in, file_out, pos_out, len,
+-                               flags);
+-       WARN_ON_ONCE(ret == -EOPNOTSUPP);
++       if (file_out->f_op->copy_file_range &&
++           file_out->f_op->copy_file_range == file_in->f_op->copy_file_range) {
++               ret = file_out->f_op->copy_file_range(file_in, pos_in,
++                               file_out, pos_out, len, flags);
+  done:
+         if (ret > 0) {
+                 fsnotify_access(file_in);
+
 Thanks,
+-Dai
 
-Steve
-
---00000000000070e27d05bc085bad
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-Add-new-mount-parameter-acdirmax-to-allow-cachi.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-Add-new-mount-parameter-acdirmax-to-allow-cachi.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_klikq69g0>
-X-Attachment-Id: f_klikq69g0
-
-RnJvbSA1MDVkMjA0MTQ3OWY1NjhjNGY0YjlhMTcwYzQ4NGY4NjZiYzcyYzU3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgMjMgRmViIDIwMjEgMTU6NTA6NTcgLTA2MDAKU3ViamVjdDogW1BBVENIIDEv
-Ml0gY2lmczogQWRkIG5ldyBtb3VudCBwYXJhbWV0ZXIgImFjZGlybWF4IiB0byBhbGxvdyBjYWNo
-aW5nCiBkaXJlY3RvcnkgbWV0YWRhdGEKCm5mcyBhbmQgY2lmcyBvbiBMaW51eCBjdXJyZW50bHkg
-aGF2ZSBhIG1vdW50IHBhcmFtZXRlciAiYWN0aW1lbyIgdG8gY29udHJvbAptZXRhZGF0YSAoYXR0
-cmlidXRlKSBjYWNoaW5nIGJ1dCBjaWZzIGRvZXMgbm90IGhhdmUgYWRkaXRpb25hbCBtb3VudApw
-YXJhbWV0ZXJzIHRvIGFsbG93IGRpc3Rpbmd1aXNoaW5nIGJldHdlZW4gY2FjaGluZyBkaXJlY3Rv
-cnkgbWV0YWRhdGEKKGUuZy4gbmVlZGVkIHRvIHJldmFsaWRhdGUgcGF0aHMpIGFuZCB0aGF0IGZv
-ciBmaWxlcy4KCkFkZCBuZXcgbW91bnQgcGFyYW1ldGVyICJhY2Rpcm1heCIgdG8gYWxsb3cgY2Fj
-aGluZyBtZXRhZGF0YSBmb3IKZGlyZWN0b3JpZXMgbW9yZSBsb29zZWx5IHRoYW4gZmlsZSBkYXRh
-LiAgTkZTIGFkanVzdHMgbWV0YWRhdGEKY2FjaGluZyBmcm9tIGFjZGlybWluIHRvIGFjZGlybWF4
-IChhbmQgYW5vdGhlciB0d28gbW91bnQgcGFybXMKZm9yIGZpbGVzKSBidXQgdG8gcmVkdWNlIGNv
-bXBsZXhpdHksIGl0IGlzIHNhZmVyIHRvIGp1c3QgaW50cm9kdWNlCnRoZSBvbmUgbW91bnQgcGFy
-bSB0byBhbGxvdyBjYWNoaW5nIGRpcmVjdG9yaWVzIGxvbmdlciAoMzAgc2Vjb25kcwp2cy4gdGhl
-IDEgc2Vjb25kIGRlZmF1bHQgZm9yIGZpbGUgbWV0YWRhdGEpIHdoaWNoIGlzIHN0aWxsIG1vcmUK
-Y29uc2VydmF0aXZlIHRoYW4gb3RoZXIgTGludXggZmlsZXN5c3RlbXMgKGUuZy4gTkZTIHNldHMg
-YWNkaXJtYXgKdG8gNjAgc2Vjb25kcykKClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3Rm
-cmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNmcy5jICAgICB8IDMgKystCiBm
-cy9jaWZzL2NpZnNnbG9iLmggICB8IDggKysrKysrKy0KIGZzL2NpZnMvY29ubmVjdC5jICAgIHwg
-MiArKwogZnMvY2lmcy9mc19jb250ZXh0LmMgfCA5ICsrKysrKysrKwogZnMvY2lmcy9mc19jb250
-ZXh0LmggfCA0ICsrKy0KIDUgZmlsZXMgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKSwgMyBkZWxl
-dGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNmcy5jIGIvZnMvY2lmcy9jaWZzZnMu
-YwppbmRleCA2ZjMzZmYzZjYyNWYuLjRlMGIwYjI2ZTg0NCAxMDA2NDQKLS0tIGEvZnMvY2lmcy9j
-aWZzZnMuYworKysgYi9mcy9jaWZzL2NpZnNmcy5jCkBAIC02MzcsOCArNjM3LDkgQEAgY2lmc19z
-aG93X29wdGlvbnMoc3RydWN0IHNlcV9maWxlICpzLCBzdHJ1Y3QgZGVudHJ5ICpyb290KQogCQlz
-ZXFfcHJpbnRmKHMsICIsc25hcHNob3Q9JWxsdSIsIHRjb24tPnNuYXBzaG90X3RpbWUpOwogCWlm
-ICh0Y29uLT5oYW5kbGVfdGltZW91dCkKIAkJc2VxX3ByaW50ZihzLCAiLGhhbmRsZXRpbWVvdXQ9
-JXUiLCB0Y29uLT5oYW5kbGVfdGltZW91dCk7Ci0JLyogY29udmVydCBhY3RpbWVvIGFuZCBkaXNw
-bGF5IGl0IGluIHNlY29uZHMgKi8KKwkvKiBjb252ZXJ0IGFjdGltZW8gYW5kIGRpcmVjdG9yeSBh
-dHRyaWJ1dGUgdGltZW91dCBhbmQgZGlzcGxheSBpbiBzZWNvbmRzICovCiAJc2VxX3ByaW50Zihz
-LCAiLGFjdGltZW89JWx1IiwgY2lmc19zYi0+Y3R4LT5hY3RpbWVvIC8gSFopOworCXNlcV9wcmlu
-dGYocywgIixhY2Rpcm1heD0lbHUiLCBjaWZzX3NiLT5jdHgtPmFjZGlybWF4IC8gSFopOwogCiAJ
-aWYgKHRjb24tPnNlcy0+Y2hhbl9tYXggPiAxKQogCQlzZXFfcHJpbnRmKHMsICIsbXVsdGljaGFu
-bmVsLG1heF9jaGFubmVscz0lenUiLApkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzZ2xvYi5oIGIv
-ZnMvY2lmcy9jaWZzZ2xvYi5oCmluZGV4IDNkZTNjNTkwOGE3Mi4uOWExNGY2ZjZlYmQ4IDEwMDY0
-NAotLS0gYS9mcy9jaWZzL2NpZnNnbG9iLmgKKysrIGIvZnMvY2lmcy9jaWZzZ2xvYi5oCkBAIC01
-MCwxMSArNTAsMTcgQEAKICNkZWZpbmUgQ0lGU19NSU5fUkNWX1BPT0wgNAogCiAjZGVmaW5lIE1B
-WF9SRU9QRU5fQVRUCTUgLyogdGhlc2UgbWFueSBtYXhpbXVtIGF0dGVtcHRzIHRvIHJlb3BlbiBh
-IGZpbGUgKi8KKwogLyoKLSAqIGRlZmF1bHQgYXR0cmlidXRlIGNhY2hlIHRpbWVvdXQgKGppZmZp
-ZXMpCisgKiBkZWZhdWx0IGF0dHJpYnV0ZSBjYWNoZSB0aW1lb3V0IGZvciBmaWxlcyAoamlmZmll
-cykKICAqLwogI2RlZmluZSBDSUZTX0RFRl9BQ1RJTUVPICgxICogSFopCiAKKy8qCisgKiBkZWZh
-dWx0IGF0dHJpYnV0ZSBjYWNoZSB0aW1lb3V0IGZvciBkaXJlY3RvcmllcyAoamlmZmllcykKKyAq
-LworI2RlZmluZSBDSUZTX0RFRl9BQ0RJUk1BWCAoMzAgKiBIWikKKwogLyoKICAqIG1heCBhdHRy
-aWJ1dGUgY2FjaGUgdGltZW91dCAoamlmZmllcykgLSAyXjMwCiAgKi8KZGlmZiAtLWdpdCBhL2Zz
-L2NpZnMvY29ubmVjdC5jIGIvZnMvY2lmcy9jb25uZWN0LmMKaW5kZXggY2Q2ZGJlYWYyMTY2Li5h
-OWRjMzlhZWU5ZjQgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMv
-Y29ubmVjdC5jCkBAIC0yMjc4LDYgKzIyNzgsOCBAQCBjb21wYXJlX21vdW50X29wdGlvbnMoc3Ry
-dWN0IHN1cGVyX2Jsb2NrICpzYiwgc3RydWN0IGNpZnNfbW50X2RhdGEgKm1udF9kYXRhKQogCiAJ
-aWYgKG9sZC0+Y3R4LT5hY3RpbWVvICE9IG5ldy0+Y3R4LT5hY3RpbWVvKQogCQlyZXR1cm4gMDsK
-KwlpZiAob2xkLT5jdHgtPmFjZGlybWF4ICE9IG5ldy0+Y3R4LT5hY2Rpcm1heCkKKwkJcmV0dXJu
-IDA7CiAKIAlyZXR1cm4gMTsKIH0KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvZnNfY29udGV4dC5jIGIv
-ZnMvY2lmcy9mc19jb250ZXh0LmMKaW5kZXggN2QwNGYyMjU1NjI0Li41NTU5NjljOGQ1ODYgMTAw
-NjQ0Ci0tLSBhL2ZzL2NpZnMvZnNfY29udGV4dC5jCisrKyBiL2ZzL2NpZnMvZnNfY29udGV4dC5j
-CkBAIC0xNDAsNiArMTQwLDcgQEAgY29uc3Qgc3RydWN0IGZzX3BhcmFtZXRlcl9zcGVjIHNtYjNf
-ZnNfcGFyYW1ldGVyc1tdID0gewogCWZzcGFyYW1fdTMyKCJyc2l6ZSIsIE9wdF9yc2l6ZSksCiAJ
-ZnNwYXJhbV91MzIoIndzaXplIiwgT3B0X3dzaXplKSwKIAlmc3BhcmFtX3UzMigiYWN0aW1lbyIs
-IE9wdF9hY3RpbWVvKSwKKwlmc3BhcmFtX3UzMigiYWNkaXJtYXgiLCBPcHRfYWNkaXJtYXgpLAog
-CWZzcGFyYW1fdTMyKCJlY2hvX2ludGVydmFsIiwgT3B0X2VjaG9faW50ZXJ2YWwpLAogCWZzcGFy
-YW1fdTMyKCJtYXhfY3JlZGl0cyIsIE9wdF9tYXhfY3JlZGl0cyksCiAJZnNwYXJhbV91MzIoImhh
-bmRsZXRpbWVvdXQiLCBPcHRfaGFuZGxldGltZW91dCksCkBAIC05MzYsNiArOTM3LDEzIEBAIHN0
-YXRpYyBpbnQgc21iM19mc19jb250ZXh0X3BhcnNlX3BhcmFtKHN0cnVjdCBmc19jb250ZXh0ICpm
-YywKIAkJCWdvdG8gY2lmc19wYXJzZV9tb3VudF9lcnI7CiAJCX0KIAkJYnJlYWs7CisJY2FzZSBP
-cHRfYWNkaXJtYXg6CisJCWN0eC0+YWNkaXJtYXggPSBIWiAqIHJlc3VsdC51aW50XzMyOworCQlp
-ZiAoY3R4LT5hY2Rpcm1heCA+IENJRlNfTUFYX0FDVElNRU8pIHsKKwkJCWNpZnNfZGJnKFZGUywg
-ImFjZGlybWF4IHRvbyBsYXJnZVxuIik7CisJCQlnb3RvIGNpZnNfcGFyc2VfbW91bnRfZXJyOwor
-CQl9CisJCWJyZWFrOwogCWNhc2UgT3B0X2VjaG9faW50ZXJ2YWw6CiAJCWN0eC0+ZWNob19pbnRl
-cnZhbCA9IHJlc3VsdC51aW50XzMyOwogCQlicmVhazsKQEAgLTEzNjIsNiArMTM3MCw3IEBAIGlu
-dCBzbWIzX2luaXRfZnNfY29udGV4dChzdHJ1Y3QgZnNfY29udGV4dCAqZmMpCiAJY3R4LT5zdHJp
-Y3RfaW8gPSB0cnVlOwogCiAJY3R4LT5hY3RpbWVvID0gQ0lGU19ERUZfQUNUSU1FTzsKKwljdHgt
-PmFjZGlybWF4ID0gQ0lGU19ERUZfQUNESVJNQVg7CiAKIAkvKiBNb3N0IGNsaWVudHMgc2V0IHRp
-bWVvdXQgdG8gMCwgYWxsb3dzIHNlcnZlciB0byB1c2UgaXRzIGRlZmF1bHQgKi8KIAljdHgtPmhh
-bmRsZV90aW1lb3V0ID0gMDsgLyogU2VlIE1TLVNNQjIgc3BlYyBzZWN0aW9uIDIuMi4xNC4yLjEy
-ICovCmRpZmYgLS1naXQgYS9mcy9jaWZzL2ZzX2NvbnRleHQuaCBiL2ZzL2NpZnMvZnNfY29udGV4
-dC5oCmluZGV4IDFjNDRhNDYwZTJjMC4uNDcyMzcyZmVjNGU5IDEwMDY0NAotLS0gYS9mcy9jaWZz
-L2ZzX2NvbnRleHQuaAorKysgYi9mcy9jaWZzL2ZzX2NvbnRleHQuaApAQCAtMTE4LDYgKzExOCw3
-IEBAIGVudW0gY2lmc19wYXJhbSB7CiAJT3B0X3JzaXplLAogCU9wdF93c2l6ZSwKIAlPcHRfYWN0
-aW1lbywKKwlPcHRfYWNkaXJtYXgsCiAJT3B0X2VjaG9faW50ZXJ2YWwsCiAJT3B0X21heF9jcmVk
-aXRzLAogCU9wdF9zbmFwc2hvdCwKQEAgLTIzMiw3ICsyMzMsOCBAQCBzdHJ1Y3Qgc21iM19mc19j
-b250ZXh0IHsKIAl1bnNpZ25lZCBpbnQgd3NpemU7CiAJdW5zaWduZWQgaW50IG1pbl9vZmZsb2Fk
-OwogCWJvb2wgc29ja29wdF90Y3Bfbm9kZWxheToxOwotCXVuc2lnbmVkIGxvbmcgYWN0aW1lbzsg
-LyogYXR0cmlidXRlIGNhY2hlIHRpbWVvdXQgKGppZmZpZXMpICovCisJdW5zaWduZWQgbG9uZyBh
-Y3RpbWVvOyAvKiBhdHRyaWJ1dGUgY2FjaGUgdGltZW91dCBmb3IgZmlsZXMgKGppZmZpZXMpICov
-CisJdW5zaWduZWQgbG9uZyBhY2Rpcm1heDsgLyogYXR0cmlidXRlIGNhY2hlIHRpbWVvdXQgZm9y
-IGRpcmVjdG9yaWVzIChqaWZmaWVzKSAqLwogCXN0cnVjdCBzbWJfdmVyc2lvbl9vcGVyYXRpb25z
-ICpvcHM7CiAJc3RydWN0IHNtYl92ZXJzaW9uX3ZhbHVlcyAqdmFsczsKIAljaGFyICpwcmVwYXRo
-OwotLSAKMi4yNy4wCgo=
---00000000000070e27d05bc085bad
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0002-cifs-convert-revalidate-of-directories-to-using-dire.patch"
-Content-Disposition: attachment; 
-	filename="0002-cifs-convert-revalidate-of-directories-to-using-dire.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_klikq69t1>
-X-Attachment-Id: f_klikq69t1
-
-RnJvbSA3OWY3MzFlMTQ1NTliZTU3ZDQ4NjQ3ZDIyMjgzYjkzNjAwY2FmMTkyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgMjMgRmViIDIwMjEgMTY6MTY6MDkgLTA2MDAKU3ViamVjdDogW1BBVENIIDIv
-Ml0gY2lmczogY29udmVydCByZXZhbGlkYXRlIG9mIGRpcmVjdG9yaWVzIHRvIHVzaW5nCiBkaXJl
-Y3RvcnkgbWV0YWRhdGEgY2FjaGUgdGltZW91dAoKVGhlIG5ldyBvcHRpb25hbCBtb3VudCBwYXJt
-LCAiYWNkaXJtYXgiIGFsbG93cyBjYWNoaW5nIHRoZSBtZXRhZGF0YQpmb3IgYSBkaXJlY3Rvcnkg
-bG9uZ2VyIHRoYW4gZmlsZSBtZXRhZGF0YSwgd2hpY2ggY2FuIGJlIHZlcnkgaGVscGZ1bApmb3Ig
-cGVyZm9ybWFuY2UuICBDb252ZXJ0IGNpZnNfaW5vZGVfbmVlZHNfcmV2YWwgdG8gY2hlY2sgYWNk
-aXJtYXgKZm9yIHJldmFsaWRhdGluZyBkaXJlY3RvcnkgbWV0YWRhdGEgKGFjdGltZW8gaXMgY2hl
-Y2tlZCBmb3IgZmlsZXMpCgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1p
-Y3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9pbm9kZS5jIHwgMjMgKysrKysrKysrKysrKysrKyst
-LS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAxNyBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQoK
-ZGlmZiAtLWdpdCBhL2ZzL2NpZnMvaW5vZGUuYyBiL2ZzL2NpZnMvaW5vZGUuYwppbmRleCBhODNi
-M2E4ZmZhYWMuLmNmZDMxY2M0NTIwZiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9pbm9kZS5jCisrKyBi
-L2ZzL2NpZnMvaW5vZGUuYwpAQCAtMjE5OCwxMiArMjE5OCwyMyBAQCBjaWZzX2lub2RlX25lZWRz
-X3JldmFsKHN0cnVjdCBpbm9kZSAqaW5vZGUpCiAJaWYgKCFsb29rdXBDYWNoZUVuYWJsZWQpCiAJ
-CXJldHVybiB0cnVlOwogCi0JaWYgKCFjaWZzX3NiLT5jdHgtPmFjdGltZW8pCi0JCXJldHVybiB0
-cnVlOwotCi0JaWYgKCF0aW1lX2luX3JhbmdlKGppZmZpZXMsIGNpZnNfaS0+dGltZSwKLQkJCQlj
-aWZzX2ktPnRpbWUgKyBjaWZzX3NiLT5jdHgtPmFjdGltZW8pKQotCQlyZXR1cm4gdHJ1ZTsKKwkv
-KgorCSAqIGRlcGVuZGluZyBvbiBpbm9kZSB0eXBlLCBjaGVjayBpZiBhdHRyaWJ1dGUgY2FjaGlu
-ZyBkaXNhYmxlZCBmb3IKKwkgKiBmaWxlcyBvciBkaXJlY3RvcmllcworCSAqLworCWlmIChTX0lT
-RElSKGlub2RlLT5pX21vZGUpKSB7CisJCWlmICghY2lmc19zYi0+Y3R4LT5hY2Rpcm1heCkKKwkJ
-CXJldHVybiB0cnVlOworCQlpZiAoIXRpbWVfaW5fcmFuZ2UoamlmZmllcywgY2lmc19pLT50aW1l
-LAorCQkJCSAgIGNpZnNfaS0+dGltZSArIGNpZnNfc2ItPmN0eC0+YWNkaXJtYXgpKQorCQkJcmV0
-dXJuIHRydWU7CisJfSBlbHNlIHsgLyogZmlsZSAqLworCQlpZiAoIWNpZnNfc2ItPmN0eC0+YWN0
-aW1lbykKKwkJCXJldHVybiB0cnVlOworCQlpZiAoIXRpbWVfaW5fcmFuZ2UoamlmZmllcywgY2lm
-c19pLT50aW1lLAorCQkJCSAgIGNpZnNfaS0+dGltZSArIGNpZnNfc2ItPmN0eC0+YWN0aW1lbykp
-CisJCQlyZXR1cm4gdHJ1ZTsKKwl9CiAKIAkvKiBoYXJkbGlua2VkIGZpbGVzIHcvIG5vc2VydmVy
-aW5vIGdldCAic3BlY2lhbCIgdHJlYXRtZW50ICovCiAJaWYgKCEoY2lmc19zYi0+bW50X2NpZnNf
-ZmxhZ3MgJiBDSUZTX01PVU5UX1NFUlZFUl9JTlVNKSAmJgotLSAKMi4yNy4wCgo=
---00000000000070e27d05bc085bad--
+>
+> Thanks,
+> Amir.
