@@ -2,228 +2,243 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32849C433DB
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 16:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A63C433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 16:57:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C11F064DF2
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 16:22:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 018C864F04
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 16:57:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232616AbhBXQV7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Feb 2021 11:21:59 -0500
-Received: from p3plsmtpa11-09.prod.phx3.secureserver.net ([68.178.252.110]:50791
-        "EHLO p3plsmtpa11-09.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232806AbhBXQVl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 24 Feb 2021 11:21:41 -0500
-X-Greylist: delayed 548 seconds by postgrey-1.27 at vger.kernel.org; Wed, 24 Feb 2021 11:21:40 EST
-Received: from [192.168.0.116] ([71.184.94.153])
-        by :SMTPAUTH: with ESMTPSA
-        id EwlBlfdpwysOoEwlDlj0Zn; Wed, 24 Feb 2021 09:11:35 -0700
-X-CMAE-Analysis: v=2.4 cv=Q50XX66a c=1 sm=1 tr=0 ts=60367ab8
- a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
- a=IkcTkHD0fZMA:10 a=yMhMjlubAAAA:8 a=20KFwNOVAAAA:8 a=pGLkceISAAAA:8
- a=TrMXproF9k-TAc-nbqIA:9 a=QEXdDO2ut3YA:10
-X-SECURESERVER-ACCT: tom@talpey.com
-Subject: Re: [PATCH] convert revalidate of directories to using directory
- metadata cache timeout
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-References: <CAH2r5msdUQ=CVM6s7ENeH7SP-teYAOioOGq7zY5sDXZFrFYiCA@mail.gmail.com>
- <CAH2r5mv6Oo5UUMOyFmKO_6xmdXZvQa_TtmFjgdN_ZoBcgSbJkA@mail.gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-Message-ID: <10881e42-9632-30b0-344d-66ed8e9cb340@talpey.com>
-Date:   Wed, 24 Feb 2021 11:11:33 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        id S235850AbhBXQ5S (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Feb 2021 11:57:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59008 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235860AbhBXQ5H (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Feb 2021 11:57:07 -0500
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3DBDC06178A;
+        Wed, 24 Feb 2021 08:56:51 -0800 (PST)
+Received: by mail-yb1-xb2e.google.com with SMTP id m9so2487416ybk.8;
+        Wed, 24 Feb 2021 08:56:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4socF7afFNU9ab4f7jBoRnfISIXE3C9G3QChXhXIvIY=;
+        b=UErSazcD7ugdXDVJas3urWUy+bkGns9IQcLsXpR5uFVRIJwA0hRgJigcO9RbNDvUWo
+         mTXoeDd2IP3u14QP0U7IFpn+5D1D/G8rJGTv7uhcmBCK7iO7NjS/r0yiVN1LNf1gbZYF
+         LL6kP46Jd3rSOlQxcO7qvDjtPnGDz1rxLIPvvOZIi9nw5Kg4D7LgmHYDs+FeUatQtYOW
+         +vSAtvNqx4DIKF1V0BDmu8sJVwnOkkyChIiQ7dM/6pHcie96HWcQOAtVqOi7ugpY/ayy
+         wq8B69KfwjtZwRML7suUXx8fembdYYuh4eSpCl0aUqV/cFG4h9aGOjawMA41Ro9XLGKK
+         /lVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4socF7afFNU9ab4f7jBoRnfISIXE3C9G3QChXhXIvIY=;
+        b=mgPmjYEJQ/DSyzaRv/M6IQ95+vIr9StqlhMGEDlu8PREMyB2cSCkfFoOEQUw91V6a4
+         pceM9mKm016hHO2FMpIE0dVxkQBLJoBgIiqB7jAP5G/rmt/S62vUS/H/8WoF/kgQyiob
+         N1BzQvjeIQtok8mzJqXZ7ElYbNdglm2jKN5QfdMbXfGWwPN5qan/K35tS1uppnQsf7+B
+         WFElIFVIzrf+tEQU1MfZs0rt7pX2gWyItVF9xep2u9oDMwcxYKfqv/6T2G3FFBgjSQ3i
+         5TE92vQKXTgm+ckB5vokp9sV+Wm7fodSEbff62oXJ1v9EESsDYfWBtj9dTmt1Tjk0uH9
+         al7Q==
+X-Gm-Message-State: AOAM530BWNoipSgO9oHpxlBVjY1GSoPlRWvK22zuDWwwl15nyRltYZK3
+        HM3GZ5ReBdv1Pyu44kcxXCxIenT5FI+bhhkIns8=
+X-Google-Smtp-Source: ABdhPJzy28YtrCuJTm3t/VrF5ALI5b6sUCG1T+wjGgUnMWwDMP800VzuS0hmC9N86RTh074Ficy/+T7XRdQgGkWLciE=
+X-Received: by 2002:a25:40d8:: with SMTP id n207mr48530494yba.3.1614185811063;
+ Wed, 24 Feb 2021 08:56:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5mv6Oo5UUMOyFmKO_6xmdXZvQa_TtmFjgdN_ZoBcgSbJkA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4xfP6YtrD/UtjCJkiacL5evgBhv+WCoyAiOI9fuv/bBzXtqXiEm0JB13lVW2K4Iy31x9Cc6wW1EXdiOtTex8ijavZRPdIO3ivokCiXbL5ERZuIlI6uv4uD
- p8FCAzDQMGEJjKGj4/QIASBrS7JJCmqBtjO/GwBzDRH2rz+NPAEtIora5zHAT4ov4nLZLp9YyfsPFtsenboHYT9+5P0Qo8CtaQYL9xjU0004Pd20KmnousN/
+References: <1ca0f87e-83b3-b4dd-4448-b44f2a9d1698@canonical.com> <SG2P15301MB00639032FD6F37360A458E2D949F9@SG2P15301MB0063.APCP153.PROD.OUTLOOK.COM>
+In-Reply-To: <SG2P15301MB00639032FD6F37360A458E2D949F9@SG2P15301MB0063.APCP153.PROD.OUTLOOK.COM>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 24 Feb 2021 08:56:40 -0800
+Message-ID: <CANT5p=obm1EaZm+exAwjRdgrh1YV8bfMZWe-=nmwP7ExTWqX+Q@mail.gmail.com>
+Subject: Re: [EXTERNAL] re: cifs: Retain old ACEs when converting between mode
+ bits and ACL.
+To:     Shyam Prasad <Shyam.Prasad@microsoft.com>,
+        rohiths msft <rohiths.msft@gmail.com>
+Cc:     Colin Ian King <colin.king@canonical.com>,
+        Steve French <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000ded7fc05bc17ebfb"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 2/23/2021 8:03 PM, Steve French wrote:
-> Updated version incorporates Ronnie's suggestion of leaving the
-> default (for directory caching) the same as it is today, 1 second, to
-> avoid
-> unnecessary risk.   Most users can safely improve performance by
-> mounting with acdirmax to a higher value (e.g. 60 seconds as NFS
-> defaults to).
-> 
-> nfs and cifs on Linux currently have a mount parameter "actimeo" to control
-> metadata (attribute) caching but cifs does not have additional mount
-> parameters to allow distinguishing between caching directory metadata
-> (e.g. needed to revalidate paths) and that for files.
+--000000000000ded7fc05bc17ebfb
+Content-Type: text/plain; charset="UTF-8"
 
-The behaviors seem to be slightly different with this change.
-With NFS, the actimeo option overrides the four min/max options,
-and by default the directory ac timers range between 30 and 60.
+Hi Steve,
 
-The CIFS code I see below seems to completely separate actimeo
-and acdirmax, and if not set, uses the historic 1 second value.
-That's fine, but it's completely different from NFS. Shouldn't we
-use a different mount option, to avoid confusing the admin?
+Please accept this fix for the bug that Colin pointed out.
+This can be hit if the server has a corrupted SD, or it got corrupted
+over the network.
+We used to ignore the ACL in such a case (which in combination with my
+patches caused the issue). But I think we should be returning an error
+immediately.
 
-> +	/*
-> +	 * depending on inode type, check if attribute caching disabled for
-> +	 * files or directories
-> +	 */
-> +	if (S_ISDIR(inode->i_mode)) {
-> +		if (!cifs_sb->ctx->acdirmax)
-> +			return true;
-> +		if (!time_in_range(jiffies, cifs_i->time,
-> +				   cifs_i->time + cifs_sb->ctx->acdirmax))
-> +			return true;
-> +	} else { /* file */
-> +		if (!cifs_sb->ctx->actimeo)
-> +			return true;
-> +		if (!time_in_range(jiffies, cifs_i->time,
-> +				   cifs_i->time + cifs_sb->ctx->actimeo))
-> +			return true;
-> +	}
+Regards,
+Shyam
+
+On Wed, Feb 24, 2021 at 7:16 AM Shyam Prasad <Shyam.Prasad@microsoft.com> wrote:
+>
+> Hi Colin,
+>
+> Thanks for reporting this. I'll submit a fix.
+>
+> Regards,
+> Shyam
+>
+> -----Original Message-----
+> From: Colin Ian King <colin.king@canonical.com>
+> Sent: Wednesday, February 24, 2021 6:14 PM
+> To: Shyam Prasad <Shyam.Prasad@microsoft.com>
+> Cc: Steve French <sfrench@samba.org>; linux-cifs@vger.kernel.org; samba-technical@lists.samba.org; linux-kernel@vger.kernel.org
+> Subject: [EXTERNAL] re: cifs: Retain old ACEs when converting between mode bits and ACL.
+>
+> Hi,
+>
+> Static analysis on linux-next with Coverity had detected a potential null pointer dereference with the following commit:
+>
+> commit f5065508897a922327f32223082325d10b069ebc
+> Author: Shyam Prasad N <sprasad@microsoft.com>
+> Date:   Fri Feb 12 04:38:43 2021 -0800
+>
+>     cifs: Retain old ACEs when converting between mode bits and ACL.
+>
+> The analysis is as follows:
+>
+> 1258 /* Convert permission bits from mode to equivalent CIFS ACL */
+> 1259 static int build_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd *pnntsd,
+> 1260        __u32 secdesclen, __u32 *pnsecdesclen, __u64 *pnmode, kuid_t
+> uid, kgid_t gid,
+> 1261        bool mode_from_sid, bool id_from_sid, int *aclflag)
+> 1262 {
+> 1263        int rc = 0;
+> 1264        __u32 dacloffset;
+> 1265        __u32 ndacloffset;
+> 1266        __u32 sidsoffset;
+> 1267        struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
+> 1268        struct cifs_sid *nowner_sid_ptr = NULL, *ngroup_sid_ptr = NULL;
+>
+>     1. assign_zero: Assigning: dacl_ptr = NULL.
+>
+> 1269        struct cifs_acl *dacl_ptr = NULL;  /* no need for SACL ptr */
+> 1270        struct cifs_acl *ndacl_ptr = NULL; /* no need for SACL ptr */
+> 1271        char *end_of_acl = ((char *)pntsd) + secdesclen;
+> 1272        u16 size = 0;
+> 1273
+> 1274        dacloffset = le32_to_cpu(pntsd->dacloffset);
+>
+>     2. Condition dacloffset, taking false branch.
+>
+> 1275        if (dacloffset) {
+> 1276                dacl_ptr = (struct cifs_acl *)((char *)pntsd +
+> dacloffset);
+> 1277                if (end_of_acl < (char *)dacl_ptr +
+> le16_to_cpu(dacl_ptr->size)) {
+> 1278                        cifs_dbg(VFS, "Existing ACL size is wrong.
+> Discarding old ACL\n");
+> 1279                        dacl_ptr = NULL;
+>
+> NOTE: dacl_ptr is set to NULL and dacloffset is true
+>
+> 1280                }
+> 1281        }
+> 1282
+> 1283        owner_sid_ptr = (struct cifs_sid *)((char *)pntsd +
+> 1284                        le32_to_cpu(pntsd->osidoffset));
+> 1285        group_sid_ptr = (struct cifs_sid *)((char *)pntsd +
+> 1286                        le32_to_cpu(pntsd->gsidoffset));
+> 1287
+>
+>     3. Condition pnmode, taking true branch.
+>     4. Condition *pnmode != 18446744073709551615ULL, taking false branch.
+>
+> 1288        if (pnmode && *pnmode != NO_CHANGE_64) { /* chmod */
+> 1289                ndacloffset = sizeof(struct cifs_ntsd);
+> 1290                ndacl_ptr = (struct cifs_acl *)((char *)pnntsd +
+> ndacloffset);
+> 1291                ndacl_ptr->revision =
+> 1292                        dacloffset ? dacl_ptr->revision :
+> cpu_to_le16(ACL_REVISION);
+> 1293
+> 1294                ndacl_ptr->size = cpu_to_le16(0);
+> 1295                ndacl_ptr->num_aces = cpu_to_le32(0);
+> 1296
+> 1297                rc = set_chmod_dacl(dacl_ptr, ndacl_ptr,
+> owner_sid_ptr, group_sid_ptr,
+> 1298                                    pnmode, mode_from_sid);
+> 1299
+> 1300                sidsoffset = ndacloffset + le16_to_cpu(ndacl_ptr->size);
+> 1301                /* copy the non-dacl portion of secdesc */
+> 1302                *pnsecdesclen = copy_sec_desc(pntsd, pnntsd, sidsoffset,
+> 1303                                NULL, NULL);
+> 1304
+> 1305                *aclflag |= CIFS_ACL_DACL;
+> 1306        } else {
+> 1307                ndacloffset = sizeof(struct cifs_ntsd);
+> 1308                ndacl_ptr = (struct cifs_acl *)((char *)pnntsd +
+> ndacloffset);
+>
+>     5. Condition dacloffset, taking false branch.
+>
+> 1309                ndacl_ptr->revision =
+> 1310                        dacloffset ? dacl_ptr->revision :
+> cpu_to_le16(ACL_REVISION);
+>
+>     Explicit null dereferenced (FORWARD_NULL)
+>
+>     6. var_deref_op: Dereferencing null pointer dacl_ptr.
+>
+> 1311                ndacl_ptr->num_aces = dacl_ptr->num_aces;
+>
+>
+> Line 1309..1311, when dacloffset and dacl_ptr is null we hit a null ptr dereference on dacl_ptr.
+>
 
 
+-- 
+Regards,
+Shyam
 
-> Add new mount parameter "acdirmax" to allow caching metadata for
-> directories more loosely than file data.  NFS adjusts metadata
-> caching from acdirmin to acdirmax (and another two mount parms
-> for files) but to reduce complexity, it is safer to just introduce
-> the one mount parm to allow caching directories longer. The
-> defaults for acdirmax and actimeo (for cifs.ko) are conservative,
-> 1 second (NFS defaults acdirmax to 60 seconds). For many workloads,
-> setting acdirmax to a higher value is safe and will improve
-> performance.  This patch leaves unchanged the default values
-> for caching metadata for files and directories but gives the
-> user more flexibility in adjusting them safely for their workload
-> via the new mount parm.
-> 
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->   fs/cifs/cifsfs.c     | 3 ++-
->   fs/cifs/cifsglob.h   | 8 +++++++-
->   fs/cifs/connect.c    | 2 ++
->   fs/cifs/fs_context.c | 9 +++++++++
->   fs/cifs/fs_context.h | 4 +++-
->   5 files changed, 23 insertions(+), 3 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 6f33ff3f625f..4e0b0b26e844 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -637,8 +637,9 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
->    seq_printf(s, ",snapshot=%llu", tcon->snapshot_time);
->    if (tcon->handle_timeout)
->    seq_printf(s, ",handletimeout=%u", tcon->handle_timeout);
-> - /* convert actimeo and display it in seconds */
-> + /* convert actimeo and directory attribute timeout and display in seconds */
->    seq_printf(s, ",actimeo=%lu", cifs_sb->ctx->actimeo / HZ);
-> + seq_printf(s, ",acdirmax=%lu", cifs_sb->ctx->acdirmax / HZ);
-> 
->    if (tcon->ses->chan_max > 1)
->    seq_printf(s, ",multichannel,max_channels=%zu",
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index cd6dbeaf2166..a9dc39aee9f4 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2278,6 +2278,8 @@ compare_mount_options(struct super_block *sb,
-> struct cifs_mnt_data *mnt_data)
-> 
->    if (old->ctx->actimeo != new->ctx->actimeo)
->    return 0;
-> + if (old->ctx->acdirmax != new->ctx->acdirmax)
-> + return 0;
-> 
->    return 1;
->   }
-> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> index 7d04f2255624..555969c8d586 100644
-> --- a/fs/cifs/fs_context.c
-> +++ b/fs/cifs/fs_context.c
-> @@ -140,6 +140,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
->    fsparam_u32("rsize", Opt_rsize),
->    fsparam_u32("wsize", Opt_wsize),
->    fsparam_u32("actimeo", Opt_actimeo),
-> + fsparam_u32("acdirmax", Opt_acdirmax),
->    fsparam_u32("echo_interval", Opt_echo_interval),
->    fsparam_u32("max_credits", Opt_max_credits),
->    fsparam_u32("handletimeout", Opt_handletimeout),
-> @@ -936,6 +937,13 @@ static int smb3_fs_context_parse_param(struct
-> fs_context *fc,
->    goto cifs_parse_mount_err;
->    }
->    break;
-> + case Opt_acdirmax:
-> + ctx->acdirmax = HZ * result.uint_32;
-> + if (ctx->acdirmax > CIFS_MAX_ACTIMEO) {
-> + cifs_dbg(VFS, "acdirmax too large\n");
-> + goto cifs_parse_mount_err;
-> + }
-> + break;
->    case Opt_echo_interval:
->    ctx->echo_interval = result.uint_32;
->    break;
-> @@ -1362,6 +1370,7 @@ int smb3_init_fs_context(struct fs_context *fc)
->    ctx->strict_io = true;
-> 
->    ctx->actimeo = CIFS_DEF_ACTIMEO;
-> + ctx->acdirmax = CIFS_DEF_ACTIMEO;
-> 
->    /* Most clients set timeout to 0, allows server to use its default */
->    ctx->handle_timeout = 0; /* See MS-SMB2 spec section 2.2.14.2.12 */
-> diff --git a/fs/cifs/fs_context.h b/fs/cifs/fs_context.h
-> index 1c44a460e2c0..472372fec4e9 100644
-> --- a/fs/cifs/fs_context.h
-> +++ b/fs/cifs/fs_context.h
-> @@ -118,6 +118,7 @@ enum cifs_param {
->    Opt_rsize,
->    Opt_wsize,
->    Opt_actimeo,
-> + Opt_acdirmax,
->    Opt_echo_interval,
->    Opt_max_credits,
->    Opt_snapshot,
-> @@ -232,7 +233,8 @@ struct smb3_fs_context {
->    unsigned int wsize;
->    unsigned int min_offload;
->    bool sockopt_tcp_nodelay:1;
-> - unsigned long actimeo; /* attribute cache timeout (jiffies) */
-> + unsigned long actimeo; /* attribute cache timeout for files (jiffies) */
-> + unsigned long acdirmax; /* attribute cache timeout for directories
-> (jiffies) */
->    struct smb_version_operations *ops;
->    struct smb_version_values *vals;
->    char *prepath;
-> 
-> On Tue, Feb 23, 2021 at 4:22 PM Steve French <smfrench@gmail.com> wrote:
->>
->> nfs and cifs on Linux currently have a mount parameter "actimeo" to
->> control metadata (attribute) caching but cifs does not have additional
->> mount parameters to allow distinguishing between caching directory
->> metadata (e.g. needed to revalidate paths) and that for files.
->>
->> Add new mount parameter "acdirmax" to allow caching metadata for
->> directories more loosely than file data.  NFS adjusts metadata
->> caching from acdirmin to acdirmax (and another two mount parms
->> for files) but to reduce complexity, it is safer to just introduce
->> the one mount parm to allow caching directories longer (30 seconds
->> vs. the 1 second default for file metadata) which is still more
->> conservative than other Linux filesystems (e.g. NFS sets acdirmax
->> to 60 seconds)
->>
->> --
->> Thanks,
->>
->> Steve
-> 
-> 
-> 
+--000000000000ded7fc05bc17ebfb
+Content-Type: application/octet-stream; 
+	name="0001-cifs-If-a-corrupted-DACL-is-returned-by-the-server-b.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-If-a-corrupted-DACL-is-returned-by-the-server-b.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kljoaesv0>
+X-Attachment-Id: f_kljoaesv0
+
+RnJvbSBiOWY4OWExMmQ4NDVlM2I4ZmI4MDE3OWUwYzIyNWQ1ZTdlYzYzM2I1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
+PgpEYXRlOiBXZWQsIDI0IEZlYiAyMDIxIDE1OjA0OjAyICswMDAwClN1YmplY3Q6IFtQQVRDSF0g
+Y2lmczogSWYgYSBjb3JydXB0ZWQgREFDTCBpcyByZXR1cm5lZCBieSB0aGUgc2VydmVyLCBiYWls
+CiBvdXQuCgpTdGF0aWMgY29kZSBhbmFseXNpcyByZXBvcnRlZCBhIHBvc3NpYmxlIG51bGwgcG9p
+bnRlciBkZXJlZmVyZW5jZQppbiBteSBsYXN0IGNvbW1pdDoKY2lmczogUmV0YWluIG9sZCBBQ0Vz
+IHdoZW4gY29udmVydGluZyBiZXR3ZWVuIG1vZGUgYml0cyBhbmQgQUNMLgoKVGhpcyBjb3VsZCBo
+YXBwZW4gaWYgdGhlIERBQ0wgcmV0dXJuZWQgYnkgdGhlIHNlcnZlciBpcyBjb3JydXB0ZWQuCldl
+IHdlcmUgdHJ5aW5nIHRvIGNvbnRpbnVlIGJ5IGFzc3VtaW5nIHRoYXQgdGhlIGZpbGUgaGFzIGVt
+cHR5IERBQ0wuCldlIHNob3VsZCBiYWlsIG91dCB3aXRoIGFuIGVycm9yIGluc3RlYWQuCgpTaWdu
+ZWQtb2ZmLWJ5OiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29tPgpSZXBvcnRl
+ZC1ieTogQ29saW4gSWFuIEtpbmcgPGNvbGluLmtpbmdAY2Fub25pY2FsLmNvbT4KLS0tCiBmcy9j
+aWZzL2NpZnNhY2wuYyB8IDQgKystLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwg
+MiBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNhY2wuYyBiL2ZzL2NpZnMv
+Y2lmc2FjbC5jCmluZGV4IDA4MDZhZTc4NDA2MS4uOWQyOWViOTY2MGMyIDEwMDY0NAotLS0gYS9m
+cy9jaWZzL2NpZnNhY2wuYworKysgYi9mcy9jaWZzL2NpZnNhY2wuYwpAQCAtMTI3NSw4ICsxMjc1
+LDggQEAgc3RhdGljIGludCBidWlsZF9zZWNfZGVzYyhzdHJ1Y3QgY2lmc19udHNkICpwbnRzZCwg
+c3RydWN0IGNpZnNfbnRzZCAqcG5udHNkLAogCWlmIChkYWNsb2Zmc2V0KSB7CiAJCWRhY2xfcHRy
+ID0gKHN0cnVjdCBjaWZzX2FjbCAqKSgoY2hhciAqKXBudHNkICsgZGFjbG9mZnNldCk7CiAJCWlm
+IChlbmRfb2ZfYWNsIDwgKGNoYXIgKilkYWNsX3B0ciArIGxlMTZfdG9fY3B1KGRhY2xfcHRyLT5z
+aXplKSkgewotCQkJY2lmc19kYmcoVkZTLCAiRXhpc3RpbmcgQUNMIHNpemUgaXMgd3JvbmcuIERp
+c2NhcmRpbmcgb2xkIEFDTFxuIik7Ci0JCQlkYWNsX3B0ciA9IE5VTEw7CisJCQljaWZzX2RiZyhW
+RlMsICJTZXJ2ZXIgcmV0dXJuZWQgaWxsZWdhbCBBQ0wgc2l6ZVxuIik7CisJCQlyZXR1cm4gLUVJ
+TlZBTDsKIAkJfQogCX0KIAotLSAKMi4yNS4xCgo=
+--000000000000ded7fc05bc17ebfb--
