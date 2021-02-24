@@ -2,146 +2,128 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB655C433DB
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 12:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC8CC433E6
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 15:11:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E3C264EC3
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 12:44:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8411164ECE
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Feb 2021 15:11:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232578AbhBXMoj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Feb 2021 07:44:39 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:53777 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232209AbhBXMog (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Feb 2021 07:44:36 -0500
-Received: from 1.general.cking.uk.vpn ([10.172.193.212])
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <colin.king@canonical.com>)
-        id 1lEtWD-000284-Ck; Wed, 24 Feb 2021 12:43:53 +0000
-To:     Shyam Prasad N <sprasad@microsoft.com>
-From:   Colin Ian King <colin.king@canonical.com>
-Subject: re: cifs: Retain old ACEs when converting between mode bits and ACL.
-Cc:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Message-ID: <1ca0f87e-83b3-b4dd-4448-b44f2a9d1698@canonical.com>
-Date:   Wed, 24 Feb 2021 12:43:52 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S230386AbhBXPKR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Feb 2021 10:10:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30547 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233871AbhBXNgo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 24 Feb 2021 08:36:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614173669;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FGAEWcqi7R+QLdnM9l4hJ0vRCcM6Gnle1kdY4AuWCGU=;
+        b=CMCSsSwcliHumXcoRFNUW/z3PKPpK/QPmlEVkvMDTWW4wfb1fH2MVnhNpXmYsXuT+2ksVn
+        YUIOZ6AmYLr/jrBZmI6pdZYJcfhC3S/SgGL1w1gQf7lBbg/zuSw0bh7WMJhzZ/jA2wrqJD
+        rqrs58uU65aUHxBiDdjD6YPFfNycddQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-540-3MKbxeFLOOeiKKs9HaYL0w-1; Wed, 24 Feb 2021 08:33:46 -0500
+X-MC-Unique: 3MKbxeFLOOeiKKs9HaYL0w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82D3BD547E;
+        Wed, 24 Feb 2021 13:32:07 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 320E35D9F1;
+        Wed, 24 Feb 2021 13:32:03 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAH2r5mv=PZk_wn2=b0VQcaom9TEw1MGLz+qB_Ktxxm2bnV9Nig@mail.gmail.com>
+References: <CAH2r5mv=PZk_wn2=b0VQcaom9TEw1MGLz+qB_Ktxxm2bnV9Nig@mail.gmail.com> <161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk> <9e49f96cd80eaf9c8ed267a7fbbcb4c6467ee790.camel@redhat.com> <CAH2r5mvPLivjuE=cbijzGSHOvx-hkWSWbcxpoBnJX-BR9pBskQ@mail.gmail.com> <20210216021015.GH2858050@casper.infradead.org>
+To:     Steve French <smfrench@gmail.com>
+Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org,
+        linux-cachefs@redhat.com, Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-mm <linux-mm@kvack.org>, linux-afs@lists.infradead.org,
+        v9fs-developer@lists.sourceforge.net,
+        Christoph Hellwig <hch@lst.de>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-nfs <linux-nfs@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        David Wysochanski <dwysocha@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        William Kucharski <william.kucharski@oracle.com>
+Subject: Re: [PATCH 00/33] Network fs helper library & fscache kiocb API [ver #3]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3743318.1614173522.1@warthog.procyon.org.uk>
+Date:   Wed, 24 Feb 2021 13:32:02 +0000
+Message-ID: <3743319.1614173522@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
+Steve French <smfrench@gmail.com> wrote:
 
-Static analysis on linux-next with Coverity had detected a potential
-null pointer dereference with the following commit:
+> This (readahead behavior improvements in Linux, on single large file
+> sequential read workloads like cp or grep) gets particularly interesting
+> with SMB3 as multichannel becomes more common.  With one channel having one
+> readahead request pending on the network is suboptimal - but not as bad as
+> when multichannel is negotiated. Interestingly in most cases two network
+> connections to the same server (different TCP sockets,but the same mount,
+> even in cases where only network adapter) can achieve better performance -
+> but still significantly lags Windows (and probably other clients) as in
+> Linux we don't keep multiple I/Os in flight at one time (unless different
+> files are being read at the same time by different threads).
 
-commit f5065508897a922327f32223082325d10b069ebc
-Author: Shyam Prasad N <sprasad@microsoft.com>
-Date:   Fri Feb 12 04:38:43 2021 -0800
+I think it should be relatively straightforward to make the netfs_readahead()
+function generate multiple read requests.  If I wasn't handed sufficient pages
+by the VM upfront to do two or more read requests, I would need to do extra
+expansion.  There are a couple of ways this could be done:
 
-    cifs: Retain old ACEs when converting between mode bits and ACL.
+ (1) I could expand the readahead_control after fully starting a read request
+     and then create another independent read request, and another for how
+     ever many we want.
 
-The analysis is as follows:
+ (2) I could expand the readahead_control first to cover however many requests
+     I'm going to generate, then chop it up into individual read requests.
 
-1258 /* Convert permission bits from mode to equivalent CIFS ACL */
-1259 static int build_sec_desc(struct cifs_ntsd *pntsd, struct cifs_ntsd
-*pnntsd,
-1260        __u32 secdesclen, __u32 *pnsecdesclen, __u64 *pnmode, kuid_t
-uid, kgid_t gid,
-1261        bool mode_from_sid, bool id_from_sid, int *aclflag)
-1262 {
-1263        int rc = 0;
-1264        __u32 dacloffset;
-1265        __u32 ndacloffset;
-1266        __u32 sidsoffset;
-1267        struct cifs_sid *owner_sid_ptr, *group_sid_ptr;
-1268        struct cifs_sid *nowner_sid_ptr = NULL, *ngroup_sid_ptr = NULL;
+However, generating larger requests means we're more likely to run into a
+problem for the cache: if we can't allocate enough pages to fill out a cache
+block, we don't have enough data to write to the cache.  Further, if the pages
+are just unlocked and abandoned, readpage will be called to read them
+individually - which means they likely won't get cached unless the cache
+granularity is PAGE_SIZE.  But that's probably okay if ENOMEM occurred.
 
-    1. assign_zero: Assigning: dacl_ptr = NULL.
+There are some other considerations too:
 
-1269        struct cifs_acl *dacl_ptr = NULL;  /* no need for SACL ptr */
-1270        struct cifs_acl *ndacl_ptr = NULL; /* no need for SACL ptr */
-1271        char *end_of_acl = ((char *)pntsd) + secdesclen;
-1272        u16 size = 0;
-1273
-1274        dacloffset = le32_to_cpu(pntsd->dacloffset);
+ (*) I would need to query the filesystem to find out if I should create
+     another request.  The fs would have to keep track of how many I/O reqs
+     are in flight and what the limit is.
 
-    2. Condition dacloffset, taking false branch.
+ (*) How and where should the readahead triggers be emplaced?  I'm guessing
+     that each block would need a trigger and that this should cause more
+     requests to be generated until we hit the limit.
 
-1275        if (dacloffset) {
-1276                dacl_ptr = (struct cifs_acl *)((char *)pntsd +
-dacloffset);
-1277                if (end_of_acl < (char *)dacl_ptr +
-le16_to_cpu(dacl_ptr->size)) {
-1278                        cifs_dbg(VFS, "Existing ACL size is wrong.
-Discarding old ACL\n");
-1279                        dacl_ptr = NULL;
+ (*) I would probably need to shuffle the request generation for the second
+     and subsequent blocks in a single netfs_readahead() call to a worker
+     thread because it'll probably be in a userspace kernel-side context and
+     blocking an application from proceeding and consuming the pages already
+     committed.
 
-NOTE: dacl_ptr is set to NULL and dacloffset is true
-
-1280                }
-1281        }
-1282
-1283        owner_sid_ptr = (struct cifs_sid *)((char *)pntsd +
-1284                        le32_to_cpu(pntsd->osidoffset));
-1285        group_sid_ptr = (struct cifs_sid *)((char *)pntsd +
-1286                        le32_to_cpu(pntsd->gsidoffset));
-1287
-
-    3. Condition pnmode, taking true branch.
-    4. Condition *pnmode != 18446744073709551615ULL, taking false
-branch.
-
-1288        if (pnmode && *pnmode != NO_CHANGE_64) { /* chmod */
-1289                ndacloffset = sizeof(struct cifs_ntsd);
-1290                ndacl_ptr = (struct cifs_acl *)((char *)pnntsd +
-ndacloffset);
-1291                ndacl_ptr->revision =
-1292                        dacloffset ? dacl_ptr->revision :
-cpu_to_le16(ACL_REVISION);
-1293
-1294                ndacl_ptr->size = cpu_to_le16(0);
-1295                ndacl_ptr->num_aces = cpu_to_le32(0);
-1296
-1297                rc = set_chmod_dacl(dacl_ptr, ndacl_ptr,
-owner_sid_ptr, group_sid_ptr,
-1298                                    pnmode, mode_from_sid);
-1299
-1300                sidsoffset = ndacloffset + le16_to_cpu(ndacl_ptr->size);
-1301                /* copy the non-dacl portion of secdesc */
-1302                *pnsecdesclen = copy_sec_desc(pntsd, pnntsd, sidsoffset,
-1303                                NULL, NULL);
-1304
-1305                *aclflag |= CIFS_ACL_DACL;
-1306        } else {
-1307                ndacloffset = sizeof(struct cifs_ntsd);
-1308                ndacl_ptr = (struct cifs_acl *)((char *)pnntsd +
-ndacloffset);
-
-    5. Condition dacloffset, taking false branch.
-
-1309                ndacl_ptr->revision =
-1310                        dacloffset ? dacl_ptr->revision :
-cpu_to_le16(ACL_REVISION);
-
-    Explicit null dereferenced (FORWARD_NULL)
-
-    6. var_deref_op: Dereferencing null pointer dacl_ptr.
-
-1311                ndacl_ptr->num_aces = dacl_ptr->num_aces;
-
-
-Line 1309..1311, when dacloffset and dacl_ptr is null we hit a null ptr
-dereference on dacl_ptr.
+David
 
