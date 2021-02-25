@@ -2,112 +2,120 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA78DC433E0
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 06:08:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D17AC433DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 07:38:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 820A664EC4
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 06:08:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD53364ECE
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 07:38:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235230AbhBYGHk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Feb 2021 01:07:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58374 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234962AbhBYGFd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Feb 2021 01:05:33 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A757C061756
-        for <linux-cifs@vger.kernel.org>; Wed, 24 Feb 2021 22:04:52 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id c131so4308346ybf.7
-        for <linux-cifs@vger.kernel.org>; Wed, 24 Feb 2021 22:04:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6+jxr3lScrNwu/Ca7R4dnLv42howEuNQQJHNj9A8bAk=;
-        b=J1I35l2JwveyjyrjvxdKSlpC54BHD4yJ0kIAnd47yxqWOe2iMEfqv9d1WSeerdorX8
-         +J3XReFKJZp7SriCPAtvHGr2r6vOwxpVZ2CLmX/LIT9VzeR2/ASmmyoGvxnxv4STsEz3
-         Kg3A284sjgS66+apakDCwRSgfqBs1lFPNa46FHAGwhKvcTz1IwNBsQC6+A1uITKyHTe1
-         WuBSDjRhcL0uTUWEfKI7zXdv3/E0G/os86CRjpDgKilyvDWMeytZE7jfXTa2ZaGf+1wN
-         3+08js87qk344PT83vJF1SxJd3Y64GHTOM6FUGmKgGMJZKLhYNXCN5fNW0l9tBv7ALp3
-         lVIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6+jxr3lScrNwu/Ca7R4dnLv42howEuNQQJHNj9A8bAk=;
-        b=Wn3L4rFez57q4byMNbTNORxbDjb7oH6mMNEeNwp34jMwtqfsXsJGrEZHVcMKqXuCj8
-         DSrnDOJjGrcUfOOI6amAgYHesFlDkIRGOssBwjIWePBdQVZiSkK0T9gwTuHcP+axYz1e
-         X2D3x1KHlt2u6P0BnjMvdEI0DRp1MlfHb3ak2O3bILNgrob3jkMx7pa7gXsSfxUw2Qtv
-         VHliCJDfZZS70vPR8yJbU4NKfAKEqXAUxI/UFvFg/Pw6paI2zPfm+qONZvG+A/t9k+Dh
-         icrlnZaTowCC5QCPQu65S//+mHXxgzuTKuRiqFzn0Yjp3rTAovR2WmkCFw5w4LrRcAZR
-         X4jg==
-X-Gm-Message-State: AOAM532BznaME6vIJmY5MhzOUOhbVFGuNR909+iulvFudi5/OH36BD0b
-        mm75mgnO088bFv2MqyBpyqIEZE1sdrKmNzuhmso=
-X-Google-Smtp-Source: ABdhPJwKsiB7c3T8IpmAqyF9sLgPy1KGjZZLzsAtRykklOpnF9UcruXyU6rCv1DGHKUvfp3ye2pY1qB6o83howYwHxQ=
-X-Received: by 2002:a25:40d8:: with SMTP id n207mr1776543yba.3.1614233091876;
- Wed, 24 Feb 2021 22:04:51 -0800 (PST)
-MIME-Version: 1.0
-References: <20210224235924.29931-1-pc@cjr.nz> <20210224235924.29931-4-pc@cjr.nz>
-In-Reply-To: <20210224235924.29931-4-pc@cjr.nz>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Thu, 25 Feb 2021 11:34:41 +0530
-Message-ID: <CANT5p=p0hSUaDiXzbLDb-VoiztoQ-efXNnqz8Ue2MJHXdYFsPw@mail.gmail.com>
-Subject: Re: [PATCH 4/4] cifs: fix nodfs mount option
-To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S234363AbhBYHiU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:38:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39087 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234545AbhBYHiR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 25 Feb 2021 02:38:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614238597;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=dSjFoylzCYKDhMZqdeFdao+Js7/2DD3LCCybC/Bb6ww=;
+        b=fCPtS7Iima/WRK4nntYnf1fJyGendQXvYeJX2Pmzp0HCAy9pNyEPSeyfLVOjhUu9J44xNp
+        NSLkp3MpK79EakCVo7pDZlZYYe+RucajbWnpHT2gnJ9c5ubsQoRn1Jo7GwgfxizVCtL0Ts
+        Z18HW3U2eG3m6I3PWID+jyOLOb2F8YE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-FVKhR4GFOOGonMHVQyT7ig-1; Thu, 25 Feb 2021 02:36:36 -0500
+X-MC-Unique: FVKhR4GFOOGonMHVQyT7ig-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2453D10CE79F;
+        Thu, 25 Feb 2021 07:36:35 +0000 (UTC)
+Received: from test1103.test.redhat.com (vpn2-54-42.bne.redhat.com [10.64.54.42])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 82641679F9;
+        Thu, 25 Feb 2021 07:36:34 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: fix handling of escaped ',' in the password mount argument
+Date:   Thu, 25 Feb 2021 17:36:27 +1000
+Message-Id: <20210225073627.32234-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+Passwords can contain ',' which are also used as the separator between
+mount options. Mount.cifs will escape all ',' characters as the string ",,".
+Update parsing of the mount options to detect ",," and treat it as a single
+'c' character.
 
-On Thu, Feb 25, 2021 at 10:16 AM Paulo Alcantara <pc@cjr.nz> wrote:
->
-> Skip DFS resolving when mounting with 'nodfs' even if
-> CONFIG_CIFS_DFS_UPCALL is enabled.
->
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-> ---
->  fs/cifs/connect.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 37452b2e24b8..6ab5f96fe1b4 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3373,15 +3373,15 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
->
->         rc = mount_get_conns(ctx, cifs_sb, &xid, &server, &ses, &tcon);
->         /*
-> -        * Unconditionally try to get an DFS referral (even cached) to determine whether it is an
-> -        * DFS mount.
-> +        * If called with 'nodfs' mount option, then skip DFS resolving.  Otherwise unconditionally
-> +        * try to get an DFS referral (even cached) to determine whether it is an DFS mount.
->          *
->          * Skip prefix path to provide support for DFS referrals from w2k8 servers which don't seem
->          * to respond with PATH_NOT_COVERED to requests that include the prefix.
->          */
-> -       if (dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb), ctx->UNC + 1, NULL,
-> +       if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS) ||
-> +           dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb), ctx->UNC + 1, NULL,
->                            NULL)) {
-> -               /* No DFS referral was returned.  Looks like a regular share. */
->                 if (rc)
->                         goto error;
->                 /* Check if it is fully accessible and then mount it */
-> --
-> 2.30.1
->
+Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/fs_context.c | 43 ++++++++++++++++++++++++++++++-------------
+ 1 file changed, 30 insertions(+), 13 deletions(-)
 
-
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 14c955a30006..892f51a21278 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -544,20 +544,37 @@ static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
+ 
+ 	/* BB Need to add support for sep= here TBD */
+ 	while ((key = strsep(&options, ",")) != NULL) {
+-		if (*key) {
+-			size_t v_len = 0;
+-			char *value = strchr(key, '=');
+-
+-			if (value) {
+-				if (value == key)
+-					continue;
+-				*value++ = 0;
+-				v_len = strlen(value);
+-			}
+-			ret = vfs_parse_fs_string(fc, key, value, v_len);
+-			if (ret < 0)
+-				break;
++		size_t len;
++		char *value;
++
++		if (*key == 0)
++			break;
++
++		/* Check if following character is the deliminator If yes,
++		 * we have encountered a double deliminator reset the NULL
++		 * character to the deliminator
++		 */
++		while (options && options[0] == ',') {
++			len = strlen(key);
++			strcpy(key + len, options);
++			options = strchr(options, ',');
++			if (options)
++				*options++ = 0;
+ 		}
++
++
++		len = 0;
++		value = strchr(key, '=');
++		if (value) {
++			if (value == key)
++				continue;
++			*value++ = 0;
++			len = strlen(value);
++		}
++
++		ret = vfs_parse_fs_string(fc, key, value, len);
++		if (ret < 0)
++			break;
+ 	}
+ 
+ 	return ret;
 -- 
-Regards,
-Shyam
+2.13.6
+
