@@ -2,102 +2,107 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF8BC433DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 00:17:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCBC2C433E0
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 00:44:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75AC06146B
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 00:17:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5639864ED6
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 00:44:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235979AbhBYARX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 24 Feb 2021 19:17:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40506 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234294AbhBYARV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 24 Feb 2021 19:17:21 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A92D2C061574;
-        Wed, 24 Feb 2021 16:16:40 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id h19so4726485edb.9;
-        Wed, 24 Feb 2021 16:16:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=dMyBH8rlEjqz4SpSQi70uv2VmD1HrNQDiHNj1GOL5L0=;
-        b=TwdyVUZlKez3JqD7Hd5bEFvh3QfmIMhHOSji7kAPwJCQX+Mf818+C169DpCoaZ91ar
-         aaqi9+n/lPZ7zBxVtSshlN9dgTtk9lSNZP9WAb6z52brFh4x65afBkINHioG55jnuEY2
-         Umtl0LgNrNY8TTzZGL8YxsyyhTwUhVe8CR/IAmXy/ue/YXM9piPCi8n/Aom7FZ4SJpdi
-         cOwbrRCLtJSanSY6AcCUAMEYgckNuvy1J9Vi64hsW2+r6rk6GN2kSxksxwEVVfUC1pm1
-         i24ruebjNy5ORSEK/rslS2aw/NT39bVTQkzDp1McCckF21oCdvb1+50Ies9cJbiCtokV
-         2ZsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=dMyBH8rlEjqz4SpSQi70uv2VmD1HrNQDiHNj1GOL5L0=;
-        b=Cn1tic7F3k7nBudWFJw80BthhxN+jN2S0HzeyavGC0+J7VNdoXXXcE1Gyb9B0ubjak
-         0FvasR4edRrWkNygbuxhHqcMeFykSMnpEuCaC2jwUnZ2g6TH8Q9k8va2jb+/S66xg2dJ
-         EZ9MnvjuzAxGs9xPo4P06EGZS7iandxoC3b0Bkj95WPkYdJRYIRDu1uMLTcqH06mqeXb
-         bLULrukTQnEDs8RNTmjdK4hx4k2cIO3ZgxkgQa0YgZ2O+3fqXWF/e9F1l8y2w0GDzmCA
-         A/FBpA7L32Gbij/MMpoSy+nlBK4IBdRjLzkBk6R5WGzPeyMLXkkEnbB1WDXpoL4xmz/p
-         oZ0g==
-X-Gm-Message-State: AOAM53082EmLTnQu3pra6LWqR5/MvPU1JEbJVsVh3r2xYTsYTywrp/sC
-        GRPp/itiZ7s0crGbgj14KzFVJZraXcYB8PchA3CjFN8=
-X-Google-Smtp-Source: ABdhPJyRzNcBX08vuJKuUxot/oPyEFoGQr2mMx7+Fh7Uf2znCB566Sc49XJu+X67Ker+Jewvv6d0gfyX6U0s/urSXMA=
-X-Received: by 2002:a05:6402:1283:: with SMTP id w3mr377477edv.340.1614212199483;
- Wed, 24 Feb 2021 16:16:39 -0800 (PST)
-MIME-Version: 1.0
-References: <20210223182726.31763-1-aaptel@suse.com> <CAKywueSCbANjCzPMnWJx7CXQM4kWO4pHtAhgpwwchMqCOcV0Lg@mail.gmail.com>
- <87tuq1zpo8.fsf@suse.com>
-In-Reply-To: <87tuq1zpo8.fsf@suse.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Wed, 24 Feb 2021 16:16:28 -0800
-Message-ID: <CAKywueSz=zMd2+BHnSd8Qt+t6jtqAYjCAR3N2yu5QJt9ZSD4-Q@mail.gmail.com>
-Subject: Re: [PATCH] cifs: ignore FL_FLOCK locks in read/write
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        id S232139AbhBYAo1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 24 Feb 2021 19:44:27 -0500
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:43625 "EHLO
+        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229752AbhBYAo1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 24 Feb 2021 19:44:27 -0500
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id 173DA5C0116;
+        Wed, 24 Feb 2021 19:43:41 -0500 (EST)
+Received: from imap1 ([10.202.2.51])
+  by compute1.internal (MEProxy); Wed, 24 Feb 2021 19:43:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        simon-taylor.me.uk; h=mime-version:message-id:date:from:to:cc
+        :subject:content-type; s=fm2; bh=djp7zLT0nDP/ynI8Ap4AY9ff0GVowNr
+        yJMaxQV/bcuw=; b=BxQx6JAxTRlJcqsaNYycy5x15wKFHDa2YLD2eBgtyvpEOYf
+        r1TB1nMx/6k04bV7s3QxPnNfAofLUC6zWWHDMnEWJMS45Rway2M3fNzyodxid1uF
+        JTNk25eNUgfs0tXrY5gaO2JUPB8v1N/1PLwSClzyQEIaW8muqCX80yvvUeZkhViu
+        thjoDryWOBJWn9OBkBeYT80zAHO3gP9rTEjsVUKLEcddvMIBPawjbcrCFqaGhMWh
+        NRgS3YwHcjGSspOFLc+EgKt1ZxnYrs4TEE8KCjQnxENr1gKk4BqLLubPYE7qu430
+        Wp6BiTUnT4ZeIyUxLapCntIxWmUEnv4juWXDvwA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:message-id
+        :mime-version:subject:to:x-me-proxy:x-me-proxy:x-me-sender
+        :x-me-sender:x-sasl-enc; s=fm2; bh=djp7zLT0nDP/ynI8Ap4AY9ff0GVow
+        NryJMaxQV/bcuw=; b=mpul+RWwCIFx8pnm2OrwXZqyFmZS6rCgBCIRYkofcbWzn
+        MXPMbw5puKzeKAeVQKQJ9Aks9DO8OstfNuj09oEHPZYMNlAZj0paiXtSLZNtqRCK
+        jNY7KGnkNoaBsO3NY87ppJidZvPmZ51bGEP/aJTUWs3eU4NhUsQValQPfuvFmaBD
+        Uw+gCDBNQaY+ixzWkrtVIAKzW080RRE87OK9RfmEUDukOYH5tbgnoO5e6dTxODYm
+        Lcqo3llYvTGA0jff75PvjGIS/aPe6SU76oeeIwQyrHRhmnb/TW8FC8KtenERkSK5
+        3qKKPZlyOozaLdBBqbQoNgBHkpG1F8WWUB4wgAlbw==
+X-ME-Sender: <xms:u_I2YH5m7WbPPJf4ZD9iJyvD5LFrY-DkoiK6FaaYKw_80mI8HbJ5oA>
+    <xme:u_I2YM7zRyUt1WDN9dRdrcLp9-7XChNcKtOTsr9D23h4-FVU3LbBkTW0whjuMEKRX
+    5aYeOI8V9kkq5HnnQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrkeekgddvgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfffhffvufgtsehttdertderredtnecuhfhrohhmpedfufhimhhonhcu
+    vfgrhihlohhrfdcuoehsihhmohhnsehsihhmohhnqdhtrgihlhhorhdrmhgvrdhukheqne
+    cuggftrfgrthhtvghrnhepveejgeegtdfgveevvdduffelgfekfeetuddvjefhueevgfev
+    hfdvudeivefffeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepshhimhhonhesshhimhhonhdqthgrhihlohhrrdhmvgdruhhk
+X-ME-Proxy: <xmx:u_I2YOc69uFXc6vHzhz0rz7z6dJWn4ncc1FBn5-AE86R-v9LrQm_ZA>
+    <xmx:u_I2YIIKmlKq1wqJwrWvDSaKlkJNhFh-H3F8mkooQTvZ9ZwPHjjbsg>
+    <xmx:u_I2YLIJIzkF3gYj_eP5QXEnFY7YYujE7haB38eykR-bE-ILrnKwjw>
+    <xmx:vfI2YNwtAzTM22JwGp91yQMbbMAnArolJJarbPkP331WxIDFZk6pOA>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 39E43130005D; Wed, 24 Feb 2021 19:43:39 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.5.0-alpha0-141-gf094924a34-fm-20210210.001-gf094924a
+Mime-Version: 1.0
+Message-Id: <0736dea6-ab54-454d-a40b-adaa372a1f53@www.fastmail.com>
+Date:   Thu, 25 Feb 2021 00:43:18 +0000
+From:   "Simon Taylor" <simon@simon-taylor.me.uk>
+To:     "Steve French" <sfrench@samba.org>
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+Subject: Using a password containing a comma fails with 5.11.1 kernel
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Agree - given the differences between semantics with and without POSIX
-extensions we should document limitations that the CIFS client has in
-respect to locking including flock, posix locks and ofd locks.
---
-Best regards,
-Pavel Shilovsky
+There seems to be a bug mounting a share when the password contains a comma with the 5.11.1 kernel.
 
-=D1=81=D1=80, 24 =D1=84=D0=B5=D0=B2=D1=80. 2021 =D0=B3. =D0=B2 03:11, Aur=
-=C3=A9lien Aptel <aaptel@suse.com>:
->
-> Pavel Shilovsky <piastryyy@gmail.com> writes:
-> > If a flock is emulated on the server side with mandatory locks (which
-> > is what we only have for SMB2 without POSIX extensions) then we should
-> > maintain the same logic on the client. Otherwise you get different
-> > behavior depending on the caching policies currently in effect on the
-> > client side. You may consider testing with both modes when
-> > leases/oplocks are on and off.
->
-> Hm.. you're right, the write will fail on the server side without
-> cache.
->
-> I guess we should document current cifs behaviour in the flock man page.
->
-> Cheers,
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
->
+I used a credential file named commapw
+
+user=CommaTest
+pass=beforecomma,aftercomma
+
+and the mount command
+
+mount.cifs //workstation/arch /mnt/arch -o vers=3.1.1,cred=/root/commapw
+
+This successfully mounts the share when using the 5.10.16 kernel but fails when using 5.11.1.
+
+The debug log was:
+
+[ 3835.380355] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'source'
+[ 3835.380360] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'ip'
+[ 3835.380362] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'unc'
+[ 3835.380364] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'vers'
+[ 3835.380365] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'user'
+[ 3835.380366] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'pass'
+[ 3835.380367] CIFS: fs/cifs/fs_context.c: CIFS: parsing cifs mount option 'aftercomma'
+[ 3835.380368] cifs: Unknown parameter 'aftercomma'
+
+The kernels are from Arch Linux packages:
+
+Linux 5.10.16-arch1-1 #1 SMP PREEMPT Sat, 13 Feb 2021 20:50:18 +0000 x86_64 GNU/Linux
+Linux 5.11.1-arch1-1 #1 SMP PREEMPT Tue, 23 Feb 2021 14:05:30 +0000 x86_64 GNU/Linux
+
+-- 
+Regards,
+Simon
