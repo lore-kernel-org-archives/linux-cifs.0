@@ -8,131 +8,220 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3540C433E9
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 19:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3FE2C433DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 21:05:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74B7764F2B
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 19:45:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADF3F64E4D
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 21:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234361AbhBYTp1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Feb 2021 14:45:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36440 "EHLO
+        id S234355AbhBYVEy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 Feb 2021 16:04:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234811AbhBYTnz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Feb 2021 14:43:55 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BBAC061574;
-        Thu, 25 Feb 2021 11:43:14 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id w36so10359296lfu.4;
-        Thu, 25 Feb 2021 11:43:14 -0800 (PST)
+        with ESMTP id S229566AbhBYVCE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Feb 2021 16:02:04 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00923C061793;
+        Thu, 25 Feb 2021 13:01:22 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id j19so10602562lfr.12;
+        Thu, 25 Feb 2021 13:01:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=8+53X3tsgIIGYEic7as5AIOyPMdcVwcLUcoH1RGZe9I=;
-        b=G3IJc6PAVdTEh4z7PsspuIOMQNQQ2hdGKB5Pl/1/LnguoOO3X1ivm2U/PzksEW3Jyc
-         z0QGJtlVUNWYNsMsrt7f/33Sx1ECZKqTL9ayuZUvZcZBzei+V7Hkhiv3ZLf0AdN4rbAp
-         qj5m/q47sZ8ywEjh6Ovhcm61CDghMUVL7/+XGOQF+H/UT5KC8Yxgu2sy/OBboakvlllA
-         jeA0ULJEaJ5TPxxxFW5mg8xGKTqZgsddR2qjZH2OMSByYfQtkIxoy3wJMBkJ4+Y1Wl3G
-         tUBzOD/KmMINSm/obG/iG3qYSUsWhosOjmuVHzpsgdEP30gSpnPKqDsJiFz1z634QtO3
-         /V7Q==
+        bh=+y7M2YdyWOJwNcoE/npVoO4W5SDgapwq18dZ8K3CKP0=;
+        b=RiKI/IfshKwphaZLtuhrm+RlwKbjh+3trklZUJz9KRrUUjFbC0iHs0Rogy1kyl5Hfn
+         vOZEst4CoAEBz4+jZWOeYLvgXtLTKKqT42E7HDg+pNp5gEYVQN9oj/Tbmu1V27fLRCUn
+         sE7X0Fc8xMYoAMdBmEwP7E0RbHa2IIQ1VXUJCG3GcfbiGuOH5ZS0jkKH7cESV/HRU73q
+         v0DpEAq3MXBkkyiWhv0jRs8YD8Yzi/2hX8FR2QK9kcURJ0rYMcO1IOQ/lKbXlvUQHlo4
+         ltmfLxhQDQ+8yE087jlq+G2e0pHyclXwcteoY+Vhij2RCwxnp/l5VYegyudk0a5nRf1l
+         UIiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=8+53X3tsgIIGYEic7as5AIOyPMdcVwcLUcoH1RGZe9I=;
-        b=B/a6SJzyXECPX9sb2jNgv8X+q8HDtb5NMPRLeF6FF2APWWRCmNygTLa8rOLSBeEF0s
-         IGtovyy+Zl5fr+VC+UQ3qz5Z5BSCnPrpZZje608Qoo0K3hRt1q4ftdv2o1cIqEoxlHzh
-         cKKDozaLlVvTH5RZzPF/jxuy6PhUDwpVMsPYqu8l5Rz8TcY3SoJWjLjPqOmca0Tt8fjg
-         DFwegrl0BtZHoRKxDqCIbTG4PLdFCAhFlx4PYjHjIDB1Ya65LLnJt6k5DRoZgEWsGBow
-         HobPe5o5/96//yL0SWSFtTias0mCGI5bG4TaaxWnMF8+JEPG+tHYstxYdo66XRjU2xah
-         Mhcw==
-X-Gm-Message-State: AOAM531Xpo7/Iab+sE14xVDZ9DGiw8Gx1cnXYO4m/poRt/2F5Hlq+wqB
-        UGDJ4hNV/EVaGWsoWLBx0Egb+pyW61qKCKS2Iho=
-X-Google-Smtp-Source: ABdhPJxv05QcgOcUT7nilIDW33RMxLkaUKO2xb4vq+/JGyNuU0mwWrCKhTOicQb3v3OcAOA5bVvMOzhLNzhJlrsHgJQ=
-X-Received: by 2002:a05:6512:1284:: with SMTP id u4mr2831452lfs.175.1614282193047;
- Thu, 25 Feb 2021 11:43:13 -0800 (PST)
+        bh=+y7M2YdyWOJwNcoE/npVoO4W5SDgapwq18dZ8K3CKP0=;
+        b=MSIUV4TTaLmXXuJEcNKyJfoQxQJTkqtXcgdusGFRiUAVIMT0a4lxs2vTH4L4jb0CJk
+         AwZ4AaIrh1sGhnf+trau5nSR3FAOKz5IPW7yfcF0lcA1RBefqA6cZUns9IsXaXEeHwKr
+         CUOlMdBcPaehnBg1Ytf2vy5W6ZzFES2tRtul3+K9uZlF8TQAwBrEL/UYEF73rIP4K++B
+         VGQ+AqCvct6YTYDHl+VebhRPeR0wG5RAYWp4PW29LC1E1/H+9EZNnXwXqXNUgyoQ+FtB
+         EmspWHuRPSIGt0M72Rxi/J0mDU7H5aQJLUupf5J3yDtGRf+qNZkfbXYADDmBPyslZCpe
+         fg9A==
+X-Gm-Message-State: AOAM532KsdFx5LGNM1OAzNx3/CJpY7z7V6de2UWjmS5k09v8MCo+UO/6
+        UGXmCrwbQUYz/5A6/rM4AeFoxV+//2DPNpr4VJE=
+X-Google-Smtp-Source: ABdhPJzYk2lOmOcNHokbTUVgIcxBi3pT1kPVMOrhu8tZVpMtyksO66kA/tcixL07fo+z9+MWm5zufgNdypTrn3iHMBw=
+X-Received: by 2002:a19:404f:: with SMTP id n76mr3021876lfa.184.1614286881305;
+ Thu, 25 Feb 2021 13:01:21 -0800 (PST)
 MIME-Version: 1.0
 References: <CAH2r5ms9dJ3RW=_+c0HApLyUC=LD5ACp_nhE2jJQuS-121kV=w@mail.gmail.com>
  <87eehwnn2c.fsf@suse.com> <CAH2r5muuEj_ZpbZ+yAGfnG-JPRP0mAzaBNVYhw7SnbReT8B1DA@mail.gmail.com>
-In-Reply-To: <CAH2r5muuEj_ZpbZ+yAGfnG-JPRP0mAzaBNVYhw7SnbReT8B1DA@mail.gmail.com>
+ <CAH2r5muV02_MT_641_OGB8gWdxZk4Och=2Mv-768MR36o8ukfA@mail.gmail.com>
+In-Reply-To: <CAH2r5muV02_MT_641_OGB8gWdxZk4Och=2Mv-768MR36o8ukfA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 25 Feb 2021 13:43:01 -0600
-Message-ID: <CAH2r5muV02_MT_641_OGB8gWdxZk4Och=2Mv-768MR36o8ukfA@mail.gmail.com>
+Date:   Thu, 25 Feb 2021 15:01:10 -0600
+Message-ID: <CAH2r5mu7kYdLG3P39x1oRoqp6wbbCrBWR9MgT4FdPwAnacZH+Q@mail.gmail.com>
 Subject: Re: [PATCH] cifs: use discard iterator to discard unneeded network
  data more efficiently
 To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
 Cc:     CIFS <linux-cifs@vger.kernel.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         David Howells <dhowells@redhat.com>
-Content-Type: multipart/mixed; boundary="000000000000af387b05bc2e5c4d"
+Content-Type: multipart/mixed; boundary="0000000000002071fe05bc2f7477"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000af387b05bc2e5c4d
+--0000000000002071fe05bc2f7477
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-lightly updated patch
+Had a typo in the previous attachment - reattached
 
+The iterator, ITER_DISCARD, that can only be used in READ mode and
+just discards any data copied to it, was added to allow a network
+filesystem to discard any unwanted data sent by a server.
+Convert cifs_discard_from_socket() to use this.
 
-On Thu, Feb 25, 2021 at 1:29 PM Steve French <smfrench@gmail.com> wrote:
+Signed-off-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ fs/cifs/cifsproto.h |  2 ++
+ fs/cifs/cifssmb.c   |  6 +++---
+ fs/cifs/connect.c   | 17 +++++++++++++++++
+ 3 files changed, 22 insertions(+), 3 deletions(-)
+
+diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+index d4b2cc7e6b1e..64eb5c817712 100644
+--- a/fs/cifs/cifsproto.h
++++ b/fs/cifs/cifsproto.h
+@@ -232,6 +232,8 @@ extern unsigned int
+setup_special_user_owner_ACE(struct cifs_ace *pace);
+ extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
+ extern int cifs_read_from_socket(struct TCP_Server_Info *server, char *buf=
+,
+           unsigned int to_read);
++extern ssize_t cifs_discard_from_socket(struct TCP_Server_Info *server,
++ size_t to_read);
+ extern int cifs_read_page_from_socket(struct TCP_Server_Info *server,
+  struct page *page,
+  unsigned int page_offset,
+diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
+index 0496934feecb..c279527aae92 100644
+--- a/fs/cifs/cifssmb.c
++++ b/fs/cifs/cifssmb.c
+@@ -1451,9 +1451,9 @@ cifs_discard_remaining_data(struct
+TCP_Server_Info *server)
+  while (remaining > 0) {
+  int length;
+
+- length =3D cifs_read_from_socket(server, server->bigbuf,
+- min_t(unsigned int, remaining,
+-     CIFSMaxBufSize + MAX_HEADER_SIZE(server)));
++ length =3D cifs_discard_from_socket(server,
++ min_t(size_t, remaining,
++       CIFSMaxBufSize + MAX_HEADER_SIZE(server)));
+  if (length < 0)
+  return length;
+  server->total_read +=3D length;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 55b1ec731d52..b9085625334e 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -564,6 +564,23 @@ cifs_read_from_socket(struct TCP_Server_Info
+*server, char *buf,
+  return cifs_readv_from_socket(server, &smb_msg);
+ }
+
++ssize_t
++cifs_discard_from_socket(struct TCP_Server_Info *server, size_t to_read)
++{
++ struct msghdr smb_msg;
++
++ /*
++ *  iov_iter_discard already sets smb_msg.type and count and iov_offset
++ *  and cifs_readv_from_socket sets msg_control and msg_controllen
++ *  so little to initialize in struct msghdr
++ */
++ smb_msg.msg_name =3D NULL;
++ smb_msg.msg_namelen =3D 0;
++ iov_iter_discard(&smb_msg.msg_iter, READ, to_read);
++
++ return cifs_readv_from_socket(server, &smb_msg);
++}
++
+ int
+ cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *pa=
+ge,
+  unsigned int page_offset, unsigned int to_read)
+
+On Thu, Feb 25, 2021 at 1:43 PM Steve French <smfrench@gmail.com> wrote:
 >
-> The other two routines initialize in iov_iter_bvec
->
-> iov->type
-> iov->bvec
-> iov->offset
-> iov->count
->
-> but iov_iter_discard already does the initialization:
-> iov_type
-> iov_offset
-> iov_count
->
-> and then we call cifs_readv_from_socket in all 3
-> which sets:
->     iov->msg_control =3D NULL
->     iov->msg_controllen =3D NULL
->
-> I will set the two additional ones to null
->     iov->msg_name
-> and
->     iov->msg_namelen
+> lightly updated patch
 >
 >
->
-> On Thu, Feb 4, 2021 at 4:29 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrot=
-e:
+> On Thu, Feb 25, 2021 at 1:29 PM Steve French <smfrench@gmail.com> wrote:
 > >
-> > Steve French <smfrench@gmail.com> writes:
-> > > +ssize_t
-> > > +cifs_discard_from_socket(struct TCP_Server_Info *server, size_t to_r=
-ead)
-> > > +{
-> > > +     struct msghdr smb_msg;
-> > > +
-> > > +     iov_iter_discard(&smb_msg.msg_iter, READ, to_read);
-> > > +
-> > > +     return cifs_readv_from_socket(server, &smb_msg);
-> > > +}
-> > > +
+> > The other two routines initialize in iov_iter_bvec
 > >
-> > Shouldn't smb_msg be initialized to zeroes? Looking around this needs t=
-o
-> > be done for cifs_read_from_socket() and cifs_read_page_from_socket() to=
-o.
+> > iov->type
+> > iov->bvec
+> > iov->offset
+> > iov->count
 > >
-> > Cheers,
-> > --
-> > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnber=
-g, DE
-> > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
+> > but iov_iter_discard already does the initialization:
+> > iov_type
+> > iov_offset
+> > iov_count
+> >
+> > and then we call cifs_readv_from_socket in all 3
+> > which sets:
+> >     iov->msg_control =3D NULL
+> >     iov->msg_controllen =3D NULL
+> >
+> > I will set the two additional ones to null
+> >     iov->msg_name
+> > and
+> >     iov->msg_namelen
+> >
+> >
+> >
+> > On Thu, Feb 4, 2021 at 4:29 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wr=
+ote:
+> > >
+> > > Steve French <smfrench@gmail.com> writes:
+> > > > +ssize_t
+> > > > +cifs_discard_from_socket(struct TCP_Server_Info *server, size_t to=
+_read)
+> > > > +{
+> > > > +     struct msghdr smb_msg;
+> > > > +
+> > > > +     iov_iter_discard(&smb_msg.msg_iter, READ, to_read);
+> > > > +
+> > > > +     return cifs_readv_from_socket(server, &smb_msg);
+> > > > +}
+> > > > +
+> > >
+> > > Shouldn't smb_msg be initialized to zeroes? Looking around this needs=
+ to
+> > > be done for cifs_read_from_socket() and cifs_read_page_from_socket() =
+too.
+> > >
+> > > Cheers,
+> > > --
+> > > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> > > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> > > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnb=
+erg, DE
+> > > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
 =C3=BCnchen)
+> > >
 > >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+>
 >
 >
 > --
@@ -147,65 +236,65 @@ Thanks,
 
 Steve
 
---000000000000af387b05bc2e5c4d
+--0000000000002071fe05bc2f7477
 Content-Type: text/x-patch; charset="US-ASCII"; 
 	name="0001-cifs-use-discard-iterator-to-discard-unneeded-networ.patch"
 Content-Disposition: attachment; 
 	filename="0001-cifs-use-discard-iterator-to-discard-unneeded-networ.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_kll9xfrg0>
-X-Attachment-Id: f_kll9xfrg0
+Content-ID: <f_kllcph710>
+X-Attachment-Id: f_kllcph710
 
 RnJvbSAxYjBiZGI1ZTZjOWM4ODQ2YWI0YTU0ODA5M2EzMjMxMWFlOWQwMDM3IE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPgpE
-YXRlOiBUaHUsIDQgRmViIDIwMjEgMDA6MTU6MjEgLTA2MDAKU3ViamVjdDogW1BBVENIXSBjaWZz
-OiB1c2UgZGlzY2FyZCBpdGVyYXRvciB0byBkaXNjYXJkIHVubmVlZGVkIG5ldHdvcmsgZGF0YQog
-bW9yZSBlZmZpY2llbnRseQoKVGhlIGl0ZXJhdG9yLCBJVEVSX0RJU0NBUkQsIHRoYXQgY2FuIG9u
-bHkgYmUgdXNlZCBpbiBSRUFEIG1vZGUgYW5kCmp1c3QgZGlzY2FyZHMgYW55IGRhdGEgY29waWVk
-IHRvIGl0LCB3YXMgYWRkZWQgdG8gYWxsb3cgYSBuZXR3b3JrCmZpbGVzeXN0ZW0gdG8gZGlzY2Fy
-ZCBhbnkgdW53YW50ZWQgZGF0YSBzZW50IGJ5IGEgc2VydmVyLgpDb252ZXJ0IGNpZnNfZGlzY2Fy
-ZF9mcm9tX3NvY2tldCgpIHRvIHVzZSB0aGlzLgoKU2lnbmVkLW9mZi1ieTogRGF2aWQgSG93ZWxs
-cyA8ZGhvd2VsbHNAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZy
-ZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc3Byb3RvLmggfCAgMiArKwogZnMv
-Y2lmcy9jaWZzc21iLmMgICB8ICA2ICsrKy0tLQogZnMvY2lmcy9jb25uZWN0LmMgICB8IDE3ICsr
-KysrKysrKysrKysrKysrCiAzIGZpbGVzIGNoYW5nZWQsIDIyIGluc2VydGlvbnMoKyksIDMgZGVs
-ZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzcHJvdG8uaCBiL2ZzL2NpZnMvY2lm
-c3Byb3RvLmgKaW5kZXggZDRiMmNjN2U2YjFlLi42NGViNWM4MTc3MTIgMTAwNjQ0Ci0tLSBhL2Zz
-L2NpZnMvY2lmc3Byb3RvLmgKKysrIGIvZnMvY2lmcy9jaWZzcHJvdG8uaApAQCAtMjMyLDYgKzIz
-Miw4IEBAIGV4dGVybiB1bnNpZ25lZCBpbnQgc2V0dXBfc3BlY2lhbF91c2VyX293bmVyX0FDRShz
-dHJ1Y3QgY2lmc19hY2UgKnBhY2UpOwogZXh0ZXJuIHZvaWQgZGVxdWV1ZV9taWQoc3RydWN0IG1p
-ZF9xX2VudHJ5ICptaWQsIGJvb2wgbWFsZm9ybWVkKTsKIGV4dGVybiBpbnQgY2lmc19yZWFkX2Zy
-b21fc29ja2V0KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgY2hhciAqYnVmLAogCQkJ
-ICAgICAgICAgdW5zaWduZWQgaW50IHRvX3JlYWQpOworZXh0ZXJuIHNzaXplX3QgY2lmc19kaXNj
-YXJkX2Zyb21fc29ja2V0KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwKKwkJCQkJc2l6
-ZV90IHRvX3JlYWQpOwogZXh0ZXJuIGludCBjaWZzX3JlYWRfcGFnZV9mcm9tX3NvY2tldChzdHJ1
-Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsCiAJCQkJCXN0cnVjdCBwYWdlICpwYWdlLAogCQkJ
-CQl1bnNpZ25lZCBpbnQgcGFnZV9vZmZzZXQsCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNzbWIu
-YyBiL2ZzL2NpZnMvY2lmc3NtYi5jCmluZGV4IDA0OTY5MzRmZWVjYi4uYzI3OTUyN2FhZTkyIDEw
-MDY0NAotLS0gYS9mcy9jaWZzL2NpZnNzbWIuYworKysgYi9mcy9jaWZzL2NpZnNzbWIuYwpAQCAt
-MTQ1MSw5ICsxNDUxLDkgQEAgY2lmc19kaXNjYXJkX3JlbWFpbmluZ19kYXRhKHN0cnVjdCBUQ1Bf
-U2VydmVyX0luZm8gKnNlcnZlcikKIAl3aGlsZSAocmVtYWluaW5nID4gMCkgewogCQlpbnQgbGVu
-Z3RoOwogCi0JCWxlbmd0aCA9IGNpZnNfcmVhZF9mcm9tX3NvY2tldChzZXJ2ZXIsIHNlcnZlci0+
-YmlnYnVmLAotCQkJCW1pbl90KHVuc2lnbmVkIGludCwgcmVtYWluaW5nLAotCQkJCSAgICBDSUZT
-TWF4QnVmU2l6ZSArIE1BWF9IRUFERVJfU0laRShzZXJ2ZXIpKSk7CisJCWxlbmd0aCA9IGNpZnNf
-ZGlzY2FyZF9mcm9tX3NvY2tldChzZXJ2ZXIsCisJCQkJbWluX3Qoc2l6ZV90LCByZW1haW5pbmcs
-CisJCQkJICAgICAgQ0lGU01heEJ1ZlNpemUgKyBNQVhfSEVBREVSX1NJWkUoc2VydmVyKSkpOwog
-CQlpZiAobGVuZ3RoIDwgMCkKIAkJCXJldHVybiBsZW5ndGg7CiAJCXNlcnZlci0+dG90YWxfcmVh
-ZCArPSBsZW5ndGg7CmRpZmYgLS1naXQgYS9mcy9jaWZzL2Nvbm5lY3QuYyBiL2ZzL2NpZnMvY29u
-bmVjdC5jCmluZGV4IDU1YjFlYzczMWQ1Mi4uYjkwODU2MjUzMzRlIDEwMDY0NAotLS0gYS9mcy9j
-aWZzL2Nvbm5lY3QuYworKysgYi9mcy9jaWZzL2Nvbm5lY3QuYwpAQCAtNTY0LDYgKzU2NCwyMyBA
-QCBjaWZzX3JlYWRfZnJvbV9zb2NrZXQoc3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBj
-aGFyICpidWYsCiAJcmV0dXJuIGNpZnNfcmVhZHZfZnJvbV9zb2NrZXQoc2VydmVyLCAmc21iX21z
-Zyk7CiB9CiAKK3NzaXplX3QKK2NpZnNfZGlzY2FyZF9mcm9tX3NvY2tldChzdHJ1Y3QgVENQX1Nl
-cnZlcl9JbmZvICpzZXJ2ZXIsIHNpemVfdCB0b19yZWFkKQoreworCXN0cnVjdCBtc2doZHIgc21i
-X21zZzsKKworCS8qCisJICogIGlvdl9pdGVyX2Rpc2NhcmQgYWxyZWFkeSBzZXRzIHNtYl9tc2cu
-dHlwZSBhbmQgY291bnQgYW5kIGlvdl9vZmZzZXQKKwkgKiAgYW5kIGNpZnNfcmVhZHZfZnJvbV9z
-b2NrZXQgc2V0cyBtc2dfY29udHJvbCBhbmQgbXNnX2NvbnRyb2xsZW4KKwkgKiAgc28gbGl0dGxl
-IHRvIGluaXRpYWxpemUgaW4gc3RydWN0IG1zZ2hkcgorCSAqLworCXNtYl9tc2cubXNnX25hbWUg
-PSBOVUxMOworCXNtYl9tc2dfbmFtZWxlbiA9IDA7CisJaW92X2l0ZXJfZGlzY2FyZCgmc21iX21z
-Zy5tc2dfaXRlciwgUkVBRCwgdG9fcmVhZCk7CisKKwlyZXR1cm4gY2lmc19yZWFkdl9mcm9tX3Nv
-Y2tldChzZXJ2ZXIsICZzbWJfbXNnKTsKK30KKwogaW50CiBjaWZzX3JlYWRfcGFnZV9mcm9tX3Nv
-Y2tldChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIHN0cnVjdCBwYWdlICpwYWdlLAog
-CXVuc2lnbmVkIGludCBwYWdlX29mZnNldCwgdW5zaWduZWQgaW50IHRvX3JlYWQpCi0tIAoyLjI3
-LjAKCg==
---000000000000af387b05bc2e5c4d--
+YXRlOiBUaHUsIDQgRmViIDIwMjEgMDA6MTU6MjEgLTA2MDAKU3ViamVjdDogW1BBVENIIDEvMl0g
+Y2lmczogdXNlIGRpc2NhcmQgaXRlcmF0b3IgdG8gZGlzY2FyZCB1bm5lZWRlZCBuZXR3b3JrCiBk
+YXRhIG1vcmUgZWZmaWNpZW50bHkKClRoZSBpdGVyYXRvciwgSVRFUl9ESVNDQVJELCB0aGF0IGNh
+biBvbmx5IGJlIHVzZWQgaW4gUkVBRCBtb2RlIGFuZApqdXN0IGRpc2NhcmRzIGFueSBkYXRhIGNv
+cGllZCB0byBpdCwgd2FzIGFkZGVkIHRvIGFsbG93IGEgbmV0d29yawpmaWxlc3lzdGVtIHRvIGRp
+c2NhcmQgYW55IHVud2FudGVkIGRhdGEgc2VudCBieSBhIHNlcnZlci4KQ29udmVydCBjaWZzX2Rp
+c2NhcmRfZnJvbV9zb2NrZXQoKSB0byB1c2UgdGhpcy4KClNpZ25lZC1vZmYtYnk6IERhdmlkIEhv
+d2VsbHMgPGRob3dlbGxzQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8
+c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNwcm90by5oIHwgIDIgKysK
+IGZzL2NpZnMvY2lmc3NtYi5jICAgfCAgNiArKystLS0KIGZzL2NpZnMvY29ubmVjdC5jICAgfCAx
+NyArKysrKysrKysrKysrKysrKwogMyBmaWxlcyBjaGFuZ2VkLCAyMiBpbnNlcnRpb25zKCspLCAz
+IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3Byb3RvLmggYi9mcy9jaWZz
+L2NpZnNwcm90by5oCmluZGV4IGQ0YjJjYzdlNmIxZS4uNjRlYjVjODE3NzEyIDEwMDY0NAotLS0g
+YS9mcy9jaWZzL2NpZnNwcm90by5oCisrKyBiL2ZzL2NpZnMvY2lmc3Byb3RvLmgKQEAgLTIzMiw2
+ICsyMzIsOCBAQCBleHRlcm4gdW5zaWduZWQgaW50IHNldHVwX3NwZWNpYWxfdXNlcl9vd25lcl9B
+Q0Uoc3RydWN0IGNpZnNfYWNlICpwYWNlKTsKIGV4dGVybiB2b2lkIGRlcXVldWVfbWlkKHN0cnVj
+dCBtaWRfcV9lbnRyeSAqbWlkLCBib29sIG1hbGZvcm1lZCk7CiBleHRlcm4gaW50IGNpZnNfcmVh
+ZF9mcm9tX3NvY2tldChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIGNoYXIgKmJ1ZiwK
+IAkJCSAgICAgICAgIHVuc2lnbmVkIGludCB0b19yZWFkKTsKK2V4dGVybiBzc2l6ZV90IGNpZnNf
+ZGlzY2FyZF9mcm9tX3NvY2tldChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsCisJCQkJ
+CXNpemVfdCB0b19yZWFkKTsKIGV4dGVybiBpbnQgY2lmc19yZWFkX3BhZ2VfZnJvbV9zb2NrZXQo
+c3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLAogCQkJCQlzdHJ1Y3QgcGFnZSAqcGFnZSwK
+IAkJCQkJdW5zaWduZWQgaW50IHBhZ2Vfb2Zmc2V0LApkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZz
+c21iLmMgYi9mcy9jaWZzL2NpZnNzbWIuYwppbmRleCAwNDk2OTM0ZmVlY2IuLmMyNzk1MjdhYWU5
+MiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZzc21iLmMKKysrIGIvZnMvY2lmcy9jaWZzc21iLmMK
+QEAgLTE0NTEsOSArMTQ1MSw5IEBAIGNpZnNfZGlzY2FyZF9yZW1haW5pbmdfZGF0YShzdHJ1Y3Qg
+VENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIpCiAJd2hpbGUgKHJlbWFpbmluZyA+IDApIHsKIAkJaW50
+IGxlbmd0aDsKIAotCQlsZW5ndGggPSBjaWZzX3JlYWRfZnJvbV9zb2NrZXQoc2VydmVyLCBzZXJ2
+ZXItPmJpZ2J1ZiwKLQkJCQltaW5fdCh1bnNpZ25lZCBpbnQsIHJlbWFpbmluZywKLQkJCQkgICAg
+Q0lGU01heEJ1ZlNpemUgKyBNQVhfSEVBREVSX1NJWkUoc2VydmVyKSkpOworCQlsZW5ndGggPSBj
+aWZzX2Rpc2NhcmRfZnJvbV9zb2NrZXQoc2VydmVyLAorCQkJCW1pbl90KHNpemVfdCwgcmVtYWlu
+aW5nLAorCQkJCSAgICAgIENJRlNNYXhCdWZTaXplICsgTUFYX0hFQURFUl9TSVpFKHNlcnZlcikp
+KTsKIAkJaWYgKGxlbmd0aCA8IDApCiAJCQlyZXR1cm4gbGVuZ3RoOwogCQlzZXJ2ZXItPnRvdGFs
+X3JlYWQgKz0gbGVuZ3RoOwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jb25uZWN0LmMgYi9mcy9jaWZz
+L2Nvbm5lY3QuYwppbmRleCA1NWIxZWM3MzFkNTIuLmI5MDg1NjI1MzM0ZSAxMDA2NDQKLS0tIGEv
+ZnMvY2lmcy9jb25uZWN0LmMKKysrIGIvZnMvY2lmcy9jb25uZWN0LmMKQEAgLTU2NCw2ICs1NjQs
+MjMgQEAgY2lmc19yZWFkX2Zyb21fc29ja2V0KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZl
+ciwgY2hhciAqYnVmLAogCXJldHVybiBjaWZzX3JlYWR2X2Zyb21fc29ja2V0KHNlcnZlciwgJnNt
+Yl9tc2cpOwogfQogCitzc2l6ZV90CitjaWZzX2Rpc2NhcmRfZnJvbV9zb2NrZXQoc3RydWN0IFRD
+UF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBzaXplX3QgdG9fcmVhZCkKK3sKKwlzdHJ1Y3QgbXNnaGRy
+IHNtYl9tc2c7CisKKwkvKgorCSAqICBpb3ZfaXRlcl9kaXNjYXJkIGFscmVhZHkgc2V0cyBzbWJf
+bXNnLnR5cGUgYW5kIGNvdW50IGFuZCBpb3Zfb2Zmc2V0CisJICogIGFuZCBjaWZzX3JlYWR2X2Zy
+b21fc29ja2V0IHNldHMgbXNnX2NvbnRyb2wgYW5kIG1zZ19jb250cm9sbGVuCisJICogIHNvIGxp
+dHRsZSB0byBpbml0aWFsaXplIGluIHN0cnVjdCBtc2doZHIKKwkgKi8KKwlzbWJfbXNnLm1zZ19u
+YW1lID0gTlVMTDsKKwlzbWJfbXNnLm1zZ19uYW1lbGVuID0gMDsKKwlpb3ZfaXRlcl9kaXNjYXJk
+KCZzbWJfbXNnLm1zZ19pdGVyLCBSRUFELCB0b19yZWFkKTsKKworCXJldHVybiBjaWZzX3JlYWR2
+X2Zyb21fc29ja2V0KHNlcnZlciwgJnNtYl9tc2cpOworfQorCiBpbnQKIGNpZnNfcmVhZF9wYWdl
+X2Zyb21fc29ja2V0KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgc3RydWN0IHBhZ2Ug
+KnBhZ2UsCiAJdW5zaWduZWQgaW50IHBhZ2Vfb2Zmc2V0LCB1bnNpZ25lZCBpbnQgdG9fcmVhZCkK
+LS0gCjIuMjcuMAoK
+--0000000000002071fe05bc2f7477--
