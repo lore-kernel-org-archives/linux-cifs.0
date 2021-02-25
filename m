@@ -8,142 +8,152 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83161C433E9
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 18:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31320C433DB
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 18:45:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A82464F26
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 18:29:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB75064EFA
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 18:45:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233242AbhBYS3n (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Feb 2021 13:29:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48494 "EHLO
+        id S233615AbhBYSpr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 Feb 2021 13:45:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232403AbhBYS3B (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Feb 2021 13:29:01 -0500
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B62C2C06121E
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Feb 2021 10:27:26 -0800 (PST)
-Received: by mail-lj1-x22a.google.com with SMTP id g1so7581743ljj.13
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Feb 2021 10:27:26 -0800 (PST)
+        with ESMTP id S233671AbhBYSpc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Feb 2021 13:45:32 -0500
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04EBC061574;
+        Thu, 25 Feb 2021 10:44:51 -0800 (PST)
+Received: by mail-lj1-x234.google.com with SMTP id r25so6696472ljk.11;
+        Thu, 25 Feb 2021 10:44:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=UMLJvMJse1VKb1ue1H1FLmWhyWVix6B4PkkzBUdSdbY=;
-        b=IL4+v+ZA58BmI3jUWWZEaO3wRKqlLyQkscxcxE85dRGRWEwDQCTLsYqe/o786ZEcYA
-         XdGH5mT5xKqMATIfIn84P28Ez1HRiVGiNU1aYetjP1jAo3BxVHfmzIUqwtZfmgceJRq2
-         dTVXHEoPcV6r0WHUmlvrYogBlkCCAH4J9/RH7R9JdkK6vOWrN610W55q8duf9FhpFSjT
-         g/2e3ECMuLycpDUOxgRHWspHEEKhQ34SutR6RU5roTnrdsCWazRwX8+1A1wlyLPcATac
-         PO4T63IRhiGcjE5Zia6UF8OP7xgRyqM7rf8MgjY3+ZzucLmw9tT3zV2qeJ1vjLngmaoA
-         Nlrw==
+        bh=rbx8LPOFbmXf8Szf9y254PvyCx/aSExb5Tf2CHubYaM=;
+        b=k3PoCZTLRY18NdHrgvvVJN1BpIe7QYovvg6t3tBHtSvNsm/NED+s7C5NmrSuvWDLXM
+         ini3+YvqF6AbfNOqtM4PICyTIIvpr2A3rkAJexntLVgPQGSPTCYeDGb54m2mRiLhdZvq
+         Lde2fI7GnlFB0aF0v3Z+G6lJzjVAg22U51iG1Ny9B8Q8cdbtqDZyWjfbUNW8UDQVf4L9
+         IkM+AoETAmEoEHoCURYq77YcJqc+MKA8e1fPZowlyA20UteVBj3jZEfpHp1EQTP/UnBS
+         +zi9N1EXW4uYR3tGSGyLEnAbxRjizVgCbXOSmAByInmElzJJUJPlJQ1SBg74Z3X8D6bz
+         7wNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=UMLJvMJse1VKb1ue1H1FLmWhyWVix6B4PkkzBUdSdbY=;
-        b=rbijvdxcTlH4nZ6ownPGMBp0xnivzk9Trgfov67ggQkOrXs1Ezdkah/RwJ3C5LOSWg
-         vFGo1dunK8Akugfb3jXE0Zx9EWiL67+N/ni39oUSsiTKj2jYN4wCScOvVgxH5RyV0GS5
-         GF5X87aCG9s5t1mnhUY38YSlqIykWtyeyPXM/Z2wRLsJSbZhwPLaRNXY7gyKOSvVLTei
-         k3j/LUnb0pPcYhSqFi1HSgtAOgZnGJjx1l0ydA7ZRp/9LswFbUYqSikwbADUwR+qstap
-         CSb7kEhJ4apIUw2Hklw0HMj4S7FwMdYUwtdBxCEmaqOyKgcOZglP9lZ/3RhJIKrkQkbI
-         6+3A==
-X-Gm-Message-State: AOAM530W6qTtutXYMO01mFD2/ThNdqIdVYZZwToknSXu1poOTFe7zXxM
-        pzo9kw1AwTOz8AFIpCHqqwTLoptfGt5Rs05+0wc=
-X-Google-Smtp-Source: ABdhPJyBET8cfXbV9yKpG1x2f2IWphtPwCa4GLT/sQD1JDjeJWB4mhpG5J8+uc/WmHdNRYQSZ+r9foTXc3c0Zl+Dvy4=
-X-Received: by 2002:a2e:98c5:: with SMTP id s5mr2258268ljj.218.1614277643670;
- Thu, 25 Feb 2021 10:27:23 -0800 (PST)
+        bh=rbx8LPOFbmXf8Szf9y254PvyCx/aSExb5Tf2CHubYaM=;
+        b=AsApA3gJmGAiQcS50EHL9QlQAo1/4Mv5QfRgln3O6cgad9aLmrbe8IFduWs8ut/w5r
+         1sgUytuXhZ4HHZvEwMOX3asFeWumcmEGPJcQUmN7LJhFAQaHhYPmeUaiQ5saQRPdFXA3
+         Vv68/GEx1eYAnb9cMYDbYAb8xg/2aFDogtVe8rhNECxA5SSyi+c+UDuBFnI/8GRCe+02
+         hOCRNIEYd7vDB5FEAnfYbv/Kx5xEVUQD+FPxwKmBszecPyjthn71CpC6Td/e+9oy7wmo
+         +KcaPXZkK4/VpLYS6rOG6zy+a4ZOb1cfQRg7UsaayCmVzUx0V+vKRH3gkYkaq4GMqCZl
+         W/cw==
+X-Gm-Message-State: AOAM532dGUuBRHTQc3NwXswEOvm8gZ/XNdhXrx9ocfrAv2bnrDAkHTqP
+        ZYgn3pvzkDQfliTnMbhUtgWpG15D/depqP2TpNZM+6iyEdg=
+X-Google-Smtp-Source: ABdhPJxJieTySEIj+LiFJ8FAagEm0v5OXzojxA5GtSJCuK3eIhed0GC/PfoSDqU5XxRqn+IUhD/kPokkB3yTHASSTMg=
+X-Received: by 2002:a05:651c:3cb:: with SMTP id f11mr2325034ljp.272.1614278689962;
+ Thu, 25 Feb 2021 10:44:49 -0800 (PST)
 MIME-Version: 1.0
-References: <20210225073627.32234-1-lsahlber@redhat.com> <CAH2r5mtJtxYUZOnJDzO9dPO-REPQqLLosPykgfArz-7AOaF9Gg@mail.gmail.com>
-In-Reply-To: <CAH2r5mtJtxYUZOnJDzO9dPO-REPQqLLosPykgfArz-7AOaF9Gg@mail.gmail.com>
+References: <CAH2r5mt+69AZFh_2OOd2JHLtqG9jo7=O7HF4bTGbSjhgi=M53g@mail.gmail.com>
+In-Reply-To: <CAH2r5mt+69AZFh_2OOd2JHLtqG9jo7=O7HF4bTGbSjhgi=M53g@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 25 Feb 2021 12:27:12 -0600
-Message-ID: <CAH2r5mtQGnN8Py0-Y5DXb=3Cc+tY9qWw0cWux-V89-NpYFofdg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix handling of escaped ',' in the password mount argument
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Simon Taylor <simon@simon-taylor.me.uk>
+Date:   Thu, 25 Feb 2021 12:44:38 -0600
+Message-ID: <CAH2r5muBiaOZooFd0XgBuNUkifH1qA1RkdJy963=UHFLQXMwGA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: convert readpages_fill_pages to use iter
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-And also added Simon's Reported-by and Tested-by
+Tentatively merged into cifs-2.6.git for-next, pending testing
 
-On Thu, Feb 25, 2021 at 12:26 PM Steve French <smfrench@gmail.com> wrote:
+On Thu, Feb 4, 2021 at 12:49 AM Steve French <smfrench@gmail.com> wrote:
 >
-> added cc: stable # 5.11 and pushed into cifs-2.6 for-next
+> (Another patch to make conversion to new netfs interfaces easier)
 >
-> On Thu, Feb 25, 2021 at 1:36 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
-> >
-> > Passwords can contain ',' which are also used as the separator between
-> > mount options. Mount.cifs will escape all ',' characters as the string ",,".
-> > Update parsing of the mount options to detect ",," and treat it as a single
-> > 'c' character.
-> >
-> > Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
-> > Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > ---
-> >  fs/cifs/fs_context.c | 43 ++++++++++++++++++++++++++++++-------------
-> >  1 file changed, 30 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> > index 14c955a30006..892f51a21278 100644
-> > --- a/fs/cifs/fs_context.c
-> > +++ b/fs/cifs/fs_context.c
-> > @@ -544,20 +544,37 @@ static int smb3_fs_context_parse_monolithic(struct fs_context *fc,
-> >
-> >         /* BB Need to add support for sep= here TBD */
-> >         while ((key = strsep(&options, ",")) != NULL) {
-> > -               if (*key) {
-> > -                       size_t v_len = 0;
-> > -                       char *value = strchr(key, '=');
-> > -
-> > -                       if (value) {
-> > -                               if (value == key)
-> > -                                       continue;
-> > -                               *value++ = 0;
-> > -                               v_len = strlen(value);
-> > -                       }
-> > -                       ret = vfs_parse_fs_string(fc, key, value, v_len);
-> > -                       if (ret < 0)
-> > -                               break;
-> > +               size_t len;
-> > +               char *value;
-> > +
-> > +               if (*key == 0)
-> > +                       break;
-> > +
-> > +               /* Check if following character is the deliminator If yes,
-> > +                * we have encountered a double deliminator reset the NULL
-> > +                * character to the deliminator
-> > +                */
-> > +               while (options && options[0] == ',') {
-> > +                       len = strlen(key);
-> > +                       strcpy(key + len, options);
-> > +                       options = strchr(options, ',');
-> > +                       if (options)
-> > +                               *options++ = 0;
-> >                 }
-> > +
-> > +
-> > +               len = 0;
-> > +               value = strchr(key, '=');
-> > +               if (value) {
-> > +                       if (value == key)
-> > +                               continue;
-> > +                       *value++ = 0;
-> > +                       len = strlen(value);
-> > +               }
-> > +
-> > +               ret = vfs_parse_fs_string(fc, key, value, len);
-> > +               if (ret < 0)
-> > +                       break;
-> >         }
-> >
-> >         return ret;
-> > --
-> > 2.13.6
-> >
+> Optimize read_page_from_socket by using an iov_iter
+>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> ---
+>  fs/cifs/cifsglob.h  |  1 +
+>  fs/cifs/cifsproto.h |  3 +++
+>  fs/cifs/connect.c   | 16 ++++++++++++++++
+>  fs/cifs/file.c      |  3 +--
+>  4 files changed, 21 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> index 50fcb65920e8..73f80cc38316 100644
+> --- a/fs/cifs/cifsglob.h
+> +++ b/fs/cifs/cifsglob.h
+> @@ -1301,6 +1301,7 @@ struct cifs_readdata {
+>   int (*copy_into_pages)(struct TCP_Server_Info *server,
+>   struct cifs_readdata *rdata,
+>   struct iov_iter *iter);
+> + struct iov_iter iter;
+>   struct kvec iov[2];
+>   struct TCP_Server_Info *server;
+>  #ifdef CONFIG_CIFS_SMB_DIRECT
+> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> index 75ce6f742b8d..64eb5c817712 100644
+> --- a/fs/cifs/cifsproto.h
+> +++ b/fs/cifs/cifsproto.h
+> @@ -239,6 +239,9 @@ extern int cifs_read_page_from_socket(struct
+> TCP_Server_Info *server,
+>   unsigned int page_offset,
+>   unsigned int to_read);
+>  extern int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb);
+> +extern int cifs_read_iter_from_socket(struct TCP_Server_Info *server,
+> +       struct iov_iter *iter,
+> +       unsigned int to_read);
+>  extern int cifs_match_super(struct super_block *, void *);
+>  extern int cifs_mount(struct cifs_sb_info *cifs_sb, struct
+> smb3_fs_context *ctx);
+>  extern void cifs_umount(struct cifs_sb_info *);
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index 943f4eba027d..7c8db233fba4 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -585,6 +585,22 @@ cifs_read_page_from_socket(struct TCP_Server_Info
+> *server, struct page *page,
+>   return cifs_readv_from_socket(server, &smb_msg);
+>  }
+>
+> +int
+> +cifs_read_iter_from_socket(struct TCP_Server_Info *server, struct
+> iov_iter *iter,
+> +    unsigned int to_read)
+> +{
+> + struct msghdr smb_msg;
+> + int ret;
+> +
+> + smb_msg.msg_iter = *iter;
+> + if (smb_msg.msg_iter.count > to_read)
+> + smb_msg.msg_iter.count = to_read;
+> + ret = cifs_readv_from_socket(server, &smb_msg);
+> + if (ret > 0)
+> + iov_iter_advance(iter, ret);
+> + return ret;
+> +}
+> +
+>  static bool
+>  is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+>  {
+> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> index 6d001905c8e5..4b8c1ac58f00 100644
+> --- a/fs/cifs/file.c
+> +++ b/fs/cifs/file.c
+> @@ -4261,8 +4261,7 @@ readpages_fill_pages(struct TCP_Server_Info *server,
+>   result = n;
+>  #endif
+>   else
+> - result = cifs_read_page_from_socket(
+> - server, page, page_offset, n);
+> + result = cifs_read_iter_from_socket(server, &rdata->iter, n);
+>   if (result < 0)
+>   break;
 >
 >
 > --
