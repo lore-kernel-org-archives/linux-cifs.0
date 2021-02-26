@@ -2,123 +2,181 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD08DC433E0
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 00:35:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B341C433DB
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 02:25:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8853D60238
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 00:35:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AE4664ED3
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 02:25:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbhBZAfW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Feb 2021 19:35:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42568 "EHLO
+        id S230212AbhBZCZi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 Feb 2021 21:25:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbhBZAfV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Feb 2021 19:35:21 -0500
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B3CAC061574
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Feb 2021 16:34:41 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id w36so11354100lfu.4
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Feb 2021 16:34:41 -0800 (PST)
+        with ESMTP id S230170AbhBZCZh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Feb 2021 21:25:37 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D9DDC061788;
+        Thu, 25 Feb 2021 18:24:50 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id v5so11612717lft.13;
+        Thu, 25 Feb 2021 18:24:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=YDUjYyZVT51ov5dZf0ShD3ItPUSdb4knqQ6jDvrtbZ0=;
-        b=Fwy0ONFM1Q8XKpfXCezsqqF+4D6xsp+KjZdFYEttUax+6EFg8QCR+2F521SBl7jO37
-         rDVXke2v8W+YONXCyh+n9cVPr5IGZiTLAnB7x56+ZnjZOB5sC8A/g/HY9o3q8M5ZfJMz
-         jQ0TOnQHANsxr0yZ4W42lpV2hzwCJCG7EqPZlRfQpCGKeUTZl0Q3PHK7BH8e09xbjIds
-         HF21Uvpu+LkYJsxdPE4uw/a3P1S+Uy5W1KGiF9O7g9401xGMc8niYlCOdEOqS6hP8H98
-         RqUID8mh5wKPTc6WYSxiMDylnmeLvFlu5AOlPsIQ7dTP5P2DJ3KHArDcLnGepGINuDg+
-         xmhA==
+         :cc;
+        bh=ljsGvMwIzgHHd0f4Vzgd0s3wnQN5Zmki9Mycw1KyE20=;
+        b=M8Za0ABFDT0XGYATp0lJiKFBajA8W9X01tlfgzeutS/xet6dWy9ZED3yNAXjpddj48
+         nwsQVGIQKkz2CKB5eHrSySUbQr7Tq0hgAqWZt8v5THS46wN4MMjPC4EUSDS8cNk/7pZb
+         lCz3NQLmuQnc7iOVNBgt75Je9qw3qv/xGvmb1nLA745sHe590AngYuKbm7k93blFld/a
+         3/GidVSB+S2OiESceEcmyjNoHKvapH+MluaI/jV2Z0/n9+Pf5lzy8Ng+8yyu94FBqvWZ
+         5JFQSk9+HUhbrob7RdwwfejFVD6+y/vmHaby96ej+5EEmkh4icT14zyBSkDR6z+2faFN
+         eqnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=YDUjYyZVT51ov5dZf0ShD3ItPUSdb4knqQ6jDvrtbZ0=;
-        b=aBZsBVViSbdk1V4pe1WJEYugqtFgS8I2GvnBf85Fr4vChJPD88Vg/wk0jq/L8YOZTd
-         WLxeviKzV1QaErtdf3qO4eSzHzTqeBt/r+i6PKgcUSIAkois2VqN4Nf4OYXKfwjgj7hj
-         iFSWIL22CvrjI76E0IisCJngqkwcZUG/mKD5JY9f/vWImvV+LySdlgU1nZ6YiOhyVT7k
-         Tujq+j9gCobPphW4j35MwZwLBNzthm65+nh7e2xkZOVjo/SJ8lb74CgVQZ8CDR9nbZhF
-         xOjKI+KR+2njZUW/Ef4k/GodQPs96WIhZSNqmjSUR/aPqIVdbrmukivlo3Rmp+/gE0Dy
-         1GlQ==
-X-Gm-Message-State: AOAM533wTR3F02AUBCa9MuyMUbQ58Hd+oBOkhTgLmTFy7j8+W4CiY6Cb
-        4OcCxzBS/wstP5BnZLzTsek4lXOv0dq5qotFnyfeXqjBHA31Ng==
-X-Google-Smtp-Source: ABdhPJzK8AKASBRM4hyz/SjzOz2HflRB/xfR2NJak5TuzehWI8ePclHNMf89TQMSluPQ1RgxYZYMfX36LZZKHTs7AOU=
-X-Received: by 2002:a05:6512:31c1:: with SMTP id j1mr237231lfe.313.1614299679564;
- Thu, 25 Feb 2021 16:34:39 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=ljsGvMwIzgHHd0f4Vzgd0s3wnQN5Zmki9Mycw1KyE20=;
+        b=adnN5Ulla1YmNOaE+sszY8D83Sezxazuqzf3sAlV6ywvVxVN4rJht2h+iwWhbOLY8J
+         +y0EYikwcFIDqVUzZUhfM+Etl9XAKkStL5BiISEk5fKrNw4jFSZSEaYfSs0TmYYgf++M
+         8UaxBm3/eFrtAH6Vp6XmpprE+/rTcifso286Z/juFJA6T5ygSf3nGG5ogtrTiFfN5oM/
+         WrGWaHs+oNSaWOIU86inexmxt8ucMkWQvvIFyHiRl49ppjNXBu60F+kRcNrORnqnCSFi
+         qJLWxlAiDgO7O7w02FgXtm2+C+WByHZd1lu+wZ4owWotu/qSWAdSmMQOIZRJsLa2Q1BA
+         aDog==
+X-Gm-Message-State: AOAM532lBrXjog5neM4rdbSRZglOD9XS5rEn0fF8quoTd/AcG+nCe447
+        5r9QdwyKngiR435QjBjb20UjMMoJhXtsx40xxmdVtrebXeQ=
+X-Google-Smtp-Source: ABdhPJxPPfndalw1ojAYxxhgYD3sz9pNioMNLvRbzXokrKZA2qcfQB8IcPTdLsMsb/MmxgBIA4ZcG+YQkqO2liDr1Jk=
+X-Received: by 2002:a19:404f:: with SMTP id n76mr481236lfa.184.1614306288903;
+ Thu, 25 Feb 2021 18:24:48 -0800 (PST)
 MIME-Version: 1.0
-References: <1462a108-7130-b94c-cbd9-457c2cbdd504@totally.rip>
-In-Reply-To: <1462a108-7130-b94c-cbd9-457c2cbdd504@totally.rip>
+References: <CAH2r5mt+69AZFh_2OOd2JHLtqG9jo7=O7HF4bTGbSjhgi=M53g@mail.gmail.com>
+ <CAH2r5muBiaOZooFd0XgBuNUkifH1qA1RkdJy963=UHFLQXMwGA@mail.gmail.com>
+In-Reply-To: <CAH2r5muBiaOZooFd0XgBuNUkifH1qA1RkdJy963=UHFLQXMwGA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 25 Feb 2021 18:34:28 -0600
-Message-ID: <CAH2r5mu+GOOb8V6PvnDSa_wQnQMBWAgQk4ERsfYrevLngjoOxg@mail.gmail.com>
-Subject: Re: Passwords containg commas are no longer working in credential files
-To:     jkhsjdhjs <jkhsjdhjs@totally.rip>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+Date:   Thu, 25 Feb 2021 20:24:37 -0600
+Message-ID: <CAH2r5mu6yo=fFpWwE3JZ0PbcdvWPA+Y9t4bHnQgAk+LS20-AUg@mail.gmail.com>
+Subject: Re: [PATCH] cifs: convert readpages_fill_pages to use iter
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Yes - it has been reported and fixed (although not pushed upstream).
-I expect to send it upstream and cc: stable so it gets backported
-fairly quickly.
+It regressed when buildbot tests run on it (hundreds of signing error
+messages logged as well) - so backed this patch out of for-next
 
-See the email thread
-"[PATCH] cifs: fix handling of escaped ',' in the password mount argument"
+On Thu, Feb 25, 2021 at 12:44 PM Steve French <smfrench@gmail.com> wrote:
+>
+> Tentatively merged into cifs-2.6.git for-next, pending testing
+>
+> On Thu, Feb 4, 2021 at 12:49 AM Steve French <smfrench@gmail.com> wrote:
+> >
+> > (Another patch to make conversion to new netfs interfaces easier)
+> >
+> > Optimize read_page_from_socket by using an iov_iter
+> >
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > Signed-off-by: Steve French <stfrench@microsoft.com>
+> > ---
+> >  fs/cifs/cifsglob.h  |  1 +
+> >  fs/cifs/cifsproto.h |  3 +++
+> >  fs/cifs/connect.c   | 16 ++++++++++++++++
+> >  fs/cifs/file.c      |  3 +--
+> >  4 files changed, 21 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> > index 50fcb65920e8..73f80cc38316 100644
+> > --- a/fs/cifs/cifsglob.h
+> > +++ b/fs/cifs/cifsglob.h
+> > @@ -1301,6 +1301,7 @@ struct cifs_readdata {
+> >   int (*copy_into_pages)(struct TCP_Server_Info *server,
+> >   struct cifs_readdata *rdata,
+> >   struct iov_iter *iter);
+> > + struct iov_iter iter;
+> >   struct kvec iov[2];
+> >   struct TCP_Server_Info *server;
+> >  #ifdef CONFIG_CIFS_SMB_DIRECT
+> > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
+> > index 75ce6f742b8d..64eb5c817712 100644
+> > --- a/fs/cifs/cifsproto.h
+> > +++ b/fs/cifs/cifsproto.h
+> > @@ -239,6 +239,9 @@ extern int cifs_read_page_from_socket(struct
+> > TCP_Server_Info *server,
+> >   unsigned int page_offset,
+> >   unsigned int to_read);
+> >  extern int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb);
+> > +extern int cifs_read_iter_from_socket(struct TCP_Server_Info *server,
+> > +       struct iov_iter *iter,
+> > +       unsigned int to_read);
+> >  extern int cifs_match_super(struct super_block *, void *);
+> >  extern int cifs_mount(struct cifs_sb_info *cifs_sb, struct
+> > smb3_fs_context *ctx);
+> >  extern void cifs_umount(struct cifs_sb_info *);
+> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> > index 943f4eba027d..7c8db233fba4 100644
+> > --- a/fs/cifs/connect.c
+> > +++ b/fs/cifs/connect.c
+> > @@ -585,6 +585,22 @@ cifs_read_page_from_socket(struct TCP_Server_Info
+> > *server, struct page *page,
+> >   return cifs_readv_from_socket(server, &smb_msg);
+> >  }
+> >
+> > +int
+> > +cifs_read_iter_from_socket(struct TCP_Server_Info *server, struct
+> > iov_iter *iter,
+> > +    unsigned int to_read)
+> > +{
+> > + struct msghdr smb_msg;
+> > + int ret;
+> > +
+> > + smb_msg.msg_iter = *iter;
+> > + if (smb_msg.msg_iter.count > to_read)
+> > + smb_msg.msg_iter.count = to_read;
+> > + ret = cifs_readv_from_socket(server, &smb_msg);
+> > + if (ret > 0)
+> > + iov_iter_advance(iter, ret);
+> > + return ret;
+> > +}
+> > +
+> >  static bool
+> >  is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+> >  {
+> > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+> > index 6d001905c8e5..4b8c1ac58f00 100644
+> > --- a/fs/cifs/file.c
+> > +++ b/fs/cifs/file.c
+> > @@ -4261,8 +4261,7 @@ readpages_fill_pages(struct TCP_Server_Info *server,
+> >   result = n;
+> >  #endif
+> >   else
+> > - result = cifs_read_page_from_socket(
+> > - server, page, page_offset, n);
+> > + result = cifs_read_iter_from_socket(server, &rdata->iter, n);
+> >   if (result < 0)
+> >   break;
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-On Thu, Feb 25, 2021 at 6:09 PM jkhsjdhjs <jkhsjdhjs@totally.rip> wrote:
->
-> Hello,
->
-> I'm using a password containing commas to mount a remote cifs on my
-> computer. I recently upgraded the linux kernel on my system to 5.11,
-> which seems to contain a regression, making the comma a separator even
-> in the credential file.
->
-> I'm using `mount /path/to/mount` to mount the filesystem with the
-> following contained in `/etc/fstab`:
->
-> //domain.tld/share    /path/to/mount    cifs
-> noauto,credentials=3D/home/jkhsjdhjs/.credentials,uid=3Djkhsjdhjs,gid=3Dj=
-khsjdhjs,dir_mode=3D0755,file_mode=3D0644
-> 0 0
->
-> My credential file looks like this:
->
-> user=3Dmyusername
-> pass=3Dabc,def
-> domain=3Dmydomain
->
-> With Linux 5.11 or 5.11.1 the following is printed to `dmesg` when
-> trying to mount the filesystem: `[ 3051.668834] cifs: Unknown parameter
-> 'def'`. This worked fine with 5.10.16 and below, the man page also says
-> this should work:
->
-> Note that a password which contains the delimiter character (i.e. a
-> comma ',') will fail to be parsed correctly on the command line.
-> However, the same password defined in the PASSWD environment variable or
-> via a credentials file (see below) or entered at the password prompt
-> will be read correctly.
->
-> Thus it seems there has been a regression in 5.11. I tried to identifiy
-> the commit that caused this regression, but wasn't able to. I also
-> checked if this bug is already known by searching lkml.org and didn't
-> find anything. Sorry if I missed something.
->
-> Best Regards,
->
-> Leon M=C3=B6ller
->
 
 
---=20
+-- 
 Thanks,
 
 Steve
