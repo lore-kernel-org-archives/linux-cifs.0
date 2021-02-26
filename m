@@ -2,179 +2,168 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B341C433DB
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 02:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A97C433E0
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 06:25:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AE4664ED3
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 02:25:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EC9C64E02
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 06:25:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230212AbhBZCZi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Feb 2021 21:25:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37874 "EHLO
+        id S229526AbhBZGZJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 Feb 2021 01:25:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230170AbhBZCZh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Feb 2021 21:25:37 -0500
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D9DDC061788;
-        Thu, 25 Feb 2021 18:24:50 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id v5so11612717lft.13;
-        Thu, 25 Feb 2021 18:24:50 -0800 (PST)
+        with ESMTP id S229498AbhBZGZI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 26 Feb 2021 01:25:08 -0500
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4EAEC061574;
+        Thu, 25 Feb 2021 22:24:27 -0800 (PST)
+Received: by mail-lj1-x22e.google.com with SMTP id k12so335900ljg.9;
+        Thu, 25 Feb 2021 22:24:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ljsGvMwIzgHHd0f4Vzgd0s3wnQN5Zmki9Mycw1KyE20=;
-        b=M8Za0ABFDT0XGYATp0lJiKFBajA8W9X01tlfgzeutS/xet6dWy9ZED3yNAXjpddj48
-         nwsQVGIQKkz2CKB5eHrSySUbQr7Tq0hgAqWZt8v5THS46wN4MMjPC4EUSDS8cNk/7pZb
-         lCz3NQLmuQnc7iOVNBgt75Je9qw3qv/xGvmb1nLA745sHe590AngYuKbm7k93blFld/a
-         3/GidVSB+S2OiESceEcmyjNoHKvapH+MluaI/jV2Z0/n9+Pf5lzy8Ng+8yyu94FBqvWZ
-         5JFQSk9+HUhbrob7RdwwfejFVD6+y/vmHaby96ej+5EEmkh4icT14zyBSkDR6z+2faFN
-         eqnQ==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=60b0NKkE4IS8WeqdaHkGZTCzE12kooB885932AJOIEs=;
+        b=e0HslaQ/AwybaSkuUGc4MCNSabaipnTeaWgkptSLNoI23I/B02uWKSUlGXQtnmHVr4
+         LWl/I6mB2KtL+Ko1akrg88baTFREWLbJ7AQD4963YFVeN/1ClIL5GACxw6nvKHEc7yz9
+         unAEPOGbXx7w97yOTUzJ8ef2WMjvzLtlmmgiIj7R1H9B9AUjYhJhhykxNthf8CM4RdKZ
+         uWR5E0Hn39JlGBRbkuVU1TKjAoFYBDdYIpFRpBZSePOORNyi5/85ZsWsdGfbYCT+5Ajg
+         /v1cfycqGeSTTzlyxXDG+cnoUoL2oQ4RWfuJbnvn68KOlES552MC9AZOM8Yp44Cd6hmz
+         FhHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ljsGvMwIzgHHd0f4Vzgd0s3wnQN5Zmki9Mycw1KyE20=;
-        b=adnN5Ulla1YmNOaE+sszY8D83Sezxazuqzf3sAlV6ywvVxVN4rJht2h+iwWhbOLY8J
-         +y0EYikwcFIDqVUzZUhfM+Etl9XAKkStL5BiISEk5fKrNw4jFSZSEaYfSs0TmYYgf++M
-         8UaxBm3/eFrtAH6Vp6XmpprE+/rTcifso286Z/juFJA6T5ygSf3nGG5ogtrTiFfN5oM/
-         WrGWaHs+oNSaWOIU86inexmxt8ucMkWQvvIFyHiRl49ppjNXBu60F+kRcNrORnqnCSFi
-         qJLWxlAiDgO7O7w02FgXtm2+C+WByHZd1lu+wZ4owWotu/qSWAdSmMQOIZRJsLa2Q1BA
-         aDog==
-X-Gm-Message-State: AOAM532lBrXjog5neM4rdbSRZglOD9XS5rEn0fF8quoTd/AcG+nCe447
-        5r9QdwyKngiR435QjBjb20UjMMoJhXtsx40xxmdVtrebXeQ=
-X-Google-Smtp-Source: ABdhPJxPPfndalw1ojAYxxhgYD3sz9pNioMNLvRbzXokrKZA2qcfQB8IcPTdLsMsb/MmxgBIA4ZcG+YQkqO2liDr1Jk=
-X-Received: by 2002:a19:404f:: with SMTP id n76mr481236lfa.184.1614306288903;
- Thu, 25 Feb 2021 18:24:48 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=60b0NKkE4IS8WeqdaHkGZTCzE12kooB885932AJOIEs=;
+        b=lUiREfqWi2pxCDKIhm0bHjGVh5m7YfldWEgyEwE/6gXGxpAU29/orCYkTBTn4BP7oH
+         fPduqJwlFVoTugP/97ZciUaprpL2BI9KStqMpHbE09jZF2QsmwAl260lcgq8QtsLvDqs
+         ZJx3N3IKgKZnd8J72lSyQXlVXgmA+3MPzw0CWw503aGcc/iOKHAC5ucoSxVJ7neWuzS0
+         vJn7Wj5ol+SFdt9saS1O3oFw31L3dJBjCWQV3GCteRVKrZLoZysogp2+FwYYEysF7NN3
+         6gKB5//nMZ06FSK0NSlrQWfr/Nb74Qk1A2XLu4WUhiAPEDxN8Z96n3B5k/Bp3ESkgpbE
+         6TRw==
+X-Gm-Message-State: AOAM531keOnM513YrIEvFI8YDyFj1XbKkaCrvRmp1NYbWHsjTZX9WnPJ
+        bsEeycVREIJEI4rpVg295Q0jJDVSGTdwg1XZCqitko/Cacg8Hw==
+X-Google-Smtp-Source: ABdhPJwVaa3LlpORKZNkzn5nWVM2AUd3+dpl+2M9SnGBqMSL1kCpT7MHNsEwt4+VcUNI36PLLQcCVl3bwYG4sFETseQ=
+X-Received: by 2002:a05:651c:548:: with SMTP id q8mr803473ljp.256.1614320665499;
+ Thu, 25 Feb 2021 22:24:25 -0800 (PST)
 MIME-Version: 1.0
-References: <CAH2r5mt+69AZFh_2OOd2JHLtqG9jo7=O7HF4bTGbSjhgi=M53g@mail.gmail.com>
- <CAH2r5muBiaOZooFd0XgBuNUkifH1qA1RkdJy963=UHFLQXMwGA@mail.gmail.com>
-In-Reply-To: <CAH2r5muBiaOZooFd0XgBuNUkifH1qA1RkdJy963=UHFLQXMwGA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 25 Feb 2021 20:24:37 -0600
-Message-ID: <CAH2r5mu6yo=fFpWwE3JZ0PbcdvWPA+Y9t4bHnQgAk+LS20-AUg@mail.gmail.com>
-Subject: Re: [PATCH] cifs: convert readpages_fill_pages to use iter
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
+Date:   Fri, 26 Feb 2021 00:24:14 -0600
+Message-ID: <CAH2r5mudreWgQdGQPSn++0H6zzY-3fcCZvxga7PcNqt4EDWo9Q@mail.gmail.com>
+Subject: [GIT PULL] CIFS/SMB3 Fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-It regressed when buildbot tests run on it (hundreds of signing error
-messages logged as well) - so backed this patch out of for-next
+Please pull the following changes since commit
+f40ddce88593482919761f74910f42f4b84c004b:
 
-On Thu, Feb 25, 2021 at 12:44 PM Steve French <smfrench@gmail.com> wrote:
->
-> Tentatively merged into cifs-2.6.git for-next, pending testing
->
-> On Thu, Feb 4, 2021 at 12:49 AM Steve French <smfrench@gmail.com> wrote:
-> >
-> > (Another patch to make conversion to new netfs interfaces easier)
-> >
-> > Optimize read_page_from_socket by using an iov_iter
-> >
-> > Signed-off-by: David Howells <dhowells@redhat.com>
-> > Signed-off-by: Steve French <stfrench@microsoft.com>
-> > ---
-> >  fs/cifs/cifsglob.h  |  1 +
-> >  fs/cifs/cifsproto.h |  3 +++
-> >  fs/cifs/connect.c   | 16 ++++++++++++++++
-> >  fs/cifs/file.c      |  3 +--
-> >  4 files changed, 21 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> > index 50fcb65920e8..73f80cc38316 100644
-> > --- a/fs/cifs/cifsglob.h
-> > +++ b/fs/cifs/cifsglob.h
-> > @@ -1301,6 +1301,7 @@ struct cifs_readdata {
-> >   int (*copy_into_pages)(struct TCP_Server_Info *server,
-> >   struct cifs_readdata *rdata,
-> >   struct iov_iter *iter);
-> > + struct iov_iter iter;
-> >   struct kvec iov[2];
-> >   struct TCP_Server_Info *server;
-> >  #ifdef CONFIG_CIFS_SMB_DIRECT
-> > diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> > index 75ce6f742b8d..64eb5c817712 100644
-> > --- a/fs/cifs/cifsproto.h
-> > +++ b/fs/cifs/cifsproto.h
-> > @@ -239,6 +239,9 @@ extern int cifs_read_page_from_socket(struct
-> > TCP_Server_Info *server,
-> >   unsigned int page_offset,
-> >   unsigned int to_read);
-> >  extern int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb);
-> > +extern int cifs_read_iter_from_socket(struct TCP_Server_Info *server,
-> > +       struct iov_iter *iter,
-> > +       unsigned int to_read);
-> >  extern int cifs_match_super(struct super_block *, void *);
-> >  extern int cifs_mount(struct cifs_sb_info *cifs_sb, struct
-> > smb3_fs_context *ctx);
-> >  extern void cifs_umount(struct cifs_sb_info *);
-> > diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> > index 943f4eba027d..7c8db233fba4 100644
-> > --- a/fs/cifs/connect.c
-> > +++ b/fs/cifs/connect.c
-> > @@ -585,6 +585,22 @@ cifs_read_page_from_socket(struct TCP_Server_Info
-> > *server, struct page *page,
-> >   return cifs_readv_from_socket(server, &smb_msg);
-> >  }
-> >
-> > +int
-> > +cifs_read_iter_from_socket(struct TCP_Server_Info *server, struct
-> > iov_iter *iter,
-> > +    unsigned int to_read)
-> > +{
-> > + struct msghdr smb_msg;
-> > + int ret;
-> > +
-> > + smb_msg.msg_iter = *iter;
-> > + if (smb_msg.msg_iter.count > to_read)
-> > + smb_msg.msg_iter.count = to_read;
-> > + ret = cifs_readv_from_socket(server, &smb_msg);
-> > + if (ret > 0)
-> > + iov_iter_advance(iter, ret);
-> > + return ret;
-> > +}
-> > +
-> >  static bool
-> >  is_smb_response(struct TCP_Server_Info *server, unsigned char type)
-> >  {
-> > diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> > index 6d001905c8e5..4b8c1ac58f00 100644
-> > --- a/fs/cifs/file.c
-> > +++ b/fs/cifs/file.c
-> > @@ -4261,8 +4261,7 @@ readpages_fill_pages(struct TCP_Server_Info *server,
-> >   result = n;
-> >  #endif
-> >   else
-> > - result = cifs_read_page_from_socket(
-> > - server, page, page_offset, n);
-> > + result = cifs_read_iter_from_socket(server, &rdata->iter, n);
-> >   if (result < 0)
-> >   break;
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
+  Linux 5.11 (2021-02-14 14:32:24 -0800)
 
+are available in the Git repository at:
 
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.12-smb3-part1
+
+for you to fetch changes up to 8369dfd7841e70711c53a065ffb8029f24520200:
+
+  cifs: update internal version number (2021-02-25 19:08:11 -0600)
+
+----------------------------------------------------------------
+cifs/smb3 fixes:
+    - improvements to mode bit conversion, chmod and chown when using
+cifsacl mount option
+     - two new mount options for controlling attribute caching
+     - improvements to crediting and reconnect, improved debugging
+     - reconnect fix
+     - add SMB3.1.1 dialect to default dialects for vers=3
+
+Still working on a security fix and some multichannel fixes which are
+not included in this pull request
+
+Test results: http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/513
+----------------------------------------------------------------
+David Howells (1):
+      cifs: use discard iterator to discard unneeded network data more
+efficiently
+
+Paulo Alcantara (4):
+      cifs: fix nodfs mount option
+      cifs: fix DFS failover
+      cifs: check all path components in resolved dfs target
+      cifs: introduce helper for finding referral server to improve
+DFS target resolution
+
+Rohith Surabattula (1):
+      TCON Reconnect during STATUS_NETWORK_NAME_DELETED
+
+Ronnie Sahlberg (1):
+      cifs: fix handling of escaped ',' in the password mount argument
+
+Shyam Prasad N (8):
+      cifs: New optype for session operations.
+      cifs: Fix in error types returned for out-of-credit situations.
+      cifs: Identify a connection by a conn_id.
+      cifs: Reformat DebugData and index connections by conn_id.
+      cifs: Fix cifsacl ACE mask for group and others.
+      cifs: Retain old ACEs when converting between mode bits and ACL.
+      cifs: Change SIDs in ACEs while transferring file ownership.
+      cifs: If a corrupted DACL is returned by the server, bail out.
+
+Steve French (11):
+      smb3: negotiate current dialect (SMB3.1.1) when version 3 or
+greater requested
+      cifs: fix trivial typo
+      cifs: documentation cleanup
+      cifs: change confusing field serverName (to ip_addr)
+      cifs: clarify hostname vs ip address in /proc/fs/cifs/DebugData
+      cifs: cleanup a few le16 vs. le32 uses in cifsacl.c
+      cifs: minor simplification to smb2_is_network_name_deleted
+      cifs: Add new mount parameter "acdirmax" to allow caching
+directory metadata
+      cifs: convert revalidate of directories to using directory
+metadata cache timeout
+      cifs: Add new parameter "acregmax" for distinct file and
+directory metadata timeout
+      cifs: update internal version number
+
+YueHaibing (1):
+      cifs: Fix inconsistent IS_ERR and PTR_ERR
+
+ Documentation/admin-guide/cifs/authors.rst      |   6 +-
+ Documentation/admin-guide/cifs/changes.rst      |   5 +-
+ Documentation/admin-guide/cifs/introduction.rst |  30 +-
+ Documentation/admin-guide/cifs/todo.rst         |  34 ++-
+ Documentation/admin-guide/cifs/usage.rst        |   2 +-
+ fs/cifs/cifs_debug.c                            | 121 ++++----
+ fs/cifs/cifs_swn.c                              |   2 +-
+ fs/cifs/cifsacl.c                               | 379 +++++++++++++++++++-----
+ fs/cifs/cifsacl.h                               |   4 +-
+ fs/cifs/cifsencrypt.c                           |   6 +-
+ fs/cifs/cifsfs.c                                |  15 +-
+ fs/cifs/cifsfs.h                                |   2 +-
+ fs/cifs/cifsglob.h                              |  11 +-
+ fs/cifs/cifsproto.h                             |   2 +
+ fs/cifs/cifssmb.c                               |   6 +-
+ fs/cifs/connect.c                               | 301 ++++++++++---------
+ fs/cifs/dfs_cache.c                             |  33 ++-
+ fs/cifs/file.c                                  |   2 +-
+ fs/cifs/fs_context.c                            |  75 +++--
+ fs/cifs/fs_context.h                            |   6 +-
+ fs/cifs/inode.c                                 |  23 +-
+ fs/cifs/sess.c                                  |   2 +-
+ fs/cifs/smb2ops.c                               | 109 +++++--
+ fs/cifs/smb2pdu.c                               |  22 +-
+ fs/cifs/trace.h                                 |  36 ++-
+ fs/cifs/transport.c                             |  63 ++--
+ 26 files changed, 883 insertions(+), 414 deletions(-)
 
 -- 
 Thanks,
