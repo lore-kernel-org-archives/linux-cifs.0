@@ -2,299 +2,97 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3FE2C433DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 21:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC4DC433DB
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 00:09:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADF3F64E4D
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Feb 2021 21:05:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C8A864F22
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Feb 2021 00:09:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234355AbhBYVEy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Feb 2021 16:04:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53342 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbhBYVCE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Feb 2021 16:02:04 -0500
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00923C061793;
-        Thu, 25 Feb 2021 13:01:22 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id j19so10602562lfr.12;
-        Thu, 25 Feb 2021 13:01:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+y7M2YdyWOJwNcoE/npVoO4W5SDgapwq18dZ8K3CKP0=;
-        b=RiKI/IfshKwphaZLtuhrm+RlwKbjh+3trklZUJz9KRrUUjFbC0iHs0Rogy1kyl5Hfn
-         vOZEst4CoAEBz4+jZWOeYLvgXtLTKKqT42E7HDg+pNp5gEYVQN9oj/Tbmu1V27fLRCUn
-         sE7X0Fc8xMYoAMdBmEwP7E0RbHa2IIQ1VXUJCG3GcfbiGuOH5ZS0jkKH7cESV/HRU73q
-         v0DpEAq3MXBkkyiWhv0jRs8YD8Yzi/2hX8FR2QK9kcURJ0rYMcO1IOQ/lKbXlvUQHlo4
-         ltmfLxhQDQ+8yE087jlq+G2e0pHyclXwcteoY+Vhij2RCwxnp/l5VYegyudk0a5nRf1l
-         UIiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+y7M2YdyWOJwNcoE/npVoO4W5SDgapwq18dZ8K3CKP0=;
-        b=MSIUV4TTaLmXXuJEcNKyJfoQxQJTkqtXcgdusGFRiUAVIMT0a4lxs2vTH4L4jb0CJk
-         AwZ4AaIrh1sGhnf+trau5nSR3FAOKz5IPW7yfcF0lcA1RBefqA6cZUns9IsXaXEeHwKr
-         CUOlMdBcPaehnBg1Ytf2vy5W6ZzFES2tRtul3+K9uZlF8TQAwBrEL/UYEF73rIP4K++B
-         VGQ+AqCvct6YTYDHl+VebhRPeR0wG5RAYWp4PW29LC1E1/H+9EZNnXwXqXNUgyoQ+FtB
-         EmspWHuRPSIGt0M72Rxi/J0mDU7H5aQJLUupf5J3yDtGRf+qNZkfbXYADDmBPyslZCpe
-         fg9A==
-X-Gm-Message-State: AOAM532KsdFx5LGNM1OAzNx3/CJpY7z7V6de2UWjmS5k09v8MCo+UO/6
-        UGXmCrwbQUYz/5A6/rM4AeFoxV+//2DPNpr4VJE=
-X-Google-Smtp-Source: ABdhPJzYk2lOmOcNHokbTUVgIcxBi3pT1kPVMOrhu8tZVpMtyksO66kA/tcixL07fo+z9+MWm5zufgNdypTrn3iHMBw=
-X-Received: by 2002:a19:404f:: with SMTP id n76mr3021876lfa.184.1614286881305;
- Thu, 25 Feb 2021 13:01:21 -0800 (PST)
+        id S230100AbhBZAIu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 Feb 2021 19:08:50 -0500
+Received: from srv.fail ([135.181.244.181]:40602 "EHLO srv.fail"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230040AbhBZAIt (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 25 Feb 2021 19:08:49 -0500
+X-Greylist: delayed 366 seconds by postgrey-1.27 at vger.kernel.org; Thu, 25 Feb 2021 19:08:48 EST
+Received: from localhost (localhost [127.0.0.1])
+        by srv.fail (Postfix) with ESMTP id C7038152C449
+        for <linux-cifs@vger.kernel.org>; Fri, 26 Feb 2021 01:01:58 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at srv.fail
+Received: from srv.fail ([127.0.0.1])
+        by localhost (srv.fail [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id 1o5-38QQCuym for <linux-cifs@vger.kernel.org>;
+        Fri, 26 Feb 2021 01:01:57 +0100 (CET)
+Received: from [IPv6:2a02:908:1086:27c0::84a] (unknown [IPv6:2a02:908:1086:27c0::84a])
+        by srv.fail (Postfix) with ESMTPSA id 0A6F8152E598
+        for <linux-cifs@vger.kernel.org>; Fri, 26 Feb 2021 01:01:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=totally.rip;
+        s=default; t=1614297717;
+        bh=z9elikXXwNmGwQ2PPTrg5UNxko/8U6ug0xb8G5sb+E0=;
+        h=To:From:Subject:Date:From;
+        b=mxqdU/p4o6F6j5qjvSiTf4V7g72DmWoIOKdzEdG/NhJR78yDztS/kJ1+jAdI1PkQr
+         dAeIdt+AerjK/qQN8jW1yHPCbJb7mxxagQoDSwf39TEdUL9Fr3yIhNp3arGVhFmOWV
+         6S20qpkhEN8nC4lss2bhl+4avw2sNQPDsxWPcrkoW1lrxFWenZdu9M7K6uxVAwunH6
+         DyzzYTr2QBjq8TJxwTIky4wvm62r7/NlGS1O65tr5rWDjBjLH0OBX+g3/W8wX5MQ3h
+         tqr512anM6YyW7jYEFWxcr+g2oktYJ5MupwdeOzsgCYksykGVtZn4EHw4XMd4nyH6y
+         kRjqUVMu1JclA==
+To:     linux-cifs@vger.kernel.org
+From:   jkhsjdhjs <jkhsjdhjs@totally.rip>
+Subject: Passwords containg commas are no longer working in credential files
+Message-ID: <1462a108-7130-b94c-cbd9-457c2cbdd504@totally.rip>
+Date:   Fri, 26 Feb 2021 01:01:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-References: <CAH2r5ms9dJ3RW=_+c0HApLyUC=LD5ACp_nhE2jJQuS-121kV=w@mail.gmail.com>
- <87eehwnn2c.fsf@suse.com> <CAH2r5muuEj_ZpbZ+yAGfnG-JPRP0mAzaBNVYhw7SnbReT8B1DA@mail.gmail.com>
- <CAH2r5muV02_MT_641_OGB8gWdxZk4Och=2Mv-768MR36o8ukfA@mail.gmail.com>
-In-Reply-To: <CAH2r5muV02_MT_641_OGB8gWdxZk4Och=2Mv-768MR36o8ukfA@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 25 Feb 2021 15:01:10 -0600
-Message-ID: <CAH2r5mu7kYdLG3P39x1oRoqp6wbbCrBWR9MgT4FdPwAnacZH+Q@mail.gmail.com>
-Subject: Re: [PATCH] cifs: use discard iterator to discard unneeded network
- data more efficiently
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
-Content-Type: multipart/mixed; boundary="0000000000002071fe05bc2f7477"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000002071fe05bc2f7477
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-Had a typo in the previous attachment - reattached
+I'm using a password containing commas to mount a remote cifs on my 
+computer. I recently upgraded the linux kernel on my system to 5.11, 
+which seems to contain a regression, making the comma a separator even 
+in the credential file.
 
-The iterator, ITER_DISCARD, that can only be used in READ mode and
-just discards any data copied to it, was added to allow a network
-filesystem to discard any unwanted data sent by a server.
-Convert cifs_discard_from_socket() to use this.
+I'm using `mount /path/to/mount` to mount the filesystem with the 
+following contained in `/etc/fstab`:
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/cifs/cifsproto.h |  2 ++
- fs/cifs/cifssmb.c   |  6 +++---
- fs/cifs/connect.c   | 17 +++++++++++++++++
- 3 files changed, 22 insertions(+), 3 deletions(-)
+//domain.tld/share    /path/to/mount    cifs 
+noauto,credentials=/home/jkhsjdhjs/.credentials,uid=jkhsjdhjs,gid=jkhsjdhjs,dir_mode=0755,file_mode=0644 
+0 0
 
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index d4b2cc7e6b1e..64eb5c817712 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -232,6 +232,8 @@ extern unsigned int
-setup_special_user_owner_ACE(struct cifs_ace *pace);
- extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
- extern int cifs_read_from_socket(struct TCP_Server_Info *server, char *buf=
-,
-           unsigned int to_read);
-+extern ssize_t cifs_discard_from_socket(struct TCP_Server_Info *server,
-+ size_t to_read);
- extern int cifs_read_page_from_socket(struct TCP_Server_Info *server,
-  struct page *page,
-  unsigned int page_offset,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 0496934feecb..c279527aae92 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -1451,9 +1451,9 @@ cifs_discard_remaining_data(struct
-TCP_Server_Info *server)
-  while (remaining > 0) {
-  int length;
+My credential file looks like this:
 
-- length =3D cifs_read_from_socket(server, server->bigbuf,
-- min_t(unsigned int, remaining,
--     CIFSMaxBufSize + MAX_HEADER_SIZE(server)));
-+ length =3D cifs_discard_from_socket(server,
-+ min_t(size_t, remaining,
-+       CIFSMaxBufSize + MAX_HEADER_SIZE(server)));
-  if (length < 0)
-  return length;
-  server->total_read +=3D length;
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 55b1ec731d52..b9085625334e 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -564,6 +564,23 @@ cifs_read_from_socket(struct TCP_Server_Info
-*server, char *buf,
-  return cifs_readv_from_socket(server, &smb_msg);
- }
+user=myusername
+pass=abc,def
+domain=mydomain
 
-+ssize_t
-+cifs_discard_from_socket(struct TCP_Server_Info *server, size_t to_read)
-+{
-+ struct msghdr smb_msg;
-+
-+ /*
-+ *  iov_iter_discard already sets smb_msg.type and count and iov_offset
-+ *  and cifs_readv_from_socket sets msg_control and msg_controllen
-+ *  so little to initialize in struct msghdr
-+ */
-+ smb_msg.msg_name =3D NULL;
-+ smb_msg.msg_namelen =3D 0;
-+ iov_iter_discard(&smb_msg.msg_iter, READ, to_read);
-+
-+ return cifs_readv_from_socket(server, &smb_msg);
-+}
-+
- int
- cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *pa=
-ge,
-  unsigned int page_offset, unsigned int to_read)
+With Linux 5.11 or 5.11.1 the following is printed to `dmesg` when 
+trying to mount the filesystem: `[ 3051.668834] cifs: Unknown parameter 
+'def'`. This worked fine with 5.10.16 and below, the man page also says 
+this should work:
 
-On Thu, Feb 25, 2021 at 1:43 PM Steve French <smfrench@gmail.com> wrote:
->
-> lightly updated patch
->
->
-> On Thu, Feb 25, 2021 at 1:29 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > The other two routines initialize in iov_iter_bvec
-> >
-> > iov->type
-> > iov->bvec
-> > iov->offset
-> > iov->count
-> >
-> > but iov_iter_discard already does the initialization:
-> > iov_type
-> > iov_offset
-> > iov_count
-> >
-> > and then we call cifs_readv_from_socket in all 3
-> > which sets:
-> >     iov->msg_control =3D NULL
-> >     iov->msg_controllen =3D NULL
-> >
-> > I will set the two additional ones to null
-> >     iov->msg_name
-> > and
-> >     iov->msg_namelen
-> >
-> >
-> >
-> > On Thu, Feb 4, 2021 at 4:29 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wr=
-ote:
-> > >
-> > > Steve French <smfrench@gmail.com> writes:
-> > > > +ssize_t
-> > > > +cifs_discard_from_socket(struct TCP_Server_Info *server, size_t to=
-_read)
-> > > > +{
-> > > > +     struct msghdr smb_msg;
-> > > > +
-> > > > +     iov_iter_discard(&smb_msg.msg_iter, READ, to_read);
-> > > > +
-> > > > +     return cifs_readv_from_socket(server, &smb_msg);
-> > > > +}
-> > > > +
-> > >
-> > > Shouldn't smb_msg be initialized to zeroes? Looking around this needs=
- to
-> > > be done for cifs_read_from_socket() and cifs_read_page_from_socket() =
-too.
-> > >
-> > > Cheers,
-> > > --
-> > > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> > > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> > > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnb=
-erg, DE
-> > > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
-=C3=BCnchen)
-> > >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
+Note that a password which contains the delimiter character (i.e. a 
+comma ',') will fail to be parsed correctly on the command line. 
+However, the same password defined in the PASSWD environment variable or 
+via a credentials file (see below) or entered at the password prompt 
+will be read correctly.
 
+Thus it seems there has been a regression in 5.11. I tried to identifiy 
+the commit that caused this regression, but wasn't able to. I also 
+checked if this bug is already known by searching lkml.org and didn't 
+find anything. Sorry if I missed something.
 
+Best Regards,
 
---=20
-Thanks,
+Leon Möller
 
-Steve
-
---0000000000002071fe05bc2f7477
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-use-discard-iterator-to-discard-unneeded-networ.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-use-discard-iterator-to-discard-unneeded-networ.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kllcph710>
-X-Attachment-Id: f_kllcph710
-
-RnJvbSAxYjBiZGI1ZTZjOWM4ODQ2YWI0YTU0ODA5M2EzMjMxMWFlOWQwMDM3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPgpE
-YXRlOiBUaHUsIDQgRmViIDIwMjEgMDA6MTU6MjEgLTA2MDAKU3ViamVjdDogW1BBVENIIDEvMl0g
-Y2lmczogdXNlIGRpc2NhcmQgaXRlcmF0b3IgdG8gZGlzY2FyZCB1bm5lZWRlZCBuZXR3b3JrCiBk
-YXRhIG1vcmUgZWZmaWNpZW50bHkKClRoZSBpdGVyYXRvciwgSVRFUl9ESVNDQVJELCB0aGF0IGNh
-biBvbmx5IGJlIHVzZWQgaW4gUkVBRCBtb2RlIGFuZApqdXN0IGRpc2NhcmRzIGFueSBkYXRhIGNv
-cGllZCB0byBpdCwgd2FzIGFkZGVkIHRvIGFsbG93IGEgbmV0d29yawpmaWxlc3lzdGVtIHRvIGRp
-c2NhcmQgYW55IHVud2FudGVkIGRhdGEgc2VudCBieSBhIHNlcnZlci4KQ29udmVydCBjaWZzX2Rp
-c2NhcmRfZnJvbV9zb2NrZXQoKSB0byB1c2UgdGhpcy4KClNpZ25lZC1vZmYtYnk6IERhdmlkIEhv
-d2VsbHMgPGRob3dlbGxzQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8
-c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNwcm90by5oIHwgIDIgKysK
-IGZzL2NpZnMvY2lmc3NtYi5jICAgfCAgNiArKystLS0KIGZzL2NpZnMvY29ubmVjdC5jICAgfCAx
-NyArKysrKysrKysrKysrKysrKwogMyBmaWxlcyBjaGFuZ2VkLCAyMiBpbnNlcnRpb25zKCspLCAz
-IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3Byb3RvLmggYi9mcy9jaWZz
-L2NpZnNwcm90by5oCmluZGV4IGQ0YjJjYzdlNmIxZS4uNjRlYjVjODE3NzEyIDEwMDY0NAotLS0g
-YS9mcy9jaWZzL2NpZnNwcm90by5oCisrKyBiL2ZzL2NpZnMvY2lmc3Byb3RvLmgKQEAgLTIzMiw2
-ICsyMzIsOCBAQCBleHRlcm4gdW5zaWduZWQgaW50IHNldHVwX3NwZWNpYWxfdXNlcl9vd25lcl9B
-Q0Uoc3RydWN0IGNpZnNfYWNlICpwYWNlKTsKIGV4dGVybiB2b2lkIGRlcXVldWVfbWlkKHN0cnVj
-dCBtaWRfcV9lbnRyeSAqbWlkLCBib29sIG1hbGZvcm1lZCk7CiBleHRlcm4gaW50IGNpZnNfcmVh
-ZF9mcm9tX3NvY2tldChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsIGNoYXIgKmJ1ZiwK
-IAkJCSAgICAgICAgIHVuc2lnbmVkIGludCB0b19yZWFkKTsKK2V4dGVybiBzc2l6ZV90IGNpZnNf
-ZGlzY2FyZF9mcm9tX3NvY2tldChzdHJ1Y3QgVENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIsCisJCQkJ
-CXNpemVfdCB0b19yZWFkKTsKIGV4dGVybiBpbnQgY2lmc19yZWFkX3BhZ2VfZnJvbV9zb2NrZXQo
-c3RydWN0IFRDUF9TZXJ2ZXJfSW5mbyAqc2VydmVyLAogCQkJCQlzdHJ1Y3QgcGFnZSAqcGFnZSwK
-IAkJCQkJdW5zaWduZWQgaW50IHBhZ2Vfb2Zmc2V0LApkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZz
-c21iLmMgYi9mcy9jaWZzL2NpZnNzbWIuYwppbmRleCAwNDk2OTM0ZmVlY2IuLmMyNzk1MjdhYWU5
-MiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZzc21iLmMKKysrIGIvZnMvY2lmcy9jaWZzc21iLmMK
-QEAgLTE0NTEsOSArMTQ1MSw5IEBAIGNpZnNfZGlzY2FyZF9yZW1haW5pbmdfZGF0YShzdHJ1Y3Qg
-VENQX1NlcnZlcl9JbmZvICpzZXJ2ZXIpCiAJd2hpbGUgKHJlbWFpbmluZyA+IDApIHsKIAkJaW50
-IGxlbmd0aDsKIAotCQlsZW5ndGggPSBjaWZzX3JlYWRfZnJvbV9zb2NrZXQoc2VydmVyLCBzZXJ2
-ZXItPmJpZ2J1ZiwKLQkJCQltaW5fdCh1bnNpZ25lZCBpbnQsIHJlbWFpbmluZywKLQkJCQkgICAg
-Q0lGU01heEJ1ZlNpemUgKyBNQVhfSEVBREVSX1NJWkUoc2VydmVyKSkpOworCQlsZW5ndGggPSBj
-aWZzX2Rpc2NhcmRfZnJvbV9zb2NrZXQoc2VydmVyLAorCQkJCW1pbl90KHNpemVfdCwgcmVtYWlu
-aW5nLAorCQkJCSAgICAgIENJRlNNYXhCdWZTaXplICsgTUFYX0hFQURFUl9TSVpFKHNlcnZlcikp
-KTsKIAkJaWYgKGxlbmd0aCA8IDApCiAJCQlyZXR1cm4gbGVuZ3RoOwogCQlzZXJ2ZXItPnRvdGFs
-X3JlYWQgKz0gbGVuZ3RoOwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jb25uZWN0LmMgYi9mcy9jaWZz
-L2Nvbm5lY3QuYwppbmRleCA1NWIxZWM3MzFkNTIuLmI5MDg1NjI1MzM0ZSAxMDA2NDQKLS0tIGEv
-ZnMvY2lmcy9jb25uZWN0LmMKKysrIGIvZnMvY2lmcy9jb25uZWN0LmMKQEAgLTU2NCw2ICs1NjQs
-MjMgQEAgY2lmc19yZWFkX2Zyb21fc29ja2V0KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZl
-ciwgY2hhciAqYnVmLAogCXJldHVybiBjaWZzX3JlYWR2X2Zyb21fc29ja2V0KHNlcnZlciwgJnNt
-Yl9tc2cpOwogfQogCitzc2l6ZV90CitjaWZzX2Rpc2NhcmRfZnJvbV9zb2NrZXQoc3RydWN0IFRD
-UF9TZXJ2ZXJfSW5mbyAqc2VydmVyLCBzaXplX3QgdG9fcmVhZCkKK3sKKwlzdHJ1Y3QgbXNnaGRy
-IHNtYl9tc2c7CisKKwkvKgorCSAqICBpb3ZfaXRlcl9kaXNjYXJkIGFscmVhZHkgc2V0cyBzbWJf
-bXNnLnR5cGUgYW5kIGNvdW50IGFuZCBpb3Zfb2Zmc2V0CisJICogIGFuZCBjaWZzX3JlYWR2X2Zy
-b21fc29ja2V0IHNldHMgbXNnX2NvbnRyb2wgYW5kIG1zZ19jb250cm9sbGVuCisJICogIHNvIGxp
-dHRsZSB0byBpbml0aWFsaXplIGluIHN0cnVjdCBtc2doZHIKKwkgKi8KKwlzbWJfbXNnLm1zZ19u
-YW1lID0gTlVMTDsKKwlzbWJfbXNnLm1zZ19uYW1lbGVuID0gMDsKKwlpb3ZfaXRlcl9kaXNjYXJk
-KCZzbWJfbXNnLm1zZ19pdGVyLCBSRUFELCB0b19yZWFkKTsKKworCXJldHVybiBjaWZzX3JlYWR2
-X2Zyb21fc29ja2V0KHNlcnZlciwgJnNtYl9tc2cpOworfQorCiBpbnQKIGNpZnNfcmVhZF9wYWdl
-X2Zyb21fc29ja2V0KHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwgc3RydWN0IHBhZ2Ug
-KnBhZ2UsCiAJdW5zaWduZWQgaW50IHBhZ2Vfb2Zmc2V0LCB1bnNpZ25lZCBpbnQgdG9fcmVhZCkK
-LS0gCjIuMjcuMAoK
---0000000000002071fe05bc2f7477--
