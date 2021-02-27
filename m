@@ -2,217 +2,230 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E4DC433E0
-	for <linux-cifs@archiver.kernel.org>; Sat, 27 Feb 2021 08:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC09C433E0
+	for <linux-cifs@archiver.kernel.org>; Sat, 27 Feb 2021 12:21:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D50EF64EBC
-	for <linux-cifs@archiver.kernel.org>; Sat, 27 Feb 2021 08:14:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49FDB64EC4
+	for <linux-cifs@archiver.kernel.org>; Sat, 27 Feb 2021 12:21:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229946AbhB0INp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 27 Feb 2021 03:13:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52694 "EHLO
+        id S229989AbhB0MVS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 27 Feb 2021 07:21:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229864AbhB0INl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 Feb 2021 03:13:41 -0500
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36356C06174A
-        for <linux-cifs@vger.kernel.org>; Sat, 27 Feb 2021 00:13:01 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id d3so17378078lfg.10
-        for <linux-cifs@vger.kernel.org>; Sat, 27 Feb 2021 00:13:01 -0800 (PST)
+        with ESMTP id S229864AbhB0MVP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 Feb 2021 07:21:15 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A152C06174A;
+        Sat, 27 Feb 2021 04:20:35 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id u125so9975267wmg.4;
+        Sat, 27 Feb 2021 04:20:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=l8yjvGadR6AoGzW9i4/uTXyz661ic6d+j5Ldu1HCuds=;
-        b=OnYugKGDM0RLYnu+I/25bMGLduJ9QDI+biLi4w/6adnpaQoUpF8ixfZnEmbsClWMgu
-         23LPW4/JSDLnXqgclcAs0JGn0U5QsfKo45LL1wcPQ45agPZ3Lw73Co4UfYGRO5ziaZLQ
-         lw9Z6upWWyK0ZDtDoCk5YuLJfvxkZhLRo3RYDyf9mGpCXba/iX00EJD2ty5egOD0Ibf7
-         XYjgHgp9xPgMKfTMFduYoOts6eCp4QNrKS3Cc2hzhfObE4d5mOxvaexf0qeNQBraWcmd
-         GW7xNrm5Iqasq7sLC6/ycXdasA2vhDD4HmA8+n6VMNBsGdnALmXHFrkS0QHwosL+TPe0
-         whfA==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=z9fh2XxJwbj4olpGc0pBQQEl8VldJ+2OIcCXvhcoVAk=;
+        b=B+9qt7q9U8KpbqSftwdlDWjeezXgFmUrPOuTAN7s6FAESz2k6e0aJlUiVCL+l+W8eS
+         iNKO5QLZuRym2RwCJWppyTAZlCbTqO5+wLZbWUtJj7mDbh+Dc3Fx8sMPn2iUWUC2osuX
+         z8ediTFSoqrkUwp+uH35QkTOI0S8Eby9w6SXzuc6644rTPzTxAll1zOG71VVjAfZRXXI
+         qkiP8ya12Isf3vVowvpS4+8iCCFw26uScalg506BpZh+D3WaN5haC7tKwZsMNTNGba4q
+         Csw4nVfEmnP3kpu9kl1izmoaP/E2vbraen9PatesAB/brPtmYPwhbXxGA3UzWrZXQDus
+         W/yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=l8yjvGadR6AoGzW9i4/uTXyz661ic6d+j5Ldu1HCuds=;
-        b=JWKLxdTRMXchDoTf/y8xrF0Pmh3Rwz0S6V6nP2zlwTeyRGssfxja2DlTVxYrEoKx1R
-         YtekgsQ72c7+SwEH6r12+4/dRCYnvMenlDRUtByaSUTuarbVM97fV1GiHCaSV/gANT+C
-         rjZSNvi2V5jN5oeWmJMLgbBcI6c3riz0nHtOhjdZwNuzkuhAuciPx9vpft1mxuodyIxh
-         Ce4uu4K0jpm34U2P8udcXLrzqgkofz/zQcrK+u/8eIeMv9RA1dzZ145fJ6T/wd/V1ra3
-         k9X88REEFqWmTLPPGHlg/h2Q/zMhSZ4kzJJsWFwl/XQBE+hmllLjT01zhINbRpXi8Ssu
-         WlNg==
-X-Gm-Message-State: AOAM5302hA35Yb+5L4EUq7kt9MNQSgXLCLZRE/55bwbHXPfdozsbenO9
-        dbmcjrPGulfs/gcoQvDdDPl/1UrhhIIueKZbnHgml/NelF9zPA==
-X-Google-Smtp-Source: ABdhPJweb+JzmXLy77fKd/uSI9f4ijtjm+z4rac+E7/gDv0r+zvUwI/JjsEBUrO/VZVDBKc44XvrOmo9L2LplyHFjCA=
-X-Received: by 2002:a05:6512:31c1:: with SMTP id j1mr3983739lfe.313.1614413579440;
- Sat, 27 Feb 2021 00:12:59 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=z9fh2XxJwbj4olpGc0pBQQEl8VldJ+2OIcCXvhcoVAk=;
+        b=N0YuxBg8TFxpj/mTvsNYgX08vCYVsVaOGUrd2HTUbAURA1ZENNipGGPnXLLkUkthkn
+         RuIExiPb/9kTj24DQOjXpDcl5FJEv/zGulnNZTdCSVSELgL7yFlDA5PvVVOsMQBSaSJJ
+         eZxDJRn5r8xDHMhX7voS4CKmUB5ZnMGoe3E69j+2tAU3g08M7hjtGCNYmakSBqpXu9tc
+         /Nm9w8cyC1dQwqPuGG43pSGk2rPKtFRtk26V3XZVuFmUyifuYGJ0dTUm7ZxWyUC3Pnsv
+         cx0j1z3ONZABQ3xwFdShiZpGWS7kXx8zTtLc3CXMI2VGySzp5XyCP473/eTKJFAApWfI
+         joXg==
+X-Gm-Message-State: AOAM533UTzZWOgAONs27UTq1NxqeKUnzdX49EuWBx8sSIymi5uEPV19u
+        ATghnXls973TDhHHGzBg1ZoLDStECb2/xQ==
+X-Google-Smtp-Source: ABdhPJyqetsnoRgwbI/XtL3hN98oDRpNApfcdg9lJ2AR/kVPjKKZow4NkITbScfRadj3cH8JQumI9A==
+X-Received: by 2002:a7b:c2aa:: with SMTP id c10mr7118521wmk.101.1614428434033;
+        Sat, 27 Feb 2021 04:20:34 -0800 (PST)
+Received: from [192.168.1.143] ([170.253.51.130])
+        by smtp.gmail.com with ESMTPSA id p16sm2958516wrt.54.2021.02.27.04.20.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 27 Feb 2021 04:20:33 -0800 (PST)
+Subject: Re: [PATCH] copy_file_range.2: Kernel v5.12 updates
+To:     Amir Goldstein <amir73il@gmail.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+Cc:     Luis Henriques <lhenriques@suse.de>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Nicolas Boichat <drinkcat@chromium.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        Andreas Dilger <adilger@dilger.ca>,
+        Olga Kornievskaia <aglo@umich.edu>,
+        Christoph Hellwig <hch@infradead.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        linux-man <linux-man@vger.kernel.org>
+References: <20210222102456.6692-1-lhenriques@suse.de>
+ <20210224142307.7284-1-lhenriques@suse.de>
+ <CAOQ4uxi3-+tOgHV_GUnWtJoQXbV5ZS9qDZsLsd9sJxX5Aftyew@mail.gmail.com>
+ <6b896b29-6fc1-0586-ef31-f2f3298b56b0@gmail.com>
+ <CAOQ4uxgFCBNwRD7e1srwaVrZMGfOE_JXENL4Q2En52srdj2AYA@mail.gmail.com>
+From:   "Alejandro Colomar (man-pages)" <alx.manpages@gmail.com>
+Message-ID: <ffd92bb4-8f72-cbec-045f-a2ad7869ab3b@gmail.com>
+Date:   Sat, 27 Feb 2021 13:20:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 27 Feb 2021 02:12:48 -0600
-Message-ID: <CAH2r5mtZW18Wq=mnU9MKH0eL-1wCKXTRGt00E-X32_dJ_H1F9w@mail.gmail.com>
-Subject: [PATCH v2] smb3: allow files to be created with backslash in name
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     Xiaoli Feng <xifeng@redhat.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Content-Type: multipart/mixed; boundary="000000000000ecaec505bc4cf3fa"
+In-Reply-To: <CAOQ4uxgFCBNwRD7e1srwaVrZMGfOE_JXENL4Q2En52srdj2AYA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000ecaec505bc4cf3fa
-Content-Type: text/plain; charset="UTF-8"
+Hi Amir,
 
-Backslash is reserved in Windows (and SMB2/SMB3 by default) but
-allowed in POSIX so must be remapped when POSIX extensions are
-not enabled.
+On 2/27/21 6:41 AM, Amir Goldstein wrote:
+> On Sat, Feb 27, 2021 at 12:19 AM Alejandro Colomar (man-pages)
+>> On 2/24/21 5:10 PM, Amir Goldstein wrote:
+>>> On Wed, Feb 24, 2021 at 4:22 PM Luis Henriques <lhenriques@suse.de> wrote:
+>>>>    .TP
+>>>> +.B EOPNOTSUPP
+>>
+>> I'll add the kernel version here:
+>>
+>> .BR EOPNOTSUPP " (since Linux 5.12)"
+> 
+> Error could be returned prior to 5.3 and would be probably returned
+> by future stable kernels 5.3..5.12 too
 
-The default mapping for SMB3 mounts ("SFM") allows mapping backslash
-(ie 0x5C in UTF8) to 0xF026 in UCS-2 (using the Unicode remapping
-range reserved for these characters), but this was not mapped by
-cifs.ko (unlike asterisk, greater than, question mark etc).  This patch
-fixes that to allow creating files and directories with backslash
-in the file or directory name.
+OK, I think I'll state <5.3 and >=5.12 for the moment, and if Greg adds 
+that to stable 5.3..5.11 kernels, please update me.
 
-Before this patch:
-   touch "/mnt2/subdir/filewith\slash"
-would return
-   touch: setting times of '/mnt2/subdir/filewith\slash': Invalid argument
+>>>>    .B EXDEV
+>>>>    The files referred to by
+>>>>    .IR fd_in " and " fd_out
+>>>> -are not on the same mounted filesystem (pre Linux 5.3).
+>>>> +are not on the same mounted filesystem (pre Linux 5.3 and post Linux 5.12).
+>>
+>> I'm not sure that 'mounted' adds any value here.  Would you remove the
+>> word here?
+> 
+> See rename(2). 'mounted' in this context is explained there.
+> HOWEVER, it does not fit here.
+> copy_file_range() IS allowed between two mounts of the same filesystem instance.
 
-With the patch tReported-by: Xiaoli Feng <xifeng@redhat.com>ouch and
-mkdir with the backslash in the name works.
+Also allowed for <5.3 ?
 
-Version two of the patch works with files in subdirectories not just
-the root of the share.
+> 
+> To make things more complicated, it appears that cross mount clone is not
+> allowed via FICLONE/FICLONERANGE ioctl, so ioctl_ficlonerange(2) man page
+> also uses the 'mounted filesystem' terminology for EXDEV
+> 
+> As things stand now, because of the fallback to clone logic,
+> copy_file_range() provides a way for users to clone across different mounts
+> of the same filesystem instance, which they cannot do with the FICLONE ioctl.
+> 
+> Fun :)
+> 
+> BTW, I don't know if preventing cross mount clone was done intentionally,
+> but as I wrote in a comment in the code once:
+> 
+>          /*
+>           * FICLONE/FICLONERANGE ioctls enforce that src and dest files are on
+>           * the same mount. Practically, they only need to be on the same file
+>           * system.
+>           */
 
-This problem was found while debugging xfstest generic/453
-    https://bugzilla.kernel.org/show_bug.cgi?id=210961
+:)
 
-Reported-by: Xiaoli Feng <xifeng@redhat.com>
+> 
+>>
+>> It reads as if two separate devices with the same filesystem type would
+>> still give this error.
+>>
+>> Per the LWN.net article Amir shared, this is permitted ("When called
+>> from user space, copy_file_range() will only try to copy a file across
+>> filesystems if the two are of the same type").
+>>
+>> This behavior was slightly different before 5.3 AFAICR (was it?) ("until
+>> then, copy_file_range() refused to copy between files that were not
+>> located on the same filesystem.").  If that's the case, I'd specify the
+>> difference, or more probably split the error into two, one before 5.3,
+>> and one since 5.12.
+>>
+> 
+> True.
+> 
+>>>
+>>> I think you need to drop the (Linux range) altogether.
+>>
+>> I'll keep the range.  Users of 5.3..5.11 might be surprised if the
+>> filesystems are different and they don't get an error, I think.
+>>
+>> I reworded it to follow other pages conventions:
+>>
+>> .BR EXDEV " (before Linux 5.3; or since Linux 5.12)"
+>>
+>> which renders as:
+>>
+>>          EXDEV (before Linux 5.3; or since Linux 5.12)
+>>                 The files referred to by fd_in and fd_out are not on
+>>                 the same mounted filesystem.
+>>
+> 
+> drop 'mounted'
 
---
+Yes
+
+> 
+>>
+>>> What's missing here is the NFS cross server copy use case.
+>>> Maybe:
+>>>
+>>> ...are not on the same mounted filesystem and the source and target filesystems
+>>> do not support cross-filesystem copy.
+>>
+>> Yes.
+>>
+>> Again, this wasn't true before 5.3, right?
+>>
+> 
+> Right.
+> Actually, v5.3 provides the vfs capabilities for filesystems to support
+> cross fs copy. I am not sure if NFS already implements cross fs copy in
+> v5.3 and not sure about cifs. Need to get input from nfs/cis developers
+> or dig in the release notes for server-side copy.
+
+Okay
+> Thanks to LWN :)
+
+:)
+
 Thanks,
 
-Steve
+Alex
 
---000000000000ecaec505bc4cf3fa
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-allow-files-to-be-created-with-backslash-in-nam.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-allow-files-to-be-created-with-backslash-in-nam.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_klng46am0>
-X-Attachment-Id: f_klng46am0
 
-RnJvbSA5NWM1ZDA2MDdhNTRmMDI1NTFiZGQ5ZWNjN2Y0MWIxZDM1YjE5MjExIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFNhdCwgMjcgRmViIDIwMjEgMDI6MDE6NDYgLTA2MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiBhbGxvdyBmaWxlcyB0byBiZSBjcmVhdGVkIHdpdGggYmFja3NsYXNoIGluIG5hbWUKCkJh
-Y2tzbGFzaCBpcyByZXNlcnZlZCBpbiBXaW5kb3dzIChhbmQgU01CMi9TTUIzIGJ5IGRlZmF1bHQp
-IGJ1dAphbGxvd2VkIGluIFBPU0lYIHNvIG11c3QgYmUgcmVtYXBwZWQgd2hlbiBQT1NJWCBleHRl
-bnNpb25zIGFyZQpub3QgZW5hYmxlZC4KClRoZSBkZWZhdWx0IG1hcHBpbmcgZm9yIFNNQjMgbW91
-bnRzICgiU0ZNIikgYWxsb3dzIG1hcHBpbmcgYmFja3NsYXNoCihpZSAweDVDIGluIFVURjgpIHRv
-IDB4RjAyNiBpbiBVQ1MtMiAodXNpbmcgdGhlIFVuaWNvZGUgcmVtYXBwaW5nCnJhbmdlIHJlc2Vy
-dmVkIGZvciB0aGVzZSBjaGFyYWN0ZXJzKSwgYnV0IHRoaXMgd2FzIG5vdCBtYXBwZWQgYnkKY2lm
-cy5rbyAodW5saWtlIGFzdGVyaXNrLCBncmVhdGVyIHRoYW4sIHF1ZXN0aW9uIG1hcmsgZXRjKS4g
-IFRoaXMgcGF0Y2gKZml4ZXMgdGhhdCB0byBhbGxvdyBjcmVhdGluZyBmaWxlcyBhbmQgZGlyZWN0
-b3JpZXMgd2l0aCBiYWNrc2xhc2gKaW4gdGhlIGZpbGUgb3IgZGlyZWN0b3J5IG5hbWUuCgpCZWZv
-cmUgdGhpcyBwYXRjaDoKICAgdG91Y2ggIi9tbnQyL2ZpbGV3aXRoXHNsYXNoIgp3b3VsZCByZXR1
-cm4KICAgdG91Y2g6IHNldHRpbmcgdGltZXMgb2YgJy9tbnQyL2ZpbGV3aXRoXHNsYXNoJzogSW52
-YWxpZCBhcmd1bWVudAoKV2l0aCB0aGUgcGF0Y2ggdG91Y2ggYW5kIG1rZGlyIHdpdGggdGhlIGJh
-Y2tzbGFzaCBpbiB0aGUgbmFtZSB3b3Jrcy4KClRoaXMgcHJvYmxlbSB3YXMgZm91bmQgd2hpbGUg
-ZGVidWdnaW5nIHhmc3Rlc3QgZ2VuZXJpYy80NTMKICAgIGh0dHBzOi8vYnVnemlsbGEua2VybmVs
-Lm9yZy9zaG93X2J1Zy5jZ2k/aWQ9MjEwOTYxCgpSZXBvcnRlZC1ieTogWGlhb2xpIEZlbmcgPHhp
-ZmVuZ0ByZWRoYXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1p
-Y3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9jaWZzX3VuaWNvZGUuYyB8IDE1ICsrKysrKysrKyst
-LS0tLQogZnMvY2lmcy9jaWZzX3VuaWNvZGUuaCB8ICAzICsrKwogZnMvY2lmcy9jaWZzZ2xvYi5o
-ICAgICB8ICA1ICstLS0tCiBmcy9jaWZzL2Rpci5jICAgICAgICAgIHwgMTggKysrKysrKysrKysr
-LS0tLS0tCiBmcy9jaWZzL21pc2MuYyAgICAgICAgIHwgIDIgKy0KIGZzL2NpZnMvc21iMm1pc2Mu
-YyAgICAgfCAxOCArKysrKysrKysrKy0tLS0tLS0KIDYgZmlsZXMgY2hhbmdlZCwgMzggaW5zZXJ0
-aW9ucygrKSwgMjMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzX3VuaWNv
-ZGUuYyBiL2ZzL2NpZnMvY2lmc191bmljb2RlLmMKaW5kZXggOWJkMDNhMjMxMDMyLi40ODk4YjE1
-NTM3OTYgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc191bmljb2RlLmMKKysrIGIvZnMvY2lmcy9j
-aWZzX3VuaWNvZGUuYwpAQCAtOTgsNiArOTgsOSBAQCBjb252ZXJ0X3NmbV9jaGFyKGNvbnN0IF9f
-dTE2IHNyY19jaGFyLCBjaGFyICp0YXJnZXQpCiAJY2FzZSBTRk1fUEVSSU9EOgogCQkqdGFyZ2V0
-ID0gJy4nOwogCQlicmVhazsKKwljYXNlIFNGTV9TTEFTSDoKKwkJKnRhcmdldCA9ICdcXCc7CisJ
-CWJyZWFrOwogCWRlZmF1bHQ6CiAJCXJldHVybiBmYWxzZTsKIAl9CkBAIC00MzEsNiArNDM0LDkg
-QEAgc3RhdGljIF9fbGUxNiBjb252ZXJ0X3RvX3NmbV9jaGFyKGNoYXIgc3JjX2NoYXIsIGJvb2wg
-ZW5kX29mX3N0cmluZykKIAljYXNlICd8JzoKIAkJZGVzdF9jaGFyID0gY3B1X3RvX2xlMTYoU0ZN
-X1BJUEUpOwogCQlicmVhazsKKwljYXNlICdcXCc6CisJCWRlc3RfY2hhciA9IGNwdV90b19sZTE2
-KFNGTV9TTEFTSCk7CisJCWJyZWFrOwogCWNhc2UgJy4nOgogCQlpZiAoZW5kX29mX3N0cmluZykK
-IAkJCWRlc3RfY2hhciA9IGNwdV90b19sZTE2KFNGTV9QRVJJT0QpOwpAQCAtNDQzLDYgKzQ0OSw5
-IEBAIHN0YXRpYyBfX2xlMTYgY29udmVydF90b19zZm1fY2hhcihjaGFyIHNyY19jaGFyLCBib29s
-IGVuZF9vZl9zdHJpbmcpCiAJCWVsc2UKIAkJCWRlc3RfY2hhciA9IDA7CiAJCWJyZWFrOworCWNh
-c2UgJy8nOgorCQlkZXN0X2NoYXIgPSBjcHVfdG9fbGUxNihVQ1MyX1NMQVNIKTsKKwkJYnJlYWs7
-CiAJZGVmYXVsdDoKIAkJZGVzdF9jaGFyID0gMDsKIAl9CkBAIC01MDIsMTEgKzUxMSw3IEBAIGNp
-ZnNDb252ZXJ0VG9VVEYxNihfX2xlMTYgKnRhcmdldCwgY29uc3QgY2hhciAqc291cmNlLCBpbnQg
-c3JjbGVuLAogCQkJZHN0X2NoYXIgPSBjb252ZXJ0X3RvX3NmbV9jaGFyKHNyY19jaGFyLCBlbmRf
-b2Zfc3RyaW5nKTsKIAkJfSBlbHNlCiAJCQlkc3RfY2hhciA9IDA7Ci0JCS8qCi0JCSAqIEZJWE1F
-OiBXZSBjYW4gbm90IGhhbmRsZSByZW1hcHBpbmcgYmFja3NsYXNoIChVTklfU0xBU0gpCi0JCSAq
-IHVudGlsIGFsbCB0aGUgY2FsbHMgdG8gYnVpbGRfcGF0aF9mcm9tX2RlbnRyeSBhcmUgbW9kaWZp
-ZWQsCi0JCSAqIGFzIHRoZXkgdXNlIGJhY2tzbGFzaCBhcyBzZXBhcmF0b3IuCi0JCSAqLworCiAJ
-CWlmIChkc3RfY2hhciA9PSAwKSB7CiAJCQljaGFybGVuID0gY3AtPmNoYXIydW5pKHNvdXJjZSAr
-IGksIHNyY2xlbiAtIGksICZ0bXApOwogCQkJZHN0X2NoYXIgPSBjcHVfdG9fbGUxNih0bXApOwpk
-aWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzX3VuaWNvZGUuaCBiL2ZzL2NpZnMvY2lmc191bmljb2Rl
-LmgKaW5kZXggODBiM2Q4NDU0MTlmLi44Y2Q1OGM3MWNiYjYgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMv
-Y2lmc191bmljb2RlLmgKKysrIGIvZnMvY2lmcy9jaWZzX3VuaWNvZGUuaApAQCAtMjQsNiArMjQs
-OSBAQAogCiAjZGVmaW5lICBVTklVUFJfTk9MT1dFUgkJLyogRXhhbXBsZSB0byBub3QgZXhwYW5k
-IGxvd2VyIGNhc2UgdGFibGVzICovCiAKKy8qIFVuaWNvZGUgZW5jb2Rpbmcgb2YgYmFja3NsYXNo
-IGNoYXJhY3RlciAqLworI2RlZmluZSBVQ1MyX1NMQVNIIDB4MDA1QworCiAvKgogICogV2luZG93
-cyBtYXBzIHRoZXNlIHRvIHRoZSB1c2VyIGRlZmluZWQgMTYgYml0IFVuaWNvZGUgcmFuZ2Ugc2lu
-Y2UgdGhleSBhcmUKICAqIHJlc2VydmVkIHN5bWJvbHMgKGFsb25nIHdpdGggXCBhbmQgLyksIG90
-aGVyd2lzZSBpbGxlZ2FsIHRvIHN0b3JlCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNnbG9iLmgg
-Yi9mcy9jaWZzL2NpZnNnbG9iLmgKaW5kZXggM2RlM2M1OTA4YTcyLi45NWJkOTgwZWM4NDkgMTAw
-NjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc2dsb2IuaAorKysgYi9mcy9jaWZzL2NpZnNnbG9iLmgKQEAg
-LTE0MzAsMTAgKzE0MzAsNyBAQCBDSUZTX0ZJTEVfU0Ioc3RydWN0IGZpbGUgKmZpbGUpCiAKIHN0
-YXRpYyBpbmxpbmUgY2hhciBDSUZTX0RJUl9TRVAoY29uc3Qgc3RydWN0IGNpZnNfc2JfaW5mbyAq
-Y2lmc19zYikKIHsKLQlpZiAoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX1BP
-U0lYX1BBVEhTKQotCQlyZXR1cm4gJy8nOwotCWVsc2UKLQkJcmV0dXJuICdcXCc7CisJcmV0dXJu
-ICcvJzsKIH0KIAogc3RhdGljIGlubGluZSB2b2lkCmRpZmYgLS1naXQgYS9mcy9jaWZzL2Rpci5j
-IGIvZnMvY2lmcy9kaXIuYwppbmRleCA5N2FjMzYzYjVkZjEuLmJiYTBmYTFjMTE4YiAxMDA2NDQK
-LS0tIGEvZnMvY2lmcy9kaXIuYworKysgYi9mcy9jaWZzL2Rpci5jCkBAIC0yMDksMTIgKzIwOSwx
-OCBAQCBjaGVja19uYW1lKHN0cnVjdCBkZW50cnkgKmRpcmVudHJ5LCBzdHJ1Y3QgY2lmc190Y29u
-ICp0Y29uKQogCQkgICAgIGxlMzJfdG9fY3B1KHRjb24tPmZzQXR0ckluZm8uTWF4UGF0aE5hbWVD
-b21wb25lbnRMZW5ndGgpKSkKIAkJcmV0dXJuIC1FTkFNRVRPT0xPTkc7CiAKLQlpZiAoIShjaWZz
-X3NiLT5tbnRfY2lmc19mbGFncyAmIENJRlNfTU9VTlRfUE9TSVhfUEFUSFMpKSB7Ci0JCWZvciAo
-aSA9IDA7IGkgPCBkaXJlbnRyeS0+ZF9uYW1lLmxlbjsgaSsrKSB7Ci0JCQlpZiAoZGlyZW50cnkt
-PmRfbmFtZS5uYW1lW2ldID09ICdcXCcpIHsKLQkJCQljaWZzX2RiZyhGWUksICJJbnZhbGlkIGZp
-bGUgbmFtZVxuIik7Ci0JCQkJcmV0dXJuIC1FSU5WQUw7Ci0JCQl9CisJLyoKKwkgKiBTTUIzLjEu
-MSBQT1NJWCBFeHRlbnNpb25zLCBDSUZTIFVuaXggRXh0ZW5zaW9ucyBhbmQgU0ZNIG1hcHBpbmdz
-CisJICogYWxsb3cgXCBpbiBwYXRocyAob3IgaW4gbGF0dGVyIGNhc2UgcmVtYXBzIFwgdG8gMHhG
-MDI2KQorCSAqLworCWlmICgoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX1BP
-U0lYX1BBVEhTKSB8fAorCSAgICAoY2lmc19zYi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5U
-X01BUF9TRk1fQ0hSKSkKKwkJcmV0dXJuIDA7CisKKwlmb3IgKGkgPSAwOyBpIDwgZGlyZW50cnkt
-PmRfbmFtZS5sZW47IGkrKykgeworCQlpZiAoZGlyZW50cnktPmRfbmFtZS5uYW1lW2ldID09ICdc
-XCcpIHsKKwkJCWNpZnNfZGJnKEZZSSwgIkludmFsaWQgZmlsZSBuYW1lXG4iKTsKKwkJCXJldHVy
-biAtRUlOVkFMOwogCQl9CiAJfQogCXJldHVybiAwOwpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9taXNj
-LmMgYi9mcy9jaWZzL21pc2MuYwppbmRleCA4MmUxNzY3MjBjYTYuLjkzNjE2NDRmNzMxMCAxMDA2
-NDQKLS0tIGEvZnMvY2lmcy9taXNjLmMKKysrIGIvZnMvY2lmcy9taXNjLmMKQEAgLTExODYsNyAr
-MTE4Niw3IEBAIGludCB1cGRhdGVfc3VwZXJfcHJlcGF0aChzdHJ1Y3QgY2lmc190Y29uICp0Y29u
-LCBjaGFyICpwcmVmaXgpCiAJCQlnb3RvIG91dDsKIAkJfQogCi0JCWNvbnZlcnRfZGVsaW1pdGVy
-KGNpZnNfc2ItPnByZXBhdGgsIENJRlNfRElSX1NFUChjaWZzX3NiKSk7CisJCWNvbnZlcnRfZGVs
-aW1pdGVyKGNpZnNfc2ItPnByZXBhdGgsIENJRlNfRElSX1NFUChjaWZzX3NiKSk7IC8qIEJCIENo
-ZWNrIHRoaXMgKi8KIAl9IGVsc2UKIAkJY2lmc19zYi0+cHJlcGF0aCA9IE5VTEw7CiAKZGlmZiAt
-LWdpdCBhL2ZzL2NpZnMvc21iMm1pc2MuYyBiL2ZzL2NpZnMvc21iMm1pc2MuYwppbmRleCA2MGQ0
-YmQxZWFlMmIuLmNlNGYwMDA2OTY1MyAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIybWlzYy5jCisr
-KyBiL2ZzL2NpZnMvc21iMm1pc2MuYwpAQCAtNDc2LDEzICs0NzYsMTcgQEAgY2lmc19jb252ZXJ0
-X3BhdGhfdG9fdXRmMTYoY29uc3QgY2hhciAqZnJvbSwgc3RydWN0IGNpZnNfc2JfaW5mbyAqY2lm
-c19zYikKIAlpZiAoZnJvbVswXSA9PSAnXFwnKQogCQlzdGFydF9vZl9wYXRoID0gZnJvbSArIDE7
-CiAKLQkvKiBTTUIzMTEgUE9TSVggZXh0ZW5zaW9ucyBwYXRocyBkbyBub3QgaW5jbHVkZSBsZWFk
-aW5nIHNsYXNoICovCi0JZWxzZSBpZiAoY2lmc19zYl9tYXN0ZXJfdGxpbmsoY2lmc19zYikgJiYK
-LQkJIGNpZnNfc2JfbWFzdGVyX3Rjb24oY2lmc19zYiktPnBvc2l4X2V4dGVuc2lvbnMgJiYKLQkJ
-IChmcm9tWzBdID09ICcvJykpIHsKLQkJc3RhcnRfb2ZfcGF0aCA9IGZyb20gKyAxOwotCX0gZWxz
-ZQotCQlzdGFydF9vZl9wYXRoID0gZnJvbTsKKwlzdGFydF9vZl9wYXRoID0gZnJvbTsKKwkvKgor
-CSAqIE9ubHkgb2xkIENJRlMgVW5peCBleHRlbnNpb25zIHBhdGhzIGluY2x1ZGUgbGVhZGluZyBz
-bGFzaAorCSAqIE5lZWQgdG8gc2tpcCBpZiBmb3IgU01CMy4xLjEgUE9TSVggRXh0ZW5zaW9ucyBh
-bmQgU01CMS8yLzMKKwkgKi8KKwlpZiAoZnJvbVswXSA9PSAnLycpIHsKKwkJaWYgKCgoY2lmc19z
-Yi0+bW50X2NpZnNfZmxhZ3MgJiBDSUZTX01PVU5UX1BPU0lYX1BBVEhTKSA9PSBmYWxzZSkgfHwK
-KwkJICAgIChjaWZzX3NiX21hc3Rlcl90bGluayhjaWZzX3NiKSAmJgorCQkgICAgIChjaWZzX3Ni
-X21hc3Rlcl90Y29uKGNpZnNfc2IpLT5wb3NpeF9leHRlbnNpb25zKSkpCisJCQlzdGFydF9vZl9w
-YXRoID0gZnJvbSArIDE7CisJfQogCiAJdG8gPSBjaWZzX3N0cm5kdXBfdG9fdXRmMTYoc3RhcnRf
-b2ZfcGF0aCwgUEFUSF9NQVgsICZsZW4sCiAJCQkJICAgY2lmc19zYi0+bG9jYWxfbmxzLCBtYXBf
-dHlwZSk7Ci0tIAoyLjI3LjAKCg==
---000000000000ecaec505bc4cf3fa--
+-- 
+Alejandro Colomar
+Linux man-pages comaintainer; https://www.kernel.org/doc/man-pages/
+http://www.alejandro-colomar.es/
