@@ -2,154 +2,133 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3113AC41621
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3434DC4321A
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1021464EBA
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05AEB6023B
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345969AbhCDA22 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 3 Mar 2021 19:28:28 -0500
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:34959 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1452928AbhCCQ6d (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Mar 2021 11:58:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1614790643;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bxKMgy15VerpeKkJ0kYjXWZ8SKlevDZRBv8JPFRJPfA=;
-        b=XSGQZh2QMF4u4r3/5Da5Ap9nQgXVB9TmiL94UUYtYrP0xvDMQBTDT/eEoZwG68De4j0Ns5
-        YAtNAdOpI6smLczu0352t/CW/U4jW3YN54PJDQbqCMAtHGa8NmuhC9N/YLYZ4T4uYIddCq
-        fVRjNdoE6C9FjrrfOrhY8G1y1qrsiWw=
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com
- (mail-db3eur04lp2058.outbound.protection.outlook.com [104.47.12.58]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-30-Jur5-lFKPXKrlqcQuHqPrQ-1; Wed, 03 Mar 2021 17:57:21 +0100
-X-MC-Unique: Jur5-lFKPXKrlqcQuHqPrQ-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I1LJxaMw84rDs+B+guWNdFZX4cciZ6lEyx8z0BSlw198afNpWlI98dfF0z5IGjslqnK0fXUqxaNGrDg/1YP83/tSgPbsNn9JFTuda7VU04VOtjqZ/P+dScpMco//5ZiOTAjjyqaSPAMf2wAuRGNECYj8gmil4w4ZBcg3UuIa3zv6fAlXfKjzqP5zQKsTZCF5Wzw6mFAYaZDLU1YtqZ46a39+/ki60iMmmOi/k0V9E9Iihv6nsYnoBo94NlrVY6KhF6v1KXa8ZNfFeQbbqf0kMXDowqVQ7UULpgHGSXx9EGqkfpQ5nOXq+M8ggqUrMy2NNnZvOPaR0aTvfmxmJSeVJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bxKMgy15VerpeKkJ0kYjXWZ8SKlevDZRBv8JPFRJPfA=;
- b=ANaij277sNG73qNIzIZTyNplGbF7YiukEzj6vATIs6ON5rkTTF2aiQxs6y/BhwLfHONAWjdnfbd7VjTXLt7tFa9aB7gYGTCSqaZyH/4W0vo2hUWBcG8r3tgbpxGGDGTI2gnj7m95gjkOV7PUiuAo5sNTjeY/FRicz4M6BrMQkoNkDPP961WLt6KBoQpg28dAm+Xi6YnkUr+zFb0n6BjX8sbiWkY8b4TShMPWctOxMGN8JuLGTfVf828KmTf17Q04y3ggGwpbDL9syghXANrkRZEgI0VQixMo1J/WiFNnAF4/DGkL32F5h5fnS6nAsyuYqfwQ24x1rplTeYFr3QOgJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: talpey.com; dkim=none (message not signed)
- header.d=none;talpey.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR04MB4751.eurprd04.prod.outlook.com (2603:10a6:803:53::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Wed, 3 Mar
- 2021 16:57:18 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3890.028; Wed, 3 Mar 2021
- 16:57:18 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-man@vger.kernel.org,
-        mtk.manpages@gmail.com
+        id S1355441AbhCDA23 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 3 Mar 2021 19:28:29 -0500
+Received: from p3plsmtpa11-03.prod.phx3.secureserver.net ([68.178.252.104]:47639
+        "EHLO p3plsmtpa11-03.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243269AbhCCSKx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Mar 2021 13:10:53 -0500
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id HVvelXiCvKEOAHVvelgCok; Wed, 03 Mar 2021 11:08:58 -0700
+X-CMAE-Analysis: v=2.4 cv=erwacqlX c=1 sm=1 tr=0 ts=603fd0ba
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=iox4zFpeAAAA:8 a=Dn3fJbBJWZ8bWwpP0-sA:9 a=QEXdDO2ut3YA:10
+ a=WzC6qhA0u3u7Ye7llzcV:22
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [PATCH v2] flock.2: add CIFS details
+To:     =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-man@vger.kernel.org, mtk.manpages@gmail.com
 Cc:     smfrench@gmail.com
-Subject: Re: [man-pages][PATCH v1] flock.2: add CIFS details
-In-Reply-To: <f1beb7c8-1f73-0ea7-7052-13b6516b5f6c@talpey.com>
-References: <20210302154831.17000-1-aaptel@suse.com>
- <5ae02f1f-af45-25aa-71b1-4f8782286158@talpey.com>
- <8735xcxkv5.fsf@suse.com>
- <f1beb7c8-1f73-0ea7-7052-13b6516b5f6c@talpey.com>
-Date:   Wed, 03 Mar 2021 17:57:17 +0100
-Message-ID: <87zgzkw4ya.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:70b:4a22:792c:d376:dd41:4ec2]
-X-ClientProxiedBy: ZR0P278CA0143.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:40::22) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+References: <8735xcxkv5.fsf@suse.com> <20210303163755.31127-1-aaptel@suse.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <17fc432c-f485-0945-6d12-fa338ea0025f@talpey.com>
+Date:   Wed, 3 Mar 2021 13:08:58 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:70b:4a22:792c:d376:dd41:4ec2) by ZR0P278CA0143.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:40::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Wed, 3 Mar 2021 16:57:17 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fa329994-b133-46b4-3471-08d8de656753
-X-MS-TrafficTypeDiagnostic: VI1PR04MB4751:
-X-Microsoft-Antispam-PRVS: <VI1PR04MB4751607532927C36A71478B9A8989@VI1PR04MB4751.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Z7eReaL92OfUHCPAEPLm5Zd1KBCrlgAHawWJqJbHH/3O9KcPZ30wyaaDdIseKOT/DqK/qJHQecciUkOUl4htP84n9o5dJj8migN+yrf3RJM8qg1A5bPuw1trQMWvuqmkxVdZ6SDxP/StYEn6eoNJCB5ilYdwG+2RDDvW0iLWv+cftmZLs5Rih8rXPy/R9rsD6xy+WdmkEx/U+mBCqG421GHlz+TaBlZn34nTd+bRfhJMsmONPAjDW2opIOuxH/GWwpSlW434H3ndRLMNHzhVKk+CG2QVtmXYzPe5tcygF0WWtPhCy1280OJVIjj3r7KmFHFnOvaWBttVDkugWi9IN15RaeQYLuFZow4NGLMq+rTj/GacuWwg/SU/uvcVro4OJz/JtlUbzi1jvWOBI8U6WoZLhogvbeeVancFwis70WkzmWISkP+YdzztVDiTdNCiOdZmNdMwQdBhP3BL4bm53+hLEav1M9fMNNAxMIU7s1hLXo3mNYQ8cevTCiBtN4MnMCSgEgcJcY/mHvYedsh2Fg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(396003)(136003)(366004)(376002)(39850400004)(66476007)(6496006)(36756003)(186003)(316002)(83380400001)(8676002)(4326008)(52116002)(478600001)(6486002)(2616005)(4744005)(66946007)(5660300002)(2906002)(66556008)(8936002)(86362001)(16526019);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?WEJiWUxraXJCMSttZXdXcHBiaGtiek4zc2o2L3FGdWZkUzhKMUt4eTBobWxW?=
- =?utf-8?B?NVg0cXE4OVAvVlBtT093TXZvbUNtaHZUTXlyem1BY3lmQzNVTVQwcWRrMVYz?=
- =?utf-8?B?MzE4WE1TUWdGY2tpT1FTMXh3VkZPcDZVZUx4UHZIbUdBVjd4ZituMm05aUIr?=
- =?utf-8?B?VlI1UVlRcHJzeXFId2NvR1VrbFNjbktqbHF5TFhmRU9pdUxRVHFFWm5rSFBS?=
- =?utf-8?B?VlQ5T2ZCSmdvQk9zOU9DQ3JzckMrakRvQm9VK2JrNDNLOVViVWpERjdTWWRx?=
- =?utf-8?B?N2NWakUwcFR3U1FJYkFVVXNidDFxdERSVDZiQThEWXhiQVhnckVnajRvSjFJ?=
- =?utf-8?B?WTlRMEM5SXUxdVlWNmxSK09lWlNhajRDMlpqVWJ5dXUwUDdWOGJHVzhxSVZ6?=
- =?utf-8?B?WVpTSm5zL05CRkNEOFYxV1JhOVZ4eWZwSTlTckh5Y005Q0puZStsWE5qTVQw?=
- =?utf-8?B?SXlyRHBPTkpxT25Sb0JWQnpEbVpJVGpjeGllWVhodlpqc0cvQ1FPL1pEcXhv?=
- =?utf-8?B?WHhkcmV4RE1naVNvUjhzTEhHYmtZMkc0Y0lrcWRuZGc1QmZTenh3Uklncmp3?=
- =?utf-8?B?cEFpSGVSQk5keHZLblRSaUdIL2ZtZ1FQSHd5Mitpb1dDT0hVOE9rV1AyQWla?=
- =?utf-8?B?YVQ5VjFocUU4YzZUUHV6ZXBIbitFTXphcmtqd0NuckVSVXlCNVFhZXRNeEVQ?=
- =?utf-8?B?ZjBhMVkyRlhWdmJ6UVBOdVM5RndNMHBYbmpOdHdYYVpoUThoR1VydlRuU2hW?=
- =?utf-8?B?ZUViVGRJcHJoRW1WOUEzY2U1d3JlYXR3ODNYYXo5dTV4amFGUWZ0THVjOTFV?=
- =?utf-8?B?S1krS2laOXlwb0E1ZWp2QUJCbENFZ0x2SFFMb0JiaWpLbmF0QmF5NExLbDZa?=
- =?utf-8?B?Q3o0elhGak9wUU5oMTJ2NXlPbExSUGhWMzNidk5HQ2pTVXBXT2NPMURjRHNa?=
- =?utf-8?B?MjVYT2IzQk1xUi9EQlVsaHhwVTNoc1hIZ25QMHlkcVorZ3dHYXdpOWFKWnNH?=
- =?utf-8?B?SXpTd0JMM0RpRVpvL2hpN3VaSjR5N1lDczVtUVpESFlOVWZTRVhvMzRtRU4z?=
- =?utf-8?B?QkRKaWFTd1V6bnBCKzJLSVBzbk0xSEZDaVVjYmN2KzE4eXBZQkRrVlVXV1Jz?=
- =?utf-8?B?cXB6VEFyemZ2VzRPa3o1aTVjOE10UXVucC9VQzdtb3FYeE1QK3FxWWFmajdZ?=
- =?utf-8?B?ekFsSDFPbVZhNnEySXNMZzBhRnphLzJ6YnVHTCtaYnU0K1pHSGxXRWVGRmZv?=
- =?utf-8?B?Y1NOcWRWT3dDYTVRcngzWEJJQVEzSHJvb2Q1R0NNQ3Y4Skc5VUwybndCR1NM?=
- =?utf-8?B?bSt5KzllWXNlaDZya1V5Mk5qbUxjR2NITXpndnEvR3BkcW13ZjlocFdGOW1R?=
- =?utf-8?B?cHNkZkk0YWFCYkExWXNVWEtRTjhzTlhXVzZFbEY3WnRyZ3JxT1g5bjlERFdw?=
- =?utf-8?B?OWprSkpiSklNYS83VzdkTmExL3VHbFkvakFRQmhTTEJONjE3ek5ZUTM5SXNv?=
- =?utf-8?B?TE1abTBLR0tneDRIUGZYOW5GTVdUTHZyMGt5VFlxRXBIUkYxRGk5WWFnYWdi?=
- =?utf-8?B?ZkxCekJLVXQ3TkpFVTRZTXhDK3JpcENpUXRjMDNnSzRWYVZPamR4RGlFc1Vx?=
- =?utf-8?B?Q0dPaklUa2xKSTVwSnRrWmtENGVKUXIwU0JuRnRIcHpqNTl2Q0tkNFRVVzU5?=
- =?utf-8?B?RG5hY0J3Mm1Lai9aL2t3RnJBV2kvL0ZOODZyM1FRVjlJMjhYOFZSenFXclFm?=
- =?utf-8?B?SXUzVEpYZE4vTHhjbFl0MzZOdUczMTI0VVFrYzZEVHJGWXBESDk3ZVR6M21R?=
- =?utf-8?B?QThDeGtwR1Mzc2hWeWdxaEtTZnE0TjhVTC9aQ25CV1NLOW83QXY4Vm5YVGJO?=
- =?utf-8?Q?8i6e7dHTCik96?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa329994-b133-46b4-3471-08d8de656753
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2021 16:57:18.0653
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ex4Gp5IE6YsrLuTNgrQkuxFg/LEmc51ex6xAHIEBdF7CgE4w9M+jG725Vb9BhDhG
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB4751
+In-Reply-To: <20210303163755.31127-1-aaptel@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfCWhMEvjwmzD8Up+kCe11ZTwxATDUaYkCaSiMu66xtAOJDknoqjgYDolWUzD30AASEU3ysNJTqgye3KgMwSCjrYbnSojIBN3xh9sSY7M38WZP//0PUlc
+ e8FRucMuxT+TXlO+yOfuCEu23fHOqGS2R4OjH5gcCUvLGWoE4cYmYqgAirQTj9yWA5HbR67TSI9xsnlKEB3D34fswAlSNIJ5hI5U69AFUtGRKovTyCril6Wa
+ Y3UHM4UmPcAuYKW16EqYRUUjY4UJu0sHPWNjwI0jsmdNTBn8mXAmMxAc5HRuK/mdVxqu39PAentTwAsva67FCqT4vKXZCb9zuQ6dnDsKIv0m4Jj6SDbtvhoQ
+ S5y4xRm4
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Tom Talpey <tom@talpey.com> writes:
-> I don't fully understand your response. What does "knows about syscall
-> from local apps" mean, from a practical perspective? That it never
-> forwards any flock() call to the server? Or that it somehow caches
-> the flock() results, and never checks if the server has a conflict
-> from another client?
+Definitely better! Couple of suggestions:
 
-Yes that's what I'm trying to say. Locking never goes on the
-wire. Server is not aware of locking, and thus neither are any other
-clients.
+On 3/3/2021 11:37 AM, Aurélien Aptel wrote:
+> From: Aurelien Aptel <aaptel@suse.com>
+> 
+> Similarly to NFS, CIFS flock() locks behave differently than the
+> standard. Document those differences.
+> 
+> Here is the rendered text:
+> 
+> CIFS details
+>    In  Linux kernels up to 5.4, flock() is not propagated over SMB. A file
+>    with such locks will not appear locked for other SMB clients.
+> 
+>    Since Linux 5.5, flock() are emulated with SMB byte-range locks on  the
+>    entire  file.  Similarly  to  NFS, this means that fcntl(2) and flock()
+>    locks interact with one another over SMB. Another important side-effect
+>    is  that  the  locks are not advisory anymore: a write on a locked file
+>    will always fail with EACCESS.  This difference originates from the de-
+>    sign of locks in the SMB protocol, which provides mandatory locking se-
+>    mantics. The nobrl mount option can be used switch back to pre-5.5 ker-
+>    nel behavior.
+> 
+> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+> ---
+>   man2/flock.2 | 21 +++++++++++++++++++++
+>   1 file changed, 21 insertions(+)
+> 
+> diff --git a/man2/flock.2 b/man2/flock.2
+> index 61d4b5396..7c4e7e8c9 100644
+> --- a/man2/flock.2
+> +++ b/man2/flock.2
+> @@ -239,6 +239,27 @@ see the discussion of the
+>   .I "local_lock"
+>   option in
+>   .BR nfs (5).
+> +.SS CIFS details
+> +In Linux kernels up to 5.4,
+> +.BR flock ()
+> +is not propagated over SMB. A file with such locks will not appear
+> +locked for other SMB clients.
 
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+Other "remote" clients, right? It's not limited to SMB, if the server
+is also managing other protocols which might support flock'ing.
 
+> +.PP
+> +Since Linux 5.5,
+> +.BR flock ()
+> +are emulated with SMB byte-range locks on the
+> +entire file. Similarly to NFS, this means that
+> +.BR fcntl (2)
+> +and
+> +.BR flock ()
+> +locks interact with one another over SMB. Another important
+
+There's a subtlety here. If the server implements these SMB byte-range
+locks in certain ways, the locks may interact with other protocols too.
+So constraining the statement to "over SMB" may be incomplete.
+
+Wy not simply say "this means that fcntl() and flock() locks interact
+with one another", and preserve the generality?
+
+> +side-effect is that the locks are not advisory anymore: a write on a
+> +locked file will always fail with
+> +.BR EACCESS .
+> +This difference originates from the design of locks in the SMB
+> +protocol, which provides mandatory locking semantics. The
+> +.BR nobrl
+> +mount option can be used switch back to pre-5.5 kernel behavior.
+
+Wait, the page just said that pre-5.5 was local only. Wouldn't it
+be better to just say that "nobrl" turns off the entire behavior of
+forwarding locks to the server, like before? Or are there other
+side effects...
+
+Tom.
+
+>   .SH SEE ALSO
+>   .BR flock (1),
+>   .BR close (2),
+> 
