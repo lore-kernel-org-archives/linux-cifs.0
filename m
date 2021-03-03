@@ -2,196 +2,218 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E26C433E6
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69ACDC432C3
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 503CD64E67
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41F7D6023B
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1451005AbhCDA2e (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 3 Mar 2021 19:28:34 -0500
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:50445 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1350313AbhCCTFl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Mar 2021 14:05:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1614798257;
+        id S1388013AbhCDA2l (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 3 Mar 2021 19:28:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44366 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1355341AbhCDAXb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Mar 2021 19:23:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614817324;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=irYpeoFd1vn4PPKGQI2P/VimUYWFx4DtL0ROKNEWfDs=;
-        b=CZTX03D6dKnMeM2nHtrPcUJkdBNfoBIhDvnLr28KmHonGfKAxRKiC2HHwCY7WOCrLLTjAt
-        RkaNivDPsuo0eNkfuevrmwFwHi03Fdgt8PKdJ33aRVG1HfURgPcul+FnBloCISsq6LieWa
-        PT5HSu+ddqbDHTKhu3cQT0wbDco9KeA=
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com
- (mail-db8eur05lp2104.outbound.protection.outlook.com [104.47.17.104])
- (Using TLS) by relay.mimecast.com with ESMTP id
- de-mta-16-8Z0l7xMiNRiP1ZWJpyRZ_w-1; Wed, 03 Mar 2021 20:04:16 +0100
-X-MC-Unique: 8Z0l7xMiNRiP1ZWJpyRZ_w-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AuKAtIW/VR+byioOUTIASjM0hRAJ5egOWY32Lj//hAphsEoVE5Ye48JEUN0DRBgxnOlvE0P6zk+x0phRO7Dr+CYujzUclQGVH9uuaAozz+Gj48LfalcxlCz9c/otZSrs8yxfhqUL3G1d0zvpdN96he5IJWdIUJIru1n7n0nk1gL9zE2NiaNLYVhuOA3cQXNipSISQFcURHAVU2pNELISEDbdmWTCZv687qie5mXU2bWaIoZujkKW7HPKh/WZFIrlK80LjlFvV34v4v3MQ54In03rggOtLaruYw7wjeHYw2aYRO9jiCex/cUBBJCntARex5al8RGWfqSSbZ4ZuS+qfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UjU9KsJuRDpPxHRZ7/NaaELVluzegeeTIs8S0XxTIGY=;
- b=bhqnT/6Cq/4RaVkrF47nXzO9dpvC2CqV6+b++zPY79A2AySiuR7StpCrX5debOrCrtkEerxZksHIMB9RqJySmYsubX/Y0IAP1YHr5Z1A2lhmQ2A3j742wt0/u+mC3MpZWz4yjLDIWTF+ZF91dttxI3QIlIg1OqojNuBQ1bkju9mXi2L6263xXCLIZkgk/DGMgtvFCBO9c2+r32fcxd128imZ50heN+AURfoYl+nq8x0h1LxJdSQlMKZBmxDrLk2XSMfSBqVYeth2+Dn+1vjyDOPMKRwYxMScLKKXKJ3I8Rr58oE6072YZriWsuL57hcYVB2SEfhfME3H/3tTm9ueIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: talpey.com; dkim=none (message not signed)
- header.d=none;talpey.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VE1PR04MB7280.eurprd04.prod.outlook.com (2603:10a6:800:1af::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Wed, 3 Mar
- 2021 19:04:14 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3890.028; Wed, 3 Mar 2021
- 19:04:13 +0000
-From:   =?UTF-8?q?Aur=C3=A9lien=20Aptel?= <aaptel@suse.com>
-To:     Tom Talpey <tom@talpey.com>,
-        =?UTF-8?q?Aur=C3=A9lien=20Aptel?= <aaptel@suse.com>,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-man@vger.kernel.org, mtk.manpages@gmail.com
-CC:     smfrench@gmail.com
-Subject: [PATCH v3] flock.2: add CIFS details
-Date:   Wed,  3 Mar 2021 20:03:53 +0100
-Message-ID: <20210303190353.31605-1-aaptel@suse.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <17fc432c-f485-0945-6d12-fa338ea0025f@talpey.com>
-References: <17fc432c-f485-0945-6d12-fa338ea0025f@talpey.com>
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-Originating-IP: [2003:fa:70b:4a22:792c:d376:dd41:4ec2]
-X-ClientProxiedBy: ZR0P278CA0100.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:23::15) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=gXOtBmgY5MdqpQGzSKCvOP3QkZbnNtvngwVGLI4VAgk=;
+        b=Ko7cgZT+UXhXXj2Ryc6TZpH+61ZK5Kr9uJq0MW8+KPxg4P4rSnrhAzmGDK+OzXK9zH5E4r
+        c96DVSRNeor/yvn/7ms5T96r14JNQ0lSE+tkhkRoeCV0EQoExb4HMeazlf1NVDNMlA+FVK
+        3UrOW2hrPhZYsj24UIBsHspfsdu2rt8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-dv_IBc6QNiipp5PAUfyt4w-1; Wed, 03 Mar 2021 18:20:21 -0500
+X-MC-Unique: dv_IBc6QNiipp5PAUfyt4w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECB8D193578C;
+        Wed,  3 Mar 2021 23:20:18 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E6AC612D7E;
+        Wed,  3 Mar 2021 23:20:12 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     linux-cachefs@redhat.com
+Cc:     dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        "J. Bruce Fields" <bfields@fieldses.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: fscache: Redesigning the on-disk cache
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:70b:4a22:792c:d376:dd41:4ec2) by ZR0P278CA0100.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:23::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Wed, 3 Mar 2021 19:04:13 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6c2b843c-346d-47b7-e157-08d8de77226b
-X-MS-TrafficTypeDiagnostic: VE1PR04MB7280:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VE1PR04MB728026BACB9F395945E63534A8989@VE1PR04MB7280.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jwSqwHZKr7Vzwh3PhedkYtwCvhi14Qa1zjW5B+VFG0ioCh/yDykhklOk+c4tHZ4p4JtPla6fJ2U0avOCFWMEeXcrBjDFiZc5aaOSZgzJR7AUax2sgUIDrCKWE/djTsL4pO7gPz0USQenJRw8Su9piElYo+uOCwoc0IjP9KkfHAEk1+Dy9rZDR4kb+vJKE/DzVn3wfOYaHl9vC69xS6yaV1svC+IY0l+BHsXjfu+fTrkhj2KwSIAB7a/flUxM/k+gu9XUX7FMhK9dCcJblSM9Iqk/GXizTeoWhLnST0TZjKL81bQl8LqwxRo/hNv/3c9aKiMiWXH3U/QcYZwtnnyxrrfMg7OHcULA4Laurbr+yZOpE0wy23bQJo0Rcko5PArl3+3exNCS2ZSJJwNXjm5cf34Ym0gIjAf/x8j6JVHQTbAFIw5HrtHVb4yY3B2FDKPEgc4QA3fVt7xzpuX9PlIy0lLhwkl7v8Sl8CqVKNnfFi92rBc7U/Th3V1OU+mDh75NG1z8EqWMbvr0b89T2pLOZRPY1a05N2pypzx+a4jELKrp2qel5y01kgu7i1bMW+0J0RT76amydhoIzEL5vtg4/5UZVJeknr9QujDEr44gj5IrjUXY5GFryTR7EUHxzK8ir9ZG10nWP+4rkyWu3+Z/5pilV7l9aIozqxCxPXheASw1mmsIzmpmcy6NZH4KSk+azB6soZYNjrfoWexKBcjKqK+9eohhCbcES01kOilNkxph++dJhcskIH4lfZTaElhRxxXMFx64wxABUnKeBFuHELKBB1g5+R+3pcpTv1w80kAgpOOh7daxxaoX1bVd+CbrrQF/KqiIiym/PnDL7QOq8gYSH94kn+HYKorde8OExRXWnk6VSzDcFC02sQA5EwrZTW7+6Dxu6ufGPR+pT6W/oA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:OSPM;SFS:(376002)(136003)(346002)(366004)(396003)(39860400002)(8676002)(83380400001)(316002)(66946007)(110136005)(8936002)(1076003)(186003)(4326008)(36756003)(6666004)(478600001)(6496006)(16526019)(52116002)(2906002)(6486002)(86362001)(5660300002)(2616005)(66476007)(66556008)(23200700001);DIR:OUT;SFP:1501;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?+Q2w5st7eFT1kcxw7wRwC/GnbqiIdLjnph4PUtOkGDxAtDhQH+DAnkx3N5q9?=
- =?us-ascii?Q?ApT9y8QKugucUyC5UPJyWPk0NloMl+z8EmdP5cJUtFpjcrYqxLONh2IftA9a?=
- =?us-ascii?Q?DEsU2y5a8XZSavPNuTwBnlI2Q53SJj6r8uAPPWEtMXeVRhzZXE9yNFw7+7KY?=
- =?us-ascii?Q?c0cEd2iNBTpALkBWCsfRxD5BefehcQiOlftYZp9/rczjSOWSQcblzsIwT/10?=
- =?us-ascii?Q?K5LeAzSQY+bypv+Qz3eV2xv4O80lcL68I+IRwhZB2a0c2CrqkiiD8Ug7u7Ff?=
- =?us-ascii?Q?/297o+tB4jV1VlfNC9SDLweeh0FkODVPjMr8CLbn826Xg884bDt3IM2j1fAr?=
- =?us-ascii?Q?Owzz5+0xSSTads61cR0kpTy/BuZMAYlrzsF2UDyaX0gaX0WIcNb2r8bKxbT+?=
- =?us-ascii?Q?sy2xg3fjRPBQ5gsa3XeU98LMxfc8z9D+WxZTIq67wqz3Pja6N7nFAD4OK2we?=
- =?us-ascii?Q?M/DjGm68X7Qzp0gfFrO9z1pnDDoR3HTXV2QD5UevKgjquQvOKBIgK7VGQHbr?=
- =?us-ascii?Q?ac1V+fzm28YBGEUr9zisGSqsA0v2SbNEd+JE4KqW9oaTD7r04HUChLVQ6oZ0?=
- =?us-ascii?Q?rL5hnu9BY126W10H0h4DbHns28WPeHlTiJ9Sh2zuYWMResbNosHrugKCrhH5?=
- =?us-ascii?Q?Zsz/X1zFtvyQCYnz978Ccyk8Cs6rkPp8ycZS8uLAtRcSz7QaApImSgeVAYdj?=
- =?us-ascii?Q?2kG98P9u0FbaFSDiOgGhslIaENNtKu63pNorkKyNVpyMNJI96l8Vtj+ERaj9?=
- =?us-ascii?Q?9XqLW6wf5Vu4FecIMiiH6PNUqM3rNS5ahInILaDk0Fue1iw7VR2EMeIEWaRq?=
- =?us-ascii?Q?HACYbqq8ovMK4Rnkjtn9ZqJlaJv0eUsM6SUJKhvEH7hKZ4DQto2ypA0JSTsI?=
- =?us-ascii?Q?AFL91YWgmUr3skNWMSYT4KQyv1vxXvNuDoOvIQyFhYRYdaNXG2I6oV5p048+?=
- =?us-ascii?Q?VssMeFevQjzE327FejbvMRXvaYGUFyfgLTJPcqdmiu02i8aSyIvmbfNb0Vyg?=
- =?us-ascii?Q?YReoRFF6EWnWmx9dE29mLWoHmqKHDIxpLQmHUvdzJ78uLrGCgdoWmM5w1Cm9?=
- =?us-ascii?Q?rvuzl/KuTGNqvemYBTMAykgAx2E85jxEuiTJ50SRvIDRRBUI7cyAGF6Rdzfk?=
- =?us-ascii?Q?u/7Bi3vJ/vQ7xq73+c0BkFX3WEJti/WmrnAmBxLoGvzjr2xXs+VJkvDbJCY6?=
- =?us-ascii?Q?fIFutvrZ3gilXuEqYcnnWK7BW8PsBu1NU+hWi0ylB7/Aqs92iYtheVwb3/1p?=
- =?us-ascii?Q?wSR21qADKQ1GW/4FRNWSNfJ13TEGYsy/MslD7yoPEww1qDZdVFLcRaYE5Tum?=
- =?us-ascii?Q?pf80pd4a8X+uQZsxdd9s7YBqsnDunHowH/EpF/VevXB/0FbOWyKXlaQKsg0G?=
- =?us-ascii?Q?shUB1nccA3gCqMOSsODQFuy345vZ?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c2b843c-346d-47b7-e157-08d8de77226b
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2021 19:04:13.9381
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: T4apX6t1xYIi1rHpHjdQxJZZqyLjD8LHS+LD/cnacMqGWzk6HRfpXs5NA7AYi4ck
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7280
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2653260.1614813611.1@warthog.procyon.org.uk>
+Date:   Wed, 03 Mar 2021 23:20:11 +0000
+Message-ID: <2653261.1614813611@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Aurelien Aptel <aaptel@suse.com>
+I'm looking at redesigning the on-disk cache format used by fscache's
+cachefiles driver to try and eliminate the number of synchronous metadata
+operations done by the driver, to improve culling performance and to reduce
+the amount of opens/files open.  I also need to stop relying on the backing
+filesystem to track where I have data stored.
 
-Similarly to NFS, CIFS flock() locks behave differently than the
-standard. Document those differences.
+There are a number of options that I've considered:
 
-Here is the rendered text:
+ (0) The current format lays out a directory tree, with directories for each
+     level of index (so in AFS's terms, you've got an overall "afs" dir
+     containing a dir for each cell.  In each cell dir, there's a dir for each
+     volume and within that there's a file for each afs vnode cached.  Extra
+     levels of directory are also interposed to reduce the number of entries
+     in a directory.
 
-CIFS details
-  In  Linux kernels up to 5.4, flock() is not propagated over SMB. A file
-  with such locks will not appear locked for remote clients.
+     - Pathwalk cost to open a cache file.
+     - Netfs coherency data is in xattrs.
+     - Invalidation done by truncate or unlink.
+     - Uses backing filesystem metadata to keep track of present data.
+       - Determined by bmap() on the cache file.
+     - Culling performed by userspace daemon.
+     - Data file opened for every write.
+     - Read done by readpage without file.
 
-  Since Linux 5.5, flock() locks are emulated with SMB  byte-range  locks
-  on  the  entire  file.  Similarly  to NFS, this means that fcntl(2) and
-  flock() locks interact with one another. Another important  side-effect
-  is  that  the  locks are not advisory anymore: a write on a locked file
-  will always fail with EACCESS.  This difference originates from the de-
-  sign of locks in the SMB protocol, which provides mandatory locking se-
-  mantics. The nobrl mount option (see mount.cifs(8)) turns off  fnctl(2)
-  and  flock() lock propagation to remote clients and makes flock() locks
-  advisory again.
+ (0a) As (0) but using SEEK_DATA/SEEK_HOLE instead of bmap and opening the
+      file for every whole operation (which may combine reads and writes).
 
-Signed-off-by: Aurelien Aptel <aaptel@suse.com>
----
- man2/flock.2 | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ (1) Structured the same as (0), but keeping an independent content map and
+     not relying on backing fs metadata.  Use a larger blocksize, say 256K, to
+     reduce the size of the content map.
 
-diff --git a/man2/flock.2 b/man2/flock.2
-index 61d4b5396..4b6e5cc24 100644
---- a/man2/flock.2
-+++ b/man2/flock.2
-@@ -239,6 +239,35 @@ see the discussion of the
- .I "local_lock"
- option in
- .BR nfs (5).
-+.SS CIFS details
-+In Linux kernels up to 5.4,
-+.BR flock ()
-+is not propagated over SMB. A file with such locks will not appear
-+locked for remote clients.
-+.PP
-+Since Linux 5.5,
-+.BR flock ()
-+locks are emulated with SMB byte-range locks on the entire
-+file. Similarly to NFS, this means that
-+.BR fcntl (2)
-+and
-+.BR flock ()
-+locks interact with one another. Another important side-effect is that
-+the locks are not advisory anymore: a write on a locked file will
-+always fail with
-+.BR EACCESS .
-+This difference originates from the design of locks in the SMB
-+protocol, which provides mandatory locking semantics. The
-+.I nobrl
-+mount option (see
-+.BR mount.cifs (8))
-+turns off
-+.BR fnctl (2)
-+and
-+.BR flock ()
-+lock propagation to remote clients and makes
-+.BR flock ()
-+locks advisory again.
- .SH SEE ALSO
- .BR flock (1),
- .BR close (2),
---=20
-2.30.0
+     - Netfs coherency data in xattrs.
+     - Invalidation done by tmpfile creation and link-replace.
+     - Content bitmap kept in xattr.
+       - Limited capacity.  Could use multiple bitmaps.
+       - Can skip the bitmap for a non-sparse file that we have all of.
+     - "Open" state kept in xattr.
+     - File is kept open
+     - Culling performed by userspace daemon.
+     - Cache file open whilst netfs file is open.
+
+ (2) Structured the same as (1), but keeping an extent list instead of a
+     bitmap.
+
+     - Content extent map kept in xattr.
+       - Limited capacity.
+       - Highly scattered extents use a lot of map space.
+
+ (3) OpenAFS-style format.  One index file to look up {file_key,block#} and an
+     array of data files, each holding one block (e.g. a 256KiB-aligned chunk
+     of a file).  Each index entry has valid start/end offsets for easy
+     truncation.
+
+     The index has a hash to facilitate the lookup and an LRU that allows a
+     block to be recycled at any time.
+
+     - File keys, are highly variable in length and can be rather long,
+       particularly NFS FIDs.
+       - Might want a separate file index that maps file keys to a slot ID
+       	 that can then be used in the block index.
+     - Netfs coherency data in vnode index entry.
+     - Invalidation done by clearing matching entries in the index.
+       - Dead data files can be lazily unlinked or truncated or just
+         overwritten.
+     - Content mapping by lookup in block index hash table.
+       - Fine if the hash table is large and scatter is good.
+     - Potential coherency problem between indices and data file.
+     - Culling performed by block index LRU.
+     - Really want to retain entire block index in RAM.
+     - Data files are opened for every read/write.
+
+ (4) Similar format to (3), but could put entirety of data in one file.
+
+     - Data file open entire time cache online.
+     - Unused block bitmap.
+     - Can use fallocate to punch out dead blocks.
+     - Could put data file on blockdev.
+
+ (5) Similar idea to (4), but just have a file index and use block pointers
+     and indirection blocks instead.  Use an LRU in the file index and cull
+     whole files only, not individual blocks.
+
+     - File keys, are highly variable in length and can be rather long,
+       particularly NFS FIDs.
+     - Netfs coherency data in vnode index entry.
+     - Unused data block bitmap.
+     - Invalidation done by clearing entries in the file index.
+       - Data blocks must be recycled and returned to bitmap.
+       - Dead data blocks can be lazily punched out with fallocate.
+     - Potential coherency problem between index, pointers/indirection and
+       bitmap.
+     - Culling performed by file index LRU.
+     - Really want to retain entire file index and block bitmap in RAM.
+       - May be less memory than block index.
+     - Data file open entire time cache online.
+     - Could put data file on blockdev.
+     - If the block size is large, lots of dead space in indirection blocks.
+
+ (6) Similar to (5), but use extent lists rather than indirection blocks.
+
+     - Requires allocation of contiguous space to be worthwhile.
+     - Buddy allocator approach?
+       - Can always arbitrarily recycle buddies to make larger spaces - if we
+       	 can find them...
+
+ (7) Hybrid approach.  Stick the first block of every netfs file in one big
+     cache file.  For a lot of cases, that would suffice for the entire file
+     if the block size is large enough.  Store the tails of larger files in
+     separate files.
+
+     - File index with LRU.
+     - More complicated to manage.
+     - Fewer files open.
+
+So (0) is what's upstream.  I have (0a) implemented in my fscache-netfs-lib
+branch and (1) implemented in my fscache-iter branch.  However, it spends a
+lot of cpu time doing synchronous metadata ops, such as creating tmpfiles,
+link creation and setting xattrs, particularly when unmounting the filesystem
+or disabling the cache - both of which are done during shutdown.
+
+I'm leaning towards (4) or (5).  I could use extent maps, but I don't
+necessarily have a good idea of what access patterns I have to deal with till
+later.  With network filesystems that are going to read and cache large blocks
+(say 2MiB), extents would allow reduction of the metadata, particularly where
+it would span a bitmap.
+
+Using a block index (4) allows me to easily recycle a large chunk of cache in
+one go - even if it means arbitrarily kicking out blocks that weren't near the
+end of the LRU yet.
+
+Using block pointers and indirection blocks (5) means I only need this data in
+RAM when I need it; with the LRU management being done in the file index.
+
+Either way with (4) and (5), at least one index really needs to be resident in
+RAM to make LRU wangling efficient.  Also, I need to decide how to handle
+coherency management - setting an "in use" flag on the file index entry and
+flushing it before making any modifications might work.
+
+On the other hand, sticking with (1) or (2) makes it easier to add extra
+metadata very easily (say to handle disconnected operation), though it's
+harder to manage culling and manage the capacity of the cache.
+
+I have a suspicion that the answer is "it depends" and that the best choice is
+very much going to be workload dependent - and may even vary from volume to
+volume within the same workload.
+
+Any thoughts or better solutions?
+
+David
 
