@@ -2,218 +2,129 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69ACDC432C3
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D9FC15503
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41F7D6023B
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95F2464E62
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1388013AbhCDA2l (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 3 Mar 2021 19:28:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44366 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1355341AbhCDAXb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Mar 2021 19:23:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614817324;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=gXOtBmgY5MdqpQGzSKCvOP3QkZbnNtvngwVGLI4VAgk=;
-        b=Ko7cgZT+UXhXXj2Ryc6TZpH+61ZK5Kr9uJq0MW8+KPxg4P4rSnrhAzmGDK+OzXK9zH5E4r
-        c96DVSRNeor/yvn/7ms5T96r14JNQ0lSE+tkhkRoeCV0EQoExb4HMeazlf1NVDNMlA+FVK
-        3UrOW2hrPhZYsj24UIBsHspfsdu2rt8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-dv_IBc6QNiipp5PAUfyt4w-1; Wed, 03 Mar 2021 18:20:21 -0500
-X-MC-Unique: dv_IBc6QNiipp5PAUfyt4w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECB8D193578C;
-        Wed,  3 Mar 2021 23:20:18 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-119-68.rdu2.redhat.com [10.10.119.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E6AC612D7E;
-        Wed,  3 Mar 2021 23:20:12 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     linux-cachefs@redhat.com
-Cc:     dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        "J. Bruce Fields" <bfields@fieldses.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: fscache: Redesigning the on-disk cache
+        id S1350313AbhCDA2g (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 3 Mar 2021 19:28:36 -0500
+Received: from p3plsmtpa11-01.prod.phx3.secureserver.net ([68.178.252.102]:53385
+        "EHLO p3plsmtpa11-01.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1388013AbhCCUYO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Mar 2021 15:24:14 -0500
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id HY1ml85cHSxgqHY1mle4LS; Wed, 03 Mar 2021 13:23:27 -0700
+X-CMAE-Analysis: v=2.4 cv=I6mg+Psg c=1 sm=1 tr=0 ts=603ff03f
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=SEc3moZ4AAAA:8 a=iox4zFpeAAAA:8 a=Dn3fJbBJWZ8bWwpP0-sA:9
+ a=QEXdDO2ut3YA:10 a=5oRCH6oROnRZc2VpWJZ3:22 a=WzC6qhA0u3u7Ye7llzcV:22
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [PATCH v3] flock.2: add CIFS details
+To:     =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-man@vger.kernel.org, mtk.manpages@gmail.com
+Cc:     smfrench@gmail.com
+References: <17fc432c-f485-0945-6d12-fa338ea0025f@talpey.com>
+ <20210303190353.31605-1-aaptel@suse.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <be8416d4-64f8-675e-3f46-f55dddf1e03b@talpey.com>
+Date:   Wed, 3 Mar 2021 15:23:27 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2653260.1614813611.1@warthog.procyon.org.uk>
-Date:   Wed, 03 Mar 2021 23:20:11 +0000
-Message-ID: <2653261.1614813611@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20210303190353.31605-1-aaptel@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfAi6iph6xbnYCuduuU9qfMGGJWBIgyBcmX2RkF6vN2+w6He2BuhNBiKlSLggG+89PJmlmW2OkTfUZWnaHdsXs82nXF3EBGAUJnRG5luN8KQ1biBV6fMP
+ S3HzkNICTNjCqoW7TB803VDlO+iwTnsV5X7dyf/NbWxPJezYAhQ3SQUg0Qg6CdUjeJfqfRLPYnrylKuVbzePowkKlqLpT5qITwJN+Za74xDY9Q5XNUCyYZLi
+ 850x9J/FbRAf9Vz/ejbblWP0fI2+aG8/7KUSUKj8WWbYZ3zLGf/jwrdFz8oNHjL43dC7qEkNXOvc6FnrW/ZVggscqXD7ORgmKHM0MWvaexJ7/b6zrZyDGaNP
+ 5PpRf2AQ
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I'm looking at redesigning the on-disk cache format used by fscache's
-cachefiles driver to try and eliminate the number of synchronous metadata
-operations done by the driver, to improve culling performance and to reduce
-the amount of opens/files open.  I also need to stop relying on the backing
-filesystem to track where I have data stored.
+It looks great, and sorry to be a pest, but I just noticed - it's
+EACCES (not EACCESS).
 
-There are a number of options that I've considered:
+Reviewed-By: Tom Talpey <tom@talpey.com>
 
- (0) The current format lays out a directory tree, with directories for each
-     level of index (so in AFS's terms, you've got an overall "afs" dir
-     containing a dir for each cell.  In each cell dir, there's a dir for each
-     volume and within that there's a file for each afs vnode cached.  Extra
-     levels of directory are also interposed to reduce the number of entries
-     in a directory.
+On 3/3/2021 2:03 PM, Aurélien Aptel wrote:
+> From: Aurelien Aptel <aaptel@suse.com>
+> 
+> Similarly to NFS, CIFS flock() locks behave differently than the
+> standard. Document those differences.
+> 
+> Here is the rendered text:
+> 
+> CIFS details
+>    In  Linux kernels up to 5.4, flock() is not propagated over SMB. A file
+>    with such locks will not appear locked for remote clients.
+> 
+>    Since Linux 5.5, flock() locks are emulated with SMB  byte-range  locks
+>    on  the  entire  file.  Similarly  to NFS, this means that fcntl(2) and
+>    flock() locks interact with one another. Another important  side-effect
+>    is  that  the  locks are not advisory anymore: a write on a locked file
+>    will always fail with EACCESS.  This difference originates from the de-
+>    sign of locks in the SMB protocol, which provides mandatory locking se-
+>    mantics. The nobrl mount option (see mount.cifs(8)) turns off  fnctl(2)
+>    and  flock() lock propagation to remote clients and makes flock() locks
+>    advisory again.
+> 
+> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+> ---
+>   man2/flock.2 | 29 +++++++++++++++++++++++++++++
+>   1 file changed, 29 insertions(+)
+> 
+> diff --git a/man2/flock.2 b/man2/flock.2
+> index 61d4b5396..4b6e5cc24 100644
+> --- a/man2/flock.2
+> +++ b/man2/flock.2
+> @@ -239,6 +239,35 @@ see the discussion of the
+>   .I "local_lock"
+>   option in
+>   .BR nfs (5).
+> +.SS CIFS details
+> +In Linux kernels up to 5.4,
+> +.BR flock ()
+> +is not propagated over SMB. A file with such locks will not appear
+> +locked for remote clients.
+> +.PP
+> +Since Linux 5.5,
+> +.BR flock ()
+> +locks are emulated with SMB byte-range locks on the entire
+> +file. Similarly to NFS, this means that
+> +.BR fcntl (2)
+> +and
+> +.BR flock ()
+> +locks interact with one another. Another important side-effect is that
+> +the locks are not advisory anymore: a write on a locked file will
+> +always fail with
+> +.BR EACCESS .
 
-     - Pathwalk cost to open a cache file.
-     - Netfs coherency data is in xattrs.
-     - Invalidation done by truncate or unlink.
-     - Uses backing filesystem metadata to keep track of present data.
-       - Determined by bmap() on the cache file.
-     - Culling performed by userspace daemon.
-     - Data file opened for every write.
-     - Read done by readpage without file.
+EACCES
 
- (0a) As (0) but using SEEK_DATA/SEEK_HOLE instead of bmap and opening the
-      file for every whole operation (which may combine reads and writes).
-
- (1) Structured the same as (0), but keeping an independent content map and
-     not relying on backing fs metadata.  Use a larger blocksize, say 256K, to
-     reduce the size of the content map.
-
-     - Netfs coherency data in xattrs.
-     - Invalidation done by tmpfile creation and link-replace.
-     - Content bitmap kept in xattr.
-       - Limited capacity.  Could use multiple bitmaps.
-       - Can skip the bitmap for a non-sparse file that we have all of.
-     - "Open" state kept in xattr.
-     - File is kept open
-     - Culling performed by userspace daemon.
-     - Cache file open whilst netfs file is open.
-
- (2) Structured the same as (1), but keeping an extent list instead of a
-     bitmap.
-
-     - Content extent map kept in xattr.
-       - Limited capacity.
-       - Highly scattered extents use a lot of map space.
-
- (3) OpenAFS-style format.  One index file to look up {file_key,block#} and an
-     array of data files, each holding one block (e.g. a 256KiB-aligned chunk
-     of a file).  Each index entry has valid start/end offsets for easy
-     truncation.
-
-     The index has a hash to facilitate the lookup and an LRU that allows a
-     block to be recycled at any time.
-
-     - File keys, are highly variable in length and can be rather long,
-       particularly NFS FIDs.
-       - Might want a separate file index that maps file keys to a slot ID
-       	 that can then be used in the block index.
-     - Netfs coherency data in vnode index entry.
-     - Invalidation done by clearing matching entries in the index.
-       - Dead data files can be lazily unlinked or truncated or just
-         overwritten.
-     - Content mapping by lookup in block index hash table.
-       - Fine if the hash table is large and scatter is good.
-     - Potential coherency problem between indices and data file.
-     - Culling performed by block index LRU.
-     - Really want to retain entire block index in RAM.
-     - Data files are opened for every read/write.
-
- (4) Similar format to (3), but could put entirety of data in one file.
-
-     - Data file open entire time cache online.
-     - Unused block bitmap.
-     - Can use fallocate to punch out dead blocks.
-     - Could put data file on blockdev.
-
- (5) Similar idea to (4), but just have a file index and use block pointers
-     and indirection blocks instead.  Use an LRU in the file index and cull
-     whole files only, not individual blocks.
-
-     - File keys, are highly variable in length and can be rather long,
-       particularly NFS FIDs.
-     - Netfs coherency data in vnode index entry.
-     - Unused data block bitmap.
-     - Invalidation done by clearing entries in the file index.
-       - Data blocks must be recycled and returned to bitmap.
-       - Dead data blocks can be lazily punched out with fallocate.
-     - Potential coherency problem between index, pointers/indirection and
-       bitmap.
-     - Culling performed by file index LRU.
-     - Really want to retain entire file index and block bitmap in RAM.
-       - May be less memory than block index.
-     - Data file open entire time cache online.
-     - Could put data file on blockdev.
-     - If the block size is large, lots of dead space in indirection blocks.
-
- (6) Similar to (5), but use extent lists rather than indirection blocks.
-
-     - Requires allocation of contiguous space to be worthwhile.
-     - Buddy allocator approach?
-       - Can always arbitrarily recycle buddies to make larger spaces - if we
-       	 can find them...
-
- (7) Hybrid approach.  Stick the first block of every netfs file in one big
-     cache file.  For a lot of cases, that would suffice for the entire file
-     if the block size is large enough.  Store the tails of larger files in
-     separate files.
-
-     - File index with LRU.
-     - More complicated to manage.
-     - Fewer files open.
-
-So (0) is what's upstream.  I have (0a) implemented in my fscache-netfs-lib
-branch and (1) implemented in my fscache-iter branch.  However, it spends a
-lot of cpu time doing synchronous metadata ops, such as creating tmpfiles,
-link creation and setting xattrs, particularly when unmounting the filesystem
-or disabling the cache - both of which are done during shutdown.
-
-I'm leaning towards (4) or (5).  I could use extent maps, but I don't
-necessarily have a good idea of what access patterns I have to deal with till
-later.  With network filesystems that are going to read and cache large blocks
-(say 2MiB), extents would allow reduction of the metadata, particularly where
-it would span a bitmap.
-
-Using a block index (4) allows me to easily recycle a large chunk of cache in
-one go - even if it means arbitrarily kicking out blocks that weren't near the
-end of the LRU yet.
-
-Using block pointers and indirection blocks (5) means I only need this data in
-RAM when I need it; with the LRU management being done in the file index.
-
-Either way with (4) and (5), at least one index really needs to be resident in
-RAM to make LRU wangling efficient.  Also, I need to decide how to handle
-coherency management - setting an "in use" flag on the file index entry and
-flushing it before making any modifications might work.
-
-On the other hand, sticking with (1) or (2) makes it easier to add extra
-metadata very easily (say to handle disconnected operation), though it's
-harder to manage culling and manage the capacity of the cache.
-
-I have a suspicion that the answer is "it depends" and that the best choice is
-very much going to be workload dependent - and may even vary from volume to
-volume within the same workload.
-
-Any thoughts or better solutions?
-
-David
-
+> +This difference originates from the design of locks in the SMB
+> +protocol, which provides mandatory locking semantics. The
+> +.I nobrl
+> +mount option (see
+> +.BR mount.cifs (8))
+> +turns off
+> +.BR fnctl (2)
+> +and
+> +.BR flock ()
+> +lock propagation to remote clients and makes
+> +.BR flock ()
+> +locks advisory again.
+>   .SH SEE ALSO
+>   .BR flock (1),
+>   .BR close (2),
+> 
