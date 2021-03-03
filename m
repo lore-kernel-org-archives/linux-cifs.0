@@ -2,133 +2,196 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3434DC4321A
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E26C433E6
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05AEB6023B
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 503CD64E67
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355441AbhCDA23 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 3 Mar 2021 19:28:29 -0500
-Received: from p3plsmtpa11-03.prod.phx3.secureserver.net ([68.178.252.104]:47639
-        "EHLO p3plsmtpa11-03.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243269AbhCCSKx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Mar 2021 13:10:53 -0500
-Received: from [192.168.0.116] ([71.184.94.153])
-        by :SMTPAUTH: with ESMTPSA
-        id HVvelXiCvKEOAHVvelgCok; Wed, 03 Mar 2021 11:08:58 -0700
-X-CMAE-Analysis: v=2.4 cv=erwacqlX c=1 sm=1 tr=0 ts=603fd0ba
- a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
- a=IkcTkHD0fZMA:10 a=iox4zFpeAAAA:8 a=Dn3fJbBJWZ8bWwpP0-sA:9 a=QEXdDO2ut3YA:10
- a=WzC6qhA0u3u7Ye7llzcV:22
-X-SECURESERVER-ACCT: tom@talpey.com
-Subject: Re: [PATCH v2] flock.2: add CIFS details
-To:     =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+        id S1451005AbhCDA2e (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 3 Mar 2021 19:28:34 -0500
+Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:50445 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1350313AbhCCTFl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Mar 2021 14:05:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1614798257;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=irYpeoFd1vn4PPKGQI2P/VimUYWFx4DtL0ROKNEWfDs=;
+        b=CZTX03D6dKnMeM2nHtrPcUJkdBNfoBIhDvnLr28KmHonGfKAxRKiC2HHwCY7WOCrLLTjAt
+        RkaNivDPsuo0eNkfuevrmwFwHi03Fdgt8PKdJ33aRVG1HfURgPcul+FnBloCISsq6LieWa
+        PT5HSu+ddqbDHTKhu3cQT0wbDco9KeA=
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com
+ (mail-db8eur05lp2104.outbound.protection.outlook.com [104.47.17.104])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ de-mta-16-8Z0l7xMiNRiP1ZWJpyRZ_w-1; Wed, 03 Mar 2021 20:04:16 +0100
+X-MC-Unique: 8Z0l7xMiNRiP1ZWJpyRZ_w-1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AuKAtIW/VR+byioOUTIASjM0hRAJ5egOWY32Lj//hAphsEoVE5Ye48JEUN0DRBgxnOlvE0P6zk+x0phRO7Dr+CYujzUclQGVH9uuaAozz+Gj48LfalcxlCz9c/otZSrs8yxfhqUL3G1d0zvpdN96he5IJWdIUJIru1n7n0nk1gL9zE2NiaNLYVhuOA3cQXNipSISQFcURHAVU2pNELISEDbdmWTCZv687qie5mXU2bWaIoZujkKW7HPKh/WZFIrlK80LjlFvV34v4v3MQ54In03rggOtLaruYw7wjeHYw2aYRO9jiCex/cUBBJCntARex5al8RGWfqSSbZ4ZuS+qfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UjU9KsJuRDpPxHRZ7/NaaELVluzegeeTIs8S0XxTIGY=;
+ b=bhqnT/6Cq/4RaVkrF47nXzO9dpvC2CqV6+b++zPY79A2AySiuR7StpCrX5debOrCrtkEerxZksHIMB9RqJySmYsubX/Y0IAP1YHr5Z1A2lhmQ2A3j742wt0/u+mC3MpZWz4yjLDIWTF+ZF91dttxI3QIlIg1OqojNuBQ1bkju9mXi2L6263xXCLIZkgk/DGMgtvFCBO9c2+r32fcxd128imZ50heN+AURfoYl+nq8x0h1LxJdSQlMKZBmxDrLk2XSMfSBqVYeth2+Dn+1vjyDOPMKRwYxMScLKKXKJ3I8Rr58oE6072YZriWsuL57hcYVB2SEfhfME3H/3tTm9ueIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: talpey.com; dkim=none (message not signed)
+ header.d=none;talpey.com; dmarc=none action=none header.from=suse.com;
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
+ by VE1PR04MB7280.eurprd04.prod.outlook.com (2603:10a6:800:1af::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Wed, 3 Mar
+ 2021 19:04:14 +0000
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3890.028; Wed, 3 Mar 2021
+ 19:04:13 +0000
+From:   =?UTF-8?q?Aur=C3=A9lien=20Aptel?= <aaptel@suse.com>
+To:     Tom Talpey <tom@talpey.com>,
+        =?UTF-8?q?Aur=C3=A9lien=20Aptel?= <aaptel@suse.com>,
         linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-man@vger.kernel.org, mtk.manpages@gmail.com
-Cc:     smfrench@gmail.com
-References: <8735xcxkv5.fsf@suse.com> <20210303163755.31127-1-aaptel@suse.com>
-From:   Tom Talpey <tom@talpey.com>
-Message-ID: <17fc432c-f485-0945-6d12-fa338ea0025f@talpey.com>
-Date:   Wed, 3 Mar 2021 13:08:58 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+CC:     smfrench@gmail.com
+Subject: [PATCH v3] flock.2: add CIFS details
+Date:   Wed,  3 Mar 2021 20:03:53 +0100
+Message-ID: <20210303190353.31605-1-aaptel@suse.com>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <17fc432c-f485-0945-6d12-fa338ea0025f@talpey.com>
+References: <17fc432c-f485-0945-6d12-fa338ea0025f@talpey.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [2003:fa:70b:4a22:792c:d376:dd41:4ec2]
+X-ClientProxiedBy: ZR0P278CA0100.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:23::15) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+ (2603:10a6:803:3::28)
 MIME-Version: 1.0
-In-Reply-To: <20210303163755.31127-1-aaptel@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfCWhMEvjwmzD8Up+kCe11ZTwxATDUaYkCaSiMu66xtAOJDknoqjgYDolWUzD30AASEU3ysNJTqgye3KgMwSCjrYbnSojIBN3xh9sSY7M38WZP//0PUlc
- e8FRucMuxT+TXlO+yOfuCEu23fHOqGS2R4OjH5gcCUvLGWoE4cYmYqgAirQTj9yWA5HbR67TSI9xsnlKEB3D34fswAlSNIJ5hI5U69AFUtGRKovTyCril6Wa
- Y3UHM4UmPcAuYKW16EqYRUUjY4UJu0sHPWNjwI0jsmdNTBn8mXAmMxAc5HRuK/mdVxqu39PAentTwAsva67FCqT4vKXZCb9zuQ6dnDsKIv0m4Jj6SDbtvhoQ
- S5y4xRm4
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (2003:fa:70b:4a22:792c:d376:dd41:4ec2) by ZR0P278CA0100.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:23::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Wed, 3 Mar 2021 19:04:13 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6c2b843c-346d-47b7-e157-08d8de77226b
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7280:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VE1PR04MB728026BACB9F395945E63534A8989@VE1PR04MB7280.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jwSqwHZKr7Vzwh3PhedkYtwCvhi14Qa1zjW5B+VFG0ioCh/yDykhklOk+c4tHZ4p4JtPla6fJ2U0avOCFWMEeXcrBjDFiZc5aaOSZgzJR7AUax2sgUIDrCKWE/djTsL4pO7gPz0USQenJRw8Su9piElYo+uOCwoc0IjP9KkfHAEk1+Dy9rZDR4kb+vJKE/DzVn3wfOYaHl9vC69xS6yaV1svC+IY0l+BHsXjfu+fTrkhj2KwSIAB7a/flUxM/k+gu9XUX7FMhK9dCcJblSM9Iqk/GXizTeoWhLnST0TZjKL81bQl8LqwxRo/hNv/3c9aKiMiWXH3U/QcYZwtnnyxrrfMg7OHcULA4Laurbr+yZOpE0wy23bQJo0Rcko5PArl3+3exNCS2ZSJJwNXjm5cf34Ym0gIjAf/x8j6JVHQTbAFIw5HrtHVb4yY3B2FDKPEgc4QA3fVt7xzpuX9PlIy0lLhwkl7v8Sl8CqVKNnfFi92rBc7U/Th3V1OU+mDh75NG1z8EqWMbvr0b89T2pLOZRPY1a05N2pypzx+a4jELKrp2qel5y01kgu7i1bMW+0J0RT76amydhoIzEL5vtg4/5UZVJeknr9QujDEr44gj5IrjUXY5GFryTR7EUHxzK8ir9ZG10nWP+4rkyWu3+Z/5pilV7l9aIozqxCxPXheASw1mmsIzmpmcy6NZH4KSk+azB6soZYNjrfoWexKBcjKqK+9eohhCbcES01kOilNkxph++dJhcskIH4lfZTaElhRxxXMFx64wxABUnKeBFuHELKBB1g5+R+3pcpTv1w80kAgpOOh7daxxaoX1bVd+CbrrQF/KqiIiym/PnDL7QOq8gYSH94kn+HYKorde8OExRXWnk6VSzDcFC02sQA5EwrZTW7+6Dxu6ufGPR+pT6W/oA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:OSPM;SFS:(376002)(136003)(346002)(366004)(396003)(39860400002)(8676002)(83380400001)(316002)(66946007)(110136005)(8936002)(1076003)(186003)(4326008)(36756003)(6666004)(478600001)(6496006)(16526019)(52116002)(2906002)(6486002)(86362001)(5660300002)(2616005)(66476007)(66556008)(23200700001);DIR:OUT;SFP:1501;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?+Q2w5st7eFT1kcxw7wRwC/GnbqiIdLjnph4PUtOkGDxAtDhQH+DAnkx3N5q9?=
+ =?us-ascii?Q?ApT9y8QKugucUyC5UPJyWPk0NloMl+z8EmdP5cJUtFpjcrYqxLONh2IftA9a?=
+ =?us-ascii?Q?DEsU2y5a8XZSavPNuTwBnlI2Q53SJj6r8uAPPWEtMXeVRhzZXE9yNFw7+7KY?=
+ =?us-ascii?Q?c0cEd2iNBTpALkBWCsfRxD5BefehcQiOlftYZp9/rczjSOWSQcblzsIwT/10?=
+ =?us-ascii?Q?K5LeAzSQY+bypv+Qz3eV2xv4O80lcL68I+IRwhZB2a0c2CrqkiiD8Ug7u7Ff?=
+ =?us-ascii?Q?/297o+tB4jV1VlfNC9SDLweeh0FkODVPjMr8CLbn826Xg884bDt3IM2j1fAr?=
+ =?us-ascii?Q?Owzz5+0xSSTads61cR0kpTy/BuZMAYlrzsF2UDyaX0gaX0WIcNb2r8bKxbT+?=
+ =?us-ascii?Q?sy2xg3fjRPBQ5gsa3XeU98LMxfc8z9D+WxZTIq67wqz3Pja6N7nFAD4OK2we?=
+ =?us-ascii?Q?M/DjGm68X7Qzp0gfFrO9z1pnDDoR3HTXV2QD5UevKgjquQvOKBIgK7VGQHbr?=
+ =?us-ascii?Q?ac1V+fzm28YBGEUr9zisGSqsA0v2SbNEd+JE4KqW9oaTD7r04HUChLVQ6oZ0?=
+ =?us-ascii?Q?rL5hnu9BY126W10H0h4DbHns28WPeHlTiJ9Sh2zuYWMResbNosHrugKCrhH5?=
+ =?us-ascii?Q?Zsz/X1zFtvyQCYnz978Ccyk8Cs6rkPp8ycZS8uLAtRcSz7QaApImSgeVAYdj?=
+ =?us-ascii?Q?2kG98P9u0FbaFSDiOgGhslIaENNtKu63pNorkKyNVpyMNJI96l8Vtj+ERaj9?=
+ =?us-ascii?Q?9XqLW6wf5Vu4FecIMiiH6PNUqM3rNS5ahInILaDk0Fue1iw7VR2EMeIEWaRq?=
+ =?us-ascii?Q?HACYbqq8ovMK4Rnkjtn9ZqJlaJv0eUsM6SUJKhvEH7hKZ4DQto2ypA0JSTsI?=
+ =?us-ascii?Q?AFL91YWgmUr3skNWMSYT4KQyv1vxXvNuDoOvIQyFhYRYdaNXG2I6oV5p048+?=
+ =?us-ascii?Q?VssMeFevQjzE327FejbvMRXvaYGUFyfgLTJPcqdmiu02i8aSyIvmbfNb0Vyg?=
+ =?us-ascii?Q?YReoRFF6EWnWmx9dE29mLWoHmqKHDIxpLQmHUvdzJ78uLrGCgdoWmM5w1Cm9?=
+ =?us-ascii?Q?rvuzl/KuTGNqvemYBTMAykgAx2E85jxEuiTJ50SRvIDRRBUI7cyAGF6Rdzfk?=
+ =?us-ascii?Q?u/7Bi3vJ/vQ7xq73+c0BkFX3WEJti/WmrnAmBxLoGvzjr2xXs+VJkvDbJCY6?=
+ =?us-ascii?Q?fIFutvrZ3gilXuEqYcnnWK7BW8PsBu1NU+hWi0ylB7/Aqs92iYtheVwb3/1p?=
+ =?us-ascii?Q?wSR21qADKQ1GW/4FRNWSNfJ13TEGYsy/MslD7yoPEww1qDZdVFLcRaYE5Tum?=
+ =?us-ascii?Q?pf80pd4a8X+uQZsxdd9s7YBqsnDunHowH/EpF/VevXB/0FbOWyKXlaQKsg0G?=
+ =?us-ascii?Q?shUB1nccA3gCqMOSsODQFuy345vZ?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c2b843c-346d-47b7-e157-08d8de77226b
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2021 19:04:13.9381
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: T4apX6t1xYIi1rHpHjdQxJZZqyLjD8LHS+LD/cnacMqGWzk6HRfpXs5NA7AYi4ck
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7280
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Definitely better! Couple of suggestions:
+From: Aurelien Aptel <aaptel@suse.com>
 
-On 3/3/2021 11:37 AM, Aurélien Aptel wrote:
-> From: Aurelien Aptel <aaptel@suse.com>
-> 
-> Similarly to NFS, CIFS flock() locks behave differently than the
-> standard. Document those differences.
-> 
-> Here is the rendered text:
-> 
-> CIFS details
->    In  Linux kernels up to 5.4, flock() is not propagated over SMB. A file
->    with such locks will not appear locked for other SMB clients.
-> 
->    Since Linux 5.5, flock() are emulated with SMB byte-range locks on  the
->    entire  file.  Similarly  to  NFS, this means that fcntl(2) and flock()
->    locks interact with one another over SMB. Another important side-effect
->    is  that  the  locks are not advisory anymore: a write on a locked file
->    will always fail with EACCESS.  This difference originates from the de-
->    sign of locks in the SMB protocol, which provides mandatory locking se-
->    mantics. The nobrl mount option can be used switch back to pre-5.5 ker-
->    nel behavior.
-> 
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-> ---
->   man2/flock.2 | 21 +++++++++++++++++++++
->   1 file changed, 21 insertions(+)
-> 
-> diff --git a/man2/flock.2 b/man2/flock.2
-> index 61d4b5396..7c4e7e8c9 100644
-> --- a/man2/flock.2
-> +++ b/man2/flock.2
-> @@ -239,6 +239,27 @@ see the discussion of the
->   .I "local_lock"
->   option in
->   .BR nfs (5).
-> +.SS CIFS details
-> +In Linux kernels up to 5.4,
-> +.BR flock ()
-> +is not propagated over SMB. A file with such locks will not appear
-> +locked for other SMB clients.
+Similarly to NFS, CIFS flock() locks behave differently than the
+standard. Document those differences.
 
-Other "remote" clients, right? It's not limited to SMB, if the server
-is also managing other protocols which might support flock'ing.
+Here is the rendered text:
 
-> +.PP
-> +Since Linux 5.5,
-> +.BR flock ()
-> +are emulated with SMB byte-range locks on the
-> +entire file. Similarly to NFS, this means that
-> +.BR fcntl (2)
-> +and
-> +.BR flock ()
-> +locks interact with one another over SMB. Another important
+CIFS details
+  In  Linux kernels up to 5.4, flock() is not propagated over SMB. A file
+  with such locks will not appear locked for remote clients.
 
-There's a subtlety here. If the server implements these SMB byte-range
-locks in certain ways, the locks may interact with other protocols too.
-So constraining the statement to "over SMB" may be incomplete.
+  Since Linux 5.5, flock() locks are emulated with SMB  byte-range  locks
+  on  the  entire  file.  Similarly  to NFS, this means that fcntl(2) and
+  flock() locks interact with one another. Another important  side-effect
+  is  that  the  locks are not advisory anymore: a write on a locked file
+  will always fail with EACCESS.  This difference originates from the de-
+  sign of locks in the SMB protocol, which provides mandatory locking se-
+  mantics. The nobrl mount option (see mount.cifs(8)) turns off  fnctl(2)
+  and  flock() lock propagation to remote clients and makes flock() locks
+  advisory again.
 
-Wy not simply say "this means that fcntl() and flock() locks interact
-with one another", and preserve the generality?
+Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+---
+ man2/flock.2 | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-> +side-effect is that the locks are not advisory anymore: a write on a
-> +locked file will always fail with
-> +.BR EACCESS .
-> +This difference originates from the design of locks in the SMB
-> +protocol, which provides mandatory locking semantics. The
-> +.BR nobrl
-> +mount option can be used switch back to pre-5.5 kernel behavior.
+diff --git a/man2/flock.2 b/man2/flock.2
+index 61d4b5396..4b6e5cc24 100644
+--- a/man2/flock.2
++++ b/man2/flock.2
+@@ -239,6 +239,35 @@ see the discussion of the
+ .I "local_lock"
+ option in
+ .BR nfs (5).
++.SS CIFS details
++In Linux kernels up to 5.4,
++.BR flock ()
++is not propagated over SMB. A file with such locks will not appear
++locked for remote clients.
++.PP
++Since Linux 5.5,
++.BR flock ()
++locks are emulated with SMB byte-range locks on the entire
++file. Similarly to NFS, this means that
++.BR fcntl (2)
++and
++.BR flock ()
++locks interact with one another. Another important side-effect is that
++the locks are not advisory anymore: a write on a locked file will
++always fail with
++.BR EACCESS .
++This difference originates from the design of locks in the SMB
++protocol, which provides mandatory locking semantics. The
++.I nobrl
++mount option (see
++.BR mount.cifs (8))
++turns off
++.BR fnctl (2)
++and
++.BR flock ()
++lock propagation to remote clients and makes
++.BR flock ()
++locks advisory again.
+ .SH SEE ALSO
+ .BR flock (1),
+ .BR close (2),
+--=20
+2.30.0
 
-Wait, the page just said that pre-5.5 was local only. Wouldn't it
-be better to just say that "nobrl" turns off the entire behavior of
-forwarding locks to the server, like before? Or are there other
-side effects...
-
-Tom.
-
->   .SH SEE ALSO
->   .BR flock (1),
->   .BR close (2),
-> 
