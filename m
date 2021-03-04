@@ -2,64 +2,37 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48855C433E6
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 18:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DEE4C433E0
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 23:50:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C87164F6B
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 18:25:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DA7B64FF1
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 23:50:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234447AbhCDSZQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 Mar 2021 13:25:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56906 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234201AbhCDSYr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Mar 2021 13:24:47 -0500
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE906C061574;
-        Thu,  4 Mar 2021 10:24:06 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id j2so15879787wrx.9;
-        Thu, 04 Mar 2021 10:24:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zOtCkSuP3/sSeDKbXtcuyFbcQjnAEtPQvMYWbEo0RWc=;
-        b=YfKywlVxA2OwkHFlyyqrfje5azAqfgnYnUxA9d2jP0QvhjMAlxLR3r6C/Elzp9q92h
-         qyNvO+EX+nMI++2Pa08tB3EF/iDL28VoGHPvvuo83KL7wz5rIqdO4IYtJ/E2EM8HjKns
-         RTj1wCLR3uGl9uaqG3daUJn2+peqIV5Gsj4O4DYbgjLbrNCM7vrdoRaYmAhEOi1gJ0Ul
-         OIkZ50/qDGctum/YlbqL4IeRhcdDcXO+Ll0CO1+kK09Rh7em/N+JV2ZBNcbz0Sa4hHfQ
-         Pasn8ntj+5g6E+Ahcl84DTVVDaAxmkqSZX5p/SxvajryIPc639gS0VB5UWev/7NlpPao
-         Zx3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zOtCkSuP3/sSeDKbXtcuyFbcQjnAEtPQvMYWbEo0RWc=;
-        b=BueaABldXxSdpMgmg4C8ssYiArOin/qNCbEIwAdduBGxI92PaNKOJVV2PxNAjzabwT
-         NEWfpmBG9EVdWb2wB1x64TN6StxVGfBcbuwjYL2LgIdID/LPvgSEEw0CBzPCtYmmBV6+
-         kEFCS/l4DOWwLQ8ImuM6hnGQyVkJes0HThE7aJLVrApa54H7EReBtMF/2TSrOhC1Pz6T
-         DTydRewHDlKW0dphHl37kxyCyLmjEf4cLCBTLY4vqh71p/4QNWhjWIWaBImIwdBvUk4N
-         rih3M3It45uaIi56niyCOtKBDI7ak1x7tyVj0kFigjhxFugDa4doOFI8o1SCf1lj67S5
-         6zQw==
-X-Gm-Message-State: AOAM531llen+U9r2ZvBcXaMeOz/X+a9vXYauK3tGvRIRVMzmbr5MOCPt
-        FBGvUYZeLMyVgOs4bt4NW3Y=
-X-Google-Smtp-Source: ABdhPJw9IGXfIEwP2LVQ0WhlSyUoO96IZPZPEYenv21JjYYT4AGCNBo1c0TUm4fQXkse7RWu/AHxvQ==
-X-Received: by 2002:adf:a1ce:: with SMTP id v14mr5534243wrv.228.1614882244603;
-        Thu, 04 Mar 2021 10:24:04 -0800 (PST)
-Received: from [192.168.1.143] ([170.253.51.130])
-        by smtp.gmail.com with ESMTPSA id w18sm143376wrr.7.2021.03.04.10.24.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Mar 2021 10:24:04 -0800 (PST)
-Subject: Re: [RFC v4] copy_file_range.2: Update cross-filesystem support for
- 5.12
-To:     "Darrick J. Wong" <djwong@kernel.org>
+        id S232956AbhCDXuK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 Mar 2021 18:50:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50612 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232543AbhCDXuK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 4 Mar 2021 18:50:10 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A8F7F64FEA;
+        Thu,  4 Mar 2021 23:50:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614901809;
+        bh=la+/LlUFeQYvhLySDR4vAFpG+8JYc37BPuVHhh/Xkwo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AKCe315TTti7vXaDkftIB9RAiJKo7klEiBS5CoaUGufcb2RT0N6rraHjbpFBjG670
+         zodPbs7P67fX4UvV0tbq0GuaoGMl+f1YGJH0AEnJlMT0VvH9OaDMjs0G7F+djIB13h
+         a0QayLF3Cc7bYfl/Z5x44VhKF8ijlhkS0SIFIfcYQF0tTzhgzvM3R806Sptq/7AztU
+         cSeOmck9FCU63eeS3robzcrzFCv5XDlbI2/l9MdYA8V6nKY80KiwbQ5zc0waiij5NO
+         TkD8cNwNDDV3xmipHZWxB8s3i4hBiAdk6vwUDsVQrT1O3ZqiSHDlshsRU2xFJoEbjj
+         pT3Qz5nwZR4SQ==
+Date:   Thu, 4 Mar 2021 15:50:06 -0800
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     "Alejandro Colomar (man-pages)" <alx.manpages@gmail.com>
 Cc:     linux-man@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>,
         Michael Kerrisk <mtk.manpages@gmail.com>,
         Luis Henriques <lhenriques@suse.de>,
@@ -85,44 +58,65 @@ Cc:     linux-man@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
         Walter Harms <wharms@bfs.de>
+Subject: Re: [RFC v4] copy_file_range.2: Update cross-filesystem support for
+ 5.12
+Message-ID: <20210304235006.GW7269@magnolia>
 References: <20210224142307.7284-1-lhenriques@suse.de>
  <20210304093806.10589-1-alx.manpages@gmail.com>
  <20210304171350.GC7267@magnolia>
-From:   "Alejandro Colomar (man-pages)" <alx.manpages@gmail.com>
-Message-ID: <37df00f9-a88e-3f16-d0b4-3297248aee66@gmail.com>
-Date:   Thu, 4 Mar 2021 19:24:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+ <37df00f9-a88e-3f16-d0b4-3297248aee66@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210304171350.GC7267@magnolia>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37df00f9-a88e-3f16-d0b4-3297248aee66@gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Darrick,
-
-On 3/4/21 6:13 PM, Darrick J. Wong wrote:
-> On Thu, Mar 04, 2021 at 10:38:07AM +0100, Alejandro Colomar wrote:
->> +However, on some virtual filesystems,
->> +the call failed to copy, while still reporting success.
+On Thu, Mar 04, 2021 at 07:24:02PM +0100, Alejandro Colomar (man-pages) wrote:
+> Hi Darrick,
 > 
-> ...success, or merely a short copy?
+> On 3/4/21 6:13 PM, Darrick J. Wong wrote:
+> > On Thu, Mar 04, 2021 at 10:38:07AM +0100, Alejandro Colomar wrote:
+> > > +However, on some virtual filesystems,
+> > > +the call failed to copy, while still reporting success.
+> > 
+> > ...success, or merely a short copy?
+> 
+> Okay.
+> 
+> > 
+> > (The rest looks reasonable (at least by c_f_r standards) to me.)
+> 
+> I'm curious, what does "c_f_r standards" mean? :)
 
-Okay.
+c_f_r is shorthand for "copy_file_range".
+
+As for standards... well... I'll just say that this being the /second/
+major shift in behavior reflects our poor community development
+processes.  The door to general cross-fs copies should not have been
+thrown open with as little testing as it did.  There are legendary
+dchinner rants about how obviously broken the generic fallback was when
+it was introduced.
+
+There's a reason why we usually wire up new kernel functionality on an
+opt-in basis, and that is to foster gradual enablement as QA resources
+permit.  It's one thing for maintainers to blow up their own subsystems
+in isolation, and an entirely different thing to do it between projects
+with no coordination.
+
+Did c_f_r work between an ext4 and an xfs?  I have no idea.  It seemed
+to work between xfses of a similar vintage and featureset, at least, but
+that's about as much testing as I have ever managed.
+
+--D
 
 > 
-> (The rest looks reasonable (at least by c_f_r standards) to me.)
-
-I'm curious, what does "c_f_r standards" mean? :)
-
-Cheers,
-
-Alex
-
--- 
-Alejandro Colomar
-Linux man-pages comaintainer; https://www.kernel.org/doc/man-pages/
-http://www.alejandro-colomar.es/
+> Cheers,
+> 
+> Alex
+> 
+> -- 
+> Alejandro Colomar
+> Linux man-pages comaintainer; https://www.kernel.org/doc/man-pages/
+> http://www.alejandro-colomar.es/
