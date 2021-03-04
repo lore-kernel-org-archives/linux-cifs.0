@@ -2,131 +2,200 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 834DDC433E0
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 13:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 966E1C4332B
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 17:15:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54E8D64EEC
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 13:49:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6463D64F59
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 17:15:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241495AbhCDNtH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 4 Mar 2021 08:49:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54213 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241479AbhCDNsl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Mar 2021 08:48:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614865635;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hNSJeU6DHgk1JDrXPc6wXwBH7UNAGKwi0d2+igWtU6Y=;
-        b=SnjAsjpErilPN7UqsfPvyID4eHUhI97DdfqH6C27rpzEgZ4XX8+k3y8fOv/jX8xdlEVTbe
-        hYBBWHINrJpRx05l7CyqMnaOS/tsL2HMjhtWd7IuXrGtkYGtwFANUXhWvvI9JFrF/u5YFJ
-        e7ketTp5CzVunoohCB7NSRKFsjcTMvA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-hcFeYL5qNHGg6spmwsZ5Zw-1; Thu, 04 Mar 2021 08:47:13 -0500
-X-MC-Unique: hcFeYL5qNHGg6spmwsZ5Zw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76E8BEC1A3;
-        Thu,  4 Mar 2021 13:47:11 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-112-66.rdu2.redhat.com [10.10.112.66])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D08AD5C1A1;
-        Thu,  4 Mar 2021 13:47:05 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <2653261.1614813611@warthog.procyon.org.uk>
-References: <2653261.1614813611@warthog.procyon.org.uk>
-To:     linux-cachefs@redhat.com
-Cc:     dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        "J. Bruce Fields" <bfields@fieldses.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <dchinner@redhat.com>,
+        id S239153AbhCDRPA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 Mar 2021 12:15:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36886 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239072AbhCDROb (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 4 Mar 2021 12:14:31 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 960E464F1E;
+        Thu,  4 Mar 2021 17:13:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614878030;
+        bh=lqO7UkOMXWWQHikCfDTDyGiTWusKSlro4VEZN21pRgk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=c7RhJ2hkF22/QR6Ws+Ygt5m539P7TU2r4XRQOb1j2WGhUQwtrop0RLw0uZ+MemZzU
+         hqmLenKN93+rdtIUoh0Fexx5dW7WA9hjA149SdKqlDG714eINwMfIAacaBtKIPNrCO
+         oPQcTLzT77A4g8h4dFkceukCFmK6HQt644bGSVLv6v1SEsYKakk60fXnpjHJJcWsOD
+         67oPOglMCgjQbzitpIhyT0NGM9vzd9Fd2IdZvQbZHSiTcYiaexbIBXyfSvFoObOm1Z
+         I2afWFBzXpFOqxhrtSiwJ5I4YY8CDrJTGEMxNUL+2Sy61o7bLMURkAx1jpnQg4oAkY
+         LmWjhrD0TModA==
+Date:   Thu, 4 Mar 2021 09:13:50 -0800
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Alejandro Colomar <alx.manpages@gmail.com>
+Cc:     linux-man@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Luis Henriques <lhenriques@suse.de>,
+        Steve French <sfrench@samba.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: fscache: Redesigning the on-disk cache - LRU handling
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Nicolas Boichat <drinkcat@chromium.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        Andreas Dilger <adilger@dilger.ca>,
+        Olga Kornievskaia <aglo@umich.edu>,
+        Christoph Hellwig <hch@infradead.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Walter Harms <wharms@bfs.de>
+Subject: Re: [RFC v4] copy_file_range.2: Update cross-filesystem support for
+ 5.12
+Message-ID: <20210304171350.GC7267@magnolia>
+References: <20210224142307.7284-1-lhenriques@suse.de>
+ <20210304093806.10589-1-alx.manpages@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2973222.1614865624.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 04 Mar 2021 13:47:04 +0000
-Message-ID: <2973223.1614865624@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210304093806.10589-1-alx.manpages@gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-David Howells <dhowells@redhat.com> wrote:
+On Thu, Mar 04, 2021 at 10:38:07AM +0100, Alejandro Colomar wrote:
+> Linux 5.12 fixes a regression.
+> 
+> Cross-filesystem (introduced in 5.3) copies were buggy.
+> 
+> Move the statements documenting cross-fs to BUGS.
+> Kernels 5.3..5.11 should be patched soon.
+> 
+> State version information for some errors related to this.
+> 
+> Reported-by: Luis Henriques <lhenriques@suse.de>
+> Reported-by: Amir Goldstein <amir73il@gmail.com>
+> Related: <https://lwn.net/Articles/846403/>
+> Cc: Greg KH <gregkh@linuxfoundation.org>
+> Cc: Michael Kerrisk <mtk.manpages@gmail.com>
+> Cc: Anna Schumaker <anna.schumaker@netapp.com>
+> Cc: Jeff Layton <jlayton@kernel.org>
+> Cc: Steve French <sfrench@samba.org>
+> Cc: Miklos Szeredi <miklos@szeredi.hu>
+> Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
+> Cc: Dave Chinner <dchinner@redhat.com>
+> Cc: Nicolas Boichat <drinkcat@chromium.org>
+> Cc: Ian Lance Taylor <iant@google.com>
+> Cc: Luis Lozano <llozano@chromium.org>
+> Cc: Andreas Dilger <adilger@dilger.ca>
+> Cc: Olga Kornievskaia <aglo@umich.edu>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: ceph-devel <ceph-devel@vger.kernel.org>
+> Cc: linux-kernel <linux-kernel@vger.kernel.org>
+> Cc: CIFS <linux-cifs@vger.kernel.org>
+> Cc: samba-technical <samba-technical@lists.samba.org>
+> Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>
+> Cc: Linux NFS Mailing List <linux-nfs@vger.kernel.org>
+> Cc: Walter Harms <wharms@bfs.de>
+> Signed-off-by: Alejandro Colomar <alx.manpages@gmail.com>
+> ---
+> 
+> v3:
+>         - Don't remove some important text.
+>         - Reword BUGS.
+> v4:
+> 	- Reword.
+> 	- Link to BUGS.
+> 
+> Thanks, Amir, for all the help and better wordings.
+> 
+> Cheers,
+> 
+> Alex
+> 
+> ---
+>  man2/copy_file_range.2 | 27 +++++++++++++++++++++++----
+>  1 file changed, 23 insertions(+), 4 deletions(-)
+> 
+> diff --git a/man2/copy_file_range.2 b/man2/copy_file_range.2
+> index 611a39b80..f58bfea8f 100644
+> --- a/man2/copy_file_range.2
+> +++ b/man2/copy_file_range.2
+> @@ -169,6 +169,9 @@ Out of memory.
+>  .B ENOSPC
+>  There is not enough space on the target filesystem to complete the copy.
+>  .TP
+> +.BR EOPNOTSUPP " (since Linux 5.12)"
+> +The filesystem does not support this operation.
+> +.TP
+>  .B EOVERFLOW
+>  The requested source or destination range is too large to represent in the
+>  specified data types.
+> @@ -184,10 +187,17 @@ or
+>  .I fd_out
+>  refers to an active swap file.
+>  .TP
+> -.B EXDEV
+> +.BR EXDEV " (before Linux 5.3)"
+> +The files referred to by
+> +.IR fd_in " and " fd_out
+> +are not on the same filesystem.
+> +.TP
+> +.BR EXDEV " (since Linux 5.12)"
+>  The files referred to by
+>  .IR fd_in " and " fd_out
+> -are not on the same mounted filesystem (pre Linux 5.3).
+> +are not on the same filesystem,
+> +and the source and target filesystems are not of the same type,
+> +or do not support cross-filesystem copy.
+>  .SH VERSIONS
+>  The
+>  .BR copy_file_range ()
+> @@ -200,8 +210,11 @@ Areas of the API that weren't clearly defined were clarified and the API bounds
+>  are much more strictly checked than on earlier kernels.
+>  Applications should target the behaviour and requirements of 5.3 kernels.
+>  .PP
+> -First support for cross-filesystem copies was introduced in Linux 5.3.
+> -Older kernels will return -EXDEV when cross-filesystem copies are attempted.
+> +Since Linux 5.12,
+> +cross-filesystem copies can be achieved
+> +when both filesystems are of the same type,
+> +and that filesystem implements support for it.
+> +See BUGS for behavior prior to 5.12.
+>  .SH CONFORMING TO
+>  The
+>  .BR copy_file_range ()
+> @@ -226,6 +239,12 @@ gives filesystems an opportunity to implement "copy acceleration" techniques,
+>  such as the use of reflinks (i.e., two or more inodes that share
+>  pointers to the same copy-on-write disk blocks)
+>  or server-side-copy (in the case of NFS).
+> +.SH BUGS
+> +In Linux kernels 5.3 to 5.11,
+> +cross-filesystem copies were implemented by the kernel,
+> +if the operation was not supported by individual filesystems.
+> +However, on some virtual filesystems,
+> +the call failed to copy, while still reporting success.
 
-> =
+...success, or merely a short copy?
 
->  (3) OpenAFS-style format.  One index file to look up {file_key,block#} =
-and an
->      array of data files, each holding one block (e.g. a 256KiB-aligned =
-chunk
->      of a file).  Each index entry has valid start/end offsets for easy
->      truncation.
-> =
+(The rest looks reasonable (at least by c_f_r standards) to me.)
 
->      The index has a hash to facilitate the lookup and an LRU that allow=
-s a
->      block to be recycled at any time.
+--D
 
-The LRU would probably have to be a doubly-linked list so that entries can=
- be
-removed from it easily.  This means typically touching two other entries,
-which might not be in the same page; further, if the entry is being freed,
-we'd need to excise it from the hash chain also, necessitating touching ma=
-ybe
-two more entries - which might also be in different pages.
-
-Maybe the LRU idea plus a free block bitmap could be combined, however.
-
- (1) Say that there's a bit-pair map, with one bit pair per block.  The pa=
-ir
-     is set to 0 when the block is free.  When the block is accessed, the =
-pair
-     is set to 3.
-
- (2) When we run out of free blocks (ie. pairs that are zero), we decremen=
-t
-     all the pairs and then look again.
-
- (3) Excision from the old hash chain would need to be done at allocation,
-     though it does give a block whose usage has been reduced to 0 the cha=
-nce
-     to be resurrected.
-
-Possible variations on the theme could be:
-
- (*) Set the pair to 2, not 3 when accessed.  Set the block to 3 to pin it=
-;
-     the process of decrementing all the pairs would leave it at 3.
-
- (*) Rather than decrementing all pairs at once, have a rotating window th=
-at
-     does a part of the map at once.
-
- (*) If a round of decrementing doesn't reduce any pairs to zero, reject a
-     request for space.
-
-This would also work for a file index.
-
-David
-
+>  .SH EXAMPLES
+>  .EX
+>  #define _GNU_SOURCE
+> -- 
+> 2.30.1.721.g45526154a5
+> 
