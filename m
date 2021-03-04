@@ -2,129 +2,215 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D9FC15503
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC68FC433DB
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 09:42:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95F2464E62
-	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 00:29:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9447164EE6
+	for <linux-cifs@archiver.kernel.org>; Thu,  4 Mar 2021 09:42:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350313AbhCDA2g (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 3 Mar 2021 19:28:36 -0500
-Received: from p3plsmtpa11-01.prod.phx3.secureserver.net ([68.178.252.102]:53385
-        "EHLO p3plsmtpa11-01.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1388013AbhCCUYO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Mar 2021 15:24:14 -0500
-Received: from [192.168.0.116] ([71.184.94.153])
-        by :SMTPAUTH: with ESMTPSA
-        id HY1ml85cHSxgqHY1mle4LS; Wed, 03 Mar 2021 13:23:27 -0700
-X-CMAE-Analysis: v=2.4 cv=I6mg+Psg c=1 sm=1 tr=0 ts=603ff03f
- a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
- a=IkcTkHD0fZMA:10 a=SEc3moZ4AAAA:8 a=iox4zFpeAAAA:8 a=Dn3fJbBJWZ8bWwpP0-sA:9
- a=QEXdDO2ut3YA:10 a=5oRCH6oROnRZc2VpWJZ3:22 a=WzC6qhA0u3u7Ye7llzcV:22
-X-SECURESERVER-ACCT: tom@talpey.com
-Subject: Re: [PATCH v3] flock.2: add CIFS details
-To:     =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-man@vger.kernel.org, mtk.manpages@gmail.com
-Cc:     smfrench@gmail.com
-References: <17fc432c-f485-0945-6d12-fa338ea0025f@talpey.com>
- <20210303190353.31605-1-aaptel@suse.com>
-From:   Tom Talpey <tom@talpey.com>
-Message-ID: <be8416d4-64f8-675e-3f46-f55dddf1e03b@talpey.com>
-Date:   Wed, 3 Mar 2021 15:23:27 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        id S237754AbhCDJlT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 4 Mar 2021 04:41:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57008 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237792AbhCDJlA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 4 Mar 2021 04:41:00 -0500
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0431DC061574;
+        Thu,  4 Mar 2021 01:40:20 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id b18so20376314wrn.6;
+        Thu, 04 Mar 2021 01:40:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=O9B1qRNEkgiYM5e4Rnx0MUxTJfW3B+WFA4nF4a8IG1Q=;
+        b=kqVtZTrb2w1p+loQqs+tswteQ6Z300X2ogL0nfpDZwRrJloEuka6Qw3vbUznk9C/mP
+         vAc+7/i3tCgseKniKiFZ1FEGT5USitOdaHx8q+dlr9Gp0Botig2yuooK/Ga3uM5o7uSW
+         qpU9D7pKZrXxLKa8M9REIDyLjIJZ37+CRU8kz8lRGssHKNu7J2k1uG8GF4xO80RZDvhr
+         fbYoyaFU+22zZHyXCX88e/XZW0Y/TjXyh8wWm0ch3ylVn8cabBUR9rXuPQEzViDMDg7d
+         kQZB2RWb34DjYLTMuQCoJ/iHGnUvORj8TL3mM06a4mhPCETW0ncNxqQ5seEmMo4C2CGA
+         DTpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=O9B1qRNEkgiYM5e4Rnx0MUxTJfW3B+WFA4nF4a8IG1Q=;
+        b=T3HVI2d+hszN9lVlEVDupyluYALtUu7ihUfzjwD+x3XXHFn4gpBvpCW7u5Xp84FmyN
+         36QK0H2aP5ITOljw8/zpdzx/gGUTma5yOxdTUkl/yb/tG4j6FnC4H0HuB7zXjIzKdkSY
+         gNryaruLatfPTZF5XwL4ztx3UqcRVS3vAT/m77dZ3eIvCGFA46ZA5vfv6zDbcIb3A3q9
+         eSPN+KOtVKbZt3+AbOyGlqWc73NLd3UI8Yp765pVTnb/bvEzi8VEjwiaqCyddlpDzPKq
+         liv6tmoRtqYLTjPOAmiruSpKCCbc1Kot5nlS7M3Rmp75KjVJToz/teFANAJ3ygkFPeOz
+         6YxQ==
+X-Gm-Message-State: AOAM531Uo60oam7pmhGi/X9Qvyv8MslIihtOTu4yvPnsxy4oSg/XJqE4
+        eQtRq2FJb4GKwoMFGIeTinX9mhDhQKcz/Q==
+X-Google-Smtp-Source: ABdhPJy5rhRh3oIwq+uQ7c2BFcomsa5X6e0OMtaarr4aRCxsiyv3xNoF5kJaWXKyZ+4A1ooWqFB6Uw==
+X-Received: by 2002:adf:a219:: with SMTP id p25mr3049987wra.400.1614850818747;
+        Thu, 04 Mar 2021 01:40:18 -0800 (PST)
+Received: from localhost.localdomain ([170.253.51.130])
+        by smtp.googlemail.com with ESMTPSA id l2sm6127295wml.38.2021.03.04.01.40.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Mar 2021 01:40:18 -0800 (PST)
+From:   Alejandro Colomar <alx.manpages@gmail.com>
+To:     linux-man@vger.kernel.org, Amir Goldstein <amir73il@gmail.com>,
+        Michael Kerrisk <mtk.manpages@gmail.com>,
+        Luis Henriques <lhenriques@suse.de>,
+        Steve French <sfrench@samba.org>
+Cc:     Alejandro Colomar <alx.manpages@gmail.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Nicolas Boichat <drinkcat@chromium.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        Andreas Dilger <adilger@dilger.ca>,
+        Olga Kornievskaia <aglo@umich.edu>,
+        Christoph Hellwig <hch@infradead.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Walter Harms <wharms@bfs.de>
+Subject: [RFC v4] copy_file_range.2: Update cross-filesystem support for 5.12
+Date:   Thu,  4 Mar 2021 10:38:07 +0100
+Message-Id: <20210304093806.10589-1-alx.manpages@gmail.com>
+X-Mailer: git-send-email 2.30.1.721.g45526154a5
+In-Reply-To: <20210224142307.7284-1-lhenriques@suse.de>
+References: <20210224142307.7284-1-lhenriques@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20210303190353.31605-1-aaptel@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfAi6iph6xbnYCuduuU9qfMGGJWBIgyBcmX2RkF6vN2+w6He2BuhNBiKlSLggG+89PJmlmW2OkTfUZWnaHdsXs82nXF3EBGAUJnRG5luN8KQ1biBV6fMP
- S3HzkNICTNjCqoW7TB803VDlO+iwTnsV5X7dyf/NbWxPJezYAhQ3SQUg0Qg6CdUjeJfqfRLPYnrylKuVbzePowkKlqLpT5qITwJN+Za74xDY9Q5XNUCyYZLi
- 850x9J/FbRAf9Vz/ejbblWP0fI2+aG8/7KUSUKj8WWbYZ3zLGf/jwrdFz8oNHjL43dC7qEkNXOvc6FnrW/ZVggscqXD7ORgmKHM0MWvaexJ7/b6zrZyDGaNP
- 5PpRf2AQ
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-It looks great, and sorry to be a pest, but I just noticed - it's
-EACCES (not EACCESS).
+Linux 5.12 fixes a regression.
 
-Reviewed-By: Tom Talpey <tom@talpey.com>
+Cross-filesystem (introduced in 5.3) copies were buggy.
 
-On 3/3/2021 2:03 PM, Aurélien Aptel wrote:
-> From: Aurelien Aptel <aaptel@suse.com>
-> 
-> Similarly to NFS, CIFS flock() locks behave differently than the
-> standard. Document those differences.
-> 
-> Here is the rendered text:
-> 
-> CIFS details
->    In  Linux kernels up to 5.4, flock() is not propagated over SMB. A file
->    with such locks will not appear locked for remote clients.
-> 
->    Since Linux 5.5, flock() locks are emulated with SMB  byte-range  locks
->    on  the  entire  file.  Similarly  to NFS, this means that fcntl(2) and
->    flock() locks interact with one another. Another important  side-effect
->    is  that  the  locks are not advisory anymore: a write on a locked file
->    will always fail with EACCESS.  This difference originates from the de-
->    sign of locks in the SMB protocol, which provides mandatory locking se-
->    mantics. The nobrl mount option (see mount.cifs(8)) turns off  fnctl(2)
->    and  flock() lock propagation to remote clients and makes flock() locks
->    advisory again.
-> 
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-> ---
->   man2/flock.2 | 29 +++++++++++++++++++++++++++++
->   1 file changed, 29 insertions(+)
-> 
-> diff --git a/man2/flock.2 b/man2/flock.2
-> index 61d4b5396..4b6e5cc24 100644
-> --- a/man2/flock.2
-> +++ b/man2/flock.2
-> @@ -239,6 +239,35 @@ see the discussion of the
->   .I "local_lock"
->   option in
->   .BR nfs (5).
-> +.SS CIFS details
-> +In Linux kernels up to 5.4,
-> +.BR flock ()
-> +is not propagated over SMB. A file with such locks will not appear
-> +locked for remote clients.
-> +.PP
-> +Since Linux 5.5,
-> +.BR flock ()
-> +locks are emulated with SMB byte-range locks on the entire
-> +file. Similarly to NFS, this means that
-> +.BR fcntl (2)
-> +and
-> +.BR flock ()
-> +locks interact with one another. Another important side-effect is that
-> +the locks are not advisory anymore: a write on a locked file will
-> +always fail with
-> +.BR EACCESS .
+Move the statements documenting cross-fs to BUGS.
+Kernels 5.3..5.11 should be patched soon.
 
-EACCES
+State version information for some errors related to this.
 
-> +This difference originates from the design of locks in the SMB
-> +protocol, which provides mandatory locking semantics. The
-> +.I nobrl
-> +mount option (see
-> +.BR mount.cifs (8))
-> +turns off
-> +.BR fnctl (2)
-> +and
-> +.BR flock ()
-> +lock propagation to remote clients and makes
-> +.BR flock ()
-> +locks advisory again.
->   .SH SEE ALSO
->   .BR flock (1),
->   .BR close (2),
-> 
+Reported-by: Luis Henriques <lhenriques@suse.de>
+Reported-by: Amir Goldstein <amir73il@gmail.com>
+Related: <https://lwn.net/Articles/846403/>
+Cc: Greg KH <gregkh@linuxfoundation.org>
+Cc: Michael Kerrisk <mtk.manpages@gmail.com>
+Cc: Anna Schumaker <anna.schumaker@netapp.com>
+Cc: Jeff Layton <jlayton@kernel.org>
+Cc: Steve French <sfrench@samba.org>
+Cc: Miklos Szeredi <miklos@szeredi.hu>
+Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc: Dave Chinner <dchinner@redhat.com>
+Cc: Nicolas Boichat <drinkcat@chromium.org>
+Cc: Ian Lance Taylor <iant@google.com>
+Cc: Luis Lozano <llozano@chromium.org>
+Cc: Andreas Dilger <adilger@dilger.ca>
+Cc: Olga Kornievskaia <aglo@umich.edu>
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: ceph-devel <ceph-devel@vger.kernel.org>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Cc: samba-technical <samba-technical@lists.samba.org>
+Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Cc: Linux NFS Mailing List <linux-nfs@vger.kernel.org>
+Cc: Walter Harms <wharms@bfs.de>
+Signed-off-by: Alejandro Colomar <alx.manpages@gmail.com>
+---
+
+v3:
+        - Don't remove some important text.
+        - Reword BUGS.
+v4:
+	- Reword.
+	- Link to BUGS.
+
+Thanks, Amir, for all the help and better wordings.
+
+Cheers,
+
+Alex
+
+---
+ man2/copy_file_range.2 | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
+
+diff --git a/man2/copy_file_range.2 b/man2/copy_file_range.2
+index 611a39b80..f58bfea8f 100644
+--- a/man2/copy_file_range.2
++++ b/man2/copy_file_range.2
+@@ -169,6 +169,9 @@ Out of memory.
+ .B ENOSPC
+ There is not enough space on the target filesystem to complete the copy.
+ .TP
++.BR EOPNOTSUPP " (since Linux 5.12)"
++The filesystem does not support this operation.
++.TP
+ .B EOVERFLOW
+ The requested source or destination range is too large to represent in the
+ specified data types.
+@@ -184,10 +187,17 @@ or
+ .I fd_out
+ refers to an active swap file.
+ .TP
+-.B EXDEV
++.BR EXDEV " (before Linux 5.3)"
++The files referred to by
++.IR fd_in " and " fd_out
++are not on the same filesystem.
++.TP
++.BR EXDEV " (since Linux 5.12)"
+ The files referred to by
+ .IR fd_in " and " fd_out
+-are not on the same mounted filesystem (pre Linux 5.3).
++are not on the same filesystem,
++and the source and target filesystems are not of the same type,
++or do not support cross-filesystem copy.
+ .SH VERSIONS
+ The
+ .BR copy_file_range ()
+@@ -200,8 +210,11 @@ Areas of the API that weren't clearly defined were clarified and the API bounds
+ are much more strictly checked than on earlier kernels.
+ Applications should target the behaviour and requirements of 5.3 kernels.
+ .PP
+-First support for cross-filesystem copies was introduced in Linux 5.3.
+-Older kernels will return -EXDEV when cross-filesystem copies are attempted.
++Since Linux 5.12,
++cross-filesystem copies can be achieved
++when both filesystems are of the same type,
++and that filesystem implements support for it.
++See BUGS for behavior prior to 5.12.
+ .SH CONFORMING TO
+ The
+ .BR copy_file_range ()
+@@ -226,6 +239,12 @@ gives filesystems an opportunity to implement "copy acceleration" techniques,
+ such as the use of reflinks (i.e., two or more inodes that share
+ pointers to the same copy-on-write disk blocks)
+ or server-side-copy (in the case of NFS).
++.SH BUGS
++In Linux kernels 5.3 to 5.11,
++cross-filesystem copies were implemented by the kernel,
++if the operation was not supported by individual filesystems.
++However, on some virtual filesystems,
++the call failed to copy, while still reporting success.
+ .SH EXAMPLES
+ .EX
+ #define _GNU_SOURCE
+-- 
+2.30.1.721.g45526154a5
+
