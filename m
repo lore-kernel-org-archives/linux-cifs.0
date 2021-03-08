@@ -2,110 +2,59 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC650C433DB
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 21:56:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 180CEC433DB
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 22:22:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CD0A64FFD
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 21:56:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B69F96523D
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 22:22:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230457AbhCHV4U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Mar 2021 16:56:20 -0500
-Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:56725 "EHLO
-        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230047AbhCHVzs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Mar 2021 16:55:48 -0500
-Received: from dread.disaster.area (pa49-181-239-12.pa.nsw.optusnet.com.au [49.181.239.12])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 29E148289A3;
-        Tue,  9 Mar 2021 08:55:36 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1lJNqh-000HG4-6L; Tue, 09 Mar 2021 08:55:35 +1100
-Date:   Tue, 9 Mar 2021 08:55:35 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Amir Goldstein <amir73il@gmail.com>, linux-cachefs@redhat.com,
-        Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        "J. Bruce Fields" <bfields@fieldses.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-afs@lists.infradead.org,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Miklos Szeredi <miklos@szeredi.hu>
-Subject: Re: fscache: Redesigning the on-disk cache
-Message-ID: <20210308215535.GA63242@dread.disaster.area>
-References: <CAOQ4uxhxwKHLT559f8v5aFTheKgPUndzGufg0E58rkEqa9oQ3Q@mail.gmail.com>
- <2653261.1614813611@warthog.procyon.org.uk>
- <517184.1615194835@warthog.procyon.org.uk>
+        id S230156AbhCHWWQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Mar 2021 17:22:16 -0500
+Received: from mx.cjr.nz ([51.158.111.142]:11854 "EHLO mx.cjr.nz"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230509AbhCHWWK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 8 Mar 2021 17:22:10 -0500
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id D58157FD3B;
+        Mon,  8 Mar 2021 22:22:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1615242129;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0PqgY3WGfot8+QkqZF1PxJfgEaN/oVuCkxxzEfcK3B4=;
+        b=kDjPjb74jE+UG0ShJsrQmhO3huBoYMFL0VXhv7poCnnRKFZX3P2Xex9k+VSg4SeXSEDSRn
+        9nTXU5Q/L7SspkJJCSrmkLB/c4r9qo+Ssd0Btk3NhlEEkt2+5nMtMzaiQMxV3EuE32sMJ+
+        9J2znItGl4uZ2pL205tkLuIkzfK/qMZCl3gPQyViRhnFR3YV1rbr86ZiWTRnPFaS9ULlrP
+        hW/YJb6KlBczWLY1EHQbJP7qvqR8Vomd6fSTtqn847pZDmNwruQV/AAqiKG8ePfnKbNkGX
+        emfHOZTYHeZ8IJH7R8++uulX9o8WrnUK6TaFLEmEYMHWQQ1kNi+dqkyAAqaF8w==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH 4/4] cifs: do not send close in compound create+close
+ requests
+In-Reply-To: <CAH2r5mvddtiKs_X7QgwpKQpGRiKaWdTD366jVNaN=H8Ha_hzyQ@mail.gmail.com>
+References: <20210308150050.19902-1-pc@cjr.nz>
+ <20210308150050.19902-4-pc@cjr.nz>
+ <CAH2r5mvddtiKs_X7QgwpKQpGRiKaWdTD366jVNaN=H8Ha_hzyQ@mail.gmail.com>
+Date:   Mon, 08 Mar 2021 19:22:05 -0300
+Message-ID: <875z2170c2.fsf@cjr.nz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <517184.1615194835@warthog.procyon.org.uk>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0 cx=a_idp_d
-        a=gO82wUwQTSpaJfP49aMSow==:117 a=gO82wUwQTSpaJfP49aMSow==:17
-        a=kj9zAlcOel0A:10 a=dESyimp9J3IA:10 a=pGLkceISAAAA:8 a=7-415B0cAAAA:8
-        a=tj5_YPy7viIAn9pg2yAA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Mar 08, 2021 at 09:13:55AM +0000, David Howells wrote:
-> Amir Goldstein <amir73il@gmail.com> wrote:
-> 
-> > >  (0a) As (0) but using SEEK_DATA/SEEK_HOLE instead of bmap and opening the
-> > >       file for every whole operation (which may combine reads and writes).
-> > 
-> > I read that NFSv4 supports hole punching, so when using ->bmap() or SEEK_DATA
-> > to keep track of present data, it's hard to distinguish between an
-> > invalid cached range and a valid "cached hole".
-> 
-> I wasn't exactly intending to permit caching over NFS.  That leads to fun
-> making sure that the superblock you're caching isn't the one that has the
-> cache in it.
-> 
-> However, we will need to handle hole-punching being done on a cached netfs,
-> even if that's just to completely invalidate the cache for that file.
-> 
-> > With ->fiemap() you can at least make the distinction between a non existing
-> > and an UNWRITTEN extent.
-> 
-> I can't use that for XFS, Ext4 or btrfs, I suspect.  Christoph and Dave's
-> assertion is that the cache can't rely on the backing filesystem's metadata
-> because these can arbitrarily insert or remove blocks of zeros to bridge or
-> split extents.
+Steve French <smfrench@gmail.com> writes:
 
-Well, that's not the big problem. The issue that makes FIEMAP
-unusable for determining if there is user data present in a file is
-that on-disk extent maps aren't exactly coherent with in-memory user
-data state.
+> stable?
 
-That is, we can have a hole on disk with delalloc user data in
-memory.  There's user data in the file, just not on disk. Same goes
-for unwritten extents - there can be dirty data in memory over an
-unwritten extent, and it won't get converted to written until the
-data is written back and the filesystem runs a conversion
-transaction.
-
-So, yeah, if you use FIEMAP to determine where data lies in a file
-that is being actively modified, you're going get corrupt data
-sooner rather than later.  SEEK_HOLE/DATA are coherent with in
-memory user data, so don't have this problem.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Yes, please.
