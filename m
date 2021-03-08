@@ -7,143 +7,93 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22560C43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4123FC4332E
 	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 23:08:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE82A652B7
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 23:08:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 107E8652BB
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 23:08:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231176AbhCHXI0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Mar 2021 18:08:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56164 "EHLO
+        id S230039AbhCHXIZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Mar 2021 18:08:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46670 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230457AbhCHXH6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Mar 2021 18:07:58 -0500
+        by vger.kernel.org with ESMTP id S229704AbhCHXH4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Mar 2021 18:07:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615244878;
+        s=mimecast20190719; t=1615244875;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:in-reply-to:in-reply-to:references:references;
-        bh=AVxGdr7lDl56PxhdLiS/DNr7Pme1x2/5gez8xA/7O4E=;
-        b=asaQt/u/VSjpau/6cthT6WpbSR7s9poj1rXc4Rl7UijY9dZZb5P47B/mPEp0mxqjtrthVR
-        JqVQBgW4dPF30poTlmyWdRWaXCBQ+T3LWy5hZdVCNlG6uXa9QGFwgQ4pLXoS4Ap42taD83
-        KqoZgCBBfczscHbknfaPucHkNHb1/No=
+        bh=K5SY4vh5dWvxmic2TwQVghVkdghisbxFUamT5maed74=;
+        b=dymD37/8YymL9HllLb9DETcpjoAZBPcrp5fBfVJ1cp0rKVXoIA07tNN6VfUXaNV8EAKsKs
+        KYiUkLY/S3oB5RkHy6ThwrdTGgwJs6+0Qd3XwOM0mnh3yipCRdxLcadZ0tMVovhRxhL5mm
+        0qDjI3ITqOSDcBfmo2BvsnEEByN+WWY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-vcw2LaBYOQab_Nlkfsp5_Q-1; Mon, 08 Mar 2021 18:07:56 -0500
-X-MC-Unique: vcw2LaBYOQab_Nlkfsp5_Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-109-E4YX-y-5NwKAz4odAGr9CA-1; Mon, 08 Mar 2021 18:07:53 -0500
+X-MC-Unique: E4YX-y-5NwKAz4odAGr9CA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 185C21823E44;
-        Mon,  8 Mar 2021 23:07:55 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6F171005D4A;
+        Mon,  8 Mar 2021 23:07:52 +0000 (UTC)
 Received: from test1103.test.redhat.com (vpn2-54-42.bne.redhat.com [10.64.54.42])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 787321A8A3;
-        Mon,  8 Mar 2021 23:07:54 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 71C5C6062F;
+        Mon,  8 Mar 2021 23:07:52 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH 2/9] cifs: pass a path to open_shroot and check if it is the root or not
-Date:   Tue,  9 Mar 2021 09:07:28 +1000
-Message-Id: <20210308230735.337-3-lsahlber@redhat.com>
+Subject: [PATCH 8/9] cifs: pass the dentry instead of the inode down to the revalidation check functions
+Date:   Tue,  9 Mar 2021 09:07:34 +1000
+Message-Id: <20210308230735.337-9-lsahlber@redhat.com>
 In-Reply-To: <20210308230735.337-1-lsahlber@redhat.com>
 References: <20210308230735.337-1-lsahlber@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Move the check for the directory path into the open_shroot() function
-but still fail for any non-root directories.
-This is preparation for later when we will start using the cache also
-for other directories than the root.
-
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/cifs/smb2inode.c | 22 ++++++++++------------
- fs/cifs/smb2ops.c   |  6 +++++-
- fs/cifs/smb2proto.h |  1 +
- 3 files changed, 16 insertions(+), 13 deletions(-)
+ fs/cifs/inode.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
-index 3d59614cbe8f..67f80c9561fc 100644
---- a/fs/cifs/smb2inode.c
-+++ b/fs/cifs/smb2inode.c
-@@ -523,22 +523,20 @@ smb2_query_path_info(const unsigned int xid, struct cifs_tcon *tcon,
- 		return -ENOMEM;
+diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
+index 0b0b01ef3ecb..98dc6d70d4fa 100644
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@ -2184,8 +2184,9 @@ cifs_rename2(struct inode *source_dir, struct dentry *source_dentry,
+ }
  
- 	/* If it is a root and its handle is cached then use it */
--	if (!strlen(full_path)) {
--		rc = open_shroot(xid, tcon, cifs_sb, &cfid);
--		if (!rc) {
--			if (tcon->crfid.file_all_info_is_valid) {
--				move_smb2_info_to_cifs(data,
-+	rc = open_shroot(xid, tcon, full_path, cifs_sb, &cfid);
-+	if (!rc) {
-+		if (tcon->crfid.file_all_info_is_valid) {
-+			move_smb2_info_to_cifs(data,
- 					       &tcon->crfid.file_all_info);
--			} else {
--				rc = SMB2_query_info(xid, tcon,
-+		} else {
-+			rc = SMB2_query_info(xid, tcon,
- 					     cfid->fid->persistent_fid,
- 					     cfid->fid->volatile_fid, smb2_data);
--				if (!rc)
--					move_smb2_info_to_cifs(data, smb2_data);
--			}
--			close_shroot(cfid);
--			goto out;
-+			if (!rc)
-+				move_smb2_info_to_cifs(data, smb2_data);
- 		}
-+		close_shroot(cfid);
-+		goto out;
- 	}
- 
- 	cifs_get_readable_path(tcon, full_path, &cfile);
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 7ee6926153b8..96ff946674e6 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -728,6 +728,7 @@ smb2_cached_lease_break(struct work_struct *work)
-  * Open the directory at the root of a share
-  */
- int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
-+		const char *path,
- 		struct cifs_sb_info *cifs_sb,
- 		struct cached_fid **cfid)
+ static bool
+-cifs_inode_needs_reval(struct inode *inode)
++cifs_dentry_needs_reval(struct dentry *dentry)
  {
-@@ -749,6 +750,9 @@ int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
- 	if (tcon->nohandlecache)
- 		return -ENOTSUPP;
++	struct inode *inode = d_inode(dentry);
+ 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
  
-+	if (strlen(path))
-+		return -ENOTSUPP;
-+
- 	mutex_lock(&tcon->crfid.fid_mutex);
- 	if (tcon->crfid.is_valid) {
- 		cifs_dbg(FYI, "found a cached root file handle\n");
-@@ -926,7 +930,7 @@ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
- 	oparms.fid = &fid;
- 	oparms.reconnect = false;
+@@ -2296,10 +2297,10 @@ cifs_zap_mapping(struct inode *inode)
+ int cifs_revalidate_file_attr(struct file *filp)
+ {
+ 	int rc = 0;
+-	struct inode *inode = file_inode(filp);
++	struct dentry *dentry = file_dentry(filp);
+ 	struct cifsFileInfo *cfile = (struct cifsFileInfo *) filp->private_data;
  
--	rc = open_shroot(xid, tcon, cifs_sb, &cfid);
-+	rc = open_shroot(xid, tcon, "", cifs_sb, &cfid);
- 	if (rc == 0)
- 		memcpy(&fid, cfid->fid, sizeof(struct cifs_fid));
- 	else
-diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
-index 9565e27681a5..7e4fc69c8b01 100644
---- a/fs/cifs/smb2proto.h
-+++ b/fs/cifs/smb2proto.h
-@@ -70,6 +70,7 @@ extern int smb3_handle_read_data(struct TCP_Server_Info *server,
- 				 struct mid_q_entry *mid);
+-	if (!cifs_inode_needs_reval(inode))
++	if (!cifs_dentry_needs_reval(dentry))
+ 		return rc;
  
- extern int open_shroot(unsigned int xid, struct cifs_tcon *tcon,
-+		       const char *path,
- 		       struct cifs_sb_info *cifs_sb,
- 		       struct cached_fid **cfid);
- extern void close_shroot(struct cached_fid *cfid);
+ 	if (tlink_tcon(cfile->tlink)->unix_ext)
+@@ -2322,7 +2323,7 @@ int cifs_revalidate_dentry_attr(struct dentry *dentry)
+ 	if (inode == NULL)
+ 		return -ENOENT;
+ 
+-	if (!cifs_inode_needs_reval(inode))
++	if (!cifs_dentry_needs_reval(dentry))
+ 		return rc;
+ 
+ 	xid = get_xid();
 -- 
 2.13.6
 
