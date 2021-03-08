@@ -1,186 +1,244 @@
-Return-Path: <SRS0=0UGd=IG=vger.kernel.org=linux-cifs-owner@kernel.org>
+Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A99C8C433DB
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 12:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60459C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 15:02:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A0B1651C9
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 12:21:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34501650CB
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 15:02:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231598AbhCHMVY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Mar 2021 07:21:24 -0500
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:33297 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231272AbhCHMU4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Mar 2021 07:20:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1615206055;
+        id S229904AbhCHPBe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Mar 2021 10:01:34 -0500
+Received: from mx.cjr.nz ([51.158.111.142]:40580 "EHLO mx.cjr.nz"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231311AbhCHPBQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 8 Mar 2021 10:01:16 -0500
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 540AF7FF6B;
+        Mon,  8 Mar 2021 15:01:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1615215675;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cBQoSFK3Iw49+JMmsX3eKbeije319M2h4dI7j5gBgnU=;
-        b=YwrLzpTZfbyUleVMqPvNF6Tltg6bi3XIzB9EvpCm/hWd4HukHErCjOyWDLmYkqQgXCxcCb
-        sVzcTwXFZo82bff4HboKhsFqc3/RQbDjAh+3mxXFIPtmzCeF/jUmtHqel2+JlRh06xzkl7
-        PaHVyX56gpETf0FA8N14fO2+DhzAjdE=
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com
- (mail-vi1eur05lp2168.outbound.protection.outlook.com [104.47.17.168])
- (Using TLS) by relay.mimecast.com with ESMTP id
- de-mta-29-Gpz_E2PEN2ezD-5D3GdaEA-1; Mon, 08 Mar 2021 13:20:54 +0100
-X-MC-Unique: Gpz_E2PEN2ezD-5D3GdaEA-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iluz0uaisXdHwvtpF5szt/8nS2y9ik/IbHM4yQTCQwwG0JsT7emcbn4Q2diRRutFUxbb+Ivc/M/eyFrp0y6L6hPiAZYdS7v0v1lEsaFbNEbGXAOGFwGG2nuOn2SK3skpil/60z5LCjf/r/0vR8t8p2DyJNLxbyTYc0H1pYF1Z6ami/oiE6vGw2q7OW6mC+aWfRj+Iq5bEqBcPTWfQ9AUuFa1sAoWzzKOG6svR0VXZ0+RPfE25Ee0TZbpCzuYJosKwNn9S9iz3qHJbrFLFXZeGSfMi6G+Hai7aqwTNM2iHgYIri7ykic75dmeHkQr49Ny/Bf80of1P5w+gAnImxrRaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cBQoSFK3Iw49+JMmsX3eKbeije319M2h4dI7j5gBgnU=;
- b=ZmnDgwFUaz7kS0cSg8L1rlCOVdFV0JW2S/t2GskzGxlZSRKKiKVdNdM5Z0vaCptbmUovkpTYi7Ad6A9NCRcROsoFC9UikdgJQDVZ7x7fquPR0r13d3Rkh6ZtjjkURdXv5ARNTsqEDekshSWjH6u1AcRDn7rruoFpdykI2JS08N34y1AGwkJeH09e/ROQaGmCGVlXXwPKwLkdeekZEmJhM7IRuag+MHtiX8oGSCAOGEIqz59wdm0A+HjSyWPm1+0CziDyLBtOvfCsuYLnm7WDclaXJk1Qges6EoeyOQIr3TWG9JfEZSOyCH54Nl1oxbiZ+w/ovSxYZ/+65R1KVnXg0A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3890.28; Mon, 8 Mar
- 2021 12:20:52 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3890.037; Mon, 8 Mar 2021
- 12:20:52 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Cc:     Pavel Shilovsky <pshilov@microsoft.com>,
-        Steve French <sfrench@samba.org>, kernel@axis.com,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] CIFS: Prevent error log on spurious oplock break
-In-Reply-To: <CANT5p=rB2=DvjtpmVy803emWpuzsy-C2+d4wqQ5g_9fJ8+a5Cw@mail.gmail.com>
-References: <20210305094107.13743-1-vincent.whitchurch@axis.com>
- <CANT5p=rB2=DvjtpmVy803emWpuzsy-C2+d4wqQ5g_9fJ8+a5Cw@mail.gmail.com>
-Date:   Mon, 08 Mar 2021 13:20:51 +0100
-Message-ID: <871rcpx2e4.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:70b:4a04:48fe:21ee:1b19:31ad]
-X-ClientProxiedBy: GV0P278CA0013.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:710:26::23) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+        bh=gyEVA9D0C7y+60GNpuGulUP1XyL92FTaSNuODqVrp0g=;
+        b=XuO8/YELZNbLPIIK9NEs+7PeBaYLBuHpVnlILQU3JAnJmND4xInPlKq3Y+PjhJdMf0sF1b
+        Q+C8xDNmWPJUhQywoNB1ZltqKjdUQEMXeLNWclFNR/OrzsgrtbvgPJGymWlINe7nC0giDK
+        LOEN5jDtVvDjX5MOQmPTWmWt0QVANu8YvrJX/3zBkA608WGUXCJLcUrg7HUSISxE2Crg7f
+        iwUFFLbS6UJfl54smNCefJovi8FIkq/z95JHyuPX/N0U/0RSSXB7/FntV9MWqNdQZs2Cq+
+        tXMPyn28CImRXFw+hQz0RntD3N/7yIHddbeKQpAApiKETX/419iTTGV3m+fktQ==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     linux-cifs@vger.kernel.org, smfrench@gmail.com
+Cc:     Paulo Alcantara <pc@cjr.nz>
+Subject: [PATCH 4/4] cifs: do not send close in compound create+close requests
+Date:   Mon,  8 Mar 2021 12:00:50 -0300
+Message-Id: <20210308150050.19902-4-pc@cjr.nz>
+In-Reply-To: <20210308150050.19902-1-pc@cjr.nz>
+References: <20210308150050.19902-1-pc@cjr.nz>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:70b:4a04:48fe:21ee:1b19:31ad) by GV0P278CA0013.CHEP278.PROD.OUTLOOK.COM (2603:10a6:710:26::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Mon, 8 Mar 2021 12:20:52 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 104a8006-467e-48eb-3dab-08d8e22c9db3
-X-MS-TrafficTypeDiagnostic: VI1PR0402MB3359:
-X-Microsoft-Antispam-PRVS: <VI1PR0402MB33591721A5D1CBF494E668E5A8939@VI1PR0402MB3359.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: G/ZbvVVKZ3aU7/zH/ZZomReNfi5dvBn6gJ2O6fXrpxhSYKD2wa2+H5X6iVz3Ilraf6809tOET8JzBvUjdOrOLryoJoLlzI/BblIoFZU9RIBaghr9QIJwLwcqhRZ0G2hjvPGUtqey/mfJ7b1debmj7EGZSLJnPQxOcbMeCpRDgUbL3rv8AhCLJK13FNjXRd6jnaxSgqjOKguARUntFBPN5TYAd9DCp6CYSDnCzhSBWlYPMBJrCzuzfsuN8MXDM3gnOh9gwR2JQHV7zau7Ggg576F92l9tOTbfelvx2zuVx02rqlP4X19dx1d5Jt4qvP9Ia/KmlyR0Qj7rvEr0Cz+GbD8YdHQkED/LqmtbkTWcSYWZ+Zx+xUGrdWUYeOdVn1J9fZSaXb26jJkqkV8LZUMmkngRMq/c7VFZxJql8qFJYzLEHTzJmAXIk1L30NjseCbiKiB5U9y6j0iG5ca37W/vj0pxaL9j3AITPJw4MX5AWBYeeD4GDLDcGUSYgyXbqoGoRrGLW/V9NKx/pF/21E7ehg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(136003)(396003)(376002)(366004)(39860400002)(5660300002)(186003)(86362001)(4326008)(66556008)(66946007)(66476007)(478600001)(2906002)(36756003)(6496006)(16526019)(83380400001)(54906003)(66574015)(6486002)(8936002)(2616005)(8676002)(316002)(110136005)(52116002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?RG9QcTJhTG4xcWJLQ09RNGlZaHYwR1JPUGF6NFpzRVIrYlpVU3hwZWNGSmlZ?=
- =?utf-8?B?RXJaSnJNMjh1cDJpQXNjdmVuRFZ6ZkNhNGJCU3pJQlBmdklQNWNVcGJVVDEx?=
- =?utf-8?B?Ujd4SjluVU1BSlVic05ueFdIZCtOTVduSGFzQ3FRUVhSQ3NWenI5L1RlTy8z?=
- =?utf-8?B?bUVnOXFOVTZhWU91VmVHZmdwRDdVdEcvWjJJYWlOTDJWenh1bWNXUTg3Y1lu?=
- =?utf-8?B?SmEvcGJYR3NWbjhiQXI0M2hUZGRMN0dLUWwyaDlFRTA4c2VqeU9FSUhvL3lN?=
- =?utf-8?B?SFNaUW9UMGJrTjBlZUhlTXV6MTdFV052dnlvNnJJT0tDdnlZbHFjODNSVHZh?=
- =?utf-8?B?eWtVMU9vQy9hOERybFZ0NTg0NW9PWFFGRnhoVkhjSTRNRVViQklEWFF2ZlFX?=
- =?utf-8?B?SkEwSk1GUW9teEg3WWswOWxlUXNrV2hRVHFDTGdDZVNiS2twRFovSURUejl5?=
- =?utf-8?B?N0Znck94WFlvYmkwMWtBVWNJR0V4Uy9uNkc2UnJVWXV2aThLYU02ZWE2MGVr?=
- =?utf-8?B?cjR3c29pN3lrL0dsTEJuZXMyaU1hb3JSSi9KeGFKV3BNY1ZmNkVoWTJWUTBE?=
- =?utf-8?B?ejRYMzNudFJEV3BwOXB1MlRpUjZqc04vK1JmTkFJdE1aeEx2dDVSaTkrOUxC?=
- =?utf-8?B?NDE0aDJEV0plZC8yaDZnOTZCUSs2TTZKU0pzMTFjb1MvTnM2UllGTkM0Tk1I?=
- =?utf-8?B?SnZBUXY4L2F2UjVmMXVxR1dIL0JYTzV2eGNKT1RSRC9OanI0Q08wdVlhM0I2?=
- =?utf-8?B?Vk0zSzJMQS9PYXFCenpSUUcvQjlUWkNjVUxrOTh0SzBuWFErTjFYcE9TWmxO?=
- =?utf-8?B?cHYwME1wUXkxQS9KN0RyK0hoRnJvZ1g2QTVXTFI4K2V5MXEwSnpja2M1SnFN?=
- =?utf-8?B?ZHVTSXRXZFRaUm1pTzZUUG5NYnhtZDJTOUszUFBkOHV2bTdxaXFCMzgzanhx?=
- =?utf-8?B?NzZwU0RPaUFzcS94cjhWSHQrRVVaQUZUa2g5WWpoRHVZUkZybkFoS1RQN2hE?=
- =?utf-8?B?ejg1cmFVRkRxdUp3SVhDUFlJU0ZzU3drNjNzeVpZYXdIV3pWZnc4ZCtBejlX?=
- =?utf-8?B?OEE4RlU3aXRsYkdZQmgyd05Eb1M4TmFSU0h0Nis3Yi8zK05uTEN1MzhsMllr?=
- =?utf-8?B?Y1NYMjROZ3p1dDl4YWZ2bE55VWp0eG5BMnFHaEFiUDA2Z0dPM2JEV0NQMmRi?=
- =?utf-8?B?ZDNuMXV0Qm9OT1RLUmJvNGUrS2VldnhNZVNlaHRDT05IWnpuVHlkSU9rQTZv?=
- =?utf-8?B?Wi85RFlsSzhuMmI4bEpKbm1oZUxHVHFjS0VJcGY2RHlCdnEyNko4MEtISDBS?=
- =?utf-8?B?V0ExYmUrNUVaclhsZnVyRi9LRmszSVc2MTJOVFE1K01rbDRqbVczK0REUnVQ?=
- =?utf-8?B?Mi9WUW5DMTNUNmJJb2NFc041TTVCRzQrdG9Wc2dQSlo2OUU1ZzN0SlVLMDRz?=
- =?utf-8?B?L09TRkFFRDlCcndtYnNWVzNoaWhQc05sWEl1RGJXTVNlcjdZTUUxdGpIeUx5?=
- =?utf-8?B?bk9BYk96VnNGNUtkQ1A5MjJIczd2dVorQThDSTFsbzI5bU80NHg4V1k1eUtM?=
- =?utf-8?B?cCs5ekZlaUNnaFZkazdaZjZ0NFFmTktmQkQvNlMvQmlCUnpFZzBtckl6YlZE?=
- =?utf-8?B?b2hBSGhXZmZEbEdlbjkxV1NPakUveXdYVjQ5SnNPMmJ3UXRXOXJRS0tsdC90?=
- =?utf-8?B?MUVuOFl4OTdxTnA4NTVMYzZmYUZXYVhmeVdQcWRjdUpvQ1pEdTI3anJkeHVy?=
- =?utf-8?B?SGRHbHoxQzVsWmhTQUptZlVBTGpZTFhyS3N2bW1aeUpEdEpRMlN3VHdhZ2Vs?=
- =?utf-8?B?dS9qN2loRWtwcWp5OEZkK0lXMDN5aVdyaTh2UUplNmppakJrNXhiVHhGblVB?=
- =?utf-8?Q?NxLwVE4+ym9y6?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 104a8006-467e-48eb-3dab-08d8e22c9db3
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2021 12:20:52.6272
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gnM1FWHoZOr8NSBExFNR+O/u4vtEJ1eLA60VHtrwonFlWn9cr+fDTn72ullOfhTi
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3359
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
-> So I don't think we should be changing the logic here.
+In case of interrupted syscalls, prevent sending CLOSE commands for
+compound CREATE+CLOSE requests by introducing an
+CIFS_CP_CREATE_CLOSE_OP flag to indicate lower layers that it should
+not send a CLOSE command to the MIDs corresponding the compound
+CREATE+CLOSE request.
 
-I would tend to agree.
+A simple reproducer:
 
-> If SMB v1 had a different behaviour, we should check if that is as per
-> the protocol documentation. If not, change it.
+    #!/bin/bash
 
-I think the main difference is that SMBv1 doesn't have the concept of
-lease keys. I think lease keys were added to handle cases like this:
+    mount //server/share /mnt -o username=foo,password=***
+    tc qdisc add dev eth0 root netem delay 450ms
+    stat -f /mnt &>/dev/null & pid=$!
+    sleep 0.01
+    kill $pid
+    tc qdisc del dev eth0 root
+    umount /mnt
 
-case a)
+Before patch:
 
-client: >> send create+lease (key=3DXYZ). I don't know the file fid yet
+    ...
+    6 0.256893470 192.168.122.2 → 192.168.122.15 SMB2 402 Create Request File: ;GetInfo Request FS_INFO/FileFsFullSizeInformation;Close Request
+    7 0.257144491 192.168.122.15 → 192.168.122.2 SMB2 498 Create Response File: ;GetInfo Response;Close Response
+    9 0.260798209 192.168.122.2 → 192.168.122.15 SMB2 146 Close Request File:
+   10 0.260841089 192.168.122.15 → 192.168.122.2 SMB2 130 Close Response, Error: STATUS_FILE_CLOSED
 
-server: local open & concurent open (create response not sent yet!)
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+---
+ fs/cifs/cifsglob.h  | 19 ++++++++++---------
+ fs/cifs/smb2inode.c |  1 +
+ fs/cifs/smb2misc.c  |  8 ++++----
+ fs/cifs/smb2ops.c   | 10 +++++-----
+ fs/cifs/smb2proto.h |  3 +--
+ fs/cifs/transport.c |  2 +-
+ 6 files changed, 22 insertions(+), 21 deletions(-)
 
-server: << send oplockbreak key=3DXYZ
-client: dont know the fid, but i can match the lease key with a request
-        I made, so it's valid
-
-server: << send create response (fid=3D123)
-client: I know the fid now
-
-case b)
-
-client: >> send create+lease (key=3DXYZ)
-server: << open file, send create response (fid=3D123)
-
-client: >> close file, release file ressources, send close fid=3D123
-server: before receiving close, concurrent open happens
-server: << send oplock break (key=3DXYZ)
-server: << send close
-client: depending on the order the response are processed, I might not
-        process oplock because i don't know this file! I already closed
-        it. But I know this lease key
-
-Without client-generated lease keys you cannot match things you don't
-have an FID for (because you haven't received it yet, or because it was
-closed). And FIDs can be reused and point to different files.
-
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 3de3c5908a72..31fc8695abd6 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -257,7 +257,7 @@ struct smb_version_operations {
+ 	/* verify the message */
+ 	int (*check_message)(char *, unsigned int, struct TCP_Server_Info *);
+ 	bool (*is_oplock_break)(char *, struct TCP_Server_Info *);
+-	int (*handle_cancelled_mid)(char *, struct TCP_Server_Info *);
++	int (*handle_cancelled_mid)(struct mid_q_entry *, struct TCP_Server_Info *);
+ 	void (*downgrade_oplock)(struct TCP_Server_Info *server,
+ 				 struct cifsInodeInfo *cinode, __u32 oplock,
+ 				 unsigned int epoch, bool *purge_cache);
+@@ -1705,16 +1705,17 @@ static inline bool is_retryable_error(int error)
+ #define   CIFS_NO_RSP_BUF   0x040    /* no response buffer required */
+ 
+ /* Type of request operation */
+-#define   CIFS_ECHO_OP      0x080    /* echo request */
+-#define   CIFS_OBREAK_OP   0x0100    /* oplock break request */
+-#define   CIFS_NEG_OP      0x0200    /* negotiate request */
++#define   CIFS_ECHO_OP            0x080  /* echo request */
++#define   CIFS_OBREAK_OP          0x0100 /* oplock break request */
++#define   CIFS_NEG_OP             0x0200 /* negotiate request */
++#define   CIFS_CP_CREATE_CLOSE_OP 0x0400 /* compound create+close request */
+ /* Lower bitmask values are reserved by others below. */
+-#define   CIFS_SESS_OP     0x2000    /* session setup request */
+-#define   CIFS_OP_MASK     0x2380    /* mask request type */
++#define   CIFS_SESS_OP            0x2000 /* session setup request */
++#define   CIFS_OP_MASK            0x2780 /* mask request type */
+ 
+-#define   CIFS_HAS_CREDITS 0x0400    /* already has credits */
+-#define   CIFS_TRANSFORM_REQ 0x0800    /* transform request before sending */
+-#define   CIFS_NO_SRV_RSP    0x1000    /* there is no server response */
++#define   CIFS_HAS_CREDITS        0x0400 /* already has credits */
++#define   CIFS_TRANSFORM_REQ      0x0800 /* transform request before sending */
++#define   CIFS_NO_SRV_RSP         0x1000 /* there is no server response */
+ 
+ /* Security Flags: indicate type of session setup needed */
+ #define   CIFSSEC_MAY_SIGN	0x00001
+diff --git a/fs/cifs/smb2inode.c b/fs/cifs/smb2inode.c
+index 1f900b81c34a..a718dc77e604 100644
+--- a/fs/cifs/smb2inode.c
++++ b/fs/cifs/smb2inode.c
+@@ -358,6 +358,7 @@ smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (cfile)
+ 		goto after_close;
+ 	/* Close */
++	flags |= CIFS_CP_CREATE_CLOSE_OP;
+ 	rqst[num_rqst].rq_iov = &vars->close_iov[0];
+ 	rqst[num_rqst].rq_nvec = 1;
+ 	rc = SMB2_close_init(tcon, server,
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 0a55a77d94de..c99966121757 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -844,14 +844,14 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
+ }
+ 
+ int
+-smb2_handle_cancelled_mid(char *buffer, struct TCP_Server_Info *server)
++smb2_handle_cancelled_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server)
+ {
+-	struct smb2_sync_hdr *sync_hdr = (struct smb2_sync_hdr *)buffer;
+-	struct smb2_create_rsp *rsp = (struct smb2_create_rsp *)buffer;
++	struct smb2_sync_hdr *sync_hdr = mid->resp_buf;
++	struct smb2_create_rsp *rsp = mid->resp_buf;
+ 	struct cifs_tcon *tcon;
+ 	int rc;
+ 
+-	if (sync_hdr->Command != SMB2_CREATE ||
++	if ((mid->optype & CIFS_CP_CREATE_CLOSE_OP) || sync_hdr->Command != SMB2_CREATE ||
+ 	    sync_hdr->Status != STATUS_SUCCESS)
+ 		return 0;
+ 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index f5087295424c..9bae7e8deb09 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1195,7 +1195,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct TCP_Server_Info *server = cifs_pick_channel(ses);
+ 	__le16 *utf16_path = NULL;
+ 	int ea_name_len = strlen(ea_name);
+-	int flags = 0;
++	int flags = CIFS_CP_CREATE_CLOSE_OP;
+ 	int len;
+ 	struct smb_rqst rqst[3];
+ 	int resp_buftype[3];
+@@ -1573,7 +1573,7 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 	struct smb_query_info qi;
+ 	struct smb_query_info __user *pqi;
+ 	int rc = 0;
+-	int flags = 0;
++	int flags = CIFS_CP_CREATE_CLOSE_OP;
+ 	struct smb2_query_info_rsp *qi_rsp = NULL;
+ 	struct smb2_ioctl_rsp *io_rsp = NULL;
+ 	void *buffer = NULL;
+@@ -2577,7 +2577,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
+ {
+ 	struct cifs_ses *ses = tcon->ses;
+ 	struct TCP_Server_Info *server = cifs_pick_channel(ses);
+-	int flags = 0;
++	int flags = CIFS_CP_CREATE_CLOSE_OP;
+ 	struct smb_rqst rqst[3];
+ 	int resp_buftype[3];
+ 	struct kvec rsp_iov[3];
+@@ -2975,7 +2975,7 @@ smb2_query_symlink(const unsigned int xid, struct cifs_tcon *tcon,
+ 	unsigned int sub_offset;
+ 	unsigned int print_len;
+ 	unsigned int print_offset;
+-	int flags = 0;
++	int flags = CIFS_CP_CREATE_CLOSE_OP;
+ 	struct smb_rqst rqst[3];
+ 	int resp_buftype[3];
+ 	struct kvec rsp_iov[3];
+@@ -3157,7 +3157,7 @@ smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_fid fid;
+ 	struct TCP_Server_Info *server = cifs_pick_channel(tcon->ses);
+-	int flags = 0;
++	int flags = CIFS_CP_CREATE_CLOSE_OP;
+ 	struct smb_rqst rqst[3];
+ 	int resp_buftype[3];
+ 	struct kvec rsp_iov[3];
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index 9565e27681a5..a2eb34a8d9c9 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -246,8 +246,7 @@ extern int SMB2_oplock_break(const unsigned int xid, struct cifs_tcon *tcon,
+ extern int smb2_handle_cancelled_close(struct cifs_tcon *tcon,
+ 				       __u64 persistent_fid,
+ 				       __u64 volatile_fid);
+-extern int smb2_handle_cancelled_mid(char *buffer,
+-					struct TCP_Server_Info *server);
++extern int smb2_handle_cancelled_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server);
+ void smb2_cancelled_close_fid(struct work_struct *work);
+ extern int SMB2_QFS_info(const unsigned int xid, struct cifs_tcon *tcon,
+ 			 u64 persistent_file_id, u64 volatile_file_id,
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index f62f512e2cb1..9438a0c35473 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -109,7 +109,7 @@ static void _cifs_mid_q_entry_release(struct kref *refcount)
+ 	if (midEntry->resp_buf && (midEntry->mid_flags & MID_WAIT_CANCELLED) &&
+ 	    midEntry->mid_state == MID_RESPONSE_RECEIVED &&
+ 	    server->ops->handle_cancelled_mid)
+-		server->ops->handle_cancelled_mid(midEntry->resp_buf, server);
++		server->ops->handle_cancelled_mid(midEntry, server);
+ 
+ 	midEntry->mid_state = MID_FREE;
+ 	atomic_dec(&midCount);
+-- 
+2.30.1
 
