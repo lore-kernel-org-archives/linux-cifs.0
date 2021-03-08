@@ -2,167 +2,103 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1245C433DB
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 22:33:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F085C433E6
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 23:08:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A634865005
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 22:33:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70931652A4
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 23:08:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231712AbhCHWdK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Mar 2021 17:33:10 -0500
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:40412 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229627AbhCHWcv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Mar 2021 17:32:51 -0500
-Received: from dread.disaster.area (pa49-181-239-12.pa.nsw.optusnet.com.au [49.181.239.12])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 3A2521041A91;
-        Tue,  9 Mar 2021 09:32:48 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1lJOQh-000IZX-At; Tue, 09 Mar 2021 09:32:47 +1100
-Date:   Tue, 9 Mar 2021 09:32:47 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Amir Goldstein <amir73il@gmail.com>, linux-cachefs@redhat.com,
-        Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        "J. Bruce Fields" <bfields@fieldses.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <dchinner@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-afs@lists.infradead.org,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Miklos Szeredi <miklos@szeredi.hu>
-Subject: Re: Metadata writtenback notification? -- was Re: fscache:
- Redesigning the on-disk cache
-Message-ID: <20210308223247.GB63242@dread.disaster.area>
-References: <CAOQ4uxjYWprb7trvamCx+DaP2yn8HCaZeZx1dSvPyFH2My303w@mail.gmail.com>
- <2653261.1614813611@warthog.procyon.org.uk>
- <CAOQ4uxhxwKHLT559f8v5aFTheKgPUndzGufg0E58rkEqa9oQ3Q@mail.gmail.com>
- <517184.1615194835@warthog.procyon.org.uk>
- <584529.1615202921@warthog.procyon.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <584529.1615202921@warthog.procyon.org.uk>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0 cx=a_idp_d
-        a=gO82wUwQTSpaJfP49aMSow==:117 a=gO82wUwQTSpaJfP49aMSow==:17
-        a=kj9zAlcOel0A:10 a=dESyimp9J3IA:10 a=pGLkceISAAAA:8 a=07d9gI8wAAAA:8
-        a=7-415B0cAAAA:8 a=fLlyUv8SAob-akP86owA:9 a=CjuIK1q_8ugA:10
-        a=e2CUPOnPG4QKp8I52DXD:22 a=biEYGPWJfzWAr4FL6Ov7:22
-        a=BPzZvq435JnGatEyYwdK:22
+        id S229488AbhCHXHx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Mar 2021 18:07:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32463 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229627AbhCHXHt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Mar 2021 18:07:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615244869;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
+        bh=81wsiKfCl4t7ZFP8lVjcPTP/RflB7DvlahVcI2y5ICY=;
+        b=OX5EYfyaZDGz9EwrOp6DIMPKVrHqWpbxMO7eixLDaXXs7sFqgSm3A+rsauIjlaRw3ZkcMK
+        ScjGC4ckNuzEXAC+wct2PqBtmgwg7SlYz4yuUgDbhK8xP8QhgP4ns4gFUc1W32sJipAFyK
+        dpK0hU3wuuWUIA9JVOliB7gP00ZtgyU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-WAB-fLZdOpCloNdq2Fwy7Q-1; Mon, 08 Mar 2021 18:07:46 -0500
+X-MC-Unique: WAB-fLZdOpCloNdq2Fwy7Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0D6D26864;
+        Mon,  8 Mar 2021 23:07:45 +0000 (UTC)
+Received: from test1103.test.redhat.com (vpn2-54-42.bne.redhat.com [10.64.54.42])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D1DC1A8A3;
+        Mon,  8 Mar 2021 23:07:44 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH 6/9] cifs: add a function to get a cached dir based on its dentry
+Date:   Tue,  9 Mar 2021 09:07:32 +1000
+Message-Id: <20210308230735.337-7-lsahlber@redhat.com>
+In-Reply-To: <20210308230735.337-1-lsahlber@redhat.com>
+References: <20210308230735.337-1-lsahlber@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Mar 08, 2021 at 11:28:41AM +0000, David Howells wrote:
-> Amir Goldstein <amir73il@gmail.com> wrote:
-> 
-> > > But after I've written and sync'd the data, I set the xattr to mark the
-> > > file not open.  At the moment I'm doing this too lazily, only doing it
-> > > when a netfs file gets evicted or when the cache gets withdrawn, but I
-> > > really need to add a queue of objects to be sealed as they're closed.  The
-> > > balance is working out how often to do the sealing as something like a
-> > > shell script can do a lot of consecutive open/write/close ops.
-> > 
-> > You could add an internal vfs API wait_for_multiple_inodes_to_be_synced().
-> > For example, xfs keeps the "LSN" on each inode, so once the transaction
-> > with some LSN has been committed, all the relevant inodes, if not dirty, can
-> > be declared as synced, without having to call fsync() on any file and without
-> > having to force transaction commit or any IO at all.
-> > 
-> > Since fscache takes care of submitting the IO, and it shouldn't care about any
-> > specific time that the data/metadata hits the disk(?), you can make use of the
-> > existing periodic writeback and rolling transaction commit and only ever need
-> > to wait for that to happen before marking cache files "closed".
-> > 
-> > There was a discussion about fsyncing a range of files on LSFMM [1].
-> > In the last comment on the article dchinner argues why we already have that
-> > API (and now also with io_uring(), but AFAIK, we do not have a useful
-> > wait_for_sync() API. And it doesn't need to be exposed to userspace at all.
-> > 
-> > [1] https://lwn.net/Articles/789024/
-> 
-> This sounds like an interesting idea.  Actually, what I probably want is a
-> notification to say that a particular object has been completely sync'd to
-> disk, metadata and all.
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/smb2ops.c   | 16 ++++++++++++++++
+ fs/cifs/smb2proto.h |  3 +++
+ 2 files changed, 19 insertions(+)
 
-This isn't hard to do yourself in the kernel. All it takes is a
-workqueue to run vfs_fsync() calls asynchronously and for the work
-to queue a local notification/wakeup when the fsync completes...
-
-That's all aio_fsync() does - the notification it queues on
-completion is the AIO completion event for userspace - so I think
-you could do this in about 50 lines of code if you really needed
-it...
-
-> However, there are some performance problems are arising in my fscache-iter
-> branch:
-> 
->  (1) It's doing a lot of synchronous metadata operations (tmpfile, truncate,
->      setxattr).
-
-Async pipelines using unbound workqueues are your friend.
-> 
->  (2) It's retaining a lot of open file structs on cache files.  Cachefiles
->      opens the file when it's first asked to access it and retains that till
->      the cookie is relinquished or the cache withdrawn (the file* doesn't
->      contribute to ENFILE/EMFILE but it still eats memory).
-
-Sounds similar to the problem that the NFSd open file cache solves.
-(fs/nfsd/filecache.c)
-
->  (3) Trimming excess data from the end of the cache file.  The problem with
->      using DIO to write to the cache is that the write has to be rounded up to
->      a multiple of the backing fs DIO blocksize,
-
-Actually, a multiple of the logical sector size of the backing
-device behind the backing filesystem.
-
->      but if the file is truncated
->      larger, that excess data now becomes part of the file.
-
-Keep the actual file size in your tracking xattr.
-
->      Possibly it's sufficient to just clear the excess page space before
->      writing, but that doesn't necessarily stop a writable mmap from
->      scribbling on it.
-
-We can't stop mmap from scribbling in it. All filesystems have this
-problem, so to prevent data leaks we have to zero the post-eof tail
-region on every write of the EOF block, anyway.
-
->  (4) Committing outstanding cache metadata at cache withdrawal or netfs
->      unmount.  I've previously mentioned this: it ends up with a whole slew of
->      synchronous metadata changes being committed to the cache in one go
->      (truncates, fallocates, fsync, xattrs, unlink+link of tmpfile) - and this
->      can take quite a long time.  The cache needs to be more proactive in
->      getting stuff committed as it goes along.
-
-Workqueues give you an easy mechanism for async dispatch and
-concurrency for synchronous operations. This is a largely solved
-problem...
-
->  (5) Attaching to an object requires a pathwalk to it (normally only two
->      steps) and then reading various xattrs on it - all synchronous, but can
->      be punted to a background threadpool.
-
-a.k.a. punting to a workqueue :)
-
-Cheers,
-
-Dave.
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 81eb7f10368b..9e2e1ce915c9 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -925,6 +925,22 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 	return rc;
+ }
+ 
++int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
++			      struct dentry *dentry,
++			      struct cached_fid **cfid)
++{
++	mutex_lock(&tcon->crfid.fid_mutex);
++	if (tcon->crfid.dentry == dentry) {
++		cifs_dbg(FYI, "found a cached root file handle by dentry\n");
++		*cfid = &tcon->crfid;
++		kref_get(&tcon->crfid.refcount);
++		mutex_unlock(&tcon->crfid.fid_mutex);
++		return 0;
++	}
++	mutex_unlock(&tcon->crfid.fid_mutex);
++	return -ENOENT;
++}
++
+ static void
+ smb3_qfs_tcon(const unsigned int xid, struct cifs_tcon *tcon,
+ 	      struct cifs_sb_info *cifs_sb)
+diff --git a/fs/cifs/smb2proto.h b/fs/cifs/smb2proto.h
+index ddbdf9923625..3b1cc27947df 100644
+--- a/fs/cifs/smb2proto.h
++++ b/fs/cifs/smb2proto.h
+@@ -73,6 +73,9 @@ extern int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 			   const char *path,
+ 			   struct cifs_sb_info *cifs_sb,
+ 			   struct cached_fid **cfid);
++extern int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
++				     struct dentry *dentry,
++				     struct cached_fid **cfid);
+ extern void close_cached_dir(struct cached_fid *cfid);
+ extern void close_cached_dir_lease(struct cached_fid *cfid);
+ extern void close_cached_dir_lease_locked(struct cached_fid *cfid);
 -- 
-Dave Chinner
-david@fromorbit.com
+2.13.6
+
