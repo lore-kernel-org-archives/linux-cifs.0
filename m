@@ -2,103 +2,110 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EFCEC433E0
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 21:10:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC650C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 21:56:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2D1464EE7
-	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 21:10:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CD0A64FFD
+	for <linux-cifs@archiver.kernel.org>; Mon,  8 Mar 2021 21:56:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229775AbhCHVJt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 8 Mar 2021 16:09:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59616 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229650AbhCHVJK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Mar 2021 16:09:10 -0500
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35AF2C06174A
-        for <linux-cifs@vger.kernel.org>; Mon,  8 Mar 2021 13:09:10 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id n22so339361wmc.2
-        for <linux-cifs@vger.kernel.org>; Mon, 08 Mar 2021 13:09:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WDwbkZzMt07KM2n3yjwWopLS40fgmnN4z4M/mAWc6nw=;
-        b=rUj7eAbTAvWO+kTX5pk8Jx6YBjGTaTzJDkeBkCyVda5rVi0ZZXl5QdZt0ONdr+cM9Z
-         wylUAoQF/9ahqjZbZzkkvo8AyS4mYFUTf4v62K+VHWKtrExp//hzdIAOXg3eRK8PX1Xs
-         k/MMBozioqb7R6xjfjOCaTiJ2sLemzcFT9rC2h7U/pojBzKowQ8x50zjjxUyVh5+vie3
-         T4xX/1bQUWVhCaRle/H9Lc1X6XZE+0RicLSqDSWrG1vsQUHvdIwT7pr6Rl7prnF2g6n0
-         yDT0onoK+LjVw47WCYs18SQEiq9+XmOI4EdqoEmfjUP8KOiZYQ80uXBPA0tnmOATwF+z
-         +deQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WDwbkZzMt07KM2n3yjwWopLS40fgmnN4z4M/mAWc6nw=;
-        b=MYLSnVSc5A7Vq4dugswOyl4GGiaFxyLAKwjjsK8/31yAsn1v+/97E88xyGHpMj5mfV
-         t4LLWcE3BFmAVNQTt3Xvw/hMqt/rXatj67980jQw+IfvNJXnw+V8hldAAO2xOoFRQwWU
-         zLVxc9fzO4BsDaic9GhdsTZDvc+TiZJVWbgsM+oM2aZmk2O031Tm/+BOV4spM0uclOZo
-         XkaoRmyfIW3+MDlg5mQSlVSiNjeDlpWif5n9lBsJCniSaOwaACGUq/FgHv/G3If3MolG
-         T1SqriKmrwgjyxkN036C5gn4OsLBzGTWvNUL2B6zBjFQRRCJ+3udbDLsBH8HSt9XqsDq
-         zl1g==
-X-Gm-Message-State: AOAM533VgvergcI0VdVdOK+OJIbxtWgjPcAReZpCe353cIyZ6Ej+2AYf
-        bccHMvEnzmWKR1EZ3z8etiAv69d13lqptfmtKv0tbK6VLT0=
-X-Google-Smtp-Source: ABdhPJx9rdXKiCRchozkKFKeIpOGNVdQ2qbwDWcEB/g39CtBMb4m5VdKG64kKdpPJSSIMfAYBNHqKPAe+QvX+N6G7SU=
-X-Received: by 2002:a1c:7fc9:: with SMTP id a192mr607956wmd.15.1615237748899;
- Mon, 08 Mar 2021 13:09:08 -0800 (PST)
+        id S230457AbhCHV4U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 8 Mar 2021 16:56:20 -0500
+Received: from mail104.syd.optusnet.com.au ([211.29.132.246]:56725 "EHLO
+        mail104.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230047AbhCHVzs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 8 Mar 2021 16:55:48 -0500
+Received: from dread.disaster.area (pa49-181-239-12.pa.nsw.optusnet.com.au [49.181.239.12])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 29E148289A3;
+        Tue,  9 Mar 2021 08:55:36 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1lJNqh-000HG4-6L; Tue, 09 Mar 2021 08:55:35 +1100
+Date:   Tue, 9 Mar 2021 08:55:35 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Amir Goldstein <amir73il@gmail.com>, linux-cachefs@redhat.com,
+        Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        "J. Bruce Fields" <bfields@fieldses.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-afs@lists.infradead.org,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>
+Subject: Re: fscache: Redesigning the on-disk cache
+Message-ID: <20210308215535.GA63242@dread.disaster.area>
+References: <CAOQ4uxhxwKHLT559f8v5aFTheKgPUndzGufg0E58rkEqa9oQ3Q@mail.gmail.com>
+ <2653261.1614813611@warthog.procyon.org.uk>
+ <517184.1615194835@warthog.procyon.org.uk>
 MIME-Version: 1.0
-References: <20210308150050.19902-1-pc@cjr.nz> <20210308150050.19902-3-pc@cjr.nz>
-In-Reply-To: <20210308150050.19902-3-pc@cjr.nz>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 8 Mar 2021 15:08:58 -0600
-Message-ID: <CAH2r5mt1hF3AjgT0mhjH9wgaoFby9TvnKZ_u+=bLj8LvxKS9hw@mail.gmail.com>
-Subject: Re: [PATCH 3/4] cifs: return proper error code in statfs(2)
-To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <517184.1615194835@warthog.procyon.org.uk>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0 cx=a_idp_d
+        a=gO82wUwQTSpaJfP49aMSow==:117 a=gO82wUwQTSpaJfP49aMSow==:17
+        a=kj9zAlcOel0A:10 a=dESyimp9J3IA:10 a=pGLkceISAAAA:8 a=7-415B0cAAAA:8
+        a=tj5_YPy7viIAn9pg2yAA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-cc:stable?
+On Mon, Mar 08, 2021 at 09:13:55AM +0000, David Howells wrote:
+> Amir Goldstein <amir73il@gmail.com> wrote:
+> 
+> > >  (0a) As (0) but using SEEK_DATA/SEEK_HOLE instead of bmap and opening the
+> > >       file for every whole operation (which may combine reads and writes).
+> > 
+> > I read that NFSv4 supports hole punching, so when using ->bmap() or SEEK_DATA
+> > to keep track of present data, it's hard to distinguish between an
+> > invalid cached range and a valid "cached hole".
+> 
+> I wasn't exactly intending to permit caching over NFS.  That leads to fun
+> making sure that the superblock you're caching isn't the one that has the
+> cache in it.
+> 
+> However, we will need to handle hole-punching being done on a cached netfs,
+> even if that's just to completely invalidate the cache for that file.
+> 
+> > With ->fiemap() you can at least make the distinction between a non existing
+> > and an UNWRITTEN extent.
+> 
+> I can't use that for XFS, Ext4 or btrfs, I suspect.  Christoph and Dave's
+> assertion is that the cache can't rely on the backing filesystem's metadata
+> because these can arbitrarily insert or remove blocks of zeros to bridge or
+> split extents.
 
-On Mon, Mar 8, 2021 at 9:01 AM Paulo Alcantara <pc@cjr.nz> wrote:
->
-> In cifs_statfs(), if server->ops->queryfs is not NULL, then we should
-> use its return value rather than always returning 0.  Instead, use rc
-> variable as it is properly set to 0 in case there is no
-> server->ops->queryfs.
->
-> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-> ---
->  fs/cifs/cifsfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index d43e935d2df4..099ad9f3660b 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -290,7 +290,7 @@ cifs_statfs(struct dentry *dentry, struct kstatfs *buf)
->                 rc = server->ops->queryfs(xid, tcon, cifs_sb, buf);
->
->         free_xid(xid);
-> -       return 0;
-> +       return rc;
->  }
->
->  static long cifs_fallocate(struct file *file, int mode, loff_t off, loff_t len)
-> --
-> 2.30.1
->
+Well, that's not the big problem. The issue that makes FIEMAP
+unusable for determining if there is user data present in a file is
+that on-disk extent maps aren't exactly coherent with in-memory user
+data state.
 
+That is, we can have a hole on disk with delalloc user data in
+memory.  There's user data in the file, just not on disk. Same goes
+for unwritten extents - there can be dirty data in memory over an
+unwritten extent, and it won't get converted to written until the
+data is written back and the filesystem runs a conversion
+transaction.
 
+So, yeah, if you use FIEMAP to determine where data lies in a file
+that is being actively modified, you're going get corrupt data
+sooner rather than later.  SEEK_HOLE/DATA are coherent with in
+memory user data, so don't have this problem.
+
+Cheers,
+
+Dave.
 -- 
-Thanks,
-
-Steve
+Dave Chinner
+david@fromorbit.com
