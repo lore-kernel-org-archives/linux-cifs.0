@@ -2,163 +2,289 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E37C433E6
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Mar 2021 10:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12EE1C433DB
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Mar 2021 11:28:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 473D06518F
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Mar 2021 10:05:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D136665267
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Mar 2021 11:28:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229837AbhCIKFH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 Mar 2021 05:05:07 -0500
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:53139 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229691AbhCIKEq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Mar 2021 05:04:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1615284284;
+        id S229546AbhCIL2W (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 Mar 2021 06:28:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36910 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231195AbhCIL2Q (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Mar 2021 06:28:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615289296;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N5XXNG5rM2KtjCjdksJEHF7DN6xMn8sSmAip3tA3O8Q=;
-        b=j/jUdITFSkzBJskqkJtdJ86ISSV2+EfuXKFdkohR08i2+s97VyuqeIXQjj+5kHg5qDkDIB
-        v7ACx+ksbzLcWkg/jq/PiAOcp692aWZMtkkGRFVfKzPach8VEjwxqoJv4fnO7KmXbB1Yu7
-        8kzZgbbFE+aLId1MSQBkHLqhYJF4v8Y=
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com
- (mail-vi1eur05lp2176.outbound.protection.outlook.com [104.47.17.176])
- (Using TLS) by relay.mimecast.com with ESMTP id
- de-mta-14-063D8ph1NPekS8qC6U_RZQ-1; Tue, 09 Mar 2021 11:04:43 +0100
-X-MC-Unique: 063D8ph1NPekS8qC6U_RZQ-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UV+vpY2j/pBKeKJt0F/qm1H0XY6c/AZFh4q5gp9T6csYJASjYzdP3SX5Imi/OWwubvyGjWu9bmygm+ItorjtJ/w/C+zhH7jAEP/UX1XqFvnKiqvfmLrg2Nw5VEjCC2J39sv9Ph8YWaL2XcnrHcHB+K87GN8kND/HtsqBx4lKfP2zO3MuMI325l68dp97wZg8Mgw0QapCwm+Tfh9kl6a5M2BMYt3e99HMAX03uX3qPe54XupSFtawLYivVP9Z99Ld19+Gh6d2YNHuT1mxDUkCvUPX2KPYDuFLNtY8nlgNpRPzM04cBa0OjRtulU2G+mLSAPfOZSQaTi7yMWjnQ/KB/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N5XXNG5rM2KtjCjdksJEHF7DN6xMn8sSmAip3tA3O8Q=;
- b=MoqVQ20/QjY5MFJMv7PMFZj35mPHotmOgNK8C/HleKEBl3LuxBYkytnDsJIwbV13ZWY+J3ozZqhnHauylEnPsgH9wrvreBPmq/cHgN0I2i8iR2B/0I/FvgWNQk+N7LI9KIU8eavuU2AQKSYHwEjLPiuAeKIGAcWc9ig/kQid0Z79XPxGYfnqXdY/VlQemXn1cBQH6PUqfARb/fyb2vx6x0Mutlxuec76uCjChqv8+D2Cdx3RPlWMKn9vI0vG/1nRtZ7Mw+nRKzsBQPOfv59ReFFp+vSM1hRkRjZxksIVc0svFGBBqJttAIpS16xrnc3VJ7WF4P5taaENIb/dxLpLoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VE1PR04MB7278.eurprd04.prod.outlook.com (2603:10a6:800:1b1::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Tue, 9 Mar
- 2021 10:04:42 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3890.037; Tue, 9 Mar 2021
- 10:04:42 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        bh=LvGBiPlaIdzFAXyfsy1qEVyMatChi1ggtZKGPfWh9R0=;
+        b=LVNz0z1YXL803AlW9Gs/ynHrnvWU4RjOIPNSJpN5vQ32F89xgpyktcLJuHIXad+HeePI48
+        BvjtiUJkYDV5Q5qqEtYG491cFSm2XS80I9WHSikQOO1DntMDYWo5KN49l1KijwoM5Ud1PC
+        Cb6GwYpLZ0bF2u+LRsvXeD3BSHsWrVM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-p4rhjGRAM9idlqpMeWWWYA-1; Tue, 09 Mar 2021 06:28:12 -0500
+X-MC-Unique: p4rhjGRAM9idlqpMeWWWYA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E714881D50;
+        Tue,  9 Mar 2021 11:28:10 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-118-152.rdu2.redhat.com [10.10.118.152])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 542A75D9CD;
+        Tue,  9 Mar 2021 11:27:55 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210308223247.GB63242@dread.disaster.area>
+References: <20210308223247.GB63242@dread.disaster.area> <CAOQ4uxjYWprb7trvamCx+DaP2yn8HCaZeZx1dSvPyFH2My303w@mail.gmail.com> <2653261.1614813611@warthog.procyon.org.uk> <CAOQ4uxhxwKHLT559f8v5aFTheKgPUndzGufg0E58rkEqa9oQ3Q@mail.gmail.com> <517184.1615194835@warthog.procyon.org.uk> <584529.1615202921@warthog.procyon.org.uk>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     dhowells@redhat.com, Amir Goldstein <amir73il@gmail.com>,
+        linux-cachefs@redhat.com, Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        "J. Bruce Fields" <bfields@fieldses.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <dchinner@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-afs@lists.infradead.org,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Steve French <sfrench@samba.org>, kernel@axis.com,
-        Pavel Shilovsky <pshilov@microsoft.com>
-Subject: Re: [PATCH] CIFS: Prevent error log on spurious oplock break
-In-Reply-To: <CAN05THQtb5RY2ye7nkyWBjrXS+=usZCxUM7jBQG+JEpg_TQQTA@mail.gmail.com>
-References: <20210305094107.13743-1-vincent.whitchurch@axis.com>
- <CANT5p=rB2=DvjtpmVy803emWpuzsy-C2+d4wqQ5g_9fJ8+a5Cw@mail.gmail.com>
- <CAN05THQtb5RY2ye7nkyWBjrXS+=usZCxUM7jBQG+JEpg_TQQTA@mail.gmail.com>
-Date:   Tue, 09 Mar 2021 11:04:41 +0100
-Message-ID: <87h7lkve12.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:70b:4a04:48fe:21ee:1b19:31ad]
-X-ClientProxiedBy: ZR0P278CA0123.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:20::20) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Miklos Szeredi <miklos@szeredi.hu>
+Subject: Re: Metadata writtenback notification? -- was Re: fscache: Redesigning the on-disk cache
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:70b:4a04:48fe:21ee:1b19:31ad) by ZR0P278CA0123.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:20::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17 via Frontend Transport; Tue, 9 Mar 2021 10:04:41 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 53a5860f-da46-4590-bb79-08d8e2e2c21e
-X-MS-TrafficTypeDiagnostic: VE1PR04MB7278:
-X-Microsoft-Antispam-PRVS: <VE1PR04MB7278750F6E0CACF00D13828EA8929@VE1PR04MB7278.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sNiLJFdYWslk+Zzq2Agr2BmYw4iZTCcK5sgUFr5n3gk55tdFaKRbB1I/0SL8yyyNUwpaMpPLncVa+3Dr1QGLn9/SSlx8Koj7Ltoermk7id8LsOjuqRz347arJkY9f+1qfcpqWJcOhdrEb2SunkDbCuJspQRoy2hZP/ewADyvsaPxGntPegqMw4lzA7Zgw0A+ap9R0eU506GU+NQXx5oTvO7VL6UMqYwLnZ5nw63QbYdOz6JD/7ckkt9cO4fnG91nk6U8NuDati1GiSgLOU5J6AUC09myJIcYBAPh6pDsvZIdKXoTaPOC1J6/Ceqhw6uBV2bIVfnxM/qqDPPhMSm0naWew72i+WrzLw/5bEffPRCdnf8lGtakHmPvyXBGAUunro3axP3sTwPw0JpS/e7dlm6Jw3lfCeAwqggIJVYM1aUvFGr0WviSdqSSg4tNQsMU52/By+e/xUaqpolIl6ZUdoFFgApUTy2jLv1/LfkJBGXybkMN1b0sXuxWfMDU7PJ7Sd5yoiyCMWLbGeJC/eZqpw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(346002)(396003)(136003)(366004)(376002)(52116002)(186003)(83380400001)(2616005)(478600001)(66946007)(6496006)(2906002)(86362001)(4744005)(66574015)(316002)(5660300002)(6486002)(8676002)(4326008)(110136005)(54906003)(16526019)(8936002)(36756003)(66476007)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?WXVpV0VpcXY5aktBRlBpbjg0eE5FVlVSbnlBUnVYL1l0R09MYWFjWkFRbjkz?=
- =?utf-8?B?TEcvSnJpOGF6bElTd3J3eUY2elJnbzU3aVdSNldRRkxLSEdNN0RsQ0x0QytP?=
- =?utf-8?B?VVZIK3pWMUZDc2wzcXhtcVQ0U01nMk1DeTNGdnN2cDY3V3VzRVRlWHF6ck01?=
- =?utf-8?B?RDdtTndkbFpZcEtyZHp2TUU2Rmx0dUY2eDRJRW1PZHhsS01ZQVhaeG1teGVh?=
- =?utf-8?B?RzlVUDBscGNxUzhuQ1NnVUNTYWNHWVpsL0UwUXRJcms1NWUzbGxydksrOU5n?=
- =?utf-8?B?WnRXZDkrSDNTc0ZTeEltSkFwMWJha1FkN1BRTFJ6eTUvSHFiUlgwUVc1Z1BV?=
- =?utf-8?B?amwyMXQvOFJYWThRcVMzK2R3eG9obktkVzNGaE8wQXZtSW80UVFCNkN4OERD?=
- =?utf-8?B?WnhXc25QV2ZMd3ljc2xNa0VFM1prUys2SVFVSGgrdUhRVFdWdjVra2Q5MmRa?=
- =?utf-8?B?MjFlcWozbG1xd3Q4MWxiMmdhQXdqSk92alRvVzFtZ2RMWWx2UHl4L3E1TWkr?=
- =?utf-8?B?VThYRnE5NksxTzU3dnBMcjFlTUhQRGdjSFFrNFc3cTZ5dTd6eTRDUjUydW52?=
- =?utf-8?B?bTdjdjEyYWRyaXUxWkZCRjlLUlBmaVdRck9CTkovcFh6dkIzbklLZWxpSzRZ?=
- =?utf-8?B?amJKOWRuQVRSL3RxbFZMTGEwQ3Nsc3NZT2xKQm5nTXdZdUxkTytUV09sa3BT?=
- =?utf-8?B?aXYvQjdFREt4dHhmS0cyTGxkMm1GTjNoNU5qSkJ4NGFRVGdGR1NOZ29rVnpD?=
- =?utf-8?B?YjFoYUJnMllvS3ZoWTJLRGxOZUNCNE0vMCtDM0NOa3FtUnFkQ0VnRHZoSHVX?=
- =?utf-8?B?SUUveE9nMTYreFkwQzM2U1c1REdjcVdzZ1Y4YUxjcThBdG5BYllsdkdia1No?=
- =?utf-8?B?dWJpRmhRUHVhc3lid1IxRXBrUldzaXZXTTdrOXBiemZvTWR0aC84MGl5Z3BK?=
- =?utf-8?B?b3FHR25ZWXFMRVErbm9vckc2QkpEYzlZWnllZWtWeEpqSEF4Q1c3VHRTY29C?=
- =?utf-8?B?NWY0YjFMbk1aRGFRbkFLc1dHNDB4WXZtek42UzdKbEhMUnZiZXdiQTRxSTVX?=
- =?utf-8?B?a1NucTB3Qjc2ZGtTUVZ5T3pONExPT1hyV2pmNlVZd3ZjUTAzVnBEaXBuenI2?=
- =?utf-8?B?dlp4MFFQb0RFQXh5cTFkRVZncEpQcy9LZmFYVHJsK0JnRHZoUnFyQWdhU0pF?=
- =?utf-8?B?UzdSSmZyQ0JOdFE4ZmRHSTN1SnkwYktPUWhtMEovd05mNWVlSDBGVFpZMFFj?=
- =?utf-8?B?V2crQi9KeVZTdlM3aWhoMUJqOFdKUXF0TGJuR1ZzSEVQWXh4UW9YaFV1dDhj?=
- =?utf-8?B?dmRUV3pjWEtuTnp6UnlaK0xncVVKL3FCSjdOR3dPZFV4SG5ISmo0NjVPenQ1?=
- =?utf-8?B?LzBxMFBJSTBqTThqYVhWUlA4UDcrRUU3N3M2VHcyNUk1Vk00bjZBOTNKanEx?=
- =?utf-8?B?dU1xczR2MXBSVzJOK2FnRmFIcW1zZDkwT29ORGdLNGdSK3FtMXpJZXY0V1Jy?=
- =?utf-8?B?ZnI0M1RGbTA3L29HeUJndW1iZEhmOFpIM3lZTzYxYUh1aDhnUnZFYXBDSml0?=
- =?utf-8?B?MUJuUURqYW9SeUE4UXQ3RjQwRE9KdmE3OW1SN0orS2VOQUttaWtBeTNJMTJx?=
- =?utf-8?B?NVdTQWNKUU9ZRy9YTVpqVTU5VXVnell4Vk4yNUppaFVENTBWbDB4TVUvaWQ5?=
- =?utf-8?B?aDMxdXRGU244WUtjKzVaZDdRUG5nVnVkSTlzbFFmZlBlMCtJRW85a1FnU2Nl?=
- =?utf-8?B?NWgya1ppWFFWNlUxZDN2anBUSjRZQXNTV09rQkE3ZTBMcXFiZ0p0SWpmUGM5?=
- =?utf-8?B?WVl5TVhvUUVNcDZpZlREcHJiNUxpbDkvdWV3RnE1cXQvNUtIMVUvaUd5bDZY?=
- =?utf-8?Q?enI/WAXR9G/fo?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 53a5860f-da46-4590-bb79-08d8e2e2c21e
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2021 10:04:42.2244
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QipnxOGvKm9wWnUbCY+DYB4sRdj5ocQey8yOoNmMSJg/6P4qFULfMV88/VHMcASp
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7278
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <156604.1615289274.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Tue, 09 Mar 2021 11:27:54 +0000
+Message-ID: <156605.1615289274@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-ronnie sahlberg <ronniesahlberg@gmail.com> writes:
-> Some thoughts I and Stever brainstormed about could be to change the code=
- in the
-> demiltiplex thread where we currently dump the packets that were "invalid=
-"
-> to maybe:
-> *  log once as VFS and then log any future ones as FYI
-> * log once as VFS and then only make the others available via dynamic
-> trace points
-> * rate limit it so we only log it once every n minutes?  (this is overkil=
-l?)
+Dave Chinner <david@fromorbit.com> wrote:
 
-My thoughts: these dumps have been very useful for us in the past, and
-at least for SMB2, they indicate real bugs I think. I have a little
-script to parse and decode them. So I'm in favor of keeping them in
-SMB2+. For SMB1 I'm OK making them dynamicaly switch to FYI.
+> > > There was a discussion about fsyncing a range of files on LSFMM [1].
+> > > In the last comment on the article dchinner argues why we already ha=
+ve that
+> > > API (and now also with io_uring(), but AFAIK, we do not have a usefu=
+l
+> > > wait_for_sync() API. And it doesn't need to be exposed to userspace =
+at all.
+> > > =
 
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+> > > [1] https://lwn.net/Articles/789024/
+> > =
+
+> > This sounds like an interesting idea.  Actually, what I probably want =
+is a
+> > notification to say that a particular object has been completely sync'=
+d to
+> > disk, metadata and all.
+> =
+
+> This isn't hard to do yourself in the kernel. All it takes is a
+> workqueue to run vfs_fsync() calls asynchronously and for the work
+> to queue a local notification/wakeup when the fsync completes...
+> =
+
+> That's all aio_fsync() does - the notification it queues on
+> completion is the AIO completion event for userspace - so I think
+> you could do this in about 50 lines of code if you really needed
+> it...
+
+I was thinking more in terms of passively finding out when metadata has be=
+en
+flushed to disk rather than actively forcing it.  Obviously I can manually
+flush from a worker thread, but that ties up a thread per file I want to
+flush (unless I want to do a higher-level sync).
+
+Btw, looking at aio_fsync(), is there any reason it copies the current cre=
+ds
+rather than just taking a ref on them?  (Granted, this may not be a questi=
+on
+for you)
+
+> > However, there are some performance problems are arising in my fscache=
+-iter
+> > branch:
+> > =
+
+> >  (1) It's doing a lot of synchronous metadata operations (tmpfile, tru=
+ncate,
+> >      setxattr).
+> =
+
+> Async pipelines using unbound workqueues are your friend.
+
+Maybe.  I could just throw everything into a workqueue and let the workque=
+ue
+deal with it.  There still have to be synchronisation points, though - I c=
+an't
+schedule a cache-write from a server-read to the cache following a 3rd-par=
+ty
+induced invalidation until after the invalidation has happened - and that
+holds up userspace from writing to the cache.  But maybe it will work.
+
+Btw, how expensive is it to throw an operation off to a workqueue versus d=
+oing
+it in thread?  Particularly if it's a synchronous op that the thread is go=
+ing
+to have to wait for (e.g. write_begin()).
+
+> >  (2) It's retaining a lot of open file structs on cache files.  Cachef=
+iles
+> >      opens the file when it's first asked to access it and retains tha=
+t till
+> >      the cookie is relinquished or the cache withdrawn (the file* does=
+n't
+> >      contribute to ENFILE/EMFILE but it still eats memory).
+> =
+
+> Sounds similar to the problem that the NFSd open file cache solves.
+> (fs/nfsd/filecache.c)
+
+Looks similiarish to what I was thinking of with having a queue of
+currently-not-in-use cookies to go through and commit and close.
+
+> >      but if the file is truncated
+> >      larger, that excess data now becomes part of the file.
+> =
+
+> Keep the actual file size in your tracking xattr.
+
+I do that, but it doesn't help entirely.  If someone truncates the file la=
+rger
+and then writes non-contiguously, the problem occurs.
+
+I've tried truncating the file down and then truncating it up, but that
+requires two synchronous ops - though the latter is relatively cheap.  I'v=
+e
+also tried fallocate() to clear the block.  What I've found is that the ne=
+xt
+DIO write then has to sync because these may read data into the pagecache =
+of
+the backing file.
+
+Apart from clearing the tail of a page on writing, it might be better for =
+me
+to read the data into a spare page, clear the tail and write it back.
+
+> >      Possibly it's sufficient to just clear the excess page space befo=
+re
+> >      writing, but that doesn't necessarily stop a writable mmap from
+> >      scribbling on it.
+> =
+
+> We can't stop mmap from scribbling in it. All filesystems have this
+> problem, so to prevent data leaks we have to zero the post-eof tail
+> region on every write of the EOF block, anyway.
+
+I meant an mmap scribbling on it after it's been cleared - but I guess tak=
+ing
+away the PTE-writeable flag and making page_mkwrite() wait should solve th=
+at.
+
+> >  (4) Committing outstanding cache metadata at cache withdrawal or netf=
+s
+> >      unmount.  I've previously mentioned this: it ends up with a whole
+> >      slew of synchronous metadata changes being committed to the cache=
+ in
+> >      one go (truncates, fallocates, fsync, xattrs, unlink+link of tmpf=
+ile)
+> >      - and this can take quite a long time.  The cache needs to be mor=
+e
+> >      proactive in getting stuff committed as it goes along.
+> =
+
+> Workqueues give you an easy mechanism for async dispatch and
+> concurrency for synchronous operations. This is a largely solved
+> problem...
+
+Yes and no.  Yes, I can fan out the number of threads doing the committing=
+,
+but there's still a limit on the I/O bandwidth - and a lot of the operatio=
+ns
+still have to hit the disk in the right order.  It still stuffs up the use=
+r
+experience if the cache eats up the entirety of the disk I/O for a few sec=
+onds
+just because an automount expired.
+
+Probably the progressive committing approach is a better one so that there=
+'s
+less to do at the end.
+
+> >  (5) Attaching to an object requires a pathwalk to it (normally only t=
+wo
+> >      steps) and then reading various xattrs on it - all synchronous, b=
+ut can
+> >      be punted to a background threadpool.
+> =
+
+> a.k.a. punting to a workqueue :)
+
+I do that, but it doesn't help so much.  Whilst it can mitigate the effect=
+ by
+running parallel to userspace, userspace tends to move pretty quickly from
+open() to read() - at which point we have to wait anyway.
+
+The problem is that all the steps are synchronous and, for the most part, =
+have
+to be sequential because there's a dependency chain: 2 x dir-lookup, get L=
+SM
+xattrs, get cache xattrs - then read the data if it's present.  I might be
+able to speculate at the end and read two cache xattrs in parallel, but ea=
+ch
+one requires a separate thread to do it.
+
+On top of that, if the user is running a parallel application such as buil=
+ding
+a kernel, a CPU running an offloaded I/O thread isn't running a user threa=
+d.
+What I've found is that increasing the size of the threadpool doesn't actu=
+ally
+affect the time taken.
+
+What I've done in my fscache-iter branch is to have a small thread pool an=
+d
+offload work to it if there's a thread free - otherwise process the work i=
+n
+the calling userspace thread and avoid the context switching.
+
+
+One reason I was wondering about moving to an approach whereby I have an i=
+ndex
+that locates all the blocks (which are then kept in a single file) is that=
+ I
+can probably keep the entire index in RAM and so the lookup costs are vast=
+ly
+reduced.  The downside as Amir pointed out is that metadata coherency is m=
+uch
+harder if I don't just want to blow the cache away if cache isn't properly
+committed when the machine is rebooted.
+
+Note that OpenAFS has been using a single-index approach, with each 256K b=
+lock
+of data in its own file.  They then zap any file that's newer than the ind=
+ex
+file when the cache is started, assuming that that file might be corrupted=
+.
+
+David
 
