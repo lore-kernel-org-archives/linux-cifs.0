@@ -2,150 +2,99 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C4AC433DB
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 19:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 761DAC433DB
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 20:08:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 840DB64E98
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 19:08:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E22264DFD
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 20:08:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233424AbhCJTH3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Mar 2021 14:07:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35466 "EHLO
+        id S231405AbhCJUHn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Mar 2021 15:07:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233403AbhCJTHF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Mar 2021 14:07:05 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40F6AC061760;
-        Wed, 10 Mar 2021 11:07:05 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id f12so24559557wrx.8;
-        Wed, 10 Mar 2021 11:07:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Jq0Z3fnfayb5xVqEpqsZTqs2j3PIOZdFc6XjGP6aSxY=;
-        b=N5V5T0WvJEuIVWBGJQp3wl2yR/bq27+b5xGEjRfVwHwrtLTWVjxrBipiANQ++8JiQW
-         wnMzEa+zHyVqZPTCxH3wLQ32ULfg+dV7VnItaQ3n7gxNU92TO7/4ak1Y+++25AHOEvPX
-         OVDkKUgwyLFOB6cvlfTD1mQxdmtfaJnQycTkPPIFppEQA7Q0SXpB99fK7dHZI2/9LJYP
-         Q75Tfqrr7hFOhj0m4u5T1DYMoOLcfNq7DjrbWUt7wqMXthaquFC/TJ4la5jW6tRmwMbT
-         r2o7jTkdu25SGNuhWylTq7IOlS9INWsFzludN+0qcsUg8S1yUYe8MN3ADOGB4K1uwDnZ
-         Tnow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Jq0Z3fnfayb5xVqEpqsZTqs2j3PIOZdFc6XjGP6aSxY=;
-        b=S3pmYc5FwH+p0jogT/587KQJ/qvWgMujTKoVRkKqeSWA6fcPBdL7cuxRKO6vWave74
-         7BePmqOb4LRmsVN+ELx+Mx+t2r3Cmp3Hx76/YjxuXoqDyqn2liBV2wbcUjTpwFyJOYUo
-         72kiKIiGCcEwpjsPRiZRylJKHgxg9ZHRj8SpPS6tbJZwndgkKBF/ZyynexCWgB9rhA1Y
-         t8V7SL1EVdYW4HgQEfQdVQjr7NunQKWenLn3sHtTb76ArCkuLfyh0Kz7d6267Vjc/nQD
-         pFiBkZBfcXeHa0xCW7pb/fZwlfjrfhOyncdDIi327dk/6m/+meK9aG9Wxw/yUxNwyQio
-         gbCw==
-X-Gm-Message-State: AOAM531oFSmwDRuTJtXD+vtcusxMYDeeei0Ji/1LSGlA6RZIBgc6UdR5
-        I9j/ypyDId/cPyMFZlIK0LEE3C2p5Hotfw==
-X-Google-Smtp-Source: ABdhPJygXyC8VynAdD4EkBm0+DQD1agZcFD93qSYxIi+Je3GoFDgHz+ANI7V2twcV52xLHuVbiVH1A==
-X-Received: by 2002:adf:82af:: with SMTP id 44mr4824283wrc.279.1615403224018;
-        Wed, 10 Mar 2021 11:07:04 -0800 (PST)
-Received: from [192.168.1.143] ([170.253.51.130])
-        by smtp.gmail.com with ESMTPSA id p27sm432050wmi.12.2021.03.10.11.07.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Mar 2021 11:07:03 -0800 (PST)
-Sender: Alejandro Colomar <alx.mailinglists@gmail.com>
-Subject: Re: [PATCH v4] flock.2: add CIFS details
-To:     =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>
-Cc:     smfrench@gmail.com, Tom Talpey <tom@talpey.com>,
-        linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        mtk.manpages@gmail.com, linux-man@vger.kernel.org
-References: <87v9a7w8q7.fsf@suse.com> <20210304095026.782-1-aaptel@suse.com>
-From:   "Alejandro Colomar (man-pages)" <alx.manpages@gmail.com>
-Message-ID: <45b64990-b879-02d3-28e5-b896af0502c4@gmail.com>
-Date:   Wed, 10 Mar 2021 20:07:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        with ESMTP id S232038AbhCJUHd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Mar 2021 15:07:33 -0500
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E14AC061574
+        for <linux-cifs@vger.kernel.org>; Wed, 10 Mar 2021 12:07:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42; h=Message-ID:Date:To:From:CC;
+        bh=WZgSmZDtt0gVJ5xspZl10g0HBuOX+QB2odikBYY3Je4=; b=I/YHwegTjqkw0JPStyG+Wf9etJ
+        /GJ7f3PLpCCOfwx7gT5VimJoPIXTL/hdS56e6rndtfO4wguSipAJCqQXHLqa/06tE1J3XJ79wdTPR
+        6Hf8MJdTCsMlGVXwD65/mQeLR89PIjuUhAZ9Hy+WQc3aBRnFbumnkHXk/mx+mvmZrtpU9fSjDzt53
+        0M5iDet2LANw8qv03BW69pEeh8JpDzDDPZSm4wTtwpxQO7OUDv3mcI4j9t+q8e5FsAaeCCb/Pg3q4
+        RuLRr/58Ab45Xj5IqCyoVdwIkKf7GvAbxOJJbhOLmwzra6bOT1lsDnNMsCcpDmF61U2h1Kb2EAQRU
+        4AuGE0qyEirV/1WqaxnlRsUMYVY2QT8of7csZk2VIygemxlDqoQL+J2gmSNjdPbpQE5ruBM7dWS/s
+        PBqp9Uq4OeL5y0zVskvH15tW3e98YPbeGC0tRO6C2Pn9v9+LZtqepC7O2lW0/6VpkxbqoQxx9EJIr
+        QD1fyyPmGYjQdawcuG3Qkt0O;
+Received: from [2a01:4f8:192:486::6:0] (port=33392 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1lK57B-0003Bl-Ub
+        for cifs-qa@samba.org; Wed, 10 Mar 2021 20:07:30 +0000
+Received: from [::1] (port=58810 helo=bugzilla.samba.org)
+        by hr6.samba.org with esmtp (Exim 4.93)
+        (envelope-from <samba-bugs@samba.org>)
+        id 1lK57A-001yeh-RG
+        for cifs-qa@samba.org; Wed, 10 Mar 2021 20:07:28 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 6843] flock's do not get sent to physical file system, causes
+ protocol interoperabilitiy issues with NFS
+Date:   Wed, 10 Mar 2021 20:07:28 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 2.6
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: sprabhu@redhat.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: FIXED
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: sprabhu@redhat.com
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-6843-10630-XmemSDtJ1M@https.bugzilla.samba.org/>
+In-Reply-To: <bug-6843-10630@https.bugzilla.samba.org/>
+References: <bug-6843-10630@https.bugzilla.samba.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <20210304095026.782-1-aaptel@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+https://bugzilla.samba.org/show_bug.cgi?id=3D6843
 
+Sachin Prabhu <sprabhu@redhat.com> changed:
 
-On 3/4/21 10:50 AM, Aurélien Aptel wrote:
-> From: Aurelien Aptel <aaptel@suse.com>
-> 
-> Similarly to NFS, CIFS flock() locks behave differently than the
-> standard. Document those differences.
-> 
-> Here is the rendered text:
-> 
-> CIFS details
->    In  Linux kernels up to 5.4, flock() is not propagated over SMB. A file
->    with such locks will not appear locked for remote clients.
-> 
->    Since Linux 5.5, flock() locks are emulated with SMB  byte-range  locks
->    on  the  entire  file.  Similarly  to NFS, this means that fcntl(2) and
->    flock() locks interact with one another. Another important  side-effect
->    is  that  the  locks are not advisory anymore: a write on a locked file
->    will always fail with EACCES.   This difference originates from the de-
->    sign of locks in the SMB protocol, which provides mandatory locking se-
->    mantics. The nobrl mount option (see mount.cifs(8)) turns off  fnctl(2)
->    and  flock() lock propagation to remote clients and makes flock() locks
->    advisory again.
-> 
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-> Reviewed-By: Tom Talpey <tom@talpey.com>
-> ---
-[...]
-> +This difference originates from the design of locks in the SMB
-> +protocol, which provides mandatory locking semantics. The
-> +.I nobrl
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|ASSIGNED                    |RESOLVED
+         Resolution|---                         |FIXED
 
-I agree with Tom.  It's much easier to read if you just say that 'nobrl' 
-torns off the non-locale behaviour, and acts as 5.4 and earlier kernels. 
-  Unless there's any subtlety that makes it different.  Is there any?
+--- Comment #5 from Sachin Prabhu <sprabhu@redhat.com> ---
+Just noticed that this old bz is still open. The original set of patches I =
+had
+proposed then wasn't included into the cifs module. This was since provided=
+ by
+Steve French
+https://github.com/torvalds/linux/commit/d0677992d2af3d65f1c1c21de3323d09d4=
+891537
 
-BTW, you should use "semantic newlines":
+Closing this issue.
 
-$ man 7 man-pages |sed -n '/semantic newlines/,/^$/p'
-    Use semantic newlines
-        In the source of a manual page,  new  sentences  should  be
-        started  on new lines, and long sentences should split into
-        lines at clause breaks (commas, semicolons, colons, and  so
-        on).   This  convention,  sometimes known as "semantic new-
-        lines", makes it easier to see the effect of patches, which
-        often  operate at the level of individual sentences or sen-
-        tence clauses.
-
-
-Thanks,
-
-Alex
-
-> +mount option (see
-> +.BR mount.cifs (8))
-> +turns off
-> +.BR fnctl (2)
-> +and
-> +.BR flock ()
-> +lock propagation to remote clients and makes
-> +.BR flock ()
-> +locks advisory again.
->   .SH SEE ALSO
->   .BR flock (1),
->   .BR close (2),
-> 
-
--- 
-Alejandro Colomar
-Linux man-pages comaintainer; https://www.kernel.org/doc/man-pages/
-http://www.alejandro-colomar.es/
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
