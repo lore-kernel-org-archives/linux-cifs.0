@@ -2,313 +2,122 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 288F6C433E6
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 17:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EBFC433DB
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 17:45:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC75364FC7
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 17:01:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEE7A64FEE
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 17:45:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233716AbhCJRBQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Mar 2021 12:01:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34831 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233737AbhCJRAw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 10 Mar 2021 12:00:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615395651;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/QrxkL5yU3bNKMVvjsOwNL+2HswH3DuEf3MKoAjRTHw=;
-        b=Jat+srolQLvLiQ8Ei7RwRa771A5poO9wrDYF+4+TYxRtoLiY5LYtEn0dpLG8lt1QEIMExc
-        I+i96DQcFybPuAagJn5uOQ3+oMSXI6Lmau9TSUKambQILmVmo5SUnvD0Kk0bwDm1sRmWOt
-        /eR6oGgNopQzFfIcvubH1FFKJMafKxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-qyyWa-4pPuSOIVR5bFKa8A-1; Wed, 10 Mar 2021 12:00:48 -0500
-X-MC-Unique: qyyWa-4pPuSOIVR5bFKa8A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEAD757;
-        Wed, 10 Mar 2021 17:00:45 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-118-152.rdu2.redhat.com [10.10.118.152])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ADBA810016FD;
-        Wed, 10 Mar 2021 17:00:33 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v4 28/28] afs: Use the fscache_write_begin() helper
-From:   David Howells <dhowells@redhat.com>
-To:     Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>
-Cc:     linux-afs@lists.infradead.org, linux-cachefs@redhat.com,
-        linux-fsdevel@vger.kernel.org, dhowells@redhat.com,
-        Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 10 Mar 2021 17:00:32 +0000
-Message-ID: <161539563244.286939.16537296241609909980.stgit@warthog.procyon.org.uk>
-In-Reply-To: <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk>
-References: <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/0.23
+        id S232695AbhCJRox (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Mar 2021 12:44:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45712 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231359AbhCJRoX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 10 Mar 2021 12:44:23 -0500
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C89C061760
+        for <linux-cifs@vger.kernel.org>; Wed, 10 Mar 2021 09:44:23 -0800 (PST)
+Received: by mail-yb1-xb2e.google.com with SMTP id b10so18747619ybn.3
+        for <linux-cifs@vger.kernel.org>; Wed, 10 Mar 2021 09:44:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=dJzbm8J6XpSUcZ3VEqc6PBXmIc3DwnE8uwUHrcZqps8=;
+        b=cqIkqAKJ9TtHWVHqq1AOOSv1o3aAJ5ic9HlZgZOal2NqMSUblxIfTCzy8wRtftarxF
+         0uQq1LeGi3D6jicJtyeb3mzx8l0lYQSfhS0T681QP7l8V+uBDPVQVrX+A9rkp9dYAAER
+         Nok98P+79EyR2RL1B/X6BuS5/mrpSL2NMULeX9/cevn8ruzTECWydw/bvN4bfj9zX22e
+         RI4R8IOE6kHQmTWO19vWEeASMORnQk/0iOsMkbDIjeiNukhBEGcume2Sxj3972dWIAlY
+         YKaHwAly2pXA+HM2+h8FVH/yHvGlKHIm7f36gr0iS+lxXx+TcZ2l6/1ARGvZT0o6ZR6V
+         Q9aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=dJzbm8J6XpSUcZ3VEqc6PBXmIc3DwnE8uwUHrcZqps8=;
+        b=KFz21UQtr1Q2V3wI6TjxIUE5p85RGPOdYJhU/GkCPQd6z/dob6Z2AyWWj56EAUlcMT
+         dkfZqf34h/xqHFJ5mKJtrlfBgCh34HUb+UcwaTZn4ZC1w7DQ9dXLEY83jYqhPZKnECJb
+         C/ID1XEqWk/xSe0oSawMs96fkJWEx5xg6IXz/Vy7h65NO+4vNG88lWuUKBPThAQMc1F1
+         SkAs8EcvXfILKadC7Bn1YjdRPtFRAqKzvyPPUX7b5MbNc+1ZklW71iidqEOvBjOxan8q
+         Oc++RShYckQpIZx0B3gcbmILLrIDSLuC3BjJs5y0axm3Mdey4S0qIR8alDeL+p4xNdvt
+         vFLw==
+X-Gm-Message-State: AOAM530P3Ua7+6KxVNUqjH6cf1uXZ/V/+tmSBl6zq/oDOcGN0KmnaLe3
+        /Yu/lLM7Gmsl9sPQsyvnkyIe/KL8aquvjPJiHNw=
+X-Google-Smtp-Source: ABdhPJySGqlezZi21hl95QBx1T3JVuZpjXT3b/NsFAaRK82e1Oc/nWFcJ7PuVnRqiii7ZeBuQCGJ1nplfsh7/oR6v+0=
+X-Received: by 2002:a25:7645:: with SMTP id r66mr5856144ybc.331.1615398262331;
+ Wed, 10 Mar 2021 09:44:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 10 Mar 2021 23:14:11 +0530
+Message-ID: <CANT5p=o0sV5XjLw1D-9L3qnWwy4DV7WF3QOrHJ8hc5gPVjNj5Q@mail.gmail.com>
+Subject: [PATCH] cifs: update new ACE pointer after populate_new_aces.
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        rohiths msft <rohiths.msft@gmail.com>
+Content-Type: multipart/mixed; boundary="00000000000098f04a05bd3237c8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make AFS use the new fscache_write_begin() helper to do the pre-reading
-required before the write.  If successful, the helper returns with the
-required page filled in and locked.  It may read more than just one page,
-expanding the read to meet cache granularity requirements as necessary.
+--00000000000098f04a05bd3237c8
+Content-Type: text/plain; charset="UTF-8"
 
-Note: A more advanced version of this could be made that does
-generic_perform_write() for a whole cache granule.  This would make it
-easier to avoid doing the download/read for the data to be overwritten.
+Hi Steve,
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: linux-cachefs@redhat.com
-cc: linux-fsdevel@vger.kernel.org
-Link: https://lore.kernel.org/r/160588546422.3465195.1546354372589291098.stgit@warthog.procyon.org.uk/ # rfc
----
+Please consider this fix for the failing generic/317 test for cifsacl
+and idsfromsid,modefromsid.
+This is exposed on certain combinations of default ACEs on the file.
 
- fs/afs/file.c     |   19 +++++++++
- fs/afs/internal.h |    1 
- fs/afs/write.c    |  108 ++++++-----------------------------------------------
- 3 files changed, 31 insertions(+), 97 deletions(-)
+-- 
+Regards,
+Shyam
 
-diff --git a/fs/afs/file.c b/fs/afs/file.c
-index 99bb4649a306..cf2b664a68a5 100644
---- a/fs/afs/file.c
-+++ b/fs/afs/file.c
-@@ -334,6 +334,13 @@ static void afs_init_rreq(struct netfs_read_request *rreq, struct file *file)
- 	rreq->netfs_priv = key_get(afs_file_key(file));
- }
- 
-+static bool afs_is_cache_enabled(struct inode *inode)
-+{
-+	struct fscache_cookie *cookie = afs_vnode_cache(AFS_FS_I(inode));
-+
-+	return fscache_cookie_enabled(cookie) && !hlist_empty(&cookie->backing_objects);
-+}
-+
- static int afs_begin_cache_operation(struct netfs_read_request *rreq)
- {
- 	struct afs_vnode *vnode = AFS_FS_I(rreq->inode);
-@@ -341,14 +348,24 @@ static int afs_begin_cache_operation(struct netfs_read_request *rreq)
- 	return fscache_begin_read_operation(rreq, afs_vnode_cache(vnode));
- }
- 
-+static int afs_check_write_begin(struct file *file, loff_t pos, unsigned len,
-+				 struct page *page, void **_fsdata)
-+{
-+	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
-+
-+	return test_bit(AFS_VNODE_DELETED, &vnode->flags) ? -ESTALE : 0;
-+}
-+
- static void afs_priv_cleanup(struct address_space *mapping, void *netfs_priv)
- {
- 	key_put(netfs_priv);
- }
- 
--static const struct netfs_read_request_ops afs_req_ops = {
-+const struct netfs_read_request_ops afs_req_ops = {
- 	.init_rreq		= afs_init_rreq,
-+	.is_cache_enabled	= afs_is_cache_enabled,
- 	.begin_cache_operation	= afs_begin_cache_operation,
-+	.check_write_begin	= afs_check_write_begin,
- 	.issue_op		= afs_req_issue_op,
- 	.cleanup		= afs_priv_cleanup,
- };
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 96b33d2e3116..9f4040724318 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -1045,6 +1045,7 @@ extern void afs_dynroot_depopulate(struct super_block *);
- extern const struct address_space_operations afs_fs_aops;
- extern const struct inode_operations afs_file_inode_operations;
- extern const struct file_operations afs_file_operations;
-+extern const struct netfs_read_request_ops afs_req_ops;
- 
- extern int afs_cache_wb_key(struct afs_vnode *, struct afs_file *);
- extern void afs_put_wb_key(struct afs_wb_key *);
-diff --git a/fs/afs/write.c b/fs/afs/write.c
-index e672833c99bc..b2e03de09c24 100644
---- a/fs/afs/write.c
-+++ b/fs/afs/write.c
-@@ -11,6 +11,8 @@
- #include <linux/pagemap.h>
- #include <linux/writeback.h>
- #include <linux/pagevec.h>
-+#include <linux/netfs.h>
-+#include <linux/fscache.h>
- #include "internal.h"
- 
- /*
-@@ -22,68 +24,6 @@ int afs_set_page_dirty(struct page *page)
- 	return __set_page_dirty_nobuffers(page);
- }
- 
--/*
-- * Handle completion of a read operation to fill a page.
-- */
--static void afs_fill_hole(struct afs_read *req)
--{
--	if (iov_iter_count(req->iter) > 0)
--		/* The read was short - clear the excess buffer. */
--		iov_iter_zero(iov_iter_count(req->iter), req->iter);
--}
--
--/*
-- * partly or wholly fill a page that's under preparation for writing
-- */
--static int afs_fill_page(struct file *file,
--			 loff_t pos, unsigned int len, struct page *page)
--{
--	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
--	struct afs_read *req;
--	size_t p;
--	void *data;
--	int ret;
--
--	_enter(",,%llu", (unsigned long long)pos);
--
--	if (pos >= vnode->vfs_inode.i_size) {
--		p = pos & ~PAGE_MASK;
--		ASSERTCMP(p + len, <=, PAGE_SIZE);
--		data = kmap(page);
--		memset(data + p, 0, len);
--		kunmap(page);
--		return 0;
--	}
--
--	req = kzalloc(sizeof(struct afs_read), GFP_KERNEL);
--	if (!req)
--		return -ENOMEM;
--
--	refcount_set(&req->usage, 1);
--	req->vnode	= vnode;
--	req->done	= afs_fill_hole;
--	req->key	= key_get(afs_file_key(file));
--	req->pos	= pos;
--	req->len	= len;
--	req->nr_pages	= 1;
--	req->iter	= &req->def_iter;
--	iov_iter_xarray(&req->def_iter, READ, &file->f_mapping->i_pages, pos, len);
--
--	ret = afs_fetch_data(vnode, req);
--	afs_put_read(req);
--	if (ret < 0) {
--		if (ret == -ENOENT) {
--			_debug("got NOENT from server"
--			       " - marking file deleted and stale");
--			set_bit(AFS_VNODE_DELETED, &vnode->flags);
--			ret = -ESTALE;
--		}
--	}
--
--	_leave(" = %d", ret);
--	return ret;
--}
--
- /*
-  * prepare to perform part of a write to a page
-  */
-@@ -102,24 +42,14 @@ int afs_write_begin(struct file *file, struct address_space *mapping,
- 	_enter("{%llx:%llu},%llx,%x",
- 	       vnode->fid.vid, vnode->fid.vnode, pos, len);
- 
--	page = grab_cache_page_write_begin(mapping, pos / PAGE_SIZE, flags);
--	if (!page)
--		return -ENOMEM;
--
--	if (!PageUptodate(page) && len != PAGE_SIZE) {
--		ret = afs_fill_page(file, pos & PAGE_MASK, PAGE_SIZE, page);
--		if (ret < 0) {
--			unlock_page(page);
--			put_page(page);
--			_leave(" = %d [prep]", ret);
--			return ret;
--		}
--		SetPageUptodate(page);
--	}
--
--#ifdef CONFIG_AFS_FSCACHE
--	wait_on_page_fscache(page);
--#endif
-+	/* Prefetch area to be written into the cache if we're caching this
-+	 * file.  We need to do this before we get a lock on the page in case
-+	 * there's more than one writer competing for the same cache block.
-+	 */
-+	ret = netfs_write_begin(file, mapping, pos, len, flags, &page, fsdata,
-+				&afs_req_ops, NULL);
-+	if (ret < 0)
-+		return ret;
- 
- 	index = page->index;
- 	from = pos - index * PAGE_SIZE;
-@@ -184,7 +114,6 @@ int afs_write_end(struct file *file, struct address_space *mapping,
- 	unsigned int f, from = pos & (thp_size(page) - 1);
- 	unsigned int t, to = from + copied;
- 	loff_t i_size, maybe_i_size;
--	int ret = 0;
- 
- 	_enter("{%llx:%llu},{%lx}",
- 	       vnode->fid.vid, vnode->fid.vnode, page->index);
-@@ -203,19 +132,7 @@ int afs_write_end(struct file *file, struct address_space *mapping,
- 		write_sequnlock(&vnode->cb_lock);
- 	}
- 
--	if (!PageUptodate(page)) {
--		if (copied < len) {
--			/* Try and load any missing data from the server.  The
--			 * unmarshalling routine will take care of clearing any
--			 * bits that are beyond the EOF.
--			 */
--			ret = afs_fill_page(file, pos + copied,
--					    len - copied, page);
--			if (ret < 0)
--				goto out;
--		}
--		SetPageUptodate(page);
--	}
-+	ASSERT(PageUptodate(page));
- 
- 	if (PagePrivate(page)) {
- 		priv = page_private(page);
-@@ -236,12 +153,11 @@ int afs_write_end(struct file *file, struct address_space *mapping,
- 
- 	if (set_page_dirty(page))
- 		_debug("dirtied %lx", page->index);
--	ret = copied;
- 
- out:
- 	unlock_page(page);
- 	put_page(page);
--	return ret;
-+	return copied;
- }
- 
- /*
+--00000000000098f04a05bd3237c8
+Content-Type: application/octet-stream; 
+	name="0001-cifs-update-new-ACE-pointer-after-populate_new_aces.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-update-new-ACE-pointer-after-populate_new_aces.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_km3qek0q0>
+X-Attachment-Id: f_km3qek0q0
 
-
+RnJvbSA4ZTIwNmNkMGRjZjI3ZTVjMTg4NWM1NmQzMThiMjA1Y2I2MmExOGNmIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
+PgpEYXRlOiBXZWQsIDEwIE1hciAyMDIxIDEwOjIyOjI3ICswMDAwClN1YmplY3Q6IFtQQVRDSF0g
+Y2lmczogdXBkYXRlIG5ldyBBQ0UgcG9pbnRlciBhZnRlciBwb3B1bGF0ZV9uZXdfYWNlcy4KCkFm
+dGVyIHRoZSBmaXggZm9yIHJldGFpbmluZyBleHRlcm5hbGx5IHNldCBBQ0VzIHdpdGggY2lmc2Fj
+bCBhbmQKbW9kZWZyb21zaWQsaWRzZnJvbXNpZCwgdGhlcmUgd2FzIGFuIGlzc3VlIGluIHBvcHVs
+YXRpbmcgdGhlCmluaGVyaXRlZCBBQ0VzIGFmdGVyIHNldHRpbmcgdGhlIEFDRXMgaW50cm9kdWNl
+ZCBieSB0aGVzZSB0d28gbW9kZXMuCkZpeGVkIHRoaXMgYnkgdXBkYXRpbmcgdGhlIEFDRSBwb2lu
+dGVyIGFnYWluIGFmdGVyIHRoZSBjYWxsIHRvCnBvcHVsYXRlX25ld19hY2VzLgoKU2lnbmVkLW9m
+Zi1ieTogU2h5YW0gUHJhc2FkIE4gPHNwcmFzYWRAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZz
+L2NpZnNhY2wuYyB8IDkgKysrKysrLS0tCiAxIGZpbGUgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCsp
+LCAzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2FjbC5jIGIvZnMvY2lm
+cy9jaWZzYWNsLmMKaW5kZXggOWQyOWViOTY2MGMyLi4yYmUyMmE1YzY5MGYgMTAwNjQ0Ci0tLSBh
+L2ZzL2NpZnMvY2lmc2FjbC5jCisrKyBiL2ZzL2NpZnMvY2lmc2FjbC5jCkBAIC0xMTE4LDcgKzEx
+MTgsNiBAQCBzdGF0aWMgaW50IHNldF9jaG1vZF9kYWNsKHN0cnVjdCBjaWZzX2FjbCAqcGRhY2ws
+IHN0cnVjdCBjaWZzX2FjbCAqcG5kYWNsLAogCS8qIFJldGFpbiBvbGQgQUNFcyB3aGljaCB3ZSBj
+YW4gcmV0YWluICovCiAJZm9yIChpID0gMDsgaSA8IHNyY19udW1fYWNlczsgKytpKSB7CiAJCXBu
+dGFjZSA9IChzdHJ1Y3QgY2lmc19hY2UgKikgKGFjbF9iYXNlICsgc2l6ZSk7Ci0JCXBubnRhY2Ug
+PSAoc3RydWN0IGNpZnNfYWNlICopIChuYWNsX2Jhc2UgKyBuc2l6ZSk7CiAKIAkJaWYgKCFuZXdf
+YWNlc19zZXQgJiYgKHBudGFjZS0+ZmxhZ3MgJiBJTkhFUklURURfQUNFKSkgewogCQkJLyogUGxh
+Y2UgdGhlIG5ldyBBQ0VzIGluIGJldHdlZW4gZXhpc3RpbmcgZXhwbGljaXQgYW5kIGluaGVyaXRl
+ZCAqLwpAQCAtMTEzMSwxNCArMTEzMCwxOCBAQCBzdGF0aWMgaW50IHNldF9jaG1vZF9kYWNsKHN0
+cnVjdCBjaWZzX2FjbCAqcGRhY2wsIHN0cnVjdCBjaWZzX2FjbCAqcG5kYWNsLAogCQl9CiAKIAkJ
+LyogSWYgaXQncyBhbnkgb25lIG9mIHRoZSBBQ0Ugd2UncmUgcmVwbGFjaW5nLCBza2lwISAqLwot
+CQlpZiAoKGNvbXBhcmVfc2lkcygmcG50YWNlLT5zaWQsICZzaWRfdW5peF9ORlNfbW9kZSkgPT0g
+MCkgfHwKKwkJaWYgKCFtb2RlX2Zyb21fc2lkICYmCisJCQkJKChjb21wYXJlX3NpZHMoJnBudGFj
+ZS0+c2lkLCAmc2lkX3VuaXhfTkZTX21vZGUpID09IDApIHx8CiAJCQkJKGNvbXBhcmVfc2lkcygm
+cG50YWNlLT5zaWQsIHBvd25lcnNpZCkgPT0gMCkgfHwKIAkJCQkoY29tcGFyZV9zaWRzKCZwbnRh
+Y2UtPnNpZCwgcGdycHNpZCkgPT0gMCkgfHwKIAkJCQkoY29tcGFyZV9zaWRzKCZwbnRhY2UtPnNp
+ZCwgJnNpZF9ldmVyeW9uZSkgPT0gMCkgfHwKLQkJCQkoY29tcGFyZV9zaWRzKCZwbnRhY2UtPnNp
+ZCwgJnNpZF9hdXRodXNlcnMpID09IDApKSB7CisJCQkJKGNvbXBhcmVfc2lkcygmcG50YWNlLT5z
+aWQsICZzaWRfYXV0aHVzZXJzKSA9PSAwKSkpIHsKIAkJCWdvdG8gbmV4dF9hY2U7CiAJCX0KIAor
+CQkvKiB1cGRhdGUgdGhlIHBvaW50ZXIgdG8gdGhlIG5leHQgQUNFIHRvIHBvcHVsYXRlKi8KKwkJ
+cG5udGFjZSA9IChzdHJ1Y3QgY2lmc19hY2UgKikgKG5hY2xfYmFzZSArIG5zaXplKTsKKwogCQlu
+c2l6ZSArPSBjaWZzX2NvcHlfYWNlKHBubnRhY2UsIHBudGFjZSwgTlVMTCk7CiAJCW51bV9hY2Vz
+Kys7CiAKLS0gCjIuMjUuMQoK
+--00000000000098f04a05bd3237c8--
