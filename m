@@ -2,143 +2,311 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05944C433DB
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 15:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A5BC433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 16:55:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3B3064F4E
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 15:17:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEADD64FC8
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 16:55:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231197AbhCJPQ1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Mar 2021 10:16:27 -0500
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:57511 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229689AbhCJPP6 (ORCPT
+        id S232897AbhCJQyw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Mar 2021 11:54:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50748 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230035AbhCJQyh (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 10 Mar 2021 10:15:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1615389356;
+        Wed, 10 Mar 2021 11:54:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615395277;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sEgQMDigNGDbw1kVZFujZEYDSjz7SEN4uTw9UNdMFUE=;
-        b=Uh7Xbx09F9coQ6SywYE3Gv02N+BLQ69lhj33EQQ85EwNvcJaV1oN5G4zhsq8Ctc25iMpV+
-        oHCWixVOdcF3hAKr+GKgz0n0OCBdM5eE1cym2gWbI5w0PzPUO04IqJft09ZugeWtj+/49z
-        zGGVC0cezw6pz3kaUFCLaBvPMEKD30I=
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com
- (mail-ve1eur01lp2056.outbound.protection.outlook.com [104.47.1.56]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-34-bsfUq8emPym8JllX7Y2yoA-1; Wed, 10 Mar 2021 16:15:55 +0100
-X-MC-Unique: bsfUq8emPym8JllX7Y2yoA-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SC/EgPviAm5xSFd9y7H0eGK3URN5Oi+EqAQ9njMiPPX+rnfCY7w6WMuywvCM4MTaFQ9wzOjFQBEdKWfWwgWc+yLGv2YYkJHkvTTEEuvYApYXGGeorpFYr8HW0oVjHLB6kZ973oDnjPCGLVbIAPZVj8tLZwULx139GIXDAiApTfyU9l20TSur27cTb5MnGV2RLmbz6OASq3iqjHeNakk9Gjgtmnki3sWqtFtCrEqDuEYpGP0kJxTYBaaImQyeBOt0Odros9eiqjkvfIeXqVOdhYT67XJqbZ7P9FZMlPiEzjBRquGbk46ln8w97uBWAQFS6opGdJcAZBkKCxu7d8sRFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sEgQMDigNGDbw1kVZFujZEYDSjz7SEN4uTw9UNdMFUE=;
- b=ZJDMqauJO4FCSsCtIOtrGJUTaaUIpoaXAkAVqk37CdCtANaQWHGCYkGrYT85rhBGiP4KiducPyQyc7q7iE2/ifgcuyVsulW9PIJh5kzQDEsP3EKcse/I+DQgBOC3ElQ8evXmrnb5Jl5GNk4EVdO/XOr247ULd6p8cr4LLvKAAgjrwdHiKi3v3SyjML1/zxkQ9rjTeJNL6M8sNc4vJCnzhDsQ2t1P/R/um0sAFpKcq4CuJB1Hmj65Esv0jEwV/3kLlF2hTfe+Dcllt1I2a9EKQKwAnS+QO7VM9gUOBuqIyPO55sriiWMn+H9nsrzJ0gsdzH1suEIsWhRQvhsQqMTclg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: axis.com; dkim=none (message not signed)
- header.d=none;axis.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR0401MB2397.eurprd04.prod.outlook.com (2603:10a6:800:2b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.17; Wed, 10 Mar
- 2021 15:15:54 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::9c1d:89de:a08e:ccc9%4]) with mapi id 15.20.3912.030; Wed, 10 Mar 2021
- 15:15:54 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Vincent Whitchurch <vincent.whitchurch@axis.com>, sfrench@samba.org
-Cc:     linux-cifs@vger.kernel.org, kernel@axis.com,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>
-Subject: Re: [PATCH] cifs: Fix preauth hash corruption
-In-Reply-To: <20210310122040.17515-1-vincent.whitchurch@axis.com>
-References: <20210310122040.17515-1-vincent.whitchurch@axis.com>
-Date:   Wed, 10 Mar 2021 16:15:51 +0100
-Message-ID: <871rcnujiw.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:70b:4a83:b8f5:d569:2662:f8fd]
-X-ClientProxiedBy: ZR0P278CA0109.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:20::6) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8wYdk4E0mxGt/3DIcLar+e9p4o0Cw/KyMbJSt2HmlgQ=;
+        b=J0J8FF26ch+DAFZ8NwihyC8D5ml+NA3wYym5+9hhRSgiRNSyevwhs+7Q1mDnpg9vIa1vP5
+        vtJKBDIN4MMf3e0eNdHMlASoPmBC1YUtjKEDrpmsTuss5ttE1WiclYagXnbRWoQXnlV/Cs
+        WdW6ZI/CM+RoB+1ITEaoqbOstI9Akvg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-UL-gcQQgMh-Y__VaulDlsQ-1; Wed, 10 Mar 2021 11:54:35 -0500
+X-MC-Unique: UL-gcQQgMh-Y__VaulDlsQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E38821018F76;
+        Wed, 10 Mar 2021 16:54:32 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-118-152.rdu2.redhat.com [10.10.118.152])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1408462467;
+        Wed, 10 Mar 2021 16:54:22 +0000 (UTC)
+Subject: [PATCH v4 00/28] Network fs helper library & fscache kiocb API
+From:   David Howells <dhowells@redhat.com>
+To:     Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>
+Cc:     linux-cachefs@redhat.com, Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Jeff Layton <jlayton@redhat.com>, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, linux-afs@lists.infradead.org,
+        v9fs-developer@lists.sourceforge.net,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        linux-cifs@vger.kernel.org, dhowells@redhat.com,
+        Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 10 Mar 2021 16:54:21 +0000
+Message-ID: <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:70b:4a83:b8f5:d569:2662:f8fd) by ZR0P278CA0109.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:20::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.18 via Frontend Transport; Wed, 10 Mar 2021 15:15:53 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: eb68242c-e13e-452d-7be6-08d8e3d765e6
-X-MS-TrafficTypeDiagnostic: VI1PR0401MB2397:
-X-Microsoft-Antispam-PRVS: <VI1PR0401MB23979125D8C53FB69FF5A814A8919@VI1PR0401MB2397.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1728;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VSOVr2x+8k5ExrcV4WOYlrE8HIm+x+wIDt7ZjDBhbugvBO17QltR+7dBEX6lg2aJSbM3/lBD3h1XTnU+qluj0iJP0iYeJF9PCVZH23gqmTvvagFQ0yQysYVMzFpPQJzNmVYs3pxrnlkDBt5HpRaNIs+QxkIAv7W18CQWnVqBQ4HEN+jCipmqvzzp4q6IWqMAYuKz8VJLjPTVyPDM8HZQ/nDLnZxD6SzZ729zZ9+g2W5pk62/p/9M438dPdbWqG+I+4OnE2XTv3HGhzRkLenpkfXaYLwUufybODKfGlr2JflrACqVfa2k5oer5U9PyLVyVYPHUrf1eIlLNB3JY2cE2Ik9ydnETUnp8lKMloKTqkUFHL/ipsuCAKwlqEwy6ihz8LfPWRuCVfDU6bF2XoBHEfd1DlovJLY75dgrhcnLtaR6M1t5tQuXUO7sh11a7043N/si+Iu8hwkwwk8LeV8ob5aBNocm2EBkeWVdiJD82XgsjZlMhyKZs5sQOBtw4L679p/4VrlGQo5JiSwrAjv5ow==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(39850400004)(346002)(136003)(396003)(366004)(86362001)(2906002)(66946007)(66556008)(5660300002)(66476007)(4744005)(6496006)(52116002)(186003)(6486002)(4326008)(8676002)(36756003)(16526019)(478600001)(8936002)(2616005)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?V0NHVGkwZC94NFdpSFh0c3puOUk4LzhUOFc3VmZRSlhSOVBtTERJQVdSa2I3?=
- =?utf-8?B?QldzZUpnbmM5UTRiV2prZFZTMSt1cDQ4ZVJVTmlnYXJyd1pXcENyUkpLNjBB?=
- =?utf-8?B?Z3pMWEwzWjFjUG15S0lxM0NGby9PdG5YZ1VEd2JSSzkxbkNOc25waHhLNEl6?=
- =?utf-8?B?Ni9QeUtLUlRFQ1g1ZjJEZk9udDIxUDNHN00vWDNBYXdMZGNleTMrVEdpY3RE?=
- =?utf-8?B?blh6U1RjeGRGNGJib3k5K2FqSHlJQTl5bTVEd2FHZnZtcUZCMlM3eUZUME1Y?=
- =?utf-8?B?V3NveDViYWg3V0tkVGxXdHRaTVlrZEJPR3dtN2xoSTlneGxmbkhIVzU0eGZU?=
- =?utf-8?B?c0ZublJkU0N3RWVxMHdaajNpUE8vK0Nhb0Z4cWcyYnMzbG00QVRLUjVyUmlH?=
- =?utf-8?B?cFNqUmM3YVp1ejJaWm9GQWhDa3NzUkpEUEdHdGFBUFg0VXRsODlKOWl1VGJT?=
- =?utf-8?B?RkVKLzhVUEVUWmJVcDB0N05WUmgvaTY3cnE3Ymt5SU9XakczWS9ETWs2QXVN?=
- =?utf-8?B?SWZ0SitTakZhbVFaUzhrVURYNlJNNTdKTEdGc3NUOVBSeFI0QmNIMFJDZUtG?=
- =?utf-8?B?OVJqQy83cEpJV1JIdWwzKzEvLzVDUUpuU0JvWjVvdUJ4UzgzSS8zR2MzUDcx?=
- =?utf-8?B?V3pEY2ZJUVAyU2VGWnQ2MWhDY2hMT3ZWYUk0UjRxUTZuYmNMTU9UZGIyYm9E?=
- =?utf-8?B?Qm53ek41TEZUQmE2YUw4OFA0UUF1bUhmZmUySnl4SFZxQXFTZDRROTdvczRR?=
- =?utf-8?B?ZHFzREo0QmdzYWwvcTZGcmhwS2xLWjZJdHpFRlhRbTF6cFNSMCtFd25XYzdU?=
- =?utf-8?B?aHdWOWVFVlFnWWJoZUp4VTJ0THZ4MzhDKzB0Vm0zNlZKSTd0WVJnOGJzNU93?=
- =?utf-8?B?aHZYbTExOHcybzE0NU9wS3J2OXJlcWRPNHFFMnpLdUtramlzbDVjc1FGeTZj?=
- =?utf-8?B?QjBmcEZkbGFGVFE4UE5nZzU0S0NnU1dPdTM0ekYyZUVOTU9CVUo0dFpwdlg3?=
- =?utf-8?B?RHdleTh0aWE1bU9aQTlRem96WHE0aXV3Sk1lS1g3cGt3TndndXhNOGZyRDMr?=
- =?utf-8?B?UnZjVmtUbmdtS2JOd2w1UHlXeGNNYzdBUVFGeHVhcW1hWlR2akRjSXppVDBL?=
- =?utf-8?B?cGllZ2ZEWVBWQjhhTC9uNStad2tYR0RraStyZVJFVkY2eWhWTjJQSTcrSVFR?=
- =?utf-8?B?YkptTEU0Z0lYaXZKVXJueVAwWlZPaEJ1djluZDlOZ2VJaTdHS1laMG9BMHBr?=
- =?utf-8?B?WEZqMmRTRncvN1NSczl6K05WU1NYL3pwSE0xai9RUnc0elpiUktZS3VlQ0Qv?=
- =?utf-8?B?Z2ltSkNDVjBHeWcrbGRyc3cxWTBDdjh6Vkp0Q2NZcURRZkIrTG11ZFpkUXpL?=
- =?utf-8?B?R2N5ZHFaZGh6SytFUzQ4dDhjQUY2SGVOOC9Tc2pXMko3TVFNWkVNREtWYXJN?=
- =?utf-8?B?RG45aEJFS29pYUQxeWZxU3JVRDk2cWxUcEhwUGt4djhuTTJ5cUR6cGZYczRv?=
- =?utf-8?B?N3JNNklKRXVrSHZQSHVTamZNbUFZaGJhMmRFdUdFbHR5SWZPcGhycE0rNDlH?=
- =?utf-8?B?Q1FNTlBuU3NyQ3oyUmRwVnBpN0JnRUlSUXEvYThWSnc2ZUZoeThaUUtaTzBD?=
- =?utf-8?B?bGdBNisvZ0FOT3pxZ1IyWmwvaWJFVjVzQ2tpVTVJUlFKakxjb2VRR0E4U21o?=
- =?utf-8?B?ckl1RDZvanQ4ZWtGUWVCK0c2eUZ0ZURaRUFJbXFvc2ZaR3JSL1NLVzc4SVFY?=
- =?utf-8?B?MmdveTZNNmtRRlZkNEVaZVZsUlA5YlB1ei9PbDZtUHhGcTJnK2pZQlZvam5l?=
- =?utf-8?B?YStYUjhTTUlOSTZoMjlZTGdiamZXS044N3gvdjNNMWlRN2xNZ0lYQy9nbmlV?=
- =?utf-8?Q?UTIIQULNI4kpD?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb68242c-e13e-452d-7be6-08d8e3d765e6
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2021 15:15:54.1411
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x3msjU0bWLMyui4gzRlNFfvzEEKar5bK0p6LN5AH1QGKw3I/Efo9AfbogjMVtPTJ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0401MB2397
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Good catch, thanks Vincent.
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
 
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+Here's a set of patches to do two things:
+
+ (1) Add a helper library to handle the new VM readahead interface.  This
+     is intended to be used unconditionally by the filesystem (whether or
+     not caching is enabled) and provides a common framework for doing
+     caching, transparent huge pages and, in the future, possibly fscrypt
+     and read bandwidth maximisation.  It also allows the netfs and the
+     cache to align, expand and slice up a read request from the VM in
+     various ways; the netfs need only provide a function to read a stretch
+     of data to the pagecache and the helper takes care of the rest.
+
+ (2) Add an alternative fscache/cachfiles I/O API that uses the kiocb
+     facility to do async DIO to transfer data to/from the netfs's pages,
+     rather than using readpage with wait queue snooping on one side and
+     vfs_write() on the other.  It also uses less memory, since it doesn't
+     do buffered I/O on the backing file.
+
+     Note that this uses SEEK_HOLE/SEEK_DATA to locate the data available
+     to be read from the cache.  Whilst this is an improvement from the
+     bmap interface, it still has a problem with regard to a modern
+     extent-based filesystem inserting or removing bridging blocks of
+     zeros.  Fixing that requires a much greater overhaul.
+
+This is a step towards overhauling the fscache API.  The change is opt-in
+on the part of the network filesystem.  A netfs should not try to mix the
+old and the new API because of conflicting ways of handling pages and the
+PG_fscache page flag and because it would be mixing DIO with buffered I/O.
+Further, the helper library can't be used with the old API.
+
+This does not change any of the fscache cookie handling APIs or the way
+invalidation is done.
+
+In the near term, I intend to deprecate and remove the old I/O API
+(fscache_allocate_page{,s}(), fscache_read_or_alloc_page{,s}(),
+fscache_write_page() and fscache_uncache_page()) and eventually replace
+most of fscache/cachefiles with something simpler and easier to follow.
+
+The patchset contains the following parts:
+
+ (1) Some helper patches, including provision of an ITER_XARRAY iov
+     iterator and a function to do readahead expansion.
+
+ (2) Patches to add the netfs helper library.
+
+ (3) A patch to add the fscache/cachefiles kiocb API.
+
+ (4) Patches to add support in AFS for this.
+
+Jeff Layton has patches to add support in Ceph for this.
+
+Dave Wysochanski also has patches for NFS for this, though they're not
+included on this branch as there's an issue with PNFS.
+
+With this, AFS without a cache passes all expected xfstests; with a cache,
+there's an extra failure, but that's also there before these patches.
+Fixing that probably requires a greater overhaul.  Ceph and NFS also pass
+the expected tests.
+
+These patches can be found also on:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=fscache-netfs-lib
+
+
+Changes
+=======
+
+ver #4:
+      Fixed some review comments from Christoph Hellwig, including dropping
+      the export of rw_verify_area()[3] and some minor stuff[4].
+
+      Moved the declaration of readahead_expand() to a better location[5].
+
+      Rebased to v5.12-rc2 and added a bunch of references into individual
+      commits.
+
+      Dropped Ceph support - that will go through the maintainer's tree.
+
+      Added interface documentation for the netfs helper library.
+
+ver #3:
+      Rolled in the bug fixes.
+
+      Adjusted the functions that unlock and wait for PG_fscache according
+      to Linus's suggestion[1].
+
+      Hold a ref on a page when PG_fscache is set as per Linus's
+      suggestion[2].
+
+      Dropped NFS support and added Ceph support.
+
+ver #2:
+      Fixed some bugs and added NFS support.
+
+Link: https://lore.kernel.org/r/CAHk-=wh+2gbF7XEjYc=HV9w_2uVzVf7vs60BPz0gFA=+pUm3ww@mail.gmail.com/ [1]
+Link: https://lore.kernel.org/r/CAHk-=wjgA-74ddehziVk=XAEMTKswPu1Yw4uaro1R3ibs27ztw@mail.gmail.com/ [2]
+Link: https://lore.kernel.org/r/20210216102614.GA27555@lst.de/ [3]
+Link: https://lore.kernel.org/r/20210216084230.GA23669@lst.de/ [4]
+Link: https://lore.kernel.org/r/20210217161358.GM2858050@casper.infradead.org/ [5]
+
+
+References
+==========
+
+These patches have been published for review before, firstly as part of a
+larger set:
+
+Link: https://lore.kernel.org/r/158861203563.340223.7585359869938129395.stgit@warthog.procyon.org.uk/
+
+Link: https://lore.kernel.org/r/159465766378.1376105.11619976251039287525.stgit@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/159465784033.1376674.18106463693989811037.stgit@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/159465821598.1377938.2046362270225008168.stgit@warthog.procyon.org.uk/
+
+Link: https://lore.kernel.org/r/160588455242.3465195.3214733858273019178.stgit@warthog.procyon.org.uk/
+
+Then as a cut-down set:
+
+Link: https://lore.kernel.org/r/161118128472.1232039.11746799833066425131.stgit@warthog.procyon.org.uk/ # v1
+
+Link: https://lore.kernel.org/r/161161025063.2537118.2009249444682241405.stgit@warthog.procyon.org.uk/ # v2
+
+Link: https://lore.kernel.org/r/161340385320.1303470.2392622971006879777.stgit@warthog.procyon.org.uk/ # v3
+
+
+Proposals/information about the design has been published here:
+
+Link: https://lore.kernel.org/r/24942.1573667720@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/2758811.1610621106@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/1441311.1598547738@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/160655.1611012999@warthog.procyon.org.uk/
+
+And requests for information:
+
+Link: https://lore.kernel.org/r/3326.1579019665@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/4467.1579020509@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/3577430.1579705075@warthog.procyon.org.uk/
+
+The NFS parts, though not included here, have been tested by someone who's
+using fscache in production:
+
+Link: https://listman.redhat.com/archives/linux-cachefs/2020-December/msg00000.html
+
+I've posted partial patches to try and help 9p and cifs along:
+
+Link: https://lore.kernel.org/r/1514086.1605697347@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/1794123.1605713481@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/241017.1612263863@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/270998.1612265397@warthog.procyon.org.uk/
+
+David
+---
+David Howells (28):
+      iov_iter: Add ITER_XARRAY
+      mm: Add an unlock function for PG_private_2/PG_fscache
+      mm: Implement readahead_control pageset expansion
+      netfs: Make a netfs helper module
+      netfs: Documentation for helper library
+      netfs, mm: Move PG_fscache helper funcs to linux/netfs.h
+      netfs, mm: Add unlock_page_fscache() and wait_on_page_fscache()
+      netfs: Provide readahead and readpage netfs helpers
+      netfs: Add tracepoints
+      netfs: Gather stats
+      netfs: Add write_begin helper
+      netfs: Define an interface to talk to a cache
+      netfs: Hold a ref on a page when PG_private_2 is set
+      fscache, cachefiles: Add alternate API to use kiocb for read/write to cache
+      afs: Disable use of the fscache I/O routines
+      afs: Pass page into dirty region helpers to provide THP size
+      afs: Print the operation debug_id when logging an unexpected data version
+      afs: Move key to afs_read struct
+      afs: Don't truncate iter during data fetch
+      afs: Log remote unmarshalling errors
+      afs: Set up the iov_iter before calling afs_extract_data()
+      afs: Use ITER_XARRAY for writing
+      afs: Wait on PG_fscache before modifying/releasing a page
+      afs: Extract writeback extension into its own function
+      afs: Prepare for use of THPs
+      afs: Use the fs operation ops to handle FetchData completion
+      afs: Use new fscache read helper API
+      afs: Use the fscache_write_begin() helper
+
+
+ Documentation/filesystems/index.rst         |    1 +
+ Documentation/filesystems/netfs_library.rst |  526 +++++++++
+ fs/Kconfig                                  |    1 +
+ fs/Makefile                                 |    1 +
+ fs/afs/Kconfig                              |    1 +
+ fs/afs/dir.c                                |  225 ++--
+ fs/afs/file.c                               |  483 ++------
+ fs/afs/fs_operation.c                       |    4 +-
+ fs/afs/fsclient.c                           |  108 +-
+ fs/afs/inode.c                              |    7 +-
+ fs/afs/internal.h                           |   59 +-
+ fs/afs/rxrpc.c                              |  150 +--
+ fs/afs/write.c                              |  656 +++++------
+ fs/afs/yfsclient.c                          |   82 +-
+ fs/cachefiles/Makefile                      |    1 +
+ fs/cachefiles/interface.c                   |    5 +-
+ fs/cachefiles/internal.h                    |    9 +
+ fs/cachefiles/rdwr2.c                       |  403 +++++++
+ fs/fscache/Kconfig                          |    1 +
+ fs/fscache/Makefile                         |    1 +
+ fs/fscache/internal.h                       |    4 +
+ fs/fscache/io.c                             |  116 ++
+ fs/fscache/page.c                           |    2 +-
+ fs/fscache/stats.c                          |    1 +
+ fs/netfs/Kconfig                            |   23 +
+ fs/netfs/Makefile                           |    5 +
+ fs/netfs/internal.h                         |   97 ++
+ fs/netfs/read_helper.c                      | 1180 +++++++++++++++++++
+ fs/netfs/stats.c                            |   59 +
+ include/linux/fscache-cache.h               |    4 +
+ include/linux/fscache.h                     |   50 +-
+ include/linux/netfs.h                       |  200 ++++
+ include/linux/pagemap.h                     |    3 +
+ include/net/af_rxrpc.h                      |    2 +-
+ include/trace/events/afs.h                  |   74 +-
+ include/trace/events/netfs.h                |  201 ++++
+ mm/filemap.c                                |   20 +
+ mm/readahead.c                              |   70 ++
+ net/rxrpc/recvmsg.c                         |    9 +-
+ 39 files changed, 3774 insertions(+), 1070 deletions(-)
+ create mode 100644 Documentation/filesystems/netfs_library.rst
+ create mode 100644 fs/cachefiles/rdwr2.c
+ create mode 100644 fs/fscache/io.c
+ create mode 100644 fs/netfs/Kconfig
+ create mode 100644 fs/netfs/Makefile
+ create mode 100644 fs/netfs/internal.h
+ create mode 100644 fs/netfs/read_helper.c
+ create mode 100644 fs/netfs/stats.c
+ create mode 100644 include/linux/netfs.h
+ create mode 100644 include/trace/events/netfs.h
+
 
