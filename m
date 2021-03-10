@@ -2,112 +2,118 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3FE4C433DB
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 02:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DCCC433E6
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 12:21:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7707F64FE0
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 02:50:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D804264FF4
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 12:21:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231976AbhCJCtd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 Mar 2021 21:49:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49406 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231673AbhCJCtN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Mar 2021 21:49:13 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AEA6C06174A;
-        Tue,  9 Mar 2021 18:49:12 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id n22so5208307wmc.2;
-        Tue, 09 Mar 2021 18:49:12 -0800 (PST)
+        id S231956AbhCJMUy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Mar 2021 07:20:54 -0500
+Received: from smtp2.axis.com ([195.60.68.18]:9013 "EHLO smtp2.axis.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232781AbhCJMUn (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 10 Mar 2021 07:20:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=Kw+LgXQW8KY9KkrizD3jcDkxfwAPNXon1f5R6IB52+g=;
-        b=oPDIo9luyaC2qN8Kr/fVdUMDoPfNhZ4YH2j7EJ293mzpPR6KOhAZRknTRIZvnsXI0Y
-         tQ3FjeBsViolk70ZaioLYC655pNugmi3/m3ctsuYkgWQKBrZQ0azY+dk3G84WzsaEWc8
-         ERpCh2CF/JQxz/0TOaSvmF01WASLTkQGM05KRwJys5Uhg5jK0l05xaOy4Fj53gb3dl8/
-         gulR7QEbNi/U5fnLO3dfFc3O2bOptbMrskTJovjyZc0MUE5Pg4eW3uYVI4yO0pAK9R76
-         vipb0+23t/QyJHhlEQYWIRO50qvIHmMWt7e5HNh5mw0CRclwbq5vOyzFB968NjID8Vu/
-         oS3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=Kw+LgXQW8KY9KkrizD3jcDkxfwAPNXon1f5R6IB52+g=;
-        b=I3MsDtaA4tQCnF5jyNkaYfYgYSoPhnzxTUjEZJs50EnfoB7N9WpZOW4uFu0wYjTvZr
-         Ku+vXE7KGMndhFSqSo0ihv+UJtIEt7lEWel095XZhy6ePufPT2/kjN9MZbM0py6fyo4i
-         IkOedPCBGCkMlwHQt6E9VOC6NsTvDycik5VpEo36MNL0eqOgcrFKURUtT3bnfBHZ3VOc
-         2zoxxyUclZShbaDAQYqOJmhQoW375JPepnXXnInlwFXxMn4rMVndWlaQlz5wkycuth0O
-         ucUx03UtyModVtI3BZh7ZAgiLCgCPXimv8PiiS0SXFG1cRxtuJY20/RSF6QrPa0+PXQz
-         DkNQ==
-X-Gm-Message-State: AOAM532C/hRpWSFDDBTR8fQnKFKCaB9oYDjJXjQkcEZML+1p/6w1iZf5
-        HOAe1CVMdERaqR4csseKj340OUCPGsLdNpbqw53+vDsJ9QVcZw==
-X-Google-Smtp-Source: ABdhPJzJ/q2iwtHnU9TC7suxba0MSXyI96DH+4J6Tkim+LPmTWQgtdbvsrYiJVJ/HTUp213naewoRW3yEcjYcURoCC8=
-X-Received: by 2002:a1c:7fc9:: with SMTP id a192mr842372wmd.15.1615344551337;
- Tue, 09 Mar 2021 18:49:11 -0800 (PST)
+  d=axis.com; q=dns/txt; s=axis-central1; t=1615378844;
+  x=1646914844;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=HFPFW7dYxBR1uHyyA+wWF7i+lKbzCuiiUpMps7ZXBjs=;
+  b=ClYcXu09LtPZsRuxysgLJr9RF5yJpkwQq8BYEB8kjJWJCZpXYRqVu5B4
+   pwkROtwsY/wcsVvKRLWPcrHh5nUp4ufmbrCwPsYASvZ2h56cIL1lhWqyA
+   UYVLn3v9mx9bA6uwp3BrLifo4fOTD3hCNTZhX3Osu1uv5A4wMJLoiHZOz
+   vL3CoMhSf1jn2+o2fMRScHtZ7UXDVJGhKUtlV92sbrtCU9FrxPSLgwpm+
+   zRtRvKCDDJggaJT2Eb6cwZe66QALAEqxS/lScBM9DVrmihoZL/XQx9Tft
+   2TCF3mEHu5jAw1JPRih8xTkrS0TE0XxH2pkWU0G5Mmw4lW1uDQfz4Nfkq
+   w==;
+From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
+To:     <sfrench@samba.org>
+CC:     <linux-cifs@vger.kernel.org>, <aaptel@suse.com>, <kernel@axis.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>
+Subject: [PATCH] cifs: Fix preauth hash corruption
+Date:   Wed, 10 Mar 2021 13:20:40 +0100
+Message-ID: <20210310122040.17515-1-vincent.whitchurch@axis.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 9 Mar 2021 20:49:00 -0600
-Message-ID: <CAH2r5mt9OWkr_sGjYXSEzRghSsOaO9O6sqfHLM2E07Am15ceAA@mail.gmail.com>
-Subject: [GIT PULL] cifs fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-a38fd8748464831584a19438cbb3082b5a2dab15:
+smb311_update_preauth_hash() uses the shash in server->secmech without
+appropriate locking, and this can lead to sessions corrupting each
+other's preauth hashes.
 
-  Linux 5.12-rc2 (2021-03-05 17:33:41 -0800)
+The following script can easily trigger the problem:
 
-are available in the Git repository at:
+	#!/bin/sh -e
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/5.12-rc2-smb3
+	NMOUNTS=10
+	for i in $(seq $NMOUNTS);
+		mkdir -p /tmp/mnt$i
+		umount /tmp/mnt$i 2>/dev/null || :
+	done
+	while :; do
+		for i in $(seq $NMOUNTS); do
+			mount -t cifs //192.168.0.1/test /tmp/mnt$i -o ... &
+		done
+		wait
+		for i in $(seq $NMOUNTS); do
+			umount /tmp/mnt$i
+		done
+	done
 
-for you to fetch changes up to 04ad69c342fc4de5bd23be9ef15ea7574fb1a87e:
+Usually within seconds this leads to one or more of the mounts failing
+with the following errors, and a "Bad SMB2 signature for message" is
+seen in the server logs:
 
-  cifs: do not send close in compound create+close requests
-(2021-03-08 21:23:22 -0600)
+ CIFS: VFS: \\192.168.0.1 failed to connect to IPC (rc=-13)
+ CIFS: VFS: cifs_mount failed w/return code = -13
 
-----------------------------------------------------------------
-6 cifs/smb3 fixes, 3 for stable, including some important mulitchannel
-crediting fixes, and fix for statfs error handling
+Fix it by holding the server mutex just like in the other places where
+the shashes are used.
 
-Regression test results:
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/524
-----------------------------------------------------------------
-Aurelien Aptel (2):
-      cifs: fix credit accounting for extra channel
-      cifs: ask for more credit on async read/write code paths
+Fixes: 8bd68c6e47abff34e4 ("CIFS: implement v3.11 preauth integrity")
+Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
+---
+ fs/cifs/transport.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Paulo Alcantara (4):
-      cifs: print MIDs in decimal notation
-      cifs: change noisy error message to FYI
-      cifs: return proper error code in statfs(2)
-      cifs: do not send close in compound create+close requests
-
- fs/cifs/cifs_debug.c |  2 +-
- fs/cifs/cifsfs.c     |  2 +-
- fs/cifs/cifsglob.h   | 19 ++++++++++---------
- fs/cifs/connect.c    | 14 +++++++-------
- fs/cifs/sess.c       |  1 +
- fs/cifs/smb2inode.c  |  1 +
- fs/cifs/smb2misc.c   | 10 +++++-----
- fs/cifs/smb2ops.c    | 10 +++++-----
- fs/cifs/smb2pdu.c    |  6 ++----
- fs/cifs/smb2proto.h  |  3 +--
- fs/cifs/transport.c  |  4 ++--
- 11 files changed, 36 insertions(+), 36 deletions(-)
-
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index e90a1d1380b0..aa9c0f6bc263 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -1196,9 +1196,12 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	/*
+ 	 * Compounding is never used during session establish.
+ 	 */
+-	if ((ses->status == CifsNew) || (optype & CIFS_NEG_OP) || (optype & CIFS_SESS_OP))
++	if ((ses->status == CifsNew) || (optype & CIFS_NEG_OP) || (optype & CIFS_SESS_OP)) {
++		mutex_lock(&server->srv_mutex);
+ 		smb311_update_preauth_hash(ses, rqst[0].rq_iov,
+ 					   rqst[0].rq_nvec);
++		mutex_unlock(&server->srv_mutex);
++	}
+ 
+ 	for (i = 0; i < num_rqst; i++) {
+ 		rc = wait_for_response(server, midQ[i]);
+@@ -1266,7 +1269,9 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 			.iov_base = resp_iov[0].iov_base,
+ 			.iov_len = resp_iov[0].iov_len
+ 		};
++		mutex_lock(&server->srv_mutex);
+ 		smb311_update_preauth_hash(ses, &iov, 1);
++		mutex_unlock(&server->srv_mutex);
+ 	}
+ 
+ out:
 -- 
-Thanks,
+2.28.0
 
-Steve
