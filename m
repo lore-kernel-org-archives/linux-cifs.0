@@ -7,47 +7,46 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDD5C433DB
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 17:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 288F6C433E6
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 17:01:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6D3264FDC
-	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 17:01:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC75364FC7
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Mar 2021 17:01:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233759AbhCJRAn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 10 Mar 2021 12:00:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58891 "EHLO
+        id S233716AbhCJRBQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 10 Mar 2021 12:01:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34831 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233846AbhCJRAT (ORCPT
+        by vger.kernel.org with ESMTP id S233737AbhCJRAw (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 10 Mar 2021 12:00:19 -0500
+        Wed, 10 Mar 2021 12:00:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615395618;
+        s=mimecast20190719; t=1615395651;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TSFY1mfuIl4jA5nx/IZIR5MuKLty4TPmhh0I/izWwUU=;
-        b=GwXcuzDGBuQ1ps/LGaC0hzGBXuFQJgE34KGnxxFJTqOqKSTETf78/trRPMZLb5mK0e981t
-        RwiEzfnDAMkJeJLszyMTWZJvkapIFfFsl+7HVOlnX5g3Ygg4cM47JrYs1BKHG5uPuc0txJ
-        3Bbz01SsfAwqIL9l/pAOVQS5rJkF9FY=
+        bh=/QrxkL5yU3bNKMVvjsOwNL+2HswH3DuEf3MKoAjRTHw=;
+        b=Jat+srolQLvLiQ8Ei7RwRa771A5poO9wrDYF+4+TYxRtoLiY5LYtEn0dpLG8lt1QEIMExc
+        I+i96DQcFybPuAagJn5uOQ3+oMSXI6Lmau9TSUKambQILmVmo5SUnvD0Kk0bwDm1sRmWOt
+        /eR6oGgNopQzFfIcvubH1FFKJMafKxg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-489-hmYzCFwQMMGxYKAp7EJGpQ-1; Wed, 10 Mar 2021 12:00:16 -0500
-X-MC-Unique: hmYzCFwQMMGxYKAp7EJGpQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-54-qyyWa-4pPuSOIVR5bFKa8A-1; Wed, 10 Mar 2021 12:00:48 -0500
+X-MC-Unique: qyyWa-4pPuSOIVR5bFKa8A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D53F108BD07;
-        Wed, 10 Mar 2021 17:00:14 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEAD757;
+        Wed, 10 Mar 2021 17:00:45 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-118-152.rdu2.redhat.com [10.10.118.152])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 11E3E60C05;
-        Wed, 10 Mar 2021 17:00:07 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ADBA810016FD;
+        Wed, 10 Mar 2021 17:00:33 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v4 26/28] afs: Use the fs operation ops to handle FetchData
- completion
+Subject: [PATCH v4 28/28] afs: Use the fscache_write_begin() helper
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
@@ -63,144 +62,253 @@ Cc:     linux-afs@lists.infradead.org, linux-cachefs@redhat.com,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 10 Mar 2021 17:00:06 +0000
-Message-ID: <161539560673.286939.391310781674212229.stgit@warthog.procyon.org.uk>
+Date:   Wed, 10 Mar 2021 17:00:32 +0000
+Message-ID: <161539563244.286939.16537296241609909980.stgit@warthog.procyon.org.uk>
 In-Reply-To: <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk>
 References: <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Use the 'success' and 'aborted' afs_operations_ops methods and add a
-'failed' method to handle the completion of an AFS.FetchData,
-AFS.FetchData64 or YFS.FetchData64 RPC operation rather than directly
-calling the done func pointed to by the afs_read struct from the call
-delivery handler.
+Make AFS use the new fscache_write_begin() helper to do the pre-reading
+required before the write.  If successful, the helper returns with the
+required page filled in and locked.  It may read more than just one page,
+expanding the read to meet cache granularity requirements as necessary.
 
-This means the done function will be called back on error also, not just on
-successful completion.
-
-This allows motion towards asynchronous data reception on data fetch calls
-and allows any error to be handed off to the fscache read helper in the
-same place as a successful completion.
+Note: A more advanced version of this could be made that does
+generic_perform_write() for a whole cache granule.  This would make it
+easier to avoid doing the download/read for the data to be overwritten.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: linux-afs@lists.infradead.org
 cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
-Link: https://lore.kernel.org/r/160588541471.3465195.8807019223378490810.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/161118157260.1232039.6549085372718234792.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/161161052647.2537118.12922380836599003659.stgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/161340417106.1303470.3502017303898569631.stgit@warthog.procyon.org.uk/ # v3
+Link: https://lore.kernel.org/r/160588546422.3465195.1546354372589291098.stgit@warthog.procyon.org.uk/ # rfc
 ---
 
- fs/afs/file.c         |   15 +++++++++++++++
- fs/afs/fs_operation.c |    4 +++-
- fs/afs/fsclient.c     |    3 ---
- fs/afs/internal.h     |    1 +
- fs/afs/yfsclient.c    |    3 ---
- 5 files changed, 19 insertions(+), 7 deletions(-)
+ fs/afs/file.c     |   19 +++++++++
+ fs/afs/internal.h |    1 
+ fs/afs/write.c    |  108 ++++++-----------------------------------------------
+ 3 files changed, 31 insertions(+), 97 deletions(-)
 
 diff --git a/fs/afs/file.c b/fs/afs/file.c
-index f6282ac0d222..231e9fd7882b 100644
+index 99bb4649a306..cf2b664a68a5 100644
 --- a/fs/afs/file.c
 +++ b/fs/afs/file.c
-@@ -255,6 +255,19 @@ void afs_put_read(struct afs_read *req)
- 	}
+@@ -334,6 +334,13 @@ static void afs_init_rreq(struct netfs_read_request *rreq, struct file *file)
+ 	rreq->netfs_priv = key_get(afs_file_key(file));
  }
  
-+static void afs_fetch_data_notify(struct afs_operation *op)
++static bool afs_is_cache_enabled(struct inode *inode)
 +{
-+	struct afs_read *req = op->fetch.req;
-+	int error = op->error;
++	struct fscache_cookie *cookie = afs_vnode_cache(AFS_FS_I(inode));
 +
-+	if (error == -ECONNABORTED)
-+		error = afs_abort_to_error(op->ac.abort_code);
-+	req->error = error;
-+
-+	if (req->done)
-+		req->done(req);
++	return fscache_cookie_enabled(cookie) && !hlist_empty(&cookie->backing_objects);
 +}
 +
- static void afs_fetch_data_success(struct afs_operation *op)
+ static int afs_begin_cache_operation(struct netfs_read_request *rreq)
  {
- 	struct afs_vnode *vnode = op->file[0].vnode;
-@@ -263,6 +276,7 @@ static void afs_fetch_data_success(struct afs_operation *op)
- 	afs_vnode_commit_status(op, &op->file[0]);
- 	afs_stat_v(vnode, n_fetches);
- 	atomic_long_add(op->fetch.req->actual_len, &op->net->n_fetch_bytes);
-+	afs_fetch_data_notify(op);
+ 	struct afs_vnode *vnode = AFS_FS_I(rreq->inode);
+@@ -341,14 +348,24 @@ static int afs_begin_cache_operation(struct netfs_read_request *rreq)
+ 	return fscache_begin_read_operation(rreq, afs_vnode_cache(vnode));
  }
  
- static void afs_fetch_data_put(struct afs_operation *op)
-@@ -276,6 +290,7 @@ static const struct afs_operation_ops afs_fetch_data_operation = {
- 	.issue_yfs_rpc	= yfs_fs_fetch_data,
- 	.success	= afs_fetch_data_success,
- 	.aborted	= afs_check_for_remote_deletion,
-+	.failed		= afs_fetch_data_notify,
- 	.put		= afs_fetch_data_put,
++static int afs_check_write_begin(struct file *file, loff_t pos, unsigned len,
++				 struct page *page, void **_fsdata)
++{
++	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
++
++	return test_bit(AFS_VNODE_DELETED, &vnode->flags) ? -ESTALE : 0;
++}
++
+ static void afs_priv_cleanup(struct address_space *mapping, void *netfs_priv)
+ {
+ 	key_put(netfs_priv);
+ }
+ 
+-static const struct netfs_read_request_ops afs_req_ops = {
++const struct netfs_read_request_ops afs_req_ops = {
+ 	.init_rreq		= afs_init_rreq,
++	.is_cache_enabled	= afs_is_cache_enabled,
+ 	.begin_cache_operation	= afs_begin_cache_operation,
++	.check_write_begin	= afs_check_write_begin,
+ 	.issue_op		= afs_req_issue_op,
+ 	.cleanup		= afs_priv_cleanup,
  };
- 
-diff --git a/fs/afs/fs_operation.c b/fs/afs/fs_operation.c
-index 97cab12b0a6c..938e28a00101 100644
---- a/fs/afs/fs_operation.c
-+++ b/fs/afs/fs_operation.c
-@@ -195,8 +195,10 @@ void afs_wait_for_operation(struct afs_operation *op)
- 	case -ECONNABORTED:
- 		if (op->ops->aborted)
- 			op->ops->aborted(op);
--		break;
-+		fallthrough;
- 	default:
-+		if (op->ops->failed)
-+			op->ops->failed(op);
- 		break;
- 	}
- 
-diff --git a/fs/afs/fsclient.c b/fs/afs/fsclient.c
-index 31e6b3635541..5e34f4dbd385 100644
---- a/fs/afs/fsclient.c
-+++ b/fs/afs/fsclient.c
-@@ -392,9 +392,6 @@ static int afs_deliver_fs_fetch_data(struct afs_call *call)
- 		break;
- 	}
- 
--	if (req->done)
--		req->done(req);
--
- 	_leave(" = 0 [done]");
- 	return 0;
- }
 diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 889f504d7308..62c1b38fa98b 100644
+index 96b33d2e3116..9f4040724318 100644
 --- a/fs/afs/internal.h
 +++ b/fs/afs/internal.h
-@@ -742,6 +742,7 @@ struct afs_operation_ops {
- 	void (*issue_yfs_rpc)(struct afs_operation *op);
- 	void (*success)(struct afs_operation *op);
- 	void (*aborted)(struct afs_operation *op);
-+	void (*failed)(struct afs_operation *op);
- 	void (*edit_dir)(struct afs_operation *op);
- 	void (*put)(struct afs_operation *op);
- };
-diff --git a/fs/afs/yfsclient.c b/fs/afs/yfsclient.c
-index 363d6dd276c0..2b35cba8ad62 100644
---- a/fs/afs/yfsclient.c
-+++ b/fs/afs/yfsclient.c
-@@ -449,9 +449,6 @@ static int yfs_deliver_fs_fetch_data64(struct afs_call *call)
- 		break;
+@@ -1045,6 +1045,7 @@ extern void afs_dynroot_depopulate(struct super_block *);
+ extern const struct address_space_operations afs_fs_aops;
+ extern const struct inode_operations afs_file_inode_operations;
+ extern const struct file_operations afs_file_operations;
++extern const struct netfs_read_request_ops afs_req_ops;
+ 
+ extern int afs_cache_wb_key(struct afs_vnode *, struct afs_file *);
+ extern void afs_put_wb_key(struct afs_wb_key *);
+diff --git a/fs/afs/write.c b/fs/afs/write.c
+index e672833c99bc..b2e03de09c24 100644
+--- a/fs/afs/write.c
++++ b/fs/afs/write.c
+@@ -11,6 +11,8 @@
+ #include <linux/pagemap.h>
+ #include <linux/writeback.h>
+ #include <linux/pagevec.h>
++#include <linux/netfs.h>
++#include <linux/fscache.h>
+ #include "internal.h"
+ 
+ /*
+@@ -22,68 +24,6 @@ int afs_set_page_dirty(struct page *page)
+ 	return __set_page_dirty_nobuffers(page);
+ }
+ 
+-/*
+- * Handle completion of a read operation to fill a page.
+- */
+-static void afs_fill_hole(struct afs_read *req)
+-{
+-	if (iov_iter_count(req->iter) > 0)
+-		/* The read was short - clear the excess buffer. */
+-		iov_iter_zero(iov_iter_count(req->iter), req->iter);
+-}
+-
+-/*
+- * partly or wholly fill a page that's under preparation for writing
+- */
+-static int afs_fill_page(struct file *file,
+-			 loff_t pos, unsigned int len, struct page *page)
+-{
+-	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
+-	struct afs_read *req;
+-	size_t p;
+-	void *data;
+-	int ret;
+-
+-	_enter(",,%llu", (unsigned long long)pos);
+-
+-	if (pos >= vnode->vfs_inode.i_size) {
+-		p = pos & ~PAGE_MASK;
+-		ASSERTCMP(p + len, <=, PAGE_SIZE);
+-		data = kmap(page);
+-		memset(data + p, 0, len);
+-		kunmap(page);
+-		return 0;
+-	}
+-
+-	req = kzalloc(sizeof(struct afs_read), GFP_KERNEL);
+-	if (!req)
+-		return -ENOMEM;
+-
+-	refcount_set(&req->usage, 1);
+-	req->vnode	= vnode;
+-	req->done	= afs_fill_hole;
+-	req->key	= key_get(afs_file_key(file));
+-	req->pos	= pos;
+-	req->len	= len;
+-	req->nr_pages	= 1;
+-	req->iter	= &req->def_iter;
+-	iov_iter_xarray(&req->def_iter, READ, &file->f_mapping->i_pages, pos, len);
+-
+-	ret = afs_fetch_data(vnode, req);
+-	afs_put_read(req);
+-	if (ret < 0) {
+-		if (ret == -ENOENT) {
+-			_debug("got NOENT from server"
+-			       " - marking file deleted and stale");
+-			set_bit(AFS_VNODE_DELETED, &vnode->flags);
+-			ret = -ESTALE;
+-		}
+-	}
+-
+-	_leave(" = %d", ret);
+-	return ret;
+-}
+-
+ /*
+  * prepare to perform part of a write to a page
+  */
+@@ -102,24 +42,14 @@ int afs_write_begin(struct file *file, struct address_space *mapping,
+ 	_enter("{%llx:%llu},%llx,%x",
+ 	       vnode->fid.vid, vnode->fid.vnode, pos, len);
+ 
+-	page = grab_cache_page_write_begin(mapping, pos / PAGE_SIZE, flags);
+-	if (!page)
+-		return -ENOMEM;
+-
+-	if (!PageUptodate(page) && len != PAGE_SIZE) {
+-		ret = afs_fill_page(file, pos & PAGE_MASK, PAGE_SIZE, page);
+-		if (ret < 0) {
+-			unlock_page(page);
+-			put_page(page);
+-			_leave(" = %d [prep]", ret);
+-			return ret;
+-		}
+-		SetPageUptodate(page);
+-	}
+-
+-#ifdef CONFIG_AFS_FSCACHE
+-	wait_on_page_fscache(page);
+-#endif
++	/* Prefetch area to be written into the cache if we're caching this
++	 * file.  We need to do this before we get a lock on the page in case
++	 * there's more than one writer competing for the same cache block.
++	 */
++	ret = netfs_write_begin(file, mapping, pos, len, flags, &page, fsdata,
++				&afs_req_ops, NULL);
++	if (ret < 0)
++		return ret;
+ 
+ 	index = page->index;
+ 	from = pos - index * PAGE_SIZE;
+@@ -184,7 +114,6 @@ int afs_write_end(struct file *file, struct address_space *mapping,
+ 	unsigned int f, from = pos & (thp_size(page) - 1);
+ 	unsigned int t, to = from + copied;
+ 	loff_t i_size, maybe_i_size;
+-	int ret = 0;
+ 
+ 	_enter("{%llx:%llu},{%lx}",
+ 	       vnode->fid.vid, vnode->fid.vnode, page->index);
+@@ -203,19 +132,7 @@ int afs_write_end(struct file *file, struct address_space *mapping,
+ 		write_sequnlock(&vnode->cb_lock);
  	}
  
--	if (req->done)
--		req->done(req);
--
- 	_leave(" = 0 [done]");
- 	return 0;
+-	if (!PageUptodate(page)) {
+-		if (copied < len) {
+-			/* Try and load any missing data from the server.  The
+-			 * unmarshalling routine will take care of clearing any
+-			 * bits that are beyond the EOF.
+-			 */
+-			ret = afs_fill_page(file, pos + copied,
+-					    len - copied, page);
+-			if (ret < 0)
+-				goto out;
+-		}
+-		SetPageUptodate(page);
+-	}
++	ASSERT(PageUptodate(page));
+ 
+ 	if (PagePrivate(page)) {
+ 		priv = page_private(page);
+@@ -236,12 +153,11 @@ int afs_write_end(struct file *file, struct address_space *mapping,
+ 
+ 	if (set_page_dirty(page))
+ 		_debug("dirtied %lx", page->index);
+-	ret = copied;
+ 
+ out:
+ 	unlock_page(page);
+ 	put_page(page);
+-	return ret;
++	return copied;
  }
+ 
+ /*
 
 
