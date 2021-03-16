@@ -2,132 +2,125 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB336C433E0
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 17:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 814FBC433DB
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 17:40:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A49665120
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 17:37:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52A636511B
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 17:40:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233321AbhCPRhN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Mar 2021 13:37:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36154 "EHLO
+        id S233538AbhCPRkZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Mar 2021 13:40:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbhCPRg4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 Mar 2021 13:36:56 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89885C06174A;
-        Tue, 16 Mar 2021 10:36:56 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id t37so12270088pga.11;
-        Tue, 16 Mar 2021 10:36:56 -0700 (PDT)
+        with ESMTP id S231851AbhCPRkJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 Mar 2021 13:40:09 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BED47C06174A;
+        Tue, 16 Mar 2021 10:40:08 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id p7so62268343eju.6;
+        Tue, 16 Mar 2021 10:40:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=C2INz9jGth8YqEdF26bQM1k6RpOCFfBaXRyDGUE3fpc=;
-        b=P0OwSngSahcWKM+DXoqhwv+uPm+yg/lInhL1wNxTMQR6yEzaEy57rxnPApK0DJUzoA
-         iReZLBDd+2VyfEZBcCf47SR+034817WZqSOhfji1tJmobI3q9rChdC1n+elSBCl4TpFu
-         LDSk7PGYZOu7TLepnzmNOwSw1t92QGsab6uk1WGcWiMslfGY0aOQ0LP+hS/3By0Zd4/Q
-         nKxgbRpBSQjK69FlerA5FW67aTN6cPTH7cWyTJD6JE3b1IBN4eSNGS607Q3LI72ybnZg
-         OyxTX0bXv3I0eMJG6CBUfMDlpgaV18ZrY/L+XPuepigkNpnp6D4XQPW+oIDWXeamiQNT
-         jqDQ==
+         :cc:content-transfer-encoding;
+        bh=i5kkHQ8E1HhgPS/MAR9lcva5tZR4bT7RdY4xuS+LLgA=;
+        b=WY5l3rsXRRLyx3+gegGnEUA4abaaHaV5DIPGHMIj9UEHqPj0QUFTIMoaWTO5VmWhzd
+         1Pb8NkJ5/wqvQ8n177F58yYUDCqH6xt/KcYXCVGFPw59HwQpAAdK7oOJmmhtzfcgL8Gs
+         7jpx9RSp7L7uJL9NgcrCS2c6JKG2LF9VxUI9rlh0SiQK2+nq0j8G3MCJfkcycNSYzsEW
+         AUzJmNetI9vbcIK14UCVeZUxlMDz1IB3Tg0NyeMJOqsZc1L8rqpQDxzN/xAPBmnGIrNV
+         JdBYkXalymKP7fI9PtSmcHwtaXS4wVAwWHqRojulgsSJhLAgV5Nt1U3BDgw4PYK0TBQf
+         TzbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=C2INz9jGth8YqEdF26bQM1k6RpOCFfBaXRyDGUE3fpc=;
-        b=G2YxRRnHqcVRvusMG9JCuLe16RPgCjtH286EX3FfgFoqYsEMNK2Jbu6ZU/egS0u7ZE
-         t4YeJeJSOMWdWje521K1Op9pWyGc/dLPgbO2C9trNlSww/n+/PdT78l5mQoX4fQkM/Qv
-         n352e8VSCvU7oCoY23cUYUyHtRtJeYEzf/8M12zH87F/k9ONE80+CfxKZv54D2/owlCX
-         1aY1yYxGvU7BTMjXwkrTZWF2JYH28YAl5+TPFDFtQEtlOBHI/Gqqe/roIhA1SBI1Xasq
-         rPecemR5H+tYIELJln1/Hj3dJRZ+bgEBFejx4p8Ju6aeR+ijC1gxccjlR6N1ZM7W0ZVg
-         AqAQ==
-X-Gm-Message-State: AOAM532qPrhIeyTh6MXAJk2vKENb0ZF23n0HUpoBBpcp0QRemzhauW6R
-        fMkWwQ9PFTk8o8Jgw/kA4xuQTJu967Jl4t2gr/nF6P3lMDqxbg==
-X-Google-Smtp-Source: ABdhPJymcDQn3heAnXPpCVSxyZhuxe2XCqoedKL02xJ1Af0X+YC26nDoDK1yat7ZvJ45X1ts4tNHKZRzHGJpIone/Bg=
-X-Received: by 2002:a63:4652:: with SMTP id v18mr655646pgk.87.1615916216114;
- Tue, 16 Mar 2021 10:36:56 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=i5kkHQ8E1HhgPS/MAR9lcva5tZR4bT7RdY4xuS+LLgA=;
+        b=YkCIEc4u4UPuNJfI6xBEzmVzknAFHcOlyltgpteWQ1+PuSTN2bpOdMZvHGm5fGb7G/
+         Y5auy2cWhEIPseN98ft64Kyfz+ijOf9KOS01bNmcchjKXFgvP6Vvn2VqHwlWwS11bxHG
+         vRcwH109MA+mgtmsT7xbhawBkXFofiqEF4X/4HhlIDqiwVe3YKvHtpWS8cC+VzKGelF9
+         RXA3SvD0/QOWh7k3nUe95hItk4wCd6MCCteN80w2zF5zq3iGN5Rq2cmM2WhzBYvut4Ed
+         b9b6iSm+sHWipUFFpdVMHHiHpNmg5F7uJSGXKgKCS5LSt9S3EQ2J7wtysrZonEMgcsqT
+         W/lg==
+X-Gm-Message-State: AOAM533NJ/U0mF/kFO0nLkeYE0HbQZ2zNYnOcOJvGiLGWBjv1S+2iiOV
+        KNvbbFrd9ug5eRtErf0YHhxtzVEasiUzOxI2MQ==
+X-Google-Smtp-Source: ABdhPJwvdZuSQbD7ZSg1tEitXgR4MqXVWi/4APt2EpFSbFXPcRxzvNBCMJiH1UXcx9oSt+IVAV1ORngTKevkSKesqL4=
+X-Received: by 2002:a17:906:7c48:: with SMTP id g8mr31326205ejp.138.1615916407556;
+ Tue, 16 Mar 2021 10:40:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210316124808.11984-1-vincent.whitchurch@axis.com> <93d506a6-5832-5006-3bab-6e8e7203da0e@talpey.com>
-In-Reply-To: <93d506a6-5832-5006-3bab-6e8e7203da0e@talpey.com>
-From:   Rohith Surabattula <rohiths.msft@gmail.com>
-Date:   Tue, 16 Mar 2021 23:06:45 +0530
-Message-ID: <CACdtm0ac+oE1+KNbOGWhy-j9XHmUn4AXG6zAaX-nL0W=NJxQMA@mail.gmail.com>
-Subject: Re: [PATCH v2] cifs: Silently ignore unknown oplock break handle
-To:     Tom Talpey <tom@talpey.com>
-Cc:     Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>, kernel@axis.com,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+References: <87v9a7w8q7.fsf@suse.com> <20210304095026.782-1-aaptel@suse.com>
+ <45b64990-b879-02d3-28e5-b896af0502c4@gmail.com> <87sg52t2xj.fsf@suse.com>
+ <139a3729-9460-7272-b1d7-c2feb5679ee9@talpey.com> <87eegltxzd.fsf@suse.com>
+ <d602e3e4-721a-a1c5-3375-1c9899da4383@talpey.com> <878s6ttwhd.fsf@suse.com>
+ <23052c07-8050-4eb8-d2de-506c60dbed7d@talpey.com> <871rcltiw9.fsf@suse.com>
+ <CAKywueREp5mib_4gmofwekrT=GhqoZo1kEmmUmNeqghG0EYYwQ@mail.gmail.com> <87pmzzs7lv.fsf@suse.com>
+In-Reply-To: <87pmzzs7lv.fsf@suse.com>
+From:   Pavel Shilovsky <piastryyy@gmail.com>
+Date:   Tue, 16 Mar 2021 10:39:56 -0700
+Message-ID: <CAKywueQPr2H69wvju=U8aKHQw_SA4hB76BObzZVZPppKJnk++A@mail.gmail.com>
+Subject: Re: [PATCH v4] flock.2: add CIFS details
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     Tom Talpey <tom@talpey.com>,
+        "Alejandro Colomar (man-pages)" <alx.manpages@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        mtk.manpages@gmail.com, linux-man@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This issue will not be seen once changes related to deferred close for
-files is committed.
-Currently, changes are in review. I will address review comments by this week.
+Sure. Thanks!
 
-Regards,
-Rohith
+I would put more details from
+https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockf=
+ileex
+:
 
-On Tue, Mar 16, 2021 at 9:33 PM Tom Talpey <tom@talpey.com> wrote:
+"""
+  Another important side-effect is that the locks are not advisory anymore:
+  any IO on an exclusively locked file will always fail with EACCES
+  when done from a separate file descriptor; write calls on
+  a file locked for shared access will fail with EACCES when done
+  from any file descriptor including the one used to lock the file.
+"""
+
+Thoughts?
+
+--
+Best regards,
+Pavel Shilovsky
+
+=D0=B2=D1=82, 16 =D0=BC=D0=B0=D1=80. 2021 =D0=B3. =D0=B2 03:42, Aur=C3=A9li=
+en Aptel <aaptel@suse.com>:
 >
-> On 3/16/2021 8:48 AM, Vincent Whitchurch via samba-technical wrote:
-> > Make SMB2 not print out an error when an oplock break is received for an
-> > unknown handle, similar to SMB1.  The SMB2 lease break path is not
-> > affected by this patch.
-> >
-> > Without this, a program which writes to a file from one thread, and
-> > opens, reads, and writes the same file from another thread triggers the
-> > below errors several times a minute when run against a Samba server
-> > configured with "smb2 leases = no".
-> >
-> >   CIFS: VFS: \\192.168.0.1 No task to wake, unknown frame received! NumMids 2
-> >   00000000: 424d53fe 00000040 00000000 00000012  .SMB@...........
-> >   00000010: 00000001 00000000 ffffffff ffffffff  ................
-> >   00000020: 00000000 00000000 00000000 00000000  ................
-> >   00000030: 00000000 00000000 00000000 00000000  ................
-> >
-> > Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
-> > ---
-> >
-> > Notes:
-> >      v2:
-> >      - Drop change to lease break
-> >      - Rewrite commit message
-> >
-> >   fs/cifs/smb2misc.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-> > index 60d4bd1eae2b..4d8576e202e3 100644
-> > --- a/fs/cifs/smb2misc.c
-> > +++ b/fs/cifs/smb2misc.c
-> > @@ -755,7 +755,7 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
-> >       }
-> >       spin_unlock(&cifs_tcp_ses_lock);
-> >       cifs_dbg(FYI, "Can not process oplock break for non-existent connection\n");
-> > -     return false;
-> > +     return true;
-> >   }
-> >
-> >   void
-> >
+> Pavel Shilovsky <piastryyy@gmail.com> writes:
+> > It is not only about writing to a locked file. It is also about any IO
+> > against a locked file if such a file is locked through another file
+> > handle. Right?
 >
-> As an oplock-only approach, it looks good. But the old cifs_dbg message
-> "non-existent connection" is possibly misleading, since the connection
-> may be perfectly fine.
+> Yes that was implied, the write was a simple example to illustrate. I'll
+> update to make it more generic:
 >
-> When breaking the loop successfully, the code emits
->         cifs_dbg(FYI, "file id match, oplock break\n");
-> so perhaps
->         cifs_dbg(FYI, "No file id matched, oplock break ignored\n");
-> ?
+>   Another important side-effect is that the locks are not advisory anymor=
+e:
+>   any IO on a locked file will always fail with EACCES,
+>   even when done from a separate file descriptor.
 >
-> Tom.
+> If you have comments please provide direct text suggestion to save time.
+>
+> Cheers,
+> --
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
+ DE
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
+=BCnchen)
+>
