@@ -2,119 +2,87 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BABF1C433DB
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 19:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D8EC433E9
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 20:38:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 87D6564F52
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 19:43:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8B3064F7B
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 20:38:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240523AbhCPTmq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Mar 2021 15:42:46 -0400
-Received: from p3plsmtpa06-07.prod.phx3.secureserver.net ([173.201.192.108]:37375
-        "EHLO p3plsmtpa06-07.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240506AbhCPTmf (ORCPT
+        id S231247AbhCPUiX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Mar 2021 16:38:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52644 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231398AbhCPUiN (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 16 Mar 2021 15:42:35 -0400
-Received: from [192.168.0.116] ([71.184.94.153])
-        by :SMTPAUTH: with ESMTPSA
-        id MFaFlRuNpZK7AMFaGlY8so; Tue, 16 Mar 2021 12:42:29 -0700
-X-CMAE-Analysis: v=2.4 cv=INzHtijG c=1 sm=1 tr=0 ts=60510a26
- a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
- a=IkcTkHD0fZMA:10 a=yMhMjlubAAAA:8 a=iox4zFpeAAAA:8 a=pGLkceISAAAA:8
- a=VI-tNiX6VCgJWLn9MxMA:9 a=QEXdDO2ut3YA:10 a=WzC6qhA0u3u7Ye7llzcV:22
-X-SECURESERVER-ACCT: tom@talpey.com
-Subject: Re: [PATCH v4] flock.2: add CIFS details
-To:     Pavel Shilovsky <piastryyy@gmail.com>,
-        =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>
-Cc:     "Alejandro Colomar (man-pages)" <alx.manpages@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        mtk.manpages@gmail.com, linux-man@vger.kernel.org
-References: <87v9a7w8q7.fsf@suse.com> <20210304095026.782-1-aaptel@suse.com>
- <45b64990-b879-02d3-28e5-b896af0502c4@gmail.com> <87sg52t2xj.fsf@suse.com>
- <139a3729-9460-7272-b1d7-c2feb5679ee9@talpey.com> <87eegltxzd.fsf@suse.com>
- <d602e3e4-721a-a1c5-3375-1c9899da4383@talpey.com> <878s6ttwhd.fsf@suse.com>
- <23052c07-8050-4eb8-d2de-506c60dbed7d@talpey.com> <871rcltiw9.fsf@suse.com>
- <CAKywueREp5mib_4gmofwekrT=GhqoZo1kEmmUmNeqghG0EYYwQ@mail.gmail.com>
- <87pmzzs7lv.fsf@suse.com>
- <CAKywueQPr2H69wvju=U8aKHQw_SA4hB76BObzZVZPppKJnk++A@mail.gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-Message-ID: <f25b6d85-0299-9557-2eb9-6c7666c8ea6e@talpey.com>
-Date:   Tue, 16 Mar 2021 15:42:27 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Tue, 16 Mar 2021 16:38:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615927092;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CMarB3VddjXNLrXwgBbm1Z1YjzBsISepgPDMYK+ct2o=;
+        b=FTI1QrdMrtJ91Vjn3PqxhcI+loiGLwhdsxdVihOumGeyHTn+r1dFjefOgdBc+dstd62IXV
+        8gXlfODbpJ3bCgrsiVfCNZ0tGuApouJ2+vuqIjK/9u6sVE8ZB/EQWInhlAQRAN7I8D4VEn
+        f9pcQFgih0+EP2jOv56t0Vzup5xU1jY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-TKLQWn3DPmW8oUP28nVqjQ-1; Tue, 16 Mar 2021 16:38:11 -0400
+X-MC-Unique: TKLQWn3DPmW8oUP28nVqjQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E5511B18BC1;
+        Tue, 16 Mar 2021 20:38:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-118-152.rdu2.redhat.com [10.10.118.152])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 807582BFE7;
+        Tue, 16 Mar 2021 20:38:01 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210316190707.GD3420@casper.infradead.org>
+References: <20210316190707.GD3420@casper.infradead.org> <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk> <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Alexander Viro <viro@zeniv.linux.org.uk>, linux-mm@kvack.org,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 02/28] mm: Add an unlock function for PG_private_2/PG_fscache
 MIME-Version: 1.0
-In-Reply-To: <CAKywueQPr2H69wvju=U8aKHQw_SA4hB76BObzZVZPppKJnk++A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfKCpTW3tr2oaj1dHxH6cXkEJTjrTCvoMywd3HQl9fxGJTzeXWd/yMqB9Xg7IrkTliOm6amb8aXrr/9DkSdwBcjxWtVv44Da6TeKhGfmvJzLcD2u5z0G/
- O8ftl7+20nWL5T9D6i81LV410wFbiQi+foj5F+pSdS0X7YlWJiOAk4dT0W2O6Efi2tSXSUN0yBRgecvgeEUWGjfNO1d0JL1PEEfmHkqRvrzmDaFyJFUHrlYa
- nep8V+a1AO9GeQeHnMly+2AaOMLVaOrHYIk8+i7r3+7uTN+gec1IaTdeS6mjpxDPQ1xlLDyQCJvtZLc8OgZbPJhDGtiinHtXMCqFJIjOk5fIFdV4Aq6ncIMU
- BNYNinq5DbrJbDVjCaTzrC2FGnZsh9X+1w7oDLaZoNKuSJRpBJEV+xYCcKZ3rb10/kSWmj/cN65nCLHYbyWD8dYRMZb1ng==
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3313318.1615927080.1@warthog.procyon.org.uk>
+Date:   Tue, 16 Mar 2021 20:38:00 +0000
+Message-ID: <3313319.1615927080@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 3/16/2021 1:39 PM, Pavel Shilovsky wrote:
-> Sure. Thanks!
-> 
-> I would put more details from
-> https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-lockfileex
-> :
-> 
-> """
->    Another important side-effect is that the locks are not advisory anymore:
->    any IO on an exclusively locked file will always fail with EACCES
->    when done from a separate file descriptor; write calls on
->    a file locked for shared access will fail with EACCES when done
->    from any file descriptor including the one used to lock the file.
-> """
-> 
-> Thoughts?
+Matthew Wilcox <willy@infradead.org> wrote:
 
-I think it'll be important to define what "exclusive" and "shared"
-mean from a Linux/POSIX API perspective, and that will get into dragon
-territory. I don't think it's a good idea to attempt that in this
-manpage. It is best to leave Windows semantics, and interop with
-Windows clients, out of it.
+> So ... a page with both flags cleared should have a refcount of N.
+> A page with one or both flags set should have a refcount of N+1.
+> ...
+> How is a poor filesystem supposed to make that true?  Also btrfs has this
+> problem since it uses private_2 for its own purposes.
 
-IOW, I personally prefer Aurélien's simple version for now.
+It's simpler if it's N+2 for both patches set.  Btw, patch 13 adds that - and
+possibly that should be merged into an earlier patch.
 
-Tom.
+David
 
-> 
-> --
-> Best regards,
-> Pavel Shilovsky
-> 
-> вт, 16 мар. 2021 г. в 03:42, Aurélien Aptel <aaptel@suse.com>:
->>
->> Pavel Shilovsky <piastryyy@gmail.com> writes:
->>> It is not only about writing to a locked file. It is also about any IO
->>> against a locked file if such a file is locked through another file
->>> handle. Right?
->>
->> Yes that was implied, the write was a simple example to illustrate. I'll
->> update to make it more generic:
->>
->>    Another important side-effect is that the locks are not advisory anymore:
->>    any IO on a locked file will always fail with EACCES,
->>    even when done from a separate file descriptor.
->>
->> If you have comments please provide direct text suggestion to save time.
->>
->> Cheers,
->> --
->> Aurélien Aptel / SUSE Labs Samba Team
->> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
->> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, DE
->> GF: Felix Imendörffer, Mary Higgins, Sri Rasiah HRB 247165 (AG München)
->>
-> 
