@@ -2,100 +2,92 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 085E4C433E9
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 11:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBBB7C433DB
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 12:49:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C26AC65036
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 11:35:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE84065036
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Mar 2021 12:49:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237272AbhCPLf0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Mar 2021 07:35:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58678 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237260AbhCPLe6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 16 Mar 2021 07:34:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615894497;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vlqsbtT9COsx+yKS+e8hs6ZYyJT5eXMndMhYe5Gjdjo=;
-        b=M6+0cVOPBYubuhLr7m1vWnilvgjNWbS4w4VSeXMDcBc8GvKGUWjDTwHXRkF2B9W4X95e51
-        x2QM8tvDcm2yIpzegU+twaNBuqFcTXPpwrfnc+OGMTTltFbZQSXti7sKBHamymY7w6xhnb
-        raPZ82FCLjoRVeyVEZ26cLLJvqyeKm0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-Q4Hxl9DtPsqAVRmB4OjmRQ-1; Tue, 16 Mar 2021 07:34:54 -0400
-X-MC-Unique: Q4Hxl9DtPsqAVRmB4OjmRQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 052CE193F561;
-        Tue, 16 Mar 2021 11:34:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-118-152.rdu2.redhat.com [10.10.118.152])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 96C3C60C0F;
-        Tue, 16 Mar 2021 11:34:45 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <161539537375.286939.16642940088716990995.stgit@warthog.procyon.org.uk>
-References: <161539537375.286939.16642940088716990995.stgit@warthog.procyon.org.uk> <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk>
-To:     Trond Myklebust <trondmy@hammerspace.com>
-Cc:     dhowells@redhat.com, Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org,
-        David Wysochanski <dwysocha@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 08/28] netfs: Provide readahead and readpage netfs helpers
+        id S231735AbhCPMsq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Mar 2021 08:48:46 -0400
+Received: from smtp2.axis.com ([195.60.68.18]:65351 "EHLO smtp2.axis.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232940AbhCPMsV (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 16 Mar 2021 08:48:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=axis.com; q=dns/txt; s=axis-central1; t=1615898901;
+  x=1647434901;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=R/qrhf2BvEAQYNmpXyzvq1FG5e/yZfN8pk3ldKPlorY=;
+  b=TueIOpS1ceRB+JTuZ38cjx/ZFdJA8/7OfutGamEm8SZo44B0LfFS3vwy
+   /2lJd249MqRj19rNRdt1MStzaZ5dym4fKjjSqg/G0A99n25KZrjXDHSFg
+   UxeN4J1BPUY5jayiRCErbOnazWespC+DSBh7xDKPu3LvT9xv3Sh7hvVO/
+   gcz+2jB8v+4Hhate0dOGj71bYhzM2skjPWI+JKwAuzqNADLR7u+kGzt6v
+   ByvuTsWRzHOTJr1u6CoYZEXSHb+aeKH5RBfVLh1yDwBfEpDzO9t9rYpN9
+   SCRKjcph6TkQ5I1X4S2hLQytGe7TRUyKBsFdFd10+iww6ZXifPwoRcCw1
+   g==;
+From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
+To:     Steve French <sfrench@samba.org>
+CC:     <kernel@axis.com>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2] cifs: Silently ignore unknown oplock break handle
+Date:   Tue, 16 Mar 2021 13:48:07 +0100
+Message-ID: <20210316124808.11984-1-vincent.whitchurch@axis.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3184203.1615894484.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 16 Mar 2021 11:34:44 +0000
-Message-ID: <3184204.1615894484@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I'm going to make the code generate more information when warning about a
-subread reporting having over-read (see attached).
+Make SMB2 not print out an error when an oplock break is received for an
+unknown handle, similar to SMB1.  The SMB2 lease break path is not
+affected by this patch.
 
-David
+Without this, a program which writes to a file from one thread, and
+opens, reads, and writes the same file from another thread triggers the
+below errors several times a minute when run against a Samba server
+configured with "smb2 leases = no".
+
+ CIFS: VFS: \\192.168.0.1 No task to wake, unknown frame received! NumMids 2
+ 00000000: 424d53fe 00000040 00000000 00000012  .SMB@...........
+ 00000010: 00000001 00000000 ffffffff ffffffff  ................
+ 00000020: 00000000 00000000 00000000 00000000  ................
+ 00000030: 00000000 00000000 00000000 00000000  ................
+
+Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
 ---
-diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
-index ce11ca4c32e4..765e88ee132d 100644
---- a/fs/netfs/read_helper.c
-+++ b/fs/netfs/read_helper.c
-@@ -641,7 +641,10 @@ void netfs_subreq_terminated(struct netfs_read_subreq=
-uest *subreq,
- 		goto failed;
+
+Notes:
+    v2:
+    - Drop change to lease break
+    - Rewrite commit message
+
+ fs/cifs/smb2misc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+index 60d4bd1eae2b..4d8576e202e3 100644
+--- a/fs/cifs/smb2misc.c
++++ b/fs/cifs/smb2misc.c
+@@ -755,7 +755,7 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
  	}
- =
-
--	if (WARN_ON(transferred_or_error > subreq->len - subreq->transferred))
-+	if (WARN(transferred_or_error > subreq->len - subreq->transferred,
-+		 "R%x[%x] %zd > %zu - %zu",
-+		 rreq->debug_id, subreq->debug_index,
-+		 transferred_or_error, subreq->len, subreq->transferred))
- 		transferred_or_error =3D subreq->len - subreq->transferred;
- =
-
- 	subreq->error =3D 0;
+ 	spin_unlock(&cifs_tcp_ses_lock);
+ 	cifs_dbg(FYI, "Can not process oplock break for non-existent connection\n");
+-	return false;
++	return true;
+ }
+ 
+ void
+-- 
+2.28.0
 
