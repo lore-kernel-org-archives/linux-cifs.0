@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC6BC2BA82
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A9EC2BB4C
 	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 00:58:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 29BB964FD6
+	by mail.kernel.org (Postfix) with ESMTP id 98FF964FCB
 	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 00:58:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231513AbhCQA5u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S231761AbhCQA5u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Tue, 16 Mar 2021 20:57:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33010 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:35236 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229896AbhCQAz6 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 16 Mar 2021 20:55:58 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2A4BB64F8F;
-        Wed, 17 Mar 2021 00:55:57 +0000 (UTC)
+        id S231500AbhCQA5P (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 16 Mar 2021 20:57:15 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 84DDA64FB4;
+        Wed, 17 Mar 2021 00:57:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615942558;
-        bh=ay1pn4ySndbEBJDvHwEjIDAYLrbbLtL1itocjZCDnIs=;
+        s=k20201202; t=1615942635;
+        bh=tA4CK3NAKwUToyZ9AmHKSR6pBb2laXj7OM143GZcISg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=s1S2wfBVfPUFD1FFA1SnWlRtIFC+faIp20A79KAqjPBfPb/ug026FGyoIzFME2Uv7
-         37ZCY78+Fr/szYz7EGiOrM9rusdzzEYArfP18Uf3WYSlIHtpRY7qTRvTYk6zV1v3dU
-         Dk9SSX42DpTSMiCJnXfFgfCh2ZkdSE7uQgtt8sN98AQxu0Cohux4GM0OCAtbkGu+an
-         7lx0bzna66uRpPUaG6IE60qZK2GU/GUL/5nHT0oXiV36Nd633ywGIt1wVVemajfC2f
-         am+H+S3GzlQEm7vqy2H8433GbxTYqGXvEI4+DHS1oi7sv4XDcE7/PsudwL7USbmG62
-         Oecdto2omj6wA==
+        b=At0V6t0HJxwsDwbMRAkwxxTXacD0AA06GCO5YLr/Y1Bw9ecHOfX0YKf3aUkyXcax7
+         PNPvncMqs3yzGALSf79yIp3E6fc0tonbJ1WytN/LrzNiUrcTloILAsFkm6xIXmjvq1
+         Ro7EtFewZJV59bnaV6fHY2qywEXqinTe8gJZQKiPqRgxoiQLGbwK4F83LyilOC/zWf
+         2ebUfKL+Tima/dnENBs86smigRdVOptyBhWJzeF2U/qiEcAKZA0Jii5WZDAf9xbrK0
+         HlR+uwZIEf12k4pNwN6VKzeJWT2RA9+pf/0LdleOuWNUn55bDmGFjDlCAzBrAiLz4l
+         dHSjyaGs40pvg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Aurelien Aptel <aaptel@suse.com>,
@@ -38,12 +38,12 @@ Cc:     Aurelien Aptel <aaptel@suse.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.11 17/61] cifs: ask for more credit on async read/write code paths
-Date:   Tue, 16 Mar 2021 20:54:51 -0400
-Message-Id: <20210317005536.724046-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 16/54] cifs: ask for more credit on async read/write code paths
+Date:   Tue, 16 Mar 2021 20:56:15 -0400
+Message-Id: <20210317005654.724862-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210317005536.724046-1-sashal@kernel.org>
-References: <20210317005536.724046-1-sashal@kernel.org>
+In-Reply-To: <20210317005654.724862-1-sashal@kernel.org>
+References: <20210317005654.724862-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -75,10 +75,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 794fc3b68b4f..6a1af5545f67 100644
+index c6f8bc6729aa..d1d550647cd6 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -4033,8 +4033,7 @@ smb2_async_readv(struct cifs_readdata *rdata)
+@@ -4032,8 +4032,7 @@ smb2_async_readv(struct cifs_readdata *rdata)
  	if (rdata->credits.value > 0) {
  		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(rdata->bytes,
  						SMB2_MAX_BUFFER_SIZE));
@@ -88,7 +88,7 @@ index 794fc3b68b4f..6a1af5545f67 100644
  
  		rc = adjust_credits(server, &rdata->credits, rdata->bytes);
  		if (rc)
-@@ -4340,8 +4339,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
+@@ -4339,8 +4338,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
  	if (wdata->credits.value > 0) {
  		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(wdata->bytes,
  						    SMB2_MAX_BUFFER_SIZE));
