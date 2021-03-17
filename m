@@ -2,113 +2,100 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B717AC433E0
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 10:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D957C433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 11:26:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D9B564F3C
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 10:54:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2938C64F6E
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 11:26:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230369AbhCQKyJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 17 Mar 2021 06:54:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59502 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230173AbhCQKxv (ORCPT
+        id S231366AbhCQLZm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 17 Mar 2021 07:25:42 -0400
+Received: from p3plsmtpa06-06.prod.phx3.secureserver.net ([173.201.192.107]:44075
+        "EHLO p3plsmtpa06-06.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230171AbhCQLZN (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 17 Mar 2021 06:53:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615978430;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CrP2lfrrdq12nJd/eCkP5MvOV60FCODOOLwLlbcHJdc=;
-        b=BXgd9mFEKFsNVzraqleu/LAUXDgwd35VgXYK4Qxm1rLofSc1fFY+MZJI5Gh/ev2gh2Nyle
-        /o/8ma8oVffjRKKn1ERgWjpjQVp9GECc9g1w40p1woBs+3u8aZavh4D6s+Hgd1o4k+agti
-        qaay9OMm2uk6gWgK7WsosFr/gvsjb90=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-YK1MK1d2OtGgyArc0_7DAQ-1; Wed, 17 Mar 2021 06:53:49 -0400
-X-MC-Unique: YK1MK1d2OtGgyArc0_7DAQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B60C84BA43;
-        Wed, 17 Mar 2021 10:53:46 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-113-138.rdu2.redhat.com [10.10.113.138])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D8CE6C32F;
-        Wed, 17 Mar 2021 10:53:42 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <31382.1615971849@warthog.procyon.org.uk>
-References: <31382.1615971849@warthog.procyon.org.uk> <CAHk-=whWoJhGeMn85LOh9FX-5d2-Upzmv1m2ZmYxvD31TKpUTA@mail.gmail.com> <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk> <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk> <20210316190707.GD3420@casper.infradead.org> <CAHk-=wjSGsRj7xwhSMQ6dAQiz53xA39pOG+XA_WeTgwBBu4uqg@mail.gmail.com> <887b9eb7-2764-3659-d0bf-6a034a031618@toxicpanda.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Josef Bacik <josef@toxicpanda.com>,
-        Matthew Wilcox <willy@infradead.org>, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Linux-MM <linux-mm@kvack.org>, linux-cachefs@redhat.com,
-        linux-afs@lists.infradead.org,
-        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 02/28] mm: Add an unlock function for PG_private_2/PG_fscache
+        Wed, 17 Mar 2021 07:25:13 -0400
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id MUIalRxa8EYmdMUIblBzbC; Wed, 17 Mar 2021 04:25:13 -0700
+X-CMAE-Analysis: v=2.4 cv=adukITkt c=1 sm=1 tr=0 ts=6051e719
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=zilokg64RarliigfnAMA:9 a=QEXdDO2ut3YA:10
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: xfstest 614 and allocation size should not be 0
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5mvD4CRP_iZRNhS+809wxOj8FSc4FHbN+UVFp8+pMJcpyg@mail.gmail.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <fef5a851-6ce2-457d-ccf9-3d8a13193193@talpey.com>
+Date:   Wed, 17 Mar 2021 07:25:13 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <38367.1615978421.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Wed, 17 Mar 2021 10:53:41 +0000
-Message-ID: <38368.1615978421@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <CAH2r5mvD4CRP_iZRNhS+809wxOj8FSc4FHbN+UVFp8+pMJcpyg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfAbNFX4/UFj7g8W46YZ2RbRvAVdhTy+HBrjcOOw1zyJGchk3zKqlS7jY/1Eaa0W59vq4dbIK1HK58qvX/aG2355iOgZa60Yjxe2XaWXKbH4Xs6KTnbzL
+ VIxVsAEOUQr1AT3pCkvlvejVxPE1WKx6hmzCmtGEp2ygAx1gS3jT02G+MlG44V0G4EWYtip5D0GOYArOeSp1TCbxKIVr+YUtONSoW49Xf7qXD7q0ql2cLI4s
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-David Howells <dhowells@redhat.com> wrote:
+On 3/17/2021 2:10 AM, Steve French wrote:
+> Was examining why xfstest 614 failed (smb3.1.1 mount to Windows), and
+> noticed a couple of problems:
+> 
+> 1) we don't requery the allocation size (number of blocks) in all
+> cases we should. This small fix should address that
+> 
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@ -2390,15 +2390,16 @@ int cifs_getattr(struct user_namespace
+> *mnt_userns, const struct path *path,
+>          struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+>          struct inode *inode = d_inode(dentry);
+>          int rc;
+>          /*
+>           * We need to be sure that all dirty pages are written and the server
+>           * has actual ctime, mtime and file length.
+>           */
+> -       if ((request_mask & (STATX_CTIME | STATX_MTIME | STATX_SIZE)) &&
+> +       if ((request_mask & (STATX_CTIME | STATX_MTIME | STATX_SIZE |
+> STATX_BLOCKS)) &&
 
->  (1) For the old fscache code that I'm trying to phase out, it does not =
-take a
->      ref when PG_fscache is taken (probably incorrectly), relying instea=
-d on
->      releasepage, etc. getting called to strip the PG_fscache bit.  PG_f=
-scache
->      is held for the lifetime of the page, indicating that fscache knows=
- about
->      it and might access it at any time (to write to the cache in the
->      background for example or to move pages around in the cache).
-> =
+Seems obviously enough correct.
 
->      Here PG_fscache should not prevent page eviction or migration and i=
-t's
->      analogous to PG_private.
-> =
+> and 2) we don't set the allocation size on the case where a cached
+> file on this client is written, and to make it worse if we queried
 
->      That said, the old fscache code keeps its own radix trees of pages =
-that
->      are undergoing write to the cache, so to allow a page to be evicted=
-,
->      releasepage and co. have to consult those
->      (__fscache_maybe_release_page()).
+Also obviously the cache needs to be kept in sync, but is it accurate to
+set the allocation size before writing? That's the server's field, so
+shouldn't it be written, then queried?
 
-Note that, ideally, we'll be able to remove the old fscache I/O code in th=
-e
-next merge window or the one after.
+> (post query attributes flag) at SMB3 close for compounded operations -
+> the Windows server (not sure about others) apparently doesn't update
+> the allocation size until the next open/queryinfo so we still end up
+> with an allocation size of 0 for a 64K file which breaks the test.
+> 
+> What the test is doing is quite simple:
+> 
+> xfs_io -f -c "truncate 64K" -c "mmap -w 0 64K" -c "mwrite -S 0xab 0
+> 64K" -c "munmap" foo1 ; stat -c %b foo1
+> 
+> And it fails - due to seeing a number of blocks 0 rather than the
+> correct value (128).  With actimeo=0 we do a subsequent open/query
+> operation which would cause it to pass since the second open/query
+> does show the correct allocation size.
+> 
+> Any ideas?
 
-David
+What actually goes on the wire diring the test? It looks like the
+munmap step should be msync'ing - does cifs.ko not write the data?
 
+Tom.
