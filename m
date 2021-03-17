@@ -4,33 +4,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D068FC4321A
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 01:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA2ADC433E0
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 01:20:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A657164F8F
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 01:01:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C8DF64F8C
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 01:20:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231715AbhCQBAV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Mar 2021 21:00:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36880 "EHLO mail.kernel.org"
+        id S229958AbhCQBUT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Mar 2021 21:20:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36118 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231689AbhCQA6m (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 16 Mar 2021 20:58:42 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8375664F97;
-        Wed, 17 Mar 2021 00:58:29 +0000 (UTC)
+        id S231679AbhCQA5a (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 16 Mar 2021 20:57:30 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0A3D664FC7;
+        Wed, 17 Mar 2021 00:57:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615942710;
-        bh=lZGNK4lXsjYhL4aluZcte66kaRelmfSa7GPvMTdCiQc=;
+        s=k20201202; t=1615942649;
+        bh=v4aQ1C+PHdEewD1wIyzJBQ9dILGTKmpEYaUkaBDltbc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lYa09+IplD5JQlAwiPb6YjAVyWBUP2ciVz6Z8DQ3mkyandjQfctoIEgXttyKkqv0g
-         05epcbRWgQmqKej/JcDJWN0noe0+715QOZuZwuQ87WRhBFVYE+tqYLD1qEEDBFjiSM
-         lCs3tHSTBtk5IJWxAhrQUcNtxewwtoXClFvwi+6O8VrLWvdMd7gXqTnxiNIRpe34Pb
-         oPTMmb77CBJ/9DgyHcFGAvNKfGsSWqyYptzbwgsC+NIuX8oGNUN+zYFre/gifk6gaM
-         fegCojq759KIE8nGR+NoqFLA9TPmunnPAoxQ/3isybtd1Hn5kCYb0P520SWpM/J1+F
-         ACV3zxCf9dK9g==
+        b=qWtQYK8xMZttJa6+tsZvRgK+4JlQxCK7ZNKk1llp/dzPAmhfDgH0ZNT9WRe6/xzDR
+         IT9BhFwhz3kc8OiNeT9ipy6lmK4lZKhi7Pm9ZKgc6liWnF1nxzE4X/8VveeOVWvSwo
+         gt5i5L+xr4njE5837nuLnwasyATfjCVubbdkg9hF5wUL1Vh8dG+mtrZOnuUfAozjRL
+         67Zdfse0pHU8/1OVc1FmPvXKVfpjqpm/VRkUCOKv52bLeEXldBDFqHmMQmjmVhCiFb
+         uywSV7E+/a58MRaDtvhIxi//S90gygYMWmVWZl3snhl6JIDg3kEWt2qneg2M8zAl6R
+         XnAmvH3FFlxmg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Paulo Alcantara <pc@cjr.nz>, Aurelien Aptel <aaptel@suse.com>,
@@ -38,12 +38,12 @@ Cc:     Paulo Alcantara <pc@cjr.nz>, Aurelien Aptel <aaptel@suse.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 22/37] cifs: change noisy error message to FYI
-Date:   Tue, 16 Mar 2021 20:57:47 -0400
-Message-Id: <20210317005802.725825-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 28/54] cifs: change noisy error message to FYI
+Date:   Tue, 16 Mar 2021 20:56:27 -0400
+Message-Id: <20210317005654.724862-28-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210317005802.725825-1-sashal@kernel.org>
-References: <20210317005802.725825-1-sashal@kernel.org>
+In-Reply-To: <20210317005654.724862-1-sashal@kernel.org>
+References: <20210317005654.724862-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -79,10 +79,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
-index eab7940bfebe..ec61c2afa154 100644
+index 9391cd17a2b5..fc9278ca26c0 100644
 --- a/fs/cifs/transport.c
 +++ b/fs/cifs/transport.c
-@@ -1145,7 +1145,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+@@ -1167,7 +1167,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
  	}
  	if (rc != 0) {
  		for (; i < num_rqst; i++) {
