@@ -4,43 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10929C4321A
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 01:00:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D068FC4321A
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 01:01:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9D7164F10
-	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 01:00:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A657164F8F
+	for <linux-cifs@archiver.kernel.org>; Wed, 17 Mar 2021 01:01:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231752AbhCQBAU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Mar 2021 21:00:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37408 "EHLO mail.kernel.org"
+        id S231715AbhCQBAV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Mar 2021 21:00:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36880 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232065AbhCQA62 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 16 Mar 2021 20:58:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9F40564F9C;
-        Wed, 17 Mar 2021 00:58:17 +0000 (UTC)
+        id S231689AbhCQA6m (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 16 Mar 2021 20:58:42 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8375664F97;
+        Wed, 17 Mar 2021 00:58:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615942698;
-        bh=xVKSMKGIWpO1GBcmuKdqsKwbK1EeZMVxxrB8EVYVhfE=;
+        s=k20201202; t=1615942710;
+        bh=lZGNK4lXsjYhL4aluZcte66kaRelmfSa7GPvMTdCiQc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lnFjkCLlXP+tXX8XWgevLJ/fQXE6UiiEQRAgKDKeFyAgTvZpc0G1DWyJ64oSh8vIw
-         awGgJn4Ipt3OW69IMuLSnaQH5PZ3HYgDG6TSz+Ycu9ICqxwaZBnObqoq1XAmfUDbJl
-         2+hstOJhiAul7DKyNX/NuC1O7niW5ePZfUna0dnql/aCNklKM8N9w5v2seK1rcIRaW
-         U482Pyu9MfxKIyGMjnJRqoCwtElqu7zruqSCywP+26n8HB2CStDVWFeYmIzx1oWF5j
-         /Ke3YlBfHvb5CJC09d3Pf/fa3JlNDtNsXhfja6idXkPAn4B47Kj7a/wLUmhCld4O99
-         kuae4HA8hawVA==
+        b=lYa09+IplD5JQlAwiPb6YjAVyWBUP2ciVz6Z8DQ3mkyandjQfctoIEgXttyKkqv0g
+         05epcbRWgQmqKej/JcDJWN0noe0+715QOZuZwuQ87WRhBFVYE+tqYLD1qEEDBFjiSM
+         lCs3tHSTBtk5IJWxAhrQUcNtxewwtoXClFvwi+6O8VrLWvdMd7gXqTnxiNIRpe34Pb
+         oPTMmb77CBJ/9DgyHcFGAvNKfGsSWqyYptzbwgsC+NIuX8oGNUN+zYFre/gifk6gaM
+         fegCojq759KIE8nGR+NoqFLA9TPmunnPAoxQ/3isybtd1Hn5kCYb0P520SWpM/J1+F
+         ACV3zxCf9dK9g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Aurelien Aptel <aaptel@suse.com>,
-        Shyam Prasad N <sprasad@microsoft.com>,
+Cc:     Paulo Alcantara <pc@cjr.nz>, Aurelien Aptel <aaptel@suse.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 12/37] cifs: ask for more credit on async read/write code paths
-Date:   Tue, 16 Mar 2021 20:57:37 -0400
-Message-Id: <20210317005802.725825-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 22/37] cifs: change noisy error message to FYI
+Date:   Tue, 16 Mar 2021 20:57:47 -0400
+Message-Id: <20210317005802.725825-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210317005802.725825-1-sashal@kernel.org>
 References: <20210317005802.725825-1-sashal@kernel.org>
@@ -52,52 +52,45 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Aurelien Aptel <aaptel@suse.com>
+From: Paulo Alcantara <pc@cjr.nz>
 
-[ Upstream commit 88fd98a2306755b965e4f4567f84e73db3b6738c ]
+[ Upstream commit e3d100eae44b42f309c1366efb8397368f1cf8ed ]
 
-When doing a large read or write workload we only
-very gradually increase the number of credits
-which can cause problems with parallelizing large i/o
-(I/O ramps up more slowly than it should for large
-read/write workloads) especially with multichannel
-when the number of credits on the secondary channels
-starts out low (e.g. less than about 130) or when
-recovering after server throttled back the number
-of credit.
+A customer has reported that their dmesg were being flooded by
 
-Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
+  CIFS: VFS: \\server Cancelling wait for mid xxx cmd: a
+  CIFS: VFS: \\server Cancelling wait for mid yyy cmd: b
+  CIFS: VFS: \\server Cancelling wait for mid zzz cmd: c
+
+because some processes that were performing statfs(2) on the share had
+been interrupted due to their automount setup when certain users
+logged in and out.
+
+Change it to FYI as they should be mostly informative rather than
+error messages.
+
+Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/smb2pdu.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ fs/cifs/transport.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 7adecfd0c1e9..81d9c4ea0e8f 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3743,8 +3743,7 @@ smb2_async_readv(struct cifs_readdata *rdata)
- 	if (rdata->credits.value > 0) {
- 		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(rdata->bytes,
- 						SMB2_MAX_BUFFER_SIZE));
--		shdr->CreditRequest =
--			cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 1);
-+		shdr->CreditRequest = cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 8);
- 
- 		rc = adjust_credits(server, &rdata->credits, rdata->bytes);
- 		if (rc)
-@@ -4038,8 +4037,7 @@ smb2_async_writev(struct cifs_writedata *wdata,
- 	if (wdata->credits.value > 0) {
- 		shdr->CreditCharge = cpu_to_le16(DIV_ROUND_UP(wdata->bytes,
- 						    SMB2_MAX_BUFFER_SIZE));
--		shdr->CreditRequest =
--			cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 1);
-+		shdr->CreditRequest = cpu_to_le16(le16_to_cpu(shdr->CreditCharge) + 8);
- 
- 		rc = adjust_credits(server, &wdata->credits, wdata->bytes);
- 		if (rc)
+diff --git a/fs/cifs/transport.c b/fs/cifs/transport.c
+index eab7940bfebe..ec61c2afa154 100644
+--- a/fs/cifs/transport.c
++++ b/fs/cifs/transport.c
+@@ -1145,7 +1145,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	}
+ 	if (rc != 0) {
+ 		for (; i < num_rqst; i++) {
+-			cifs_server_dbg(VFS, "Cancelling wait for mid %llu cmd: %d\n",
++			cifs_server_dbg(FYI, "Cancelling wait for mid %llu cmd: %d\n",
+ 				 midQ[i]->mid, le16_to_cpu(midQ[i]->command));
+ 			send_cancel(server, &rqst[i], midQ[i]);
+ 			spin_lock(&GlobalMid_Lock);
 -- 
 2.30.1
 
