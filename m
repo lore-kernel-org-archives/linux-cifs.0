@@ -2,189 +2,87 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9642C433E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 13:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C9DC433E0
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Mar 2021 07:25:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91FBA6191F
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 13:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1721164F01
+	for <linux-cifs@archiver.kernel.org>; Thu, 18 Mar 2021 07:25:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231376AbhCVN0N (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 09:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35340 "EHLO
+        id S229787AbhCRHYm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Mar 2021 03:24:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230448AbhCVNZn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 09:25:43 -0400
+        with ESMTP id S229784AbhCRHYK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Mar 2021 03:24:10 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E74CEC061574;
-        Mon, 22 Mar 2021 06:25:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 577B7C06174A
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Mar 2021 00:24:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-         s=42; h=Date:Message-ID:From:Cc:To;
-        bh=2pTAH7EZAdLSAE5R2Xy8ywDt2Dc8ZTDLeumutAH0RKU=; b=F7YPZX3VvyRxSNzrKKb6ys3K0F
-        g+79KJDZCDh/WBu0TgwYzmdi2Nm+16fysh9gkcNlk9X6ZbJ9XHL/6KoUcFJIO3Mlw/M5Dd+pnqxmZ
-        wFi2LHPqy7D1kWTpHOvlJkzVYHx6eXIG1Dd3qmQm5nZf4hyIAdccTP4tWwmEBGRyVX0fyw7ZUMskC
-        X2aInc0n9a47I0H9A+Td2IpUQdgtWPJaswlqPYvA8KF6hEz61yZ0Kbc7G3440uwUjA+vYDcFJo6xZ
-        bIwkgpQTHOl+87LLFfANc7pO1zW/obLuA6t+wnIjW+agrMLgMqelSn4n8qTIcHyS8O47cBJ+PPaSg
-        HNNyY/077ThHBATQl3YhRxPimrc5LxT03J04G57L9mKP99/OeJTnmqGRx1w0IfOij2hQ45Ss5CSYl
-        ksytvPiVXaIN48IFTFpR8OXpH7nBZsqo2mbzQWeg7oLiQBH6JpBjhRE3FJiG1zmd/Qu7oGg8NKItA
-        kDRcB2xL2ccLwYcNVC/9yBiR;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+         s=42; h=Message-ID:Date:To:From:CC;
+        bh=yM7H0ESbl80aNeiTcgrZ2sN2FYU6bqQ2HcEkrpW144U=; b=hhtChp9UoB3Jzh36aKPTv13fXX
+        p98E8u+tqOfdKYHFHRn4bFN1E2zyRQyx1XnXP8LVJNUlXlvw8RsJBcCPxuX2fORwz3MG1gnSFc8kh
+        dkFV/tcIN59JFL8BALeaiocvVfhlfDMDMmdvaWU1k9Gtzsvw8auglCwO8CIC+HBnWAhJ9O94wyTut
+        k2apLv+W156yxZI6yj9POvlFcLNjmGEUG/Qh0rAq03+jPXZdMOGnUq/XvLYHb/qPcf/F7I9VLPWJN
+        NrmKHIvOafzFYHYB9GZjUZ0tAKf0VWcFn8Uf+94imgHJ+fSnbIRVhgFcNxyI7M5/dIVtwq7ODpDeJ
+        oOdhgdGmO7PZkvNbzjFpPDI2ZZ5h1lseRHUAXxriyuYMNtYJjmTajFgimC4e8bLtd8LI4ZyiHxWnH
+        Z5l5TuI2pDs8uGfyPaXi30M629vz506aZVPhtWCRCR8NiXU2/vfCf96ytXR5tx9MiRK6RMRtrGpKD
+        na48lsgu6wsZTFzXGcxBMBQH;
+Received: from [2a01:4f8:192:486::6:0] (port=38178 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1lOKYq-0003UK-Bn; Mon, 22 Mar 2021 13:25:36 +0000
-To:     Christoph Hellwig <hch@lst.de>,
-        Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     linux-cifs@vger.kernel.org, aurelien.aptel@gmail.com,
-        linux-cifsd-devel@lists.sourceforge.net, senozhatsky@chromium.org,
-        rdunlap@infradead.org, sandeen@sandeen.net,
-        linux-kernel@vger.kernel.org, aaptel@suse.com, hch@infradead.org,
-        viro@zeniv.linux.org.uk, ronniesahlberg@gmail.com,
-        linux-fsdevel@vger.kernel.org, colin.king@canonical.com,
-        Steve French <stfrench@microsoft.com>
-References: <20210322051344.1706-1-namjae.jeon@samsung.com>
- <CGME20210322052206epcas1p438f15851216f07540537c5547a0a2c02@epcas1p4.samsung.com>
- <20210322051344.1706-3-namjae.jeon@samsung.com> <20210322064712.GD1667@kadam>
- <20210322065011.GA2909@lst.de>
-From:   Stefan Metzmacher <metze@samba.org>
-Subject: Re: [Linux-cifsd-devel] [PATCH 2/5] cifsd: add server-side procedures
- for SMB3
-Message-ID: <7894be19-54f6-4c2c-daaa-1db03141e87c@samba.org>
-Date:   Mon, 22 Mar 2021 14:25:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id 1lMn0j-0005W3-9p
+        for cifs-qa@samba.org; Thu, 18 Mar 2021 07:24:01 +0000
+Received: from [::1] (port=63596 helo=bugzilla.samba.org)
+        by hr6.samba.org with esmtp (Exim 4.93)
+        (envelope-from <samba-bugs@samba.org>)
+        id 1lMn0i-002iWF-PS
+        for cifs-qa@samba.org; Thu, 18 Mar 2021 07:24:00 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 14476] Cannot set timestamp of Minshall-French symlinks from a
+ CIFS mount
+Date:   Thu, 18 Mar 2021 07:23:59 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 5.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: bjacke@samba.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: sfrench@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: version
+Message-ID: <bug-14476-10630-DvVDRLIoEM@https.bugzilla.samba.org/>
+In-Reply-To: <bug-14476-10630@https.bugzilla.samba.org/>
+References: <bug-14476-10630@https.bugzilla.samba.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <20210322065011.GA2909@lst.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="6UnFxiyjAB23kM2930rUzzDEuwXWMZy9h"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6UnFxiyjAB23kM2930rUzzDEuwXWMZy9h
-Content-Type: multipart/mixed; boundary="4qSVWlLiwZ2A06gYey0rbvw7kWnkj4pov";
- protected-headers="v1"
-From: Stefan Metzmacher <metze@samba.org>
-To: Christoph Hellwig <hch@lst.de>, Dan Carpenter <dan.carpenter@oracle.com>
-Cc: linux-cifs@vger.kernel.org, aurelien.aptel@gmail.com,
- linux-cifsd-devel@lists.sourceforge.net, senozhatsky@chromium.org,
- rdunlap@infradead.org, sandeen@sandeen.net, linux-kernel@vger.kernel.org,
- aaptel@suse.com, hch@infradead.org, viro@zeniv.linux.org.uk,
- ronniesahlberg@gmail.com, linux-fsdevel@vger.kernel.org,
- colin.king@canonical.com, Steve French <stfrench@microsoft.com>
-Message-ID: <7894be19-54f6-4c2c-daaa-1db03141e87c@samba.org>
-Subject: Re: [Linux-cifsd-devel] [PATCH 2/5] cifsd: add server-side procedures
- for SMB3
-References: <20210322051344.1706-1-namjae.jeon@samsung.com>
- <CGME20210322052206epcas1p438f15851216f07540537c5547a0a2c02@epcas1p4.samsung.com>
- <20210322051344.1706-3-namjae.jeon@samsung.com> <20210322064712.GD1667@kadam>
- <20210322065011.GA2909@lst.de>
-In-Reply-To: <20210322065011.GA2909@lst.de>
+https://bugzilla.samba.org/show_bug.cgi?id=3D14476
 
---4qSVWlLiwZ2A06gYey0rbvw7kWnkj4pov
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Bj=C3=B6rn Jacke <bjacke@samba.org> changed:
 
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+            Version|3.x                         |5.x
 
-Am 22.03.21 um 07:50 schrieb Christoph Hellwig:
-> On Mon, Mar 22, 2021 at 09:47:13AM +0300, Dan Carpenter wrote:
->> On Mon, Mar 22, 2021 at 02:13:41PM +0900, Namjae Jeon wrote:
->>> +static unsigned char
->>> +asn1_octet_decode(struct asn1_ctx *ctx, unsigned char *ch)
->>> +{
->>> +	if (ctx->pointer >=3D ctx->end) {
->>> +		ctx->error =3D ASN1_ERR_DEC_EMPTY;
->>> +		return 0;
->>> +	}
->>> +	*ch =3D *(ctx->pointer)++;
->>> +	return 1;
->>> +}
->>
->>
->> Make this bool.
->>
->=20
-> More importantly don't add another ANS1 parser, but use the generic
-> one in lib/asn1_decoder.c instead.  CIFS should also really use it.
-
-I think the best would be to avoid asn1 completely in the kernel
-and do the whole authentication in userspace.
-
-The kernel can only deal this blobs here, I don't there's need to
-look inside the blobs.
-
-1. ksmbd-mount would provide a fixed initial blob that's always
-   the same and will be returned in the
-   "2.2.4 SMB2 NEGOTIATE Response" PDU as SecurityBuffer
-
-2. The kernel just blindly forwards the SecurityBuffer
-   of "2.2.5 SMB2 SESSION_SETUP Request" to userspace
-   together with the client provided SessionId (from
-   2.2.1.2 SMB2 Packet Header - SYNC) as well as
-   negotiated signing and encryption algorithm ids
-   and the latest preauth hash.
-
-3. Userspace passes a NTSTATUS together with SecurityBuffer blob for the
-   2.2.6 SMB2 SESSION_SETUP Response back to the kernel:
-
-   - NT_STATUS_MORE_PROCESSING_REQUIRED (more authentication legs are req=
-uired)
-     SecurityBuffer is most likely a non empty buffer
-
-   - NT_STATUS_OK - The authentication is complete:
-     SecurityBuffer might be empty or not
-     It also pass a channel signing key, a decryption and encrytion key
-     as well as the unix token ( I guess in the current form it's only ui=
-d/gid)
-     down to the kernel
-
-   - Any other status means the authentication failed, which is a hard er=
-ror for the client
-
-The PDU definitions are defined here:
-https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-smb2/6eaf=
-6e75-9c23-4eda-be99-c9223c60b181
-
-I think everything else belongs to userspace.
-
-Such a "simple" design for the kernel part, would mean that ksmbd-mount w=
-ould do what the
-kernel part is currently doing, but it also means it will be trivial to p=
-lug the userspace
-part to samba's winbindd in future order to get domain wide authenticatio=
-n.
-
-metze
-
-
---4qSVWlLiwZ2A06gYey0rbvw7kWnkj4pov--
-
---6UnFxiyjAB23kM2930rUzzDEuwXWMZy9h
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEfFbGo3YXpfgryIw9DbX1YShpvVYFAmBYmsQACgkQDbX1YShp
-vVYCDA/9HKKADvAj1r/udNzjMzn+kT+4lpHFRzQltPBVe7JMdFry6XDgGe1DG8Gs
-EHzPQpIOI2xJgOM+DnyIXM0DHnSrgjsYHsnQXikDYUw5gZMAx9djJI55ncFZrIj5
-cvbM4zmflCwErzMBVu2535fUmKoMgv0ny5nYoL5wzqlD5kaAz3l30Nzlul7HwH6X
-R7cZFrrKmO1h9Of5JOIicok5CieJgOq/1dcmilEJQ6P2sc9qYhnVlf2vnTSRWPbo
-XtaIB7kawTE3QrCCdUu6FYQe5h6yxwl9bOKHVZ1IQ8d8JHszi0OHCF5Z3PcJLg5Q
-n3vKFNMpeAeMjy813zSDvh6CDkgHsU/zkJnQeCu54Pe407NwoW9KSaDFG6PFZsyV
-cGuHyShF7YRP5PScFsM5YSR29T6pzQDbLocsIcxoMawu7Ls3wYAa2W1fqH9ZmtgN
-vyOQrP924JFkuxfpTlDygvYT/bnnos93tVBlX6Hq70LUcI5i1Thd6fQFEYcQ74zt
-xxFx0bwXZxwPgaAWxySEegYBHnV8dxxj336e7LhRcMyBmn/tQo3Pjb+Lv2866wee
-yqSMVDQX9sCXd7XIwewEN9fhZ3zvRmSNgPIdC82ge59LhT8oiYH/f2XHMc5/B/vY
-+6wBng+/T/CNYdle2y1TCY4hRV58X0IdHDopdvxWogEG5Fvyx3w=
-=n0tH
------END PGP SIGNATURE-----
-
---6UnFxiyjAB23kM2930rUzzDEuwXWMZy9h--
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
