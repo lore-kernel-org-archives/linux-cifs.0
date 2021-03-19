@@ -2,111 +2,111 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 906BFC433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE50EC433E0
 	for <linux-cifs@archiver.kernel.org>; Fri, 19 Mar 2021 05:53:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3BD0E64ED7
+	by mail.kernel.org (Postfix) with ESMTP id 7F7D064DBD
 	for <linux-cifs@archiver.kernel.org>; Fri, 19 Mar 2021 05:53:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233913AbhCSFxI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 19 Mar 2021 01:53:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56920 "EHLO
+        id S233865AbhCSFxH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 Mar 2021 01:53:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230337AbhCSFxH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Mar 2021 01:53:07 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85563C06174A;
-        Thu, 18 Mar 2021 22:53:06 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id f26so10481203ljp.8;
-        Thu, 18 Mar 2021 22:53:06 -0700 (PDT)
+        with ESMTP id S233904AbhCSFwj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Mar 2021 01:52:39 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4BAC06174A
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Mar 2021 22:52:38 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id g8so1092606lfv.12
+        for <linux-cifs@vger.kernel.org>; Thu, 18 Mar 2021 22:52:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ieKEg/I8DWyrNnzM2/enM81rs852gdyY9A7m+JJ808U=;
-        b=iquAE73D+G5vtFjan5O+JlTPfC66rcUGH/5thoAYHxPmC24aRf/jy+PA3N8+BpHx3u
-         g2KmGfunQ6z4ink3IHSgAg1+a+VbCxC5nivZehVhVfMDUa5V0lcH9eHLBAcfktr8HB8c
-         JXd/YLFYA/QBhunWB86TPz8WYOP2qb90C5psmvcS/0gnMmftlZJ6VOwD3mMBLpo+g75Y
-         9/o+y+Lke2U7b2OXIvaj9v29YDqNG4rRkFWPwNSgCPKmsNJj8FW4AcdIfAvLn89O/ldy
-         UlccC/CAB3UN3X1dzXG79XeZn3AByb9CGsFRvnx7RebEg1BJ/cbnVbk/xcJYqH2n8LIF
-         4jRw==
+         :cc:content-transfer-encoding;
+        bh=ZuDTEVlmsc1G1XeamRhw8f0Asf1nygL71LykZCWq1lY=;
+        b=LThnh7tj/JXDp1SySeHzX2LymuqEc6yF2INzLwPvVGSa2Rl7erzfsIbeN+V5Np/Xdx
+         7eBKw1H9a1k2FzEnN524+OWFLJEQt0dc/gO0kEFKc2Ii//gv3oDfkMwXn3HmqxBdPwIe
+         IQnDktDS/E+oO+oaJnHVIGLFa94vpajk/9M1WqTuAIDdFuyEwn8Tku6NSVKhafts4sHM
+         Pc7pxAs44nQubtoZWJVO5oFT8LP/lKMdEIav8u81f7uISUDMez3uZTZUtrI51w+mxuE1
+         LrD8ltInLiiPzveGBNHHfSQWEbT0HFDoanv2zFTTMs998VVy7dnqiDlpqcvnfqfC0Cr6
+         x4zA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ieKEg/I8DWyrNnzM2/enM81rs852gdyY9A7m+JJ808U=;
-        b=WqpnTYz9k2syMObDxb92llGYJPr2Bxo4sYM2EIMXZMbKDDMVps3bcnkIDO/mgyYEZL
-         pZ5A+XDb52T5B4Q6d8liyrRQsnprT1wh9V6N4GJsCCGAHiBN45gqkbVFGFM6muHb+dTy
-         bVJWa9iYYVLVpil6LbhS1Tn3Wt0aThAW+ke1QwgE+SLhA5G0CCN3JQma3VKvXybXJbQ6
-         X59qPqnhqVyF158A5bVJH2DZKLlfQaOHEp11vsziKvhCh1yR/uAlw7PCV9bpqb4I+6Yj
-         Af8sg7nGBHUc1MDaM9LSOeH+Bv+2H5jDND6rvrm7/odVley8Jji3zE11ALPcwIxUpiI5
-         p8+w==
-X-Gm-Message-State: AOAM533/zsnMVPNxvY+sOn2AvBjssJCxScKtomI+un3xrAfFpuZOpnxw
-        PwfnNdnM+hqxn4wxaUkQ5KXmjlEEHTo0bgLGMFw=
-X-Google-Smtp-Source: ABdhPJydyF85xrIO4j2aR2Wm5nIVy2epWPKLP+h7WXhkpS3H1B7/f3GVCd/4EXVHM/UTaYywdG+DosSaWPia01x72gk=
-X-Received: by 2002:a2e:9907:: with SMTP id v7mr3584997lji.256.1616133185055;
- Thu, 18 Mar 2021 22:53:05 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ZuDTEVlmsc1G1XeamRhw8f0Asf1nygL71LykZCWq1lY=;
+        b=UNEUX9V6d/piYOhxOeUlLUS4sYJe05IvijiaS5RbdkF5bqQoOpxf6PMOREu7eS8Vh8
+         UVXm1vpOAzw4fcwpfq6DIjm7jIpnZEouXqrLp5/gZwnChrPtMveJecwVrgFHTV0F3KOg
+         EUNpiGWN81nahtHHm3xLSBUY6KqA/xeLl8imzLOkH1xZAru27c71Giuuhm4rRRPc+YTh
+         fEiQgUyg9vaowRAJEcbeAwMrW4yhJE2Rcrc2+bI9qphV00IRCDG/lxA4m+1rrcZ1AhLV
+         QaOIIvbdUx52LC6S20tnJrkgzyY7gjv7T3z3uBbNzy7ugjC8RzWb9o76IFz67l8J2bZw
+         nLmQ==
+X-Gm-Message-State: AOAM532PN/4ZQAajRxK4CGBpun086tI/I4zkSWFW2ANyxSYxCrb2H2Vr
+        HR7xi57zLcWaGbzPz8KtU5wR6Kg7hplftFupzVA=
+X-Google-Smtp-Source: ABdhPJylQsUg9L8UHG2LXHYH34z0w61w0+39OmwoRWkAIdZ6nTS2MWexdbMHsEHJ2+H+GhHHkDmvRryqBsQwMaRK6Bk=
+X-Received: by 2002:a19:7515:: with SMTP id y21mr7603831lfe.282.1616133157476;
+ Thu, 18 Mar 2021 22:52:37 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210319004657.485503-1-liu.xuzhi@zte.com.cn>
-In-Reply-To: <20210319004657.485503-1-liu.xuzhi@zte.com.cn>
+References: <20210318181710.9003-1-aaptel@suse.com>
+In-Reply-To: <20210318181710.9003-1-aaptel@suse.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 19 Mar 2021 00:52:54 -0500
-Message-ID: <CAH2r5mvXw8mdY1b56O6802NoemXMh70P4MJY0E-dr-rZ6=Cu-A@mail.gmail.com>
-Subject: Re: [PATCH] fs/cifs/: fix misspellings using codespell tool
-To:     menglong8.dong@gmail.com
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Liu xuzhi <liu.xuzhi@zte.com.cn>
+Date:   Fri, 19 Mar 2021 00:52:26 -0500
+Message-ID: <CAH2r5msdofNV9um=-YkzcRiJdRVi6L-P8ejrLUuouW-YGmmgGw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: warn and fail if trying to use rootfs without the
+ config option
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 merged into cifs-2.6.git for-next
 
-On Thu, Mar 18, 2021 at 7:50 PM <menglong8.dong@gmail.com> wrote:
+On Thu, Mar 18, 2021 at 1:17 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
+:
 >
-> From: Liu xuzhi <liu.xuzhi@zte.com.cn>
+> From: Aurelien Aptel <aaptel@suse.com>
 >
-> A typo is found out by codespell tool in 251th lines of cifs_swn.c:
->
-> $ codespell ./fs/cifs/
-> ./cifs_swn.c:251: funciton  ==> function
->
-> Fix a typo found by codespell.
->
-> Signed-off-by: Liu xuzhi <liu.xuzhi@zte.com.cn>
+> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
 > ---
->  fs/cifs/cifs_swn.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  fs/cifs/fs_context.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 >
-> diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
-> index f2d730fffccb..d829b8bf833e 100644
-> --- a/fs/cifs/cifs_swn.c
-> +++ b/fs/cifs/cifs_swn.c
-> @@ -248,7 +248,7 @@ static int cifs_swn_send_unregister_message(struct cifs_swn_reg *swnreg)
->
->  /*
->   * Try to find a matching registration for the tcon's server name and share name.
-> - * Calls to this funciton must be protected by cifs_swnreg_idr_mutex.
-> + * Calls to this function must be protected by cifs_swnreg_idr_mutex.
->   * TODO Try to avoid memory allocations
->   */
->  static struct cifs_swn_reg *cifs_find_swn_reg(struct cifs_tcon *tcon)
+> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+> index 9b0e82bc584f..d0580e2d1f32 100644
+> --- a/fs/cifs/fs_context.c
+> +++ b/fs/cifs/fs_context.c
+> @@ -1197,9 +1197,11 @@ static int smb3_fs_context_parse_param(struct fs_c=
+ontext *fc,
+>                 pr_warn_once("Witness protocol support is experimental\n"=
+);
+>                 break;
+>         case Opt_rootfs:
+> -#ifdef CONFIG_CIFS_ROOT
+> -               ctx->rootfs =3D true;
+> +#ifndef CONFIG_CIFS_ROOT
+> +               cifs_dbg(VFS, "rootfs support requires CONFIG_CIFS_ROOT c=
+onfig option\n");
+> +               goto cifs_parse_mount_err;
+>  #endif
+> +               ctx->rootfs =3D true;
+>                 break;
+>         case Opt_posixpaths:
+>                 if (result.negated)
 > --
-> 2.25.1
+> 2.30.0
 >
 
 
--- 
+--=20
 Thanks,
 
 Steve
