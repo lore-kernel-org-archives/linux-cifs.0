@@ -2,100 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45853C433E6
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Mar 2021 18:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA40C433DB
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Mar 2021 00:48:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E728E64F01
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Mar 2021 18:59:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C7A964D90
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Mar 2021 00:48:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232775AbhCRS6x (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Mar 2021 14:58:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57154 "EHLO
+        id S231576AbhCSAr3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Mar 2021 20:47:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232772AbhCRS6h (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Mar 2021 14:58:37 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE02DC06174A;
-        Thu, 18 Mar 2021 11:58:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=3PjOp+lk4bp+j1ybJzbccJCr44SWPFydI7o9KoqHLQs=; b=EBJEDA+bSKteXzmolNEj5iWl9m
-        q6nJjUmAnJkUIhDdaoeP8Y/7V+XatW5vMwwXrNmTjmT9rDFZetrav2sdVoIo2vC/v4/ndZSM0XXfO
-        m3Hdcqmy8SIWO1mcocYrcWeLxvRDLWI3jL9yxbE/ph+zqtGiEY973dZVYyQwZsW+3X5iEOy+qg26F
-        K51/lvIZK1LL+Ayrb4kopqBSqaO5PX1wUiCcRFyy5Nbx3AXiFrrXf7yqO5wO+JS44oSqbxWPPCrRm
-        aaLS+l3/UPzYqeve92nf3lKvB1o919Je5j1+Agxr2a454P+q624/5zZPNheCPUnuXzUhaYrqr9w6X
-        QS/sUrEw==;
-Received: from [2601:1c0:6280:3f0::9757]
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lMxq0-003NeF-Kl; Thu, 18 Mar 2021 18:57:44 +0000
-Subject: Re: linux-next: Tree for Mar 18 (cifsd: Kconfig)
-To:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        linux-cifsd-devel@lists.sourceforge.net,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        Steve French <sfrench@samba.org>,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-        Namjae Jeon <namjae.jeon@samsung.com>
-References: <20210318210844.5e9adf1e@canb.auug.org.au>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <3497bc60-51be-04ba-50c8-4bc258df7f31@infradead.org>
-Date:   Thu, 18 Mar 2021 11:57:36 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        with ESMTP id S231365AbhCSArH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Mar 2021 20:47:07 -0400
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 783DBC06174A;
+        Thu, 18 Mar 2021 17:47:07 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id b184so4681851pfa.11;
+        Thu, 18 Mar 2021 17:47:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pMjjN3dGBQb3GjpDVh58+2sh65rE4RFeTUG4XEdacoU=;
+        b=Z8EwSpkZogScuwMCaJ4MsU1qLtpGhZ8NZhIU5QDrj/DtarcfWVSbWBWfJ+1HCd9zgW
+         WOU8ZvADfIS88Cl7BUtuAHQiHYnATozsOrJX2ng2rKOMlUBth2V3cIsEFpiNc18y+9yW
+         E3qNOGV7w2ZWYXfj6D9YklyFdhpwvsX6BEUAgW/FRZXUDS+8KcdYnkcWkYQeT/VBS/BB
+         fn/jdXNZ8ZCm3DUJnwt/pT78gbp6wIagndO1cEaXmHq/JQD6mNTREamxNGYw7nuaO2P8
+         glo5Mxp5sN1zEUm/Sf+kLd08jgD6hyvjbMvnI5tpTU2olxDSTKmjJmM0fMEyt/JloBRM
+         BVyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pMjjN3dGBQb3GjpDVh58+2sh65rE4RFeTUG4XEdacoU=;
+        b=hsLYjFO91XnVDMfODPmF+Y8dVbhUa3OdTTaRj6RpdQW3t+F4gkPqv78kIZz2jf2s74
+         238Hft/yTOYZO535RybSoNUiNKvKnKeECbvxYb9SeOVIghVjEo8HoTrnCEQbyAkY2tfr
+         gXSMC1oyo6SfcjKGC9bJuH3ahHEJkzHMTNGZDQNmdmZS2H7AltWsm49pPYvCIcE/WPcL
+         0r5MqhWZkv/m07zPx4falZDWOjGdelDNiKzvP1PcMSqdPQ/FWVFqdIFAROxuYpJtrWkU
+         Bro0KyZf7KqpZ8pulgRLwZzlZ3mZwOTv+X3+g7Ijryurie8ZW1UVT67fKZkqZZbMyQ7/
+         DH5A==
+X-Gm-Message-State: AOAM531WcRSFOOb0E6VBxSeKzeOs1EznES1+XWpoh8QJCslKmNbM6Nyz
+        t+dJ0jLuYo097AV2iuxim2wU0JpYeNU=
+X-Google-Smtp-Source: ABdhPJyYwjthzI4fYRoszLzF8Efq2LwsU5gX+tYbtd7hN33/jVGNNdyye62nPlyEQSJChLg5Rvs2aQ==
+X-Received: by 2002:a63:c604:: with SMTP id w4mr3157673pgg.283.1616114823866;
+        Thu, 18 Mar 2021 17:47:03 -0700 (PDT)
+Received: from localhost.localdomain ([178.236.46.205])
+        by smtp.gmail.com with ESMTPSA id y8sm3715645pfe.36.2021.03.18.17.47.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Mar 2021 17:47:03 -0700 (PDT)
+From:   menglong8.dong@gmail.com
+X-Google-Original-From: liu.xuzhi@zte.com.cn
+To:     linux-cifs@vger.kernel.org
+Cc:     sfrench@samba.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org, Liu xuzhi <liu.xuzhi@zte.com.cn>
+Subject: [PATCH] fs/cifs/: fix misspellings using codespell tool
+Date:   Thu, 18 Mar 2021 17:46:57 -0700
+Message-Id: <20210319004657.485503-1-liu.xuzhi@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20210318210844.5e9adf1e@canb.auug.org.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 3/18/21 3:08 AM, Stephen Rothwell wrote:
-> Hi all,
-> 
-> News: there will be no linux-next release on Friday this week.
-> 
-> Warning: Some of the branches in linux-next are still based on v5.12-rc1,
-> so please be careful if you are trying to bisect a bug.
-> 
-> News: if your -next included tree is based on Linus' tree tag
-> v5.12-rc1{,-dontuse} (or somewhere between v5.11 and that tag), please
-> consider rebasing it onto v5.12-rc2. Also, please check any branches
-> merged into your branch.
-> 
-> Changes since 20210317:
-> 
-> The cifsd tree lost its build failure.
+From: Liu xuzhi <liu.xuzhi@zte.com.cn>
 
-kconfig warning in cifsd:
+A typo is found out by codespell tool in 251th lines of cifs_swn.c:
 
-WARNING: unmet direct dependencies detected for CRYPTO_ARC4
-  Depends on [n]: CRYPTO [=y] && CRYPTO_USER_API_ENABLE_OBSOLETE [=n]
-  Selected by [y]:
-  - SMB_SERVER [=y] && NETWORK_FILESYSTEMS [=y] && INET [=y]
+$ codespell ./fs/cifs/
+./cifs_swn.c:251: funciton  ==> function
 
+Fix a typo found by codespell.
 
+Signed-off-by: Liu xuzhi <liu.xuzhi@zte.com.cn>
+---
+ fs/cifs/cifs_swn.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Either
-	select CRYPTO_ARC4 if CRYPTO_USER_API_ENABLE_OBSOLETE
-or add
-	select CRYPTO_USER_API
-	select CRYPTO_USER_API_ENABLE_OBSOLETE
-
-The first choice is certainly more palatable if it is OK.
-
-
-thanks.
+diff --git a/fs/cifs/cifs_swn.c b/fs/cifs/cifs_swn.c
+index f2d730fffccb..d829b8bf833e 100644
+--- a/fs/cifs/cifs_swn.c
++++ b/fs/cifs/cifs_swn.c
+@@ -248,7 +248,7 @@ static int cifs_swn_send_unregister_message(struct cifs_swn_reg *swnreg)
+ 
+ /*
+  * Try to find a matching registration for the tcon's server name and share name.
+- * Calls to this funciton must be protected by cifs_swnreg_idr_mutex.
++ * Calls to this function must be protected by cifs_swnreg_idr_mutex.
+  * TODO Try to avoid memory allocations
+  */
+ static struct cifs_swn_reg *cifs_find_swn_reg(struct cifs_tcon *tcon)
 -- 
-~Randy
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
+2.25.1
+
