@@ -8,55 +8,56 @@ X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05453C433DB
-	for <linux-cifs@archiver.kernel.org>; Sat, 20 Mar 2021 16:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 194A1C433C1
+	for <linux-cifs@archiver.kernel.org>; Sat, 20 Mar 2021 16:20:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE78061964
-	for <linux-cifs@archiver.kernel.org>; Sat, 20 Mar 2021 16:17:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC45761966
+	for <linux-cifs@archiver.kernel.org>; Sat, 20 Mar 2021 16:20:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229840AbhCTQRY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 20 Mar 2021 12:17:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48088 "EHLO
+        id S229871AbhCTQTh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 20 Mar 2021 12:19:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229821AbhCTQRY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 Mar 2021 12:17:24 -0400
+        with ESMTP id S229767AbhCTQTH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 Mar 2021 12:19:07 -0400
 Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE330C061574;
-        Sat, 20 Mar 2021 09:17:23 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id a198so14698755lfd.7;
-        Sat, 20 Mar 2021 09:17:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 923CEC061574;
+        Sat, 20 Mar 2021 09:19:06 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id w37so14680255lfu.13;
+        Sat, 20 Mar 2021 09:19:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to:cc;
         bh=MjE8p8N6AtPJDpjXiZiJj0taGnUvpDrOn3GR8Bz5Jq0=;
-        b=pdgc8nLLZlAQ+Sh900ZiHpWCImI587k43qprKp7qpwcyqBPEsYDcsRHy4H1s+Gu2OE
-         IYAknTO9G91lsw0antFasThFJcdtjym54WK633zowikjgq+1J1/MxjhIeK01aI0DLuj1
-         oYRuF5OJ04H9BG96F3QsQa2QsymQuJvkMoGyJtYklHy8wzCN/HsWSQ1C1SLyUFhHq2DR
-         RAo3mtEeKx15A753kb0gMxAPjiA5pAcAQzVbvNFlcQjavC+TNT8s2NDOmq7pBPR0qtzY
-         xaLJ8GAtxNgDlvYVM2dvi3AuQAB0Fyn8qnmf+l2i3md2Ik1E1XWQgfITmTdhvEhb/ihT
-         Mlng==
+        b=u1NyQ7Cmn7Tfs82lnywUoJl0+A2zZEu/2Vq91OTFAPUqRKEdNno8NWxL4/Q+WC/RBe
+         WU2M6ZRNH2DWmZ/xTdXQ4ctgWEArxxeDWFdar7a6t2mlMLOIELEg1wl5EJc/Ujful5Gs
+         DrLl88GWgklDtQF8vdDhH+WJQd8DuzSCbPCrE6pjVdZ4jx1e53Stjn9oMp/zTR+6J5aW
+         wBAwX5yssZ9RLUyrmkXSiya3xjhThPh0txiBKcYaNUFLSmf0ILsWacIoRBqHTZFKNe03
+         mK6tdz2CZKw+Jzoe0g2Ls7iWQyzwk7QnzQ8RmRaoYz/Hgv34hH9ZGKZwJwB4WkwzV6MX
+         TFqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
         bh=MjE8p8N6AtPJDpjXiZiJj0taGnUvpDrOn3GR8Bz5Jq0=;
-        b=e/cP1i4uUcptGcqaD5hQLf2tv66hecoKuQHDfP4IDhBhi/p8tVRfm3wx16PGLvxvDA
-         rW7AUH+WoETF6Ldq25X5aTJqQN9YG1OAzJYHD6xEh2O8KP31Zn0u29JWv42FDCotVJBv
-         jTuVf3gjouZCRpNwOyLZR2Tp7kA/pu0XUejdPKXYHhMxoiCMjUh05jem8LoqrCeNQGN6
-         ESNdnvZu2fDrr2cD1HGGoVSjVmf1NjlNAkJBziwS5gkKSLi0jpscRX7/3tK9hEj0i3ES
-         4QlmAk7r06626vWZERODivXD2DvW7PsCP+T4BkDH7H2ZzabwaCWp371fpnArcX9Nh47E
-         7alQ==
-X-Gm-Message-State: AOAM5306JOeil1ppJ5vogimeOKOKN4j1dU+4QWWprDkQinKetRXEl89o
-        fdpBUEPoosBsxt4wEB8VIlVcAAdf7pbU6tWJSZ3k5rLoDjL+dw==
-X-Google-Smtp-Source: ABdhPJwFn/b0MVFEepvQaUa9qOAcI7i+QWH0OFcXEM7mh0QqbMKL8AoasqOPlfavWSMaHnD/LroEml12txZ9kDBfO3E=
-X-Received: by 2002:a19:3f04:: with SMTP id m4mr3905483lfa.395.1616257041813;
- Sat, 20 Mar 2021 09:17:21 -0700 (PDT)
+        b=SB+SJR6vMycwO1dt8ssuL1Ksqd3boJKihqszyFk8nFkuFc5N/27iqJK7CYvgsw94Vr
+         sSIAP9ytm6Nc07xR7btRulEXsvYjpVbbZea6yL7h3WUnowXqp4MHM44SIh14iSCnwiUy
+         8qf707ESq1ciF/WlKs3Kaxc7oPDb+5R2LVRv/UN6Q2w3QZAZKmbCV8iGgnBFb4J8Z4lR
+         ouQ320Wj7/PJ/X9CAuZ0X3Eq0GaCxTJw0Z8ajbdEfM/6fweHkpX9LlYMfsuNkvS2a5Hn
+         09gztp8p9dt94TiqfpfkTRlQEDi1sAb/U0H5cFmonclruyIAbEgjWrtERQJcm7Q6HHPj
+         YzaQ==
+X-Gm-Message-State: AOAM531TLeS0CyJqrLU1X0jqQ2DB9S4CScTODRdaYHzQT7r1iGJZRSnw
+        h0Crh7kc8BODkkVfCHaWsH6HfRJWhvr9l9KndbPmVFyseeoOag==
+X-Google-Smtp-Source: ABdhPJzGQ/YWgxTWu88BG3nv9Jt7ijtIGKqbyLH7RWT8xTb1tIlPTEcbfTsqhMwkEuoGEIhL6X5F6/N10/iwgVjPWko=
+X-Received: by 2002:a19:7515:: with SMTP id y21mr4114216lfe.282.1616257144963;
+ Sat, 20 Mar 2021 09:19:04 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 20 Mar 2021 11:17:10 -0500
-Message-ID: <CAH2r5msU=QjVKHq_qYNOqwtLFctqU6E6cM9nBUw934Zb7YR9Hw@mail.gmail.com>
+Date:   Sat, 20 Mar 2021 11:18:54 -0500
+Message-ID: <CAH2r5mt9Mj-gE4fhj4=bH9CyXuTa4er4T2OC5E+VgpacmR4zvA@mail.gmail.com>
 Subject: [GIT PULL] CIFS/SMB3 Fixes
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
