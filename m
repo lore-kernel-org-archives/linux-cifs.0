@@ -2,143 +2,124 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	RDNS_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
-Received: from mail.kernel.org (unknown [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46653C433DB
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 Mar 2021 02:12:34 +0000 (UTC)
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2868CC433DB
+	for <linux-cifs@archiver.kernel.org>; Sun, 21 Mar 2021 10:54:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65FE661954
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 Mar 2021 02:12:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7F7360C41
+	for <linux-cifs@archiver.kernel.org>; Sun, 21 Mar 2021 10:54:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbhCUBm5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 20 Mar 2021 21:42:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55758 "EHLO
+        id S229815AbhCUKy1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 21 Mar 2021 06:54:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbhCUBml (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 20 Mar 2021 21:42:41 -0400
+        with ESMTP id S229926AbhCUKx6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Mar 2021 06:53:58 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56484C061574;
-        Sat, 20 Mar 2021 18:42:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 476BAC061574;
+        Sun, 21 Mar 2021 03:53:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=OHbnhUmSKXKUNQXDuUhAYkDR4SHYPZJ41RILLR4eq0o=; b=WJD6WJqsGwCY3P1j5e3ovPL//F
-        5RbS0a3Lg88hg9MB0jYULiy/rFKJzbGCbrOapYTb266XbbyKA8CTrtvek66/nG33VaFg7VdMBRbZR
-        rnPMGsBm9j06adyP+A8QTZhRk0UEwOFu8zRa/WX5OeKUuZ+8YrF+LcaXS/z87nWR3tKlZ6cwW0Syp
-        kq9Y5/xMHFDtxNLwNsH9lKI3RuLMynoTNQK4hzK4Vqwfsf9J1ZXgGgduQBDRr8PlJm3OFdHS6ZrwQ
-        3fhRurJFVDu4wmnenxltcI7MoWu83uWJo+ueqXyOwnSdoY74gjndAyvqk62MAvIAKmI/huMjFZFAX
-        h7v56bTQ==;
+        bh=IPWTpmNlwvQD2iMEaDZM4gbTBQw2JCKTcw+XHs6sAEA=; b=MycDLrIcd3ic8F/80A6VFdemDq
+        mP6wMKgaJ+5fZ8A/5UZohpMbjrn0frButsf5ebBykDEX/RU1WPXs8HsON7xXx/0rh1H8iKU1zW2Bo
+        gQnxM6q4iczEUtjYAhChY4xbcUghuUJ8SxLKS+Scas5RUAPIY1QVsjBRYZNB4Td9A/GdUbK+pGXzm
+        ZxqPcKHFmjWFBOpIOxuPGE2Ge3lH75MgJq4zOA4kCUIW8QztYln6orsFPBg70IOQjgwHxMTUkpQvT
+        sP5/cIEzN7DAaOGyHDRzy6+/swS96oUDvvYZzfmO85Y4+6qJHHEg0lpaPO9kP30HPHtXl8+ynO5/A
+        9oZufQ3g==;
 Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lNn6Q-006Ymd-I3; Sun, 21 Mar 2021 01:42:05 +0000
-Date:   Sun, 21 Mar 2021 01:42:02 +0000
+        id 1lNvhl-007173-MX; Sun, 21 Mar 2021 10:53:12 +0000
+Date:   Sun, 21 Mar 2021 10:53:09 +0000
 From:   Matthew Wilcox <willy@infradead.org>
 To:     David Howells <dhowells@redhat.com>
 Cc:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@redhat.com>, linux-mm@kvack.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Alexander Viro <viro@zeniv.linux.org.uk>, linux-mm@kvack.org,
         linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
         David Wysochanski <dwysocha@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 08/28] netfs: Provide readahead and readpage netfs
- helpers
-Message-ID: <20210321014202.GF3420@casper.infradead.org>
+Subject: Re: [PATCH v4 02/28] mm: Add an unlock function for
+ PG_private_2/PG_fscache
+Message-ID: <20210321105309.GG3420@casper.infradead.org>
 References: <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk>
- <161539537375.286939.16642940088716990995.stgit@warthog.procyon.org.uk>
+ <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <161539537375.286939.16642940088716990995.stgit@warthog.procyon.org.uk>
+In-Reply-To: <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 04:56:13PM +0000, David Howells wrote:
-> +void netfs_readahead(struct readahead_control *ractl,
-> +		     const struct netfs_read_request_ops *ops,
-> +		     void *netfs_priv)
+On Wed, Mar 10, 2021 at 04:54:49PM +0000, David Howells wrote:
+> Add a function, unlock_page_private_2(), to unlock PG_private_2 analogous
+> to that of PG_lock.  Add a kerneldoc banner to that indicating the example
+> usage case.
+
+One of the things which confused me about this was ... where's the other
+side?  Where's lock_page_private_2()?  Then I found this:
+
+#ifdef CONFIG_AFS_FSCACHE
+        if (PageFsCache(page) &&
+            wait_on_page_bit_killable(page, PG_fscache) < 0)
+                return VM_FAULT_RETRY;
+#endif
+
+Please respect the comment!
+
+/*
+ * This is exported only for wait_on_page_locked/wait_on_page_writeback, etc.,
+ * and should not be used directly.
+ */
+extern void wait_on_page_bit(struct page *page, int bit_nr);
+extern int wait_on_page_bit_killable(struct page *page, int bit_nr);
+
+I think we need the exported API to be wait_on_page_private_2(), and
+AFS needs to not tinker in the guts of filemap.  Otherwise you miss
+out on bugfixes like c2407cf7d22d0c0d94cf20342b3b8f06f1d904e7 (see also
+https://lore.kernel.org/linux-fsdevel/20210320054104.1300774-4-willy@infradead.org/T/#u
+).
+
+That also brings up that there is no set_page_private_2().  I think
+that's OK -- you only set PageFsCache() immediately after reading the
+page from the server.  But I feel this "unlock_page_private_2" is actually
+"clear_page_private_2" -- ie it's equivalent to writeback, not to lock.
+
+> +++ b/mm/filemap.c
+> @@ -1432,6 +1432,26 @@ void unlock_page(struct page *page)
+>  }
+>  EXPORT_SYMBOL(unlock_page);
+>  
+> +/**
+> + * unlock_page_private_2 - Unlock a page that's locked with PG_private_2
+> + * @page: The page
+> + *
+> + * Unlocks a page that's locked with PG_private_2 and wakes up sleepers in
+> + * wait_on_page_private_2().
+> + *
+> + * This is, for example, used when a netfs page is being written to a local
+> + * disk cache, thereby allowing writes to the cache for the same page to be
+> + * serialised.
+> + */
+> +void unlock_page_private_2(struct page *page)
 > +{
-> +	struct netfs_read_request *rreq;
-> +	struct page *page;
-> +	unsigned int debug_index = 0;
-> +
-> +	_enter("%lx,%x", readahead_index(ractl), readahead_count(ractl));
-> +
-> +	if (readahead_count(ractl) == 0)
-> +		goto cleanup;
-> +
-> +	rreq = netfs_alloc_read_request(ops, netfs_priv, ractl->file);
-> +	if (!rreq)
-> +		goto cleanup;
-> +	rreq->mapping	= ractl->mapping;
-> +	rreq->start	= readahead_pos(ractl);
-> +	rreq->len	= readahead_length(ractl);
-> +
-> +	netfs_rreq_expand(rreq, ractl);
-> +
-> +	atomic_set(&rreq->nr_rd_ops, 1);
-> +	do {
-> +		if (!netfs_rreq_submit_slice(rreq, &debug_index))
-> +			break;
-> +
-> +	} while (rreq->submitted < rreq->len);
-> +
-> +	while ((page = readahead_page(ractl)))
-> +		put_page(page);
-
-You don't need this pair of lines (unless I'm missing something).
-read_pages() in mm/readahead.c puts the reference and unlocks any
-pages which are not read by the readahead op.  Indeed, I think doing
-this is buggy because you don't unlock the page.
-
-> +	/* If we decrement nr_rd_ops to 0, the ref belongs to us. */
-> +	if (atomic_dec_and_test(&rreq->nr_rd_ops))
-> +		netfs_rreq_assess(rreq, false);
-> +	return;
-> +
-> +cleanup:
-> +	if (netfs_priv)
-> +		ops->cleanup(ractl->mapping, netfs_priv);
-> +	return;
+> +	page = compound_head(page);
+> +	VM_BUG_ON_PAGE(!PagePrivate2(page), page);
+> +	clear_bit_unlock(PG_private_2, &page->flags);
+> +	wake_up_page_bit(page, PG_private_2);
 > +}
-> +EXPORT_SYMBOL(netfs_readahead);
-
-> +int netfs_readpage(struct file *file,
-> +		   struct page *page,
-> +		   const struct netfs_read_request_ops *ops,
-> +		   void *netfs_priv)
-> +{
-> +	struct netfs_read_request *rreq;
-> +	unsigned int debug_index = 0;
-> +	int ret;
+> +EXPORT_SYMBOL(unlock_page_private_2);
 > +
-> +	_enter("%lx", page->index);
-> +
-> +	rreq = netfs_alloc_read_request(ops, netfs_priv, file);
-> +	if (!rreq) {
-> +		if (netfs_priv)
-> +			ops->cleanup(netfs_priv, page->mapping);
-> +		unlock_page(page);
-> +		return -ENOMEM;
-> +	}
-> +	rreq->mapping	= page->mapping;
-
-FYI, this isn't going to work with swap-over-NFS.  You have to use
-page_file_mapping().
-
-> +	rreq->start	= page->index * PAGE_SIZE;
-
-and page_index() here.
-
-I rather dislike it that swap-over-NFS uses readpage which makes this
-need to exist.  If somebody were to switch SWP_FS_OPS to using kiocbs,
-some of this pain could go away.
-
+>  /**
