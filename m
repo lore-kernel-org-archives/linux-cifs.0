@@ -2,62 +2,62 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAE7C433E0
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 Mar 2021 19:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB8DC433DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 02:21:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D305A61582
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 Mar 2021 19:59:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C2B16187E
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 02:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230350AbhCUT7U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 21 Mar 2021 15:59:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35840 "EHLO
+        id S229728AbhCVCU1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 21 Mar 2021 22:20:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230346AbhCUT7L (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Mar 2021 15:59:11 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A04EC061574;
-        Sun, 21 Mar 2021 12:59:10 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id x28so18019321lfu.6;
-        Sun, 21 Mar 2021 12:59:10 -0700 (PDT)
+        with ESMTP id S229579AbhCVCUH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Mar 2021 22:20:07 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C143C061574;
+        Sun, 21 Mar 2021 19:20:06 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id a198so18829773lfd.7;
+        Sun, 21 Mar 2021 19:20:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=SCbav4rA/1c8IGx7BoDDC3wW9SvxXS0LmGW2bJT/fsA=;
-        b=rt+lC0FSVeUk4pMgadZ3dyFX4/8mPlQPkc87b1dIIiqI3YDGa+ssswQ2i3YXnssupt
-         nL5ov8kUKfu0i4xVQ3ZA+IKUE+seR9mE4WYQP+BvnL8zrf+Wfyn/8joK3jw7UOgtmRxu
-         w6tbCkgc0m18xvbFf+elWx8fErN6ovxBo5UB6ngK5xBznAfSV/qfShpzO8VsIEX+mBAK
-         jHnDlEtukRUwJVJqqaXWtkYXtZT2zhNZsDQWzmGFh1CMaes1EduVlC0HGYqI1PHnuEea
-         CBGnQDGMtFFAkU1nq+lsG9CP0VoKAhkHzo4mNV2YCpIbDTwn7ytMovkQmMEMS/DofWUe
-         Ag/g==
+        bh=LAHZNIYSi0F1MV0vcwk809LdQrlgjxs53TwNlXuiDLI=;
+        b=UerhiW+BWw9+1uBAlT7e7HZcDydSEC/UvjsujJ5fnYeYCtB18GqUe4igxjBa9U2Eu/
+         aTX3+cyO9OdCfLigWF1o8iE/19oj+KkgdM/tnFs+rWsqZCJlv49xR9zcexKgzHXf/vw+
+         njyTU+VYLzBVeMcjv363pZSyX13XrfLekSkYOrExmUWaneeTeS1E6ePGSjTYc1jAHRSb
+         FlOPSZp4vLu+JLWWU5fcQUvPhVc236To4K6NIQyAm0v6vhNSFeXX/15TJriobkvD/9Jk
+         OGHv9vaizgOoKlekamc+LZB+nyamTpMp8BcvUUTOmZnsE5yNAendp8mmOiGTrEosEC51
+         eo6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=SCbav4rA/1c8IGx7BoDDC3wW9SvxXS0LmGW2bJT/fsA=;
-        b=eR5vQgL1j03dfEOUDjziO8ACGdws6cGCMjqbdiWGZi2BYXWVJk4Fcs3N9OeCczDAc+
-         95ohphDGSZUX2utQG76Z3L7X6uO7Mk0cVvVEP63hYmZCn7Zs+cFog9ZIOYER1E2F1jso
-         +z4jMtH2t5JITydUJjaw0E4xyYw9duTd/6cS8hgEvo+J6gPbI4VbowJiWEQXCWO1Axyy
-         m3Jta8UNNTsgFZTFUzgT1teMYAV/h81/mokQCP+9OU5CPefX+g4mYx0sZaDOSnglDLy5
-         XjAeN+QfNXdEbA2InrZm5UWvEP0CrnRrfoihFO3qW4jFz4gw2MnrRfYuXAesZShyIbcO
-         A3vA==
-X-Gm-Message-State: AOAM531EJNAgglZT4zBVGlVvbNHModJrQg4cg+UmpgJ+Zi8Ylc/3HOCI
-        p+i1agNqRbcq0QR13KJjgutdCw79whscuXohaY8=
-X-Google-Smtp-Source: ABdhPJz42+15F1ar4sJ+KjWjKAFWf+aLFKt3k95V+45NqXQyCskhwqHxpyWF1wBPVmP51mk6jtzQ17bWm3BXVTqa4+Q=
-X-Received: by 2002:a19:7515:: with SMTP id y21mr7161645lfe.282.1616356748934;
- Sun, 21 Mar 2021 12:59:08 -0700 (PDT)
+        bh=LAHZNIYSi0F1MV0vcwk809LdQrlgjxs53TwNlXuiDLI=;
+        b=Ezf8lR+Z7EajJc5+2EfRfEF6cp1iK0hTR9+vfJR9eoU2jIZBguZhgolxppzYCmkJUf
+         /I+J9W2pzrny7qJXLsyKdRmHUfmVjhwIgp8PoxwqG+d339QaRDcQNUUgXhdpFj80P2kc
+         mkjaeDrp6EvUZMhqjFWlECbtOUUmWwECQxO8tiiZcsE8xqYDx7jwpIvYosazJYoAH0x6
+         tUWxchbcDjf1e95xcMVFkLnsEt5KAPE28pTXZ69xhTy4Ttzw5gMc2UmSbIcAJepX5Mso
+         EcmCCoGtgMt2J09pQBWn8d44JvIL506rC6wvRv0nvNHvvbHb7vc99gHCw41A7GWsm4CF
+         cVjQ==
+X-Gm-Message-State: AOAM532NxZoRXN01IucQhhGcuWXmYjC+Az/GQ1DJ/HyV8QgmNPmSmBVS
+        UQUYawQO4WEVvevNWFcXi06XlVghdOyMF0Hj06rPwK3KL9jvOg==
+X-Google-Smtp-Source: ABdhPJwL2G5G9OuAdt0S6mUqLlgd+qR1m8S393PHyiFtKfXe0Qyfs1mBBQWn1188WesNVNYbTtXLjADio9e9DD05apY=
+X-Received: by 2002:a19:7515:: with SMTP id y21mr7818752lfe.282.1616379604757;
+ Sun, 21 Mar 2021 19:20:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <YFV6iexd6YQTybPr@zeniv-ca.linux.org.uk>
-In-Reply-To: <YFV6iexd6YQTybPr@zeniv-ca.linux.org.uk>
+References: <YFV6iexd6YQTybPr@zeniv-ca.linux.org.uk> <CAH2r5mvA0WeeV1ZSW4HPvksvs+=GmkiV5nDHqCRddfxkgPNfXA@mail.gmail.com>
+In-Reply-To: <CAH2r5mvA0WeeV1ZSW4HPvksvs+=GmkiV5nDHqCRddfxkgPNfXA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 21 Mar 2021 14:58:58 -0500
-Message-ID: <CAH2r5mvA0WeeV1ZSW4HPvksvs+=GmkiV5nDHqCRddfxkgPNfXA@mail.gmail.com>
+Date:   Sun, 21 Mar 2021 21:19:53 -0500
+Message-ID: <CAH2r5msWJn5a7JCUdoyJ7nfyeafRS8TvtgF+mZCY08LBf=9LAQ@mail.gmail.com>
 Subject: Re: [RFC][PATCHSET] hopefully saner handling of pathnames in cifs
 To:     Al Viro <viro@zeniv.linux.org.uk>
 Cc:     CIFS <linux-cifs@vger.kernel.org>,
@@ -68,110 +68,124 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-WIll run the automated tests on these.
+automated tests failed so will need to dig in a little more and see
+what is going on
 
-Also FYI - patches 2 and 6 had some checkpatch warnings (although fairly minor).
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/533
 
-On Fri, Mar 19, 2021 at 11:36 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+On Sun, Mar 21, 2021 at 2:58 PM Steve French <smfrench@gmail.com> wrote:
 >
->         Patch series (#work.cifs in vfs.git) tries to clean the things
-> up in and around build_path_from_dentry().  Part of that is constifying
-> the pointers around that stuff, then it lifts the allocations into
-> callers and finally switches build_path_from_dentry() to using
-> dentry_path_raw() instead of open-coding it.  Handling of ->d_name
-> and friends is subtle enough, and it would be better to have fewer
-> places besides fs/d_path.c that need to mess with those...
+> WIll run the automated tests on these.
 >
->         Help with review and testing would be very much appreciated -
-> there's a plenty of mount options/server combinations ;-/
+> Also FYI - patches 2 and 6 had some checkpatch warnings (although fairly minor).
 >
->         For those who prefer to look at it in git, it lives in
-> git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git #work.cifs;
-> individual patches go in followups.
+> On Fri, Mar 19, 2021 at 11:36 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+> >
+> >         Patch series (#work.cifs in vfs.git) tries to clean the things
+> > up in and around build_path_from_dentry().  Part of that is constifying
+> > the pointers around that stuff, then it lifts the allocations into
+> > callers and finally switches build_path_from_dentry() to using
+> > dentry_path_raw() instead of open-coding it.  Handling of ->d_name
+> > and friends is subtle enough, and it would be better to have fewer
+> > places besides fs/d_path.c that need to mess with those...
+> >
+> >         Help with review and testing would be very much appreciated -
+> > there's a plenty of mount options/server combinations ;-/
+> >
+> >         For those who prefer to look at it in git, it lives in
+> > git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git #work.cifs;
+> > individual patches go in followups.
+> >
+> > Shortlog:
+> > Al Viro (7):
+> >       cifs: don't cargo-cult strndup()
+> >       cifs: constify get_normalized_path() properly
+> >       cifs: constify path argument of ->make_node()
+> >       cifs: constify pathname arguments in a bunch of helpers
+> >       cifs: make build_path_from_dentry() return const char *
+> >       cifs: allocate buffer in the caller of build_path_from_dentry()
+> >       cifs: switch build_path_from_dentry() to using dentry_path_raw()
+> >
+> > 1) a bunch of kstrdup() calls got cargo-culted as kstrndup().
+> > This is unidiomatic *and* pointless - it's not any "safer"
+> > that way (pass it a non-NUL-terminated array, and strlen()
+> > will barf same as kstrdup()) and it's actually a pessimization.
+> > Converted to plain kstrdup() calls.
+> >
+> > 2) constifying pathnames: get_normalized_path() gets a
+> > constant string and, on success, returns either that string
+> > or its modified copy.  It is declared with the wrong prototype -
+> > int get_normalized_path(const char *path, char **npath)
+> > so the caller might get a non-const alias of the original const
+> > string.  Fortunately, none of the callers actually use that
+> > alias to modify the string, so it's not an active bug - just
+> > the wrong typization.
+> >
+> > 3) constifying pathnames: ->make_node().  Unlike the rest of
+> > methods that take pathname as an argument, it has that argument
+> > declared as char *, not const char *.  Pure misannotation,
+> > since all instances never modify that actual string (or pass it
+> > to anything that might do the same).
+> >
+> > 4) constifying pathnames: a bunch of helpers.  Several functions
+> > have pathname argument declared as char *, when const char *
+> > would be fine - they neither modify the string nor pass it to
+> > anything that might.
+> >
+> > 5) constifying pathnames: build_path_from_dentry().
+> > That's the main source of pathnames; all callers are actually
+> > treating the string it returns as constant one.  Declare it
+> > to return const char * and adjust the callers.
+> >
+> > 6) take buffer allocation out of build_path_from_dentry().
+> > Trying to do exact-sized allocation is pointless - allocated
+> > object are short-lived anyway (the caller is always the one
+> > to free the string it gets from build_path_from_dentry()).
+> > As the matter of fact, we are in the same situation as with
+> > pathname arguments of syscalls - short-lived allocations
+> > limited to 4Kb and freed before the caller returns to userland.
+> > So we can just do allocations from names_cachep and do that
+> > in the caller; that way we don't need to bother with GFP_ATOMIC
+> > allocations.  Moreover, having the caller do allocations will
+> > permit us to switch build_path_from_dentry() to use of dentry_path_raw()
+> > (in the next commit).
+> >
+> > 7) build_path_from_dentry() essentially open-codes dentry_path_raw();
+> > the difference is that it wants to put the result in the beginning
+> > of the buffer (which we don't need anymore, since the caller knows
+> > what to free anyway) _and_ we might want '\\' for component separator
+> > instead of the normal '/'.  It's easier to use dentry_path_raw()
+> > and (optionally) post-process the result, replacing all '/' with
+> > '\\'.  Note that the last part needs profiling - I would expect it
+> > to be noise (we have just formed the string and it's all in hot cache),
+> > but that needs to be verified.
+> >
+> > Diffstat:
+> >  fs/cifs/cifs_dfs_ref.c |  14 +++--
+> >  fs/cifs/cifsglob.h     |   2 +-
+> >  fs/cifs/cifsproto.h    |  19 +++++--
+> >  fs/cifs/connect.c      |   9 +--
+> >  fs/cifs/dfs_cache.c    |  41 +++++++-------
+> >  fs/cifs/dir.c          | 148 ++++++++++++++++++-------------------------------
+> >  fs/cifs/file.c         |  79 +++++++++++++-------------
+> >  fs/cifs/fs_context.c   |   2 +-
+> >  fs/cifs/inode.c        | 110 ++++++++++++++++++------------------
+> >  fs/cifs/ioctl.c        |  13 +++--
+> >  fs/cifs/link.c         |  46 +++++++++------
+> >  fs/cifs/misc.c         |   2 +-
+> >  fs/cifs/readdir.c      |  15 ++---
+> >  fs/cifs/smb1ops.c      |   6 +-
+> >  fs/cifs/smb2ops.c      |  19 ++++---
+> >  fs/cifs/unc.c          |   4 +-
+> >  fs/cifs/xattr.c        |  40 +++++++------
+> >  17 files changed, 278 insertions(+), 291 deletions(-)
 >
-> Shortlog:
-> Al Viro (7):
->       cifs: don't cargo-cult strndup()
->       cifs: constify get_normalized_path() properly
->       cifs: constify path argument of ->make_node()
->       cifs: constify pathname arguments in a bunch of helpers
->       cifs: make build_path_from_dentry() return const char *
->       cifs: allocate buffer in the caller of build_path_from_dentry()
->       cifs: switch build_path_from_dentry() to using dentry_path_raw()
 >
-> 1) a bunch of kstrdup() calls got cargo-culted as kstrndup().
-> This is unidiomatic *and* pointless - it's not any "safer"
-> that way (pass it a non-NUL-terminated array, and strlen()
-> will barf same as kstrdup()) and it's actually a pessimization.
-> Converted to plain kstrdup() calls.
 >
-> 2) constifying pathnames: get_normalized_path() gets a
-> constant string and, on success, returns either that string
-> or its modified copy.  It is declared with the wrong prototype -
-> int get_normalized_path(const char *path, char **npath)
-> so the caller might get a non-const alias of the original const
-> string.  Fortunately, none of the callers actually use that
-> alias to modify the string, so it's not an active bug - just
-> the wrong typization.
+> --
+> Thanks,
 >
-> 3) constifying pathnames: ->make_node().  Unlike the rest of
-> methods that take pathname as an argument, it has that argument
-> declared as char *, not const char *.  Pure misannotation,
-> since all instances never modify that actual string (or pass it
-> to anything that might do the same).
->
-> 4) constifying pathnames: a bunch of helpers.  Several functions
-> have pathname argument declared as char *, when const char *
-> would be fine - they neither modify the string nor pass it to
-> anything that might.
->
-> 5) constifying pathnames: build_path_from_dentry().
-> That's the main source of pathnames; all callers are actually
-> treating the string it returns as constant one.  Declare it
-> to return const char * and adjust the callers.
->
-> 6) take buffer allocation out of build_path_from_dentry().
-> Trying to do exact-sized allocation is pointless - allocated
-> object are short-lived anyway (the caller is always the one
-> to free the string it gets from build_path_from_dentry()).
-> As the matter of fact, we are in the same situation as with
-> pathname arguments of syscalls - short-lived allocations
-> limited to 4Kb and freed before the caller returns to userland.
-> So we can just do allocations from names_cachep and do that
-> in the caller; that way we don't need to bother with GFP_ATOMIC
-> allocations.  Moreover, having the caller do allocations will
-> permit us to switch build_path_from_dentry() to use of dentry_path_raw()
-> (in the next commit).
->
-> 7) build_path_from_dentry() essentially open-codes dentry_path_raw();
-> the difference is that it wants to put the result in the beginning
-> of the buffer (which we don't need anymore, since the caller knows
-> what to free anyway) _and_ we might want '\\' for component separator
-> instead of the normal '/'.  It's easier to use dentry_path_raw()
-> and (optionally) post-process the result, replacing all '/' with
-> '\\'.  Note that the last part needs profiling - I would expect it
-> to be noise (we have just formed the string and it's all in hot cache),
-> but that needs to be verified.
->
-> Diffstat:
->  fs/cifs/cifs_dfs_ref.c |  14 +++--
->  fs/cifs/cifsglob.h     |   2 +-
->  fs/cifs/cifsproto.h    |  19 +++++--
->  fs/cifs/connect.c      |   9 +--
->  fs/cifs/dfs_cache.c    |  41 +++++++-------
->  fs/cifs/dir.c          | 148 ++++++++++++++++++-------------------------------
->  fs/cifs/file.c         |  79 +++++++++++++-------------
->  fs/cifs/fs_context.c   |   2 +-
->  fs/cifs/inode.c        | 110 ++++++++++++++++++------------------
->  fs/cifs/ioctl.c        |  13 +++--
->  fs/cifs/link.c         |  46 +++++++++------
->  fs/cifs/misc.c         |   2 +-
->  fs/cifs/readdir.c      |  15 ++---
->  fs/cifs/smb1ops.c      |   6 +-
->  fs/cifs/smb2ops.c      |  19 ++++---
->  fs/cifs/unc.c          |   4 +-
->  fs/cifs/xattr.c        |  40 +++++++------
->  17 files changed, 278 insertions(+), 291 deletions(-)
+> Steve
 
 
 
