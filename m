@@ -2,101 +2,97 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2DFC433DB
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 17:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F37FC433E2
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 17:14:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC42A61994
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 17:10:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DAB961998
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 17:14:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231578AbhCVRK1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 13:10:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56100 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbhCVRJ6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 13:09:58 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF1EC061574;
-        Mon, 22 Mar 2021 10:09:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=9pBxK++rOdIu6auvAS1zs5EH7ywKGgPoUb614cFfN9k=; b=UGGKqhE8DJjuTFnUKQ819Uvw93
-        PsTWheAhjkG4Y5U/aZG5axtvQy+yECK+MSX+pezy8ureB6M/MHg6gfOPiTe9jE8P6ONMmMMkA2wFW
-        BA5v0VARijyBMGPeDi47CJJp/i1KwQQxMUjYCaZnmFLivfFBIcFBMN4HJ6KC57jSVou+MiqXgmgdJ
-        Nm87DABBZa8jjW5hciJ4Ym5oIEvLeoBrVZJiV3JPsQIzjxoSrn7EKHH58P7DA6mRNMPGs1SGgb9Nh
-        lLdX08/ntYSZcDPPixRgJ+vht8AtDMA4fp9slUvXkUFGLzgChry7uo5gKbSAFJX93yixiPi7oMQR/
-        wmxT7M7w==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lOO3I-008p9Z-TN; Mon, 22 Mar 2021 17:09:23 +0000
-Date:   Mon, 22 Mar 2021 17:09:16 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Namjae Jeon <namjae.jeon@samsung.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org,
-        linux-cifsd-devel@lists.sourceforge.net, smfrench@gmail.com,
-        hyc.lee@gmail.com, viro@zeniv.linux.org.uk, hch@lst.de,
-        hch@infradead.org, ronniesahlberg@gmail.com,
-        aurelien.aptel@gmail.com, aaptel@suse.com, sandeen@sandeen.net,
-        dan.carpenter@oracle.com, colin.king@canonical.com,
-        rdunlap@infradead.org,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-        Steve French <stfrench@microsoft.com>
-Subject: Re: [PATCH 3/5] cifsd: add file operations
-Message-ID: <20210322170916.GS1719932@casper.infradead.org>
-References: <20210322051344.1706-1-namjae.jeon@samsung.com>
- <CGME20210322052207epcas1p3f0a5bdfd2c994a849a67b465479d0721@epcas1p3.samsung.com>
- <20210322051344.1706-4-namjae.jeon@samsung.com>
- <20210322081512.GI1719932@casper.infradead.org>
- <YFhdWeedjQQgJdbi@google.com>
+        id S231985AbhCVROP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 13:14:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33405 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230367AbhCVRN7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 22 Mar 2021 13:13:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616433238;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aMbmUNAFvNWl2qhZsFpoWOGxDUGbmddTSEhEjr5Mf7I=;
+        b=gAM22rBbJFJ2eXkIzQ3JMSPhPCNkekCpAj2d07RUslS3SgjBobqh4tXx742ng3euvmL5MS
+        yQLLv0OvqOaaqtrYxRq6h+Bc8CD4HkvgLkGo0/HAWIK5lWBhjTHCE06q0qLGzN7r8ttCP9
+        WHmI4DzXd9hUho8swUNKOjJ8qU2yCiA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-537-03ysOJ7_MVCEbA-orqBIWQ-1; Mon, 22 Mar 2021 13:13:56 -0400
+X-MC-Unique: 03ysOJ7_MVCEbA-orqBIWQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 803B0801817;
+        Mon, 22 Mar 2021 17:13:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-112-58.rdu2.redhat.com [10.10.112.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A8BF860C0F;
+        Mon, 22 Mar 2021 17:13:48 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210321014202.GF3420@casper.infradead.org>
+References: <20210321014202.GF3420@casper.infradead.org> <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk> <161539537375.286939.16642940088716990995.stgit@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@redhat.com>, linux-mm@kvack.org,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org,
+        David Wysochanski <dwysocha@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 08/28] netfs: Provide readahead and readpage netfs helpers
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YFhdWeedjQQgJdbi@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2285031.1616433227.1@warthog.procyon.org.uk>
+Date:   Mon, 22 Mar 2021 17:13:47 +0000
+Message-ID: <2285032.1616433227@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Mar 22, 2021 at 06:03:21PM +0900, Sergey Senozhatsky wrote:
-> On (21/03/22 08:15), Matthew Wilcox wrote:
-> > 
-> > What's the scenario for which your allocator performs better than slub
-> > 
+Matthew Wilcox <willy@infradead.org> wrote:
+
+> > +	while ((page = readahead_page(ractl)))
+> > +		put_page(page);
 > 
-> IIRC request and reply buffers can be up to 4M in size. So this stuff
-> just allocates a number of fat buffers and keeps them around so that
-> it doesn't have to vmalloc(4M) for every request and every response.
+> You don't need this pair of lines (unless I'm missing something).
+> read_pages() in mm/readahead.c puts the reference and unlocks any
+> pages which are not read by the readahead op.  Indeed, I think doing
+> this is buggy because you don't unlock the page.
 
-Hang on a minute, this speaks to a deeper design problem.  If we're doing
-a 'request' or 'reply' that is that large, the I/O should be coming from
-or going to the page cache.  If it goes via a 4MB virtually contiguous
-buffer first, that's a memcpy that could/should be avoided.
+Actually, I do need them.  The pages haven't been removed from the ractl at
+this point so just returning would cause them all to be unlocked prematurely.
 
-But now i'm looking for how ksmbd_find_buffer() is used, and it isn't.
-So it looks like someone came to the same conclusion I did, but forgot
-to delete the wm code.
+I don't pass the ractl to the filesystem or the cache because I may be calling
+them for partial pages, I may be issuing multiple ops sequentially on a page
+and the ractl may have ceased to exist by the time I issue an op.
 
-That said, there are plenty of opportunities to optimise the vmalloc code,
-and that's worth pursuing.  And here's the receive path which contains
-the memcpy that should be avoided (ok, it's actually the call to ->read;
-we shouldn't be reading in the entire 4MB but rather the header):
+The unlocking is done by netfs_rreq_unlock(), even for pages that didn't get
+read.
 
-+		conn->request_buf = ksmbd_alloc_request(size);
-+		if (!conn->request_buf)
-+			continue;
-+
-+		memcpy(conn->request_buf, hdr_buf, sizeof(hdr_buf));
-+		if (!ksmbd_smb_request(conn))
-+			break;
-+
-+		/*
-+		 * We already read 4 bytes to find out PDU size, now
-+		 * read in PDU
-+		 */
-+		size = t->ops->read(t, conn->request_buf + 4, pdu_size);
+I've added a comment to this effect.
+
+David
 
