@@ -2,38 +2,39 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE67C433DB
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 08:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FCA9C433C1
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 08:36:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 793966196C
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 08:16:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 593756196E
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 08:36:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbhCVIQP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 04:16:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53002 "EHLO
+        id S229547AbhCVIfv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 04:35:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229870AbhCVIPr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 04:15:47 -0400
+        with ESMTP id S229508AbhCVIfg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 04:35:36 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6DD1C061574;
-        Mon, 22 Mar 2021 01:15:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E87E0C061574;
+        Mon, 22 Mar 2021 01:35:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=3UcZ7X0BPfyvpZ2kfhXVZxzYo1lJR/oLtPPQ3opNY70=; b=ZwHWUWpaI1u32wbEwfRB0niJx6
-        R9hu8b7S2ayxyCcBkuE7mzDuGi/LOxKIAZAYH7GEgzfk+zxan/+xBkzcXjsMGq5ixffAjANLVgGxX
-        KpzYDUMRpTheAPaIPEqRF4Ayek/aEHxPuniOB/PpHBazqTrmyLPKFZ+p6kIwlvfgBqFZc3j1k/1oq
-        cqWMRPdKXd0gzEba9MnTvwCtq15zfiR1uYTTIYXBC9cFw4DMCFpAg95vp08L0OEQGgNt5bI8jPmz2
-        tEBgey1STuXk7Tw1ConfIoM3wTRfRuUZvJQPCVFUH/0lNCk6dMRlX0wl4DV4LSH6bO5UvT6Dh4+2r
-        3rIl3bTg==;
+        bh=QoevHkEyhDjxsOKj6fJ4R4SgOfRQylQoV4S5iGinLZU=; b=D1nWnujJVHJ4MgUjzDSpImYZAf
+        /0UT4qq4l0rO6u1vGolh/id2xfThwNNw5HdMWaZxUGPcTXKXqO1LDhF39j5rCORszzvOoltjdYdzi
+        vdHViRlfbrRePQfgaOZCC0sekOtwgXBHtiMrNLHVCi1LdnOCUS1ybjRcqei7y1qQAOoLfxKMsYwW1
+        GtrmEnJdbEh1Z0+7iF0yKKJTBLQh+IxCENArr9jqTOQebxFH9r5aSDx0/1efNNz0tdVOs54ENgh3q
+        eDpsL/6Vn0RAcDq9U/SJnruG64G1sNujBf3bVTc6pEqv/tudiNTP1WTpcmuoBn5tUTKLWmOxk6VRB
+        bCblmvMg==;
 Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lOFiS-008CCP-TG; Mon, 22 Mar 2021 08:15:15 +0000
-Date:   Mon, 22 Mar 2021 08:15:12 +0000
+        id 1lOG1N-008DOR-LV; Mon, 22 Mar 2021 08:34:55 +0000
+Date:   Mon, 22 Mar 2021 08:34:45 +0000
 From:   Matthew Wilcox <willy@infradead.org>
 To:     Namjae Jeon <namjae.jeon@samsung.com>
 Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -46,123 +47,120 @@ Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
         colin.king@canonical.com, rdunlap@infradead.org,
         Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
         Steve French <stfrench@microsoft.com>
-Subject: Re: [PATCH 3/5] cifsd: add file operations
-Message-ID: <20210322081512.GI1719932@casper.infradead.org>
+Subject: Re: [PATCH 2/5] cifsd: add server-side procedures for SMB3
+Message-ID: <20210322083445.GJ1719932@casper.infradead.org>
 References: <20210322051344.1706-1-namjae.jeon@samsung.com>
- <CGME20210322052207epcas1p3f0a5bdfd2c994a849a67b465479d0721@epcas1p3.samsung.com>
- <20210322051344.1706-4-namjae.jeon@samsung.com>
+ <CGME20210322052206epcas1p438f15851216f07540537c5547a0a2c02@epcas1p4.samsung.com>
+ <20210322051344.1706-3-namjae.jeon@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210322051344.1706-4-namjae.jeon@samsung.com>
+In-Reply-To: <20210322051344.1706-3-namjae.jeon@samsung.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Mar 22, 2021 at 02:13:42PM +0900, Namjae Jeon wrote:
-> This adds file operations and buffer pool for cifsd.
-
-Why do you want this buffer pool?  Do you not trust the
-slab allocator to be able to do its job?  Because what you have
-here looks slower than the slab allocator.
-
-Let's follow this through for the best-case scenario (a buffer of the right
-size already exists):
-
-> +void *ksmbd_find_buffer(size_t size)
+On Mon, Mar 22, 2021 at 02:13:41PM +0900, Namjae Jeon wrote:
+> +++ b/fs/cifsd/mgmt/ksmbd_ida.c
+> @@ -0,0 +1,69 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
+> + */
+> +
+> +#include "ksmbd_ida.h"
+> +
+> +struct ksmbd_ida *ksmbd_ida_alloc(void)
 > +{
-> +	struct wm *wm;
+> +	struct ksmbd_ida *ida;
 > +
-> +	wm = find_wm(size);
+> +	ida = kmalloc(sizeof(struct ksmbd_ida), GFP_KERNEL);
+> +	if (!ida)
+> +		return NULL;
 > +
-> +	WARN_ON(!wm);
-> +	if (wm)
-> +		return wm->buffer;
-> +	return NULL;
+> +	ida_init(&ida->map);
+> +	return ida;
 > +}
 
-OK, simple, we just call find_wm().
+... why?  Everywhere that you call ksmbd_ida_alloc(), you would
+be better off just embedding the struct ida into the struct that
+currently has a pointer to it.  Or declaring it statically.  Then
+you can even initialise it statically using DEFINE_IDA() and
+eliminate the initialiser functions.
 
-> +static struct wm *find_wm(size_t size)
+I'd remove the ksmbd_ida abstraction, although I like this wrapper:
+
+> +int ksmbd_acquire_smb2_tid(struct ksmbd_ida *ida)
 > +{
-> +	struct wm_list *wm_list;
-> +	struct wm *wm;
+> +	int id;
 > +
-> +	wm_list = match_wm_list(size);
-
-First we find the list for this buffer ...
-
-> +static struct wm_list *match_wm_list(size_t size)
-> +{
-> +	struct wm_list *l, *rl = NULL;
+> +	do {
+> +		id = __acquire_id(ida, 0, 0);
+> +	} while (id == 0xFFFF);
 > +
-> +	read_lock(&wm_lists_lock);
-> +	list_for_each_entry(l, &wm_lists, list) {
-> +		if (l->sz == size) {
-> +			rl = l;
-> +			break;
-> +		}
+> +	return id;
+
+Very clever, given your constraint.  I might do it as:
+
+	int id = ida_alloc(ida, GFP_KERNEL);
+	if (id == 0xffff)
+		id = ida_alloc(ida, GFP_KERNEL);
+	return id;
+
+Although ...
+
+> +	tree_conn = ksmbd_alloc(sizeof(struct ksmbd_tree_connect));
+> +	if (!tree_conn) {
+> +		status.ret = -ENOMEM;
+> +		goto out_error;
 > +	}
-> +	read_unlock(&wm_lists_lock);
-> +	return rl;
-> +}
+> +
+> +	tree_conn->id = ksmbd_acquire_tree_conn_id(sess);
+> +	if (tree_conn->id < 0) {
+> +		status.ret = -EINVAL;
+> +		goto out_error;
+> +	}
+> +
+> +	peer_addr = KSMBD_TCP_PEER_SOCKADDR(sess->conn);
+> +	resp = ksmbd_ipc_tree_connect_request(sess,
+> +					      sc,
+> +					      tree_conn,
+> +					      peer_addr);
+> +	if (!resp) {
+> +		status.ret = -EINVAL;
+> +		goto out_error;
+> +	}
+> +
+> +	status.ret = resp->status;
+> +	if (status.ret != KSMBD_TREE_CONN_STATUS_OK)
+> +		goto out_error;
+> +
+> +	tree_conn->flags = resp->connection_flags;
+> +	tree_conn->user = sess->user;
+> +	tree_conn->share_conf = sc;
+> +	status.tree_conn = tree_conn;
+> +
+> +	list_add(&tree_conn->list, &sess->tree_conn_list);
 
-... by taking an rwlock, and walking a linked list?!  Uh ...
+This is basically the only function which calls that, and this is a relatively
+common anti-pattern when using the IDA -- you've allocated a unique ID,
+but then you stuff the object in a list and ...
 
-> +	while (1) {
-> +		spin_lock(&wm_list->wm_lock);
-> +		if (!list_empty(&wm_list->idle_wm)) {
-> +			wm = list_entry(wm_list->idle_wm.next,
-> +					struct wm,
-> +					list);
-> +			list_del(&wm->list);
-> +			spin_unlock(&wm_list->wm_lock);
-> +			return wm;
+> +struct ksmbd_tree_connect *ksmbd_tree_conn_lookup(struct ksmbd_session *sess,
+> +						  unsigned int id)
+> +{
+> +	struct ksmbd_tree_connect *tree_conn;
+> +	struct list_head *tmp;
+> +
+> +	list_for_each(tmp, &sess->tree_conn_list) {
+> +		tree_conn = list_entry(tmp, struct ksmbd_tree_connect, list);
+> +		if (tree_conn->id == id)
+> +			return tree_conn;
+> +	}
 
-Great!  We found one!  And all it cost us was acquiring a global rwlock,
-walking a linked list to find a wmlist, then a per-wmlist spinlock.
+... walk the linked list looking for an ID match.  You'd be much better
+off using an allocating XArray:
+https://www.kernel.org/doc/html/latest/core-api/xarray.html
 
-Meanwhile, there's no guarantee the buffer we found is on the local
-NUMA node.
-
-Compare to slub, allocating from a kmem_cache (assuming you create
-one for each buffer size ...):
-
-void *kmem_cache_alloc(struct kmem_cache *s, gfp_t gfpflags)
-        void *ret = slab_alloc(s, gfpflags, _RET_IP_, s->object_size);
-
-static __always_inline void *slab_alloc(struct kmem_cache *s,
-                gfp_t gfpflags, unsigned long addr, size_t orig_size)
-        return slab_alloc_node(s, gfpflags, NUMA_NO_NODE, addr, orig_size);
-
-static __always_inline void *slab_alloc_node(struct kmem_cache *s,
-                gfp_t gfpflags, int node, unsigned long addr, size_t orig_size)
-        do {
-                tid = this_cpu_read(s->cpu_slab->tid);
-                c = raw_cpu_ptr(s->cpu_slab);
-        } while (IS_ENABLED(CONFIG_PREEMPTION) &&
-                 unlikely(tid != READ_ONCE(c->tid)));
-        object = c->freelist;
-        page = c->page;
-        if (unlikely(!object || !page || !node_match(page, node))) {
-                object = __slab_alloc(s, gfpflags, node, addr, c);
-        } else {
-                void *next_object = get_freepointer_safe(s, object);
-                if (unlikely(!this_cpu_cmpxchg_double(
-                                s->cpu_slab->freelist, s->cpu_slab->tid,
-                                object, tid,
-                                next_object, next_tid(tid)))) {
-
-                        note_cmpxchg_failure("slab_alloc", s, tid);
-                        goto redo;
-                }
-                prefetch_freepointer(s, next_object);
-                stat(s, ALLOC_FASTPATH);
-
-No lock, anywhere.  Lots of percpu goodness, so you get memory allocated
-on your local node.
-
-What's the scenario for which your allocator performs better than slub,
-on a typical machine that serves enough SMB that it's worth having an
-in-kernel SMBD?
-
+Then you could lookup tree connections in O(log(n)) time instead of
+O(n) time.
