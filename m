@@ -2,108 +2,104 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC90C433DB
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 14:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2461C433C1
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 14:51:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4895A6187E
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 14:42:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50A296197F
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 14:51:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230156AbhCVOlv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 10:41:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52096 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbhCVOlq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 10:41:46 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C0FC061574;
-        Mon, 22 Mar 2021 07:41:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=RaCtvaHwo/TZn625kVRWBgdSA5no54J7WgYPxjdoG7E=; b=SBc/ON5tkAeoJz8M87KOQ19vrw
-        pnuWSCSN/BuNgJ+CWCe/pwoQtp6ETfywBh/717fidsZmO2NyhCTYf/NJv13xHd/PjtpgrNamKbVFH
-        vlEZfh31D8qSobxBbpQG5m9Tiw1nuMFjPL+s+3qreV7lYaAW6refD51xr+hOOL8PPZiNkLtfOqIfw
-        cCU+1LbS6gcak/jVmi4WDUUnPCn7apvJvyX/AX7xO9oT9rSq29/O9rlZt0i5XRL6cRBVBF5In3p4E
-        nWiJaLsxIR7N/PXp9+jpOQtWHBdMQySi1wiYvoEfTXTUpiaMPUpF1VILs3rDuGGGtaxmWsqWxxfJ1
-        2gbarSiQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lOLjW-008epC-Iy; Mon, 22 Mar 2021 14:40:43 +0000
-Date:   Mon, 22 Mar 2021 14:40:42 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Namjae Jeon <namjae.jeon@samsung.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        id S231388AbhCVOv3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 10:51:29 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:53714 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231319AbhCVOu4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 10:50:56 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12MEdSp4008512;
+        Mon, 22 Mar 2021 14:50:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=BphrJzlt3qRSdUhRnJzfY4j/0pk3zpIfS3ewWk7W9z0=;
+ b=aT2sBQ1fE1xHacFJoa169R+0TWmWFb/Lxv6Y9+d33mKiRlNWN5q/4L6zcskJFbNOyMe/
+ XxuQ/nl/40KWFBjK7SQJ4U2ruRpqMvU8IeKhtqKsmxeXypAmBxnHXstDWW3o31oAoCd/
+ G8coKZiZz6fTOZz6yxMLJxRG//XCet6Sh+ib3u2WeztZ7AkQCmXF75QYifUZZIPZdoBm
+ AU17wSBhyXez4JmRHHrlx08U8eiNzTFt8UxdlhN0sVVG5QgfIrKZUQIxtptWob8/aNMA
+ FH9NyBZ3+O1Xw0a0bkphp4NfadWTmQtBMwJ4IiEHT4DKb8nCYoXQGfY1IQUaQzD5anNL Aw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 37d90mbqsw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Mar 2021 14:50:23 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12MEf51C145746;
+        Mon, 22 Mar 2021 14:50:22 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 37dtmna0cp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Mar 2021 14:50:22 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 12MEoIx4014232;
+        Mon, 22 Mar 2021 14:50:19 GMT
+Received: from mwanda (/10.175.191.120)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 22 Mar 2021 07:50:18 -0700
+Date:   Mon, 22 Mar 2021 17:50:11 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Namjae Jeon <namjae.jeon@samsung.com>
+Cc:     Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
         linux-cifs@vger.kernel.org,
-        linux-cifsd-devel@lists.sourceforge.net, smfrench@gmail.com,
-        hyc.lee@gmail.com, viro@zeniv.linux.org.uk, hch@infradead.org,
-        ronniesahlberg@gmail.com, aurelien.aptel@gmail.com,
-        aaptel@suse.com, sandeen@sandeen.net, dan.carpenter@oracle.com,
-        colin.king@canonical.com, rdunlap@infradead.org,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-        Steve French <stfrench@microsoft.com>
-Subject: Re: [PATCH 3/5] cifsd: add file operations
-Message-ID: <20210322144042.GO1719932@casper.infradead.org>
-References: <20210322051344.1706-1-namjae.jeon@samsung.com>
- <CGME20210322052207epcas1p3f0a5bdfd2c994a849a67b465479d0721@epcas1p3.samsung.com>
- <20210322051344.1706-4-namjae.jeon@samsung.com>
- <20210322081512.GI1719932@casper.infradead.org>
- <YFhdWeedjQQgJdbi@google.com>
- <20210322135718.GA28451@lst.de>
+        linux-cifsd-devel@lists.sourceforge.net,
+        kernel-janitors@vger.kernel.org
+Subject: [PATCH] cifsd: Fix an error code in smb2_read()
+Message-ID: <YFiuo53u7GHg7cU5@mwanda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210322135718.GA28451@lst.de>
+X-Proofpoint-IMR: 1
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9931 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 phishscore=0
+ bulkscore=0 suspectscore=0 malwarescore=0 mlxlogscore=975 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103220108
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9931 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 mlxscore=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 lowpriorityscore=0
+ phishscore=0 mlxlogscore=949 suspectscore=0 clxscore=1011 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103220108
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Mar 22, 2021 at 02:57:18PM +0100, Christoph Hellwig wrote:
-> On Mon, Mar 22, 2021 at 06:03:21PM +0900, Sergey Senozhatsky wrote:
-> > On (21/03/22 08:15), Matthew Wilcox wrote:
-> > > 
-> > > What's the scenario for which your allocator performs better than slub
-> > > 
-> > 
-> > IIRC request and reply buffers can be up to 4M in size. So this stuff
-> > just allocates a number of fat buffers and keeps them around so that
-> > it doesn't have to vmalloc(4M) for every request and every response.
-> 
-> Do we have any data suggesting it is faster than vmalloc?
+This code is assigning the wrong variable to "err" so it returns
+zero/success instead of -ENOMEM.
 
-Oh, I have no trouble believing it's faster than vmalloc.  Here's
-the fast(!) path that always has memory available, never does retries.
-I'm calling out the things I perceive as expensive on the right hand side.
-Also, I'm taking the 4MB size as the example.
+Fixes: 788b6f45c1d2 ("cifsd: add server-side procedures for SMB3")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+---
+ fs/cifsd/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-vmalloc()
-  __vmalloc_node()
-    __vmalloc_node_range()
-      __get_vm_area_node()
-				[allocates vm_struct]
-	alloc_vmap_area()
-				[allocates vmap_area]
-				[takes free_vmap_area_lock]
-	  __alloc_vmap_area()
-	    find_vmap_lowest_match
-				[walks free_vmap_area_root]
-				[takes vmap_area_lock]
-      __vmalloc_area_node()
-				... array_size is 8KiB, we call __vmalloc_node
-	__vmalloc_node
-				[everything we did above, all over again,
-				 two more allocations, two more lock acquire]
-	alloc_pages_node(), 1024 times
-	vmap_pages_range_noflush()
-	  vmap_range_noflush()
-				[allocate at least two pages for PTEs]
+diff --git a/fs/cifsd/smb2pdu.c b/fs/cifsd/smb2pdu.c
+index 32816baa8a99..6770ebedc24a 100644
+--- a/fs/cifsd/smb2pdu.c
++++ b/fs/cifsd/smb2pdu.c
+@@ -6200,7 +6200,7 @@ int smb2_read(struct ksmbd_work *work)
+ 		work->aux_payload_buf = ksmbd_alloc_response(length);
+ 	}
+ 	if (!work->aux_payload_buf) {
+-		err = nbytes;
++		err = -ENOMEM;
+ 		goto out;
+ 	}
+ 
+-- 
+2.30.2
 
-There's definitely some low handling fruit here.  __vmalloc_area_node()
-should probably call kvmalloc_node() instead of __vmalloc_node() for
-table sizes > 4KiB.  But a lot of this is inherent to how vmalloc works,
-and we need to put a cache in front of it.  Just not this one.
