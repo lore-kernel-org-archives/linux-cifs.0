@@ -2,71 +2,86 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 303C0C433C1
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 20:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE4C6C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 22:19:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00EC361992
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 20:42:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD327619A5
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 22:19:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229730AbhCVUl3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 16:41:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45006 "EHLO
+        id S230022AbhCVWTS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 18:19:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230254AbhCVUlD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 16:41:03 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDE4C061574
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Mar 2021 13:41:02 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id a1so22802222ljp.2
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Mar 2021 13:41:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=HewuPpOxkdLcnnFrjkOEFBj/Hl2Wcca0LcoZKP0PLDs=;
-        b=c0OD2UFaAxDtrDFIY+8zdcnC5RJswAYNIzSWV8bpNV5i3PjIGOCM9W/FLw5UTmC/jG
-         Cr7evsdGIXcqsDF+SGKjpTDVRorN3BDBgkKd1Ht5iVuCz/cGdnyVE8EKGVqgPGKvaE/z
-         9ldH2PO9ZStNwDUIRNyb89Xd1Dblfsyy6Hs9kl8Dd1oqf9UFmNE55wtDmYfX/GcXLKcM
-         +23eO5nGwrZgQgoq7vu03MUDdNIpoxc3YxZtua5OcieD1DtGbvrylgVlUIs4W/tivh4b
-         N3kmP0Qz4kZJd3EOFLDnmeTmcEFbKv+dcZFzNR5sYCS39HPD5NU78BLORqtwWbM2FV5l
-         f8gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=HewuPpOxkdLcnnFrjkOEFBj/Hl2Wcca0LcoZKP0PLDs=;
-        b=WVxjjc62S+KnQEMrEwdghLTkWio+EbY/xXjH7skWtQua7nNq/EQdOGgZ+DXbVSV24P
-         7Ph0Dgmr2v0F4GxAPr4zqx6o0D7PiV3laaNSeDvBvQmonDI7Ez57Njo45CXO01e2OGMs
-         sbBCqeIJaF26VHxjKR96WMg/8nKrnTcAc1MNH07GXCiGO2DpG2zyUlyDz5U4pxyn3q/A
-         vzScDZc7MCrj1DLVYsStPabrGsralZpeaZKuDeexsAe9svLOKCWR4kS7PuYXhadhVLJ2
-         eqil91b2aohUAaK2rUv9E/Xu1QZt7qCAj0q3OuBplnGKhpQXEkUG62r7pDOmtFNhYC2i
-         zpSA==
-X-Gm-Message-State: AOAM531zwi4DpjczgcSQO73pgVhbc2G1y26RygQojTMrNiICeRAU/zUb
-        +o4waVz08nn5rRNaIvtMmNzua7w8vAhhZkRVTNo=
-X-Google-Smtp-Source: ABdhPJxlWyLJqdnrLjWPNC1tImykjox8nv480vON5kbxS22L5jgedujYFjFBncLJm8ii1XJPlKq0XT+JreKsFkEFTJI=
-X-Received: by 2002:a2e:1612:: with SMTP id w18mr850079ljd.6.1616445660614;
- Mon, 22 Mar 2021 13:41:00 -0700 (PDT)
+        with ESMTP id S230016AbhCVWTQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 18:19:16 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44614C061574;
+        Mon, 22 Mar 2021 15:19:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=NHsFX5MxjeF+VaAwcwyWFoKD78wZlg9OURQbD+OIWjI=; b=lRF/zob9BaEhB0ShW00Zg6tQC4
+        GYTJS0a3vdB87rFIsddE92qBPvZez5JPYt5PPnZhpyZcPWMFw6E6PWJsk8Nll/c5p6M4q3NLH4Dv+
+        iVSaJQjLNW9dbd4gBjHUBlB52OTsTx/lfg8jfOQ0dO+GhlnWwQW4bwsAuBq4nRCuT4IzeH3Q/6Zri
+        zq5tVOo5meCFreI34KxT+59bGXMex4D+q+QV0RoumOPpOCk+OFo5xevvWcpp08LZtVY1cjeoUxDIC
+        Lf9GeU0rjy/X6n6X1etT3+jIowXBTUqzMBOHDl6c8aU8odIlj/QCQNXIwsvOHDgW993Bwbua8mlc7
+        6U3bCzGg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lOSsK-009A1r-Qz; Mon, 22 Mar 2021 22:18:28 +0000
+Date:   Mon, 22 Mar 2021 22:18:16 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Namjae Jeon <namjae.jeon@samsung.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org,
+        linux-cifsd-devel@lists.sourceforge.net, smfrench@gmail.com,
+        senozhatsky@chromium.org, hyc.lee@gmail.com,
+        viro@zeniv.linux.org.uk, hch@lst.de, hch@infradead.org,
+        ronniesahlberg@gmail.com, aurelien.aptel@gmail.com,
+        aaptel@suse.com, sandeen@sandeen.net, dan.carpenter@oracle.com,
+        colin.king@canonical.com, rdunlap@infradead.org,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Steve French <stfrench@microsoft.com>
+Subject: Re: [PATCH 1/5] cifsd: add server handler and tranport layers
+Message-ID: <20210322221816.GW1719932@casper.infradead.org>
+References: <20210322051344.1706-1-namjae.jeon@samsung.com>
+ <CGME20210322052204epcas1p1382cadbfe958d156c0ad9f7fcb8532b7@epcas1p1.samsung.com>
+ <20210322051344.1706-2-namjae.jeon@samsung.com>
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 22 Mar 2021 15:40:49 -0500
-Message-ID: <CAH2r5muFSCWQUVn+iuZ_8fiWrCXtNmO0+AaEEEqFmD9+qj8-1w@mail.gmail.com>
-Subject: ksmbd wiki page
-To:     linux-cifsd-devel@lists.sourceforge.net,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <namjae.jeon@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210322051344.1706-2-namjae.jeon@samsung.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Did some updates for the wiki page for ksmbd (cifsd)
+On Mon, Mar 22, 2021 at 02:13:40PM +0900, Namjae Jeon wrote:
+> +#define RESPONSE_BUF(w)		((void *)(w)->response_buf)
+> +#define REQUEST_BUF(w)		((void *)(w)->request_buf)
 
-https://wiki.samba.org/index.php/Linux_Kernel_Server
+Why do you do this obfuscation?
 
--- 
-Thanks,
+> +#define RESPONSE_BUF_NEXT(w)	\
+> +	((void *)((w)->response_buf + (w)->next_smb2_rsp_hdr_off))
+> +#define REQUEST_BUF_NEXT(w)	\
+> +	((void *)((w)->request_buf + (w)->next_smb2_rcv_hdr_off))
 
-Steve
+These obfuscations aren't even used; delete them
+
+> +#define RESPONSE_SZ(w)		((w)->response_sz)
+> +
+> +#define INIT_AUX_PAYLOAD(w)	((w)->aux_payload_buf = NULL)
+> +#define HAS_AUX_PAYLOAD(w)	((w)->aux_payload_sz != 0)
+
+I mean, do you really find it clearer to write:
+
+	if (HAS_AUX_PAYLOAD(work))
+than
+	if (work->aux_payload_sz)
+
+The unobfuscated version is actually shorter!
+
