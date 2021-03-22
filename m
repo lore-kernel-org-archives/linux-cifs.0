@@ -2,125 +2,159 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88BA3C433E3
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 11:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7426C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 12:26:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67997619A1
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 11:31:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72F786198E
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 12:26:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbhCVLbL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 07:31:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38830 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbhCVLau (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 07:30:50 -0400
-Received: from mail.sernet.de (mail.sernet.de [IPv6:2a0a:a3c0:0:25::217:2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CBE8C061574
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Mar 2021 04:30:50 -0700 (PDT)
-Received: from intern.sernet.de by mail.sernet.de
-        with esmtps (Exim Mail Transfer Agent)
-        id 1lOIle-0000XQ-CB; Mon, 22 Mar 2021 12:30:42 +0100
-Received: by intern.sernet.de
-        id 1lOIle-0001h2-9Z; Mon, 22 Mar 2021 12:30:42 +0100
-Received: from bjacke by pell.sernet.de with local (Exim 4.93)
-        (envelope-from <bjacke@sernet.de>)
-        id 1lOIle-004F44-3A; Mon, 22 Mar 2021 12:30:42 +0100
-Date:   Mon, 22 Mar 2021 12:30:42 +0100
-From:   =?iso-8859-1?Q?Bj=F6rn?= JACKE <bj@sernet.de>
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        =?iso-8859-1?Q?Aur=E9lien?= Aptel <aaptel@suse.com>,
-        Paulo Alcantara <pc@cjr.nz>, linux-cifs@vger.kernel.org,
-        linux-cifsd-devel@lists.sourceforge.net
-Subject: Re: we actually need richacls ...
-Message-ID: <20210322113042.GA1001620@sernet.de>
-References: <bug-14494-10630@https.bugzilla.samba.org/>
- <bug-14494-10630-dugIJZXmUw@https.bugzilla.samba.org/>
- <20210318075025.GA600594@sernet.de>
- <CAH2r5msva0XmGjNMonOp0PtXXi5aJeAZ92Cr_MeohEwhzK-kWQ@mail.gmail.com>
- <CAN05THTtitSbSEbXtFDJUB3dpTzBFEh5bQLSE=mSheLrsvvNrA@mail.gmail.com>
+        id S229574AbhCVM0V (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 08:26:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51522 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229692AbhCVMZn (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 22 Mar 2021 08:25:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 218AC6198B;
+        Mon, 22 Mar 2021 12:25:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616415942;
+        bh=cdHrv9OyjJ5nKhMY5NIPkvBN+yh8ZI803sgsg5wwt40=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=cHW7sD+AReIuZ0kbWfmwJbf3Cy+5XmCLOtWTGiIAmvWiH2SQ/AKticgZVSlwz68xN
+         HbeauYuYm4aC2Dwt+eIW33i6p0zn4qAyEsexeSwLAL4EZ08/LiFa8bEhfB6W8ZbfYq
+         Bame1p2JMEk9TPc/vweA945JSmAjbKa7+BFHXyv9Pz92kCDz3BZi57UAX3UFBJqe2a
+         B2arQiOSJt/3ixdUbo9wFJrelHKKthJ48iS2hrRi0TdSJENvD5MbH1tf+kiIgib8Op
+         wVTXl6hTRu/7Z2yhsH393XfabulU5HKRbg9Ksvw22ldlM1rMoKL2hFvAI5SvY7YP1O
+         /5iCp+7CpVHdw==
+Message-ID: <88d125046426ec27c2cac4816a10c6e3fe515ecc.camel@kernel.org>
+Subject: Re: [RFC][PATCHSET] hopefully saner handling of pathnames in cifs
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Al Viro <viro@zeniv.linux.org.uk>, linux-cifs@vger.kernel.org
+Cc:     Steve French <sfrench@samba.org>, linux-fsdevel@vger.kernel.org
+Date:   Mon, 22 Mar 2021 08:25:40 -0400
+In-Reply-To: <YFV6iexd6YQTybPr@zeniv-ca.linux.org.uk>
+References: <YFV6iexd6YQTybPr@zeniv-ca.linux.org.uk>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAN05THTtitSbSEbXtFDJUB3dpTzBFEh5bQLSE=mSheLrsvvNrA@mail.gmail.com>
-X-Q:    Die Schriftsteller koennen nicht so schnell schreiben, wie die
- Regierungen Kriege machen; denn das Schreiben verlangt Denkarbeit. - Brecht
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 2021-03-20 at 16:35 +1000 ronnie sahlberg sent off:
-> What we are talking about is NTFS semantics and how to integrate it
-> into a posix environment like Linux.
+On Sat, 2021-03-20 at 04:31 +0000, Al Viro wrote:
+> 	Patch series (#work.cifs in vfs.git) tries to clean the things
+> up in and around build_path_from_dentry().  Part of that is constifying
+> the pointers around that stuff, then it lifts the allocations into
+> callers and finally switches build_path_from_dentry() to using
+> dentry_path_raw() instead of open-coding it.  Handling of ->d_name
+> and friends is subtle enough, and it would be better to have fewer
+> places besides fs/d_path.c that need to mess with those...
+> 
+> 	Help with review and testing would be very much appreciated -
+> there's a plenty of mount options/server combinations ;-/
+> 
+> 	For those who prefer to look at it in git, it lives in
+> git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git #work.cifs;
+> individual patches go in followups.
+> 
+> Shortlog:
+> Al Viro (7):
+>       cifs: don't cargo-cult strndup()
+>       cifs: constify get_normalized_path() properly
+>       cifs: constify path argument of ->make_node()
+>       cifs: constify pathname arguments in a bunch of helpers
+>       cifs: make build_path_from_dentry() return const char *
+>       cifs: allocate buffer in the caller of build_path_from_dentry()
+>       cifs: switch build_path_from_dentry() to using dentry_path_raw()
+> 
+> 1) a bunch of kstrdup() calls got cargo-culted as kstrndup().
+> This is unidiomatic *and* pointless - it's not any "safer"
+> that way (pass it a non-NUL-terminated array, and strlen()
+> will barf same as kstrdup()) and it's actually a pessimization.
+> Converted to plain kstrdup() calls.
+> 
+> 2) constifying pathnames: get_normalized_path() gets a
+> constant string and, on success, returns either that string
+> or its modified copy.  It is declared with the wrong prototype -
+> int get_normalized_path(const char *path, char **npath)
+> so the caller might get a non-const alias of the original const
+> string.  Fortunately, none of the callers actually use that
+> alias to modify the string, so it's not an active bug - just
+> the wrong typization.
+> 
+> 3) constifying pathnames: ->make_node().  Unlike the rest of
+> methods that take pathname as an argument, it has that argument
+> declared as char *, not const char *.  Pure misannotation,
+> since all instances never modify that actual string (or pass it 
+> to anything that might do the same).
+> 
+> 4) constifying pathnames: a bunch of helpers.  Several functions
+> have pathname argument declared as char *, when const char *
+> would be fine - they neither modify the string nor pass it to
+> anything that might.
+> 
+> 5) constifying pathnames: build_path_from_dentry().
+> That's the main source of pathnames; all callers are actually
+> treating the string it returns as constant one.  Declare it
+> to return const char * and adjust the callers.
+> 
+> 6) take buffer allocation out of build_path_from_dentry().
+> Trying to do exact-sized allocation is pointless - allocated
+> object are short-lived anyway (the caller is always the one
+> to free the string it gets from build_path_from_dentry()).
+> As the matter of fact, we are in the same situation as with
+> pathname arguments of syscalls - short-lived allocations
+> limited to 4Kb and freed before the caller returns to userland.
+> So we can just do allocations from names_cachep and do that
+> in the caller; that way we don't need to bother with GFP_ATOMIC
+> allocations.  Moreover, having the caller do allocations will
+> permit us to switch build_path_from_dentry() to use of dentry_path_raw()
+> (in the next commit).
+> 
+> 7) build_path_from_dentry() essentially open-codes dentry_path_raw();
+> the difference is that it wants to put the result in the beginning
+> of the buffer (which we don't need anymore, since the caller knows
+> what to free anyway) _and_ we might want '\\' for component separator
+> instead of the normal '/'.  It's easier to use dentry_path_raw()
+> and (optionally) post-process the result, replacing all '/' with
+> '\\'.  Note that the last part needs profiling - I would expect it
+> to be noise (we have just formed the string and it's all in hot cache),
+> but that needs to be verified.
+> 
+> Diffstat:
+>  fs/cifs/cifs_dfs_ref.c |  14 +++--
+>  fs/cifs/cifsglob.h     |   2 +-
+>  fs/cifs/cifsproto.h    |  19 +++++--
+>  fs/cifs/connect.c      |   9 +--
+>  fs/cifs/dfs_cache.c    |  41 +++++++-------
+>  fs/cifs/dir.c          | 148 ++++++++++++++++++-------------------------------
+>  fs/cifs/file.c         |  79 +++++++++++++-------------
+>  fs/cifs/fs_context.c   |   2 +-
+>  fs/cifs/inode.c        | 110 ++++++++++++++++++------------------
+>  fs/cifs/ioctl.c        |  13 +++--
+>  fs/cifs/link.c         |  46 +++++++++------
+>  fs/cifs/misc.c         |   2 +-
+>  fs/cifs/readdir.c      |  15 ++---
+>  fs/cifs/smb1ops.c      |   6 +-
+>  fs/cifs/smb2ops.c      |  19 ++++---
+>  fs/cifs/unc.c          |   4 +-
+>  fs/cifs/xattr.c        |  40 +++++++------
+>  17 files changed, 278 insertions(+), 291 deletions(-)
 
-as we are talking here about Unix systems, let's call what we're talking about
-NFS4 ACLs. See:
 
-https://wiki.samba.org/index.php/NFS4_ACL_overview
+This all looks reasonable.
 
+FWIW, we switched ceph to use a similar buffer allocation scheme for
+built paths a couple of years ago. I left the allocation in the caller
+there, and we just return the offset of the start of the string to the
+caller (which we only use to free the buffer later). It works but it's a
+bit klunky.
 
-> We are not going to implement NTFS semantics in the kernel, that train
-> left the station 20 years ago.
+Acked-by: Jeff Layton <jlayton@kernel.org>
 
-the train of NFS4 ACLs in Linux actually didn't leave the station at all, it's
-still in the station waiting for lights switching to green :)
-
-
-> What we can do is to try to emulate. Try to map NTFS onto posix in a
-> way that makes most sense for most
-> average people.
-
-As mapping the ACLs is too lossy, cifs has the cifsacl mount option, but that
-is buggy, issues with that don't get a lot of attention.
-
-
-> But that is it. We can never do 100% ntfs.
-
-true, this why Samba started the acl_xattr to manage the ACLs on its own in
-userspace. This is making it difficult to manage though as you have to do that
-through the SMB layser then only. Also no interoperability with native file
-access or different layers like NFS is impossible with that. The acl_xattr
-modules was born out of pitty that we're in that we lack NFS4 ACLs on Linux.
-
-
-> And we cover the main use cases.
-
-with "cover most use cases" you are still talking generally about POSIX draft
-ACLs vs. NFS4 ACLs here?
-
-> Are there use cases where the mappings will not work becasue we are
-> not NTFS? Very likely.
-
-lot's of cases. Starting from the concept of ACL inheritence which doesn't
-exist in POSIX draft ACLs at all (no, POSIX draft default ACLs are not
-comparable with it).
-
-
-> Maybe those use cases that require full 100% NTFS semantics should
-> just use windows?
-
-you want to ask people who need NFS4 ACLs to use Windows, seriously? I rather
-recommend using other Unix systems that support NFS4 ACLs. Actually all other
-actively developed Unix systems do support NFS4 ACLS.
-
-Customers, who want to use SMB also for their Linux clients, give up quite
-soon because of the shortcomings of the permission management.. Without native
-NFS4 ACLs this will probably not change - this is why I ask the cifs vfs and
-the cifsd people here to help push to get NFS4 ACLs aka richacls in he kernel
-vfs layer.
-
-You know that POSIX draft ACLs had never been finally standrarized, they were
-were withdrawn in 1997. However NFS4 ACLs are standarized.
-
-
-> If not, patches sent to the mailinglist are welcome.
-
-Andreas Grünbacher sent working patches long time ago, see the links from
-the wiki article above.
-
-Björn
