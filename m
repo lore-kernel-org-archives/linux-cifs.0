@@ -2,39 +2,67 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08704C433C1
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 07:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0B2C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 07:06:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C4FFE6192D
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 07:03:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D44BB6191E
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 07:06:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229875AbhCVHDL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 03:03:11 -0400
-Received: from zeniv-ca.linux.org.uk ([142.44.231.140]:47100 "EHLO
-        zeniv-ca.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbhCVHC4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 03:02:56 -0400
-Received: from viro by zeniv-ca.linux.org.uk with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lOEaT-00852M-Ht; Mon, 22 Mar 2021 07:02:53 +0000
-Date:   Mon, 22 Mar 2021 07:02:53 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
+        id S229574AbhCVHFx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 03:05:53 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:36036 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229696AbhCVHFn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 03:05:43 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12M73t0o099089;
+        Mon, 22 Mar 2021 07:05:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=x+Nl+B3JaHI2gCWqxgXVdIS2QpAmEvGC8iOFJYovRHQ=;
+ b=cktZb3CwIUpnDgZQHuu0A1Wre1qxgvbjtQE/BBv3eLFw/oFjqBD2WRQDbXR39bWVaM00
+ sNTab5hemCYplEpgV7khB3y3cKL56DX4kFJ+rQRRudn8jLJrn1iun4GfAejsgQq5/guF
+ +rJswd3FjSBPp8lI+VnWfcbCX50JgYIR+8K6qNC8Nv9Nshb4CVFZp6zBlAShep/LO7Zu
+ 3SusqshZCpPtS89kdtfxnu4Tjy+oyH0mnyufdHFXHqIWIMuGM1xh6NNQoabOPG6j0hOy
+ diFutFxikms3Hr4WFu+q21WGeuWDEYfEfzjqpWY4l6suRSKB8zqbhY/KezkdLhLX/Dfr 1g== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by userp2120.oracle.com with ESMTP id 37d9pmtepg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Mar 2021 07:05:05 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12M752kW165660;
+        Mon, 22 Mar 2021 07:05:03 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 37dtmmv7xb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 22 Mar 2021 07:05:03 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 12M750gj002777;
+        Mon, 22 Mar 2021 07:05:00 GMT
+Received: from kadam (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 22 Mar 2021 00:04:59 -0700
+Date:   Mon, 22 Mar 2021 10:04:47 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
 To:     Namjae Jeon <namjae.jeon@samsung.com>
 Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-cifs@vger.kernel.org,
         linux-cifsd-devel@lists.sourceforge.net, smfrench@gmail.com,
-        senozhatsky@chromium.org, hyc.lee@gmail.com, hch@lst.de,
-        hch@infradead.org, ronniesahlberg@gmail.com,
-        aurelien.aptel@gmail.com, aaptel@suse.com, sandeen@sandeen.net,
-        dan.carpenter@oracle.com, colin.king@canonical.com,
+        senozhatsky@chromium.org, hyc.lee@gmail.com,
+        viro@zeniv.linux.org.uk, hch@lst.de, hch@infradead.org,
+        ronniesahlberg@gmail.com, aurelien.aptel@gmail.com,
+        aaptel@suse.com, sandeen@sandeen.net, colin.king@canonical.com,
         rdunlap@infradead.org,
         Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
         Steve French <stfrench@microsoft.com>
 Subject: Re: [PATCH 3/5] cifsd: add file operations
-Message-ID: <YFhBHScj4QxLl/Ef@zeniv-ca.linux.org.uk>
+Message-ID: <20210322070447.GE1667@kadam>
 References: <20210322051344.1706-1-namjae.jeon@samsung.com>
  <CGME20210322052207epcas1p3f0a5bdfd2c994a849a67b465479d0721@epcas1p3.samsung.com>
  <20210322051344.1706-4-namjae.jeon@samsung.com>
@@ -42,35 +70,160 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20210322051344.1706-4-namjae.jeon@samsung.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-IMR: 1
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9930 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 phishscore=0
+ bulkscore=0 suspectscore=0 malwarescore=0 mlxlogscore=999 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103220052
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9930 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 phishscore=0
+ mlxlogscore=999 priorityscore=1501 impostorscore=0 bulkscore=0 spamscore=0
+ adultscore=0 clxscore=1015 malwarescore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103220052
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 On Mon, Mar 22, 2021 at 02:13:42PM +0900, Namjae Jeon wrote:
-
-> +static struct ksmbd_file *__ksmbd_lookup_fd(struct ksmbd_file_table *ft,
-> +					    unsigned int id)
+> +void *ksmbd_alloc(size_t size)
 > +{
-> +	bool unclaimed = true;
-> +	struct ksmbd_file *fp;
-> +
-> +	read_lock(&ft->lock);
-> +	fp = idr_find(ft->idr, id);
-> +	if (fp)
-> +		fp = ksmbd_fp_get(fp);
-> +
-> +	if (fp && fp->f_ci) {
-> +		read_lock(&fp->f_ci->m_lock);
-> +		unclaimed = list_empty(&fp->node);
-> +		read_unlock(&fp->f_ci->m_lock);
-> +	}
-> +	read_unlock(&ft->lock);
-> +
-> +	if (fp && unclaimed) {
-> +		atomic_dec(&fp->refcount);
-> +		return NULL;
-> +	}
+> +	return kvmalloc(size, GFP_KERNEL | __GFP_ZERO);
 
-Can that atomic_dec() end up dropping the last remaining reference?
-If not, what's to prevent that?
+
+This patch adds a bunch of wrappers around kvmalloc().  Don't do that.
+Just use kvmalloc() directly instead.  They just make the code hard to
+read.  kvmalloc() is not appropriate for small allocations.  This
+wrapper hides a GFP_KERNEL which may lead to scheduling in atomic bugs
+and the secret ZEROing makes the code hard to read.
+
+> +}
+> +
+> +void ksmbd_free(void *ptr)
+> +{
+> +	kvfree(ptr);
+> +}
+> +
+> +static struct wm *wm_alloc(size_t sz, gfp_t flags)
+> +{
+> +	struct wm *wm;
+> +	size_t alloc_sz = sz + sizeof(struct wm);
+                          ^^^^^^^^^^^^^^^^^^^^^^
+
+Check for integer overflow.
+
+> +
+> +	wm = kvmalloc(alloc_sz, flags);
+> +	if (!wm)
+> +		return NULL;
+> +	wm->sz = sz;
+> +	return wm;
+> +}
+> +
+> +static int register_wm_size_class(size_t sz)
+> +{
+> +	struct wm_list *l, *nl;
+> +
+> +	nl = kvmalloc(sizeof(struct wm_list), GFP_KERNEL);
+
+Just use kmalloc() for small allocations.
+
+> +	if (!nl)
+> +		return -ENOMEM;
+> +
+> +	nl->sz = sz;
+> +	spin_lock_init(&nl->wm_lock);
+> +	INIT_LIST_HEAD(&nl->idle_wm);
+> +	INIT_LIST_HEAD(&nl->list);
+> +	init_waitqueue_head(&nl->wm_wait);
+> +	nl->avail_wm = 0;
+> +
+> +	write_lock(&wm_lists_lock);
+> +	list_for_each_entry(l, &wm_lists, list) {
+> +		if (l->sz == sz) {
+> +			write_unlock(&wm_lists_lock);
+> +			kvfree(nl);
+> +			return 0;
+> +		}
+> +	}
+> +
+> +	list_add(&nl->list, &wm_lists);
+> +	write_unlock(&wm_lists_lock);
+> +	return 0;
+> +}
+> +
+> +static struct wm_list *match_wm_list(size_t size)
+> +{
+> +	struct wm_list *l, *rl = NULL;
+> +
+> +	read_lock(&wm_lists_lock);
+> +	list_for_each_entry(l, &wm_lists, list) {
+> +		if (l->sz == size) {
+> +			rl = l;
+> +			break;
+> +		}
+> +	}
+> +	read_unlock(&wm_lists_lock);
+> +	return rl;
+> +}
+> +
+> +static struct wm *find_wm(size_t size)
+> +{
+> +	struct wm_list *wm_list;
+> +	struct wm *wm;
+> +
+> +	wm_list = match_wm_list(size);
+> +	if (!wm_list) {
+> +		if (register_wm_size_class(size))
+> +			return NULL;
+> +		wm_list = match_wm_list(size);
+> +	}
+> +
+> +	if (!wm_list)
+> +		return NULL;
+> +
+> +	while (1) {
+> +		spin_lock(&wm_list->wm_lock);
+> +		if (!list_empty(&wm_list->idle_wm)) {
+> +			wm = list_entry(wm_list->idle_wm.next,
+> +					struct wm,
+> +					list);
+> +			list_del(&wm->list);
+> +			spin_unlock(&wm_list->wm_lock);
+> +			return wm;
+> +		}
+> +
+> +		if (wm_list->avail_wm > num_online_cpus()) {
+> +			spin_unlock(&wm_list->wm_lock);
+> +			wait_event(wm_list->wm_wait,
+> +				   !list_empty(&wm_list->idle_wm));
+> +			continue;
+> +		}
+> +
+> +		wm_list->avail_wm++;
+
+I don't think we should increment this until after the allocation
+succeeds?
+
+> +		spin_unlock(&wm_list->wm_lock);
+> +
+> +		wm = wm_alloc(size, GFP_KERNEL);
+> +		if (!wm) {
+> +			spin_lock(&wm_list->wm_lock);
+> +			wm_list->avail_wm--;
+> +			spin_unlock(&wm_list->wm_lock);
+> +			wait_event(wm_list->wm_wait,
+> +				   !list_empty(&wm_list->idle_wm));
+> +			continue;
+> +		}
+> +		break;
+> +	}
+> +
+> +	return wm;
+> +}
+
+regards,
+dan carpenter
+
