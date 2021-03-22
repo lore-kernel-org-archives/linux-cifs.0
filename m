@@ -2,138 +2,97 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CA7C433DB
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 10:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E2DC433E1
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 10:57:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 271016198F
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 10:27:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B31A56199E
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 10:57:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230053AbhCVK1P (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 06:27:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230241AbhCVK1M (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 06:27:12 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D56D0C061756
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Mar 2021 03:27:11 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id v23so6302734ple.9
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Mar 2021 03:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=+wvdQhVLwLoFosU2KHxQqJGVby7PQnpq6urwRwMBx7A=;
-        b=b6WqhwKq/OQDbEMnA7e5IsW2C1eZP0RdD5OqEOz/f7YJnGBe4g45Xf3AZi9FXXlEV9
-         NfEi9uJBe65YYGnEf+liwwuh6hcBUKPdE5ByThKU31Gbiva6Ok5UnR1lvo5ZwDqZIHgT
-         7FHfBbvCknigoBvrP5OTvm3knCnl3doTyIPas=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=+wvdQhVLwLoFosU2KHxQqJGVby7PQnpq6urwRwMBx7A=;
-        b=bWP1ZqsvvXk0PvzDmH7n95FziI0PqfikI3WNWnCrpRcYEStdy0NwjofvOne7WV6lQK
-         IzAnL1HRixqLrm6dFaYjiMbBSi4I6MnWvv2CHZN4HtiMG6eJhd9YaPaBGBBBCm7xtplH
-         bYX9vJgKE8MsIk6xp1+DB9uzY3YTP52aStu+IlF6znXXk5O+w35skzWXVqT1Y7+nIlDI
-         fsbwU4ywliDrCCK/xbnVcRmJw7G6Azjcs5ri0o5JZh4TCrQD4srNLzbtSE0mZ+lrBsoH
-         wDJVddQumPd86RCEJIhQI2bsQmcIZhNWSj8fBT4nnGZAnqaA+XPojdp1rXsT2jKRj+fb
-         FvqQ==
-X-Gm-Message-State: AOAM530yn5b50pNdGok0NkHrPlQR7Tj8UY5779f2QF3fAcWl46xzolhP
-        sBo4ATRRpHinxDKJtKow5KOEFw==
-X-Google-Smtp-Source: ABdhPJwLw70xF0T1APO8o5oOg758meoNWyGdI6qKxSFYvxLU3qMkHixXKq8q1LSC6BT/IFVCFO9Ocg==
-X-Received: by 2002:a17:902:ce86:b029:e6:b1f6:3c5c with SMTP id f6-20020a170902ce86b02900e6b1f63c5cmr939950plg.13.1616408831429;
-        Mon, 22 Mar 2021 03:27:11 -0700 (PDT)
-Received: from google.com ([2409:10:2e40:5100:b1b5:270:5df6:6d6e])
-        by smtp.gmail.com with ESMTPSA id j3sm14304223pjf.36.2021.03.22.03.27.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Mar 2021 03:27:10 -0700 (PDT)
-Date:   Mon, 22 Mar 2021 19:27:03 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+        id S230203AbhCVK47 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 06:56:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47867 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230343AbhCVK4i (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 22 Mar 2021 06:56:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616410597;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QWqNRl3St0myqfYb/YgoRI1vcQ7ggUTH0MpgdoanYXM=;
+        b=YGVf2hIMX4kUDbWr3J+EDakNf3+w3y++v7TfjIRkbGKcq5d58GuCny3FA6RyfDmGpFQ/Qu
+        eXbRYCgird4yFkOKXTLy8eLoMmTCyrraZ2uPOGExO8usOHXS6XnSe+J23gQbyCsQfJip58
+        xFCuT6cL9nUZ8LrMroIiCc7qi87INuw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-552-FCLoq-t8N6KUPH3xmAXDmQ-1; Mon, 22 Mar 2021 06:56:36 -0400
+X-MC-Unique: FCLoq-t8N6KUPH3xmAXDmQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34BE081622;
+        Mon, 22 Mar 2021 10:56:34 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-112-58.rdu2.redhat.com [10.10.112.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7152A54478;
+        Mon, 22 Mar 2021 10:56:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210321105309.GG3420@casper.infradead.org>
+References: <20210321105309.GG3420@casper.infradead.org> <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk> <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk>
 To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Namjae Jeon <namjae.jeon@samsung.com>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org,
-        linux-cifsd-devel@lists.sourceforge.net, smfrench@gmail.com,
-        senozhatsky@chromium.org, hyc.lee@gmail.com,
-        viro@zeniv.linux.org.uk, hch@lst.de, hch@infradead.org,
-        ronniesahlberg@gmail.com, aurelien.aptel@gmail.com,
-        aaptel@suse.com, sandeen@sandeen.net, dan.carpenter@oracle.com,
-        colin.king@canonical.com, rdunlap@infradead.org,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-        Steve French <stfrench@microsoft.com>
-Subject: Re: [PATCH 2/5] cifsd: add server-side procedures for SMB3
-Message-ID: <YFhw932H8BZalhmu@google.com>
-References: <20210322051344.1706-1-namjae.jeon@samsung.com>
- <CGME20210322052206epcas1p438f15851216f07540537c5547a0a2c02@epcas1p4.samsung.com>
- <20210322051344.1706-3-namjae.jeon@samsung.com>
- <20210322083445.GJ1719932@casper.infradead.org>
+Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Alexander Viro <viro@zeniv.linux.org.uk>, linux-mm@kvack.org,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 02/28] mm: Add an unlock function for PG_private_2/PG_fscache
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210322083445.GJ1719932@casper.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1885295.1616410586.1@warthog.procyon.org.uk>
+Date:   Mon, 22 Mar 2021 10:56:26 +0000
+Message-ID: <1885296.1616410586@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On (21/03/22 08:34), Matthew Wilcox wrote:
-> > +++ b/fs/cifsd/mgmt/ksmbd_ida.c
-> > @@ -0,0 +1,69 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/*
-> > + *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
-> > + */
-> > +
-> > +#include "ksmbd_ida.h"
-> > +
-> > +struct ksmbd_ida *ksmbd_ida_alloc(void)
-> > +{
-> > +	struct ksmbd_ida *ida;
-> > +
-> > +	ida = kmalloc(sizeof(struct ksmbd_ida), GFP_KERNEL);
-> > +	if (!ida)
-> > +		return NULL;
-> > +
-> > +	ida_init(&ida->map);
-> > +	return ida;
-> > +}
->
-> ... why?  Everywhere that you call ksmbd_ida_alloc(), you would
-> be better off just embedding the struct ida into the struct that
-> currently has a pointer to it.  Or declaring it statically.  Then
-> you can even initialise it statically using DEFINE_IDA() and
-> eliminate the initialiser functions.
+Matthew Wilcox <willy@infradead.org> wrote:
 
-IIRC this ida is per SMB session, so it probably cannot be static.
-And Windows, IIRC, doesn't like "just any IDs". Some versions of Windows
-would fail the session login if server would return the first id == 0,
-instead of 1. Or vice versa. I don't remember all the details, the last
-time I looked into this was in 2019.
+> That also brings up that there is no set_page_private_2().  I think
+> that's OK -- you only set PageFsCache() immediately after reading the
+> page from the server.  But I feel this "unlock_page_private_2" is actually
+> "clear_page_private_2" -- ie it's equivalent to writeback, not to lock.
 
-[..]
-> > +struct ksmbd_tree_connect *ksmbd_tree_conn_lookup(struct ksmbd_session *sess,
-> > +						  unsigned int id)
-> > +{
-> > +	struct ksmbd_tree_connect *tree_conn;
-> > +	struct list_head *tmp;
-> > +
-> > +	list_for_each(tmp, &sess->tree_conn_list) {
-> > +		tree_conn = list_entry(tmp, struct ksmbd_tree_connect, list);
-> > +		if (tree_conn->id == id)
-> > +			return tree_conn;
-> > +	}
->
-> ... walk the linked list looking for an ID match.  You'd be much better
-> off using an allocating XArray:
-> https://www.kernel.org/doc/html/latest/core-api/xarray.html
+How about I do the following:
 
-I think cifsd code predates XArray ;)
+ (1) Add set_page_private_2() or mark_page_private_2() to set the PG_fscache_2
+     bit.  It could take a ref on the page here.
 
-> Then you could lookup tree connections in O(log(n)) time instead of
-> O(n) time.
+ (2) Rename unlock_page_private_2() to end_page_private_2().  It could drop
+     the ref on the page here, but that then means I can't use
+     pagevec_release().
 
-Agreed. Not sure I remember why the code does list traversal here.
+ (3) Add wait_on_page_private_2() an analogue of wait_on_page_writeback()
+     rather than wait_on_page_locked().
+
+ (4) Provide fscache synonyms of the above.
+
+David
+
