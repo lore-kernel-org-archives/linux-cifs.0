@@ -5,58 +5,54 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F04CEC433E3
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 22:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EBBEC433E2
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 22:23:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B4BF3619B3
+	by mail.kernel.org (Postfix) with ESMTP id CE610619D1
 	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 22:23:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233952AbhCWWWq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Mar 2021 18:22:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27512 "EHLO
+        id S233943AbhCWWWs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Mar 2021 18:22:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49299 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234118AbhCWWUN (ORCPT
+        by vger.kernel.org with ESMTP id S234142AbhCWWUl (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 23 Mar 2021 18:20:13 -0400
+        Tue, 23 Mar 2021 18:20:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616538013;
+        s=mimecast20190719; t=1616538041;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Tzv4pc40F243hXSb1onXZpzraeqWNjSBNE4RA4oaAvk=;
-        b=B6ADxgOBsHFLuZvZq+ShzgkC1aM9FVABbq7GvqgKaOJmBJJdmgf2qkWjnCKj0Lv0U3P4R5
-        TxHmG4rt9th4RtJpMXKGAT2qYF8kHgJfYAzvPfGc3t++UOMvMwyDo+D9hpVsDIgF8mfTNe
-        UOFJ+8i7QUahbEQrvk6lpesjj4T8UA0=
+        bh=+CHhGaNrHS7fAS7o0AmZcQ1NdKnUoZt3jBwiye+Bp2U=;
+        b=D7Vx1ICc8uoDKULSkz8HtbH5ihsFMPhVePagTyVemvhuMYnJ3aL4jnUjKa6cz0wDWBXvpO
+        L3/xiyI9igf8TQNDI47GpUb0ydnCJm/FiLD89MnszaUITSBLJirV9ZdHotUyUCPBnEfOoy
+        Lze04lZ6XSic6wMbuadCwZ1jfoNtCQU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-554-Mlx7PC2UPkal6SFr7Eh6mg-1; Tue, 23 Mar 2021 18:20:11 -0400
-X-MC-Unique: Mlx7PC2UPkal6SFr7Eh6mg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-306-a_479-DOPsaIIHNd64fOBQ-1; Tue, 23 Mar 2021 18:20:39 -0400
+X-MC-Unique: a_479-DOPsaIIHNd64fOBQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D5B087504F;
-        Tue, 23 Mar 2021 22:20:09 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0CB2107ACCD;
+        Tue, 23 Mar 2021 22:20:37 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-112-58.rdu2.redhat.com [10.10.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1BD3060877;
-        Tue, 23 Mar 2021 22:19:58 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BC4A85C1C5;
+        Tue, 23 Mar 2021 22:20:28 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v5 13/28] netfs: Define an interface to talk to a cache
+Subject: [PATCH v5 15/28] afs: Disable use of the fscache I/O routines
 From:   David Howells <dhowells@redhat.com>
 To:     Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>
-Cc:     Jeff Layton <jlayton@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+Cc:     linux-afs@lists.infradead.org, linux-cachefs@redhat.com,
         linux-fsdevel@vger.kernel.org, dhowells@redhat.com,
         Jeff Layton <jlayton@redhat.com>,
         David Wysochanski <dwysocha@redhat.com>,
@@ -66,513 +62,348 @@ Cc:     Jeff Layton <jlayton@redhat.com>,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 23 Mar 2021 22:19:58 +0000
-Message-ID: <161653799826.2770958.9015430297426331950.stgit@warthog.procyon.org.uk>
+Date:   Tue, 23 Mar 2021 22:20:28 +0000
+Message-ID: <161653802797.2770958.547311814861545911.stgit@warthog.procyon.org.uk>
 In-Reply-To: <161653784755.2770958.11820491619308713741.stgit@warthog.procyon.org.uk>
 References: <161653784755.2770958.11820491619308713741.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add an interface to the netfs helper library for reading data from the
-cache instead of downloading it from the server and support for writing
-data just downloaded or cleared to the cache.
-
-The API passes an iov_iter to the cache read/write routines to indicate the
-data/buffer to be used.  This is done using the ITER_XARRAY type to provide
-direct access to the netfs inode's pagecache.
-
-When the netfs's ->begin_cache_operation() method is called, this must fill
-in the cache_resources in the netfs_read_request struct, including the
-netfs_cache_ops used by the helper lib to talk to the cache.  The helper
-lib does not directly access the cache.
-
-Changes
-v5:
-- Use end_page_fscache() rather than unlock_page_fscache()[2].
-
-v4:
-- Added flag to netfs_subreq_terminated() to indicate that the caller may
-  have been running async and stuff that might sleep needs punting to a
-  workqueue (can't use in_softirq()[1]).
-- Add missing inc of netfs_n_rh_read stat.
-- Move initial definition of fscache_begin_read_operation() elsewhere.
-- Need to call op->begin_cache_operation() from netfs_write_begin().
+Disable use of the fscache I/O routined by the AFS filesystem.  It's about
+to transition to passing iov_iters down and fscache is about to have its
+I/O path to use iov_iter, so all that needs to change.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Jeff Layton <jlayton@redhat.com>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: linux-mm@kvack.org
-cc: linux-cachefs@redhat.com
 cc: linux-afs@lists.infradead.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: ceph-devel@vger.kernel.org
-cc: v9fs-developer@lists.sourceforge.net
+cc: linux-cachefs@redhat.com
 cc: linux-fsdevel@vger.kernel.org
-Link: https://lore.kernel.org/r/20210216084230.GA23669@lst.de/ [1]
-Link: https://lore.kernel.org/r/2499407.1616505440@warthog.procyon.org.uk/ [2]
-Link: https://lore.kernel.org/r/161118141321.1232039.8296910406755622458.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/161161036700.2537118.11170748455436854978.stgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/161340399569.1303470.1138884774643385730.stgit@warthog.procyon.org.uk/ # v3
-Link: https://lore.kernel.org/r/161539542874.286939.13337898213448136687.stgit@warthog.procyon.org.uk/ # v4
+Link: https://lore.kernel.org/r/158861209824.340223.1864211542341758994.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/159465768717.1376105.2229314852486665807.stgit@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/160588457929.3465195.1730097418904945578.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/161118143744.1232039.2727898205333669064.stgit@warthog.procyon.org.uk/ # rfc
+Link: https://lore.kernel.org/r/161161039077.2537118.7986870854927176905.stgit@warthog.procyon.org.uk/ # v2
+Link: https://lore.kernel.org/r/161340403323.1303470.8159439948319423431.stgit@warthog.procyon.org.uk/ # v3
+Link: https://lore.kernel.org/r/161539547167.286939.3536238932531122332.stgit@warthog.procyon.org.uk/ # v4
 ---
 
- fs/netfs/read_helper.c |  241 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/linux/netfs.h  |   49 ++++++++++
- 2 files changed, 289 insertions(+), 1 deletion(-)
+ fs/afs/file.c  |  199 ++++++++++----------------------------------------------
+ fs/afs/inode.c |    2 -
+ fs/afs/write.c |   10 ---
+ 3 files changed, 36 insertions(+), 175 deletions(-)
 
-diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
-index 54febf354588..3498bde035eb 100644
---- a/fs/netfs/read_helper.c
-+++ b/fs/netfs/read_helper.c
-@@ -88,6 +88,8 @@ static void netfs_free_read_request(struct work_struct *work)
- 	if (rreq->netfs_priv)
- 		rreq->netfs_ops->cleanup(rreq->mapping, rreq->netfs_priv);
- 	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
-+	if (rreq->cache_resources.ops)
-+		rreq->cache_resources.ops->end_operation(&rreq->cache_resources);
- 	kfree(rreq);
- 	netfs_stat_d(&netfs_n_rh_rreq);
- }
-@@ -154,6 +156,34 @@ static void netfs_clear_unread(struct netfs_read_subrequest *subreq)
- 	iov_iter_zero(iov_iter_count(&iter), &iter);
- }
- 
-+static void netfs_cache_read_terminated(void *priv, ssize_t transferred_or_error,
-+					bool was_async)
-+{
-+	struct netfs_read_subrequest *subreq = priv;
-+
-+	netfs_subreq_terminated(subreq, transferred_or_error, was_async);
-+}
-+
-+/*
-+ * Issue a read against the cache.
-+ * - Eats the caller's ref on subreq.
-+ */
-+static void netfs_read_from_cache(struct netfs_read_request *rreq,
-+				  struct netfs_read_subrequest *subreq,
-+				  bool seek_data)
-+{
-+	struct netfs_cache_resources *cres = &rreq->cache_resources;
-+	struct iov_iter iter;
-+
-+	netfs_stat(&netfs_n_rh_read);
-+	iov_iter_xarray(&iter, READ, &rreq->mapping->i_pages,
-+			subreq->start + subreq->transferred,
-+			subreq->len   - subreq->transferred);
-+
-+	cres->ops->read(cres, subreq->start, &iter, seek_data,
-+			netfs_cache_read_terminated, subreq);
-+}
-+
- /*
-  * Fill a subrequest region with zeroes.
-  */
-@@ -198,6 +228,144 @@ static void netfs_rreq_completed(struct netfs_read_request *rreq, bool was_async
- 	netfs_put_read_request(rreq, was_async);
- }
- 
-+/*
-+ * Deal with the completion of writing the data to the cache.  We have to clear
-+ * the PG_fscache bits on the pages involved and release the caller's ref.
-+ *
-+ * May be called in softirq mode and we inherit a ref from the caller.
-+ */
-+static void netfs_rreq_unmark_after_write(struct netfs_read_request *rreq,
-+					  bool was_async)
-+{
-+	struct netfs_read_subrequest *subreq;
-+	struct page *page;
-+	pgoff_t unlocked = 0;
-+	bool have_unlocked = false;
-+
-+	rcu_read_lock();
-+
-+	list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
-+		XA_STATE(xas, &rreq->mapping->i_pages, subreq->start / PAGE_SIZE);
-+
-+		xas_for_each(&xas, page, (subreq->start + subreq->len - 1) / PAGE_SIZE) {
-+			/* We might have multiple writes from the same huge
-+			 * page, but we mustn't unlock a page more than once.
-+			 */
-+			if (have_unlocked && page->index <= unlocked)
-+				continue;
-+			unlocked = page->index;
-+			end_page_fscache(page);
-+			have_unlocked = true;
-+		}
-+	}
-+
-+	rcu_read_unlock();
-+	netfs_rreq_completed(rreq, was_async);
-+}
-+
-+static void netfs_rreq_copy_terminated(void *priv, ssize_t transferred_or_error,
-+				       bool was_async)
-+{
-+	struct netfs_read_subrequest *subreq = priv;
-+	struct netfs_read_request *rreq = subreq->rreq;
-+
-+	if (IS_ERR_VALUE(transferred_or_error)) {
-+		subreq->error = transferred_or_error;
-+		netfs_stat(&netfs_n_rh_write_failed);
-+	} else {
-+		subreq->error = 0;
-+		netfs_stat(&netfs_n_rh_write_done);
-+	}
-+
-+	trace_netfs_sreq(subreq, netfs_sreq_trace_write_term);
-+
-+	/* If we decrement nr_wr_ops to 0, the ref belongs to us. */
-+	if (atomic_dec_and_test(&rreq->nr_wr_ops))
-+		netfs_rreq_unmark_after_write(rreq, was_async);
-+
-+	netfs_put_subrequest(subreq, was_async);
-+}
-+
-+/*
-+ * Perform any outstanding writes to the cache.  We inherit a ref from the
-+ * caller.
-+ */
-+static void netfs_rreq_do_write_to_cache(struct netfs_read_request *rreq)
-+{
-+	struct netfs_cache_resources *cres = &rreq->cache_resources;
-+	struct netfs_read_subrequest *subreq, *next, *p;
-+	struct iov_iter iter;
-+	loff_t pos;
-+
-+	trace_netfs_rreq(rreq, netfs_rreq_trace_write);
-+
-+	/* We don't want terminating writes trying to wake us up whilst we're
-+	 * still going through the list.
-+	 */
-+	atomic_inc(&rreq->nr_wr_ops);
-+
-+	list_for_each_entry_safe(subreq, p, &rreq->subrequests, rreq_link) {
-+		if (!test_bit(NETFS_SREQ_WRITE_TO_CACHE, &subreq->flags)) {
-+			list_del_init(&subreq->rreq_link);
-+			netfs_put_subrequest(subreq, false);
-+		}
-+	}
-+
-+	list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
-+		/* Amalgamate adjacent writes */
-+		pos = round_down(subreq->start, PAGE_SIZE);
-+		if (pos != subreq->start) {
-+			subreq->len += subreq->start - pos;
-+			subreq->start = pos;
-+		}
-+		subreq->len = round_up(subreq->len, PAGE_SIZE);
-+
-+		while (!list_is_last(&subreq->rreq_link, &rreq->subrequests)) {
-+			next = list_next_entry(subreq, rreq_link);
-+			if (next->start > subreq->start + subreq->len)
-+				break;
-+			subreq->len += next->len;
-+			subreq->len = round_up(subreq->len, PAGE_SIZE);
-+			list_del_init(&next->rreq_link);
-+			netfs_put_subrequest(next, false);
-+		}
-+
-+		iov_iter_xarray(&iter, WRITE, &rreq->mapping->i_pages,
-+				subreq->start, subreq->len);
-+
-+		atomic_inc(&rreq->nr_wr_ops);
-+		netfs_stat(&netfs_n_rh_write);
-+		netfs_get_read_subrequest(subreq);
-+		trace_netfs_sreq(subreq, netfs_sreq_trace_write);
-+		cres->ops->write(cres, subreq->start, &iter,
-+				 netfs_rreq_copy_terminated, subreq);
-+	}
-+
-+	/* If we decrement nr_wr_ops to 0, the usage ref belongs to us. */
-+	if (atomic_dec_and_test(&rreq->nr_wr_ops))
-+		netfs_rreq_unmark_after_write(rreq, false);
-+}
-+
-+static void netfs_rreq_write_to_cache_work(struct work_struct *work)
-+{
-+	struct netfs_read_request *rreq =
-+		container_of(work, struct netfs_read_request, work);
-+
-+	netfs_rreq_do_write_to_cache(rreq);
-+}
-+
-+static void netfs_rreq_write_to_cache(struct netfs_read_request *rreq,
-+				      bool was_async)
-+{
-+	if (was_async) {
-+		rreq->work.func = netfs_rreq_write_to_cache_work;
-+		if (!queue_work(system_unbound_wq, &rreq->work))
-+			BUG();
-+	} else {
-+		netfs_rreq_do_write_to_cache(rreq);
-+	}
-+}
-+
- /*
-  * Unlock the pages in a read operation.  We need to set PG_fscache on any
-  * pages we're going to write back before we unlock them.
-@@ -299,7 +467,10 @@ static void netfs_rreq_short_read(struct netfs_read_request *rreq,
- 
- 	netfs_get_read_subrequest(subreq);
- 	atomic_inc(&rreq->nr_rd_ops);
--	netfs_read_from_server(rreq, subreq);
-+	if (subreq->source == NETFS_READ_FROM_CACHE)
-+		netfs_read_from_cache(rreq, subreq, true);
-+	else
-+		netfs_read_from_server(rreq, subreq);
- }
- 
- /*
-@@ -344,6 +515,25 @@ static bool netfs_rreq_perform_resubmissions(struct netfs_read_request *rreq)
- 	return false;
- }
- 
-+/*
-+ * Check to see if the data read is still valid.
-+ */
-+static void netfs_rreq_is_still_valid(struct netfs_read_request *rreq)
-+{
-+	struct netfs_read_subrequest *subreq;
-+
-+	if (!rreq->netfs_ops->is_still_valid ||
-+	    rreq->netfs_ops->is_still_valid(rreq))
-+		return;
-+
-+	list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
-+		if (subreq->source == NETFS_READ_FROM_CACHE) {
-+			subreq->error = -ESTALE;
-+			__set_bit(NETFS_RREQ_INCOMPLETE_IO, &rreq->flags);
-+		}
-+	}
-+}
-+
- /*
-  * Assess the state of a read request and decide what to do next.
-  *
-@@ -355,6 +545,8 @@ static void netfs_rreq_assess(struct netfs_read_request *rreq, bool was_async)
- 	trace_netfs_rreq(rreq, netfs_rreq_trace_assess);
- 
- again:
-+	netfs_rreq_is_still_valid(rreq);
-+
- 	if (!test_bit(NETFS_RREQ_FAILED, &rreq->flags) &&
- 	    test_bit(NETFS_RREQ_INCOMPLETE_IO, &rreq->flags)) {
- 		if (netfs_rreq_perform_resubmissions(rreq))
-@@ -367,6 +559,9 @@ static void netfs_rreq_assess(struct netfs_read_request *rreq, bool was_async)
- 	clear_bit_unlock(NETFS_RREQ_IN_PROGRESS, &rreq->flags);
- 	wake_up_bit(&rreq->flags, NETFS_RREQ_IN_PROGRESS);
- 
-+	if (test_bit(NETFS_RREQ_WRITE_TO_CACHE, &rreq->flags))
-+		return netfs_rreq_write_to_cache(rreq, was_async);
-+
- 	netfs_rreq_completed(rreq, was_async);
- }
- 
-@@ -504,7 +699,10 @@ static enum netfs_read_source netfs_cache_prepare_read(struct netfs_read_subrequ
- 						       loff_t i_size)
- {
- 	struct netfs_read_request *rreq = subreq->rreq;
-+	struct netfs_cache_resources *cres = &rreq->cache_resources;
- 
-+	if (cres->ops)
-+		return cres->ops->prepare_read(subreq, i_size);
- 	if (subreq->start >= rreq->i_size)
- 		return NETFS_FILL_WITH_ZEROES;
- 	return NETFS_DOWNLOAD_FROM_SERVER;
-@@ -595,6 +793,9 @@ static bool netfs_rreq_submit_slice(struct netfs_read_request *rreq,
- 	case NETFS_DOWNLOAD_FROM_SERVER:
- 		netfs_read_from_server(rreq, subreq);
- 		break;
-+	case NETFS_READ_FROM_CACHE:
-+		netfs_read_from_cache(rreq, subreq, false);
-+		break;
- 	default:
- 		BUG();
+diff --git a/fs/afs/file.c b/fs/afs/file.c
+index 85f5adf21aa0..6d43713fde01 100644
+--- a/fs/afs/file.c
++++ b/fs/afs/file.c
+@@ -203,24 +203,6 @@ void afs_put_read(struct afs_read *req)
  	}
-@@ -607,9 +808,23 @@ static bool netfs_rreq_submit_slice(struct netfs_read_request *rreq,
- 	return false;
  }
  
-+static void netfs_cache_expand_readahead(struct netfs_read_request *rreq,
-+					 loff_t *_start, size_t *_len, loff_t i_size)
-+{
-+	struct netfs_cache_resources *cres = &rreq->cache_resources;
-+
-+	if (cres->ops && cres->ops->expand_readahead)
-+		cres->ops->expand_readahead(cres, _start, _len, i_size);
-+}
-+
- static void netfs_rreq_expand(struct netfs_read_request *rreq,
- 			      struct readahead_control *ractl)
+-#ifdef CONFIG_AFS_FSCACHE
+-/*
+- * deal with notification that a page was read from the cache
+- */
+-static void afs_file_readpage_read_complete(struct page *page,
+-					    void *data,
+-					    int error)
+-{
+-	_enter("%p,%p,%d", page, data, error);
+-
+-	/* if the read completes with an error, we just unlock the page and let
+-	 * the VM reissue the readpage */
+-	if (!error)
+-		SetPageUptodate(page);
+-	unlock_page(page);
+-}
+-#endif
+-
+ static void afs_fetch_data_success(struct afs_operation *op)
  {
-+	/* Give the cache a chance to change the request parameters.  The
-+	 * resultant request must contain the original region.
+ 	struct afs_vnode *vnode = op->file[0].vnode;
+@@ -288,89 +270,46 @@ int afs_page_filler(void *data, struct page *page)
+ 	if (test_bit(AFS_VNODE_DELETED, &vnode->flags))
+ 		goto error;
+ 
+-	/* is it cached? */
+-#ifdef CONFIG_AFS_FSCACHE
+-	ret = fscache_read_or_alloc_page(vnode->cache,
+-					 page,
+-					 afs_file_readpage_read_complete,
+-					 NULL,
+-					 GFP_KERNEL);
+-#else
+-	ret = -ENOBUFS;
+-#endif
+-	switch (ret) {
+-		/* read BIO submitted (page in cache) */
+-	case 0:
+-		break;
+-
+-		/* page not yet cached */
+-	case -ENODATA:
+-		_debug("cache said ENODATA");
+-		goto go_on;
+-
+-		/* page will not be cached */
+-	case -ENOBUFS:
+-		_debug("cache said ENOBUFS");
+-
+-		fallthrough;
+-	default:
+-	go_on:
+-		req = kzalloc(struct_size(req, array, 1), GFP_KERNEL);
+-		if (!req)
+-			goto enomem;
+-
+-		/* We request a full page.  If the page is a partial one at the
+-		 * end of the file, the server will return a short read and the
+-		 * unmarshalling code will clear the unfilled space.
+-		 */
+-		refcount_set(&req->usage, 1);
+-		req->pos = (loff_t)page->index << PAGE_SHIFT;
+-		req->len = PAGE_SIZE;
+-		req->nr_pages = 1;
+-		req->pages = req->array;
+-		req->pages[0] = page;
+-		get_page(page);
+-
+-		/* read the contents of the file from the server into the
+-		 * page */
+-		ret = afs_fetch_data(vnode, key, req);
+-		afs_put_read(req);
+-
+-		if (ret < 0) {
+-			if (ret == -ENOENT) {
+-				_debug("got NOENT from server"
+-				       " - marking file deleted and stale");
+-				set_bit(AFS_VNODE_DELETED, &vnode->flags);
+-				ret = -ESTALE;
+-			}
+-
+-#ifdef CONFIG_AFS_FSCACHE
+-			fscache_uncache_page(vnode->cache, page);
+-#endif
+-			BUG_ON(PageFsCache(page));
+-
+-			if (ret == -EINTR ||
+-			    ret == -ENOMEM ||
+-			    ret == -ERESTARTSYS ||
+-			    ret == -EAGAIN)
+-				goto error;
+-			goto io_error;
+-		}
++	req = kzalloc(struct_size(req, array, 1), GFP_KERNEL);
++	if (!req)
++		goto enomem;
+ 
+-		SetPageUptodate(page);
++	/* We request a full page.  If the page is a partial one at the
++	 * end of the file, the server will return a short read and the
++	 * unmarshalling code will clear the unfilled space.
 +	 */
-+	netfs_cache_expand_readahead(rreq, &rreq->start, &rreq->len, rreq->i_size);
++	refcount_set(&req->usage, 1);
++	req->pos = (loff_t)page->index << PAGE_SHIFT;
++	req->len = PAGE_SIZE;
++	req->nr_pages = 1;
++	req->pages = req->array;
++	req->pages[0] = page;
++	get_page(page);
 +
- 	/* Give the netfs a chance to change the request parameters.  The
- 	 * resultant request must contain the original region.
++	/* read the contents of the file from the server into the
++	 * page */
++	ret = afs_fetch_data(vnode, key, req);
++	afs_put_read(req);
+ 
+-		/* send the page to the cache */
+-#ifdef CONFIG_AFS_FSCACHE
+-		if (PageFsCache(page) &&
+-		    fscache_write_page(vnode->cache, page, vnode->status.size,
+-				       GFP_KERNEL) != 0) {
+-			fscache_uncache_page(vnode->cache, page);
+-			BUG_ON(PageFsCache(page));
++	if (ret < 0) {
++		if (ret == -ENOENT) {
++			_debug("got NOENT from server"
++			       " - marking file deleted and stale");
++			set_bit(AFS_VNODE_DELETED, &vnode->flags);
++			ret = -ESTALE;
+ 		}
+-#endif
+-		unlock_page(page);
++
++		if (ret == -EINTR ||
++		    ret == -ENOMEM ||
++		    ret == -ERESTARTSYS ||
++		    ret == -EAGAIN)
++			goto error;
++		goto io_error;
+ 	}
+ 
++	SetPageUptodate(page);
++	unlock_page(page);
++
+ 	_leave(" = 0");
+ 	return 0;
+ 
+@@ -416,23 +355,10 @@ static int afs_readpage(struct file *file, struct page *page)
+  */
+ static void afs_readpages_page_done(struct afs_read *req)
+ {
+-#ifdef CONFIG_AFS_FSCACHE
+-	struct afs_vnode *vnode = req->vnode;
+-#endif
+ 	struct page *page = req->pages[req->index];
+ 
+ 	req->pages[req->index] = NULL;
+ 	SetPageUptodate(page);
+-
+-	/* send the page to the cache */
+-#ifdef CONFIG_AFS_FSCACHE
+-	if (PageFsCache(page) &&
+-	    fscache_write_page(vnode->cache, page, vnode->status.size,
+-			       GFP_KERNEL) != 0) {
+-		fscache_uncache_page(vnode->cache, page);
+-		BUG_ON(PageFsCache(page));
+-	}
+-#endif
+ 	unlock_page(page);
+ 	put_page(page);
+ }
+@@ -491,9 +417,6 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+ 		index = page->index;
+ 		if (add_to_page_cache_lru(page, mapping, index,
+ 					  readahead_gfp_mask(mapping))) {
+-#ifdef CONFIG_AFS_FSCACHE
+-			fscache_uncache_page(vnode->cache, page);
+-#endif
+ 			put_page(page);
+ 			break;
+ 		}
+@@ -526,9 +449,6 @@ static int afs_readpages_one(struct file *file, struct address_space *mapping,
+ 	for (i = 0; i < req->nr_pages; i++) {
+ 		page = req->pages[i];
+ 		if (page) {
+-#ifdef CONFIG_AFS_FSCACHE
+-			fscache_uncache_page(vnode->cache, page);
+-#endif
+ 			SetPageError(page);
+ 			unlock_page(page);
+ 		}
+@@ -560,37 +480,6 @@ static int afs_readpages(struct file *file, struct address_space *mapping,
+ 	}
+ 
+ 	/* attempt to read as many of the pages as possible */
+-#ifdef CONFIG_AFS_FSCACHE
+-	ret = fscache_read_or_alloc_pages(vnode->cache,
+-					  mapping,
+-					  pages,
+-					  &nr_pages,
+-					  afs_file_readpage_read_complete,
+-					  NULL,
+-					  mapping_gfp_mask(mapping));
+-#else
+-	ret = -ENOBUFS;
+-#endif
+-
+-	switch (ret) {
+-		/* all pages are being read from the cache */
+-	case 0:
+-		BUG_ON(!list_empty(pages));
+-		BUG_ON(nr_pages != 0);
+-		_leave(" = 0 [reading all]");
+-		return 0;
+-
+-		/* there were pages that couldn't be read from the cache */
+-	case -ENODATA:
+-	case -ENOBUFS:
+-		break;
+-
+-		/* other error */
+-	default:
+-		_leave(" = %d", ret);
+-		return ret;
+-	}
+-
+ 	while (!list_empty(pages)) {
+ 		ret = afs_readpages_one(file, mapping, pages);
+ 		if (ret < 0)
+@@ -670,17 +559,6 @@ static void afs_invalidatepage(struct page *page, unsigned int offset,
+ 
+ 	BUG_ON(!PageLocked(page));
+ 
+-#ifdef CONFIG_AFS_FSCACHE
+-	/* we clean up only if the entire page is being invalidated */
+-	if (offset == 0 && length == PAGE_SIZE) {
+-		if (PageFsCache(page)) {
+-			struct afs_vnode *vnode = AFS_FS_I(page->mapping->host);
+-			fscache_wait_on_page_write(vnode->cache, page);
+-			fscache_uncache_page(vnode->cache, page);
+-		}
+-	}
+-#endif
+-
+ 	if (PagePrivate(page))
+ 		afs_invalidate_dirty(page, offset, length);
+ 
+@@ -702,13 +580,6 @@ static int afs_releasepage(struct page *page, gfp_t gfp_flags)
+ 
+ 	/* deny if page is being written to the cache and the caller hasn't
+ 	 * elected to wait */
+-#ifdef CONFIG_AFS_FSCACHE
+-	if (!fscache_maybe_release_page(vnode->cache, page, gfp_flags)) {
+-		_leave(" = F [cache busy]");
+-		return 0;
+-	}
+-#endif
+-
+ 	if (PagePrivate(page)) {
+ 		priv = (unsigned long)detach_page_private(page);
+ 		trace_afs_page_dirty(vnode, tracepoint_string("rel"),
+diff --git a/fs/afs/inode.c b/fs/afs/inode.c
+index 1156b2df28d3..48519ee00eef 100644
+--- a/fs/afs/inode.c
++++ b/fs/afs/inode.c
+@@ -428,7 +428,7 @@ static void afs_get_inode_cache(struct afs_vnode *vnode)
+ 	} __packed key;
+ 	struct afs_vnode_cache_aux aux;
+ 
+-	if (vnode->status.type == AFS_FTYPE_DIR) {
++	if (vnode->status.type != AFS_FTYPE_FILE) {
+ 		vnode->cache = NULL;
+ 		return;
+ 	}
+diff --git a/fs/afs/write.c b/fs/afs/write.c
+index c9195fc67fd8..92eaa88000d7 100644
+--- a/fs/afs/write.c
++++ b/fs/afs/write.c
+@@ -847,9 +847,6 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
+ 	/* Wait for the page to be written to the cache before we allow it to
+ 	 * be modified.  We then assume the entire page will need writing back.
  	 */
-@@ -661,6 +876,7 @@ void netfs_readahead(struct readahead_control *ractl,
- 	struct netfs_read_request *rreq;
- 	struct page *page;
- 	unsigned int debug_index = 0;
-+	int ret;
+-#ifdef CONFIG_AFS_FSCACHE
+-	fscache_wait_on_page_write(vnode->cache, vmf->page);
+-#endif
  
- 	_enter("%lx,%x", readahead_index(ractl), readahead_count(ractl));
- 
-@@ -678,6 +894,11 @@ void netfs_readahead(struct readahead_control *ractl,
- 	trace_netfs_read(rreq, readahead_pos(ractl), readahead_length(ractl),
- 			 netfs_read_trace_readahead);
- 
-+	if (ops->begin_cache_operation) {
-+		ret = ops->begin_cache_operation(rreq);
-+		if (ret == -ENOMEM || ret == -EINTR || ret == -ERESTARTSYS)
-+			goto cleanup_free;
-+	}
- 	netfs_rreq_expand(rreq, ractl);
- 
- 	atomic_set(&rreq->nr_rd_ops, 1);
-@@ -698,6 +919,9 @@ void netfs_readahead(struct readahead_control *ractl,
- 		netfs_rreq_assess(rreq, false);
- 	return;
- 
-+cleanup_free:
-+	netfs_put_read_request(rreq, false);
-+	return;
- cleanup:
- 	if (netfs_priv)
- 		ops->cleanup(ractl->mapping, netfs_priv);
-@@ -747,6 +971,14 @@ int netfs_readpage(struct file *file,
- 	netfs_stat(&netfs_n_rh_readpage);
- 	trace_netfs_read(rreq, rreq->start, rreq->len, netfs_read_trace_readpage);
- 
-+	if (ops->begin_cache_operation) {
-+		ret = ops->begin_cache_operation(rreq);
-+		if (ret == -ENOMEM || ret == -EINTR || ret == -ERESTARTSYS) {
-+			unlock_page(page);
-+			goto out;
-+		}
-+	}
-+
- 	netfs_get_read_request(rreq);
- 
- 	atomic_set(&rreq->nr_rd_ops, 1);
-@@ -768,6 +1000,7 @@ int netfs_readpage(struct file *file,
- 	ret = rreq->error;
- 	if (ret == 0 && rreq->submitted < rreq->len)
- 		ret = -EIO;
-+out:
- 	netfs_put_read_request(rreq, false);
+ 	if (PageWriteback(vmf->page) &&
+ 	    wait_on_page_bit_killable(vmf->page, PG_writeback) < 0)
+@@ -936,12 +933,5 @@ int afs_launder_page(struct page *page)
+ 	priv = (unsigned long)detach_page_private(page);
+ 	trace_afs_page_dirty(vnode, tracepoint_string("laundered"),
+ 			     page->index, priv);
+-
+-#ifdef CONFIG_AFS_FSCACHE
+-	if (PageFsCache(page)) {
+-		fscache_wait_on_page_write(vnode->cache, page);
+-		fscache_uncache_page(vnode->cache, page);
+-	}
+-#endif
  	return ret;
  }
-@@ -881,6 +1114,12 @@ int netfs_write_begin(struct file *file, struct address_space *mapping,
- 	netfs_stat(&netfs_n_rh_write_begin);
- 	trace_netfs_read(rreq, pos, len, netfs_read_trace_write_begin);
- 
-+	if (ops->begin_cache_operation) {
-+		ret = ops->begin_cache_operation(rreq);
-+		if (ret == -ENOMEM || ret == -EINTR || ret == -ERESTARTSYS)
-+			goto error;
-+	}
-+
- 	/* Expand the request to meet caching requirements and download
- 	 * preferences.
- 	 */
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 99659ed9524e..2299e7662ff0 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -92,6 +92,18 @@ enum netfs_read_source {
- 	NETFS_INVALID_READ,
- } __mode(byte);
- 
-+typedef void (*netfs_io_terminated_t)(void *priv, ssize_t transferred_or_error,
-+				      bool was_async);
-+
-+/*
-+ * Resources required to do operations on a cache.
-+ */
-+struct netfs_cache_resources {
-+	const struct netfs_cache_ops	*ops;
-+	void				*cache_priv;
-+	void				*cache_priv2;
-+};
-+
- /*
-  * Descriptor for a single component subrequest.
-  */
-@@ -121,11 +133,13 @@ struct netfs_read_request {
- 	struct work_struct	work;
- 	struct inode		*inode;		/* The file being accessed */
- 	struct address_space	*mapping;	/* The mapping being accessed */
-+	struct netfs_cache_resources cache_resources;
- 	struct list_head	subrequests;	/* Requests to fetch I/O from disk or net */
- 	void			*netfs_priv;	/* Private data for the netfs */
- 	unsigned int		debug_id;
- 	unsigned int		cookie_debug_id;
- 	atomic_t		nr_rd_ops;	/* Number of read ops in progress */
-+	atomic_t		nr_wr_ops;	/* Number of write ops in progress */
- 	size_t			submitted;	/* Amount submitted for I/O so far */
- 	size_t			len;		/* Length of the request */
- 	short			error;		/* 0 or error that occurred */
-@@ -149,6 +163,7 @@ struct netfs_read_request {
- struct netfs_read_request_ops {
- 	bool (*is_cache_enabled)(struct inode *inode);
- 	void (*init_rreq)(struct netfs_read_request *rreq, struct file *file);
-+	int (*begin_cache_operation)(struct netfs_read_request *rreq);
- 	void (*expand_readahead)(struct netfs_read_request *rreq);
- 	bool (*clamp_length)(struct netfs_read_subrequest *subreq);
- 	void (*issue_op)(struct netfs_read_subrequest *subreq);
-@@ -159,6 +174,40 @@ struct netfs_read_request_ops {
- 	void (*cleanup)(struct address_space *mapping, void *netfs_priv);
- };
- 
-+/*
-+ * Table of operations for access to a cache.  This is obtained by
-+ * rreq->ops->begin_cache_operation().
-+ */
-+struct netfs_cache_ops {
-+	/* End an operation */
-+	void (*end_operation)(struct netfs_cache_resources *cres);
-+
-+	/* Read data from the cache */
-+	int (*read)(struct netfs_cache_resources *cres,
-+		    loff_t start_pos,
-+		    struct iov_iter *iter,
-+		    bool seek_data,
-+		    netfs_io_terminated_t term_func,
-+		    void *term_func_priv);
-+
-+	/* Write data to the cache */
-+	int (*write)(struct netfs_cache_resources *cres,
-+		     loff_t start_pos,
-+		     struct iov_iter *iter,
-+		     netfs_io_terminated_t term_func,
-+		     void *term_func_priv);
-+
-+	/* Expand readahead request */
-+	void (*expand_readahead)(struct netfs_cache_resources *cres,
-+				 loff_t *_start, size_t *_len, loff_t i_size);
-+
-+	/* Prepare a read operation, shortening it to a cached/uncached
-+	 * boundary as appropriate.
-+	 */
-+	enum netfs_read_source (*prepare_read)(struct netfs_read_subrequest *subreq,
-+					       loff_t i_size);
-+};
-+
- struct readahead_control;
- extern void netfs_readahead(struct readahead_control *,
- 			    const struct netfs_read_request_ops *,
 
 
