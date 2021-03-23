@@ -2,42 +2,54 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D27BDC433DB
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 13:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C83ACC433E0
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 14:18:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91602619B3
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 13:52:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A70E160295
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 14:18:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231384AbhCWNwZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Mar 2021 09:52:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40620 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231362AbhCWNwI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Mar 2021 09:52:08 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B58C061574;
-        Tue, 23 Mar 2021 06:52:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BH51iSUzyg9KZ7syxnXQS3KRs906Uf9wJkKS6a1BsxQ=; b=angZPyAg1GkZnw395mQ1H2hSyZ
-        8FOuwPttbyu8A1w79GjNbJ2Ieum4ZYQv23Oe3ZuJALNa7bX50chua3/7bvzuk2g4H8GOUuRC6/PQM
-        Hq5J51thoR+VeXDXKg67FA4Pp9G5lzX1rTN9EnLPIxEtzEC9ankHhUyPM0E8SxgpjkNXcMH1Yz4Tt
-        DDw3C28/GiSWV2VPdA5FotyoAThZeYb6ZrknqHo9PTiqk61ys+mhrvVoFqtF28H8htXQUl2cco69T
-        loCYl4Ngxp2H7mit+LkiOZ0FHezZ4vUaS/YRmBAzfLodBDRcJm+pu8DFMhBrYUhI5bzW/qIwD/IRL
-        XBhU3HsQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lOhRE-00A7tp-Gh; Tue, 23 Mar 2021 13:51:19 +0000
-Date:   Tue, 23 Mar 2021 13:51:16 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Trond Myklebust <trondmy@hammerspace.com>,
+        id S232228AbhCWORu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Mar 2021 10:17:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44851 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232271AbhCWOQq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 23 Mar 2021 10:16:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616509000;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ecY1CzrvE1DPEu+sD2G/cZP9TNuYSjbK9W1EHfXolDw=;
+        b=M7GAMfXqr8B5H/LhUTF2IlgI+Ty2EAIOXMsz+rQsA+w+BlCZOkYmua11woYOwci+xObPSf
+        zm1XP9zdpRm+On8hSALX33cp2PaapPmJssPEQ8aeQndtqVfAhEOCDaKJAnPEF+Ps4jXRs0
+        1aRrg+MGnnIUgR+L7vrLVv+5Ktg37BM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-exvroquTOx2NCDRTMVZpiw-1; Tue, 23 Mar 2021 10:16:39 -0400
+X-MC-Unique: exvroquTOx2NCDRTMVZpiw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C2855B365;
+        Tue, 23 Mar 2021 14:16:36 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-112-58.rdu2.redhat.com [10.10.112.58])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E189C10016FD;
+        Tue, 23 Mar 2021 14:16:28 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210323135116.GF1719932@casper.infradead.org>
+References: <20210323135116.GF1719932@casper.infradead.org> <1885296.1616410586@warthog.procyon.org.uk> <20210321105309.GG3420@casper.infradead.org> <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk> <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk> <2499407.1616505440@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
@@ -50,50 +62,67 @@ Cc:     Trond Myklebust <trondmy@hammerspace.com>,
         linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
         David Wysochanski <dwysocha@redhat.com>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 02/28] mm: Add an unlock function for
- PG_private_2/PG_fscache
-Message-ID: <20210323135116.GF1719932@casper.infradead.org>
-References: <1885296.1616410586@warthog.procyon.org.uk>
- <20210321105309.GG3420@casper.infradead.org>
- <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk>
- <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk>
- <2499407.1616505440@warthog.procyon.org.uk>
+Subject: Re: [PATCH v4 02/28] mm: Add an unlock function for PG_private_2/PG_fscache
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2499407.1616505440@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2503809.1616508988.1@warthog.procyon.org.uk>
+Date:   Tue, 23 Mar 2021 14:16:28 +0000
+Message-ID: <2503810.1616508988@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 01:17:20PM +0000, David Howells wrote:
-> +++ b/fs/afs/write.c
-> @@ -846,7 +846,7 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
->  	 */
->  #ifdef CONFIG_AFS_FSCACHE
->  	if (PageFsCache(page) &&
-> -	    wait_on_page_bit_killable(page, PG_fscache) < 0)
-> +	    wait_on_page_fscache_killable(page) < 0)
->  		return VM_FAULT_RETRY;
->  #endif
->  
-> @@ -861,7 +861,8 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
->  	 * details the portion of the page we need to write back and we might
->  	 * need to redirty the page if there's a problem.
->  	 */
-> -	wait_on_page_writeback(page);
-> +	if (wait_on_page_writeback_killable(page) < 0)
-> +		return VM_FAULT_RETRY | VM_FAULT_LOCKED;
+Matthew Wilcox <willy@infradead.org> wrote:
 
-You forgot to unlock the page.  Also, if you're waiting killably here,
-do you need to wait before you get the page lock?  Ditto for waiting on
-fscache -- do you want to do that before or after you get the page lock?
+> On Tue, Mar 23, 2021 at 01:17:20PM +0000, David Howells wrote:
+> > +++ b/fs/afs/write.c
+> > @@ -846,7 +846,7 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
+> >  	 */
+> >  #ifdef CONFIG_AFS_FSCACHE
+> >  	if (PageFsCache(page) &&
+> > -	    wait_on_page_bit_killable(page, PG_fscache) < 0)
+> > +	    wait_on_page_fscache_killable(page) < 0)
+> >  		return VM_FAULT_RETRY;
+> >  #endif
+> >  
+> > @@ -861,7 +861,8 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
+> >  	 * details the portion of the page we need to write back and we might
+> >  	 * need to redirty the page if there's a problem.
+> >  	 */
+> > -	wait_on_page_writeback(page);
+> > +	if (wait_on_page_writeback_killable(page) < 0)
+> > +		return VM_FAULT_RETRY | VM_FAULT_LOCKED;
+> 
+> You forgot to unlock the page.
 
-Also, I never quite understood why you needed to wait for fscache
-writes to finish before allowing the page to be dirtied.  Is this a
-wait_for_stable_page() kind of situation, where the cache might be
-calculating a checksum on it?  Because as far as I can tell, once the
-page is dirty in RAM, the contents of the on-disk cache are irrelevant ...
-unless they're part of a RAID 5 checksum kind of situation.
+Do I need to?  Doesn't VM_FAULT_LOCKED indicate that to the caller?  Or is it
+impermissible to do it like that?
 
-I didn't spot any other problems ...
+> Also, if you're waiting killably here, do you need to wait before you get
+> the page lock?  Ditto for waiting on fscache -- do you want to do that
+> before or after you get the page lock?
+
+I'm waiting both before and after.  If I wait before, write() can go and
+trample over the page between PG_writeback/PG_fscache being cleared and us
+getting the lock here.  Probably I should only be waiting after locking the
+page.
+
+> Also, I never quite understood why you needed to wait for fscache
+> writes to finish before allowing the page to be dirtied.  Is this a
+> wait_for_stable_page() kind of situation, where the cache might be
+> calculating a checksum on it?  Because as far as I can tell, once the
+> page is dirty in RAM, the contents of the on-disk cache are irrelevant ...
+> unless they're part of a RAID 5 checksum kind of situation.
+
+Um.  I do want to add disconnected operation in the future and cache
+encryption, but, as things currently stand, it isn't necessary because the
+cache object is marked "in use" and will be discarded on rebinding after a
+power loss or crash if it's still marked when it's opened again.
+
+Also, the thought has occurred to me that I can make use of reflink copy to
+handle the caching of local modifications to cached files, in which case I'd
+rather have a clean copy to link from.
+
+David
+
