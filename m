@@ -2,477 +2,240 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F19B6C433E0
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 13:18:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F2B1C433E1
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 13:28:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF694619C2
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 13:18:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AC5B619BF
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 13:28:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231438AbhCWNST (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Mar 2021 09:18:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40598 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231674AbhCWNRf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 23 Mar 2021 09:17:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616505453;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nRkjTtb93YUNeVAd/BbXfvOHeWrSjEm57bE3N3KyVfI=;
-        b=bSy/ibn8PkCE2CT1ODyrxtK69kdy8r0H8P1hL6Sv2VESg6PopstIDnlyc7NglzsZQg17U7
-        FFXgixpV7k2JdB7LUh1bnSl/DjlPdxZ3Gd6JK1wbTTzChEztoeyyxZO6FrN8W6iVHtQgOp
-        ktl/l9m81nN5KnU8eOJPa1VVNnPzHOc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-456-bJPnASvjNIq86k_X6wklsg-1; Tue, 23 Mar 2021 09:17:31 -0400
-X-MC-Unique: bJPnASvjNIq86k_X6wklsg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1F8764151;
-        Tue, 23 Mar 2021 13:17:28 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-112-58.rdu2.redhat.com [10.10.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BBF8A610AF;
-        Tue, 23 Mar 2021 13:17:21 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <1885296.1616410586@warthog.procyon.org.uk>
-References: <1885296.1616410586@warthog.procyon.org.uk> <20210321105309.GG3420@casper.infradead.org> <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk> <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
+        id S229508AbhCWN2W (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Mar 2021 09:28:22 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:41568 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231404AbhCWN1w (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Mar 2021 09:27:52 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12NDKCfh056190;
+        Tue, 23 Mar 2021 13:27:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=MVqQ7s2WzKyNtpCuABtLdT6Z2dI4JW+Zqkq8SQ4aBn4=;
+ b=UDBguXtNg73Q5KnKkZyvpPSRVRwVG+/N6jIoeGlYovfhgqyHpnY07csmQ5j2KRb3g8uY
+ 4IZVmjZVUwKfAI41PBsfoINE68ZXqvjySBb4rT+NszRTb+L3MIeyjaf3A45+cMCEAe39
+ xFumwdkDCe7S2CxWWS86uwTRD/eo6TF0Q0qUzBos4YHraMVNli9Ai/tn8Sz2lbp2FJrv
+ h3IAQD3FYZpl2zk38J7pJ8/7zJYjP0UyOsd6PY+I4mWMrJGAf7fPBlCgTRPgo1wmccmg
+ yCkPTayQf0SqXu6dqaoiJqlndebOandF7rek8l8n1T1c0/06qEbaYywuX3VyPdNRSnmv fw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2120.oracle.com with ESMTP id 37d9pmxwxs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Mar 2021 13:27:19 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12NDQiXp179991;
+        Tue, 23 Mar 2021 13:27:17 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 37dtyxecmh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 23 Mar 2021 13:27:17 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 12NDRC2D005969;
+        Tue, 23 Mar 2021 13:27:12 GMT
+Received: from mwanda (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 23 Mar 2021 06:27:11 -0700
+Date:   Tue, 23 Mar 2021 16:27:04 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Namjae Jeon <namjae.jeon@samsung.com>
+Cc:     Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
         Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Alexander Viro <viro@zeniv.linux.org.uk>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 02/28] mm: Add an unlock function for PG_private_2/PG_fscache
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        linux-cifs@vger.kernel.org,
+        linux-cifsd-devel@lists.sourceforge.net,
+        kernel-janitors@vger.kernel.org
+Subject: [PATCH v2] cifsd: fix error handling in ksmbd_server_init()
+Message-ID: <YFnsqPphqvItA3z2@mwanda>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2499406.1616505440.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 23 Mar 2021 13:17:20 +0000
-Message-ID: <2499407.1616505440@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Proofpoint-IMR: 1
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9931 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 suspectscore=0 spamscore=0 malwarescore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103230099
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9931 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 phishscore=0
+ mlxlogscore=999 priorityscore=1501 impostorscore=0 bulkscore=0 spamscore=0
+ adultscore=0 clxscore=1015 malwarescore=0 mlxscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103230098
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-David Howells <dhowells@redhat.com> wrote:
+The error handling in ksmbd_server_init() uses "one function to free
+everything style" which is impossible to audit and leads to several
+canonical bugs.  When we free something that wasn't allocated it may be
+uninitialized, an error pointer, freed in a different function or we
+try freeing "foo->bar" when "foo" is a NULL pointer.  And since the
+code is impossible to audit then it leads to memory leaks.
 
-> Matthew Wilcox <willy@infradead.org> wrote:
-> =
+In the ksmbd_server_init() function, every goto will lead to a crash
+because we have not allocated the work queue but we call
+ksmbd_workqueue_destroy() which tries to flush a NULL work queue.
+Another bug is if ksmbd_init_buffer_pools() fails then it leads to a
+double free because we free "work_cache" twice.  A third type of bug is
+that we forgot to call ksmbd_release_inode_hash() so that is a resource
+leak.
 
-> > That also brings up that there is no set_page_private_2().  I think
-> > that's OK -- you only set PageFsCache() immediately after reading the
-> > page from the server.  But I feel this "unlock_page_private_2" is actu=
-ally
-> > "clear_page_private_2" -- ie it's equivalent to writeback, not to lock=
-.
-> =
+A better way to write error handling is for every function to clean up
+after itself and never leave things partially allocated.  Then we can
+use "free the last successfully allocated resource" style.  That way
+when someone is reading the code they can just track the last resource
+in their head and verify that the goto matches what they expect.
 
-> How about I do the following:
-> =
+In this patch I modified ksmbd_ipc_init() to clean up after itself and
+then I converted ksmbd_server_init() to use gotos to clean up.
 
->  (1) Add set_page_private_2() or mark_page_private_2() to set the PG_fsc=
-ache_2
->      bit.  It could take a ref on the page here.
-> =
-
->  (2) Rename unlock_page_private_2() to end_page_private_2().  It could d=
-rop
->      the ref on the page here, but that then means I can't use
->      pagevec_release().
-> =
-
->  (3) Add wait_on_page_private_2() an analogue of wait_on_page_writeback(=
-)
->      rather than wait_on_page_locked().
-> =
-
->  (4) Provide fscache synonyms of the above.
-
-Perhaps something like the attached changes (they'll need merging back int=
-o
-the other patches).
-
-David
+Fixes: cabcebc31de4 ("cifsd: introduce SMB3 kernel server")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
- include/linux/pagemap.h |   21 +++++++++++++++++-
- include/linux/netfs.h   |   54 ++++++++++++++++++++++++++++++++++++------=
-------
- fs/afs/write.c          |    5 ++--
- fs/netfs/read_helper.c  |   17 +++++----------
- mm/filemap.c            |   49 +++++++++++++++++++++++++++++++++++++++---=
--
- mm/page-writeback.c     |   25 ++++++++++++++++++++++
- 6 files changed, 139 insertions(+), 32 deletions(-)
+v2: remove __exit annotation from ksmbd_release_inode_hash() as detected
+by the kbuild-bot
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index bf05e99ce588..5c14a9365aae 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -591,7 +591,6 @@ extern int __lock_page_async(struct page *page, struct=
- wait_page_queue *wait);
- extern int __lock_page_or_retry(struct page *page, struct mm_struct *mm,
- 				unsigned int flags);
- extern void unlock_page(struct page *page);
--void unlock_page_private_2(struct page *page);
- =
+ fs/cifsd/server.c        | 33 +++++++++++++++++++++++----------
+ fs/cifsd/transport_ipc.c | 14 +++++++++++---
+ fs/cifsd/vfs_cache.c     |  2 +-
+ fs/cifsd/vfs_cache.h     |  2 +-
+ 4 files changed, 36 insertions(+), 15 deletions(-)
 
- /*
-  * Return true if the page was successfully locked
-@@ -684,11 +683,31 @@ static inline int wait_on_page_locked_killable(struc=
-t page *page)
- =
-
- int put_and_wait_on_page_locked(struct page *page, int state);
- void wait_on_page_writeback(struct page *page);
-+int wait_on_page_writeback_killable(struct page *page);
- extern void end_page_writeback(struct page *page);
- void wait_for_stable_page(struct page *page);
- =
-
- void page_endio(struct page *page, bool is_write, int err);
- =
-
-+/**
-+ * set_page_private_2 - Set PG_private_2 on a page and take a ref
-+ * @page: The page.
-+ *
-+ * Set the PG_private_2 flag on a page and take the reference needed for =
-the VM
-+ * to handle its lifetime correctly.  This sets the flag and takes the
-+ * reference unconditionally, so care must be taken not to set the flag a=
-gain
-+ * if it's already set.
-+ */
-+static inline void set_page_private_2(struct page *page)
-+{
-+	get_page(page);
-+	SetPagePrivate2(page);
-+}
+diff --git a/fs/cifsd/server.c b/fs/cifsd/server.c
+index 85862c3ea7c0..31e454cb3ce2 100644
+--- a/fs/cifsd/server.c
++++ b/fs/cifsd/server.c
+@@ -567,39 +567,52 @@ static int __init ksmbd_server_init(void)
+ 
+ 	ret = server_conf_init();
+ 	if (ret)
+-		return ret;
++		goto err_unregister;
+ 
+ 	ret = ksmbd_init_buffer_pools();
+ 	if (ret)
+-		return ret;
++		goto err_unregister;
+ 
+ 	ret = ksmbd_init_session_table();
+ 	if (ret)
+-		goto error;
++		goto err_destroy_pools;
+ 
+ 	ret = ksmbd_ipc_init();
+ 	if (ret)
+-		goto error;
++		goto err_free_session_table;
+ 
+ 	ret = ksmbd_init_global_file_table();
+ 	if (ret)
+-		goto error;
++		goto err_ipc_release;
+ 
+ 	ret = ksmbd_inode_hash_init();
+ 	if (ret)
+-		goto error;
++		goto err_destroy_file_table;
+ 
+ 	ret = ksmbd_crypto_create();
+ 	if (ret)
+-		goto error;
++		goto err_release_inode_hash;
+ 
+ 	ret = ksmbd_workqueue_init();
+ 	if (ret)
+-		goto error;
++		goto err_crypto_destroy;
+ 	return 0;
+ 
+-error:
+-	ksmbd_server_shutdown();
++err_crypto_destroy:
++	ksmbd_crypto_destroy();
++err_release_inode_hash:
++	ksmbd_release_inode_hash();
++err_destroy_file_table:
++	ksmbd_free_global_file_table();
++err_ipc_release:
++	ksmbd_ipc_release();
++err_free_session_table:
++	ksmbd_free_session_table();
++err_destroy_pools:
++	ksmbd_destroy_buffer_pools();
++err_unregister:
++	class_unregister(&ksmbd_control_class);
 +
-+void end_page_private_2(struct page *page);
-+void wait_on_page_private_2(struct page *page);
-+int wait_on_page_private_2_killable(struct page *page);
-+
- /*
-  * Add an arbitrary waiter to a page's wait queue
-  */
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 9d3fbed4e30a..2299e7662ff0 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -29,32 +29,60 @@
- #define TestClearPageFsCache(page)	TestClearPagePrivate2((page))
- =
-
- /**
-- * unlock_page_fscache - Unlock a page that's locked with PG_fscache
-- * @page: The page
-+ * set_page_fscache - Set PG_fscache on a page and take a ref
-+ * @page: The page.
-  *
-- * Unlocks a page that's locked with PG_fscache and wakes up sleepers in
-- * wait_on_page_fscache().  This page bit is used by the netfs helpers wh=
-en a
-- * netfs page is being written to a local disk cache, thereby allowing wr=
-ites
-- * to the cache for the same page to be serialised.
-+ * Set the PG_fscache (PG_private_2) flag on a page and take the referenc=
-e
-+ * needed for the VM to handle its lifetime correctly.  This sets the fla=
-g and
-+ * takes the reference unconditionally, so care must be taken not to set =
-the
-+ * flag again if it's already set.
-  */
--static inline void unlock_page_fscache(struct page *page)
-+static inline void set_page_fscache(struct page *page)
- {
--	unlock_page_private_2(page);
-+	set_page_private_2(page);
+ 	return ret;
  }
- =
-
- /**
-- * wait_on_page_fscache - Wait for PG_fscache to be cleared on a page
-+ * end_page_fscache - Clear PG_fscache and release any waiters
-  * @page: The page
-  *
-- * Wait for the PG_fscache (PG_private_2) page bit to be removed from a p=
-age.
-- * This is, for example, used to handle a netfs page being written to a l=
-ocal
-+ * Clear the PG_fscache (PG_private_2) bit on a page and wake up any slee=
-pers
-+ * waiting for this.  The page ref held for PG_private_2 being set is rel=
-eased.
-+ *
-+ * This is, for example, used when a netfs page is being written to a loc=
-al
-  * disk cache, thereby allowing writes to the cache for the same page to =
-be
-  * serialised.
-  */
-+static inline void end_page_fscache(struct page *page)
-+{
-+	end_page_private_2(page);
-+}
-+
-+/**
-+ * wait_on_page_fscache - Wait for PG_fscache to be cleared on a page
-+ * @page: The page to wait on
-+ *
-+ * Wait for PG_fscache (aka PG_private_2) to be cleared on a page.
-+ */
- static inline void wait_on_page_fscache(struct page *page)
- {
--	if (PageFsCache(page))
--		wait_on_page_bit(compound_head(page), PG_fscache);
-+	wait_on_page_private_2(page);
-+}
-+
-+/**
-+ * wait_on_page_fscache_killable - Wait for PG_fscache to be cleared on a=
- page
-+ * @page: The page to wait on
-+ *
-+ * Wait for PG_fscache (aka PG_private_2) to be cleared on a page or unti=
-l a
-+ * fatal signal is received by the calling task.
-+ *
-+ * Return:
-+ * - 0 if successful.
-+ * - -EINTR if a fatal signal was encountered.
-+ */
-+static inline int wait_on_page_fscache_killable(struct page *page)
-+{
-+	return wait_on_page_private_2_killable(page);
- }
- =
-
- enum netfs_read_source {
-diff --git a/fs/afs/write.c b/fs/afs/write.c
-index b2e03de09c24..9f82e2bb463e 100644
---- a/fs/afs/write.c
-+++ b/fs/afs/write.c
-@@ -846,7 +846,7 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
- 	 */
- #ifdef CONFIG_AFS_FSCACHE
- 	if (PageFsCache(page) &&
--	    wait_on_page_bit_killable(page, PG_fscache) < 0)
-+	    wait_on_page_fscache_killable(page) < 0)
- 		return VM_FAULT_RETRY;
- #endif
- =
-
-@@ -861,7 +861,8 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
- 	 * details the portion of the page we need to write back and we might
- 	 * need to redirty the page if there's a problem.
- 	 */
--	wait_on_page_writeback(page);
-+	if (wait_on_page_writeback_killable(page) < 0)
-+		return VM_FAULT_RETRY | VM_FAULT_LOCKED;
- =
-
- 	priv =3D afs_page_dirty(page, 0, thp_size(page));
- 	priv =3D afs_page_dirty_mmapped(priv);
-diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
-index 56e90e0388f2..2b23584499b2 100644
---- a/fs/netfs/read_helper.c
-+++ b/fs/netfs/read_helper.c
-@@ -239,13 +239,10 @@ static void netfs_rreq_unmark_after_write(struct net=
-fs_read_request *rreq,
- 					  bool was_async)
- {
- 	struct netfs_read_subrequest *subreq;
--	struct pagevec pvec;
- 	struct page *page;
- 	pgoff_t unlocked =3D 0;
- 	bool have_unlocked =3D false;
- =
-
--	pagevec_init(&pvec);
--
- 	rcu_read_lock();
- =
-
- 	list_for_each_entry(subreq, &rreq->subrequests, rreq_link) {
-@@ -258,9 +255,7 @@ static void netfs_rreq_unmark_after_write(struct netfs=
-_read_request *rreq,
- 			if (have_unlocked && page->index <=3D unlocked)
- 				continue;
- 			unlocked =3D page->index;
--			unlock_page_fscache(page);
--			if (pagevec_add(&pvec, page) =3D=3D 0)
--				pagevec_release(&pvec);
-+			end_page_fscache(page);
- 			have_unlocked =3D true;
- 		}
+ 
+diff --git a/fs/cifsd/transport_ipc.c b/fs/cifsd/transport_ipc.c
+index c49e46fda9b1..e5f4d97b2924 100644
+--- a/fs/cifsd/transport_ipc.c
++++ b/fs/cifsd/transport_ipc.c
+@@ -887,11 +887,19 @@ int ksmbd_ipc_init(void)
+ 	if (ret) {
+ 		ksmbd_err("Failed to register KSMBD netlink interface %d\n",
+ 				ret);
+-		return ret;
++		goto cancel_work;
  	}
-@@ -419,10 +414,8 @@ static void netfs_rreq_unlock(struct netfs_read_reque=
-st *rreq)
- 				pg_failed =3D true;
- 				break;
- 			}
--			if (test_bit(NETFS_SREQ_WRITE_TO_CACHE, &subreq->flags)) {
--				get_page(page);
--				SetPageFsCache(page);
--			}
-+			if (test_bit(NETFS_SREQ_WRITE_TO_CACHE, &subreq->flags))
-+				set_page_fscache(page);
- 			pg_failed |=3D subreq_failed;
- 			if (pgend < iopos + subreq->len)
- 				break;
-@@ -1167,7 +1160,9 @@ int netfs_write_begin(struct file *file, struct addr=
-ess_space *mapping,
- 		goto error;
- =
-
- have_page:
--	wait_on_page_fscache(page);
-+	ret =3D wait_on_page_fscache_killable(page);
-+	if (ret < 0)
-+		goto error;
- have_page_no_wait:
- 	if (netfs_priv)
- 		ops->cleanup(netfs_priv, mapping);
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 925964b67583..788b71e8a72d 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1433,24 +1433,63 @@ void unlock_page(struct page *page)
- EXPORT_SYMBOL(unlock_page);
- =
-
- /**
-- * unlock_page_private_2 - Unlock a page that's locked with PG_private_2
-+ * end_page_private_2 - Clear PG_private_2 and release any waiters
-  * @page: The page
-  *
-- * Unlocks a page that's locked with PG_private_2 and wakes up sleepers i=
-n
-- * wait_on_page_private_2().
-+ * Clear the PG_private_2 bit on a page and wake up any sleepers waiting =
-for
-+ * this.  The page ref held for PG_private_2 being set is released.
-  *
-  * This is, for example, used when a netfs page is being written to a loc=
-al
-  * disk cache, thereby allowing writes to the cache for the same page to =
-be
-  * serialised.
-  */
--void unlock_page_private_2(struct page *page)
-+void end_page_private_2(struct page *page)
+ 
+ 	ida = ksmbd_ida_alloc();
+-	if (!ida)
+-		return -ENOMEM;
++	if (!ida) {
++		ret = -ENOMEM;
++		goto unregister;
++	}
+ 	return 0;
++
++unregister:
++	genl_unregister_family(&ksmbd_genl_family);
++cancel_work:
++	cancel_delayed_work_sync(&ipc_timer_work);
++	return ret;
+ }
+diff --git a/fs/cifsd/vfs_cache.c b/fs/cifsd/vfs_cache.c
+index af92fab5b7ae..34e045f27230 100644
+--- a/fs/cifsd/vfs_cache.c
++++ b/fs/cifsd/vfs_cache.c
+@@ -236,7 +236,7 @@ int __init ksmbd_inode_hash_init(void)
+ 	return 0;
+ }
+ 
+-void __exit ksmbd_release_inode_hash(void)
++void ksmbd_release_inode_hash(void)
  {
- 	page =3D compound_head(page);
- 	VM_BUG_ON_PAGE(!PagePrivate2(page), page);
- 	clear_bit_unlock(PG_private_2, &page->flags);
- 	wake_up_page_bit(page, PG_private_2);
-+	put_page(page);
-+}
-+EXPORT_SYMBOL(end_page_private_2);
-+
-+/**
-+ * wait_on_page_private_2 - Wait for PG_private_2 to be cleared on a page
-+ * @page: The page to wait on
-+ *
-+ * Wait for PG_private_2 (aka PG_fscache) to be cleared on a page.
-+ */
-+void wait_on_page_private_2(struct page *page)
-+{
-+	while (PagePrivate2(page))
-+		wait_on_page_bit(page, PG_private_2);
-+}
-+EXPORT_SYMBOL(wait_on_page_private_2);
-+
-+/**
-+ * wait_on_page_private_2_killable - Wait for PG_private_2 to be cleared =
-on a page
-+ * @page: The page to wait on
-+ *
-+ * Wait for PG_private_2 (aka PG_fscache) to be cleared on a page or unti=
-l a
-+ * fatal signal is received by the calling task.
-+ *
-+ * Return:
-+ * - 0 if successful.
-+ * - -EINTR if a fatal signal was encountered.
-+ */
-+int wait_on_page_private_2_killable(struct page *page)
-+{
-+	int ret =3D 0;
-+
-+	while (PagePrivate2(page)) {
-+		ret =3D wait_on_page_bit_killable(page, PG_private_2);
-+		if (ret < 0)
-+			break;
-+	}
-+
-+	return ret;
+ 	vfree(inode_hashtable);
  }
--EXPORT_SYMBOL(unlock_page_private_2);
-+EXPORT_SYMBOL(wait_on_page_private_2_killable);
- =
+diff --git a/fs/cifsd/vfs_cache.h b/fs/cifsd/vfs_cache.h
+index 7d23657c86c6..04ab5967a9ae 100644
+--- a/fs/cifsd/vfs_cache.h
++++ b/fs/cifsd/vfs_cache.h
+@@ -194,7 +194,7 @@ void ksmbd_set_fd_limit(unsigned long limit);
+  */
+ 
+ int __init ksmbd_inode_hash_init(void);
+-void __exit ksmbd_release_inode_hash(void);
++void ksmbd_release_inode_hash(void);
+ 
+ enum KSMBD_INODE_STATUS {
+ 	KSMBD_INODE_STATUS_OK,
+-- 
+2.30.2
 
- /**
-  * end_page_writeback - end writeback against a page
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index eb34d204d4ee..b8bad275f94b 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2833,6 +2833,31 @@ void wait_on_page_writeback(struct page *page)
- }
- EXPORT_SYMBOL_GPL(wait_on_page_writeback);
- =
-
-+/**
-+ * Wait for a page to complete writeback
-+ * @page: The page to wait on
-+ *
-+ * Wait for the writeback status of a page to clear or a fatal signal to =
-occur.
-+ *
-+ * Return:
-+ * - 0 on success.
-+ * - -EINTR if a fatal signal was encountered.
-+ */
-+int wait_on_page_writeback_killable(struct page *page)
-+{
-+	int ret =3D 0;
-+
-+	while (PageWriteback(page)) {
-+		trace_wait_on_page_writeback(page, page_mapping(page));
-+		ret =3D wait_on_page_bit_killable(page, PG_writeback);
-+		if (ret < 0)
-+			break;
-+	}
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(wait_on_page_writeback_killable);
-+
- /**
-  * wait_for_stable_page() - wait for writeback to finish, if necessary.
-  * @page:	The page to wait on.
 
