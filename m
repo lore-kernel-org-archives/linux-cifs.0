@@ -2,54 +2,54 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C83ACC433E0
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 14:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E209C433C1
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 22:07:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A70E160295
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 14:18:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A8DA619CD
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 22:07:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232228AbhCWORu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Mar 2021 10:17:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44851 "EHLO
+        id S233674AbhCWWGb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Mar 2021 18:06:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33799 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232271AbhCWOQq (ORCPT
+        by vger.kernel.org with ESMTP id S233812AbhCWWGY (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 23 Mar 2021 10:16:46 -0400
+        Tue, 23 Mar 2021 18:06:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616509000;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1616537178;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ecY1CzrvE1DPEu+sD2G/cZP9TNuYSjbK9W1EHfXolDw=;
-        b=M7GAMfXqr8B5H/LhUTF2IlgI+Ty2EAIOXMsz+rQsA+w+BlCZOkYmua11woYOwci+xObPSf
-        zm1XP9zdpRm+On8hSALX33cp2PaapPmJssPEQ8aeQndtqVfAhEOCDaKJAnPEF+Ps4jXRs0
-        1aRrg+MGnnIUgR+L7vrLVv+5Ktg37BM=
+        bh=pRq3eZVbRV0oWPAPcRDv0Y/ExsjTvRldW+ZwtCTRY5g=;
+        b=Tp8NjKXIGklgcEYMLogsUQIKvLMvkUl/ENsE2kylwO+mngHPFFduvg5Ho8mIQW++unADKV
+        vTpTjjBArt3boJhreJAKMeqL5pxrngGE7IDbnaVfeVpN/pibgTW/nPlRvVTAISYYFbrG2u
+        g4/8KVL4g867QzVN8knMhjdt2epKYJo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-exvroquTOx2NCDRTMVZpiw-1; Tue, 23 Mar 2021 10:16:39 -0400
-X-MC-Unique: exvroquTOx2NCDRTMVZpiw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-1-kYdx-kK4MaCmJMrG8tZ3eA-1; Tue, 23 Mar 2021 18:06:15 -0400
+X-MC-Unique: kYdx-kK4MaCmJMrG8tZ3eA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C2855B365;
-        Tue, 23 Mar 2021 14:16:36 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0FF7800D53;
+        Tue, 23 Mar 2021 22:06:11 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-112-58.rdu2.redhat.com [10.10.112.58])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E189C10016FD;
-        Tue, 23 Mar 2021 14:16:28 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 28FFB50C0E;
+        Tue, 23 Mar 2021 22:06:05 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
 From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20210323135116.GF1719932@casper.infradead.org>
-References: <20210323135116.GF1719932@casper.infradead.org> <1885296.1616410586@warthog.procyon.org.uk> <20210321105309.GG3420@casper.infradead.org> <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk> <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk> <2499407.1616505440@warthog.procyon.org.uk>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+In-Reply-To: <2503810.1616508988@warthog.procyon.org.uk>
+References: <2503810.1616508988@warthog.procyon.org.uk> <20210323135116.GF1719932@casper.infradead.org> <1885296.1616410586@warthog.procyon.org.uk> <20210321105309.GG3420@casper.infradead.org> <161539526152.286939.8589700175877370401.stgit@warthog.procyon.org.uk> <161539528910.286939.1252328699383291173.stgit@warthog.procyon.org.uk> <2499407.1616505440@warthog.procyon.org.uk>
+Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+        Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
@@ -65,64 +65,32 @@ Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
 Subject: Re: [PATCH v4 02/28] mm: Add an unlock function for PG_private_2/PG_fscache
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2503809.1616508988.1@warthog.procyon.org.uk>
-Date:   Tue, 23 Mar 2021 14:16:28 +0000
-Message-ID: <2503810.1616508988@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-ID: <2769313.1616537164.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Tue, 23 Mar 2021 22:06:04 +0000
+Message-ID: <2769314.1616537164@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
+David Howells <dhowells@redhat.com> wrote:
 
-> On Tue, Mar 23, 2021 at 01:17:20PM +0000, David Howells wrote:
-> > +++ b/fs/afs/write.c
-> > @@ -846,7 +846,7 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
-> >  	 */
-> >  #ifdef CONFIG_AFS_FSCACHE
-> >  	if (PageFsCache(page) &&
-> > -	    wait_on_page_bit_killable(page, PG_fscache) < 0)
-> > +	    wait_on_page_fscache_killable(page) < 0)
-> >  		return VM_FAULT_RETRY;
-> >  #endif
-> >  
-> > @@ -861,7 +861,8 @@ vm_fault_t afs_page_mkwrite(struct vm_fault *vmf)
-> >  	 * details the portion of the page we need to write back and we might
-> >  	 * need to redirty the page if there's a problem.
-> >  	 */
-> > -	wait_on_page_writeback(page);
-> > +	if (wait_on_page_writeback_killable(page) < 0)
-> > +		return VM_FAULT_RETRY | VM_FAULT_LOCKED;
-> 
-> You forgot to unlock the page.
+> > > -	wait_on_page_writeback(page);
+> > > +	if (wait_on_page_writeback_killable(page) < 0)
+> > > +		return VM_FAULT_RETRY | VM_FAULT_LOCKED;
+> > =
 
-Do I need to?  Doesn't VM_FAULT_LOCKED indicate that to the caller?  Or is it
-impermissible to do it like that?
+> > You forgot to unlock the page.
+> =
 
-> Also, if you're waiting killably here, do you need to wait before you get
-> the page lock?  Ditto for waiting on fscache -- do you want to do that
-> before or after you get the page lock?
+> Do I need to?  Doesn't VM_FAULT_LOCKED indicate that to the caller?  Or =
+is it
+> impermissible to do it like that?
 
-I'm waiting both before and after.  If I wait before, write() can go and
-trample over the page between PG_writeback/PG_fscache being cleared and us
-getting the lock here.  Probably I should only be waiting after locking the
-page.
-
-> Also, I never quite understood why you needed to wait for fscache
-> writes to finish before allowing the page to be dirtied.  Is this a
-> wait_for_stable_page() kind of situation, where the cache might be
-> calculating a checksum on it?  Because as far as I can tell, once the
-> page is dirty in RAM, the contents of the on-disk cache are irrelevant ...
-> unless they're part of a RAID 5 checksum kind of situation.
-
-Um.  I do want to add disconnected operation in the future and cache
-encryption, but, as things currently stand, it isn't necessary because the
-cache object is marked "in use" and will be discarded on rebinding after a
-power loss or crash if it's still marked when it's opened again.
-
-Also, the thought has occurred to me that I can make use of reflink copy to
-handle the caching of local modifications to cached files, in which case I'd
-rather have a clean copy to link from.
+Looks like, yes, I do need to.  VM_FAULT_LOCKED is ignored if RETRY is giv=
+en.
 
 David
 
