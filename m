@@ -2,128 +2,187 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 695EFC433C1
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 00:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A61C433C1
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 03:02:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B7C961992
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 00:15:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AEE4619AE
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 03:02:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230363AbhCWAOx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 20:14:53 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:13837 "EHLO
+        id S229673AbhCWDBe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 23:01:34 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:43976 "EHLO
         mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231317AbhCWAO3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 20:14:29 -0400
+        with ESMTP id S229537AbhCWDB0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 23:01:26 -0400
 Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210323001427epoutp02205ccafee524d84bc9b091908d7fd64a~u0Gl2C1RD1753917539epoutp02x
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Mar 2021 00:14:27 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210323001427epoutp02205ccafee524d84bc9b091908d7fd64a~u0Gl2C1RD1753917539epoutp02x
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210323030124epoutp0287bdbcd142d423038208dda5dd94350d~u2YWtLRej0173001730epoutp02F
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Mar 2021 03:01:24 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210323030124epoutp0287bdbcd142d423038208dda5dd94350d~u2YWtLRej0173001730epoutp02F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1616458467;
-        bh=9ZTqikGfuSNBkZVtRe4z3tgEtRpuhIhnaohbU4HxrVI=;
-        h=From:To:In-Reply-To:Subject:Date:References:From;
-        b=RK8j+N93BchjKIwSM1cuplxSr8rcMDV5fLrqtw1Zt21uRz6FKhE0PtIopjVYO5wdD
-         h7OdPhXMsi+fiff1ZCqNAxYRqh3NcZAQmmgkxbNJIF5pKKlKxYM/ryN9j1DcPJnwbr
-         e72K1Ndn1qvyAdcx75TfcMdx+g5pZQum9zkJUcsg=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        s=mail20170921; t=1616468484;
+        bh=zBS8pwQVYwk/Dc+dG60rDT0FuBHEKko+RRMZ08todfw=;
+        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+        b=GtCUyKg4rS67yZeQQvZcmr3BK3HaRW/6X06eRDKA79+VX9jWot6gpogiO9NyjGGDY
+         LpnXsa6HmahUz+coj7nlPSy6E4nhxdUoAnxYHyUMOtkLPqA0I00jZjTZD7EpK8OSSF
+         AswXHUGSVSsmes+L+1i+vtwgLnevyY8DQmTNbM2U=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
         epcas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210323001426epcas1p2bdd263b74a7ccf9bb468e9684009021b~u0GlFhaw21507015070epcas1p2v;
-        Tue, 23 Mar 2021 00:14:26 +0000 (GMT)
-Received: from epsmges1p5.samsung.com (unknown [182.195.40.163]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4F4Bgj2wB7z4x9Ps; Tue, 23 Mar
-        2021 00:14:25 +0000 (GMT)
+        20210323030123epcas1p283ad5d568f2a1e6a2220b1eee9c252fc~u2YWLLu_j0184801848epcas1p23;
+        Tue, 23 Mar 2021 03:01:23 +0000 (GMT)
+Received: from epsmges1p2.samsung.com (unknown [182.195.40.160]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4F4GNL60P2z4x9QF; Tue, 23 Mar
+        2021 03:01:22 +0000 (GMT)
 Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
-        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
-        ED.7E.10347.FD239506; Tue, 23 Mar 2021 09:14:23 +0900 (KST)
+        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        EF.12.63458.20A59506; Tue, 23 Mar 2021 12:01:22 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210323001423epcas1p2d95fe1898c2f0ec5318bf7379d20b1c3~u0GiG3zpQ1726617266epcas1p2c;
-        Tue, 23 Mar 2021 00:14:23 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20210323030122epcas1p147f5f0b852da3e35e928496737b85f0e~u2YUpHm2t2478424784epcas1p1o;
+        Tue, 23 Mar 2021 03:01:22 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
         epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210323001423epsmtrp25c51a0775aa582b6e0bd7c1d45c0e0b8~u0GiGGWnX2317923179epsmtrp2H;
-        Tue, 23 Mar 2021 00:14:23 +0000 (GMT)
-X-AuditID: b6c32a39-15dff7000002286b-ae-605932dfa477
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4B.CF.13470.FD239506; Tue, 23 Mar 2021 09:14:23 +0900 (KST)
-Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip1.samsung.com
+        20210323030122epsmtrp285c519b915fdba75e16667736fb75baa~u2YUn8Ryl1483914839epsmtrp2T;
+        Tue, 23 Mar 2021 03:01:22 +0000 (GMT)
+X-AuditID: b6c32a36-6dfff7000000f7e2-bb-60595a021871
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        67.C4.08745.10A59506; Tue, 23 Mar 2021 12:01:22 +0900 (KST)
+Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip2.samsung.com
         (KnoxPortal) with ESMTPA id
-        20210323001423epsmtip10188c91e8fe89f8003858075d63205f4~u0Gh6ZMpF1180411804epsmtip1e;
-        Tue, 23 Mar 2021 00:14:23 +0000 (GMT)
+        20210323030121epsmtip27f30b5160f4fafe3846d6e38d6f83351~u2YUTe8JZ0545905459epsmtip2_;
+        Tue, 23 Mar 2021 03:01:21 +0000 (GMT)
 From:   "Namjae Jeon" <namjae.jeon@samsung.com>
-To:     "'Steve French'" <smfrench@gmail.com>,
-        <linux-cifsd-devel@lists.sourceforge.net>,
-        "'CIFS'" <linux-cifs@vger.kernel.org>
-In-Reply-To: <CAH2r5muFSCWQUVn+iuZ_8fiWrCXtNmO0+AaEEEqFmD9+qj8-1w@mail.gmail.com>
-Subject: RE: ksmbd wiki page
-Date:   Tue, 23 Mar 2021 09:14:23 +0900
-Message-ID: <00ae01d71f79$7a76aa20$6f63fe60$@samsung.com>
+To:     "'Matthew Wilcox'" <willy@infradead.org>
+Cc:     <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-cifs@vger.kernel.org>,
+        <linux-cifsd-devel@lists.sourceforge.net>, <smfrench@gmail.com>,
+        <senozhatsky@chromium.org>, <hyc.lee@gmail.com>,
+        <viro@zeniv.linux.org.uk>, <hch@lst.de>, <hch@infradead.org>,
+        <ronniesahlberg@gmail.com>, <aurelien.aptel@gmail.com>,
+        <aaptel@suse.com>, <sandeen@sandeen.net>,
+        <dan.carpenter@oracle.com>, <colin.king@canonical.com>,
+        <rdunlap@infradead.org>,
+        "'Sergey Senozhatsky'" <sergey.senozhatsky@gmail.com>,
+        "'Steve French'" <stfrench@microsoft.com>
+In-Reply-To: <20210322221816.GW1719932@casper.infradead.org>
+Subject: RE: [PATCH 1/5] cifsd: add server handler and tranport layers
+Date:   Tue, 23 Mar 2021 12:01:22 +0900
+Message-ID: <00d901d71f90$cdfd24f0$69f76ed0$@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQFFRxmYUJogNSuAPx+l3/xFPu6QbwGQMwVvq6fi/MA=
+Thread-Index: AQGKnGOaYF8FWW41Vo1OapoCvoUV0QMoPiJ6Am1CcOcBjsy+tqrwuGGg
 Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrKKsWRmVeSWpSXmKPExsWy7bCmvu59o8gEg+cTbCxe/N/FbPHz/3dG
-        izcvDrM5MHvsnHWX3WP3gs9MHp83yQUwR+XYZKQmpqQWKaTmJeenZOal2yp5B8c7x5uaGRjq
-        GlpamCsp5CXmptoqufgE6Lpl5gAtUlIoS8wpBQoFJBYXK+nb2RTll5akKmTkF5fYKqUWpOQU
-        GBoU6BUn5haX5qXrJefnWhkaGBiZAlUm5GTsWniZpeA+U8XZPYdYGhjXMHUxcnJICJhITHw7
-        nbmLkYtDSGAHo8S8ndOZIJxPjBLTHrZAOd8YJX4vOMUI03Jp/2c2EFtIYC+jxKXbmhBFLxkl
-        Pq96xg6SYBPQlfj3Zz9QEQeHiEC9xIkrAiBhToFAiaPbV4DNERaQkZh8+xMTSAmLgKrEtP01
-        IGFeAUuJRde2skLYghInZz5hAbGZBeQltr+dwwxxgoLEz6fLWCGmW0lc+28FUSIiMbuzDewZ
-        CYFH7BJbVpxhBKmREHCR2N4eDNEqLPHq+BZ2CFtK4vO7vWwQJdUSH/dDTe9glHjx3RbCNpa4
-        uX4D2CZmAU2J9bv0IcKKEjt/z2WE2Mon8e5rDyvEFF6JjjYhiBJVib5Lh6GhLC3R1f4BaqmH
-        xM6TD1knMCrOQvLiLCQvzkLyyyyExQsYWVYxiqUWFOempxYbFpgix/MmRnD607LcwTj97Qe9
-        Q4xMHIyHGCU4mJVEeFvCIxKEeFMSK6tSi/Lji0pzUosPMZoCw3wis5Rocj4wAeeVxBuaGhkb
-        G1uYmJmbmRorifMmGTyIFxJITyxJzU5NLUgtgulj4uCUamBS++y+YnfKM8lnchfqHK1ydlhE
-        ngx7wbrsckR+y8Vgh+XMagem901+vWrpd1Gz6EUm1sy/hM2bOMXttscLa4VFs0zbtVnW4xTb
-        lmctf6XlvC057fZ6ZCSy+m27xzD7XftHyTnK3YqzTSfOdZp0+czmeJaTJdmhOVvmfBBINzvV
-        vO/MS6PY4/f87qa6Vl+/Nf0ss/+2toyyj7/enL+8dfmpSJXJVyptTxw5MlFr56kgZe/wY9nf
-        qkRzmX90/7i6esGKVdebjMtdBe4v/C73Sbopfv5mIafr+YwRoYHza3mVHLPOdf49IHdkn8tB
-        ydnzXgtMOG/kHaT9wkll7vXHYes+rNUoCy/8m9m9SLP1p72OEktxRqKhFnNRcSIAnh0k5ggE
-        AAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGLMWRmVeSWpSXmKPExsWy7bCSnO59o8gEg5fLFC1e/N/FbPHz/3dG
-        izcvDrM5MHvsnHWX3WP3gs9MHp83yQUwR3HZpKTmZJalFunbJXBl7Fp4maXgPlPF2T2HWBoY
-        1zB1MXJySAiYSFza/5mti5GLQ0hgN6PE7V2XWSES0hLHTpxh7mLkALKFJQ4fLoaoec4oMevG
-        TrBmNgFdiX9/9rOB2CIC9RKXZk1nBLGFBBYxSpybXAFicwoEShzdvgIsLiwgIzH59icmkJks
-        AqoS0/bXgIR5BSwlFl3bygphC0qcnPmEBcRmFtCW6H3Yyghhy0tsfzuHGeI0BYmfT5exgowR
-        EbCSuPbfCqJERGJ2ZxvzBEahWUgmzUIyaRaSSbOQtCxgZFnFKJlaUJybnltsWGCYl1quV5yY
-        W1yal66XnJ+7iREc9FqaOxi3r/qgd4iRiYPxEKMEB7OSCG9LeESCEG9KYmVValF+fFFpTmrx
-        IUZpDhYlcd4LXSfjhQTSE0tSs1NTC1KLYLJMHJxSDUx+qZ7Ltz8ttefSWPnVJc4h9H9moUbO
-        qYPneoXtby075lB+9K2Um1usb+Ir9px8Y2sDMw+pK+9a9ThMpzyy1d647ISLUosk80PHF0/d
-        FWNndRxj9O9y2nXJI0oxIYXVR/Gchiz3Fvn008s9NUsfZ/W6Odcobgwpyzn9bd9059n3OK+w
-        PiqI6dX2sDn11mo5E+f5oszjix5efGazwqTbsK+3smnWPN+oedtvf9qu/9PlYx13Ssic4+dP
-        3two8rJgyXE+Fa0+9bW1k7lkOBhUfr3YY3cgKePNlMmqcw+eenedJa73/LM9cl9ZmJ5PnHvU
-        vnX760z1WXsOzDpmq9+8ZuqJE5Kn1rnedt9/8OuVfdZKLMUZiYZazEXFiQCdQBdj6QIAAA==
-X-CMS-MailID: 20210323001423epcas1p2d95fe1898c2f0ec5318bf7379d20b1c3
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Ta0xTZxjO6Tk9LbK6Y6n4BRctx7Eh49JSWz9MIWRTdhLIJMFFxrK0BzgD
+        RmlrC9ucP1Y3biIwL3NoQYY4uYwtXETAIkPLEFxhCooJTBQjZLBSJ3RTLgIrPZrx73mf93ne
+        N8/35eWjwgXch5+mzWQMWlpD4uuwlq7tIUGchA/UksojQfCww4bBHvsSDy7WFeHQvlyCQdux
+        Sg6srevmwLsP/ubByRULCudXniHwSscNDN62lOHQcc+lKyqe5cKcOwGwvbEShz87H/Hg9GQX
+        DkeOf4/Dm0s9XLg4V4ZHiiizqQinSk0DGHXZPMqjLtYEUO0VTg7VPmzCqZy2JR41MzGCUc3n
+        H3Ko+uYhjHI2baGaxh2c2FcSNMpUhk5mDGJGm6RLTtOmhJPRcap3VHKFRBokDYM7SbGWzmDC
+        yd0xsUFRaRpXUFL8Ka3JclGxtNFIhkQoDbqsTEacqjNmhpOMPlmjl0r0wUY6w5ilTQlO0mXs
+        kkokoXKXUq1JLb42gerzhZ9fKD+LmZCS9QWIBx8QO8Cf7afQAmQdX0i0IeB23ddctphFQNf1
+        FpwtnAgoXVjmFSB8t2V6ZjPLWxBQOHURYYspBFxrvIqtzsWJILD8vBNfxSIiEBRMtbrHokQz
+        BnoXvuKsNjwIJbA+HXVjLyIKtFw96TZghB+Y7qt18wIiDNhH8zAWbwA3zoy7MUpsBa2OMpQN
+        IQbzE1VcdlkUqBwyoaxGBEqP5LrDAaLaA9gLm3msYTeY/anohdkL/NXzkvcBzscdOBvzEJjp
+        fCHJR8Dks3AWy8BwfQN3VYIS20G9JYSlfcHlxbMIu3Y9ePxvIZedIgD5uUJW4geKB7s4LN4M
+        CvKe8I4hpHlNMPOaYOY1Acz/L6tAsB8Rb0ZvzEhhjFJ96NrPbkLcRxCgaENOOJ4EWxEOH7Ei
+        gI+SIkH2/ni1UJBMH/yCMehUhiwNY7QictdTH0d9NibpXFekzVRJ5aEymQzuUOxUyGXkJgEt
+        GVMJiRQ6k0lnGD1jeOnj8D18TBy0f+rp6/vyv4m0+Pd9FGcb8s2WjVuC45Vn+h2tYjUYi7gg
+        +EMURtQvdCjfG/TsHr2+yzl1yXNMkfyD/yb5gWxh7pVfogfvDxQN1o3EmW71ndbHdN6vqdF7
+        g8DIOc3eu/5kxMbEjz31K1V3fj8X7Kh+95HsnGPBj9Zma6K/6zx6ujVOuefgAVgR6HfJMZS4
+        IdbyYbXtUP/egYC5XtvbJ167uaXqk21bfw0xhT//R33e+9S9mobflpp8y49aiZLyZq/+xoHe
+        Ze/0hNrPKCI0L+nVB/FC4tss2+FK4lZ3j1Wx5w3dl3nR74tm35xJ7bI9fCvHbt8Wl75Psl/V
+        MG4bThTGqOfLSMyYSksDUIOR/g8xNy5gjQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sf0yMcRzHfZ/ne889Rfa4bnyVidswpx/yY75IMbTHGCWbtLXuTo+06tzu
+        qfzadLYKZ9fkt7sTZZnEWlfqUsKdSor8KD+iJSpZHdJC03Xc3Uz/vff+vN7vvf/40KToA/Sh
+        E5WpnFopT5ZQnrDCKvELIGJ2yBbm5AN82NYEcUO/XYh/F+so3D92DuKmEwUELiquI/DLzq9C
+        3Oe4TeIRx0+Aa+40QvzitpHCtnd/OV3OdwHOapXi6tICCt8c+ijEA31WCrfnXqJwi71BgH//
+        MlKrxaxeo6NYg+YZZKv0HUK27JqUrb48RLDVbzQUm2W2C9nBnnbIll/pItiS8jbIDplmsqZu
+        GxExKcYzJJ5LTkzn1EGhMs/dOfd7SNVR0b7CvItQA85N1gKaRswSNDDoqwUetIgxA/TIscup
+        EeOL6h82k27EG1mtvBZ4/kU+AXS2tYRyMhQTgMZG77q0mPFH2s+VAidEMo8gKtXlC9wJG0Bl
+        OjvhpDyYEGT50eHS3kw4qrh3ypWGzBw00Fzk8r2Y5ai/4wh06ymo8UI3dK4gmUCUXQqcNsn4
+        oUqbkXQPnYVGeq4K3CPCUUGbhnQzYmQ4lk2eAN76cU36/036cU36cYnLAF4H0zkVn5KQwger
+        Fim5vYG8PIVPUyYE7tyTYgKuN5BKzaDm+rdACyBoYAGIJiVir8zt0TKRV7x8/wFOvSdOnZbM
+        8RbgS0PJNK+n2sY4EZMgT+WSOE7Fqf9dCdrDR0PcDPXfpihjorLIN4+XtphiM6ZGLltYbMge
+        nvDF//2EZR8z2Lolrb31qLf4U6lmUJl/6rlE/Hb2ytCuysW5W+cmyw6uMZkjU/POrCtve0nX
+        rnQYkqy3cgq3RAY/2OSYZd9qXV4Y3Lq+6bNwwX4F96HXGkJXmTMVe8M21E/NCDqba8x6/7oQ
+        vFKkvz1pJA0+Y7wKRm+e0RT25NtoXqwcFlV0+9mj1tb6xJqj4rsqRu6FHFgw/xBuXH+8Pb2v
+        xOZ9fnje6KQH0uakfXTcxB2W8PCamLSGNdaJYZ1gMC5US4fJthgd0fIBwK2KiJg9xtM/9Z2b
+        YKbwxQqwserG6VHFsFoC+d3yYCmp5uV/AB1dI011AwAA
+X-CMS-MailID: 20210323030122epcas1p147f5f0b852da3e35e928496737b85f0e
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: SVC_REQ_APPROVE
 CMS-TYPE: 101P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210322204103epcas1p36333367769cffbd735c9b61d58a74431
-References: <CGME20210322204103epcas1p36333367769cffbd735c9b61d58a74431@epcas1p3.samsung.com>
-        <CAH2r5muFSCWQUVn+iuZ_8fiWrCXtNmO0+AaEEEqFmD9+qj8-1w@mail.gmail.com>
+X-CMS-RootMailID: 20210322052204epcas1p1382cadbfe958d156c0ad9f7fcb8532b7
+References: <20210322051344.1706-1-namjae.jeon@samsung.com>
+        <CGME20210322052204epcas1p1382cadbfe958d156c0ad9f7fcb8532b7@epcas1p1.samsung.com>
+        <20210322051344.1706-2-namjae.jeon@samsung.com>
+        <20210322221816.GW1719932@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-> Did some updates for the wiki page for ksmbd (cifsd)
-Great! Looks good to me!
-Thanks a lot!
+> On Mon, Mar 22, 2021 at 02:13:40PM +0900, Namjae Jeon wrote:
+> > +#define RESPONSE_BUF(w)		((void *)(w)->response_buf)
+> > +#define REQUEST_BUF(w)		((void *)(w)->request_buf)
 > 
-> https://protect2.fireeye.com/v1/url?k=a0092f36-ff921629-a008a479-000babdfecba-
-> e6a2a99f56c0e17b&q=1&e=dda77347-9f46-4283-8da1-
-> 6932cb291dec&u=https%3A%2F%2Fwiki.samba.org%2Findex.php%2FLinux_Kernel_Server
+> Why do you do this obfuscation?
+I don't remember exactly, but back then, It looked easier...
 > 
-> --
-> Thanks,
+> > +#define RESPONSE_BUF_NEXT(w)	\
+> > +	((void *)((w)->response_buf + (w)->next_smb2_rsp_hdr_off))
+> > +#define REQUEST_BUF_NEXT(w)	\
+> > +	((void *)((w)->request_buf + (w)->next_smb2_rcv_hdr_off))
 > 
-> Steve
+> These obfuscations aren't even used; delete them
+They are used in many place.
+./smb2pdu.c:            *rsp = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:            err_rsp = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:            rsp_hdr = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:    struct smb2_hdr *hdr = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:    struct smb2_hdr *rsp = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:    rsp_hdr = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:            rsp = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:            rsp = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:            hdr = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:            hdr = RESPONSE_BUF_NEXT(work);
+./smb2pdu.c:            rsp = RESPONSE_BUF_NEXT(work);
+
+./smb2pdu.c:            *req = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:            rcv_hdr = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:    struct smb2_hdr *req_hdr = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:    struct smb2_hdr *req = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:    rcv_hdr = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:    hdr = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:            req = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:            req = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:            hdr = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:    req_hdr = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:            hdr = REQUEST_BUF_NEXT(work);
+./smb2pdu.c:    req_hdr = REQUEST_BUF_NEXT(work);
+> 
+> > +#define RESPONSE_SZ(w)		((w)->response_sz)
+> > +
+> > +#define INIT_AUX_PAYLOAD(w)	((w)->aux_payload_buf = NULL)
+> > +#define HAS_AUX_PAYLOAD(w)	((w)->aux_payload_sz != 0)
+> 
+> I mean, do you really find it clearer to write:
+> 
+> 	if (HAS_AUX_PAYLOAD(work))
+> than
+> 	if (work->aux_payload_sz)
+> 
+> The unobfuscated version is actually shorter!
+Yep, looks better, Will fix it.
+
+Thanks for your review!
+
 
