@@ -7,148 +7,130 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E1ABC433DB
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 23:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7AFC433DB
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 00:06:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31664619A9
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Mar 2021 23:21:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0479C619AA
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 00:06:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230306AbhCVXUd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 19:20:33 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:24462 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230274AbhCVXUE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 19:20:04 -0400
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210322232002epoutp02473a859b6a54fbbc2c4811a4f77ba98e~uzXFVaoDj0837108371epoutp02U
-        for <linux-cifs@vger.kernel.org>; Mon, 22 Mar 2021 23:20:02 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210322232002epoutp02473a859b6a54fbbc2c4811a4f77ba98e~uzXFVaoDj0837108371epoutp02U
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1616455202;
-        bh=yowKQ1DnxB8uGC1tQdSiUvOwMNgjSuCBnJg0zNuQ6PE=;
-        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-        b=CD9dyxQ6tZoGEMIn4RgZVLxu9s50KNITXdxKjCkUQUAbtcN1p5xceaPhOVlu4YcOw
-         VXThFdv9/FX+3M+dicKo5ide/BkaOIJUp3f3T4XxIRbfXvPD+YgFivJu0SnOdj+d2s
-         y83SjInUB9aLT8Nj0Q2kCOqoHfQr5kiNLNZz4Cqs=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210322232002epcas1p1bd6995b330ced2b6df351969588303e7~uzXEtgrgz0920509205epcas1p1G;
-        Mon, 22 Mar 2021 23:20:02 +0000 (GMT)
-Received: from epsmges1p1.samsung.com (unknown [182.195.40.165]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4F49Sx4sfBz4x9Pp; Mon, 22 Mar
-        2021 23:20:01 +0000 (GMT)
-Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
-        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4C.01.02418.12629506; Tue, 23 Mar 2021 08:20:01 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210322232000epcas1p28c05deccaa1120af13d28963a593a2a7~uzXDUgWB43231532315epcas1p2H;
-        Mon, 22 Mar 2021 23:20:00 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20210322232000epsmtrp167db0ff674fa23739420669df358175d~uzXDTUBtv0793707937epsmtrp18;
-        Mon, 22 Mar 2021 23:20:00 +0000 (GMT)
-X-AuditID: b6c32a35-c23ff70000010972-90-605926213cf2
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        55.7B.08745.02629506; Tue, 23 Mar 2021 08:20:00 +0900 (KST)
-Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20210322232000epsmtip257b5a3c74ffd1dcd5ded4c027b94b782~uzXDEqXag1241312413epsmtip2S;
-        Mon, 22 Mar 2021 23:20:00 +0000 (GMT)
-From:   "Namjae Jeon" <namjae.jeon@samsung.com>
-To:     "'Christoph Hellwig'" <hch@lst.de>
-Cc:     <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-cifs@vger.kernel.org>,
-        <linux-cifsd-devel@lists.sourceforge.net>, <smfrench@gmail.com>,
-        <senozhatsky@chromium.org>, <hyc.lee@gmail.com>,
-        <viro@zeniv.linux.org.uk>, <hch@infradead.org>,
-        <ronniesahlberg@gmail.com>, <aurelien.aptel@gmail.com>,
-        <aaptel@suse.com>, <sandeen@sandeen.net>,
-        <colin.king@canonical.com>, <rdunlap@infradead.org>,
-        "'Sergey Senozhatsky'" <sergey.senozhatsky@gmail.com>,
-        "'Steve French'" <stfrench@microsoft.com>,
-        "'Dan Carpenter'" <dan.carpenter@oracle.com>
-In-Reply-To: <20210322065011.GA2909@lst.de>
-Subject: RE: [PATCH 2/5] cifsd: add server-side procedures for SMB3
-Date:   Tue, 23 Mar 2021 08:20:00 +0900
-Message-ID: <009c01d71f71$e1a5e470$a4f1ad50$@samsung.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQGKnGOaYF8FWW41Vo1OapoCvoUV0QJx6VhoAkDjIaQCMP/z3QDRv4r9quv+OfA=
-Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMJsWRmVeSWpSXmKPExsWy7bCmrq6iWmSCwdS1KhaNb0+zWBx//Zfd
-        4vfqXjaL1/+ms1icnrCIyWLl6qNMFtfuv2e3ePF/F7PFz//fGS327D3JYnF51xw2i7d3gOp6
-        +z6xWrRe0bLYvXERm8Xaz4/ZLd68OMxmcWvifDaL83+PszoIe8xq6GXzmN1wkcVj56y77B6b
-        V2h57F7wmclj980GNo/WHX/ZPT4+vcXisWXxQyaP9Vuusnh83iTnsenJW6YAnqgcm4zUxJTU
-        IoXUvOT8lMy8dFsl7+B453hTMwNDXUNLC3MlhbzE3FRbJRefAF23zBygH5UUyhJzSoFCAYnF
-        xUr6djZF+aUlqQoZ+cUltkqpBSk5BYYGBXrFibnFpXnpesn5uVaGBgZGpkCVCTkZbw/3sBb8
-        Zanoa17J1MD4hLmLkZNDQsBEYsHiRjBbSGAHo8TJSRZdjFxA9idGibPLnjBCOJ8ZJdru9TPB
-        dHROncMEkdjFKPH45X92iPaXjBLf7sqC2GwCuhL//uxnA7FFBNQkzvxsYwdpYBbYwSKxceY1
-        sH2cAtoSt/YdBlrBwSEs4CyxcasMSJhFQFXiVHsPI4jNK2ApsWjDJTYIW1Di5MwnLCA2s4C8
-        xPa3c6BeUJD4+XQZK8QuP4k7V89A1YhIzO5sYwbZKyGwmFNi/f8pUB+4SKz4/AGqWVji1fEt
-        7BC2lMTLfpBDOYDsaomP+6FKOhglXny3hbCNJW6u38AKUsIsoCmxfpc+RFhRYufvuYwQa/kk
-        3n3tYYWYwivR0SYEUaIq0XfpMNQB0hJd7R/YJzAqzULy2Cwkj81C8sAshGULGFlWMYqlFhTn
-        pqcWGxYYIkf1JkZw6tcy3cE48e0HvUOMTByMhxglOJiVRHhbwiMShHhTEiurUovy44tKc1KL
-        DzGaAoN6IrOUaHI+MPvklcQbmhoZGxtbmJiZm5kaK4nzJhk8iBcSSE8sSc1OTS1ILYLpY+Lg
-        lGpgMqrdW6MTe/RfXFnz1v3b20Tqa7r7Ll6duHLi2hczJDycf89069g4qaeueSLbDX/+e3k3
-        12ov3Sz5akb2nTchi39NXSvxl/1JRd4H28L+7PuromM1fT2Cz24XWLNlp+eF5vKV9w8e+Xr8
-        9+IHznZ/fwr4Km86LnKff/7ZbnWvpuwU8znK5TXXQyyuOOmKTmM6uG1Z/+vF3XfD8vd9ipnG
-        XX1M+NkdLe2Pq/rzJr/pdyy8M/eB423J/ct/s381v3zgWPn3fbPy7oYeXCxbs3xyR/91NZ+5
-        DFe5RMsCjVWK+y9dam04d1Kp/sG6R8apAtEduo/zJhTsnKBy7+wC2bKFn6/6vZJO+SHbcG1P
-        34F5768qsRRnJBpqMRcVJwIAJ4seUIYEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHIsWRmVeSWpSXmKPExsWy7bCSvK6CWmSCwbVXGhaNb0+zWBx//Zfd
-        4vfqXjaL1/+ms1icnrCIyWLl6qNMFtfuv2e3ePF/F7PFz//fGS327D3JYnF51xw2i7d3gOp6
-        +z6xWrRe0bLYvXERm8Xaz4/ZLd68OMxmcWvifDaL83+PszoIe8xq6GXzmN1wkcVj56y77B6b
-        V2h57F7wmclj980GNo/WHX/ZPT4+vcXisWXxQyaP9Vuusnh83iTnsenJW6YAnigum5TUnMyy
-        1CJ9uwSujLeHe1gL/rJU9DWvZGpgfMLcxcjJISFgItE5dQ5TFyMXh5DADkaJ60v6oRLSEsdO
-        nAGyOYBsYYnDh4shap4zSvxatJkVpIZNQFfi35/9bCC2iICaxJmfbewgRcwCZ1gkVtxuYYbo
-        +MUosWHvF0aQKk4BbYlb+w4zgkwVFnCW2LhVBiTMIqAqcaq9B6yEV8BSYtGGS2wQtqDEyZlP
-        WEDKmQX0JNo2gpUwC8hLbH87B+pOBYmfT5exQtzgJ3Hn6hkWiBoRidmdbcwTGIVnIZk0C2HS
-        LCSTZiHpWMDIsopRMrWgODc9t9iwwCgvtVyvODG3uDQvXS85P3cTIzgJaGntYNyz6oPeIUYm
-        DsZDjBIczEoivC3hEQlCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeS90nYwXEkhPLEnNTk0tSC2C
-        yTJxcEo1MKWvKNN+eU30hmrNg6fxmstKT7cphC+7WZjUsFb5+p/3+/XaVkUGdOt5G+usnvHh
-        Xs/dW3ZfqzSFguLPxu99ZxIxc35Y/XKelUyhuU9/iOpNmZn08uQT7bUMMkkGkx6vXbb/S3Nv
-        iybLQuOzW+s3rZ0yTWMiy/EVN5sj7kt0JJgynl7xg7nyv8kjV/FvLzRXHGvbcausXj75Dpu3
-        E5/qyuuL3mxZOuV2QbfGUc70lbXWLxiYzVpNy231l0vv0Uucrpz3OSVE9OLcF5axRx+8OXbJ
-        XTVh4+5UB85Pr5q2bfBdufOspodZTLZFz8vtelc0rSY3WrH/SUnfdXBbSOg7DuOcBTce3buy
-        /qri8+t8D4uUWIozEg21mIuKEwEt1fyQcQMAAA==
-X-CMS-MailID: 20210322232000epcas1p28c05deccaa1120af13d28963a593a2a7
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210322052206epcas1p438f15851216f07540537c5547a0a2c02
+        id S230499AbhCWAGO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 20:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60604 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230393AbhCWAGA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 20:06:00 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2563FC061574
+        for <linux-cifs@vger.kernel.org>; Mon, 22 Mar 2021 17:06:00 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id ot17-20020a17090b3b51b0290109c9ac3c34so9119919pjb.4
+        for <linux-cifs@vger.kernel.org>; Mon, 22 Mar 2021 17:06:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=YrwTxM1JRhwCBImEEMiXrWUueuGP8y0gV5ZRW5L/A0w=;
+        b=AJK6iy9YZIVcsFMyZdM9/n2Nq0jYRLcbLu0OgwUd6kWoGdYixeRnX91zceByThB+qg
+         1O9QBmew16jSEs3tCZj/VvWo4XFFHqr29XVTBN8INs9MAV1j69hzmrerT3ouIxnYD54Z
+         wl2MsvF3QF/MbjAbrMzOV+q/Tyj/tgJMdUMDY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=YrwTxM1JRhwCBImEEMiXrWUueuGP8y0gV5ZRW5L/A0w=;
+        b=P2tqh+yB4KHKJfSPH2BC5BpKieqVi5AaCAz6ipQ+6YgaIHfsxzKxzZ6tObeNtKKH1H
+         fkRQjZCuLILGIHUAh7Muzm4emUhK7Eb9hDT/YHxkTHpjwXA+ETh+J/OKrF/TPJyuVeCE
+         rB9RznkK2shWXgQmv7fv3ctf3Dy15jYGnQpw7qBgL3Vuv5gEsFuxo90FSxoAV3GnRhds
+         eRzxm47uUxRlQG7gfe/BOibylC2s6u0pzR+YEO6MdS0ekk0egc2Ydz/Opvzi13Kia1/5
+         FpI+PiSpJce2GuZLEKRxsEV5LMDHtgUik9Fa/8HFY4cT6OsBBCo76KAYqjzMwXbBdNgD
+         IZ8g==
+X-Gm-Message-State: AOAM533oLZ9W/w8WWgiNVpktqVtilqmv1IZypw2JRoaXCgiyZiUmdK6M
+        PrPiUareUMsKUqy1eVeHppasiw==
+X-Google-Smtp-Source: ABdhPJzi4JptaWSjZ+IpPh95R3QM3rbCmXAkIDW3AERR+GPKvu25DYfOuw1jEE+qkDYTJZUnMG4TkA==
+X-Received: by 2002:a17:90a:7c4b:: with SMTP id e11mr1510708pjl.151.1616457959673;
+        Mon, 22 Mar 2021 17:05:59 -0700 (PDT)
+Received: from google.com ([2409:10:2e40:5100:bcf2:e05a:a993:9494])
+        by smtp.gmail.com with ESMTPSA id t22sm493650pjw.54.2021.03.22.17.05.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Mar 2021 17:05:59 -0700 (PDT)
+Date:   Tue, 23 Mar 2021 09:05:51 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Namjae Jeon <namjae.jeon@samsung.com>,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org,
+        linux-cifsd-devel@lists.sourceforge.net, smfrench@gmail.com,
+        hyc.lee@gmail.com, viro@zeniv.linux.org.uk, hch@lst.de,
+        hch@infradead.org, ronniesahlberg@gmail.com,
+        aurelien.aptel@gmail.com, aaptel@suse.com, sandeen@sandeen.net,
+        dan.carpenter@oracle.com, colin.king@canonical.com,
+        rdunlap@infradead.org, Steve French <stfrench@microsoft.com>
+Subject: Re: [PATCH 3/5] cifsd: add file operations
+Message-ID: <YFkw3yabfNCXuO05@google.com>
 References: <20210322051344.1706-1-namjae.jeon@samsung.com>
-        <CGME20210322052206epcas1p438f15851216f07540537c5547a0a2c02@epcas1p4.samsung.com>
-        <20210322051344.1706-3-namjae.jeon@samsung.com>
-        <20210322064712.GD1667@kadam> <20210322065011.GA2909@lst.de>
+ <CGME20210322052207epcas1p3f0a5bdfd2c994a849a67b465479d0721@epcas1p3.samsung.com>
+ <20210322051344.1706-4-namjae.jeon@samsung.com>
+ <20210322081512.GI1719932@casper.infradead.org>
+ <YFhdWeedjQQgJdbi@google.com>
+ <20210322170916.GS1719932@casper.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210322170916.GS1719932@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-
-> On Mon, Mar 22, 2021 at 09:47:13AM +0300, Dan Carpenter wrote:
-> > On Mon, Mar 22, 2021 at 02:13:41PM +0900, Namjae Jeon wrote:
-> > > +static unsigned char
-> > > +asn1_octet_decode(struct asn1_ctx *ctx, unsigned char *ch) {
-> > > +	if (ctx->pointer >= ctx->end) {
-> > > +		ctx->error = ASN1_ERR_DEC_EMPTY;
-> > > +		return 0;
-> > > +	}
-> > > +	*ch = *(ctx->pointer)++;
-> > > +	return 1;
-> > > +}
-> >
-> >
-> > Make this bool.
-> >
+On (21/03/22 17:09), Matthew Wilcox wrote:
+> On Mon, Mar 22, 2021 at 06:03:21PM +0900, Sergey Senozhatsky wrote:
+> > On (21/03/22 08:15), Matthew Wilcox wrote:
+> > > 
+> > > What's the scenario for which your allocator performs better than slub
+> > > 
+> > 
+> > IIRC request and reply buffers can be up to 4M in size. So this stuff
+> > just allocates a number of fat buffers and keeps them around so that
+> > it doesn't have to vmalloc(4M) for every request and every response.
 > 
-> More importantly don't add another ANS1 parser, but use the generic one in lib/asn1_decoder.c instead.
-> CIFS should also really use it.
-Okay, Let me check it, cifs also...
-Thanks!
+> Hang on a minute, this speaks to a deeper design problem.  If we're doing
+> a 'request' or 'reply' that is that large, the I/O should be coming from
+> or going to the page cache.  If it goes via a 4MB virtually contiguous
+> buffer first, that's a memcpy that could/should be avoided.
 
+But huge vmalloc buffers are still needed. For instance, `ls -la` in
+a directory with a huge number of entries.
+
+> But now i'm looking for how ksmbd_find_buffer() is used, and it isn't.
+> So it looks like someone came to the same conclusion I did, but forgot
+> to delete the wm code.
+
+Yes, I think it's disabled by default and requires some smb.conf
+configuration. So I guess that wm code can be removed. Especially given
+that
+
+> That said, there are plenty of opportunities to optimise the vmalloc code,
+> and that's worth pursuing.
+
+That would be really interesting to see!
+
+> And here's the receive path which contains
+> the memcpy that should be avoided (ok, it's actually the call to ->read;
+> we shouldn't be reading in the entire 4MB but rather the header):
+
+> +		conn->request_buf = ksmbd_alloc_request(size);
+> +		if (!conn->request_buf)
+> +			continue;
+> +
+> +		memcpy(conn->request_buf, hdr_buf, sizeof(hdr_buf));
+> +		if (!ksmbd_smb_request(conn))
+> +			break;
+> +
+> +		/*
+> +		 * We already read 4 bytes to find out PDU size, now
+> +		 * read in PDU
+> +		 */
+> +		size = t->ops->read(t, conn->request_buf + 4, pdu_size);
+
+
+// A side note, it seems that the maximum read/write/trans buffer size that
+// windows supports is 8MB, not 4MB.
