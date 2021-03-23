@@ -7,304 +7,123 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03653C433DB
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 00:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 695EFC433C1
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 00:15:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BAF65619A9
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 00:13:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B7C961992
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 00:15:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230334AbhCWAMn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 22 Mar 2021 20:12:43 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:24483 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230298AbhCWAMU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 20:12:20 -0400
-Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210323001218epoutp03276a364e74d4f8af5679db7e6ccec458~u0Etp7fpu2576325763epoutp03H
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Mar 2021 00:12:18 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210323001218epoutp03276a364e74d4f8af5679db7e6ccec458~u0Etp7fpu2576325763epoutp03H
+        id S230363AbhCWAOx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Mar 2021 20:14:53 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:13837 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231317AbhCWAO3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Mar 2021 20:14:29 -0400
+Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210323001427epoutp02205ccafee524d84bc9b091908d7fd64a~u0Gl2C1RD1753917539epoutp02x
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Mar 2021 00:14:27 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210323001427epoutp02205ccafee524d84bc9b091908d7fd64a~u0Gl2C1RD1753917539epoutp02x
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1616458338;
-        bh=uP47+MAZInBagtKyLFw181heQ369em/Nzhd92xvvz9U=;
-        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-        b=beNP1Omd4FmDAWLbfWjpcTx3l8YZV7VkIbxtKe3cZrhp9sawdRHupkQfd16RHJSpc
-         Ve3e5XJTygihIg/l4OdQfGR2IQ2vKXq4O7+TlJMfyIvaUQsYalwZlA9QqgTcUIt3Ql
-         pLhw8RLlFRIkRNbt1y1a3KQt7HbzM1pXu64Lw8KY=
+        s=mail20170921; t=1616458467;
+        bh=9ZTqikGfuSNBkZVtRe4z3tgEtRpuhIhnaohbU4HxrVI=;
+        h=From:To:In-Reply-To:Subject:Date:References:From;
+        b=RK8j+N93BchjKIwSM1cuplxSr8rcMDV5fLrqtw1Zt21uRz6FKhE0PtIopjVYO5wdD
+         h7OdPhXMsi+fiff1ZCqNAxYRqh3NcZAQmmgkxbNJIF5pKKlKxYM/ryN9j1DcPJnwbr
+         e72K1Ndn1qvyAdcx75TfcMdx+g5pZQum9zkJUcsg=
 Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
-        20210323001217epcas1p3c45c6d17e75c53afbf599ec76593cc04~u0EtF3VBR0148201482epcas1p3b;
-        Tue, 23 Mar 2021 00:12:17 +0000 (GMT)
-Received: from epsmges1p5.samsung.com (unknown [182.195.40.161]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4F4BdF075Vz4x9Q5; Tue, 23 Mar
-        2021 00:12:17 +0000 (GMT)
-Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
+        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20210323001426epcas1p2bdd263b74a7ccf9bb468e9684009021b~u0GlFhaw21507015070epcas1p2v;
+        Tue, 23 Mar 2021 00:14:26 +0000 (GMT)
+Received: from epsmges1p5.samsung.com (unknown [182.195.40.163]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4F4Bgj2wB7z4x9Ps; Tue, 23 Mar
+        2021 00:14:25 +0000 (GMT)
+Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
         epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
-        1D.ED.10347.06239506; Tue, 23 Mar 2021 09:12:16 +0900 (KST)
+        ED.7E.10347.FD239506; Tue, 23 Mar 2021 09:14:23 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20210323001216epcas1p1e3f31c9ae427cb9beab59af3b4fc79ea~u0EroNvP11469614696epcas1p1w;
-        Tue, 23 Mar 2021 00:12:16 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20210323001423epcas1p2d95fe1898c2f0ec5318bf7379d20b1c3~u0GiG3zpQ1726617266epcas1p2c;
+        Tue, 23 Mar 2021 00:14:23 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
         epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210323001216epsmtrp2b1eb7f4357254bf9a3254a850857c8a4~u0ErnFcYs2193521935epsmtrp2T;
-        Tue, 23 Mar 2021 00:12:16 +0000 (GMT)
-X-AuditID: b6c32a39-15dff7000002286b-ee-60593260b1e2
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        6A.8F.08745.06239506; Tue, 23 Mar 2021 09:12:16 +0900 (KST)
-Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip2.samsung.com
+        20210323001423epsmtrp25c51a0775aa582b6e0bd7c1d45c0e0b8~u0GiGGWnX2317923179epsmtrp2H;
+        Tue, 23 Mar 2021 00:14:23 +0000 (GMT)
+X-AuditID: b6c32a39-15dff7000002286b-ae-605932dfa477
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        4B.CF.13470.FD239506; Tue, 23 Mar 2021 09:14:23 +0900 (KST)
+Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip1.samsung.com
         (KnoxPortal) with ESMTPA id
-        20210323001216epsmtip217f211028a5629cc2745f4c5724f485f~u0ErTahbi1338313383epsmtip2K;
-        Tue, 23 Mar 2021 00:12:16 +0000 (GMT)
+        20210323001423epsmtip10188c91e8fe89f8003858075d63205f4~u0Gh6ZMpF1180411804epsmtip1e;
+        Tue, 23 Mar 2021 00:14:23 +0000 (GMT)
 From:   "Namjae Jeon" <namjae.jeon@samsung.com>
-To:     "'Al Viro'" <viro@zeniv.linux.org.uk>
-Cc:     <linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-cifs@vger.kernel.org>,
-        <linux-cifsd-devel@lists.sourceforge.net>, <smfrench@gmail.com>,
-        <senozhatsky@chromium.org>, <hyc.lee@gmail.com>, <hch@lst.de>,
-        <hch@infradead.org>, <ronniesahlberg@gmail.com>,
-        <aurelien.aptel@gmail.com>, <aaptel@suse.com>,
-        <sandeen@sandeen.net>, <dan.carpenter@oracle.com>,
-        <colin.king@canonical.com>, <rdunlap@infradead.org>,
-        "'Sergey Senozhatsky'" <sergey.senozhatsky@gmail.com>,
-        "'Steve French'" <stfrench@microsoft.com>
-In-Reply-To: <YFg/W4q9PHwTAJtZ@zeniv-ca.linux.org.uk>
-Subject: RE: [PATCH 3/5] cifsd: add file operations
-Date:   Tue, 23 Mar 2021 09:12:16 +0900
-Message-ID: <00ad01d71f79$2e9883d0$8bc98b70$@samsung.com>
+To:     "'Steve French'" <smfrench@gmail.com>,
+        <linux-cifsd-devel@lists.sourceforge.net>,
+        "'CIFS'" <linux-cifs@vger.kernel.org>
+In-Reply-To: <CAH2r5muFSCWQUVn+iuZ_8fiWrCXtNmO0+AaEEEqFmD9+qj8-1w@mail.gmail.com>
+Subject: RE: ksmbd wiki page
+Date:   Tue, 23 Mar 2021 09:14:23 +0900
+Message-ID: <00ae01d71f79$7a76aa20$6f63fe60$@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQGKnGOaYF8FWW41Vo1OapoCvoUV0QMvkMmsAV/TykYDBijVbqrtAR+g
+Thread-Index: AQFFRxmYUJogNSuAPx+l3/xFPu6QbwGQMwVvq6fi/MA=
 Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA02TbUxTVxjHc+69vS1kjEth7lgWh1choRvQUosHBs5FQ64MDcZtbu5D29Gb
-        llDappcahiwpRBxjAxG3OQpEhWlRAiiCQoGRAAtoSRg6p5AJQ2BDHa91I8jbWu6W8e33nPN/
-        Xv7nRYSLn5MSUZoxk7UYNQaa9CVudofLItTRH6llnYsI5U67CNT7bFWIlmuLSPRs7RyBXCVV
-        GLpS+yOGfhmdFaKpdSeOltYXAWrvuE2ge84KEk3/6tEVFS8IUP7PUtR2vYpEde5xIfpzqptE
-        w2fOk2hgtVewN5Cx24pIptw2SDCt9kdC5kaNlGm74MaYtiEbyeS3rAqZ+clhgmmqHsOYhqb7
-        BONu3MY0TkxjKS8dM8TrWY2WtYSwxlSTNs2oS6DfPaLap1LGyOQR8li0mw4xajLYBHp/ckpE
-        YprB45EOOa4xWD1LKRqOo6P2xFtM1kw2RG/iMhNo1qw1mOUycySnyeCsRl1kqikjTi6TRSs9
-        SrVBX1ndipsd4VkFEyOkDbzYVghEIkjtgmdX6ELgKxJTLQDmduYL+GABwDnbd0Qh8PEEbgCd
-        w3Fe9iYsNLYQvMgJYFNXP+CDJwCu3BnDvSqSioBrK52kl4OocLheWYJ7RThVRsCp70cF3g0f
-        SgkLnMtCLwdSCpi75MC8TFChsO6iY6OQHxUL74/YAc8B8HbZxMZIOPU6vDVdgfMjhcClycsC
-        vlkinOrPE/CaIFj+xamNxpBy+MCeSzWAT9gPBwtuCHgOhE97m4Q8S6B7poPkD+YEnO/8t34B
-        gFOLCTwr4FDDNYFXgnuMNTij+OXtsHW5EvBtX4Yzf30l4Kv4wYJTYl4SCovvdmM8B8PCz+eE
-        JYC2bzJm32TMvsmA/f9mFwBxFWxhzVyGjuXkZuXmu24EG89fGtsCzk3PRXYBTAS6ABThdJDf
-        yaMfqsV+Ws2n2azFpLJYDSzXBZSeoz6DS15JNXn+jzFTJVdGKxQKtCtmd4xSQb/q94nsN5WY
-        0mky2XSWNbOW//IwkY/EhqXv+5Ybq8+ApaZSidWcfTCprirywMPa+o6L/o6brvYfwoRHD9wJ
-        4w6dN8XrTpbvPBznb93atLpFWnramnR97dGl02E5gw/65tta29nhxK2Ec8+OipwEPO1jdnln
-        ku0NMZkd9VaJg7z74D01kD5erOlOfzPmVm5onnaA+/J9V06FrmbQ9dphWUny+uz42GRA8cr8
-        C8nz1D9GH/7d02eaPVuk3ivV+9YT4rKR5NXCax/05R16LH1SvaOTi9VF9FPbK3VYM+d+++tj
-        cvFPBxm2diDakTpe1Jz+tE91osdKZAdcbS/t6gs9zmbJZt+53OuqjxwK1v8+s3QP9/8mOO2z
-        rOYKmuD0GrkUt3CafwABX29dhwQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHIsWRmVeSWpSXmKPExsWy7bCSvG6CUWSCwZk5fBaNb0+zWBx//Zfd
-        4vfqXjaL1/+ms1icnrCIyWLl6qNMFtfuv2e3ePF/F7PFz//fGS327D3JYnF51xw2i7d3gOp6
-        +z6xWrRe0bLYvXERm8Xaz4/ZLd68OMxmcWvifDaL83+PszoIe8xq6GXzmN1wkcVj56y77B6b
-        V2h57F7wmclj980GNo/WHX/ZPT4+vcXisWXxQyaP9Vuusnh83iTnsenJW6YAnigum5TUnMyy
-        1CJ9uwSujLmLdzIXLNes6Hhyj62B8ZdcFyMnh4SAicSnTTtYuhi5OIQEdjBK/O69wgKRkJY4
-        duIMcxcjB5AtLHH4cDFIWEjgOaPE55ZMEJtNQFfi35/9bCC2iICmxP+5E5hB5jALrGWR2HH4
-        CyvE0GeMEhcXvWQHqeIUMJXo2PUbzBYWMJZo/LmcCcRmEVCVWLtwOTOIzStgKXH13ixGCFtQ
-        4uTMJywgRzAL6Em0bQQLMwvIS2x/O4cZ4k4FiZ9Pl7FCHOEm8eJMEytEjYjE7M425gmMwrOQ
-        TJqFMGkWkkmzkHQsYGRZxSiZWlCcm55bbFhglJdarlecmFtcmpeul5yfu4kRnAS0tHYw7ln1
-        Qe8QIxMH4yFGCQ5mJRHelvCIBCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8F7pOxgsJpCeWpGan
-        phakFsFkmTg4pRqYjje9+qDRWtV0XeCJesQvt0/W93LZH73bv9XlpL/Ikd0Mu41/e0cFst1a
-        +VTFTizxtdc7LtPfzV92TfnPt1D+xentyTrBDWcrE3XyzvjUaLc/kg8z250bJhnmlVe4T/kZ
-        T9kttznCiT9mFxpYX2hdYFZTZHLRq///xhKGtOWm9d5lJbtTFv9xnPKuO+2hbbTJBh6OvRnz
-        tBlnb1nRe6NpS06ai/bG1+WvHlpMmd7q8qQl3FXzKedygav6cVWPFTzeyu1Qrry3rOK90VMN
-        v88pUe+zHsk9UNuvxinfcPv4psoy58Oqm55cbL9ZOu387Gs7u1S0c2/tZgjnlks8K1eczlOq
-        yDg7Xk1/2aOEE6+UWIozEg21mIuKEwGG9KvccQMAAA==
-X-CMS-MailID: 20210323001216epcas1p1e3f31c9ae427cb9beab59af3b4fc79ea
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrKKsWRmVeSWpSXmKPExsWy7bCmvu59o8gEg+cTbCxe/N/FbPHz/3dG
+        izcvDrM5MHvsnHWX3WP3gs9MHp83yQUwR+XYZKQmpqQWKaTmJeenZOal2yp5B8c7x5uaGRjq
+        GlpamCsp5CXmptoqufgE6Lpl5gAtUlIoS8wpBQoFJBYXK+nb2RTll5akKmTkF5fYKqUWpOQU
+        GBoU6BUn5haX5qXrJefnWhkaGBiZAlUm5GTsWniZpeA+U8XZPYdYGhjXMHUxcnJICJhITHw7
+        nbmLkYtDSGAHo8S8ndOZIJxPjBLTHrZAOd8YJX4vOMUI03Jp/2c2EFtIYC+jxKXbmhBFLxkl
+        Pq96xg6SYBPQlfj3Zz9QEQeHiEC9xIkrAiBhToFAiaPbV4DNERaQkZh8+xMTSAmLgKrEtP01
+        IGFeAUuJRde2skLYghInZz5hAbGZBeQltr+dwwxxgoLEz6fLWCGmW0lc+28FUSIiMbuzDewZ
+        CYFH7BJbVpxhBKmREHCR2N4eDNEqLPHq+BZ2CFtK4vO7vWwQJdUSH/dDTe9glHjx3RbCNpa4
+        uX4D2CZmAU2J9bv0IcKKEjt/z2WE2Mon8e5rDyvEFF6JjjYhiBJVib5Lh6GhLC3R1f4BaqmH
+        xM6TD1knMCrOQvLiLCQvzkLyyyyExQsYWVYxiqUWFOempxYbFpgix/MmRnD607LcwTj97Qe9
+        Q4xMHIyHGCU4mJVEeFvCIxKEeFMSK6tSi/Lji0pzUosPMZoCw3wis5Rocj4wAeeVxBuaGhkb
+        G1uYmJmbmRorifMmGTyIFxJITyxJzU5NLUgtgulj4uCUamBS++y+YnfKM8lnchfqHK1ydlhE
+        ngx7wbrsckR+y8Vgh+XMagem901+vWrpd1Gz6EUm1sy/hM2bOMXttscLa4VFs0zbtVnW4xTb
+        lmctf6XlvC057fZ6ZCSy+m27xzD7XftHyTnK3YqzTSfOdZp0+czmeJaTJdmhOVvmfBBINzvV
+        vO/MS6PY4/f87qa6Vl+/Nf0ss/+2toyyj7/enL+8dfmpSJXJVyptTxw5MlFr56kgZe/wY9nf
+        qkRzmX90/7i6esGKVdebjMtdBe4v/C73Sbopfv5mIafr+YwRoYHza3mVHLPOdf49IHdkn8tB
+        ydnzXgtMOG/kHaT9wkll7vXHYes+rNUoCy/8m9m9SLP1p72OEktxRqKhFnNRcSIAnh0k5ggE
+        AAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGLMWRmVeSWpSXmKPExsWy7bCSnO59o8gEg5fLFC1e/N/FbPHz/3dG
+        izcvDrM5MHvsnHWX3WP3gs9MHp83yQUwR3HZpKTmZJalFunbJXBl7Fp4maXgPlPF2T2HWBoY
+        1zB1MXJySAiYSFza/5mti5GLQ0hgN6PE7V2XWSES0hLHTpxh7mLkALKFJQ4fLoaoec4oMevG
+        TrBmNgFdiX9/9rOB2CIC9RKXZk1nBLGFBBYxSpybXAFicwoEShzdvgIsLiwgIzH59icmkJks
+        AqoS0/bXgIR5BSwlFl3bygphC0qcnPmEBcRmFtCW6H3Yyghhy0tsfzuHGeI0BYmfT5exgowR
+        EbCSuPbfCqJERGJ2ZxvzBEahWUgmzUIyaRaSSbOQtCxgZFnFKJlaUJybnltsWGCYl1quV5yY
+        W1yal66XnJ+7iREc9FqaOxi3r/qgd4iRiYPxEKMEB7OSCG9LeESCEG9KYmVValF+fFFpTmrx
+        IUZpDhYlcd4LXSfjhQTSE0tSs1NTC1KLYLJMHJxSDUx+qZ7Ltz8ttefSWPnVJc4h9H9moUbO
+        qYPneoXtby075lB+9K2Um1usb+Ir9px8Y2sDMw+pK+9a9ThMpzyy1d647ISLUosk80PHF0/d
+        FWNndRxj9O9y2nXJI0oxIYXVR/Gchiz3Fvn008s9NUsfZ/W6Odcobgwpyzn9bd9059n3OK+w
+        PiqI6dX2sDn11mo5E+f5oszjix5efGazwqTbsK+3smnWPN+oedtvf9qu/9PlYx13Ssic4+dP
+        3two8rJgyXE+Fa0+9bW1k7lkOBhUfr3YY3cgKePNlMmqcw+eenedJa73/LM9cl9ZmJ5PnHvU
+        vnX760z1WXsOzDpmq9+8ZuqJE5Kn1rnedt9/8OuVfdZKLMUZiYZazEXFiQCdQBdj6QIAAA==
+X-CMS-MailID: 20210323001423epcas1p2d95fe1898c2f0ec5318bf7379d20b1c3
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: SVC_REQ_APPROVE
 CMS-TYPE: 101P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210322052207epcas1p3f0a5bdfd2c994a849a67b465479d0721
-References: <20210322051344.1706-1-namjae.jeon@samsung.com>
-        <CGME20210322052207epcas1p3f0a5bdfd2c994a849a67b465479d0721@epcas1p3.samsung.com>
-        <20210322051344.1706-4-namjae.jeon@samsung.com>
-        <YFg/W4q9PHwTAJtZ@zeniv-ca.linux.org.uk>
+X-CMS-RootMailID: 20210322204103epcas1p36333367769cffbd735c9b61d58a74431
+References: <CGME20210322204103epcas1p36333367769cffbd735c9b61d58a74431@epcas1p3.samsung.com>
+        <CAH2r5muFSCWQUVn+iuZ_8fiWrCXtNmO0+AaEEEqFmD9+qj8-1w@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-> On Mon, Mar 22, 2021 at 02:13:42PM +0900, Namjae Jeon wrote:
-> > This adds file operations and buffer pool for cifsd.
+> Did some updates for the wiki page for ksmbd (cifsd)
+Great! Looks good to me!
+Thanks a lot!
 > 
-> Some random notes:
+> https://protect2.fireeye.com/v1/url?k=a0092f36-ff921629-a008a479-000babdfecba-
+> e6a2a99f56c0e17b&q=1&e=dda77347-9f46-4283-8da1-
+> 6932cb291dec&u=https%3A%2F%2Fwiki.samba.org%2Findex.php%2FLinux_Kernel_Server
 > 
-> > +static void rollback_path_modification(char *filename) {
-> > +	if (filename) {
-> > +		filename--;
-> > +		*filename = '/';
-> What an odd way to spell filename[-1] = '/';...
-Okay. Will fix.
+> --
+> Thanks,
 > 
-> > +int ksmbd_vfs_inode_permission(struct dentry *dentry, int acc_mode,
-> > +bool delete) {
-> 
-> > +	if (delete) {
-> > +		struct dentry *parent;
-> > +
-> > +		parent = dget_parent(dentry);
-> > +		if (!parent)
-> > +			return -EINVAL;
-> > +
-> > +		if (inode_permission(&init_user_ns, d_inode(parent), MAY_EXEC | MAY_WRITE)) {
-> > +			dput(parent);
-> > +			return -EACCES;
-> > +		}
-> > +		dput(parent);
-> 
-> Who's to guarantee that parent is stable?  IOW, by the time of that
-> inode_permission() call dentry might very well not be a child of that thing...
-Okay, Will fix.
-> 
-> > +	parent = dget_parent(dentry);
-> > +	if (!parent)
-> > +		return 0;
-> > +
-> > +	if (!inode_permission(&init_user_ns, d_inode(parent), MAY_EXEC | MAY_WRITE))
-> > +		*daccess |= FILE_DELETE_LE;
-> 
-> Ditto.
-Okay.
-> 
-> > +int ksmbd_vfs_mkdir(struct ksmbd_work *work,
-> > +		    const char *name,
-> > +		    umode_t mode)
-> 
-> 
-> > +	err = vfs_mkdir(&init_user_ns, d_inode(path.dentry), dentry, mode);
-> > +	if (!err) {
-> > +		ksmbd_vfs_inherit_owner(work, d_inode(path.dentry),
-> > +			d_inode(dentry));
-> 
-> ->mkdir() might very well return success, with dentry left unhashed negative.
-> Look at the callers of vfs_mkdir() to see how it should be handled.
-Okay, Will fix.
-> 
-> > +static int check_lock_range(struct file *filp,
-> > +			    loff_t start,
-> > +			    loff_t end,
-> > +			    unsigned char type)
-> > +{
-> > +	struct file_lock *flock;
-> > +	struct file_lock_context *ctx = file_inode(filp)->i_flctx;
-> > +	int error = 0;
-> > +
-> > +	if (!ctx || list_empty_careful(&ctx->flc_posix))
-> > +		return 0;
-> > +
-> > +	spin_lock(&ctx->flc_lock);
-> > +	list_for_each_entry(flock, &ctx->flc_posix, fl_list) {
-> > +		/* check conflict locks */
-> > +		if (flock->fl_end >= start && end >= flock->fl_start) {
-> > +			if (flock->fl_type == F_RDLCK) {
-> > +				if (type == WRITE) {
-> > +					ksmbd_err("not allow write by shared lock\n");
-> > +					error = 1;
-> > +					goto out;
-> > +				}
-> > +			} else if (flock->fl_type == F_WRLCK) {
-> > +				/* check owner in lock */
-> > +				if (flock->fl_file != filp) {
-> > +					error = 1;
-> > +					ksmbd_err("not allow rw access by exclusive lock from other
-> opens\n");
-> > +					goto out;
-> > +				}
-> > +			}
-> > +		}
-> > +	}
-> > +out:
-> > +	spin_unlock(&ctx->flc_lock);
-> > +	return error;
-> > +}
-> 
-> WTF is that doing in smbd?
-This code was added to pass the smb2 lock test of samba's smbtorture.
-Will fix it.
-> 
-> > +	filp = fp->filp;
-> > +	inode = d_inode(filp->f_path.dentry);
-> 
-> That should be file_inode().  Try it on overlayfs, watch it do interesting things...
-Okay.
-> 
-> > +	nbytes = kernel_read(filp, rbuf, count, pos);
-> > +	if (nbytes < 0) {
-> > +		name = d_path(&filp->f_path, namebuf, sizeof(namebuf));
-> > +		if (IS_ERR(name))
-> > +			name = "(error)";
-> > +		ksmbd_err("smb read failed for (%s), err = %zd\n",
-> > +				name, nbytes);
-> 
-> Do you really want the full pathname here?  For (presumably) spew into syslog?
-No, Will fix.
-> 
-> > +int ksmbd_vfs_remove_file(struct ksmbd_work *work, char *name) {
-> > +	struct path parent;
-> > +	struct dentry *dir, *dentry;
-> > +	char *last;
-> > +	int err = -ENOENT;
-> > +
-> > +	last = extract_last_component(name);
-> > +	if (!last)
-> > +		return -ENOENT;
-> 
-> Yeccchhh...
-I guess I change it err instead of -ENOENT.
-
-> 
-> > +	if (ksmbd_override_fsids(work))
-> > +		return -ENOMEM;
-> > +
-> > +	err = kern_path(name, LOOKUP_FOLLOW | LOOKUP_DIRECTORY, &parent);
-> > +	if (err) {
-> > +		ksmbd_debug(VFS, "can't get %s, err %d\n", name, err);
-> > +		ksmbd_revert_fsids(work);
-> > +		rollback_path_modification(last);
-> > +		return err;
-> > +	}
-> > +
-> > +	dir = parent.dentry;
-> > +	if (!d_inode(dir))
-> > +		goto out;
-> 
-> Really?  When does that happen?
-Will fix.
-> 
-> > +static int __ksmbd_vfs_rename(struct ksmbd_work *work,
-> > +			      struct dentry *src_dent_parent,
-> > +			      struct dentry *src_dent,
-> > +			      struct dentry *dst_dent_parent,
-> > +			      struct dentry *trap_dent,
-> > +			      char *dst_name)
-> > +{
-> > +	struct dentry *dst_dent;
-> > +	int err;
-> > +
-> > +	spin_lock(&src_dent->d_lock);
-> > +	list_for_each_entry(dst_dent, &src_dent->d_subdirs, d_child) {
-> > +		struct ksmbd_file *child_fp;
-> > +
-> > +		if (d_really_is_negative(dst_dent))
-> > +			continue;
-> > +
-> > +		child_fp = ksmbd_lookup_fd_inode(d_inode(dst_dent));
-> > +		if (child_fp) {
-> > +			spin_unlock(&src_dent->d_lock);
-> > +			ksmbd_debug(VFS, "Forbid rename, sub file/dir is in use\n");
-> > +			return -EACCES;
-> > +		}
-> > +	}
-> > +	spin_unlock(&src_dent->d_lock);
-> 
-> Hard NAK right there.  That thing has no business poking at that level.
-> And I'm pretty certain that it's racy as hell.
-Okay. It was same reason(smbtorture test), will fix it also.
-
-Thanks for your review!
+> Steve
 
