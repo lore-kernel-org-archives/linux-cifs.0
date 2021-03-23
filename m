@@ -2,115 +2,148 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF89C433DB
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 05:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52822C433E0
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 05:36:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D976A619B4
-	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 05:05:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27AE1619B3
+	for <linux-cifs@archiver.kernel.org>; Tue, 23 Mar 2021 05:36:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229494AbhCWFFK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Mar 2021 01:05:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40076 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbhCWFEr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Mar 2021 01:04:47 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D6E5C061574;
-        Mon, 22 Mar 2021 22:04:47 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id f16so24002413ljm.1;
-        Mon, 22 Mar 2021 22:04:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yFi4t0LwY0/K7P1KzIFPQAnrQ32/ev3JJFzV7tX7RKk=;
-        b=SMFDbPc0pk3vToOaNc6sXwfhvd1OwvXso6Z74eSubasphj185X6E7FYll5EeTQBU89
-         VxRpqCzu5wWAUKeAYemf0D8N9LZBXG+PzcmgVJNGv75dhHvjn/CZKo/fUCNf77lOjlm+
-         Kn36yzqSVey+L+LqEMAzMlNLZDspYBjRzcH5LFuXfYzVDiEde7iVohCTA437G5ntNRYz
-         OH8L4wBUrCR3VIE0VAFtTGyNECZOzEB9jwPOQ5So5p1kVoGB9DUcCPQ+pxaatPAAIB3M
-         RG+eS13Z3RhjEDDffJ6r+Vmsu5yK5NzZT+uKh7Gqo6YxCYKTvm0HiBBGvmj7yiTSvXp8
-         dqBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yFi4t0LwY0/K7P1KzIFPQAnrQ32/ev3JJFzV7tX7RKk=;
-        b=R0MJAoN3T7aS100QK5+hlowh76pS3r30B0/IoGiJfRp2ACw4ABBG1LBZbWwV5vPn3Z
-         0ks8WEtGIDLiNdSzUkiSjSOWwYyLWKKE0jIpJXbW4pbwh3q9xxdUNBkjKL6HJmzz1eWv
-         2sxYD9zfdmiLbOaIucN9oQ0kkM8Xy8qnTy+eoFis8G4ZeZnT5g3ryTHCKW8gZxC4TQG+
-         cZtL6QpxW+6bZd5LTWgvzI86EUbbJWaFRi3Xb4uhRlHP/tZqpF7ErUhtImbcH7j0nn/+
-         ooKHsmn+WgawaT2/iMVJmncm80d1b5GpHGM1vXJPqptd0XbyI7HBaGuhxiFC9fuiZuMu
-         gX3g==
-X-Gm-Message-State: AOAM530wSziPTUe9sLdTyCuNE9hcV83hQBA92oYQ8xdkOIQt9l3cqNZC
-        c2RM53hFREcVbY5gTX4xOtcUShbrVC8QeWS1qsVSO4U0aL0DtQ==
-X-Google-Smtp-Source: ABdhPJywpQh2eLBXniSg8yoBz0GpvCTWcxpxz+8wSJBCgMgMm31oTW2hJrxWfbkRs30lyz9cAL0vXn1cKlRpSFi20mM=
-X-Received: by 2002:a2e:98c5:: with SMTP id s5mr1823738ljj.218.1616475885492;
- Mon, 22 Mar 2021 22:04:45 -0700 (PDT)
+        id S229494AbhCWFfd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Mar 2021 01:35:33 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:11452 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229451AbhCWFfH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Mar 2021 01:35:07 -0400
+Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210323053505epoutp035432d3a0a04e3c4863b3347893318c6b~u4eiYeFzb1400714007epoutp03N
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Mar 2021 05:35:05 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210323053505epoutp035432d3a0a04e3c4863b3347893318c6b~u4eiYeFzb1400714007epoutp03N
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1616477705;
+        bh=gQjyguLaBbjy93jFGQTyXsiTkaZxiPVVbFZD/zYWHqk=;
+        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+        b=IdNOrAexaoj93bYsu/Si7DdS3ccG3q2ZdzsjjS4qJmqGaKUU7DOJWAV4Wa5gUR50x
+         V/PqJDkm9BSCaSPsneBjZjTv1bcNbH5ubtFhII+v20T6hrXsfJpQi7Ub1huFZT+5Di
+         937iWa02ySTg92DOkPeIEjmKwmAAD0I9IRtqa/NI=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20210323053504epcas1p1bea16d336c86331738ba2d36f7dd1d8c~u4ehs90Ng1197011970epcas1p1F;
+        Tue, 23 Mar 2021 05:35:04 +0000 (GMT)
+Received: from epsmges1p3.samsung.com (unknown [182.195.40.159]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4F4Kng1gJ3z4x9Pt; Tue, 23 Mar
+        2021 05:35:03 +0000 (GMT)
+Received: from epcas1p2.samsung.com ( [182.195.41.46]) by
+        epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+        9E.88.50768.70E79506; Tue, 23 Mar 2021 14:35:03 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20210323053502epcas1p11d1920a160d484c700aed547030b372a~u4egAHsmV0422404224epcas1p1w;
+        Tue, 23 Mar 2021 05:35:02 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210323053502epsmtrp2bc6f12e4870264b8f2d09d480d61f32b~u4ef-VovM3168731687epsmtrp24;
+        Tue, 23 Mar 2021 05:35:02 +0000 (GMT)
+X-AuditID: b6c32a37-fd9ff7000000c650-95-60597e078c67
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        CD.07.13470.60E79506; Tue, 23 Mar 2021 14:35:02 +0900 (KST)
+Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20210323053502epsmtip2f156c3f47aad4fd1e32ba39a59dabd69~u4ef0OmDi2664826648epsmtip2n;
+        Tue, 23 Mar 2021 05:35:02 +0000 (GMT)
+From:   "Namjae Jeon" <namjae.jeon@samsung.com>
+To:     "'Dan Carpenter'" <dan.carpenter@oracle.com>
+Cc:     "'Sergey Senozhatsky'" <sergey.senozhatsky@gmail.com>,
+        "'Steve French'" <sfrench@samba.org>,
+        "'Hyunchul Lee'" <hyc.lee@gmail.com>,
+        "'Ronnie Sahlberg'" <lsahlber@redhat.com>,
+        <linux-cifs@vger.kernel.org>,
+        <linux-cifsd-devel@lists.sourceforge.net>,
+        <kernel-janitors@vger.kernel.org>
+In-Reply-To: <YFiuo53u7GHg7cU5@mwanda>
+Subject: RE: [PATCH] cifsd: Fix an error code in smb2_read()
+Date:   Tue, 23 Mar 2021 14:35:02 +0900
+Message-ID: <00f401d71fa6$45e5f6d0$d1b1e470$@samsung.com>
 MIME-Version: 1.0
-References: <YFV6iexd6YQTybPr@zeniv-ca.linux.org.uk> <CAH2r5mvA0WeeV1ZSW4HPvksvs+=GmkiV5nDHqCRddfxkgPNfXA@mail.gmail.com>
- <CAH2r5msWJn5a7JCUdoyJ7nfyeafRS8TvtgF+mZCY08LBf=9LAQ@mail.gmail.com> <YFgDH6wzFZ6FIs3R@zeniv-ca.linux.org.uk>
-In-Reply-To: <YFgDH6wzFZ6FIs3R@zeniv-ca.linux.org.uk>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 23 Mar 2021 00:04:34 -0500
-Message-ID: <CAH2r5mucWfotrdXvVvvUG-GEOhB=zGAhuPXSzAyw7X=EZDDzYg@mail.gmail.com>
-Subject: Re: [RFC][PATCHSET] hopefully saner handling of pathnames in cifs
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQMmNmoMXA2EsxVJ+e0peq3551WO1gJIQ+DBp+CdNYA=
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprPJsWRmVeSWpSXmKPExsWy7bCmni57XWSCwaYF3Bav/01nsbh2/z27
+        xdZb0hYv/u9itvj5/zujxYKr+hZrPz9mt+h4eZTZgcNj56y77B67F3xm8vj49BaLx/t9V9k8
+        5u7qY/T4vEkugC0qxyYjNTEltUghNS85PyUzL91WyTs43jne1MzAUNfQ0sJcSSEvMTfVVsnF
+        J0DXLTMH6BwlhbLEnFKgUEBicbGSvp1NUX5pSapCRn5xia1SakFKToGhQYFecWJucWleul5y
+        fq6VoYGBkSlQZUJOxss5bAVT2SqOfjrA1MD4laWLkZNDQsBEYtm0aUxdjFwcQgI7GCXm75sD
+        5XxilJh9bQ4LhPONUeLZ4hdMMC23H15nhUjsBWpZdYERJCEk8JJR4v6tCBCbTUBX4t+f/Wwg
+        toiAgcS9ky/AJjELLGKSWN51CayBU0BN4tOarWCHCAvYSHxcsQhsA4uAqsSaK9eZQWxeAUuJ
+        e1uPMEHYghInZz4Bq2cWkJfY/nYOM8RFChI/ny5jhVhmJfF31wImiBoRidmdbcwgiyUElnJI
+        rNj5mhWiwUXi7YTTUM3CEq+Ob2GHsKUkPr/bC3Q1B5BdLfFxP1RJB6PEi++2ELaxxM31G1hB
+        SpgFNCXW79KHCCtK7Pw9lxFiLZ/Eu689rBBTeCU62oQgSlQl+i4dhoahtERX+wf2CYxKs5A8
+        NgvJY7OQPDALYdkCRpZVjGKpBcW56anFhgXGyHG9iRGcUrXMdzBOe/tB7xAjEwfjIUYJDmYl
+        Ed6W8IgEId6UxMqq1KL8+KLSnNTiQ4ymwKCeyCwlmpwPTOp5JfGGpkbGxsYWJmbmZqbGSuK8
+        SQYP4oUE0hNLUrNTUwtSi2D6mDg4pRqY3CO3MJRNml4at2pl38zETCWvoECT619+/0lffL00
+        N8BWmuunxXHTs6+bzBN/zgh0TZHgNgv6ej9rgtSc9Ck23Jc0ZzzKFTsQfupWQl/CkUuM1yqu
+        V2xf37FUqmypfa0G34M76y3ncX4qkg67xRy/2dr+pPS1+xtjvZ+ub/5RWD2fscT5QXLtsrRp
+        Iaee/p+ysuTj++SjO3o2Hz2tpJ7+ojNfYInS6vtmbz+uONN/tY6DQbJIvNS6X7J2K3/dc5OP
+        1pJPPxs5XNz/++KJi4fKfzq7pK1onHuDz1OtoszwtPr02eH7Vf/edfyxLmN+ryLLY/6OPcfc
+        3K7MUmDqfu5QMvdOvJ/nd+9N85vvhiW+VmIpzkg01GIuKk4EABWz2bEyBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupgkeLIzCtJLcpLzFFi42LZdlhJXpetLjLB4Ei/jsXrf9NZLK7df89u
+        sfWWtMWL/7uYLX7+/85oseCqvsXaz4/ZLTpeHmV24PDYOesuu8fuBZ+ZPD4+vcXi8X7fVTaP
+        ubv6GD0+b5ILYIvisklJzcksSy3St0vgyng5h61gKlvF0U8HmBoYv7J0MXJySAiYSNx+eJ21
+        i5GLQ0hgN6PEob27mCES0hLHTpwBsjmAbGGJw4eLIWqeM0oce3WYEaSGTUBX4t+f/WwgtoiA
+        gcS9ky9YQIqYBVYwSdw+vJgVJCEkUC7x6NF8sKGcAmoSn9ZsBdssLGAj8XHFIiYQm0VAVWLN
+        letgNbwClhL3th5hgrAFJU7OfMICcgSzgJ5E20awvcwC8hLb386BulNB4ufTZawQN1hJ/N21
+        gAmiRkRidmcb8wRG4VlIJs1CmDQLyaRZSDoWMLKsYpRMLSjOTc8tNiwwzEst1ytOzC0uzUvX
+        S87P3cQIjiwtzR2M21d90DvEyMTBeIhRgoNZSYS3JTwiQYg3JbGyKrUoP76oNCe1+BCjNAeL
+        kjjvha6T8UIC6YklqdmpqQWpRTBZJg5OqQam6MDbjCknfWLqBfa6zCmdUb1gt8Yu27CN77UT
+        azZf25PVrf3zhXX42f0SvYrxXyWL2jSUankrFauTv5tWhbdMyHtfv/P99U+FTOwez/e2RP9R
+        q5SOat0doqu4J5KhZidDaEbsI4tpa2rKliakHZy/SJ3DRcrOo6k4Smuup+Lp4/eyN+lvXf90
+        9WedFz6s55ZOb9Qq+a+2q17l5fr2B3+kVvIlzt6393ZgqVCT3vwYCY8t67u/1Cyc+WzGlzOC
+        f3o/clXO2fX6f0ue7bozbw8cmx18k72l5vyMC93VqV/a1pjGPC2OeWb+2+PRnLXH9cyZHFQK
+        j/xg+e9kvDburmLipKpFIvddHDoXaEmdWn9DiaU4I9FQi7moOBEAoX9rJRsDAAA=
+X-CMS-MailID: 20210323053502epcas1p11d1920a160d484c700aed547030b372a
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210322145056epcas1p2803a480b8b83f038407553c2b25fd384
+References: <CGME20210322145056epcas1p2803a480b8b83f038407553c2b25fd384@epcas1p2.samsung.com>
+        <YFiuo53u7GHg7cU5@mwanda>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-reran with the updated patch 7 and it failed (although I didn't have
-time to dig much into it today) - see
-
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/534
-
-but it seems to run ok without patch 7 (just the first six patches)
-
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/535
-
-On Sun, Mar 21, 2021 at 9:40 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
->
-> On Sun, Mar 21, 2021 at 09:19:53PM -0500, Steve French wrote:
-> > automated tests failed so will need to dig in a little more and see
-> > what is going on
-> >
-> > http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/533
->
-> <looks>
->
-> Oh, bugger...  I think I see a braino that might be responsible for that;
-> whether it's all that's going on or not, that's an obvious bug.  Incremental
-> for that one would be
->
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index 3febf667d119..ed16f75ac0fa 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -132,7 +132,7 @@ build_path_from_dentry_optional_prefix(struct dentry *direntry, void *page,
->         }
->         if (dfsplen) {
->                 s -= dfsplen;
-> -               memcpy(page, tcon->treeName, dfsplen);
-> +               memcpy(s, tcon->treeName, dfsplen);
->                 if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) {
->                         int i;
->                         for (i = 0; i < dfsplen; i++) {
->
->
-> Folded and force-pushed (same branch).  My apologies...
+Hi Dan,
+> This code is assigning the wrong variable to "err" so it returns zero/success instead of -ENOMEM.
+> 
+> Fixes: 788b6f45c1d2 ("cifsd: add server-side procedures for SMB3")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+I will apply this patch.
+Thanks for your work!
+> ---
+>  fs/cifsd/smb2pdu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/cifsd/smb2pdu.c b/fs/cifsd/smb2pdu.c index 32816baa8a99..6770ebedc24a 100644
+> --- a/fs/cifsd/smb2pdu.c
+> +++ b/fs/cifsd/smb2pdu.c
+> @@ -6200,7 +6200,7 @@ int smb2_read(struct ksmbd_work *work)
+>  		work->aux_payload_buf = ksmbd_alloc_response(length);
+>  	}
+>  	if (!work->aux_payload_buf) {
+> -		err = nbytes;
+> +		err = -ENOMEM;
+>  		goto out;
+>  	}
+> 
+> --
+> 2.30.2
 
 
-
--- 
-Thanks,
-
-Steve
