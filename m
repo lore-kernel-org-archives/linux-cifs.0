@@ -2,102 +2,80 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E856FC433DB
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Mar 2021 05:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C92C8C433C1
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Mar 2021 06:15:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3D8061481
-	for <linux-cifs@archiver.kernel.org>; Thu, 25 Mar 2021 05:28:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C34261A1D
+	for <linux-cifs@archiver.kernel.org>; Thu, 25 Mar 2021 06:15:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbhCYF2N (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Mar 2021 01:28:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46662 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbhCYF2C (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 25 Mar 2021 01:28:02 -0400
-X-Greylist: delayed 167 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 24 Mar 2021 22:28:02 PDT
-Received: from mail.as201155.net (mail.as201155.net [IPv6:2a05:a1c0:f001::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D4D7C06174A
-        for <linux-cifs@vger.kernel.org>; Wed, 24 Mar 2021 22:28:02 -0700 (PDT)
-Received: from smtps.newmedia-net.de ([2a05:a1c0:0:de::167]:36760 helo=webmail.newmedia-net.de)
-        by mail.as201155.net with esmtps (TLSv1:DHE-RSA-AES256-SHA:256)
-        (Exim 4.82_1-5b7a7c0-XX)
-        (envelope-from <s.gottschall@dd-wrt.com>)
-        id 1lPIUU-00020F-2a; Thu, 25 Mar 2021 06:25:06 +0100
-X-CTCH-RefID: str=0001.0A782F21.605C1EB2.0066,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=dd-wrt.com; s=mikd;
-        h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID; bh=FWiIUfzfzmg/UyJPfZ5eKC2jY996A0w7LSl0n7TyuhI=;
-        b=t0Mo6LM+gA02x5GYCB73fbR3J5es6lKfyIiKIUMD5LEMGp5Uh5NDX2IaNdsg53SWku/80LUQOR0JGY81G8iwtD+y9xiHkMogglqmDnPA9Em8dRuTe5WcWdId/sojkGnZ7p8OybJLEDz+XkNIK6FXeGWPrKn804H4WRwMonpXjUo=;
-Message-ID: <e95a8960-199b-e114-e5f9-e5879a9466c3@dd-wrt.com>
-Date:   Thu, 25 Mar 2021 06:25:03 +0100
+        id S229461AbhCYGO7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 25 Mar 2021 02:14:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35582 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229504AbhCYGOe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 25 Mar 2021 02:14:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616652873;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=F2xLttf5LIv85p2xnWXxLUMnGByJzMehkk08miJfUko=;
+        b=F3sHcJL+Q0bbbo4A7gIuXbhayCme7ReqJhV5hbTqaTBYbLIPVZf5A3fK+QPGMTjAjRRzwI
+        JbH80iRe1LRdspHH27mv9WkQ5H6JFpPkvuy1HefRR3pF5eBhYHEKquES182cZZI9Nx6roX
+        E4AWyMlkRrY8J9cmGWeNF2ub5V0VtBs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-861CiX0eNG6WL2CPSonZrg-1; Thu, 25 Mar 2021 02:14:29 -0400
+X-MC-Unique: 861CiX0eNG6WL2CPSonZrg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A874D5B366;
+        Thu, 25 Mar 2021 06:14:28 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-17.bne.redhat.com [10.64.54.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 256C610023AF;
+        Thu, 25 Mar 2021 06:14:27 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: revalidate mapping when we open files for SMB1 POSIX
+Date:   Thu, 25 Mar 2021 16:14:21 +1000
+Message-Id: <20210325061421.42753-1-lsahlber@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:87.0) Gecko/20100101
- Thunderbird/87.0
-Subject: Re: [PATCH 2/5] cifsd: add server-side procedures for SMB3
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Namjae Jeon <namjae.jeon@samsung.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org,
-        linux-cifsd-devel@lists.sourceforge.net, smfrench@gmail.com,
-        senozhatsky@chromium.org, hyc.lee@gmail.com,
-        viro@zeniv.linux.org.uk, hch@lst.de, hch@infradead.org,
-        ronniesahlberg@gmail.com, aurelien.aptel@gmail.com,
-        aaptel@suse.com, sandeen@sandeen.net, colin.king@canonical.com,
-        rdunlap@infradead.org,
-        'Sergey Senozhatsky' <sergey.senozhatsky@gmail.com>,
-        'Steve French' <stfrench@microsoft.com>
-References: <20210322051344.1706-1-namjae.jeon@samsung.com>
- <CGME20210322052206epcas1p438f15851216f07540537c5547a0a2c02@epcas1p4.samsung.com>
- <20210322051344.1706-3-namjae.jeon@samsung.com> <20210322064712.GD1667@kadam>
- <009b01d71f71$9224f4e0$b66edea0$@samsung.com> <20210323071945.GJ1667@kadam>
-From:   Sebastian Gottschall <s.gottschall@dd-wrt.com>
-In-Reply-To: <20210323071945.GJ1667@kadam>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Received:  from [2003:c9:3f4c:a900:4051:3fe6:eb8a:97]
-        by webmail.newmedia-net.de with esmtpsa (TLSv1:AES128-SHA:128)
-        (Exim 4.72)
-        (envelope-from <s.gottschall@dd-wrt.com>)
-        id 1lPIUT-000IIE-CO; Thu, 25 Mar 2021 06:25:05 +0100
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+RHBZ: 1933527
 
-Am 23.03.2021 um 08:19 schrieb Dan Carpenter:
-> On Tue, Mar 23, 2021 at 08:17:47AM +0900, Namjae Jeon wrote:
->>>> +
->>>> +static int
->>>> +compare_oid(unsigned long *oid1, unsigned int oid1len,
->>>> +	    unsigned long *oid2, unsigned int oid2len) {
->>>> +	unsigned int i;
->>>> +
->>>> +	if (oid1len != oid2len)
->>>> +		return 0;
->>>> +
->>>> +	for (i = 0; i < oid1len; i++) {
->>>> +		if (oid1[i] != oid2[i])
->>>> +			return 0;
->>>> +	}
->>>> +	return 1;
->>>> +}
->>> Call this oid_eq()?
->> Why not compare_oid()? This code is come from cifs.
->> I need clear reason to change both cifs/cifsd...
->>
-> Boolean functions should tell you what they are testing in the name.
-> Without any context you can't know what if (compare_oid(one, two)) {
-> means, but if (oid_equal(one, two)) { is readable.
->
-> regards,
-> dan carpenter
-ahm just a pointless comment. but
-return !memcmp(oid1,oid2, sizeof(long*)*oid1len);
-looks much more efficient than this "for" loop
->
->
->
+We have seen read cache surviving across close to open under
+SMB1 POSIX.
+
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/file.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 26de4329d161..042e24aad410 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -165,6 +165,7 @@ int cifs_posix_open(char *full_path, struct inode **pinode,
+ 			goto posix_open_ret;
+ 		}
+ 	} else {
++		cifs_revalidate_mapping(*pinode);
+ 		cifs_fattr_to_inode(*pinode, &fattr);
+ 	}
+ 
+-- 
+2.29.2
+
