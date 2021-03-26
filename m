@@ -2,104 +2,123 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C89C433E1
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Mar 2021 17:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14DA1C433DB
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Mar 2021 19:53:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C4DA61A2D
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Mar 2021 17:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA7606196C
+	for <linux-cifs@archiver.kernel.org>; Fri, 26 Mar 2021 19:53:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230350AbhCZRBZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 26 Mar 2021 13:01:25 -0400
-Received: from gateway33.websitewelcome.com ([192.185.145.23]:34992 "EHLO
-        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230381AbhCZRBR (ORCPT
+        id S229986AbhCZTwp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 26 Mar 2021 15:52:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20424 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230298AbhCZTwm (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 26 Mar 2021 13:01:17 -0400
-X-Greylist: delayed 1500 seconds by postgrey-1.27 at vger.kernel.org; Fri, 26 Mar 2021 13:01:17 EDT
-Received: from cm17.websitewelcome.com (cm17.websitewelcome.com [100.42.49.20])
-        by gateway33.websitewelcome.com (Postfix) with ESMTP id 41A98857A4E
-        for <linux-cifs@vger.kernel.org>; Fri, 26 Mar 2021 11:13:18 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id Pp5Kl91KAMGeEPp5KlogLi; Fri, 26 Mar 2021 11:13:18 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=sXBjgLTu76uTaWX0R7809lCSyGgsc8Sygcl8kzPa31g=; b=E5CtBqHdRp4mzdp86hktOocKt8
-        WY9zbVHvS5zhockEiVBSkSbs4iEkzjA60vDhqa6SML2weLBlfRjnJYaIects8zHLUZit820pDFxGe
-        eKlHU3+92pJ8zn/8Im0NU7WPtSTWFTx5UMIrkmIY/iyUW0nwPBEUyKzv7xc5NwCE4V9V5DuDrcKxz
-        yZ0HMrrYoby8V/wuHopk+wwUg36od/0PpXJ1LV5mOOfQoV6bcc9ucRGMoBJwSOxwmZ1uqAUJ9u0Tw
-        0OePSMB/Ytcpm2FqJzXG2VRv+1l6NShDEiBNDLGvS6VijYEh97T/M0wWRMFAMxDtv8g9zHusHnb41
-        crH73K6w==;
-Received: from 187-162-31-110.static.axtel.net ([187.162.31.110]:35424 helo=[192.168.15.8])
-        by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1lPp5J-004Js4-TR; Fri, 26 Mar 2021 11:13:17 -0500
-Subject: Re: [PATCH][next] cifs: cifspdu.h: Replace one-element array with
- flexible-array member
-To:     =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Steve French <sfrench@samba.org>
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20210326011117.GA46303@embeddedor> <877dltrjue.fsf@suse.com>
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Message-ID: <4def044f-4529-9e73-6d01-1a9751f6b09a@embeddedor.com>
-Date:   Fri, 26 Mar 2021 10:13:16 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        Fri, 26 Mar 2021 15:52:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616788361;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=pRMd6weXBtSfjzrJVOVqZD2RntUBFIaT97mCoFYt+1M=;
+        b=NUEXYQYX7hz4gtDSdQIXMX8GpUbelIHn8jWGHvIkfSM9o8/LwzTTipDlLaCJGD9xvsvNFo
+        3IbKS41PJSff9qDsIXFkOpIq1yJgJbOlI/OkccyZgRG+8iZ4B3bEQnmJulsnmRAeWPlCs3
+        brtlapnblb6KuXmWd8PbGwUokoZFz88=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-497-CSzxyfxMPq6ykcZl706CZQ-1; Fri, 26 Mar 2021 15:52:38 -0400
+X-MC-Unique: CSzxyfxMPq6ykcZl706CZQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D42671005D7B;
+        Fri, 26 Mar 2021 19:52:37 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-17.bne.redhat.com [10.64.54.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 065D91B5C3;
+        Fri, 26 Mar 2021 19:52:36 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: add support for FALLOC_FL_COLLAPSE_RANGE
+Date:   Sat, 27 Mar 2021 05:52:29 +1000
+Message-Id: <20210326195229.114110-1-lsahlber@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <877dltrjue.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 187.162.31.110
-X-Source-L: No
-X-Exim-ID: 1lPp5J-004Js4-TR
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 187-162-31-110.static.axtel.net ([192.168.15.8]) [187.162.31.110]:35424
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 4
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/smb2ops.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 9bae7e8deb09..3bb18944aaa4 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -3640,6 +3640,44 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 	return rc;
+ }
+ 
++static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
++			    loff_t off, loff_t len)
++{
++	int rc;
++	unsigned int xid;
++	struct cifsFileInfo *cfile = file->private_data;
++	__le64 eof;
++
++	xid = get_xid();
++
++	if (off + len < off) {
++		rc = -EFBIG;
++		goto out;
++	}
++
++	if (off >= i_size_read(file->f_inode) ||
++	    off + len >= i_size_read(file->f_inode)) {
++		rc = -EINVAL;
++		goto out;
++	}
++
++	rc = smb2_copychunk_range(xid, cfile, cfile, off + len,
++				  i_size_read(file->f_inode) - off - len, off);
++	if (rc < 0)
++		goto out;
++
++	eof = i_size_read(file->f_inode) - len;
++	rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
++			  cfile->fid.volatile_fid, cfile->pid, &eof);
++	if (rc < 0)
++		goto out;
++
++	rc = 0;
++ out:
++	free_xid(xid);
++	return rc;
++}
++
+ static loff_t smb3_llseek(struct file *file, struct cifs_tcon *tcon, loff_t offset, int whence)
+ {
+ 	struct cifsFileInfo *wrcfile, *cfile = file->private_data;
+@@ -3811,6 +3849,8 @@ static long smb3_fallocate(struct file *file, struct cifs_tcon *tcon, int mode,
+ 		return smb3_zero_range(file, tcon, off, len, false);
+ 	} else if (mode == FALLOC_FL_KEEP_SIZE)
+ 		return smb3_simple_falloc(file, tcon, off, len, true);
++	else if (mode == FALLOC_FL_COLLAPSE_RANGE)
++		return smb3_collapse_range(file, tcon, off, len);
+ 	else if (mode == 0)
+ 		return smb3_simple_falloc(file, tcon, off, len, false);
+ 
+-- 
+2.29.2
 
-On 3/26/21 10:54, Aurélien Aptel wrote:
-> "Gustavo A. R. Silva" <gustavoars@kernel.org> writes:
->> There is a regular need in the kernel to provide a way to declare having
->> a dynamically sized set of trailing elements in a structure. Kernel code
->> should always use “flexible array members”[1] for these cases. The older
->> style of one-element or zero-length arrays should no longer be used[2].
-> 
-> I've checked the usages of the struct, looks OK (we don't allocate it
-> directly, we use memory from the small/big buff pools).
-
-Awesome. :)
-
-> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
-
-Thank you, Aurelien.
---
-Gustavo
