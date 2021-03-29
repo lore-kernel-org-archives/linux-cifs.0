@@ -4,33 +4,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A249C433C1
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:24:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA23AC433E2
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:24:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 589A1619E6
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:24:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9778761A02
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:24:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232637AbhC2WXr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Mar 2021 18:23:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46518 "EHLO mail.kernel.org"
+        id S232300AbhC2WXu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Mar 2021 18:23:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47520 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232026AbhC2WWT (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 29 Mar 2021 18:22:19 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 398D061996;
-        Mon, 29 Mar 2021 22:22:18 +0000 (UTC)
+        id S232342AbhC2WXA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 29 Mar 2021 18:23:00 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 805F361999;
+        Mon, 29 Mar 2021 22:22:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617056539;
-        bh=gYYxf2YlTbSeU/nFklOPxLrXqQH4/Dm0fpyodjHg0jQ=;
+        s=k20201202; t=1617056580;
+        bh=0EFjcJfAUnbTPqgR9U7XRVS07+tNXBq+mdTVyYpzXow=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=a9Emlk2OXAuXNWRzq7Op1jNC7iFpKCSBjzeEO+t3BjVKIT4sj6esTeenVLpqqI1A6
-         zaE6iXVBZ6JZzaVOXGbewoiw6QM+jvSGsWP/SWsZXEeIT/Dsom0GqCLNwv4MbrUOYm
-         1MEFkkyvBzpevvtgSzmhAmWY+PJIB9hkDIJwekueBSqV3PykynaAhmifDz+39muD8d
-         9vuf2z5q+yiwMRmaMsHQyCtPU7UU+DmB025au3W6ZN8h6IzO0nvapsE+CmPKa7ZgAM
-         FWvL1F5c6eYqrB4kCZ5g5QyVodAeV0JR8OMxnYEjCFtfCNFkPHyh/Y455MhsH0Fdsq
-         ECLJ1aSoz9frg==
+        b=M1qMOdYSPWfCTNTSy5cVV+BuXJcwerFgACOQJLm0kJtTK/SK93SXfkKxJw1ms0nqg
+         xzLhgTwJUrmPRn9gOS75UBc7nXk5z0aY69aP+tYA13IBaE0h400eAV3iC8XAHd2bDq
+         p7t8Tc4dpl6jkoU+WM8qLWpFRU5UicfDV80M70YUP1iijN3T16XVoKMTPBhjLks0Ba
+         j4ZNwKNXITjy+/bhQrzg8OrdzMTPDQxgdEyZfYhxwQuS+GVYIYx8gi8kbHEp9y1FuG
+         IJXgYlbYaV17TvDoLXfTpZMSaPal9UWBBPdtECwJsUX55IB8fUs9aB+qoJCRkP5FIQ
+         SAXpQhuKt13EA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Vincent Whitchurch <vincent.whitchurch@axis.com>,
@@ -38,12 +38,12 @@ Cc:     Vincent Whitchurch <vincent.whitchurch@axis.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.11 36/38] cifs: Silently ignore unknown oplock break handle
-Date:   Mon, 29 Mar 2021 18:21:31 -0400
-Message-Id: <20210329222133.2382393-36-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 31/33] cifs: Silently ignore unknown oplock break handle
+Date:   Mon, 29 Mar 2021 18:22:19 -0400
+Message-Id: <20210329222222.2382987-31-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210329222133.2382393-1-sashal@kernel.org>
-References: <20210329222133.2382393-1-sashal@kernel.org>
+In-Reply-To: <20210329222222.2382987-1-sashal@kernel.org>
+References: <20210329222222.2382987-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -83,10 +83,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index d9073b569e17..53fb751bf210 100644
+index db22d686c61f..be3df90bb2bc 100644
 --- a/fs/cifs/smb2misc.c
 +++ b/fs/cifs/smb2misc.c
-@@ -754,8 +754,8 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
+@@ -745,8 +745,8 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
  		}
  	}
  	spin_unlock(&cifs_tcp_ses_lock);
