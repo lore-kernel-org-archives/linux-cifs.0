@@ -4,45 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32704C433E6
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5620C433DB
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:26:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B9AB619DF
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:24:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97D5E6196E
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:26:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232446AbhC2WY1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Mar 2021 18:24:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47426 "EHLO mail.kernel.org"
+        id S231769AbhC2WZ4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Mar 2021 18:25:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48712 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232311AbhC2WW7 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 29 Mar 2021 18:22:59 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5AE226198E;
-        Mon, 29 Mar 2021 22:22:58 +0000 (UTC)
+        id S232359AbhC2WXw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 29 Mar 2021 18:23:52 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5B4A361990;
+        Mon, 29 Mar 2021 22:23:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617056579;
-        bh=7WivkTwt3Qho7FYaPS6DVi9+11PGsKEdbb8NQr6QT8o=;
+        s=k20201202; t=1617056605;
+        bh=ABixJEs+1GDjJj499aO3kybyji/C5xFLQDGqqXEFmSs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=By3TKS8W60WeNCV2pMxRNLrKbs7dyXMA7Q5SPFTHPLzw9QPfVmStUnf1nAqYe0nsh
-         sbmLJAxG70sNoDqknOOOlmDplu4tgDh+kZ/ghmCMDd4SzvhqlKRPy+WyDs0GoJyHD8
-         +guUE3nG+uiWdlN99MRRzGtwYDXRN5RnMZsP9AIEjCN6YYmP4H/qmuznNiv4XUNU94
-         uWKD3471YPv3u5Cy3hWkigMWxZP4g/1aN+EjupVAJGQhhg4t4tS6d27M6TwSZf1Ia2
-         aczPsmakrYsM/WK2Oqz97wjSjhYd5e2pHfc3ygqUw/mnOgSpqJ6tJr9+lODzhIR8nX
-         Xg/0xGHaW8tLA==
+        b=PAzj/awBKwbVq/lhKTX2byWwR1dHRxJRHB3wHMhMdCVZY0uDDZbr6cQVp+aptp0Ks
+         CgoDo6DX+hEIwLYYP6HKaBkBVjCyMltQjvaIano7OHzhu7HeOoZaZheuCkLupBTJWR
+         HMo/tqFuokBfRg7HXGfVfohPvrHZOLNAtQv0JmEMuDMatG5pevrHGgCNGfc8QvQDQ2
+         eu/ElWMOQ2VV880HNk5VsPm4LQSEwRm1AxJjA6IL7IZ5PGIAeL38UYDkZwqWa1NwP9
+         v1xOUB/DJmoCBLqWI35guOw6uMOKlBZ5e8j67yOfPSljImAJNkj8iLu+9z+VUNvF5w
+         fAebS+A3HI3WA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ronnie Sahlberg <lsahlber@redhat.com>, Paulo Alcantara <pc@cjr.nz>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.10 30/33] cifs: revalidate mapping when we open files for SMB1 POSIX
-Date:   Mon, 29 Mar 2021 18:22:18 -0400
-Message-Id: <20210329222222.2382987-30-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 18/19] cifs: revalidate mapping when we open files for SMB1 POSIX
+Date:   Mon, 29 Mar 2021 18:23:01 -0400
+Message-Id: <20210329222303.2383319-18-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210329222222.2382987-1-sashal@kernel.org>
-References: <20210329222222.2382987-1-sashal@kernel.org>
+In-Reply-To: <20210329222303.2383319-1-sashal@kernel.org>
+References: <20210329222303.2383319-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -74,7 +74,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index be46fab4c96d..da057570bb93 100644
+index 31d578739341..1aac8d38f887 100644
 --- a/fs/cifs/file.c
 +++ b/fs/cifs/file.c
 @@ -164,6 +164,7 @@ int cifs_posix_open(char *full_path, struct inode **pinode,
