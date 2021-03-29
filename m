@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A042C433E0
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92726C433E6
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:27:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 620D76198E
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:26:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FF23617C9
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:27:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232348AbhC2WZ6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Mar 2021 18:25:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47674 "EHLO mail.kernel.org"
+        id S232445AbhC2W1e (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Mar 2021 18:27:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48600 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232351AbhC2WXw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 29 Mar 2021 18:23:52 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 799BE61999;
-        Mon, 29 Mar 2021 22:23:25 +0000 (UTC)
+        id S232871AbhC2WY5 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 29 Mar 2021 18:24:57 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 44FB16024A;
+        Mon, 29 Mar 2021 22:23:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617056606;
+        s=k20201202; t=1617056625;
         bh=VS+G6bXMJNFdYt7lAreBIpGlSxaBqhnKtMhsDtoxpBE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bIbelUmvtEuiPK7Wm7hUQFAV7kN+gxYexRH6AeumsE3KwdljEnIMRfIxFU9ega36f
-         RGkYEkitoQ+7m/PiQ8jdXSAGqrv6MSvYvxkH3kqF3ZjUCj2wqsYkbrNHSlQVLADzGt
-         4D8CZatXEveAVLkB9v5veZD3ijNjmV8iw/wdfoJX/7bDZi7fbMI4mumhXJCb8QmQTN
-         6NMnHdlnErxhCzOETn39x9Vbmojnrqjd0VrmtgIJZjdCeqHuF9jmYQTPNpoAAWu0mL
-         hoC0vWLtyCljHwbav1zl1UviGdlGgolioaIm9gLVPNGk2uF6wCo1BLTGE4kM9Z/yTM
-         yzc4+6zoJNomQ==
+        b=N8Kd0eN3+uxijJGZSoVr7Ngi2dv8x/uoppiiqvJYTNaqtLUQ+QTA0zLuCz6wv/X+X
+         3SEKovbFKTaXCm4ixBjY5OW69zAq+kTWTK7iVR5u9xxTUqsxHy/Nw32AlngoTT0Tgb
+         Iynu5D6gSU2mG+r64mig8rfzL73RqnYJauAyuQi/xUoVqCl0samBFdB8urwxnXztuv
+         mIYda5iSqBL87w//xsaxWUDI6lPs0Rnoj062hgdYVIrVEP3M9vrsJDktFJ/YrypgLB
+         QuCS8j9B8TVruHgUm98fRvEMPoObUb0HmMb+An3/GNdsgvZ7gwIeHaF8+7PtuGoLrj
+         TmnVDShA3uj0g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Vincent Whitchurch <vincent.whitchurch@axis.com>,
@@ -38,12 +38,12 @@ Cc:     Vincent Whitchurch <vincent.whitchurch@axis.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 19/19] cifs: Silently ignore unknown oplock break handle
-Date:   Mon, 29 Mar 2021 18:23:02 -0400
-Message-Id: <20210329222303.2383319-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 15/15] cifs: Silently ignore unknown oplock break handle
+Date:   Mon, 29 Mar 2021 18:23:26 -0400
+Message-Id: <20210329222327.2383533-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210329222303.2383319-1-sashal@kernel.org>
-References: <20210329222303.2383319-1-sashal@kernel.org>
+In-Reply-To: <20210329222327.2383533-1-sashal@kernel.org>
+References: <20210329222327.2383533-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
