@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B14DAC433DB
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC5DC433E8
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:30:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7AA80601FC
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:29:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6990D6191F
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Mar 2021 22:30:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232936AbhC2W2p (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Mar 2021 18:28:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49548 "EHLO mail.kernel.org"
+        id S231624AbhC2W3u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Mar 2021 18:29:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48734 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232531AbhC2W0L (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 29 Mar 2021 18:26:11 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E4A98619CB;
-        Mon, 29 Mar 2021 22:23:59 +0000 (UTC)
+        id S232628AbhC2W1y (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 29 Mar 2021 18:27:54 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6DE46619DA;
+        Mon, 29 Mar 2021 22:24:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617056640;
-        bh=3tq3hnrcHXFKtFFh9/sB3X/Z016TELf87TU7B7HdbbM=;
+        s=k20201202; t=1617056654;
+        bh=t2HXyKzwOQHohnpHhRKGY8i4hCGRDtJM6cvKdB+ROLI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=B1nFf1mBN0zd4OMrurpCN8+rXTcXguW0nDOOyiC/djk30cI8Dau84PqvI9m/vD8lx
-         zF4k6cqfrePw4QkEviFBmaqrJEv8voY5hpNuaAiZvfEXwVEOz3x0jd7YRGZ8cOzLme
-         EiPPfniJcvpmvSwMF1fD0g2WYw7SNOB1BCIi0B/X8ETYVIJBtdWbdiCLh/Nli1f+02
-         ZUCRHYmCZCB/gFU6lWao1pFfn2ChMDK/w3Q/AsoItdUtGDsWvDQv3y8orbseL05EdG
-         C8/zH9SBAHlYjBw0DQROiXuxdizn5Qi5BWA2m5E7YR8UTeDrDcpzyXRvY7OuGNnVtZ
-         NOp+1vDkXq/3g==
+        b=q+kdlKIqN5JTcWnDx6GkiS3/ohTBAN1oYaM6ARAh6buNOnSpN/9jhiAD2nOT4CfZe
+         jvB5od4KZxqJxK4XDvKqDP4a3aZQlUU2YvYuks14FVMhX4tmnEOMSqT04bDa4dhsIx
+         caGBs+px0PKj5aHrOZ4iBulq7AqaLWMEFzwco/+jattMgRFdGNCbc8fgyBZQRN3CLA
+         RYT5aAMkiy1uzIkkADn5PyBO2uhbMEVryqQc1dvKzgpfpZYYhjcn8rW65OK3wSKpkm
+         5ID1beXkDNvcFUVak76+4SP+PxuQ3b7xiU9he1t91+DdRtumeCGfHMBnD3trw84OuL
+         mSDGCTPOtr6vg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Vincent Whitchurch <vincent.whitchurch@axis.com>,
@@ -38,12 +38,12 @@ Cc:     Vincent Whitchurch <vincent.whitchurch@axis.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.14 12/12] cifs: Silently ignore unknown oplock break handle
-Date:   Mon, 29 Mar 2021 18:23:45 -0400
-Message-Id: <20210329222345.2383777-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 10/10] cifs: Silently ignore unknown oplock break handle
+Date:   Mon, 29 Mar 2021 18:24:01 -0400
+Message-Id: <20210329222401.2383930-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210329222345.2383777-1-sashal@kernel.org>
-References: <20210329222345.2383777-1-sashal@kernel.org>
+In-Reply-To: <20210329222401.2383930-1-sashal@kernel.org>
+References: <20210329222401.2383930-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -83,10 +83,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index 0c6e5450ff76..80339e318294 100644
+index bddb2d7b3982..075b285bbd3e 100644
 --- a/fs/cifs/smb2misc.c
 +++ b/fs/cifs/smb2misc.c
-@@ -656,8 +656,8 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
+@@ -651,8 +651,8 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
  		}
  	}
  	spin_unlock(&cifs_tcp_ses_lock);
