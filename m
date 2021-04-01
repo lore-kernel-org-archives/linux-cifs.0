@@ -2,133 +2,223 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E324C433B4
-	for <linux-cifs@archiver.kernel.org>; Thu,  1 Apr 2021 08:18:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40889C43470
+	for <linux-cifs@archiver.kernel.org>; Thu,  1 Apr 2021 09:09:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C53F60FE9
-	for <linux-cifs@archiver.kernel.org>; Thu,  1 Apr 2021 08:18:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE69D610D0
+	for <linux-cifs@archiver.kernel.org>; Thu,  1 Apr 2021 09:09:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230284AbhDAIRa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 1 Apr 2021 04:17:30 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:56393 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233080AbhDAIRR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Apr 2021 04:17:17 -0400
-Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210401081715epoutp019dfbf0a53355727491788a151dc40bc5~xrfsccioW2528225282epoutp01h
-        for <linux-cifs@vger.kernel.org>; Thu,  1 Apr 2021 08:17:15 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210401081715epoutp019dfbf0a53355727491788a151dc40bc5~xrfsccioW2528225282epoutp01h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1617265035;
-        bh=vgbPXoR2wLvBR7QZ88GMHoPZAHxfQlH41VOC/Czif9g=;
-        h=From:To:In-Reply-To:Subject:Date:References:From;
-        b=Hvj54Vdw77qFxPIbwOqZM4WJ1bjFsqFn6hNbGApgo/3pEL3p7vRVoUW1rs5o7ufVW
-         qbGb7H87rI7Oywh2aFzQr0y8fcKqmoeYmUG65HF4QAIV+EqC8+BvRJeBwWYtIX/ur0
-         DNgWLu7rXjT/cEjA8P5e8U7MK0SxyyJWShCRlKas=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
-        20210401081714epcas1p3d04cef095c860f8d0fca63940df1e2c4~xrfr8_lVe1503215032epcas1p33;
-        Thu,  1 Apr 2021 08:17:14 +0000 (GMT)
-Received: from epsmges1p2.samsung.com (unknown [182.195.40.160]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4F9wyd5lsXz4x9Q2; Thu,  1 Apr
-        2021 08:17:13 +0000 (GMT)
-Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
-        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        CA.45.02277.98185606; Thu,  1 Apr 2021 17:17:13 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
-        20210401081713epcas1p3aee989bb7fdfb07918cafe96ab6be33c~xrfqnQLhi1504115041epcas1p3t;
-        Thu,  1 Apr 2021 08:17:13 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210401081713epsmtrp248a9eb5cfb39cb2fe6be4e61d6b8e9e4~xrfqmcNSP2201922019epsmtrp2T;
-        Thu,  1 Apr 2021 08:17:13 +0000 (GMT)
-X-AuditID: b6c32a36-4d7ff700000108e5-b0-606581897d8c
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F3.A2.08745.98185606; Thu,  1 Apr 2021 17:17:13 +0900 (KST)
-Received: from namjaejeon01 (unknown [10.88.104.63]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20210401081712epsmtip1f1cb5e77e7f1ca84725115f2c061b3da~xrfqXktBa0332003320epsmtip11;
-        Thu,  1 Apr 2021 08:17:12 +0000 (GMT)
-From:   "Namjae Jeon" <namjae.jeon@samsung.com>
-To:     "'Muhammad Usama Anjum'" <musamaanjum@gmail.com>,
-        "'Sergey Senozhatsky'" <sergey.senozhatsky@gmail.com>,
-        "'Steve French'" <sfrench@samba.org>,
-        "'Hyunchul Lee'" <hyc.lee@gmail.com>,
-        "'open list:COMMON INTERNET FILE SYSTEM SERVER \(CIFSD\)'" 
+        id S233553AbhDAJJX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 1 Apr 2021 05:09:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233702AbhDAJI6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Apr 2021 05:08:58 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9908AC0613E6;
+        Thu,  1 Apr 2021 02:08:57 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id j7so1062031wrd.1;
+        Thu, 01 Apr 2021 02:08:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
+        bh=zfLEgiVPM1EK9I/Nt42wOScERsBlthcf9kfWnVgYF2Q=;
+        b=fHOJMypWJhhdilZSqgus776bitjj+6ECd25ljjjUUgd/L3W2gUzr1RaQFXaoNGZ8q/
+         08ohAbHbg28YHIs7dUH+nZRVhUwicJ96HqiSCMrWaFNAcfRpxgosz4BFrxMaU9Ml7WcG
+         PIPLOfMVcHONaoXT9lb8ME2dqqnJVgDjjAn4upV4/KtoDlCYG3kHrmQd/ax24n80hnId
+         dq0V9qXcp38humOfzkzGVDzRvxwTNVpeUaQhOvme9OilkTwP4OahpmQ2bDqgvEANnGGV
+         lZgqSYEeFbHvI7093cMKti9e87KDn/pBSPZP9u6UURbGnCu0MiHZ5B+pwQkUzSCnT4Fo
+         xPCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=zfLEgiVPM1EK9I/Nt42wOScERsBlthcf9kfWnVgYF2Q=;
+        b=rfVWl0j9EpOikp9H97MQ8dTmMrSZJMMOhOyuRWHYI+v8xGrDGIOztfM3dJ4MaLd/QJ
+         h/om0kGjd6VUdGL96kPFm19z1f4Q5DOQXI6yjHJmdqgfh1S80nQlKpz8P5/99zx4zhuz
+         sk15t2SxWUGKBa30It5HBbTdCAf7rxIw3Z5OFjiQEk7/6Ggqx8Gd+e7/RkDnrhRi5tXL
+         /yicvLKyFwwRKKFKh3aEVrUJmRWfmGeA2HAstCNMnVKFtMJLRkvY0+XQxoVookzJCU1d
+         FJ0v+AEb+KAB/rEKMKeH2AhrQeZil7n3sQ1AuaR/K3AgiBqCSjB55clcSMbkF+C7MawY
+         BA7Q==
+X-Gm-Message-State: AOAM532hPbkcgNjHnKPjVGsqH4nPd3AII7SBq8CjJBv5nKK0Thu5XXv2
+        hvdlWJsrEJO0vzQVeOapSw4=
+X-Google-Smtp-Source: ABdhPJy3wsTTqmFumyzlT5bNJa58quMPVPj3Zo4eKzUSD/gEAxlpRvKnIyhg5WvQqFSWW3otqvDeuw==
+X-Received: by 2002:adf:b1c9:: with SMTP id r9mr8594838wra.51.1617268136402;
+        Thu, 01 Apr 2021 02:08:56 -0700 (PDT)
+Received: from LEGION ([39.46.7.73])
+        by smtp.gmail.com with ESMTPSA id f16sm8880603wrt.21.2021.04.01.02.08.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Apr 2021 02:08:55 -0700 (PDT)
+Date:   Thu, 1 Apr 2021 14:08:50 +0500
+From:   Muhammad Usama Anjum <musamaanjum@gmail.com>
+To:     Namjae Jeon <namjae.jeon@samsung.com>,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        "open list:COMMON INTERNET FILE SYSTEM SERVER (CIFSD)" 
         <linux-cifs@vger.kernel.org>,
-        "'open list:COMMON INTERNET FILE SYSTEM SERVER \(CIFSD\)'" 
+        "open list:COMMON INTERNET FILE SYSTEM SERVER (CIFSD)" 
         <linux-cifsd-devel@lists.sourceforge.net>,
-        "'open list'" <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>, <colin.king@canonical.com>,
-        <dan.carpenter@oracle.com>
-In-Reply-To: <20210401075531.GA2766105@LEGION>
-Subject: RE: [PATCH] cifsd: fix memory leak when loop ends
-Date:   Thu, 1 Apr 2021 17:17:13 +0900
-Message-ID: <003901d726cf$6b75d890$426189b0$@samsung.com>
+        open list <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org, colin.king@canonical.com,
+        dan.carpenter@oracle.com
+Cc:     musamaanjum@gmail.com
+Subject: [PATCH] cifsd: use kfree to free memory allocated by kmalloc or
+ kzalloc
+Message-ID: <20210401090850.GA2779473@LEGION>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQG8FoHjOwNMvoZKP6UmJNrFtYqTewIzYq1UqsPWbrA=
-Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNJsWRmVeSWpSXmKPExsWy7bCmgW5nY2qCwdZ36ha/V/eyWbz+N53F
-        4tr99+wWW29JW7z4v4vZ4uf/74wWl3fNYbPY27qN0WLt58fsFh0vjzI7cHnMauhl89g56y67
-        x+4Fn5k8Pj69xeIxd1cfo8fnTXIBbFE5NhmpiSmpRQqpecn5KZl56bZK3sHxzvGmZgaGuoaW
-        FuZKCnmJuam2Si4+AbpumTlAlykplCXmlAKFAhKLi5X07WyK8ktLUhUy8otLbJVSC1JyCgwN
-        CvSKE3OLS/PS9ZLzc60MDQyMTIEqE3Iy2k6eZiqYwVwxZdZMlgbG00xdjBwcEgImEidWmnYx
-        cnEICexglFj9sIsFwvnEKLGocxk7hPOZUWL7unVsXYycYB2L77yAqtrFKLFm8ylmCOclo8S6
-        +VPAqtgEdCX+/dnPBpIQEehlkXj/9wgTSIJTQE9i4ocfzCC2sICVxP8ta1hAbBYBFYl362Yx
-        gti8ApYSh6/dYoGwBSVOznwCZjMLyEtsfzuHGeIMBYmfT5exgtgiQHNWLJ/ODFEjIjG7sw3s
-        IgmBlRwSD9a/Y4JocJHo7fzHCmELS7w6voUdwpaS+PxuLxskNKolPu6Hmt/BKPHiuy2EbSxx
-        c/0GVpASZgFNifW79CHCihI7f89lhFjLJ/Huaw8rxBReiY42IYgSVYm+S4ehDpCW6Gr/ALXU
-        Q6Lj9gXmCYyKs5A8OQvJk7OQPDMLYfECRpZVjGKpBcW56anFhgVGyJG9iRGcarXMdjBOevtB
-        7xAjEwfjIUYJDmYlEV7hA4kJQrwpiZVVqUX58UWlOanFhxhNgcE+kVlKNDkfmOzzSuINTY2M
-        jY0tTMzMzUyNlcR5Ew0exAsJpCeWpGanphakFsH0MXFwSjUwhZ6RCt8+Iy/TZNunO1wHbwWk
-        P2ysbdBb8nqO6psJxvLzrwcfue/kGSsYUr3q+Rq12JqQTmVe3/u6N/ZfYGD8da373tWjPwUt
-        TzmeNfHV1t9SueRtKcMK0ZgIxzsdfVHPOydcYLgmGvv3/QNdJZO4MkXBW67HAw/eVHY+enGC
-        cN3Js49EBC5pluWs1QxIcpUOUnr4Kn5Nt2/LIz23pWkT1vKe9HRYmKu9KaQgnPfntG8Peg8w
-        ZG8LD5w5X9U402JmvbjJjMe5v7Z9X82pLBg0I5Qtb8XWAxkWq/zPpYZn9L4+86xtpulPUaEn
-        8Qd4Rf8aP+tsqy6Q+TP/XtPa8+ttFF8X3tCbdJzhAEv78ac8SizFGYmGWsxFxYkAT2wuwD4E
-        AAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupgkeLIzCtJLcpLzFFi42LZdlhJTrezMTXB4Nomdovfq3vZLF7/m85i
-        ce3+e3aLrbekLV7838Vs8fP/d0aLy7vmsFnsbd3GaLH282N2i46XR5kduDxmNfSyeeycdZfd
-        Y/eCz0weH5/eYvGYu6uP0ePzJrkAtigum5TUnMyy1CJ9uwSujLaTp5kKZjBXTJk1k6WB8TRT
-        FyMnh4SAicTiOy9Yuhi5OIQEdjBKbNn3jR0iIS1x7MQZ5i5GDiBbWOLw4WKImueMEu+3vgGr
-        YRPQlfj3Zz8bSEJEYCKLxLcFF8ESQgL1Emumv2UDsTkF9CQmfvjBDGILC1hJ/N+yhgXEZhFQ
-        kXi3bhYjiM0rYClx+NotFghbUOLkzCcsIIuZgXrbNoKVMAvIS2x/O4cZ4jYFiZ9Pl7GC2CJA
-        I1csn84MUSMiMbuzjXkCo9AsJJNmIUyahWTSLCQdCxhZVjFKphYU56bnFhsWGOWllusVJ+YW
-        l+al6yXn525iBEeWltYOxj2rPugdYmTiYDzEKMHBrCTCK3wgMUGINyWxsiq1KD++qDQntfgQ
-        ozQHi5I474Wuk/FCAumJJanZqakFqUUwWSYOTqkGJr2zEb8XPVu3t8oy511Zadj6SK53gZVF
-        Tk5TPorabWZiTlBVdgvZyP5w7RfFt4s/xvKvnPtwu+Tlc68UVyXJ1TvO+a4h5iDGOW850+9/
-        3Rfl9JaqxS9+LWx7PjyCqeFkYZCibTn7588BhhuvTfLO/b+6Xz5YNnfRxolmXz3LC/5NNRTf
-        /HiT5aNLvp3ZmhuL/D8UHPy6TSNroaVWXCWz1Bz2rN/tlzZ0FCsUdm89I7zW0u/T1bvPVN3D
-        mRMYhF7fevBj0gyOv7qfE94lC/xnLRbwybTacYi9dUZWtgPbr7jZJvsyZ4ql3rl2ib3yUcGU
-        H1a/f971cT7iovrDybbwDJPZNPtdT3Yau73O+MnBqMRSnJFoqMVcVJwIAHtoyzcbAwAA
-X-CMS-MailID: 20210401081713epcas1p3aee989bb7fdfb07918cafe96ab6be33c
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210401075539epcas1p3b7cb52923217b212c80185aab135fe22
-References: <CGME20210401075539epcas1p3b7cb52923217b212c80185aab135fe22@epcas1p3.samsung.com>
-        <20210401075531.GA2766105@LEGION>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-> 
-> Memory is being allocated and if veto_list is zero, the loop breaks without cleaning up the allocated
-> memory. In this patch, the length check has been moved before allocation. If loop breaks, the memory
-> isn't allocated in the first place. Thus the memory is being protected from leaking.
-> 
-> Signed-off-by: Muhammad Usama Anjum <musamaanjum@gmail.com>
-I will apply. Thanks for your patch!
+kfree should be used to free memory allocated by kmalloc or kzalloc to
+avoid any overhead and for maintaining consistency.
+
+Fixes: 5dfeb6d945 ("cifsd: use kmalloc() for small allocations")
+Signed-off-by: Muhammad Usama Anjum <musamaanjum@gmail.com>
+---
+ fs/cifsd/buffer_pool.c       | 4 ++--
+ fs/cifsd/mgmt/share_config.c | 2 +-
+ fs/cifsd/mgmt/user_config.c  | 8 ++++----
+ fs/cifsd/mgmt/user_session.c | 6 +++---
+ fs/cifsd/smb2pdu.c           | 4 ++--
+ fs/cifsd/vfs_cache.c         | 2 +-
+ 6 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/fs/cifsd/buffer_pool.c b/fs/cifsd/buffer_pool.c
+index ad2a2c885a2c..a9ef3e703232 100644
+--- a/fs/cifsd/buffer_pool.c
++++ b/fs/cifsd/buffer_pool.c
+@@ -78,7 +78,7 @@ static int register_wm_size_class(size_t sz)
+ 	list_for_each_entry(l, &wm_lists, list) {
+ 		if (l->sz == sz) {
+ 			write_unlock(&wm_lists_lock);
+-			kvfree(nl);
++			kfree(nl);
+ 			return 0;
+ 		}
+ 	}
+@@ -181,7 +181,7 @@ static void wm_list_free(struct wm_list *l)
+ 		list_del(&wm->list);
+ 		kvfree(wm);
+ 	}
+-	kvfree(l);
++	kfree(l);
+ }
+ 
+ static void wm_lists_destroy(void)
+diff --git a/fs/cifsd/mgmt/share_config.c b/fs/cifsd/mgmt/share_config.c
+index db780febd692..e3d459c4dbb2 100644
+--- a/fs/cifsd/mgmt/share_config.c
++++ b/fs/cifsd/mgmt/share_config.c
+@@ -102,7 +102,7 @@ static int parse_veto_list(struct ksmbd_share_config *share,
+ 
+ 		p->pattern = kstrdup(veto_list, GFP_KERNEL);
+ 		if (!p->pattern) {
+-			ksmbd_free(p);
++			kfree(p);
+ 			return -ENOMEM;
+ 		}
+ 
+diff --git a/fs/cifsd/mgmt/user_config.c b/fs/cifsd/mgmt/user_config.c
+index f0c2f8994a6b..c31e2c4d2d6f 100644
+--- a/fs/cifsd/mgmt/user_config.c
++++ b/fs/cifsd/mgmt/user_config.c
+@@ -46,8 +46,8 @@ struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp)
+ 
+ 	if (!user->name || !user->passkey) {
+ 		kfree(user->name);
+-		ksmbd_free(user->passkey);
+-		ksmbd_free(user);
++		kfree(user->passkey);
++		kfree(user);
+ 		user = NULL;
+ 	}
+ 	return user;
+@@ -57,8 +57,8 @@ void ksmbd_free_user(struct ksmbd_user *user)
+ {
+ 	ksmbd_ipc_logout_request(user->name);
+ 	kfree(user->name);
+-	ksmbd_free(user->passkey);
+-	ksmbd_free(user);
++	kfree(user->passkey);
++	kfree(user);
+ }
+ 
+ int ksmbd_anonymous_user(struct ksmbd_user *user)
+diff --git a/fs/cifsd/mgmt/user_session.c b/fs/cifsd/mgmt/user_session.c
+index 5a2113bf18ef..fa2140d4755a 100644
+--- a/fs/cifsd/mgmt/user_session.c
++++ b/fs/cifsd/mgmt/user_session.c
+@@ -53,7 +53,7 @@ static void __session_rpc_close(struct ksmbd_session *sess,
+ 
+ 	ksmbd_free(resp);
+ 	ksmbd_rpc_id_free(entry->id);
+-	ksmbd_free(entry);
++	kfree(entry);
+ }
+ 
+ static void ksmbd_session_rpc_clear_list(struct ksmbd_session *sess)
+@@ -119,7 +119,7 @@ int ksmbd_session_rpc_open(struct ksmbd_session *sess, char *rpc_name)
+ 	return entry->id;
+ error:
+ 	list_del(&entry->list);
+-	ksmbd_free(entry);
++	kfree(entry);
+ 	return -EINVAL;
+ }
+ 
+@@ -174,7 +174,7 @@ void ksmbd_session_destroy(struct ksmbd_session *sess)
+ 	ksmbd_release_id(session_ida, sess->id);
+ 
+ 	ksmbd_ida_free(sess->tree_conn_ida);
+-	ksmbd_free(sess);
++	kfree(sess);
+ }
+ 
+ static struct ksmbd_session *__session_lookup(unsigned long long id)
+diff --git a/fs/cifsd/smb2pdu.c b/fs/cifsd/smb2pdu.c
+index 139041768f65..a4bcf6a85f02 100644
+--- a/fs/cifsd/smb2pdu.c
++++ b/fs/cifsd/smb2pdu.c
+@@ -1611,7 +1611,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 
+ 			ksmbd_conn_set_good(work);
+ 			sess->state = SMB2_SESSION_VALID;
+-			ksmbd_free(sess->Preauth_HashValue);
++			kfree(sess->Preauth_HashValue);
+ 			sess->Preauth_HashValue = NULL;
+ 		} else if (conn->preferred_auth_mech == KSMBD_AUTH_NTLMSSP) {
+ 			rc = generate_preauth_hash(work);
+@@ -1637,7 +1637,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 
+ 				ksmbd_conn_set_good(work);
+ 				sess->state = SMB2_SESSION_VALID;
+-				ksmbd_free(sess->Preauth_HashValue);
++				kfree(sess->Preauth_HashValue);
+ 				sess->Preauth_HashValue = NULL;
+ 			}
+ 		} else {
+diff --git a/fs/cifsd/vfs_cache.c b/fs/cifsd/vfs_cache.c
+index ec631dc6f1fb..f2a863542dc7 100644
+--- a/fs/cifsd/vfs_cache.c
++++ b/fs/cifsd/vfs_cache.c
+@@ -829,6 +829,6 @@ void ksmbd_destroy_file_table(struct ksmbd_file_table *ft)
+ 
+ 	__close_file_table_ids(ft, NULL, session_fd_check);
+ 	idr_destroy(ft->idr);
+-	ksmbd_free(ft->idr);
++	kfree(ft->idr);
+ 	ft->idr = NULL;
+ }
+-- 
+2.25.1
 
