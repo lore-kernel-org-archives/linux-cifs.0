@@ -2,106 +2,170 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60FBEC433B4
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Apr 2021 15:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFF7C433ED
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 05:24:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F35F610CC
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Apr 2021 15:42:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30AB461399
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 05:24:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235444AbhDBPmY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 2 Apr 2021 11:42:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33682 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234968AbhDBPmY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 2 Apr 2021 11:42:24 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2AEDC0613E6;
-        Fri,  2 Apr 2021 08:42:21 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id u20so5946881lja.13;
-        Fri, 02 Apr 2021 08:42:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ggySz5ziFujBJxLBrs7YHDp8OTC2HkWK1c+xKFsqIgE=;
-        b=Nz7dQjym5qVZsccPilJbfmOGjEgHU6MXQXCryAUdG0ybN3lGI6mBsl1Gwi5F340fnw
-         gmubvWwqdURU3W9hFdxCyhNPvu1p+4RJX6Z+wIYQmnMyPANbC8Xs0K1Qc1mBQ4YuFzby
-         LIk5wcLuGcoVsX2RibIRZAEVSk9K5Myr8Pu3yiY25+9FTJyRA+BNBXYdxVM+qtHqn6q5
-         r6Ln0yccRTPax8JfcUYyH/YPdCi92DgtkFyZCk6Gb9xxfAgbk8NduhwlqnfZYcKYyRC6
-         Hh7y+8VlmQf64Rn56rNL1Ct6jnZK3poF7hWlU6CSVLBX9DSCIwnIUSgqL4/+gQqObfPn
-         neEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ggySz5ziFujBJxLBrs7YHDp8OTC2HkWK1c+xKFsqIgE=;
-        b=Z/uE0PDJmCZ63uujwD8aAQ3G4ewYh3G//07aSIvHLj0XEaVMT2oD1o60VIMchyNTDb
-         RAKFFooq0NpN7dzDfD+B/9R4HLXmNwaLHk0g7jAaYiLiyELcNBKY5e2AvVBQgx9WiYKS
-         h4yiTzXMqXRDVC3CF4HQKsJFroNyKcytHUNHWrBiEkEJL5sdgnoNUECI5MomQ+K5rQst
-         B9Wdrn6jkJhIfBemvs3ylV6ZdfR3i51fSLXVCWIY4KOtTMi9FwGf3SlqIa8gqxzsWDT0
-         /xc4nVWKMQNKSMk4Zw4tWph6DGSM7M11vC8im6F/xCOguLIMha8QIWDSJuC2T/uoE06f
-         62iQ==
-X-Gm-Message-State: AOAM530T2qYDxRuFtlCFw2hUQwQEDi+gnL8iWDeFWE54BiJrj4BOpFBt
-        tdfotsBRT2YdjAfH815gynizDusba5dDeB24bV+FPsjDCaQ=
-X-Google-Smtp-Source: ABdhPJyV8JUgqosPubOwp84IVUCKDKLhg6YVBOoZt9qxKxatixf45J3IS0QozRVb6PrEBUw8/o36RQRXg8sJYO1+fUA=
-X-Received: by 2002:a2e:8503:: with SMTP id j3mr8627596lji.272.1617378140014;
- Fri, 02 Apr 2021 08:42:20 -0700 (PDT)
+        id S231970AbhDEFYS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 5 Apr 2021 01:24:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56600 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229540AbhDEFYR (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 5 Apr 2021 01:24:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 325176138F;
+        Mon,  5 Apr 2021 05:24:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1617600252;
+        bh=M5HqKDCST9r1ErCNZdLcT+V9m148cOwOB3AdHel2elc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=hYxGHSOUM1lmYuxafECVWKyVk/1yMgA27ZdLlPDWh3vMvPlO1tJgduVSItMFVYODB
+         JnpFy9S2+owMH0EwMW3WCLjXexXYPCOYEO5/IqJ3FMCgeVaT4yr/j6+DRxhh/RHSAO
+         I1A/TcGX7LefUSTMjTgUtndaKMYI+Ez73/54gQSKZVhXbyvmmaXHiDKrhp7PK/ezIU
+         RcQ8Mvm4DVbdl8ybz0bVAmetN9hTocKU3ObpUPL8uDmMHUzfLLqmicbBNCI2o/pEQP
+         k9Rt4IrksIjQLoaiBQCmWY+qnMpMNnphY/45jPoVm6dllEvwABl5jDaDxSDKdrjv1z
+         kInT8rj7le7+A==
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Leon Romanovsky <leonro@nvidia.com>,
+        Adit Ranadive <aditr@vmware.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Devesh Sharma <devesh.sharma@broadcom.com>,
+        Faisal Latif <faisal.latif@intel.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "J. Bruce Fields" <bfields@fieldses.org>,
+        Jens Axboe <axboe@fb.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, Lijun Ou <oulijun@huawei.com>,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Michael Guralnik <michaelgur@nvidia.com>,
+        Michal Kalderon <mkalderon@marvell.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Naresh Kumar PBS <nareshkumar.pbs@broadcom.com>,
+        netdev@vger.kernel.org, Potnuri Bharat Teja <bharat@chelsio.com>,
+        rds-devel@oss.oracle.com, Sagi Grimberg <sagi@grimberg.me>,
+        samba-technical@lists.samba.org,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        Selvin Xavier <selvin.xavier@broadcom.com>,
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        Somnath Kotur <somnath.kotur@broadcom.com>,
+        Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+        Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        VMware PV-Drivers <pv-drivers@vmware.com>,
+        Weihang Li <liweihang@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: [PATCH rdma-next 00/10] Enable relaxed ordering for ULPs
+Date:   Mon,  5 Apr 2021 08:23:54 +0300
+Message-Id: <20210405052404.213889-1-leon@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <20210401075117.998330-1-wanjiabing@vivo.com>
-In-Reply-To: <20210401075117.998330-1-wanjiabing@vivo.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 2 Apr 2021 10:42:09 -0500
-Message-ID: <CAH2r5ms-rZPZi9TLE6f4Xoc33B51YKbuT+pVy8xaeNFzg9jLVg@mail.gmail.com>
-Subject: Re: [PATCH] fs: cifs: Remove unnecessary struct declaration
-To:     Wan Jiabing <wanjiabing@vivo.com>
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>, kael_w@yeah.net
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+From: Leon Romanovsky <leonro@nvidia.com>
 
-On Thu, Apr 1, 2021 at 2:52 AM Wan Jiabing <wanjiabing@vivo.com> wrote:
->
-> struct cifs_readdata is declared twice. One is declared
-> at 208th line.
-> And struct cifs_readdata is defined blew.
-> The declaration here is not needed. Remove the duplicate.
->
-> Signed-off-by: Wan Jiabing <wanjiabing@vivo.com>
-> ---
->  fs/cifs/cifsglob.h | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 67c056a9a519..ec824ab8c5ca 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1283,8 +1283,6 @@ struct cifs_aio_ctx {
->         bool                    direct_io;
->  };
->
-> -struct cifs_readdata;
-> -
->  /* asynchronous read support */
->  struct cifs_readdata {
->         struct kref                     refcount;
-> --
-> 2.25.1
->
+From Avihai,
 
+Relaxed Ordering is a PCIe mechanism that relaxes the strict ordering
+imposed on PCI transactions, and thus, can improve performance.
+
+Until now, relaxed ordering could be set only by user space applications
+for user MRs. The following patch series enables relaxed ordering for the
+kernel ULPs as well. Relaxed ordering is an optional capability, and as
+such, it is ignored by vendors that don't support it.
+
+The following test results show the performance improvement achieved
+with relaxed ordering. The test was performed on a NVIDIA A100 in order
+to check performance of storage infrastructure over xprtrdma:
+
+Without Relaxed Ordering:
+READ: bw=16.5GiB/s (17.7GB/s), 16.5GiB/s-16.5GiB/s (17.7GB/s-17.7GB/s),
+io=1987GiB (2133GB), run=120422-120422msec
+
+With relaxed ordering:
+READ: bw=72.9GiB/s (78.2GB/s), 72.9GiB/s-72.9GiB/s (78.2GB/s-78.2GB/s),
+io=2367GiB (2542GB), run=32492-32492msec
+
+Thanks
+
+Avihai Horon (10):
+  RDMA: Add access flags to ib_alloc_mr() and ib_mr_pool_init()
+  RDMA/core: Enable Relaxed Ordering in __ib_alloc_pd()
+  RDMA/iser: Enable Relaxed Ordering
+  RDMA/rtrs: Enable Relaxed Ordering
+  RDMA/srp: Enable Relaxed Ordering
+  nvme-rdma: Enable Relaxed Ordering
+  cifs: smbd: Enable Relaxed Ordering
+  net/rds: Enable Relaxed Ordering
+  net/smc: Enable Relaxed Ordering
+  xprtrdma: Enable Relaxed Ordering
+
+ drivers/infiniband/core/mr_pool.c             |  7 +-
+ drivers/infiniband/core/rw.c                  | 12 ++--
+ drivers/infiniband/core/verbs.c               | 26 +++++--
+ drivers/infiniband/hw/bnxt_re/ib_verbs.c      |  2 +-
+ drivers/infiniband/hw/bnxt_re/ib_verbs.h      |  2 +-
+ drivers/infiniband/hw/cxgb4/iw_cxgb4.h        |  2 +-
+ drivers/infiniband/hw/cxgb4/mem.c             |  2 +-
+ drivers/infiniband/hw/hns/hns_roce_device.h   |  2 +-
+ drivers/infiniband/hw/hns/hns_roce_mr.c       |  2 +-
+ drivers/infiniband/hw/i40iw/i40iw_verbs.c     |  3 +-
+ drivers/infiniband/hw/mlx4/mlx4_ib.h          |  2 +-
+ drivers/infiniband/hw/mlx4/mr.c               |  2 +-
+ drivers/infiniband/hw/mlx5/mlx5_ib.h          | 12 ++--
+ drivers/infiniband/hw/mlx5/mr.c               | 61 ++++++++--------
+ drivers/infiniband/hw/mlx5/wr.c               | 69 ++++++++++++++-----
+ drivers/infiniband/hw/ocrdma/ocrdma_verbs.c   |  2 +-
+ drivers/infiniband/hw/ocrdma/ocrdma_verbs.h   |  2 +-
+ drivers/infiniband/hw/qedr/verbs.c            |  2 +-
+ drivers/infiniband/hw/qedr/verbs.h            |  2 +-
+ drivers/infiniband/hw/vmw_pvrdma/pvrdma_mr.c  |  4 +-
+ .../infiniband/hw/vmw_pvrdma/pvrdma_verbs.h   |  2 +-
+ drivers/infiniband/sw/rdmavt/mr.c             |  3 +-
+ drivers/infiniband/sw/rdmavt/mr.h             |  2 +-
+ drivers/infiniband/sw/rxe/rxe_verbs.c         |  2 +-
+ drivers/infiniband/sw/siw/siw_verbs.c         |  2 +-
+ drivers/infiniband/sw/siw/siw_verbs.h         |  2 +-
+ drivers/infiniband/ulp/iser/iser_memory.c     | 10 ++-
+ drivers/infiniband/ulp/iser/iser_verbs.c      |  6 +-
+ drivers/infiniband/ulp/rtrs/rtrs-clt.c        |  6 +-
+ drivers/infiniband/ulp/rtrs/rtrs-srv.c        | 15 ++--
+ drivers/infiniband/ulp/srp/ib_srp.c           |  8 +--
+ drivers/nvme/host/rdma.c                      | 19 +++--
+ fs/cifs/smbdirect.c                           | 17 +++--
+ include/rdma/ib_verbs.h                       | 11 ++-
+ include/rdma/mr_pool.h                        |  3 +-
+ net/rds/ib_frmr.c                             |  7 +-
+ net/smc/smc_ib.c                              |  3 +-
+ net/smc/smc_wr.c                              |  3 +-
+ net/sunrpc/xprtrdma/frwr_ops.c                | 10 +--
+ 39 files changed, 209 insertions(+), 140 deletions(-)
 
 -- 
-Thanks,
+2.30.2
 
-Steve
