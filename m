@@ -2,42 +2,34 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36BA9C433ED
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 05:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF9BBC433ED
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 13:41:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 17D4C613B2
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 05:24:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0FDF613AE
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 13:41:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232347AbhDEFY4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 5 Apr 2021 01:24:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57994 "EHLO mail.kernel.org"
+        id S235885AbhDENl3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 5 Apr 2021 09:41:29 -0400
+Received: from verein.lst.de ([213.95.11.211]:50764 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232302AbhDEFYx (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 5 Apr 2021 01:24:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 27751613A0;
-        Mon,  5 Apr 2021 05:24:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617600286;
-        bh=qC4efJ6nsgEYXrpmkxKWy75LAL147M2IGYN5TPsAdII=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fWplzcsL9Z5M80eaItlaxJPIR8oDNUKVel7eVHXrIxgYhy15rmgiaRan2ANUF/xfS
-         apgjMlinRcwdZm0uRUeyF/w4IyRoC8LiJdvurqBkHVTLLZHkorC1ppo+CRAOPQhuco
-         hko2LOHnT6P1Cu75LPSLN6AjVOzu0jA/c2M6h8tw4toBn+o4y/+WJoCy91HO2D7mvd
-         NAzKe3/TxiRAXu7DgOhWFA9vuqbpH3rhesPmiSiqOcI7iH/mrdhmzUMyzAgWVBGM3/
-         VuCoVYPSlpRIc2bqYFPLZamRFc55xmRnknWVB8LUXs8Muk5YNrVOlYzmxGXd+Mjwyu
-         zd12jPeU6mFnw==
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Avihai Horon <avihaih@nvidia.com>,
+        id S235826AbhDENl3 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 5 Apr 2021 09:41:29 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C3BD068BEB; Mon,  5 Apr 2021 15:41:15 +0200 (CEST)
+Date:   Mon, 5 Apr 2021 15:41:15 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     Doug Ledford <dledford@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
         Adit Ranadive <aditr@vmware.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Ariel Elior <aelior@marvell.com>,
+        Avihai Horon <avihaih@nvidia.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Bernard Metzler <bmt@zurich.ibm.com>,
         Christoph Hellwig <hch@lst.de>,
@@ -76,61 +68,38 @@ Cc:     Avihai Horon <avihaih@nvidia.com>,
         Weihang Li <liweihang@huawei.com>,
         Yishai Hadas <yishaih@nvidia.com>,
         Zhu Yanjun <zyjzyj2000@gmail.com>
-Subject: [PATCH rdma-next 09/10] net/smc: Enable Relaxed Ordering
-Date:   Mon,  5 Apr 2021 08:24:03 +0300
-Message-Id: <20210405052404.213889-10-leon@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210405052404.213889-1-leon@kernel.org>
+Subject: Re: [PATCH rdma-next 00/10] Enable relaxed ordering for ULPs
+Message-ID: <20210405134115.GA22346@lst.de>
 References: <20210405052404.213889-1-leon@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210405052404.213889-1-leon@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Avihai Horon <avihaih@nvidia.com>
+On Mon, Apr 05, 2021 at 08:23:54AM +0300, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
+> 
+> >From Avihai,
+> 
+> Relaxed Ordering is a PCIe mechanism that relaxes the strict ordering
+> imposed on PCI transactions, and thus, can improve performance.
+> 
+> Until now, relaxed ordering could be set only by user space applications
+> for user MRs. The following patch series enables relaxed ordering for the
+> kernel ULPs as well. Relaxed ordering is an optional capability, and as
+> such, it is ignored by vendors that don't support it.
+> 
+> The following test results show the performance improvement achieved
+> with relaxed ordering. The test was performed on a NVIDIA A100 in order
+> to check performance of storage infrastructure over xprtrdma:
 
-Enable Relaxed Ordering for smc.
+Isn't the Nvidia A100 a GPU not actually supported by Linux at all?
+What does that have to do with storage protocols?
 
-Relaxed Ordering is an optional access flag and as such, it is ignored
-by vendors that don't support it.
-
-Signed-off-by: Avihai Horon <avihaih@nvidia.com>
-Reviewed-by: Michael Guralnik <michaelgur@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- net/smc/smc_ib.c | 3 ++-
- net/smc/smc_wr.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-index 4e91ed3dc265..6b65c5d1f957 100644
---- a/net/smc/smc_ib.c
-+++ b/net/smc/smc_ib.c
-@@ -579,7 +579,8 @@ int smc_ib_get_memory_region(struct ib_pd *pd, int access_flags,
- 		return 0; /* already done */
- 
- 	buf_slot->mr_rx[link_idx] =
--		ib_alloc_mr(pd, IB_MR_TYPE_MEM_REG, 1 << buf_slot->order, 0);
-+		ib_alloc_mr(pd, IB_MR_TYPE_MEM_REG, 1 << buf_slot->order,
-+			    IB_ACCESS_RELAXED_ORDERING);
- 	if (IS_ERR(buf_slot->mr_rx[link_idx])) {
- 		int rc;
- 
-diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-index cbc73a7e4d59..78e9650621f1 100644
---- a/net/smc/smc_wr.c
-+++ b/net/smc/smc_wr.c
-@@ -555,7 +555,8 @@ static void smc_wr_init_sge(struct smc_link *lnk)
- 	lnk->wr_reg.wr.num_sge = 0;
- 	lnk->wr_reg.wr.send_flags = IB_SEND_SIGNALED;
- 	lnk->wr_reg.wr.opcode = IB_WR_REG_MR;
--	lnk->wr_reg.access = IB_ACCESS_LOCAL_WRITE | IB_ACCESS_REMOTE_WRITE;
-+	lnk->wr_reg.access = IB_ACCESS_LOCAL_WRITE | IB_ACCESS_REMOTE_WRITE |
-+			     IB_ACCESS_RELAXED_ORDERING;
- }
- 
- void smc_wr_free_link(struct smc_link *lnk)
--- 
-2.30.2
-
+Also if you enable this for basically all kernel ULPs, why not have
+an opt-out into strict ordering for the cases that need it (if there are
+any).
