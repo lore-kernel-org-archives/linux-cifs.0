@@ -2,221 +2,247 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9580CC433B4
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 21:41:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CC0C433ED
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 23:44:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52FBE61353
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 21:41:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A57086135D
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 23:44:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241253AbhDEVlF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 5 Apr 2021 17:41:05 -0400
-Received: from mail.xes-mad.com ([162.248.234.2]:27171 "EHLO mail.xes-mad.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229890AbhDEVlE (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 5 Apr 2021 17:41:04 -0400
-X-Greylist: delayed 375 seconds by postgrey-1.27 at vger.kernel.org; Mon, 05 Apr 2021 17:41:04 EDT
-Received: from zimbra.xes-mad.com (zimbra.xes-mad.com [10.52.0.127])
-        by mail.xes-mad.com (Postfix) with ESMTP id 7A0E220248
-        for <linux-cifs@vger.kernel.org>; Mon,  5 Apr 2021 16:34:40 -0500 (CDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xes-inc.com; s=mail;
-        t=1617658480; bh=rvADVjeHmEJKgRTVFcNmcC/cC/E8dYdNr2Madl5e5TI=;
-        h=Date:From:To:Subject:From;
-        b=I31ouF+yoRYp7YdAXDIRpHT9UGLgjCetcYkfa9mzt/OYJrHWSsZnfASzteGpm2wm0
-         taLPyp1Vj20qdE2RuM4DQms7tV6cqFc6EDRdVV165ZNgxIoby4uLqB81UVzeNNjBMu
-         l8r3PVSbD1giX2LHtKB7qzYJK8TZti77j7S9P+Ik=
-Date:   Mon, 5 Apr 2021 16:34:40 -0500 (CDT)
-From:   Nate Collins <ncollins@xes-inc.com>
-To:     linux-cifs@vger.kernel.org
-Message-ID: <3798863.814011.1617658480343.JavaMail.zimbra@xes-inc.com>
-Subject: multiuser/cifscreds not functioning on newer Ubuntu releases
+        id S230421AbhDEXoN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 5 Apr 2021 19:44:13 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:52178 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242083AbhDEXoM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 5 Apr 2021 19:44:12 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 135Ncvl7057499;
+        Mon, 5 Apr 2021 23:42:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version; s=corp-2020-01-29;
+ bh=zKtM2+uDe32oGasrBZxOOoKchrt9wI6AkiWSVfkigHY=;
+ b=qqqXBvbzbX9/DZYmSyaQSUi+Y7owIdydoXu0vIzBVLGOP48aPBNswS6RC8n4A19OAj2Z
+ dqRgS8VMNVIfj6ijH3Cug0raew97YssgNu9zednVOT3gU7wi4iOcwocqmM4bV+IbQoJ9
+ mg9WKaMLox49dpXEq3yZVp/XJkuSFKdgIWOGmDhD8J1ldfwosI20ZnS37TCmJ7EOyipH
+ ed698g1i8qu5h768owxsdE/+Qdpgo0sMEUYOdwGyiidPtFj3vkjFBMTe6S5kvadvsU9+
+ mQs6UkZve05T4nPxZiVh0g8YuZdwJeG5UQFx2ua11MOFA9mjvY7r8FnpDtHsbFM7FQJw hw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 37q38mkmvf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 05 Apr 2021 23:42:42 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 135NewkK163998;
+        Mon, 5 Apr 2021 23:42:41 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2177.outbound.protection.outlook.com [104.47.57.177])
+        by userp3020.oracle.com with ESMTP id 37q2pthgqv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 05 Apr 2021 23:42:41 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Oza/qf6ORAI3lgiuCa7uYUiyFrHkOFcLU3aQ6nOpKU6cs04HaBqd/QFsLmX2KKfuuGRZERHfquGdfgFwo2xaZO4Rl/nbN6et5ZfBE+7fQTLFAVTeBxDGDcsvfefpeExBW5euWbm82uKj6VIjR7sslrtgtdOT6jEWFEIGnvUMXeZhJzVGSKFjaNgKp0VyWROofSvql8xS8Gjyn452L/qlLY9Sdbf+wtQsrO4ZWdBYg7RCBPAtetKNPJHfqfGhB964es/+nenrdAQwB3+FJeKtigEgeNAE8HJO1F0+bBg3vPLNTidbsIBoBHB3yTIIrPNLPUOkYliTQcFGh0jM00V0jA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zKtM2+uDe32oGasrBZxOOoKchrt9wI6AkiWSVfkigHY=;
+ b=B2yBIEvAzUULh72HKJZQbSFPqwZvECw+lLioPuhPIrnrftO5aFOWqqF1DSDzIvSVTsElhIRur0x5cHDpdEcLzu3VB9//2XSqmwJf/TqXa7VDUdoJuaDLzT9Z9x7qordNg1Ln0S59KRfykCXu5V/4WoNcuU5BdEKjKAGlOSGBF8CRSXA5AJZt+I7AQT5LLCKdIslM2ZbzJirqqe26OW0lAfNKICzd48mqNkwGAskDKLNryrW3bVAnwBrvpizASTpdlw7J7xwpUHk9aGvWUYjNiXI8i9VEmDPS5aQmSNu4UXjqjxvCyDNzFSAHBSuERaMjJIESSAe9YdT6n8urSke6SQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zKtM2+uDe32oGasrBZxOOoKchrt9wI6AkiWSVfkigHY=;
+ b=TmHd73cZ4o/N1BNae19uz9JV6tn9dyBW6jXvm8HWf3f4CaaTQD5cOZDuKmpOxikY7zSP4PXR8GEM3OErKFwha8/de0KM3ceiSGigMWiJOXdIcCwAvCMkShjBn1D5aGDaitFnzt5wIgtVvyn00QosDGCb4OsT1RoUpfI1n2or3so=
+Received: from SJ0PR10MB4688.namprd10.prod.outlook.com (2603:10b6:a03:2db::24)
+ by BYAPR10MB3669.namprd10.prod.outlook.com (2603:10b6:a03:119::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.32; Mon, 5 Apr
+ 2021 23:42:31 +0000
+Received: from SJ0PR10MB4688.namprd10.prod.outlook.com
+ ([fe80::50bf:7319:321c:96c9]) by SJ0PR10MB4688.namprd10.prod.outlook.com
+ ([fe80::50bf:7319:321c:96c9%4]) with mapi id 15.20.3999.032; Mon, 5 Apr 2021
+ 23:42:31 +0000
+From:   Chuck Lever III <chuck.lever@oracle.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Adit Ranadive <aditr@vmware.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Devesh Sharma <devesh.sharma@broadcom.com>,
+        Faisal Latif <faisal.latif@intel.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Bruce Fields <bfields@fieldses.org>, Jens Axboe <axboe@fb.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, Lijun Ou <oulijun@huawei.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Michael Guralnik <michaelgur@nvidia.com>,
+        Michal Kalderon <mkalderon@marvell.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Naresh Kumar PBS <nareshkumar.pbs@broadcom.com>,
+        Linux-Net <netdev@vger.kernel.org>,
+        Potnuri Bharat Teja <bharat@chelsio.com>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        Selvin Xavier <selvin.xavier@broadcom.com>,
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        Somnath Kotur <somnath.kotur@broadcom.com>,
+        Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+        Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        VMware PV-Drivers <pv-drivers@vmware.com>,
+        Weihang Li <liweihang@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [PATCH rdma-next 00/10] Enable relaxed ordering for ULPs
+Thread-Topic: [PATCH rdma-next 00/10] Enable relaxed ordering for ULPs
+Thread-Index: AQHXKdvtaH6rA5oohECEHiKcvcnWG6ql7vqAgABr9oCAADwHAA==
+Date:   Mon, 5 Apr 2021 23:42:31 +0000
+Message-ID: <C2924F03-11C5-4839-A4F3-36872194EEA8@oracle.com>
+References: <20210405052404.213889-1-leon@kernel.org>
+ <20210405134115.GA22346@lst.de> <20210405200739.GB7405@nvidia.com>
+In-Reply-To: <20210405200739.GB7405@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=oracle.com;
+x-originating-ip: [68.61.232.219]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f0c56502-f0b5-4421-9459-08d8f88c7ac9
+x-ms-traffictypediagnostic: BYAPR10MB3669:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR10MB3669C4B8FFC587AA19F90E9C93779@BYAPR10MB3669.namprd10.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 1P4/L1/ZJNVYsq3zoAQHsRP9UvupmZIfHQY+XnQnH5lv82rLLrpSzQeYH/12YKh6Ea1h23o0jB54TUuJW6z0y12ZyqjP9IwsB0hPS1pg9jHhRz31BDNAhm5wbXnizfOsFPmmd6QkjBYak5tKAOEU2OkVOGu71kVM9zMGUnX1zfVuRipXVO3jWjZUS8y9o1wgULZbv+ziayhlEjYV4FI5Q0//tYXalrI1JjwCZtaeqFiUj4vEdqK4FgldCtXopVZqrewNvQGeoUZUvAhffBucqw3C7w9nBKt4F3PvUQjqnIYw57NFPh0tRZxnPFeu7a1Icusb434uEzIMGEpHnb4gX+JIiT3xKX5nQHtu9GWMFY4jA1bNMH2QnAgqGdxCfl+2FvOdvN/gROdSRpV1BCxyPUQDNa4IJ/45i8TClvjnRTCdKWq2ScYhOW0V4i4WNtea6cu7lDpFJXME6HnDf9nz113NaHjJYGX/c+vhtwMVfzwu7MrhpjQydY6ggpzPtJbS/3Ho6ZI4ckkOONRsfwLXCa+11s7DUuKlsM+rwOAWLreYXBfuO2Fr6UulB7CKdsV30ohAa2Rst0rJ7W6/VZxGAHkyOeihc6LppT+19IHNaCxiEP3sKX4fHO4/PVuzpKa5yxG8Ro49YCqPgzduel5QHETYWnlu2x+Wv9sdEKWplGnqLRH0tsp82vQRKotgl9O2
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR10MB4688.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(396003)(136003)(346002)(366004)(39860400002)(64756008)(66446008)(4326008)(6486002)(66476007)(38100700001)(8676002)(2906002)(66946007)(2616005)(66556008)(26005)(6916009)(33656002)(91956017)(8936002)(53546011)(6506007)(83380400001)(7416002)(7406005)(6512007)(478600001)(36756003)(186003)(54906003)(86362001)(76116006)(71200400001)(5660300002)(316002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?fU1731iuF5s3ZfAXU2eFrlz5VWawkbELDW24dAvCcoetlZ//NsdiLAW6Y1Gf?=
+ =?us-ascii?Q?jwHFlUZir0fVOfxeASJmoRWbdkrqA2l5fGDOKJYx3nIop6jZOjgxUdCwQoAk?=
+ =?us-ascii?Q?VGhDK2Bdtn36a/uO2szgA48BPHez7fhfFI6Gh7T45eo75uMd6Y6kLGRx8636?=
+ =?us-ascii?Q?OVbmE/U/H6bJiDtS5wTiALUS7ZmiEQ2A84XnhbCFb8PvYsVU13X+7+rSJ+Px?=
+ =?us-ascii?Q?Ysf/6T4jLe63J35INSfGTrr5eQAhprYEFBnjMzcOELD7J4OUPHb7yaPLdJLu?=
+ =?us-ascii?Q?pPnjH9HqsX+b+2RQSQ/FFUJHDxeFikinzf3PUSDInYvJB+A6Trd5K3eAeoH/?=
+ =?us-ascii?Q?CtNR7hRuUkaiV8MOhoKpMV9mwmMESLsRv2Ob2wGROSRO3OJ12O1mpTnP2GxL?=
+ =?us-ascii?Q?o3PBnRmXK/e0VykBj8Pl445Hn41tKP8JUR13XKRDlpOcU12HGsCUQ0WL7HGh?=
+ =?us-ascii?Q?BoQG61fmioyAWk+0PUMEdCkFH/+Rwiou6LnMVej9r88rWnRraj7zCjFldH2i?=
+ =?us-ascii?Q?m9AJLcxpV4hwBMby0Y79x++A1b/G11vch4VyqL/y0UTwcdKFRoADT3uUiWfZ?=
+ =?us-ascii?Q?O13pRBmTwetTqH16rA57lOy7cxj9WxbjTRvsd5xBjbvICEMbEcZAL+vJUu5I?=
+ =?us-ascii?Q?/xuAAvVVwYluFCF4/U5XQCQjZxl+CBjBiJUZt8ON6A6SgDdtcttW+PaWHzjn?=
+ =?us-ascii?Q?RPFLsF9LYAhBBQd3KPqejhO5IoKUyBO5Xtn9GRakEiS/CaBejBUcgVxig2T8?=
+ =?us-ascii?Q?kuGQflA9T7OvQzh15LyPtNPyutSy1OskNivxyeyZk4Y8OrGdKQa0XrsYoqEc?=
+ =?us-ascii?Q?+Czvqe62IbGS2ZgQVQREG5xCMMQrUz6gCXRalaIxJuWh5ZFmSPySf/xpWDN9?=
+ =?us-ascii?Q?tjJXca2jYcDAGwz5fXVUPfB00BeTYhCbziIzuHtrA+vlGH742aRO+kh0t95b?=
+ =?us-ascii?Q?gzc3bW9Wmu1FlIhp8Yw7nG/tW5JnbkbAiDZOe5DZ4PhXDst9/+wcQH5Gg4MF?=
+ =?us-ascii?Q?z8gCvVZrMTFNPzRU0mPTymsC3SiFXAluiQl72LrS4yNnIT4bHa4KHWso3tK5?=
+ =?us-ascii?Q?vdN3W9nGhv7lAhwoeccCPpnEIg2Mb93K2Aq1bT12xg7otA5RMzIu5L9y9eoO?=
+ =?us-ascii?Q?wKxOxDX0/3L7pS1cybObTXO4ZfZRb0OtPOiWSR0ScDIdh/LoH/eTbR1quXgs?=
+ =?us-ascii?Q?XawX/gauqz4cOlBSfDTfEBX7b88TX4kl0MzD/vCGn4fkuaeyB3/uQi3fZj9w?=
+ =?us-ascii?Q?LxY+TVOKF07nJxA5DDhBLpP8mqx3Krcz644M+z47TV9DI1EYqbXgBolZq4YW?=
+ =?us-ascii?Q?bJdvBDKv1dUkInkFAa2OQXL6?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <69878C021114F24EA5FA2F46F9DA0365@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.52.17.93]
-X-Mailer: Zimbra 8.8.15_GA_3996 (ZimbraWebClient - GC89 (Win)/8.8.15_GA_3996)
-Thread-Index: zfsCWz3oq5gRsOXrvAegmI+oaDcGLw==
-Thread-Topic: multiuser/cifscreds not functioning on newer Ubuntu releases
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR10MB4688.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f0c56502-f0b5-4421-9459-08d8f88c7ac9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Apr 2021 23:42:31.0921
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 25Gc+/aJACeCR+j9+mbqW0oTfQ1ncSEcbZ51VcLeEjMTOLkowk6VKD2PH0Q2km4W7lXFaZQGezA3lquPEFkUrA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR10MB3669
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9945 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
+ malwarescore=0 phishscore=0 bulkscore=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104030000 definitions=main-2104050158
+X-Proofpoint-GUID: sIuYRWDDGEAZZQlar9MnLoK_g2T-7nP9
+X-Proofpoint-ORIG-GUID: sIuYRWDDGEAZZQlar9MnLoK_g2T-7nP9
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9945 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 suspectscore=0
+ impostorscore=0 malwarescore=0 priorityscore=1501 spamscore=0 mlxscore=0
+ bulkscore=0 lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104030000
+ definitions=main-2104050158
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I initially posted this to the Samba mailing list, where it didn't 
-receive much attention, but it might be more appropriate for a
-CIFS-specific mailing list. Per the subject, this may be an
-Ubuntu-specific bug, but I don't have the familiarity with CIFS to
-claim this is so and that nothing is wrong with my setup.
 
----
 
-This is a problem that's plagued us for a while that we haven't been
-able to resolve due to the lack of familiarity with cifscreds and keyring
-debugging, so I thought I'd ask here to see if there's anything obviously
-wrong with our setup, or if there's any cifscreds/keyring debugging
-advice that could help us.
+> On Apr 5, 2021, at 4:07 PM, Jason Gunthorpe <jgg@nvidia.com> wrote:
+>=20
+> On Mon, Apr 05, 2021 at 03:41:15PM +0200, Christoph Hellwig wrote:
+>> On Mon, Apr 05, 2021 at 08:23:54AM +0300, Leon Romanovsky wrote:
+>>> From: Leon Romanovsky <leonro@nvidia.com>
+>>>=20
+>>>> From Avihai,
+>>>=20
+>>> Relaxed Ordering is a PCIe mechanism that relaxes the strict ordering
+>>> imposed on PCI transactions, and thus, can improve performance.
+>>>=20
+>>> Until now, relaxed ordering could be set only by user space application=
+s
+>>> for user MRs. The following patch series enables relaxed ordering for t=
+he
+>>> kernel ULPs as well. Relaxed ordering is an optional capability, and as
+>>> such, it is ignored by vendors that don't support it.
+>>>=20
+>>> The following test results show the performance improvement achieved
+>>> with relaxed ordering. The test was performed on a NVIDIA A100 in order
+>>> to check performance of storage infrastructure over xprtrdma:
+>>=20
+>> Isn't the Nvidia A100 a GPU not actually supported by Linux at all?
+>> What does that have to do with storage protocols?
+>=20
+> I think it is a typo (or at least mit makes no sense to be talking
+> about NFS with a GPU chip) Probably it should be a DGX A100 which is a
+> dual socket AMD server with alot of PCIe, and xptrtrdma is a NFS-RDMA
+> workload.
 
-We currently use multiuser CIFS mounts on a handful of domain-joined
-Ubuntu 16.04 servers to permit users to access CIFS shares with their AD
-credentials. The CIFS shares in question are mounted by a separate service
-account. Everything has been working as expected on the 16.04 servers:
+We need to get a better idea what correctness testing has been done,
+and whether positive correctness testing results can be replicated
+on a variety of platforms.
 
-$ cat /etc/lsb-release
-DISTRIB_ID=Ubuntu
-DISTRIB_RELEASE=16.04
-DISTRIB_CODENAME=xenial
-DISTRIB_DESCRIPTION="Ubuntu 16.04 LTS"
+I have an old Haswell dual-socket system in my lab, but otherwise
+I'm not sure I have a platform that would be interesting for such a
+test.
 
-$ uname -a
-Linux host1 4.4.0-206-generic #238-Ubuntu SMP Tue Mar 16 07:52:37 UTC
-2021 x86_64 x86_64 x86_64 GNU/Linux
 
-$ dpkg --list | grep cifs
-ii  cifs-utils                            2:6.4-1ubuntu1.1
-amd64        Common Internet File System utilities
+> AMD dual socket systems are well known to benefit from relaxed
+> ordering, people have been doing this in userspace for a while now
+> with the opt in.
 
-$ keyctl show
-Session Keyring
- [key] --alswrv      0     0  keyring: _ses
- [key] ---lswrv      0 65534   \_ keyring: _uid.0
 
-$ cifscreds add share
-Password:
+--
+Chuck Lever
 
-$ ls /mnt/share/
-Content
-...
 
-$ keyctl show
-Session Keyring
- [key] --alswrv      0     0  keyring: _ses
- [key] ---lswrv      0 65534   \_ keyring: _uid.0
- [key] ----sw-v  [uid] [gid]   \_ logon: cifs:a:[share IP]
 
-$ mount | grep multiuser
-//share/share on /mnt/share type cifs
-(rw,relatime,vers=3.0,sec=ntlmsspi,cache=strict,multiuser,domain=[domain],
-uid=0,noforceuid,gid=0,noforcegid,addr=[share IP],file_mode=0755,
-dir_mode=0755,nounix,serverino,mapposix,noperm,rsize=1048576,
-wsize=1048576,echo_interval=60,actimeo=1)
-
-$ grep cifs /etc/pam.d/*
-/etc/pam.d/common-auth:auth    optional            pam_cifscreds.so
-/etc/pam.d/common-session:session optional    pam_cifscreds.so
-host=[domain controller]
-
-$
-
-However, with the exact same setup on an 18.04 and 20.04 server, I am
-unable to access the CIFS mount after running cifscreds add share:
-
-$ cat /etc/lsb-release
-DISTRIB_ID=Ubuntu
-DISTRIB_RELEASE=18.04
-DISTRIB_CODENAME=bionic
-DISTRIB_DESCRIPTION="Ubuntu 18.04.1 LTS"
-
-$ uname -a
-Linux host2 4.15.0-42-generic #45-Ubuntu SMP Thu Nov 15 19:32:57 UTC
-2018 x86_64 x86_64 x86_64 GNU/Linux
-
-$ dpkg --list | grep cifs
-ii  cifs-utils                            2:6.8-1ubuntu1.1
-amd64        Common Internet File System utilities
-
-$ keyctl show
-Session Keyring
- [key] --alswrv      0     0  keyring: _ses
- [key] ---lswrv      0 65534   \_ keyring: _uid.0
-
-$ cifscreds add share
-Password:
-
-$ ls /mnt/share
-ls: cannot access '/mnt/share': Permission denied
-
-$ keyctl show
-Session Keyring
- [key] --alswrv      0     0  keyring: _ses
- [key] ---lswrv      0 65534   \_ keyring: _uid.0
- [key] ----sw-v  [uid] [gid]   \_ logon: cifs:a:[share IP]
-
-$ mount | grep multiuser
-//share/share on /mnt/share type cifs
-(rw,relatime,vers=3.0,sec=ntlmsspi,cache=strict,multiuser,domain=[domain],
-uid=0,noforceuid,gid=0,noforcegid,addr=[share IP],file_mode=0755,
-dir_mode=0755,soft,nounix,serverino,mapposix,noperm,rsize=1048576,
-wsize=1048576,echo_interval=60,actimeo=1)
-
-$
-
-The following error appears in dmesg whenever I try to interact with
-/mnt/share:
-
-[   44.660510] CIFS VFS: signing requested but authenticated as guest
-[   44.663053] CIFS VFS: SMB signature verification returned error = -13
-[   44.663172] CIFS VFS: failed to connect to IPC (rc=-13)
-[   44.664501] CIFS VFS: SMB signature verification returned error = -13
-[   44.665361] CIFS VFS: SMB signature verification returned error = -13
-[   44.665442] CIFS VFS: cifs_put_smb_ses: Session Logoff failure rc=-13
-
-I can't tell if these mssages are significant or not -- I recall reading
-that this was just a change in logging between releases. I tried using
-ntlm through ntlmssp for the mount, but none of those protocols resulted
-in the mountpoint being accessible by my user (they did however get rid of
-the dmesg message). I've tried adjusting other mount options to no avail.
-I can recreate this issue on multiple shares across multiple servers.
-
-I found this bug report:
-
-https://bugs.launchpad.net/ubuntu/+source/cifs-utils/+bug/1900856
-
-along with this one:
-
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=986168
-
-which seem to be similar issues, except with Kerberos authentication. From
-the first report, I enabled some more verbose debugging:
-
-$ echo 'module cifs +p' > /sys/kernel/debug/dynamic_debug/control
-$ echo 'file fs/cifs/* +p' > /sys/kernel/debug/dynamic_debug/control
-$ echo 7 > /proc/fs/cifs/cifsFYI
-$ echo 1 > /sys/module/dns_resolver/parameters/debug
-
-Then, when attempting to ls /mnt/share:
-
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/smb2maperror.c: Mapping SMB2
-status code 0xc0000022 to POSIX err -13
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/misc.c: Null buffer passed
-to cifs_small_buf_release
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/connect.c: CIFS VFS: leaving
-cifs_setup_ipc (xid = 109) rc = -13
-CIFS VFS: failed to connect to IPC (rc=-13)
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/connect.c: CIFS VFS: in
-cifs_get_tcon as Xid: 110 with uid: 1001
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/smb2pdu.c: TCON
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/transport.c: Sending smb:
-smb_len=100
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/connect.c: RFC1002 header 0x49
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/smb2misc.c: smb2_check_message
-length: 0x4d, smb_buf_length: 0x49
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/smb2misc.c: SMB2 len 77
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/transport.c:
-cifs_sync_mid_result: cmd=3 mid=41 state=4
-CIFS VFS: SMB signature verification returned error = -13
-Status code returned 0xc0000022 STATUS_ACCESS_DENIED
-/build/linux-Y38gIP/linux-4.15.0/fs/cifs/smb2maperror.c: Mapping SMB2
-status code 0xc0000022 to POSIX err -13
-
-Not sure if these messages are meaningful, but I thought I'd include them.
-
-There's been other cifscreds strangeness that we've noticed, like access
-to mounts not being immediately revoked when `cifscreds clear[all]`
-is ran, but this is the main, easily reproducible issue we've been seeing
-that's preventing us from using multiuser on CIFS mounts.
-
-We use Samba DCs on version 4.12.3-8, and the CIFS share hosts are
-up-to-date TrueNAS servers.
