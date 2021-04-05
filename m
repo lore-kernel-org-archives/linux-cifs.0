@@ -2,162 +2,139 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A9D6C433B4
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 15:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 457E4C433B4
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 15:33:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 56B41613B1
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 15:27:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18A8260FEF
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Apr 2021 15:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237991AbhDEP11 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 5 Apr 2021 11:27:27 -0400
-Received: from mail-pj1-f49.google.com ([209.85.216.49]:52087 "EHLO
-        mail-pj1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232714AbhDEP10 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 5 Apr 2021 11:27:26 -0400
-Received: by mail-pj1-f49.google.com with SMTP id s21so6260363pjq.1;
-        Mon, 05 Apr 2021 08:27:20 -0700 (PDT)
+        id S232714AbhDEPdh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 5 Apr 2021 11:33:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54218 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238291AbhDEPde (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 5 Apr 2021 11:33:34 -0400
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BDD6C061756
+        for <linux-cifs@vger.kernel.org>; Mon,  5 Apr 2021 08:33:26 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id 82so2313166yby.7
+        for <linux-cifs@vger.kernel.org>; Mon, 05 Apr 2021 08:33:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=f6dy3Ip3DaXRrhKvJCfr4jBUh7QAlRrG6iSAD5A3T6Y=;
+        b=l/8Ifw8JVQOrwDzlF0j4t7QDzLyu4FtdGjV1G3C3wXTV05WqR4G//mJ969SFy1TJuw
+         aV2P6h4PNX2FKcSIkS49KeWgzqlbgFK3kTEjdpqyCo56+FZ+ahqO3iLGdJG//WtRaxzl
+         7B0yaefw09aoif18wsus0e7RvZcNZ/ti7fuhBTXDDhipH59/OGOTwYbwyNuLM5O6g6C5
+         M6mib4Rbt0vbLkna79ljc5xa/k1/qUHth+/N1dty7xFIScCBU4KivPwxLPvC0R0NkUOX
+         pCgmyinLL6s+w3flO1CLv7Zv78Cpm/eAgDHdIDAftMqVfMJ4gFcQv3A4b0i8s1loLw04
+         WD6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=s6/xO6zDlOcf9rGpsVwdjh2veGTAn/Y535MvhVK0maI=;
-        b=h9EtD5dygBgSwlVuY9Jq6t+X2QFeSKBAkLNb8O5qKyvy3AGmgN7kScbfC7a9jLtSQi
-         Z1sS31l/OWdoApZgs07IyDTIt4Vt9unJzh2oUmBlZ1dcZbglfJyRHc343UVzS0J/gB69
-         Eia2NxXoItDcvXbhXr5JyUWefkOUynENpPCvCqLT9uJG+gOFHktluYVVAQujWgyZ1CXH
-         opKRO9ZSgM82jTPeMpxBKC0oaMvZJI5J2mbEq8lDlJOJniapJWlAacenFoG7FVAhIWso
-         riUNBcde/x8w0fA7n4Oc8Niicf6zMOAoLtUKfLTObExCAUybVvDZH1RCzngmYP1J1Z/E
-         BRNQ==
-X-Gm-Message-State: AOAM53271sAdFQyyNyFbp7r9nebheGfwuj34uN9tQFpPpqb7rY50RQiR
-        Js8Q6+WcdfOTSJSj21l2Ok0=
-X-Google-Smtp-Source: ABdhPJxlWm0Lzuy1NvlR6D9W30X3v6KfefWidA41cG0vntzFiFzAU4ozy7Gn2cAEzl4sPpga7IG/QA==
-X-Received: by 2002:a17:90b:33d0:: with SMTP id lk16mr14383989pjb.115.1617636440145;
-        Mon, 05 Apr 2021 08:27:20 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:20c0:5960:9793:8deb? ([2601:647:4000:d7:20c0:5960:9793:8deb])
-        by smtp.gmail.com with ESMTPSA id p11sm16137366pjo.48.2021.04.05.08.27.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Apr 2021 08:27:19 -0700 (PDT)
-Subject: Re: [PATCH rdma-next 01/10] RDMA: Add access flags to ib_alloc_mr()
- and ib_mr_pool_init()
-To:     Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Avihai Horon <avihaih@nvidia.com>,
-        Adit Ranadive <aditr@vmware.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Ariel Elior <aelior@marvell.com>,
-        Bernard Metzler <bmt@zurich.ibm.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Devesh Sharma <devesh.sharma@broadcom.com>,
-        Faisal Latif <faisal.latif@intel.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "J. Bruce Fields" <bfields@fieldses.org>,
-        Jens Axboe <axboe@fb.com>,
-        Karsten Graul <kgraul@linux.ibm.com>,
-        Keith Busch <kbusch@kernel.org>, Lijun Ou <oulijun@huawei.com>,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Michael Guralnik <michaelgur@nvidia.com>,
-        Michal Kalderon <mkalderon@marvell.com>,
-        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
-        Naresh Kumar PBS <nareshkumar.pbs@broadcom.com>,
-        netdev@vger.kernel.org, Potnuri Bharat Teja <bharat@chelsio.com>,
-        rds-devel@oss.oracle.com, Sagi Grimberg <sagi@grimberg.me>,
-        samba-technical@lists.samba.org,
-        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-        Selvin Xavier <selvin.xavier@broadcom.com>,
-        Shiraz Saleem <shiraz.saleem@intel.com>,
-        Somnath Kotur <somnath.kotur@broadcom.com>,
-        Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
-        Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        VMware PV-Drivers <pv-drivers@vmware.com>,
-        Weihang Li <liweihang@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhu Yanjun <zyjzyj2000@gmail.com>
-References: <20210405052404.213889-1-leon@kernel.org>
- <20210405052404.213889-2-leon@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <c21edd64-396c-4c7c-86f8-79045321a528@acm.org>
-Date:   Mon, 5 Apr 2021 08:27:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=f6dy3Ip3DaXRrhKvJCfr4jBUh7QAlRrG6iSAD5A3T6Y=;
+        b=FrsUAP6q1WymKtSBzSU6x1mGMnN9NKg5csjumbh7q40MBS7IsBAgdBBfBVwXL6EejP
+         28gMeGmbysWbtANF+x8x580Hr3hFaPa77IJrIZbPC2rkRhKm6H/7RGxAN5w4LXPzWShg
+         ugHfLw03fkbGQBZY+z8TDYeijfRobCTVI/mHYbF03OgPU4ZTFUuwYLyrAnVaIcno5HTU
+         yYYLATU4PvEGUtqHq0Oi+A2J/dItj9bM/8W2hkZuG6ztsVMel3vw8Vrdlxwwps9iArAT
+         5hcDA24nRwO1eofqPs8ViqfWyAupDhXN+NqtofzjsBtJMbmI3aCYzsUotmboxSvGrhgg
+         Pc/g==
+X-Gm-Message-State: AOAM531zXP1nEzqyaEJbStkLb8ePK7QJdhcPZ4bkNOEqJ+EzHhnj/J6I
+        fz8DXW/bPGEHG6kRmbHZl9iXbwaDS4T77eFT3bA=
+X-Google-Smtp-Source: ABdhPJzlRV77yDbRaiKgY7vl9XxIJzDbo45c/xZZ8RGydjxRmLUfam/9d3P7a2DT8ytJ69GnrXCKionm/ipS3JxU/R8=
+X-Received: by 2002:a25:3b4d:: with SMTP id i74mr36213618yba.3.1617636805688;
+ Mon, 05 Apr 2021 08:33:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210405052404.213889-2-leon@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Mon, 5 Apr 2021 21:03:14 +0530
+Message-ID: <CANT5p=qWyYCD_gSw-AzvxOgzTzWkBK1uUz-16YougX5No8jjgQ@mail.gmail.com>
+Subject: [PATCH] cifs: On cifs_reconnect, resolve the hostname again.
+To:     Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000002de70705bf3b6bf3"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 4/4/21 10:23 PM, Leon Romanovsky wrote:
-> diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
-> index bed4cfe50554..59138174affa 100644
-> --- a/include/rdma/ib_verbs.h
-> +++ b/include/rdma/ib_verbs.h
-> @@ -2444,10 +2444,10 @@ struct ib_device_ops {
->  				       struct ib_udata *udata);
->  	int (*dereg_mr)(struct ib_mr *mr, struct ib_udata *udata);
->  	struct ib_mr *(*alloc_mr)(struct ib_pd *pd, enum ib_mr_type mr_type,
-> -				  u32 max_num_sg);
-> +				  u32 max_num_sg, u32 access);
->  	struct ib_mr *(*alloc_mr_integrity)(struct ib_pd *pd,
->  					    u32 max_num_data_sg,
-> -					    u32 max_num_meta_sg);
-> +					    u32 max_num_meta_sg, u32 access);
->  	int (*advise_mr)(struct ib_pd *pd,
->  			 enum ib_uverbs_advise_mr_advice advice, u32 flags,
->  			 struct ib_sge *sg_list, u32 num_sge,
-> @@ -4142,11 +4142,10 @@ static inline int ib_dereg_mr(struct ib_mr *mr)
->  }
->  
->  struct ib_mr *ib_alloc_mr(struct ib_pd *pd, enum ib_mr_type mr_type,
-> -			  u32 max_num_sg);
-> +			  u32 max_num_sg, u32 access);
->  
-> -struct ib_mr *ib_alloc_mr_integrity(struct ib_pd *pd,
-> -				    u32 max_num_data_sg,
-> -				    u32 max_num_meta_sg);
-> +struct ib_mr *ib_alloc_mr_integrity(struct ib_pd *pd, u32 max_num_data_sg,
-> +				    u32 max_num_meta_sg, u32 access);
->  
->  /**
->   * ib_update_fast_reg_key - updates the key portion of the fast_reg MR
-> diff --git a/include/rdma/mr_pool.h b/include/rdma/mr_pool.h
-> index e77123bcb43b..2a0ee791037d 100644
-> --- a/include/rdma/mr_pool.h
-> +++ b/include/rdma/mr_pool.h
-> @@ -11,7 +11,8 @@ struct ib_mr *ib_mr_pool_get(struct ib_qp *qp, struct list_head *list);
->  void ib_mr_pool_put(struct ib_qp *qp, struct list_head *list, struct ib_mr *mr);
->  
->  int ib_mr_pool_init(struct ib_qp *qp, struct list_head *list, int nr,
-> -		enum ib_mr_type type, u32 max_num_sg, u32 max_num_meta_sg);
-> +		    enum ib_mr_type type, u32 max_num_sg, u32 max_num_meta_sg,
-> +		    u32 access);
->  void ib_mr_pool_destroy(struct ib_qp *qp, struct list_head *list);
->  
->  #endif /* _RDMA_MR_POOL_H */
+--0000000000002de70705bf3b6bf3
+Content-Type: text/plain; charset="UTF-8"
 
-Does the new 'access' argument only control whether or not PCIe relaxed
-ordering is enabled? It seems wrong to me to make enabling of PCIe
-relaxed ordering configurable. I think this mechanism should be enabled
-unconditionally if the HCA supports it.
+Hi Steve,
 
-Thanks,
+Please consider the attached patch for performing the DNS query again
+on reconnect.
+This is important when connecting to Azure file shares. The UNC
+generally contains the server name as a FQDN, and the IP address which
+the name resolves to can change over time.
 
-Bart.
+After our last conversation about this, I discovered that for the
+non-DFS scenario, we never do DNS resolutions in cifs.ko, since
+mount.cifs already resolves the name and passes the "addr=" arg during
+mount.
+
+Hi Paulo,
+
+I noticed that you had a patch for this long back. But I don't see
+that call happening in the latest code. Any idea why that was done?
+
+========================
+commit 28eb24ff75c5ac130eb326b3b4d0dcecfc0f427d
+Author: Paulo Alcantara <paulo@paulo.ac>
+Date:   Tue Nov 20 15:16:36 2018 -0200
+
+    cifs: Always resolve hostname before reconnecting
+
+    In case a hostname resolves to a different IP address (e.g. long
+    running mounts), make sure to resolve it every time prior to calling
+    generic_ip_connect() in reconnect.
+
+    Suggested-by: Steve French <stfrench@microsoft.com>
+    Signed-off-by: Paulo Alcantara <palcantara@suse.de>
+    Signed-off-by: Steve French <stfrench@microsoft.com>
+=========================
+
+-- 
+Regards,
+Shyam
+
+--0000000000002de70705bf3b6bf3
+Content-Type: application/octet-stream; 
+	name="0001-cifs-On-cifs_reconnect-resolve-the-hostname-again.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-On-cifs_reconnect-resolve-the-hostname-again.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kn4qvu6q0>
+X-Attachment-Id: f_kn4qvu6q0
+
+RnJvbSAyODlmN2YwZmEyMjllYTE4MTA5NDgyMWMzMDlhMmJhOTM1ODc5MWEzIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
+PgpEYXRlOiBXZWQsIDMxIE1hciAyMDIxIDE0OjM1OjI0ICswMDAwClN1YmplY3Q6IFtQQVRDSF0g
+Y2lmczogT24gY2lmc19yZWNvbm5lY3QsIHJlc29sdmUgdGhlIGhvc3RuYW1lIGFnYWluLgoKT24g
+Y2lmc19yZWNvbm5lY3QsIG1ha2Ugc3VyZSB0aGF0IEROUyByZXNvbHV0aW9uIGhhcHBlbnMgYWdh
+aW4uCkl0IGNvdWxkIGJlIHRoZSBjYXVzZSBvZiBjb25uZWN0aW9uIHRvIGdvIGRlYWQgaW4gdGhl
+IGZpcnN0IHBsYWNlLgoKU2lnbmVkLW9mZi1ieTogU2h5YW0gUHJhc2FkIE4gPHNwcmFzYWRAbWlj
+cm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2Nvbm5lY3QuYyB8IDE1ICsrKysrKysrKysrKysrKwog
+MSBmaWxlIGNoYW5nZWQsIDE1IGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2Nv
+bm5lY3QuYyBiL2ZzL2NpZnMvY29ubmVjdC5jCmluZGV4IGVlYzhhMjA1MmRhMi4uM2RiMzAwNmJi
+YjQ3IDEwMDY0NAotLS0gYS9mcy9jaWZzL2Nvbm5lY3QuYworKysgYi9mcy9jaWZzL2Nvbm5lY3Qu
+YwpAQCAtMzIxLDE0ICszMjEsMjkgQEAgY2lmc19yZWNvbm5lY3Qoc3RydWN0IFRDUF9TZXJ2ZXJf
+SW5mbyAqc2VydmVyKQogI2VuZGlmCiAKICNpZmRlZiBDT05GSUdfQ0lGU19ERlNfVVBDQUxMCisJ
+CWlmIChjaWZzX3NiICYmIGNpZnNfc2ItPm9yaWdpbl9mdWxscGF0aCkKIAkJCS8qCiAJCQkgKiBT
+ZXQgdXAgbmV4dCBERlMgdGFyZ2V0IHNlcnZlciAoaWYgYW55KSBmb3IgcmVjb25uZWN0LiBJZiBE
+RlMKIAkJCSAqIGZlYXR1cmUgaXMgZGlzYWJsZWQsIHRoZW4gd2Ugd2lsbCByZXRyeSBsYXN0IHNl
+cnZlciB3ZQogCQkJICogY29ubmVjdGVkIHRvIGJlZm9yZS4KIAkJCSAqLwogCQkJcmVjb25uX3Nl
+dF9uZXh0X2Rmc190YXJnZXQoc2VydmVyLCBjaWZzX3NiLCAmdGd0X2xpc3QsICZ0Z3RfaXQpOwor
+CQllbHNlIHsKKyNlbmRpZgorCQkJLyoKKwkJCSAqIFJlc29sdmUgdGhlIGhvc3RuYW1lIGFnYWlu
+IHRvIG1ha2Ugc3VyZSB0aGF0IElQIGFkZHJlc3MgaXMgdXAtdG8tZGF0ZS4KKwkJCSAqLworCQkJ
+cmMgPSByZWNvbm5fc2V0X2lwYWRkcl9mcm9tX2hvc3RuYW1lKHNlcnZlcik7CisJCQlpZiAocmMp
+IHsKKwkJCQljaWZzX2RiZyhGWUksICIlczogZmFpbGVkIHRvIHJlc29sdmUgaG9zdG5hbWU6ICVk
+XG4iLAorCQkJCQkJX19mdW5jX18sIHJjKTsKKwkJCX0KKworI2lmZGVmIENPTkZJR19DSUZTX0RG
+U19VUENBTEwKKwkJfQogI2VuZGlmCiAKKwogI2lmZGVmIENPTkZJR19DSUZTX1NXTl9VUENBTEwK
+IAkJfQogI2VuZGlmCi0tIAoyLjI1LjEKCg==
+--0000000000002de70705bf3b6bf3--
