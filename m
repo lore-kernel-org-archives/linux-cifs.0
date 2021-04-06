@@ -2,63 +2,89 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4616EC433ED
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 20:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86F30C433B4
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 22:56:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1B16613C2
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 20:19:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A446613C4
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 22:56:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347172AbhDFUTR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Apr 2021 16:19:17 -0400
-Received: from mail.xes-mad.com ([162.248.234.2]:43751 "EHLO mail.xes-mad.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1347165AbhDFUTQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 6 Apr 2021 16:19:16 -0400
-Received: from zimbra.xes-mad.com (zimbra.xes-mad.com [10.52.0.127])
-        by mail.xes-mad.com (Postfix) with ESMTP id E5BFF2028D;
-        Tue,  6 Apr 2021 15:19:07 -0500 (CDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xes-inc.com; s=mail;
-        t=1617740347; bh=D9wQzNjggUvW+sg8MmmsD5Hx6NRQdkjMZX2+chrt0xU=;
-        h=Date:From:To:Cc:In-Reply-To:Subject:From;
-        b=G87qTLUjExtYmv+H+fhDnkic7DLx7c7GbnocwG5wdMunZoJug6yzVauW2gLxLtSb1
-         QVIOdT60ejU29g4A6Q/PtnHNYV/HFgeI+WfFxLUqhx+HvhrK2GHAz3rtFTTsFyk1/V
-         PFYqv+5DL1buJcHndsFRum9IgpKWtAWkD9ZTqTP4=
-Date:   Tue, 6 Apr 2021 15:19:07 -0500 (CDT)
-From:   Nate Collins <ncollins@xes-inc.com>
-To:     =?iso-8859-1?Q?Aur=E9lien?= Aptel <aaptel@suse.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Message-ID: <1489475591.409647.1617740347892.JavaMail.zimbra@xes-inc.com>
-In-Reply-To: <87k0pf4u7g.fsf@suse.com>
-Subject: Re: multiuser/cifscreds not functioning on newer Ubuntu releases
+        id S233345AbhDFW4I convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Apr 2021 18:56:08 -0400
+Received: from ishtar.tlinx.org ([173.164.175.65]:49460 "EHLO
+        Ishtar.sc.tlinx.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232452AbhDFW4H (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Apr 2021 18:56:07 -0400
+Received: from [192.168.3.12] (Athenae [192.168.3.12])
+        by Ishtar.sc.tlinx.org (8.14.7/8.14.4/SuSE Linux 0.8) with ESMTP id 136MtltV095407;
+        Tue, 6 Apr 2021 15:55:50 -0700
+Message-ID: <606CE6F3.3010701@tlinx.org>
+Date:   Tue, 06 Apr 2021 15:55:47 -0700
+From:   "L. A. Walsh" <linux-cifs@tlinx.org>
+User-Agent: Thunderbird 2.0.0.24 (Windows/20100228)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.52.17.93]
-X-Mailer: Zimbra 8.8.15_GA_3996 (ZimbraWebClient - GC89 (Win)/8.8.15_GA_3996)
+To:     =?UTF-8?B?QXVyw6lsaWVuIEFwdGVs?= <aaptel@suse.com>
+CC:     Dan Carpenter <dan.carpenter@oracle.com>, namjae.jeon@samsung.com,
+        linux-cifs@vger.kernel.org
+Subject: Re: cifsd: introduce <SMB2n3> kernel server
+References: <YFNRsYSWw77UMxw1@mwanda> <606C1DD6.80606@tlinx.org> <87h7kj4t4c.fsf@suse.com>
+In-Reply-To: <87h7kj4t4c.fsf@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Thanks for the wireshark tip, I found that the domain wasn't getting
-included in the NTLMSSP_AUTH packet.
+On 2021/04/06 03:14, Aurélien Aptel wrote:
+> "L. A. Walsh" <linux-cifs@tlinx.org> writes:
+>   
+>> On 2021/03/18 06:12, Dan Carpenter wrote:
+>>     
+>>> [ cifsd: introduce SMB3 kernel server"
+>>>       
+>> Is it to be Linux policy that it will give in-kernel
+>> support for only for smb3, or is it planned to move the rest of the proto
+>> into the kernel as well?  It sorta seems like earlier parts of the protocol,
+>> still dominant on home networks, though it seems linux not supporting
+>> all of linux's smb devices, from smb2.1 and before.
+>>     
+>
+> smb1 (aka cifs) is unsecure, out of support and being actively
+> deprecated for over 10 years. Microsoft is uninstalling the smb1 server
+> on Windows updates. That's how hard they want to kill it. Samba is
+> planning to drop smb1 too eventually.
+>   
+Dropping Smb1 support for linux-serving would seem to be a reasonable
+step, since I would be hard-pressed to find a client that still
+only talked Smb1 (clients from XP-era).
 
-cifscreds add -u user@domain.com share
+I am more concerned about the more secure smb2 & smb2.1 dialects. 
+I have heard there is a security difference even between 2 & 2.1,
+though, I don't often see a breakout between 2.0(only)+2.1, with both
+seeming to be lumped in under Smb2. 
 
-allows me to access the mutiuser mount as my user. My question now is,
-where should that domain be specified so that it's not needed when
-running cifscreds? The mount already has domain=domain.com set, and
-in the pam_cifscreds.co module's line in /etc/pam.d/common-session,
-I tried replacing host=dc.domain.com with domain=domain.com, but still
-the NTLMSSP_AUTH packet didn't have the domain set.
+So lets say dropping smb1 isn't an issue...
+>
+>   
+>> Isn't the base of an smb3 server the same functions
+>> of an smb2.x server with the new smb3 extensions?
+>>     
+>
+> AFAICT Namjae's ksmbd support smb2 and above.
+>   
+---
+    Then would it be a problem if it is called something like
+"smb2n3" so it can be readily understood to support both?
 
-> Ubuntu 18 is from 2018 right? There have been multiple regressions and
-> fixes related to signing since then. After a quick scan I see these
-> fixes (from most recent to oldest):
+    It's just a small comfort issue, since 'smb3' really doesn't
+seem to be very convincing about its smb2-support.
 
-Yeah, 18.04 is from 2018, but 20.04 (the most recent LTS release) has
-the same change in functionality. Should've made that clearer in my
-initial post.
+> Cheers,
+>   
+Likewise!
+
+
