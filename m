@@ -2,98 +2,84 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED58C433B4
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 15:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDBDC433B4
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 15:03:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 173C0613C0
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 15:02:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA8CF613C4
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 15:03:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345380AbhDFPCw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Apr 2021 11:02:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50744 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243457AbhDFPCv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Apr 2021 11:02:51 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9179BC06174A;
-        Tue,  6 Apr 2021 08:02:43 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id y1so16837541ljm.10;
-        Tue, 06 Apr 2021 08:02:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nx8rtm61zSc6YwTnf3ZbUlYy9Dq9r8tfsMgUX9qmoNo=;
-        b=M5/Hkw25e2NmykvBVejl4WLe2ldNk8MxUFf0cNecBg+jUg5E2wIsxaR/8MNChCY6ki
-         wf04oL8mFb9HD/FC70Ez8/cIQvi3iESXwYOOtJyHutE1uTx47P8uQTneQ5TntM0QsT3J
-         MTQ9yA3cSCeT0sfS1V/lIjARD1MoA85sIlN1FakroZrdjWUc8D17cPf0AwHtB/20xtKW
-         FJEILl2b33grLVyuMc+LzJ5NqtWNtT6Ha5WoREnAHiLIn+BOX7lSW3scqXui5dC0l0L0
-         YpymtxuT/oHnGiboGkGOgnuJp2xC/M0RCKB+YLeW5JenVPKQJBiW4A/hDI/NYSHJW+RR
-         bLnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nx8rtm61zSc6YwTnf3ZbUlYy9Dq9r8tfsMgUX9qmoNo=;
-        b=e797qDRLNe8iFd6zAPYhqQX4ccVVCDw+7MnRTZuoV4xZ3sdBgyzuY23SDgePzJnVEH
-         dfpWi3n7PPEABbWOqHjDdMiINfUCB0/y12yXcOhDdM/v3dkPSCuE2CHKWTr6a+brNq31
-         OYJGWP9EaUY+irSWeoZ1UvNDc6B03Nc42PP266+qUiGxjsnecMybYvnz4foJprZ+8un+
-         yI8F5T9O5XmtV3exgwQrucVT5m5gpUzN+squHkdI4p3wE/GtMkRWqrfd7/imTo9GrkE7
-         Tm7U5h4mP+ydQySrLVDmBZUTF0Dfv9vlBLhsLRxjvqfxyv3px5cZU6hEZVQVT7oXlFGE
-         Q8ig==
-X-Gm-Message-State: AOAM531ebQNupIpKiouIFUhiLcYC34Hts6nTp5A5U8qXPmAh+D7R7i2j
-        0zi/ue+LynKHCF7SLLCAYdeDRKgmFf7Ctg==
-X-Google-Smtp-Source: ABdhPJxs7jbHcohMQzPKoVJltP/ygn8BjdzO0+cNuYqZdd2RPi+XA5muLZZhaPqRsQPtJmrioVmJbQ==
-X-Received: by 2002:a2e:9758:: with SMTP id f24mr18774250ljj.404.1617721361879;
-        Tue, 06 Apr 2021 08:02:41 -0700 (PDT)
-Received: from galeon.lan (77-254-182-100.adsl.inetia.pl. [77.254.182.100])
-        by smtp.gmail.com with ESMTPSA id h6sm2182262lfd.77.2021.04.06.08.02.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Apr 2021 08:02:40 -0700 (PDT)
-From:   Maciek Borzecki <maciek.borzecki@gmail.com>
-To:     linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        Steve French <sfrench@samba.org>
-Cc:     Maciek Borzecki <maciek.borzecki@gmail.com>
-Subject: [PATCH] cifs: escape spaces in share names
-Date:   Tue,  6 Apr 2021 17:02:29 +0200
-Message-Id: <dc18955dda8844bf7b27dfd2cce50f7c62eb82e5.1617720952.git.maciek.borzecki@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        id S233435AbhDFPEB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Apr 2021 11:04:01 -0400
+Received: from verein.lst.de ([213.95.11.211]:54950 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233417AbhDFPEA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 6 Apr 2021 11:04:00 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id AA45E68B02; Tue,  6 Apr 2021 17:03:44 +0200 (CEST)
+Date:   Tue, 6 Apr 2021 17:03:44 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Adit Ranadive <aditr@vmware.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Devesh Sharma <devesh.sharma@broadcom.com>,
+        Faisal Latif <faisal.latif@intel.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "J. Bruce Fields" <bfields@fieldses.org>,
+        Jens Axboe <axboe@fb.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, Lijun Ou <oulijun@huawei.com>,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Michael Guralnik <michaelgur@nvidia.com>,
+        Michal Kalderon <mkalderon@marvell.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Naresh Kumar PBS <nareshkumar.pbs@broadcom.com>,
+        netdev@vger.kernel.org, Potnuri Bharat Teja <bharat@chelsio.com>,
+        rds-devel@oss.oracle.com, Sagi Grimberg <sagi@grimberg.me>,
+        samba-technical@lists.samba.org,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        Selvin Xavier <selvin.xavier@broadcom.com>,
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        Somnath Kotur <somnath.kotur@broadcom.com>,
+        Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+        Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        VMware PV-Drivers <pv-drivers@vmware.com>,
+        Weihang Li <liweihang@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [PATCH rdma-next 01/10] RDMA: Add access flags to
+ ib_alloc_mr() and ib_mr_pool_init()
+Message-ID: <20210406150344.GA8909@lst.de>
+References: <c21edd64-396c-4c7c-86f8-79045321a528@acm.org> <YGvwUI022t/rJy5U@unreal> <20210406052717.GA4835@lst.de> <YGv4niuc31WnqpEJ@unreal> <20210406121312.GK7405@nvidia.com> <20210406123034.GA28930@lst.de> <20210406140437.GR7405@nvidia.com> <20210406141552.GA4936@lst.de> <20210406144039.GS7405@nvidia.com> <20210406145457.GA7790@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210406145457.GA7790@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Commit 653a5efb849a ("cifs: update super_operations to show_devname")
-introduced the display of devname for cifs mounts. However, when mounting
-a share which has a whitespace in the name, that exact share name is also
-displayed in mountinfo. Make sure that all whitespace is escaped.
+On Tue, Apr 06, 2021 at 04:54:57PM +0200, Christoph Hellwig wrote:
+> That is something everyone gets wrong at first (yourself included)
 
-Signed-off-by: Maciek Borzecki <maciek.borzecki@gmail.com>
----
- fs/cifs/cifsfs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 099ad9f3660bb28db1b6a9aea9538282b41c6455..3c6cb85b95e207df222248f10cc9df937cdda24e 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -476,7 +476,8 @@ static int cifs_show_devname(struct seq_file *m, struct dentry *root)
- 		seq_puts(m, "none");
- 	else {
- 		convert_delimiter(devname, '/');
--		seq_puts(m, devname);
-+		/* escape all spaces in share names */
-+		seq_escape(m, devname, " ");
- 		kfree(devname);
- 	}
- 	return 0;
--- 
-2.31.1
-
+The yourself here should have been a yours truly or "myself", sorry.
