@@ -2,195 +2,221 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 122F5C43462
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 14:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D55C0C433ED
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 14:40:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA18E613AE
-	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 14:30:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1A79613BE
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Apr 2021 14:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345151AbhDFOaI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Apr 2021 10:30:08 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:50865 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230032AbhDFOaF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Apr 2021 10:30:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1617719396;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vq/lMlqPc+qFf5Zb/K2Hd/YCjK2gi+M/b+bv27ce/a0=;
-        b=I7PBNSYZp12Oh4dt4IausFZK3nJkW8gJTKIm6vB9wuVfNeQ4QsiGF7ucArT9vOamFBuwQA
-        f8XPHmN3Fg/HBGOaTXIDB31514iZu6m2CdtXO/hLXKMXjZCjUkp3TU8X2jzeh+19VMUq9q
-        IQEYOAfXIs/WzfmK3NS5wA1moVUkq3o=
-Received: from EUR03-DB5-obe.outbound.protection.outlook.com
- (mail-db5eur03lp2051.outbound.protection.outlook.com [104.47.10.51]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-22-5pAxeC0nOmOoG5oggDXHsA-1; Tue, 06 Apr 2021 16:29:32 +0200
-X-MC-Unique: 5pAxeC0nOmOoG5oggDXHsA-1
+        id S233131AbhDFOkw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Apr 2021 10:40:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45972 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233070AbhDFOkw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Apr 2021 10:40:52 -0400
+Received: from NAM04-CO1-obe.outbound.protection.outlook.com (mail-co1nam04on061e.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe4d::61e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2026FC06174A;
+        Tue,  6 Apr 2021 07:40:44 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O+83c094+KyfA/F0BkDvu2SnRxzfgrN+MKMj8ks2smLLrCF2kbVxkqMObUFfRmd62vTx3FU+GQox/3puyBXS5/aEqnvws8OyA4GP1rMHlzGz2j+lnL0mSvpuw9JmNObhZBH5Yl4KUcKdI7vjjl7a2fI4Tx0v46kBkNARGNyIQk9JOL5HyljLJwNT9kS9mFC0RRTSEtQ/InP2DZeQ/Rpto08WimNmoYKd2yd4PrxXSMjiDVMJwx5rZmuzdr100+lep3gurGoCHH27MSk8O6O4fOPTrzdRq0XPIuuGJHXouq4wEVozjBNDd/oIAgFLF4UgoTH1ju9x1yK+0pTYIFAC2g==
+ b=hG98hl+yWLKNVdFqMG/Ept10RdAMQ4JC8qm9ApOFjCjqFEPa5juNvQkpA1tjkeSLoJcDMaFnl1WQPmQG9EgAYAQ7g7OitzVqs5cfOQ7XhmSN5ZY5u652BfPMnXi9pBUrqorf47vAAU7GTMuieQFdjATZdz8XSjJ71Ko+akyusOlqrE++pWHnXEdZuqjo6a39ZHsglL6mW1kTj37dlwKjNYUb+OzCcISriccchet7ThVOiUsU09hTcHBoUNLIFL0z0rJn+mMBmwx22/KVd4Uu0qTfSLkoYVo1lyypuXIfo9VoZtJJBfy7ifyn8FqBHhXxLQZIOo9mF1mpHQJ+wE8wXA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vq/lMlqPc+qFf5Zb/K2Hd/YCjK2gi+M/b+bv27ce/a0=;
- b=nRtnjEzbXB8hpkUgPHE2j420NznC72nhq0EdOqwxaFXbKbwvqEbS7pdJY9CmArqLdmWgK7N5Jp5/G2yCbyS8VebZ4WpnWskbjOmkWhmqKN5RSZTaRJDey1uZUl6HzAlKrOZdbqS8KxSYdNd0kCHr5AGmbpWrzF5sgwwTaSQxkZ2vSz/e01Aq5n33ju5nvIMxx2zX/xaRt52mBSVz32bCMdM2FTk83uiAKq0LS9ndwAkt8U4LyNrY19dzWpyW09FtpLVTMxeI/igl2KHYjLK3DdZtR+lwxGVQoXtWnL39HCYmuTQxkYP05IOUW0i4rM2zm7TYJ5jooDwhpUjJq1rsrQ==
+ bh=NbNlPFzZ+LloSluv42Yv8u2KdBXG8/DdxMDpts0f1PE=;
+ b=LoNByi4zPBFN4eShbX3vJconx0FcuPugiSuUWR+blOvpWXiJUoiNwBIqucwQDBggfgvnFKVolFZ8b7QSwcsbNr+X4AJvM6rnJ43ZiItnKBD+N/4Ee7mYP5rmFTbXJ8QUlqnEOzgSBx87QlKIurgV+mGuByYwBrGs+W4nlCW5sxxH7v1YFf7/9geAlyk9xWdYCCs/AWNi93Z2AHlGpXFtgCKKwzJdguQ+0cgDg9mDnMiQ9O2GLw1TFDBg0gvCoDIs317zO/7g7LnvR8KAfCQsE6ZZ93xZJrVBtYuT1Oe3jhQhgkbTXiimHhYgeWHXjGdCKXBMXTv0cLzLmmj0O0SYDw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: barracuda.com; dkim=none (message not signed)
- header.d=none;barracuda.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR0401MB2576.eurprd04.prod.outlook.com (2603:10a6:800:56::8) with
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NbNlPFzZ+LloSluv42Yv8u2KdBXG8/DdxMDpts0f1PE=;
+ b=JLiqUIVdzo/yR2UGD1nIkeAaVOOiLTNQyfKFw28EDDNRDjqNeT28XLnf3gRm5vjzRZhnwXaSdsnZfg8thlcOCtRDSkC12mh9CaewaLa678NYJOFBR6Wnyc8G7rxN4Rs2MoyDUG1QlkKkXE4DEaF4XbklpL1SDMsDCdCKXqvbXCpgVONT/k1hWwKUjRFQAbYvse0TYfbognV6OXmDx6UjYDnoXRl/Ucz3EU9HT/RQq8tWp0hNb538IZJIOGuct7+QIqMFiSAOgAbm/TmAv30FTdLhFjqJaPxvbwjShCh9JKhSG9jaw9wP7rhJ675Q6MK9avyiwUmB586oEqh6gSMEIg==
+Authentication-Results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com (2603:10b6:5:14a::12)
+ by DM6PR12MB4267.namprd12.prod.outlook.com (2603:10b6:5:21e::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.28; Tue, 6 Apr
- 2021 14:29:30 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94%5]) with mapi id 15.20.3999.032; Tue, 6 Apr 2021
- 14:29:30 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Seth Thielemann <sthielemann@barracuda.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH cifs segfault ]
-In-Reply-To: <DM6PR10MB3833F0DD867BF1B48F60B99FA2769@DM6PR10MB3833.namprd10.prod.outlook.com>
-References: <DM6PR10MB3833F0DD867BF1B48F60B99FA2769@DM6PR10MB3833.namprd10.prod.outlook.com>
-Date:   Tue, 06 Apr 2021 16:28:14 +0200
-Message-ID: <87eefn4hdt.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:705:3023:3e6b:6105:9a2b:bde1]
-X-ClientProxiedBy: ZR0P278CA0021.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:1c::8) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.27; Tue, 6 Apr
+ 2021 14:40:42 +0000
+Received: from DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87]) by DM6PR12MB3834.namprd12.prod.outlook.com
+ ([fe80::1c62:7fa3:617b:ab87%6]) with mapi id 15.20.3999.032; Tue, 6 Apr 2021
+ 14:40:42 +0000
+Date:   Tue, 6 Apr 2021 11:40:39 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Leon Romanovsky <leon@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Adit Ranadive <aditr@vmware.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Devesh Sharma <devesh.sharma@broadcom.com>,
+        Faisal Latif <faisal.latif@intel.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "J. Bruce Fields" <bfields@fieldses.org>,
+        Jens Axboe <axboe@fb.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, Lijun Ou <oulijun@huawei.com>,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Michael Guralnik <michaelgur@nvidia.com>,
+        Michal Kalderon <mkalderon@marvell.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Naresh Kumar PBS <nareshkumar.pbs@broadcom.com>,
+        netdev@vger.kernel.org, Potnuri Bharat Teja <bharat@chelsio.com>,
+        rds-devel@oss.oracle.com, Sagi Grimberg <sagi@grimberg.me>,
+        samba-technical@lists.samba.org,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        Selvin Xavier <selvin.xavier@broadcom.com>,
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        Somnath Kotur <somnath.kotur@broadcom.com>,
+        Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+        Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        VMware PV-Drivers <pv-drivers@vmware.com>,
+        Weihang Li <liweihang@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [PATCH rdma-next 01/10] RDMA: Add access flags to ib_alloc_mr()
+ and ib_mr_pool_init()
+Message-ID: <20210406144039.GS7405@nvidia.com>
+References: <20210405052404.213889-1-leon@kernel.org>
+ <20210405052404.213889-2-leon@kernel.org>
+ <c21edd64-396c-4c7c-86f8-79045321a528@acm.org>
+ <YGvwUI022t/rJy5U@unreal>
+ <20210406052717.GA4835@lst.de>
+ <YGv4niuc31WnqpEJ@unreal>
+ <20210406121312.GK7405@nvidia.com>
+ <20210406123034.GA28930@lst.de>
+ <20210406140437.GR7405@nvidia.com>
+ <20210406141552.GA4936@lst.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210406141552.GA4936@lst.de>
+X-Originating-IP: [142.162.115.133]
+X-ClientProxiedBy: BL1PR13CA0331.namprd13.prod.outlook.com
+ (2603:10b6:208:2c6::6) To DM6PR12MB3834.namprd12.prod.outlook.com
+ (2603:10b6:5:14a::12)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:705:3023:3e6b:6105:9a2b:bde1) by ZR0P278CA0021.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:1c::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.29 via Frontend Transport; Tue, 6 Apr 2021 14:29:30 +0000
+Received: from mlx.ziepe.ca (142.162.115.133) by BL1PR13CA0331.namprd13.prod.outlook.com (2603:10b6:208:2c6::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.8 via Frontend Transport; Tue, 6 Apr 2021 14:40:41 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1lTmsh-0019DW-Q6; Tue, 06 Apr 2021 11:40:39 -0300
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 35a01375-9266-458b-3f57-08d8f90863c6
-X-MS-TrafficTypeDiagnostic: VI1PR0401MB2576:
-X-Microsoft-Antispam-PRVS: <VI1PR0401MB2576E6ECDE177AD90C05DF4AA8769@VI1PR0401MB2576.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Office365-Filtering-Correlation-Id: d4779066-176d-4e6c-d3dd-08d8f909f3e4
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4267:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB42676D482D3787D5F20FF19EC2769@DM6PR12MB4267.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SKYLmuiskw9L/HsZModq1SSDBxkfxscVPMzL83QiwtuRlK78hyIrrNMcnjcuH7Zp8/xnCmtifPtuAFoVhUCHkbUHj58ouuyNxzFQ53soAWE1WYbj2Vn9TS7IHqSWCWIjRxH8zNICAJvz54HFjbDYckvkpdYowlFrzZ2rZkBSbusaZs66aNE1HC9+S/Rfv8ZXI42g9n3kUr7NVDG3jIG4yJjslTKOy1OFtclGMDErjMq5ARRDYbLDKDxX1MzBgHBtR2oMhlUngz2E6Eq8bZZqEuFI4vfu5gTkP+VljQwuNIzZQLuTqNknL2T4LihXS5DY13AbxQDddjl2SDtyBh9wMvcrUNNOktf4AYwAKTsSH+futZDTJXZzpu3tdifMa/LZk7NSUNU8FvVIJDvguCIF3NFRWAS9ZyjkifEQ+2wIg4EEQ4WAEI0Gs/8DXSvFCtsVpqsx3bB+bJekUk+Ksdd6JhN4XQVtT/jO9jr3Jgo/5SUbqIlLDffdPgCuqYlHaFgixm4fxAeyasrX8bAJNjBNRnsF7uaeBp3otwFaHM+EHX/Mz+UUMoYlbB6Kvooc6/5gILlYOMoWuoKECSZRHPq74BI6Ia/gYOld/OLPO/cIqRzPFvShmcD/pSJr69eacja36Ugl3e/peXw0kIr5WJ4X3Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(39860400002)(376002)(346002)(136003)(366004)(316002)(8676002)(66946007)(2906002)(5660300002)(186003)(478600001)(38100700001)(8936002)(6496006)(86362001)(6486002)(2616005)(110136005)(52116002)(36756003)(16526019)(66476007)(66556008)(6666004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?a0o3S2t5WjdWbGxtdTNqa09qWVpGWmsrNGswMzBkUmlmbU45NzZiWU1KblNi?=
- =?utf-8?B?RGl3cDFHaEZIb212QUJuZ1JwS1VZa00yNUZJNkhQRWl0bTNCcHFST2h3UDlW?=
- =?utf-8?B?TUlmTVZGdmZjU2hjSGZaUk0wU2VqbmpQQzZkU1N6Njh5RFM0dUNRYkZpVmRZ?=
- =?utf-8?B?YUJCTWRlSWdlcXdPcTVhOHRqR3dKd2l6Mm03RHAvVzNMcVZXMUQrL01ReGR3?=
- =?utf-8?B?eUt2WEMxQXJTSlYwTDk3cEI0eWdPdzgzNUNLWEh5d1RuYkt5Ym9yOGJvTFlP?=
- =?utf-8?B?c0tSZTc3TzlhRHJMMFlNQXV4d2NQTVlvbU1qb0tSNGxrekwybjR4aTlGZ1U0?=
- =?utf-8?B?aHhreEd4cTduS0tjZFB5WC94a2xqN3pJWlluS2Y0MlE2NTZUTjdBbXQzVzZo?=
- =?utf-8?B?cld4Um03bDJjWHpaY25CNW05eENIMXM4U29YeCszOGNRQ1ZJYmJFellSYWVD?=
- =?utf-8?B?MmQreGNxOXJWTVRMZGZUQUhIVVFiK2hIbW5xcnE2NHZlYnNpenpab05tTFp6?=
- =?utf-8?B?SlR4RHZFNzZTUDRMclc0SlFNZUkyRUgyOE4ybmswNlJBZHlPQ3ZMUCtuREdo?=
- =?utf-8?B?Q0dtVkdVQjI3TGl3bUxPa0U3cWg5b3FSSTEzUUdBL3I3RnNNWGVwdldDMzdi?=
- =?utf-8?B?K1Z1bC8vZUZkMjY4Q1NXbHM1Q1NIYVNrS3RxVGpSVzRId2JVbmZOMU9BZkRw?=
- =?utf-8?B?d2p0bTlLeHVwMDh1cFMySEMwMG5rVGk3V0U2eGNGaTJDYjBqWU8zN3NBM3NM?=
- =?utf-8?B?LzNiMmFNTUtyWnNIcDFtdXZSWTRFQUhvSXBtRUN3MHh2S0JuZWZuTkNydzN0?=
- =?utf-8?B?YUVCTEIvSGJsNmNlakRDVjVoTWpLVndGRHlraG1tVStWeXVvZHduY21xZEJv?=
- =?utf-8?B?OGlMTWJ4Q1l6TjdyZmtUWWxGQmtIcmVySmFvSHVDZy9ZUFlaTWlHdVdUOGtx?=
- =?utf-8?B?UkZTanl1QWxWR01JYmpzSlNxSHh0QVFSM1pySzFxTGFKbVNMcUZxQyszVGhy?=
- =?utf-8?B?MzZoYVdJZ0FsOVVzRFVzWEQ3Rmc2M0YxS2kvTG05WWVYZFphdjVqRTBNOFdj?=
- =?utf-8?B?OFprOVV0TmFyWHZHYmgzQyttdVFhUTJEMk0yT1ZwcVgzYzBLYml0YSthYWRS?=
- =?utf-8?B?SmRYcjFDZTRqSllSMVhxUURyaWIxbkJTQjZTK2tsZWIzYjRBS3BUeEJPYnVS?=
- =?utf-8?B?K0I3TXpTQWtQSDBmdEN5TkhoaXRlcVExcFJURys3ZDJ4MGhFQy9uanR1Zm1H?=
- =?utf-8?B?c3FkeW54eXFGbjR1MEx4MlhiNE0yTnE1eGRTQ1ZLc29IVHVhNEhsbnVlOW1R?=
- =?utf-8?B?WmM5NkNzVDloUkIyaHRUcEUvcW5tYzY1TW1EUW5FUDh2WExIcWVTRmdwdnpT?=
- =?utf-8?B?VVAzTmZDTDJERk44UThGanIyNUMwNTRiYVVMYUJPVTVuSXJ1amdNdlcrcmgr?=
- =?utf-8?B?Q2QyalhlNnRJUXBVdEcxcHBxblQxaE1WczBhYk1NWE9BTzBOTmRLaG0xOFZq?=
- =?utf-8?B?NlJBdVZ2RndYOE5OYWIyTUcvQ2ZOSnZ2Z01jdi9PbWRqTXBZVXJod0JVSWNa?=
- =?utf-8?B?ZU9mbGZ6VWNpY1BVWk1VMTdnQmRaSWd3VEhzdXREdUt3K3hwS3BLV0Zra3Av?=
- =?utf-8?B?RWRoeTdsU1drQXpMRFBzeERLWGpGV01MS2tQT0xNZnpXdFZiRXEwUGpXQlBq?=
- =?utf-8?B?bmtnYnpMVG95VXU0Uk5XZVhyUWdRRFBvOE1Bb3o2aW9YQ2wyLytLZVZGSlNy?=
- =?utf-8?B?eUhFOTlaSXgvenRBbzlYM1ZEYS96YzZzQmZnbFRrOEhtRXF1emhFL3dlVHUv?=
- =?utf-8?B?VVFKODZmTktmNVVTbEt0L1dXWmxxa1MvR1RUUjYxTzV6SVd3bEpPNGgxbWZU?=
- =?utf-8?Q?7Uc97dCexVkAm?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35a01375-9266-458b-3f57-08d8f90863c6
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-Microsoft-Antispam-Message-Info: DyMC1ukkr3ZEQ7nvGmqTegzKIqIM0ejkeuBzhFC2ab3x3wNX19qG9KlXOSXtGD2NmFhCAP4kqEOisEpmkQcwBCFkcbSi+aZs3jyZoyu5n3WK2i00e2jip0OoW85qhbB/RnLaPW6vlukHO7+0DZjw/WP4qJTkzpC2FQhb98kWS/quhN+c/79dhLeV2nVm9O0cS/An8jAQHtuFcmx8FwPrJ/Ecy2Z6AhlmvL5sf6rmtBY8yGA2KvVaP+Awkq8J3iwuZfD1O0ZRR8HEIzRE9TQ9CXAiS3Srh9azklb3CfuQHL3XaKaGnLPMH9U9877K0acKB4T+TyPxeilw6/SKl4ZvpvtRUzpjHgiEvaZQ3X/Ayk3wydFTUsEgKTnGSN02bueP60Fj1f1ZyaWxBSbaWsXW2wvJiiS46eF8s4bT1kBZLd3qo3axuRXVGB2vX9uJmO1Dsp7eseSTaAizsqKFw1jmj48PHcRVfl6d6Eeq55OwKZuyVxjOeMbIbnLCAAOJKo3o+HbiBZzuR/b9BNYkXHQvCrHuUDd2vnHceO7HveXqnToVPhw8oAXBCS2zEl+BV22Z2HkUWqMRrLy8ooMN6DLkwgRjbeAsRFkFWhHzZvnSAipr8ZYv5WWgQV4xPlONdQ+aJv20ZYFvnojrl6zXPtdH90gfnkpuMJlzv86j9g3hfmc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3834.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(366004)(396003)(346002)(136003)(38100700001)(9786002)(33656002)(6916009)(186003)(8676002)(36756003)(66556008)(5660300002)(316002)(54906003)(9746002)(83380400001)(1076003)(2906002)(4326008)(8936002)(478600001)(86362001)(7406005)(26005)(7416002)(426003)(2616005)(66476007)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?8yphmt3yGhHX5Zsba9uMbf0nWm1Fs0hkgV4Wzs/lPfqePvsmbEWytuuf/d2e?=
+ =?us-ascii?Q?Az1ssoz301u6Vt3/iNqzxEBgust9VUqGVJHoCb7xkhg3W700ViSbdTcVajUV?=
+ =?us-ascii?Q?bXR2i84J4sAbPGPTgtDDibdEyc1Zydv/0R1nkM/rcVL5+DvtqczsHfXSoz9M?=
+ =?us-ascii?Q?3xBr0ai1qz+5SctuAeSLZ47T6XajXypyTsyj5DJ7OM4wBGu8q/wR0kxVciq8?=
+ =?us-ascii?Q?XB4lG8tCIRQRobOyPMn1YoR1mA/Vl9lTn10+8hcctEVO05IQC0B82N9ExZI9?=
+ =?us-ascii?Q?BsvPekysXOIggEhxlQe06mMmAIaDlHo/NcR7JDeYGWujIu8ztDywoPnO/pB+?=
+ =?us-ascii?Q?vgVNF1POd5/IID/AhoiD6vHM0oWo2TYT0WMuUa8xcqOgO50gep5iQyytB2OD?=
+ =?us-ascii?Q?PXDnDWgqreSjhI7LBb3jkdRK36qjsskmFvRJDapCXVjvKB2aA9A5n1wTKc1z?=
+ =?us-ascii?Q?By/6zoT/XbQr1eSkdyYdktC41JcdY01YtiHgWXYWePIQcUPFo8TxnUn68t6v?=
+ =?us-ascii?Q?ydUsMlvoLRzi2cGmhk6iVso7CCqK7pnv9GF0sP/flW62znx6ptc4w4dLaOzZ?=
+ =?us-ascii?Q?4gzje2+HV4jfK9rxsZ/LZHBRo+BgcAMSxtNXv2b65Ay4kbMbeb2Tuy1OBkLx?=
+ =?us-ascii?Q?OZIY509mVnAYU34JOeurarq825ZJg3r6P6ViuJU/o5lelzgukzkDxmFSFdxS?=
+ =?us-ascii?Q?d3fNqegdUAoonEAQ+PbDylUMrYGWYxIDI06kxHqKYRgqj9bp7XcHYYZm9EkT?=
+ =?us-ascii?Q?dnWSwq9bb32lQls+uNtjTFv8OLY5Davz/PiCrIA2hxe177YZn/SHfX+jDETN?=
+ =?us-ascii?Q?4FCE9uE5rZypTRQTOY2YWTRnu+6SzwXAKRXNvoNlvw8RLhfvDaDS3TFLXUFu?=
+ =?us-ascii?Q?HS5anVfYmI0cjWIhQ8dTPf2rNjDOzKy6R6CgYp1CRtI5F+b5Rd/dUYRgpRf2?=
+ =?us-ascii?Q?EtIhk/yWvRPqtbZlxF878M05S8Pkj9xjIN1xrgEGb6Vzb/Cm3lsC4vsQRTkb?=
+ =?us-ascii?Q?ZeUXIBu/yRsJTMnLfCYSgqxgChBxVP3HOEtnXSebtET7/x3L9RxouPNr4seh?=
+ =?us-ascii?Q?td9Sj/8C7pXKBrKTgrIruTPOboyurdm1Aej8LtS1YdTUkXvsWOB2Yoz3Uwe6?=
+ =?us-ascii?Q?BbSjE93V40li0ENQqIKP+ApxwCCmOiH5JsseQ3lAHsQSfbtdsEayjDpDhN/1?=
+ =?us-ascii?Q?5blG9OxWKTKk4pjDSrM0cB+c6AiAU4r0wer0T+lFpKyjGLUIogC+b/CLTcju?=
+ =?us-ascii?Q?ef4FE48vIce5nVYdaqZI/Tt8CBfV9In0Yev9pMfInXrLi8VUoBzjGvsmXGJn?=
+ =?us-ascii?Q?LMZgcLzo6rGcE0xq4qqXndXLtF6NeAifd4yt+KCbHWoM7g=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4779066-176d-4e6c-d3dd-08d8f909f3e4
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3834.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2021 14:29:30.3425
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2021 14:40:41.8155
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /C/GKhNivAvP6EsBkesJHQGXpTZlAnh6tm+9N1TjrTNXS5e2toqX/ft6+AdXlTiT
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0401MB2576
+X-MS-Exchange-CrossTenant-UserPrincipalName: nJRKVGEknL/KzJR/nZzGNpfhXsAKDNN/iumt1+FprcSNhoDz7G0UO8stOCAdTz7j
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4267
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Seth,
+On Tue, Apr 06, 2021 at 04:15:52PM +0200, Christoph Hellwig wrote:
+> On Tue, Apr 06, 2021 at 11:04:37AM -0300, Jason Gunthorpe wrote:
+> > It might be idiodic, but I have to keep the uverbs thing working
+> > too.
+> > 
+> > There is a lot of assumption baked in to all the drivers that
+> > user/kernel is the same thing, we'd have to go in and break this.
+> > 
+> > Essentially #2 ends up as deleting IB_ACCESS_RELAXED_ORDERING kernel
+> > side and instead doing some IB_ACCESS_DISABLE_RO in kernel,
+> > translating uverbs IBV_ACCESS_* to this then finding and inverting all
+> > the driver logic and also finding and unblocking all the places that
+> > enforce valid access flags in the drivers. It is complicated enough
+> 
+> Inverting the polarity of a flag at the uapi boundary is pretty
+> trivial and we already do it all over the kernel.
 
-Seth Thielemann <sthielemann@barracuda.com> writes:
-> - Observed segfaults during cifs share backups, core investigation and st=
-race revealed that files were being opened
->   but upon read the syscall was returning a 32-bit error code:
+Yes, but the complexity is how the drivers are constructed they are
+designed to reject flags they don't know about..
 
-On my system (x86_64)
-- ssize_t is signed and long which is 8 bytes
-- int is signed and 4 bytes
+Hum, it looks like someone has already been in here and we now have a
+IB_ACCESS_OPTIONAL concept. 
 
-That is a weird bug. Casting (long)-13 to int is ok because -13 is
-representable in both.
+Something like this would be the starting point:
 
-> - Above is an impossible situation, the sign extension was at fault. The =
-two functions using the trinary assignment of rc
-> in the cifs asio context:
+diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
+index bed4cfe50554f7..fcb107df0eefc6 100644
+--- a/include/rdma/ib_verbs.h
++++ b/include/rdma/ib_verbs.h
+@@ -1440,9 +1440,11 @@ enum ib_access_flags {
+ 	IB_ZERO_BASED = IB_UVERBS_ACCESS_ZERO_BASED,
+ 	IB_ACCESS_ON_DEMAND = IB_UVERBS_ACCESS_ON_DEMAND,
+ 	IB_ACCESS_HUGETLB = IB_UVERBS_ACCESS_HUGETLB,
+-	IB_ACCESS_RELAXED_ORDERING = IB_UVERBS_ACCESS_RELAXED_ORDERING,
+ 
+ 	IB_ACCESS_OPTIONAL = IB_UVERBS_ACCESS_OPTIONAL_RANGE,
++	_IB_ACCESS_RESERVED1 = IB_UVERBS_ACCESS_RELAXED_ORDERING,
++	IB_ACCESS_DISABLE_RELAXED_ORDERING,
++
+ 	IB_ACCESS_SUPPORTED =
+ 		((IB_ACCESS_HUGETLB << 1) - 1) | IB_ACCESS_OPTIONAL,
+ };
 
-You mean this line in collect_uncached_write_data() right? I think the
-current code changed from your version, it's in a different function now.
+However I see only EFA actually uses IB_ACCESS_OPTIONAL, so the lead
+up would be to audit all the drivers to process optional access_flags
+properly. Maybe this was done, but I don't see much evidence of it..
 
-	ctx->rc =3D (rc =3D=3D 0) ? ctx->total_len : rc;
+Sigh. It is a big mess cleaning adventure in drivers really.
 
->    188db:       45 85 e4                test   r12d,r12d
+> Do we actually ever need the strict ordering semantics in the kernel?
 
-Ok I'm assuming r12d is the rc var.
-we test if rc =3D=3D 0 (low 32bit of r12)
+No, only for uverbs.
 
->    188de:       44 89 e0                mov    eax,r12d   <- msl cleared
-
-Now we set eax (low 32bits) to rc (what is msl? most significat l...?).
-But the high 32bits are unknown
-
->    188e1:       0f 84 6a 01 00 00       je     18a51 <cifs_uncached_write=
-v_complete+0x371>
-
-if rc was zero, we take the jump
-
->    188e7:       48 8b 7c 24 18          mov    rdi,QWORD PTR [rsp+0x18]
->    188ec:       49 89 85 a8 00 00 00    mov    QWORD PTR [r13+0xa8],rax <=
-- saved
-
-Otherwise we store rax (unknown high 32 bits + low 32bit of rc) in the ctx.
-
-So -13 is
-
-    0xfffffff3 (int)
-
-but if you copy it in low part of a zero 64bits you end up with (wrong)
-
-    0x00000000fffffff3 (long)
-   =20
-which is 4294967283... should have been 0xfffffffffffffff3
-
-I'm no compiler expert but this looks like possible wrong generated
-code for the cast :/
-
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
-
+Jason
