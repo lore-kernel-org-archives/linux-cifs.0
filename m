@@ -2,149 +2,195 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B37C433B4
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Apr 2021 18:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EFE8C433ED
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Apr 2021 19:00:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D659961165
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Apr 2021 18:56:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03F8F61245
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Apr 2021 19:00:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355495AbhDGS4h (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 7 Apr 2021 14:56:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50572 "EHLO
+        id S1355527AbhDGTBE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 7 Apr 2021 15:01:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355485AbhDGS4Z (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Apr 2021 14:56:25 -0400
+        with ESMTP id S1355515AbhDGTBC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Apr 2021 15:01:02 -0400
 Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B3AC061760;
-        Wed,  7 Apr 2021 11:56:14 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id j18so6409355lfg.5;
-        Wed, 07 Apr 2021 11:56:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E7CC06175F
+        for <linux-cifs@vger.kernel.org>; Wed,  7 Apr 2021 12:00:51 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id r8so12669461lfp.10
+        for <linux-cifs@vger.kernel.org>; Wed, 07 Apr 2021 12:00:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sqCYS/CZAfWK/te/TXf/5fA6YQW/6TBwZyYpp2SH+v4=;
-        b=AHll28d352WOBUobfVUMEp3cy5IdxPDlST8FWjTO0mhkMoSBg1A4Of9op2bYccbsV6
-         RgFncfZUBu6+VWLWJpSLuc+xg8ZZIWuaArFCKhsroolZ4kUWfsgdUlPKB/TNa1XJHpdM
-         UsVh7UAwmbOdqwp/kv9GKM2NaQUOE9UWiW9mPsWDLaHFrVmyknx0/WLGnJr6uzZhsU4n
-         ZFV3BBItSRS7QzZWEjm1Czn1kszEeZxhPY5V/kPym/NkR5iLMW7sEwg532YLAz2yJGA1
-         2bx7OSYwPg4J5gkrKLd5tMrifzNZbDAlw1+M8uIeHYXUPtcEyrpX9L5UpDrBGKBthWwG
-         WXtg==
+         :cc:content-transfer-encoding;
+        bh=yKftuOzfnDeyydXKohiChUiDYgyXfsV6qKqcpTqYrwo=;
+        b=EVZeAPosned9jsYtoM+ta+tIB312TldtSNMygZykBFmEc5WKs44rIxSjL++tXH45gC
+         6Ngb+0DCgHZWlFXHGZl3vWpBuFoQ9Y9uXhDCxt7Aj6iYTCO0JIZwtBYGmGz518S/2gZb
+         xtsDJHgQnUjtZn8gNwJThGQ4bAqMaedJYcUpaKLrsGxOZNtt5VkRnGOHDeF8zE6BPPbW
+         +z6W/qb80i1eUrYi7xl8kqSkjLUfZRE0yHh3BYfHG/vloQADFqlALWNx5YA+EROqF9pP
+         F25yFwcjd5w0QXRjGQ4GwC9l25fLH/jIm1zHB5OBJM0gEr6RpYD+oWx1NlmED/Py/HnN
+         G4DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sqCYS/CZAfWK/te/TXf/5fA6YQW/6TBwZyYpp2SH+v4=;
-        b=VDnZ5K6gUckJh28GXd8ONYqk+diAno+lSc/hcZAsqs1L94253RQUIibg2rXtJ3RFvU
-         sAFrHKirXQ1ywp+NPOWar33vl+dyhLzCdseP9iZDxTuG9erCCn2CZFvZa3LWO0+Y2Vkk
-         +Hnlzj/EC8BGfdwpmfSMYfga6acHP6zkaxYLemgzTy6uvjVx8Qp01fG7Wk+W4Tpsh+hN
-         MVPrg2i7vpy1SqxTvbU3+kapKGn/spogMc1Gl/xTzp985FsysMaX8GiaMS3z04bbyq5x
-         cvLzgD9t0gMEPPR42SlY/HFAW7ws4vapPTMocggjSe9vYi5dWQEXboGja3rcp7Zztl0A
-         XAtQ==
-X-Gm-Message-State: AOAM533ZsZ29EBV79hdeEl1xDisLDOvLd+1bPlhnushy1tDJ/s/ma5vZ
-        kKC5Igei3wcEc91V0e6Z1cckc3AXxa+ni4xaeX0=
-X-Google-Smtp-Source: ABdhPJzA95p0YdnMvuPKs6+hQkjWiknPgGEWN1kURPrTWLaR6nQNbA01kQgU1P8Cc4rQ/wPiJzJk5758kYC7LRgRNsg=
-X-Received: by 2002:a19:7515:: with SMTP id y21mr3461350lfe.282.1617821772792;
- Wed, 07 Apr 2021 11:56:12 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=yKftuOzfnDeyydXKohiChUiDYgyXfsV6qKqcpTqYrwo=;
+        b=NQXE+46YVYTygMVapeKqnyLnAmt5N00j0egxO1A72f7iYa2EvDDkELemJlB5pBG3Ry
+         5UH65YKqaXwVwbnA46q7zmnpBoJEwrLYRejJ17JASnjRCq6fQNkD7A9QtDFJTCbE/kby
+         CNJNWt1Huks/q2yWKTZ80MgcuVmzGzW7on9OYZZsNv+zI7ZKa/oP1eH+KMjcQCy8HkV3
+         uxpDtmNXuFDhZ/xzWbfZRplJsKXGenRUkZmB+Hm99CtxaQp/b8wh2TLOIrG02jOZ/EoD
+         E1QDnxQYca3b0FQ3QKIxkqC4AeEXgmjFd4rMhb1C01ikD8pCsotTTJdgn/1pfzz57/SL
+         45Pw==
+X-Gm-Message-State: AOAM532yA9CP1g5hj21DbqkxTONMkOWTNM8lGxwEaG9gRLZuexXNDv18
+        YEYeTM1tGM/VJIK26N/pSvS5KHlefMiWeIjCGyKUKX3fetM=
+X-Google-Smtp-Source: ABdhPJy7ZTx9NnEnrLHULRQMUgdYx6nZM1XwWzxb6RyynLBy5rMchLl+PW1QsV0r/fzecgWpVVQ4mQxvxmrf/ajtr4M=
+X-Received: by 2002:ac2:4148:: with SMTP id c8mr2846751lfi.307.1617822050196;
+ Wed, 07 Apr 2021 12:00:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <dc18955dda8844bf7b27dfd2cce50f7c62eb82e5.1617720952.git.maciek.borzecki@gmail.com>
-In-Reply-To: <dc18955dda8844bf7b27dfd2cce50f7c62eb82e5.1617720952.git.maciek.borzecki@gmail.com>
+References: <CANT5p=qWyYCD_gSw-AzvxOgzTzWkBK1uUz-16YougX5No8jjgQ@mail.gmail.com>
+ <87im50vi9v.fsf@cjr.nz> <CANT5p=pHPPwf8H1ZbBT+yr4CP17+BB2evDBxPVjYrvr+kdF1FQ@mail.gmail.com>
+ <CAKywueSCF-ZgmJZif=kkspk_b8Xp3ARUGHD64nnc5ZbVk3EcxA@mail.gmail.com>
+ <CAH2r5mv1=tpjPOZhq97t+X99dfSDtzWepp5bpqPqjf9Z1t6+sg@mail.gmail.com> <CANT5p=rq+jXGyZG-23dpOVOomObXmXEdr9FsO-=-vX9tH+kkCA@mail.gmail.com>
+In-Reply-To: <CANT5p=rq+jXGyZG-23dpOVOomObXmXEdr9FsO-=-vX9tH+kkCA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 7 Apr 2021 13:56:01 -0500
-Message-ID: <CAH2r5msOOnnaD7PSmPQNwppsiRPRyhmZ1StYp+kGoEyV6tCScA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: escape spaces in share names
-To:     Maciek Borzecki <maciek.borzecki@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>
-Content-Type: multipart/mixed; boundary="00000000000013d39f05bf667ced"
+Date:   Wed, 7 Apr 2021 14:00:39 -0500
+Message-ID: <CAH2r5mtymY0xCWB65=EV5Kh5PiuvuX34Zmd-_Avb-Gc7gWxo-Q@mail.gmail.com>
+Subject: Re: [PATCH] cifs: On cifs_reconnect, resolve the hostname again.
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     Pavel Shilovsky <piastryyy@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000013d39f05bf667ced
-Content-Type: text/plain; charset="UTF-8"
+updated cifs-2.6.git for-next with newer version of this patch
 
-Good catch - added one other minor thing, whitespace in share name
-could be a space or a tab, so changed that line to:
-
-+               seq_escape(m, devname, " \t");
-
-from
-+               seq_escape(m, devname, " ");
-
-On Wed, Apr 7, 2021 at 12:35 AM Maciek Borzecki
-<maciek.borzecki@gmail.com> wrote:
+On Wed, Apr 7, 2021 at 12:43 PM Shyam Prasad N <nspmangalore@gmail.com> wro=
+te:
 >
-> Commit 653a5efb849a ("cifs: update super_operations to show_devname")
-> introduced the display of devname for cifs mounts. However, when mounting
-> a share which has a whitespace in the name, that exact share name is also
-> displayed in mountinfo. Make sure that all whitespace is escaped.
+> The intel bot identified an issue with the earlier version of the fix,
+> when not compiled with DFS.
+> Here's an updated version with that fix too.
 >
-> Signed-off-by: Maciek Borzecki <maciek.borzecki@gmail.com>
-> ---
->  fs/cifs/cifsfs.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Regards,
+> Shyam
 >
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 099ad9f3660bb28db1b6a9aea9538282b41c6455..3c6cb85b95e207df222248f10cc9df937cdda24e 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -476,7 +476,8 @@ static int cifs_show_devname(struct seq_file *m, struct dentry *root)
->                 seq_puts(m, "none");
->         else {
->                 convert_delimiter(devname, '/');
-> -               seq_puts(m, devname);
-> +               /* escape all spaces in share names */
-> +               seq_escape(m, devname, " ");
->                 kfree(devname);
->         }
->         return 0;
+> On Wed, Apr 7, 2021 at 9:13 AM Steve French <smfrench@gmail.com> wrote:
+> >
+> > merged into cifs-2.6.git for-next
+> >
+> > On Tue, Apr 6, 2021 at 11:34 AM Pavel Shilovsky <piastryyy@gmail.com> w=
+rote:
+> > >
+> > > Looks good!
+> > >
+> > > Reviewed-by: Pavel Shilovsky <pshilov@microsoft.com>
+> > >
+> > > CC: <stable@vger.kernel.org> # 5.11+
+> > >
+> > > --
+> > > Best regards,
+> > > Pavel Shilovsky
+> > >
+> > > =D0=BF=D0=BD, 5 =D0=B0=D0=BF=D1=80. 2021 =D0=B3. =D0=B2 19:07, Shyam =
+Prasad N <nspmangalore@gmail.com>:
+> > > >
+> > > > Hi Paulo,
+> > > >
+> > > > Thanks for the quick review. And nice catch about CONFIG_CIFS_DFS_U=
+PCALL.
+> > > > Fixed it, added CC for stable.
+> > > > Attached updated patch.
+> > > >
+> > > > Regards,
+> > > > Shyam
+> > > >
+> > > > On Mon, Apr 5, 2021 at 9:24 PM Paulo Alcantara <pc@cjr.nz> wrote:
+> > > > >
+> > > > > Shyam Prasad N <nspmangalore@gmail.com> writes:
+> > > > >
+> > > > > > Please consider the attached patch for performing the DNS query=
+ again
+> > > > > > on reconnect.
+> > > > > > This is important when connecting to Azure file shares. The UNC
+> > > > > > generally contains the server name as a FQDN, and the IP addres=
+s which
+> > > > > > the name resolves to can change over time.
+> > > > > >
+> > > > > > After our last conversation about this, I discovered that for t=
+he
+> > > > > > non-DFS scenario, we never do DNS resolutions in cifs.ko, since
+> > > > > > mount.cifs already resolves the name and passes the "addr=3D" a=
+rg during
+> > > > > > mount.
+> > > > >
+> > > > > Yeah, this should happen for both cases.  Good catch!
+> > > > >
+> > > > > > I noticed that you had a patch for this long back. But I don't =
+see
+> > > > > > that call happening in the latest code. Any idea why that was d=
+one?
+> > > > >
+> > > > > I don't know.  Maybe some other patch broke it.
+> > > > >
+> > > > > We should probably mark it for stable as well.
+> > > > >
+> > > > > > From 289f7f0fa229ea181094821c309a2ba9358791a3 Mon Sep 17 00:00:=
+00 2001
+> > > > > > From: Shyam Prasad N <sprasad@microsoft.com>
+> > > > > > Date: Wed, 31 Mar 2021 14:35:24 +0000
+> > > > > > Subject: [PATCH] cifs: On cifs_reconnect, resolve the hostname =
+again.
+> > > > > >
+> > > > > > On cifs_reconnect, make sure that DNS resolution happens again.
+> > > > > > It could be the cause of connection to go dead in the first pla=
+ce.
+> > > > > >
+> > > > > > Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> > > > > > ---
+> > > > > >  fs/cifs/connect.c | 15 +++++++++++++++
+> > > > > >  1 file changed, 15 insertions(+)
+> > > > >
+> > > > > This patch breaks when CONFIG_CIFS_DFS_UPCALL isn't set.
+> > > > >
+> > > > > Please declare reconn_set_ipaddr_from_hostname() outside the "#if=
+def
+> > > > > CONFIG_CIFS_DFS_UPCALL" in connect.c.
+> > > > >
+> > > > > Otherwise,
+> > > > >
+> > > > > Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+> > > >
+> > > >
+> > > >
+> > > > --
+> > > > Regards,
+> > > > Shyam
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+>
+>
+>
 > --
-> 2.31.1
->
+> Regards,
+> Shyam
 
 
--- 
+
+--=20
 Thanks,
 
 Steve
-
---00000000000013d39f05bf667ced
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-escape-spaces-in-share-names.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-escape-spaces-in-share-names.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kn7taqr20>
-X-Attachment-Id: f_kn7taqr20
-
-RnJvbSAxZWU0ZjMzZmZhODMwMjY3ZDMyNGIwZDU0N2ZhY2QyNWRkNjgzYTEyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBNYWNpZWsgQm9yemVja2kgPG1hY2llay5ib3J6ZWNraUBnbWFp
-bC5jb20+CkRhdGU6IFR1ZSwgNiBBcHIgMjAyMSAxNzowMjoyOSArMDIwMApTdWJqZWN0OiBbUEFU
-Q0hdIGNpZnM6IGVzY2FwZSBzcGFjZXMgaW4gc2hhcmUgbmFtZXMKCkNvbW1pdCA2NTNhNWVmYjg0
-OWEgKCJjaWZzOiB1cGRhdGUgc3VwZXJfb3BlcmF0aW9ucyB0byBzaG93X2Rldm5hbWUiKQppbnRy
-b2R1Y2VkIHRoZSBkaXNwbGF5IG9mIGRldm5hbWUgZm9yIGNpZnMgbW91bnRzLiBIb3dldmVyLCB3
-aGVuIG1vdW50aW5nCmEgc2hhcmUgd2hpY2ggaGFzIGEgd2hpdGVzcGFjZSBpbiB0aGUgbmFtZSwg
-dGhhdCBleGFjdCBzaGFyZSBuYW1lIGlzIGFsc28KZGlzcGxheWVkIGluIG1vdW50aW5mby4gTWFr
-ZSBzdXJlIHRoYXQgYWxsIHdoaXRlc3BhY2UgaXMgZXNjYXBlZC4KClNpZ25lZC1vZmYtYnk6IE1h
-Y2llayBCb3J6ZWNraSA8bWFjaWVrLmJvcnplY2tpQGdtYWlsLmNvbT4KQ0M6IDxzdGFibGVAdmdl
-ci5rZXJuZWwub3JnPiAjIDUuMTErClJldmlld2VkLWJ5OiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNh
-ZEBtaWNyb3NvZnQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1p
-Y3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9jaWZzZnMuYyB8IDMgKystCiAxIGZpbGUgY2hhbmdl
-ZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9j
-aWZzZnMuYyBiL2ZzL2NpZnMvY2lmc2ZzLmMKaW5kZXggMDk5YWQ5ZjM2NjBiLi4zYzZjYjg1Yjk1
-ZTIgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc2ZzLmMKKysrIGIvZnMvY2lmcy9jaWZzZnMuYwpA
-QCAtNDc2LDcgKzQ3Niw4IEBAIHN0YXRpYyBpbnQgY2lmc19zaG93X2Rldm5hbWUoc3RydWN0IHNl
-cV9maWxlICptLCBzdHJ1Y3QgZGVudHJ5ICpyb290KQogCQlzZXFfcHV0cyhtLCAibm9uZSIpOwog
-CWVsc2UgewogCQljb252ZXJ0X2RlbGltaXRlcihkZXZuYW1lLCAnLycpOwotCQlzZXFfcHV0cyht
-LCBkZXZuYW1lKTsKKwkJLyogZXNjYXBlIGFsbCBzcGFjZXMgaW4gc2hhcmUgbmFtZXMgKi8KKwkJ
-c2VxX2VzY2FwZShtLCBkZXZuYW1lLCAiIFx0Iik7CiAJCWtmcmVlKGRldm5hbWUpOwogCX0KIAly
-ZXR1cm4gMDsKLS0gCjIuMjcuMAoK
---00000000000013d39f05bf667ced--
