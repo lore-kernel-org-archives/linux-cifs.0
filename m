@@ -2,77 +2,73 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB16C433B4
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Apr 2021 02:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B4DC433B4
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Apr 2021 03:40:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23AD8613BD
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Apr 2021 02:28:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C8E5613BD
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Apr 2021 03:40:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238543AbhDGC2I (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Apr 2021 22:28:08 -0400
-Received: from m12-12.163.com ([220.181.12.12]:50950 "EHLO m12-12.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233994AbhDGC2H (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 6 Apr 2021 22:28:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Me5hN
-        OF2h0y0yS3J/7We7nlIRtQIvPxa/0EyPfwDP70=; b=C97c5CQVvlZsRxAslaMhN
-        PerQbr22PMUP1usdZznfcKqb7pt805Szboi+O7RafrOlGdAKu3K14FwNpSEYA4Mn
-        L5HW1N8mEMrkux1RxbIzJrvUI7pStjcfMtl2XM0XnS87+XsCXLGhK2L1fh5CJuEt
-        lF9i7CkkLGC8sRqwoWfz4Q=
-Received: from COOL-20201222LC.ccdomain.com (unknown [218.94.48.178])
-        by smtp8 (Coremail) with SMTP id DMCowABHieSTGG1gTazQYA--.7038S2;
-        Wed, 07 Apr 2021 10:27:34 +0800 (CST)
-From:   liliu_096@163.com
-To:     sfrench@samba.org, samba-technical@lists.samba.org
-Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "jack1.li_cp" <liliu1@yulong.com>
-Subject: [PATCH] fs: cifs: Fix spelling of 'security'
-Date:   Wed,  7 Apr 2021 10:26:55 +0800
-Message-Id: <20210407022655.21124-1-liliu_096@163.com>
-X-Mailer: git-send-email 2.21.0.windows.1
+        id S234240AbhDGDke (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Apr 2021 23:40:34 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:15937 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234337AbhDGDke (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Apr 2021 23:40:34 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FFVTw4PVCzyN8B;
+        Wed,  7 Apr 2021 11:38:12 +0800 (CST)
+Received: from localhost.localdomain (10.175.101.6) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.498.0; Wed, 7 Apr 2021 11:40:12 +0800
+From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+To:     <namjae.jeon@samsung.com>, <zhangxiaoxu5@huawei.com>,
+        <sfrench@samba.org>, <sergey.senozhatsky@gmail.com>,
+        <hyc.lee@gmail.com>, <linux-cifs@vger.kernel.org>,
+        <linux-cifsd-devel@lists.sourceforge.net>, <yukuai3@huawei.com>
+Subject: [PATCH] cifsd: Select SG_POOL for SMB_SERVER
+Date:   Tue, 6 Apr 2021 23:45:46 -0400
+Message-ID: <20210407034546.2314958-1-zhangxiaoxu5@huawei.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: DMCowABHieSTGG1gTazQYA--.7038S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrZw15tF1rKFWxWr43KryUWrg_yoWfXrg_GF
-        4vkw1kW345AF43Xw13CrZ5Wrs29a4IyFWSk3ZxWF1UGasxGFW8Ga4Dtrn3ZF48CrsrCryq
-        vrnFqFyUCr1fJjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU1D5rDUUUUU==
-X-Originating-IP: [218.94.48.178]
-X-CM-SenderInfo: 5olox3bbqzlqqrwthudrp/1tbiRRZtx1l914Vv0QAAsx
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: "jack1.li_cp" <liliu1@yulong.com>
+hulk-robot following build error:
+ fs/cifsd/transport_rdma.c: In function ‘read_write_done’:
+ fs/cifsd/transport_rdma.c:1297:2: error: implicit declaration of function ‘sg_free_table_chained’ [-Werror=implicit-function-declaration]
+  1297 |  sg_free_table_chained(&msg->sgt, SG_CHUNK_SIZE);
 
-secuirty -> security
+The reason is CONFIG_SG_POOL is not enabled in the config, to
+avoid such failure, select SG_POOL in Kconfig for SMB_SERVER.
 
-Signed-off-by: jack1.li_cp <liliu1@yulong.com>
+Fixes: 75b8988dfe83 ("cifsd: add server handler for central processing and tranport layers")
+Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
 ---
- fs/cifs/cifsacl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cifsd/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/cifs/cifsacl.c b/fs/cifs/cifsacl.c
-index 562913e..d2d8e26 100644
---- a/fs/cifs/cifsacl.c
-+++ b/fs/cifs/cifsacl.c
-@@ -1418,7 +1418,7 @@ int set_cifs_acl(struct cifs_ntsd *pnntsd, __u32 acllen,
- 	 * Add three ACEs for owner, group, everyone getting rid of other ACEs
- 	 * as chmod disables ACEs and set the security descriptor. Allocate
- 	 * memory for the smb header, set security descriptor request security
--	 * descriptor parameters, and secuirty descriptor itself
-+	 * descriptor parameters, and security descriptor itself
- 	 */
- 	secdesclen = max_t(u32, secdesclen, DEFAULT_SEC_DESC_LEN);
- 	pnntsd = kmalloc(secdesclen, GFP_KERNEL);
+diff --git a/fs/cifsd/Kconfig b/fs/cifsd/Kconfig
+index d1ac53c83125..fb57672424be 100644
+--- a/fs/cifsd/Kconfig
++++ b/fs/cifsd/Kconfig
+@@ -17,6 +17,7 @@ config SMB_SERVER
+ 	select CRYPTO_AEAD2
+ 	select CRYPTO_CCM
+ 	select CRYPTO_GCM
++	select SG_POOL
+ 	default n
+ 	help
+ 	  Choose Y here if you want to allow SMB3 compliant clients
 -- 
-1.9.1
-
+2.25.4
 
