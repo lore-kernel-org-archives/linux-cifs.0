@@ -2,45 +2,56 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B624C433ED
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 14:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 949C2C433ED
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 15:25:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4567C60C3D
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 14:55:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55A9F61103
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 15:25:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231630AbhDHOzh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 8 Apr 2021 10:55:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231480AbhDHOzg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Apr 2021 10:55:36 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA528C061760;
-        Thu,  8 Apr 2021 07:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=9ngPzXydGHBjskx5cUB/06uGvBv1ng+f09FOLsWljv8=; b=JmqiGWaoPyP0M/wyjvEambr2hQ
-        Pqfhp0rW3/YWQSEW67k7BqrjIQoQAHIbjqS/Ov+4EVqS9oYAxYFObB143hXed3ldwgU9EPF4Xw5Xs
-        mOMGA4NF7eOLQt/RM4MdXGRqBa7Iy7T8wJSU+ghg3wes7SBZ/XEtD8y6cInb1UTB/pwAY0K6mlReR
-        N96yrQ0ZtYi4KD9lCpm1g76pst1pbgLT4KckVkbUWxGFC97tUtXN6puarzldUCUYnQRyRVYLYP5yh
-        yKV5ashBhese4KOWcF6ZJNu7cCKhHd/6ZbA5ZK/v9CFVDq4ZVFs9SerOLlEUccOAaEejb6sfUGfh2
-        9TrgBE/g==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lUW3g-00GNjJ-Br; Thu, 08 Apr 2021 14:55:03 +0000
-Date:   Thu, 8 Apr 2021 15:55:00 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-fsdevel@vger.kernel.org,
+        id S232238AbhDHPZ6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 8 Apr 2021 11:25:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48462 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232227AbhDHPZ6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Apr 2021 11:25:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617895546;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CGwlC/hESn7y7qGIlb10fpokHrJdwvIGgWjnr/18nGE=;
+        b=TiLMDIBiS/jlzQQ+rwUi5xeSqhxE8lRoYgpGQQEbBvYft7De7oHz+jrYtmWIrvlL2dZ95D
+        VeLgWH8Xy/obp0lDe5lTm4YqNSbSe/JkyJUeLDGo5WX36NNV3qxt+ItGByLuSL7qhQ87es
+        9u8EtPYxU27jTWcSpK7lfHvSYXPJt7w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-fI44sw60N3C0hNH1bdmEJA-1; Thu, 08 Apr 2021 11:25:45 -0400
+X-MC-Unique: fI44sw60N3C0hNH1bdmEJA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D75CE8189C8;
+        Thu,  8 Apr 2021 15:25:41 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-119-35.rdu2.redhat.com [10.10.119.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7DD1710013C1;
+        Thu,  8 Apr 2021 15:25:35 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210408145057.GN2531743@casper.infradead.org>
+References: <20210408145057.GN2531743@casper.infradead.org> <161789062190.6155.12711584466338493050.stgit@warthog.procyon.org.uk> <161789066013.6155.9816857201817288382.stgit@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Marshall <hubcap@omnibond.com>, linux-mm@kvack.org,
+        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
         linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
         linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
@@ -51,21 +62,30 @@ Cc:     linux-fsdevel@vger.kernel.org,
         Jeff Layton <jlayton@redhat.com>,
         David Wysochanski <dwysocha@redhat.com>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 05/30] mm: Implement readahead_control pageset
- expansion
-Message-ID: <20210408145500.GO2531743@casper.infradead.org>
-References: <161789062190.6155.12711584466338493050.stgit@warthog.procyon.org.uk>
- <161789069829.6155.4295672417565512161.stgit@warthog.procyon.org.uk>
+Subject: Re: [PATCH v6 02/30] mm: Add set/end/wait functions for PG_private_2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <161789069829.6155.4295672417565512161.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <14839.1617895534.1@warthog.procyon.org.uk>
+Date:   Thu, 08 Apr 2021 16:25:34 +0100
+Message-ID: <14840.1617895534@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Apr 08, 2021 at 03:04:58PM +0100, David Howells wrote:
-> Suggested-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> Signed-off-by: David Howells <dhowells@redhat.com>
+Matthew Wilcox <willy@infradead.org> wrote:
 
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> > +void end_page_private_2(struct page *page)
+> > +{
+> > +	page = compound_head(page);
+> > +	VM_BUG_ON_PAGE(!PagePrivate2(page), page);
+> > +	clear_bit_unlock(PG_private_2, &page->flags);
+> > +	wake_up_page_bit(page, PG_private_2);
+> 
+> ... but when we try to end on a tail, we actually wake up the head ...
+
+Question is, should I remove compound_head() here or add it into the other
+functions?
+
+David
+
