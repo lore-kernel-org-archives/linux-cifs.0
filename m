@@ -2,111 +2,83 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3C4C433ED
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 10:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66633C433ED
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 12:07:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A17E3610C7
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 10:51:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40598610C7
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 12:07:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229837AbhDHKvT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 8 Apr 2021 06:51:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60274 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbhDHKvS (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Apr 2021 06:51:18 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94718C061760
-        for <linux-cifs@vger.kernel.org>; Thu,  8 Apr 2021 03:51:07 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id g38so2120794ybi.12
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Apr 2021 03:51:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=MWLs2d5Sb5yBAHwdW/1TMC/gtmESOyJW9s3EtVBmGlk=;
-        b=n4ekP395jJhrTDNRrIfvCB3fQRLyu5ZAeYLnS34ZlKhDvHeqFWgjq4w7OhJyqe+P+2
-         nACoBpLs0E2Zu9eHJf8ehybYtXCrTzj+kvAwOoiFPDy8ZBIrzoDvWz79glNanWYI9KFx
-         ca+ZhI6V0MZqTX1mM7wrxqk0FaQZYH3t+1iMrcOfVCV3OjwVWfFjhkYco1sq05PysYKO
-         8F+BkHhpA3MgGX+Drj6CfO4wJCCIiY4/Wu1Po1uY7F8fwToyymd68xmYGKI8HKMpA+Z6
-         wQwSnQHAawI/mqOq4bLgN5Pz99OZg4w2t+xToSp3Jl+WoAL6IP9hOc0BFWBiJVgrJxb5
-         yvGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=MWLs2d5Sb5yBAHwdW/1TMC/gtmESOyJW9s3EtVBmGlk=;
-        b=Ju1YfCbCyTIDgdwKwu7582YnX47J+LCMdVGVizLRovbvPDsvmDUi8FgjIzyfq92HKU
-         UAU0pGhhVIBqOgVzM0CTA3KDpzfQzBU7X9e/bgFZsCXEzNJyPw1fLvhwQp/1vi574gjl
-         lo3hVxLpoIiD0lCpGex9Zx3h2PdNCvrxx2j7bsGEgLeb8QtZxGEEltZwFbNryYx4L5HX
-         MKREeNpJU8nKeFGwg9sb4U+3PflpvcjIB6TZyfzzzatA2DBBGV1SflHQ2k+XYLAmiDln
-         3BGo/omo7iOglLrvme1bpDBb0v+H6h3AistQAKMPznAIlCuP8YJcZsBxwroU5+Fo4fKX
-         71dg==
-X-Gm-Message-State: AOAM532eec/COa1KCMbInJ/ejLMvaZiY/6bf4VzxTqt4LFmpz2gmaBui
-        EwK4uqMmYO6O4r21T4w34Ja9DVua2CeFiSYxyPk=
-X-Google-Smtp-Source: ABdhPJxt+522h3FFgGEhsROVkJeUh5Ln5myn2qgv+T4GPwsmR/BSqdXsWMHd99u5dnAyNJ81BXhoTXeEPAw/fWP8Vy4=
-X-Received: by 2002:a25:31d5:: with SMTP id x204mr10779439ybx.3.1617879066825;
- Thu, 08 Apr 2021 03:51:06 -0700 (PDT)
+        id S231158AbhDHMHZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 8 Apr 2021 08:07:25 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:43921 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229837AbhDHMHZ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 8 Apr 2021 08:07:25 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4FGKkm1fGBz9sWH;
+        Thu,  8 Apr 2021 22:07:12 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1617883632;
+        bh=afB+tFvSVPpjZFZ2XPoyqVczHtcZ7+0K0bTZXcR5UVY=;
+        h=Date:From:To:Cc:Subject:From;
+        b=QT1D1UtyI+z+6GADlposgOWj0FIIcYcWgqzReRxWHGa3V2jrAw2AdnRVVIKAN1W4J
+         nuD1pFhUfVhmbDSaPVLqsXz2/ukkyuY52yAMp1OyGU8a5q32WwBd9duey3a4v4CCKj
+         YbR4cwkbTgU6ZbptIKAU0R3QAkoVSCw8TrF/wXQLY184lqJyyzCeCvz4F4UleXArdL
+         tWPVFQOLLRBsX7Df6Xa5tDHg3QyjzYUJcaSMX10aApbwL7Pl8S0Sv1yqWV2BCijEus
+         oM4qy/hUK1ci85eHDpZncVqmX9Ge48qqM3GzEcS7sC0YMshtkKJ4ZVyKQ5zAjTqSnJ
+         WOW22ouahPUgg==
+Date:   Thu, 8 Apr 2021 22:07:11 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Signed-off-by missing for commit in the cifs tree
+Message-ID: <20210408220711.5a39d4a0@canb.auug.org.au>
 MIME-Version: 1.0
-References: <CANT5p=qWyYCD_gSw-AzvxOgzTzWkBK1uUz-16YougX5No8jjgQ@mail.gmail.com>
- <87im50vi9v.fsf@cjr.nz> <CANT5p=pHPPwf8H1ZbBT+yr4CP17+BB2evDBxPVjYrvr+kdF1FQ@mail.gmail.com>
- <CAKywueSCF-ZgmJZif=kkspk_b8Xp3ARUGHD64nnc5ZbVk3EcxA@mail.gmail.com>
- <CAH2r5mv1=tpjPOZhq97t+X99dfSDtzWepp5bpqPqjf9Z1t6+sg@mail.gmail.com>
- <CANT5p=rq+jXGyZG-23dpOVOomObXmXEdr9FsO-=-vX9tH+kkCA@mail.gmail.com> <878s5t4185.fsf@suse.com>
-In-Reply-To: <878s5t4185.fsf@suse.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Thu, 8 Apr 2021 16:20:55 +0530
-Message-ID: <CANT5p=rcXNH45roAVy8Zht889dKfexmEWFwKTvyssHA-cNA6rA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: On cifs_reconnect, resolve the hostname again.
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Pavel Shilovsky <piastryyy@gmail.com>,
-        Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="Sig_/7jEnSQe/RMO0Z32CLYq2aQD";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Aur=C3=A9lien,
+--Sig_/7jEnSQe/RMO0Z32CLYq2aQD
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-That logic is already there.
-If reconn_set_ipaddr_from_hostname() returns failure, we log it and
-continue with the reconnect to the old server->dstaddr anyway,
+Hi all,
 
-Regards,
-Shyam
+Commit
 
-On Thu, Apr 8, 2021 at 2:11 PM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
->
-> Shyam Prasad N <nspmangalore@gmail.com> writes:
-> > The intel bot identified an issue with the earlier version of the fix,
-> > when not compiled with DFS.
-> > Here's an updated version with that fix too.
->
-> Ah I guess that's why resolving wasn't done on reconnect outside of DFS:
-> it requires the DNS resolver which requires upcalling i.e. having
-> keys-utils, request-conf.conf and dns_resolver key installed and
-> properly configured on the system to be able to reconnect.
->
-> Maybe we should fallback to retrying the same ip if resolving isn't
-> available.
->
-> Cheers,
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
->
+  e67fcb31fb0e ("stuff")
 
+is missing a Signed-off-by from its author and comitter.
 
 --=20
-Regards,
-Shyam
+Cheers,
+Stephen Rothwell
+
+--Sig_/7jEnSQe/RMO0Z32CLYq2aQD
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmBu8e8ACgkQAVBC80lX
+0GxwZAf+NSMy7ed6NB5OayNLtLA0G7wLcgWk5J7nMb5LTg6ZB+96Q16lqgm6vldd
+tqjSdc8r/WxDymJITqJaB6zZctCaO8Pcdrnbkvv/18KmlzK87kBZbb3LOvhPDOVx
+GzXCEw0WpivzHtWaWdT3lbq6iaFlHfKe370poumVnnaJ4luwl6jMbcjEvCUSYl+2
+SzqSKctq6txddE4Kth6mlV7/yfY+vZT0Uzcg0aaY27f1WXyFX3mNBx57TZ7m1THn
+LYVuMMsKzNz/p8MOCrcqA2dxUJDSWSdBSgHX3DtWv5cwZnUr+TAodjz2W0KWM0eG
+m6Iruj4cJ3GeWH8AOStx1u34es5ogA==
+=Vg3O
+-----END PGP SIGNATURE-----
+
+--Sig_/7jEnSQe/RMO0Z32CLYq2aQD--
