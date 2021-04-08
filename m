@@ -2,128 +2,90 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49168C433B4
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 15:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 204B5C433ED
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 16:09:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26B5961139
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 15:57:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECE66610F8
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Apr 2021 16:09:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232147AbhDHP6A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 8 Apr 2021 11:58:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31526 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231655AbhDHP55 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Apr 2021 11:57:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617897466;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NinlbVPhwGdJcoVcBt2udn4w5X18/v4CvahbnKLeeMI=;
-        b=YEQmUl/FwzdaBaSrJRErp2PkpVKPdwoDA8i5YQtgBPLTv1z6zfT0O3ty68sdGH0ZRmVroz
-        Fbqu8trYwWm+lWdxWHb2P3E72G/50utR7EEb24CLeiNphbtP1fFtwInDsisv4y4uGdx9XY
-        N+5Ou6BGjDQJJiBTvjZzGPfggiBtnT8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-0tkXerksNmuLEQR_9ITDFg-1; Thu, 08 Apr 2021 11:57:42 -0400
-X-MC-Unique: 0tkXerksNmuLEQR_9ITDFg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1B2A107ACC7;
-        Thu,  8 Apr 2021 15:57:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-119-35.rdu2.redhat.com [10.10.119.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3DE165C1C4;
-        Thu,  8 Apr 2021 15:57:32 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20210408145057.GN2531743@casper.infradead.org>
-References: <20210408145057.GN2531743@casper.infradead.org> <161789062190.6155.12711584466338493050.stgit@warthog.procyon.org.uk> <161789066013.6155.9816857201817288382.stgit@warthog.procyon.org.uk>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 02/30] mm: Add set/end/wait functions for PG_private_2
+        id S231655AbhDHQJt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 8 Apr 2021 12:09:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46100 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231526AbhDHQJt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Apr 2021 12:09:49 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE6BC061760;
+        Thu,  8 Apr 2021 09:09:37 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id b14so4922679lfv.8;
+        Thu, 08 Apr 2021 09:09:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=q2y70uZn9bzb33FU99dlR3SYEgVlIDBNcQtt2y1+RFM=;
+        b=VB7uXpQBDBw9TAc+0C1va246dBbHcAG3IlxYYEK+346bf2T/yNBVAQYqcOjJvI/Rz5
+         ucCMkthqLQTOn/xJ6m+0gR3X6lvtNxM7IyC6NlDvKbAy1GGM+PCdkU5gzlI9DMRX2ikl
+         AP+soFJqGU/fjXI5bon39W/+vbldAvEWWMHWSjsHM6xHTMJupu0mPP7tUHy9BZxlopMo
+         9cPRd6maw99ks3eeg905nKJzIn6MfQi2W8MJCx4FYIYomHxoKsmrF71I9fn9rmLFCjVx
+         wvqZaZyn2MEMtvZMqWeUjfZRfRQvXlwXIYvHjvInlXksHW5kYnMgmt2FNFE3cHAoqFQP
+         iCRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=q2y70uZn9bzb33FU99dlR3SYEgVlIDBNcQtt2y1+RFM=;
+        b=VxYugw40y7NTEw6U9wMi/JAmBzRLOkXcodVbyEIfzRrwVOa7hUZmbMrbGrFtR5/kpk
+         mtqc+CljTH0umJ0YuvXUcZ7Ze28XfHcyup79elAprqxxbi+4hoEr2lmSoyOwQT/LEIzi
+         l9Z5+ITJoq4OOQGicjOHv1dLtBnf3w/ApdgOOcKZ+k9YiqFCYRkwJM/KdN4e4cRILyVW
+         9ymMTDz+dZ8rH6tUwF46/EboJVwmqM1r86pLBtXEmINI1cALg51B8fLvzj7X+xCE/+/+
+         zKeoT2Xkvsu5PzAkG0Ulxj1Br0b2if4lf9do2+WwezcFr9HWHqDR05TINkr3BpYNd+z8
+         51Ow==
+X-Gm-Message-State: AOAM533u/SLQLTmsyorr8ESdE2QwHBmUWOtf9uoHxVNdlIHJVHE1B6dM
+        w11KpJ3ydkGMJt+lm+U1cW68Y3ZfSpzwp7VGeoiJ6Ebc2MA=
+X-Google-Smtp-Source: ABdhPJyJbS8fyp2YGyi1GVee1muNET1yBazDtu+lJk2Bae/jYuLjtSv5T7EoJj+9xUv1TE6EmD2SqO4knQdYzZYddgo=
+X-Received: by 2002:a19:7515:: with SMTP id y21mr7155456lfe.282.1617898174959;
+ Thu, 08 Apr 2021 09:09:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <46016.1617897451.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 08 Apr 2021 16:57:31 +0100
-Message-ID: <46017.1617897451@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20210408220711.5a39d4a0@canb.auug.org.au>
+In-Reply-To: <20210408220711.5a39d4a0@canb.auug.org.au>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 8 Apr 2021 11:09:23 -0500
+Message-ID: <CAH2r5mts7HLToeuUgPSp5kpurYw9VYt8L26ruudiZ0vHv3BvUA@mail.gmail.com>
+Subject: Re: linux-next: Signed-off-by missing for commit in the cifs tree
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Here's a partial change, but we still need to deal with the assumption tha=
-t
-page_has_private() makes that its output can be used to count the number o=
-f
-refs held for PG_private *and* PG_private_2 - which isn't true for my code
-here.
+fixed - (a tmp branch was accidentally pushed)
 
-David
----
-commit e7c28d83b84b972c3faa0dd86020548aa50eda75
-Author: David Howells <dhowells@redhat.com>
-Date:   Thu Apr 8 16:33:20 2021 +0100
+On Thu, Apr 8, 2021 at 7:07 AM Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> Hi all,
+>
+> Commit
+>
+>   e67fcb31fb0e ("stuff")
+>
+> is missing a Signed-off-by from its author and comitter.
+>
+> --
+> Cheers,
+> Stephen Rothwell
 
-    netfs: Fix PG_private_2 helper functions to consistently use compound_=
-head()
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index ef511364cc0c..63ca6430aef5 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -699,6 +699,7 @@ void page_endio(struct page *page, bool is_write, int =
-err);
-  */
- static inline void set_page_private_2(struct page *page)
- {
-+	page =3D compound_head(page);
- 	get_page(page);
- 	SetPagePrivate2(page);
- }
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 0ce93c8799ca..46e0321ba87a 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1461,6 +1461,7 @@ EXPORT_SYMBOL(end_page_private_2);
-  */
- void wait_on_page_private_2(struct page *page)
- {
-+	page =3D compound_head(page);
- 	while (PagePrivate2(page))
- 		wait_on_page_bit(page, PG_private_2);
- }
-@@ -1481,6 +1482,7 @@ int wait_on_page_private_2_killable(struct page *pag=
-e)
- {
- 	int ret =3D 0;
- =
 
-+	page =3D compound_head(page);
- 	while (PagePrivate2(page)) {
- 		ret =3D wait_on_page_bit_killable(page, PG_private_2);
- 		if (ret < 0)
+-- 
+Thanks,
 
+Steve
