@@ -2,146 +2,112 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E3BC43460
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 12:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E42C43460
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 12:35:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB42861165
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 12:13:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9CFD610CA
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 12:35:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233483AbhDIMNf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Apr 2021 08:13:35 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:32885 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231402AbhDIMNf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Apr 2021 08:13:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1617970401;
+        id S233038AbhDIMgD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Apr 2021 08:36:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30500 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231819AbhDIMgA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Apr 2021 08:36:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617971747;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GmoIUx6okKo8fv5MfCPjE4a9WGKuOXMXpAW+OGkKb3U=;
-        b=VP8xhpeJ2ytKmFJkZETvn5nXO8Lq/ShWUiSz9SOcUBtXO4wHNw8fQ5TnWpfsUuA+VKnTGa
-        hwghAVnAQgvYGMQvAAvEMj9NmjwSK2BdD5YAlExzDkVWBsnInpdz++BvKRN8r2JELx6EIA
-        zKn5VZf3gyp8X8yuIqOjT4+znAJ/+cc=
-Received: from EUR02-HE1-obe.outbound.protection.outlook.com
- (mail-he1eur02lp2057.outbound.protection.outlook.com [104.47.5.57]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-12-c0llpcEvN4-w8HlvhtCfJQ-1; Fri, 09 Apr 2021 14:13:05 +0200
-X-MC-Unique: c0llpcEvN4-w8HlvhtCfJQ-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JnN3IQj8h3997qcbHDnxDkejRYrP3buU22Fy8NzjpnV5tRr0Xzo4j/qmMurYLMnF7hSq/34LgY1eZxhpSz76GiQCIe49Pfz5ClE0HjJUnVpJ9mXhiM9fPnPddl/yVj3QzFaZNNIPOtZIMQJk1NAMhzCEHJN3dqSzvkOJv+CI05sBu+wQMrGB7y1KS+YGkyReYp4uiIRS2tXdLoc/bNYaAlXlFOhTrLih2sHwDiRSo6KlioA7aaYRVF/h4qTnsUCEhRaXZEDuNows/0c3krE4/bweboSRYkv7oMhPJDMvHfxax25CDf7K4bAbTazSlIXr3iI9L5UhXzGv3qe7rtyagA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GmoIUx6okKo8fv5MfCPjE4a9WGKuOXMXpAW+OGkKb3U=;
- b=ndEZQsOncw4diZyyCuuTXrNgb56wBVA4KLHp7Jh4sYApue6iFkegHEAduN9RB0GWyqGltxXTit1Yy45cIMDBiUsx4Rk3s/M2n9QOG+5c02TSYikenYf+ZEyjxl3nidtP7A2MQAllD0fE487ck7hw/RyPJy+6Z3xJZeTcA/xIiAcRF7kNOfwFLYYci7xnAmk05Pb/+QeLi9cuHBSRfH/TLE+tP3S+qjJUlszOx2BjIK77pFE3sNRmtg9UbW6sAtx3XJlbVDhx41hkqaZXodU1rNIzknkheFWOiEUZwoN1XB+/lPnWdBh5WBtwr+SWEDu0ECCA51zb55JkedUPEfzbdw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR04MB6928.eurprd04.prod.outlook.com (2603:10a6:803:12e::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.18; Fri, 9 Apr
- 2021 12:13:03 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94%5]) with mapi id 15.20.3999.035; Fri, 9 Apr 2021
- 12:13:03 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Pavel Shilovsky <piastryyy@gmail.com>, Tom Talpey <tom@talpey.com>
-Cc:     "Alejandro Colomar (man-pages)" <alx.manpages@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        mtk.manpages@gmail.com, linux-man@vger.kernel.org
-Subject: Re: [PATCH v5] flock.2: add CIFS details
-In-Reply-To: <20210322143024.13930-1-aaptel@suse.com>
-References: <CAKywueQkELXyRjihtD2G=vswVuaeoeyMjrDfqTQeVF_NoRVm6A@mail.gmail.com>
- <20210322143024.13930-1-aaptel@suse.com>
-Date:   Fri, 09 Apr 2021 14:13:00 +0200
-Message-ID: <87wntb3bcj.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:705:3046:69ee:cad4:97e6:ea8f]
-X-ClientProxiedBy: ZR0P278CA0159.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:41::8) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+        bh=RQb7qzHISTbizitMiYm8wD/fZ+45DgKONa+egqhiCY0=;
+        b=U7OQrel0DTaGAJPLlRV3kCq1+Jwy7BykGjXltX3kBBviGmYauir8QpiAPv8dmrtsBA/AA9
+        sUjRLCdlryI+5YA6qzNQL4JQinyACFlKKzit8CK1MKN4OGrt/9aCrwRnq385SkhELttLKm
+        dV2va1WkUgf+WsOVUptPZfHabxk4TLo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-1VuZXlZMP_qGLOcyqDfQHg-1; Fri, 09 Apr 2021 08:35:43 -0400
+X-MC-Unique: 1VuZXlZMP_qGLOcyqDfQHg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC5B019251A1;
+        Fri,  9 Apr 2021 12:35:40 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-119-35.rdu2.redhat.com [10.10.119.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E65E55DAA5;
+        Fri,  9 Apr 2021 12:35:34 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20210409111636.GR2531743@casper.infradead.org>
+References: <20210409111636.GR2531743@casper.infradead.org> <CAHk-=wi_XrtTanTwoKs0jwnjhSvwpMYVDJ477VtjvvTXRjm5wQ@mail.gmail.com> <161796595714.350846.1547688999823745763.stgit@warthog.procyon.org.uk>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     dhowells@redhat.com, torvalds@linux-foundation.org,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, jlayton@kernel.org, hch@lst.de,
+        linux-cachefs@redhat.com, v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/3] mm: Return bool from pagebit test functions
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:705:3046:69ee:cad4:97e6:ea8f) by ZR0P278CA0159.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:41::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.29 via Frontend Transport; Fri, 9 Apr 2021 12:13:02 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a6f349f2-bdb5-484b-b98a-08d8fb50d307
-X-MS-TrafficTypeDiagnostic: VI1PR04MB6928:
-X-Microsoft-Antispam-PRVS: <VI1PR04MB6928D6C8D7FC103EF6911D0CA8739@VI1PR04MB6928.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: STP51MXM3taMSP9f2PAs0KS2uk1rnZtz923+4+WoqJF8JYAn1ztLN+08PTAfQ3JhBTRObcAbDhC7VkG2azJgttNgynxAF5f4/TNGnSlAcwBsZbOYKyXSo+/fo0KQVzfdII4fDSnznGv+r4UPGN0M9U8q5U0XyLqqGBL5QiIMtCmTlV3HBZ8XmIw3SJjbCyvHiXjUUdOvBMUidBXSQ5m6av/wALVfDHExTaBYmEjVA5/mxiepYbbn+fIZc3btok29omIO9ZtQCuRGWycRO/NLIQ/+E4B5gWU/SFJZ3MLA1BFphPuUb2BGWojoD5ICKj1CTzokWAp/cO5HVITkwKWd0vJKGWNDRcqfJsXduFEAt0jHwBrca0LUCIv2i3oX5uhS8X9IuVLj+ARqC46NMlTqSg7DzLovuw0MJQ6nS0Sis9ZDKStWi19Zy6ZeEm9bc1p7aWsdnP8Rb92SvKhpH0fYyEgHMMdjMBxyIVVz7rcn9tmgW0WA9EItAwYXHxxsPcb9HExe7081Gveb00Ld38iizC/aAPOLyYaWPrYKzBoEH7fX+TUDvMyDsp/hG8i9eatapjAlAclJIyRYTFK7Yh19R1nrI0YT9QINmsLariAI/iHOBZQkQjmOMLfMBGE7vB+l/tYUqcfMwaz4pfNFfgLNnA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(366004)(39860400002)(376002)(136003)(396003)(66556008)(6496006)(2906002)(66946007)(38100700001)(66476007)(558084003)(52116002)(2616005)(6486002)(86362001)(36756003)(54906003)(110136005)(186003)(8936002)(478600001)(16526019)(5660300002)(316002)(8676002)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?eWFJMXJJOTA4bVFKZnJOR1Z6WUVxT0ZtR3RodmxiYytCNVZKYjZ3YWNXaENV?=
- =?utf-8?B?VGJjQXdkSmc2UXB2QlM2MWIrY0NHdVNJaEdwaDdQMzIwQzk0UUN2QkRtMmgv?=
- =?utf-8?B?dk1sUnJIOXhGeE9MSzkwcFBPRW1tWWNiYVNyRzdFQXZ4Z1lvS2lrMGluUU14?=
- =?utf-8?B?TnFhcnBVcHFuLzFibHFCd0o3d0Yvb1h6ZERoS1lYdnZWckNFVzBUQXcvem1h?=
- =?utf-8?B?blE2NmJUUUw3T3NBdDZtZHYwak9XR2NNSWZFQjJqT1o3NTg5OEZUcFJva2VW?=
- =?utf-8?B?OW51a0Irb0V3UEtjNnRFMnQvTkwybzVjU1FwSWZXRDNUY0xsamFmamx6L3lQ?=
- =?utf-8?B?TE0wZXEvSG9kcG5aY2J4V1I3dDZiYkFJa255bkFYNlREL3V5dHYxbUVseUFL?=
- =?utf-8?B?bitoc1lsTGlFYlNrY1pxNmpxZi9OSDU3SGFYWDNlSjRvQjN5MEN6NXAweXNT?=
- =?utf-8?B?Rzh2LzVHRXZObDJKWUUvamtlYlVod0RjbFV6ZElFYkNWVThSa201SjZGTEdJ?=
- =?utf-8?B?Y0hGd3lMRm5EWWZyaXIyMmFjSFdNOGhEVzg4QWltbERoMGw3NjhxL2t0Z0ti?=
- =?utf-8?B?MmY3VXBWVmU0aUl4bmhQQjlZcmsyTjlEMG5GdVVMZ1hLYnM3bHMvV21IZUdJ?=
- =?utf-8?B?dW5CRGpiNnJuRmNBZ1dEVVZudlNxbG9wWlRqaEowY1Q4Wkw0dUt2M3VnajNH?=
- =?utf-8?B?eTBnNjRwaEhwZXBhenNORTA0c3FFaWhTU0JORGRURW1PK1ZqU1BjcUlmQnFs?=
- =?utf-8?B?dDZGRVBXd0w2UmVneUp2ZlpadzFmY1UrcFBXZ0JBNm9ObG05bmQ5K2RpUHJF?=
- =?utf-8?B?YXlBWHAzYUVFVjdXZ0lHaTVzaHRjOW5KYXpYUE1FTzYyMnpqQUhBUUZUaTRu?=
- =?utf-8?B?OFFwOGZma3VjSlZMWmN0ZTVIZDFPellxbEQwVUZ5WXJPbEhFRkxDMTVQZkhr?=
- =?utf-8?B?VFhsOWVRWERlTXRMYzhKNzJCMnpqU1NadTA4QXd6V1p0UE12bDhuWVdCK01s?=
- =?utf-8?B?ajZQZGthZFpOall4dHpkV1lzOWtibHhNVzBXUE8zV2NPU0NnQ1VxU1FlamJY?=
- =?utf-8?B?MkNRL00yV3NDeVN5K3R0c3JSTkJDZ0VROXVaQ2h2dGNIUlpkdkRJVFVHQ2lx?=
- =?utf-8?B?eExUcnFLRGpvaGdUN1FnZ1pQT0JURjRQcmZ5dDF4d3dJUnk4WDlmdlg0MU95?=
- =?utf-8?B?NVdVMXZUVC9aWENMUHNPOWVha0dhSDZqdml2MCtaMnJYZ3czcWJtZHloV3NB?=
- =?utf-8?B?RTBZcVBqSnAxUTc3eXpUN2RscG5lcHhaZ2FkZW1iK1dROHNrNGJNdnpjY2Mv?=
- =?utf-8?B?WWgxVUlhMnEwYnJROVZUcXArWWJnaDU2M2pZc2ZPL1cyUHRwc1BNZ0hhUlZF?=
- =?utf-8?B?bnMzdE1JdStmMjB2WlJWMFRRczhjWDFHSkcvN05MWldtWDlVWWlrUHQrZDFq?=
- =?utf-8?B?c2R2MWo5NGIvVTB5MDQrejBRMjlNZE9rL1ZXVkN2Z1p1NVNGZzRvdTNJODJZ?=
- =?utf-8?B?alNRV0ZKSGMxK3FPamZsZGV2Tzd0dUJBMElKZllWTVFCaFk3TnRlR0pxYmo0?=
- =?utf-8?B?NDZZM3kvd2lrN29zMno5bjcvYlpOMTN0aS95OXBmNjF2YjlTMi9JSm9uV0Jr?=
- =?utf-8?B?eUFxd3NaaHR6RnZRbFBmRTVIdkZNTVFSWGx4WjVOREpBM3lTSmhjSVpZSXBX?=
- =?utf-8?B?YnFMZXlQbGVpNkx2Qm8remMwek10Q0dwMnVUNGVIMGM3Q0UxcExUakcvcmoy?=
- =?utf-8?B?S2g5RDRDay84UGlBYVFsNDNsQzNSZ1FkUFZyYTRLdlE5L0Q2NHpXbFdZa0c4?=
- =?utf-8?B?YXN0VDBHY2IrVVhMc0lLMVk5UmJ5WWQ2Y3RtTStNRURPa2JtNWFmMDk1Y01B?=
- =?utf-8?Q?O+x15KKEdzyH7?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6f349f2-bdb5-484b-b98a-08d8fb50d307
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2021 12:13:03.0818
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1rsD9nmEfqcfykcgBr4NOkkr4CCu2aO3xXDsOKO9TkwsujYt0ej1P+Vx07rQo2Pk
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6928
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <625170.1617971734.1@warthog.procyon.org.uk>
+Date:   Fri, 09 Apr 2021 13:35:34 +0100
+Message-ID: <625171.1617971734@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+Matthew Wilcox <willy@infradead.org> wrote:
 
-Friendly ping to the man page maintainers
+> iirc i looked at doing this as part of the folio work, and it ended up
+> increasing the size of the kernel.  Did you run bloat-o-meter on the
+> result of doing this?
 
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+add/remove: 2/2 grow/shrink: 15/16 up/down: 408/-599 (-191)
+Function                                     old     new   delta
+iomap_write_end_inline                         -     128    +128
+try_to_free_swap                              59     179    +120
+page_to_index.part                             -      36     +36
+page_size                                    432     456     +24
+PageTransCompound                            154     175     +21
+truncate_inode_pages_range                   791     807     +16
+invalidate_inode_pages2_range                504     518     +14
+ceph_uninline_data                           969     982     +13
+iomap_read_inline_data.isra                  129     139     +10
+page_cache_pipe_buf_confirm                   85      93      +8
+ceph_writepages_start                       3237    3243      +6
+hpage_pincount_available                      94      97      +3
+__collapse_huge_page_isolate                 768     771      +3
+page_vma_mapped_walk                        1070    1072      +2
+PageHuge                                      39      41      +2
+collapse_file                               2046    2047      +1
+__free_pages_ok                              449     450      +1
+wait_on_page_bit_common                      598     597      -1
+iomap_page_release                           104     103      -1
+change_pte_range                             818     817      -1
+pageblock_skip_persistent                     45      42      -3
+is_transparent_hugepage                       63      60      -3
+nfs_readpage                                 486     482      -4
+ext4_readpage_inline                         155     151      -4
+release_pages                                640     635      -5
+ext4_write_inline_data_end                   286     281      -5
+ext4_mb_load_buddy_gfp                       690     684      -6
+afs_dir_check                                536     529      -7
+page_trans_huge_map_swapcount                374     363     -11
+io_uring_mmap                                199     184     -15
+io_buffer_account_pin                        276     259     -17
+page_to_index                                 50       -     -50
+iomap_write_end                              375     306     -69
+try_to_free_swap.part                        137       -    -137
+PageUptodate                                 716     456    -260
+Total: Before=17207139, After=17206948, chg -0.00%
 
