@@ -2,78 +2,131 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 805ACC433B4
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 07:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC59C433ED
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 08:14:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 58D2861168
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 07:41:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2837E611AB
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 08:14:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231496AbhDIHl1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Apr 2021 03:41:27 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:16429 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229751AbhDIHl0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Apr 2021 03:41:26 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FGqlB5r3ZzlWFc;
-        Fri,  9 Apr 2021 15:39:18 +0800 (CST)
-Received: from localhost.localdomain (10.175.101.6) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 9 Apr 2021 15:40:59 +0800
-From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
-To:     <zhangxiaoxu5@huawei.com>, <sfrench@samba.org>,
-        <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-        <yukuai3@huawei.com>, <sprasad@microsoft.com>
-Subject: [PATCH] cifs: Fix build error when no CONFIG_DNS_RESOLVER
-Date:   Fri, 9 Apr 2021 03:46:34 -0400
-Message-ID: <20210409074634.1809521-1-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.25.4
+        id S232267AbhDIIOs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Apr 2021 04:14:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50867 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229803AbhDIIOs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Apr 2021 04:14:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617956075;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6YraNPigCCa2QjWFUNdLS4ExsZNHhjTNhXM21Vxjs0s=;
+        b=iJChKhVkUCP1rBz+XPVkh7PCBL8WNYEFM/rwwWA3XR6txE1Ydf17DkGxKS3ueL6Yi2y49W
+        K7L82Ox2YVI6xkHO/v2Uu5glFLjeUc12gpIoLbt61xxSwGGr6rutiOi+Y7r/pzhNfWbxw+
+        duzG6zgQfXHa0+3H7svN/1sKdn8S06Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-01GEC8DGP-Cp7uL9zOpe3g-1; Fri, 09 Apr 2021 04:14:33 -0400
+X-MC-Unique: 01GEC8DGP-Cp7uL9zOpe3g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9A5510054F6;
+        Fri,  9 Apr 2021 08:14:31 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-119-35.rdu2.redhat.com [10.10.119.35])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C66C160BE5;
+        Fri,  9 Apr 2021 08:14:25 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wi_XrtTanTwoKs0jwnjhSvwpMYVDJ477VtjvvTXRjm5wQ@mail.gmail.com>
+References: <CAHk-=wi_XrtTanTwoKs0jwnjhSvwpMYVDJ477VtjvvTXRjm5wQ@mail.gmail.com> <20210408145057.GN2531743@casper.infradead.org> <161789062190.6155.12711584466338493050.stgit@warthog.procyon.org.uk> <161789066013.6155.9816857201817288382.stgit@warthog.procyon.org.uk> <46017.1617897451@warthog.procyon.org.uk> <136646.1617916529@warthog.procyon.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Linux-MM <linux-mm@kvack.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC][PATCH] mm: Split page_has_private() in two to better handle PG_private_2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <184802.1617956064.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 09 Apr 2021 09:14:24 +0100
+Message-ID: <184803.1617956064@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-hulk robot following build error:
-  ld: fs/cifs/dns_resolve.o: in function `dns_resolve_server_name_to_ip':
-  dns_resolve.c:(.text+0x154): undefined reference to `dns_query'
-  make: *** [Makefile:1251: vmlinux] Error 1
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-Fixes: e488292a31fa ("cifs: On cifs_reconnect, resolve the hostname again.")
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
----
- fs/cifs/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> >  #define PAGE_FLAGS_PRIVATE                             \
+> >         (1UL << PG_private | 1UL << PG_private_2)
+>
+> I think this should be re-named to be PAGE_FLAGS_CLEANUP, because I
+> don't think it makes any other sense to "combine" the two PG_private*
+> bits any more. No?
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index fe03cbdae959..0d8199765045 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -18,6 +18,7 @@ config CIFS
- 	select CRYPTO_AES
- 	select CRYPTO_LIB_DES
- 	select KEYS
-+	select DNS_RESOLVER
- 	help
- 	  This is the client VFS module for the SMB3 family of NAS protocols,
- 	  (including support for the most recent, most secure dialect SMB3.1.1)
-@@ -179,7 +180,6 @@ config CIFS_DEBUG_DUMP_KEYS
- config CIFS_DFS_UPCALL
- 	bool "DFS feature support"
- 	depends on CIFS
--	select DNS_RESOLVER
- 	help
- 	  Distributed File System (DFS) support is used to access shares
- 	  transparently in an enterprise name space, even if the share
--- 
-2.25.4
+Sure.  Do we even want it still, or should I just fold it into
+page_needs_cleanup()?  It seems to be the only place it's used.
+
+> > +static inline int page_private_count(struct page *page)
+> > +{
+> > +       return test_bit(PG_private, &page->flags) ? 1 : 0;
+> > +}
+>
+> Why is this open-coding the bit test, rather than just doing
+>
+>         return PagePrivate(page) ? 1 : 0;
+>
+> instead? In fact, since test_bit() _should_ return a 'bool', I think eve=
+n just
+>
+>         return PagePrivate(page);
+
+Sorry, yes, it should be that.  I was looking at transforming the "1 <<
+PG_private" and completely overlooked that this should be PagePrivate().
+
+> should work and give the same result, but I could imagine that some
+> architecture version of "test_bit()" might return some other non-zero
+> value (although honestly, I think that should be fixed if so).
+
+Yeah.  I seem to recall that test_bit() on some arches used to return the
+datum just with the other bits masked off, but I may be misremembering.
+
+In asm-generic/bitops/non-atomic.h:
+
+static inline int test_bit(int nr, const volatile unsigned long *addr)
+{
+	return 1UL & (addr[BIT_WORD(nr)] >> (nr & (BITS_PER_LONG-1)));
+}
+
+should perhaps return bool?
+
+I wonder, should:
+
+	static __always_inline int PageTail(struct page *page)
+	static __always_inline int PageCompound(struct page *page)
+	static __always_inline int Page##uname(struct page *page)
+	static __always_inline int TestSetPage##uname(struct page *page)
+	static __always_inline int TestClearPage##uname(struct page *page)
+
+also all return bool?
+
+David
 
