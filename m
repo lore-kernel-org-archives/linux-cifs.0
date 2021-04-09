@@ -2,140 +2,152 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFA7C433B4
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 04:55:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DC1C433B4
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 05:23:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7BA2361177
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 04:55:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9952610C8
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 05:23:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229715AbhDIEz4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Apr 2021 00:55:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43534 "EHLO
+        id S231540AbhDIFYA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Apr 2021 01:24:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbhDIEz4 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Apr 2021 00:55:56 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFF7AC061760
-        for <linux-cifs@vger.kernel.org>; Thu,  8 Apr 2021 21:55:43 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id x8so70076ybx.2
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Apr 2021 21:55:43 -0700 (PDT)
+        with ESMTP id S229840AbhDIFXs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Apr 2021 01:23:48 -0400
+Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C90C061763
+        for <linux-cifs@vger.kernel.org>; Thu,  8 Apr 2021 22:23:35 -0700 (PDT)
+Received: by mail-ua1-x932.google.com with SMTP id r20so1460227uam.6
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Apr 2021 22:23:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7qyVwjO+2aW8+q2wKA7u0X87h3DMFKB2eaL8s0yZKWU=;
-        b=R4GQ9IEEnwxLkSsXiS92g6QdGlyFlSFHOoiIqTtc4Em2k9ft2vTFDtDHWBx9+yn2rD
-         TBboV4BTPhgJmFNWtapguz3fs9UguBTYhRrFgrEDdVUk8GcDgIjSjTqtAkMorxSpf0vW
-         kAAogQj5w5oeDqXLC1UKSsGb/yV/GeNkIVI+WXW1aEMiyjjR9jnKpiKoUrPFOglV9FlE
-         +Wr7ta51bEX01fKy/H0xXbKVu4G+Bfo/zXCtVw/GVR5vOB4Ufd8KkQnTDFFnRP/EZsf3
-         RjFyYNBlUgBWl0l7r0kKjQmSNeeSm034rV3jjRPCr7d3gzVG8MUd41KQdMjqSbtT+4Xz
-         sJTg==
+         :cc:content-transfer-encoding;
+        bh=gTs7X0Kha8yyPPjoketYAk4TM4kCJYNv+QtbVLV11qw=;
+        b=JBxB536edN2icemaU8QdaNm6AYnLTCaemM3Ithzlz1Np8v6pO1wJVYu2ejP+rZfSsz
+         3qTVcd9dZRn1Feo6qXBUuDjeMAnnW2T0zl5u/1BBTcFJ+rKqnzY7gZyIabasGO0cSGPX
+         8205mExpo36r3SKCYZ/4AByGCO1VBW7dAvtH8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7qyVwjO+2aW8+q2wKA7u0X87h3DMFKB2eaL8s0yZKWU=;
-        b=pR6iHgZAQ5r9qSp6kxK2W6vRgpawmgDCxaZOQHRVuGz+/7dgEfua4QT7wElC49HpUH
-         6qppYs3V74d+LrZgRLEATYpNvrgnAl9OxZZjOXFQ+xyS9tTGx3ZE9keo0D9nBoZr7h9h
-         JHK+uCFpx8eJp/ttOXN0DMyVL5qxPY+KXl4HajFW+LrTIrekWE65SkmU4dC62YzJNlSS
-         CU55cut951K4sUppxxhwrzOzzpQLx+Ld6CRVM4qvNBv4rlriFskXQAW8YoyKqI4H1p0G
-         SHQO3EF7QoSZLC4gMfwsSsLY7GNA2+yniY6/cbJTu9yZ4XmaPwoh8OAzVWkZuN3X0mr9
-         RDng==
-X-Gm-Message-State: AOAM533e7bAmyJMwR95AO5kkmu7uIkNLzPte6EpmDuyWKZNg169+cwRR
-        p5ZXUGQ8XZwVRcd06nRDYgdD//8mOJjWq+PrP9cm3hVc
-X-Google-Smtp-Source: ABdhPJyZDTe01oGrPwg7N+OcMAGNjiBAxjDrYZGvuwH9ijvRo/X9tnbDTJmQ3mFlLPHpQw9ZSLQOjuO+LS46bmIZBc4=
-X-Received: by 2002:a25:ef42:: with SMTP id w2mr15949875ybm.34.1617944142140;
- Thu, 08 Apr 2021 21:55:42 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=gTs7X0Kha8yyPPjoketYAk4TM4kCJYNv+QtbVLV11qw=;
+        b=XwbEjt1L7wAT3ePY9DX/zPSlB6tkvy3ZczYePIFj5OTXinyliA8PhwuxO3WdrwA2d9
+         WyYIf1OfqVeuQMi0NwnoiZCkkXEWZbxD3v6mgp8BsmZo/hAn/9ljZJFxbY5jiQi96toR
+         MV7Q7wNNHk4sNZqxvFYMBmV1bGPRTUHH5TXF6k+9YX1248EcJst5W0Iog2XJiHbPxUWs
+         k6aFdCZetyMmX42UUIsopZZgGRdTZutunuCg5gEB+3eVI8dHNuBoMrtEKuyX67Doj6WB
+         E9bCk+rqzQmsH9ghEl9J6HdAVIuWM/HN5pjpAe+DbTMmaHXnhdL5d0hH3IYF9/g0IuNw
+         26cQ==
+X-Gm-Message-State: AOAM532RIbbYy9qv8kAyk56e2zQYC5F0Ds4Hj32uSwPFP+7kDgIy46Je
+        JvLvUUpwAjs6aiU8+zHH/VR/z42/LDS0aFrFzn/SYQ==
+X-Google-Smtp-Source: ABdhPJyiEqe2/5BdCT+RzysMIjR0yOEhjnFfYuWD4d3HBGwzC0gqP0VjxLNWerB7XM2SkAAm/TzcFU4LTi8Xfv/RYMA=
+X-Received: by 2002:ab0:7593:: with SMTP id q19mr9451736uap.74.1617945814814;
+ Thu, 08 Apr 2021 22:23:34 -0700 (PDT)
 MIME-Version: 1.0
-References: <CA+V7QS9gJ+WX6iVsRBaCoHZXwr-zPQSNWbsUqk=N06xAYv1N6g@mail.gmail.com>
-In-Reply-To: <CA+V7QS9gJ+WX6iVsRBaCoHZXwr-zPQSNWbsUqk=N06xAYv1N6g@mail.gmail.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Fri, 9 Apr 2021 10:25:31 +0530
-Message-ID: <CANT5p=q=RmfmPNahsx=E0Ec_W7o6+=JeSPB2m5Vm7pVzuANzRg@mail.gmail.com>
-Subject: Re: Query - cifscreds usage
-To:     Richard Beare <richard.beare@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+References: <20210221195833.23828-1-lhenriques@suse.de> <20210222102456.6692-1-lhenriques@suse.de>
+ <CAN-5tyELMY7b7CKO-+an47ydq8r_4+SOyhuvdH0qE0-JmdZ44Q@mail.gmail.com>
+ <YDYpHccgM7agpdTQ@suse.de> <CANMq1KBgwEXFh8AxpPW2t1SA0NVsyR45m0paLEU4D4w80dc_fA@mail.gmail.com>
+In-Reply-To: <CANMq1KBgwEXFh8AxpPW2t1SA0NVsyR45m0paLEU4D4w80dc_fA@mail.gmail.com>
+From:   Nicolas Boichat <drinkcat@chromium.org>
+Date:   Fri, 9 Apr 2021 13:23:23 +0800
+Message-ID: <CANMq1KDTgnGtNxWj2XxAT3mdsNjc551uUCg6EWnh=Hd0KcVQKQ@mail.gmail.com>
+Subject: Re: [PATCH v8] vfs: fix copy_file_range regression in cross-fs copies
+To:     Luis Henriques <lhenriques@suse.de>
+Cc:     Olga Kornievskaia <aglo@umich.edu>,
+        Amir Goldstein <amir73il@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        Andreas Dilger <adilger@dilger.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-nfs <linux-nfs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Richard,
+On Wed, Feb 24, 2021 at 6:44 PM Nicolas Boichat <drinkcat@chromium.org> wro=
+te:
+>
+> On Wed, Feb 24, 2021 at 6:22 PM Luis Henriques <lhenriques@suse.de> wrote=
+:
+> >
+> > On Tue, Feb 23, 2021 at 08:00:54PM -0500, Olga Kornievskaia wrote:
+> > > On Mon, Feb 22, 2021 at 5:25 AM Luis Henriques <lhenriques@suse.de> w=
+rote:
+> > > >
+> > > > A regression has been reported by Nicolas Boichat, found while usin=
+g the
+> > > > copy_file_range syscall to copy a tracefs file.  Before commit
+> > > > 5dae222a5ff0 ("vfs: allow copy_file_range to copy across devices") =
+the
+> > > > kernel would return -EXDEV to userspace when trying to copy a file =
+across
+> > > > different filesystems.  After this commit, the syscall doesn't fail=
+ anymore
+> > > > and instead returns zero (zero bytes copied), as this file's conten=
+t is
+> > > > generated on-the-fly and thus reports a size of zero.
+> > > >
+> > > > This patch restores some cross-filesystem copy restrictions that ex=
+isted
+> > > > prior to commit 5dae222a5ff0 ("vfs: allow copy_file_range to copy a=
+cross
+> > > > devices").  Filesystems are still allowed to fall-back to the VFS
+> > > > generic_copy_file_range() implementation, but that has now to be do=
+ne
+> > > > explicitly.
+> > > >
+> > > > nfsd is also modified to fall-back into generic_copy_file_range() i=
+n case
+> > > > vfs_copy_file_range() fails with -EOPNOTSUPP or -EXDEV.
+> > > >
+> > > > Fixes: 5dae222a5ff0 ("vfs: allow copy_file_range to copy across dev=
+ices")
+> > > > Link: https://lore.kernel.org/linux-fsdevel/20210212044405.4120619-=
+1-drinkcat@chromium.org/
+> > > > Link: https://lore.kernel.org/linux-fsdevel/CANMq1KDZuxir2LM5jOTm0x=
+x+BnvW=3DZmpsG47CyHFJwnw7zSX6Q@mail.gmail.com/
+> > > > Link: https://lore.kernel.org/linux-fsdevel/20210126135012.1.If45b7=
+cdc3ff707bc1efa17f5366057d60603c45f@changeid/
+> > > > Reported-by: Nicolas Boichat <drinkcat@chromium.org>
+> > > > Signed-off-by: Luis Henriques <lhenriques@suse.de>
+> > >
+> > > I tested v8 and I believe it works for NFS.
+> >
+> > Thanks a lot for the testing.  And to everyone else for reviews,
+> > feedback,... and patience.
+>
+> Thanks so much to you!!!
+>
+> Works here, you can add my
+> Tested-by: Nicolas Boichat <drinkcat@chromium.org>
 
-Why not use cifscreds to store your user credentials against the
-server? And then use an additional mount option "multiuser".
-I haven't tried this yet, but I feel that should work for your use case.
+What happened to this patch? It does not seem to have been picked up
+yet? Any reason why?
 
-Let me know if I'm missing anything here.
-
-Regards,
-Shyam
-
-On Thu, Mar 18, 2021 at 3:41 AM Richard Beare <richard.beare@gmail.com> wrote:
->
-> Hi,
-> Apologies in advance if this is the wrong forum. Getting help
-> documentation directed me here. I'm setting up a small set of
-> workstations with what I hope to be three types of users, and would
-> like to clarify whether certain parts of the cifs configuation are
-> possible - something I haven't been able to determine from manuals or
-> google to date.
->
-> The base system is ubuntu 20.04lts:
->
-> uname -r
-> 5.4.0-67-generic
->
-> mount.cifs -V
-> mount.cifs version: 6.9
->
-> The current setup of the machine successfully handles the cifs mount
-> via pam_mount. The mount uses ntlmssp credentials, with a command
-> like:
->
-> MOUNT_OPTIONS="-o
-> username=${USER},uid=${_UID},gid=${_GID},domain=DOMAIN,sec=ntlmssp,vers=2.1"
-> AD_SHARE="//ad.host/home/user${USER_FOLDER}/${USER}"
->
-> mount -t cifs ${AD_SHARE} ${_MNTPT} ${MOUNT_OPTIONS}
->
-> There is no kerberos for the cifs share available to linux.
-> What I'd like to know is whether it is possible to use kernel key
-> credentials, like those stored with cifscreds, to authenticate a mount
-> request at other times.
->
-> For example, might it be possible to capture those credentials in the
-> pam process and then later issue a mount command that does not prompt
-> for a password? My interpretation of the docs suggests that it isn't
-> possible - the credentials are used to control access to an already
-> mounted share, rather than perform the initial mount.
->
-> I'd like to be able to have both cifs and nfs mounts happening in the
-> same place under autofs control, but without placing credentials in
-> files. The cifscreds option seems very close, but not quite right - is
-> my interpretation right?
->
->
-> More information on why I'm asking this - I'd like a user to be able
-> to authenticate against AD,
-> get checked against some list, have an nfs mounted home directory
-> provided if available and the cifs share mounted elsewhere for
-> convenience. A cifs share gets used for home folders if the user isn't
-> on the special list. Any user should be able to trigger automounts of
-> nfs home folders by accessing them, as in a typical pure linux setup.
->
-> The other option I think may be viable is modification of the home
-> folder location during the login process, but I can't see how to
-> achieve that either.
-> Thanks
-
-
-
--- 
-Regards,
-Shyam
+> >
+> > I'll now go look into the manpage and see what needs to be changed.
+> >
+> > Cheers,
+> > --
+> > Lu=C3=ADs
