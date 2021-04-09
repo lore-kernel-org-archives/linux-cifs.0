@@ -2,146 +2,155 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8607C433B4
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 14:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4780BC433B4
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 14:26:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9EEE61181
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 14:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CA4F61165
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 14:26:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233768AbhDIOGS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Apr 2021 10:06:18 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:25691 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233745AbhDIOGQ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Apr 2021 10:06:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1617977162;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cEmqoJyXGBCLmwz23DXaJshEzbSz6IO/BJQGgho3Gk8=;
-        b=E5DcTTedkUgFID9vPWXJqqnzr3U5oTnRE1cgfSxyFbHCdVQO1vi+hus0D2GTmnteTcNu7x
-        k4g7WEW+QtSP7k+H6jMMAqwlGR57xIqptofASDw36VPyf+AQepVQNMyjVusKGLxwSkiJ09
-        LUjmujcBRMQYrn8Zl+rJupuJm4XhAbY=
-Received: from EUR02-HE1-obe.outbound.protection.outlook.com
- (mail-he1eur02lp2053.outbound.protection.outlook.com [104.47.5.53]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-36-Jvb0FK9HPte_4fRLJFufcw-1; Fri, 09 Apr 2021 16:05:56 +0200
-X-MC-Unique: Jvb0FK9HPte_4fRLJFufcw-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HgNehyOb4kR5K/0NAX8wFWs3+LElHaMKGDTXRn2KhrXtC49gSkv8lDlokj6mGKuwiM89rIkFqcFL/mWlwDInxVkYGd2qasV+du4UwkI8FzdQxoL5v4wWMusG/7GSFyMc3u52gqmWOg2zWxALlK6q0OIvUHaIP+siFp/qRNdyGgXDBRe+sTNbbE3fAUIZH+wCZirs18ZXGWG9miyczi5fophZQECu6n+ZZcBuBFESzuFpdvWdRwijjwDoLqprUQFdQhM6RmIJrcc6/CoQaCKXRzKm90bCS0cHExML+pv8opHOBM05rgnQaQcBA2YGO1eERO0yfz2roeYLvsBsY6KtdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cEmqoJyXGBCLmwz23DXaJshEzbSz6IO/BJQGgho3Gk8=;
- b=O+rAVS8sBFbmj3JSVrRzKHvRRql04FAW0pL/QL2Pw25NG8nUkSoqUYlN3dzlNGL70fDIqBHRlxj9043CM5glmD8/VR6zBPr+05wv4p6eLoYexPVyb/ovJnFKqiePc5Ltar/eAtv8PmxECJTna+szZxhuF5NnOdZ8Kk/Fp263r5aCC+C2IBp+8wWo4HTOzz6oKaXns9frDD2NQ8xmNrQcO9NXMDBOAkpxMuksTZZbNdy30VXwJbzxbg/a1QqqiV55EEXvrDOA2uYdOPauczx2KzphCPPBntvFPuoxTTAFxNdqondcAmE8uLLbLcEVr3yJsXyERm04ixxeOqQVLhv5tA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VE1PR04MB6720.eurprd04.prod.outlook.com (2603:10a6:803:123::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.29; Fri, 9 Apr
- 2021 14:05:54 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94%5]) with mapi id 15.20.3999.035; Fri, 9 Apr 2021
- 14:05:54 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     =?utf-8?Q?J=2E_Pablo_Gonz=C3=A1lez?= <disablez@gmail.com>,
-        linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] smbinfo: Add command for displaying alternate data streams
-In-Reply-To: <CAMM8u5miX1JbzWMG3WLZLZeD1_ZL=6nufWJaT7ensA+yPo5zeQ@mail.gmail.com>
-References: <CAMM8u5miX1JbzWMG3WLZLZeD1_ZL=6nufWJaT7ensA+yPo5zeQ@mail.gmail.com>
-Date:   Fri, 09 Apr 2021 16:05:52 +0200
-Message-ID: <87r1jj364f.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:705:3046:69ee:cad4:97e6:ea8f]
-X-ClientProxiedBy: ZR0P278CA0099.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:23::14) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+        id S233409AbhDIO0p (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Apr 2021 10:26:45 -0400
+Received: from p3plsmtpa06-08.prod.phx3.secureserver.net ([173.201.192.109]:36800
+        "EHLO p3plsmtpa06-08.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231756AbhDIO0o (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Apr 2021 10:26:44 -0400
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id Us5VlwAa2dm6ZUs5Wl5bWv; Fri, 09 Apr 2021 07:26:30 -0700
+X-CMAE-Analysis: v=2.4 cv=U/hXscnu c=1 sm=1 tr=0 ts=60706416
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=RpEpbWADTCFOjAt6Sx0A:9 a=QEXdDO2ut3YA:10
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [PATCH rdma-next 00/10] Enable relaxed ordering for ULPs
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Chuck Lever III <chuck.lever@oracle.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Adit Ranadive <aditr@vmware.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Devesh Sharma <devesh.sharma@broadcom.com>,
+        Faisal Latif <faisal.latif@intel.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Bruce Fields <bfields@fieldses.org>, Jens Axboe <axboe@fb.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, Lijun Ou <oulijun@huawei.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Michael Guralnik <michaelgur@nvidia.com>,
+        Michal Kalderon <mkalderon@marvell.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Naresh Kumar PBS <nareshkumar.pbs@broadcom.com>,
+        Linux-Net <netdev@vger.kernel.org>,
+        Potnuri Bharat Teja <bharat@chelsio.com>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        Selvin Xavier <selvin.xavier@broadcom.com>,
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        Somnath Kotur <somnath.kotur@broadcom.com>,
+        Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+        Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        VMware PV-Drivers <pv-drivers@vmware.com>,
+        Weihang Li <liweihang@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>
+References: <20210405052404.213889-1-leon@kernel.org>
+ <20210405134115.GA22346@lst.de> <20210405200739.GB7405@nvidia.com>
+ <C2924F03-11C5-4839-A4F3-36872194EEA8@oracle.com>
+ <20210406114952.GH7405@nvidia.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <aeb7334b-edc0-78c2-4adb-92d4a994210d@talpey.com>
+Date:   Fri, 9 Apr 2021 10:26:21 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:705:3046:69ee:cad4:97e6:ea8f) by ZR0P278CA0099.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:23::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.17 via Frontend Transport; Fri, 9 Apr 2021 14:05:54 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: dddfc906-9ad7-4b7a-6a43-08d8fb609722
-X-MS-TrafficTypeDiagnostic: VE1PR04MB6720:
-X-Microsoft-Antispam-PRVS: <VE1PR04MB67209651CCF5F583A199609CA8739@VE1PR04MB6720.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7nBmVpgz56ZbXg5pLt1P3GjsuDxgSxJfCaX4e1pPBcw0zDmsnEtqT5QuJaTu736UJwVsGnS3zckbf631onI9mEqFWERS3OuB2Eq/teUGEmpdOT4l3HZDySKpUN07LwvqR84Gy3PO7rohydwEC4iKh4C/QPVb3I/oBLnTsTF9x0gt3glpspOys3NzXzn+2aixwJuVQ8SaNRrg5e8Kr7b+nkT9WCkx4xH1h1i6081eaBvA4apeMBC25odX7nDEFJnNnMV6NX9hKI7NmtMXpf5TeZ1YYMSHtZToFaM1EeoLCbEEFCFXD6WvI975Z+2vluXyTvW8pDYPRLQZGwhZejb5VuHvPqrE8tkAOnm/Iham7dkn7h0Uyyp6Lcpd8YfxAIV0v7oL6TkvlceJvJp8mVB24Y6W2QRj00194f3yFjB5swt3RkOxbzb/4/LG1TNT3gOe14O8SRIv9ckoKWeSIerooOijOEsT3PHbwl2j7MNKBYpt/WTekQNGtXIgE7uk9P6JhDpg9vMMKvZFCtKyOKxMCz6Vo+XkHMJW+02Ie1H5E6XeAJIBZ4m/vdGlgI9e+bYs1eZU1gtg2bRez1kZ4ZmTLIASG8tlKdlWOxxkCjXuKXKJW56kRcU9mBT7H0Y+x3Ih/0LheQs4k2cp9dC3BALVcA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(346002)(376002)(39860400002)(366004)(136003)(2616005)(6496006)(478600001)(2906002)(36756003)(38100700001)(4744005)(66946007)(5660300002)(86362001)(66476007)(66556008)(186003)(52116002)(8676002)(316002)(8936002)(16526019)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?SGxkcWxpYkVPdzJUOUZxN0sxemR0bXo3dStEa2YyODY3bzJweVFoYmVCS040?=
- =?utf-8?B?WkVXZkVvU1NVYTBpYjEyT1gyK1NNMHptTUFTdnhCNkc2WXo4UkkrUytNTk9w?=
- =?utf-8?B?T0Znenp4SWNhWHdDcVFDd1BBMFd3VTZIVUpoNW9nL0k4TTliNllGUkJibmxV?=
- =?utf-8?B?WXpnNHRKOW0xRWxwUHdSQnA1aGNwWHlzYmNUbUp0dTYxalp2QkQxUjVlSE44?=
- =?utf-8?B?b2sxOUdwZS91S3RvelRzU0NnQTN1elM3dU15emNFOGh6bTlvWS9ycVVkb09p?=
- =?utf-8?B?emJhUHZXblVjQ2pUZDFLczZnMWluRGpzV2plYWhmZm1RNmswZ3BMQlBTQ0Yw?=
- =?utf-8?B?d2JiQkRwaTB0NktmRzZHazQzY2VUeStJd3ZqMnMyK3RkWUJpR1FLYkpXZHR6?=
- =?utf-8?B?WW9ISXdlYm1JbGRvRlhJRCtwSGttTXpPMDk4Nm5VRUxlZWFQNkFzVHd4V0Na?=
- =?utf-8?B?TU9uaWxZOTRsN0V5eFhBbDh5b0FGejVmZ2pEUGkzUWY1ZEFWRkp3RXZoeHpt?=
- =?utf-8?B?RjJxN1dENmtFellBM2VmWkU3UFhRN21NRlJKWi9SeGtNb1ZPQUZhSllxdGZs?=
- =?utf-8?B?bVIxckU3OS9neUR4NnlZWTBCTWxZeGNQcVRyZTFscnp2V0pwSzZFMmx3Yjhn?=
- =?utf-8?B?dHdjemZLNW9UdnRSMzNOc3pKT1ZIdTQxaHI4b2pTRUlLVUUyeXNWcWIrckcw?=
- =?utf-8?B?OVZxVmMvM01TbGwwQ3RkNm9tQmdPTEQ2M2tpdk1lVGFqbXE0ZXpCdlRGVXEw?=
- =?utf-8?B?NnBHUTQ3b1c0SjRiY3kvMldxTGQ0L2NCaWNabU1YazhVTkE4YkczaUxOZzFv?=
- =?utf-8?B?UWV0TStrWUFUQ0dCRnoydVhTbGNROXh2dVNmMHdKQUk4bE1Vb1IxUGVEZklo?=
- =?utf-8?B?NFNDbklVMXZheHU5SGFHaFBxVGxsS1NmVTlVaWkzM0llZTNsNmp4SVpRUDYz?=
- =?utf-8?B?aTZYWFFJOWwrU1BzUDNCbnIxUGlNK3VEOHZTbXdSSml2TjhQd05FWG56S25Y?=
- =?utf-8?B?a0c3d1lFSE1xZmZvWndPZ1kwWDNJd0tva2FXZGJQeURYNElPREFycERBODFQ?=
- =?utf-8?B?bUlmVzcwVFFyM1F6eThLVnVqZjBNSWFCQWRENFpKODBUK2FPTUJ1bnVZQVR6?=
- =?utf-8?B?ZlJKSXBLUi8vU1NzRmwxdUUrRUZKUHRBZEU5a0huMGkxOHdnbVpJNHJ2SllV?=
- =?utf-8?B?bm1RUHMrYXBaQmh1dmVBc3B3YlFQVHByc2xxVFllNnJOVm52SE9MZ1dwSE1m?=
- =?utf-8?B?a1RJNHJJTGdlZTAzNkhWSWZvdzg4YWdVTHlvY0ZPVGVtR3N0K2lBczdvNS96?=
- =?utf-8?B?SDlhenBxTk1zWDRvUCs3MmlEZFY0ZTNGejdzSzFQNk1lYXlJRk54RGhLTHM2?=
- =?utf-8?B?eTh2bENRK2grNFdxQzNEOCt5Sk1RR0o3eDhneGZlR2YyVERNMVp3Ukc5ODN4?=
- =?utf-8?B?MnpzVlZQTmhZSm1EV3lrYTcvcm9Jak5XQlBQZVNvZmxYNzhyc3pLT3JIcVlk?=
- =?utf-8?B?MGtOczArd2tCbXBsSlhpbjgwMG1EWnRqNW8xVnBSUUZBOHlMRXBFK0VYdUpY?=
- =?utf-8?B?aVYyS29JTnJXNkpFZzV0RnpTaU5qVm5vbDluZjVBUXFNLytMTEQzMTRicDhU?=
- =?utf-8?B?MXBHR3pwWTJUNEU5QU9LY0c1M09QSk8rK3A1dEtBcmlGUWNsa2ZEMXBHSUty?=
- =?utf-8?B?cnZqNms3eFhYSXozZGV4bVFiZ3RQR0F2REUxK3Z6WS9Dd2wrWll1Y3JOem9R?=
- =?utf-8?B?WGViL21DcVQzd1ZGcStPTXl1cHNqeWJrMTdRd1k5MHhIR2Rhamd2QWQwdTBq?=
- =?utf-8?B?S3MxRnlEN2w3SmVDWTZlSFNXcFlJMEIyM1dzL3RzZ05QODJ3ZDN0UVh0cDdm?=
- =?utf-8?Q?NJ8JhhJBClqlB?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dddfc906-9ad7-4b7a-6a43-08d8fb609722
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2021 14:05:54.5021
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EmDtTH1czIK3YHOo/N5J4lHNu3mC2DfIMjO3ybUe/D7WCSQshqR7q9/iCjgX5o5n
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB6720
+In-Reply-To: <20210406114952.GH7405@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: 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
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-J. Pablo Gonz=C3=A1lez <disablez@gmail.com> writes:
-> This patch adds a new command to smbinfo which retrieves and displays
-> the list of alternate data streams for a file.
+On 4/6/2021 7:49 AM, Jason Gunthorpe wrote:
+> On Mon, Apr 05, 2021 at 11:42:31PM +0000, Chuck Lever III wrote:
+>   
+>> We need to get a better idea what correctness testing has been done,
+>> and whether positive correctness testing results can be replicated
+>> on a variety of platforms.
+> 
+> RO has been rolling out slowly on mlx5 over a few years and storage
+> ULPs are the last to change. eg the mlx5 ethernet driver has had RO
+> turned on for a long time, userspace HPC applications have been using
+> it for a while now too.
 
-I gave it a quick try and it works. LGTM.
+I'd love to see RO be used more, it was always something the RDMA
+specs supported and carefully architected for. My only concern is
+that it's difficult to get right, especially when the platforms
+have been running strictly-ordered for so long. The ULPs need
+testing, and a lot of it.
 
-Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+> We know there are platforms with broken RO implementations (like
+> Haswell) but the kernel is supposed to globally turn off RO on all
+> those cases. I'd be a bit surprised if we discover any more from this
+> series.
+> 
+> On the other hand there are platforms that get huge speed ups from
+> turning this on, AMD is one example, there are a bunch in the ARM
+> world too.
 
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+My belief is that the biggest risk is from situations where completions
+are batched, and therefore polling is used to detect them without
+interrupts (which explicitly). The RO pipeline will completely reorder
+DMA writes, and consumers which infer ordering from memory contents may
+break. This can even apply within the provider code, which may attempt
+to poll WR and CQ structures, and be tripped up.
 
+The Mellanox adapter, itself, historically has strict in-order DMA
+semantics, and while it's great to relax that, changing it by default
+for all consumers is something to consider very cautiously.
+
+> Still, obviously people should test on the platforms they have.
+
+Yes, and "test" be taken seriously with focus on ULP data integrity.
+Speedups will mean nothing if the data is ever damaged.
+
+Tom.
