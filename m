@@ -2,217 +2,173 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B92DAC43461
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 15:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B7EBC433B4
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 15:58:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 827D2610E5
-	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 15:32:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F7EF610D1
+	for <linux-cifs@archiver.kernel.org>; Fri,  9 Apr 2021 15:58:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233744AbhDIPdH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 9 Apr 2021 11:33:07 -0400
-Received: from p3plsmtpa06-04.prod.phx3.secureserver.net ([173.201.192.105]:46739
-        "EHLO p3plsmtpa06-04.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233288AbhDIPdG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 9 Apr 2021 11:33:06 -0400
-Received: from [192.168.0.116] ([71.184.94.153])
-        by :SMTPAUTH: with ESMTPSA
-        id Ut7hlRPfQe8QFUt7ilij9S; Fri, 09 Apr 2021 08:32:51 -0700
-X-CMAE-Analysis: v=2.4 cv=JLz+D+Gb c=1 sm=1 tr=0 ts=607073a3
- a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
- a=IkcTkHD0fZMA:10 a=SEc3moZ4AAAA:8 a=oSsZz9J6dYZdRk27ncsA:9 a=QEXdDO2ut3YA:10
- a=5oRCH6oROnRZc2VpWJZ3:22
-X-SECURESERVER-ACCT: tom@talpey.com
-Subject: Re: [PATCH rdma-next 00/10] Enable relaxed ordering for ULPs
-To:     Chuck Lever III <chuck.lever@oracle.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@lst.de>,
-        Leon Romanovsky <leon@kernel.org>,
-        Doug Ledford <dledford@redhat.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        Adit Ranadive <aditr@vmware.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Ariel Elior <aelior@marvell.com>,
-        Avihai Horon <avihaih@nvidia.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Bernard Metzler <bmt@zurich.ibm.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Devesh Sharma <devesh.sharma@broadcom.com>,
-        Faisal Latif <faisal.latif@intel.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Bruce Fields <bfields@fieldses.org>, Jens Axboe <axboe@fb.com>,
-        Karsten Graul <kgraul@linux.ibm.com>,
-        Keith Busch <kbusch@kernel.org>, Lijun Ou <oulijun@huawei.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Michael Guralnik <michaelgur@nvidia.com>,
-        Michal Kalderon <mkalderon@marvell.com>,
-        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
-        Naresh Kumar PBS <nareshkumar.pbs@broadcom.com>,
-        Linux-Net <netdev@vger.kernel.org>,
-        Potnuri Bharat Teja <bharat@chelsio.com>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
+        id S233824AbhDIP6f (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 9 Apr 2021 11:58:35 -0400
+Received: from mail-eopbgr1320090.outbound.protection.outlook.com ([40.107.132.90]:61920
+        "EHLO APC01-PU1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233884AbhDIP6e (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 9 Apr 2021 11:58:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UKOTRe9uKqkw47XGJ2D7cKXKqe42wr7rcOevsb6JGgK1ygFEXRkh99jsNjOQ9CPL7j2UirlJUT5d32z44DUkazoZbxVc4mW/ufuxR7glf3FI8COqEKpcT97WJ43X3alrorBbZ9ShOH4VDx36J+ei4vcegwrF/LjznLRkeyYgRYE0KMADyv7RfDZxWHUo+1XHfkyfMNM94IxggUeR+fvreWxplkv3mMJgYLRnchw8lO53aFxQF0YLxo5PI54ddidqpYT5GVB4zTUQ8FXTqi1+kp3Lz3/xzYAzbPj2xGQuviBWV0/wM1Y2C+y+Y69V8QtXioS/Npe+l+hngPyUHbe+HQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1auWXKX4qRuUBUjSLtmbkTcMnNFkvsH+bfWgI6YoNBQ=;
+ b=oNkyZJ0+T4Q7JxrNjXr7IYyXobkCZ2630hLTYg6S+mor6Ovs+PVsKlNX0TxToo5XM8hGng95kgEy362+HgyxbQTCDjaSq3cyxFsrOaixxPqCr5PyXFKuPWxw0XYm7x5OS6i8n4Xi31TfCbwjhZaEZRCdPOuXRusNtcR6bCSZUsPC2P8uNZwG1ud9E4wZE9SA9LoP3VTwOuVvCTEJw2aZn+vI6PZt4H1lTkB9z9XXAB3Fbvy8Cb1XOapi5w/0fXVPduXeu/QzTD1YsBEOhyWJW2266WMwnX5grtML5YnCZIhueyx4wUd4r6HyWXNjhbxEAqs1DP40AwOEY40Ng6wRxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1auWXKX4qRuUBUjSLtmbkTcMnNFkvsH+bfWgI6YoNBQ=;
+ b=iSBQoZgz9UxZszLfGqrn+PTTVu0kPzxz9HQhHrnyTjvYvKHn4RyhIWPWcMV0HKga33/mc3k2GpfHDCrLNwtKKso9el347VPGETMJ1Lz8nISIeSaOxeWevhEhtRjk6IEIaAyRNsRVIF+FMTVIhkc5S3I7NHp3oikUxCZ8o3TOmJM=
+Received: from PSAP153MB0422.APCP153.PROD.OUTLOOK.COM (20.182.94.12) by
+ PSAP153MB0421.APCP153.PROD.OUTLOOK.COM (20.182.94.75) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4042.4; Fri, 9 Apr 2021 15:58:18 +0000
+Received: from PSAP153MB0422.APCP153.PROD.OUTLOOK.COM
+ ([fe80::24d9:ce8b:8c06:2299]) by PSAP153MB0422.APCP153.PROD.OUTLOOK.COM
+ ([fe80::24d9:ce8b:8c06:2299%8]) with mapi id 15.20.4042.010; Fri, 9 Apr 2021
+ 15:58:18 +0000
+From:   Shyam Prasad <Shyam.Prasad@microsoft.com>
+To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>,
+        "sfrench@samba.org" <sfrench@samba.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
         "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-        Selvin Xavier <selvin.xavier@broadcom.com>,
-        Shiraz Saleem <shiraz.saleem@intel.com>,
-        Somnath Kotur <somnath.kotur@broadcom.com>,
-        Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
-        Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        VMware PV-Drivers <pv-drivers@vmware.com>,
-        Weihang Li <liweihang@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Zhu Yanjun <zyjzyj2000@gmail.com>
-References: <20210405052404.213889-1-leon@kernel.org>
- <20210405134115.GA22346@lst.de> <20210405200739.GB7405@nvidia.com>
- <C2924F03-11C5-4839-A4F3-36872194EEA8@oracle.com>
- <20210406114952.GH7405@nvidia.com>
- <aeb7334b-edc0-78c2-4adb-92d4a994210d@talpey.com>
- <8A5E83DF-5C08-49CE-8EE3-08DC63135735@oracle.com>
-From:   Tom Talpey <tom@talpey.com>
-Message-ID: <4b02d1b2-be0e-0d1d-7ac3-38d32e44e77e@talpey.com>
-Date:   Fri, 9 Apr 2021 11:32:41 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
-MIME-Version: 1.0
-In-Reply-To: <8A5E83DF-5C08-49CE-8EE3-08DC63135735@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        "yukuai3@huawei.com" <yukuai3@huawei.com>
+Subject: RE: [EXTERNAL] [PATCH] cifs: Fix build error when no
+ CONFIG_DNS_RESOLVER
+Thread-Topic: [EXTERNAL] [PATCH] cifs: Fix build error when no
+ CONFIG_DNS_RESOLVER
+Thread-Index: AQHXLRO7xSy/YwnOJ02w+rqUNvvfkKqsV7Wg
+Date:   Fri, 9 Apr 2021 15:58:18 +0000
+Message-ID: <PSAP153MB04220A98B9A57BF059DF611894739@PSAP153MB0422.APCP153.PROD.OUTLOOK.COM>
+References: <20210409074634.1809521-1-zhangxiaoxu5@huawei.com>
+In-Reply-To: <20210409074634.1809521-1-zhangxiaoxu5@huawei.com>
+Accept-Language: en-IN, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: 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
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=7020c6c7-de99-4633-9334-b4da3dc5675e;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2021-04-09T15:56:40Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: huawei.com; dkim=none (message not signed)
+ header.d=none;huawei.com; dmarc=none action=none header.from=microsoft.com;
+x-originating-ip: [2404:f801:8028:1:60f6:ca47:5dfc:b1d0]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d9e7f452-4837-474b-27ff-08d8fb704acf
+x-ms-traffictypediagnostic: PSAP153MB0421:
+x-microsoft-antispam-prvs: <PSAP153MB04218381973A2D91B09F2CC894739@PSAP153MB0421.APCP153.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: YAzCZp2/UFRSHarAueMV3JopG2Da5/D7Ghnl1k0x2eYnOGDI9DqVo5tFsDxcM4h28BJfDkMupHe1qzwfgMZfqGw2qBKywe/C8lrfQC25uJWpsE8bewO1XBv+kW2KpoBaMnKKsPVoxo+47jylMie0xR4uJkviAxSqkYVP3nNm0qC+m0lh0oA/YZGqxQW1MxSCU3waEoxv9cGzwapmP4uc08fJxHSN5YpgadTH8uf0+DAMBYNsKShbOIP13glnqEauEdDRsCQuRczBxvmxAv9QeSoZzL4BRLc9iJEMcwfTQ/uWJEjsmxOaAPd2XpbcekcXUUGUeX3K4SY0vYvpB0fDLR9veABuIbs9/wFFmv4wgB4Zqm+tVKO5jHFzfpUaRGtqV1LfxZe0ctXq4eNDrE74yOInz+eHEoY64s2SiiEw4Bn3vg5IYd+g7xIURDAz1LI+Bl7nuOqOXf6xjVv1QsmLC1zaSVF/BvynzzC41WR7qA3U/C4q3r8/2IfMrFOHISyUo7edAeMW52Thad6TQbU2tCrKMIeardEaoppEvm7jtCTKU6dVTs1fKQzpI39u6V38sKH3KSdlFanELtFqHPKdjDtsymrvzFqM+L2q05IPj2kzFcSYJteP6xZ6QrdXqdcOwryrwtdJcDo5zFlO0dN6Z1rVgIgXxOXAcoYmjcJxvIQ=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAP153MB0422.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(376002)(136003)(39860400002)(396003)(76116006)(53546011)(86362001)(8990500004)(8936002)(66476007)(66446008)(2906002)(66556008)(64756008)(66946007)(316002)(110136005)(186003)(83380400001)(6506007)(55016002)(5660300002)(38100700001)(33656002)(478600001)(7696005)(8676002)(71200400001)(52536014)(82950400001)(82960400001)(10290500003)(9686003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?9rgux3m41BgoMUT2P8ER48Bt1dSgVZvbmhYdhzkXC3NuZPH63qGWblajHDnY?=
+ =?us-ascii?Q?NoHA4wDAmgI+UpJ10/AgrpNu5OjZFN2nVYydGu50ymJHFr4v1UeHwMyAXOrA?=
+ =?us-ascii?Q?5eMD6u8V6yao0at1uxXxuwtJbugKltTbCB2wuuWu8m1l4OIaU2oYjDvIDNhp?=
+ =?us-ascii?Q?FcHp2JyOJW8cZqsFnRRPaJeKlqMD/OP30Lft91NzujB5vvidnY14l02huNp0?=
+ =?us-ascii?Q?A42on75BmnOA2SZ6Jvk0owwrVMkWjuWOAZ1JNd0U+u3cKISSVFeD22Zv2P3M?=
+ =?us-ascii?Q?GDKdxyxVcEmlvLbNxrmkNcyg43779c1I3RVStttDASfaL1VuMkAjt+L219GG?=
+ =?us-ascii?Q?nJOfnRTvX97ZCowEEpPYF3zWc2ttyC1QQOiYbBltBLT0gWNguEMSrwE/CSqR?=
+ =?us-ascii?Q?Dp5BRfJfW8XDa1d0WwdHhHP9jcvaWO9AQ5ooJHzOnDDY6aPWIBNOeU0NgKcg?=
+ =?us-ascii?Q?2Wm9enrg2RUEptfKQ3TMgQLS2lxaGgfXr3JA4bEoi7uf/TU3YQdAfz0ho/9c?=
+ =?us-ascii?Q?nS0TO6KNKUMrAjGwZOQCiytxW10F/YhVMDvZgUoaHJWIsjJhbBxRBNJLhCaj?=
+ =?us-ascii?Q?Pb1teiJaiAwwTNkU21+8ayDJEAw+l6Kfu7pU98vdvljVTGLWSEp1N4BMpJhp?=
+ =?us-ascii?Q?8x8umvoO8UK4twh1uEDEGS4b+HUThb5jF8hRIXJMrW0kV2XtOanorWXwrUcm?=
+ =?us-ascii?Q?TfBwQOwvUI9+qthtH8T+IXm4SwCwLhhF+g7rcGPQPUEWlvPaorBhMJ+GGOOu?=
+ =?us-ascii?Q?rh2wGcSE9snM9pveEaJOC0yHOeSYV0Os4XUm/T9FT6JwlbCAc3SDCe05ZvjF?=
+ =?us-ascii?Q?ZNL+JgAtfUQwXMsg8mnCj2OswZuTVl4H185XXMWxnV2SBwNW5W3QVj+MwV7Q?=
+ =?us-ascii?Q?b9Md6IEjxnb+7elBzb+eR1p7hviBLhxX3oFktzvWhAlKsrI7o0P3VRikOLdW?=
+ =?us-ascii?Q?g4q+Y6/uss5r3l6n2CoBOWZGR6MTt/gh9skqZ1akh6lygMfCmaxitG/UizuA?=
+ =?us-ascii?Q?GkushDvgIGoW2lXXOAosBc4oTRkmAruhNG+5uYin45QfQUu92h0H4gk42AKy?=
+ =?us-ascii?Q?bWQUjBaBfnfWIUc1U/xVSsTQ5TfdFrrNWlKt0+RlUH8fMU+uHw6wYVwF65Zc?=
+ =?us-ascii?Q?K9ZsQLjf++/O+z7bPxWwJFA7GdepndOeW4KTDCpSufdxHG6BMAWyyl6WM+2D?=
+ =?us-ascii?Q?FTmezVfwJ4fLxfyvmrZuYISnQloD/z2yttfs9at4kmlP83p/VBlLx3FzAckI?=
+ =?us-ascii?Q?5agSVS+xYMr41n3tp8kJ+ATwSZaR5EocHTVzZjX50EimtTTfRAmULPagyJUL?=
+ =?us-ascii?Q?/Ayt2srrNDmrh4+PLlL4Kr6jxtMiMM5eIIeUqODH9GxoonccpH63g0tCASb4?=
+ =?us-ascii?Q?nFLBvj0=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PSAP153MB0422.APCP153.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9e7f452-4837-474b-27ff-08d8fb704acf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2021 15:58:18.0823
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SkfQ7LVhnRIRlz9L/wl0QV/MALvKDQpW0hlJtbOOKjnwOuY/+DoPXrdiqBI77EVEFCOXQMKcieXXF39CLYAwbg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PSAP153MB0421
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 4/9/2021 10:45 AM, Chuck Lever III wrote:
-> 
-> 
->> On Apr 9, 2021, at 10:26 AM, Tom Talpey <tom@talpey.com> wrote:
->>
->> On 4/6/2021 7:49 AM, Jason Gunthorpe wrote:
->>> On Mon, Apr 05, 2021 at 11:42:31PM +0000, Chuck Lever III wrote:
->>>   
->>>> We need to get a better idea what correctness testing has been done,
->>>> and whether positive correctness testing results can be replicated
->>>> on a variety of platforms.
->>> RO has been rolling out slowly on mlx5 over a few years and storage
->>> ULPs are the last to change. eg the mlx5 ethernet driver has had RO
->>> turned on for a long time, userspace HPC applications have been using
->>> it for a while now too.
->>
->> I'd love to see RO be used more, it was always something the RDMA
->> specs supported and carefully architected for. My only concern is
->> that it's difficult to get right, especially when the platforms
->> have been running strictly-ordered for so long. The ULPs need
->> testing, and a lot of it.
->>
->>> We know there are platforms with broken RO implementations (like
->>> Haswell) but the kernel is supposed to globally turn off RO on all
->>> those cases. I'd be a bit surprised if we discover any more from this
->>> series.
->>> On the other hand there are platforms that get huge speed ups from
->>> turning this on, AMD is one example, there are a bunch in the ARM
->>> world too.
->>
->> My belief is that the biggest risk is from situations where completions
->> are batched, and therefore polling is used to detect them without
->> interrupts (which explicitly). The RO pipeline will completely reorder
->> DMA writes, and consumers which infer ordering from memory contents may
->> break. This can even apply within the provider code, which may attempt
->> to poll WR and CQ structures, and be tripped up.
-> 
-> You are referring specifically to RPC/RDMA depending on Receive
-> completions to guarantee that previous RDMA Writes have been
-> retired? Or is there a particular implementation practice in
-> the Linux RPC/RDMA code that worries you?
+Hi Zhang,
 
-Nothing in the RPC/RDMA code, which is IMO correct. The worry, which
-is hopefully unfounded, is that the RO pipeline might not have flushed
-when a completion is posted *after* posting an interrupt.
+Thanks for the catch.=20
+But it looks like Steve had already made this change yesterday. Can you ple=
+ase pull and check now?
 
-Something like this...
+Regards,
+Shyam
 
-RDMA Write arrives
-	PCIe RO Write for data
-	PCIe RO Write for data
-	...
-RDMA Write arrives
-	PCIe RO Write for data
-	...
-RDMA Send arrives
-	PCIe RO Write for receive data
-	PCIe RO Write for receive descriptor
-	PCIe interrupt (flushes RO pipeline for all three ops above)
+-----Original Message-----
+From: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>=20
+Sent: Friday, April 9, 2021 1:17 PM
+To: zhangxiaoxu5@huawei.com; sfrench@samba.org; linux-cifs@vger.kernel.org;=
+ samba-technical@lists.samba.org; yukuai3@huawei.com; Shyam Prasad <Shyam.P=
+rasad@microsoft.com>
+Subject: [EXTERNAL] [PATCH] cifs: Fix build error when no CONFIG_DNS_RESOLV=
+ER
 
-RPC/RDMA polls CQ
-	Reaps receive completion
+hulk robot following build error:
+  ld: fs/cifs/dns_resolve.o: in function `dns_resolve_server_name_to_ip':
+  dns_resolve.c:(.text+0x154): undefined reference to `dns_query'
+  make: *** [Makefile:1251: vmlinux] Error 1
 
-RDMA Send arrives
-	PCIe RO Write for receive data
-	PCIe RO write for receive descriptor
-	Does *not* interrupt, since CQ not armed
+Fixes: e488292a31fa ("cifs: On cifs_reconnect, resolve the hostname again."=
+)
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+---
+ fs/cifs/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-RPC/RDMA continues to poll CQ
-	Reaps receive completion
-	PCIe RO writes not yet flushed
-	Processes incomplete in-memory data
-	Bzzzt
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig index fe03cbdae959..0d819976=
+5045 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -18,6 +18,7 @@ config CIFS
+ 	select CRYPTO_AES
+ 	select CRYPTO_LIB_DES
+ 	select KEYS
++	select DNS_RESOLVER
+ 	help
+ 	  This is the client VFS module for the SMB3 family of NAS protocols,
+ 	  (including support for the most recent, most secure dialect SMB3.1.1) @=
+@ -179,7 +180,6 @@ config CIFS_DEBUG_DUMP_KEYS  config CIFS_DFS_UPCALL
+ 	bool "DFS feature support"
+ 	depends on CIFS
+-	select DNS_RESOLVER
+ 	help
+ 	  Distributed File System (DFS) support is used to access shares
+ 	  transparently in an enterprise name space, even if the share
+--
+2.25.4
 
-Hopefully, the adapter performs a PCIe flushing read, or something
-to avoid this when an interrupt is not generated. Alternatively, I'm
-overly paranoid.
-
-Tom.
-
->> The Mellanox adapter, itself, historically has strict in-order DMA
->> semantics, and while it's great to relax that, changing it by default
->> for all consumers is something to consider very cautiously.
->>
->>> Still, obviously people should test on the platforms they have.
->>
->> Yes, and "test" be taken seriously with focus on ULP data integrity.
->> Speedups will mean nothing if the data is ever damaged.
-> 
-> I agree that data integrity comes first.
-> 
-> Since I currently don't have facilities to test RO in my lab, the
-> community will have to agree on a set of tests and expected results
-> that specifically exercise the corner cases you are concerned about.
-> 
-> 
-> --
-> Chuck Lever
-> 
-> 
-> 
-> 
