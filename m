@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D2FC433B4
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 16:16:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BDCC433B4
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 16:59:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 561356121F
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 16:16:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0A876023C
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 16:59:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238197AbhDLQQi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Apr 2021 12:16:38 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:56082 "EHLO
+        id S244839AbhDLRAH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Apr 2021 13:00:07 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:30350 "EHLO
         de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237798AbhDLQQh (ORCPT
+        by vger.kernel.org with ESMTP id S243689AbhDLQ6U (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:16:37 -0400
+        Mon, 12 Apr 2021 12:58:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1618244178;
+        t=1618246679;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QpMs7PEIynVqJprICVSsS77n4nge+WVu1wgJW/KXYdU=;
-        b=FSAEOHjQujvG6ubleFDR4kzI0pvbg9GvaAHmfy/qJ8aYSnmFX+F5JTLQ7ZOf1Xs6C9SLyv
-        i02WjNZti68rRAXImPeIZCnxp1HL2cLwWvaKywte52PpJwC2FCueSUnt9SJyPVsGuKT4Ac
-        ZfPSGV01o2cMpucOe7awe0Bvvu/CzKU=
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com
- (mail-db3eur04lp2052.outbound.protection.outlook.com [104.47.12.52]) (Using
+        bh=Duc+g0ge5n+ZvVu3Gi7zPRmkGbOPW7zEnJbLmZh/sDY=;
+        b=GuIyNHsO9icJLkEFUhPgQVOgvQkQWyt4Fj1oI8NFDXoC2c4D5hkL7szarPp2jA4bUF6p4M
+        8Ku5JI2G1Ar86KcZ7T5Vrpv+WDBz7zD2b2f86ep+2lKhcv0/IAVM/PiS+CA6cvmsADsm9+
+        kzQjhUF+osjXijEtCmmMsYNDLf99tcc=
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com
+ (mail-he1eur04lp2059.outbound.protection.outlook.com [104.47.13.59]) (Using
  TLS) by relay.mimecast.com with ESMTP id
- de-mta-30-X1-ZjLWiOSaHlwkbQ5nxyA-1; Mon, 12 Apr 2021 18:16:17 +0200
-X-MC-Unique: X1-ZjLWiOSaHlwkbQ5nxyA-1
+ de-mta-25-TNdbd9bMOUGCy-0Nkq7uBA-1; Mon, 12 Apr 2021 18:57:58 +0200
+X-MC-Unique: TNdbd9bMOUGCy-0Nkq7uBA-1
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BNOWO918bod7BqNzjxXt7la9dkYVoJG2JnMWW5Em9mci779Jc54F6SeLqXymjRJu6GjU2xXEnAMZ4nozbBa4IJ1/FF+H0VUnxFbRFY9aPfnE5fJlmUoKStvcq9fdHPLlcyeHDfXwH1gfXwXXd+a9nmJ53IIhmH59qF+HefxOv47ujwVFUubm7ph7tttKnAHxUA9t3HTVW8MdCTY2o5m/eCmqt1tNTZfK5x+h3lofoXyANXaI0+/Oxdm/rzX7Yo0Dl8uBNd7hZPyaNm6EeAj/tuHAVC++k3SbesuNl9VnRfaOliQ79mTCk7c9Omcomo6BR6nz0moP8soQxs/VGkAmbA==
+ b=VJT5biPMxqcqbD3qJEty7S7efP0U9SS3rJ/o1zMnSR7Ee7nPEN7rNIMYWH+CJya+0/8Di8IeYQMrfIIB131gW2HJU9yJqGFuajKD0beJL2flBv52eMu9Kj1JSkWHuo9Tn6RFFozPfqI74Vqv9UsMZ2z4Q1EdRarmRxIs3RH8qur9OB/fb/pE5WuQyTXJkAnVGUyeJdkt2MPvC77lDy2A0nUVrHjm4uPd/uJtwjzA8fi1GA6Nsd7RhSXhBWRwRa+58tmWusqZhNVwyqCPv2zYOXS9kB4P1688zsPiVuoR1T+rzr3+wKb2IVizqfU8Y9hUanjFKrJ3qQ87yBsVckyOdw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QpMs7PEIynVqJprICVSsS77n4nge+WVu1wgJW/KXYdU=;
- b=lgnMnfwC6iGOAw1x/p9Y5oYos0LW6CW5wcFNhiR1btB+UxnM0uhTFGotogNlIhQ20KM7wry3rwonYrBhQbi0ZnjsOQRaWy4hdsTTK9nkelkKgiJqgLfO/Dm39NQbsd2M73dXjXfUPrd/QVN3yDj5zbmQhI721PkC+emT8iRohxoZ42Kz4Id+NEBLObTyzxNz7nGN9JOkxubhz6uTCs5nNKjeg/G3vhxbxjt56BC0z+nV9IGZT2jv9RXoP23LEMzQuzxHT5S0czIdJcPJ2ihkSFAlJwmtItgpY60QyJI+26hQ7l5reFiaX4pUIi85Q5SpMuNPkkAXB4l+y5wUpqSIFA==
+ bh=Duc+g0ge5n+ZvVu3Gi7zPRmkGbOPW7zEnJbLmZh/sDY=;
+ b=QlIug+p3hqOPVKzI49//ewTn+BQXDj6+4ygLxoM7JSD69s81AizgPxmuqdpJY/kPYXaSugovRviBHV+hz19gJFMqiEZ7SoABQPt2b32guKjZft9f4w0myKPOX9pkE4Des9PQoeAS+7J9G2vY2C+vnS2CiE5gsdXNAz1gGUJk3AA/0A9gdIsmQtw+Gfneg+ulmPulFwcaI40I4but2lOOKE+vbqKGsfFI1KNYRHGP5SEDQIjSvbSfmQBi+7D3ONfOMKreAQGehqUn7KyO+clNyrbbcPAzWxwnS1oQJpr0JPjiSfLdJceMLpsWQu0yLPud5XmaYeFR7YmpH9hSwoDgzA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
  dkim=pass header.d=suse.com; arc=none
@@ -51,139 +51,130 @@ Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
  by VI1PR0402MB3517.eurprd04.prod.outlook.com (2603:10a6:803:b::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.18; Mon, 12 Apr
- 2021 16:16:16 +0000
+ 2021 16:57:57 +0000
 Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
  ([fe80::3c87:7c9e:2597:4d94]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
  ([fe80::3c87:7c9e:2597:4d94%5]) with mapi id 15.20.4020.022; Mon, 12 Apr 2021
- 16:16:16 +0000
+ 16:57:56 +0000
 From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH] cifs: correct comments explaining internal semaphore
- usage in the module
-In-Reply-To: <CAH2r5mvmsdai3iCwpohqUeeiW5tPSeiQgCH8DcpicWntc25rNg@mail.gmail.com>
-References: <CAH2r5mvmsdai3iCwpohqUeeiW5tPSeiQgCH8DcpicWntc25rNg@mail.gmail.com>
-Date:   Mon, 12 Apr 2021 18:16:13 +0200
-Message-ID: <87h7kb32cy.fsf@suse.com>
+To:     Rohith Surabattula <rohiths.msft@gmail.com>,
+        Steve French <smfrench@gmail.com>
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
+Subject: Re: cifs: Deferred close for files
+In-Reply-To: <CACdtm0avBPeuxEvfymnVk4eYCYO3fCiywJWH0VYmVGiM2OL9_A@mail.gmail.com>
+References: <CACdtm0Y1NeC0jNTOtjhTtGRt0sfyhyxC=wNfMu1eqibe6qJbwA@mail.gmail.com>
+ <CANT5p=pFU=1OKiBA0m0_Pqms4Vsxz7omEgvfDDAb8U3M4-3qbA@mail.gmail.com>
+ <461d79c3-1b32-b0f8-157c-b5d4b25507d7@talpey.com>
+ <CACdtm0agzeVRiQg1zZjm=jFrf-gSQ-+YGc1Zm1xN1Pd9tJia4Q@mail.gmail.com>
+ <49874720-dc76-2660-17e7-f7157a9725d4@talpey.com>
+ <CACdtm0Z5BfbHp8Y2nFLv0k854hDe6-j4xtYDP4oruKPOtxxz2Q@mail.gmail.com>
+ <CACdtm0ZYHjHXt-n8xnRQgZ+ZdLw4XVdb_yCK3Q_QSG4SrK6_Lw@mail.gmail.com>
+ <CACdtm0YhpOW+7-ELLOk97utOikU-06Zccwq-2HK+h3aFumnedg@mail.gmail.com>
+ <CAH2r5muCvxAHPOac4Ai5fxK_TLYiSw4LKy0QZv9iVVJoRkdCew@mail.gmail.com>
+ <CACdtm0avBPeuxEvfymnVk4eYCYO3fCiywJWH0VYmVGiM2OL9_A@mail.gmail.com>
+Date:   Mon, 12 Apr 2021 18:57:54 +0200
+Message-ID: <87blaj30fh.fsf@suse.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-Originating-IP: [2003:fa:703:389:f439:5b5b:3992:60b2]
-X-ClientProxiedBy: ZR0P278CA0007.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:16::17) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-ClientProxiedBy: ZR0P278CA0017.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:16::27) To VI1PR0402MB3359.eurprd04.prod.outlook.com
  (2603:10a6:803:3::28)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:703:389:f439:5b5b:3992:60b2) by ZR0P278CA0007.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:16::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Mon, 12 Apr 2021 16:16:15 +0000
+Received: from localhost (2003:fa:703:389:f439:5b5b:3992:60b2) by ZR0P278CA0017.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:16::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.19 via Frontend Transport; Mon, 12 Apr 2021 16:57:56 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9d61c878-4cc3-4385-9a0b-08d8fdce4c60
+X-MS-Office365-Filtering-Correlation-Id: 0911b0c5-2162-4a1c-0809-08d8fdd41ee7
 X-MS-TrafficTypeDiagnostic: VI1PR0402MB3517:
-X-Microsoft-Antispam-PRVS: <VI1PR0402MB351716365FDC167F6D20B252A8709@VI1PR0402MB3517.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Microsoft-Antispam-PRVS: <VI1PR0402MB3517B28F9C7B074D07E29FDDA8709@VI1PR0402MB3517.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HY5zq8Q7NC1PFGnXfp3Z02V3b3s985A747gcNCM7iEwiGMI+DIjq1XJ2e8CAbaSIt4bDj5UfxQpuEEL0KM9UGC3vgDNjCSUvNvE8A4Aj1NPA3f738vnqXWx9gjYTAbRlohlVQTGL80qzjTbqGYbd5ewcdhrYiql/2pqSrypOSb3nP7yThPk2QZHW3u/fmDHi86U+3h+8hMyUnQyuIb5hT/4ve/QLJOGe9m5Xv3Ups3jV9whkWzWNjnS9G5V9OeMcDp4tkp9J2w5Gm1hEDNqcX4ruohsHOAKNLLrsmw4OqEiItcho9nihQTJaFbKYd5/GmF3ZItHFumNClcthD1KDRisXNTKAnJA45chfSp7KOX/fba/yQY2u3wHqrh3Xw+Go3tx54rK+NwMU1Y2ap8klwOwaT+xY7vQ8DU74ILwIgCjVDWOd8KGo7zmz/yE3Fjj1Jc9qWEi0v95EnG5tWfwlWiOHQVd78G+84rdHfNwYk/kShR85tBtuW53vGYMmCjmydyp5qkR2oRBYvHYlO7c+3LLWcYLNSWxRITAkNbvXrtUnCewoDc6zmrw/6cGo8aFgEcRMMB/BOzjRSJuCx7Fr+A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(376002)(39860400002)(346002)(366004)(136003)(36756003)(186003)(66946007)(66476007)(83380400001)(2616005)(16526019)(6486002)(52116002)(316002)(66556008)(8936002)(66574015)(38100700002)(86362001)(478600001)(8676002)(2906002)(5660300002)(6496006)(110136005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?L1ZIcGNDRVdneG5zUGpTV3NYZWNjYS8wY3h0UVFzOC92WDY1RjZGc2NESEcr?=
- =?utf-8?B?MkRxdXZac3c3c2FVVmVBdThMTU9XV0svVVlSL1F4a1FyK0lqS0JaZi9zNXNR?=
- =?utf-8?B?WDBCQkZqQXcvL1Bmd21IS0EwV0Z6VWVNa1FyWlMwQnpveGduRWd5eWJpS0lX?=
- =?utf-8?B?QnR0TEhJVVVaUHRRWWNQRGZpVGtQTVdQMjF5blMwbEJxZnAzbW1sK0RSekdG?=
- =?utf-8?B?a2FDNU9uQm50VGJHUkJCQ2NDTXplZGo4WTlqRmJZTS96WGg2VXczSEtqN0sv?=
- =?utf-8?B?SlY0ajZhUDN1MTlpazNyWTNqV3FTTEptNUdVYkJSK2FNQzJLSXYvY3VPTzZB?=
- =?utf-8?B?KzRpay9zaGgxcDdXWXJUdWhjYUUyNkE4RlppUmtHMTRvVGFDZzhBUFp6K2c0?=
- =?utf-8?B?dG1NQUlBam9VcDJzR0tib2liRzdQcW1wWERmKy9oR2hCek1zUkVWUURoaldi?=
- =?utf-8?B?ZzhOWmxndmpkbml1STBzWE1sTjV3NU5iclNRdTBOTUlTNmlxbVFkSEpCRmg3?=
- =?utf-8?B?dlVBZ05VTTVwSjJpcjdNbkQxYjRnMzRIMUhqMlRHdWNaZXFvbFBsTm5TQmdQ?=
- =?utf-8?B?VE54ek10dUloR0dnN0YrdW41Z1RNYWhkNHNMZmdkcUNyemdwdjYxK21OMGNo?=
- =?utf-8?B?WXFRdTQvbmxRWmVkRFQ4V3JFS0pOSGtUOW56OCtpNG5LSDh5QVkyWUd0dEIv?=
- =?utf-8?B?UzBiSUJFUkVOakZEcUorckxaR09xT0FpbEdIZTBBbFlCZVJPYk9CZmlzM3h6?=
- =?utf-8?B?UEo3Nk50VGJlNWc3aEN3c1dVTkZDanVjWlhWUmdlaHFFV1RNdmJBUmV1TWN0?=
- =?utf-8?B?YUs1QVlCTFRhaVB1UHBqZC9vY1E1VVZ0cXhTUmZlVVR2ZVdEUmd1TklOVGwz?=
- =?utf-8?B?ZVovV0puZUpyRGZmUWEzMi84VVhmckRza3JPU1pmRndCbTM3MDlYRXJ0VjJP?=
- =?utf-8?B?ZFRiSG45UWhaUmNVVmNjYWs2bmIzaUhkUHE4Q1lFQXNyOStyZVFVR1pDUVl6?=
- =?utf-8?B?MWttRmtlUEdNYVBzQ0MxT1JncGdjcEdaZDQxMHJwVTJtNUFBRi8xUmVjOE5j?=
- =?utf-8?B?SkFHSHA1c1Y4UVYra2IvdzFMM1RsMXlCb29WcHY5OVNtVFpHT3pkZXVuZ2ti?=
- =?utf-8?B?UGhCTWZBSlg3QWZNNlRDMDFuVnkzK0ptZ0FWTEhzTTNac2VHbWJqNUJlajNn?=
- =?utf-8?B?UHkzSWZSNDdQWjVSV2FNOTdRY1ZqaGgzMkVrcWViQUdWZVVWN0cyK2t6OTFF?=
- =?utf-8?B?dmhUVXNZeU9yRGZOZU5KRlV2VjlIVVlkYjE0N0JWTSthbVBJS2FsR3QxL1V6?=
- =?utf-8?B?Tyt1eXZ3V3hUZWJpNGE5THp2OUdHNTVNcHJVR3BZWWJvYUI4YXhJQllFNnh4?=
- =?utf-8?B?R01TTEtybWVNaUpaSEQrOWRLTzllZkNOMWl5bDRZdEptSytjK1pPbTlLMnBO?=
- =?utf-8?B?cFZpZFNHSUZhTjY0ZHh4YmY4dFM2NUJ1d2U0TFMya1ArakRYWW56ekxKbldu?=
- =?utf-8?B?ajRQRFd6d3l0R1FDK2NYdXpaT2JPQzg1Z2wvWkxOZTBNYW1QNGRWVXpWeXFp?=
- =?utf-8?B?RVJRS0R2ZUZTSnVzZERJZldBTHFMUXZiRTVsMnpWczhmNGxhY1FGejdqNndy?=
- =?utf-8?B?STlKOUNRQXRBVDVlRWtmb2ovbkF2MUYrSHNTeGk2ajBoUGFGcnRYL3ZQMzJu?=
- =?utf-8?B?bVd0eExqZ0FOM0xUUWE4ejg0SllldXQwUzlTWkxrSkM4S3dGMjJDdE9UUmpu?=
- =?utf-8?B?YVhMak10Y01SQnlZMEwwNDBwSWlXNGhDMitjRW5idTMrNkxhTzF4M2FPbHFt?=
- =?utf-8?B?aVRSNDlCTVVlOTg1T0tpSkU3TERkdnVLTG1tK01XWDlZdWgzNHg0UXNKWUM4?=
- =?utf-8?Q?bCZSrXBc6cfBI?=
+X-Microsoft-Antispam-Message-Info: sAQdn63Ts0RQY+nLON+eWxhVH85umkAPpsGS2pS72GQS95E3RqQXJ1EB4FvBhQ7E5jZuKIwxRUISk81W6WCR1kE2s9R7NC3kjAm/aHNMpe89IFQKvemLEUDCo593ynOP6cMJMpxxNIwx2uiITYaeJgo4nTylQSA+f72cosjfx5IGa9eg0jpKHmQrx8ghj0/8pfLSSBRtgmdbt6K6xsYTbJQLF9gKFPIZmHA1JTAQa1PyAaM2EfXkxcRxIX8HovfAtRRPpLCxrKH0Mhqm9yWxgMtRS2wnPPZ/x9h6kcBBN4lD/pQH32sCJwGoymWlcqptvjkQs4JMm0Blhz1YISVjQ5LR2yVBYkzF6XKdIwMA+uxayfS8Z0dAAoVBNkiHtqA7kbpf59+E7NJTliZNPQpAdOfKUmTfEuyk1DJAin1IG6b5AfX0SbGodowTyCFMNjYWc68ox6yn8435GXiP5g+whCXurjGAF0nZyz7uPbibmH3FgB8RTq9zkLxhxM4P6q/VUyHaiwz9g2LMWZwqHjEPZCh21qI3ICJz7hrhmVG85KckpdPbGh9CmKmtHbfFCyOQJfOw7nxJZQyVQuT9ztyLMA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(39860400002)(136003)(396003)(376002)(366004)(478600001)(86362001)(38100700002)(8936002)(66574015)(5660300002)(6496006)(2906002)(110136005)(54906003)(8676002)(4326008)(6486002)(52116002)(16526019)(83380400001)(2616005)(186003)(36756003)(66946007)(66556008)(316002)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?cUk5aitIWG0wR3YxdlBCL09vYWxyVE1UQ2xEd29UZDJKZ3oyTVo0dWpQejF0?=
+ =?utf-8?B?UDNlU2lDUkF1bTBhdjRhZ3lnNVdrcVQ4MTUzTzdpaXFISWhFelZZL2tpQytE?=
+ =?utf-8?B?U2l2dGw4QTg3QlAwZWNJSnRQNHRWWDRKUDU5akw0SDhBRkl5SWlNckx6Rk9j?=
+ =?utf-8?B?U3pnVmpMRWpSMGxGMWNpelFId3RMdkRZK1NZQTRGTUQ0YWdOWVc3aDIvRWNh?=
+ =?utf-8?B?Q1NMWDFwV3VnQ1lqbVBrK3czZUlQb1VWQXhWQmsvbE9xMm5hc3FMZkZhZndG?=
+ =?utf-8?B?czd5bkpPb3FINEsvSVhkTGt4V0VXMlRRMWowK0k5QmxRRWxsVFU3NXcwWEFs?=
+ =?utf-8?B?TlpkdnlWajJ1d2R4Q3VGR3FjRFZ6MjFlVlg2dU1mSGkrNE9xZXU4SlhaQ3kz?=
+ =?utf-8?B?U0NSazgreVBLYjBIY3NNZ2tpNWVRa2dwVHpja1lBbEhVOEJ2QXRPUDduU2Ir?=
+ =?utf-8?B?V1FLOVVMWUk1Vjg2YTlKUUJpNkFZbTluRXVsU1Jzbm0xYmdUZlVDYlMzRHJx?=
+ =?utf-8?B?NGJOV1FyVUtoeGhnUElwRGsrRmN6bjROUk5TQVpQSzFlbXcrSWRpQ0FUWDRC?=
+ =?utf-8?B?R3pKdzhNcUtFS1d2YVFLeWZWZnMzamtvK1k4QUREZ3Z0akFOcThHUWJiM1d4?=
+ =?utf-8?B?UTZ6UytxOVAzcDQxbDJ0ejZWWGFxNnB0b3dNcWlIOHRUNUYvZ1hXKytRbVlh?=
+ =?utf-8?B?eGRJeHd0SVczbjV4NWJ0QnVyLzY2MTE0Wmh4VmRVSFdYV1huRzhYV1dudUhu?=
+ =?utf-8?B?WHplQTdMd0puK0FQRDhVQWJpQTg5RGc2MDhhM1JFTDdFdVRVQU5hN3p0SzVo?=
+ =?utf-8?B?S3hxd0VBSmFuY1BiaFhuanNEZk9OZUowdDVFM0xSU2FOY2hMTjRLbWhJNFNE?=
+ =?utf-8?B?bTZURzFLMGNVRy91UkRHUUN0dE90SFQvVkt5VVF3N0tYbG1xc2o0ZFZXRm1D?=
+ =?utf-8?B?djM3cGkyd3BtVlRhOVNTcWs1WFlkSVV4YXBtN21QWHNlR25mdFZ1Qm8xOGxL?=
+ =?utf-8?B?N2gwL1FUMVUxci8vVlNnMjF1UldTeEt2VmQ1eGhhQWYycXJtQXhPRE94NEtD?=
+ =?utf-8?B?a09vQklOVUozZXY0QXpUUFIya05MTlgrTVlpQlJEam5JbGxKQ0NWSzUyMldM?=
+ =?utf-8?B?aVFabVhNc0pGbG1meGR2WnVFSHpGbmsvdk8yYmE5d3VuNmwrcDZ1amo2d2VT?=
+ =?utf-8?B?V09TNGd0bXBzekQ4aEVyNXE5M1JSQkFKRFhIM2p6bDlPd1dmSHp5Sk1rSlpD?=
+ =?utf-8?B?SVpQMUdvSGlKUDdrWndRcENGeElhUXNOZThGY25DUzVxS3Z4Vlc5eXZvNVd0?=
+ =?utf-8?B?bnFyQTgrd093UGJaT2szMXVmMFpvLzFTaXJYbkFpQy9FUVpldTBETEszVDA3?=
+ =?utf-8?B?NDVKU25ramVNOXI2OUhwaFhKa0JDM1lFMCtGRTdaUFNvSnpieUppSzFXWThR?=
+ =?utf-8?B?OUViV3BicDRHNUZKUW95N3BGK09hdTA4Ymxkbll1dWpRL2tpc2hXSUVEYTFz?=
+ =?utf-8?B?MXZzUC9ONkkzYVduZjFUQlVBN3FRREFENkJ6clZHVUF6dzRaSXpHV2k5Vlpo?=
+ =?utf-8?B?N0JuYjRiRWJzM1FuNjA0S0ZlRVpYM3J0TlhBaUk2NUFhVkMvOG1NOWdwZUNL?=
+ =?utf-8?B?ckttMkczdHlubGFpZEpGdDJ3ajVMYXJFN1dSbjlZSGZQYWZQZzBBSmwxZXpW?=
+ =?utf-8?B?L3ZkNiswcUtqRXpzYU5ZNHpXZFZrWTBocTFCd3RYQ3NULythTmZ4MzVmdXRq?=
+ =?utf-8?B?THNOWHh3aUlWc1h4bUZXTCsvdUxDRWRQeHVIWlhMQVpRV1IyaUgwMWNJcSsw?=
+ =?utf-8?B?enFHNUNMWVJodDVINm5KVmZjYms4cDBDTml6Ull6MW1SV2RYenl2a0U5a1hx?=
+ =?utf-8?Q?0DuidRqLRclDl?=
 X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d61c878-4cc3-4385-9a0b-08d8fdce4c60
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0911b0c5-2162-4a1c-0809-08d8fdd41ee7
 X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2021 16:16:16.1053
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2021 16:57:56.7915
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dKrHBY/yPX5nlH7PT0MDi5wQ0gu3TXzRKyu5rQb0/qLzf5mC4McIg9Loetc6SmhD
+X-MS-Exchange-CrossTenant-UserPrincipalName: HkSSMyr/yJtrFPCrrKrhcVUlwHtM4nezTsoX66pT1ZwIzIiB1SbnWT51TRjqEU3z
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3517
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve French <smfrench@gmail.com> writes:
-> A few of the semaphores had been removed, and one additional one
-> needed to be noted in the comments.   (Additional updates to the
-> semaphore/mutex/lock descriptions in the comments in cifsglob.h
-> could be helpful to make sure they accurately reflect what protects
-> what).
 
-That's a very good idea. A good starting point would be:
+I have added test cifs/105 that triggers oplock breaks. I think it could
+be used as a base or be modified to test your code (unless you already
+have some script). In anycase I would like to make sure we can trigger
+the codepath you are adding on the buildbot. My script is in
+/root/buildbot/scripts/fedora29/cifs/105 and it simply calls the
+optest.py script in the same directory.
 
-  $ grep 'struct[\t ]*mutex\|spinlock_t\|rw_semaphore\|seqlock_t\|rcu_.*loc=
-k' fs/cifs/*[ch]
+The code is essentially:
 
-  fs/cifs/cifs_fs_sb.h:   spinlock_t tlink_tree_lock;
-  fs/cifs/cifsglob.h:     spinlock_t req_lock;  /* protect the two values a=
-bove */
-  fs/cifs/cifsglob.h:     struct mutex srv_mutex;
-  fs/cifs/cifsglob.h:     struct mutex reconnect_mutex; /* prevent simultan=
-eous reconnects */
-  fs/cifs/cifsglob.h:     struct mutex session_mutex;
-  fs/cifs/cifsglob.h:     spinlock_t iface_lock;
-  fs/cifs/cifsglob.h:     struct mutex fid_mutex;
-  fs/cifs/cifsglob.h:     spinlock_t open_file_lock; /* protects list above=
- */
-  fs/cifs/cifsglob.h:     spinlock_t stat_lock;  /* protects the two fields=
- above */
-  fs/cifs/cifsglob.h:     spinlock_t file_info_lock; /* protects four flag/=
-count fields above */
-  fs/cifs/cifsglob.h:     struct mutex fh_mutex; /* prevents reopen race af=
-ter dead ses*/
-  fs/cifs/cifsglob.h:     struct mutex            aio_mutex;
-  fs/cifs/cifsglob.h:     struct rw_semaphore lock_sem;   /* protect the fi=
-elds above */
-  fs/cifs/cifsglob.h:     spinlock_t      open_file_lock; /* protects openF=
-ileList */
-  fs/cifs/cifsglob.h:     spinlock_t writers_lock;
-  fs/cifs/cifsglob.h:GLOBAL_EXTERN spinlock_t             cifs_tcp_ses_lock=
-;
-  fs/cifs/cifsglob.h:GLOBAL_EXTERN spinlock_t GlobalMid_Lock;  /* protects =
-above & list operations */
-  fs/cifs/cifsproto.h:extern void cifs_down_write(struct rw_semaphore *sem)=
-;
-  fs/cifs/dfs_cache.c:    spinlock_t ctx_lock;
-  fs/cifs/dir.c:  rcu_read_lock();
-  fs/cifs/dir.c:                  rcu_read_unlock();
-  fs/cifs/dir.c:  rcu_read_unlock();
-  fs/cifs/dir.c:  rcu_read_lock();
-  fs/cifs/dir.c:                  rcu_read_unlock();
-  fs/cifs/dir.c:  rcu_read_unlock();
-  fs/cifs/file.c:cifs_down_write(struct rw_semaphore *sem)
-  fs/cifs/smbdirect.h:    spinlock_t lock_new_credits_offered;
-  fs/cifs/smbdirect.h:    spinlock_t mr_list_lock;
-  fs/cifs/smbdirect.h:    spinlock_t receive_queue_lock;
-  fs/cifs/smbdirect.h:    spinlock_t empty_packet_queue_lock;
-  fs/cifs/smbdirect.h:    spinlock_t reassembly_queue_lock;
+    for x in range(n_children):
+        pid =3D os.fork()
+        if pid =3D=3D 0:
+            for i in range(n_it):
+                a =3D open(fna, 'w+') # file accessed by first mount point =
+A
+                b =3D open(fnb, 'r')  # same file via 2nd mount point B
+                b.close()
+                a.close()
+            exit(0)
+
+That python script mounts the same share twice but with -o nosharesock,
+to disable connection reuse (so you have 2 TCP connection).
+
+Then it creates n_children, and each children is opening/closing for
+read or write the same file (but accessed through different mount
+point) in a loop (n_it times).
+
+If a process has opened it for READ it will open it with a READ lease,
+so that multiple client can cache reads.
+
+As soon as one process opens it for writes, it will make the server
+notify clients that have a READ lease on the file to downgrade it. This
+notification is the oplock break.
 
 Cheers,
 --=20
