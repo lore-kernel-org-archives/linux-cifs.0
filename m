@@ -2,342 +2,195 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CF6C433B4
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 16:01:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D2FC433B4
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 16:16:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D3AC61350
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 16:01:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 561356121F
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 16:16:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238498AbhDLQCL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Apr 2021 12:02:11 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:28708 "EHLO
+        id S238197AbhDLQQi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Apr 2021 12:16:38 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:56082 "EHLO
         de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238937AbhDLQCK (ORCPT
+        by vger.kernel.org with ESMTP id S237798AbhDLQQh (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:02:10 -0400
+        Mon, 12 Apr 2021 12:16:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1618243311;
+        t=1618244178;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=nmhZOuSQwEhsXB2FchtYeMVWvjWn0FI4HoRC6A0lFMg=;
-        b=LZf83hAFX6hzTaWHmZPx10C1rEnyogklx013GXrZk3aQhWgQtiHUESHq50Q6d6xoOdRdp1
-        oUd63C1xs2lQbXXlUeEq5FaZYpLTkiaDckBuov7SGagPbZoV6RMYvrNUoR938AleOfvat1
-        iquUQd4VroxjvD3Z/E7bj97HFdkTy4w=
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com
- (mail-he1eur04lp2050.outbound.protection.outlook.com [104.47.13.50]) (Using
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QpMs7PEIynVqJprICVSsS77n4nge+WVu1wgJW/KXYdU=;
+        b=FSAEOHjQujvG6ubleFDR4kzI0pvbg9GvaAHmfy/qJ8aYSnmFX+F5JTLQ7ZOf1Xs6C9SLyv
+        i02WjNZti68rRAXImPeIZCnxp1HL2cLwWvaKywte52PpJwC2FCueSUnt9SJyPVsGuKT4Ac
+        ZfPSGV01o2cMpucOe7awe0Bvvu/CzKU=
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com
+ (mail-db3eur04lp2052.outbound.protection.outlook.com [104.47.12.52]) (Using
  TLS) by relay.mimecast.com with ESMTP id
- de-mta-19-GQ5arQAuOIykL8Q5w5cVqw-1; Mon, 12 Apr 2021 18:01:50 +0200
-X-MC-Unique: GQ5arQAuOIykL8Q5w5cVqw-1
+ de-mta-30-X1-ZjLWiOSaHlwkbQ5nxyA-1; Mon, 12 Apr 2021 18:16:17 +0200
+X-MC-Unique: X1-ZjLWiOSaHlwkbQ5nxyA-1
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e/HatqlqFsaXvSzCLCnjD2JFbJxF5SQGjUZN772OjHn51VNfJmbxCKIPk12XeKOiFkuUbhe+xmR4Wm5oWrvnu2oOH4tUgAMJvIFhIcrO4+Dlz8+AKpTD/zdybaOdL4+tXQNG0UgnpKKUPhYQGv7gN7liB4/H/BvENLoPvcERU/6tGzNUi9tUSsjAyKmMIbvyG9+IBcZLdtRQxkh9hJuV7LxpgzCN6Fzo8YZ0z1e/YhrmbrKvpvLrMsvcFekDXbsQ3X+luXVZUZ9U8xMaENnKSTIm60pub9p61wEiz9f625HbFTSCfdb3BmSK06SNnRNk9bf/H8aJsIETH4BrZ5IATQ==
+ b=BNOWO918bod7BqNzjxXt7la9dkYVoJG2JnMWW5Em9mci779Jc54F6SeLqXymjRJu6GjU2xXEnAMZ4nozbBa4IJ1/FF+H0VUnxFbRFY9aPfnE5fJlmUoKStvcq9fdHPLlcyeHDfXwH1gfXwXXd+a9nmJ53IIhmH59qF+HefxOv47ujwVFUubm7ph7tttKnAHxUA9t3HTVW8MdCTY2o5m/eCmqt1tNTZfK5x+h3lofoXyANXaI0+/Oxdm/rzX7Yo0Dl8uBNd7hZPyaNm6EeAj/tuHAVC++k3SbesuNl9VnRfaOliQ79mTCk7c9Omcomo6BR6nz0moP8soQxs/VGkAmbA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lpF33TaxW5o7xGpXavlDFh55Ak3L0hIUJ1jFWfIR/2g=;
- b=mUHKVVrxlL4Ew6+LfUBn/Y+ciDJoSZcYPP2Ad4bWnpkwgKRk53vNAeYEQZaJxN+KLOBvWsPKHIBZ9GR8HLqLGEiHKqKrF9sCLmeYDhln3wce+XbxOXok8S0im2Q9zTF5cErfsvS4YEb1vAvS16E/nSOVU6tHgdICfocS/U4tTRa2JiQliUckTvXdAP/cah0xSQ2xc+T+i9PfLTM78531qkPi+90A+xRHAdJEjCXcti1Mtjkdj9lKsM0xNXF8juthjQeilen1sYLLcpenM0C6NOL6/9AAF8NEb/aX6Dk8rxilXvOLcS35kiYyeg0YzxJ0HJfl58fSrhyB4Bo97McRKQ==
+ bh=QpMs7PEIynVqJprICVSsS77n4nge+WVu1wgJW/KXYdU=;
+ b=lgnMnfwC6iGOAw1x/p9Y5oYos0LW6CW5wcFNhiR1btB+UxnM0uhTFGotogNlIhQ20KM7wry3rwonYrBhQbi0ZnjsOQRaWy4hdsTTK9nkelkKgiJqgLfO/Dm39NQbsd2M73dXjXfUPrd/QVN3yDj5zbmQhI721PkC+emT8iRohxoZ42Kz4Id+NEBLObTyzxNz7nGN9JOkxubhz6uTCs5nNKjeg/G3vhxbxjt56BC0z+nV9IGZT2jv9RXoP23LEMzQuzxHT5S0czIdJcPJ2ihkSFAlJwmtItgpY60QyJI+26hQ7l5reFiaX4pUIi85Q5SpMuNPkkAXB4l+y5wUpqSIFA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
  dkim=pass header.d=suse.com; arc=none
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=suse.com;
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
 Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR0401MB2400.eurprd04.prod.outlook.com (2603:10a6:800:2c::15) with
+ by VI1PR0402MB3517.eurprd04.prod.outlook.com (2603:10a6:803:b::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.21; Mon, 12 Apr
- 2021 16:01:48 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.18; Mon, 12 Apr
+ 2021 16:16:16 +0000
 Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
  ([fe80::3c87:7c9e:2597:4d94]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
  ([fe80::3c87:7c9e:2597:4d94%5]) with mapi id 15.20.4020.022; Mon, 12 Apr 2021
- 16:01:48 +0000
-From:   =?UTF-8?q?Aur=C3=A9lien=20Aptel?= <aaptel@suse.com>
-To:     linux-cifs@vger.kernel.org
-CC:     smfrench@gmail.com, Aurelien Aptel <aaptel@suse.com>
-Subject: [PATCH v1] cifs: remove old dead code
-Date:   Mon, 12 Apr 2021 18:01:43 +0200
-Message-ID: <20210412160143.7412-1-aaptel@suse.com>
-X-Mailer: git-send-email 2.30.0
+ 16:16:16 +0000
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH] cifs: correct comments explaining internal semaphore
+ usage in the module
+In-Reply-To: <CAH2r5mvmsdai3iCwpohqUeeiW5tPSeiQgCH8DcpicWntc25rNg@mail.gmail.com>
+References: <CAH2r5mvmsdai3iCwpohqUeeiW5tPSeiQgCH8DcpicWntc25rNg@mail.gmail.com>
+Date:   Mon, 12 Apr 2021 18:16:13 +0200
+Message-ID: <87h7kb32cy.fsf@suse.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
 X-Originating-IP: [2003:fa:703:389:f439:5b5b:3992:60b2]
-X-ClientProxiedBy: ZR0P278CA0023.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:1c::10) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-ClientProxiedBy: ZR0P278CA0007.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:16::17) To VI1PR0402MB3359.eurprd04.prod.outlook.com
  (2603:10a6:803:3::28)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:703:389:f439:5b5b:3992:60b2) by ZR0P278CA0023.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:1c::10) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Mon, 12 Apr 2021 16:01:47 +0000
+Received: from localhost (2003:fa:703:389:f439:5b5b:3992:60b2) by ZR0P278CA0007.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:16::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend Transport; Mon, 12 Apr 2021 16:16:15 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1eb30007-a6ab-44a4-20b2-08d8fdcc470c
-X-MS-TrafficTypeDiagnostic: VI1PR0401MB2400:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR0401MB24002CDB9690FC6C726D4AC1A8709@VI1PR0401MB2400.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Office365-Filtering-Correlation-Id: 9d61c878-4cc3-4385-9a0b-08d8fdce4c60
+X-MS-TrafficTypeDiagnostic: VI1PR0402MB3517:
+X-Microsoft-Antispam-PRVS: <VI1PR0402MB351716365FDC167F6D20B252A8709@VI1PR0402MB3517.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PTwEv03CbdC/Kq/AnOseJSS+SjQwt6/Tpsv35opHW5zDl/f6uNFoUW1nIY5BDpUucwUCgXwLg5YlsZseNS5FkVWQ2CacU1Pm0kbPvfOR8YFKhZ6ctGPaotL/Eh3dK6cbXGpu1x+SRtJZhA1V9PAL6c6BVXvaVsgwAAeEDmU8RJ4abrb/TwMsQGLrBQcfX6sdWXvZDcQFgoA0HOiRSsYhGbJiaSyRdPW+w+Aex2gj6zo4/VF9PUuYDGW4CBn/NUm5Oh+fvtfbHP98Co4Q74ZpPxtI9efPMcaET0on4x3KmWSuuqhRkPHk/qEX8bx6lx/pdF57RaOa+ezTFO/bmNLyhb8EsQkXg9ka8WJX/SkUBkhIM2zt1KQlaFXzD5EpPdL4cFmy8kt957RGEioISOgl043KrJM878Z6g4y5B5eibKhy4E4AQ7fXAL5+JYacbpFMiJ0UeZjgOIa3e5V6h5/iMMTwriEJMWr3TmdG/p8jkFjR+g0U8A67paLPyRkerK6DUElwOGQaZK/3CnqUjVH8QIZ6NIknMPyJyJyVUXmZx+D++4fa0x9StIj68D5psv/0uKua5q40NgHEhfoviRBlG5H3mmjTs0uvEWcscBk1QP2pxMAaDGBi+5RG7Bllu/N+jKaNQprtMoXbjZR9298I5zUCZhbxUd5oaFmpqIx117F7Mr16SR5mn1Tl1xOTqmphUYVuXKYNFWGpv5qq0ARduEDSaZJMrPZeqhrzTv42YNZDiDHQ8Qz1y4tr713TSOYHJhkrO4l1QjkQSfbhLZYgPYz4O7S89HIrF54t67gVim3tKl4ZT66pxzkJA3tnDz3RhHz1JE7WWHsB7zPFyALA8KttmHky7rEpa9tD+fdVjVuQ52uMDBmc3PlnpIVsWsKi9G1ZH5gQ+DhU4hRd2G5Wr6fvNLylkD55JAXl923LcAEcQrMJj6MqyUxk040BvqVXkAg
- wjOaEaM/GxOlL2hVSiw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:OSPM;SFS:(366004)(396003)(136003)(376002)(39860400002)(346002)(6666004)(6916009)(36756003)(86362001)(107886003)(478600001)(52116002)(6496006)(1076003)(38100700002)(66476007)(66556008)(4326008)(16526019)(186003)(66946007)(6486002)(5660300002)(2906002)(316002)(8676002)(2616005)(8936002)(83380400001)(23200700001);DIR:OUT;SFP:1501;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?p8npbVjchcENybPCrPONWhaB4vegpHJgVoiUhElnCtoh5ml+56i8TMCJNeeh?=
- =?us-ascii?Q?iB6AozHQSBqe0baRo+RtSa5ussJLOPlf69l6tIHDqoOzvXBjzr1beiDk1lD0?=
- =?us-ascii?Q?JAcPnkc4dJDCp+oYECcyGUa5AsR5dR4+fT50sJA7erefXJVGNW0Hwn8dX2CI?=
- =?us-ascii?Q?587vYu/mlBmhk2UeU++WJaAIR0Cfb4l6+XcmgjOrDU4G8XD0HlTHdbsyRngI?=
- =?us-ascii?Q?giDOSAn8a3IkvntmI1RZR9m1xJ4g10bC8FfWdLcnmzS6njaJplUKubIEMK2p?=
- =?us-ascii?Q?BUE+AP7vWkv4w4LTz8cvabHCN2cuRWE+G8Yh3Tw8k8E6uhJMGdpfB/0aIKyi?=
- =?us-ascii?Q?uh9ntLdRn4JzAMaDkUnXjsNBwctJptRbGcBIs0M9DCtVKp4OUx77nVPgV4H3?=
- =?us-ascii?Q?qp2tSMDCq4Yqq0XbtoFpWE9B96S4YLU+odCCi1TOLb+xL+QoFsKPclx/W+A/?=
- =?us-ascii?Q?Aqf0F3Jv3T4l8yQnvpzSV6Tw1BiIVkO2kqAVtEMW8JHEIt5PItDMl6Gs7rSK?=
- =?us-ascii?Q?kdquSBBPb90WHgKxPmE5pUvazoVdgjf460lRhGhoeaUmx5vDQuKK/Y88BAqm?=
- =?us-ascii?Q?UoxbLOZuYcluI8AbnjjBs7BtvqeNCy7kkQhDgTfG8CURyzXjEi0eqxPtPzQv?=
- =?us-ascii?Q?n2XLILCdKlbPJ1MJcSj/jgOuiffo4UbJ36UQS6ieQu9HsxYtgK/4ZaFqLIUf?=
- =?us-ascii?Q?ZYngU1AJ/39XfaHHt8SA/71xEU5IxZKyvASlEcV33s9i7iJW6Tbn46/UpE4d?=
- =?us-ascii?Q?6ULW5033NFkkEqa4VAh7zgVIOEeAwOYZeH9hLk3JjbU5sdTASHGM0kChDOcq?=
- =?us-ascii?Q?4/D0AZ6v5zFIPjap5ykffn1HXVEeLrTf+7n+AxTC2MD2lnzVvW7l39u2Mu40?=
- =?us-ascii?Q?9Y4v+oXZ/oaDfFluybqDVgA4+48U2IExBHhVsrRKl9s1puJIMmFNFI4E7m8T?=
- =?us-ascii?Q?LUyhcu7SxyEAcoernm3Y+dzk/bay8QsMShlgH3u0daON4XlgC6lSacr1RGtm?=
- =?us-ascii?Q?05W3nuvb3L86z1Tg12YI1QgTtNtAhf+hSFNJiWNS7CTsTxjf4hweJRaKT36E?=
- =?us-ascii?Q?oy7WaRL/K3Q/KOZRZ6L9CCNBkBcDPdJVpeTEgk2eOyZ3SL9FJyZhtzw0bx8p?=
- =?us-ascii?Q?vnWoW2e3qGXAgAwH5c1xCaZDoJ33uDnwYskFjKwI5Q7hQNSbBKzjQUJwdPYo?=
- =?us-ascii?Q?PLOFY1W6Wvq7pC1j4gadYnVAr6fL/V1l1jqMxTmoDIJeyktzbRmq3ZGkg/Zs?=
- =?us-ascii?Q?QNyLsSBk4xJenWB3gSN4ifck2NeRVfxqHkPGbMS2ak6dj9Cf0c3Kv0izUZIe?=
- =?us-ascii?Q?M/BMfhga681HT9Q6SaVhSAJWEdW/FP06MgQqUi+JKZbjIN8qIr9xoNO5UQxe?=
- =?us-ascii?Q?IUhYHoE=3D?=
+X-Microsoft-Antispam-Message-Info: HY5zq8Q7NC1PFGnXfp3Z02V3b3s985A747gcNCM7iEwiGMI+DIjq1XJ2e8CAbaSIt4bDj5UfxQpuEEL0KM9UGC3vgDNjCSUvNvE8A4Aj1NPA3f738vnqXWx9gjYTAbRlohlVQTGL80qzjTbqGYbd5ewcdhrYiql/2pqSrypOSb3nP7yThPk2QZHW3u/fmDHi86U+3h+8hMyUnQyuIb5hT/4ve/QLJOGe9m5Xv3Ups3jV9whkWzWNjnS9G5V9OeMcDp4tkp9J2w5Gm1hEDNqcX4ruohsHOAKNLLrsmw4OqEiItcho9nihQTJaFbKYd5/GmF3ZItHFumNClcthD1KDRisXNTKAnJA45chfSp7KOX/fba/yQY2u3wHqrh3Xw+Go3tx54rK+NwMU1Y2ap8klwOwaT+xY7vQ8DU74ILwIgCjVDWOd8KGo7zmz/yE3Fjj1Jc9qWEi0v95EnG5tWfwlWiOHQVd78G+84rdHfNwYk/kShR85tBtuW53vGYMmCjmydyp5qkR2oRBYvHYlO7c+3LLWcYLNSWxRITAkNbvXrtUnCewoDc6zmrw/6cGo8aFgEcRMMB/BOzjRSJuCx7Fr+A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(376002)(39860400002)(346002)(366004)(136003)(36756003)(186003)(66946007)(66476007)(83380400001)(2616005)(16526019)(6486002)(52116002)(316002)(66556008)(8936002)(66574015)(38100700002)(86362001)(478600001)(8676002)(2906002)(5660300002)(6496006)(110136005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?L1ZIcGNDRVdneG5zUGpTV3NYZWNjYS8wY3h0UVFzOC92WDY1RjZGc2NESEcr?=
+ =?utf-8?B?MkRxdXZac3c3c2FVVmVBdThMTU9XV0svVVlSL1F4a1FyK0lqS0JaZi9zNXNR?=
+ =?utf-8?B?WDBCQkZqQXcvL1Bmd21IS0EwV0Z6VWVNa1FyWlMwQnpveGduRWd5eWJpS0lX?=
+ =?utf-8?B?QnR0TEhJVVVaUHRRWWNQRGZpVGtQTVdQMjF5blMwbEJxZnAzbW1sK0RSekdG?=
+ =?utf-8?B?a2FDNU9uQm50VGJHUkJCQ2NDTXplZGo4WTlqRmJZTS96WGg2VXczSEtqN0sv?=
+ =?utf-8?B?SlY0ajZhUDN1MTlpazNyWTNqV3FTTEptNUdVYkJSK2FNQzJLSXYvY3VPTzZB?=
+ =?utf-8?B?KzRpay9zaGgxcDdXWXJUdWhjYUUyNkE4RlppUmtHMTRvVGFDZzhBUFp6K2c0?=
+ =?utf-8?B?dG1NQUlBam9VcDJzR0tib2liRzdQcW1wWERmKy9oR2hCek1zUkVWUURoaldi?=
+ =?utf-8?B?ZzhOWmxndmpkbml1STBzWE1sTjV3NU5iclNRdTBOTUlTNmlxbVFkSEpCRmg3?=
+ =?utf-8?B?dlVBZ05VTTVwSjJpcjdNbkQxYjRnMzRIMUhqMlRHdWNaZXFvbFBsTm5TQmdQ?=
+ =?utf-8?B?VE54ek10dUloR0dnN0YrdW41Z1RNYWhkNHNMZmdkcUNyemdwdjYxK21OMGNo?=
+ =?utf-8?B?WXFRdTQvbmxRWmVkRFQ4V3JFS0pOSGtUOW56OCtpNG5LSDh5QVkyWUd0dEIv?=
+ =?utf-8?B?UzBiSUJFUkVOakZEcUorckxaR09xT0FpbEdIZTBBbFlCZVJPYk9CZmlzM3h6?=
+ =?utf-8?B?UEo3Nk50VGJlNWc3aEN3c1dVTkZDanVjWlhWUmdlaHFFV1RNdmJBUmV1TWN0?=
+ =?utf-8?B?YUs1QVlCTFRhaVB1UHBqZC9vY1E1VVZ0cXhTUmZlVVR2ZVdEUmd1TklOVGwz?=
+ =?utf-8?B?ZVovV0puZUpyRGZmUWEzMi84VVhmckRza3JPU1pmRndCbTM3MDlYRXJ0VjJP?=
+ =?utf-8?B?ZFRiSG45UWhaUmNVVmNjYWs2bmIzaUhkUHE4Q1lFQXNyOStyZVFVR1pDUVl6?=
+ =?utf-8?B?MWttRmtlUEdNYVBzQ0MxT1JncGdjcEdaZDQxMHJwVTJtNUFBRi8xUmVjOE5j?=
+ =?utf-8?B?SkFHSHA1c1Y4UVYra2IvdzFMM1RsMXlCb29WcHY5OVNtVFpHT3pkZXVuZ2ti?=
+ =?utf-8?B?UGhCTWZBSlg3QWZNNlRDMDFuVnkzK0ptZ0FWTEhzTTNac2VHbWJqNUJlajNn?=
+ =?utf-8?B?UHkzSWZSNDdQWjVSV2FNOTdRY1ZqaGgzMkVrcWViQUdWZVVWN0cyK2t6OTFF?=
+ =?utf-8?B?dmhUVXNZeU9yRGZOZU5KRlV2VjlIVVlkYjE0N0JWTSthbVBJS2FsR3QxL1V6?=
+ =?utf-8?B?Tyt1eXZ3V3hUZWJpNGE5THp2OUdHNTVNcHJVR3BZWWJvYUI4YXhJQllFNnh4?=
+ =?utf-8?B?R01TTEtybWVNaUpaSEQrOWRLTzllZkNOMWl5bDRZdEptSytjK1pPbTlLMnBO?=
+ =?utf-8?B?cFZpZFNHSUZhTjY0ZHh4YmY4dFM2NUJ1d2U0TFMya1ArakRYWW56ekxKbldu?=
+ =?utf-8?B?ajRQRFd6d3l0R1FDK2NYdXpaT2JPQzg1Z2wvWkxOZTBNYW1QNGRWVXpWeXFp?=
+ =?utf-8?B?RVJRS0R2ZUZTSnVzZERJZldBTHFMUXZiRTVsMnpWczhmNGxhY1FGejdqNndy?=
+ =?utf-8?B?STlKOUNRQXRBVDVlRWtmb2ovbkF2MUYrSHNTeGk2ajBoUGFGcnRYL3ZQMzJu?=
+ =?utf-8?B?bVd0eExqZ0FOM0xUUWE4ejg0SllldXQwUzlTWkxrSkM4S3dGMjJDdE9UUmpu?=
+ =?utf-8?B?YVhMak10Y01SQnlZMEwwNDBwSWlXNGhDMitjRW5idTMrNkxhTzF4M2FPbHFt?=
+ =?utf-8?B?aVRSNDlCTVVlOTg1T0tpSkU3TERkdnVLTG1tK01XWDlZdWgzNHg0UXNKWUM4?=
+ =?utf-8?Q?bCZSrXBc6cfBI?=
 X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1eb30007-a6ab-44a4-20b2-08d8fdcc470c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d61c878-4cc3-4385-9a0b-08d8fdce4c60
 X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2021 16:01:48.1137
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2021 16:16:16.1053
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kLFRRG+IzDjlAVhqRUdpGC3ceaCLFa3PwaeTd5Je2lnYOG1chGsXEEShSx7DaceL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0401MB2400
+X-MS-Exchange-CrossTenant-UserPrincipalName: dKrHBY/yPX5nlH7PT0MDi5wQ0gu3TXzRKyu5rQb0/qLzf5mC4McIg9Loetc6SmhD
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3517
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Aurelien Aptel <aaptel@suse.com>
+Steve French <smfrench@gmail.com> writes:
+> A few of the semaphores had been removed, and one additional one
+> needed to be noted in the comments.   (Additional updates to the
+> semaphore/mutex/lock descriptions in the comments in cifsglob.h
+> could be helpful to make sure they accurately reflect what protects
+> what).
 
-While reviewing a patch clarifying locks and locking hierarchy I
-realized some locks were unused.
+That's a very good idea. A good starting point would be:
 
-This commit removes old data and code that isn't actually used
-anywhere, or hidden in ifdefs which cannot be enabled from the kernel
-config.
+  $ grep 'struct[\t ]*mutex\|spinlock_t\|rw_semaphore\|seqlock_t\|rcu_.*loc=
+k' fs/cifs/*[ch]
 
-* The uid/gid trees and associated locks are left-overs from when
-  uid/sid mapping had an extra caching layer on top of the keyring and
-  are now unused.
-  See commit faa65f07d21e ("cifs: simplify id_to_sid and sid_to_id mapping =
-code")
-  from 2012.
+  fs/cifs/cifs_fs_sb.h:   spinlock_t tlink_tree_lock;
+  fs/cifs/cifsglob.h:     spinlock_t req_lock;  /* protect the two values a=
+bove */
+  fs/cifs/cifsglob.h:     struct mutex srv_mutex;
+  fs/cifs/cifsglob.h:     struct mutex reconnect_mutex; /* prevent simultan=
+eous reconnects */
+  fs/cifs/cifsglob.h:     struct mutex session_mutex;
+  fs/cifs/cifsglob.h:     spinlock_t iface_lock;
+  fs/cifs/cifsglob.h:     struct mutex fid_mutex;
+  fs/cifs/cifsglob.h:     spinlock_t open_file_lock; /* protects list above=
+ */
+  fs/cifs/cifsglob.h:     spinlock_t stat_lock;  /* protects the two fields=
+ above */
+  fs/cifs/cifsglob.h:     spinlock_t file_info_lock; /* protects four flag/=
+count fields above */
+  fs/cifs/cifsglob.h:     struct mutex fh_mutex; /* prevents reopen race af=
+ter dead ses*/
+  fs/cifs/cifsglob.h:     struct mutex            aio_mutex;
+  fs/cifs/cifsglob.h:     struct rw_semaphore lock_sem;   /* protect the fi=
+elds above */
+  fs/cifs/cifsglob.h:     spinlock_t      open_file_lock; /* protects openF=
+ileList */
+  fs/cifs/cifsglob.h:     spinlock_t writers_lock;
+  fs/cifs/cifsglob.h:GLOBAL_EXTERN spinlock_t             cifs_tcp_ses_lock=
+;
+  fs/cifs/cifsglob.h:GLOBAL_EXTERN spinlock_t GlobalMid_Lock;  /* protects =
+above & list operations */
+  fs/cifs/cifsproto.h:extern void cifs_down_write(struct rw_semaphore *sem)=
+;
+  fs/cifs/dfs_cache.c:    spinlock_t ctx_lock;
+  fs/cifs/dir.c:  rcu_read_lock();
+  fs/cifs/dir.c:                  rcu_read_unlock();
+  fs/cifs/dir.c:  rcu_read_unlock();
+  fs/cifs/dir.c:  rcu_read_lock();
+  fs/cifs/dir.c:                  rcu_read_unlock();
+  fs/cifs/dir.c:  rcu_read_unlock();
+  fs/cifs/file.c:cifs_down_write(struct rw_semaphore *sem)
+  fs/cifs/smbdirect.h:    spinlock_t lock_new_credits_offered;
+  fs/cifs/smbdirect.h:    spinlock_t mr_list_lock;
+  fs/cifs/smbdirect.h:    spinlock_t receive_queue_lock;
+  fs/cifs/smbdirect.h:    spinlock_t empty_packet_queue_lock;
+  fs/cifs/smbdirect.h:    spinlock_t reassembly_queue_lock;
 
-* cifs_oplock_break_ops is a left-over from when slow_work was remplaced
-  by regular workqueue and is now unused.
-  See commit 9b646972467f ("cifs: use workqueue instead of slow-work")
-  from 2010.
-
-* CIFSSMBSetAttrLegacy is SMB1 cruft dealing with some legacy
-  NT4/Win9x behaviour.
-
-* Remove CONFIG_CIFS_DNOTIFY_EXPERIMENTAL left-overs. This was already
-  partially removed in 392e1c5dc9cc ("cifs: rename and clarify CIFS_ASYNC_O=
-P and CIFS_NO_RESP")
-  from 2019. Kill it completely.
-
-* Another candidate that was considered but spared is
-  CONFIG_CIFS_NFSD_EXPORT which has an empty implementation and cannot
-  be enabled by a config option (although it is listed but disabled with
-  "BROKEN" as a dep). It's unclear whether this could even function
-  today in its current form but it has it's own .c file and Kconfig
-  entry which is a bit more involved to remove and might make a come
-  back?
-
-Signed-off-by: Aurelien Aptel <aaptel@suse.com>
----
- fs/cifs/cifsfs.c    |  4 ----
- fs/cifs/cifsglob.h  | 17 ---------------
- fs/cifs/cifsproto.h | 11 ----------
- fs/cifs/cifssmb.c   | 50 ---------------------------------------------
- fs/cifs/inode.c     |  9 --------
- 5 files changed, 91 deletions(-)
-
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index 1b65ff9e9189..8dc2306c9092 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1526,10 +1526,6 @@ init_cifs(void)
- 	int rc =3D 0;
- 	cifs_proc_init();
- 	INIT_LIST_HEAD(&cifs_tcp_ses_list);
--#ifdef CONFIG_CIFS_DNOTIFY_EXPERIMENTAL /* unused temporarily */
--	INIT_LIST_HEAD(&GlobalDnotifyReqList);
--	INIT_LIST_HEAD(&GlobalDnotifyRsp_Q);
--#endif /* was needed for dnotify, and will be needed for inotify when VFS =
-fix */
- /*
-  *  Initialize Global counters
-  */
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index dec0620ccca4..107e1eebaba4 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -1827,13 +1827,6 @@ GLOBAL_EXTERN struct list_head		cifs_tcp_ses_list;
-  */
- GLOBAL_EXTERN spinlock_t		cifs_tcp_ses_lock;
-=20
--#ifdef CONFIG_CIFS_DNOTIFY_EXPERIMENTAL /* unused temporarily */
--/* Outstanding dir notify requests */
--GLOBAL_EXTERN struct list_head GlobalDnotifyReqList;
--/* DirNotify response queue */
--GLOBAL_EXTERN struct list_head GlobalDnotifyRsp_Q;
--#endif /* was needed for dnotify, and will be needed for inotify when VFS =
-fix */
--
- /*
-  * Global transaction id (XID) information
-  */
-@@ -1877,19 +1870,9 @@ extern unsigned int cifs_min_small;  /* min size of =
-small buf pool */
- extern unsigned int cifs_max_pending; /* MAX requests at once to server*/
- extern bool disable_legacy_dialects;  /* forbid vers=3D1.0 and vers=3D2.0 =
-mounts */
-=20
--GLOBAL_EXTERN struct rb_root uidtree;
--GLOBAL_EXTERN struct rb_root gidtree;
--GLOBAL_EXTERN spinlock_t siduidlock;
--GLOBAL_EXTERN spinlock_t sidgidlock;
--GLOBAL_EXTERN struct rb_root siduidtree;
--GLOBAL_EXTERN struct rb_root sidgidtree;
--GLOBAL_EXTERN spinlock_t uidsidlock;
--GLOBAL_EXTERN spinlock_t gidsidlock;
--
- void cifs_oplock_break(struct work_struct *work);
- void cifs_queue_oplock_break(struct cifsFileInfo *cfile);
-=20
--extern const struct slow_work_ops cifs_oplock_break_ops;
- extern struct workqueue_struct *cifsiod_wq;
- extern struct workqueue_struct *decrypt_wq;
- extern struct workqueue_struct *fileinfo_put_wq;
-diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-index 75ce6f742b8d..10c84a8159d7 100644
---- a/fs/cifs/cifsproto.h
-+++ b/fs/cifs/cifsproto.h
-@@ -358,11 +358,6 @@ extern int CIFSSMBSetFileDisposition(const unsigned in=
-t xid,
- 				     struct cifs_tcon *tcon,
- 				     bool delete_file, __u16 fid,
- 				     __u32 pid_of_opener);
--#if 0
--extern int CIFSSMBSetAttrLegacy(unsigned int xid, struct cifs_tcon *tcon,
--			char *fileName, __u16 dos_attributes,
--			const struct nls_table *nls_codepage);
--#endif /* possibly unneeded function */
- extern int CIFSSMBSetEOF(const unsigned int xid, struct cifs_tcon *tcon,
- 			 const char *file_name, __u64 size,
- 			 struct cifs_sb_info *cifs_sb, bool set_allocation);
-@@ -504,12 +499,6 @@ extern int generate_smb311signingkey(struct cifs_ses *=
-);
- extern int calc_lanman_hash(const char *password, const char *cryptkey,
- 				bool encrypt, char *lnm_session_key);
- #endif /* CIFS_WEAK_PW_HASH */
--#ifdef CONFIG_CIFS_DNOTIFY_EXPERIMENTAL /* unused temporarily */
--extern int CIFSSMBNotify(const unsigned int xid, struct cifs_tcon *tcon,
--			const int notify_subdirs, const __u16 netfid,
--			__u32 filter, struct file *file, int multishot,
--			const struct nls_table *nls_codepage);
--#endif /* was needed for dnotify, and will be needed for inotify when VFS =
-fix */
- extern int CIFSSMBCopy(unsigned int xid,
- 			struct cifs_tcon *source_tcon,
- 			const char *fromName,
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index c279527aae92..7fcc0fc4e68b 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -5917,56 +5917,6 @@ CIFSSMBSetPathInfo(const unsigned int xid, struct ci=
-fs_tcon *tcon,
- 	return rc;
- }
-=20
--/* Can not be used to set time stamps yet (due to old DOS time format) */
--/* Can be used to set attributes */
--#if 0  /* Possibly not needed - since it turns out that strangely NT4 has =
-a bug
--	  handling it anyway and NT4 was what we thought it would be needed for
--	  Do not delete it until we prove whether needed for Win9x though */
--int
--CIFSSMBSetAttrLegacy(unsigned int xid, struct cifs_tcon *tcon, char *fileN=
-ame,
--		__u16 dos_attrs, const struct nls_table *nls_codepage)
--{
--	SETATTR_REQ *pSMB =3D NULL;
--	SETATTR_RSP *pSMBr =3D NULL;
--	int rc =3D 0;
--	int bytes_returned;
--	int name_len;
--
--	cifs_dbg(FYI, "In SetAttrLegacy\n");
--
--SetAttrLgcyRetry:
--	rc =3D smb_init(SMB_COM_SETATTR, 8, tcon, (void **) &pSMB,
--		      (void **) &pSMBr);
--	if (rc)
--		return rc;
--
--	if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
--		name_len =3D
--			ConvertToUTF16((__le16 *) pSMB->fileName, fileName,
--				       PATH_MAX, nls_codepage);
--		name_len++;     /* trailing null */
--		name_len *=3D 2;
--	} else {
--		name_len =3D copy_path_name(pSMB->fileName, fileName);
--	}
--	pSMB->attr =3D cpu_to_le16(dos_attrs);
--	pSMB->BufferFormat =3D 0x04;
--	inc_rfc1001_len(pSMB, name_len + 1);
--	pSMB->ByteCount =3D cpu_to_le16(name_len + 1);
--	rc =3D SendReceive(xid, tcon->ses, (struct smb_hdr *) pSMB,
--			 (struct smb_hdr *) pSMBr, &bytes_returned, 0);
--	if (rc)
--		cifs_dbg(FYI, "Error in LegacySetAttr =3D %d\n", rc);
--
--	cifs_buf_release(pSMB);
--
--	if (rc =3D=3D -EAGAIN)
--		goto SetAttrLgcyRetry;
--
--	return rc;
--}
--#endif /* temporarily unneeded SetAttr legacy function */
--
- static void
- cifs_fill_unix_set_info(FILE_UNIX_BASIC_INFO *data_offset,
- 			const struct cifs_unix_set_info_args *args)
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index f2df4422e54a..2a73ae04b741 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -2961,12 +2961,3 @@ cifs_setattr(struct user_namespace *mnt_userns, stru=
-ct dentry *direntry,
- 	/* BB: add cifs_setattr_legacy for really old servers */
- 	return rc;
- }
--
--#if 0
--void cifs_delete_inode(struct inode *inode)
--{
--	cifs_dbg(FYI, "In cifs_delete_inode, inode =3D 0x%p\n", inode);
--	/* may have to add back in if and when safe distributed caching of
--	   directories added e.g. via FindNotify */
--}
--#endif
+Cheers,
 --=20
-2.30.0
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
+E
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
+nchen)
 
