@@ -2,222 +2,257 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92415C433B4
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 19:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51387C43461
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 20:20:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A1AE61356
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 19:35:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B43A61358
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Apr 2021 20:20:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237410AbhDLTgN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Apr 2021 15:36:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37580 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236717AbhDLTgM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Apr 2021 15:36:12 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F57CC061574
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Apr 2021 12:35:54 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id b26so4711319pfr.3
-        for <linux-cifs@vger.kernel.org>; Mon, 12 Apr 2021 12:35:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VnJ6hE/9ejor75E+9VyTxz6IOuWJqVTi5dRKFYuua9k=;
-        b=tiGnaErtrwep6yut8WJJo43Ha91jgnreD1eBpg8LiYOIdTOJvHMbga8U5wpnhbAcEW
-         c6zEpeD9hvlvQe+UWvXdc/Yn3lWSz4WNzdkUskJ5GON19V3yOBGhE9t0jOi4pFjNLVWS
-         2MiFiHIvrJwzJb95zNcFdKDFnU9PabHUkbQxJYG2UfPSD8EVQEd6rDhTjAzA3rQyFEqj
-         9x4JHdHsxbu7hg5kvYsFhqaEaQH1AqPsHuj/pO0oOrMCck2vjsK7cJsdE6Ki9OcYHvhk
-         BQpI6p8GVAbvTQ3m4NZ6uklDSLHUSULuTwLu/7xfOQegk/Qt/H++yT87pVEIUmTsrfB9
-         8YrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VnJ6hE/9ejor75E+9VyTxz6IOuWJqVTi5dRKFYuua9k=;
-        b=Pd23Aqz453nzI3NVRvjoqnsCdoYIpu9D8km+GUC9KIOAl+doJ161st7WcSzONTtc0l
-         cnmb4YleXGjfbVPQ5bKAfT505htOZWqOuoKNaJ9pJgEEHNiH8NZ82d/3QO5zEO5Pvdm3
-         lpl/yMfzdaZLCzi/UCpvKDazBzPDTAKWo1/hHIqGg3n8N4XvBFRwtEKCZJU9tnfPKcTb
-         oxP99dPCWN5yFN2BwO8ocOuMmITFAviAPPIq3NUrkEPSMHxZAvOcg02TiSDoWHIc9MmN
-         tewq+ljawUPubyEXFQ45wKLcAUSMJzfjFb0CPJwCKAuwuiu6D3o3VGoaNjLK+5Px2SvN
-         fcjA==
-X-Gm-Message-State: AOAM532NB6d86LT4bYc7zFRNg791+2qJ2aua51oUzEMVspCq8cIapgAU
-        4WhNF9qa/yhuFazSCrv+pPBxlQfAtPUxlAjU4QM=
-X-Google-Smtp-Source: ABdhPJwJ7hFL+3toDir+Aa76Sw1ki+X2uq9bqH69a7ug7t8fLC7en3egpDrysf15fTSysJZeTXCsQI2zr92Q0nJcDx4=
-X-Received: by 2002:a65:40c7:: with SMTP id u7mr28468282pgp.29.1618256153868;
- Mon, 12 Apr 2021 12:35:53 -0700 (PDT)
+        id S238165AbhDLUVL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Apr 2021 16:21:11 -0400
+Received: from p3plsmtpa06-10.prod.phx3.secureserver.net ([173.201.192.111]:40888
+        "EHLO p3plsmtpa06-10.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237595AbhDLUVK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 12 Apr 2021 16:21:10 -0400
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id W339l3kjiyIwVW339ls9Ne; Mon, 12 Apr 2021 13:20:51 -0700
+X-CMAE-Analysis: v=2.4 cv=NP4QR22g c=1 sm=1 tr=0 ts=6074aba3
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=hlpFoNB0AAAA:8 a=SEc3moZ4AAAA:8 a=EXjNRlMbRGv2XLaMZsQA:9
+ a=QEXdDO2ut3YA:10 a=kMYpNb-kQgMLPvQdVK_m:22 a=5oRCH6oROnRZc2VpWJZ3:22
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [PATCH rdma-next 00/10] Enable relaxed ordering for ULPs
+To:     Haakon Bugge <haakon.bugge@oracle.com>,
+        David Laight <David.Laight@aculab.com>
+Cc:     Chuck Lever III <chuck.lever@oracle.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Adit Ranadive <aditr@vmware.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Devesh Sharma <devesh.sharma@broadcom.com>,
+        Faisal Latif <faisal.latif@intel.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Bruce Fields <bfields@fieldses.org>, Jens Axboe <axboe@fb.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, Lijun Ou <oulijun@huawei.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        OFED mailing list <linux-rdma@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Michael Guralnik <michaelgur@nvidia.com>,
+        Michal Kalderon <mkalderon@marvell.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Naresh Kumar PBS <nareshkumar.pbs@broadcom.com>,
+        Linux-Net <netdev@vger.kernel.org>,
+        Potnuri Bharat Teja <bharat@chelsio.com>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        Selvin Xavier <selvin.xavier@broadcom.com>,
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        Somnath Kotur <somnath.kotur@broadcom.com>,
+        Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+        Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        VMware PV-Drivers <pv-drivers@vmware.com>,
+        Weihang Li <liweihang@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>
+References: <20210405052404.213889-1-leon@kernel.org>
+ <20210405134115.GA22346@lst.de> <20210405200739.GB7405@nvidia.com>
+ <C2924F03-11C5-4839-A4F3-36872194EEA8@oracle.com>
+ <20210406114952.GH7405@nvidia.com>
+ <aeb7334b-edc0-78c2-4adb-92d4a994210d@talpey.com>
+ <8A5E83DF-5C08-49CE-8EE3-08DC63135735@oracle.com>
+ <4b02d1b2-be0e-0d1d-7ac3-38d32e44e77e@talpey.com>
+ <1FA38618-E245-4C53-BF49-6688CA93C660@oracle.com>
+ <7b9e7d9c-13d7-0d18-23b4-0d94409c7741@talpey.com>
+ <f71b24433f4540f0a13133111a59dab8@AcuMS.aculab.com>
+ <880A23A2-F078-42CF-BEE2-30666BCB9B5D@oracle.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <7deadc67-650c-ea15-722b-a1d77d38faba@talpey.com>
+Date:   Mon, 12 Apr 2021 16:20:47 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-References: <CACdtm0Y1NeC0jNTOtjhTtGRt0sfyhyxC=wNfMu1eqibe6qJbwA@mail.gmail.com>
- <CAH2r5mviSVQXO6BK42NDer14DKKopP4oCTD4WuiiridB7Q2Hwg@mail.gmail.com> <CAH2r5muxLnkE3qT0dsn7A_ZDMeBW8cXsHV3mCePTFjeVBJ26Vw@mail.gmail.com>
-In-Reply-To: <CAH2r5muxLnkE3qT0dsn7A_ZDMeBW8cXsHV3mCePTFjeVBJ26Vw@mail.gmail.com>
-From:   Rohith Surabattula <rohiths.msft@gmail.com>
-Date:   Tue, 13 Apr 2021 01:05:43 +0530
-Message-ID: <CACdtm0baDOoM62qW9DxVEMXA-XS5iQcB5W55Sz5jx6oWj80oWQ@mail.gmail.com>
-Subject: Re: cifs: Deferred close for files
-To:     Steve French <smfrench@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Pavel Shilovsky <piastryyy@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        sribhat.msa@outlook.com,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <880A23A2-F078-42CF-BEE2-30666BCB9B5D@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: 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
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Steve,
+On 4/12/2021 2:32 PM, Haakon Bugge wrote:
+> 
+> 
+>> On 10 Apr 2021, at 15:30, David Laight <David.Laight@aculab.com> wrote:
+>>
+>> From: Tom Talpey
+>>> Sent: 09 April 2021 18:49
+>>> On 4/9/2021 12:27 PM, Haakon Bugge wrote:
+>>>>
+>>>>
+>>>>> On 9 Apr 2021, at 17:32, Tom Talpey <tom@talpey.com> wrote:
+>>>>>
+>>>>> On 4/9/2021 10:45 AM, Chuck Lever III wrote:
+>>>>>>> On Apr 9, 2021, at 10:26 AM, Tom Talpey <tom@talpey.com> wrote:
+>>>>>>>
+>>>>>>> On 4/6/2021 7:49 AM, Jason Gunthorpe wrote:
+>>>>>>>> On Mon, Apr 05, 2021 at 11:42:31PM +0000, Chuck Lever III wrote:
+>>>>>>>>
+>>>>>>>>> We need to get a better idea what correctness testing has been done,
+>>>>>>>>> and whether positive correctness testing results can be replicated
+>>>>>>>>> on a variety of platforms.
+>>>>>>>> RO has been rolling out slowly on mlx5 over a few years and storage
+>>>>>>>> ULPs are the last to change. eg the mlx5 ethernet driver has had RO
+>>>>>>>> turned on for a long time, userspace HPC applications have been using
+>>>>>>>> it for a while now too.
+>>>>>>>
+>>>>>>> I'd love to see RO be used more, it was always something the RDMA
+>>>>>>> specs supported and carefully architected for. My only concern is
+>>>>>>> that it's difficult to get right, especially when the platforms
+>>>>>>> have been running strictly-ordered for so long. The ULPs need
+>>>>>>> testing, and a lot of it.
+>>>>>>>
+>>>>>>>> We know there are platforms with broken RO implementations (like
+>>>>>>>> Haswell) but the kernel is supposed to globally turn off RO on all
+>>>>>>>> those cases. I'd be a bit surprised if we discover any more from this
+>>>>>>>> series.
+>>>>>>>> On the other hand there are platforms that get huge speed ups from
+>>>>>>>> turning this on, AMD is one example, there are a bunch in the ARM
+>>>>>>>> world too.
+>>>>>>>
+>>>>>>> My belief is that the biggest risk is from situations where completions
+>>>>>>> are batched, and therefore polling is used to detect them without
+>>>>>>> interrupts (which explicitly). The RO pipeline will completely reorder
+>>>>>>> DMA writes, and consumers which infer ordering from memory contents may
+>>>>>>> break. This can even apply within the provider code, which may attempt
+>>>>>>> to poll WR and CQ structures, and be tripped up.
+>>>>>> You are referring specifically to RPC/RDMA depending on Receive
+>>>>>> completions to guarantee that previous RDMA Writes have been
+>>>>>> retired? Or is there a particular implementation practice in
+>>>>>> the Linux RPC/RDMA code that worries you?
+>>>>>
+>>>>> Nothing in the RPC/RDMA code, which is IMO correct. The worry, which
+>>>>> is hopefully unfounded, is that the RO pipeline might not have flushed
+>>>>> when a completion is posted *after* posting an interrupt.
+>>>>>
+>>>>> Something like this...
+>>>>>
+>>>>> RDMA Write arrives
+>>>>> 	PCIe RO Write for data
+>>>>> 	PCIe RO Write for data
+>>>>> 	...
+>>>>> RDMA Write arrives
+>>>>> 	PCIe RO Write for data
+>>>>> 	...
+>>>>> RDMA Send arrives
+>>>>> 	PCIe RO Write for receive data
+>>>>> 	PCIe RO Write for receive descriptor
+>>>>
+>>>> Do you mean the Write of the CQE? It has to be Strongly Ordered for a correct implementation. Then
+>>> it will shure prior written RO date has global visibility when the CQE can be observed.
+>>>
+>>> I wasn't aware that a strongly-ordered PCIe Write will ensure that
+>>> prior relaxed-ordered writes went first. If that's the case, I'm
+>>> fine with it - as long as the providers are correctly coded!!
+> 
+> The PCIe spec (Table Ordering Rules Summary) is quite clear here (A Posted request is Memory Write Request in this context):
+> 
+> 	A Posted Request must not pass another Posted Request unless A2b applies.
+> 
+> 	A2b: A Posted Request with RO Set is permitted to pass another Posted Request.
+> 
+> 
+> Thxs, Håkon
 
-I didn't observe when I ran locally against Azure.
-Let me try to reproduce.
+Ok, good - a non-RO write (for example, to a CQE), or an interrupt
+(which would be similarly non-RO), will "get behind" all prior writes.
 
-Regards,
-Rohith
+So the issue is only in testing all the providers and platforms,
+to be sure this new behavior isn't tickling anything that went
+unnoticed all along, because no RDMA provider ever issued RO.
 
-On Mon, Apr 12, 2021 at 10:54 PM Steve French <smfrench@gmail.com> wrote:
->
-> I was running to Samba server as the target
->
-> On Mon, Apr 12, 2021 at 12:23 PM Steve French <smfrench@gmail.com> wrote:
-> >
-> > I saw some problems in dmesg ( when running test generic/005) multiple
-> > similar errors.  Anyone else see them?
-> >
-> > Rohith,
-> > Can you repro that?
-> >
-> > [171877.491187] run fstests generic/005 at 2021-04-12 12:20:57
-> > [171878.245576] ------------[ cut here ]------------
-> > [171878.245578] WARNING: CPU: 5 PID: 546266 at
-> > arch/x86/include/asm/kfence.h:44 kfence_protect_page+0x33/0xa0
-> > [171878.245583] Modules linked in: cifs(OE) md4 rfcomm nls_utf8 libdes
-> > ccm cachefiles fscache nf_tables nfnetlink cmac algif_hash
-> > algif_skcipher af_alg bnep nls_iso8859_1 mei_hdcp intel_rapl_msr
-> > x86_pkg_temp_thermal intel_powerclamp snd_sof_pci_intel_cnl
-> > snd_sof_intel_hda_common coretemp snd_soc_hdac_hda soundwire_intel
-> > soundwire_generic_allocation soundwire_cadence snd_sof_intel_hda
-> > kvm_intel snd_sof_pci nouveau snd_sof iwlmvm kvm snd_sof_xtensa_dsp
-> > snd_hda_ext_core snd_soc_acpi_intel_match mac80211 snd_soc_acpi
-> > crct10dif_pclmul soundwire_bus ghash_clmulni_intel aesni_intel
-> > snd_hda_codec_realtek snd_soc_core mxm_wmi snd_hda_codec_generic
-> > drm_ttm_helper crypto_simd ttm cryptd snd_compress snd_hda_codec_hdmi
-> > libarc4 ac97_bus drm_kms_helper snd_pcm_dmaengine rapl btusb cec
-> > intel_cstate snd_hda_intel uvcvideo btrtl rc_core btbcm
-> > videobuf2_vmalloc btintel videobuf2_memops iwlwifi snd_intel_dspcfg
-> > videobuf2_v4l2 fb_sys_fops snd_intel_sdw_acpi thinkpad_acpi serio_raw
-> > videobuf2_common syscopyarea
-> > [171878.245630]  bluetooth snd_hda_codec processor_thermal_device
-> > efi_pstore videodev processor_thermal_rfim sysfillrect
-> > processor_thermal_mbox snd_seq_midi processor_thermal_rapl sysimgblt
-> > snd_hda_core ecdh_generic snd_seq_midi_event snd_hwdep nvidiafb
-> > ucsi_acpi nvram intel_rapl_common input_leds mc ecc mei_me
-> > platform_profile intel_wmi_thunderbolt vgastate typec_ucsi wmi_bmof
-> > elan_i2c ee1004 ledtrig_audio cfg80211 8250_dw fb_ddc joydev snd_pcm
-> > mei i2c_algo_bit intel_soc_dts_iosf intel_pch_thermal snd_rawmidi
-> > typec snd_seq snd_seq_device snd_timer snd soundcore int3403_thermal
-> > int340x_thermal_zone int3400_thermal acpi_thermal_rel acpi_pad mac_hid
-> > sch_fq_codel parport_pc ppdev lp parport drm sunrpc ip_tables x_tables
-> > autofs4 wacom hid_generic usbhid hid xfs btrfs blake2b_generic xor
-> > raid6_pq libcrc32c rtsx_pci_sdmmc crc32_pclmul nvme psmouse e1000e
-> > i2c_i801 intel_lpss_pci i2c_smbus rtsx_pci nvme_core intel_lpss
-> > xhci_pci idma64 xhci_pci_renesas wmi video pinctrl_cannonlake
-> > [171878.245679]  [last unloaded: cifs]
-> > [171878.245680] CPU: 5 PID: 546266 Comm: kworker/5:1 Tainted: G
-> > W  OE     5.12.0-051200rc6-generic #202104042231
-> > [171878.245682] Hardware name: LENOVO 20MAS08500/20MAS08500, BIOS
-> > N2CET54W (1.37 ) 06/20/2020
-> > [171878.245684] Workqueue: cifsoplockd cifs_oplock_break [cifs]
-> > [171878.245720] RIP: 0010:kfence_protect_page+0x33/0xa0
-> > [171878.245724] Code: 53 89 f3 48 8d 75 e4 48 83 ec 10 65 48 8b 04 25
-> > 28 00 00 00 48 89 45 e8 31 c0 e8 d8 f4 d9 ff 48 85 c0 74 06 83 7d e4
-> > 01 74 06 <0f> 0b 31 c0 eb 39 48 8b 38 48 89 c2 84 db 75 47 48 89 f8 0f
-> > 1f 40
-> > [171878.245726] RSP: 0018:ffffa33b84d47c20 EFLAGS: 00010046
-> > [171878.245727] RAX: 0000000000000000 RBX: 0000000000000000 RCX:
-> > ffffa33b84d47c24
-> > [171878.245729] RDX: ffffa33b84d47c24 RSI: 0000000000000000 RDI:
-> > 0000000000000000
-> > [171878.245730] RBP: ffffa33b84d47c40 R08: 0000000000000000 R09:
-> > 0000000000000000
-> > [171878.245731] R10: 0000000000000000 R11: 0000000000000000 R12:
-> > 0000000000000000
-> > [171878.245732] R13: ffffa33b84d47d68 R14: ffffa33b84d47d68 R15:
-> > 0000000000000000
-> > [171878.245734] FS:  0000000000000000(0000) GS:ffff8da17bb40000(0000)
-> > knlGS:0000000000000000
-> > [171878.245736] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [171878.245737] CR2: 0000000000000268 CR3: 0000000484e10003 CR4:
-> > 00000000003706e0
-> > [171878.245739] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-> > 0000000000000000
-> > [171878.245740] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-> > 0000000000000400
-> > [171878.245741] Call Trace:
-> > [171878.245744]  kfence_unprotect+0x17/0x30
-> > [171878.245746]  kfence_handle_page_fault+0x97/0x250
-> > [171878.245748]  page_fault_oops+0x88/0x130
-> > [171878.245751]  do_user_addr_fault+0x323/0x670
-> > [171878.245754]  ? cifsFileInfo_put_final+0x10a/0x120 [cifs]
-> > [171878.245784]  exc_page_fault+0x6c/0x150
-> > [171878.245808]  asm_exc_page_fault+0x1e/0x30
-> > [171878.245811] RIP: 0010:_raw_spin_lock+0xc/0x30
-> > [171878.245814] Code: ba 01 00 00 00 f0 0f b1 17 75 01 c3 55 89 c6 48
-> > 89 e5 e8 d7 42 4b ff 66 90 5d c3 0f 1f 00 0f 1f 44 00 00 31 c0 ba 01
-> > 00 00 00 <f0> 0f b1 17 75 01 c3 55 89 c6 48 89 e5 e8 b2 42 4b ff 66 90
-> > 5d c3
-> > [171878.245830] RSP: 0018:ffffa33b84d47e10 EFLAGS: 00010246
-> > [171878.245831] RAX: 0000000000000000 RBX: ffff8d9a0994d510 RCX:
-> > 000000008020001e
-> > [171878.245832] RDX: 0000000000000001 RSI: 000000008020001e RDI:
-> > 0000000000000268
-> > [171878.245833] RBP: ffffa33b84d47e70 R08: 0000000000000001 R09:
-> > 0000000000000001
-> > [171878.245834] R10: ffffffffaec73500 R11: 0000000000000000 R12:
-> > 0000000000000000
-> > [171878.245835] R13: ffff8d9a0994d400 R14: ffff8d9f9e1f9c20 R15:
-> > ffff8d9a092b1800
-> > [171878.245838]  ? cifs_oplock_break+0x1e9/0x5d0 [cifs]
-> > [171878.245871]  process_one_work+0x220/0x3c0
-> > [171878.245874]  worker_thread+0x50/0x370
-> > [171878.245876]  kthread+0x12f/0x150
-> > [171878.245878]  ? process_one_work+0x3c0/0x3c0
-> > [171878.245880]  ? __kthread_bind_mask+0x70/0x70
-> > [171878.245882]  ret_from_fork+0x22/0x30
-> > [171878.245887] ---[ end trace fefd5c5bed217748 ]---
-> > [171878.245892] ------------[ cut here ]------------
-> >
-> > On Tue, Mar 9, 2021 at 3:11 AM Rohith Surabattula
-> > <rohiths.msft@gmail.com> wrote:
-> > >
-> > > Hi All,
-> > >
-> > > Please find the attached patch which will defer the close to server.
-> > > So, performance can be improved.
-> > >
-> > > i.e When file is open, write, close, open, read, close....
-> > > As close is deferred and oplock is held, cache will not be invalidated
-> > > and same handle can be used for second open.
-> > >
-> > > Please review the changes and let me know your thoughts.
-> > >
-> > > Regards,
-> > > Rohith
-> >
-> >
-> >
-> > --
-> > Thanks,
-> >
-> > Steve
->
->
->
-> --
-> Thanks,
->
-> Steve
+Honestly, the Haswell sounds like a great first candidate, because
+if it has a known-broken RO behavior, verifying that it works with
+this change is highly important. I'd have greater confidence in newer
+platforms, in other words. They *all* have to work, proveably.
+
+Tom.
+
+>> I remember trying to read the relevant section of the PCIe spec.
+>> (Possibly in a book that was trying to make it easier to understand!)
+>> It is about as clear as mud.
+>>
+>> I presume this is all about allowing PCIe targets (eg ethernet cards)
+>> to use relaxed ordering on write requests to host memory.
+>> And that such writes can be completed out of order?
+>>
+>> It isn't entirely clear that you aren't talking of letting the
+>> cpu do 'relaxed order' writes to PCIe targets!
+>>
+>> For a typical ethernet driver the receive interrupt just means
+>> 'go and look at the receive descriptor ring'.
+>> So there is an absolute requirement that the writes for data
+>> buffer complete before the write to the receive descriptor.
+>> There is no requirement for the interrupt (requested after the
+>> descriptor write) to have been seen by the cpu.
+>>
+>> Quite often the driver will find the 'receive complete'
+>> descriptor when processing frames from an earlier interrupt
+>> (and nothing to do in response to the interrupt itself).
+>>
+>> So the write to the receive descriptor would have to have RO clear
+>> to ensure that all the buffer writes complete first.
+>>
+>> (The furthest I've got into PCIe internals was fixing the bug
+>> in some vendor-supplied FPGA logic that failed to correctly
+>> handle multiple data TLP responses to a single read TLP.
+>> Fortunately it wasn't in the hard-IP bit.)
+>>
+>> 	David
+>>
+>> -
+>> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+>> Registration No: 1397386 (Wales)
+> 
