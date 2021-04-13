@@ -2,104 +2,119 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3E6C433ED
-	for <linux-cifs@archiver.kernel.org>; Tue, 13 Apr 2021 21:31:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61FD6C433ED
+	for <linux-cifs@archiver.kernel.org>; Tue, 13 Apr 2021 23:26:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4ED05611F0
-	for <linux-cifs@archiver.kernel.org>; Tue, 13 Apr 2021 21:31:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3680160C3D
+	for <linux-cifs@archiver.kernel.org>; Tue, 13 Apr 2021 23:26:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbhDMVbr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 13 Apr 2021 17:31:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38402 "EHLO
+        id S243606AbhDMX01 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 13 Apr 2021 19:26:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229892AbhDMVbq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Apr 2021 17:31:46 -0400
-X-Greylist: delayed 339 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 13 Apr 2021 14:31:26 PDT
-Received: from mail.darkrain42.org (o-chul.darkrain42.org [IPv6:2600:3c01::f03c:91ff:fe96:292c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 962D5C061574
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Apr 2021 14:31:26 -0700 (PDT)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
- d=darkrain42.org; i=@darkrain42.org; q=dns/txt; s=ed25519-2020-12;
- t=1618349147; h=from : to : cc : subject : date : message-id :
- mime-version : content-transfer-encoding : from;
- bh=INSjkgplWP499f+foXGMrXcO4msoz7Ierugs0n5Wp58=;
- b=RlBS28IGRZK+TMm8UzHtB5vdD6VuoI1svhFWHN2yOdmOEdnHNA0dKMha+SSbj9l4UUIMf
- xLtJvknxExgO/9EAg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=darkrain42.org;
- i=@darkrain42.org; q=dns/txt; s=rsa-2020-12; t=1618349147; h=from : to
- : cc : subject : date : message-id : mime-version :
- content-transfer-encoding : from;
- bh=INSjkgplWP499f+foXGMrXcO4msoz7Ierugs0n5Wp58=;
- b=hn98JrSiNFHclugsyYWGlNFwhTCGkwiDv6NrCiyNk7vKKAjQ7VCpnd7zYCYeOI4M3Pd8P
- bmZqTp4fEKh/uOzc1gyEBojLKCh3h4zht/ow2uIvF+k1T0GaD+uevLNsOhkT/pXft+UOJgk
- a7MUy4qMQPRkKEidD/ymbOK0Arn2piSQwHQ46aI0B5MU0wHaeM2FegFc965GebeAUwRVR9i
- 4jz0bYzpdg062ULEQJH6iOrLcusroGU/Yf8WRaswC2OnC0ISANnV/+ubanTc2A4IJrWkVwP
- pWlmvTylrbJtOjf/ZnbTkbZRndgOldREAPzT0l+KzoPGiccYKTYBEfe3BT7A==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by o-chul.darkrain42.org (Postfix) with ESMTPSA id CD74E80F9;
-        Tue, 13 Apr 2021 14:25:46 -0700 (PDT)
-From:   Paul Aurich <paul@darkrain42.org>
-To:     linux-cifs@vger.kernel.org, sfrench@samba.org
-Cc:     paul@darkrain42.org
-Subject: [PATCH] cifs: Return correct error code from smb2_get_enc_key
-Date:   Tue, 13 Apr 2021 14:25:27 -0700
-Message-Id: <20210413212527.473765-1-paul@darkrain42.org>
-X-Mailer: git-send-email 2.31.0
+        with ESMTP id S230123AbhDMX01 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Apr 2021 19:26:27 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76850C061574;
+        Tue, 13 Apr 2021 16:26:06 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id p6so11321204wrn.9;
+        Tue, 13 Apr 2021 16:26:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
+        bh=Bem/p08va+1GAFuU0LTGSjQYRLOf3cmGSRP+mg48WO0=;
+        b=gAqek3+Yxs0T57tuh7TxH8pYNNFco4ooq3u47xzORW4+3k4dxKScnRb94m07lXJCtO
+         6vFgbKDUAWkL89ldu90rjm/qlqvsLT9aWhEsUOHfmXov+derlxr6OD/wSU6XClgxUwva
+         PP/EvYvowS8l1ypyIXJGs0Lb+VonygfGkLobJnS+1tMfAm88B1h8Bmq6gFDW9HGOM6wp
+         kjeQO9YH67vIxh/c1lKVQKqEDSY94PEE+kJ4xNPV9c2M8u0QtLcjDjHS3hiXrgSdCYUA
+         4W0WdSCxX6qdlMMhVQW7rX+QILvwn4qtFBGRbRZQg3Mzcg8ITYVTZ0w1xPGLnlcX1uUd
+         OpKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=Bem/p08va+1GAFuU0LTGSjQYRLOf3cmGSRP+mg48WO0=;
+        b=cghuq1j2VeGcGhWfLFVMeW2JaQ6rNGH1OULgoIdO8M5bKYH0pgiVQHD0M8RkGxaZmg
+         9MI3Su2n87CfCR9mYnQHP3TOBcG7AvMUPMBunwTsPyXm+OJZda+6HpC6ByTyCFYEOI4a
+         opIBxUvXXj1ZXLIQSauEc5j5OrhRkMvreZq74y5WxwY2E+Ycdn8f7xqrlirEj+nSD+7m
+         kkUJPdgzRJnkT50a0+sxK9VJFhDPZ6potafd/rXq/Wzy/LmVkKi3HudDKoIbnMGjqUxB
+         NWwsCD8je/KFq420t2Jhf9NnFQdheyQWak4hiTxlcr1sfw2Pg9yCg3QNgnAIBz/orsYf
+         aKpA==
+X-Gm-Message-State: AOAM531G2IAWVksLHutDVdwHQY9Xkdg29nz+P9Pg4mXuT9mXn4yaAijb
+        42bpbf3sv8bWy9uuTohtnkg=
+X-Google-Smtp-Source: ABdhPJxpNylQxNyIvvIYwWjESkNUS14wxwP2YXsCfk6lD56i2MYhY+u38RHgySVHjDRdkUek/6oOgQ==
+X-Received: by 2002:adf:f250:: with SMTP id b16mr10066858wrp.347.1618356364056;
+        Tue, 13 Apr 2021 16:26:04 -0700 (PDT)
+Received: from LEGION ([39.46.65.172])
+        by smtp.gmail.com with ESMTPSA id i12sm1504831wmd.3.2021.04.13.16.26.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Apr 2021 16:26:03 -0700 (PDT)
+Date:   Wed, 14 Apr 2021 04:25:58 +0500
+From:   Muhammad Usama Anjum <musamaanjum@gmail.com>
+To:     Steve French <sfrench@samba.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        "open list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS)" 
+        <linux-cifs@vger.kernel.org>,
+        "moderated list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS)" 
+        <samba-technical@lists.samba.org>,
+        open list <linux-kernel@vger.kernel.org>
+Cc:     musamaanjum@gmail.com, kernel-janitors@vger.kernel.org,
+        dan.carpenter@oracle.com, colin.king@canonical.com
+Subject: [PATCH] cifs: remove unnecessary copies of tcon->crfid.fid
+Message-ID: <20210413232558.GA1136036@LEGION>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Avoid a warning if the error percolates back up:
+pfid is being set to tcon->crfid.fid and they are copied in each other
+multiple times. Remove the memcopy between same pointers.
 
-[440700.376476] CIFS VFS: \\otters.example.com crypt_message: Could not get encryption key
-[440700.386947] ------------[ cut here ]------------
-[440700.386948] err = 1
-[440700.386977] WARNING: CPU: 11 PID: 2733 at /build/linux-hwe-5.4-p6lk6L/linux-hwe-5.4-5.4.0/lib/errseq.c:74 errseq_set+0x5c/0x70
-...
-[440700.397304] CPU: 11 PID: 2733 Comm: tar Tainted: G           OE     5.4.0-70-generic #78~18.04.1-Ubuntu
-...
-[440700.397334] Call Trace:
-[440700.397346]  __filemap_set_wb_err+0x1a/0x70
-[440700.397419]  cifs_writepages+0x9c7/0xb30 [cifs]
-[440700.397426]  do_writepages+0x4b/0xe0
-[440700.397444]  __filemap_fdatawrite_range+0xcb/0x100
-[440700.397455]  filemap_write_and_wait+0x42/0xa0
-[440700.397486]  cifs_setattr+0x68b/0xf30 [cifs]
-[440700.397493]  notify_change+0x358/0x4a0
-[440700.397500]  utimes_common+0xe9/0x1c0
-[440700.397510]  do_utimes+0xc5/0x150
-[440700.397520]  __x64_sys_utimensat+0x88/0xd0
-
-Fixes: 61cfac6f267d ("CIFS: Fix possible use after free in demultiplex thread")
-Signed-off-by: Paul Aurich <paul@darkrain42.org>
-CC: stable@vger.kernel.org
+Addresses-Coverity: ("Overlapped copy")
+Fixes: 9e81e8ff74b9 ("cifs: return cached_fid from open_shroot")
+Signed-off-by: Muhammad Usama Anjum <musamaanjum@gmail.com>
 ---
- fs/cifs/smb2ops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'm not sure why refcount was being incremented here. This file has been
+evoloved so much. Any ideas?
+
+fs/cifs/smb2ops.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index 61214b23c57f..caa5432a5ed1 100644
+index 61214b23c57f..6fa35003dcfe 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -4418,7 +4418,7 @@ smb2_get_enc_key(struct TCP_Server_Info *server, __u64 ses_id, int enc, u8 *key)
- 	}
- 	spin_unlock(&cifs_tcp_ses_lock);
+@@ -847,14 +847,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 			.volatile_fid = pfid->volatile_fid,
+ 		};
  
--	return 1;
-+	return -ENOENT;
- }
- /*
-  * Encrypt or decrypt @rqst message. @rqst[0] has the following format:
+-		/*
+-		 * caller expects this func to set pfid to a valid
+-		 * cached root, so we copy the existing one and get a
+-		 * reference.
+-		 */
+-		memcpy(pfid, tcon->crfid.fid, sizeof(*pfid));
+-		kref_get(&tcon->crfid.refcount);
+-
+ 		mutex_unlock(&tcon->crfid.fid_mutex);
+ 
+ 		if (rc == 0) {
+@@ -885,7 +877,6 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 	oparms.fid->mid = le64_to_cpu(o_rsp->sync_hdr.MessageId);
+ #endif /* CIFS_DEBUG2 */
+ 
+-	memcpy(tcon->crfid.fid, pfid, sizeof(struct cifs_fid));
+ 	tcon->crfid.tcon = tcon;
+ 	tcon->crfid.is_valid = true;
+ 	tcon->crfid.dentry = dentry;
 -- 
-2.31.0
+2.25.1
 
