@@ -2,301 +2,149 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B7C0C433B4
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Apr 2021 12:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D89D3C433ED
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Apr 2021 14:16:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C502E6112F
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Apr 2021 12:00:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D63E61166
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Apr 2021 14:16:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350616AbhDNMAj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 14 Apr 2021 08:00:39 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:34160 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1348989AbhDNMAi (ORCPT
+        id S1346600AbhDNORE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 14 Apr 2021 10:17:04 -0400
+Received: from p3plsmtpa12-07.prod.phx3.secureserver.net ([68.178.252.236]:40231
+        "EHLO p3plsmtpa12-07.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345706AbhDNORC (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 14 Apr 2021 08:00:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1618401616;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GW3H2zH9OK6rMOsc/IpqGm1OHC3FnsL8rDNYh7Jjs+A=;
-        b=fSnUbMj2t8tmIyUSEAo6GjiGUtnok2ke7zlP5SUyFRMGcXi9+1pgR0+gXFXMq/R54SY79v
-        t6cUsjgyhZfF8+c0fkzHHonqmc/CvNKboYr6Vonhb1pJRsUPVsurl55bomJRWjARtvWSTn
-        lopUpwrytGI5wBkxmR2GIjaas9H1lYE=
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com
- (mail-db5eur01lp2053.outbound.protection.outlook.com [104.47.2.53]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-20-FaPxWxg0PAO6vKNC5YysKg-1; Wed, 14 Apr 2021 14:00:14 +0200
-X-MC-Unique: FaPxWxg0PAO6vKNC5YysKg-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TasslUl+qQvNgkV96ii+5I+WVKYFkchXWKeOsSGAxAe1yXTdq+wImkZ0iV9U0XRrrAn5UgL4Eyb4IwoAwqdS7EFGSuPQGZK8mvtLNFvZthFn+1uO2/zCuV/wz4C7dBy7fUYorOdXnIdbQHb0HJom7DE9BXjACJIfhLeIssev/xaXR75oY/R5weWHFzFNeAyYpqkEK3+kGhqE+CDa46LrUNDXtEaoE1wC5bBsEAmPnaHHlhgWWnq2l0PjHyDB79Bz2VdEJepslNwQecZlBGg9Gfv1kIutenOJHirpdG4p1vApQ/RFstzEg0hDLHIhPVJ17MUsLthzd8r+JEp/X2rD2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GW3H2zH9OK6rMOsc/IpqGm1OHC3FnsL8rDNYh7Jjs+A=;
- b=f7KN3N9lAB9acTrfgV85rU7bv6QprnmQhE2pz1Ctr5bhtB2ifanyTGlk8MKHtcPSJ3hZoOXfWu0NmTDxgh5pq9KK/HHgPjWSkVlcHqMg3J3+lSZys2K9fzU5LLqTpPVGRViYQ4lKaUAJaeZV/1uPTP5qjOGQ1WnW/tcHFMlqUOT846msy1H/RIsQoON3ILoiqx62fC4hLMoY0DUtoSo/ybtQ2ZpDUVrh6msmyiQgcGQIMqZiIeCOrWQh+AmOXcLCMaKGi0C7qwx0HMG+fYQv1VnvQryuhkn6wVCq0cnT3w2njIwixCEhYeDvZhxoYLHENVpILOyL8LFRntVPOgwfpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VE1PR04MB6654.eurprd04.prod.outlook.com (2603:10a6:803:129::33) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.18; Wed, 14 Apr
- 2021 12:00:12 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94%5]) with mapi id 15.20.4020.022; Wed, 14 Apr 2021
- 12:00:12 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Muhammad Usama Anjum <musamaanjum@gmail.com>,
+        Wed, 14 Apr 2021 10:17:02 -0400
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id WgJgl1TYe83tOWgJgl6gLC; Wed, 14 Apr 2021 07:16:32 -0700
+X-CMAE-Analysis: v=2.4 cv=ONniYQWB c=1 sm=1 tr=0 ts=6076f940
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=mjHj8f7IP-_Ssy1yzXMA:9 a=QEXdDO2ut3YA:10
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [PATCH rdma-next 00/10] Enable relaxed ordering for ULPs
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Haakon Bugge <haakon.bugge@oracle.com>,
+        David Laight <David.Laight@aculab.com>,
+        Chuck Lever III <chuck.lever@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Leon Romanovsky <leon@kernel.org>,
+        Doug Ledford <dledford@redhat.com>,
+        Leon Romanovsky <leonro@nvidia.com>,
+        Adit Ranadive <aditr@vmware.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Ariel Elior <aelior@marvell.com>,
+        Avihai Horon <avihaih@nvidia.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Devesh Sharma <devesh.sharma@broadcom.com>,
+        Faisal Latif <faisal.latif@intel.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Bruce Fields <bfields@fieldses.org>, Jens Axboe <axboe@fb.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Keith Busch <kbusch@kernel.org>, Lijun Ou <oulijun@huawei.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        OFED mailing list <linux-rdma@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Michael Guralnik <michaelgur@nvidia.com>,
+        Michal Kalderon <mkalderon@marvell.com>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Naresh Kumar PBS <nareshkumar.pbs@broadcom.com>,
+        Linux-Net <netdev@vger.kernel.org>,
+        Potnuri Bharat Teja <bharat@chelsio.com>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        Selvin Xavier <selvin.xavier@broadcom.com>,
+        Shiraz Saleem <shiraz.saleem@intel.com>,
+        Somnath Kotur <somnath.kotur@broadcom.com>,
+        Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
         Steve French <sfrench@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        "open list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS)" 
-        <linux-cifs@vger.kernel.org>,
-        "moderated list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS)" 
-        <samba-technical@lists.samba.org>,
-        open list <linux-kernel@vger.kernel.org>
-Cc:     musamaanjum@gmail.com, kernel-janitors@vger.kernel.org,
-        dan.carpenter@oracle.com, colin.king@canonical.com
-Subject: Re: [PATCH] cifs: remove unnecessary copies of tcon->crfid.fid
-In-Reply-To: <20210413232558.GA1136036@LEGION>
-References: <20210413232558.GA1136036@LEGION>
-Date:   Wed, 14 Apr 2021 14:00:09 +0200
-Message-ID: <87tuo913g6.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:703:334:3d56:188d:3047:1bd5]
-X-ClientProxiedBy: ZR0P278CA0102.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:23::17) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        VMware PV-Drivers <pv-drivers@vmware.com>,
+        Weihang Li <liweihang@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhu Yanjun <zyjzyj2000@gmail.com>
+References: <C2924F03-11C5-4839-A4F3-36872194EEA8@oracle.com>
+ <20210406114952.GH7405@nvidia.com>
+ <aeb7334b-edc0-78c2-4adb-92d4a994210d@talpey.com>
+ <8A5E83DF-5C08-49CE-8EE3-08DC63135735@oracle.com>
+ <4b02d1b2-be0e-0d1d-7ac3-38d32e44e77e@talpey.com>
+ <1FA38618-E245-4C53-BF49-6688CA93C660@oracle.com>
+ <7b9e7d9c-13d7-0d18-23b4-0d94409c7741@talpey.com>
+ <f71b24433f4540f0a13133111a59dab8@AcuMS.aculab.com>
+ <880A23A2-F078-42CF-BEE2-30666BCB9B5D@oracle.com>
+ <7deadc67-650c-ea15-722b-a1d77d38faba@talpey.com>
+ <20210412224843.GQ7405@nvidia.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <02593083-056e-cc62-22cf-d6bd6c9b18a8@talpey.com>
+Date:   Wed, 14 Apr 2021 10:16:28 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:703:334:3d56:188d:3047:1bd5) by ZR0P278CA0102.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:23::17) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.18 via Frontend Transport; Wed, 14 Apr 2021 12:00:12 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1a76ac50-d147-4fd0-462d-08d8ff3cdbcd
-X-MS-TrafficTypeDiagnostic: VE1PR04MB6654:
-X-Microsoft-Antispam-PRVS: <VE1PR04MB6654C0D2A83060E265079CCFA84E9@VE1PR04MB6654.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Eh8BsofqCBJppCbNCgQUQSWCZN5H8TC6vYat7RfE82J/bulKDTLfxvgf1cNssN/W5UmWZ5x3hX5tgGEEcrNGYaFXT7d8dO+RwJuy8BHZtGRQo6GBzc9Xj5jz5+ugkPEydVCy9PbCsAcgeTAZDRaYD1Y7mIIbVfPTUbPnpr/IUpAASGx5RL9tFHZ2Y/jsU17NIKqdC38A0kGCAG0NRCKChyVpn675YGQQe4YL8RPeVuuRz+xn/MI1UPLyhsa2HjSGSK7+8mT1P+L9Yu75RfrQC2Rw1BI7uttoqJLm52+nHrE9O8nEfUEgEuK8pUL6eWbjnfeV76eoYEqMG/a4W8z5Uf7mUc9ZZXHUlCTTNhre8LKBCJZ+oKUSpJIbBfNCHCXscq5BSMpJfBLZ5eLXojjGQvf3HGG++5s478cD/ScsWvxFuLZoSzbZIFdUILC2DjvQwIVv6xSso5sPiWcP9YF/0CdralrTyI5dlqYiXyfRJuxN2yOQQ3q4jfBWGmykneKySWb9nPqSRHlzfxibwRmRV3FsaDb1Yrt1KIdy9+pZ27h3VozR4jbDrLNsEDmGHAViIogSGJI7eMAT+/IquxObLw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(376002)(39860400002)(346002)(136003)(366004)(316002)(110136005)(8936002)(36756003)(4326008)(66476007)(83380400001)(2906002)(6496006)(2616005)(478600001)(5660300002)(66946007)(8676002)(86362001)(38100700002)(66574015)(6486002)(186003)(66556008)(6666004)(16526019)(52116002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?bmZJdmNOdDh3L0VnczBmSVNGbzZJZXNlUVIxVWNaeDJOb2ZKOEZndndoOTJ5?=
- =?utf-8?B?Wndlek90Zi91R09PRk5GUG5CZjZ4bjFzVEVHRDZJK2ZoSTlMYitaRW1mOWNu?=
- =?utf-8?B?N3Vkb1ZudFdSS1FIMGlVSzVFSXBER215U29MZDRUbkk2Umkyd3JoZHZIVGhz?=
- =?utf-8?B?eWt1a20rWWNSbTNweGNQVnlnQktRbWJ6cmFlOVFnRkd5QmJQR3BZUnp2eGVx?=
- =?utf-8?B?M2xoaEhURDJZTzBvMlY4TG1jdllQWm12NHBlQmFORXZaeEVuL09ya2ZWSXVk?=
- =?utf-8?B?VFhuNXJLVmtaS05rRXVwL1NpSFZ0TFdiVHg0K0JmbnF4T0kyOGFyMmtkUmZC?=
- =?utf-8?B?S2MvVUZYOTdnWFRmd1NXcC9TcFpQU2d2c21hQWlXcVVETHgvdG1VMUgxVmlq?=
- =?utf-8?B?ZkRvS2ZocFJRS21BSGRCQzQwOTNIUW1CR2h1Rm5DNm5xVHpWN0lkRm9aMDR0?=
- =?utf-8?B?L3Z0T1lwTzFZOHRYVWVsOFZycHpsSXpMMVA4RG5ocWZqMENOTGR6czRUdHEv?=
- =?utf-8?B?aVV6WmthdTRWTDZVa1doQkZNUUxQWnFoVUNadFZWTmFiR3JpVlIraWtXLy9E?=
- =?utf-8?B?dTZ6K0xMQmFTS083MFdkMDRSZ3YzUng4Q2tQcmVpRm84OW9XSHFuQnlkajVE?=
- =?utf-8?B?UlI3N0ZraGI1VExtR1JxOWxNUmpacjU5alNvNXlXem9IOS9odU1kS2tOZjFj?=
- =?utf-8?B?T1duaXNyZUUyNUNRc1MyandUV3FqRVdOMUxpTStLdVg5QUNJRDhPNEZma0pL?=
- =?utf-8?B?U1dZY2FGQS9wc0NtZFBGcjQzUmJKNHdxa0xyVWlSTjVQQk5zeG1GaTJ0NTFN?=
- =?utf-8?B?enZqRTk2Tld0V0kwUmVqZGMxN0o5SlN4SDRkMzk4ZnNIc1dDTmpqUTl6Kytt?=
- =?utf-8?B?OXJvSXkzNnFxbW5zeUdPMmI3b2ROaTBrMkQxTEoxR3NGVFpSbm5kNFNwdWZD?=
- =?utf-8?B?aVdQWjhSMGhveVkzZmhzUVhnem5jcHd3cHRnRlBLUFB2c0FQWjNLSlhUVWJ4?=
- =?utf-8?B?NjFtQStWd0RmdWtLaUN1dSsxR2N6QXF6WldmSDRNbktoWE4zVGdZL0JDNE9G?=
- =?utf-8?B?dkNpWVRPU2xIWWRpTjN5d3k1OW0zYzFTclVMOENnZXpnZkJNc2hMSHc3dUpL?=
- =?utf-8?B?YzFTV1dadnZXQ0NZMzRtYTdxeEorQVZZcytscVFTZ0hEV3FRelJUS29adTIr?=
- =?utf-8?B?OE9sanMzVmoraGVQUEhnM3VaT0hPUThCUjFHb25wVnR1R0FRYVBVM2FXQjln?=
- =?utf-8?B?dEhQdE1ZaWxlM2lTRmYrUmxRZGpKV0ZoVFd3b1FzeFNYQ0dMaEpBNjN6T2VO?=
- =?utf-8?B?aVplWEl4TW94S0dwODE0dWdFUVJyekFqWFlnajk2aXJmRkFqMVZONEhVV2N0?=
- =?utf-8?B?L3NDSFRmRjJyNjlSdjk1cDc3OXFtV1pGZ0JwMTFRdUV1SVcvSFhtQ0IvaXRr?=
- =?utf-8?B?SzhHcjh4U25BR0g5bU1kR3NKcDllemMwSnIyNHpqVVdnSFVpMGhnSk4vaDdO?=
- =?utf-8?B?MStWcWlXdk9ZVXVvTUNHVElUNldDL0kvOVRUMXFZMWt0L2lGVmxiRkJWbkUw?=
- =?utf-8?B?blk0OHFJckpOWUUzTTAyTzZEcmg3UGdnQTBtZGFSQ3RJMjNlNWh6U0JmZUQ5?=
- =?utf-8?B?clpJQk1mZ3pYUmtrOXhWbWJOQTJGdVloa3kvQmxUV25kMEZmTHp0Z0pGQ3Vx?=
- =?utf-8?B?ZWFpZkxxSmFqRU93UHN3Ry95ak5ReGNmdlBtWmczR2NUa09RRjEvT1Q3TkF5?=
- =?utf-8?B?c1orQk1VRUZhWHF1UzFCNFFWUmZXLzdlRStUb08xSzdtV0tSVGtMQmlsM2sw?=
- =?utf-8?B?aCtSUFFPb002OUdzVmlqU3JWNDhFRGhRVlRDaVFlY0ZvOUpWb1NBaVdkWGlL?=
- =?utf-8?Q?oNWx+M7Pxo5Cp?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a76ac50-d147-4fd0-462d-08d8ff3cdbcd
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2021 12:00:12.5028
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6o6KUYsZvDlcKH5XOjJBFcRF+H0Y//n5YhZ3jC0zV2lCpQHhcQ4UzBypH6zU3owH
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB6654
+In-Reply-To: <20210412224843.GQ7405@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: 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
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Muhammad Usama Anjum <musamaanjum@gmail.com> writes:
-> pfid is being set to tcon->crfid.fid and they are copied in each other
-> multiple times. Remove the memcopy between same pointers.
->
-> Addresses-Coverity: ("Overlapped copy")
-> Fixes: 9e81e8ff74b9 ("cifs: return cached_fid from open_shroot")
-> Signed-off-by: Muhammad Usama Anjum <musamaanjum@gmail.com>
-> ---
-> I'm not sure why refcount was being incremented here. This file has been
-> evoloved so much. Any ideas?
+On 4/12/2021 6:48 PM, Jason Gunthorpe wrote:
+> On Mon, Apr 12, 2021 at 04:20:47PM -0400, Tom Talpey wrote:
+> 
+>> So the issue is only in testing all the providers and platforms,
+>> to be sure this new behavior isn't tickling anything that went
+>> unnoticed all along, because no RDMA provider ever issued RO.
+> 
+> The mlx5 ethernet driver has run in RO mode for a long time, and it
+> operates in basically the same way as RDMA. The issues with Haswell
+> have been worked out there already.
+> 
+> The only open question is if the ULPs have errors in their
+> implementation, which I don't think we can find out until we apply
+> this series and people start running their tests aggressively.
 
-The fact that pfid is the same as the cache is very weird... Probably
-due to recent change.
+I agree that the core RO support should go in. But turning it on
+by default for a ULP should be the decision of each ULP maintainer.
+It's a huge risk to shift all the storage drivers overnight. How
+do you propose to ensure the aggressive testing happens?
 
-This function returns a cached dir entry for the root of the share which
-can be accessed/shared by multiple task.
+One thing that worries me is the patch02 on-by-default for the dma_lkey.
+There's no way for a ULP to prevent IB_ACCESS_RELAXED_ORDERING
+from being set in __ib_alloc_pd().
 
-The basic logic is:
+Tom.
 
-    open_cached_dir(result) {
-   =20
-        if (cache.is_valid) {
-            memcpy(result, cache->fid)
-            return
-        }
-   =20
-        // not cached, send open() to server
-        dir tmp;
-        smb2_open(&tmp...)
-        memcpy(cache->fid, tmp)
-        cache.is_valid =3D true
-        memcpy(result, cache->fid)
-        return
-    }
-
-My understanding of this is that all file/dir entry have a refcount so
-to prevent callers from releasing the cached entry when they put it we
-need to bump it before returning.
-
-    open_cached_dir(result) {
-   =20
-        if (cache.is_valid) {
-            kref_get(cache)
-            memcpy(result, cache->fid)
-            return
-        }
-   =20
-        // not cached, send open() to server
-        dir tmp;
-        smb2_open(&tmp...)
-        memcpy(cache->fid, tmp)
-        cache.is_valid =3D true
-
-        kref_init(cache)
-        kref_get(cache)
-
-        memcpy(result, cache->fid)
-        return
-    }
-
-Now this function can be called from multiple thread, and there are
-couple of critical sections.
-
-
-    process 1                process 2
-    -------------------     -----------------
-    if (cache.is_valid)    =20
-    =3D> false continue        =20
-    smb2_open(...)           =20
-   =20
-                            if (cache.is_valid)    =20
-                            =3D> false continue        =20
-                            smb2_open(...)           =20
-   =20
-    cache.is_valid =3D true
-
-In that exemple, we ended up opening twice and overwriting the cache.
-So we need to add locks to avoid this race condition.
-
-    open_cached_dir(result) {
-      	mutex_lock(cache)
-                 =20
-        if (cache.is_valid) {
-            kref_get(cache)
-            memcpy(result, cache->fid)
-            mutex_unlock(cache)
-            return cache
-        }
-   =20
-        // not cached, send open() to server
-        dir tmp;
-        smb2_open(&tmp...)
-        memcpy(cache->fid, tmp)
-        cache.is_valid =3D true
-
-        kref_init(cache)
-        kref_get(cache)
-
-        mutex_unlock(cache)
-
-        memcpy(result, cache->fid)
-        return
-    }
-
-But now we get reports of deadlocks. Turns out smb2_open() in some code
-path (if it ends up triggering reconnect) will take the lock
-again. Since linux mutex are not reentrant this will block forever
-(deadlock). So we need to release for the smb2_open() call.
-
-    open_cached_dir(result) {
-      	mutex_lock(cache);
-                 =20
-        if (cache.is_valid) {
-            kref_get(cache)
-            memcpy(result, cache->fid)
-            return cache
-        }
-
-        // release lock for open
-        mutex_unlock(cache)
-        // not cached, send open() to server
-        dir tmp;
-        smb2_open(&tmp...)
-        // take it back
-        mutex_lock(cache)
-
-        // now we need to check is_valid again since it could have been
-        // changed in that small unlocked time frame by a concurrent proces=
-s
-        if (cache.is_valid) {
-            // a concurrent call to this func was done already
-            // return the existing one to caller
-            memcpy(result, cache->fid)
-            kref_get(cache)
-            mutex_unlock(cache)
-            // close the tmp duplicate one we opened
-            smb2_close(tmp)
-            return
-        }
-
-        memcpy(result, cache->fid)
-        kref_init(cache)
-        kref_get(cache)
-
-        mutex_unlock(cache)
-
-        return
-    }
-
-That ^^^ is the pseudo-code of what the function *should* be doing. We
-need to go over it and see what it is doing different now. I think it's
-likely when we made the code to be used for caching any dir
-something diverged wrong.
-
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
 
