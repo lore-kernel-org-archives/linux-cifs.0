@@ -2,84 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC3EC433ED
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Apr 2021 07:41:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D451AC433ED
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Apr 2021 15:00:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93F1961166
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Apr 2021 07:41:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB2F06115B
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Apr 2021 15:00:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238711AbhDPHlu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 16 Apr 2021 03:41:50 -0400
-Received: from mail.astralinux.ru ([217.74.38.119]:49066 "EHLO
-        mail.astralinux.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231666AbhDPHlu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 16 Apr 2021 03:41:50 -0400
-X-Greylist: delayed 351 seconds by postgrey-1.27 at vger.kernel.org; Fri, 16 Apr 2021 03:41:49 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by mail.astralinux.ru (Postfix) with ESMTP id E703835E76A5;
-        Fri, 16 Apr 2021 10:35:32 +0300 (MSK)
-Received: from mail.astralinux.ru ([127.0.0.1])
-        by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id xDAy0NnRM9mc; Fri, 16 Apr 2021 10:35:32 +0300 (MSK)
-Received: from localhost (localhost [127.0.0.1])
-        by mail.astralinux.ru (Postfix) with ESMTP id 3B62035E769F;
-        Fri, 16 Apr 2021 10:35:32 +0300 (MSK)
-X-Virus-Scanned: amavisd-new at astralinux.ru
-Received: from mail.astralinux.ru ([127.0.0.1])
-        by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id C0i-Y4wx9fzO; Fri, 16 Apr 2021 10:35:32 +0300 (MSK)
-Received: from himera.home (95-24-186-126.broadband.corbina.ru [95.24.186.126])
-        by mail.astralinux.ru (Postfix) with ESMTPSA id 153D135E769B;
-        Fri, 16 Apr 2021 10:35:32 +0300 (MSK)
-Date:   Fri, 16 Apr 2021 10:35:30 +0300
-From:   Eugene Korenevsky <ekorenevsky@astralinux.ru>
-To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
-Subject: [PATCH] cifs: fix out-of-bound memory access when calling
- smb3_notify() at mount point
-Message-ID: <20210416073530.GA21974@himera.home>
+        id S235877AbhDPPAk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 16 Apr 2021 11:00:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50488 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233916AbhDPPAk (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 16 Apr 2021 11:00:40 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA738C061574
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Apr 2021 08:00:15 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id u20so31361027lja.13
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Apr 2021 08:00:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=fmhhMaC9jl2RVHJ7vwIkjhR4yolSMbfxl4BIXazBmMs=;
+        b=sVq+G8hhuwy+5V7x/pKqBk2mqtAdKKNqXneKIcGRBjEnjBrFREmW8LvyGJZ+/LOzct
+         3jKmND4KXWuk3wOfqd/UFxxfGgM/w0ifBnDlcEO4ZdbSv+oD8+fgnQewrPdepH/XJbqw
+         VtEzWfjQA9WFV22iSvxrqUHOaSf57W1JN2AlJB/JYGc4uxXTG03EEgtBW71eaMZVgJxJ
+         CyvlBe29W+5Y/lYHvQN/UdXzhP0+/mBUo7Tf2xYXbzNq/ZUdP1UZ9oxFRNyq5vB2/W2W
+         YjRX1JC6E+LZoRTcApjZGFTf41q3XULmDPO3zlca3xrlwa8mGvZZ4EuifbQV98uUhmZN
+         kLHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=fmhhMaC9jl2RVHJ7vwIkjhR4yolSMbfxl4BIXazBmMs=;
+        b=Rbxm/1lZlemTEPwNy91IgmZ7xYkW2lwnBekLNXzqentuRWbui+lYXdQy/r9Is00/cl
+         TDRb5CqDEX3J5upODsJCiDy5fuROaOiPNsgCuHWK7hdpec9HWi7lab/d1jHjwTllbLrV
+         VegF0eDi70v2nJ+K1ZTELgiQLdFzP/7aAOdEKhjFyWNhLADNzkZVjj8u7ok72AXa3M3W
+         +OoAYvrZTL3nBCCERML473OAlEhM8EFx7LopeFc1SDkP5TvoNhpk+e3LfOqQod/n3er6
+         HOgSMeLRKnTKHNnhJAPwt9pydCV36dm4lwfAei85janzrdVEMa1YL/sVkFJk06k9P33V
+         oU9g==
+X-Gm-Message-State: AOAM530oYbjeTKW77TXglFE9okBmsbA8fXOkKbJQhKEdnDWKtClu9pXx
+        6DWeSJQnNI932W2Z2MPp2ztwkcvrCpSyMEZAxexR2ApJkE8=
+X-Google-Smtp-Source: ABdhPJywttTsCDFrkkchlwJV/NXjnbGSWPm6gdIv/V/mNZ8ehVf1tqtM/SWXhv5EUWFUoWnKC1OQhCOtriSWFKegup8=
+X-Received: by 2002:a05:651c:339:: with SMTP id b25mr2883255ljp.406.1618585213847;
+ Fri, 16 Apr 2021 08:00:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 16 Apr 2021 10:00:03 -0500
+Message-ID: <CAH2r5mvsC9n-WA-ngFViKctD_H=3x5JeEcf_DP+yL9wH1YU9mA@mail.gmail.com>
+Subject: testing results against current for-next
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If smb3_notify() is called at mount point of CIFS, build_path_from_dentry()
-returns the pointer to kmalloc-ed memory with terminating zero (this is
-empty FileName to be passed to SMB2 CREATE request). This pointer is assigned
-to the `path` variable.
-Then `path + 1` (to skip first backslash symbol) is passed to
-cifs_convert_path_to_utf16(). This is incorrect for empty path and causes
-out-of-bound memory access.
+testing on current for-next (35 patches) looks good (other than an
+intermittent problem seen occasionally in a couple multichannel tests
+over the last few weeks - will be interesting if the multichannel
+reconnect improvements suggested would help this)
 
-Get rid of this "increase by one". cifs_convert_path_to_utf16() already
-contains the check for leading backslash in the path.
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/577
 
-BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=212693
-Signed-off-by: Eugene Korenevsky <ekorenevsky@astralinux.ru>
----
- fs/cifs/smb2ops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+passes all tests now that one patch,
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index caa5432a5ed1..b13a8e3e1e24 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -2264,7 +2264,7 @@ smb3_notify(const unsigned int xid, struct file *pfile,
- 		goto notify_exit;
- 	}
- 
--	utf16_path = cifs_convert_path_to_utf16(path + 1, cifs_sb);
-+	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
- 	if (utf16_path == NULL) {
- 		rc = -ENOMEM;
- 		goto notify_exit;
+     "cifs: improve fallocate emulation"
+
+was temporarily removed from for-next. That patch looks like the one
+that had caused the regression over the past week (use of this patch
+may have uncovered a copychunk bug) - so we need to dig into why this
+patch breaks various xfstests.
+
 -- 
-2.20.1
+Thanks,
 
+Steve
