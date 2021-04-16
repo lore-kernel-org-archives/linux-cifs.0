@@ -7,74 +7,96 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D451AC433ED
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Apr 2021 15:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32C96C433ED
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Apr 2021 18:55:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB2F06115B
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Apr 2021 15:00:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01D596137D
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Apr 2021 18:55:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235877AbhDPPAk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 16 Apr 2021 11:00:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50488 "EHLO
+        id S239488AbhDPS4R (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 16 Apr 2021 14:56:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233916AbhDPPAk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 16 Apr 2021 11:00:40 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA738C061574
-        for <linux-cifs@vger.kernel.org>; Fri, 16 Apr 2021 08:00:15 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id u20so31361027lja.13
-        for <linux-cifs@vger.kernel.org>; Fri, 16 Apr 2021 08:00:15 -0700 (PDT)
+        with ESMTP id S236466AbhDPS4N (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 16 Apr 2021 14:56:13 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED5B5C061574
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Apr 2021 11:55:46 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id x19so15891241lfa.2
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Apr 2021 11:55:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=fmhhMaC9jl2RVHJ7vwIkjhR4yolSMbfxl4BIXazBmMs=;
-        b=sVq+G8hhuwy+5V7x/pKqBk2mqtAdKKNqXneKIcGRBjEnjBrFREmW8LvyGJZ+/LOzct
-         3jKmND4KXWuk3wOfqd/UFxxfGgM/w0ifBnDlcEO4ZdbSv+oD8+fgnQewrPdepH/XJbqw
-         VtEzWfjQA9WFV22iSvxrqUHOaSf57W1JN2AlJB/JYGc4uxXTG03EEgtBW71eaMZVgJxJ
-         CyvlBe29W+5Y/lYHvQN/UdXzhP0+/mBUo7Tf2xYXbzNq/ZUdP1UZ9oxFRNyq5vB2/W2W
-         YjRX1JC6E+LZoRTcApjZGFTf41q3XULmDPO3zlca3xrlwa8mGvZZ4EuifbQV98uUhmZN
-         kLHQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=dspdFmmMU9hrcpWkzCZAOBEW2/CFETxqS7fH1drKSLo=;
+        b=rtOD//MM9vaHhf8PgiGQUhjpJ/QBc6lTik1hmxA/jHtmmwVUaOO1ZGl1A+Pr5w4rUc
+         ryKhhTi3mjefngErGxjjG8aRFOnkrSttBzPVLLZDRQQlr1y760y5L4AIyX6tPvyAznrm
+         tExUCmT9mI9s7KDj0WPI93IXrM6lqz/nBQojYszjJ6GNm1+cacbMDt83GpdIe4c7TyCd
+         cu0NR+JOqjdNpZ2MqMz4ZJCuUx9yqLpbsos9fV1JiIupnkLN736RZPo1pMd2BtTrKrk2
+         9ekM7IDHmvC0A0uGfV+dIIzQ6wcWQQpK3rSm5yBgGFoZusTIWucG/W0LpJ60Yse4CvnS
+         4JIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=fmhhMaC9jl2RVHJ7vwIkjhR4yolSMbfxl4BIXazBmMs=;
-        b=Rbxm/1lZlemTEPwNy91IgmZ7xYkW2lwnBekLNXzqentuRWbui+lYXdQy/r9Is00/cl
-         TDRb5CqDEX3J5upODsJCiDy5fuROaOiPNsgCuHWK7hdpec9HWi7lab/d1jHjwTllbLrV
-         VegF0eDi70v2nJ+K1ZTELgiQLdFzP/7aAOdEKhjFyWNhLADNzkZVjj8u7ok72AXa3M3W
-         +OoAYvrZTL3nBCCERML473OAlEhM8EFx7LopeFc1SDkP5TvoNhpk+e3LfOqQod/n3er6
-         HOgSMeLRKnTKHNnhJAPwt9pydCV36dm4lwfAei85janzrdVEMa1YL/sVkFJk06k9P33V
-         oU9g==
-X-Gm-Message-State: AOAM530oYbjeTKW77TXglFE9okBmsbA8fXOkKbJQhKEdnDWKtClu9pXx
-        6DWeSJQnNI932W2Z2MPp2ztwkcvrCpSyMEZAxexR2ApJkE8=
-X-Google-Smtp-Source: ABdhPJywttTsCDFrkkchlwJV/NXjnbGSWPm6gdIv/V/mNZ8ehVf1tqtM/SWXhv5EUWFUoWnKC1OQhCOtriSWFKegup8=
-X-Received: by 2002:a05:651c:339:: with SMTP id b25mr2883255ljp.406.1618585213847;
- Fri, 16 Apr 2021 08:00:13 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=dspdFmmMU9hrcpWkzCZAOBEW2/CFETxqS7fH1drKSLo=;
+        b=XQYGMh2JMMJCUh+Kc5ObM6jHE5AtzNX9C7lcy3FrAKoHJUPak0qghj0j5OmMUipAft
+         +obiHGPi/SNgKZ72F1ye9ltSG5ZFDhOJc6AzulSA1d3iu8k6HggZ39gjjRxO9JjT9Vi0
+         zhkhvokU16ugE+kZm28FQjTnP58oFef2Ydg7+pmlE3ZxnxerpIt6if1r/Nb6ayWOPy24
+         SdgkQn06VCUjJgNkfWCP3jTW70rnj3JTDKMqkpXm2UJPAxiniZTVB3a0F+8up9QiK75F
+         UG++4gLdjEW2hPJvKlfP17AWcx11ZET77OitDZLhL3/og2yo7WF7sO9y2zurb5yakKXi
+         MWlw==
+X-Gm-Message-State: AOAM532qJfCM5hWaNTrHrFwX39xE29TtgpxX2cmQ4B5VCg/JBUhS+2U/
+        m0ea3jDqG9sPw2U1h8e/YG+LSTSKSael64+kqNVgyFmG
+X-Google-Smtp-Source: ABdhPJxwXpncP6VFWku6hTivpVSNVremY/dXOQq16ngVqt+gA71ijHyyynN0LV/hTUrSYepC30tFpYjNjsh4biRpPm8=
+X-Received: by 2002:ac2:5cab:: with SMTP id e11mr3946211lfq.175.1618599345266;
+ Fri, 16 Apr 2021 11:55:45 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAH2r5mtjCnXosTKnV7J33=T4aVxD4kkkU6PcuHisMw=trLycbg@mail.gmail.com>
+In-Reply-To: <CAH2r5mtjCnXosTKnV7J33=T4aVxD4kkkU6PcuHisMw=trLycbg@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 16 Apr 2021 10:00:03 -0500
-Message-ID: <CAH2r5mvsC9n-WA-ngFViKctD_H=3x5JeEcf_DP+yL9wH1YU9mA@mail.gmail.com>
-Subject: testing results against current for-next
+Date:   Fri, 16 Apr 2021 13:55:34 -0500
+Message-ID: <CAH2r5mu581SM=A3r2PucVO486tVR7KSuSjnL0JC0mbaWSCH+fQ@mail.gmail.com>
+Subject: Fwd: Deferred close patch - performance improvements
 To:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-testing on current for-next (35 patches) looks good (other than an
-intermittent problem seen occasionally in a couple multichannel tests
-over the last few weeks - will be interesting if the multichannel
-reconnect improvements suggested would help this)
+---------- Forwarded message ---------
+From: Steve French <smfrench@gmail.com>
+Date: Fri, Apr 16, 2021 at 1:55 PM
+Subject: Deferred close patch - performance improvements
+To: rohiths msft <rohiths.msft@gmail.com>
 
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/577
 
-passes all tests now that one patch,
+I noticed some significant improvements in perf of some xfstest cases
+on the latest buildbot run (and some test cases where perf got worse,
+but fewer cases of that) with Rohith's recent deferred close patch (it
+is possible, although less likely that some other patches in for-next
+contributed to the performance changes - it is probably mostly due to
+Rohith's patch). Some examples:
 
-     "cifs: improve fallocate emulation"
+cifs/104 improved from 28 to 4 seconds, 85% faster
+generic/011 from 8:24 to 7:28, 11% faster
+generic/032 from 8:10 to 5:34, 32% faster
+generic/117 from 5:35 to 5:01, 10% faster
+generic/239 from 1:41 to 1:22 19% faster
 
-was temporarily removed from for-next. That patch looks like the one
-that had caused the regression over the past week (use of this patch
-may have uncovered a copychunk bug) - so we need to dig into why this
-patch breaks various xfstests.
+But a few got much slower:
+generic/070 from 5:08 to 8:48
+generic/100 from 3:44  to 5:10
+generic/263 from 3:32 to 10:17
+
+Although there is some variable in perf on individual tests due to the
+usual temporary load factors, overall the run was 10 to 20 minutes
+faster (5 to 10% faster) than usual (which will be helpful going
+forward in multiple ways) with current for-next, and is promising.
+--
+Thanks,
+
+Steve
+
 
 -- 
 Thanks,
