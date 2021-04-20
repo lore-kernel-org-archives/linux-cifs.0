@@ -2,109 +2,113 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB22BC433B4
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Apr 2021 17:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3848C433B4
+	for <linux-cifs@archiver.kernel.org>; Tue, 20 Apr 2021 18:38:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D01F613AE
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Apr 2021 17:02:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D6FA613D3
+	for <linux-cifs@archiver.kernel.org>; Tue, 20 Apr 2021 18:38:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233344AbhDTRCq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Apr 2021 13:02:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57452 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233281AbhDTRCq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 20 Apr 2021 13:02:46 -0400
-Received: from mail.tuxed.org (mail.tuxed.org [IPv6:2a01:4f8:c2c:58f::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DBB9C06174A
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Apr 2021 10:02:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alexanderkoch.net;
-        s=2019; t=1618938133;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/UeHOEOQG/cbqaVtcmDocaExLD0ZqjQmo53IGer9RWk=;
-        b=N3S3Zc6h5DOVWryKjcSE2zW2V9apIhjKDCT7/+ix+fG4s778P7U6jKxlll4Qfm92gKZjFS
-        gVJDuLLUlMXtVrwq/z7HuVXMTzMutyj06vMAryxDDKAR7ycPmrcTQbs3++mevmT6RD4fmn
-        K9SQDlO6Ko/Pp1mmYhvCYxRbCuu+Uz2olJGapX9JG8MJgi8w9tAirsTLRpksdBLBq0NbdJ
-        lIeuTRSv1hlFUR9H6QvLDEeWGuXSjjTbmDQW/+EwF8cfTNl4WFIhR0JM3GHN9LqfPvPOY9
-        HSVYhJdsuAke2mQAE/kgGuUxT6bD4HbKJQZny2EvOrPflsNFFZMzfLLx0Xuc0Q==
+        id S233092AbhDTSi6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 20 Apr 2021 14:38:58 -0400
+Received: from p3plsmtpa07-10.prod.phx3.secureserver.net ([173.201.192.239]:50622
+        "EHLO p3plsmtpa07-10.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233498AbhDTSi6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 20 Apr 2021 14:38:58 -0400
+Received: from [192.168.0.116] ([71.184.94.153])
+        by :SMTPAUTH: with ESMTPSA
+        id YvGTloys6n3d9YvGTl19mI; Tue, 20 Apr 2021 11:38:25 -0700
+X-CMAE-Analysis: v=2.4 cv=M+qIlw8s c=1 sm=1 tr=0 ts=607f1fa2
+ a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
+ a=IkcTkHD0fZMA:10 a=yMhMjlubAAAA:8 a=8bt7bneSKaUb_571X_EA:9 a=QEXdDO2ut3YA:10
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [PATCH][SMB3] limit noisy error
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5msPnCHf2qHtJ=tJymfa9cgyOgnrv9xPEiYF=nsWTg1syg@mail.gmail.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <bbdfbbaf-c196-bcdb-cc8f-5effb6d4d0b6@talpey.com>
+Date:   Tue, 20 Apr 2021 14:38:25 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Date:   Tue, 20 Apr 2021 19:02:10 +0200
-From:   Alexander Koch <mail@alexanderkoch.net>
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     linux-cifs@vger.kernel.org
-Subject: Re: cifs.upcall broken with cifs-utils 6.13
-In-Reply-To: <87h7k0zz6r.fsf@suse.com>
-References: <a01d5d22-5990-c00d-bc2a-582d2585ea69@alexanderkoch.net>
- <87h7k0zz6r.fsf@suse.com>
-Message-ID: <956dd84c4e27fd02541ca4fabb7b1776@alexanderkoch.net>
-X-Sender: mail@alexanderkoch.net
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=alexanderkoch.net; s=2019; t=1618938133;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/UeHOEOQG/cbqaVtcmDocaExLD0ZqjQmo53IGer9RWk=;
-        b=TyQg6F78cJczPnGWXMZUEXRZBhetseKhjt8YSWlmJ7tiRk25uZHBiwTxhdHt7RipdCTX9i
-        g4osDDYDpr7NGqhzZNZHu9IuBjlNVwmKwGL4KCX4V09wf6h45Yr37mZC790lW3LrWB/8Aq
-        uB7UuvRiyI9ro3AYBnSxRFV8THpoeesuVXBj5ADzURL630PFs8kIf8OKUJGEw2woimG80b
-        eTGL3Z1FlEI7GLTvIVh41OvM2aitC9BD5YZujUyjJYXPpiiF8gnMnKW1zPIy2B+8R48cFz
-        rNg6QLGEYOgZdCZR9anr434EHPNvr8zpWJbAeLX4E2ur2CNWCLfNeZ7xXoxZMg==
-ARC-Seal: i=1; s=2019; d=alexanderkoch.net; t=1618938133; a=rsa-sha256;
-        cv=none;
-        b=j0L52b9FXfEKZBF03tumRlNnxik54kNAqbKHbDbHHlPqLM2t96Qv/aUn6s/eS4BBUoDg1/
-        XDcf1kcAuIc6MNppeHHO9pZsuZQ9Xk+bSqL9s86uiN38YftNAMOjnI77//TYnS018qRVGT
-        FPQWgtZfnCqo7qTvDWOJeR9zh6lbGuMtsoYoEnMvOMwf212sWI07JiY1Rsbx9Xysz0diuj
-        JDahBmXkUR4xiPUILBdA5H1HZuc6aNrbC1eQts9SqjyfoToYCjgVvERLWQUImjmVZCwS1G
-        MuBGKDJ72TseR9s0j+WQuiWNE5gb8n+LdkpB1W2jrUej+ndOdTBdF+KHWyFYRw==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=mail@alexanderkoch.net smtp.mailfrom=mail@alexanderkoch.net
-Authentication-Results: ORIGINATING;
-        auth=pass smtp.auth=mail@alexanderkoch.net smtp.mailfrom=mail@alexanderkoch.net
+In-Reply-To: <CAH2r5msPnCHf2qHtJ=tJymfa9cgyOgnrv9xPEiYF=nsWTg1syg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfFPrVdaioAVybzluWKAue49YkV8ejOSFzadQDO4vGBA4CQLa4RYqMz1wbLfDrdi8ZbU+xDykImTohGRy4tpMI+SRSxA5Z7vF6KIZGZk4ySAHqsB+f3pK
+ Wus3jRjVXsDKpGRoOrI2G+PIDMH8caDTZeHB495I1Si3WO7Dgpv9Unfxkcb+R+GqrEIlVmE13o/w/PiMfcT8MEWX0BPPSYSRMbBBnm32flBAu9bgHlft+fNR
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Aurélien,
+On 4/20/2021 12:27 AM, Steve French wrote:
+> For servers which don't support copy_range (SMB3 CopyChunk), the
+> logging of:
+>   CIFS: VFS: \\server\share refcpy ioctl error -95 getting resume key
+> can fill the client logs and make debugging real problems more
+> difficult.  Change the -EOPNOTSUPP on copy_range to a "warn once"
 
->> The recent release of cifs-utils 6.13, more precisely e461afd8cf 
->> (which,
->> to my understanding, is a fix for CVE-2021-20208) makes attempts of
->> mounting CIFS shares with krb5 fail for me:
->> 
->> Can anyone tell me if this is a packaging/configuration issue (Arch in
->> my case) or a bug?
+Making this a warn_once will suppress the future message for all
+tcon's, won't it? Is it possible to use a bit in the tcon to track
+this instead? That might be a closer match to the scope of the
+message.
+
+Tom.
+
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> ---
+>   fs/cifs/smb2ops.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> It's unfortunately a regression in the CVE fix. We are trying to come 
-> up
-> with a proper fix.
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 5ccc36d98dad..dd0eb665b680 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -1567,7 +1567,10 @@ SMB2_request_res_key(const unsigned int xid,
+> struct cifs_tcon *tcon,
+>    NULL, 0 /* no input */, CIFSMaxBufSize,
+>    (char **)&res_key, &ret_data_len);
 > 
-> In the meantime, as a workaround:
+> - if (rc) {
+> + if (rc == -EOPNOTSUPP) {
+> + pr_warn_once("Server share %s does not support copy range\n", tcon->treeName);
+> + goto req_res_keyFor servers which don't support copy_range (SMB3
+> CopyChunk), the
+> logging of:
+>   CIFS: VFS: \\server\share refcpy ioctl error -95 getting resume key
+> can fill the client logs and make debugging real problems more
+> difficult.  Change the -EOPNOTSUPP on copy_range to a "warn once"
 > 
-> * you can build cifs-utils --with-libcap=yes (libcap instead of
-> libcapng). This will skip
->   capability dropping in cifs.upcall.c.
-> * Alternatively you can comment out the call to trim_capabilities() in
->   cifs.upcall.c.
-
-Thanks a million for the clarification. For me, downgrading the package 
-to
-6.12 works as an intermediate solution.
-
-I'll open a task on the Arch bugtracker and let the package maintainer
-decide what to do with the package until a proper fix is done.
-
-
-Cheers,
-
-Alex
+> Signed-off-by: Steve French <stfrench@microsoft.com>
+> ---
+>   fs/cifs/smb2ops.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+> index 5ccc36d98dad..dd0eb665b680 100644
+> --- a/fs/cifs/smb2ops.c
+> +++ b/fs/cifs/smb2ops.c
+> @@ -1567,7 +1567,10 @@ SMB2_request_res_key(const unsigned int xid,
+> struct cifs_tcon *tcon,
+>    NULL, 0 /* no input */, CIFSMaxBufSize,
+>    (char **)&res_key, &ret_data_len);
+> 
+> - if (rc) {
+> + if (rc == -EOPNOTSUPP) {
+> + pr_warn_once("Server share %s does not support copy range\n", tcon->treeName);
+> + goto req_res_key_exit;
+> + } else if (rc) {
+>    cifs_tcon_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
+>    goto req_res_key_exit;
+>    }_exit;
+> + } else if (rc) {
+>    cifs_tcon_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
+>    goto req_res_key_exit;
+>    }
+> 
