@@ -2,113 +2,72 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=BAYES_05,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3848C433B4
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Apr 2021 18:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEAFCC433B4
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Apr 2021 17:18:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D6FA613D3
-	for <linux-cifs@archiver.kernel.org>; Tue, 20 Apr 2021 18:38:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91F4A61164
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Apr 2021 17:18:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233092AbhDTSi6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 20 Apr 2021 14:38:58 -0400
-Received: from p3plsmtpa07-10.prod.phx3.secureserver.net ([173.201.192.239]:50622
-        "EHLO p3plsmtpa07-10.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233498AbhDTSi6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 20 Apr 2021 14:38:58 -0400
-Received: from [192.168.0.116] ([71.184.94.153])
-        by :SMTPAUTH: with ESMTPSA
-        id YvGTloys6n3d9YvGTl19mI; Tue, 20 Apr 2021 11:38:25 -0700
-X-CMAE-Analysis: v=2.4 cv=M+qIlw8s c=1 sm=1 tr=0 ts=607f1fa2
- a=vbvdVb1zh1xTTaY8rfQfKQ==:117 a=vbvdVb1zh1xTTaY8rfQfKQ==:17
- a=IkcTkHD0fZMA:10 a=yMhMjlubAAAA:8 a=8bt7bneSKaUb_571X_EA:9 a=QEXdDO2ut3YA:10
-X-SECURESERVER-ACCT: tom@talpey.com
-Subject: Re: [PATCH][SMB3] limit noisy error
-To:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-References: <CAH2r5msPnCHf2qHtJ=tJymfa9cgyOgnrv9xPEiYF=nsWTg1syg@mail.gmail.com>
-From:   Tom Talpey <tom@talpey.com>
-Message-ID: <bbdfbbaf-c196-bcdb-cc8f-5effb6d4d0b6@talpey.com>
-Date:   Tue, 20 Apr 2021 14:38:25 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        id S241450AbhDURTT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 21 Apr 2021 13:19:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39116 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239774AbhDURTT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 21 Apr 2021 13:19:19 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4FEC06174A
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Apr 2021 10:18:46 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id m7so37777125ljp.10
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Apr 2021 10:18:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=xhbE5Y+Q73HxpuNvlnsrA54suBX0vDBfs6mkhYk+UKQ=;
+        b=Kod00dR6mB6Qn5e7LVZJ69wpoZgunY9RisUMi6xSY4jnUtTimaHaf6D2FzZb5NJS0L
+         2sNdUTevLa+k0aarm+6bsphDdG9/Pik8TgtKAHFo0GLGODReYbjKu3ChXphkKReqrXtA
+         CdJmO2ivavSTK1Xjsb8/UHwmYLZlcR7xpDA+0Ob31zxGrky6VBRMCabaErqg3Hl4X7+J
+         A2Rnaws55sYmULHvqxI6Yb0Qz8dyJerFkWQBQb3e4wsx3jbvh5hZ6iU/Ze1SaLaqryoc
+         Bk4sivIErMf5JiH9+Z/roDjRQrLOTFcqZfugkZL5aeIuEr4QUuHkYMK1g0kEvpFcYFcU
+         9xnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=xhbE5Y+Q73HxpuNvlnsrA54suBX0vDBfs6mkhYk+UKQ=;
+        b=Co/ZB36Lxq27lasWEl2DawowtgXNKllavC1ryX5W4gnFOa7cMOgt5g0q/Vw8zCzWLI
+         inNeCAu8D1hmsqwYfUJh/oVFji83iI0VI2cCFhQQjcyq7FB5HsGBbnkwiZkFsdTY2Kb9
+         np2Ye/DcqIRrjl4aVGcTewYkER1N75dfnzyrfqESyToYV2zJq/ccD+cTfziuboG1aOQJ
+         +p2XsDgUU/H9pvQlXKnPazkVn42XeJziDbm/AU3qxakj0KSEZDxGYu1Dm3/8TKMt1xl0
+         AlQUhJwKMHVhnBIYJwKICY2QiI15XaXvfcWUkHoqj6l7XmSh6SDSNpFiejyC6qWlE6ge
+         fnPg==
+X-Gm-Message-State: AOAM531N3lyzCwyCyhP0YMIAOD6bWQktZ9Aps+cOudLLLO9YCmHerwUh
+        vKJipxFavSwH2kErOPgYDWrfhSaHj9olRn8V8a6yHhd6aZY=
+X-Google-Smtp-Source: ABdhPJxlKoNZca8UuM/dywpMh47JqX6v7+L9JI8GwXsc4zq/lC3UEZqaoHg+foA2Ra+Fu7BuPNZf9bJJNmlQ2zF23Pc=
+X-Received: by 2002:a2e:a78b:: with SMTP id c11mr20321939ljf.6.1619025524120;
+ Wed, 21 Apr 2021 10:18:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5msPnCHf2qHtJ=tJymfa9cgyOgnrv9xPEiYF=nsWTg1syg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4xfFPrVdaioAVybzluWKAue49YkV8ejOSFzadQDO4vGBA4CQLa4RYqMz1wbLfDrdi8ZbU+xDykImTohGRy4tpMI+SRSxA5Z7vF6KIZGZk4ySAHqsB+f3pK
- Wus3jRjVXsDKpGRoOrI2G+PIDMH8caDTZeHB495I1Si3WO7Dgpv9Unfxkcb+R+GqrEIlVmE13o/w/PiMfcT8MEWX0BPPSYSRMbBBnm32flBAu9bgHlft+fNR
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 21 Apr 2021 12:18:32 -0500
+Message-ID: <CAH2r5mse7yH8VxL4x3bRz1qe2K1p69mo6ApMZzQH_v8ZLpy6kA@mail.gmail.com>
+Subject: ksmbd testing progress - buildbot run passed
+To:     CIFS <linux-cifs@vger.kernel.org>,
+        linux-cifsd-devel@lists.sourceforge.net
+Cc:     Namjae Jeon <namjae.jeon@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 4/20/2021 12:27 AM, Steve French wrote:
-> For servers which don't support copy_range (SMB3 CopyChunk), the
-> logging of:
->   CIFS: VFS: \\server\share refcpy ioctl error -95 getting resume key
-> can fill the client logs and make debugging real problems more
-> difficult.  Change the -EOPNOTSUPP on copy_range to a "warn once"
+Current Linux client (minus the deferred close patches) to current
+ksmbd on 5.12-rc8 as a test target passed all tests:
 
-Making this a warn_once will suppress the future message for all
-tcon's, won't it? Is it possible to use a bit in the tcon to track
-this instead? That might be a closer match to the scope of the
-message.
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/32
 
-Tom.
+-- 
+Thanks,
 
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> ---
->   fs/cifs/smb2ops.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 5ccc36d98dad..dd0eb665b680 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1567,7 +1567,10 @@ SMB2_request_res_key(const unsigned int xid,
-> struct cifs_tcon *tcon,
->    NULL, 0 /* no input */, CIFSMaxBufSize,
->    (char **)&res_key, &ret_data_len);
-> 
-> - if (rc) {
-> + if (rc == -EOPNOTSUPP) {
-> + pr_warn_once("Server share %s does not support copy range\n", tcon->treeName);
-> + goto req_res_keyFor servers which don't support copy_range (SMB3
-> CopyChunk), the
-> logging of:
->   CIFS: VFS: \\server\share refcpy ioctl error -95 getting resume key
-> can fill the client logs and make debugging real problems more
-> difficult.  Change the -EOPNOTSUPP on copy_range to a "warn once"
-> 
-> Signed-off-by: Steve French <stfrench@microsoft.com>
-> ---
->   fs/cifs/smb2ops.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 5ccc36d98dad..dd0eb665b680 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1567,7 +1567,10 @@ SMB2_request_res_key(const unsigned int xid,
-> struct cifs_tcon *tcon,
->    NULL, 0 /* no input */, CIFSMaxBufSize,
->    (char **)&res_key, &ret_data_len);
-> 
-> - if (rc) {
-> + if (rc == -EOPNOTSUPP) {
-> + pr_warn_once("Server share %s does not support copy range\n", tcon->treeName);
-> + goto req_res_key_exit;
-> + } else if (rc) {
->    cifs_tcon_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
->    goto req_res_key_exit;
->    }_exit;
-> + } else if (rc) {
->    cifs_tcon_dbg(VFS, "refcpy ioctl error %d getting resume key\n", rc);
->    goto req_res_key_exit;
->    }
-> 
+Steve
