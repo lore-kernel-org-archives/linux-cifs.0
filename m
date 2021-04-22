@@ -2,140 +2,87 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A442C433B4
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 14:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5448BC433ED
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 22:14:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B79E861435
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 14:51:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26572611AE
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 22:14:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236405AbhDVOvw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Apr 2021 10:51:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39504 "EHLO mail.kernel.org"
+        id S236877AbhDVWOv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Apr 2021 18:14:51 -0400
+Received: from mx2.suse.de ([195.135.220.15]:48364 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236019AbhDVOvv (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 22 Apr 2021 10:51:51 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1B63461425;
-        Thu, 22 Apr 2021 14:51:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619103076;
-        bh=SABrBVqsF72QfA15qnobAparqW+KASuoIMcq/PiBNyQ=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=ISEFHesJOLuYeLHcNDksC5KuWW+5nxW3X+DhvyEAmqF/uRFP5nQxuBuVn5L/aZiYr
-         2Cy7HQg4cBmEOyWy/aD5GewKDQib2hy0QHxelQ3fbslJekhlOKA8Vv0qamHl/sHAaa
-         zI+F9ko8twDY4PvNrgRcbc715vs98IxZn9EO2++8yAKRZVnQHsTjOXMbGsXu8pyu1S
-         7yxSntGlu+TorOs1Ps6BNrZ3UsK/LoNdK7xyDZJxRVyc4X1GriKhZAIkVarearMkBS
-         Ex8eq+2aZnRgx41OlNE2DBmA2pe7SPgzHIlqYkoZljNTB+4QBRADLXV1hfqWwTv8f7
-         U/aewDPyMcKtQ==
-Message-ID: <95de6e0ff902903cfc8825a4e0b7f1c64594630f.camel@kernel.org>
-Subject: Re: [PATCH v6 01/30] iov_iter: Add ITER_XARRAY
-From:   Jeff Layton <jlayton@kernel.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        David Wysochanski <dwysocha@redhat.com>,
-        linux-kernel@vger.kernel.org
-Date:   Thu, 22 Apr 2021 10:51:13 -0400
-In-Reply-To: <2293710.1619099492@warthog.procyon.org.uk>
-References: <27c369a8f42bb8a617672b2dc0126a5c6df5a050.camel@kernel.org>
-         <161789062190.6155.12711584466338493050.stgit@warthog.procyon.org.uk>
-         <161789064740.6155.11932541175173658065.stgit@warthog.procyon.org.uk>
-         <2293710.1619099492@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.40.0 (3.40.0-1.fc34) 
+        id S235977AbhDVWOv (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 22 Apr 2021 18:14:51 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 3F032AFEA
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Apr 2021 22:14:15 +0000 (UTC)
+From:   David Disseldorp <ddiss@suse.de>
+To:     linux-cifs@vger.kernel.org
+Cc:     David Disseldorp <ddiss@suse.de>
+Subject: [PATCH] cifs: fix leak in cifs_smb3_do_mount() ctx
+Date:   Fri, 23 Apr 2021 00:14:03 +0200
+Message-Id: <20210422221403.13617-1-ddiss@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, 2021-04-22 at 14:51 +0100, David Howells wrote:
-> Jeff Layton <jlayton@kernel.org> wrote:
-> 
-> > As a general note, iov_iter.c could really do with some (verbose)
-> > comments explaining things. A kerneldoc header that explains the
-> > arguments to iterate_all_kinds would sure make this easier to review.
-> 
-> Definitely.  But that really requires a separate patch.
-> 
+cifs_smb3_do_mount() calls smb3_fs_context_dup() and then
+cifs_setup_volume_info(). The latter's subsequent smb3_parse_devname()
+call overwrites the cifs_sb->ctx->UNC string already dup'ed by
+smb3_fs_context_dup(), resulting in a leak. E.g.
 
-I suppose.
+unreferenced object 0xffff888002980420 (size 32):
+  comm "mount", pid 160, jiffies 4294892541 (age 30.416s)
+  hex dump (first 32 bytes):
+    5c 5c 31 39 32 2e 31 36 38 2e 31 37 34 2e 31 30  \\192.168.174.10
+    34 5c 72 61 70 69 64 6f 2d 73 68 61 72 65 00 00  4\rapido-share..
+  backtrace:
+    [<00000000069e12f6>] kstrdup+0x28/0x50
+    [<00000000b61f4032>] smb3_fs_context_dup+0x127/0x1d0 [cifs]
+    [<00000000c6e3e3bf>] cifs_smb3_do_mount+0x77/0x660 [cifs]
+    [<0000000063467a6b>] smb3_get_tree+0xdf/0x220 [cifs]
+    [<00000000716f731e>] vfs_get_tree+0x1b/0x90
+    [<00000000491d3892>] path_mount+0x62a/0x910
+    [<0000000046b2e774>] do_mount+0x50/0x70
+    [<00000000ca7b64dd>] __x64_sys_mount+0x81/0xd0
+    [<00000000b5122496>] do_syscall_64+0x33/0x40
+    [<000000002dd397af>] entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-> > > @@ -1126,7 +1199,12 @@ void iov_iter_revert(struct iov_iter *i, size_t unroll)
-> > >  		return;
-> > >  	}
-> > >  	unroll -= i->iov_offset;
-> > > -	if (iov_iter_is_bvec(i)) {
-> > > +	if (iov_iter_is_xarray(i)) {
-> > > +		BUG(); /* We should never go beyond the start of the specified
-> > > +			* range since we might then be straying into pages that
-> > > +			* aren't pinned.
-> > > +			*/
-> > 
-> > It's not needed now, but there are a lot of calls to iov_iter_revert in
-> > the kernel, and going backward doesn't necessarily mean we'd be straying
-> > into an unpinned range. xarray_start never changes; would it not be ok
-> > to allow reverting as long as you don't move to a lower offset than that
-> > point?
-> 
-> This is handled starting a couple of lines above the start of the hunk:
-> 
-> 	if (unroll <= i->iov_offset) {
-> 		i->iov_offset -= unroll;
-> 		return;
-> 	}
-> 
-> As long as the amount you want to unroll by doesn't exceed the amount you've
-> consumed of the iterator, it will allow you to do it.  The BUG is there to
-> catch someone attempting to over-revert (and there's no way to return an
-> error).
-> 
+This change is a bandaid until the cifs_setup_volume_info() TODO and
+error handling issues are resolved.
 
-Ahh thanks. I misread that bit. That makes sense. Sucks about having to
-BUG() there, but I'm not sure what else you can do.
+Signed-off-by: David Disseldorp <ddiss@suse.de>
+---
+ fs/cifs/cifsfs.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-> > > +static ssize_t iter_xarray_copy_pages(struct page **pages, struct xarray *xa,
-> > > +				       pgoff_t index, unsigned int nr_pages)
-> > 
-> > nit: This could use a different name -- I was expecting to see page
-> > _contents_ copied here, but it's just populating the page array with
-> > pointers.
-> 
-> Fair point.  Um...  how about iter_xarray_populate_pages() or
-> iter_xarray_list_pages()?
-> 
-
-I like "populate" better.
-
-> > I think you've planned to remove iov_iter_for_each_range as well? I'll
-> > assume that this is going away. It might be nice to post the latest
-> > version of this patch with that change, just for posterity.
-> 
-> I'll put that in a separate patch.
-> 
-> > In any case, this all looks reasonable to me, modulo a few nits and a
-> > general dearth of comments.
-> > 
-> > Reviewed-by: Jeff Layton <jlayton@kernel.org>
-> 
-> Thanks,
-> David
-> 
-
-Cheers,
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 5ddd20b62484..34c125798ad3 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -834,6 +834,12 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+ 		goto out;
+ 	}
+ 
++	/* cifs_setup_volume_info->smb3_parse_devname() redups UNC & prepath */
++	kfree(cifs_sb->ctx->UNC);
++	cifs_sb->ctx->UNC = NULL;
++	kfree(cifs_sb->ctx->prepath);
++	cifs_sb->ctx->prepath = NULL;
++
+ 	rc = cifs_setup_volume_info(cifs_sb->ctx, NULL, old_ctx->UNC);
+ 	if (rc) {
+ 		root = ERR_PTR(rc);
 -- 
-Jeff Layton <jlayton@kernel.org>
+2.26.2
 
