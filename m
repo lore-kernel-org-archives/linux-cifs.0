@@ -2,74 +2,57 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4CC2C433ED
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 22:16:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C71C433ED
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 22:35:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91B40608FE
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 22:16:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB54561139
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 22:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236896AbhDVWRe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Apr 2021 18:17:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55404 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232844AbhDVWRc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 22 Apr 2021 18:17:32 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA45C06174A
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Apr 2021 15:16:56 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id i3so29615944edt.1
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Apr 2021 15:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RKilX3qohNIwUEMirvtf+1d+omhXJdcQrgZYKoNJp6w=;
-        b=MbN/2Yj5BE7OZau9swwA3wfBo9iuX8K3NNnJUbM3TEMYb7v53hoLjW2ohST69RmOGO
-         l4S4Gws85sxhk2/C4jqCZ6YnUXilMrCQlHQbPPFw753ODKCxeeqykCnSvynu0Vq2dyud
-         jOVfBzC+YPDShAwrxZ4QucLfQ2RZ4txuXKJ6ysBAOWgUBVClMEvXOMGEVcCDCHvwI5J8
-         NdPGFgWC7IPxtoQkESyY1N32pHp5fPLyX0pORBk/eZLOIWWJ3/qhLmS46Z3dAOSzF9Z1
-         Sr2Gx6U08SmDSuywgmbwmimPoS2kfnlAbWq4f2CMAJodBxRa8+PcNCPKZmeBOaAEp8FC
-         VvSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RKilX3qohNIwUEMirvtf+1d+omhXJdcQrgZYKoNJp6w=;
-        b=JUAsjtFRmOupMs+nDGfM1GTNCdQAMMBET1xrLpAqCq89gJlS3Dx5EhOinOmca6Ljxj
-         Yb4ZIJPRFMENUsWN2TNRCJdNffxOtdZADhCbsJFN7TXCI+a9GkkK43U9Bena1J0CetU/
-         RxRYOj7B0cLQ9peo3yvlw8XZZCUiaWd8F9DDLgIWXuhILiOENddKdvTgXUxLdCbE9XVQ
-         hyq55yRbpfQ4OqKTB2L+f7RNjWFOJJiMqRU/wFdUc07DQm1tdaeSF/54nmYBdkpg7gKQ
-         PnDi5WE0ldGkewmKJt9gPy7uRBW9d8yGieU2prFX6+a74t87A8Q9NZvCbNIpobChTZrk
-         QEyQ==
-X-Gm-Message-State: AOAM531kGB/yqJyfmbmjBZAm1eyonU1NPmufl2DfmKIYzbqu+RXfXpgT
-        CAnwlZq0PtyGK3yYkghMFVv0Mre26nE5SNCj/cRhSF2y
-X-Google-Smtp-Source: ABdhPJzzsgrUWsj44xBsBid89gMWkiLM77UdN1e32qlJ8XhsR1DUjr9302lwxTx9XqQmniH9iEaUeWX5Htw6I0NYiVU=
-X-Received: by 2002:a50:ee0b:: with SMTP id g11mr790031eds.218.1619129814971;
- Thu, 22 Apr 2021 15:16:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210422221403.13617-1-ddiss@suse.de>
-In-Reply-To: <20210422221403.13617-1-ddiss@suse.de>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Fri, 23 Apr 2021 08:16:43 +1000
-Message-ID: <CAN05THTvRT8Hst0fGmzgSe5WgDct+oTvAxk=NuhvCt=2_NCzxQ@mail.gmail.com>
+        id S235977AbhDVWgI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Apr 2021 18:36:08 -0400
+Received: from mx.cjr.nz ([51.158.111.142]:38968 "EHLO mx.cjr.nz"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232844AbhDVWgI (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 22 Apr 2021 18:36:08 -0400
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id 543FE7FC03;
+        Thu, 22 Apr 2021 22:35:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1619130930;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SLl9Bo6c3SDKPXWvR8ugMbHn+r5MFp3lJadaJllj4KY=;
+        b=CvIJ+8UEgOQ6Rp6HM/p9h3MxGQmLzZqKI0QC4sOz4/5ZHw8Pq+kWWAg4v9y5PdL9W8JoW9
+        S3oppolmWyyhEWx/hYd0WLxerfVxejZGFXrN7Ee1TEw76Z+HwEpkcw9JrjjqVHThbVGnJP
+        bKzBXn1xYejThGv48Cf+GjiAUrb9fQyyEt7dah+YMht8GKhol3D2Ho7SLedrLsch6H5xqP
+        ZTPGlQq/AHrwMhskZiWPBZi4Xh6GcNk5Fa7ZOL6Qkk/S6FTfBHe8dIguO79lwe5pCxVJgB
+        s2rfKWZvewHOw+RwMbmhJ20hvdQHm2OJQhP1gMJ7Ws1rphQnFYovDlc0VqM9fw==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     David Disseldorp <ddiss@suse.de>, linux-cifs@vger.kernel.org
+Cc:     David Disseldorp <ddiss@suse.de>
 Subject: Re: [PATCH] cifs: fix leak in cifs_smb3_do_mount() ctx
-To:     David Disseldorp <ddiss@suse.de>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210422221403.13617-1-ddiss@suse.de>
+References: <20210422221403.13617-1-ddiss@suse.de>
+Date:   Thu, 22 Apr 2021 19:35:15 -0300
+Message-ID: <8735vi54nw.fsf@cjr.nz>
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Acked-by me
+David Disseldorp <ddiss@suse.de> writes:
 
-On Fri, Apr 23, 2021 at 8:14 AM David Disseldorp <ddiss@suse.de> wrote:
->
 > cifs_smb3_do_mount() calls smb3_fs_context_dup() and then
 > cifs_setup_volume_info(). The latter's subsequent smb3_parse_devname()
 > call overwrites the cifs_sb->ctx->UNC string already dup'ed by
@@ -99,24 +82,5 @@ On Fri, Apr 23, 2021 at 8:14 AM David Disseldorp <ddiss@suse.de> wrote:
 > ---
 >  fs/cifs/cifsfs.c | 6 ++++++
 >  1 file changed, 6 insertions(+)
->
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index 5ddd20b62484..34c125798ad3 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -834,6 +834,12 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
->                 goto out;
->         }
->
-> +       /* cifs_setup_volume_info->smb3_parse_devname() redups UNC & prepath */
-> +       kfree(cifs_sb->ctx->UNC);
-> +       cifs_sb->ctx->UNC = NULL;
-> +       kfree(cifs_sb->ctx->prepath);
-> +       cifs_sb->ctx->prepath = NULL;
-> +
->         rc = cifs_setup_volume_info(cifs_sb->ctx, NULL, old_ctx->UNC);
->         if (rc) {
->                 root = ERR_PTR(rc);
-> --
-> 2.26.2
->
+
+Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
