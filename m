@@ -2,142 +2,112 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3F37C433B4
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 23:04:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF34FC433ED
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 23:51:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A37EB61463
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 23:04:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8116D613B7
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 23:51:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235346AbhDWXFf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 23 Apr 2021 19:05:35 -0400
-Received: from mail108.syd.optusnet.com.au ([211.29.132.59]:56364 "EHLO
-        mail108.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232992AbhDWXFc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 23 Apr 2021 19:05:32 -0400
-Received: from dread.disaster.area (pa49-181-239-12.pa.nsw.optusnet.com.au [49.181.239.12])
-        by mail108.syd.optusnet.com.au (Postfix) with ESMTPS id A7DB51AF798;
-        Sat, 24 Apr 2021 09:04:50 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1la4qv-004cCW-Fb; Sat, 24 Apr 2021 09:04:49 +1000
-Date:   Sat, 24 Apr 2021 09:04:49 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Amir Goldstein <amir73il@gmail.com>, Ted Tso <tytso@mit.edu>,
-        ceph-devel@vger.kernel.org, Chao Yu <yuchao0@huawei.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
-        Steve French <sfrench@samba.org>
-Subject: Re: [PATCH 02/12] mm: Protect operations adding pages to page cache
- with invalidate_lock
-Message-ID: <20210423230449.GC1990290@dread.disaster.area>
-References: <20210423171010.12-1-jack@suse.cz>
- <20210423173018.23133-2-jack@suse.cz>
+        id S232429AbhDWXwP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Apr 2021 19:52:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53000 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232106AbhDWXwO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Apr 2021 19:52:14 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C74F0C061574
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Apr 2021 16:51:35 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id a13so3600338ljp.2
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Apr 2021 16:51:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tc3bu2BiI8PLLreP/CtdwDchsn8MOLWO2mH1ju6l2Ng=;
+        b=Zzok+ZhzRFEGpMQaWWZ8JQal+2KWxheswp/YQM3dEcZ3YvRY60p19rklv5geTXiM1K
+         yTUCJA60WIM0qjyIpASr6AmZEXpFqzCoklToK29WRCNVqFNbCVSpFlZ85f6AmiKbPZFd
+         9hYHL0r4NXIdEdhVADm7dqK60+Spof2mDUOlpkNWwTPZRZHX9YPri0WeTO/I0hHK9qCq
+         3EO3fDNVnCevuq60ptrMEdS52M/V8eiLDDjj6QqQF9aqI62bKEun4O4vSk18QaZ91ywC
+         fOZiTXoYWFmEGog4r33+7xxp6YxBlArSwPiA5D2HvVRwrkGq4v0VB6RlFht/zxnCXKoK
+         clKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tc3bu2BiI8PLLreP/CtdwDchsn8MOLWO2mH1ju6l2Ng=;
+        b=MKO1B30JYsolVa3wSwCZomu/f8JNeqa4KWHqqTGY2BhEnUYEQ0BLwfKdmosq/NcPH8
+         lHvYTeRwyipc1/Dqt+K1tUugENLnEPEfQC5C+m/wf6BlHGy9D4rgwYNNxVVBZaIEh7S2
+         w2w8dDRRmBaINE2RVDsEwrDSl2XX1zY9y0OXLpiy80p+BFk2ORTp2xIuvkHzxV0DcdMt
+         edj9RyjJqkrsYpN+L4nD78gsTIi3wyb+LTKbbDedd8AG22HR7GJ7hjyCWq2R+gDKp62u
+         hAF73BKmzPvj6WSU1ad4A5jbOs5EmjGUCpj2/eV1h3eM/ty/UGxM/EyBK+l9YAJ42WWr
+         q37A==
+X-Gm-Message-State: AOAM533ftGuFbizjaahP6Gz0wTRnbwQgSu5U3FOZP6Qs1WAPM8aruknM
+        g3JpnJ94qU80VP3VopimhtYqqPnMuP1owlmg2kDx6hU2
+X-Google-Smtp-Source: ABdhPJxPkwlfmX4BzG8YtYWSMzwMSfzRpSPLPfmkzXhoULyS1aJsHAlJHyRGHOtzCbBLC0fpIMBuklAVN6O4b9+7ckM=
+X-Received: by 2002:a2e:a78b:: with SMTP id c11mr4465831ljf.6.1619221894254;
+ Fri, 23 Apr 2021 16:51:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210423173018.23133-2-jack@suse.cz>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=F8MpiZpN c=1 sm=1 tr=0 cx=a_idp_f
-        a=gO82wUwQTSpaJfP49aMSow==:117 a=gO82wUwQTSpaJfP49aMSow==:17
-        a=kj9zAlcOel0A:10 a=3YhXtTcJ-WEA:10 a=7-415B0cAAAA:8
-        a=fwWlK0ynS9Jva5SY9FMA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+References: <20210422221403.13617-1-ddiss@suse.de> <8735vi54nw.fsf@cjr.nz>
+In-Reply-To: <8735vi54nw.fsf@cjr.nz>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 23 Apr 2021 18:51:23 -0500
+Message-ID: <CAH2r5mvg-2zaVsYnw-_iBSPXsbQekACJz+CYEviuNM3CjZJGXQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix leak in cifs_smb3_do_mount() ctx
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     David Disseldorp <ddiss@suse.de>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Apr 23, 2021 at 07:29:31PM +0200, Jan Kara wrote:
-> Currently, serializing operations such as page fault, read, or readahead
-> against hole punching is rather difficult. The basic race scheme is
-> like:
-> 
-> fallocate(FALLOC_FL_PUNCH_HOLE)			read / fault / ..
->   truncate_inode_pages_range()
-> 						  <create pages in page
-> 						   cache here>
->   <update fs block mapping and free blocks>
-> 
-> Now the problem is in this way read / page fault / readahead can
-> instantiate pages in page cache with potentially stale data (if blocks
-> get quickly reused). Avoiding this race is not simple - page locks do
-> not work because we want to make sure there are *no* pages in given
-> range. inode->i_rwsem does not work because page fault happens under
-> mmap_sem which ranks below inode->i_rwsem. Also using it for reads makes
-> the performance for mixed read-write workloads suffer.
-> 
-> So create a new rw_semaphore in the address_space - invalidate_lock -
-> that protects adding of pages to page cache for page faults / reads /
-> readahead.
-.....
-> diff --git a/fs/inode.c b/fs/inode.c
-> index a047ab306f9a..43596dd8b61e 100644
-> --- a/fs/inode.c
-> +++ b/fs/inode.c
-> @@ -191,6 +191,9 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
->  	mapping_set_gfp_mask(mapping, GFP_HIGHUSER_MOVABLE);
->  	mapping->private_data = NULL;
->  	mapping->writeback_index = 0;
-> +	init_rwsem(&mapping->invalidate_lock);
-> +	lockdep_set_class(&mapping->invalidate_lock,
-> +			  &sb->s_type->invalidate_lock_key);
->  	inode->i_private = NULL;
->  	inode->i_mapping = mapping;
->  	INIT_HLIST_HEAD(&inode->i_dentry);	/* buggered by rcu freeing */
+merged into cifs-2.6.git for-next and kicking off (buildbot) testing
+run with it now
 
-Oh, lockdep. That might be a problem here.
+On Thu, Apr 22, 2021 at 5:36 PM Paulo Alcantara <pc@cjr.nz> wrote:
+>
+> David Disseldorp <ddiss@suse.de> writes:
+>
+> > cifs_smb3_do_mount() calls smb3_fs_context_dup() and then
+> > cifs_setup_volume_info(). The latter's subsequent smb3_parse_devname()
+> > call overwrites the cifs_sb->ctx->UNC string already dup'ed by
+> > smb3_fs_context_dup(), resulting in a leak. E.g.
+> >
+> > unreferenced object 0xffff888002980420 (size 32):
+> >   comm "mount", pid 160, jiffies 4294892541 (age 30.416s)
+> >   hex dump (first 32 bytes):
+> >     5c 5c 31 39 32 2e 31 36 38 2e 31 37 34 2e 31 30  \\192.168.174.10
+> >     34 5c 72 61 70 69 64 6f 2d 73 68 61 72 65 00 00  4\rapido-share..
+> >   backtrace:
+> >     [<00000000069e12f6>] kstrdup+0x28/0x50
+> >     [<00000000b61f4032>] smb3_fs_context_dup+0x127/0x1d0 [cifs]
+> >     [<00000000c6e3e3bf>] cifs_smb3_do_mount+0x77/0x660 [cifs]
+> >     [<0000000063467a6b>] smb3_get_tree+0xdf/0x220 [cifs]
+> >     [<00000000716f731e>] vfs_get_tree+0x1b/0x90
+> >     [<00000000491d3892>] path_mount+0x62a/0x910
+> >     [<0000000046b2e774>] do_mount+0x50/0x70
+> >     [<00000000ca7b64dd>] __x64_sys_mount+0x81/0xd0
+> >     [<00000000b5122496>] do_syscall_64+0x33/0x40
+> >     [<000000002dd397af>] entry_SYSCALL_64_after_hwframe+0x44/0xae
+> >
+> > This change is a bandaid until the cifs_setup_volume_info() TODO and
+> > error handling issues are resolved.
+> >
+> > Signed-off-by: David Disseldorp <ddiss@suse.de>
+> > ---
+> >  fs/cifs/cifsfs.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+>
+> Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
 
-The XFS_MMAPLOCK has non-trivial lockdep annotations so that it is
-tracked as nesting properly against the IOLOCK and the ILOCK. When
-you end up using xfs_ilock(XFS_MMAPLOCK..) to lock this, XFS will
-add subclass annotations to the lock and they are going to be
-different to the locking that the VFS does.
 
-We'll see this from xfs_lock_two_inodes() (e.g. in
-xfs_swap_extents()) and xfs_ilock2_io_mmap() during reflink
-oper.....
 
-Oooooh. The page cache copy done when breaking a shared extent needs
-to lock out page faults on both the source and destination, but it
-still needs to be able to populate the page cache of both the source
-and destination file.....
-
-.... and vfs_dedupe_file_range_compare() has to be able to read
-pages from both the source and destination file to determine that
-the contents are identical and that's done while we hold the
-XFS_MMAPLOCK exclusively so the compare is atomic w.r.t. all other
-user data modification operations being run....
-
-I now have many doubts that this "serialise page faults by locking
-out page cache instantiation" method actually works as a generic
-mechanism. It's not just page cache invalidation that relies on
-being able to lock out page faults: copy-on-write and deduplication
-both require the ability to populate the page cache with source data
-while page faults are locked out so the data can be compared/copied
-atomically with the extent level manipulations and so user data
-modifications cannot occur until the physical extent manipulation
-operation has completed.
-
-Having only just realised this is a problem, no solution has
-immediately popped into my mind. I'll chew on it over the weekend,
-but I'm not hopeful at this point...
-
-Cheers,
-
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Thanks,
+
+Steve
