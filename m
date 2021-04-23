@@ -2,85 +2,152 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C71C433ED
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 22:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 813CFC43461
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 04:41:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB54561139
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Apr 2021 22:35:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 638B2613BD
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 04:41:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235977AbhDVWgI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Apr 2021 18:36:08 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:38968 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232844AbhDVWgI (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 22 Apr 2021 18:36:08 -0400
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 543FE7FC03;
-        Thu, 22 Apr 2021 22:35:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1619130930;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SLl9Bo6c3SDKPXWvR8ugMbHn+r5MFp3lJadaJllj4KY=;
-        b=CvIJ+8UEgOQ6Rp6HM/p9h3MxGQmLzZqKI0QC4sOz4/5ZHw8Pq+kWWAg4v9y5PdL9W8JoW9
-        S3oppolmWyyhEWx/hYd0WLxerfVxejZGFXrN7Ee1TEw76Z+HwEpkcw9JrjjqVHThbVGnJP
-        bKzBXn1xYejThGv48Cf+GjiAUrb9fQyyEt7dah+YMht8GKhol3D2Ho7SLedrLsch6H5xqP
-        ZTPGlQq/AHrwMhskZiWPBZi4Xh6GcNk5Fa7ZOL6Qkk/S6FTfBHe8dIguO79lwe5pCxVJgB
-        s2rfKWZvewHOw+RwMbmhJ20hvdQHm2OJQhP1gMJ7Ws1rphQnFYovDlc0VqM9fw==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     David Disseldorp <ddiss@suse.de>, linux-cifs@vger.kernel.org
-Cc:     David Disseldorp <ddiss@suse.de>
-Subject: Re: [PATCH] cifs: fix leak in cifs_smb3_do_mount() ctx
-In-Reply-To: <20210422221403.13617-1-ddiss@suse.de>
-References: <20210422221403.13617-1-ddiss@suse.de>
-Date:   Thu, 22 Apr 2021 19:35:15 -0300
-Message-ID: <8735vi54nw.fsf@cjr.nz>
+        id S229549AbhDWEle (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Apr 2021 00:41:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54100 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230437AbhDWEld (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 23 Apr 2021 00:41:33 -0400
+Received: from mail-ua1-x92d.google.com (mail-ua1-x92d.google.com [IPv6:2607:f8b0:4864:20::92d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B351BC06138C
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Apr 2021 21:40:56 -0700 (PDT)
+Received: by mail-ua1-x92d.google.com with SMTP id g24so3837572uak.11
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Apr 2021 21:40:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cYjZlbF3DXM7zGnEvoUEauj9qs95JDVKd+qkmT8E5Es=;
+        b=Sz162M5Od95RKrPl3X/Ac4xcDjeMsrrM/4Xt3pyER0eWJaPxr1EiE1YWPdfvaRqo8Z
+         9BuZXgXl61gDrjkAfvHLKWCwv0Hz3q0z5HGKJCQkDs0zZc1hd1SYYMVD4xhYjVO1eYBK
+         nUrplSbXYGSOOCNOwNBzogI6pG1sjmuXCgXbc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cYjZlbF3DXM7zGnEvoUEauj9qs95JDVKd+qkmT8E5Es=;
+        b=K5CZhlERkfFTo9HxL+rWX0tbM1jfDG5ysPsAjbGcqlcZ1//pRLL+Ki6Xed5FddZuaq
+         ci/qoCtubi5JPk8oEZm1bYXz3qixd3rzFF96UIrpotldlip58EeIXDJKcRgqFSItaeKU
+         DKu+d7XIZzEmOi0riw3R1qaoRTwMKl1HyWyyDdqmXKkCJ1aWFBOMLdeAGnc5UOyL0OLk
+         aP0IaF5TxSXnOI8B1HgSd9Q9hfbnPw8INNuFWYp0LP13XICAWW+t5sz06O1bIhtTFazu
+         93ug9TgxOPAbUeP+K9kepHDxSow9kl7okDJs3uoZslFczeYOhhXYhGoSQWbegeRYLp/K
+         1hQw==
+X-Gm-Message-State: AOAM530VEKmnij8T2J3RSJPoEyYshw21JninAD1US+b470TLzoXVcT1+
+        MKSwv9IUWI7H/X98HZ76BlEmUoOKETQWKE/6apP8vw==
+X-Google-Smtp-Source: ABdhPJxN50JqYMGhnzwmNIzBqf5XELBKZ9iKqf346L2CEQrzbVJ1FDlyDZ16cLmlLwpKkRZI87JeC+iOPw+JE+Tq628=
+X-Received: by 2002:ab0:638e:: with SMTP id y14mr1572161uao.82.1619152855684;
+ Thu, 22 Apr 2021 21:40:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20210221195833.23828-1-lhenriques@suse.de> <20210222102456.6692-1-lhenriques@suse.de>
+ <CAN-5tyELMY7b7CKO-+an47ydq8r_4+SOyhuvdH0qE0-JmdZ44Q@mail.gmail.com>
+ <YDYpHccgM7agpdTQ@suse.de> <CANMq1KBgwEXFh8AxpPW2t1SA0NVsyR45m0paLEU4D4w80dc_fA@mail.gmail.com>
+ <CANMq1KDTgnGtNxWj2XxAT3mdsNjc551uUCg6EWnh=Hd0KcVQKQ@mail.gmail.com>
+ <8735vzfugn.fsf@suse.de> <CAOQ4uxjdVZywBi6=D1eRfBhRk+nobTz4N87jcejDtvzBMMMKXQ@mail.gmail.com>
+In-Reply-To: <CAOQ4uxjdVZywBi6=D1eRfBhRk+nobTz4N87jcejDtvzBMMMKXQ@mail.gmail.com>
+From:   Nicolas Boichat <drinkcat@chromium.org>
+Date:   Fri, 23 Apr 2021 12:40:44 +0800
+Message-ID: <CANMq1KAOwj9dJenwF2NadQ73ytfccuPuahBJE7ak6S7XP6nCjg@mail.gmail.com>
+Subject: Re: [PATCH v8] vfs: fix copy_file_range regression in cross-fs copies
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     Luis Henriques <lhenriques@suse.de>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Olga Kornievskaia <aglo@umich.edu>,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Dave Chinner <dchinner@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        Andreas Dilger <adilger@dilger.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-nfs <linux-nfs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-David Disseldorp <ddiss@suse.de> writes:
+On Fri, Apr 9, 2021 at 9:50 PM Amir Goldstein <amir73il@gmail.com> wrote:
+>
+> On Fri, Apr 9, 2021 at 4:39 PM Luis Henriques <lhenriques@suse.de> wrote:
+> >
+> > Nicolas Boichat <drinkcat@chromium.org> writes:
+> >
+> > > On Wed, Feb 24, 2021 at 6:44 PM Nicolas Boichat <drinkcat@chromium.org> wrote:
+> > >>
+> > >> On Wed, Feb 24, 2021 at 6:22 PM Luis Henriques <lhenriques@suse.de> wrote:
+> > >> >
+> > >> > On Tue, Feb 23, 2021 at 08:00:54PM -0500, Olga Kornievskaia wrote:
+> > >> > > On Mon, Feb 22, 2021 at 5:25 AM Luis Henriques <lhenriques@suse.de> wrote:
+> > >> > > >
+> > >> > > > A regression has been reported by Nicolas Boichat, found while using the
+> > >> > > > copy_file_range syscall to copy a tracefs file.  Before commit
+> > >> > > > 5dae222a5ff0 ("vfs: allow copy_file_range to copy across devices") the
+> > >> > > > kernel would return -EXDEV to userspace when trying to copy a file across
+> > >> > > > different filesystems.  After this commit, the syscall doesn't fail anymore
+> > >> > > > and instead returns zero (zero bytes copied), as this file's content is
+> > >> > > > generated on-the-fly and thus reports a size of zero.
+> > >> > > >
+> > >> > > > This patch restores some cross-filesystem copy restrictions that existed
+> > >> > > > prior to commit 5dae222a5ff0 ("vfs: allow copy_file_range to copy across
+> > >> > > > devices").  Filesystems are still allowed to fall-back to the VFS
+> > >> > > > generic_copy_file_range() implementation, but that has now to be done
+> > >> > > > explicitly.
+> > >> > > >
+> > >> > > > nfsd is also modified to fall-back into generic_copy_file_range() in case
+> > >> > > > vfs_copy_file_range() fails with -EOPNOTSUPP or -EXDEV.
+> > >> > > >
+> > >> > > > Fixes: 5dae222a5ff0 ("vfs: allow copy_file_range to copy across devices")
+> > >> > > > Link: https://lore.kernel.org/linux-fsdevel/20210212044405.4120619-1-drinkcat@chromium.org/
+> > >> > > > Link: https://lore.kernel.org/linux-fsdevel/CANMq1KDZuxir2LM5jOTm0xx+BnvW=ZmpsG47CyHFJwnw7zSX6Q@mail.gmail.com/
+> > >> > > > Link: https://lore.kernel.org/linux-fsdevel/20210126135012.1.If45b7cdc3ff707bc1efa17f5366057d60603c45f@changeid/
+> > >> > > > Reported-by: Nicolas Boichat <drinkcat@chromium.org>
+> > >> > > > Signed-off-by: Luis Henriques <lhenriques@suse.de>
+> > >> > >
+> > >> > > I tested v8 and I believe it works for NFS.
+> > >> >
+> > >> > Thanks a lot for the testing.  And to everyone else for reviews,
+> > >> > feedback,... and patience.
+> > >>
+> > >> Thanks so much to you!!!
+> > >>
+> > >> Works here, you can add my
+> > >> Tested-by: Nicolas Boichat <drinkcat@chromium.org>
+> > >
+> > > What happened to this patch? It does not seem to have been picked up
+> > > yet? Any reason why?
+> >
+> > Hmm... good question.  I'm not actually sure who would be picking it.  Al,
+> > maybe...?
+> >
+>
+> Darrick,
+>
+> Would you mind taking this through your tree in case Al doesn't pick it up?
 
-> cifs_smb3_do_mount() calls smb3_fs_context_dup() and then
-> cifs_setup_volume_info(). The latter's subsequent smb3_parse_devname()
-> call overwrites the cifs_sb->ctx->UNC string already dup'ed by
-> smb3_fs_context_dup(), resulting in a leak. E.g.
->
-> unreferenced object 0xffff888002980420 (size 32):
->   comm "mount", pid 160, jiffies 4294892541 (age 30.416s)
->   hex dump (first 32 bytes):
->     5c 5c 31 39 32 2e 31 36 38 2e 31 37 34 2e 31 30  \\192.168.174.10
->     34 5c 72 61 70 69 64 6f 2d 73 68 61 72 65 00 00  4\rapido-share..
->   backtrace:
->     [<00000000069e12f6>] kstrdup+0x28/0x50
->     [<00000000b61f4032>] smb3_fs_context_dup+0x127/0x1d0 [cifs]
->     [<00000000c6e3e3bf>] cifs_smb3_do_mount+0x77/0x660 [cifs]
->     [<0000000063467a6b>] smb3_get_tree+0xdf/0x220 [cifs]
->     [<00000000716f731e>] vfs_get_tree+0x1b/0x90
->     [<00000000491d3892>] path_mount+0x62a/0x910
->     [<0000000046b2e774>] do_mount+0x50/0x70
->     [<00000000ca7b64dd>] __x64_sys_mount+0x81/0xd0
->     [<00000000b5122496>] do_syscall_64+0x33/0x40
->     [<000000002dd397af>] entry_SYSCALL_64_after_hwframe+0x44/0xae
->
-> This change is a bandaid until the cifs_setup_volume_info() TODO and
-> error handling issues are resolved.
->
-> Signed-off-by: David Disseldorp <ddiss@suse.de>
-> ---
->  fs/cifs/cifsfs.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+Err, sorry for yet another ping... but it would be good to move
+forward with those patches ,-P
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Thanks!
+
+> Thanks,
+> Amir.
