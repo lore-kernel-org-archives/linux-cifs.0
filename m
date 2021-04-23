@@ -2,88 +2,90 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0FEC433B4
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 14:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ACEDC43460
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 17:30:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 159316145A
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 14:33:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 482186140F
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Apr 2021 17:30:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242618AbhDWOeG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 23 Apr 2021 10:34:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36782 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230355AbhDWOeE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 23 Apr 2021 10:34:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619188407;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TjxYyjr3+n/FgdeoX21aU0rXvOBSEI7Z5zCaxLkZK4Q=;
-        b=FPY+RzXPMgUD6g+zYy6K2V76gXPi0ahgYiy/09+H1FZ52r4fvDnZR4n1lYkxPKQj+xSwD8
-        ywEMpevakTRNd7OEaJafjfotZkJGDXT+oCYiJf9QAcgAZRwzymzpaXWDdNdjab2KKTLbsx
-        13iM3AlCHhVDmhGmZd6z5xdFX0vhJtA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-558-AceqMeyuOfiNiPlJDe3uCw-1; Fri, 23 Apr 2021 10:33:24 -0400
-X-MC-Unique: AceqMeyuOfiNiPlJDe3uCw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F459839A4C;
-        Fri, 23 Apr 2021 14:33:22 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-112-124.rdu2.redhat.com [10.10.112.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E3B2960C25;
-        Fri, 23 Apr 2021 14:33:14 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20210423140625.GC235567@casper.infradead.org>
-References: <20210423140625.GC235567@casper.infradead.org> <161918446704.3145707.14418606303992174310.stgit@warthog.procyon.org.uk> <161918448151.3145707.11541538916600921083.stgit@warthog.procyon.org.uk>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
-        Dave Wysochanski <dwysocha@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 01/31] iov_iter: Add ITER_XARRAY
+        id S243453AbhDWRbB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 23 Apr 2021 13:31:01 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43728 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243429AbhDWRa7 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 23 Apr 2021 13:30:59 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 5EAE9B1D6;
+        Fri, 23 Apr 2021 17:30:19 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id C3FC11F2C54; Fri, 23 Apr 2021 19:30:18 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     <linux-fsdevel@vger.kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Amir Goldstein <amir73il@gmail.com>,
+        Dave Chinner <david@fromorbit.com>, Ted Tso <tytso@mit.edu>,
+        Jan Kara <jack@suse.cz>, Steve French <sfrench@samba.org>,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH 12/12] cifs: Fix race between hole punch and page fault
+Date:   Fri, 23 Apr 2021 19:29:41 +0200
+Message-Id: <20210423173018.23133-12-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210423171010.12-1-jack@suse.cz>
+References: <20210423171010.12-1-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3153357.1619188393.1@warthog.procyon.org.uk>
-Date:   Fri, 23 Apr 2021 15:33:14 +0100
-Message-ID: <3153358.1619188394@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
+Cifs has a following race between hole punching and page fault:
 
-> On Fri, Apr 23, 2021 at 02:28:01PM +0100, David Howells wrote:
-> Now, is this important?  There are no filesystems which do I/O to THPs
-> today.  So it's not possible to pick up the fact that it doesn't work,
-> and I hope to have the page cache fixed soon.  And fixing this now
-> will create more work later as part of fixing the page cache.  But I
-> wouldn't feel right not mentioning this problem ...
+CPU1                                            CPU2
+smb3_fallocate()
+  smb3_punch_hole()
+    truncate_pagecache_range()
+                                                filemap_fault()
+                                                  - loads old data into the
+                                                    page cache
+    SMB2_ioctl(..., FSCTL_SET_ZERO_DATA, ...)
 
-So I can leave the code as-is for the moment and it can be fixed with your
-patches?
+And now we have stale data in the page cache. Fix the problem by locking
+out faults (as well as reads) using mapping->invalidate_lock while hole
+punch is running.
 
-David
+CC: Steve French <sfrench@samba.org>
+CC: linux-cifs@vger.kernel.org
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ fs/cifs/smb2ops.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index f703204fb185..18231f9bc336 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -3543,6 +3543,7 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 		return rc;
+ 	}
+ 
++	down_write(&inode->i_mapping->invalidate_lock);
+ 	/*
+ 	 * We implement the punch hole through ioctl, so we need remove the page
+ 	 * caches first, otherwise the data may be inconsistent with the server.
+@@ -3560,6 +3561,7 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 			sizeof(struct file_zero_data_information),
+ 			CIFSMaxBufSize, NULL, NULL);
+ 	free_xid(xid);
++	up_write(&inode->i_mapping->invalidate_lock);
+ 	return rc;
+ }
+ 
+-- 
+2.26.2
 
