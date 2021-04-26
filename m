@@ -2,161 +2,172 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F375EC433ED
-	for <linux-cifs@archiver.kernel.org>; Sun, 25 Apr 2021 23:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B0AC43460
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 04:52:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C34CB6112F
-	for <linux-cifs@archiver.kernel.org>; Sun, 25 Apr 2021 23:15:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EE1B61263
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 04:52:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231431AbhDYXPp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 25 Apr 2021 19:15:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42027 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231422AbhDYXPo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 25 Apr 2021 19:15:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619392503;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=n+JuniTf6/0QJHyHH9jZCObdX5/aD9evlCt++gaJJ1U=;
-        b=HaPfit6tCzXwJczD3kpJvAV4E315OpFWx2DQGRjxjNxWgg3Yy/3QFdemjhTdu4Bewn+YN7
-        ynvZSNMLuDkiKne+P8M01zFapqo+Z38gltWbtKbb9Pm88rRKEB6HlfYWrpkdBjMRIRWhoJ
-        ghivv38PwkiG8CZ+P+NzR5g0IEZznv8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-BQSQMrQCPYm7CjiNMMlK1Q-1; Sun, 25 Apr 2021 19:15:01 -0400
-X-MC-Unique: BQSQMrQCPYm7CjiNMMlK1Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 009458030B5;
-        Sun, 25 Apr 2021 23:14:59 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-112-124.rdu2.redhat.com [10.10.112.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9C7785D74F;
-        Sun, 25 Apr 2021 23:14:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <161918448151.3145707.11541538916600921083.stgit@warthog.procyon.org.uk>
-References: <161918448151.3145707.11541538916600921083.stgit@warthog.procyon.org.uk> <161918446704.3145707.14418606303992174310.stgit@warthog.procyon.org.uk>
-To:     Alexander Viro <viro@zeniv.linux.org.uk>
-Cc:     dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
-        Dave Wysochanski <dwysocha@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@redhat.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH] iov_iter: Four fixes for ITER_XARRAY
+        id S229506AbhDZExW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Apr 2021 00:53:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59988 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229469AbhDZExV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Apr 2021 00:53:21 -0400
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AD01C061574
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Apr 2021 21:52:39 -0700 (PDT)
+Received: by mail-yb1-xb32.google.com with SMTP id t94so10019762ybi.3
+        for <linux-cifs@vger.kernel.org>; Sun, 25 Apr 2021 21:52:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=dF5NkQW2l8YzcJgY6B7g3OvZDjIemy0cgB9Ta5KCd7M=;
+        b=s5jERKqVUImiLI1TCVTEg3Vx3LrDDH1eAaxKMzc7651s0iUDZIMFeW0O5DNSbX6tLB
+         BwOuvDtXYlqd+alCfaLpFIAABHeLU4YUt1GG58hyeVIDDtx/q3pSZUwU3fFcv6QFevLc
+         PfXWqzphcxEcRjd0LKN2BbDMqOJTVx/r0SpEkwcxQFd1VgTQ8zCHOhx2JXj6nJck0FLH
+         Aojp0Yb2y3EmNnHPRVzw2e6AsKd6SPJPis1lVop6/sUPeP6a5Mb897KyV3ofTJlBmSQd
+         gVMWqgxXbFCktCRSEZzTrPlrTsOlF/jmSy5rEEj06iYZnX26l89bJ94iGmzeFS+Pax+B
+         QgbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=dF5NkQW2l8YzcJgY6B7g3OvZDjIemy0cgB9Ta5KCd7M=;
+        b=XGpq5wHVuGNGzYKl3UFG4tR7+lgPheLrLhEqK89G9IwI0j3m4ONSDxGKhfQNvB3vuA
+         M01HY6/W2d0pj2sYiEIHcL3RSMWqLmoQQDEi63A1AiDARYMkH6FyP+gEWbUZom4CNuVK
+         lIUmNteMfJe2KgxJVxtqK9CQcbm+a4NrUEpjctVmUxrADUNf5xt1U8cV9giKWG+o9IdU
+         9pFJ2JkAGTDwkubEfZ8iJV9Uj9BOqKQ+ODKr6ufcM0UGB0zEcKnGjxjttwbUJMAl92eY
+         tF6fHZl62qYDHEevpZsoNdHKRokG8jBMhyyuLsQsfXVoLEX8X+7rdxxfYt6VMrO6aHdi
+         v9fQ==
+X-Gm-Message-State: AOAM530gZR/FpcZvZJMCe6LIt2M0DAk+o/0RrfMH1Yd9Hk9ZrDed/vcl
+        tLoYID2OVI5I2dGWn2/YnxwcOHkXw1sKFf9jeXM=
+X-Google-Smtp-Source: ABdhPJxmCTO/3mGEXNKhBAtozXB/Vnhx6cuIfTmiMRREL63vdyf321rpe3RocezqYXoJIedR1guFgPJp4s+AGDe1PtA=
+X-Received: by 2002:a25:3287:: with SMTP id y129mr6115745yby.97.1619412758608;
+ Sun, 25 Apr 2021 21:52:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3545033.1619392490.1@warthog.procyon.org.uk>
+References: <CAH2r5mvfMfgGimkmC9nQxvOMt=2E7S1=dA33MJaszy5NHE2zxQ@mail.gmail.com>
+ <20210425020946.GG235567@casper.infradead.org> <CAH2r5mui+DSj0RzgcGy+EVeg7VXEwd9fanAPNdBS+NSSiv9+Ug@mail.gmail.com>
+ <CAH2r5msv6PtzSMVv1uVY983rKzdLvfL06T5OeTiU8eLyoMjL_A@mail.gmail.com>
+In-Reply-To: <CAH2r5msv6PtzSMVv1uVY983rKzdLvfL06T5OeTiU8eLyoMjL_A@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Mon, 26 Apr 2021 10:22:27 +0530
+Message-ID: <CANT5p=qVq5mD2jfvt1Ym24hQF9M-aj1v1GT2q+_41p1OTESTKw@mail.gmail.com>
+Subject: Re: [PATCH] smb3: add rasize mount parameter to improve performance
+ of readahead
+To:     Steve French <smfrench@gmail.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date:   Mon, 26 Apr 2021 00:14:50 +0100
-Message-ID: <3545034.1619392490@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Al,
+Agree with this. Was experimenting on the similar lines on Friday.
+Does show good improvements with sequential workload.
+For random read/write workload, the user can use the default value.
 
-I think this patch should include all the fixes necessary.  I could merge
-it in, but I think it might be better to tag it on the end as an additiona=
-l
-patch.
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
 
-David
----
-iov_iter: Four fixes for ITER_XARRAY
+On Sun, Apr 25, 2021 at 10:20 PM Steve French <smfrench@gmail.com> wrote:
+>
+> Updated patch attached. It does seem to help - just tried an experiment
+>
+>       dd if=3D/mnt/test/1GBfile of=3D/dev/null bs=3D1M count=3D1024
+>
+> to the same server, same share and compared mounting with rasize=3D6MB
+> vs. default (1MB to Azure)
+>
+> (rw,relatime,vers=3D3.1.1,cache=3Dstrict,username=3Dlinuxsmb3testsharesmc=
+,uid=3D0,noforceuid,gid=3D0,noforcegid,addr=3D20.150.70.104,file_mode=3D077=
+7,dir_mode=3D0777,soft,persistenthandles,nounix,serverino,mapposix,mfsymlin=
+ks,nostrictsync,rsize=3D1048576,wsize=3D1048576,bsize=3D1048576,echo_interv=
+al=3D60,actimeo=3D1,multichannel,max_channels=3D2)
+>
+> Got 391 MB/s  with rasize=3D6MB, much faster than default (which ends up
+> as 1MB with current code) of 163MB/s
+>
+>
+>
+>
+>
+>
+> # dd if=3D/mnt/test/394.29520 of=3D/dev/null bs=3D1M count=3D1024 ; dd
+> if=3D/mnt/scratch/394.29520 of=3D/mnt/test/junk1 bs=3D1M count=3D1024 ;dd
+> if=3D/mnt/test/394.29520 of=3D/dev/null bs=3D1M count=3D1024 ; dd
+> if=3D/mnt/scratch/394.29520 of=3D/mnt/test/junk1 bs=3D1M count=3D1024 ;
+> 1024+0 records in
+> 1024+0 records out
+> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 4.06764 s, 264 MB/s
+> 1024+0 records in
+> 1024+0 records out
+> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 12.5912 s, 85.3 MB/s
+> 1024+0 records in
+> 1024+0 records out
+> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 3.0573 s, 351 MB/s
+> 1024+0 records in
+> 1024+0 records out
+> 1073741824 bytes (1.1 GB, 1.0 GiB) copied, 8.58283 s, 125 MB/s
+>
+> On Sat, Apr 24, 2021 at 9:36 PM Steve French <smfrench@gmail.com> wrote:
+> >
+> > Yep - good catch.  It is missing part of my patch :(
+> >
+> > Ugh
+> >
+> > Will need to rerun and get real numbers
+> >
+> > On Sat, Apr 24, 2021 at 9:10 PM Matthew Wilcox <willy@infradead.org> wr=
+ote:
+> > >
+> > > On Sat, Apr 24, 2021 at 02:27:11PM -0500, Steve French wrote:
+> > > > Using the buildbot test systems, this resulted in an average improv=
+ement
+> > > > of 14% to the Windows server test target for the first 12 tests I
+> > > > tried (no multichannel)
+> > > > changing to 12MB rasize (read ahead size).   Similarly increasing t=
+he
+> > > > rasize to 12MB to Azure (this time with multichannel, 4 channels)
+> > > > improved performance 37%
+> > > >
+> > > > Note that Ceph had already introduced a mount parameter "rasize" to
+> > > > allow controlling this.  Add mount parameter "rasize" to cifs.ko to
+> > > > allow control of read ahead (rasize defaults to 4MB which is typica=
+lly
+> > > > what it used to default to to the many servers whose rsize was that=
+).
+> > >
+> > > I think something was missing from this patch -- I see you parse it a=
+nd
+> > > set it in the mount context, but I don't see where it then gets used =
+to
+> > > actually affect readahead.
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-Fix four things[1] in the patch that adds ITER_XARRAY[2]:
 
- (1) Remove the address_space struct predeclaration.  This is a holdover
-     from when it was ITER_MAPPING.
 
- (2) Fix _copy_mc_to_iter() so that the xarray segment updates count and
-     iov_offset in the iterator before returning.
-
- (3) Fix iov_iter_alignment() to not loop in the xarray case.  Because the
-     middle pages are all whole pages, only the end pages need be
-     considered - and this can be reduced to just looking at the start
-     position in the xarray and the iteration size.
-
- (4) Fix iov_iter_advance() to limit the size of the advance to no more
-     than the remaining iteration size.
-
-Reported-by: Al Viro <viro@zeniv.linux.org.uk>
-Signed-off-by: David Howells <dhowells@redhat.com>
-Link: https://lore.kernel.org/r/YIVrJT8GwLI0Wlgx@zeniv-ca.linux.org.uk [1]
-Link: https://lore.kernel.org/r/161918448151.3145707.11541538916600921083.=
-stgit@warthog.procyon.org.uk [2]
----
- include/linux/uio.h |    1 -
- lib/iov_iter.c      |    5 +++++
- 2 files changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 5f5ffc45d4aa..d3ec87706d75 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -10,7 +10,6 @@
- #include <uapi/linux/uio.h>
- =
-
- struct page;
--struct address_space;
- struct pipe_inode_info;
- =
-
- struct kvec {
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 44fa726a8323..61228a6c69f8 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -791,6 +791,8 @@ size_t _copy_mc_to_iter(const void *addr, size_t bytes=
-, struct iov_iter *i)
- 			curr_addr =3D (unsigned long) from;
- 			bytes =3D curr_addr - s_addr - rem;
- 			rcu_read_unlock();
-+			i->iov_offset +=3D bytes;
-+			i->count -=3D bytes;
- 			return bytes;
- 		}
- 		})
-@@ -1147,6 +1149,7 @@ void iov_iter_advance(struct iov_iter *i, size_t siz=
-e)
- 		return;
- 	}
- 	if (unlikely(iov_iter_is_xarray(i))) {
-+		size =3D min(size, i->count);
- 		i->iov_offset +=3D size;
- 		i->count -=3D size;
- 		return;
-@@ -1346,6 +1349,8 @@ unsigned long iov_iter_alignment(const struct iov_it=
-er *i)
- 			return size | i->iov_offset;
- 		return size;
- 	}
-+	if (unlikely(iov_iter_is_xarray(i)))
-+		return (i->xarray_start + i->iov_offset) | i->count;
- 	iterate_all_kinds(i, size, v,
- 		(res |=3D (unsigned long)v.iov_base | v.iov_len, 0),
- 		res |=3D v.bv_offset | v.bv_len,
-
+--=20
+Regards,
+Shyam
