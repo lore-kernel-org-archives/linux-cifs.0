@@ -2,80 +2,63 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E23CC433B4
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 19:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5FDC433ED
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 20:57:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57CA661185
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 19:52:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B37961040
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 20:57:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241076AbhDZTxd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Apr 2021 15:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34826 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241606AbhDZTxd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Apr 2021 15:53:33 -0400
-Received: from zeniv-ca.linux.org.uk (zeniv-ca.linux.org.uk [IPv6:2607:5300:60:148a::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47A03C061574;
-        Mon, 26 Apr 2021 12:52:51 -0700 (PDT)
-Received: from viro by zeniv-ca.linux.org.uk with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lb7Hl-008TqF-IE; Mon, 26 Apr 2021 19:52:49 +0000
-Date:   Mon, 26 Apr 2021 19:52:49 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-fsdevel@vger.kernel.org,
-        Dave Wysochanski <dwysocha@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 01/31] iov_iter: Add ITER_XARRAY
-Message-ID: <YIcaESRqrBRqD/EQ@zeniv-ca.linux.org.uk>
-References: <YIcMVCkp4xswHolw@zeniv-ca.linux.org.uk>
- <161918446704.3145707.14418606303992174310.stgit@warthog.procyon.org.uk>
- <161918448151.3145707.11541538916600921083.stgit@warthog.procyon.org.uk>
- <3651951.1619465011@warthog.procyon.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3651951.1619465011@warthog.procyon.org.uk>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+        id S233919AbhDZU6I (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Apr 2021 16:58:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35982 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233483AbhDZU6H (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 26 Apr 2021 16:58:07 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 6719761006;
+        Mon, 26 Apr 2021 20:57:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1619470645;
+        bh=OAMGFyO1/fidKOjLw3/Ql8/KRpF53/CXAAyPPS1dk4I=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=Nka4AWIkKLpKi3Q6evqURGB6vWf/osfhbAn4H6Kzf78BdQqMYVLjuGZUB+dGCp0mt
+         od/kkSAZgNROxPNsB6MM6d50IqzurAaRs1CHZIG+lYzCd48vF8s2Gxout/laeZ7U6W
+         AocQ+Lpar/3SxRXiBxxdEXYZC/VPg3xjzbu2L3If8DlSBNG/JoYAUBbosYQ2pr1Jky
+         lEw0U47s2Car+T97ybU8FsQz3+r2sIqvAMfc1m9GjmXoGhGUQUOUn/HRyEAkgDisS6
+         T70Lx6ulI8UslUh4rMxBpgOu0oq1qyIvMG6chnR2CTEhCWqG0r/iAGKunVU5zG9b4p
+         2Oo3yRIQcdiZw==
+Subject: Re: [GIT PULL] CIFS/SMB3 fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mvK3_dmwbtH6v0unMEnrdR5Rny+Aki3GnyD=uRU2GH4=w@mail.gmail.com>
+References: <CAH2r5mvK3_dmwbtH6v0unMEnrdR5Rny+Aki3GnyD=uRU2GH4=w@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mvK3_dmwbtH6v0unMEnrdR5Rny+Aki3GnyD=uRU2GH4=w@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.12-rc-smb3-fixes-part1
+X-PR-Tracked-Commit-Id: a8a6082d4ae29d98129440c4a5de8e6ea3de0983
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 2a19866b6e4cf554b57660549d12496ea84aa7d7
+Message-Id: <161947064531.16410.13523451458836871835.pr-tracker-bot@kernel.org>
+Date:   Mon, 26 Apr 2021 20:57:25 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Apr 26, 2021 at 08:23:31PM +0100, David Howells wrote:
+The pull request you sent on Mon, 26 Apr 2021 14:50:57 -0500:
 
-> I really need to defer this question to Willy, but as I understand it,
-> xas_retry() only restarts the current iteration.  Referring to the comment on
-> xas_reset():
-> 
->  * Resets the error or walk state of the @xas so future walks of the
->  * array will start from the root.  Use this if you have dropped the
->  * xarray lock and want to reuse the xa_state.
-> 
-> I think that the walk returns to the bottom of the tree and whilst xarray
-> presents an interface that appears to be a contiguous array, it's actually a
-> tree internally - and 'root' is the root of the tree, not the head of the
-> array.
-> 
-> Basically, I think it throws away its cached iteration state - which might
-> have been modified - and rewalks the tree to get back to the same index.
+> git://git.samba.org/sfrench/cifs-2.6.git tags/5.12-rc-smb3-fixes-part1
 
-From RTFS(lib/xarray.c) that looks right.  Nevermind the question, then...
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/2a19866b6e4cf554b57660549d12496ea84aa7d7
 
-Anyway, 
+Thank you!
 
-Reviewed-by: Al Viro <viro@zeniv.linux.org.uk>
-
-on the xarray-related bits (this patch + followups)
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
