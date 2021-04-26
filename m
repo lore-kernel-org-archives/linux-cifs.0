@@ -2,119 +2,206 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E307C433B4
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 19:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A06C433ED
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 19:51:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BA1A61289
-	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 19:24:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6205F61289
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Apr 2021 19:51:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240221AbhDZTYn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Apr 2021 15:24:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24086 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239934AbhDZTYm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 26 Apr 2021 15:24:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619465039;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4SqDWTwGLz0yG83bRGbUR1MGHDhF5H6AJtqMldOHVmY=;
-        b=iPescA7+mdsUbYmNeIfUoXCyhDmro2YHWlD7D68Y9NRY0dIi4a1TXT9wm0ys3kb0JNcfEk
-        pYSdtGJ5dBkpmzO5baZ/NQyC4u4z4dXCKoHhRJlp8L/sJjjICMGiDKFRqpYPGZL/vK+j1E
-        fArWddvNPCgBES8OtvfG5Crk+xfMppI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-BAwWcPM1PsiTJg_KTP0EFA-1; Mon, 26 Apr 2021 15:23:54 -0400
-X-MC-Unique: BAwWcPM1PsiTJg_KTP0EFA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBE0418A08DD;
-        Mon, 26 Apr 2021 19:23:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-112-124.rdu2.redhat.com [10.10.112.124])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 363631A353;
-        Mon, 26 Apr 2021 19:23:32 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <YIcMVCkp4xswHolw@zeniv-ca.linux.org.uk>
-References: <YIcMVCkp4xswHolw@zeniv-ca.linux.org.uk> <161918446704.3145707.14418606303992174310.stgit@warthog.procyon.org.uk> <161918448151.3145707.11541538916600921083.stgit@warthog.procyon.org.uk>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
-        Dave Wysochanski <dwysocha@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 01/31] iov_iter: Add ITER_XARRAY
+        id S241238AbhDZTvw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Apr 2021 15:51:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34458 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241076AbhDZTvv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Apr 2021 15:51:51 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D54C061574
+        for <linux-cifs@vger.kernel.org>; Mon, 26 Apr 2021 12:51:09 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id n138so90211317lfa.3
+        for <linux-cifs@vger.kernel.org>; Mon, 26 Apr 2021 12:51:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=ZUF6wewKbojkzesC8JnnpAekS6no9z4jIwe+y4LdVks=;
+        b=Pi0zIPptnPkljhtLuFL2+zatM+b49XCkwauEaq5UUPlMjaGiVEvj8HsJPCvaatCCV0
+         1FSjPv2oEwHLWhfaOkxaIvqpayhOGHmcJmVlOwi08Tj6gf+4wTQlV4M3nMQYJBIVFWl/
+         qrqay1oYuqgNkA/VKdkfc37rw/GhS5UcuHOQnEqH1kjHYh5gK+o/jLa6bSGtXYfn+WhG
+         bmzX8I4I98jCBPXR1722InjM6eQ3kJJRBaFyh7jG0WkcViZVhTGbdqoIiCMgZtoPheq+
+         FfjZW2lk2XK/OmDUZZ+zyVW4UYSuJOEff1SLanCZ1GVj0LMQYGgg02Gr2OxVvDt979w8
+         7bCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=ZUF6wewKbojkzesC8JnnpAekS6no9z4jIwe+y4LdVks=;
+        b=G36OhUYqPqMIA3v/8T606kHJTuZeKXvaIXsAfREKFXgFAbRl1Bi0wCoy1X+TdHPazH
+         r9AuyjnA5ftgltIUkuoQ4Ja7QYIQyoVCAFQnbHcDYChXrAA7qgWT9Ip+O4yqSU9gVd/7
+         7lVfSurR/81KKocMFGE9BtqfCVxSLt4Gk4zhG4/Qc3RT1MnGLSSkKNbukuSa7Xf2KWPn
+         n9sGOhiFoJnhqnTbY7wdshGSB/RM5FSnHf2pISQROy7t9C2VSC7NEC2C33dCRpfeODtU
+         1ADIK8y4Oq9yeNX8Juh4YLpJVixKH6ferANeQ8YeQiGuKkHI8oVhStaEPdzx4qE972eR
+         H2/A==
+X-Gm-Message-State: AOAM530mDVysGR84jQXqYXv/5H4t2Tlt6eKtIUOK1GuzrF1mt20Ts94h
+        Ekh96614Cobc+kS1wlgSrtX2rkR7nsLZwfajBzvIS/PIFCU=
+X-Google-Smtp-Source: ABdhPJyA9TU7PDWgGK/8KTCmNWRTXEqxF5P3RSZ+bGTDEUO8VhILrMCKA3qra03METjwt/ILm4CMyoS272u/I0eU++w=
+X-Received: by 2002:a05:6512:3ca0:: with SMTP id h32mr14519485lfv.184.1619466668279;
+ Mon, 26 Apr 2021 12:51:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3651950.1619465011.1@warthog.procyon.org.uk>
-Date:   Mon, 26 Apr 2021 20:23:31 +0100
-Message-ID: <3651951.1619465011@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 26 Apr 2021 14:50:57 -0500
+Message-ID: <CAH2r5mvK3_dmwbtH6v0unMEnrdR5Rny+Aki3GnyD=uRU2GH4=w@mail.gmail.com>
+Subject: [GIT PULL] CIFS/SMB3 fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Al Viro <viro@zeniv.linux.org.uk> wrote:
+Please pull the following changes since commit
+9f4ad9e425a1d3b6a34617b8ea226d56a119a717:
 
-> On Fri, Apr 23, 2021 at 02:28:01PM +0100, David Howells wrote:
-> > -#define iterate_all_kinds(i, n, v, I, B, K) {			\
-> > +#define iterate_xarray(i, n, __v, skip, STEP) {		\
-> > +	struct page *head = NULL;				\
-> > +	size_t wanted = n, seg, offset;				\
-> > +	loff_t start = i->xarray_start + skip;			\
-> > +	pgoff_t index = start >> PAGE_SHIFT;			\
-> > +	int j;							\
-> > +								\
-> > +	XA_STATE(xas, i->xarray, index);			\
-> > +								\
-> > +	rcu_read_lock();						\
-> > +	xas_for_each(&xas, head, ULONG_MAX) {				\
-> > +		if (xas_retry(&xas, head))				\
-> > +			continue;					\
-> 
-> OK, now I'm really confused; what's to guarantee that restart will not have
-> you hit the same entry more than once?  STEP might be e.g.
-> 
-> 		memcpy_to_page(v.bv_page, v.bv_offset,
-> 			       (from += v.bv_len) - v.bv_len, v.bv_len)
-> 
-> which is clearly not idempotent - from gets incremented, after all.
-> What am I missing here?
+  Linux 5.12 (2021-04-25 13:49:08 -0700)
 
-I really need to defer this question to Willy, but as I understand it,
-xas_retry() only restarts the current iteration.  Referring to the comment on
-xas_reset():
+are available in the Git repository at:
 
- * Resets the error or walk state of the @xas so future walks of the
- * array will start from the root.  Use this if you have dropped the
- * xarray lock and want to reuse the xa_state.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.12-rc-smb3-fixes-part1
 
-I think that the walk returns to the bottom of the tree and whilst xarray
-presents an interface that appears to be a contiguous array, it's actually a
-tree internally - and 'root' is the root of the tree, not the head of the
-array.
+for you to fetch changes up to a8a6082d4ae29d98129440c4a5de8e6ea3de0983:
 
-Basically, I think it throws away its cached iteration state - which might
-have been modified - and rewalks the tree to get back to the same index.
+  cifs: update internal version number (2021-04-25 23:59:27 -0500)
 
-David
+----------------------------------------------------------------
+40 cifs/smb3 changesets, including 4 fixes for stable, and various new features:
 
+- improvements to root directory metadata caching
+- addition of new "rasize" mount parameter which can significantly
+increase read ahead performance (e.g. copy can be much faster,
+especially with multichannel)
+- addition of support for insert and collapse range
+- improvements to error handling in mount
+
+Additional features still being tested: including the important
+performance patches for deferred close ("handle lease" support)
+patches, the improved support for fallocate, and some important
+improvements to multichannel reconnect behavior are still being tested
+and are not included in this pull request.
+
+Reran the regression tests on these 40 on top of recently released 5.12:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/604
+----------------------------------------------------------------
+Al Viro (7):
+      cifs: don't cargo-cult strndup()
+      cifs: constify get_normalized_path() properly
+      cifs: constify path argument of ->make_node()
+      cifs: constify pathname arguments in a bunch of helpers
+      cifs: make build_path_from_dentry() return const char *
+      cifs: allocate buffer in the caller of build_path_from_dentry()
+      cifs: switch build_path_from_dentry() to using dentry_path_raw()
+
+Aurelien Aptel (8):
+      cifs: simplify SWN code with dummy funcs instead of ifdefs
+      Documentation/admin-guide/cifs: document open_files and dfscache
+      cifs: remove old dead code
+      cifs: make fs_context error logging wrapper
+      cifs: add fs_context param to parsing helpers
+      cifs: log mount errors using cifs_errorf()
+      cifs: export supported mount options via new mount_params /proc file
+      smb2: fix use-after-free in smb2_ioctl_query_info()
+
+David Disseldorp (1):
+      cifs: fix leak in cifs_smb3_do_mount() ctx
+
+Eugene Korenevsky (1):
+      cifs: fix out-of-bound memory access when calling smb3_notify()
+at mount point
+
+Gustavo A. R. Silva (1):
+      cifs: cifspdu.h: Replace one-element array with flexible-array member
+
+Jiapeng Chong (1):
+      cifs: Remove useless variable
+
+Muhammad Usama Anjum (1):
+      cifs: remove unnecessary copies of tcon->crfid.fid
+
+Paul Aurich (1):
+      cifs: Return correct error code from smb2_get_enc_key
+
+Ronnie Sahlberg (11):
+      cifs: move the check for nohandlecache into open_shroot
+      cifs: pass a path to open_shroot and check if it is the root or not
+      cifs: rename the *_shroot* functions to *_cached_dir*
+      cifs: store a pointer to the root dentry in cifs_sb_info once we
+have completed mounting the share
+      cifs: Grab a reference for the dentry of the cached directory
+during the lifetime of the cache
+      cifs: add a function to get a cached dir based on its dentry
+      cifs: add a timestamp to track when the lease of the cached dir was taken
+      cifs: pass the dentry instead of the inode down to the
+revalidation check functions
+      cifs: check the timestamp for the cached dirent when deciding on
+revalidate
+      cifs: add support for FALLOC_FL_COLLAPSE_RANGE
+      cifs: add FALLOC_FL_INSERT_RANGE support
+
+Steve French (6):
+      cifs: correct comments explaining internal semaphore usage in the module
+      smb3: update protocol header definitions based to include new flags
+      SMB3: update structures for new compression protocol definitions
+      smb3: limit noisy error
+      smb3: add rasize mount parameter to improve readahead performance
+      cifs: update internal version number
+
+Wan Jiabing (1):
+      fs: cifs: Remove repeated struct declaration
+
+jack1.li_cp (1):
+      cifs: Fix spelling of 'security'
+
+ Documentation/admin-guide/cifs/usage.rst |   3 +
+ fs/cifs/cifs_debug.c                     |  58 +++++++++++++--
+ fs/cifs/cifs_dfs_ref.c                   |  14 ++--
+ fs/cifs/cifs_fs_sb.h                     |   4 +
+ fs/cifs/cifs_swn.h                       |  27 +++++++
+ fs/cifs/cifsacl.c                        |   4 +-
+ fs/cifs/cifsfs.c                         |  47 ++++++++++--
+ fs/cifs/cifsfs.h                         |   2 +-
+ fs/cifs/cifsglob.h                       |  32 ++------
+ fs/cifs/cifspdu.h                        |   2 +-
+ fs/cifs/cifsproto.h                      |  30 ++++----
+ fs/cifs/cifssmb.c                        |  52 +------------
+ fs/cifs/connect.c                        |  34 ++-------
+ fs/cifs/dfs_cache.c                      |  41 ++++++-----
+ fs/cifs/dir.c                            | 150
+++++++++++++++-----------------------
+ fs/cifs/file.c                           |  79 ++++++++++----------
+ fs/cifs/fs_context.c                     | 143
+++++++++++++++++++++----------------
+ fs/cifs/fs_context.h                     |  13 ++--
+ fs/cifs/inode.c                          | 140
+++++++++++++++++++-----------------
+ fs/cifs/ioctl.c                          |  13 ++--
+ fs/cifs/link.c                           |  46 +++++++-----
+ fs/cifs/misc.c                           |   2 +-
+ fs/cifs/readdir.c                        |  15 ++--
+ fs/cifs/smb1ops.c                        |   6 +-
+ fs/cifs/smb2inode.c                      |  10 +--
+ fs/cifs/smb2misc.c                       |   1 +
+ fs/cifs/smb2ops.c                        | 195
+++++++++++++++++++++++++++++++++++++++-----------
+ fs/cifs/smb2pdu.c                        |   2 +-
+ fs/cifs/smb2pdu.h                        |  49 +++++++++++--
+ fs/cifs/smb2proto.h                      |  16 ++--
+ fs/cifs/unc.c                            |   4 +-
+ fs/cifs/xattr.c                          |  40 +++++-----
+ 32 files changed, 724 insertions(+), 550 deletions(-)
+
+-- 
+Thanks,
+
+Steve
