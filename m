@@ -2,250 +2,131 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F4BC43600
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Apr 2021 00:14:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57796C433ED
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Apr 2021 02:23:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC0376101C
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Apr 2021 00:14:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2562C60FDB
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Apr 2021 02:23:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234896AbhD0AOw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Apr 2021 20:14:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32848 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234598AbhD0AOv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 26 Apr 2021 20:14:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619482448;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U3rMIJssX1d2huVmRZulEKHtd5HxdDz+2MIzkHFnJbI=;
-        b=IyRKE8cllfRd3LEFBbfwPJzLmi4wbp8uvi8qL7hs57IJMNRM/vzWg24LvC9wwvVLhGaq3b
-        4I3Mb2pf3EivzGV7GzHVDAf5knbEA6g4ZU0pTjehvgw+w4m94aJuDEWcOhHAVRQOTUReYb
-        i2oxdlAXkjdXy+405Q7DxmnpTu8CuPc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-aGAgAgXLNhO-fNW1VoCbsA-1; Mon, 26 Apr 2021 20:14:04 -0400
-X-MC-Unique: aGAgAgXLNhO-fNW1VoCbsA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E76DF18397A4;
-        Tue, 27 Apr 2021 00:14:01 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-112-20.rdu2.redhat.com [10.10.112.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DD9C260C4A;
-        Tue, 27 Apr 2021 00:13:50 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <3779937.1619478404@warthog.procyon.org.uk>
-References: <3779937.1619478404@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Christoph Hellwig <hch@lst.de>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-nfs@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net
-Subject: [GIT PULL] afs: Preparation for fscache overhaul
+        id S231449AbhD0CYc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Apr 2021 22:24:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35858 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230371AbhD0CYc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Apr 2021 22:24:32 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7060BC061574
+        for <linux-cifs@vger.kernel.org>; Mon, 26 Apr 2021 19:23:49 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id z13so10333487lft.1
+        for <linux-cifs@vger.kernel.org>; Mon, 26 Apr 2021 19:23:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZDFWAX5uWarzZd3mzJxPPEmJlbpOVlBCUXzmru5WnmU=;
+        b=ehDgVABBwrnmUaoCGSDnEbzjSxC3FrPd64W3qZK180lda6nvqeXXI+/kpb6YFtIOLA
+         ax65fgxh1wD3CMf+z46cQCdedk/wvLJ5w/xatfr/vNfkS+JRu7ALuuIJhYxtTaUbDtCA
+         Hdx7OiYNoeXfZMVj7RGNz9FJEurOhZL67iQcaX0fvkTmAdULczUtSjK1K17/tEs4vi/B
+         vlBegB1YHh0MOAV5v31+lABJoAqVDaXbQHgw5ixKFc7ZL7LYCZyHAb6xZWSoI0KV47TW
+         GaU0bMdvAEYJWhrByMDWjAXpDdvvI0zzgDfs5Mg9JOPMXUGKDkVj1ylGta7fyH407H6m
+         ScuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZDFWAX5uWarzZd3mzJxPPEmJlbpOVlBCUXzmru5WnmU=;
+        b=QcC7Xxfl063Rc1WqAX1epBnI3ss5Zc2BpqgKHQt0WqyhJThGCMg3/Jj2vqBFRfiaEC
+         okarSvPNmZalRSdtABdGIaXL+5yHL91P/h4YIsX7+XLH76gp+7W92Q2vU4DofPU6YKR9
+         wCv9FDX5VBscM5bze+DrvolDYbPNkoG4x8YBebmYgfg8a55ROjFQlTPiSVLVv2vnGxiZ
+         kHNl+fj7aH+JnhKPwC2oTWil1VZ1LdgtEQp6dW9D5vhgIBAyXDcHgJ1U+mwjJWwkjAAb
+         J8jSDHKqqJD7pMjw7N8ID6HpTzDM2X8OVLSrlnt7UPcB4zCtJz80XyMHP5BTdB1EFLB3
+         ZKXg==
+X-Gm-Message-State: AOAM53001Rc+CvCiVi1DZCJI764Hp9vpk+RlFem+gbbzdYbxTLipTPh2
+        WhXZIoTTJtF+x1IBMep4Vtqxd+QDQA/FjHXqfoE=
+X-Google-Smtp-Source: ABdhPJz99LSibUtU4FKT52RfKdx0Q1N+9BkhckMlQGeMtPw6Xtm721jsnqkRQnPVDrZ3YsQcwdIVtriWNQK3/C/dFVc=
+X-Received: by 2002:a05:6512:3ca0:: with SMTP id h32mr15486615lfv.184.1619490227856;
+ Mon, 26 Apr 2021 19:23:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3785062.1619482429.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 27 Apr 2021 01:13:49 +0100
-Message-ID: <3785063.1619482429@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <CAH2r5mvfMfgGimkmC9nQxvOMt=2E7S1=dA33MJaszy5NHE2zxQ@mail.gmail.com>
+ <20210425020946.GG235567@casper.infradead.org> <CAH2r5mui+DSj0RzgcGy+EVeg7VXEwd9fanAPNdBS+NSSiv9+Ug@mail.gmail.com>
+ <CAH2r5msv6PtzSMVv1uVY983rKzdLvfL06T5OeTiU8eLyoMjL_A@mail.gmail.com>
+ <CANT5p=qVq5mD2jfvt1Ym24hQF9M-aj1v1GT2q+_41p1OTESTKw@mail.gmail.com> <20210426115457.GJ235567@casper.infradead.org>
+In-Reply-To: <20210426115457.GJ235567@casper.infradead.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 26 Apr 2021 21:23:36 -0500
+Message-ID: <CAH2r5muEvEUAMEonGWYvBUp1Xp67eACEVNs3JtR9XKTts7vVPw@mail.gmail.com>
+Subject: Re: [PATCH] smb3: add rasize mount parameter to improve performance
+ of readahead
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Linus,
+On Mon, Apr 26, 2021 at 6:55 AM Matthew Wilcox <willy@infradead.org> wrote:
+>
+> On Mon, Apr 26, 2021 at 10:22:27AM +0530, Shyam Prasad N wrote:
+> > Agree with this. Was experimenting on the similar lines on Friday.
+> > Does show good improvements with sequential workload.
+> > For random read/write workload, the user can use the default value.
+>
+> For a random access workload, Linux's readahead shouldn't kick in.
+> Do you see a slowdown when using this patch with a random I/O workload?
 
-Here's a set of patches for the AFS filesystem for 5.13 to begin the
-process of overhauling the use of the fscache API by AFS and the
-introduction of support for features such as Transparent Huge Pages (THPs)=
-.
+I see few slowdowns in the 20 or so xfstests I have tried, but the
+value of rasize
+varies a lot by server type and network type and number of channels.  I don't
+have enough data to set rasize well (I have experimented with 4MB to 12MB
+but need more data).
 
- (1) Add some support for THPs, including using core VM helper functions t=
-o
-     find details of pages.
+In some experiments running 20+ typical xfstests
 
- (2) Use the ITER_XARRAY I/O iterator to mediate access to the pagecache a=
-s
-     this handles THPs and doesn't require allocation of large bvec arrays=
-.
+So far I see really good improvement in multichannel to Azure with setting
+rasize to 4 times negotiated read size. But I saw less than a 1% gain though
+to a slower Windows server running in a VM (without multichannel).  I
+also didn't
+see a gain to localhost Samba in the simple examples I tried. I saw
+about an 11% gain to a typical Azure share without multichannel. See
+some example perf data below. The numbers on right are perf with
+rasize set to 4MB,
+ie 4 times the negotiated read size, instead of results using defaults
+of ra_pages = 1MB rsize (on the left).
 
- (3) Delegate address_space read/pre-write I/O methods for AFS to the netf=
-s
-     helper library.  A method is provided to the library that allows it t=
-o
-     issue a read against the server.
-
-     This includes a change in use for PG_fscache (it now indicates a DIO
-     write in progress from the marked page), so a number of waits need to
-     be deployed for it.
-
- (4) Split the core AFS writeback function to make it easier to modify in
-     future patches to handle writing to the cache.  [This might feasibly
-     make more sense moved out into my fscache-iter branch].
-
-I've tested these with "xfstests -g quick" against an AFS volume (xfstests
-needs patching to make it work).  With this, AFS without a cache passes al=
-l
-expected xfstests; with a cache, there's an extra failure, but that's also
-there before these patches.  Fixing that probably requires a greater
-overhaul (as can be found on my fscache-iter branch, but that's for a late=
-r
-time).
-
-Thanks should go to Marc Dionne and Jeff Altman of AuriStor for exercising
-the patches in their test farm also.
+generic/001 113s ...  117s
+generic/005 35s ...  34s
+generic/006 567s ...  503s
+generic/010 1s ...  1s
+generic/011 620s ...  594s
+generic/024 10s ...  10s
+generic/028 5s ...  5s
+generic/029 2s ...  2s
+generic/030 3s ...  2s
+generic/036 11s ...  11s
+generic/069 7s ...  7s
+generic/070 287s ...  270s
+generic/080 3s ...  2s
+generic/084 6s ...  6s
+generic/086 1s ...  1s
+generic/095 25s ...  23s
+generic/098 1s ...  1s
+generic/109 469s ...  328s
+generic/117 219s ...  201s
+generic/124 21s ...  20s
+generic/125 63s ...  62s
+generic/130 27s ...  24s
+generic/132 24s ...  25s
 
 
-Changes
-=3D=3D=3D=3D=3D=3D=3D
+-- 
+Thanks,
 
-These patches are dependent on the netfs-lib branch and have been posted i=
-n
-association with them.  The changes relevant to these patches are:
-
-ver #6:
-      Split the afs patches out into their own branch.
-
-ver #5:
-      Fixed some review comments from Matthew Wilcox:
-
-      - Better names for wrangling functions for PG_private_2 and
-        PG_fscache wrangling functions[3].  Came up with
-        {set,end,wait_for}_page_private_2() and aliased these for fscache.
-
-      Moved the taking of/dropping a page ref for the PG_private_2 flag
-      into the set and end functions.
-
-ver #4:
-      Rebased to v5.12-rc2 and added a bunch of references into individual
-      commits.
-
-ver #3:
-      Adjusted the functions that unlock and wait for PG_fscache according
-      to Linus's suggestion[1].
-
-      Hold a ref on a page when PG_fscache is set as per Linus's
-      suggestion[2].
-
-Link: https://lore.kernel.org/r/CAHk-=3Dwh+2gbF7XEjYc=3DHV9w_2uVzVf7vs60BP=
-z0gFA=3D+pUm3ww@mail.gmail.com/ [1]
-Link: https://lore.kernel.org/r/CAHk-=3DwjgA-74ddehziVk=3DXAEMTKswPu1Yw4ua=
-ro1R3ibs27ztw@mail.gmail.com/ [2]
-Link: https://lore.kernel.org/r/20210321105309.GG3420@casper.infradead.org=
-/ [3]
-
-References
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-These patches have been published for review before, firstly as part of a
-larger set:
-
-Link: https://lore.kernel.org/r/158861203563.340223.7585359869938129395.st=
-git@warthog.procyon.org.uk/
-
-Link: https://lore.kernel.org/r/159465766378.1376105.11619976251039287525.=
-stgit@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/r/159465784033.1376674.18106463693989811037.=
-stgit@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/r/159465821598.1377938.2046362270225008168.s=
-tgit@warthog.procyon.org.uk/
-
-Link: https://lore.kernel.org/r/160588455242.3465195.3214733858273019178.s=
-tgit@warthog.procyon.org.uk/
-
-Then as a cut-down set:
-
-Link: https://lore.kernel.org/r/161118128472.1232039.11746799833066425131.=
-stgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/161161025063.2537118.2009249444682241405.s=
-tgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/161340385320.1303470.2392622971006879777.s=
-tgit@warthog.procyon.org.uk/ # v3
-Link: https://lore.kernel.org/r/161539526152.286939.8589700175877370401.st=
-git@warthog.procyon.org.uk/ # v4
-Link: https://lore.kernel.org/r/161653784755.2770958.11820491619308713741.=
-stgit@warthog.procyon.org.uk/ # v5
-Link: https://lore.kernel.org/r/161789062190.6155.12711584466338493050.stg=
-it@warthog.procyon.org.uk/ # v6
-Link: https://lore.kernel.org/r/161918446704.3145707.14418606303992174310.=
-stgit@warthog.procyon.org.uk # v7
-
-David
----
-The following changes since commit 26aaeffcafe6cbb7c3978fa6ed7555122f8c9f8=
-c:
-
-  fscache, cachefiles: Add alternate API to use kiocb for read/write to ca=
-che (2021-04-23 10:14:32 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
-/afs-netfs-lib-20210426
-
-for you to fetch changes up to 3003bbd0697b659944237f3459489cb596ba196c:
-
-  afs: Use the netfs_write_begin() helper (2021-04-23 10:17:28 +0100)
-
-----------------------------------------------------------------
-AFS: Use the new netfs lib
-
-----------------------------------------------------------------
-David Howells (14):
-      afs: Disable use of the fscache I/O routines
-      afs: Pass page into dirty region helpers to provide THP size
-      afs: Print the operation debug_id when logging an unexpected data ve=
-rsion
-      afs: Move key to afs_read struct
-      afs: Don't truncate iter during data fetch
-      afs: Log remote unmarshalling errors
-      afs: Set up the iov_iter before calling afs_extract_data()
-      afs: Use ITER_XARRAY for writing
-      afs: Wait on PG_fscache before modifying/releasing a page
-      afs: Extract writeback extension into its own function
-      afs: Prepare for use of THPs
-      afs: Use the fs operation ops to handle FetchData completion
-      afs: Use new netfs lib read helper API
-      afs: Use the netfs_write_begin() helper
-
- fs/afs/Kconfig             |   1 +
- fs/afs/dir.c               | 225 +++++++++++-----
- fs/afs/file.c              | 483 +++++++++------------------------
- fs/afs/fs_operation.c      |   4 +-
- fs/afs/fsclient.c          | 108 +++-----
- fs/afs/inode.c             |   7 +-
- fs/afs/internal.h          |  59 ++--
- fs/afs/rxrpc.c             | 150 ++++-------
- fs/afs/write.c             | 657 +++++++++++++++++++++++-----------------=
------
- fs/afs/yfsclient.c         |  82 ++----
- include/net/af_rxrpc.h     |   2 +-
- include/trace/events/afs.h |  74 +++--
- net/rxrpc/recvmsg.c        |   9 +-
- 13 files changed, 805 insertions(+), 1056 deletions(-)
-
+Steve
