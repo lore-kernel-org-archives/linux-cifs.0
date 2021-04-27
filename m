@@ -2,131 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57796C433ED
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Apr 2021 02:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B56C433B4
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Apr 2021 10:25:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2562C60FDB
-	for <linux-cifs@archiver.kernel.org>; Tue, 27 Apr 2021 02:23:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04CD6611C1
+	for <linux-cifs@archiver.kernel.org>; Tue, 27 Apr 2021 10:25:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231449AbhD0CYc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 26 Apr 2021 22:24:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35858 "EHLO
+        id S235461AbhD0KZ7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 27 Apr 2021 06:25:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230371AbhD0CYc (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 26 Apr 2021 22:24:32 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7060BC061574
-        for <linux-cifs@vger.kernel.org>; Mon, 26 Apr 2021 19:23:49 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id z13so10333487lft.1
-        for <linux-cifs@vger.kernel.org>; Mon, 26 Apr 2021 19:23:49 -0700 (PDT)
+        with ESMTP id S230365AbhD0KZ6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 27 Apr 2021 06:25:58 -0400
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C197FC061763
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Apr 2021 03:25:12 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id q192so15034852ybg.4
+        for <linux-cifs@vger.kernel.org>; Tue, 27 Apr 2021 03:25:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZDFWAX5uWarzZd3mzJxPPEmJlbpOVlBCUXzmru5WnmU=;
-        b=ehDgVABBwrnmUaoCGSDnEbzjSxC3FrPd64W3qZK180lda6nvqeXXI+/kpb6YFtIOLA
-         ax65fgxh1wD3CMf+z46cQCdedk/wvLJ5w/xatfr/vNfkS+JRu7ALuuIJhYxtTaUbDtCA
-         Hdx7OiYNoeXfZMVj7RGNz9FJEurOhZL67iQcaX0fvkTmAdULczUtSjK1K17/tEs4vi/B
-         vlBegB1YHh0MOAV5v31+lABJoAqVDaXbQHgw5ixKFc7ZL7LYCZyHAb6xZWSoI0KV47TW
-         GaU0bMdvAEYJWhrByMDWjAXpDdvvI0zzgDfs5Mg9JOPMXUGKDkVj1ylGta7fyH407H6m
-         ScuQ==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=utbUAovdMHAf+XUL0PRQa2Dd7b9tLp7dPyhVxQStc68=;
+        b=C8pXenvC8m4HROEg+Zm6tOSWlyJG323E1hn69NUlBPa++01YtF/6CUlS+O9SX3YNKV
+         ohVWxqQ8E16+rN2YCDK/pWohRRtHQku3bn3ihinqIcMmn+856CiEyXONt64ZOMs443OX
+         CzPhKbt9LK2f9oWGqH/KsE5G/0ux8isd/+IhI3IDtr0b5sj1vkyDZ7Tp4yNau/45YJQV
+         aSTXSWz1Ok8EnFUUdhKnVyoUy0zuI81dj7bZd5VmIrZgGLATLHC9UbxhTGhUA+l/57tK
+         DvSVCNI34ODL4qob4Wc5ydRRmlXwsT6ARrgBgL3JZe7V5bZWYhsiyWqFURwEEUNvDOHK
+         /cBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZDFWAX5uWarzZd3mzJxPPEmJlbpOVlBCUXzmru5WnmU=;
-        b=QcC7Xxfl063Rc1WqAX1epBnI3ss5Zc2BpqgKHQt0WqyhJThGCMg3/Jj2vqBFRfiaEC
-         okarSvPNmZalRSdtABdGIaXL+5yHL91P/h4YIsX7+XLH76gp+7W92Q2vU4DofPU6YKR9
-         wCv9FDX5VBscM5bze+DrvolDYbPNkoG4x8YBebmYgfg8a55ROjFQlTPiSVLVv2vnGxiZ
-         kHNl+fj7aH+JnhKPwC2oTWil1VZ1LdgtEQp6dW9D5vhgIBAyXDcHgJ1U+mwjJWwkjAAb
-         J8jSDHKqqJD7pMjw7N8ID6HpTzDM2X8OVLSrlnt7UPcB4zCtJz80XyMHP5BTdB1EFLB3
-         ZKXg==
-X-Gm-Message-State: AOAM53001Rc+CvCiVi1DZCJI764Hp9vpk+RlFem+gbbzdYbxTLipTPh2
-        WhXZIoTTJtF+x1IBMep4Vtqxd+QDQA/FjHXqfoE=
-X-Google-Smtp-Source: ABdhPJz99LSibUtU4FKT52RfKdx0Q1N+9BkhckMlQGeMtPw6Xtm721jsnqkRQnPVDrZ3YsQcwdIVtriWNQK3/C/dFVc=
-X-Received: by 2002:a05:6512:3ca0:: with SMTP id h32mr15486615lfv.184.1619490227856;
- Mon, 26 Apr 2021 19:23:47 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=utbUAovdMHAf+XUL0PRQa2Dd7b9tLp7dPyhVxQStc68=;
+        b=NiujuHRK6pN8Dk2DDu1I4JNQK60ET05/iNubaM/fDu5/MT0IFd14OfBudH4dsNNV9T
+         t/MGME6whe0YUHVNJ1TuMrJXZTNlJp8vSpDXQiyJoBUDsf2IXyaVd0QGl7vNQ5DW9UzE
+         IgG4TI0m47jK1mNJdaV+Sem3UrXHD6IwUmG/nRGrXF2FBPmmHRb+l8KABb+DbhfbBqrq
+         kqHoxslN/k2eX57MIRNPVmG7/DklXWAbrPwJoN9ruZjQkc6SKVbKFm4vSODbkW1OtU6U
+         FqWKKBqiMsL7lCgW9iYGjfUvM+ttuORdpGxtjaKZS7vMqnsUNmZkjYvP3LQvaokYw0Ag
+         bj5g==
+X-Gm-Message-State: AOAM531bZd7Zaq/l+1XSgJxQ6RNmZBxfMIY52AIs1BGtJ7svvRMpf4a5
+        EF16HeF6NcfBQq0vsyOGhya80z58xdGKUUCw2+MT+d1Oq/Y/+g==
+X-Google-Smtp-Source: ABdhPJwYl3pbQH7G3RuXn5c/9y3B5KIJp2nGaNHuOG5fo28v1Y7+6PQQe0/Z+bdQXxNlY8JI/HR8qO0LHuzjZ4AcFio=
+X-Received: by 2002:a25:2a0a:: with SMTP id q10mr29404297ybq.403.1619519111717;
+ Tue, 27 Apr 2021 03:25:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvfMfgGimkmC9nQxvOMt=2E7S1=dA33MJaszy5NHE2zxQ@mail.gmail.com>
- <20210425020946.GG235567@casper.infradead.org> <CAH2r5mui+DSj0RzgcGy+EVeg7VXEwd9fanAPNdBS+NSSiv9+Ug@mail.gmail.com>
- <CAH2r5msv6PtzSMVv1uVY983rKzdLvfL06T5OeTiU8eLyoMjL_A@mail.gmail.com>
- <CANT5p=qVq5mD2jfvt1Ym24hQF9M-aj1v1GT2q+_41p1OTESTKw@mail.gmail.com> <20210426115457.GJ235567@casper.infradead.org>
-In-Reply-To: <20210426115457.GJ235567@casper.infradead.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 26 Apr 2021 21:23:36 -0500
-Message-ID: <CAH2r5muEvEUAMEonGWYvBUp1Xp67eACEVNs3JtR9XKTts7vVPw@mail.gmail.com>
-Subject: Re: [PATCH] smb3: add rasize mount parameter to improve performance
- of readahead
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        David Howells <dhowells@redhat.com>
+From:   Daniel Lewart <lewart3@gmail.com>
+Date:   Tue, 27 Apr 2021 05:25:00 -0500
+Message-ID: <CALE_k2GChTGfKjU8ws-rKQLmYP-5NY0PcKGEOmRE-3auKvAUyA@mail.gmail.com>
+Subject: cifs-utils mount credentials file is relative to mountpoint
+To:     linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Apr 26, 2021 at 6:55 AM Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Mon, Apr 26, 2021 at 10:22:27AM +0530, Shyam Prasad N wrote:
-> > Agree with this. Was experimenting on the similar lines on Friday.
-> > Does show good improvements with sequential workload.
-> > For random read/write workload, the user can use the default value.
->
-> For a random access workload, Linux's readahead shouldn't kick in.
-> Do you see a slowdown when using this patch with a random I/O workload?
+cifs-utils Team,
 
-I see few slowdowns in the 20 or so xfstests I have tried, but the
-value of rasize
-varies a lot by server type and network type and number of channels.  I don't
-have enough data to set rasize well (I have experimented with 4MB to 12MB
-but need more data).
+mount.cifs and mount.smb3 both have the following -o option:
+        credentials=filename | cred=filename
 
-In some experiments running 20+ typical xfstests
+E.g.:
+        mount -t smb3 -o cred=mycredfile service mountpoint
 
-So far I see really good improvement in multichannel to Azure with setting
-rasize to 4 times negotiated read size. But I saw less than a 1% gain though
-to a slower Windows server running in a VM (without multichannel).  I
-also didn't
-see a gain to localhost Samba in the simple examples I tried. I saw
-about an 11% gain to a typical Azure share without multichannel. See
-some example perf data below. The numbers on right are perf with
-rasize set to 4MB,
-ie 4 times the negotiated read size, instead of results using defaults
-of ra_pages = 1MB rsize (on the left).
+I would expect mount to look for mycredfile in the current directory.
+Instead mount looks for mycredfile in the mountpoint directory.
 
-generic/001 113s ...  117s
-generic/005 35s ...  34s
-generic/006 567s ...  503s
-generic/010 1s ...  1s
-generic/011 620s ...  594s
-generic/024 10s ...  10s
-generic/028 5s ...  5s
-generic/029 2s ...  2s
-generic/030 3s ...  2s
-generic/036 11s ...  11s
-generic/069 7s ...  7s
-generic/070 287s ...  270s
-generic/080 3s ...  2s
-generic/084 6s ...  6s
-generic/086 1s ...  1s
-generic/095 25s ...  23s
-generic/098 1s ...  1s
-generic/109 469s ...  328s
-generic/117 219s ...  201s
-generic/124 21s ...  20s
-generic/125 63s ...  62s
-generic/130 27s ...  24s
-generic/132 24s ...  25s
+I consider this to be a bug.
 
+This problem is caused by chdir(&mountpoint) being called *before*
+the credentials file is opened and read.
+Below are excerpts from mount.cifs.c which show some details.
 
--- 
-Thanks,
+I can think of two fixes:
 
-Steve
+1) Open and read the credentials file *before* chdir(&mountpoint)
+
+2) Document that the credentials file should have an absolute path
+
+Thank you!
+Daniel Lewart
+Urbana, Illinois
+---
+mount.cifs.c
+
+2039 int main(int argc, char **argv)
+2040 {
+2163     /* chdir into mountpoint as soon as possible */
+2164     rc = acquire_mountpoint(&mountpoint);
+2187     /* child */
+2188     rc = assemble_mountinfo(...);
+2353 }
+
+acquire_mountpoint -> chdir
+assemble_mountinfo -> parse_options -> open_cred_file -> fopen
+
+###
