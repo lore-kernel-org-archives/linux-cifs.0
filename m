@@ -2,186 +2,274 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D60C433B4
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Apr 2021 18:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1248EC433B4
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Apr 2021 18:53:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4F5061408
-	for <linux-cifs@archiver.kernel.org>; Thu, 29 Apr 2021 18:39:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2C546143B
+	for <linux-cifs@archiver.kernel.org>; Thu, 29 Apr 2021 18:53:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241122AbhD2SkM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 29 Apr 2021 14:40:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39444 "EHLO
+        id S241392AbhD2Sxx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 29 Apr 2021 14:53:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233565AbhD2SkM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Apr 2021 14:40:12 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF300C06138B
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Apr 2021 11:39:24 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id c11so2388393lfi.9
-        for <linux-cifs@vger.kernel.org>; Thu, 29 Apr 2021 11:39:24 -0700 (PDT)
+        with ESMTP id S241370AbhD2Sxw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 29 Apr 2021 14:53:52 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75284C06138D
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Apr 2021 11:53:05 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id a5so40729037ljk.0
+        for <linux-cifs@vger.kernel.org>; Thu, 29 Apr 2021 11:53:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=tZhwg6jpiGwejPtU4vB5ZQzdh3q+pfO366ow6R419v8=;
-        b=hcOhjUthXEbvwIsr7TUibOQ6or2Sx49VQhpU307UhoGLHlPCFdirbddXqm9Ny+/lXg
-         bmnHPmsXFXX05+J2qKYHvYDAaqfISo8/60P323He1X/dQOFiC/sGmkzF/spT6kvcX3lA
-         XyWjOGTMcRTdS1AOV1IzTrlwQSjv+wAcvck818InA1+Qq0l6+RmL2wqQH9oMNYaDcNbY
-         8L3XwjBOix0bntBiixBVZwjx5jgi9NQI8Hnlw0ZelSom7gs216mU/WyO9dLFA3CGmTNS
-         G0vDJwiE+j5P5kiQJ/Tm5HBdTyAal63LXPglQSpED10nekNEiizaCKXfgtY3YYcrVztz
-         mhaA==
+        bh=P2l6P2i8VRq+vEWQEGKaqEYDDvi7b+VoExNFrtutRJ0=;
+        b=uPBQsQz/JkbfUFsHcofHRZaAufrpGe/MNrmTR3pc/lZV8/2UzT48B6svEcL1Ma8yC7
+         7xrbiB+edZRQAoRVGrO2keyMnV0YTH07Ot74o4gJXrK++5LeH0O2wqKGAPCLjBSPTL/M
+         1AoZewiXAIA+juxXtISxcFIb65zAsIOPhDOXPuIKWkp0Zgwrpk8KO2LOx0OftzUwmapR
+         0QYLABirr395m8+iT387sNG+hEKXpzFR3OXqs+jwZkDOfeC8RHBg39m95SrbAJDdM2DN
+         DVIHyWT4deRahV31kGEVKSYNcJG7VPC8npDMCtHAPBeZncpkRizMsu4b8K9HA+Jha6rK
+         K+mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=tZhwg6jpiGwejPtU4vB5ZQzdh3q+pfO366ow6R419v8=;
-        b=BLU1/9u5vBPD6VhfFVsy0MuuNfL7Y7SHQb8MmXhgV83aZMCpWt48/JJL/SZBf8ZVnt
-         20bCdt0bhjZmkOqxDq5bFvc7VhCOIIk0/cb2ogON/i9G/xVQn4OgQdwPLyrT6PEq3dqB
-         cFQzZWVb5Cr3nPJRCnQ1qdvk4bFUYzKGVROcicTiMWxkv6MFfH8oUceSJ7atsrdun3Wc
-         uDA/FLjw/coSVwihgmkddr5e1u7CXtGYhnw8ZrD3wVN6snVfctVR6AIuSct4ftkmIAwK
-         HRNNOkS1KcjXM1vWfEqom5jbxpH0N49kQ4x5z9ZeHyXKqnniFRWxUxbphNSMMEvroUqI
-         0gCQ==
-X-Gm-Message-State: AOAM5317ziLc6JXUhDvp0l316np3Zh3qxxlTeKs9s8feh40uTyh1CjBW
-        SFhzqruZxzBRPeCItGsejr0DWtQj2xJFNDeds4UCbN9q49w=
-X-Google-Smtp-Source: ABdhPJzPVHsCMaugSI07HqZ6l28e1ThY1+FMXM8m33pW/cDiddwc0vd3vbHN5BR6mc0jQWpNgILG1yeq5s0S8TUoH10=
-X-Received: by 2002:a19:f504:: with SMTP id j4mr627240lfb.307.1619721563371;
- Thu, 29 Apr 2021 11:39:23 -0700 (PDT)
+        bh=P2l6P2i8VRq+vEWQEGKaqEYDDvi7b+VoExNFrtutRJ0=;
+        b=DMRfVmOka4F6wqvhQ8SdVWNmDs7oLaQ2DLRyXBniA28nMWesqu+Q2/WVcUs8ERnKyp
+         FGE6efvoSLSmC1ftojKjpi5WBfD/VIJglBuYl6iT34+sgpf29VDfVLRjHyXI2hre2a0r
+         M+x/GB0BG+EUiNLPiCXhc7je3zuz9a2e36n6uXiea72NU0Q4dE7bi3COz3sJtbSYIFx2
+         yAsxxKsaUh7ftEymKT09mXxBMYc1lAl4pOPmOuT+boKkFLumMZRQ5eKXl6Ti3Pe4d19m
+         4A0FuHpGbdgIDA/a99/7L4mWw9gjvisUxTXndiFEHiWuWDaJ42cx+4lArgdQlQVfKgpd
+         5IPg==
+X-Gm-Message-State: AOAM533yaDiLAS2R26uKhduOrb5kPHqCRYPuvYmMH53x9EtfgcJ8LGjw
+        APZr1f44QyHGoiDRTIz3uvHrPBScvsTID16jHE0=
+X-Google-Smtp-Source: ABdhPJydJH2aPSRnUsVrehtrz15jo/VU6OEnatpYaXrS7uiDW26BwIGRBK84F7eQD6o99LWLrsR8YV/pf7LBTbyueKA=
+X-Received: by 2002:a2e:3208:: with SMTP id y8mr816420ljy.477.1619722383787;
+ Thu, 29 Apr 2021 11:53:03 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvKfohJ=NkkCM7AxqRYq2+D8kRMTxP3VdG=W0s72Cdh0A@mail.gmail.com>
- <8735v9wiad.fsf@suse.com>
-In-Reply-To: <8735v9wiad.fsf@suse.com>
+References: <CANT5p=qykPGoWwtfSdXe9BsXp083M9-7zaAXJgkPok0Onp6Zow@mail.gmail.com>
+ <87zgxhuxdd.fsf@suse.com> <CANT5p=ojeaoyifJ-6bxc0mGnAnYqgUH5=W8exhjf=8Hjfat5Eg@mail.gmail.com>
+ <CANT5p=oeCf3VeyFECPeUrnGwQM71pehj=o0t25z-+hWmpY+bSg@mail.gmail.com>
+In-Reply-To: <CANT5p=oeCf3VeyFECPeUrnGwQM71pehj=o0t25z-+hWmpY+bSg@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 29 Apr 2021 13:39:12 -0500
-Message-ID: <CAH2r5msnQ4YjJee2FSKPRknNEWsD61V-hvw15m7L3_qBY+Nk1g@mail.gmail.com>
-Subject: Re: [PATCH] cifs: add shutdown support
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+Date:   Thu, 29 Apr 2021 13:52:52 -0500
+Message-ID: <CAH2r5mtFQpZUtjaqMSu7cvz+ykkNfLmYAJuJfVRHM3x+rg+LLw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: detect dead connections only when echoes are enabled.
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Pavel Shilovsky <piastryyy@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-You are correct - I have to add the code to clear the bit on remount
+FYI kicked off buildbot with your patch (and Rohiths)
 
-I have added your other changes and will send updated patch after lunch
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/11/bu=
+ilds/41
 
-root@smfrench-ThinkPad-P52:~# mount | grep cifs
-//localhost/test on /mnt1 type cifs
-(rw,relatime,vers=3D3.1.1,cache=3Dstrict,username=3Dsmfrench,uid=3D0,noforc=
-euid,gid=3D0,noforcegid,addr=3D127.0.0.1,file_mode=3D0755,dir_mode=3D0755,s=
-oft,nounix,serverino,mapposix,noperm,rsize=3D4194304,wsize=3D4194304,bsize=
-=3D1048576,echo_interval=3D60,actimeo=3D1)
-root@smfrench-ThinkPad-P52:~# touch /mnt1/file
-root@smfrench-ThinkPad-P52:~# ~smfrench/xfstests-dev/src/godown /mnt1/
-root@smfrench-ThinkPad-P52:~# touch /mnt1/file
-touch: cannot touch '/mnt1/file': Input/output error
-root@smfrench-ThinkPad-P52:~# mount -o remount /mnt1
-root@smfrench-ThinkPad-P52:~# touch /mnt1/file
-touch: cannot touch '/mnt1/file': Input/output error
-
-On Thu, Apr 29, 2021 at 4:29 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
-:
+On Thu, Apr 29, 2021 at 10:48 AM Shyam Prasad N <nspmangalore@gmail.com> wr=
+ote:
 >
+> Attaching updated patch with can_echo() instead of referencing echoes dir=
+ectly.
+> I'll submit another patch for the other changes.
 >
-> Do we need to add code to clear the flag on remount or is it implicitely
-> cleared by not copying it?
+> Regards,
+> Shyam
 >
-> Steve French <smfrench@gmail.com> writes:
-> >  #define CIFS_MOUNT_MODE_FROM_SID 0x10000000 /* retrieve mode from
-> > special ACE */
-> >  #define CIFS_MOUNT_RO_CACHE 0x20000000  /* assumes share will not chan=
-ge */
-> >  #define CIFS_MOUNT_RW_CACHE 0x40000000  /* assumes only client accessi=
-ng */
-> > +#define SMB3_MOUNT_SHUTDOWN 0x80000000
->
-> While I totally understand wanting to remove the "cifs" name, those
-> flags are specific to the kernel & filesystem and have nothing to do
-> with the wire protocol so in this case I would rather use CIFS_ prefix
-> because SMB3_ is misleading and all the other flags are already using CIF=
-S_.
->
-> One day we should do s/CIFS/SMBFS/i on the whole tree where CIFS refers
-> to kernel stuff (not protocol) and rename the module smbfs. But that's a
-> story for another day I guess.
->
+> On Thu, Apr 29, 2021 at 5:59 PM Shyam Prasad N <nspmangalore@gmail.com> w=
+rote:
 > >
-> >  struct cifs_sb_info {
-> >   struct rb_root tlink_tree;
-> > diff --git a/fs/cifs/cifs_ioctl.h b/fs/cifs/cifs_ioctl.h
-> > index 153d5c842a9b..a744022d2a71 100644
-> > --- a/fs/cifs/cifs_ioctl.h
-> > +++ b/fs/cifs/cifs_ioctl.h
-> > @@ -78,3 +78,19 @@ struct smb3_notify {
-> >  #define CIFS_QUERY_INFO _IOWR(CIFS_IOCTL_MAGIC, 7, struct smb_query_in=
-fo)
-> >  #define CIFS_DUMP_KEY _IOWR(CIFS_IOCTL_MAGIC, 8, struct smb3_key_debug=
-_info)
-> >  #define CIFS_IOC_NOTIFY _IOW(CIFS_IOCTL_MAGIC, 9, struct smb3_notify)
-> > +#define SMB3_IOC_SHUTDOWN _IOR ('X', 125, __u32)
+> > Hi Aur=C3=A9lien,
+> >
+> > Replies below...
+> >
+> > On Thu, Apr 29, 2021 at 5:16 PM Aur=C3=A9lien Aptel <aaptel@suse.com> w=
+rote:
+> > >
+> > >
+> > > Hi Shyam,
+> > >
+> > > Ok so I ended up looking at a lot of code to check this... And I'm st=
+ill
+> > > unsure.
+> > >
+> > > First, it looks like server->echoes is only used for smb2 and there i=
+s
+> > > a generic server->ops->can_echo() you can use that just returns
+> > > server->echoes it for smb2.
+> > Agree. I can use can_echo() instead.
+> >
+> > >
+> > > Shyam Prasad N <nspmangalore@gmail.com> writes:
+> > > > Hi,
+> > > >
+> > > > Recently, some xfstests and later some manual testing on multi-chan=
+nel
+> > > > revealed that we detect unresponsive servers on some of the channel=
+s
+> > > > to the same server.
+> > > >
+> > > > The issue is seen when a channel is setup and sits idle without any
+> > > > traffic. Generally, we enable echoes and oplocks on a channel durin=
+g
+> > > > the first request, based on the number of credits available on the
+> > > > channel. So on idle channels, we trip in our logic to check server
+> > > > unresponsiveness.
+> > >
+> > > That makes sense but while looking at the code I see we always queue
+> > > echo request in cifs_get_tcp_session(), which is called when adding a
+> > > channel.
+> > >
+> > > cifs_ses_add_channel() {
+> > >         ctx.echo_interval =3D ses->server->echo_interval / HZ;
+> > >
+> > >         chan->server =3D cifs_get_tcp_session(&ctx);
+> > >
+> > >         rc =3D cifs_negotiate_protocol(xid, ses) {
+> > >                 server->tcpStatus =3D CifsGood;
+> > >         }
+> > >
+> > >         rc =3D cifs_setup_session(xid, ses, cifs_sb->local_nls);
+> > > }
+> > >
+> > > cifs_get_tcp_session() {
+> > >
+> > >         INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
+> > >
+> > >         tcp_ses->tcpStatus =3D CifsNeedNegotiate;
+> > >
+> > >         tcp_ses->lstrp =3D jiffies;
+> > >
+> > >         if (ctx->echo_interval >=3D SMB_ECHO_INTERVAL_MIN &&
+> > >                 ctx->echo_interval <=3D SMB_ECHO_INTERVAL_MAX)
+> > >                 tcp_ses->echo_interval =3D ctx->echo_interval * HZ;
+> > >         else
+> > >                 tcp_ses->echo_interval =3D SMB_ECHO_INTERVAL_DEFAULT =
+* HZ;
+> > >
+> > >         queue_delayed_work(cifsiod_wq, &tcp_ses->echo, tcp_ses->echo_=
+interval);
+> > > }
+> > >
+> > > cifs_echo_request() {
+> > >
+> > >         if (server->tcpStatus =3D=3D CifsNeedNegotiate)
+> > >                 echo_interval =3D 0; <=3D=3D=3D branch taken
+> > >         else
+> > >                 echo_interval =3D server->echo_interval;
+> > >
+> > >         if (server->tcpStatus not in {NeedReconnect, Exiting, New}
+> > >            && server->can_echo()
+> > >            && jiffies > server->lstrp + echo_interval - HZ)
+> > >         {
+> > >                 server->echo();
+> > >         }
+> > >
+> > >         queue_delayed_work(cifsiod_wq, &server->echo, server->echo_in=
+terval);
+> > >         =3D=3D=3D> echo_interval =3D 0 so calls itself immediatly
+> > > }
+> > >
+> > > SMB2_echo() {
+> > >         if (server->tcpStatus =3D=3D CifsNeedNegotiate) {
+> > >                 /* No need to send echo on newly established connecti=
+ons */
+> > >                 mod_delayed_work(cifsiod_wq, &server->reconnect, 0);
+> > >                 =3D=3D=3D=3D> calls smb2_reconnect_server() immediatl=
+y if NeedNego
+> > >                 return rc;
+> > >         }
+> > >
+> > > }
+> > >
+> > > smb2_reconnect_server() {
+> > >         // channel has no TCONs so it does essentially nothing
+> > > }
+> > >
+> > > server_unresponsive() {
+> > >         if (server->tcpStatus in {Good, NeedNegotiate}
+> > >            && jiffies > server->lstrp + 3 * server->echo_interval)
+> > >         {
+> > >                 cifs_server_dbg(VFS, "has not responded in %lu second=
+s. Reconnecting...\n",
+> > >                          (3 * server->echo_interval) / HZ);
+> > >                 cifs_reconnect(server);
+> > >                 return true;
+> > >         }
+> > >         return false;
+> > > }
+> > >
+> > > So it looks to me that cifs_get_tcp_session() starts the
+> > > cifs_echo_request() work, which calls itself with no delay in an
+> > > infinite loop doing nothing (that's probably bad...) until session_se=
+tup
+> > > succeeds, after which the delay between the self-call is set.
+> >
+> > Perhaps we think that 1 sec is too much for us to complete negotiate?
+> > But echo_interval of 0 looks bad.
+> >
+> > Ideally, we should queue echo work only when session setup is complete.
+> > What do you think?
+> >
+> > >
+> > > During session_setup():
+> > >
+> > > * last response time (lstrp) gets updated
+> > >
+> > > * sending/recv requests should interact with the server
+> > >   credits and call change_conf(), which should enable server->echoes
+> > >   =3D=3D> is that part not working?
+> > It's working. But since these channels are idle, change_conf is not
+> > called for these channels.
+> > So echoes=3Dfalse till there's some activity on the channel.
+> >
+> > >
+> > > Once enabled, the echo_request workq will finally send the echo on th=
+e
+> > > wire, which should -/+ 1 credit and update lstrp.
+> > >
+> > > > Attached a one-line fix for this. Have tested it in my environment.
+> > > > Another approach to fix this could be to enable echoes during
+> > > > initialization of a server struct. Or soon after the session setup.
+> > > > But I felt that this approach is better. Let me know if you feel
+> > > > otherwise.
+> > >
+> > > I think the idea of your change is ok but there's probably also an is=
+sue
+> > > in crediting in session_setup()/change_conf() if echoes is not enable=
+d
+> > > at this point no?
+> > >
+> > > Cheers,
+> > > --
+> > > Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> > > GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> > > SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnb=
+erg, DE
+> > > GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=
+=C3=BCnchen)
+> > >
+> >
+> >
+> > --
+> > Regards,
+> > Shyam
 >
-> Same
 >
-> > +
-> > +/*
-> > + * Flags for going down operation
-> > + */
-> > +#define SMB3_GOING_FLAGS_DEFAULT                0x0     /* going down =
-*/
-> > +#define SMB3_GOING_FLAGS_LOGFLUSH               0x1     /* flush log
-> > but not data */
-> > +#define SMB3_GOING_FLAGS_NOLOGFLUSH             0x2     /* don't
 >
-> Same
->
-> > flush log nor data */
-> > +
-> > +static inline bool smb3_forced_shutdown(struct cifs_sb_info *sbi)
->
-> Same
->
-> > +     cifs_dbg(VFS, "shut down requested (%d)", flags); /* BB FIXME */
-> > +/*   trace_smb3_shutdown(sb, flags);*/
->
-> What is there to fix? It's doing like ext4 so it's fine no?
->
-> > +
-> > +     /*
-> > +      * see:
-> > +      *   https://man7.org/linux/man-pages/man2/ioctl_xfs_goingdown.2.=
-html
-> > +      * for more information and description of original intent of the=
- flags
-> > +      */
-> > +     switch (flags) {
-> > +     /*
-> > +      * We could add support later for default flag which requires:
-> > +      *     "Flush all dirty data and metadata to disk"
-> > +      * would need to call syncfs or equivalent to flush page cache fo=
-r
-> > +      * the mount and then issue fsync to server (if nostrictsync not =
-set)
-> > +      */
-> > +     case SMB3_GOING_FLAGS_DEFAULT:
-> > +             cifs_dbg(VFS, "default flags\n");
->
-> Should this be removed, less verbose or more info should be printed?
->
-> Cheers,
 > --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
->
+> Regards,
+> Shyam
+
 
 
 --=20
