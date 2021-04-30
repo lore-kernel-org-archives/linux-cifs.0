@@ -2,116 +2,165 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E07AC433B4
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Apr 2021 19:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C06C433ED
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Apr 2021 19:40:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00A216146D
-	for <linux-cifs@archiver.kernel.org>; Fri, 30 Apr 2021 19:22:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3514061466
+	for <linux-cifs@archiver.kernel.org>; Fri, 30 Apr 2021 19:40:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230475AbhD3TXX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 30 Apr 2021 15:23:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55776 "EHLO
+        id S233210AbhD3TlP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 30 Apr 2021 15:41:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230356AbhD3TXW (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 30 Apr 2021 15:23:22 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D28AC06174A
-        for <linux-cifs@vger.kernel.org>; Fri, 30 Apr 2021 12:22:33 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id v6so5342445ljj.5
-        for <linux-cifs@vger.kernel.org>; Fri, 30 Apr 2021 12:22:33 -0700 (PDT)
+        with ESMTP id S233188AbhD3TlN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 30 Apr 2021 15:41:13 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB04C06174A;
+        Fri, 30 Apr 2021 12:40:24 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 12so111446891lfq.13;
+        Fri, 30 Apr 2021 12:40:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=JI0mPIQY4SQQXCeRpiiDgKdyW+NtwT6tlay69HeL4tY=;
-        b=q5K+I0onBtzEfRgxEyea0On6OIUncr24GuB9VUpoAxKg1J1z/fTXoNCCUqg/bI0QZz
-         AtYEAqkRrxczNGvwwEr4f9iQE+iSp0/wkggzVqxHiMEo5BkmwiiX1VqTLluTot6OlHEn
-         1esqGoEmQ0zc2DL6DRvXxEOC4Ef+0Ujhzn7/H61yOFCXI29r2AQBJulC0hjqtZ7NiuRJ
-         XKkuVjGMHBrGfzTsZm3kBuNrDsXKQdORglcmvUi2SpEHy83wa0ZJRw6Ai0H64AELaqHB
-         STAjbcSJgSBXyEjpksv1BKcnxbPVYXLf3zDb70vJdXqWNIueFyIVi7klmBR802ByCjVH
-         QGDQ==
+        bh=wr3TJWjpkmXIK0mmqtUjTMHf0hJ6LevoMO/vPiujiS0=;
+        b=C9xke+WVC4FuSBch1oqd9Eay6aIRdFjN9thDN8ixRLOBbVsp4TfjhVOOsAUIwYB4nq
+         iv1y0TLHWgCApwlWBhI91eCPAtbqgJB+xsbCl0NT//WZcFcEkbnwB/QGT9ahQcTldMus
+         11N0rY7jqGdbHZzZupLuSdhKwWNFUWZDttaO6ocTtxphVh1diB5CnNQj3Y4VZONjLQc2
+         ELlDgBqPzdmC3tErOTQgFZSoUFChExt75nP2aoyw4lI/wWf4AsaZHFBC/b3Lx+O5pvC3
+         og6lphaMpf/zW+6IDps+5gULMHEGljpwz2UunaLLTLoQLyGXFq/vtsS7X3pf7ooZNJPa
+         li/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=JI0mPIQY4SQQXCeRpiiDgKdyW+NtwT6tlay69HeL4tY=;
-        b=k3eK2g53E59DghehlVd1bUz7gL55xpNL6iiQiWJUmpbynQp8r3sr/1We5T6qmCAipF
-         pHe5HdmKP/7qPyBpFTJcoTkF6jRd8jUPLvzGwXPxX/NIX61SfLOB8QZIpYXICNVpz/AA
-         NxttfSM+FXAGPkrI1bWFMz1gZm4TjHJ4K/wHcRw5LDAEZ+xiM9+OfLXgGMIDXTkaO9dC
-         ez9RAAx3lZvop18GCMdygxOuTfwowjuMwPsAhOfOzjVlEdZH9kOgldUOzwQ5UZOA85Ek
-         kQ5uBezVkmVqkFJhMB9pPSIOXZ7j7t2gJuk+snrXt+Cig1izMDL8Ube3mjJRqzSKF3l8
-         Du2g==
-X-Gm-Message-State: AOAM532u34lT2ic4ABwm0PU3IUGYPon6Zx70ygqh7o3SjD3JQI4eayrH
-        8pPORN/i8abcwge7FCj4Gp1fshsF1IXkOytfcNf1kqkZ
-X-Google-Smtp-Source: ABdhPJyecTMJVayUB61GFRkhPnXccJCGuBMDe4YamEhZZuB/vElX//ORscx6dOdq9G0VKu2sfSjs6tq1WLlyvc2g1PI=
-X-Received: by 2002:a2e:6e03:: with SMTP id j3mr4772807ljc.218.1619810551795;
- Fri, 30 Apr 2021 12:22:31 -0700 (PDT)
+        bh=wr3TJWjpkmXIK0mmqtUjTMHf0hJ6LevoMO/vPiujiS0=;
+        b=lYWfkKtnlLx4Fp+mtB/nmZrRBz8Qqthi3hAs/ASOnyOGGpRD8fYlgtA86HG5ny1qd0
+         gsbcRP+PpDBnOpHAkazKsmwdqrkAMZi1T9ldE60o+UsQyM93XAQoClD2p0vQq5Qhy9kg
+         Jsa/EfK6Y++gAfvsAvxLToMIOB7NXGpqm8M/bq0C6gVRCfKiX3RToE/pUEceFYJ1qyvu
+         qMG1lMclDFxaJiyNYdhB0loUydNpwXn+dVn8fsuitDAXCmwe9Nak85+PTJaKaqPNmdvc
+         g2sfk9TK7Fld4EV8VxyLKZj95CxmBJlN61ZIvVFBj384In6lYurXgIwPE24FgiIs96lr
+         Mm9A==
+X-Gm-Message-State: AOAM5310QrrD/4rpueHLN0bbX4A7HepHxN/ruXSAzhZzhmDqynXuZSYl
+        PDCZPltZihS6ufUUaY0BfbYh8kzsxml65Ied19Q=
+X-Google-Smtp-Source: ABdhPJxWGNF8Xm6C0xc8l5hJbd6xKA3cSO7mn7M2P/EQse0eMG7C4Vb1cXfVh142rpyy2KX3m1xTgMj2ftZeC42+lK8=
+X-Received: by 2002:a19:614e:: with SMTP id m14mr4249766lfk.395.1619811623256;
+ Fri, 30 Apr 2021 12:40:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvfMfgGimkmC9nQxvOMt=2E7S1=dA33MJaszy5NHE2zxQ@mail.gmail.com>
- <20210425020946.GG235567@casper.infradead.org> <CAH2r5mui+DSj0RzgcGy+EVeg7VXEwd9fanAPNdBS+NSSiv9+Ug@mail.gmail.com>
- <CAH2r5msv6PtzSMVv1uVY983rKzdLvfL06T5OeTiU8eLyoMjL_A@mail.gmail.com>
- <CANT5p=qVq5mD2jfvt1Ym24hQF9M-aj1v1GT2q+_41p1OTESTKw@mail.gmail.com>
- <20210426115457.GJ235567@casper.infradead.org> <CANT5p=rHgmLdHJm_y3CCpb=KoEbnJApce2wx4hORY2CwHP2NbQ@mail.gmail.com>
- <20210430115948.GL1847222@casper.infradead.org>
-In-Reply-To: <20210430115948.GL1847222@casper.infradead.org>
+References: <20210430180843.16920-1-pc@cjr.nz>
+In-Reply-To: <20210430180843.16920-1-pc@cjr.nz>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 30 Apr 2021 14:22:20 -0500
-Message-ID: <CAH2r5mtE2g=p_rKThrDR_4N6=zqaBiz_KpK+bPpw5Q+qeFuTjQ@mail.gmail.com>
-Subject: Re: [PATCH] smb3: add rasize mount parameter to improve performance
- of readahead
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        David Howells <dhowells@redhat.com>
+Date:   Fri, 30 Apr 2021 14:40:12 -0500
+Message-ID: <CAH2r5mvfj8Q9rKZjOBv1tyzeKAemRf41nnQKxCD3wJWGofro3w@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix automount regression of dfs links
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        David Disseldorp <ddiss@suse.de>,
+        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
+        Stable <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Apr 30, 2021 at 7:00 AM Matthew Wilcox <willy@infradead.org> wrote:
+FYI - Running the DFS tests now
+
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/3/builds/99
+
+On Fri, Apr 30, 2021 at 1:10 PM Paulo Alcantara <pc@cjr.nz> wrote:
 >
-> On Fri, Apr 30, 2021 at 04:19:27PM +0530, Shyam Prasad N wrote:
-> > Although ideally, I feel that we (cifs.ko) should be able to read in
-> > larger granular "chunks" even for small reads, in expectation that
-> > surrounding offsets will be read soon.
+> Unfortunately we can't kfree() the UNC and prefix paths in
+> cifs_smb3_do_mount() because they could have come from a chased DFS
+> referral (automount) and we rely on the new values set in cifs_sb->ctx
+> prior to calling cifs_mount().
 >
-> Why?  How is CIFS special and different from every other filesystem that
-> means you know what the access pattern of userspace is going to be better
-> than the generic VFS?
-
-In general small chunks are bad for network file systems since the 'cost' of
-sending a large read or write on the network (and in the call stack on
-the client
-and server, with various task switches etc) is not much more than a small one.
-This can be different on a local file system with less latency between request
-and response and fewer task switches involved on client and server.
-
-
-There are tradeoffs between - having multiple small chunks in flight
-vs. fewer large chunks in flight - but a general idea is that if possible it can
-be much faster to keep some requests in flight and keep some activity:
-- on the network
-- on the server side
-- on the client side
-
-to avoid "dead time" where nothing is happening on the network due to latency
-decrypting on the client or server etc.  For this reason it makes sense that
-having multiple 4 1MB reads in flight (e.g. copying a file with new "rasize"
-mount parm set to (e.g.) 4MB for cifs.ko) can be much faster than only
-having 1 1MB
-read in flight at one time, and much, much faster than using direct
-i/o where some
-tools like "rsync" use quite small i/o sizes (cp uses 1MB i/o if
-uncached i/o for
-case where mounted to cifs and nfs but rsync uses a small size which hurts
-uncached performance greatly)
-uses much smaller)
+> Instead, fix smb3_parse_devname() to not leak the UNC and prefix paths
+> when parsing new share paths.
+>
+> Cc: <stable@vger.kernel.org> # v5.11+
+> Fixes: 315db9a05b7a ("cifs: fix leak in cifs_smb3_do_mount() ctx")
+> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+> ---
+>  fs/cifs/cifsfs.c     |  6 ------
+>  fs/cifs/connect.c    | 10 +++++++---
+>  fs/cifs/fs_context.c |  2 ++
+>  3 files changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> index 8a6894577697..bfe98136f9c1 100644
+> --- a/fs/cifs/cifsfs.c
+> +++ b/fs/cifs/cifsfs.c
+> @@ -863,12 +863,6 @@ cifs_smb3_do_mount(struct file_system_type *fs_type,
+>                 goto out;
+>         }
+>
+> -       /* cifs_setup_volume_info->smb3_parse_devname() redups UNC & prepath */
+> -       kfree(cifs_sb->ctx->UNC);
+> -       cifs_sb->ctx->UNC = NULL;
+> -       kfree(cifs_sb->ctx->prepath);
+> -       cifs_sb->ctx->prepath = NULL;
+> -
+>         rc = cifs_setup_volume_info(cifs_sb->ctx, NULL, old_ctx->UNC);
+>         if (rc) {
+>                 root = ERR_PTR(rc);
+> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+> index becd5f807787..ee4a92cbcb29 100644
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -3159,9 +3159,13 @@ static int do_dfs_failover(const char *path, const char *full_path, struct cifs_
+>  int
+>  cifs_setup_volume_info(struct smb3_fs_context *ctx, const char *mntopts, const char *devname)
+>  {
+> -       int rc = 0;
+> +       int rc;
+>
+> -       smb3_parse_devname(devname, ctx);
+> +       rc = smb3_parse_devname(devname, ctx);
+> +       if (rc) {
+> +               cifs_dbg(VFS, "%s: failed to parse %s: %d\n", __func__, devname, rc);
+> +               return rc;
+> +       }
+>
+>         if (mntopts) {
+>                 char *ip;
+> @@ -3189,7 +3193,7 @@ cifs_setup_volume_info(struct smb3_fs_context *ctx, const char *mntopts, const c
+>                 return -EINVAL;
+>         }
+>
+> -       return rc;
+> +       return 0;
+>  }
+>
+>  static int
+> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+> index 1d6e0e15b034..b502a44e15a1 100644
+> --- a/fs/cifs/fs_context.c
+> +++ b/fs/cifs/fs_context.c
+> @@ -476,6 +476,7 @@ smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx)
+>
+>         /* move "pos" up to delimiter or NULL */
+>         pos += len;
+> +       kfree(ctx->UNC);
+>         ctx->UNC = kstrndup(devname, pos - devname, GFP_KERNEL);
+>         if (!ctx->UNC)
+>                 return -ENOMEM;
+> @@ -490,6 +491,7 @@ smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx)
+>         if (!*pos)
+>                 return 0;
+>
+> +       kfree(ctx->prepath);
+>         ctx->prepath = kstrdup(pos, GFP_KERNEL);
+>         if (!ctx->prepath)
+>                 return -ENOMEM;
+> --
+> 2.31.1
+>
 
 
 -- 
