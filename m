@@ -2,173 +2,242 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD266C433B4
-	for <linux-cifs@archiver.kernel.org>; Sat,  1 May 2021 18:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EE8C433B4
+	for <linux-cifs@archiver.kernel.org>; Sat,  1 May 2021 20:49:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D53561450
-	for <linux-cifs@archiver.kernel.org>; Sat,  1 May 2021 18:51:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 551E261350
+	for <linux-cifs@archiver.kernel.org>; Sat,  1 May 2021 20:49:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232043AbhEASwB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 1 May 2021 14:52:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48848 "EHLO
+        id S231656AbhEAUug (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 1 May 2021 16:50:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230522AbhEASwA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 1 May 2021 14:52:00 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3EBAC06174A
-        for <linux-cifs@vger.kernel.org>; Sat,  1 May 2021 11:51:09 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id a36so2042877ljq.8
-        for <linux-cifs@vger.kernel.org>; Sat, 01 May 2021 11:51:09 -0700 (PDT)
+        with ESMTP id S231547AbhEAUug (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 1 May 2021 16:50:36 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABE8CC06174A
+        for <linux-cifs@vger.kernel.org>; Sat,  1 May 2021 13:49:45 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id h10so1949251edt.13
+        for <linux-cifs@vger.kernel.org>; Sat, 01 May 2021 13:49:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Qmny8M+yTumM69Nd6gxEYTWzMSJy6QSPRt836W71y18=;
-        b=bckgkaWuh1p1YXyR9ZtnYwoodCx128rGTSf6t3q9kYVIEcFs+yv7B7k9aDGo5V/d+j
-         C7Er4asmSvEpEUnDwmLug8aL9yBZI2ryb5fdfUUIGdBnpldrot7m7V4obReJ4RUcXvgU
-         d8F4Hhmi9VPECryVszU1v9j9eqYtICY6oNZGCxRlnMPmFtVJOS+Lv28ZPmS9poUKecTd
-         YPn2tYU0E1WnU3xaTxcH9LiayksdRwdJx8SCXza+hpcrYitFY1rmFSQj8vDxjpGZS0Oo
-         Gtcfin9ZClrEn0fKReagK3FTEI1k7+ig5WJhXg9s/JNCqxtKLW52cwX+3emLm5/OBl7r
-         4pqA==
+        bh=qXdYuOz2TSzmNOz3Svbp51VQOzryV4mpau4B6pSG3Yo=;
+        b=FU8q9BT1X0YgGy/bZoA2du06OmQVoLkj9dkO+NLm2ejMl2KWGSZ1VWYLtP7OL3T+Jv
+         SbkLFK+och/zSZ4Afa/VbPhg4bSOuMPowH3K/uu+QdjpzS4cpeWCFXkLcFXp8EPbJ5YC
+         9Y/uZXpa4vTQOrBHOKPFvv64gG4LTv/3iLCf++JOSy4nQICgcfdm9RvrKM4v3GhPl1Hq
+         dLW9XiQ1gA6ZqdUZflVycS7iPn+xCR9uc5c7Bso+2Gh9qTk/3nZjG8s4Bu5Vb7yzgbt9
+         nV7f2pE7pYWt9c0pRqgy9Ts0hBmRNoQFGOESI7oBEvzdlPBNL2seu+9tk0kMfdMJ9R0I
+         DuDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Qmny8M+yTumM69Nd6gxEYTWzMSJy6QSPRt836W71y18=;
-        b=Hs3X+7u/9q6MyXJhvd3gjlB+7l/ZVPkPBibtlktI1wgrngm/CAz+SAv81b8qt26GhY
-         uS09MPu1EIDNMlmlfa50LCtsmdYeozuys0jWs0tAUplxIA0OQmPbAoIBfhfVRIM+i4Cp
-         ihB4u0gNWn8EfezJCwXdeN3q99sz5OLcS709eya9cMqf9ntCGpcVGbiK4mH/rb1ZBTCt
-         VnacO0OUaU+WC4jmZIt5UXNkzQIuDJEmVfKoqMsXMFQhiF0txlVlAHUeujx1ik+erfc+
-         X9X/JNjFSJ+j+tR4hRwEFdhPnNyPjdCq3oTw1JtrQnCWJuaY9JAxDrJvKyGo1l3v7Wg9
-         Lssg==
-X-Gm-Message-State: AOAM532wOaPLagOzQ2Ut9u8QgWWJAYmO14M0KEtSfQkDza6bGqLM+WZ+
-        /xvP+g/AALhMhJU3R+xDatDbZIkf3djjmfxEiZ8=
-X-Google-Smtp-Source: ABdhPJyRgJDjpumsb16aEwRWLCA9LqYR8gVTSj6RyttllKr/g/kURnBBud4HdFbRUOqtSUD+yt6lAjnlQBwWh6ZTa5M=
-X-Received: by 2002:a2e:9094:: with SMTP id l20mr7818331ljg.272.1619895068177;
- Sat, 01 May 2021 11:51:08 -0700 (PDT)
+        bh=qXdYuOz2TSzmNOz3Svbp51VQOzryV4mpau4B6pSG3Yo=;
+        b=gO1cAIWL+hcLP7h9yBDTeGE+e33+KQVGSvRU6Ba4yMMGPFEKe1vXgZwmy4YHleNRt3
+         6om7fRDIrV/U/b+RqFRiBuPB/WLZpq1zb509KuUEQdEZWvl+ZKtL458vtgNYgcsUk10d
+         gSZIRW+mBX+MPSZiXBgeHCE2mQvdXewP4LByNNclmkFxaW4s9VTVfJm739jfDPplVEoK
+         tgJJXA+H+4UxMN0JP8hS6ZxlmT6TV+8wQkKCXZZ/tgZueqyvZsd2QAizlhmREBzqxl66
+         EVDw3Kq+dI95lakbzfs0yBzzbU9biVsyDCFiZn5vcMMNN1iJYZW0MXXcPTocKIXN4RNz
+         ha0A==
+X-Gm-Message-State: AOAM531WMP7zXW+vIV92/5et6xcNjLB0IQfnBjALGW0c9+1+Db6mZbC+
+        GOqKCBZ0WnK6OuuaqjLMmptQtD9dbnHL5NPxc/Vo7tcA
+X-Google-Smtp-Source: ABdhPJySGmehGrxTuuyVQhDG1j4m87N4RpsqPC7dEu2rLfv9YLachSg7TLVFAye+GXqsbT6M+8Iv3g58kpPdcj2HE8c=
+X-Received: by 2002:aa7:d88d:: with SMTP id u13mr2778567edq.114.1619902184375;
+ Sat, 01 May 2021 13:49:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvfMfgGimkmC9nQxvOMt=2E7S1=dA33MJaszy5NHE2zxQ@mail.gmail.com>
- <20210425020946.GG235567@casper.infradead.org> <CAH2r5mui+DSj0RzgcGy+EVeg7VXEwd9fanAPNdBS+NSSiv9+Ug@mail.gmail.com>
- <CAH2r5msv6PtzSMVv1uVY983rKzdLvfL06T5OeTiU8eLyoMjL_A@mail.gmail.com>
- <CANT5p=qVq5mD2jfvt1Ym24hQF9M-aj1v1GT2q+_41p1OTESTKw@mail.gmail.com>
- <20210426115457.GJ235567@casper.infradead.org> <CANT5p=rHgmLdHJm_y3CCpb=KoEbnJApce2wx4hORY2CwHP2NbQ@mail.gmail.com>
- <20210430115948.GL1847222@casper.infradead.org> <CAH2r5mtE2g=p_rKThrDR_4N6=zqaBiz_KpK+bPpw5Q+qeFuTjQ@mail.gmail.com>
- <20210501183502.GU1847222@casper.infradead.org> <CAH2r5msS8NR_FAZGs7NLZNMGUVZ6GfOKc_4Mn5iCLbSX7DAYMA@mail.gmail.com>
-In-Reply-To: <CAH2r5msS8NR_FAZGs7NLZNMGUVZ6GfOKc_4Mn5iCLbSX7DAYMA@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 1 May 2021 13:50:57 -0500
-Message-ID: <CAH2r5ms7f_cZmM84eOqjrKwaBEFL_KRaFT-EO2=D3XYMKvfvzg@mail.gmail.com>
-Subject: Re: [PATCH] smb3: add rasize mount parameter to improve performance
- of readahead
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
+References: <CAH2r5muN3rpUur8jSav=fJfnt_vuJhgOXxMeGmXvT3KvxbBU5w@mail.gmail.com>
+ <CAN05THQzSCZwypBWg9YZAarjrsQ74qowp4Bneo3crW9FfqVqPA@mail.gmail.com>
+ <CAH2r5muu3YiBAk1Mf_xOFQJih8Ms7sQhNUKwUrFreggK-Mmr-A@mail.gmail.com> <CANT5p=rGGNdVjBSTZm1OsecEW=-5edZhZwBjSU1Q8d8dO+JsPA@mail.gmail.com>
+In-Reply-To: <CANT5p=rGGNdVjBSTZm1OsecEW=-5edZhZwBjSU1Q8d8dO+JsPA@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Sun, 2 May 2021 06:49:30 +1000
+Message-ID: <CAN05THTmZCNXsH4_i=0CO6CaVOYuZ=z5XHW+U_=q3Djxz6XxBA@mail.gmail.com>
+Subject: Re: [PATCH] smb3.1.1: allow dumping GCM256 keys to improve debugging
+ of encrypted shares
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>,
-        Jeff Layton <jlayton@redhat.com>,
-        David Howells <dhowells@redhat.com>
+        samba-technical <samba-technical@lists.samba.org>,
+        COMMON INTERNET FILE SYSTEM SERVER 
+        <linux-cifsd-devel@lists.sourceforge.net>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Forgot to mention another obvious point ... the number of 'channels'
-is dynamic for some filesystems.
-For example clustered SMB3 servers can notify the clients
-asynchronously when more 'channels'
-are added (more network connections added - e.g. in cloud environments
-or clustered high performance
-server environments you can temporarily add more high performance
-ethernet or RDMA adapters temporarily to the host)
-so it is quite possible that the server can indicate to the client
-that more network throughput is now available
-(Windows takes advantage of this, and even polls to check for new
-interfaces every 10 minutes, but the Linux client
-does not yet - but it is something we will likely add soon).
+On Sat, May 1, 2021 at 8:53 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+>
+> Looks good to me.
+>
+> On a related note, we need a way for the root user to dump keys for
+> another SMB session to the same path. This will be useful for
+> mutli-user scenario.
+> i.e. for dumping keys for SMB session as another user.
+> Since we're adding a new IOCTL, perhaps we should add another arg
+> which identifies the user? Maybe based on the UID:GID of the user
+> session, in addition to the path supplied?
 
-On Sat, May 1, 2021 at 1:47 PM Steve French <smfrench@gmail.com> wrote:
+Or as an alternative, dump an array of ALL user sessions with
+information about which user and which part of a multi-channel
+connection that the keys belong to.
+And let userspace sort out "which keys do I need for my wireshark session".
+
 >
-> On Sat, May 1, 2021 at 1:35 PM Matthew Wilcox <willy@infradead.org> wrote:
+> Regards,
+> Shyam
+>
+> On Sat, May 1, 2021 at 9:49 AM Steve French <smfrench@gmail.com> wrote:
 > >
-> > On Fri, Apr 30, 2021 at 02:22:20PM -0500, Steve French wrote:
-> > > On Fri, Apr 30, 2021 at 7:00 AM Matthew Wilcox <willy@infradead.org> wrote:
-> > > >
-> > > > On Fri, Apr 30, 2021 at 04:19:27PM +0530, Shyam Prasad N wrote:
-> > > > > Although ideally, I feel that we (cifs.ko) should be able to read in
-> > > > > larger granular "chunks" even for small reads, in expectation that
-> > > > > surrounding offsets will be read soon.
-> > > >
-> > > > Why?  How is CIFS special and different from every other filesystem that
-> > > > means you know what the access pattern of userspace is going to be better
-> > > > than the generic VFS?
+> > changed as suggested - see attached
+> >
+> > On Fri, Apr 30, 2021 at 11:00 PM ronnie sahlberg
+> > <ronniesahlberg@gmail.com> wrote:
 > > >
-> > > In general small chunks are bad for network file systems since the 'cost' of
-> > > sending a large read or write on the network (and in the call stack on
-> > > the client
-> > > and server, with various task switches etc) is not much more than a small one.
-> > > This can be different on a local file system with less latency between request
-> > > and response and fewer task switches involved on client and server.
+> > > These elements should probably be [32] and not
+> > > + __u8 smb3encryptionkey[SMB3_ENC_DEC_KEY_SIZE];
+> > >
+> > > Because this is now visible to userspace and we can not allow this to
+> > > ever change.
+> > > Because when GCM512 is eventually released, if we bump
+> > > SMB3_ENC_DEC_KEY_SIZE to a larger value we suddenly break userspace.
+> > >
+> > >
+> > > On Sat, May 1, 2021 at 8:20 AM Steve French <smfrench@gmail.com> wrote:
+> > > >
+> > > > Previously we were only able to dump CCM or GCM-128 keys (see "smbinfo
+> > > > keys" e.g.)
+> > > > to allow network debugging (e.g. wireshark) of mounts to SMB3.1.1 encrypted
+> > > > shares.  But with the addition of GCM-256 support, we have to be able to dump
+> > > > 32 byte instead of 16 byte keys which requires adding an additional ioctl
+> > > > for that.
+> > > >
+> > > > Signed-off-by: Steve French <stfrench@microsoft.com>
+> > > > ---
+> > > >  fs/cifs/cifs_ioctl.h | 19 +++++++++++++++++++
+> > > >  fs/cifs/ioctl.c      | 33 +++++++++++++++++++++++++++++++++
+> > > >  2 files changed, 52 insertions(+)
+> > > >
+> > > > diff --git a/fs/cifs/cifs_ioctl.h b/fs/cifs/cifs_ioctl.h
+> > > > index f262c64516bc..9f2ed9cccb08 100644
+> > > > --- a/fs/cifs/cifs_ioctl.h
+> > > > +++ b/fs/cifs/cifs_ioctl.h
+> > > > @@ -57,6 +57,12 @@ struct smb_query_info {
+> > > >   /* char buffer[]; */
+> > > >  } __packed;
+> > > >
+> > > > +/*
+> > > > + * Dumping the commonly used 16 byte (e.g. CCM and GCM128) keys still supported
+> > > > + * for backlevel compatibility, but is not sufficient for dumping the less
+> > > > + * frequently used GCM256 (32 byte) keys (see the newer "CIFS_DUMP_FULL_KEY"
+> > > > + * ioctl for dumping decryption info for GCM256 mounts)
+> > > > + */
+> > > >  struct smb3_key_debug_info {
+> > > >   __u64 Suid;
+> > > >   __u16 cipher_type;
+> > > > @@ -65,6 +71,18 @@ struct smb3_key_debug_info {
+> > > >   __u8 smb3decryptionkey[SMB3_SIGN_KEY_SIZE];
+> > > >  } __packed;
+> > > >
+> > > > +/*
+> > > > + * Dump full key (32 byte encrypt/decrypt keys instead of 16 bytes)
+> > > > + * is needed if GCM256 (stronger encryption) negotiated
+> > > > + */
+> > > > +struct smb3_full_key_debug_info {
+> > > > + __u64 Suid;
+> > > > + __u16 cipher_type;
+> > > > + __u8 auth_key[16]; /* SMB2_NTLMV2_SESSKEY_SIZE */
+> > > > + __u8 smb3encryptionkey[SMB3_ENC_DEC_KEY_SIZE];
+> > > > + __u8 smb3decryptionkey[SMB3_ENC_DEC_KEY_SIZE];
+> > > > +} __packed;
+> > > > +
+> > > >  struct smb3_notify {
+> > > >   __u32 completion_filter;
+> > > >   bool watch_tree;
+> > > > @@ -78,6 +96,7 @@ struct smb3_notify {
+> > > >  #define CIFS_QUERY_INFO _IOWR(CIFS_IOCTL_MAGIC, 7, struct smb_query_info)
+> > > >  #define CIFS_DUMP_KEY _IOWR(CIFS_IOCTL_MAGIC, 8, struct smb3_key_debug_info)
+> > > >  #define CIFS_IOC_NOTIFY _IOW(CIFS_IOCTL_MAGIC, 9, struct smb3_notify)
+> > > > +#define CIFS_DUMP_FULL_KEY _IOWR(CIFS_IOCTL_MAGIC, 10, struct
+> > > > smb3_full_key_debug_info)
+> > > >  #define CIFS_IOC_SHUTDOWN _IOR ('X', 125, __u32)
+> > > >
+> > > >  /*
+> > > > diff --git a/fs/cifs/ioctl.c b/fs/cifs/ioctl.c
+> > > > index ef41fa878793..e4321e2a27d2 100644
+> > > > --- a/fs/cifs/ioctl.c
+> > > > +++ b/fs/cifs/ioctl.c
+> > > > @@ -218,6 +218,7 @@ long cifs_ioctl(struct file *filep, unsigned int
+> > > > command, unsigned long arg)
+> > > >  {
+> > > >   struct inode *inode = file_inode(filep);
+> > > >   struct smb3_key_debug_info pkey_inf;
+> > > > + struct smb3_full_key_debug_info pfull_key_inf;
+> > > >   int rc = -ENOTTY; /* strange error - but the precedent */
+> > > >   unsigned int xid;
+> > > >   struct cifsFileInfo *pSMBFile = filep->private_data;
+> > > > @@ -354,6 +355,38 @@ long cifs_ioctl(struct file *filep, unsigned int
+> > > > command, unsigned long arg)
+> > > >   else
+> > > >   rc = 0;
+> > > >   break;
+> > > > + /*
+> > > > + * Dump full key (32 bytes instead of 16 bytes) is
+> > > > + * needed if GCM256 (stronger encryption) negotiated
+> > > > + */
+> > > > + case CIFS_DUMP_FULL_KEY:
+> > > > + if (pSMBFile == NULL)
+> > > > + break;
+> > > > + if (!capable(CAP_SYS_ADMIN)) {
+> > > > + rc = -EACCES;
+> > > > + break;
+> > > > + }
+> > > > +
+> > > > + tcon = tlink_tcon(pSMBFile->tlink);
+> > > > + if (!smb3_encryption_required(tcon)) {
+> > > > + rc = -EOPNOTSUPP;
+> > > > + break;
+> > > > + }
+> > > > + pfull_key_inf.cipher_type =
+> > > > + le16_to_cpu(tcon->ses->server->cipher_type);
+> > > > + pfull_key_inf.Suid = tcon->ses->Suid;
+> > > > + memcpy(pfull_key_inf.auth_key, tcon->ses->auth_key.response,
+> > > > + 16 /* SMB2_NTLMV2_SESSKEY_SIZE */);
+> > > > + memcpy(pfull_key_inf.smb3decryptionkey,
+> > > > +       tcon->ses->smb3decryptionkey, SMB3_ENC_DEC_KEY_SIZE);
+> > > > + memcpy(pfull_key_inf.smb3encryptionkey,
+> > > > +       tcon->ses->smb3encryptionkey, SMB3_ENC_DEC_KEY_SIZE);
+> > > > + if (copy_to_user((void __user *)arg, &pfull_key_inf,
+> > > > + sizeof(struct smb3_full_key_debug_info)))
+> > > > + rc = -EFAULT;
+> > > > + else
+> > > > + rc = 0;
+> > > > + break;
+> > > >   case CIFS_IOC_NOTIFY:
+> > > >   if (!S_ISDIR(inode->i_mode)) {
+> > > >   /* Notify can only be done on directories */
+> > > >
+> > > > --
+> > > > Thanks,
+> > > >
+> > > > Steve
 > >
-> > Block-based filesystems are often, but not always local.  For example,
-> > we might be using nbd, iSCSI, FCoE or something similar to include
-> > network latency between the filesystem and its storage.  Even without
-> > those possibilities, a NAND SSD looks pretty similar.  Look at the
-> > graphic titled "Idle Average Random Read Latency" on this page:
 > >
-> > https://www.intel.ca/content/www/ca/en/architecture-and-technology/optane-technology/balancing-bandwidth-and-latency-article-brief.html
 > >
-> > That seems to be showing 5us software latency for an SSD with 80us of
-> > hardware latency.  That says to me we should have 16 outstanding reads
-> > to a NAND SSD in order to keep the pipeline full.
+> > --
+> > Thanks,
 > >
-> > Conversely, a network filesystem might be talking to localhost,
-> > and seeing much lower latency compared to going across the data
-> > center, between data centres or across the Pacific.
-> >
-> > So, my point is that Linux's readahead is pretty poor.  Adding
-> > hacks in for individual filesystems isn't a good route to fixing it,
-> > and reading larger chunks has already passed the point of dimnishing
-> > returns for many workloads.
-> >
-> > I laid it out in a bit more detail here:
-> > https://lore.kernel.org/linux-fsdevel/20210224155121.GQ2858050@casper.infradead.org/
+> > Steve
 >
-> Yes - those are good points.  Because the latencies vary the most for
-> network/cluster filesystems which can vary by more than a million
-> times greater (from localhost and RDMA (aka smbdirect) which can be
-> very low latencies, to some cloud workloads which have longer
-> latencies by high throughput, or to servers where the files are
-> 'offline' (archived or in the cloud) where I have seen some examples
-> where it could take minutes instead) - it is especially important for
-> this in the long run to be better tunable.  In the short term, at
-> least having some tuneables on the file system mount (like Ceph's
-> "rapages") makes sense.
->
-> Seems like there are three problems to solve:
-> - the things your note mentions about how to get the core readahead
-> code to ramp up a 'reasonable' number of I/Os are very important
-> but also
-> - how to let a filesystem signal the readahead code to slow down or
-> allow partially fulfilling read ahead requests (in the SMB3 case this
-> can be done when 'credits' on the connection (one 'credit' is needed
-> for each 64K of I/O) are starting to get lower)
-> - how to let a filesystem signal the readahead code to temporarily
-> stop readahead (or max readahead at one i/o of size = readsize).  This
-> could happen e.g. when the filesystem gets an "out of resources" error
-> message from the server, or when reconnect is triggered
 >
 >
 > --
-> Thanks,
->
-> Steve
-
-
-
--- 
-Thanks,
-
-Steve
+> Regards,
+> Shyam
