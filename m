@@ -2,151 +2,138 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE56C433ED
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 May 2021 13:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9AC2C433ED
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 May 2021 14:22:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F3BC6121F
-	for <linux-cifs@archiver.kernel.org>; Wed,  5 May 2021 13:28:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 640EF61029
+	for <linux-cifs@archiver.kernel.org>; Wed,  5 May 2021 14:22:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233594AbhEEN3Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 May 2021 09:29:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52500 "EHLO
+        id S232171AbhEEOXQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 5 May 2021 10:23:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233593AbhEEN3P (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 May 2021 09:29:15 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1696DC061574
-        for <linux-cifs@vger.kernel.org>; Wed,  5 May 2021 06:28:19 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id p12so2475403ljg.1
-        for <linux-cifs@vger.kernel.org>; Wed, 05 May 2021 06:28:19 -0700 (PDT)
+        with ESMTP id S232079AbhEEOXP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 May 2021 10:23:15 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07E68C061574;
+        Wed,  5 May 2021 07:22:19 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id z9so2798154lfu.8;
+        Wed, 05 May 2021 07:22:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iHBAUjGaHBSzjioQWf1uJ+K7bCER4ubaH7dJG71fpvw=;
-        b=BHKL8orPcvlumzz+/bfCdLUFTNfOo2GZHNYyMbBj5ESp5TlF3Y3xT8wtW+2sgGWn5S
-         m20k17rYDwsIrQUgfF9H9ROBjtOiyteuPOd7bIx2fw3jytbR7ehsMcJ0QO6DQILeCi5o
-         lk2i1CrbEVLfLrqO9Day1iO0Byg/ffsxWCY9JIOxrxIpHX5mXlkNiu2q8KQD1rG1sg6b
-         o0BKQEZGB9e2VOjs0iw97QrtUZfzsZz0xQ8UWZIlAQaEcZzHTeGeIfdZ4u+FaGMnvFVo
-         SBd9zULeOu39CGhwJzKIo5BMil2vI+pEAZVRa0Sq15NFvSFVKR7Vr27e/Pp8/BXeQ1IU
-         1+0Q==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=XgVsKKoBQDRVgbjHThG6cU9TXkUBKJb924zCStcnUCQ=;
+        b=CxbqbQ9iFWSzp5R3V43mnGsPXcoEi+ISSGNggf18T1z0iXNx0V++93mONi/+B2IpwG
+         rD7uRpYUCN6pnnba4QPUb64IMOJgf8Oz4hNk6B3u/GRqEEX9G/r33uuEsfIDzce0GNxv
+         rhZQzbLn9aSRNTOwC/KM9C8uzI5kG24Rc4LyozoVF0J1rHoyxLpowbL03Tntjg9zLJI9
+         9NnOav5Aab2tYDiX7OAf0LIETKWcfY8R03vIS90RZJKj0cd6PG53yCJ09P3PhjQqzBIl
+         q9rH1qI0NyBtKijkICjYpv1KM0enJkRr2ySvDjQ7Rq3cjZFE1ELK9gCnXLwaXgGUmwbQ
+         HHVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iHBAUjGaHBSzjioQWf1uJ+K7bCER4ubaH7dJG71fpvw=;
-        b=e+h/rMnhHFMNwHYmSO/JbiJ6v5EPXAnGAp6nX7MQVa2pTUg2ubvomYxM8ED5X6Dd3n
-         F+bL+lIXYwfRo12oA2UXtG52oSOxZwHUSxEORSaAvklh0cytrUMRAQ9AfD5v5wiQjQD4
-         CcYlyCB994NVYssG8eCXFZok6tFnktV3P/mWxRC72eCZQc+6whKkWvvteUnF4HfQm/II
-         lIUKlNn3CbLbrMjXsNM64PkWtOHktLhD/1jK4oribqdJ0ECQG3TiZz5PfnN0rby5vqGT
-         bPGV0hX1RIQ/CnMfT6kkhZ8QsglS/E38iAl5/FDM7eDJZPjBcvX0T4N9jl9xUiZGPtFh
-         QKeA==
-X-Gm-Message-State: AOAM531OoiIq7FMjJ11ZO4zNmCMR6YibXibtBD6pOBYCDhTodSzLCVvr
-        HtYxcyZwBAlrsCcd8pGnFz/LezqYHI0zNbcyFQUA2GN/
-X-Google-Smtp-Source: ABdhPJx+r8/xxaqUPpUsYfC6BQcflVXF2L5olcwSWiMiE4Nl+Gi2pINf96P7O991VljdNYUHHqcCwKYmDmjUwF6qT5M=
-X-Received: by 2002:a2e:7f03:: with SMTP id a3mr21704945ljd.406.1620221297415;
- Wed, 05 May 2021 06:28:17 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=XgVsKKoBQDRVgbjHThG6cU9TXkUBKJb924zCStcnUCQ=;
+        b=JSRDEtI+9i8E/xT+AWrSdRII/SNT0/44gA1itlAL+hflbSIYvlCdqN5fhU0NZmE6yi
+         iCQb4bGugqhsEB3vCN8q4ebaD45NozOzjKCnK/P4aHGWE8xCGZWu4dwiRUi5rwIKWXmy
+         iCpuMdfjQFA2dJTMQuzHuCP4W63JAxvHHKXw9JmTsWI/A5hQwWfou9f3rlglR+C/6YBl
+         4QWmqfs6NDYQshmbT/e0AMi5okyNATLVZsP63GIx5URqKZ6p9gBKLMvBdMXc2Pe2z6ji
+         jueKLdFey/oZqlvFzODDfZvf8wMVKG1H3BNNXTLZFfad78t3b+nI4kOG7ya0/+1q/spr
+         p/tQ==
+X-Gm-Message-State: AOAM530+eTnTDAC8o+BQVaCwesysFyRh46nDfn+23hzKeA+YYwOD4oOY
+        rU3hy7VhqFyVRXFH4/ITBntA/0jPlQrDusfJGCEA3O3x
+X-Google-Smtp-Source: ABdhPJyOTwwPplhOanvEhB4tQ3uGxqjxUiEHjr3VIaSK9dLKzx65rb0O05XVwer/VRb1bGyy2KVC/27ipKfq9eAtpfE=
+X-Received: by 2002:a19:614e:: with SMTP id m14mr20085393lfk.395.1620224537399;
+ Wed, 05 May 2021 07:22:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAHFuRQaCL4nWp0W1WBbQ-ycZAOW0gV9LgT7RmqiPaUaVaac-6w@mail.gmail.com>
-In-Reply-To: <CAHFuRQaCL4nWp0W1WBbQ-ycZAOW0gV9LgT7RmqiPaUaVaac-6w@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 5 May 2021 08:28:06 -0500
-Message-ID: <CAH2r5mtMUUrMnNPO5x30TpPkfvQng__EtO62r7W-sxiJR69P0w@mail.gmail.com>
-Subject: Re: Question regarding the patch "cifs: Fix the target file was
- deleted when rename failed."
-To:     Jan Melcher <mail@jan-melcher.de>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+Date:   Wed, 5 May 2021 09:22:06 -0500
+Message-ID: <CAH2r5muJhWfmbsz+T1adiAT0n5DSPfsMDVBWFEY=xb22ptzGiQ@mail.gmail.com>
+Subject: [GIT PULL] CIFS/SMB3 Fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Your points are good ones - and it is worth revisiting the
-'silly-rename' approach to a workaround (and others if people have
-ideas here). Although this is solved with the SMB3.1.1 POSIX
-Extensions (more exact semantics for the rename and delete of open
-files) the majority of servers don't support that yet so this is
-important to follow up more.
+Please pull the following changes since commit
+a8a6082d4ae29d98129440c4a5de8e6ea3de0983:
 
-Would be interested in opinion of others on these patches - and it
-might help for your example if you took your example above and put it
-in a simple script (might save a few minutes of time for others
-wanting to experiment with this scenario).
+  cifs: update internal version number (2021-04-25 23:59:27 -0500)
 
-On Wed, May 5, 2021 at 6:10 AM Jan Melcher <mail@jan-melcher.de> wrote:
->
-> I hope this is the right place for me to start a discussion regarding
-> a problem in the cifs file system.
->
-> I'm experiencing the problem the patch "cifs: Fix the target file was
-> deleted when rename failed."
-> (https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=9ffad9263b467efd8f8dc7ae1941a0a655a2bab2)
-> was trying to solve. It was further described in the samba-technical
-> mailing list (https://lists.samba.org/archive/samba-technical/2020-July/135592.html).
-> The patch was eventually reverted
-> (https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=0e6705182d4e1b77248a93470d6d7b3013d59b30).
->
-> Before I found the patch and the mailing list entry, I produced the
-> problem with the following sequence:
->
-> $ exec 20>file # open file and leave file descriptor open
-> $ touch file.lock
-> $ mv file.lock file
-> mv: cannot move 'file.lock' to 'file': Permission denied
-> $ ls -la
-> total 16
-> drwxr-xr-x 2 2000 2000     0 May  4 12:17 .
-> drwxr-xr-x 2 2000 2000 16384 May  4 12:17 ..
-> -rwxr-xr-x 1 2000 2000     0 May  4 12:17 file.lock
->
-> In other words, renaming a file onto an existing file that has an open
-> file descriptor effectively deletes that original target file. This
-> happens both with samba and with a Windows server. I thzink this
-> command sequence seems is quite common because that's the way many
-> applications do file locking on posix file systems. In our case, the
-> problem corrupted Git repositories multiple times because of packfile
-> indices getting deleted.
->
-> The patch I linked would have reduced the problem from a corruption to
-> a mere failed operation (the unlink-then-rename strategy is the last
-> resort at that place; if it is skipped, the rename fails).
->
-> Digging through the cifs history, I found this patch
-> (https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=14121bdccc17b8c0e4368a9c0e4f82c3dd47f240)
-> from 2008: "cifs: make cifs_rename handle -EACCES errors". It tried to
-> rename the target file to a random name (a "silly rename" I guess) and
-> also marked it for deletion, then tried the actual rename operation.
-> In my understanding, this solution should solve the mentioned problem
-> because renames are still allowed for files that have open file
-> handles. (Of course with the problem that for a short time, the target
-> file does not exist at all, but this problem also exists today).
->
-> The patch has been reverted shortly after
-> (https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=8d281efb67463fe8aac8f6e10b31492fc218bf2b)
-> because it would cause problems with servers that do not support busy
-> file renames. Maybe the situation changed since 2008 and there are
-> less servers that do not support busy file renames (my Windows machine
-> supports it), or we could find a way to re-implement the patch for
-> servers that do support busy file renames. The logic to handle a file
-> handle on the source file already tries to to a busy-file-rename by
-> the way.
->
-> These are just my thoughts after two days of digging into the problems
-> and never having seen the cifs code before, so please forgive me if
-> I'm just talking nonsense. But it would be great to hear what you
-> think about this.
->
-> Jan
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.13-rc-smb3-part2
+
+for you to fetch changes up to bae4c0c1c2d576d32e37925ef972a5d45f34e36d:
+
+  fs/cifs: Fix resource leak (2021-05-04 11:53:15 -0500)
+
+----------------------------------------------------------------
+10 CIFS/SMB3 changesets (including two for stable):
+- some important multichannel fixes
+- support for handle leases (deferred close)
+- shutdown support (which is also helpful since it enables multiple xfstests)
+- enable negotiating stronger encryption by default (GCM256)
+- improve wireshark debugging by allowing more options for root to
+dump decryption keys
+
+SambaXP and the SMB3 Plugfest test event are going on now so I am
+expecting more patches over the next few days due to extra testing
+(including more multichannel fixes).
+
+Regression test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/628
+----------------------------------------------------------------
+Khaled ROMDHANI (1):
+      fs/cifs: Fix resource leak
+
+Paulo Alcantara (1):
+      cifs: fix regression when mounting shares with prefix paths
+
+Rohith Surabattula (2):
+      cifs: Deferred close for files
+      Cifs: Fix kernel oops caused by deferred close for files.
+
+Shyam Prasad N (2):
+      cifs: detect dead connections only when echoes are enabled.
+      cifs: use echo_interval even when connection not ready.
+
+Steve French (4):
+      smb3.1.1: enable negotiating stronger encryption by default
+      cifs: add shutdown support
+      smb3.1.1: allow dumping GCM256 keys to improve debugging of
+encrypted shares
+      smb3.1.1: allow dumping keys for multiuser mounts
+
+ fs/cifs/cifs_fs_sb.h |   1 +
+ fs/cifs/cifs_ioctl.h |  35 ++++++++++++++++++++++++++
+ fs/cifs/cifsfs.c     |  25 ++++++++++++-------
+ fs/cifs/cifsglob.h   |  17 +++++++++++++
+ fs/cifs/cifsproto.h  |  13 ++++++++++
+ fs/cifs/connect.c    |  37 ++++++++++++++-------------
+ fs/cifs/dir.c        |  10 ++++++++
+ fs/cifs/file.c       | 102
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ fs/cifs/fs_context.c |   5 ++++
+ fs/cifs/inode.c      |  27 ++++++++++++++++++--
+ fs/cifs/ioctl.c      | 112
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/link.c       |  13 +++++++++-
+ fs/cifs/misc.c       |  79
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ fs/cifs/xattr.c      |   4 +++
+ 14 files changed, 447 insertions(+), 33 deletions(-)
 
 
-
--- 
+--
 Thanks,
 
 Steve
