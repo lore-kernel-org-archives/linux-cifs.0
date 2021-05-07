@@ -2,192 +2,216 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B087AC433B4
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 May 2021 13:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1B5C433ED
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 May 2021 14:16:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7DC7A61401
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 May 2021 13:48:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B47C761436
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 May 2021 14:16:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237288AbhEGNtv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 7 May 2021 09:49:51 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([194.104.111.102]:47074 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233394AbhEGNtv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 May 2021 09:49:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1620395330;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ddvbvD2W+1jMd8X7qcY0oH+b0oHq8R3O2e/EltdDUEA=;
-        b=P+y+zNKYSi3L0Yc4sIz2Gd43CoKVZCQz9vJrJekO2g9k9svLbcYBf+hr7iINfemSgvEc6n
-        6XZ/lWCw/dM6GdvXQQLCY3S09VFvLHyjyAqPAYV1t7dCVeKf33HU9cNrR8PK8ep++BFmz6
-        ilSycJQKWitDInkTUvhDPj1DBv2kBGk=
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com
- (mail-he1eur04lp2055.outbound.protection.outlook.com [104.47.13.55]) (Using
- TLS) by relay.mimecast.com with ESMTP id de-mta-6-Qh_Gby9wOiawS9Z_f5yoAw-1;
- Fri, 07 May 2021 15:48:49 +0200
-X-MC-Unique: Qh_Gby9wOiawS9Z_f5yoAw-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MtxiDEtnnQ/ZKpk09cUcZ6IbEx7WNdnoYD2jqJeIVN6/O7ScJZIAHRGsob8C5XJdcWN5dJb6VVdbhe2WNdLhXB0l+ixXrJXMantvjzLATEtIOyKK2psSV+Oj5xtW41RAXCuE3U0AmACt/HPjL9fQCWqbyAisn0XJtACZBpv9aPfSWJLc8R1eeYwLev22KnIrVy1ww2877Nywo0T5s2yIwIf1cgh1QrAUMVi2RQbW/IXgixDB2wXVR/c+1hV87ocWko8TBn2HAfHj7xMTO2g9WxCWLHe+lqBWT5S8X7HC/2unmhzGo0F7y+YSAlE3V73jqolg/RuULr8I3E47emjdUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ddvbvD2W+1jMd8X7qcY0oH+b0oHq8R3O2e/EltdDUEA=;
- b=ReBps58bhcZZT7wDoW7lnp3BiC+QtMTkrfhGEpnvjPwrOgCXftdicRukWD/6noagSkw7ctaaL1qNPK21y6eQ9ojTJ3I8beBBcARj8Hw0sntoB2vKItoFa7uUoG8jOohcFNzWqu+sRTD+ryrpNL+Uho/TAbfP6lSmpSxZBG4fSkFCLqr4Cy9U2vaz8cMhx+gPgmqp8JzNcb6S7ub5ysXvB0S+VMKpvlTEI0u5HFnIhBWFleaHX/4xaexwecxUy2JCNgGb2FFeZKxSTaeCnrrwLPDj6pfjrNtggSEXgtCmfikqtQDM+RS7CxG20BCe6L5AwBwfrppboxp/in9Fk3h68A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VE1PR04MB7453.eurprd04.prod.outlook.com (2603:10a6:800:1b0::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.25; Fri, 7 May
- 2021 13:48:48 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94%5]) with mapi id 15.20.4108.028; Fri, 7 May 2021
- 13:48:47 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     Steve French <smfrench@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        COMMON INTERNET FILE SYSTEM SERVER 
-        <linux-cifsd-devel@lists.sourceforge.net>
-Subject: Re: [PATCH] smb3.1.1: allow dumping GCM256 keys to improve
- debugging of encrypted shares
-In-Reply-To: <CAH2r5mugntjkFbsz0YCRZwsL0YTZRtb5ZNBUcPBx5nTTWPG_1w@mail.gmail.com>
+        id S233756AbhEGORJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 7 May 2021 10:17:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53848 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233482AbhEGORH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 May 2021 10:17:07 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50232C061574
+        for <linux-cifs@vger.kernel.org>; Fri,  7 May 2021 07:16:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42; h=Date:Message-ID:From:Cc:To;
+        bh=FLGmbryqnUZTI8oPwjjTgXqxusqPK1nV1B9+r0JqCDo=; b=Rf0UNDSAmKDr3JeRhHrkZ7q68u
+        v1a4vjcC5DQmDncerII5kYtAYoxotEBrzRnqWVm0EJXH2FakoFH9LszEXeh8XxiQnpnD5NBspradO
+        dg80TgqD2JxRnN5/lpyVnOcPpLwG5KQXqfl0h7/3Zw5lg22kHViDU3hAhW9JGpyeqdKZi6Cw73oIC
+        +nOtlDNNd6T93TdiNr5Fe9cMichMFzWYtAmpKDUXKbhVZ3/F0BDwpjrBlvqLYWT7pCgGlsw+dTTmm
+        Th0n6l0K+sidj14gTADK06lA3OGgV2MgHhmtewDBUUT2WkHc80ba6vU0YZnULu8OQ9gCYFfqPuPYU
+        XkX64LQ5IAqCDkpVIui9u3GLanoqXVjmAHQ0Sc/ZS7qVk4+6j5Jq2dNO2W8t4kbPb10QgTbuqtgQk
+        YQAfin9daZjxUIMulDCJmt9fjIRIm0Uggr1f1E+xv1wxIwfRfyh/qf0AkjdttwdghZZ7un572yhjc
+        SHuswl/rMu8BBKdFzbIlRY75;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1lf1Gv-0004gu-3i; Fri, 07 May 2021 14:16:05 +0000
+To:     =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     samba-technical <samba-technical@lists.samba.org>,
+        linux-cifsd-devel@lists.sourceforge.net
 References: <CAH2r5muN3rpUur8jSav=fJfnt_vuJhgOXxMeGmXvT3KvxbBU5w@mail.gmail.com>
- <CAN05THQzSCZwypBWg9YZAarjrsQ74qowp4Bneo3crW9FfqVqPA@mail.gmail.com>
- <CAH2r5muu3YiBAk1Mf_xOFQJih8Ms7sQhNUKwUrFreggK-Mmr-A@mail.gmail.com>
- <CANT5p=rGGNdVjBSTZm1OsecEW=-5edZhZwBjSU1Q8d8dO+JsPA@mail.gmail.com>
- <CAN05THTmZCNXsH4_i=0CO6CaVOYuZ=z5XHW+U_=q3Djxz6XxBA@mail.gmail.com>
- <CAH2r5msrS0Ox86NgpfUrwv_MPEU7pYGdG=JfYwK9Btia6W8PLA@mail.gmail.com>
- <CAH2r5mugntjkFbsz0YCRZwsL0YTZRtb5ZNBUcPBx5nTTWPG_1w@mail.gmail.com>
-Date:   Fri, 07 May 2021 15:48:45 +0200
-Message-ID: <87lf8qu01u.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:713:a617:3026:1c10:d670:5fc7]
-X-ClientProxiedBy: ZR0P278CA0139.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:40::18) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+ <c2b84e56-87c6-469d-c272-02731cb0937c@samba.org> <87y2cqu9as.fsf@suse.com>
+ <2e20d5e9-148b-dbb2-9fda-50521be46fa5@samba.org> <87sg2yu18q.fsf@suse.com>
+From:   Stefan Metzmacher <metze@samba.org>
+Subject: Re: [PATCH] smb3.1.1: allow dumping GCM256 keys to improve debugging
+ of encrypted shares
+Message-ID: <1780584e-d602-00c4-6f4b-c112f158148c@samba.org>
+Date:   Fri, 7 May 2021 16:16:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:713:a617:3026:1c10:d670:5fc7) by ZR0P278CA0139.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:40::18) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.25 via Frontend Transport; Fri, 7 May 2021 13:48:47 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 52eae253-e9a6-4bc0-7bf7-08d9115ed6bc
-X-MS-TrafficTypeDiagnostic: VE1PR04MB7453:
-X-Microsoft-Antispam-PRVS: <VE1PR04MB745346D3BA01C2F27E073C20A8579@VE1PR04MB7453.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +fYVcPiJ0tdeaO1zZgWezRohaoRWLZpS+1TQa4qTUrO+QrPglAj2zrpHO9Xmi2MUjR9x4KX9wFokpJfHo8T/CkYCAr/jmMZHNAEWmZ5wDqTvleFhMgZEyetLN6ERaSd2HvLvRTeWFLE5yWAW/hc4sVkB9zpjQnJPIFK27bXmq2xZ3Js9/sHkkKGkMoytWYgapoE96gXZsfQjC7E2Jcg+rbFuujmYGFW5rw9vq26qvgIyF1S0nxj8t1oUgxRKWF8/1W43iorRhGO+VDB4FWJalLqd4iqV1+93wi5T5582OX8270CTOP4YXRPsUAtQyGsfGiZ5T2E2/E3pAJCwIbuMqsWyRDqC2TXecIiUEEu7F4n+R3WgPA4WdCmhbAMZVBhjG2JoqeaszGU3daO4HSr4JgQHbCCc+eBKaHoV6LFr+DOQjs6bPol2cKL5oJSZLLl013M6Uk9eiVBvKc9nbMx6vy2cEasODmYBVthif5itSvi5q0GsN7gUeVNIhUQ+LXxkpfdBrOweaNgKqEtX/6PHUyVpz93HSXnsKh4tFPF7fU0QDAjQX35nGo6JIhII0B0CUJOPqHomOqZGN3RF45Y/dQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(376002)(346002)(136003)(366004)(39850400004)(8936002)(16526019)(478600001)(38100700002)(2616005)(8676002)(36756003)(6496006)(52116002)(66946007)(83380400001)(66556008)(66476007)(186003)(86362001)(54906003)(110136005)(316002)(4326008)(66574015)(2906002)(6486002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?cVU3dWJxMThicFZ0WHh1UmJtYmEzUjM4VFIrQ01RbDNxcngrbjNRRVR1L0o0?=
- =?utf-8?B?aGtteDRHMFBycXVVMWR1RU93R3JiVjZicFAxQ0grQWtKejN0U2xPRk9XTWhO?=
- =?utf-8?B?UXE3dSsvbi9hU25HOUxhbk5jTGtwSkszMnZ0b2dhOVBjb3lZRzFOaXBZMXlw?=
- =?utf-8?B?cEZJdXJ0NUZnRUVySGl0eUlEUHRQb2Z2UmVFTUNFNk5ubHpOSlBYVHhJc2xG?=
- =?utf-8?B?MXVueUE4d0RYYjV0YzFzQUpMRStNaDkxajRhZmo1b3BnNHRWN1dzOFdWdmpP?=
- =?utf-8?B?TWZnUXFjeWpWa1Z2c3c3WXVad0EwOWo4UlpKOGNOdlV2ejNud1hSWndHTUdB?=
- =?utf-8?B?VmJJMmZQTzllNkp6UzJpR1paNGFiK1pTMDJ6S2xNV25NWGxvTWxndHFIelhL?=
- =?utf-8?B?OHdaUWZjVG82Uk1CRi9Pc1BkemFzb1FYMys4Yk5HdUxGTFVHUmtTbVEwTHgw?=
- =?utf-8?B?NWFJeEI3dWw5U2t5VG5ScVpxMG9xdEduei9vYytxd1NneGRMbEQ2cW0zSWRq?=
- =?utf-8?B?U3RYSk9ERWFFVUl2aW9RcFJwMVJCSS9YYVQxWFo2WVBWdjRzc1FhT1dzeTZz?=
- =?utf-8?B?RXJoSlExZGZnYjRYWWxCQkplWjZ3TzNTUURUcU5OM21wSEpXNndIYTloTW9p?=
- =?utf-8?B?c01jTktPY25jSTdKMjllSDBxenJsY0lqamxveTNma29QbVZWRThodDZXNkdV?=
- =?utf-8?B?V3FSVHhudDJ4ckFVTlRUUEMwcjdEbXF1U284ald4cDF6SGgrRkdwNmZpa1B1?=
- =?utf-8?B?SkRSZmd4a2xXOGFQZVVMZCtHRWNMYUlhYTJ3bDdOb3ZuYnNjOERZbThQa3la?=
- =?utf-8?B?MjhnbVZmeFFYcWhwZi9DTGhvR2RyWnF4NnFFQmNuNm1HSjFTNk1BZlVUVmNi?=
- =?utf-8?B?TnU0S0w4U09hR2UzMzlrMFZBU3UrRzdPRE1Ca3NiZEd5R2NrTG9GYjl2ams5?=
- =?utf-8?B?L3lZSVM1blYyVUpKaXR6cXExT1lQUlpDMFdyc2xJTnpKSjFzVFVpU2YrQkE5?=
- =?utf-8?B?WmJUUHJVSEpIWUZYZTR1S3BITEJScm5VNFpUQU5WKzBBaFQ1bFZHdVJCb0RB?=
- =?utf-8?B?L0NSM1lhRWdoRTlCaHM5N1hLSk5NaEpidC9sK3BwSkpiUTZGcnB1M29oR3Z5?=
- =?utf-8?B?QnhZM2YyWjczaCtjYU1vMHZqZ3FyMGRhdDZBNVVRZG1lWWQ2UDc5dnd4bkho?=
- =?utf-8?B?RUIzQStrbldjczgrR081SHByRHordW5KWU1XamZmMHFWbER2N25NSVhqTkJw?=
- =?utf-8?B?dXlyNHZNYkgyek9BaDFQQjJVL25Wbmw0b2k3NWYxNlNXK2ZPMW1XaVBSM0FJ?=
- =?utf-8?B?NHRHeGZvNVN4ck5EOE9GMUc3SThmUkYza0ZDenRsRUx1WXBzRnZZM3JjRk83?=
- =?utf-8?B?dXVQUk5TVTNkeGZLbEIxNmtPUzU4Y1daWnN4SmJDOC81UXAwY0JYdzFlVVhW?=
- =?utf-8?B?eUpPdGNFejRybEJlMGlnM0xMS2FoWHM5eEZpbnlWbUhtVVUvcXNVd2FpNTZr?=
- =?utf-8?B?eTF6L2RhYWppR3R5ckcvTGh0aThaSHpad0pLeTNXY3dDNjdtSWhKNzNnRERt?=
- =?utf-8?B?YWtSWG5qR0lvck5rRUd0d1Z6R1g5TXRHSEJqQzNmeXAvRDVOZ0tSTHMya0d2?=
- =?utf-8?B?MVJtSFFGeVlVQTNxRTluREoxZXZLa3RFU05XWnVMRFVBL3dEUGdrS2pjbjBO?=
- =?utf-8?B?T1BaNnRMMnFKcXgzc3BDY0Qrc0ExTzEzMWF4Y0o5S0YwQ2M1SDJxTVVTTFVZ?=
- =?utf-8?B?cVh5L05KNW1Cb0tEU1dmN1FzUDZCcllQTmxSS0J0UUYvaE9nT09MRnlxekJu?=
- =?utf-8?B?LytnS2FVT29JQ0hNcXFwNHpCRUFKT2p3ZUlEclhmcGluOUNrUTlaRjZlYXp6?=
- =?utf-8?Q?oAvvWNh+LdVLb?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 52eae253-e9a6-4bc0-7bf7-08d9115ed6bc
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2021 13:48:47.9239
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6xGXUvDQX2V+Qcy9uYEw4UEwaremPYvTY/KIKk7OYLN5CHzp8vUtQQRFhpzpspb8
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7453
+In-Reply-To: <87sg2yu18q.fsf@suse.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="gvNdfHH7rY4COsDl2ItImy3ZeI73a6YLb"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Steve French <smfrench@gmail.com> writes:
->> > Or as an alternative, dump an array of ALL user sessions with
->> > information about which user and which part of a multi-channel
->> > connection that the keys belong to.
->> > And let userspace sort out "which keys do I need for my wireshark sess=
-ion".
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gvNdfHH7rY4COsDl2ItImy3ZeI73a6YLb
+Content-Type: multipart/mixed; boundary="9x1I8onavYicF3G8xjLNadnqUWueGKc50";
+ protected-headers="v1"
+From: Stefan Metzmacher <metze@samba.org>
+To: =?UTF-8?Q?Aur=c3=a9lien_Aptel?= <aaptel@suse.com>,
+ Steve French <smfrench@gmail.com>, CIFS <linux-cifs@vger.kernel.org>
+Cc: samba-technical <samba-technical@lists.samba.org>,
+ linux-cifsd-devel@lists.sourceforge.net
+Message-ID: <1780584e-d602-00c4-6f4b-c112f158148c@samba.org>
+Subject: Re: [PATCH] smb3.1.1: allow dumping GCM256 keys to improve debugging
+ of encrypted shares
+References: <CAH2r5muN3rpUur8jSav=fJfnt_vuJhgOXxMeGmXvT3KvxbBU5w@mail.gmail.com>
+ <c2b84e56-87c6-469d-c272-02731cb0937c@samba.org> <87y2cqu9as.fsf@suse.com>
+ <2e20d5e9-148b-dbb2-9fda-50521be46fa5@samba.org> <87sg2yu18q.fsf@suse.com>
+In-Reply-To: <87sg2yu18q.fsf@suse.com>
 
-All channels for 1 session share the same keys (except signing).
+--9x1I8onavYicF3G8xjLNadnqUWueGKc50
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I like Shyam's idea of having extra uid arg but it's more tricky
-to get (have to walk the tlink RB tree and find matching uid) compared
-to an extra session id arg.
+Am 07.05.21 um 15:23 schrieb Aur=C3=A9lien Aptel:
+> Stefan Metzmacher <metze@samba.org> writes:
+>> No in order to derive the aes256 keys we need the full session key tha=
+t
+>> falls out of the authentication and that's 32 bytes is kerberos
+>> with aes256-cts-hmac-sha1-96 (the default) is used.
+>=20
+> Ok
+>=20
+>>> I would call it server_in_key and server_out_key.
+>>
+>> That's fine too.
+>>
+>>> I think we should have 2 ioctl:
+>>> - GET_FULL_KEY_SIZE: return the size of the struct
+>>> - GET_FULL_KEY: return the struct
+>>>
+>>> (note: no __packed, this might create all sorts of issues and kernel =
+ABI
+>>> will be stable across the system anyway. I hope we didn't pack other
+>>> ioctl in the past... need to check)
+>=20
+> I've checked and sadly we use __packed for every struct :(
+> That means we are forcing users to have packed struct as well which is
+> not a standard C attribute. Portable C code will have to process each
+> member field manually. I guess clang and gcc both support it so that's
+> not a huge deal... anyway that's a problem for another day.
+>=20
+>>> struct smb3_full_key_debug_info {
+>>> 	__u64 session_id;
+>>> 	__u16 cipher_type;
+>>>         union {
+>>>             struct smb3_aes128_debug_info {
+>>>         	__u8 session_key[16];
+>>> 		__u8 server_in_key[16];
+>>> 		__u8 server_out_key[16];
+>>>             } aes128;
+>>>             struct smb3_aes256_debug_info {
+>>>         	__u8 session_key[16];
+>>> 		__u8 server_in_key[32];
+>>> 		__u8 server_out_key[32];
+>>>             } aes256;
+>>>         } keys;
+>>> };
+>>>
+>>> * Users will call GET_FULL_KEY_SIZE to allocate a properly sized buff=
+er.
+>>> * Users can do a switch on cipher_type and process what they know exi=
+st
+>>> * We can update the struct if we need to in the future without breaki=
+ng
+>>>   userspace
+>>>
+>>> This should cover any possible updates (AES-512 or some new cipher...=
+)
+>>> unless I'm missing something.
+>>
+>> I think we should have explicit length fields for each key, if it's ea=
+sier
+>> we can still use fixed size arrays.
+>=20
+> The problem with this is that if we make the keys bigger for a future
+> cipher, old userspace program will send us a buffer of the size of the
+> old smaller struct.
+>=20
+> eg:
+>=20
+> * user on kernel version N compiles:
+>=20
+>     struct smb3_cipher_key_debug_info {
+>         __u64 session_id;
+>         __u16 cipher_algorithm;
+>         __u8 session_key_length;
+>         __u8 session_key[32];
+>         __u8 server_in_key_length;
+>         __u8 server_in_key[32];
+>         __u8 server_out_key_length;
+>         __u8 server_out_key[32];
+>     } buf; // sizeof =3D> 16
+>    =20
+>     ioctl(fd, CIFS_DUMP_FULL_KEY, &buf);
+>=20
+> * user keeps compiled program and upgrades kernel to version N+1 where =
+the
+>   kernel added AES-512 or whatever:
+>=20
+> * in the kernel, sizeof(smb3_cipher_key_debug_info) is now let's say 24=
 
-> +static int cifs_dump_full_key(struct cifs_tcon *tcon, unsigned long arg)
-> +{
-> +	struct smb3_full_key_debug_info pfull_key_inf;
-> +	__u64 suid;
-> +	struct list_head *tmp;
-> +	struct cifs_ses *ses;
-> +	bool found =3D false;
-> +
-> +	if (!smb3_encryption_required(tcon))
-> +		return -EOPNOTSUPP;
-> +
-> +	ses =3D tcon->ses; /* default to user id for current user */
-> +	if (get_user(suid, (__u32 __user *)arg))
-> +		suid =3D 0;
-> +	if (suid) {
-> +		/* search to see if there is a session with a matching SMB UID */
-> +		spin_lock(&cifs_tcp_ses_lock);
-> +		list_for_each(tmp, &tcon->ses->server->smb_ses_list) {
-> +			ses =3D list_entry(tmp, struct cifs_ses, smb_ses_list);
-> +			if (ses->Suid =3D=3D suid) {
-> +				found =3D true;
-> +				break;
-> +			}
-> +		}
-> +		spin_unlock(&cifs_tcp_ses_lock);
+>=20
+>     copy_to_user(userbuf, &kernelbuf, sizeof(struct smb3_full_key_debug=
+_info));
+>=20
+> Since we don't know the size of the user provided buffer and we assume
+> it's the same as the current size of the struct, So we will actually
+> write past it (24-16 =3D> invalid write of 8 bytes).
+>=20
+> With the extra ioctl to get the size, userspace will always give us a
+> buffer that matches the struct size of the running system.
 
-Btw, if we go with this we need to bump the session refcount if access
-it outside of the locked section (and decrement before returning).
+If you ever change it just use another struct and another ioctl opcode.
+also the ioctl macros encode the struct size into the id, the the ioctl o=
+pcode would
+change anyway.
 
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+metze
 
+
+
+--9x1I8onavYicF3G8xjLNadnqUWueGKc50--
+
+--gvNdfHH7rY4COsDl2ItImy3ZeI73a6YLb
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEfFbGo3YXpfgryIw9DbX1YShpvVYFAmCVS6AACgkQDbX1YShp
+vVbOyw/+L4PO1hO4yKK3HU6bq1R0/LV/bP02BtY7JLH23bPXPqPoBvTaoIYSN4Ye
+RoibgX/DMGbQeRon03tIhCrxXW4zkcUMbMrciFuW3Hk/8x51J4yy5I9UEbd3IWwZ
+4Mu00/gEAtvEMld7OkJt/Ohvl+Gonsk0D3zOaViBJFOiozfBqbbXV90Zab0EijnB
+AQuXRPaw7O36Rg/vb9qKM05i5sYgN6z09Wf8Cqqt9Y/Jb85tytiHsKbnJliBTasn
+PpK/Ad7LMQmvwzz5y7fSTjIOM9Qzoq8W+IWlamn8UAT1QwdcL5A3qzWqk5byIcxI
+momcaShw9V7lB4rVNHSEsb/b4DVk810mH8GPpx8X5tgzbwwrkm/lJXp8WoDOqLtp
+9BCFQl0tP5bclswD/oNtl+GWCP8c2X5qgFabDbMriTojZIviPGL2nJpN8UaHVAQj
+8+xQbcltfC1iwMcEaE1oSH0TBSVsU3G5KHsE2ZZhVPOucg7JPtb0B+wORjhdfooJ
+WeDafLAyJnYVpT0c+UsaiQrQROiGdUAmSyXZ/lXBpOy8qmFuo5/k9M0BUIFqbfJQ
+TojYToEEj9tcg/yKaXI5nb92sbTedNYqMJD4qKgxwxR++UZXQI8aP4w0fj48TPeY
+8ZEWsXHTAPWY7hvyffkDUlYAHI7zsCC6R9M9Kt66x96NjkS8Crs=
+=01xA
+-----END PGP SIGNATURE-----
+
+--gvNdfHH7rY4COsDl2ItImy3ZeI73a6YLb--
