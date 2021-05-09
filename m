@@ -2,200 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02808C43461
-	for <linux-cifs@archiver.kernel.org>; Sun,  9 May 2021 21:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08543C433B4
+	for <linux-cifs@archiver.kernel.org>; Sun,  9 May 2021 23:33:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2EE9613C9
-	for <linux-cifs@archiver.kernel.org>; Sun,  9 May 2021 21:44:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DD81613D0
+	for <linux-cifs@archiver.kernel.org>; Sun,  9 May 2021 23:33:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbhEIVpL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 9 May 2021 17:45:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39556 "EHLO
+        id S229939AbhEIXem (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 9 May 2021 19:34:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbhEIVpK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 May 2021 17:45:10 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 439D0C06175F;
-        Sun,  9 May 2021 14:44:06 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id h4so14536147wrt.12;
-        Sun, 09 May 2021 14:44:06 -0700 (PDT)
+        with ESMTP id S229847AbhEIXel (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 May 2021 19:34:41 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB0DC061574
+        for <linux-cifs@vger.kernel.org>; Sun,  9 May 2021 16:33:35 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id 76so13789351qkn.13
+        for <linux-cifs@vger.kernel.org>; Sun, 09 May 2021 16:33:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=DBusF/KbjHCWghHBMnMPpKehqCL6Xa7jSi7F9W8BPnw=;
-        b=NquJH4ELcrfZ2CwqHRFyicsGjSC/dPUMr2Ze4RjmfN9UV3IuIYC/wTeu3VUXiJc0k4
-         eRYV/Tia9lgtkPZar7Jchn2M8DbxiW4m8VU+lYi3bTm8yEJRXyGM26o+r7Qqq9v4KjIY
-         86hPtSo1qPmNBySrGzJtvpvw2iOYQMlSuB5nGbAYsCxaya+iLxPWR6lZP+GrBfqtGqXY
-         LIspv5q48vmDsY3biUOXnNteFTYsspNhIJisj5I4zmibBXpZqR+JDTtmlPuhyHGIK7jL
-         iH/E9TH7q1bl/WV94KzbN0pY10zRDDt3CBuqTCIH1Sk+lGlnype2XnSdwdehOT02hvtE
-         9bgw==
+        d=gwmail.gwu.edu; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=YkDDytZNQxbBUAfAVAEk4fD9xRC/hQr+ckTlhR7Sl/U=;
+        b=FG6PiqyE9rwCmLm9vyAou6ABFbikh0QGJVU0tj77mdedT8Gdo/QKRDk6Gkn50zGeLC
+         Svv58IeJagoFS7uMs2L5zQi0Se21n5ap2lva5U9g3qMt/9IjtBYTGNfLb47dHk1LN92S
+         iWClsRA7Mc1xYvmY1v5g2PEUNU+eSH9HgLTf3QLQ8Dnhqmsc3X/ix2mW6PHZbtTcXdz2
+         5fI+JZAuWqEChaenVa3KD6cA2a0ZHFJfK/sDWYE+rPFlvkqOnLMkmVv54emtTkv+rfML
+         6ZRnhHaVcyH7PqQ47CqDBIdP1GBmNeu+UP29Wu5JKza9mvY7yndPNUysZhJsf+CQz0Az
+         rIgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=DBusF/KbjHCWghHBMnMPpKehqCL6Xa7jSi7F9W8BPnw=;
-        b=cdu2bnIB1euN/z2X0q9UbaURrHCAu7R6mBHdfd6V5YQrcU/5Enap7JDFST8HKcC2H0
-         5gVy/8V/Dy2XwK9WtbXAyH7wE/maDZrsToSPwzd7Cf9XUaeP8Tg18EkJZFIPUZmDuZAN
-         9DCu06cTEJcVgmdJKyvqU4ctpLx89NiIztU2s7uPjwLZ75YNTeU0tRznaXsBt3LLReQW
-         H45Z5ngPc24Ci1vcSyPc2e86lrubDbCA4movexpZeJHjxY+E9nvSoF6HeTo5/EYX+wGY
-         ZDxuPf2BgVIA1W3mG2aixhe4SoVjBKBdP0GoxIZAhtcLRA5X3NLpjVxMINmjs/cKnnpc
-         6tRQ==
-X-Gm-Message-State: AOAM531CJbH0o0fr6dN9GobxBFPeYt4cF/pragFn6FUa5OMV669pUobs
-        c6AfEHTbM8cHmOxaSaJirgUt7Mw9fu/rWA==
-X-Google-Smtp-Source: ABdhPJzvo/vbcHXbIH58HJbFF3QSN4voQDezYqeXyuqC8KbYNbm3j7DNhei/2xk3i0xTQLH+8Z/R6w==
-X-Received: by 2002:adf:a316:: with SMTP id c22mr26126159wrb.202.1620596645039;
-        Sun, 09 May 2021 14:44:05 -0700 (PDT)
-Received: from localhost.localdomain ([170.253.36.171])
-        by smtp.googlemail.com with ESMTPSA id u6sm16495530wml.6.2021.05.09.14.44.03
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=YkDDytZNQxbBUAfAVAEk4fD9xRC/hQr+ckTlhR7Sl/U=;
+        b=b9JqiMEw/E/34a5PMB4aC9GGllrQ3/aKIuOl2YSCKG+dFcHieLUQZMUQX277rDqxdz
+         X4V3izrxF1P2drjzEfu31v+N38KztTjPrFg5nnHJguxH3HH0Ht69rnZKC8qKiYPzmpy9
+         ENQML+5Vzwe/EQ8xZdFndkgW8Y2YVanNqmbnVWNwJLvaBEHjBZGmpNvdOBoox9gYOoOl
+         slhUtzw8bqrGqcTInnr9Azo+MPKEv/Yt14ddgBOCOr7y4S2+pvqD8UyiWKGsrpjYf4rX
+         uLhLZZCQYCm4KqiVq9n03Pr+9aBWXJQy/wPbwupqoS3/3uJ/WKkb7gHvn1tKFALV6qQb
+         fSmQ==
+X-Gm-Message-State: AOAM530K7dl8JEhEhw4BjCCA4I9IBJyfFNJ+ua8n3JdeX/RDP3YTtQKy
+        ibeLxg/rdwcox1lxnjLwRlCN6Q==
+X-Google-Smtp-Source: ABdhPJx8IK1oBHvd+hmpLgGmiiozZrYWxFIVWOxr6sSYq+mtN0m69XKwqC5beCyk5AaJfI+3WS4Tvg==
+X-Received: by 2002:a05:620a:c8f:: with SMTP id q15mr444683qki.400.1620603214599;
+        Sun, 09 May 2021 16:33:34 -0700 (PDT)
+Received: from bunsen3.telenet.unc.edu (bunsen3.telenet.unc.edu. [204.85.191.47])
+        by smtp.googlemail.com with ESMTPSA id 7sm5789256qkd.20.2021.05.09.16.33.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 May 2021 14:44:04 -0700 (PDT)
-From:   Alejandro Colomar <alx.manpages@gmail.com>
-To:     mtk.manpages@gmail.com
-Cc:     Alejandro Colomar <alx.manpages@gmail.com>,
-        linux-man@vger.kernel.org, Luis Henriques <lhenriques@suse.de>,
-        Amir Goldstein <amir73il@gmail.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Nicolas Boichat <drinkcat@chromium.org>,
-        Ian Lance Taylor <iant@google.com>,
-        Luis Lozano <llozano@chromium.org>,
-        Andreas Dilger <adilger@dilger.ca>,
-        Olga Kornievskaia <aglo@umich.edu>,
-        Christoph Hellwig <hch@infradead.org>,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Walter Harms <wharms@bfs.de>
-Subject: [PATCH] copy_file_range.2: Update cross-filesystem support for 5.12
-Date:   Sun,  9 May 2021 23:39:06 +0200
-Message-Id: <20210509213930.94120-12-alx.manpages@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210509213930.94120-1-alx.manpages@gmail.com>
-References: <20210509213930.94120-1-alx.manpages@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Sun, 09 May 2021 16:33:34 -0700 (PDT)
+From:   wenhuizhang <wenhui@gwmail.gwu.edu>
+Cc:     wenhui@gwmail.gwu.edu, Steve French <sfrench@samba.org>,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] Signed-off-by: wenhuizhang <wenhui@gwmail.gwu.edu>
+Date:   Sun,  9 May 2021 19:33:27 -0400
+Message-Id: <20210509233327.22241-1-wenhui@gwmail.gwu.edu>
+X-Mailer: git-send-email 2.17.1
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Linux 5.12 fixes a regression.
+Deadstore detected by Lukas Bulwahn's CodeChecker Tool (ELISA group).
 
-Cross-filesystem (introduced in 5.3) copies were buggy.
+line 741 struct cifsInodeInfo *cinode;
+line 747 cinode = CIFS_I(d_inode(cfile->dentry));
+could be deleted.
 
-Move the statements documenting cross-fs to BUGS.
-Kernels 5.3..5.11 should be patched soon.
+Signed-off-by: wenhuizhang <wenhui@gwmail.gwu.edu>
 
-State version information for some errors related to this.
-
-Reported-by: Luis Henriques <lhenriques@suse.de>
-Reported-by: Amir Goldstein <amir73il@gmail.com>
-Related: <https://lwn.net/Articles/846403/>
-Cc: Greg KH <gregkh@linuxfoundation.org>
-Cc: Michael Kerrisk <mtk.manpages@gmail.com>
-Cc: Anna Schumaker <anna.schumaker@netapp.com>
-Cc: Jeff Layton <jlayton@kernel.org>
-Cc: Steve French <sfrench@samba.org>
-Cc: Miklos Szeredi <miklos@szeredi.hu>
-Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc: Dave Chinner <dchinner@redhat.com>
-Cc: Nicolas Boichat <drinkcat@chromium.org>
-Cc: Ian Lance Taylor <iant@google.com>
-Cc: Luis Lozano <llozano@chromium.org>
-Cc: Andreas Dilger <adilger@dilger.ca>
-Cc: Olga Kornievskaia <aglo@umich.edu>
-Cc: Christoph Hellwig <hch@infradead.org>
-Cc: ceph-devel <ceph-devel@vger.kernel.org>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Cc: samba-technical <samba-technical@lists.samba.org>
-Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Cc: Linux NFS Mailing List <linux-nfs@vger.kernel.org>
-Cc: Walter Harms <wharms@bfs.de>
-Signed-off-by: Alejandro Colomar <alx.manpages@gmail.com>
+cinode on filesystem should not be deleted when files are closed, they are representations of some data fields on a physical disk, thus no further action is required.
+The virtual inode on vfs will be handled by vfs automatically, and the denotation is inode, which is different from the cinode.
 ---
- man2/copy_file_range.2 | 27 +++++++++++++++++++++++----
- 1 file changed, 23 insertions(+), 4 deletions(-)
+ fs/cifs/misc.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/man2/copy_file_range.2 b/man2/copy_file_range.2
-index 467a16300..843e02241 100644
---- a/man2/copy_file_range.2
-+++ b/man2/copy_file_range.2
-@@ -169,6 +169,9 @@ Out of memory.
- .B ENOSPC
- There is not enough space on the target filesystem to complete the copy.
- .TP
-+.BR EOPNOTSUPP " (since Linux 5.12)"
-+The filesystem does not support this operation.
-+.TP
- .B EOVERFLOW
- The requested source or destination range is too large to represent in the
- specified data types.
-@@ -184,10 +187,17 @@ or
- .I fd_out
- refers to an active swap file.
- .TP
--.B EXDEV
-+.BR EXDEV " (before Linux 5.3)"
-+The files referred to by
-+.IR fd_in " and " fd_out
-+are not on the same filesystem.
-+.TP
-+.BR EXDEV " (since Linux 5.12)"
- The files referred to by
- .IR fd_in " and " fd_out
--are not on the same mounted filesystem (pre Linux 5.3).
-+are not on the same filesystem,
-+and the source and target filesystems are not of the same type,
-+or do not support cross-filesystem copy.
- .SH VERSIONS
- The
- .BR copy_file_range ()
-@@ -200,8 +210,11 @@ Areas of the API that weren't clearly defined were clarified and the API bounds
- are much more strictly checked than on earlier kernels.
- Applications should target the behaviour and requirements of 5.3 kernels.
- .PP
--First support for cross-filesystem copies was introduced in Linux 5.3.
--Older kernels will return -EXDEV when cross-filesystem copies are attempted.
-+Since Linux 5.12,
-+cross-filesystem copies can be achieved
-+when both filesystems are of the same type,
-+and that filesystem implements support for it.
-+See BUGS for behavior prior to 5.12.
- .SH CONFORMING TO
- The
- .BR copy_file_range ()
-@@ -226,6 +239,12 @@ gives filesystems an opportunity to implement "copy acceleration" techniques,
- such as the use of reflinks (i.e., two or more inodes that share
- pointers to the same copy-on-write disk blocks)
- or server-side-copy (in the case of NFS).
-+.SH BUGS
-+In Linux kernels 5.3 to 5.11,
-+cross-filesystem copies were implemented by the kernel,
-+if the operation was not supported by individual filesystems.
-+However, on some virtual filesystems,
-+the call failed to copy, while still reporting success.
- .SH EXAMPLES
- .EX
- #define _GNU_SOURCE
+diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
+index 524dbdfb7184..801a5300f765 100644
+--- a/fs/cifs/misc.c
++++ b/fs/cifs/misc.c
+@@ -738,13 +738,11 @@ void
+ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
+ {
+ 	struct cifsFileInfo *cfile;
+-	struct cifsInodeInfo *cinode;
+ 	struct list_head *tmp;
+ 
+ 	spin_lock(&tcon->open_file_lock);
+ 	list_for_each(tmp, &tcon->openFileList) {
+ 		cfile = list_entry(tmp, struct cifsFileInfo, tlist);
+-		cinode = CIFS_I(d_inode(cfile->dentry));
+ 		if (delayed_work_pending(&cfile->deferred))
+ 			mod_delayed_work(deferredclose_wq, &cfile->deferred, 0);
+ 	}
 -- 
-2.31.1
+2.17.1
 
