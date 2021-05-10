@@ -7,66 +7,112 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A61FFC433ED
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 01:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CF5DC433ED
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 04:26:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81513613B6
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 01:52:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D876E61006
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 04:26:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230096AbhEJBxU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 9 May 2021 21:53:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36810 "EHLO
+        id S229642AbhEJE1u (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 May 2021 00:27:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230079AbhEJBxT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 May 2021 21:53:19 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABE6CC061573
-        for <linux-cifs@vger.kernel.org>; Sun,  9 May 2021 18:52:15 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id f12so6252506ljp.2
-        for <linux-cifs@vger.kernel.org>; Sun, 09 May 2021 18:52:15 -0700 (PDT)
+        with ESMTP id S229569AbhEJE1u (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 May 2021 00:27:50 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FDB2C061573;
+        Sun,  9 May 2021 21:26:46 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id w13so792706ilv.11;
+        Sun, 09 May 2021 21:26:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=9aUe7NOn+caUBMLc8vLfdWJteR614E3Q5fxCfIWMMsw=;
-        b=ANTp81Uftnq4z4tj4sdPItti+PzWq4aAvl+OKgV3UkC/lH0CZHINrHV6jM4zpcdc+n
-         SETzftf8o/3A7I1RbNmFToE9J2TbXSv6qrq7RbiQf7jgtTDTby89EdvEfx7N3QCQuy40
-         nbuPVgV8M3V9J1u3bYS52+Z9xxTS9loIugz8Nu1nWuiwV1k4rFIS5GhJxsYBloom+zZ5
-         XDpyjFFeJtqWEML+YSSVqDatZEGDxCGB8yXMyjNYljgM065uK+LIQXJZFQtRO73GeylO
-         JugCk61/kdJRPiPf2vRwtBTL8uSc2ZalfIDs6y+CTenb8ur57yzdN7GWjxtQX7Xhvrds
-         PGAQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vrW6spNhSrHQfksBCubidylUZF4PsPIbB3rPZO64ujI=;
+        b=maMV82VdZ+6NVY1H1vUwxTqXy0nXFpllHSIJ/tyCXiwj9kE0LCybDNLh4PhzoP7aVE
+         YoOi2jEd7ZfhUFyLEa2yiFCg2G0lnQ52DEOXXYCtn+JOxlrmUytOXJxIbXydU8ixOHvl
+         q1XrwslzrWDiizvyPzeB4pwn9kb6bKR0zDi4/3ued811MlgT5DJwX8fqzElF7rEmEiIN
+         JC1UvngquTTbQYaZNe00U3qPgFxpW3hvPUDuPWo14ZnNrUuGRfh0RtTx+nHEP5F8Ehwz
+         cmCrTFy6AKYWTdpWHwxxlGQrBH6jXLvfNog9Itvgv9e4VJR0tF3D+Qr2sN4gbzL9V/MQ
+         DjIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=9aUe7NOn+caUBMLc8vLfdWJteR614E3Q5fxCfIWMMsw=;
-        b=htjVxmgr1EapR57jP9wCSKKb5OQdIw0iCcG84qiICiNOWsKzxBDYCkxNlykIt+/dWZ
-         Rvd07AAy6PAACRi2q77lG+AipVJstJ+CioXTU+0RsSJ0H7OwaVQnxPzgvJ+3Zli+XWMU
-         RsnlCs/LikiDmJ/aC4KBGZzzvTDUKSDWOSP2bWYo8pYpXsXomF7kzlmokZzbmKytLxYz
-         70I8aPdvLiLi+J0o4FEZWlbLhrE2xVY9LSt1P25hv5MCWkl53QmA7sXybzmOGjy2WIlY
-         NowRbV4T2Gj6p5MNVKwvkqw2qyrIVos2hbqu/sQlCY+qK02LS+vLYXJuRdRF91KmoJSZ
-         CPDA==
-X-Gm-Message-State: AOAM533sRoXJxpBviugb3x2BJOGg5Kaxrvxc6/uI5HwD/fShIZQ6qu38
-        r6r6VqMKYXhA7aR6M0X8T/T22xuj+wO7MkKg/pENOs5Y5n4=
-X-Google-Smtp-Source: ABdhPJzE6bSwVWYaay5Z9IRq/QtujLlriabA4aEBSvTiZl+usFHdTbhw1Md0H9VNxIRRehcDvVXfvBr69ihBFbpGzQ8=
-X-Received: by 2002:a2e:b8d2:: with SMTP id s18mr18366291ljp.148.1620611533090;
- Sun, 09 May 2021 18:52:13 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vrW6spNhSrHQfksBCubidylUZF4PsPIbB3rPZO64ujI=;
+        b=MrOPpdZ5wANG5RnpxJLylN6Mm4toHi2jkJracIDxw1maW/t5STCrufNo1joPikN0ei
+         bbkohS8pe6eW/glliM635/VuUZ+Kf1TkPINZPqmM+1Gkv0BOWuC7D+6PvYdr3WHbrIyM
+         2geS80O9JfPcd9FyXTqOnhdU0GbckIl03D80sJ+LXHh8jjqidqSNYE3P+GuvOKCWYr1U
+         IlddQHaQKx2bO8bM0CwNYOGUcYB1415hzeDR16UqAm5c7zSL422fBWoslOTJisuK9TlT
+         zFVp8PEBipp/wlWGEv/TO/tXAxekMjlYfeEbfIBRGYddcNOmwEfTp4bBezD1B879K1t4
+         m+nA==
+X-Gm-Message-State: AOAM533kkS1afMP1RqTZRF+ekS6EK0axVodxt/GZRqbax3oJsXAspWv6
+        q57MBJyw5EKbPU/YjHap4qIc0KtlgRy+TRJ0KXc=
+X-Google-Smtp-Source: ABdhPJxrhdp8bUdHz5FwO47aZSX+yN3CdPcXDTAW/eIBd6hg2GtSC8JJuxS00T9WmDG2mjyZ7CDbKZl2xrtx3BZ15gU=
+X-Received: by 2002:a92:de0c:: with SMTP id x12mr20195626ilm.275.1620620806016;
+ Sun, 09 May 2021 21:26:46 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 9 May 2021 20:52:02 -0500
-Message-ID: <CAH2r5mvEySqFgn66+OON+vV2r3RrBNSfvmMeeMm-u3vPPikABA@mail.gmail.com>
-Subject: rapages mount option and xfstests
-To:     CIFS <linux-cifs@vger.kernel.org>
+References: <20210509213930.94120-1-alx.manpages@gmail.com>
+ <20210509213930.94120-12-alx.manpages@gmail.com> <a95d7a31-2345-8e1e-78d7-a1a8f7161565@gmail.com>
+In-Reply-To: <a95d7a31-2345-8e1e-78d7-a1a8f7161565@gmail.com>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Mon, 10 May 2021 07:26:35 +0300
+Message-ID: <CAOQ4uxgB+sZ08jB+mFXuPJfTSJUV+Re5XKQ=hN7A4xfYo0dj6A@mail.gmail.com>
+Subject: Re: [PATCH] copy_file_range.2: Update cross-filesystem support for 5.12
+To:     "Michael Kerrisk (man-pages)" <mtk.manpages@gmail.com>
+Cc:     Alejandro Colomar <alx.manpages@gmail.com>,
+        linux-man <linux-man@vger.kernel.org>,
+        Luis Henriques <lhenriques@suse.de>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Steve French <sfrench@samba.org>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Nicolas Boichat <drinkcat@chromium.org>,
+        Ian Lance Taylor <iant@google.com>,
+        Luis Lozano <llozano@chromium.org>,
+        Andreas Dilger <adilger@dilger.ca>,
+        Olga Kornievskaia <aglo@umich.edu>,
+        Christoph Hellwig <hch@infradead.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Walter Harms <wharms@bfs.de>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Interesting to see tests where setting rapages (4 x rsize seems fine)
-seems to help with xfstests - e.g. improves the run of test
-generic/310 a lot from 197 seconds down to 153 (with multichannel, 4
-channels to Azure) - but most xfstests don't do a lot of sequential
-reads from the page cache apparently.
+On Mon, May 10, 2021 at 3:01 AM Michael Kerrisk (man-pages)
+<mtk.manpages@gmail.com> wrote:
+>
+> Hi Alex,
+>
+> On 5/10/21 9:39 AM, Alejandro Colomar wrote:
+> > Linux 5.12 fixes a regression.
 
--- 
+Nope.
+That never happened:
+https://lore.kernel.org/linux-fsdevel/8735v4tcye.fsf@suse.de/
+
+> >
+> > Cross-filesystem (introduced in 5.3) copies were buggy.
+> >
+> > Move the statements documenting cross-fs to BUGS.
+> > Kernels 5.3..5.11 should be patched soon.
+> >
+> > State version information for some errors related to this.
+>
+> Thanks. Patch applied.
+
+I guess that would need to be reverted...
+
 Thanks,
-
-Steve
+Amir.
