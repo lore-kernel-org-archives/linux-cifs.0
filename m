@@ -2,220 +2,71 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EA9C433B4
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 00:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A61FFC433ED
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 01:52:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1ABBF60FE9
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 00:01:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81513613B6
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 01:52:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbhEJACg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 9 May 2021 20:02:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41120 "EHLO
+        id S230096AbhEJBxU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 9 May 2021 21:53:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229853AbhEJACg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 May 2021 20:02:36 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BFE3C061573;
-        Sun,  9 May 2021 17:01:32 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id j6-20020a17090adc86b02900cbfe6f2c96so9237924pjv.1;
-        Sun, 09 May 2021 17:01:32 -0700 (PDT)
+        with ESMTP id S230079AbhEJBxT (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 May 2021 21:53:19 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABE6CC061573
+        for <linux-cifs@vger.kernel.org>; Sun,  9 May 2021 18:52:15 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id f12so6252506ljp.2
+        for <linux-cifs@vger.kernel.org>; Sun, 09 May 2021 18:52:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=cc:subject:to:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=RCbsF0rsHchNF4Z47MfeXnkE48Z3YPKTAxzeoF4KGWI=;
-        b=F6s38GpEolJEV6UGVlzsKCgWD0v7DhR4sgKU1BhtB9dZRsJfeiuzHIYDSDqVjBhGWW
-         eTjRswb2/t70afCmqzQchfJgpGjsypQFx60HAnuxQjG0VGYM4egd6wAg6tHSvNqcI07X
-         xtlTL6QGfRdixmDBFIFjA7mAnxbJOuHHs+N00SSK6cy0xUAT5kSDySd/bwyTQxkZM++9
-         a7I2xMkt97CpFjXZDrPvZIZooVnNPfFiJ7qP6DBBeHdJLw+kRHHRHSK8O72YnQ6xwYC0
-         fUdGPnvW4O/aocrYuKf3LmyAwJAtu3OCvOhCBiU+VA4h8yklvgmWOQOZbM3LnfNRA2PI
-         0qFA==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=9aUe7NOn+caUBMLc8vLfdWJteR614E3Q5fxCfIWMMsw=;
+        b=ANTp81Uftnq4z4tj4sdPItti+PzWq4aAvl+OKgV3UkC/lH0CZHINrHV6jM4zpcdc+n
+         SETzftf8o/3A7I1RbNmFToE9J2TbXSv6qrq7RbiQf7jgtTDTby89EdvEfx7N3QCQuy40
+         nbuPVgV8M3V9J1u3bYS52+Z9xxTS9loIugz8Nu1nWuiwV1k4rFIS5GhJxsYBloom+zZ5
+         XDpyjFFeJtqWEML+YSSVqDatZEGDxCGB8yXMyjNYljgM065uK+LIQXJZFQtRO73GeylO
+         JugCk61/kdJRPiPf2vRwtBTL8uSc2ZalfIDs6y+CTenb8ur57yzdN7GWjxtQX7Xhvrds
+         PGAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:cc:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=RCbsF0rsHchNF4Z47MfeXnkE48Z3YPKTAxzeoF4KGWI=;
-        b=RAy7B7sl2rLIPviusVgn/XiorCCllLWcXTWpjPCvaiBcBZoTZuUkj8ac3W3UTlQMW3
-         y9whGHgveE/wasP/w2EYmh1c0duHPHBh9yDZz80ytrdKYxdbnny4mr88PnE8gi91ipVk
-         uvngniPn192LHxDawqIxQMvHb5Q6gTBk5CAdb5YupjZ+APRMWfh293GfvO/6S+NE7PvU
-         EXbjfGAoc2Qvycf1hl2kygIDMGc/xYruA8ShPzgyUdrW69F8L0dFAHucKB51YsuBcxOL
-         yhW7T+Hnxl1oqdU19uOEeJguAYOy7v8q2bMmx7/XbjTgQinB8YDZp0cusrDWLJlgZf5f
-         h5HA==
-X-Gm-Message-State: AOAM532qR1sccScM4L9VJtbvx6Xjd2VFJZfzbM4M/wOaAG6ApqkfxXHF
-        F5iVdvxoB3NU6Joxj9oiyD4=
-X-Google-Smtp-Source: ABdhPJx/WcYYj3yWUknHesGy1DMzm/LquwtgJQXW4aClNXHF34qK6pR3cH2MiYV2mW6a7a8KYAKCNQ==
-X-Received: by 2002:a17:90a:a384:: with SMTP id x4mr24408383pjp.201.1620604891941;
-        Sun, 09 May 2021 17:01:31 -0700 (PDT)
-Received: from [192.168.192.21] (47-72-82-130.dsl.dyn.ihug.co.nz. [47.72.82.130])
-        by smtp.gmail.com with ESMTPSA id q24sm9334079pgb.19.2021.05.09.17.01.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 May 2021 17:01:31 -0700 (PDT)
-Cc:     mtk.manpages@gmail.com, linux-man@vger.kernel.org,
-        Luis Henriques <lhenriques@suse.de>,
-        Amir Goldstein <amir73il@gmail.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Steve French <sfrench@samba.org>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Nicolas Boichat <drinkcat@chromium.org>,
-        Ian Lance Taylor <iant@google.com>,
-        Luis Lozano <llozano@chromium.org>,
-        Andreas Dilger <adilger@dilger.ca>,
-        Olga Kornievskaia <aglo@umich.edu>,
-        Christoph Hellwig <hch@infradead.org>,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        Walter Harms <wharms@bfs.de>
-Subject: Re: [PATCH] copy_file_range.2: Update cross-filesystem support for
- 5.12
-To:     Alejandro Colomar <alx.manpages@gmail.com>
-References: <20210509213930.94120-1-alx.manpages@gmail.com>
- <20210509213930.94120-12-alx.manpages@gmail.com>
-From:   "Michael Kerrisk (man-pages)" <mtk.manpages@gmail.com>
-Message-ID: <a95d7a31-2345-8e1e-78d7-a1a8f7161565@gmail.com>
-Date:   Mon, 10 May 2021 12:01:20 +1200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=9aUe7NOn+caUBMLc8vLfdWJteR614E3Q5fxCfIWMMsw=;
+        b=htjVxmgr1EapR57jP9wCSKKb5OQdIw0iCcG84qiICiNOWsKzxBDYCkxNlykIt+/dWZ
+         Rvd07AAy6PAACRi2q77lG+AipVJstJ+CioXTU+0RsSJ0H7OwaVQnxPzgvJ+3Zli+XWMU
+         RsnlCs/LikiDmJ/aC4KBGZzzvTDUKSDWOSP2bWYo8pYpXsXomF7kzlmokZzbmKytLxYz
+         70I8aPdvLiLi+J0o4FEZWlbLhrE2xVY9LSt1P25hv5MCWkl53QmA7sXybzmOGjy2WIlY
+         NowRbV4T2Gj6p5MNVKwvkqw2qyrIVos2hbqu/sQlCY+qK02LS+vLYXJuRdRF91KmoJSZ
+         CPDA==
+X-Gm-Message-State: AOAM533sRoXJxpBviugb3x2BJOGg5Kaxrvxc6/uI5HwD/fShIZQ6qu38
+        r6r6VqMKYXhA7aR6M0X8T/T22xuj+wO7MkKg/pENOs5Y5n4=
+X-Google-Smtp-Source: ABdhPJzE6bSwVWYaay5Z9IRq/QtujLlriabA4aEBSvTiZl+usFHdTbhw1Md0H9VNxIRRehcDvVXfvBr69ihBFbpGzQ8=
+X-Received: by 2002:a2e:b8d2:: with SMTP id s18mr18366291ljp.148.1620611533090;
+ Sun, 09 May 2021 18:52:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210509213930.94120-12-alx.manpages@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 9 May 2021 20:52:02 -0500
+Message-ID: <CAH2r5mvEySqFgn66+OON+vV2r3RrBNSfvmMeeMm-u3vPPikABA@mail.gmail.com>
+Subject: rapages mount option and xfstests
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Alex,
-
-On 5/10/21 9:39 AM, Alejandro Colomar wrote:
-> Linux 5.12 fixes a regression.
-> 
-> Cross-filesystem (introduced in 5.3) copies were buggy.
-> 
-> Move the statements documenting cross-fs to BUGS.
-> Kernels 5.3..5.11 should be patched soon.
-> 
-> State version information for some errors related to this.
-
-Thanks. Patch applied.
-
-Cheers,
-
-Michael
-
-> 
-> Reported-by: Luis Henriques <lhenriques@suse.de>
-> Reported-by: Amir Goldstein <amir73il@gmail.com>
-> Related: <https://lwn.net/Articles/846403/>
-> Cc: Greg KH <gregkh@linuxfoundation.org>
-> Cc: Michael Kerrisk <mtk.manpages@gmail.com>
-> Cc: Anna Schumaker <anna.schumaker@netapp.com>
-> Cc: Jeff Layton <jlayton@kernel.org>
-> Cc: Steve French <sfrench@samba.org>
-> Cc: Miklos Szeredi <miklos@szeredi.hu>
-> Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
-> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> Cc: "Darrick J. Wong" <darrick.wong@oracle.com>
-> Cc: Dave Chinner <dchinner@redhat.com>
-> Cc: Nicolas Boichat <drinkcat@chromium.org>
-> Cc: Ian Lance Taylor <iant@google.com>
-> Cc: Luis Lozano <llozano@chromium.org>
-> Cc: Andreas Dilger <adilger@dilger.ca>
-> Cc: Olga Kornievskaia <aglo@umich.edu>
-> Cc: Christoph Hellwig <hch@infradead.org>
-> Cc: ceph-devel <ceph-devel@vger.kernel.org>
-> Cc: linux-kernel <linux-kernel@vger.kernel.org>
-> Cc: CIFS <linux-cifs@vger.kernel.org>
-> Cc: samba-technical <samba-technical@lists.samba.org>
-> Cc: linux-fsdevel <linux-fsdevel@vger.kernel.org>
-> Cc: Linux NFS Mailing List <linux-nfs@vger.kernel.org>
-> Cc: Walter Harms <wharms@bfs.de>
-> Signed-off-by: Alejandro Colomar <alx.manpages@gmail.com>
-> ---
->  man2/copy_file_range.2 | 27 +++++++++++++++++++++++----
->  1 file changed, 23 insertions(+), 4 deletions(-)
-> 
-> diff --git a/man2/copy_file_range.2 b/man2/copy_file_range.2
-> index 467a16300..843e02241 100644
-> --- a/man2/copy_file_range.2
-> +++ b/man2/copy_file_range.2
-> @@ -169,6 +169,9 @@ Out of memory.
->  .B ENOSPC
->  There is not enough space on the target filesystem to complete the copy.
->  .TP
-> +.BR EOPNOTSUPP " (since Linux 5.12)"
-> +The filesystem does not support this operation.
-> +.TP
->  .B EOVERFLOW
->  The requested source or destination range is too large to represent in the
->  specified data types.
-> @@ -184,10 +187,17 @@ or
->  .I fd_out
->  refers to an active swap file.
->  .TP
-> -.B EXDEV
-> +.BR EXDEV " (before Linux 5.3)"
-> +The files referred to by
-> +.IR fd_in " and " fd_out
-> +are not on the same filesystem.
-> +.TP
-> +.BR EXDEV " (since Linux 5.12)"
->  The files referred to by
->  .IR fd_in " and " fd_out
-> -are not on the same mounted filesystem (pre Linux 5.3).
-> +are not on the same filesystem,
-> +and the source and target filesystems are not of the same type,
-> +or do not support cross-filesystem copy.
->  .SH VERSIONS
->  The
->  .BR copy_file_range ()
-> @@ -200,8 +210,11 @@ Areas of the API that weren't clearly defined were clarified and the API bounds
->  are much more strictly checked than on earlier kernels.
->  Applications should target the behaviour and requirements of 5.3 kernels.
->  .PP
-> -First support for cross-filesystem copies was introduced in Linux 5.3.
-> -Older kernels will return -EXDEV when cross-filesystem copies are attempted.
-> +Since Linux 5.12,
-> +cross-filesystem copies can be achieved
-> +when both filesystems are of the same type,
-> +and that filesystem implements support for it.
-> +See BUGS for behavior prior to 5.12.
->  .SH CONFORMING TO
->  The
->  .BR copy_file_range ()
-> @@ -226,6 +239,12 @@ gives filesystems an opportunity to implement "copy acceleration" techniques,
->  such as the use of reflinks (i.e., two or more inodes that share
->  pointers to the same copy-on-write disk blocks)
->  or server-side-copy (in the case of NFS).
-> +.SH BUGS
-> +In Linux kernels 5.3 to 5.11,
-> +cross-filesystem copies were implemented by the kernel,
-> +if the operation was not supported by individual filesystems.
-> +However, on some virtual filesystems,
-> +the call failed to copy, while still reporting success.
->  .SH EXAMPLES
->  .EX
->  #define _GNU_SOURCE
-> 
-
+Interesting to see tests where setting rapages (4 x rsize seems fine)
+seems to help with xfstests - e.g. improves the run of test
+generic/310 a lot from 197 seconds down to 153 (with multichannel, 4
+channels to Azure) - but most xfstests don't do a lot of sequential
+reads from the page cache apparently.
 
 -- 
-Michael Kerrisk
-Linux man-pages maintainer; http://www.kernel.org/doc/man-pages/
-Linux/UNIX System Programming Training: http://man7.org/training/
+Thanks,
+
+Steve
