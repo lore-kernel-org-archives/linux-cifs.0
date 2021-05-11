@@ -2,117 +2,79 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDCBC433ED
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 10:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC80C433B4
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 13:03:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4381461164
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 10:39:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8CE0611CB
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 13:03:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230166AbhEKKlC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 May 2021 06:41:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53092 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229892AbhEKKlC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 May 2021 06:41:02 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D840C061574
-        for <linux-cifs@vger.kernel.org>; Tue, 11 May 2021 03:39:56 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id u19-20020a0568302493b02902d61b0d29adso16315657ots.10
-        for <linux-cifs@vger.kernel.org>; Tue, 11 May 2021 03:39:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=mdcqW+KWuNLspQeI0uQffB9x0etiRD+WGNtdXxIgjjk=;
-        b=CTeA09hNnzrp19VfquqQW2UbagKV3OIFdYYLlmy5lYWiyOO6V9AcUcNzlt1vBOjjtM
-         tkgQc7CGxYrzcmz/2LXbekcgNnxuH2Q3aT1g1URNB8obMUMs57ZQUc/PiYkc69rse+ou
-         ZuW8fUdzV8tuAT15T4C/F+fwzoxwUh+2HynKf57UqqELOPUyYt5cePj1fSiK1yWbATME
-         Ujp3wrJcDAmJmduw13sGPaccedgM4Rp2NSuyfZ/lfhqMXr3y4ZRR/OOI4s78p6yTivV3
-         lgZS7emnCxbxYcFU8BC8EGV5DlIKYUnvmjs4L1vcNfl/qmbb1v3jPAKlnCu3qGdiqOmZ
-         f62w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=mdcqW+KWuNLspQeI0uQffB9x0etiRD+WGNtdXxIgjjk=;
-        b=oOXpNRQ1tBmokE8ht/ekk41KFRkb5OeQe9WOV1yVz/zgnZhMUOfablMHgBLhCeBU9X
-         I3Q+Pjv16jjzRQ1CJEGaT3vLlI0Q+mRo2pMvYZ/ArNv5RJEsxDvjPcYWOIWSqr1bargb
-         3h9R0wJ8/ci/OO9kxUiOKJ4HMSKB84XViynWzRcASbJR/WEm8RGyrYKBYMjWkASVqh/m
-         jKNW3c1hjyNflf7Oln1xcwKbiZcwy2OUavJAPRn9YigCUhUiBR+bZTRVAwWnZNoUNf4p
-         XVF9xKRwtGMkhueW9wEv4/g/5Du20LxC+uvU3Oy2Tt7Cgka+PqX7bhd7mBbabQrpkbkB
-         /3bg==
-X-Gm-Message-State: AOAM531cZ2Sk2ycdVvYv1m75N9ymSXSpCYzDFKtDTRFpsQUQqSOq7lth
-        6cWvxkSX2b08Hs07ErYy3BOBPgvaaQQlXBB2Ya/+sILQd/7roA==
-X-Google-Smtp-Source: ABdhPJywpy0SygRMx7iuZ8xIaIGE9UuuwN+pvt8osg9Z7tiqZ3mHfGNMJuv1Fq+m1kRVziqde/Yd31YAszLFVYHbOA8=
-X-Received: by 2002:a05:6830:349b:: with SMTP id c27mr7849160otu.251.1620729594970;
- Tue, 11 May 2021 03:39:54 -0700 (PDT)
+        id S231455AbhEKNEi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 May 2021 09:04:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22148 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230494AbhEKNEf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 11 May 2021 09:04:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620738208;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wEXY8BTqa3d3uYB2YjcuwQfVE+POd7RJ8n0NUW4FWKQ=;
+        b=WcH6ZTVjfMuYQlhcGA1dCqDY8WmKqDiF/9s7Izunj9shVoNSKnQ2BrgjiIURlJEBUY1gUv
+        ZpeOYmLsVyyw5Dz2ML1/i7nO3ahhoiDyJ0eDD3AMNaaMptZOkFAODNVonDgnnrVS8yy1F9
+        N84Lr4/aXfJPDRQ19ESb28Onn7DYcbc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-9PDcTZLuOZaP9USgtjLcrQ-1; Tue, 11 May 2021 09:03:25 -0400
+X-MC-Unique: 9PDcTZLuOZaP9USgtjLcrQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69F6E19611BE;
+        Tue, 11 May 2021 13:03:24 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A2B7F60C04;
+        Tue, 11 May 2021 13:03:23 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAH2r5ms+NL=J2Wa=wY2doV450qL8S97gnJW_4eSCp1aiz1SEZA@mail.gmail.com>
+References: <CAH2r5ms+NL=J2Wa=wY2doV450qL8S97gnJW_4eSCp1aiz1SEZA@mail.gmail.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     dhowells@redhat.com, linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: Compile warning with current kernel and netfs
 MIME-Version: 1.0
-References: <CAEVyU88zhTKVrbk-+YCrd4fTN=za8906CwFFGzDk0OovSD4=QA@mail.gmail.com>
- <877dkcuj8k.fsf@suse.com> <CAEVyU89=egaEAdvCD=FVkLwP4akzY3y8q=0hFW-hSryq0sxnxg@mail.gmail.com>
- <871rajv9ug.fsf@suse.com>
-In-Reply-To: <871rajv9ug.fsf@suse.com>
-From:   Calvin Chiang <calvin.chiang@gmail.com>
-Date:   Tue, 11 May 2021 12:39:43 +0200
-Message-ID: <CAEVyU88hgNyNgscCHf_GSNNDYbjPWSyH2033fbDEBXM2oLCiQQ@mail.gmail.com>
-Subject: Re: Unable to find pw entry for uid
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2509399.1620738202.1@warthog.procyon.org.uk>
+Date:   Tue, 11 May 2021 14:03:22 +0100
+Message-ID: <2509400.1620738202@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-many thanks Aurelien for helping a newbie to get started!
-just getting this setup now. i'll post back if i manage to find something.
+Steve French <smfrench@gmail.com> wrote:
 
-On Thu, 6 May 2021 at 23:19, Aur=C3=A9lien Aptel <aaptel@suse.com> wrote:
->
-> Calvin Chiang <calvin.chiang@gmail.com> writes:
-> > I guess after i make the change in the cifs.upcall.c file i need to
-> > autoreconf /config /make /make install ?
-> > is it correct that this will overwrite all the files from the
-> > cifs-utils package on my machine?
->
-> Yes you need to make sure you have all the dependencies required to
-> build cifs.upcall (your package manager of your distro might provide a
-> way to get 'build dependencies' of a package). If it's missing some the
-> configure script might disable the build of cifs.upcall so make sure it
-> is built. You can run
->
-> as regular user:
->
->    autoreconf -i
->    ./configure
->    make
->
-> Check where is installed your current cifs.upcall ($ whereis
-> cifs.upcall) usually it's in /usr/sbin/. I would recommend keeping a
-> copy of the old one.
->
-> as root (or sudo):
->
-> make backup once:
->
->     cp /usr/sbin/cifs.upcall{,.backup}
->
-> then to build and use new one (rm is to make sure it is rebuilt):
->
->      rm -f cifs.upcall && make && sudo cp cifs.upcall /usr/sbin/
->
-> Good luck
->
-> Cheers,
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
->
+>   CC [M]  /home/smfrench/cifs-2.6/fs/cifs/fscache.o
+>   CHECK   /home/smfrench/cifs-2.6/fs/cifs/fscache.c
+> /home/smfrench/cifs-2.6/fs/cifs/fscache.c: note: in included file
+> (through include/linux/fscache.h,
+> /home/smfrench/cifs-2.6/fs/cifs/fscache.h):
+> ./include/linux/netfs.h:93:15: error: don't know how to apply mode to
+> unsigned int enum netfs_read_source
+
+Yeah - that's a bit the checker doesn't know how to support.  It's meant to
+make enum netfs_read_source-type struct members take less space.  I think gcc
+and clang are both fine with it.
+
+David
+
