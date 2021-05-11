@@ -2,75 +2,92 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAFC5C433ED
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 23:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7C49C433ED
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 02:01:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A45860E09
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 May 2021 23:36:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84DEE6147E
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 02:01:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbhEJXhk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 May 2021 19:37:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46032 "EHLO
+        id S230157AbhEKCC0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 May 2021 22:02:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbhEJXhk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 May 2021 19:37:40 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F06C061574;
-        Mon, 10 May 2021 16:36:34 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id x2so25871780lff.10;
-        Mon, 10 May 2021 16:36:34 -0700 (PDT)
+        with ESMTP id S229948AbhEKCCZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 May 2021 22:02:25 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9907C061574;
+        Mon, 10 May 2021 19:01:18 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id b7so23186082ljr.4;
+        Mon, 10 May 2021 19:01:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to:cc;
-        bh=1vLdoMc436V5vLkM/SG9lcVa+pKt53d4Ho0rY0HJLfc=;
-        b=HXOpcvY8PWrOtEAuDNbElzaBcbgypIoio4lEwgCBpMZIShlIzqBgXtbmYvW3Y01XzC
-         gBS7Ky0IdiL/qcwbZ1sBrNoYsWxNsiX3xuzGae1SDlk8JK8ecK22xeUN/ZqXHbxPpcj7
-         2aNt9y0N/1teetxGUGyFEBG+GgF8j5IQ4VJzxrXGPYckzBcCrzbvPN24iwo4Fv5leSNA
-         Fu0LzFyK6kbgAh1IM6pbD1pacRwaOa61gUl32IxOMlBVZq3NgkYDlgM/xCJC4jpawR95
-         h6OrrGlQAmnAfIwm9cwIrAAdU5hjESFjs/YcTIqVD/RyrXV9gSZBXmXhlpX49Fl04OCm
-         sfiQ==
+        bh=ioUucnPMgSC35CAEteVQQzvC39GoLoRBdeWSll6aTjw=;
+        b=W3w/DGZ0s20SCuV3fP+RzIHYkBmaYWNGNYcga+8x0AR159vBXyDAdsv2XeUNECZtHQ
+         GJtHneEjES6alZ9O+W0D3ZIObK4RBChEYeETe4paAHwUDAZfw5/tMB5v3iC8b6FSQB9h
+         NvdqBbTCPvzG+uJyojGhKDHUnemC8m125BuTddH914jtpFcm5z2+lJHHoXSxRk2WEqu4
+         JkDUPdGiVjsN1LGuRHZss6KFW5d1gDtCOQMCxWRt2+H35KyhJGa/V03TDZnc+Dkt+Plj
+         4ITLpJ8BYcn+9YYx+q1LGeO0xzwEBnByAwo0ikcXWpNYrhc/0Eh/q2lHwn1VLy/UpG5d
+         jZiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=1vLdoMc436V5vLkM/SG9lcVa+pKt53d4Ho0rY0HJLfc=;
-        b=Y+cVZ035Pn74c/eAk4sPXNN3cUqnfTzAS2220OK7yfQfPzp07jcf4iIDbR9cw5TkkF
-         DaKHTIEw3h7T3ja+ezDg9AK1PUxKHEBJKss7ZdN7aU1Y6/KRim8GQUjQhd0+2HwM3Bhn
-         6jrjP6qInWQawGUHnn4OMRSNy9homPpkaIUFkMiq+G0DFQipp2T+CPId0LaLLze4OhHW
-         IX8bSZnxnca0LejwJRyKl/cBPIgOu/mgwR3x/ACsqP4rPrRTBGaiQ4oHwCW1/Sa8Celn
-         FiwS7/NLE34iMoPxCMC0eMXGhsP+jwwKl16LxwNQYFTEdVwjCBDDZMZ7kdzWWsMAV24y
-         /PZw==
-X-Gm-Message-State: AOAM532ZtdbYjn5Ab6JVeOf27v15ixeew9jNCf6iG27GkgHFw2TBoBsc
-        mac7ahRvpe2rRqoUJ3ZAr/MmFfDPfTsCZcGwl3JY853AdyCUNg==
-X-Google-Smtp-Source: ABdhPJw1SI0MRnGPPtZfzIIMcPqt73V+WOITPpHN1gISMKHTWFjGrBfizgYMWD3HWZce3HWVawlSOYG59wnLWNf9leU=
-X-Received: by 2002:a19:614e:: with SMTP id m14mr18062622lfk.395.1620689793374;
- Mon, 10 May 2021 16:36:33 -0700 (PDT)
+        bh=ioUucnPMgSC35CAEteVQQzvC39GoLoRBdeWSll6aTjw=;
+        b=IKE28lxW5gqmkHsf434vKOlioK715hcVAuwZK1biE+VqmxAFh9If/QJgL1hJZSN1SP
+         GAhQ7/pBr9FPHUzOF7+I51uRusMHMwxA5cVvCH6AvlWaj/ZxhPcQjEpBubjldfwQqhza
+         PB4WiLbeO63kxKiFpEba60470vivAFqja6FWGZd7Z/mAx4NJQAoUVelbp65vaRGwenGt
+         FwrM+18y/ad/r/PCSCKLKZtydDR0EEJFAYHbFmyeVVdjPIlbgAsLle/nbmTn+wOh7wFT
+         rH9LUwttPSDgCcQZUJmZfEZTbHS3BuZ9xRzpmAKZE/l80e7EXgiqGt+CBxez+jysQ/K6
+         i8aQ==
+X-Gm-Message-State: AOAM532ieky3yZIKl0SXd21ek+AfD5GX4aGExQT+1DkACCh7zn7+XOUq
+        s5UQuCtFnFBxYQuHSk2rPwzaE6Fc/aCH76ZvlcU=
+X-Google-Smtp-Source: ABdhPJw6KPlnNtVpQ+JK5HiMrKbA3XNWidJlNU3GyUMmZ1Yc478mHRK91Ujyr4kaQwSCW7TpH05qlwK86qUi5aYm24U=
+X-Received: by 2002:a2e:b8d2:: with SMTP id s18mr22527423ljp.148.1620698477409;
+ Mon, 10 May 2021 19:01:17 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 10 May 2021 18:36:22 -0500
-Message-ID: <CAH2r5mt1Fy6hR+Rdig0sHsOS8fVQDsKf9HqZjvjORS3R-7=RFw@mail.gmail.com>
-Subject: fanotify and network/cluster fs
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Date:   Mon, 10 May 2021 21:01:06 -0500
+Message-ID: <CAH2r5ms+NL=J2Wa=wY2doV450qL8S97gnJW_4eSCp1aiz1SEZA@mail.gmail.com>
+Subject: Compile warning with current kernel and netfs
+To:     David Howells <dhowells@redhat.com>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-With the recent changes to fanotify (e.g.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7cea2a3c505e)
-has there been any additional discussion of what it would take to
-allow fanotify to be supported for network/cluster fs (all major
-dialects supported by cifs.ko support sending notify requests to the
-server - but there is no way for cifs.ko to be told which notify
-requests to send as fanotify/inotify are local only in current Linux -
-unlike other OS where notify is primarily for network fs and passed
-down to the fs)
+Noticed the following netfs related new warning when compiling cifs.ko
+with the current 5.13-rc1
+
+  CC [M]  /home/smfrench/cifs-2.6/fs/cifs/fscache.o
+  CHECK   /home/smfrench/cifs-2.6/fs/cifs/fscache.c
+/home/smfrench/cifs-2.6/fs/cifs/fscache.c: note: in included file
+(through include/linux/fscache.h,
+/home/smfrench/cifs-2.6/fs/cifs/fscache.h):
+./include/linux/netfs.h:93:15: error: don't know how to apply mode to
+unsigned int enum netfs_read_source
+  CC [M]  /home/smfrench/cifs-2.6/fs/cifs/cache.o
+  CHECK   /home/smfrench/cifs-2.6/fs/cifs/cache.c
+/home/smfrench/cifs-2.6/fs/cifs/cache.c: note: in included file
+(through include/linux/fscache.h,
+/home/smfrench/cifs-2.6/fs/cifs/fscache.h):
+./include/linux/netfs.h:93:15: error: don't know how to apply mode to
+unsigned int enum netfs_read_source
+
+It doesn't like this enum in include/linux/netfs.h:
+
+enum netfs_read_source {
+        NETFS_FILL_WITH_ZEROES,
+        NETFS_DOWNLOAD_FROM_SERVER,
+        NETFS_READ_FROM_CACHE,
+        NETFS_INVALID_READ,
+} __mode(byte);
 
 -- 
 Thanks,
