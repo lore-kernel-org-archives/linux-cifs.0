@@ -2,111 +2,95 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BD95C43460
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 03:30:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD7AC433ED
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 04:34:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 367946161C
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 03:30:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16AC8615FF
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 04:34:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230126AbhEKDbf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 May 2021 23:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41614 "EHLO
+        id S229586AbhEKEfH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 May 2021 00:35:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230137AbhEKDbf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 May 2021 23:31:35 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31639C061574;
-        Mon, 10 May 2021 20:30:29 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id z9so26482742lfu.8;
-        Mon, 10 May 2021 20:30:29 -0700 (PDT)
+        with ESMTP id S229548AbhEKEfG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 May 2021 00:35:06 -0400
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36E8AC061574;
+        Mon, 10 May 2021 21:34:01 -0700 (PDT)
+Received: by mail-il1-x136.google.com with SMTP id o9so10934734ilh.6;
+        Mon, 10 May 2021 21:34:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=3C7fFNhnTXuSTSUif3G3U+Ps41gUdqPvKoJBdyO2gKY=;
-        b=OycmJoJELTYsZz0Bxg10upBlKAv2xPIXvQ11ZGsJSmiNNM7rjXQ6q/oSxj5EgxXkaq
-         mLcFildLqCf9J16YqDqUYD3zwZ2beQ6eWDuLcvnMA0HFRzhdUmwYTiKHIrDKTYqgRtS1
-         L7zYBuirTCrAuAXnxlAXygzTrqOiRNtIU4P6Y41///2gCpqqMS+D8PFgKA/GDJpvyQg9
-         DtAz2BVXYb7sIcGY4Aq/6ymsbHc2rwrC1++xMrK0PUVNQi37pJhCNgjS5znQqMEJE60F
-         GzVoozHScH/rT+0YB2OtU01picS+Ci/GowUDmzcUSSxm94yyXpjZpx3I+twzqP+uG26x
-         Y2lA==
+        bh=CfUwZWIMtFqUWOFRb1yI+FNyvJ/OkAyJSULvaCQz8ss=;
+        b=tDUb6aYMiLIvJgg2v2g0IAJwxtKWdiOE/OtwepOaxnDDG7TknHjePeJ/QtpRxKozSe
+         /n3SmfA4ZxjORGylMc4qPC3Oi7JNgruHCfLXt3bMW1dpWvfxg27KJ0dMXmDdPNuY9ayr
+         gCAhfT35p5NkVndOBmAfEK77JH+mrjKcPsFudXCXF7TX0h0iRsioq20BGEibuefPbj8e
+         T9qjO9Pjhxnns3Dde0hqTonVhnQkO8Op2+4IVdw4nQrELZ0gyE7G0m56iPM4L5iEEIv8
+         ETMqPR9gNgH35Y7uy1Gt3G/H592b/QhdXQUAWwH8Aq6WEISzXmQao86fbp4aWNy8dgZr
+         9KoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=3C7fFNhnTXuSTSUif3G3U+Ps41gUdqPvKoJBdyO2gKY=;
-        b=IHWL+OdtUqfWWbocc9pDPgg1qoH0Y7VVaOgNmrUm4+O6AEVUxZ4iI2xpDgEfB9yOJr
-         wynQHh8MD8aP6VZV2NZ+fWkVGFP8+itmWnqJQHhSMTCkPN/Uva1w1Cu4tBjwwK8dF9EP
-         baqFUADULSvOkmPOwl2qPvkpBZOfMuqN3apQK7O5F3ZKcn0RSLM/RPXMPn9/8znu8hu/
-         64ztdOR7ufAdhYJt+ejVdT3xBfA0E8IzZrSA/bOicrnQ9AM5yoZdNNNtFthB+lECyLse
-         so0WaHi9AGr18iaPbq0ppeNc4oBaBZBiMGXyiHUJMXSFQckmLnlf/XBsH495ICjaBs6m
-         Y/Mg==
-X-Gm-Message-State: AOAM531/DF2Sb0aI1qqycr6oWJVeGYNxhuW01vlW1SuAyB7P9sIT+VDr
-        RtJrqZr647kBn0AJaDEH84HH0mZGaboUfrsE4PwFJOFlw9w=
-X-Google-Smtp-Source: ABdhPJxd4DUkWbNLaav5EIAWQZ1O5Puq3inIyD4+yUHmiwTrFO4HQu03JWI4T8HZlBY3UXXZnsmG3oTWL6XJC0SjgH8=
-X-Received: by 2002:a05:6512:142:: with SMTP id m2mr19686940lfo.313.1620703827640;
- Mon, 10 May 2021 20:30:27 -0700 (PDT)
+        bh=CfUwZWIMtFqUWOFRb1yI+FNyvJ/OkAyJSULvaCQz8ss=;
+        b=TsOj1bKmGgPYv+s131CHHJiaMikRaH63BZC8ApCF/rqL1+gAX1PVWCsLwpEnuDd6c3
+         Jzrd8y33c7XLfP+jX+bNbhQzNFpvpaG/WBKCElbQRKjkVXJaeWjrP1qsf7iK9oikH8RG
+         w+0K2RmZvZpnzy/O1MaJs6EW5s19/LgNQdnFaiK4hDXKzrXRfgnT7W+5S1QmdZi6gmzM
+         nT14Tw0Oa1ZTdeYP5+MItNOfFlXCAAca5n0S64CbztpscNUSgt5EUAjL63St9HoJI2iz
+         yDO6pvFhes+qJeRvqloEZgTBOjMk4RUiAft6qdynvphFDqEDJG1AEyUXrIakj5F/G+vt
+         lmqg==
+X-Gm-Message-State: AOAM532QEKnx46XPud5dl4Zp6uVxatErv/wrhs8PosFdgDhG/FjoaHKQ
+        JSB1AjK5+z5ZivkHAWRN1CKnTF9mKIRY2qeXzajVuFDqq7A=
+X-Google-Smtp-Source: ABdhPJzHVoo8JtSicLmssQ/DW41zGysAwxl21FPZ+B17KgQfDFtNDYxVKtZyGNvANfSWDacO2WRb3EflTE6PprJ11W8=
+X-Received: by 2002:a92:b74a:: with SMTP id c10mr24010182ilm.72.1620707640614;
+ Mon, 10 May 2021 21:34:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5ms+NL=J2Wa=wY2doV450qL8S97gnJW_4eSCp1aiz1SEZA@mail.gmail.com>
-In-Reply-To: <CAH2r5ms+NL=J2Wa=wY2doV450qL8S97gnJW_4eSCp1aiz1SEZA@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 10 May 2021 22:30:16 -0500
-Message-ID: <CAH2r5mtLY6CRT2CYR--ETq4zPT87+3Eqmk-2=q7eqP+i6BoCLQ@mail.gmail.com>
-Subject: Re: Compile warning with current kernel and netfs
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+References: <CAH2r5mt1Fy6hR+Rdig0sHsOS8fVQDsKf9HqZjvjORS3R-7=RFw@mail.gmail.com>
+In-Reply-To: <CAH2r5mt1Fy6hR+Rdig0sHsOS8fVQDsKf9HqZjvjORS3R-7=RFw@mail.gmail.com>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Tue, 11 May 2021 07:33:49 +0300
+Message-ID: <CAOQ4uxigOsEUrU5-QndJujVtP9KLdjEQTm3bHjGRCFWjZCAKBw@mail.gmail.com>
+Subject: Re: fanotify and network/cluster fs
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-And forgot to mention that this is on very recent distro, has recent
-libraries etc., I had to move to Ubuntu 21.04 due to dependencies of
-eBPF and other pieces on newer libc, pahole etc
+On Tue, May 11, 2021 at 2:36 AM Steve French <smfrench@gmail.com> wrote:
+>
+> With the recent changes to fanotify (e.g.
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7cea2a3c505e)
 
-On Mon, May 10, 2021 at 9:01 PM Steve French <smfrench@gmail.com> wrote:
->
-> Noticed the following netfs related new warning when compiling cifs.ko
-> with the current 5.13-rc1
->
->   CC [M]  /home/smfrench/cifs-2.6/fs/cifs/fscache.o
->   CHECK   /home/smfrench/cifs-2.6/fs/cifs/fscache.c
-> /home/smfrench/cifs-2.6/fs/cifs/fscache.c: note: in included file
-> (through include/linux/fscache.h,
-> /home/smfrench/cifs-2.6/fs/cifs/fscache.h):
-> ./include/linux/netfs.h:93:15: error: don't know how to apply mode to
-> unsigned int enum netfs_read_source
->   CC [M]  /home/smfrench/cifs-2.6/fs/cifs/cache.o
->   CHECK   /home/smfrench/cifs-2.6/fs/cifs/cache.c
-> /home/smfrench/cifs-2.6/fs/cifs/cache.c: note: in included file
-> (through include/linux/fscache.h,
-> /home/smfrench/cifs-2.6/fs/cifs/fscache.h):
-> ./include/linux/netfs.h:93:15: error: don't know how to apply mode to
-> unsigned int enum netfs_read_source
->
-> It doesn't like this enum in include/linux/netfs.h:
->
-> enum netfs_read_source {
->         NETFS_FILL_WITH_ZEROES,
->         NETFS_DOWNLOAD_FROM_SERVER,
->         NETFS_READ_FROM_CACHE,
->         NETFS_INVALID_READ,
-> } __mode(byte);
->
-> --
-> Thanks,
->
-> Steve
+Not sure how this is related to remote fs notifications.
 
+> has there been any additional discussion of what it would take to
+> allow fanotify to be supported for network/cluster fs (all major
 
+It would take someone to pick up this RFC that was already posted
+2 years ago:
+https://lore.kernel.org/linux-fsdevel/20190507085707.GD30899@veci.piliscsaba.redhat.com/
+https://lore.kernel.org/linux-fsdevel/CAOQ4uxipauh1UXHSFt=WsiaDexqecjm4eDkVfnQXN8eYofdg2A@mail.gmail.com/
 
--- 
+> dialects supported by cifs.ko support sending notify requests to the
+> server - but there is no way for cifs.ko to be told which notify
+> requests to send as fanotify/inotify are local only in current Linux -
+> unlike other OS where notify is primarily for network fs and passed
+> down to the fs)
+>
+
+If you wait long enough, I'll get to implementing this for FUSE some day...
+But there is *really* nothing blocking cifs developers from implementing this
+and writing the specialized tests. I can help with guidance.
+
 Thanks,
-
-Steve
+Amir.
