@@ -2,165 +2,303 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5B7C433ED
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 09:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08716C433ED
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 13:46:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 699FA6108D
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 09:38:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C581761407
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 13:46:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230285AbhELJjv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 12 May 2021 05:39:51 -0400
-Received: from de-smtp-delivery-102.mimecast.com ([62.140.7.102]:52102 "EHLO
-        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230293AbhELJjt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 12 May 2021 05:39:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
-        t=1620812319;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pEVb+z5L/MOLhBEVNm5bXUnjYt9WWILi1dzLw31dE/o=;
-        b=HyQ1A3Cu+i8doxEfhpFQjtudWhhPaitIDYsLZ6a508NqD1WGDtrpvEevwkbv+50zk0/Dt/
-        KgqipeGWs0RnwInRLHu/MKtI6ScC7KpnbU6Cxwl2TfumgRPte1PdVmi20LRLawhO8EAVgB
-        N24vBGhSrmPLMY2BeKf7d6d1G4cF9Ek=
-Received: from EUR03-DB5-obe.outbound.protection.outlook.com
- (mail-db5eur03lp2059.outbound.protection.outlook.com [104.47.10.59]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- de-mta-26-w_gKg2ncNyKcVEKz1qav1w-1; Wed, 12 May 2021 11:38:38 +0200
-X-MC-Unique: w_gKg2ncNyKcVEKz1qav1w-1
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZUzRfjc9svErTubp0IUetDlD7CnXqXLIaZiqm3sXz0gQtGM1GxrrT4gmTw05zHpPU0Xwg66L49ETwp7S5vN7rk4krJVpi4AFDlGkv7SxTf0XS9PqxzdVEcvqDVmaVxx9lY0rXM1h2r0VsmFdEM/c2gp5GI4erniYG49dxtrfLcX+4qXui0Ljjg7wE+k9iJJWfFJgD+ETe1/eppn/fr1YXscoeuKE28ypVdusIlofoO/2rFz80SQHhbVMpEdak0yv5guyNPCi1nYiBrT7Nm8KH7lvZkBXlTYx3LzKLqm/JCC6ZrhASpq0XWOLIckLOglvFD6R1FHGjdQBba87YmwCwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pEVb+z5L/MOLhBEVNm5bXUnjYt9WWILi1dzLw31dE/o=;
- b=a8xOiL5BF/u7yPqYjsW9jepzZNeod0U3SlqJ97F7OfWrA606YspWiY+gs3hfa76DMWXkpXvD5IyZACtBtSIRQ1Vx5S0u6nkzXYXXzP/DO3sOgT3qFRV5dinsS61E0MSEAaKC5X8FxRNKXPdViP8FzQAmY+doIIT4VR6U+YJHx6jhjAnW28MGH1VO3Zr/glfHzqaxGoXPSUnbp7XZrv6qOcCCEaTNqswDLypC5o4K8IaGtFpE5Iv9Tc95N/64L5BjFZRZbSyCp2bMNxUsvOkANsLRYU6SMxzFqosFq5Qxxc9RJCoAG/enRBOAZAZs6jLzBNri+MKickUW0P4RPMigzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-Authentication-Results: gwmail.gwu.edu; dkim=none (message not signed)
- header.d=none;gwmail.gwu.edu; dmarc=none action=none header.from=suse.com;
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
- by VI1PR0402MB3519.eurprd04.prod.outlook.com (2603:10a6:803:8::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.26; Wed, 12 May
- 2021 09:38:36 +0000
-Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
- ([fe80::3c87:7c9e:2597:4d94%5]) with mapi id 15.20.4129.025; Wed, 12 May 2021
- 09:38:36 +0000
-From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
-To:     wenhuizhang <wenhui@gwmail.gwu.edu>
-Cc:     wenhuizhang <wenhui@gwmail.gwu.edu>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Deadstore detected by Lukas Bulwahn's CodeChecker Tool
- (ELISA group)
-In-Reply-To: <20210511223425.12863-1-wenhui@gwmail.gwu.edu>
-References: <20210509233327.22241-1-wenhui@gwmail.gwu.edu>
- <20210511223425.12863-1-wenhui@gwmail.gwu.edu>
-Date:   Wed, 12 May 2021 11:38:33 +0200
-Message-ID: <87v97os352.fsf@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [2003:fa:713:d359:b215:6aa5:3693:e486]
-X-ClientProxiedBy: ZR0P278CA0088.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:22::21) To VI1PR0402MB3359.eurprd04.prod.outlook.com
- (2603:10a6:803:3::28)
+        id S230508AbhELNrm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 May 2021 09:47:42 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41368 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230492AbhELNrm (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 12 May 2021 09:47:42 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 58A3CB1B4;
+        Wed, 12 May 2021 13:46:32 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id D59C61E08FF; Wed, 12 May 2021 15:46:31 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     <linux-fsdevel@vger.kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
+        Chao Yu <yuchao0@huawei.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        linux-cifs@vger.kernel.org, <linux-ext4@vger.kernel.org>,
+        linux-f2fs-devel@lists.sourceforge.net, <linux-mm@kvack.org>,
+        <linux-xfs@vger.kernel.org>, Miklos Szeredi <miklos@szeredi.hu>,
+        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@lst.de>, Hugh Dickins <hughd@google.com>
+Subject: [PATCH 01/11] mm: Fix comments mentioning i_mutex
+Date:   Wed, 12 May 2021 15:46:09 +0200
+Message-Id: <20210512134631.4053-1-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210512101639.22278-1-jack@suse.cz>
+References: <20210512101639.22278-1-jack@suse.cz>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost (2003:fa:713:d359:b215:6aa5:3693:e486) by ZR0P278CA0088.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:22::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4108.25 via Frontend Transport; Wed, 12 May 2021 09:38:35 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c2d7a275-5c5b-4a94-f09f-08d91529b715
-X-MS-TrafficTypeDiagnostic: VI1PR0402MB3519:
-X-Microsoft-Antispam-PRVS: <VI1PR0402MB3519AB17F4BB381DD6589748A8529@VI1PR0402MB3519.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1227;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /g6dtVoIWWGfJETEz5jKYsfWT3mwut2ElvLCoTMP3BQeRKlQeS5cBZDQV8iG804HMnPw9nY5BNzSMMQZp1g+IOTsWeu+hX+cjfRevU1kphZWuaWg1bfm3gwFuZa8rzWM3a1QH7l8RMEpjYslCBc9Z+pxViOjO4izU2S8vWCWJHl+iGZMp3dx3KjOCQeH3yf3mR78XhXacKRJb7q0G5d9CizdkmPDtAd1CvkfkXP0yNMf7DYzZOzZCVtRnEQGt5fDHgRfUhUkuj9PeHePFiKJe+4/8tq+HorjgLNQ62gNmOcROqXvMl2nYDnzhUXdW0XERiYgzHYn2OYYhDV/JAqP+cOjxzyd7Zx2cBjh+vsajQetEQZi8WC72nFaOjsYH3AGsE+e5pxMgcMR7AWkbOVKEVQ4XZd8MRtLB0I1Tabr+ULrI6sRrw9YH1uEbQ4BZpa3u1UT+nBOQHg6NOsqjdBHAE5bfvDL4dyyp3Bk7EV2PjJAtUdR9TtpKKeFvWQw7wC4Y1IdkuGqhuXg97jYonriExoolHeYBYTHBH7orNocpdkUFT5VjWzDttHN8TFmPXrC+apRcFGS59Y4GLO+YPBdJQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(346002)(136003)(376002)(366004)(396003)(38100700002)(66556008)(66476007)(5660300002)(36756003)(6916009)(2616005)(66946007)(478600001)(4326008)(54906003)(6486002)(316002)(83380400001)(8936002)(8676002)(6496006)(186003)(16526019)(66574015)(52116002)(86362001)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?WStkeVNpUlNEaDgycTZKRVJ0YUxxdnppb1JYYTBHRGg4SlhIVTVsblNJZmEr?=
- =?utf-8?B?dHFFQ3hWbzVvK2ZFTEdKemtGMXFrcGFDT2dTbklXWkpVV3V1WWdBSjB2cDBx?=
- =?utf-8?B?NEZ2MmhsRHJka3NvN2dLNGQ3am1pMWFYWTNzZkFYMEVZZ09IN3BGcENmM1ph?=
- =?utf-8?B?MlNKdGE1VFFqd1pMUDRsVXlGbk83K2Z6cnV5UkZkNVh1T0lNaTJRM0RRSkNC?=
- =?utf-8?B?eUZNSHdjK1RzWHNaU3BMdGFYeUJHaHFZN2MzT2tUbGhscVAwMXpKRmtyRG5J?=
- =?utf-8?B?NDdjVlZNYXorSVAwTWZodi8rNUh5NWpySVduME5NL1JOMjhybFcyblI3MlQz?=
- =?utf-8?B?WUVYN3F6eU1JVWNEMnh2U3crVW5NSFVIS002SGl5ZnNUNE1TT3kvN3EyS1lQ?=
- =?utf-8?B?c3VoM0tuQWdPSC9PdE96RitqR0NWd0QxT3lHY2p1aVNsRVdqRTA2cEtqNHo0?=
- =?utf-8?B?dXczMDNoL2VVY2t0SkVkTkFNdmpnRWVEZ2NRV1c2bzR4VzdGU2w2L0ZTNU1H?=
- =?utf-8?B?TFJLcGMzalBZRGR4b2NhWnNvREZRM0pIQllhT1BzN2I0ZEMzUDlvUFQraFVo?=
- =?utf-8?B?dkhXUG5ZQnBtZnF0WWYvdzB6RVo2aFFGREdqM0tmY0x5ZnB1RWc5Rm43bEFG?=
- =?utf-8?B?Yk9sMmhJa0VSVHJ5TktkOHF0cHM5ODlXd2lIQWxETkc2VHA4QWQ3bWQyWUUr?=
- =?utf-8?B?TE0xeUtjQ3dBOFlveFpuQU5oQUd5ckw3S2tFaWhFcm9iU2dKSkRVeERNbUNE?=
- =?utf-8?B?ZlQxRnhYK1cwZkdtUnljWmRGS2E0cGtsMUxRUTViZUxFMkE4UWluL0hNcmV6?=
- =?utf-8?B?Z04vM0pTY0N5RWJkNUdlRllzRGU3bWR4eDNPZVZUUXFKM29EVHlUTUVlRGph?=
- =?utf-8?B?dFB4by9MSDUzQnd3Rll5YU9ZazFreU91TVB0b2F2aCtkQnlWYWR0c0pzWE13?=
- =?utf-8?B?V1Fiei9nZTJiVENCT3JtT3J0L2NzNEZ3THJxZEhFVHd0a1ZSR09UWldPNmcx?=
- =?utf-8?B?OFE0eXA2dVZMV2JDbi9Rb2tSSVdGN3R6bDdrbm0vdjNsa0lVS0JVQ3JXQ3Bh?=
- =?utf-8?B?bFJMWFdkeGJBYkt5cm5od1VrajI1N3VCNit4M0R1RnJ1MUhzeVpxQVhVYlNJ?=
- =?utf-8?B?cDdzeXhYaVNOVm92YVd2Z0lsdzhKZk9vUmdkMXN2UnBXWWdoR0QxUnFka3g4?=
- =?utf-8?B?YiswSmJyRHNZaHFaemllWDY5ZjdZT1E4SUpIVkhIcWNPbTdQSnd2R3U5SXFs?=
- =?utf-8?B?YnVVMXhDVkpMN1luaVEvdWxCd2E0WlFrR3dIQTdsY3hWVnpscEh0d0o0M3A3?=
- =?utf-8?B?QVByVitjdVEvTjYxa25MOHZrcWF2OU84ZXVjZExGZFRGeVo2Q2JOdHBSRUpq?=
- =?utf-8?B?R0plUXFLY2JxbjQ4MTV0MVo1V1d6V3VkUUtsME5hSTJlSVRLelZVK2pmN2Vl?=
- =?utf-8?B?aDA4T3ZHV3dpTXVMSXJ3TDJ4bTJoOTJJVTVXb24vTVZ5T050UWJ4RlhFWTJU?=
- =?utf-8?B?TWVabmNUcEFrNlNEa0Z6MkVUUnRmVmhlRU1TV2F2bnovTHF0bis1cWVObkJS?=
- =?utf-8?B?dkIxOXFTa0l1YjRwUjluZCs4eFZmcHlSRnlkaDYrZEhyRFNsbmRHTlF4MEtt?=
- =?utf-8?B?dFc5QnRUaVlYeWFCYUo3aWNFRE81TE1sRTVYYzZWWUE4dXd5T0dKY0RHWWlX?=
- =?utf-8?B?SnRmYnFzcGZBR0p2MjAvVEd3c3NEbzM1cVUvSUhJL2xNRnF5K3VWdWwxeVNq?=
- =?utf-8?B?bTgrTWo5L0JCcGxSaUxOaXc2Skw0K29YQlc1UTUwUVBMZW9IcmlmSmsyck9y?=
- =?utf-8?B?ZEVhNnIybi8rM2tpQUlHRVJ5L1pyWXV6UHJKbzd1TEs0enhiVEVJUy80TDVm?=
- =?utf-8?Q?VGoWVwbCWdzZW?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2d7a275-5c5b-4a94-f09f-08d91529b715
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 May 2021 09:38:36.0455
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Hb9iPlCPIvm5xyBHRBfC8xI/1KHSopOMzr4YtmflkAkDQCBKfOGPEJx9tBAs3i8E
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3519
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-wenhuizhang <wenhui@gwmail.gwu.edu> writes:
-> Deadstore detected by Lukas Bulwahn's CodeChecker Tool (ELISA group).
->
-> line 741 struct cifsInodeInfo *cinode;
-> line 747 cinode =3D CIFS_I(d_inode(cfile->dentry));
-> could be deleted.
->
-> cinode on filesystem should not be deleted when files are closed, they ar=
-e representations of some data fields on a physical disk, thus no further a=
-ction is required.
-> The virtual inode on vfs will be handled by vfs automatically, and the de=
-notation is inode, which is different from the cinode.
->
-> Signed-off-by: wenhuizhang <wenhui@gwmail.gwu.edu>
+inode->i_mutex has been replaced with inode->i_rwsem long ago. Fix
+comments still mentioning i_mutex.
 
-That's better but:
-* the subject (first line of commit msg) should be about what the patch
-  actually does, usally with a prefix of the subsystem. So for example:
-  cifs: remove deadstore in cifs_close_all_deferred_files()
-* the body of the commit msg should be wrapped around 80 cols to avoid
-  long lines unless you are quoting some output or urls
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Hugh Dickins <hughd@google.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ mm/filemap.c        | 10 +++++-----
+ mm/madvise.c        |  2 +-
+ mm/memory-failure.c |  2 +-
+ mm/rmap.c           |  6 +++---
+ mm/shmem.c          | 20 ++++++++++----------
+ mm/truncate.c       |  8 ++++----
+ 6 files changed, 24 insertions(+), 24 deletions(-)
 
-Cheers,
---=20
-Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
-E
-GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
-nchen)
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 66f7e9fdfbc4..ba1068a1837f 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -76,7 +76,7 @@
+  *      ->swap_lock		(exclusive_swap_page, others)
+  *        ->i_pages lock
+  *
+- *  ->i_mutex
++ *  ->i_rwsem
+  *    ->i_mmap_rwsem		(truncate->unmap_mapping_range)
+  *
+  *  ->mmap_lock
+@@ -87,7 +87,7 @@
+  *  ->mmap_lock
+  *    ->lock_page		(access_process_vm)
+  *
+- *  ->i_mutex			(generic_perform_write)
++ *  ->i_rwsem			(generic_perform_write)
+  *    ->mmap_lock		(fault_in_pages_readable->do_page_fault)
+  *
+  *  bdi->wb.list_lock
+@@ -3710,12 +3710,12 @@ EXPORT_SYMBOL(generic_perform_write);
+  * modification times and calls proper subroutines depending on whether we
+  * do direct IO or a standard buffered write.
+  *
+- * It expects i_mutex to be grabbed unless we work on a block device or similar
++ * It expects i_rwsem to be grabbed unless we work on a block device or similar
+  * object which does not need locking at all.
+  *
+  * This function does *not* take care of syncing data in case of O_SYNC write.
+  * A caller has to handle it. This is mainly due to the fact that we want to
+- * avoid syncing under i_mutex.
++ * avoid syncing under i_rwsem.
+  *
+  * Return:
+  * * number of bytes written, even for truncated writes
+@@ -3803,7 +3803,7 @@ EXPORT_SYMBOL(__generic_file_write_iter);
+  *
+  * This is a wrapper around __generic_file_write_iter() to be used by most
+  * filesystems. It takes care of syncing the file in case of O_SYNC file
+- * and acquires i_mutex as needed.
++ * and acquires i_rwsem as needed.
+  * Return:
+  * * negative error code if no data has been written at all of
+  *   vfs_fsync_range() failed for a synchronous write
+diff --git a/mm/madvise.c b/mm/madvise.c
+index 63e489e5bfdb..a0137706b92a 100644
+--- a/mm/madvise.c
++++ b/mm/madvise.c
+@@ -853,7 +853,7 @@ static long madvise_remove(struct vm_area_struct *vma,
+ 			+ ((loff_t)vma->vm_pgoff << PAGE_SHIFT);
+ 
+ 	/*
+-	 * Filesystem's fallocate may need to take i_mutex.  We need to
++	 * Filesystem's fallocate may need to take i_rwsem.  We need to
+ 	 * explicitly grab a reference because the vma (and hence the
+ 	 * vma's reference to the file) can go away as soon as we drop
+ 	 * mmap_lock.
+diff --git a/mm/memory-failure.c b/mm/memory-failure.c
+index 85ad98c00fd9..9dcc9bcea731 100644
+--- a/mm/memory-failure.c
++++ b/mm/memory-failure.c
+@@ -704,7 +704,7 @@ static int me_pagecache_clean(struct page *p, unsigned long pfn)
+ 	/*
+ 	 * Truncation is a bit tricky. Enable it per file system for now.
+ 	 *
+-	 * Open: to take i_mutex or not for this? Right now we don't.
++	 * Open: to take i_rwsem or not for this? Right now we don't.
+ 	 */
+ 	return truncate_error_page(p, pfn, mapping);
+ }
+diff --git a/mm/rmap.c b/mm/rmap.c
+index 693a610e181d..a35cbbbded0d 100644
+--- a/mm/rmap.c
++++ b/mm/rmap.c
+@@ -20,9 +20,9 @@
+ /*
+  * Lock ordering in mm:
+  *
+- * inode->i_mutex	(while writing or truncating, not reading or faulting)
++ * inode->i_rwsem	(while writing or truncating, not reading or faulting)
+  *   mm->mmap_lock
+- *     page->flags PG_locked (lock_page)   * (see huegtlbfs below)
++ *     page->flags PG_locked (lock_page)   * (see hugetlbfs below)
+  *       hugetlbfs_i_mmap_rwsem_key (in huge_pmd_share)
+  *         mapping->i_mmap_rwsem
+  *           hugetlb_fault_mutex (hugetlbfs specific page fault mutex)
+@@ -41,7 +41,7 @@
+  *                             in arch-dependent flush_dcache_mmap_lock,
+  *                             within bdi.wb->list_lock in __sync_single_inode)
+  *
+- * anon_vma->rwsem,mapping->i_mutex      (memory_failure, collect_procs_anon)
++ * anon_vma->rwsem,mapping->i_mmap_rwsem   (memory_failure, collect_procs_anon)
+  *   ->tasklist_lock
+  *     pte map lock
+  *
+diff --git a/mm/shmem.c b/mm/shmem.c
+index a08cedefbfaa..056204b1f76a 100644
+--- a/mm/shmem.c
++++ b/mm/shmem.c
+@@ -96,7 +96,7 @@ static struct vfsmount *shm_mnt;
+ 
+ /*
+  * shmem_fallocate communicates with shmem_fault or shmem_writepage via
+- * inode->i_private (with i_mutex making sure that it has only one user at
++ * inode->i_private (with i_rwsem making sure that it has only one user at
+  * a time): we would prefer not to enlarge the shmem inode just for that.
+  */
+ struct shmem_falloc {
+@@ -774,7 +774,7 @@ static int shmem_free_swap(struct address_space *mapping,
+  * Determine (in bytes) how many of the shmem object's pages mapped by the
+  * given offsets are swapped out.
+  *
+- * This is safe to call without i_mutex or the i_pages lock thanks to RCU,
++ * This is safe to call without i_rwsem or the i_pages lock thanks to RCU,
+  * as long as the inode doesn't go away and racy results are not a problem.
+  */
+ unsigned long shmem_partial_swap_usage(struct address_space *mapping,
+@@ -806,7 +806,7 @@ unsigned long shmem_partial_swap_usage(struct address_space *mapping,
+  * Determine (in bytes) how many of the shmem object's pages mapped by the
+  * given vma is swapped out.
+  *
+- * This is safe to call without i_mutex or the i_pages lock thanks to RCU,
++ * This is safe to call without i_rwsem or the i_pages lock thanks to RCU,
+  * as long as the inode doesn't go away and racy results are not a problem.
+  */
+ unsigned long shmem_swap_usage(struct vm_area_struct *vma)
+@@ -1069,7 +1069,7 @@ static int shmem_setattr(struct user_namespace *mnt_userns,
+ 		loff_t oldsize = inode->i_size;
+ 		loff_t newsize = attr->ia_size;
+ 
+-		/* protected by i_mutex */
++		/* protected by i_rwsem */
+ 		if ((newsize < oldsize && (info->seals & F_SEAL_SHRINK)) ||
+ 		    (newsize > oldsize && (info->seals & F_SEAL_GROW)))
+ 			return -EPERM;
+@@ -2049,7 +2049,7 @@ static vm_fault_t shmem_fault(struct vm_fault *vmf)
+ 	/*
+ 	 * Trinity finds that probing a hole which tmpfs is punching can
+ 	 * prevent the hole-punch from ever completing: which in turn
+-	 * locks writers out with its hold on i_mutex.  So refrain from
++	 * locks writers out with its hold on i_rwsem.  So refrain from
+ 	 * faulting pages into the hole while it's being punched.  Although
+ 	 * shmem_undo_range() does remove the additions, it may be unable to
+ 	 * keep up, as each new page needs its own unmap_mapping_range() call,
+@@ -2060,7 +2060,7 @@ static vm_fault_t shmem_fault(struct vm_fault *vmf)
+ 	 * we just need to make racing faults a rare case.
+ 	 *
+ 	 * The implementation below would be much simpler if we just used a
+-	 * standard mutex or completion: but we cannot take i_mutex in fault,
++	 * standard mutex or completion: but we cannot take i_rwsem in fault,
+ 	 * and bloating every shmem inode for this unlikely case would be sad.
+ 	 */
+ 	if (unlikely(inode->i_private)) {
+@@ -2518,7 +2518,7 @@ shmem_write_begin(struct file *file, struct address_space *mapping,
+ 	struct shmem_inode_info *info = SHMEM_I(inode);
+ 	pgoff_t index = pos >> PAGE_SHIFT;
+ 
+-	/* i_mutex is held by caller */
++	/* i_rwsem is held by caller */
+ 	if (unlikely(info->seals & (F_SEAL_GROW |
+ 				   F_SEAL_WRITE | F_SEAL_FUTURE_WRITE))) {
+ 		if (info->seals & (F_SEAL_WRITE | F_SEAL_FUTURE_WRITE))
+@@ -2618,7 +2618,7 @@ static ssize_t shmem_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 
+ 		/*
+ 		 * We must evaluate after, since reads (unlike writes)
+-		 * are called without i_mutex protection against truncate
++		 * are called without i_rwsem protection against truncate
+ 		 */
+ 		nr = PAGE_SIZE;
+ 		i_size = i_size_read(inode);
+@@ -2688,7 +2688,7 @@ static loff_t shmem_file_llseek(struct file *file, loff_t offset, int whence)
+ 		return -ENXIO;
+ 
+ 	inode_lock(inode);
+-	/* We're holding i_mutex so we can access i_size directly */
++	/* We're holding i_rwsem so we can access i_size directly */
+ 	offset = mapping_seek_hole_data(mapping, offset, inode->i_size, whence);
+ 	if (offset >= 0)
+ 		offset = vfs_setpos(file, offset, MAX_LFS_FILESIZE);
+@@ -2717,7 +2717,7 @@ static long shmem_fallocate(struct file *file, int mode, loff_t offset,
+ 		loff_t unmap_end = round_down(offset + len, PAGE_SIZE) - 1;
+ 		DECLARE_WAIT_QUEUE_HEAD_ONSTACK(shmem_falloc_waitq);
+ 
+-		/* protected by i_mutex */
++		/* protected by i_rwsem */
+ 		if (info->seals & (F_SEAL_WRITE | F_SEAL_FUTURE_WRITE)) {
+ 			error = -EPERM;
+ 			goto out;
+diff --git a/mm/truncate.c b/mm/truncate.c
+index 95af244b112a..57a618c4a0d6 100644
+--- a/mm/truncate.c
++++ b/mm/truncate.c
+@@ -415,7 +415,7 @@ EXPORT_SYMBOL(truncate_inode_pages_range);
+  * @mapping: mapping to truncate
+  * @lstart: offset from which to truncate
+  *
+- * Called under (and serialised by) inode->i_mutex.
++ * Called under (and serialised by) inode->i_rwsem.
+  *
+  * Note: When this function returns, there can be a page in the process of
+  * deletion (inside __delete_from_page_cache()) in the specified range.  Thus
+@@ -432,7 +432,7 @@ EXPORT_SYMBOL(truncate_inode_pages);
+  * truncate_inode_pages_final - truncate *all* pages before inode dies
+  * @mapping: mapping to truncate
+  *
+- * Called under (and serialized by) inode->i_mutex.
++ * Called under (and serialized by) inode->i_rwsem.
+  *
+  * Filesystems have to use this in the .evict_inode path to inform the
+  * VM that this is the final truncate and the inode is going away.
+@@ -753,7 +753,7 @@ EXPORT_SYMBOL(truncate_pagecache);
+  * setattr function when ATTR_SIZE is passed in.
+  *
+  * Must be called with a lock serializing truncates and writes (generally
+- * i_mutex but e.g. xfs uses a different lock) and before all filesystem
++ * i_rwsem but e.g. xfs uses a different lock) and before all filesystem
+  * specific block truncation has been performed.
+  */
+ void truncate_setsize(struct inode *inode, loff_t newsize)
+@@ -782,7 +782,7 @@ EXPORT_SYMBOL(truncate_setsize);
+  *
+  * The function must be called after i_size is updated so that page fault
+  * coming after we unlock the page will already see the new i_size.
+- * The function must be called while we still hold i_mutex - this not only
++ * The function must be called while we still hold i_rwsem - this not only
+  * makes sure i_size is stable but also that userspace cannot observe new
+  * i_size value before we are prepared to store mmap writes at new inode size.
+  */
+-- 
+2.26.2
 
