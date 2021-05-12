@@ -2,106 +2,107 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24881C433B4
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 22:34:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D17A1C433B4
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 05:05:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E04866191C
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 May 2021 22:34:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD7AA610FA
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 05:05:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbhEKWfm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 May 2021 18:35:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46104 "EHLO
+        id S229704AbhELFGr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 May 2021 01:06:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbhEKWfl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 May 2021 18:35:41 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD37EC06174A
-        for <linux-cifs@vger.kernel.org>; Tue, 11 May 2021 15:34:34 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id m13so666228qtk.13
-        for <linux-cifs@vger.kernel.org>; Tue, 11 May 2021 15:34:34 -0700 (PDT)
+        with ESMTP id S229580AbhELFGq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 May 2021 01:06:46 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75FFAC061574;
+        Tue, 11 May 2021 22:05:38 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id a2so10878613lfc.9;
+        Tue, 11 May 2021 22:05:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gwmail.gwu.edu; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=42C6HOQrWTE0332FVLv9iuHqZnhb3K1H7/h3GIL4MSc=;
-        b=R3jEIakaWLP5NOGisY4zhv2ai1fhVP4du3Af0XCzYkDEr7hC9neNDaWKQFaNRokVff
-         g9ir6mrvxtoheB8wliCGGydK2tz2GMl/NxG8NOHpUVScs7tfT59egprnXznWQs6ENvcD
-         AJ2kOYea2SEWt7YvaD21PciyAuRE1qrtteAul016yMMMQIxpoD3yhJrJTxq3yDS4iraZ
-         nfGf9yBAF8jctw9Qo4GyZVxt3yBf90LThpHG8dEYMzywhTDKuywdgHrde7Z9H6eATbjR
-         o391p+SDKEhSUh5yv28rcdE9TNz9BzR1bpIKY3ZzSkBIuYupdR6kPaG4iEKHHhbhFwT3
-         1uCQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pK3uO91nApx/1zLPS7zLQaMIrJTPe2LSIi5/lqX34mk=;
+        b=gCRNfz0r1wwRV/wOqlyKNuvyCHEju3TWeFQ6ujJr0ilGE4BXgN/SCiKM9rw0DBvhRH
+         /MhS/+V2yYNz2bwNZvLAEfD7OHa4hloswdOSRf95nglCYVzTVFJdMN+6FhhrCiFGeCb5
+         vql5cpPqEt8mNgortbozwQS16brr5Px5JAGJcFT8J8KbjJS5bl0tVRbho3Gr3Yt3DPhX
+         KVEhU1ZMPobj4M8mdywwJ3ZFJFPxGRLL2iVQMAR1wHslJrYrzTpdBBuUPMQPLOhuwe5l
+         4I6B8XlVyPfNcXUZ9urLPKpMUTTIurCrtccVl7EDr/VKFw3yyhmKmNFeds34knrKAluL
+         KOgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=42C6HOQrWTE0332FVLv9iuHqZnhb3K1H7/h3GIL4MSc=;
-        b=FhWTBVO4RTigruQxivksRF1hjqvAkwwCLmWJZ6a9ROZdP6unDE3NNlQQqxkZIdmzQM
-         7DjJ9lglZ+FNSVYueg/3Ub99MUgHYj9zV2V0IQbYw1uK5di6AHT6UxjTiEz0MARk2/YV
-         Ygnohjd+S7VqU8+6xO4ZszkGNyUaYeqGTgWyRMNf+OaIrrmT3BoUI2CYeIYSGDGTFYqn
-         rk1BWsLhcpdfTlwtZMGfTpk5Ksd67kEZACHk9WF/5+iune2PNQxnUXUOcIyt7fzwU1xA
-         xeN46PPTqm26vpr3ciWZM0uuTAkgj3qwW9GfSmzECOKiKgIHyqFwLJNrvn+rNsIgzT80
-         zBIA==
-X-Gm-Message-State: AOAM530gY57yFxrMLQnWyfA221WXScG19ozqFps/OOTnhdCEIpLcXQUK
-        JD8jNGIhNiUwwabzOJiQw/Fx+w==
-X-Google-Smtp-Source: ABdhPJxV96xnFvz7FJPLVu7Br1PXs3Jda9e433Lii337jAA4jXMN/PND2tj93cJuK4xl7CincupAVw==
-X-Received: by 2002:a05:622a:d1:: with SMTP id p17mr30792975qtw.86.1620772474057;
-        Tue, 11 May 2021 15:34:34 -0700 (PDT)
-Received: from bunsen3.telenet.unc.edu (bunsen3.telenet.unc.edu. [204.85.191.47])
-        by smtp.googlemail.com with ESMTPSA id b23sm9042761qtq.0.2021.05.11.15.34.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 May 2021 15:34:33 -0700 (PDT)
-From:   wenhuizhang <wenhui@gwmail.gwu.edu>
-Cc:     wenhuizhang <wenhui@gwmail.gwu.edu>,
-        Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Deadstore detected by Lukas Bulwahn's CodeChecker Tool (ELISA group)
-Date:   Tue, 11 May 2021 18:34:25 -0400
-Message-Id: <20210511223425.12863-1-wenhui@gwmail.gwu.edu>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210509233327.22241-1-wenhui@gwmail.gwu.edu>
-References: <20210509233327.22241-1-wenhui@gwmail.gwu.edu>
-To:     unlisted-recipients:; (no To-header on input)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pK3uO91nApx/1zLPS7zLQaMIrJTPe2LSIi5/lqX34mk=;
+        b=fYHWwGqXkmX6Ef3XRczacUDfZUH4d/YD+R8nzwrX5Lm52ei4SOD9UHIAfEJoSuv8R/
+         RbuK+XMh/aBNj2HmMHrUw3bgXyqe4g0CxoXb3HteELSHQxlBzhsrwqqE6gzNyxwmq+5v
+         K/u/a4SiJegQBvaHqTdvSDTL9gIPDFcsvjLj+/Q8bTNvZ6J1rp2zW3RMCnZuVAUIZUgY
+         yioJtBTMoHSQhVRLag5yu/FtpGAOFYnBCCj/4JzUysd7EzY9Sw9LRQaq+g9ccCZwwN/t
+         mJLu7veewv6wAeP1nrSfROJtxcuCeS4ruqSJ0UgExArczBXHlebgFawoUDrV/lnOdzIu
+         KO/g==
+X-Gm-Message-State: AOAM532rsLebIzR4Yf5xaui6xxiO6zRYS1WHgaLXK3dmHhK0MHKEYEvu
+        cj1wlp2/UszwhWdvQW4We0/5TJ/HKjBseDHidjA=
+X-Google-Smtp-Source: ABdhPJzUn+A5w3VFWjHFzxn0t9GDncrmEricf20Su46X7NuzjrSq50ZiQcJNTOhDjI364BpdQY10+x8MbHvJ2KLWuqk=
+X-Received: by 2002:a05:6512:142:: with SMTP id m2mr23979220lfo.313.1620795936825;
+ Tue, 11 May 2021 22:05:36 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAH2r5mt1Fy6hR+Rdig0sHsOS8fVQDsKf9HqZjvjORS3R-7=RFw@mail.gmail.com>
+ <CAOQ4uxigOsEUrU5-QndJujVtP9KLdjEQTm3bHjGRCFWjZCAKBw@mail.gmail.com>
+In-Reply-To: <CAOQ4uxigOsEUrU5-QndJujVtP9KLdjEQTm3bHjGRCFWjZCAKBw@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 12 May 2021 00:05:25 -0500
+Message-ID: <CAH2r5mvjHcQVCj4g0mNeOHRRjc-xH88XZL-JFSAV+yw=idfMnA@mail.gmail.com>
+Subject: Re: fanotify and network/cluster fs
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Deadstore detected by Lukas Bulwahn's CodeChecker Tool (ELISA group).
+On Mon, May 10, 2021 at 11:34 PM Amir Goldstein <amir73il@gmail.com> wrote:
+>
+> On Tue, May 11, 2021 at 2:36 AM Steve French <smfrench@gmail.com> wrote:
+> >
+> > With the recent changes to fanotify (e.g.
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7cea2a3c505e)
+>
+> Not sure how this is related to remote fs notifications.
+>
+> > has there been any additional discussion of what it would take to
+> > allow fanotify to be supported for network/cluster fs (all major
+>
+> It would take someone to pick up this RFC that was already posted
+> 2 years ago:
+> https://lore.kernel.org/linux-fsdevel/20190507085707.GD30899@veci.piliscsaba.redhat.com/
+> https://lore.kernel.org/linux-fsdevel/CAOQ4uxipauh1UXHSFt=WsiaDexqecjm4eDkVfnQXN8eYofdg2A@mail.gmail.com/
+>
+> > dialects supported by cifs.ko support sending notify requests to the
+> > server - but there is no way for cifs.ko to be told which notify
+> > requests to send as fanotify/inotify are local only in current Linux -
+> > unlike other OS where notify is primarily for network fs and passed
+> > down to the fs)
+> >
+>
+> If you wait long enough, I'll get to implementing this for FUSE some day...
+> But there is *really* nothing blocking cifs developers from implementing this
+> and writing the specialized tests. I can help with guidance.
 
-line 741 struct cifsInodeInfo *cinode;
-line 747 cinode = CIFS_I(d_inode(cfile->dentry));
-could be deleted.
+It's on my TODO list but I am dealing with some multichannel bugs at
+the moment...
+but would be great if someone had run into the same thing and fixed it.  If not
+I will revisit the question of how to do this
 
-cinode on filesystem should not be deleted when files are closed, they are representations of some data fields on a physical disk, thus no further action is required.
-The virtual inode on vfs will be handled by vfs automatically, and the denotation is inode, which is different from the cinode.
 
-Signed-off-by: wenhuizhang <wenhui@gwmail.gwu.edu>
 
----
- fs/cifs/misc.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/fs/cifs/misc.c b/fs/cifs/misc.c
-index 524dbdfb7184..801a5300f765 100644
---- a/fs/cifs/misc.c
-+++ b/fs/cifs/misc.c
-@@ -738,13 +738,11 @@ void
- cifs_close_all_deferred_files(struct cifs_tcon *tcon)
- {
- 	struct cifsFileInfo *cfile;
--	struct cifsInodeInfo *cinode;
- 	struct list_head *tmp;
- 
- 	spin_lock(&tcon->open_file_lock);
- 	list_for_each(tmp, &tcon->openFileList) {
- 		cfile = list_entry(tmp, struct cifsFileInfo, tlist);
--		cinode = CIFS_I(d_inode(cfile->dentry));
- 		if (delayed_work_pending(&cfile->deferred))
- 			mod_delayed_work(deferredclose_wq, &cfile->deferred, 0);
- 	}
 -- 
-2.17.1
+Thanks,
 
+Steve
