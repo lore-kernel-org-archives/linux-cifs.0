@@ -2,107 +2,94 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C8BC433ED
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 21:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49295C433ED
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 21:39:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99654613DF
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 21:39:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B519613DF
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 May 2021 21:39:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234476AbhELViW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 12 May 2021 17:38:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44862 "EHLO
+        id S230212AbhELVkq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 May 2021 17:40:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381358AbhELTd6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 May 2021 15:33:58 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA230C061761;
-        Wed, 12 May 2021 12:28:53 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id b7so31049933ljr.4;
-        Wed, 12 May 2021 12:28:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JWP0l+BA0fGfCW3697UumhoAM6OZCftdKGj+XYdvmfw=;
-        b=jau0A7xhAKhNGGJJ6FHnLqlBanUYsG4/Xgrwbeb7LF93cOfKc6gIGxtrG8L93G9h3f
-         xdF/N+vTKym3eL4xJZqCUekg/qtC81Tq82Zcm246zcaw/353BgLe5X/qAD1uuA3b7IrD
-         IcLGS5RDD44EnpQsLv65nnaiiB1xaG6CQkmXTC6jJ8DQg1bfNnE2GjMLcvjkSUXU7Tkg
-         VlUIFCMH5svj1mEyjnxNd9qWES0Tnnq5+U/U/S+OEysNGMpsy8uJ6NIWTsIkPoqLPtBT
-         qql0mtiN6aCZ2BkloTkbsla9sXJUTaekCXW9MzOQpPjLTQyxx9BNIhPPy7Ohsa/OrMQh
-         GXcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JWP0l+BA0fGfCW3697UumhoAM6OZCftdKGj+XYdvmfw=;
-        b=JQJIfBNcMdlF0YsN79upGcfc/jdVqcCXBSfVgqj7yRX4uGE9yv+qHeNIKtnfrdbWPx
-         4wiL15v9t5Zj7BYNEATLzmsbcBUVDabeItMcopFXRO2CnYahtNAbhuhJbEhyGJ3WMNwU
-         eHgV7n0Y7QXfr3mjhPKVnJxM/CQ3LFsutbHvVtynnNVwwjP1BLCPJ6ADGETSr+pdLx49
-         +y+lHXCHdtkJKiSrYHCv9L4fl7dKqRXSyGPtsb/IRLRfds5cpCHopzOXWAzd2EDzD2o5
-         jkPXwnFm0P7Hd+QmY4YmngUdw0zRJ4J0m0ZjCpdMsfGcsI7NkINMDc4vap7a/s3VWIrF
-         uKGA==
-X-Gm-Message-State: AOAM532OOQ2qkPQ72gO3JSxzVf+XWhiQwGn1UhUTQOLNWxPYZAt/tUWd
-        xunkPDWwrYLOeaNRNYcUrF0gqqxUDojRsrtQGV4=
-X-Google-Smtp-Source: ABdhPJybjV1UrN30hcZfWkxdJZJglKnFZJNX4SuGmgPSoe/Xw3yeEITbPhCey3BqWWyluYg0SRnoz0qVGrEzJuI95zI=
-X-Received: by 2002:a2e:7819:: with SMTP id t25mr9229961ljc.406.1620847732192;
- Wed, 12 May 2021 12:28:52 -0700 (PDT)
-MIME-Version: 1.0
-References: <YJvwVq3Gl35RQrIe@casper.infradead.org>
-In-Reply-To: <YJvwVq3Gl35RQrIe@casper.infradead.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 12 May 2021 14:28:41 -0500
-Message-ID: <CAH2r5msOQsdeknBdTsfMXYzrb5=NuKEBPc4WD1CkYp10t19Guw@mail.gmail.com>
-Subject: Re: Removing readpages aop
+        with ESMTP id S1392620AbhELViE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 May 2021 17:38:04 -0400
+Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C2A7C061761;
+        Wed, 12 May 2021 14:24:32 -0700 (PDT)
+Received: by nautica.notk.org (Postfix, from userid 108)
+        id 70BC5C009; Wed, 12 May 2021 23:24:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+        t=1620854671; bh=iu3EAcBcCCyh2dvMo7i/UfETwu/cAjPrs9y/9IF/rzg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GqFP10EOCURuFkF2xT3PfYLIY2J/Vt5P+TKC+LR86EYnDVWOiW1p0DaJC80tMytf1
+         5gN1vjC8t9tFEqHpcBzo3MjbeWnOyCsh8VwxR5wFwId+U1nHFIRPH6eGU0XnRQ4jGI
+         /SsgIMi1W6qyOOjrlalZ0AkA2TawlTgrts/qqk1u1tjlJlAt9rRxfyrsKFQdSmvLLf
+         60gftBiNyOvw241iDw7Ixc/ONci3OhTq0SqB2Hha0ZnGEU8kohnF+cJ0zDC9kYAG5Q
+         lc4JRWj/hSOa3rKODk9l9X+dxBTJt4b/LxGbsKWpas3N+o/AEZ0xIdPNB8szmgh/1g
+         RaInV+L3PfTbA==
+Received: from odin.codewreck.org (localhost [127.0.0.1])
+        by nautica.notk.org (Postfix) with ESMTPS id 63EE0C009;
+        Wed, 12 May 2021 23:24:29 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+        t=1620854671; bh=iu3EAcBcCCyh2dvMo7i/UfETwu/cAjPrs9y/9IF/rzg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=GqFP10EOCURuFkF2xT3PfYLIY2J/Vt5P+TKC+LR86EYnDVWOiW1p0DaJC80tMytf1
+         5gN1vjC8t9tFEqHpcBzo3MjbeWnOyCsh8VwxR5wFwId+U1nHFIRPH6eGU0XnRQ4jGI
+         /SsgIMi1W6qyOOjrlalZ0AkA2TawlTgrts/qqk1u1tjlJlAt9rRxfyrsKFQdSmvLLf
+         60gftBiNyOvw241iDw7Ixc/ONci3OhTq0SqB2Hha0ZnGEU8kohnF+cJ0zDC9kYAG5Q
+         lc4JRWj/hSOa3rKODk9l9X+dxBTJt4b/LxGbsKWpas3N+o/AEZ0xIdPNB8szmgh/1g
+         RaInV+L3PfTbA==
+Received: from localhost (odin.codewreck.org [local])
+        by odin.codewreck.org (OpenSMTPD) with ESMTPA id af7d1893;
+        Wed, 12 May 2021 21:24:26 +0000 (UTC)
+Date:   Thu, 13 May 2021 06:24:11 +0900
+From:   Dominique Martinet <asmadeus@codewreck.org>
 To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-nfs <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, linux-fsdevel@vger.kernel.org
+Subject: Re: [V9fs-developer] Removing readpages aop
+Message-ID: <YJxHe+8qn6yYLld3@codewreck.org>
+References: <YJvwVq3Gl35RQrIe@casper.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YJvwVq3Gl35RQrIe@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I don't have any objections as long as:
-- we see at least mild performance benefit (or at least we are
-confident that no performance loss)
-- it passes regression tests (the usual xfstest bucket)
-- it doesn't complicate the code too much (sounds like it actually
-might simplify it, but needs a little more work)
-- make sure that the usual tuning parms still work (e.g. "rsize" and
-"rasize" mount options) or we can figure out a sane way to autotune
-readhead so those wouldn't be needed for any workload
-
-But currently since we get the most benefit from multichannel (as that
-allows even better parallelization of i/o) ... I have been focused on
-various multichannel issues (low credit situations, reconnect, fall
-back to different channels when weird errors, adjusting channels
-dynamically when server adds or removes adapters on the fly) for the
-short term
-
-On Wed, May 12, 2021 at 10:31 AM Matthew Wilcox <willy@infradead.org> wrote:
->
+Matthew Wilcox wrote on Wed, May 12, 2021 at 04:12:22PM +0100:
 > In Linus' current tree, there are just three filesystems left using the
 > readpages address_space_operation:
->
+> 
 > $ git grep '\.readpages'
 > fs/9p/vfs_addr.c:       .readpages = v9fs_vfs_readpages,
 > fs/cifs/file.c: .readpages = cifs_readpages,
 > fs/nfs/file.c:  .readpages = nfs_readpages,
->
+> 
 > I'd love to finish getting rid of ->readpages as it would simplify
 > the VFS.  AFS and Ceph were both converted since 5.12 to use
 > netfs_readahead().  Is there any chance we might get the remaining three
 > filesystems converted in the next merge window?
->
 
+David sent me a mostly-working implementation for netfs and it does get
+rid of readpages, so it's just a matter of finding time for thorough
+tests and cleanups...
+I'd also like to let it sit in -next for a while (let's say at least one
+month), so realistically I need to look at it within the next few weeks
+and I honestly probably won't have time with my current schedule... But
+it'll definitely be done for 5.15 (next's next merge window), and
+probably in -next in ~2ish months if that's good enough for you.
+
+
+If you can convince me both cifs and nfs will get it done before then I
+might reconsider priorities :-D
 
 -- 
-Thanks,
-
-Steve
+Dominique
