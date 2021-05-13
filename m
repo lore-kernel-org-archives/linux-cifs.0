@@ -2,86 +2,90 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B028C433B4
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 May 2021 13:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81522C433B4
+	for <linux-cifs@archiver.kernel.org>; Thu, 13 May 2021 15:13:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 244F8613AA
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 May 2021 13:38:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DE4D610A7
+	for <linux-cifs@archiver.kernel.org>; Thu, 13 May 2021 15:13:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234142AbhEMNjn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 13 May 2021 09:39:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60126 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234106AbhEMNjY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 13 May 2021 09:39:24 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC79C061574;
-        Thu, 13 May 2021 06:38:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=7qdcsekCpDC0XbH1OXVUDI58yFo8Z7At/i6/i0XMALI=; b=tfkCjdPhG2JWyiamQqLUcVIUaa
-        XIAK/k2n62tt+Wbf/46OEwAYMQmA+a7bxfjCQNJeofqSoJn1tx8g09UAvpof8TiISSa9sOFxVSN8w
-        nCvW92rZta0Ztby0RSYVTKYOkyXuxIu5khMZE9L+bS3UvMSj+aeeIUOr7y/BZ0s3moMIBGnmRaaSy
-        08Fy6gD4Ww+T7IVNTy+9uiKfwl9bw9+Ie3saiCuYJSsI+W//LBbl1U4U9o+0MyqTusGI62zeRBaCe
-        sAGJMylp/ZwrTaXz1ygWi77JLYrKiU3A1rF9dV6x19gN9MMMDWs8rVF6qFAXnGsUza3T3lvP2KglO
-        Sl13Etjw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lhBU3-009Sko-72; Thu, 13 May 2021 13:35:00 +0000
-Date:   Thu, 13 May 2021 14:34:35 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Steve French <smfrench@gmail.com>
-Cc:     linux-nfs <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: Re: Removing readpages aop
-Message-ID: <YJ0q6/Oe5yJ+H+Tn@casper.infradead.org>
-References: <YJvwVq3Gl35RQrIe@casper.infradead.org>
- <CAH2r5msOQsdeknBdTsfMXYzrb5=NuKEBPc4WD1CkYp10t19Guw@mail.gmail.com>
+        id S234598AbhEMPOk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 13 May 2021 11:14:40 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37582 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234295AbhEMPOc (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 13 May 2021 11:14:32 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 50F95610A7;
+        Thu, 13 May 2021 15:13:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620918802;
+        bh=41qb467358PVWANG8SIzcwNL37SGfMDJteXHTiVFBmk=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=Qx2rlVZSXYR2TxqHlZxJ1qDYqorMs4V3rrBSNXmrDaFr5uI2z94F7FU+eielXHQ6w
+         2qVIDsLxAF96kf3b4BGAB48Nbtg0iPtdpMEemoAitO+/0QNgy1DqDkFsldKm2iFG34
+         +aGB6I+7cJL3h/SyZxWRbhI8FV4FwxZEEkAQTWEi8d9fSYWV9qxXuKce3QsXLcxvUP
+         lBV8m6hEDtLxxc5bQ7/tgghDpTOj9AAuS3EZHS1bAJo29OIZBY9Kwi7BYJQop8iqGL
+         fjMc+CK+tp7BY+ZZXOfaCc1pPRse2na0vsFEWjbQvB4PbRz5/bLXYsCspK9njJAwts
+         5R80Xhp0QuCUg==
+Message-ID: <f820202cc50d6869a5ef1f4deabed4b4c75db9b6.camel@kernel.org>
+Subject: Re: [PATCH] netfs: Pass flags through to
+ grab_cache_page_write_begin()
+From:   Jeff Layton <jlayton@kernel.org>
+To:     David Howells <dhowells@redhat.com>, willy@infradead.org
+Cc:     linux-mm@kvack.org, linux-cachefs@redhat.com,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, linux-fsdevel@vger.kernel.org
+Date:   Thu, 13 May 2021 11:13:20 -0400
+In-Reply-To: <162090295383.3165945.13595101698295243662.stgit@warthog.procyon.org.uk>
+References: <162090295383.3165945.13595101698295243662.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.40.1 (3.40.1-1.fc34) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAH2r5msOQsdeknBdTsfMXYzrb5=NuKEBPc4WD1CkYp10t19Guw@mail.gmail.com>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, May 12, 2021 at 02:28:41PM -0500, Steve French wrote:
-> I don't have any objections as long as:
-> - we see at least mild performance benefit (or at least we are
-> confident that no performance loss)
+On Thu, 2021-05-13 at 11:49 +0100, David Howells wrote:
+> In netfs_write_begin(), pass the AOP flags through to
+> grab_cache_page_write_begin() so that a request to use GFP_NOFS is honoured.
+> 
+> Fixes: e1b1240c1ff5 ("netfs: Add write_begin helper")
+> Reported-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: linux-mm@kvack.org
+> cc: linux-cachefs@redhat.com
+> cc: linux-afs@lists.infradead.org
+> cc: linux-nfs@vger.kernel.org
+> cc: linux-cifs@vger.kernel.org
+> cc: ceph-devel@vger.kernel.org
+> cc: v9fs-developer@lists.sourceforge.net
+> cc: linux-fsdevel@vger.kernel.org
+> ---
+> 
+>  fs/netfs/read_helper.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
+> index 193841d03de0..725614625ed4 100644
+> --- a/fs/netfs/read_helper.c
+> +++ b/fs/netfs/read_helper.c
+> @@ -1068,7 +1068,7 @@ int netfs_write_begin(struct file *file, struct address_space *mapping,
+>  	DEFINE_READAHEAD(ractl, file, NULL, mapping, index);
+>  
+>  retry:
+> -	page = grab_cache_page_write_begin(mapping, index, 0);
+> +	page = grab_cache_page_write_begin(mapping, index, flags);
+>  	if (!page)
+>  		return -ENOMEM;
+>  
+> 
+> 
 
-Nobody's complained of a performance loss in the other ~30 filesystems
-which have already been converted (some almost a year ago).  And CIFS
-has one of the more convoluted readpages implementation, so I'd expect
-a higher likelihood of a performance gain from CIFS.
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
 
-> - it passes regression tests (the usual xfstest bucket)
-> - it doesn't complicate the code too much (sounds like it actually
-> might simplify it, but needs a little more work)
-> - make sure that the usual tuning parms still work (e.g. "rsize" and
-> "rasize" mount options) or we can figure out a sane way to autotune
-> readhead so those wouldn't be needed for any workload
-
-One of the enhancements added as part of the recent netfs merge
-was readahead_expand().  Take a look at it and see if it works for you.
-
-> But currently since we get the most benefit from multichannel (as that
-> allows even better parallelization of i/o) ... I have been focused on
-> various multichannel issues (low credit situations, reconnect, fall
-> back to different channels when weird errors, adjusting channels
-> dynamically when server adds or removes adapters on the fly) for the
-> short term
-
-Understood.  Only so many hours in the day.
-
-I think
-https://lore.kernel.org/linux-fsdevel/1794123.1605713481@warthog.procyon.org.uk/
-is the most recent version, but as Dave notes, it needs attention from
-somebody who knows the CIFS code better.
