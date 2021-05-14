@@ -2,148 +2,93 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4673C433ED
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 May 2021 23:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B6BC433B4
+	for <linux-cifs@archiver.kernel.org>; Fri, 14 May 2021 03:48:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 917F861421
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 May 2021 23:19:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3E2261440
+	for <linux-cifs@archiver.kernel.org>; Fri, 14 May 2021 03:48:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231448AbhEMXVD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 13 May 2021 19:21:03 -0400
-Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:46599 "EHLO
-        mail105.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229544AbhEMXVC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 13 May 2021 19:21:02 -0400
-Received: from dread.disaster.area (pa49-195-118-180.pa.nsw.optusnet.com.au [49.195.118.180])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id E18F8104486A;
-        Fri, 14 May 2021 09:19:46 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1lhKcL-000g6Q-Tb; Fri, 14 May 2021 09:19:45 +1000
-Date:   Fri, 14 May 2021 09:19:45 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        ceph-devel@vger.kernel.org, Chao Yu <yuchao0@huawei.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
-        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH 03/11] mm: Protect operations adding pages to page cache
- with invalidate_lock
-Message-ID: <20210513231945.GD2893@dread.disaster.area>
-References: <20210512101639.22278-1-jack@suse.cz>
- <20210512134631.4053-3-jack@suse.cz>
- <20210512152345.GE8606@magnolia>
- <20210513174459.GH2734@quack2.suse.cz>
- <20210513185252.GB9675@magnolia>
+        id S231934AbhENDtX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 13 May 2021 23:49:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50562 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231829AbhENDtX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 13 May 2021 23:49:23 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF71DC061574
+        for <linux-cifs@vger.kernel.org>; Thu, 13 May 2021 20:48:11 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id c15so21776466ljr.7
+        for <linux-cifs@vger.kernel.org>; Thu, 13 May 2021 20:48:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=CQKmOodFrG+/fJsp7fm6Cnhy7/dXRI0EFonlOTqTqMI=;
+        b=PcWSlzDsSLgUFoPjmKNdyPgmQAIx1/QqJV0BvmbL7FJgJzJgLZHazklQqFrFM//R7N
+         QOCEwqO4FpwfluYCFbKIHbohVa3UHZfaXBTVJT2GhrSfWNr0wCMCX0evaNIEliE3h47d
+         tLHpWae5qpfWySyZG/UuPn4D32BCoKKY8GhiFS97GxbXqlhN0Yptlk+WLtqrHAMwpzhD
+         d1GfgG6Cm2iacPTlxu17KTWVpe1u79sU6y9Jyw0ERIMqPz4QPgOmNG/zbRFplztVRWg6
+         wE0rAKVmPEAIDQWDoGTmFgtTQTuhi9Xfp/vR65wSMsb0igOpx2nVDUO1Y3N5oZ6oCsnB
+         OXMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=CQKmOodFrG+/fJsp7fm6Cnhy7/dXRI0EFonlOTqTqMI=;
+        b=ieCKYjfWkRPgPy5wqcbf9Q93qJ8W8rz/V0k01wG5rC11ZYIIVx48rlRpxd8yQOC/2g
+         cfwCToCRJg7d1hselnQPZAqzH845WosVMp6r50bIFory63sddNFSOs/kHCGZ6aQOydQ0
+         HtSNO9fbnzzzcoqxy8/zelietSVw4mTlxLRE+Jd+kCIBUGXqhAuHdeXZxw6LX/h3Linv
+         n7GyMEjV0bjgE4++s5klqoV1eaL5YlZxTu/TayyY6juJ/fhk0uu3Nu328gb4yRYIlJ53
+         zHo4EYXaY9ba382dYZMjXNNoFUX0P5tYBgpSXUAnPpKgRKNDY9D5YLeyUJeT1EgXlUIh
+         rTPw==
+X-Gm-Message-State: AOAM533D1PxqzZcav8lorh2aYz9/skYdrrqLOT7bzsIgwZdy1NJ3yikT
+        Dqi6iVd8zqPfuDDpLJdXxX6yMOUQ6LXeIOu/fV4X/qvwUasEog==
+X-Google-Smtp-Source: ABdhPJzkII++HhZbyzAWb7E1xuwotxTStfwUGPn2o+CWGWy/onsvBS8cjVbw6R/mfI05pWZUQXxuXaPS+JQYUjGtDFA=
+X-Received: by 2002:a2e:9e57:: with SMTP id g23mr12296654ljk.148.1620964090187;
+ Thu, 13 May 2021 20:48:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210513185252.GB9675@magnolia>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=Tu+Yewfh c=1 sm=1 tr=0
-        a=xcwBwyABtj18PbVNKPPJDQ==:117 a=xcwBwyABtj18PbVNKPPJDQ==:17
-        a=kj9zAlcOel0A:10 a=5FLXtPjwQuUA:10 a=7-415B0cAAAA:8
-        a=mWKqDkno6h2Jm8PBvhwA:9 a=tbcINoE9r3WEgN6G:21 a=dTGQcn7ZmTsWEmKd:21
-        a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+References: <CAH2r5mtxZx3RG4Z_b6-9bsaLBMAHObGas-yPe3rttj1tXcFtnA@mail.gmail.com>
+In-Reply-To: <CAH2r5mtxZx3RG4Z_b6-9bsaLBMAHObGas-yPe3rttj1tXcFtnA@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 13 May 2021 22:47:59 -0500
+Message-ID: <CAH2r5mtkjSwU4mqbkUJomdB3o0Uo84agSVS_Vn+Yz7t1uLYoCg@mail.gmail.com>
+Subject: Re: Additional xfstests
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, May 13, 2021 at 11:52:52AM -0700, Darrick J. Wong wrote:
-> On Thu, May 13, 2021 at 07:44:59PM +0200, Jan Kara wrote:
-> > On Wed 12-05-21 08:23:45, Darrick J. Wong wrote:
-> > > On Wed, May 12, 2021 at 03:46:11PM +0200, Jan Kara wrote:
-> > > > +->fallocate implementation must be really careful to maintain page cache
-> > > > +consistency when punching holes or performing other operations that invalidate
-> > > > +page cache contents. Usually the filesystem needs to call
-> > > > +truncate_inode_pages_range() to invalidate relevant range of the page cache.
-> > > > +However the filesystem usually also needs to update its internal (and on disk)
-> > > > +view of file offset -> disk block mapping. Until this update is finished, the
-> > > > +filesystem needs to block page faults and reads from reloading now-stale page
-> > > > +cache contents from the disk. VFS provides mapping->invalidate_lock for this
-> > > > +and acquires it in shared mode in paths loading pages from disk
-> > > > +(filemap_fault(), filemap_read(), readahead paths). The filesystem is
-> > > > +responsible for taking this lock in its fallocate implementation and generally
-> > > > +whenever the page cache contents needs to be invalidated because a block is
-> > > > +moving from under a page.
-> > > > +
-> > > > +->copy_file_range and ->remap_file_range implementations need to serialize
-> > > > +against modifications of file data while the operation is running. For blocking
-> > > > +changes through write(2) and similar operations inode->i_rwsem can be used. For
-> > > > +blocking changes through memory mapping, the filesystem can use
-> > > > +mapping->invalidate_lock provided it also acquires it in its ->page_mkwrite
-> > > > +implementation.
-> > > 
-> > > Question: What is the locking order when acquiring the invalidate_lock
-> > > of two different files?  Is it the same as i_rwsem (increasing order of
-> > > the struct inode pointer) or is it the same as the XFS MMAPLOCK that is
-> > > being hoisted here (increasing order of i_ino)?
-> > > 
-> > > The reason I ask is that remap_file_range has to do that, but I don't
-> > > see any conversions for the xfs_lock_two_inodes(..., MMAPLOCK_EXCL)
-> > > calls in xfs_ilock2_io_mmap in this series.
-> > 
-> > Good question. Technically, I don't think there's real need to establish a
-> > single ordering because locks among different filesystems are never going
-> > to be acquired together (effectively each lock type is local per sb and we
-> > are free to define an ordering for each lock type differently). But to
-> > maintain some sanity I guess having the same locking order for doublelock
-> > of i_rwsem and invalidate_lock makes sense. Is there a reason why XFS uses
-> > by-ino ordering? So that we don't have to consider two different orders in
-> > xfs_lock_two_inodes()...
-> 
-> I imagine Dave will chime in on this, but I suspect the reason is
-> hysterical raisins^Wreasons.
+26 more tests added (33 more if you include the ones added last week)
 
-It's the locking rules that XFS has used pretty much forever.
-Locking by inode number always guarantees the same locking order of
-two inodes in the same filesystem, regardless of the specific
-in-memory instances of the two inodes.
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/641
 
-e.g. if we lock based on the inode structure address, in one
-instancex, we could get A -> B, then B gets recycled and
-reallocated, then we get B -> A as the locking order for the same
-two inodes.
+On Thu, May 13, 2021 at 5:49 PM Steve French <smfrench@gmail.com> wrote:
+>
+> Did some experiments running more xfstests today, and we continue to
+> be improving - can now add significantly more (e.g. to Samba server
+> running on btrfs), 25+ tests that are now working in my quick tests
+> this afternoon.  That is in addition to the ones we have added over
+> the past few weeks.
+>
+> 051, 110, 111, 115, 116, 118, 119, 121, 139, 144, 163, 164, 165, 170,
+> 183, 185, 188, 189, 190, 191, 194, 195, 196, 197, 201, 245 ... and
+> more
+>
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-That, IMNSHO, is utterly crazy because with non-deterministic inode
-lock ordered like this you can't make consistent locking rules for
-locking the physical inode cluster buffers underlying the inodes in
-the situation where they also need to be locked.
 
-We've been down this path before more than a decade ago when the
-powers that be decreed that inode locking order is to be "by
-structure address" rather than inode number, because "inode number
-is not unique across multiple superblocks".
 
-I'm not sure that there is anywhere that locks multiple inodes
-across different superblocks, but here we are again....
-
-> It might simply be time to convert all
-> three XFS inode locks to use the same ordering rules.
-
-Careful, there lie dragons along that path because of things like
-how the inode cluster buffer operations work - they all assume
-ascending inode number traversal within and across inode cluster
-buffers and hence we do have locking order constraints based on
-inode number...
-
-Cheers,
-
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Thanks,
+
+Steve
