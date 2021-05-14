@@ -2,111 +2,96 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74811C433ED
-	for <linux-cifs@archiver.kernel.org>; Fri, 14 May 2021 11:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA05C433ED
+	for <linux-cifs@archiver.kernel.org>; Fri, 14 May 2021 16:02:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C7E5613B6
-	for <linux-cifs@archiver.kernel.org>; Fri, 14 May 2021 11:07:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D87BA613C8
+	for <linux-cifs@archiver.kernel.org>; Fri, 14 May 2021 16:02:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbhENLIP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 14 May 2021 07:08:15 -0400
-Received: from mx2.suse.de ([195.135.220.15]:40048 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229445AbhENLIP (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 14 May 2021 07:08:15 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 724A5AF11;
-        Fri, 14 May 2021 11:07:02 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id AB2D71F2B4A; Fri, 14 May 2021 13:07:00 +0200 (CEST)
-Date:   Fri, 14 May 2021 13:07:00 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
-        Chao Yu <yuchao0@huawei.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
-        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>
-Subject: Re: [PATCH 03/11] mm: Protect operations adding pages to page cache
- with invalidate_lock
-Message-ID: <20210514110700.GA27655@quack2.suse.cz>
-References: <20210512101639.22278-1-jack@suse.cz>
- <20210512134631.4053-3-jack@suse.cz>
- <YJvo1bGG1tG+gtgC@casper.infradead.org>
- <20210513190114.GJ2734@quack2.suse.cz>
- <YJ2AR0IURFzz+52G@casper.infradead.org>
+        id S233842AbhENQDP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 14 May 2021 12:03:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45330 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231485AbhENQDO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 14 May 2021 12:03:14 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B309AC061574;
+        Fri, 14 May 2021 09:02:01 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id c15so23913830ljr.7;
+        Fri, 14 May 2021 09:02:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=hbs58K5TlV2bJvEoYy+ewLKsVKD8mWsVRSkrb6/1M38=;
+        b=aWERtuBkNybSMk+QQY4cJ521GkTSpqS+FEMVRqjP4xHxSm0FHJcHPlsDD2wVkwOuZN
+         Dbz29Dd6wbD5VElVLOFCSBMnLBIF2//VJjmI25M+DHPp/ooQjvhBOx6n50Nhm3aJIDC7
+         gnOpzHv49ogsB7yJIR9N99BnCH/Dw/9oZi6LWF5eS/Dud1iiYz4/Xg1xcKZuB9pOYnNl
+         nSgJgJC4vdzVvSEwk0lHDNh6OzXAS2X4vz/70ZPzpXY3+DUyo5fTuE7X+g8HnecDo2WZ
+         XknrVjlSLtUwuL9huGcyaP8/i5LracWWNp09klBi93SNmVsuZ/f3x3tWlLkIuJQ63Onx
+         /tOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=hbs58K5TlV2bJvEoYy+ewLKsVKD8mWsVRSkrb6/1M38=;
+        b=i4GfsOVRJHjHJ0Htt5p1Cq2A8prkkMt3udYyVPJQpz+z2BSHFJccT6YjYyNa7yeiQQ
+         HhTQEdPe+eEX3gBidgGb7/eg+fwM8KGLHKDrUtqfZqWrtz0IOgbo42UH3z0AEuhja01u
+         aM8bVbK8oDZctalJnebAGVOaMnOfyOoNgUU0R4tOVkGWe5jFxjIsevU4XxcmwRlrlNnr
+         BR9bmlDynDBHxQ700Dlks9Vq6mzBpWXiyMVnKvhymPcq3P5Dh31zmwfRxvasplPqULyn
+         HFmpY8Myof5SYgAq6ULKi8p79Ml+nz+/e7E5d5Mm7ewYtD+MoARVhZ6mspqwkTCbL4UU
+         XBXA==
+X-Gm-Message-State: AOAM530ZdWLuZAjvSHnnfYhPhyiVgZaQLtfkwK3jii6V783qF0AFanXw
+        /q4CqY+euhyUTFkwEjN2qA4FFbdA7OiL5SeZnD8=
+X-Google-Smtp-Source: ABdhPJz9fhj9VklicGlUHwFGpHf0bgXbKi6WLqBEDvp90FsUA5MYMjRvqyHQnaRP5IpjwVvTl8/OCcpHf0lpYkFSFkk=
+X-Received: by 2002:a2e:bc1e:: with SMTP id b30mr4380301ljf.6.1621008120227;
+ Fri, 14 May 2021 09:02:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YJ2AR0IURFzz+52G@casper.infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20210509233327.22241-1-wenhui@gwmail.gwu.edu> <20210513165516.17723-1-wenhui@gwmail.gwu.edu>
+ <87sg2pshr4.fsf@suse.com>
+In-Reply-To: <87sg2pshr4.fsf@suse.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 14 May 2021 11:01:49 -0500
+Message-ID: <CAH2r5mtYy9jT80mJNBXnsXwOVRLaTADdLibpTyP7NANMXEtepw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: remove deadstore in cifs_close_all_deferred_files()
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     wenhuizhang <wenhui@gwmail.gwu.edu>,
+        Steve French <sfrench@samba.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu 13-05-21 20:38:47, Matthew Wilcox wrote:
-> On Thu, May 13, 2021 at 09:01:14PM +0200, Jan Kara wrote:
-> > On Wed 12-05-21 15:40:21, Matthew Wilcox wrote:
-> > > Remind me (or, rather, add to the documentation) why we have to hold the
-> > > invalidate_lock during the call to readpage / readahead, and we don't just
-> > > hold it around the call to add_to_page_cache / add_to_page_cache_locked
-> > > / add_to_page_cache_lru ?  I appreciate that ->readpages is still going
-> > > to suck, but we're down to just three implementations of ->readpages now
-> > > (9p, cifs & nfs).
-> > 
-> > There's a comment in filemap_create_page() trying to explain this. We need
-> > to protect against cases like: Filesystem with 1k blocksize, file F has
-> > page at index 0 with uptodate buffer at 0-1k, rest not uptodate. All blocks
-> > underlying page are allocated. Now let read at offset 1k race with hole
-> > punch at offset 1k, length 1k.
-> > 
-> > read()					hole punch
-> > ...
-> >   filemap_read()
-> >     filemap_get_pages()
-> >       - page found in the page cache but !Uptodate
-> >       filemap_update_page()
-> > 					  locks everything
-> > 					  truncate_inode_pages_range()
-> > 					    lock_page(page)
-> > 					    do_invalidatepage()
-> > 					    unlock_page(page)
-> >         locks page
-> >           filemap_read_page()
-> 
-> Ah, this is the partial_start case, which means that page->mapping
-> is still valid.  But that means that do_invalidatepage() was called
-> with (offset 1024, length 1024), immediately after we called
-> zero_user_segment().  So isn't this a bug in the fs do_invalidatepage()?
-> The range from 1k-2k _is_ uptodate.  It's been zeroed in memory,
-> and if we were to run after the "free block" below, we'd get that
-> memory zeroed again.
+merged into cifs-2.6.git for-next
 
-Well, yes, do_invalidatepage() could mark zeroed region as uptodate. But I
-don't think we want to rely on 'uptodate' not getting spuriously cleared
-(which would reopen the problem). Generally the assumption is that there's
-no problem clearing (or not setting) uptodate flag of a clean buffer
-because the fs can always provide the data again. Similarly, fs is free to
-refetch data into clean & uptodate page, if it thinks it's worth it. Now
-all these would become correctness issues. So IMHO the fragility is not
-worth the shorter lock hold times. That's why I went for the rule that
-read-IO submission is still protected by invalidate_lock to make things
-simple.
+On Fri, May 14, 2021 at 6:01 AM Aur=C3=A9lien Aptel via samba-technical
+<samba-technical@lists.samba.org> wrote:
+>
+>
+> Reviewed-by: Aurelien Aptel <aaptel@suse.com>
+>
+> Cheers,
+> --
+> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
+ DE
+> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
+=BCnchen)
+>
+>
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+
+--=20
+Thanks,
+
+Steve
