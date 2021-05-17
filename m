@@ -2,72 +2,125 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 814CBC433ED
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 May 2021 19:15:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6BBCC433B4
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 May 2021 21:04:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B731611BD
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 May 2021 19:15:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BF176113C
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 May 2021 21:04:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231869AbhEQTQc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 May 2021 15:16:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48732 "EHLO
+        id S236014AbhEQVF5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 May 2021 17:05:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231161AbhEQTQb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 May 2021 15:16:31 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22BA7C061573
-        for <linux-cifs@vger.kernel.org>; Mon, 17 May 2021 12:15:14 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id i9so10394081lfe.13
-        for <linux-cifs@vger.kernel.org>; Mon, 17 May 2021 12:15:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=I/en9ExFFAmHa+2LvHenGz+69URsY0wDxMIxqoGMxQk=;
-        b=Ko4/dNtbCBmL/maGvfs3hnkppoldwzF4JD9VHcOpIpdFj3qBABB4lkqNRjK4mzWGrb
-         bpXKTPyC0RcaT53mYl0MKhbnWKmvx1gF88+ca5VqJSTXx1vK0wZIgNeNhFm9tnRpPKB4
-         kUqqQOsbu/ZuXj6zNXouhKp1gIE297LWeAYpJuJisVAteoJH9D/L/QplU1WEMr+BbtLQ
-         9Wzvjmp0eih4sxK6xWPMnLq8gk1/C38CN4PZkWxkqVD14BWAp705K+wuOeRUmK4ixJuG
-         vD3JlTt45OE0uLlPMNJ0RZ+B4evlCercFzhJ0SXCZPq5D4PIs7nZLlUyaN1z7Wu4b0Db
-         R4WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=I/en9ExFFAmHa+2LvHenGz+69URsY0wDxMIxqoGMxQk=;
-        b=FFpbl6OLZIWD1yGQfKFS2FbKJ6e1O/YGXQEMIhmGVtlPiKUkIZO79aqnB+nm4b8Wkm
-         8zwNA1Cr1JGgJ7oEWjdtDuyq5QJOqAvvoPbzqWbUjfzye8GrFoZqpC6KoCRE5kB2d6LD
-         bpbkNdzL4HzFWdcDB//I0JdgRbNeP7PTk8UuEIyMXSjPc4uWKAECxNBrdN9PhzfmnzIm
-         BN9oUz9ZHQQ/51IIFOsHHTxaWTTG9+w/czuAtlVSNw13EhcCFfl624/pb039mL4eyqXL
-         Gp0rRP8ANt5g13cdVYdTA0Cg5fs7DBTDcCaySE16qBR/wtiA6AgO8imFs+l0BfgJVVvd
-         YTUA==
-X-Gm-Message-State: AOAM532lSWlqz4eCA3zZVpsD/TuLeaF3ypS2I8YSMRRxdZnl742a4lt3
-        Dz4Dm/Hd5PSEYnKZU/jnkGSSpuVfY2stfUBeLmE/2CmV8nkX3g==
-X-Google-Smtp-Source: ABdhPJyLWjWwloyp15e6xa7jOMua1Y0b27PCptAq7dEeTLW870uOTdVKrGx+yNRyHNypBW1zXuALtyoIFEmr/zAMOh0=
-X-Received: by 2002:a05:6512:b17:: with SMTP id w23mr932256lfu.133.1621278911412;
- Mon, 17 May 2021 12:15:11 -0700 (PDT)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 17 May 2021 14:14:59 -0500
-Message-ID: <CAH2r5mtOj24Rh8-3fJBz0X2kXY7m3Zt6LZfPqL+YBu_MzT7eMw@mail.gmail.com>
-Subject: current Linux client vs. current ksmbd
-To:     Namjae Jeon <namjae.jeon@samsung.com>,
+        with ESMTP id S234755AbhEQVF5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 May 2021 17:05:57 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA8EC061573;
+        Mon, 17 May 2021 14:04:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:
+        Subject:Sender:Reply-To:Cc:Content-ID:Content-Description;
+        bh=ql13rlKLv4OPAWCH9i8KAWhh1VDhSbcB2pzitfM5u+k=; b=JZW+yzAiS/5wQMvnvrEPcAVuWJ
+        B/G0SX7UMYQUzccP9r9+yabgBrKUAUdHNIsresSjUTW8sxjq7kTtE/0SOfRgY5adz023UOVOdT0pm
+        qe9anbFwqN3rN+X9mlCH/3e+8aJij0zys0CGAtm+vxdcp+0aD/jSB/uYILGrZmMxkTvy9U9hbbhCJ
+        gd93tZeb6WEmvjTtSVZJ2kOeM76rHcHctx1IHrmp42ddtLq/c4jQ32Ybxy3gPXBv6I5J8eMVTNS8a
+        kBgBBiskKF+uIxZRhux2Zcxz7HROQPnuNkFPK6AUCFMBoxjYRguokrZ7zbQUmleCXS5TiSG1CRBNE
+        eLPCCXig==;
+Received: from [2601:1c0:6280:3f0::7376]
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1likPm-00E9PR-M6; Mon, 17 May 2021 21:04:38 +0000
+Subject: Re: Fwd: [EXTERNAL] Re: ioctl.c:undefined reference to
+ `__get_user_bad'
+To:     Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>,
-        COMMON INTERNET FILE SYSTEM SERVER 
-        <linux-cifsd-devel@lists.sourceforge.net>
-Content-Type: text/plain; charset="UTF-8"
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+References: <202105110829.MHq04tJz-lkp@intel.com>
+ <a022694d-426a-0415-83de-4cc5cd9d1d38@infradead.org>
+ <MN2PR21MB15184963469FEC9B13433964E42D9@MN2PR21MB1518.namprd21.prod.outlook.com>
+ <CAH2r5mswqB9DT21YnSXMSAiU0YwFUNu0ni6f=cW+aLz4ssA8rw@mail.gmail.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <d3e24342-4f30-6a2f-3617-a917539eac94@infradead.org>
+Date:   Mon, 17 May 2021 14:04:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
+MIME-Version: 1.0
+In-Reply-To: <CAH2r5mswqB9DT21YnSXMSAiU0YwFUNu0ni6f=cW+aLz4ssA8rw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Noticed two failures in the latest test run - not sure if reproducible
-yet (tests  cifs/105 and generic/464)
+On 5/17/21 10:13 AM, Steve French wrote:
+>> If you fix the issue, kindly add following tag as appropriate
+>> Reported-by: kernel test robot <lkp@intel.com>
+>>
+>> All errors (new ones prefixed by >>):
+>>
+>>    arm-linux-gnueabi-ld: fs/cifs/ioctl.o: in function `cifs_dump_full_key':
+>>>> ioctl.c:(.text+0x44): undefined reference to `__get_user_bad'
+>>
+> 
+> <snip>
+> 
+>> # CONFIG_MMU is not set
+>>
+>> and arch/arm/include/asm/uaccess.h does not implement get_user(size 8 bytes)
+>> for the non-MMU case:
+> 
+> I see another place in fs/cifs/ioctl.c where we already had been doing
+> a get_user() into a u64 - any idea what you are supposed to do
+> instead?  Any example code where people have worked around this.
 
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/35
+Hi Steve,
+
+This change in cifs_dump_full_key() makes it build OK:
+
+-       if (get_user(suid, (__u64 __user *)arg))
++       if (get_user(suid, (unsigned int __user *)arg))
+
+
+That is what the other call uses:
+
+		case FS_IOC_SETFLAGS:
+			cifs_dbg(VFS, "cifs ioctl FS_IOC_SETFLAGS:\n");
+			if (pSMBFile == NULL)
+				break;
+			tcon = tlink_tcon(pSMBFile->tlink);
+			caps = le64_to_cpu(tcon->fsUnixInfo.Capability);
+
+			if (get_user(ExtAttrBits, (int __user *)arg)) {
+				rc = -EFAULT;
+				break;
+			}
+
+However, my reading/understanding is that the one immediately above
+is incorrect, as is the -/+ patch above it, since get_user() gets its
+data size (1, 2, 4, 8) from the type of the pointer that is passed to it.
+For 8 bytes (64 bits), 'int' is not sufficient, so IMO the get_user()
+call that builds:
+			if (get_user(ExtAttrBits, (int __user *)arg)) {
+is a bug. It should be:
+			if (get_user(ExtAttrBits, (__u64 __user *)arg)) {
+and if I make that latter change in the source file, the build says:
+
+arm-linux-gnueabi-ld: fs/cifs/ioctl.o: in function `cifs_dump_full_key':
+ioctl.c:(.text+0x14): undefined reference to `__get_user_bad'
+arm-linux-gnueabi-ld: fs/cifs/ioctl.o: in function `cifs_ioctl':
+ioctl.c:(.text+0x1f2): undefined reference to `__get_user_bad'
+
+so now both of them fail on the get_user() of 8 bytes.
+
+Hope that clarifies things.  It tells me that arm no-MMU still
+needs support for get_user() of size 8 bytes.
+
 -- 
-Thanks,
+~Randy
 
-Steve
