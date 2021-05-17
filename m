@@ -2,106 +2,91 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABDBFC433B4
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 May 2021 11:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C03C433B4
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 May 2021 17:13:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BA63611CA
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 May 2021 11:21:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7E5261261
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 May 2021 17:13:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236632AbhEQLWe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 May 2021 07:22:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42102 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236528AbhEQLWd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 17 May 2021 07:22:33 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id D7294AED7;
-        Mon, 17 May 2021 11:21:15 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 56F6D1F2CA4; Mon, 17 May 2021 13:21:15 +0200 (CEST)
-Date:   Mon, 17 May 2021 13:21:15 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-        linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        ceph-devel@vger.kernel.org, Chao Yu <yuchao0@huawei.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
-        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH 03/11] mm: Protect operations adding pages to page cache
- with invalidate_lock
-Message-ID: <20210517112115.GC31755@quack2.suse.cz>
-References: <20210512101639.22278-1-jack@suse.cz>
- <20210512134631.4053-3-jack@suse.cz>
- <20210512152345.GE8606@magnolia>
- <20210513174459.GH2734@quack2.suse.cz>
- <20210513185252.GB9675@magnolia>
- <20210513231945.GD2893@dread.disaster.area>
- <20210514161730.GL9675@magnolia>
+        id S236009AbhEQROm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 May 2021 13:14:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49446 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235848AbhEQROm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 May 2021 13:14:42 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 738B6C061573;
+        Mon, 17 May 2021 10:13:25 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id v9so8564880lfa.4;
+        Mon, 17 May 2021 10:13:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=YW4kTCwrNjfUZX+2cYxMOpD57e76pTrkb3RiCqgyKsk=;
+        b=lWXGunBWmMsAvV+iz1HoCTaPgLQVpJb+B+13kjqKRtKAh+UmQ/jsQFgv1UWSpHHNDb
+         /dpIgvRlx8zPjSUoMojDwMLCCbs99v1DB/weEkEHvm2mLmnXd3n5NChp2MOBhy67lAga
+         tFP1+4jwxulE/QhSOPAH6OMV+ZA1f/OWwifM+mB3kdyl/A+37fOANO8DzQwirEoK/bMi
+         Ku6LXV2BYPGSI4OXb73w+pyngS4E+LtGFmzt/NUXDyPP6uJ+oH9k1dsTesPcgbVOX/Lq
+         PJjmGfbuI9OIJhIJuGqqRsPD0WeUQlfgr963ThtCJT+jCI2Og5oCBHAcepiEuY/wHIEp
+         YElQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=YW4kTCwrNjfUZX+2cYxMOpD57e76pTrkb3RiCqgyKsk=;
+        b=WTrYk7KiFuTIK48+oEH7+76eIvTUA5ugnccVRh8d2tuYOC9cVhzsY1GBiiLufXlhA6
+         LxqqkW5s2vYLY06x8CyqdKzI0WqWzjbGhrtvxEjDPRiPfqlvicbFrHECXGQ7ToTDVVIF
+         bXVVooHkh9pyZlfsp9lb2iieC8dCqZZo0KziHrdSHMgyKrDmUm4seDbDTWmkuGAK30vH
+         FSJ/hoVMQWFjsfc2cLG4OzO5rsXj9jTeLUr538vAOjLJu1T1UfxWj9oNXP4XEPphwzc+
+         mUHTs7yXjw4PC6yRnwwRxeXvDRqadSvTE9wBioYcGHgVAsSvu4hzczHDVomRWlbvrC/7
+         Zg4Q==
+X-Gm-Message-State: AOAM5312FfyOFBiIhDeE1U9kkWW93/GZWM9jhd3ghA9A+y543DXeN9JI
+        1Nxyg+aWi5QnBluUOslzMVw4BxYeTpHcr/1pnZg=
+X-Google-Smtp-Source: ABdhPJyxx5A1Uh88zOG44o1mnOFK+YqAPDU8NJMfBhs5d5SI4RTaeEDjDx6YJlSyVN/giyQsdG/3z9aCEsdmn7DfgDA=
+X-Received: by 2002:a05:6512:33d0:: with SMTP id d16mr652121lfg.184.1621271603832;
+ Mon, 17 May 2021 10:13:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210514161730.GL9675@magnolia>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <202105110829.MHq04tJz-lkp@intel.com> <a022694d-426a-0415-83de-4cc5cd9d1d38@infradead.org>
+ <MN2PR21MB15184963469FEC9B13433964E42D9@MN2PR21MB1518.namprd21.prod.outlook.com>
+In-Reply-To: <MN2PR21MB15184963469FEC9B13433964E42D9@MN2PR21MB1518.namprd21.prod.outlook.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 17 May 2021 12:13:12 -0500
+Message-ID: <CAH2r5mswqB9DT21YnSXMSAiU0YwFUNu0ni6f=cW+aLz4ssA8rw@mail.gmail.com>
+Subject: Fwd: [EXTERNAL] Re: ioctl.c:undefined reference to `__get_user_bad'
+To:     Randy Dunlap <rdunlap@infradead.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri 14-05-21 09:17:30, Darrick J. Wong wrote:
-> On Fri, May 14, 2021 at 09:19:45AM +1000, Dave Chinner wrote:
-> > We've been down this path before more than a decade ago when the
-> > powers that be decreed that inode locking order is to be "by
-> > structure address" rather than inode number, because "inode number
-> > is not unique across multiple superblocks".
-> > 
-> > I'm not sure that there is anywhere that locks multiple inodes
-> > across different superblocks, but here we are again....
-> 
-> Hm.  Are there situations where one would want to lock multiple
-> /mappings/ across different superblocks?  The remapping code doesn't
-> allow cross-super operations, so ... pipes and splice, maybe?  I don't
-> remember that code well enough to say for sure.
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+>
+> All errors (new ones prefixed by >>):
+>
+>    arm-linux-gnueabi-ld: fs/cifs/ioctl.o: in function `cifs_dump_full_key':
+>>> ioctl.c:(.text+0x44): undefined reference to `__get_user_bad'
+>
 
-Splice and friends work one file at a time. I.e., first they fill a pipe
-from the file with ->read_iter, then they flush the pipe to the target file
-with ->write_iter. So file locking doesn't get coupled there.
+<snip>
 
-> I've been operating under the assumption that as long as one takes all
-> the same class of lock at the same time (e.g. all the IOLOCKs, then all
-> the MMAPLOCKs, then all the ILOCKs, like reflink does) that the
-> incongruency in locking order rules within a class shouldn't be a
-> problem.
+># CONFIG_MMU is not set
+>
+>and arch/arm/include/asm/uaccess.h does not implement get_user(size 8 bytes)
+> for the non-MMU case:
 
-That's my understanding as well.
+I see another place in fs/cifs/ioctl.c where we already had been doing
+a get_user() into a u64 - any idea what you are supposed to do
+instead?  Any example code where people have worked around this.
 
-> > > It might simply be time to convert all
-> > > three XFS inode locks to use the same ordering rules.
-> > 
-> > Careful, there lie dragons along that path because of things like
-> > how the inode cluster buffer operations work - they all assume
-> > ascending inode number traversal within and across inode cluster
-> > buffers and hence we do have locking order constraints based on
-> > inode number...
-> 
-> Fair enough, I'll leave the ILOCK alone. :)
-
-OK, so should I change the order for invalidate_lock or shall we just leave
-that alone as it is not a practical problem AFAICT.
-
-								Honza
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks,
+
+Steve
