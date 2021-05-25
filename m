@@ -2,43 +2,47 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 482CAC47088
-	for <linux-cifs@archiver.kernel.org>; Tue, 25 May 2021 13:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B419BC4708D
+	for <linux-cifs@archiver.kernel.org>; Tue, 25 May 2021 13:51:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D6BA6141B
-	for <linux-cifs@archiver.kernel.org>; Tue, 25 May 2021 13:51:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B0686140F
+	for <linux-cifs@archiver.kernel.org>; Tue, 25 May 2021 13:51:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233405AbhEYNwf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 25 May 2021 09:52:35 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42524 "EHLO mx2.suse.de"
+        id S233456AbhEYNwh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 25 May 2021 09:52:37 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42556 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233193AbhEYNwd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 25 May 2021 09:52:33 -0400
+        id S233200AbhEYNwe (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 25 May 2021 09:52:34 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1621950662; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=IgdiZSIksJKZJJBeE+3E0SKcPJ/OLd2TYXDb2TzzPSE=;
-        b=rtJhyDHqbJ2gWMsn83eK6XBEPYn5QhqVL61VynXm194xqzgJFMd3pAY1Q6bhqrbNurdv+B
-        y3anoWRupX7Gq80JYBka/FERIfWuZcNAUXYmm0I5yMfWupTdR3ijVmf6SEViA65I3lC20m
-        E1FoEu0khhgBUCKOLHzXronTPJES3eY=
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xd8OifYoNQOCikHzR++3NeOR/xz1/yXNT7sn6d6yzXM=;
+        b=nm1y6L5sx98fW3ya4ETm6cobwGk3mK4Rbvr0dd27LA7T6Klpj7rp6OLoBr98OmknmeMiA0
+        GAiNM/TDxIeAirMs1kSu3QJu7SyCutfA5NBEcTZlqMlsknj/z6w9qbeQI/5LTw0E0RhfAK
+        WULOuyv2UNUeZrFDzAsQFxp6PyTHq7w=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1621950662;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=IgdiZSIksJKZJJBeE+3E0SKcPJ/OLd2TYXDb2TzzPSE=;
-        b=Pwm/5L0cRw/9Y810+7Iq97g8+HdjgE3uv4Jxvs/x/w6m7FqRVmpb3PkrnXBvPQIdRvXkhh
-        1T6xz3rQ7jUcJFDA==
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xd8OifYoNQOCikHzR++3NeOR/xz1/yXNT7sn6d6yzXM=;
+        b=MpXHFE6Xqv1cFmXsCTjOpEiOcYOiUi3nvMA7eShKZt6qV/wNePjLY1ZrolXeIYcMYTldtS
+        PF6XfrOYC1YffOCA==
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id AE383AEAB;
+        by mx2.suse.de (Postfix) with ESMTP id B0E75AEB3;
         Tue, 25 May 2021 13:51:01 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 0EFDA1F2C98; Tue, 25 May 2021 15:51:00 +0200 (CEST)
+        id 1FAB91F2CAF; Tue, 25 May 2021 15:51:00 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -54,99 +58,93 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         <linux-xfs@vger.kernel.org>, Miklos Szeredi <miklos@szeredi.hu>,
         Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 0/13 v6] fs: Hole punch vs page cache filling races
-Date:   Tue, 25 May 2021 15:50:37 +0200
-Message-Id: <20210525125652.20457-1-jack@suse.cz>
+Subject: [PATCH 04/13] mm: Add functions to lock invalidate_lock for two mappings
+Date:   Tue, 25 May 2021 15:50:41 +0200
+Message-Id: <20210525135100.11221-4-jack@suse.cz>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210525125652.20457-1-jack@suse.cz>
+References: <20210525125652.20457-1-jack@suse.cz>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello,
+Some operations such as reflinking blocks among files will need to lock
+invalidate_lock for two mappings. Add helper functions to do that.
 
-here is another version of my patches to address races between hole punching
-and page cache filling functions for ext4 and other filesystems. The biggest
-change since the last time is providing function to lock two mappings and using
-it from XFS. Other changes were pretty minor.
-
-Out of all filesystem supporting hole punching, only GFS2 and OCFS2 remain
-unresolved. GFS2 people are working on their own solution (cluster locking is
-involved), OCFS2 has even bigger issues (maintainers informed, looking into
-it).
-
-As a next step, I'd like to actually make sure all calls to
-truncate_inode_pages() happen under mapping->invalidate_lock, add the assert
-and then we can also get rid of i_size checks in some places (truncate can
-use the same serialization scheme as hole punch). But that step is mostly
-a cleanup so I'd like to get these functional fixes in first.
-
-Note that the first patch of the series is already in mm tree but I'm
-submitting it here so that the series applies to Linus' tree cleanly.
-
-Changes since v5:
-* Added some reviewed-by tags
-* Added functions for locking two mappings and using them from XFS where needed
-* Some minor code style & comment fixes
-
-Changes since v4:
-* Rebased onto 5.13-rc1
-* Removed shmfs conversion patches
-* Fixed up zonefs changelog
-* Fixed up XFS comments
-* Added patch fixing up definition of file_operations in Documentation/vfs/
-* Updated documentation and comments to explain invalidate_lock is used also
-  to prevent changes through memory mappings to existing pages for some VFS
-  operations.
-
-Changes since v3:
-* Renamed and moved lock to struct address_space
-* Added conversions of tmpfs, ceph, cifs, fuse, f2fs
-* Fixed error handling path in filemap_read()
-* Removed .page_mkwrite() cleanup from the series for now
-
-Changes since v2:
-* Added documentation and comments regarding lock ordering and how the lock is
-  supposed to be used
-* Added conversions of ext2, xfs, zonefs
-* Added patch removing i_mapping_sem protection from .page_mkwrite handlers
-
-Changes since v1:
-* Moved to using inode->i_mapping_sem instead of aops handler to acquire
-  appropriate lock
-
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
-Motivation:
+ include/linux/fs.h |  6 ++++++
+ mm/filemap.c       | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-Amir has reported [1] a that ext4 has a potential issues when reads can race
-with hole punching possibly exposing stale data from freed blocks or even
-corrupting filesystem when stale mapping data gets used for writeout. The
-problem is that during hole punching, new page cache pages can get instantiated
-and block mapping from the looked up in a punched range after
-truncate_inode_pages() has run but before the filesystem removes blocks from
-the file. In principle any filesystem implementing hole punching thus needs to
-implement a mechanism to block instantiating page cache pages during hole
-punching to avoid this race. This is further complicated by the fact that there
-are multiple places that can instantiate pages in page cache.  We can have
-regular read(2) or page fault doing this but fadvise(2) or madvise(2) can also
-result in reading in page cache pages through force_page_cache_readahead().
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 897238d9f1e0..e6f7447505f5 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -822,6 +822,12 @@ static inline void inode_lock_shared_nested(struct inode *inode, unsigned subcla
+ void lock_two_nondirectories(struct inode *, struct inode*);
+ void unlock_two_nondirectories(struct inode *, struct inode*);
+ 
++void filemap_invalidate_down_write_two(struct address_space *mapping1,
++				       struct address_space *mapping2);
++void filemap_invalidate_up_write_two(struct address_space *mapping1,
++				     struct address_space *mapping2);
++
++
+ /*
+  * NOTE: in a 32bit arch with a preemptable kernel and
+  * an UP compile the i_size_read/write must be atomic
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 4d9ec4c6cc34..d3801a9739aa 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1009,6 +1009,44 @@ struct page *__page_cache_alloc(gfp_t gfp)
+ EXPORT_SYMBOL(__page_cache_alloc);
+ #endif
+ 
++/*
++ * filemap_invalidate_down_write_two - lock invalidate_lock for two mappings
++ *
++ * Lock exclusively invalidate_lock of any passed mapping that is not NULL.
++ *
++ * @mapping1: the first mapping to lock
++ * @mapping2: the second mapping to lock
++ */
++void filemap_invalidate_down_write_two(struct address_space *mapping1,
++				       struct address_space *mapping2)
++{
++	if (mapping1 > mapping2)
++		swap(mapping1, mapping2);
++	if (mapping1)
++		down_write(&mapping1->invalidate_lock);
++	if (mapping2 && mapping1 != mapping2)
++		down_write_nested(&mapping2->invalidate_lock, 1);
++}
++EXPORT_SYMBOL(filemap_invalidate_down_write_two);
++
++/*
++ * filemap_invalidate_up_write_two - unlock invalidate_lock for two mappings
++ *
++ * Unlock exclusive invalidate_lock of any passed mapping that is not NULL.
++ *
++ * @mapping1: the first mapping to unlock
++ * @mapping2: the second mapping to unlock
++ */
++void filemap_invalidate_up_write_two(struct address_space *mapping1,
++				     struct address_space *mapping2)
++{
++	if (mapping1)
++		up_write(&mapping1->invalidate_lock);
++	if (mapping2 && mapping1 != mapping2)
++		up_write(&mapping2->invalidate_lock);
++}
++EXPORT_SYMBOL(filemap_invalidate_up_write_two);
++
+ /*
+  * In order to wait for pages to become available there must be
+  * waitqueues associated with pages. By using a hash table of
+-- 
+2.26.2
 
-There are couple of ways how to fix this. First way (currently implemented by
-XFS) is to protect read(2) and *advise(2) calls with i_rwsem so that they are
-serialized with hole punching. This is easy to do but as a result all reads
-would then be serialized with writes and thus mixed read-write workloads suffer
-heavily on ext4. Thus this series introduces inode->i_mapping_sem and uses it
-when creating new pages in the page cache and looking up their corresponding
-block mapping. We also replace EXT4_I(inode)->i_mmap_sem with this new rwsem
-which provides necessary serialization with hole punching for ext4.
-
-								Honza
-
-[1] https://lore.kernel.org/linux-fsdevel/CAOQ4uxjQNmxqmtA_VbYW0Su9rKRk2zobJmahcyeaEVOFKVQ5dw@mail.gmail.com/
-
-Previous versions:
-Link: https://lore.kernel.org/linux-fsdevel/20210208163918.7871-1-jack@suse.cz/
-Link: https://lore.kernel.org/r/20210413105205.3093-1-jack@suse.cz
-Link: https://lore.kernel.org/r/20210423171010.12-1-jack@suse.cz
-Link: https://lore.kernel.org/r/20210512101639.22278-1-jack@suse.cz
