@@ -2,68 +2,122 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A0BC2B9F8
-	for <linux-cifs@archiver.kernel.org>; Tue, 25 May 2021 17:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A34C4707F
+	for <linux-cifs@archiver.kernel.org>; Tue, 25 May 2021 20:43:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64E4D61417
-	for <linux-cifs@archiver.kernel.org>; Tue, 25 May 2021 17:36:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EFC2610CE
+	for <linux-cifs@archiver.kernel.org>; Tue, 25 May 2021 20:43:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232849AbhEYRiC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 25 May 2021 13:38:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59956 "EHLO mail.kernel.org"
+        id S231504AbhEYUoo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 25 May 2021 16:44:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35618 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234125AbhEYRhx (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 25 May 2021 13:37:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id D808E61157;
-        Tue, 25 May 2021 17:36:22 +0000 (UTC)
+        id S231182AbhEYUoo (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 25 May 2021 16:44:44 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A400061409;
+        Tue, 25 May 2021 20:43:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621964182;
-        bh=LskCapKtyB8RvSvFDfob6jRHdNLRDzxTgT9OF4bwRiI=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Ny9MBHfnFRBWDZ5MaAeHH23HUW1HtoA9ZG0uLesxIxrOzDxzq5Gadxv2HQz/Yhqh0
-         pusvJG8wsNSJq0TglpUrg1uQbQmSGfZ4dnLomTqhchJRsIYOQF7LMUGyvDx71bWGa5
-         PETGfYUjgVBZiAog9xmPRfGhn/0IDwEYA4LEisITlNPo9vN/0Mp/RI/nqE/Ejxzkcm
-         oCK0BqSAQr6i5ety5eL3kWRNgq7DGhnSgtra3Sch8HOHDbBeAc31ruhd1S+rOyx9/N
-         cX/pi3MeCA4BSGwcfwDcjuUA+DiO9bvQkVYAqCGHHYtkzymrl8QwzqKS7x/rDi+whW
-         vGZhk8ikkDIww==
-Subject: Re: [GIT PULL] netfs: Fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <4007708.1621947662@warthog.procyon.org.uk>
-References: <4007708.1621947662@warthog.procyon.org.uk>
-X-PR-Tracked-List-Id: <ceph-devel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <4007708.1621947662@warthog.procyon.org.uk>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/netfs-lib-fixes-20200525
-X-PR-Tracked-Commit-Id: b71c791254ff5e78a124c8949585dccd9e225e06
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ad9f25d338605d26acedcaf3ba5fab5ca26f1c10
-Message-Id: <162196418275.15660.9511112826045891745.pr-tracker-bot@kernel.org>
-Date:   Tue, 25 May 2021 17:36:22 +0000
-To:     David Howells <dhowells@redhat.com>
-Cc:     torvalds@linux-foundation.org, dhowells@redhat.com,
-        geert@linux-m68k.org, willy@infradead.org,
-        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net
+        s=k20201202; t=1621975393;
+        bh=D9/lkDf7/4G2MsG+84gaDXO7v7xhTSSqmHMTWi1xl5w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gWt3V53WTHyJPdEqHJaiSjzFKDoxv0siITj6vkwlqJXoCFCv3a3exQZokq6Tonv30
+         gMlbZf5iUa/Tplf7dwGeETBsjwgLMAEfIxdlTKGU+qc54RBD6xX/YQQvQ5ekFgP4qd
+         2+r05F69dPROmTIFIVRPzEBOiSjcvk4cl99FWfRWeS/2hUrt1iSElUvXsOhXbbeYrI
+         3Jy9OORfYg3TKBLlS3Bi54A4zCiGK6t5PZVWbNrjze/xPOo+5rBtv4rgxsNNeh02E1
+         Whjvii7J/mMCnawZPlrhtapQheVSwKVYf3ytpEB2b4316qWTYa5vsbWoW7/muPlCfX
+         GhrzuzD+2ASMw==
+Date:   Tue, 25 May 2021 13:43:13 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
+        Chao Yu <yuchao0@huawei.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
+        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH 02/13] documentation: Sync file_operations members with
+ reality
+Message-ID: <20210525204313.GL202121@locust>
+References: <20210525125652.20457-1-jack@suse.cz>
+ <20210525135100.11221-2-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210525135100.11221-2-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Tue, 25 May 2021 14:01:02 +0100:
+On Tue, May 25, 2021 at 03:50:39PM +0200, Jan Kara wrote:
+> Sync listing of struct file_operations members with the real one in
+> fs.h.
+> 
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+>  Documentation/filesystems/locking.rst | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
+> index 1e894480115b..4ed2b22bd0a8 100644
+> --- a/Documentation/filesystems/locking.rst
+> +++ b/Documentation/filesystems/locking.rst
+> @@ -506,6 +506,7 @@ prototypes::
+>  	ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+>  	ssize_t (*read_iter) (struct kiocb *, struct iov_iter *);
+>  	ssize_t (*write_iter) (struct kiocb *, struct iov_iter *);
+> +	int (*iopoll) (struct kiocb *kiocb, bool spin);
+>  	int (*iterate) (struct file *, struct dir_context *);
+>  	int (*iterate_shared) (struct file *, struct dir_context *);
+>  	__poll_t (*poll) (struct file *, struct poll_table_struct *);
+> @@ -518,12 +519,6 @@ prototypes::
+>  	int (*fsync) (struct file *, loff_t start, loff_t end, int datasync);
+>  	int (*fasync) (int, struct file *, int);
+>  	int (*lock) (struct file *, int, struct file_lock *);
+> -	ssize_t (*readv) (struct file *, const struct iovec *, unsigned long,
+> -			loff_t *);
+> -	ssize_t (*writev) (struct file *, const struct iovec *, unsigned long,
+> -			loff_t *);
+> -	ssize_t (*sendfile) (struct file *, loff_t *, size_t, read_actor_t,
+> -			void __user *);
+>  	ssize_t (*sendpage) (struct file *, struct page *, int, size_t,
+>  			loff_t *, int);
+>  	unsigned long (*get_unmapped_area)(struct file *, unsigned long,
+> @@ -536,6 +531,14 @@ prototypes::
+>  			size_t, unsigned int);
+>  	int (*setlease)(struct file *, long, struct file_lock **, void **);
+>  	long (*fallocate)(struct file *, int, loff_t, loff_t);
+> +	void (*show_fdinfo)(struct seq_file *m, struct file *f);
+> +	unsigned (*mmap_capabilities)(struct file *);
+> +	ssize_t (*copy_file_range)(struct file *, loff_t, struct file *,
+> +			loff_t, size_t, unsigned int);
+> +	loff_t (*remap_file_range)(struct file *file_in, loff_t pos_in,
+> +			struct file *file_out, loff_t pos_out,
+> +			loff_t len, unsigned int remap_flags);
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/netfs-lib-fixes-20200525
+Acked-by: Darrick J. Wong <djwong@kernel.org>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ad9f25d338605d26acedcaf3ba5fab5ca26f1c10
+The remap_file_range part looks correct to me.  At a glance the others
+seem fine too, but I'm not as familiar with them...
 
-Thank you!
+--D
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> +	int (*fadvise)(struct file *, loff_t, loff_t, int);
+>  
+>  locking rules:
+>  	All may block.
+> -- 
+> 2.26.2
+> 
