@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B594DC47082
-	for <linux-cifs@archiver.kernel.org>; Wed, 26 May 2021 22:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D330DC4707F
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 May 2021 17:33:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BE12613CA
-	for <linux-cifs@archiver.kernel.org>; Wed, 26 May 2021 22:40:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE30C6128B
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 May 2021 17:33:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233887AbhEZWlb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 26 May 2021 18:41:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60008 "EHLO
+        id S229881AbhE0RfQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 May 2021 13:35:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231419AbhEZWlb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 May 2021 18:41:31 -0400
+        with ESMTP id S234061AbhE0RfP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 27 May 2021 13:35:15 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43FD1C061574
-        for <linux-cifs@vger.kernel.org>; Wed, 26 May 2021 15:39:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EEBEC061574
+        for <linux-cifs@vger.kernel.org>; Thu, 27 May 2021 10:33:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
          s=42; h=Message-ID:Date:To:From:CC;
-        bh=HGCcIRRYMfCpovsmcLl7SP/Ei0ZIntd8rTZt9geF2MI=; b=EXJ0/UQKEzFFwtY/J2xzla/hD4
-        3XhXMmfiEs8zEnHcgHxZz4TnbsP5apQ/Yb48Q00C6p4kataHrGJoXMmyWx7h4s5uFBfgnv5YIckuJ
-        avaP5I0JiXTMYS8/K7nM2u8GXvwlT/F2cN6d6zhu+eUXsbgHaHr9VPRPjH/P1CyZ2P3Y9B1k53YU3
-        9p23ckrSoPmedeJeDbdpxhgPwNh4FF344iJPZWR6kjgA6MJe2XYV5A17LLM40D3i6IWAMKvhrhxLM
-        WudmeDTKUP+FzL+DnA/pbLHWRgKDfw4xs7kAa95/RAx0pWMG2R31jX/KVQoS/yhu6KYpm8KVmugeU
-        icCQ2EwW/Ryc7A1/75j9lDYIj0azlup8pdyKtSbiEBO6Gdzj1faUsCQ/xXuw3BVMaLgOByW/l0Qdi
-        IGpPM7Mg7gHleGCy6KVR28Bv69EgvvMHnKKKi4nyrLa3CNBqmRsT4Z0mXo9aKOeR+zEDlDzSeCpsh
-        L1SPIpegIey6RVLw4278SLW3;
-Received: from [2a01:4f8:192:486::6:0] (port=56410 helo=hr6.samba.org) 
+        bh=GMlcKAEpYJmrrvhtXn5rJzK29HpRTeVoaDT4n2GIZUo=; b=Bacngo1dxFnBFyGF5GOwa0zu7y
+        JUB8e2xwLdS396yAf1hNlOZaxk4okBtOYdFseewx5VpGYsQFHzgMrCmMjTBLqYQaOctcUXjDHCkWM
+        VkmuPJpIILKTzX8ExQ7Cn8HoHMQlT8OuF1Cp26kB7XcnCG5YZgp7H9OA1OVHSc2NSGmVg35wwnb8w
+        ddyM8NsBFyFo9GShPFa0xG1uBImq/hv5e7RlTdYOzFnOutTsdklQn313033oAUqmLFr53gTu/5fWD
+        aBRsAqgLhtoB8MuTIWYGBHpuhw0TeL3WVJ343fetklplOvX9OC812Hpv1RoEIrp3OhJToFU1B5Cyj
+        R1eA/PIjjqoYsSVi+d08V4oY9HxXhivNROLBg5OAYgpr36oyOrEVmbKc0OuSIBOW1FTkUie5q3pOw
+        QSWS6vL08N31J5xD18uxCE0W81bJYuJzrKAzgYsPCyvSzzEo4O9yPS3hI2r3BK4gu7jJZCWoi31tE
+        /VpTRbnBdUpm00NjxiiAgx4B;
+Received: from [2a01:4f8:192:486::6:0] (port=56658 helo=hr6.samba.org) 
         by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
         (Exim)
-        id 1lm2Bw-0004ag-NB
-        for cifs-qa@samba.org; Wed, 26 May 2021 22:39:56 +0000
-Received: from [::1] (port=34294 helo=bugzilla.samba.org)
+        id 1lmJt1-0006eF-3D
+        for cifs-qa@samba.org; Thu, 27 May 2021 17:33:35 +0000
+Received: from [::1] (port=34544 helo=bugzilla.samba.org)
         by hr6.samba.org with esmtp (Exim 4.93)
         (envelope-from <samba-bugs@samba.org>)
-        id 1lm2Bw-008pKC-74
-        for cifs-qa@samba.org; Wed, 26 May 2021 22:39:56 +0000
+        id 1lmJt0-008uHy-8a
+        for cifs-qa@samba.org; Thu, 27 May 2021 17:33:34 +0000
 From:   samba-bugs@samba.org
 To:     cifs-qa@samba.org
 Subject: [Bug 14713] SMBv3 negotiation fails with a Solaris server
-Date:   Wed, 26 May 2021 22:39:55 +0000
+Date:   Thu, 27 May 2021 17:33:33 +0000
 X-Bugzilla-Reason: QAcontact
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -53,7 +53,7 @@ X-Bugzilla-Component: kernel fs
 X-Bugzilla-Version: 5.x
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ronniesahlberg@gmail.com
+X-Bugzilla-Who: richard.flint@gmail.com
 X-Bugzilla-Status: ASSIGNED
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P5
@@ -61,7 +61,7 @@ X-Bugzilla-Assigned-To: sfrench@samba.org
 X-Bugzilla-Target-Milestone: ---
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-14713-10630-l1JCiYZOAg@https.bugzilla.samba.org/>
+Message-ID: <bug-14713-10630-elT4Jp3Iez@https.bugzilla.samba.org/>
 In-Reply-To: <bug-14713-10630@https.bugzilla.samba.org/>
 References: <bug-14713-10630@https.bugzilla.samba.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -75,26 +75,9 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 https://bugzilla.samba.org/show_bug.cgi?id=3D14713
 
---- Comment #34 from Ronnie Sahlberg <ronniesahlberg@gmail.com> ---
-Signing.  It is not required on the server config,
-
-BUT in 3.1.1 signing is required for all TreeConnect calls (0x03) always, by
-the protocol.
-
-In 3.0 and 3.0.2 signing is required for all
-Ioctl:fsctl_validate_negotiate_info calls. Also by protocol requirements.
-
-The command code for Ioctl is 0x0b, which you saw in the log.
-
-
-At least it got the mount process a bit further by using vers=3D3.0 since w=
-e got
-past the TreeConnect.   I forgot that in 3.0 we have that Ioctl call.
-It could have worked, but I forgot about the Ioctl :-(
-
-
-Anyway, this is another datapoint that tells us that the issue is that it is
-related to the session key imo.
+--- Comment #35 from Richard Flint <richard.flint@gmail.com> ---
+Thanks for your help it - does seem that you've narrowed down the cause a
+little. Is it still required for me to dump those keys?
 
 --=20
 You are receiving this mail because:
