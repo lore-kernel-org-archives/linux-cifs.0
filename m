@@ -2,97 +2,143 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32957C47088
-	for <linux-cifs@archiver.kernel.org>; Wed, 26 May 2021 20:36:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FCD2C4707F
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 May 2021 12:01:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 141CF613BF
-	for <linux-cifs@archiver.kernel.org>; Wed, 26 May 2021 20:36:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D572A60FE4
+	for <linux-cifs@archiver.kernel.org>; Thu, 27 May 2021 12:01:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232507AbhEZUhp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 26 May 2021 16:37:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60670 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231377AbhEZUhm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 26 May 2021 16:37:42 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A30BC061574;
-        Wed, 26 May 2021 13:36:09 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id q7so4545604lfr.6;
-        Wed, 26 May 2021 13:36:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GlfHDai4ONn60e6TNReFwPChDr2UAYYMQAwfbWWymqo=;
-        b=BiinMcC1tfG7D9B/MpBArh8RezrXAapNkwzZvVu9gpy8O0veUTGhyyYdosbVKvSPkZ
-         1TOxiyh9nKQ8lrkja+Vaq8SRebFOoJdYUd1YlqG6lRwe1VzbuZ6Hds2N8t8shzZX9bLL
-         qwkAat3gCIKqQVJixG0svWA7Sj/43V8Xpx4chL0g3gmKvSzpuHu6yagUSruINFFcuGfw
-         +GKz5n3V7wALXRcCmlt7E+e4K+kuf0veLOGj8yVUTkfjUd7MFfIhMfjL3jXRo6bxjcEr
-         5Ox72GCiJm6E0YvTQ6V6eXs3ItfqidR/3Y3eIGABzJ/9FFCPDxX/FVa0Hys2jcNQUqOr
-         MQgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GlfHDai4ONn60e6TNReFwPChDr2UAYYMQAwfbWWymqo=;
-        b=N2AFIploHGp9ew/PEffd/5nkw1HH2FgV1zd+h89C6YVF8pyxXUoC02iKuuNIwdtXT9
-         naWoFrPY0ups5LoMXSsjkAQGujalwXfu7N4mK2EacCfi9U5Tji+k4I0oWzrO6rsmHjX5
-         QHm1t7kpwsJcZML6N9bsXRvN8MjKbUafo8G9J3eE48j2yLRMXD1qcRf0fumNLnosS053
-         Oh+6nZ+p1z2K+dvNxk8sJ2g21ph3RxrGvy11H8+1whyqFwVr9GGax+aJCGnZRJjqmqIV
-         Uh6OHeMBoY12oHVwP4K/G/G/iJ/QBgmh8VR5Ne8xwEl23TxnVcR156s0qc5jazTtCbjG
-         G+mA==
-X-Gm-Message-State: AOAM531rPNxUECr2P00SZqEw9NJWLo673UEdnwvXTN+NcnjJKCbcMnhu
-        K1KQDTyRXDpE0ugZ/HdNWaE=
-X-Google-Smtp-Source: ABdhPJwZjC/TUOd8aDc/+Ao3iaOCp7q1cSGq8xzn3GGkUc2a8mh2GEnzNZH2vXXl1rQ+iOhClTL3Lg==
-X-Received: by 2002:a05:6512:ac8:: with SMTP id n8mr3324320lfu.100.1622061367812;
-        Wed, 26 May 2021 13:36:07 -0700 (PDT)
-Received: from localhost.localdomain (h-98-128-228-193.NA.cust.bahnhof.se. [98.128.228.193])
-        by smtp.gmail.com with ESMTPSA id c4sm7721lfc.258.2021.05.26.13.36.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 May 2021 13:36:07 -0700 (PDT)
-From:   Rikard Falkeborn <rikard.falkeborn@gmail.com>
-To:     Steve French <sfrench@samba.org>
-Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-kernel@vger.kernel.org,
-        Rikard Falkeborn <rikard.falkeborn@gmail.com>
-Subject: [PATCH] cifs: Constify static struct genl_ops
-Date:   Wed, 26 May 2021 22:35:45 +0200
-Message-Id: <20210526203545.13160-1-rikard.falkeborn@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        id S234627AbhE0MDX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 27 May 2021 08:03:23 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54298 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234562AbhE0MDW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 27 May 2021 08:03:22 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1622116908; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dzbVRZmzFuPYI5poJku3auZPHvmkGSaVp1vMN+///aM=;
+        b=f2cxEqETTBvEmV4ULoxNaMI1iCVFmFrGue2YsLPhsPaIwuWVWOs+sxiPUa8otMLF+YX0oZ
+        uhov743BXdjHMHq4sEArHqsspS7mHteRQKwa0LzGiZVHpqcufpjvdvGhVbTucTMzS1ouxn
+        le5Tq6JlMjVPTCeShhV6Fk3X7MaBZg0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1622116908;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dzbVRZmzFuPYI5poJku3auZPHvmkGSaVp1vMN+///aM=;
+        b=7ZmMbPHvotaCLsOpw+GVeU5Zo9oFBCWF89Cqa0I7loV15uebJ80v4o2t67vCmwZ9u62oXn
+        kdu5eoF4IBW9prBQ==
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 1D6CBAD77;
+        Thu, 27 May 2021 12:01:48 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 5A1181F2C9A; Thu, 27 May 2021 14:01:47 +0200 (CEST)
+Date:   Thu, 27 May 2021 14:01:47 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     "Darrick J. Wong" <djwong@kernel.org>
+Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
+        Chao Yu <yuchao0@huawei.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
+        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 07/13] xfs: Convert to use invalidate_lock
+Message-ID: <20210527120147.GD24486@quack2.suse.cz>
+References: <20210525125652.20457-1-jack@suse.cz>
+ <20210525135100.11221-7-jack@suse.cz>
+ <20210525213729.GC202144@locust>
+ <20210526101840.GC30369@quack2.suse.cz>
+ <20210526153251.GZ202121@locust>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210526153251.GZ202121@locust>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The only usage of cifs_genl_ops[] is to assign its address to the ops
-field in the genl_family struct, which is a pointer to const. Make it
-const to allow the compiler to put it in read-only memory.
+On Wed 26-05-21 08:32:51, Darrick J. Wong wrote:
+> On Wed, May 26, 2021 at 12:18:40PM +0200, Jan Kara wrote:
+> > On Tue 25-05-21 14:37:29, Darrick J. Wong wrote:
+> > > On Tue, May 25, 2021 at 03:50:44PM +0200, Jan Kara wrote:
+> > > > Use invalidate_lock instead of XFS internal i_mmap_lock. The intended
+> > > > purpose of invalidate_lock is exactly the same. Note that the locking in
+> > > > __xfs_filemap_fault() slightly changes as filemap_fault() already takes
+> > > > invalidate_lock.
+> > > > 
+> > > > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > > > CC: <linux-xfs@vger.kernel.org>
+> > > > CC: "Darrick J. Wong" <darrick.wong@oracle.com>
+> > > 
+> > > It's djwong@kernel.org now.
+> > 
+> > OK, updated.
+> > 
+> > > > @@ -355,8 +358,11 @@ xfs_isilocked(
+> > > >  
+> > > >  	if (lock_flags & (XFS_MMAPLOCK_EXCL|XFS_MMAPLOCK_SHARED)) {
+> > > >  		if (!(lock_flags & XFS_MMAPLOCK_SHARED))
+> > > > -			return !!ip->i_mmaplock.mr_writer;
+> > > > -		return rwsem_is_locked(&ip->i_mmaplock.mr_lock);
+> > > > +			return !debug_locks ||
+> > > > +				lockdep_is_held_type(
+> > > > +					&VFS_I(ip)->i_mapping->invalidate_lock,
+> > > > +					0);
+> > > > +		return rwsem_is_locked(&VFS_I(ip)->i_mapping->invalidate_lock);
+> > > 
+> > > This doesn't look right...
+> > > 
+> > > If lockdep is disabled, we always return true for
+> > > xfs_isilocked(ip, XFS_MMAPLOCK_EXCL) even if nobody holds the lock?
+> > > 
+> > > Granted, you probably just copy-pasted from the IOLOCK_SHARED clause
+> > > beneath it.  Er... oh right, preichl was messing with all that...
+> > > 
+> > > https://lore.kernel.org/linux-xfs/20201016021005.548850-2-preichl@redhat.com/
+> > 
+> > Indeed copy-paste programming ;) It certainly makes the assertions happy
+> > but useless. Should I pull the patch you reference into the series? It
+> > seems to have been uncontroversial and reviewed. Or will you pull the
+> > series to xfs tree so I can just rebase on top?
+> 
+> The full conversion series introduced assertion failures because lockdep
+> can't handle some of the ILOCK usage patterns, specifically the fact
+> that a thread sometimes takes the ILOCK but then hands the inode to a
+> workqueue to avoid overflowing the first thread's stack.  That's why it
+> never got merged into the xfs tree.
 
-Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
----
- fs/cifs/netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I see. Yeah, we do "interesting" dances around lockdep fs-freezing
+annotations for AIO as well where the freeze protection is inherited from
+submission to completion context (we effectively generate false release
+event for lockdep when exiting submit context and false acquire event in
+the completion context). It can be done but it's ugly and error prone.
 
-diff --git a/fs/cifs/netlink.c b/fs/cifs/netlink.c
-index 5aaabe4cc0a7..291cb606f149 100644
---- a/fs/cifs/netlink.c
-+++ b/fs/cifs/netlink.c
-@@ -30,7 +30,7 @@ static const struct nla_policy cifs_genl_policy[CIFS_GENL_ATTR_MAX + 1] = {
- 	[CIFS_GENL_ATTR_SWN_RESOURCE_NAME]	= { .type = NLA_STRING},
- };
- 
--static struct genl_ops cifs_genl_ops[] = {
-+static const struct genl_ops cifs_genl_ops[] = {
- 	{
- 		.cmd = CIFS_GENL_CMD_SWN_NOTIFY,
- 		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+> However, that kind of switcheroo isn't done with the
+> MMAPLOCK/invalidate_lock, so you could simply pull the patch I linked
+> above into your series.
+
+OK, will do!
+
+								Honza
+
 -- 
-2.31.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
