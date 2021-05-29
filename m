@@ -7,100 +7,76 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A17C47090
-	for <linux-cifs@archiver.kernel.org>; Sat, 29 May 2021 08:16:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D472CC4708E
+	for <linux-cifs@archiver.kernel.org>; Sat, 29 May 2021 11:48:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A94F610A8
-	for <linux-cifs@archiver.kernel.org>; Sat, 29 May 2021 08:16:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9079161186
+	for <linux-cifs@archiver.kernel.org>; Sat, 29 May 2021 11:48:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbhE2ISN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 29 May 2021 04:18:13 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:5140 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbhE2ISL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 29 May 2021 04:18:11 -0400
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4FsZ811ZpXzYnYd;
-        Sat, 29 May 2021 16:13:53 +0800 (CST)
-Received: from dggpeml500017.china.huawei.com (7.185.36.243) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Sat, 29 May 2021 16:16:32 +0800
-Received: from huawei.com (10.175.103.91) by dggpeml500017.china.huawei.com
- (7.185.36.243) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Sat, 29 May
- 2021 16:16:31 +0800
-From:   Yang Yingliang <yangyingliang@huawei.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-cifsd-devel@lists.sourceforge.net>,
-        <linux-cifs@vger.kernel.org>
-CC:     <namjae.jeon@samsung.com>, <sergey.senozhatsky@gmail.com>,
-        <sfrench@samba.org>, <hyc.lee@gmail.com>
-Subject: [PATCH -next 3/3] cifsd: check return value of ksmbd_vfs_getcasexattr() correctly
-Date:   Sat, 29 May 2021 16:20:58 +0800
-Message-ID: <20210529082058.3012233-3-yangyingliang@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210529082058.3012233-1-yangyingliang@huawei.com>
-References: <20210529082058.3012233-1-yangyingliang@huawei.com>
+        id S229652AbhE2Lua (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 29 May 2021 07:50:30 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:2355 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229602AbhE2Lu3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 29 May 2021 07:50:29 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Fsfpj4Z22z1BFXH;
+        Sat, 29 May 2021 19:44:13 +0800 (CST)
+Received: from dggema769-chm.china.huawei.com (10.1.198.211) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Sat, 29 May 2021 19:48:51 +0800
+Received: from localhost (10.174.179.215) by dggema769-chm.china.huawei.com
+ (10.1.198.211) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Sat, 29
+ May 2021 19:48:50 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <sfrench@samba.org>
+CC:     <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
+        <linux-kernel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] cifs: Remove unused inline function is_sysvol_or_netlogon()
+Date:   Sat, 29 May 2021 19:48:48 +0800
+Message-ID: <20210529114848.19608-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.103.91]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500017.china.huawei.com (7.185.36.243)
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggema769-chm.china.huawei.com (10.1.198.211)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If ksmbd_vfs_getcasexattr() returns -ENOMEM, stream_buf is NULL,
-it will cause null-ptr-deref when using it to copy memory. So we
-need check the return value of ksmbd_vfs_getcasexattr() by comparing
-with 0.
+is_sysvol_or_netlogon() is never used, so can remove it.
 
-Fixes: f44158485826 ("cifsd: add file operations")
-Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- fs/cifsd/vfs.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ fs/cifs/dfs_cache.c | 11 -----------
+ 1 file changed, 11 deletions(-)
 
-diff --git a/fs/cifsd/vfs.c b/fs/cifsd/vfs.c
-index 97d5584ec870..45ba30f1f2d2 100644
---- a/fs/cifsd/vfs.c
-+++ b/fs/cifsd/vfs.c
-@@ -274,7 +274,6 @@ static int ksmbd_vfs_stream_read(struct ksmbd_file *fp, char *buf, loff_t *pos,
+diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+index b1fa30fefe1f..03c81c39a507 100644
+--- a/fs/cifs/dfs_cache.c
++++ b/fs/cifs/dfs_cache.c
+@@ -319,17 +319,6 @@ static inline unsigned int cache_entry_hash(const void *data, int size)
+ 	return h & (CACHE_HTABLE_SIZE - 1);
+ }
+ 
+-/* Check whether second path component of @path is SYSVOL or NETLOGON */
+-static inline bool is_sysvol_or_netlogon(const char *path)
+-{
+-	const char *s;
+-	char sep = path[0];
+-
+-	s = strchr(path + 1, sep) + 1;
+-	return !strncasecmp(s, "sysvol", strlen("sysvol")) ||
+-		!strncasecmp(s, "netlogon", strlen("netlogon"));
+-}
+-
+ /* Return target hint of a DFS cache entry */
+ static inline char *get_tgt_name(const struct cache_entry *ce)
  {
- 	ssize_t v_len;
- 	char *stream_buf = NULL;
--	int err;
- 
- 	ksmbd_debug(VFS, "read stream data pos : %llu, count : %zd\n",
- 		    *pos, count);
-@@ -283,10 +282,9 @@ static int ksmbd_vfs_stream_read(struct ksmbd_file *fp, char *buf, loff_t *pos,
- 				       fp->stream.name,
- 				       fp->stream.size,
- 				       &stream_buf);
--	if (v_len == -ENOENT) {
-+	if ((int)v_len < 0) {
- 		ksmbd_err("not found stream in xattr : %zd\n", v_len);
--		err = -ENOENT;
--		return err;
-+		return (int)v_len;
- 	}
- 
- 	memcpy(buf, &stream_buf[*pos], count);
-@@ -415,9 +413,9 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *fp, char *buf, loff_t *pos,
- 				       fp->stream.name,
- 				       fp->stream.size,
- 				       &stream_buf);
--	if (v_len == -ENOENT) {
-+	if ((int)v_len < 0) {
- 		ksmbd_err("not found stream in xattr : %zd\n", v_len);
--		err = -ENOENT;
-+		err = (int)v_len;
- 		goto out;
- 	}
- 
 -- 
-2.25.1
+2.17.1
 
