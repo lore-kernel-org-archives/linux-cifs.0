@@ -4,82 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E248EC07E94
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Jun 2021 15:25:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD67C47092
+	for <linux-cifs@archiver.kernel.org>; Sun, 30 May 2021 13:51:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C378061400
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Jun 2021 15:25:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68E196108D
+	for <linux-cifs@archiver.kernel.org>; Sun, 30 May 2021 13:51:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbhFDP12 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 4 Jun 2021 11:27:28 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:21990 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229675AbhFDP12 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 4 Jun 2021 11:27:28 -0400
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 1F89F7FC02;
-        Fri,  4 Jun 2021 15:25:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1622820340;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oOxmSNZCPWeZDQdiSOSqEVY+DJjrSsroiEI4mEB5+qE=;
-        b=CRdRs9bm2eQ8sWBJx/KKVJk6hiDw2mKEj0Mta4pXZdbiMlzIm9O/1papdblx3KTnDaEW+7
-        QBT9nR6BxbZ6zyNLpOYknQ1w5JX5nU0cZxjvXDzYZfXvksyDQMznt8GUO9bK4Bcdlve3rN
-        4jSAimYdDEaTwJLnQ/tv3ZkgZcVqs2pEI6QmBvoAZWC8ifwR+XSCZGF8VHgODHO9nT1EKY
-        +83GlWc9DfhKeqBKsunVk0cMykkkRLjQnwH/27M6tzsgGcwH62lkj/vTb6p42A7XOe0aBv
-        BGejbZ4nvVsWIkZg24EwcJS5glvKd+HlTPNcUW5MSy0VnQpiJO3YCLYbav2h3A==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>,
-        CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com,
-        rohiths msft <rohiths.msft@gmail.com>
-Subject: Re: Multichannel patches
-In-Reply-To: <CANT5p=o6Oq-27Xj4Z6-XzXKL45Dwg7JjGw2HA9jv5+YFQKpHUg@mail.gmail.com>
-References: <CANT5p=oMLZei+OhXZ-8Hr2NCx=pRYWF1zQ0vRQ5D_NkvLGwJDg@mail.gmail.com>
- <875yywp64t.fsf@cjr.nz>
- <CANT5p=o6Oq-27Xj4Z6-XzXKL45Dwg7JjGw2HA9jv5+YFQKpHUg@mail.gmail.com>
-Date:   Fri, 04 Jun 2021 12:25:33 -0300
-Message-ID: <87y2bpk5xu.fsf@cjr.nz>
+        id S229580AbhE3Nw7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 30 May 2021 09:52:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57518 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229500AbhE3Nw6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 30 May 2021 09:52:58 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40B9FC061574
+        for <linux-cifs@vger.kernel.org>; Sun, 30 May 2021 06:51:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+         s=42; h=Message-ID:Date:To:From:CC;
+        bh=X+tvL+rOaY/tHgEDwksGrbRsvHd1Gz7PyibXoulrvSM=; b=uplo1LrJhXtmvQqnJbUUV92iKz
+        Tq1gW7o5cnvPHmSnfhT81TL5jALtz/r0vodZ/SGIEsJ4jE/t7DPrsvDW/WfZLVz8jAyjHQtTx0duG
+        vUkZd7ejBd1RNRI2ou9xNfrZzKpqGhyCZbDc2z5LVzEWDz7oxtS6OLz/KiBN9pxJFrd6IZK6Ihq5r
+        zCmHwXdPhi6sRNzzcAQUnjc5jmOvmWtH67AZS+fGxbYgLx0cCIn79RWchcajsLhi3730hvOmfc+EV
+        1y3oaNhwY2Gxpz00tgg2JQhTdkzpDrMP82iLZ2pGiqKGi3IbdvLKFMMjIgsgx5veMcB6EpBU8QtBU
+        mmflR+lujC9Dt+SwwEQj1qt3dsc2VKyBq6lf4/mModDNyoUGmHTt8unCzjQ57KEH0zdt9/HrdPaiL
+        ZcXqFRSRoYIU0O43pPiC2AeseH9Djj7J9vEixkERAkmBDdd4HPSz568RQWOF2qd8WfvAM8WPviFN+
+        Ddf3dPND4pxZuaS+YpXJU4n/;
+Received: from [2a01:4f8:192:486::6:0] (port=57216 helo=hr6.samba.org) 
+        by hr2.samba.org with esmtps (TLS1.3:ECDHE_RSA_CHACHA20_POLY1305:256)
+        (Exim)
+        id 1lnLqW-0004gp-W1
+        for cifs-qa@samba.org; Sun, 30 May 2021 13:51:17 +0000
+Received: from [::1] (port=35102 helo=bugzilla.samba.org)
+        by hr6.samba.org with esmtp (Exim 4.93)
+        (envelope-from <samba-bugs@samba.org>)
+        id 1lnLqW-0099h3-2Z
+        for cifs-qa@samba.org; Sun, 30 May 2021 13:51:16 +0000
+From:   samba-bugs@samba.org
+To:     cifs-qa@samba.org
+Subject: [Bug 14713] SMBv3 negotiation fails with a Solaris server
+Date:   Sun, 30 May 2021 13:51:15 +0000
+X-Bugzilla-Reason: QAcontact
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: CifsVFS
+X-Bugzilla-Component: kernel fs
+X-Bugzilla-Version: 5.x
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: richard.flint@gmail.com
+X-Bugzilla-Status: ASSIGNED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P5
+X-Bugzilla-Assigned-To: sfrench@samba.org
+X-Bugzilla-Target-Milestone: ---
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-14713-10630-YfXLMo3WiI@https.bugzilla.samba.org/>
+In-Reply-To: <bug-14713-10630@https.bugzilla.samba.org/>
+References: <bug-14713-10630@https.bugzilla.samba.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.samba.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+https://bugzilla.samba.org/show_bug.cgi?id=3D14713
 
-> @Paulo Alcantara That would be great if you can help testing my
-> changes. Please test with these new changes.
+--- Comment #36 from Richard Flint <richard.flint@gmail.com> ---
+As requested I am emailing you details of the successful SMB2.1 negotiation
+using both smbclient:
 
-OK.
+smbclient //nonsuch/myshare -m SMB2 --user=3Dmyuser
 
->> The super is only used for providing cifs_sb_info::origin_fullpath as key to find the corresponding failover targets in referral cache.
-> I'm wondering what would happen if there are multiple tcons to the
-> same origin_fullpath (possibly in different sessions)?
+and the CIFS mount command (with vers=3D2.1 and without seal).
 
-That is certainly a problem, indeed.  I'm waiting for the DFS tests to
-finish and then send a series that contains a potential fix for that --
-e.g. not sharing TCP servers when mounting DFS shares.  We used to not
-share tcons with DFS mounts because they might contain different prefix
-paths but connected to same share, however that wasn't enough because
-multiple DFS mounts may connect to same target servers, although they
-might failover to completely different servers.
-
-> Also, doesn't failover targets apply to each channel under a session?
-> Shouldn't we switch targets on reconnect of secondary channels too?
-
-That's a interesting question.  I recall discussing this with Aurelien
-some time ago while running a few DFS + multichannel tests.
-
-So yes, I agree with you that when we successfully reconnect to failover
-target (primary channel), then we should also update all secondary
-channels with the new server's ip address and reconnect them.
+--=20
+You are receiving this mail because:
+You are the QA Contact for the bug.=
