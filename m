@@ -8,103 +8,137 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9ABEC47082
-	for <linux-cifs@archiver.kernel.org>; Mon, 31 May 2021 04:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF8EC4708F
+	for <linux-cifs@archiver.kernel.org>; Mon, 31 May 2021 05:39:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8131B61008
-	for <linux-cifs@archiver.kernel.org>; Mon, 31 May 2021 04:31:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D69E61248
+	for <linux-cifs@archiver.kernel.org>; Mon, 31 May 2021 05:39:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229475AbhEaEcx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 31 May 2021 00:32:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51250 "EHLO
+        id S230032AbhEaFkj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 31 May 2021 01:40:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbhEaEcu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 31 May 2021 00:32:50 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE35C061574
-        for <linux-cifs@vger.kernel.org>; Sun, 30 May 2021 21:31:10 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id a5so14927993lfm.0
-        for <linux-cifs@vger.kernel.org>; Sun, 30 May 2021 21:31:10 -0700 (PDT)
+        with ESMTP id S229730AbhEaFkf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 31 May 2021 01:40:35 -0400
+Received: from mail-ua1-x92d.google.com (mail-ua1-x92d.google.com [IPv6:2607:f8b0:4864:20::92d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD8BAC061574;
+        Sun, 30 May 2021 22:38:55 -0700 (PDT)
+Received: by mail-ua1-x92d.google.com with SMTP id n61so5989702uan.2;
+        Sun, 30 May 2021 22:38:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=bIkcDtH56sinAfWg8xsMCLuNZcRfeogON1KPDAO3M1g=;
-        b=T0XzbhqD0f3e6OqnTELqbw5Nj/5TwY89b77HXbzp6pret2pzY6hLK9fp4OCoaW996X
-         hpH0Rja51bFqtPY3XHbAeAkTuh18S+BpqwfmH8FBk2Qiavf2RkrN/QGSWMwp8AsGGL4L
-         7ksza75moHm/xMuRyvlRUKLC3ENdNlDnMVpdNdGZfG7MHcFx3yJzYM0GhYWUYZlVb2fF
-         00y6hS1tkhLiJTOJ6WIfns3mx+nBm+R2bHSLRWu91ilLfP0vt7892QKIS1t8Bw4PNCSn
-         bG5oX98I2Yo7yhbm/l8QoPK/CfBBNOyloWjF+hn+9GoOfUXHXYMgv4CJuhM5nN7HhMPp
-         b28Q==
+        bh=HnNmmcpEGANCywXAOHjjcUJ4MN6oF/accismZD3OTBY=;
+        b=sDg+mggvypKBneaa3Jrh6Gwlmjq7O+/sgTx9+ShU59xkd38JFVUcZUHTK7IdznJa/O
+         T4wttBebcWUfBojLxSjIwj0o/xqvFZIApQZAIl0km6c8zpD1GXXbMNpmdOFYGDru2n0k
+         d4F4SfkrQjZlJB+VoldJNtCi03dzZRr5YsWcvcFV6mak3lXgOnlIQnsTGcW+0PRiJQNw
+         y5O0EaafidOdazuwmmhkblHGAQlKb1xYifEfQ8eH8Iv31D9YLqTB4Hb7Q9cKifR1Jvr7
+         J/9oi/Fnp2451KV631ZW3GZ7w98hE8V7KhPc8fN4ubxm5lYa6KyjM+WdsSSqrW7JbVdg
+         2kMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=bIkcDtH56sinAfWg8xsMCLuNZcRfeogON1KPDAO3M1g=;
-        b=Bn0jK36XCpN4FZfD88RV2Uw99/bVED3bUyVY/Oz9krBvRH1hiw7t5pjqLg1lfRiASl
-         EhvOhtBIhUqNdhzMPgAemEaQxY4zTLIhFySiBIPxEw3iXXj6+zg6IKOcRDPUzRN8abRK
-         7pA+561dtRFjLvfBny3cmNJWeYHa9i04YbyzuFCZGCb9ZVyGrAE5yTpEX1NEp/ttlwEc
-         AYSWvRt6kvsSjsx4CXT8G3jxHP74fjaNtXPu7QlXNCxOAonKJrSmF8kqxLMTOnPDBPxO
-         EwEctRW39O2nnveCHRKOuino1Dqg+7Yf9SIZe86vTr5cbVAsmDR6RcD0j+w+5FFW5Uit
-         BNIw==
-X-Gm-Message-State: AOAM5319GXV21Mz9A6PmUg46HOpkRCrJdBSWZ2OX44CPTo1TA/Eezppt
-        Q+NTBZlpPoT3ZYmGKJtNHZeXYnLE+Ms8BElMluE=
-X-Google-Smtp-Source: ABdhPJwt1Aaz4t8SqA+93MeUulKZkDc6OESetODtSyt0GkqG9TsmkFVXr+4m1khk98rsyr1K/vdnxVbEVtsOQmcmddY=
-X-Received: by 2002:a05:6512:344f:: with SMTP id j15mr6295668lfr.175.1622435468922;
- Sun, 30 May 2021 21:31:08 -0700 (PDT)
+        bh=HnNmmcpEGANCywXAOHjjcUJ4MN6oF/accismZD3OTBY=;
+        b=aKLnQUzgE3nMp2Sfb9zdgj7Fum5omwo8GBF7pMnfdC+mZ0tHkM+C8XMZ3Es4CiM7vc
+         KLdscn12HyBTTFOimtvchjrVHvS5W1+PgK6VCaEUf9B+/aE4FrcB0Y1483FKnlgwBwpt
+         hUp/ke827YMPdZrKLweUogoVHl1w2jbhtqdy7heC8e48D4+asD8r9mBGBAyTE7UVrVW9
+         6pMmfU/ds96SaD531rjlNpBFauzJkHwdzEBkN/C2fDDd5Q1RInXnpwo4FBkmB30Z/4Lm
+         GPVNn3hV/GBGuidBgn/KrNrge/8ivnxrTR617sZtLHBZdQgkkURHBz9i8AHlJ4M9IzZ1
+         VTBQ==
+X-Gm-Message-State: AOAM533rlw9fE0+SIKh1hnz5xWE80DQ27VMyEygvb04KoN34Aplyp77W
+        qhdtFywxisWHuudMvDhWxJP7bf1i+XZblm7YMfM=
+X-Google-Smtp-Source: ABdhPJxVnhl7BbzXoHUxBwYsSTgkaTs5EoHCr/SSq7+a3HYzww0NBP4xIl/errV4WHy7xBi0YnvOFYPm/59cNixeAeg=
+X-Received: by 2002:a1f:b488:: with SMTP id d130mr11690045vkf.17.1622439533937;
+ Sun, 30 May 2021 22:38:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210528143248.7521-1-aaptel@suse.com>
-In-Reply-To: <20210528143248.7521-1-aaptel@suse.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 30 May 2021 23:30:57 -0500
-Message-ID: <CAH2r5muTVLS9J7QCpQvKozUz4txVvBeY0hbDYKRfjEpMJvscBw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix ipv6 formating in cifs_ses_add_channel
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
+References: <20210531030550.1708816-1-yangyingliang@huawei.com>
+In-Reply-To: <20210531030550.1708816-1-yangyingliang@huawei.com>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Mon, 31 May 2021 14:38:42 +0900
+Message-ID: <CANFS6bbZysgZ2Wv7_FqmeBC0e34h5uiBLFdeiDvOxHFd2XGTSg@mail.gmail.com>
+Subject: Re: [PATCH -next v2] cifsd: check return value of ksmbd_vfs_getcasexattr()
+ correctly
+To:     Yang Yingliang <yangyingliang@huawei.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        linux-cifsd-devel <linux-cifsd-devel@lists.sourceforge.net>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <namjae.jeon@samsung.com>,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Steve French <sfrench@samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
-
-On Fri, May 28, 2021 at 9:32 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
-:
+2021=EB=85=84 5=EC=9B=94 31=EC=9D=BC (=EC=9B=94) =EC=98=A4=ED=9B=84 12:01, =
+Yang Yingliang <yangyingliang@huawei.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=
+=B1:
 >
-> From: Aurelien Aptel <aaptel@suse.com>
+> If ksmbd_vfs_getcasexattr() returns -ENOMEM, stream_buf is NULL,
+> it will cause null-ptr-deref when using it to copy memory. So we
+> need check the return value of ksmbd_vfs_getcasexattr() by comparing
+> with 0.
 >
-> Use %pI6 for IPv6 addresses
->
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
+> Fixes: f44158485826 ("cifsd: add file operations")
+> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
 > ---
->  fs/cifs/sess.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> v2:
+>   Handle the case ksmbd_vfs_getcasexattr() returns 0.
+> ---
+>  fs/cifsd/vfs.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
 >
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index a92a1fb7cb52..cd19aa11f27e 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -195,7 +195,7 @@ cifs_ses_add_channel(struct cifs_sb_info *cifs_sb, st=
-ruct cifs_ses *ses,
->                          ses, iface->speed, iface->rdma_capable ? "yes" :=
- "no",
->                          &ipv4->sin_addr);
->         else
-> -               cifs_dbg(FYI, "adding channel to ses %p (speed:%zu bps rd=
-ma:%s ip:%pI4)\n",
-> +               cifs_dbg(FYI, "adding channel to ses %p (speed:%zu bps rd=
-ma:%s ip:%pI6)\n",
->                          ses, iface->speed, iface->rdma_capable ? "yes" :=
- "no",
->                          &ipv6->sin6_addr);
+> diff --git a/fs/cifsd/vfs.c b/fs/cifsd/vfs.c
+> index 97d5584ec870..2a9cc0bc7726 100644
+> --- a/fs/cifsd/vfs.c
+> +++ b/fs/cifsd/vfs.c
+> @@ -274,7 +274,6 @@ static int ksmbd_vfs_stream_read(struct ksmbd_file *f=
+p, char *buf, loff_t *pos,
+>  {
+>         ssize_t v_len;
+>         char *stream_buf =3D NULL;
+> -       int err;
+>
+>         ksmbd_debug(VFS, "read stream data pos : %llu, count : %zd\n",
+>                     *pos, count);
+> @@ -283,10 +282,9 @@ static int ksmbd_vfs_stream_read(struct ksmbd_file *=
+fp, char *buf, loff_t *pos,
+>                                        fp->stream.name,
+>                                        fp->stream.size,
+>                                        &stream_buf);
+> -       if (v_len =3D=3D -ENOENT) {
+> +       if ((int)v_len <=3D 0) {
+>                 ksmbd_err("not found stream in xattr : %zd\n", v_len);
+> -               err =3D -ENOENT;
+> -               return err;
+> +               return v_len =3D=3D 0 ? -ENOENT : (int)v_len;
+
+How about making ksmbd_vfs_getcasexattr return -ENONENT instead of
+returning 0 to
+remove duplicate error handling code?
+
+Thanks,
+Hyunchul
+
+>         }
+>
+>         memcpy(buf, &stream_buf[*pos], count);
+> @@ -415,9 +413,9 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *=
+fp, char *buf, loff_t *pos,
+>                                        fp->stream.name,
+>                                        fp->stream.size,
+>                                        &stream_buf);
+> -       if (v_len =3D=3D -ENOENT) {
+> +       if ((int)v_len <=3D 0) {
+>                 ksmbd_err("not found stream in xattr : %zd\n", v_len);
+> -               err =3D -ENOENT;
+> +               err =3D v_len =3D=3D 0 ? -ENOENT : (int)v_len;
+>                 goto out;
+>         }
 >
 > --
-> 2.31.1
+> 2.25.1
 >
-
-
---=20
-Thanks,
-
-Steve
