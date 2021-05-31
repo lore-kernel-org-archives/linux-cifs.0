@@ -2,140 +2,126 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D36BC4708E
-	for <linux-cifs@archiver.kernel.org>; Sat, 29 May 2021 14:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1FFC47092
+	for <linux-cifs@archiver.kernel.org>; Mon, 31 May 2021 01:09:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1CD0F61157
-	for <linux-cifs@archiver.kernel.org>; Sat, 29 May 2021 14:13:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6756F61278
+	for <linux-cifs@archiver.kernel.org>; Mon, 31 May 2021 01:09:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbhE2OOv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 29 May 2021 10:14:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60924 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbhE2OOu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 29 May 2021 10:14:50 -0400
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D10FC061574;
-        Sat, 29 May 2021 07:13:13 -0700 (PDT)
-Received: by mail-vs1-xe32.google.com with SMTP id f11so3702285vst.0;
-        Sat, 29 May 2021 07:13:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=L2BlukILXONRQJcclTGh7GA2Qfr+L6d986kgRYUf/Ws=;
-        b=lbrqNq0uEAew5n0pLs6zfKEUdjlz+WISW0Ok7SWpREczZQzFfAhbmhny6bTB9zwAR9
-         fiSbdsKRRPQ36nnRT2YDNiEmqVKU8H3/FTRSoLh1ALQSWYlgCgF+68e++RWnRnf6PNW3
-         39KuASfdF7zkxDJNi4xRvukcCrwStY3ywYwpQy1JORYO3flk+RiU/lr8jEL+wL7pez0K
-         8DuaekToFufi+g3pv+kWkfYBK1+hMgChZjsHv83z7PU+nsFijLZA71RN7Y5PjPFR8VEH
-         m2Ajsw8T6rN+lESstwrTwxlUgjRwEhbIScO+d8JEzzruhK20IcYcf/6ANdD5WITI76Bp
-         UDWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=L2BlukILXONRQJcclTGh7GA2Qfr+L6d986kgRYUf/Ws=;
-        b=uXo3JEMXSRi8zuKkph9U/zi5R1S51tZUohswF2iprU0TMcghH2BfOIZOTlekqR3vlc
-         3Mk26MxFWEwoFahw6oIApgXRyzBBsJITwNDveslsPtHoZ2i7ch+E9e3eJaVQ9R4jOyYm
-         FpYzvQGUuDyveVFZptb/b24cZYtrzMXD/bUB/+vWFwsvCy7NwH/tnZksXzGL1Ih1vSun
-         0Ki33jGPfWh98dz1v5R8s3d2UVNCTAZpmry4Qie1ES1ZrreO8PM+s7bb2Y6vuKdn0G26
-         Dy1R8pp1yPDXdMn+wjQgW+wAaL+wrVnvTL7NfqcpCSMtV+MchKfog5QrNwn613jOcThg
-         3gmA==
-X-Gm-Message-State: AOAM532T3wn0gKVfH33+NRMjq4ntSZQPSo9NU6GiA+pFGPmgI74omR39
-        9scjqGCgBnLO7OgtirpZnppu8p0doZ2XI8JFg7I=
-X-Google-Smtp-Source: ABdhPJxDAViTVR8Z4Bq2yEXQKABk64nreqW75JIfEKNXn7UHMF8Ml1UzCfBPNAnEbTbvJ3u7GQBZnBmC8nA1Hnr1tb0=
-X-Received: by 2002:a67:d017:: with SMTP id r23mr10749055vsi.12.1622297592646;
- Sat, 29 May 2021 07:13:12 -0700 (PDT)
+        id S229941AbhEaBK4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 30 May 2021 21:10:56 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:58376 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229897AbhEaBKz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 30 May 2021 21:10:55 -0400
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210531010915epoutp023ac81a926552459a2d333b0c4c38d369~EAXIKyBCU2430224302epoutp02z
+        for <linux-cifs@vger.kernel.org>; Mon, 31 May 2021 01:09:15 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210531010915epoutp023ac81a926552459a2d333b0c4c38d369~EAXIKyBCU2430224302epoutp02z
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1622423355;
+        bh=564Sd01tVo5cveiCmJa5+UV0p3NF2/OhL+Hln/gw1oU=;
+        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+        b=hmoS5BNKcCJNJ+G6qaczMyXQuVLr6xmKeGwUFx0LUpGtsdmaPZ6Ubu8zj2TjMyoRc
+         tqhcQTvotV5XOKgL3tuyXT3MvburaF9plaSYX1X9EFHnEkUnFHlkFS5dTvnQm0spI5
+         UZIFrigpGtYVylLRQQFX7dD3rS3VsU90oWXBieTE=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20210531010914epcas1p1874f3a1bdab08b43432cbd426f54b3e0~EAXH1XhQr2242322423epcas1p1w;
+        Mon, 31 May 2021 01:09:14 +0000 (GMT)
+Received: from epsmges1p3.samsung.com (unknown [182.195.40.166]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4Ftcd500NWz4x9QB; Mon, 31 May
+        2021 01:09:13 +0000 (GMT)
+Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
+        epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+        B9.3B.09824.73734B06; Mon, 31 May 2021 10:09:11 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
+        20210531010910epcas1p33002ec0dba10896e6d63178a08eab385~EAXEVH1UM3235632356epcas1p3R;
+        Mon, 31 May 2021 01:09:10 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210531010910epsmtrp26bf6bec867517521de820fe00a36da9f~EAXEUal8e2033320333epsmtrp2h;
+        Mon, 31 May 2021 01:09:10 +0000 (GMT)
+X-AuditID: b6c32a37-04bff70000002660-e3-60b43737267d
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        1A.AC.08637.63734B06; Mon, 31 May 2021 10:09:10 +0900 (KST)
+Received: from namjaejeon01 (unknown [10.89.31.77]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20210531010910epsmtip1b5e985d2ae77a07792a185db8a6a209d~EAXEDFk8L2990229902epsmtip1S;
+        Mon, 31 May 2021 01:09:10 +0000 (GMT)
+From:   "Namjae Jeon" <namjae.jeon@samsung.com>
+To:     "'Yang Yingliang'" <yangyingliang@huawei.com>
+Cc:     <sergey.senozhatsky@gmail.com>, <sfrench@samba.org>,
+        <hyc.lee@gmail.com>, <linux-kernel@vger.kernel.org>,
+        <linux-cifsd-devel@lists.sourceforge.net>,
+        <linux-cifs@vger.kernel.org>
+In-Reply-To: <20210529082058.3012233-1-yangyingliang@huawei.com>
+Subject: RE: [PATCH -next 1/3] cifsd: fix memleak in
+ ksmbd_vfs_stream_write()
+Date:   Mon, 31 May 2021 10:09:10 +0900
+Message-ID: <001001d755b9$90306380$b0912a80$@samsung.com>
 MIME-Version: 1.0
-References: <20210529082058.3012233-1-yangyingliang@huawei.com> <20210529082058.3012233-3-yangyingliang@huawei.com>
-In-Reply-To: <20210529082058.3012233-3-yangyingliang@huawei.com>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Sat, 29 May 2021 23:13:01 +0900
-Message-ID: <CANFS6bYGp0CsdjovHxpaxbYVq72U3EY8C-oSphHDUSrwLmxCOA@mail.gmail.com>
-Subject: Re: [PATCH -next 3/3] cifsd: check return value of
- ksmbd_vfs_getcasexattr() correctly
-To:     Yang Yingliang <yangyingliang@huawei.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        linux-cifsd-devel <linux-cifsd-devel@lists.sourceforge.net>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <namjae.jeon@samsung.com>,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-        Steve French <sfrench@samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQHGFJ2WtWYoeA5H1K6a0pImPZRtFQJmwAWLqwwTmjA=
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprOJsWRmVeSWpSXmKPExsWy7bCmrq65+ZYEg9N3xS2u3X/PbvHi/y5m
+        i5//vzNaXN41h81i7efH7BYdL48yW2z5dI3Jgd1j56y77B4tR96yeuxe8JnJY+6uPkaPz5vk
+        AlijcmwyUhNTUosUUvOS81My89JtlbyD453jTc0MDHUNLS3MlRTyEnNTbZVcfAJ03TJzgM5Q
+        UihLzCkFCgUkFhcr6dvZFOWXlqQqZOQXl9gqpRak5BQYGhToFSfmFpfmpesl5+daGRoYGJkC
+        VSbkZEz9/o25oIWp4tznDtYGxpuMXYwcHBICJhI92xO7GLk4hAR2MEosbHjBDOF8YpR4dGwZ
+        E4TzjVFi2fwvQBlOsI4nG/cwgthCAnsZJRbN0YQoesEo8en2OxaQBJuArsS/P/vZQGwRAUOJ
+        lRNuMYIUMQvsZJTYubUTrIhTwEHi7LIbYJOEBfwlZt3tZwWxWQRUJbq2TwPbxitgKXHl6CQm
+        CFtQ4uTMJ2C9zALyEtvfzoG6SEHi59NlrBDLrCSO/7vPDFEjIjG7sw3sHwmBuRwS/683skA0
+        uEjM+d/NCmELS7w6voUdwpaS+PxuLxuEXS5x4uQvJgi7RmLDvH3skAAzluh5UQJiMgtoSqzf
+        pQ9RoSix8/dcRoi1fBLvvvawQlTzSnS0CUGUqEr0XToMNVBaoqv9A/sERqVZSB6bheSxWUge
+        mIWwbAEjyypGsdSC4tz01GLDAmPkuN7ECE6hWuY7GKe9/aB3iJGJg/EQowQHs5II75mKjQlC
+        vCmJlVWpRfnxRaU5qcWHGE2BQT2RWUo0OR+YxPNK4g1NjYyNjS1MzMzNTI2VxHnTnasThATS
+        E0tSs1NTC1KLYPqYODilGphEaxerPxSX8Xe8HMCeEc18VXhHzPSvvL9uPG1Qdans8Lj1e6qH
+        xCPrKbc0t6mknftSuiP0d96MWT2rtIWf33gR9TJKTG7XDftb3ontvr9n1K9unSHQzht1l32i
+        +IUtP/J2Mucal081ur4iKJx/kVTzB9GrEdudi54aH+iIz2i7f2Sm7I2bAd/2Chj/WxEnIvvy
+        ykv+fI9TFtOY1TXF+K4kc86emuE7gWNXX9UdjlM876dttvnLX2UXxvDoEdP0a7xbr+gFWyZq
+        2mxpy9WYc595Dde/hnmvD7WwrwjrfXbSJFkqQFpDP+qUaUKNQGawx25HiaWTrxw6N2PPLeP6
+        zaudXjJMX//ukOrP645PpGSVWIozEg21mIuKEwGK976MKgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpkkeLIzCtJLcpLzFFi42LZdlhJTtfMfEuCwYKnhhbX7r9nt3jxfxez
+        xc//3xktLu+aw2ax9vNjdouOl0eZLbZ8usbkwO6xc9Zddo+WI29ZPXYv+MzkMXdXH6PH501y
+        AaxRXDYpqTmZZalF+nYJXBlTv39jLmhhqjj3uYO1gfEmYxcjJ4eEgInEk417gGwuDiGB3YwS
+        f/dNZ4JISEscO3GGuYuRA8gWljh8uBgkLCTwjFGiZRk/iM0moCvx789+NhBbRMBQYuWEW2Bz
+        mAX2M0pMODOZBWLoREaJTX0dzCBVnAIOEmeX3QDbLCzgK3Fs8VUWEJtFQFWia/s0sBpeAUuJ
+        K0cnMUHYghInZz5hATmCWUBPom0jWCuzgLzE9rdzmCHuVJD4+XQZK8QRVhLH/91nhqgRkZjd
+        2cY8gVF4FpJJsxAmzUIyaRaSjgWMLKsYJVMLinPTc4sNCwzzUsv1ihNzi0vz0vWS83M3MYJj
+        SUtzB+P2VR/0DjEycTAeYpTgYFYS4T1TsTFBiDclsbIqtSg/vqg0J7X4EKM0B4uSOO+FrpPx
+        QgLpiSWp2ampBalFMFkmDk6pBqaaaWF2E8xWFSYq/+9ePL/b+zXPomxj5ftvmEs3ugRskcjb
+        fWjC2n2dbeukje/WyS3/X1e0Qd1uV4pP9bfpfEsXVxTvz1nFuuMVQ+nNcz8nlL4K5LLICZb7
+        phmod6ld8g/HHoblidfWKzNd8ztm8+BNQ7Vj6+KNB3g+JbosMrjN4CVTsu/UAuH9Wyx3CS4q
+        Ppcyd8bSIqcfmYkhb7s8J664+nQpI/9LXfGi1WvyHbx/aEon5IV8dZp4ecd9Uz4JuT07hDzm
+        1Pg1st6/W309333qpaQ17l8kbx6+l6T+Z2+75OekrBcmq+uzMq1S7VUMtd9bqM6p/xg5weHx
+        UhtLsbyj4narVog5Sh1eylx1vVuJpTgj0VCLuag4EQBIHMrgFAMAAA==
+X-CMS-MailID: 20210531010910epcas1p33002ec0dba10896e6d63178a08eab385
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210529081635epcas1p130adfff1e044c7749f059e413ad4e8b8
+References: <CGME20210529081635epcas1p130adfff1e044c7749f059e413ad4e8b8@epcas1p1.samsung.com>
+        <20210529082058.3012233-1-yangyingliang@huawei.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Yang,
-
-2021=EB=85=84 5=EC=9B=94 29=EC=9D=BC (=ED=86=A0) =EC=98=A4=ED=9B=84 5:16, Y=
-ang Yingliang <yangyingliang@huawei.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=
-=B1:
->
-> If ksmbd_vfs_getcasexattr() returns -ENOMEM, stream_buf is NULL,
-> it will cause null-ptr-deref when using it to copy memory. So we
-> need check the return value of ksmbd_vfs_getcasexattr() by comparing
-> with 0.
->
+> Before assigning wbuf to stream_buf, memory allocate in
+> ksmbd_vfs_getcasexattr() need be freed.
+> 
 > Fixes: f44158485826 ("cifsd: add file operations")
 > Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
-> ---
->  fs/cifsd/vfs.c | 10 ++++------
->  1 file changed, 4 insertions(+), 6 deletions(-)
->
-> diff --git a/fs/cifsd/vfs.c b/fs/cifsd/vfs.c
-> index 97d5584ec870..45ba30f1f2d2 100644
-> --- a/fs/cifsd/vfs.c
-> +++ b/fs/cifsd/vfs.c
-> @@ -274,7 +274,6 @@ static int ksmbd_vfs_stream_read(struct ksmbd_file *f=
-p, char *buf, loff_t *pos,
->  {
->         ssize_t v_len;
->         char *stream_buf =3D NULL;
-> -       int err;
->
->         ksmbd_debug(VFS, "read stream data pos : %llu, count : %zd\n",
->                     *pos, count);
-> @@ -283,10 +282,9 @@ static int ksmbd_vfs_stream_read(struct ksmbd_file *=
-fp, char *buf, loff_t *pos,
->                                        fp->stream.name,
->                                        fp->stream.size,
->                                        &stream_buf);
-> -       if (v_len =3D=3D -ENOENT) {
-> +       if ((int)v_len < 0) {
+I will apply, Thanks for your patch!
 
-because ksmbd_vfs_getcasexattr can return 0, 0 has to be handled.
-
-Thanks,
-Hyunchul
-
->                 ksmbd_err("not found stream in xattr : %zd\n", v_len);
-> -               err =3D -ENOENT;
-> -               return err;
-> +               return (int)v_len;
->         }
->
->         memcpy(buf, &stream_buf[*pos], count);
-> @@ -415,9 +413,9 @@ static int ksmbd_vfs_stream_write(struct ksmbd_file *=
-fp, char *buf, loff_t *pos,
->                                        fp->stream.name,
->                                        fp->stream.size,
->                                        &stream_buf);
-> -       if (v_len =3D=3D -ENOENT) {
-> +       if ((int)v_len < 0) {
->                 ksmbd_err("not found stream in xattr : %zd\n", v_len);
-> -               err =3D -ENOENT;
-> +               err =3D (int)v_len;
->                 goto out;
->         }
->
-> --
-> 2.25.1
->
