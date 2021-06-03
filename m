@@ -2,112 +2,233 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E2EC4708F
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Jun 2021 18:56:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A9FDC47082
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Jun 2021 05:31:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BB3A613AD
-	for <linux-cifs@archiver.kernel.org>; Wed,  2 Jun 2021 18:56:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1ED69613DA
+	for <linux-cifs@archiver.kernel.org>; Thu,  3 Jun 2021 05:31:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbhFBS6R (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 2 Jun 2021 14:58:17 -0400
-Received: from mail-lf1-f49.google.com ([209.85.167.49]:45620 "EHLO
-        mail-lf1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229467AbhFBS6R (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 2 Jun 2021 14:58:17 -0400
-Received: by mail-lf1-f49.google.com with SMTP id j10so4909728lfb.12
-        for <linux-cifs@vger.kernel.org>; Wed, 02 Jun 2021 11:56:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=0qmuboDmAxMcnj4Uo8kUasyStmmfA9XXGVw/XcdTeJA=;
-        b=RiwAOq46u23hT87oIJ9HKBcpdPbjh52xo7niTODA2/ggZ5v48rZAfvN/1zvpJRsniZ
-         J/4D4/H/kSR6iRts3t5LoozaU9fsoy7Sf4dkO7GxywKBj60s5+u9ZGSyvo8jIEIJH8DH
-         X+S2pRD8QLK7aeePbsAO0S0i9oKAgJa2zbOOES7tsyUlfWsmS6Kr5H0yhmvUf2Zp/CUT
-         TNh0u2+sDibD3hldA9Ff+quMZKPsXlrk8V2lWO3O3o5vk7lDLui9IFM8zlb07mxhf7wD
-         D6Xle419krlLssBbyF/g3VL38u/v4N5Y4zdAGVnBNV4mL6g49F6Qg24ROorJ+6lMTXDR
-         Cr8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=0qmuboDmAxMcnj4Uo8kUasyStmmfA9XXGVw/XcdTeJA=;
-        b=JWtFcFxgVO0gjLEvvPsyOJG26vSaC67jCVp8SgafYd3fdaPtSd7xz2zkly23oE3l2t
-         +pUu1ZfzTtwoODBNfYPDLXh/uZvzGM3KdSixQOgxWLBap0OaJH0hPQkV4tuqHWgCj7PY
-         p4QjeRTrjeUSiA6P1SZmkov7L9w9q8vbVmrq2RtLCRh56xPNjnITe6u9HT4PGlQ1bMuV
-         axzXWX6hsEpYE2Zjmqq71erOMcsraHfLvsam8A6UTJ4diJXgrZZaL1Mg7rXbmLeqkdf+
-         kXwDk/Tbu2oPaoBqkiDfUpnsLoPyrMTtTexzR+J8WjJOWTsplSa9/b6FOvcZ5yZkueRR
-         cM9w==
-X-Gm-Message-State: AOAM530tqi34YXcF8iVBO+ahQqhWZw37VCBi/EtY2YXG1yPCWG+0HR9E
-        duHlx23mSUlsKYnmoqdKPWNt+aBk0aDAN0NOXRY=
-X-Google-Smtp-Source: ABdhPJyElJ6IdzZGESAmhngX+PH2/TcftrI58LIX14MWG4yHENZ9LgGCvvLeqrasCKhR6w87mASotH8Jh21vL4s6evY=
-X-Received: by 2002:a19:f611:: with SMTP id x17mr23811052lfe.313.1622660132800;
- Wed, 02 Jun 2021 11:55:32 -0700 (PDT)
+        id S229682AbhFCFdB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 3 Jun 2021 01:33:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31423 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229663AbhFCFdB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 3 Jun 2021 01:33:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1622698277;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3GBQnqmxa6HwQVZOC/olgD9jsJm1ESvZD+EVLBsml1w=;
+        b=fWmuG9cDlFZYLVc8o8CUCh0DB6ZdDmG+XZEBwtQONJnRUqw/LTRi1Z+M9oFgRqemlTLFM9
+        E39RPhI+WDpYBNyIoE+FAt0X6gVA/btAohTLQR5/FFVt32evvmvR/HB1D/82BrJBJsEakb
+        utcE8zobkxDYoksTXrmBwnPCc3sCA00=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-227-NqxItu13N2-Lw2FIvCimEA-1; Thu, 03 Jun 2021 01:31:13 -0400
+X-MC-Unique: NqxItu13N2-Lw2FIvCimEA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D9B5801B14;
+        Thu,  3 Jun 2021 05:31:12 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-178.bne.redhat.com [10.64.54.178])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D5E98100760F;
+        Thu,  3 Jun 2021 05:31:11 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: improve fallocate emulation
+Date:   Thu,  3 Jun 2021 15:31:01 +1000
+Message-Id: <20210603053101.1229297-2-lsahlber@redhat.com>
+In-Reply-To: <20210603053101.1229297-1-lsahlber@redhat.com>
+References: <20210603053101.1229297-1-lsahlber@redhat.com>
 MIME-Version: 1.0
-References: <CANT5p=oMLZei+OhXZ-8Hr2NCx=pRYWF1zQ0vRQ5D_NkvLGwJDg@mail.gmail.com>
- <874kegtg2o.fsf@suse.com>
-In-Reply-To: <874kegtg2o.fsf@suse.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 2 Jun 2021 13:55:21 -0500
-Message-ID: <CAH2r5muWPj4rSFWTi4vuWQZWsJooyV-Yu3XZhEcXjY6sPH+Ltg@mail.gmail.com>
-Subject: Re: Multichannel patches
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>, sribhat.msa@outlook.com,
-        rohiths msft <rohiths.msft@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looking through the PR - agree with Aurelien's comments (mostly minor)
+RHBZ: 1866684
 
-On Wed, Jun 2, 2021 at 10:57 AM Aur=C3=A9lien Aptel <aaptel@suse.com> wrote=
-:
->
-> Hi Shyam,
->
-> We've already discussed how to go about it so your changes LGTM.
-> I've added some minor comments on your github pull request.
->
-> Shyam Prasad N <nspmangalore@gmail.com> writes:
-> > P.S. There is a logic in cifs_reconnect to switch between the targets
-> > for the server. I don't think these changes will break the DFS
-> > scenario. The code will likely take effect only for when the primary
-> > channel reconnects (as DFS server entries are cached with super block
-> > as the key). Perhaps more changes will be needed there to also switch
-> > between the targets for individual channels (maybe use superblock +
-> > channel num as the key for caching entries?). Folks with better
-> > knowledge than me with this code may want to check on this?
->
-> You need to talk with Paulo for this. He has just sent a rewrite of the
-> cache yday.
->
-> > @Steve French It'll be good to let a few cycles of buildbot to run
-> > with this code, before submitting to upstream. I have run a bunch of
-> > tests with this. However, more soak time will be safer.
->
-> We need more tests on the buildbot so if you have things for mchan we
-> can run on it please add it there.
->
-> Cheers,
-> --
-> Aur=C3=A9lien Aptel / SUSE Labs Samba Team
-> GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
-> SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg,=
- DE
-> GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=
-=BCnchen)
->
+We don't have a real fallocate in the SMB2 protocol so we used to emulate fallocate
+by simply switching the file to become non-sparse. But as that could potantially
+consume a lot more data than we intended to fallocate (large sparse file and fallocating a thin
+slice in the middle) we would only do this IFF the fallocate request was for virtually the entire file.
 
+This patch improves this and starts allowing us to fallocate smaller chunks of a file by
+overwriting the region with 0, for the parts that are unallocated.
 
---=20
-Thanks,
+The method used is to first query the server for FSCTL_QUERY_ALLOCATED_RANGES to find what
+is unallocated in teh fallocate range and then to only overwrite-with-zero the unallocated ranges to fill
+in the holes.
+As overwriting-with-zero is different from just allocating blocks, and potentially much more expensive,
+we limit this to only allow fallocate ranges up to 1Mb in size.
 
-Steve
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/smb2ops.c | 133 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 133 insertions(+)
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 21ef51d338e0..b68ba92893b6 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -3601,6 +3601,119 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 	return rc;
+ }
+ 
++static int smb3_simple_fallocate_write_range(unsigned int xid,
++					     struct cifs_tcon *tcon,
++					     struct cifsFileInfo *cfile,
++					     loff_t off, loff_t len,
++					     char *buf)
++{
++	struct cifs_io_parms io_parms = {0};
++	int nbytes;
++	struct kvec iov[2];
++
++	io_parms.netfid = cfile->fid.netfid;
++	io_parms.pid = current->tgid;
++	io_parms.tcon = tcon;
++	io_parms.persistent_fid = cfile->fid.persistent_fid;
++	io_parms.volatile_fid = cfile->fid.volatile_fid;
++	io_parms.offset = off;
++	io_parms.length = len;
++
++	/* iov[0] is reserved for smb header */
++	iov[1].iov_base = buf;
++	iov[1].iov_len = io_parms.length;
++	return SMB2_write(xid, &io_parms, &nbytes, iov, 1);
++}
++
++static int smb3_simple_fallocate_range(unsigned int xid,
++				       struct cifs_tcon *tcon,
++				       struct cifsFileInfo *cfile,
++				       loff_t off, loff_t len)
++{
++	struct file_allocated_range_buffer in_data, *out_data = NULL, *tmp_data;
++	u32 out_data_len;
++	char *buf = NULL;
++	loff_t l;
++	int rc;
++
++	in_data.file_offset = cpu_to_le64(off);
++	in_data.length = cpu_to_le64(len);
++	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
++			cfile->fid.volatile_fid,
++			FSCTL_QUERY_ALLOCATED_RANGES, true,
++			(char *)&in_data, sizeof(in_data),
++			1024 * sizeof(struct file_allocated_range_buffer),
++			(char **)&out_data, &out_data_len);
++	if (rc)
++		goto out;
++	/*
++	 * It is already all allocated
++	 */
++	if (out_data_len == 0)
++		goto out;
++
++	buf = kzalloc(1024 * 1024, GFP_KERNEL);
++	if (buf == NULL) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	tmp_data = out_data;
++	while (len) {
++		/*
++		 * The rest of the region is unmapped so write it all.
++		 */
++		if (out_data_len == 0) {
++			rc = smb3_simple_fallocate_write_range(xid, tcon,
++					       cfile, off, len, buf);
++			goto out;
++		}
++
++		if (out_data_len < sizeof(struct file_allocated_range_buffer)) {
++			rc = -EINVAL;
++			goto out;
++		}
++
++		if (off < le64_to_cpu(tmp_data->file_offset)) {
++			/*
++			 * We are at a hole. Write until the end of the region
++			 * or until the next allocated data,
++			 * whichever comes next.
++			 */
++			l = le64_to_cpu(tmp_data->file_offset) - off;
++			if (len < l)
++				l = len;
++			rc = smb3_simple_fallocate_write_range(xid, tcon,
++					       cfile, off, l, buf);
++			if (rc)
++				goto out;
++			off = off + l;
++			len = len - l;
++			if (len == 0)
++				goto out;
++		}
++		/*
++		 * We are at a section of allocated data, just skip forward
++		 * until the end of the data or the end of the region
++		 * we are supposed to fallocate, whichever comes first.
++		 */
++		l = le64_to_cpu(tmp_data->length);
++		if (len < l)
++			l = len;
++		off += l;
++		len -= l;
++
++		tmp_data = &tmp_data[1];
++		out_data_len -= sizeof(struct file_allocated_range_buffer);
++	}
++
++ out:
++	kfree(out_data);
++	kfree(buf);
++	return rc;
++}
++
++
+ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 			    loff_t off, loff_t len, bool keep_size)
+ {
+@@ -3661,6 +3774,26 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 	}
+ 
+ 	if ((keep_size == true) || (i_size_read(inode) >= off + len)) {
++		/*
++		 * At this point, we are trying to fallocate an internal
++		 * regions of a sparse file. Since smb2 does not have a
++		 * fallocate command we have two otions on how to emulate this.
++		 * We can either turn the entire file to become non-sparse
++		 * which we only do if the fallocate is for virtually
++		 * the whole file,  or we can overwrite the region with zeroes
++		 * using SMB2_write, which could be prohibitevly expensive
++		 * if len is large.
++		 */
++		/*
++		 * We are only trying to fallocate a small region so
++		 * just write it with zero.
++		 */
++		if (len <= 1024 * 1024) {
++			rc = smb3_simple_fallocate_range(xid, tcon, cfile,
++							 off, len);
++			goto out;
++		}
++
+ 		/*
+ 		 * Check if falloc starts within first few pages of file
+ 		 * and ends within a few pages of the end of file to
+-- 
+2.30.2
+
