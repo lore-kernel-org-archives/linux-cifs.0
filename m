@@ -2,134 +2,156 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AECB1C07E94
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Jun 2021 09:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 711CEC4708F
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Jun 2021 10:35:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 932A16108D
-	for <linux-cifs@archiver.kernel.org>; Fri,  4 Jun 2021 09:21:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CD2361415
+	for <linux-cifs@archiver.kernel.org>; Fri,  4 Jun 2021 10:35:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230050AbhFDJXP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 4 Jun 2021 05:23:15 -0400
-Received: from mail-ej1-f46.google.com ([209.85.218.46]:44904 "EHLO
-        mail-ej1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229962AbhFDJXP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Jun 2021 05:23:15 -0400
-Received: by mail-ej1-f46.google.com with SMTP id c10so13400759eja.11
-        for <linux-cifs@vger.kernel.org>; Fri, 04 Jun 2021 02:21:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=hy/qFdBqxnuvliwIjp97UN0D29BYkAVb7TMvJfgcgs0=;
-        b=QeWMrNbKywBFEOv7REdQjtOA11T9a4l+Go6fuCCYNNrMLtH8qzH3JyR763YM9BXDlV
-         Rkvp9FVhrH4XQ8vmyD7SOv/nwSa8tglOsz4hTkkaoLv3r8WtIU0NbhDO/r0t3dCsizGX
-         NtaO1sLKVSS54+UUv3RyCxhRu2MBloCMHahVb3LqhiZPe8UUGz2MgbWfa6uX6ddvFXjf
-         B3Q2smzYEKAsCMK4Lf1kbFV9fDxOuYmRPsgupPV+x35pu3D/CMwSFmeavi9aFPqSLG3T
-         YY/mlqv53Vy1BVGzffrup+S50mxeGBbQBjtEXpyOm8gP3+XKwhzH40n6i7yErt2np8/E
-         WMJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=hy/qFdBqxnuvliwIjp97UN0D29BYkAVb7TMvJfgcgs0=;
-        b=WH5Ta2MVgRCCWl+gkadkvDDpkvERb63u9Hry3s9J12Dy6klEe0Och8w3R6jBcmSysT
-         O4OOGtStHGIbfUinXyVPNjKRIZdwafRHGz1HwyLbzdRBPOm2sWYA2/wIED6zlSQUeNTK
-         hx069hovFP/W2rhbns9FC1ipU0z9Y2PZcNQIsE/e/RNWY0EHAyC9z1mb8Cx9li6gJdLC
-         uzfCfACb1z8eToCalis05IWLW61+9CjVJEND6JJQKRk43EOdX/rnGMuRJk5QUOV+POwR
-         hQeX0sA+aVB8T4upLO6R5vCmdTAs27nxg8nj9S3Hy+FsfKw0Ybd0EscHcU7pmUVj47I8
-         /v5A==
-X-Gm-Message-State: AOAM532qaTYPk8K/59Ii5OAD5T6NZ+VfvAYvgoywbRfNPoUB8/h5H+9J
-        TXQBgiaKOwVbopu0ogFcnMblo52vxlBFLOowJj2eafep1fvIOf/z
-X-Google-Smtp-Source: ABdhPJwkGJjRjKIcmJirI7Y6tIxR9hgQPaSiTRjT1j1NsCCJNsKTajl1oRrxbpDpDy2+lhQRgv0f9CB3LE9YFl7PsMI=
-X-Received: by 2002:a17:906:9d05:: with SMTP id fn5mr3247466ejc.133.1622798427976;
- Fri, 04 Jun 2021 02:20:27 -0700 (PDT)
+        id S229962AbhFDKhn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 4 Jun 2021 06:37:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53014 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229674AbhFDKhn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 4 Jun 2021 06:37:43 -0400
+Received: from laurent.telenet-ops.be (laurent.telenet-ops.be [IPv6:2a02:1800:110:4::f00:19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFEADC061761
+        for <linux-cifs@vger.kernel.org>; Fri,  4 Jun 2021 03:35:56 -0700 (PDT)
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed20:f130:bbcb:eb08:8a92])
+        by laurent.telenet-ops.be with bizsmtp
+        id Cybt250012NEgeT01ybtHG; Fri, 04 Jun 2021 12:35:53 +0200
+Received: from rox.of.borg ([192.168.97.57])
+        by ramsan.of.borg with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1lp7BA-00Cc2O-MU; Fri, 04 Jun 2021 12:35:52 +0200
+Received: from geert by rox.of.borg with local (Exim 4.93)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1lp5id-001cIZ-N9; Fri, 04 Jun 2021 11:02:19 +0200
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+To:     Steve French <sfrench@samba.org>,
+        Shyam Prasad N <sprasad@microsoft.com>
+Cc:     linux-cifs@vger.kernel.org, linux-next@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Change cifs_ses.chans_need_reconnect and chan_index to "unsigned long"
+Date:   Fri,  4 Jun 2021 11:02:19 +0200
+Message-Id: <20210604090219.385504-1-geert@linux-m68k.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Fri, 4 Jun 2021 14:50:16 +0530
-Message-ID: <CA+G9fYsnWUYuahxv3+vQx3UQ_CvJ5caiQwb7BXEuDGxPjmrM1w@mail.gmail.com>
-Subject: [next] fs: cifsglob.h:955:20: error: passing argument 2 of 'test_bit'
- from incompatible pointer type
-To:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        lkft-triage@lists.linaro.org
-Cc:     Steve French <sfrench@samba.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The following builds failed on Linux next-20210604 due to warnings / errors.
+On 32-bit (e.g. m68k):
 
-  - arm (s3c2410_defconfig) with gcc- 8 / 9 / 10
-  - parisc (defconfig) with gcc-8 / 9 / 10
-  - powerpc (ppc6xx_defconfig) with gcc- 8 / 9 /10
+    fs/cifs/cifssmb.c: In function ‘cifs_reconnect_tcon’:
+    ./include/linux/kern_levels.h:5:18: warning: format ‘%lx’ expects argument of type ‘long unsigned int’, but argument 2 has type ‘size_t’ {aka ‘unsigned int’} [-Wformat=]
+    fs/cifs/cifssmb.c:201:42: note: format string is defined here
+      201 |  cifs_dbg(FYI, "sess reconnect mask: 0x%lx, tcon reconnect: %d",
+	  |                                        ~~^
+	  |                                          |
+	  |                                          long unsigned int
+	  |                                        %x
 
-In file included from fs/cifs/transport.c:38:
-fs/cifs/transport.c: In function 'cifs_pick_channel':
-fs/cifs/cifsglob.h:955:20: error: passing argument 2 of 'test_bit'
-from incompatible pointer type [-Werror=incompatible-pointer-types]
-  955 |  test_bit((index), &(ses)->chans_need_reconnect)
-           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-           |
-           size_t * {aka unsigned int *}
-fs/cifs/transport.c:1065:7: note: in expansion of macro
-'CIFS_CHAN_NEEDS_RECONNECT'
- 1065 |   if (CIFS_CHAN_NEEDS_RECONNECT(ses, index))
-      |       ^~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from arch/powerpc/include/asm/bitops.h:193,
-                 from include/linux/bitops.h:32,
-                 from include/linux/kernel.h:12,
-                 from include/linux/list.h:9,
-                 from include/linux/wait.h:7,
-                 from include/linux/wait_bit.h:8,
-                 from include/linux/fs.h:6,
-                 from fs/cifs/transport.c:23:
-include/asm-generic/bitops/non-atomic.h:104:66: note: expected 'const
-volatile long unsigned int *' but argument is of type 'size_t *' {aka
-'unsigned int *'}
-  104 | static inline int test_bit(int nr, const volatile unsigned long *addr)
-                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~
-cc1: some warnings being treated as errors
-make[3]: *** [scripts/Makefile.build:272: fs/cifs/transport.o] Error 1
-fs/cifs/sess.c: In function 'cifs_chan_set_need_reconnect':
-fs/cifs/sess.c:98:22: error: passing argument 2 of 'set_bit' from
-incompatible pointer type [-Werror=incompatible-pointer-types]
-   98 |  set_bit(chan_index, &ses->chans_need_reconnect);
-             ^~~~~~~~~~~~~~~~~~~~~~~~~~
-             |
-             size_t * {aka unsigned int *}
+    fs/cifs/transport.c: In function ‘cifs_pick_channel’:
+    fs/cifs/cifsglob.h:955:20: error: passing argument 2 of ‘test_bit’ from incompatible pointer type [-Werror=incompatible-pointer-types]
+      955 |  test_bit((index), &(ses)->chans_need_reconnect)
+	  |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	  |                    |
+	  |                    size_t * {aka unsigned int *}
+    ./arch/m68k/include/asm/bitops.h:151:66: note: expected ‘const volatile long unsigned int *’ but argument is of type ‘size_t *’ {aka ‘unsigned int *’}
+      151 | static inline int test_bit(int nr, const volatile unsigned long *vaddr)
+	  |                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
 
+    fs/cifs/sess.c: In function ‘cifs_chan_set_need_reconnect’:
+    fs/cifs/sess.c:98:22: error: passing argument 2 of ‘bset_mem_set_bit’ from incompatible pointer type [-Werror=incompatible-pointer-types]
+       98 |  set_bit(chan_index, &ses->chans_need_reconnect);
+	  |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+	  |                      |
+	  |                      size_t * {aka unsigned int *}
+    ./arch/m68k/include/asm/bitops.h:41:69: note: expected ‘volatile long unsigned int *’ but argument is of type ‘size_t *’ {aka ‘unsigned int *’}
+       41 | static inline void bset_mem_set_bit(int nr, volatile unsigned long *vaddr)
+	  |                                             ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+    fs/cifs/sess.c:98:22: error: passing argument 2 of ‘bfset_mem_set_bit’ from incompatible pointer type [-Werror=incompatible-pointer-types]
+       98 |  set_bit(chan_index, &ses->chans_need_reconnect);
+	  |                      ^~~~~~~~~~~~~~~~~~~~~~~~~~
+	  |                      |
+	  |                      size_t * {aka unsigned int *}
+    ./arch/m68k/include/asm/bitops.h:50:70: note: expected ‘volatile long unsigned int *’ but argument is of type ‘size_t *’ {aka ‘unsigned int *’}
+       50 | static inline void bfset_mem_set_bit(int nr, volatile unsigned long *vaddr)
+	  |                                              ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
 
-Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+   [...]
 
-Full build log:
-https://gitlab.com/Linaro/lkft/mirrors/next/linux-next/-/jobs/1317929765#L247
+As bitops can only operate on long objects, and
+cifs_ses_get_chan_index() already returns "unsigned long", fix this by
+changing cifs_ses.chans_need_reconnect and chan_index from "size_t" to
+"unsigned long".
 
-Steps to reproduce:
------------------------------
+Fixes: 374c6c7bba3cbaa1 ("cifs: changes to support multichannel during channel reconnect")
+Reported-by: noreply@ellerman.id.au
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+Can you please add Link: headers when committing patches?
+I could not find this patch in the lore archives of linux-cifs or
+linux-fsdevel, presumably it was posted elsewhere?
+Thanks!
+---
+ fs/cifs/cifsglob.h | 2 +-
+ fs/cifs/sess.c     | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-# TuxMake is a command line tool and Python library that provides
-# portable and repeatable Linux kernel builds across a variety of
-# architectures, toolchains, kernel configurations, and make targets.
-#
-# TuxMake supports the concept of runtimes.
-# See https://docs.tuxmake.org/runtimes/, for that to work it requires
-# that you install podman or docker on your system.
-#
-# To install tuxmake on your system globally:
-# sudo pip3 install -U tuxmake
-#
-# See https://docs.tuxmake.org/ for complete documentation.
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 8fea2ddd2bd7af26..a9c026af21e1e9d1 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -968,7 +968,7 @@ struct cifs_ses {
+ 	 * enable the sessions on top to continue to live till any
+ 	 * of the channels below are active.
+ 	 */
+-	size_t chans_need_reconnect;
++	unsigned long chans_need_reconnect;
+ };
+ 
+ static inline bool
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 1721a3b246942266..1a17ddd6abbe5778 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -94,7 +94,7 @@ void
+ cifs_chan_set_need_reconnect(struct cifs_ses *ses,
+ 			     struct TCP_Server_Info *server)
+ {
+-	size_t chan_index = cifs_ses_get_chan_index(ses, server);
++	unsigned long chan_index = cifs_ses_get_chan_index(ses, server);
+ 	set_bit(chan_index, &ses->chans_need_reconnect);
+ 	cifs_dbg(FYI, "Set reconnect bitmask for chan %lu; now 0x%lx\n",
+ 		 chan_index, ses->chans_need_reconnect);
+@@ -104,7 +104,7 @@ void
+ cifs_chan_clear_need_reconnect(struct cifs_ses *ses,
+ 			       struct TCP_Server_Info *server)
+ {
+-	size_t chan_index = cifs_ses_get_chan_index(ses, server);
++	unsigned long chan_index = cifs_ses_get_chan_index(ses, server);
+ 	clear_bit(chan_index, &ses->chans_need_reconnect);
+ 	cifs_dbg(FYI, "Cleared reconnect bitmask for chan %lu; now 0x%lx\n",
+ 		 chan_index, ses->chans_need_reconnect);
+@@ -114,7 +114,7 @@ bool
+ cifs_chan_needs_reconnect(struct cifs_ses *ses,
+ 			    struct TCP_Server_Info *server)
+ {
+-	size_t chan_index = cifs_ses_get_chan_index(ses, server);
++	unsigned long chan_index = cifs_ses_get_chan_index(ses, server);
+ 	return CIFS_CHAN_NEEDS_RECONNECT(ses, chan_index);
+ }
+ 
+-- 
+2.25.1
 
-tuxmake --runtime podman --target-arch arm --toolchain gcc-8 --kconfig
-s3c2410_defconfig
-
-
---
-Linaro LKFT
-https://lkft.linaro.org
