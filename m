@@ -8,244 +8,388 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28FAAC47082
-	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:59:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A89C47082
+	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 21:05:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03E9A6138C
-	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:59:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F02546138C
+	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 21:05:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbhFEVBa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 5 Jun 2021 17:01:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50150 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbhFEVB3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Jun 2021 17:01:29 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE87EC061766
-        for <linux-cifs@vger.kernel.org>; Sat,  5 Jun 2021 13:59:27 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id m21so3752613lfg.13
-        for <linux-cifs@vger.kernel.org>; Sat, 05 Jun 2021 13:59:27 -0700 (PDT)
+        id S230022AbhFEVHi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 5 Jun 2021 17:07:38 -0400
+Received: from mail-lf1-f44.google.com ([209.85.167.44]:34670 "EHLO
+        mail-lf1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229998AbhFEVHh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Jun 2021 17:07:37 -0400
+Received: by mail-lf1-f44.google.com with SMTP id f30so19515817lfj.1
+        for <linux-cifs@vger.kernel.org>; Sat, 05 Jun 2021 14:05:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=R/KLXfh8T6zu4Ar85DLXHjlnpMsDz2v7+2mUSZPbAdE=;
-        b=n8AxTz/Ifoful+kLScQ/YHOYdZ5kaI8HEFCXqvrOyz4zNJ7kR1Uxn4xNSsUeSaWnOC
-         WAWCZ9+qTjkqr71bGmSUjckicwQdHW5Sz0ktf3hOlDSA+M8ifBLbDO15ee1ynS3AthRg
-         +VtCFhhgD6VgL8RhbN5ZLNnXO3IwJr3A00Z15HDai63pP/ZoL4FoWhCJkxoQZfGp0qbX
-         I1QpS4uZ1IQX0nxI9RhpLystCO5JxVv4AMkgG4iH6e8iwo3sRak7+e/uh8SQHcv2MNHA
-         odhxmuxNsRIqu8rITLte86eL7LIJu9Bcd6BxaG0YqoBA/rg+bjFMCQT/OR2mxSkqugq+
-         bzUg==
+        bh=D6dXlDN3wb6oDdLY1K1nuNrT04Ee+iSk8YEkmQS05kY=;
+        b=sO3deFvpbRJukgZUB2OvQfUgpH5zDShtgD4TP68svabTnDRl7s9S/7NJJQ5a4a1x0E
+         Yvmw86kFA689DecEYQARY2maasx5SeQB33RX7TOn7KG1WmuwFtKvwufhUWIo0K3+bnr4
+         VfzEgz/6w9p/JTRosoxwivO79bhvIo++rkbTzx048CA8UHL5WuoxvaDkpUYNTbAJevls
+         0sSfUjeH/e7IWDnKXixPl3i3ByWgSVCStUupDqqgmn56JJoJ9qzrU6TbRY920jP204A3
+         PUd8Fioe0kSuROba3VHWrLjsHYoIypPLM69UOr9QvS1u8gWF/IDmBCXp8U9dd5RaeNwy
+         JNTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=R/KLXfh8T6zu4Ar85DLXHjlnpMsDz2v7+2mUSZPbAdE=;
-        b=kDhadwn4iBVCkDD+AH+A5zmubs6NGZmEHZQxKiv+p16AP3IYLLLa1fIoHy2qWtrUBa
-         TzhMc7qavAomGDVs/tUDN5sCV9DYe9ix9+mXYUjbCBe+8frC0ATSFs0xJs9MHQenFjrA
-         0fBFqTn9x/U9bJezv57EnAmrudkyNmAOgXQh4SC6XijwnJA8JVGw60CsmVcPw3jh05yY
-         TUcNW8nFXdJDhOerckKVVsxyX5dozXNqJp+M2Y9n5lc29sCNZO8RXyPavqLTCFxqklQD
-         R2yTSd8O0ohesf6hEBZeeJulISLYGvjWKBGiTIHai2YMhE0cCy8uJ0XXJoOlHdheoDFi
-         p9Ow==
-X-Gm-Message-State: AOAM533nh2lWTTvRSEFLtqWt5gdF02igcwOTNd3ysksFmNaBBMk0hZMD
-        4TV1dixU9oCu8r1na4tMTh5bCBIW4sNkLyd9cnY=
-X-Google-Smtp-Source: ABdhPJzIECt1N5kQucNC/yQgQfGlljDmbKZmoy/7QziWVJZ3ifTGI0TopI6ZMwyDiMUk+epkI2HhWfGW1GOruX37XH4=
-X-Received: by 2002:ac2:5684:: with SMTP id 4mr7061309lfr.282.1622926766239;
- Sat, 05 Jun 2021 13:59:26 -0700 (PDT)
+        bh=D6dXlDN3wb6oDdLY1K1nuNrT04Ee+iSk8YEkmQS05kY=;
+        b=m+jJ50R9s5JQPmiua+v+F7KfnTyip3Hl1/pie56P8Y/vJYj1xPwvmXt3A9ApUwmdrs
+         lVz49OWyBOzc9WQbHUB3sRMVsvHjqHb4fg+BfZRv13hKh3yz1jpZaFxAHHCRZaDvySm/
+         A2EYJh+ffcZJgW/BogbHoe7uZmzXsM6n22dn8VJSTc2pqL3pTGCQuP4YG0Qq/njD35Te
+         dB5oaCqLSnAkpZXqysb5bjxTfjjdiyXQk8mx+xtviw0/VX8IU0bpe6X911x4izuIT1Z7
+         LPke4OGtSx2V8BoExh0iv6TIfOv9qoa936ZvbxtCXbVYPbf45D35hvTU89ictVAdaejz
+         Hz4g==
+X-Gm-Message-State: AOAM5324/fDtedF7ZBCn2qdZ665ulfq1aBt70DoyI88WaGIEfmkjU4oI
+        rI57OcKPCPlUzGZDtXxiUMZomJO096kY6WVOenOAhF0NI5Y=
+X-Google-Smtp-Source: ABdhPJxoY9e34ZCrBfpVDsGZuApCJiYUiFoW4B2kZKj/IX+L6CGrdIrLM1/6jwtIZHdJOn5C2XmGA+xteNxU+L24Ea4=
+X-Received: by 2002:a05:6512:b17:: with SMTP id w23mr6592713lfu.133.1622927072913;
+ Sat, 05 Jun 2021 14:04:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210603053101.1229297-1-lsahlber@redhat.com> <20210603053101.1229297-2-lsahlber@redhat.com>
-In-Reply-To: <20210603053101.1229297-2-lsahlber@redhat.com>
+References: <20210604222533.4760-1-pc@cjr.nz> <20210604222533.4760-6-pc@cjr.nz>
+In-Reply-To: <20210604222533.4760-6-pc@cjr.nz>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 5 Jun 2021 15:59:15 -0500
-Message-ID: <CAH2r5mvNgHyiV-yaLHPiBiUSYHPKpncXY8L-ra+oXcorM3wexQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: improve fallocate emulation
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Date:   Sat, 5 Jun 2021 16:04:22 -0500
+Message-ID: <CAH2r5muf4Tthghai7dSsX4trQRDeCBb53t9H7sjuHqAnWHOCtw@mail.gmail.com>
+Subject: Re: [PATCH 5/7] cifs: fix path comparison and hash calc
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-corrected some minor formatting in the description and merged into
-cifs-2.6.git for-next
+applied the other 6 patches to cifs-2.6.git for-next but this one
+wouldn't apply to for-next so I left it out temporarily.
 
-On Thu, Jun 3, 2021 at 12:31 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
+On Fri, Jun 4, 2021 at 5:26 PM Paulo Alcantara <pc@cjr.nz> wrote:
 >
-> RHBZ: 1866684
+> Fix cache lookup and hash calculations when handling paths with
+> different cases.
 >
-> We don't have a real fallocate in the SMB2 protocol so we used to emulate fallocate
-> by simply switching the file to become non-sparse. But as that could potantially
-> consume a lot more data than we intended to fallocate (large sparse file and fallocating a thin
-> slice in the middle) we would only do this IFF the fallocate request was for virtually the entire file.
->
-> This patch improves this and starts allowing us to fallocate smaller chunks of a file by
-> overwriting the region with 0, for the parts that are unallocated.
->
-> The method used is to first query the server for FSCTL_QUERY_ALLOCATED_RANGES to find what
-> is unallocated in teh fallocate range and then to only overwrite-with-zero the unallocated ranges to fill
-> in the holes.
-> As overwriting-with-zero is different from just allocating blocks, and potentially much more expensive,
-> we limit this to only allow fallocate ranges up to 1Mb in size.
->
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> Signed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
 > ---
->  fs/cifs/smb2ops.c | 133 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 133 insertions(+)
+>  fs/cifs/dfs_cache.c | 168 ++++++++++++++++++++++++--------------------
+>  1 file changed, 93 insertions(+), 75 deletions(-)
 >
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 21ef51d338e0..b68ba92893b6 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -3601,6 +3601,119 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+> diff --git a/fs/cifs/dfs_cache.c b/fs/cifs/dfs_cache.c
+> index c52fec3c4092..f7c4874ddc17 100644
+> --- a/fs/cifs/dfs_cache.c
+> +++ b/fs/cifs/dfs_cache.c
+> @@ -424,12 +424,24 @@ int dfs_cache_init(void)
 >         return rc;
 >  }
 >
-> +static int smb3_simple_fallocate_write_range(unsigned int xid,
-> +                                            struct cifs_tcon *tcon,
-> +                                            struct cifsFileInfo *cfile,
-> +                                            loff_t off, loff_t len,
-> +                                            char *buf)
-> +{
-> +       struct cifs_io_parms io_parms = {0};
-> +       int nbytes;
-> +       struct kvec iov[2];
-> +
-> +       io_parms.netfid = cfile->fid.netfid;
-> +       io_parms.pid = current->tgid;
-> +       io_parms.tcon = tcon;
-> +       io_parms.persistent_fid = cfile->fid.persistent_fid;
-> +       io_parms.volatile_fid = cfile->fid.volatile_fid;
-> +       io_parms.offset = off;
-> +       io_parms.length = len;
-> +
-> +       /* iov[0] is reserved for smb header */
-> +       iov[1].iov_base = buf;
-> +       iov[1].iov_len = io_parms.length;
-> +       return SMB2_write(xid, &io_parms, &nbytes, iov, 1);
-> +}
-> +
-> +static int smb3_simple_fallocate_range(unsigned int xid,
-> +                                      struct cifs_tcon *tcon,
-> +                                      struct cifsFileInfo *cfile,
-> +                                      loff_t off, loff_t len)
-> +{
-> +       struct file_allocated_range_buffer in_data, *out_data = NULL, *tmp_data;
-> +       u32 out_data_len;
-> +       char *buf = NULL;
-> +       loff_t l;
-> +       int rc;
-> +
-> +       in_data.file_offset = cpu_to_le64(off);
-> +       in_data.length = cpu_to_le64(len);
-> +       rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
-> +                       cfile->fid.volatile_fid,
-> +                       FSCTL_QUERY_ALLOCATED_RANGES, true,
-> +                       (char *)&in_data, sizeof(in_data),
-> +                       1024 * sizeof(struct file_allocated_range_buffer),
-> +                       (char **)&out_data, &out_data_len);
-> +       if (rc)
-> +               goto out;
-> +       /*
-> +        * It is already all allocated
-> +        */
-> +       if (out_data_len == 0)
-> +               goto out;
-> +
-> +       buf = kzalloc(1024 * 1024, GFP_KERNEL);
-> +       if (buf == NULL) {
-> +               rc = -ENOMEM;
-> +               goto out;
-> +       }
-> +
-> +       tmp_data = out_data;
-> +       while (len) {
-> +               /*
-> +                * The rest of the region is unmapped so write it all.
-> +                */
-> +               if (out_data_len == 0) {
-> +                       rc = smb3_simple_fallocate_write_range(xid, tcon,
-> +                                              cfile, off, len, buf);
-> +                       goto out;
-> +               }
-> +
-> +               if (out_data_len < sizeof(struct file_allocated_range_buffer)) {
-> +                       rc = -EINVAL;
-> +                       goto out;
-> +               }
-> +
-> +               if (off < le64_to_cpu(tmp_data->file_offset)) {
-> +                       /*
-> +                        * We are at a hole. Write until the end of the region
-> +                        * or until the next allocated data,
-> +                        * whichever comes next.
-> +                        */
-> +                       l = le64_to_cpu(tmp_data->file_offset) - off;
-> +                       if (len < l)
-> +                               l = len;
-> +                       rc = smb3_simple_fallocate_write_range(xid, tcon,
-> +                                              cfile, off, l, buf);
-> +                       if (rc)
-> +                               goto out;
-> +                       off = off + l;
-> +                       len = len - l;
-> +                       if (len == 0)
-> +                               goto out;
-> +               }
-> +               /*
-> +                * We are at a section of allocated data, just skip forward
-> +                * until the end of the data or the end of the region
-> +                * we are supposed to fallocate, whichever comes first.
-> +                */
-> +               l = le64_to_cpu(tmp_data->length);
-> +               if (len < l)
-> +                       l = len;
-> +               off += l;
-> +               len -= l;
-> +
-> +               tmp_data = &tmp_data[1];
-> +               out_data_len -= sizeof(struct file_allocated_range_buffer);
-> +       }
-> +
-> + out:
-> +       kfree(out_data);
-> +       kfree(buf);
-> +       return rc;
-> +}
-> +
-> +
->  static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
->                             loff_t off, loff_t len, bool keep_size)
+> -static inline unsigned int cache_entry_hash(const void *data, int size)
+> +static int cache_entry_hash(const void *data, int size, unsigned int *hash)
 >  {
-> @@ -3661,6 +3774,26 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+> -       unsigned int h;
+> +       int i, clen;
+> +       const unsigned char *s = data;
+> +       wchar_t c;
+> +       unsigned int h = 0;
+>
+> -       h = jhash(data, size, 0);
+> -       return h & (CACHE_HTABLE_SIZE - 1);
+> +       for (i = 0; i < size; i += clen) {
+> +               clen = cache_cp->char2uni(&s[i], size - i, &c);
+> +               if (unlikely(clen < 0)) {
+> +                       cifs_dbg(VFS, "%s: can't convert char\n", __func__);
+> +                       return clen;
+> +               }
+> +               c = cifs_toupper(c);
+> +               h = jhash(&c, sizeof(c), h);
+> +       }
+> +       *hash = h % CACHE_HTABLE_SIZE;
+> +       return 0;
+>  }
+>
+>  /* Check whether second path component of @path is SYSVOL or NETLOGON */
+> @@ -522,9 +534,7 @@ static int copy_ref_data(const struct dfs_info3_param *refs, int numrefs,
+>  }
+>
+>  /* Allocate a new cache entry */
+> -static struct cache_entry *alloc_cache_entry(const char *path,
+> -                                            const struct dfs_info3_param *refs,
+> -                                            int numrefs)
+> +static struct cache_entry *alloc_cache_entry(struct dfs_info3_param *refs, int numrefs)
+>  {
+>         struct cache_entry *ce;
+>         int rc;
+> @@ -533,11 +543,9 @@ static struct cache_entry *alloc_cache_entry(const char *path,
+>         if (!ce)
+>                 return ERR_PTR(-ENOMEM);
+>
+> -       ce->path = kstrdup(path, GFP_KERNEL);
+> -       if (!ce->path) {
+> -               kmem_cache_free(cache_slab, ce);
+> -               return ERR_PTR(-ENOMEM);
+> -       }
+> +       ce->path = refs[0].path_name;
+> +       refs[0].path_name = NULL;
+> +
+>         INIT_HLIST_NODE(&ce->hlist);
+>         INIT_LIST_HEAD(&ce->tlist);
+>
+> @@ -579,12 +587,18 @@ static void remove_oldest_entry_locked(void)
+>  }
+>
+>  /* Add a new DFS cache entry */
+> -static int add_cache_entry_locked(const char *path, unsigned int hash,
+> -                                 struct dfs_info3_param *refs, int numrefs)
+> +static int add_cache_entry_locked(struct dfs_info3_param *refs, int numrefs)
+>  {
+> +       int rc;
+>         struct cache_entry *ce;
+> +       unsigned int hash;
+>
+> -       ce = alloc_cache_entry(path, refs, numrefs);
+> +       convert_delimiter(refs[0].path_name, '\\');
+> +       rc = cache_entry_hash(refs[0].path_name, strlen(refs[0].path_name), &hash);
+> +       if (rc)
+> +               return rc;
+> +
+> +       ce = alloc_cache_entry(refs, numrefs);
+>         if (IS_ERR(ce))
+>                 return PTR_ERR(ce);
+>
+> @@ -604,57 +618,69 @@ static int add_cache_entry_locked(const char *path, unsigned int hash,
+>         return 0;
+>  }
+>
+> -static struct cache_entry *__lookup_cache_entry(const char *path)
+> +/* Check if two DFS paths are equal.  @s1 and @s2 are expected to be in @cache_cp's charset */
+> +static bool dfs_path_equal(const char *s1, int len1, const char *s2, int len2)
+> +{
+> +       int i, l1, l2;
+> +       wchar_t c1, c2;
+> +
+> +       if (len1 != len2)
+> +               return false;
+> +
+> +       for (i = 0; i < len1; i += l1) {
+> +               l1 = cache_cp->char2uni(&s1[i], len1 - i, &c1);
+> +               l2 = cache_cp->char2uni(&s2[i], len2 - i, &c2);
+> +               if (unlikely(l1 < 0 && l2 < 0)) {
+> +                       if (s1[i] != s2[i])
+> +                               return false;
+> +                       l1 = 1;
+> +                       continue;
+> +               }
+> +               if (l1 != l2)
+> +                       return false;
+> +               if (cifs_toupper(c1) != cifs_toupper(c2))
+> +                       return false;
+> +       }
+> +       return true;
+> +}
+> +
+> +static struct cache_entry *__lookup_cache_entry(const char *path, unsigned int hash, int len)
+>  {
+>         struct cache_entry *ce;
+> -       unsigned int h;
+> -       bool found = false;
+>
+> -       h = cache_entry_hash(path, strlen(path));
+> -
+> -       hlist_for_each_entry(ce, &cache_htable[h], hlist) {
+> -               if (!strcasecmp(path, ce->path)) {
+> -                       found = true;
+> +       hlist_for_each_entry(ce, &cache_htable[hash], hlist) {
+> +               if (dfs_path_equal(ce->path, strlen(ce->path), path, len)) {
+>                         dump_ce(ce);
+> -                       break;
+> +                       return ce;
+>                 }
+>         }
+> -
+> -       if (!found)
+> -               ce = ERR_PTR(-ENOENT);
+> -       return ce;
+> +       return ERR_PTR(-EEXIST);
+>  }
+>
+>  /*
+> - * Find a DFS cache entry in hash table and optionally check prefix path against
+> - * @path.
+> - * Use whole path components in the match.
+> - * Must be called with htable_rw_lock held.
+> + * Find a DFS cache entry in hash table and optionally check prefix path against normalized @path.
+>   *
+> - * Return ERR_PTR(-ENOENT) if the entry is not found.
+> + * Use whole path components in the match.  Must be called with htable_rw_lock held.
+> + *
+> + * Return ERR_PTR(-EEXIST) if the entry is not found.
+>   */
+> -static struct cache_entry *lookup_cache_entry(const char *path, unsigned int *hash)
+> +static struct cache_entry *lookup_cache_entry(const char *path)
+>  {
+> -       struct cache_entry *ce = ERR_PTR(-ENOENT);
+> -       unsigned int h;
+> +       struct cache_entry *ce;
+>         int cnt = 0;
+> -       char *npath;
+> -       char *s, *e;
+> -       char sep;
+> +       const char *s = path, *e;
+> +       char sep = *s;
+> +       unsigned int hash;
+> +       int rc;
+>
+> -       npath = kstrdup(path, GFP_KERNEL);
+> -       if (!npath)
+> -               return ERR_PTR(-ENOMEM);
+> -
+> -       s = npath;
+> -       sep = *npath;
+>         while ((s = strchr(s, sep)) && ++cnt < 3)
+>                 s++;
+>
+>         if (cnt < 3) {
+> -               h = cache_entry_hash(path, strlen(path));
+> -               ce = __lookup_cache_entry(path);
+> -               goto out;
+> +               rc = cache_entry_hash(path, strlen(path), &hash);
+> +               if (rc)
+> +                       return ERR_PTR(rc);
+> +               return __lookup_cache_entry(path, hash, strlen(path));
+>         }
+>         /*
+>          * Handle paths that have more than two path components and are a complete prefix of the DFS
+> @@ -662,36 +688,29 @@ static struct cache_entry *lookup_cache_entry(const char *path, unsigned int *ha
+>          *
+>          * See MS-DFSC 3.2.5.5 "Receiving a Root Referral Request or Link Referral Request".
+>          */
+> -       h = cache_entry_hash(npath, strlen(npath));
+> -       e = npath + strlen(npath) - 1;
+> +       e = path + strlen(path) - 1;
+>         while (e > s) {
+> -               char tmp;
+> +               int len;
+>
+>                 /* skip separators */
+>                 while (e > s && *e == sep)
+>                         e--;
+>                 if (e == s)
+> -                       goto out;
+> -
+> -               tmp = *(e+1);
+> -               *(e+1) = 0;
+> -
+> -               ce = __lookup_cache_entry(npath);
+> -               if (!IS_ERR(ce)) {
+> -                       h = cache_entry_hash(npath, strlen(npath));
+>                         break;
+> -               }
+>
+> -               *(e+1) = tmp;
+> +               len = e + 1 - path;
+> +               rc = cache_entry_hash(path, len, &hash);
+> +               if (rc)
+> +                       return ERR_PTR(rc);
+> +               ce = __lookup_cache_entry(path, hash, len);
+> +               if (!IS_ERR(ce))
+> +                       return ce;
+> +
+>                 /* backward until separator */
+>                 while (e > s && *e != sep)
+>                         e--;
+>         }
+> -out:
+> -       if (hash)
+> -               *hash = h;
+> -       kfree(npath);
+> -       return ce;
+> +       return ERR_PTR(-EEXIST);
+>  }
+>
+>  /**
+> @@ -717,7 +736,7 @@ static int update_cache_entry_locked(const char *path, const struct dfs_info3_pa
+>         struct cache_entry *ce;
+>         char *s, *th = NULL;
+>
+> -       ce = lookup_cache_entry(path, NULL);
+> +       ce = lookup_cache_entry(path);
+>         if (IS_ERR(ce))
+>                 return PTR_ERR(ce);
+>
+> @@ -767,7 +786,6 @@ static int get_dfs_referral(const unsigned int xid, struct cifs_ses *ses, const
+>  static int cache_refresh_path(const unsigned int xid, struct cifs_ses *ses, const char *path)
+>  {
+>         int rc;
+> -       unsigned int hash;
+>         struct cache_entry *ce;
+>         struct dfs_info3_param *refs = NULL;
+>         int numrefs = 0;
+> @@ -777,7 +795,7 @@ static int cache_refresh_path(const unsigned int xid, struct cifs_ses *ses, cons
+>
+>         down_write(&htable_rw_lock);
+>
+> -       ce = lookup_cache_entry(path, &hash);
+> +       ce = lookup_cache_entry(path);
+>         if (!IS_ERR(ce)) {
+>                 if (!cache_entry_expired(ce)) {
+>                         dump_ce(ce);
+> @@ -808,7 +826,7 @@ static int cache_refresh_path(const unsigned int xid, struct cifs_ses *ses, cons
+>                 remove_oldest_entry_locked();
 >         }
 >
->         if ((keep_size == true) || (i_size_read(inode) >= off + len)) {
-> +               /*
-> +                * At this point, we are trying to fallocate an internal
-> +                * regions of a sparse file. Since smb2 does not have a
-> +                * fallocate command we have two otions on how to emulate this.
-> +                * We can either turn the entire file to become non-sparse
-> +                * which we only do if the fallocate is for virtually
-> +                * the whole file,  or we can overwrite the region with zeroes
-> +                * using SMB2_write, which could be prohibitevly expensive
-> +                * if len is large.
-> +                */
-> +               /*
-> +                * We are only trying to fallocate a small region so
-> +                * just write it with zero.
-> +                */
-> +               if (len <= 1024 * 1024) {
-> +                       rc = smb3_simple_fallocate_range(xid, tcon, cfile,
-> +                                                        off, len);
-> +                       goto out;
-> +               }
-> +
->                 /*
->                  * Check if falloc starts within first few pages of file
->                  * and ends within a few pages of the end of file to
+> -       rc = add_cache_entry_locked(path, hash, refs, numrefs);
+> +       rc = add_cache_entry_locked(refs, numrefs);
+>         if (!rc)
+>                 atomic_inc(&cache_count);
+>
+> @@ -940,7 +958,7 @@ int dfs_cache_find(const unsigned int xid, struct cifs_ses *ses, const struct nl
+>
+>         down_read(&htable_rw_lock);
+>
+> -       ce = lookup_cache_entry(npath, NULL);
+> +       ce = lookup_cache_entry(npath);
+>         if (IS_ERR(ce)) {
+>                 up_read(&htable_rw_lock);
+>                 rc = PTR_ERR(ce);
+> @@ -987,7 +1005,7 @@ int dfs_cache_noreq_find(const char *path, struct dfs_info3_param *ref,
+>
+>         down_read(&htable_rw_lock);
+>
+> -       ce = lookup_cache_entry(path, NULL);
+> +       ce = lookup_cache_entry(path);
+>         if (IS_ERR(ce)) {
+>                 rc = PTR_ERR(ce);
+>                 goto out_unlock;
+> @@ -1044,7 +1062,7 @@ int dfs_cache_update_tgthint(const unsigned int xid, struct cifs_ses *ses,
+>
+>         down_write(&htable_rw_lock);
+>
+> -       ce = lookup_cache_entry(npath, NULL);
+> +       ce = lookup_cache_entry(npath);
+>         if (IS_ERR(ce)) {
+>                 rc = PTR_ERR(ce);
+>                 goto out_unlock;
+> @@ -1098,7 +1116,7 @@ int dfs_cache_noreq_update_tgthint(const char *path, const struct dfs_cache_tgt_
+>
+>         down_write(&htable_rw_lock);
+>
+> -       ce = lookup_cache_entry(path, NULL);
+> +       ce = lookup_cache_entry(path);
+>         if (IS_ERR(ce)) {
+>                 rc = PTR_ERR(ce);
+>                 goto out_unlock;
+> @@ -1147,7 +1165,7 @@ int dfs_cache_get_tgt_referral(const char *path, const struct dfs_cache_tgt_iter
+>
+>         down_read(&htable_rw_lock);
+>
+> -       ce = lookup_cache_entry(path, NULL);
+> +       ce = lookup_cache_entry(path);
+>         if (IS_ERR(ce)) {
+>                 rc = PTR_ERR(ce);
+>                 goto out_unlock;
 > --
-> 2.30.2
+> 2.31.1
 >
 
 
