@@ -5,93 +5,86 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D7DAC47082
-	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A425C4743D
+	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:45:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B2BF60FF2
-	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DE7061263
+	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:45:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbhFEUik (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 5 Jun 2021 16:38:40 -0400
-Received: from mail-lj1-f178.google.com ([209.85.208.178]:35724 "EHLO
-        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230075AbhFEUik (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Jun 2021 16:38:40 -0400
-Received: by mail-lj1-f178.google.com with SMTP id n24so2095757lji.2
-        for <linux-cifs@vger.kernel.org>; Sat, 05 Jun 2021 13:36:51 -0700 (PDT)
+        id S230022AbhFEUrb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 5 Jun 2021 16:47:31 -0400
+Received: from mail-lj1-f177.google.com ([209.85.208.177]:36684 "EHLO
+        mail-lj1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229998AbhFEUrb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Jun 2021 16:47:31 -0400
+Received: by mail-lj1-f177.google.com with SMTP id 131so16332389ljj.3;
+        Sat, 05 Jun 2021 13:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=WxJIhnV1CmW2pUXfbmK184VKomiizW310TnGgF5D+7U=;
-        b=LB8XgFCw9MsTg6BCMpGnNukGTte4qxMnCJ7PJ98XEuAtFbsoFb9CHQD0nfCsAabgUD
-         yN/eznX1SDndiJ2E4/STc3UG3fth/VlVVqSqood8upKrZkH1FWp+GXgtG+tXRFIwKm7G
-         KaqPD3Ly+d5bg16/yt78vxiObhD3DPpwS92ARvpIVlhmeLAgiSNWPK6zS5JUzndejytc
-         ZrHqf9bBQMND5PPcv+A6Iydo2o3e9B9iVqRty9I09v5/fyKP3XZ+B/TgcRGG5Ywfv28O
-         RN0GxSnqNNKkoW9grchA8odYieRm5zQ03hzAJud3YDQ12fytgwJA3JzrXRm3NUj3P2GA
-         0AHw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yn/TbVn6f1UMlCFPmbCfjZI3NeczMRtP3SfRjDr4sck=;
+        b=TiUc93tB+fvcHVCD3q43RWiQLi79CkumIXL99mU6fkQBIa1cTI5yEK6TuHvVb+YFds
+         0rKD1gr8BCy2uVUVkopcbK6Nu3CXSaHt6RQCMY7B0+71h4D++r6ytoyIi6ZwQrY4hvo4
+         SxtGq8KLRyyHfZJYZsXnkcSpO2NaBF1cy0DOlMN1WE/Z0BIqUVWHPPCJvMzttF2Z76qm
+         S1sGi71wSChk4jh4cQ5N4TqIZ6+XfeW568hr9Yuf7THy72tpysgQN0TvD9boQDdL46pc
+         mohZO6ZB/7MDHNXJODhbTPOZ3mYIi44DnJd/O1lAimCFxm/FtuStxE0X7I/UZeW1UXTI
+         4OEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=WxJIhnV1CmW2pUXfbmK184VKomiizW310TnGgF5D+7U=;
-        b=pO2fxu6O8oBE+E308BQS/zqQwTnMx6kEmWTDYKYomcMx9yiKz/saIpSnSmQan25Zn0
-         SCfs2OZNBEZqzSQPn9YwteUU8jQ0nNVCRd0n6+GybyBxiuqSUJJcahmNS257Y9ChbLdg
-         9zJR2vfwHCzV02+9BKk1b9hw2iJPOn6yQOPL7fhfL8qKhA/zX5/b67ic6ierEcGV81s0
-         sYeS1lPSOJEoa5gZQfQYlatfIduTRwWKPTVCeGl7oEZ9PXqIiOwimCvxGWmIAHp9FCrW
-         skkqFeQu1zai6HQOEYp1xhQiF0iBRbK7lIXCTbf83Msrll11tuENnQmFY8rkWfuEIQkF
-         wc2A==
-X-Gm-Message-State: AOAM533O+FvwdxjTyk+uO/WsRQH9AboC1gKK022dqZwmJ5wCvGu42WX0
-        EuyBQw+2h0kRJTYrxbdGOy5/n1gnLu3fYXIe8B1pxMm4i10=
-X-Google-Smtp-Source: ABdhPJz0Oc8V4AgpNYkA4/6I+oHLcFCIrfla92a2zSlZ+kJaLtmUKsY3DaBPT138laWTIPjp8qNdSvbGSw7VUfwO9+U=
-X-Received: by 2002:a2e:7819:: with SMTP id t25mr8507989ljc.406.1622925350965;
- Sat, 05 Jun 2021 13:35:50 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yn/TbVn6f1UMlCFPmbCfjZI3NeczMRtP3SfRjDr4sck=;
+        b=WeuYg9h0FPepRugMrPRT+5x4EljdECI5DGVk9GWZhcDlsbznAkgetQIItGsQc1aTTP
+         hRKSKLThKbJlcrcUjZ/EPeF3+MpeiO8rNnosSCALJns9JlW/BS6H9zGsCkZY4b/BGwYv
+         lYsZaGQJoX/GtmJGlPS/uGFlWFOc6ekzW2hAypqGnLstwnD2xTiUKtoX97BeXYbr5HZJ
+         5BCfcpiH3HCoMzex1a01uIgTxzHxjzTUpfCL7ettDRhGo9RXD9KncSJw6p5S4NZ32VvE
+         xq+eYgeTl+bPKR6FDpCyCOdJNJQVqOxsSJa9tbqwnQQranlovy7oNAQMRr2gdCh399m1
+         l82A==
+X-Gm-Message-State: AOAM532tVF5pyYVDVHck9UvYKQDclR4nHPW2QoVP7ZsiNGy+Fali+aY/
+        t3H4jYQUyyWa+w/7uff/7P/NE9zKu9qDrTeVVPP1WIHkF04=
+X-Google-Smtp-Source: ABdhPJwaogxOuxZI2Wd3F6lbz/Fxre7xfivwqwT2cRs6sNCy+XM0a/9IVdPmgNPcZArbbQqrIKnCuFSwVYhYNkQmZIc=
+X-Received: by 2002:a2e:2e05:: with SMTP id u5mr8583721lju.256.1622925868100;
+ Sat, 05 Jun 2021 13:44:28 -0700 (PDT)
 MIME-Version: 1.0
+References: <20210529114848.19608-1-yuehaibing@huawei.com> <87eednot8g.fsf@cjr.nz>
+In-Reply-To: <87eednot8g.fsf@cjr.nz>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 5 Jun 2021 15:35:40 -0500
-Message-ID: <CAH2r5msw+NW758zrjaqzUQ3unA5pbNxpu3b6quAg0gndn1_BXQ@mail.gmail.com>
-Subject: [PATCH][CIFS] Remove duplicated prototype
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000000aafb705c40ac173"
+Date:   Sat, 5 Jun 2021 15:44:17 -0500
+Message-ID: <CAH2r5mtGz1vHrjh4nXg8E2NWsyq2V3BcO3XSnCWtLD1DZqurZQ@mail.gmail.com>
+Subject: Re: [PATCH -next] cifs: Remove unused inline function is_sysvol_or_netlogon()
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     YueHaibing <yuehaibing@huawei.com>,
+        Steve French <sfrench@samba.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000000aafb705c40ac173
-Content-Type: text/plain; charset="UTF-8"
+merged into cifs-2.6.git for-next
 
-trivial patch merged into cifs-2.6.git for-next
+On Mon, May 31, 2021 at 9:50 AM Paulo Alcantara <pc@cjr.nz> wrote:
+>
+> YueHaibing <yuehaibing@huawei.com> writes:
+>
+> > is_sysvol_or_netlogon() is never used, so can remove it.
+> >
+> > Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> > ---
+> >  fs/cifs/dfs_cache.c | 11 -----------
+> >  1 file changed, 11 deletions(-)
+>
+> Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+
+
 
 -- 
 Thanks,
 
 Steve
-
---0000000000000aafb705c40ac173
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-remove-duplicated-prototype.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-remove-duplicated-prototype.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kpk7u3er0>
-X-Attachment-Id: f_kpk7u3er0
-
-RnJvbSA0MzFiOWMxNThjYjFlMWVkOTA2ODcxZjgyZmVmMDljMGFmNzI5OWRiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFNhdCwgNSBKdW4gMjAyMSAxNTozMzowMCAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIGNp
-ZnM6IHJlbW92ZSBkdXBsaWNhdGVkIHByb3RvdHlwZQoKc21iMl9maW5kX3NtYl9zZXMgd2FzIGRl
-ZmluZWQgdHdpY2UgaW4gc21iMnByb3RvLmgKClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8
-c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL3NtYjJwcm90by5oIHwgMiAtLQog
-MSBmaWxlIGNoYW5nZWQsIDIgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIy
-cHJvdG8uaCBiL2ZzL2NpZnMvc21iMnByb3RvLmgKaW5kZXggYTVmODdiMDJjZmFmLi40MTUyMDc3
-ZTNjMDcgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvc21iMnByb3RvLmgKKysrIGIvZnMvY2lmcy9zbWIy
-cHJvdG8uaApAQCAtNjQsOCArNjQsNiBAQCBleHRlcm4gdm9pZCBzbWIyX2VjaG9fcmVxdWVzdChz
-dHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspOwogZXh0ZXJuIF9fbGUzMiBzbWIyX2dldF9sZWFzZV9z
-dGF0ZShzdHJ1Y3QgY2lmc0lub2RlSW5mbyAqY2lub2RlKTsKIGV4dGVybiBib29sIHNtYjJfaXNf
-dmFsaWRfb3Bsb2NrX2JyZWFrKGNoYXIgKmJ1ZmZlciwKIAkJCQkgICAgICAgc3RydWN0IFRDUF9T
-ZXJ2ZXJfSW5mbyAqc3J2KTsKLWV4dGVybiBzdHJ1Y3QgY2lmc19zZXMgKnNtYjJfZmluZF9zbWJf
-c2VzKHN0cnVjdCBUQ1BfU2VydmVyX0luZm8gKnNlcnZlciwKLQkJCQkJICBfX3U2NCBzZXNfaWQp
-OwogZXh0ZXJuIGludCBzbWIzX2hhbmRsZV9yZWFkX2RhdGEoc3RydWN0IFRDUF9TZXJ2ZXJfSW5m
-byAqc2VydmVyLAogCQkJCSBzdHJ1Y3QgbWlkX3FfZW50cnkgKm1pZCk7CiAKLS0gCjIuMzAuMgoK
---0000000000000aafb705c40ac173--
