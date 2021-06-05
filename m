@@ -2,103 +2,149 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27474C47082
-	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 176F1C47082
+	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:52:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04F14613B4
-	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:47:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECF946138C
+	for <linux-cifs@archiver.kernel.org>; Sat,  5 Jun 2021 20:52:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbhFEUtZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 5 Jun 2021 16:49:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47526 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbhFEUtY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Jun 2021 16:49:24 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50217C061766;
-        Sat,  5 Jun 2021 13:47:20 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id w15so16284539ljo.10;
-        Sat, 05 Jun 2021 13:47:20 -0700 (PDT)
+        id S229998AbhFEUyf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 5 Jun 2021 16:54:35 -0400
+Received: from mail-lf1-f42.google.com ([209.85.167.42]:34341 "EHLO
+        mail-lf1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230090AbhFEUyd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 5 Jun 2021 16:54:33 -0400
+Received: by mail-lf1-f42.google.com with SMTP id f30so19481720lfj.1;
+        Sat, 05 Jun 2021 13:52:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=4cStJ2sFpNIdNUI9DcsT/mkiPPlBZuyp5QLWw6imaYc=;
-        b=QtESuXB0PtZjtH++S1RRH4E4aeMpqIog64vtVlivI9L5aWQy/NYlOY0JA49Iw+7ruB
-         BKExjUaGCxe5wpVFe4rgQ6s40cHFz+q7wkvol2BmHb3EvlPjfIu87j/ew8qM4sFSHXSc
-         yC10oxqRrzS8ZjSaNB30O90jVXqqgrRdON695OlQI517wLSAS2GcZ1dJF1ZBDlWMnlHR
-         myxj5iUt44PiHPs1Vak4acZiER0POYz0P+v+h2iFXFhBJJOFo8VPUowU2ACZUdn+yF8I
-         MY+OzIQ094gBxShy3RU0hIjXRrdAmR7xOuctFT1Uwkel6tZpZ/hZj/6SXEisjciQfltf
-         BTsw==
+        bh=NeucVVYBqR4NtptCPVit6uqG78d6Me8sFT/5HJOioMM=;
+        b=UfZ4Y7S5wJzmo3KdhQjAWo1UGVea5AGtbObSBCNksHi9GeZ4EqgAOCYZuHrxpi2ZJm
+         2lLEwjhagfvssQnvzTqEW4Yl0o4LV1/919zs5jo1jviyRzGo1oyPqv/Bk7HJj6BmlMIw
+         AR5LCiMhWuxQs1ePGaWgJ5cVfOBALYWL16whSOI/NAOvnYwC9ym2AAT5xIHGU8Yw5DIQ
+         4neDdEWkWHEBjAoCz1i5Yu/jKicm5QYom+uIlaiodv0uRPnzUGkzmHBMwgPpHcX2QGvX
+         gJGBaAaDK49yi2XUb8ZWNX3JMMqYXfyZQMYfOgR4w7HZcCcNR/jYsfb0DK5J3VU7WSJB
+         3/oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=4cStJ2sFpNIdNUI9DcsT/mkiPPlBZuyp5QLWw6imaYc=;
-        b=cTKC1QOpnaOQd6PLdxsVxAvs7dhLvXVIuhJqnN4wUEfSaw6vw0h9Men6qsG6AQuydd
-         jWn7tORAvi2TOnXarPbfsKQ9hP1fi10rIo1QdB0J2qGteS40/6bnhbOJu08YOHCdt3pT
-         UnHd9bWvdNKYqluDkBziPW+wwPoQd8dayWD8jlzSbEOumJrH+ii2CK10llQVdAu7mdup
-         Bmym2RDveHW1rV+mZlqKA+HYSkVWv1cU3DPhB2D+fyImrN0pZHubBKF49KFd5BFEecJA
-         TGxUpBI6I9hvcFU5V0gKAthEwm4qMHSozFZ+3inE2pFyy2RMio3wTi0XMJJV9PBmHl+h
-         T5BA==
-X-Gm-Message-State: AOAM531IvTZxOR/b1JU06/PPF5xxRrFDDx/2JJI1WyyOT4Ir+c3LKO7e
-        DJOkJSAe2kvBM9jvnCeDfe5MapIkwr0DrYgQBg/TDc14eg0=
-X-Google-Smtp-Source: ABdhPJx8RG63VVbd8Ot5eXuzN6ZGihtg29eGHWgc2Ip+SPl7/7Ys16S0wZ78B06DRVQgEfhazZNZsB91mSc4gmxKiIk=
-X-Received: by 2002:a2e:9a87:: with SMTP id p7mr3598873lji.477.1622926038656;
- Sat, 05 Jun 2021 13:47:18 -0700 (PDT)
+        bh=NeucVVYBqR4NtptCPVit6uqG78d6Me8sFT/5HJOioMM=;
+        b=AvHcLy/9WMwwVLkVlBwa1Kmg9/NF9HrHh9KqW1G2VYMWUptmtiKjX7wYT33uzT4PLc
+         eo7BjIgA1eQ8HWKi9WOXVPzUlgMz9F0r69nGDEpc8m31kVwuKEnKbNWmJU9wi7mp7H8D
+         E2ATH17+jZ0+eZgn2ADTmq07RQghlZITL95KXMGeV5CODzk572Zn6jsFqzTiDVu8nQM4
+         pZrZXjvMHXiZeu0Ys+Y6dvEBxh/y0ETaEXn7RiHLo5QDF21rKh1bnKtsSa340Ta37w4f
+         v4ALh2hX5/ALLTMvufFjbIduD/Iehjswgan0RQoeGg1LH8LMVe8SYCEphVDca3c2bmYZ
+         mejg==
+X-Gm-Message-State: AOAM532o82Ij/A1osNqP0DqAUCFUXyq3QCvifi44GsKeL7eVPiLebQbf
+        hbGS9tGZfThoTnBSNLg6er6ZjK95fV9lMpjjg9o=
+X-Google-Smtp-Source: ABdhPJyaUmu4mJHf+r5EO7tRZFWoqjozfEnvSWdk9NCAhRrVk4dbn75NWh5kpQIuUY6no0ANnljhmpkNOeAmaKpllUg=
+X-Received: by 2002:a05:6512:b17:: with SMTP id w23mr6565422lfu.133.1622926290273;
+ Sat, 05 Jun 2021 13:51:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210526203545.13160-1-rikard.falkeborn@gmail.com>
-In-Reply-To: <20210526203545.13160-1-rikard.falkeborn@gmail.com>
+References: <CA+G9fYsnWUYuahxv3+vQx3UQ_CvJ5caiQwb7BXEuDGxPjmrM1w@mail.gmail.com>
+In-Reply-To: <CA+G9fYsnWUYuahxv3+vQx3UQ_CvJ5caiQwb7BXEuDGxPjmrM1w@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 5 Jun 2021 15:47:07 -0500
-Message-ID: <CAH2r5muYv=tMkkX2bV0W3OU7Z8GLPwiekh_6D0pPQp+ybhmuMQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Constify static struct genl_ops
-To:     Rikard Falkeborn <rikard.falkeborn@gmail.com>
+Date:   Sat, 5 Jun 2021 15:51:19 -0500
+Message-ID: <CAH2r5msKk8=6msSYpUHJftKuV9zq15ptME4MHBNacc4FXb9iUQ@mail.gmail.com>
+Subject: Re: [next] fs: cifsglob.h:955:20: error: passing argument 2 of
+ 'test_bit' from incompatible pointer type
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>
 Cc:     CIFS <linux-cifs@vger.kernel.org>,
         samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Samuel Cabrero <scabrero@suse.de>
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        lkft-triage@lists.linaro.org, Steve French <sfrench@samba.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
+Probably was reported earlier and this code has been changed.  The
+multichannel patches are also temporarily removed from for-next while
+Shyam is doing some fixes to the series.
 
-On Wed, May 26, 2021 at 4:06 PM Rikard Falkeborn
-<rikard.falkeborn@gmail.com> wrote:
+On Fri, Jun 4, 2021 at 4:23 AM Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
 >
-> The only usage of cifs_genl_ops[] is to assign its address to the ops
-> field in the genl_family struct, which is a pointer to const. Make it
-> const to allow the compiler to put it in read-only memory.
+> The following builds failed on Linux next-20210604 due to warnings / errors.
 >
-> Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
-> ---
->  fs/cifs/netlink.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   - arm (s3c2410_defconfig) with gcc- 8 / 9 / 10
+>   - parisc (defconfig) with gcc-8 / 9 / 10
+>   - powerpc (ppc6xx_defconfig) with gcc- 8 / 9 /10
 >
-> diff --git a/fs/cifs/netlink.c b/fs/cifs/netlink.c
-> index 5aaabe4cc0a7..291cb606f149 100644
-> --- a/fs/cifs/netlink.c
-> +++ b/fs/cifs/netlink.c
-> @@ -30,7 +30,7 @@ static const struct nla_policy cifs_genl_policy[CIFS_GENL_ATTR_MAX + 1] = {
->         [CIFS_GENL_ATTR_SWN_RESOURCE_NAME]      = { .type = NLA_STRING},
->  };
+> In file included from fs/cifs/transport.c:38:
+> fs/cifs/transport.c: In function 'cifs_pick_channel':
+> fs/cifs/cifsglob.h:955:20: error: passing argument 2 of 'test_bit'
+> from incompatible pointer type [-Werror=incompatible-pointer-types]
+>   955 |  test_bit((index), &(ses)->chans_need_reconnect)
+>            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>            |
+>            size_t * {aka unsigned int *}
+> fs/cifs/transport.c:1065:7: note: in expansion of macro
+> 'CIFS_CHAN_NEEDS_RECONNECT'
+>  1065 |   if (CIFS_CHAN_NEEDS_RECONNECT(ses, index))
+>       |       ^~~~~~~~~~~~~~~~~~~~~~~~~
+> In file included from arch/powerpc/include/asm/bitops.h:193,
+>                  from include/linux/bitops.h:32,
+>                  from include/linux/kernel.h:12,
+>                  from include/linux/list.h:9,
+>                  from include/linux/wait.h:7,
+>                  from include/linux/wait_bit.h:8,
+>                  from include/linux/fs.h:6,
+>                  from fs/cifs/transport.c:23:
+> include/asm-generic/bitops/non-atomic.h:104:66: note: expected 'const
+> volatile long unsigned int *' but argument is of type 'size_t *' {aka
+> 'unsigned int *'}
+>   104 | static inline int test_bit(int nr, const volatile unsigned long *addr)
+>                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~
+> cc1: some warnings being treated as errors
+> make[3]: *** [scripts/Makefile.build:272: fs/cifs/transport.o] Error 1
+> fs/cifs/sess.c: In function 'cifs_chan_set_need_reconnect':
+> fs/cifs/sess.c:98:22: error: passing argument 2 of 'set_bit' from
+> incompatible pointer type [-Werror=incompatible-pointer-types]
+>    98 |  set_bit(chan_index, &ses->chans_need_reconnect);
+>              ^~~~~~~~~~~~~~~~~~~~~~~~~~
+>              |
+>              size_t * {aka unsigned int *}
 >
-> -static struct genl_ops cifs_genl_ops[] = {
-> +static const struct genl_ops cifs_genl_ops[] = {
->         {
->                 .cmd = CIFS_GENL_CMD_SWN_NOTIFY,
->                 .validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+>
+> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+>
+> Full build log:
+> https://gitlab.com/Linaro/lkft/mirrors/next/linux-next/-/jobs/1317929765#L247
+>
+> Steps to reproduce:
+> -----------------------------
+>
+> # TuxMake is a command line tool and Python library that provides
+> # portable and repeatable Linux kernel builds across a variety of
+> # architectures, toolchains, kernel configurations, and make targets.
+> #
+> # TuxMake supports the concept of runtimes.
+> # See https://docs.tuxmake.org/runtimes/, for that to work it requires
+> # that you install podman or docker on your system.
+> #
+> # To install tuxmake on your system globally:
+> # sudo pip3 install -U tuxmake
+> #
+> # See https://docs.tuxmake.org/ for complete documentation.
+>
+> tuxmake --runtime podman --target-arch arm --toolchain gcc-8 --kconfig
+> s3c2410_defconfig
+>
+>
 > --
-> 2.31.1
->
+> Linaro LKFT
+> https://lkft.linaro.org
+
 
 
 -- 
