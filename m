@@ -2,98 +2,163 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A9CC47095
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 13:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 180D8C47082
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 14:52:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3152061153
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 13:58:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E390D61208
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 14:52:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230269AbhFGOAS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Jun 2021 10:00:18 -0400
-Received: from mail-qt1-f171.google.com ([209.85.160.171]:33787 "EHLO
-        mail-qt1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230261AbhFGOAR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Jun 2021 10:00:17 -0400
-Received: by mail-qt1-f171.google.com with SMTP id e3so1011518qte.0
-        for <linux-cifs@vger.kernel.org>; Mon, 07 Jun 2021 06:58:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=LSEQWZP6ltUZh8/1tscfee4ykF012TZGRkAClyEpoYs=;
-        b=D2IeGpHxONNWeCdCum02Fz+NLcoOzub2uAe+9n56I90P6i77vasNDBK0swy+5pB+Yn
-         Y/jtjCBWlkZCvYyrLEcWhiuUGtnrW2uqQ1IJHaN79ZWM2NQin/eF/J/JvOjkNmtMwAvN
-         b1OaIPnvHJM8i2nziUi9CxRTP/dTtmxuR7Y6V9bXcczTxAZ+A0OMWh3+wz8LuinryXgd
-         nBJR1AHZI8yQZQZm0Y0mZoPK9iui9cKCOtTSXb8lCwjdoLPRTDnhRx1A/x85d8WlusPC
-         gF/5m73peaQ/9CN31aYFLpcDcmvsd1QqHFAGOxMMm/UhtB732cfLWIWC2ybzRW2qBi5v
-         mJvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=LSEQWZP6ltUZh8/1tscfee4ykF012TZGRkAClyEpoYs=;
-        b=PNd797GckZNRehb4i2vZ2tYDBwNf1cccrjbkIV0PRYke9knO7xuJsDIeuhHIvSMZ5M
-         nJUM+CouYNPUgabFQAfrYarNvo6AaUn15Wmt0yuWkNeZFO9kJFix3MhgxB1MdN0ecUK0
-         SEAnliD9O30Ozq/Z1AV1uEP14Ga2bH5gTQ800A7lXfFXTnz3e6ySCy6wakqWBu5jQPF/
-         Bpx9javrCF4SvsvYbW4+sxberupdh1M9mqrRaCJ/OTHXQPI9SQHfxYWcxVN0kldCXagZ
-         hNvz/lo8m2DMnxGcdNLCyaxIs3TxbvoNm0zCy8jqxnM0gymYSPSBp8Lwx2wTAgmokD35
-         QfSw==
-X-Gm-Message-State: AOAM533AjOVhKnQk3G2s6LrWRtC+ejveQMGL/VmPsyavL9+nIK6xfK0O
-        kx03RpcNxcAENDqHdk3HHTQ=
-X-Google-Smtp-Source: ABdhPJy+Q8J7xjhS47epzbN6hK2I68OFRU17edQ8jpfokHnuSaTCHOEvZPMAaM5pDbmxS134QExxCg==
-X-Received: by 2002:ac8:734f:: with SMTP id q15mr7765595qtp.146.1623074229239;
-        Mon, 07 Jun 2021 06:57:09 -0700 (PDT)
-Received: from nyarly.rlyeh.local ([179.233.244.167])
-        by smtp.gmail.com with ESMTPSA id b189sm9723695qkc.91.2021.06.07.06.57.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jun 2021 06:57:08 -0700 (PDT)
-Date:   Mon, 7 Jun 2021 10:57:04 -0300
-From:   Thiago Rafael Becker <trbecker@gmail.com>
-To:     =?iso-8859-1?Q?Aur=E9lien?= Aptel <aaptel@suse.com>
-Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org,
-        samba-technical@lists.samba.org, tbecker@redhat.com,
-        jshivers@redhat.com
-Subject: Re: [RFC PATCH] cifs: retry lookup and readdir when EAGAIN is
- returned.
-Message-ID: <YL4lsBT8Amy4Nh87@nyarly.rlyeh.local>
-References: <YLplrk3FQiUtVoWi@nyarly.rlyeh.local>
- <87v96qrpdt.fsf@suse.com>
+        id S230385AbhFGOyb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 7 Jun 2021 10:54:31 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:51518 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230220AbhFGOya (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Jun 2021 10:54:30 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 838B71FD30;
+        Mon,  7 Jun 2021 14:52:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1623077557; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=dXoAu7GQXVTWLNML0ZDCTisk4K7XoHyJObObTC90fms=;
+        b=n5y6GFisMEh+A5JM36h5vwzI9AfE+bbNmsI1jJQIjg63Kl2XZCkUOnazg1stcBSt1g2F/B
+        kGORzGj2jqJqLUAjF53Dragxk4kjM8pCR0frezM0yBkPCoB6WesCJE6r/B9rygmxDaO0vR
+        +URUuqHP6cHorDGg2yg7KECsXmr+X+A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1623077557;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=dXoAu7GQXVTWLNML0ZDCTisk4K7XoHyJObObTC90fms=;
+        b=mYFsNfNlCAlPVk9uoaYY4HANzUKLEdfBnU/GFntY7jVg1ZQFkotYD6gILk8kz0Wk/TZ9Gf
+        AxSAYgNMGjWXlCAQ==
+Received: from quack2.suse.cz (unknown [10.100.200.198])
+        by relay2.suse.de (Postfix) with ESMTP id B48B3A3B88;
+        Mon,  7 Jun 2021 14:52:36 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 7FFA81F2CAC; Mon,  7 Jun 2021 16:52:36 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     <linux-fsdevel@vger.kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
+        Chao Yu <yuchao0@huawei.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        linux-cifs@vger.kernel.org, <linux-ext4@vger.kernel.org>,
+        linux-f2fs-devel@lists.sourceforge.net, <linux-mm@kvack.org>,
+        <linux-xfs@vger.kernel.org>, Miklos Szeredi <miklos@szeredi.hu>,
+        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 0/14 v7] fs: Hole punch vs page cache filling races
+Date:   Mon,  7 Jun 2021 16:52:10 +0200
+Message-Id: <20210607144631.8717-1-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4536; h=from:subject:message-id; bh=P0xjoHEljjWrXlT5jhnGa40YEfdwjktVMbfSRuehRng=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBgvjKWdgDiE/fLVFkWEAkIZkFmQCkqJGxyJZ4ENpOy pv3oapKJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYL4ylgAKCRCcnaoHP2RA2aboB/ sFYL2MHuSq4OG683y+6SRm+HLM9QjIwDQ1mhPrW5rdgFESv6HtB0RLh5l3h9f+oIYyyXM3oFKpTph9 pVTRYbSCjRcrn6WyyqmYousdw2V5l7BgNv92EKKH21ci4zh3ILXKLRhFn07A8MxRdtqNFzQuWhixkc okci90yaAc+nM+whGNX6L3rDA2tCheAsL5Wgrfm95V+SWYP+Co0VG32hpiTIistXxbzJF8CuiSgITE 9P8uLujr6fmaRlblzZRhL132+zFHxO1p319kllneBn3/+NbEZCbgFsVoJrtqCCgWA1lJBF1J84uWhE jnGow/3y6AE3EIzGCNUoZmj/Tcy7pd
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87v96qrpdt.fsf@suse.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Jun 07, 2021 at 11:32:46AM +0200, Aurélien Aptel wrote:
-> If the user session is deleted trying again will always fail. Are you
-> sure this is the reason you get this issue?
+Hello,
 
-It is. We can explicitly delete the user sesssion on windows prior to one
-of these calls, which will be replyed with STATUS_USER_SESSION_DELETED.
+here is another version of my patches to address races between hole punching
+and page cache filling functions for ext4 and other filesystems. The biggest
+change since the last time is providing function to lock two mappings and using
+it from XFS. Other changes were pretty minor.
 
+Out of all filesystem supporting hole punching, only GFS2 and OCFS2 remain
+unresolved. GFS2 people are working on their own solution (cluster locking is
+involved), OCFS2 has even bigger issues (maintainers informed, looking into
+it).
 
-  470 0.0 client → server SMB2 198 Create Request File:
-  471 0.n server → client SMB2 143 Create Response, Error: STATUS_USER_SESSION_DELETED
+As a next step, I'd like to actually make sure all calls to
+truncate_inode_pages() happen under mapping->invalidate_lock, add the assert
+and then we can also get rid of i_size checks in some places (truncate can
+use the same serialization scheme as hole punch). But that step is mostly
+a cleanup so I'd like to get these functional fixes in first.
 
-Which is converted to EAGAIN with the expectation that someone will
-handle it down the stack while the user session is restablished. This
-doesn't happen currently, and EAGAIN is leaking to userspace.
+Note that the first patch of the series is already in mm tree but I'm
+submitting it here so that the series applies to Linus' tree cleanly.
 
-For getdents, EAGAIN is unexpected, and most applications don't bother
-handling it, including coreutils (ls and stat were used to test this
-patch). And for several syscalls that rely on lookup, returning EAGAIN is
-unexpected, so we shouldn't leak it.
+Changes since v6:
+* Added some reviewed-by tags
+* Added wrapper for taking invalidate_lock similar to inode_lock
+* Renamed wrappers for taking invalidate_lock for two inodes
+* Added xfs patch to make xfs_isilocked() work better even without lockdep
+* Some minor documentation fixes
 
-In our testing, sending the call again handles the problem with no userspace disrruption.
+Changes since v5:
+* Added some reviewed-by tags
+* Added functions for locking two mappings and using them from XFS where needed
+* Some minor code style & comment fixes
 
-Best,
-Thiago
+Changes since v4:
+* Rebased onto 5.13-rc1
+* Removed shmfs conversion patches
+* Fixed up zonefs changelog
+* Fixed up XFS comments
+* Added patch fixing up definition of file_operations in Documentation/vfs/
+* Updated documentation and comments to explain invalidate_lock is used also
+  to prevent changes through memory mappings to existing pages for some VFS
+  operations.
+
+Changes since v3:
+* Renamed and moved lock to struct address_space
+* Added conversions of tmpfs, ceph, cifs, fuse, f2fs
+* Fixed error handling path in filemap_read()
+* Removed .page_mkwrite() cleanup from the series for now
+
+Changes since v2:
+* Added documentation and comments regarding lock ordering and how the lock is
+  supposed to be used
+* Added conversions of ext2, xfs, zonefs
+* Added patch removing i_mapping_sem protection from .page_mkwrite handlers
+
+Changes since v1:
+* Moved to using inode->i_mapping_sem instead of aops handler to acquire
+  appropriate lock
+
+---
+Motivation:
+
+Amir has reported [1] a that ext4 has a potential issues when reads can race
+with hole punching possibly exposing stale data from freed blocks or even
+corrupting filesystem when stale mapping data gets used for writeout. The
+problem is that during hole punching, new page cache pages can get instantiated
+and block mapping from the looked up in a punched range after
+truncate_inode_pages() has run but before the filesystem removes blocks from
+the file. In principle any filesystem implementing hole punching thus needs to
+implement a mechanism to block instantiating page cache pages during hole
+punching to avoid this race. This is further complicated by the fact that there
+are multiple places that can instantiate pages in page cache.  We can have
+regular read(2) or page fault doing this but fadvise(2) or madvise(2) can also
+result in reading in page cache pages through force_page_cache_readahead().
+
+There are couple of ways how to fix this. First way (currently implemented by
+XFS) is to protect read(2) and *advise(2) calls with i_rwsem so that they are
+serialized with hole punching. This is easy to do but as a result all reads
+would then be serialized with writes and thus mixed read-write workloads suffer
+heavily on ext4. Thus this series introduces inode->i_mapping_sem and uses it
+when creating new pages in the page cache and looking up their corresponding
+block mapping. We also replace EXT4_I(inode)->i_mmap_sem with this new rwsem
+which provides necessary serialization with hole punching for ext4.
+
+								Honza
+
+[1] https://lore.kernel.org/linux-fsdevel/CAOQ4uxjQNmxqmtA_VbYW0Su9rKRk2zobJmahcyeaEVOFKVQ5dw@mail.gmail.com/
+
+Previous versions:
+Link: https://lore.kernel.org/linux-fsdevel/20210208163918.7871-1-jack@suse.cz/
+Link: https://lore.kernel.org/r/20210413105205.3093-1-jack@suse.cz
+Link: https://lore.kernel.org/r/20210423171010.12-1-jack@suse.cz
+Link: https://lore.kernel.org/r/20210512101639.22278-1-jack@suse.cz
+Link: http://lore.kernel.org/r/20210525125652.20457-1-jack@suse.cz
