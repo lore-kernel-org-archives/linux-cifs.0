@@ -2,49 +2,50 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41FA2C48BCF
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 14:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7FFC49EA2
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 14:52:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A5A560FE5
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 14:52:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 361F261108
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 14:52:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231143AbhFGOyb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Jun 2021 10:54:31 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:34624 "EHLO
+        id S231265AbhFGOye (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 7 Jun 2021 10:54:34 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:34694 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230264AbhFGOya (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Jun 2021 10:54:30 -0400
+        with ESMTP id S230438AbhFGOyb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Jun 2021 10:54:31 -0400
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 819DE21A68;
+        by smtp-out1.suse.de (Postfix) with ESMTP id DE3D321A9B;
         Mon,  7 Jun 2021 14:52:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1623077557; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vhH8fZvd6Tom4nBiYNHBFCVmcJF6aY93XCBQD2IK7mE=;
-        b=sTYyrBrhmcoYH4Pc6qGpefCJy5Sux5PJVReKTeUz6gUVd74lV8PShJvlmgXRUYi7K78zGY
-        d4J3ry2lEKY4SEj8ooKRSfsxNwMcXt1Hj4nLWK6IcMLWMM+R6InO8T8IFySZfCpG7xy0Kk
-        TEFjqGOekbxuEn9tycM3YhzJbNJncoU=
+        bh=Y0cR5u9TaTNf3kT8s6I4jpd1jCjKCNBR8ag5a0EBpIA=;
+        b=lRNmVcmRG737AlbDU8H4w/KlwsUwJATOMmnyK9j1C08aviXsnN+z59eaOMXG3SBOcoo8hP
+        X49jgtJSXWZJTSrn32cp+qmrqms9Z6RpgegsMLcHWf+adcj8nnqU+LC6V8BOQzrTU8V5hu
+        p1w/2gMeidgaPqBZqSEpWAXCVUkjENo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1623077557;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vhH8fZvd6Tom4nBiYNHBFCVmcJF6aY93XCBQD2IK7mE=;
-        b=DwFAqfCR7Wr+2ACyXhre2GSoLv5DOgFn+ENsakIV7+3dRNt9fpuZ6AfKNeT4x7NlOGqZpl
-        fOCS0M97+XnF36Bg==
+        bh=Y0cR5u9TaTNf3kT8s6I4jpd1jCjKCNBR8ag5a0EBpIA=;
+        b=DzX0ZLzbeMzKgIqY3N5UjYGxTkUqF+YfzdtDAPtexZAmQW4jN1i8OjliYuGNqWSQdGeMbm
+        JEK/HMzy1klveLCQ==
 Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id B8DC1A3B98;
-        Mon,  7 Jun 2021 14:52:36 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id AE2EAA3B8D;
+        Mon,  7 Jun 2021 14:52:37 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 91DF31F2CB3; Mon,  7 Jun 2021 16:52:36 +0200 (CEST)
+        id 9D0CF1F2CB5; Mon,  7 Jun 2021 16:52:36 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     Christoph Hellwig <hch@infradead.org>,
@@ -60,95 +61,158 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         <linux-xfs@vger.kernel.org>, Miklos Szeredi <miklos@szeredi.hu>,
         Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
         Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 04/14] mm: Add functions to lock invalidate_lock for two mappings
-Date:   Mon,  7 Jun 2021 16:52:14 +0200
-Message-Id: <20210607145236.31852-4-jack@suse.cz>
+Subject: [PATCH 06/14] ext2: Convert to using invalidate_lock
+Date:   Mon,  7 Jun 2021 16:52:16 +0200
+Message-Id: <20210607145236.31852-6-jack@suse.cz>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210607144631.8717-1-jack@suse.cz>
 References: <20210607144631.8717-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2616; h=from:subject; bh=feuIxLKoHMpqfTsHSNzx+Llrxfh/M4pQHEj3mln4fkU=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBgvjKf4qNEt/Jyz8s3OnJ3hXcO5MHT6Xe5BiU0vi7v Yg+bSvWJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYL4ynwAKCRCcnaoHP2RA2chHB/ wKYys4WnIBaTn+iTmcDwD76cwJNj9fNUmSIB5g6n0gtAP4/BnjWvcBbmQla0RGUYJvtO/9VQX1/DPE RdysgXZVUQqMFjHYjWjBwkkpPWcvdHvIW+9KXp0iJzLJkqUV8p8ZfByoP2JTRzDN82Rte87GtnN2Sp L0xIljcsn5jrH8Ww2o3Twm5GXBaCRdS8AVgRk1xEBgsw9Tm6VEqipm87uxNWlHgaU4THjuXQviA32K qTmxhDoIUFvd+7DyJIQyVFx8U2bwkAdQVm20zTZnZAZepHKSgapRODGbx6Yqk1g6ob+l9hmvzMz/zA Y3rmXXMf7ydvJe7qAvc8CkddqajivD
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4682; h=from:subject; bh=CDcZWsyH32vJE3DSXVHXUVYPxLcy1S8W7KZFP94NQWc=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBgvjKgthhqcWN94OroqMs+dt8ZjvTEGenhtDvbVKo4 rIyqNfCJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYL4yoAAKCRCcnaoHP2RA2TxZCA CRdo+Mbb6U82tItDgWExu+HN9TPnhfk4Ge6vz5lG4CbHc40AXb90NGmXzbXkb4Qovz6zhJODtOVBtm WmN9EsXJdn7TWSttbSjCX4oqlnUq4Qgu9t+MiXyo8a0JITM3/sXXPF0Gy783DF1SuYMVogVkibN0Kp sCH/g2aptvoJEfUeWcbr1FHGrit1Ojjl/kHhmYGE1dTO9g9Nz0/sqtY4g8jL3ckAelok/zdMZqG7qP WFI8qHzir4+bULWsuaN3XRs28PdT+8L/0SVgYUS8ZUdfO2rXZkWTJP3X0hiuMC4RYgQhQoTmB6cxRS 3HcqGSSnT/qf3t1hzAjFoCJBBGbQxC
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Some operations such as reflinking blocks among files will need to lock
-invalidate_lock for two mappings. Add helper functions to do that.
+Ext2 has its private dax_sem used for synchronizing page faults and
+truncation. Use mapping->invalidate_lock instead as it is meant for this
+purpose.
 
+CC: <linux-ext4@vger.kernel.org>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- include/linux/fs.h |  6 ++++++
- mm/filemap.c       | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+)
+ fs/ext2/ext2.h  | 11 -----------
+ fs/ext2/file.c  |  7 +++----
+ fs/ext2/inode.c | 12 ++++++------
+ fs/ext2/super.c |  3 ---
+ 4 files changed, 9 insertions(+), 24 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index d8afbc9661d7..ddc11bafc183 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -849,6 +849,12 @@ static inline void filemap_invalidate_unlock_shared(
- void lock_two_nondirectories(struct inode *, struct inode*);
- void unlock_two_nondirectories(struct inode *, struct inode*);
+diff --git a/fs/ext2/ext2.h b/fs/ext2/ext2.h
+index b0a694820cb7..81907a041570 100644
+--- a/fs/ext2/ext2.h
++++ b/fs/ext2/ext2.h
+@@ -667,9 +667,6 @@ struct ext2_inode_info {
+ 	struct rw_semaphore xattr_sem;
+ #endif
+ 	rwlock_t i_meta_lock;
+-#ifdef CONFIG_FS_DAX
+-	struct rw_semaphore dax_sem;
+-#endif
  
-+void filemap_invalidate_lock_two(struct address_space *mapping1,
-+				 struct address_space *mapping2);
-+void filemap_invalidate_unlock_two(struct address_space *mapping1,
-+				   struct address_space *mapping2);
-+
-+
+ 	/*
+ 	 * truncate_mutex is for serialising ext2_truncate() against
+@@ -685,14 +682,6 @@ struct ext2_inode_info {
+ #endif
+ };
+ 
+-#ifdef CONFIG_FS_DAX
+-#define dax_sem_down_write(ext2_inode)	down_write(&(ext2_inode)->dax_sem)
+-#define dax_sem_up_write(ext2_inode)	up_write(&(ext2_inode)->dax_sem)
+-#else
+-#define dax_sem_down_write(ext2_inode)
+-#define dax_sem_up_write(ext2_inode)
+-#endif
+-
  /*
-  * NOTE: in a 32bit arch with a preemptable kernel and
-  * an UP compile the i_size_read/write must be atomic
-diff --git a/mm/filemap.c b/mm/filemap.c
-index c8e7e451d81e..b8e9bccecd9f 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -1009,6 +1009,44 @@ struct page *__page_cache_alloc(gfp_t gfp)
- EXPORT_SYMBOL(__page_cache_alloc);
+  * Inode dynamic state flags
+  */
+diff --git a/fs/ext2/file.c b/fs/ext2/file.c
+index f98466acc672..eb97aa3d700e 100644
+--- a/fs/ext2/file.c
++++ b/fs/ext2/file.c
+@@ -81,7 +81,7 @@ static ssize_t ext2_dax_write_iter(struct kiocb *iocb, struct iov_iter *from)
+  *
+  * mmap_lock (MM)
+  *   sb_start_pagefault (vfs, freeze)
+- *     ext2_inode_info->dax_sem
++ *     address_space->invalidate_lock
+  *       address_space->i_mmap_rwsem or page_lock (mutually exclusive in DAX)
+  *         ext2_inode_info->truncate_mutex
+  *
+@@ -91,7 +91,6 @@ static ssize_t ext2_dax_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ static vm_fault_t ext2_dax_fault(struct vm_fault *vmf)
+ {
+ 	struct inode *inode = file_inode(vmf->vma->vm_file);
+-	struct ext2_inode_info *ei = EXT2_I(inode);
+ 	vm_fault_t ret;
+ 	bool write = (vmf->flags & FAULT_FLAG_WRITE) &&
+ 		(vmf->vma->vm_flags & VM_SHARED);
+@@ -100,11 +99,11 @@ static vm_fault_t ext2_dax_fault(struct vm_fault *vmf)
+ 		sb_start_pagefault(inode->i_sb);
+ 		file_update_time(vmf->vma->vm_file);
+ 	}
+-	down_read(&ei->dax_sem);
++	filemap_invalidate_lock_shared(inode->i_mapping);
+ 
+ 	ret = dax_iomap_fault(vmf, PE_SIZE_PTE, NULL, NULL, &ext2_iomap_ops);
+ 
+-	up_read(&ei->dax_sem);
++	filemap_invalidate_unlock_shared(inode->i_mapping);
+ 	if (write)
+ 		sb_end_pagefault(inode->i_sb);
+ 	return ret;
+diff --git a/fs/ext2/inode.c b/fs/ext2/inode.c
+index 68178b2234bd..2c76b9ffea26 100644
+--- a/fs/ext2/inode.c
++++ b/fs/ext2/inode.c
+@@ -1175,7 +1175,7 @@ static void ext2_free_branches(struct inode *inode, __le32 *p, __le32 *q, int de
+ 		ext2_free_data(inode, p, q);
+ }
+ 
+-/* dax_sem must be held when calling this function */
++/* mapping->invalidate_lock must be held when calling this function */
+ static void __ext2_truncate_blocks(struct inode *inode, loff_t offset)
+ {
+ 	__le32 *i_data = EXT2_I(inode)->i_data;
+@@ -1192,7 +1192,7 @@ static void __ext2_truncate_blocks(struct inode *inode, loff_t offset)
+ 	iblock = (offset + blocksize-1) >> EXT2_BLOCK_SIZE_BITS(inode->i_sb);
+ 
+ #ifdef CONFIG_FS_DAX
+-	WARN_ON(!rwsem_is_locked(&ei->dax_sem));
++	WARN_ON(!rwsem_is_locked(&inode->i_mapping->invalidate_lock));
  #endif
  
-+/*
-+ * filemap_invalidate_lock_two - lock invalidate_lock for two mappings
-+ *
-+ * Lock exclusively invalidate_lock of any passed mapping that is not NULL.
-+ *
-+ * @mapping1: the first mapping to lock
-+ * @mapping2: the second mapping to lock
-+ */
-+void filemap_invalidate_lock_two(struct address_space *mapping1,
-+				 struct address_space *mapping2)
-+{
-+	if (mapping1 > mapping2)
-+		swap(mapping1, mapping2);
-+	if (mapping1)
-+		down_write(&mapping1->invalidate_lock);
-+	if (mapping2 && mapping1 != mapping2)
-+		down_write_nested(&mapping2->invalidate_lock, 1);
-+}
-+EXPORT_SYMBOL(filemap_invalidate_lock_two);
-+
-+/*
-+ * filemap_invalidate_unlock_two - unlock invalidate_lock for two mappings
-+ *
-+ * Unlock exclusive invalidate_lock of any passed mapping that is not NULL.
-+ *
-+ * @mapping1: the first mapping to unlock
-+ * @mapping2: the second mapping to unlock
-+ */
-+void filemap_invalidate_unlock_two(struct address_space *mapping1,
-+				   struct address_space *mapping2)
-+{
-+	if (mapping1)
-+		up_write(&mapping1->invalidate_lock);
-+	if (mapping2 && mapping1 != mapping2)
-+		up_write(&mapping2->invalidate_lock);
-+}
-+EXPORT_SYMBOL(filemap_invalidate_unlock_two);
-+
- /*
-  * In order to wait for pages to become available there must be
-  * waitqueues associated with pages. By using a hash table of
+ 	n = ext2_block_to_path(inode, iblock, offsets, NULL);
+@@ -1274,9 +1274,9 @@ static void ext2_truncate_blocks(struct inode *inode, loff_t offset)
+ 	if (ext2_inode_is_fast_symlink(inode))
+ 		return;
+ 
+-	dax_sem_down_write(EXT2_I(inode));
++	filemap_invalidate_lock(inode->i_mapping);
+ 	__ext2_truncate_blocks(inode, offset);
+-	dax_sem_up_write(EXT2_I(inode));
++	filemap_invalidate_unlock(inode->i_mapping);
+ }
+ 
+ static int ext2_setsize(struct inode *inode, loff_t newsize)
+@@ -1306,10 +1306,10 @@ static int ext2_setsize(struct inode *inode, loff_t newsize)
+ 	if (error)
+ 		return error;
+ 
+-	dax_sem_down_write(EXT2_I(inode));
++	filemap_invalidate_lock(inode->i_mapping);
+ 	truncate_setsize(inode, newsize);
+ 	__ext2_truncate_blocks(inode, newsize);
+-	dax_sem_up_write(EXT2_I(inode));
++	filemap_invalidate_unlock(inode->i_mapping);
+ 
+ 	inode->i_mtime = inode->i_ctime = current_time(inode);
+ 	if (inode_needs_sync(inode)) {
+diff --git a/fs/ext2/super.c b/fs/ext2/super.c
+index 21e09fbaa46f..987bcf32ed46 100644
+--- a/fs/ext2/super.c
++++ b/fs/ext2/super.c
+@@ -206,9 +206,6 @@ static void init_once(void *foo)
+ 	init_rwsem(&ei->xattr_sem);
+ #endif
+ 	mutex_init(&ei->truncate_mutex);
+-#ifdef CONFIG_FS_DAX
+-	init_rwsem(&ei->dax_sem);
+-#endif
+ 	inode_init_once(&ei->vfs_inode);
+ }
+ 
 -- 
 2.26.2
 
