@@ -2,107 +2,318 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,LOTS_OF_MONEY,MAILING_LIST_MULTI,MONEY_NOHTML,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC518C47094
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 15:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F66C4743F
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 15:31:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D248761164
-	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 15:28:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BCB46120F
+	for <linux-cifs@archiver.kernel.org>; Mon,  7 Jun 2021 15:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230294AbhFGP3w (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 7 Jun 2021 11:29:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38028 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230212AbhFGP3v (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 7 Jun 2021 11:29:51 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F07AC061766
-        for <linux-cifs@vger.kernel.org>; Mon,  7 Jun 2021 08:27:46 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id g12so9017378qvx.12
-        for <linux-cifs@vger.kernel.org>; Mon, 07 Jun 2021 08:27:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=oHbV3Y7l7uoNK6hbv64je8rSkWHPyCic5O4iy1tk7yk=;
-        b=nLB9HdEsm20ZvKOPKS6s0B79gfNuRoQU3nqTpxyLguopVGOWNzrutVZQxt/mW9Fjwz
-         GBsrHRuu3CKi5QZJf85yrW8srKqsFQmJrBrQr330H0e5MsZnUez1mm9wroa1SvkDLEgf
-         pZQYgG296WEbmLGWVFQ6LBlDSmM38kkwew44Ha2+JMHQ4bBQVILqi/VnG72nVDaEeiKy
-         a2b/gG4/uEC8zNsIMDi9DBR0INRsUWrASCekSn+HJtUP+19TQJpO+yop0AfHuY9/ImaS
-         ACuzb8mTmlJn+6qYTvcX9NvmnnS4FbG8KImFetXd1mL4F26siVtKZVWu0JPs6UkWEDBI
-         13Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=oHbV3Y7l7uoNK6hbv64je8rSkWHPyCic5O4iy1tk7yk=;
-        b=He9v8gR++5zpvwCR8bUAVoPUQhv+zIB6gJztF8EdhGEhKvkXezTb1CfLe9zVsgLy1U
-         cIprB3iVocBC4Xk02p3+zknjq4GxChUnbsC34tQMGwGKGnEz2bNfx5orhNFbe68+SUqv
-         Na3k8ZvITs13IMyBpo1WMjKHGEb4ak9qK6du3oZcWKlyl7gccgXd41npuzbfJSeP8bp6
-         C86SlAnspDeGoQy2faUXEnwvI40k11NC8zaW21zuOiV3BKawpIxo9V5Er+4HkIDlbf6u
-         XWPxf3u9xEBqM011JDQRlGzL8h/rCqJ2wSUkOoq7PyqXiSSyUHRbhsfenN78uvgPvWJ3
-         I2dg==
-X-Gm-Message-State: AOAM532I3p8Dj644aL+F4N9CIqch/87v+muU/SX+JTUTklFQYlT9YmBo
-        Jg2x+yEls+sTje4jCoqwyzk=
-X-Google-Smtp-Source: ABdhPJzGEUvX9HIuo47u7H+IKcN5MuykHvNEozWDnGrNDISF7OgosAgHWLLtK7OvAXjgmcG5Mb1VCw==
-X-Received: by 2002:a0c:e601:: with SMTP id z1mr18702326qvm.62.1623079665670;
-        Mon, 07 Jun 2021 08:27:45 -0700 (PDT)
-Received: from nyarly.rlyeh.local ([179.233.244.167])
-        by smtp.gmail.com with ESMTPSA id i10sm9887486qko.68.2021.06.07.08.27.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jun 2021 08:27:45 -0700 (PDT)
-Date:   Mon, 7 Jun 2021 12:27:40 -0300
-From:   Thiago Rafael Becker <trbecker@gmail.com>
-To:     =?iso-8859-1?Q?Aur=E9lien?= Aptel <aaptel@suse.com>
-Cc:     linux-cifs@vger.kernel.org, sfrench@samba.org,
-        samba-technical@lists.samba.org, tbecker@redhat.com,
-        jshivers@redhat.com
-Subject: Re: [RFC PATCH] cifs: retry lookup and readdir when EAGAIN is
- returned.
-Message-ID: <YL467HEHQoTR2eEC@nyarly.rlyeh.local>
-References: <YLplrk3FQiUtVoWi@nyarly.rlyeh.local>
- <87v96qrpdt.fsf@suse.com>
- <YL4lsBT8Amy4Nh87@nyarly.rlyeh.local>
+        id S230493AbhFGPdF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 7 Jun 2021 11:33:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39968 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230390AbhFGPdE (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 7 Jun 2021 11:33:04 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 10CAF61164;
+        Mon,  7 Jun 2021 15:31:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623079873;
+        bh=x7ltdwKuj/8AEfn5X8yQRrY1wycb+wnIWGHXQdLgplA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kPNkDSqRwfSOovrx3y8vwkHq9xqWu09qyeFrejTeJAil/FJDMSCCSBdQF1iu6K6g4
+         2kOOfqeSzgAzjVyWMm8KKtQ0IafqNNmN6JexIE3FE50yv5pXRHaxBlr2iY8j5Kt4rh
+         yBYsBTiQH1n3VRGKvtQxoEiKy82Y5hlInQlCifhj+5MzQ7abTnNow8N8LhkHjqwZcT
+         jaCz8qvgWW7FQbzbkFEIz2vrPSOXJVS7RFP9U8s7Boq/UWjwzDyyGtDqkUXUNB8oRZ
+         wZ6X/1VlxsIAxPv1oDj3KYAB5FJLGcoFewkqnSxVriV4OYkgVWRyh6VA0BH3eDXz7z
+         dsXUJLA3EJsfg==
+Date:   Mon, 7 Jun 2021 08:31:12 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
+        Chao Yu <yuchao0@huawei.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
+        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@lst.de>, Hugh Dickins <hughd@google.com>
+Subject: Re: [PATCH 01/14] mm: Fix comments mentioning i_mutex
+Message-ID: <20210607153112.GF2945738@locust>
+References: <20210607144631.8717-1-jack@suse.cz>
+ <20210607145236.31852-1-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YL4lsBT8Amy4Nh87@nyarly.rlyeh.local>
+In-Reply-To: <20210607145236.31852-1-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The following capture for a run of ls after running close-smbsession on
-windows and clearing the caches on the linux client running the upstream
-kernel.
+On Mon, Jun 07, 2021 at 04:52:11PM +0200, Jan Kara wrote:
+> inode->i_mutex has been replaced with inode->i_rwsem long ago. Fix
+> comments still mentioning i_mutex.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Acked-by: Hugh Dickins <hughd@google.com>
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
-    1   0.000000 client → server SMB2 410 Create Request File: dir;GetInfo Request FILE_INFO/SMB2_FILE_ALL_INFO;Close Request
-    2   0.004586 server → client  SMB2 274 Create Response, Error: STATUS_USER_SESSION_DELETED;GetInfo Response, Error: STATUS_INVALID_PARAMETER;Close Response, Error: STATUS_INVALID_PARAMETER
-    9   0.024997 client → server SMB2 290 Negotiate Protocol Request
-   10   0.033179 server → client  SMB2 566 Negotiate Protocol Response
-   12   0.033578 client → server SMB2 178 Session Setup Request, NTLMSSP_NEGOTIATE
-   13   0.041297 server → client  SMB2 368 Session Setup Response, Error: STATUS_MORE_PROCESSING_REQUIRED, NTLMSSP_CHALLENGE
-   15   0.041792 client → server SMB2 434 Session Setup Request, NTLMSSP_AUTH, User: \user
-   16   0.047307 server → client  SMB2 130 Session Setup Response
-   18   0.047832 client → server SMB2 174 Tree Connect Request Tree: \\server\root
-   19   0.057075 server → client  SMB2 138 Tree Connect Response
-   20   0.057586 client → server SMB2 172 Tree Connect Request Tree: \\server\IPC$
-   21   0.062169 server → client  SMB2 138 Tree Connect Response
-   22   0.062273 client → server SMB2 410 Create Request File: dir;GetInfo Request FILE_INFO/SMB2_FILE_ALL_INFO;Close Request
-   23   0.069050 server → client  SMB2 570 Create Response File: dir;GetInfo Response;Close Response
-   24   0.069943 client → server SMB2 316 Create Request File: dir;Find Request SMB2_FIND_ID_FULL_DIRECTORY_INFO Pattern: *
-   25   0.079125 server → client  SMB2 3842 Create Response File: dir;Find Response SMB2_FIND_ID_FULL_DIRECTORY_INFO Pattern: *
-   27   0.081926 client → server SMB2 156 Find Request File: dir SMB2_FIND_ID_FULL_DIRECTORY_INFO Pattern: *
-   28   0.093209 server → client  SMB2 130 Find Response, Error: STATUS_NO_MORE_FILES SMB2_FIND_ID_FULL_DIRECTORY_INFO Pattern: *
-   29   0.093743 client → server SMB2 146 Close Request File: dir
-   30   0.099034 server → client  SMB2 182 Close Response
-   
-Similar pattern for stat.
+Looks good to me,
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
-Best,
-Thiago
+--D
+
+> ---
+>  mm/filemap.c        | 10 +++++-----
+>  mm/madvise.c        |  2 +-
+>  mm/memory-failure.c |  2 +-
+>  mm/rmap.c           |  6 +++---
+>  mm/shmem.c          | 20 ++++++++++----------
+>  mm/truncate.c       |  8 ++++----
+>  6 files changed, 24 insertions(+), 24 deletions(-)
+> 
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index 66f7e9fdfbc4..ba1068a1837f 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -76,7 +76,7 @@
+>   *      ->swap_lock		(exclusive_swap_page, others)
+>   *        ->i_pages lock
+>   *
+> - *  ->i_mutex
+> + *  ->i_rwsem
+>   *    ->i_mmap_rwsem		(truncate->unmap_mapping_range)
+>   *
+>   *  ->mmap_lock
+> @@ -87,7 +87,7 @@
+>   *  ->mmap_lock
+>   *    ->lock_page		(access_process_vm)
+>   *
+> - *  ->i_mutex			(generic_perform_write)
+> + *  ->i_rwsem			(generic_perform_write)
+>   *    ->mmap_lock		(fault_in_pages_readable->do_page_fault)
+>   *
+>   *  bdi->wb.list_lock
+> @@ -3710,12 +3710,12 @@ EXPORT_SYMBOL(generic_perform_write);
+>   * modification times and calls proper subroutines depending on whether we
+>   * do direct IO or a standard buffered write.
+>   *
+> - * It expects i_mutex to be grabbed unless we work on a block device or similar
+> + * It expects i_rwsem to be grabbed unless we work on a block device or similar
+>   * object which does not need locking at all.
+>   *
+>   * This function does *not* take care of syncing data in case of O_SYNC write.
+>   * A caller has to handle it. This is mainly due to the fact that we want to
+> - * avoid syncing under i_mutex.
+> + * avoid syncing under i_rwsem.
+>   *
+>   * Return:
+>   * * number of bytes written, even for truncated writes
+> @@ -3803,7 +3803,7 @@ EXPORT_SYMBOL(__generic_file_write_iter);
+>   *
+>   * This is a wrapper around __generic_file_write_iter() to be used by most
+>   * filesystems. It takes care of syncing the file in case of O_SYNC file
+> - * and acquires i_mutex as needed.
+> + * and acquires i_rwsem as needed.
+>   * Return:
+>   * * negative error code if no data has been written at all of
+>   *   vfs_fsync_range() failed for a synchronous write
+> diff --git a/mm/madvise.c b/mm/madvise.c
+> index 63e489e5bfdb..a0137706b92a 100644
+> --- a/mm/madvise.c
+> +++ b/mm/madvise.c
+> @@ -853,7 +853,7 @@ static long madvise_remove(struct vm_area_struct *vma,
+>  			+ ((loff_t)vma->vm_pgoff << PAGE_SHIFT);
+>  
+>  	/*
+> -	 * Filesystem's fallocate may need to take i_mutex.  We need to
+> +	 * Filesystem's fallocate may need to take i_rwsem.  We need to
+>  	 * explicitly grab a reference because the vma (and hence the
+>  	 * vma's reference to the file) can go away as soon as we drop
+>  	 * mmap_lock.
+> diff --git a/mm/memory-failure.c b/mm/memory-failure.c
+> index 85ad98c00fd9..9dcc9bcea731 100644
+> --- a/mm/memory-failure.c
+> +++ b/mm/memory-failure.c
+> @@ -704,7 +704,7 @@ static int me_pagecache_clean(struct page *p, unsigned long pfn)
+>  	/*
+>  	 * Truncation is a bit tricky. Enable it per file system for now.
+>  	 *
+> -	 * Open: to take i_mutex or not for this? Right now we don't.
+> +	 * Open: to take i_rwsem or not for this? Right now we don't.
+>  	 */
+>  	return truncate_error_page(p, pfn, mapping);
+>  }
+> diff --git a/mm/rmap.c b/mm/rmap.c
+> index 693a610e181d..a35cbbbded0d 100644
+> --- a/mm/rmap.c
+> +++ b/mm/rmap.c
+> @@ -20,9 +20,9 @@
+>  /*
+>   * Lock ordering in mm:
+>   *
+> - * inode->i_mutex	(while writing or truncating, not reading or faulting)
+> + * inode->i_rwsem	(while writing or truncating, not reading or faulting)
+>   *   mm->mmap_lock
+> - *     page->flags PG_locked (lock_page)   * (see huegtlbfs below)
+> + *     page->flags PG_locked (lock_page)   * (see hugetlbfs below)
+>   *       hugetlbfs_i_mmap_rwsem_key (in huge_pmd_share)
+>   *         mapping->i_mmap_rwsem
+>   *           hugetlb_fault_mutex (hugetlbfs specific page fault mutex)
+> @@ -41,7 +41,7 @@
+>   *                             in arch-dependent flush_dcache_mmap_lock,
+>   *                             within bdi.wb->list_lock in __sync_single_inode)
+>   *
+> - * anon_vma->rwsem,mapping->i_mutex      (memory_failure, collect_procs_anon)
+> + * anon_vma->rwsem,mapping->i_mmap_rwsem   (memory_failure, collect_procs_anon)
+>   *   ->tasklist_lock
+>   *     pte map lock
+>   *
+> diff --git a/mm/shmem.c b/mm/shmem.c
+> index a08cedefbfaa..056204b1f76a 100644
+> --- a/mm/shmem.c
+> +++ b/mm/shmem.c
+> @@ -96,7 +96,7 @@ static struct vfsmount *shm_mnt;
+>  
+>  /*
+>   * shmem_fallocate communicates with shmem_fault or shmem_writepage via
+> - * inode->i_private (with i_mutex making sure that it has only one user at
+> + * inode->i_private (with i_rwsem making sure that it has only one user at
+>   * a time): we would prefer not to enlarge the shmem inode just for that.
+>   */
+>  struct shmem_falloc {
+> @@ -774,7 +774,7 @@ static int shmem_free_swap(struct address_space *mapping,
+>   * Determine (in bytes) how many of the shmem object's pages mapped by the
+>   * given offsets are swapped out.
+>   *
+> - * This is safe to call without i_mutex or the i_pages lock thanks to RCU,
+> + * This is safe to call without i_rwsem or the i_pages lock thanks to RCU,
+>   * as long as the inode doesn't go away and racy results are not a problem.
+>   */
+>  unsigned long shmem_partial_swap_usage(struct address_space *mapping,
+> @@ -806,7 +806,7 @@ unsigned long shmem_partial_swap_usage(struct address_space *mapping,
+>   * Determine (in bytes) how many of the shmem object's pages mapped by the
+>   * given vma is swapped out.
+>   *
+> - * This is safe to call without i_mutex or the i_pages lock thanks to RCU,
+> + * This is safe to call without i_rwsem or the i_pages lock thanks to RCU,
+>   * as long as the inode doesn't go away and racy results are not a problem.
+>   */
+>  unsigned long shmem_swap_usage(struct vm_area_struct *vma)
+> @@ -1069,7 +1069,7 @@ static int shmem_setattr(struct user_namespace *mnt_userns,
+>  		loff_t oldsize = inode->i_size;
+>  		loff_t newsize = attr->ia_size;
+>  
+> -		/* protected by i_mutex */
+> +		/* protected by i_rwsem */
+>  		if ((newsize < oldsize && (info->seals & F_SEAL_SHRINK)) ||
+>  		    (newsize > oldsize && (info->seals & F_SEAL_GROW)))
+>  			return -EPERM;
+> @@ -2049,7 +2049,7 @@ static vm_fault_t shmem_fault(struct vm_fault *vmf)
+>  	/*
+>  	 * Trinity finds that probing a hole which tmpfs is punching can
+>  	 * prevent the hole-punch from ever completing: which in turn
+> -	 * locks writers out with its hold on i_mutex.  So refrain from
+> +	 * locks writers out with its hold on i_rwsem.  So refrain from
+>  	 * faulting pages into the hole while it's being punched.  Although
+>  	 * shmem_undo_range() does remove the additions, it may be unable to
+>  	 * keep up, as each new page needs its own unmap_mapping_range() call,
+> @@ -2060,7 +2060,7 @@ static vm_fault_t shmem_fault(struct vm_fault *vmf)
+>  	 * we just need to make racing faults a rare case.
+>  	 *
+>  	 * The implementation below would be much simpler if we just used a
+> -	 * standard mutex or completion: but we cannot take i_mutex in fault,
+> +	 * standard mutex or completion: but we cannot take i_rwsem in fault,
+>  	 * and bloating every shmem inode for this unlikely case would be sad.
+>  	 */
+>  	if (unlikely(inode->i_private)) {
+> @@ -2518,7 +2518,7 @@ shmem_write_begin(struct file *file, struct address_space *mapping,
+>  	struct shmem_inode_info *info = SHMEM_I(inode);
+>  	pgoff_t index = pos >> PAGE_SHIFT;
+>  
+> -	/* i_mutex is held by caller */
+> +	/* i_rwsem is held by caller */
+>  	if (unlikely(info->seals & (F_SEAL_GROW |
+>  				   F_SEAL_WRITE | F_SEAL_FUTURE_WRITE))) {
+>  		if (info->seals & (F_SEAL_WRITE | F_SEAL_FUTURE_WRITE))
+> @@ -2618,7 +2618,7 @@ static ssize_t shmem_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
+>  
+>  		/*
+>  		 * We must evaluate after, since reads (unlike writes)
+> -		 * are called without i_mutex protection against truncate
+> +		 * are called without i_rwsem protection against truncate
+>  		 */
+>  		nr = PAGE_SIZE;
+>  		i_size = i_size_read(inode);
+> @@ -2688,7 +2688,7 @@ static loff_t shmem_file_llseek(struct file *file, loff_t offset, int whence)
+>  		return -ENXIO;
+>  
+>  	inode_lock(inode);
+> -	/* We're holding i_mutex so we can access i_size directly */
+> +	/* We're holding i_rwsem so we can access i_size directly */
+>  	offset = mapping_seek_hole_data(mapping, offset, inode->i_size, whence);
+>  	if (offset >= 0)
+>  		offset = vfs_setpos(file, offset, MAX_LFS_FILESIZE);
+> @@ -2717,7 +2717,7 @@ static long shmem_fallocate(struct file *file, int mode, loff_t offset,
+>  		loff_t unmap_end = round_down(offset + len, PAGE_SIZE) - 1;
+>  		DECLARE_WAIT_QUEUE_HEAD_ONSTACK(shmem_falloc_waitq);
+>  
+> -		/* protected by i_mutex */
+> +		/* protected by i_rwsem */
+>  		if (info->seals & (F_SEAL_WRITE | F_SEAL_FUTURE_WRITE)) {
+>  			error = -EPERM;
+>  			goto out;
+> diff --git a/mm/truncate.c b/mm/truncate.c
+> index 95af244b112a..57a618c4a0d6 100644
+> --- a/mm/truncate.c
+> +++ b/mm/truncate.c
+> @@ -415,7 +415,7 @@ EXPORT_SYMBOL(truncate_inode_pages_range);
+>   * @mapping: mapping to truncate
+>   * @lstart: offset from which to truncate
+>   *
+> - * Called under (and serialised by) inode->i_mutex.
+> + * Called under (and serialised by) inode->i_rwsem.
+>   *
+>   * Note: When this function returns, there can be a page in the process of
+>   * deletion (inside __delete_from_page_cache()) in the specified range.  Thus
+> @@ -432,7 +432,7 @@ EXPORT_SYMBOL(truncate_inode_pages);
+>   * truncate_inode_pages_final - truncate *all* pages before inode dies
+>   * @mapping: mapping to truncate
+>   *
+> - * Called under (and serialized by) inode->i_mutex.
+> + * Called under (and serialized by) inode->i_rwsem.
+>   *
+>   * Filesystems have to use this in the .evict_inode path to inform the
+>   * VM that this is the final truncate and the inode is going away.
+> @@ -753,7 +753,7 @@ EXPORT_SYMBOL(truncate_pagecache);
+>   * setattr function when ATTR_SIZE is passed in.
+>   *
+>   * Must be called with a lock serializing truncates and writes (generally
+> - * i_mutex but e.g. xfs uses a different lock) and before all filesystem
+> + * i_rwsem but e.g. xfs uses a different lock) and before all filesystem
+>   * specific block truncation has been performed.
+>   */
+>  void truncate_setsize(struct inode *inode, loff_t newsize)
+> @@ -782,7 +782,7 @@ EXPORT_SYMBOL(truncate_setsize);
+>   *
+>   * The function must be called after i_size is updated so that page fault
+>   * coming after we unlock the page will already see the new i_size.
+> - * The function must be called while we still hold i_mutex - this not only
+> + * The function must be called while we still hold i_rwsem - this not only
+>   * makes sure i_size is stable but also that userspace cannot observe new
+>   * i_size value before we are prepared to store mmap writes at new inode size.
+>   */
+> -- 
+> 2.26.2
+> 
