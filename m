@@ -2,126 +2,180 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D443FC47082
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 10:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24AF4C48BCD
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 11:54:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEE5E6100A
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 10:53:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0980C6135A
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 11:54:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231488AbhFHKzZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 8 Jun 2021 06:55:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39866 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229937AbhFHKzZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Jun 2021 06:55:25 -0400
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C89A7C061574;
-        Tue,  8 Jun 2021 03:53:21 -0700 (PDT)
-Received: by mail-vs1-xe32.google.com with SMTP id f11so10622454vst.0;
-        Tue, 08 Jun 2021 03:53:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=f5hP7X6WI56JdWoZLZrHxXTsaf70BoFuMh2uY4QI6S4=;
-        b=LtYm5V66dJuNk679QaZ5fIyWD337d6fOpiB7Y4mezsS6QugxkFtku5M3hyvsbX5Sys
-         ivbLuZ6i2/nMGWsmHKJNaSOBCmLHCpT05UQnAJw+efD7BdKE32+PqvT32ao4q7hE2WAX
-         KGXDuc+25FVyAS5YCtByzAyirgdTi/6D0woMJfCDWown50xIYpPig0J/3k8NBOXqYQB8
-         E3r05M3F9s1So1sPla51axX4PgtHU831zjeKxu6XOgOpUyYgvOdNn/p68M7umNKjkA3j
-         D5IeBzchDKc5uxGVLqNr9kJvMFu6+O+eayxssP+McNCQ5EG9Lf+cRHBNZLlyPuKd3hz0
-         owtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=f5hP7X6WI56JdWoZLZrHxXTsaf70BoFuMh2uY4QI6S4=;
-        b=C/MhfI3vqlJ9qi/enNwyPw/uaEEHwX1Eyc+TTU2BUcTOXHiSpRNE12adcXoB42qpLD
-         kIJrtG4Rz9OFqpxT9vIlG/HzBPNK5rLGMlbN2bmFeualn9+904g4q1Vm8KI4FupAINAj
-         CgG+uZXHYFGuqaSsICIE5XWjbMQiwPY1bn6DGEgwECZKuocSThiK5NyIRpBMzUZU/isx
-         AOJLbRqIrCj7ISKwDuFZ4LTMvwjxeul5mM+tDtK6P3SnMbSLY3CKRj9R2UiM9PAvsDCv
-         T+HAWuKYBWBuDGgovdObXsYAR46/60dk6HQ5oMbCM3oWNNoJz4nwrT/Tdwg6lte30ZSt
-         AqCQ==
-X-Gm-Message-State: AOAM531GyC+GHXonoIQXldth2VQExUsnRqGm/ySMHPFjyFREiwpDkD7E
-        iNBqjj1ObAy1UOtTd35GH6BsMkxXqH2gwIBd7vksL1Bqa7A=
-X-Google-Smtp-Source: ABdhPJyG59a8KqGRbarb/eR+TeduAtdCFsrlWRNdkI+s3hH8Asm9jcZu7gVPVmO/VwH+PCpBU4daVYl/UUx849iuVMs=
-X-Received: by 2002:a67:cd08:: with SMTP id u8mr3988866vsl.18.1623149601020;
- Tue, 08 Jun 2021 03:53:21 -0700 (PDT)
+        id S232114AbhFHL4j (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Jun 2021 07:56:39 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:38940 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231849AbhFHL4i (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Jun 2021 07:56:38 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 4B5101FD33;
+        Tue,  8 Jun 2021 11:54:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1623153283; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZXCe1g+SmTbuHQMlMaRoFzHtIWv6tHR0ZrrXgche280=;
+        b=F7Sd00J10ROqvn6h0IRHeVi7Vq/iVSFODD3NI704FMIx3v429RnrW5b1Ial0UyvnKfSx/Y
+        h2y3ZPa5mqhR5hbHisnXXjfg/9vOaN5amNBqdL8sZfE07OUGULN3H0ds66CrlzyQN6HCaZ
+        yZuwYWUMbyGFDYApJ3Am6L68B2Jhp9k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1623153283;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZXCe1g+SmTbuHQMlMaRoFzHtIWv6tHR0ZrrXgche280=;
+        b=L5Pt4oxyijI/8MZG/Kv2aq7i85N+IHx3Hrnddk+qXs11bKzzIcCTcsPNEiJlg/yQVe8CBw
+        XuDpar5KKQdt0TCg==
+Received: from quack2.suse.cz (unknown [10.100.200.198])
+        by relay2.suse.de (Postfix) with ESMTP id E236CA3B84;
+        Tue,  8 Jun 2021 11:54:42 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id C0C201F2C94; Tue,  8 Jun 2021 13:54:42 +0200 (CEST)
+Date:   Tue, 8 Jun 2021 13:54:42 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
+        Chao Yu <yuchao0@huawei.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
+        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 0/14 v7] fs: Hole punch vs page cache filling races
+Message-ID: <20210608115442.GE5562@quack2.suse.cz>
+References: <20210607144631.8717-1-jack@suse.cz>
 MIME-Version: 1.0
-References: <20210608202748.06334136@canb.auug.org.au>
-In-Reply-To: <20210608202748.06334136@canb.auug.org.au>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Tue, 8 Jun 2021 19:53:09 +0900
-Message-ID: <CANFS6baQi_PDM+4XHNn6MnFtmvbP3JUDJJgw7fvkGDYja4=ELg@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the cifs tree
-To:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        Steve French <smfrench@gmail.com>,
-        Namjae Jeon <namjae.jeon@samsung.com>,
-        Namjae Jeon <linkinjeon@kernel.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210607144631.8717-1-jack@suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 Hello,
 
-2021=EB=85=84 6=EC=9B=94 8=EC=9D=BC (=ED=99=94) =EC=98=A4=ED=9B=84 7:27, St=
-ephen Rothwell <sfr@canb.auug.org.au>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
-> Hi all,
->
-> After merging the cifs tree, today's linux-next build (powerpc
-> allyesconfig) failed like this:
->
-> ld: fs/cifsd/spnego_negtokeninit.asn1.o:(.rodata.spnego_negtokeninit_deco=
-der+0x0): multiple definition of `spnego_negtokeninit_decoder'; fs/cifs/spn=
-ego_negtoken
-> init.asn1.o:(.rodata.spnego_negtokeninit_decoder+0x0): first defined here
-> ld: fs/cifsd/asn1.o:(.opd+0xa8): multiple definition of `gssapi_this_mech=
-'; fs/cifs/asn1.o:(.opd+0x18): first defined here
-> ld: fs/cifsd/asn1.o: in function `.gssapi_this_mech':
-> asn1.c:(.text.gssapi_this_mech+0x0): multiple definition of `.gssapi_this=
-_mech'; fs/cifs/asn1.o:asn1.c:(.text.gssapi_this_mech+0x0): first defined h=
-ere
-> ld: fs/cifsd/asn1.o:(.opd+0xc0): multiple definition of `neg_token_init_m=
-ech_type'; fs/cifs/asn1.o:(.opd+0x30): first defined here
-> ld: fs/cifsd/asn1.o: in function `.neg_token_init_mech_type':
-> asn1.c:(.text.neg_token_init_mech_type+0x0): multiple definition of `.neg=
-_token_init_mech_type'; fs/cifs/asn1.o:asn1.c:(.text.neg_token_init_mech_ty=
-pe+0x0): first defined here
->
-> Caused by commit
->
->   4a957ba6daf6 ("cifs: decoding negTokenInit with generic ASN1 decoder")
+I wanted to add one more thing: The series has gathered decent amount of
+review so it seems to be mostly ready to go. But I'd still like some review
+from FUSE side (Miklos?) and then someone from pagecache / mm side checking
+mainly patch 3/14. Since most of the changes are in fs, I guess it makes
+most sense to merge this through some fs tree - either XFS, ext4, or VFS.
 
-I missed functions and structures generated from the ASN1 compiler
-aren't static.
+								Honza
 
-Steve, and Namjae,
-We need to rename *.asn1 files and decoder's callback functions. Is it bett=
-er
-to change cifs's code?
-
-Thanks,
-Hyunchul
-
->
-> interacting with commit
->
->   fad4161b5cd0 ("cifsd: decoding gss token using lib/asn1_decoder.c")
->
-> from the cifsd tree.
->
-> I have reverted that cifs tree commit for today.
->
-> --
-> Cheers,
-> Stephen Rothwell
+On Mon 07-06-21 16:52:10, Jan Kara wrote:
+> Hello,
+> 
+> here is another version of my patches to address races between hole punching
+> and page cache filling functions for ext4 and other filesystems. The biggest
+> change since the last time is providing function to lock two mappings and using
+> it from XFS. Other changes were pretty minor.
+> 
+> Out of all filesystem supporting hole punching, only GFS2 and OCFS2 remain
+> unresolved. GFS2 people are working on their own solution (cluster locking is
+> involved), OCFS2 has even bigger issues (maintainers informed, looking into
+> it).
+> 
+> As a next step, I'd like to actually make sure all calls to
+> truncate_inode_pages() happen under mapping->invalidate_lock, add the assert
+> and then we can also get rid of i_size checks in some places (truncate can
+> use the same serialization scheme as hole punch). But that step is mostly
+> a cleanup so I'd like to get these functional fixes in first.
+> 
+> Note that the first patch of the series is already in mm tree but I'm
+> submitting it here so that the series applies to Linus' tree cleanly.
+> 
+> Changes since v6:
+> * Added some reviewed-by tags
+> * Added wrapper for taking invalidate_lock similar to inode_lock
+> * Renamed wrappers for taking invalidate_lock for two inodes
+> * Added xfs patch to make xfs_isilocked() work better even without lockdep
+> * Some minor documentation fixes
+> 
+> Changes since v5:
+> * Added some reviewed-by tags
+> * Added functions for locking two mappings and using them from XFS where needed
+> * Some minor code style & comment fixes
+> 
+> Changes since v4:
+> * Rebased onto 5.13-rc1
+> * Removed shmfs conversion patches
+> * Fixed up zonefs changelog
+> * Fixed up XFS comments
+> * Added patch fixing up definition of file_operations in Documentation/vfs/
+> * Updated documentation and comments to explain invalidate_lock is used also
+>   to prevent changes through memory mappings to existing pages for some VFS
+>   operations.
+> 
+> Changes since v3:
+> * Renamed and moved lock to struct address_space
+> * Added conversions of tmpfs, ceph, cifs, fuse, f2fs
+> * Fixed error handling path in filemap_read()
+> * Removed .page_mkwrite() cleanup from the series for now
+> 
+> Changes since v2:
+> * Added documentation and comments regarding lock ordering and how the lock is
+>   supposed to be used
+> * Added conversions of ext2, xfs, zonefs
+> * Added patch removing i_mapping_sem protection from .page_mkwrite handlers
+> 
+> Changes since v1:
+> * Moved to using inode->i_mapping_sem instead of aops handler to acquire
+>   appropriate lock
+> 
+> ---
+> Motivation:
+> 
+> Amir has reported [1] a that ext4 has a potential issues when reads can race
+> with hole punching possibly exposing stale data from freed blocks or even
+> corrupting filesystem when stale mapping data gets used for writeout. The
+> problem is that during hole punching, new page cache pages can get instantiated
+> and block mapping from the looked up in a punched range after
+> truncate_inode_pages() has run but before the filesystem removes blocks from
+> the file. In principle any filesystem implementing hole punching thus needs to
+> implement a mechanism to block instantiating page cache pages during hole
+> punching to avoid this race. This is further complicated by the fact that there
+> are multiple places that can instantiate pages in page cache.  We can have
+> regular read(2) or page fault doing this but fadvise(2) or madvise(2) can also
+> result in reading in page cache pages through force_page_cache_readahead().
+> 
+> There are couple of ways how to fix this. First way (currently implemented by
+> XFS) is to protect read(2) and *advise(2) calls with i_rwsem so that they are
+> serialized with hole punching. This is easy to do but as a result all reads
+> would then be serialized with writes and thus mixed read-write workloads suffer
+> heavily on ext4. Thus this series introduces inode->i_mapping_sem and uses it
+> when creating new pages in the page cache and looking up their corresponding
+> block mapping. We also replace EXT4_I(inode)->i_mmap_sem with this new rwsem
+> which provides necessary serialization with hole punching for ext4.
+> 
+> 								Honza
+> 
+> [1] https://lore.kernel.org/linux-fsdevel/CAOQ4uxjQNmxqmtA_VbYW0Su9rKRk2zobJmahcyeaEVOFKVQ5dw@mail.gmail.com/
+> 
+> Previous versions:
+> Link: https://lore.kernel.org/linux-fsdevel/20210208163918.7871-1-jack@suse.cz/
+> Link: https://lore.kernel.org/r/20210413105205.3093-1-jack@suse.cz
+> Link: https://lore.kernel.org/r/20210423171010.12-1-jack@suse.cz
+> Link: https://lore.kernel.org/r/20210512101639.22278-1-jack@suse.cz
+> Link: http://lore.kernel.org/r/20210525125652.20457-1-jack@suse.cz
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
