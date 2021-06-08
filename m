@@ -2,143 +2,140 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 052ECC47082
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 12:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01857C47082
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 13:16:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9A3361246
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 12:23:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBFFC61003
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 13:16:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232439AbhFHMZf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 8 Jun 2021 08:25:35 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:41262 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232204AbhFHMZf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Jun 2021 08:25:35 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 068C71FD4B;
-        Tue,  8 Jun 2021 12:23:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1623155021; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9bGY+Cp/pA/h7guRE2vnnzMhgDr7PUBan0gj2Iw/ofI=;
-        b=u+SJezkNd+Hoy4TfHmq/mbbx5D8h6raNCIe+MwxggDuvtCqz7pVcD7eM1nbJHaQgq+I3my
-        3i7vDVPXx6oHV/Keus/sL+hjeAgtO00KSyTNORn8Zw+1sEM7AY7JmeY5qIvsBhEF5NtDj8
-        Srd1wuy2dHheynxeRqlgPZLBXH5MniY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1623155021;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9bGY+Cp/pA/h7guRE2vnnzMhgDr7PUBan0gj2Iw/ofI=;
-        b=NgBZQfRqJnI6VvgsU0Gc4V+xB5uFCK0ttkDE0YMGzDaZvCRCGQg4CZC2NzMIJNyad41SHa
-        +dBP2rSIDB0nPdAw==
-Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id E3E48A3B81;
-        Tue,  8 Jun 2021 12:23:40 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id CFD9C1F2C94; Tue,  8 Jun 2021 14:23:40 +0200 (CEST)
-Date:   Tue, 8 Jun 2021 14:23:40 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
-        Chao Yu <yuchao0@huawei.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
-        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 08/14] xfs: Convert to use invalidate_lock
-Message-ID: <20210608122340.GH5562@quack2.suse.cz>
-References: <20210607144631.8717-1-jack@suse.cz>
- <20210607145236.31852-8-jack@suse.cz>
- <20210607155633.GI2945738@locust>
+        id S232720AbhFHNSg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Jun 2021 09:18:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43410 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231344AbhFHNSg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Jun 2021 09:18:36 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD39C061787;
+        Tue,  8 Jun 2021 06:16:28 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id r5so32092631lfr.5;
+        Tue, 08 Jun 2021 06:16:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=/PdaUTb+rUg5ur++SpKYiw2joB3HKEA1rOqeSBAWksA=;
+        b=CE8iuxgCHuRWaZA4qwJXJzCuSannhhSj9aCTl1MMTNq6V/CdbrhWdgv+aK7qdsMxLg
+         YvMQbAvNAK1MJHg9qbdrmovmw+5Vi9tEq3xukBUIbbemu4lZMmMDqP4TLb1kKPON+rKW
+         OMajHBbl+yM1T43eQCVQicXeZi4ng+g/h158E9Je9UR1dqpp4KAWatAwh/GGXLLDPqNR
+         sH+L9H4RRu7m/yLcJtAYilX8MPxaC57aLx9xWoMg4nAkh7b64t+DmSDLfYohEjDV1fO/
+         zEnatM82enfeAQASf9t6Zt7L5B1llg60YmiFyf4IcQOoaSDmTfYheqyeGrNTI2gTE4/b
+         ejnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=/PdaUTb+rUg5ur++SpKYiw2joB3HKEA1rOqeSBAWksA=;
+        b=oAWaaClMkdxTLUqcrUkbgZ97+pjG7lSsJ95pxJugHGQcUe4fqCOKcxzAQ8MPrcW590
+         /IsHvtgGbghdGexAktxlwNJs05xckzCgL+055cWNMxnL1gNaC8fz/bTa5Q5ouXOdu5SY
+         cj/uTUt/w74pXu7D5nUJvfF7JVA5SZVE/QoSNi6dXedI2h+oBLiLFOJ046MmNyDrGS17
+         IxMqVEE01y8+y0WgVEaare5SbJ+23LYfCV1umEDTvE+nK1TJ69XtJcAsf5crdSWN/Bbk
+         MKS/Oj9RhQJuxOlXeI7ocS0W5XBBNq53SRoGpSW6wcMs4J9ugXpeUxdL8rXbp0YsTvQO
+         /Vfw==
+X-Gm-Message-State: AOAM531WdwhcqFcP6EGvExmJKrhkfqaWsNl4ckzBLOk9kkNFqqisrQW5
+        j46UeKno9JW5EQSuQsv5zK3ZWXz9M4K6iLgKyyQ=
+X-Google-Smtp-Source: ABdhPJzs5yqBCi+TgT2UUYjGlHJMzPQdqh4UeFmvSO/k955CS4DBYYpx0sgXMyKI1rfLg6kS1kh578vwbydxab+llqI=
+X-Received: by 2002:a05:6512:3694:: with SMTP id d20mr7234682lfs.184.1623158185318;
+ Tue, 08 Jun 2021 06:16:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210607155633.GI2945738@locust>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20210608202748.06334136@canb.auug.org.au> <CANFS6baQi_PDM+4XHNn6MnFtmvbP3JUDJJgw7fvkGDYja4=ELg@mail.gmail.com>
+In-Reply-To: <CANFS6baQi_PDM+4XHNn6MnFtmvbP3JUDJJgw7fvkGDYja4=ELg@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 8 Jun 2021 08:16:14 -0500
+Message-ID: <CAH2r5mstMzq78NydjbkX4goJD1j0pzsvi1fAnLfTZbuNvuFvog@mail.gmail.com>
+Subject: Re: linux-next: build failure after merge of the cifs tree
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Namjae Jeon <namjae.jeon@samsung.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon 07-06-21 08:56:33, Darrick J. Wong wrote:
-> On Mon, Jun 07, 2021 at 04:52:18PM +0200, Jan Kara wrote:
-> > Use invalidate_lock instead of XFS internal i_mmap_lock. The intended
-> > purpose of invalidate_lock is exactly the same. Note that the locking in
-> > __xfs_filemap_fault() slightly changes as filemap_fault() already takes
-> > invalidate_lock.
-> > 
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > CC: <linux-xfs@vger.kernel.org>
-> > CC: "Darrick J. Wong" <djwong@kernel.org>
-> > Signed-off-by: Jan Kara <jack@suse.cz>
-> > ---
-> >  fs/xfs/xfs_file.c  | 13 +++++++-----
-> >  fs/xfs/xfs_inode.c | 50 ++++++++++++++++++++++++----------------------
-> >  fs/xfs/xfs_inode.h |  1 -
-> >  fs/xfs/xfs_super.c |  2 --
-> >  4 files changed, 34 insertions(+), 32 deletions(-)
-> > 
-> > diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
-> > index 396ef36dcd0a..7cb7703c2209 100644
-> > --- a/fs/xfs/xfs_file.c
-> > +++ b/fs/xfs/xfs_file.c
-> > @@ -1282,7 +1282,7 @@ xfs_file_llseek(
-> >   *
-> >   * mmap_lock (MM)
-> >   *   sb_start_pagefault(vfs, freeze)
-> > - *     i_mmaplock (XFS - truncate serialisation)
-> > + *     invalidate_lock (vfs/XFS_MMAPLOCK - truncate serialisation)
-> >   *       page_lock (MM)
-> >   *         i_lock (XFS - extent map serialisation)
-> >   */
-> > @@ -1303,24 +1303,27 @@ __xfs_filemap_fault(
-> >  		file_update_time(vmf->vma->vm_file);
-> >  	}
-> >  
-> > -	xfs_ilock(XFS_I(inode), XFS_MMAPLOCK_SHARED);
-> >  	if (IS_DAX(inode)) {
-> >  		pfn_t pfn;
-> >  
-> > +		xfs_ilock(XFS_I(inode), XFS_MMAPLOCK_SHARED);
-> >  		ret = dax_iomap_fault(vmf, pe_size, &pfn, NULL,
-> >  				(write_fault && !vmf->cow_page) ?
-> >  				 &xfs_direct_write_iomap_ops :
-> >  				 &xfs_read_iomap_ops);
-> >  		if (ret & VM_FAULT_NEEDDSYNC)
-> >  			ret = dax_finish_sync_fault(vmf, pe_size, pfn);
-> > +		xfs_iunlock(XFS_I(inode), XFS_MMAPLOCK_SHARED);
-> 
-> I've been wondering if iomap_page_mkwrite and dax_iomap_fault should be
-> taking these locks?  I guess that would violate the premise that iomap
-> requires that callers arrange for concurrency control (i.e. iomap
-> doesn't take locks).
+I will back out your patch to cifs.ko
 
-Well, iomap does take page locks but I agree that generally it stays away
-from high-level locks. So keeping invalidate_lock out of it makes more
-sense to me as well.
+On Tue, Jun 8, 2021 at 5:53 AM Hyunchul Lee <hyc.lee@gmail.com> wrote:
+>
+> Hello,
+>
+> 2021=EB=85=84 6=EC=9B=94 8=EC=9D=BC (=ED=99=94) =EC=98=A4=ED=9B=84 7:27, =
+Stephen Rothwell <sfr@canb.auug.org.au>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=
+=B1:
+> >
+> > Hi all,
+> >
+> > After merging the cifs tree, today's linux-next build (powerpc
+> > allyesconfig) failed like this:
+> >
+> > ld: fs/cifsd/spnego_negtokeninit.asn1.o:(.rodata.spnego_negtokeninit_de=
+coder+0x0): multiple definition of `spnego_negtokeninit_decoder'; fs/cifs/s=
+pnego_negtoken
+> > init.asn1.o:(.rodata.spnego_negtokeninit_decoder+0x0): first defined he=
+re
+> > ld: fs/cifsd/asn1.o:(.opd+0xa8): multiple definition of `gssapi_this_me=
+ch'; fs/cifs/asn1.o:(.opd+0x18): first defined here
+> > ld: fs/cifsd/asn1.o: in function `.gssapi_this_mech':
+> > asn1.c:(.text.gssapi_this_mech+0x0): multiple definition of `.gssapi_th=
+is_mech'; fs/cifs/asn1.o:asn1.c:(.text.gssapi_this_mech+0x0): first defined=
+ here
+> > ld: fs/cifsd/asn1.o:(.opd+0xc0): multiple definition of `neg_token_init=
+_mech_type'; fs/cifs/asn1.o:(.opd+0x30): first defined here
+> > ld: fs/cifsd/asn1.o: in function `.neg_token_init_mech_type':
+> > asn1.c:(.text.neg_token_init_mech_type+0x0): multiple definition of `.n=
+eg_token_init_mech_type'; fs/cifs/asn1.o:asn1.c:(.text.neg_token_init_mech_=
+type+0x0): first defined here
+> >
+> > Caused by commit
+> >
+> >   4a957ba6daf6 ("cifs: decoding negTokenInit with generic ASN1 decoder"=
+)
+>
+> I missed functions and structures generated from the ASN1 compiler
+> aren't static.
+>
+> Steve, and Namjae,
+> We need to rename *.asn1 files and decoder's callback functions. Is it be=
+tter
+> to change cifs's code?
+>
+> Thanks,
+> Hyunchul
+>
+> >
+> > interacting with commit
+> >
+> >   fad4161b5cd0 ("cifsd: decoding gss token using lib/asn1_decoder.c")
+> >
+> > from the cifsd tree.
+> >
+> > I have reverted that cifs tree commit for today.
+> >
+> > --
+> > Cheers,
+> > Stephen Rothwell
 
-> Code changes look fine, though.
-> 
-> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
-Thanks!
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+--=20
+Thanks,
+
+Steve
