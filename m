@@ -2,125 +2,216 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D2A9C47082
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 21:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F37C47082
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 22:18:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8115261278
-	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 21:49:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64F9E613AD
+	for <linux-cifs@archiver.kernel.org>; Tue,  8 Jun 2021 22:18:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234752AbhFHVvl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 8 Jun 2021 17:51:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44400 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234782AbhFHVvl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Jun 2021 17:51:41 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40028C061574
-        for <linux-cifs@vger.kernel.org>; Tue,  8 Jun 2021 14:49:47 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id r5so34555494lfr.5
-        for <linux-cifs@vger.kernel.org>; Tue, 08 Jun 2021 14:49:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=BSS4C+Tof4hX7XOl0u8vZzIzOJkeQij5kHDcnOxRbtQ=;
-        b=u9hj/yoXRsvtCUvpFePU7s2TiK+2tivLMfkX5m6iJFRZrIZzt8312bf7U0Qa4ahyuU
-         MzeHFa/IuBbB2yBDJOaIowEMKVDd/SWB8SX0dig0uQdWFmzTg7IE3TMA6I0mJGxe/5Rc
-         Y/dE85naosBmQxURJ8jbtHUAc2k3OrrKeT/4PRYsM41zALOb2A2B+MgIGaf3Ep3Qv03B
-         q9FXCk5mLAPHgTv5Uut67j/EG3ERdXf1SJRHCP3J4RrHSKC5L94ys0ZMylzSe7tlJdpo
-         K9dB51dj13JUev4f5ONQoHYd5wNtKQ7uE+E/+QcxrJjSefXcP3mjP7WFX2nuFziYS8/I
-         up/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=BSS4C+Tof4hX7XOl0u8vZzIzOJkeQij5kHDcnOxRbtQ=;
-        b=RMWw0kfFMLdLvUDm0QXQCrF7XpqXHA9fEUz+xG8nam9N/HxDdnFGdkzg07qMrTaCW+
-         6pWaL3ZdqdjYGDUZBWkCK3bzN2kEHeoGXD0iTYexm/LbjSTu5OaogkeYMVEJ2qLG208w
-         UAoDCC0+Vc6Ceuk8c+vEhHfYHohr2DmwaJxwKTOZyYx4Z3lEfFNX7sb4KR8UEenrzBos
-         qtaJaQCuV7CBV0wGAsJ1pTtmIywfHt0zhzk7lxiBcrvers+fgCgu/X2ygOsaORzsbFZM
-         19+UYVfP8wWX2oRZCZQELhcu4yXINK456MIJs3KkUhdUtWqAOKECZmBHbCVIiY9DHlcQ
-         YksA==
-X-Gm-Message-State: AOAM530fearMJmmazo2ex5kmgwBNjkIbfznw0xioycI0YZAG2IJFTQ/Q
-        a/OnN09zIUDQd3htj+I1G0FQuYmju5z9Y2xc/9/v3p2JCks=
-X-Google-Smtp-Source: ABdhPJz0r+myW7wXzehh/u9I4qp8s9yNYWkKTuV6fXEQni7Q4eJ9LWDU3QSCbb3mlJBWaylwYcUS/XauJ4A1j+eritw=
-X-Received: by 2002:a05:6512:3694:: with SMTP id d20mr8645060lfs.184.1623188985306;
- Tue, 08 Jun 2021 14:49:45 -0700 (PDT)
+        id S234323AbhFHWUg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 8 Jun 2021 18:20:36 -0400
+Received: from mail110.syd.optusnet.com.au ([211.29.132.97]:56720 "EHLO
+        mail110.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229548AbhFHWUf (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 8 Jun 2021 18:20:35 -0400
+Received: from dread.disaster.area (pa49-179-138-183.pa.nsw.optusnet.com.au [49.179.138.183])
+        by mail110.syd.optusnet.com.au (Postfix) with ESMTPS id 31D2F10625F;
+        Wed,  9 Jun 2021 08:18:16 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1lqk35-00AXg4-VK; Wed, 09 Jun 2021 08:18:15 +1000
+Date:   Wed, 9 Jun 2021 08:18:15 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        ceph-devel@vger.kernel.org, Chao Yu <yuchao0@huawei.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
+        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>,
+        Pavel Reichl <preichl@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH 07/14] xfs: Refactor xfs_isilocked()
+Message-ID: <20210608221815.GM664593@dread.disaster.area>
+References: <20210607144631.8717-1-jack@suse.cz>
+ <20210607145236.31852-7-jack@suse.cz>
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 8 Jun 2021 16:49:34 -0500
-Message-ID: <CAH2r5mtXtY9K5=DA8dfgNm2rbvLB7GJUUvC7_0q8R1uGLtxV0Q@mail.gmail.com>
-Subject: [CIFS][PATCH] Enable extended stats by default
-To:     CIFS <linux-cifs@vger.kernel.org>
-Cc:     samba-technical <samba-technical@lists.samba.org>,
-        COMMON INTERNET FILE SYSTEM SERVER 
-        <linux-cifsd-devel@lists.sourceforge.net>
-Content-Type: multipart/mixed; boundary="000000000000df7b6a05c4482259"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210607145236.31852-7-jack@suse.cz>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0
+        a=MnllW2CieawZLw/OcHE/Ng==:117 a=MnllW2CieawZLw/OcHE/Ng==:17
+        a=kj9zAlcOel0A:10 a=r6YtysWOX24A:10 a=20KFwNOVAAAA:8 a=yPCof4ZbAAAA:8
+        a=7-415B0cAAAA:8 a=wL01ZgEgnFvSBV24lgMA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000df7b6a05c4482259
-Content-Type: text/plain; charset="UTF-8"
+On Mon, Jun 07, 2021 at 04:52:17PM +0200, Jan Kara wrote:
+> From: Pavel Reichl <preichl@redhat.com>
+> 
+> Refactor xfs_isilocked() to use newly introduced __xfs_rwsem_islocked().
+> __xfs_rwsem_islocked() is a helper function which encapsulates checking
+> state of rw_semaphores hold by inode.
+> 
+> Signed-off-by: Pavel Reichl <preichl@redhat.com>
+> Suggested-by: Dave Chinner <dchinner@redhat.com>
+> Suggested-by: Eric Sandeen <sandeen@redhat.com>
+> Suggested-by: Darrick J. Wong <darrick.wong@oracle.com>
+> Reviewed-by: Darrick J. Wong <darrick.wong@oracle.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+>  fs/xfs/xfs_inode.c | 39 +++++++++++++++++++++++++++++++--------
+>  fs/xfs/xfs_inode.h | 21 ++++++++++++++-------
+>  2 files changed, 45 insertions(+), 15 deletions(-)
 
-Patch to enable CONFIG_CIFS_STATS2 by default
+As a standalone patch, this is overly elaborate and way more complex
+than it needs to be. It's not really just a refactor, either,
+because of the unnecessary shifting games it adds.
+
+> diff --git a/fs/xfs/xfs_inode.c b/fs/xfs/xfs_inode.c
+> index 0369eb22c1bb..6247977870bd 100644
+> --- a/fs/xfs/xfs_inode.c
+> +++ b/fs/xfs/xfs_inode.c
+> @@ -342,9 +342,34 @@ xfs_ilock_demote(
+>  }
+>  
+>  #if defined(DEBUG) || defined(XFS_WARN)
+> -int
+> +static inline bool
+> +__xfs_rwsem_islocked(
+> +	struct rw_semaphore	*rwsem,
+> +	int			lock_flags,
+> +	int			shift)
+> +{
+> +	lock_flags >>= shift;
+> +
+> +	if (!debug_locks)
+> +		return rwsem_is_locked(rwsem);
+> +	/*
+> +	 * If the shared flag is not set, pass 0 to explicitly check for
+> +	 * exclusive access to the lock. If the shared flag is set, we typically
+> +	 * want to make sure the lock is at least held in shared mode
+> +	 * (i.e., shared | excl) but we don't necessarily care that it might
+> +	 * actually be held exclusive. Therefore, pass -1 to check whether the
+> +	 * lock is held in any mode rather than one of the explicit shared mode
+> +	 * values (1 or 2)."
+> +	 */
+> +	if (lock_flags & (1 << XFS_SHARED_LOCK_SHIFT)) {
+> +		return lockdep_is_held_type(rwsem, -1);
+> +	}
+> +	return lockdep_is_held_type(rwsem, 0);
+> +}
+
+Pass in a boolean value for shared/exclusive and
+you can get rid of passing in the lock flags as well.
+
+static bool
+__xfs_rwsem_islocked(
+	struct rw_semaphore	*rwsem,
+	bool			shared)
+{
+	if (!debug_locks)
+		return rwsem_is_locked(rwsem);
+
+	if (!shared)
+		return lockdep_is_held_type(rwsem, 0);
+
+	/*
+	 * We are checking that the lock is held at least in shared
+	 * mode but don't care that it might be held exclusively
+	 * (i.e. shared | excl). Hence we check if the lock is held
+	 * in any mode rather than an explicit shared mode.
+	 */
+	return lockdep_is_held_type(rwsem, -1);
+}
+
+> +
+> +bool
+>  xfs_isilocked(
+> -	xfs_inode_t		*ip,
+> +	struct xfs_inode	*ip,
+>  	uint			lock_flags)
+>  {
+>  	if (lock_flags & (XFS_ILOCK_EXCL|XFS_ILOCK_SHARED)) {
+> @@ -359,15 +384,13 @@ xfs_isilocked(
+>  		return rwsem_is_locked(&ip->i_mmaplock.mr_lock);
+>  	}
+>  
+> -	if (lock_flags & (XFS_IOLOCK_EXCL|XFS_IOLOCK_SHARED)) {
+> -		if (!(lock_flags & XFS_IOLOCK_SHARED))
+> -			return !debug_locks ||
+> -				lockdep_is_held_type(&VFS_I(ip)->i_rwsem, 0);
+> -		return rwsem_is_locked(&VFS_I(ip)->i_rwsem);
+> +	if (lock_flags & (XFS_IOLOCK_EXCL | XFS_IOLOCK_SHARED)) {
+> +		return __xfs_rwsem_islocked(&VFS_I(ip)->i_rwsem, lock_flags,
+> +				XFS_IOLOCK_FLAG_SHIFT);
+
+Then this is simply:
+
+		return __xfs_rwsem_islocked(&VFS_I(ip)->i_rwsem,
+				(lock_flags & XFS_IOLOCK_SHARED));
+
+And the conversion for the MMAPLOCK in the next patch is equally
+simple.
 
 
+> diff --git a/fs/xfs/xfs_inode.h b/fs/xfs/xfs_inode.h
+> index ca826cfba91c..1c0e15c480bc 100644
+> --- a/fs/xfs/xfs_inode.h
+> +++ b/fs/xfs/xfs_inode.h
+> @@ -262,12 +262,19 @@ static inline bool xfs_inode_has_bigtime(struct xfs_inode *ip)
+>   * Bit ranges:	1<<1  - 1<<16-1 -- iolock/ilock modes (bitfield)
+>   *		1<<16 - 1<<32-1 -- lockdep annotation (integers)
+>   */
+> -#define	XFS_IOLOCK_EXCL		(1<<0)
+> -#define	XFS_IOLOCK_SHARED	(1<<1)
+> -#define	XFS_ILOCK_EXCL		(1<<2)
+> -#define	XFS_ILOCK_SHARED	(1<<3)
+> -#define	XFS_MMAPLOCK_EXCL	(1<<4)
+> -#define	XFS_MMAPLOCK_SHARED	(1<<5)
+> +
+> +#define XFS_IOLOCK_FLAG_SHIFT	0
+> +#define XFS_ILOCK_FLAG_SHIFT	2
+> +#define XFS_MMAPLOCK_FLAG_SHIFT	4
+> +
+> +#define XFS_SHARED_LOCK_SHIFT	1
+> +
+> +#define XFS_IOLOCK_EXCL		(1 << XFS_IOLOCK_FLAG_SHIFT)
+> +#define XFS_IOLOCK_SHARED	(XFS_IOLOCK_EXCL << XFS_SHARED_LOCK_SHIFT)
+> +#define XFS_ILOCK_EXCL		(1 << XFS_ILOCK_FLAG_SHIFT)
+> +#define XFS_ILOCK_SHARED	(XFS_ILOCK_EXCL << XFS_SHARED_LOCK_SHIFT)
+> +#define XFS_MMAPLOCK_EXCL	(1 << XFS_MMAPLOCK_FLAG_SHIFT)
+> +#define XFS_MMAPLOCK_SHARED	(XFS_MMAPLOCK_EXCL << XFS_SHARED_LOCK_SHIFT)
+>  
+>  #define XFS_LOCK_MASK		(XFS_IOLOCK_EXCL | XFS_IOLOCK_SHARED \
+>  				| XFS_ILOCK_EXCL | XFS_ILOCK_SHARED \
 
+And all this shifting goes away and the change is much, much
+simpler. If/when other changes are made to this code that require
+shifting like this, then we can make these modifications. But in
+this patch for this usage they don't really make much sense at all..
+
+Cheers,
+
+Dave.
 -- 
-Thanks,
-
-Steve
-
---000000000000df7b6a05c4482259
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-enable-extended-stats-by-default.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-enable-extended-stats-by-default.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kpoksrh60>
-X-Attachment-Id: f_kpoksrh60
-
-RnJvbSA3YTZiNmQ1YTVmZmU5YmFlNzViZjEzMGUyZDgyYTM0YzM5ZGJlZTY1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgOCBKdW4gMjAyMSAxNjo0Mzo0MSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIGNp
-ZnM6IGVuYWJsZSBleHRlbmRlZCBzdGF0cyBieSBkZWZhdWx0CgpDT05GSUdfQ0lGU19TVEFUUzIg
-Y2FuIGJlIHZlcnkgdXNlZnVsIHNpbmNlIGl0IHNob3dzCmxhdGVuY2llcyBieSBjb21tYW5kLCBh
-bmQgYWxsb3dzIGVuYWJsaW5nIHRoZSBzbG93IHJlc3BvbnNlCmR5bmFtaWMgdHJhY2Vwb2ludCB3
-aGljaCBjYW4gYmUgdXNlZnVsIHRvIGlkZW50aWZ5CnBlcmZvcm1hbmNlIHByb2JsZW1zLgoKRm9y
-IGV4YW1wbGU6CgpUb3RhbCB0aW1lIHNwZW50IHByb2Nlc3NpbmcgYnkgY29tbWFuZC4gVGltZSB1
-bml0cyBhcmUgamlmZmllcyAoMTAwMCBwZXIgc2Vjb25kKQogIFNNQjMgQ01ECU51bWJlcglUb3Rh
-bCBUaW1lCUZhc3Rlc3QJU2xvd2VzdAogIC0tLS0tLS0tCS0tLS0tLQktLS0tLS0tLS0tCS0tLS0t
-LS0JLS0tLS0tLQogIDAJCTEJMgkJMgkyCiAgMQkJMgk2CQkyCTQKICAyCQkwCTAJCTAJMAogIDMJ
-CTQJMTEJCTIJNAogIDQJCTIJMTYJCTUJMTEKICA1CQk0NTQ2CTM0MTA0CQkyCTQ4NwogIDYJCTQ0
-MjEJMzI5MDEJCTIJNDg3CiAgNwkJMAkwCQkwCTAKICA4CQk2OTUJMjc4MQkJMgkzOQogIDkJCTM5
-MQkxNzA4CQkyCTI3CiAgMTAJCTAJMAkJMAkwCiAgMTEJCTQJNgkJMQkyCiAgMTIJCTAJMAkJMAkw
-CiAgMTMJCTAJMAkJMAkwCiAgMTQJCTM4ODcJMTc2OTYJCTAJMTI4CiAgMTUJCTAJMAkJMAkwCiAg
-MTYJCTE0NzEJOTk1MAkJMQk0ODcKICAxNwkJMTY5CTI2OTUJCTkJMTE2CiAgMTgJCTgwCTM4MQkJ
-MgkxMAogIDEJCTIJNgkJMgk0CiAgMgkJMAkwCQkwCTAKICAzCQk0CTExCQkyCTQKICA0CQkyCTE2
-CQk1CTExCiAgNQkJNDU0NgkzNDEwNAkJMgk0ODcKICA2CQk0NDIxCTMyOTAxCQkyCTQ4NwogIDcJ
-CTAJMAkJMAkwCiAgOAkJNjk1CTI3ODEJCTIJMzkKICA5CQkzOTEJMTcwOAkJMgkyNwogIDEwCQkw
-CTAJCTAJMAogIDExCQk0CTYJCTEJMgogIDEyCQkwCTAJCTAJMAogIDEzCQkwCTAJCTAJMAogIDE0
-CQkzODg3CTE3Njk2CQkwCTEyOAogIDE1CQkwCTAJCTAJMAogIDE2CQkxNDcxCTk5NTAJCTEJNDg3
-CiAgMTcJCTE2OQkyNjk1CQk5CTExNgogIDE4CQk4MAkzODEJCTIJMTAKClNpZ25lZC1vZmYtYnk6
-IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL0tjb25m
-aWcgfCA0ICsrLS0KIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25z
-KC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9LY29uZmlnIGIvZnMvY2lmcy9LY29uZmlnCmluZGV4
-IDdkZTVjODkzYzE4MS4uNzM2NDk1MGE5ZWY0IDEwMDY0NAotLS0gYS9mcy9jaWZzL0tjb25maWcK
-KysrIGIvZnMvY2lmcy9LY29uZmlnCkBAIC01OSw2ICs1OSw3IEBAIGNvbmZpZyBDSUZTCiBjb25m
-aWcgQ0lGU19TVEFUUzIKIAlib29sICJFeHRlbmRlZCBzdGF0aXN0aWNzIgogCWRlcGVuZHMgb24g
-Q0lGUworCWRlZmF1bHQgeQogCWhlbHAKIAkgIEVuYWJsaW5nIHRoaXMgb3B0aW9uIHdpbGwgYWxs
-b3cgbW9yZSBkZXRhaWxlZCBzdGF0aXN0aWNzIG9uIFNNQgogCSAgcmVxdWVzdCB0aW1pbmcgdG8g
-YmUgZGlzcGxheWVkIGluIC9wcm9jL2ZzL2NpZnMvRGVidWdEYXRhIGFuZCBhbHNvCkBAIC02Nyw4
-ICs2OCw3IEBAIGNvbmZpZyBDSUZTX1NUQVRTMgogCSAgZm9yIG1vcmUgZGV0YWlscy4gVGhlc2Ug
-YWRkaXRpb25hbCBzdGF0aXN0aWNzIG1heSBoYXZlIGEgbWlub3IgZWZmZWN0CiAJICBvbiBwZXJm
-b3JtYW5jZSBhbmQgbWVtb3J5IHV0aWxpemF0aW9uLgogCi0JICBVbmxlc3MgeW91IGFyZSBhIGRl
-dmVsb3BlciBvciBhcmUgZG9pbmcgbmV0d29yayBwZXJmb3JtYW5jZSBhbmFseXNpcwotCSAgb3Ig
-dHVuaW5nLCBzYXkgTi4KKwkgIElmIHVuc3VyZSwgc2F5IFkuCiAKIGNvbmZpZyBDSUZTX0FMTE9X
-X0lOU0VDVVJFX0xFR0FDWQogCWJvb2wgIlN1cHBvcnQgbGVnYWN5IHNlcnZlcnMgd2hpY2ggdXNl
-IGxlc3Mgc2VjdXJlIGRpYWxlY3RzIgotLSAKMi4zMC4yCgo=
---000000000000df7b6a05c4482259--
+Dave Chinner
+david@fromorbit.com
