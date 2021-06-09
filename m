@@ -1,77 +1,79 @@
 Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.0 required=3.0 tests=BAYES_50,DKIMWL_BL,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D2AC48BD1
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Jun 2021 14:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB4AC48BCF
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Jun 2021 14:44:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B6BBE61285
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Jun 2021 14:13:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 764806139A
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Jun 2021 14:44:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237468AbhFIOPK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 9 Jun 2021 10:15:10 -0400
-Received: from flippie-beckerswealth-sa.xyz ([62.173.147.2]:37280 "EHLO
-        host.flippie-beckerswealth-sa.xyz" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237408AbhFIOPG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Jun 2021 10:15:06 -0400
-X-Greylist: delayed 5787 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Jun 2021 10:15:06 EDT
-Received: from flippie-beckerswealth-sa.xyz (ec2-3-131-99-163.us-east-2.compute.amazonaws.com [3.131.99.163])
-        by host.flippie-beckerswealth-sa.xyz (Postfix) with ESMTPA id 0E53A3120A4E
-        for <linux-cifs@vger.kernel.org>; Wed,  9 Jun 2021 15:10:27 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealth-sa.xyz 0E53A3120A4E
+        id S236549AbhFIOq3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 9 Jun 2021 10:46:29 -0400
+Received: from mail-yb1-f182.google.com ([209.85.219.182]:40816 "EHLO
+        mail-yb1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236867AbhFIOq3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Jun 2021 10:46:29 -0400
+Received: by mail-yb1-f182.google.com with SMTP id e10so35829779ybb.7
+        for <linux-cifs@vger.kernel.org>; Wed, 09 Jun 2021 07:44:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippie-beckerswealth-sa.xyz; s=default; t=1623240629;
-        bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=ekSmH2DiWuEKEP3sm+DVYNgVkluUU3QRV3KKzegcq3Fs3DAsO8j92wIsOpMijTPxL
-         qmgsUyLFOTf+1WD5W4yIOdq5SjopJQ8F/NIDJOzMyp9L3UuJiyhN6wK48POnrE68HB
-         CTKtqvjmfXCKejKAbqnxe9w3LWsISHckdRa6bA3c=
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealth-sa.xyz 0E53A3120A4E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippie-beckerswealth-sa.xyz; s=default; t=1623240629;
-        bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=ekSmH2DiWuEKEP3sm+DVYNgVkluUU3QRV3KKzegcq3Fs3DAsO8j92wIsOpMijTPxL
-         qmgsUyLFOTf+1WD5W4yIOdq5SjopJQ8F/NIDJOzMyp9L3UuJiyhN6wK48POnrE68HB
-         CTKtqvjmfXCKejKAbqnxe9w3LWsISHckdRa6bA3c=
-Reply-To: jmasuku40@flippiebeckerwealthservices.com
-From:   Jotham Masuku <jmasuku40@flippie-beckerswealth-sa.xyz>
-To:     linux-cifs@vger.kernel.org
-Subject: Proposal
-Date:   09 Jun 2021 12:10:27 +0000
-Message-ID: <20210609121026.996C92BDC476367A@flippie-beckerswealth-sa.xyz>
-Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=hR1kDHgE4G7eNHc4NZs6vH3sDBt5Uoz19ntcd5wj0nc=;
+        b=a/vCw6maMv3YC0uNst5VTsMT80lF7E0+tZaVcsV8f9uXs/bcJOM5zfCb8443ujNpY+
+         SLaf5sckDC7g5LjlnjmIciHWjoUBu4xIzYwaQ0BzjPME2F5+QvGtXsp2ICo1omWO1bM9
+         XZ11UDJXQZRSdkQ9hnpib9riItj2KXMw5XtDmKpzedsHMl1pj5eiX89rfa2QCax4fl+K
+         Pm3jJoRRjcy0soJfzHhbsdUb3fIChSmnEJZ6lrNyJ9is3yU+tw+u3ts6F+rh4nSPdTSb
+         Y7n3+bdVvTMt6b8Fpfou1EX6Y643kJ2YWxIbD2r90k0t3A/VZM/U9Z0hPCmXK5WlGQzx
+         ol3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=hR1kDHgE4G7eNHc4NZs6vH3sDBt5Uoz19ntcd5wj0nc=;
+        b=fbmMJcHo43xeYkCvw61KEjxru4Tez2tMJqXh5VHNcMx1HBg9475LaqOQJcPMGcPmUH
+         cTMBY4kotCVkuK4Wa6I1jziS3LJILQRLabm7wfKY8wk9Nqu34rt9BJtSn8bQrXFPBXG7
+         Nb2tzOaYTjrPbKihQXxp4GzAUBkdr4wvujHhrJo5vRAbH+9HbSn4yWLlFAeTxAzXuwDt
+         qOMWZ9d2RvmagDkdfPQDjLdYNZyoITXD9hgUshJg6ehcoNls5UgyTgwzT8z6Hx5pP2gp
+         X1q+XnVyfEQJlYb44c90QW8d9OeCUXwRMJnfOvKM/dAxA3SsEXq3s2AoiV+8qewlBFW4
+         0pYA==
+X-Gm-Message-State: AOAM533+IPM6awmhFmpwZHQzDzmZ69+YTyE2727Tra3ICzsNSvJDKN7j
+        YBlr/YKkRtY6cU8mU4DFIzjJ+py8066u4XqgZIU=
+X-Google-Smtp-Source: ABdhPJzlcd1/lrq+OWMpBNuAkRHpqy0dOWMXsC69TluYi6jPHlqr5N9HowwYPDKyao1RjHh6YiUG3BI/ZeDuYwpNUe8=
+X-Received: by 2002:a25:ef42:: with SMTP id w2mr521836ybm.34.1623249814157;
+ Wed, 09 Jun 2021 07:43:34 -0700 (PDT)
+MIME-Version: 1.0
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 9 Jun 2021 20:13:23 +0530
+Message-ID: <CANT5p=prtZ5ZZGSrFFb4sOc_+-tytDpL1s4VzMnsk1vGq2d5Jg@mail.gmail.com>
+Subject: fscache metadata query
+To:     David Howells <dhowells@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello there,
+Hi David,
 
-I hope this message finds you in good spirits especially during=20
-this challenging time of coronavirus pandemic. I hope you and=20
-your family are well and keeping safe. Anyway, I am Jotham=20
-Masuku, a broker working with Flippiebecker Wealth. I got your=20
-contact (along with few other contacts) through an online=20
-business directory and I thought I should contact you to see if=20
-you are interested in this opportunity. I am contacting you=20
-because one of my high profile clients is interested in investing=20
-abroad and has asked me to look for individuals and companies=20
-with interesting business ideas and projects that he can invest=20
-in. He wants to invest a substantial amount of asset abroad.
+I was exploring the cifs.ko implementation of fscache recently for a
+customer use case.
+For this use case, I felt that it would be quite useful to obtain info
+about what data (pages) are currently cached by fscache. Is there
+already a mechanism to be able to get this information? Or is
+something planned on similar lines?
 
-Please kindly respond back to this email if you are interested in=20
-this opportunity. Once I receive your response, I will give you=20
-more details and we can plan a strategy that will be beneficial=20
-to all parties.
+Even if fscache provides netfs a way to provide callback functions
+which can get called when older data is culled by fscache, the netfs
+can maintain this metadata internally.
 
-Best regards
+More thoughts?
 
-J Masuku
-Flippiebecker Wealth
+--
+Regards,
+Shyam
