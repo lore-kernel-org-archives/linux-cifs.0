@@ -2,78 +2,86 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB4AC48BCF
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Jun 2021 14:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1467FC48BCF
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Jun 2021 16:48:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 764806139A
-	for <linux-cifs@archiver.kernel.org>; Wed,  9 Jun 2021 14:44:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC27E613AE
+	for <linux-cifs@archiver.kernel.org>; Wed,  9 Jun 2021 16:48:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236549AbhFIOq3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 9 Jun 2021 10:46:29 -0400
-Received: from mail-yb1-f182.google.com ([209.85.219.182]:40816 "EHLO
-        mail-yb1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236867AbhFIOq3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 9 Jun 2021 10:46:29 -0400
-Received: by mail-yb1-f182.google.com with SMTP id e10so35829779ybb.7
-        for <linux-cifs@vger.kernel.org>; Wed, 09 Jun 2021 07:44:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=hR1kDHgE4G7eNHc4NZs6vH3sDBt5Uoz19ntcd5wj0nc=;
-        b=a/vCw6maMv3YC0uNst5VTsMT80lF7E0+tZaVcsV8f9uXs/bcJOM5zfCb8443ujNpY+
-         SLaf5sckDC7g5LjlnjmIciHWjoUBu4xIzYwaQ0BzjPME2F5+QvGtXsp2ICo1omWO1bM9
-         XZ11UDJXQZRSdkQ9hnpib9riItj2KXMw5XtDmKpzedsHMl1pj5eiX89rfa2QCax4fl+K
-         Pm3jJoRRjcy0soJfzHhbsdUb3fIChSmnEJZ6lrNyJ9is3yU+tw+u3ts6F+rh4nSPdTSb
-         Y7n3+bdVvTMt6b8Fpfou1EX6Y643kJ2YWxIbD2r90k0t3A/VZM/U9Z0hPCmXK5WlGQzx
-         ol3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=hR1kDHgE4G7eNHc4NZs6vH3sDBt5Uoz19ntcd5wj0nc=;
-        b=fbmMJcHo43xeYkCvw61KEjxru4Tez2tMJqXh5VHNcMx1HBg9475LaqOQJcPMGcPmUH
-         cTMBY4kotCVkuK4Wa6I1jziS3LJILQRLabm7wfKY8wk9Nqu34rt9BJtSn8bQrXFPBXG7
-         Nb2tzOaYTjrPbKihQXxp4GzAUBkdr4wvujHhrJo5vRAbH+9HbSn4yWLlFAeTxAzXuwDt
-         qOMWZ9d2RvmagDkdfPQDjLdYNZyoITXD9hgUshJg6ehcoNls5UgyTgwzT8z6Hx5pP2gp
-         X1q+XnVyfEQJlYb44c90QW8d9OeCUXwRMJnfOvKM/dAxA3SsEXq3s2AoiV+8qewlBFW4
-         0pYA==
-X-Gm-Message-State: AOAM533+IPM6awmhFmpwZHQzDzmZ69+YTyE2727Tra3ICzsNSvJDKN7j
-        YBlr/YKkRtY6cU8mU4DFIzjJ+py8066u4XqgZIU=
-X-Google-Smtp-Source: ABdhPJzlcd1/lrq+OWMpBNuAkRHpqy0dOWMXsC69TluYi6jPHlqr5N9HowwYPDKyao1RjHh6YiUG3BI/ZeDuYwpNUe8=
-X-Received: by 2002:a25:ef42:: with SMTP id w2mr521836ybm.34.1623249814157;
- Wed, 09 Jun 2021 07:43:34 -0700 (PDT)
-MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Wed, 9 Jun 2021 20:13:23 +0530
-Message-ID: <CANT5p=prtZ5ZZGSrFFb4sOc_+-tytDpL1s4VzMnsk1vGq2d5Jg@mail.gmail.com>
-Subject: fscache metadata query
-To:     David Howells <dhowells@redhat.com>,
+        id S230029AbhFIQuO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 9 Jun 2021 12:50:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42514 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229504AbhFIQuO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 9 Jun 2021 12:50:14 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5E22D613C7;
+        Wed,  9 Jun 2021 16:48:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623257299;
+        bh=hHxaS0PsHl0aV79Af27WsPfXn9a5Kv7gST9ycrsXUy8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=MYEcht6K+HpkclU45W88qEiWG3ymrqGxG9fB3rG5YgdwGPSIHs6bSLlO8zzK26lAi
+         yFnBgsAB9xrUUjgUQ4jcfdVK7aXOAEQYYaAwaQ4o3A8PogZTgVfjgNuYwd252KRco5
+         szUagbD5RS9IZBOirQ7jSbM+420RzuJiFZd135UL0L8e90iodAvDjkTw/qpkf3SfnR
+         Qlj/dEH6XrqJkNMO8n6XJw8K2pq5/IEi3arUJghERuoT31R5+7xe91D6b2Mb411JDv
+         V5aMRhEckyipSQhFxEk7+G5je1W5wijrZngpajK8+CbsnhG08S74KjY+ZXiAVPW3/8
+         rSHtKOQYrMgJg==
+Date:   Wed, 9 Jun 2021 09:48:18 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Stephen Hemminger <stephen@networkplumber.org>
+Cc:     Alexander Aring <aahringo@redhat.com>,
+        Stefan Metzmacher <metze@samba.org>,
+        Steve French <smfrench@gmail.com>,
+        =?UTF-8?B?QXVyw6ls?= =?UTF-8?B?aWVu?= Aptel <aaptel@suse.com>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-nfs <linux-nfs@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        Leif Sahlberg <lsahlber@redhat.com>,
+        Steven Whitehouse <swhiteho@redhat.com>
+Subject: Re: quic in-kernel implementation?
+Message-ID: <20210609094818.7aaf21bd@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+In-Reply-To: <20210608153349.0f02ba71@hermes.local>
+References: <CAK-6q+hS29yoTF4tKq+Xt3G=_PPDi9vmFVwGPmutbsQyD2i=CA@mail.gmail.com>
+        <87pmwxsjxm.fsf@suse.com>
+        <CAH2r5msMBZ5AYQcfK=-xrOASzVC0SgoHdPnyqEPRcfd-tzUstw@mail.gmail.com>
+        <35352ef0-86ed-aaa5-4a49-b2b08dc3674d@samba.org>
+        <CAK-6q+g3_9g++wQGbhzBhk2cp=0fb3aVL9GoAoYNPq6M4QnCdQ@mail.gmail.com>
+        <20210608153349.0f02ba71@hermes.local>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi David,
+On Tue, 8 Jun 2021 15:33:49 -0700 Stephen Hemminger wrote:
+> On Tue, 8 Jun 2021 17:03:16 -0400
+> > > With having the fuse-like socket before it should be trivial to switch
+> > > between the implementations.    
+> > 
+> > So a good starting point would be to have such a "fuse-like socket"
+> > component? What about having a simple example for that at first
+> > without having quic involved. The kernel calls some POSIX-like socket
+> > interface which triggers a communication to a user space application.
+> > This user space application will then map everything to a user space
+> > generated socket. This would be a map from socket struct
+> > "proto/proto_ops" to user space and vice versa. The kernel application
+> > probably can use the kernel_FOO() (e.g. kernel_recvmsg()) socket api
+> > directly then. Exactly like "fuse" as you mentioned just for sockets.
+> > 
+> > I think two veth interfaces can help to test something like that,
+> > either with a "fuse-like socket" on the other end or an user space
+> > application. Just doing a ping-pong example.
+> > 
+> > Afterwards we can look at how to replace the user generated socket
+> > application with any $LIBQUIC e.g. msquic implementation as second
+> > step.
+> 
+> Socket state management is complex and timers etc in userspace are hard.
 
-I was exploring the cifs.ko implementation of fscache recently for a
-customer use case.
-For this use case, I felt that it would be quite useful to obtain info
-about what data (pages) are currently cached by fscache. Is there
-already a mechanism to be able to get this information? Or is
-something planned on similar lines?
-
-Even if fscache provides netfs a way to provide callback functions
-which can get called when older data is culled by fscache, the netfs
-can maintain this metadata internally.
-
-More thoughts?
-
---
-Regards,
-Shyam
++1 seeing the struggles fuse causes in storage land "fuse for sockets"
+is not an exciting temporary solution IMHO..
