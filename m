@@ -2,122 +2,78 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 408A7C48BDF
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Jun 2021 10:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ADC0C47094
+	for <linux-cifs@archiver.kernel.org>; Thu, 10 Jun 2021 11:39:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2493A613D0
-	for <linux-cifs@archiver.kernel.org>; Thu, 10 Jun 2021 10:40:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EC7F613DE
+	for <linux-cifs@archiver.kernel.org>; Thu, 10 Jun 2021 11:39:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229980AbhFJKmr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 10 Jun 2021 06:42:47 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:55992 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229770AbhFJKmq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Jun 2021 06:42:46 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id BB0721FD47;
-        Thu, 10 Jun 2021 10:40:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1623321648; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=e69p7cSpTPxrgycR/WxxaL+1l2Iy0njG9LV0PDer+c4=;
-        b=WNzicnn9I9Uzi3rhrzU3g34rvVnvDxp/dzgOfJ8QelNeJaO+n3iduUNFK/9KFkm8z8EeQW
-        NL1SjEN/b720E7re5xPsC8EubYb6b5KZXIu9/vLgcdL89PUhpyLXDk4QFY4xIwUI5aT9rc
-        RHr+TtYt2pnBErVijdh7TG9nIRAFQQs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1623321648;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=e69p7cSpTPxrgycR/WxxaL+1l2Iy0njG9LV0PDer+c4=;
-        b=ldzR16nIFLY7YSLUeT9j/700yV/caPCby06yFrv/SQbZy/V+JI6iP9FH6mfkFJSIwBuRfv
-        KhEDZH21lxejVFDA==
-Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 24988A3B8B;
-        Thu, 10 Jun 2021 10:40:48 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id E025A1F2CAB; Thu, 10 Jun 2021 12:40:47 +0200 (CEST)
-Date:   Thu, 10 Jun 2021 12:40:47 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
-        Chao Yu <yuchao0@huawei.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
-        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
-        Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@lst.de>, Hugh Dickins <hughd@google.com>
-Subject: Re: [PATCH 01/14] mm: Fix comments mentioning i_mutex
-Message-ID: <20210610104047.GA23539@quack2.suse.cz>
-References: <20210607144631.8717-1-jack@suse.cz>
- <20210607145236.31852-1-jack@suse.cz>
- <YMHWIcbnLPW5AfiC@T590>
+        id S230161AbhFJLlN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 10 Jun 2021 07:41:13 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:5489 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229895AbhFJLlJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 10 Jun 2021 07:41:09 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4G12445559zZf6K;
+        Thu, 10 Jun 2021 19:36:20 +0800 (CST)
+Received: from dggpeml500020.china.huawei.com (7.185.36.88) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 10 Jun 2021 19:39:11 +0800
+Received: from huawei.com (10.175.127.227) by dggpeml500020.china.huawei.com
+ (7.185.36.88) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Thu, 10 Jun
+ 2021 19:39:10 +0800
+From:   Baokun Li <libaokun1@huawei.com>
+To:     <sfrench@samba.org>, <linux-cifs@vger.kernel.org>,
+        <samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>
+CC:     <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+        <yangjihong1@huawei.com>, <yukuai3@huawei.com>,
+        <libaokun1@huawei.com>
+Subject: [PATCH -next] cifs: fix doc warnings in cifs_dfs_ref.c
+Date:   Thu, 10 Jun 2021 19:48:17 +0800
+Message-ID: <20210610114817.3524037-1-libaokun1@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YMHWIcbnLPW5AfiC@T590>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500020.china.huawei.com (7.185.36.88)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu 10-06-21 17:06:41, Ming Lei wrote:
-> On Mon, Jun 07, 2021 at 04:52:11PM +0200, Jan Kara wrote:
-> > inode->i_mutex has been replaced with inode->i_rwsem long ago. Fix
-> > comments still mentioning i_mutex.
-> > 
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > Acked-by: Hugh Dickins <hughd@google.com>
-> > Signed-off-by: Jan Kara <jack@suse.cz>
-> > ---
-> 
-> ...
-> 
-> > diff --git a/mm/rmap.c b/mm/rmap.c
-> > index 693a610e181d..a35cbbbded0d 100644
-> > --- a/mm/rmap.c
-> > +++ b/mm/rmap.c
-> > @@ -20,9 +20,9 @@
-> >  /*
-> >   * Lock ordering in mm:
-> >   *
-> > - * inode->i_mutex	(while writing or truncating, not reading or faulting)
-> > + * inode->i_rwsem	(while writing or truncating, not reading or faulting)
-> >   *   mm->mmap_lock
-> > - *     page->flags PG_locked (lock_page)   * (see huegtlbfs below)
-> > + *     page->flags PG_locked (lock_page)   * (see hugetlbfs below)
-> >   *       hugetlbfs_i_mmap_rwsem_key (in huge_pmd_share)
-> >   *         mapping->i_mmap_rwsem
-> >   *           hugetlb_fault_mutex (hugetlbfs specific page fault mutex)
-> > @@ -41,7 +41,7 @@
-> >   *                             in arch-dependent flush_dcache_mmap_lock,
-> >   *                             within bdi.wb->list_lock in __sync_single_inode)
-> >   *
-> > - * anon_vma->rwsem,mapping->i_mutex      (memory_failure, collect_procs_anon)
-> > + * anon_vma->rwsem,mapping->i_mmap_rwsem   (memory_failure, collect_procs_anon)
-> 
-> This one looks a typo.
+Add description for `cifs_compose_mount_options` to fix the W=1 warnings:
 
-Actually it isn't a typo. Memory failure path doesn't touch inode->i_rwsem
-at all. It uses mapping->i_mmap_rwsem in collect_procs_file(). So perhaps
-the functions listed there should be updated to (collect_procs_anon(),
-collect_procs_file()) but the lock name change is IMO correct.
+ fs/cifs/cifs_dfs_ref.c:139: warning: Function parameter or
+  member 'devname' not described in 'cifs_compose_mount_options'
 
-								Honza
+Signed-off-by: Baokun Li <libaokun1@huawei.com>
+---
+ fs/cifs/cifs_dfs_ref.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
+index c87c37cf2914..ec57cdb1590f 100644
+--- a/fs/cifs/cifs_dfs_ref.c
++++ b/fs/cifs/cifs_dfs_ref.c
+@@ -125,7 +125,7 @@ cifs_build_devname(char *nodename, const char *prepath)
+  * @sb_mountdata:	parent/root DFS mount options (template)
+  * @fullpath:		full path in UNC format
+  * @ref:		optional server's referral
+- *
++ * @devname:		return the built cifs device name if passed pointer not NULL
+  * creates mount options for submount based on template options sb_mountdata
+  * and replacing unc,ip,prefixpath options with ones we've got form ref_unc.
+  *
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.31.1
+
