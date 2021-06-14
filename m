@@ -2,1268 +2,578 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 203C1C48BE6
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Jun 2021 12:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D299C2B9F4
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Jun 2021 17:18:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC749610A2
-	for <linux-cifs@archiver.kernel.org>; Mon, 14 Jun 2021 12:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6791261242
+	for <linux-cifs@archiver.kernel.org>; Mon, 14 Jun 2021 17:18:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232955AbhFNMso (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 14 Jun 2021 08:48:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33216 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232992AbhFNMsn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 14 Jun 2021 08:48:43 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E1C6C061574;
-        Mon, 14 Jun 2021 05:46:24 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id g142so15231113ybf.9;
-        Mon, 14 Jun 2021 05:46:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=V0ntc4/AXda6pDtryZB5M+kjYfLi4Bfi0CoUR2uChqk=;
-        b=clileFeEHt1W1AS2ccYRUVkoZ/7t7W4SeXZKmuvoZ/gpQaV6iipx8N/s/jx8QwUSfB
-         iJr8K4TKZX/C8biY5zFOUsEDwjv9AOZ8EhzjIkAtVqKmcQoBBdRl9GuBiz627eMCo4PH
-         TUpy7LbxwHUTAWilCPtWoUAS2aHe2cRFRQzFubSqNTzozlK3x8R8BseOr7d7Wra5cEkz
-         d6wDopjIadOvzXAhEh+vJ/v9Bn/bW73Hbj0Bpbhxn3rA2rnTzamNzmW//6uQ3b3M8qtw
-         9bz5nSY5PuenwcQPHl5gYIgDUXv1v+v5WHZEpYR3+WtYhFN4bFENcqQGSd7Kjmjs8qVr
-         21Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=V0ntc4/AXda6pDtryZB5M+kjYfLi4Bfi0CoUR2uChqk=;
-        b=q8q+IBoEVYkvo04Y/CAtVK8YcCjk4/YAznuofbbZoLGDiMNUogw/IwZnQqg6yZIldp
-         pbJLvg5+8gewO9UxMkV8JQWKQOY6yJdmCLrRzxLiDrAE+UDct1IAkXuHHmJEnHiiyn8Z
-         1n1VMjk1SQ+cOSBaFDPGT0BMjUPVdRqaGlF1fXwURwTVrbCCLwxlV3VhVQKa5JFS36Gf
-         Ej17sI3ExOiBFwB0pIc9tWZEiQ3Mqp/rjkF/8UDdyimd454v0wkfUao4Y6sD7Up/QwdV
-         Nyn7wNMPiMojbSGshjv+s6bJW2b7AERMRWmQTo6F4J8S4LxIbfassUxP3eJvkzXPKddy
-         XBIA==
-X-Gm-Message-State: AOAM530V7imdN0KhAY92ft+BOAWHs+AIMqP9TvsqNAWiHzlsYefJ2eDA
-        Lh+WIVT8/4wKWluCaGshQBHsgbNbrPHz/EEzHa0=
-X-Google-Smtp-Source: ABdhPJwsWPGrThDvQXuJpxJqKC8QtuTiEi3Dq1o4NGL93SKL9RuM6Xl3CjjuTRG9Hzkn07zYxv0FPWDIROiDjUlsd9w=
-X-Received: by 2002:a25:3089:: with SMTP id w131mr4374686ybw.34.1623674782956;
- Mon, 14 Jun 2021 05:46:22 -0700 (PDT)
+        id S235587AbhFNRU1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 14 Jun 2021 13:20:27 -0400
+Received: from mga18.intel.com ([134.134.136.126]:49995 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235566AbhFNRUV (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 14 Jun 2021 13:20:21 -0400
+IronPort-SDR: XZferJjXBLmjJLkmSEeJCG4AjfbsGS2ue1xP9LwqQGSqhyDHWPbDrDnR06042yzwlZ87OBl1uy
+ BQS+DHivA22w==
+X-IronPort-AV: E=McAfee;i="6200,9189,10015"; a="193158823"
+X-IronPort-AV: E=Sophos;i="5.83,273,1616482800"; 
+   d="gz'50?scan'50,208,50";a="193158823"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2021 10:18:17 -0700
+IronPort-SDR: n0+//y8WaM4rFgJwcv22E9oauyX6tLl+ccjELKAQ3Hn2qx3b5i3riziI7r8JFM6qtL8cedmIWd
+ G+rYZfKwcm9g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.83,273,1616482800"; 
+   d="gz'50?scan'50,208,50";a="554173662"
+Received: from lkp-server01.sh.intel.com (HELO 4aae0cb4f5b5) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Jun 2021 10:18:15 -0700
+Received: from kbuild by 4aae0cb4f5b5 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1lsqE2-000041-VU; Mon, 14 Jun 2021 17:18:14 +0000
+Date:   Tue, 15 Jun 2021 01:17:14 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Paulo Alcantara <pc@cjr.nz>
+Cc:     kbuild-all@lists.01.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org,
+        Steve French <stfrench@microsoft.com>
+Subject: [cifs:for-next 17/18] fs/cifs/dfs_cache.c:1433:1: warning: the frame
+ size of 1120 bytes is larger than 1024 bytes
+Message-ID: <202106150111.ZAZ01oRN-lkp@intel.com>
 MIME-Version: 1.0
-References: <270998.1612265397@warthog.procyon.org.uk>
-In-Reply-To: <270998.1612265397@warthog.procyon.org.uk>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Mon, 14 Jun 2021 18:16:11 +0530
-Message-ID: <CANT5p=o3uvY0MB8Ftf6_17qMp0GKKebLb-QHv4rHayAQJNo7eA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Rough, incomplete conversion to revised fscache I/O API
-To:     David Howells <dhowells@redhat.com>
-Cc:     Steven French <sfrench@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>, linux-cachefs@redhat.com,
-        linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed; boundary="3V7upXqbjpZ4EhLz"
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Feb 2, 2021 at 5:03 PM David Howells <dhowells@redhat.com> wrote:
->
-> Hi Steve,
->
-> Here's a rough, but incomplete, conversion of cifs to use the revised fscache
-> I/O API and the netfs helper lib, but I've about hit the limit of what I can
-> manage to do.  It's built on top of my fscache-netfs-lib branch:
->
->         https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=fscache-netfs-lib
->
-> Notes:
->
->  (*) I've replaced some code to discard data by reading into a big buffer with
->      code that uses the ITER_DISCARD iterator instead.  See
->      cifs_discard_from_socket().
->
->  (*) I've tried to make the ordinary read use an ITER_XARRAY iterator and read
->      into that directly from the socket, rather than looping through a bunch
->      of pages.  This will handle THPs and partial pages for you.  However,
->      under some circumstances, readpages_fill_pages() would then be reading
->      from an iterator to an iterator, it appears.  Possibly the source
->      iterator can be got rid of, but the code is quite complex.
->
->  (*) There's a new function, cifs_req_issue_op(), which the netfs helpers use
->      to issue a read on part of a request.  This looks at current->tgid, but
->      might be running on a workqueue, so needs to get the tgid from somewhere
->      else if not CIFS_MOUNT_RWPIDFORWARD.
->
->  (*) cifs_readpage(), cifs_readahead() and cifs_write_begin() now go through
->      the helpers.  cifs_readpages() is obsolete and is removed.
->
->  (*) At the completion of a read, netfs_subreq_terminated() is called.  As a
->      future optimisation, we can add a function to do incremental advancement
->      of the pages, unlocking them as we go.  The issue is, however, that we
->      have to coordinate with writing larger page lumps to the cache.
->
->  (*) The clause in cifs_write_begin() about optimising away a read when we
->      have an oplock needs dealing with, but I'm not sure how to fit it in.
->
-> David
-> ---
-> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-> index fe03cbdae959..ad296c3dbd04 100644
-> --- a/fs/cifs/Kconfig
-> +++ b/fs/cifs/Kconfig
-> @@ -2,6 +2,7 @@
->  config CIFS
->         tristate "SMB3 and CIFS support (advanced network filesystem)"
->         depends on INET
-> +       select NETFS_SUPPORT
->         select NLS
->         select CRYPTO
->         select CRYPTO_MD4
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 50fcb65920e8..fe5fd4bcb866 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -1283,6 +1283,7 @@ struct cifs_readdata;
->
->  /* asynchronous read support */
->  struct cifs_readdata {
-> +       struct netfs_read_subrequest    *subreq;
->         struct kref                     refcount;
->         struct list_head                list;
->         struct completion               done;
-> @@ -1301,6 +1302,7 @@ struct cifs_readdata {
->         int (*copy_into_pages)(struct TCP_Server_Info *server,
->                                 struct cifs_readdata *rdata,
->                                 struct iov_iter *iter);
-> +       struct iov_iter                 iter;
->         struct kvec                     iov[2];
->         struct TCP_Server_Info          *server;
->  #ifdef CONFIG_CIFS_SMB_DIRECT
-> diff --git a/fs/cifs/cifsproto.h b/fs/cifs/cifsproto.h
-> index 340ff81ee87b..f5ac4a7c1cfc 100644
-> --- a/fs/cifs/cifsproto.h
-> +++ b/fs/cifs/cifsproto.h
-> @@ -230,11 +230,16 @@ extern unsigned int setup_special_user_owner_ACE(struct cifs_ace *pace);
->  extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
->  extern int cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
->                                  unsigned int to_read);
-> +extern ssize_t cifs_discard_from_socket(struct TCP_Server_Info *server,
-> +                                       size_t to_read);
->  extern int cifs_read_page_from_socket(struct TCP_Server_Info *server,
->                                         struct page *page,
->                                         unsigned int page_offset,
->                                         unsigned int to_read);
->  extern int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb);
-> +extern int cifs_read_iter_from_socket(struct TCP_Server_Info *server,
-> +                                     struct iov_iter *iter,
-> +                                     unsigned int to_read);
->  extern int cifs_match_super(struct super_block *, void *);
->  extern int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx);
->  extern void cifs_umount(struct cifs_sb_info *);
-> diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-> index 0496934feecb..671afc822afc 100644
-> --- a/fs/cifs/cifssmb.c
-> +++ b/fs/cifs/cifssmb.c
-> @@ -36,6 +36,7 @@
->  #include <linux/swap.h>
->  #include <linux/task_io_accounting_ops.h>
->  #include <linux/uaccess.h>
-> +#include <linux/netfs.h>
->  #include "cifspdu.h"
->  #include "cifsglob.h"
->  #include "cifsacl.h"
-> @@ -1445,15 +1446,15 @@ int
->  cifs_discard_remaining_data(struct TCP_Server_Info *server)
->  {
->         unsigned int rfclen = server->pdu_size;
-> -       int remaining = rfclen + server->vals->header_preamble_size -
-> +       size_t remaining = rfclen + server->vals->header_preamble_size -
->                 server->total_read;
->
->         while (remaining > 0) {
-> -               int length;
-> +               ssize_t length;
->
-> -               length = cifs_read_from_socket(server, server->bigbuf,
-> -                               min_t(unsigned int, remaining,
-> -                                   CIFSMaxBufSize + MAX_HEADER_SIZE(server)));
-> +               length = cifs_discard_from_socket(server,
-> +                               min_t(size_t, remaining,
-> +                                     CIFSMaxBufSize + MAX_HEADER_SIZE(server)));
->                 if (length < 0)
->                         return length;
->                 server->total_read += length;
-> @@ -1664,7 +1665,14 @@ cifs_readv_callback(struct mid_q_entry *mid)
->                 rdata->result = -EIO;
->         }
->
-> -       queue_work(cifsiod_wq, &rdata->work);
-> +       if (rdata->subreq) {
-> +               netfs_subreq_terminated(rdata->subreq,
-> +                                       (rdata->result == 0 || rdata->result == -EAGAIN) ?
-> +                                       rdata->got_bytes : rdata->result);
-> +               kref_put(&rdata->refcount, cifs_readdata_release);
-> +       } else {
-> +               queue_work(cifsiod_wq, &rdata->work);
-> +       }
->         DeleteMidQEntry(mid);
->         add_credits(server, &credits, 0);
->  }
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 5d39129406ea..28c13602ed43 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -564,6 +564,15 @@ cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
->         return cifs_readv_from_socket(server, &smb_msg);
->  }
->
-> +ssize_t
-> +cifs_discard_from_socket(struct TCP_Server_Info *server, size_t to_read)
-> +{
-> +       struct msghdr smb_msg;
-> +       iov_iter_discard(&smb_msg.msg_iter, READ, to_read);
-> +
-> +       return cifs_readv_from_socket(server, &smb_msg);
-> +}
-> +
->  int
->  cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *page,
->         unsigned int page_offset, unsigned int to_read)
-> @@ -575,6 +584,22 @@ cifs_read_page_from_socket(struct TCP_Server_Info *server, struct page *page,
->         return cifs_readv_from_socket(server, &smb_msg);
->  }
->
-> +int
-> +cifs_read_iter_from_socket(struct TCP_Server_Info *server, struct iov_iter *iter,
-> +                          unsigned int to_read)
-> +{
-> +       struct msghdr smb_msg;
-> +       int ret;
-> +
-> +       smb_msg.msg_iter = *iter;
-> +       if (smb_msg.msg_iter.count > to_read)
-> +               smb_msg.msg_iter.count = to_read;
-> +       ret = cifs_readv_from_socket(server, &smb_msg);
-> +       if (ret > 0)
-> +               iov_iter_advance(iter, ret);
-> +       return ret;
-> +}
-> +
->  static bool
->  is_smb_response(struct TCP_Server_Info *server, unsigned char type)
->  {
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index 6d001905c8e5..c1f7ad4dbcb9 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -34,6 +34,7 @@
->  #include <linux/slab.h>
->  #include <linux/swap.h>
->  #include <linux/mm.h>
-> +#include <linux/netfs.h>
->  #include <asm/div64.h>
->  #include "cifsfs.h"
->  #include "cifspdu.h"
-> @@ -4006,98 +4007,6 @@ cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to)
->         return rc;
->  }
->
-> -static ssize_t
-> -cifs_read(struct file *file, char *read_data, size_t read_size, loff_t *offset)
-> -{
-> -       int rc = -EACCES;
-> -       unsigned int bytes_read = 0;
-> -       unsigned int total_read;
-> -       unsigned int current_read_size;
-> -       unsigned int rsize;
-> -       struct cifs_sb_info *cifs_sb;
-> -       struct cifs_tcon *tcon;
-> -       struct TCP_Server_Info *server;
-> -       unsigned int xid;
-> -       char *cur_offset;
-> -       struct cifsFileInfo *open_file;
-> -       struct cifs_io_parms io_parms = {0};
-> -       int buf_type = CIFS_NO_BUFFER;
-> -       __u32 pid;
-> -
-> -       xid = get_xid();
-> -       cifs_sb = CIFS_FILE_SB(file);
-> -
-> -       /* FIXME: set up handlers for larger reads and/or convert to async */
-> -       rsize = min_t(unsigned int, cifs_sb->ctx->rsize, CIFSMaxBufSize);
-> -
-> -       if (file->private_data == NULL) {
-> -               rc = -EBADF;
-> -               free_xid(xid);
-> -               return rc;
-> -       }
-> -       open_file = file->private_data;
-> -       tcon = tlink_tcon(open_file->tlink);
-> -       server = cifs_pick_channel(tcon->ses);
-> -
-> -       if (!server->ops->sync_read) {
-> -               free_xid(xid);
-> -               return -ENOSYS;
-> -       }
-> -
-> -       if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
-> -               pid = open_file->pid;
-> -       else
-> -               pid = current->tgid;
-> -
-> -       if ((file->f_flags & O_ACCMODE) == O_WRONLY)
-> -               cifs_dbg(FYI, "attempting read on write only file instance\n");
-> -
-> -       for (total_read = 0, cur_offset = read_data; read_size > total_read;
-> -            total_read += bytes_read, cur_offset += bytes_read) {
-> -               do {
-> -                       current_read_size = min_t(uint, read_size - total_read,
-> -                                                 rsize);
-> -                       /*
-> -                        * For windows me and 9x we do not want to request more
-> -                        * than it negotiated since it will refuse the read
-> -                        * then.
-> -                        */
-> -                       if (!(tcon->ses->capabilities &
-> -                               tcon->ses->server->vals->cap_large_files)) {
-> -                               current_read_size = min_t(uint,
-> -                                       current_read_size, CIFSMaxBufSize);
-> -                       }
-> -                       if (open_file->invalidHandle) {
-> -                               rc = cifs_reopen_file(open_file, true);
-> -                               if (rc != 0)
-> -                                       break;
-> -                       }
-> -                       io_parms.pid = pid;
-> -                       io_parms.tcon = tcon;
-> -                       io_parms.offset = *offset;
-> -                       io_parms.length = current_read_size;
-> -                       io_parms.server = server;
-> -                       rc = server->ops->sync_read(xid, &open_file->fid, &io_parms,
-> -                                                   &bytes_read, &cur_offset,
-> -                                                   &buf_type);
-> -               } while (rc == -EAGAIN);
-> -
-> -               if (rc || (bytes_read == 0)) {
-> -                       if (total_read) {
-> -                               break;
-> -                       } else {
-> -                               free_xid(xid);
-> -                               return rc;
-> -                       }
-> -               } else {
-> -                       cifs_stats_bytes_read(tcon, total_read);
-> -                       *offset += bytes_read;
-> -               }
-> -       }
-> -       free_xid(xid);
-> -       return total_read;
-> -}
-> -
->  /*
->   * If the page is mmap'ed into a process' page tables, then we need to make
->   * sure that it doesn't change while being written back.
-> @@ -4107,7 +4016,21 @@ cifs_page_mkwrite(struct vm_fault *vmf)
->  {
->         struct page *page = vmf->page;
->
-> -       lock_page(page);
-> +       /* Wait for the page to be written to the cache before we allow it to
-> +        * be modified.  We then assume the entire page will need writing back.
-> +        */
-> +#ifdef CONFIG_CIFS_FSCACHE
-> +       if (PageFsCache(page) &&
-> +           wait_on_page_bit_killable(page, PG_fscache) < 0)
-> +               return VM_FAULT_RETRY;
-> +#endif
-> +
-> +       if (PageWriteback(page) &&
-> +           wait_on_page_bit_killable(page, PG_writeback) < 0)
-> +               return VM_FAULT_RETRY;
-> +
-> +       if (lock_page_killable(page) < 0)
-> +               return VM_FAULT_RETRY;
->         return VM_FAULT_LOCKED;
->  }
->
-> @@ -4154,39 +4077,6 @@ int cifs_file_mmap(struct file *file, struct vm_area_struct *vma)
->         return rc;
->  }
->
-> -static void
-> -cifs_readv_complete(struct work_struct *work)
-> -{
-> -       unsigned int i, got_bytes;
-> -       struct cifs_readdata *rdata = container_of(work,
-> -                                               struct cifs_readdata, work);
-> -
-> -       got_bytes = rdata->got_bytes;
-> -       for (i = 0; i < rdata->nr_pages; i++) {
-> -               struct page *page = rdata->pages[i];
-> -
-> -               lru_cache_add(page);
-> -
-> -               if (rdata->result == 0 ||
-> -                   (rdata->result == -EAGAIN && got_bytes)) {
-> -                       flush_dcache_page(page);
-> -                       SetPageUptodate(page);
-> -               }
-> -
-> -               unlock_page(page);
-> -
-> -               if (rdata->result == 0 ||
-> -                   (rdata->result == -EAGAIN && got_bytes))
-> -                       cifs_readpage_to_fscache(rdata->mapping->host, page);
-> -
-> -               got_bytes -= min_t(unsigned int, PAGE_SIZE, got_bytes);
-> -
-> -               put_page(page);
-> -               rdata->pages[i] = NULL;
-> -       }
-> -       kref_put(&rdata->refcount, cifs_readdata_release);
-> -}
-> -
->  static int
->  readpages_fill_pages(struct TCP_Server_Info *server,
->                      struct cifs_readdata *rdata, struct iov_iter *iter,
-> @@ -4261,8 +4151,7 @@ readpages_fill_pages(struct TCP_Server_Info *server,
->                         result = n;
->  #endif
->                 else
-> -                       result = cifs_read_page_from_socket(
-> -                                       server, page, page_offset, n);
-> +                       result = cifs_read_iter_from_socket(server, &rdata->iter, n);
->                 if (result < 0)
->                         break;
->
-> @@ -4288,292 +4177,179 @@ cifs_readpages_copy_into_pages(struct TCP_Server_Info *server,
->         return readpages_fill_pages(server, rdata, iter, iter->count);
->  }
->
-> -static int
-> -readpages_get_pages(struct address_space *mapping, struct list_head *page_list,
-> -                   unsigned int rsize, struct list_head *tmplist,
-> -                   unsigned int *nr_pages, loff_t *offset, unsigned int *bytes)
-> -{
-> -       struct page *page, *tpage;
-> -       unsigned int expected_index;
-> -       int rc;
-> -       gfp_t gfp = readahead_gfp_mask(mapping);
-> -
-> -       INIT_LIST_HEAD(tmplist);
-> -
-> -       page = lru_to_page(page_list);
-> -
-> -       /*
-> -        * Lock the page and put it in the cache. Since no one else
-> -        * should have access to this page, we're safe to simply set
-> -        * PG_locked without checking it first.
-> -        */
-> -       __SetPageLocked(page);
-> -       rc = add_to_page_cache_locked(page, mapping,
-> -                                     page->index, gfp);
-> -
-> -       /* give up if we can't stick it in the cache */
-> -       if (rc) {
-> -               __ClearPageLocked(page);
-> -               return rc;
-> -       }
-> -
-> -       /* move first page to the tmplist */
-> -       *offset = (loff_t)page->index << PAGE_SHIFT;
-> -       *bytes = PAGE_SIZE;
-> -       *nr_pages = 1;
-> -       list_move_tail(&page->lru, tmplist);
-> -
-> -       /* now try and add more pages onto the request */
-> -       expected_index = page->index + 1;
-> -       list_for_each_entry_safe_reverse(page, tpage, page_list, lru) {
-> -               /* discontinuity ? */
-> -               if (page->index != expected_index)
-> -                       break;
-> -
-> -               /* would this page push the read over the rsize? */
-> -               if (*bytes + PAGE_SIZE > rsize)
-> -                       break;
-> -
-> -               __SetPageLocked(page);
-> -               rc = add_to_page_cache_locked(page, mapping, page->index, gfp);
-> -               if (rc) {
-> -                       __ClearPageLocked(page);
-> -                       break;
-> -               }
-> -               list_move_tail(&page->lru, tmplist);
-> -               (*bytes) += PAGE_SIZE;
-> -               expected_index++;
-> -               (*nr_pages)++;
-> -       }
-> -       return rc;
-> -}
-> -
-> -static int cifs_readpages(struct file *file, struct address_space *mapping,
-> -       struct list_head *page_list, unsigned num_pages)
-> +/*
-> + * Issue a read operation on behalf of the netfs helper functions.  We're asked
-> + * to make a read of a certain size at a point in the file.  We are permitted
-> + * to only read a portion of that, but as long as we read something, the netfs
-> + * helper will call us again so that we can issue another read.
-> + */
-> +static void cifs_req_issue_op(struct netfs_read_subrequest *subreq)
->  {
-> -       int rc;
-> -       int err = 0;
-> -       struct list_head tmplist;
-> -       struct cifsFileInfo *open_file = file->private_data;
-> -       struct cifs_sb_info *cifs_sb = CIFS_FILE_SB(file);
-> +       struct netfs_read_request *rreq = subreq->rreq;
->         struct TCP_Server_Info *server;
-> -       pid_t pid;
-> +       struct cifs_readdata *rdata;
-> +       struct cifsFileInfo *open_file = rreq->netfs_priv;
-> +       struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
-> +       struct cifs_credits credits_on_stack, *credits = &credits_on_stack;
->         unsigned int xid;
-> +       pid_t pid;
-> +       int rc;
-> +       unsigned int rsize;
->
->         xid = get_xid();
-> -       /*
-> -        * Reads as many pages as possible from fscache. Returns -ENOBUFS
-> -        * immediately if the cookie is negative
-> -        *
-> -        * After this point, every page in the list might have PG_fscache set,
-> -        * so we will need to clean that up off of every page we don't use.
-> -        */
-> -       rc = cifs_readpages_from_fscache(mapping->host, mapping, page_list,
-> -                                        &num_pages);
-> -       if (rc == 0) {
-> -               free_xid(xid);
-> -               return rc;
-> -       }
->
->         if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_RWPIDFORWARD)
->                 pid = open_file->pid;
->         else
->                 pid = current->tgid;
-> +#warning current might be a workqueue
->
->         rc = 0;
->         server = cifs_pick_channel(tlink_tcon(open_file->tlink)->ses);
->
-> -       cifs_dbg(FYI, "%s: file=%p mapping=%p num_pages=%u\n",
-> -                __func__, file, mapping, num_pages);
-> -
-> -       /*
-> -        * Start with the page at end of list and move it to private
-> -        * list. Do the same with any following pages until we hit
-> -        * the rsize limit, hit an index discontinuity, or run out of
-> -        * pages. Issue the async read and then start the loop again
-> -        * until the list is empty.
-> -        *
-> -        * Note that list order is important. The page_list is in
-> -        * the order of declining indexes. When we put the pages in
-> -        * the rdata->pages, then we want them in increasing order.
-> -        */
-> -       while (!list_empty(page_list) && !err) {
-> -               unsigned int i, nr_pages, bytes, rsize;
-> -               loff_t offset;
-> -               struct page *page, *tpage;
-> -               struct cifs_readdata *rdata;
-> -               struct cifs_credits credits_on_stack;
-> -               struct cifs_credits *credits = &credits_on_stack;
-> +       cifs_dbg(FYI, "%s: op=%08x[%x] mapping=%p len=%zu/%zu\n",
-> +                __func__, rreq->debug_id, subreq->debug_index, rreq->mapping,
-> +                subreq->transferred, subreq->len);
->
-> -               if (open_file->invalidHandle) {
-> +       if (open_file->invalidHandle) {
-> +               do {
->                         rc = cifs_reopen_file(open_file, true);
-> -                       if (rc == -EAGAIN)
-> -                               continue;
-> -                       else if (rc)
-> -                               break;
-> -               }
-> -
-> -               rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
-> -                                                  &rsize, credits);
-> +               } while (rc == -EAGAIN);
->                 if (rc)
-> -                       break;
-> -
-> -               /*
-> -                * Give up immediately if rsize is too small to read an entire
-> -                * page. The VFS will fall back to readpage. We should never
-> -                * reach this point however since we set ra_pages to 0 when the
-> -                * rsize is smaller than a cache page.
-> -                */
-> -               if (unlikely(rsize < PAGE_SIZE)) {
-> -                       add_credits_and_wake_if(server, credits, 0);
-> -                       free_xid(xid);
-> -                       return 0;
-> -               }
-> -
-> -               nr_pages = 0;
-> -               err = readpages_get_pages(mapping, page_list, rsize, &tmplist,
-> -                                        &nr_pages, &offset, &bytes);
-> -               if (!nr_pages) {
-> -                       add_credits_and_wake_if(server, credits, 0);
-> -                       break;
-> -               }
-> -
-> -               rdata = cifs_readdata_alloc(nr_pages, cifs_readv_complete);
-> -               if (!rdata) {
-> -                       /* best to give up if we're out of mem */
-> -                       list_for_each_entry_safe(page, tpage, &tmplist, lru) {
-> -                               list_del(&page->lru);
-> -                               lru_cache_add(page);
-> -                               unlock_page(page);
-> -                               put_page(page);
-> -                       }
-> -                       rc = -ENOMEM;
-> -                       add_credits_and_wake_if(server, credits, 0);
-> -                       break;
-> -               }
-> +                       goto out;
-> +       }
->
-> -               rdata->cfile = cifsFileInfo_get(open_file);
-> -               rdata->server = server;
-> -               rdata->mapping = mapping;
-> -               rdata->offset = offset;
-> -               rdata->bytes = bytes;
-> -               rdata->pid = pid;
-> -               rdata->pagesz = PAGE_SIZE;
-> -               rdata->tailsz = PAGE_SIZE;
-> -               rdata->read_into_pages = cifs_readpages_read_into_pages;
-> -               rdata->copy_into_pages = cifs_readpages_copy_into_pages;
-> -               rdata->credits = credits_on_stack;
-> +       rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize, &rsize, credits);
-> +       if (rc)
-> +               goto out;
->
-> -               list_for_each_entry_safe(page, tpage, &tmplist, lru) {
-> -                       list_del(&page->lru);
-> -                       rdata->pages[rdata->nr_pages++] = page;
-> -               }
-> +       rdata = cifs_readdata_alloc(0, NULL);
-> +       if (!rdata) {
-> +               rc = -ENOMEM;
-> +               add_credits_and_wake_if(server, credits, 0);
-> +               goto out;
-> +       }
->
-> -               rc = adjust_credits(server, &rdata->credits, rdata->bytes);
-> +       rdata->subreq = subreq;
-> +       rdata->cfile = cifsFileInfo_get(open_file);
-> +       rdata->server = server;
-> +       rdata->mapping = rreq->mapping;
-> +       rdata->offset = subreq->start + subreq->transferred;
-> +       rdata->bytes = subreq->len   - subreq->transferred;
-> +       rdata->pid = pid;
-> +       rdata->pagesz = PAGE_SIZE;
-> +       rdata->tailsz = PAGE_SIZE;
-> +       rdata->read_into_pages = cifs_readpages_read_into_pages;
-> +       rdata->copy_into_pages = cifs_readpages_copy_into_pages;
-> +       rdata->credits = credits_on_stack;
->
-> -               if (!rc) {
-> -                       if (rdata->cfile->invalidHandle)
-> -                               rc = -EAGAIN;
-> -                       else
-> -                               rc = server->ops->async_readv(rdata);
-> -               }
-> +       iov_iter_xarray(&rdata->iter, READ, &rreq->mapping->i_pages,
-> +                       rdata->offset, rdata->bytes);
->
-> -               if (rc) {
-> -                       add_credits_and_wake_if(server, &rdata->credits, 0);
-> -                       for (i = 0; i < rdata->nr_pages; i++) {
-> -                               page = rdata->pages[i];
-> -                               lru_cache_add(page);
-> -                               unlock_page(page);
-> -                               put_page(page);
-> -                       }
-> -                       /* Fallback to the readpage in error/reconnect cases */
-> -                       kref_put(&rdata->refcount, cifs_readdata_release);
-> -                       break;
-> -               }
-> +       rc = adjust_credits(server, &rdata->credits, rdata->bytes);
-> +       if (!rc) {
-> +               if (rdata->cfile->invalidHandle)
-> +                       rc = -EAGAIN;
-> +               else
-> +                       rc = server->ops->async_readv(rdata);
-> +       }
->
-> +       if (rc) {
-> +               add_credits_and_wake_if(server, &rdata->credits, 0);
-> +               /* Fallback to the readpage in error/reconnect cases */
->                 kref_put(&rdata->refcount, cifs_readdata_release);
->         }
->
-> -       /* Any pages that have been shown to fscache but didn't get added to
-> -        * the pagecache must be uncached before they get returned to the
-> -        * allocator.
-> -        */
-> -       cifs_fscache_readpages_cancel(mapping->host, page_list);
-> +       kref_put(&rdata->refcount, cifs_readdata_release);
-> +
-> +out:
->         free_xid(xid);
-> -       return rc;
-> +       if (rc < 0)
-> +               netfs_subreq_terminated(subreq, rc);
->  }
->
-> -/*
-> - * cifs_readpage_worker must be called with the page pinned
-> - */
-> -static int cifs_readpage_worker(struct file *file, struct page *page,
-> -       loff_t *poffset)
-> +static void cifs_init_rreq(struct netfs_read_request *rreq, struct file *file)
->  {
-> -       char *read_data;
-> -       int rc;
-> -
-> -       /* Is the page cached? */
-> -       rc = cifs_readpage_from_fscache(file_inode(file), page);
-> -       if (rc == 0)
-> -               goto read_complete;
-> +       rreq->netfs_priv = file->private_data;
-> +}
->
-> -       read_data = kmap(page);
-> -       /* for reads over a certain size could initiate async read ahead */
-> +static bool cifs_is_cache_enabled(struct inode *inode)
-> +{
-> +       struct fscache_cookie *cookie = cifs_inode_cookie(inode);
->
-> -       rc = cifs_read(file, read_data, PAGE_SIZE, poffset);
-> +       return fscache_cookie_enabled(cookie) && !hlist_empty(&cookie->backing_objects);
-> +}
->
-> -       if (rc < 0)
-> -               goto io_error;
-> -       else
-> -               cifs_dbg(FYI, "Bytes read %d\n", rc);
-> +static int cifs_begin_cache_operation(struct netfs_read_request *rreq)
-> +{
-> +       return fscache_begin_read_operation(rreq, cifs_inode_cookie(rreq->inode));
-> +}
->
-> -       /* we do not want atime to be less than mtime, it broke some apps */
-> -       file_inode(file)->i_atime = current_time(file_inode(file));
-> -       if (timespec64_compare(&(file_inode(file)->i_atime), &(file_inode(file)->i_mtime)))
-> -               file_inode(file)->i_atime = file_inode(file)->i_mtime;
-> -       else
-> -               file_inode(file)->i_atime = current_time(file_inode(file));
-> +/*
-> + * Expand the size of a readahead to the size of the rsize, if at least as
-> + * large as a page, allowing for the possibility that rsize is not pow-2
-> + * aligned.  The caller will then clamp it to i_size.
-> + */
-> +static void cifs_expand_readahead(struct netfs_read_request *rreq)
-> +{
-> +       struct cifs_sb_info *cifs_sb = CIFS_SB(rreq->inode->i_sb);
-> +       unsigned int rsize = cifs_sb->ctx->rsize;
-> +       loff_t misalignment;
->
-> -       if (PAGE_SIZE > rc)
-> -               memset(read_data + rc, 0, PAGE_SIZE - rc);
-> +       if (rsize < PAGE_SIZE)
-> +               return;
->
-> -       flush_dcache_page(page);
-> -       SetPageUptodate(page);
-> +       if (rsize < INT_MAX)
-> +               rsize = roundup_pow_of_two(rsize);
-> +       else
-> +               rsize = ((unsigned int)INT_MAX + 1) / 2;
->
-> -       /* send this page to the cache */
-> -       cifs_readpage_to_fscache(file_inode(file), page);
-> +       misalignment = rreq->start & (rsize - 1);
-> +       if (misalignment) {
-> +               rreq->start -= misalignment;
-> +               rreq->len += misalignment;
-> +       }
->
-> -       rc = 0;
-> +       rreq->len = round_up(rreq->len, rsize);
-> +}
->
-> -io_error:
-> -       kunmap(page);
-> -       unlock_page(page);
-> +static void cifs_rreq_done(struct netfs_read_request *rreq)
-> +{
-> +       struct inode *inode = rreq->inode;
->
-> -read_complete:
-> -       return rc;
-> +       /* we do not want atime to be less than mtime, it broke some apps */
-> +       inode->i_atime = current_time(inode);
-> +       if (timespec64_compare(&inode->i_atime, &inode->i_mtime))
-> +               inode->i_atime = inode->i_mtime;
-> +       else
-> +               inode->i_atime = current_time(inode);
->  }
->
-> +const struct netfs_read_request_ops cifs_req_ops = {
-> +       .init_rreq              = cifs_init_rreq,
-> +       .is_cache_enabled       = cifs_is_cache_enabled,
-> +       .begin_cache_operation  = cifs_begin_cache_operation,
-> +       .expand_readahead       = cifs_expand_readahead,
-> +       .issue_op               = cifs_req_issue_op,
-> +       .done                   = cifs_rreq_done,
-> +};
-> +
->  static int cifs_readpage(struct file *file, struct page *page)
->  {
->         loff_t offset = (loff_t)page->index << PAGE_SHIFT;
-> -       int rc = -EACCES;
-> -       unsigned int xid;
-> -
-> -       xid = get_xid();
->
-> -       if (file->private_data == NULL) {
-> -               rc = -EBADF;
-> -               free_xid(xid);
-> -               return rc;
-> -       }
-> +       if (!file->private_data)
-> +               return -EBADF;
->
-> -       cifs_dbg(FYI, "readpage %p at offset %d 0x%x\n",
-> -                page, (int)offset, (int)offset);
-> +       cifs_dbg(FYI, "readpage %p at offset %u 0x%x\n",
-> +                page, (unsigned int)offset, (int)offset);
->
-> -       rc = cifs_readpage_worker(file, page, &offset);
-> +       return netfs_readpage(file, page, &cifs_req_ops, NULL);
-> +}
->
-> -       free_xid(xid);
-> -       return rc;
-> +static void cifs_readahead(struct readahead_control *ractl)
-> +{
-> +       netfs_readahead(ractl, &cifs_req_ops, NULL);
->  }
->
->  static int is_inode_writable(struct cifsInodeInfo *cifs_inode)
-> @@ -4625,34 +4401,21 @@ static int cifs_write_begin(struct file *file, struct address_space *mapping,
->                         loff_t pos, unsigned len, unsigned flags,
->                         struct page **pagep, void **fsdata)
->  {
-> -       int oncethru = 0;
-> -       pgoff_t index = pos >> PAGE_SHIFT;
-> -       loff_t offset = pos & (PAGE_SIZE - 1);
-> -       loff_t page_start = pos & PAGE_MASK;
-> -       loff_t i_size;
->         struct page *page;
-> -       int rc = 0;
-> +       int rc;
->
->         cifs_dbg(FYI, "write_begin from %lld len %d\n", (long long)pos, len);
->
-> -start:
-> -       page = grab_cache_page_write_begin(mapping, index, flags);
-> -       if (!page) {
-> -               rc = -ENOMEM;
-> -               goto out;
-> -       }
-> -
-> -       if (PageUptodate(page))
-> -               goto out;
-> -
-> -       /*
-> -        * If we write a full page it will be up to date, no need to read from
-> -        * the server. If the write is short, we'll end up doing a sync write
-> -        * instead.
-> +       /* Prefetch area to be written into the cache if we're caching this
-> +        * file.  We need to do this before we get a lock on the page in case
-> +        * there's more than one writer competing for the same cache block.
->          */
-> -       if (len == PAGE_SIZE)
-> -               goto out;
-> +       rc = netfs_write_begin(file, mapping, pos, len, flags, &page, fsdata,
-> +                              &cifs_req_ops, NULL);
-> +       if (rc < 0)
-> +               return rc;
->
-> +#if 0
->         /*
->          * optimize away the read when we have an oplock, and we're not
->          * expecting to use any of the data we'd be reading in. That
-> @@ -4676,25 +4439,8 @@ static int cifs_write_begin(struct file *file, struct address_space *mapping,
->                         goto out;
->                 }
->         }
-> -
-> -       if ((file->f_flags & O_ACCMODE) != O_WRONLY && !oncethru) {
-> -               /*
-> -                * might as well read a page, it is fast enough. If we get
-> -                * an error, we don't need to return it. cifs_write_end will
-> -                * do a sync write instead since PG_uptodate isn't set.
-> -                */
-> -               cifs_readpage_worker(file, page, &page_start);
-> -               put_page(page);
-> -               oncethru = 1;
-> -               goto start;
-> -       } else {
-> -               /* we could try using another file handle if there is one -
-> -                  but how would we lock it to prevent close of that handle
-> -                  racing with this read? In any case
-> -                  this will be written out by write_end so is fine */
-> -       }
-> -out:
-> -       *pagep = page;
-> +#endif
-> +       *pagep = find_subpage(page, pos / PAGE_SIZE);
->         return rc;
->  }
->
-> @@ -4703,16 +4449,23 @@ static int cifs_release_page(struct page *page, gfp_t gfp)
->         if (PagePrivate(page))
->                 return 0;
->
-> -       return cifs_fscache_release_page(page, gfp);
-> +       /* deny if page is being written to the cache and the caller hasn't
-> +        * elected to wait */
-> +#ifdef CONFIG_CIFS_FSCACHE
-> +       if (PageFsCache(page)) {
-> +               if (!(gfp & __GFP_DIRECT_RECLAIM) || !(gfp & __GFP_FS))
-> +                       return 0;
-> +               wait_on_page_fscache(page);
-> +       }
-> +#endif
-> +
-> +       return 1;
->  }
->
->  static void cifs_invalidate_page(struct page *page, unsigned int offset,
->                                  unsigned int length)
->  {
-> -       struct cifsInodeInfo *cifsi = CIFS_I(page->mapping->host);
-> -
-> -       if (offset == 0 && length == PAGE_SIZE)
-> -               cifs_fscache_invalidate_page(page, &cifsi->vfs_inode);
-> +       wait_on_page_fscache(page);
->  }
->
->  static int cifs_launder_page(struct page *page)
-> @@ -4732,7 +4485,7 @@ static int cifs_launder_page(struct page *page)
->         if (clear_page_dirty_for_io(page))
->                 rc = cifs_writepage_locked(page, &wbc);
->
-> -       cifs_fscache_invalidate_page(page, page->mapping->host);
-> +       wait_on_page_fscache(page);
->         return rc;
->  }
->
-> @@ -4872,7 +4625,7 @@ static void cifs_swap_deactivate(struct file *file)
->
->  const struct address_space_operations cifs_addr_ops = {
->         .readpage = cifs_readpage,
-> -       .readpages = cifs_readpages,
-> +       .readahead = cifs_readahead,
->         .writepage = cifs_writepage,
->         .writepages = cifs_writepages,
->         .write_begin = cifs_write_begin,
-> diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-> index 20d24af33ee2..4acd599d91d9 100644
-> --- a/fs/cifs/fscache.c
-> +++ b/fs/cifs/fscache.c
-> @@ -199,7 +199,6 @@ static void cifs_fscache_disable_inode_cookie(struct inode *inode)
->
->         if (cifsi->fscache) {
->                 cifs_dbg(FYI, "%s: (0x%p)\n", __func__, cifsi->fscache);
-> -               fscache_uncache_all_inode_pages(cifsi->fscache, inode);
->                 fscache_relinquish_cookie(cifsi->fscache, NULL, true);
->                 cifsi->fscache = NULL;
->         }
-> @@ -229,120 +228,3 @@ void cifs_fscache_reset_inode_cookie(struct inode *inode)
->                          __func__, cifsi->fscache, old);
->         }
->  }
-> -
-> -int cifs_fscache_release_page(struct page *page, gfp_t gfp)
-> -{
-> -       if (PageFsCache(page)) {
-> -               struct inode *inode = page->mapping->host;
-> -               struct cifsInodeInfo *cifsi = CIFS_I(inode);
-> -
-> -               cifs_dbg(FYI, "%s: (0x%p/0x%p)\n",
-> -                        __func__, page, cifsi->fscache);
-> -               if (!fscache_maybe_release_page(cifsi->fscache, page, gfp))
-> -                       return 0;
-> -       }
-> -
-> -       return 1;
-> -}
-> -
-> -static void cifs_readpage_from_fscache_complete(struct page *page, void *ctx,
-> -                                               int error)
-> -{
-> -       cifs_dbg(FYI, "%s: (0x%p/%d)\n", __func__, page, error);
-> -       if (!error)
-> -               SetPageUptodate(page);
-> -       unlock_page(page);
-> -}
-> -
-> -/*
-> - * Retrieve a page from FS-Cache
-> - */
-> -int __cifs_readpage_from_fscache(struct inode *inode, struct page *page)
-> -{
-> -       int ret;
-> -
-> -       cifs_dbg(FYI, "%s: (fsc:%p, p:%p, i:0x%p\n",
-> -                __func__, CIFS_I(inode)->fscache, page, inode);
-> -       ret = fscache_read_or_alloc_page(CIFS_I(inode)->fscache, page,
-> -                                        cifs_readpage_from_fscache_complete,
-> -                                        NULL,
-> -                                        GFP_KERNEL);
-> -       switch (ret) {
-> -
-> -       case 0: /* page found in fscache, read submitted */
-> -               cifs_dbg(FYI, "%s: submitted\n", __func__);
-> -               return ret;
-> -       case -ENOBUFS:  /* page won't be cached */
-> -       case -ENODATA:  /* page not in cache */
-> -               cifs_dbg(FYI, "%s: %d\n", __func__, ret);
-> -               return 1;
-> -
-> -       default:
-> -               cifs_dbg(VFS, "unknown error ret = %d\n", ret);
-> -       }
-> -       return ret;
-> -}
-> -
-> -/*
-> - * Retrieve a set of pages from FS-Cache
-> - */
-> -int __cifs_readpages_from_fscache(struct inode *inode,
-> -                               struct address_space *mapping,
-> -                               struct list_head *pages,
-> -                               unsigned *nr_pages)
-> -{
-> -       int ret;
-> -
-> -       cifs_dbg(FYI, "%s: (0x%p/%u/0x%p)\n",
-> -                __func__, CIFS_I(inode)->fscache, *nr_pages, inode);
-> -       ret = fscache_read_or_alloc_pages(CIFS_I(inode)->fscache, mapping,
-> -                                         pages, nr_pages,
-> -                                         cifs_readpage_from_fscache_complete,
-> -                                         NULL,
-> -                                         mapping_gfp_mask(mapping));
-> -       switch (ret) {
-> -       case 0: /* read submitted to the cache for all pages */
-> -               cifs_dbg(FYI, "%s: submitted\n", __func__);
-> -               return ret;
-> -
-> -       case -ENOBUFS:  /* some pages are not cached and can't be */
-> -       case -ENODATA:  /* some pages are not cached */
-> -               cifs_dbg(FYI, "%s: no page\n", __func__);
-> -               return 1;
-> -
-> -       default:
-> -               cifs_dbg(FYI, "unknown error ret = %d\n", ret);
-> -       }
-> -
-> -       return ret;
-> -}
-> -
-> -void __cifs_readpage_to_fscache(struct inode *inode, struct page *page)
-> -{
-> -       struct cifsInodeInfo *cifsi = CIFS_I(inode);
-> -       int ret;
-> -
-> -       cifs_dbg(FYI, "%s: (fsc: %p, p: %p, i: %p)\n",
-> -                __func__, cifsi->fscache, page, inode);
-> -       ret = fscache_write_page(cifsi->fscache, page,
-> -                                cifsi->vfs_inode.i_size, GFP_KERNEL);
-> -       if (ret != 0)
-> -               fscache_uncache_page(cifsi->fscache, page);
-> -}
-> -
-> -void __cifs_fscache_readpages_cancel(struct inode *inode, struct list_head *pages)
-> -{
-> -       cifs_dbg(FYI, "%s: (fsc: %p, i: %p)\n",
-> -                __func__, CIFS_I(inode)->fscache, inode);
-> -       fscache_readpages_cancel(CIFS_I(inode)->fscache, pages);
-> -}
-> -
-> -void __cifs_fscache_invalidate_page(struct page *page, struct inode *inode)
-> -{
-> -       struct cifsInodeInfo *cifsi = CIFS_I(inode);
-> -       struct fscache_cookie *cookie = cifsi->fscache;
-> -
-> -       cifs_dbg(FYI, "%s: (0x%p/0x%p)\n", __func__, page, cookie);
-> -       fscache_wait_on_page_write(cookie, page);
-> -       fscache_uncache_page(cookie, page);
-> -}
-> diff --git a/fs/cifs/fscache.h b/fs/cifs/fscache.h
-> index e811f2dd7619..b86ef0fcf676 100644
-> --- a/fs/cifs/fscache.h
-> +++ b/fs/cifs/fscache.h
-> @@ -21,6 +21,7 @@
->  #ifndef _CIFS_FSCACHE_H
->  #define _CIFS_FSCACHE_H
->
-> +#define FSCACHE_USE_NEW_IO_API
->  #include <linux/fscache.h>
->
->  #include "cifsglob.h"
-> @@ -70,56 +71,9 @@ extern void cifs_fscache_release_inode_cookie(struct inode *);
->  extern void cifs_fscache_set_inode_cookie(struct inode *, struct file *);
->  extern void cifs_fscache_reset_inode_cookie(struct inode *);
->
-> -extern void __cifs_fscache_invalidate_page(struct page *, struct inode *);
-> -extern int cifs_fscache_release_page(struct page *page, gfp_t gfp);
-> -extern int __cifs_readpage_from_fscache(struct inode *, struct page *);
-> -extern int __cifs_readpages_from_fscache(struct inode *,
-> -                                        struct address_space *,
-> -                                        struct list_head *,
-> -                                        unsigned *);
-> -extern void __cifs_fscache_readpages_cancel(struct inode *, struct list_head *);
-> -
-> -extern void __cifs_readpage_to_fscache(struct inode *, struct page *);
-> -
-> -static inline void cifs_fscache_invalidate_page(struct page *page,
-> -                                              struct inode *inode)
-> -{
-> -       if (PageFsCache(page))
-> -               __cifs_fscache_invalidate_page(page, inode);
-> -}
-> -
-> -static inline int cifs_readpage_from_fscache(struct inode *inode,
-> -                                            struct page *page)
-> -{
-> -       if (CIFS_I(inode)->fscache)
-> -               return __cifs_readpage_from_fscache(inode, page);
-> -
-> -       return -ENOBUFS;
-> -}
-> -
-> -static inline int cifs_readpages_from_fscache(struct inode *inode,
-> -                                             struct address_space *mapping,
-> -                                             struct list_head *pages,
-> -                                             unsigned *nr_pages)
-> -{
-> -       if (CIFS_I(inode)->fscache)
-> -               return __cifs_readpages_from_fscache(inode, mapping, pages,
-> -                                                    nr_pages);
-> -       return -ENOBUFS;
-> -}
-> -
-> -static inline void cifs_readpage_to_fscache(struct inode *inode,
-> -                                           struct page *page)
-> -{
-> -       if (PageFsCache(page))
-> -               __cifs_readpage_to_fscache(inode, page);
-> -}
-> -
-> -static inline void cifs_fscache_readpages_cancel(struct inode *inode,
-> -                                                struct list_head *pages)
-> +static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inode)
->  {
-> -       if (CIFS_I(inode)->fscache)
-> -               return __cifs_fscache_readpages_cancel(inode, pages);
-> +       return CIFS_I(inode)->fscache;
->  }
->
->  #else /* CONFIG_CIFS_FSCACHE */
-> @@ -138,34 +92,8 @@ static inline void cifs_fscache_release_inode_cookie(struct inode *inode) {}
->  static inline void cifs_fscache_set_inode_cookie(struct inode *inode,
->                                                  struct file *filp) {}
->  static inline void cifs_fscache_reset_inode_cookie(struct inode *inode) {}
-> -static inline int cifs_fscache_release_page(struct page *page, gfp_t gfp)
-> -{
-> -       return 1; /* May release page */
-> -}
-> -
-> -static inline void cifs_fscache_invalidate_page(struct page *page,
-> -                       struct inode *inode) {}
-> -static inline int
-> -cifs_readpage_from_fscache(struct inode *inode, struct page *page)
-> -{
-> -       return -ENOBUFS;
-> -}
->
-> -static inline int cifs_readpages_from_fscache(struct inode *inode,
-> -                                             struct address_space *mapping,
-> -                                             struct list_head *pages,
-> -                                             unsigned *nr_pages)
-> -{
-> -       return -ENOBUFS;
-> -}
-> -
-> -static inline void cifs_readpage_to_fscache(struct inode *inode,
-> -                       struct page *page) {}
-> -
-> -static inline void cifs_fscache_readpages_cancel(struct inode *inode,
-> -                                                struct list_head *pages)
-> -{
-> -}
-> +static inline struct fscache_cookie *cifs_inode_cookie(struct inode *inode) { return NULL; }
->
->  #endif /* CONFIG_CIFS_FSCACHE */
->
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index 794fc3b68b4f..788b5a364365 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -36,6 +36,7 @@
->  #include <linux/uuid.h>
->  #include <linux/pagemap.h>
->  #include <linux/xattr.h>
-> +#include <linux/netfs.h>
->  #include "smb2pdu.h"
->  #include "cifsglob.h"
->  #include "cifsacl.h"
-> @@ -3984,7 +3985,14 @@ smb2_readv_callback(struct mid_q_entry *mid)
->                                      tcon->tid, tcon->ses->Suid,
->                                      rdata->offset, rdata->got_bytes);
->
-> -       queue_work(cifsiod_wq, &rdata->work);
-> +       if (rdata->subreq) {
-> +               netfs_subreq_terminated(rdata->subreq,
-> +                                       (rdata->result == 0 || rdata->result == -EAGAIN) ?
-> +                                       rdata->got_bytes : rdata->result);
-> +               kref_put(&rdata->refcount, cifs_readdata_release);
-> +       } else {
-> +               queue_work(cifsiod_wq, &rdata->work);
-> +       }
->         DeleteMidQEntry(mid);
->         add_credits(server, &credits, 0);
->  }
->
 
-Hi David,
+--3V7upXqbjpZ4EhLz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I went through the above changes. Overall, the new netfs helper APIs
-do appear to make things a lot easier for the netfs.
+tree:   git://git.samba.org/sfrench/cifs-2.6.git for-next
+head:   93223fc8b35a801dbd2b3423c20035e8427d3271
+commit: d01a3530e1ec321e74b0a4ca99e343bcb6c0dda6 [17/18] cifs: avoid starvation when refreshing dfs cache
+config: mips-nlm_xlp_defconfig (attached as .config)
+compiler: mips64-linux-gcc (GCC) 9.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        git remote add cifs git://git.samba.org/sfrench/cifs-2.6.git
+        git fetch --no-tags cifs for-next
+        git checkout d01a3530e1ec321e74b0a4ca99e343bcb6c0dda6
+        # save the attached .config to linux build tree
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-9.3.0 make.cross ARCH=mips 
 
-However, I see that you've thrown away the old way to control
-invalidation/release of fscache pages for an inode and replaced them
-with a wait on the page's fscache bit.
-Wouldn't fscache benefit from knowing the pages that are no longer
-necessary? Don't we need to tell fscache that the pages are no longer
-needed?
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-And how can a netfs request the fscache to flush all the dirty pages
-for an inode?
-The reason being that the data is still dirty, as long as it is not
-written to the server.
-For various reasons, cifs.ko may need to know that all the dirty data
-for an inode is written back to the server, before proceeding.
+All warnings (new ones prefixed by >>):
 
--- 
-Regards,
-Shyam
+   fs/cifs/dfs_cache.c: In function 'refresh_cache':
+>> fs/cifs/dfs_cache.c:1433:1: warning: the frame size of 1120 bytes is larger than 1024 bytes [-Wframe-larger-than=]
+    1433 | }
+         | ^
+
+
+vim +1433 fs/cifs/dfs_cache.c
+
+345c1a4a9e09dc Paulo Alcantara (SUSE  2019-12-04  1366) 
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1367  static void refresh_cache(struct cifs_ses **sessions)
+5072010ccf0592 Paulo Alcantara (SUSE  2019-03-19  1368) {
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1369  	int i;
+5072010ccf0592 Paulo Alcantara (SUSE  2019-03-19  1370) 	struct cifs_ses *ses;
+54be1f6c1c3749 Paulo Alcantara        2018-11-14  1371  	unsigned int xid;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1372  	struct {
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1373  		char *path;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1374  		struct cifs_ses *ses;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1375  	} referrals[CACHE_MAX_ENTRIES];
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1376  	int count = 0;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1377  	struct cache_entry *ce;
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1378  
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1379  	/*
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1380  	 * Refresh all cached entries.  Get all new referrals outside critical section to avoid
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1381  	 * starvation while performing SMB2 IOCTL on broken or slow connections.
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1382  
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1383  	 * The cache entries may cover more paths than the active mounts
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1384  	 * (e.g. domain-based DFS referrals or multi tier DFS setups).
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1385  	 */
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1386  	down_read(&htable_rw_lock);
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1387  	for (i = 0; i < CACHE_HTABLE_SIZE; i++) {
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1388  		struct hlist_head *l = &cache_htable[i];
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1389  
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1390  		hlist_for_each_entry(ce, l, hlist) {
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1391  			if (count == ARRAY_SIZE(referrals))
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1392  				goto out_unlock;
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1393  			if (hlist_unhashed(&ce->hlist) || !cache_entry_expired(ce))
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1394  				continue;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1395  			referrals[count].path = kstrdup(ce->path, GFP_ATOMIC);
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1396  			referrals[count++].ses = find_ipc_from_server_path(sessions, ce->path);
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1397  		}
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1398  	}
+54be1f6c1c3749 Paulo Alcantara        2018-11-14  1399  
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1400  out_unlock:
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1401  	up_read(&htable_rw_lock);
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1402  
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1403  	for (i = 0; i < count; i++) {
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1404  		char *path = referrals[i].path;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1405  		struct dfs_info3_param *refs = NULL;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1406  		int numrefs = 0;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1407  		int rc = 0;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1408  
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1409  		ses = referrals[i].ses;
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1410  		if (!path || IS_ERR(ses))
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1411  			goto next_referral;
+742d8de0186e9f Paulo Alcantara (SUSE  2019-12-04  1412) 
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1413  		xid = get_xid();
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1414  		rc = get_dfs_referral(xid, ses, path, &refs, &numrefs);
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04  1415  		free_xid(xid);
+54be1f6c1c3749 Paulo Alcantara        2018-11-14  1416  
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1417  		if (!rc) {
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1418  			down_write(&htable_rw_lock);
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1419  			ce = lookup_cache_entry(path);
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1420  			/*
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1421  			 * We need to re-check it because other tasks might have it deleted or
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1422  			 * updated.
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1423  			 */
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1424  			if (!IS_ERR(ce) && cache_entry_expired(ce))
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1425  				update_cache_entry_locked(ce, refs, numrefs);
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1426  			up_write(&htable_rw_lock);
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1427  		}
+5072010ccf0592 Paulo Alcantara (SUSE  2019-03-19  1428) 
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1429  next_referral:
+d01a3530e1ec32 Paulo Alcantara        2021-06-08  1430  		kfree(path);
+54be1f6c1c3749 Paulo Alcantara        2018-11-14  1431  		free_dfs_info_array(refs, numrefs);
+54be1f6c1c3749 Paulo Alcantara        2018-11-14  1432  	}
+c3d785fa5c7bdb Paulo Alcantara        2021-06-04 @1433  }
+54be1f6c1c3749 Paulo Alcantara        2018-11-14  1434  
+
+:::::: The code at line 1433 was first introduced by commit
+:::::: c3d785fa5c7bdbe69cb8b223cf84396d873202ea cifs: keep referral server sessions alive
+
+:::::: TO: Paulo Alcantara <pc@cjr.nz>
+:::::: CC: Steve French <stfrench@microsoft.com>
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+
+--3V7upXqbjpZ4EhLz
+Content-Type: application/gzip
+Content-Disposition: attachment; filename=".config.gz"
+Content-Transfer-Encoding: base64
+
+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
+
+--3V7upXqbjpZ4EhLz--
