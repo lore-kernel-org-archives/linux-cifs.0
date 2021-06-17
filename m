@@ -2,87 +2,115 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6950BC2B9F4
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 08:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6DCBC49361
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 09:27:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 379DB613B9
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 08:55:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94D75613DF
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 09:27:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230526AbhFQI5U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Jun 2021 04:57:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45226 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230291AbhFQI5U (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Jun 2021 04:57:20 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B14C061574;
-        Thu, 17 Jun 2021 01:55:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=7kLQp6MYKDk8/sAaxwp980AGLDLmbDndmOr3pBheMP8=; b=s8gPNuR5E60SDx/0jvFuG+ztKT
-        LhkO7ekXck3IFxpaFRh0aXcx68zPSCb9j8qEojrfsBzB458A8Wpo3blG/4i9Fgwvbw3TjTMpCRW59
-        VDdK549e9Uj+LlQ4b0QFL2VyktYjZNBGvUW6vlpaztsCzTyyYhazCPnhn1tUZ5f4pnweFZ+zoTfcW
-        vi3pQgHb9r1oipRjtDslyHYP3KK6c5uEA0YJ0qhlIfuVzu7oTLsvgGpZktf1hxdc8y2w+1WnpyYtm
-        5hFg7oBbDir+o13KteeAI+h/AHOcmJHO7kEJdITTE4WSd+WSgTmHe3mKfyx7gYxOZETR30oq6EHa1
-        6BJ7DQog==;
-Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ltnnN-008wOt-0k; Thu, 17 Jun 2021 08:54:45 +0000
-Date:   Thu, 17 Jun 2021 09:54:41 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        linux-fsdevel@vger.kernel.org, Dave Chinner <david@fromorbit.com>,
-        ceph-devel@vger.kernel.org, Chao Yu <yuchao0@huawei.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Johannes Thumshirn <jth@kernel.org>,
-        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
-        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
-        Matthew Wilcox <willy@infradead.org>,
-        Pavel Reichl <preichl@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Eric Sandeen <sandeen@redhat.com>
-Subject: Re: [PATCH 07/14] xfs: Refactor xfs_isilocked()
-Message-ID: <YMsN0beVOAXn0Mx4@infradead.org>
-References: <20210615090844.6045-1-jack@suse.cz>
- <20210615091814.28626-7-jack@suse.cz>
- <YMr/eA3Eq2u6yUNw@infradead.org>
- <20210617085319.GD32587@quack2.suse.cz>
+        id S231490AbhFQJ32 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Jun 2021 05:29:28 -0400
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:8872 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231252AbhFQJ30 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 17 Jun 2021 05:29:26 -0400
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15H9GckB025155;
+        Thu, 17 Jun 2021 09:26:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=qujzn587D0Q2bLjdZk/oxp+PqRdUi4X2qEhbIM5kU3E=;
+ b=aD8L4a/vErGhdvq7FkmTwbf+487fmYxLeIyUMP3xFHmHj3ryNdUY347cWLWm9hUK9rJb
+ b1H8WEnL4QxmF+DwAhZeoVUDD4p1rRvDRFJIIKndClAYVrqL2zIfbqMx1MVo/OMTLoJP
+ ttCkk745Vj0+HRL3pRJJ/PTNOkqFNAXe2jIpV/bVPJLfTp4dNQkRxEXb3cPrzAUmVi2p
+ qrCA542bwS85T0L9YYJ0m3wz6LQEXhe9gGeB5NfdL6yRkV0bgc90BXBTaVRP1darszNt
+ aZ+Le0WW+DIKbdrS6FoS/FoWdt+Elc2zR8wkSbpmDA0vTxAeK/rwFZt5PhXR0gg9g8nb XA== 
+Received: from oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 396tr0v3wk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Jun 2021 09:26:52 +0000
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [127.0.0.1])
+        by pps.podrdrct (8.16.0.36/8.16.0.36) with SMTP id 15H9QpJR039994;
+        Thu, 17 Jun 2021 09:26:51 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by aserp3020.oracle.com with ESMTP id 396wav5w84-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Jun 2021 09:26:51 +0000
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 15H9KxOA019039;
+        Thu, 17 Jun 2021 09:26:50 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3020.oracle.com with ESMTP id 396wav5w77-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Jun 2021 09:26:50 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 15H9Qlvr010759;
+        Thu, 17 Jun 2021 09:26:47 GMT
+Received: from kadam (/102.222.70.252)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 17 Jun 2021 02:26:47 -0700
+Date:   Thu, 17 Jun 2021 12:26:39 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Baokun Li <libaokun1@huawei.com>
+Cc:     Namjae Jeon <namjae.jeon@samsung.com>,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org,
+        linux-cifsd-devel@lists.sourceforge.net,
+        kernel-janitors@vger.kernel.org, Hulk Robot <hulkci@huawei.com>
+Subject: Re: [PATCH -next] cifsd: fix WARNING: convert list_for_each to entry
+ variant in smb2pdu.c
+Message-ID: <20210617092639.GD1861@kadam>
+References: <20210617064653.3193618-1-libaokun1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210617085319.GD32587@quack2.suse.cz>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210617064653.3193618-1-libaokun1@huawei.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-GUID: AzCRVm5ZkCMFjj1jO_ZDIpZLa_EdIOWt
+X-Proofpoint-ORIG-GUID: AzCRVm5ZkCMFjj1jO_ZDIpZLa_EdIOWt
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jun 17, 2021 at 10:53:19AM +0200, Jan Kara wrote:
-> On Thu 17-06-21 08:53:28, Christoph Hellwig wrote:
-> > On Tue, Jun 15, 2021 at 11:17:57AM +0200, Jan Kara wrote:
-> > > From: Pavel Reichl <preichl@redhat.com>
-> > > 
-> > > Refactor xfs_isilocked() to use newly introduced __xfs_rwsem_islocked().
-> > > __xfs_rwsem_islocked() is a helper function which encapsulates checking
-> > > state of rw_semaphores hold by inode.
-> > 
-> > Looks good with the updated commit log:
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Thu, Jun 17, 2021 at 02:46:53PM +0800, Baokun Li wrote:
+> convert list_for_each() to list_for_each_entry() where
+> applicable.
 > 
-> I suppose you mean Reviewed-by, don't you?
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Baokun Li <libaokun1@huawei.com>
+> ---
+>  fs/cifsd/smb2pdu.c | 15 ++++-----------
+>  1 file changed, 4 insertions(+), 11 deletions(-)
+> 
+> diff --git a/fs/cifsd/smb2pdu.c b/fs/cifsd/smb2pdu.c
+> index ac15a9287310..22ef1d9eed1b 100644
+> --- a/fs/cifsd/smb2pdu.c
+> +++ b/fs/cifsd/smb2pdu.c
+> @@ -74,10 +74,7 @@ static inline int check_session_id(struct ksmbd_conn *conn, u64 id)
+>  struct channel *lookup_chann_list(struct ksmbd_session *sess)
+>  {
+>  	struct channel *chann;
+> -	struct list_head *t;
+> -
+> -	list_for_each(t, &sess->ksmbd_chann_list) {
+> -		chann = list_entry(t, struct channel, chann_list);
+> +	list_for_each_entry(chann, &sess->ksmbd_chann_list, chann_list) {
+>  		if (chann && chann->conn == sess->conn)
 
-Yes:
+"chan" is the list iterator and it can't be NULL.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+>  			return chann;
+>  	}
+
+regards,
+dan carpenter
+
