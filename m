@@ -2,116 +2,78 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA91C2B9F4
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 07:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01D8C48BE5
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 07:53:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60A57613D5
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 07:42:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5092613C1
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 07:53:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229686AbhFQHo4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Jun 2021 03:44:56 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4828 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229666AbhFQHox (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Jun 2021 03:44:53 -0400
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4G5DRR5w96zXglR;
-        Thu, 17 Jun 2021 15:37:39 +0800 (CST)
-Received: from dggpeml500020.china.huawei.com (7.185.36.88) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 17 Jun 2021 15:42:41 +0800
-Received: from huawei.com (10.175.127.227) by dggpeml500020.china.huawei.com
- (7.185.36.88) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Thu, 17 Jun
- 2021 15:42:41 +0800
-From:   Baokun Li <libaokun1@huawei.com>
-To:     <libaokun1@huawei.com>, Namjae Jeon <namjae.jeon@samsung.com>,
-        "Sergey Senozhatsky" <sergey.senozhatsky@gmail.com>,
-        Steve French <sfrench@samba.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>
-CC:     <linux-cifs@vger.kernel.org>,
-        <linux-cifsd-devel@lists.sourceforge.net>,
-        <kernel-janitors@vger.kernel.org>, Hulk Robot <hulkci@huawei.com>
-Subject: [PATCH -next v2] cifsd: convert list_for_each to entry variant in smb2pdu.c
-Date:   Thu, 17 Jun 2021 15:51:39 +0800
-Message-ID: <20210617075139.3282382-1-libaokun1@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        id S229805AbhFQH4A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Jun 2021 03:56:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59810 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229666AbhFQH4A (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Jun 2021 03:56:00 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7B01C061574;
+        Thu, 17 Jun 2021 00:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=s/guCNqWCkmsU7CrB51RF3NwfMDPZgiKfP50tfDySTw=; b=RuKUcH4MTj4hHByqmtwofNJuj8
+        y86MhiLUnWdHgYd3gfLOkP03hk0uealQEX588h3dG7cyXKqw7wbAYEhrhF+3ozbDgRhEyR6aSPEal
+        o566CZ8ndKyagLU9eDpPq81xCsrrb/dAut7MsVY3EO6oqrG2gyW6/cm8Hk0dBC2182oXDjJsVxt9X
+        1LSuSj4dBjh8AyLOHRgwxxQdXB3XupKzpMSDLQltN2b/hsXGcokulPLJw5inKYoj0t1LOA74xpjbc
+        J8UJv2QD9U4FSe2vuTejCTX1Lp7+ZroVPcKBcQhUsNBY9HGXxLD2bo1WN4n2bNX7t34eI3SCBjLnp
+        udzBWqDA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ltmq8-008tCW-Mo; Thu, 17 Jun 2021 07:53:34 +0000
+Date:   Thu, 17 Jun 2021 08:53:28 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Dave Chinner <david@fromorbit.com>, ceph-devel@vger.kernel.org,
+        Chao Yu <yuchao0@huawei.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Johannes Thumshirn <jth@kernel.org>,
+        linux-cifs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
+        Steve French <sfrench@samba.org>, Ted Tso <tytso@mit.edu>,
+        Matthew Wilcox <willy@infradead.org>,
+        Pavel Reichl <preichl@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Eric Sandeen <sandeen@redhat.com>
+Subject: Re: [PATCH 07/14] xfs: Refactor xfs_isilocked()
+Message-ID: <YMr/eA3Eq2u6yUNw@infradead.org>
+References: <20210615090844.6045-1-jack@suse.cz>
+ <20210615091814.28626-7-jack@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500020.china.huawei.com (7.185.36.88)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210615091814.28626-7-jack@suse.cz>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-convert list_for_each() to list_for_each_entry() where
-applicable.
+On Tue, Jun 15, 2021 at 11:17:57AM +0200, Jan Kara wrote:
+> From: Pavel Reichl <preichl@redhat.com>
+> 
+> Refactor xfs_isilocked() to use newly introduced __xfs_rwsem_islocked().
+> __xfs_rwsem_islocked() is a helper function which encapsulates checking
+> state of rw_semaphores hold by inode.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Baokun Li <libaokun1@huawei.com>
----
-V1->V2:
-        Modified Patch Title
+Looks good with the updated commit log:
 
- fs/cifsd/smb2pdu.c | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
-
-diff --git a/fs/cifsd/smb2pdu.c b/fs/cifsd/smb2pdu.c
-index ac15a9287310..22ef1d9eed1b 100644
---- a/fs/cifsd/smb2pdu.c
-+++ b/fs/cifsd/smb2pdu.c
-@@ -74,10 +74,7 @@ static inline int check_session_id(struct ksmbd_conn *conn, u64 id)
- struct channel *lookup_chann_list(struct ksmbd_session *sess)
- {
- 	struct channel *chann;
--	struct list_head *t;
--
--	list_for_each(t, &sess->ksmbd_chann_list) {
--		chann = list_entry(t, struct channel, chann_list);
-+	list_for_each_entry(chann, &sess->ksmbd_chann_list, chann_list) {
- 		if (chann && chann->conn == sess->conn)
- 			return chann;
- 	}
-@@ -6258,7 +6255,6 @@ int smb2_cancel(struct ksmbd_work *work)
- 	struct smb2_hdr *hdr = work->request_buf;
- 	struct smb2_hdr *chdr;
- 	struct ksmbd_work *cancel_work = NULL;
--	struct list_head *tmp;
- 	int canceled = 0;
- 	struct list_head *command_list;
- 
-@@ -6269,9 +6265,8 @@ int smb2_cancel(struct ksmbd_work *work)
- 		command_list = &conn->async_requests;
- 
- 		spin_lock(&conn->request_lock);
--		list_for_each(tmp, command_list) {
--			cancel_work = list_entry(tmp, struct ksmbd_work,
--						 async_request_entry);
-+		list_for_each_entry(cancel_work, command_list,
-+				    async_request_entry) {
- 			chdr = cancel_work->request_buf;
- 
- 			if (cancel_work->async_id !=
-@@ -6290,9 +6285,7 @@ int smb2_cancel(struct ksmbd_work *work)
- 		command_list = &conn->requests;
- 
- 		spin_lock(&conn->request_lock);
--		list_for_each(tmp, command_list) {
--			cancel_work = list_entry(tmp, struct ksmbd_work,
--						 request_entry);
-+		list_for_each_entry(cancel_work, command_list, request_entry) {
- 			chdr = cancel_work->request_buf;
- 
- 			if (chdr->MessageId != hdr->MessageId ||
--- 
-2.31.1
-
+Signed-off-by: Christoph Hellwig <hch@lst.de>
