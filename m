@@ -7,29 +7,29 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E13C2B9F4
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 06:37:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA91C2B9F4
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 07:42:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F817613F1
-	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 06:37:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60A57613D5
+	for <linux-cifs@archiver.kernel.org>; Thu, 17 Jun 2021 07:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229729AbhFQGkE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 17 Jun 2021 02:40:04 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4823 "EHLO
+        id S229686AbhFQHo4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 17 Jun 2021 03:44:56 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4828 "EHLO
         szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229712AbhFQGkE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Jun 2021 02:40:04 -0400
+        with ESMTP id S229666AbhFQHox (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 17 Jun 2021 03:44:53 -0400
 Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4G5C0h57Q1zXgkx;
-        Thu, 17 Jun 2021 14:32:52 +0800 (CST)
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4G5DRR5w96zXglR;
+        Thu, 17 Jun 2021 15:37:39 +0800 (CST)
 Received: from dggpeml500020.china.huawei.com (7.185.36.88) by
  dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Thu, 17 Jun 2021 14:37:54 +0800
+ 15.1.2176.2; Thu, 17 Jun 2021 15:42:41 +0800
 Received: from huawei.com (10.175.127.227) by dggpeml500020.china.huawei.com
  (7.185.36.88) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Thu, 17 Jun
- 2021 14:37:54 +0800
+ 2021 15:42:41 +0800
 From:   Baokun Li <libaokun1@huawei.com>
 To:     <libaokun1@huawei.com>, Namjae Jeon <namjae.jeon@samsung.com>,
         "Sergey Senozhatsky" <sergey.senozhatsky@gmail.com>,
@@ -38,15 +38,15 @@ To:     <libaokun1@huawei.com>, Namjae Jeon <namjae.jeon@samsung.com>,
 CC:     <linux-cifs@vger.kernel.org>,
         <linux-cifsd-devel@lists.sourceforge.net>,
         <kernel-janitors@vger.kernel.org>, Hulk Robot <hulkci@huawei.com>
-Subject: [PATCH -next] cifsd: fix WARNING: convert list_for_each to entry variant in smb2pdu.c
-Date:   Thu, 17 Jun 2021 14:46:53 +0800
-Message-ID: <20210617064653.3193618-1-libaokun1@huawei.com>
+Subject: [PATCH -next v2] cifsd: convert list_for_each to entry variant in smb2pdu.c
+Date:   Thu, 17 Jun 2021 15:51:39 +0800
+Message-ID: <20210617075139.3282382-1-libaokun1@huawei.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type:   text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
 X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  dggpeml500020.china.huawei.com (7.185.36.88)
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -59,6 +59,9 @@ applicable.
 Reported-by: Hulk Robot <hulkci@huawei.com>
 Signed-off-by: Baokun Li <libaokun1@huawei.com>
 ---
+V1->V2:
+        Modified Patch Title
+
  fs/cifsd/smb2pdu.c | 15 ++++-----------
  1 file changed, 4 insertions(+), 11 deletions(-)
 
@@ -109,4 +112,6 @@ index ac15a9287310..22ef1d9eed1b 100644
  			chdr = cancel_work->request_buf;
  
  			if (chdr->MessageId != hdr->MessageId ||
+-- 
+2.31.1
 
