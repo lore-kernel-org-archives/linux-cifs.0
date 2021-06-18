@@ -8,168 +8,179 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 719DFC48BDF
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Jun 2021 04:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 104B6C48BDF
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Jun 2021 04:16:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5100061351
-	for <linux-cifs@archiver.kernel.org>; Fri, 18 Jun 2021 04:09:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E085861139
+	for <linux-cifs@archiver.kernel.org>; Fri, 18 Jun 2021 04:16:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229591AbhFRELZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 18 Jun 2021 00:11:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47652 "EHLO
+        id S230197AbhFRESs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 18 Jun 2021 00:18:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229466AbhFRELX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Jun 2021 00:11:23 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FA34C061574
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Jun 2021 21:09:13 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id a1so13928118lfr.12
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Jun 2021 21:09:13 -0700 (PDT)
+        with ESMTP id S229475AbhFRESr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 18 Jun 2021 00:18:47 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D5F9C061574;
+        Thu, 17 Jun 2021 21:16:37 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id d13so12074480ljg.12;
+        Thu, 17 Jun 2021 21:16:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Jq4B3avybY4XSJGB+m+7/MptGTh/l5uH9dNGzWIr4yg=;
-        b=jcWa7DBTrJ0TdVGBWFgGBZYAbXYh0sUIYIcRYFtab3oEWf65kyQ5XamN058Jb6UTvb
-         igcQaSB+lSA5rZxMYN81aERwk5gZebZgsBGJdEUiX6qEXiXV6HMxROEPZzGP3HdhGdei
-         rLuNhkPF9/xOZPGWOnnmFNf2lsVuKXfmJsB3XLWn7XlRsYzVkLQq+QufiTwiwnA0KLl8
-         3AQe+f6AzsNOQKAqd/wmils9VZkN4cxA0Zq53t5Z9cJGR/HaQGqvDMTsEULhSQU878Q4
-         DZ8WAAY4lJ+k5F+6EZ2cSqBVCc1R06iXJUAANpHFLxUdaUQvGPmwO1vs4CDiYTZoEjYH
-         moKQ==
+        bh=mCvwX5+vk8V7BQG3zhJB8owe7BcQtEPZvcZWN8YaLew=;
+        b=oEYG8+1CdEWGShhblOI/IyYWbzHssVqmiSiHw5NzI8Mp8BwFBsE+tvAN9SKTZosZ8C
+         cVmuWm4BKMXDz2GNjzBvWoYQhMyG8PiBunVcmZXWAF0zJBxgCEe+UKRHfzaW0LmTNjkD
+         RQFNhEZvTFGKfx0ApcUyomqirzARoHl75LAv7FoPZFR3xsvfFCpbgIalrAR+TNIOHCub
+         iNW1U6t6llTqFiN55Z7gcwmLPJEgUiaM3xQ1xVsxrTW4muT38lWurIkdTVjHQB6KGi1+
+         JRhE5uHMM8CawEo2dPpGQAtPDmpJex6bs3ztJLhKJt6D7j9OwPQfxkJ/FlVKay4Z6ACj
+         O68A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Jq4B3avybY4XSJGB+m+7/MptGTh/l5uH9dNGzWIr4yg=;
-        b=VqIdYpghb0YX67tinGPmwvrrr+7yTXx2oYnx3bFgKEc85HvXSJ0H23cNik2lKigRkY
-         /8GnEsHZVg6d85rlIWcIqffwds3sxyZS9045QSqaZueU1f3SR9bkdcXAZ4tfyrYzDOiT
-         trUg/crC8oWx76kAsw0IMAjP1DWxOUtFcpvts0/YtL7lrFJwYGLUHgGt01l86YIlcrgD
-         H/P7UmfwQ9tu42/Oxfnl2BFDsRw0AIFOVsUgQiyApDhsmVKbFhLt465cDRUIRj26Umhq
-         /Qm8+lzQtfDCaaYdLDo20JXxGiafzrp+v+SQclppp5JuE5W6By4Tecy9h8ViTE5PUDh/
-         xtqQ==
-X-Gm-Message-State: AOAM530qirf5vqJc3oeUQdcoo7+2g6xIop4JaDcN1YXtoteUWwHJ/SnL
-        tan7FcYzf7zqV4N4nfUmZ+za9t+tmBRyqdWwQRqW+vlO9yc=
-X-Google-Smtp-Source: ABdhPJzIYbjU2ZRtbsX5ujNBEyUXQ0Ck1xktimwEcny8DIPMY2pIK1R5BDce2j9uPnOScdrs3iHcsy6eUFXqc2ScL60=
-X-Received: by 2002:a19:ae16:: with SMTP id f22mr1436889lfc.313.1623989351335;
- Thu, 17 Jun 2021 21:09:11 -0700 (PDT)
+        bh=mCvwX5+vk8V7BQG3zhJB8owe7BcQtEPZvcZWN8YaLew=;
+        b=N0v5w5XeixzJLLqB+AK32FhNHLU5km241GnEQGzewUEezYag9JS/b++fxbznKA+Bqq
+         q1jxVAxTPNitl5Mfbmgr+sxzEeojJM2jQyEjdpfFgytgz0RMV0HwpdiK99GHacmlBq1n
+         SPmOQAVkMkOUwqdmkw6ym55WaZHrKD4dAAGOrjoi1OQf1R9SoN5dskPREukSrDmFy2F/
+         /C17Jdl7codSkHVHYe/KKFEsc02PjCPmNXAQKEBX4S8GRk3BAb9bsHjwp21WK6DA9nHo
+         Z3bPfLEPS2HQL2mAjHBRgXrB12TJScYfORb20qCLXmEcvWpP8gX6OvRPwkeKN5RG9O15
+         cXAg==
+X-Gm-Message-State: AOAM531Zu6N6FZYdexNuW+c/EJP+xOsagS7/V+Vh6BRgJspDYPX79ych
+        q56qzLd4xpWqT3FojV3T1sfuWlpTs3Pez2t49zU=
+X-Google-Smtp-Source: ABdhPJyUpDXqDD148jq7aVQbdrvt2B+K8YJqgK8iUPmc8bAHZhIJU3ufjCvD+JeK061NBce1HekS9JsPcwAIEHa94oA=
+X-Received: by 2002:a2e:a234:: with SMTP id i20mr7894780ljm.272.1623989795895;
+ Thu, 17 Jun 2021 21:16:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210617084122.1117-1-thunder.leizhen@huawei.com>
-In-Reply-To: <20210617084122.1117-1-thunder.leizhen@huawei.com>
+References: <20210618040232.2550645-1-libaokun1@huawei.com>
+In-Reply-To: <20210618040232.2550645-1-libaokun1@huawei.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 17 Jun 2021 23:09:00 -0500
-Message-ID: <CAH2r5msQ4NKah88JOo4yX9jZtogLnfscULRtvbn21+aP=0x=jQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] cifs: remove unnecessary oom message
-To:     Zhen Lei <thunder.leizhen@huawei.com>
+Date:   Thu, 17 Jun 2021 23:16:24 -0500
+Message-ID: <CAH2r5msqnE+1=yfd_E32MNY0qpgRokMJzQ4j88_RC2rBYGMxqQ@mail.gmail.com>
+Subject: Re: [PATCH -next v2] cifs: convert list_for_each to entry variant in smb2misc.c
+To:     Baokun Li <libaokun1@huawei.com>
 Cc:     Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        samba-technical <samba-technical@lists.samba.org>,
+        kernel-janitors <kernel-janitors@vger.kernel.org>,
+        Hulk Robot <hulkci@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-I am curious the motivation for these - I agree that removing the
-debug messages saves (albeit trivial amount of) memory but curious
-about how other areas of the kernel handle logging low memory/out of
-memory issues?
+tentatively merged into cifs-2.6.git for-next
 
-On Thu, Jun 17, 2021 at 3:42 AM Zhen Lei <thunder.leizhen@huawei.com> wrote:
+On Thu, Jun 17, 2021 at 11:02 PM Baokun Li <libaokun1@huawei.com> wrote:
 >
-> Fixes scripts/checkpatch.pl warning:
-> WARNING: Possible unnecessary 'out of memory' message
+> convert list_for_each() to list_for_each_entry() where
+> applicable.
 >
-> Remove it can help us save a bit of memory.
->
-> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Baokun Li <libaokun1@huawei.com>
 > ---
->  fs/cifs/cifsencrypt.c | 4 +---
->  fs/cifs/connect.c     | 6 +-----
->  fs/cifs/sess.c        | 6 +-----
->  fs/cifs/smb2pdu.c     | 2 --
->  4 files changed, 3 insertions(+), 15 deletions(-)
+> V1->V2:
+>         Convert the missing list_for_each to entry
 >
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index b8f1ff9a83f3..74f16730e502 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -787,10 +787,8 @@ calc_seckey(struct cifs_ses *ses)
->         get_random_bytes(sec_key, CIFS_SESS_KEY_SIZE);
+>  fs/cifs/smb2misc.c | 33 ++++++++-------------------------
+>  1 file changed, 8 insertions(+), 25 deletions(-)
 >
->         ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
-> -       if (!ctx_arc4) {
-> -               cifs_dbg(VFS, "Could not allocate arc4 context\n");
-> +       if (!ctx_arc4)
->                 return -ENOMEM;
-> -       }
+> diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
+> index 06d555d4da9a..aba048153f79 100644
+> --- a/fs/cifs/smb2misc.c
+> +++ b/fs/cifs/smb2misc.c
+> @@ -164,12 +164,10 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *srvr)
+>                 struct smb2_transform_hdr *thdr =
+>                         (struct smb2_transform_hdr *)buf;
+>                 struct cifs_ses *ses = NULL;
+> -               struct list_head *tmp;
 >
->         arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
->         arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 05f5c84a63a4..b52bb6dc6ecb 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -97,10 +97,8 @@ static int reconn_set_ipaddr_from_hostname(struct TCP_Server_Info *server)
->         len = strlen(server->hostname) + 3;
+>                 /* decrypt frame now that it is completely read in */
+>                 spin_lock(&cifs_tcp_ses_lock);
+> -               list_for_each(tmp, &srvr->smb_ses_list) {
+> -                       ses = list_entry(tmp, struct cifs_ses, smb_ses_list);
+> +               list_for_each_entry(ses, &srvr->smb_ses_list, smb_ses_list) {
+>                         if (ses->Suid == thdr->SessionId)
+>                                 break;
 >
->         unc = kmalloc(len, GFP_KERNEL);
-> -       if (!unc) {
-> -               cifs_dbg(FYI, "%s: failed to create UNC path\n", __func__);
-> +       if (!unc)
->                 return -ENOMEM;
-> -       }
->         scnprintf(unc, len, "\\\\%s", server->hostname);
+> @@ -548,7 +546,6 @@ static bool
+>  smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp)
+>  {
+>         __u8 lease_state;
+> -       struct list_head *tmp;
+>         struct cifsFileInfo *cfile;
+>         struct cifsInodeInfo *cinode;
+>         int ack_req = le32_to_cpu(rsp->Flags &
+> @@ -556,8 +553,7 @@ smb2_tcon_has_lease(struct cifs_tcon *tcon, struct smb2_lease_break *rsp)
 >
->         rc = dns_resolve_server_name_to_ip(unc, &ipaddr);
-> @@ -1758,8 +1756,6 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
->         if (is_domain && ses->domainName) {
->                 ctx->domainname = kstrdup(ses->domainName, GFP_KERNEL);
->                 if (!ctx->domainname) {
-> -                       cifs_dbg(FYI, "Unable to allocate %zd bytes for domain\n",
-> -                                len);
->                         rc = -ENOMEM;
->                         kfree(ctx->username);
->                         ctx->username = NULL;
-> diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-> index cd19aa11f27e..cc97b2981c3d 100644
-> --- a/fs/cifs/sess.c
-> +++ b/fs/cifs/sess.c
-> @@ -602,10 +602,8 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
->         if (tilen) {
->                 ses->auth_key.response = kmemdup(bcc_ptr + tioffset, tilen,
->                                                  GFP_KERNEL);
-> -               if (!ses->auth_key.response) {
-> -                       cifs_dbg(VFS, "Challenge target info alloc failure\n");
-> +               if (!ses->auth_key.response)
->                         return -ENOMEM;
-> -               }
->                 ses->auth_key.len = tilen;
->         }
+>         lease_state = le32_to_cpu(rsp->NewLeaseState);
 >
-> @@ -1338,8 +1336,6 @@ sess_auth_kerberos(struct sess_data *sess_data)
->         ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
->                                          GFP_KERNEL);
->         if (!ses->auth_key.response) {
-> -               cifs_dbg(VFS, "Kerberos can't allocate (%u bytes) memory\n",
-> -                        msg->sesskey_len);
->                 rc = -ENOMEM;
->                 goto out_put_spnego_key;
->         }
-> diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-> index c205f93e0a10..2b978564e188 100644
-> --- a/fs/cifs/smb2pdu.c
-> +++ b/fs/cifs/smb2pdu.c
-> @@ -1355,8 +1355,6 @@ SMB2_auth_kerberos(struct SMB2_sess_data *sess_data)
->                 ses->auth_key.response = kmemdup(msg->data, msg->sesskey_len,
->                                                  GFP_KERNEL);
->                 if (!ses->auth_key.response) {
-> -                       cifs_dbg(VFS, "Kerberos can't allocate (%u bytes) memory\n",
-> -                                msg->sesskey_len);
->                         rc = -ENOMEM;
->                         goto out_put_spnego_key;
->                 }
+> -       list_for_each(tmp, &tcon->openFileList) {
+> -               cfile = list_entry(tmp, struct cifsFileInfo, tlist);
+> +       list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+>                 cinode = CIFS_I(d_inode(cfile->dentry));
+>
+>                 if (memcmp(cinode->lease_key, rsp->LeaseKey,
+> @@ -618,7 +614,6 @@ static bool
+>  smb2_is_valid_lease_break(char *buffer)
+>  {
+>         struct smb2_lease_break *rsp = (struct smb2_lease_break *)buffer;
+> -       struct list_head *tmp, *tmp1, *tmp2;
+>         struct TCP_Server_Info *server;
+>         struct cifs_ses *ses;
+>         struct cifs_tcon *tcon;
+> @@ -628,15 +623,9 @@ smb2_is_valid_lease_break(char *buffer)
+>
+>         /* look up tcon based on tid & uid */
+>         spin_lock(&cifs_tcp_ses_lock);
+> -       list_for_each(tmp, &cifs_tcp_ses_list) {
+> -               server = list_entry(tmp, struct TCP_Server_Info, tcp_ses_list);
+> -
+> -               list_for_each(tmp1, &server->smb_ses_list) {
+> -                       ses = list_entry(tmp1, struct cifs_ses, smb_ses_list);
+> -
+> -                       list_for_each(tmp2, &ses->tcon_list) {
+> -                               tcon = list_entry(tmp2, struct cifs_tcon,
+> -                                                 tcon_list);
+> +       list_for_each_entry(server, &cifs_tcp_ses_list, tcp_ses_list) {
+> +               list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+> +                       list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
+>                                 spin_lock(&tcon->open_file_lock);
+>                                 cifs_stats_inc(
+>                                     &tcon->stats.cifs_stats.num_oplock_brks);
+> @@ -687,7 +676,6 @@ bool
+>  smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
+>  {
+>         struct smb2_oplock_break *rsp = (struct smb2_oplock_break *)buffer;
+> -       struct list_head *tmp, *tmp1, *tmp2;
+>         struct cifs_ses *ses;
+>         struct cifs_tcon *tcon;
+>         struct cifsInodeInfo *cinode;
+> @@ -710,16 +698,11 @@ smb2_is_valid_oplock_break(char *buffer, struct TCP_Server_Info *server)
+>
+>         /* look up tcon based on tid & uid */
+>         spin_lock(&cifs_tcp_ses_lock);
+> -       list_for_each(tmp, &server->smb_ses_list) {
+> -               ses = list_entry(tmp, struct cifs_ses, smb_ses_list);
+> -
+> -               list_for_each(tmp1, &ses->tcon_list) {
+> -                       tcon = list_entry(tmp1, struct cifs_tcon, tcon_list);
+> +       list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
+> +               list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
+>
+>                         spin_lock(&tcon->open_file_lock);
+> -                       list_for_each(tmp2, &tcon->openFileList) {
+> -                               cfile = list_entry(tmp2, struct cifsFileInfo,
+> -                                                    tlist);
+> +                       list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+>                                 if (rsp->PersistentFid !=
+>                                     cfile->fid.persistent_fid ||
+>                                     rsp->VolatileFid !=
 > --
-> 2.25.1
->
+> 2.31.1
 >
 
 
