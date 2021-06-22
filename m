@@ -2,102 +2,107 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60701C2B9F4
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Jun 2021 11:00:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B37A1C49EA7
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Jun 2021 15:26:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49103613AE
-	for <linux-cifs@archiver.kernel.org>; Tue, 22 Jun 2021 11:00:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A017260FEB
+	for <linux-cifs@archiver.kernel.org>; Tue, 22 Jun 2021 15:26:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230004AbhFVLCv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Jun 2021 07:02:51 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:51604 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229769AbhFVLCu (ORCPT
+        id S232334AbhFVP2Q (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Jun 2021 11:28:16 -0400
+Received: from p3plsmtpa06-04.prod.phx3.secureserver.net ([173.201.192.105]:58313
+        "EHLO p3plsmtpa06-04.prod.phx3.secureserver.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232330AbhFVP2Q (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 22 Jun 2021 07:02:50 -0400
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15MArN7T006540;
-        Tue, 22 Jun 2021 11:00:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=jF1rOE1ka1kjLVoEdkzZOcOYF8W6bwDXtgL5Olaot4A=;
- b=CUJBlrdEOpr0QUI5FpUmcryvghlsP/FDWSNPhKBvmAQiPkCz6WLr0jzTxZ+LkiKkOmtq
- 4q8w+KHYsiy12T/CKezt7O0eKFwINRcvG1kcQBQQcNBxxKwDRVj1lNFf5XQT8xR5MpII
- 4xhjRk/U6uEERIrWRr43kAE16kF+XSJHsg/DrkhZ9ItYBtsRlNGWs6+pHggy4dOwHBpR
- fDhxRQgRLHDBk3uqTwOex3JzS6xkClFMsl6ei1BrtDWkjeOzsK3Qgwd6XsAiblXm+WDs
- N+WBjzGlE7Bn2qQn4mPYlns+butVyf8JZsychjIMzow66AKIdr1D9IAbXB/sQInQzXu6 qw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by mx0b-00069f02.pphosted.com with ESMTP id 39as86tjv0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Jun 2021 11:00:10 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 15MAxqpD128765;
-        Tue, 22 Jun 2021 11:00:09 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by userp3020.oracle.com with ESMTP id 399tbsddus-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Jun 2021 11:00:09 +0000
-Received: from userp3020.oracle.com (userp3020.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 15MB071i130710;
-        Tue, 22 Jun 2021 11:00:07 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 399tbsddrb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 22 Jun 2021 11:00:07 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0121.oracle.com (8.14.4/8.14.4) with ESMTP id 15MB03Ze028573;
-        Tue, 22 Jun 2021 11:00:03 GMT
-Received: from mwanda (/102.222.70.252)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 22 Jun 2021 04:00:02 -0700
-Date:   Tue, 22 Jun 2021 13:59:55 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Steve French <sfrench@samba.org>
-Cc:     Baokun Li <libaokun1@huawei.com>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] cifs: fix NULL dereference in smb2_check_message()
-Message-ID: <YNHCq6N9bAODxvnp@mwanda>
+        Tue, 22 Jun 2021 11:28:16 -0400
+X-Greylist: delayed 437 seconds by postgrey-1.27 at vger.kernel.org; Tue, 22 Jun 2021 11:28:16 EDT
+Received: from [192.168.0.100] ([96.237.161.203])
+        by :SMTPAUTH: with ESMTPSA
+        id viAjleA5hyubKviAklUeJx; Tue, 22 Jun 2021 08:18:42 -0700
+X-CMAE-Analysis: v=2.4 cv=avN3tQVV c=1 sm=1 tr=0 ts=60d1ff52
+ a=Pd5wr8UCr3ug+LLuBLYm7w==:117 a=Pd5wr8UCr3ug+LLuBLYm7w==:17
+ a=IkcTkHD0fZMA:10 a=yMhMjlubAAAA:8 a=SEc3moZ4AAAA:8 a=WtrXtaRitKTu45twBd0A:9
+ a=QEXdDO2ut3YA:10 a=5oRCH6oROnRZc2VpWJZ3:22
+X-SECURESERVER-ACCT: tom@talpey.com
+Subject: Re: [SMBDIRECT][PATCH] missing rc checks while waiting for SMB3 over
+ RDMA events
+To:     Steve French <smfrench@gmail.com>, Long Li <longli@microsoft.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+References: <CAH2r5msOSLaZT42-jFMjJrB1YiYTZBzdM18ieqQY2v=YwXzcrA@mail.gmail.com>
+From:   Tom Talpey <tom@talpey.com>
+Message-ID: <1241844c-c9ab-2055-a363-80db63a4dd22@talpey.com>
+Date:   Tue, 22 Jun 2021 11:18:42 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Proofpoint-ORIG-GUID: BUXnIuDvwyeI93WAyjRGSm8xWtyvsCAH
-X-Proofpoint-GUID: BUXnIuDvwyeI93WAyjRGSm8xWtyvsCAH
+In-Reply-To: <CAH2r5msOSLaZT42-jFMjJrB1YiYTZBzdM18ieqQY2v=YwXzcrA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-CMAE-Envelope: MS4xfHuI+aivFMuuZGehMwo60U0hMxx4SRlZRovOfkVEQV+DSNr7Xsgr24M1GrRqkHKlEcIEK+uWkTiIMKBUCjvZ58HFuk8/Dd/oXj4kDTj8r+LIbJTT9Wgw
+ uCxr9bQrLlMcs9Gi98JmKYOsxS7kwHj5xyQKsK+BbVYVRkoyp96CPTa6hGbejTDjrtsLWkRg0yQ/8trMfUgSgZyhFdcx1CoroewBJRQsFS4yT1Zld/TuvfBs
+ bZ6vADug7cS7eXqCfY/CXUStivJNypo3m9iBNrrE/DmlV7ezTzfNA55513B31uhc
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This code sets "ses" to NULL which will lead to a NULL dereference on
-the second iteration through the loop.
+On 6/21/2021 5:32 PM, Steve French wrote:
+>      There were two places where we weren't checking for error
+>      (e.g. ERESTARTSYS) while waiting for rdma resolution.
+> 
+>      Addresses-Coverity: 1462165 ("Unchecked return value")
+>     Signed-off-by: Steve French <stfrench@microsoft.com>
+> 
+> diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
+> index 10dfe5006792..ae07732f750f 100644
+> --- a/fs/cifs/smbdirect.c
+> +++ b/fs/cifs/smbdirect.c
+> @@ -572,8 +572,11 @@ static struct rdma_cm_id *smbd_create_id(
+>                  log_rdma_event(ERR, "rdma_resolve_addr() failed %i\n", rc);
+>                  goto out;
+>          }
+> -       wait_for_completion_interruptible_timeout(
+> +       rc = wait_for_completion_interruptible_timeout(
+>                  &info->ri_done, msecs_to_jiffies(RDMA_RESOLVE_TIMEOUT));
+> +       /* -ERESTARTSYS, returned when interrupted, is the only rc mentioned */
 
-Fixes: 85346c17e425 ("cifs: convert list_for_each to entry variant in smb2misc.c")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- fs/cifs/smb2misc.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Suggest the same comment text as the one below, this one seems uncertain.
 
-diff --git a/fs/cifs/smb2misc.c b/fs/cifs/smb2misc.c
-index c6bb2ea1983b..668f77108831 100644
---- a/fs/cifs/smb2misc.c
-+++ b/fs/cifs/smb2misc.c
-@@ -158,11 +158,10 @@ smb2_check_message(char *buf, unsigned int len, struct TCP_Server_Info *srvr)
- 		list_for_each_entry(ses, &srvr->smb_ses_list, smb_ses_list) {
- 			if (ses->Suid == thdr->SessionId)
- 				break;
--
--			ses = NULL;
- 		}
- 		spin_unlock(&cifs_tcp_ses_lock);
--		if (ses == NULL) {
-+		if (list_entry_is_head(ses, &srvr->smb_ses_list,
-+				       smb_ses_list)) {
- 			cifs_dbg(VFS, "no decryption - session id not found\n");
- 			return 1;
- 		}
--- 
-2.30.2
+> +       if (rc < 0)
+> +               goto out;
+>          rc = info->ri_rc;
+>          if (rc) {
+>                  log_rdma_event(ERR, "rdma_resolve_addr() completed %i\n", rc);
+> @@ -586,8 +589,10 @@ static struct rdma_cm_id *smbd_create_id(
+>                  log_rdma_event(ERR, "rdma_resolve_route() failed %i\n", rc);
+>                  goto out;
+>          }
+> -       wait_for_completion_interruptible_timeout(
+> +       rc = wait_for_completion_interruptible_timeout(
+>                  &info->ri_done, msecs_to_jiffies(RDMA_RESOLVE_TIMEOUT));
+> +       if (rc < 0)  /* e.g. if interrupted and returns -ERESTARTSYS */
 
+delete "and"?
+
+> +               goto out
+
+Missing a semicolon.     ^^^
+
+>          rc = info->ri_rc;
+>          if (rc) {
+>                  log_rdma_event(ERR, "rdma_resolve_route() completed %i\n", rc);
+> 
+> 
+
+One meta-comment. There's no message logged for these ERESTARTSYS cases.
+That might be confusing in the log, if they lead to failure.
+
+Reviewed-By: Tom Talpey <tom@talpey.com>
+
+Tom.
