@@ -2,171 +2,157 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,WEIRD_PORT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E0B1C4743C
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Jun 2021 03:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A3BAC4743C
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Jun 2021 04:01:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E475611CE
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Jun 2021 03:42:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEF846135A
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Jun 2021 04:01:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230130AbhFWDo0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Jun 2021 23:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54878 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229774AbhFWDoZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Jun 2021 23:44:25 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72499C061574
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Jun 2021 20:42:08 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id g192so1230921pfb.6
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Jun 2021 20:42:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gnarbox-com.20150623.gappssmtp.com; s=20150623;
-        h=from:content-transfer-encoding:mime-version:subject:message-id:date
-         :to;
-        bh=2BOX2dWoIQlp+L2PPEQ1erffxeSBg8FnzNbmkRlEgnw=;
-        b=CxFzmnwRTCl8E6Wv6iMm4ZH+eUfoi4B0wgTr1fG8wkL9wQ2u5FKoVFgsx8JqgCPy7Q
-         /T7EQvii5soXSUoug758tBewz9Hgc+YS57ef8uh1wHu3Oh+5NPtwj+OkI2aOimMTbguO
-         4ZHf6sVNWkmcUoiBFwfdufbQ4vbgg2XWeoDJN1vQzJKeE3kwAyIAKrtK4nc5Nn4dx2v4
-         ymt04xC+MpLMjzVtxIrYyLXv1pVYEIgGPAKjj7aXrna5l1kgDaOsgXQvLxivottS8RAd
-         2upAkYi3CDA9enfbammnWfvE4yNzCgZ0z542fZDQgWO/XGrkrgedqe+SdxNfBBUwYcCu
-         SWmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:content-transfer-encoding:mime-version
-         :subject:message-id:date:to;
-        bh=2BOX2dWoIQlp+L2PPEQ1erffxeSBg8FnzNbmkRlEgnw=;
-        b=erOZRPo6JpO9Wsx+9JHliPkbpRXzg4UopWKNHXqePrzrXuNjfheotS+mpEIfV6x0l+
-         MFflC21Yqa+IZ0cGmOzmbAGdI7SyuD9UgACobz+No4SW6Bnj6EsQlROpz1Etof9dqf3A
-         m6VExkzgtbFNJBwTpPNoH6/ZRSjwmgt4bSrUnL+Dcdn8+3jYqpLkLGR8We4IjV49koyk
-         L8jTk44mkgZbMHP7bpAYZ/5bqlx3wgK7GVUeAywsfJkcMl9erjU83fhaKPVAyx2ZBWHH
-         viBFPr92ZCC9f3IyMPDuoDuf0k9xW6QHmWKlSjALBQXgl1HtBGjGpIIJsYYRV7QfOQFE
-         kNKw==
-X-Gm-Message-State: AOAM532L0nARzuYQCHmYdwcRa+QmjwBDxSKcWxt63ztUDmOo6BgewMOr
-        Mipfk1o3EJdPWrvHr6ldATTuPZhHiPnzOw==
-X-Google-Smtp-Source: ABdhPJxezPeiEJA8GD/62dqPWTURLoVgADRlO5xMjfJYvUmy6U/6OflHSk6oiM7I5SmKrYVmTqLJlQ==
-X-Received: by 2002:a65:5288:: with SMTP id y8mr1826662pgp.31.1624419727423;
-        Tue, 22 Jun 2021 20:42:07 -0700 (PDT)
-Received: from smtpclient.apple ([47.151.138.208])
-        by smtp.gmail.com with ESMTPSA id i2sm3451673pjj.25.2021.06.22.20.42.05
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 22 Jun 2021 20:42:05 -0700 (PDT)
-From:   David Manpearl <david@gnarbox.com>
-Content-Type: text/plain;
-        charset=us-ascii
+        id S229959AbhFWEDp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 23 Jun 2021 00:03:45 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:49723 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229485AbhFWEDo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Jun 2021 00:03:44 -0400
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210623040126epoutp02e02c98ce983eb56ef348510fff705028~LGjB_Oevp1939319393epoutp02h
+        for <linux-cifs@vger.kernel.org>; Wed, 23 Jun 2021 04:01:26 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210623040126epoutp02e02c98ce983eb56ef348510fff705028~LGjB_Oevp1939319393epoutp02h
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1624420886;
+        bh=5PVFU6ULDmRmj4Yre3X/Pn6O0VQfnzl9i1rorA3ArU4=;
+        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+        b=mZLO7r0uWjlvdXg0RPA7hr8hszwsXqzf2of8ib8SGZ/oBH48VkyTgPP3iqRq98sPA
+         7MueOqey1Vou5w4T8YXgfHXH1OKA7oy1cX8Z3Widvue8q9QI9mlZ72zivW8w7FH5VO
+         Jx+01JwzLdg14EJh/JS+UhqLWfztKNJprDaeS6Bk=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
+        20210623040125epcas1p4f281addb37ea5634dc1cce0363294657~LGjBjaP-S0698606986epcas1p4M;
+        Wed, 23 Jun 2021 04:01:25 +0000 (GMT)
+Received: from epsmges1p2.samsung.com (unknown [182.195.40.164]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4G8qM85YWsz4x9Px; Wed, 23 Jun
+        2021 04:01:24 +0000 (GMT)
+Received: from epcas1p2.samsung.com ( [182.195.41.46]) by
+        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        C1.3C.09551.412B2D06; Wed, 23 Jun 2021 13:01:24 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20210623040124epcas1p1fbbc1a57a729991c45e496142d489222~LGjAN_Yca3217232172epcas1p1-;
+        Wed, 23 Jun 2021 04:01:24 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210623040124epsmtrp2552920e4c6b370b9842bbf5393f2b028~LGjANKzRp0602206022epsmtrp2b;
+        Wed, 23 Jun 2021 04:01:24 +0000 (GMT)
+X-AuditID: b6c32a36-2b3ff7000000254f-ee-60d2b214e907
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        E4.A4.08289.412B2D06; Wed, 23 Jun 2021 13:01:24 +0900 (KST)
+Received: from namjaejeon01 (unknown [10.89.31.77]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20210623040124epsmtip152f2e830417267ab6f85cd68d1124380~LGi-_jYsa0437804378epsmtip15;
+        Wed, 23 Jun 2021 04:01:24 +0000 (GMT)
+From:   "Namjae Jeon" <namjae.jeon@samsung.com>
+To:     "'Steve French'" <smfrench@gmail.com>
+Cc:     =?utf-8?Q?'Aur=C3=A9lien_Aptel'?= <aurelien.aptel@gmail.com>,
+        "'Christoph Hellwig'" <hch@infradead.org>,
+        "'COMMON INTERNET FILE SYSTEM SERVER'" 
+        <linux-cifsd-devel@lists.sourceforge.net>,
+        "'CIFS'" <linux-cifs@vger.kernel.org>,
+        "'ronnie sahlberg'" <ronniesahlberg@gmail.com>
+In-Reply-To: <CAH2r5msB8Y8qn+DFV=3g=K791p1ssFJh=+yNOC4bG8iW3K07tw@mail.gmail.com>
+Subject: RE: ksmbd mailing list
+Date:   Wed, 23 Jun 2021 13:01:23 +0900
+Message-ID: <007101d767e4$6edb4ff0$4c91efd0$@samsung.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: SMB Partial Send Causes CIFS VFS Reconnection and File Copy Failure
-Message-Id: <80F3362B-C817-4C16-A890-78ED3C6E0347@gnarbox.com>
-Date:   Tue, 22 Jun 2021 20:42:04 -0700
-To:     linux-cifs@vger.kernel.org
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: ko
+Thread-Index: AQKEoK/ucUJhU+AlUKRaTDLvHCKH0wHZDfPRAiUqc4MCZCxSvwDYIZrJAdymPOepfc1SgA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphk+LIzCtJLcpLzFFi42LZdlhTT1dk06UEgxU3NSyOv/7LbnF6wiIm
+        ixf/dzFb/Pz/ndGit+8Tq8WbF4fZHNg8ds66y+6xeYWWx+4Fn5k8Pm+SC2CJyrHJSE1MSS1S
+        SM1Lzk/JzEu3VfIOjneONzUzMNQ1tLQwV1LIS8xNtVVy8QnQdcvMAdqtpFCWmFMKFApILC5W
+        0rezKcovLUlVyMgvLrFVSi1IySkwNCjQK07MLS7NS9dLzs+1MjQwMDIFqkzIydh1dyNrQZtA
+        Rc+0t+wNjI/4uhg5OCQETCRefErsYuTiEBLYwSjx8f8mZgjnE6PE5J/nGSGcz4wSsw9MZO1i
+        5ATrWLtlGztEYhejxKPJ76GqXjBK9Dz4zghSxSagK/Hvz342EFtEQFPize5JYHOZBWYxSdx/
+        0MwOkuAUCJTYtuQd2FhhAXmJVYcbmEBsFgFVibV3e8BqeAUsJQ6tXcsKYQtKnJz5hAXEZhbQ
+        lli28DUzxEkKEj+fLmOFiItIzO5sYwZ5TkQgTGJuqxrIXgmBVg6J5tlLoV5wkVh3u5cRwhaW
+        eHV8CzuELSXx+d1eNgi7XOLEyV9MEHaNxIZ5+9ghAWYs0fOiBMRkBvpr/S59iApFiZ2/5zJC
+        XMAn8e5rDytENa9ER5sQRImqRN+lw1ADpSW62j+wT2BUmoXkr1lI/pqF5JdZCMsWMLKsYhRL
+        LSjOTU8tNiwwQo7rTYzgZKlltoNx0tsPeocYmTgYDzFKcDArifA+armUIMSbklhZlVqUH19U
+        mpNafIjRFBjSE5mlRJPzgek6ryTe0NTI2NjYwsTM3MzUWEmcdyfboQQhgfTEktTs1NSC1CKY
+        PiYOTqkGpmm568O+ZdVuunlJZvrCXVp+0WuNs6c26IWuOnsrWfPm/z/td6T+/jod72m+PqJy
+        6+qg6MBv2ZWT9G9sLnwy+9S+XLYHLza8nz6PWSz76NIz4m8ur9U89FD3xvHPuQVLl4j+u6Br
+        8oxnRqKlv9xTz8Iugf6cZMHYE5VieRcWBn0Okvrw2+TviQ1vuFs0mzeuZTyg2xnqPN9eYvKG
+        6SyPnz7PEtzfODvtnN/RXOVEic3WkbHyOhkBN/aXeYcdFtmd8DD+1I97CnoLOp8+fs8vXszg
+        ULQlwyVOTS3kVcwLrqbXafPez0hK73tq/fzxrSyNzR1OLdpymzI/bvGVvLTsUbqH5KzCtdw7
+        e/V6tnw/9VmJpTgj0VCLuag4EQCIuv2CHwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrGLMWRmVeSWpSXmKPExsWy7bCSnK7IpksJBnMesVscf/2X3eL0hEVM
+        Fi/+72K2+Pn/O6NFb98nVos3Lw6zObB57Jx1l91j8wotj90LPjN5fN4kF8ASxWWTkpqTWZZa
+        pG+XwJWxeqJsQRdPxc++TywNjGs5uxg5OSQETCTWbtnG3sXIxSEksINR4tCsm6wQCWmJYyfO
+        MHcxcgDZwhKHDxdD1DxjlDj8+j4LSA2bgK7Evz/72UBsEQFNiTe7JzGDFDELzGGS+Ln4FVhC
+        SGAnk8SxhgIQm1MgUGLbkndgC4QF5CVWHW5gArFZBFQl1t7tYQexeQUsJQ6tXcsKYQtKnJz5
+        BGwZs4C2xNObT+HsZQtfM0McqiDx8+kyVoi4iMTszjawo0UEwiTmtqpNYBSehWTSLCSTZiGZ
+        NAtJ9wJGllWMkqkFxbnpucWGBUZ5qeV6xYm5xaV56XrJ+bmbGMFRo6W1g3HPqg96hxiZOBgP
+        MUpwMCuJ8D5quZQgxJuSWFmVWpQfX1Sak1p8iFGag0VJnPdC18l4IYH0xJLU7NTUgtQimCwT
+        B6dUAxPv0ZXFhi93d79eeqx9dhazrYv1ifoKRZb8evN9N8rsmT4FKXCpVbbufb+7e8kVQe7f
+        TKFzMtZeCl+gaX/K4VnfpaUHjBdsjTC+bd2c2aMVwS7Yrr707cP/D7aU1Jtc8JmSylReZOy2
+        udG4McotIiEqt+6X6Ur/jQdyV8sL2Z0qF+Tb7Wt7purSGfe7D6QyxKSt126Y1C+86M2Lx0Kb
+        T2lftL74lPvkIzU5z8JTzJpfPFa6Z6cJztR/dGBZcV/jp6S2iluRV5i3zD2w8DFnilXIa0/1
+        cIfXmnfNo7Zt1d66KSG2UnrjvEtWHr3L0pyabuSl5m0MKzDa6fXi2eoZBqpf5xk+/f6GifHb
+        bpcDl5VYijMSDbWYi4oTAVH+9koJAwAA
+X-CMS-MailID: 20210623040124epcas1p1fbbc1a57a729991c45e496142d489222
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210622061228epcas1p247d557ef24a971eaf395edd6174bed5e
+References: <CGME20210622061228epcas1p247d557ef24a971eaf395edd6174bed5e@epcas1p2.samsung.com>
+        <YNF/OpvdMLbIDZiZ@infradead.org>
+        <013001d76734$0cf3bee0$26db3ca0$@samsung.com> <87mtriqj6v.fsf@suse.com>
+        <006501d767d9$361eeec0$a25ccc40$@samsung.com>
+        <CAH2r5msB8Y8qn+DFV=3g=K791p1ssFJh=+yNOC4bG8iW3K07tw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-During file copy operations from our local file system to a Synology =
-Samba server file system from within our app, we are seeing numerous =
-partial data sends which appear to cause CIFS reconnections, which in =
-turn cause the copies to fail.
-We see these errors logged by our Golang application on the following =
-operations:
-os.Create
-- tbd|ERROR [tbd/daemon] (tbd_copy_file.go:333#openWriters) Failed =
-create file [open =
-/media/smb_192_168_86_40_GBXShare/SHAREBOX/100MEDIA/DJI_0114.JPG: no =
-such file or directory]
-write
-- tbd|ERROR [tbd/daemon] (tbd_copy_file.go:440#finishFile) writer [write =
-/media/smb_192_168_86_40_GBXShare/SHAREBOX2/100MEDIA_01/DJI_0002.JPG: =
-bad file descriptor]
-- tbd|ERROR [tbd/daemon] (tbd_copy_file.go:294#openWriters) Failed =
-create file [open =
-/media/smb_192_168_86_40_GBXShare/SHAREBOX2/100MEDIA_01/DJI_0073.JPG: =
-resource temporarily unavailable]
-- tbd|ERROR [tbd/daemon] (tbd_copy_file.go:393#finishFile) writer [write =
-/media/smb_192_168_86_40_GBXShare/SHAREBOX2/100MEDIA_01/DJI_0072.JPG: =
-broken pipe]
-file.Sync
-- tbd|ERROR [tbd/daemon] (tbd_copy_file.go:395#finishFile) sync [sync =
-/media/smb_192_168_86_40_GBXShare/SMBSHARE/100MEDIA_02/DJI_0014(1).JPG: =
-input/output error]
-file.Close
-- tbd|WARN  [tbd/daemon] (tbd_copy_file.go:435#finishFile) close [close =
-/media/smb_192_168_86_40_GBXShare/SHAREBOX2/100MEDIA_02/DJI_0097.JPG: =
-input/output error]
+> We should probably put a few lines in the cifsd and cifs client wiki page=
+s on samba.org and also in
+> the kernel documentation directory for each that notes that emails with p=
+atches should have a prefix
+> that indicates whether server or client or utils (e.g. =5Bcifsd=5D or =5B=
+ksmbd=5D if you prefer, =5Bcifs=5D for
+> the client and =5Bcifs-utils=5D for the tools)
+Okay, I will update it in wiki and kernel documentation.
 
-Partial send log example:
-[196361.832049] /usr/src/kernel/fs/cifs/transport.c: partial send =
-(wanted=3D65652 sent=3D116): terminating session
-
-Usually followed by:
-[196361.868197] CIFS VFS: Free previous auth_key.response =3D =
-ffff88011748b000
-
-- What are the scenarios in which a partial send will occur, because =
-this does not appear to be a network issue on our side?
-
-- If this is expected behavior, how are we supposed to be handling the =
-partial sends in userspace?
-
-- Are there other errors you see in the attached logs?
-
-Linux Kernel version: 4.9.115-yocto-standard
-We are using the "fs/cifs/" directory from the =
-"linux-4.9-full-backports" branch from this repo: =
-https://github.com/smfrench/smb3-cifs-linux-stable-backports
-
-Mount.cifs version: 6.7
-Samba version:
-http://192.168.86.40:5000
-Control Panel > File Services > Max SMB3, Min SMB2.
-Appliance: Synology:
-Model name: DS1618
-CPU: INTEL Atom C3538
-
-DebugData:
-# cat /proc/fs/cifs/DebugData
-Display Internal CIFS Data Structures for Debugging
----------------------------------------------------
-CIFS Version 2.11
-Features: posix xattr
-Active VFS Requests: 0
-Servers:
-Number of credits: 512 Dialect 0x202
-1) Name: 192.168.86.40 Uses: 1 Capability: 0x300001 Session Status: 1 =
-TCP status: 1
-Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0
-Shares:
-0) IPC: \\192.168.86.40\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
-PathComponentMax: 0 Status: 1 type: 0
-1) \\192.168.86.40\GBXShare Mounts: 4 DevInfo: 0x20 Attributes: 0x5006f
-PathComponentMax: 255 Status: 1 type: DISK
-MIDs:
-Number of credits: 528 Dialect 0x302
-2) Name: 192.168.86.40 Uses: 1 Capability: 0x300005 Session Status: 1 =
-TCP status: 1
-Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0
-Shares:
-0) IPC: \\192.168.86.40\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
-PathComponentMax: 0 Status: 1 type: 0
-Share Capabilities: None Share Flags: 0x0
-
-1) \\192.168.86.40\GBXShare Mounts: 1 DevInfo: 0x20 Attributes: 0x5006f
-PathComponentMax: 255 Status: 1 type: DISK
-Share Capabilities: None Aligned, Partition Aligned, Share Flags: 0x0 =
-Optimal sector size: 0x200
-MIDs:
-
-Logs: dmesgCIFS-h.log: =
-https://drive.google.com/file/d/1_fWpvSs5zeOFaV-YlGfW2ej3LGwFZSns/view?usp=
-=3Dsharing
-
-- Thank you, David
-
-
+Thanks=21
+>=20
+> On Tue, Jun 22, 2021 at 9:41 PM Namjae Jeon <namjae.jeon=40samsung.com> w=
+rote:
+> >
+> > > =22Namjae Jeon=22 <namjae.jeon=40samsung.com> writes:
+> > > > Add CC: Steve, Ronnie, Aur=C3=A9lien.=0D=0A>=20>=20>=20>=20Any=20op=
+inions?=0D=0A>=20>=20>=0D=0A>=20>=20>=20I=20think=20having=20only=20one=20l=
+ist=20would=20be=20nice=20too,=20but=20we=20should=0D=0A>=20>=20>=20ask/doc=
+ument=20to=20put=20a=20=5Bcifsd=5D=20tag=20somewhere=20in=20the=20subject,=
+=20which=20is=20hard=20to=20enforce.=0D=0A>=20>=20>=0D=0A>=20>=20>=20Case=
+=20in=20point,=20it=20already=20gets=20confusing=20when=20people=20send=20p=
+atches=0D=0A>=20>=20>=20for=0D=0A>=20>=20>=20cifs-utils:=20we=20can't=20alw=
+ays=20tell=20it's=20not=20for=20the=20kernel=20from=20the=0D=0A>=20>=20>=20=
+subject=20which=20can=20confuse=20people=20and=20scripts.=0D=0A>=20>=20Than=
+ks=20for=20your=20opinion=21=0D=0A>=20>=20I=20will=20change=20to=20specify=
+=20single=20list(linux-cifs=40vger.kernel.org)=20in=20MAINTAINERS.=0D=0A>=
+=20>=0D=0A>=20>=20>=20Cheers,=0D=0A>=20>=20>=20--=0D=0A>=20>=20>=20Aur=C3=
+=A9lien=20Aptel=20/=20SUSE=20Labs=20Samba=20Team=0D=0A>=20>=20>=20GPG:=2018=
+39=20CB5F=209F5B=20FB9B=20AA97=20=208C99=2003C8=20A49B=20521B=20D5D3=20SUSE=
+=0D=0A>=20>=20>=20Software=20Solutions=20Germany=20GmbH,=20Maxfeldstr.=205,=
+=2090409=20N=C3=BCrnberg,=20DE=0D=0A>=20>=20>=20GF:=20Felix=20Imend=C3=B6rf=
+fer,=20Mary=20Higgins,=20Sri=20Rasiah=20HRB=20247165=20(AG=0D=0A>=20>=20>=
+=20M=C3=BCnchen)=0D=0A>=20>=0D=0A>=20>=0D=0A>=20=0D=0A>=20=0D=0A>=20--=0D=
+=0A>=20Thanks,=0D=0A>=20=0D=0A>=20Steve=0D=0A=0D=0A
