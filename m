@@ -8,123 +8,118 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6229CC2B9F4
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Jun 2021 01:03:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CAAEC2B9F4
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Jun 2021 01:18:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 354D1611CE
-	for <linux-cifs@archiver.kernel.org>; Wed, 23 Jun 2021 01:03:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F97661166
+	for <linux-cifs@archiver.kernel.org>; Wed, 23 Jun 2021 01:18:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229955AbhFWBGP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 22 Jun 2021 21:06:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48278 "EHLO
+        id S229786AbhFWBUV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 22 Jun 2021 21:20:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229751AbhFWBGO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Jun 2021 21:06:14 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04EBAC061574
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Jun 2021 18:03:58 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id s22so660906ljg.5
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Jun 2021 18:03:57 -0700 (PDT)
+        with ESMTP id S229751AbhFWBUU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 22 Jun 2021 21:20:20 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173A9C061574
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Jun 2021 18:18:03 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id p7so1323009lfg.4
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Jun 2021 18:18:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=KTjDRd9b+aLcrTZ1m/ciseHLt4RCRJiJuXaoxtD3nYM=;
-        b=f+7P6S4Y96kbSCHTf1aArcb5vfV/SeKVxYxrzJ24wkdtQs7uKBF0edXT5H7KuJHvGX
-         JJGRI4XPHbxF9FpHqngeI0OpKwhYHfUFROvHYsRTwaH39JmTAKh55TP/7nIszmiBXq6Z
-         4cXZm31rQdvLmrU+pw+v3weXEe0K31rLfvvFoL85udX/JW/iGDzS2IS/zte8Mp4buAlw
-         3pdBqZ5actG/i6S6ZO8DPGo4bxvxkR67a6SZNeyBlskk44WukeyQvKaiEhKQEVbJ9WT/
-         EcAdbbTnnxLpL0OpjqN+Bzre2ehCYRgyW3E3BU8wnueYv4iimn+a13eTSAzYCuvRz53m
-         W2IA==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=07FgMVo6gbZ16ocf7Rsp/dQ4TFHeb86K0zNpFrg/quU=;
+        b=t0ZGr7xRMrF2oIengY35iXBGWFzBt+ueM3w51Dnalesg0rFsZL2Qv4tCbvn+LMlmzU
+         44s4Xhl09KyKSYsYMvVUSyt0FjVbQTL+gy2bMMdT6SNqDCnOFlLWQy+Uhj2/nUqZMJ19
+         OWO7uV8YkRA+uvcMAMk2uYZadkIRaNNxyGFddSQwlmU9341nevn7+sD5ddQmfLneXxMO
+         5DP2tcZ9MjH9WigehImJ8XVsGoq/EGTX4aEDX6d2FuSSpt78S6U9F+FaJ65WIm5ZosZY
+         tgBrA9o8TG567oH9BkSjbU1ODEYmFU0pJFPZRqEGQC6TMqhY6PM5P0kW1VMSYocaUfRn
+         kk3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=KTjDRd9b+aLcrTZ1m/ciseHLt4RCRJiJuXaoxtD3nYM=;
-        b=gBeTlnqDY7IbK0dO1ch8/EjFZjW2EzohErZvVhEKeaHMGtxDN+cMTCemU8yDhssQGl
-         g04Kl2WFmQotMKnYTCKDGzsbMoIkEtc0cFcp/B5HHvCPGxOEApdfuYV3C/P9jEJaYC3A
-         ncmkMQ+Bx/ZpCekatkfWT0RZ8Ta11XHxKfMpN9HTGzwCgOQJ5TmuBA1yr1dcoqOdnPy4
-         FiZDz766Zr8L8jiRWaKh9T8xvgQAZoOD2MxsNnjRA/4WMp+Ub2jO4yaBOWCT9RSXYoGI
-         xFwNcPcmXsXe253Qg94ZUYh/yTEOj0zhNe8XrMPtf8LC3VnaMVdP8alWgtuQCTn6+jI3
-         +yOg==
-X-Gm-Message-State: AOAM532lXJPsVdYImyIdPEU2MTO3LxmutVCeXnZSetQWb2pq6jOl7qP7
-        u5uttuRsfUS2rD+sNIBkGNIPtlk04cU5Q5OdmdYAQZ4kVUGhaw==
-X-Google-Smtp-Source: ABdhPJzm/kcsqjmbN9pnDezoxtos2KKOc83xpPWi9YJIdEffpG25SO0fWvpcrC2/MP8RjeFv0ulTq9me6V4DcCyGzTM=
-X-Received: by 2002:a2e:86d7:: with SMTP id n23mr5589803ljj.406.1624410236179;
- Tue, 22 Jun 2021 18:03:56 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=07FgMVo6gbZ16ocf7Rsp/dQ4TFHeb86K0zNpFrg/quU=;
+        b=Sd/XJWHMd/mTAXI1fhj0kPCictKyPvcLrZP/CWVgfiXIW0hP++JqE4EGR/ILWvXRuL
+         L4hQbDzWpMniDGgBLUqloNCsDhGU+oCUNi8lGmfSY7J7CZVyzkqhO1SEf6m99U0bejbQ
+         PHNW+VxtqRPHVkmTLYHg7jAorBWErVggWaftQmTONofeh14Ke6g9t3txiAVfNE1MwUhO
+         vEWhGEcv7ehBK/wfD7CiOZbtQlRV1FPi8pMHe5Ba8bJjSw2q2GcDUjWSRS7CqbdLto98
+         OoULYGBnm+zCfTws+nj7lKRbVG7IQ5lfquFOO9p6Od0WpCeiRI+lkqWdMG4NVfPWlCUV
+         Uc/w==
+X-Gm-Message-State: AOAM530+UBfw/crRWZk7bSDXqxMSSDR36vefCwZ8fL0eR5t+8SSePGEz
+        TnkcTfyt0TgzSSdZBOgt1yUrpgdtGmzvPx7PwRUJl7toOmWqwQ==
+X-Google-Smtp-Source: ABdhPJw5JIuUdl/XgRzme7sbDzEeYgweu9+v5bZrsTyWaeRsCnvgN+6oZxvqgnVzDk4RFDeXshGaEbGRXok+IzQKUEg=
+X-Received: by 2002:ac2:419a:: with SMTP id z26mr5024151lfh.307.1624411081257;
+ Tue, 22 Jun 2021 18:18:01 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 22 Jun 2021 20:03:45 -0500
-Message-ID: <CAH2r5mtN+0MLW3e_xhqEP3R_EFULWjrzScuyYZgZ2AE9ukERRA@mail.gmail.com>
-Subject: [PATCH][CIFS] missing null check for newinode pointer
+Date:   Tue, 22 Jun 2021 20:17:50 -0500
+Message-ID: <CAH2r5mvxp8OZthKPQGCv82xEkNW+z7SN_QhdRUMnHJ2Fm4pJqA@mail.gmail.com>
+Subject: [PATCH] cifs: missing null pointer check in cifs_mount
 To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000018ec9905c5647b19"
+Cc:     Paulo Alcantara <pc@cjr.nz>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: multipart/mixed; boundary="00000000000077d19b05c564adc6"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000018ec9905c5647b19
+--00000000000077d19b05c564adc6
 Content-Type: text/plain; charset="UTF-8"
 
-in cifs_do_create we check if newinode is valid before referencing it
-but are missing the check in one place in fs/cifs/dir.c
+We weren't checking if tcon is null before setting dfs path,
+although we check for null tcon in an earlier assignment statement.
 
-Addresses-Coverity: 1357292 ("Dereference after null check")
+Addresses-Coverity: 1476411 ("Dereference after null check")
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/cifs/dir.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ fs/cifs/connect.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 912333082b18..aca6ed58cc44 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -384,10 +384,11 @@ cifs_do_create(struct inode *inode, struct
-dentry *direntry, unsigned int xid,
-  goto out_err;
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index 8d95607a9312..196ef9ec69db 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3480,7 +3480,8 @@ int cifs_mount(struct cifs_sb_info *cifs_sb,
+struct smb3_fs_context *ctx)
+  goto error;
   }
+  spin_lock(&cifs_tcp_ses_lock);
+- tcon->dfs_path = ref_path;
++ if (tcon)
++ tcon->dfs_path = ref_path;
+  ref_path = NULL;
+  spin_unlock(&cifs_tcp_ses_lock);
 
-- if (S_ISDIR(newinode->i_mode)) {
-- rc = -EISDIR;
-- goto out_err;
-- }
-+ if (newinode)
-+ if (S_ISDIR(newinode->i_mode)) {
-+ rc = -EISDIR;
-+ goto out_err;
-+ }
-
-  d_drop(direntry);
-  d_add(direntry, newinode);
 
 -- 
 Thanks,
 
 Steve
 
---00000000000018ec9905c5647b19
+--00000000000077d19b05c564adc6
 Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-missing-null-check-for-newinode-pointer.patch"
+	name="0001-cifs-missing-null-pointer-check-in-cifs_mount.patch"
 Content-Disposition: attachment; 
-	filename="0001-cifs-missing-null-check-for-newinode-pointer.patch"
+	filename="0001-cifs-missing-null-pointer-check-in-cifs_mount.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_kq8rwmgz0>
-X-Attachment-Id: f_kq8rwmgz0
+Content-ID: <f_kq8senbd0>
+X-Attachment-Id: f_kq8senbd0
 
-RnJvbSA4MjUyYzBiYzczY2FkNzNhOGY0Zjc2ZTkwYzIzODFlZTM0ZmZiYzBmIE1vbiBTZXAgMTcg
+RnJvbSA2MzIwOTZiNjZiMmZhMjYyMWUzZDJkMDJjMmMyZmQ0MzY5NzU4MTBiIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgMjIgSnVuIDIwMjEgMTk6NTM6MDggLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBtaXNzaW5nIG51bGwgY2hlY2sgZm9yIG5ld2lub2RlIHBvaW50ZXIKCmluIGNpZnNfZG9f
-Y3JlYXRlIHdlIGNoZWNrIGlmIG5ld2lub2RlIGlzIHZhbGlkIGJlZm9yZSByZWZlcmVuY2luZyBp
-dApidXQgYXJlIG1pc3NpbmcgdGhlIGNoZWNrIGluIG9uZSBwbGFjZSBpbiBmcy9jaWZzL2Rpci5j
-CgpBZGRyZXNzZXMtQ292ZXJpdHk6IDEzNTcyOTIgKCJEZXJlZmVyZW5jZSBhZnRlciBudWxsIGNo
-ZWNrIikKU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29t
-PgotLS0KIGZzL2NpZnMvZGlyLmMgfCA5ICsrKysrLS0tLQogMSBmaWxlIGNoYW5nZWQsIDUgaW5z
-ZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2Rpci5jIGIv
-ZnMvY2lmcy9kaXIuYwppbmRleCA5MTIzMzMwODJiMTguLmFjYTZlZDU4Y2M0NCAxMDA2NDQKLS0t
-IGEvZnMvY2lmcy9kaXIuYworKysgYi9mcy9jaWZzL2Rpci5jCkBAIC0zODQsMTAgKzM4NCwxMSBA
-QCBjaWZzX2RvX2NyZWF0ZShzdHJ1Y3QgaW5vZGUgKmlub2RlLCBzdHJ1Y3QgZGVudHJ5ICpkaXJl
-bnRyeSwgdW5zaWduZWQgaW50IHhpZCwKIAkJZ290byBvdXRfZXJyOwogCX0KIAotCWlmIChTX0lT
-RElSKG5ld2lub2RlLT5pX21vZGUpKSB7Ci0JCXJjID0gLUVJU0RJUjsKLQkJZ290byBvdXRfZXJy
-OwotCX0KKwlpZiAobmV3aW5vZGUpCisJCWlmIChTX0lTRElSKG5ld2lub2RlLT5pX21vZGUpKSB7
-CisJCQlyYyA9IC1FSVNESVI7CisJCQlnb3RvIG91dF9lcnI7CisJCX0KIAogCWRfZHJvcChkaXJl
-bnRyeSk7CiAJZF9hZGQoZGlyZW50cnksIG5ld2lub2RlKTsKLS0gCjIuMzAuMgoK
---00000000000018ec9905c5647b19--
+CkRhdGU6IFR1ZSwgMjIgSnVuIDIwMjEgMjA6MTM6NDQgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBtaXNzaW5nIG51bGwgcG9pbnRlciBjaGVjayBpbiBjaWZzX21vdW50CgpXZSB3ZXJlbid0
+IGNoZWNraW5nIGlmIHRjb24gaXMgbnVsbCBiZWZvcmUgc2V0dGluZyBkZnMgcGF0aCwKYWx0aG91
+Z2ggd2UgY2hlY2sgZm9yIG51bGwgdGNvbiBpbiBhbiBlYXJsaWVyIGFzc2lnbm1lbnQgc3RhdGVt
+ZW50LgoKQWRkcmVzc2VzLUNvdmVyaXR5OiAxNDc2NDExICgiRGVyZWZlcmVuY2UgYWZ0ZXIgbnVs
+bCBjaGVjayIpClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0
+LmNvbT4KLS0tCiBmcy9jaWZzL2Nvbm5lY3QuYyB8IDMgKystCiAxIGZpbGUgY2hhbmdlZCwgMiBp
+bnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jb25uZWN0
+LmMgYi9mcy9jaWZzL2Nvbm5lY3QuYwppbmRleCA4ZDk1NjA3YTkzMTIuLjE5NmVmOWVjNjlkYiAx
+MDA2NDQKLS0tIGEvZnMvY2lmcy9jb25uZWN0LmMKKysrIGIvZnMvY2lmcy9jb25uZWN0LmMKQEAg
+LTM0ODAsNyArMzQ4MCw4IEBAIGludCBjaWZzX21vdW50KHN0cnVjdCBjaWZzX3NiX2luZm8gKmNp
+ZnNfc2IsIHN0cnVjdCBzbWIzX2ZzX2NvbnRleHQgKmN0eCkKIAkJZ290byBlcnJvcjsKIAl9CiAJ
+c3Bpbl9sb2NrKCZjaWZzX3RjcF9zZXNfbG9jayk7Ci0JdGNvbi0+ZGZzX3BhdGggPSByZWZfcGF0
+aDsKKwlpZiAodGNvbikKKwkJdGNvbi0+ZGZzX3BhdGggPSByZWZfcGF0aDsKIAlyZWZfcGF0aCA9
+IE5VTEw7CiAJc3Bpbl91bmxvY2soJmNpZnNfdGNwX3Nlc19sb2NrKTsKIAotLSAKMi4zMC4yCgo=
+--00000000000077d19b05c564adc6--
