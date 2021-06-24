@@ -2,187 +2,169 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,WEIRD_PORT
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E13C49EA5
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 18:21:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECF7C49EA6
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 20:34:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 46FE96135C
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 18:21:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE3A5613BD
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 20:34:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232573AbhFXSXa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 24 Jun 2021 14:23:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41082 "EHLO
+        id S232460AbhFXUg3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 24 Jun 2021 16:36:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232515AbhFXSXa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 24 Jun 2021 14:23:30 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5534C061574
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Jun 2021 11:21:09 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id hc16so10823361ejc.12
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Jun 2021 11:21:09 -0700 (PDT)
+        with ESMTP id S232310AbhFXUg3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 24 Jun 2021 16:36:29 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C65ACC061574
+        for <linux-cifs@vger.kernel.org>; Thu, 24 Jun 2021 13:34:08 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id d13so9453901ljg.12
+        for <linux-cifs@vger.kernel.org>; Thu, 24 Jun 2021 13:34:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=kR2bEq25iayABNzer0UnuSwP8khPR3/Fg6DdPD7/2MM=;
-        b=ebh6OLEody+YFSnBnP5jtDxXDQ+W8VNZoHupkDg83L0siqYH1fWGThZ1tTO9Lo/S1j
-         UOmkirHTzVTCakZiYdcKoHVEUcq2+OhBi824/drHL/K53qvAutvdAq1D+nJ71Zh4uOaS
-         Kc7awNrp2MpWaA3SxDafbulnLboggY4yYfDP2WfVROYolCCmVebn6297ZZwnPsq3sg4m
-         PosIAvJEXjtk3QLP4+tSTbrT3CzFLl1vzoIjsJuD/3XuLPlhxcDdq86P+i/osan5OeXI
-         zZgUV7XJ1CW2o9TmX/wfZWGt5IybaOMIGr7en+INwMhpSsBnZ4pGKtllVtDv5DRM39Yf
-         t8mw==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=LN6s2yCtRIeJn4no/JRinYyKm3zCu0o0ugOVBzFGoA0=;
+        b=UxIOD131RIWKdcj6ufPWMTYHOxs8HMhJrEka4akD9UQlD9o4cG/lmzqfFVfHWlAz7d
+         mX7az+ryIeeALXThh8Sk8j5XXFrkeP68iqIYLdPLkVSTpMAEkjti+fqKPkod6hIHzunJ
+         ZIlsHC/k7oCbJTSkA6MLQTWy34G+6aEz0vYhpwatbdkhF4RFP4Vyc5eFRjHKIWj8sL8j
+         /d3CnCM9A5aNyn2goIp9tzYlwCeZlWefaenbJfjDyWh3PcqBLCPJouh1K+Ncu9GujMWb
+         Ma3crhqjwp7upBARu0PbU52xotRKysPbnaZI+4XOvLOSrazd0x6BZmg44F1ISYxP7WgS
+         9CoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=kR2bEq25iayABNzer0UnuSwP8khPR3/Fg6DdPD7/2MM=;
-        b=V3WV+mN4UAROpRei8FdBOFGA+RSsvi7Cw/St/NqtjRRqNd60JEEz0V0stNQK8eoPWI
-         ea5uMjUTKYIEwUqIkwQKj8GD2MRaIRJYGtuI6XqqK4/XDsaeUxeB3nOv9xE3FmhXIemH
-         mlXcRnoP7plIYBLur4N4h/kfakyHry5zdqbuiLA3lsYVb1wXZWYl2O62syAXS1pe1zab
-         Ukvui0tBmHNDi9w1otxqxEX41Zcj0wEi/b668tU7LZtR7iPrqRALcbskiMRYA4qV5Jvl
-         U/Ws/vyXqO3i6M2rB915TP6LxTtKXq3+9Ch5otwtEYAwQHrUaObnZZKWumA0YP983f3x
-         u7Ww==
-X-Gm-Message-State: AOAM532fkpOLHVqtrm8Jn+i7bjFGnKhQeT8dwvf3w8IUTurUdu/meEUf
-        c9ev98KpONdwxmsL3ivaPLMM+UMtnn+HR4il4A==
-X-Google-Smtp-Source: ABdhPJx91W31h+sYb7wfb/54Xkg4bl26KrSb84NvWak1L0QmJ4VTAef78iFBvPVJPo26gIVFu5LGtYoNz8WddnLCS98=
-X-Received: by 2002:a17:907:7b82:: with SMTP id ne2mr6441571ejc.271.1624558868110;
- Thu, 24 Jun 2021 11:21:08 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=LN6s2yCtRIeJn4no/JRinYyKm3zCu0o0ugOVBzFGoA0=;
+        b=Ziqyr4IDKpJpcuiQCAJO8Mz5LCqIbUeU54jeKhddqOxBCms1Ey2gA3gkEJ3S0pVcAE
+         TLFADMEDFdVyJFuP9aVmdzuqj0q4JMjfquIvB9xqni6gLGL6uJgoBTeKUFVMoJ4s9yH2
+         lg1/WYdwC2x5zW0hR28BU/dVDUsmEZ+puIJiavkQHZEEz9CFwZ1k2Ddv7xQf/62VbkFi
+         aUeicmvlZLfcOAp16C5ciZ8VybdgLAL8mzhfRWyShajZU4tHGP8X5rnXRaqskKc7Sjdn
+         VEvxMcqVdufDuLjiGC9tJ0LbCU+6LnzXU/XIVCt5mK7S1i7JYqotCtTF28ILaFH5ipqA
+         Vx6w==
+X-Gm-Message-State: AOAM530ByfaV0UyNl2dl+JAom0d0m03tUHYVs+NrjbcCjY3nejHi6UOP
+        KfBfZgDl18dJQLgSUM0rU8piBFzw0VeiSmRi/YPvtweLSK8TuQ==
+X-Google-Smtp-Source: ABdhPJz73wigHxHT8QKfOkmroZ0jsRrUTPdFhHKI5PKVObW5sbDuSJyTyeJqknYAHxha3r5bPyhOi/tlIC+gkq4b96c=
+X-Received: by 2002:a2e:a234:: with SMTP id i20mr5386653ljm.272.1624566846730;
+ Thu, 24 Jun 2021 13:34:06 -0700 (PDT)
 MIME-Version: 1.0
-References: <80F3362B-C817-4C16-A890-78ED3C6E0347@gnarbox.com>
-In-Reply-To: <80F3362B-C817-4C16-A890-78ED3C6E0347@gnarbox.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 24 Jun 2021 11:20:57 -0700
-Message-ID: <CAKywueQ29aD9vc0nQFdBW6sEWtyzJo5Se8g5YDGSnHFVWfEnYA@mail.gmail.com>
-Subject: Re: SMB Partial Send Causes CIFS VFS Reconnection and File Copy Failure
-To:     David Manpearl <david@gnarbox.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 24 Jun 2021 15:33:55 -0500
+Message-ID: <CAH2r5muNO=LB=v6AuoSmqku_z+66-ZR89z7ZGfYXXJCeswGHeg@mail.gmail.com>
+Subject: [PATCH][CIFS] fix missing spinlock around update to ses->status
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000d05c9105c588f163"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi David,
+--000000000000d05c9105c588f163
+Content-Type: text/plain; charset="UTF-8"
 
-Some issues with partial sends were fixed in the 5.1 kernel. I don't
-think the patches were backported to 4.9.
+In the other places where we update ses->status we protect the
+updates via GlobalMid_Lock. So to be consistent add the same
+locking around it in cifs_put_smb_ses where it was missing.
 
-In particular the following patches are needed:
+Addresses-Coverity: 1268904 ("Data race condition")
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ fs/cifs/cifsglob.h | 3 ++-
+ fs/cifs/connect.c  | 5 ++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-https://www.spinics.net/lists/linux-cifs/msg16569.html
-https://www.spinics.net/lists/linux-cifs/msg20496.html
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index 988346904fd0..fc6b08e5ebbc 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -887,7 +887,7 @@ struct cifs_ses {
+  struct mutex session_mutex;
+  struct TCP_Server_Info *server; /* pointer to server info */
+  int ses_count; /* reference counter */
+- enum statusEnum status;
++ enum statusEnum status;  /* updates protected by GlobalMid_Lock */
+  unsigned overrideSecFlg;  /* if non-zero override global sec flags */
+  char *serverOS; /* name of operating system underlying server */
+  char *serverNOS; /* name of network operating system of server */
+@@ -1785,6 +1785,7 @@ require use of the stronger protocol */
+  * list operations on pending_mid_q and oplockQ
+  *      updates to XID counters, multiplex id  and SMB sequence numbers
+  *      list operations on global DnotifyReqList
++ *      updates to ses->status
+  *  tcp_ses_lock protects:
+  * list operations on tcp and SMB session lists
+  *  tcon->open_file_lock protects the list of open files hanging off the tcon
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index c8079376d294..5d269f583dac 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -1598,9 +1598,12 @@ void cifs_put_smb_ses(struct cifs_ses *ses)
+  spin_unlock(&cifs_tcp_ses_lock);
+  return;
+  }
++ spin_unlock(&cifs_tcp_ses_lock);
++
++ spin_lock(&GlobalMid_Lock);
+  if (ses->status == CifsGood)
+  ses->status = CifsExiting;
+- spin_unlock(&cifs_tcp_ses_lock);
++ spin_unlock(&GlobalMid_Lock);
 
-The errors may occur if an application accessing a share uses signals
-that may be triggered during system calls. Such errors should be
-handled by retrying in the userspace if getting -EINTR.
+  cifs_free_ipc(ses);
 
---
-Best regards,
-Pavel Shilovsky
 
-=D0=B2=D1=82, 22 =D0=B8=D1=8E=D0=BD. 2021 =D0=B3. =D0=B2 20:42, David Manpe=
-arl <david@gnarbox.com>:
+-- 
+Thanks,
 
->
-> During file copy operations from our local file system to a Synology Samb=
-a server file system from within our app, we are seeing numerous partial da=
-ta sends which appear to cause CIFS reconnections, which in turn cause the =
-copies to fail.
-> We see these errors logged by our Golang application on the following ope=
-rations:
-> os.Create
-> - tbd|ERROR [tbd/daemon] (tbd_copy_file.go:333#openWriters) Failed create=
- file [open /media/smb_192_168_86_40_GBXShare/SHAREBOX/100MEDIA/DJI_0114.JP=
-G: no such file or directory]
-> write
-> - tbd|ERROR [tbd/daemon] (tbd_copy_file.go:440#finishFile) writer [write =
-/media/smb_192_168_86_40_GBXShare/SHAREBOX2/100MEDIA_01/DJI_0002.JPG: bad f=
-ile descriptor]
-> - tbd|ERROR [tbd/daemon] (tbd_copy_file.go:294#openWriters) Failed create=
- file [open /media/smb_192_168_86_40_GBXShare/SHAREBOX2/100MEDIA_01/DJI_007=
-3.JPG: resource temporarily unavailable]
-> - tbd|ERROR [tbd/daemon] (tbd_copy_file.go:393#finishFile) writer [write =
-/media/smb_192_168_86_40_GBXShare/SHAREBOX2/100MEDIA_01/DJI_0072.JPG: broke=
-n pipe]
-> file.Sync
-> - tbd|ERROR [tbd/daemon] (tbd_copy_file.go:395#finishFile) sync [sync /me=
-dia/smb_192_168_86_40_GBXShare/SMBSHARE/100MEDIA_02/DJI_0014(1).JPG: input/=
-output error]
-> file.Close
-> - tbd|WARN  [tbd/daemon] (tbd_copy_file.go:435#finishFile) close [close /=
-media/smb_192_168_86_40_GBXShare/SHAREBOX2/100MEDIA_02/DJI_0097.JPG: input/=
-output error]
->
-> Partial send log example:
-> [196361.832049] /usr/src/kernel/fs/cifs/transport.c: partial send (wanted=
-=3D65652 sent=3D116): terminating session
->
-> Usually followed by:
-> [196361.868197] CIFS VFS: Free previous auth_key.response =3D ffff8801174=
-8b000
->
-> - What are the scenarios in which a partial send will occur, because this=
- does not appear to be a network issue on our side?
->
-> - If this is expected behavior, how are we supposed to be handling the pa=
-rtial sends in userspace?
->
-> - Are there other errors you see in the attached logs?
->
-> Linux Kernel version: 4.9.115-yocto-standard
-> We are using the "fs/cifs/" directory from the "linux-4.9-full-backports"=
- branch from this repo: https://github.com/smfrench/smb3-cifs-linux-stable-=
-backports
->
-> Mount.cifs version: 6.7
-> Samba version:
-> http://192.168.86.40:5000
-> Control Panel > File Services > Max SMB3, Min SMB2.
-> Appliance: Synology:
-> Model name: DS1618
-> CPU: INTEL Atom C3538
->
-> DebugData:
-> # cat /proc/fs/cifs/DebugData
-> Display Internal CIFS Data Structures for Debugging
-> ---------------------------------------------------
-> CIFS Version 2.11
-> Features: posix xattr
-> Active VFS Requests: 0
-> Servers:
-> Number of credits: 512 Dialect 0x202
-> 1) Name: 192.168.86.40 Uses: 1 Capability: 0x300001 Session Status: 1 TCP=
- status: 1
-> Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0
-> Shares:
-> 0) IPC: \\192.168.86.40\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
-> PathComponentMax: 0 Status: 1 type: 0
-> 1) \\192.168.86.40\GBXShare Mounts: 4 DevInfo: 0x20 Attributes: 0x5006f
-> PathComponentMax: 255 Status: 1 type: DISK
-> MIDs:
-> Number of credits: 528 Dialect 0x302
-> 2) Name: 192.168.86.40 Uses: 1 Capability: 0x300005 Session Status: 1 TCP=
- status: 1
-> Local Users To Server: 1 SecMode: 0x1 Req On Wire: 0
-> Shares:
-> 0) IPC: \\192.168.86.40\IPC$ Mounts: 1 DevInfo: 0x0 Attributes: 0x0
-> PathComponentMax: 0 Status: 1 type: 0
-> Share Capabilities: None Share Flags: 0x0
->
-> 1) \\192.168.86.40\GBXShare Mounts: 1 DevInfo: 0x20 Attributes: 0x5006f
-> PathComponentMax: 255 Status: 1 type: DISK
-> Share Capabilities: None Aligned, Partition Aligned, Share Flags: 0x0 Opt=
-imal sector size: 0x200
-> MIDs:
->
-> Logs: dmesgCIFS-h.log: https://drive.google.com/file/d/1_fWpvSs5zeOFaV-Yl=
-GfW2ej3LGwFZSns/view?usp=3Dsharing
->
-> - Thank you, David
->
->
+Steve
+
+--000000000000d05c9105c588f163
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-fix-missing-spinlock-around-update-to-ses-statu.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-fix-missing-spinlock-around-update-to-ses-statu.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kqbd3lxr0>
+X-Attachment-Id: f_kqbd3lxr0
+
+RnJvbSA1OTEwNzFmYWIyMzJiY2RlMzU4NGFkMWZkMWVkMGY2ZmRjMmZjZGI1IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFRodSwgMjQgSnVuIDIwMjEgMTU6Mjg6MDQgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBmaXggbWlzc2luZyBzcGlubG9jayBhcm91bmQgdXBkYXRlIHRvIHNlcy0+c3RhdHVzCgpJ
+biB0aGUgb3RoZXIgcGxhY2VzIHdoZXJlIHdlIHVwZGF0ZSBzZXMtPnN0YXR1cyB3ZSBwcm90ZWN0
+IHRoZQp1cGRhdGVzIHZpYSBHbG9iYWxNaWRfTG9jay4gU28gdG8gYmUgY29uc2lzdGVudCBhZGQg
+dGhlIHNhbWUKbG9ja2luZyBhcm91bmQgaXQgaW4gY2lmc19wdXRfc21iX3NlcyB3aGVyZSBpdCB3
+YXMgbWlzc2luZy4KCkFkZHJlc3Nlcy1Db3Zlcml0eTogMTI2ODkwNCAoIkRhdGEgcmFjZSBjb25k
+aXRpb24iKQpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5j
+b20+Ci0tLQogZnMvY2lmcy9jaWZzZ2xvYi5oIHwgMyArKy0KIGZzL2NpZnMvY29ubmVjdC5jICB8
+IDUgKysrKy0KIDIgZmlsZXMgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygt
+KQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lmc2dsb2IuaApp
+bmRleCA5ODgzNDY5MDRmZDAuLmZjNmIwOGU1ZWJiYyAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZz
+Z2xvYi5oCisrKyBiL2ZzL2NpZnMvY2lmc2dsb2IuaApAQCAtODg3LDcgKzg4Nyw3IEBAIHN0cnVj
+dCBjaWZzX3NlcyB7CiAJc3RydWN0IG11dGV4IHNlc3Npb25fbXV0ZXg7CiAJc3RydWN0IFRDUF9T
+ZXJ2ZXJfSW5mbyAqc2VydmVyOwkvKiBwb2ludGVyIHRvIHNlcnZlciBpbmZvICovCiAJaW50IHNl
+c19jb3VudDsJCS8qIHJlZmVyZW5jZSBjb3VudGVyICovCi0JZW51bSBzdGF0dXNFbnVtIHN0YXR1
+czsKKwllbnVtIHN0YXR1c0VudW0gc3RhdHVzOyAgLyogdXBkYXRlcyBwcm90ZWN0ZWQgYnkgR2xv
+YmFsTWlkX0xvY2sgKi8KIAl1bnNpZ25lZCBvdmVycmlkZVNlY0ZsZzsgIC8qIGlmIG5vbi16ZXJv
+IG92ZXJyaWRlIGdsb2JhbCBzZWMgZmxhZ3MgKi8KIAljaGFyICpzZXJ2ZXJPUzsJCS8qIG5hbWUg
+b2Ygb3BlcmF0aW5nIHN5c3RlbSB1bmRlcmx5aW5nIHNlcnZlciAqLwogCWNoYXIgKnNlcnZlck5P
+UzsJLyogbmFtZSBvZiBuZXR3b3JrIG9wZXJhdGluZyBzeXN0ZW0gb2Ygc2VydmVyICovCkBAIC0x
+Nzg1LDYgKzE3ODUsNyBAQCByZXF1aXJlIHVzZSBvZiB0aGUgc3Ryb25nZXIgcHJvdG9jb2wgKi8K
+ICAqCWxpc3Qgb3BlcmF0aW9ucyBvbiBwZW5kaW5nX21pZF9xIGFuZCBvcGxvY2tRCiAgKiAgICAg
+IHVwZGF0ZXMgdG8gWElEIGNvdW50ZXJzLCBtdWx0aXBsZXggaWQgIGFuZCBTTUIgc2VxdWVuY2Ug
+bnVtYmVycwogICogICAgICBsaXN0IG9wZXJhdGlvbnMgb24gZ2xvYmFsIERub3RpZnlSZXFMaXN0
+CisgKiAgICAgIHVwZGF0ZXMgdG8gc2VzLT5zdGF0dXMKICAqICB0Y3Bfc2VzX2xvY2sgcHJvdGVj
+dHM6CiAgKglsaXN0IG9wZXJhdGlvbnMgb24gdGNwIGFuZCBTTUIgc2Vzc2lvbiBsaXN0cwogICog
+IHRjb24tPm9wZW5fZmlsZV9sb2NrIHByb3RlY3RzIHRoZSBsaXN0IG9mIG9wZW4gZmlsZXMgaGFu
+Z2luZyBvZmYgdGhlIHRjb24KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5jIGIvZnMvY2lm
+cy9jb25uZWN0LmMKaW5kZXggYzgwNzkzNzZkMjk0Li41ZDI2OWY1ODNkYWMgMTAwNjQ0Ci0tLSBh
+L2ZzL2NpZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC0xNTk4LDkgKzE1
+OTgsMTIgQEAgdm9pZCBjaWZzX3B1dF9zbWJfc2VzKHN0cnVjdCBjaWZzX3NlcyAqc2VzKQogCQlz
+cGluX3VubG9jaygmY2lmc190Y3Bfc2VzX2xvY2spOwogCQlyZXR1cm47CiAJfQorCXNwaW5fdW5s
+b2NrKCZjaWZzX3RjcF9zZXNfbG9jayk7CisKKwlzcGluX2xvY2soJkdsb2JhbE1pZF9Mb2NrKTsK
+IAlpZiAoc2VzLT5zdGF0dXMgPT0gQ2lmc0dvb2QpCiAJCXNlcy0+c3RhdHVzID0gQ2lmc0V4aXRp
+bmc7Ci0Jc3Bpbl91bmxvY2soJmNpZnNfdGNwX3Nlc19sb2NrKTsKKwlzcGluX3VubG9jaygmR2xv
+YmFsTWlkX0xvY2spOwogCiAJY2lmc19mcmVlX2lwYyhzZXMpOwogCi0tIAoyLjMwLjIKCg==
+--000000000000d05c9105c588f163--
