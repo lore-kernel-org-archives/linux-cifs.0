@@ -2,109 +2,110 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-24.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9817CC48BC2
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 01:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81597C48BC2
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 01:52:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72E8D6128C
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 01:02:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60CD161351
+	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 01:52:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229774AbhFXBFJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 23 Jun 2021 21:05:09 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:18607 "EHLO
+        id S229759AbhFXByr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 23 Jun 2021 21:54:47 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:30304 "EHLO
         mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229758AbhFXBFI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Jun 2021 21:05:08 -0400
-Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210624010248epoutp02f248213277c808fbc42969daadb0393a~LXwW5vimy1794317943epoutp026
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Jun 2021 01:02:48 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210624010248epoutp02f248213277c808fbc42969daadb0393a~LXwW5vimy1794317943epoutp026
+        with ESMTP id S229758AbhFXByq (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 23 Jun 2021 21:54:46 -0400
+Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210624015226epoutp02d7718c5c71829dd19f865166b732be52~LYbr3BMDA2519625196epoutp02Y
+        for <linux-cifs@vger.kernel.org>; Thu, 24 Jun 2021 01:52:26 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210624015226epoutp02d7718c5c71829dd19f865166b732be52~LYbr3BMDA2519625196epoutp02Y
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1624496568;
-        bh=VgQSjXhQ4qAZ/z/W2Wp4PAvllT/ZctH0/VYHmIW8kRs=;
+        s=mail20170921; t=1624499546;
+        bh=FQBHgfVz3jPN0iAH1xs7SG8yucWBCWSgzsaIbWxev90=;
         h=From:To:Cc:Subject:Date:References:From;
-        b=M7pBjnQLM53Y8mBAQ3afop3pcLZWfENoeO5Kb7fuKqQHL1cIWTm/U0kcg/iV5iv0R
-         9uPhuu2NpiP6RTrVKlHcAPo0+McZd3f0cXqxOozr28Tr18po6op0X9t5vtod6mvm+H
-         FBZGiccWddjWqNmxSmh8zxorK8uaMokHkncVG8eA=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
-        20210624010239epcas1p426fe969276cd9769ec657572d4614f82~LXwOgxlQ92274222742epcas1p4C;
-        Thu, 24 Jun 2021 01:02:39 +0000 (GMT)
-Received: from epsmges1p2.samsung.com (unknown [182.195.40.159]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4G9MLQ17FTz4x9QV; Thu, 24 Jun
-        2021 01:02:38 +0000 (GMT)
+        b=CLDo5HiOYDboYw+vOHNytny8giFNSFs6QD3yuKce7GUQQUb9jFNQ3EtP6T9aca7CG
+         ashShnH/ob2pgeaPK62pxx99vmIDJ4ABO6nVUI9H+Q136aWJ2XxN0WtdgNn5hGBu6C
+         Ip8lxRcMQ23JJIv2oCgMg1qgjujfmbwisjdGnA88=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20210624015225epcas1p17c025739f7111abb21d91b9ea05eb7a2~LYbrSapjL2499824998epcas1p1L;
+        Thu, 24 Jun 2021 01:52:25 +0000 (GMT)
+Received: from epsmges1p1.samsung.com (unknown [182.195.40.161]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4G9NRr4VqXz4x9QK; Thu, 24 Jun
+        2021 01:52:24 +0000 (GMT)
 Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
-        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        32.BE.09551.8A9D3D06; Thu, 24 Jun 2021 10:02:32 +0900 (KST)
+        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        9D.B3.09952.855E3D06; Thu, 24 Jun 2021 10:52:24 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210624010230epcas1p27cee803b261296294a069e8169a03c4a~LXwFkUwRx1170211702epcas1p29;
-        Thu, 24 Jun 2021 01:02:30 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20210624015215epcas1p1a5b07effa03a047b1f76481d344d52c6~LYbh5riPg0607106071epcas1p1B;
+        Thu, 24 Jun 2021 01:52:15 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
         epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210624010230epsmtrp2415744ad319f15c6e0694db1563619e5~LXwFjk1oQ0890808908epsmtrp2J;
-        Thu, 24 Jun 2021 01:02:30 +0000 (GMT)
-X-AuditID: b6c32a36-2b3ff7000000254f-17-60d3d9a8ce38
+        20210624015215epsmtrp26bc522dc075007db669b6e6058be8ad2~LYbh4yNnh3160031600epsmtrp2G;
+        Thu, 24 Jun 2021 01:52:15 +0000 (GMT)
+X-AuditID: b6c32a35-45dff700000026e0-1c-60d3e5582841
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        E6.03.08289.6A9D3D06; Thu, 24 Jun 2021 10:02:30 +0900 (KST)
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        04.1F.08394.F45E3D06; Thu, 24 Jun 2021 10:52:15 +0900 (KST)
 Received: from localhost.localdomain (unknown [10.89.31.219]) by
         epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210624010229epsmtip189d06a47618c0b1e35a45d4305ff95bd~LXwFXdsqM2054820548epsmtip1E;
-        Thu, 24 Jun 2021 01:02:29 +0000 (GMT)
+        20210624015215epsmtip1254de95d776033da241308fbcee18019~LYbhrC7WU1066110661epsmtip1l;
+        Thu, 24 Jun 2021 01:52:15 +0000 (GMT)
 From:   Namjae Jeon <namjae.jeon@samsung.com>
 To:     linux-cifs@vger.kernel.org, linux-cifsd-devel@lists.sourceforge.net
 Cc:     Namjae Jeon <namjae.jeon@samsung.com>,
         Steve French <smfrench@gmail.com>,
         Ronnie Sahlberg <ronniesahlberg@gmail.com>,
         Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH 1/2] ksmbd: move fs/cifsd to fs/ksmbd
-Date:   Thu, 24 Jun 2021 09:52:10 +0900
-Message-Id: <20210624005211.26886-1-namjae.jeon@samsung.com>
+Subject: [PATCH v2 1/2] ksmbd: move fs/cifsd to fs/ksmbd
+Date:   Thu, 24 Jun 2021 10:42:42 +0900
+Message-Id: <20210624014242.900-1-namjae.jeon@samsung.com>
 X-Mailer: git-send-email 2.17.1
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrBKsWRmVeSWpSXmKPExsWy7bCmru6Km5cTDFpPCVicnrCIyeLF/13M
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrOKsWRmVeSWpSXmKPExsWy7bCmrm7E08sJBsvfK1mcnrCIyeLF/13M
         Fj//f2e0+DG93qK37xOrxZsXh9kc2Dx2zrrL7rF5hZbH7gWfmTz6tqxi9Pi8SS6ANSrHJiM1
         MSW1SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VWycUnQNctMwdov5JCWWJOKVAo
-        ILG4WEnfzqYov7QkVSEjv7jEVim1ICWnwNCgQK84Mbe4NC9dLzk/18rQwMDIFKgyISfjx8OT
-        jAU7JzNW3Lnzg6WBcUNpFyMnh4SAicT7xd8Zuxi5OIQEdjBK9O/ZB+V8YpS4/ugAO4TzmVFi
-        5q3NjDAtCzv3QyV2MUrsXH2aBSQB1nL0F38XIwcHm4C2xJ8toiBhEQF3iWX7+5lB6pkFFjNK
-        9DSvZgdJCAuYSjTOn8gGYrMIqEosfnoFbA6vgI3Eym1TWCGWyUus3nCAGcJexS4x67o/hO0i
-        MffjdqgaYYlXx7ewQ9hSEp/f7WWDsMslTpz8xQRh10hsmLePHeQ2CQFjiZ4XJSAms4CmxPpd
-        +hAVihI7f88Fe5FZgE/i3dceVohqXomONiGIElWJvkuHoQZKS3S1f4Ba6iGx4shHdkggxEqc
-        /nCYdQKj7CyEBQsYGVcxiqUWFOempxYbFhghx9EmRnCS0jLbwTjp7Qe9Q4xMHIyHGCU4mJVE
-        eB+1XEoQ4k1JrKxKLcqPLyrNSS0+xGgKDK2JzFKiyfnANJlXEm9oamRsbGxhYmZuZmqsJM67
-        k+1QgpBAemJJanZqakFqEUwfEwenVANTWd7S7W7Hd57KDWBVYf66ZkPVlxWiShumd/ufuqev
-        PJ3zYeza6x9zdBlX5M243yHscvUEy1uFP5ZzuG95vb4guL7847Xi/EkVf4XvrJq1dkpnB+sZ
-        MZbkafO+Z4tlS52P+7Qmrae13C0xa8lry5KWROZjylwXC5/N9eY72dAsurY9QCLrv9+TybaC
-        G180xDVnfZ7+iIFzTW3tU8c/MnfTP6yf02Bly7bhn4f2FAc71nn2T5tN1O03qhZrvb8YM1NY
-        L+e9+c0tuc/uLMrKb/rXuGrxn5zyT5bLFgloN1pNltjYXRvAo5smkHK8YYdvudXr8IUbL8+a
-        xOGodO1UzkauqtMvfl3u2Lm0oGnFuTIeJZbijERDLeai4kQA1ly5R9sDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrBJMWRmVeSWpSXmKPExsWy7bCSnO6ym5cTDF7+ZLM4PWERk8WL/7uY
-        LX7+/85o8WN6vUVv3ydWizcvDrM5sHnsnHWX3WPzCi2P3Qs+M3n0bVnF6PF5k1wAaxSXTUpq
-        TmZZapG+XQJXxo+HJxkLdk5mrLhz5wdLA+OG0i5GTg4JAROJhZ372bsYuTiEBHYwSixfcZgd
-        IiEtcezEGeYuRg4gW1ji8OFiiJoPjBLvNy5jBImzCWhL/NkiClIuIuApsffqebA5zAJLGSXm
-        3OkGmyMsYCrROH8iG4jNIqAqsfjpFRYQm1fARmLltimsELvkJVZvOMA8gZFnASPDKkbJ1ILi
-        3PTcYsMCo7zUcr3ixNzi0rx0veT83E2M4MDR0trBuGfVB71DjEwcjIcYJTiYlUR4H7VcShDi
-        TUmsrEotyo8vKs1JLT7EKM3BoiTOe6HrZLyQQHpiSWp2ampBahFMlomDU6qBif/cVNe+Vf+s
-        +KpzU+z+PfZzvsbD2h7O/ubLcfe69aZf1J7F8s1/Wct92FtHS1c+5MQOpuXSbjOr8p6y5Wyb
-        c2e329VYWyfdxsqPdzMr3x+c3dz8Zupt5eA9d799b9GO4F2qteDVo+nhB57Z3bpVrhh8qLZr
-        ksOlz9vblr1rUZD7VrpU+qBeSOcMp8A/SiEzPWq0hXjeze7Wryl7rXPlQscPg5/LZu+Zs4jz
-        ZE/W0++RmQf3rYtWFuyR1kyWXZ1YsmSuCXNMY3fmmg/8z+dlX06Vb63LXSX1+O1ed5Ne2Yw6
-        Jve18ytCA5Pv+9WFsk46M2ljj3VC7fx13Cb8N1acWPjuJ9s65ak+JVIXqtgjlViKMxINtZiL
-        ihMBu42PvYsCAAA=
-X-CMS-MailID: 20210624010230epcas1p27cee803b261296294a069e8169a03c4a
+        ILG4WEnfzqYov7QkVSEjv7jEVim1ICWnwNCgQK84Mbe4NC9dLzk/18rQwMDIFKgyISej4ctW
+        9oIDsxkrDjV9Z25gPFDbxcjBISFgItG8RKmLkYtDSGAHo8S543vYIZxPjBLNL+cydzFyAjnf
+        GCVOLdMEsUEaPjb3M0MU7WWUWLphEhtcx58tO9hAxrIJaAPZoiANIgLuEsv2QzQwCyxmlOhp
+        Xs0OUiMsYCEx63UUSA2LgKrEqhsT2UBsXgEriRkXFrFCLJOXWL3hAFivhMAqdokNncuYIRIu
+        EjuXb2OCsIUlXh3fwg5hS0l8freXDcIulzhx8hdUTY3Ehnn72CFeNpboeVECYjILaEqs36UP
+        UaEosfP3XEYQm1mAT+Ld1x5WiGpeiY42IYgSVYm+S4ehBkpLdLV/gFrqITH9UTMTJKhiJZ7+
+        OMk8gVF2FsKCBYyMqxjFUguKc9NTiw0LDJGjaBMjOEVpme5gnPj2g94hRiYOxkOMEhzMSiK8
+        j1ouJQjxpiRWVqUW5ccXleakFh9iNAUG10RmKdHkfGCSzCuJNzQ1MjY2tjAxMzczNVYS593J
+        dihBSCA9sSQ1OzW1ILUIpo+Jg1OqgYk3IeuAbV/ikX8HvZf5mqm/nl/M9qFULnr5oWeVeyIX
+        3MmydftcH/bw1Y3a4pfxLYqH53iGS0zb7MDOuSGf0dA60m7ltAMPauPd0l7eykm0u7nfn1sg
+        Xzv3gPDfd9Ebzd42eu/K/Tf1svLf0Mygh4frhRYoXJoRdf6w5Pq2iVZL3pqt3Pw1aU/Pp+m1
+        j7IOxEz8Ey/DYZ3q4vtMpWV/7+PnPfqNOx/ETHsef+Kh2MG3PmdXpjplbczJnB3QzMDm4dSZ
+        8/noDIYdX9NSFv2W/u610fDWf0vLKmYHo1Myez18PjM5tsce3fM9+ZjV8xXRFaa3UxeXXz2e
+        F1T8f+cGt9/Bp3Ie/vWrzOjYlyayTUmJpTgj0VCLuag4EQAb35WQ2gMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrGJMWRmVeSWpSXmKPExsWy7bCSnK7/08sJBtO2S1qcnrCIyeLF/13M
+        Fj//f2e0+DG93qK37xOrxZsXh9kc2Dx2zrrL7rF5hZbH7gWfmTz6tqxi9Pi8SS6ANYrLJiU1
+        J7MstUjfLoEro+HLVvaCA7MZKw41fWduYDxQ28XIySEhYCLxsbmfGcQWEtjNKPG5twAiLi1x
+        7MQZoDgHkC0scfhwcRcjF1DJB0aJje2PGEHibALaEn+2iIKUiwh4Suy9ep4dpIZZYCmjxJw7
+        3ewgNcICFhKzXkeB1LAIqEqsujGRDcTmFbCSmHFhESvEKnmJ1RsOME9g5FnAyLCKUTK1oDg3
+        PbfYsMAwL7Vcrzgxt7g0L10vOT93EyM4aLQ0dzBuX/VB7xAjEwfjIUYJDmYlEd5HLZcShHhT
+        EiurUovy44tKc1KLDzFKc7AoifNe6DoZLySQnliSmp2aWpBaBJNl4uCUamDK1/T2emc1/9PW
+        +n9BfALz3LdeXdNpOlnT922GJctzk9qoyfNvNcp/DdB8efvt6wtnSyvO3J8UfuP3ymtNh0Mf
+        +Dks/LY/xH1nceHX7JtCpyzF29gYP64zCVkzdTfDyitXV5XyzNnvWJUq6sq/aMuN+5fsX2o0
+        xIsZztl+L99qmf6WPv0ffM/mPGs+2+tw22JN5XPJUwZcyqZLArudf1bH88t/nDXBdMb18g4x
+        2xZn7UlmDjNmX99k92p/gXLI52ZD2cs81tH9cYuuG0m9kLi0UXnKXZXepzeOntd+w7Fp5qr9
+        RfeeW9pdiUipMdbcnLPymljb3vW34wW0uiTX19Vt5mw+wO6Y6l8medI5Oz5diaU4I9FQi7mo
+        OBEA+/EZVokCAAA=
+X-CMS-MailID: 20210624015215epcas1p1a5b07effa03a047b1f76481d344d52c6
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: SVC_REQ_APPROVE
 CMS-TYPE: 101P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210624010230epcas1p27cee803b261296294a069e8169a03c4a
-References: <CGME20210624010230epcas1p27cee803b261296294a069e8169a03c4a@epcas1p2.samsung.com>
+X-CMS-RootMailID: 20210624015215epcas1p1a5b07effa03a047b1f76481d344d52c6
+References: <CGME20210624015215epcas1p1a5b07effa03a047b1f76481d344d52c6@epcas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -112,76 +113,79 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 Move fs/cifsd to fs/ksmbd and rename the remaining cifsd name to ksmbd.
 
 Cc: Steve French <smfrench@gmail.com>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com> 
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: Christoph Hellwig <hch@infradead.org>
 Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
 ---
- Documentation/filesystems/cifs/index.rst               |  2 +-
- .../filesystems/cifs/{cifsd.rst => ksmbd.rst}          | 10 +++++-----
- fs/Kconfig                                             |  2 +-
- fs/Makefile                                            |  2 +-
- fs/{cifsd => ksmbd}/Kconfig                            |  2 +-
- fs/{cifsd => ksmbd}/Makefile                           |  0
- fs/{cifsd => ksmbd}/asn1.c                             |  0
- fs/{cifsd => ksmbd}/asn1.h                             |  0
- fs/{cifsd => ksmbd}/auth.c                             |  0
- fs/{cifsd => ksmbd}/auth.h                             |  0
- fs/{cifsd => ksmbd}/connection.c                       |  0
- fs/{cifsd => ksmbd}/connection.h                       |  0
- fs/{cifsd => ksmbd}/crypto_ctx.c                       |  0
- fs/{cifsd => ksmbd}/crypto_ctx.h                       |  0
- fs/{cifsd => ksmbd}/glob.h                             |  0
- fs/{cifsd => ksmbd}/ksmbd_server.h                     |  0
- fs/{cifsd => ksmbd}/ksmbd_spnego_negtokeninit.asn1     |  0
- fs/{cifsd => ksmbd}/ksmbd_spnego_negtokentarg.asn1     |  0
- fs/{cifsd => ksmbd}/ksmbd_work.c                       |  0
- fs/{cifsd => ksmbd}/ksmbd_work.h                       |  0
- fs/{cifsd => ksmbd}/mgmt/ksmbd_ida.c                   |  0
- fs/{cifsd => ksmbd}/mgmt/ksmbd_ida.h                   |  0
- fs/{cifsd => ksmbd}/mgmt/share_config.c                |  0
- fs/{cifsd => ksmbd}/mgmt/share_config.h                |  0
- fs/{cifsd => ksmbd}/mgmt/tree_connect.c                |  0
- fs/{cifsd => ksmbd}/mgmt/tree_connect.h                |  0
- fs/{cifsd => ksmbd}/mgmt/user_config.c                 |  0
- fs/{cifsd => ksmbd}/mgmt/user_config.h                 |  0
- fs/{cifsd => ksmbd}/mgmt/user_session.c                |  0
- fs/{cifsd => ksmbd}/mgmt/user_session.h                |  0
- fs/{cifsd => ksmbd}/misc.c                             |  0
- fs/{cifsd => ksmbd}/misc.h                             |  0
- fs/{cifsd => ksmbd}/ndr.c                              |  0
- fs/{cifsd => ksmbd}/ndr.h                              |  0
- fs/{cifsd => ksmbd}/nterr.h                            |  0
- fs/{cifsd => ksmbd}/ntlmssp.h                          |  0
- fs/{cifsd => ksmbd}/oplock.c                           |  0
- fs/{cifsd => ksmbd}/oplock.h                           |  0
- fs/{cifsd => ksmbd}/server.c                           |  0
- fs/{cifsd => ksmbd}/server.h                           |  0
- fs/{cifsd => ksmbd}/smb2misc.c                         |  0
- fs/{cifsd => ksmbd}/smb2ops.c                          |  0
- fs/{cifsd => ksmbd}/smb2pdu.c                          |  0
- fs/{cifsd => ksmbd}/smb2pdu.h                          |  0
- fs/{cifsd => ksmbd}/smb_common.c                       |  0
- fs/{cifsd => ksmbd}/smb_common.h                       |  0
- fs/{cifsd => ksmbd}/smbacl.c                           |  0
- fs/{cifsd => ksmbd}/smbacl.h                           |  0
- fs/{cifsd => ksmbd}/smbfsctl.h                         |  0
- fs/{cifsd => ksmbd}/smbstatus.h                        |  0
- fs/{cifsd => ksmbd}/transport_ipc.c                    |  0
- fs/{cifsd => ksmbd}/transport_ipc.h                    |  0
- fs/{cifsd => ksmbd}/transport_rdma.c                   |  0
- fs/{cifsd => ksmbd}/transport_rdma.h                   |  0
- fs/{cifsd => ksmbd}/transport_tcp.c                    |  0
- fs/{cifsd => ksmbd}/transport_tcp.h                    |  0
- fs/{cifsd => ksmbd}/unicode.c                          |  0
- fs/{cifsd => ksmbd}/unicode.h                          |  0
- fs/{cifsd => ksmbd}/uniupr.h                           |  0
- fs/{cifsd => ksmbd}/vfs.c                              |  0
- fs/{cifsd => ksmbd}/vfs.h                              |  0
- fs/{cifsd => ksmbd}/vfs_cache.c                        |  0
- fs/{cifsd => ksmbd}/vfs_cache.h                        |  0
- 63 files changed, 9 insertions(+), 9 deletions(-)
+ v2:
+  - rename missing cifsd name in Kconfig.
+
+ Documentation/filesystems/cifs/index.rst           |  2 +-
+ .../filesystems/cifs/{cifsd.rst => ksmbd.rst}      | 10 +++++-----
+ fs/Kconfig                                         |  2 +-
+ fs/Makefile                                        |  2 +-
+ fs/{cifsd => ksmbd}/Kconfig                        | 14 +++++++-------
+ fs/{cifsd => ksmbd}/Makefile                       |  0
+ fs/{cifsd => ksmbd}/asn1.c                         |  0
+ fs/{cifsd => ksmbd}/asn1.h                         |  0
+ fs/{cifsd => ksmbd}/auth.c                         |  0
+ fs/{cifsd => ksmbd}/auth.h                         |  0
+ fs/{cifsd => ksmbd}/connection.c                   |  0
+ fs/{cifsd => ksmbd}/connection.h                   |  0
+ fs/{cifsd => ksmbd}/crypto_ctx.c                   |  0
+ fs/{cifsd => ksmbd}/crypto_ctx.h                   |  0
+ fs/{cifsd => ksmbd}/glob.h                         |  0
+ fs/{cifsd => ksmbd}/ksmbd_server.h                 |  0
+ fs/{cifsd => ksmbd}/ksmbd_spnego_negtokeninit.asn1 |  0
+ fs/{cifsd => ksmbd}/ksmbd_spnego_negtokentarg.asn1 |  0
+ fs/{cifsd => ksmbd}/ksmbd_work.c                   |  0
+ fs/{cifsd => ksmbd}/ksmbd_work.h                   |  0
+ fs/{cifsd => ksmbd}/mgmt/ksmbd_ida.c               |  0
+ fs/{cifsd => ksmbd}/mgmt/ksmbd_ida.h               |  0
+ fs/{cifsd => ksmbd}/mgmt/share_config.c            |  0
+ fs/{cifsd => ksmbd}/mgmt/share_config.h            |  0
+ fs/{cifsd => ksmbd}/mgmt/tree_connect.c            |  0
+ fs/{cifsd => ksmbd}/mgmt/tree_connect.h            |  0
+ fs/{cifsd => ksmbd}/mgmt/user_config.c             |  0
+ fs/{cifsd => ksmbd}/mgmt/user_config.h             |  0
+ fs/{cifsd => ksmbd}/mgmt/user_session.c            |  0
+ fs/{cifsd => ksmbd}/mgmt/user_session.h            |  0
+ fs/{cifsd => ksmbd}/misc.c                         |  0
+ fs/{cifsd => ksmbd}/misc.h                         |  0
+ fs/{cifsd => ksmbd}/ndr.c                          |  0
+ fs/{cifsd => ksmbd}/ndr.h                          |  0
+ fs/{cifsd => ksmbd}/nterr.h                        |  0
+ fs/{cifsd => ksmbd}/ntlmssp.h                      |  0
+ fs/{cifsd => ksmbd}/oplock.c                       |  0
+ fs/{cifsd => ksmbd}/oplock.h                       |  0
+ fs/{cifsd => ksmbd}/server.c                       |  0
+ fs/{cifsd => ksmbd}/server.h                       |  0
+ fs/{cifsd => ksmbd}/smb2misc.c                     |  0
+ fs/{cifsd => ksmbd}/smb2ops.c                      |  0
+ fs/{cifsd => ksmbd}/smb2pdu.c                      |  0
+ fs/{cifsd => ksmbd}/smb2pdu.h                      |  0
+ fs/{cifsd => ksmbd}/smb_common.c                   |  0
+ fs/{cifsd => ksmbd}/smb_common.h                   |  0
+ fs/{cifsd => ksmbd}/smbacl.c                       |  0
+ fs/{cifsd => ksmbd}/smbacl.h                       |  0
+ fs/{cifsd => ksmbd}/smbfsctl.h                     |  0
+ fs/{cifsd => ksmbd}/smbstatus.h                    |  0
+ fs/{cifsd => ksmbd}/transport_ipc.c                |  0
+ fs/{cifsd => ksmbd}/transport_ipc.h                |  0
+ fs/{cifsd => ksmbd}/transport_rdma.c               |  0
+ fs/{cifsd => ksmbd}/transport_rdma.h               |  0
+ fs/{cifsd => ksmbd}/transport_tcp.c                |  0
+ fs/{cifsd => ksmbd}/transport_tcp.h                |  0
+ fs/{cifsd => ksmbd}/unicode.c                      |  0
+ fs/{cifsd => ksmbd}/unicode.h                      |  0
+ fs/{cifsd => ksmbd}/uniupr.h                       |  0
+ fs/{cifsd => ksmbd}/vfs.c                          |  0
+ fs/{cifsd => ksmbd}/vfs.h                          |  0
+ fs/{cifsd => ksmbd}/vfs_cache.c                    |  0
+ fs/{cifsd => ksmbd}/vfs_cache.h                    |  0
+ 63 files changed, 15 insertions(+), 15 deletions(-)
  rename Documentation/filesystems/cifs/{cifsd.rst => ksmbd.rst} (98%)
- rename fs/{cifsd => ksmbd}/Kconfig (97%)
+ rename fs/{cifsd => ksmbd}/Kconfig (81%)
  rename fs/{cifsd => ksmbd}/Makefile (100%)
  rename fs/{cifsd => ksmbd}/asn1.c (100%)
  rename fs/{cifsd => ksmbd}/asn1.h (100%)
@@ -321,10 +325,10 @@ index 542a77374d12..e03a048b2cd8 100644
  obj-$(CONFIG_NTFS_FS)		+= ntfs/
  obj-$(CONFIG_UFS_FS)		+= ufs/
 diff --git a/fs/cifsd/Kconfig b/fs/ksmbd/Kconfig
-similarity index 97%
+similarity index 81%
 rename from fs/cifsd/Kconfig
 rename to fs/ksmbd/Kconfig
-index 796f928a7da0..ba8554fc36d3 100644
+index 796f928a7da0..e9a5ac01b6e0 100644
 --- a/fs/cifsd/Kconfig
 +++ b/fs/ksmbd/Kconfig
 @@ -1,5 +1,5 @@
@@ -334,6 +338,34 @@ index 796f928a7da0..ba8554fc36d3 100644
  	depends on INET
  	depends on MULTIUSER
  	depends on FILE_LOCKING
+@@ -31,13 +31,13 @@ config SMB_SERVER
+ 	  case you can choose N here.
+ 
+ 	  You also need to install user space programs which can be found
+-	  in cifsd-tools, available from
+-	  https://github.com/cifsd-team/cifsd-tools.
+-	  More detail about how to run the cifsd kernel server is
++	  in ksmbd-tools, available from
++	  https://github.com/cifsd-team/ksmbd-tools.
++	  More detail about how to run the ksmbd kernel server is
+ 	  available via README file
+-	  (https://github.com/cifsd-team/cifsd-tools/blob/master/README).
++	  (https://github.com/cifsd-team/ksmbd-tools/blob/master/README).
+ 
+-	  cifsd kernel server includes support for auto-negotiation,
++	  ksmbd kernel server includes support for auto-negotiation,
+ 	  Secure negotiate, Pre-authentication integrity, oplock/lease,
+ 	  compound requests, multi-credit, packet signing, RDMA(smbdirect),
+ 	  smb3 encryption, copy-offload, secure per-user session
+@@ -61,7 +61,7 @@ config SMB_SERVER_CHECK_CAP_NET_ADMIN
+ 	default y
+ 
+ 	help
+-	  Prevent unprivileged processes to start the cifsd kernel server.
++	  Prevent unprivileged processes to start the ksmbd kernel server.
+ 
+ config SMB_SERVER_KERBEROS5
+ 	bool "Support for Kerberos 5"
 diff --git a/fs/cifsd/Makefile b/fs/ksmbd/Makefile
 similarity index 100%
 rename from fs/cifsd/Makefile
