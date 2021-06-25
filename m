@@ -8,163 +8,106 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECF7C49EA6
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 20:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BC0C2B9F4
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Jun 2021 19:05:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE3A5613BD
-	for <linux-cifs@archiver.kernel.org>; Thu, 24 Jun 2021 20:34:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AAC5D6161F
+	for <linux-cifs@archiver.kernel.org>; Fri, 25 Jun 2021 19:05:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232460AbhFXUg3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 24 Jun 2021 16:36:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43270 "EHLO
+        id S229630AbhFYTIF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 25 Jun 2021 15:08:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232310AbhFXUg3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 24 Jun 2021 16:36:29 -0400
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C65ACC061574
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Jun 2021 13:34:08 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id d13so9453901ljg.12
-        for <linux-cifs@vger.kernel.org>; Thu, 24 Jun 2021 13:34:08 -0700 (PDT)
+        with ESMTP id S229531AbhFYTIE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 25 Jun 2021 15:08:04 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 487C5C061574
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Jun 2021 12:05:43 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id f30so17991884lfj.1
+        for <linux-cifs@vger.kernel.org>; Fri, 25 Jun 2021 12:05:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to;
-        bh=LN6s2yCtRIeJn4no/JRinYyKm3zCu0o0ugOVBzFGoA0=;
-        b=UxIOD131RIWKdcj6ufPWMTYHOxs8HMhJrEka4akD9UQlD9o4cG/lmzqfFVfHWlAz7d
-         mX7az+ryIeeALXThh8Sk8j5XXFrkeP68iqIYLdPLkVSTpMAEkjti+fqKPkod6hIHzunJ
-         ZIlsHC/k7oCbJTSkA6MLQTWy34G+6aEz0vYhpwatbdkhF4RFP4Vyc5eFRjHKIWj8sL8j
-         /d3CnCM9A5aNyn2goIp9tzYlwCeZlWefaenbJfjDyWh3PcqBLCPJouh1K+Ncu9GujMWb
-         Ma3crhqjwp7upBARu0PbU52xotRKysPbnaZI+4XOvLOSrazd0x6BZmg44F1ISYxP7WgS
-         9CoQ==
+        bh=InP6oRCIPiB+HD5DGTbbQNkMuEWrLYsDWMHvun0hZgc=;
+        b=kDc0Q/kFHM7vm66aBb3h83rpIhZXfuwDSl1xuF/VSkC8Rpw9G+f4yTKk45t/cqerCS
+         cFBdPuZh4PtxHLpgutiHPAi0tNu3nbuJt5dT5bHmFlihOeDa8T0hhIR52PLHpIOoy4Nt
+         VOK6hTCKqxULfkAiGgggXLLuxucLSjR0lVXVm7kGioddWd68OkE+HpPBGeXTz+RMTaQd
+         R3m3ME8JbGSo7oTIn3Nuymo6kD4cGzRo8WRg5xRW8I32MZ5AHi9pjoaglQvI/wOEA5ek
+         ZERyhogzRU+jdgpkMus4A8Cqs6mB8sW+saFDKcggS5E2OiNFaIS2JCTk8hH9KK6uXa+/
+         zpUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=LN6s2yCtRIeJn4no/JRinYyKm3zCu0o0ugOVBzFGoA0=;
-        b=Ziqyr4IDKpJpcuiQCAJO8Mz5LCqIbUeU54jeKhddqOxBCms1Ey2gA3gkEJ3S0pVcAE
-         TLFADMEDFdVyJFuP9aVmdzuqj0q4JMjfquIvB9xqni6gLGL6uJgoBTeKUFVMoJ4s9yH2
-         lg1/WYdwC2x5zW0hR28BU/dVDUsmEZ+puIJiavkQHZEEz9CFwZ1k2Ddv7xQf/62VbkFi
-         aUeicmvlZLfcOAp16C5ciZ8VybdgLAL8mzhfRWyShajZU4tHGP8X5rnXRaqskKc7Sjdn
-         VEvxMcqVdufDuLjiGC9tJ0LbCU+6LnzXU/XIVCt5mK7S1i7JYqotCtTF28ILaFH5ipqA
-         Vx6w==
-X-Gm-Message-State: AOAM530ByfaV0UyNl2dl+JAom0d0m03tUHYVs+NrjbcCjY3nejHi6UOP
-        KfBfZgDl18dJQLgSUM0rU8piBFzw0VeiSmRi/YPvtweLSK8TuQ==
-X-Google-Smtp-Source: ABdhPJz73wigHxHT8QKfOkmroZ0jsRrUTPdFhHKI5PKVObW5sbDuSJyTyeJqknYAHxha3r5bPyhOi/tlIC+gkq4b96c=
-X-Received: by 2002:a2e:a234:: with SMTP id i20mr5386653ljm.272.1624566846730;
- Thu, 24 Jun 2021 13:34:06 -0700 (PDT)
+        bh=InP6oRCIPiB+HD5DGTbbQNkMuEWrLYsDWMHvun0hZgc=;
+        b=TpKwfQWz8zOGMdXqBdNfTIrDst/WgLVK98x8eVgCkfx3t8G52T309cans8zskaGUDn
+         QbC/V6IJCf2Xxgr7t8bpGM4CLcyaAFi3RmKx96fx2TC/YpqL/7iA96710xu8UaHZvErL
+         IRu5WYUxPvvZHo81agu21Eet0xGxcv9mZ0+L/QzHNAt9L7RyvApovNKe9Z/gSXErfoXw
+         je1FbVcFqkU0EfGSXY7DIGrryyii/UpiR3eScKSatWF5u1wEtjq98F78H/d9LEEWRrjj
+         c5dEdhMXOp9HrGK993OeJaaeDFnfp03Q8T5k+q4qYmdT6YNlPvXXXiueY1IdB0GpvPOD
+         meiQ==
+X-Gm-Message-State: AOAM531LAzG23w0YGOqnXYnz47e0mSikhX74wRup3vLPPeMyDO8j5UHh
+        4GnoehYgd2AxGe49gtJs8x0bTEsJzOsCgaPn26xdP9L4tPcWSg==
+X-Google-Smtp-Source: ABdhPJyjmyXVYjZvIZ/IndRCPZJTGNZ11ub++/GQzz8Bm2kG5Z7jp1xx6G1S5r51gXrdDS2yTr0VEIhX4xIYni36fZw=
+X-Received: by 2002:a19:6712:: with SMTP id b18mr9355741lfc.184.1624647941106;
+ Fri, 25 Jun 2021 12:05:41 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 24 Jun 2021 15:33:55 -0500
-Message-ID: <CAH2r5muNO=LB=v6AuoSmqku_z+66-ZR89z7ZGfYXXJCeswGHeg@mail.gmail.com>
-Subject: [PATCH][CIFS] fix missing spinlock around update to ses->status
+Date:   Fri, 25 Jun 2021 14:05:30 -0500
+Message-ID: <CAH2r5msPAUhfb-4LxYgLXT-XpP32z84QtK11yTJLGpnPZ1edmA@mail.gmail.com>
+Subject: [SMB3][PATCH] address minor Coverity warning
 To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000d05c9105c588f163"
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000d05c9105c588f163
-Content-Type: text/plain; charset="UTF-8"
+    There was one place where we weren't locking CurrentMid, and although
+    likely to be safe since even without the lock since it is during
+    negotiate protocol, it is more consistent to lock it in this last remaining
+    place, and avoids confusing Coverity warning.
 
-In the other places where we update ses->status we protect the
-updates via GlobalMid_Lock. So to be consistent add the same
-locking around it in cifs_put_smb_ses where it was missing.
-
-Addresses-Coverity: 1268904 ("Data race condition")
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/cifs/cifsglob.h | 3 ++-
- fs/cifs/connect.c  | 5 ++++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+    Addresses-Coverity: 1486665 ("Data race condition")
+    Signed-off-by: Steve French <stfrench@microsoft.com>
 
 diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index 988346904fd0..fc6b08e5ebbc 100644
+index fc6b08e5ebbc..3100f8b66e60 100644
 --- a/fs/cifs/cifsglob.h
 +++ b/fs/cifs/cifsglob.h
-@@ -887,7 +887,7 @@ struct cifs_ses {
-  struct mutex session_mutex;
-  struct TCP_Server_Info *server; /* pointer to server info */
-  int ses_count; /* reference counter */
-- enum statusEnum status;
-+ enum statusEnum status;  /* updates protected by GlobalMid_Lock */
-  unsigned overrideSecFlg;  /* if non-zero override global sec flags */
-  char *serverOS; /* name of operating system underlying server */
-  char *serverNOS; /* name of network operating system of server */
-@@ -1785,6 +1785,7 @@ require use of the stronger protocol */
-  * list operations on pending_mid_q and oplockQ
+@@ -621,7 +621,7 @@ struct TCP_Server_Info {
+        /* SMB_COM_WRITE_RAW or SMB_COM_READ_RAW. */
+        unsigned int capabilities; /* selective disabling of caps by smb sess */
+        int timeAdj;  /* Adjust for difference in server time zone in sec */
+-       __u64 CurrentMid;         /* multiplex id - rotating counter */
++       __u64 CurrentMid;         /* multiplex id - rotating counter,
+protected by GlobalMid_Lock */
+        char cryptkey[CIFS_CRYPTO_KEY_SIZE]; /* used by ntlm, ntlmv2 etc */
+        /* 16th byte of RFC1001 workstation name is always null */
+        char workstation_RFC1001_name[RFC1001_NAME_LEN_WITH_NULL];
+@@ -1786,6 +1786,7 @@ require use of the stronger protocol */
   *      updates to XID counters, multiplex id  and SMB sequence numbers
   *      list operations on global DnotifyReqList
-+ *      updates to ses->status
+  *      updates to ses->status
++ *      updates to server->CurrentMid
   *  tcp_ses_lock protects:
-  * list operations on tcp and SMB session lists
+  *     list operations on tcp and SMB session lists
   *  tcon->open_file_lock protects the list of open files hanging off the tcon
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index c8079376d294..5d269f583dac 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1598,9 +1598,12 @@ void cifs_put_smb_ses(struct cifs_ses *ses)
-  spin_unlock(&cifs_tcp_ses_lock);
-  return;
-  }
-+ spin_unlock(&cifs_tcp_ses_lock);
-+
-+ spin_lock(&GlobalMid_Lock);
-  if (ses->status == CifsGood)
-  ses->status = CifsExiting;
-- spin_unlock(&cifs_tcp_ses_lock);
-+ spin_unlock(&GlobalMid_Lock);
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 903de7449aa3..e4c8f603dd58 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -388,7 +388,9 @@ smb2_negotiate(const unsigned int xid, struct cifs_ses *ses)
+ {
+        int rc;
 
-  cifs_free_ipc(ses);
++       spin_lock(&GlobalMid_Lock);
+        cifs_ses_server(ses)->CurrentMid = 0;
++       spin_unlock(&GlobalMid_Lock);
+        rc = SMB2_negotiate(xid, ses);
+        /* BB we probably don't need to retry with modern servers */
+        if (rc == -EAGAIN)
 
 
 -- 
 Thanks,
 
 Steve
-
---000000000000d05c9105c588f163
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-fix-missing-spinlock-around-update-to-ses-statu.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-fix-missing-spinlock-around-update-to-ses-statu.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kqbd3lxr0>
-X-Attachment-Id: f_kqbd3lxr0
-
-RnJvbSA1OTEwNzFmYWIyMzJiY2RlMzU4NGFkMWZkMWVkMGY2ZmRjMmZjZGI1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFRodSwgMjQgSnVuIDIwMjEgMTU6Mjg6MDQgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBmaXggbWlzc2luZyBzcGlubG9jayBhcm91bmQgdXBkYXRlIHRvIHNlcy0+c3RhdHVzCgpJ
-biB0aGUgb3RoZXIgcGxhY2VzIHdoZXJlIHdlIHVwZGF0ZSBzZXMtPnN0YXR1cyB3ZSBwcm90ZWN0
-IHRoZQp1cGRhdGVzIHZpYSBHbG9iYWxNaWRfTG9jay4gU28gdG8gYmUgY29uc2lzdGVudCBhZGQg
-dGhlIHNhbWUKbG9ja2luZyBhcm91bmQgaXQgaW4gY2lmc19wdXRfc21iX3NlcyB3aGVyZSBpdCB3
-YXMgbWlzc2luZy4KCkFkZHJlc3Nlcy1Db3Zlcml0eTogMTI2ODkwNCAoIkRhdGEgcmFjZSBjb25k
-aXRpb24iKQpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5j
-b20+Ci0tLQogZnMvY2lmcy9jaWZzZ2xvYi5oIHwgMyArKy0KIGZzL2NpZnMvY29ubmVjdC5jICB8
-IDUgKysrKy0KIDIgZmlsZXMgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygt
-KQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lmc2dsb2IuaApp
-bmRleCA5ODgzNDY5MDRmZDAuLmZjNmIwOGU1ZWJiYyAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZz
-Z2xvYi5oCisrKyBiL2ZzL2NpZnMvY2lmc2dsb2IuaApAQCAtODg3LDcgKzg4Nyw3IEBAIHN0cnVj
-dCBjaWZzX3NlcyB7CiAJc3RydWN0IG11dGV4IHNlc3Npb25fbXV0ZXg7CiAJc3RydWN0IFRDUF9T
-ZXJ2ZXJfSW5mbyAqc2VydmVyOwkvKiBwb2ludGVyIHRvIHNlcnZlciBpbmZvICovCiAJaW50IHNl
-c19jb3VudDsJCS8qIHJlZmVyZW5jZSBjb3VudGVyICovCi0JZW51bSBzdGF0dXNFbnVtIHN0YXR1
-czsKKwllbnVtIHN0YXR1c0VudW0gc3RhdHVzOyAgLyogdXBkYXRlcyBwcm90ZWN0ZWQgYnkgR2xv
-YmFsTWlkX0xvY2sgKi8KIAl1bnNpZ25lZCBvdmVycmlkZVNlY0ZsZzsgIC8qIGlmIG5vbi16ZXJv
-IG92ZXJyaWRlIGdsb2JhbCBzZWMgZmxhZ3MgKi8KIAljaGFyICpzZXJ2ZXJPUzsJCS8qIG5hbWUg
-b2Ygb3BlcmF0aW5nIHN5c3RlbSB1bmRlcmx5aW5nIHNlcnZlciAqLwogCWNoYXIgKnNlcnZlck5P
-UzsJLyogbmFtZSBvZiBuZXR3b3JrIG9wZXJhdGluZyBzeXN0ZW0gb2Ygc2VydmVyICovCkBAIC0x
-Nzg1LDYgKzE3ODUsNyBAQCByZXF1aXJlIHVzZSBvZiB0aGUgc3Ryb25nZXIgcHJvdG9jb2wgKi8K
-ICAqCWxpc3Qgb3BlcmF0aW9ucyBvbiBwZW5kaW5nX21pZF9xIGFuZCBvcGxvY2tRCiAgKiAgICAg
-IHVwZGF0ZXMgdG8gWElEIGNvdW50ZXJzLCBtdWx0aXBsZXggaWQgIGFuZCBTTUIgc2VxdWVuY2Ug
-bnVtYmVycwogICogICAgICBsaXN0IG9wZXJhdGlvbnMgb24gZ2xvYmFsIERub3RpZnlSZXFMaXN0
-CisgKiAgICAgIHVwZGF0ZXMgdG8gc2VzLT5zdGF0dXMKICAqICB0Y3Bfc2VzX2xvY2sgcHJvdGVj
-dHM6CiAgKglsaXN0IG9wZXJhdGlvbnMgb24gdGNwIGFuZCBTTUIgc2Vzc2lvbiBsaXN0cwogICog
-IHRjb24tPm9wZW5fZmlsZV9sb2NrIHByb3RlY3RzIHRoZSBsaXN0IG9mIG9wZW4gZmlsZXMgaGFu
-Z2luZyBvZmYgdGhlIHRjb24KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5jIGIvZnMvY2lm
-cy9jb25uZWN0LmMKaW5kZXggYzgwNzkzNzZkMjk0Li41ZDI2OWY1ODNkYWMgMTAwNjQ0Ci0tLSBh
-L2ZzL2NpZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC0xNTk4LDkgKzE1
-OTgsMTIgQEAgdm9pZCBjaWZzX3B1dF9zbWJfc2VzKHN0cnVjdCBjaWZzX3NlcyAqc2VzKQogCQlz
-cGluX3VubG9jaygmY2lmc190Y3Bfc2VzX2xvY2spOwogCQlyZXR1cm47CiAJfQorCXNwaW5fdW5s
-b2NrKCZjaWZzX3RjcF9zZXNfbG9jayk7CisKKwlzcGluX2xvY2soJkdsb2JhbE1pZF9Mb2NrKTsK
-IAlpZiAoc2VzLT5zdGF0dXMgPT0gQ2lmc0dvb2QpCiAJCXNlcy0+c3RhdHVzID0gQ2lmc0V4aXRp
-bmc7Ci0Jc3Bpbl91bmxvY2soJmNpZnNfdGNwX3Nlc19sb2NrKTsKKwlzcGluX3VubG9jaygmR2xv
-YmFsTWlkX0xvY2spOwogCiAJY2lmc19mcmVlX2lwYyhzZXMpOwogCi0tIAoyLjMwLjIKCg==
---000000000000d05c9105c588f163--
