@@ -2,136 +2,164 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 266D3C11F67
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Jul 2021 01:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82EA8C11F68
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Jul 2021 11:04:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F144A6140C
-	for <linux-cifs@archiver.kernel.org>; Fri,  2 Jul 2021 01:49:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F4DB6135F
+	for <linux-cifs@archiver.kernel.org>; Fri,  2 Jul 2021 11:04:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234627AbhGBBve (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 1 Jul 2021 21:51:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42998 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234579AbhGBBvd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 1 Jul 2021 21:51:33 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 148A7C061762
-        for <linux-cifs@vger.kernel.org>; Thu,  1 Jul 2021 18:49:02 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id f30so15332005lfj.1
-        for <linux-cifs@vger.kernel.org>; Thu, 01 Jul 2021 18:49:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=dqMaZ6CpBoFaSF9qL4tP+aQr7ula1dlmAgUQSMZKQBU=;
-        b=IODcgKfoju5KmIQpKl3GRICh6kA3rc/z5gqjnnmP/9NdFo6aqoMpkI7lnO0rsfVcx/
-         14Qs5Dpf0ysHEN3bwva3jqIYebVA2+oBsaP/uiKokUjbOsEkt8CumPLNp0g6ALK4EAdk
-         6XMGNyqTsogpbC9L69Q/ZTF/rO5TSY+Q+M4uP1+GoaaIfA2bNPEDqr2x2iW9RY1Wtl7W
-         POh6MD+NxVPjphEPM32lvOp3/kZ+XzfEvM38P+jThe5dLa+hiLbBDLhQATJnu9Kx6SeJ
-         SxhgHLZXP6/2mW015EW57yUkQz9D/Yj7IiDoYz9mklu7N17bBdDwm1lNzPz/k9opFi0z
-         ow3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=dqMaZ6CpBoFaSF9qL4tP+aQr7ula1dlmAgUQSMZKQBU=;
-        b=VOiaXmdqnyE7sTuQ1YIe85f2EikArDW/kL4ogQf3BzG4FaO97f272zStXQ7HVRt46J
-         CcLHeg2EnKmbpAV7bKZgpZSPG5qR5glbkic8C3tLWW0tByxY/HpHZfLuiw0v7U4XRxhb
-         idRk/eEgthA7+uSSeI8tcWStzBmO0EIUTqieGtGYwV1NxxPGHEP1jWaxbuNWwaq2aHRf
-         iGBnMbPROtTW3DIr3vq2HZPODbD1lfBG8jpDv7/gNRU19+YVu7Lh2oPfq+2+ElAeKut7
-         APDOsLUieOplfoHMZNRFZoTRhxAkaPozIW4qHJ7s0Z1XAKBNBxwqnUnJNHfWXtbXlE6W
-         XvWw==
-X-Gm-Message-State: AOAM532cCLKaub3wz5fQIStjXMidR9DyaeO1u+2GPTKB7xIoJ+3IGcuA
-        9TaQR9iHGtAyY+k7nPkiqCyUg+oKGfkZ9s78+cCB6gdmLIIwHw==
-X-Google-Smtp-Source: ABdhPJypiPPO9i7ZzfDJwg9YvE8Ct5ESLV5CVZqpZLhJtTuFru3qZC/Ry98fQWD3NDqyygmXAj+1yh8qKkav4mpSvRI=
-X-Received: by 2002:a19:cc6:: with SMTP id 189mr1952951lfm.175.1625190540067;
- Thu, 01 Jul 2021 18:49:00 -0700 (PDT)
+        id S231464AbhGBLG7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 2 Jul 2021 07:06:59 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([194.104.111.102]:40366 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231320AbhGBLG6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 2 Jul 2021 07:06:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1625223861;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a9OxhcYDHaj6gqL1dN2Inpg25CkyMUq0fbosuT4LGx4=;
+        b=gXJw3PGImCrjHnVoYu4xIx/3/q9PCUcvZGQo6+Zn11ZC0Mqd775T4BpxPhwyo0x9dKuSGj
+        BsvlV0IJNtI7CEmFteC0U5aEnDzVFtMYJKGfcjkseISkuAGuW4r14vLiWmJRJ0WypMUSrr
+        iMVZ6mMImKTSbYFtsbqZuEet4uWPHYY=
+Received: from EUR03-AM5-obe.outbound.protection.outlook.com
+ (mail-am5eur03lp2053.outbound.protection.outlook.com [104.47.8.53]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ de-mta-36-RsgJb09CNWKFe7Yvf5GHDw-2; Fri, 02 Jul 2021 13:04:20 +0200
+X-MC-Unique: RsgJb09CNWKFe7Yvf5GHDw-2
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AzOD5GbmVUMbW9/8RNO2/PQByBZumBl2zAmd9VonNtGkv2tyTqY/kBbm1l7PcKlB9Y/bIhx70VP7Z5MgEXtxTvMsOILChXa+bqXB0ABuGSLpJknK9TvLVvxSzPFfC/xc5UdcSc70GzP2dFil5hjiG58Mx7vJ2GKd+dz1T+dG3ZkjfhI8kUqSLKUSzy0BJrpPaltRzIyVtCvXT3ZwiQjT1vB2327rCXDCQmBnQFkpm8hCVm0KY/jWua/cmoIVekAPaMxlL4RT4jcUX6TSjZ3uqU67Z93HLKo6XwT/cyUqKAiwm3PYV4gvE0OVehFaUtm0SrvNhRckeY+gNnhMrpHKQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=a9OxhcYDHaj6gqL1dN2Inpg25CkyMUq0fbosuT4LGx4=;
+ b=BLmH6YF17jTJLu2Oh0JoI350fiK25JYk/FnovuzLSXt7DS65H8VORayGGK0OuoAPf2htVPQXN2NlJuEhPaSzUrIkEJWcgZcnZDJ6sLyrOoPVTD4VcyahNgM6tLBYWslBtAqucBu8ox1Ex1hREgMHVs0n3nGfLkgzcAwb0Fs+PaG5lemrTCkGFsSc/SAd4N7yZBPmS9OoICno6LBlo3P40fI9YBZMfJHEq33/VVyHD6mhxJbrLMMhSuI/zXmRPcKw7SGlwkhCf50kqNnAXukA1iVIkJtQYrht+FfDSY/3hFMv7IC1916VqgjKqWujemeOYv/Z5v2224oxvT1a/egzdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=suse.com;
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
+ by VI1PR04MB6925.eurprd04.prod.outlook.com (2603:10a6:803:135::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.23; Fri, 2 Jul
+ 2021 11:04:20 +0000
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::18e7:6a19:208d:179d]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::18e7:6a19:208d:179d%6]) with mapi id 15.20.4264.026; Fri, 2 Jul 2021
+ 11:04:19 +0000
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH][CIFS] make locking consistent around the server session
+ status
+In-Reply-To: <CAH2r5muOpGHkvPyxJy_Qbp7gLC4ssL4eBOcY59U9+7KAjFHzcQ@mail.gmail.com>
+References: <CAH2r5muOpGHkvPyxJy_Qbp7gLC4ssL4eBOcY59U9+7KAjFHzcQ@mail.gmail.com>
+Date:   Fri, 02 Jul 2021 13:04:19 +0200
+Message-ID: <87o8blou30.fsf@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [2003:fa:709:ff16:1045:9d08:76b8:80d1]
+X-ClientProxiedBy: ZR0P278CA0125.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:20::22) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+ (2603:10a6:803:3::28)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 1 Jul 2021 20:48:49 -0500
-Message-ID: <CAH2r5muwZikVYiE7J+mwBxFLRe4yP4YsA-=vBJQ56KGfRabNKw@mail.gmail.com>
-Subject: [PATCH] CIFS: Clarify SMB1 code for UnixCreateSymLink
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000d55bde05c61a2872"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (2003:fa:709:ff16:1045:9d08:76b8:80d1) by ZR0P278CA0125.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:20::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.22 via Frontend Transport; Fri, 2 Jul 2021 11:04:19 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ec588a26-82c7-4f40-ab6a-08d93d49241c
+X-MS-TrafficTypeDiagnostic: VI1PR04MB6925:
+X-Microsoft-Antispam-PRVS: <VI1PR04MB6925CBD90083F23E6B56E6E8A81F9@VI1PR04MB6925.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: MZXqYE4FvRDd55voOCAPX4+uyhwJoZjwqrUF8beOIk9E9ARGxQH2/FlUnpKH6DPwV1ebNMoZNa8fOGl4Nn6bQi01wgf8L1nu6Mv0gc0FgfN1zhyiwptJt/7al5e17W+z07jACYBiyb+6b1OnQdRTzVdzhTGk6RFihwb6T2xNHmobKBiWHBI99T4QLZtWwTQsPU4FNPi0QWu4Ullv53YPSCoE/bmrNqk33vtLyRrnCLfMZ2PCIZ93/PEq6DocG3K1JLZhfXGHZZHB4r802gvmHghL5ZskBStwP8OzpQQOqeMbd2wqjACEEu8eOTGU99w7szxzqjSxH9CYnSTuWh+6MIIegvRi/AywPsAVY6hgwVUuwC+MuL5LCRM+rllQbvWnwEbPjnp1GperTWRgyIQcZazaqhSgL04hWwtknfnRxvC3TgRB8ZnbCxshagHhuH9nNPJyf+v4RXpiXPoUmsKiB3vc/4Ip8ExgSZoNJ++w4k8rG94z1TgnaGQGFAYsPP6wKHRPaFUGX7q8pHyU1Fs5yzbzjsmvYm0HotBC3649g6WXUoAj8WxZP48Tb0daOEaaGVR/YQSalV8pLu21M9AUZX/Wflr2tky+bTlduWUQTpoApBl5QBUf5VQkoePbVpgaNNUuvJM2zY0vBiVmnjMIKw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(39860400002)(396003)(366004)(376002)(346002)(66574015)(8676002)(186003)(16526019)(38100700002)(83380400001)(6486002)(36756003)(2616005)(86362001)(66476007)(5660300002)(6496006)(66556008)(66946007)(8936002)(478600001)(2906002)(110136005)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SE1FcWZNVzc5aG9XL1ZIZWNYTmJXK1R3K3NKRVRETktVdzhmYkY4Y1Rua05y?=
+ =?utf-8?B?cTVIZlZ1WTAvM25yaDNpcTZ4Z214ODNFZ0VxZnFQdFpiNk5lNTFvdnVSYVVK?=
+ =?utf-8?B?Mk91dzUwYlhFK2xnSVBGT2JjeW81WlAvcDJGdnBXVkQ2aWw1Ri9mU2tQU3ky?=
+ =?utf-8?B?a0VpeWh6c211SWdaSzJVYkQxcnZFbEVXZkl0UnY0WmptMUI0NEUzM29QRzRV?=
+ =?utf-8?B?Y2plSHhITUNMODlQWXVna0pkbUZ2RnY2WWdNTVhlbDRFNlN0RVFJamk1Vk1L?=
+ =?utf-8?B?alphZXNrMEJKYXVqT3h4U3FQNm9HaWxLZDRZUmQxTXd1WGpBaTRwVmI3TUE2?=
+ =?utf-8?B?NFNtZ0JWQytEemgyY0dWWVFVY0c4RzZWRWlqSiszRnBIdjlHUE5MK3M2bjhp?=
+ =?utf-8?B?K2NoR0ptTHpNZWZkUkhCSGptRkx3aTFiYzB5a0NZaTlvOEFsS2VrWE4wQmhr?=
+ =?utf-8?B?enh2WFVvL0FBb05vZURVWEI3cE1yOGJvbUhLeGFlOURpb1Fud0pLNktqdVE3?=
+ =?utf-8?B?eDRncWliTk1NbmlBOEFUY0YwRmRnUlRDSlhlNkdnaU1xSVFEelFVbHU1c2di?=
+ =?utf-8?B?QnRxQjU0UGt5ZXF6SmFRZ25qLytmOVhhU0dsNzN5MG5mQkpxVEdoNUdsNDlW?=
+ =?utf-8?B?UUVFSWZWeVhwRGdXRVAyOHJLakFGRER5bVlJd1g0V24vMUJoRWxJMGNHUHcx?=
+ =?utf-8?B?bnhRVWtvbUFWTHJ5ekVzRERzaUJueXdwMUl6RldvdEUvVzE2cG9ZdUhxNEFO?=
+ =?utf-8?B?cWVFaUxPYi92VkJLTlBFV3dYYTdEWFNsUGR2eFNnUUh5dm9qWGk0RHZIUmNI?=
+ =?utf-8?B?bGJ4TWtDTHpJalVRckxlRGhsZkhLOFRqQTZ4MkRzbDVMOXFFNjZvVVhHZlNP?=
+ =?utf-8?B?MFpjZENmM2VzazJ3cFZjSGh4ank1WFhEWHA2Mm9jVWVXWWl5aUhWbmYyeURa?=
+ =?utf-8?B?TzRJOUsvdk5XS1hRUlJWTHM1dE1NaWpJOXNkcGIvc0VEU2F5Mmk2MXF2K2dR?=
+ =?utf-8?B?UnNRY0piWjhSL3piNEUwd2JGcUdjZWNKTnhRbkJxejBHOGVxL21VUytNbFBt?=
+ =?utf-8?B?UjVQaUNEK2lRa1dFK09mMm94NUphckhLaFc2a2x5d29UMjlaSHh4c2dMZEtk?=
+ =?utf-8?B?K0dJNmZwaFFWNEFNUEwrMkJyRjJIU01DZGk3WlNhV2xhQnRacTUxL1pMUHNS?=
+ =?utf-8?B?WWk4dUo3RGV1QVBsNG43RmtpS0ZPZ0NPTG45Sy9qMmJtU2NGdEZuYURDR1ZJ?=
+ =?utf-8?B?OWxzbW1Vc2MvQkR5QnF4dlRra2FYN2RnWDJ6MkFUQnJDVlhZbmw2K3hKcmlK?=
+ =?utf-8?B?K2l4dHlQcTdGLy94cHorcEM3L1dzbmpZZUpOY1YvUlU5M1FUdCtad1hZZE1K?=
+ =?utf-8?B?U05RRGJnSjY4N3ZLa0hjVk5BRFVTOUZOY1F0NHR2c1czK3NrQS9jTzRJbHBt?=
+ =?utf-8?B?VUJ3TlBjTTRmUjFNMG9kaENuazVHZVdndHZxR3U0L1JsaGRQWHd1cVN6ci9S?=
+ =?utf-8?B?Wi8zczhBWFJJS01HSnYwRTBGTjJMK1orMjBPaEwxR3BCSHVTd3cxWjhnZEt4?=
+ =?utf-8?B?dVVyMFQrbFREN3hGMG5MN2J1dXE3VEE1d1RMeHU4WTRkZU5PdldURWdDc3J0?=
+ =?utf-8?B?Mm1HUUI3b2lhRVFxVzVVS2VQdVhVVXRDa0hMRW5GR1JQQW5ERmVxWVVoSVhV?=
+ =?utf-8?B?TmVqT2dkS1djcmtMUGJ5c0Rzb2hwS0FqWDI3VkdqTDdvS2JWWGc0dHVzeFI3?=
+ =?utf-8?B?TTlCcHJFS2VMa0hlOWUwNmxzL1BlMFBuSEEva21ENWZZNEh1Um53cVlXdktk?=
+ =?utf-8?B?eDJWNllVYWZTcXMyZUpKWFQ5UnZrRVVBVG55dy9JRFJIR1E4Ui9zVFVWM1R3?=
+ =?utf-8?Q?WGNJphxcylyis?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec588a26-82c7-4f40-ab6a-08d93d49241c
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2021 11:04:19.8760
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NEzBxh07XkooCNdFKdRL2ijXmG41IpXGweqbCdcoJS+8xvGPHgncCEsOVaOanAD4
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6925
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000d55bde05c61a2872
-Content-Type: text/plain; charset="UTF-8"
+Steve French <smfrench@gmail.com> writes:
+> There were three places where we were not taking the spinlock
+> around updates to server->tcpStatus when it was being modified.
+> To be consistent (also removes Coverity warning) and to remove
+> possibility of race best to lock all places where it is updated.
 
-Coverity also complains about the way we calculate the offset
-(starting from the address of a 4 byte array within the
-header structure rather than from the beginning of the struct
-plus 4 bytes) for creating SMB1 symlinks when using the Unix
-extensions.  This doesn't change the address but
-makes it slightly clearer.
+If we lock for writing we also need to lock for reading otherwise the
+locking isn't protecting anything.
+> --- a/fs/cifs/connect.c
+> +++ b/fs/cifs/connect.c
+> @@ -1358,7 +1358,9 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx)
+>   * to the struct since the kernel thread not created yet
+>   * no need to spinlock this init of tcpStatus or srv_count
 
-Addresses-Coverity: 711530 ("Out of bounds read")
-Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/cifs/cifssmb.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index ea12fa6eacb6..a14d3f533301 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -2925,7 +2925,8 @@ CIFSUnixCreateSymLink(const unsigned int xid,
-struct cifs_tcon *tcon,
-  InformationLevel) - 4;
-  offset = param_offset + params;
+There is comment just on top saying no need to spinlock.
 
-- data_offset = (char *) (&pSMB->hdr.Protocol) + offset;
-+ /* SMB offsets are from the beginning of SMB which is 4 bytes in,
-after RFC1001 field */
-+ data_offset = (char *)pSMB + offset + 4;
-  if (pSMB->hdr.Flags2 & SMBFLG2_UNICODE) {
-  name_len_target =
-      cifsConvertToUTF16((__le16 *) data_offset, toName,
+>   */
+> + spin_lock(&GlobalMid_Lock);
+>   tcp_ses->tcpStatus =3D CifsNew;
+> + spin_unlock(&GlobalMid_Lock);
+>   ++tcp_ses->srv_count;
 
--- 
-Thanks,
+Cheers,
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
+E
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
+nchen)
 
-Steve
-
---000000000000d55bde05c61a2872
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-CIFS-Clarify-SMB1-code-for-UnixCreateSymLink.patch"
-Content-Disposition: attachment; 
-	filename="0001-CIFS-Clarify-SMB1-code-for-UnixCreateSymLink.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kqlofsi80>
-X-Attachment-Id: f_kqlofsi80
-
-RnJvbSBlNzE5OGRiZjhiNjIyOTYzMTk2OTBkYTU5MWMzOTZjZjA1ZDkxYzY1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFRodSwgMSBKdWwgMjAyMSAyMDo0NDoyNyAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIENJ
-RlM6IENsYXJpZnkgU01CMSBjb2RlIGZvciBVbml4Q3JlYXRlU3ltTGluawoKQ292ZXJpdHkgYWxz
-byBjb21wbGFpbnMgYWJvdXQgdGhlIHdheSB3ZSBjYWxjdWxhdGUgdGhlIG9mZnNldAooc3RhcnRp
-bmcgZnJvbSB0aGUgYWRkcmVzcyBvZiBhIDQgYnl0ZSBhcnJheSB3aXRoaW4gdGhlCmhlYWRlciBz
-dHJ1Y3R1cmUgcmF0aGVyIHRoYW4gZnJvbSB0aGUgYmVnaW5uaW5nIG9mIHRoZSBzdHJ1Y3QKcGx1
-cyA0IGJ5dGVzKSBmb3IgY3JlYXRpbmcgU01CMSBzeW1saW5rcyB3aGVuIHVzaW5nIHRoZSBVbml4
-CmV4dGVuc2lvbnMuICBUaGlzIGRvZXNuJ3QgY2hhbmdlIHRoZSBhZGRyZXNzIGJ1dAptYWtlcyBp
-dCBzbGlnaHRseSBjbGVhcmVyLgoKQWRkcmVzc2VzLUNvdmVyaXR5OiA3MTE1MjkgKCJPdXQgb2Yg
-Ym91bmRzIHJlYWQiKQpSZXZpZXdlZC1ieTogUm9ubmllIFNhaGxiZXJnIDxsc2FobGJlckByZWRo
-YXQuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5j
-b20+Ci0tLQogZnMvY2lmcy9jaWZzc21iLmMgfCAzICsrLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5z
-ZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3NtYi5j
-IGIvZnMvY2lmcy9jaWZzc21iLmMKaW5kZXggZWExMmZhNmVhY2I2Li5hMTRkM2Y1MzMzMDEgMTAw
-NjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc3NtYi5jCisrKyBiL2ZzL2NpZnMvY2lmc3NtYi5jCkBAIC0y
-OTI1LDcgKzI5MjUsOCBAQCBDSUZTVW5peENyZWF0ZVN5bUxpbmsoY29uc3QgdW5zaWduZWQgaW50
-IHhpZCwgc3RydWN0IGNpZnNfdGNvbiAqdGNvbiwKIAkJCQlJbmZvcm1hdGlvbkxldmVsKSAtIDQ7
-CiAJb2Zmc2V0ID0gcGFyYW1fb2Zmc2V0ICsgcGFyYW1zOwogCi0JZGF0YV9vZmZzZXQgPSAoY2hh
-ciAqKSAoJnBTTUItPmhkci5Qcm90b2NvbCkgKyBvZmZzZXQ7CisJLyogU01CIG9mZnNldHMgYXJl
-IGZyb20gdGhlIGJlZ2lubmluZyBvZiBTTUIgd2hpY2ggaXMgNCBieXRlcyBpbiwgYWZ0ZXIgUkZD
-MTAwMSBmaWVsZCAqLworCWRhdGFfb2Zmc2V0ID0gKGNoYXIgKilwU01CICsgb2Zmc2V0ICsgNDsK
-IAlpZiAocFNNQi0+aGRyLkZsYWdzMiAmIFNNQkZMRzJfVU5JQ09ERSkgewogCQluYW1lX2xlbl90
-YXJnZXQgPQogCQkgICAgY2lmc0NvbnZlcnRUb1VURjE2KChfX2xlMTYgKikgZGF0YV9vZmZzZXQs
-IHRvTmFtZSwKLS0gCjIuMzAuMgoK
---000000000000d55bde05c61a2872--
