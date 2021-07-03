@@ -2,119 +2,97 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A9A1C07E97
-	for <linux-cifs@archiver.kernel.org>; Sat,  3 Jul 2021 20:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA5FC07E97
+	for <linux-cifs@archiver.kernel.org>; Sat,  3 Jul 2021 21:23:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F192613E1
-	for <linux-cifs@archiver.kernel.org>; Sat,  3 Jul 2021 20:54:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABEB7613E2
+	for <linux-cifs@archiver.kernel.org>; Sat,  3 Jul 2021 21:23:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbhGCU5M (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 3 Jul 2021 16:57:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43712 "EHLO
+        id S229596AbhGCV0E (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 3 Jul 2021 17:26:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbhGCU5M (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 3 Jul 2021 16:57:12 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B497EC061762
-        for <linux-cifs@vger.kernel.org>; Sat,  3 Jul 2021 13:54:37 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id r26so7464529lfp.2
-        for <linux-cifs@vger.kernel.org>; Sat, 03 Jul 2021 13:54:37 -0700 (PDT)
+        with ESMTP id S229562AbhGCV0D (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 3 Jul 2021 17:26:03 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 540E2C061762
+        for <linux-cifs@vger.kernel.org>; Sat,  3 Jul 2021 14:23:29 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id bq39so12418312lfb.12
+        for <linux-cifs@vger.kernel.org>; Sat, 03 Jul 2021 14:23:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=oxwDvbSggAceEEotuy4gDNre5ZX2qK2hyg8CebLNA54=;
-        b=OrQHvotJPu5jcRNyXegP4J39gFvdRjcSWK/dzIp1cBcDhHwdfuZCiYgFNr6DlxyVQK
-         mYavE6hkQNT6T/2OwRz9hyKAMSBkOZn/7qaM27FaXhevlVx67n6pMSrxcsRy1McNeQJz
-         cMljiF+RWJO8q56cY8wFAwwpZ8WdeBFwDkee1pMapsmxAYBs0I3KF0Tbc+mlMbyeekcx
-         4sbtq1xZBXryibtPsso22WbTcWhIFAEttxrlMd0tb1lE1aTrG3ZORBsW1E4Ofb5s+qRK
-         lA5t3cQD0QuHSub6uQALPwX5qdSURMQ1LZGOjw5p8Z1ncHvKkuYxi8RD5dn8g7t4OsWp
-         Oy+w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=8zXyhtu1MRHAtvuWNqDWvsWPZ9SX3B77AwD8QzMwIGU=;
+        b=hMHTc+YT/yYPUX072pJ0dcCYSNP5vpt7SmQcf1S07T1ukwvxbbnBbGPy4fSQP6FaWv
+         3YYtj1f9E0R0bS2kmqqYRY/JZCdBsge2BSubGL1QYO0Wd9piuwo8VzWdLdVMCbE9vwoz
+         3MpT7oj7wKUVaYZpPm/R6KI66OSS2QUvKdbSArbA+SIr1o4AZKWKv9Jedt6RSHIJk8mZ
+         f2jMcwBmZSJuYZo5DXjkCJE1iBhmQaVo0AM4EcqQqwK6Tfkm7xvgluPyWpBoYK7im8OX
+         0hUVs+EOkm8UwOsdfH0VHczCSV9MJEAQ+Ks5BEcnsym0WsRMLqAHKqjNc/RhU3jCj6lf
+         1saQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=oxwDvbSggAceEEotuy4gDNre5ZX2qK2hyg8CebLNA54=;
-        b=GGE/nTpuc00dp68XrwsUqlO+Xpxh3FSdNlmi4r28nwY71n9Odwt6PZOKJ4BrcqwpGl
-         hSU7+/Tvj8Di3+yuZMnhpU4atxn0YQttfnLgdTF0mOqm2iHxlEf9LNQKUuSkcGx5URkd
-         fJkeoEH67Icv+ApGO3OrwSqfHPdH7bolZl59kdFY5QNzSDntBfdEWNHRTh6RhRoa7pPY
-         hap+AGTwhqZPfUekyu0b0V7r8stH8f64mRrcpm3sdSE6v+BelLRKx2rkVQg0FLQ0S7UU
-         NBSbZgjUTbO1jqX177l48XzGDpkRH1o7hvm6j4yABqHDMzffQsCTw8dEmdYdlszBCrH3
-         OSBQ==
-X-Gm-Message-State: AOAM5327ZjYE2B5rDlTDPwhaYdvA3xuBdFaL3DhuIwuTVLwv/u5n9aMi
-        GI/dP2L8hNcsvvTFni4f/MVp96D4kWaiXlCU9aJAcPChT9POZQ==
-X-Google-Smtp-Source: ABdhPJzqnYLQoydQJ34c1tWvfAl3Y32jzD0A7dyscLLuRzW6ldvNA6j0kPSFfNgzcUErV55/n7C3/JDSDLSCPaiB+0w=
-X-Received: by 2002:ac2:4475:: with SMTP id y21mr2903228lfl.133.1625345675506;
- Sat, 03 Jul 2021 13:54:35 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=8zXyhtu1MRHAtvuWNqDWvsWPZ9SX3B77AwD8QzMwIGU=;
+        b=bigT9S7i0xoZZMu1CRfbXpE2u+Uhj7oU76jqQUqolnyt3GbRBfRtLlSsIy9LdulpPK
+         P4wV8RhTD0wtJo5WpLy7gVtdOdQz9u/9s6thQKs1Juw026SxnPWuRrOROyVx7OtyXujd
+         3PU99IuT/oUevFp/s+oQYnH8gar5QSyKd+uPz4g4zJzGNRnNoT9qcpXSQDBLFAjyL4A3
+         Db9aHfh0YHOzT9dtH+Sh7090x/M87q9jf6MDo9CtYeht+/Ny9K6/tO1sMfCjJM+UrvZW
+         9M1JiNHmavweP1z2MjTWOu+kN8zSINfH0h2VsRGKx8xx35A6CDKRVkvks8FebmgOlR95
+         kkRw==
+X-Gm-Message-State: AOAM533zsZ/NCRA/ts/POkMv8/PAJgAGj3e+aZGRvomck0ywk/Z5pAwV
+        n74h3EGKeOwRZOxesfWZjTaclIpi7eJzMc5B0Z1Ni/dDpeg=
+X-Google-Smtp-Source: ABdhPJyzwJN7gfymV+T9cPWE1cNgt+305YPSZnckuyFqdYKMLWxZuUDEnPRyLY5ES86L+uYqkjpMMO1IFVLF9C24+04=
+X-Received: by 2002:a05:6512:3049:: with SMTP id b9mr4549210lfb.395.1625347407331;
+ Sat, 03 Jul 2021 14:23:27 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAH2r5mu4qE+BPdLkVz=JvUPrbU2D7cUS15S_PBEgbr17VxgaYA@mail.gmail.com>
+In-Reply-To: <CAH2r5mu4qE+BPdLkVz=JvUPrbU2D7cUS15S_PBEgbr17VxgaYA@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 3 Jul 2021 15:54:23 -0500
-Message-ID: <CAH2r5mtsZCW77xg_mtcQjznSZ-iBZZjDE4Z_+odfnpeEYYfNnA@mail.gmail.com>
-Subject: [PATCH][SMB3] Fix typo in smb2pdu.h
+Date:   Sat, 3 Jul 2021 16:23:15 -0500
+Message-ID: <CAH2r5msWpB+uzaUH+jdOT7q4c18EbY5DhK_8rpeu9otm3_KECg@mail.gmail.com>
+Subject: Fwd: Test results on latest ksmbd
 To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000a04c5d05c63e477a"
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000a04c5d05c63e477a
-Content-Type: text/plain; charset="UTF-8"
+---------- Forwarded message ---------
+From: Steve French <smfrench@gmail.com>
+Date: Sat, Jul 3, 2021 at 7:25 AM
+Subject: Test results on latest ksmbd
+To: COMMON INTERNET FILE SYSTEM SERVER <linux-cifsd-devel@lists.sourceforge.net>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-fsdevel
+<linux-fsdevel@vger.kernel.org>
 
-Although it compiles, the test robot correctly noted:
-  'cifsacl.h' file not found with <angled> include; use "quotes" instead
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/cifs/smb2pdu.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I ran the buildbot (SMB3 regression tests from Linux) against the
+kernel server with the recent updates from Namjae et al.  All tests
+continue to pass.  Good news.  ksmbd seems to be making good progress.
 
-diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
-index a5c48b85549a..ba75e65924ac 100644
---- a/fs/cifs/smb2pdu.h
-+++ b/fs/cifs/smb2pdu.h
-@@ -13,7 +13,7 @@
- #define _SMB2PDU_H
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/49
 
- #include <net/sock.h>
--#include <cifsacl.h>
-+#include "cifsacl.h"
+FYI - An earlier run hit an intermittent problem in mainline (5.14-rc)
+in the scheduler (not a problem with the server, the client side was
+running on very current mainline which appears to have this
+intermittent problem which I have also seen running unrelated tests):
+       [ 4826.261325] RIP: 0010:cfs_rq_is_decayed.part.93+0x13/0x18
 
- /*
-  * Note that, due to trying to use names similar to the protocol
-specifications,
+
+
+--
+Thanks,
+
+Steve
+
 
 -- 
 Thanks,
 
 Steve
-
---000000000000a04c5d05c63e477a
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-fix-typo-in-header-file.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-fix-typo-in-header-file.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kqo8tk9c0>
-X-Attachment-Id: f_kqo8tk9c0
-
-RnJvbSBkOGYyYjM5MGIxMDkwOTRjZDAzZDc0OTM5ZmJiNTkwZmQ2NjZmYjQ1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFNhdCwgMyBKdWwgMjAyMSAxNTo0OTozNSAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIHNt
-YjM6IGZpeCB0eXBvIGluIGhlYWRlciBmaWxlCgpBbHRob3VnaCBpdCBjb21waWxlcywgdGhlIHRl
-c3Qgcm9ib3QgY29ycmVjdGx5IG5vdGVkOgogICdjaWZzYWNsLmgnIGZpbGUgbm90IGZvdW5kIHdp
-dGggPGFuZ2xlZD4gaW5jbHVkZTsgdXNlICJxdW90ZXMiIGluc3RlYWQKClJlcG9ydGVkLWJ5OiBr
-ZXJuZWwgdGVzdCByb2JvdCA8bGtwQGludGVsLmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJl
-bmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvc21iMnBkdS5oIHwgMiAr
-LQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0t
-Z2l0IGEvZnMvY2lmcy9zbWIycGR1LmggYi9mcy9jaWZzL3NtYjJwZHUuaAppbmRleCBhNWM0OGI4
-NTU0OWEuLmJhNzVlNjU5MjRhYyAxMDA2NDQKLS0tIGEvZnMvY2lmcy9zbWIycGR1LmgKKysrIGIv
-ZnMvY2lmcy9zbWIycGR1LmgKQEAgLTEzLDcgKzEzLDcgQEAKICNkZWZpbmUgX1NNQjJQRFVfSAog
-CiAjaW5jbHVkZSA8bmV0L3NvY2suaD4KLSNpbmNsdWRlIDxjaWZzYWNsLmg+CisjaW5jbHVkZSAi
-Y2lmc2FjbC5oIgogCiAvKgogICogTm90ZSB0aGF0LCBkdWUgdG8gdHJ5aW5nIHRvIHVzZSBuYW1l
-cyBzaW1pbGFyIHRvIHRoZSBwcm90b2NvbCBzcGVjaWZpY2F0aW9ucywKLS0gCjIuMzAuMgoK
---000000000000a04c5d05c63e477a--
