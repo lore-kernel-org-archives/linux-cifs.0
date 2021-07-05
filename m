@@ -2,156 +2,153 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-25.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20986C11F69
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 03:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D23F5C07E99
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 10:51:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F21E761178
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 03:18:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AABCC6100B
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 10:51:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230095AbhGEDUv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 4 Jul 2021 23:20:51 -0400
-Received: from mailout4.samsung.com ([203.254.224.34]:61686 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229950AbhGEDUO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 4 Jul 2021 23:20:14 -0400
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20210705031737epoutp04bab5971beb9d60fd9a0c41356177f4be~OxsM_DqSQ0795207952epoutp048
-        for <linux-cifs@vger.kernel.org>; Mon,  5 Jul 2021 03:17:37 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20210705031737epoutp04bab5971beb9d60fd9a0c41356177f4be~OxsM_DqSQ0795207952epoutp048
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1625455057;
-        bh=//z18A8yEe6HZaQDVeR7zO5jUtfPzAs2XyKlKaZ7lDs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LiVCRILLDvFm2mqOCR+x8BPGAYZeamyUiGjxJ8BMhkW4fdZD0jQf9khK4K2CaBVf7
-         JVmc+YYDTwoNg0K/yyab8uOu8OqN+v7Kn2/iydaV5DIW8LgBHpLqDMwpSg9D4QkERo
-         C8RhThSegRGgt8Op2NIRGfYZbm0I353dlTIztgIo=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
-        20210705031736epcas1p4fb3b739056ef2f94447d893d19f08c25~OxsMTx0ZC0813108131epcas1p4R;
-        Mon,  5 Jul 2021 03:17:36 +0000 (GMT)
-Received: from epsmges1p2.samsung.com (unknown [182.195.40.160]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4GJ9q34VdHz4x9Q1; Mon,  5 Jul
-        2021 03:17:35 +0000 (GMT)
-Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
-        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        9C.9F.09551.FC972E06; Mon,  5 Jul 2021 12:17:35 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210705031734epcas1p232641a646669d8c52307471903ad7904~OxsKpPYxD1374013740epcas1p2k;
-        Mon,  5 Jul 2021 03:17:34 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210705031734epsmtrp287a06064ab64cb7af81a76549c58b7d6~OxsKoeakV1726817268epsmtrp2G;
-        Mon,  5 Jul 2021 03:17:34 +0000 (GMT)
-X-AuditID: b6c32a36-2b3ff7000000254f-9c-60e279cf2bcf
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        77.BB.08394.EC972E06; Mon,  5 Jul 2021 12:17:34 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.89.31.111]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20210705031734epsmtip2eea6e64fbeeab95856abd1fd4952b740~OxsKWMF-X2672126721epsmtip2U;
-        Mon,  5 Jul 2021 03:17:34 +0000 (GMT)
-From:   Namjae Jeon <namjae.jeon@samsung.com>
-To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org
-Cc:     linux-cifsd-devel@lists.sourceforge.net, aurelien.aptel@gmail.com,
-        senozhatsky@chromium.org, sandeen@sandeen.net, aaptel@suse.com,
-        willy@infradead.org, hch@infradead.org, viro@zeniv.linux.org.uk,
-        ronniesahlberg@gmail.com, dan.carpenter@oracle.com, hch@lst.de,
-        christian@brauner.io, smfrench@gmail.com, hyc.lee@gmail.com,
-        Namjae Jeon <namjae.jeon@samsung.com>,
-        Steve French <stfrench@microsoft.com>
-Subject: [PATCH v5 13/13] MAINTAINERS: add ksmbd kernel server
-Date:   Mon,  5 Jul 2021 12:07:29 +0900
-Message-Id: <20210705030729.10292-14-namjae.jeon@samsung.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210705030729.10292-1-namjae.jeon@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrDJsWRmVeSWpSXmKPExsWy7bCmge75ykcJBnMaxS0a355msTj++i+7
-        ReM7ZYvX/6azWJyesIjJYuXqo0wW1+6/Z7d48X8Xs8XP/98ZLfbsPclicXnXHDaLH9PrLXr7
-        PrFatF7Rsti9cRGbxZsXh9ksbk2cz2Zx/u9xVovfP+awOQh7/J37kdljdsNFFo+ds+6ye2xe
-        oeWxe8FnJo/dNxvYPFp3/GX3+Pj0FotH35ZVjB5bFj9k8li/5SqLx+dNch6bnrxlCuCNyrHJ
-        SE1MSS1SSM1Lzk/JzEu3VfIOjneONzUzMNQ1tLQwV1LIS8xNtVVy8QnQdcvMAXpTSaEsMacU
-        KBSQWFyspG9nU5RfWpKqkJFfXGKrlFqQklNgaFCgV5yYW1yal66XnJ9rZWhgYGQKVJmQk9E+
-        8SRrwVOOiuurVzM2MJ5l72Lk5JAQMJGY+rmHtYuRi0NIYAejxKKl55khnE+MEh9Pv2WHcL4x
-        Sny/fIwFpqXn7zcWiMReRonVTb8QWu49nwbkcHCwCWhL/NkiCtIgIhArcWPHa7AaZoHZzBK3
-        dm5hBUkIC9hJnJ8xhwnEZhFQlZjV/BrM5hWwlZjy5yfUgfISqzccYAaxOYHie7uuskLEb3BI
-        bD1vB2G7SHw/uReqXlji1fEtULaUxOd3e9kg7HKJEyd/MUHYNRIb5u1jB7lTQsBYoudFCYjJ
-        LKApsX6XPkSFosTO33MZQWxmAT6Jd19BQQRSzSvR0SYEUaIq0XfpMNRAaYmu9g9QSz0kJmze
-        Bw23CaBAnMY0gVFuFsKGBYyMqxjFUguKc9NTiw0LjJAjbBMjOBlrme1gnPT2g94hRiYOxkOM
-        EhzMSiK8ofPuJQjxpiRWVqUW5ccXleakFh9iNAUG3URmKdHkfGA+yCuJNzQ1MjY2tjAxMzcz
-        NVYS593JdihBSCA9sSQ1OzW1ILUIpo+Jg1OqgWlFxIfN27ymHH/jt/3FJ9ONvMEsRhxT737l
-        6l779mFabvHuO5s7dONmBO88s1bdj3dnEq/s4nMP/EKO3j6iOU3GYve+58sTz2lW7NXhvvC9
-        43tL+gTlHs+n+z4crb4kdeGiuaBTxiSlQ5Hrpk72usawRSOuXTnk6Nu9BoInru4VTXN+t+Vr
-        IsM2i9TE225Cj/fFHlqSfu38kaO6Xx98NmlZxzLv/HVWXcvlUkuKZFOfTcpc1/z+yL+m1Qo6
-        k/4Lf7V8ZLFkFUtep8KBm8/e3pgfoFYicrTw5K9rOx+d21qqZfZk7TKh3XcN2bhVXlevC/Fy
-        sLHf3B96a1fZwf8tZVkG1yct41dqF/yV6sw/ketIphJLcUaioRZzUXEiAIH2nChPBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrGLMWRmVeSWpSXmKPExsWy7bCSvO65ykcJBp92aVs0vj3NYnH89V92
-        i8Z3yhav/01nsTg9YRGTxcrVR5ksrt1/z27x4v8uZouf/78zWuzZe5LF4vKuOWwWP6bXW/T2
-        fWK1aL2iZbF74yI2izcvDrNZ3Jo4n83i/N/jrBa/f8xhcxD2+Dv3I7PH7IaLLB47Z91l99i8
-        Qstj94LPTB67bzawebTu+Mvu8fHpLRaPvi2rGD22LH7I5LF+y1UWj8+b5Dw2PXnLFMAbxWWT
-        kpqTWZZapG+XwJXRPvEka8FTjorrq1czNjCeZe9i5OSQEDCR6Pn7jaWLkYtDSGA3o8Skts+s
-        EAlpiWMnzjB3MXIA2cIShw8XQ9R8YJR4NWMeWJxNQFvizxZRkHIRgXiJmw23weYwC6xnlngz
-        9RcLSEJYwE7i/Iw5TCA2i4CqxKzm12A2r4CtxJQ/P6GOkJdYveEAM4jNCRTf23UV7AYhARuJ
-        7p8/WCcw8i1gZFjFKJlaUJybnltsWGCYl1quV5yYW1yal66XnJ+7iREcNVqaOxi3r/qgd4iR
-        iYPxEKMEB7OSCG/ovHsJQrwpiZVVqUX58UWlOanFhxilOViUxHkvdJ2MFxJITyxJzU5NLUgt
-        gskycXBKNTAZn5/ppSqzT/fE7NSaC+IH+G6erTnH+2FD0TIhjrh/xy4Zln1xc+PY17n4nUfb
-        uvt5N8wz2mZ2tPGYzUtK8ePIO8fU8/z3x3t2k0M1Ez2dLM7ujO0/9mZLq24+D8ss9xldz462
-        Pph4JbWxYEHConm+k+55TF2uo84iYCI85ZuYwWtfAy2zoGkHGz91FnloTZ+Tvzbbtjp0ofr1
-        i0s7XrZ69fK5Vu3pfNGmrGnaYehy4sHuP3/jFOVk3/7pZFkttVnmyc67CmFfF6/9N2/RgX+f
-        9nx/EMDIpRFrns5R8G6Cm93a4NYrb3cJTT16wW7CD6lpB/2X502ZpJ540PnXhc2zE/5p8XCu
-        0Yv4t/rQqV2WSizFGYmGWsxFxYkAPhy3+QkDAAA=
-X-CMS-MailID: 20210705031734epcas1p232641a646669d8c52307471903ad7904
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210705031734epcas1p232641a646669d8c52307471903ad7904
-References: <20210705030729.10292-1-namjae.jeon@samsung.com>
-        <CGME20210705031734epcas1p232641a646669d8c52307471903ad7904@epcas1p2.samsung.com>
+        id S230511AbhGEKy3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 5 Jul 2021 06:54:29 -0400
+Received: from de-smtp-delivery-102.mimecast.com ([194.104.109.102]:56179 "EHLO
+        de-smtp-delivery-102.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230482AbhGEKy3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 5 Jul 2021 06:54:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=mimecast20200619;
+        t=1625482311;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ADD3efIo11jB5uIHY4lgMmJPsiVUZ7KxIWuykBgSWqQ=;
+        b=Nvva/dRQGFkETbMFr9EtJUu5W2mYEKa0NICG/xs0Y19M6QFlx44iPjRzuAKmPoccReMVxy
+        BOXZZeNqzzsjLJRcfscUrsjf/sN/0tGbp3OTt3x9UVHYb8/4uvHbBjn6E2xjvj5g6U8s60
+        ZMkolmV4CqH5E7RqBiZFaH3El5Dy6N8=
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com
+ (mail-vi1eur05lp2168.outbound.protection.outlook.com [104.47.17.168])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ de-mta-13-VSEF6vvvO06DjVVJVj_6xw-1; Mon, 05 Jul 2021 12:51:50 +0200
+X-MC-Unique: VSEF6vvvO06DjVVJVj_6xw-1
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=brQ35CuTzOv35wc6Pjmm1BrtuQZAaqw2NCMKtm7n+2r++ptAZxoJYTbMzssUsHdrCBwmgPgWFMGUZNg4o6EFqoWYYw1AMYXZstAfvy7uVr5bhu31tpMQElXfUDmxSAFoD1gDxiS3u+AvUZtsbantS/tsFACfGiMdxssqwVEXzOXJLwkC4UCjq7AlXdlHarIuu7l8ub/+1W/itQGxvYW1pJVrRuXkEmZpWrY0Mhl0eBnd2Cf+8n2woRhhQsy4UKLVsud6kHHLgC1HbQgBKYQ0Yh6jq/djKVyY5eey9e1AZDPcODzkj9VYx4fuC5aOMAvLVb9e6LLkWVB8OgsKMFiDRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ADD3efIo11jB5uIHY4lgMmJPsiVUZ7KxIWuykBgSWqQ=;
+ b=iJTK5ZQI/mpCxk7yEhx736qImQJXOPypzPigsj3Jvrq1xq2C/Edjtxx8tqSLv0nF9tUUt9/G6P/EzmKk21PsYD97AQ5VlfT6RWRWHuuUJ4qwfwnGf4FpGT92FXKVDorPdVY2GugNuH3+D5RgQSNT9bu/U6j3FBwS0axzdOtib0KuHaqKZ6WQRqqMuwkzWYCMukfo03ewkH2ubhCzYpuvEVVhFxINFf8FPmZwkIEjLEmySRGTKUup8GOEBZat+ojtQ0Xow2NH5rBJao5lUecnEBGTtmphlC/MWQEOHJz6LEeitJiS6g8ml5uLmuYeOHopu0txgflxzf42GRS91pzgXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Authentication-Results: cjr.nz; dkim=none (message not signed)
+ header.d=none;cjr.nz; dmarc=none action=none header.from=suse.com;
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com (2603:10a6:803:3::28)
+ by VI1PR04MB6910.eurprd04.prod.outlook.com (2603:10a6:803:135::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.22; Mon, 5 Jul
+ 2021 10:51:49 +0000
+Received: from VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::18e7:6a19:208d:179d]) by VI1PR0402MB3359.eurprd04.prod.outlook.com
+ ([fe80::18e7:6a19:208d:179d%6]) with mapi id 15.20.4264.026; Mon, 5 Jul 2021
+ 10:51:49 +0000
+From:   =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>
+To:     Paulo Alcantara <pc@cjr.nz>, linux-cifs@vger.kernel.org,
+        smfrench@gmail.com
+Cc:     Paulo Alcantara <pc@cjr.nz>
+Subject: Re: [PATCH] cifs: include regular shares to the list of unshared
+ tcp servers
+In-Reply-To: <20210702171710.406-1-pc@cjr.nz>
+References: <20210702171710.406-1-pc@cjr.nz>
+Date:   Mon, 05 Jul 2021 12:51:48 +0200
+Message-ID: <87im1powxn.fsf@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [2003:fa:709:ff78:616f:16b9:1438:527b]
+X-ClientProxiedBy: ZR0P278CA0003.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:16::13) To VI1PR0402MB3359.eurprd04.prod.outlook.com
+ (2603:10a6:803:3::28)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost (2003:fa:709:ff78:616f:16b9:1438:527b) by ZR0P278CA0003.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:16::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4287.22 via Frontend Transport; Mon, 5 Jul 2021 10:51:49 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 4d13278c-fefa-4d6d-97f7-08d93fa2e40e
+X-MS-TrafficTypeDiagnostic: VI1PR04MB6910:
+X-Microsoft-Antispam-PRVS: <VI1PR04MB691069287EB2F6E278720B3DA81C9@VI1PR04MB6910.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: s87Edmw0Cju2cRnbMKzL8eCectjZyRcmtptGA9qDRccINwmeTTP2GUORlbFVByoix/+kg0ihzUewSYdCevZEkWGqkWQX12e8VYcPEhz5GuHBd4lH6Gq5BQTUMzHcQF31SlB2uxOAJaC0RkHhTatbRqdYXERlqHQbKWzBGOSTkWRaBX2w+PcJmRiaRAZuD1+5iB3LbEwKLjAyKrvOfhXi9aVaLi4x4qoGtDaxVYCVYbnpeX1h0eO6AIHXSGgMbgAUjHt7jxmhOP5STIt8Pv4hUFDOz7Rvt78HGABkeD4u7LE5C6zVXg9JMWY9X1tBlp2SNtBgswNNSUgYK/+1gmJXu1dMLoLY2rfvyFuonPIiOpfg78vBCYUWwyscVwV2S6uqtxaxdunNRbmCqSuWTQ5zYEMZNLGL7D8KV8fur0vgeAEoC35W1aaBDbyl3yrWAvX9nU0vNOjpz+/r7Ort28DA45AGJHOLZBa7CB06Va7yqqlwGFZQV/W7i6Q7OuMXdwqTQMT0TPcorCgedWH5NRnNoj/V1UjrYYISzNKozB3qugbjjWqQ87S3Jb/U82ghawzKirOUKUjZOLfZFeYful1jtpssghN/C4b6agyjE4FtgXp7NXvsaUXi7yqJ/lhoOqkl/pPUJXOkZJw9i6tNJFdzgQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3359.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(376002)(346002)(396003)(366004)(136003)(39860400002)(4744005)(8936002)(8676002)(6496006)(16526019)(38100700002)(186003)(478600001)(5660300002)(36756003)(2906002)(6486002)(86362001)(66476007)(2616005)(66556008)(66946007)(316002)(4326008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dW1XNjJyUzk5enN6MkN4NU9kVlhEWFhPS1pSbk5GZ0piVWNyR2NzcHJHUklL?=
+ =?utf-8?B?dEp1UEFVM0k4MC91eTJzem9pWnFhckFBb2Z0bWNibGRuQXJEazBOTTl3dHZG?=
+ =?utf-8?B?cEtxbW5FMFJTeXNLM1p6NUJsWDJoc2xoZVB5YzU0a2xCeUl5RWtJcFNSeFNu?=
+ =?utf-8?B?SkZleUk3NFBXTkJTMy9JaS85bmZVZy85QVM5clVHSTBlOUJVNkpzNlBhcG4v?=
+ =?utf-8?B?d2ZNaTZaN21CMytwM3o5Q2RtTFRMbkFLem5aYXdQVURHVG03dWtDRW1BaHF2?=
+ =?utf-8?B?dFVMWGp0SStXbTBhU0dZeEUzOHJDYTMxTklQMkVKckhjUmJQMERCNlByQVZS?=
+ =?utf-8?B?ZFZVWjFCN25YZHdjdytNZ0tPRTdqRGVPejBGVmtJMUtJeDdxd0pVdzVvOCtP?=
+ =?utf-8?B?bnZGVlFuVkFaVlhscmpsVXZFbE5IWnBrYzkzUHI0NFlSV0d1OG41OVJ5a1ZI?=
+ =?utf-8?B?aUp3bUNsZGZTcE9tYXQ1dVJDcGRDVGdtQWdEdWthZzYxVG5OTDZIRWpURERn?=
+ =?utf-8?B?c3Fic0xOcjQ1Y0RTZGY1UFVTdExNSEF1ZU9JemgyVW1ubk9yOWI0K0F2UlYr?=
+ =?utf-8?B?Ty9zR3hoNVZnQXUxSnVOd0psUzNaK1VySnQ1ZEozdlFROE1MQ3Y5U0FmMU1T?=
+ =?utf-8?B?TGJ0bWxUQ1R6NUVOZ1lDYTBYRHJyTHYvTmJhQnF5Z3d0NmRnSkFxSzZlRFll?=
+ =?utf-8?B?bEI0MXcwVjdmL0NyUXY5Qyt2YWR2cEtLQzZNRmhCTFdaZFhHQUNxVTRGQzFO?=
+ =?utf-8?B?L1NwaGtSazJkSkg1Rnc0QTgxMWlGTE9HVUhGSGVEMXBsZ1NWalFFZUlyV3d0?=
+ =?utf-8?B?bENPZjRzRS8rbVhKWlEwQmJwUG1yY0pzd2pDQWFGVU4zZlFreUlvcWgvaEN0?=
+ =?utf-8?B?bUdhRjRYUEdEK0YralZ1TDBGR3BzMUwxVkNlY1RKcUxaQnJhTlc5bWc3WTU0?=
+ =?utf-8?B?N0hTYlJBSFBkRDQ2blpYdFgzS1VVRjVicEg3d3ZlZWJkTll0MHM5aCtyVTBP?=
+ =?utf-8?B?RnI4SjFsQVViZ3N6VGhndjdUbXZuamc0eTNxK1hjUzEwanVDY1hmdmJqMG8x?=
+ =?utf-8?B?aG03RTQxRG5xckM4SG8zbEFCclZZYUl2dWNiMXAwYk85ZDF5Tm5scGpzOVF6?=
+ =?utf-8?B?QmFKelFHZStiUTVBd1VWdFNsQjg2Z1ArdkJmZmNJbzNYVE9PdGQ4Njc3azJn?=
+ =?utf-8?B?d3NDQ2xJTG9CZm1RNGRpeE9qdm9KeUlYUTRBL1AzOXp6Y0wyL21oK2UzaEVa?=
+ =?utf-8?B?cWQrT0lMRWpsM1g2QjFNQzJTTDREbmlrUjlEdDZQdHVMUXhYN0xQRnBkMWgy?=
+ =?utf-8?B?TG54T1Z2dUlhVk9xMDlTc3h0NWFmVDE2djh5dzdpSldWbEJEbGNISWNmalRC?=
+ =?utf-8?B?d0ZMS00rM1orSERuTkpFOXhaLzQ1R0o4ZHZxakRqUkJIRjY3bW5RQnBTNDJX?=
+ =?utf-8?B?WXA1VUx6Mis3RUxySjJ0SEhUR0p3Z0pHYy9RbzR2Wk9jSVV4UkxTRmdyS0c5?=
+ =?utf-8?B?SjhQUG0xQXVZYWtmeW95c29CaG1yM296N05pTWVVb0QrVXQvTTVoc1dhWGph?=
+ =?utf-8?B?NEwra3RnZWNZTEVuMHpwVFJ4NmxhTU1Za0xHZ0RUalJYR2xBVzlwc3BoUWsx?=
+ =?utf-8?B?QjZpRnVPb3JaRWlQTFNlTHF1OVQ4Qm9hQmhkSFZUaXdwejAvVTJKZExyaHdQ?=
+ =?utf-8?B?blR3dncxQUJINUt6SmdGcGxmeDgxNkdIUWNXTm1Eekl6eVVtSUpaTXRhWFFz?=
+ =?utf-8?B?OTFuWThhdWpWSGliWm0wdUFGZm9NMFNtSnV2U2Q0dXNOZFB6T3k1TFE5ZXJo?=
+ =?utf-8?B?eUVIVGJmUjhXUHNEWTYwUWRuSFdVbGthVUhqaEFBeUlQUGZYRW1WdEJWRXhB?=
+ =?utf-8?Q?PywLh0R5JwQAE?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d13278c-fefa-4d6d-97f7-08d93fa2e40e
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR0402MB3359.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2021 10:51:49.4318
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DPL9wdvL9QmcUECsGSiIarbg4pBbdO44toYFiTmxr5hlAAkHYtLOTi3+D5eJfRPy
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6910
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add myself, Steve French, Sergey Senozhatsky and Hyunchul Lee
-as ksmbd maintainer.
+Paulo Alcantara <pc@cjr.nz> writes:
+> We need to make regular shares to also not share tcp servers because
+> we might have both regular and dfs mounts connecting to same server.
 
-Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+So with this change we never reuse tcp connections, and nosharesock
+because the default mount option for all cases. We might as well remove
+all the code for searching/matching/reusing tcp connection, smb session,
+tree connects.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bd7aff0c120f..73b2f896a2ff 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9938,6 +9938,15 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git
- F:	Documentation/dev-tools/kselftest*
- F:	tools/testing/selftests/
- 
-+KERNEL SMB3 SERVER (KSMBD)
-+M:	Namjae Jeon <namjae.jeon@samsung.com>
-+M:	Sergey Senozhatsky <senozhatsky@chromium.org>
-+M:	Steve French <sfrench@samba.org>
-+M:	Hyunchul Lee <hyc.lee@gmail.com>
-+L:	linux-cifs@vger.kernel.org
-+S:	Maintained
-+F:	fs/ksmbd/
-+
- KERNEL UNIT TESTING FRAMEWORK (KUnit)
- M:	Brendan Higgins <brendanhiggins@google.com>
- L:	linux-kselftest@vger.kernel.org
--- 
-2.17.1
+That doesn't seem good. If dfs connections are made with the nosharesock
+flag they should not be reused already no?
+
+Cheers,
+--=20
+Aur=C3=A9lien Aptel / SUSE Labs Samba Team
+GPG: 1839 CB5F 9F5B FB9B AA97  8C99 03C8 A49B 521B D5D3
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, D=
+E
+GF: Felix Imend=C3=B6rffer, Mary Higgins, Sri Rasiah HRB 247165 (AG M=C3=BC=
+nchen)
 
