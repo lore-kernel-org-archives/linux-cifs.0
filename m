@@ -7,44 +7,41 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D0FCC07E9C
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 15:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50710C07E9B
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 15:32:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18D82619AB
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 15:31:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40645619B1
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 15:32:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233001AbhGEPeI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 5 Jul 2021 11:34:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58642 "EHLO mail.kernel.org"
+        id S232837AbhGEPfP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 5 Jul 2021 11:35:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58756 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232514AbhGEPdW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 5 Jul 2021 11:33:22 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5F0E560C41;
-        Mon,  5 Jul 2021 15:30:37 +0000 (UTC)
+        id S233057AbhGEPeM (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 5 Jul 2021 11:34:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 63BAF619B3;
+        Mon,  5 Jul 2021 15:31:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625499038;
-        bh=TbsfBF/06lTy+h1drp/8oRI59/zCtxta1qITByGw/KI=;
+        s=k20201202; t=1625499067;
+        bh=lSfJF6GAWok9ndKgaHe/W5GtGfCcKUVUStrb5YyW1GE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Nhg8HNdkxALQEgZd5kdZXGDrp9/SYfcv3kxETXgxGnzoyexRB/axCoUZiU9u2MepN
-         AzHM2B5OLWhH1uFjs/VLqXMDaqI00Aw7wTak2fioujwRvT6nLkNBDfEQ4cFIcCUYwB
-         o9wt4HVoLK8gbCemhJ2CgGTiPkDFw/rSrnhaSkHnBs1mhUP4n+aoyn5xs4IdyHmF88
-         lDubhGNdDQMlmQXA+MjbKsYApxbU9rhP3pvYapr90FWs0JUhTmPhg8U1BT0s6w085Q
-         BKIZ3tUV1l7BaYyYxQef4O3HbJ9FxBbCbisN5ZpU44sQ9hKVJH6H16Ih6vz4Berbag
-         Idok+96jkY4IA==
+        b=DAREVoZ2fEl6MLCPtrhSZ6xhHAR+KntkgKTmkPst9TurttwNUQXG13TdELTsYGL13
+         0kd8XrxgJbUButCEmOO1UPDabuVkRYN0GxyTZJYszzJnawJEQwvV5Kcko3TERpz1M3
+         1XOj/bwWjPHsa/LxjOOaLLextOUNK6dlHJtPCt/w5bhFOPdDONm0QWiepU+fEHKx0Q
+         GYaHbn0RLgDhN/CjzFZY3BH/+7oFnSKclX1plGGnxyuqZ4n+gVuBNQvKoUsMFVKlnW
+         bkvKk41/bYjyQ13AUSELIHuCh2GKMNt2KrKCKgaTFHVS+xBiuA0a619WP6nnJ7aJit
+         kFHa2CI1ky2pA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
-        kernel test robot <lkp@intel.com>,
-        Aurelien Aptel <aaptel@suse.com>, Paulo Alcantara <pc@cjr.nz>,
-        Steve French <stfrench@microsoft.com>,
+Cc:     Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.10 29/41] cifs: improve fallocate emulation
-Date:   Mon,  5 Jul 2021 11:29:49 -0400
-Message-Id: <20210705153001.1521447-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 22/26] cifs: fix missing spinlock around update to ses->status
+Date:   Mon,  5 Jul 2021 11:30:35 -0400
+Message-Id: <20210705153039.1521781-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210705153001.1521447-1-sashal@kernel.org>
-References: <20210705153001.1521447-1-sashal@kernel.org>
+In-Reply-To: <20210705153039.1521781-1-sashal@kernel.org>
+References: <20210705153039.1521781-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -53,189 +50,61 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Ronnie Sahlberg <lsahlber@redhat.com>
+From: Steve French <stfrench@microsoft.com>
 
-[ Upstream commit 966a3cb7c7db786452a87afdc3b48858fc4d4d6b ]
+[ Upstream commit 0060a4f28a9ef45ae8163c0805e944a2b1546762 ]
 
-RHBZ: 1866684
+In the other places where we update ses->status we protect the
+updates via GlobalMid_Lock. So to be consistent add the same
+locking around it in cifs_put_smb_ses where it was missing.
 
-We don't have a real fallocate in the SMB2 protocol so we used to emulate fallocate
-by simply switching the file to become non-sparse. But as that could potantially consume
-a lot more data than we intended to fallocate (large sparse file and fallocating a thin
-slice in the middle) we would only do this IFF the fallocate request was for virtually
-the entire file.
-
-This patch improves this and starts allowing us to fallocate smaller chunks of a file by
-overwriting the region with 0, for the parts that are unallocated.
-
-The method used is to first query the server for FSCTL_QUERY_ALLOCATED_RANGES to find what
-is unallocated in the fallocate range and then to only overwrite-with-zero the unallocated
-ranges to fill in the holes.
-
-As overwriting-with-zero is different from just allocating blocks, and potentially much
-more expensive, we limit this to only allow fallocate ranges up to 1Mb in size.
-
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Acked-by: Aurelien Aptel <aaptel@suse.com>
-Acked-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Addresses-Coverity: 1268904 ("Data race condition")
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/cifs/smb2ops.c | 133 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 133 insertions(+)
+ fs/cifs/cifsglob.h | 3 ++-
+ fs/cifs/connect.c  | 5 ++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index a9d155530144..f6ceb79a995d 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -3459,6 +3459,119 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- 	return rc;
- }
- 
-+static int smb3_simple_fallocate_write_range(unsigned int xid,
-+					     struct cifs_tcon *tcon,
-+					     struct cifsFileInfo *cfile,
-+					     loff_t off, loff_t len,
-+					     char *buf)
-+{
-+	struct cifs_io_parms io_parms = {0};
-+	int nbytes;
-+	struct kvec iov[2];
-+
-+	io_parms.netfid = cfile->fid.netfid;
-+	io_parms.pid = current->tgid;
-+	io_parms.tcon = tcon;
-+	io_parms.persistent_fid = cfile->fid.persistent_fid;
-+	io_parms.volatile_fid = cfile->fid.volatile_fid;
-+	io_parms.offset = off;
-+	io_parms.length = len;
-+
-+	/* iov[0] is reserved for smb header */
-+	iov[1].iov_base = buf;
-+	iov[1].iov_len = io_parms.length;
-+	return SMB2_write(xid, &io_parms, &nbytes, iov, 1);
-+}
-+
-+static int smb3_simple_fallocate_range(unsigned int xid,
-+				       struct cifs_tcon *tcon,
-+				       struct cifsFileInfo *cfile,
-+				       loff_t off, loff_t len)
-+{
-+	struct file_allocated_range_buffer in_data, *out_data = NULL, *tmp_data;
-+	u32 out_data_len;
-+	char *buf = NULL;
-+	loff_t l;
-+	int rc;
-+
-+	in_data.file_offset = cpu_to_le64(off);
-+	in_data.length = cpu_to_le64(len);
-+	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
-+			cfile->fid.volatile_fid,
-+			FSCTL_QUERY_ALLOCATED_RANGES, true,
-+			(char *)&in_data, sizeof(in_data),
-+			1024 * sizeof(struct file_allocated_range_buffer),
-+			(char **)&out_data, &out_data_len);
-+	if (rc)
-+		goto out;
-+	/*
-+	 * It is already all allocated
-+	 */
-+	if (out_data_len == 0)
-+		goto out;
-+
-+	buf = kzalloc(1024 * 1024, GFP_KERNEL);
-+	if (buf == NULL) {
-+		rc = -ENOMEM;
-+		goto out;
-+	}
-+
-+	tmp_data = out_data;
-+	while (len) {
-+		/*
-+		 * The rest of the region is unmapped so write it all.
-+		 */
-+		if (out_data_len == 0) {
-+			rc = smb3_simple_fallocate_write_range(xid, tcon,
-+					       cfile, off, len, buf);
-+			goto out;
-+		}
-+
-+		if (out_data_len < sizeof(struct file_allocated_range_buffer)) {
-+			rc = -EINVAL;
-+			goto out;
-+		}
-+
-+		if (off < le64_to_cpu(tmp_data->file_offset)) {
-+			/*
-+			 * We are at a hole. Write until the end of the region
-+			 * or until the next allocated data,
-+			 * whichever comes next.
-+			 */
-+			l = le64_to_cpu(tmp_data->file_offset) - off;
-+			if (len < l)
-+				l = len;
-+			rc = smb3_simple_fallocate_write_range(xid, tcon,
-+					       cfile, off, l, buf);
-+			if (rc)
-+				goto out;
-+			off = off + l;
-+			len = len - l;
-+			if (len == 0)
-+				goto out;
-+		}
-+		/*
-+		 * We are at a section of allocated data, just skip forward
-+		 * until the end of the data or the end of the region
-+		 * we are supposed to fallocate, whichever comes first.
-+		 */
-+		l = le64_to_cpu(tmp_data->length);
-+		if (len < l)
-+			l = len;
-+		off += l;
-+		len -= l;
-+
-+		tmp_data = &tmp_data[1];
-+		out_data_len -= sizeof(struct file_allocated_range_buffer);
-+	}
-+
-+ out:
-+	kfree(out_data);
-+	kfree(buf);
-+	return rc;
-+}
-+
-+
- static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 			    loff_t off, loff_t len, bool keep_size)
- {
-@@ -3519,6 +3632,26 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+index b16c994414ab..9c0e348cb00f 100644
+--- a/fs/cifs/cifsglob.h
++++ b/fs/cifs/cifsglob.h
+@@ -964,7 +964,7 @@ struct cifs_ses {
+ 	struct mutex session_mutex;
+ 	struct TCP_Server_Info *server;	/* pointer to server info */
+ 	int ses_count;		/* reference counter */
+-	enum statusEnum status;
++	enum statusEnum status;  /* updates protected by GlobalMid_Lock */
+ 	unsigned overrideSecFlg;  /* if non-zero override global sec flags */
+ 	char *serverOS;		/* name of operating system underlying server */
+ 	char *serverNOS;	/* name of network operating system of server */
+@@ -1814,6 +1814,7 @@ require use of the stronger protocol */
+  *	list operations on pending_mid_q and oplockQ
+  *      updates to XID counters, multiplex id  and SMB sequence numbers
+  *      list operations on global DnotifyReqList
++ *      updates to ses->status
+  *  tcp_ses_lock protects:
+  *	list operations on tcp and SMB session lists
+  *  tcon->open_file_lock protects the list of open files hanging off the tcon
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index ab9eeb5ff8e5..da0720f41ebc 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3049,9 +3049,12 @@ void cifs_put_smb_ses(struct cifs_ses *ses)
+ 		spin_unlock(&cifs_tcp_ses_lock);
+ 		return;
  	}
- 
- 	if ((keep_size == true) || (i_size_read(inode) >= off + len)) {
-+		/*
-+		 * At this point, we are trying to fallocate an internal
-+		 * regions of a sparse file. Since smb2 does not have a
-+		 * fallocate command we have two otions on how to emulate this.
-+		 * We can either turn the entire file to become non-sparse
-+		 * which we only do if the fallocate is for virtually
-+		 * the whole file,  or we can overwrite the region with zeroes
-+		 * using SMB2_write, which could be prohibitevly expensive
-+		 * if len is large.
-+		 */
-+		/*
-+		 * We are only trying to fallocate a small region so
-+		 * just write it with zero.
-+		 */
-+		if (len <= 1024 * 1024) {
-+			rc = smb3_simple_fallocate_range(xid, tcon, cfile,
-+							 off, len);
-+			goto out;
-+		}
++	spin_unlock(&cifs_tcp_ses_lock);
 +
- 		/*
- 		 * Check if falloc starts within first few pages of file
- 		 * and ends within a few pages of the end of file to
++	spin_lock(&GlobalMid_Lock);
+ 	if (ses->status == CifsGood)
+ 		ses->status = CifsExiting;
+-	spin_unlock(&cifs_tcp_ses_lock);
++	spin_unlock(&GlobalMid_Lock);
+ 
+ 	cifs_free_ipc(ses);
+ 
 -- 
 2.30.2
 
