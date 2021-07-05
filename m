@@ -2,113 +2,240 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5838CC07E99
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 14:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA5A0C07E9E
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 15:29:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3413661958
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 14:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1D1161993
+	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 15:29:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231441AbhGEOki (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 5 Jul 2021 10:40:38 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:16170 "EHLO mx.cjr.nz"
+        id S232200AbhGEPbz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 5 Jul 2021 11:31:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56648 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231366AbhGEOki (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 5 Jul 2021 10:40:38 -0400
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 0E1B180862;
-        Mon,  5 Jul 2021 14:37:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1625495879;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qo27ODdabZ4oTbG/c87uu3N/UBK94IVOSuABSGxa8SU=;
-        b=vsKADVqx4EJO9tCMrwtfFilLzSLg+AproB8FK3peeIF3ZavcdK4ghzCOxP1WBT/EBvsfL6
-        rbieXg4fY9cCnAqOB7aeC4C6Y5w3ZLVSSZHScjREi+riKTbl8fEieWAvux06dhzMSUORgj
-        /HCA0ET2Gr7wRle5qDJkZqV22WFjiO8h/IOQrFNKsImIgBSh8QP68ETzIt8Lq4R0SCYzNv
-        eFgfhWsiV605oOKO29Rsg5pvO218I8u+Aey2Y5cKPS/bcIlxv4B74F9qJ0SzwCnfg98Lwc
-        UtVcNHghRlwHenCWTkNvBdns0yJ6yWd4LEr3GmKuLyI3t8+QhFzqPCIehJWOnQ==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     =?utf-8?Q?Aur=C3=A9lien?= Aptel <aaptel@suse.com>,
-        linux-cifs@vger.kernel.org, smfrench@gmail.com
-Subject: Re: [PATCH] cifs: include regular shares to the list of unshared
- tcp servers
-In-Reply-To: <87im1powxn.fsf@suse.com>
-References: <20210702171710.406-1-pc@cjr.nz> <87im1powxn.fsf@suse.com>
-Date:   Mon, 05 Jul 2021 11:37:55 -0300
-Message-ID: <87a6n0967w.fsf@cjr.nz>
+        id S232198AbhGEPbn (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 5 Jul 2021 11:31:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 32A986198D;
+        Mon,  5 Jul 2021 15:29:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1625498946;
+        bh=YiVkQDLRAapwLNvBwX9UK9D5pXW8BaYdNU8onEnEyeM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Vwf2NGTW/YtdImHsWQRYIXg/6JfLcj2SMkvY6rZFJVRmGlC30l6u9UfZN/SsYiRCM
+         8x0ceHw8Ro1mTWPYKEBsztNqgtP7nr5y4AY5EOelPDwIDcbTLKkyGPz6rEetiwi/iA
+         qANPURVAm3Xjc2ObDMebaQKZgo2GGdicWvHXVXKaOSVbSljFw3e1tDy8TwTxhQoL+3
+         P2Xv/+JaHrzvcHTztpQPGyt4JqPILP/KZuG6U44pdXCO/XPxzkNWfyOEBtHG9fXwKN
+         ojhcS22GgTYqJcVyin5bf4z6ibgW6Nb/rOkkZrOkzs0TI+3IRv1BSurlidAbWdp6Xx
+         zUAnP204vp+Aw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+        kernel test robot <lkp@intel.com>,
+        Aurelien Aptel <aaptel@suse.com>, Paulo Alcantara <pc@cjr.nz>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 5.13 38/59] cifs: improve fallocate emulation
+Date:   Mon,  5 Jul 2021 11:27:54 -0400
+Message-Id: <20210705152815.1520546-38-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210705152815.1520546-1-sashal@kernel.org>
+References: <20210705152815.1520546-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Aur=C3=A9lien Aptel <aaptel@suse.com> writes:
+From: Ronnie Sahlberg <lsahlber@redhat.com>
 
-> Paulo Alcantara <pc@cjr.nz> writes:
->> We need to make regular shares to also not share tcp servers because
->> we might have both regular and dfs mounts connecting to same server.
->
-> So with this change we never reuse tcp connections, and nosharesock
-> because the default mount option for all cases. We might as well remove
-> all the code for searching/matching/reusing tcp connection, smb session,
-> tree connects.
+[ Upstream commit 966a3cb7c7db786452a87afdc3b48858fc4d4d6b ]
 
-Sounds like a good idea, yes.  Of course, if we really want to do this
-regardless CONFIG_CIFS_DFS_UPCALL, it would probably be better off doing
-it in a separate series.
+RHBZ: 1866684
 
-> That doesn't seem good. If dfs connections are made with the nosharesock
-> flag they should not be reused already no?
+We don't have a real fallocate in the SMB2 protocol so we used to emulate fallocate
+by simply switching the file to become non-sparse. But as that could potantially consume
+a lot more data than we intended to fallocate (large sparse file and fallocating a thin
+slice in the middle) we would only do this IFF the fallocate request was for virtually
+the entire file.
 
-The previous version only made sure to not share tcp servers among DFS
-shares, however, we must do it for all shares when we have
-CONFIG_CIFS_DFS_UPCALL option enabled.
+This patch improves this and starts allowing us to fallocate smaller chunks of a file by
+overwriting the region with 0, for the parts that are unallocated.
 
-Without this change, the following would occur:
+The method used is to first query the server for FSCTL_QUERY_ALLOCATED_RANGES to find what
+is unallocated in the fallocate range and then to only overwrite-with-zero the unallocated
+ranges to fill in the holes.
 
-mount //dfsroot/dfs (new tcp)
-mount //dfsroot/share (reuse tcp because
+As overwriting-with-zero is different from just allocating blocks, and potentially much
+more expensive, we limit this to only allow fallocate ranges up to 1Mb in size.
 
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Acked-by: Aurelien Aptel <aaptel@suse.com>
+Acked-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/smb2ops.c | 133 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 133 insertions(+)
 
-	rc =3D mount_get_conns(ctx, cifs_sb, &xid, &server, &ses, &tcon);
-	/*
-	 * If called with 'nodfs' mount option, then skip DFS resolving.  Otherwis=
-e unconditionally
-	 * try to get an DFS referral (even cached) to determine whether it is an =
-DFS mount.
-	 *
-	 * Skip prefix path to provide support for DFS referrals from w2k8 servers=
- which don't seem
-	 * to respond with PATH_NOT_COVERED to requests that include the prefix.
-	 */
-	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_DFS) ||
-	    dfs_cache_find(xid, ses, cifs_sb->local_nls, cifs_remap(cifs_sb), ctx-=
->UNC + 1, NULL,
-			   NULL)) {
-		if (rc)
-			goto error;
-		/* Check if it is fully accessible and then mount it */
-		rc =3D is_path_remote(cifs_sb, ctx, xid, server, tcon);
-		if (!rc)
-			goto out;
-		if (rc !=3D -EREMOTE)
-			goto error;
-	}
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 21ef51d338e0..b68ba92893b6 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -3601,6 +3601,119 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 	return rc;
+ }
+ 
++static int smb3_simple_fallocate_write_range(unsigned int xid,
++					     struct cifs_tcon *tcon,
++					     struct cifsFileInfo *cfile,
++					     loff_t off, loff_t len,
++					     char *buf)
++{
++	struct cifs_io_parms io_parms = {0};
++	int nbytes;
++	struct kvec iov[2];
++
++	io_parms.netfid = cfile->fid.netfid;
++	io_parms.pid = current->tgid;
++	io_parms.tcon = tcon;
++	io_parms.persistent_fid = cfile->fid.persistent_fid;
++	io_parms.volatile_fid = cfile->fid.volatile_fid;
++	io_parms.offset = off;
++	io_parms.length = len;
++
++	/* iov[0] is reserved for smb header */
++	iov[1].iov_base = buf;
++	iov[1].iov_len = io_parms.length;
++	return SMB2_write(xid, &io_parms, &nbytes, iov, 1);
++}
++
++static int smb3_simple_fallocate_range(unsigned int xid,
++				       struct cifs_tcon *tcon,
++				       struct cifsFileInfo *cfile,
++				       loff_t off, loff_t len)
++{
++	struct file_allocated_range_buffer in_data, *out_data = NULL, *tmp_data;
++	u32 out_data_len;
++	char *buf = NULL;
++	loff_t l;
++	int rc;
++
++	in_data.file_offset = cpu_to_le64(off);
++	in_data.length = cpu_to_le64(len);
++	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
++			cfile->fid.volatile_fid,
++			FSCTL_QUERY_ALLOCATED_RANGES, true,
++			(char *)&in_data, sizeof(in_data),
++			1024 * sizeof(struct file_allocated_range_buffer),
++			(char **)&out_data, &out_data_len);
++	if (rc)
++		goto out;
++	/*
++	 * It is already all allocated
++	 */
++	if (out_data_len == 0)
++		goto out;
++
++	buf = kzalloc(1024 * 1024, GFP_KERNEL);
++	if (buf == NULL) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	tmp_data = out_data;
++	while (len) {
++		/*
++		 * The rest of the region is unmapped so write it all.
++		 */
++		if (out_data_len == 0) {
++			rc = smb3_simple_fallocate_write_range(xid, tcon,
++					       cfile, off, len, buf);
++			goto out;
++		}
++
++		if (out_data_len < sizeof(struct file_allocated_range_buffer)) {
++			rc = -EINVAL;
++			goto out;
++		}
++
++		if (off < le64_to_cpu(tmp_data->file_offset)) {
++			/*
++			 * We are at a hole. Write until the end of the region
++			 * or until the next allocated data,
++			 * whichever comes next.
++			 */
++			l = le64_to_cpu(tmp_data->file_offset) - off;
++			if (len < l)
++				l = len;
++			rc = smb3_simple_fallocate_write_range(xid, tcon,
++					       cfile, off, l, buf);
++			if (rc)
++				goto out;
++			off = off + l;
++			len = len - l;
++			if (len == 0)
++				goto out;
++		}
++		/*
++		 * We are at a section of allocated data, just skip forward
++		 * until the end of the data or the end of the region
++		 * we are supposed to fallocate, whichever comes first.
++		 */
++		l = le64_to_cpu(tmp_data->length);
++		if (len < l)
++			l = len;
++		off += l;
++		len -= l;
++
++		tmp_data = &tmp_data[1];
++		out_data_len -= sizeof(struct file_allocated_range_buffer);
++	}
++
++ out:
++	kfree(out_data);
++	kfree(buf);
++	return rc;
++}
++
++
+ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 			    loff_t off, loff_t len, bool keep_size)
+ {
+@@ -3661,6 +3774,26 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 	}
+ 
+ 	if ((keep_size == true) || (i_size_read(inode) >= off + len)) {
++		/*
++		 * At this point, we are trying to fallocate an internal
++		 * regions of a sparse file. Since smb2 does not have a
++		 * fallocate command we have two otions on how to emulate this.
++		 * We can either turn the entire file to become non-sparse
++		 * which we only do if the fallocate is for virtually
++		 * the whole file,  or we can overwrite the region with zeroes
++		 * using SMB2_write, which could be prohibitevly expensive
++		 * if len is large.
++		 */
++		/*
++		 * We are only trying to fallocate a small region so
++		 * just write it with zero.
++		 */
++		if (len <= 1024 * 1024) {
++			rc = smb3_simple_fallocate_range(xid, tcon, cfile,
++							 off, len);
++			goto out;
++		}
++
+ 		/*
+ 		 * Check if falloc starts within first few pages of file
+ 		 * and ends within a few pages of the end of file to
+-- 
+2.30.2
 
-would get executed in cifs_mount() and we only set nosharesock after that)
-
-With this patch:
-
-mount //dfsroot/dfs (new tcp)
-mount //dfsroot/share (new tcp)
