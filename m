@@ -2,109 +2,72 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50710C07E9B
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 15:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16CCAC07E9C
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Jul 2021 12:34:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40645619B1
-	for <linux-cifs@archiver.kernel.org>; Mon,  5 Jul 2021 15:32:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 042526044F
+	for <linux-cifs@archiver.kernel.org>; Tue,  6 Jul 2021 12:34:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232837AbhGEPfP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 5 Jul 2021 11:35:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58756 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233057AbhGEPeM (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 5 Jul 2021 11:34:12 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 63BAF619B3;
-        Mon,  5 Jul 2021 15:31:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625499067;
-        bh=lSfJF6GAWok9ndKgaHe/W5GtGfCcKUVUStrb5YyW1GE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DAREVoZ2fEl6MLCPtrhSZ6xhHAR+KntkgKTmkPst9TurttwNUQXG13TdELTsYGL13
-         0kd8XrxgJbUButCEmOO1UPDabuVkRYN0GxyTZJYszzJnawJEQwvV5Kcko3TERpz1M3
-         1XOj/bwWjPHsa/LxjOOaLLextOUNK6dlHJtPCt/w5bhFOPdDONm0QWiepU+fEHKx0Q
-         GYaHbn0RLgDhN/CjzFZY3BH/+7oFnSKclX1plGGnxyuqZ4n+gVuBNQvKoUsMFVKlnW
-         bkvKk41/bYjyQ13AUSELIHuCh2GKMNt2KrKCKgaTFHVS+xBiuA0a619WP6nnJ7aJit
-         kFHa2CI1ky2pA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Steve French <stfrench@microsoft.com>,
-        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 22/26] cifs: fix missing spinlock around update to ses->status
-Date:   Mon,  5 Jul 2021 11:30:35 -0400
-Message-Id: <20210705153039.1521781-22-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210705153039.1521781-1-sashal@kernel.org>
-References: <20210705153039.1521781-1-sashal@kernel.org>
+        id S233417AbhGFMhZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Jul 2021 08:37:25 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:56609 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241050AbhGFMHr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Jul 2021 08:07:47 -0400
+Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
+        by youngberry.canonical.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <colin.king@canonical.com>)
+        id 1m0jp0-0007eU-7T; Tue, 06 Jul 2021 12:05:02 +0000
+From:   Colin King <colin.king@canonical.com>
+To:     Namjae Jeon <namjae.jeon@samsung.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <sfrench@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH][next] ksmbd: Fix read on the uninitialized pointer sess
+Date:   Tue,  6 Jul 2021 13:05:01 +0100
+Message-Id: <20210706120501.28776-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Steve French <stfrench@microsoft.com>
+From: Colin Ian King <colin.king@canonical.com>
 
-[ Upstream commit 0060a4f28a9ef45ae8163c0805e944a2b1546762 ]
+There is a error handling case that passes control to label out_err
+without pointer sess being assigned a value. The unassigned pointer
+may be any garbage value and so the test of rc < 0 && sess maybe
+true leading to sess being passed to the call to ksmbd_session_destroy.
+Fix this by setting sess to NULL in this corner case.
 
-In the other places where we update ses->status we protect the
-updates via GlobalMid_Lock. So to be consistent add the same
-locking around it in cifs_put_smb_ses where it was missing.
-
-Addresses-Coverity: 1268904 ("Data race condition")
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Addresses-Coverity: ("Uninitialized pointer read")
+Fixes: f5a544e3bab7 ("ksmbd: add support for SMB3 multichannel")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- fs/cifs/cifsglob.h | 3 ++-
- fs/cifs/connect.c  | 5 ++++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ fs/ksmbd/smb2pdu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-index b16c994414ab..9c0e348cb00f 100644
---- a/fs/cifs/cifsglob.h
-+++ b/fs/cifs/cifsglob.h
-@@ -964,7 +964,7 @@ struct cifs_ses {
- 	struct mutex session_mutex;
- 	struct TCP_Server_Info *server;	/* pointer to server info */
- 	int ses_count;		/* reference counter */
--	enum statusEnum status;
-+	enum statusEnum status;  /* updates protected by GlobalMid_Lock */
- 	unsigned overrideSecFlg;  /* if non-zero override global sec flags */
- 	char *serverOS;		/* name of operating system underlying server */
- 	char *serverNOS;	/* name of network operating system of server */
-@@ -1814,6 +1814,7 @@ require use of the stronger protocol */
-  *	list operations on pending_mid_q and oplockQ
-  *      updates to XID counters, multiplex id  and SMB sequence numbers
-  *      list operations on global DnotifyReqList
-+ *      updates to ses->status
-  *  tcp_ses_lock protects:
-  *	list operations on tcp and SMB session lists
-  *  tcon->open_file_lock protects the list of open files hanging off the tcon
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index ab9eeb5ff8e5..da0720f41ebc 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3049,9 +3049,12 @@ void cifs_put_smb_ses(struct cifs_ses *ses)
- 		spin_unlock(&cifs_tcp_ses_lock);
- 		return;
- 	}
-+	spin_unlock(&cifs_tcp_ses_lock);
-+
-+	spin_lock(&GlobalMid_Lock);
- 	if (ses->status == CifsGood)
- 		ses->status = CifsExiting;
--	spin_unlock(&cifs_tcp_ses_lock);
-+	spin_unlock(&GlobalMid_Lock);
- 
- 	cifs_free_ipc(ses);
- 
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index dda90812feef..ad976dbbb0b6 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -1615,6 +1615,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 	} else if ((conn->dialect < SMB30_PROT_ID ||
+ 		    server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL) &&
+ 		   (req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
++		sess = NULL;
+ 		rc = -EACCES;
+ 		goto out_err;
+ 	} else {
 -- 
-2.30.2
+2.31.1
 
