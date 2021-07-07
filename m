@@ -8,131 +8,129 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CCE7C07E96
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 02:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2730C07E96
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 02:46:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6408361CA2
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 02:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6B4161C81
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 02:46:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbhGGCe7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 6 Jul 2021 22:34:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50346 "EHLO
+        id S229996AbhGGCs5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 6 Jul 2021 22:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229949AbhGGCe6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Jul 2021 22:34:58 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B6FC061574
-        for <linux-cifs@vger.kernel.org>; Tue,  6 Jul 2021 19:32:18 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id e20so688665ljn.8
-        for <linux-cifs@vger.kernel.org>; Tue, 06 Jul 2021 19:32:18 -0700 (PDT)
+        with ESMTP id S229894AbhGGCs5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 6 Jul 2021 22:48:57 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8946C061574
+        for <linux-cifs@vger.kernel.org>; Tue,  6 Jul 2021 19:46:16 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id y42so1401895lfa.3
+        for <linux-cifs@vger.kernel.org>; Tue, 06 Jul 2021 19:46:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to;
-        bh=J6edy1Q3uFiMOoeNC4ijFGchxRUA2b/DRCKTIWpJrXs=;
-        b=bsqB684MOtWpLXxeB1PoFHCipmdHwk+fl/KtrDldGIldqUXjRCjBGNzwIGBAY3Eu2S
-         UgQrs5rkpX1nuPfoQOyYLd8Kmhn35LJlPtUkURJDqm2tXQWhdfEkqMqAqJCXLTe2GKya
-         A7nx5AsUYwgSToai/VabFU9Bz53VbBD6Gx1nnOMK7RX9OljvHAYO4v+fhFDaQu+uMZ+K
-         T8GrJXTxJJl/FkpsmmdtJkTo+XQiiTrYbTv1Dn9opOAhwlebtEiCCLzD/m43rxZwmawQ
-         ySO13jWCpDxIqSH0fCrXNnuR3nDCxyRTx/4/j8qV98EGSijyA0c1F+7/LaN2ue5RWhEf
-         /j2w==
+        bh=zp9FK4ClBBXMRVq3i9TrKEbK6GCWnIVqRpypGdPGgI0=;
+        b=L21NRDTq6wGGhV5/aaUYJXVz/FAj44HFb89R4liQpyQ+c60cTS7qdR1Ai7H3Ud9Yyf
+         50K7n9gQncPpaUCyJGY/NIkgDOsy0sCXH0pkUQZwlInCJClMHzpuQGqRdz0fheXliOkG
+         dDjGON/XufEcPz1mwMbmUwgDp3yuqyPZz3A72liW5ilJ0JSTQ9poXCNZBkElm+nsf2US
+         td9AWllXLLmO/JuZGT3GjHEdTVTke3EkxUaLn6cMHpR17sYiUr5hQ0btYQy995inwpOB
+         3Rk1BFaOO1brltPJkslTBLqksP3eu6RuS/+PL2SZjp283cs7JmGrpiiARXjf43lhv6q0
+         vX+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=J6edy1Q3uFiMOoeNC4ijFGchxRUA2b/DRCKTIWpJrXs=;
-        b=Ea+LMw2potZ4HRUZb6phK+WurmMrNK6NuSfXb1flcZp8qgIJAvf815wh2CkqQOr/5U
-         fWmWE1TqNFcip9/McYk+Bt8w/83GCuw+uw2EgGKq6OkUdllDq/R19LTb4OPTvxSsVvTk
-         0zJ2CfgWaNe1IAVq78HpCT0C/xXuQq42BJ2G23FYKfuzR3MtKUvEttax3x8DeibiIOAN
-         m6XltzrXODpBF1czGNHq4OQ9sKLaYvSVbeaR1bz9MdladmP/8XgC+adv2HJ/TxAdtLXX
-         yIqBOrZgGJ5hPnqi3FjhxIWlVXxgNWZz1Z0SvQt9DSF8GVrBxcakinauxJqc/E8mzWrO
-         TnXw==
-X-Gm-Message-State: AOAM5339t3kaenm9O28OaKUh2RXS4/RnVr4w2mSXMRitwHKAf9Yr97Ls
-        oaKeGRA+7tbgIzW+IFPSPLEW909bnq3vZ43MFSTngIGJaSw=
-X-Google-Smtp-Source: ABdhPJxPCaprH5i5qQH1j6P36UAM/qJbPSiNzQDfIY0t9uMoc8Ztr7hbzUhXG+/uWIRJNYXjXCVMWtIbMF+Ch6rmEoY=
-X-Received: by 2002:a2e:140e:: with SMTP id u14mr9944014ljd.148.1625625136264;
- Tue, 06 Jul 2021 19:32:16 -0700 (PDT)
+        bh=zp9FK4ClBBXMRVq3i9TrKEbK6GCWnIVqRpypGdPGgI0=;
+        b=KB9Fh7X4EHeEjNeOqEoFX/mx0lGGGlCrERVk2DYjNzmOo/LN9ZHQUbzV69Ew250dIK
+         psKnzKC1+lro0RBiT8OiqeBMS3CXeg9AGDQFH7a532Krl1ErU+Pbxx0lkEcwDzAWMLRI
+         KW1e5Tebo0zpuIBNey0nCts6wVEwgrNoGDpyU+EnKBGzqvilgNlqZP06ETrePsgb+VeJ
+         Wx+eravvRKjBlBkEwX3AUKvYW3kA8xzTPcjG8qU4vR04Ukq71qjrERDGm+JKFpU3ohfn
+         eAy6hDKrJLDv7DvU0SJT3hKwzNA0dF5N/gHEFnUQBtykaXGzPj5LR3HPO76pU75b+ZiR
+         +ZJw==
+X-Gm-Message-State: AOAM530BdQuH2R8NK5Ou0Jy4eO0p/jYXOiqDzUZ8fMwkJ2xxa3uQPbHT
+        5SjxAjmtOzhHX2od3yRkPeIjYkm+ePkWdRgUOnvN0mA7ZxY=
+X-Google-Smtp-Source: ABdhPJw3pD19Z+oNo3+hpRy5nUtlgoWwyxO2OBsNjES/IhFeV3cNR/4bsv0QoygcljBWhvWbtPI/tUeZIcK/ylhcINE=
+X-Received: by 2002:a19:5043:: with SMTP id z3mr15927248lfj.282.1625625974956;
+ Tue, 06 Jul 2021 19:46:14 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 6 Jul 2021 21:32:02 -0500
-Message-ID: <CAH2r5muHMjdmmK1GvhqEuqdvvncTvWYwWcd8avER1iQoGAt7LQ@mail.gmail.com>
-Subject: [PATCH][CIFS] Clarify code for SMB1 SetFileSize
+Date:   Tue, 6 Jul 2021 21:46:01 -0500
+Message-ID: <CAH2r5mudi2+JF---Ou_8eojmH0f8o7Fz2NejuNvFmPaLPCbUww@mail.gmail.com>
+Subject: [CIFS][PATCH] Clarify SMB1 code for delete
 To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000c92d0105c67f58ee"
+Content-Type: multipart/mixed; boundary="000000000000c67ba005c67f8a29"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000c92d0105c67f58ee
+--000000000000c67ba005c67f8a29
 Content-Type: text/plain; charset="UTF-8"
 
 Coverity also complains about the way we calculate the offset
-(starting from the address of a 4 byte array within the header
-structure rather than from the beginning of the struct plus
-4 bytes) for setting the file size using SMB1. This changeset
-doesn't change the address but makes it slightly clearer.
+(starting from the address of a 4 byte array within the
+header structure rather than from the beginning of the struct
+plus 4 bytes) for SMB1 SetFileDisposition (which is used to
+unlink a file by setting the delete on close flag).  This
+changeset doesn't change the address but makes it slightly
+clearer.
 
-Addresses-Coverity: 711525 ("Out of bounds write")
+Addresses-Coverity: 711524 ("Out of bounds write")
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/cifs/cifssmb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/cifs/cifssmb.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 22b8c12962fa..a513a89aad1a 100644
+index a513a89aad1a..0863238ddd20 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -5628,9 +5628,9 @@ CIFSSMBSetFileSize(const unsigned int xid,
-struct cifs_tcon *tcon,
-  pSMB->TotalDataCount = pSMB->DataCount;
-  pSMB->TotalParameterCount = pSMB->ParameterCount;
-  pSMB->ParameterOffset = cpu_to_le16(param_offset);
+@@ -5763,7 +5763,8 @@ CIFSSMBSetFileDisposition(const unsigned int
+xid, struct cifs_tcon *tcon,
+  param_offset = offsetof(struct smb_com_transaction2_sfi_req, Fid) - 4;
+  offset = param_offset + params;
+
+- data_offset = (char *) (&pSMB->hdr.Protocol) + offset;
 + /* SMB offsets are from the beginning of SMB which is 4 bytes in,
 after RFC1001 field */
-  parm_data =
-- (struct file_end_of_file_info *) (((char *) &pSMB->hdr.Protocol)
-- + offset);
-+ (struct file_end_of_file_info *)(((char *)pSMB) + offset + 4);
-  pSMB->DataOffset = cpu_to_le16(offset);
-  parm_data->FileSize = cpu_to_le64(size);
-  pSMB->Fid = cfile->fid.netfid;
++ data_offset = (char *)(pSMB) + offset + 4;
+
+  count = 1;
+  pSMB->MaxParameterCount = cpu_to_le16(2);
 
 -- 
 Thanks,
 
 Steve
 
---000000000000c92d0105c67f58ee
+--000000000000c67ba005c67f8a29
 Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-CIFS-Clarify-SMB1-code-for-SetFileSize.patch"
+	name="0001-CIFS-Clarify-SMB1-code-for-delete.patch"
 Content-Disposition: attachment; 
-	filename="0001-CIFS-Clarify-SMB1-code-for-SetFileSize.patch"
+	filename="0001-CIFS-Clarify-SMB1-code-for-delete.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_kqsv82qj0>
-X-Attachment-Id: f_kqsv82qj0
+Content-ID: <f_kqsvq2u60>
+X-Attachment-Id: f_kqsvq2u60
 
-RnJvbSAxMTk0MTI4ZTM3ZWRmODZjN2UyYmJiNjFmODc4NTczZjU0ZmIwZTgwIE1vbiBTZXAgMTcg
+RnJvbSA1MzJkYjRiZjg1ZjlmMmZhZTEzMTU0ZmZjNDVjZmI3MTI3OWE1ZGFiIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgNiBKdWwgMjAyMSAyMToyNzoyNiAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIENJ
-RlM6IENsYXJpZnkgU01CMSBjb2RlIGZvciBTZXRGaWxlU2l6ZQoKQ292ZXJpdHkgYWxzbyBjb21w
-bGFpbnMgYWJvdXQgdGhlIHdheSB3ZSBjYWxjdWxhdGUgdGhlIG9mZnNldAooc3RhcnRpbmcgZnJv
-bSB0aGUgYWRkcmVzcyBvZiBhIDQgYnl0ZSBhcnJheSB3aXRoaW4gdGhlIGhlYWRlcgpzdHJ1Y3R1
-cmUgcmF0aGVyIHRoYW4gZnJvbSB0aGUgYmVnaW5uaW5nIG9mIHRoZSBzdHJ1Y3QgcGx1cwo0IGJ5
-dGVzKSBmb3Igc2V0dGluZyB0aGUgZmlsZSBzaXplIHVzaW5nIFNNQjEuIFRoaXMgY2hhbmdlc2V0
-CmRvZXNuJ3QgY2hhbmdlIHRoZSBhZGRyZXNzIGJ1dCBtYWtlcyBpdCBzbGlnaHRseSBjbGVhcmVy
-LgoKQWRkcmVzc2VzLUNvdmVyaXR5OiA3MTE1MjUgKCJPdXQgb2YgYm91bmRzIHdyaXRlIikKU2ln
-bmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNyb3NvZnQuY29tPgotLS0KIGZz
-L2NpZnMvY2lmc3NtYi5jIHwgNCArKy0tCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
-LCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3NtYi5jIGIvZnMvY2lm
-cy9jaWZzc21iLmMKaW5kZXggMjJiOGMxMjk2MmZhLi5hNTEzYTg5YWFkMWEgMTAwNjQ0Ci0tLSBh
-L2ZzL2NpZnMvY2lmc3NtYi5jCisrKyBiL2ZzL2NpZnMvY2lmc3NtYi5jCkBAIC01NjI4LDkgKzU2
-MjgsOSBAQCBDSUZTU01CU2V0RmlsZVNpemUoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0
-IGNpZnNfdGNvbiAqdGNvbiwKIAlwU01CLT5Ub3RhbERhdGFDb3VudCA9IHBTTUItPkRhdGFDb3Vu
-dDsKIAlwU01CLT5Ub3RhbFBhcmFtZXRlckNvdW50ID0gcFNNQi0+UGFyYW1ldGVyQ291bnQ7CiAJ
-cFNNQi0+UGFyYW1ldGVyT2Zmc2V0ID0gY3B1X3RvX2xlMTYocGFyYW1fb2Zmc2V0KTsKKwkvKiBT
-TUIgb2Zmc2V0cyBhcmUgZnJvbSB0aGUgYmVnaW5uaW5nIG9mIFNNQiB3aGljaCBpcyA0IGJ5dGVz
-IGluLCBhZnRlciBSRkMxMDAxIGZpZWxkICovCiAJcGFybV9kYXRhID0KLQkJKHN0cnVjdCBmaWxl
-X2VuZF9vZl9maWxlX2luZm8gKikgKCgoY2hhciAqKSAmcFNNQi0+aGRyLlByb3RvY29sKQotCQkJ
-CSsgb2Zmc2V0KTsKKwkJKHN0cnVjdCBmaWxlX2VuZF9vZl9maWxlX2luZm8gKikoKChjaGFyICop
-cFNNQikgKyBvZmZzZXQgKyA0KTsKIAlwU01CLT5EYXRhT2Zmc2V0ID0gY3B1X3RvX2xlMTYob2Zm
-c2V0KTsKIAlwYXJtX2RhdGEtPkZpbGVTaXplID0gY3B1X3RvX2xlNjQoc2l6ZSk7CiAJcFNNQi0+
-RmlkID0gY2ZpbGUtPmZpZC5uZXRmaWQ7Ci0tIAoyLjMwLjIKCg==
---000000000000c92d0105c67f58ee--
+CkRhdGU6IFR1ZSwgNiBKdWwgMjAyMSAyMTo0MjowOCAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIENJ
+RlM6IENsYXJpZnkgU01CMSBjb2RlIGZvciBkZWxldGUKCkNvdmVyaXR5IGFsc28gY29tcGxhaW5z
+IGFib3V0IHRoZSB3YXkgd2UgY2FsY3VsYXRlIHRoZSBvZmZzZXQKKHN0YXJ0aW5nIGZyb20gdGhl
+IGFkZHJlc3Mgb2YgYSA0IGJ5dGUgYXJyYXkgd2l0aGluIHRoZQpoZWFkZXIgc3RydWN0dXJlIHJh
+dGhlciB0aGFuIGZyb20gdGhlIGJlZ2lubmluZyBvZiB0aGUgc3RydWN0CnBsdXMgNCBieXRlcykg
+Zm9yIFNNQjEgU2V0RmlsZURpc3Bvc2l0aW9uICh3aGljaCBpcyB1c2VkIHRvCnVubGluayBhIGZp
+bGUgYnkgc2V0dGluZyB0aGUgZGVsZXRlIG9uIGNsb3NlIGZsYWcpLiAgVGhpcwpjaGFuZ2VzZXQg
+ZG9lc24ndCBjaGFuZ2UgdGhlIGFkZHJlc3MgYnV0IG1ha2VzIGl0IHNsaWdodGx5CmNsZWFyZXIu
+CgpBZGRyZXNzZXMtQ292ZXJpdHk6IDcxMTUyNCAoIk91dCBvZiBib3VuZHMgd3JpdGUiKQpTaWdu
+ZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMv
+Y2lmcy9jaWZzc21iLmMgfCAzICsrLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwg
+MSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3NtYi5jIGIvZnMvY2lmcy9j
+aWZzc21iLmMKaW5kZXggYTUxM2E4OWFhZDFhLi4wODYzMjM4ZGRkMjAgMTAwNjQ0Ci0tLSBhL2Zz
+L2NpZnMvY2lmc3NtYi5jCisrKyBiL2ZzL2NpZnMvY2lmc3NtYi5jCkBAIC01NzYzLDcgKzU3NjMs
+OCBAQCBDSUZTU01CU2V0RmlsZURpc3Bvc2l0aW9uKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0
+cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJcGFyYW1fb2Zmc2V0ID0gb2Zmc2V0b2Yoc3RydWN0IHNt
+Yl9jb21fdHJhbnNhY3Rpb24yX3NmaV9yZXEsIEZpZCkgLSA0OwogCW9mZnNldCA9IHBhcmFtX29m
+ZnNldCArIHBhcmFtczsKIAotCWRhdGFfb2Zmc2V0ID0gKGNoYXIgKikgKCZwU01CLT5oZHIuUHJv
+dG9jb2wpICsgb2Zmc2V0OworCS8qIFNNQiBvZmZzZXRzIGFyZSBmcm9tIHRoZSBiZWdpbm5pbmcg
+b2YgU01CIHdoaWNoIGlzIDQgYnl0ZXMgaW4sIGFmdGVyIFJGQzEwMDEgZmllbGQgKi8KKwlkYXRh
+X29mZnNldCA9IChjaGFyICopKHBTTUIpICsgb2Zmc2V0ICsgNDsKIAogCWNvdW50ID0gMTsKIAlw
+U01CLT5NYXhQYXJhbWV0ZXJDb3VudCA9IGNwdV90b19sZTE2KDIpOwotLSAKMi4zMC4yCgo=
+--000000000000c67ba005c67f8a29--
