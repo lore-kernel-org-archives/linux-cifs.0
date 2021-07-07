@@ -8,132 +8,131 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 523C3C07E95
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 18:41:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD29FC07E95
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 19:08:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 37ED461C81
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 18:41:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3EFC61CC2
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 19:08:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232723AbhGGSoj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 7 Jul 2021 14:44:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40444 "EHLO
+        id S231248AbhGGTKu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 7 Jul 2021 15:10:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232331AbhGGSog (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Jul 2021 14:44:36 -0400
+        with ESMTP id S230160AbhGGTKu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 7 Jul 2021 15:10:50 -0400
 Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76C27C061767
-        for <linux-cifs@vger.kernel.org>; Wed,  7 Jul 2021 11:40:23 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id u18so6506041lff.9
-        for <linux-cifs@vger.kernel.org>; Wed, 07 Jul 2021 11:40:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A976C061574
+        for <linux-cifs@vger.kernel.org>; Wed,  7 Jul 2021 12:08:08 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id q18so6791383lfc.7
+        for <linux-cifs@vger.kernel.org>; Wed, 07 Jul 2021 12:08:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to;
-        bh=pu8gyira5Skp8iMTpC2i3Oq0LD7WW20LKfir8GJKH6Y=;
-        b=k4PRO/zI0sdTS5LeDogcxanX9OmmFATXftENxDK+Svqt2pYkvQA74pUEyOZqREHZ0u
-         wNBrE6WwgKAd+t+sSWV/hMu9FkquRK6TocBxPNYA34YrH+iN/PHjjoQi5/3R8nyRLMyq
-         BlDiJqheJqhW8klCHxQW1wDJRWi2DFKe9E0GBAXvkVH3fIIG7amAc0Irt5yELgYzJcJI
-         ue34XihktyniTE8jq/YstUmiU5hGSRsAKoAig0DgQMXK+nPgwL7TV0TDTKb/B8Ny85T9
-         LyeAZNjwNrxQV2Lw33W8mw4RwYNxv6MxXNbfaK2S4gJ1W+tlbtmc4Ema+zgV1lNIl7pQ
-         ETOA==
+        bh=N8o4s4S+U5bp6nCXpE01ZZjPN4ueWJ5Fv3glrcsfmXI=;
+        b=G7wd1rJvXIQzZK4rkzpOFXRcsporoTWVCECpzGOF72qI+Uj81L+18f62EqKwRnFwZc
+         WBMj1+NevPW5asSWfE6u5Rjhw0kqC2L6RfUZ042vYA00qEKB/QDdRriOgLwAY2dp9x8s
+         W58gY4o/Wm0zJDVEltUZQob/vj3Wgt2JFZ1ZzOYDdWN5koti22iRJK43+gR6QOWX4l2W
+         fjq1m1Sr5eslS+xbPEWlOxZc2cC0/XlXgzhWtCmpAD9B6Jy3MGZnyaaU9juN4yuJJTy0
+         usaQPLf2VmnAj0aHvpqiEH0axx+aShTFsrUCSfWEskwvh6kJ7SbR/X+0HcIms9WxAnDs
+         t+2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=pu8gyira5Skp8iMTpC2i3Oq0LD7WW20LKfir8GJKH6Y=;
-        b=h1mJ+i/LbVXAzcUHv6Hak7Wd9+rQ3wgkCDBb0h8XP7TqCnPsC8nNKGUcDII5tNzIV+
-         XWnka+HDvTaSK+cDCL94sU1kX5g6aubierDR40SuR6AurAMrJ2yrLtDXdfCZ+GhMwIn/
-         o4uVRjjwmTR4dCAmCe40CLfpzRl+5gXMWLpzeRpPG8pZUqC77UtPaiq9uk2vPzu0Y+ts
-         cSqclVXeSTFCq4mhZ9XBJnqaW2k75j5FNJ+JqW/0T+t49NCZ71jVlfxRYurJkF71R6ep
-         5TrOJFjsCjl6S6aSOq5sYkFzj8nQ5Tnq48g383HVSjqZw/TzeOavXyd7akdA9nekTF+w
-         9MKg==
-X-Gm-Message-State: AOAM533tI836gx6smE76BdKTA0KAzWbYRAfL4as6BGzcjRspra2RdbBW
-        JOB35a/yjk7C/Y7Ga+zufFDe7jnelBiI998+cDYv1BjepC4=
-X-Google-Smtp-Source: ABdhPJy/XxwS0FGz6ujE9fPl7/vyryuY1RzqTlJBJy+Pbpk6h0iWsTvfr72DnNzKtknlnC1crsRp+AzimBKtIWoI388=
-X-Received: by 2002:a2e:b5a3:: with SMTP id f3mr10885874ljn.406.1625683221581;
- Wed, 07 Jul 2021 11:40:21 -0700 (PDT)
+        bh=N8o4s4S+U5bp6nCXpE01ZZjPN4ueWJ5Fv3glrcsfmXI=;
+        b=ahKG6LjwatC4RMxacziwWY2ydSdY/tl8AYrb4MorwUXvTmT3E6VKjKpfOPkgr5CXah
+         ozfy4XRCmubIQKvHO3FHeGbuiU3S+75MVxPPhxz1w+8vM8yCT5+724N/Rqwnla1xp0fa
+         0NhCXUUB0egZktQBgJxrX9wuaE2fsnpLOtesetM31IM+B7Ja7SHluOe28rwgZ1lAXSXY
+         Rw7JzfK89dp8SlSTAbMwt+qkTnTNgJjAfU7zi9MrRyqanVkLzf+JRU2/VC9nI9B7tSjL
+         fYp6YnsA3/MuFqmqJ9OJ+7y6QoAeBMQuHd7cuHKFRjsT1o9i8QBJexV291Ztn6wTYUOx
+         52FA==
+X-Gm-Message-State: AOAM530D+AagGOR+g/OzTz6tRJo/+QzjUlBQmaTf8N+TiyplNfTuHVwH
+        B/DCMCZUwfZvNNYY2s+LBGQ5XrHyyZPZR5VTIFTfej6SN0Y=
+X-Google-Smtp-Source: ABdhPJwbtGur3iZsbEz0GWm3URo77ph0dLZIO/69eymcWukkjJYF2c2yc2Nhb1taalWjGyHVNjm4BxcZAtAqHsXpIu0=
+X-Received: by 2002:a19:5043:: with SMTP id z3mr19121679lfj.282.1625684884967;
+ Wed, 07 Jul 2021 12:08:04 -0700 (PDT)
 MIME-Version: 1.0
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 7 Jul 2021 13:40:08 -0500
-Message-ID: <CAH2r5msZ8+-HcjXK0xgRDjBRkUg597_mGWx8ry2-PxhJY16mkw@mail.gmail.com>
-Subject: [PATCH][CIFS] Clarify SMB1 code for rename open file
+Date:   Wed, 7 Jul 2021 14:07:52 -0500
+Message-ID: <CAH2r5mtA8psGCcH_=JQbXw--im8f6e+bqy12YRRdww9gEyy6uw@mail.gmail.com>
+Subject: [PATCH][CIFS] Clarify SMB1 code for POSIX Lock
 To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000f0ac2205c68cdef4"
+Content-Type: multipart/mixed; boundary="00000000000015ebe305c68d424a"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000f0ac2205c68cdef4
+--00000000000015ebe305c68d424a
 Content-Type: text/plain; charset="UTF-8"
 
-And one more trivial coverity issue related patch ...
-(with fewer old issues like this, in the future it will be easier
-to spot important new ones that tools like this report)
+Another trivial (Coverity reported issue) patch ...
 
 Coverity also complains about the way we calculate the offset
 (starting from the address of a 4 byte array within the
 header structure rather than from the beginning of the struct
-plus 4 bytes) for SMB1 RenameOpenFile. This changeset
+plus 4 bytes) for SMB1 PosixLock. This changeset
 doesn't change the address but makes it slightly clearer.
 
-Addresses-Coverity: 711521 ("Out of bounds write")
+Addresses-Coverity: 711520 ("Out of bounds write")
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
  fs/cifs/cifssmb.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 0863238ddd20..16bd4cf3bceb 100644
+index 16bd4cf3bceb..f72e3b3dca69 100644
 --- a/fs/cifs/cifssmb.c
 +++ b/fs/cifs/cifssmb.c
-@@ -2767,7 +2767,8 @@ int CIFSSMBRenameOpenFile(const unsigned int
-xid, struct cifs_tcon *pTcon,
-  param_offset = offsetof(struct smb_com_transaction2_sfi_req, Fid) - 4;
-  offset = param_offset + params;
-
-- data_offset = (char *) (&pSMB->hdr.Protocol) + offset;
+@@ -2537,8 +2537,9 @@ CIFSSMBPosixLock(const unsigned int xid, struct
+cifs_tcon *tcon,
+  pSMB->TotalDataCount = pSMB->DataCount;
+  pSMB->TotalParameterCount = pSMB->ParameterCount;
+  pSMB->ParameterOffset = cpu_to_le16(param_offset);
 + /* SMB offsets are from the beginning of SMB which is 4 bytes in,
 after RFC1001 field */
-+ data_offset = (char *)(pSMB) + offset + 4;
-  rename_info = (struct set_file_rename *) data_offset;
-  pSMB->MaxParameterCount = cpu_to_le16(2);
-  pSMB->MaxDataCount = cpu_to_le16(1000); /* BB find max SMB from sess */
+  parm_data = (struct cifs_posix_lock *)
+- (((char *) &pSMB->hdr.Protocol) + offset);
++ (((char *)pSMB) + offset + 4);
+
+  parm_data->lock_type = cpu_to_le16(lock_type);
+  if (waitFlag) {
+
 
 -- 
 Thanks,
 
 Steve
 
---000000000000f0ac2205c68cdef4
+--00000000000015ebe305c68d424a
 Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-CIFS-Clarify-SMB1-code-for-rename-open-file.patch"
+	name="0001-CIFS-Clarify-SMB1-code-for-POSIX-Lock.patch"
 Content-Disposition: attachment; 
-	filename="0001-CIFS-Clarify-SMB1-code-for-rename-open-file.patch"
+	filename="0001-CIFS-Clarify-SMB1-code-for-POSIX-Lock.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_kqttt1yb0>
-X-Attachment-Id: f_kqttt1yb0
+Content-ID: <f_kqtusc920>
+X-Attachment-Id: f_kqtusc920
 
-RnJvbSBhMmM2YjVmOTUyMjZkNThmODU4NjRmNWEzMGU4OTJiNWVjODg1YmQ2IE1vbiBTZXAgMTcg
+RnJvbSA3YjdhMTFhN2I1YTg2NTM5MDYyMWQxNTZiZDE2OWEwYTIyZGJlYWY5IE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFdlZCwgNyBKdWwgMjAyMSAxMzozNDo0NyAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIENJ
-RlM6IENsYXJpZnkgU01CMSBjb2RlIGZvciByZW5hbWUgb3BlbiBmaWxlCgpDb3Zlcml0eSBhbHNv
-IGNvbXBsYWlucyBhYm91dCB0aGUgd2F5IHdlIGNhbGN1bGF0ZSB0aGUgb2Zmc2V0CihzdGFydGlu
-ZyBmcm9tIHRoZSBhZGRyZXNzIG9mIGEgNCBieXRlIGFycmF5IHdpdGhpbiB0aGUKaGVhZGVyIHN0
-cnVjdHVyZSByYXRoZXIgdGhhbiBmcm9tIHRoZSBiZWdpbm5pbmcgb2YgdGhlIHN0cnVjdApwbHVz
-IDQgYnl0ZXMpIGZvciBTTUIxIFJlbmFtZU9wZW5GaWxlLiBUaGlzIGNoYW5nZXNldApkb2Vzbid0
-IGNoYW5nZSB0aGUgYWRkcmVzcyBidXQgbWFrZXMgaXQgc2xpZ2h0bHkgY2xlYXJlci4KCkFkZHJl
-c3Nlcy1Db3Zlcml0eTogNzExNTIxICgiT3V0IG9mIGJvdW5kcyB3cml0ZSIpClNpZ25lZC1vZmYt
-Ynk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2Np
-ZnNzbWIuYyB8IDMgKystCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0
-aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9jaWZzc21iLmMgYi9mcy9jaWZzL2NpZnNzbWIu
-YwppbmRleCAwODYzMjM4ZGRkMjAuLjE2YmQ0Y2YzYmNlYiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9j
-aWZzc21iLmMKKysrIGIvZnMvY2lmcy9jaWZzc21iLmMKQEAgLTI3NjcsNyArMjc2Nyw4IEBAIGlu
-dCBDSUZTU01CUmVuYW1lT3BlbkZpbGUoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGNp
-ZnNfdGNvbiAqcFRjb24sCiAJcGFyYW1fb2Zmc2V0ID0gb2Zmc2V0b2Yoc3RydWN0IHNtYl9jb21f
-dHJhbnNhY3Rpb24yX3NmaV9yZXEsIEZpZCkgLSA0OwogCW9mZnNldCA9IHBhcmFtX29mZnNldCAr
-IHBhcmFtczsKIAotCWRhdGFfb2Zmc2V0ID0gKGNoYXIgKikgKCZwU01CLT5oZHIuUHJvdG9jb2wp
-ICsgb2Zmc2V0OworCS8qIFNNQiBvZmZzZXRzIGFyZSBmcm9tIHRoZSBiZWdpbm5pbmcgb2YgU01C
-IHdoaWNoIGlzIDQgYnl0ZXMgaW4sIGFmdGVyIFJGQzEwMDEgZmllbGQgKi8KKwlkYXRhX29mZnNl
-dCA9IChjaGFyICopKHBTTUIpICsgb2Zmc2V0ICsgNDsKIAlyZW5hbWVfaW5mbyA9IChzdHJ1Y3Qg
-c2V0X2ZpbGVfcmVuYW1lICopIGRhdGFfb2Zmc2V0OwogCXBTTUItPk1heFBhcmFtZXRlckNvdW50
-ID0gY3B1X3RvX2xlMTYoMik7CiAJcFNNQi0+TWF4RGF0YUNvdW50ID0gY3B1X3RvX2xlMTYoMTAw
-MCk7IC8qIEJCIGZpbmQgbWF4IFNNQiBmcm9tIHNlc3MgKi8KLS0gCjIuMzAuMgoK
---000000000000f0ac2205c68cdef4--
+CkRhdGU6IFdlZCwgNyBKdWwgMjAyMSAxNDowMzo1NCAtMDUwMApTdWJqZWN0OiBbUEFUQ0hdIENJ
+RlM6IENsYXJpZnkgU01CMSBjb2RlIGZvciBQT1NJWCBMb2NrCgpDb3Zlcml0eSBhbHNvIGNvbXBs
+YWlucyBhYm91dCB0aGUgd2F5IHdlIGNhbGN1bGF0ZSB0aGUgb2Zmc2V0CihzdGFydGluZyBmcm9t
+IHRoZSBhZGRyZXNzIG9mIGEgNCBieXRlIGFycmF5IHdpdGhpbiB0aGUKaGVhZGVyIHN0cnVjdHVy
+ZSByYXRoZXIgdGhhbiBmcm9tIHRoZSBiZWdpbm5pbmcgb2YgdGhlIHN0cnVjdApwbHVzIDQgYnl0
+ZXMpIGZvciBTTUIxIFBvc2l4TG9jay4gVGhpcyBjaGFuZ2VzZXQKZG9lc24ndCBjaGFuZ2UgdGhl
+IGFkZHJlc3MgYnV0IG1ha2VzIGl0IHNsaWdodGx5IGNsZWFyZXIuCgpBZGRyZXNzZXMtQ292ZXJp
+dHk6IDcxMTUyMCAoIk91dCBvZiBib3VuZHMgd3JpdGUiKQpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBG
+cmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9jaWZzc21iLmMgfCAz
+ICsrLQogMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlm
+ZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3NtYi5jIGIvZnMvY2lmcy9jaWZzc21iLmMKaW5kZXggMTZi
+ZDRjZjNiY2ViLi5mNzJlM2IzZGNhNjkgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY2lmc3NtYi5jCisr
+KyBiL2ZzL2NpZnMvY2lmc3NtYi5jCkBAIC0yNTM3LDggKzI1MzcsOSBAQCBDSUZTU01CUG9zaXhM
+b2NrKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBjaWZzX3Rjb24gKnRjb24sCiAJcFNN
+Qi0+VG90YWxEYXRhQ291bnQgPSBwU01CLT5EYXRhQ291bnQ7CiAJcFNNQi0+VG90YWxQYXJhbWV0
+ZXJDb3VudCA9IHBTTUItPlBhcmFtZXRlckNvdW50OwogCXBTTUItPlBhcmFtZXRlck9mZnNldCA9
+IGNwdV90b19sZTE2KHBhcmFtX29mZnNldCk7CisJLyogU01CIG9mZnNldHMgYXJlIGZyb20gdGhl
+IGJlZ2lubmluZyBvZiBTTUIgd2hpY2ggaXMgNCBieXRlcyBpbiwgYWZ0ZXIgUkZDMTAwMSBmaWVs
+ZCAqLwogCXBhcm1fZGF0YSA9IChzdHJ1Y3QgY2lmc19wb3NpeF9sb2NrICopCi0JCQkoKChjaGFy
+ICopICZwU01CLT5oZHIuUHJvdG9jb2wpICsgb2Zmc2V0KTsKKwkJCSgoKGNoYXIgKilwU01CKSAr
+IG9mZnNldCArIDQpOwogCiAJcGFybV9kYXRhLT5sb2NrX3R5cGUgPSBjcHVfdG9fbGUxNihsb2Nr
+X3R5cGUpOwogCWlmICh3YWl0RmxhZykgewotLSAKMi4zMC4yCgo=
+--00000000000015ebe305c68d424a--
