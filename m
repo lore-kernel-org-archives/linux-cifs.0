@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B93BC07E95
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 16:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49CBDC07E95
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 16:27:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57935613B2
-	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 16:26:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D95361C94
+	for <linux-cifs@archiver.kernel.org>; Wed,  7 Jul 2021 16:27:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbhGGQ3M (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 7 Jul 2021 12:29:12 -0400
-Received: from mx.cjr.nz ([51.158.111.142]:50090 "EHLO mx.cjr.nz"
+        id S230018AbhGGQ3s (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 7 Jul 2021 12:29:48 -0400
+Received: from mx.cjr.nz ([51.158.111.142]:50230 "EHLO mx.cjr.nz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230297AbhGGQ3J (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 7 Jul 2021 12:29:09 -0400
+        id S229542AbhGGQ3r (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 7 Jul 2021 12:29:47 -0400
 Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 653B57FD1E;
-        Wed,  7 Jul 2021 16:26:25 +0000 (UTC)
+        by mx.cjr.nz (Postfix) with ESMTPSA id C4B897FD1E;
+        Wed,  7 Jul 2021 16:27:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1625675186;
+        t=1625675226;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=XkdILNGBwWcw+f26uNyjz6J9sGUbbb42F+YdiZ+NoNE=;
-        b=MwGYbQ1ITdrRriGiLdNw/arXskvtX+hS8ItfVxHRw4yQkuDR/Nr2LXD6ejOn9RRFayPw3S
-        Ux9i2O2xKkF4CSXhfhPD6WmKv2Bgb90nrVLszEY9GtsH4xyXLIqa1Elu0FZIYU1dQdb1fS
-        sLaDSwsreOII5IwSDfayvgbuXCy6cPDkD+W0/JDcS5m3vt1irmlJkiYwCDecAmhH8wkmzU
-        77WdOl9k/EmMw5b/AiV8rAzEnBh+e4gjbAKAjxw8EK8sVDFjmD70dYewEdR5p4+ZG1gr54
-        M/C+T5BMTGK7ygVMd+Pkl9qoeitCnVKQs2Ly53qwdtLO67nsR5LAetrkQs1BOg==
+        bh=XNvTmmW4DCdOJKEB5c0j9iV2LlI73Be2vTgbrEar54M=;
+        b=dMA4hcHssU9CRTrUH5JC8rEvbeurIBqUBEtUEN48RkD83vDZARxB7SblzefxzOYM8VkX9f
+        h2yrwu+mnDYQnr4hirV50Bs/wSh+jh/XaIHgrlCzd9T/GNs7XkTd0YcULCodVoa9EHbTcA
+        YIkkJ2yUeTFu3xb0OKb0lCLIm6kAXAjWtSXg9CgEM2DYdc6ZKEnvUcjhOff5m+myRXYQQp
+        NHXD5bXIqsC3mDyWdA8yGfR04H7ZQYKBKi2kv/7BQTqqzV5i33RWGM6eJftzAwp6YF/56P
+        V91DOHmX3SRCJwFkOGq+Bro8MSUB3bw2I/Zw7daj7yRgxG8ulphy34dfkYvCAQ==
 From:   Paulo Alcantara <pc@cjr.nz>
 To:     Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH][CIFS] Clarify code for SMB1 SetFileSize
-In-Reply-To: <CAH2r5muHMjdmmK1GvhqEuqdvvncTvWYwWcd8avER1iQoGAt7LQ@mail.gmail.com>
-References: <CAH2r5muHMjdmmK1GvhqEuqdvvncTvWYwWcd8avER1iQoGAt7LQ@mail.gmail.com>
-Date:   Wed, 07 Jul 2021 13:26:21 -0300
-Message-ID: <87fswq5bv6.fsf@cjr.nz>
+Subject: Re: [CIFS][PATCH] Clarify SMB1 code for delete
+In-Reply-To: <CAH2r5mudi2+JF---Ou_8eojmH0f8o7Fz2NejuNvFmPaLPCbUww@mail.gmail.com>
+References: <CAH2r5mudi2+JF---Ou_8eojmH0f8o7Fz2NejuNvFmPaLPCbUww@mail.gmail.com>
+Date:   Wed, 07 Jul 2021 13:27:02 -0300
+Message-ID: <87czru5bu1.fsf@cjr.nz>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
@@ -54,15 +54,17 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 Steve French <smfrench@gmail.com> writes:
 
 > Coverity also complains about the way we calculate the offset
-> (starting from the address of a 4 byte array within the header
-> structure rather than from the beginning of the struct plus
-> 4 bytes) for setting the file size using SMB1. This changeset
-> doesn't change the address but makes it slightly clearer.
+> (starting from the address of a 4 byte array within the
+> header structure rather than from the beginning of the struct
+> plus 4 bytes) for SMB1 SetFileDisposition (which is used to
+> unlink a file by setting the delete on close flag).  This
+> changeset doesn't change the address but makes it slightly
+> clearer.
 >
-> Addresses-Coverity: 711525 ("Out of bounds write")
+> Addresses-Coverity: 711524 ("Out of bounds write")
 > Signed-off-by: Steve French <stfrench@microsoft.com>
 > ---
->  fs/cifs/cifssmb.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  fs/cifs/cifssmb.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
 Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
