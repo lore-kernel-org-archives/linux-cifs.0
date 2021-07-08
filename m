@@ -5,216 +5,442 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FCCC07E96
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Jul 2021 23:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5BCC07E96
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Jul 2021 23:20:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD94B61442
-	for <linux-cifs@archiver.kernel.org>; Thu,  8 Jul 2021 23:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E29F461432
+	for <linux-cifs@archiver.kernel.org>; Thu,  8 Jul 2021 23:20:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230433AbhGHXRd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 8 Jul 2021 19:17:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53284 "EHLO
+        id S229650AbhGHXWw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 8 Jul 2021 19:22:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230425AbhGHXRd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Jul 2021 19:17:33 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF627C061574
-        for <linux-cifs@vger.kernel.org>; Thu,  8 Jul 2021 16:14:49 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id t3so10934704edc.7
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Jul 2021 16:14:49 -0700 (PDT)
+        with ESMTP id S229553AbhGHXWw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 8 Jul 2021 19:22:52 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE2DAC061574
+        for <linux-cifs@vger.kernel.org>; Thu,  8 Jul 2021 16:20:09 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id b40so4978612ljf.12
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Jul 2021 16:20:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=PYqN/8kusvjwSE5DI+VAD9BltTdFP7k9Laod1MUzldM=;
-        b=tP04ykIFzH1pY8bD+0o66irfkitjuXpWQncg4q/xx/lRUST2p/ZL/aejc85eSl1uBg
-         WYVvGJpMGiINjDac3ndap5AtOICZ4aeSInwysMWNjSm1O7so0wDwFYs8FZdOt90HZX0T
-         mzq6qki8bJcLSwHEgmmHoekXwlJjrfLHjKY6l9cE+qTtNCDkuaf5+V6hCFVcNpolaMrv
-         h/WAIvryREmKpwCk4gZKM2kqGV+GdI5I2Qn06VDmgg6TUnYIx5Zacuj2nPBy5Via3VY9
-         NoTNU+ICWmL5AMxt6JIVVFEDSuztbZrYx09rvZmJv6E10DVTVwVdAB8NXUXxY8gUIBS0
-         UwWQ==
+        bh=33BqSzNIp7DEf3Fq73eeN+Oq+kujQg9EdA2VfBW7/MA=;
+        b=SdRzmxMWxD91/RWjKfh1Aujx3NqzaKWYTqiCv4pq8Ardc4DJvGqdaluvtPzgPXL/ZG
+         k28m7XfCjTXyiB4MTW7b60wtU+B0n/XBz1Y7fJNINwON62npZiXibbdLnr/iaB0xaSHa
+         3RavZwt9r2nSn89sFJC9pLKLVuNJvc/t0L5JTB1IYATtmWG1FRYoC6DZbVwNqWUw/yE1
+         AAKAzEXtAVVf736zuwBG82+9NWAzcNagHQeXrWo45x/4vEGfrsS1rQPvyTf6AM4cqkHf
+         gqrqfqAY8GCXg+ZFRLpuVa8D8VP9renSRFfetrFDDXN9C9pKeqpA6+I1Fr295SO1/4q4
+         awoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=PYqN/8kusvjwSE5DI+VAD9BltTdFP7k9Laod1MUzldM=;
-        b=P2RM9cBmMTfydtD+FUSRhTbPBb65udvO51LUiXaUaqB8c/G/E6V7ZsbU4biLTyP8qh
-         iHAOW064lub/uOBjqElGblTtWhKeeCWUTgACfw+djHSGg4hxmsfkEJGMwpR5xA+ebIhS
-         vWVy//X4uLbbAMq25eonBDkLUYqEq5fLkxSdDAmKARDyAglcI0eCmKfCF8CaBOpxaYVt
-         rnkSSWA/QSIKDxcZP8T7pbB3SeSZ+n2wejKHYM1Gu5zsLFEz4ApEF1NT4nSFN/vOjWxT
-         F9/NXxJ9oDaNoYdtooBV7pwJIoyiQngLQWA8Du8oKnzokd/pSSmEYPvag0RO+eJXqFoL
-         Q4QQ==
-X-Gm-Message-State: AOAM532A5TD9lvhblsh82rnDivDr6HF1sW/tz2RfRUqVAlvFWFuxeJmv
-        Va2fQWU1I+UY4hEu6gEGd2GV6eMwDfZBEU4xxg==
-X-Google-Smtp-Source: ABdhPJwDJR2jv6qD7mMMdfE+XKnmoiNA952C7MVZ1JYgC4Wwqq8KBl1TYRehSvuNYV0RdrvpD26NCjo2w9xj/bGca5k=
-X-Received: by 2002:a50:875d:: with SMTP id 29mr18786359edv.340.1625786088314;
- Thu, 08 Jul 2021 16:14:48 -0700 (PDT)
+        bh=33BqSzNIp7DEf3Fq73eeN+Oq+kujQg9EdA2VfBW7/MA=;
+        b=Rtd0ttwrmLskyONTxIc1FK4o3K+Q9tox/YHWS2hYnxK3tfWmaVcTjntZ5CBLwTVS00
+         tzBMd8piJp3bzuQRUbalX0aEQw4O82/aODY+Vk1x/y4j61t2bIvp5lswPY4CLDzUOabU
+         Rqh1PHOV/Fl1IfSoH3r1Vr1CmvLA2av7Nf0HpsE1NgYWPMyxQheYNnTudUOdndcUATQn
+         4bmugwbpVKqWNaTukGDXd1twuJa2QxprLgIaduLQltEWitvef/EkiaG1pBiuDLPToWvg
+         ss8aOg9SxId243S7ObjQ5IVAYepR/edd4wOUoD01euYRsy5gG/QJK96xdtKYq3GQtyca
+         UbUg==
+X-Gm-Message-State: AOAM532KVmxb3ho+/q2v0lEVed8BslvH3W2umvZpSgIRUkxr3lHj+ABX
+        UzeCWZb/YDL1vc9JT7Ux5Tb9lDh8kjufldtz09Y=
+X-Google-Smtp-Source: ABdhPJyxFz/VhfBlbA9dl/0MFLLWbv/L5MmkcT6N34dVBWF7Sely34NWZtGOzyWieKuU6aLUk6GmM8Eq4GsJD44MdLM=
+X-Received: by 2002:a2e:5756:: with SMTP id r22mr938543ljd.477.1625786408068;
+ Thu, 08 Jul 2021 16:20:08 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210521152940.23072-1-aaptel@suse.com>
-In-Reply-To: <20210521152940.23072-1-aaptel@suse.com>
-From:   Pavel Shilovsky <piastryyy@gmail.com>
-Date:   Thu, 8 Jul 2021 16:14:37 -0700
-Message-ID: <CAKywueT80W0Q25HDb=cDR3JoVzanEPzrFzjwAqqqsf_6Sx9Yjg@mail.gmail.com>
-Subject: Re: [PATCH cifs-utils] smbinfo: add support for new key dump ioctl
-To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>
+References: <CAH2r5mvS6aHG8dXBre0RuGPzUb0g1hh-OPnhEup9PrX5z0zv5g@mail.gmail.com>
+ <CAH2r5mu_fVutwr+XY8i-EpWO9gTw+dvHoy1oFk_wxHeMuVgxqA@mail.gmail.com>
+ <CAH2r5mstq3L33-RBDrJ+0Z1K2PAP0z=5bm=wQ8XHdx4th_caFw@mail.gmail.com>
+ <CAN05THSBo74HOMYV+mHejb1s4tAb_uv=8cmcO1UDRScFw-WUQg@mail.gmail.com> <CAKywueR0JE9-a8Gs-bxvDQgmDNzpm=sodpWc7rXaG58WR1EZiQ@mail.gmail.com>
+In-Reply-To: <CAKywueR0JE9-a8Gs-bxvDQgmDNzpm=sodpWc7rXaG58WR1EZiQ@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 8 Jul 2021 18:19:57 -0500
+Message-ID: <CAH2r5mtKzR731tZ-+_MJ+4paW3kTqP3BM07Bu3j6bRbgxiE9_Q@mail.gmail.com>
+Subject: Re: [PATCH][SMB3.1.1] add ability to send signing negotiate context
+To:     Pavel Shilovsky <piastryyy@gmail.com>
+Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-=D0=BF=D1=82, 21 =D0=BC=D0=B0=D1=8F 2021 =D0=B3. =D0=B2 08:29, Aur=C3=A9lie=
-n Aptel <aaptel@suse.com>:
->
-> From: Aurelien Aptel <aaptel@suse.com>
->
-> * try new one first, fall back on old one otherwise =3D> retrocompatible
-> * use better cipher descriptions
->
-> Signed-off-by: Aurelien Aptel <aaptel@suse.com>
-> ---
->  smbinfo | 79 +++++++++++++++++++++++++++++++++++++++++++++------------
->  1 file changed, 63 insertions(+), 16 deletions(-)
->
-> diff --git a/smbinfo b/smbinfo
-> index b96fdbc..73c5bb3 100755
-> --- a/smbinfo
-> +++ b/smbinfo
-> @@ -34,6 +34,7 @@ VERBOSE =3D False
->  CIFS_QUERY_INFO          =3D 0xc018cf07
->  CIFS_ENUMERATE_SNAPSHOTS =3D 0x800ccf06
->  CIFS_DUMP_KEY            =3D 0xc03acf08
-> +CIFS_DUMP_FULL_KEY       =3D 0xc011cf0a
->
->  # large enough input buffer length
->  INPUT_BUFFER_LENGTH =3D 16384
-> @@ -192,9 +193,11 @@ ACE_FLAGS =3D [
->  ]
->
->  CIPHER_TYPES =3D [
-> -    (0x00, "SMB3.0 CCM encryption"),
-> -    (0x01, "CCM encryption"),
-> -    (0x02, "GCM encryption"),
-> +    (0x00, "AES-128-CCM"),
-> +    (0x01, "AES-128-CCM"),
-> +    (0x02, "AES-128-GCM"),
-> +    (0x03, "AES-256-CCM"),
-> +    (0x04, "AES-256-GCM"),
->  ]
->
->  def main():
-> @@ -799,35 +802,79 @@ class KeyDebugInfoStruct:
->      def __init__(self):
->          self.suid =3D bytearray()
->          self.cipher =3D 0
-> -        self.auth_key =3D bytearray()
-> +        self.session_key =3D bytearray()
->          self.enc_key =3D bytearray()
->          self.dec_key =3D bytearray()
->
->      def ioctl(self, fd):
->          buf =3D bytearray()
->          buf.extend(struct.pack("=3D 8s H 16s 16s 16s", self.suid, self.c=
-ipher,
-> -                               self.auth_key, self.enc_key, self.dec_key=
-))
-> +                               self.session_key, self.enc_key, self.dec_=
-key))
->          fcntl.ioctl(fd, CIFS_DUMP_KEY, buf, True)
-> -        (self.suid, self.cipher, self.auth_key,
-> +        (self.suid, self.cipher, self.session_key,
->           self.enc_key, self.dec_key) =3D struct.unpack_from('=3D 8s H 16=
-s 16s 16s', buf, 0)
->
-> +class FullKeyDebugInfoStruct:
-> +    def __init__(self):
-> +        # lets pick something large to be future proof
-> +        # 17 + 3*32 would be strict minimum as of linux 5.13
-> +        self.in_size =3D 1024
-> +        self.suid =3D bytearray()
-> +        self.cipher =3D 0
-> +        self.session_key_len =3D 0
-> +        self.server_in_key_len =3D 0
-> +        self.server_out_key_len =3D 0
-> +
-> +    def ioctl(self, fd):
-> +        fmt =3D "=3D I 8s H B B B"
-> +        size =3D struct.calcsize(fmt)
-> +        buf =3D bytearray()
-> +        buf.extend(struct.pack(fmt, self.in_size, self.suid, self.cipher=
-,
-> +                               self.session_key_len, self.server_in_key_=
-len, self.server_out_key_len))
-> +        buf.extend(bytearray(self.in_size-size))
-> +        fcntl.ioctl(fd, CIFS_DUMP_FULL_KEY, buf, True)
-> +        (self.in_size, self.suid, self.cipher,
-> +         self.session_key_len, self.server_in_key_len,
-> +         self.server_out_key_len) =3D struct.unpack_from(fmt, buf, 0)
-> +
-> +        end =3D size
-> +        self.session_key =3D buf[end:end+self.session_key_len]
-> +        end +=3D self.session_key_len
-> +        self.server_in_key =3D buf[end:end+self.server_in_key_len]
-> +        end +=3D self.server_in_key_len
-> +        self.server_out_key =3D buf[end:end+self.server_out_key_len]
-> +
->  def bytes_to_hex(buf):
->      return " ".join(["%02x"%x for x in buf])
->
->  def cmd_keys(args):
-> -    kd =3D KeyDebugInfoStruct()
-> +    fd =3D os.open(args.file, os.O_RDONLY)
-> +    kd =3D FullKeyDebugInfoStruct()
-> +
->      try:
-> -        fd =3D os.open(args.file, os.O_RDONLY)
-> +        # try new call first
->          kd.ioctl(fd)
->      except Exception as e:
-> -        print("syscall failed: %s"%e)
-> -        return False
-> -
-> -    print("Session Id: %s"%bytes_to_hex(kd.suid))
-> -    print("Cipher: %s"%type_to_str(kd.cipher, CIPHER_TYPES, verbose=3DTr=
-ue))
-> -    print("Session Key: %s"%bytes_to_hex(kd.auth_key))
-> -    print("Encryption key: %s"%bytes_to_hex(kd.enc_key))
-> -    print("Decryption key: %s"%bytes_to_hex(kd.dec_key))
-> +        # new failed, try old call
-> +        kd =3D KeyDebugInfoStruct()
-> +        try:
-> +            kd.ioctl(fd)
-> +        except Exception as e:
-> +            # both new and old call failed
-> +            print("syscall failed: %s"%e)
-> +            return False
-> +        print("Session Id: %s"%bytes_to_hex(kd.suid))
-> +        print("Cipher: %s"%type_to_str(kd.cipher, CIPHER_TYPES, verbose=
-=3DTrue))
-> +        print("Session Key: %s"%bytes_to_hex(kd.session_key))
-> +        print("Encryption key: %s"%bytes_to_hex(kd.enc_key))
-> +        print("Decryption key: %s"%bytes_to_hex(kd.dec_key))
-> +    else:
-> +        # no exception, new call succeeded
-> +        print("Session Id: %s"%bytes_to_hex(kd.suid))
-> +        print("Cipher: %s"%type_to_str(kd.cipher, CIPHER_TYPES, verbose=
-=3DTrue))
-> +        print("Session Key: %s"%bytes_to_hex(kd.session_key))
-> +        print("ServerIn  Key: %s"%bytes_to_hex(kd.server_in_key))
-> +        print("ServerOut key: %s"%bytes_to_hex(kd.server_out_key))
->
->  if __name__ =3D=3D '__main__':
->      main()
-> --
-> 2.31.1
->
+It is a little tricky to figure out good wording here.
 
-Merged. Thanks!
---
-Best regards,
-Pavel Shilovsky
+"enable_negotiate_signing" (eventually) could end up requesting all 3
+... which means that the server could choose SHA256 over GMAC over
+CMAC.  Maybe I should avoid all mention of GMAC.
+
+My reason for noting "GMAC is experimental" is that if GMAC is
+negotiated it is less tested than the other two (since fewer servers
+currently support it compared to the other two which are broadly
+supported and thus already tested with cifs.ko) - but the effect of
+the patch is to let the server choose which algorithm it prefers ...
+so perhaps I should avoid mentioning GMAC here.
+
+On Thu, Jul 8, 2021 at 5:06 PM Pavel Shilovsky <piastryyy@gmail.com> wrote:
+>
+> @@ -104,6 +105,9 @@ MODULE_PARM_DESC(enable_gcm_256, "Enable
+> requesting strongest (256 bit) GCM encr
+>  module_param(require_gcm_256, bool, 0644);
+>  MODULE_PARM_DESC(require_gcm_256, "Require strongest (256 bit) GCM
+> encryption. Default: n/N/0");
+>
+> +module_param(enable_negotiate_signing, bool, 0644);
+> +MODULE_PARM_DESC(enable_GMAC_signing, "Enable requesting faster
+> (GMAC) packet signing. Default: n/N/0");
+> +
+>
+> s/enable_GMAC_signing/enable_negotiate_signing/ ?
+>
+> Also the description here is misleading: this param enables sending
+> the signing context not requesting GMAC which is not supported yet.
+>
+>
+> +    if (enable_negotiate_signing) {
+> +        pr_warn_once("requesting GMAC signing is experimental\n");
+>
+> Here as well - we are not requesting GMAC here, we are sending the
+> signing context with CMAC. I don't think this should be marked as
+> experimental.
+>
+> --
+> Best regards,
+> Pavel Shilovsky
+>
+> =D1=81=D1=80, 7 =D0=B8=D1=8E=D0=BB. 2021 =D0=B3. =D0=B2 21:52, ronnie sah=
+lberg <ronniesahlberg@gmail.com>:
+> >
+> > lgtm
+> >
+> > On Thu, Jul 8, 2021 at 2:49 PM Steve French <smfrench@gmail.com> wrote:
+> > >
+> > > v4 of patch (includes minor change to set local variable "num_algs"
+> > > once to number of algorithms and use that throughout
+> > > build_signing_context to make code a little clearer)
+> > >
+> > >
+> > > On Wed, Jul 7, 2021 at 11:27 PM Steve French <smfrench@gmail.com> wro=
+te:
+> > > >
+> > > > v3 of patch.  Updated with additional feedback from Ronnie (to make=
+ it
+> > > > more context len and datalength clearer)
+> > > >
+> > > >
+> > > > On Wed, Jul 7, 2021 at 9:44 PM Steve French <smfrench@gmail.com> wr=
+ote:
+> > > > >
+> > > > > Support for faster packet signing (using GMAC instead of CMAC) ca=
+n
+> > > > > now be negotiated to some newer servers, including Windows.
+> > > > > See MS-SMB2 section 2.2.3.17.
+> > > > >
+> > > > > This patch adds support for sending the new negotiate context
+> > > > > with the first of three supported signing algorithms (AES-CMAC)
+> > > > > and decoding the response.  A followon patch will add support
+> > > > > for sending the other two (including AES-GMAC, which is fastest)
+> > > > > and changing the signing algorithm used based on what was
+> > > > > negotiated.
+> > > > >
+> > > > > To allow the client to request GMAC signing set module parameter
+> > > > > "enable_negotiate_signing" to 1.
+> > > > >
+> > > > > Reviewed-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> > > > > Signed-off-by: Steve French <stfrench@microsoft.com>
+> > > > > ---
+> > > > >  fs/cifs/cifsfs.c   |  4 +++
+> > > > >  fs/cifs/cifsglob.h |  3 ++
+> > > > >  fs/cifs/smb2pdu.c  | 83 ++++++++++++++++++++++++++++++++++++++++=
+------
+> > > > >  fs/cifs/smb2pdu.h  |  5 ++-
+> > > > >  4 files changed, 84 insertions(+), 11 deletions(-)
+> > > > >
+> > > > > diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+> > > > > index 9fb874dd8d24..476b07213fcd 100644
+> > > > > --- a/fs/cifs/cifsfs.c
+> > > > > +++ b/fs/cifs/cifsfs.c
+> > > > > @@ -65,6 +65,7 @@ bool lookupCacheEnabled =3D true;
+> > > > >  bool disable_legacy_dialects; /* false by default */
+> > > > >  bool enable_gcm_256 =3D true;
+> > > > >  bool require_gcm_256; /* false by default */
+> > > > > +bool enable_negotiate_signing; /* false by default */
+> > > > >  unsigned int global_secflags =3D CIFSSEC_DEF;
+> > > > >  /* unsigned int ntlmv2_support =3D 0; */
+> > > > >  unsigned int sign_CIFS_PDUs =3D 1;
+> > > > > @@ -104,6 +105,9 @@ MODULE_PARM_DESC(enable_gcm_256, "Enable
+> > > > > requesting strongest (256 bit) GCM encr
+> > > > >  module_param(require_gcm_256, bool, 0644);
+> > > > >  MODULE_PARM_DESC(require_gcm_256, "Require strongest (256 bit) G=
+CM
+> > > > > encryption. Default: n/N/0");
+> > > > >
+> > > > > +module_param(enable_negotiate_signing, bool, 0644);
+> > > > > +MODULE_PARM_DESC(enable_GMAC_signing, "Enable requesting faster
+> > > > > (GMAC) packet signing. Default: n/N/0");
+> > > > > +
+> > > > >  module_param(disable_legacy_dialects, bool, 0644);
+> > > > >  MODULE_PARM_DESC(disable_legacy_dialects, "To improve security i=
+t may be "
+> > > > >     "helpful to restrict the ability to "
+> > > > > diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
+> > > > > index 921680fb7931..3c2e117bb926 100644
+> > > > > --- a/fs/cifs/cifsglob.h
+> > > > > +++ b/fs/cifs/cifsglob.h
+> > > > > @@ -667,9 +667,11 @@ struct TCP_Server_Info {
+> > > > >   unsigned int max_write;
+> > > > >   unsigned int min_offload;
+> > > > >   __le16 compress_algorithm;
+> > > > > + __u16 signing_algorithm;
+> > > > >   __le16 cipher_type;
+> > > > >   /* save initital negprot hash */
+> > > > >   __u8 preauth_sha_hash[SMB2_PREAUTH_HASH_SIZE];
+> > > > > + bool signing_negotiated; /* true if valid signing context rcvd =
+from server */
+> > > > >   bool posix_ext_supported;
+> > > > >   struct delayed_work reconnect; /* reconnect workqueue job */
+> > > > >   struct mutex reconnect_mutex; /* prevent simultaneous reconnect=
+s */
+> > > > > @@ -1869,6 +1871,7 @@ extern unsigned int global_secflags; /* if =
+on,
+> > > > > session setup sent
+> > > > >  extern unsigned int sign_CIFS_PDUs;  /* enable smb packet signin=
+g */
+> > > > >  extern bool enable_gcm_256; /* allow optional negotiate of stron=
+gest
+> > > > > signing (aes-gcm-256) */
+> > > > >  extern bool require_gcm_256; /* require use of strongest signing
+> > > > > (aes-gcm-256) */
+> > > > > +extern bool enable_negotiate_signing; /* request use of faster (=
+GMAC)
+> > > > > signing if available */
+> > > > >  extern bool linuxExtEnabled;/*enable Linux/Unix CIFS extensions*=
+/
+> > > > >  extern unsigned int CIFSMaxBufSize;  /* max size not including h=
+dr */
+> > > > >  extern unsigned int cifs_min_rcv;    /* min size of big ntwrk bu=
+f pool */
+> > > > > diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+> > > > > index 962826dc3316..757f145e70e5 100644
+> > > > > --- a/fs/cifs/smb2pdu.c
+> > > > > +++ b/fs/cifs/smb2pdu.c
+> > > > > @@ -433,6 +433,23 @@ build_compression_ctxt(struct
+> > > > > smb2_compression_capabilities_context *pneg_ctxt)
+> > > > >   pneg_ctxt->CompressionAlgorithms[2] =3D SMB3_COMPRESS_LZNT1;
+> > > > >  }
+> > > > >
+> > > > > +static void
+> > > > > +build_signing_ctxt(struct smb2_signing_capabilities *pneg_ctxt)
+> > > > > +{
+> > > > > + pneg_ctxt->ContextType =3D SMB2_SIGNING_CAPABILITIES;
+> > > > > + /*
+> > > > > + * Data length must be increased here if more than 3 signing alg=
+orithms
+> > > > > + * sent but currently only 3 are defined. And context Data lengt=
+h must
+> > > > > + * be rounded to multiple of 8 for some servers.
+> > > > > + */
+> > > > > + pneg_ctxt->DataLength =3D
+> > > > > + cpu_to_le16(DIV_ROUND_UP(sizeof(struct smb2_signing_capabilitie=
+s) -
+> > > > > + sizeof(struct smb2_neg_context), 8) * 8);
+> > > > > + pneg_ctxt->SigningAlgorithmCount =3D cpu_to_le16(1);
+> > > > > + pneg_ctxt->SigningAlgorithms[0] =3D cpu_to_le16(SIGNING_ALG_AES=
+_CMAC);
+> > > > > + /* TBD add SIGNING_ALG_AES_GMAC and/or SIGNING_ALG_HMAC_SHA256 =
+*/
+> > > > > +}
+> > > > > +
+> > > > >  static void
+> > > > >  build_encrypt_ctxt(struct smb2_encryption_neg_context *pneg_ctxt=
+)
+> > > > >  {
+> > > > > @@ -498,7 +515,7 @@ assemble_neg_contexts(struct smb2_negotiate_r=
+eq *req,
+> > > > >         struct TCP_Server_Info *server, unsigned int *total_len)
+> > > > >  {
+> > > > >   char *pneg_ctxt;
+> > > > > - unsigned int ctxt_len;
+> > > > > + unsigned int ctxt_len, neg_context_count;
+> > > > >
+> > > > >   if (*total_len > 200) {
+> > > > >   /* In case length corrupted don't want to overrun smb buffer */
+> > > > > @@ -525,6 +542,17 @@ assemble_neg_contexts(struct smb2_negotiate_=
+req *req,
+> > > > >   *total_len +=3D ctxt_len;
+> > > > >   pneg_ctxt +=3D ctxt_len;
+> > > > >
+> > > > > + ctxt_len =3D build_netname_ctxt((struct smb2_netname_neg_contex=
+t *)pneg_ctxt,
+> > > > > + server->hostname);
+> > > > > + *total_len +=3D ctxt_len;
+> > > > > + pneg_ctxt +=3D ctxt_len;
+> > > > > +
+> > > > > + build_posix_ctxt((struct smb2_posix_neg_context *)pneg_ctxt);
+> > > > > + *total_len +=3D sizeof(struct smb2_posix_neg_context);
+> > > > > + pneg_ctxt +=3D sizeof(struct smb2_posix_neg_context);
+> > > > > +
+> > > > > + neg_context_count =3D 4;
+> > > > > +
+> > > > >   if (server->compress_algorithm) {
+> > > > >   build_compression_ctxt((struct smb2_compression_capabilities_co=
+ntext *)
+> > > > >   pneg_ctxt);
+> > > > > @@ -533,17 +561,24 @@ assemble_neg_contexts(struct smb2_negotiate=
+_req *req,
+> > > > >   8) * 8;
+> > > > >   *total_len +=3D ctxt_len;
+> > > > >   pneg_ctxt +=3D ctxt_len;
+> > > > > - req->NegotiateContextCount =3D cpu_to_le16(5);
+> > > > > - } else
+> > > > > - req->NegotiateContextCount =3D cpu_to_le16(4);
+> > > > > + neg_context_count++;
+> > > > > + }
+> > > > >
+> > > > > - ctxt_len =3D build_netname_ctxt((struct smb2_netname_neg_contex=
+t *)pneg_ctxt,
+> > > > > - server->hostname);
+> > > > > - *total_len +=3D ctxt_len;
+> > > > > - pneg_ctxt +=3D ctxt_len;
+> > > > > + if (enable_negotiate_signing) {
+> > > > > + pr_warn_once("requesting GMAC signing is experimental\n");
+> > > > > + build_signing_ctxt((struct smb2_signing_capabilities *)
+> > > > > + pneg_ctxt);
+> > > > > + ctxt_len =3D DIV_ROUND_UP(
+> > > > > + sizeof(struct smb2_signing_capabilities),
+> > > > > + 8) * 8;
+> > > > > + *total_len +=3D ctxt_len;
+> > > > > + pneg_ctxt +=3D ctxt_len;
+> > > > > + neg_context_count++;
+> > > > > + }
+> > > > > +
+> > > > > + /* check for and add transport_capabilities and signing capabil=
+ities */
+> > > > > + req->NegotiateContextCount =3D cpu_to_le16(neg_context_count);
+> > > > >
+> > > > > - build_posix_ctxt((struct smb2_posix_neg_context *)pneg_ctxt);
+> > > > > - *total_len +=3D sizeof(struct smb2_posix_neg_context);
+> > > > >  }
+> > > > >
+> > > > >  static void decode_preauth_context(struct smb2_preauth_neg_conte=
+xt *ctxt)
+> > > > > @@ -632,6 +667,31 @@ static int decode_encrypt_ctx(struct
+> > > > > TCP_Server_Info *server,
+> > > > >   return 0;
+> > > > >  }
+> > > > >
+> > > > > +static void decode_signing_ctx(struct TCP_Server_Info *server,
+> > > > > +        struct smb2_signing_capabilities *pctxt)
+> > > > > +{
+> > > > > + unsigned int len =3D le16_to_cpu(pctxt->DataLength);
+> > > > > +
+> > > > > + if ((len < 4) || (len > 16)) {
+> > > > > + pr_warn_once("server sent bad signing negcontext\n");
+> > > > > + return;
+> > > > > + }
+> > > > > + if (le16_to_cpu(pctxt->SigningAlgorithmCount) !=3D 1) {
+> > > > > + pr_warn_once("Invalid signing algorithm count\n");
+> > > > > + return;
+> > > > > + }
+> > > > > + if (le16_to_cpu(pctxt->SigningAlgorithms[0]) > 2) {
+> > > > > + pr_warn_once("unknown signing algorithm\n");
+> > > > > + return;
+> > > > > + }
+> > > > > +
+> > > > > + server->signing_negotiated =3D true;
+> > > > > + server->signing_algorithm =3D le16_to_cpu(pctxt->SigningAlgorit=
+hms[0]);
+> > > > > + cifs_dbg(FYI, "signing algorithm %d chosen\n",
+> > > > > +      server->signing_algorithm);
+> > > > > +}
+> > > > > +
+> > > > > +
+> > > > >  static int smb311_decode_neg_context(struct smb2_negotiate_rsp *=
+rsp,
+> > > > >        struct TCP_Server_Info *server,
+> > > > >        unsigned int len_of_smb)
+> > > > > @@ -675,6 +735,9 @@ static int smb311_decode_neg_context(struct
+> > > > > smb2_negotiate_rsp *rsp,
+> > > > >   (struct smb2_compression_capabilities_context *)pctx);
+> > > > >   else if (pctx->ContextType =3D=3D SMB2_POSIX_EXTENSIONS_AVAILAB=
+LE)
+> > > > >   server->posix_ext_supported =3D true;
+> > > > > + else if (pctx->ContextType =3D=3D SMB2_SIGNING_CAPABILITIES)
+> > > > > + decode_signing_ctx(server,
+> > > > > + (struct smb2_signing_capabilities *)pctx);
+> > > > >   else
+> > > > >   cifs_server_dbg(VFS, "unknown negcontext of type %d ignored\n",
+> > > > >   le16_to_cpu(pctx->ContextType));
+> > > > > diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+> > > > > index ba75e65924ac..4b27cb9105fd 100644
+> > > > > --- a/fs/cifs/smb2pdu.h
+> > > > > +++ b/fs/cifs/smb2pdu.h
+> > > > > @@ -329,7 +329,7 @@ struct smb2_neg_context {
+> > > > >   __le16 ContextType;
+> > > > >   __le16 DataLength;
+> > > > >   __le32 Reserved;
+> > > > > - /* Followed by array of data */
+> > > > > + /* Followed by array of data. NOTE: some servers require paddin=
+g to
+> > > > > 8 byte boundary */
+> > > > >  } __packed;
+> > > > >
+> > > > >  #define SMB311_LINUX_CLIENT_SALT_SIZE 32
+> > > > > @@ -394,6 +394,7 @@ struct smb2_compression_capabilities_context =
+{
+> > > > >   __u16 Padding;
+> > > > >   __u32 Flags;
+> > > > >   __le16 CompressionAlgorithms[3];
+> > > > > + /* Check if pad needed */
+> > > > >  } __packed;
+> > > > >
+> > > > >  /*
+> > > > > @@ -420,6 +421,7 @@ struct smb2_transport_capabilities_context {
+> > > > >   __le16  DataLength;
+> > > > >   __u32 Reserved;
+> > > > >   __le32 Flags;
+> > > > > + __u32 Pad;
+> > > > >  } __packed;
+> > > > >
+> > > > >  /*
+> > > > > @@ -458,6 +460,7 @@ struct smb2_signing_capabilities {
+> > > > >   __u32 Reserved;
+> > > > >   __le16 SigningAlgorithmCount;
+> > > > >   __le16 SigningAlgorithms[];
+> > > > > + /*  Followed by padding to 8 byte boundary (required by some se=
+rvers) */
+> > > > >  } __packed;
+> > > > >
+> > > > >  #define POSIX_CTXT_DATA_LEN 16
+> > > > >
+> > > > > --
+> > > > > Thanks,
+> > > > >
+> > > > > Steve
+> > > >
+> > > >
+> > > >
+> > > > --
+> > > > Thanks,
+> > > >
+> > > > Steve
+> > >
+> > >
+> > >
+> > > --
+> > > Thanks,
+> > >
+> > > Steve
+
+
+
+--=20
+Thanks,
+
+Steve
