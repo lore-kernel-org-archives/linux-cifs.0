@@ -2,65 +2,70 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E969C07E9B
-	for <linux-cifs@archiver.kernel.org>; Sat, 10 Jul 2021 19:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE3FBC11F66
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 11:03:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8537761363
-	for <linux-cifs@archiver.kernel.org>; Sat, 10 Jul 2021 19:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEACB60FE9
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 11:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230439AbhGJTLb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 10 Jul 2021 15:11:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56504 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229771AbhGJTLb (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 10 Jul 2021 15:11:31 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 9D3376135E;
-        Sat, 10 Jul 2021 19:08:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625944125;
-        bh=J62tnOvFlZ3NzEUiCOfvsPM1qImrW4OuLGRHbCiqZso=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=IsHNIVTIClVilD8vd9xU9f471MogTX9mnS5m1CSZjKhqsN+EjaGwpTUPMwdq2Yy0z
-         4L5if6RTkpvIIIkdXmK5qAuqVeJTOzxZGf0yQhvd8J5DY/m6kgZuvfKsKscGiICTv2
-         ekkCueTIGKpP2zK1b9D9QUn/i2idI7+DSJg37MvAGDtralUtnfq6tACqAyN4y8Nv3Q
-         i0EDOdAFM404yVi4ae+yyZnutG9tK/tAQihd2elnqoS+uIlZgxnhpXToMmOq892K40
-         7vnU8YRfGAm/JaAbHu2OV/6t3P+S2PJG9pw2Yn9ZXjekwjNEPlUdG94flhzxxnTu/2
-         wKyhc0PS9o6mA==
-Subject: Re: [GIT PULL] CIFS Fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvVySsTqqQfzZ0q9kR5qmYvmCTf_sybHLWw2UtnPAKpSA@mail.gmail.com>
-References: <CAH2r5mvVySsTqqQfzZ0q9kR5qmYvmCTf_sybHLWw2UtnPAKpSA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvVySsTqqQfzZ0q9kR5qmYvmCTf_sybHLWw2UtnPAKpSA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.14-rc-smb3-fixes-part2
-X-PR-Tracked-Commit-Id: 4d069f6022e938bc51667da637f2483a37a77e19
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1e16624d7b4376797ede36e3c955375cf0f23298
-Message-Id: <162594412561.8052.6915530198063263616.pr-tracker-bot@kernel.org>
-Date:   Sat, 10 Jul 2021 19:08:45 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        id S235437AbhGLLGh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Jul 2021 07:06:37 -0400
+Received: from lgeamrelo13.lge.com ([156.147.23.53]:52930 "EHLO
+        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S235410AbhGLLGg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jul 2021 07:06:36 -0400
+X-Greylist: delayed 1799 seconds by postgrey-1.27 at vger.kernel.org; Mon, 12 Jul 2021 07:06:36 EDT
+Received: from unknown (HELO lgeamrelo02.lge.com) (156.147.1.126)
+        by 156.147.23.53 with ESMTP; 12 Jul 2021 19:33:46 +0900
+X-Original-SENDERIP: 156.147.1.126
+X-Original-MAILFROM: hyc.lee@gmail.com
+Received: from unknown (HELO localhost.localdomain) (10.177.225.35)
+        by 156.147.1.126 with ESMTP; 12 Jul 2021 19:33:46 +0900
+X-Original-SENDERIP: 10.177.225.35
+X-Original-MAILFROM: hyc.lee@gmail.com
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+To:     Steve French <sfrench@samba.org>
+Cc:     kernel-team@lge.com, Namjae Jeon <linkinjeon@kernel.org>,
+        linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: [PATCH] cifs: fix the out of range assignment to bit fields in parse_server_interfaces
+Date:   Mon, 12 Jul 2021 19:34:02 +0900
+Message-Id: <20210712103402.15457-1-hyc.lee@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 10 Jul 2021 12:22:09 -0500:
+Because the out of range assignment to bit fields
+are compiler-dependant, the fields could have wrong
+value.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.14-rc-smb3-fixes-part2
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+---
+ fs/cifs/smb2ops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1e16624d7b4376797ede36e3c955375cf0f23298
-
-Thank you!
-
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index e4c8f603dd58..232d528df230 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -557,8 +557,8 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 	p = buf;
+ 	while (bytes_left >= sizeof(*p)) {
+ 		info->speed = le64_to_cpu(p->LinkSpeed);
+-		info->rdma_capable = le32_to_cpu(p->Capability & RDMA_CAPABLE);
+-		info->rss_capable = le32_to_cpu(p->Capability & RSS_CAPABLE);
++		info->rdma_capable = le32_to_cpu(p->Capability & RDMA_CAPABLE) ? 1 : 0;
++		info->rss_capable = le32_to_cpu(p->Capability & RSS_CAPABLE) ? 1 : 0;
+ 
+ 		cifs_dbg(FYI, "%s: adding iface %zu\n", __func__, *iface_count);
+ 		cifs_dbg(FYI, "%s: speed %zu bps\n", __func__, info->speed);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.17.1
+
