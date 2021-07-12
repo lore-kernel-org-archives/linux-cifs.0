@@ -2,110 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8077C07E99
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 12:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF97AC07E99
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 13:20:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB95961154
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 12:26:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 965ED60FE3
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 13:20:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231998AbhGLM3e (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Jul 2021 08:29:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30819 "EHLO
+        id S230210AbhGLNXr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Jul 2021 09:23:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36132 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231736AbhGLM3d (ORCPT
+        by vger.kernel.org with ESMTP id S230191AbhGLNXq (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 12 Jul 2021 08:29:33 -0400
+        Mon, 12 Jul 2021 09:23:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626092805;
+        s=mimecast20190719; t=1626096058;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=O6lYKGVmT3g543VONT88b8IryJyesxNt34iiJehqsRE=;
-        b=bTdX3ETWc7pUkUuQKKhYPL7NurVS2dibKKKk+ktczSRSCpTqDOTQkXrVaZR00xGCIWqx6r
-        I4pb25p736sXLhX07RZtBslP0c4EbA/5wckoiHDTRX+a0kqOKUk/RJn6iYAFBR0VK+d9G/
-        N5miyPp7uZwbHIqaltuEcPSeUJVbJYI=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=lPbnClPcI3p3suga88iSzUoRbrrUHKr+tNs6YbPYxPg=;
+        b=RUgN0Jxmo8CX0LdrpCI1iVCqWKaNPnwDF6rN8OkOEkO8N9Q0lpPBTTBE82rqMfWFZZzi1r
+        kUHIoHybba9u3Un+A2x9M/lnP1EBD162/pXW9x1QeMSuSRY7ek9uvp6079i8oXulI4wyPv
+        lgk6nY3h+zfHlw7IrcZIfjqh/uNE7pk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-_PSiDqXvPhySbsJ2IgNOxw-1; Mon, 12 Jul 2021 08:26:42 -0400
-X-MC-Unique: _PSiDqXvPhySbsJ2IgNOxw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-516-4yt6oCxUNL-qZPYO4GUdUQ-1; Mon, 12 Jul 2021 09:20:56 -0400
+X-MC-Unique: 4yt6oCxUNL-qZPYO4GUdUQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E28C802C88;
-        Mon, 12 Jul 2021 12:26:40 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0600F1023F40;
+        Mon, 12 Jul 2021 13:20:56 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-118-19.rdu2.redhat.com [10.10.118.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D2E260875;
-        Mon, 12 Jul 2021 12:26:33 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2ADD81971B;
+        Mon, 12 Jul 2021 13:20:55 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH] netfs: Add MAINTAINERS record
 From:   David Howells <dhowells@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     Jeff Layton <jlayton@kernel.org>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-mm@kvack.org, linux-cachefs@redhat.com,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, dhowells@redhat.com,
-        linux-kernel@vger.kernel.org
-Date:   Mon, 12 Jul 2021 13:26:32 +0100
-Message-ID: <162609279295.3129635.5721010331369998019.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/0.23
+In-Reply-To: <CAH2r5mvm5ZTyGmyuNzxWhc5ynb5LpjtdADtHVjFeF46Q5MUsFQ@mail.gmail.com>
+References: <CAH2r5mvm5ZTyGmyuNzxWhc5ynb5LpjtdADtHVjFeF46Q5MUsFQ@mail.gmail.com>
+To:     Steve French <smfrench@gmail.com>
+Cc:     dhowells@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Subject: Re: confusing fscache path
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3136370.1626096054.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 12 Jul 2021 14:20:54 +0100
+Message-ID: <3136371.1626096054@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a MAINTAINERS record for the new netfs helper library.
+Steve French <smfrench@gmail.com> wrote:
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Jeff Layton <jlayton@kernel.org>
-cc: Matthew Wilcox (Oracle) <willy@infradead.org>
-cc: linux-mm@kvack.org
-cc: linux-cachefs@redhat.com
-cc: linux-afs@lists.infradead.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: ceph-devel@vger.kernel.org
-cc: v9fs-developer@lists.sourceforge.net
-cc: linux-fsdevel@vger.kernel.org
-Link: https://lore.kernel.org/r/162377165897.729347.292567369593752239.stgit@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/r/162377519404.734878.4912821418522385423.stgit@warthog.procyon.org.uk/ # v1
----
+> The path from fscache_uncache_all_inode_pages is:
+>    fscache_uncache_all_inode_pages-->__fscache_uncache_all_inode_pages
+> (line 132 of fs/fscache/page.c) -->__fscache_uncache_page (locks on
+> line 1120 and then on line 1141 "goto done" without unlocking it)
 
- MAINTAINERS |    9 +++++++++
- 1 file changed, 9 insertions(+)
+This bit, you mean?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a61f4f3b78a9..2fd13803cd06 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13050,6 +13050,15 @@ NETWORKING [WIRELESS]
- L:	linux-wireless@vger.kernel.org
- Q:	http://patchwork.kernel.org/project/linux-wireless/list/
- 
-+NETWORK FILESYSTEM HELPER LIBRARY
-+M:	David Howells <dhowells@redhat.com>
-+M:	Jeff Layton <jlayton@kernel.org>
-+L:	linux-cachefs@redhat.com (moderated for non-subscribers)
-+S:	Supported
-+F:	Documentation/filesystems/netfs_library.rst
-+F:	fs/netfs/
-+F:	include/linux/netfs.h
-+
- NETXEN (1/10) GbE SUPPORT
- M:	Manish Chopra <manishc@marvell.com>
- M:	Rahul Verma <rahulv@marvell.com>
+	if (TestClearPageFsCache(page) &&
+	    object->cache->ops->uncache_page) {
+		/* the cache backend releases the cookie lock */
+		fscache_stat(&fscache_n_cop_uncache_page);
+		object->cache->ops->uncache_page(object, page);
+		fscache_stat_d(&fscache_n_cop_uncache_page);
+		goto done;
+	}
 
+Note the comment.
+
+Here's the unlock:
+
+	void cachefiles_uncache_page(struct fscache_object *_object, struct page =
+*page)
+		__releases(&object->fscache.cookie->lock)
+	{
+		struct cachefiles_object *object;
+
+		object =3D container_of(_object, struct cachefiles_object, fscache);
+
+		_enter("%p,{%lu}", object, page->index);
+
+		spin_unlock(&object->fscache.cookie->lock);
+	}
+
+David
 
