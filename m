@@ -2,70 +2,110 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE3FBC11F66
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 11:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8077C07E99
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 12:26:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEACB60FE9
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 11:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB95961154
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 12:26:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235437AbhGLLGh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Jul 2021 07:06:37 -0400
-Received: from lgeamrelo13.lge.com ([156.147.23.53]:52930 "EHLO
-        lgeamrelo11.lge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S235410AbhGLLGg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jul 2021 07:06:36 -0400
-X-Greylist: delayed 1799 seconds by postgrey-1.27 at vger.kernel.org; Mon, 12 Jul 2021 07:06:36 EDT
-Received: from unknown (HELO lgeamrelo02.lge.com) (156.147.1.126)
-        by 156.147.23.53 with ESMTP; 12 Jul 2021 19:33:46 +0900
-X-Original-SENDERIP: 156.147.1.126
-X-Original-MAILFROM: hyc.lee@gmail.com
-Received: from unknown (HELO localhost.localdomain) (10.177.225.35)
-        by 156.147.1.126 with ESMTP; 12 Jul 2021 19:33:46 +0900
-X-Original-SENDERIP: 10.177.225.35
-X-Original-MAILFROM: hyc.lee@gmail.com
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-To:     Steve French <sfrench@samba.org>
-Cc:     kernel-team@lge.com, Namjae Jeon <linkinjeon@kernel.org>,
-        linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Subject: [PATCH] cifs: fix the out of range assignment to bit fields in parse_server_interfaces
-Date:   Mon, 12 Jul 2021 19:34:02 +0900
-Message-Id: <20210712103402.15457-1-hyc.lee@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S231998AbhGLM3e (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Jul 2021 08:29:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30819 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231736AbhGLM3d (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 12 Jul 2021 08:29:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1626092805;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=O6lYKGVmT3g543VONT88b8IryJyesxNt34iiJehqsRE=;
+        b=bTdX3ETWc7pUkUuQKKhYPL7NurVS2dibKKKk+ktczSRSCpTqDOTQkXrVaZR00xGCIWqx6r
+        I4pb25p736sXLhX07RZtBslP0c4EbA/5wckoiHDTRX+a0kqOKUk/RJn6iYAFBR0VK+d9G/
+        N5miyPp7uZwbHIqaltuEcPSeUJVbJYI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-250-_PSiDqXvPhySbsJ2IgNOxw-1; Mon, 12 Jul 2021 08:26:42 -0400
+X-MC-Unique: _PSiDqXvPhySbsJ2IgNOxw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E28C802C88;
+        Mon, 12 Jul 2021 12:26:40 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-118-19.rdu2.redhat.com [10.10.118.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D2E260875;
+        Mon, 12 Jul 2021 12:26:33 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH] netfs: Add MAINTAINERS record
+From:   David Howells <dhowells@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     Jeff Layton <jlayton@kernel.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        linux-mm@kvack.org, linux-cachefs@redhat.com,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, dhowells@redhat.com,
+        linux-kernel@vger.kernel.org
+Date:   Mon, 12 Jul 2021 13:26:32 +0100
+Message-ID: <162609279295.3129635.5721010331369998019.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Because the out of range assignment to bit fields
-are compiler-dependant, the fields could have wrong
-value.
+Add a MAINTAINERS record for the new netfs helper library.
 
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Jeff Layton <jlayton@kernel.org>
+cc: Matthew Wilcox (Oracle) <willy@infradead.org>
+cc: linux-mm@kvack.org
+cc: linux-cachefs@redhat.com
+cc: linux-afs@lists.infradead.org
+cc: linux-nfs@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: ceph-devel@vger.kernel.org
+cc: v9fs-developer@lists.sourceforge.net
+cc: linux-fsdevel@vger.kernel.org
+Link: https://lore.kernel.org/r/162377165897.729347.292567369593752239.stgit@warthog.procyon.org.uk/
+Link: https://lore.kernel.org/r/162377519404.734878.4912821418522385423.stgit@warthog.procyon.org.uk/ # v1
 ---
- fs/cifs/smb2ops.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index e4c8f603dd58..232d528df230 100644
---- a/fs/cifs/smb2ops.c
-+++ b/fs/cifs/smb2ops.c
-@@ -557,8 +557,8 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
- 	p = buf;
- 	while (bytes_left >= sizeof(*p)) {
- 		info->speed = le64_to_cpu(p->LinkSpeed);
--		info->rdma_capable = le32_to_cpu(p->Capability & RDMA_CAPABLE);
--		info->rss_capable = le32_to_cpu(p->Capability & RSS_CAPABLE);
-+		info->rdma_capable = le32_to_cpu(p->Capability & RDMA_CAPABLE) ? 1 : 0;
-+		info->rss_capable = le32_to_cpu(p->Capability & RSS_CAPABLE) ? 1 : 0;
+ MAINTAINERS |    9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a61f4f3b78a9..2fd13803cd06 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13050,6 +13050,15 @@ NETWORKING [WIRELESS]
+ L:	linux-wireless@vger.kernel.org
+ Q:	http://patchwork.kernel.org/project/linux-wireless/list/
  
- 		cifs_dbg(FYI, "%s: adding iface %zu\n", __func__, *iface_count);
- 		cifs_dbg(FYI, "%s: speed %zu bps\n", __func__, info->speed);
--- 
-2.17.1
++NETWORK FILESYSTEM HELPER LIBRARY
++M:	David Howells <dhowells@redhat.com>
++M:	Jeff Layton <jlayton@kernel.org>
++L:	linux-cachefs@redhat.com (moderated for non-subscribers)
++S:	Supported
++F:	Documentation/filesystems/netfs_library.rst
++F:	fs/netfs/
++F:	include/linux/netfs.h
++
+ NETXEN (1/10) GbE SUPPORT
+ M:	Manish Chopra <manishc@marvell.com>
+ M:	Rahul Verma <rahulv@marvell.com>
+
 
