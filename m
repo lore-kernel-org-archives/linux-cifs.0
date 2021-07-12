@@ -2,50 +2,49 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 512C2C11F68
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 16:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C76EC07E99
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 16:58:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31A3160C3E
-	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 16:56:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D9F1611CD
+	for <linux-cifs@archiver.kernel.org>; Mon, 12 Jul 2021 16:58:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234316AbhGLQ7X (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 12 Jul 2021 12:59:23 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:54496 "EHLO
+        id S235199AbhGLQ7L (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 12 Jul 2021 12:59:11 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:54364 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234810AbhGLQ7D (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jul 2021 12:59:03 -0400
+        with ESMTP id S234366AbhGLQ7B (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 12 Jul 2021 12:59:01 -0400
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 565261FFD9;
+        by smtp-out2.suse.de (Postfix) with ESMTP id 041921FFD3;
         Mon, 12 Jul 2021 16:56:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1626108970; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YiTPK3VbhB8SGIIgtQ8YaJoAHU79xdWWrLD1Cz+9DnA=;
-        b=DWtfRnKWjNKnxMsTQ1SGvNjLcy4rPG8skM8ju6TeA/lForojRvwk41zmqAdEVU+4j2Sl0T
-        2lj26+6LLT3CEcH0/dQ5CwT92qBu7y9vMSaQ73kdSBwtg8o8gFZWUbWAcPWbXM6o77QSqR
-        wGcBUjNjuC1/UkJIHpJlWcTwtKu3o9w=
+        bh=QmszcyVRNOfyO141lqkqYDkpw92FHsSdEmKvmGCXqh4=;
+        b=br6SCOFvzzW3pse2tlfBcXfiJwYYASdQGNFHn10uHXfn62xKZgpAD7QX02nANqnSiuUOvX
+        fn8G4O1ygsjDUHl0obCsuYJEI5APpOMnpDfJU9+la6QDeRO9Gg2JWYPWHP7068mACqWOgb
+        j94z/hCi/UmN83myK39qKuF+xK+79eI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1626108970;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=YiTPK3VbhB8SGIIgtQ8YaJoAHU79xdWWrLD1Cz+9DnA=;
-        b=QPP3aWNGs6SfoVhsIbbywwbfUy2k9ad5zIPQlxhzUK/19Pf82NWtcwFChtQuMqeWK1uL+e
-        6SjL/cWoReVvY2Bg==
+        bh=QmszcyVRNOfyO141lqkqYDkpw92FHsSdEmKvmGCXqh4=;
+        b=KItbtZFlBxJGcjExKeGtIesWGb0cegzWvtdtM3y5rEbnfAkLk1+qlIK1F3Y68HSy03wePF
+        IFpQQiNSwcVyfdAg==
 Received: from quack2.suse.cz (unknown [10.100.224.230])
-        by relay2.suse.de (Postfix) with ESMTP id 20129A3B92;
-        Mon, 12 Jul 2021 16:56:10 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id DCA44A3B8B;
+        Mon, 12 Jul 2021 16:56:09 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id DAA901F2CDD; Mon, 12 Jul 2021 18:56:09 +0200 (CEST)
+        id C2A441F2CD2; Mon, 12 Jul 2021 18:56:09 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     <linux-ext4@vger.kernel.org>,
@@ -56,126 +55,98 @@ Cc:     <linux-ext4@vger.kernel.org>,
         <linux-xfs@vger.kernel.org>,
         linux-f2fs-devel@lists.sourceforge.net, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, Jan Kara <jack@suse.cz>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 10/14] zonefs: Convert to using invalidate_lock
-Date:   Mon, 12 Jul 2021 18:56:01 +0200
-Message-Id: <20210712165609.13215-10-jack@suse.cz>
+Subject: [PATCH 04/14] mm: Add functions to lock invalidate_lock for two mappings
+Date:   Mon, 12 Jul 2021 18:55:55 +0200
+Message-Id: <20210712165609.13215-4-jack@suse.cz>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210712163901.29514-1-jack@suse.cz>
 References: <20210712163901.29514-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3579; h=from:subject; bh=A/7AtC2eRQANRoxuBRHLYLyusp8+Mdp8nN+Gi+I3MCo=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBg7HQhO3dYj/Mgvj7UVbam0r3XqE0cuodG8u0lHKX2 sTw+xtuJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYOx0IQAKCRCcnaoHP2RA2ZqECA Cl/AMWcOtUoG5AqMmm9U66OrwxCWfjmzWhiUUE7/g+ZDsh+x5V9pS4ZjlUFCZnNkQhFnI+cafQaKQS jgqRC1tR5Gg3V/gWt9okHslcx9q0q2WIVMDkzr+YcXTaT9EDNFcpSTQOjuHUkmsZdDsrkM7ZD/v4bn NNkbghi9t+eYi1RyDU3mrtdWoef3tRwW5HmjabHyKAbakl40vDKfYdCFCS+bEdISF2xGhUhakHDsGW IjoBMkjU95+L0nSKOSYbxiSD0CPAh9htJdEWEFApAo8gha6s/ZAOk+Y+ZtaGvSko/dEh8lOHsVB9mV tScsND0zUtnLiV5+Rz+JPrb0l4bw2o
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2711; h=from:subject; bh=n/id7CdzTitim6/Q4kdGwpm6fQ2I7WpUBKplzIVZqrg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBg7HQck5dmKlHI2ci2Ul08y1JbXiN8coVEfYq6hR7g S9CBeRmJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYOx0HAAKCRCcnaoHP2RA2cMMCA CBmLq4KWHGN4/73gYb+7lHTa7VRBTjJoZ+Oi50OoiHFqE5iGdPJ6T/3YBw8b1cSr5n4umcQf1wPy9Q ON0qo8Nxoz35wNwkzBnNNoGE7KytVDwMowWJTXaHzYwQ6gU0H4EzBM3E3/v2xCWZqNJfrvTVXf1qdr WT+MaP9r5rmMOKBO/rb7avUZkrQ91g6dItPcmEI72JnsF5JmMmTyIRLsbIR7+Y3+mvYS0+EMLVvUKy 52eXgZU3YjlB1w294ho4lmA9TeZI36AQxyIN74pwEWnHhY3+8vAuABIGttpjnw8gWE504G8hIS3Xbq qLtj/sXf/MlNFF2m7jQf7ohsJzj1Sn
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Use invalidate_lock instead of zonefs' private i_mmap_sem. The intended
-purpose is exactly the same.
+Some operations such as reflinking blocks among files will need to lock
+invalidate_lock for two mappings. Add helper functions to do that.
 
-CC: Damien Le Moal <damien.lemoal@wdc.com>
-CC: Johannes Thumshirn <jth@kernel.org>
-CC: <linux-fsdevel@vger.kernel.org>
-Acked-by: Damien Le Moal <damien.lemoal@wdc.com>
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/zonefs/super.c  | 23 +++++------------------
- fs/zonefs/zonefs.h |  7 +++----
- 2 files changed, 8 insertions(+), 22 deletions(-)
+ include/linux/fs.h |  6 ++++++
+ mm/filemap.c       | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
-index dbf03635869c..f323bf3b0e82 100644
---- a/fs/zonefs/super.c
-+++ b/fs/zonefs/super.c
-@@ -462,7 +462,7 @@ static int zonefs_file_truncate(struct inode *inode, loff_t isize)
- 	inode_dio_wait(inode);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 90a80de37ad4..894ff2451793 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -849,6 +849,12 @@ static inline void filemap_invalidate_unlock_shared(
+ void lock_two_nondirectories(struct inode *, struct inode*);
+ void unlock_two_nondirectories(struct inode *, struct inode*);
  
- 	/* Serialize against page faults */
--	down_write(&zi->i_mmap_sem);
-+	filemap_invalidate_lock(inode->i_mapping);
++void filemap_invalidate_lock_two(struct address_space *mapping1,
++				 struct address_space *mapping2);
++void filemap_invalidate_unlock_two(struct address_space *mapping1,
++				   struct address_space *mapping2);
++
++
+ /*
+  * NOTE: in a 32bit arch with a preemptable kernel and
+  * an UP compile the i_size_read/write must be atomic
+diff --git a/mm/filemap.c b/mm/filemap.c
+index 56988c4e655d..fd3f94d36c49 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1009,6 +1009,44 @@ struct page *__page_cache_alloc(gfp_t gfp)
+ EXPORT_SYMBOL(__page_cache_alloc);
+ #endif
  
- 	/* Serialize against zonefs_iomap_begin() */
- 	mutex_lock(&zi->i_truncate_mutex);
-@@ -500,7 +500,7 @@ static int zonefs_file_truncate(struct inode *inode, loff_t isize)
- 
- unlock:
- 	mutex_unlock(&zi->i_truncate_mutex);
--	up_write(&zi->i_mmap_sem);
-+	filemap_invalidate_unlock(inode->i_mapping);
- 
- 	return ret;
- }
-@@ -575,18 +575,6 @@ static int zonefs_file_fsync(struct file *file, loff_t start, loff_t end,
- 	return ret;
- }
- 
--static vm_fault_t zonefs_filemap_fault(struct vm_fault *vmf)
--{
--	struct zonefs_inode_info *zi = ZONEFS_I(file_inode(vmf->vma->vm_file));
--	vm_fault_t ret;
--
--	down_read(&zi->i_mmap_sem);
--	ret = filemap_fault(vmf);
--	up_read(&zi->i_mmap_sem);
--
--	return ret;
--}
--
- static vm_fault_t zonefs_filemap_page_mkwrite(struct vm_fault *vmf)
- {
- 	struct inode *inode = file_inode(vmf->vma->vm_file);
-@@ -607,16 +595,16 @@ static vm_fault_t zonefs_filemap_page_mkwrite(struct vm_fault *vmf)
- 	file_update_time(vmf->vma->vm_file);
- 
- 	/* Serialize against truncates */
--	down_read(&zi->i_mmap_sem);
-+	filemap_invalidate_lock_shared(inode->i_mapping);
- 	ret = iomap_page_mkwrite(vmf, &zonefs_iomap_ops);
--	up_read(&zi->i_mmap_sem);
-+	filemap_invalidate_unlock_shared(inode->i_mapping);
- 
- 	sb_end_pagefault(inode->i_sb);
- 	return ret;
- }
- 
- static const struct vm_operations_struct zonefs_file_vm_ops = {
--	.fault		= zonefs_filemap_fault,
-+	.fault		= filemap_fault,
- 	.map_pages	= filemap_map_pages,
- 	.page_mkwrite	= zonefs_filemap_page_mkwrite,
- };
-@@ -1158,7 +1146,6 @@ static struct inode *zonefs_alloc_inode(struct super_block *sb)
- 
- 	inode_init_once(&zi->i_vnode);
- 	mutex_init(&zi->i_truncate_mutex);
--	init_rwsem(&zi->i_mmap_sem);
- 	zi->i_wr_refcnt = 0;
- 
- 	return &zi->i_vnode;
-diff --git a/fs/zonefs/zonefs.h b/fs/zonefs/zonefs.h
-index 51141907097c..7b147907c328 100644
---- a/fs/zonefs/zonefs.h
-+++ b/fs/zonefs/zonefs.h
-@@ -70,12 +70,11 @@ struct zonefs_inode_info {
- 	 * and changes to the inode private data, and in particular changes to
- 	 * a sequential file size on completion of direct IO writes.
- 	 * Serialization of mmap read IOs with truncate and syscall IO
--	 * operations is done with i_mmap_sem in addition to i_truncate_mutex.
--	 * Only zonefs_seq_file_truncate() takes both lock (i_mmap_sem first,
--	 * i_truncate_mutex second).
-+	 * operations is done with invalidate_lock in addition to
-+	 * i_truncate_mutex.  Only zonefs_seq_file_truncate() takes both lock
-+	 * (invalidate_lock first, i_truncate_mutex second).
- 	 */
- 	struct mutex		i_truncate_mutex;
--	struct rw_semaphore	i_mmap_sem;
- 
- 	/* guarded by i_truncate_mutex */
- 	unsigned int		i_wr_refcnt;
++/*
++ * filemap_invalidate_lock_two - lock invalidate_lock for two mappings
++ *
++ * Lock exclusively invalidate_lock of any passed mapping that is not NULL.
++ *
++ * @mapping1: the first mapping to lock
++ * @mapping2: the second mapping to lock
++ */
++void filemap_invalidate_lock_two(struct address_space *mapping1,
++				 struct address_space *mapping2)
++{
++	if (mapping1 > mapping2)
++		swap(mapping1, mapping2);
++	if (mapping1)
++		down_write(&mapping1->invalidate_lock);
++	if (mapping2 && mapping1 != mapping2)
++		down_write_nested(&mapping2->invalidate_lock, 1);
++}
++EXPORT_SYMBOL(filemap_invalidate_lock_two);
++
++/*
++ * filemap_invalidate_unlock_two - unlock invalidate_lock for two mappings
++ *
++ * Unlock exclusive invalidate_lock of any passed mapping that is not NULL.
++ *
++ * @mapping1: the first mapping to unlock
++ * @mapping2: the second mapping to unlock
++ */
++void filemap_invalidate_unlock_two(struct address_space *mapping1,
++				   struct address_space *mapping2)
++{
++	if (mapping1)
++		up_write(&mapping1->invalidate_lock);
++	if (mapping2 && mapping1 != mapping2)
++		up_write(&mapping2->invalidate_lock);
++}
++EXPORT_SYMBOL(filemap_invalidate_unlock_two);
++
+ /*
+  * In order to wait for pages to become available there must be
+  * waitqueues associated with pages. By using a hash table of
 -- 
 2.26.2
 
