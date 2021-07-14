@@ -2,202 +2,135 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C272C07E95
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 00:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2F3C07E95
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 00:48:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F2FE6128C
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 00:15:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 724746136E
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 00:48:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237113AbhGNASS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 13 Jul 2021 20:18:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36606 "EHLO
+        id S237180AbhGNAvj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 13 Jul 2021 20:51:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236981AbhGNASR (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Jul 2021 20:18:17 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34606C0613EE
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Jul 2021 17:15:26 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id o5so231552ejy.7
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Jul 2021 17:15:26 -0700 (PDT)
+        with ESMTP id S237113AbhGNAvj (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 13 Jul 2021 20:51:39 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87090C0613DD
+        for <linux-cifs@vger.kernel.org>; Tue, 13 Jul 2021 17:48:48 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id y42so528057lfa.3
+        for <linux-cifs@vger.kernel.org>; Tue, 13 Jul 2021 17:48:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=pV8TLkIm18kzqeSazBXDYDS3UNRXyk80X0MU+3ArHLw=;
-        b=A9TEU8B02DAJIEQC8SudaKLGjOsIp2RJRvKTyan2manVD/ponRIEF7yc9aIzZdGRpx
-         ObXYrOlooJ9LGuWQyUQEjhUD5nP80d6QSx59xQQ6rvABo5Jb8aznDnhKeeKiVuTadh17
-         OEPEzIFFctkpDRfdzsadD5kGm47wRW/KDUVr4uy8F5BebenlxRLZdpl+a2HmEquIEuGa
-         D1HIVCF3/5MnnIRpJupK3AK9+3EyYHGYOCpBMHwchcEn23qOaPprN3IjFOMG/rNuWMRx
-         1Iq824vjSpEDIU3zC4AUl3qJinH97eCcSiFs00bFAHq59sJN5mn6oAE1emsgOa7WfXzF
-         ApVg==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=42KWca6eNuXtcoPPSYzkMkreLs0lgHPNn4GnIBPajs8=;
+        b=ALpE/hH5ypXs2f5mXTtkKA86IamdKkIAySl7J5fYOrRdBgi3Roqn80WPhlczymS/5b
+         9UYFw8Xqn60EZ4tA3W8KnhBrMqbwbzRQphUgcKYn2gNvYqLl+qR9muQ+bnwl+c84bYKc
+         nkHO022t5jQgLedWo+JmilAjabwtrjdshLwplr0HXrtQXQvpa6E9ABkcUhdxxHr1DeqE
+         8sr7yBIbp6hqj+khYY2bxeQ4K/lfe6mj2cTx4tsN3thEolTOscvu3wkBXh+1o9+MMpTN
+         ks7dVfFYtip9KV09nG04yfDzUAbAfQTQoHQPqFgddbaBeWyHdvYYX2WdymIrQxa7miUP
+         eD+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=pV8TLkIm18kzqeSazBXDYDS3UNRXyk80X0MU+3ArHLw=;
-        b=JOb/pcNadyN8AhO8KZZvYA4oDEfnJXeePgc/IEebaxWygIwXGx5cQZctHeddjZG5wO
-         pzn3S/iNRIFAk4ia+AaxgWgSRPBbb5jJgdn1oNDBzQTWdD8/eCV7NMQRu3uGxfyFDu4g
-         bMUk3VJJZz9g0s3qT+Dq+0KPUdwshOeWPInWTL5+rGl7nfFIe/6Bxa/ws6KeksxXFXJP
-         XnudSpgDRJtFH87OCFU3SBf9ZU6dOivSi71uBdu4nK01nlt3TXNESNxHmJbvUwO0AMUp
-         dt/as71PZDU6e3k+nAVe44vSaDa7KthlJIMLFrq6KnYkTKhXGxD+EW6jt6GzNQ59SOrk
-         Fxdg==
-X-Gm-Message-State: AOAM530cJ46Id2iU61GOebNUUY4rxAtpB+jsPAu5SoYx2JgAijIeJn+A
-        t6kwlgBgWQleS0U4q9vUeEop8HAawcd6kZ6IuiQ=
-X-Google-Smtp-Source: ABdhPJwWVLHjeN4hI0c/Cs+dxN+ccHjQwXGNwAN+5mMWdxh42kyyFnAaN+99ph665MB3dfEQxyBuPeLMpKrUETD8VSY=
-X-Received: by 2002:a17:906:2da1:: with SMTP id g1mr8780247eji.47.1626221724729;
- Tue, 13 Jul 2021 17:15:24 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=42KWca6eNuXtcoPPSYzkMkreLs0lgHPNn4GnIBPajs8=;
+        b=n8ZDOQ/98qaDnRfWyVwJ8g2z67PPsx3rosxnH8Xq2yIh1x8SK9Xiu6/R9JGykR/6Gr
+         9GiZahNQrCL8+Q9asZDVsVlaqdRu9gpQ2oCUxBYUpRwG3JnrP+R4KWNZdqj3LdIPuyLy
+         zSJzvO1aq7miRIcVjPkUVj7m4VoUkVCvvA7f62uOhksd1TmGTjTnnGT+Ieox76VyfJxP
+         oEa8P/+2jjUy0FNB9uvhjdXhJCrtSMAsaaFKiFow0wHYYfKLcWtX3DaTucQkB3gKbwds
+         hKo45ZNVLXfoXDngQi1HnUFrZPzEKcvRvqKfOY2LLX82VBKCHbR3D7+x8ceXgPaypeMO
+         uyzA==
+X-Gm-Message-State: AOAM531GorZkhT7TI51EyK+vUwjNoTrMynnETfdwZoXoNBUGwkY1P3RK
+        EcllmoMyd2r2rN8x79PUn7SY5qifsVjWD12FJBOr6Eu48RZgww==
+X-Google-Smtp-Source: ABdhPJzjI2CerCpGlOJ9x5Swl5JZsMWjilPjXswTxYMCSrfR7bkIcyAFNbTP9/PhRvWm/b6i0nX4DHezib0mpqKLVps=
+X-Received: by 2002:a05:6512:604:: with SMTP id b4mr5733591lfe.184.1626223725600;
+ Tue, 13 Jul 2021 17:48:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <CANT5p=pDrNBRQSHAarXzxTRNF9Lo=-q-hsnbBTHJZue=ggGzXw@mail.gmail.com>
- <CAH2r5mvxj-A3F1tPr9OH1D00bdznVYyx7FzyjLZt=Xq41TCVxw@mail.gmail.com> <CAKywueR3aTzrC-QM=P3tJ3RuS1AWAPsgcK-eqyX55HYtH-M_bQ@mail.gmail.com>
-In-Reply-To: <CAKywueR3aTzrC-QM=P3tJ3RuS1AWAPsgcK-eqyX55HYtH-M_bQ@mail.gmail.com>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Wed, 14 Jul 2021 10:15:13 +1000
-Message-ID: <CAN05THQL3GTN0oG8rREQ3W9bxEoAV+NppbSgAuytdzPyH3cuhA@mail.gmail.com>
-Subject: Re: cifs.ko page management during reads
-To:     Pavel Shilovsky <piastryyy@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 13 Jul 2021 19:48:34 -0500
+Message-ID: <CAH2r5mtHpjjVVKFYKEkAZHG5U=-_umHwMhF2KDJjDSNgoa=Fxw@mail.gmail.com>
+Subject: [PATCH] cifs: fix missing null session check in mount
+To:     CIFS <linux-cifs@vger.kernel.org>
+Cc:     Paulo Alcantara <pc@cjr.nz>
+Content-Type: multipart/mixed; boundary="0000000000007d7ad905c70ab747"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Jul 14, 2021 at 8:58 AM Pavel Shilovsky <piastryyy@gmail.com> wrote=
-:
->
-> =D0=BF=D0=BD, 12 =D0=B8=D1=8E=D0=BB. 2021 =D0=B3. =D0=B2 22:41,Steve Fren=
-ch <smfrench@gmail.com>:
-> >
-> > And don't forget "esize" mount option to allow offload of decryption...
-> >
-> > On Tue, Jul 13, 2021, 00:37 Shyam Prasad N <nspmangalore@gmail.com> wro=
-te:
-> >>
-> >> Hi all,
-> >>
-> >> I'm trying to understand our read path (big picture is to integrate
-> >> the new netfs helpers into cifs.ko), and I wanted to get some
-> >> understanding about why things are the way they are. @Pavel Shilovsky
-> >> I'm guessing that you've worked on most of this code, so hoping that
-> >> you'll be able to answer some of these:
->
-> Thanks for taking a look at this.
->
-> >>
-> >> 1. for cases where both encryption and signing are disabled, it looks
-> >> like we read from the socket page-by-page directly into pages and map
-> >> those to the inode address space
->
-> Yes, we read directly into pre-allocated pages. For direct IO we read
-> into pages supplied by the user and for non-direct IO (including page
-> IO) we allocate intermediate pages.
->
-> >>
-> >> 2. for cases where encryption is enabled, we read the encrypted data
-> >> into a set of pages first, then call crypto APIs, which decrypt the
-> >> data in-place to the same pages. We then copy out the decrypted data
-> >> from these pages into the pages in the address space that are already
-> >> mapped.
->
-> Correct. Regardless of whether offloading is used or not there is an extr=
-a copy.
->
-> >>
-> >> 3. similarly for the signing case, we read the data into a set of
-> >> pages first, then verify signature, then copy the pages to the mapped
-> >> pages in the inode address space.
->
-> Yes.
->
-> >>
-> >> for case 1, can't we read from the socket directly into the mapped
-> >> pages?
->
-> Yes - assuming no signing or encryption, we should be able to read
-> directly into the mapped pages. But I doubt many people use SMB2
-> without signing or encryption although there may be some use cases
-> requiring performance over safety.
->
-> >> for case 2 and 3, instead of allocating temporary pages to read
-> >> into, can't we read directly into the pages of the inode address
-> >> space? the only risk I see is that if decryption or sign verification
-> >> fails, it would overwrite the data that is already present in the page
-> >> cache. but I see that as acceptable, because we're reading from the
-> >> server, since the data we have in the cache is stale anyways.
->
-> Theoretically we may try doing this with signing but we need to make
-> sure that no one can modify those pages locally which may lead to
-> signing errors. I don't think today we reconnect an SMB session on
-> those today but we probably should.
->
-> For encryption, we do not know where read data starts in an encrypted
-> SMB packet, so there is almost no point to read directly because we
-> would need to shift (copy) the data afterwards anyway.
+--0000000000007d7ad905c70ab747
+Content-Type: text/plain; charset="UTF-8"
 
-Yes. But even if we knew where the data starts, it will not be aligned
-to a page anyway so we need to memcpy() it anyway.
+Although it is unlikely to be have ended up with a null
+session pointer calling cifs_try_adding_channels in cifs_mount.
+Coverity correctly notes that we are already checking for
+it earlier (when we return from do_dfs_failover), so at
+a minimum to clarify the code we should make sure we also
+check for it when we exit the loop so we don't end up calling
+cifs_try_adding_channels or mount_setup_tlink with a null
+ses pointer.
 
-But I think it is possible, with a lot of effort. And probably not
-worth the effort.
+Addresses-Coverity: 1505608 ("Derefernce after null check")
+Reviewed-off-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ fs/cifs/connect.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-But, I have been toying with the idea of trying to do "zero-copy" SMB2
-READ in libsmb2.
-It, does read all the unencrypted READ payloads straight into the
-application buffer without a copy
-already, but just like cifs.ko it uses an intermediate buffer for
-encrypted packets.And thus an extra memcpy()
+diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
+index db6c607269f5..463cae116c12 100644
+--- a/fs/cifs/connect.c
++++ b/fs/cifs/connect.c
+@@ -3577,7 +3577,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb,
+struct smb3_fs_context *ctx)
+  rc = -ELOOP;
+  } while (rc == -EREMOTE);
 
-The solution I was thinking of would be something like :
-1, Read the first 4 + 64 bytes into a buffer.  This will be
-enough to hold, either
-1a, unencrypted case:
-      inspect the SMB2 header to find the opcode, then read the
-response header  (16 bytes for smb2 read/write responses)
-      then read the payload straight into the application buffer.
-      I do this already and it works without too much pain.
-      Now we are finished for the unencrypted case.
-2, encrypted case:
-      In this case we have the full transform header and also part of
-an encrypted smb2 header.
-      We know how big the transform header is so we can copy the
-partial smb2 header into a 64 byte
-      temp buffer and then read the remaining part of the smb2 header.
-3,   Start decryption, but only run it for the first 64 bytes, i.e.
-the smb2 header.
-3a, OPCODE !=3D READ: Inspect the decrypted smb2 header, IF it is NOT a
-read response then just read all remaining data into
-      a temp buffer, continue the decryption and handle it the normal way.
-4,   If the opcode is a READ, then read an additional 16 bytes into a
-temp buffer and continue the decryption of these 16 bytes.
-5,   What follows now is the read response payload so read this
-decrypted data straight into the application buffer (or pages)
-      and again, continue the decryption and decrypt the data in-place.
-      Voila, zero-copy encrypted read handling.  Which would really
-help on a PS2 since memcpy() is pretty expensive on its very slow
-memory.
+- if (rc || !tcon)
++ if (rc || !tcon || !ses)
+  goto error;
 
+  kfree(ref_path);
 
-I think this would work, and it would be very interesting to implement.
-Not sure if it is worth it to do in kernel code because there will be
-hairy special conditions to handle.
+-- 
+Thanks,
 
+Steve
 
-For kernel code I think it would be better/safer to have fast hw
-offload for memcpy()
+--0000000000007d7ad905c70ab747
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-fix-missing-null-session-check-in-mount.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-fix-missing-null-session-check-in-mount.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kr2rlz010>
+X-Attachment-Id: f_kr2rlz010
 
-
-regards
-ronnie sahlberg
-
-
->
-> --
-> Best regards,
-> Pavel Shilovsky
+RnJvbSA4Yjc1NWFkMzhjNzJkMmRjMzlmZDZlOTExMGQwM2FhMTMyNDk4NTcxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFR1ZSwgMTMgSnVsIDIwMjEgMTk6NDA6MzMgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBmaXggbWlzc2luZyBudWxsIHNlc3Npb24gY2hlY2sgaW4gbW91bnQKCkFsdGhvdWdoIGl0
+IGlzIHVubGlrZWx5IHRvIGJlIGhhdmUgZW5kZWQgdXAgd2l0aCBhIG51bGwKc2Vzc2lvbiBwb2lu
+dGVyIGNhbGxpbmcgY2lmc190cnlfYWRkaW5nX2NoYW5uZWxzIGluIGNpZnNfbW91bnQuCkNvdmVy
+aXR5IGNvcnJlY3RseSBub3RlcyB0aGF0IHdlIGFyZSBhbHJlYWR5IGNoZWNraW5nIGZvcgppdCBl
+YXJsaWVyICh3aGVuIHdlIHJldHVybiBmcm9tIGRvX2Rmc19mYWlsb3ZlciksIHNvIGF0CmEgbWlu
+aW11bSB0byBjbGFyaWZ5IHRoZSBjb2RlIHdlIHNob3VsZCBtYWtlIHN1cmUgd2UgYWxzbwpjaGVj
+ayBmb3IgaXQgd2hlbiB3ZSBleGl0IHRoZSBsb29wIHNvIHdlIGRvbid0IGVuZCB1cCBjYWxsaW5n
+CmNpZnNfdHJ5X2FkZGluZ19jaGFubmVscyBvciBtb3VudF9zZXR1cF90bGluayB3aXRoIGEgbnVs
+bApzZXMgcG9pbnRlci4KCkFkZHJlc3Nlcy1Db3Zlcml0eTogMTUwNTYwOCAoIkRlcmVmZXJuY2Ug
+YWZ0ZXIgbnVsbCBjaGVjayIpClJldmlld2VkLWJ5OiBQYXVsbyBBbGNhbnRhcmEgKFNVU0UpIDxw
+Y0BjanIubno+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0
+LmNvbT4KLS0tCiBmcy9jaWZzL2Nvbm5lY3QuYyB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGlu
+c2VydGlvbigrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY29ubmVjdC5j
+IGIvZnMvY2lmcy9jb25uZWN0LmMKaW5kZXggZGI2YzYwNzI2OWY1Li40NjNjYWUxMTZjMTIgMTAw
+NjQ0Ci0tLSBhL2ZzL2NpZnMvY29ubmVjdC5jCisrKyBiL2ZzL2NpZnMvY29ubmVjdC5jCkBAIC0z
+NTc3LDcgKzM1NzcsNyBAQCBpbnQgY2lmc19tb3VudChzdHJ1Y3QgY2lmc19zYl9pbmZvICpjaWZz
+X3NiLCBzdHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgpCiAJCQlyYyA9IC1FTE9PUDsKIAl9IHdo
+aWxlIChyYyA9PSAtRVJFTU9URSk7CiAKLQlpZiAocmMgfHwgIXRjb24pCisJaWYgKHJjIHx8ICF0
+Y29uIHx8ICFzZXMpCiAJCWdvdG8gZXJyb3I7CiAKIAlrZnJlZShyZWZfcGF0aCk7Ci0tIAoyLjMw
+LjIKCg==
+--0000000000007d7ad905c70ab747--
