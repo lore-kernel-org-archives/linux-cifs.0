@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 412DAC47E55
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 19:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 436BBC47E4B
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 19:45:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2870F613E8
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 19:41:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 306C06140F
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 19:45:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236861AbhGNToT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 14 Jul 2021 15:44:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38756 "EHLO mail.kernel.org"
+        id S233268AbhGNTsL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 14 Jul 2021 15:48:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38880 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234515AbhGNTnf (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 14 Jul 2021 15:43:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5DD64613E8;
-        Wed, 14 Jul 2021 19:40:33 +0000 (UTC)
+        id S237489AbhGNTq5 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 14 Jul 2021 15:46:57 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5C9D161408;
+        Wed, 14 Jul 2021 19:42:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1626291634;
-        bh=q2Px6zKs/i7okRqz6Z6BNxv5W0pDtSNaUU/oHMVllOw=;
+        s=k20201202; t=1626291780;
+        bh=O0csXEgYRC6D4Ovgk61aLtj/+X0YhNXx8mySag30PNc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=adEl85eIy/xRoqN8qXQh3xvDlDtzDOQONjeG8yHAX5oOZUiP3WMc7QB9bGepBeAKU
-         f7fPbqo9uWg0KF1UCSWc1oE7ci0jcOREDnQIkI/SxOfMjj5hm6XVmI8oXabTfEr5TA
-         Ld5t4HUCAym3a2IagzmBjEP/xdlklPJBt8VWMdpCr6fMBkbJYffG1NiEIKc9KAZUrn
-         /ZHtJ+u5NczlaNLGN3UleXCuwVnzqTyAXsXx6zFQTOPYzBIxgZiZ/cPoggRO1yJtrc
-         dtNaALfM5G47R5TslWSfs2Sdk605zsvl9Pf5pqxnDFUCUrTus8TYAcN/MJNrIzhpxF
-         xTV7/+Mr2N4Ng==
+        b=IWypnav7k8hgwH1cyHAiI4iR3CBYY8kPc04+J01QgxQ7KG7uLALxW3YNAQ6m39Ej7
+         IpCh0/XasT9GagJDIwD9CO/reEkoS0iNoaKUsa5Sehka/yZlIlgbUHuuUNdRMRe1wq
+         6+UNYENgMnpqSrya2GXqtR3OFYclQXHyJMEwXgJgRBYJ82lV9yTspdDtXgDJkDlRv5
+         IfNBNiO4bmNPFIsl7vAqxi0xLc3wVnPXsHPX86IwGZvHUMhNIamk3L3Yp40uN2MwID
+         h2btW9vpobbfx7mXa0DvrYHsNhgy7si5dcy0T+MVFiLaKoqLMgjFQ1vMjUQ36l81Fg
+         8B25IjeKVxq7Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Paulo Alcantara <pc@cjr.nz>, Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.13 108/108] cifs: prevent NULL deref in cifs_compose_mount_options()
-Date:   Wed, 14 Jul 2021 15:38:00 -0400
-Message-Id: <20210714193800.52097-108-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.12 102/102] cifs: prevent NULL deref in cifs_compose_mount_options()
+Date:   Wed, 14 Jul 2021 15:40:35 -0400
+Message-Id: <20210714194036.53141-102-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210714193800.52097-1-sashal@kernel.org>
-References: <20210714193800.52097-1-sashal@kernel.org>
+In-Reply-To: <20210714194036.53141-1-sashal@kernel.org>
+References: <20210714194036.53141-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -66,7 +66,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/fs/cifs/cifs_dfs_ref.c b/fs/cifs/cifs_dfs_ref.c
-index c87c37cf2914..4e3c15cd403a 100644
+index 6b1ce4efb591..2891089aadbb 100644
 --- a/fs/cifs/cifs_dfs_ref.c
 +++ b/fs/cifs/cifs_dfs_ref.c
 @@ -151,6 +151,9 @@ char *cifs_compose_mount_options(const char *sb_mountdata,
