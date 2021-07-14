@@ -8,72 +8,67 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5C5C07E9A
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 05:02:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED6D6C07E9A
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 05:30:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7858D613B0
-	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 05:02:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEAF26136E
+	for <linux-cifs@archiver.kernel.org>; Wed, 14 Jul 2021 05:30:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237787AbhGNFF1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 14 Jul 2021 01:05:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44616 "EHLO
+        id S237887AbhGNFcy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 14 Jul 2021 01:32:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbhGNFF1 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 14 Jul 2021 01:05:27 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F06C0613DD
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Jul 2021 22:02:36 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id t17so1474884lfq.0
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Jul 2021 22:02:36 -0700 (PDT)
+        with ESMTP id S237802AbhGNFcy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 14 Jul 2021 01:32:54 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1A34C0613DD
+        for <linux-cifs@vger.kernel.org>; Tue, 13 Jul 2021 22:30:02 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id ga14so1294125ejc.6
+        for <linux-cifs@vger.kernel.org>; Tue, 13 Jul 2021 22:30:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=I7sRWBdw2rcymoGIboyvXWQEZAyq5maHcczpCYjuo7s=;
-        b=rbbjXsdsXHQot0o0mBI6iY+yLskhbQ1woJx0592sT5846+PZfL8tL8LD1Jw5nNqXhW
-         LqJGUk1TjROUyRR+dFC8drK43iAZLrFDQebtlCl4H3ntmV+HZkuC/T7VQObAoGV0Az78
-         Fp0bGobHc/Ee7xGexhBGNkYAm01c1UrZ6GQZCF7Rt2Nyl9kSty6YuGz2gbXnD+TdhYLA
-         ZI0E4Qln8RcL6Qr5YHa4VmwkjzdvtAo9oZ0X76ogz6QrO6yGqcJmuIv7X3xiaW5m0iEN
-         SEYvFvvDtQGdecD2h0hJiXs52wd94bi1BP+lAjIvggEcv1R6/sos5PdCcj1Rs8PmrkTQ
-         4aSw==
+        bh=w0oxelNJwT6/4qp2Iouj7pjKoRpgMwP+WG57kdzNunU=;
+        b=FOLA1ugQgLQzj4WnO7CDwtXgpStZMNfOaPVfzut/px7spZ+7j/Ho/Dgmfkwv/5svVD
+         Yse7Qe4DOYDt2Hejw5f86+1L6WhOKzIezXotN3Up+3VzMjP+1ZbaabCqKHuNBkkT06tl
+         jqLJgtN9btdbXagcK0gEeIsycfKXHam9wO2SA+bi4YbvOy8163C6m8M3Ya6wINyFTLfz
+         4HXNs9mzxajSV5hl6Tc1BnT2oPs0yPq8i375HNZjTH8fqpNXgnQv6/udCnvUtE36B7/N
+         bfPRPZFm9QiOMr/bq+EEc3jGHvW6HM7DjXGoT3/HDR6qGffbI9shy0FvBvzdjetiBh/E
+         /PAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=I7sRWBdw2rcymoGIboyvXWQEZAyq5maHcczpCYjuo7s=;
-        b=Fhdqn3GnTwaqytQ3rSiajmwxfkIa90o4HAeN/D/0wPzBRceTy44MQvPKPtK9u9uup5
-         Q7CBLIgZo9fV+ojyA3sgdr0gs2VpKuJa5Zu0XVWtudUEX08+g9ki+axnQxLnGbq3F8Xl
-         E+LLu86ooW3eS1eY90h+PortYSjwTyPYgeRiM8aWY7L6qN6RIhiWor12zV0sRsODNGmW
-         OGEtQLfZorigWTsQbO/2QFWgsFLxsX085bfcBZLlyKBVkt5tmFL/65PV/2B9+1Q+ky+1
-         RzPUhljcyhszOjQdGeA5iGejD/i4i7pSCG5L1QjzUnrtDH2JP8HqRUPTATmnMRui0f2A
-         oB6A==
-X-Gm-Message-State: AOAM532biXGncO/qcyFudUKtdwFpMCz9xKaBi591bVS/Odaj2JJeqo6z
-        YEOjtRnXm2Tb2kJsxeYXCKlL/36uzkYUPvlWbU4=
-X-Google-Smtp-Source: ABdhPJzq23p4ivQo8aeyGxSCt2ZCRi3h24dilcb5Akiez79E9RCn2VCbLNFfBxVb6cTszG9HOmiCHwa3AN+2XP0ou5A=
-X-Received: by 2002:ac2:419a:: with SMTP id z26mr6611567lfh.307.1626238954730;
- Tue, 13 Jul 2021 22:02:34 -0700 (PDT)
+        bh=w0oxelNJwT6/4qp2Iouj7pjKoRpgMwP+WG57kdzNunU=;
+        b=IsXTOEi09wmd0tqv3DGdJZBTlraCqPHuPvvXFMtHDxbvaPJq9ZlX2Bf0HCH/jDcM90
+         muz7AE4Qz7WE7zruDC7UxsL05rax3mXPq05/7WTvEsyDO8upA/FpBdgSjp6CwHFd2o2a
+         eZxD89E8bM8tLiLctJ86lm0uqFHeWzE6JYB9zXZHe/piVHtbiZOmnF5s8rxgWD4J/QaC
+         QzupJEAPosvq9uNkX2bli4QQfsAywDWiOhLY3iOpfTKm9IRsW2H49K7g63O3/WCnCTmT
+         Skw0qwUDyiajJuwcKO+m8j+oUfVLIcdiUFKWZbf1tdXbdHQb4+F/OCElMTKrVA51VCDl
+         02hA==
+X-Gm-Message-State: AOAM533zfd57Z4BR+eEnv8O3DmTfbPwmimictHanUxPKY7WtrgnbCf7r
+        LLVuQp5w2PxFtG/Hr8wcj01w1KNJRou8plelIXQ=
+X-Google-Smtp-Source: ABdhPJzNPtSIBdRdnHKBVU+pqtSVUhGVEGRnAXrwCRGCrXAV3C4dq3+KOqZkm7CCa9XE5Wtjad2hd6UMs4JuYUSrm+I=
+X-Received: by 2002:a17:906:14cf:: with SMTP id y15mr9914604ejc.124.1626240601510;
+ Tue, 13 Jul 2021 22:30:01 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAH2r5mtHpjjVVKFYKEkAZHG5U=-_umHwMhF2KDJjDSNgoa=Fxw@mail.gmail.com>
  <CANT5p=rOkJ=R1sLHPBuuV350ox7F8u1r6PEZ+nN-gGVcdJ32bg@mail.gmail.com>
 In-Reply-To: <CANT5p=rOkJ=R1sLHPBuuV350ox7F8u1r6PEZ+nN-gGVcdJ32bg@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 14 Jul 2021 00:02:24 -0500
-Message-ID: <CAH2r5muxBkcsssK0p-NQSVOUkX0kn=E-XjKX1MPBasxNtU=mSw@mail.gmail.com>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Wed, 14 Jul 2021 15:29:50 +1000
+Message-ID: <CAN05THTiFLgQxbQ22PVZppGMkD=nAn0tg5VEdnojBu2-W0oX1Q@mail.gmail.com>
 Subject: Re: [PATCH] cifs: fix missing null session check in mount
 To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-But isn't it the return from do_dfs_failover the issue ... we checked
-right before we called it on line 3561 ... but if it fails to populate
-ses ... then we break out of the loop - we could change it to "goto
-error" but the change in the patch is a little broader (wait until we
-exit the while loop)
-
-On Tue, Jul 13, 2021 at 11:54 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+On Wed, Jul 14, 2021 at 2:55 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
 >
 > On Wed, Jul 14, 2021 at 6:19 AM Steve French <smfrench@gmail.com> wrote:
 > >
@@ -117,6 +112,12 @@ On Tue, Jul 13, 2021 at 11:54 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
 >
 > Doesn't it make sense to check rc, tcon and ses values right after
 > mount_get_conns call?
+
+Or check rc, but to make mount_get_conns an easy to use api,
+maybe make sure and specify that IF it returns error then the output
+arguments are
+guaranteed to be NULL.
+
 >
 >         rc = mount_get_conns(ctx, cifs_sb, &xid, &server, &ses,
 > &tcon);          <<<<<<<<<<<<<<<<<<<
@@ -150,10 +151,3 @@ On Tue, Jul 13, 2021 at 11:54 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
 > --
 > Regards,
 > Shyam
-
-
-
--- 
-Thanks,
-
-Steve
