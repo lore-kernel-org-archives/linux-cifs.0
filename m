@@ -2,612 +2,338 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-24.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 296E8C636CA
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jul 2021 23:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5CD5C636C9
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jul 2021 00:03:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06D4B613C9
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jul 2021 23:47:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FF53613C3
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jul 2021 00:03:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232425AbhGOXuL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Jul 2021 19:50:11 -0400
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:1258 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229783AbhGOXuK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 15 Jul 2021 19:50:10 -0400
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 16FNfGGi027264;
-        Thu, 15 Jul 2021 23:47:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
- cc : references : message-id : date : in-reply-to : content-type :
- mime-version; s=corp-2021-07-09;
- bh=nJju39mBtPu/SZQpHnthZMHF5IC1MWmytoEuSM+jd9Q=;
- b=oHjOjlr7wutKm3SjP/BXvy4WlyTB8mF+8wQnRNWrUPb94VO5ISOJxQzfR3nJS2uh5mUa
- OeYgC99i1aj7kzeVZmrZyPh56fSRPQOOZ3ukJkj+JXbPcyCEdQ1koIFbP91a0GMXawyF
- p4VP0y3u2pUb9+rnIjbxccWVFFjlJ5H8xYUxG474pcRDFNWeOwHy1doiHo0IULtIvBsi
- 6ozSmQk3h5beSsiFFVE11zeLZ/zG6UYajsq/svn+R1jrdgOOTniA/PNLoNHEsUrqaQmP
- ChPGMtihGh5xk8gMx0kPjnRAJ6387TCsMEmkHIZfE2fmpcKhWFG2UW38Gln9aMdCGXdj fQ== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
- cc : references : message-id : date : in-reply-to : content-type :
- mime-version; s=corp-2020-01-29;
- bh=nJju39mBtPu/SZQpHnthZMHF5IC1MWmytoEuSM+jd9Q=;
- b=CJqIkzDMZQ/H77cQKlqCg4Q0jvqsMuwER7sSr2/U/b7ChumsCb3J8WAskZ8UPs3WtNz+
- ydoGO1K2Pp3/UZKgADagfgMbsvqEqHsgGprAS7me5OpHFf3ibAnwF27VsKtYcI9IYyJN
- 9BFaX6ahZ5ColRojnoNrGkI3t8c44qgnjC/DPLrKGaQTNxaQzISlr03yfUXvnTQfnyMO
- m72cJmUWmFCkpxPp/vSwGcWlSk16dc4xpPSw7WPSdH8sqC9hKB0tJbYA4UUNwYh7pVYW
- BLTf3urXTV//dGj1pflIAC/G4KX8esuElkrMBnOal1vEEM1XLwx0D0Xeeva+tpc7PgGV uQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 39tw3pr4ny-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Jul 2021 23:47:15 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 16FNenkZ181975;
-        Thu, 15 Jul 2021 23:47:14 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2040.outbound.protection.outlook.com [104.47.66.40])
-        by aserp3020.oracle.com with ESMTP id 39twnf4kps-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Jul 2021 23:47:14 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ew9Th2NBsmS9tZ+9Q8WGknl59QWUbzcjzeuhI3KVkQfNU8yVly8B0UGr4fznNAqqJaYVk1yGfAAKEdGxBBA4/0QfSBufDweG+ovnnNGmAZdDXc6sy7iIIwWqDLtVH852Y9JCHBMjm1aFKg6mosfOTQ/EzASEKW9ZbswCMWXR6eIaKdmzHb4Ycqt6c2SJ3VOopdmYV/RjZhfiZZBNiBc+xnp44+EYhKwBozX6yJx/LifBSE9h6tsccQRx9r0GaOp6bqI05AQxNVAur2z80eqv5acqY0+FBlQ2MUFHR7RiWEILDkwdB3zs0JI4pRWE+NqEKXPw5q1jv8L8fkMx82y+OA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nJju39mBtPu/SZQpHnthZMHF5IC1MWmytoEuSM+jd9Q=;
- b=f2tohy3Bd0WXn9XTnwEw8weWJ2CozZdkN/V/U6xmhrlmPHN0wAqAWG+OfY1Qh7D45k2iu6w9DO7thAqGxoN4IfnteOWRsmETDKs4tTGX4dlhp+ItuiwemJuC098DMFH/B2PI8a0qknYgkDHK5RmpVuXKWI6oN5iiB+O4RscDPSxEbPC/JrUwxZvmqzVMZkPNXO2Ks/xpxsgXXILUbbUXom7/haG1InThuU5qqXTBXTJaZ2mE2SXgKp4oWA6G92WhYctecno+WA0UtD8LbH90kIT/94aOZzVA4c1Vdi+dbTW2vUflL/C5+zsYKQmTvnnccVunP0KqByWOEU3tdq8AcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nJju39mBtPu/SZQpHnthZMHF5IC1MWmytoEuSM+jd9Q=;
- b=jF2S7EAd770MpE20eNbgPvOpnim+avh5KgVlnucNPoPN8RoliJVwoIXUFO/Ix/g+PipXzQredGMBFIhWIAj56lssbPVup2ml4GS+oMtCj7eiOZDBzVxRyk+EHlon4OdPw4rhHoRUj4YuQk44abmaDQVYQwnjBpLqP8y5H7sWVxQ=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=oracle.com;
-Received: from BY5PR10MB4257.namprd10.prod.outlook.com (2603:10b6:a03:211::21)
- by BY5PR10MB4131.namprd10.prod.outlook.com (2603:10b6:a03:206::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.23; Thu, 15 Jul
- 2021 23:47:12 +0000
-Received: from BY5PR10MB4257.namprd10.prod.outlook.com
- ([fe80::b5de:87d0:75cb:bb9e]) by BY5PR10MB4257.namprd10.prod.outlook.com
- ([fe80::b5de:87d0:75cb:bb9e%5]) with mapi id 15.20.4331.021; Thu, 15 Jul 2021
- 23:47:12 +0000
-Subject: Re: Locking issue between NFSv4 and SMB client
-From:   dai.ngo@oracle.com
-To:     Bruce Fields <bfields@fieldses.org>
-Cc:     "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-References: <5b7be2c0-95a6-048c-581f-17e5e3750daa@oracle.com>
-Message-ID: <777c4ec9-6dbe-503c-1295-322f9dc8a531@oracle.com>
-Date:   Thu, 15 Jul 2021 16:47:09 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.10.2
-In-Reply-To: <5b7be2c0-95a6-048c-581f-17e5e3750daa@oracle.com>
-Content-Type: multipart/mixed;
- boundary="------------03F37B337EE450A249E8E3E0"
-Content-Language: en-US
-X-ClientProxiedBy: SN7P220CA0029.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:806:123::34) To BY5PR10MB4257.namprd10.prod.outlook.com
- (2603:10b6:a03:211::21)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from dhcp-10-159-159-205.vpn.oracle.com (72.219.112.78) by SN7P220CA0029.NAMP220.PROD.OUTLOOK.COM (2603:10b6:806:123::34) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4331.22 via Frontend Transport; Thu, 15 Jul 2021 23:47:11 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3f966a56-2ef9-4929-1ba5-08d947eade12
-X-MS-TrafficTypeDiagnostic: BY5PR10MB4131:
-X-Microsoft-Antispam-PRVS: <BY5PR10MB413103AACE5902D3F63B051A87129@BY5PR10MB4131.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KGSvfpLh4cm+lT7GEDuk3CO59U7tu6beTUJC0kfBr3nJzk6sczqrzV1pa9gobLZCTfDhKdAhCh7a6lEDy7ttpsWyMgG3seFWln2nmzdSphkapZpCMyKOkluPnWvZaIVTe+leEcoxRqLzlEiGsrIkkt4nAdYuq14FWvuJ4s3CgN80dqkZzeD3tus4sLRnXOZz+tBSohfm+tVTCx8JaMHfP7BwVejCUEFc5aYYODZKpALtCRn0w6Kb3QtCDLa99tbk6/SLL9rReyjgE0xp1JV9QM0nOVkMRk2UmReIjr0drVcifyvShliuTTr9fdj+Ct57b4v0Qx+8iF6Q4oqXKGyKLVxpJO1s82gKO0O1rG1YBj3DqqGxmQL26Yl5+dhWMd2uV6h/Rf9LINJenEbuso0mXAVHq1JOJ9+ZjVfXPW5AcBqWqLzWebGoL6mqXlGWAZqXjUIT7I7zFba5d0ymBnWgQOzLe2w981zdV4stUFloeyzJ+FmZaD0rCmBUJXpWMxq0EHxFMlaByzOoePQXRD8YYtKul+VE8s2vWelZSmKBkGeiunn1PFaSSHsBFOGOEUlzY5B9DHtnZszw8kNfNipJFWER2hMeG4lntleQvs3zAx/bK02LdlSbL+nKS7/Is5UsuyAH71h9JrhhA/KzbfGEN6IdH99RB/nizkCsFlnqbX+xnpKtDsd0YcNn+egco2/6F4W74c87FGCElMGmJBTatg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR10MB4257.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(366004)(396003)(39860400002)(136003)(376002)(5660300002)(2906002)(31686004)(7696005)(4326008)(956004)(316002)(8936002)(26005)(53546011)(2616005)(31696002)(33964004)(9686003)(478600001)(235185007)(83380400001)(66476007)(6916009)(36756003)(186003)(66556008)(54906003)(66576008)(86362001)(6486002)(66946007)(8676002)(21490400003)(38100700002)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YmNBYUhHR1V6Z3FNejNSa2RGZlBCWG9ITDZrMVpwM1dpcmVXbXZ6R3RLRUlT?=
- =?utf-8?B?RFlGK2RSVW9ST3hSamszdnpNNXlFYzU4ZzcwMnAzN1hXVDFuYnZDWEdZUFdX?=
- =?utf-8?B?NVpNQmtOVXNHLzcxcVVLREY0L012SVUvdzQ5THdVd2JVVEFZcFU3NXZXWG5F?=
- =?utf-8?B?dEVLd3RGeW1ibW9JOTc3b0RqN1hsdFFEbjBXQjZJanVPMzBnRlk2elpjSWlY?=
- =?utf-8?B?MlBSK2ZrM3N5a0RuZ3lQWGdvQVJFQThWYkpkYlM0c3Yyd0FUSGVqaERxRHhz?=
- =?utf-8?B?WWVENVkxcHZ0T1FWRTRPS1ZMY0JDRVFhTEZHZGIxcS9ud0psa21POGp3NGlY?=
- =?utf-8?B?MWcrZlpNYUZGUUt2T2dHbDUrcWhrM1k0VmVlQjM1TFNubUd2NHAwWTRHUk5B?=
- =?utf-8?B?OWR1Q2RUTk80clEvL2lJZ3paUmw1Rlcxa2I0cXVyT2htTXVqSm8rQzlOR0NU?=
- =?utf-8?B?dDh2bEVPKy9OdmpLZTFhdUVGTUM0dGROSFFSaExxQjRHWHdWaFBSN1ROZTBS?=
- =?utf-8?B?NTE5a1VxYlRWa2ZwaTQvQUcwd1EvZjJXb0R2dGJrL25QbVFqaE00YVN5cmpU?=
- =?utf-8?B?Ly9oVVgySjROZys1VzJPeDNOMjM0RUEvdUxSRlgxNHJLaXRmREdmcklxTHo5?=
- =?utf-8?B?UjZmcGhYUll3ZTRLRnQwcTc5QWc0ZVlSaTJ4TnNPWnpHWWlManRXVDJjdXNK?=
- =?utf-8?B?eUFxYzVDOHpVMGViYzVJV2R5bmtlN2E4UG5hdnBhSE1vRXB3Yzh0bGtVWVJJ?=
- =?utf-8?B?bmRpb2JkQktuTHhTZ3ZVeGN2S2lZY1dCWkN6MXBCR3EwYUM3Vko1VktoYWFB?=
- =?utf-8?B?Uk5Yd3FVOEFtMEdsQWkrUElRTXJoWHhOaFo3VnFKTTkxUnNLVVEwMTBoMHVj?=
- =?utf-8?B?SmZDTGJDMG9zMEd0enROWE1VdTdLUWVBR0g2TEVLZnh6cWNDVHU2aE1OL3FY?=
- =?utf-8?B?Vk03dzBWTjlrR21MaGtvUDBwRVdKaE9zSkFHNHBoMVIvL1RmWkM1T1Q2cW05?=
- =?utf-8?B?M2pZMnZPSzgyOUU2ZjFvUzRPY00xdTJPZGdCaWlJdWppcmVTSTNDd1llRG12?=
- =?utf-8?B?bGs3TXpEQjJtejlzbXJlZm9EeGxRbEhwYlFNY2lxWDF4VHV0TnF6TkI3UUgr?=
- =?utf-8?B?eklMelhTeUk1dGtiNnNQMmNWOCtMdHZSNGlDakZCY255cTBVcHpxaVBNZktE?=
- =?utf-8?B?UkhqV1BTTUU3YjFpUnFVeXJuTG5oTWpwUlJnRXMvc0dBYkZ1TGxQaGN6Zlgr?=
- =?utf-8?B?K1drT2NOL3EySDhkdm90VlEraEw1cll1QmV4dXhQdys0L296N2RqMSs1Nmp4?=
- =?utf-8?B?cFpxRU5kdzFIeUdwK1d6TklmTy9talhOa05palJIZGQvQy9RMngrUFJxRE9L?=
- =?utf-8?B?RHVuTDlrb2pJTFFOYkwybkFSRnViWGN1WUJGcTdORG8vdkpDNGY0TVBTYjFU?=
- =?utf-8?B?Wmw4RDc3WllFdW55N1VhS1EzajNXZWRUQ3JCSGw5ODRvOTg2RFhUOG9qN1N1?=
- =?utf-8?B?RGJKQnN0UDJqTXRTT1pMOEo4VnJ5UXM5Zll5dDdhVTk5M0RLTjlTM2JmQkEy?=
- =?utf-8?B?L2tweHh6NTB4b0QzSEpKZTVBdnN1QjJWUTcxZmZnUlcvd3RCL2VDRmdPYmpI?=
- =?utf-8?B?UjhXc1VjRmlFSTdiODAzNC95Y3llbnFxbkhnRmNwamNHa2hRTTFHdW9HbHlh?=
- =?utf-8?B?NU1TUjNpSDlTSnBYNEk1Q0F3Qjd6aVFWNlFiYUp3b0I2UGJ6Mm8xQlhFYjJk?=
- =?utf-8?Q?TVc8u7uJOnVQjP66QdqoK00JhP+eJFpSgtbvV/m?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f966a56-2ef9-4929-1ba5-08d947eade12
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB4257.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2021 23:47:12.5374
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2FeEFCGiiFpLMoYfd/idiYA/658713YN/mEd5B8nkaJHEhR7ksc37xwCkg3gkvB0pAy/RAR1nad6NSq9/dBgxw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR10MB4131
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=10046 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 adultscore=0 spamscore=0
- mlxlogscore=999 bulkscore=0 phishscore=0 suspectscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2107150154
-X-Proofpoint-GUID: BOfxrtJyWvIAthxmVvaK2OQJi9ZLmO5r
-X-Proofpoint-ORIG-GUID: BOfxrtJyWvIAthxmVvaK2OQJi9ZLmO5r
+        id S231806AbhGPAGu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Jul 2021 20:06:50 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:28728 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230519AbhGPAGu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jul 2021 20:06:50 -0400
+Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210716000354epoutp03c12b9155755faf0a92aa815822e65d13~SHJNsH6pD0437204372epoutp03k
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Jul 2021 00:03:54 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210716000354epoutp03c12b9155755faf0a92aa815822e65d13~SHJNsH6pD0437204372epoutp03k
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1626393834;
+        bh=0ecHHt7lCuZJh3o10h6QCYCxalCSpfibUbGLmS4sLFg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=mPlFMCtGNhpbsZLLkaFElc+mrPaCOC4/aeGEF9pdavoT9TLRxuQ0+H1x0+y18bBSp
+         ZoZDVSWJNRvxxHWHmmAQCwMmyIfRjM8i+DhrPQQxJbBjvZLNktd4vuwsRS93Myv/uF
+         XXtGLmxssjp6qFavP+RGlusGnAjLWg02ekKFIHIs=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20210716000351epcas1p18b93ddc1dc6434f2086fe8816c7a046c~SHJK7S8wn1421114211epcas1p1I;
+        Fri, 16 Jul 2021 00:03:51 +0000 (GMT)
+Received: from epsmges1p1.samsung.com (unknown [182.195.40.162]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4GQs0Q65Mrz4x9Q6; Fri, 16 Jul
+        2021 00:03:50 +0000 (GMT)
+Received: from epcas1p2.samsung.com ( [182.195.41.46]) by
+        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F9.C9.09952.6ECC0F06; Fri, 16 Jul 2021 09:03:50 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
+        20210716000347epcas1p49645cb64b0400b21eaf9e73e5267e211~SHJHCWJ6r0593605936epcas1p4D;
+        Fri, 16 Jul 2021 00:03:47 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20210716000347epsmtrp13203e366b91221c99f2adaef0d1269fa~SHJG-ohi12064220642epsmtrp1j;
+        Fri, 16 Jul 2021 00:03:47 +0000 (GMT)
+X-AuditID: b6c32a35-447ff700000026e0-61-60f0cce6772a
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        9A.8E.08289.3ECC0F06; Fri, 16 Jul 2021 09:03:47 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.89.31.111]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20210716000347epsmtip23ebdfe5d3b84fd5d6fe4c45b40d90f8b~SHJGwHJHR1664016640epsmtip2Q;
+        Fri, 16 Jul 2021 00:03:47 +0000 (GMT)
+From:   Namjae Jeon <namjae.jeon@samsung.com>
+To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org
+Cc:     linux-cifsd-devel@lists.sourceforge.net, aurelien.aptel@gmail.com,
+        senozhatsky@chromium.org, sandeen@sandeen.net, willy@infradead.org,
+        hch@infradead.org, viro@zeniv.linux.org.uk,
+        ronniesahlberg@gmail.com, dan.carpenter@oracle.com, hch@lst.de,
+        christian@brauner.io, smfrench@gmail.com, hyc.lee@gmail.com,
+        Namjae Jeon <namjae.jeon@samsung.com>,
+        Steve French <stfrench@microsoft.com>
+Subject: [PATCH v6 01/13] ksmbd: add document
+Date:   Fri, 16 Jul 2021 08:53:44 +0900
+Message-Id: <20210715235356.3191-2-namjae.jeon@samsung.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210715235356.3191-1-namjae.jeon@samsung.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrIJsWRmVeSWpSXmKPExsWy7bCmnu6zMx8SDF6s1Lc4/vovu0XjO2WL
+        1/+ms1icnrCIyWLl6qNMFtfuv2e3ePF/F7PFz//fGS327D3JYnF51xw2ix/T6y16+z6xWrRe
+        0bLYvXERm8WbF4fZLG5NnM9mcf7vcVaL3z/msDkIefyd+5HZY3bDRRaPnbPusntsXqHlsXvB
+        ZyaP3Tcb2Dxad/xl9/j49BaLR9+WVYweWxY/ZPL4vEnOY9OTt0wBPFE5NhmpiSmpRQqpecn5
+        KZl56bZK3sHxzvGmZgaGuoaWFuZKCnmJuam2Si4+AbpumTlAzykplCXmlAKFAhKLi5X07WyK
+        8ktLUhUy8otLbJVSC1JyCgwNCvSKE3OLS/PS9ZLzc60MDQyMTIEqE3IyJsxpYito9a54v+YS
+        awPjE4suRk4OCQETiZ72/exdjFwcQgI7GCX23/4H5XxilPhwbA0LhPOZUeLWol2MMC13/z9k
+        BrGFBHYxSrSvEYHrODFnGVA7BwebgLbEny2iIDUiArESN3a8ZgapYRboYpZ4ev8ME0hCWEBX
+        ouXBIbChLAKqEruvTGEFsXkFrCUm9raxQSyTl1i94QDYMk4BG4nHJ79BHXGCQ+LSggoI20Vi
+        VtcNqLiwxKvjW9ghbCmJl/1tUHa5xImTv5gg7BqJDfP2gd0pIWAs0fOiBMRkFtCUWL9LH6JC
+        UWLn77lgE5kF+CTefe1hhajmlehoE4IoUZXou3QYaqC0RFf7B6hFHhIPH/+BhmE/o8Tub0sY
+        JzDKzULYsICRcRWjWGpBcW56arFhgSFyfG1iBKddLdMdjBPfftA7xMjEwXiIUYKDWUmEd6nR
+        2wQh3pTEyqrUovz4otKc1OJDjKbAoJvILCWanA9M/Hkl8YamRsbGxhYmZuZmpsZK4rw72Q4l
+        CAmkJ5akZqemFqQWwfQxcXBKNTA9vXPuld/mrVs3/ZK4+MDjd7ZFzu7YmFkMUQ/FJjpp/jkX
+        XB6rLHnwi5teuvCtefKcym33OGQ/bPbjkDgmdlV204qpXcLXlFlfpzWU8G6pmK2XI2KTu+xw
+        79zzVtJZ++5nG/8IjrjwXZ1pExOf0iHWSw2Xzx98VFD+3+v56iChgA7h+jvv53D7Vp9gni3w
+        4smflncp554YFbyq3MizNNNGTFS1v831nkGynRrnyujLbwMT8i5xd/RcPy+vu2j/VG8Xrdwl
+        HFdNH2jeLzgaZTRd40nAnPBHwUXbU7nUfK3eXOASjbN/a1lltXHC90tXF56a8fI1e9iiA9td
+        XzukLVj/2ip9T7Ypx+3dD3bNLy1QYinOSDTUYi4qTgQAyMFbhkQEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrDLMWRmVeSWpSXmKPExsWy7bCSvO7jMx8SDL5sUbM4/vovu0XjO2WL
+        1/+ms1icnrCIyWLl6qNMFtfuv2e3ePF/F7PFz//fGS327D3JYnF51xw2ix/T6y16+z6xWrRe
+        0bLYvXERm8WbF4fZLG5NnM9mcf7vcVaL3z/msDkIefyd+5HZY3bDRRaPnbPusntsXqHlsXvB
+        ZyaP3Tcb2Dxad/xl9/j49BaLR9+WVYweWxY/ZPL4vEnOY9OTt0wBPFFcNimpOZllqUX6dglc
+        GRPmNLEVtHpXvF9zibWB8YlFFyMnh4SAicTd/w+Zuxi5OIQEdjBKfD3ZxAaRkJY4duIMUIID
+        yBaWOHy4GKLmA6PE5Ia9TCBxNgFtiT9bREHKRQTiJW423GYBqWEWmMMssXPjEUaQhLCArkTL
+        g0NgNouAqsTuK1NYQWxeAWuJib1tULvkJVZvOMAMYnMK2Eg8PvkNrF4IqGb9mg0sExj5FjAy
+        rGKUTC0ozk3PLTYsMMpLLdcrTswtLs1L10vOz93ECI4QLa0djHtWfdA7xMjEwXiIUYKDWUmE
+        d6nR2wQh3pTEyqrUovz4otKc1OJDjNIcLErivBe6TsYLCaQnlqRmp6YWpBbBZJk4OKUamFR0
+        bpW4OK2cmn5T8N3XqDNLpjNf4zx2X96G815xdV6dj8WLP1ejZaYxm6TdWvlUWvChjVXxb9ek
+        Zdfk9pRlGGbF700uy9p6L2Qa26e+cO+yI9szeW1e+KudstR1m1CRcWjn3X8lKhYybH1P3xZ8
+        uCauKrJ4atUcn3+Wfcnyh8SMVrsEn3lkkyfyruPdd72Tn9tCip9x5i16fadS9IHLHv0lMn8K
+        NjU5eS++eUhcq2Xf/60ZJfw/2zWjUqtZ3vjtED0pvu23WHqiJ9d8JdkE/9VxuodvuhxdIMac
+        /uV7kN+xg0E71H0tQ5g39DNLf4k/wJTLFs2WY2t59kWq5DNLJ/szR5dxPj//6ADftTnVSizF
+        GYmGWsxFxYkA7/z2Sf8CAAA=
+X-CMS-MailID: 20210716000347epcas1p49645cb64b0400b21eaf9e73e5267e211
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210716000347epcas1p49645cb64b0400b21eaf9e73e5267e211
+References: <20210715235356.3191-1-namjae.jeon@samsung.com>
+        <CGME20210716000347epcas1p49645cb64b0400b21eaf9e73e5267e211@epcas1p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---------------03F37B337EE450A249E8E3E0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+This adds a document describing ksmbd design, key features and usage.
 
-Oops I forgot the pcap files
+Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ Documentation/filesystems/cifs/index.rst |  10 ++
+ Documentation/filesystems/cifs/ksmbd.rst | 164 +++++++++++++++++++++++
+ Documentation/filesystems/index.rst      |   2 +-
+ 3 files changed, 175 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/filesystems/cifs/index.rst
+ create mode 100644 Documentation/filesystems/cifs/ksmbd.rst
 
--Dai
+diff --git a/Documentation/filesystems/cifs/index.rst b/Documentation/filesystems/cifs/index.rst
+new file mode 100644
+index 000000000000..1c8597a679ab
+--- /dev/null
++++ b/Documentation/filesystems/cifs/index.rst
+@@ -0,0 +1,10 @@
++===============================
++CIFS
++===============================
++
++
++.. toctree::
++   :maxdepth: 1
++
++   ksmbd
++   cifsroot
+diff --git a/Documentation/filesystems/cifs/ksmbd.rst b/Documentation/filesystems/cifs/ksmbd.rst
+new file mode 100644
+index 000000000000..1e111efecd45
+--- /dev/null
++++ b/Documentation/filesystems/cifs/ksmbd.rst
+@@ -0,0 +1,164 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++==========================
++KSMBD - SMB3 Kernel Server
++==========================
++
++KSMBD is a linux kernel server which implements SMB3 protocol in kernel space
++for sharing files over network.
++
++KSMBD architecture
++==================
++
++The subset of performance related operations belong in kernelspace and
++the other subset which belong to operations which are not really related with
++performance in userspace. So, DCE/RPC management that has historically resulted
++into number of buffer overflow issues and dangerous security bugs and user
++account management are implemented in user space as ksmbd.mountd.
++File operations that are related with performance (open/read/write/close etc.)
++in kernel space (ksmbd). This also allows for easier integration with VFS
++interface for all file operations.
++
++ksmbd (kernel daemon)
++---------------------
++
++When the server daemon is started, It starts up a forker thread
++(ksmbd/interface name) at initialization time and open a dedicated port 445
++for listening to SMB requests. Whenever new clients make request, Forker
++thread will accept the client connection and fork a new thread for dedicated
++communication channel between the client and the server. It allows for parallel
++processing of SMB requests(commands) from clients as well as allowing for new
++clients to make new connections. Each instance is named ksmbd/1~n(port number)
++to indicate connected clients. Depending on the SMB request types, each new
++thread can decide to pass through the commands to the user space (ksmbd.mountd),
++currently DCE/RPC commands are identified to be handled through the user space.
++To further utilize the linux kernel, it has been chosen to process the commands
++as workitems and to be executed in the handlers of the ksmbd-io kworker threads.
++It allows for multiplexing of the handlers as the kernel take care of initiating
++extra worker threads if the load is increased and vice versa, if the load is
++decreased it destroys the extra worker threads. So, after connection is
++established with client. Dedicated ksmbd/1..n(port number) takes complete
++ownership of receiving/parsing of SMB commands. Each received command is worked
++in parallel i.e., There can be multiple clients commands which are worked in
++parallel. After receiving each command a separated kernel workitem is prepared
++for each command which is further queued to be handled by ksmbd-io kworkers.
++So, each SMB workitem is queued to the kworkers. This allows the benefit of load
++sharing to be managed optimally by the default kernel and optimizing client
++performance by handling client commands in parallel.
++
++ksmbd.mountd (user space daemon)
++--------------------------------
++
++ksmbd.mountd is userspace process to, transfer user account and password that
++are registered using ksmbd.adduser(part of utils for user space). Further it
++allows sharing information parameters that parsed from smb.conf to ksmbd in
++kernel. For the execution part it has a daemon which is continuously running
++and connected to the kernel interface using netlink socket, it waits for the
++requests(dcerpc and share/user info). It handles RPC calls (at a minimum few
++dozen) that are most important for file server from NetShareEnum and
++NetServerGetInfo. Complete DCE/RPC response is prepared from the user space
++and passed over to the associated kernel thread for the client.
++
++
++KSMBD Feature Status
++====================
++
++============================== =================================================
++Feature name                   Status
++============================== =================================================
++Dialects                       Supported. SMB2.1 SMB3.0, SMB3.1.1 dialects
++                               (intentionally excludes security vulnerable SMB1
++                               dialect).
++Auto Negotiation               Supported.
++Compound Request               Supported.
++Oplock Cache Mechanism         Supported.
++SMB2 leases(v1 lease)          Supported.
++Directory leases(v2 lease)     Planned for future.
++Multi-credits                  Supported.
++NTLM/NTLMv2                    Supported.
++HMAC-SHA256 Signing            Supported.
++Secure negotiate               Supported.
++Signing Update                 Supported.
++Pre-authentication integrity   Supported.
++SMB3 encryption(CCM, GCM)      Supported. (CCM and GCM128 supported, GCM256 in
++                               progress)
++SMB direct(RDMA)               Partially Supported. SMB3 Multi-channel is
++                               required to connect to Windows client.
++SMB3 Multi-channel             In Progress.
++SMB3.1.1 POSIX extension       Supported.
++ACLs                           Partially Supported. only DACLs available, SACLs
++                               (auditing) is planned for the future. For
++                               ownership (SIDs) ksmbd generates random subauth
++                               values(then store it to disk) and use uid/gid
++                               get from inode as RID for local domain SID.
++                               The current acl implementation is limited to
++                               standalone server, not a domain member.
++                               Integration with Samba tools is being worked on
++                               to allow future support for running as a domain
++                               member.
++Kerberos                       Supported.
++Durable handle v1,v2           Planned for future.
++Persistent handle              Planned for future.
++SMB2 notify                    Planned for future.
++Sparse file support            Supported.
++DCE/RPC support                Partially Supported. a few calls(NetShareEnumAll,
++                               NetServerGetInfo, SAMR, LSARPC) that are needed
++                               for file server handled via netlink interface
++                               from ksmbd.mountd. Additional integration with
++                               Samba tools and libraries via upcall is being
++                               investigated to allow support for additional
++                               DCE/RPC management calls (and future support
++                               for Witness protocol e.g.)
++ksmbd/nfsd interoperability    Planned for future. The features that ksmbd
++                               support are Leases, Notify, ACLs and Share modes.
++============================== =================================================
++
++
++How to run
++==========
++
++1. Download ksmbd-tools and compile them.
++	- https://github.com/cifsd-team/ksmbd-tools
++
++2. Create user/password for SMB share.
++
++	# mkdir /etc/ksmbd/
++	# ksmbd.adduser -a <Enter USERNAME for SMB share access>
++
++3. Create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
++	- Refer smb.conf.example and
++          https://github.com/cifsd-team/ksmbd-tools/blob/master/Documentation/configuration.txt
++
++4. Insert ksmbd.ko module
++
++	# insmod ksmbd.ko
++
++5. Start ksmbd user space daemon
++	# ksmbd.mountd
++
++6. Access share from Windows or Linux using CIFS
++
++Shutdown KSMBD
++==============
++
++1. kill user and kernel space daemon
++	# sudo ksmbd.control -s
++
++How to turn debug print on
++==========================
++
++Each layer
++/sys/class/ksmbd-control/debug
++
++1. Enable all component prints
++	# sudo ksmbd.control -d "all"
++
++2. Enable one of components(smb, auth, vfs, oplock, ipc, conn, rdma)
++	# sudo ksmbd.control -d "smb"
++
++3. Show what prints are enable.
++	# cat/sys/class/ksmbd-control/debug
++	  [smb] auth vfs oplock ipc conn [rdma]
++
++4. Disable prints:
++	If you try the selected component once more, It is disabled without brackets.
+diff --git a/Documentation/filesystems/index.rst b/Documentation/filesystems/index.rst
+index 246af51b277a..7e1f44c14e6f 100644
+--- a/Documentation/filesystems/index.rst
++++ b/Documentation/filesystems/index.rst
+@@ -72,7 +72,7 @@ Documentation for filesystem implementations.
+    befs
+    bfs
+    btrfs
+-   cifs/cifsroot
++   cifs/index
+    ceph
+    coda
+    configfs
+-- 
+2.17.1
 
-On 7/15/21 4:45 PM, dai.ngo@oracle.com wrote:
-> Hi Bruce,
->
-> I'm doing some locking testing between NFSv4 and SMB client and
-> think there are some issues on the server that allows both clients
-> to lock the same file at the same time.
->
-> Here is what I did:
->
-> NOTE: lck is a simple program that use lockf(3) to lock a file from
-> offset 0 to the length specified by '-l'.
->
-> On NFSv4 client
-> ---------------
->
-> [root@nfsvmd07 ~]# nfsstat -m
-> /tmp/mnt from nfsvmf24:/root/smb_share
-> Flags: rw,relatime,vers=4.1,rsize=1048576,wsize=1048576,namlen=255,hard,
-> proto=tcp,timeo=600,retrans=2,sec=sys,clientaddr=10.80.62.47,
->        local_lock=none,addr=10.80.111.94
-> [root@nfsvmd07 ~]#
->
->
-> [root@nfsvmd07 ~]# ./lck -p /tmp/mnt/messages -W -l 100000000
-> Lck/file: 1, Maxlocks: 10000000
-> Locking[/tmp/mnt/messages] Offset[0] Len[100000000] N[0]...doing F_LOCK..
-> LOCKED...
->
-> Locks[1] files[1] took[2.000s] sleep waiting...Hit Control-C to stop
->
-> [NFS client successfully locks the file]
->
-> On SMB client
-> -------------
->
-> [root@nfsvme24 ~]# mount |grep cifs
-> //nfsvmf24/smb_share on /tmp/mnt type cifs 
-> (rw,relatime,vers=3.1.1,cache=strict,username=root,uid=0,noforceuid,gid=0,noforcegid,addr=10.80.111.94,file_mode=0755,dir_mode=0755,soft,nounix,serverino,mapposix,rsize=4194304,wsize=4194304,bsize=1048576,echo_interval=60,actimeo=1)
-> [root@nfsvme24 ~]#
->
-> [root@nfsvme24 ~]# smbclient -L nfsvmf24
-> Enter SAMBA\root's password:
->
->     Sharename       Type      Comment
->     ---------       ----      -------
->     print$          Disk      Printer Drivers
->     smb_share       Disk      Test Samba Share       <<===== share to 
-> mount
->     IPC$            IPC       IPC Service (Samba 4.10.16)
->     root            Disk      Home Directories
-> Reconnecting with SMB1 for workgroup listing.
->
->     Server               Comment
->     ---------            -------
->
->     Workgroup            Master
->     ---------            -------
-> [root@nfsvme24 ~]#
->
-> [root@nfsvme24 ~]# ./lck -p /tmp/mnt/messages -W -l 100000000
-> Lck/file: 1, Maxlocks: 10000000
-> Locking[/tmp/mnt/messages] Offset[0] Len[100000000] N[0]...doing F_LOCK..
-> LOCKED...
->
-> Locks[1] files[1] took[2.000s] sleep waiting...Hit Control-C to stop
->
-> [SMB client successfully locks the file]
->
-> The same issue happens when either client locks the file first.
-> I think this is what has happened:
->
-> 1. NFSv4 client opens and locks the file first
->
->     . NFSv4 client send OPEN and LOCK to server, server replies
->       OK on both requests.
->
->     . SMB client sends create request with Oplock==Lease for
->       the same file.
->
->     . server holds off on replying to SMB client's create request,
->       recalls delegation from NFSv4 client, waits for NFSv4 client
->       to return the delegation then replies success to SMB client's
->       create request with lease granted (Oplock==Lease).
->
->       NOTE: I think SMB server should replies the create request
->       with Oplock==None to force the SMB client to sends the
->       lock request.
->
->     . Once SMB client receives the reply of the create with
->       'Oplock==Lease', it assumes it has full control of the file
->       therefor it does not need to send the lock request.
->
->     . both NFSv4 and SMB client now think they have locked the file.
->
-> pcap:  nfs_lock_smb_lock.pcap
->
-> 2. SMB client creates the file with 'Oplock==Lease' first
->
->     . SMB sends create request with 'Oplock==Lease' to server,
->       server replies OK with 'Oplock==Lease'. SMB client skips
->       sending lock request since it assumes it has full control
->       of the file with the lease.
->
->     . NFSv4 client sends OPEN to server, server replies OK with
->       delagation is none. NFSv4 client sends LOCK request, since
->       no lock was created in the kernel for the SMB client, the
->       lock was granted to the NFSv4 client.
->
->      NOTE: I think the SMB server should send lease break
->      notification to the SMB client, wait for the lease break
->      acknowledgment from SMB client before replying to the
->      OPEN of the NFSv4 client. This will force the SMB client
->      to send the lock request to the server.
->
->     . both NFSv4 and SMB client now think they have locked the file.
->
-> Your thought?
->
-> Thanks,
->
-> -Dai
->
-
---------------03F37B337EE450A249E8E3E0
-Content-Type: application/octet-stream; x-mac-type="0"; x-mac-creator="0";
- name="nfs_lock_smb_lock.pcap"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="nfs_lock_smb_lock.pcap"
-
-Cg0NCmwAAABNPCsaAQAAAP//////////AwARAExpbnV4IDUuMTMuMC1yYzYrAAAABAAuAER1bXBj
-YXAgMS4xMC4xNCAoR2l0IFJldiBVbmtub3duIGZyb20gdW5rbm93bikAAAAAAABsAAAAAQAAAGAA
-AABxAAAAAAAEAAIAAwBhbnkACQABAAkAAAALABoAAGhvc3QgbmZzdm1lMjQgb3IgbmZzdm1kMDcA
-AAwAEQBMaW51eCA1LjEzLjAtcmM2KwAAAAAAAABgAAAABgAAADQBAAAAAAAAbcqRFnpswQwUAQAA
-BAEAAAAAAAEABjzfHo6kQAAACABFAAD0WK9AAD8GICgKUD4vClBvXgMHCAESrPJNjJuIPYAYAfUq
-kQAAAQEIChTGFqAYYXMigAAAvCWmvCwAAAAAAAAAAgABhqMAAAAEAAAAAQAAAAEAAAAwAAAAAAAA
-ABZuZnN2bWQwNy51cy5vcmFjbGUuY29tAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA
-AQAAAAMAAAA1C6jfYOd97TsHAAAAAAAAAAAABWUAAAAAAAAAAAAAAAAAAAAWAAAAHAEABwDOpzcM
-AAAAAAdTl5w8ik5csaYqfzbhCo8AAAAJAAAAAgAQARoAsKI6AAAAAAAAAAAAAAAAAAAAADQBAAAG
-AAAAaAEAAAAAAABtypEWS6/EDEgBAAA4AQAAAAQAAQAGCAAnclVkAAAIAEUAASgpMEAAQAZOcwpQ
-b14KUD4vCAEDB4ybiD0SrPMNgBgMdcNHAAABAQgKGGGgMRTGFqCAAADwJaa8LAAAAAEAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAADAAAANQAAAAALqN9g533tOwcAAAAAAAAAAAAFZQAAAAAAAAAd
-AAAAHQAAAAAAAAAWAAAAAAAAAAkAAAAAAAAAAgAQARoAsKI6AAAAgAAAAAJg72PUI3/iEgAAAAAA
-AAAjB1OXnDyKTlyxpip/NuEKjwAAAAAMN6fOAAAB+AAAAAIAAAABMAAAAAAAAAEwAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAABg72PXMwKCcQAAAABg72PUI3/iEgAAAABg72PUI3/iEgAAAAAMN6fOAAAA
-AAAAAAAAAAAAAAAAAGgBAAAGAAAAdAAAAAAAAABtypEW53/ZDFQAAABEAAAAAAAAAQAGPN8ejqRA
-AAAIAEUAADRYsEAAPwYg5wpQPi8KUG9eAwcIARKs8w2Mm4kxgBAB9agSAAABAQgKFMYWoRhhoDEA
-AAAAAAAAAAAAAAAAAAAAdAAAAAYAAABAAQAAAAAAAG3KkRapAN4MIAEAABABAAAAAAABAAY83x6O
-pEAAAAgARQABAFixQAA/BiAaClA+LwpQb14DBwgBEqzzDYybiTGAGAH1EAAAAAEBCAoUxhaiGGGg
-MYAAAMgmprwsAAAAAAAAAAIAAYajAAAABAAAAAEAAAABAAAAMAAAAAAAAAAWbmZzdm1kMDcudXMu
-b3JhY2xlLmNvbQAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAADAAAANQuo32Dn
-fe07BwAAAAAAAAAAAAVmAAAAAAAAAAAAAAAAAAAAFgAAACgBAAeBzqc3DAAAAAAHU5ecPIpOXLGm
-Kn824QqP96c3DAAAAADq1tCaAAAACQAAAAIAEAEaALCiOgAAAAAAAAAAAAAAAAAAAABAAQAABgAA
-AGgBAAAAAAAAbcqRFmUb4AxIAQAAOAEAAAAEAAEABggAJ3JVZAAACABFAAEoKTFAAEAGTnIKUG9e
-ClA+LwgBAweMm4kxEqzz2YAYDHXDRwAAAQEIChhhoDIUxhaigAAA8CamvCwAAAABAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAwAAADUAAAAAC6jfYOd97TsHAAAAAAAAAAAABWYAAAAAAAAAHQAA
-AB0AAAAAAAAAFgAAAAAAAAAJAAAAAAAAAAIAEAEaALCiOgAAAIAAAAABYO9r2gw/VIIAAAAAAAS9
-8AdTl5w8ik5csaYqfzbhCo8AAAAADDen9wAAAYAAAAABAAAAATAAAAAAAAABMAAAAAAAAAAAAAAA
-AAAAAAAEwAAAAAAAYO9j4QlS45wAAAAAYO9r2gw/VIIAAAAAYO9r2gyAzxYAAAAADDen9wAAAAAA
-AAAAAAAAAAAAAABoAQAABgAAAIQBAAAAAAAAbcqRFlSFAw1kAQAAVAEAAAAAAAEABjzfHo6kQAAA
-CABFAAFEWLJAAD8GH9UKUD4vClBvXgMHCAESrPPZjJuKJYAYAfXQawAAAQEIChTGFqQYYaAygAAB
-DCemvCwAAAAAAAAAAgABhqMAAAAEAAAAAQAAAAEAAAAwAAAAAAAAABZuZnN2bWQwNy51cy5vcmFj
-bGUuY29tAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAUAAAA1C6jfYOd97TsH
-AAAAAAAAAAAABWcAAAAAAAAAAAAAAAEAAAAWAAAAKAEAB4HOpzcMAAAAAAdTl5w8ik5csaYqfzbh
-Co/3pzcMAAAAAOrW0JoAAAASAAAAAAAAAAMAAAAAC6jfYOd97TsAAAAYb3BlbiBpZDoAAAAoAAAA
-AAAKMEviBBAdAAAAAAAAAAQAAAADAAAALQAAAAkAAAACABABGgCwojoAAAAAAAAAAAAAAAAAAAAA
-hAEAAAYAAADYAQAAAAAAAG3KkRZFgAYNuAEAAKgBAAAABAABAAYIACdyVWQAAAgARQABmCkyQABA
-Bk4BClBvXgpQPi8IAQMHjJuKJRKs9OmAGAx+w7cAAAEBCAoYYaA1FMYWpIAAAWAnprwsAAAAAQAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAA1AAAAAAuo32Dnfe07BwAAAAAAAAAAAAVnAAAA
-AAAAAB0AAAAdAAAAAAAAABYAAAAAAAAAEgAAAAAAAAABC6jfYOd97TskAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAkAAAAAQAAAAAAAAABAAAAAQuo32Dnfe07JQAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAwAAAAAAAAAtAAAADQAAAAkAAAAAAAAAAgAQARoAsKI6AAAAgAAAAAFg72vaDD9UggAA
-AAAABL3wB1OXnDyKTlyxpip/NuEKjwAAAAAMN6f3AAABgAAAAAEAAAABMAAAAAAAAAEwAAAAAAAA
-AAAAAAAAAAAAAATAAAAAAABg72PhCVLjnAAAAABg72vaDD9UggAAAABg72vaDIDPFgAAAAAMN6f3
-AAAAAABDwHYAHAABAAApXNgBAAAGAAAAiAEAAAAAAABtypEWqektDWgBAABYAQAAAAAAAQAGPN8e
-jqRAAAAIAEUAAUhYs0AAPwYf0ApQPi8KUG9eAwcIARKs9OmMm4uJgBgB9c4HAAABAQgKFMYWpxhh
-oDWAAAEQKKa8LAAAAAAAAAACAAGGowAAAAQAAAABAAAAAQAAADAAAAAAAAAAFm5mc3ZtZDA3LnVz
-Lm9yYWNsZS5jb20AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAwAAADULqN9g
-533tOwcAAAAAAAAAAAAFaAAAAAAAAAAAAAAAAQAAABYAAAAoAQAHgc6nNwwAAAAAB1OXnDyKTlyx
-pip/NuEKj/enNwwAAAAA6tbQmgAAAAwAAAAEAAAAAAAAAAAAAAAAAAAAAAX14QAAAAABAAAAAAAA
-AAELqN9g533tOyQAAAAAAAAAC6jfYOd97TsAAAAUbG9jayBpZDoAAAAoAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAiAEAAAYAAADoAAAAAAAAAG3KkRYoWjANyAAAALgAAAAABAABAAYIACdyVWQAAAgA
-RQAAqCkzQABABk7wClBvXgpQPi8IAQMHjJuLiRKs9f2AGAyGwscAAAEBCAoYYaA4FMYWp4AAAHAo
-prwsAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAA1AAAAAAuo32Dnfe07BwAAAAAA
-AAAAAAVoAAAAAAAAAB0AAAAdAAAAAAAAABYAAAAAAAAADAAAAAAAAAABC6jfYOd97TsmAAAAAAAA
-AAAAAAAAAAAAAAAAAOgAAAAGAAAAdAAAAAAAAABtypEWs5/wD1QAAABEAAAAAAAAAQAGPN8ejqRA
-AAAIAEUAADRYtEAAPwYg4wpQPi8KUG9eAwcIARKs9f2Mm4v9gBAB9aIcAAABAQgKFMYW1BhhoDgG
-b3JhY2xlA2NvbQAAHAABdAAAAAYAAAB0AAAAAAAAAG3KkRYRN6/iVAAAAEQAAAAAAAABAAY83x6O
-pEAAAAgARQAANNM6QAA/BqYjClA+aApQb14D+QgBXxIYd/IOQGaAEAH1ZKIAAAEBCApGAlGzRam6
-aAZvcmFjbGUDY29tAAABAAF0AAAABgAAAHQAAAAAAAAAbcqRFuunr+JUAAAARAAAAAAEAAEABggA
-J3JVZAAACABFAAA08uNAAEAGhXoKUG9eClA+aAgBA/nyDkBmXxIYeIAQAfXCjAAAAQEICkWqMmdG
-AWG0D3pVPscXuS8pFV6vThx+gnQAAAAGAAAA/AAAAAAAAABtypEWT2u24twAAADMAAAAAAAAAQAG
-PN8ejqRAAAAIAEUAALzTO0AAPwalmgpQPmgKUG9eA/kIAV8SGHjyDkBmgBgB9XnXAAABAQgKRgJR
-s0WpumiAAACElZiKqgAAAAAAAAACAAGGowAAAAQAAAABAAAAAQAAACwAAAAAAAAAFm5mc3ZtZTI0
-LnVzLm9yYWNsZS5jb20AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAANQuo32Dl
-fe07BgAAAAAAAAAAAABkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwAAAAGAAAAyAAAAAAA
-AABtypEWji+44qgAAACYAAAAAAQAAQAGCAAnclVkAAAIAEUAAIjy5EAAQAaFJQpQb14KUD5oCAED
-+fIOQGZfEhkAgBgB9cLgAAABAQgKRaoyaEYCUbOAAABQlZiKqgAAAAEAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAABAAAANQAAAAALqN9g5X3tOwYAAAAAAAAAAAAAZAAAAAAAAAAdAAAAHQAAAAAA
-AAAAAAAAAAAAAAAAAAAAyAAAAAYAAAB0AAAAAAAAAG3KkRZjWsniVAAAAEQAAAAAAAABAAY83x6O
-pEAAAAgARQAANNM8QAA/BqYhClA+aApQb14D+QgBXxIZAPIOQLqAEAH168MAAAEBCApGAlG0Raoy
-aAZvcmFjbGUDY29tAAAcAAF0AAAABgAAALwAAAAAAAAAbcqRFh47zeKcAAAAjAAAAAAAAAEABjzf
-Ho6kQAAACABFAAB8jMJAAD8G7FMKUD5oClBvXt34Ab1N00LHXBmxbYAYDAsJSwAAAQEICkYCUbVF
-qTopAAAARP5TTUJAAAAAAAAAAA0AAQAAAAAAAAAAALAAAAAAAAAAu3QAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAEAAAAAAAAAALwAAAAGAAAAvAAAAAAAAABtypEWWoHR
-4pwAAACMAAAAAAQAAQAGCAAnclVkAAAIAEUAAHwPnkAAQAZoeApQb14KUD5oAb3d+FwZsW1N00MP
-gBgB9cLUAAABAQgKRaoyakYCUbUAAABE/lNNQkAAAAAAAAAADQABAAEAAAAAAAAAsAAAAAAAAAC7
-dAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAdAAAAHQAAAAAAAAAWvAAAAAYA
-AAB0AAAAAAAAAG3KkRbxX+LiVAAAAEQAAAAAAAABAAY83x6OpEAAAAgARQAANIzDQAA/BuyaClA+
-aApQb17d+AG9TdNDD1wZsbWAEAwLGhgAAAEBCApGAlG2RaoyagAAAAAAAAAAAAAAAAAAAAB0AAAA
-BgAAAOABAAAAAAAAb8qRFh4xC0rAAQAAsAEAAAAAAAEABjzfHo6kQAAACABFAAGgjMRAAD8G6y0K
-UD5oClBvXt34Ab1N00MPXBmxtYAYDAve0wAAAQEICkYCaUBFqjJqAAABaP5TTUJAAAEAAAAAAAUA
-CgAAAAAAqAAAALEAAAAAAAAAz3QAAH/BlYl3W7+gAAAAAAAAAAAAAAAAAAAAAAAAAAA5AAAAAgAA
-AAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAcAAAABAAAAAAAAAHgAEACQAAAAGAAAAG0AZQBzAHMA
-YQBnAGUAcwAAAAAAAAAAAAAAAAAQAAQAAAAAAAAAAABRRmlkAAAAAP5TTUJAAAEAAAAAABAACgAE
-AAAAaAAAALIAAAAAAAAAz3QAAH/BlYl3W7+gAAAAAAAAAAAAAAAAAAAAAAAAAAApAAESZSAAAAAA
-AAAAAAAAAAAAAAAAAAD//////////////////////lNNQkAAAQAAAAAABgAKAAQAAAAAAAAAswAA
-AAAAAADPdAAAf8GViXdbv6AAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAA////////////////
-/////wAAAAAAAAAAAAAAAAAAAADgAQAABgAAAIgCAAAAAAAAb8qRFqKRGkpoAgAAWAIAAAAEAAEA
-BggAJ3JVZAAACABFAAJID59AAEAGZqsKUG9eClA+aAG93fhcGbG1TdNEe4AYAfXEoAAAAQEICkWq
-SfZGAmlAAAACEP5TTUJAAAEAAAAAAAUAAAABAAAA0AAAALEAAAAAAAAAz3QAAH/BlYl3W7+gAAAA
-AAAAAAAAAAAAAAAAAAAAAABZAAAAAQAAAO8kJt/+eNcB7yQm3/541wESK7afA3nXARIrtp8DedcB
-AAAQAAAAAADwvQQAAAAAACAAAAAAAAAAkABXAAAAAADcr0ItAAAAAJgAAAA4AAAAAAAAABAABAAA
-ABgAIAAAAFFGaWQAAAAA96c3DAAAAAAA/gAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+U01CQAABAAAA
-AAAQAAAABQAAAMAAAACyAAAAAAAAAM90AAB/wZWJd1u/oAAAAAAAAAAAAAAAAAAAAAAAAAAACQBI
-AHYAAADvJCbf/njXAe8kJt/+eNcBEiu2nwN51wESK7afA3nXASAAAAAAAAAAAAAQAAAAAADwvQQA
-AAAAAAEAAAAAAAAA96c3DAAAAAAAAAAAgAAAAAAAAAAAAAAAIAAAAAAAAAASAAAAXABtAGUAcwBz
-AGEAZwBlAHMAAAD+U01CQAABAAAAAAAGAB4ABQAAAAAAAACzAAAAAAAAAM90AAB/wZWJd1u/oAAA
-AAAAAAAAAAAAAAAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACIAgAABgAAAHQAAAAAAAAA
-b8qRFqi1KUpUAAAARAAAAAAAAAEABjzfHo6kQAAACABFAAA0jMVAAD8G7JgKUD5oClBvXt34Ab1N
-00R7XBmzyYAQDAvnfwAAAQEICkYCaUJFqkn2gAABDCemvCwAAAAAAAAAAnQAAAAGAAAAmAEAAAAA
-AABvypEWUtzzSngBAABoAQAAAAAAAQAGPN8ejqRAAAAIAEUAAViMxkAAPwbrcwpQPmgKUG9e3fgB
-vU3TRHtcGbPJgBgMC0RbAAABAQgKRgJpT0WqSfYAAAEg/lNNQkAAAQAAAAAABQAKAAAAAAAAAAAA
-tAAAAAAAAADPdAAAf8GViXdbv6AAAAAAAAAAAAAAAAAAAAAAAAAAADkAAP8CAAAAAAAAAAAAAAAA
-AAAAAAAAAIAAAMAAAAAABwAAAAMAAABAAAAAeAAQAJAAAACQAAAAbQBlAHMAcwBhAGcAZQBzAAAA
-AAAAAAAAUAAAABAABAAAABgANAAAAFJxTHMAAAAADlePZfYgStOHTu2kktENEwcAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAEAAEAAAAGAAQAAAAREhuUQAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAABAABAAAAAAAAAAAAFFGaWQAAAAAMAAAAAAAAAAAAAAAAAAAAJgBAAAG
-AAAASAEAAAAAAABvypEWnqL7SigBAAAYAQAAAAQAAQAGCAAnclVkAAAIAEUAAQgpNEAAQAZOjwpQ
-b14KUD4vCAEDB4ybi/0SrPX9gBgMhsMnAAABAQgKGGHF0hTGFtSAAADQMiOoIAAAAAAAAAACQAAA
-AAAAAAEAAAABAAAAAQAAACwAAAAAAAAAFm5mc3ZtZjI0LnVzLm9yYWNsZS5jb20AAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAgAAAAsLqN9g533tOwcAAAAAAAAAAAAACAAAAAAA
-AAAAAAAAAAAAAAAAAAAEAAAAAQuo32Dnfe07JQAAAAAAAAAAAAAoAQAHgc6nNwwAAAAAB1OXnDyK
-Tlyxpip/NuEKj/enNwwAAAAA6tbQmgX14QAAAAABAAAAAAAAAAFIAQAABgAAAHQAAAAAAAAAb8qR
-FtOqEUtUAAAARAAAAAAAAAEABjzfHo6kQAAACABFAAA0WLVAAD8GIOIKUD4vClBvXgMHCAESrPX9
-jJuM0YAQAfVWPwAAAQEIChTGPEMYYcXSgAAAcCimvCwAAAABAAAAAHQAAAAGAAAAzAAAAAAAAABv
-ypEWZ30iS6wAAACcAAAAAAAAAQAGPN8ejqRAAAAIAEUAAIxYtkAAPwYgiQpQPi8KUG9eAwcIARKs
-9f2Mm4zRgBgB9TRLAAABAQgKFMY8RBhhxdKAAABUMiOoIAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAACAAAACwAAAAALqN9g533tOwcAAAAAAAAAAAAACAAAAAAAAAAPAAAADwAAAAQAAAAA
-AAAAAAAAAAAAAAAAAAAAAMwAAAAGAAAAVAEAAAAAAABvypEWdREmSzQBAAAkAQAAAAAAAQAGPN8e
-jqRAAAAIAEUAARRYt0AAPwYgAApQPi8KUG9eAwcIARKs9lWMm4zRgBgB9XmoAAABAQgKFMY8RBhh
-xdKAAADcKaa8LAAAAAAAAAACAAGGowAAAAQAAAABAAAAAQAAADAAAAAAAAAAFm5mc3ZtZDA3LnVz
-Lm9yYWNsZS5jb20AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAABAAAABAAAADULqN9g
-533tOwcAAAAAAAAAAAAFaQAAAAAAAAAAAAAAAQAAABYAAAAoAQAHgc6nNwwAAAAAB1OXnDyKTlyx
-pip/NuEKj/enNwwAAAAA6tbQmgAAAAkAAAACAAAAGAAwAAAAAAAIAAAAAQuo32Dnfe07JQAAAAAE
-Cv7nqcDBAAEAAQAAKRdUAQAABgAAAHQAAAAAAAAAb8qRFmP5KEtUAAAARAAAAAAEAAEABggAJ3JV
-ZAAACABFAAA0KTVAAEAGT2IKUG9eClA+LwgBAweMm4zREqz3NYAQDIbCUwAAAQEIChhhxdUUxjxE
-D3pVPscXuS8pFV6vThx+gnQAAAAGAAAAGAEAAAAAAABvypEWaRksS/gAAADoAAAAAAQAAQAGCAAn
-clVkAAAIAEUAANgpNkAAQAZOvQpQb14KUD4vCAEDB4ybjNESrPc1gBgMhsL3AAABAQgKGGHF1RTG
-PESAAACgKaa8LAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAANQAAAAALqN9g533t
-OwcAAAAAAAAAAAAFaQAAAAAAAAAdAAAAHQAAAAAAAAAWAAAAAAAAAAkAAAAAAAAAAgAAABgAMAAA
-AAAAKGDva9oMP1SCAAAAAAAEvfAAAAAAYO9r2gw/VIIAAAAAYO9r2gyAzxYAAAAIAAAAAAAAAAAA
-AAAAAAAAAAAAAAAYAQAABgAAAHQAAAAAAAAAb8qRFvYJQktUAAAARAAAAAAAAAEABjzfHo6kQAAA
-CABFAAA0WLhAAD8GIN8KUD4vClBvXgMHCAESrPc1jJuNdYAQAfVUXQAAAQEIChTGPEYYYcXVgAAA
-UJWYiqoAAAABAAAAAHQAAAAGAAAAlAEAAAAAAABvypEW5SVRS3QBAABkAQAAAAQAAQAGCAAnclVk
-AAAIAEUAAVQPoEAAQAZnngpQb14KUD5oAb3d+FwZs8lN00WfgBgB9cOsAAABAQgKRapKCkYCaU8A
-AAEc/lNNQkAAAQAAAAAABQAKAAEAAAAAAAAAtAAAAAAAAADPdAAAf8GViXdbv6AAAAAAAAAAAAAA
-AAAAAAAAAAAAAFkA/wABAAAA7yQm3/541wHvJCbf/njXARIrtp8DedcBEiu2nwN51wEAABAAAAAA
-APC9BAAAAAAAIAAAAAAAAABzDdlLAAAAAFsEhPkAAAAAmAAAAIQAAAA4AAAAEAAEAAAAGAAgAAAA
-UUZpZAAAAAD3pzcMAAAAAAD+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAQAAAAYADQAAABS
-cUxzAAAAAA5Xj2X2IErTh07tpJLRDRMHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA
-AAAAAAAAAAAAAAAAAAAAAAAAlAEAAAYAAAB0AAAAAAAAAG/KkRbCgGFLVAAAAEQAAAAAAAABAAY8
-3x6OpEAAAAgARQAANIzHQAA/BuyWClA+aApQb17d+AG9TdNFn1wZtOmAEAwL5RMAAAEBCApGAmlW
-RapKCgAAAET+U01CQAAAAAAAAAB0AAAABgAAAFwBAAAAAAAAcMqRFltUkTQ8AQAALAEAAAAAAAEA
-BjzfHo6kQAAACABFAAEcWLlAAD8GH/YKUD4vClBvXgMHCAESrPc1jJuNdYAYAfVnEAAAAQEIChTG
-S5AYYcXVgAAA5CqmvCwAAAAAAAAAAgABhqMAAAAEAAAAAQAAAAEAAAAwAAAAAAAAABZuZnN2bWQw
-Ny51cy5vcmFjbGUuY29tAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAMAAAA1
-C6jfYOd97TsHAAAAAAAAAAAABWoAAAAAAAAAAAAAAAEAAAAWAAAAKAEAB4HOpzcMAAAAAAdTl5w8
-ik5csaYqfzbhCo/3pzcMAAAAAOrW0JoAAAAOAAAAAgAAAAAAAAABC6jfYOd97TsmAAAAAAAAAAAA
-AAD//////////yN/4hIAAAAADDenzgAAAABcAQAABgAAAOgAAAAAAAAAcMqRFrEQlDTIAAAAuAAA
-AAAEAAEABggAJ3JVZAAACABFAACoKTdAAEAGTuwKUG9eClA+LwgBAweMm411Eqz4HYAYDIbCxwAA
-AQEIChhh1SEUxkuQgAAAcCqmvCwAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAADUA
-AAAAC6jfYOd97TsHAAAAAAAAAAAABWoAAAAAAAAAHQAAAB0AAAAAAAAAFgAAAAAAAAAOAAAAAAAA
-AAILqN9g533tOyYAAAAAAAAAAAAAAAAAAAAAAAAA6AAAAAYAAAB0AAAAAAAAAHDKkRYDBqo0VAAA
-AEQAAAAAAAABAAY83x6OpEAAAAgARQAANFi6QAA/BiDdClA+LwpQb14DBwgBEqz4HYybjemAEAH1
-NGoAAAEBCAoUxkuRGGHVIQAAAWj+U01CQAABAAAAAAB0AAAABgAAABQBAAAAAAAAcMqRFvVBsDT0
-AAAA5AAAAAAAAAEABjzfHo6kQAAACABFAADUWLtAAD8GIDwKUD4vClBvXgMHCAESrPgdjJuN6YAY
-AfWV3QAAAQEIChTGS5IYYdUhgAAAnCumvCwAAAAAAAAAAgABhqMAAAAEAAAAAQAAAAEAAAAwAAAA
-AAAAABZuZnN2bWQwNy51cy5vcmFjbGUuY29tAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAA
-AAAAAQAAAAIAAAA1C6jfYOd97TsHAAAAAAAAAAAABWsAAAAAAAAAAAAAAAEAAAAtAAAAAguo32Dn
-fe07JgAAABAABAAAABgAIAAAAFFGaWQUAQAABgAAAFgBAAAAAAAAcMqRFv12szQ4AQAAKAEAAAAA
-AAEABjzfHo6kQAAACABFAAEYWLxAAD8GH/cKUD4vClBvXgMHCAESrPi9jJuN6YAYAfU64QAAAQEI
-ChTGS5IYYdUhgAAA4CymvCwAAAAAAAAAAgABhqMAAAAEAAAAAQAAAAEAAAAwAAAAAAAAABZuZnN2
-bWQwNy51cy5vcmFjbGUuY29tAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAQA
-AAA1C6jfYOd97TsHAAAAAAAAAAAAAA0AAAABAAAAAQAAAAEAAAAWAAAAKAEAB4HOpzcMAAAAAAdT
-l5w8ik5csaYqfzbhCo/3pzcMAAAAAOrW0JoAAAAJAAAAAgAAABgAMCAAAAAABAAAAAAAAAABC6jf
-YOd97TskAAAAAAAAAAAKMEviBBAdAAAAAFgBAAAGAAAA0AAAAAAAAABwypEWFzC1NLAAAACgAAAA
-AAQAAQAGCAAnclVkAAAIAEUAAJApOEAAQAZPAwpQb14KUD4vCAEDB4ybjekSrPmhgBgMj8KvAAAB
-AQgKGGHVJBTGS5KAAABYK6a8LAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAANQAA
-AAALqN9g533tOwcAAAAAAAAAAAAFawAAAAAAAAAdAAAAHQAAAAAAAAAtAAAAAIAAAMAAAAAABwAA
-AAMAAADQAAAABgAAADABAAAAAAAAcMqRFvCWuTQQAQAAAAEAAAAEAAEABggAJ3JVZAAACABFAADw
-KTlAAEAGTqIKUG9eClA+LwgBAweMm45FEqz5oYAYDI/DDwAAAQEIChhh1SQUxkuSgAAAuCymvCwA
-AAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAADUAAAAAC6jfYOd97TsHAAAAAAAAAAAA
-AA0AAAABAAAAHQAAAB0AAAAAAAAAFgAAAAAAAAAJAAAAAAAAAAIAAAAYADAgAAAAADBg72vaDD9U
-ggAAAAAABL3wAAAAAAAEwAAAAAAAYO9r2gw/VIIAAAAAYO9r2gyAzxYAAAAEAAAAAP////8AAAAA
-AAAAAAAAAAA8ik5csaYqfzbhCo/3pzcMMAEAAAYAAAB0AAAAAAAAAHDKkRZ1psg0VAAAAEQAAAAA
-AAABAAY83x6OpEAAAAgARQAANFi9QAA/BiDaClA+LwpQb14DBwgBEqz5oYybjkWAEAH1MoQAAAEB
-CAoUxkuUGGHVJIAAAHAoprwsAAAAAQAAAAB0AAAABgAAAHQAAAAAAAAAcMqRFu73yzRUAAAARAAA
-AAAAAAEABjzfHo6kQAAACABFAAA0WL5AAD8GINkKUD4vClBvXgMHCAESrPmhjJuPAYAQAfUxyAAA
-AQEIChTGS5QYYdUkgAAAVDIjqCAAAAABAAAAAHQAAAAGAAAA0AAAAAAAAABwypEWgo7u7LAAAACg
-AAAAAAAAAQAGPN8ejqRAAAAIAEUAAJCMyEAAPwbsOQpQPmgKUG9e3fgBvU3TRZ9cGbTpgBgMCypQ
-AAABAQgKRgKEs0WqSgoAAABY/lNNQkAAAQAAAAAABgAKAAAAAAAAAAAAtQAAAAAAAAC7dAAAf8GV
-iXdbv6AAAAAAAAAAAAAAAAAAAAAAAAAAABgAAQAAAAAAcw3ZSwAAAABbBIT5AAAAAAAAAAAAAAAB
-AAAABAAAADXQAAAABgAAAPQAAAAAAAAAcMqRFlg99OzUAAAAxAAAAAAEAAEABggAJ3JVZAAACABF
-AAC0D6FAAEAGaD0KUG9eClA+aAG93fhcGbTpTdNF+4AYAfXDDAAAAQEICkWqZWlGAoSzAAAAfP5T
-TUJAAAEAAAAAAAYACgABAAAAAAAAALUAAAAAAAAAu3QAAH/BlYl3W7+gAAAAAAAAAAAAAAAAAAAA
-AAAAAAA8AAEAAAAAAO8kJt/+eNcB7yQm3/541wESK7afA3nXARIrtp8DedcBAAAQAAAAAADwvQQA
-AAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA9AAAAAYAAAB0AAAAAAAAAHDKkRYkGQPtVAAAAEQAAAAA
-AAABAAY83x6OpEAAAAgARQAANIzJQAA/BuyUClA+aApQb17d+AG9TdNF+1wZtWmAEAwLrXoAAAEB
-CApGAoS0RaplaYAAAKApprwsAAAAAQAAAAB0AAAABgAAAHQAAAAAAAAAdcqRFhw/xAlUAAAARAAA
-AAAAAAEABjzfHo6kQAAACABFAAA00z1AAD8GpiAKUD5oClBvXgP5CAFfEhj/8g5AuoAQAfVzxQAA
-AQEICkYCybNFqjJogAAAUJWYiqoAAAABAAAAAHQAAAAGAAAAdAAAAAAAAAB1ypEWEMfECVQAAABE
-AAAAAAQAAQAGCAAnclVkAAAIAEUAADTy5UAAQAaFeApQb14KUD5oCAED+fIOQLpfEhkAgBAB9cKM
-AAABAQgKRaqqaEYCUbQAAAEc/lNNQkAAAQAAAAAAdAAAAAYAAAB0AAAAAAAAAHfKkRaaoSI9VAAA
-AEQAAAAAAAABAAY83x6OpEAAAAgARQAANFi/QAA/BiDYClA+LwpQb14DBwgBEqz5oIybjwGAEAH1
-u8wAAAEBCAoUxsGQGGHVJAAAAET+U01CQAAAAAAAAAB0AAAABgAAAHQAAAAAAAAAd8qRFiD/Ij1U
-AAAARAAAAAAEAAEABggAJ3JVZAAACABFAAA0KTpAAEAGT10KUG9eClA+LwgBAweMm48BEqz5oYAQ
-DI/CUwAAAQEIChhiSyIUxkuUgAAA5CqmvCwAAAAAAAAAAnQAAAA=
-
---------------03F37B337EE450A249E8E3E0
-Content-Type: application/octet-stream; x-mac-type="0"; x-mac-creator="0";
- name="smb_lock_nfs_lock.pcap"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="smb_lock_nfs_lock.pcap"
-
-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
-
---------------03F37B337EE450A249E8E3E0--
