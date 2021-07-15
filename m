@@ -5,46 +5,46 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFFF2C47E51
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jul 2021 13:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDE5C47E52
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jul 2021 13:40:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C153361279
-	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jul 2021 13:40:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA53E61167
+	for <linux-cifs@archiver.kernel.org>; Thu, 15 Jul 2021 13:40:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237776AbhGONnf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S237801AbhGONnf (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Thu, 15 Jul 2021 09:43:35 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:55658 "EHLO
+Received: from smtp-out1.suse.de ([195.135.220.28]:55660 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232830AbhGONn1 (ORCPT
+        with ESMTP id S232802AbhGONn1 (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jul 2021 09:43:27 -0400
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 4E96922848;
+        by smtp-out1.suse.de (Postfix) with ESMTP id 4DBA02282A;
         Thu, 15 Jul 2021 13:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1626356433; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1GlMykmW5dU6u8/oJfYiziq3SSg7iOhv9PkBlHqVviU=;
-        b=IJzT8B6zNrMkbuJkaFuSGNx/cysqu+RHwJTvkH5yLbzpaIbQeDaLN4yPYW9wwFijZdvvLm
-        c1weTUJbX1lXzJouKlVauWsIjKwDZz/7dQiAzNr1hSvktboSq2/tcS6xcgWW12x0UXyVfK
-        UMccAy7ex6v78nqCgbiyD+ueRWxtNfI=
+        bh=dSJNYi2EjK6WpJlFRpe2IuMqHuUJYHQH+NO2vWgyFGg=;
+        b=r7uAzkh/LSvTU+XWBd733PveaP53L/sk18I7vRhYd0S3xmB5TuJ7AZ0Fekgj5SXJ0B5SfA
+        SJA48ivXLVn5yZKZswQfFOQhR4tLyJ7O5926UjHyDGdIe4/D7UjmMQZLQiEB29PRfktlfw
+        PE4sXqT7AQoC5t17VGOWnzH6vWLrqgE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1626356433;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1GlMykmW5dU6u8/oJfYiziq3SSg7iOhv9PkBlHqVviU=;
-        b=jx+OTAvL9IZYxGuRCjFTGIz3mg3K4CyDjyms8YgB62fhqY6AcWjBS1fkDyxYMh1n5x1AND
-        Y9Tkw7oj4PW25mDw==
+        bh=dSJNYi2EjK6WpJlFRpe2IuMqHuUJYHQH+NO2vWgyFGg=;
+        b=cDdhW4+KKzF+Hly8A0dgozw6g2hc8xSeDQqt2K48qawD+fjxhXSZXfVot5JUTMlbo9xzjr
+        2oxXXVUmB7i3sNCA==
 Received: from quack2.suse.cz (unknown [10.100.200.198])
-        by relay2.suse.de (Postfix) with ESMTP id 3913DA3B99;
+        by relay2.suse.de (Postfix) with ESMTP id 3B7ECA3B9A;
         Thu, 15 Jul 2021 13:40:33 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 053DD1E0BF4; Thu, 15 Jul 2021 15:40:33 +0200 (CEST)
+        id 0E4B81E0BFC; Thu, 15 Jul 2021 15:40:33 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     <linux-fsdevel@vger.kernel.org>
 Cc:     <linux-ext4@vger.kernel.org>,
@@ -56,70 +56,97 @@ Cc:     <linux-ext4@vger.kernel.org>,
         linux-f2fs-devel@lists.sourceforge.net, linux-cifs@vger.kernel.org,
         ceph-devel@vger.kernel.org, Jan Kara <jack@suse.cz>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 02/14] documentation: Sync file_operations members with reality
-Date:   Thu, 15 Jul 2021 15:40:12 +0200
-Message-Id: <20210715134032.24868-2-jack@suse.cz>
+Subject: [PATCH 04/14] mm: Add functions to lock invalidate_lock for two mappings
+Date:   Thu, 15 Jul 2021 15:40:14 +0200
+Message-Id: <20210715134032.24868-4-jack@suse.cz>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210715133202.5975-1-jack@suse.cz>
 References: <20210715133202.5975-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2326; h=from:subject; bh=Wk8yjaZi1nJ5yIUh0xIbMo5SndDvKgP46BqPUOtHcOc=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBg8Dq93WYq4ngjQmYdY8pwDNohIZO7my5PAfcPGE+q NOtwZ9uJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYPA6vQAKCRCcnaoHP2RA2TSqB/ 9L720FlUO78Z0CB/KEXguatdutu1XO6ePPTnmUGaODlhryIwR9L3HEcKpAiQGju3/sA8lu09tpAFIr Adp7t4J28YyaW36/FWzh6wN45FBPx/VNgfcXP3VZQ27AFjIl+ZJQylq49gJMtVEvZGP6NSNccm8qjL jqIbMnCdJcadAeimaWt+xj4ArYK7uURLJPjY4qEO1Q8MlBeFGVr47y8nKkgDcv44NDfAuFnVw39V8S gYKQlxM8zGBQP4CJqZbNna12R97EfFnnmd4XcitTPsdbwzHmaSCxzBSeoAbwzLBYBLLSSGa8X6mMZh gHVaOXWmyyThBN3lWOFYwoBrCcR5cA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2711; h=from:subject; bh=pxG959YMz3LFOsl9BwK2LiP5YusDSYP7NTB6LUXCXkw=; b=owGbwMvMwME4Z+4qdvsUh5uMp9WSGBI+WO1nr+VnNVrxSG3uY7dEM6/6t3IXn6V6e1TJxjHcVdwm E8fZyWjMwsDIwSArpsiyOvKi9rV5Rl1bQzVkYAaxMoFMYeDiFICJlNZxMFy6VmzM/LIjtM65/7Wl4b fi+SYx4r+0rZmVOtIFYrhKml46Wr+TFtLf/MHog7Sp3I+jMoqyP+RN1kVacecHm53mbV78fcLPXfaV XaHmrTuP2yjsEopNTFHfvONLh+T0OQ455ef5W786HWLv8vzqlxeeZNJ55rfPt46uTbXMr66H15RPOa a/xVm24emjcI9brZ8TH327/uZhzbWrDtlTitlYvFzkNFgCj118LTfjWs3ymIR/8c/EahwzfzhL/Zr8 V9/i9eKEJ3u7a/SDT6nPabqZnMvBzNN9uTDhRe2hqHM/nLbZr9GLKi99w5N1/u+bvyn/Epot7z6brT 1VX/HkveR/KqlGh09zxH49u3sSAA==
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Sync listing of struct file_operations members with the real one in
-fs.h.
+Some operations such as reflinking blocks among files will need to lock
+invalidate_lock for two mappings. Add helper functions to do that.
 
 Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- Documentation/filesystems/locking.rst | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ include/linux/fs.h |  6 ++++++
+ mm/filemap.c       | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
-index 2183fd8cc350..cdf15492c699 100644
---- a/Documentation/filesystems/locking.rst
-+++ b/Documentation/filesystems/locking.rst
-@@ -506,6 +506,7 @@ prototypes::
- 	ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
- 	ssize_t (*read_iter) (struct kiocb *, struct iov_iter *);
- 	ssize_t (*write_iter) (struct kiocb *, struct iov_iter *);
-+	int (*iopoll) (struct kiocb *kiocb, bool spin);
- 	int (*iterate) (struct file *, struct dir_context *);
- 	int (*iterate_shared) (struct file *, struct dir_context *);
- 	__poll_t (*poll) (struct file *, struct poll_table_struct *);
-@@ -518,12 +519,6 @@ prototypes::
- 	int (*fsync) (struct file *, loff_t start, loff_t end, int datasync);
- 	int (*fasync) (int, struct file *, int);
- 	int (*lock) (struct file *, int, struct file_lock *);
--	ssize_t (*readv) (struct file *, const struct iovec *, unsigned long,
--			loff_t *);
--	ssize_t (*writev) (struct file *, const struct iovec *, unsigned long,
--			loff_t *);
--	ssize_t (*sendfile) (struct file *, loff_t *, size_t, read_actor_t,
--			void __user *);
- 	ssize_t (*sendpage) (struct file *, struct page *, int, size_t,
- 			loff_t *, int);
- 	unsigned long (*get_unmapped_area)(struct file *, unsigned long,
-@@ -536,6 +531,14 @@ prototypes::
- 			size_t, unsigned int);
- 	int (*setlease)(struct file *, long, struct file_lock **, void **);
- 	long (*fallocate)(struct file *, int, loff_t, loff_t);
-+	void (*show_fdinfo)(struct seq_file *m, struct file *f);
-+	unsigned (*mmap_capabilities)(struct file *);
-+	ssize_t (*copy_file_range)(struct file *, loff_t, struct file *,
-+			loff_t, size_t, unsigned int);
-+	loff_t (*remap_file_range)(struct file *file_in, loff_t pos_in,
-+			struct file *file_out, loff_t pos_out,
-+			loff_t len, unsigned int remap_flags);
-+	int (*fadvise)(struct file *, loff_t, loff_t, int);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 90a80de37ad4..894ff2451793 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -849,6 +849,12 @@ static inline void filemap_invalidate_unlock_shared(
+ void lock_two_nondirectories(struct inode *, struct inode*);
+ void unlock_two_nondirectories(struct inode *, struct inode*);
  
- locking rules:
- 	All may block.
++void filemap_invalidate_lock_two(struct address_space *mapping1,
++				 struct address_space *mapping2);
++void filemap_invalidate_unlock_two(struct address_space *mapping1,
++				   struct address_space *mapping2);
++
++
+ /*
+  * NOTE: in a 32bit arch with a preemptable kernel and
+  * an UP compile the i_size_read/write must be atomic
+diff --git a/mm/filemap.c b/mm/filemap.c
+index f7f9b87d2cd0..0fad08331cf4 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -1009,6 +1009,44 @@ struct page *__page_cache_alloc(gfp_t gfp)
+ EXPORT_SYMBOL(__page_cache_alloc);
+ #endif
+ 
++/*
++ * filemap_invalidate_lock_two - lock invalidate_lock for two mappings
++ *
++ * Lock exclusively invalidate_lock of any passed mapping that is not NULL.
++ *
++ * @mapping1: the first mapping to lock
++ * @mapping2: the second mapping to lock
++ */
++void filemap_invalidate_lock_two(struct address_space *mapping1,
++				 struct address_space *mapping2)
++{
++	if (mapping1 > mapping2)
++		swap(mapping1, mapping2);
++	if (mapping1)
++		down_write(&mapping1->invalidate_lock);
++	if (mapping2 && mapping1 != mapping2)
++		down_write_nested(&mapping2->invalidate_lock, 1);
++}
++EXPORT_SYMBOL(filemap_invalidate_lock_two);
++
++/*
++ * filemap_invalidate_unlock_two - unlock invalidate_lock for two mappings
++ *
++ * Unlock exclusive invalidate_lock of any passed mapping that is not NULL.
++ *
++ * @mapping1: the first mapping to unlock
++ * @mapping2: the second mapping to unlock
++ */
++void filemap_invalidate_unlock_two(struct address_space *mapping1,
++				   struct address_space *mapping2)
++{
++	if (mapping1)
++		up_write(&mapping1->invalidate_lock);
++	if (mapping2 && mapping1 != mapping2)
++		up_write(&mapping2->invalidate_lock);
++}
++EXPORT_SYMBOL(filemap_invalidate_unlock_two);
++
+ /*
+  * In order to wait for pages to become available there must be
+  * waitqueues associated with pages. By using a hash table of
 -- 
 2.26.2
 
