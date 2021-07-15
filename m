@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA069C6377D
-	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jul 2021 00:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C6EAC6377E
+	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jul 2021 00:04:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91CA9613C3
+	by mail.kernel.org (Postfix) with ESMTP id DC889613C3
 	for <linux-cifs@archiver.kernel.org>; Fri, 16 Jul 2021 00:04:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232834AbhGPAG7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 15 Jul 2021 20:06:59 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:28920 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232620AbhGPAG5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jul 2021 20:06:57 -0400
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210716000402epoutp030ade27c1ae45b40a114e7b661b1db646~SHJUdYnj90474504745epoutp03V
-        for <linux-cifs@vger.kernel.org>; Fri, 16 Jul 2021 00:04:02 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210716000402epoutp030ade27c1ae45b40a114e7b661b1db646~SHJUdYnj90474504745epoutp03V
+        id S232848AbhGPAHC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 15 Jul 2021 20:07:02 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:52315 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232738AbhGPAG7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 15 Jul 2021 20:06:59 -0400
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210716000404epoutp01beaf9c82402778d48e23e7ea5655b267~SHJWb6HHw1920619206epoutp01a
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Jul 2021 00:04:04 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210716000404epoutp01beaf9c82402778d48e23e7ea5655b267~SHJWb6HHw1920619206epoutp01a
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1626393842;
-        bh=g0mD+5v0L7v+Km3OZAnPI5n2fVRSgvNdXonK3ve9U/k=;
+        s=mail20170921; t=1626393844;
+        bh=JnFbS1a0O8jMUbuOm0uXiX267ybMjtRGH49AX1wEeEI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=e1LCy+0yxHxwd+3a1smGBFeo4YMbBditbbvfnslDhGqJguXYilppNPzXhqXyfMfl7
-         4nsJxB0R/nB0pELaJQkBMj/zIyLy4PpMIiDtrw9H8Ktx2XY5lr4awCa042rEBW8Kc7
-         CdTYIgwXG9D+tbj9G6oPvDCGUTVugCV3NNAxgA60=
+        b=JqqmJSwa2Om71soG39mgWIhdI5IxtA06SkKIGSk48OCiG5WM7uchUksAvxWN8kWV4
+         emX0K9pc03bbMNDs0p1A7fuKJ/iQyq9F+FIMmHFw6a4GJYKGtP3hhyQxReZHmZ0zXN
+         QED75w5BCbDvtR2hf8NLeDEeCZa9da+5Cf4b96+w=
 Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
-        20210716000358epcas1p3190cc38ec2b2b0987d41b6439d6a6f89~SHJRPfUrf1797817978epcas1p32;
-        Fri, 16 Jul 2021 00:03:58 +0000 (GMT)
-Received: from epsmges1p3.samsung.com (unknown [182.195.40.166]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4GQs0Y4Ml3z4x9QJ; Fri, 16 Jul
-        2021 00:03:57 +0000 (GMT)
-Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
-        epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        D5.2C.09468.DECC0F06; Fri, 16 Jul 2021 09:03:57 +0900 (KST)
+        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20210716000400epcas1p1e7997a20a6db52e67605513ba6b0d3af~SHJTTv7Cd0138201382epcas1p1b;
+        Fri, 16 Jul 2021 00:04:00 +0000 (GMT)
+Received: from epsmges1p1.samsung.com (unknown [182.195.40.162]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4GQs0b5sPpz4x9Pw; Fri, 16 Jul
+        2021 00:03:59 +0000 (GMT)
+Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
+        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        35.D9.09952.FECC0F06; Fri, 16 Jul 2021 09:03:59 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
         epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
-        20210716000352epcas1p37f04458aea3e3025ae837745c3d90f54~SHJLWUtPw2764727647epcas1p3a;
-        Fri, 16 Jul 2021 00:03:52 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        20210716000356epcas1p3444a50440a5a0cfbc28f9ba935637bab~SHJO1F59f2760827608epcas1p3W;
+        Fri, 16 Jul 2021 00:03:56 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
         epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210716000352epsmtrp2750869ff96f4f8bee51fc3d3c7ed16f1~SHJLVGppE1353413534epsmtrp2q;
-        Fri, 16 Jul 2021 00:03:52 +0000 (GMT)
-X-AuditID: b6c32a37-0c7ff700000024fc-70-60f0cced5504
+        20210716000356epsmtrp2f656d1e4f40e294f8c123b742d44f7e4~SHJOzOI9l1353413534epsmtrp2u;
+        Fri, 16 Jul 2021 00:03:56 +0000 (GMT)
+X-AuditID: b6c32a35-9fad2a80000026e0-8e-60f0ccef7024
 Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        AB.FA.08394.8ECC0F06; Fri, 16 Jul 2021 09:03:52 +0900 (KST)
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        30.9E.08289.BECC0F06; Fri, 16 Jul 2021 09:03:55 +0900 (KST)
 Received: from localhost.localdomain (unknown [10.89.31.111]) by
         epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20210716000351epsmtip25d1871500a51ae4edaee7534979eaabd~SHJK6LwIL1799417994epsmtip2B;
-        Fri, 16 Jul 2021 00:03:51 +0000 (GMT)
+        20210716000355epsmtip2135ff2008a833cd8b2de4e79e8274303~SHJOY5OJv1664616646epsmtip2F;
+        Fri, 16 Jul 2021 00:03:55 +0000 (GMT)
 From:   Namjae Jeon <namjae.jeon@samsung.com>
 To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-cifs@vger.kernel.org
@@ -66,60 +66,60 @@ Cc:     linux-cifsd-devel@lists.sourceforge.net, aurelien.aptel@gmail.com,
         christian@brauner.io, smfrench@gmail.com, hyc.lee@gmail.com,
         Namjae Jeon <namjae.jeon@samsung.com>,
         Steve French <stfrench@microsoft.com>
-Subject: [PATCH v6 07/13] ksmbd: add authentication
-Date:   Fri, 16 Jul 2021 08:53:50 +0900
-Message-Id: <20210715235356.3191-8-namjae.jeon@samsung.com>
+Subject: [PATCH v6 11/13] ksmbd: add file operations
+Date:   Fri, 16 Jul 2021 08:53:54 +0900
+Message-Id: <20210715235356.3191-12-namjae.jeon@samsung.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210715235356.3191-1-namjae.jeon@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrKJsWRmVeSWpSXmKPExsWy7bCmvu7bMx8SDGa8kbY4/vovu0XjO2WL
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCJsWRmVeSWpSXmKPExsWy7bCmru77Mx8SDOZt1bA4/vovu0XjO2WL
         1/+ms1icnrCIyWLl6qNMFtfuv2e3ePF/F7PFz//fGS327D3JYnF51xw2ix/T6y16+z6xWrRe
         0bLYvXERm8WbF4fZLG5NnM9mcf7vcVaL3z/msDkIefyd+5HZY3bDRRaPnbPusntsXqHlsXvB
         ZyaP3Tcb2Dxad/xl9/j49BaLR9+WVYweWxY/ZPL4vEnOY9OTt0wBPFE5NhmpiSmpRQqpecn5
         KZl56bZK3sHxzvGmZgaGuoaWFuZKCnmJuam2Si4+AbpumTlAzykplCXmlAKFAhKLi5X07WyK
-        8ktLUhUy8otLbJVSC1JyCgwNCvSKE3OLS/PS9ZLzc60MDQyMTIEqE3Iy2r6dYimYNomlouvT
-        c8YGxhNrmLsYOTkkBEwkji2Zxt7FyMUhJLCDUeLUmS1sEM4nRon2B3dZIJxvjBKb7n5ghWm5
-        duAEVMteRoltx3cywrUc7vzF1MXIwcEmoC3xZ4soSIOIQKzEjR2vmUFqmAW6mCWe3j/DBJIQ
-        FjCWaPzcADaVRUBV4urhTjYQm1fAWuLy5Z/sENvkJVZvOAB2LKeAjcTjk9/AlkkIXOCQuNB8
-        G+okF4mmrW+gPhKWeHV8C1SzlMTnd3vZIOxyiRMnfzFB2DUSG+btYwc5VALoiJ4XJSAms4Cm
-        xPpd+hAVihI7f89lBLGZBfgk3n3tYYWo5pXoaBOCKFGV6Lt0GGqgtERX+weopR4Sz+4uZoYE
-        ST+jxNm+J2wTGOVmIWxYwMi4ilEstaA4Nz212LDAGDnONjGC06+W+Q7GaW8/6B1iZOJgPMQo
-        wcGsJMK71OhtghBvSmJlVWpRfnxRaU5q8SFGU2DYTWSWEk3OB2aAvJJ4Q1MjY2NjCxMzczNT
-        YyVx3p1shxKEBNITS1KzU1MLUotg+pg4OKUamJSX8HaWbq6b98VNeJ6Q35LrYkK6DA++2M5W
-        n/74e7qN9xFzJzvztw8/pu2bmNs+Vd1jn9OeKfoXRR5Pu2seWVjewKpTeW9OVWr2JP6JxWaq
-        5qEPF73msbvWG9ceFHxi53u2glO3r+eeuvCk43nU4m+F3oZKl2dmLTRc/v1E2nn9dgON5jzd
-        ySoxJ2PmqF2Uzp2zP21J0v7wyRFr4pZ8a/S0vqFsxuVqWXU48KjuxXWC2Ye4l0zQLfIT2LBj
-        ybYNPFVulb5WSftunmVrYfjyWV1DYfNbD43yIw7zDXhWurHnzNpzbeox8xcOyxllPc1fBcdM
-        +KqvdWkt6+80YUnebH0T58XtN8Ul/tR/4lhxWomlOCPRUIu5qDgRAGdbxyhIBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrHLMWRmVeSWpSXmKPExsWy7bCSvO6LMx8SDHb/5bQ4/vovu0XjO2WL
+        8ktLUhUy8otLbJVSC1JyCgwNCvSKE3OLS/PS9ZLzc60MDQyMTIEqE3IyblzfzFTQ2MlasfLq
+        BPYGxtsdLF2MnBwSAiYSm7//YOpi5OIQEtjBKLH13gNGCOcTo8SyTzugMp8ZJXa9nMMK09K4
+        cDU7RGIXo8SZDY9Z4Frm/F3N1sXIwcEmoC3xZ4soSIOIQKzEjR2vmUFqmAW6mCWe3j/DBJIQ
+        Bpp06lAbmM0ioCqxe8ZLMJtXwEZiz84+qG3yEqs3HGAGsTmB4o9PfgO7T0LgDIfE1xObWECW
+        SQi4SLTcyoeoF5Z4dXwLO4QtJfH53V42CLtc4sTJX0wQdo3Ehnn72CFajSV6XpSAmMwCmhLr
+        d+lDVChK7Pw9lxHEZhbgk3j3tYcVoppXoqNNCKJEVaLv0mGogdISXe0foJZ6SLRcb4OGWz+j
+        xJGXZ5knMMrNQtiwgJFxFaNYakFxbnpqsWGBIXKUbWIEJ18t0x2ME99+0DvEyMTBeIhRgoNZ
+        SYR3qdHbBCHelMTKqtSi/Pii0pzU4kOMpsCgm8gsJZqcD0z/eSXxhqZGxsbGFiZm5mamxkri
+        vDvZDiUICaQnlqRmp6YWpBbB9DFxcEo1MAW595yeOufKrmO53yYki3bve9xvYuXoV2A4RezL
+        HLPlhTfmLZpycc1sv1fNUUf3Kp1vjOtT2bKa0dHsQu6fuWu9baVa97yRDF6j/ua13M4Ot4uK
+        U1Yvu/yc+Rzz+jVe7Iv6zlp4zVXj2izGmqErz3L3xgP5Kq3mLyoeEydmzvFUVd/FrFhyT7Yu
+        SsJUL/716apmbjmmprqdC4y1Ms3ezXW7MFu7+ZVizoXVBxRaTT4d/biCQz7xgu7r/NlKprdq
+        El7ImAUliR+6fp/9rUzniXdrOo5X3rszYfmOtDXS6fx/GhYs9HnP4JbgztisczX5ck7E1vW1
+        lqxhM2o6mdP69fkOvVt+vPPbep5Vn73mCyqxFGckGmoxFxUnAgDgmoRURwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrHLMWRmVeSWpSXmKPExsWy7bCSvO7rMx8SDK69s7A4/vovu0XjO2WL
         1/+ms1icnrCIyWLl6qNMFtfuv2e3ePF/F7PFz//fGS327D3JYnF51xw2ix/T6y16+z6xWrRe
         0bLYvXERm8WbF4fZLG5NnM9mcf7vcVaL3z/msDkIefyd+5HZY3bDRRaPnbPusntsXqHlsXvB
         ZyaP3Tcb2Dxad/xl9/j49BaLR9+WVYweWxY/ZPL4vEnOY9OTt0wBPFFcNimpOZllqUX6dglc
-        GW3fTrEUTJvEUtH16TljA+OJNcxdjJwcEgImEtcOnGDvYuTiEBLYzSjx+MdKVoiEtMSxE2eA
-        ijiAbGGJw4eLIWo+MEr0LWlgAomzCWhL/NkiClIuIhAvcbPhNgtIDbPAHGaJnRuPMIIkhAWM
-        JRo/N4DNZBFQlbh6uJMNxOYVsJa4fPknO8QueYnVGw6AHcQpYCPx+OQ3sF4hoJr1azawTGDk
-        W8DIsIpRMrWgODc9t9iwwDAvtVyvODG3uDQvXS85P3cTIzhKtDR3MG5f9UHvECMTB+MhRgkO
-        ZiUR3qVGbxOEeFMSK6tSi/Lji0pzUosPMUpzsCiJ817oOhkvJJCeWJKanZpakFoEk2Xi4JRq
-        YJrxTeTC5mqTy96LXtWvSbuTFrRmzpfYCasjeiwnBQhf+3Z657fnn974HT3VedX0Xus7mzXt
-        z/fOeBMYeen+jgcHb896te+tUrPCl5T3a7efKvt9RlVBryxt064c5Tep8kcZOLL+LPi9LWPv
-        l5cWKmcq3qlN/PU1+e+TDMbZNhdypOJTI5b+WuynfPCk0XudS5YRZ2b3+/pHGz/Vmu+itT7L
-        4IdvkNmy2CUivdkKGmnx229V6rXd2DKhaOk5UUeP54psj35PeqmpmrGs9rraFcclLYe+TRZn
-        4Pfc4jJl/6q8ze2sq09wc1/4xzGxoolzs2rJ99dBByKLp7nUN76ad1Jsh+iNLMukpJd87z8a
-        BZ/4oMRSnJFoqMVcVJwIAJNlGw4BAwAA
-X-CMS-MailID: 20210716000352epcas1p37f04458aea3e3025ae837745c3d90f54
+        GTeub2YqaOxkrVh5dQJ7A+PtDpYuRk4OCQETicaFq9m7GLk4hAR2MEo8m/AWKiEtcezEGeYu
+        Rg4gW1ji8OFiiJoPjBKL7k5kAYmzCWhL/NkiClIuIhAvcbPhNgtIDbPAHGaJnRuPMIIkhIEW
+        nDrUxgRiswioSuye8RLM5hWwkdizs48VYpe8xOoNB5hBbE6g+OOT38B6hQSsJdav2cAygZFv
+        ASPDKkbJ1ILi3PTcYsMCo7zUcr3ixNzi0rx0veT83E2M4CjR0trBuGfVB71DjEwcjIcYJTiY
+        lUR4lxq9TRDiTUmsrEotyo8vKs1JLT7EKM3BoiTOe6HrZLyQQHpiSWp2ampBahFMlomDU6qB
+        acGVROlXCYrsrit3vDLrDnO/8tEmRdbZyp3vueJ9wY37KtqtDf395icdTf27XFxv77cu5ZIG
+        8d1R2Q5bs+dMl/t+y7Iwv6lG54++xxwr90Ma6TFz4xsdZL9Lm3woc6ndt7B5xbTDd9WXuSnN
+        nlTxyHLLDfuHpYduH135Mfn0uZMPOTvYn+ybpV4ulXaga/5l/5XvWSbmPgou/Hj9Z4LSXEfl
+        qGtB3avW8y9Y2RzNOXvK0QnJEjs475quDVX4IPGGa6cs++kD3WEy566lWs2OE2x5Krz/vmlj
+        vUFkroyTiimTQojM5dbjr9y/fWX1kVzQ6lkUJBn4WGWx15x/4T6Pq8pMBQV2FEzjNzS89b1F
+        iaU4I9FQi7moOBEAVOs+ZAEDAAA=
+X-CMS-MailID: 20210716000356epcas1p3444a50440a5a0cfbc28f9ba935637bab
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: SVC_REQ_APPROVE
 CMS-TYPE: 101P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210716000352epcas1p37f04458aea3e3025ae837745c3d90f54
+X-CMS-RootMailID: 20210716000356epcas1p3444a50440a5a0cfbc28f9ba935637bab
 References: <20210715235356.3191-1-namjae.jeon@samsung.com>
-        <CGME20210716000352epcas1p37f04458aea3e3025ae837745c3d90f54@epcas1p3.samsung.com>
+        <CGME20210716000356epcas1p3444a50440a5a0cfbc28f9ba935637bab@epcas1p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This adds NTLM/NTLMv2/Kerberos authentications and signing/encryption.
+This adds file operations.
 
 Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
 Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
@@ -127,408 +127,24 @@ Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
 Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/ksmbd/asn1.c                         |  343 ++++++
- fs/ksmbd/asn1.h                         |   21 +
- fs/ksmbd/auth.c                         | 1364 +++++++++++++++++++++++
- fs/ksmbd/auth.h                         |   67 ++
- fs/ksmbd/crypto_ctx.c                   |  282 +++++
- fs/ksmbd/crypto_ctx.h                   |   74 ++
- fs/ksmbd/ksmbd_spnego_negtokeninit.asn1 |   31 +
- fs/ksmbd/ksmbd_spnego_negtokentarg.asn1 |   19 +
- fs/ksmbd/ntlmssp.h                      |  169 +++
- 9 files changed, 2370 insertions(+)
- create mode 100644 fs/ksmbd/asn1.c
- create mode 100644 fs/ksmbd/asn1.h
- create mode 100644 fs/ksmbd/auth.c
- create mode 100644 fs/ksmbd/auth.h
- create mode 100644 fs/ksmbd/crypto_ctx.c
- create mode 100644 fs/ksmbd/crypto_ctx.h
- create mode 100644 fs/ksmbd/ksmbd_spnego_negtokeninit.asn1
- create mode 100644 fs/ksmbd/ksmbd_spnego_negtokentarg.asn1
- create mode 100644 fs/ksmbd/ntlmssp.h
+ fs/ksmbd/vfs.c       | 1886 ++++++++++++++++++++++++++++++++++++++++++
+ fs/ksmbd/vfs.h       |  197 +++++
+ fs/ksmbd/vfs_cache.c |  725 ++++++++++++++++
+ fs/ksmbd/vfs_cache.h |  178 ++++
+ fs/ksmbd/xattr.h     |  122 +++
+ 5 files changed, 3108 insertions(+)
+ create mode 100644 fs/ksmbd/vfs.c
+ create mode 100644 fs/ksmbd/vfs.h
+ create mode 100644 fs/ksmbd/vfs_cache.c
+ create mode 100644 fs/ksmbd/vfs_cache.h
+ create mode 100644 fs/ksmbd/xattr.h
 
-diff --git a/fs/ksmbd/asn1.c b/fs/ksmbd/asn1.c
+diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
 new file mode 100644
-index 000000000000..b014f4638610
+index 000000000000..612c52d7a01b
 --- /dev/null
-+++ b/fs/ksmbd/asn1.c
-@@ -0,0 +1,343 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * The ASB.1/BER parsing code is derived from ip_nat_snmp_basic.c which was in
-+ * turn derived from the gxsnmp package by Gregory McLean & Jochen Friedrich
-+ *
-+ * Copyright (c) 2000 RP Internet (www.rpi.net.au).
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/mm.h>
-+#include <linux/slab.h>
-+#include <linux/oid_registry.h>
-+
-+#include "glob.h"
-+
-+#include "asn1.h"
-+#include "connection.h"
-+#include "auth.h"
-+#include "ksmbd_spnego_negtokeninit.asn1.h"
-+#include "ksmbd_spnego_negtokentarg.asn1.h"
-+
-+#define SPNEGO_OID_LEN 7
-+#define NTLMSSP_OID_LEN  10
-+#define KRB5_OID_LEN  7
-+#define KRB5U2U_OID_LEN  8
-+#define MSKRB5_OID_LEN  7
-+static unsigned long SPNEGO_OID[7] = { 1, 3, 6, 1, 5, 5, 2 };
-+static unsigned long NTLMSSP_OID[10] = { 1, 3, 6, 1, 4, 1, 311, 2, 2, 10 };
-+static unsigned long KRB5_OID[7] = { 1, 2, 840, 113554, 1, 2, 2 };
-+static unsigned long KRB5U2U_OID[8] = { 1, 2, 840, 113554, 1, 2, 2, 3 };
-+static unsigned long MSKRB5_OID[7] = { 1, 2, 840, 48018, 1, 2, 2 };
-+
-+static char NTLMSSP_OID_STR[NTLMSSP_OID_LEN] = { 0x2b, 0x06, 0x01, 0x04, 0x01,
-+	0x82, 0x37, 0x02, 0x02, 0x0a };
-+
-+static bool
-+asn1_subid_decode(const unsigned char **begin, const unsigned char *end,
-+		  unsigned long *subid)
-+{
-+	const unsigned char *ptr = *begin;
-+	unsigned char ch;
-+
-+	*subid = 0;
-+
-+	do {
-+		if (ptr >= end)
-+			return false;
-+
-+		ch = *ptr++;
-+		*subid <<= 7;
-+		*subid |= ch & 0x7F;
-+	} while ((ch & 0x80) == 0x80);
-+
-+	*begin = ptr;
-+	return true;
-+}
-+
-+static bool asn1_oid_decode(const unsigned char *value, size_t vlen,
-+			    unsigned long **oid, size_t *oidlen)
-+{
-+	const unsigned char *iptr = value, *end = value + vlen;
-+	unsigned long *optr;
-+	unsigned long subid;
-+
-+	vlen += 1;
-+	if (vlen < 2 || vlen > UINT_MAX / sizeof(unsigned long))
-+		goto fail_nullify;
-+
-+	*oid = kmalloc(vlen * sizeof(unsigned long), GFP_KERNEL);
-+	if (!*oid)
-+		return false;
-+
-+	optr = *oid;
-+
-+	if (!asn1_subid_decode(&iptr, end, &subid))
-+		goto fail;
-+
-+	if (subid < 40) {
-+		optr[0] = 0;
-+		optr[1] = subid;
-+	} else if (subid < 80) {
-+		optr[0] = 1;
-+		optr[1] = subid - 40;
-+	} else {
-+		optr[0] = 2;
-+		optr[1] = subid - 80;
-+	}
-+
-+	*oidlen = 2;
-+	optr += 2;
-+
-+	while (iptr < end) {
-+		if (++(*oidlen) > vlen)
-+			goto fail;
-+
-+		if (!asn1_subid_decode(&iptr, end, optr++))
-+			goto fail;
-+	}
-+	return true;
-+
-+fail:
-+	kfree(*oid);
-+fail_nullify:
-+	*oid = NULL;
-+	return false;
-+}
-+
-+static bool oid_eq(unsigned long *oid1, unsigned int oid1len,
-+		   unsigned long *oid2, unsigned int oid2len)
-+{
-+	if (oid1len != oid2len)
-+		return false;
-+
-+	return memcmp(oid1, oid2, oid1len) == 0;
-+}
-+
-+int
-+ksmbd_decode_negTokenInit(unsigned char *security_blob, int length,
-+			  struct ksmbd_conn *conn)
-+{
-+	return asn1_ber_decoder(&ksmbd_spnego_negtokeninit_decoder, conn,
-+				security_blob, length);
-+}
-+
-+int
-+ksmbd_decode_negTokenTarg(unsigned char *security_blob, int length,
-+			  struct ksmbd_conn *conn)
-+{
-+	return asn1_ber_decoder(&ksmbd_spnego_negtokentarg_decoder, conn,
-+				security_blob, length);
-+}
-+
-+static int compute_asn_hdr_len_bytes(int len)
-+{
-+	if (len > 0xFFFFFF)
-+		return 4;
-+	else if (len > 0xFFFF)
-+		return 3;
-+	else if (len > 0xFF)
-+		return 2;
-+	else if (len > 0x7F)
-+		return 1;
-+	else
-+		return 0;
-+}
-+
-+static void encode_asn_tag(char *buf, unsigned int *ofs, char tag, char seq,
-+			   int length)
-+{
-+	int i;
-+	int index = *ofs;
-+	char hdr_len = compute_asn_hdr_len_bytes(length);
-+	int len = length + 2 + hdr_len;
-+
-+	/* insert tag */
-+	buf[index++] = tag;
-+
-+	if (!hdr_len) {
-+		buf[index++] = len;
-+	} else {
-+		buf[index++] = 0x80 | hdr_len;
-+		for (i = hdr_len - 1; i >= 0; i--)
-+			buf[index++] = (len >> (i * 8)) & 0xFF;
-+	}
-+
-+	/* insert seq */
-+	len = len - (index - *ofs);
-+	buf[index++] = seq;
-+
-+	if (!hdr_len) {
-+		buf[index++] = len;
-+	} else {
-+		buf[index++] = 0x80 | hdr_len;
-+		for (i = hdr_len - 1; i >= 0; i--)
-+			buf[index++] = (len >> (i * 8)) & 0xFF;
-+	}
-+
-+	*ofs += (index - *ofs);
-+}
-+
-+int build_spnego_ntlmssp_neg_blob(unsigned char **pbuffer, u16 *buflen,
-+				  char *ntlm_blob, int ntlm_blob_len)
-+{
-+	char *buf;
-+	unsigned int ofs = 0;
-+	int neg_result_len = 4 + compute_asn_hdr_len_bytes(1) * 2 + 1;
-+	int oid_len = 4 + compute_asn_hdr_len_bytes(NTLMSSP_OID_LEN) * 2 +
-+		NTLMSSP_OID_LEN;
-+	int ntlmssp_len = 4 + compute_asn_hdr_len_bytes(ntlm_blob_len) * 2 +
-+		ntlm_blob_len;
-+	int total_len = 4 + compute_asn_hdr_len_bytes(neg_result_len +
-+			oid_len + ntlmssp_len) * 2 +
-+			neg_result_len + oid_len + ntlmssp_len;
-+
-+	buf = kmalloc(total_len, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	/* insert main gss header */
-+	encode_asn_tag(buf, &ofs, 0xa1, 0x30, neg_result_len + oid_len +
-+			ntlmssp_len);
-+
-+	/* insert neg result */
-+	encode_asn_tag(buf, &ofs, 0xa0, 0x0a, 1);
-+	buf[ofs++] = 1;
-+
-+	/* insert oid */
-+	encode_asn_tag(buf, &ofs, 0xa1, 0x06, NTLMSSP_OID_LEN);
-+	memcpy(buf + ofs, NTLMSSP_OID_STR, NTLMSSP_OID_LEN);
-+	ofs += NTLMSSP_OID_LEN;
-+
-+	/* insert response token - ntlmssp blob */
-+	encode_asn_tag(buf, &ofs, 0xa2, 0x04, ntlm_blob_len);
-+	memcpy(buf + ofs, ntlm_blob, ntlm_blob_len);
-+	ofs += ntlm_blob_len;
-+
-+	*pbuffer = buf;
-+	*buflen = total_len;
-+	return 0;
-+}
-+
-+int build_spnego_ntlmssp_auth_blob(unsigned char **pbuffer, u16 *buflen,
-+				   int neg_result)
-+{
-+	char *buf;
-+	unsigned int ofs = 0;
-+	int neg_result_len = 4 + compute_asn_hdr_len_bytes(1) * 2 + 1;
-+	int total_len = 4 + compute_asn_hdr_len_bytes(neg_result_len) * 2 +
-+		neg_result_len;
-+
-+	buf = kmalloc(total_len, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	/* insert main gss header */
-+	encode_asn_tag(buf, &ofs, 0xa1, 0x30, neg_result_len);
-+
-+	/* insert neg result */
-+	encode_asn_tag(buf, &ofs, 0xa0, 0x0a, 1);
-+	if (neg_result)
-+		buf[ofs++] = 2;
-+	else
-+		buf[ofs++] = 0;
-+
-+	*pbuffer = buf;
-+	*buflen = total_len;
-+	return 0;
-+}
-+
-+int ksmbd_gssapi_this_mech(void *context, size_t hdrlen, unsigned char tag,
-+			   const void *value, size_t vlen)
-+{
-+	unsigned long *oid;
-+	size_t oidlen;
-+	int err = 0;
-+
-+	if (!asn1_oid_decode(value, vlen, &oid, &oidlen)) {
-+		err = -EBADMSG;
-+		goto out;
-+	}
-+
-+	if (!oid_eq(oid, oidlen, SPNEGO_OID, SPNEGO_OID_LEN))
-+		err = -EBADMSG;
-+	kfree(oid);
-+out:
-+	if (err) {
-+		char buf[50];
-+
-+		sprint_oid(value, vlen, buf, sizeof(buf));
-+		ksmbd_debug(AUTH, "Unexpected OID: %s\n", buf);
-+	}
-+	return err;
-+}
-+
-+int ksmbd_neg_token_init_mech_type(void *context, size_t hdrlen,
-+				   unsigned char tag, const void *value,
-+				   size_t vlen)
-+{
-+	struct ksmbd_conn *conn = context;
-+	unsigned long *oid;
-+	size_t oidlen;
-+	int mech_type;
-+	char buf[50];
-+
-+	if (!asn1_oid_decode(value, vlen, &oid, &oidlen))
-+		goto fail;
-+
-+	if (oid_eq(oid, oidlen, NTLMSSP_OID, NTLMSSP_OID_LEN))
-+		mech_type = KSMBD_AUTH_NTLMSSP;
-+	else if (oid_eq(oid, oidlen, MSKRB5_OID, MSKRB5_OID_LEN))
-+		mech_type = KSMBD_AUTH_MSKRB5;
-+	else if (oid_eq(oid, oidlen, KRB5_OID, KRB5_OID_LEN))
-+		mech_type = KSMBD_AUTH_KRB5;
-+	else if (oid_eq(oid, oidlen, KRB5U2U_OID, KRB5U2U_OID_LEN))
-+		mech_type = KSMBD_AUTH_KRB5U2U;
-+	else
-+		goto fail;
-+
-+	conn->auth_mechs |= mech_type;
-+	if (conn->preferred_auth_mech == 0)
-+		conn->preferred_auth_mech = mech_type;
-+
-+	kfree(oid);
-+	return 0;
-+
-+fail:
-+	kfree(oid);
-+	sprint_oid(value, vlen, buf, sizeof(buf));
-+	ksmbd_debug(AUTH, "Unexpected OID: %s\n", buf);
-+	return -EBADMSG;
-+}
-+
-+int ksmbd_neg_token_init_mech_token(void *context, size_t hdrlen,
-+				    unsigned char tag, const void *value,
-+				    size_t vlen)
-+{
-+	struct ksmbd_conn *conn = context;
-+
-+	conn->mechToken = kmalloc(vlen + 1, GFP_KERNEL);
-+	if (!conn->mechToken)
-+		return -ENOMEM;
-+
-+	memcpy(conn->mechToken, value, vlen);
-+	conn->mechToken[vlen] = '\0';
-+	return 0;
-+}
-+
-+int ksmbd_neg_token_targ_resp_token(void *context, size_t hdrlen,
-+				    unsigned char tag, const void *value,
-+				    size_t vlen)
-+{
-+	struct ksmbd_conn *conn = context;
-+
-+	conn->mechToken = kmalloc(vlen + 1, GFP_KERNEL);
-+	if (!conn->mechToken)
-+		return -ENOMEM;
-+
-+	memcpy(conn->mechToken, value, vlen);
-+	conn->mechToken[vlen] = '\0';
-+	return 0;
-+}
-diff --git a/fs/ksmbd/asn1.h b/fs/ksmbd/asn1.h
-new file mode 100644
-index 000000000000..ce105f4ce305
---- /dev/null
-+++ b/fs/ksmbd/asn1.h
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * The ASB.1/BER parsing code is derived from ip_nat_snmp_basic.c which was in
-+ * turn derived from the gxsnmp package by Gregory McLean & Jochen Friedrich
-+ *
-+ * Copyright (c) 2000 RP Internet (www.rpi.net.au).
-+ * Copyright (C) 2018 Samsung Electronics Co., Ltd.
-+ */
-+
-+#ifndef __ASN1_H__
-+#define __ASN1_H__
-+
-+int ksmbd_decode_negTokenInit(unsigned char *security_blob, int length,
-+			      struct ksmbd_conn *conn);
-+int ksmbd_decode_negTokenTarg(unsigned char *security_blob, int length,
-+			      struct ksmbd_conn *conn);
-+int build_spnego_ntlmssp_neg_blob(unsigned char **pbuffer, u16 *buflen,
-+				  char *ntlm_blob, int ntlm_blob_len);
-+int build_spnego_ntlmssp_auth_blob(unsigned char **pbuffer, u16 *buflen,
-+				   int neg_result);
-+#endif /* __ASN1_H__ */
-diff --git a/fs/ksmbd/auth.c b/fs/ksmbd/auth.c
-new file mode 100644
-index 000000000000..de36f12070bf
---- /dev/null
-+++ b/fs/ksmbd/auth.c
-@@ -0,0 +1,1364 @@
++++ b/fs/ksmbd/vfs.c
+@@ -0,0 +1,1886 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
@@ -540,2037 +156,3127 @@ index 000000000000..de36f12070bf
 +#include <linux/uaccess.h>
 +#include <linux/backing-dev.h>
 +#include <linux/writeback.h>
-+#include <linux/uio.h>
 +#include <linux/xattr.h>
-+#include <crypto/hash.h>
-+#include <crypto/aead.h>
-+#include <linux/random.h>
-+#include <linux/scatterlist.h>
++#include <linux/falloc.h>
++#include <linux/genhd.h>
++#include <linux/fsnotify.h>
++#include <linux/dcache.h>
++#include <linux/slab.h>
++#include <linux/vmalloc.h>
++#include <linux/sched/xacct.h>
++#include <linux/crc32c.h>
 +
-+#include "auth.h"
 +#include "glob.h"
-+
-+#include <linux/fips.h>
-+#include <crypto/des.h>
-+
-+#include "server.h"
-+#include "smb_common.h"
++#include "oplock.h"
 +#include "connection.h"
++#include "vfs.h"
++#include "vfs_cache.h"
++#include "smbacl.h"
++#include "ndr.h"
++#include "auth.h"
++#include "misc.h"
++
++#include "smb_common.h"
++#include "mgmt/share_config.h"
++#include "mgmt/tree_connect.h"
 +#include "mgmt/user_session.h"
 +#include "mgmt/user_config.h"
-+#include "crypto_ctx.h"
-+#include "transport_ipc.h"
 +
-+/*
-+ * Fixed format data defining GSS header and fixed string
-+ * "not_defined_in_RFC4178@please_ignore".
-+ * So sec blob data in neg phase could be generated statically.
-+ */
-+static char NEGOTIATE_GSS_HEADER[AUTH_GSS_LENGTH] = {
-+#ifdef CONFIG_SMB_SERVER_KERBEROS5
-+	0x60, 0x5e, 0x06, 0x06, 0x2b, 0x06, 0x01, 0x05,
-+	0x05, 0x02, 0xa0, 0x54, 0x30, 0x52, 0xa0, 0x24,
-+	0x30, 0x22, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86,
-+	0xf7, 0x12, 0x01, 0x02, 0x02, 0x06, 0x09, 0x2a,
-+	0x86, 0x48, 0x82, 0xf7, 0x12, 0x01, 0x02, 0x02,
-+	0x06, 0x0a, 0x2b, 0x06, 0x01, 0x04, 0x01, 0x82,
-+	0x37, 0x02, 0x02, 0x0a, 0xa3, 0x2a, 0x30, 0x28,
-+	0xa0, 0x26, 0x1b, 0x24, 0x6e, 0x6f, 0x74, 0x5f,
-+	0x64, 0x65, 0x66, 0x69, 0x6e, 0x65, 0x64, 0x5f,
-+	0x69, 0x6e, 0x5f, 0x52, 0x46, 0x43, 0x34, 0x31,
-+	0x37, 0x38, 0x40, 0x70, 0x6c, 0x65, 0x61, 0x73,
-+	0x65, 0x5f, 0x69, 0x67, 0x6e, 0x6f, 0x72, 0x65
-+#else
-+	0x60, 0x48, 0x06, 0x06, 0x2b, 0x06, 0x01, 0x05,
-+	0x05, 0x02, 0xa0, 0x3e, 0x30, 0x3c, 0xa0, 0x0e,
-+	0x30, 0x0c, 0x06, 0x0a, 0x2b, 0x06, 0x01, 0x04,
-+	0x01, 0x82, 0x37, 0x02, 0x02, 0x0a, 0xa3, 0x2a,
-+	0x30, 0x28, 0xa0, 0x26, 0x1b, 0x24, 0x6e, 0x6f,
-+	0x74, 0x5f, 0x64, 0x65, 0x66, 0x69, 0x6e, 0x65,
-+	0x64, 0x5f, 0x69, 0x6e, 0x5f, 0x52, 0x46, 0x43,
-+	0x34, 0x31, 0x37, 0x38, 0x40, 0x70, 0x6c, 0x65,
-+	0x61, 0x73, 0x65, 0x5f, 0x69, 0x67, 0x6e, 0x6f,
-+	0x72, 0x65
-+#endif
-+};
-+
-+void ksmbd_copy_gss_neg_header(void *buf)
++static char *extract_last_component(char *path)
 +{
-+	memcpy(buf, NEGOTIATE_GSS_HEADER, AUTH_GSS_LENGTH);
++	char *p = strrchr(path, '/');
++
++	if (p && p[1] != '\0') {
++		*p = '\0';
++		p++;
++	} else {
++		p = NULL;
++		pr_err("Invalid path %s\n", path);
++	}
++	return p;
 +}
 +
-+static void
-+str_to_key(unsigned char *str, unsigned char *key)
++static void ksmbd_vfs_inherit_owner(struct ksmbd_work *work,
++				    struct inode *parent_inode,
++				    struct inode *inode)
 +{
-+	int i;
++	if (!test_share_config_flag(work->tcon->share_conf,
++				    KSMBD_SHARE_FLAG_INHERIT_OWNER))
++		return;
 +
-+	key[0] = str[0] >> 1;
-+	key[1] = ((str[0] & 0x01) << 6) | (str[1] >> 2);
-+	key[2] = ((str[1] & 0x03) << 5) | (str[2] >> 3);
-+	key[3] = ((str[2] & 0x07) << 4) | (str[3] >> 4);
-+	key[4] = ((str[3] & 0x0F) << 3) | (str[4] >> 5);
-+	key[5] = ((str[4] & 0x1F) << 2) | (str[5] >> 6);
-+	key[6] = ((str[5] & 0x3F) << 1) | (str[6] >> 7);
-+	key[7] = str[6] & 0x7F;
-+	for (i = 0; i < 8; i++)
-+		key[i] = (key[i] << 1);
-+}
-+
-+static int
-+smbhash(unsigned char *out, const unsigned char *in, unsigned char *key)
-+{
-+	unsigned char key2[8];
-+	struct des_ctx ctx;
-+
-+	if (fips_enabled) {
-+		ksmbd_debug(AUTH, "FIPS compliance enabled: DES not permitted\n");
-+		return -ENOENT;
-+	}
-+
-+	str_to_key(key, key2);
-+	des_expand_key(&ctx, key2, DES_KEY_SIZE);
-+	des_encrypt(&ctx, out, in);
-+	memzero_explicit(&ctx, sizeof(ctx));
-+	return 0;
-+}
-+
-+static int ksmbd_enc_p24(unsigned char *p21, const unsigned char *c8, unsigned char *p24)
-+{
-+	int rc;
-+
-+	rc = smbhash(p24, c8, p21);
-+	if (rc)
-+		return rc;
-+	rc = smbhash(p24 + 8, c8, p21 + 7);
-+	if (rc)
-+		return rc;
-+	return smbhash(p24 + 16, c8, p21 + 14);
-+}
-+
-+/* produce a md4 message digest from data of length n bytes */
-+static int ksmbd_enc_md4(unsigned char *md4_hash, unsigned char *link_str,
-+			 int link_len)
-+{
-+	int rc;
-+	struct ksmbd_crypto_ctx *ctx;
-+
-+	ctx = ksmbd_crypto_ctx_find_md4();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "Crypto md4 allocation error\n");
-+		return -ENOMEM;
-+	}
-+
-+	rc = crypto_shash_init(CRYPTO_MD4(ctx));
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not init md4 shash\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_MD4(ctx), link_str, link_len);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not update with link_str\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_final(CRYPTO_MD4(ctx), md4_hash);
-+	if (rc)
-+		ksmbd_debug(AUTH, "Could not generate md4 hash\n");
-+out:
-+	ksmbd_release_crypto_ctx(ctx);
-+	return rc;
-+}
-+
-+static int ksmbd_enc_update_sess_key(unsigned char *md5_hash, char *nonce,
-+				     char *server_challenge, int len)
-+{
-+	int rc;
-+	struct ksmbd_crypto_ctx *ctx;
-+
-+	ctx = ksmbd_crypto_ctx_find_md5();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "Crypto md5 allocation error\n");
-+		return -ENOMEM;
-+	}
-+
-+	rc = crypto_shash_init(CRYPTO_MD5(ctx));
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not init md5 shash\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_MD5(ctx), server_challenge, len);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not update with challenge\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_MD5(ctx), nonce, len);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not update with nonce\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_final(CRYPTO_MD5(ctx), md5_hash);
-+	if (rc)
-+		ksmbd_debug(AUTH, "Could not generate md5 hash\n");
-+out:
-+	ksmbd_release_crypto_ctx(ctx);
-+	return rc;
++	i_uid_write(inode, i_uid_read(parent_inode));
 +}
 +
 +/**
-+ * ksmbd_gen_sess_key() - function to generate session key
-+ * @sess:	session of connection
-+ * @hash:	source hash value to be used for find session key
-+ * @hmac:	source hmac value to be used for finding session key
++ * ksmbd_vfs_lock_parent() - lock parent dentry if it is stable
 + *
++ * the parent dentry got by dget_parent or @parent could be
++ * unstable, we try to lock a parent inode and lookup the
++ * child dentry again.
++ *
++ * the reference count of @parent isn't incremented.
 + */
-+static int ksmbd_gen_sess_key(struct ksmbd_session *sess, char *hash,
-+			      char *hmac)
++int ksmbd_vfs_lock_parent(struct dentry *parent, struct dentry *child)
 +{
-+	struct ksmbd_crypto_ctx *ctx;
-+	int rc;
++	struct dentry *dentry;
++	int ret = 0;
 +
-+	ctx = ksmbd_crypto_ctx_find_hmacmd5();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "could not crypto alloc hmacmd5\n");
-+		return -ENOMEM;
++	inode_lock_nested(d_inode(parent), I_MUTEX_PARENT);
++	dentry = lookup_one_len(child->d_name.name, parent,
++				child->d_name.len);
++	if (IS_ERR(dentry)) {
++		ret = PTR_ERR(dentry);
++		goto out_err;
 +	}
 +
-+	rc = crypto_shash_setkey(CRYPTO_HMACMD5_TFM(ctx),
-+				 hash,
-+				 CIFS_HMAC_MD5_HASH_SIZE);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "hmacmd5 set key fail error %d\n", rc);
-+		goto out;
++	if (dentry != child) {
++		ret = -ESTALE;
++		dput(dentry);
++		goto out_err;
 +	}
 +
-+	rc = crypto_shash_init(CRYPTO_HMACMD5(ctx));
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not init hmacmd5 error %d\n", rc);
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_HMACMD5(ctx),
-+				 hmac,
-+				 SMB2_NTLMV2_SESSKEY_SIZE);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not update with response error %d\n", rc);
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_final(CRYPTO_HMACMD5(ctx), sess->sess_key);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not generate hmacmd5 hash error %d\n", rc);
-+		goto out;
-+	}
-+
-+out:
-+	ksmbd_release_crypto_ctx(ctx);
-+	return rc;
-+}
-+
-+static int calc_ntlmv2_hash(struct ksmbd_session *sess, char *ntlmv2_hash,
-+			    char *dname)
-+{
-+	int ret, len, conv_len;
-+	wchar_t *domain = NULL;
-+	__le16 *uniname = NULL;
-+	struct ksmbd_crypto_ctx *ctx;
-+
-+	ctx = ksmbd_crypto_ctx_find_hmacmd5();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "can't generate ntlmv2 hash\n");
-+		return -ENOMEM;
-+	}
-+
-+	ret = crypto_shash_setkey(CRYPTO_HMACMD5_TFM(ctx),
-+				  user_passkey(sess->user),
-+				  CIFS_ENCPWD_SIZE);
-+	if (ret) {
-+		ksmbd_debug(AUTH, "Could not set NT Hash as a key\n");
-+		goto out;
-+	}
-+
-+	ret = crypto_shash_init(CRYPTO_HMACMD5(ctx));
-+	if (ret) {
-+		ksmbd_debug(AUTH, "could not init hmacmd5\n");
-+		goto out;
-+	}
-+
-+	/* convert user_name to unicode */
-+	len = strlen(user_name(sess->user));
-+	uniname = kzalloc(2 + UNICODE_LEN(len), GFP_KERNEL);
-+	if (!uniname) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	conv_len = smb_strtoUTF16(uniname, user_name(sess->user), len,
-+				  sess->conn->local_nls);
-+	if (conv_len < 0 || conv_len > len) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+	UniStrupr(uniname);
-+
-+	ret = crypto_shash_update(CRYPTO_HMACMD5(ctx),
-+				  (char *)uniname,
-+				  UNICODE_LEN(conv_len));
-+	if (ret) {
-+		ksmbd_debug(AUTH, "Could not update with user\n");
-+		goto out;
-+	}
-+
-+	/* Convert domain name or conn name to unicode and uppercase */
-+	len = strlen(dname);
-+	domain = kzalloc(2 + UNICODE_LEN(len), GFP_KERNEL);
-+	if (!domain) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	conv_len = smb_strtoUTF16((__le16 *)domain, dname, len,
-+				  sess->conn->local_nls);
-+	if (conv_len < 0 || conv_len > len) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	ret = crypto_shash_update(CRYPTO_HMACMD5(ctx),
-+				  (char *)domain,
-+				  UNICODE_LEN(conv_len));
-+	if (ret) {
-+		ksmbd_debug(AUTH, "Could not update with domain\n");
-+		goto out;
-+	}
-+
-+	ret = crypto_shash_final(CRYPTO_HMACMD5(ctx), ntlmv2_hash);
-+	if (ret)
-+		ksmbd_debug(AUTH, "Could not generate md5 hash\n");
-+out:
-+	kfree(uniname);
-+	kfree(domain);
-+	ksmbd_release_crypto_ctx(ctx);
++	dput(dentry);
++	return 0;
++out_err:
++	inode_unlock(d_inode(parent));
 +	return ret;
 +}
 +
-+/**
-+ * ksmbd_auth_ntlm() - NTLM authentication handler
-+ * @sess:	session of connection
-+ * @pw_buf:	NTLM challenge response
-+ * @passkey:	user password
-+ *
-+ * Return:	0 on success, error number on error
-+ */
-+int ksmbd_auth_ntlm(struct ksmbd_session *sess, char *pw_buf)
++int ksmbd_vfs_may_delete(struct user_namespace *user_ns,
++			 struct dentry *dentry)
 +{
-+	int rc;
-+	unsigned char p21[21];
-+	char key[CIFS_AUTH_RESP_SIZE];
-+
-+	memset(p21, '\0', 21);
-+	memcpy(p21, user_passkey(sess->user), CIFS_NTHASH_SIZE);
-+	rc = ksmbd_enc_p24(p21, sess->ntlmssp.cryptkey, key);
-+	if (rc) {
-+		pr_err("password processing failed\n");
-+		return rc;
-+	}
-+
-+	ksmbd_enc_md4(sess->sess_key, user_passkey(sess->user),
-+		      CIFS_SMB1_SESSKEY_SIZE);
-+	memcpy(sess->sess_key + CIFS_SMB1_SESSKEY_SIZE, key,
-+	       CIFS_AUTH_RESP_SIZE);
-+	sess->sequence_number = 1;
-+
-+	if (strncmp(pw_buf, key, CIFS_AUTH_RESP_SIZE) != 0) {
-+		ksmbd_debug(AUTH, "ntlmv1 authentication failed\n");
-+		return -EINVAL;
-+	}
-+
-+	ksmbd_debug(AUTH, "ntlmv1 authentication pass\n");
-+	return 0;
-+}
-+
-+/**
-+ * ksmbd_auth_ntlmv2() - NTLMv2 authentication handler
-+ * @sess:	session of connection
-+ * @ntlmv2:		NTLMv2 challenge response
-+ * @blen:		NTLMv2 blob length
-+ * @domain_name:	domain name
-+ *
-+ * Return:	0 on success, error number on error
-+ */
-+int ksmbd_auth_ntlmv2(struct ksmbd_session *sess, struct ntlmv2_resp *ntlmv2,
-+		      int blen, char *domain_name)
-+{
-+	char ntlmv2_hash[CIFS_ENCPWD_SIZE];
-+	char ntlmv2_rsp[CIFS_HMAC_MD5_HASH_SIZE];
-+	struct ksmbd_crypto_ctx *ctx;
-+	char *construct = NULL;
-+	int rc, len;
-+
-+	ctx = ksmbd_crypto_ctx_find_hmacmd5();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "could not crypto alloc hmacmd5\n");
-+		return -ENOMEM;
-+	}
-+
-+	rc = calc_ntlmv2_hash(sess, ntlmv2_hash, domain_name);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not get v2 hash rc %d\n", rc);
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_setkey(CRYPTO_HMACMD5_TFM(ctx),
-+				 ntlmv2_hash,
-+				 CIFS_HMAC_MD5_HASH_SIZE);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not set NTLMV2 Hash as a key\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_init(CRYPTO_HMACMD5(ctx));
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not init hmacmd5\n");
-+		goto out;
-+	}
-+
-+	len = CIFS_CRYPTO_KEY_SIZE + blen;
-+	construct = kzalloc(len, GFP_KERNEL);
-+	if (!construct) {
-+		rc = -ENOMEM;
-+		goto out;
-+	}
-+
-+	memcpy(construct, sess->ntlmssp.cryptkey, CIFS_CRYPTO_KEY_SIZE);
-+	memcpy(construct + CIFS_CRYPTO_KEY_SIZE, &ntlmv2->blob_signature, blen);
-+
-+	rc = crypto_shash_update(CRYPTO_HMACMD5(ctx), construct, len);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not update with response\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_final(CRYPTO_HMACMD5(ctx), ntlmv2_rsp);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not generate md5 hash\n");
-+		goto out;
-+	}
-+
-+	rc = ksmbd_gen_sess_key(sess, ntlmv2_hash, ntlmv2_rsp);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not generate sess key\n");
-+		goto out;
-+	}
-+
-+	if (memcmp(ntlmv2->ntlmv2_hash, ntlmv2_rsp, CIFS_HMAC_MD5_HASH_SIZE) != 0)
-+		rc = -EINVAL;
-+out:
-+	ksmbd_release_crypto_ctx(ctx);
-+	kfree(construct);
-+	return rc;
-+}
-+
-+/**
-+ * __ksmbd_auth_ntlmv2() - NTLM2(extended security) authentication handler
-+ * @sess:	session of connection
-+ * @client_nonce:	client nonce from LM response.
-+ * @ntlm_resp:		ntlm response data from client.
-+ *
-+ * Return:	0 on success, error number on error
-+ */
-+static int __ksmbd_auth_ntlmv2(struct ksmbd_session *sess, char *client_nonce,
-+			       char *ntlm_resp)
-+{
-+	char sess_key[CIFS_SMB1_SESSKEY_SIZE] = {0};
-+	int rc;
-+	unsigned char p21[21];
-+	char key[CIFS_AUTH_RESP_SIZE];
-+
-+	rc = ksmbd_enc_update_sess_key(sess_key,
-+				       client_nonce,
-+				       (char *)sess->ntlmssp.cryptkey, 8);
-+	if (rc) {
-+		pr_err("password processing failed\n");
-+		goto out;
-+	}
-+
-+	memset(p21, '\0', 21);
-+	memcpy(p21, user_passkey(sess->user), CIFS_NTHASH_SIZE);
-+	rc = ksmbd_enc_p24(p21, sess_key, key);
-+	if (rc) {
-+		pr_err("password processing failed\n");
-+		goto out;
-+	}
-+
-+	if (memcmp(ntlm_resp, key, CIFS_AUTH_RESP_SIZE) != 0)
-+		rc = -EINVAL;
-+out:
-+	return rc;
-+}
-+
-+/**
-+ * ksmbd_decode_ntlmssp_auth_blob() - helper function to construct
-+ * authenticate blob
-+ * @authblob:	authenticate blob source pointer
-+ * @usr:	user details
-+ * @sess:	session of connection
-+ *
-+ * Return:	0 on success, error number on error
-+ */
-+int ksmbd_decode_ntlmssp_auth_blob(struct authenticate_message *authblob,
-+				   int blob_len, struct ksmbd_session *sess)
-+{
-+	char *domain_name;
-+	unsigned int lm_off, nt_off;
-+	unsigned short nt_len;
++	struct dentry *parent;
 +	int ret;
 +
-+	if (blob_len < sizeof(struct authenticate_message)) {
-+		ksmbd_debug(AUTH, "negotiate blob len %d too small\n",
-+			    blob_len);
-+		return -EINVAL;
++	parent = dget_parent(dentry);
++	ret = ksmbd_vfs_lock_parent(parent, dentry);
++	if (ret) {
++		dput(parent);
++		return ret;
 +	}
 +
-+	if (memcmp(authblob->Signature, "NTLMSSP", 8)) {
-+		ksmbd_debug(AUTH, "blob signature incorrect %s\n",
-+			    authblob->Signature);
-+		return -EINVAL;
++	ret = inode_permission(user_ns, d_inode(parent),
++			       MAY_EXEC | MAY_WRITE);
++
++	inode_unlock(d_inode(parent));
++	dput(parent);
++	return ret;
++}
++
++int ksmbd_vfs_query_maximal_access(struct user_namespace *user_ns,
++				   struct dentry *dentry, __le32 *daccess)
++{
++	struct dentry *parent;
++	int ret = 0;
++
++	*daccess = cpu_to_le32(FILE_READ_ATTRIBUTES | READ_CONTROL);
++
++	if (!inode_permission(user_ns, d_inode(dentry), MAY_OPEN | MAY_WRITE))
++		*daccess |= cpu_to_le32(WRITE_DAC | WRITE_OWNER | SYNCHRONIZE |
++				FILE_WRITE_DATA | FILE_APPEND_DATA |
++				FILE_WRITE_EA | FILE_WRITE_ATTRIBUTES |
++				FILE_DELETE_CHILD);
++
++	if (!inode_permission(user_ns, d_inode(dentry), MAY_OPEN | MAY_READ))
++		*daccess |= FILE_READ_DATA_LE | FILE_READ_EA_LE;
++
++	if (!inode_permission(user_ns, d_inode(dentry), MAY_OPEN | MAY_EXEC))
++		*daccess |= FILE_EXECUTE_LE;
++
++	parent = dget_parent(dentry);
++	ret = ksmbd_vfs_lock_parent(parent, dentry);
++	if (ret) {
++		dput(parent);
++		return ret;
 +	}
 +
-+	lm_off = le32_to_cpu(authblob->LmChallengeResponse.BufferOffset);
-+	nt_off = le32_to_cpu(authblob->NtChallengeResponse.BufferOffset);
-+	nt_len = le16_to_cpu(authblob->NtChallengeResponse.Length);
++	if (!inode_permission(user_ns, d_inode(parent), MAY_EXEC | MAY_WRITE))
++		*daccess |= FILE_DELETE_LE;
 +
-+	/* process NTLM authentication */
-+	if (nt_len == CIFS_AUTH_RESP_SIZE) {
-+		if (le32_to_cpu(authblob->NegotiateFlags) &
-+		    NTLMSSP_NEGOTIATE_EXTENDED_SEC)
-+			return __ksmbd_auth_ntlmv2(sess, (char *)authblob +
-+				lm_off, (char *)authblob + nt_off);
-+		else
-+			return ksmbd_auth_ntlm(sess, (char *)authblob +
-+				nt_off);
-+	}
-+
-+	/* TODO : use domain name that imported from configuration file */
-+	domain_name = smb_strndup_from_utf16((const char *)authblob +
-+			le32_to_cpu(authblob->DomainName.BufferOffset),
-+			le16_to_cpu(authblob->DomainName.Length), true,
-+			sess->conn->local_nls);
-+	if (IS_ERR(domain_name))
-+		return PTR_ERR(domain_name);
-+
-+	/* process NTLMv2 authentication */
-+	ksmbd_debug(AUTH, "decode_ntlmssp_authenticate_blob dname%s\n",
-+		    domain_name);
-+	ret = ksmbd_auth_ntlmv2(sess, (struct ntlmv2_resp *)((char *)authblob + nt_off),
-+				nt_len - CIFS_ENCPWD_SIZE,
-+				domain_name);
-+	kfree(domain_name);
++	inode_unlock(d_inode(parent));
++	dput(parent);
 +	return ret;
 +}
 +
 +/**
-+ * ksmbd_decode_ntlmssp_neg_blob() - helper function to construct
-+ * negotiate blob
-+ * @negblob: negotiate blob source pointer
-+ * @rsp:     response header pointer to be updated
-+ * @sess:    session of connection
++ * ksmbd_vfs_create() - vfs helper for smb create file
++ * @work:	work
++ * @name:	file name
++ * @mode:	file create mode
 + *
++ * Return:	0 on success, otherwise error
 + */
-+int ksmbd_decode_ntlmssp_neg_blob(struct negotiate_message *negblob,
-+				  int blob_len, struct ksmbd_session *sess)
++int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mode)
 +{
-+	if (blob_len < sizeof(struct negotiate_message)) {
-+		ksmbd_debug(AUTH, "negotiate blob len %d too small\n",
-+			    blob_len);
-+		return -EINVAL;
++	struct path path;
++	struct dentry *dentry;
++	int err;
++
++	dentry = kern_path_create(AT_FDCWD, name, &path, 0);
++	if (IS_ERR(dentry)) {
++		err = PTR_ERR(dentry);
++		if (err != -ENOENT)
++			pr_err("path create failed for %s, err %d\n",
++			       name, err);
++		return err;
 +	}
 +
-+	if (memcmp(negblob->Signature, "NTLMSSP", 8)) {
-+		ksmbd_debug(AUTH, "blob signature incorrect %s\n",
-+			    negblob->Signature);
-+		return -EINVAL;
++	mode |= S_IFREG;
++	err = vfs_create(mnt_user_ns(path.mnt), d_inode(path.dentry),
++			 dentry, mode, true);
++	if (!err) {
++		ksmbd_vfs_inherit_owner(work, d_inode(path.dentry),
++					d_inode(dentry));
++	} else {
++		pr_err("File(%s): creation failed (err:%d)\n", name, err);
 +	}
-+
-+	sess->ntlmssp.client_flags = le32_to_cpu(negblob->NegotiateFlags);
-+	return 0;
++	done_path_create(&path, dentry);
++	return err;
 +}
 +
 +/**
-+ * ksmbd_build_ntlmssp_challenge_blob() - helper function to construct
-+ * challenge blob
-+ * @chgblob: challenge blob source pointer to initialize
-+ * @rsp:     response header pointer to be updated
-+ * @sess:    session of connection
++ * ksmbd_vfs_mkdir() - vfs helper for smb create directory
++ * @work:	work
++ * @name:	directory name
++ * @mode:	directory create mode
 + *
++ * Return:	0 on success, otherwise error
 + */
-+unsigned int
-+ksmbd_build_ntlmssp_challenge_blob(struct challenge_message *chgblob,
-+				   struct ksmbd_session *sess)
++int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode)
 +{
-+	struct target_info *tinfo;
-+	wchar_t *name;
-+	__u8 *target_name;
-+	unsigned int flags, blob_off, blob_len, type, target_info_len = 0;
-+	int len, uni_len, conv_len;
-+	int cflags = sess->ntlmssp.client_flags;
++	struct path path;
++	struct dentry *dentry;
++	int err;
 +
-+	memcpy(chgblob->Signature, NTLMSSP_SIGNATURE, 8);
-+	chgblob->MessageType = NtLmChallenge;
-+
-+	flags = NTLMSSP_NEGOTIATE_UNICODE |
-+		NTLMSSP_NEGOTIATE_NTLM | NTLMSSP_TARGET_TYPE_SERVER |
-+		NTLMSSP_NEGOTIATE_TARGET_INFO;
-+
-+	if (cflags & NTLMSSP_NEGOTIATE_SIGN) {
-+		flags |= NTLMSSP_NEGOTIATE_SIGN;
-+		flags |= cflags & (NTLMSSP_NEGOTIATE_128 |
-+				   NTLMSSP_NEGOTIATE_56);
++	dentry = kern_path_create(AT_FDCWD, name, &path, LOOKUP_DIRECTORY);
++	if (IS_ERR(dentry)) {
++		err = PTR_ERR(dentry);
++		if (err != -EEXIST)
++			ksmbd_debug(VFS, "path create failed for %s, err %d\n",
++				    name, err);
++		return err;
 +	}
 +
-+	if (cflags & NTLMSSP_NEGOTIATE_ALWAYS_SIGN)
-+		flags |= NTLMSSP_NEGOTIATE_ALWAYS_SIGN;
-+
-+	if (cflags & NTLMSSP_REQUEST_TARGET)
-+		flags |= NTLMSSP_REQUEST_TARGET;
-+
-+	if (sess->conn->use_spnego &&
-+	    (cflags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
-+		flags |= NTLMSSP_NEGOTIATE_EXTENDED_SEC;
-+
-+	chgblob->NegotiateFlags = cpu_to_le32(flags);
-+	len = strlen(ksmbd_netbios_name());
-+	name = kmalloc(2 + UNICODE_LEN(len), GFP_KERNEL);
-+	if (!name)
-+		return -ENOMEM;
-+
-+	conv_len = smb_strtoUTF16((__le16 *)name, ksmbd_netbios_name(), len,
-+				  sess->conn->local_nls);
-+	if (conv_len < 0 || conv_len > len) {
-+		kfree(name);
-+		return -EINVAL;
-+	}
-+
-+	uni_len = UNICODE_LEN(conv_len);
-+
-+	blob_off = sizeof(struct challenge_message);
-+	blob_len = blob_off + uni_len;
-+
-+	chgblob->TargetName.Length = cpu_to_le16(uni_len);
-+	chgblob->TargetName.MaximumLength = cpu_to_le16(uni_len);
-+	chgblob->TargetName.BufferOffset = cpu_to_le32(blob_off);
-+
-+	/* Initialize random conn challenge */
-+	get_random_bytes(sess->ntlmssp.cryptkey, sizeof(__u64));
-+	memcpy(chgblob->Challenge, sess->ntlmssp.cryptkey,
-+	       CIFS_CRYPTO_KEY_SIZE);
-+
-+	/* Add Target Information to security buffer */
-+	chgblob->TargetInfoArray.BufferOffset = cpu_to_le32(blob_len);
-+
-+	target_name = (__u8 *)chgblob + blob_off;
-+	memcpy(target_name, name, uni_len);
-+	tinfo = (struct target_info *)(target_name + uni_len);
-+
-+	chgblob->TargetInfoArray.Length = 0;
-+	/* Add target info list for NetBIOS/DNS settings */
-+	for (type = NTLMSSP_AV_NB_COMPUTER_NAME;
-+	     type <= NTLMSSP_AV_DNS_DOMAIN_NAME; type++) {
-+		tinfo->Type = cpu_to_le16(type);
-+		tinfo->Length = cpu_to_le16(uni_len);
-+		memcpy(tinfo->Content, name, uni_len);
-+		tinfo = (struct target_info *)((char *)tinfo + 4 + uni_len);
-+		target_info_len += 4 + uni_len;
-+	}
-+
-+	/* Add terminator subblock */
-+	tinfo->Type = 0;
-+	tinfo->Length = 0;
-+	target_info_len += 4;
-+
-+	chgblob->TargetInfoArray.Length = cpu_to_le16(target_info_len);
-+	chgblob->TargetInfoArray.MaximumLength = cpu_to_le16(target_info_len);
-+	blob_len += target_info_len;
-+	kfree(name);
-+	ksmbd_debug(AUTH, "NTLMSSP SecurityBufferLength %d\n", blob_len);
-+	return blob_len;
-+}
-+
-+#ifdef CONFIG_SMB_SERVER_KERBEROS5
-+int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
-+			    int in_len, char *out_blob, int *out_len)
-+{
-+	struct ksmbd_spnego_authen_response *resp;
-+	struct ksmbd_user *user = NULL;
-+	int retval;
-+
-+	resp = ksmbd_ipc_spnego_authen_request(in_blob, in_len);
-+	if (!resp) {
-+		ksmbd_debug(AUTH, "SPNEGO_AUTHEN_REQUEST failure\n");
-+		return -EINVAL;
-+	}
-+
-+	if (!(resp->login_response.status & KSMBD_USER_FLAG_OK)) {
-+		ksmbd_debug(AUTH, "krb5 authentication failure\n");
-+		retval = -EPERM;
++	mode |= S_IFDIR;
++	err = vfs_mkdir(mnt_user_ns(path.mnt), d_inode(path.dentry),
++			dentry, mode);
++	if (err) {
 +		goto out;
-+	}
++	} else if (d_unhashed(dentry)) {
++		struct dentry *d;
 +
-+	if (*out_len <= resp->spnego_blob_len) {
-+		ksmbd_debug(AUTH, "buf len %d, but blob len %d\n",
-+			    *out_len, resp->spnego_blob_len);
-+		retval = -EINVAL;
-+		goto out;
-+	}
-+
-+	if (resp->session_key_len > sizeof(sess->sess_key)) {
-+		ksmbd_debug(AUTH, "session key is too long\n");
-+		retval = -EINVAL;
-+		goto out;
-+	}
-+
-+	user = ksmbd_alloc_user(&resp->login_response);
-+	if (!user) {
-+		ksmbd_debug(AUTH, "login failure\n");
-+		retval = -ENOMEM;
-+		goto out;
-+	}
-+	sess->user = user;
-+
-+	memcpy(sess->sess_key, resp->payload, resp->session_key_len);
-+	memcpy(out_blob, resp->payload + resp->session_key_len,
-+	       resp->spnego_blob_len);
-+	*out_len = resp->spnego_blob_len;
-+	retval = 0;
-+out:
-+	kvfree(resp);
-+	return retval;
-+}
-+#else
-+int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
-+			    int in_len, char *out_blob, int *out_len)
-+{
-+	return -EOPNOTSUPP;
-+}
-+#endif
-+
-+/**
-+ * ksmbd_sign_smb2_pdu() - function to generate packet signing
-+ * @conn:	connection
-+ * @key:	signing key
-+ * @iov:        buffer iov array
-+ * @n_vec:	number of iovecs
-+ * @sig:	signature value generated for client request packet
-+ *
-+ */
-+int ksmbd_sign_smb2_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
-+			int n_vec, char *sig)
-+{
-+	struct ksmbd_crypto_ctx *ctx;
-+	int rc, i;
-+
-+	ctx = ksmbd_crypto_ctx_find_hmacsha256();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "could not crypto alloc hmacmd5\n");
-+		return -ENOMEM;
-+	}
-+
-+	rc = crypto_shash_setkey(CRYPTO_HMACSHA256_TFM(ctx),
-+				 key,
-+				 SMB2_NTLMV2_SESSKEY_SIZE);
-+	if (rc)
-+		goto out;
-+
-+	rc = crypto_shash_init(CRYPTO_HMACSHA256(ctx));
-+	if (rc) {
-+		ksmbd_debug(AUTH, "hmacsha256 init error %d\n", rc);
-+		goto out;
-+	}
-+
-+	for (i = 0; i < n_vec; i++) {
-+		rc = crypto_shash_update(CRYPTO_HMACSHA256(ctx),
-+					 iov[i].iov_base,
-+					 iov[i].iov_len);
-+		if (rc) {
-+			ksmbd_debug(AUTH, "hmacsha256 update error %d\n", rc);
++		d = lookup_one_len(dentry->d_name.name, dentry->d_parent,
++				   dentry->d_name.len);
++		if (IS_ERR(d)) {
++			err = PTR_ERR(d);
 +			goto out;
 +		}
++		if (unlikely(d_is_negative(d))) {
++			dput(d);
++			err = -ENOENT;
++			goto out;
++		}
++
++		ksmbd_vfs_inherit_owner(work, d_inode(path.dentry), d_inode(d));
++		dput(d);
++	}
++out:
++	done_path_create(&path, dentry);
++	if (err)
++		pr_err("mkdir(%s): creation failed (err:%d)\n", name, err);
++	return err;
++}
++
++static ssize_t ksmbd_vfs_getcasexattr(struct user_namespace *user_ns,
++				      struct dentry *dentry, char *attr_name,
++				      int attr_name_len, char **attr_value)
++{
++	char *name, *xattr_list = NULL;
++	ssize_t value_len = -ENOENT, xattr_list_len;
++
++	xattr_list_len = ksmbd_vfs_listxattr(dentry, &xattr_list);
++	if (xattr_list_len <= 0)
++		goto out;
++
++	for (name = xattr_list; name - xattr_list < xattr_list_len;
++			name += strlen(name) + 1) {
++		ksmbd_debug(VFS, "%s, len %zd\n", name, strlen(name));
++		if (strncasecmp(attr_name, name, attr_name_len))
++			continue;
++
++		value_len = ksmbd_vfs_getxattr(user_ns,
++					       dentry,
++					       name,
++					       attr_value);
++		if (value_len < 0)
++			pr_err("failed to get xattr in file\n");
++		break;
 +	}
 +
-+	rc = crypto_shash_final(CRYPTO_HMACSHA256(ctx), sig);
-+	if (rc)
-+		ksmbd_debug(AUTH, "hmacsha256 generation error %d\n", rc);
 +out:
-+	ksmbd_release_crypto_ctx(ctx);
-+	return rc;
++	kvfree(xattr_list);
++	return value_len;
++}
++
++static int ksmbd_vfs_stream_read(struct ksmbd_file *fp, char *buf, loff_t *pos,
++				 size_t count)
++{
++	ssize_t v_len;
++	char *stream_buf = NULL;
++
++	ksmbd_debug(VFS, "read stream data pos : %llu, count : %zd\n",
++		    *pos, count);
++
++	v_len = ksmbd_vfs_getcasexattr(file_mnt_user_ns(fp->filp),
++				       fp->filp->f_path.dentry,
++				       fp->stream.name,
++				       fp->stream.size,
++				       &stream_buf);
++	if ((int)v_len <= 0)
++		return (int)v_len;
++
++	if (v_len <= *pos) {
++		count = -EINVAL;
++		goto free_buf;
++	}
++
++	if (v_len - *pos < count)
++		count = v_len - *pos;
++
++	memcpy(buf, &stream_buf[*pos], count);
++
++free_buf:
++	kvfree(stream_buf);
++	return count;
 +}
 +
 +/**
-+ * ksmbd_sign_smb3_pdu() - function to generate packet signing
-+ * @conn:	connection
-+ * @key:	signing key
-+ * @iov:        buffer iov array
-+ * @n_vec:	number of iovecs
-+ * @sig:	signature value generated for client request packet
++ * check_lock_range() - vfs helper for smb byte range file locking
++ * @filp:	the file to apply the lock to
++ * @start:	lock start byte offset
++ * @end:	lock end byte offset
++ * @type:	byte range type read/write
 + *
++ * Return:	0 on success, otherwise error
 + */
-+int ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
-+			int n_vec, char *sig)
++static int check_lock_range(struct file *filp, loff_t start, loff_t end,
++			    unsigned char type)
 +{
-+	struct ksmbd_crypto_ctx *ctx;
-+	int rc, i;
++	struct file_lock *flock;
++	struct file_lock_context *ctx = file_inode(filp)->i_flctx;
++	int error = 0;
 +
-+	ctx = ksmbd_crypto_ctx_find_cmacaes();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "could not crypto alloc cmac\n");
-+		return -ENOMEM;
-+	}
-+
-+	rc = crypto_shash_setkey(CRYPTO_CMACAES_TFM(ctx),
-+				 key,
-+				 SMB2_CMACAES_SIZE);
-+	if (rc)
-+		goto out;
-+
-+	rc = crypto_shash_init(CRYPTO_CMACAES(ctx));
-+	if (rc) {
-+		ksmbd_debug(AUTH, "cmaces init error %d\n", rc);
-+		goto out;
-+	}
-+
-+	for (i = 0; i < n_vec; i++) {
-+		rc = crypto_shash_update(CRYPTO_CMACAES(ctx),
-+					 iov[i].iov_base,
-+					 iov[i].iov_len);
-+		if (rc) {
-+			ksmbd_debug(AUTH, "cmaces update error %d\n", rc);
-+			goto out;
-+		}
-+	}
-+
-+	rc = crypto_shash_final(CRYPTO_CMACAES(ctx), sig);
-+	if (rc)
-+		ksmbd_debug(AUTH, "cmaces generation error %d\n", rc);
-+out:
-+	ksmbd_release_crypto_ctx(ctx);
-+	return rc;
-+}
-+
-+struct derivation {
-+	struct kvec label;
-+	struct kvec context;
-+	bool binding;
-+};
-+
-+static int generate_key(struct ksmbd_session *sess, struct kvec label,
-+			struct kvec context, __u8 *key, unsigned int key_size)
-+{
-+	unsigned char zero = 0x0;
-+	__u8 i[4] = {0, 0, 0, 1};
-+	__u8 L128[4] = {0, 0, 0, 128};
-+	__u8 L256[4] = {0, 0, 1, 0};
-+	int rc;
-+	unsigned char prfhash[SMB2_HMACSHA256_SIZE];
-+	unsigned char *hashptr = prfhash;
-+	struct ksmbd_crypto_ctx *ctx;
-+
-+	memset(prfhash, 0x0, SMB2_HMACSHA256_SIZE);
-+	memset(key, 0x0, key_size);
-+
-+	ctx = ksmbd_crypto_ctx_find_hmacsha256();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "could not crypto alloc hmacmd5\n");
-+		return -ENOMEM;
-+	}
-+
-+	rc = crypto_shash_setkey(CRYPTO_HMACSHA256_TFM(ctx),
-+				 sess->sess_key,
-+				 SMB2_NTLMV2_SESSKEY_SIZE);
-+	if (rc)
-+		goto smb3signkey_ret;
-+
-+	rc = crypto_shash_init(CRYPTO_HMACSHA256(ctx));
-+	if (rc) {
-+		ksmbd_debug(AUTH, "hmacsha256 init error %d\n", rc);
-+		goto smb3signkey_ret;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_HMACSHA256(ctx), i, 4);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not update with n\n");
-+		goto smb3signkey_ret;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_HMACSHA256(ctx),
-+				 label.iov_base,
-+				 label.iov_len);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not update with label\n");
-+		goto smb3signkey_ret;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_HMACSHA256(ctx), &zero, 1);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not update with zero\n");
-+		goto smb3signkey_ret;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_HMACSHA256(ctx),
-+				 context.iov_base,
-+				 context.iov_len);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not update with context\n");
-+		goto smb3signkey_ret;
-+	}
-+
-+	if (sess->conn->cipher_type == SMB2_ENCRYPTION_AES256_CCM ||
-+	    sess->conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM)
-+		rc = crypto_shash_update(CRYPTO_HMACSHA256(ctx), L256, 4);
-+	else
-+		rc = crypto_shash_update(CRYPTO_HMACSHA256(ctx), L128, 4);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not update with L\n");
-+		goto smb3signkey_ret;
-+	}
-+
-+	rc = crypto_shash_final(CRYPTO_HMACSHA256(ctx), hashptr);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not generate hmacmd5 hash error %d\n",
-+			    rc);
-+		goto smb3signkey_ret;
-+	}
-+
-+	memcpy(key, hashptr, key_size);
-+
-+smb3signkey_ret:
-+	ksmbd_release_crypto_ctx(ctx);
-+	return rc;
-+}
-+
-+static int generate_smb3signingkey(struct ksmbd_session *sess,
-+				   struct ksmbd_conn *conn,
-+				   const struct derivation *signing)
-+{
-+	int rc;
-+	struct channel *chann;
-+	char *key;
-+
-+	chann = lookup_chann_list(sess, conn);
-+	if (!chann)
++	if (!ctx || list_empty_careful(&ctx->flc_posix))
 +		return 0;
 +
-+	if (sess->conn->dialect >= SMB30_PROT_ID && signing->binding)
-+		key = chann->smb3signingkey;
-+	else
-+		key = sess->smb3signingkey;
-+
-+	rc = generate_key(sess, signing->label, signing->context, key,
-+			  SMB3_SIGN_KEY_SIZE);
-+	if (rc)
-+		return rc;
-+
-+	if (!(sess->conn->dialect >= SMB30_PROT_ID && signing->binding))
-+		memcpy(chann->smb3signingkey, key, SMB3_SIGN_KEY_SIZE);
-+
-+	ksmbd_debug(AUTH, "dumping generated AES signing keys\n");
-+	ksmbd_debug(AUTH, "Session Id    %llu\n", sess->id);
-+	ksmbd_debug(AUTH, "Session Key   %*ph\n",
-+		    SMB2_NTLMV2_SESSKEY_SIZE, sess->sess_key);
-+	ksmbd_debug(AUTH, "Signing Key   %*ph\n",
-+		    SMB3_SIGN_KEY_SIZE, key);
-+	return 0;
-+}
-+
-+int ksmbd_gen_smb30_signingkey(struct ksmbd_session *sess,
-+			       struct ksmbd_conn *conn)
-+{
-+	struct derivation d;
-+
-+	d.label.iov_base = "SMB2AESCMAC";
-+	d.label.iov_len = 12;
-+	d.context.iov_base = "SmbSign";
-+	d.context.iov_len = 8;
-+	d.binding = conn->binding;
-+
-+	return generate_smb3signingkey(sess, conn, &d);
-+}
-+
-+int ksmbd_gen_smb311_signingkey(struct ksmbd_session *sess,
-+				struct ksmbd_conn *conn)
-+{
-+	struct derivation d;
-+
-+	d.label.iov_base = "SMBSigningKey";
-+	d.label.iov_len = 14;
-+	if (conn->binding) {
-+		struct preauth_session *preauth_sess;
-+
-+		preauth_sess = ksmbd_preauth_session_lookup(conn, sess->id);
-+		if (!preauth_sess)
-+			return -ENOENT;
-+		d.context.iov_base = preauth_sess->Preauth_HashValue;
-+	} else {
-+		d.context.iov_base = sess->Preauth_HashValue;
-+	}
-+	d.context.iov_len = 64;
-+	d.binding = conn->binding;
-+
-+	return generate_smb3signingkey(sess, conn, &d);
-+}
-+
-+struct derivation_twin {
-+	struct derivation encryption;
-+	struct derivation decryption;
-+};
-+
-+static int generate_smb3encryptionkey(struct ksmbd_session *sess,
-+				      const struct derivation_twin *ptwin)
-+{
-+	int rc;
-+
-+	rc = generate_key(sess, ptwin->encryption.label,
-+			  ptwin->encryption.context, sess->smb3encryptionkey,
-+			  SMB3_ENC_DEC_KEY_SIZE);
-+	if (rc)
-+		return rc;
-+
-+	rc = generate_key(sess, ptwin->decryption.label,
-+			  ptwin->decryption.context,
-+			  sess->smb3decryptionkey, SMB3_ENC_DEC_KEY_SIZE);
-+	if (rc)
-+		return rc;
-+
-+	ksmbd_debug(AUTH, "dumping generated AES encryption keys\n");
-+	ksmbd_debug(AUTH, "Cipher type   %d\n", sess->conn->cipher_type);
-+	ksmbd_debug(AUTH, "Session Id    %llu\n", sess->id);
-+	ksmbd_debug(AUTH, "Session Key   %*ph\n",
-+		    SMB2_NTLMV2_SESSKEY_SIZE, sess->sess_key);
-+	if (sess->conn->cipher_type == SMB2_ENCRYPTION_AES256_CCM ||
-+	    sess->conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM) {
-+		ksmbd_debug(AUTH, "ServerIn Key  %*ph\n",
-+			    SMB3_GCM256_CRYPTKEY_SIZE, sess->smb3encryptionkey);
-+		ksmbd_debug(AUTH, "ServerOut Key %*ph\n",
-+			    SMB3_GCM256_CRYPTKEY_SIZE, sess->smb3decryptionkey);
-+	} else {
-+		ksmbd_debug(AUTH, "ServerIn Key  %*ph\n",
-+			    SMB3_GCM128_CRYPTKEY_SIZE, sess->smb3encryptionkey);
-+		ksmbd_debug(AUTH, "ServerOut Key %*ph\n",
-+			    SMB3_GCM128_CRYPTKEY_SIZE, sess->smb3decryptionkey);
-+	}
-+	return 0;
-+}
-+
-+int ksmbd_gen_smb30_encryptionkey(struct ksmbd_session *sess)
-+{
-+	struct derivation_twin twin;
-+	struct derivation *d;
-+
-+	d = &twin.encryption;
-+	d->label.iov_base = "SMB2AESCCM";
-+	d->label.iov_len = 11;
-+	d->context.iov_base = "ServerOut";
-+	d->context.iov_len = 10;
-+
-+	d = &twin.decryption;
-+	d->label.iov_base = "SMB2AESCCM";
-+	d->label.iov_len = 11;
-+	d->context.iov_base = "ServerIn ";
-+	d->context.iov_len = 10;
-+
-+	return generate_smb3encryptionkey(sess, &twin);
-+}
-+
-+int ksmbd_gen_smb311_encryptionkey(struct ksmbd_session *sess)
-+{
-+	struct derivation_twin twin;
-+	struct derivation *d;
-+
-+	d = &twin.encryption;
-+	d->label.iov_base = "SMBS2CCipherKey";
-+	d->label.iov_len = 16;
-+	d->context.iov_base = sess->Preauth_HashValue;
-+	d->context.iov_len = 64;
-+
-+	d = &twin.decryption;
-+	d->label.iov_base = "SMBC2SCipherKey";
-+	d->label.iov_len = 16;
-+	d->context.iov_base = sess->Preauth_HashValue;
-+	d->context.iov_len = 64;
-+
-+	return generate_smb3encryptionkey(sess, &twin);
-+}
-+
-+int ksmbd_gen_preauth_integrity_hash(struct ksmbd_conn *conn, char *buf,
-+				     __u8 *pi_hash)
-+{
-+	int rc;
-+	struct smb2_hdr *rcv_hdr = (struct smb2_hdr *)buf;
-+	char *all_bytes_msg = (char *)&rcv_hdr->ProtocolId;
-+	int msg_size = be32_to_cpu(rcv_hdr->smb2_buf_length);
-+	struct ksmbd_crypto_ctx *ctx = NULL;
-+
-+	if (conn->preauth_info->Preauth_HashId !=
-+	    SMB2_PREAUTH_INTEGRITY_SHA512)
-+		return -EINVAL;
-+
-+	ctx = ksmbd_crypto_ctx_find_sha512();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "could not alloc sha512\n");
-+		return -ENOMEM;
-+	}
-+
-+	rc = crypto_shash_init(CRYPTO_SHA512(ctx));
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not init shashn");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_SHA512(ctx), pi_hash, 64);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not update with n\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_SHA512(ctx), all_bytes_msg, msg_size);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not update with n\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_final(CRYPTO_SHA512(ctx), pi_hash);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not generate hash err : %d\n", rc);
-+		goto out;
-+	}
-+out:
-+	ksmbd_release_crypto_ctx(ctx);
-+	return rc;
-+}
-+
-+int ksmbd_gen_sd_hash(struct ksmbd_conn *conn, char *sd_buf, int len,
-+		      __u8 *pi_hash)
-+{
-+	int rc;
-+	struct ksmbd_crypto_ctx *ctx = NULL;
-+
-+	ctx = ksmbd_crypto_ctx_find_sha256();
-+	if (!ctx) {
-+		ksmbd_debug(AUTH, "could not alloc sha256\n");
-+		return -ENOMEM;
-+	}
-+
-+	rc = crypto_shash_init(CRYPTO_SHA256(ctx));
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not init shashn");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_update(CRYPTO_SHA256(ctx), sd_buf, len);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "could not update with n\n");
-+		goto out;
-+	}
-+
-+	rc = crypto_shash_final(CRYPTO_SHA256(ctx), pi_hash);
-+	if (rc) {
-+		ksmbd_debug(AUTH, "Could not generate hash err : %d\n", rc);
-+		goto out;
-+	}
-+out:
-+	ksmbd_release_crypto_ctx(ctx);
-+	return rc;
-+}
-+
-+static int ksmbd_get_encryption_key(struct ksmbd_conn *conn, __u64 ses_id,
-+				    int enc, u8 *key)
-+{
-+	struct ksmbd_session *sess;
-+	u8 *ses_enc_key;
-+
-+	sess = ksmbd_session_lookup_all(conn, ses_id);
-+	if (!sess)
-+		return -EINVAL;
-+
-+	ses_enc_key = enc ? sess->smb3encryptionkey :
-+		sess->smb3decryptionkey;
-+	memcpy(key, ses_enc_key, SMB3_ENC_DEC_KEY_SIZE);
-+
-+	return 0;
-+}
-+
-+static inline void smb2_sg_set_buf(struct scatterlist *sg, const void *buf,
-+				   unsigned int buflen)
-+{
-+	void *addr;
-+
-+	if (is_vmalloc_addr(buf))
-+		addr = vmalloc_to_page(buf);
-+	else
-+		addr = virt_to_page(buf);
-+	sg_set_page(sg, addr, buflen, offset_in_page(buf));
-+}
-+
-+static struct scatterlist *ksmbd_init_sg(struct kvec *iov, unsigned int nvec,
-+					 u8 *sign)
-+{
-+	struct scatterlist *sg;
-+	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 24;
-+	int i, nr_entries[3] = {0}, total_entries = 0, sg_idx = 0;
-+
-+	if (!nvec)
-+		return NULL;
-+
-+	for (i = 0; i < nvec - 1; i++) {
-+		unsigned long kaddr = (unsigned long)iov[i + 1].iov_base;
-+
-+		if (is_vmalloc_addr(iov[i + 1].iov_base)) {
-+			nr_entries[i] = ((kaddr + iov[i + 1].iov_len +
-+					PAGE_SIZE - 1) >> PAGE_SHIFT) -
-+				(kaddr >> PAGE_SHIFT);
-+		} else {
-+			nr_entries[i]++;
-+		}
-+		total_entries += nr_entries[i];
-+	}
-+
-+	/* Add two entries for transform header and signature */
-+	total_entries += 2;
-+
-+	sg = kmalloc_array(total_entries, sizeof(struct scatterlist), GFP_KERNEL);
-+	if (!sg)
-+		return NULL;
-+
-+	sg_init_table(sg, total_entries);
-+	smb2_sg_set_buf(&sg[sg_idx++], iov[0].iov_base + 24, assoc_data_len);
-+	for (i = 0; i < nvec - 1; i++) {
-+		void *data = iov[i + 1].iov_base;
-+		int len = iov[i + 1].iov_len;
-+
-+		if (is_vmalloc_addr(data)) {
-+			int j, offset = offset_in_page(data);
-+
-+			for (j = 0; j < nr_entries[i]; j++) {
-+				unsigned int bytes = PAGE_SIZE - offset;
-+
-+				if (!len)
-+					break;
-+
-+				if (bytes > len)
-+					bytes = len;
-+
-+				sg_set_page(&sg[sg_idx++],
-+					    vmalloc_to_page(data), bytes,
-+					    offset_in_page(data));
-+
-+				data += bytes;
-+				len -= bytes;
-+				offset = 0;
++	spin_lock(&ctx->flc_lock);
++	list_for_each_entry(flock, &ctx->flc_posix, fl_list) {
++		/* check conflict locks */
++		if (flock->fl_end >= start && end >= flock->fl_start) {
++			if (flock->fl_type == F_RDLCK) {
++				if (type == WRITE) {
++					pr_err("not allow write by shared lock\n");
++					error = 1;
++					goto out;
++				}
++			} else if (flock->fl_type == F_WRLCK) {
++				/* check owner in lock */
++				if (flock->fl_file != filp) {
++					error = 1;
++					pr_err("not allow rw access by exclusive lock from other opens\n");
++					goto out;
++				}
 +			}
-+		} else {
-+			sg_set_page(&sg[sg_idx++], virt_to_page(data), len,
-+				    offset_in_page(data));
 +		}
 +	}
-+	smb2_sg_set_buf(&sg[sg_idx], sign, SMB2_SIGNATURE_SIZE);
-+	return sg;
++out:
++	spin_unlock(&ctx->flc_lock);
++	return error;
 +}
 +
-+int ksmbd_crypt_message(struct ksmbd_conn *conn, struct kvec *iov,
-+			unsigned int nvec, int enc)
++/**
++ * ksmbd_vfs_read() - vfs helper for smb file read
++ * @work:	smb work
++ * @fid:	file id of open file
++ * @count:	read byte count
++ * @pos:	file pos
++ *
++ * Return:	number of read bytes on success, otherwise error
++ */
++int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp, size_t count,
++		   loff_t *pos)
 +{
-+	struct smb2_transform_hdr *tr_hdr =
-+		(struct smb2_transform_hdr *)iov[0].iov_base;
-+	unsigned int assoc_data_len = sizeof(struct smb2_transform_hdr) - 24;
-+	int rc;
-+	struct scatterlist *sg;
-+	u8 sign[SMB2_SIGNATURE_SIZE] = {};
-+	u8 key[SMB3_ENC_DEC_KEY_SIZE];
-+	struct aead_request *req;
-+	char *iv;
-+	unsigned int iv_len;
-+	struct crypto_aead *tfm;
-+	unsigned int crypt_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
-+	struct ksmbd_crypto_ctx *ctx;
++	struct file *filp = fp->filp;
++	ssize_t nbytes = 0;
++	char *rbuf = work->aux_payload_buf;
++	struct inode *inode = file_inode(filp);
 +
-+	rc = ksmbd_get_encryption_key(conn,
-+				      le64_to_cpu(tr_hdr->SessionId),
-+				      enc,
-+				      key);
++	if (S_ISDIR(inode->i_mode))
++		return -EISDIR;
++
++	if (unlikely(count == 0))
++		return 0;
++
++	if (work->conn->connection_type) {
++		if (!(fp->daccess & (FILE_READ_DATA_LE | FILE_EXECUTE_LE))) {
++			pr_err("no right to read(%pd)\n",
++			       fp->filp->f_path.dentry);
++			return -EACCES;
++		}
++	}
++
++	if (ksmbd_stream_fd(fp))
++		return ksmbd_vfs_stream_read(fp, rbuf, pos, count);
++
++	if (!work->tcon->posix_extensions) {
++		int ret;
++
++		ret = check_lock_range(filp, *pos, *pos + count - 1, READ);
++		if (ret) {
++			pr_err("unable to read due to lock\n");
++			return -EAGAIN;
++		}
++	}
++
++	nbytes = kernel_read(filp, rbuf, count, pos);
++	if (nbytes < 0) {
++		pr_err("smb read failed for (%s), err = %zd\n",
++		       fp->filename, nbytes);
++		return nbytes;
++	}
++
++	filp->f_pos = *pos;
++	return nbytes;
++}
++
++static int ksmbd_vfs_stream_write(struct ksmbd_file *fp, char *buf, loff_t *pos,
++				  size_t count)
++{
++	char *stream_buf = NULL, *wbuf;
++	struct user_namespace *user_ns = file_mnt_user_ns(fp->filp);
++	size_t size, v_len;
++	int err = 0;
++
++	ksmbd_debug(VFS, "write stream data pos : %llu, count : %zd\n",
++		    *pos, count);
++
++	size = *pos + count;
++	if (size > XATTR_SIZE_MAX) {
++		size = XATTR_SIZE_MAX;
++		count = (*pos + count) - XATTR_SIZE_MAX;
++	}
++
++	v_len = ksmbd_vfs_getcasexattr(user_ns,
++				       fp->filp->f_path.dentry,
++				       fp->stream.name,
++				       fp->stream.size,
++				       &stream_buf);
++	if ((int)v_len < 0) {
++		pr_err("not found stream in xattr : %zd\n", v_len);
++		err = (int)v_len;
++		goto out;
++	}
++
++	if (v_len < size) {
++		wbuf = kvmalloc(size, GFP_KERNEL | __GFP_ZERO);
++		if (!wbuf) {
++			err = -ENOMEM;
++			goto out;
++		}
++
++		if (v_len > 0)
++			memcpy(wbuf, stream_buf, v_len);
++		kvfree(stream_buf);
++		stream_buf = wbuf;
++	}
++
++	memcpy(&stream_buf[*pos], buf, count);
++
++	err = ksmbd_vfs_setxattr(user_ns,
++				 fp->filp->f_path.dentry,
++				 fp->stream.name,
++				 (void *)stream_buf,
++				 size,
++				 0);
++	if (err < 0)
++		goto out;
++
++	fp->filp->f_pos = *pos;
++	err = 0;
++out:
++	kvfree(stream_buf);
++	return err;
++}
++
++/**
++ * ksmbd_vfs_write() - vfs helper for smb file write
++ * @work:	work
++ * @fid:	file id of open file
++ * @buf:	buf containing data for writing
++ * @count:	read byte count
++ * @pos:	file pos
++ * @sync:	fsync after write
++ * @written:	number of bytes written
++ *
++ * Return:	0 on success, otherwise error
++ */
++int ksmbd_vfs_write(struct ksmbd_work *work, struct ksmbd_file *fp,
++		    char *buf, size_t count, loff_t *pos, bool sync,
++		    ssize_t *written)
++{
++	struct ksmbd_session *sess = work->sess;
++	struct file *filp;
++	loff_t	offset = *pos;
++	int err = 0;
++
++	if (sess->conn->connection_type) {
++		if (!(fp->daccess & FILE_WRITE_DATA_LE)) {
++			pr_err("no right to write(%pd)\n",
++			       fp->filp->f_path.dentry);
++			err = -EACCES;
++			goto out;
++		}
++	}
++
++	filp = fp->filp;
++
++	if (ksmbd_stream_fd(fp)) {
++		err = ksmbd_vfs_stream_write(fp, buf, pos, count);
++		if (!err)
++			*written = count;
++		goto out;
++	}
++
++	if (!work->tcon->posix_extensions) {
++		err = check_lock_range(filp, *pos, *pos + count - 1, WRITE);
++		if (err) {
++			pr_err("unable to write due to lock\n");
++			err = -EAGAIN;
++			goto out;
++		}
++	}
++
++	/* Do we need to break any of a levelII oplock? */
++	smb_break_all_levII_oplock(work, fp, 1);
++
++	err = kernel_write(filp, buf, count, pos);
++	if (err < 0) {
++		ksmbd_debug(VFS, "smb write failed, err = %d\n", err);
++		goto out;
++	}
++
++	filp->f_pos = *pos;
++	*written = err;
++	err = 0;
++	if (sync) {
++		err = vfs_fsync_range(filp, offset, offset + *written, 0);
++		if (err < 0)
++			pr_err("fsync failed for filename = %pd, err = %d\n",
++			       fp->filp->f_path.dentry, err);
++	}
++
++out:
++	return err;
++}
++
++/**
++ * ksmbd_vfs_getattr() - vfs helper for smb getattr
++ * @work:	work
++ * @fid:	file id of open file
++ * @attrs:	inode attributes
++ *
++ * Return:	0 on success, otherwise error
++ */
++int ksmbd_vfs_getattr(struct path *path, struct kstat *stat)
++{
++	int err;
++
++	err = vfs_getattr(path, stat, STATX_BTIME, AT_STATX_SYNC_AS_STAT);
++	if (err)
++		pr_err("getattr failed, err %d\n", err);
++	return err;
++}
++
++/**
++ * ksmbd_vfs_fsync() - vfs helper for smb fsync
++ * @work:	work
++ * @fid:	file id of open file
++ *
++ * Return:	0 on success, otherwise error
++ */
++int ksmbd_vfs_fsync(struct ksmbd_work *work, u64 fid, u64 p_id)
++{
++	struct ksmbd_file *fp;
++	int err;
++
++	fp = ksmbd_lookup_fd_slow(work, fid, p_id);
++	if (!fp) {
++		pr_err("failed to get filp for fid %llu\n", fid);
++		return -ENOENT;
++	}
++	err = vfs_fsync(fp->filp, 0);
++	if (err < 0)
++		pr_err("smb fsync failed, err = %d\n", err);
++	ksmbd_fd_put(work, fp);
++	return err;
++}
++
++/**
++ * ksmbd_vfs_remove_file() - vfs helper for smb rmdir or unlink
++ * @name:	absolute directory or file name
++ *
++ * Return:	0 on success, otherwise error
++ */
++int ksmbd_vfs_remove_file(struct ksmbd_work *work, char *name)
++{
++	struct path path;
++	struct dentry *parent;
++	int err;
++	int flags = 0;
++
++	if (ksmbd_override_fsids(work))
++		return -ENOMEM;
++
++	if (test_share_config_flag(work->tcon->share_conf,
++				   KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS))
++		flags = LOOKUP_FOLLOW;
++
++	err = kern_path(name, flags, &path);
++	if (err) {
++		ksmbd_debug(VFS, "can't get %s, err %d\n", name, err);
++		ksmbd_revert_fsids(work);
++		return err;
++	}
++
++	parent = dget_parent(path.dentry);
++	err = ksmbd_vfs_lock_parent(parent, path.dentry);
++	if (err) {
++		dput(parent);
++		path_put(&path);
++		ksmbd_revert_fsids(work);
++		return err;
++	}
++
++	if (!d_inode(path.dentry)->i_nlink) {
++		err = -ENOENT;
++		goto out_err;
++	}
++
++	if (S_ISDIR(d_inode(path.dentry)->i_mode)) {
++		err = vfs_rmdir(mnt_user_ns(path.mnt), d_inode(parent),
++				path.dentry);
++		if (err && err != -ENOTEMPTY)
++			ksmbd_debug(VFS, "%s: rmdir failed, err %d\n", name,
++				    err);
++	} else {
++		err = vfs_unlink(mnt_user_ns(path.mnt), d_inode(parent),
++				 path.dentry, NULL);
++		if (err)
++			ksmbd_debug(VFS, "%s: unlink failed, err %d\n", name,
++				    err);
++	}
++
++out_err:
++	inode_unlock(d_inode(parent));
++	dput(parent);
++	path_put(&path);
++	ksmbd_revert_fsids(work);
++	return err;
++}
++
++/**
++ * ksmbd_vfs_link() - vfs helper for creating smb hardlink
++ * @oldname:	source file name
++ * @newname:	hardlink name
++ *
++ * Return:	0 on success, otherwise error
++ */
++int ksmbd_vfs_link(struct ksmbd_work *work, const char *oldname,
++		   const char *newname)
++{
++	struct path oldpath, newpath;
++	struct dentry *dentry;
++	int err;
++	int flags = 0;
++
++	if (ksmbd_override_fsids(work))
++		return -ENOMEM;
++
++	if (test_share_config_flag(work->tcon->share_conf,
++				   KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS))
++		flags = LOOKUP_FOLLOW;
++
++	err = kern_path(oldname, flags, &oldpath);
++	if (err) {
++		pr_err("cannot get linux path for %s, err = %d\n",
++		       oldname, err);
++		goto out1;
++	}
++
++	dentry = kern_path_create(AT_FDCWD, newname, &newpath,
++				  flags | LOOKUP_REVAL);
++	if (IS_ERR(dentry)) {
++		err = PTR_ERR(dentry);
++		pr_err("path create err for %s, err %d\n", newname, err);
++		goto out2;
++	}
++
++	err = -EXDEV;
++	if (oldpath.mnt != newpath.mnt) {
++		pr_err("vfs_link failed err %d\n", err);
++		goto out3;
++	}
++
++	err = vfs_link(oldpath.dentry, mnt_user_ns(newpath.mnt),
++		       d_inode(newpath.dentry),
++		       dentry, NULL);
++	if (err)
++		ksmbd_debug(VFS, "vfs_link failed err %d\n", err);
++
++out3:
++	done_path_create(&newpath, dentry);
++out2:
++	path_put(&oldpath);
++out1:
++	ksmbd_revert_fsids(work);
++	return err;
++}
++
++static int ksmbd_validate_entry_in_use(struct dentry *src_dent)
++{
++	struct dentry *dst_dent;
++
++	spin_lock(&src_dent->d_lock);
++	list_for_each_entry(dst_dent, &src_dent->d_subdirs, d_child) {
++		struct ksmbd_file *child_fp;
++
++		if (d_really_is_negative(dst_dent))
++			continue;
++
++		child_fp = ksmbd_lookup_fd_inode(d_inode(dst_dent));
++		if (child_fp) {
++			spin_unlock(&src_dent->d_lock);
++			ksmbd_debug(VFS, "Forbid rename, sub file/dir is in use\n");
++			return -EACCES;
++		}
++	}
++	spin_unlock(&src_dent->d_lock);
++
++	return 0;
++}
++
++static int __ksmbd_vfs_rename(struct ksmbd_work *work,
++			      struct user_namespace *src_user_ns,
++			      struct dentry *src_dent_parent,
++			      struct dentry *src_dent,
++			      struct user_namespace *dst_user_ns,
++			      struct dentry *dst_dent_parent,
++			      struct dentry *trap_dent,
++			      char *dst_name)
++{
++	struct dentry *dst_dent;
++	int err;
++
++	if (!work->tcon->posix_extensions) {
++		err = ksmbd_validate_entry_in_use(src_dent);
++		if (err)
++			return err;
++	}
++
++	if (d_really_is_negative(src_dent_parent))
++		return -ENOENT;
++	if (d_really_is_negative(dst_dent_parent))
++		return -ENOENT;
++	if (d_really_is_negative(src_dent))
++		return -ENOENT;
++	if (src_dent == trap_dent)
++		return -EINVAL;
++
++	if (ksmbd_override_fsids(work))
++		return -ENOMEM;
++
++	dst_dent = lookup_one_len(dst_name, dst_dent_parent, strlen(dst_name));
++	err = PTR_ERR(dst_dent);
++	if (IS_ERR(dst_dent)) {
++		pr_err("lookup failed %s [%d]\n", dst_name, err);
++		goto out;
++	}
++
++	err = -ENOTEMPTY;
++	if (dst_dent != trap_dent && !d_really_is_positive(dst_dent)) {
++		struct renamedata rd = {
++			.old_mnt_userns	= src_user_ns,
++			.old_dir	= d_inode(src_dent_parent),
++			.old_dentry	= src_dent,
++			.new_mnt_userns	= dst_user_ns,
++			.new_dir	= d_inode(dst_dent_parent),
++			.new_dentry	= dst_dent,
++		};
++		err = vfs_rename(&rd);
++	}
++	if (err)
++		pr_err("vfs_rename failed err %d\n", err);
++	if (dst_dent)
++		dput(dst_dent);
++out:
++	ksmbd_revert_fsids(work);
++	return err;
++}
++
++int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
++			char *newname)
++{
++	struct path dst_path;
++	struct dentry *src_dent_parent, *dst_dent_parent;
++	struct dentry *src_dent, *trap_dent, *src_child;
++	char *dst_name;
++	int err;
++	int flags;
++
++	dst_name = extract_last_component(newname);
++	if (!dst_name)
++		return -EINVAL;
++
++	src_dent_parent = dget_parent(fp->filp->f_path.dentry);
++	src_dent = fp->filp->f_path.dentry;
++
++	flags = LOOKUP_DIRECTORY;
++	if (test_share_config_flag(work->tcon->share_conf,
++				   KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS))
++		flags |= LOOKUP_FOLLOW;
++
++	err = kern_path(newname, flags, &dst_path);
++	if (err) {
++		ksmbd_debug(VFS, "Cannot get path for %s [%d]\n", newname, err);
++		goto out;
++	}
++	dst_dent_parent = dst_path.dentry;
++
++	trap_dent = lock_rename(src_dent_parent, dst_dent_parent);
++	dget(src_dent);
++	dget(dst_dent_parent);
++	src_child = lookup_one_len(src_dent->d_name.name, src_dent_parent,
++				   src_dent->d_name.len);
++	if (IS_ERR(src_child)) {
++		err = PTR_ERR(src_child);
++		goto out_lock;
++	}
++
++	if (src_child != src_dent) {
++		err = -ESTALE;
++		dput(src_child);
++		goto out_lock;
++	}
++	dput(src_child);
++
++	err = __ksmbd_vfs_rename(work,
++				 file_mnt_user_ns(fp->filp),
++				 src_dent_parent,
++				 src_dent,
++				 mnt_user_ns(dst_path.mnt),
++				 dst_dent_parent,
++				 trap_dent,
++				 dst_name);
++out_lock:
++	dput(src_dent);
++	dput(dst_dent_parent);
++	unlock_rename(src_dent_parent, dst_dent_parent);
++	path_put(&dst_path);
++out:
++	dput(src_dent_parent);
++	return err;
++}
++
++/**
++ * ksmbd_vfs_truncate() - vfs helper for smb file truncate
++ * @work:	work
++ * @name:	old filename
++ * @fid:	file id of old file
++ * @size:	truncate to given size
++ *
++ * Return:	0 on success, otherwise error
++ */
++int ksmbd_vfs_truncate(struct ksmbd_work *work, const char *name,
++		       struct ksmbd_file *fp, loff_t size)
++{
++	struct path path;
++	int err = 0;
++
++	if (name) {
++		err = kern_path(name, 0, &path);
++		if (err) {
++			pr_err("cannot get linux path for %s, err %d\n",
++			       name, err);
++			return err;
++		}
++		err = vfs_truncate(&path, size);
++		if (err)
++			pr_err("truncate failed for %s err %d\n",
++			       name, err);
++		path_put(&path);
++	} else {
++		struct file *filp;
++
++		filp = fp->filp;
++
++		/* Do we need to break any of a levelII oplock? */
++		smb_break_all_levII_oplock(work, fp, 1);
++
++		if (!work->tcon->posix_extensions) {
++			struct inode *inode = file_inode(filp);
++
++			if (size < inode->i_size) {
++				err = check_lock_range(filp, size,
++						       inode->i_size - 1, WRITE);
++			} else {
++				err = check_lock_range(filp, inode->i_size,
++						       size - 1, WRITE);
++			}
++
++			if (err) {
++				pr_err("failed due to lock\n");
++				return -EAGAIN;
++			}
++		}
++
++		err = vfs_truncate(&filp->f_path, size);
++		if (err)
++			pr_err("truncate failed for filename : %s err %d\n",
++			       fp->filename, err);
++	}
++
++	return err;
++}
++
++/**
++ * ksmbd_vfs_listxattr() - vfs helper for smb list extended attributes
++ * @dentry:	dentry of file for listing xattrs
++ * @list:	destination buffer
++ * @size:	destination buffer length
++ *
++ * Return:	xattr list length on success, otherwise error
++ */
++ssize_t ksmbd_vfs_listxattr(struct dentry *dentry, char **list)
++{
++	ssize_t size;
++	char *vlist = NULL;
++
++	size = vfs_listxattr(dentry, NULL, 0);
++	if (size <= 0)
++		return size;
++
++	vlist = kvmalloc(size, GFP_KERNEL | __GFP_ZERO);
++	if (!vlist)
++		return -ENOMEM;
++
++	*list = vlist;
++	size = vfs_listxattr(dentry, vlist, size);
++	if (size < 0) {
++		ksmbd_debug(VFS, "listxattr failed\n");
++		kvfree(vlist);
++		*list = NULL;
++	}
++
++	return size;
++}
++
++static ssize_t ksmbd_vfs_xattr_len(struct user_namespace *user_ns,
++				   struct dentry *dentry, char *xattr_name)
++{
++	return vfs_getxattr(user_ns, dentry, xattr_name, NULL, 0);
++}
++
++/**
++ * ksmbd_vfs_getxattr() - vfs helper for smb get extended attributes value
++ * @user_ns:	user namespace
++ * @dentry:	dentry of file for getting xattrs
++ * @xattr_name:	name of xattr name to query
++ * @xattr_buf:	destination buffer xattr value
++ *
++ * Return:	read xattr value length on success, otherwise error
++ */
++ssize_t ksmbd_vfs_getxattr(struct user_namespace *user_ns,
++			   struct dentry *dentry,
++			   char *xattr_name, char **xattr_buf)
++{
++	ssize_t xattr_len;
++	char *buf;
++
++	*xattr_buf = NULL;
++	xattr_len = ksmbd_vfs_xattr_len(user_ns, dentry, xattr_name);
++	if (xattr_len < 0)
++		return xattr_len;
++
++	buf = kmalloc(xattr_len + 1, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	xattr_len = vfs_getxattr(user_ns, dentry, xattr_name,
++				 (void *)buf, xattr_len);
++	if (xattr_len > 0)
++		*xattr_buf = buf;
++	else
++		kfree(buf);
++	return xattr_len;
++}
++
++/**
++ * ksmbd_vfs_setxattr() - vfs helper for smb set extended attributes value
++ * @user_ns:	user namespace
++ * @dentry:	dentry to set XATTR at
++ * @name:	xattr name for setxattr
++ * @value:	xattr value to set
++ * @size:	size of xattr value
++ * @flags:	destination buffer length
++ *
++ * Return:	0 on success, otherwise error
++ */
++int ksmbd_vfs_setxattr(struct user_namespace *user_ns,
++		       struct dentry *dentry, const char *attr_name,
++		       const void *attr_value, size_t attr_size, int flags)
++{
++	int err;
++
++	err = vfs_setxattr(user_ns,
++			   dentry,
++			   attr_name,
++			   attr_value,
++			   attr_size,
++			   flags);
++	if (err)
++		ksmbd_debug(VFS, "setxattr failed, err %d\n", err);
++	return err;
++}
++
++/**
++ * ksmbd_vfs_set_fadvise() - convert smb IO caching options to linux options
++ * @filp:	file pointer for IO
++ * @options:	smb IO options
++ */
++void ksmbd_vfs_set_fadvise(struct file *filp, __le32 option)
++{
++	struct address_space *mapping;
++
++	mapping = filp->f_mapping;
++
++	if (!option || !mapping)
++		return;
++
++	if (option & FILE_WRITE_THROUGH_LE) {
++		filp->f_flags |= O_SYNC;
++	} else if (option & FILE_SEQUENTIAL_ONLY_LE) {
++		filp->f_ra.ra_pages = inode_to_bdi(mapping->host)->ra_pages * 2;
++		spin_lock(&filp->f_lock);
++		filp->f_mode &= ~FMODE_RANDOM;
++		spin_unlock(&filp->f_lock);
++	} else if (option & FILE_RANDOM_ACCESS_LE) {
++		spin_lock(&filp->f_lock);
++		filp->f_mode |= FMODE_RANDOM;
++		spin_unlock(&filp->f_lock);
++	}
++}
++
++int ksmbd_vfs_zero_data(struct ksmbd_work *work, struct ksmbd_file *fp,
++			loff_t off, loff_t len)
++{
++	smb_break_all_levII_oplock(work, fp, 1);
++	if (fp->f_ci->m_fattr & ATTR_SPARSE_FILE_LE)
++		return vfs_fallocate(fp->filp,
++				     FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
++				     off, len);
++
++	return vfs_fallocate(fp->filp, FALLOC_FL_ZERO_RANGE, off, len);
++}
++
++int ksmbd_vfs_fqar_lseek(struct ksmbd_file *fp, loff_t start, loff_t length,
++			 struct file_allocated_range_buffer *ranges,
++			 int in_count, int *out_count)
++{
++	struct file *f = fp->filp;
++	struct inode *inode = file_inode(fp->filp);
++	loff_t maxbytes = (u64)inode->i_sb->s_maxbytes, end;
++	loff_t extent_start, extent_end;
++	int ret = 0;
++
++	if (start > maxbytes)
++		return -EFBIG;
++
++	if (!in_count)
++		return 0;
++
++	/*
++	 * Shrink request scope to what the fs can actually handle.
++	 */
++	if (length > maxbytes || (maxbytes - length) < start)
++		length = maxbytes - start;
++
++	if (start + length > inode->i_size)
++		length = inode->i_size - start;
++
++	*out_count = 0;
++	end = start + length;
++	while (start < end && *out_count < in_count) {
++		extent_start = f->f_op->llseek(f, start, SEEK_DATA);
++		if (extent_start < 0) {
++			if (extent_start != -ENXIO)
++				ret = (int)extent_start;
++			break;
++		}
++
++		if (extent_start >= end)
++			break;
++
++		extent_end = f->f_op->llseek(f, extent_start, SEEK_HOLE);
++		if (extent_end < 0) {
++			if (extent_end != -ENXIO)
++				ret = (int)extent_end;
++			break;
++		} else if (extent_start >= extent_end) {
++			break;
++		}
++
++		ranges[*out_count].file_offset = cpu_to_le64(extent_start);
++		ranges[(*out_count)++].length =
++			cpu_to_le64(min(extent_end, end) - extent_start);
++
++		start = extent_end;
++	}
++
++	return ret;
++}
++
++int ksmbd_vfs_remove_xattr(struct user_namespace *user_ns,
++			   struct dentry *dentry, char *attr_name)
++{
++	return vfs_removexattr(user_ns, dentry, attr_name);
++}
++
++int ksmbd_vfs_unlink(struct user_namespace *user_ns,
++		     struct dentry *dir, struct dentry *dentry)
++{
++	int err = 0;
++
++	err = ksmbd_vfs_lock_parent(dir, dentry);
++	if (err)
++		return err;
++	dget(dentry);
++
++	if (S_ISDIR(d_inode(dentry)->i_mode))
++		err = vfs_rmdir(user_ns, d_inode(dir), dentry);
++	else
++		err = vfs_unlink(user_ns, d_inode(dir), dentry, NULL);
++
++	dput(dentry);
++	inode_unlock(d_inode(dir));
++	if (err)
++		ksmbd_debug(VFS, "failed to delete, err %d\n", err);
++
++	return err;
++}
++
++static int __dir_empty(struct dir_context *ctx, const char *name, int namlen,
++		       loff_t offset, u64 ino, unsigned int d_type)
++{
++	struct ksmbd_readdir_data *buf;
++
++	buf = container_of(ctx, struct ksmbd_readdir_data, ctx);
++	buf->dirent_count++;
++
++	if (buf->dirent_count > 2)
++		return -ENOTEMPTY;
++	return 0;
++}
++
++/**
++ * ksmbd_vfs_empty_dir() - check for empty directory
++ * @fp:	ksmbd file pointer
++ *
++ * Return:	true if directory empty, otherwise false
++ */
++int ksmbd_vfs_empty_dir(struct ksmbd_file *fp)
++{
++	int err;
++	struct ksmbd_readdir_data readdir_data;
++
++	memset(&readdir_data, 0, sizeof(struct ksmbd_readdir_data));
++
++	set_ctx_actor(&readdir_data.ctx, __dir_empty);
++	readdir_data.dirent_count = 0;
++
++	err = iterate_dir(fp->filp, &readdir_data.ctx);
++	if (readdir_data.dirent_count > 2)
++		err = -ENOTEMPTY;
++	else
++		err = 0;
++	return err;
++}
++
++static int __caseless_lookup(struct dir_context *ctx, const char *name,
++			     int namlen, loff_t offset, u64 ino,
++			     unsigned int d_type)
++{
++	struct ksmbd_readdir_data *buf;
++
++	buf = container_of(ctx, struct ksmbd_readdir_data, ctx);
++
++	if (buf->used != namlen)
++		return 0;
++	if (!strncasecmp((char *)buf->private, name, namlen)) {
++		memcpy((char *)buf->private, name, namlen);
++		buf->dirent_count = 1;
++		return -EEXIST;
++	}
++	return 0;
++}
++
++/**
++ * ksmbd_vfs_lookup_in_dir() - lookup a file in a directory
++ * @dir:	path info
++ * @name:	filename to lookup
++ * @namelen:	filename length
++ *
++ * Return:	0 on success, otherwise error
++ */
++static int ksmbd_vfs_lookup_in_dir(struct path *dir, char *name, size_t namelen)
++{
++	int ret;
++	struct file *dfilp;
++	int flags = O_RDONLY | O_LARGEFILE;
++	struct ksmbd_readdir_data readdir_data = {
++		.ctx.actor	= __caseless_lookup,
++		.private	= name,
++		.used		= namelen,
++		.dirent_count	= 0,
++	};
++
++	dfilp = dentry_open(dir, flags, current_cred());
++	if (IS_ERR(dfilp))
++		return PTR_ERR(dfilp);
++
++	ret = iterate_dir(dfilp, &readdir_data.ctx);
++	if (readdir_data.dirent_count > 0)
++		ret = 0;
++	fput(dfilp);
++	return ret;
++}
++
++/**
++ * ksmbd_vfs_kern_path() - lookup a file and get path info
++ * @name:	name of file for lookup
++ * @flags:	lookup flags
++ * @path:	if lookup succeed, return path info
++ * @caseless:	caseless filename lookup
++ *
++ * Return:	0 on success, otherwise error
++ */
++int ksmbd_vfs_kern_path(char *name, unsigned int flags, struct path *path,
++			bool caseless)
++{
++	int err;
++
++	if (name[0] != '/')
++		return -EINVAL;
++
++	err = kern_path(name, flags, path);
++	if (!err)
++		return 0;
++
++	if (caseless) {
++		char *filepath;
++		struct path parent;
++		size_t path_len, remain_len;
++
++		filepath = kstrdup(name, GFP_KERNEL);
++		if (!filepath)
++			return -ENOMEM;
++
++		path_len = strlen(filepath);
++		remain_len = path_len - 1;
++
++		err = kern_path("/", flags, &parent);
++		if (err)
++			goto out;
++
++		while (d_can_lookup(parent.dentry)) {
++			char *filename = filepath + path_len - remain_len;
++			char *next = strchrnul(filename, '/');
++			size_t filename_len = next - filename;
++			bool is_last = !next[0];
++
++			if (filename_len == 0)
++				break;
++
++			err = ksmbd_vfs_lookup_in_dir(&parent, filename,
++						      filename_len);
++			if (err) {
++				path_put(&parent);
++				goto out;
++			}
++
++			path_put(&parent);
++			next[0] = '\0';
++
++			err = kern_path(filepath, flags, &parent);
++			if (err)
++				goto out;
++
++			if (is_last) {
++				path->mnt = parent.mnt;
++				path->dentry = parent.dentry;
++				goto out;
++			}
++
++			next[0] = '/';
++			remain_len -= filename_len + 1;
++		}
++
++		path_put(&parent);
++		err = -EINVAL;
++out:
++		kfree(filepath);
++	}
++	return err;
++}
++
++int ksmbd_vfs_remove_acl_xattrs(struct user_namespace *user_ns,
++				struct dentry *dentry)
++{
++	char *name, *xattr_list = NULL;
++	ssize_t xattr_list_len;
++	int err = 0;
++
++	xattr_list_len = ksmbd_vfs_listxattr(dentry, &xattr_list);
++	if (xattr_list_len < 0) {
++		goto out;
++	} else if (!xattr_list_len) {
++		ksmbd_debug(SMB, "empty xattr in the file\n");
++		goto out;
++	}
++
++	for (name = xattr_list; name - xattr_list < xattr_list_len;
++	     name += strlen(name) + 1) {
++		ksmbd_debug(SMB, "%s, len %zd\n", name, strlen(name));
++
++		if (!strncmp(name, XATTR_NAME_POSIX_ACL_ACCESS,
++			     sizeof(XATTR_NAME_POSIX_ACL_ACCESS) - 1) ||
++		    !strncmp(name, XATTR_NAME_POSIX_ACL_DEFAULT,
++			     sizeof(XATTR_NAME_POSIX_ACL_DEFAULT) - 1)) {
++			err = ksmbd_vfs_remove_xattr(user_ns, dentry, name);
++			if (err)
++				ksmbd_debug(SMB,
++					    "remove acl xattr failed : %s\n", name);
++		}
++	}
++out:
++	kvfree(xattr_list);
++	return err;
++}
++
++int ksmbd_vfs_remove_sd_xattrs(struct user_namespace *user_ns,
++			       struct dentry *dentry)
++{
++	char *name, *xattr_list = NULL;
++	ssize_t xattr_list_len;
++	int err = 0;
++
++	xattr_list_len = ksmbd_vfs_listxattr(dentry, &xattr_list);
++	if (xattr_list_len < 0) {
++		goto out;
++	} else if (!xattr_list_len) {
++		ksmbd_debug(SMB, "empty xattr in the file\n");
++		goto out;
++	}
++
++	for (name = xattr_list; name - xattr_list < xattr_list_len;
++			name += strlen(name) + 1) {
++		ksmbd_debug(SMB, "%s, len %zd\n", name, strlen(name));
++
++		if (!strncmp(name, XATTR_NAME_SD, XATTR_NAME_SD_LEN)) {
++			err = ksmbd_vfs_remove_xattr(user_ns, dentry, name);
++			if (err)
++				ksmbd_debug(SMB, "remove xattr failed : %s\n", name);
++		}
++	}
++out:
++	kvfree(xattr_list);
++	return err;
++}
++
++static struct xattr_smb_acl *ksmbd_vfs_make_xattr_posix_acl(struct user_namespace *user_ns,
++							    struct inode *inode,
++							    int acl_type)
++{
++	struct xattr_smb_acl *smb_acl = NULL;
++	struct posix_acl *posix_acls;
++	struct posix_acl_entry *pa_entry;
++	struct xattr_acl_entry *xa_entry;
++	int i;
++
++	posix_acls = get_acl(inode, acl_type);
++	if (!posix_acls)
++		return NULL;
++
++	smb_acl = kzalloc(sizeof(struct xattr_smb_acl) +
++			  sizeof(struct xattr_acl_entry) * posix_acls->a_count,
++			  GFP_KERNEL);
++	if (!smb_acl)
++		goto out;
++
++	smb_acl->count = posix_acls->a_count;
++	pa_entry = posix_acls->a_entries;
++	xa_entry = smb_acl->entries;
++	for (i = 0; i < posix_acls->a_count; i++, pa_entry++, xa_entry++) {
++		switch (pa_entry->e_tag) {
++		case ACL_USER:
++			xa_entry->type = SMB_ACL_USER;
++			xa_entry->uid = from_kuid(user_ns, pa_entry->e_uid);
++			break;
++		case ACL_USER_OBJ:
++			xa_entry->type = SMB_ACL_USER_OBJ;
++			break;
++		case ACL_GROUP:
++			xa_entry->type = SMB_ACL_GROUP;
++			xa_entry->gid = from_kgid(user_ns, pa_entry->e_gid);
++			break;
++		case ACL_GROUP_OBJ:
++			xa_entry->type = SMB_ACL_GROUP_OBJ;
++			break;
++		case ACL_OTHER:
++			xa_entry->type = SMB_ACL_OTHER;
++			break;
++		case ACL_MASK:
++			xa_entry->type = SMB_ACL_MASK;
++			break;
++		default:
++			pr_err("unknown type : 0x%x\n", pa_entry->e_tag);
++			goto out;
++		}
++
++		if (pa_entry->e_perm & ACL_READ)
++			xa_entry->perm |= SMB_ACL_READ;
++		if (pa_entry->e_perm & ACL_WRITE)
++			xa_entry->perm |= SMB_ACL_WRITE;
++		if (pa_entry->e_perm & ACL_EXECUTE)
++			xa_entry->perm |= SMB_ACL_EXECUTE;
++	}
++out:
++	posix_acl_release(posix_acls);
++	return smb_acl;
++}
++
++int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
++			   struct user_namespace *user_ns,
++			   struct dentry *dentry,
++			   struct smb_ntsd *pntsd, int len)
++{
++	int rc;
++	struct ndr sd_ndr = {0}, acl_ndr = {0};
++	struct xattr_ntacl acl = {0};
++	struct xattr_smb_acl *smb_acl, *def_smb_acl = NULL;
++	struct inode *inode = d_inode(dentry);
++
++	acl.version = 4;
++	acl.hash_type = XATTR_SD_HASH_TYPE_SHA256;
++	acl.current_time = ksmbd_UnixTimeToNT(current_time(inode));
++
++	memcpy(acl.desc, "posix_acl", 9);
++	acl.desc_len = 10;
++
++	pntsd->osidoffset =
++		cpu_to_le32(le32_to_cpu(pntsd->osidoffset) + NDR_NTSD_OFFSETOF);
++	pntsd->gsidoffset =
++		cpu_to_le32(le32_to_cpu(pntsd->gsidoffset) + NDR_NTSD_OFFSETOF);
++	pntsd->dacloffset =
++		cpu_to_le32(le32_to_cpu(pntsd->dacloffset) + NDR_NTSD_OFFSETOF);
++
++	acl.sd_buf = (char *)pntsd;
++	acl.sd_size = len;
++
++	rc = ksmbd_gen_sd_hash(conn, acl.sd_buf, acl.sd_size, acl.hash);
 +	if (rc) {
-+		pr_err("Could not get %scryption key\n", enc ? "en" : "de");
++		pr_err("failed to generate hash for ndr acl\n");
 +		return rc;
 +	}
 +
-+	if (conn->cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
-+	    conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM)
-+		ctx = ksmbd_crypto_ctx_find_gcm();
-+	else
-+		ctx = ksmbd_crypto_ctx_find_ccm();
-+	if (!ctx) {
-+		pr_err("crypto alloc failed\n");
-+		return -ENOMEM;
-+	}
++	smb_acl = ksmbd_vfs_make_xattr_posix_acl(user_ns, inode,
++						 ACL_TYPE_ACCESS);
++	if (S_ISDIR(inode->i_mode))
++		def_smb_acl = ksmbd_vfs_make_xattr_posix_acl(user_ns, inode,
++							     ACL_TYPE_DEFAULT);
 +
-+	if (conn->cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
-+	    conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM)
-+		tfm = CRYPTO_GCM(ctx);
-+	else
-+		tfm = CRYPTO_CCM(ctx);
-+
-+	if (conn->cipher_type == SMB2_ENCRYPTION_AES256_CCM ||
-+	    conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM)
-+		rc = crypto_aead_setkey(tfm, key, SMB3_GCM256_CRYPTKEY_SIZE);
-+	else
-+		rc = crypto_aead_setkey(tfm, key, SMB3_GCM128_CRYPTKEY_SIZE);
++	rc = ndr_encode_posix_acl(&acl_ndr, user_ns, inode,
++				  smb_acl, def_smb_acl);
 +	if (rc) {
-+		pr_err("Failed to set aead key %d\n", rc);
-+		goto free_ctx;
++		pr_err("failed to encode ndr to posix acl\n");
++		goto out;
 +	}
 +
-+	rc = crypto_aead_setauthsize(tfm, SMB2_SIGNATURE_SIZE);
++	rc = ksmbd_gen_sd_hash(conn, acl_ndr.data, acl_ndr.offset,
++			       acl.posix_acl_hash);
 +	if (rc) {
-+		pr_err("Failed to set authsize %d\n", rc);
-+		goto free_ctx;
++		pr_err("failed to generate hash for ndr acl\n");
++		goto out;
 +	}
 +
-+	req = aead_request_alloc(tfm, GFP_KERNEL);
-+	if (!req) {
-+		rc = -ENOMEM;
-+		goto free_ctx;
++	rc = ndr_encode_v4_ntacl(&sd_ndr, &acl);
++	if (rc) {
++		pr_err("failed to encode ndr to posix acl\n");
++		goto out;
 +	}
 +
-+	if (!enc) {
-+		memcpy(sign, &tr_hdr->Signature, SMB2_SIGNATURE_SIZE);
-+		crypt_len += SMB2_SIGNATURE_SIZE;
-+	}
++	rc = ksmbd_vfs_setxattr(user_ns, dentry,
++				XATTR_NAME_SD, sd_ndr.data,
++				sd_ndr.offset, 0);
++	if (rc < 0)
++		pr_err("Failed to store XATTR ntacl :%d\n", rc);
 +
-+	sg = ksmbd_init_sg(iov, nvec, sign);
-+	if (!sg) {
-+		pr_err("Failed to init sg\n");
-+		rc = -ENOMEM;
-+		goto free_req;
-+	}
-+
-+	iv_len = crypto_aead_ivsize(tfm);
-+	iv = kzalloc(iv_len, GFP_KERNEL);
-+	if (!iv) {
-+		rc = -ENOMEM;
-+		goto free_sg;
-+	}
-+
-+	if (conn->cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
-+	    conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM) {
-+		memcpy(iv, (char *)tr_hdr->Nonce, SMB3_AES_GCM_NONCE);
-+	} else {
-+		iv[0] = 3;
-+		memcpy(iv + 1, (char *)tr_hdr->Nonce, SMB3_AES_CCM_NONCE);
-+	}
-+
-+	aead_request_set_crypt(req, sg, sg, crypt_len, iv);
-+	aead_request_set_ad(req, assoc_data_len);
-+	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
-+
-+	if (enc)
-+		rc = crypto_aead_encrypt(req);
-+	else
-+		rc = crypto_aead_decrypt(req);
-+	if (rc)
-+		goto free_iv;
-+
-+	if (enc)
-+		memcpy(&tr_hdr->Signature, sign, SMB2_SIGNATURE_SIZE);
-+
-+free_iv:
-+	kfree(iv);
-+free_sg:
-+	kfree(sg);
-+free_req:
-+	kfree(req);
-+free_ctx:
-+	ksmbd_release_crypto_ctx(ctx);
++	kfree(sd_ndr.data);
++out:
++	kfree(acl_ndr.data);
++	kfree(smb_acl);
++	kfree(def_smb_acl);
 +	return rc;
 +}
-diff --git a/fs/ksmbd/auth.h b/fs/ksmbd/auth.h
++
++int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
++			   struct user_namespace *user_ns,
++			   struct dentry *dentry,
++			   struct smb_ntsd **pntsd)
++{
++	int rc;
++	struct ndr n;
++	struct inode *inode = d_inode(dentry);
++	struct ndr acl_ndr = {0};
++	struct xattr_ntacl acl;
++	struct xattr_smb_acl *smb_acl = NULL, *def_smb_acl = NULL;
++	__u8 cmp_hash[XATTR_SD_HASH_SIZE] = {0};
++
++	rc = ksmbd_vfs_getxattr(user_ns, dentry, XATTR_NAME_SD, &n.data);
++	if (rc <= 0)
++		return rc;
++
++	n.length = rc;
++	rc = ndr_decode_v4_ntacl(&n, &acl);
++	if (rc)
++		goto free_n_data;
++
++	smb_acl = ksmbd_vfs_make_xattr_posix_acl(user_ns, inode,
++						 ACL_TYPE_ACCESS);
++	if (S_ISDIR(inode->i_mode))
++		def_smb_acl = ksmbd_vfs_make_xattr_posix_acl(user_ns, inode,
++							     ACL_TYPE_DEFAULT);
++
++	rc = ndr_encode_posix_acl(&acl_ndr, user_ns, inode, smb_acl,
++				  def_smb_acl);
++	if (rc) {
++		pr_err("failed to encode ndr to posix acl\n");
++		goto out_free;
++	}
++
++	rc = ksmbd_gen_sd_hash(conn, acl_ndr.data, acl_ndr.offset, cmp_hash);
++	if (rc) {
++		pr_err("failed to generate hash for ndr acl\n");
++		goto out_free;
++	}
++
++	if (memcmp(cmp_hash, acl.posix_acl_hash, XATTR_SD_HASH_SIZE)) {
++		pr_err("hash value diff\n");
++		rc = -EINVAL;
++		goto out_free;
++	}
++
++	*pntsd = acl.sd_buf;
++	(*pntsd)->osidoffset = cpu_to_le32(le32_to_cpu((*pntsd)->osidoffset) -
++					   NDR_NTSD_OFFSETOF);
++	(*pntsd)->gsidoffset = cpu_to_le32(le32_to_cpu((*pntsd)->gsidoffset) -
++					   NDR_NTSD_OFFSETOF);
++	(*pntsd)->dacloffset = cpu_to_le32(le32_to_cpu((*pntsd)->dacloffset) -
++					   NDR_NTSD_OFFSETOF);
++
++	rc = acl.sd_size;
++out_free:
++	kfree(acl_ndr.data);
++	kfree(smb_acl);
++	kfree(def_smb_acl);
++	if (rc < 0) {
++		kfree(acl.sd_buf);
++		*pntsd = NULL;
++	}
++
++free_n_data:
++	kfree(n.data);
++	return rc;
++}
++
++int ksmbd_vfs_set_dos_attrib_xattr(struct user_namespace *user_ns,
++				   struct dentry *dentry,
++				   struct xattr_dos_attrib *da)
++{
++	struct ndr n;
++	int err;
++
++	err = ndr_encode_dos_attr(&n, da);
++	if (err)
++		return err;
++
++	err = ksmbd_vfs_setxattr(user_ns, dentry, XATTR_NAME_DOS_ATTRIBUTE,
++				 (void *)n.data, n.offset, 0);
++	if (err)
++		ksmbd_debug(SMB, "failed to store dos attribute in xattr\n");
++	kfree(n.data);
++
++	return err;
++}
++
++int ksmbd_vfs_get_dos_attrib_xattr(struct user_namespace *user_ns,
++				   struct dentry *dentry,
++				   struct xattr_dos_attrib *da)
++{
++	struct ndr n;
++	int err;
++
++	err = ksmbd_vfs_getxattr(user_ns, dentry, XATTR_NAME_DOS_ATTRIBUTE,
++				 (char **)&n.data);
++	if (err > 0) {
++		n.length = err;
++		if (ndr_decode_dos_attr(&n, da))
++			err = -EINVAL;
++		kfree(n.data);
++	} else {
++		ksmbd_debug(SMB, "failed to load dos attribute in xattr\n");
++	}
++
++	return err;
++}
++
++/**
++ * ksmbd_vfs_init_kstat() - convert unix stat information to smb stat format
++ * @p:          destination buffer
++ * @ksmbd_kstat:      ksmbd kstat wrapper
++ */
++void *ksmbd_vfs_init_kstat(char **p, struct ksmbd_kstat *ksmbd_kstat)
++{
++	struct file_directory_info *info = (struct file_directory_info *)(*p);
++	struct kstat *kstat = ksmbd_kstat->kstat;
++	u64 time;
++
++	info->FileIndex = 0;
++	info->CreationTime = cpu_to_le64(ksmbd_kstat->create_time);
++	time = ksmbd_UnixTimeToNT(kstat->atime);
++	info->LastAccessTime = cpu_to_le64(time);
++	time = ksmbd_UnixTimeToNT(kstat->mtime);
++	info->LastWriteTime = cpu_to_le64(time);
++	time = ksmbd_UnixTimeToNT(kstat->ctime);
++	info->ChangeTime = cpu_to_le64(time);
++
++	if (ksmbd_kstat->file_attributes & ATTR_DIRECTORY_LE) {
++		info->EndOfFile = 0;
++		info->AllocationSize = 0;
++	} else {
++		info->EndOfFile = cpu_to_le64(kstat->size);
++		info->AllocationSize = cpu_to_le64(kstat->blocks << 9);
++	}
++	info->ExtFileAttributes = ksmbd_kstat->file_attributes;
++
++	return info;
++}
++
++int ksmbd_vfs_fill_dentry_attrs(struct ksmbd_work *work,
++				struct user_namespace *user_ns,
++				struct dentry *dentry,
++				struct ksmbd_kstat *ksmbd_kstat)
++{
++	u64 time;
++	int rc;
++
++	generic_fillattr(user_ns, d_inode(dentry), ksmbd_kstat->kstat);
++
++	time = ksmbd_UnixTimeToNT(ksmbd_kstat->kstat->ctime);
++	ksmbd_kstat->create_time = time;
++
++	/*
++	 * set default value for the case that store dos attributes is not yes
++	 * or that acl is disable in server's filesystem and the config is yes.
++	 */
++	if (S_ISDIR(ksmbd_kstat->kstat->mode))
++		ksmbd_kstat->file_attributes = ATTR_DIRECTORY_LE;
++	else
++		ksmbd_kstat->file_attributes = ATTR_ARCHIVE_LE;
++
++	if (test_share_config_flag(work->tcon->share_conf,
++				   KSMBD_SHARE_FLAG_STORE_DOS_ATTRS)) {
++		struct xattr_dos_attrib da;
++
++		rc = ksmbd_vfs_get_dos_attrib_xattr(user_ns, dentry, &da);
++		if (rc > 0) {
++			ksmbd_kstat->file_attributes = cpu_to_le32(da.attr);
++			ksmbd_kstat->create_time = da.create_time;
++		} else {
++			ksmbd_debug(VFS, "fail to load dos attribute.\n");
++		}
++	}
++
++	return 0;
++}
++
++ssize_t ksmbd_vfs_casexattr_len(struct user_namespace *user_ns,
++				struct dentry *dentry, char *attr_name,
++				int attr_name_len)
++{
++	char *name, *xattr_list = NULL;
++	ssize_t value_len = -ENOENT, xattr_list_len;
++
++	xattr_list_len = ksmbd_vfs_listxattr(dentry, &xattr_list);
++	if (xattr_list_len <= 0)
++		goto out;
++
++	for (name = xattr_list; name - xattr_list < xattr_list_len;
++			name += strlen(name) + 1) {
++		ksmbd_debug(VFS, "%s, len %zd\n", name, strlen(name));
++		if (strncasecmp(attr_name, name, attr_name_len))
++			continue;
++
++		value_len = ksmbd_vfs_xattr_len(user_ns, dentry, name);
++		break;
++	}
++
++out:
++	kvfree(xattr_list);
++	return value_len;
++}
++
++int ksmbd_vfs_xattr_stream_name(char *stream_name, char **xattr_stream_name,
++				size_t *xattr_stream_name_size, int s_type)
++{
++	char *type, *buf;
++
++	if (s_type == DIR_STREAM)
++		type = ":$INDEX_ALLOCATION";
++	else
++		type = ":$DATA";
++
++	buf = kasprintf(GFP_KERNEL, "%s%s%s",
++			XATTR_NAME_STREAM, stream_name,	type);
++	if (!buf)
++		return -ENOMEM;
++
++	*xattr_stream_name = buf;
++	*xattr_stream_name_size = strlen(buf) + 1;
++
++	return 0;
++}
++
++int ksmbd_vfs_copy_file_ranges(struct ksmbd_work *work,
++			       struct ksmbd_file *src_fp,
++			       struct ksmbd_file *dst_fp,
++			       struct srv_copychunk *chunks,
++			       unsigned int chunk_count,
++			       unsigned int *chunk_count_written,
++			       unsigned int *chunk_size_written,
++			       loff_t *total_size_written)
++{
++	unsigned int i;
++	loff_t src_off, dst_off, src_file_size;
++	size_t len;
++	int ret;
++
++	*chunk_count_written = 0;
++	*chunk_size_written = 0;
++	*total_size_written = 0;
++
++	if (!(src_fp->daccess & (FILE_READ_DATA_LE | FILE_EXECUTE_LE))) {
++		pr_err("no right to read(%pd)\n", src_fp->filp->f_path.dentry);
++		return -EACCES;
++	}
++	if (!(dst_fp->daccess & (FILE_WRITE_DATA_LE | FILE_APPEND_DATA_LE))) {
++		pr_err("no right to write(%pd)\n", dst_fp->filp->f_path.dentry);
++		return -EACCES;
++	}
++
++	if (ksmbd_stream_fd(src_fp) || ksmbd_stream_fd(dst_fp))
++		return -EBADF;
++
++	smb_break_all_levII_oplock(work, dst_fp, 1);
++
++	if (!work->tcon->posix_extensions) {
++		for (i = 0; i < chunk_count; i++) {
++			src_off = le64_to_cpu(chunks[i].SourceOffset);
++			dst_off = le64_to_cpu(chunks[i].TargetOffset);
++			len = le32_to_cpu(chunks[i].Length);
++
++			if (check_lock_range(src_fp->filp, src_off,
++					     src_off + len - 1, READ))
++				return -EAGAIN;
++			if (check_lock_range(dst_fp->filp, dst_off,
++					     dst_off + len - 1, WRITE))
++				return -EAGAIN;
++		}
++	}
++
++	src_file_size = i_size_read(file_inode(src_fp->filp));
++
++	for (i = 0; i < chunk_count; i++) {
++		src_off = le64_to_cpu(chunks[i].SourceOffset);
++		dst_off = le64_to_cpu(chunks[i].TargetOffset);
++		len = le32_to_cpu(chunks[i].Length);
++
++		if (src_off + len > src_file_size)
++			return -E2BIG;
++
++		ret = vfs_copy_file_range(src_fp->filp, src_off,
++					  dst_fp->filp, dst_off, len, 0);
++		if (ret < 0)
++			return ret;
++
++		*chunk_count_written += 1;
++		*total_size_written += ret;
++	}
++	return 0;
++}
++
++void ksmbd_vfs_posix_lock_wait(struct file_lock *flock)
++{
++	wait_event(flock->fl_wait, !flock->fl_blocker);
++}
++
++int ksmbd_vfs_posix_lock_wait_timeout(struct file_lock *flock, long timeout)
++{
++	return wait_event_interruptible_timeout(flock->fl_wait,
++						!flock->fl_blocker,
++						timeout);
++}
++
++void ksmbd_vfs_posix_lock_unblock(struct file_lock *flock)
++{
++	locks_delete_block(flock);
++}
++
++int ksmbd_vfs_set_init_posix_acl(struct user_namespace *user_ns,
++				 struct inode *inode)
++{
++	struct posix_acl_state acl_state;
++	struct posix_acl *acls;
++	int rc;
++
++	ksmbd_debug(SMB, "Set posix acls\n");
++	rc = init_acl_state(&acl_state, 1);
++	if (rc)
++		return rc;
++
++	/* Set default owner group */
++	acl_state.owner.allow = (inode->i_mode & 0700) >> 6;
++	acl_state.group.allow = (inode->i_mode & 0070) >> 3;
++	acl_state.other.allow = inode->i_mode & 0007;
++	acl_state.users->aces[acl_state.users->n].uid = inode->i_uid;
++	acl_state.users->aces[acl_state.users->n++].perms.allow =
++		acl_state.owner.allow;
++	acl_state.groups->aces[acl_state.groups->n].gid = inode->i_gid;
++	acl_state.groups->aces[acl_state.groups->n++].perms.allow =
++		acl_state.group.allow;
++	acl_state.mask.allow = 0x07;
++
++	acls = posix_acl_alloc(6, GFP_KERNEL);
++	if (!acls) {
++		free_acl_state(&acl_state);
++		return -ENOMEM;
++	}
++	posix_state_to_acl(&acl_state, acls->a_entries);
++	rc = set_posix_acl(user_ns, inode, ACL_TYPE_ACCESS, acls);
++	if (rc < 0)
++		ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_ACCESS) failed, rc : %d\n",
++			    rc);
++	else if (S_ISDIR(inode->i_mode)) {
++		posix_state_to_acl(&acl_state, acls->a_entries);
++		rc = set_posix_acl(user_ns, inode, ACL_TYPE_DEFAULT,
++				   acls);
++		if (rc < 0)
++			ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_DEFAULT) failed, rc : %d\n",
++				    rc);
++	}
++	free_acl_state(&acl_state);
++	posix_acl_release(acls);
++	return rc;
++}
++
++int ksmbd_vfs_inherit_posix_acl(struct user_namespace *user_ns,
++				struct inode *inode, struct inode *parent_inode)
++{
++	struct posix_acl *acls;
++	struct posix_acl_entry *pace;
++	int rc, i;
++
++	acls = get_acl(parent_inode, ACL_TYPE_DEFAULT);
++	if (!acls)
++		return -ENOENT;
++	pace = acls->a_entries;
++
++	for (i = 0; i < acls->a_count; i++, pace++) {
++		if (pace->e_tag == ACL_MASK) {
++			pace->e_perm = 0x07;
++			break;
++		}
++	}
++
++	rc = set_posix_acl(user_ns, inode, ACL_TYPE_ACCESS, acls);
++	if (rc < 0)
++		ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_ACCESS) failed, rc : %d\n",
++			    rc);
++	if (S_ISDIR(inode->i_mode)) {
++		rc = set_posix_acl(user_ns, inode, ACL_TYPE_DEFAULT,
++				   acls);
++		if (rc < 0)
++			ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_DEFAULT) failed, rc : %d\n",
++				    rc);
++	}
++	posix_acl_release(acls);
++	return rc;
++}
+diff --git a/fs/ksmbd/vfs.h b/fs/ksmbd/vfs.h
 new file mode 100644
-index 000000000000..9c2d4badd05d
+index 000000000000..cb0cba0d5d07
 --- /dev/null
-+++ b/fs/ksmbd/auth.h
-@@ -0,0 +1,67 @@
++++ b/fs/ksmbd/vfs.h
+@@ -0,0 +1,197 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/*
++ *   Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
 + *   Copyright (C) 2018 Samsung Electronics Co., Ltd.
 + */
 +
-+#ifndef __AUTH_H__
-+#define __AUTH_H__
++#ifndef __KSMBD_VFS_H__
++#define __KSMBD_VFS_H__
 +
-+#include "ntlmssp.h"
++#include <linux/file.h>
++#include <linux/fs.h>
++#include <linux/namei.h>
++#include <uapi/linux/xattr.h>
++#include <linux/posix_acl.h>
 +
-+#ifdef CONFIG_SMB_SERVER_KERBEROS5
-+#define AUTH_GSS_LENGTH		96
-+#define AUTH_GSS_PADDING	0
-+#else
-+#define AUTH_GSS_LENGTH		74
-+#define AUTH_GSS_PADDING	6
-+#endif
-+
-+#define CIFS_HMAC_MD5_HASH_SIZE	(16)
-+#define CIFS_NTHASH_SIZE	(16)
++#include "smbacl.h"
++#include "xattr.h"
 +
 +/*
-+ * Size of the ntlm client response
++ * Enumeration for stream type.
 + */
-+#define CIFS_AUTH_RESP_SIZE		24
-+#define CIFS_SMB1_SIGNATURE_SIZE	8
-+#define CIFS_SMB1_SESSKEY_SIZE		16
-+
-+#define KSMBD_AUTH_NTLMSSP	0x0001
-+#define KSMBD_AUTH_KRB5		0x0002
-+#define KSMBD_AUTH_MSKRB5	0x0004
-+#define KSMBD_AUTH_KRB5U2U	0x0008
-+
-+struct ksmbd_session;
-+struct ksmbd_conn;
-+struct kvec;
-+
-+int ksmbd_crypt_message(struct ksmbd_conn *conn, struct kvec *iov,
-+			unsigned int nvec, int enc);
-+void ksmbd_copy_gss_neg_header(void *buf);
-+int ksmbd_auth_ntlm(struct ksmbd_session *sess, char *pw_buf);
-+int ksmbd_auth_ntlmv2(struct ksmbd_session *sess, struct ntlmv2_resp *ntlmv2,
-+		      int blen, char *domain_name);
-+int ksmbd_decode_ntlmssp_auth_blob(struct authenticate_message *authblob,
-+				   int blob_len, struct ksmbd_session *sess);
-+int ksmbd_decode_ntlmssp_neg_blob(struct negotiate_message *negblob,
-+				  int blob_len, struct ksmbd_session *sess);
-+unsigned int
-+ksmbd_build_ntlmssp_challenge_blob(struct challenge_message *chgblob,
-+				   struct ksmbd_session *sess);
-+int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
-+			    int in_len,	char *out_blob, int *out_len);
-+int ksmbd_sign_smb2_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
-+			int n_vec, char *sig);
-+int ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
-+			int n_vec, char *sig);
-+int ksmbd_gen_smb30_signingkey(struct ksmbd_session *sess,
-+			       struct ksmbd_conn *conn);
-+int ksmbd_gen_smb311_signingkey(struct ksmbd_session *sess,
-+				struct ksmbd_conn *conn);
-+int ksmbd_gen_smb30_encryptionkey(struct ksmbd_session *sess);
-+int ksmbd_gen_smb311_encryptionkey(struct ksmbd_session *sess);
-+int ksmbd_gen_preauth_integrity_hash(struct ksmbd_conn *conn, char *buf,
-+				     __u8 *pi_hash);
-+int ksmbd_gen_sd_hash(struct ksmbd_conn *conn, char *sd_buf, int len,
-+		      __u8 *pi_hash);
-+#endif
-diff --git a/fs/ksmbd/crypto_ctx.c b/fs/ksmbd/crypto_ctx.c
-new file mode 100644
-index 000000000000..5f4b1008d17e
---- /dev/null
-+++ b/fs/ksmbd/crypto_ctx.c
-@@ -0,0 +1,282 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *   Copyright (C) 2019 Samsung Electronics Co., Ltd.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/string.h>
-+#include <linux/err.h>
-+#include <linux/slab.h>
-+#include <linux/wait.h>
-+#include <linux/sched.h>
-+
-+#include "glob.h"
-+#include "crypto_ctx.h"
-+
-+struct crypto_ctx_list {
-+	spinlock_t		ctx_lock;
-+	int			avail_ctx;
-+	struct list_head	idle_ctx;
-+	wait_queue_head_t	ctx_wait;
++enum {
++	DATA_STREAM	= 1,	/* type $DATA */
++	DIR_STREAM		/* type $INDEX_ALLOCATION */
 +};
 +
-+static struct crypto_ctx_list ctx_list;
++/* CreateOptions */
++/* Flag is set, it must not be a file , valid for directory only */
++#define FILE_DIRECTORY_FILE_LE			cpu_to_le32(0x00000001)
++#define FILE_WRITE_THROUGH_LE			cpu_to_le32(0x00000002)
++#define FILE_SEQUENTIAL_ONLY_LE			cpu_to_le32(0x00000004)
 +
-+static inline void free_aead(struct crypto_aead *aead)
++/* Should not buffer on server*/
++#define FILE_NO_INTERMEDIATE_BUFFERING_LE	cpu_to_le32(0x00000008)
++/* MBZ */
++#define FILE_SYNCHRONOUS_IO_ALERT_LE		cpu_to_le32(0x00000010)
++/* MBZ */
++#define FILE_SYNCHRONOUS_IO_NONALERT_LE		cpu_to_le32(0x00000020)
++
++/* Flaf must not be set for directory */
++#define FILE_NON_DIRECTORY_FILE_LE		cpu_to_le32(0x00000040)
++
++/* Should be zero */
++#define CREATE_TREE_CONNECTION			cpu_to_le32(0x00000080)
++#define FILE_COMPLETE_IF_OPLOCKED_LE		cpu_to_le32(0x00000100)
++#define FILE_NO_EA_KNOWLEDGE_LE			cpu_to_le32(0x00000200)
++#define FILE_OPEN_REMOTE_INSTANCE		cpu_to_le32(0x00000400)
++
++/**
++ * Doc says this is obsolete "open for recovery" flag should be zero
++ * in any case.
++ */
++#define CREATE_OPEN_FOR_RECOVERY		cpu_to_le32(0x00000400)
++#define FILE_RANDOM_ACCESS_LE			cpu_to_le32(0x00000800)
++#define FILE_DELETE_ON_CLOSE_LE			cpu_to_le32(0x00001000)
++#define FILE_OPEN_BY_FILE_ID_LE			cpu_to_le32(0x00002000)
++#define FILE_OPEN_FOR_BACKUP_INTENT_LE		cpu_to_le32(0x00004000)
++#define FILE_NO_COMPRESSION_LE			cpu_to_le32(0x00008000)
++
++/* Should be zero*/
++#define FILE_OPEN_REQUIRING_OPLOCK		cpu_to_le32(0x00010000)
++#define FILE_DISALLOW_EXCLUSIVE			cpu_to_le32(0x00020000)
++#define FILE_RESERVE_OPFILTER_LE		cpu_to_le32(0x00100000)
++#define FILE_OPEN_REPARSE_POINT_LE		cpu_to_le32(0x00200000)
++#define FILE_OPEN_NO_RECALL_LE			cpu_to_le32(0x00400000)
++
++/* Should be zero */
++#define FILE_OPEN_FOR_FREE_SPACE_QUERY_LE	cpu_to_le32(0x00800000)
++#define CREATE_OPTIONS_MASK			cpu_to_le32(0x00FFFFFF)
++#define CREATE_OPTION_READONLY			0x10000000
++/* system. NB not sent over wire */
++#define CREATE_OPTION_SPECIAL			0x20000000
++
++struct ksmbd_work;
++struct ksmbd_file;
++struct ksmbd_conn;
++
++struct ksmbd_dir_info {
++	const char	*name;
++	char		*wptr;
++	char		*rptr;
++	int		name_len;
++	int		out_buf_len;
++	int		num_entry;
++	int		data_count;
++	int		last_entry_offset;
++	bool		hide_dot_file;
++	int		flags;
++};
++
++struct ksmbd_readdir_data {
++	struct dir_context	ctx;
++	union {
++		void		*private;
++		char		*dirent;
++	};
++
++	unsigned int		used;
++	unsigned int		dirent_count;
++	unsigned int		file_attr;
++};
++
++/* ksmbd kstat wrapper to get valid create time when reading dir entry */
++struct ksmbd_kstat {
++	struct kstat		*kstat;
++	unsigned long long	create_time;
++	__le32			file_attributes;
++};
++
++int ksmbd_vfs_lock_parent(struct dentry *parent, struct dentry *child);
++int ksmbd_vfs_may_delete(struct user_namespace *user_ns, struct dentry *dentry);
++int ksmbd_vfs_query_maximal_access(struct user_namespace *user_ns,
++				   struct dentry *dentry, __le32 *daccess);
++int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mode);
++int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode);
++int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp,
++		   size_t count, loff_t *pos);
++int ksmbd_vfs_write(struct ksmbd_work *work, struct ksmbd_file *fp,
++		    char *buf, size_t count, loff_t *pos, bool sync,
++		    ssize_t *written);
++int ksmbd_vfs_fsync(struct ksmbd_work *work, u64 fid, u64 p_id);
++int ksmbd_vfs_remove_file(struct ksmbd_work *work, char *name);
++int ksmbd_vfs_link(struct ksmbd_work *work,
++		   const char *oldname, const char *newname);
++int ksmbd_vfs_getattr(struct path *path, struct kstat *stat);
++int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
++			char *newname);
++int ksmbd_vfs_truncate(struct ksmbd_work *work, const char *name,
++		       struct ksmbd_file *fp, loff_t size);
++struct srv_copychunk;
++int ksmbd_vfs_copy_file_ranges(struct ksmbd_work *work,
++			       struct ksmbd_file *src_fp,
++			       struct ksmbd_file *dst_fp,
++			       struct srv_copychunk *chunks,
++			       unsigned int chunk_count,
++			       unsigned int *chunk_count_written,
++			       unsigned int *chunk_size_written,
++			       loff_t  *total_size_written);
++ssize_t ksmbd_vfs_listxattr(struct dentry *dentry, char **list);
++ssize_t ksmbd_vfs_getxattr(struct user_namespace *user_ns,
++			   struct dentry *dentry,
++			   char *xattr_name,
++			   char **xattr_buf);
++ssize_t ksmbd_vfs_casexattr_len(struct user_namespace *user_ns,
++				struct dentry *dentry, char *attr_name,
++				int attr_name_len);
++int ksmbd_vfs_setxattr(struct user_namespace *user_ns,
++		       struct dentry *dentry, const char *attr_name,
++		       const void *attr_value, size_t attr_size, int flags);
++int ksmbd_vfs_xattr_stream_name(char *stream_name, char **xattr_stream_name,
++				size_t *xattr_stream_name_size, int s_type);
++int ksmbd_vfs_remove_xattr(struct user_namespace *user_ns,
++			   struct dentry *dentry, char *attr_name);
++int ksmbd_vfs_kern_path(char *name, unsigned int flags, struct path *path,
++			bool caseless);
++int ksmbd_vfs_empty_dir(struct ksmbd_file *fp);
++void ksmbd_vfs_set_fadvise(struct file *filp, __le32 option);
++int ksmbd_vfs_zero_data(struct ksmbd_work *work, struct ksmbd_file *fp,
++			loff_t off, loff_t len);
++struct file_allocated_range_buffer;
++int ksmbd_vfs_fqar_lseek(struct ksmbd_file *fp, loff_t start, loff_t length,
++			 struct file_allocated_range_buffer *ranges,
++			 int in_count, int *out_count);
++int ksmbd_vfs_unlink(struct user_namespace *user_ns,
++		     struct dentry *dir, struct dentry *dentry);
++void *ksmbd_vfs_init_kstat(char **p, struct ksmbd_kstat *ksmbd_kstat);
++int ksmbd_vfs_fill_dentry_attrs(struct ksmbd_work *work,
++				struct user_namespace *user_ns,
++				struct dentry *dentry,
++				struct ksmbd_kstat *ksmbd_kstat);
++void ksmbd_vfs_posix_lock_wait(struct file_lock *flock);
++int ksmbd_vfs_posix_lock_wait_timeout(struct file_lock *flock, long timeout);
++void ksmbd_vfs_posix_lock_unblock(struct file_lock *flock);
++int ksmbd_vfs_remove_acl_xattrs(struct user_namespace *user_ns,
++				struct dentry *dentry);
++int ksmbd_vfs_remove_sd_xattrs(struct user_namespace *user_ns,
++			       struct dentry *dentry);
++int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
++			   struct user_namespace *user_ns,
++			   struct dentry *dentry,
++			   struct smb_ntsd *pntsd, int len);
++int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
++			   struct user_namespace *user_ns,
++			   struct dentry *dentry,
++			   struct smb_ntsd **pntsd);
++int ksmbd_vfs_set_dos_attrib_xattr(struct user_namespace *user_ns,
++				   struct dentry *dentry,
++				   struct xattr_dos_attrib *da);
++int ksmbd_vfs_get_dos_attrib_xattr(struct user_namespace *user_ns,
++				   struct dentry *dentry,
++				   struct xattr_dos_attrib *da);
++int ksmbd_vfs_set_init_posix_acl(struct user_namespace *user_ns,
++				 struct inode *inode);
++int ksmbd_vfs_inherit_posix_acl(struct user_namespace *user_ns,
++				struct inode *inode,
++				struct inode *parent_inode);
++#endif /* __KSMBD_VFS_H__ */
+diff --git a/fs/ksmbd/vfs_cache.c b/fs/ksmbd/vfs_cache.c
+new file mode 100644
+index 000000000000..92d8c61ffd2a
+--- /dev/null
++++ b/fs/ksmbd/vfs_cache.c
+@@ -0,0 +1,725 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (C) 2016 Namjae Jeon <linkinjeon@kernel.org>
++ * Copyright (C) 2019 Samsung Electronics Co., Ltd.
++ */
++
++#include <linux/fs.h>
++#include <linux/slab.h>
++#include <linux/vmalloc.h>
++
++#include "glob.h"
++#include "vfs_cache.h"
++#include "oplock.h"
++#include "vfs.h"
++#include "connection.h"
++#include "mgmt/tree_connect.h"
++#include "mgmt/user_session.h"
++#include "smb_common.h"
++
++#define S_DEL_PENDING			1
++#define S_DEL_ON_CLS			2
++#define S_DEL_ON_CLS_STREAM		8
++
++static unsigned int inode_hash_mask __read_mostly;
++static unsigned int inode_hash_shift __read_mostly;
++static struct hlist_head *inode_hashtable __read_mostly;
++static DEFINE_RWLOCK(inode_hash_lock);
++
++static struct ksmbd_file_table global_ft;
++static atomic_long_t fd_limit;
++static struct kmem_cache *filp_cache;
++
++void ksmbd_set_fd_limit(unsigned long limit)
 +{
-+	if (aead)
-+		crypto_free_aead(aead);
++	limit = min(limit, get_max_files());
++	atomic_long_set(&fd_limit, limit);
 +}
 +
-+static void free_shash(struct shash_desc *shash)
++static bool fd_limit_depleted(void)
 +{
-+	if (shash) {
-+		crypto_free_shash(shash->tfm);
-+		kfree(shash);
-+	}
++	long v = atomic_long_dec_return(&fd_limit);
++
++	if (v >= 0)
++		return false;
++	atomic_long_inc(&fd_limit);
++	return true;
 +}
 +
-+static struct crypto_aead *alloc_aead(int id)
++static void fd_limit_close(void)
 +{
-+	struct crypto_aead *tfm = NULL;
-+
-+	switch (id) {
-+	case CRYPTO_AEAD_AES_GCM:
-+		tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
-+		break;
-+	case CRYPTO_AEAD_AES_CCM:
-+		tfm = crypto_alloc_aead("ccm(aes)", 0, 0);
-+		break;
-+	default:
-+		pr_err("Does not support encrypt ahead(id : %d)\n", id);
-+		return NULL;
-+	}
-+
-+	if (IS_ERR(tfm)) {
-+		pr_err("Failed to alloc encrypt aead : %ld\n", PTR_ERR(tfm));
-+		return NULL;
-+	}
-+
-+	return tfm;
++	atomic_long_inc(&fd_limit);
 +}
 +
-+static struct shash_desc *alloc_shash_desc(int id)
++/*
++ * INODE hash
++ */
++
++static unsigned long inode_hash(struct super_block *sb, unsigned long hashval)
 +{
-+	struct crypto_shash *tfm = NULL;
-+	struct shash_desc *shash;
++	unsigned long tmp;
 +
-+	switch (id) {
-+	case CRYPTO_SHASH_HMACMD5:
-+		tfm = crypto_alloc_shash("hmac(md5)", 0, 0);
-+		break;
-+	case CRYPTO_SHASH_HMACSHA256:
-+		tfm = crypto_alloc_shash("hmac(sha256)", 0, 0);
-+		break;
-+	case CRYPTO_SHASH_CMACAES:
-+		tfm = crypto_alloc_shash("cmac(aes)", 0, 0);
-+		break;
-+	case CRYPTO_SHASH_SHA256:
-+		tfm = crypto_alloc_shash("sha256", 0, 0);
-+		break;
-+	case CRYPTO_SHASH_SHA512:
-+		tfm = crypto_alloc_shash("sha512", 0, 0);
-+		break;
-+	case CRYPTO_SHASH_MD4:
-+		tfm = crypto_alloc_shash("md4", 0, 0);
-+		break;
-+	case CRYPTO_SHASH_MD5:
-+		tfm = crypto_alloc_shash("md5", 0, 0);
-+		break;
-+	default:
-+		return NULL;
-+	}
-+
-+	if (IS_ERR(tfm))
-+		return NULL;
-+
-+	shash = kzalloc(sizeof(*shash) + crypto_shash_descsize(tfm),
-+			GFP_KERNEL);
-+	if (!shash)
-+		crypto_free_shash(tfm);
-+	else
-+		shash->tfm = tfm;
-+	return shash;
++	tmp = (hashval * (unsigned long)sb) ^ (GOLDEN_RATIO_PRIME + hashval) /
++		L1_CACHE_BYTES;
++	tmp = tmp ^ ((tmp ^ GOLDEN_RATIO_PRIME) >> inode_hash_shift);
++	return tmp & inode_hash_mask;
 +}
 +
-+static void ctx_free(struct ksmbd_crypto_ctx *ctx)
++static struct ksmbd_inode *__ksmbd_inode_lookup(struct inode *inode)
 +{
-+	int i;
++	struct hlist_head *head = inode_hashtable +
++		inode_hash(inode->i_sb, inode->i_ino);
++	struct ksmbd_inode *ci = NULL, *ret_ci = NULL;
 +
-+	for (i = 0; i < CRYPTO_SHASH_MAX; i++)
-+		free_shash(ctx->desc[i]);
-+	for (i = 0; i < CRYPTO_AEAD_MAX; i++)
-+		free_aead(ctx->ccmaes[i]);
-+	kfree(ctx);
-+}
-+
-+static struct ksmbd_crypto_ctx *ksmbd_find_crypto_ctx(void)
-+{
-+	struct ksmbd_crypto_ctx *ctx;
-+
-+	while (1) {
-+		spin_lock(&ctx_list.ctx_lock);
-+		if (!list_empty(&ctx_list.idle_ctx)) {
-+			ctx = list_entry(ctx_list.idle_ctx.next,
-+					 struct ksmbd_crypto_ctx,
-+					 list);
-+			list_del(&ctx->list);
-+			spin_unlock(&ctx_list.ctx_lock);
-+			return ctx;
++	hlist_for_each_entry(ci, head, m_hash) {
++		if (ci->m_inode == inode) {
++			if (atomic_inc_not_zero(&ci->m_count))
++				ret_ci = ci;
++			break;
 +		}
-+
-+		if (ctx_list.avail_ctx > num_online_cpus()) {
-+			spin_unlock(&ctx_list.ctx_lock);
-+			wait_event(ctx_list.ctx_wait,
-+				   !list_empty(&ctx_list.idle_ctx));
-+			continue;
-+		}
-+
-+		ctx_list.avail_ctx++;
-+		spin_unlock(&ctx_list.ctx_lock);
-+
-+		ctx = kzalloc(sizeof(struct ksmbd_crypto_ctx), GFP_KERNEL);
-+		if (!ctx) {
-+			spin_lock(&ctx_list.ctx_lock);
-+			ctx_list.avail_ctx--;
-+			spin_unlock(&ctx_list.ctx_lock);
-+			wait_event(ctx_list.ctx_wait,
-+				   !list_empty(&ctx_list.idle_ctx));
-+			continue;
-+		}
-+		break;
 +	}
-+	return ctx;
++	return ret_ci;
 +}
 +
-+void ksmbd_release_crypto_ctx(struct ksmbd_crypto_ctx *ctx)
++static struct ksmbd_inode *ksmbd_inode_lookup(struct ksmbd_file *fp)
 +{
-+	if (!ctx)
++	return __ksmbd_inode_lookup(file_inode(fp->filp));
++}
++
++static struct ksmbd_inode *ksmbd_inode_lookup_by_vfsinode(struct inode *inode)
++{
++	struct ksmbd_inode *ci;
++
++	read_lock(&inode_hash_lock);
++	ci = __ksmbd_inode_lookup(inode);
++	read_unlock(&inode_hash_lock);
++	return ci;
++}
++
++int ksmbd_query_inode_status(struct inode *inode)
++{
++	struct ksmbd_inode *ci;
++	int ret = KSMBD_INODE_STATUS_UNKNOWN;
++
++	read_lock(&inode_hash_lock);
++	ci = __ksmbd_inode_lookup(inode);
++	if (ci) {
++		ret = KSMBD_INODE_STATUS_OK;
++		if (ci->m_flags & S_DEL_PENDING)
++			ret = KSMBD_INODE_STATUS_PENDING_DELETE;
++		atomic_dec(&ci->m_count);
++	}
++	read_unlock(&inode_hash_lock);
++	return ret;
++}
++
++bool ksmbd_inode_pending_delete(struct ksmbd_file *fp)
++{
++	return (fp->f_ci->m_flags & S_DEL_PENDING);
++}
++
++void ksmbd_set_inode_pending_delete(struct ksmbd_file *fp)
++{
++	fp->f_ci->m_flags |= S_DEL_PENDING;
++}
++
++void ksmbd_clear_inode_pending_delete(struct ksmbd_file *fp)
++{
++	fp->f_ci->m_flags &= ~S_DEL_PENDING;
++}
++
++void ksmbd_fd_set_delete_on_close(struct ksmbd_file *fp,
++				  int file_info)
++{
++	if (ksmbd_stream_fd(fp)) {
++		fp->f_ci->m_flags |= S_DEL_ON_CLS_STREAM;
 +		return;
-+
-+	spin_lock(&ctx_list.ctx_lock);
-+	if (ctx_list.avail_ctx <= num_online_cpus()) {
-+		list_add(&ctx->list, &ctx_list.idle_ctx);
-+		spin_unlock(&ctx_list.ctx_lock);
-+		wake_up(&ctx_list.ctx_wait);
-+		return;
 +	}
 +
-+	ctx_list.avail_ctx--;
-+	spin_unlock(&ctx_list.ctx_lock);
-+	ctx_free(ctx);
++	fp->f_ci->m_flags |= S_DEL_ON_CLS;
 +}
 +
-+static struct ksmbd_crypto_ctx *____crypto_shash_ctx_find(int id)
++static void ksmbd_inode_hash(struct ksmbd_inode *ci)
 +{
-+	struct ksmbd_crypto_ctx *ctx;
++	struct hlist_head *b = inode_hashtable +
++		inode_hash(ci->m_inode->i_sb, ci->m_inode->i_ino);
 +
-+	if (id >= CRYPTO_SHASH_MAX)
-+		return NULL;
-+
-+	ctx = ksmbd_find_crypto_ctx();
-+	if (ctx->desc[id])
-+		return ctx;
-+
-+	ctx->desc[id] = alloc_shash_desc(id);
-+	if (ctx->desc[id])
-+		return ctx;
-+	ksmbd_release_crypto_ctx(ctx);
-+	return NULL;
++	hlist_add_head(&ci->m_hash, b);
 +}
 +
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_hmacmd5(void)
++static void ksmbd_inode_unhash(struct ksmbd_inode *ci)
 +{
-+	return ____crypto_shash_ctx_find(CRYPTO_SHASH_HMACMD5);
++	write_lock(&inode_hash_lock);
++	hlist_del_init(&ci->m_hash);
++	write_unlock(&inode_hash_lock);
 +}
 +
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_hmacsha256(void)
++static int ksmbd_inode_init(struct ksmbd_inode *ci, struct ksmbd_file *fp)
 +{
-+	return ____crypto_shash_ctx_find(CRYPTO_SHASH_HMACSHA256);
-+}
-+
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_cmacaes(void)
-+{
-+	return ____crypto_shash_ctx_find(CRYPTO_SHASH_CMACAES);
-+}
-+
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_sha256(void)
-+{
-+	return ____crypto_shash_ctx_find(CRYPTO_SHASH_SHA256);
-+}
-+
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_sha512(void)
-+{
-+	return ____crypto_shash_ctx_find(CRYPTO_SHASH_SHA512);
-+}
-+
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_md4(void)
-+{
-+	return ____crypto_shash_ctx_find(CRYPTO_SHASH_MD4);
-+}
-+
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_md5(void)
-+{
-+	return ____crypto_shash_ctx_find(CRYPTO_SHASH_MD5);
-+}
-+
-+static struct ksmbd_crypto_ctx *____crypto_aead_ctx_find(int id)
-+{
-+	struct ksmbd_crypto_ctx *ctx;
-+
-+	if (id >= CRYPTO_AEAD_MAX)
-+		return NULL;
-+
-+	ctx = ksmbd_find_crypto_ctx();
-+	if (ctx->ccmaes[id])
-+		return ctx;
-+
-+	ctx->ccmaes[id] = alloc_aead(id);
-+	if (ctx->ccmaes[id])
-+		return ctx;
-+	ksmbd_release_crypto_ctx(ctx);
-+	return NULL;
-+}
-+
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_gcm(void)
-+{
-+	return ____crypto_aead_ctx_find(CRYPTO_AEAD_AES_GCM);
-+}
-+
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_ccm(void)
-+{
-+	return ____crypto_aead_ctx_find(CRYPTO_AEAD_AES_CCM);
-+}
-+
-+void ksmbd_crypto_destroy(void)
-+{
-+	struct ksmbd_crypto_ctx *ctx;
-+
-+	while (!list_empty(&ctx_list.idle_ctx)) {
-+		ctx = list_entry(ctx_list.idle_ctx.next,
-+				 struct ksmbd_crypto_ctx,
-+				 list);
-+		list_del(&ctx->list);
-+		ctx_free(ctx);
-+	}
-+}
-+
-+int ksmbd_crypto_create(void)
-+{
-+	struct ksmbd_crypto_ctx *ctx;
-+
-+	spin_lock_init(&ctx_list.ctx_lock);
-+	INIT_LIST_HEAD(&ctx_list.idle_ctx);
-+	init_waitqueue_head(&ctx_list.ctx_wait);
-+	ctx_list.avail_ctx = 1;
-+
-+	ctx = kzalloc(sizeof(struct ksmbd_crypto_ctx), GFP_KERNEL);
-+	if (!ctx)
-+		return -ENOMEM;
-+	list_add(&ctx->list, &ctx_list.idle_ctx);
++	ci->m_inode = file_inode(fp->filp);
++	atomic_set(&ci->m_count, 1);
++	atomic_set(&ci->op_count, 0);
++	atomic_set(&ci->sop_count, 0);
++	ci->m_flags = 0;
++	ci->m_fattr = 0;
++	INIT_LIST_HEAD(&ci->m_fp_list);
++	INIT_LIST_HEAD(&ci->m_op_list);
++	rwlock_init(&ci->m_lock);
 +	return 0;
 +}
-diff --git a/fs/ksmbd/crypto_ctx.h b/fs/ksmbd/crypto_ctx.h
++
++static struct ksmbd_inode *ksmbd_inode_get(struct ksmbd_file *fp)
++{
++	struct ksmbd_inode *ci, *tmpci;
++	int rc;
++
++	read_lock(&inode_hash_lock);
++	ci = ksmbd_inode_lookup(fp);
++	read_unlock(&inode_hash_lock);
++	if (ci)
++		return ci;
++
++	ci = kmalloc(sizeof(struct ksmbd_inode), GFP_KERNEL);
++	if (!ci)
++		return NULL;
++
++	rc = ksmbd_inode_init(ci, fp);
++	if (rc) {
++		pr_err("inode initialized failed\n");
++		kfree(ci);
++		return NULL;
++	}
++
++	write_lock(&inode_hash_lock);
++	tmpci = ksmbd_inode_lookup(fp);
++	if (!tmpci) {
++		ksmbd_inode_hash(ci);
++	} else {
++		kfree(ci);
++		ci = tmpci;
++	}
++	write_unlock(&inode_hash_lock);
++	return ci;
++}
++
++static void ksmbd_inode_free(struct ksmbd_inode *ci)
++{
++	ksmbd_inode_unhash(ci);
++	kfree(ci);
++}
++
++static void ksmbd_inode_put(struct ksmbd_inode *ci)
++{
++	if (atomic_dec_and_test(&ci->m_count))
++		ksmbd_inode_free(ci);
++}
++
++int __init ksmbd_inode_hash_init(void)
++{
++	unsigned int loop;
++	unsigned long numentries = 16384;
++	unsigned long bucketsize = sizeof(struct hlist_head);
++	unsigned long size;
++
++	inode_hash_shift = ilog2(numentries);
++	inode_hash_mask = (1 << inode_hash_shift) - 1;
++
++	size = bucketsize << inode_hash_shift;
++
++	/* init master fp hash table */
++	inode_hashtable = vmalloc(size);
++	if (!inode_hashtable)
++		return -ENOMEM;
++
++	for (loop = 0; loop < (1U << inode_hash_shift); loop++)
++		INIT_HLIST_HEAD(&inode_hashtable[loop]);
++	return 0;
++}
++
++void ksmbd_release_inode_hash(void)
++{
++	vfree(inode_hashtable);
++}
++
++static void __ksmbd_inode_close(struct ksmbd_file *fp)
++{
++	struct dentry *dir, *dentry;
++	struct ksmbd_inode *ci = fp->f_ci;
++	int err;
++	struct file *filp;
++
++	filp = fp->filp;
++	if (ksmbd_stream_fd(fp) && (ci->m_flags & S_DEL_ON_CLS_STREAM)) {
++		ci->m_flags &= ~S_DEL_ON_CLS_STREAM;
++		err = ksmbd_vfs_remove_xattr(file_mnt_user_ns(filp),
++					     filp->f_path.dentry,
++					     fp->stream.name);
++		if (err)
++			pr_err("remove xattr failed : %s\n",
++			       fp->stream.name);
++	}
++
++	if (atomic_dec_and_test(&ci->m_count)) {
++		write_lock(&ci->m_lock);
++		if (ci->m_flags & (S_DEL_ON_CLS | S_DEL_PENDING)) {
++			dentry = filp->f_path.dentry;
++			dir = dentry->d_parent;
++			ci->m_flags &= ~(S_DEL_ON_CLS | S_DEL_PENDING);
++			write_unlock(&ci->m_lock);
++			ksmbd_vfs_unlink(file_mnt_user_ns(filp), dir, dentry);
++			write_lock(&ci->m_lock);
++		}
++		write_unlock(&ci->m_lock);
++
++		ksmbd_inode_free(ci);
++	}
++}
++
++static void __ksmbd_remove_durable_fd(struct ksmbd_file *fp)
++{
++	if (!has_file_id(fp->persistent_id))
++		return;
++
++	write_lock(&global_ft.lock);
++	idr_remove(global_ft.idr, fp->persistent_id);
++	write_unlock(&global_ft.lock);
++}
++
++static void __ksmbd_remove_fd(struct ksmbd_file_table *ft, struct ksmbd_file *fp)
++{
++	if (!has_file_id(fp->volatile_id))
++		return;
++
++	write_lock(&fp->f_ci->m_lock);
++	list_del_init(&fp->node);
++	write_unlock(&fp->f_ci->m_lock);
++
++	write_lock(&ft->lock);
++	idr_remove(ft->idr, fp->volatile_id);
++	write_unlock(&ft->lock);
++}
++
++static void __ksmbd_close_fd(struct ksmbd_file_table *ft, struct ksmbd_file *fp)
++{
++	struct file *filp;
++	struct ksmbd_lock *smb_lock, *tmp_lock;
++
++	fd_limit_close();
++	__ksmbd_remove_durable_fd(fp);
++	__ksmbd_remove_fd(ft, fp);
++
++	close_id_del_oplock(fp);
++	filp = fp->filp;
++
++	__ksmbd_inode_close(fp);
++	if (!IS_ERR_OR_NULL(filp))
++		fput(filp);
++
++	/* because the reference count of fp is 0, it is guaranteed that
++	 * there are not accesses to fp->lock_list.
++	 */
++	list_for_each_entry_safe(smb_lock, tmp_lock, &fp->lock_list, flist) {
++		spin_lock(&fp->conn->llist_lock);
++		list_del(&smb_lock->clist);
++		spin_unlock(&fp->conn->llist_lock);
++
++		list_del(&smb_lock->flist);
++		locks_free_lock(smb_lock->fl);
++		kfree(smb_lock);
++	}
++
++	kfree(fp->filename);
++	if (ksmbd_stream_fd(fp))
++		kfree(fp->stream.name);
++	kmem_cache_free(filp_cache, fp);
++}
++
++static struct ksmbd_file *ksmbd_fp_get(struct ksmbd_file *fp)
++{
++	if (!atomic_inc_not_zero(&fp->refcount))
++		return NULL;
++	return fp;
++}
++
++static struct ksmbd_file *__ksmbd_lookup_fd(struct ksmbd_file_table *ft,
++					    u64 id)
++{
++	struct ksmbd_file *fp;
++
++	if (!has_file_id(id))
++		return NULL;
++
++	read_lock(&ft->lock);
++	fp = idr_find(ft->idr, id);
++	if (fp)
++		fp = ksmbd_fp_get(fp);
++	read_unlock(&ft->lock);
++	return fp;
++}
++
++static void __put_fd_final(struct ksmbd_work *work, struct ksmbd_file *fp)
++{
++	__ksmbd_close_fd(&work->sess->file_table, fp);
++	atomic_dec(&work->conn->stats.open_files_count);
++}
++
++static void set_close_state_blocked_works(struct ksmbd_file *fp)
++{
++	struct ksmbd_work *cancel_work, *ctmp;
++
++	spin_lock(&fp->f_lock);
++	list_for_each_entry_safe(cancel_work, ctmp, &fp->blocked_works,
++				 fp_entry) {
++		list_del(&cancel_work->fp_entry);
++		cancel_work->state = KSMBD_WORK_CLOSED;
++		cancel_work->cancel_fn(cancel_work->cancel_argv);
++	}
++	spin_unlock(&fp->f_lock);
++}
++
++int ksmbd_close_fd(struct ksmbd_work *work, u64 id)
++{
++	struct ksmbd_file	*fp;
++	struct ksmbd_file_table	*ft;
++
++	if (!has_file_id(id))
++		return 0;
++
++	ft = &work->sess->file_table;
++	read_lock(&ft->lock);
++	fp = idr_find(ft->idr, id);
++	if (fp) {
++		set_close_state_blocked_works(fp);
++
++		if (!atomic_dec_and_test(&fp->refcount))
++			fp = NULL;
++	}
++	read_unlock(&ft->lock);
++
++	if (!fp)
++		return -EINVAL;
++
++	__put_fd_final(work, fp);
++	return 0;
++}
++
++void ksmbd_fd_put(struct ksmbd_work *work, struct ksmbd_file *fp)
++{
++	if (!fp)
++		return;
++
++	if (!atomic_dec_and_test(&fp->refcount))
++		return;
++	__put_fd_final(work, fp);
++}
++
++static bool __sanity_check(struct ksmbd_tree_connect *tcon, struct ksmbd_file *fp)
++{
++	if (!fp)
++		return false;
++	if (fp->tcon != tcon)
++		return false;
++	return true;
++}
++
++struct ksmbd_file *ksmbd_lookup_foreign_fd(struct ksmbd_work *work, u64 id)
++{
++	return __ksmbd_lookup_fd(&work->sess->file_table, id);
++}
++
++struct ksmbd_file *ksmbd_lookup_fd_fast(struct ksmbd_work *work, u64 id)
++{
++	struct ksmbd_file *fp = __ksmbd_lookup_fd(&work->sess->file_table, id);
++
++	if (__sanity_check(work->tcon, fp))
++		return fp;
++
++	ksmbd_fd_put(work, fp);
++	return NULL;
++}
++
++struct ksmbd_file *ksmbd_lookup_fd_slow(struct ksmbd_work *work, u64 id,
++					u64 pid)
++{
++	struct ksmbd_file *fp;
++
++	if (!has_file_id(id)) {
++		id = work->compound_fid;
++		pid = work->compound_pfid;
++	}
++
++	fp = __ksmbd_lookup_fd(&work->sess->file_table, id);
++	if (!__sanity_check(work->tcon, fp)) {
++		ksmbd_fd_put(work, fp);
++		return NULL;
++	}
++	if (fp->persistent_id != pid) {
++		ksmbd_fd_put(work, fp);
++		return NULL;
++	}
++	return fp;
++}
++
++struct ksmbd_file *ksmbd_lookup_durable_fd(unsigned long long id)
++{
++	return __ksmbd_lookup_fd(&global_ft, id);
++}
++
++struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid)
++{
++	struct ksmbd_file	*fp = NULL;
++	unsigned int		id;
++
++	read_lock(&global_ft.lock);
++	idr_for_each_entry(global_ft.idr, fp, id) {
++		if (!memcmp(fp->create_guid,
++			    cguid,
++			    SMB2_CREATE_GUID_SIZE)) {
++			fp = ksmbd_fp_get(fp);
++			break;
++		}
++	}
++	read_unlock(&global_ft.lock);
++
++	return fp;
++}
++
++struct ksmbd_file *ksmbd_lookup_fd_inode(struct inode *inode)
++{
++	struct ksmbd_file	*lfp;
++	struct ksmbd_inode	*ci;
++
++	ci = ksmbd_inode_lookup_by_vfsinode(inode);
++	if (!ci)
++		return NULL;
++
++	read_lock(&ci->m_lock);
++	list_for_each_entry(lfp, &ci->m_fp_list, node) {
++		if (inode == file_inode(lfp->filp)) {
++			atomic_dec(&ci->m_count);
++			read_unlock(&ci->m_lock);
++			return lfp;
++		}
++	}
++	atomic_dec(&ci->m_count);
++	read_unlock(&ci->m_lock);
++	return NULL;
++}
++
++#define OPEN_ID_TYPE_VOLATILE_ID	(0)
++#define OPEN_ID_TYPE_PERSISTENT_ID	(1)
++
++static void __open_id_set(struct ksmbd_file *fp, u64 id, int type)
++{
++	if (type == OPEN_ID_TYPE_VOLATILE_ID)
++		fp->volatile_id = id;
++	if (type == OPEN_ID_TYPE_PERSISTENT_ID)
++		fp->persistent_id = id;
++}
++
++static int __open_id(struct ksmbd_file_table *ft, struct ksmbd_file *fp,
++		     int type)
++{
++	u64			id = 0;
++	int			ret;
++
++	if (type == OPEN_ID_TYPE_VOLATILE_ID && fd_limit_depleted()) {
++		__open_id_set(fp, KSMBD_NO_FID, type);
++		return -EMFILE;
++	}
++
++	idr_preload(GFP_KERNEL);
++	write_lock(&ft->lock);
++	ret = idr_alloc_cyclic(ft->idr, fp, 0, INT_MAX - 1, GFP_NOWAIT);
++	if (ret >= 0) {
++		id = ret;
++		ret = 0;
++	} else {
++		id = KSMBD_NO_FID;
++		fd_limit_close();
++	}
++
++	__open_id_set(fp, id, type);
++	write_unlock(&ft->lock);
++	idr_preload_end();
++	return ret;
++}
++
++unsigned int ksmbd_open_durable_fd(struct ksmbd_file *fp)
++{
++	__open_id(&global_ft, fp, OPEN_ID_TYPE_PERSISTENT_ID);
++	return fp->persistent_id;
++}
++
++struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp)
++{
++	struct ksmbd_file *fp;
++	int ret;
++
++	fp = kmem_cache_zalloc(filp_cache, GFP_KERNEL);
++	if (!fp) {
++		pr_err("Failed to allocate memory\n");
++		return ERR_PTR(-ENOMEM);
++	}
++
++	INIT_LIST_HEAD(&fp->blocked_works);
++	INIT_LIST_HEAD(&fp->node);
++	INIT_LIST_HEAD(&fp->lock_list);
++	spin_lock_init(&fp->f_lock);
++	atomic_set(&fp->refcount, 1);
++
++	fp->filp		= filp;
++	fp->conn		= work->sess->conn;
++	fp->tcon		= work->tcon;
++	fp->volatile_id		= KSMBD_NO_FID;
++	fp->persistent_id	= KSMBD_NO_FID;
++	fp->f_ci		= ksmbd_inode_get(fp);
++
++	if (!fp->f_ci) {
++		ret = -ENOMEM;
++		goto err_out;
++	}
++
++	ret = __open_id(&work->sess->file_table, fp, OPEN_ID_TYPE_VOLATILE_ID);
++	if (ret) {
++		ksmbd_inode_put(fp->f_ci);
++		goto err_out;
++	}
++
++	atomic_inc(&work->conn->stats.open_files_count);
++	return fp;
++
++err_out:
++	kmem_cache_free(filp_cache, fp);
++	return ERR_PTR(ret);
++}
++
++static int
++__close_file_table_ids(struct ksmbd_file_table *ft,
++		       struct ksmbd_tree_connect *tcon,
++		       bool (*skip)(struct ksmbd_tree_connect *tcon,
++				    struct ksmbd_file *fp))
++{
++	unsigned int			id;
++	struct ksmbd_file		*fp;
++	int				num = 0;
++
++	idr_for_each_entry(ft->idr, fp, id) {
++		if (skip(tcon, fp))
++			continue;
++
++		set_close_state_blocked_works(fp);
++
++		if (!atomic_dec_and_test(&fp->refcount))
++			continue;
++		__ksmbd_close_fd(ft, fp);
++		num++;
++	}
++	return num;
++}
++
++static bool tree_conn_fd_check(struct ksmbd_tree_connect *tcon,
++			       struct ksmbd_file *fp)
++{
++	return fp->tcon != tcon;
++}
++
++static bool session_fd_check(struct ksmbd_tree_connect *tcon,
++			     struct ksmbd_file *fp)
++{
++	return false;
++}
++
++void ksmbd_close_tree_conn_fds(struct ksmbd_work *work)
++{
++	int num = __close_file_table_ids(&work->sess->file_table,
++					 work->tcon,
++					 tree_conn_fd_check);
++
++	atomic_sub(num, &work->conn->stats.open_files_count);
++}
++
++void ksmbd_close_session_fds(struct ksmbd_work *work)
++{
++	int num = __close_file_table_ids(&work->sess->file_table,
++					 work->tcon,
++					 session_fd_check);
++
++	atomic_sub(num, &work->conn->stats.open_files_count);
++}
++
++int ksmbd_init_global_file_table(void)
++{
++	return ksmbd_init_file_table(&global_ft);
++}
++
++void ksmbd_free_global_file_table(void)
++{
++	struct ksmbd_file	*fp = NULL;
++	unsigned int		id;
++
++	idr_for_each_entry(global_ft.idr, fp, id) {
++		__ksmbd_remove_durable_fd(fp);
++		kmem_cache_free(filp_cache, fp);
++	}
++
++	ksmbd_destroy_file_table(&global_ft);
++}
++
++int ksmbd_file_table_flush(struct ksmbd_work *work)
++{
++	struct ksmbd_file	*fp = NULL;
++	unsigned int		id;
++	int			ret;
++
++	read_lock(&work->sess->file_table.lock);
++	idr_for_each_entry(work->sess->file_table.idr, fp, id) {
++		ret = ksmbd_vfs_fsync(work, fp->volatile_id, KSMBD_NO_FID);
++		if (ret)
++			break;
++	}
++	read_unlock(&work->sess->file_table.lock);
++	return ret;
++}
++
++int ksmbd_init_file_table(struct ksmbd_file_table *ft)
++{
++	ft->idr = kzalloc(sizeof(struct idr), GFP_KERNEL);
++	if (!ft->idr)
++		return -ENOMEM;
++
++	idr_init(ft->idr);
++	rwlock_init(&ft->lock);
++	return 0;
++}
++
++void ksmbd_destroy_file_table(struct ksmbd_file_table *ft)
++{
++	if (!ft->idr)
++		return;
++
++	__close_file_table_ids(ft, NULL, session_fd_check);
++	idr_destroy(ft->idr);
++	kfree(ft->idr);
++	ft->idr = NULL;
++}
++
++int ksmbd_init_file_cache(void)
++{
++	filp_cache = kmem_cache_create("ksmbd_file_cache",
++				       sizeof(struct ksmbd_file), 0,
++				       SLAB_HWCACHE_ALIGN, NULL);
++	if (!filp_cache)
++		goto out;
++
++	return 0;
++
++out:
++	pr_err("failed to allocate file cache\n");
++	return -ENOMEM;
++}
++
++void ksmbd_exit_file_cache(void)
++{
++	kmem_cache_destroy(filp_cache);
++}
+diff --git a/fs/ksmbd/vfs_cache.h b/fs/ksmbd/vfs_cache.h
 new file mode 100644
-index 000000000000..ef11154b43df
+index 000000000000..70dfe6a99f13
 --- /dev/null
-+++ b/fs/ksmbd/crypto_ctx.h
-@@ -0,0 +1,74 @@
++++ b/fs/ksmbd/vfs_cache.h
+@@ -0,0 +1,178 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/*
 + *   Copyright (C) 2019 Samsung Electronics Co., Ltd.
 + */
 +
-+#ifndef __CRYPTO_CTX_H__
-+#define __CRYPTO_CTX_H__
++#ifndef __VFS_CACHE_H__
++#define __VFS_CACHE_H__
 +
-+#include <crypto/hash.h>
-+#include <crypto/aead.h>
++#include <linux/file.h>
++#include <linux/fs.h>
++#include <linux/rwsem.h>
++#include <linux/spinlock.h>
++#include <linux/idr.h>
++#include <linux/workqueue.h>
 +
-+enum {
-+	CRYPTO_SHASH_HMACMD5	= 0,
-+	CRYPTO_SHASH_HMACSHA256,
-+	CRYPTO_SHASH_CMACAES,
-+	CRYPTO_SHASH_SHA256,
-+	CRYPTO_SHASH_SHA512,
-+	CRYPTO_SHASH_MD4,
-+	CRYPTO_SHASH_MD5,
-+	CRYPTO_SHASH_MAX,
++#include "vfs.h"
++
++/* Windows style file permissions for extended response */
++#define	FILE_GENERIC_ALL	0x1F01FF
++#define	FILE_GENERIC_READ	0x120089
++#define	FILE_GENERIC_WRITE	0x120116
++#define	FILE_GENERIC_EXECUTE	0X1200a0
++
++#define KSMBD_START_FID		0
++#define KSMBD_NO_FID		(INT_MAX)
++#define SMB2_NO_FID		(0xFFFFFFFFFFFFFFFFULL)
++
++struct ksmbd_conn;
++struct ksmbd_session;
++
++struct ksmbd_lock {
++	struct file_lock *fl;
++	struct list_head clist;
++	struct list_head flist;
++	struct list_head llist;
++	unsigned int flags;
++	int cmd;
++	int zero_len;
++	unsigned long long start;
++	unsigned long long end;
 +};
 +
-+enum {
-+	CRYPTO_AEAD_AES_GCM = 16,
-+	CRYPTO_AEAD_AES_CCM,
-+	CRYPTO_AEAD_MAX,
++struct stream {
++	char *name;
++	ssize_t size;
 +};
 +
-+enum {
-+	CRYPTO_BLK_ECBDES	= 32,
-+	CRYPTO_BLK_MAX,
++struct ksmbd_inode {
++	rwlock_t			m_lock;
++	atomic_t			m_count;
++	atomic_t			op_count;
++	/* opinfo count for streams */
++	atomic_t			sop_count;
++	struct inode			*m_inode;
++	unsigned int			m_flags;
++	struct hlist_node		m_hash;
++	struct list_head		m_fp_list;
++	struct list_head		m_op_list;
++	struct oplock_info		*m_opinfo;
++	__le32				m_fattr;
 +};
 +
-+struct ksmbd_crypto_ctx {
-+	struct list_head		list;
++struct ksmbd_file {
++	struct file			*filp;
++	char				*filename;
++	u64				persistent_id;
++	u64				volatile_id;
 +
-+	struct shash_desc		*desc[CRYPTO_SHASH_MAX];
-+	struct crypto_aead		*ccmaes[CRYPTO_AEAD_MAX];
++	spinlock_t			f_lock;
++
++	struct ksmbd_inode		*f_ci;
++	struct ksmbd_inode		*f_parent_ci;
++	struct oplock_info __rcu	*f_opinfo;
++	struct ksmbd_conn		*conn;
++	struct ksmbd_tree_connect	*tcon;
++
++	atomic_t			refcount;
++	__le32				daccess;
++	__le32				saccess;
++	__le32				coption;
++	__le32				cdoption;
++	__u64				create_time;
++	__u64				itime;
++
++	bool				is_nt_open;
++	bool				attrib_only;
++
++	char				client_guid[16];
++	char				create_guid[16];
++	char				app_instance_id[16];
++
++	struct stream			stream;
++	struct list_head		node;
++	struct list_head		blocked_works;
++	struct list_head		lock_list;
++
++	int				durable_timeout;
++
++	/* for SMB1 */
++	int				pid;
++
++	/* conflict lock fail count for SMB1 */
++	unsigned int			cflock_cnt;
++	/* last lock failure start offset for SMB1 */
++	unsigned long long		llock_fstart;
++
++	int				dirent_offset;
++
++	/* if ls is happening on directory, below is valid*/
++	struct ksmbd_readdir_data	readdir_data;
++	int				dot_dotdot[2];
 +};
 +
-+#define CRYPTO_HMACMD5(c)	((c)->desc[CRYPTO_SHASH_HMACMD5])
-+#define CRYPTO_HMACSHA256(c)	((c)->desc[CRYPTO_SHASH_HMACSHA256])
-+#define CRYPTO_CMACAES(c)	((c)->desc[CRYPTO_SHASH_CMACAES])
-+#define CRYPTO_SHA256(c)	((c)->desc[CRYPTO_SHASH_SHA256])
-+#define CRYPTO_SHA512(c)	((c)->desc[CRYPTO_SHASH_SHA512])
-+#define CRYPTO_MD4(c)		((c)->desc[CRYPTO_SHASH_MD4])
-+#define CRYPTO_MD5(c)		((c)->desc[CRYPTO_SHASH_MD5])
++static inline void set_ctx_actor(struct dir_context *ctx,
++				 filldir_t actor)
++{
++	ctx->actor = actor;
++}
 +
-+#define CRYPTO_HMACMD5_TFM(c)	((c)->desc[CRYPTO_SHASH_HMACMD5]->tfm)
-+#define CRYPTO_HMACSHA256_TFM(c)\
-+				((c)->desc[CRYPTO_SHASH_HMACSHA256]->tfm)
-+#define CRYPTO_CMACAES_TFM(c)	((c)->desc[CRYPTO_SHASH_CMACAES]->tfm)
-+#define CRYPTO_SHA256_TFM(c)	((c)->desc[CRYPTO_SHASH_SHA256]->tfm)
-+#define CRYPTO_SHA512_TFM(c)	((c)->desc[CRYPTO_SHASH_SHA512]->tfm)
-+#define CRYPTO_MD4_TFM(c)	((c)->desc[CRYPTO_SHASH_MD4]->tfm)
-+#define CRYPTO_MD5_TFM(c)	((c)->desc[CRYPTO_SHASH_MD5]->tfm)
++#define KSMBD_NR_OPEN_DEFAULT BITS_PER_LONG
 +
-+#define CRYPTO_GCM(c)		((c)->ccmaes[CRYPTO_AEAD_AES_GCM])
-+#define CRYPTO_CCM(c)		((c)->ccmaes[CRYPTO_AEAD_AES_CCM])
++struct ksmbd_file_table {
++	rwlock_t		lock;
++	struct idr		*idr;
++};
 +
-+void ksmbd_release_crypto_ctx(struct ksmbd_crypto_ctx *ctx);
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_hmacmd5(void);
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_hmacsha256(void);
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_cmacaes(void);
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_sha512(void);
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_sha256(void);
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_md4(void);
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_md5(void);
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_gcm(void);
-+struct ksmbd_crypto_ctx *ksmbd_crypto_ctx_find_ccm(void);
-+void ksmbd_crypto_destroy(void);
-+int ksmbd_crypto_create(void);
++static inline bool has_file_id(u64 id)
++{
++	return id < KSMBD_NO_FID;
++}
 +
-+#endif /* __CRYPTO_CTX_H__ */
-diff --git a/fs/ksmbd/ksmbd_spnego_negtokeninit.asn1 b/fs/ksmbd/ksmbd_spnego_negtokeninit.asn1
-new file mode 100644
-index 000000000000..0065f191b54b
---- /dev/null
-+++ b/fs/ksmbd/ksmbd_spnego_negtokeninit.asn1
-@@ -0,0 +1,31 @@
-+GSSAPI ::=
-+	[APPLICATION 0] IMPLICIT SEQUENCE {
-+		thisMech
-+			OBJECT IDENTIFIER ({ksmbd_gssapi_this_mech}),
-+		negotiationToken
-+			NegotiationToken
-+	}
++static inline bool ksmbd_stream_fd(struct ksmbd_file *fp)
++{
++	return fp->stream.name != NULL;
++}
 +
-+MechType ::= OBJECT IDENTIFIER ({ksmbd_neg_token_init_mech_type})
-+
-+MechTypeList ::= SEQUENCE OF MechType
-+
-+NegTokenInit ::=
-+	SEQUENCE {
-+		mechTypes
-+			[0] MechTypeList,
-+		reqFlags
-+			[1] BIT STRING OPTIONAL,
-+		mechToken
-+			[2] OCTET STRING OPTIONAL ({ksmbd_neg_token_init_mech_token}),
-+		mechListMIC
-+			[3] OCTET STRING OPTIONAL
-+	}
-+
-+NegotiationToken ::=
-+	CHOICE {
-+		negTokenInit
-+			[0] NegTokenInit,
-+		negTokenTarg
-+			[1] ANY
-+	}
-diff --git a/fs/ksmbd/ksmbd_spnego_negtokentarg.asn1 b/fs/ksmbd/ksmbd_spnego_negtokentarg.asn1
-new file mode 100644
-index 000000000000..1151933e7b9c
---- /dev/null
-+++ b/fs/ksmbd/ksmbd_spnego_negtokentarg.asn1
-@@ -0,0 +1,19 @@
-+GSSAPI ::=
-+	CHOICE {
-+		negTokenInit
-+			[0] ANY,
-+		negTokenTarg
-+			[1] NegTokenTarg
-+	}
-+
-+NegTokenTarg ::=
-+	SEQUENCE {
-+		negResult
-+			[0] ENUMERATED OPTIONAL,
-+		supportedMech
-+			[1] OBJECT IDENTIFIER OPTIONAL,
-+		responseToken
-+			[2] OCTET STRING OPTIONAL ({ksmbd_neg_token_targ_resp_token}),
-+		mechListMIC
-+			[3] OCTET STRING OPTIONAL
-+	}
-diff --git a/fs/ksmbd/ntlmssp.h b/fs/ksmbd/ntlmssp.h
-new file mode 100644
-index 000000000000..adaf4c0cbe8f
---- /dev/null
-+++ b/fs/ksmbd/ntlmssp.h
-@@ -0,0 +1,169 @@
-+/* SPDX-License-Identifier: LGPL-2.1+ */
-+/*
-+ *   Copyright (c) International Business Machines  Corp., 2002,2007
-+ *   Author(s): Steve French (sfrench@us.ibm.com)
-+ */
-+
-+#ifndef __KSMBD_NTLMSSP_H
-+#define __KSMBD_NTLMSSP_H
-+
-+#define NTLMSSP_SIGNATURE "NTLMSSP"
-+
-+/* Security blob target info data */
-+#define TGT_Name        "KSMBD"
-+
-+/*
-+ * Size of the crypto key returned on the negotiate SMB in bytes
-+ */
-+#define CIFS_CRYPTO_KEY_SIZE	(8)
-+#define CIFS_KEY_SIZE	(40)
++int ksmbd_init_file_table(struct ksmbd_file_table *ft);
++void ksmbd_destroy_file_table(struct ksmbd_file_table *ft);
++int ksmbd_close_fd(struct ksmbd_work *work, u64 id);
++struct ksmbd_file *ksmbd_lookup_fd_fast(struct ksmbd_work *work, u64 id);
++struct ksmbd_file *ksmbd_lookup_foreign_fd(struct ksmbd_work *work, u64 id);
++struct ksmbd_file *ksmbd_lookup_fd_slow(struct ksmbd_work *work, u64 id,
++					u64 pid);
++void ksmbd_fd_put(struct ksmbd_work *work, struct ksmbd_file *fp);
++struct ksmbd_file *ksmbd_lookup_durable_fd(unsigned long long id);
++struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid);
++struct ksmbd_file *ksmbd_lookup_fd_inode(struct inode *inode);
++unsigned int ksmbd_open_durable_fd(struct ksmbd_file *fp);
++struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp);
++void ksmbd_close_tree_conn_fds(struct ksmbd_work *work);
++void ksmbd_close_session_fds(struct ksmbd_work *work);
++int ksmbd_close_inode_fds(struct ksmbd_work *work, struct inode *inode);
++int ksmbd_init_global_file_table(void);
++void ksmbd_free_global_file_table(void);
++int ksmbd_file_table_flush(struct ksmbd_work *work);
++void ksmbd_set_fd_limit(unsigned long limit);
 +
 +/*
-+ * Size of encrypted user password in bytes
++ * INODE hash
 + */
-+#define CIFS_ENCPWD_SIZE	(16)
-+#define CIFS_CPHTXT_SIZE	(16)
++int __init ksmbd_inode_hash_init(void);
++void ksmbd_release_inode_hash(void);
 +
-+/* Message Types */
-+#define NtLmNegotiate     cpu_to_le32(1)
-+#define NtLmChallenge     cpu_to_le32(2)
-+#define NtLmAuthenticate  cpu_to_le32(3)
-+#define UnknownMessage    cpu_to_le32(8)
-+
-+/* Negotiate Flags */
-+#define NTLMSSP_NEGOTIATE_UNICODE         0x01 /* Text strings are unicode */
-+#define NTLMSSP_NEGOTIATE_OEM             0x02 /* Text strings are in OEM */
-+#define NTLMSSP_REQUEST_TARGET            0x04 /* Srv returns its auth realm */
-+/* define reserved9                       0x08 */
-+#define NTLMSSP_NEGOTIATE_SIGN          0x0010 /* Request signing capability */
-+#define NTLMSSP_NEGOTIATE_SEAL          0x0020 /* Request confidentiality */
-+#define NTLMSSP_NEGOTIATE_DGRAM         0x0040
-+#define NTLMSSP_NEGOTIATE_LM_KEY        0x0080 /* Use LM session key */
-+/* defined reserved 8                   0x0100 */
-+#define NTLMSSP_NEGOTIATE_NTLM          0x0200 /* NTLM authentication */
-+#define NTLMSSP_NEGOTIATE_NT_ONLY       0x0400 /* Lanman not allowed */
-+#define NTLMSSP_ANONYMOUS               0x0800
-+#define NTLMSSP_NEGOTIATE_DOMAIN_SUPPLIED 0x1000 /* reserved6 */
-+#define NTLMSSP_NEGOTIATE_WORKSTATION_SUPPLIED 0x2000
-+#define NTLMSSP_NEGOTIATE_LOCAL_CALL    0x4000 /* client/server same machine */
-+#define NTLMSSP_NEGOTIATE_ALWAYS_SIGN   0x8000 /* Sign. All security levels  */
-+#define NTLMSSP_TARGET_TYPE_DOMAIN     0x10000
-+#define NTLMSSP_TARGET_TYPE_SERVER     0x20000
-+#define NTLMSSP_TARGET_TYPE_SHARE      0x40000
-+#define NTLMSSP_NEGOTIATE_EXTENDED_SEC 0x80000 /* NB:not related to NTLMv2 pwd*/
-+/* #define NTLMSSP_REQUEST_INIT_RESP     0x100000 */
-+#define NTLMSSP_NEGOTIATE_IDENTIFY    0x100000
-+#define NTLMSSP_REQUEST_ACCEPT_RESP   0x200000 /* reserved5 */
-+#define NTLMSSP_REQUEST_NON_NT_KEY    0x400000
-+#define NTLMSSP_NEGOTIATE_TARGET_INFO 0x800000
-+/* #define reserved4                 0x1000000 */
-+#define NTLMSSP_NEGOTIATE_VERSION    0x2000000 /* we do not set */
-+/* #define reserved3                 0x4000000 */
-+/* #define reserved2                 0x8000000 */
-+/* #define reserved1                0x10000000 */
-+#define NTLMSSP_NEGOTIATE_128       0x20000000
-+#define NTLMSSP_NEGOTIATE_KEY_XCH   0x40000000
-+#define NTLMSSP_NEGOTIATE_56        0x80000000
-+
-+/* Define AV Pair Field IDs */
-+enum av_field_type {
-+	NTLMSSP_AV_EOL = 0,
-+	NTLMSSP_AV_NB_COMPUTER_NAME,
-+	NTLMSSP_AV_NB_DOMAIN_NAME,
-+	NTLMSSP_AV_DNS_COMPUTER_NAME,
-+	NTLMSSP_AV_DNS_DOMAIN_NAME,
-+	NTLMSSP_AV_DNS_TREE_NAME,
-+	NTLMSSP_AV_FLAGS,
-+	NTLMSSP_AV_TIMESTAMP,
-+	NTLMSSP_AV_RESTRICTION,
-+	NTLMSSP_AV_TARGET_NAME,
-+	NTLMSSP_AV_CHANNEL_BINDINGS
++enum KSMBD_INODE_STATUS {
++	KSMBD_INODE_STATUS_OK,
++	KSMBD_INODE_STATUS_UNKNOWN,
++	KSMBD_INODE_STATUS_PENDING_DELETE,
 +};
 +
-+/* Although typedefs are not commonly used for structure definitions */
-+/* in the Linux kernel, in this particular case they are useful      */
-+/* to more closely match the standards document for NTLMSSP from     */
-+/* OpenGroup and to make the code more closely match the standard in */
-+/* appearance */
++int ksmbd_query_inode_status(struct inode *inode);
++bool ksmbd_inode_pending_delete(struct ksmbd_file *fp);
++void ksmbd_set_inode_pending_delete(struct ksmbd_file *fp);
++void ksmbd_clear_inode_pending_delete(struct ksmbd_file *fp);
++void ksmbd_fd_set_delete_on_close(struct ksmbd_file *fp,
++				  int file_info);
++int ksmbd_init_file_cache(void);
++void ksmbd_exit_file_cache(void);
++#endif /* __VFS_CACHE_H__ */
+diff --git a/fs/ksmbd/xattr.h b/fs/ksmbd/xattr.h
+new file mode 100644
+index 000000000000..8857c01093d9
+--- /dev/null
++++ b/fs/ksmbd/xattr.h
+@@ -0,0 +1,122 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *   Copyright (C) 2021 Samsung Electronics Co., Ltd.
++ */
 +
-+struct security_buffer {
-+	__le16 Length;
-+	__le16 MaximumLength;
-+	__le32 BufferOffset;	/* offset to buffer */
-+} __packed;
++#ifndef __XATTR_H__
++#define __XATTR_H__
 +
-+struct target_info {
-+	__le16 Type;
-+	__le16 Length;
-+	__u8 Content[0];
-+} __packed;
++/*
++ * These are on-disk structures to store additional metadata into xattr to
++ * reproduce windows filesystem semantics. And they are encoded with NDR to
++ * compatible with samba's xattr meta format. The compatibility with samba
++ * is important because it can lose the information(file attribute,
++ * creation time, acls) about the existing files when switching between
++ * ksmbd and samba.
++ */
 +
-+struct negotiate_message {
-+	__u8 Signature[sizeof(NTLMSSP_SIGNATURE)];
-+	__le32 MessageType;     /* NtLmNegotiate = 1 */
-+	__le32 NegotiateFlags;
-+	struct security_buffer DomainName;	/* RFC 1001 style and ASCII */
-+	struct security_buffer WorkstationName;	/* RFC 1001 and ASCII */
-+	/*
-+	 * struct security_buffer for version info not present since we
-+	 * do not set the version is present flag
-+	 */
-+	char DomainString[0];
-+	/* followed by WorkstationString */
-+} __packed;
-+
-+struct challenge_message {
-+	__u8 Signature[sizeof(NTLMSSP_SIGNATURE)];
-+	__le32 MessageType;   /* NtLmChallenge = 2 */
-+	struct security_buffer TargetName;
-+	__le32 NegotiateFlags;
-+	__u8 Challenge[CIFS_CRYPTO_KEY_SIZE];
-+	__u8 Reserved[8];
-+	struct security_buffer TargetInfoArray;
-+	/*
-+	 * struct security_buffer for version info not present since we
-+	 * do not set the version is present flag
-+	 */
-+} __packed;
-+
-+struct authenticate_message {
-+	__u8 Signature[sizeof(NTLMSSP_SIGNATURE)];
-+	__le32 MessageType;  /* NtLmsAuthenticate = 3 */
-+	struct security_buffer LmChallengeResponse;
-+	struct security_buffer NtChallengeResponse;
-+	struct security_buffer DomainName;
-+	struct security_buffer UserName;
-+	struct security_buffer WorkstationName;
-+	struct security_buffer SessionKey;
-+	__le32 NegotiateFlags;
-+	/*
-+	 * struct security_buffer for version info not present since we
-+	 * do not set the version is present flag
-+	 */
-+	char UserString[0];
-+} __packed;
-+
-+struct ntlmv2_resp {
-+	char ntlmv2_hash[CIFS_ENCPWD_SIZE];
-+	__le32 blob_signature;
-+	__u32  reserved;
-+	__le64  time;
-+	__u64  client_chal; /* random */
-+	__u32  reserved2;
-+	/* array of name entries could follow ending in minimum 4 byte struct */
-+} __packed;
-+
-+/* per smb session structure/fields */
-+struct ntlmssp_auth {
-+	/* whether session key is per smb session */
-+	bool		sesskey_per_smbsess;
-+	/* sent by client in type 1 ntlmsssp exchange */
-+	__u32		client_flags;
-+	/* sent by server in type 2 ntlmssp exchange */
-+	__u32		conn_flags;
-+	/* sent to server */
-+	unsigned char	ciphertext[CIFS_CPHTXT_SIZE];
-+	/* used by ntlmssp */
-+	char		cryptkey[CIFS_CRYPTO_KEY_SIZE];
++/*
++ * Dos attribute flags used for what variable is valid.
++ */
++enum {
++	XATTR_DOSINFO_ATTRIB		= 0x00000001,
++	XATTR_DOSINFO_EA_SIZE		= 0x00000002,
++	XATTR_DOSINFO_SIZE		= 0x00000004,
++	XATTR_DOSINFO_ALLOC_SIZE	= 0x00000008,
++	XATTR_DOSINFO_CREATE_TIME	= 0x00000010,
++	XATTR_DOSINFO_CHANGE_TIME	= 0x00000020,
++	XATTR_DOSINFO_ITIME		= 0x00000040
 +};
-+#endif /* __KSMBD_NTLMSSP_H */
++
++/*
++ * Dos attribute structure which is compatible with samba's one.
++ * Storing it into the xattr named "DOSATTRIB" separately from inode
++ * allows ksmbd to faithfully reproduce windows filesystem semantics
++ * on top of a POSIX filesystem.
++ */
++struct xattr_dos_attrib {
++	__u16	version;	/* version 3 or version 4 */
++	__u32	flags;		/* valid flags */
++	__u32	attr;		/* Dos attribute */
++	__u32	ea_size;	/* EA size */
++	__u64	size;
++	__u64	alloc_size;
++	__u64	create_time;	/* File creation time */
++	__u64	change_time;	/* File change time */
++	__u64	itime;		/* Invented/Initial time */
++};
++
++/*
++ * Enumeration is used for computing posix acl hash.
++ */
++enum {
++	SMB_ACL_TAG_INVALID = 0,
++	SMB_ACL_USER,
++	SMB_ACL_USER_OBJ,
++	SMB_ACL_GROUP,
++	SMB_ACL_GROUP_OBJ,
++	SMB_ACL_OTHER,
++	SMB_ACL_MASK
++};
++
++#define SMB_ACL_READ			4
++#define SMB_ACL_WRITE			2
++#define SMB_ACL_EXECUTE			1
++
++struct xattr_acl_entry {
++	int type;
++	uid_t uid;
++	gid_t gid;
++	mode_t perm;
++};
++
++/*
++ * xattr_smb_acl structure is used for computing posix acl hash.
++ */
++struct xattr_smb_acl {
++	int count;
++	int next;
++	struct xattr_acl_entry entries[0];
++};
++
++/* 64bytes hash in xattr_ntacl is computed with sha256 */
++#define XATTR_SD_HASH_TYPE_SHA256	0x1
++#define XATTR_SD_HASH_SIZE		64
++
++/*
++ * xattr_ntacl is used for storing ntacl and hashes.
++ * Hash is used for checking valid posix acl and ntacl in xattr.
++ */
++struct xattr_ntacl {
++	__u16	version; /* version 4*/
++	void	*sd_buf;
++	__u32	sd_size;
++	__u16	hash_type; /* hash type */
++	__u8	desc[10]; /* posix_acl description */
++	__u16	desc_len;
++	__u64	current_time;
++	__u8	hash[XATTR_SD_HASH_SIZE]; /* 64bytes hash for ntacl */
++	__u8	posix_acl_hash[XATTR_SD_HASH_SIZE]; /* 64bytes hash for posix acl */
++};
++
++/* DOS ATTRIBUITE XATTR PREFIX */
++#define DOS_ATTRIBUTE_PREFIX		"DOSATTRIB"
++#define DOS_ATTRIBUTE_PREFIX_LEN	(sizeof(DOS_ATTRIBUTE_PREFIX) - 1)
++#define XATTR_NAME_DOS_ATTRIBUTE	(XATTR_USER_PREFIX DOS_ATTRIBUTE_PREFIX)
++#define XATTR_NAME_DOS_ATTRIBUTE_LEN	\
++		(sizeof(XATTR_USER_PREFIX DOS_ATTRIBUTE_PREFIX) - 1)
++
++/* STREAM XATTR PREFIX */
++#define STREAM_PREFIX			"DosStream."
++#define STREAM_PREFIX_LEN		(sizeof(STREAM_PREFIX) - 1)
++#define XATTR_NAME_STREAM		(XATTR_USER_PREFIX STREAM_PREFIX)
++#define XATTR_NAME_STREAM_LEN		(sizeof(XATTR_NAME_STREAM) - 1)
++
++/* SECURITY DESCRIPTOR(NTACL) XATTR PREFIX */
++#define SD_PREFIX			"NTACL"
++#define SD_PREFIX_LEN	(sizeof(SD_PREFIX) - 1)
++#define XATTR_NAME_SD	(XATTR_SECURITY_PREFIX SD_PREFIX)
++#define XATTR_NAME_SD_LEN	\
++		(sizeof(XATTR_SECURITY_PREFIX SD_PREFIX) - 1)
++
++#endif /* __XATTR_H__ */
 -- 
 2.17.1
 
