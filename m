@@ -2,143 +2,105 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A98C12002
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 19:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 128F7C63797
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 21:02:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 82D8B60FE7
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 19:00:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFFFD61261
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 21:02:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238524AbhGUSUL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 21 Jul 2021 14:20:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52404 "EHLO
+        id S230123AbhGUUV1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 21 Jul 2021 16:21:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49101 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237955AbhGUSUL (ORCPT
+        by vger.kernel.org with ESMTP id S230010AbhGUUVS (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 21 Jul 2021 14:20:11 -0400
+        Wed, 21 Jul 2021 16:21:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626894047;
+        s=mimecast20190719; t=1626901314;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1gH3Ux0CT6hU+v/YeUAIBalSzkDA3DKDpAjmYag8B8E=;
-        b=VWha/EgDRfOK8PiKeHoq/+hv9G9oq2wG+h67hbSeSx/pqF88eNqTiG/7Wpf0atguaSn9OK
-        CiebzZTwa9wgHsAalzadcM6sIA7odfPRyZhRGWNm0CmCbLTQ0GrjScrQ43M85/sburDjbs
-        pQNZzFA2Q4D+A+qPvz+58U3U8JKZbeg=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-80kIpdSoNv-B4EwavHVVug-1; Wed, 21 Jul 2021 15:00:45 -0400
-X-MC-Unique: 80kIpdSoNv-B4EwavHVVug-1
-Received: by mail-qk1-f198.google.com with SMTP id o14-20020a05620a0d4eb02903a5eee61155so2352749qkl.9
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Jul 2021 12:00:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=1gH3Ux0CT6hU+v/YeUAIBalSzkDA3DKDpAjmYag8B8E=;
-        b=b5q9Kq9O+ezdd0Z6vzsHf4isvnNGBr5ObCWNVJhY1QYR4k6u7cLSHhGZveZgkdLgF7
-         dw550J+CMLDTXXDDd7gsWS+LyrXH/UlOS4SRq6GVwVZSSXQavjkJeh9ySoS7yUofeGJ5
-         9R+BjEdIW3DWWjlWQmkqe9aZhWWCrvEknu4SMdswmxQqLRJo7pHOhQxS+Wbqqvno6EuV
-         T0ArmKNwfGhxjPNaIiPejrZRLMLq41AxqVc3kJ8NKN2nEnnzLlvihyO7lzx9g4e7mfvF
-         gGMMD+FCzagbQIVvBCh653dEmdbfI7MxSecipEoMt8ijNzmaEFZLBVL3iUbXcCw/nF6E
-         oe4w==
-X-Gm-Message-State: AOAM530IWxBWjUBuOZJGS8sXngAG3PeSChhr5mIuXuJm6NNAhtGoUYTR
-        G6l41sG15fwfdKwct9fQbA1VMJ4Dv+C1pbATKV0N9K8XOx/1J9OztXX0w4z+yhGHY2ZQv9u0Uw8
-        Wv6lzzakHDMvzUiTi47lI2g==
-X-Received: by 2002:a0c:e70f:: with SMTP id d15mr4739144qvn.47.1626894045392;
-        Wed, 21 Jul 2021 12:00:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzLJs8XXnPDqD0EYRCTwpJGY8jpuBbe7MH5DxMPfLcBBLk08k/UTRTJHL2M7llSs52l9VDF/g==
-X-Received: by 2002:a0c:e70f:: with SMTP id d15mr4739113qvn.47.1626894045207;
-        Wed, 21 Jul 2021 12:00:45 -0700 (PDT)
-Received: from [192.168.1.3] (68-20-15-154.lightspeed.rlghnc.sbcglobal.net. [68.20.15.154])
-        by smtp.gmail.com with ESMTPSA id x7sm9290487qtw.24.2021.07.21.12.00.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 12:00:44 -0700 (PDT)
-Message-ID: <56b3c140a388b98f74f2e71c656e77655da3129f.camel@redhat.com>
-Subject: Re: [RFC PATCH 03/12] netfs: Remove
- netfs_read_subrequest::transferred
-From:   Jeff Layton <jlayton@redhat.com>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-fsdevel@vger.kernel.org,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=GclXY2ksYr1Udx8zsfvHxRSGegwER5nsOIWFyg2Lzz8=;
+        b=Xocnl0eHJy9F9rhxLrpI/D0hnmuMVgkHp4Jr0cEEfdtH+FOHtj0yRFMKx/bOtaa4iP2/ER
+        nzfHVXrd+Ujl+ntLRQWmzaZhoGlue69aDOdWXnhDDA4hzkB6O9akHMtOvaPNHRa6V+0zoY
+        xGZWFK3ynMRuH8hm4uB6UIo+WsSxJAU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-535-kVNbtwaQPnGttHTX-PduvA-1; Wed, 21 Jul 2021 17:01:51 -0400
+X-MC-Unique: kVNbtwaQPnGttHTX-PduvA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C62010086CA;
+        Wed, 21 Jul 2021 21:01:49 +0000 (UTC)
+Received: from max.com (unknown [10.40.194.164])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1811E385;
+        Wed, 21 Jul 2021 21:01:46 +0000 (UTC)
+From:   Andreas Gruenbacher <agruenba@redhat.com>
+To:     Alexander Viro <viro@zeniv.linux.org.uk>,
         Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>
+Cc:     Andreas Gruenbacher <agruenba@redhat.com>,
         Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        devel@lists.orangefs.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 21 Jul 2021 15:00:43 -0400
-In-Reply-To: <298117.1626893692@warthog.procyon.org.uk>
-References: <e7a3b850e8a42845f4e020c7642743b3dce2b9f1.camel@redhat.com>
-         <162687506932.276387.14456718890524355509.stgit@warthog.procyon.org.uk>
-         <162687511125.276387.15493860267582539643.stgit@warthog.procyon.org.uk>
-         <298117.1626893692@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.40.3 (3.40.3-1.fc34) 
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-cifs@vger.kernel.org
+Subject: [PATCH] iov_iter: Fix iov_iter_get_pages{,_alloc} page fault return value
+Date:   Wed, 21 Jul 2021 23:01:45 +0200
+Message-Id: <20210721210145.166669-1-agruenba@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 2021-07-21 at 19:54 +0100, David Howells wrote:
-> Jeff Layton <jlayton@redhat.com> wrote:
-> 
-> > The above two deltas seem like they should have been in patch #2.
-> 
-> Yeah.  Looks like at least partially so.
-> 
-> > > @@ -635,15 +625,8 @@ void netfs_subreq_terminated(struct netfs_read_subrequest *subreq,
-> > >  		goto failed;
-> > >  	}
-> > >  
-> > > -	if (WARN(transferred_or_error > subreq->len - subreq->transferred,
-> > > -		 "Subreq overread: R%x[%x] %zd > %zu - %zu",
-> > > -		 rreq->debug_id, subreq->debug_index,
-> > > -		 transferred_or_error, subreq->len, subreq->transferred))
-> > > -		transferred_or_error = subreq->len - subreq->transferred;
-> > > -
-> > >  	subreq->error = 0;
-> > > -	subreq->transferred += transferred_or_error;
-> > > -	if (subreq->transferred < subreq->len)
-> > > +	if (iov_iter_count(&subreq->iter))
-> > >  		goto incomplete;
-> > >  
-> > 
-> > I must be missing it, but where does subreq->iter get advanced to the
-> > end of the current read? If you're getting rid of subreq->transferred
-> > then I think that has to happen above, no?
-> 
-> For afs, afs_req_issue_op() points fsreq->iter at the subrequest iterator and
-> calls afs_fetch_data().  Thereafter, we wend our way to
-> afs_deliver_fs_fetch_data() or yfs_deliver_fs_fetch_data() which set
-> call->iter to point to that iterator and then call afs_extract_data() which
-> passes it to rxrpc_kernel_recv_data(), which eventually passes it to
-> skb_copy_datagram_iter(), which advances the iterator.
-> 
-> For the cache, the subrequest iterator is passed to the cache backend by
-> netfs_read_from_cache().  This would be cachefiles_read() which calls
-> vfs_iocb_iter_read() which I thought advances the iterator (leastways,
-> filemap_read() keeps going until iov_iter_count() reaches 0 or some other stop
-> condition occurs and doesn't thereafter call iov_iter_revert()).
-> 
+Both iov_iter_get_pages and iov_iter_get_pages_alloc return the number of bytes
+of the iovec they could get the pages for.  When they cannot get any pages,
+they're supposed to return 0, but when the start of the iovec isn't page
+aligned, the calculation goes wrong and they return a negative value.
+Fix that in both functions.
 
-Ok, this will probably regress ceph then. We don't really have anything
-to do with the subreq->iter at this point and this patch doesn't change
-that. If you're going to make this change, it'd be cleaner to also fix
-up ceph_netfs_issue_op to advance the iter at the same time.
+In addition, change iov_iter_get_pages_alloc to return ZERO_SIZE_PTR in that
+case to prevent resource leaks.
+
+It seems that the cifs and nfs filesystems don't handle the zero case very
+well.  Steve, Trond, Anna, could you please have a look?
+
+Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
+---
+ lib/iov_iter.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index e23123ae3a13..20dc3d800573 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1484,7 +1484,7 @@ ssize_t iov_iter_get_pages(struct iov_iter *i,
+ 		res = get_user_pages_fast(addr, n,
+ 				iov_iter_rw(i) != WRITE ?  FOLL_WRITE : 0,
+ 				pages);
+-		if (unlikely(res < 0))
++		if (unlikely(res <= 0))
+ 			return res;
+ 		return (res == n ? len : res * PAGE_SIZE) - *start;
+ 	}
+@@ -1608,8 +1608,9 @@ ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
+ 			return -ENOMEM;
+ 		res = get_user_pages_fast(addr, n,
+ 				iov_iter_rw(i) != WRITE ?  FOLL_WRITE : 0, p);
+-		if (unlikely(res < 0)) {
++		if (unlikely(res <= 0)) {
+ 			kvfree(p);
++			*pages = ZERO_SIZE_PTR;
+ 			return res;
+ 		}
+ 		*pages = p;
 -- 
-Jeff Layton <jlayton@redhat.com>
+2.26.3
 
