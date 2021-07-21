@@ -2,210 +2,88 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84E5C6377A
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 16:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F38CFC636C9
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 17:09:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D1AB56120E
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 16:20:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6A7C60FF3
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 17:09:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236043AbhGUPkL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 21 Jul 2021 11:40:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52498 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235967AbhGUPkK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 21 Jul 2021 11:40:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626884446;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YkZTscC6KpmV7ZPZQ/arpngaCqGBZg3nbQ0knfcsigA=;
-        b=OoNHUArlPziuidJkqum5NZbzWl39kZjrq4df41R5oo6znE6t+yLYc7yQp+RG/+GR/O3JGL
-        i4A+KrgqRY9y6V+MOcv+m5i9kIoMjtMX0RYriMvGWgiNuPci8UQwpf51MkFl21mJgESsH4
-        ob8TyMIRz1KtdFpJc6sqena2XP/IT7o=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-ci3DKCyBN-KvBUEvz5nZ8g-1; Wed, 21 Jul 2021 12:20:45 -0400
-X-MC-Unique: ci3DKCyBN-KvBUEvz5nZ8g-1
-Received: by mail-qv1-f71.google.com with SMTP id q11-20020ad4434b0000b029030449450d37so1870861qvs.14
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Jul 2021 09:20:44 -0700 (PDT)
+        id S229816AbhGUQ2h (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 21 Jul 2021 12:28:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37106 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229861AbhGUQ2h (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 21 Jul 2021 12:28:37 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A088AC061575
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Jul 2021 10:09:12 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id gb6so4323133ejc.5
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Jul 2021 10:09:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=fcB0b9OnXwiSLahFiMezwWcBXoM+Dk63RiEUDbB8wxg=;
+        b=hAumjq8KLBkLHVdm/Xu+ECFyoDgO1IQ1hxb6Ug7gZwFIB+WI7FSWgycI27eKpB1GUB
+         Rk1VSwfJJPloNNvKux7q728d3UxxuEQGHCTqhvaRBivyQjUmKpkMt2Hb7VDdow+hZQfu
+         Av8C/1X3lsZfydhx4hOMTXsjl+9ebANcUBbgyviqEAFJPaN/uFclB0XlzkUcz+a02/jf
+         pi/akRUShhCKmqI32rX4W7AsoTewiPMlRnlrF7Og2aB2qunDOOPpHQWZkqPq8kSk2i7s
+         pSsm2lZcerP9rYOyvXZqC9qB4fMPRKLcKdYam5RYKQtPoDH1KdsjtpYMZTjC6TotfAUk
+         3vFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=YkZTscC6KpmV7ZPZQ/arpngaCqGBZg3nbQ0knfcsigA=;
-        b=txGzYeGGQEjnU1tBY7u9cVUaTcMfJsZeo8ZGML6IP/oXQN8DdaOuzs67O2Yq8XoO7Y
-         yeRP0B4tuW9Y1yXHNQ//erfcmaszTB+Mk0mA9nQTf+d5/NHlFp9in6PZjM92zEGs5YS0
-         n+Ku3eLA+bDHtuZibT8vQqSF0vaxJWjl6rcW+FwUPilY94DyobXCZRnRYFFBDbeIRFPf
-         J16z9iXLXBriNfEhmLWYqZzayXftyNfj/X9uxb5HBb/RyA0fW3MwZABOgXTqzATxKQaW
-         5QhdOrfsq3mTn9i4GeNNMb2fwSJ/mBvoaX3zHvcK8U/LQxzxZoczIhUdJ6Joci/E4YPQ
-         F5og==
-X-Gm-Message-State: AOAM532OX3koZtb7gGjQtbYwdE/U/Fc5+CkgsMCKifV/EFZcGW3XJrqO
-        1lMdQQt63EJM1r/X+ETNJ2dTyGVLPKIAVU11jyRNvLgezkPMDZ7s+gnYFIJ2miIs2aBHH5+rOmV
-        k1VG7ngUHBgB5o9F2E47amg==
-X-Received: by 2002:a0c:a223:: with SMTP id f32mr37104018qva.8.1626884444601;
-        Wed, 21 Jul 2021 09:20:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw+t6fxG/ixd7o7dlSLuaUhbdIrVbCJpvX027HWNZq9vT5wDnkVq2oxjwvDHG0JV/G1ddMkig==
-X-Received: by 2002:a0c:a223:: with SMTP id f32mr37103999qva.8.1626884444411;
-        Wed, 21 Jul 2021 09:20:44 -0700 (PDT)
-Received: from [192.168.1.3] (68-20-15-154.lightspeed.rlghnc.sbcglobal.net. [68.20.15.154])
-        by smtp.gmail.com with ESMTPSA id i4sm9475118qka.130.2021.07.21.09.20.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 09:20:43 -0700 (PDT)
-Message-ID: <35ecb577315f486f1636b2316c2051ad004f6f7b.camel@redhat.com>
-Subject: Re: [RFC PATCH 01/12] afs: Sort out symlink reading
-From:   Jeff Layton <jlayton@redhat.com>
-To:     David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org
-Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        devel@lists.orangefs.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 21 Jul 2021 12:20:42 -0400
-In-Reply-To: <162687508008.276387.6418924257569297305.stgit@warthog.procyon.org.uk>
-References: <162687506932.276387.14456718890524355509.stgit@warthog.procyon.org.uk>
-         <162687508008.276387.6418924257569297305.stgit@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.40.3 (3.40.3-1.fc34) 
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=fcB0b9OnXwiSLahFiMezwWcBXoM+Dk63RiEUDbB8wxg=;
+        b=UE95rShe2XnBOgwfqQSZ62F0vpwxMn1nq/verAx9kZF5jZbtHF8um8iInkpYSXctTG
+         3NRsZ6GWOciayvK6CtgetGGSFBfHsjNXLWuiadVubcyQUzHA7Ng+tqFYRiBilzK/P5xH
+         rZa+kzsdOERz7vO5/L6JYqMXxUj/c52oiiOjeINO7B+Y8HCuLUs3Jb9TjdhYWykgrRA4
+         E1tBwGOL8Ye2K5vs6D6N+EFXszzMV1kdL8jRXaoyJxsp0SxFV4FvFy67rCTkEewyTI0r
+         jYMQ98HizfnUkWLmydY0rY1f3ff2x24Z3Jo9Fc3uJHViSJdWje3Hz4V6BVrX7HOgPDgB
+         pngQ==
+X-Gm-Message-State: AOAM531qKWLOeJVXMCyzSG25Nu2ewy3J4FxllMnz6t3+HkAbnMY76KoJ
+        Nq65Fyhhu1hAr2k4nLxeXttt2e6h/TlAH6BdYy0=
+X-Google-Smtp-Source: ABdhPJxuwCmv1Kn6t3ffygt7zZ58hVTRmhOLBn0h06/Nd5A/i+1YQrzXL3GRBy4rtcxhWL6njiK8MskNelmk8y+5rEg=
+X-Received: by 2002:a17:906:63ca:: with SMTP id u10mr29296046ejk.411.1626887351188;
+ Wed, 21 Jul 2021 10:09:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 21 Jul 2021 22:38:59 +0530
+Message-ID: <CANT5p=p+f6mrQqKULqJdbyDN-NJoQCsGruvVMH+BUJU0-n62rg@mail.gmail.com>
+Subject: Classification of reads within a filesystem
+To:     Matthew Wilcox <willy@infradead.org>,
+        David Howells <dhowells@redhat.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 2021-07-21 at 14:44 +0100, David Howells wrote:
-> afs_readpage() doesn't get a file pointer when called for a symlink, so
-> separate it from regular file pointer handling.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> ---
-> 
->  fs/afs/file.c     |   14 +++++++++-----
->  fs/afs/inode.c    |    6 +++---
->  fs/afs/internal.h |    3 ++-
->  3 files changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/fs/afs/file.c b/fs/afs/file.c
-> index ca0d993add65..c9c21ad0e7c9 100644
-> --- a/fs/afs/file.c
-> +++ b/fs/afs/file.c
-> @@ -19,6 +19,7 @@
->  
->  static int afs_file_mmap(struct file *file, struct vm_area_struct *vma);
->  static int afs_readpage(struct file *file, struct page *page);
-> +static int afs_symlink_readpage(struct file *file, struct page *page);
->  static void afs_invalidatepage(struct page *page, unsigned int offset,
->  			       unsigned int length);
->  static int afs_releasepage(struct page *page, gfp_t gfp_flags);
-> @@ -46,7 +47,7 @@ const struct inode_operations afs_file_inode_operations = {
->  	.permission	= afs_permission,
->  };
->  
-> -const struct address_space_operations afs_fs_aops = {
-> +const struct address_space_operations afs_file_aops = {
->  	.readpage	= afs_readpage,
->  	.readahead	= afs_readahead,
->  	.set_page_dirty	= afs_set_page_dirty,
-> @@ -60,6 +61,12 @@ const struct address_space_operations afs_fs_aops = {
->  	.writepages	= afs_writepages,
->  };
->  
-> +const struct address_space_operations afs_symlink_aops = {
-> +	.readpage	= afs_symlink_readpage,
-> +	.releasepage	= afs_releasepage,
-> +	.invalidatepage	= afs_invalidatepage,
-> +};
-> +
->  static const struct vm_operations_struct afs_vm_ops = {
->  	.fault		= filemap_fault,
->  	.map_pages	= filemap_map_pages,
-> @@ -321,7 +328,7 @@ static void afs_req_issue_op(struct netfs_read_subrequest *subreq)
->  	afs_fetch_data(fsreq->vnode, fsreq);
->  }
->  
-> -static int afs_symlink_readpage(struct page *page)
-> +static int afs_symlink_readpage(struct file *file, struct page *page)
->  {
->  	struct afs_vnode *vnode = AFS_FS_I(page->mapping->host);
->  	struct afs_read *fsreq;
+Hi Matthew,
 
+I had a query about a filesystem's ability to differentiate readaheads
+from actual reads.
+David Howells suggested that you may be able to answer this one. If
+not, please feel free to add the right people to this email.
 
-I wonder...would you be better served here by not using page_readlink
-for symlinks and instead use simple_get_link and roll your own readlink
-operation. It seems a bit more direct, and AFS seems to be the only
-caller of page_readlink.
+In a scenario where a user/application issues a readahead/fadvise for
+large data ranges in advance (informing the kernel that they intend to
+read these data ranges soon). Depending on how much data ranges these
+calls cover, it could keep the network quite busy for a network
+filesystem (or the disk for a block filesystem).
 
-> @@ -386,9 +393,6 @@ const struct netfs_read_request_ops afs_req_ops = {
->  
->  static int afs_readpage(struct file *file, struct page *page)
->  {
-> -	if (!file)
-> -		return afs_symlink_readpage(page);
-> -
->  	return netfs_readpage(file, page, &afs_req_ops, NULL);
->  }
->  
-> diff --git a/fs/afs/inode.c b/fs/afs/inode.c
-> index bef6f5ccfb09..cf7b66957c6f 100644
-> --- a/fs/afs/inode.c
-> +++ b/fs/afs/inode.c
-> @@ -105,7 +105,7 @@ static int afs_inode_init_from_status(struct afs_operation *op,
->  		inode->i_mode	= S_IFREG | (status->mode & S_IALLUGO);
->  		inode->i_op	= &afs_file_inode_operations;
->  		inode->i_fop	= &afs_file_operations;
-> -		inode->i_mapping->a_ops	= &afs_fs_aops;
-> +		inode->i_mapping->a_ops	= &afs_file_aops;
->  		break;
->  	case AFS_FTYPE_DIR:
->  		inode->i_mode	= S_IFDIR |  (status->mode & S_IALLUGO);
-> @@ -123,11 +123,11 @@ static int afs_inode_init_from_status(struct afs_operation *op,
->  			inode->i_mode	= S_IFDIR | 0555;
->  			inode->i_op	= &afs_mntpt_inode_operations;
->  			inode->i_fop	= &afs_mntpt_file_operations;
-> -			inode->i_mapping->a_ops	= &afs_fs_aops;
-> +			inode->i_mapping->a_ops	= &afs_symlink_aops;
->  		} else {
->  			inode->i_mode	= S_IFLNK | status->mode;
->  			inode->i_op	= &afs_symlink_inode_operations;
-> -			inode->i_mapping->a_ops	= &afs_fs_aops;
-> +			inode->i_mapping->a_ops	= &afs_symlink_aops;
->  		}
->  		inode_nohighmem(inode);
->  		break;
-> diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-> index 791cf02e5696..ccdde00ada8a 100644
-> --- a/fs/afs/internal.h
-> +++ b/fs/afs/internal.h
-> @@ -1050,7 +1050,8 @@ extern void afs_dynroot_depopulate(struct super_block *);
->  /*
->   * file.c
->   */
-> -extern const struct address_space_operations afs_fs_aops;
-> +extern const struct address_space_operations afs_file_aops;
-> +extern const struct address_space_operations afs_symlink_aops;
->  extern const struct inode_operations afs_file_inode_operations;
->  extern const struct file_operations afs_file_operations;
->  extern const struct netfs_read_request_ops afs_req_ops;
-> 
-> 
+I see some value if filesystems have the ability to differentiate the
+reads from regular buffered reads by users. In such cases, the
+filesystem can choose to throttle the readahead reads, so that there's
+a specified bandwidth that's still available for regular reads.
 
-Regardless, this is more reasonable than what's there now.
+I wanted to get your opinions about this. And whether this can be done
+already in VFS ->readahead and ->readpage calls in the filesystems?
 
-Reviewed-by: Jeff Layton <jlayton@redhat.com>
-
+-- 
+Regards,
+Shyam
