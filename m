@@ -2,271 +2,96 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78962C636C9
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 17:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01293C636C9
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 17:52:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4554961246
-	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 17:43:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D58146121F
+	for <linux-cifs@archiver.kernel.org>; Wed, 21 Jul 2021 17:52:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229962AbhGURDO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 21 Jul 2021 13:03:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47599 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229928AbhGURDO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 21 Jul 2021 13:03:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1626889430;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3dOn7+nrEQrDF2IcT4kr/9MG9FoA4OKzs2zFSvE50Nw=;
-        b=TzH38iu4sbKjMeSzIj4A9hkBCxoOWBslcRg9QjkKIzPbXnlYxN131oqdv1/qQTw66TXhtR
-        lkccyP9TpFdWluBEwEpqWirqyCohCNUlYVm5kpKh4woyj/ZKYEjofNVkIAS8HBWN7+kjZS
-        DqKMAeF/ptjBkBU1qD4DrvfcCWRqMNg=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-453-zL-nS67MO0KifRl3TEpZrA-1; Wed, 21 Jul 2021 13:43:49 -0400
-X-MC-Unique: zL-nS67MO0KifRl3TEpZrA-1
-Received: by mail-qt1-f200.google.com with SMTP id u8-20020a05622a1988b02902615523e725so1947732qtc.21
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Jul 2021 10:43:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=3dOn7+nrEQrDF2IcT4kr/9MG9FoA4OKzs2zFSvE50Nw=;
-        b=GRoKVGfkUca6t9FqOVUxuHBVxMYvPEHlX0bkdNGt8VzV7awOq3b7TkvbaNYSZOOWzv
-         JltX282D1dkxbJ/1xRLBmT5a7o7l0NleKK8ZLt780Fqo7Biz1OK+qTA9HkxwjCrNeSE1
-         B9Lm/LwUQoW6voXKZzPV1CSlm6umimPU46yULeOSvSliVuFZYXjNCgDvBF1CETJUdhF2
-         PmyNFaQ1ZVOrBjaJMCMygPxAIDHg14EXFVGcZAPa8GBxCxnp4zY2LNuMBY506IKM5wEl
-         AXBvqZD2w2vxN9LzbzFHyFGYXvckKIWNTf6oWIMcplC0nKAplY7Prb7zAZoDfi29YPic
-         Js/A==
-X-Gm-Message-State: AOAM532RA37a7LgPkBJ7ldKO6TckHKMI1GnbPXHy0sE11GLdf51iyaJw
-        LWq13Z/6r1ZO1GfslhMxwONJ+mUQOgWzR2NAx2A59guN/ZZdyfZVDRHCNZAz2GoHqhDxzxB2PPn
-        wpfJ/StLjtGN8xYw4Hch4/A==
-X-Received: by 2002:a05:622a:1653:: with SMTP id y19mr18163561qtj.305.1626889428564;
-        Wed, 21 Jul 2021 10:43:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy73QoeXgeoF1lBpX1Vc7kQ/yjCgrGxg1ygCZQ38G6t9sqd8L74fPzeKuZd3aAUpkrFW+V2/g==
-X-Received: by 2002:a05:622a:1653:: with SMTP id y19mr18163539qtj.305.1626889428351;
-        Wed, 21 Jul 2021 10:43:48 -0700 (PDT)
-Received: from [192.168.1.3] (68-20-15-154.lightspeed.rlghnc.sbcglobal.net. [68.20.15.154])
-        by smtp.gmail.com with ESMTPSA id r16sm11484664qke.73.2021.07.21.10.43.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 10:43:47 -0700 (PDT)
-Message-ID: <e7a3b850e8a42845f4e020c7642743b3dce2b9f1.camel@redhat.com>
-Subject: Re: [RFC PATCH 03/12] netfs: Remove
- netfs_read_subrequest::transferred
-From:   Jeff Layton <jlayton@redhat.com>
-To:     David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org
-Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        David Wysochanski <dwysocha@redhat.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        devel@lists.orangefs.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 21 Jul 2021 13:43:47 -0400
-In-Reply-To: <162687511125.276387.15493860267582539643.stgit@warthog.procyon.org.uk>
-References: <162687506932.276387.14456718890524355509.stgit@warthog.procyon.org.uk>
-         <162687511125.276387.15493860267582539643.stgit@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.40.3 (3.40.3-1.fc34) 
+        id S229983AbhGURMC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 21 Jul 2021 13:12:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46940 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229751AbhGURMC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 21 Jul 2021 13:12:02 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90F80C061575
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Jul 2021 10:52:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=PLDV3KPiBnbLIxraVn//g4kOgYAF2S8s9GAYsctJ7t4=; b=hNdFQfBEYOh3EBcM0eAizxqE5M
+        S9CYp8nGWBEgkqCkGu7Hx2l6nrIJDNfgQc0awMKQfreSjYr358OKdqJHHoKS7It1NVYn7ZIhUXZwI
+        zpwZC8DJsSYV9SrKV8KCKynWpdzpKtYc2K1PDC3EvMwtTlyyj423Dbw3u6DcHm0nIK7dHfs0mKnfQ
+        xcfrrPHNg/YE4pHaRGTinnH0wS1dk8B/MxOTov3tMh0/pnzUW/aeyGSZFQDg4RVWxMOyr6ngDF/Vb
+        /OMpr4i4pvrE5CpILCg2+I8uH/2YFrdW2qqSyBAeUjJ6MRQywrWkhkBc0jPZXR26oF04+S1fJxtOR
+        V8e8n6FQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1m6GO5-009SFA-Mc; Wed, 21 Jul 2021 17:52:10 +0000
+Date:   Wed, 21 Jul 2021 18:52:05 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     David Howells <dhowells@redhat.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: Classification of reads within a filesystem
+Message-ID: <YPhexTyuuE0/Wxf5@casper.infradead.org>
+References: <CANT5p=p+f6mrQqKULqJdbyDN-NJoQCsGruvVMH+BUJU0-n62rg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANT5p=p+f6mrQqKULqJdbyDN-NJoQCsGruvVMH+BUJU0-n62rg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 2021-07-21 at 14:45 +0100, David Howells wrote:
-> Remove netfs_read_subrequest::transferred as it's redundant as the count on
-> the iterator added to the subrequest can be used instead.
+On Wed, Jul 21, 2021 at 10:38:59PM +0530, Shyam Prasad N wrote:
+> In a scenario where a user/application issues a readahead/fadvise for
+> large data ranges in advance (informing the kernel that they intend to
+> read these data ranges soon). Depending on how much data ranges these
+> calls cover, it could keep the network quite busy for a network
+> filesystem (or the disk for a block filesystem).
 > 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> ---
+> I see some value if filesystems have the ability to differentiate the
+> reads from regular buffered reads by users. In such cases, the
+> filesystem can choose to throttle the readahead reads, so that there's
+> a specified bandwidth that's still available for regular reads.
 > 
->  fs/afs/file.c                |    4 ++--
->  fs/netfs/read_helper.c       |   26 ++++----------------------
->  include/linux/netfs.h        |    1 -
->  include/trace/events/netfs.h |   12 ++++++------
->  4 files changed, 12 insertions(+), 31 deletions(-)
-> 
-> diff --git a/fs/afs/file.c b/fs/afs/file.c
-> index ca529f23515a..82e945dbe379 100644
-> --- a/fs/afs/file.c
-> +++ b/fs/afs/file.c
-> @@ -315,8 +315,8 @@ static void afs_req_issue_op(struct netfs_read_subrequest *subreq)
->  		return netfs_subreq_terminated(subreq, -ENOMEM, false);
->  
->  	fsreq->subreq	= subreq;
-> -	fsreq->pos	= subreq->start + subreq->transferred;
-> -	fsreq->len	= subreq->len   - subreq->transferred;
-> +	fsreq->pos	= subreq->start + subreq->len - iov_iter_count(&subreq->iter);
-> +	fsreq->len	= iov_iter_count(&subreq->iter);
->  	fsreq->key	= subreq->rreq->netfs_priv;
->  	fsreq->vnode	= vnode;
->  	fsreq->iter	= &subreq->iter;
-> diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
-> index 715f3e9c380d..5e1a9be48130 100644
-> --- a/fs/netfs/read_helper.c
-> +++ b/fs/netfs/read_helper.c
-> @@ -148,12 +148,7 @@ static void __netfs_put_subrequest(struct netfs_read_subrequest *subreq,
->   */
->  static void netfs_clear_unread(struct netfs_read_subrequest *subreq)
->  {
-> -	struct iov_iter iter;
-> -
-> -	iov_iter_xarray(&iter, READ, &subreq->rreq->mapping->i_pages,
-> -			subreq->start + subreq->transferred,
-> -			subreq->len   - subreq->transferred);
-> -	iov_iter_zero(iov_iter_count(&iter), &iter);
-> +	iov_iter_zero(iov_iter_count(&subreq->iter), &subreq->iter);
->  }
->  
->  static void netfs_cache_read_terminated(void *priv, ssize_t transferred_or_error,
-> @@ -173,14 +168,9 @@ static void netfs_read_from_cache(struct netfs_read_request *rreq,
->  				  bool seek_data)
->  {
->  	struct netfs_cache_resources *cres = &rreq->cache_resources;
-> -	struct iov_iter iter;
->  
->  	netfs_stat(&netfs_n_rh_read);
-> -	iov_iter_xarray(&iter, READ, &rreq->mapping->i_pages,
-> -			subreq->start + subreq->transferred,
-> -			subreq->len   - subreq->transferred);
-> -
-> -	cres->ops->read(cres, subreq->start, &iter, seek_data,
-> +	cres->ops->read(cres, subreq->start, &subreq->iter, seek_data,
->  			netfs_cache_read_terminated, subreq);
->  }
->  
+> I wanted to get your opinions about this. And whether this can be done
+> already in VFS ->readahead and ->readpage calls in the filesystems?
 
-The above two deltas seem like they should have been in patch #2.
+This is something I have an interest in, but haven't had time to pursue.
+The readahead code gets this information because the page cache
+calls page_cache_sync_ra() if it needs this page right now, and calls
+page_cache_async_ra() if it thinks it will need the page in the future.
 
-> @@ -419,7 +409,7 @@ static void netfs_rreq_unlock(struct netfs_read_request *rreq)
->  			if (pgend < iopos + subreq->len)
->  				break;
->  
-> -			account += subreq->transferred;
-> +			account += subreq->len - iov_iter_count(&subreq->iter);
->  			iopos += subreq->len;
->  			if (!list_is_last(&subreq->rreq_link, &rreq->subrequests)) {
->  				subreq = list_next_entry(subreq, rreq_link);
-> @@ -635,15 +625,8 @@ void netfs_subreq_terminated(struct netfs_read_subrequest *subreq,
->  		goto failed;
->  	}
->  
-> -	if (WARN(transferred_or_error > subreq->len - subreq->transferred,
-> -		 "Subreq overread: R%x[%x] %zd > %zu - %zu",
-> -		 rreq->debug_id, subreq->debug_index,
-> -		 transferred_or_error, subreq->len, subreq->transferred))
-> -		transferred_or_error = subreq->len - subreq->transferred;
-> -
->  	subreq->error = 0;
-> -	subreq->transferred += transferred_or_error;
-> -	if (subreq->transferred < subreq->len)
-> +	if (iov_iter_count(&subreq->iter))
->  		goto incomplete;
->  
+ondemand_readahead() currently gets a true/false parameter
+(hit_readahead_marker), although my folio patches change it to pass in
+a folio or NULL.  That is then *not* passed to the filesystem, but it
+could be information passed in the ractl.
 
-I must be missing it, but where does subreq->iter get advanced to the
-end of the current read? If you're getting rid of subreq->transferred
-then I think that has to happen above, no?
+There's also some tidying-up to be done around faulting.  Currently
+fault-around doesn't have a way to express "read me all the pages around
+page N".  Instead it just assumes that pages N-R/2 to N+R/2 are the
+right ones to fetch when it should be left up to the filesystem or the
+readahead code to determine what window of pages to fetch.
 
->  complete:
-> @@ -667,7 +650,6 @@ void netfs_subreq_terminated(struct netfs_read_subrequest *subreq,
->  incomplete:
->  	if (test_bit(NETFS_SREQ_CLEAR_TAIL, &subreq->flags)) {
->  		netfs_clear_unread(subreq);
-> -		subreq->transferred = subreq->len;
->  		goto complete;
->  	}
->  
-> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-> index 5e4fafcc9480..45d40c622205 100644
-> --- a/include/linux/netfs.h
-> +++ b/include/linux/netfs.h
-> @@ -116,7 +116,6 @@ struct netfs_read_subrequest {
->  	struct iov_iter		iter;		/* Iterator for this subrequest */
->  	loff_t			start;		/* Where to start the I/O */
->  	size_t			len;		/* Size of the I/O */
-> -	size_t			transferred;	/* Amount of data transferred */
->  	refcount_t		usage;
->  	short			error;		/* 0 or error that occurred */
->  	unsigned short		debug_index;	/* Index in list (for debugging output) */
-> diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-> index 4d470bffd9f1..04ac29fc700f 100644
-> --- a/include/trace/events/netfs.h
-> +++ b/include/trace/events/netfs.h
-> @@ -190,7 +190,7 @@ TRACE_EVENT(netfs_sreq,
->  		    __field(enum netfs_read_source,	source		)
->  		    __field(enum netfs_sreq_trace,	what		)
->  		    __field(size_t,			len		)
-> -		    __field(size_t,			transferred	)
-> +		    __field(size_t,			remain		)
->  		    __field(loff_t,			start		)
->  			     ),
->  
-> @@ -202,7 +202,7 @@ TRACE_EVENT(netfs_sreq,
->  		    __entry->source	= sreq->source;
->  		    __entry->what	= what;
->  		    __entry->len	= sreq->len;
-> -		    __entry->transferred = sreq->transferred;
-> +		    __entry->remain	= iov_iter_count(&sreq->iter);
->  		    __entry->start	= sreq->start;
->  			   ),
->  
-> @@ -211,7 +211,7 @@ TRACE_EVENT(netfs_sreq,
->  		      __print_symbolic(__entry->what, netfs_sreq_traces),
->  		      __print_symbolic(__entry->source, netfs_sreq_sources),
->  		      __entry->flags,
-> -		      __entry->start, __entry->transferred, __entry->len,
-> +		      __entry->start, __entry->len - __entry->remain, __entry->len,
->  		      __entry->error)
->  	    );
->  
-> @@ -230,7 +230,7 @@ TRACE_EVENT(netfs_failure,
->  		    __field(enum netfs_read_source,	source		)
->  		    __field(enum netfs_failure,		what		)
->  		    __field(size_t,			len		)
-> -		    __field(size_t,			transferred	)
-> +		    __field(size_t,			remain		)
->  		    __field(loff_t,			start		)
->  			     ),
->  
-> @@ -242,7 +242,7 @@ TRACE_EVENT(netfs_failure,
->  		    __entry->source	= sreq ? sreq->source : NETFS_INVALID_READ;
->  		    __entry->what	= what;
->  		    __entry->len	= sreq ? sreq->len : 0;
-> -		    __entry->transferred = sreq ? sreq->transferred : 0;
-> +		    __entry->remain	= sreq ? iov_iter_count(&sreq->iter) : 0;
->  		    __entry->start	= sreq ? sreq->start : 0;
->  			   ),
->  
-> @@ -250,7 +250,7 @@ TRACE_EVENT(netfs_failure,
->  		      __entry->rreq, __entry->index,
->  		      __print_symbolic(__entry->source, netfs_sreq_sources),
->  		      __entry->flags,
-> -		      __entry->start, __entry->transferred, __entry->len,
-> +		      __entry->start, __entry->len - __entry->remain, __entry->len,
->  		      __print_symbolic(__entry->what, netfs_failures),
->  		      __entry->error)
->  	    );
-> 
-> 
+Another thing I have an interest in doing but not had opportunity to
+pursue is making ->readpage synchronous.  The current MM code always
+calls ->readahead first and only calls ->readpage if ->readahead fails.
+That means that all the async ->readpage work is actually wrong; we
+want to return the best error possible from ->readpage, even if that
+means sleeping.
 
--- 
-Jeff Layton <jlayton@redhat.com>
-
+Oh ... except for swap.  For NFS only, it calls ->readpage, so it really
+wants ->readpage to be async so it can kick off multiple pages and
+then wait for the one it actually needs.  That gets into a conversation
+about how much we really care about swap-over-NFS, whether swap should
+be using ->readpage or ->direct_IO, and whether swap should use the
+file readahead code or its own virtual address based readahead code.
+Most of those discussions are outside my area of expertise.
