@@ -2,140 +2,99 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A6EC63793
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Jul 2021 07:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F72C6377D
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Jul 2021 16:50:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89A4C61249
-	for <linux-cifs@archiver.kernel.org>; Thu, 22 Jul 2021 07:22:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70AF56120C
+	for <linux-cifs@archiver.kernel.org>; Thu, 22 Jul 2021 16:50:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230106AbhGVGlb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Jul 2021 02:41:31 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:37368 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbhGVGla (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 22 Jul 2021 02:41:30 -0400
-Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210722072204epoutp0199cb0eff2c7ba9499fcca169100c4aa5~UC-ffF7xH2479424794epoutp01C
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Jul 2021 07:22:04 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210722072204epoutp0199cb0eff2c7ba9499fcca169100c4aa5~UC-ffF7xH2479424794epoutp01C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1626938524;
-        bh=QmiwsOp96TmtymuHB/WVhpHtyoPNu2aa4OAwPWaKKaI=;
-        h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-        b=ru1Pv6bSYSzfYSVxEML4dD2rS4/M5nBc2YvPbWW/Sxlc/rZLuaVMWQSJS3ac/ZBmp
-         CDgidIutO4zJrhfNUQzjVrGfZR2ovKernrstHDrF4IedWf1WmjBA+9Pp6t4g4ux9gE
-         BfseOi8byWja0psOZSFo9p/jiSpAm9h5+NILkobg=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210722072204epcas1p115df0354b01f8344ccb211e0002a15b3~UC-fUFn5b0903809038epcas1p1o;
-        Thu, 22 Jul 2021 07:22:04 +0000 (GMT)
-Received: from epsmges1p3.samsung.com (unknown [182.195.40.161]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4GVkRH2n7cz4x9QD; Thu, 22 Jul
-        2021 07:22:03 +0000 (GMT)
-Received: from epcas1p2.samsung.com ( [182.195.41.46]) by
-        epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F4.44.09468.99C19F06; Thu, 22 Jul 2021 16:22:01 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210722072200epcas1p290f4fae8d380c60b00a5daa5f4016e5b~UC-cCfDK20258902589epcas1p2V;
-        Thu, 22 Jul 2021 07:22:00 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210722072200epsmtrp2dd4d9f90f13aef5464a5b671c8ce1c58~UC-cB03yk2216722167epsmtrp2N;
-        Thu, 22 Jul 2021 07:22:00 +0000 (GMT)
-X-AuditID: b6c32a37-66505a80000024fc-a4-60f91c990247
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        64.FF.08394.89C19F06; Thu, 22 Jul 2021 16:22:00 +0900 (KST)
-Received: from namjaejeon01 (unknown [10.89.31.77]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20210722072200epsmtip1195947ec3a39f81dfe51e46b2cd65820~UC-b2qhWq2340223402epsmtip1Y;
-        Thu, 22 Jul 2021 07:22:00 +0000 (GMT)
-From:   "Namjae Jeon" <namjae.jeon@samsung.com>
-To:     "'ronnie sahlberg'" <ronniesahlberg@gmail.com>
-Cc:     "'Leif Sahlberg'" <lsahlber@redhat.com>,
-        "'linux-cifs'" <linux-cifs@vger.kernel.org>
-In-Reply-To: <CAN05THTv3o8yDuGLJE5M+YXhdW6ChnnUyznVF_a_3uLQcE=5Tw@mail.gmail.com>
-Subject: RE: [PATCH] cifs: only write 64kb at a time when fallocating a
- small region of a file
-Date:   Thu, 22 Jul 2021 16:22:00 +0900
-Message-ID: <006b01d77eca$4343a840$c9caf8c0$@samsung.com>
+        id S235040AbhGVQJA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Jul 2021 12:09:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48550 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234234AbhGVQHY (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 22 Jul 2021 12:07:24 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE2AC0619DF
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Jul 2021 09:44:54 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id t3so8142917ljc.3
+        for <linux-cifs@vger.kernel.org>; Thu, 22 Jul 2021 09:44:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZljMzZHOgtO4kkhGy7h8lFcfHKzYupnCNcLpMQLqp7g=;
+        b=TyeyJLb6kUcqGeqAesLVsCTW5c4bXXAFJB0q/fd1ZjYCmdzq4ryANEZf/vHxoNBLfq
+         46TI7wpu+KRyH8VREk9e9X5+Eqs+54tARWNbRguxaBoqP0+9pNqV+Oa10gQKi+qaaPV7
+         4WZvYprclfwWuOghtmOXVa8GUbAvSO4s82lwWDxNa28KF3nmjayPj4WJgdec1RokD0Eb
+         b+bdgbxTQKITGySbCB7y4E/bjvPN/nDPEOKTel5EK4oZWImOPs9Z/1sWv89S+R/vEJF+
+         a7yt1wNscWF0VnCrkW/rg0VsH/WSMGbKd8MvrLSqBW7aVTi+1XTpZsMIyBilcu8Qyd2q
+         DkbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZljMzZHOgtO4kkhGy7h8lFcfHKzYupnCNcLpMQLqp7g=;
+        b=oU3zbT4N8qI9ZW81tYu4JR+dxiAqKobev8J2FfiMejtkltLV1pkdBW2i3SaaIa+axr
+         +K2XJh/pcQsP9pkP1YGF/cMw+HgEIU0JXS87koSgKgQ4jGobuo02MHNvhlvdf2R0cMxX
+         YKYZC54XM68xpLgfBgMhmjrm+ptgvFchpR1mcPwpq41UAZSWDgD5ouOeP8ooqQ5DF7MW
+         SqxAneuqJZSUvyYu5aJKtTCRTzBajJ92tG3zr51cZL8eX+8yPVMm8deNi86MatlivSBv
+         lthVNKotZTd8KoF4JHzStYvHobX6bQxRiJwJ/586BxVIMEjoF0pi7cIzqiQp9ZTxAzOV
+         J2JQ==
+X-Gm-Message-State: AOAM532Kx61witSMSBnnFBY9WIFghDm5YEnxXRttR3DNF+nDlg7K9E5F
+        /w+pk+R6SzMEwlU9POyYA16WvFnpZwF8bcV6TIE=
+X-Google-Smtp-Source: ABdhPJwv9JuGQDsyQe1oQzNxU+dtWIkD2C6rs/OQvFwOoCM8TazLgAykq4v0rDHwFEeiguzPSaipdP7r5+JlxmA3XW0=
+X-Received: by 2002:a2e:9852:: with SMTP id e18mr681123ljj.6.1626972293134;
+ Thu, 22 Jul 2021 09:44:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHxVlcgtFcS9XEREPWB6nfEmeiRZwGYsS+AAo3wyigCil6ALQJDwXMVAQZ5K++qyw2NwA==
-Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrKKsWRmVeSWpSXmKPExsWy7bCmnu5MmZ8JBsfOSFu8+L+L2WLBVX2L
-        3r5PrA7MHjtn3WX3eL/vKpvH501yAcxROTYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqG
-        lhbmSgp5ibmptkouPgG6bpk5QHuUFMoSc0qBQgGJxcVK+nY2RfmlJakKGfnFJbZKqQUpOQWG
-        BgV6xYm5xaV56XrJ+blWhgYGRqZAlQk5GfPftLEVtAhWTPrxm7GBcTp3FyMnh4SAiUTjtJfM
-        XYxcHEICOxglXtw9zQjhfGKUeHz0NBtIlZDAN0aJ5RtdYDqWXvrGAlG0l1Fi7fFLUM4LRomv
-        +z8wgVSxCehK/PuzH6xbRMBIYsfB5cwgNrNAlETn9sNgNZwCgRKnui6wgNjCAgkSC67vAIuz
-        CKhKXJnaxwpi8wpYSnTcvsMCYQtKnJz5hAVijrzE9rdzmCEuUpD4+XQZUD0H0K4wia+zKiBK
-        RCRmd7ZBlbxll5gyrwikRELARWLaJjGIsLDEq+Nb2CFsKYnP7/ayQdjlEidO/mKCsGskNszb
-        xw7RaizR86IExGQW0JRYv0sfokJRYufvuYwQS/kk3n3tYYWo5pXoaBOCKFGV6Lt0GGqgtERX
-        +wf2CYxKs5B8NQvJV7OQnD8LYdkCRpZVjGKpBcW56anFhgXGyBG9iRGc/rTMdzBOe/tB7xAj
-        EwfjIUYJDmYlEV6Voq8JQrwpiZVVqUX58UWlOanFhxhNgeE8kVlKNDkfmIDzSuINTY2MjY0t
-        TMzMzUyNlcR5v8UCNQmkJ5akZqemFqQWwfQxcXBKNTCdFz/TuvhwiYuEUa1PsHCLnrYZ58L+
-        M3rR5usuznHaM5t3d4C67WeV3fu2/dlhnPpswTtf+Y9HtijelrwT1W182c3zKf/da0eP/uvt
-        8CyflfjWzSdrws+6K/+kOu+EM5kxJAmWxqpuPDxFcW7eW/Pnu6SErfMmdbuKf6tre+L/e07n
-        xsNfOe6KH/x4WLpco+2r5BSTbctmZVd+rqzv7hcQ0q/8tfHSNvG6mrWvZFcqpXIen/MkovKH
-        1xxug6iNHxYWn3vs+vuW+gzHeW9fP+v+uHkdz3Xp4uVbdjaffLX7/dXK3w1yIplpD58E3D/B
-        vOnyPuaZO1Kyu3yZTdttAyIez1E/K9vyQnaDwf7JG2ZsUWIpzkg01GIuKk4EACE/N4MIBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrILMWRmVeSWpSXmKPExsWy7bCSnO4MmZ8JBn0PDSxe/N/FbLHgqr5F
-        b98nVgdmj52z7rJ7vN93lc3j8ya5AOYoLpuU1JzMstQifbsEroz5b9rYCloEKyb9+M3YwDid
-        u4uRk0NCwERi6aVvLF2MXBxCArsZJaafXcIKkZCWOHbiDHMXIweQLSxx+HAxSFhI4BmjxOUz
-        eSA2m4CuxL8/+9lAbBEBI4kdB5czg9jMAlESC5pXsUDUf2SS6P+hBmJzCgRKnOq6ABYXFoiT
-        +P9xBxOIzSKgKnFlah/YWl4BS4mO23dYIGxBiZMzn7BAzNSW6H3Yyghhy0tsfzuHGeJMBYmf
-        T5exgpwpIhAm8XVWBUSJiMTszjbmCYzCs5BMmoVk0iwkk2YhaVnAyLKKUTK1oDg3PbfYsMAw
-        L7Vcrzgxt7g0L10vOT93EyM4FrQ0dzBuX/VB7xAjEwfjIUYJDmYlEV6Voq8JQrwpiZVVqUX5
-        8UWlOanFhxilOViUxHkvdJ2MFxJITyxJzU5NLUgtgskycXBKNTCZdZQUTF1nr+KmFH7ZZccM
-        7dr1h9wzD7K8v/19WlnwpI0Whxo/ah5ZqB3n4DlPvuCR7/4KxSkdyyqn+t/nS+D+vdc20rZ/
-        08LJnOI3HYxNWzmyK6wNn60Kff/5R1X9o5dTW/eWufx+eOTZV57ncTLyrpt3/b6s4XQxfPb0
-        l0WPZkxZYvTqduljpayWuoPKk9cKTDWcl3yoXGTVxsVrZB7ciujyvVeiOfPw9g9nzeZP2OwU
-        sXnSZ1vx2DPWawT9RA/8PWeh/r6DdbfcSoM/51N59n4oe8YvHJo+y8Q5YfUsu4ehX1hiGtod
-        c0NWha131XxxWv6StsKqwLk7nR3er2pfa7G93LNwhlAlp1TKx7hTSizFGYmGWsxFxYkAaXWG
-        FfQCAAA=
-X-CMS-MailID: 20210722072200epcas1p290f4fae8d380c60b00a5daa5f4016e5b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210721015429epcas1p4654c2b9348101aa7967bfe60d1d8da71
 References: <CGME20210721015429epcas1p4654c2b9348101aa7967bfe60d1d8da71@epcas1p4.samsung.com>
-        <014c01d77dd3$57add320$07097960$@samsung.com>
-        <016b01d77e00$fe61efd0$fb25cf70$@samsung.com>
-        <CAGvGhF55Tq-sLUtKBn+QX6kWrL9dDzKkXFKdQ==gz3s=RkySKQ@mail.gmail.com>
-        <006601d77ec6$6b1b13c0$41513b40$@samsung.com>
-        <CAN05THTv3o8yDuGLJE5M+YXhdW6ChnnUyznVF_a_3uLQcE=5Tw@mail.gmail.com>
+ <014c01d77dd3$57add320$07097960$@samsung.com> <016b01d77e00$fe61efd0$fb25cf70$@samsung.com>
+ <CAGvGhF55Tq-sLUtKBn+QX6kWrL9dDzKkXFKdQ==gz3s=RkySKQ@mail.gmail.com>
+ <006601d77ec6$6b1b13c0$41513b40$@samsung.com> <CAN05THTv3o8yDuGLJE5M+YXhdW6ChnnUyznVF_a_3uLQcE=5Tw@mail.gmail.com>
+In-Reply-To: <CAN05THTv3o8yDuGLJE5M+YXhdW6ChnnUyznVF_a_3uLQcE=5Tw@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 22 Jul 2021 11:44:41 -0500
+Message-ID: <CAH2r5mt0JdioMoVZ4zOpe7cM=_tWif2VdbscAR6Osh1hJO_wfA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: only write 64kb at a time when fallocating a small
+ region of a file
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Namjae Jeon <namjae.jeon@samsung.com>,
+        Leif Sahlberg <lsahlber@redhat.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000979ce805c7b901ac"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-> Yes, ofcourse.
-Thank you!
+--000000000000979ce805c7b901ac
+Content-Type: text/plain; charset="UTF-8"
 
-> 
+Removed the deletion from the patch, and added Reported-by: Namjae ...
+and pushed to cifs-2.6.git for-next
+
+On Thu, Jul 22, 2021 at 2:19 AM ronnie sahlberg
+<ronniesahlberg@gmail.com> wrote:
+>
+> Yes, ofcourse.
+>
 > Steve, can you revert that deletion in the patch?
-> 
+>
 > On Thu, Jul 22, 2021 at 4:55 PM Namjae Jeon <namjae.jeon@samsung.com> wrote:
 > >
 > > > This code is actually bogus and does the opposite of what the comment says.
-> > > If out_data_len is 0 then that means that the entire region is
-> > > unallocated and then we should not bail out but proceed and allocate the hole.
+> > > If out_data_len is 0 then that means that the entire region is unallocated and then we should not
+> > > bail out but proceed and allocate the hole.
 > >
 > > > generic/071 works against a windows server for me.
 > >
 > >
-> > > If it fails with this code removed it might mean that generic/071 never worked with cifs.ko
-> correctly.
+> > > If it fails with this code removed it might mean that generic/071 never worked with cifs.ko correctly.
 > >
 > > generic/071 create preallocated extent by calling fallocate with keep size flags.
 > > It means the file size should not be increased.
@@ -143,8 +102,8 @@ Thank you!
 > > It means the file size becomes 1MB.
 > >
 > > And then, generic/071 call again fallocate(0, 512K) which mean file size should be 512K.
-> > but SMB2_set_eof() in cifs is not called due to the code
-> > below(->i_size is bigger than off + len), So 071 test failed as file size remains 1MB.
+> > but SMB2_set_eof() in cifs is not called due to the code below(->i_size is bigger than off + len),
+> > So 071 test failed as file size remains 1MB.
 > >
 > >         /*
 > >          * Extending the file
@@ -155,8 +114,7 @@ Thank you!
 > >                         goto out;
 > >
 > >                 if ((cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) == 0)
-> >                         smb2_set_sparse(xid, tcon, cfile, inode,
-> > false);
+> >                         smb2_set_sparse(xid, tcon, cfile, inode, false);
 > >
 > >                 eof = cpu_to_le64(off + len);
 > >                 rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
@@ -171,3 +129,56 @@ Thank you!
 > >         }
 > >
 
+
+
+-- 
+Thanks,
+
+Steve
+
+--000000000000979ce805c7b901ac
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-cifs-only-write-64kb-at-a-time-when-fallocating-a-sm.patch"
+Content-Disposition: attachment; 
+	filename="0001-cifs-only-write-64kb-at-a-time-when-fallocating-a-sm.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_krf5adf50>
+X-Attachment-Id: f_krf5adf50
+
+RnJvbSAyNDg1YmQ3NTU3YTdlZGI0NTIwYjQwNzJhZjQ2NGYwYTA4YzhlZmUwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+
+CkRhdGU6IFRodSwgMjIgSnVsIDIwMjEgMTQ6NTM6MzIgKzEwMDAKU3ViamVjdDogW1BBVENIIDEv
+Ml0gY2lmczogb25seSB3cml0ZSA2NGtiIGF0IGEgdGltZSB3aGVuIGZhbGxvY2F0aW5nIGEgc21h
+bGwKIHJlZ2lvbiBvZiBhIGZpbGUKCldlIG9ubHkgYWxsb3cgc2VuZGluZyBzaW5nbGUgY3JlZGl0
+IHdyaXRlcyB0aHJvdWdoIHRoZSBTTUIyX3dyaXRlKCkgc3luY2hyb25vdXMKYXBpIHNvIHNwbGl0
+IHRoaXMgaW50byBzbWFsbGVyIGNodW5rcy4KCkZpeGVzOiA5NjZhM2NiN2M3ZGIgKCJjaWZzOiBp
+bXByb3ZlIGZhbGxvY2F0ZSBlbXVsYXRpb24iKQoKU2lnbmVkLW9mZi1ieTogUm9ubmllIFNhaGxi
+ZXJnIDxsc2FobGJlckByZWRoYXQuY29tPgpSZXBvcnRlZC1ieTogTmFtamFlIEplb24gPG5hbWph
+ZS5qZW9uQHNhbXN1bmcuY29tPgpTaWduZWQtb2ZmLWJ5OiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNo
+QG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9zbWIyb3BzLmMgfCAyNiArKysrKysrKysrKysr
+KysrKysrLS0tLS0tLQogMSBmaWxlIGNoYW5nZWQsIDE5IGluc2VydGlvbnMoKyksIDcgZGVsZXRp
+b25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIyb3BzLmMgYi9mcy9jaWZzL3NtYjJvcHMu
+YwppbmRleCBiYTNjNThlMWY3MjUuLjVjZWZiNTk3MjM5NiAxMDA2NDQKLS0tIGEvZnMvY2lmcy9z
+bWIyb3BzLmMKKysrIGIvZnMvY2lmcy9zbWIyb3BzLmMKQEAgLTM2MTcsNyArMzYxNyw3IEBAIHN0
+YXRpYyBpbnQgc21iM19zaW1wbGVfZmFsbG9jYXRlX3dyaXRlX3JhbmdlKHVuc2lnbmVkIGludCB4
+aWQsCiAJCQkJCSAgICAgY2hhciAqYnVmKQogewogCXN0cnVjdCBjaWZzX2lvX3Bhcm1zIGlvX3Bh
+cm1zID0gezB9OwotCWludCBuYnl0ZXM7CisJaW50IHJjLCBuYnl0ZXM7CiAJc3RydWN0IGt2ZWMg
+aW92WzJdOwogCiAJaW9fcGFybXMubmV0ZmlkID0gY2ZpbGUtPmZpZC5uZXRmaWQ7CkBAIC0zNjI1
+LDEzICszNjI1LDI1IEBAIHN0YXRpYyBpbnQgc21iM19zaW1wbGVfZmFsbG9jYXRlX3dyaXRlX3Jh
+bmdlKHVuc2lnbmVkIGludCB4aWQsCiAJaW9fcGFybXMudGNvbiA9IHRjb247CiAJaW9fcGFybXMu
+cGVyc2lzdGVudF9maWQgPSBjZmlsZS0+ZmlkLnBlcnNpc3RlbnRfZmlkOwogCWlvX3Bhcm1zLnZv
+bGF0aWxlX2ZpZCA9IGNmaWxlLT5maWQudm9sYXRpbGVfZmlkOwotCWlvX3Bhcm1zLm9mZnNldCA9
+IG9mZjsKLQlpb19wYXJtcy5sZW5ndGggPSBsZW47CiAKLQkvKiBpb3ZbMF0gaXMgcmVzZXJ2ZWQg
+Zm9yIHNtYiBoZWFkZXIgKi8KLQlpb3ZbMV0uaW92X2Jhc2UgPSBidWY7Ci0JaW92WzFdLmlvdl9s
+ZW4gPSBpb19wYXJtcy5sZW5ndGg7Ci0JcmV0dXJuIFNNQjJfd3JpdGUoeGlkLCAmaW9fcGFybXMs
+ICZuYnl0ZXMsIGlvdiwgMSk7CisJd2hpbGUgKGxlbikgeworCQlpb19wYXJtcy5vZmZzZXQgPSBv
+ZmY7CisJCWlvX3Bhcm1zLmxlbmd0aCA9IGxlbjsKKwkJaWYgKGlvX3Bhcm1zLmxlbmd0aCA+IFNN
+QjJfTUFYX0JVRkZFUl9TSVpFKQorCQkJaW9fcGFybXMubGVuZ3RoID0gU01CMl9NQVhfQlVGRkVS
+X1NJWkU7CisJCS8qIGlvdlswXSBpcyByZXNlcnZlZCBmb3Igc21iIGhlYWRlciAqLworCQlpb3Zb
+MV0uaW92X2Jhc2UgPSBidWY7CisJCWlvdlsxXS5pb3ZfbGVuID0gaW9fcGFybXMubGVuZ3RoOwor
+CQlyYyA9IFNNQjJfd3JpdGUoeGlkLCAmaW9fcGFybXMsICZuYnl0ZXMsIGlvdiwgMSk7CisJCWlm
+IChyYykKKwkJCWJyZWFrOworCQlpZiAobmJ5dGVzID4gbGVuKQorCQkJcmV0dXJuIC1FSU5WQUw7
+CisJCWJ1ZiArPSBuYnl0ZXM7CisJCW9mZiArPSBuYnl0ZXM7CisJCWxlbiAtPSBuYnl0ZXM7CisJ
+fQorCXJldHVybiByYzsKIH0KIAogc3RhdGljIGludCBzbWIzX3NpbXBsZV9mYWxsb2NhdGVfcmFu
+Z2UodW5zaWduZWQgaW50IHhpZCwKLS0gCjIuMzAuMgoK
+--000000000000979ce805c7b901ac--
