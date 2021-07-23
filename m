@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-20.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F15B5C4320E
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Jul 2021 03:59:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D7CEC4338F
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Jul 2021 03:59:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D786060F50
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Jul 2021 03:59:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1423060F38
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Jul 2021 03:59:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234221AbhGWDSc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Jul 2021 23:18:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37168 "EHLO mail.kernel.org"
+        id S234549AbhGWDSu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Jul 2021 23:18:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39264 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234191AbhGWDR4 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 22 Jul 2021 23:17:56 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8FDC960F43;
-        Fri, 23 Jul 2021 03:58:29 +0000 (UTC)
+        id S234290AbhGWDSQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 22 Jul 2021 23:18:16 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4E01560EFD;
+        Fri, 23 Jul 2021 03:58:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627012710;
-        bh=I/+Q/zFFDQxipqZuuw6/+vIJwIvOLyAIjYB2YVACA/g=;
+        s=k20201202; t=1627012730;
+        bh=bP7EfWyYpsjKDH4AQ8uVNKRnm8HyzjShB9bWxlcPHOU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gSj+Hlbzc/yL30bKBCxS1ivERZtDiR5EOephglpMeaKDv3wqUkkTtRsVMgKUg8tCj
-         4rvO2AGgitZIdPV/GipDFnb625XOMAJJE8KfGs7jQkJoB6Px2mRTRLJMMYLVOaWCgy
-         RtTdHkhLJrTugbqqZzYdoDKtK+Q0GnQZ5b76Atq+KRJpApet+QRKUNUjAiU2bpWj2l
-         mR+xjW2JAjJ4wu7P0iCEfDRsqrLCf+UMq45Z8d8IU9NVUQpiDiVsSFuTut5pvG7tW1
-         szQTNUlTxk8SzstQ2k18LtZG3vYNgKnzjyGGEde+rCc2cx2zcCnVAd0uWqMxzHezDC
-         /5bjtMGh9Om5Q==
+        b=E//7lXsnjZ4QL8osvX+XkrovwMPpzfCIfrD0ILdyvlhllTkDZ50o8wVIFt453k6ci
+         dNN6FdZw0XJKKH80PWZm3yGkKr5JIRYv53zFrNwTuB0acLjOtwj0v3C01NPR7/Mt4r
+         bAeYJ5rnCxTcFIoCwSJKGFPATQ49dOD6JiOtqSizrgXSY9T1ZxnHwRbOBYfTJoVkp0
+         2IZ/0gtdDus8V+12j8UgclH+/SuVswZmnXlkQISx91nPa9Ix9vaJPay7rYdwb3fpJH
+         MUg/3begOlbpZVjZGaJy9EzzkHUfxVpVEsxhrDFCqFq4HDSqF9zfw3nw8XLWxbC446
+         EWjZ26oaOdYKw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Hyunchul Lee <hyc.lee@gmail.com>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 11/14] cifs: fix the out of range assignment to bit fields in parse_server_interfaces
-Date:   Thu, 22 Jul 2021 23:58:10 -0400
-Message-Id: <20210723035813.531837-11-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 10/11] cifs: fix the out of range assignment to bit fields in parse_server_interfaces
+Date:   Thu, 22 Jul 2021 23:58:34 -0400
+Message-Id: <20210723035835.532148-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210723035813.531837-1-sashal@kernel.org>
-References: <20210723035813.531837-1-sashal@kernel.org>
+In-Reply-To: <20210723035835.532148-1-sashal@kernel.org>
+References: <20210723035835.532148-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -67,10 +67,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-index bf6b4f71dc58..defee1d208d2 100644
+index 5a14f518cd97..61955a7c838b 100644
 --- a/fs/cifs/smb2ops.c
 +++ b/fs/cifs/smb2ops.c
-@@ -498,8 +498,8 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+@@ -386,8 +386,8 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
  	p = buf;
  	while (bytes_left >= sizeof(*p)) {
  		info->speed = le64_to_cpu(p->LinkSpeed);
