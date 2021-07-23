@@ -2,136 +2,85 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-20.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E029C4338F
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Jul 2021 02:26:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD4DC4320A
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Jul 2021 03:58:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 300EB60EC0
-	for <linux-cifs@archiver.kernel.org>; Fri, 23 Jul 2021 02:26:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F13EC60F3A
+	for <linux-cifs@archiver.kernel.org>; Fri, 23 Jul 2021 03:58:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233231AbhGWBp3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 22 Jul 2021 21:45:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39604 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233225AbhGWBp3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 22 Jul 2021 21:45:29 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482C1C061575
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Jul 2021 19:26:02 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id b26so11558285lfo.4
-        for <linux-cifs@vger.kernel.org>; Thu, 22 Jul 2021 19:26:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=eu5y6PwPeTl7+lzc0ZYq/q/z+iVy2oY+toaq93aDqsQ=;
-        b=dfAAAOLPLCHquOkOF0JshKHADdA7/dx91HKCyin6wJ1ze9sYYF9sjDyod7CjrdJVCy
-         kpS/Z4aW468uVqpfLdXdZ5QmWH/os5SJiFSSDVp0nZ+tkjNjrjXRCJ2BNbQF1MMBjCGx
-         Zce0D+rGjpbSsLG1E2K7KOJy7V5kU3Cqv67V1k0v73suLb/tpzj+rneKMjyk9jrq6sgr
-         9+wxwxNdH80L+5GfP2rUoyF2wXC77T5HXTkAejeg+yE5b/VahJU1yPcHpL6BQhydvngK
-         a/s17fEG3IWYTpvbdz1GN+1hTFwo4Yp46AAxybsU3mcin8qp8HW4xP9gWUr3JOqkEeCZ
-         T3FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=eu5y6PwPeTl7+lzc0ZYq/q/z+iVy2oY+toaq93aDqsQ=;
-        b=EVGLdJqD5MjeHgC0QvUbChBzL8kKHHOMod4Vh6bxroPX4dHMPKa3ZPzjYhzXt9QYL0
-         4JsInHDv4HpKsl6rMjPTFaf1aGjvqiKKoqSIZILyCMxxNL/CjcuLmW/sNKrJOr+mvGzI
-         PF1XrhYUjZEUl9oaPlKej2DZ5rzrsOyRQ0LMIQ/6pSNx4f/J40nYLY7E8wuGaduIMIxL
-         +fH/9LA955zVTDYD6q3OJyvchemHZl6D7DXGUinjHBHCVMdKIVd5wF8WdNGeRU7Hcd1x
-         cDw6yZAxJt4ACehmLnzZcMYoapImXoC14PocZXl+QbsMJIvT06g5K1dcphkMwFkYcO6V
-         IINA==
-X-Gm-Message-State: AOAM531t96nkQLSCJ4OpkQ3mNuHcTfPs9Xbn2DzD1YyQT8392Xg0vB2B
-        o6opsky0MitYyjZrm3A0TaIDi3esaXiXi0+78n4=
-X-Google-Smtp-Source: ABdhPJwMfEgoNSZBYS/aZjM0ENfj1CkxylOXRZ5CmyzWwDmrHzNpTtWvemG0L6yEeipwE+u77rB/4QDOs2mg/Ubodw4=
-X-Received: by 2002:ac2:4845:: with SMTP id 5mr1537430lfy.313.1627007160537;
- Thu, 22 Jul 2021 19:26:00 -0700 (PDT)
+        id S233846AbhGWDR0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 22 Jul 2021 23:17:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37500 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233837AbhGWDRJ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 22 Jul 2021 23:17:09 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id EE28260F02;
+        Fri, 23 Jul 2021 03:57:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1627012663;
+        bh=sLeRchgHxS9aI+LfQZzViXxZ6d3N3CoUQimmi9/VdbM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=POFWSNgs6NeYQTX052EJDBftFjAEXTIY/7nby/1vCrBpb7dC+yGcMclWmqxQwL+kh
+         FICCuXrPCbgLogejzsUTcU2IQkyVFDn/cbiaJrReUjaQrV5bBDMC945PXE5GGJWVIa
+         c8xAEQv4QrBnpLaPvRDyXfCykJLOpB2hxO7C+rTD2WAxq6L0nueRHOOmdELIL1Mxgf
+         iHGQxggb/tnSvk8kfwVYLGxs9WrRghgstp1+OD6VMBiCTSyzKajezv+8cqtOqQQaPn
+         pKyK6MRbPziSS2BY5pjxYYSUR804iHksH4InT7mBt0app3EMzK0558OASOZOHr3BOf
+         keXiNGed0L3cw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Hyunchul Lee <hyc.lee@gmail.com>,
+        Steve French <stfrench@microsoft.com>,
+        Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Subject: [PATCH AUTOSEL 5.13 16/19] cifs: fix the out of range assignment to bit fields in parse_server_interfaces
+Date:   Thu, 22 Jul 2021 23:57:17 -0400
+Message-Id: <20210723035721.531372-16-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210723035721.531372-1-sashal@kernel.org>
+References: <20210723035721.531372-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20210723012124.3405007-1-lsahlber@redhat.com>
-In-Reply-To: <20210723012124.3405007-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 22 Jul 2021 21:25:49 -0500
-Message-ID: <CAH2r5mvQbdcCpHW+g+p54Sjdj+DP-pwtbsJ=o7KxFaRweo-Yew@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix fallocate when trying to allocate a hole.
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-With the minor fix to change the rc from EFBIG to 0 to address the
-xfstest 071 failure, tentatively merged into cifs-2.6.git for-next
-pending more testing
+From: Hyunchul Lee <hyc.lee@gmail.com>
 
-On Thu, Jul 22, 2021 at 8:21 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> Remove the conditional checking for out_data_len and skipping the fallocate
-> if it is 0. This is wrong will actually change any legitimate the fallocate
-> where the entire region is unallocated into a no-op.
->
-> Additionally, before allocating the range, if FALLOC_FL_KEEP_SIZE is set then
-> we need to clamp the length of the fallocate region as to not extend the size of the file.
->
-> Fixes: 966a3cb7c7db ("cifs: improve fallocate emulation")
-> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> ---
->  fs/cifs/smb2ops.c | 23 ++++++++++++++++++-----
->  1 file changed, 18 insertions(+), 5 deletions(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index 5cefb5972396..238717654e46 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -3667,11 +3667,6 @@ static int smb3_simple_fallocate_range(unsigned int xid,
->                         (char **)&out_data, &out_data_len);
->         if (rc)
->                 goto out;
-> -       /*
-> -        * It is already all allocated
-> -        */
-> -       if (out_data_len == 0)
-> -               goto out;
->
->         buf = kzalloc(1024 * 1024, GFP_KERNEL);
->         if (buf == NULL) {
-> @@ -3794,6 +3789,24 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
->                 goto out;
->         }
->
-> +       if (keep_size == true) {
-> +               /*
-> +                * We can not preallocate pages beyond the end of the file
-> +                * in SMB2.
-> +                */
-> +               if (off >= i_size_read(inode)) {
-> +                       rc = -EFBIG;
-> +                       goto out;
-> +               }
-> +               /*
-> +                * For fallocates that are partially beyond the end of file,
-> +                * clamp len so we only fallocate up to the end of file.
-> +                */
-> +               if (off + len > i_size_read(inode)) {
-> +                       len = i_size_read(inode) - off;
-> +               }
-> +       }
-> +
->         if ((keep_size == true) || (i_size_read(inode) >= off + len)) {
->                 /*
->                  * At this point, we are trying to fallocate an internal
-> --
-> 2.30.2
->
+[ Upstream commit c9c9c6815f9004ee1ec87401ed0796853bd70f1b ]
 
+Because the out of range assignment to bit fields
+are compiler-dependant, the fields could have wrong
+value.
 
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/cifs/smb2ops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index 903de7449aa3..1e5b707833aa 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -555,8 +555,8 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 	p = buf;
+ 	while (bytes_left >= sizeof(*p)) {
+ 		info->speed = le64_to_cpu(p->LinkSpeed);
+-		info->rdma_capable = le32_to_cpu(p->Capability & RDMA_CAPABLE);
+-		info->rss_capable = le32_to_cpu(p->Capability & RSS_CAPABLE);
++		info->rdma_capable = le32_to_cpu(p->Capability & RDMA_CAPABLE) ? 1 : 0;
++		info->rss_capable = le32_to_cpu(p->Capability & RSS_CAPABLE) ? 1 : 0;
+ 
+ 		cifs_dbg(FYI, "%s: adding iface %zu\n", __func__, *iface_count);
+ 		cifs_dbg(FYI, "%s: speed %zu bps\n", __func__, info->speed);
 -- 
-Thanks,
+2.30.2
 
-Steve
