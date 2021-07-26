@@ -2,63 +2,97 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5256CC4338F
-	for <linux-cifs@archiver.kernel.org>; Sun, 25 Jul 2021 00:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2403C4338F
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Jul 2021 09:44:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 25FAE60E90
-	for <linux-cifs@archiver.kernel.org>; Sun, 25 Jul 2021 00:34:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BAE3B60F42
+	for <linux-cifs@archiver.kernel.org>; Mon, 26 Jul 2021 09:44:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbhGXXyM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 24 Jul 2021 19:54:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50372 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229601AbhGXXyL (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 24 Jul 2021 19:54:11 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id ADF4C600D4;
-        Sun, 25 Jul 2021 00:34:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1627173282;
-        bh=Wr+k0F9LGhr559tSyNTKoziwtWchXvOjTd4wEDimnkc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Y5dCqxgY1xgirpCQ6kiry83eaSZBHiMFKAzRZUkHsUxyuFl+A9AFxt+BAjAOiGJ6i
-         ETVBRVYkpP7qm4L7IQmhvdOtoRSgV++ClA00vwN+Xsi8zWOogMW9iuy/2Sm0D8VH/X
-         io9KJc+tnf48jOzr3nmagc/v91+BzM0wcjE4xNJTgtjKPCgr0G1XyexHwxv4BXaqad
-         L+RRUCuqJe3RDe4tY3ISZTSWl41zk+Jku8EU5BXliIyHBPhimwW36mJMzsvcS6ELPi
-         ntE5ZltHQAfv0IW3ddEATwUnape6GRzJuY79gi8HvWgBSFz2agdFTMP4RVty+TE/30
-         4SyrfhCrbhvWg==
-Subject: Re: [GIT PULL] CIFS/SMB3 Fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtnAgJo_C_=NRVU_Z6hZByLyv5EKedhr7NY7AcT7-KBXA@mail.gmail.com>
-References: <CAH2r5mtnAgJo_C_=NRVU_Z6hZByLyv5EKedhr7NY7AcT7-KBXA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtnAgJo_C_=NRVU_Z6hZByLyv5EKedhr7NY7AcT7-KBXA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.14-rc2-smb3-fixes
-X-PR-Tracked-Commit-Id: 488968a8945c119859d91bb6a8dc13bf50002f15
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d8079fac168168b25677dc16c00ffaf9fb7df723
-Message-Id: <162717328257.17472.17474909796875893432.pr-tracker-bot@kernel.org>
-Date:   Sun, 25 Jul 2021 00:34:42 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+        id S232882AbhGZJEX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 26 Jul 2021 05:04:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23338 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232482AbhGZJEX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 26 Jul 2021 05:04:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1627292690;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kBC7/7n7ieIR+PQocFWGsdEhjsiqMRhY14cESzBGes0=;
+        b=AS9h2lnV6opB1buD6SIjKiqKGnIwsB7DPJViOSV9dCJa9fBXg3B2YnwCz4cW6t2NHf9Yxf
+        pjbV8NaCd4hwl/tYWqAyEIdc9ZycwF/SIC8eM345JJIfV+VUhHS3rarSm3Vzj4FMVg6sJH
+        rhmwzLpCGttTcm1AqdBYScEVvlh2fIo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-brLp6B6MMoKsBE9RNfYfwA-1; Mon, 26 Jul 2021 05:44:47 -0400
+X-MC-Unique: brLp6B6MMoKsBE9RNfYfwA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A966F8799EF;
+        Mon, 26 Jul 2021 09:44:44 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.22.16.89])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 61BB85C1D1;
+        Mon, 26 Jul 2021 09:44:36 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <35ecb577315f486f1636b2316c2051ad004f6f7b.camel@redhat.com>
+References: <35ecb577315f486f1636b2316c2051ad004f6f7b.camel@redhat.com> <162687506932.276387.14456718890524355509.stgit@warthog.procyon.org.uk> <162687508008.276387.6418924257569297305.stgit@warthog.procyon.org.uk>
+To:     Jeff Layton <jlayton@redhat.com>
+Cc:     dhowells@redhat.com, linux-fsdevel@vger.kernel.org,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        devel@lists.orangefs.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 01/12] afs: Sort out symlink reading
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <812199.1627292675.1@warthog.procyon.org.uk>
+Date:   Mon, 26 Jul 2021 10:44:35 +0100
+Message-ID: <812200.1627292675@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 24 Jul 2021 17:20:30 -0500:
+Jeff Layton <jlayton@redhat.com> wrote:
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.14-rc2-smb3-fixes
+> > -static int afs_symlink_readpage(struct page *page)
+> > +static int afs_symlink_readpage(struct file *file, struct page *page)
+> >  {
+> >  	struct afs_vnode *vnode = AFS_FS_I(page->mapping->host);
+> >  	struct afs_read *fsreq;
+> 
+> 
+> I wonder...would you be better served here by not using page_readlink
+> for symlinks and instead use simple_get_link and roll your own readlink
+> operation. It seems a bit more direct, and AFS seems to be the only
+> caller of page_readlink.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d8079fac168168b25677dc16c00ffaf9fb7df723
+Maybe.  At some point it will need to go through netfs_readpage() so that it
+will get cached and maybe encrypted.  Possibly there should be a
+netfs_readlink().  AFS directories too will at some point need to go through
+netfs_readahead() or similar.
 
-Thank you!
+David
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
