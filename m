@@ -2,182 +2,158 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21AFCC4320E
-	for <linux-cifs@archiver.kernel.org>; Thu,  5 Aug 2021 18:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70125C432BE
+	for <linux-cifs@archiver.kernel.org>; Thu,  5 Aug 2021 21:59:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E89BB60F01
-	for <linux-cifs@archiver.kernel.org>; Thu,  5 Aug 2021 18:50:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5159561164
+	for <linux-cifs@archiver.kernel.org>; Thu,  5 Aug 2021 21:59:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241786AbhHESuu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 5 Aug 2021 14:50:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56990 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241757AbhHESut (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 Aug 2021 14:50:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628189434;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IiYjOVol2JvYBzSm9nmbOsFi1gSlVR+sNt5v+Iro+eM=;
-        b=ZHbbAU61oS1H+2oKLhh8moglBhhHg9ftrLE4x06oC+5N59lgrVeSpWNOFolj5VDfdjOBjg
-        JHdkv0sLAG+RU8NV0HI3je+fFAMDQabsFcLI6ODWV8Z0zBC50uzg2lkHxV5LkcU81uU/9x
-        ldeg5zLEeBhlU26u5Fl6xXD+FK36/ZQ=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-MhSjKDgUPW-A7BjpncDdew-1; Thu, 05 Aug 2021 14:50:33 -0400
-X-MC-Unique: MhSjKDgUPW-A7BjpncDdew-1
-Received: by mail-qk1-f199.google.com with SMTP id e11-20020a05620a208bb02903b854c43335so4746995qka.21
-        for <linux-cifs@vger.kernel.org>; Thu, 05 Aug 2021 11:50:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=IiYjOVol2JvYBzSm9nmbOsFi1gSlVR+sNt5v+Iro+eM=;
-        b=fa07HHq1RZNyBdA0gI8iAD0hPPWc9VBRlJsNbiQkTm5nlhDdNeVZUYgqpeZFhp1fIZ
-         VfWBi8pfCeyeF1FbNDSTMNknulpdXOQZjIhhDbWp33+9l4A/3o5mNEc6Bv0337XEWOFV
-         cnz6Sb+iGbRqGv5J8qeHWAFlOaMNddfg9jC+zhYLAtfelRS0Gnjj7l8VKtZ30lVYhtsr
-         9CEPXzsR03tIbGBZvcmbXLcfXpZAbHJN0HscfyXrtqDqSaie6jHChfPoJdey2dstNnWs
-         71KKTjyzoukzO6jPAHqun3T3svsjv3dpKwieC7HNowPe0v0Q5rFFzvIrIMbH+oTp/wbI
-         xSpw==
-X-Gm-Message-State: AOAM533a7JSY1R/VLTvIvZSHQbH4EANgtxb3mY1ZE+sHDcRb6I+zDkqR
-        b2Bzm8NTDNKSTyXi7whPhObQNjKYr96nzUq2CorU9mFsp9VVhC2PEcljwMKoSCA6s9PxHi+vmWO
-        JoFDA6ksqI7633drf3L83WQ==
-X-Received: by 2002:a05:620a:b44:: with SMTP id x4mr4723780qkg.11.1628189432780;
-        Thu, 05 Aug 2021 11:50:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwCNAmptp/YxuNLEFQ2GKThqZsDaw/EkAl6/uzN/fIMPdEnuhdMjnc4Ro9mfYivPJI45LPC9Q==
-X-Received: by 2002:a05:620a:b44:: with SMTP id x4mr4723755qkg.11.1628189432545;
-        Thu, 05 Aug 2021 11:50:32 -0700 (PDT)
-Received: from [192.168.1.3] (68-20-15-154.lightspeed.rlghnc.sbcglobal.net. [68.20.15.154])
-        by smtp.gmail.com with ESMTPSA id c190sm3509913qkg.46.2021.08.05.11.50.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Aug 2021 11:50:32 -0700 (PDT)
-Message-ID: <90a2a17aeae0447793496426d21794a3b0f7c197.camel@redhat.com>
-Subject: Re: Canvassing for network filesystem write size vs page size
-From:   Jeff Layton <jlayton@redhat.com>
-To:     David Howells <dhowells@redhat.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Miklos Szeredi <miklos@szeredi.hu>
-Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        devel@lists.orangefs.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 05 Aug 2021 14:50:30 -0400
-In-Reply-To: <1219713.1628181333@warthog.procyon.org.uk>
-References: <YQv+iwmhhZJ+/ndc@casper.infradead.org>
-         <YQvpDP/tdkG4MMGs@casper.infradead.org>
-         <YQvbiCubotHz6cN7@casper.infradead.org>
-         <1017390.1628158757@warthog.procyon.org.uk>
-         <1170464.1628168823@warthog.procyon.org.uk>
-         <1186271.1628174281@warthog.procyon.org.uk>
-         <1219713.1628181333@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.40.3 (3.40.3-1.fc34) 
+        id S232852AbhHEV7r (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 5 Aug 2021 17:59:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52578 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232968AbhHEV7q (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 5 Aug 2021 17:59:46 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F21AF61157;
+        Thu,  5 Aug 2021 21:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628200772;
+        bh=MeLnT3CMobnAZ0zp49eYFHn5nhm9lSY2nSjIl9/FEaA=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=sIJ09dbqA6QWegRxG83cdvb2iyJ5XozAN4pFGeilJSAtq2xF7N4l+BJ5lYvNrj9J+
+         +8UO3YH+QcAqRYnR/A6Ybg9g76+Z4zCp/O++V9gsUpHOJ5OgILfFJx08H2sCJbV74N
+         7evD+xE5ACYmX7GRUWKEx5/UGG4MGU+hrqET9lHwcfj4TaMdFNY9hEyjyVrf7JHvOx
+         YFYmViW1UJVGVmGY95ZvVD2rNLPOSvgK68+Dss8JJJtk2tRaeHEIpqUqDl4IBCmO8o
+         f+1T6cF8oNP4fp8HO04e5jZzBeRnp8yqF2GYnbBI5XBes8zxx93EpLRENHEW1PFOCd
+         +RjdQHFyi1/uw==
+Received: by mail-oo1-f54.google.com with SMTP id o17-20020a4a64110000b0290263e1ba7ff9so1722373ooc.2;
+        Thu, 05 Aug 2021 14:59:31 -0700 (PDT)
+X-Gm-Message-State: AOAM533dSa8UMPHicpsT9AkrwclIZ17CGaZMaAcvIprldUEiXtY7ygKG
+        OUzExqOBOywVKDlH6IFZOTJl/xYF+ZpHo8oQw38=
+X-Google-Smtp-Source: ABdhPJwU1DkfO4DN0oavzhohkoWqAhatuJlGM7rEMLHWSs2gBz8qdpYUyQkA591mwk10vKMe5BuouHQYm5Qet9yPaQo=
+X-Received: by 2002:a4a:e382:: with SMTP id l2mr4836128oov.85.1628200771299;
+ Thu, 05 Aug 2021 14:59:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: by 2002:ac9:7203:0:0:0:0:0 with HTTP; Thu, 5 Aug 2021 14:59:30 -0700 (PDT)
+In-Reply-To: <20210805110219.GJ22532@kadam>
+References: <20210805060546.3268-1-namjae.jeon@samsung.com>
+ <CGME20210805061600epcas1p13ca76c1e21f317f9f3f52860a70a241e@epcas1p1.samsung.com>
+ <20210805060546.3268-9-namjae.jeon@samsung.com> <20210805110219.GJ22532@kadam>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Fri, 6 Aug 2021 06:59:30 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8y_QPr+9oYqyGGtnunHBXKXi6Qr-YNM=sAsDSvr6r-LQ@mail.gmail.com>
+Message-ID: <CAKYAXd8y_QPr+9oYqyGGtnunHBXKXi6Qr-YNM=sAsDSvr6r-LQ@mail.gmail.com>
+Subject: Re: [Linux-cifsd-devel] [PATCH v7 08/13] ksmbd: add smb3 engine part 1
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Namjae Jeon <namjae.jeon@samsung.com>, linux-cifs@vger.kernel.org,
+        aurelien.aptel@gmail.com, linux-cifsd-devel@lists.sourceforge.net,
+        sandeen@sandeen.net, linux-kernel@vger.kernel.org,
+        willy@infradead.org, hch@infradead.org, senozhatsky@chromium.org,
+        viro@zeniv.linux.org.uk, ronniesahlberg@gmail.com,
+        linux-fsdevel@vger.kernel.org,
+        Steve French <stfrench@microsoft.com>, hch@lst.de,
+        christian@brauner.io
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, 2021-08-05 at 17:35 +0100, David Howells wrote:
-> With Willy's upcoming folio changes, from a filesystem point of view, we're
-> going to be looking at folios instead of pages, where:
-> 
->  - a folio is a contiguous collection of pages;
-> 
->  - each page in the folio might be standard PAGE_SIZE page (4K or 64K, say) or
->    a huge pages (say 2M each);
-> 
->  - a folio has one dirty flag and one writeback flag that applies to all
->    constituent pages;
-> 
->  - a complete folio currently is limited to PMD_SIZE or order 8, but could
->    theoretically go up to about 2GiB before various integer fields have to be
->    modified (not to mention the memory allocator).
-> 
-> Willy is arguing that network filesystems should, except in certain very
-> special situations (eg. O_SYNC), only write whole folios (limited to EOF).
-> 
-> Some network filesystems, however, currently keep track of which byte ranges
-> are modified within a dirty page (AFS does; NFS seems to also) and only write
-> out the modified data.
-> 
-> Also, there are limits to the maximum RPC payload sizes, so writing back large
-> pages may necessitate multiple writes, possibly to multiple servers.
-> 
-> What I'm trying to do is collate each network filesystem's properties (I'm
-> including FUSE in that).
-> 
-> So we have the following filesystems:
-> 
->  Plan9
->  - Doesn't track bytes
->  - Only writes single pages
-> 
->  AFS
->  - Max RPC payload theoretically ~5.5 TiB (OpenAFS), ~16EiB (Auristor/kAFS)
->  - kAFS (Linux kernel)
->    - Tracks bytes, only writes back what changed
->    - Writes from up to 65535 contiguous pages.
->  - OpenAFS/Auristor (UNIX/Linux)
->    - Deal with cache-sized blocks (configurable, but something from 8K to 2M),
->      reads and writes in these blocks
->  - OpenAFS/Auristor (Windows)
->    - Track bytes, write back only what changed
-> 
->  Ceph
->  - File divided into objects (typically 2MiB in size), which may be scattered
->    over multiple servers.
+Hi Dan,
 
-The default is 4M in modern cephfs clusters, but the rest is correct.
+2021-08-05 20:02 GMT+09:00, Dan Carpenter <dan.carpenter@oracle.com>:
+> On Thu, Aug 05, 2021 at 03:05:41PM +0900, Namjae Jeon wrote:
+>> +/**
+>> + * check_session_id() - check for valid session id in smb header
+>> + * @conn:	connection instance
+>> + * @id:		session id from smb header
+>> + *
+>> + * Return:      1 if valid session id, otherwise 0
+>> + */
+>> +static inline int check_session_id(struct ksmbd_conn *conn, u64 id)
+>
+> Make this bool.  Same for all the is_* functions.
+Okay, I will fix it on next version.
+>
+>> +{
+>> +	struct ksmbd_session *sess;
+>> +
+>> +	if (id == 0 || id == -1)
+>> +		return 0;
+>> +
+>> +	sess = ksmbd_session_lookup_all(conn, id);
+>> +	if (sess)
+>> +		return 1;
+>> +	pr_err("Invalid user session id: %llu\n", id);
+>> +	return 0;
+>> +}
+>> +
+>> +struct channel *lookup_chann_list(struct ksmbd_session *sess, struct
+>> ksmbd_conn *conn)
+>> +{
+>> +	struct channel *chann;
+>> +
+>> +	list_for_each_entry(chann, &sess->ksmbd_chann_list, chann_list) {
+>> +		if (chann->conn == conn)
+>> +			return chann;
+>> +	}
+>> +
+>> +	return NULL;
+>> +}
+>> +
+>> +/**
+>> + * smb2_get_ksmbd_tcon() - get tree connection information for a tree id
+>> + * @work:	smb work
+>> + *
+>> + * Return:      matching tree connection on success, otherwise error
+>
+> This documentation seems out of date.
+Okay.
+>
+>> + */
+>> +int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
+>> +{
+>> +	struct smb2_hdr *req_hdr = work->request_buf;
+>> +	int tree_id;
+>> +
+>> +	work->tcon = NULL;
+>> +	if (work->conn->ops->get_cmd_val(work) == SMB2_TREE_CONNECT_HE ||
+>> +	    work->conn->ops->get_cmd_val(work) ==  SMB2_CANCEL_HE ||
+>> +	    work->conn->ops->get_cmd_val(work) ==  SMB2_LOGOFF_HE) {
+>> +		ksmbd_debug(SMB, "skip to check tree connect request\n");
+>> +		return 0;
+>> +	}
+>> +
+>> +	if (xa_empty(&work->sess->tree_conns)) {
+>> +		ksmbd_debug(SMB, "NO tree connected\n");
+>> +		return -1;
+>
+> Better to return -EINVAL.
+Okay, Will fix it.
 
->  - Max RPC size is therefore object size.
->  - Doesn't track bytes.
-> 
->  CIFS/SMB
->  - Writes back just changed bytes immediately under some circumstances
-
-cifs.ko can also just do writes to specific byte ranges synchronously
-when it doesn't have the ability to use the cache (i.e. no oplock or
-lease). CephFS also does this when it doesn't have the necessary
-capabilities (aka caps) to use the pagecache.
-
-If we want to add infrastructure for netfs writeback, then it would be
-nice to consider similar infrastructure to handle those cases as well.
-
->  - Doesn't track bytes and writes back whole pages otherwise.
->  - SMB3 has a max RPC size of 16MiB, with a default of 4MiB
-> 
->  FUSE
->  - Doesn't track bytes.
->  - Max 'RPC' size of 256 pages (I think).
-> 
->  NFS
->  - Tracks modified bytes within a page.
->  - Max RPC size of 1MiB.
->  - Files may be constructed of objects scattered over different servers.
-> 
->  OrangeFS
->  - Doesn't track bytes.
->  - Multipage writes possible.
-> 
-> If you could help me fill in the gaps, that would be great.
-
-
--- 
-Jeff Layton <jlayton@redhat.com>
-
+Thanks for your review!
+>
+>> +	}
+>> +
+>> +	tree_id = le32_to_cpu(req_hdr->Id.SyncId.TreeId);
+>> +	work->tcon = ksmbd_tree_conn_lookup(work->sess, tree_id);
+>> +	if (!work->tcon) {
+>> +		pr_err("Invalid tid %d\n", tree_id);
+>> +		return -1;
+>> +	}
+>> +
+>> +	return 1;
+>> +}
+>
+> regards,
+> dan carpenter
+>
+>
+> _______________________________________________
+> Linux-cifsd-devel mailing list
+> Linux-cifsd-devel@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/linux-cifsd-devel
+>
