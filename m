@@ -6,100 +6,92 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2EB0C4320E
-	for <linux-cifs@archiver.kernel.org>; Thu,  5 Aug 2021 23:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE91C4338F
+	for <linux-cifs@archiver.kernel.org>; Fri,  6 Aug 2021 07:18:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7ADE460EB2
-	for <linux-cifs@archiver.kernel.org>; Thu,  5 Aug 2021 23:48:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCCE160BD3
+	for <linux-cifs@archiver.kernel.org>; Fri,  6 Aug 2021 07:18:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242470AbhHEXsh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 5 Aug 2021 19:48:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57038 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232947AbhHEXsg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 5 Aug 2021 19:48:36 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8081C0613D5;
-        Thu,  5 Aug 2021 16:48:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=H3DXaH0DYq/AU+2Gphrkn9Lwf3WnAckLZe9TrSof2hk=; b=abtQMLOoZXkVPjuUhEHDqRyq8B
-        KaXEaoLL1BbXX3emsso4LunhdcKMhxkxFYrvD42OWevUVXBkxay+rvTGncsdtcRnfeBGk8FEEJ82g
-        7/1GwpkJ5N+N8oeYGnLfSHWILFgbWRZWolqBrSWognGRqvZRQXjAioMsIt7VqwR/5y0set0rb2Sl8
-        h9eiGCC6w7qRlR//cfZPoHad3zUxLgvZHKF63EjM+zKlK/T0Bdbw8efLJ0qrWM7BwE0fJDaDjccp8
-        JIHfTwF5MfItHb3bT+6SzPp1jD/VaVUH71EQLFXh7i5EzMqMKWZH/pY+tCRYFBtVdRh4Xsh6Krd+Y
-        hXAscibg==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mBn5L-007d2p-Uz; Thu, 05 Aug 2021 23:47:39 +0000
-Date:   Fri, 6 Aug 2021 00:47:35 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Anna Schumaker <anna.schumaker@netapp.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Jeff Layton <jlayton@redhat.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        devel@lists.orangefs.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Canvassing for network filesystem write size vs page size
-Message-ID: <YQx4lx7vEbvmfBnE@casper.infradead.org>
-References: <YQv+iwmhhZJ+/ndc@casper.infradead.org>
- <YQvpDP/tdkG4MMGs@casper.infradead.org>
- <YQvbiCubotHz6cN7@casper.infradead.org>
- <1017390.1628158757@warthog.procyon.org.uk>
- <1170464.1628168823@warthog.procyon.org.uk>
- <1186271.1628174281@warthog.procyon.org.uk>
- <1219713.1628181333@warthog.procyon.org.uk>
+        id S240523AbhHFHSd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 6 Aug 2021 03:18:33 -0400
+Received: from mail.tuxed.org ([116.203.59.37]:58440 "EHLO mail.tuxed.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230115AbhHFHSd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 6 Aug 2021 03:18:33 -0400
+X-Greylist: delayed 518 seconds by postgrey-1.27 at vger.kernel.org; Fri, 06 Aug 2021 03:18:33 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alexanderkoch.net;
+        s=2019; t=1628233773;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S+am1S/eRWJ0BmibE8XmJh+EOij0SVtCRb1tKYD+kb4=;
+        b=ec2WFycGlomsGnbMwp332xreS3LmRhbTHsr4aMBh5S3rjnKY19/yxgseJ1RLsZMJ9smELD
+        lI3e4pDBFGc1un/TNU/utoMq0UpCR3mBtxGAJkqSGFgCDb4PccDnDvJdjXZb9pXtjGKzH7
+        doDvr8uXh2xuVrp/PBhpbhyneqQl98H6o6296NlP0ivwRxl7eY9JBQ2ttcSCl9StO9aSMS
+        Dl7lztyZPIQGVdi/xJBgtxBkoI8qVG5oJTiVM6DYzGdZpy7Uu1qs907CHN7eA8MeXX+iKc
+        CU7c0rMMDLDJ3cSZHMMEMjvszchQps5rtc0vrO6jFwYTh8OvIh8kiwixSLAwfg==
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1219713.1628181333@warthog.procyon.org.uk>
+Date:   Fri, 06 Aug 2021 09:09:33 +0200
+From:   Alexander Koch <mail@alexanderkoch.net>
+To:     =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>
+Cc:     linux-cifs@vger.kernel.org
+Subject: Re: cifs.upcall broken with cifs-utils 6.13
+In-Reply-To: <956dd84c4e27fd02541ca4fabb7b1776@alexanderkoch.net>
+References: <a01d5d22-5990-c00d-bc2a-582d2585ea69@alexanderkoch.net>
+ <87h7k0zz6r.fsf@suse.com>
+ <956dd84c4e27fd02541ca4fabb7b1776@alexanderkoch.net>
+Message-ID: <2f863f5d2c22907a88a4bfc04ab5f1b4@alexanderkoch.net>
+X-Sender: mail@alexanderkoch.net
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=alexanderkoch.net; s=2019; t=1628233773;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S+am1S/eRWJ0BmibE8XmJh+EOij0SVtCRb1tKYD+kb4=;
+        b=X9oUFhp/+sc21VaBhdfUE0O2raj8meWr2bodxkkI0bp5TdlSpN5PdoeLIWecNceVsBwmvl
+        +iUtYSrxTMU+Pm/dQUF3hk8tb3cEQQLuHDKcklxeS1Op6vPdfc40Dh5xiBT5AU8ikfU2TD
+        bwZtiVHojwFLQAu2dir9OlmhQ/H1VrjbVpXqXaip2O215m9kmK8x5SzXNuIg+DmV+eUS2d
+        qtUscueYatEAebqKlWRUBgxd0z/Xt9ALBIHTPZUwuR3dG73DbgWFCG/3x0vXgOZPtLQa4g
+        J8JJQYEhz5Uxaskgx5YtlI+tWkIl0OmpgfKtzOyyPcJwEmqwQOcB86NRexXynw==
+ARC-Seal: i=1; s=2019; d=alexanderkoch.net; t=1628233773; a=rsa-sha256;
+        cv=none;
+        b=R1gskBN3n7eUYvfUr1w9ooT4clou+Jt2TcLdly61Yy2mDhOxh7ECCw6G/lIyb0DmjO8X6f
+        Wj6tyO9DMp32lFWD8QHpabjh2DXDAHwwE50ZJ/2zqEMo0OGYP1PG24VC7FRpu9MKEM9Amh
+        6sxj1p9c/5HvRH/JDMaG6crDrYHB4NXeA/fnR79xLX5nuY/S/AurR8q7xnqspliKC2zjx4
+        Grw1pgZt7KbDoM6sZjGpXijjuCknSbK73r3ocrBmHrV1JhtAwqOxychpky0wfKkQVEDMg7
+        9LvWfnoNou9+ce8Zh5MWG+sUDyE4V9b2/zpUuPEUFcUaHEXjH09GOA2JC/Z1fQ==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=mail@alexanderkoch.net smtp.mailfrom=mail@alexanderkoch.net
+Authentication-Results: ORIGINATING;
+        auth=pass smtp.auth=mail@alexanderkoch.net smtp.mailfrom=mail@alexanderkoch.net
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Aug 05, 2021 at 05:35:33PM +0100, David Howells wrote:
-> With Willy's upcoming folio changes, from a filesystem point of view, we're
-> going to be looking at folios instead of pages, where:
-> 
->  - a folio is a contiguous collection of pages;
-> 
->  - each page in the folio might be standard PAGE_SIZE page (4K or 64K, say) or
->    a huge pages (say 2M each);
+Hi Aurélien,
 
-This is not a great way to explain folios.
+>> It's unfortunately a regression in the CVE fix. We are trying to come 
+>> up
+>> with a proper fix.
 
-If you're familiar with compound pages, a folio is a new type for
-either a base page or the head page of a compound page; nothing more
-and nothing less.
+Any news about the proper fix for this regression?
 
-If you're not familiar with compound pages, a folio contains 2^n
-contiguous pages.  They are treated as a single unit.
+I've seen there is no new release but maybe the is a patch that I could
+propose for the maintainer of the 'cifs-utils' package in Arch in order 
+to
+work around this issue.
 
->  - a folio has one dirty flag and one writeback flag that applies to all
->    constituent pages;
-> 
->  - a complete folio currently is limited to PMD_SIZE or order 8, but could
->    theoretically go up to about 2GiB before various integer fields have to be
->    modified (not to mention the memory allocator).
+As of right now, the only working option is to keep the package 
+downgraded
+to 6.12.
 
-Filesystems should not make an assumption about this ... I suspect
-the optimum page size scales with I/O bandwidth; taking PCI bandwidth
-as a reasonable proxy, it's doubled five times in twenty years.
 
-> Willy is arguing that network filesystems should, except in certain very
-> special situations (eg. O_SYNC), only write whole folios (limited to EOF).
+Best regards,
 
-I did also say that the write could be limited by, eg, a byte-range
-lease on the file.  If the client doesn't have permission to write
-a byte range, then it doesn't need to write it back.
-
+Alex
