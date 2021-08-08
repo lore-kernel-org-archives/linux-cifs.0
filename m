@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B874EC43216
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7082CC00143
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9ED7861055
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5874160F35
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232243AbhHHQ0J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 8 Aug 2021 12:26:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47530 "EHLO mail.kernel.org"
+        id S232502AbhHHQ0K (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 8 Aug 2021 12:26:10 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47508 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231882AbhHHQZg (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        id S231859AbhHHQZg (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
         Sun, 8 Aug 2021 12:25:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AC3B6610A1;
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 478D9610E7;
         Sun,  8 Aug 2021 16:25:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1628439917;
-        bh=s8/pegOQ7RYOq+lh3ThWZRo1NRJOC4wAYqGAubgRpOU=;
+        bh=xmLXv5i7UZvG04SFDJpgGHD2RFkBzJD+zP5l8qNjoBE=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=jvq5yzqR6RoEecl4y1TjillgIF7I6qPa74Gyb7EtLccaqf3UZZeDSACwA5V9YcoEM
-         +0nDO8hc3r1SW4TEQzWPXRkwesbSyw+Tp6lRiTI9pOMSSoaXB3YY+TEAi5DSvdeJfn
-         oSuaQ+hG8uRvT3ByMfTCH0Dfbyx8RQBKfp9pWCOVYY8Tvi1Gp82FIqIlJsk5jAGFSE
-         kq29jYqwhS+AD9rFH//ptfRxG3SAKEvSWxWq2Br4+Vwo9L6m+a3n+d/HlC5mAsfCET
-         BNC71n1V9DRYoFe0DnjEv2ZqNOoJpCawE4648iyrsqLn4a2m4twkzZpY9jCqLVn7AY
-         2RTQoRtOuv9rg==
+        b=AMesRXMciqTy9Z+x+pnrhCk8JGOS/orqjtIWJcARwaLKeo6rCnwvABVawy59SFgk3
+         58vuidq58/vYYQVZ+riALGfKfsJIS5PrE1PjmxNL+rwInsZcUzEhOTDlAux/oGtpUo
+         4SqVdxzndy8XgVRDYzPds6thgt7O0V5uaQG7dimlyktHJLz1fqjGbJFm8+MShhiLRN
+         NJh+EfeSiMGjOdn28KEE4QID6GsT5oUYPjAsm9Y50PblNrgSYR5U+wm8vfKtOu1lL5
+         BVC4WyAZlmciw14uVn4tWe23S14Z4WC/tgNVFGFO/RBJq7f+s7/seeKfpKqU/oGWpk
+         yHIzD0DrI+5AA==
 Received: by pali.im (Postfix)
-        id 6E27613DC; Sun,  8 Aug 2021 18:25:17 +0200 (CEST)
+        id 0316F1430; Sun,  8 Aug 2021 18:25:17 +0200 (CEST)
 From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
@@ -49,9 +49,9 @@ To:     linux-fsdevel@vger.kernel.org,
         Pavel Machek <pavel@ucw.cz>,
         =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>,
         Christoph Hellwig <hch@infradead.org>
-Subject: [RFC PATCH 10/20] befs: Allow to use native UTF-8 mode
-Date:   Sun,  8 Aug 2021 18:24:43 +0200
-Message-Id: <20210808162453.1653-11-pali@kernel.org>
+Subject: [RFC PATCH 09/20] befs: Fix error processing when load_nls() fails
+Date:   Sun,  8 Aug 2021 18:24:42 +0200
+Message-Id: <20210808162453.1653-10-pali@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210808162453.1653-1-pali@kernel.org>
 References: <20210808162453.1653-1-pali@kernel.org>
@@ -62,58 +62,31 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-befs driver already has a code which avoids usage of NLS when befs_sb->nls
-is not set.
-
-But befs_fill_super() always set befs_sb->nls, so activating native UTF-8
-is not possible.
-
-Fix it by not setting befs_sb->nls when iocharset is set to utf8. So now
-after this cgange mount option iocharset=utf8 activates usage of native
-UTF-8 code path in befs driver.
+Ensure that specified charset in iocharset= mount option is used. On error
+correctly propagate error code back to the caller.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/befs/linuxvfs.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ fs/befs/linuxvfs.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/fs/befs/linuxvfs.c b/fs/befs/linuxvfs.c
-index 963da3e9ab5d..000f946b92b6 100644
+index e071157bdaa3..963da3e9ab5d 100644
 --- a/fs/befs/linuxvfs.c
 +++ b/fs/befs/linuxvfs.c
-@@ -770,6 +770,7 @@ static int befs_show_options(struct seq_file *m, struct dentry *root)
- {
- 	struct befs_sb_info *befs_sb = BEFS_SB(root->d_sb);
- 	struct befs_mount_options *opts = &befs_sb->mount_opts;
-+	struct nls_table *nls = befs_sb->nls;
- 
- 	if (!uid_eq(opts->uid, GLOBAL_ROOT_UID))
- 		seq_printf(m, ",uid=%u",
-@@ -777,8 +778,10 @@ static int befs_show_options(struct seq_file *m, struct dentry *root)
- 	if (!gid_eq(opts->gid, GLOBAL_ROOT_GID))
- 		seq_printf(m, ",gid=%u",
- 			   from_kgid_munged(&init_user_ns, opts->gid));
--	if (opts->iocharset)
--		seq_printf(m, ",iocharset=%s", opts->iocharset);
-+	if (nls)
-+		seq_printf(m, ",iocharset=%s", nls->charset);
-+	else
-+		seq_puts(m, ",iocharset=utf8");
- 	if (opts->debug)
- 		seq_puts(m, ",debug");
- 	return 0;
-@@ -908,8 +911,10 @@ befs_fill_super(struct super_block *sb, void *data, int silent)
- 		goto unacquire_priv_sbp;
- 	}
- 
-+	if (strcmp(opt.iocharset ? opt.iocharset : CONFIG_NLS_DEFAULT, "utf8") == 0) {
-+		befs_debug(sb, "Using native UTF-8 without nls");
- 	/* load nls library */
--	if (befs_sb->mount_opts.iocharset) {
-+	} else if (befs_sb->mount_opts.iocharset) {
- 		befs_debug(sb, "Loading nls: %s",
+@@ -914,10 +914,9 @@ befs_fill_super(struct super_block *sb, void *data, int silent)
  			   befs_sb->mount_opts.iocharset);
  		befs_sb->nls = load_nls(befs_sb->mount_opts.iocharset);
+ 		if (!befs_sb->nls) {
+-			befs_warning(sb, "Cannot load nls %s"
+-					" loading default nls",
++			befs_error(sb, "Cannot load nls %s",
+ 					befs_sb->mount_opts.iocharset);
+-			befs_sb->nls = load_nls_default();
++			goto unacquire_priv_sbp;
+ 		}
+ 	/* load default nls if none is specified  in mount options */
+ 	} else {
 -- 
 2.20.1
 
