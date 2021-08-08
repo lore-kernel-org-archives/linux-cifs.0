@@ -4,35 +4,35 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 751FEC432BE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B874EC43216
 	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C90F60F35
+	by mail.kernel.org (Postfix) with ESMTP id 9ED7861055
 	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231872AbhHHQZg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 8 Aug 2021 12:25:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47316 "EHLO mail.kernel.org"
+        id S232243AbhHHQ0J (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 8 Aug 2021 12:26:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47530 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231217AbhHHQZe (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 8 Aug 2021 12:25:34 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8B3C86101D;
-        Sun,  8 Aug 2021 16:25:15 +0000 (UTC)
+        id S231882AbhHHQZg (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 8 Aug 2021 12:25:36 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AC3B6610A1;
+        Sun,  8 Aug 2021 16:25:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628439915;
-        bh=CCbOjF4h8gnTbFB8EC68C16uQ5tIWZrtjoVHn9HD2fg=;
+        s=k20201202; t=1628439917;
+        bh=s8/pegOQ7RYOq+lh3ThWZRo1NRJOC4wAYqGAubgRpOU=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=E+KscZX+ZPE+Jo3MK0DyGd64O/Ih5qoALWraOXZo+AA9RoS76bKzgVt70R1ObShCh
-         lQepZYufzuiHS8LEouK2Tdn0Yvg3Fz1aSdKt9UT+Zsa0bhPknvpNtTJVxxOHpIqD5C
-         DMIGFarRGtRwjA0OoJp+B0RO3z4FbKXMbMa5aAcgFzleGvykrtxgnSGC4yO6Uh6HD0
-         FHeqyUPQYic/NOCimrO1lOkaqWZ/1ux0yitdhjPBZiLaI1u8M30I5Pw+8xWavjPFr3
-         RQCwqcKfYabgkdiv2Wztl+5JsVuajSEsy7ToZbmtwStaKYjvsU1DxFIqSRn69jfRV9
-         /WN0DKRegZiPA==
+        b=jvq5yzqR6RoEecl4y1TjillgIF7I6qPa74Gyb7EtLccaqf3UZZeDSACwA5V9YcoEM
+         +0nDO8hc3r1SW4TEQzWPXRkwesbSyw+Tp6lRiTI9pOMSSoaXB3YY+TEAi5DSvdeJfn
+         oSuaQ+hG8uRvT3ByMfTCH0Dfbyx8RQBKfp9pWCOVYY8Tvi1Gp82FIqIlJsk5jAGFSE
+         kq29jYqwhS+AD9rFH//ptfRxG3SAKEvSWxWq2Br4+Vwo9L6m+a3n+d/HlC5mAsfCET
+         BNC71n1V9DRYoFe0DnjEv2ZqNOoJpCawE4648iyrsqLn4a2m4twkzZpY9jCqLVn7AY
+         2RTQoRtOuv9rg==
 Received: by pali.im (Postfix)
-        id 1D5D915B6; Sun,  8 Aug 2021 18:25:15 +0200 (CEST)
+        id 6E27613DC; Sun,  8 Aug 2021 18:25:17 +0200 (CEST)
 From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
@@ -49,9 +49,9 @@ To:     linux-fsdevel@vger.kernel.org,
         Pavel Machek <pavel@ucw.cz>,
         =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>,
         Christoph Hellwig <hch@infradead.org>
-Subject: [RFC PATCH 05/20] ntfs: Undeprecate iocharset= mount option
-Date:   Sun,  8 Aug 2021 18:24:38 +0200
-Message-Id: <20210808162453.1653-6-pali@kernel.org>
+Subject: [RFC PATCH 10/20] befs: Allow to use native UTF-8 mode
+Date:   Sun,  8 Aug 2021 18:24:43 +0200
+Message-Id: <20210808162453.1653-11-pali@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210808162453.1653-1-pali@kernel.org>
 References: <20210808162453.1653-1-pali@kernel.org>
@@ -62,75 +62,58 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Other fs drivers are using iocharset= mount option for specifying charset.
-So mark iocharset= mount option as preferred and deprecate nls= mount
-option.
+befs driver already has a code which avoids usage of NLS when befs_sb->nls
+is not set.
+
+But befs_fill_super() always set befs_sb->nls, so activating native UTF-8
+is not possible.
+
+Fix it by not setting befs_sb->nls when iocharset is set to utf8. So now
+after this cgange mount option iocharset=utf8 activates usage of native
+UTF-8 code path in befs driver.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/ntfs/inode.c  |  2 +-
- fs/ntfs/super.c  | 13 ++++---------
- fs/ntfs/unistr.c |  3 ++-
- 3 files changed, 7 insertions(+), 11 deletions(-)
+ fs/befs/linuxvfs.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/fs/ntfs/inode.c b/fs/ntfs/inode.c
-index 4474adb393ca..3676f185b4a0 100644
---- a/fs/ntfs/inode.c
-+++ b/fs/ntfs/inode.c
-@@ -2303,7 +2303,7 @@ int ntfs_show_options(struct seq_file *sf, struct dentry *root)
- 		seq_printf(sf, ",fmask=0%o", vol->fmask);
- 		seq_printf(sf, ",dmask=0%o", vol->dmask);
+diff --git a/fs/befs/linuxvfs.c b/fs/befs/linuxvfs.c
+index 963da3e9ab5d..000f946b92b6 100644
+--- a/fs/befs/linuxvfs.c
++++ b/fs/befs/linuxvfs.c
+@@ -770,6 +770,7 @@ static int befs_show_options(struct seq_file *m, struct dentry *root)
+ {
+ 	struct befs_sb_info *befs_sb = BEFS_SB(root->d_sb);
+ 	struct befs_mount_options *opts = &befs_sb->mount_opts;
++	struct nls_table *nls = befs_sb->nls;
+ 
+ 	if (!uid_eq(opts->uid, GLOBAL_ROOT_UID))
+ 		seq_printf(m, ",uid=%u",
+@@ -777,8 +778,10 @@ static int befs_show_options(struct seq_file *m, struct dentry *root)
+ 	if (!gid_eq(opts->gid, GLOBAL_ROOT_GID))
+ 		seq_printf(m, ",gid=%u",
+ 			   from_kgid_munged(&init_user_ns, opts->gid));
+-	if (opts->iocharset)
+-		seq_printf(m, ",iocharset=%s", opts->iocharset);
++	if (nls)
++		seq_printf(m, ",iocharset=%s", nls->charset);
++	else
++		seq_puts(m, ",iocharset=utf8");
+ 	if (opts->debug)
+ 		seq_puts(m, ",debug");
+ 	return 0;
+@@ -908,8 +911,10 @@ befs_fill_super(struct super_block *sb, void *data, int silent)
+ 		goto unacquire_priv_sbp;
  	}
--	seq_printf(sf, ",nls=%s", vol->nls_map->charset);
-+	seq_printf(sf, ",iocharset=%s", vol->nls_map->charset);
- 	if (NVolCaseSensitive(vol))
- 		seq_printf(sf, ",case_sensitive");
- 	if (NVolShowSystemFiles(vol))
-diff --git a/fs/ntfs/super.c b/fs/ntfs/super.c
-index 0d7e948cb29c..02de1aa05b7c 100644
---- a/fs/ntfs/super.c
-+++ b/fs/ntfs/super.c
-@@ -192,11 +192,6 @@ static bool parse_options(ntfs_volume *vol, char *opt)
- 			ntfs_warning(vol->sb, "Ignoring obsolete option %s.",
- 					p);
- 		else if (!strcmp(p, "nls") || !strcmp(p, "iocharset")) {
--			if (!strcmp(p, "iocharset"))
--				ntfs_warning(vol->sb, "Option iocharset is "
--						"deprecated. Please use "
--						"option nls=<charsetname> in "
--						"the future.");
- 			if (!v || !*v)
- 				goto needs_arg;
- use_utf8:
-@@ -218,10 +213,10 @@ static bool parse_options(ntfs_volume *vol, char *opt)
- 		} else if (!strcmp(p, "utf8")) {
- 			bool val = false;
- 			ntfs_warning(vol->sb, "Option utf8 is no longer "
--				   "supported, using option nls=utf8. Please "
--				   "use option nls=utf8 in the future and "
--				   "make sure utf8 is compiled either as a "
--				   "module or into the kernel.");
-+				   "supported, using option iocharset=utf8. "
-+				   "Please use option iocharset=utf8 in the "
-+				   "future and make sure utf8 is compiled "
-+				   "either as a module or into the kernel.");
- 			if (!v || !*v)
- 				val = true;
- 			else if (!simple_getbool(v, &val))
-diff --git a/fs/ntfs/unistr.c b/fs/ntfs/unistr.c
-index a6b6c64f14a9..75a7f73bccdd 100644
---- a/fs/ntfs/unistr.c
-+++ b/fs/ntfs/unistr.c
-@@ -372,7 +372,8 @@ retry:			wc = nls->uni2char(le16_to_cpu(ins[i]), ns + o,
- conversion_err:
- 	ntfs_error(vol->sb, "Unicode name contains characters that cannot be "
- 			"converted to character set %s.  You might want to "
--			"try to use the mount option nls=utf8.", nls->charset);
-+			"try to use the mount option iocharset=utf8.",
-+			nls->charset);
- 	if (ns != *outs)
- 		kfree(ns);
- 	if (wc != -ENAMETOOLONG)
+ 
++	if (strcmp(opt.iocharset ? opt.iocharset : CONFIG_NLS_DEFAULT, "utf8") == 0) {
++		befs_debug(sb, "Using native UTF-8 without nls");
+ 	/* load nls library */
+-	if (befs_sb->mount_opts.iocharset) {
++	} else if (befs_sb->mount_opts.iocharset) {
+ 		befs_debug(sb, "Loading nls: %s",
+ 			   befs_sb->mount_opts.iocharset);
+ 		befs_sb->nls = load_nls(befs_sb->mount_opts.iocharset);
 -- 
 2.20.1
 
