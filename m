@@ -2,196 +2,114 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 594D8C4320E
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 747F4C4320A
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 20:34:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41D5660462
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:26:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5581D60F38
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 20:34:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232253AbhHHQ0K (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 8 Aug 2021 12:26:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47554 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231933AbhHHQZh (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 8 Aug 2021 12:25:37 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4E7826103B;
-        Sun,  8 Aug 2021 16:25:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628439918;
-        bh=Y0Q6rt+tDWZMBi0N4PwxXpAY8aZOyLa7NpaJo/VUL6k=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=Dvu/AnbAZPEBaBQPuIZJm8QvDcGhRBm08stqQ3DK71DNbQpFCFI7FwsrM2Eyo9xZZ
-         j2lP4/wkv2OB6oYYR1OJ3+BfxNwQBt0tw4umUTB4NXXrekUqFgDqVx/vWKZVTExkB/
-         rpUSKnx3NBChV1HNldnKnFY+0YYUPeWwlSJOH+GwQgiRjeFBA+zqDxVZoGjD8O5kh3
-         HUU5nuvDle+bkxTt2ZJRYOkDcD0KQKr6eY5NF7N6vZdZ0gZOFJvNAhrKLlEmrXMqGD
-         oOKj7wYpSMJZ+dqhTq3aNoePBFFfVjZJRPdM35CrNTCq5nNlKkUx7ZOQXciYfgUbQW
-         Xe9HAz3pDKlcw==
-Received: by pali.im (Postfix)
-        id 0FB2B13DC; Sun,  8 Aug 2021 18:25:18 +0200 (CEST)
-From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To:     linux-fsdevel@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.cz>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: [RFC PATCH 11/20] hfs: Explicitly set hsb->nls_disk when hsb->nls_io is set
-Date:   Sun,  8 Aug 2021 18:24:44 +0200
-Message-Id: <20210808162453.1653-12-pali@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210808162453.1653-1-pali@kernel.org>
-References: <20210808162453.1653-1-pali@kernel.org>
+        id S231576AbhHHUe0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 8 Aug 2021 16:34:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58886 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229977AbhHHUeZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 8 Aug 2021 16:34:25 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A14E4C061760
+        for <linux-cifs@vger.kernel.org>; Sun,  8 Aug 2021 13:34:04 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id n6so7334761ljp.9
+        for <linux-cifs@vger.kernel.org>; Sun, 08 Aug 2021 13:34:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=ABwPSDZlngzaPtZ4oTTKY3RQYyDa6eKhnI9WnZtU/9A=;
+        b=K80HLdHGRNvK+x5C2D5UqSJESwk8kTR3hRr5z6qZPhqmhNzz2CS+K7M1dd64SyiXkC
+         4LHA1p5xp1bql3T9GSwJTgC+e6rmOAoYOcZlJDIWIRmt9Jq+R5gHrIzWIafzLupwMly0
+         uXSO6z2CoaS9dayED/ASq4UZCIAZHxiOLDF9cdZHk4Ogf79JpoJk1kyNT807kqtFc3ZI
+         yvU8w1gc58yv66aXEivStqcrdKjf9LrYGFMO3eY231e7FySy8QAtEgcZm7owimvAWdsm
+         TXAKtOBWKWRllhw5xM24GvCtrlASNTMcAoAZaYoNIHw8Xw34dzGFETl59IjPrHdLPlAC
+         Xnsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:content-transfer-encoding;
+        bh=ABwPSDZlngzaPtZ4oTTKY3RQYyDa6eKhnI9WnZtU/9A=;
+        b=B6onSzhc909mE3aHPr0nTh3MlKmGt5vlc5EqkFGS9AW+8zL1O8EBiXhJV2NAKyc75K
+         glqVk+C50w/I3i6jo9+NnJaXls1z9bNquscNXxdaoiuH3YEjpAP9rDWE7jefZNu9VInG
+         s6auebq+NNE3+56OwExnBjC+cclQWgQM+oijdYyZntkJrdjvxsUWYtFepTOLC1LpfiNR
+         QwZPBU7YSJzWkInAEs+82SWVMFR8fC1UaKbAvwnIRXs2xqlh31Q15Gcw3um3bTlbzBjI
+         L8PgDK+uR5dEVhO5cRVYSd9QsM9zVWXfrGQclVhmFIAJnfKuttzCCdo7+5aFJ1DBGQyG
+         ORPQ==
+X-Gm-Message-State: AOAM532BKQcZZsrXkUMsuMlZT7C1xVI6o9LD5hgSjBxIRfNFcFuGZbto
+        /0KKBDUtwYfQZJWatu9E8jAnuM57UKeLL/wwFtanUZWR7Odkmw==
+X-Google-Smtp-Source: ABdhPJwgerpmLM4IdN/YxHxNXohSuQorVEnYW4yCFoCvE3uU+lJBwfygpFPHT7CN4Psla+I8mEOHPaPAQBlihmR6iMU=
+X-Received: by 2002:a2e:a44a:: with SMTP id v10mr13556805ljn.497.1628454843053;
+ Sun, 08 Aug 2021 13:34:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <CAJK_Yh-m-p8r=9WhrHn=V5yMWBpYZCRZeqWyci+NbUEGNPwpYw@mail.gmail.com>
+In-Reply-To: <CAJK_Yh-m-p8r=9WhrHn=V5yMWBpYZCRZeqWyci+NbUEGNPwpYw@mail.gmail.com>
+From:   =?UTF-8?B?U1pJR0VUVsOBUkkgSsOhbm9z?= <jszigetvari@gmail.com>
+Date:   Sun, 8 Aug 2021 22:33:27 +0200
+Message-ID: <CAJK_Yh_tWGoRkCSfSwPBHi2SAPi9cKeyb8L=Lg1Gx=xtEDY29w@mail.gmail.com>
+Subject: Re: rsync copy operation fails on a CIFS mount
+To:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-It does not make any sense to set hsb->nls_io (NLS iocharset used between
-VFS and hfs driver) when hsb->nls_disk (NLS codepage used between hfs
-driver and disk) is not set.
+Dear Members,
 
-Reverse engineering driver code shown what is doing in this special case:
+I work for a company that (among others) sells Ubuntu-based log
+storage appliances. I ran into a problem, where I'm trying to copy a
+large amount of data over to a CIFS mount from a Ubuntu 18.04 based
+appliance to a Windows 2012 R2 Storage Server, and rsync fails after
+1-2-3 hours into the copy operation with something like:
+rsync: failed to set times on "FILENAME.U5EgGX": No such device (19)"
 
-    When codepage was not defined but iocharset was then
-    hfs driver copied 8bit character from disk directly to
-    16bit unicode wchar_t type. Which means it did conversion
-    from Latin1 (ISO-8859-1) to Unicode because first 256
-    Unicode code points matches 8bit ISO-8859-1 codepage table.
-    So when iocharset was specified and codepage not, then
-    codepage used implicit value "iso8859-1".
+and I see a number of kernel logs just prior to that, that look like this:
 
-So when hsb->nls_disk is not set and hsb->nls_io is then explicitly set
-hsb->nls_disk to "iso8859-1".
+kernel: [3819786.441711] CIFS VFS: No task to wake, unknown frame
+received! NumMids 1
+kernel: [3819786.441717] 00000000: 6c000000 424d53fe 00000040 00000000
+ ...l.SMB@.......
+kernel: [3819786.441718] 00000010: 00000012 00000001 00000000 ffffffff
+ ................
+kernel: [3819786.441720] 00000020: ffffffff 00000000 00000000 00000000
+ ................
+kernel: [3819786.441721] 00000030: 00000000 00000000 00000000 00000000
+ ................
+kernel: [3819786.441722] 00000040: 00000000
 
-Such setup is obviously incompatible with Mac OS systems as they do not
-support iso8859-1 encoding for hfs. So print warning into dmesg about this
-fact.
+I also tried to google around for a while, and I found the same exact
+package hexdump on the linux-cifs mailing list from 2012:
+https://www.spinics.net/lists/linux-cifs/msg06634.html
 
-After this change hsb->nls_disk is always set, so remove code paths for
-case when hsb->nls_disk was not set as they are not needed anymore.
+In that thread the person reporting the problem failed to reproduce
+the problem a few weeks after reporting it.
+There it was recommended to try and mount the share with SMB v1, but
+that is out of the question nowdays.
 
-Signed-off-by: Pali Rohár <pali@kernel.org>
----
- fs/hfs/super.c | 31 +++++++++++++++++++++++++++++++
- fs/hfs/trans.c | 38 ++++++++++++++------------------------
- 2 files changed, 45 insertions(+), 24 deletions(-)
+We tried forcing the mount to happen with vers=3D3 and 3.02, but it made
+no difference. The error still re-occurred.
 
-diff --git a/fs/hfs/super.c b/fs/hfs/super.c
-index 12d9bae39363..86bc46746c7f 100644
---- a/fs/hfs/super.c
-+++ b/fs/hfs/super.c
-@@ -351,6 +351,37 @@ static int parse_options(char *options, struct hfs_sb_info *hsb)
- 		}
- 	}
- 
-+	if (hsb->nls_io && !hsb->nls_disk) {
-+		/*
-+		 * Previous version of hfs driver did something unexpected:
-+		 * When codepage was not defined but iocharset was then
-+		 * hfs driver copied 8bit character from disk directly to
-+		 * 16bit unicode wchar_t type. Which means it did conversion
-+		 * from Latin1 (ISO-8859-1) to Unicode because first 256
-+		 * Unicode code points matches 8bit ISO-8859-1 codepage table.
-+		 * So when iocharset was specified and codepage not, then
-+		 * codepage used implicit value "iso8859-1".
-+		 *
-+		 * To not change this previous default behavior as some users
-+		 * may depend on it, we load iso8859-1 NLS table explicitly
-+		 * to simplify code and make it more reable what happens.
-+		 *
-+		 * In context of hfs driver it is really strange to use
-+		 * ISO-8859-1 codepage table for storing data to disk, but
-+		 * nothing forbids it. Just it is highly incompatible with
-+		 * Mac OS systems. So via pr_warn() inform user that this
-+		 * is not probably what he wants.
-+		 */
-+		pr_warn("iocharset was specified but codepage not, "
-+			"using default codepage=iso8859-1\n");
-+		pr_warn("this default codepage=iso8859-1 is incompatible with "
-+			"Mac OS systems and may be changed in the future");
-+		hsb->nls_disk = load_nls("iso8859-1");
-+		if (!hsb->nls_disk) {
-+			pr_err("unable to load iso8859-1 codepage\n");
-+			return 0;
-+		}
-+	}
- 	if (hsb->nls_disk && !hsb->nls_io) {
- 		hsb->nls_io = load_nls_default();
- 		if (!hsb->nls_io) {
-diff --git a/fs/hfs/trans.c b/fs/hfs/trans.c
-index 39f5e343bf4d..c75682c61b06 100644
---- a/fs/hfs/trans.c
-+++ b/fs/hfs/trans.c
-@@ -48,18 +48,13 @@ int hfs_mac2asc(struct super_block *sb, char *out, const struct hfs_name *in)
- 		wchar_t ch;
- 
- 		while (srclen > 0) {
--			if (nls_disk) {
--				size = nls_disk->char2uni(src, srclen, &ch);
--				if (size <= 0) {
--					ch = '?';
--					size = 1;
--				}
--				src += size;
--				srclen -= size;
--			} else {
--				ch = *src++;
--				srclen--;
-+			size = nls_disk->char2uni(src, srclen, &ch);
-+			if (size <= 0) {
-+				ch = '?';
-+				size = 1;
- 			}
-+			src += size;
-+			srclen -= size;
- 			if (ch == '/')
- 				ch = ':';
- 			size = nls_io->uni2char(ch, dst, dstlen);
-@@ -119,20 +114,15 @@ void hfs_asc2mac(struct super_block *sb, struct hfs_name *out, const struct qstr
- 			srclen -= size;
- 			if (ch == ':')
- 				ch = '/';
--			if (nls_disk) {
--				size = nls_disk->uni2char(ch, dst, dstlen);
--				if (size < 0) {
--					if (size == -ENAMETOOLONG)
--						goto out;
--					*dst = '?';
--					size = 1;
--				}
--				dst += size;
--				dstlen -= size;
--			} else {
--				*dst++ = ch > 0xff ? '?' : ch;
--				dstlen--;
-+			size = nls_disk->uni2char(ch, dst, dstlen);
-+			if (size < 0) {
-+				if (size == -ENAMETOOLONG)
-+					goto out;
-+				*dst = '?';
-+				size = 1;
- 			}
-+			dst += size;
-+			dstlen -= size;
- 		}
- 	} else {
- 		char ch;
--- 
-2.20.1
+Best Regards,
+J=C3=A1nos Szigetv=C3=A1ri
+--
+Janos SZIGETVARI
+RHCE, License no. 150-053-692
 
+LinkedIn: linkedin.com/in/janosszigetvari
+
+__@__=CB=9AV=CB=9A
+Make the switch to open (source) applications, protocols, formats now:
+- windows -> Linux, iexplore -> Firefox, msoffice -> LibreOffice
+- msn -> jabber protocol (Pidgin, Google Talk)
+- mp3 -> ogg, wmv -> ogg, jpg -> png, doc/xls/ppt -> odt/ods/odp
