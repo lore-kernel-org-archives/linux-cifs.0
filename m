@@ -2,139 +2,91 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D0A0C4320A
-	for <linux-cifs@archiver.kernel.org>; Fri,  6 Aug 2021 15:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A51F9C4338F
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 06:13:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6A2660F38
-	for <linux-cifs@archiver.kernel.org>; Fri,  6 Aug 2021 15:05:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7401860FD8
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 06:13:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243431AbhHFPF0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 6 Aug 2021 11:05:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22069 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243269AbhHFPFZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 6 Aug 2021 11:05:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628262309;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=5B073nk1DS+XhzOJ9EAEUKaNTVzIvIbT8CxRSjSpPZU=;
-        b=It1i4sBC2tDEdS3VSitwO9H+W7pPc9SovMPPBB5Y2UvS53Zw6eWK05FfUteg12QrSubZYW
-        vzvpTt3WnbUXjYHyVG9wAAr1SginuHFf2MfBi8sI7zBLi52YuU5NhW/DUsivea9wjQWmg/
-        FN0TXXKnrcOKMpW9gsGUk0sgrnrkXp4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-ky3v8YG6NV-FlJD_H1kZwQ-1; Fri, 06 Aug 2021 11:05:08 -0400
-X-MC-Unique: ky3v8YG6NV-FlJD_H1kZwQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72BB9107ACF5;
-        Fri,  6 Aug 2021 15:05:05 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.22.32.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CBEEA10640E8;
-        Fri,  6 Aug 2021 15:04:54 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <YQ1Ei9lv9ov2AheS@casper.infradead.org>
-References: <YQ1Ei9lv9ov2AheS@casper.infradead.org> <YQxh/G0xGl3GtC8y@casper.infradead.org> <YQv+iwmhhZJ+/ndc@casper.infradead.org> <YQvpDP/tdkG4MMGs@casper.infradead.org> <YQvbiCubotHz6cN7@casper.infradead.org> <1017390.1628158757@warthog.procyon.org.uk> <1170464.1628168823@warthog.procyon.org.uk> <1186271.1628174281@warthog.procyon.org.uk> <1219713.1628181333@warthog.procyon.org.uk> <CAHk-=wjyEk9EuYgE3nBnRCRd_AmRYVOGACEjt0X33QnORd5-ig@mail.gmail.com> <1302671.1628257357@warthog.procyon.org.uk>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Jeff Layton <jlayton@redhat.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, devel@lists.orangefs.org,
-        Linux-MM <linux-mm@kvack.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: Canvassing for network filesystem write size vs page size
+        id S229597AbhHHGNm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 8 Aug 2021 02:13:42 -0400
+Received: from smtp3-g21.free.fr ([212.27.42.3]:28221 "EHLO smtp3-g21.free.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229473AbhHHGNl (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 8 Aug 2021 02:13:41 -0400
+Received: from [IPv6:fde6:7a:7d20:612::1095] (unknown [IPv6:2a00:1678:1337:7a21:1467:3dd8:95d9:eced])
+        (Authenticated sender: landrlatz@free.fr)
+        by smtp3-g21.free.fr (Postfix) with ESMTPA id 1483D13F7F0
+        for <linux-cifs@vger.kernel.org>; Sun,  8 Aug 2021 08:13:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=free.fr;
+        s=smtp-20201208; t=1628403202;
+        bh=KUO1xKKS0/hkIMzyWW+YFd9NMQgqgseitpJf01X2yCQ=;
+        h=To:From:Subject:Date:From;
+        b=NaSFx9Lcw8zEoWRCMBlvRnNUEauswvJYXkpply+FCv5fnbX7jKjF09ooLzXh8zenP
+         rzzvRsADYZpxpeNmPjr38CYXIPhAIzLrXwS0XsEhvr07OTlrFVdc6W7hREKQDd8ZwG
+         Kc0bWAcqfJcYEDB4igScFiSy/fOeELqqPOtRsGLtu7Kh/d+niEkXw8hqp4FuZpcA9l
+         jXCmPissjntjZaflzJkGxL2jD9ut+kpd1y5AG8tSiaREArJvHnuuawN0Tvpve0Yq3T
+         nrgbTRwTiJVcGeMbqxdYQUmYYj1hmYGVIptVN3+X92Gvo4Q3+Mwl6gpDBSLQHmOv3/
+         Y6CqabyM3qYpw==
+To:     linux-cifs@vger.kernel.org
+From:   Gene Poole <landrlatz@free.fr>
+Subject: CIFS share becomes inaccessible but can be reached by smbclient
+Message-ID: <b625b223-16d9-10ad-a9ea-3289ee4c478f@free.fr>
+Date:   Sun, 8 Aug 2021 08:13:56 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:68.0) Gecko/20100101
+ Firefox/68.0 Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1306893.1628262293.1@warthog.procyon.org.uk>
-Date:   Fri, 06 Aug 2021 16:04:53 +0100
-Message-ID: <1306894.1628262293@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
+Hello. I need to state right away that I am not an IT person and only 
+began learning Linux so I could create a small home music-and-backup server.
 
-> No, that is very much not the same thing.  Look at what NFS does, like
-> Linus said.  Consider this test program:
-> 
-> 	fd = open();
-> 	lseek(fd, 5, SEEK_SET);
-> 	write(fd, buf, 3);
-> 	write(fd, buf2, 10);
-> 	write(fd, buf3, 2);
-> 	close(fd);
+The little server in question is a Wandboard running Arch Linux ARM. It 
+comprises two HDDS which mirror each other. it serves a Windows PC and a 
+Logitech Squeezebox music appliance. It has no HIDs and I administrate 
+it from the Windows (Ultimate 7) PC using PuTTY.
 
-Yes, I get that.  I can do that when there isn't a local cache or content
-encryption.
+The shares on the Wandboard have no problem being read from and written 
+to by the Windows PC and the Squeezebox. But shares on the Windows PC 
+mounted on the Wandbord at boot become inaccessible after a certain 
+period of time (sometimes as short as 20 minutes). An ls command to list 
+the mount directory of the share shows "Host is down. " Chmod shows the 
+mount directory (/mnt/Work)  with ??? ??? ??. An attempt to remount 
+after unmounting shows "No such file or directory." Network traces show 
+no SMB2 calls being mde to the Windows PC.
 
-Note that, currently, if the pages (or cache blocks) being read/modified are
-beyond the EOF at the point when the file is opened, truncated down or last
-subject to 3rd-party invalidation, I don't go to the server at all.
+Setting up the Windows share to automount with systemd and auto-unmount 
+after 1 minute without activity has helped in that the share remains 
+accessible (so far for up to 12 hours and counting). *But if* I cd into 
+the actual mount directory (which seems to cause the auto-unmount to 
+stop functioning), the same symptoms appear. There is only one slight 
+difference: Instead of "Host is down" the error is "cannot access 
+'/mnt/Work': No such device."
 
-> > But that kind of screws with local caching.  The local cache might need to
-> > track the missing bits, and we are likely to be using blocks larger than a
-> > page.
-> 
-> There's nothing to cache.  Pages which are !Uptodate aren't going to get
-> locally cached.
+I have been to several different forums (including Arch Linux Questions 
+and Server Fault, etc.) with this question and no one has been able to 
+or found the time to help. I can't find a specific cifs forum. I am in 
+the process of reading the LinuxCIFS utils documentation, but it is slow 
+going for me. I would appreciate any tips anyone can give and/or the 
+name of an appropriate forum or mailing list. I can supply any 
+information, but may need help with gathering it.
 
-Eh?  Of course there is.  You've just written some data.  That need to get
-copied to the cache as well as the server if that file is supposed to be being
-cached (for filesystems that support local caching of files open for writing,
-which AFS does).
+Thanks for reading.
 
-> > Basically, there are a lot of scenarios where not having fully populated
-> > pages sucks.  And for streaming writes, wouldn't it be better if you used
-> > DIO writes?
-> 
-> DIO can't do sub-512-byte writes.
-
-Yes it can - and it works for my AFS client at least with the patches in my
-fscache-iter-2 branch.  This is mainly a restriction for block storage devices
-we're doing DMA to - but we're not doing direct DMA to block storage devices
-typically when talking to a network filesystem.
-
-For AFS, at least, I can just make one big FetchData/StoreData RPC that
-reads/writes the entire DIO request in a single op; for other filesystems
-(NFS, ceph for example), it needs breaking up into a sequence of RPCs, but
-there's no particular reason that I know of that requires it to be 512-byte
-aligned on any of these.
-
-Things get more interesting if you're doing DIO to a content-encrypted file
-because the block size may be 4096 or even a lot larger - in which case we
-would have to do local RMW to handle misaligned writes, but it presents no
-particular difficulty.
-
-> You might not be trying to do anything for block filesystems, but we
-> should think about what makes sense for block filesystems as well as
-> network filesystems.
-
-Whilst that's a good principle, they have very different characteristics that
-might make that difficult.
-
-David
+      - Arch Linux ARM version 5.7.2-1-ARCH
+        - samba v 4.12.3
+        - cifs-utils v 2.26
+        - mount.cifs v 6.10
+      - host: Windows 7 Ultimate with SMB1 disabled and SMB2 enabled, 
+all permissions and policies verfied
 
