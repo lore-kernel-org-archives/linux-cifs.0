@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D62C4338F
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39745C4320E
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D65C6108E
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20F796108E
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232114AbhHHQZk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 8 Aug 2021 12:25:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47362 "EHLO mail.kernel.org"
+        id S231217AbhHHQZm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 8 Aug 2021 12:25:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47462 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232036AbhHHQZj (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 8 Aug 2021 12:25:39 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 04B2E61057;
+        id S230049AbhHHQZk (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 8 Aug 2021 12:25:40 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F41CA61158;
         Sun,  8 Aug 2021 16:25:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628439920;
-        bh=yqPsetOw4W6bNgWR24S/rgdafRjACRvNO9i2APLG5Ro=;
+        s=k20201202; t=1628439921;
+        bh=egOVkUn690xt7FZbOqT8MsamXeKICn7MJFEojXwgYng=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=BtwW5Zl6wIxOKHFKlHcsPRe+j0YTnRSwYl6E6kuEnVHwY4CBX48L8O0rugI7wyCYC
-         UnlD/kWdvO4XtPIXqTb9wFag7zVQd+J2uBqrUWWzyXYo7l34TOngROP6s7SQhK15CC
-         ky5BgKIX53TpuEKZmKIFlZ9O8/DntW5KQ//t2T6jHyh2ljsaRO9T+KnRJbQ8f0R3TE
-         UHq3mHTu4YXURWwRjPI43ewlLrf73Cra+K38i6EMoOMJsyUr8tat/P1CqLlFLgi3Go
-         XZf3P9HXbdpA910MyUK3rx5xNerwfViTPsPc+th1TeeFWtsn74GqakoahK2cdtspTH
-         7JxuJHSVoY2YA==
+        b=VfOqSRuFvLe4mUUL47GjIPLuSciYWeBfWxTj8QxGd/gywNzUF/V/VSDO1OyBQr2KI
+         pb+/lcc+l8h1rOWyRpZkTobnDfwXGl/H7pUks8skBwnjgJ8dMZQLIP9YOvb3BKH3Wy
+         V1R+kOj4CCwoCPPwLaaCpJxU4fOXP4FYxCVXWqkaOHv0JNJsuzxurHCQKqPhY0n1z1
+         4vZJUKQ9G5I1Ky5nA1PqgI7ZFqOMpZdsfyxxz0S30hvQAWk9476TrXbiEKOAo6kLM3
+         SIF8Py6NINVOJfprskSbi/cpeMQk6ukYVbWgPcDIPnVFRXEz7veuskQX6vEW+BSd/N
+         2QRocWokUB1bQ==
 Received: by pali.im (Postfix)
-        id B983D1430; Sun,  8 Aug 2021 18:25:19 +0200 (CEST)
+        id B20291430; Sun,  8 Aug 2021 18:25:20 +0200 (CEST)
 From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
@@ -49,9 +49,9 @@ To:     linux-fsdevel@vger.kernel.org,
         Pavel Machek <pavel@ucw.cz>,
         =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>,
         Christoph Hellwig <hch@infradead.org>
-Subject: [RFC PATCH 14/20] jfs: Remove custom iso8859-1 implementation
-Date:   Sun,  8 Aug 2021 18:24:47 +0200
-Message-Id: <20210808162453.1653-15-pali@kernel.org>
+Subject: [RFC PATCH 16/20] jfs: Do not use broken utf8 NLS table for iocharset=utf8 mount option
+Date:   Sun,  8 Aug 2021 18:24:49 +0200
+Message-Id: <20210808162453.1653-17-pali@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210808162453.1653-1-pali@kernel.org>
 References: <20210808162453.1653-1-pali@kernel.org>
@@ -62,130 +62,113 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When iocharset= mount option is not specified or when is set to
-iocharset=none then jfs driver uses its own custom iso8895-1 encoding
-implementation.
+NLS table for utf8 is broken and cannot be fixed.
 
-NLS already provides iso8895-1 module, so use it instead of custom jfs
-iso8859-1 implementation.
+So instead of broken utf8 nls functions char2uni() and uni2char() use
+functions utf8s_to_utf16s() and utf16s_to_utf8s() which implements correct
+conversion between UTF-16 and UTF-8.
+
+These functions implements also correct processing of UTF-16 surrogate
+pairs and therefore after this change jfs driver would be able to correctly
+handle also file names with 4-byte UTF-8 sequences.
+
+When iochatset=utf8 is used then set sbi->nls_tab to NULL and use it for
+distinguish between the fact if NLS table or native UTF-8 functions should
+be used.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/jfs/jfs_unicode.c | 14 +-------------
- fs/jfs/super.c       | 29 +++++++++++++++++++----------
- 2 files changed, 20 insertions(+), 23 deletions(-)
+ fs/jfs/jfs_unicode.c | 17 +++++++++++++++--
+ fs/jfs/super.c       | 24 +++++++++++++++---------
+ 2 files changed, 30 insertions(+), 11 deletions(-)
 
 diff --git a/fs/jfs/jfs_unicode.c b/fs/jfs/jfs_unicode.c
-index 0c1e9027245a..1d0f65d13b58 100644
+index 2db923872bf1..4c39b6b65bca 100644
 --- a/fs/jfs/jfs_unicode.c
 +++ b/fs/jfs/jfs_unicode.c
-@@ -33,13 +33,8 @@ int jfs_strfromUCS_le(char *to, const __le16 * from,
- 					       NLS_MAX_CHARSET_SIZE);
- 			if (charlen > 0)
- 				outlen += charlen;
--			else
-+			else {
- 				to[outlen++] = '?';
--		}
--	} else {
--		for (i = 0; (i < len) && from[i]; i++) {
--			if (unlikely(le16_to_cpu(from[i]) & 0xff00)) {
--				to[i] = '?';
- 				if (unlikely(warn)) {
- 					warn--;
- 					warn_again--;
-@@ -49,12 +44,8 @@ int jfs_strfromUCS_le(char *to, const __le16 * from,
- 					printk(KERN_ERR
- 				"mount with iocharset=utf8 to access\n");
+@@ -46,6 +46,9 @@ int jfs_strfromUCS_le(char *to, int maxlen, const __le16 * from,
  				}
--
  			}
--			else
--				to[i] = (char) (le16_to_cpu(from[i]));
  		}
--		outlen = i;
++	} else {
++		outlen = utf16s_to_utf8s(from, len,
++					 UTF16_LITTLE_ENDIAN, to, maxlen-1);
  	}
  	to[outlen] = 0;
  	return outlen;
-@@ -84,9 +75,6 @@ static int jfs_strtoUCS(wchar_t * to, const unsigned char *from, int len,
+@@ -61,6 +64,7 @@ static int jfs_strtoUCS(wchar_t * to, const unsigned char *from, int len,
+ 		struct nls_table *codepage)
+ {
+ 	int charlen;
++	int outlen;
+ 	int i;
+ 
+ 	if (codepage) {
+@@ -75,10 +79,19 @@ static int jfs_strtoUCS(wchar_t * to, const unsigned char *from, int len,
  				return charlen;
  			}
  		}
--	} else {
--		for (i = 0; (i < len) && from[i]; i++)
--			to[i] = (wchar_t) from[i];
++		outlen = i;
++	} else {
++		outlen = utf8s_to_utf16s(from, len, UTF16_LITTLE_ENDIAN,
++					 to, len);
++		if (outlen < 1) {
++			jfs_err("jfs_strtoUCS: utf8s_to_utf16s returned %d.",
++				outlen);
++			return outlen;
++		}
  	}
  
- 	to[i] = 0;
+-	to[i] = 0;
+-	return i;
++	to[outlen] = 0;
++	return outlen;
+ }
+ 
+ /*
 diff --git a/fs/jfs/super.c b/fs/jfs/super.c
-index 9030aeaf0f88..8ba2ac032292 100644
+index 8ba2ac032292..f449fdd56654 100644
 --- a/fs/jfs/super.c
 +++ b/fs/jfs/super.c
-@@ -231,7 +231,7 @@ static const match_table_t tokens = {
- };
- 
- static int parse_options(char *options, struct super_block *sb, s64 *newLVSize,
--			 int *flag)
-+			 int *flag, int remount)
- {
- 	void *nls_map = (void *)-1;	/* -1: no change;  NULL: none */
- 	char *p;
-@@ -263,14 +263,14 @@ static int parse_options(char *options, struct super_block *sb, s64 *newLVSize,
+@@ -261,16 +261,20 @@ static int parse_options(char *options, struct super_block *sb, s64 *newLVSize,
+ 			/* Don't do anything ;-) */
+ 			break;
  		case Opt_iocharset:
- 			if (nls_map && nls_map != (void *) -1)
+-			if (nls_map && nls_map != (void *) -1)
++			if (nls_map && nls_map != (void *) -1) {
  				unload_nls(nls_map);
--			if (!strcmp(args[0].from, "none"))
--				nls_map = NULL;
--			else {
-+			/* compatibility alias none means ISO-8859-1 */
-+			if (strcmp(args[0].from, "none") == 0)
-+				nls_map = load_nls("iso8859-1");
-+			else
- 				nls_map = load_nls(args[0].from);
--				if (!nls_map) {
--					pr_err("JFS: charset not found\n");
--					goto cleanup;
--				}
-+			if (!nls_map) {
-+				pr_err("JFS: charset not found\n");
-+				goto cleanup;
+-			/* compatibility alias none means ISO-8859-1 */
+-			if (strcmp(args[0].from, "none") == 0)
+-				nls_map = load_nls("iso8859-1");
+-			else
+-				nls_map = load_nls(args[0].from);
+-			if (!nls_map) {
+-				pr_err("JFS: charset not found\n");
+-				goto cleanup;
++				nls_map = NULL;
++			}
++			if (strcmp(args[0].from, "utf8") != 0) {
++				/* compatibility alias none means ISO-8859-1 */
++				if (strcmp(args[0].from, "none") == 0)
++					nls_map = load_nls("iso8859-1");
++				else
++					nls_map = load_nls(args[0].from);
++				if (!nls_map) {
++					pr_err("JFS: charset not found\n");
++					goto cleanup;
++				}
  			}
  			break;
  		case Opt_resize:
-@@ -414,6 +414,15 @@ static int parse_options(char *options, struct super_block *sb, s64 *newLVSize,
- 		}
- 	}
- 
-+	if (!remount && nls_map == (void *) -1) {
-+		/* Previously default NLS table was ISO-8859-1 */
-+		nls_map = load_nls("iso8859-1");
-+		if (!nls_map) {
-+			pr_err("JFS: iso8859-1 charset not found\n");
-+			goto cleanup;
-+		}
-+	}
-+
- 	if (nls_map != (void *) -1) {
- 		/* Discard old (if remount) */
- 		unload_nls(sbi->nls_tab);
-@@ -435,7 +444,7 @@ static int jfs_remount(struct super_block *sb, int *flags, char *data)
- 	int ret;
- 
- 	sync_filesystem(sb);
--	if (!parse_options(data, sb, &newLVSize, &flag))
-+	if (!parse_options(data, sb, &newLVSize, &flag, 1))
- 		return -EINVAL;
- 
- 	if (newLVSize) {
-@@ -513,7 +522,7 @@ static int jfs_fill_super(struct super_block *sb, void *data, int silent)
- 	/* initialize the mount flag and determine the default error handler */
- 	flag = JFS_ERR_REMOUNT_RO;
- 
--	if (!parse_options((char *) data, sb, &newLVSize, &flag))
-+	if (!parse_options((char *) data, sb, &newLVSize, &flag, 0))
- 		goto out_kfree;
- 	sbi->flag = flag;
- 
+@@ -718,6 +722,8 @@ static int jfs_show_options(struct seq_file *seq, struct dentry *root)
+ 		seq_printf(seq, ",discard=%u", sbi->minblks_trim);
+ 	if (sbi->nls_tab)
+ 		seq_printf(seq, ",iocharset=%s", sbi->nls_tab->charset);
++	else
++		seq_puts(seq, ",iocharset=utf8");
+ 	if (sbi->flag & JFS_ERR_CONTINUE)
+ 		seq_printf(seq, ",errors=continue");
+ 	if (sbi->flag & JFS_ERR_PANIC)
 -- 
 2.20.1
 
