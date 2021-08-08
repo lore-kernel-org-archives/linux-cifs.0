@@ -2,37 +2,37 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C35C4338F
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9023BC4320E
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89F7C61078
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7273D61075
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231494AbhHHQZe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 8 Aug 2021 12:25:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47258 "EHLO mail.kernel.org"
+        id S231828AbhHHQZg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 8 Aug 2021 12:25:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47282 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231398AbhHHQZe (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        id S230049AbhHHQZe (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
         Sun, 8 Aug 2021 12:25:34 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DCC4E60F92;
-        Sun,  8 Aug 2021 16:25:14 +0000 (UTC)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5A3DC61019;
+        Sun,  8 Aug 2021 16:25:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1628439915;
-        bh=Ohc/3heuGxLg0kv3NvHFDAfCusqeQ5RY2plc5dtqdq8=;
-        h=From:To:Subject:Date:From;
-        b=V5RCkUgAyQb6xImM0cY+ybB7FN3DiId8+ohpzyIXCEEfeCYrqQn8hQSslrzTF992u
-         TFOFnDIF3jgzPACAo8vwqW4yK+3X/jQ3p1T/kvV1JGW4SCH1UB3BRojP1vxUfCvdQH
-         NtsuTK4hEF5BxKfRYPwLZ86ncby4i5qz1bALQajKRRUh1N4Tu8lUDdZLrg8pWnLqp7
-         E1XdIyl1CWlMENfcuLmedfbTMjOZg62oY5c4t9Ykd7sUOTspJKM5LaVTW53CtJEBCO
-         PKvNxS7W63zN90tWf2HRXuOz/6gAhXS0kW7/Mlg0mB/IQnMyX0MTBcrvZCX2SA0MAy
-         uuW28QvKI2mYQ==
+        bh=SvKOqyPaGSzoaIcYwQ0yRxDdigaErxC/HKUfKX6Zrtc=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=hOZn2eQCBH07F4do1hg8Lbo8/EGitk9c3nGslXaoXHoJxnwmVTzTopeoh/i5A+dRz
+         +hQyiLFU/vjmhXfbIJewjGg1jkhXeGsEnpxngLTaIgA59xilyJ2ZFZye8CkUDUtfOV
+         3WRkf9aeq56MTG9sEJInu+TH1/yNQcfq32ljdAb0Y69r8mgh12oytPhYvL7poh9Cd6
+         o6xss5RH6D72UXPJugRdVHUOczcg8p3OVR2VzGag1zeGHAsfFd46hap86mxOCoAiBG
+         nWf2ZYxdARW30jDLeuJ/JON5j5ccLn85rtPTgzuUrjPA7YinjA1o3XKOlPrpewC1Y/
+         AGayuPIIx4VMA==
 Received: by pali.im (Postfix)
-        id 6166413DC; Sun,  8 Aug 2021 18:25:12 +0200 (CEST)
+        id 730F21545; Sun,  8 Aug 2021 18:25:13 +0200 (CEST)
 From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
@@ -49,10 +49,12 @@ To:     linux-fsdevel@vger.kernel.org,
         Pavel Machek <pavel@ucw.cz>,
         =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>,
         Christoph Hellwig <hch@infradead.org>
-Subject: [RFC PATCH 00/20] fs: Remove usage of broken nls_utf8 and drop it
-Date:   Sun,  8 Aug 2021 18:24:33 +0200
-Message-Id: <20210808162453.1653-1-pali@kernel.org>
+Subject: [RFC PATCH 02/20] hfsplus: Add iocharset= mount option as alias for nls=
+Date:   Sun,  8 Aug 2021 18:24:35 +0200
+Message-Id: <20210808162453.1653-3-pali@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210808162453.1653-1-pali@kernel.org>
+References: <20210808162453.1653-1-pali@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -60,98 +62,53 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Module nls_utf8 is broken in several ways. It does not support (full)
-UTF-8, despite its name. It cannot handle 4-byte UTF-8 sequences and
-tolower/toupper table is not implemented at all. Which means that it is
-not suitable for usage in case-insensitive filesystems or UTF-16
-filesystems (because of e.g. missing UTF-16 surrogate pairs processing).
+Other fs drivers are using iocharset= mount option for specifying charset.
+So add it also for hfsplus and mark old nls= mount option as deprecated.
 
-This is RFC patch series which unify and fix iocharset=utf8 mount
-option in all fs drivers and converts all remaining fs drivers to use
-utf8s_to_utf16s(), utf16s_to_utf8s(), utf8_to_utf32(), utf32_to_utf8
-functions for implementing UTF-8 support instead of nls_utf8.
+Signed-off-by: Pali Rohár <pali@kernel.org>
+---
+ fs/hfsplus/options.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-So at the end it allows to completely drop this broken nls_utf8 module.
-
-For more details look at email thread where was discussed fs unification:
-https://lore.kernel.org/linux-fsdevel/20200102211855.gg62r7jshp742d6i@pali/t/#u
-
-This patch series is mostly untested and presented as RFC. Please let me
-know what do you think about it and if is the correct way how to fix
-broken UTF-8 support in fs drivers. As explained in above email thread I
-think it does not make sense to try fixing whole NLS framework and it is
-easier to just drop this nls_utf8 module.
-
-Note: this patch series does not address UTF-8 fat case-sensitivity issue:
-https://lore.kernel.org/linux-fsdevel/20200119221455.bac7dc55g56q2l4r@pali/
-
-Pali Rohár (20):
-  fat: Fix iocharset=utf8 mount option
-  hfsplus: Add iocharset= mount option as alias for nls=
-  udf: Fix iocharset=utf8 mount option
-  isofs: joliet: Fix iocharset=utf8 mount option
-  ntfs: Undeprecate iocharset= mount option
-  ntfs: Fix error processing when load_nls() fails
-  befs: Fix printing iocharset= mount option
-  befs: Rename enum value Opt_charset to Opt_iocharset to match mount
-    option
-  befs: Fix error processing when load_nls() fails
-  befs: Allow to use native UTF-8 mode
-  hfs: Explicitly set hsb->nls_disk when hsb->nls_io is set
-  hfs: Do not use broken utf8 NLS table for iocharset=utf8 mount option
-  hfsplus: Do not use broken utf8 NLS table for iocharset=utf8 mount
-    option
-  jfs: Remove custom iso8859-1 implementation
-  jfs: Fix buffer overflow in jfs_strfromUCS_le() function
-  jfs: Do not use broken utf8 NLS table for iocharset=utf8 mount option
-  ntfs: Do not use broken utf8 NLS table for iocharset=utf8 mount option
-  cifs: Do not use broken utf8 NLS table for iocharset=utf8 mount option
-  cifs: Remove usage of load_nls_default() calls
-  nls: Drop broken nls_utf8 module
-
- fs/befs/linuxvfs.c          |  22 ++++---
- fs/cifs/cifs_unicode.c      | 128 +++++++++++++++++++++++-------------
- fs/cifs/cifs_unicode.h      |   2 +-
- fs/cifs/cifsfs.c            |   2 +
- fs/cifs/cifssmb.c           |   8 +--
- fs/cifs/connect.c           |   8 ++-
- fs/cifs/dfs_cache.c         |  24 +++----
- fs/cifs/dir.c               |  28 ++++++--
- fs/cifs/smb2pdu.c           |  17 ++---
- fs/cifs/winucase.c          |  14 ++--
- fs/fat/Kconfig              |  15 -----
- fs/fat/dir.c                |  17 ++---
- fs/fat/fat.h                |  22 +++++++
- fs/fat/inode.c              |  28 ++++----
- fs/fat/namei_vfat.c         |  26 ++++++--
- fs/hfs/super.c              |  62 ++++++++++++++---
- fs/hfs/trans.c              |  62 +++++++++--------
- fs/hfsplus/dir.c            |   6 +-
- fs/hfsplus/options.c        |  39 ++++++-----
- fs/hfsplus/super.c          |   7 +-
- fs/hfsplus/unicode.c        |  31 ++++++++-
- fs/hfsplus/xattr.c          |  14 ++--
- fs/hfsplus/xattr_security.c |   3 +-
- fs/isofs/inode.c            |  27 ++++----
- fs/isofs/isofs.h            |   1 -
- fs/isofs/joliet.c           |   4 +-
- fs/jfs/jfs_dtree.c          |  13 +++-
- fs/jfs/jfs_unicode.c        |  35 +++++-----
- fs/jfs/jfs_unicode.h        |   2 +-
- fs/jfs/super.c              |  29 ++++++--
- fs/nls/Kconfig              |   9 ---
- fs/nls/Makefile             |   1 -
- fs/nls/nls_utf8.c           |  67 -------------------
- fs/ntfs/dir.c               |   6 +-
- fs/ntfs/inode.c             |   5 +-
- fs/ntfs/super.c             |  60 ++++++++---------
- fs/ntfs/unistr.c            |  28 +++++++-
- fs/udf/super.c              |  50 ++++++--------
- fs/udf/udf_sb.h             |   2 -
- fs/udf/unicode.c            |   4 +-
- 40 files changed, 510 insertions(+), 418 deletions(-)
- delete mode 100644 fs/nls/nls_utf8.c
-
+diff --git a/fs/hfsplus/options.c b/fs/hfsplus/options.c
+index 047e05c57560..a975548f6b91 100644
+--- a/fs/hfsplus/options.c
++++ b/fs/hfsplus/options.c
+@@ -23,6 +23,7 @@ enum {
+ 	opt_creator, opt_type,
+ 	opt_umask, opt_uid, opt_gid,
+ 	opt_part, opt_session, opt_nls,
++	opt_iocharset,
+ 	opt_nodecompose, opt_decompose,
+ 	opt_barrier, opt_nobarrier,
+ 	opt_force, opt_err
+@@ -37,6 +38,7 @@ static const match_table_t tokens = {
+ 	{ opt_part, "part=%u" },
+ 	{ opt_session, "session=%u" },
+ 	{ opt_nls, "nls=%s" },
++	{ opt_iocharset, "iocharset=%s" },
+ 	{ opt_decompose, "decompose" },
+ 	{ opt_nodecompose, "nodecompose" },
+ 	{ opt_barrier, "barrier" },
+@@ -166,6 +168,9 @@ int hfsplus_parse_options(char *input, struct hfsplus_sb_info *sbi)
+ 			}
+ 			break;
+ 		case opt_nls:
++			pr_warn("option nls= is deprecated, use iocharset=\n");
++			/* fallthrough */
++		case opt_iocharset:
+ 			if (sbi->nls) {
+ 				pr_err("unable to change nls mapping\n");
+ 				return 0;
+@@ -230,7 +235,7 @@ int hfsplus_show_options(struct seq_file *seq, struct dentry *root)
+ 	if (sbi->session >= 0)
+ 		seq_printf(seq, ",session=%u", sbi->session);
+ 	if (sbi->nls)
+-		seq_printf(seq, ",nls=%s", sbi->nls->charset);
++		seq_printf(seq, ",iocharset=%s", sbi->nls->charset);
+ 	if (test_bit(HFSPLUS_SB_NODECOMPOSE, &sbi->flags))
+ 		seq_puts(seq, ",nodecompose");
+ 	if (test_bit(HFSPLUS_SB_NOBARRIER, &sbi->flags))
 -- 
 2.20.1
 
