@@ -4,35 +4,35 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46577C4320E
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F9BC432BE
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 213216115C
-	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71C7C60F35
+	for <linux-cifs@archiver.kernel.org>; Sun,  8 Aug 2021 16:25:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232336AbhHHQZx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 8 Aug 2021 12:25:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47508 "EHLO mail.kernel.org"
+        id S232394AbhHHQ0A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 8 Aug 2021 12:26:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47642 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232109AbhHHQZk (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 8 Aug 2021 12:25:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7CCC061159;
-        Sun,  8 Aug 2021 16:25:21 +0000 (UTC)
+        id S231967AbhHHQZi (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 8 Aug 2021 12:25:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6F85D61028;
+        Sun,  8 Aug 2021 16:25:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628439921;
-        bh=z/FhqL9hG3wsAsCw14eqfq6cdKCY6sXwbLTyVeyWntw=;
+        s=k20201202; t=1628439919;
+        bh=Xjiv1V1kbObBq09/duKu+NNtCwH+mfEyS1BKpAACXoo=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=eGaZ5eaTBGadLSABdqluDPMNhsqP/wYRtcVcsjA5pSDpnP9/4mP259wjzz/CPWuqr
-         bri5qcFT3o6QCGpF1b1c4cq9uYgsm8tooRc9TRbbtp5g3gyjo9SyTfVwbSzL+MCaSK
-         TBVbCixDf70sxwy4hRbJCd3CKGwzY8Dux+JxLv1E0QiCgqHXOH95md7XqSbJlVEObI
-         PojIcURWFuuMzoZqi7g04Hd6mZyyiLTKAEO9KNJ4YOlxZkwbPH2c14VZj1DAryDntR
-         rPyv6tIYuKcHdgZyhHOe2JUT/4Z7Dpm6foeLVgBilLuCdF9a5OYENrJo8+oGaNMPkq
-         mnjvdHV7tieiA==
+        b=kiYoPRKsI5tsT4xbdCejBqO3jTq5lo5wRlSzXg/xA/jNy/5SGxnS8/XnUr17EFzAl
+         dOllXqmy1G7ym/6f8VQ9qOMUMpp8Omk7hW5yirERfPLUsFvqcPHKq3XxKbNvjVtJMG
+         gjorDMUhCR3Uw8TTbMLnynRJiH4K4t26l4tOxjQqfMDDAl2+fRFIGbLvQdbgT9dgeL
+         1jhp1j93dcAN4wL8RLUPy8loa5Ihjlfi0O4wkxWsNlkB0dm0BhuILclWbXzlKbVNnN
+         Zr68+oOBNF+vwJ6ZmW4igUxxmo44XO6R1NuCk9un+xUDHcderBG7mVVOY9O329fBxN
+         3/1hKzGpYyuGg==
 Received: by pali.im (Postfix)
-        id 3DCD413DC; Sun,  8 Aug 2021 18:25:21 +0200 (CEST)
+        id 2D3CC13DC; Sun,  8 Aug 2021 18:25:19 +0200 (CEST)
 From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
@@ -49,9 +49,9 @@ To:     linux-fsdevel@vger.kernel.org,
         Pavel Machek <pavel@ucw.cz>,
         =?UTF-8?q?Marek=20Beh=C3=BAn?= <marek.behun@nic.cz>,
         Christoph Hellwig <hch@infradead.org>
-Subject: [RFC PATCH 17/20] ntfs: Do not use broken utf8 NLS table for iocharset=utf8 mount option
-Date:   Sun,  8 Aug 2021 18:24:50 +0200
-Message-Id: <20210808162453.1653-18-pali@kernel.org>
+Subject: [RFC PATCH 13/20] hfsplus: Do not use broken utf8 NLS table for iocharset=utf8 mount option
+Date:   Sun,  8 Aug 2021 18:24:46 +0200
+Message-Id: <20210808162453.1653-14-pali@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210808162453.1653-1-pali@kernel.org>
 References: <20210808162453.1653-1-pali@kernel.org>
@@ -65,226 +65,256 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 NLS table for utf8 is broken and cannot be fixed.
 
 So instead of broken utf8 nls functions char2uni() and uni2char() use
-functions utf8s_to_utf16s() and utf16s_to_utf8s() which implements correct
-conversion between UTF-16 and UTF-8.
+functions utf8_to_utf32() and utf32_to_utf8() which implements correct
+encoding and decoding between Unicode code points and UTF-8 sequence.
 
-These functions implements also correct processing of UTF-16 surrogate
-pairs and therefore after this change ntfs driver would be able to correctly
-handle also file names with 4-byte UTF-8 sequences.
+Note that this fs driver does not support full Unicode range, specially
+UTF-16 surrogate pairs are unsupported. This patch does not change this
+limitation and support for UTF-16 surrogate pairs stay unimplemented.
 
-When iochatset=utf8 is used then set vol->nls_map to NULL and use it for
+When iochatset=utf8 is used then set sbi->nls to NULL and use it for
 distinguish between the fact if NLS table or native UTF-8 functions should
 be used.
 
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/ntfs/dir.c    |  6 ++++--
- fs/ntfs/inode.c  |  5 ++++-
- fs/ntfs/super.c  | 41 ++++++++++++++++++++++++-----------------
- fs/ntfs/unistr.c | 27 ++++++++++++++++++++++++---
- 4 files changed, 56 insertions(+), 23 deletions(-)
+ fs/hfsplus/dir.c            |  6 ++++--
+ fs/hfsplus/options.c        | 32 ++++++++++++++++++--------------
+ fs/hfsplus/super.c          |  7 +------
+ fs/hfsplus/unicode.c        | 31 ++++++++++++++++++++++++++++---
+ fs/hfsplus/xattr.c          | 14 +++++++++-----
+ fs/hfsplus/xattr_security.c |  3 ++-
+ 6 files changed, 62 insertions(+), 31 deletions(-)
 
-diff --git a/fs/ntfs/dir.c b/fs/ntfs/dir.c
-index cd96083a12c8..035582b92aa2 100644
---- a/fs/ntfs/dir.c
-+++ b/fs/ntfs/dir.c
-@@ -1034,7 +1034,8 @@ static inline int ntfs_filldir(ntfs_volume *vol,
- 	}
- 	name_len = ntfs_ucstonls(vol, (ntfschar*)&ie->key.file_name.file_name,
- 			ie->key.file_name.file_name_length, &name,
--			NTFS_MAX_NAME_LEN * NLS_MAX_CHARSET_SIZE + 1);
-+			NTFS_MAX_NAME_LEN *
-+			(vol->nls_map ? NLS_MAX_CHARSET_SIZE : 4) + 1);
- 	if (name_len <= 0) {
- 		ntfs_warning(vol->sb, "Skipping unrepresentable inode 0x%llx.",
- 				(long long)MREF_LE(ie->data.dir.indexed_file));
-@@ -1118,7 +1119,8 @@ static int ntfs_readdir(struct file *file, struct dir_context *actor)
- 	 * Allocate a buffer to store the current name being processed
- 	 * converted to format determined by current NLS.
- 	 */
--	name = kmalloc(NTFS_MAX_NAME_LEN * NLS_MAX_CHARSET_SIZE + 1, GFP_NOFS);
-+	name = kmalloc(NTFS_MAX_NAME_LEN *
-+		       (vol->nls_map ? NLS_MAX_CHARSET_SIZE : 4) + 1, GFP_NOFS);
- 	if (unlikely(!name)) {
+diff --git a/fs/hfsplus/dir.c b/fs/hfsplus/dir.c
+index 84714bbccc12..2caf0cd82221 100644
+--- a/fs/hfsplus/dir.c
++++ b/fs/hfsplus/dir.c
+@@ -144,7 +144,8 @@ static int hfsplus_readdir(struct file *file, struct dir_context *ctx)
+ 	err = hfs_find_init(HFSPLUS_SB(sb)->cat_tree, &fd);
+ 	if (err)
+ 		return err;
+-	strbuf = kmalloc(NLS_MAX_CHARSET_SIZE * HFSPLUS_MAX_STRLEN + 1, GFP_KERNEL);
++	strbuf = kmalloc((HFSPLUS_SB(sb)->nls ? NLS_MAX_CHARSET_SIZE : 4) *
++			HFSPLUS_MAX_STRLEN + 1, GFP_KERNEL);
+ 	if (!strbuf) {
  		err = -ENOMEM;
- 		goto err_out;
-diff --git a/fs/ntfs/inode.c b/fs/ntfs/inode.c
-index 3676f185b4a0..1437944be66d 100644
---- a/fs/ntfs/inode.c
-+++ b/fs/ntfs/inode.c
-@@ -2303,7 +2303,10 @@ int ntfs_show_options(struct seq_file *sf, struct dentry *root)
- 		seq_printf(sf, ",fmask=0%o", vol->fmask);
- 		seq_printf(sf, ",dmask=0%o", vol->dmask);
- 	}
--	seq_printf(sf, ",iocharset=%s", vol->nls_map->charset);
-+	if (vol->nls_map)
-+		seq_printf(sf, ",iocharset=%s", vol->nls_map->charset);
-+	else
-+		seq_puts(sf, ",iocharset=utf8");
- 	if (NVolCaseSensitive(vol))
- 		seq_printf(sf, ",case_sensitive");
- 	if (NVolShowSystemFiles(vol))
-diff --git a/fs/ntfs/super.c b/fs/ntfs/super.c
-index 69c7871b742e..358f5e9e3c46 100644
---- a/fs/ntfs/super.c
-+++ b/fs/ntfs/super.c
-@@ -84,7 +84,7 @@ static int simple_getbool(char *s, bool *setval)
-  *
-  * Parse the recognized options in @opt for the ntfs volume described by @vol.
-  */
--static bool parse_options(ntfs_volume *vol, char *opt)
-+static bool parse_options(ntfs_volume *vol, char *opt, int remount)
- {
- 	char *p, *v, *ov;
- 	static char *utf8 = "utf8";
-@@ -95,6 +95,7 @@ static bool parse_options(ntfs_volume *vol, char *opt)
- 	int mft_zone_multiplier = -1, on_errors = -1;
- 	int show_sys_files = -1, case_sensitive = -1, disable_sparse = -1;
- 	struct nls_table *nls_map = NULL;
-+	int have_iocharset = 0;
+ 		goto out;
+@@ -203,7 +204,8 @@ static int hfsplus_readdir(struct file *file, struct dir_context *ctx)
+ 		hfs_bnode_read(fd.bnode, &entry, fd.entryoffset,
+ 			fd.entrylength);
+ 		type = be16_to_cpu(entry.type);
+-		len = NLS_MAX_CHARSET_SIZE * HFSPLUS_MAX_STRLEN;
++		len = (HFSPLUS_SB(sb)->nls ? NLS_MAX_CHARSET_SIZE : 4) *
++		      HFSPLUS_MAX_STRLEN;
+ 		err = hfsplus_uni2asc(sb, &fd.key->cat.name, strbuf, &len);
+ 		if (err)
+ 			goto out;
+diff --git a/fs/hfsplus/options.c b/fs/hfsplus/options.c
+index a975548f6b91..16c08cb5c4f8 100644
+--- a/fs/hfsplus/options.c
++++ b/fs/hfsplus/options.c
+@@ -104,6 +104,9 @@ int hfsplus_parse_options(char *input, struct hfsplus_sb_info *sbi)
+ 	char *p;
+ 	substring_t args[MAX_OPT_ARGS];
+ 	int tmp, token;
++	int have_iocharset;
++
++	have_iocharset = 0;
  
- 	/* I am lazy... (-8 */
- #define NTFS_GETOPT_WITH_DEFAULT(option, variable, default_value)	\
-@@ -196,12 +197,16 @@ static bool parse_options(ntfs_volume *vol, char *opt)
- 				goto needs_arg;
- use_utf8:
- 			unload_nls(nls_map);
--			nls_map = load_nls(v);
--			if (!nls_map) {
--				ntfs_error(vol->sb, "NLS character set "
--					   "%s not found.", v);
--				return false;
-+			nls_map = NULL;
-+			if (strcmp(v, "utf8") != 0) {
-+				nls_map = load_nls(v);
-+				if (!nls_map) {
-+					ntfs_error(vol->sb, "NLS character set "
-+						   "%s not found.", v);
-+					return false;
+ 	if (!input)
+ 		goto done;
+@@ -171,20 +174,24 @@ int hfsplus_parse_options(char *input, struct hfsplus_sb_info *sbi)
+ 			pr_warn("option nls= is deprecated, use iocharset=\n");
+ 			/* fallthrough */
+ 		case opt_iocharset:
+-			if (sbi->nls) {
++			if (have_iocharset) {
+ 				pr_err("unable to change nls mapping\n");
+ 				return 0;
+ 			}
+ 			p = match_strdup(&args[0]);
+-			if (p)
+-				sbi->nls = load_nls(p);
+-			if (!sbi->nls) {
+-				pr_err("unable to load nls mapping \"%s\"\n",
+-				       p);
+-				kfree(p);
++			if (!p)
+ 				return 0;
++			if (strcmp(p, "utf8") != 0) {
++				sbi->nls = load_nls(p);
++				if (!sbi->nls) {
++					pr_err("unable to load nls mapping "
++						"\"%s\"\n", p);
++					kfree(p);
++					return 0;
 +				}
  			}
+ 			kfree(p);
 +			have_iocharset = 1;
- 		} else if (!strcmp(p, "utf8")) {
- 			bool val = false;
- 			ntfs_warning(vol->sb, "Option utf8 is no longer "
-@@ -241,25 +246,27 @@ static bool parse_options(ntfs_volume *vol, char *opt)
- 			return false;
+ 			break;
+ 		case opt_decompose:
+ 			clear_bit(HFSPLUS_SB_NODECOMPOSE, &sbi->flags);
+@@ -207,13 +214,10 @@ int hfsplus_parse_options(char *input, struct hfsplus_sb_info *sbi)
+ 	}
+ 
+ done:
+-	if (!sbi->nls) {
+-		/* try utf8 first, as this is the old default behaviour */
+-		sbi->nls = load_nls("utf8");
+-		if (!sbi->nls)
+-			sbi->nls = load_nls_default();
+-		if (!sbi->nls)
+-			return 0;
++	if (!have_iocharset) {
++		/* use utf8, as this is the old default behaviour */
++		pr_debug("using native UTF-8 without nls\n");
++		/* no sbi->nls means that native UTF-8 code is used */
+ 	}
+ 
+ 	return 1;
+diff --git a/fs/hfsplus/super.c b/fs/hfsplus/super.c
+index b9e3db3f855f..985662451bfc 100644
+--- a/fs/hfsplus/super.c
++++ b/fs/hfsplus/super.c
+@@ -403,11 +403,7 @@ static int hfsplus_fill_super(struct super_block *sb, void *data, int silent)
+ 
+ 	/* temporarily use utf8 to correctly find the hidden dir below */
+ 	nls = sbi->nls;
+-	sbi->nls = load_nls("utf8");
+-	if (!sbi->nls) {
+-		pr_err("unable to load nls for utf8\n");
+-		goto out_unload_nls;
+-	}
++	sbi->nls = NULL;
+ 
+ 	/* Grab the volume header */
+ 	if (hfsplus_read_wrapper(sb)) {
+@@ -585,7 +581,6 @@ static int hfsplus_fill_super(struct super_block *sb, void *data, int silent)
  		}
  	}
--	if (nls_map) {
--		if (vol->nls_map && vol->nls_map != nls_map) {
-+	if (have_iocharset) {
-+		if (remount && vol->nls_map != nls_map) {
- 			ntfs_error(vol->sb, "Cannot change NLS character set "
- 					"on remount.");
- 			return false;
--		} /* else (!vol->nls_map) */
--		ntfs_debug("Using NLS character set %s.", nls_map->charset);
--		vol->nls_map = nls_map;
--	} else /* (!nls_map) */ {
--		if (!vol->nls_map) {
-+		} else (!remount) {
-+			ntfs_debug("Using NLS character set %s.",
-+					nls_map ? nls_map->charset : "utf8");
-+			vol->nls_map = nls_map;
-+		}
-+	} else if (!remount) {
-+		if (strcmp(CONFIG_NLS_DEFAULT, "utf8") != 0) {
- 			vol->nls_map = load_nls_default();
- 			if (!vol->nls_map) {
- 				ntfs_error(vol->sb, "Failed to load default "
- 						"NLS character set.");
- 				return false;
+ 
+-	unload_nls(sbi->nls);
+ 	sbi->nls = nls;
+ 	return 0;
+ 
+diff --git a/fs/hfsplus/unicode.c b/fs/hfsplus/unicode.c
+index 73342c925a4b..1d8c31c5126f 100644
+--- a/fs/hfsplus/unicode.c
++++ b/fs/hfsplus/unicode.c
+@@ -190,7 +190,12 @@ int hfsplus_uni2asc(struct super_block *sb,
+ 				c0 = ':';
+ 				break;
  			}
--			ntfs_debug("Using default NLS character set (%s).",
--					vol->nls_map->charset);
+-			res = nls->uni2char(c0, op, len);
++			if (nls)
++				res = nls->uni2char(c0, op, len);
++			else (len > 0)
++				res = utf32_to_utf8(c0, op, len);
++			else
++				res = -ENAMETOOLONG;
+ 			if (res < 0) {
+ 				if (res == -ENAMETOOLONG)
+ 					goto out;
+@@ -233,7 +238,12 @@ int hfsplus_uni2asc(struct super_block *sb,
+ 			cc = c0;
  		}
-+		ntfs_debug("Using default NLS character set (%s).",
-+				vol->nls_map ? vol->nls_map->charset : "utf8");
- 	}
- 	if (mft_zone_multiplier != -1) {
- 		if (vol->mft_zone_multiplier && vol->mft_zone_multiplier !=
-@@ -534,7 +541,7 @@ static int ntfs_remount(struct super_block *sb, int *flags, char *opt)
- 
- 	// TODO: Deal with *flags.
- 
--	if (!parse_options(vol, opt))
-+	if (!parse_options(vol, opt, 1))
- 		return -EINVAL;
- 
- 	ntfs_debug("Done.");
-@@ -2731,7 +2738,7 @@ static int ntfs_fill_super(struct super_block *sb, void *opt, const int silent)
- 	NVolSetSparseEnabled(vol);
- 
- 	/* Important to get the mount options dealt with now. */
--	if (!parse_options(vol, (char*)opt))
-+	if (!parse_options(vol, (char*)opt, 0))
- 		goto err_out_now;
- 
- 	/* We support sector sizes up to the PAGE_SIZE. */
-diff --git a/fs/ntfs/unistr.c b/fs/ntfs/unistr.c
-index 75a7f73bccdd..f29d83fb09bb 100644
---- a/fs/ntfs/unistr.c
-+++ b/fs/ntfs/unistr.c
-@@ -254,6 +254,16 @@ int ntfs_nlstoucs(const ntfs_volume *vol, const char *ins,
- 	if (likely(ins)) {
- 		ucs = kmem_cache_alloc(ntfs_name_cache, GFP_NOFS);
- 		if (likely(ucs)) {
-+			if (!nls) {
-+				wc_len = utf8s_to_utf16s(ins, ins_len,
-+						UTF16_LITTLE_ENDIAN, ucs,
-+						NTFS_MAX_NAME_LEN);
-+				if (wc_len < 0 || wc_len >= NTFS_MAX_NAME_LEN)
-+					goto name_err;
-+				ucs[wc_len] = 0;
-+				*outs = ucs;
-+				return o;
-+			}
- 			for (i = o = 0; i < ins_len; i += wc_len) {
- 				wc_len = nls->char2uni(ins + i, ins_len - i,
- 						&wc);
-@@ -283,7 +293,7 @@ int ntfs_nlstoucs(const ntfs_volume *vol, const char *ins,
- 	if (wc_len < 0) {
- 		ntfs_error(vol->sb, "Name using character set %s contains "
- 				"characters that cannot be converted to "
--				"Unicode.", nls->charset);
-+				"Unicode.", nls ? nls->charset : "utf8");
- 		i = -EILSEQ;
- 	} else /* if (o >= NTFS_MAX_NAME_LEN) */ {
- 		ntfs_error(vol->sb, "Name is too long (maximum length for a "
-@@ -335,11 +345,22 @@ int ntfs_ucstonls(const ntfs_volume *vol, const ntfschar *ins,
- 			goto conversion_err;
- 		}
- 		if (!ns) {
--			ns_len = ins_len * NLS_MAX_CHARSET_SIZE;
-+			ns_len = ins_len * (nls ? NLS_MAX_CHARSET_SIZE : 4);
- 			ns = kmalloc(ns_len + 1, GFP_NOFS);
- 			if (!ns)
- 				goto mem_err_out;
- 		}
-+		if (!nls) {
-+			o = utf16s_to_utf8s(ins, ins_len, UTF16_LITTLE_ENDIAN,
-+					ns, ns_len);
-+			if (o >= ns_len) {
-+				wc = -ENAMETOOLONG;
-+				goto conversion_err;
-+			}
-+			ns[o] = 0;
-+			*outs = ns;
-+			return o;
+ done:
+-		res = nls->uni2char(cc, op, len);
++		if (nls)
++			res = nls->uni2char(cc, op, len);
++		else (len > 0)
++			res = utf32_to_utf8(cc, op, len);
++		else
++			res = -ENAMETOOLONG;
+ 		if (res < 0) {
+ 			if (res == -ENAMETOOLONG)
+ 				goto out;
+@@ -256,7 +266,22 @@ int hfsplus_uni2asc(struct super_block *sb,
+ static inline int asc2unichar(struct super_block *sb, const char *astr, int len,
+ 			      wchar_t *uc)
+ {
+-	int size = HFSPLUS_SB(sb)->nls->char2uni(astr, len, uc);
++	struct nls_table *nls = HFSPLUS_SB(sb)->nls;
++	unicode_t u;
++	int size;
++
++	if (nls)
++		size = nls->char2uni(astr, len, uc);
++	else {
++		size = utf8_to_utf32(astr, len, &u);
++		if (size >= 0) {
++			/* TODO: Add support for UTF-16 surrogate pairs */
++			if (u <= MAX_WCHAR_T)
++				*uc = u;
++			else
++				size = -EINVAL;
 +		}
- 		for (i = o = 0; i < ins_len; i++) {
- retry:			wc = nls->uni2char(le16_to_cpu(ins[i]), ns + o,
- 					ns_len - o);
-@@ -373,7 +394,7 @@ retry:			wc = nls->uni2char(le16_to_cpu(ins[i]), ns + o,
- 	ntfs_error(vol->sb, "Unicode name contains characters that cannot be "
- 			"converted to character set %s.  You might want to "
- 			"try to use the mount option iocharset=utf8.",
--			nls->charset);
-+			nls ? nls->charset : "utf8");
- 	if (ns != *outs)
- 		kfree(ns);
- 	if (wc != -ENAMETOOLONG)
++	}
+ 	if (size <= 0) {
+ 		*uc = '?';
+ 		size = 1;
+diff --git a/fs/hfsplus/xattr.c b/fs/hfsplus/xattr.c
+index e2855ceefd39..9b2653f08a5f 100644
+--- a/fs/hfsplus/xattr.c
++++ b/fs/hfsplus/xattr.c
+@@ -425,7 +425,8 @@ int hfsplus_setxattr(struct inode *inode, const char *name,
+ 	char *xattr_name;
+ 	int res;
+ 
+-	xattr_name = kmalloc(NLS_MAX_CHARSET_SIZE * HFSPLUS_ATTR_MAX_STRLEN + 1,
++	xattr_name = kmalloc((HFSPLUS_SB(sb)->nls ? NLS_MAX_CHARSET_SIZE : 4) *
++			     HFSPLUS_ATTR_MAX_STRLEN + 1,
+ 		GFP_KERNEL);
+ 	if (!xattr_name)
+ 		return -ENOMEM;
+@@ -579,7 +580,8 @@ ssize_t hfsplus_getxattr(struct inode *inode, const char *name,
+ 	int res;
+ 	char *xattr_name;
+ 
+-	xattr_name = kmalloc(NLS_MAX_CHARSET_SIZE * HFSPLUS_ATTR_MAX_STRLEN + 1,
++	xattr_name = kmalloc((HFSPLUS_SB(sb)->nls ? NLS_MAX_CHARSET_SIZE : 4) *
++			     HFSPLUS_ATTR_MAX_STRLEN + 1,
+ 			     GFP_KERNEL);
+ 	if (!xattr_name)
+ 		return -ENOMEM;
+@@ -699,8 +701,9 @@ ssize_t hfsplus_listxattr(struct dentry *dentry, char *buffer, size_t size)
+ 		return err;
+ 	}
+ 
+-	strbuf = kmalloc(NLS_MAX_CHARSET_SIZE * HFSPLUS_ATTR_MAX_STRLEN +
+-			XATTR_MAC_OSX_PREFIX_LEN + 1, GFP_KERNEL);
++	strbuf = kmalloc((HFSPLUS_SB(sb)->nls ? NLS_MAX_CHARSET_SIZE : 4) *
++			HFSPLUS_ATTR_MAX_STRLEN + XATTR_MAC_OSX_PREFIX_LEN + 1,
++			GFP_KERNEL);
+ 	if (!strbuf) {
+ 		res = -ENOMEM;
+ 		goto out;
+@@ -732,7 +735,8 @@ ssize_t hfsplus_listxattr(struct dentry *dentry, char *buffer, size_t size)
+ 		if (be32_to_cpu(attr_key.cnid) != inode->i_ino)
+ 			goto end_listxattr;
+ 
+-		xattr_name_len = NLS_MAX_CHARSET_SIZE * HFSPLUS_ATTR_MAX_STRLEN;
++		xattr_name_len = (HFSPLUS_SB(sb)->nls ? NLS_MAX_CHARSET_SIZE : 4)
++				* HFSPLUS_ATTR_MAX_STRLEN;
+ 		if (hfsplus_uni2asc(inode->i_sb,
+ 			(const struct hfsplus_unistr *)&fd.key->attr.key_name,
+ 					strbuf, &xattr_name_len)) {
+diff --git a/fs/hfsplus/xattr_security.c b/fs/hfsplus/xattr_security.c
+index c1c7a16cbf21..438ebcd1359b 100644
+--- a/fs/hfsplus/xattr_security.c
++++ b/fs/hfsplus/xattr_security.c
+@@ -41,7 +41,8 @@ static int hfsplus_initxattrs(struct inode *inode,
+ 	char *xattr_name;
+ 	int err = 0;
+ 
+-	xattr_name = kmalloc(NLS_MAX_CHARSET_SIZE * HFSPLUS_ATTR_MAX_STRLEN + 1,
++	xattr_name = kmalloc((HFSPLUS_SB(sb)->nls ? NLS_MAX_CHARSET_SIZE : 4) *
++			     HFSPLUS_ATTR_MAX_STRLEN + 1,
+ 		GFP_KERNEL);
+ 	if (!xattr_name)
+ 		return -ENOMEM;
 -- 
 2.20.1
 
