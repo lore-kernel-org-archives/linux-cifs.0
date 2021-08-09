@@ -2,189 +2,261 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C369CC4338F
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Aug 2021 09:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFCDC4338F
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Aug 2021 17:32:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABF7760F92
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Aug 2021 09:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EE8660F56
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Aug 2021 17:32:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233802AbhHIJ7H (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 9 Aug 2021 05:59:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39582 "EHLO
+        id S234153AbhHIRcX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 9 Aug 2021 13:32:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233799AbhHIJ7F (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Aug 2021 05:59:05 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 969E0C0613D3
-        for <linux-cifs@vger.kernel.org>; Mon,  9 Aug 2021 02:58:43 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id g30so420293lfv.4
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Aug 2021 02:58:43 -0700 (PDT)
+        with ESMTP id S234154AbhHIRcW (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Aug 2021 13:32:22 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E810DC061796
+        for <linux-cifs@vger.kernel.org>; Mon,  9 Aug 2021 10:32:01 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id o13so19238850qkk.9
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Aug 2021 10:32:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=vwVr24D5ktrYij+v5KnhQs3nUu4IJFxnzT+zKB3+50M=;
-        b=kCbRehGe55efVTCdUv2wy/TPrcsGlVM+WFoSjdjgp8kXp+ObnhUu515LMCXe0/0Cwb
-         hrt+4H8Eo/el+WbVMBZQWCRDGyAo+KbBPdxJXX7OrAJ+m4iatJnLJHJWyZHkx0PJi+Ut
-         ThvGUnqoErg9JG5Y8wGJkezD5vFXOrrmKEfneWrwvL4opz7iCq+0eB3YLMksJU+slC3b
-         kHIf2FfvCo6KSW6Nna6Xdka1EYUPgeeQ03DYcsmskFVnIJB8baV3P4xAB2UpXfTR6qfM
-         vYQhShjS9wHt0JJ/luhS2SFWzCG6deJfFXsWXoT90dNV37pbiJJ6Hq3uVuTaH1iE6h2W
-         c6+g==
+        d=dubeyko-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=7Vd5SsqyCkC/WgUABGMpKlM3a+dx8fPcAdSDlrr7kY0=;
+        b=seUpAt0yXvIirfnAYoUqFGjwoZC+rgyLhRUXlyHk3nDPCzLGfb78L05dlREknR+/XH
+         iO69QBKFLuPFL9UszB05RDwabdo0TMVtwRm0dHaqAGTiCJsivHKb2IEQr6zGJAWNkHzT
+         OymplCtr3L4tWqzFprpeRpm7lUfzEi4mAKMYbTSTeun3UgJxEtf9LyiJ2EKDWirNC0Bl
+         O8QDSpv2LBkMbEgJrr84bAO/JRCYDNIgEV65WmX6Ci9knvEWvmy8Su/1GHvbJO+aynvE
+         qMAbzsWh+CdaYqzxlIN4W2esY+q5bXjvs3YHho+kD1ATwChA7LooxcjoKjQBj6h58ZaB
+         6TAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=vwVr24D5ktrYij+v5KnhQs3nUu4IJFxnzT+zKB3+50M=;
-        b=FgISeEDJDCRuxVI9hYkObIKvB7s4HV52s7rEcGUqoL9jXLgYUHcQZYprxIQuJ2Favh
-         88DyPDZFJKMR63nsL0eJzi11AosRyJUKLToo2jBTGMUBtpQ8fYp7to2Hd9uhz4qzXLME
-         TxV6tVMQ5TJo9HA+Iu/fsg+egw0BJYUhFj0kAP1143iMEEwvmzIBkDidWxR6hbANJWQu
-         rWH/o/UYV3JWelhM0sm8qVW87wxCliPATF9/zK64GJWEDeZu66sqOUB3r+Mas/dWfpm3
-         CBHQm7QqnOpYYLP/WFXSKO/lESieIeAGQQzS0S1semXoLg9WrWiC6eOoPd7vZ1XZOy9E
-         8T4A==
-X-Gm-Message-State: AOAM53366HPgBLmoAurKBoqQV00EeguGgLsAJcq4KH3Rv7AYk/3QfqRH
-        BJO3ZlQFy/dvxoY7r8TWUCb4WIBYuIc9kO3yubr9eZSVT4w=
-X-Google-Smtp-Source: ABdhPJyfOP1jB/T7Ti/iTNMT6j6X/RI+PxDxJe7nIGLHFyXFxkd261SIQtoWHpikF058q9nb9NHvfR53lKl8iTfYv+M=
-X-Received: by 2002:a19:4890:: with SMTP id v138mr16500940lfa.626.1628503121964;
- Mon, 09 Aug 2021 02:58:41 -0700 (PDT)
-MIME-Version: 1.0
-From:   Rohith Surabattula <rohiths.msft@gmail.com>
-Date:   Mon, 9 Aug 2021 15:28:31 +0530
-Message-ID: <CACdtm0Z4rDEGsi02+0DJnw2EoTV2CSC-jDN-SyDhKz0WcGZoAQ@mail.gmail.com>
-Subject: [PATCH][CIFS]Call close synchronously during unlink/rename/lease break.
-To:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>
-Content-Type: multipart/mixed; boundary="00000000000019ccb305c91d6e1b"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=7Vd5SsqyCkC/WgUABGMpKlM3a+dx8fPcAdSDlrr7kY0=;
+        b=ok170V97BPpfH2ruxCfM9gA9o0w04vpAK5YeKcHlsM5mjvkiDWf3QbFLbDj9hHr49L
+         0YwldiXdtrWQfJzaDaAJ0C5DOJM+72yocPH53z1/GCT+agUWT4MSiWkAlL122BL88wGk
+         NYTFDr63fO+W7HWD50lx89oG3FeYkSgexUSMDhkpXDbul1DGaJNg/RNsl5cjR7a1MZIF
+         Eo7w0hRmUWfaBerI+oyvBwo8+o5oX0K5Q6r1i/Uf/h/A7omJ8ujEV7oZb5KotmV26nyg
+         GVyyUxzbVArcmEKVHaBqtOJyyw3NzMRpgZ50hG6ovkhhWmKLu6zaFXz4DVEWBiWG0NPH
+         xLSA==
+X-Gm-Message-State: AOAM532xZ4qId12uWeWBgFMdzHtdeKwhL3N5633ThHOndsZ+wDU41Bof
+        KzFXo/R3lrGAmYcmXj8rLszMmA==
+X-Google-Smtp-Source: ABdhPJxDxb8Z+GtvraOrw4meO7gw2JzU3WYo0bH8LeIk4lSkmYbk6azkakGXV9z7D9hJ8zUXrToayw==
+X-Received: by 2002:a05:620a:1193:: with SMTP id b19mr23546498qkk.439.1628530321096;
+        Mon, 09 Aug 2021 10:32:01 -0700 (PDT)
+Received: from smtpclient.apple ([2600:1700:42f0:6600:615b:6e84:29a:3bc6])
+        by smtp.gmail.com with ESMTPSA id t14sm9006401qkm.7.2021.08.09.10.31.58
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Aug 2021 10:32:00 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [RFC PATCH 11/20] hfs: Explicitly set hsb->nls_disk when
+ hsb->nls_io is set
+From:   Viacheslav Dubeyko <slava@dubeyko.com>
+In-Reply-To: <20210808162453.1653-12-pali@kernel.org>
+Date:   Mon, 9 Aug 2021 10:31:55 -0700
+Cc:     Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net,
+        LKML <linux-kernel@vger.kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jan Kara <jack@suse.cz>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Luis de Bethencourt <luisbg@kernel.org>,
+        Salah Triki <salah.triki@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        =?utf-8?Q?Marek_Beh=C3=BAn?= <marek.behun@nic.cz>,
+        Christoph Hellwig <hch@infradead.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D0302F93-BAE5-48F0-87D0-B68B10D7757B@dubeyko.com>
+References: <20210808162453.1653-1-pali@kernel.org>
+ <20210808162453.1653-12-pali@kernel.org>
+To:     =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000019ccb305c91d6e1b
-Content-Type: text/plain; charset="UTF-8"
 
-Hi Steve/All,
 
-During unlink/rename/lease break, deferred work for close is
-scheduled immediately but in asynchronous manner which might
-lead to race with actual(unlink/rename) commands.
+> On Aug 8, 2021, at 9:24 AM, Pali Roh=C3=A1r <pali@kernel.org> wrote:
+>=20
+> It does not make any sense to set hsb->nls_io (NLS iocharset used =
+between
+> VFS and hfs driver) when hsb->nls_disk (NLS codepage used between hfs
+> driver and disk) is not set.
+>=20
+> Reverse engineering driver code shown what is doing in this special =
+case:
+>=20
+>    When codepage was not defined but iocharset was then
+>    hfs driver copied 8bit character from disk directly to
+>    16bit unicode wchar_t type. Which means it did conversion
+>    from Latin1 (ISO-8859-1) to Unicode because first 256
+>    Unicode code points matches 8bit ISO-8859-1 codepage table.
+>    So when iocharset was specified and codepage not, then
+>    codepage used implicit value "iso8859-1".
+>=20
+> So when hsb->nls_disk is not set and hsb->nls_io is then explicitly =
+set
+> hsb->nls_disk to "iso8859-1".
+>=20
+> Such setup is obviously incompatible with Mac OS systems as they do =
+not
+> support iso8859-1 encoding for hfs. So print warning into dmesg about =
+this
+> fact.
+>=20
+> After this change hsb->nls_disk is always set, so remove code paths =
+for
+> case when hsb->nls_disk was not set as they are not needed anymore.
+>=20
 
-This change will schedule close synchronously which will avoid
-the race conditions with other commands.
 
-Regards,
-Rohith
+Sounds reasonable. But it will be great to know that the change has been =
+tested reasonably well.
 
---00000000000019ccb305c91d6e1b
-Content-Type: application/octet-stream; 
-	name="cifs-Call-close-synchronously-during-unlink-rename-l.patch"
-Content-Disposition: attachment; 
-	filename="cifs-Call-close-synchronously-during-unlink-rename-l.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ks4gof0g0>
-X-Attachment-Id: f_ks4gof0g0
+Thanks,
+Slava.
 
-RnJvbSA2MGExNGUxYTk4Yzk3YmNkMDQ3YTc3NmFmYmNmZGI4ODNlMjY5MDA3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSb2hpdGggU3VyYWJhdHR1bGEKIDxyb2hpdGhzQG1pY3Jvc29m
-dC5jb20+CkRhdGU6IE1vbiwgOSBBdWcgMjAyMSAwOTozMjo0NiArMDAwMApTdWJqZWN0OiBbUEFU
-Q0hdIGNpZnM6IENhbGwgY2xvc2Ugc3luY2hyb25vdXNseSBkdXJpbmcgdW5saW5rL3JlbmFtZS9s
-ZWFzZQogYnJlYWsuCgpEdXJpbmcgdW5saW5rL3JlbmFtZS9sZWFzZSBicmVhaywgZGVmZXJyZWQg
-d29yayBmb3IgY2xvc2UgaXMKc2NoZWR1bGVkIGltbWVkaWF0ZWx5IGJ1dCBpbiBhc3luY2hyb25v
-dXMgbWFubmVyIHdoaWNoIG1pZ2h0CmxlYWQgdG8gcmFjZSB3aXRoIGFjdHVhbCh1bmxpbmsvcmVu
-YW1lKSBjb21tYW5kcy4KClRoaXMgY2hhbmdlIHdpbGwgc2NoZWR1bGUgY2xvc2Ugc3luY2hyb25v
-dXNseSB3aGljaCB3aWxsIGF2b2lkCnRoZSByYWNlIGNvbmRpdGlvbnMgd2l0aCBvdGhlciBjb21t
-YW5kcy4KClNpZ25lZC1vZmYtYnk6IFJvaGl0aCBTdXJhYmF0dHVsYSA8cm9oaXRoc0BtaWNyb3Nv
-ZnQuY29tPgotLS0KIGZzL2NpZnMvY2lmc2dsb2IuaCB8ICA1ICsrKysrCiBmcy9jaWZzL2ZpbGUu
-YyAgICAgfCAzNSArKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLQogZnMvY2lmcy9t
-aXNjLmMgICAgIHwgNDIgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0t
-CiAzIGZpbGVzIGNoYW5nZWQsIDUyIGluc2VydGlvbnMoKyksIDMwIGRlbGV0aW9ucygtKQoKZGlm
-ZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc2dsb2IuaCBiL2ZzL2NpZnMvY2lmc2dsb2IuaAppbmRleCBj
-MGJmYzJmMDEwMzAuLmM2YTk1NDJjYTI4MSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9jaWZzZ2xvYi5o
-CisrKyBiL2ZzL2NpZnMvY2lmc2dsb2IuaApAQCAtMTYxMSw2ICsxNjExLDExIEBAIHN0cnVjdCBk
-ZnNfaW5mbzNfcGFyYW0gewogCWludCB0dGw7CiB9OwogCitzdHJ1Y3QgZmlsZV9saXN0IHsKKwlz
-dHJ1Y3QgbGlzdF9oZWFkIGxpc3Q7CisJc3RydWN0IGNpZnNGaWxlSW5mbyAqY2ZpbGU7Cit9Owor
-CiAvKgogICogY29tbW9uIHN0cnVjdCBmb3IgaG9sZGluZyBpbm9kZSBpbmZvIHdoZW4gc2VhcmNo
-aW5nIGZvciBvciB1cGRhdGluZyBhbgogICogaW5vZGUgd2l0aCBuZXcgaW5mbwpkaWZmIC0tZ2l0
-IGEvZnMvY2lmcy9maWxlLmMgYi9mcy9jaWZzL2ZpbGUuYwppbmRleCAwYTcyODQwYTg4ZjEuLmJi
-OThmYmRkMjJhOSAxMDA2NDQKLS0tIGEvZnMvY2lmcy9maWxlLmMKKysrIGIvZnMvY2lmcy9maWxl
-LmMKQEAgLTQ4NDcsMTcgKzQ4NDcsNiBAQCB2b2lkIGNpZnNfb3Bsb2NrX2JyZWFrKHN0cnVjdCB3
-b3JrX3N0cnVjdCAqd29yaykKIAkJY2lmc19kYmcoVkZTLCAiUHVzaCBsb2NrcyByYyA9ICVkXG4i
-LCByYyk7CiAKIG9wbG9ja19icmVha19hY2s6Ci0JLyoKLQkgKiByZWxlYXNpbmcgc3RhbGUgb3Bs
-b2NrIGFmdGVyIHJlY2VudCByZWNvbm5lY3Qgb2Ygc21iIHNlc3Npb24gdXNpbmcKLQkgKiBhIG5v
-dyBpbmNvcnJlY3QgZmlsZSBoYW5kbGUgaXMgbm90IGEgZGF0YSBpbnRlZ3JpdHkgaXNzdWUgYnV0
-IGRvCi0JICogbm90IGJvdGhlciBzZW5kaW5nIGFuIG9wbG9jayByZWxlYXNlIGlmIHNlc3Npb24g
-dG8gc2VydmVyIHN0aWxsIGlzCi0JICogZGlzY29ubmVjdGVkIHNpbmNlIG9wbG9jayBhbHJlYWR5
-IHJlbGVhc2VkIGJ5IHRoZSBzZXJ2ZXIKLQkgKi8KLQlpZiAoIWNmaWxlLT5vcGxvY2tfYnJlYWtf
-Y2FuY2VsbGVkKSB7Ci0JCXJjID0gdGNvbi0+c2VzLT5zZXJ2ZXItPm9wcy0+b3Bsb2NrX3Jlc3Bv
-bnNlKHRjb24sICZjZmlsZS0+ZmlkLAotCQkJCQkJCSAgICAgY2lub2RlKTsKLQkJY2lmc19kYmco
-RllJLCAiT3Bsb2NrIHJlbGVhc2UgcmMgPSAlZFxuIiwgcmMpOwotCX0KIAkvKgogCSAqIFdoZW4g
-b3Bsb2NrIGJyZWFrIGlzIHJlY2VpdmVkIGFuZCB0aGVyZSBhcmUgbm8gYWN0aXZlCiAJICogZmls
-ZSBoYW5kbGVzIGJ1dCBjYWNoZWQsIHRoZW4gc2NoZWR1bGUgZGVmZXJyZWQgY2xvc2UgaW1tZWRp
-YXRlbHkuCkBAIC00ODY1LDE3ICs0ODU0LDI3IEBAIHZvaWQgY2lmc19vcGxvY2tfYnJlYWsoc3Ry
-dWN0IHdvcmtfc3RydWN0ICp3b3JrKQogCSAqLwogCXNwaW5fbG9jaygmQ0lGU19JKGlub2RlKS0+
-ZGVmZXJyZWRfbG9jayk7CiAJaXNfZGVmZXJyZWQgPSBjaWZzX2lzX2RlZmVycmVkX2Nsb3NlKGNm
-aWxlLCAmZGNsb3NlKTsKKwlzcGluX3VubG9jaygmQ0lGU19JKGlub2RlKS0+ZGVmZXJyZWRfbG9j
-ayk7CiAJaWYgKGlzX2RlZmVycmVkICYmCiAJICAgIGNmaWxlLT5kZWZlcnJlZF9jbG9zZV9zY2hl
-ZHVsZWQgJiYKIAkgICAgZGVsYXllZF93b3JrX3BlbmRpbmcoJmNmaWxlLT5kZWZlcnJlZCkpIHsK
-LQkJLyoKLQkJICogSWYgdGhlcmUgaXMgbm8gcGVuZGluZyB3b3JrLCBtb2RfZGVsYXllZF93b3Jr
-IHF1ZXVlcyBuZXcgd29yay4KLQkJICogU28sIEluY3JlYXNlIHRoZSByZWYgY291bnQgdG8gYXZv
-aWQgdXNlLWFmdGVyLWZyZWUuCi0JCSAqLwotCQlpZiAoIW1vZF9kZWxheWVkX3dvcmsoZGVmZXJy
-ZWRjbG9zZV93cSwgJmNmaWxlLT5kZWZlcnJlZCwgMCkpCi0JCQljaWZzRmlsZUluZm9fZ2V0KGNm
-aWxlKTsKKwkJaWYgKGNhbmNlbF9kZWxheWVkX3dvcmsoJmNmaWxlLT5kZWZlcnJlZCkpIHsKKwkJ
-CV9jaWZzRmlsZUluZm9fcHV0KGNmaWxlLCBmYWxzZSwgZmFsc2UpOworCQkJZ290byBvcGxvY2tf
-YnJlYWtfZG9uZTsKKwkJfQogCX0KLQlzcGluX3VubG9jaygmQ0lGU19JKGlub2RlKS0+ZGVmZXJy
-ZWRfbG9jayk7CisJLyoKKwkgKiByZWxlYXNpbmcgc3RhbGUgb3Bsb2NrIGFmdGVyIHJlY2VudCBy
-ZWNvbm5lY3Qgb2Ygc21iIHNlc3Npb24gdXNpbmcKKwkgKiBhIG5vdyBpbmNvcnJlY3QgZmlsZSBo
-YW5kbGUgaXMgbm90IGEgZGF0YSBpbnRlZ3JpdHkgaXNzdWUgYnV0IGRvCisJICogbm90IGJvdGhl
-ciBzZW5kaW5nIGFuIG9wbG9jayByZWxlYXNlIGlmIHNlc3Npb24gdG8gc2VydmVyIHN0aWxsIGlz
-CisJICogZGlzY29ubmVjdGVkIHNpbmNlIG9wbG9jayBhbHJlYWR5IHJlbGVhc2VkIGJ5IHRoZSBz
-ZXJ2ZXIKKwkgKi8KKwlpZiAoIWNmaWxlLT5vcGxvY2tfYnJlYWtfY2FuY2VsbGVkKSB7CisJCXJj
-ID0gdGNvbi0+c2VzLT5zZXJ2ZXItPm9wcy0+b3Bsb2NrX3Jlc3BvbnNlKHRjb24sICZjZmlsZS0+
-ZmlkLAorCQkJCQkJCSAgICAgY2lub2RlKTsKKwkJY2lmc19kYmcoRllJLCAiT3Bsb2NrIHJlbGVh
-c2UgcmMgPSAlZFxuIiwgcmMpOworCX0KK29wbG9ja19icmVha19kb25lOgogCV9jaWZzRmlsZUlu
-Zm9fcHV0KGNmaWxlLCBmYWxzZSAvKiBkbyBub3Qgd2FpdCBmb3Igb3Vyc2VsZiAqLywgZmFsc2Up
-OwogCWNpZnNfZG9uZV9vcGxvY2tfYnJlYWsoY2lub2RlKTsKIH0KZGlmZiAtLWdpdCBhL2ZzL2Np
-ZnMvbWlzYy5jIGIvZnMvY2lmcy9taXNjLmMKaW5kZXggY2RiMWVjMTQ2MWRlLi42ZGY0ZmI5MmQx
-NGEgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvbWlzYy5jCisrKyBiL2ZzL2NpZnMvbWlzYy5jCkBAIC03
-MjMsMjAgKzcyMywzMCBAQCB2b2lkCiBjaWZzX2Nsb3NlX2RlZmVycmVkX2ZpbGUoc3RydWN0IGNp
-ZnNJbm9kZUluZm8gKmNpZnNfaW5vZGUpCiB7CiAJc3RydWN0IGNpZnNGaWxlSW5mbyAqY2ZpbGUg
-PSBOVUxMOworCXN0cnVjdCBmaWxlX2xpc3QgKnRtcF9saXN0OworCXN0cnVjdCBsaXN0X2hlYWQg
-ZmlsZV9oZWFkOwogCiAJaWYgKGNpZnNfaW5vZGUgPT0gTlVMTCkKIAkJcmV0dXJuOwogCisJSU5J
-VF9MSVNUX0hFQUQoJmZpbGVfaGVhZCk7CisJc3Bpbl9sb2NrKCZjaWZzX2lub2RlLT5vcGVuX2Zp
-bGVfbG9jayk7CiAJbGlzdF9mb3JfZWFjaF9lbnRyeShjZmlsZSwgJmNpZnNfaW5vZGUtPm9wZW5G
-aWxlTGlzdCwgZmxpc3QpIHsKIAkJaWYgKGRlbGF5ZWRfd29ya19wZW5kaW5nKCZjZmlsZS0+ZGVm
-ZXJyZWQpKSB7Ci0JCQkvKgotCQkJICogSWYgdGhlcmUgaXMgbm8gcGVuZGluZyB3b3JrLCBtb2Rf
-ZGVsYXllZF93b3JrIHF1ZXVlcyBuZXcgd29yay4KLQkJCSAqIFNvLCBJbmNyZWFzZSB0aGUgcmVm
-IGNvdW50IHRvIGF2b2lkIHVzZS1hZnRlci1mcmVlLgotCQkJICovCi0JCQlpZiAoIW1vZF9kZWxh
-eWVkX3dvcmsoZGVmZXJyZWRjbG9zZV93cSwgJmNmaWxlLT5kZWZlcnJlZCwgMCkpCi0JCQkJY2lm
-c0ZpbGVJbmZvX2dldChjZmlsZSk7CisJCQlpZiAoY2FuY2VsX2RlbGF5ZWRfd29yaygmY2ZpbGUt
-PmRlZmVycmVkKSkgeworCQkJCXRtcF9saXN0ID0ga21hbGxvYyhzaXplb2Yoc3RydWN0IGZpbGVf
-bGlzdCksIEdGUF9BVE9NSUMpOworCQkJCWlmICh0bXBfbGlzdCA9PSBOVUxMKQorCQkJCQljb250
-aW51ZTsKKwkJCQl0bXBfbGlzdC0+Y2ZpbGUgPSBjZmlsZTsKKwkJCQlsaXN0X2FkZF90YWlsKCZ0
-bXBfbGlzdC0+bGlzdCwgJmZpbGVfaGVhZCk7CisJCQl9CiAJCX0KIAl9CisJc3Bpbl91bmxvY2so
-JmNpZnNfaW5vZGUtPm9wZW5fZmlsZV9sb2NrKTsKKworCWxpc3RfZm9yX2VhY2hfZW50cnkodG1w
-X2xpc3QsICZmaWxlX2hlYWQsIGxpc3QpIHsKKwkJX2NpZnNGaWxlSW5mb19wdXQodG1wX2xpc3Qt
-PmNmaWxlLCB0cnVlLCBmYWxzZSk7CisJfQogfQogCiB2b2lkCkBAIC03NDQsMjAgKzc1NCwyOCBA
-QCBjaWZzX2Nsb3NlX2FsbF9kZWZlcnJlZF9maWxlcyhzdHJ1Y3QgY2lmc190Y29uICp0Y29uKQog
-ewogCXN0cnVjdCBjaWZzRmlsZUluZm8gKmNmaWxlOwogCXN0cnVjdCBsaXN0X2hlYWQgKnRtcDsK
-KwlzdHJ1Y3QgZmlsZV9saXN0ICp0bXBfbGlzdDsKKwlzdHJ1Y3QgbGlzdF9oZWFkIGZpbGVfaGVh
-ZDsKIAorCUlOSVRfTElTVF9IRUFEKCZmaWxlX2hlYWQpOwogCXNwaW5fbG9jaygmdGNvbi0+b3Bl
-bl9maWxlX2xvY2spOwogCWxpc3RfZm9yX2VhY2godG1wLCAmdGNvbi0+b3BlbkZpbGVMaXN0KSB7
-CiAJCWNmaWxlID0gbGlzdF9lbnRyeSh0bXAsIHN0cnVjdCBjaWZzRmlsZUluZm8sIHRsaXN0KTsK
-IAkJaWYgKGRlbGF5ZWRfd29ya19wZW5kaW5nKCZjZmlsZS0+ZGVmZXJyZWQpKSB7Ci0JCQkvKgot
-CQkJICogSWYgdGhlcmUgaXMgbm8gcGVuZGluZyB3b3JrLCBtb2RfZGVsYXllZF93b3JrIHF1ZXVl
-cyBuZXcgd29yay4KLQkJCSAqIFNvLCBJbmNyZWFzZSB0aGUgcmVmIGNvdW50IHRvIGF2b2lkIHVz
-ZS1hZnRlci1mcmVlLgotCQkJICovCi0JCQlpZiAoIW1vZF9kZWxheWVkX3dvcmsoZGVmZXJyZWRj
-bG9zZV93cSwgJmNmaWxlLT5kZWZlcnJlZCwgMCkpCi0JCQkJY2lmc0ZpbGVJbmZvX2dldChjZmls
-ZSk7CisJCQlpZiAoY2FuY2VsX2RlbGF5ZWRfd29yaygmY2ZpbGUtPmRlZmVycmVkKSkgeworCQkJ
-CXRtcF9saXN0ID0ga21hbGxvYyhzaXplb2Yoc3RydWN0IGZpbGVfbGlzdCksIEdGUF9BVE9NSUMp
-OworCQkJCWlmICh0bXBfbGlzdCA9PSBOVUxMKQorCQkJCQljb250aW51ZTsKKwkJCQl0bXBfbGlz
-dC0+Y2ZpbGUgPSBjZmlsZTsKKwkJCQlsaXN0X2FkZF90YWlsKCZ0bXBfbGlzdC0+bGlzdCwgJmZp
-bGVfaGVhZCk7CisJCQl9CiAJCX0KIAl9CiAJc3Bpbl91bmxvY2soJnRjb24tPm9wZW5fZmlsZV9s
-b2NrKTsKKworCWxpc3RfZm9yX2VhY2hfZW50cnkodG1wX2xpc3QsICZmaWxlX2hlYWQsIGxpc3Qp
-IHsKKwkJX2NpZnNGaWxlSW5mb19wdXQodG1wX2xpc3QtPmNmaWxlLCB0cnVlLCBmYWxzZSk7CisJ
-fQogfQogCiAvKiBwYXJzZXMgREZTIHJlZmZlcmFsIFYzIHN0cnVjdHVyZQotLSAKMi4zMC4yCgo=
---00000000000019ccb305c91d6e1b--
+
+> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
+> ---
+> fs/hfs/super.c | 31 +++++++++++++++++++++++++++++++
+> fs/hfs/trans.c | 38 ++++++++++++++------------------------
+> 2 files changed, 45 insertions(+), 24 deletions(-)
+>=20
+> diff --git a/fs/hfs/super.c b/fs/hfs/super.c
+> index 12d9bae39363..86bc46746c7f 100644
+> --- a/fs/hfs/super.c
+> +++ b/fs/hfs/super.c
+> @@ -351,6 +351,37 @@ static int parse_options(char *options, struct =
+hfs_sb_info *hsb)
+> 		}
+> 	}
+>=20
+> +	if (hsb->nls_io && !hsb->nls_disk) {
+> +		/*
+> +		 * Previous version of hfs driver did something =
+unexpected:
+> +		 * When codepage was not defined but iocharset was then
+> +		 * hfs driver copied 8bit character from disk directly =
+to
+> +		 * 16bit unicode wchar_t type. Which means it did =
+conversion
+> +		 * from Latin1 (ISO-8859-1) to Unicode because first 256
+> +		 * Unicode code points matches 8bit ISO-8859-1 codepage =
+table.
+> +		 * So when iocharset was specified and codepage not, =
+then
+> +		 * codepage used implicit value "iso8859-1".
+> +		 *
+> +		 * To not change this previous default behavior as some =
+users
+> +		 * may depend on it, we load iso8859-1 NLS table =
+explicitly
+> +		 * to simplify code and make it more reable what =
+happens.
+> +		 *
+> +		 * In context of hfs driver it is really strange to use
+> +		 * ISO-8859-1 codepage table for storing data to disk, =
+but
+> +		 * nothing forbids it. Just it is highly incompatible =
+with
+> +		 * Mac OS systems. So via pr_warn() inform user that =
+this
+> +		 * is not probably what he wants.
+> +		 */
+> +		pr_warn("iocharset was specified but codepage not, "
+> +			"using default codepage=3Diso8859-1\n");
+> +		pr_warn("this default codepage=3Diso8859-1 is =
+incompatible with "
+> +			"Mac OS systems and may be changed in the =
+future");
+> +		hsb->nls_disk =3D load_nls("iso8859-1");
+> +		if (!hsb->nls_disk) {
+> +			pr_err("unable to load iso8859-1 codepage\n");
+> +			return 0;
+> +		}
+> +	}
+> 	if (hsb->nls_disk && !hsb->nls_io) {
+> 		hsb->nls_io =3D load_nls_default();
+> 		if (!hsb->nls_io) {
+> diff --git a/fs/hfs/trans.c b/fs/hfs/trans.c
+> index 39f5e343bf4d..c75682c61b06 100644
+> --- a/fs/hfs/trans.c
+> +++ b/fs/hfs/trans.c
+> @@ -48,18 +48,13 @@ int hfs_mac2asc(struct super_block *sb, char *out, =
+const struct hfs_name *in)
+> 		wchar_t ch;
+>=20
+> 		while (srclen > 0) {
+> -			if (nls_disk) {
+> -				size =3D nls_disk->char2uni(src, srclen, =
+&ch);
+> -				if (size <=3D 0) {
+> -					ch =3D '?';
+> -					size =3D 1;
+> -				}
+> -				src +=3D size;
+> -				srclen -=3D size;
+> -			} else {
+> -				ch =3D *src++;
+> -				srclen--;
+> +			size =3D nls_disk->char2uni(src, srclen, &ch);
+> +			if (size <=3D 0) {
+> +				ch =3D '?';
+> +				size =3D 1;
+> 			}
+> +			src +=3D size;
+> +			srclen -=3D size;
+> 			if (ch =3D=3D '/')
+> 				ch =3D ':';
+> 			size =3D nls_io->uni2char(ch, dst, dstlen);
+> @@ -119,20 +114,15 @@ void hfs_asc2mac(struct super_block *sb, struct =
+hfs_name *out, const struct qstr
+> 			srclen -=3D size;
+> 			if (ch =3D=3D ':')
+> 				ch =3D '/';
+> -			if (nls_disk) {
+> -				size =3D nls_disk->uni2char(ch, dst, =
+dstlen);
+> -				if (size < 0) {
+> -					if (size =3D=3D -ENAMETOOLONG)
+> -						goto out;
+> -					*dst =3D '?';
+> -					size =3D 1;
+> -				}
+> -				dst +=3D size;
+> -				dstlen -=3D size;
+> -			} else {
+> -				*dst++ =3D ch > 0xff ? '?' : ch;
+> -				dstlen--;
+> +			size =3D nls_disk->uni2char(ch, dst, dstlen);
+> +			if (size < 0) {
+> +				if (size =3D=3D -ENAMETOOLONG)
+> +					goto out;
+> +				*dst =3D '?';
+> +				size =3D 1;
+> 			}
+> +			dst +=3D size;
+> +			dstlen -=3D size;
+> 		}
+> 	} else {
+> 		char ch;
+> --=20
+> 2.20.1
+>=20
+
