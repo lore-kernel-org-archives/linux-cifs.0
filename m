@@ -2,63 +2,39 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81380C4338F
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Aug 2021 20:52:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0020FC4338F
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Aug 2021 21:25:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 592DF601FF
-	for <linux-cifs@archiver.kernel.org>; Mon,  9 Aug 2021 20:52:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9C6F60F93
+	for <linux-cifs@archiver.kernel.org>; Mon,  9 Aug 2021 21:25:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236303AbhHIUwk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 9 Aug 2021 16:52:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48790 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236062AbhHIUwj (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 9 Aug 2021 16:52:39 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86B1FC0613D3;
-        Mon,  9 Aug 2021 13:52:18 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id h11so10510897ljo.12;
-        Mon, 09 Aug 2021 13:52:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=dK575eflD+STye7Op1lRK6nqKdgr0fcfkvv4bBDnEnQ=;
-        b=dsxdF+eBSn/90W8Q0YlAKuarE7/CMiCbElHS7lqpn+7mXr0Ks4IlkvFFDJFfxjfclT
-         kpMIfbETD6N8E0/Hy4PzQg5a3aGaIe0PGSTAYxw/h8Fpda2vFvYVvcQrWPjHwDYlQg9A
-         LGye2a/52ekUVE/1AXRIxt4B3x3eBNi0TtSuxYDCMCG6xrL814dXEiOpCMIjTzUuqZD2
-         WO0IhfUmRVEMtu+MGmgAuBs7yKRqE5UHM+CJP6Qa4AU+oxFuhDNaoAmZcksFPqppnR9o
-         sJ4VIwl4T1B3NbjC/XNMFh2pei+Y9IlgowjD9s3krz7uaxNf8uObKMM0jrjNpwrpDEaS
-         zrTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=dK575eflD+STye7Op1lRK6nqKdgr0fcfkvv4bBDnEnQ=;
-        b=t3fesBRLPGFLVTB438pncdPNobvlYoiOhzxK7bxEeeVSSzji+VODiCPns4EDxAyQw8
-         MhKzedviFOBm2Z3aSuahzyKWi4OoVfDv4Ar2w/Xk7y5UmW1jD27Byjz5lb2nFioJpLcg
-         m8OKABcRGQkx/Ms+ZjWr3nSMCFxls7E1jDEbX/gleg7+ZNH5dBJkyv/CJhZTjSyipBPG
-         fBeit+5XIp7NKOmKJa4DePXtgzn+dp2Edw3N+zPiRC4iG19UPuotTVlsXutF3C6QXnbI
-         ASX/P95dvrM0maT7wowfbpetQHJU2cweupKWR9Q4GowWnlF3pFNrRr0V/nzGuRy3XZEe
-         wRbg==
-X-Gm-Message-State: AOAM530vcDZ0ERgETcuRfL6Whw/u9azYBGp84UgGOQoc4QABN9TyCh1a
-        HfuySECEUOC3hUuj/Tygo2c=
-X-Google-Smtp-Source: ABdhPJxdAmIIMREvt7Qdl08XDDa3yv5ckIQSESbS+K1Ck04daVHWiCCfZLO5pN71JjJxDXTF3KG+2g==
-X-Received: by 2002:a2e:3206:: with SMTP id y6mr1985938ljy.187.1628542336977;
-        Mon, 09 Aug 2021 13:52:16 -0700 (PDT)
-Received: from kari-VirtualBox (85-23-89-224.bb.dnainternet.fi. [85.23.89.224])
-        by smtp.gmail.com with ESMTPSA id c10sm1283899ljr.134.2021.08.09.13.52.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Aug 2021 13:52:16 -0700 (PDT)
-Date:   Mon, 9 Aug 2021 23:52:14 +0300
-From:   Kari Argillander <kari.argillander@gmail.com>
-To:     Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+        id S234842AbhHIV0U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 9 Aug 2021 17:26:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50430 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230366AbhHIV0T (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 9 Aug 2021 17:26:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 893AB60EB9;
+        Mon,  9 Aug 2021 21:25:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628544358;
+        bh=OVk9UHdUYnGUAQ/9b5LQEesj/Z+2icrT45MDhBuum7k=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=k3zkEbpe3SR2ifocQzBNaNV4JTESvreRYDOITb5EhKP8EF1VxpwWoy+RBCTjiYmKG
+         v1qC5xH3ZnW5mGznhtox5enskOXyHSnXgsen3YDz0BndDX9twm/bgcx4pfzEYCaSTN
+         4XTcBM/zRN4/bJViHUON4w3GNQslKscKPWCGx7Q3xYbB4TUm3Wqi2t6+RAMDLGRuAN
+         gRWcEfpioDK297C83BT0zf/omKPI/Lqh9aO/PfhsA5pH+7K1y0OV5zWmYsuYhYuCTk
+         gmaJUaIsg0ijm4gpMEBQFUZBGw5V4pZFH6p1K+X46nz64ONI6umzfOUp2j44Pu+/X7
+         AbZ/qMVdtS+AQ==
+Received: by pali.im (Postfix)
+        id 41BACC7C; Mon,  9 Aug 2021 23:25:56 +0200 (CEST)
+Date:   Mon, 9 Aug 2021 23:25:56 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     Kari Argillander <kari.argillander@gmail.com>
 Cc:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
         jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
@@ -74,23 +50,27 @@ Cc:     linux-fsdevel@vger.kernel.org,
         Pavel Machek <pavel@ucw.cz>,
         Marek =?utf-8?B?QmVow7pu?= <marek.behun@nic.cz>,
         Christoph Hellwig <hch@infradead.org>
-Subject: Re: [RFC PATCH 05/20] ntfs: Undeprecate iocharset= mount option
-Message-ID: <20210809205214.mual4t7ipppc7h3v@kari-VirtualBox>
+Subject: Re: [RFC PATCH 02/20] hfsplus: Add iocharset= mount option as alias
+ for nls=
+Message-ID: <20210809212556.3ygj6atbc5ma642m@pali>
 References: <20210808162453.1653-1-pali@kernel.org>
- <20210808162453.1653-6-pali@kernel.org>
+ <20210808162453.1653-3-pali@kernel.org>
+ <20210809204921.3ovrnbtzywsui4pt@kari-VirtualBox>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210808162453.1653-6-pali@kernel.org>
+In-Reply-To: <20210809204921.3ovrnbtzywsui4pt@kari-VirtualBox>
+User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sun, Aug 08, 2021 at 06:24:38PM +0200, Pali Rohár wrote:
-> Other fs drivers are using iocharset= mount option for specifying charset.
-> So mark iocharset= mount option as preferred and deprecate nls= mount
-> option.
+On Monday 09 August 2021 23:49:21 Kari Argillander wrote:
+> On Sun, Aug 08, 2021 at 06:24:35PM +0200, Pali RohÃ¡r wrote:
+> > Other fs drivers are using iocharset= mount option for specifying charset.
+> > So add it also for hfsplus and mark old nls= mount option as deprecated.
+> 
+> It would be good to also update Documentation/filesystems/hfsplus.rst.
 
-Documentation needs to also be updated here.
-
+Good point! I'm making a note.
