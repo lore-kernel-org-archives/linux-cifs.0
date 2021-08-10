@@ -2,84 +2,78 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 520CDC4338F
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Aug 2021 06:34:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF757C4338F
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Aug 2021 10:44:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22C2260E9B
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Aug 2021 06:34:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB7B060EB5
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Aug 2021 10:44:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbhHJGej (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 10 Aug 2021 02:34:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30819 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229459AbhHJGej (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 10 Aug 2021 02:34:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628577256;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=hojzk0zeEhbULOpCcg+qe2MBidy33TFFW9PMc15rFLc=;
-        b=bUho/PbM+hgzQjrSkx/HOXbAOcUp0qu5BWY5YlKnledDmC/NU8FyaEKefvNL2o1Ic4NMnj
-        eI19y7G2qyzY94ueLfVNW1IuElPdYSUrg6IjrUFMvwU0eFYRjVfbiXmpE0a0E7VhJ/ujUz
-        nWGgl8bcxAF5hxjnwM1GmBPaIhpfPGI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-l8_RJ5RmPTqNtrfP09__Sg-1; Tue, 10 Aug 2021 02:34:03 -0400
-X-MC-Unique: l8_RJ5RmPTqNtrfP09__Sg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2A95100F764;
-        Tue, 10 Aug 2021 06:34:02 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-105.bne.redhat.com [10.64.54.105])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0A7541B4B8;
-        Tue, 10 Aug 2021 06:34:01 +0000 (UTC)
-From:   Ronnie Sahlberg <lsahlber@redhat.com>
-To:     linux-cifs <linux-cifs@vger.kernel.org>
-Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH] cifs: use the correct max-length for dentry_path_raw()
-Date:   Tue, 10 Aug 2021 16:33:55 +1000
-Message-Id: <20210810063355.721945-1-lsahlber@redhat.com>
+        id S235623AbhHJKo3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 10 Aug 2021 06:44:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39692 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231705AbhHJKo3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Aug 2021 06:44:29 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F9A8C0613D3
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Aug 2021 03:44:07 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id k9so12242613edr.10
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Aug 2021 03:44:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=PoB4ffYPS4ncgMK2IbZmX2wNO+7gY/LVYemZ/bMXf7A=;
+        b=ePmW1YA1HmVVLXjn2/TmzJkMpQsT+T9R03C9Es2n/Vnfkdzbv2P7pbLxoiaZMChvtb
+         G8jpVBZP4jCcfgqTZ/uAqHq0Q3U0DZebJCOHOPUfedN0mtZbGJbg6sv1l/l8YhwY8gs8
+         VC6L5zSQu895Z7VajN5KF3DCU5JkJYSOlQKtytewDqkuR0MY194QjEi6wkRoefJr+kdR
+         QmD+oWeAwiEmeJFIHELz9/lU3LaVTIo57KPfYPIMRgMtRVna5t8o0m28Lqq7hWa/gMrQ
+         oNGUmHLaGTqCJ/SaxovWgO6yQw6Rm3q0bUIiSiWXjy+odzOB6EElh1E3mdBVmnihpHVp
+         ANXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=PoB4ffYPS4ncgMK2IbZmX2wNO+7gY/LVYemZ/bMXf7A=;
+        b=uTs2jt4JuloxqCYSys06UyPOk7+0+JxGYPxXF7Xz3GV/0CSlQ7THHz72Pq6iqOg4Rj
+         v4W81FxofzKXTOmI9z064RKnkknViBS6Bw+nCn1qens1lwK+mb/VECCHcfwIswiioOXb
+         6Tmr4t3ZMz/pEezeheQLlH09IcCBksPeb/XF21w2JyPm99eXFPwQKLOHjZf2SFUtAlLc
+         VZqHbJF5Ff9fyNglBaOPqkJuxlMeFRkj2t0M/M2WIkfNIjzyzpplfPMJaMmdE/R4tbc2
+         I8rWTO2Ph6Aw4azV/1rmWJVzv03FkhUISKxya/dzsAuFzY8qIu0fGK+fSKIKxpiyhWkB
+         2QdQ==
+X-Gm-Message-State: AOAM5306djXs8dIu+5UoC3sP/rbI+XqT39SMFUrrrcGgol3NkmRwvuOv
+        h3xYgkyQnASX2SHZKdpID09qXQZjSXbzQmRYvXE=
+X-Google-Smtp-Source: ABdhPJyyprkcrypU19g58tyv5AXLXWZXJvBlbdd7vy+bRCbH3M7+HFSFrPlP/ZMmCKvN9AdcldR50t3/xBdmbgaWLJY=
+X-Received: by 2002:a05:6402:5242:: with SMTP id t2mr4190195edd.200.1628592245889;
+ Tue, 10 Aug 2021 03:44:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Tue, 10 Aug 2021 16:13:54 +0530
+Message-ID: <CANT5p=r5tE5VkQBG62K94fATeW4uGW7Q6_KcHj+5HsiKWoAD8g@mail.gmail.com>
+Subject: [PATCH] cifs: enable fscache usage even for files opened as rw
+To:     Steve French <smfrench@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-RHBZ: 1972502
+Hi Steve,
 
-PATH_MAX is 4096 but PAGE_SIZE can be >4096 on some architectures
-such as ppc and would thus write beyond the end of the actual object.
+The following patch enables fscache even for scenarios where files are
+opened in rw mode. Our current implementation only enables fscache
+when the file is opened O_RDONLY.
 
-CC: Stable <stable@vger.kernel.org>
-Reported-by: Xiaoli Feng <xifeng@redhat.com>
-Suggested-by: Brian foster <bfoster@redhat.com>
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
----
- fs/cifs/dir.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+https://github.com/sprasad-microsoft/smb3-kernel-client/pull/5
 
-diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-index 79402ca0ddfa..5f8a302ffcb2 100644
---- a/fs/cifs/dir.c
-+++ b/fs/cifs/dir.c
-@@ -100,7 +100,7 @@ build_path_from_dentry_optional_prefix(struct dentry *direntry, void *page,
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_USE_PREFIX_PATH)
- 		pplen = cifs_sb->prepath ? strlen(cifs_sb->prepath) + 1 : 0;
- 
--	s = dentry_path_raw(direntry, page, PAGE_SIZE);
-+	s = dentry_path_raw(direntry, page, PATH_MAX);
- 	if (IS_ERR(s))
- 		return s;
- 	if (!s[1])	// for root we want "", not "/"
+Note that this patch can safely be backported. It still does not use
+netfs helper library.
+I'll be sending another patch with the netfs helper integration soon.
+
 -- 
-2.30.2
-
+Regards,
+Shyam
