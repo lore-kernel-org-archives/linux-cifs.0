@@ -4,75 +4,97 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF757C4338F
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Aug 2021 10:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA053C4338F
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Aug 2021 11:46:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB7B060EB5
-	for <linux-cifs@archiver.kernel.org>; Tue, 10 Aug 2021 10:44:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9462B60EBB
+	for <linux-cifs@archiver.kernel.org>; Tue, 10 Aug 2021 11:46:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235623AbhHJKo3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 10 Aug 2021 06:44:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39692 "EHLO
+        id S238273AbhHJLrB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 10 Aug 2021 07:47:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231705AbhHJKo3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Aug 2021 06:44:29 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F9A8C0613D3
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Aug 2021 03:44:07 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id k9so12242613edr.10
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Aug 2021 03:44:07 -0700 (PDT)
+        with ESMTP id S233534AbhHJLrB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 10 Aug 2021 07:47:01 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 669BFC0613D3
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Aug 2021 04:46:39 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id bo19so10454558edb.9
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Aug 2021 04:46:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=PoB4ffYPS4ncgMK2IbZmX2wNO+7gY/LVYemZ/bMXf7A=;
-        b=ePmW1YA1HmVVLXjn2/TmzJkMpQsT+T9R03C9Es2n/Vnfkdzbv2P7pbLxoiaZMChvtb
-         G8jpVBZP4jCcfgqTZ/uAqHq0Q3U0DZebJCOHOPUfedN0mtZbGJbg6sv1l/l8YhwY8gs8
-         VC6L5zSQu895Z7VajN5KF3DCU5JkJYSOlQKtytewDqkuR0MY194QjEi6wkRoefJr+kdR
-         QmD+oWeAwiEmeJFIHELz9/lU3LaVTIo57KPfYPIMRgMtRVna5t8o0m28Lqq7hWa/gMrQ
-         oNGUmHLaGTqCJ/SaxovWgO6yQw6Rm3q0bUIiSiWXjy+odzOB6EElh1E3mdBVmnihpHVp
-         ANXA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mcNqVm4/eumaXJjBSz1H6sCX/n9KRkIwyfLxxDJPOSE=;
+        b=izm2RMCPVz6k910JYh3bnErAhhHZRG1+FSN1Uq+zQAzFaWdtVP3rkfA/6ehujw6C5n
+         jlqqEMW9q78IfEoNq4PhNQWzA/DjFs/Xuz8wjyYK82oJUAbDD8qHDH88PwoJ5tW+s1wr
+         J5Ww3STEBs/Idc3uWuuFDbodekD7WGlaaNdxcSWtoAPVYcIakGnMaShqFn+qh5zvxvBV
+         RgU8bXJBxw6pkm7jjPpzK8ZZqJFaLIdNUbW+JfizWXy+/zL2ind5Pv1clT3TcKo2FQ2S
+         NMwRKZ19mAFUHq/mOXzFhyUTCgvalNroHMvFHAY96VcV5djmfsBu2UzZinCYMiE+pMOS
+         Xzpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=PoB4ffYPS4ncgMK2IbZmX2wNO+7gY/LVYemZ/bMXf7A=;
-        b=uTs2jt4JuloxqCYSys06UyPOk7+0+JxGYPxXF7Xz3GV/0CSlQ7THHz72Pq6iqOg4Rj
-         v4W81FxofzKXTOmI9z064RKnkknViBS6Bw+nCn1qens1lwK+mb/VECCHcfwIswiioOXb
-         6Tmr4t3ZMz/pEezeheQLlH09IcCBksPeb/XF21w2JyPm99eXFPwQKLOHjZf2SFUtAlLc
-         VZqHbJF5Ff9fyNglBaOPqkJuxlMeFRkj2t0M/M2WIkfNIjzyzpplfPMJaMmdE/R4tbc2
-         I8rWTO2Ph6Aw4azV/1rmWJVzv03FkhUISKxya/dzsAuFzY8qIu0fGK+fSKIKxpiyhWkB
-         2QdQ==
-X-Gm-Message-State: AOAM5306djXs8dIu+5UoC3sP/rbI+XqT39SMFUrrrcGgol3NkmRwvuOv
-        h3xYgkyQnASX2SHZKdpID09qXQZjSXbzQmRYvXE=
-X-Google-Smtp-Source: ABdhPJyyprkcrypU19g58tyv5AXLXWZXJvBlbdd7vy+bRCbH3M7+HFSFrPlP/ZMmCKvN9AdcldR50t3/xBdmbgaWLJY=
-X-Received: by 2002:a05:6402:5242:: with SMTP id t2mr4190195edd.200.1628592245889;
- Tue, 10 Aug 2021 03:44:05 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mcNqVm4/eumaXJjBSz1H6sCX/n9KRkIwyfLxxDJPOSE=;
+        b=JTMNWWjD5Pqp6rb8dNSn7ssSONhnw7pC4ik73kPiVXIgw759VXxbHqP8ElwEMKUMSF
+         KIDVvED1X6zQdSJrLNeVbM918jm45U2rIOiRGqhobCWmJ8YxGlzw6uVkJ9/MMwkzOnwN
+         96JHTw9XSHCAAvv59P9JBmoBxjec0GaugwZWbe2+k49A5Tx+DiEV6I+5lVORYBDsag9a
+         nMvaoV6MxPsFIhmheMkG5wF2hxmXgns8nMtuhZMJEVe3AKLvy8cn6fWr5S/OB/9i8/MR
+         OA/J0lyU/hddX+HjTLIOxJ6Hnzdu0DXKsp9ESiVlq/2aJwatMg26HbP1myA0AR42xcVy
+         8GWg==
+X-Gm-Message-State: AOAM530/bwLudYaEyMbQDBM40S1QW5D4Rbc7j727CZt2QqIPWXti9z/A
+        IhRlDQXrAJqzBX0R40rEgasegNhwAqsp7ziKd5o=
+X-Google-Smtp-Source: ABdhPJyEdcgen0tvqR3814AYcztCjuRBGffbldJ3ALuTLsEMqwoT4p3TjbSTF8rfQzSEFbaAF0uS0BwzvoXda5HI/WA=
+X-Received: by 2002:a05:6402:5112:: with SMTP id m18mr4406106edd.47.1628595997979;
+ Tue, 10 Aug 2021 04:46:37 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAH2r5ms3XvZSLbAOb7irrZpS0aFsDUW59qRDdN19H8ZaR_YX+w@mail.gmail.com>
+ <CACdtm0YKX0AK6axj+QnpG9cd1ee-3D9jreo567vK+Raf8B0MQw@mail.gmail.com>
+In-Reply-To: <CACdtm0YKX0AK6axj+QnpG9cd1ee-3D9jreo567vK+Raf8B0MQw@mail.gmail.com>
 From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Tue, 10 Aug 2021 16:13:54 +0530
-Message-ID: <CANT5p=r5tE5VkQBG62K94fATeW4uGW7Q6_KcHj+5HsiKWoAD8g@mail.gmail.com>
-Subject: [PATCH] cifs: enable fscache usage even for files opened as rw
-To:     Steve French <smfrench@gmail.com>,
-        David Howells <dhowells@redhat.com>,
+Date:   Tue, 10 Aug 2021 17:16:26 +0530
+Message-ID: <CANT5p=rkhwZgNL_v81rMLJXZPh_bojzH6eAwkEPn4LizK2vozQ@mail.gmail.com>
+Subject: Re: [PATCH][CIFS] Handle race conditions during rename
+To:     Rohith Surabattula <rohiths.msft@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Steve,
+I see a memory leak of dclose in cifs_close. I hope that's the one you
+were referring to earlier?
+Also, we'll need to avoid cifs_close_all_deferred_files in the future.
+Maybe not for this patch.
 
-The following patch enables fscache even for scenarios where files are
-opened in rw mode. Our current implementation only enables fscache
-when the file is opened O_RDONLY.
+Other than that, looks good to me.
+Reviewed-by: Shyam Prasad N <sprasad@microsoft.com>
 
-https://github.com/sprasad-microsoft/smb3-kernel-client/pull/5
+On Mon, Aug 9, 2021 at 3:54 PM Rohith Surabattula
+<rohiths.msft@gmail.com> wrote:
+>
+> Hi Steve, All,
+>
+> Have updated the patch slightly with null check to avoid kernel oops.
+>
+> Regards,
+> Rohith
+>
+> On Wed, Aug 4, 2021 at 11:13 PM Steve French <smfrench@gmail.com> wrote:
+> >
+> > Lightly updated version of Rohith's newer version of his deferred close fix (fixed minor checkpatch issue and added cc:stable #5.13
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
 
-Note that this patch can safely be backported. It still does not use
-netfs helper library.
-I'll be sending another patch with the netfs helper integration soon.
+
 
 -- 
 Regards,
