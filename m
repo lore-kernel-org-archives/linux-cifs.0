@@ -2,118 +2,242 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1596C4338F
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Aug 2021 13:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DDFC4338F
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Aug 2021 14:17:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA326604D7
-	for <linux-cifs@archiver.kernel.org>; Thu, 12 Aug 2021 13:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 815B26103E
+	for <linux-cifs@archiver.kernel.org>; Thu, 12 Aug 2021 14:17:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237664AbhHLNWq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 12 Aug 2021 09:22:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60670 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237671AbhHLNVf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Aug 2021 09:21:35 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3025C00EA84
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Aug 2021 06:21:03 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id f5so8241097wrm.13
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Aug 2021 06:21:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=M2hDm2bbAZjHUXfscohHcV4TKuF84LkWtN+JrhEJdyE=;
-        b=WFR6c9ttGixhIOn3Ioil3tZKcmr1KFYeLzLazmmbKO8C/um8p3QAj35Uky7hOUj2N+
-         BepcQ1tx7TRfOy2v1bYnLM3assVLFs6cjF1k4xxVDGxXKvSkjqKijOsMwh9ahVwMSNB6
-         0KQoYzo2zV6giE+wIBlCb2eRI4j3d5YCuE5udTXQis2udu9a/1WGpm0x2dQhcUo7uvFW
-         FO5nvBOA7Do1Ml6OnvvoIZAoOqqokjL2RfdnERHaowtl6SfL36qWSAqRbhcZ7mtxEEP+
-         0iT6kGpFuX999mASgwzN08ux2sAHa+BVioolfUy9OPu7d3QpsqdCnOWoBgO7FCn/SfvZ
-         Ti9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=M2hDm2bbAZjHUXfscohHcV4TKuF84LkWtN+JrhEJdyE=;
-        b=ZuhF+sXgMN5+EiSFRElcmgyYpEd0nMp9ZmOpfKroFhZfNjf2xUAreLkHDUX2J0WrRE
-         yfhDdL2j87/wXiTxEw4z/1Am2oxNVDsJeVx6U2Ir2Z3ZAbTf7qN1EVKYXZ0oD0/yRLTR
-         sJbIMs8nNhuDLCi9gEi+cVrLsZ5heYRky14HATE//zBiP0+H59kh3772o1mh/nji+fGi
-         UBR6AYOgnXC4KxPd8uw1uJphGDcXLeKT+TeEEk4TEcPSsBjpFs0fq+T+5tVQszsEZOoB
-         FRKAmVu9RwqiJ7vXAhixpX8HCfFcfaeEs20y/hSEqx9NKkEBqL6l+CA9FSD9lQve5KYV
-         k8UA==
-X-Gm-Message-State: AOAM530Ho1ZoYzszF4Jqu7fWZ8Cq9uy07+UxMIHmpDsBWL7pn9A3SyZt
-        SsvCQyUCHJlQIZ30lDayCgcV/7dspXgKeIPoEtqKTxE1XN0MNQ==
-X-Google-Smtp-Source: ABdhPJxuHQsJ/8CycQj30W5hWxHtSx2D1d4kXEQGLtsHSiibkyK/CvbSRMmJr9F4sn29YhDjfsLBjOmKqczrtJr82jU=
-X-Received: by 2002:a5d:50cd:: with SMTP id f13mr2906376wrt.68.1628774461981;
- Thu, 12 Aug 2021 06:21:01 -0700 (PDT)
+        id S237290AbhHLOSE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 12 Aug 2021 10:18:04 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:35466 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236547AbhHLOSD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 12 Aug 2021 10:18:03 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 4F2141FF47;
+        Thu, 12 Aug 2021 14:17:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1628777857; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1LOq+1RQ1bTZ6xSCL5P+LUHz6PeiGtFp6lwo2Lqqi7Q=;
+        b=SyRasx6BYceomp5A+vWd4xR0dle1B5guJeUWfAt8MXCICkXDRM4Oz3QToHB6VB0i3wuklT
+        rD1ODhLj1qp3Gxa/cBNEn2uynbbVSk3bEWm1MvgSMO1+bSW5Vz10g7cH5ayULBga1nLnI0
+        F5UXM0ya2H7/DIFqNTn5zZVy+6MCS1k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1628777857;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1LOq+1RQ1bTZ6xSCL5P+LUHz6PeiGtFp6lwo2Lqqi7Q=;
+        b=GnzDUaCqYiTEgMmiYEgvAadtT34kHXqFeZpKyBC6BK2GN55zyPQnlN7MyWkUiuOme/CnH1
+        ZhReSiomtDrRUaDw==
+Received: from quack2.suse.cz (unknown [10.100.224.230])
+        by relay2.suse.de (Postfix) with ESMTP id 6B05DA3F4E;
+        Thu, 12 Aug 2021 14:17:36 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 46CF11F2BA7; Thu, 12 Aug 2021 16:17:36 +0200 (CEST)
+Date:   Thu, 12 Aug 2021 16:17:36 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jan Kara <jack@suse.cz>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Luis de Bethencourt <luisbg@kernel.org>,
+        Salah Triki <salah.triki@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Marek =?iso-8859-1?Q?Beh=FAn?= <marek.behun@nic.cz>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [RFC PATCH 03/20] udf: Fix iocharset=utf8 mount option
+Message-ID: <20210812141736.GE14675@quack2.suse.cz>
+References: <20210808162453.1653-1-pali@kernel.org>
+ <20210808162453.1653-4-pali@kernel.org>
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 12 Aug 2021 08:20:51 -0500
-Message-ID: <CAH2r5muan8hTn6Wn2NGgPM3NP5MQ_nd4HU6D7ofLgJk9vsb6ag@mail.gmail.com>
-Subject: [PATCH v2][CIFS] avoid signed integer overflow in calculating blocks
-To:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210808162453.1653-4-pali@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Adding fix for one more place where the same error can occur
+On Sun 08-08-21 18:24:36, Pali Rohár wrote:
+> Currently iocharset=utf8 mount option is broken. To use UTF-8 as iocharset,
+> it is required to use utf8 mount option.
+> 
+> Fix iocharset=utf8 mount option to use be equivalent to the utf8 mount
+> option.
+> 
+> If UTF-8 as iocharset is used then s_nls_map is set to NULL. So simplify
+> code around, remove UDF_FLAG_NLS_MAP and UDF_FLAG_UTF8 flags as to
+> distinguish between UTF-8 and non-UTF-8 it is needed just to check if
+> s_nls_map set to NULL or not.
+> 
+> Signed-off-by: Pali Rohár <pali@kernel.org>
 
-xfstest generic/525 can generate the following warning:
+Thanks for the cleanup. It looks good. Feel free to add:
 
- UBSAN: signed-integer-overflow in fs/cifs/file.c:2644:31
- 9223372036854775807 + 511 cannot be represented in type 'long long int'
+Reviewed-by: Jan Kara <jack@suse.cz>
 
- Call Trace:
-  dump_stack+0x8d/0xb5
-  ubsan_epilogue+0x5/0x50
-  handle_overflow+0xa3/0xb0
-  cifs_write_end+0x424/0x440 [cifs]
-  generic_perform_write+0xef/0x190
+Or should I take this patch through my tree?
 
-due to overflowing loff_t (a signed 64 bit) when it is rounded up
-to calculate number of 512 byte blocks in a file in two places.
+								Honza
 
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/cifs/file.c  | 3 ++-
- fs/cifs/inode.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index 0166f39f1888..3cc17871471a 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2641,7 +2641,8 @@ static int cifs_write_end(struct file *file,
-struct address_space *mapping,
-  spin_lock(&inode->i_lock);
-  if (pos > inode->i_size) {
-  i_size_write(inode, pos);
-- inode->i_blocks = (512 - 1 + pos) >> 9;
-+ /* round up to block boundary, avoid overflow loff_t */
-+ inode->i_blocks = ((__u64)pos + (512 - 1)) >> 9;
-  }
-  spin_unlock(&inode->i_lock);
-  }
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 65f8a70cece3..f1dbcbc79abb 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -2631,7 +2631,7 @@ cifs_set_file_size(struct inode *inode, struct
-iattr *attrs,
-  * this is best estimate we have for blocks allocated for a file
-  * Number of blocks must be rounded up so size 1 is not 0 blocks
-  */
-- inode->i_blocks = (512 - 1 + attrs->ia_size) >> 9;
-+ inode->i_blocks = ((__u64)attrs->ia_size + (512 - 1)) >> 9;
-
-  /*
-  * The man page of truncate says if the size changed,
+> ---
+>  fs/udf/super.c   | 50 ++++++++++++++++++------------------------------
+>  fs/udf/udf_sb.h  |  2 --
+>  fs/udf/unicode.c |  4 ++--
+>  3 files changed, 21 insertions(+), 35 deletions(-)
+> 
+> diff --git a/fs/udf/super.c b/fs/udf/super.c
+> index 2f83c1204e20..6e8c29107b04 100644
+> --- a/fs/udf/super.c
+> +++ b/fs/udf/super.c
+> @@ -349,10 +349,10 @@ static int udf_show_options(struct seq_file *seq, struct dentry *root)
+>  		seq_printf(seq, ",lastblock=%u", sbi->s_last_block);
+>  	if (sbi->s_anchor != 0)
+>  		seq_printf(seq, ",anchor=%u", sbi->s_anchor);
+> -	if (UDF_QUERY_FLAG(sb, UDF_FLAG_UTF8))
+> -		seq_puts(seq, ",utf8");
+> -	if (UDF_QUERY_FLAG(sb, UDF_FLAG_NLS_MAP) && sbi->s_nls_map)
+> +	if (sbi->s_nls_map)
+>  		seq_printf(seq, ",iocharset=%s", sbi->s_nls_map->charset);
+> +	else
+> +		seq_puts(seq, ",iocharset=utf8");
+>  
+>  	return 0;
+>  }
+> @@ -558,19 +558,24 @@ static int udf_parse_options(char *options, struct udf_options *uopt,
+>  			/* Ignored (never implemented properly) */
+>  			break;
+>  		case Opt_utf8:
+> -			uopt->flags |= (1 << UDF_FLAG_UTF8);
+> +			if (!remount) {
+> +				unload_nls(uopt->nls_map);
+> +				uopt->nls_map = NULL;
+> +			}
+>  			break;
+>  		case Opt_iocharset:
+>  			if (!remount) {
+> -				if (uopt->nls_map)
+> -					unload_nls(uopt->nls_map);
+> -				/*
+> -				 * load_nls() failure is handled later in
+> -				 * udf_fill_super() after all options are
+> -				 * parsed.
+> -				 */
+> +				unload_nls(uopt->nls_map);
+> +				uopt->nls_map = NULL;
+> +			}
+> +			/* When nls_map is not loaded then UTF-8 is used */
+> +			if (!remount && strcmp(args[0].from, "utf8") != 0) {
+>  				uopt->nls_map = load_nls(args[0].from);
+> -				uopt->flags |= (1 << UDF_FLAG_NLS_MAP);
+> +				if (!uopt->nls_map) {
+> +					pr_err("iocharset %s not found\n",
+> +						args[0].from);
+> +					return 0;
+> +				}
+>  			}
+>  			break;
+>  		case Opt_uforget:
+> @@ -2139,21 +2144,6 @@ static int udf_fill_super(struct super_block *sb, void *options, int silent)
+>  	if (!udf_parse_options((char *)options, &uopt, false))
+>  		goto parse_options_failure;
+>  
+> -	if (uopt.flags & (1 << UDF_FLAG_UTF8) &&
+> -	    uopt.flags & (1 << UDF_FLAG_NLS_MAP)) {
+> -		udf_err(sb, "utf8 cannot be combined with iocharset\n");
+> -		goto parse_options_failure;
+> -	}
+> -	if ((uopt.flags & (1 << UDF_FLAG_NLS_MAP)) && !uopt.nls_map) {
+> -		uopt.nls_map = load_nls_default();
+> -		if (!uopt.nls_map)
+> -			uopt.flags &= ~(1 << UDF_FLAG_NLS_MAP);
+> -		else
+> -			udf_debug("Using default NLS map\n");
+> -	}
+> -	if (!(uopt.flags & (1 << UDF_FLAG_NLS_MAP)))
+> -		uopt.flags |= (1 << UDF_FLAG_UTF8);
+> -
+>  	fileset.logicalBlockNum = 0xFFFFFFFF;
+>  	fileset.partitionReferenceNum = 0xFFFF;
+>  
+> @@ -2308,8 +2298,7 @@ static int udf_fill_super(struct super_block *sb, void *options, int silent)
+>  error_out:
+>  	iput(sbi->s_vat_inode);
+>  parse_options_failure:
+> -	if (uopt.nls_map)
+> -		unload_nls(uopt.nls_map);
+> +	unload_nls(uopt.nls_map);
+>  	if (lvid_open)
+>  		udf_close_lvid(sb);
+>  	brelse(sbi->s_lvid_bh);
+> @@ -2359,8 +2348,7 @@ static void udf_put_super(struct super_block *sb)
+>  	sbi = UDF_SB(sb);
+>  
+>  	iput(sbi->s_vat_inode);
+> -	if (UDF_QUERY_FLAG(sb, UDF_FLAG_NLS_MAP))
+> -		unload_nls(sbi->s_nls_map);
+> +	unload_nls(sbi->s_nls_map);
+>  	if (!sb_rdonly(sb))
+>  		udf_close_lvid(sb);
+>  	brelse(sbi->s_lvid_bh);
+> diff --git a/fs/udf/udf_sb.h b/fs/udf/udf_sb.h
+> index 758efe557a19..4fa620543d30 100644
+> --- a/fs/udf/udf_sb.h
+> +++ b/fs/udf/udf_sb.h
+> @@ -20,8 +20,6 @@
+>  #define UDF_FLAG_UNDELETE		6
+>  #define UDF_FLAG_UNHIDE			7
+>  #define UDF_FLAG_VARCONV		8
+> -#define UDF_FLAG_NLS_MAP		9
+> -#define UDF_FLAG_UTF8			10
+>  #define UDF_FLAG_UID_FORGET     11    /* save -1 for uid to disk */
+>  #define UDF_FLAG_GID_FORGET     12
+>  #define UDF_FLAG_UID_SET	13
+> diff --git a/fs/udf/unicode.c b/fs/udf/unicode.c
+> index 5fcfa96463eb..622569007b53 100644
+> --- a/fs/udf/unicode.c
+> +++ b/fs/udf/unicode.c
+> @@ -177,7 +177,7 @@ static int udf_name_from_CS0(struct super_block *sb,
+>  		return 0;
+>  	}
+>  
+> -	if (UDF_QUERY_FLAG(sb, UDF_FLAG_NLS_MAP))
+> +	if (UDF_SB(sb)->s_nls_map)
+>  		conv_f = UDF_SB(sb)->s_nls_map->uni2char;
+>  	else
+>  		conv_f = NULL;
+> @@ -285,7 +285,7 @@ static int udf_name_to_CS0(struct super_block *sb,
+>  	if (ocu_max_len <= 0)
+>  		return 0;
+>  
+> -	if (UDF_QUERY_FLAG(sb, UDF_FLAG_NLS_MAP))
+> +	if (UDF_SB(sb)->s_nls_map)
+>  		conv_f = UDF_SB(sb)->s_nls_map->char2uni;
+>  	else
+>  		conv_f = NULL;
+> -- 
+> 2.20.1
+> 
 -- 
-Thanks,
-
-Steve
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
