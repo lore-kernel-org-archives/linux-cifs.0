@@ -2,112 +2,103 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E240C4338F
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 13:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 337A8C4338F
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 14:47:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38165610A4
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 13:48:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14FCF60F00
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 14:47:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239792AbhHMNsv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Aug 2021 09:48:51 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:44396 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239392AbhHMNsu (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Aug 2021 09:48:50 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id D61AE1FFC4;
-        Fri, 13 Aug 2021 13:48:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1628862502; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iKfxhwub3oLTOa/l2On4u32rCTa2b379k/9DNB6qAU0=;
-        b=Z8uS515S7zGDIuGZKjdGQnOGi1B1NMkvn5EMA+l5RfMfD16SG+wM9Mm19p+1gipU7UNAHX
-        0E1CJ40H6H/zsQSY2HDwFUHjF2rqaZ5HB9V3rjis6qJb/e0Pz6SehsbBqLGTKBNap1mO4r
-        qDyFX3gpOxFN0s2mLPgjWuzgZ7EINj0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1628862502;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iKfxhwub3oLTOa/l2On4u32rCTa2b379k/9DNB6qAU0=;
-        b=zyI2xYTl44lkAN35E0504dtH/sg3z277p6lXJScR58eQIKfhnvpgRsIr1Y6nFxZ5yCYNkB
-        DAkXUUrU1WgUfMAg==
-Received: from quack2.suse.cz (jack.udp.ovpn1.prg.suse.de [10.100.224.230])
-        by relay2.suse.de (Postfix) with ESMTP id 6A489A3B87;
-        Fri, 13 Aug 2021 13:48:22 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 4587E1E423D; Fri, 13 Aug 2021 15:48:22 +0200 (CEST)
-Date:   Fri, 13 Aug 2021 15:48:22 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        Marek =?iso-8859-1?Q?Beh=FAn?= <marek.behun@nic.cz>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [RFC PATCH 03/20] udf: Fix iocharset=utf8 mount option
-Message-ID: <20210813134822.GF11955@quack2.suse.cz>
-References: <20210808162453.1653-1-pali@kernel.org>
- <20210808162453.1653-4-pali@kernel.org>
- <20210812141736.GE14675@quack2.suse.cz>
- <20210812155134.g67ncugjvruos3cy@pali>
+        id S240836AbhHMOrw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Aug 2021 10:47:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45851 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240818AbhHMOrv (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 13 Aug 2021 10:47:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1628866044;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=+F5e/QJCQvTQyfdm+mXX5RdrWpejQYPMUGSZ/zRGUYg=;
+        b=HPWZiPabWoPFTO8P0obg/vGBtv+t7kxFRU5KXCYTKj2XNmi0LZHtBSqRD4botQ2j9sBqaa
+        9Px6PMrUv9erOt/G9aI0FBKFIqkSSohzcokugVdh1DLRhcKMQgQ4JfPNXO+bb9ib3AHTTF
+        sH2HM+WmFpZmwsfi69jUwzAcbPvnZVI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-524-lV9q3wEuNu2HaooDE1H1AA-1; Fri, 13 Aug 2021 10:47:23 -0400
+X-MC-Unique: lV9q3wEuNu2HaooDE1H1AA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A77DC1008061;
+        Fri, 13 Aug 2021 14:47:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.22.32.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B9DC060853;
+        Fri, 13 Aug 2021 14:47:15 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+Subject: [PATCH] netfs: Fix READ/WRITE confusion when calling
+ iov_iter_xarray()
+From:   David Howells <dhowells@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     Jeff Layton <jlayton@kernel.org>, linux-cachefs@redhat.com,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        dhowells@redhat.com, linux-kernel@vger.kernel.org
+Date:   Fri, 13 Aug 2021 15:47:14 +0100
+Message-ID: <162886603464.3940407.3790841170414793899.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210812155134.g67ncugjvruos3cy@pali>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu 12-08-21 17:51:34, Pali Rohár wrote:
-> On Thursday 12 August 2021 16:17:36 Jan Kara wrote:
-> > On Sun 08-08-21 18:24:36, Pali Rohár wrote:
-> > > Currently iocharset=utf8 mount option is broken. To use UTF-8 as iocharset,
-> > > it is required to use utf8 mount option.
-> > > 
-> > > Fix iocharset=utf8 mount option to use be equivalent to the utf8 mount
-> > > option.
-> > > 
-> > > If UTF-8 as iocharset is used then s_nls_map is set to NULL. So simplify
-> > > code around, remove UDF_FLAG_NLS_MAP and UDF_FLAG_UTF8 flags as to
-> > > distinguish between UTF-8 and non-UTF-8 it is needed just to check if
-> > > s_nls_map set to NULL or not.
-> > > 
-> > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > 
-> > Thanks for the cleanup. It looks good. Feel free to add:
-> > 
-> > Reviewed-by: Jan Kara <jack@suse.cz>
-> > 
-> > Or should I take this patch through my tree?
-> 
-> Hello! Patches are just RFC, mostly untested and not ready for merging.
-> I will wait for feedback and then I do more testing nad prepare new
-> patch series.
+Fix netfs_clear_unread() to pass READ to iov_iter_xarray() instead of WRITE
+(the flag is about the operation accessing the buffer, not what sort of
+access it is doing to the buffer).
 
-OK, FWIW I've also tested the UDF and isofs patches.
+Fixes: 3d3c95046742 ("netfs: Provide readahead and readpage netfs helpers")
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
+cc: linux-cachefs@redhat.com
+cc: linux-afs@lists.infradead.org
+cc: ceph-devel@vger.kernel.org
+cc: linux-cifs@vger.kernel.org
+cc: linux-nfs@vger.kernel.org
+cc: v9fs-developer@lists.sourceforge.net
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-mm@kvack.org
+Link: https://lore.kernel.org/r/162729351325.813557.9242842205308443901.stgit@warthog.procyon.org.uk/
+---
 
-								Honza
+ fs/netfs/read_helper.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
+index 2ad91f9e2a45..9320a42dfaf9 100644
+--- a/fs/netfs/read_helper.c
++++ b/fs/netfs/read_helper.c
+@@ -150,7 +150,7 @@ static void netfs_clear_unread(struct netfs_read_subrequest *subreq)
+ {
+ 	struct iov_iter iter;
+ 
+-	iov_iter_xarray(&iter, WRITE, &subreq->rreq->mapping->i_pages,
++	iov_iter_xarray(&iter, READ, &subreq->rreq->mapping->i_pages,
+ 			subreq->start + subreq->transferred,
+ 			subreq->len   - subreq->transferred);
+ 	iov_iter_zero(iov_iter_count(&iter), &iter);
+
+
