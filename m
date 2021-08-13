@@ -2,92 +2,135 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18849C4338F
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 20:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B33BC4338F
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 20:19:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5B6361042
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 20:13:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38B27610EA
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 20:19:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233890AbhHMUOJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Aug 2021 16:14:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60452 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234363AbhHMUOI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 13 Aug 2021 16:14:08 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D469C061756
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Aug 2021 13:13:40 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id d4so21901759lfk.9
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Aug 2021 13:13:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yPWPZ2s3U3R+Aae/yZhWXO3RNRx1+8T/ah0KdULDKWw=;
-        b=KyQ6lP2mKztIh5CetUffS/v53RNiQWD0ACFAEOICSQMSn7tbV2sx8zJu0VUoF/CKH/
-         HI+0RoX/rATUucLxeipwBIWUH3e6Mpx1aPV72R+nilPq5M6Ls4L01QpJUpPV8Eab+qT2
-         yReweqnprGzJTi3GE+aO+XO4tVrPOta59zURb3f1ft1tujtp+o4SdbVGfRieN0jBkIMX
-         ufaVCgDUSa2QOoczw3QJ1UV0tK5siidsXR0pznsbxmp+IUEeNxSi3IwRZQiop4s6R0ug
-         +JbjjsDALywdWRMk6cV4fcQh8umFbUXC7pjOdHCfEPqGmtFvH6n2HQ90KbpNo3XQDoik
-         L9rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yPWPZ2s3U3R+Aae/yZhWXO3RNRx1+8T/ah0KdULDKWw=;
-        b=cJvPKbvwz2Ya5CgnGsLL6c+Bvqy77t5Og0gKuZJvQ75CC4LI8YN5s9ZeGj8CXANUiG
-         J+NeT+NCidI05ox0zBe0sGqf/MbasvdGbTuXzSO/3iR6JDLSfAwAj8J66ArjMfrVv2Ls
-         4vQea9o79lTx6vZOlvuGi0C7ox38dDSPQKxWSP3TtMruCNh7wYl2/CyF5xyY6hJQNS0Y
-         X7h+fvXtICX41PCWKGrt10cVPvhMfX+BDW9bXpvuHtiJH/WdK2f9kFl7d0Qox9gtCcz3
-         xeQh3xt6pUE9bic73itf0fok03K3hfPrFuO/XDKM1FVKMMHvQK7G5r9ToKrfs9uypWSm
-         3OLQ==
-X-Gm-Message-State: AOAM530lALBzmJvdKikGR4bSPhhGCV3C8IPs/XGyoB9ob93XnH9Nqsdm
-        W4hwRM0BcaLdwlB4/bz2eXQA4wKXJs9vwUd8oOY=
-X-Google-Smtp-Source: ABdhPJzcsIyJ7dIS6y+E9UWQf8uccl2WKX/kJWC/0JKtBZfbR79Yg8FnZqsDhzqkKniek7vlwk4VPp1a3Ta5zGnXd/c=
-X-Received: by 2002:ac2:4350:: with SMTP id o16mr3018155lfl.184.1628885618906;
- Fri, 13 Aug 2021 13:13:38 -0700 (PDT)
+        id S234126AbhHMUUZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Aug 2021 16:20:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43520 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233743AbhHMUUZ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 13 Aug 2021 16:20:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0B9AA610CC;
+        Fri, 13 Aug 2021 20:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628885998;
+        bh=xcRKD6cavQDiPz0SFq1rvbp5fqwrvQU7hDAgltipPwA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Ml/q/3lXKx7gElVGI2Ljug3HcTmzV+RE0Jhl5ZotLDdseeFGB8RpHh5vepQHXuwXM
+         OF9DT8GUz8L+dJgCzWf9Naq+qmxc/IVklF60cR8GFCorGC4b73ah1zHYE1KQGF0g6p
+         jk4T6aV04j9Sxy8AUWZDpq5MfVDKIIEe8oLpkXwMJAD8qSheHkHibyQff6KVKDs1KA
+         gpRldNf9AGbzSgjEncjqqsOzuCICYp9mFiPwzyXhbP1La0+sRC+GyCrgKh2NKISn1E
+         wCTeZ1OFxYBxAsf6ZEYQuBph7wjFOFf160nGqC47CsRqLhDGf6AmS9bhgK+1Z03dbr
+         k53htSs5eL6lg==
+Date:   Fri, 13 Aug 2021 13:19:56 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        linux-crypto@vger.kernel.org
+Subject: Re: Building cifs.ko without any support for insecure crypto?
+Message-ID: <YRbT7IbSCXo4Dl0u@sol.localdomain>
+References: <YRXlwDBfQql36wJx@sol.localdomain>
+ <CAN05THSm5fEcnLKxcsidKPRUC6PVLCkWMBZUW05KNm4uMJNHWw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20210813195644.937810-1-lsahlber@redhat.com>
-In-Reply-To: <20210813195644.937810-1-lsahlber@redhat.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 13 Aug 2021 15:13:28 -0500
-Message-ID: <CAH2r5msnD1f+Oqit=821QzjZcF=qrBa+axaW4NkWkVeAcjS7mQ@mail.gmail.com>
-Subject: Re: cifs: only compile with DES when building with SMB1 support
-To:     Ronnie Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAN05THSm5fEcnLKxcsidKPRUC6PVLCkWMBZUW05KNm4uMJNHWw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Any idea how much memory it saves when loading cifs.ko built without
-SMB1 support?
+On Fri, Aug 13, 2021 at 02:46:21PM +1000, ronnie sahlberg wrote:
+> On Fri, Aug 13, 2021 at 1:34 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > Hi!
+> >
+> > We should be working to eliminate any uses of insecure crypto algorithms (e.g.
+> > DES, ARC4, MD4, MD5) from the kernel.  In particular, it should be possible to
+> > build a kernel for a modern system without including any such algorithms.
+> >
+> > Currently, CONFIG_CIFS is problematic because it selects all these algorithms
+> > (kconfig options: CONFIG_CRYPTO_LIB_DES, CONFIG_CRYPTO_LIB_ARC4,
+> > CONFIG_CRYPTO_MD4, CONFIG_CRYPTO_MD5).
+> >
+> > It looks like these algorithms might only be used by SMB2.0 and earlier, and the
+> > more modern SMB versions don't use them.  Is that the case?  It mostly looks
+> > like that, but there's one case I'm not sure about -- there's a call chain which
+> > appears to use ARC4 and HMAC-MD5 even with the most recent SMB version:
+> >
+> >     smb311_operations.sess_setup()
+> >       SMB2_sess_setup()
+> >         SMB2_sess_auth_rawntlmssp_authenticate()
+> >           build_ntlmssp_auth_blob()
+> >             setup_ntlmv2_rsp()
+> 
+> md4 and md5 are used with the NTLMSSP authentication for all dialects,
+> including the latest 3.1.1.
 
-On Fri, Aug 13, 2021 at 2:57 PM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
->
-> Steve, list
->
-> These three patches moves smb1 and all functions that depend on DES
-> into smb1ops.c and will optionally compile smb1ops.c iff SMB1 support
-> is enabled (CONFIG_CIFS_ALLOW_INSECURE_LEGACY)
->
-> Additionally, make CONFIG_CIFS_ALLOW_INSECURE_LEGACY depend on
-> CONFIG_LIB_DES so that if the kernel is built without DES support
-> we automatically disable the smb1 protocol.
->
->
-> This allows to build a cifs module on a kernel where DES has been disabled.
->
->
->
+That's unfortunate.  Surely Microsoft knows that md4 has been severely
+compromised for over 25 years?  And md5 for 15 years.
 
+> The only other authentication mechanism for SMB is krb5.
 
--- 
-Thanks,
+Is the long-term plan to have everyone migrate to kerberos?  Currently kerberos
+doesn't appear to be the default, so not many people actually use it -- right?
 
-Steve
+> This means that if we build a kernel without md4/md5 then we can no
+> longer use NTLMSSP user/password
+> style authentication, only kerberos.
+>
+> I guess that the use cases where a kernel without these algorithms are
+> present are ok with kerberos as the
+> only authentication mech.
+
+Well, maybe.  Even without kerberos, would it still be possible to use SMB with
+a "guest" user only?
+
+> 
+> Afaik arc4 is only used for signing in the smb1 case.
+> 
+> >
+> > Also, there's already an option CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n which
+> > disables support for SMB2.0 and earlier.  However, it doesn't actually compile
+> > out the code but rather just prevents it from being used.  That means that the
+> > DES and ARC4 library interfaces are still depended on at link time, so they
+> > can't be omitted.  Have there been any considerations towards making
+> > CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n compile out the code for SMB2.0 and earlier?
+> 
+> I think initially we just wanted to disable its use. If we want to
+> compile a kernel completely without arc4/md4/md5 I think we would need
+> to:
+> 
+> 1, Change CONFIG_CIFS_ALLOW_INSECURE_LEGACY=n to compile out the code
+> as you suggests.
+> This should remove the dependency for arc4. I think this would be a
+> good thing to do.
+> 
+> 2, Have a different CONFIG_... to compile out the use of NTLMSSP
+> authentication. This must be a different define
+> since md4/md5 are also used for non-legacy dialects.
+> And this should remove the dependency of md4/5.
+> 
+> For the latter, I guess we would need a global, i.e. not
+> cifs-specific, config option for this. I assume other users of
+> rc4/md4/md5
+> would also want this.
+> A new CONFIG_INSECURE_CRYPTO=n ?
+
+There is already an option CRYPTO_USER_API_ENABLE_OBSOLETE that could be
+renamed and reused if we wanted to expand its scope to all insecure crypto.
+
+Although a one-size-fits all kernel-wide option controlling "insecure" crypto
+could be controversial, as there is no consensus whether some crypto algorithms
+are secure or not, and different subsystems have different constraints.
+
+- Eric
