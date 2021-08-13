@@ -2,103 +2,88 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 337A8C4338F
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 14:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C936CC4338F
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 19:57:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14FCF60F00
-	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 14:47:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95F43610CF
+	for <linux-cifs@archiver.kernel.org>; Fri, 13 Aug 2021 19:57:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240836AbhHMOrw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 13 Aug 2021 10:47:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45851 "EHLO
+        id S233644AbhHMT51 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 13 Aug 2021 15:57:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34653 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240818AbhHMOrv (ORCPT
+        by vger.kernel.org with ESMTP id S230440AbhHMT50 (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 13 Aug 2021 10:47:51 -0400
+        Fri, 13 Aug 2021 15:57:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1628866044;
+        s=mimecast20190719; t=1628884619;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=+F5e/QJCQvTQyfdm+mXX5RdrWpejQYPMUGSZ/zRGUYg=;
-        b=HPWZiPabWoPFTO8P0obg/vGBtv+t7kxFRU5KXCYTKj2XNmi0LZHtBSqRD4botQ2j9sBqaa
-        9Px6PMrUv9erOt/G9aI0FBKFIqkSSohzcokugVdh1DLRhcKMQgQ4JfPNXO+bb9ib3AHTTF
-        sH2HM+WmFpZmwsfi69jUwzAcbPvnZVI=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1dlqH81QyEveO9tVNVzv8OSWtAJG3aqT3lKYrOwnOSE=;
+        b=YunoSgBAWeVNoKOCkPwUXbIgePgQeKJwIH3mcSS2E+KiqGcNUyB+fnIWGJPtfYc1GKV5iP
+        +nBE/UncdrrMGkJ4h3792B1U15b27JHi/H2r8k4Ojw6qYwz+pBVJXEfgY+CpFVV0G+R9Cv
+        MR/s4DwAQMfMmm3TLR0PVOsBYI8/YbU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-524-lV9q3wEuNu2HaooDE1H1AA-1; Fri, 13 Aug 2021 10:47:23 -0400
-X-MC-Unique: lV9q3wEuNu2HaooDE1H1AA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-226-xd4L1zrGM1CiVrxTGnvzuw-1; Fri, 13 Aug 2021 15:56:57 -0400
+X-MC-Unique: xd4L1zrGM1CiVrxTGnvzuw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A77DC1008061;
-        Fri, 13 Aug 2021 14:47:21 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.22.32.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B9DC060853;
-        Fri, 13 Aug 2021 14:47:15 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH] netfs: Fix READ/WRITE confusion when calling
- iov_iter_xarray()
-From:   David Howells <dhowells@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     Jeff Layton <jlayton@kernel.org>, linux-cachefs@redhat.com,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        dhowells@redhat.com, linux-kernel@vger.kernel.org
-Date:   Fri, 13 Aug 2021 15:47:14 +0100
-Message-ID: <162886603464.3940407.3790841170414793899.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/0.23
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A67081008060;
+        Fri, 13 Aug 2021 19:56:56 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-114.bne.redhat.com [10.64.54.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EDF0710074E1;
+        Fri, 13 Aug 2021 19:56:55 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH 1/3] cifs: only compile in smb1ops.c if we configure CIFS_ALLOW_INSECURE_LEGACY
+Date:   Sat, 14 Aug 2021 05:56:42 +1000
+Message-Id: <20210813195644.937810-2-lsahlber@redhat.com>
+In-Reply-To: <20210813195644.937810-1-lsahlber@redhat.com>
+References: <20210813195644.937810-1-lsahlber@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Fix netfs_clear_unread() to pass READ to iov_iter_xarray() instead of WRITE
-(the flag is about the operation accessing the buffer, not what sort of
-access it is doing to the buffer).
-
-Fixes: 3d3c95046742 ("netfs: Provide readahead and readpage netfs helpers")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-cc: linux-cachefs@redhat.com
-cc: linux-afs@lists.infradead.org
-cc: ceph-devel@vger.kernel.org
-cc: linux-cifs@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: v9fs-developer@lists.sourceforge.net
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
-Link: https://lore.kernel.org/r/162729351325.813557.9242842205308443901.stgit@warthog.procyon.org.uk/
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
+ fs/cifs/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
- fs/netfs/read_helper.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
-index 2ad91f9e2a45..9320a42dfaf9 100644
---- a/fs/netfs/read_helper.c
-+++ b/fs/netfs/read_helper.c
-@@ -150,7 +150,7 @@ static void netfs_clear_unread(struct netfs_read_subrequest *subreq)
- {
- 	struct iov_iter iter;
+diff --git a/fs/cifs/Makefile b/fs/cifs/Makefile
+index 87fcacdf3de7..96739082718d 100644
+--- a/fs/cifs/Makefile
++++ b/fs/cifs/Makefile
+@@ -8,7 +8,7 @@ obj-$(CONFIG_CIFS) += cifs.o
+ cifs-y := trace.o cifsfs.o cifssmb.o cifs_debug.o connect.o dir.o file.o \
+ 	  inode.o link.o misc.o netmisc.o smbencrypt.o transport.o \
+ 	  cifs_unicode.o nterr.o cifsencrypt.o \
+-	  readdir.o ioctl.o sess.o export.o smb1ops.o unc.o winucase.o \
++	  readdir.o ioctl.o sess.o export.o unc.o winucase.o \
+ 	  smb2ops.o smb2maperror.o smb2transport.o \
+ 	  smb2misc.o smb2pdu.o smb2inode.o smb2file.o cifsacl.o fs_context.o \
+ 	  dns_resolve.o cifs_spnego_negtokeninit.asn1.o asn1.o
+@@ -17,6 +17,8 @@ $(obj)/asn1.o: $(obj)/cifs_spnego_negtokeninit.asn1.h
  
--	iov_iter_xarray(&iter, WRITE, &subreq->rreq->mapping->i_pages,
-+	iov_iter_xarray(&iter, READ, &subreq->rreq->mapping->i_pages,
- 			subreq->start + subreq->transferred,
- 			subreq->len   - subreq->transferred);
- 	iov_iter_zero(iov_iter_count(&iter), &iter);
-
+ $(obj)/cifs_spnego_negtokeninit.asn1.o: $(obj)/cifs_spnego_negtokeninit.asn1.c $(obj)/cifs_spnego_negtokeninit.asn1.h
+ 
++cifs-$(CONFIG_CIFS_ALLOW_INSECURE_LEGACY) += smb1ops.o
++
+ cifs-$(CONFIG_CIFS_XATTR) += xattr.o
+ 
+ cifs-$(CONFIG_CIFS_UPCALL) += cifs_spnego.o
+-- 
+2.30.2
 
