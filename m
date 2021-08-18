@@ -2,111 +2,164 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3B2C4338F
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 16:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C19C4338F
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 17:45:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84EE06108D
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 16:52:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72A4260EFE
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 17:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229768AbhHRQwi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 18 Aug 2021 12:52:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55744 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbhHRQwh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 Aug 2021 12:52:37 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FD5AC061764
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Aug 2021 09:52:02 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id u22so5908911lfq.13
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Aug 2021 09:52:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=O3Y3KGkU9uYEt8yInDYkUTKbM38pZsVc3yS9x48C7g8=;
-        b=d2oyBSh36vqeZB+Jh0yRSJ+BSYH+eCo4+GSb8wp9AVzxhBXzb2InD/kqupi7YtnSjh
-         Qr1OJZloLR07/wGckRoGm1KRwM/P+liPdmhda9hq4iv4HQVLSz14tPAeAdbpB6kGpgn/
-         3n5WnWmcn7D9bNlU1iuQW8qgPZtMmdR52bwL+6ZmT/qqcSVV5vFIYQX/FLuzGuoc1BVz
-         1GIb70tsU9hO9xl1dMpmRH8Di6c1LXFe1JrQ8SKMb7HfaJp8XiNsE8uwilDu6EItmLg/
-         mau+rG8LfAzp/qatolzWEwAWk+S0RxajwegB4DR3dCOPXnZvKOmyOeO9RiPiaW8orlIb
-         HTLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=O3Y3KGkU9uYEt8yInDYkUTKbM38pZsVc3yS9x48C7g8=;
-        b=ECJsuwa9i0lMZKvijhjvMRxAB4AjLjDQw9tONDJu7LV7hBTK3zhxddnpncESOpp/xW
-         eVA2yuOFa5lArdCvcYf4ZyehNQlvqd6t0vCFZJiug1tBaTcENuUk+cDuMFHzDGEbvgrV
-         cShRoHFes8zsqNScsFjWsxEA+PjWUkxNzhfaLu4Mg5AgE0s5P8fAwdQzFZXEhAYkvEgf
-         5UILxv2d/5uNTm2DvcfbanxyBARAxzy4/nijIur7LabgQO2HgG/T3MW/qgxko18hRU7n
-         xQzO5DFYtL+YkESjB0n19/9yGy/KDIvqe4eRtQ4QeG28PhshYRFne/ovCZ5jDAmo7Vex
-         toFQ==
-X-Gm-Message-State: AOAM532x/C/BnBzq/7fR5GjhF8vz6qHu7grN7L3+toTIq3OMk0KEG52P
-        0fOvgxEXykm1ovCbiGvuXcu05DlG2vVrJZ0M31g=
-X-Google-Smtp-Source: ABdhPJzH/4a66wwJom7UUu1cCrnQvZKWOGORpRU5gUpock4T1uUNaFqJZKQflSgJcqcOewm16muwT/8OUVoMdXhNO9Q=
-X-Received: by 2002:a19:c796:: with SMTP id x144mr6948397lff.395.1629305520860;
- Wed, 18 Aug 2021 09:52:00 -0700 (PDT)
+        id S231330AbhHRRqV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 18 Aug 2021 13:46:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37178 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231422AbhHRRqV (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 18 Aug 2021 13:46:21 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 53A20610CB;
+        Wed, 18 Aug 2021 17:45:44 +0000 (UTC)
+Date:   Wed, 18 Aug 2021 19:45:39 +0200
+From:   Christian Brauner <christian.brauner@ubuntu.com>
+To:     Namjae Jeon <namjae.jeon@samsung.com>
+Cc:     'Christian Brauner' <brauner@kernel.org>,
+        'Sergey Senozhatsky' <senozhatsky@chromium.org>,
+        'David Sterba' <dsterba@suse.com>,
+        'Steve French' <stfrench@microsoft.com>,
+        'Christoph Hellwig' <hch@infradead.org>,
+        'Hyunchul Lee' <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH] ksmbd: fix lookup on idmapped mounts
+Message-ID: <20210818174539.ro2ryrbku3ozdjvi@wittgenstein>
+References: <CGME20210816115835epcas1p410fb2a768b1af42d2458027de74dcd3c@epcas1p4.samsung.com>
+ <20210816115605.178441-1-brauner@kernel.org>
+ <008d01d792f6$c2735f30$475a1d90$@samsung.com>
 MIME-Version: 1.0
-References: <20210818041021.1210797-1-lsahlber@redhat.com> <815daf08-7569-59ce-0318-dfe2b16e1d96@talpey.com>
- <CAN05THR_Y+uoER=iNiwoiZ0yPcJ2T-LvRqOew59G53SafUMg3g@mail.gmail.com>
-In-Reply-To: <CAN05THR_Y+uoER=iNiwoiZ0yPcJ2T-LvRqOew59G53SafUMg3g@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 18 Aug 2021 11:51:49 -0500
-Message-ID: <CAH2r5mvj5w1NxkyH4XE6S6J0O7VFJ-XWB_Og_JsmA0M8i=AW2A@mail.gmail.com>
-Subject: Re: Disable key exchange if ARC4 is not available
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Tom Talpey <tom@talpey.com>, Ronnie Sahlberg <lsahlber@redhat.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <008d01d792f6$c2735f30$475a1d90$@samsung.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 11:29 AM ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
->
-> On Wed, Aug 18, 2021 at 11:18 PM Tom Talpey <tom@talpey.com> wrote:
-> >
-> > On 8/18/2021 12:10 AM, Ronnie Sahlberg wrote:
-> > > Steve,
-> > >
-> > > We depend on ARC4 for generating the encrypted session key in key exchange.
-> > > This patch disables the key exchange/encrypted session key for ntlmssp
-> > > IF the kernel does not have any ARC4 support.
-> > >
-> > > This allows to build the cifs module even if ARC4 has been removed
-> > > though with a weaker type of NTLMSSP support.
-> >
-> > It's a good goal but it seems wrong to downgrade the security
-> > so silently. Wouldn't it be a better approach to select ARC4,
-> > and thereby force the build to succeed or fail? Alternatively,
-> > change the #ifndef ARC4 to a positive option named (for example)
-> > DOWNGRADED_NTLMSSP or something equally foreboding?
->
-> Good point.
-> Maybe we should drop this patch and instead copy ARC4 into fs/cifs
-> so we have a private version of the code in cifs.ko.
-> And do the same for md4 and md5.
+On Tue, Aug 17, 2021 at 08:30:55AM +0900, Namjae Jeon wrote:
+> > From: Christian Brauner <christian.brauner@ubuntu.com>
+> > 
+> > It's great that the new in-kernel ksmbd server will support idmapped mounts out of the box! However,
+> > lookup is currently broken. Lookup helpers such as lookup_one_len() call inode_permission() internally
+> > to ensure that the caller is privileged over the inode of the base dentry they are trying to lookup
+> > under. So the permission checking here is currently wrong.
+> > 
+> > Linux v5.15 will gain a new lookup helper lookup_one() that does take idmappings into account. I've
+> > added it as part of my patch series to make btrfs support idmapped mounts. The new helper is in linux-
+> > next as part of David's (Sterba) btrfs for-next branch as commit c972214c133b ("namei: add mapping
+> > aware lookup helper").
+> > 
+> > I've said it before during one of my first reviews: I would very much recommend adding fstests to [1].
+> > It already seems to have very rudimentary cifs support. There is a completely generic idmapped mount
+> > testsuite that supports idmapped mounts.
+> > 
+> > [1]: https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/
+> > Cc: Steve French <stfrench@microsoft.com>
+> > Cc: Christoph Hellwig <hch@infradead.org>
+> > Cc: Namjae Jeon <namjae.jeon@samsung.com>
+> > Cc: Hyunchul Lee <hyc.lee@gmail.com>
+> > Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+> > Cc: David Sterba <dsterba@suse.com>
+> > Cc: linux-cifs@vger.kernel.org
+> > Signed-off-by: Christian Brauner <christian.brauner@ubuntu.com>
+> > ---
+> Hi Christian,
+> 
+> > I merged David's for-next tree into cifsd-next to test this. I did only compile test this. If someone
+> > gives me a clear set of instructions how to test ksmbd on my local machine I can at least try to cut
+> > some time out of my week to do more reviews. (I'd especially like to see acl behavior with ksmbd.)
+> 
+> There is "How to run ksmbd" section in patch cover letter.
+>  https://lkml.org/lkml/2021/8/5/54
+> 
+> Let me know if it doesn't work well even if you try to run it with this step.
+> And We will also check whether your patch work fine.
+> 
+> > 
+> > One more thing, the tree for ksmbd was very hard to find. I had to do a lot archeology to end up at:
+> > 
+> > git://git.samba.org/ksmbd.git
+> This is also in the patch cover letter. See "Mailing list and repositories" section.
+> I think that you can use :
+>     https://github.com/namjaejeon/smb3-kernel/tree/ksmbd-v7-series
+> 
+> > 
+> > Would be appreciated if this tree could be reflected in MAINTAINERS or somewhere else. The github
+> > repos with the broken out patches/module aren't really that helpful.
+> Okay, I will add git address of ksmbd in MAINTAINERS on next spin.
+> 
+> > 
+> > Thanks!
+> > Christian
+> Really thanks for your review and I will apply this patch after checking it.
 
+Thank your for the pointers.
 
-Yes ... and allow a build option where ARC4/MD4 are removed from the
-build and NTLMSSP disabled,
-forcing kerberos in the short term, and then we need to get working
-ASAP on adding some choices in the future,
-perhaps something similar to
+Ok, so I've been taking the time to look into cifs and ksmbd today. My
+mental model was wrong. There are two things to consider here:
 
-https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/jj852232(v=ws.11)
+1. server: idmapped mounts with ksmbd
+2. client: idmapped mounts with cifs
 
-where Windows allows plugging in additional auth mechanisms to SPNEGO
-(and pick at least one new mechanism beyond
-KRB5 to support in the kernel client ...)
+Your patchset adds support for 1.
+Let's say I have the following ksmbd config:
 
--- 
-Thanks,
+root@f2-vm:~# cat /etc/ksmbd/smb.conf
+[global]
+        netbios name = SMBD
+        server max protocol = SMB3
+[test]
+        path = /opt
+        writeable = yes
+        comment = TEST
+        read only = no
 
-Steve
+So /opt can be an idmapped mount and ksmb would know how to deal with
+that correctly, i.e. you could do:
+
+mount-idmapped --map-mount=b:1000:0:1 /opt /opt
+
+ksmbd.mountd
+
+and ksmbd would take the idmapping of /opt into account.
+
+That however is different from 2. which is cifs itself being idmappable.
+Whether or not that makes sense or is needed will need some thinking.
+
+In any case, this has consequences for xfstests and now I understand
+your earlier confusion. In another mail you pointed out that cifs
+reports that idmapped mounts are not supported. That is correct insofar
+as it means 2. is not supported, i.e. you can't do:
+
+mount -t cifs -o username=foo,password=bar //server/files /mnt
+
+and then
+
+mount-idmapped --map-mount=b:1000:0:1 /mnt /mnt
+
+but that's also not what you want in order to test for ksmbd. What you
+want is to test 1.
+
+So your test setup would require you to setup an idmapped mount and have
+ksmbd use that which can then be mounted by a client.
+
+With your instructions I was at least able to get a ksmb instance
+running and be able to mount a client with -t cifs. All on the same
+machine, i.e. my server is localhost.
+
+However, I need to dig a bit into the semantics to make better
+assertions about what's going on.
+
+Are unix extension supported with ksmb? Everytime I try to use "posix"
+as a mount option with mount -t cifs -o //127.0.0.1/test /mnt I get
+"uid=0" and "gid=0" and "noposix". I do set "unix extensions = yes" in
+both the samba and ksmbd smb.conf.
+
+Christian
