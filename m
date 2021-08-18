@@ -2,104 +2,134 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15842C4320A
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 02:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90B67C4338F
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 04:10:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9B6260FE6
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 02:46:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 646B160551
+	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 04:10:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235263AbhHRCrZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 17 Aug 2021 22:47:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55504 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231449AbhHRCrZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 17 Aug 2021 22:47:25 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E252EC061764;
-        Tue, 17 Aug 2021 19:46:50 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id d16so2284621ljq.4;
-        Tue, 17 Aug 2021 19:46:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RWmXHWwVFrhlQDHC2rVDGYKlpIeA9JdQ6DniyzAK9as=;
-        b=qh1RLH0Gd1nVywJwS084M5nIdCuU3fLrE9me78hJx6YJWUywAhES+Rv22p+/SPc1fL
-         9o4aeQ5FiuDpY9zA9fe7S7dVA4fZUyI0E4Ck5FCqY8OVxp4fGUDqm72VfRFfCvL7da0s
-         4gfx8Sp6sXTCSvkI+kKDtqnennbd/VEodL+hFPm8gJTXqV7kaQYtgFavrFzglcF1/0lP
-         6wjk56Z64KV378ezVD85SjvFX3TL1C1oxgjDzi6C/yhxLPewDD/qTijgJGHcgkvlRVOg
-         J8Aqjwzc0qVGN8vltM4wiET4xJtYKs6RgUEE+GaZ8Dgkuw0j2UafSoX7quwlrC18yH/I
-         qF4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RWmXHWwVFrhlQDHC2rVDGYKlpIeA9JdQ6DniyzAK9as=;
-        b=ofk6dNko7gOv6EH1BcsFR7e5KlqhA7zX/gQlmirei1sa+PNZAKlwb6ToBc7Aqrbjac
-         8DeFEdPaaAQ8KMuThXF7Qgj5Ndt9+RGTuAjby3b32JCQ6UBgo9uIEvNPzHbJ32eomJO9
-         ijZ/MwHhxSaJzKsWOJrF6Z5BaZ/TZq2qTtFXMVwIL8mAMKIs0fDoR4rO8x7SSOFjrKEL
-         Qof9obgB0SXVaIJe6ngQQcyiDm1kUdyYFbV+9A1xHup5zk5dHsnnab1U5/s3k6INvQF6
-         uyHvQwW5tKEbW7eTYj8bfTQyorKze6ABRVZojkOKkq6y6zdwc8U23SuIvSN+WgnkI3d4
-         tV/A==
-X-Gm-Message-State: AOAM531S6D1+zdBeNjTkXwmmkPX8uNmG2OtAuZoyAdgNVzQ/Kq4nr3cK
-        isNM7/XQ7AtJHqWAPoQ9vSRUBfIxF4dCNRkkvGI=
-X-Google-Smtp-Source: ABdhPJwslGU/+xPwEkW6sdIpppodrm2AblhgBsp9WtZcWZkLIovt/JPSv6Jr/pVskQeBDBGbAgTovI27ptCXrwwcQdc=
-X-Received: by 2002:a2e:a884:: with SMTP id m4mr5841362ljq.406.1629254809157;
- Tue, 17 Aug 2021 19:46:49 -0700 (PDT)
+        id S229454AbhHRELJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 18 Aug 2021 00:11:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56183 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229449AbhHRELI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 18 Aug 2021 00:11:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629259834;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hM7huVPnUx+3EmOk1XfIZeQI7nSHhBlU+w887TpQ4wg=;
+        b=RPmiPK178zHBHQjAgGFzv5qfOf4NFOK26SlkWxznxNg1Jl+l1fVrQU0OPvdBqXzJNnd5hX
+        gMcEfqdVwn3Mea/lkGfvpCQFxC9FQIVoyV0B4uQic5G0TcDUkeobIsvj+6n7XvQooRvy6B
+        NkbqqOybwli5a8bP9D9mRFs4+66Y2qQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-Jf8dzhArPKWkXFi0xuAMMQ-1; Wed, 18 Aug 2021 00:10:32 -0400
+X-MC-Unique: Jf8dzhArPKWkXFi0xuAMMQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33BFF1007C83;
+        Wed, 18 Aug 2021 04:10:31 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-114.bne.redhat.com [10.64.54.114])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 058561B5C0;
+        Wed, 18 Aug 2021 04:10:29 +0000 (UTC)
+From:   Ronnie Sahlberg <lsahlber@redhat.com>
+To:     linux-cifs <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>
+Subject: [PATCH] cifs: disable ntlmssp key exchange if ARC4 is not available
+Date:   Wed, 18 Aug 2021 14:10:21 +1000
+Message-Id: <20210818041021.1210797-2-lsahlber@redhat.com>
+In-Reply-To: <20210818041021.1210797-1-lsahlber@redhat.com>
+References: <20210818041021.1210797-1-lsahlber@redhat.com>
 MIME-Version: 1.0
-References: <20210817102709.15046-1-len.baker@gmx.com> <87im03h9zb.fsf@cjr.nz>
-In-Reply-To: <87im03h9zb.fsf@cjr.nz>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 17 Aug 2021 21:46:38 -0500
-Message-ID: <CAH2r5mtKsjPesR6yBTO8RB=BFYc5Cb23OA_gEQyWMNrORXdavg@mail.gmail.com>
-Subject: Re: [PATCH] CIFS: Fix a potencially linear read overflow
-To:     Paulo Alcantara <pc@cjr.nz>
-Cc:     Len Baker <len.baker@gmx.com>, Steve French <sfrench@samba.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Suresh Jayaraman <sjayaraman@suse.de>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-tentatively merged into cifs-2.6.git for-next pending testing
+This allows to build cifs.ko when ARC4 is not available.
+It comes with the drawback that key-exchange is no longer negotiated.
 
-On Tue, Aug 17, 2021 at 7:29 PM Paulo Alcantara <pc@cjr.nz> wrote:
->
-> Len Baker <len.baker@gmx.com> writes:
->
-> > strlcpy() reads the entire source buffer first. This read may exceed the
-> > destination size limit. This is both inefficient and can lead to linear
-> > read overflows if a source string is not NUL-terminated.
-> >
-> > Also, the strnlen() call does not avoid the read overflow in the strlcpy
-> > function when a not NUL-terminated string is passed.
-> >
-> > So, replace this block by a call to kstrndup() that avoids this type of
-> > overflow and does the same.
-> >
-> > Fixes: 066ce6899484d ("cifs: rename cifs_strlcpy_to_host and make it use new functions")
-> > Signed-off-by: Len Baker <len.baker@gmx.com>
-> > ---
-> >  fs/cifs/cifs_unicode.c | 9 ++-------
-> >  1 file changed, 2 insertions(+), 7 deletions(-)
->
-> Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+---
+ fs/cifs/cifsencrypt.c | 10 ++++++++++
+ fs/cifs/sess.c        |  6 ++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-
-
+diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
+index 7680e0a9bea3..a5cf604f1864 100644
+--- a/fs/cifs/cifsencrypt.c
++++ b/fs/cifs/cifsencrypt.c
+@@ -22,7 +22,9 @@
+ #include <linux/random.h>
+ #include <linux/highmem.h>
+ #include <linux/fips.h>
++#ifdef CRYPTO_ARC4
+ #include <crypto/arc4.h>
++#endif
+ #include <crypto/aead.h>
+ 
+ int __cifs_calc_signature(struct smb_rqst *rqst,
+@@ -682,6 +684,13 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
+ 	return rc;
+ }
+ 
++#ifndef CRYPTO_ARC4
++int
++calc_seckey(struct cifs_ses *ses)
++{
++	return -ENODEV;
++}
++#else
+ int
+ calc_seckey(struct cifs_ses *ses)
+ {
+@@ -712,6 +721,7 @@ calc_seckey(struct cifs_ses *ses)
+ 	kfree_sensitive(ctx_arc4);
+ 	return 0;
+ }
++#endif
+ 
+ void
+ cifs_crypto_secmech_release(struct TCP_Server_Info *server)
+diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
+index 34a990e1ae44..a05ef87b0560 100644
+--- a/fs/cifs/sess.c
++++ b/fs/cifs/sess.c
+@@ -622,9 +622,10 @@ void build_ntlmssp_negotiate_blob(unsigned char *pbuffer,
+ 		NTLMSSP_NEGOTIATE_SEAL;
+ 	if (server->sign)
+ 		flags |= NTLMSSP_NEGOTIATE_SIGN;
++#ifdef CRYPTO_ARC4		
+ 	if (!server->session_estab || ses->ntlmssp->sesskey_per_smbsess)
+ 		flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
+-
++#endif
+ 	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+ 
+ 	sec_blob->WorkstationName.BufferOffset = 0;
+@@ -690,9 +691,10 @@ int build_ntlmssp_auth_blob(unsigned char **pbuffer,
+ 		NTLMSSP_NEGOTIATE_SEAL;
+ 	if (ses->server->sign)
+ 		flags |= NTLMSSP_NEGOTIATE_SIGN;
++#ifdef CRYPTO_ARC4		
+ 	if (!ses->server->session_estab || ses->ntlmssp->sesskey_per_smbsess)
+ 		flags |= NTLMSSP_NEGOTIATE_KEY_XCH;
+-
++#endif
+ 	tmp = *pbuffer + sizeof(AUTHENTICATE_MESSAGE);
+ 	sec_blob->NegotiateFlags = cpu_to_le32(flags);
+ 
 -- 
-Thanks,
+2.30.2
 
-Steve
