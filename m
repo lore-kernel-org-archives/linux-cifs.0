@@ -2,44 +2,68 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 550A9C4338F
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 08:34:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC97C4338F
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 10:23:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 248936113D
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 08:34:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A75BB6109F
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 10:23:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237035AbhHSIfL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 Aug 2021 04:35:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48128 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231494AbhHSIfK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 19 Aug 2021 04:35:10 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 896D1610FA;
-        Thu, 19 Aug 2021 08:34:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629362074;
-        bh=Bd2L1bF1i5ySeLJ979rjOA+eVsO+A3AVVXhjsHT7yGQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=XbZFir7iCQmB49KMFmSrAaS5/1hj+ReN+h9w4sj8ze/4hYuraavS71ss+lp4A80iU
-         At1TEW+wYevB3cmLh/neU1KFlyLVpt2aS8RHAUOVbgb1BUCE3ua2zhTB2eT7KrRyNf
-         AoA8gCV8ywtLsOyJE/dXp+8CoMIjcLplvazqy72vzKjA1GJKv+51E/KoN40z14uy7f
-         +oO0DKJCIrDRyn5hnYfqfj/K70DJQd/jwnkek1INKgV/aA8t4Af92aNMu7iEfhNoPv
-         wc/FOH7kxBCTpa1TlmYwD7fz6aN04hx33KGrs+N8D6eKftBVNafYBb7SQ/C5H6EcvN
-         o240Z2pI38mww==
-Received: by pali.im (Postfix)
-        id 365367EA; Thu, 19 Aug 2021 10:34:32 +0200 (CEST)
-Date:   Thu, 19 Aug 2021 10:34:32 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Jan Kara <jack@suse.cz>
+        id S238043AbhHSKYX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 19 Aug 2021 06:24:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42222 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236149AbhHSKYX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Aug 2021 06:24:23 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06532C061575;
+        Thu, 19 Aug 2021 03:23:47 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id f2so10706451ljn.1;
+        Thu, 19 Aug 2021 03:23:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=s7gzHcAvUGRal7zGjfCj1tvyGgqr2i8nXDn4Q3sKzQk=;
+        b=Mfyx9RZf49s53j40JmyfZM1lJWT/tSB5dUUVPbPQyL1z9vJPwL8wxRbIWIw1ek9N3P
+         FCdsucQWgjUO4i8U/uWO19zPjJzxYSv3B0ps89+KpLOFQzlQyZ6Q7gYJ2o5hH9x7boZK
+         0hHxub5elRpkprNhLwVf8Z35OTkvNjcpWTknPnUzIBddpJWPGpp3zCNq/CF6jdEH4/1D
+         csNUXhEd/S70aZEY370wZybpR4RAhznZFB5p5DHOjaZ2WPdH7bCuyDoZ+Tfjryp/J9k9
+         jYZ0Z5Ysn3Bx4t7gZi58GygFNtApzoSEW/Ha01maSBtlbczhdiMyi5YMIFmIRLeiyk2A
+         QqNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=s7gzHcAvUGRal7zGjfCj1tvyGgqr2i8nXDn4Q3sKzQk=;
+        b=rq44BOmXdILfAJyNIXRVziPFsFyEf6MyOAiWUrtctZxBarDUYDiFMlCs6AFtWoaFZM
+         XurCopVlNQ9Ctra5OD60OugOSRmiw9M0y7M9Wxx1iF24FZaAM7CrOxh/pg46huBncVe/
+         NK4I45+x4FBYy0cirFUSPh5GgtMYkLJGUb2Hs+ByIi/eSqcf6iJJTE3qutZxkxAhCIFY
+         eeia/Xz4EaGL7x0xtg8b2JicI/5S/AjoX3v/ubtqv2iQKYSWIr4rgYnfiluXF48EK1r/
+         wM+E5HDQ/JhwlcjKmudv7QS550nLl9KPLQo5RJG16bGbzOwg1E1cgs+IxXnglYzIIuvY
+         oyGQ==
+X-Gm-Message-State: AOAM532/UDrVrTakUDyD4YuUYLUq18nC4VSfHSLHxicVTZ6rZD01okNE
+        F7uKYCMiOQSaeYLgsSRUIMQ=
+X-Google-Smtp-Source: ABdhPJwBC3AtCQaaRJLeMqncG4o7h0yRkRo3Vd0w10HmGYffhLah81Cfn2ICXXTq/oY9pVnTwY2K2Q==
+X-Received: by 2002:a2e:2f1c:: with SMTP id v28mr11179313ljv.476.1629368625379;
+        Thu, 19 Aug 2021 03:23:45 -0700 (PDT)
+Received: from kari-VirtualBox (85-23-89-224.bb.dnainternet.fi. [85.23.89.224])
+        by smtp.gmail.com with ESMTPSA id i21sm262452lfc.92.2021.08.19.03.23.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 03:23:44 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 13:23:42 +0300
+From:   Kari Argillander <kari.argillander@gmail.com>
+To:     Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 Cc:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
         jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
         Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jan Kara <jack@suse.cz>,
         OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
         "Theodore Y . Ts'o" <tytso@mit.edu>,
         Luis de Bethencourt <luisbg@kernel.org>,
@@ -50,62 +74,44 @@ Cc:     linux-fsdevel@vger.kernel.org,
         Pavel Machek <pavel@ucw.cz>,
         Marek =?utf-8?B?QmVow7pu?= <marek.behun@nic.cz>,
         Christoph Hellwig <hch@infradead.org>
-Subject: Re: [RFC PATCH 03/20] udf: Fix iocharset=utf8 mount option
-Message-ID: <20210819083432.yy36hrbxzmbasvwd@pali>
+Subject: Re: [RFC PATCH 05/20] ntfs: Undeprecate iocharset= mount option
+Message-ID: <20210819102342.6ps7lowpuomyqcdk@kari-VirtualBox>
 References: <20210808162453.1653-1-pali@kernel.org>
- <20210808162453.1653-4-pali@kernel.org>
- <20210812141736.GE14675@quack2.suse.cz>
- <20210812155134.g67ncugjvruos3cy@pali>
- <20210813134822.GF11955@quack2.suse.cz>
+ <20210808162453.1653-6-pali@kernel.org>
+ <20210819012108.3isqi4t6rmd5fd5x@kari-VirtualBox>
+ <20210819081222.vnvxfrtqctfev6xu@pali>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210813134822.GF11955@quack2.suse.cz>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20210819081222.vnvxfrtqctfev6xu@pali>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Friday 13 August 2021 15:48:22 Jan Kara wrote:
-> On Thu 12-08-21 17:51:34, Pali Roh√°r wrote:
-> > On Thursday 12 August 2021 16:17:36 Jan Kara wrote:
-> > > On Sun 08-08-21 18:24:36, Pali Roh√°r wrote:
-> > > > Currently iocharset=utf8 mount option is broken. To use UTF-8 as iocharset,
-> > > > it is required to use utf8 mount option.
-> > > > 
-> > > > Fix iocharset=utf8 mount option to use be equivalent to the utf8 mount
-> > > > option.
-> > > > 
-> > > > If UTF-8 as iocharset is used then s_nls_map is set to NULL. So simplify
-> > > > code around, remove UDF_FLAG_NLS_MAP and UDF_FLAG_UTF8 flags as to
-> > > > distinguish between UTF-8 and non-UTF-8 it is needed just to check if
-> > > > s_nls_map set to NULL or not.
-> > > > 
-> > > > Signed-off-by: Pali Roh√°r <pali@kernel.org>
-> > > 
-> > > Thanks for the cleanup. It looks good. Feel free to add:
-> > > 
-> > > Reviewed-by: Jan Kara <jack@suse.cz>
-> > > 
-> > > Or should I take this patch through my tree?
-> > 
-> > Hello! Patches are just RFC, mostly untested and not ready for merging.
-> > I will wait for feedback and then I do more testing nad prepare new
-> > patch series.
+On Thu, Aug 19, 2021 at 10:12:22AM +0200, Pali Roh·r wrote:
+> On Thursday 19 August 2021 04:21:08 Kari Argillander wrote:
+> > On Sun, Aug 08, 2021 at 06:24:38PM +0200, Pali Roh·r wrote:
+> > > Other fs drivers are using iocharset= mount option for specifying charset.
+> > > So mark iocharset= mount option as preferred and deprecate nls= mount
+> > > option.
+> >  
+> > One idea is also make this change to fs/fc_parser.c and then when we
+> > want we can drop support from all filesystem same time. This way we
+> > can get more deprecated code off the fs drivers. Draw back is that
+> > then every filesstem has this deprecated nls= option if it support
+> > iocharsets option. But that should imo be ok.
 > 
-> OK, FWIW I've also tested the UDF and isofs patches.
+> Beware that iocharset= is required only for fs which store filenames in
+> some specific encoding (in this case extension to UTF-16). For fs which
+> store filenames in raw bytes this option should not be parsed at all.
 
-Well, if you have already done tests, patches are correct and these fs
-driver are working fine then fell free to take it through your tree.
+Yeah of course. I was thinking that what we do is that if key is nls=
+we change key to iocharset, print deprecated and then send it to driver
+parser as usual. This way driver parser will never know that user
+specifie nls= because it just get iocharset. But this is probebly too
+fancy way to think simple problem. Just idea. 
 
-I just wanted to warn people that patches in this RFC are mostly
-untested to prevent some issues. But if somebody else was faster than
-me, did testing + reviewing and there was no issue, I do not see any
-problem with including them. Just I cannot put my own Tested-by (yet) :-)
+> Therefore I'm not sure if this parsing should be in global
+> fs/fc_parser.c file...
 
-> 								Honza
-> 
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
