@@ -7,100 +7,94 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF3CC432BE
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 23:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D058C4338F
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 01:21:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E63A610CD
-	for <linux-cifs@archiver.kernel.org>; Wed, 18 Aug 2021 23:04:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FB446103E
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 01:21:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232862AbhHRXEi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 18 Aug 2021 19:04:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56836 "EHLO
+        id S234866AbhHSBVs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 18 Aug 2021 21:21:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbhHRXEi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 Aug 2021 19:04:38 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6F81C061764;
-        Wed, 18 Aug 2021 16:04:02 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id g13so8148229lfj.12;
-        Wed, 18 Aug 2021 16:04:02 -0700 (PDT)
+        with ESMTP id S234194AbhHSBVs (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 Aug 2021 21:21:48 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A862FC061764;
+        Wed, 18 Aug 2021 18:21:12 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id i28so8918629lfl.2;
+        Wed, 18 Aug 2021 18:21:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8Z1R2fYrOTNobmlJ+3vB5EQ4usNEedoji07UX/UXLZ0=;
-        b=bhiznbVnEElfdRFu5TOHs3MZd9U86RLjG+RsUU898sYZlmi8E4xAcRhy+WpNWWeCDY
-         /z1H9MCRx3dojy3XQXAbMs02Ix0261vSBEEYzSnps/vmwNL6fX0oE69uOaJQrt1w00Mu
-         giLOtN7RVaT1P84/tTtRJa7B0bXTIsnZY8KZQ+xc6FUeCt3JgHjytvqvLl7PlVeRSoc5
-         skImqy9Yd2S3yyKtHodkB7JEG5vGrYxkvr65UTuuw2qAANVDDsRHQ6aimPJ/ajaOfHt2
-         VPKv6u5AiLvavRpMsuFaAEUjAvxREtwsF/sD1agnKfjPa3dLSyRoyLOjyvbgMq9IXxiH
-         Z/VA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=SJuvwza4i3euGFKnNsOSq5UE2l7kBSIoFPXhirEE3R4=;
+        b=fxKyYxPdHn19y1zWIJctQyf02Cp5BGh+iXmRYyxGsHjzqVwZ28VBRWJ4ovpTkA0OpW
+         7fRNbiUErN6HeIrTCsFh8vUDYXQ9BBAkpzzuBP+Xys1jrVAcWqWXy4S384e/U35Qh00m
+         BcXnkq+FlEm+WVrtUHfbtnwu9oBE9V2+Oj495lXZNHXn5UtCT85FzqvMvZobRbJ3Lg+k
+         4/O1d9BcepeOCNoy3b0rfSHJLXU1gqed0RkIl1eygr4nghgbMn82FHAB/nGOvrWViZEh
+         1EzCbkXQ3qygEk0UqGtscvSrQzF2Y1pSqSqOIdxX9j/kN/SYja/ZXXipVZdgStPyrMUC
+         ElsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8Z1R2fYrOTNobmlJ+3vB5EQ4usNEedoji07UX/UXLZ0=;
-        b=JgXA78q8ahQFUVl8r8NyvC6Iw3mR7K9LgUYhM4lQZmzxtvZTW3a0xteMNxfNrtylzJ
-         SF2MdikMG+qD21A3rlINhat5nYytFQFf3cm+oZXcmsi27DQKQPdcwbQVM5OIH5zu8wlj
-         lSFXFHaK8hRPVhHLgBApRyG48H2MCws5mRhYSyFkhRGkYnLqZHv5/96X/mnIpTrdcB8y
-         VOuXzrg6CnODEpYi/ixi+rYTJ0cTJduILpU/P/IQiVYXETte5ZDWNJvq3+ER9BObYdAb
-         WtoMKt9yeLAXw6lYrLwhstLIWNKGT489FtKKY23/KC2JtBhoENE3oycAmHgK7g6OADiZ
-         dbxA==
-X-Gm-Message-State: AOAM532/soaUl8ESDW1WIrS3zGYmrsFmj+0MsL2uf9dxi4hR7YH1kJ7n
-        bFDY/qe8Vo0ebsgxR2NbMdFhRixTvIye/2lMJ1E=
-X-Google-Smtp-Source: ABdhPJze8nwhCjJoYbyQoJXtKIj01aYAK41g4x9FgD9H5Tboj6ecAbU6Kj8CjIoc6WnoqS7daB/gMc5AuEvdi/DKyQE=
-X-Received: by 2002:ac2:4350:: with SMTP id o16mr8377063lfl.184.1629327841043;
- Wed, 18 Aug 2021 16:04:01 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=SJuvwza4i3euGFKnNsOSq5UE2l7kBSIoFPXhirEE3R4=;
+        b=oicsjzqzpQ2Tc2GqHBHXJ0v6c949A114O7B3aKONwPa0Iu7xMp+L6hNYSgJ1wthQUm
+         EtzDSoKNZVgDAut2tw0DsSQwVOWLAbNmhrre+w2fK0HgW28wl23a2s/AOWeyBD5Tw8Gw
+         QkYqwnEuYuhH+7QoeAi1FgYxnE4c1nhkBpWxDBtP2nyYGmfz4VXELpBsJv7S0oZZVEDS
+         eq5x5cg3UplYCzI8Hlv68S0ClHro6OcS9X8w1KXp+ryU2bzqt7PqhOzRNKzga+OLotEJ
+         cIXZfKqm4/7VoVAVrPOc0sXq8WLTSFB+g7cCRtZFgSlGKcLJMwushWvsxUP8nyX0Cpgr
+         XnxQ==
+X-Gm-Message-State: AOAM530RA72kHUJsiUPU829qA2a0EWXXOQAB3b2SHXU4bqsktf1MRV5O
+        cLb3u0xzEKrvQZf1ZSFnn6Y=
+X-Google-Smtp-Source: ABdhPJxUSdb/TSThZOC0vW4s1x5WY/iq6HsaI5MpPqZA8s1xJqhodoM4fRPhgnAeb9XSAPuwLQqFGg==
+X-Received: by 2002:ac2:4884:: with SMTP id x4mr539877lfc.650.1629336071117;
+        Wed, 18 Aug 2021 18:21:11 -0700 (PDT)
+Received: from kari-VirtualBox (85-23-89-224.bb.dnainternet.fi. [85.23.89.224])
+        by smtp.gmail.com with ESMTPSA id bt25sm131947lfb.282.2021.08.18.18.21.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Aug 2021 18:21:10 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 04:21:08 +0300
+From:   Kari Argillander <kari.argillander@gmail.com>
+To:     Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jan Kara <jack@suse.cz>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Luis de Bethencourt <luisbg@kernel.org>,
+        Salah Triki <salah.triki@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Marek =?utf-8?B?QmVow7pu?= <marek.behun@nic.cz>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [RFC PATCH 05/20] ntfs: Undeprecate iocharset= mount option
+Message-ID: <20210819012108.3isqi4t6rmd5fd5x@kari-VirtualBox>
+References: <20210808162453.1653-1-pali@kernel.org>
+ <20210808162453.1653-6-pali@kernel.org>
 MIME-Version: 1.0
-References: <20210818144617.110061-1-ardb@kernel.org> <946591db-36aa-23db-a5c4-808546eab762@gmail.com>
- <CAMj1kXEjHojAZ0_DPkogHAbmS6XAOFN3t8-4VB0+zN8ruTPVCg@mail.gmail.com>
- <24606605-71ae-f918-b71a-480be7d68e43@gmail.com> <CAMj1kXEO8PwLfT8uAYgeFF7T3TznWz4E=R1JArvCdKXk8qiAMQ@mail.gmail.com>
- <e2462d50-57e9-b7d7-bc07-0f365a01d215@gmail.com>
-In-Reply-To: <e2462d50-57e9-b7d7-bc07-0f365a01d215@gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 18 Aug 2021 18:03:50 -0500
-Message-ID: <CAH2r5muUQT5EX0Z=9MFr=QHGaajF5unwnDwib8CN0hbKP7J4Rw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] crypto: remove MD4 generic shash
-To:     Denis Kenzior <denkenz@gmail.com>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210808162453.1653-6-pali@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Aug 18, 2021 at 5:22 PM Denis Kenzior <denkenz@gmail.com> wrote:
->
-> Hi Ard,
->
-> >> That is not something that iwd has any control over though?  We have to support
-> >> it for as long as there are  organizations using TTLS + MD5 or PEAPv0.  There
->
-> Ah, my brain said MSCHAP but my fingers typed MD5.
->
-> >> are still surprisingly many today.
-> >>
-> >
-> > Does that code rely on MD4 as well?
-> >
->
-> But the answer is yes.  Both PEAP and TTLS use MSCHAP or MSCHAPv2 in some form.
->   These are commonly used for Username/Password based WPA(2|3)-Enterprise
-> authentication.  Think 'eduroam' for example.
+On Sun, Aug 08, 2021 at 06:24:38PM +0200, Pali Rohár wrote:
+> Other fs drivers are using iocharset= mount option for specifying charset.
+> So mark iocharset= mount option as preferred and deprecate nls= mount
+> option.
+ 
+One idea is also make this change to fs/fc_parser.c and then when we
+want we can drop support from all filesystem same time. This way we
+can get more deprecated code off the fs drivers. Draw back is that
+then every filesstem has this deprecated nls= option if it support
+iocharsets option. But that should imo be ok.
 
-Can you give some background here?  IIRC MS-CHAPv2 is much worse than
-the NTLMSSP case
-in cifs.ko (where RC4/MD5 is used narrowly).   Doesn't MS-CHAPv2 depend on DES?
-
-
-
--- 
-Thanks,
-
-Steve
