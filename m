@@ -2,108 +2,84 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE42CC4320A
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 05:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C987C4338F
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 08:12:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C85F36112D
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 05:23:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A03B61139
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 08:12:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229782AbhHSFYV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 Aug 2021 01:24:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57668 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbhHSFYV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Aug 2021 01:24:21 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4B6C061756;
-        Wed, 18 Aug 2021 22:23:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Date:Cc:To:From:Message-ID;
-        bh=FKXJJR+E/d8HbrkHuWmDXOz37OkPecELRHt/LNShliU=; b=huKyadOm7s+DNRYIGOpDDkpH2S
-        obnwZPzaIGeW7jkSCpclmxk7tQT/XngBfUbT8+0xZ6HngQFeAUK+D1MMpKnOT9w/e6U4rY9ryFvAP
-        lCyyw2cc8ovxUQlT7kszBcF2kwCtdQDGbojJadVLB0Zh9cPv3QvUCutMFgzTkaVFsGKyXN5TAhMGZ
-        OFMLsAbrrEcWD4kdO6o01vjDbcUqUhLBK9XX5RHuRxrj++U5g1bg1rLWzYeigxA7g/KgNjaNtWnhf
-        Mg4w97sc9fc5ohclNm6OGo1x1/UJt5A+HQwt8n1435WwID8SnS9U7lTlbDpvBm0A36PpXMaqMsKyM
-        5lYPN2Yamatzw3/HcbWAE9SztrFLmGFq3IB4tsH8uX9lWsLCrDg2b0vOK4sewKuQCi+Kx55a/7xz2
-        rDgu+m7GI41GedbKS+11yCYizWmCF1ct3nALgsPc1Lllf3QU6DbMLpR3TYlpSjCOMDbs0n4563DJi
-        M9lPqnFFf3Hl48nfqp4oQYbi;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1mGaWi-0020ip-MC; Thu, 19 Aug 2021 05:23:41 +0000
-Message-ID: <ba396d64c1ed0336530c465aff55f768fae8d95d.camel@samba.org>
-Subject: Re: [PATCH 0/2] crypto: remove MD4 generic shash
-From:   Andrew Bartlett <abartlet@samba.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Jeremy Allison <jra@samba.org>, Steve French <smfrench@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        samba-technical <samba-technical@lists.samba.org>,
-        David Howells <dhowells@redhat.com>,
-        Steve French <sfrench@samba.org>, keyrings@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Denis Kenzior <denkenz@gmail.com>
-Date:   Thu, 19 Aug 2021 17:23:30 +1200
-In-Reply-To: <YR3pi9HEbhknJdl6@sol.localdomain>
-References: <20210818144617.110061-1-ardb@kernel.org>
-         <946591db-36aa-23db-a5c4-808546eab762@gmail.com>
-         <CAMj1kXEjHojAZ0_DPkogHAbmS6XAOFN3t8-4VB0+zN8ruTPVCg@mail.gmail.com>
-         <24606605-71ae-f918-b71a-480be7d68e43@gmail.com>
-         <CAH2r5muhHnrAbu-yX3h1VPjW+2CUyUtSCzyoOs7MXw=fE7HA_Q@mail.gmail.com>
-         <YR2E2FZNdMj2xl+0@jeremy-acer>
-         <d08c99b8550cc48fe04cc9f4cd5eca0532f5733d.camel@samba.org>
-         <YR3pi9HEbhknJdl6@sol.localdomain>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S237240AbhHSINI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 19 Aug 2021 04:13:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44120 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236854AbhHSINA (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 19 Aug 2021 04:13:00 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D0D1A61131;
+        Thu, 19 Aug 2021 08:12:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629360745;
+        bh=GOCGkI4khodlS6ZkJJHgdEHRUQUkLqQWLt51fbZhqag=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ImP54DbDs6Ze/pjeJpxZIXIxsHwZxhPCVYEj1FQ58Pk8MQu0YgBPPHVt2QyUrWWOo
+         F+7xVtg+xAy7FRjbe1EDJHizPC/0f/+6YwEFfR5N4NeTc9Emy2+fr9qITRH7x6la1+
+         hCoKeGQqcKtWUd31f3zvr+9Afmvbea3bQHeAPiMQbPMWP2TOn6PTse/9stQ5OEP3SZ
+         JTYkH0+aLr1DP5o6LkC0JuhqRDq62f+H5i2uiAFs3/pjZM9v7Hz9dS2sVFhpuvLxJE
+         HuqJuEhjdyzIEfkvibVqGVld2ul4ViExKk1iPge2+38neIx/AdSziIQW7tMIsNbDhk
+         G+ZkXmRCjJf3Q==
+Received: by pali.im (Postfix)
+        id 571FC7EA; Thu, 19 Aug 2021 10:12:22 +0200 (CEST)
+Date:   Thu, 19 Aug 2021 10:12:22 +0200
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To:     Kari Argillander <kari.argillander@gmail.com>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jan Kara <jack@suse.cz>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Luis de Bethencourt <luisbg@kernel.org>,
+        Salah Triki <salah.triki@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Marek =?utf-8?B?QmVow7pu?= <marek.behun@nic.cz>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [RFC PATCH 05/20] ntfs: Undeprecate iocharset= mount option
+Message-ID: <20210819081222.vnvxfrtqctfev6xu@pali>
+References: <20210808162453.1653-1-pali@kernel.org>
+ <20210808162453.1653-6-pali@kernel.org>
+ <20210819012108.3isqi4t6rmd5fd5x@kari-VirtualBox>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210819012108.3isqi4t6rmd5fd5x@kari-VirtualBox>
+User-Agent: NeoMutt/20180716
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 2021-08-18 at 22:18 -0700, Eric Biggers wrote:
+On Thursday 19 August 2021 04:21:08 Kari Argillander wrote:
+> On Sun, Aug 08, 2021 at 06:24:38PM +0200, Pali Rohár wrote:
+> > Other fs drivers are using iocharset= mount option for specifying charset.
+> > So mark iocharset= mount option as preferred and deprecate nls= mount
+> > option.
+>  
+> One idea is also make this change to fs/fc_parser.c and then when we
+> want we can drop support from all filesystem same time. This way we
+> can get more deprecated code off the fs drivers. Draw back is that
+> then every filesstem has this deprecated nls= option if it support
+> iocharsets option. But that should imo be ok.
 
-> I'm not sure you understand how embarrassing it is to still be using
-> these
-> algorithms.  MD4 has been broken for over 25 years, and better
-> algorithms have
-> been recommended for 29 years.  Similarly MD5 has been broken for 16
-> years and
-> better algorithms have been recommended for 25 years (though granted,
-> HMAC-MD5
-> is more secure than plain MD5 when properly used).  Meanwhile SHA-2
-> is 20 years
-> old and is still considered secure.  So this isn't something that
-> changes every
-> month -- we're talking about no one bothering to do anything in 30
-> years.
-> 
-> Of course, if cryptography isn't actually applicable to the use case,
-> then
-> cryptography shouldn't be used at all.
+Beware that iocharset= is required only for fs which store filenames in
+some specific encoding (in this case extension to UTF-16). For fs which
+store filenames in raw bytes this option should not be parsed at all.
 
-I'm sorry that Samba - or the Kernel, you could implement whatever is
-desired between cifs.ko and kcifsd -  hasn't gone it alone to build a
-new peer-to-peer mechanism, but absent a Samba-only solution Microsoft
-has been asked and has no intention of updating NTLM, so embarrassing
-or otherwise this is how it is.
-
-Thankfully only the HMAC-MD5 step in what you mention is
-cryptographically significant, the rest are just very lossy compression
-algorithms.  
-
-Andrew Bartlett
-
--- 
-Andrew Bartlett (he/him)       https://samba.org/~abartlet/
-Samba Team Member (since 2001) https://samba.org
-Samba Team Lead, Catalyst IT   https://catalyst.net.nz/services/samba
-
-Samba Development and Support, Catalyst IT - Expert Open Source
-Solutions
-
+Therefore I'm not sure if this parsing should be in global
+fs/fc_parser.c file...
