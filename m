@@ -6,56 +6,54 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 667B4C4338F
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 03:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A26AEC4338F
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 03:53:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5231361130
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 03:49:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76F0C610A1
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 03:53:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236007AbhHSDuF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 18 Aug 2021 23:50:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37044 "EHLO
+        id S235893AbhHSDx6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 18 Aug 2021 23:53:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235806AbhHSDuE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 Aug 2021 23:50:04 -0400
+        with ESMTP id S235806AbhHSDx5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 18 Aug 2021 23:53:57 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A293DC061764;
-        Wed, 18 Aug 2021 20:49:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A05C061764;
+        Wed, 18 Aug 2021 20:53:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
         s=42; h=Date:Cc:To:From:Message-ID;
-        bh=j5tjpwG95NMneNvkZrZuuP58BNA+DYtbNUwlFLXa088=; b=a5x+MjnJdalNxaXTqFlHAcM74Y
-        BeWcrdGfHsRK2BUUKzE5rHJUJNzlKIEUi6JpR1OwX5XADMJrfHBHfYwt7Re/tqYH0FKqVYpVdU+J/
-        +++gJ81R7ghl1fIv+OsLYX+Fl4Kn0ybRIxSOB4x+PJeQwLN8WDEkd4dNrcLcqH+1bZOWrVZwlKZ2G
-        7es3417aDlkCMz6VnUxf4Jiynxo4++wcgU7uTr5RW886HTEx17R3z2u+KvZ8Pj33JWUQtl++HCZGV
-        ExraIrEsSgAHL/4ctZpua/e8wm/Xn+jGo/q/VVChYmuZX4mvZOdd5On9g5iDFZWiBJ6jOYN69WZXx
-        RVnc+rpcqtVa7YYn53PCk0fC8kc88tzPkukFQjMwwAkzYQ76pCzOuXNGL88TvM+IY4Zu+PwLPSrAM
-        jFbrfZruvdtWvv8wp5uU2/61Z3/+r/Jv7u9FCX0AHoA2UBzBvX/ssGUAOdyOEAg7IWIQM3TtIPOTd
-        fM423ije1pODh1jMqDy4Ben6;
+        bh=bKgCaUEic8Dg9c08X1G5eHnxJn89fD/khBgbO3YyqOk=; b=vnSH7dr4uMF8ev4i9LVbl1uedS
+        xHSpFKIri1k/7rL5kwAmKGsKLyEa1N0Qh1SvtKY0d04/3Cq4yqP4yYrqx6PAFn2nCLC7v14Y+1zTa
+        wlRHGc61ABHp61HH3uP6YAnpcL1AF4GIjg8M/MKk7YCwZrfC7Wq3jtQwxCz+lSpnIJtmhMK7g9UAT
+        lf25P9tLmNRn6C1XuSwxlTDVFPHST+MKTFfsMIB4L4CLF3zqSRqbQi1DHvOx2RPftfAGbH16mW3xH
+        h/6/55RK892d7GiUQeFYr+LDwpdFhZZ5Ljz7sJ1RwrD/r2O8ZyK7Zs7vD0f/By1yZ8/FKo03NS6l1
+        7bSV4NpanqSx95K/J8EJM85ohgMwifJrglhZeWwu+BObErwxxlvsBRvTu0/bbvnSV7Xr1Tg8n6pmt
+        5S1b6NSw7wuZ9AlbO8dL5kAHLQt7SETVKmhkvjCbq0x2tcxNJ7QReJob8j0c+W69uU10yIvxPXXOt
+        +DNbiPyr9ajg/8Wc4Q6FWXz9;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
         (Exim)
-        id 1mGZ3U-0020Ds-IC; Thu, 19 Aug 2021 03:49:25 +0000
-Message-ID: <d08c99b8550cc48fe04cc9f4cd5eca0532f5733d.camel@samba.org>
-Subject: Re: [PATCH 0/2] crypto: remove MD4 generic shash
+        id 1mGZ7G-0020Gg-8A; Thu, 19 Aug 2021 03:53:19 +0000
+Message-ID: <b8befda31438d4717ddd86e8c9e051264bf108b2.camel@samba.org>
+Subject: Re: Building cifs.ko without any support for insecure crypto?
 From:   Andrew Bartlett <abartlet@samba.org>
-To:     Jeremy Allison <jra@samba.org>, Steve French <smfrench@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        David Howells <dhowells@redhat.com>,
-        Steve French <sfrench@samba.org>, keyrings@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Denis Kenzior <denkenz@gmail.com>
-Date:   Thu, 19 Aug 2021 15:49:14 +1200
-In-Reply-To: <YR2E2FZNdMj2xl+0@jeremy-acer>
-References: <20210818144617.110061-1-ardb@kernel.org>
-         <946591db-36aa-23db-a5c4-808546eab762@gmail.com>
-         <CAMj1kXEjHojAZ0_DPkogHAbmS6XAOFN3t8-4VB0+zN8ruTPVCg@mail.gmail.com>
-         <24606605-71ae-f918-b71a-480be7d68e43@gmail.com>
-         <CAH2r5muhHnrAbu-yX3h1VPjW+2CUyUtSCzyoOs7MXw=fE7HA_Q@mail.gmail.com>
-         <YR2E2FZNdMj2xl+0@jeremy-acer>
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Date:   Thu, 19 Aug 2021 15:53:11 +1200
+In-Reply-To: <CAN05THS27h9QFpNuVVQmqz8k8_SKD8V8TbzZVYxco7S86i0zWA@mail.gmail.com>
+References: <YRXlwDBfQql36wJx@sol.localdomain>
+         <CAN05THSm5fEcnLKxcsidKPRUC6PVLCkWMBZUW05KNm4uMJNHWw@mail.gmail.com>
+         <YRbT7IbSCXo4Dl0u@sol.localdomain>
+         <CAN05THScNOVh5biQnqM8YDOvNid4Dh=wZS=ObczzmSEpv1LpRw@mail.gmail.com>
+         <YRrkhzOARiT6TqQA@gmail.com>
+         <CAMj1kXH93HU5SNUDLpn+c0ryJUYWpRKVXeoPK8jPOSwiS3_79A@mail.gmail.com>
+         <CAN05THS27h9QFpNuVVQmqz8k8_SKD8V8TbzZVYxco7S86i0zWA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
@@ -64,32 +62,106 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, 2021-08-18 at 15:08 -0700, Jeremy Allison via samba-technical
+On Thu, 2021-08-19 at 13:43 +1000, ronnie sahlberg via samba-technical
 wrote:
+> On Wed, Aug 18, 2021 at 9:44 PM Ard Biesheuvel <ardb@kernel.org>
+> wrote:
+> > On Tue, 17 Aug 2021 at 00:19, Eric Biggers <ebiggers@kernel.org>
+> > wrote:
+> > > On Sun, Aug 15, 2021 at 08:38:23PM +1000, ronnie sahlberg wrote:
+> > > > What are the plans here? To just offer the possibility to
+> > > > disable all
+> > > > these old crypto and hashes on a local kernel compile?
+> > > > Or is the plan to just outright remove it from the kernel
+> > > > sources?
+> > > > 
+> > > > If the first, I think that could possible be done for cifs. I
+> > > > think a
+> > > > lot of the security minded larger enterprises already may be
+> > > > disabling
+> > > > both SMB1 and also NTLM on serverside, so they would be fine.
+> > > > 
+> > > > For the latter, I think it would be a no-go since aside from
+> > > > krb5
+> > > > there are just no other viable authentication mechs for smb.
+> > > 
+> > > Removing the code would be best, but allowing it to be compiled
+> > > out would be the
+> > > next best thing.
+> > > 
+> > > > TL;DR
+> > > > If NTLMSSP authentication is disabled, there are no other
+> > > > options to
+> > > > map a share than using KRB5
+> > > > and setting up the krb5 infrastructure. And thus smaller sites
+> > > > will
+> > > > not be able to use CIFS :-(
+> > > > So while I think it is feasible to add support to cifs.ko to
+> > > > conditionally disable features depending in a kernel compile
+> > > > (no SMB1
+> > > > if des/rc4 is missing, no NTLM if rc4/md4/md5 is missing)  I
+> > > > don't
+> > > > think it is feasible to disable these by default.
+> > > > I will work on making it possible to build cifs.ko with limied
+> > > > functionality when these algorithms are disabled though.
+> > > 
+> > > FWIW, the way this came up is that the Compatibility Test Suite
+> > > for Android 11
+> > > verifies that CONFIG_CRYPTO_MD4 isn't set.  The reason that test
+> > > got added is
+> > > because for a short time, CONFIG_CRYPTO_MD4 had accidentally been
+> > > enabled in the
+> > > recommended kernel config for Android.  Since "obviously" no one
+> > > would be using
+> > > a completely broken crypto algorithm from 31 years ago, when
+> > > fixing that bug we
+> > > decided to go a bit further and just forbid it from the kernel
+> > > config.
+> > > 
+> > > I guess we'll have to remove that test for now (assuming that
+> > > CONFIG_CIFS is to
+> > > be allowed at all on an Android device, and that the people who
+> > > want to use it
+> > > don't want to use kerberos which is probably the case).
+> > > 
+> > > It is beyond ridiculous that this is even an issue though, given
+> > > that MD4 has
+> > > been severely compromised for over 25 years.
+> > > 
+> > > One thing which we should seriously consider doing is removing
+> > > md4 from the
+> > > crypto API and moving it into fs/cifs/.  It isn't a valid crypto
+> > > algorithm, so
+> > > anyone who wants to use it should have to maintain it themselves.
+> > > 
+> > 
+> > +1 to moving the md4 code into fs/cifs, so that the CIFS
+> > maintainers
+> > can own it and phase it out on their own schedule, and prevent its
+> > inadvertent use in other places.
 > 
-> My 2 cents. Preventing NTLM authentication/signing from working would
-> be
-> a negative for the Linux kernel client. I don't mind if that code has
-> to be isolated inside cifs.ko, but it really needs to keep working,
-> at least until we have a pluggable client auth in cifs.ko and Samba
-> that allows the single-server (non AD-Domain) case to keep working
-> easily.
+> Ok, let me summarize the status and what I think we will need to do
+> in cifs.
+> 
+> DES
+> ---
+> Removal of DES is not controversial since this only affects SMB1.
+> SMB2 has been around since 2006 and it is starting to become viable
+> to at least
+> disable the SMB1 protocol by default today.
+> There are still servers that only support SMB1 but they are becoming
+> rare.
+> I think also Microsoft Windows default to disable (but not remove)
+> SMB1 by default
+> on some configurations today.
+> 
+> I am proposing that we remove the hard dependency to DES and instead
+> make it a soft dependency to "do not build SMB1 if DES is missing".
 
-I would echo that, and also just remind folks that MD4 in NTLMSSP is
-used as a compression only, it has no security value.  The security
-would be the same if the password was compressed with MD4, SHA1 or
-SHA256 - the security comes from the complexity of the password and the
-HMAC-MD5 rounds inside NTLMv2.  
-
-I'll also mention the use of MD4, which is used to re-encrypt a short-
-term key with the long-term key out of the NTLMv2 scheme.  This
-thankfully is an unchecksumed simple RC4 round of one random value with
-another, so not subject to known-plaintext attacks here.
-
-I know neither MD4 nor HMAC-MD5 is not flavour of the month any more,
-with good reason, but we would not want to go with way of NFSv4 which
-is, as I understand it, full Kerberos or bust (so folks choose no
-protection).
+NTLMSSP is also used over SMB1 (and presumably in cifs.ko), allowing
+NTLMv2.  This means you would only need DES with 'bare' NTLM, which
+means you are talking to a very, very old server, eg NT4 or Win9X, or
+are running old crypto for giggles. 
 
 Andrew Bartlett
 
