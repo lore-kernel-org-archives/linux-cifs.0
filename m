@@ -2,39 +2,63 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F20A6C4338F
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 22:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D3FC4338F
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 23:18:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C25496109F
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 22:04:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 551B6610A1
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 23:18:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231184AbhHSWEx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 Aug 2021 18:04:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43380 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229605AbhHSWEw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 19 Aug 2021 18:04:52 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id ADFEF6108F;
-        Thu, 19 Aug 2021 22:04:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629410655;
-        bh=aUhzsHm+fJwhMTC1YGSa8jGlBGg6DmC3CFu7zMxr+VE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TGeMjKTr1FVwA7pQUArJRW8E2BtTQ4aNAs+1OXpfMatsVwerUR/jDq723KcxJp78v
-         1/YHKbhkhVekIBOmBFpZC/YdUAyc1XUbsx+3VlKF9EXx1kLpt+JZESe09e045PuUFS
-         U8UcsRiQdKyWmrybcNP14Rra09zGYSsBdWBhXi6PHOXyd6xGHMLG2xwNkfGSQqqFHN
-         zp7rg/cdnhEIseJprZ8V8SxTr1MEKgUFJ0HEpYpR6Ijb4Q80mBUPYVhtEVtO1aAe84
-         9NUYX1G9N0anTevfQtT/zyLLTkPUZNiQ+76QH+D9dDEAFE00/eerI7VtPKEfs3fPZq
-         B6WgpO3azmYyQ==
-Received: by pali.im (Postfix)
-        id 632537EA; Fri, 20 Aug 2021 00:04:12 +0200 (CEST)
-Date:   Fri, 20 Aug 2021 00:04:12 +0200
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To:     Kari Argillander <kari.argillander@gmail.com>
+        id S236042AbhHSXTP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 19 Aug 2021 19:19:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53520 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229808AbhHSXTP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Aug 2021 19:19:15 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2395C061575;
+        Thu, 19 Aug 2021 16:18:37 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id w20so16352050lfu.7;
+        Thu, 19 Aug 2021 16:18:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=Ry+uQ2ze+f23BW9wmso3e2NcNF5MK0mmAGV5/hmmOmo=;
+        b=uJ7HeHQontttqIGqQ2NX/14IN/xSl7wiyEI0b6WFZ9B4Dk2KIpd5De3gqj/D4hSwx0
+         gRNXb/wxBl6wkYTzjm+KZtVK0roxZgPm8z4Pq1aBHFPH6AjN/buNZ107mIV240blAWzH
+         xnfTFqB2fCWp2CG+8vtFP+AeTHM5XXl/CoU91GXHQZ6NWaP7lUV1kIsNh4ck8DBB0o3h
+         /FK+6lBKeWsGqNhpFP5rDtQcdaGZbOsPYjsHL9y50TqOaFd9YT6rv0eLFkf0yRt3VKDP
+         MBLtq/DxFcyYpau9CLyyDhmfF2txevvNvUwOPdmv5/Ml0CqAmPLH3vycy/XY2IjiQFs0
+         MK/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=Ry+uQ2ze+f23BW9wmso3e2NcNF5MK0mmAGV5/hmmOmo=;
+        b=O/0vX5e4jUvP+sC3BwkzPtlDSjyT68P8s8n7zzW+OkQrbwqUFWb7VZa7Pt9dmu9DNC
+         VaNmSWZa8U/171HOlqPYwAJYMaGsSMg/u+PwmiRtMpzN2WXbjNJfYbUP815gRf0h/mrx
+         x5NxemWaGaUHDCTEHJBGefrfXkPh6kv7K2FZW/s4hdrGlvM7jRM/7X4YEo5VhaXLJioB
+         FvPjSpfApf0qzvYlYycLmxICli8Qiju8HgiwsANDTci7UXyG1s5FbYTTn6ua4vipMMaC
+         rPSZOY9BaIHyW6GpX+pRV9M6s2+3cHATDieD0ZKU3gA0KDCd75LrcuchXPkMcl4WDrvF
+         tTSQ==
+X-Gm-Message-State: AOAM531YnK3aomrYHkOxAElUMdmf1hzxl3JUvoNFfW0clGh0avUhC19R
+        +4sB7U+ReKjD26VFnQVR5WY=
+X-Google-Smtp-Source: ABdhPJx87x0dZUPkISoJL4ME1bzX8W9BQeT50/qxq+el9HtXrx76quTuHsUMVVORkAiJcCURiF15WQ==
+X-Received: by 2002:a05:6512:22cd:: with SMTP id g13mr12755777lfu.440.1629415116388;
+        Thu, 19 Aug 2021 16:18:36 -0700 (PDT)
+Received: from kari-VirtualBox (85-23-89-224.bb.dnainternet.fi. [85.23.89.224])
+        by smtp.gmail.com with ESMTPSA id 3sm381713ljq.136.2021.08.19.16.18.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 16:18:35 -0700 (PDT)
+Date:   Fri, 20 Aug 2021 02:18:33 +0300
+From:   Kari Argillander <kari.argillander@gmail.com>
+To:     Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 Cc:     linux-fsdevel@vger.kernel.org,
         linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
         jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
@@ -51,51 +75,60 @@ Cc:     linux-fsdevel@vger.kernel.org,
         Marek =?utf-8?B?QmVow7pu?= <marek.behun@nic.cz>,
         Christoph Hellwig <hch@infradead.org>
 Subject: Re: [RFC PATCH 05/20] ntfs: Undeprecate iocharset= mount option
-Message-ID: <20210819220412.jicwnrevzi6s25ee@pali>
+Message-ID: <20210819231833.deyfwq73tbslkizc@kari-VirtualBox>
 References: <20210808162453.1653-1-pali@kernel.org>
  <20210808162453.1653-6-pali@kernel.org>
  <20210819012108.3isqi4t6rmd5fd5x@kari-VirtualBox>
  <20210819081222.vnvxfrtqctfev6xu@pali>
  <20210819102342.6ps7lowpuomyqcdk@kari-VirtualBox>
+ <20210819220412.jicwnrevzi6s25ee@pali>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210819102342.6ps7lowpuomyqcdk@kari-VirtualBox>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20210819220412.jicwnrevzi6s25ee@pali>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thursday 19 August 2021 13:23:42 Kari Argillander wrote:
-> On Thu, Aug 19, 2021 at 10:12:22AM +0200, Pali RohÃ¡r wrote:
-> > On Thursday 19 August 2021 04:21:08 Kari Argillander wrote:
-> > > On Sun, Aug 08, 2021 at 06:24:38PM +0200, Pali RohÃ¡r wrote:
-> > > > Other fs drivers are using iocharset= mount option for specifying charset.
-> > > > So mark iocharset= mount option as preferred and deprecate nls= mount
-> > > > option.
-> > >  
-> > > One idea is also make this change to fs/fc_parser.c and then when we
-> > > want we can drop support from all filesystem same time. This way we
-> > > can get more deprecated code off the fs drivers. Draw back is that
-> > > then every filesstem has this deprecated nls= option if it support
-> > > iocharsets option. But that should imo be ok.
+On Fri, Aug 20, 2021 at 12:04:12AM +0200, Pali Rohár wrote:
+> On Thursday 19 August 2021 13:23:42 Kari Argillander wrote:
+> > On Thu, Aug 19, 2021 at 10:12:22AM +0200, Pali Rohár wrote:
+> > > On Thursday 19 August 2021 04:21:08 Kari Argillander wrote:
+> > > > On Sun, Aug 08, 2021 at 06:24:38PM +0200, Pali Rohár wrote:
+> > > > > Other fs drivers are using iocharset= mount option for specifying charset.
+> > > > > So mark iocharset= mount option as preferred and deprecate nls= mount
+> > > > > option.
+> > > >  
+> > > > One idea is also make this change to fs/fc_parser.c and then when we
+> > > > want we can drop support from all filesystem same time. This way we
+> > > > can get more deprecated code off the fs drivers. Draw back is that
+> > > > then every filesstem has this deprecated nls= option if it support
+> > > > iocharsets option. But that should imo be ok.
+> > > 
+> > > Beware that iocharset= is required only for fs which store filenames in
+> > > some specific encoding (in this case extension to UTF-16). For fs which
+> > > store filenames in raw bytes this option should not be parsed at all.
 > > 
-> > Beware that iocharset= is required only for fs which store filenames in
-> > some specific encoding (in this case extension to UTF-16). For fs which
-> > store filenames in raw bytes this option should not be parsed at all.
+> > Yeah of course. I was thinking that what we do is that if key is nls=
+> > we change key to iocharset, print deprecated and then send it to driver
+> > parser as usual. This way driver parser will never know that user
+> > specifie nls= because it just get iocharset. But this is probebly too
+> > fancy way to think simple problem. Just idea. 
 > 
-> Yeah of course. I was thinking that what we do is that if key is nls=
-> we change key to iocharset, print deprecated and then send it to driver
-> parser as usual. This way driver parser will never know that user
-> specifie nls= because it just get iocharset. But this is probebly too
-> fancy way to think simple problem. Just idea. 
+> This has an issue that when you use nls= option for e.g. ext4 fs then
+> kernel starts reporting that nls= for ext4 is deprecated. But there is
+> no nls= option and neither iocharset= option for ext4. So kernel should
+> not start reporting such warnings for ext4.
 
-This has an issue that when you use nls= option for e.g. ext4 fs then
-kernel starts reporting that nls= for ext4 is deprecated. But there is
-no nls= option and neither iocharset= option for ext4. So kernel should
-not start reporting such warnings for ext4.
+It gets kinda messy. I was also thinking that but if that was
+implemented then we could first send iocharset to driver and after that
+we print deprecated if it succeeded. If it not succeed then we print
+error messages same as always.
 
-> > Therefore I'm not sure if this parsing should be in global
-> > fs/fc_parser.c file...
+I have not look how easily this is can be done in parser.
+
 > 
+> > > Therefore I'm not sure if this parsing should be in global
+> > > fs/fc_parser.c file...
+> > 
