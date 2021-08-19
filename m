@@ -2,126 +2,92 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B9B4C4338F
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 10:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B7A9C4320A
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 10:42:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA3F5610A7
-	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 10:41:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CA5A6113E
+	for <linux-cifs@archiver.kernel.org>; Thu, 19 Aug 2021 10:42:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237810AbhHSKlu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 19 Aug 2021 06:41:50 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:41020 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237730AbhHSKlt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 19 Aug 2021 06:41:49 -0400
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 614ED220A2;
-        Thu, 19 Aug 2021 10:41:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1629369672; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rYCiuaaVE837hJmVPqNGfQdo0C78s0ZEZthPtB8IJws=;
-        b=QHaOmtrPYFKY/ECa0Oh3D3wOcmiAL2JIpqDvMQlYI8BpjqLWJt/mUSCQ2vcjBliEoI4vxA
-        SYRH4Cp+inhlt3V0CmPecdnxJE3Epw2H+midOIK0+xTMDInKdu3RequJsEUPyMp2pqyIQw
-        CijlpHlUEd3Hub7F+wyUGJuZ/cSF75w=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1629369672;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rYCiuaaVE837hJmVPqNGfQdo0C78s0ZEZthPtB8IJws=;
-        b=Gru6Sh+lMbjFw9se8RNLXjS6xr6bYz+hcdqsCoSCBrJKyJSzbka4LCg8dAxA8ab7QDTvHb
-        tSzoTxy76e1B4yCA==
-Received: from quack2.suse.cz (unknown [10.100.224.230])
-        by relay2.suse.de (Postfix) with ESMTP id 66AC1A3B9A;
-        Thu, 19 Aug 2021 10:40:54 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id B8FF31E0679; Thu, 19 Aug 2021 12:41:11 +0200 (CEST)
-Date:   Thu, 19 Aug 2021 12:41:11 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-        "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Luis de Bethencourt <luisbg@kernel.org>,
-        Salah Triki <salah.triki@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Dave Kleikamp <shaggy@kernel.org>,
-        Anton Altaparmakov <anton@tuxera.com>,
-        Pavel Machek <pavel@ucw.cz>,
-        Marek =?iso-8859-1?Q?Beh=FAn?= <marek.behun@nic.cz>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [RFC PATCH 03/20] udf: Fix iocharset=utf8 mount option
-Message-ID: <20210819104111.GC32435@quack2.suse.cz>
-References: <20210808162453.1653-1-pali@kernel.org>
- <20210808162453.1653-4-pali@kernel.org>
- <20210812141736.GE14675@quack2.suse.cz>
- <20210812155134.g67ncugjvruos3cy@pali>
- <20210813134822.GF11955@quack2.suse.cz>
- <20210819083432.yy36hrbxzmbasvwd@pali>
+        id S237730AbhHSKnB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 19 Aug 2021 06:43:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51560 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236149AbhHSKnB (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 19 Aug 2021 06:43:01 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A80AF6113D;
+        Thu, 19 Aug 2021 10:42:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629369745;
+        bh=xJ7UEL9HZ8z2uF/hWejre2Z71R2i5cuER1AULbTrHpg=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=uEK7tapHLENc7dbFtE12KQet8t4ygrP0X7IPeavlsD2wPyOYpQiswQgvj4lHUVQ0I
+         458Tu2LaCOiujPgXQl4acdUFDdR+Ma8Ip/CHvUl1l6+JerfXFDHRXjPJnHOysFikU+
+         ixeQw1AMxKtUU0RfALFjBl/4kEjW6akS04OEg6GjW8tdtFMnjj6jCpDQip+XQ+NDL6
+         2Jg2vhEeWhPno9CcBpwHi6i7EJzGixQEvBk8lMvanfYV5r8ks5Xm8u2UJPAu+rwSgQ
+         F9+0H+qtUH2IW62qrpRbTDN2bKv2Yqbv6XYdzeaA6GwKTgvyYOgHDGdm3iSHDFCK8M
+         7nMPQbmqv/w7g==
+Message-ID: <1cbfe2bbb46ab48bf6dddee9a15a7c04c99db8f7.camel@kernel.org>
+Subject: Re: [PATCH 0/2] crypto: remove MD4 generic shash
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>, Denis Kenzior <denkenz@gmail.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        Steve French <sfrench@samba.org>,
+        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
+Date:   Thu, 19 Aug 2021 13:42:22 +0300
+In-Reply-To: <CAMj1kXEjHojAZ0_DPkogHAbmS6XAOFN3t8-4VB0+zN8ruTPVCg@mail.gmail.com>
+References: <20210818144617.110061-1-ardb@kernel.org>
+         <946591db-36aa-23db-a5c4-808546eab762@gmail.com>
+         <CAMj1kXEjHojAZ0_DPkogHAbmS6XAOFN3t8-4VB0+zN8ruTPVCg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210819083432.yy36hrbxzmbasvwd@pali>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu 19-08-21 10:34:32, Pali Rohár wrote:
-> On Friday 13 August 2021 15:48:22 Jan Kara wrote:
-> > On Thu 12-08-21 17:51:34, Pali Rohár wrote:
-> > > On Thursday 12 August 2021 16:17:36 Jan Kara wrote:
-> > > > On Sun 08-08-21 18:24:36, Pali Rohár wrote:
-> > > > > Currently iocharset=utf8 mount option is broken. To use UTF-8 as iocharset,
-> > > > > it is required to use utf8 mount option.
-> > > > > 
-> > > > > Fix iocharset=utf8 mount option to use be equivalent to the utf8 mount
-> > > > > option.
-> > > > > 
-> > > > > If UTF-8 as iocharset is used then s_nls_map is set to NULL. So simplify
-> > > > > code around, remove UDF_FLAG_NLS_MAP and UDF_FLAG_UTF8 flags as to
-> > > > > distinguish between UTF-8 and non-UTF-8 it is needed just to check if
-> > > > > s_nls_map set to NULL or not.
-> > > > > 
-> > > > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > > > 
-> > > > Thanks for the cleanup. It looks good. Feel free to add:
-> > > > 
-> > > > Reviewed-by: Jan Kara <jack@suse.cz>
-> > > > 
-> > > > Or should I take this patch through my tree?
-> > > 
-> > > Hello! Patches are just RFC, mostly untested and not ready for merging.
-> > > I will wait for feedback and then I do more testing nad prepare new
-> > > patch series.
-> > 
-> > OK, FWIW I've also tested the UDF and isofs patches.
-> 
-> Well, if you have already done tests, patches are correct and these fs
-> driver are working fine then fell free to take it through your tree.
-> 
-> I just wanted to warn people that patches in this RFC are mostly
-> untested to prevent some issues. But if somebody else was faster than
-> me, did testing + reviewing and there was no issue, I do not see any
-> problem with including them. Just I cannot put my own Tested-by (yet) :-)
+On Wed, 2021-08-18 at 18:10 +0200, Ard Biesheuvel wrote:
+> On Wed, 18 Aug 2021 at 16:51, Denis Kenzior <denkenz@gmail.com>
+> wrote:
+> > Hi Ard,
+> >=20
+> > On 8/18/21 9:46 AM, Ard Biesheuvel wrote:
+> > > As discussed on the list [0], MD4 is still being relied upon by
+> > > the CIFS
+> > > driver, even though successful attacks on MD4 are as old as Linux
+> > > itself.
+> > >=20
+> > > So let's move the code into the CIFS driver, and remove it from
+> > > the
+> > > crypto API so that it is no longer exposed to other subsystems or
+> > > to
+> > > user space via AF_ALG.
+> > >=20
+> >=20
+> > Can we please stop removing algorithms from AF_ALG?
+>=20
+> I don't think we can, to be honest. We need to have a deprecation
+> path
+> for obsolete and insecure algorithms: the alternative is to keep
+> supporting a long tail of broken crypto indefinitely.
 
-OK, I've pulled the udf and isofs fixes to my tree.
+I think you are ignoring the fact that by doing that you might be
+removing a migration path to more secure algorithms, for some legacy
+systems.
 
-								Honza
+I.e. in some cases this might mean sticking to insecure algorithm *and*
+old kernel for unnecessary long amount of time because migration is
+more costly.
 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Perhaps there could be a comman-line parameter or similar to enable
+legacy crypto?
+
+/Jarkko
