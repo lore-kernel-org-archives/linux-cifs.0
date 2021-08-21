@@ -2,159 +2,333 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-21.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2A1C4338F
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Aug 2021 03:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C4AC43214
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Aug 2021 05:59:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2674D611C3
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Aug 2021 03:49:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47084610E6
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Aug 2021 05:59:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232295AbhHUDt5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 20 Aug 2021 23:49:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46874 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbhHUDt5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Aug 2021 23:49:57 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA00C061575;
-        Fri, 20 Aug 2021 20:49:17 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id u22so24609496lfq.13;
-        Fri, 20 Aug 2021 20:49:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zHOVDDy6Elh+zfWbuB2hVkW/DiSiV2mlyNyWlRpko1k=;
-        b=dDwcE8t7q/kyfCmqNuWd5qCbT4xcdx1l0pa96J5KWVMZ4d/FJdNXj53i4Zz0e/Ksj/
-         ApUVZLoXFhXLBJge6j7CqP6X4Y0MgZ2MEjHd0LCKMzsB+LAWKLiitgiNKQPbtN3KX9L0
-         DRVNkRQ77FenzaDRP8j4xfPdyE1WOQIpIDVaxu8Cj5YmdAi5EGo5o6/0w+ohtJhQmwBq
-         uyEPvXuIe44GPXkmxkho++tNovgzAsuLXhbBzsGeB13wBpfiVeCLddD1Kx3jwIFDXN3H
-         laxsPrnL96nMpcgDOYylmemk95dV9q9hCOSZgHIPdQWKJbBApQY3rhMIYNG+1PbJjDDj
-         4/8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zHOVDDy6Elh+zfWbuB2hVkW/DiSiV2mlyNyWlRpko1k=;
-        b=XPp8wofHzNZE4FMC8rDOQ4L22CT/GwpqhBy/w3btYLavExkNh5sw61NWWJNtE3R+H9
-         A4FwsTmOnwEuAXD+7/b/s4mIs5fHGu8vJaNVA4l1vxgSQ+AYb+v8HPGwd8iMBFa9jY1y
-         1t7eC7jLQ6fslsU2jmoZ3oGUota/tCchs2Y+uqtBNih3+biNaJjM9EZYEjjUivu2au9m
-         OJCgshuAXMoGAnpZAF855ipCnYOFrQQ7uw08u+4095nvKUBZ+CrgpzrlF/hUWNpDoIUV
-         liFnbmPKvgunSXwnLS9I68c4gy1PGYaeZEOK+ZIys0Lf9kWArrhJg0w8qpXsrdDA/TRF
-         qa7g==
-X-Gm-Message-State: AOAM531KILRomGaaYU72OLi3aVycs7DzQL0oVgRqSb4rGi6TxzwNe6CG
-        +PL6bWRlkUVvmwnQk/AcrPLO3xcLV1Ce4mbUVU3nzJlJ6ms=
-X-Google-Smtp-Source: ABdhPJz9Yp/cOICdPWWe7C4f0+W/y7G8ogcXIR/JW21OvDVIDHMjDp+d36/NP9TLWjzkPBR7HX1+myUjZfHpuQc0IS0=
-X-Received: by 2002:a05:6512:3455:: with SMTP id j21mr12302316lfr.282.1629517755929;
- Fri, 20 Aug 2021 20:49:15 -0700 (PDT)
+        id S230375AbhHUGAB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 21 Aug 2021 02:00:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39034 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230319AbhHUGAB (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 21 Aug 2021 02:00:01 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AF6F2611EF
+        for <linux-cifs@vger.kernel.org>; Sat, 21 Aug 2021 05:59:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1629525562;
+        bh=Sw2hx449bmsTssdmnNJySH0AaHwsHPlVLMQrshvGDo0=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=mki9eCXeWDLEByMTph2WLrVrz82wyEUjyTipBXSb2Hm940eKrtmlaHjQ09cH8FcfZ
+         fnNOJeQcwNaea5Vbpry0ke1Regh5HWACrmnxyVdQoUTZC2dUEogWMKupNWJUVUICw6
+         Ue8nb1LuDA3Z+uvPGwBGLsfcQk66E9xu6oUELZrI9KJyEYUme+tfHm0phboiZmNKH4
+         WYGmXrLakQ0mbwt2IWVIGpB5tL84GWsMrh/ZpN/fcFYeIxPkDxUept0OmpU2MHFF4t
+         l8fs6JQmu4SHLGOJzPF01jpxcamAjr4OmF4paZtmSOCLQCvDSxgvp5UuuE+bCwPxAf
+         3APhG/nXKghCQ==
+Received: by mail-ot1-f47.google.com with SMTP id g66-20020a9d12c8000000b0051aeba607f1so11218615otg.11
+        for <linux-cifs@vger.kernel.org>; Fri, 20 Aug 2021 22:59:22 -0700 (PDT)
+X-Gm-Message-State: AOAM530XQBQzbkG1cyA+/QgjzZBTtBVCqvapmtzK844B/sNizjWSPcl1
+        zWBKkUjUWSSdHdCzYfvFFFeDZ1RnzSwirDvyOM4=
+X-Google-Smtp-Source: ABdhPJy7QgrcyNGPOTIKkCrcaGZsRhi1AK8B6mpVnl0Zh1hj1XdMNVFOcTqoX+vh+kIUGjcw6ldc1HreoK58kz0Enn0=
+X-Received: by 2002:aca:bfc6:: with SMTP id p189mr5342391oif.167.1629525562016;
+ Fri, 20 Aug 2021 22:59:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvxX6BqLvgWO18QE+rQsAZoAzopvu5S3fyy45a+Y-w_MQ@mail.gmail.com>
-In-Reply-To: <CAH2r5mvxX6BqLvgWO18QE+rQsAZoAzopvu5S3fyy45a+Y-w_MQ@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 20 Aug 2021 22:49:04 -0500
-Message-ID: <CAH2r5mvVHHgNcg1=YM25e7rK+LnXcvq0iTLW6Jf1BiP1XqoQDw@mail.gmail.com>
-Subject: Re: [PATCH] oid_registry: Add OIDs for missing Spnego auth mechanisms
- to Macs
-To:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        Paulo Alcantara <pc@cjr.nz>
-Cc:     samba-technical <samba-technical@lists.samba.org>
-Content-Type: multipart/mixed; boundary="000000000000ff730805ca09aa11"
+Received: by 2002:ac9:1bc6:0:0:0:0:0 with HTTP; Fri, 20 Aug 2021 22:59:21
+ -0700 (PDT)
+In-Reply-To: <20210819130136.zziq7yr4htiowb5n@wittgenstein>
+References: <CGME20210816115835epcas1p410fb2a768b1af42d2458027de74dcd3c@epcas1p4.samsung.com>
+ <20210816115605.178441-1-brauner@kernel.org> <008d01d792f6$c2735f30$475a1d90$@samsung.com>
+ <20210818174539.ro2ryrbku3ozdjvi@wittgenstein> <000001d794a0$94ec20a0$bec461e0$@samsung.com>
+ <20210819130136.zziq7yr4htiowb5n@wittgenstein>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sat, 21 Aug 2021 14:59:21 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9ON8-j9_uPTE4fi_kW9Zi_8ov++3ujJm5etnigiZ6uQw@mail.gmail.com>
+Message-ID: <CAKYAXd9ON8-j9_uPTE4fi_kW9Zi_8ov++3ujJm5etnigiZ6uQw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix lookup on idmapped mounts
+To:     Christian Brauner <christian.brauner@ubuntu.com>
+Cc:     Namjae Jeon <namjae.jeon@samsung.com>,
+        Steve French <stfrench@microsoft.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        David Sterba <dsterba@suse.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000ff730805ca09aa11
-Content-Type: text/plain; charset="UTF-8"
-
-Fixed a typo in the patch (missing ',').  Updated patch attached.
-
-
-On Fri, Aug 20, 2021 at 6:18 PM Steve French <smfrench@gmail.com> wrote:
+2021-08-19 22:01 GMT+09:00, Christian Brauner <christian.brauner@ubuntu.com>:
+> On Thu, Aug 19, 2021 at 11:19:04AM +0900, Namjae Jeon wrote:
+>> > On Tue, Aug 17, 2021 at 08:30:55AM +0900, Namjae Jeon wrote:
+>> > > > From: Christian Brauner <christian.brauner@ubuntu.com>
+>> > > >
+>> > > > It's great that the new in-kernel ksmbd server will support
+>> > > > idmapped
+>> > > > mounts out of the box! However, lookup is currently broken. Lookup
+>> > > > helpers such as lookup_one_len() call inode_permission() internally
+>> > > > to ensure that the caller is privileged over the inode of the base
+>> > > > dentry they are trying to
+>> > lookup under. So the permission checking here is currently wrong.
+>> > > >
+>> > > > Linux v5.15 will gain a new lookup helper lookup_one() that does
+>> > > > take idmappings into account. I've added it as part of my patch
+>> > > > series to make btrfs support idmapped mounts. The new helper is in
+>> > > > linux- next as part of David's (Sterba) btrfs for-next branch as
+>> > > > commit c972214c133b ("namei: add
+>> > mapping aware lookup helper").
+>> > > >
+>> > > > I've said it before during one of my first reviews: I would very
+>> > > > much recommend adding fstests to
+>> > [1].
+>> > > > It already seems to have very rudimentary cifs support. There is a
+>> > > > completely generic idmapped mount testsuite that supports idmapped
+>> > > > mounts.
+>> > > >
+>> > > > [1]: https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/
+>> > > > Cc: Steve French <stfrench@microsoft.com>
+>> > > > Cc: Christoph Hellwig <hch@infradead.org>
+>> > > > Cc: Namjae Jeon <namjae.jeon@samsung.com>
+>> > > > Cc: Hyunchul Lee <hyc.lee@gmail.com>
+>> > > > Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+>> > > > Cc: David Sterba <dsterba@suse.com>
+>> > > > Cc: linux-cifs@vger.kernel.org
+>> > > > Signed-off-by: Christian Brauner <christian.brauner@ubuntu.com>
+>> > > > ---
+>> > > Hi Christian,
+>> > >
+>> > > > I merged David's for-next tree into cifsd-next to test this. I did
+>> > > > only compile test this. If someone gives me a clear set of
+>> > > > instructions how to test ksmbd on my local machine I can at least
+>> > > > try to cut some time out of my week to do more reviews. (I'd
+>> > > > especially like to see acl behavior with ksmbd.)
+>> > >
+>> > > There is "How to run ksmbd" section in patch cover letter.
+>> > >
+>> > > https://protect2.fireeye.com/v1/url?k=65ecaaf0-3a779239-65ed21bf-0cc47
+>> > > a336fae-53bc47005a1a97a9&q=1&e=e44c9f9f-d7ae-4768-8cc2-8f02d748fc6e&u=
+>> > > https%3A%2F%2Flkml.org%2Flkml%2F2021%2F8%2F5%2F54
+>> > >
+>> > > Let me know if it doesn't work well even if you try to run it with
+>> > > this step.
+>> > > And We will also check whether your patch work fine.
+>> > >
+>> > > >
+>> > > > One more thing, the tree for ksmbd was very hard to find. I had to
+>> > > > do a lot archeology to end up
+>> > at:
+>> > > >
+>> > > > git://git.samba.org/ksmbd.git
+>> > > This is also in the patch cover letter. See "Mailing list and
+>> > > repositories" section.
+>> > > I think that you can use :
+>> > >
+>> > > https://protect2.fireeye.com/v1/url?k=8af83a5d-d5630294-8af9b112-0cc47
+>> > > a336fae-e471ffbdb93d05b7&q=1&e=e44c9f9f-d7ae-4768-8cc2-8f02d748fc6e&u=
+>> > > https%3A%2F%2Fgithub.com%2Fnamjaejeon%2Fsmb3-kernel%2Ftree%2Fksmbd-v7-
+>> > > series
+>> > >
+>> > > >
+>> > > > Would be appreciated if this tree could be reflected in MAINTAINERS
+>> > > > or somewhere else. The github repos with the broken out
+>> > > > patches/module aren't really that helpful.
+>> > > Okay, I will add git address of ksmbd in MAINTAINERS on next spin.
+>> > >
+>> > > >
+>> > > > Thanks!
+>> > > > Christian
+>> > > Really thanks for your review and I will apply this patch after
+>> > > checking it.
+>> >
+>> > Thank your for the pointers.
+>> >
+>> > Ok, so I've been taking the time to look into cifs and ksmbd today. My
+>> > mental model was wrong. There
+>> > are two things to consider here:
+>> >
+>> > 1. server: idmapped mounts with ksmbd
+>> > 2. client: idmapped mounts with cifs
+>> >
+>> > Your patchset adds support for 1.
+>> Right.
+>>
+>> > Let's say I have the following ksmbd config:
+>> >
+>> > root@f2-vm:~# cat /etc/ksmbd/smb.conf
+>> > [global]
+>> >         netbios name = SMBD
+>> >         server max protocol = SMB3
+>> > [test]
+>> >         path = /opt
+>> >         writeable = yes
+>> >         comment = TEST
+>> >         read only = no
+>> >
+>> > So /opt can be an idmapped mount and ksmb would know how to deal with
+>> > that correctly, i.e. you could
+>> > do:
+>> >
+>> > mount-idmapped --map-mount=b:1000:0:1 /opt /opt
+>> >
+>> > ksmbd.mountd
+>> >
+>> > and ksmbd would take the idmapping of /opt into account.
+>> Right.
+>>
+>> >
+>> > That however is different from 2. which is cifs itself being
+>> > idmappable.
+>> Right.
+>>
+>> > Whether or not that makes sense or is needed will need some thinking.
+>> >
+>> > In any case, this has consequences for xfstests and now I understand
+>> > your earlier confusion. In
+>> > another mail you pointed out that cifs reports that idmapped mounts are
+>> > not supported. That is correct
+>> > insofar as it means 2. is not supported, i.e. you can't do:
+>> Right.
+>>
+>> >
+>> > mount -t cifs -o username=foo,password=bar //server/files /mnt
+>> >
+>> > and then
+>> >
+>> > mount-idmapped --map-mount=b:1000:0:1 /mnt /mnt
+>> >
+>> > but that's also not what you want in order to test for ksmbd. What you
+>> > want is to test 1.
+>> Right. So we have manually tested it, not xfstests.
+>>
+>> >
+>> > So your test setup would require you to setup an idmapped mount and have
+>> > ksmbd use that which can then
+>> > be mounted by a client.
+>> >
+>> > With your instructions I was at least able to get a ksmb instance
+>> > running and be able to mount a
+>> > client with -t cifs. All on the same machine, i.e. my server is
+>> > localhost.
+>> Okay.
+>>
+>> >
+>> > However, I need to dig a bit into the semantics to make better
+>> > assertions about what's going on.
+>> Okay. And I have applied your patch to ksmbd.
+>>
+>> >
+>> > Are unix extension supported with ksmb? Everytime I try to use "posix"
+>> > as a mount option with mount -t cifs -o //127.0.0.1/test /mnt I get
+>> > "uid=0" and "gid=0" and "noposix".
+>> > I do set "unix extensions = yes" in both the samba and ksmbd smb.conf.
+>> With posix mount option, It should work. It worked well before but it is
+>> strange now.
+>>
+>> I'm not sure this is the correct fix, But could you please try to mount
+>> with the below change ?
+>>
+>> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+>> index eed59bc1d913..5fd0b0ddcc57 100644
+>> --- a/fs/cifs/fs_context.c
+>> +++ b/fs/cifs/fs_context.c
+>> @@ -1268,8 +1268,10 @@ static int smb3_fs_context_parse_param(struct
+>> fs_context *fc,
+>>         case Opt_unix:
+>>                 if (result.negated)
+>>                         ctx->linux_ext = 0;
+>> -               else
+>> +               else {
+>> +                       ctx->linux_ext = 1;
+>>                         ctx->no_linux_ext = 1;
+>> +               }
+>>                 break;
+>>         case Opt_nocase:
+>>                 ctx->nocase = 1;
 >
->  In testing mounts to Macs, noticed that the OIDS for some
->  GSSAPI/SPNEGO auth mechanisms sent by the server were not
->  recognized and were missing from the header.
+> That stops the bleeding indeed. :)
+Okay, sorry for late response.
+> I think a slightly nicer fix might be:
 >
->  Signed-off-by: Steve French <stfrench@microsoft.com>
+> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+> index eed59bc1d913..424b8dc2232e 100644
+> --- a/fs/cifs/fs_context.c
+> +++ b/fs/cifs/fs_context.c
+> @@ -1269,7 +1269,8 @@ static int smb3_fs_context_parse_param(struct
+> fs_context *fc,
+>                 if (result.negated)
+>                         ctx->linux_ext = 0;
+>                 else
+> -                       ctx->no_linux_ext = 1;
+> +                       ctx->linux_ext = 1;
+> +               ctx->no_linux_ext = !ctx->linux_ext;
+>                 break;
+>         case Opt_nocase:
+>                 ctx->nocase = 1;
 >
-> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-> index 3d8db1f6a5db..2728842721bc 100644
-> --- a/include/linux/oid_registry.h
-> +++ b/include/linux/oid_registry.h
-> @@ -70,6 +70,9 @@ enum OID {
+> So with this patch applied I got unix permissions working after all. So
+> I was able to do some more testing.
+Okay.
 >
->         OID_spnego,                     /* 1.3.6.1.5.5.2 */
+> Just a few questions (independent of idmapped mounts):
 >
-> +       OID_IAKerb,                     /* 1.3.6.1.5.2.5 */
-> +       OID_PKU2U                       /* 1.3.5.1.5.2.7 */
-> +       OID_Scram,                      /* 1.3.6.1.5.5.14 */
->         OID_certAuthInfoAccess,         /* 1.3.6.1.5.5.7.1.1 */
->         OID_sha1,                       /* 1.3.14.3.2.26 */
->         OID_id_ansip384r1,              /* 1.3.132.0.34 */
-> @@ -104,6 +107,10 @@ enum OID {
->         OID_authorityKeyIdentifier,     /* 2.5.29.35 */
->         OID_extKeyUsage,                /* 2.5.29.37 */
+> 1. Are the "uid=" and "gid=" mount options ignored when "username=" is
+>    specified and "posix" is specified?
 >
-> +       /* Heimdal mechanisms */
-> +       OID_NetlogonMechanism,          /* 1.2.752.43.14.2 */
-> +       OID_appleLocalKdcSupported,     /* 1.2.752.43.14.3 */
-> +
->         /* EC-RDSA */
->         OID_gostCPSignA,                /* 1.2.643.2.2.35.1 */
->         OID_gostCPSignB,                /* 1.2.643.2.2.35.2 */
+>    It seems that "uid=" and "gid=" have are silently ignored when
+>    "posix' is set. They are neither used to report file ownership under
+>    the cifs mountpoint nor are they relevant when determining ownership
+>    on disk?
 >
+>    As an example, assume I have added a user "foo" with uid 1000 to
+>    ksmbd via:
 >
-> --
-> Thanks,
+>            ksmbd.adduser -a foo
 >
-> Steve
+>    And I mounted a share via:
+>
+>            mount -t cifs -o
+> username=foo,password=bar,posix,uid=1234,gid=1234,forceuid,forcegid
+> //127.0.0.1/test /mnt
+>
+>    i) Ownership in /mnt appears posix-correct, i.e. "uid=" and "gid=" have
+>       no effect on the reported ownership.
+>
+>    ii) Assume I'm logged in as the root user with uid 0. If I create
+>        file or directory in /mnt it will be owned by user foo, i.e. uid
+>        1000, i.e., the "uid=1234" and "gid=1234" mount option have zero
+>        effect on the ownership of the files?
+>
+> 2. Are the "uid=" and "gid=" options ignored for permission checking
+>    when "posix" is specified?
+>
+> 3. Am I correct in assuming that there is no mount option that makes
+>    chown() or chmod() have an actual effect.
+That will be an answer for 1,2, 3 question. There are mount options for this.
+ 1. modefromsid
+ 2. idsfromsid
 
+You can use this mount option and please check it.
+>
+>    cifs seems to have support for it but the ksmbd server doesn't seem
+>    to?
+No, you need to use mount options for this as I said.
+ksmbd have supported it but I found an issue related to chown and have fixed.
 
+Could you please check the below git branch (pulled David'tree + ksmbd fixes) ?
 
--- 
-Thanks,
+  git clone --branch=for-christian https://github.com/namjaejeon/smb3-kernel
 
-Steve
-
---000000000000ff730805ca09aa11
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-oid_registry-Add-OIDs-for-missing-Spnego-auth-mechan.patch"
-Content-Disposition: attachment; 
-	filename="0001-oid_registry-Add-OIDs-for-missing-Spnego-auth-mechan.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ksl8sgpp0>
-X-Attachment-Id: f_ksl8sgpp0
-
-RnJvbSA5ZDVhZTM0YWE5Y2ZhYTAzZDIwNWY0YTdhMjY4ZDVlZTliMzNjNTdlIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IEZyaSwgMjAgQXVnIDIwMjEgMTg6MTA6MzYgLTA1MDAKU3ViamVjdDogW1BBVENIXSBv
-aWRfcmVnaXN0cnk6IEFkZCBPSURzIGZvciBtaXNzaW5nIFNwbmVnbyBhdXRoIG1lY2hhbmlzbXMg
-dG8KIE1hY3MKCkluIHRlc3RpbmcgbW91bnRzIHRvIE1hY3MsIG5vdGljZWQgdGhhdCB0aGUgT0lE
-UyBmb3Igc29tZQpHU1NBUEkvU1BORUdPIGF1dGggbWVjaGFuaXNtcyBzZW50IGJ5IHRoZSBzZXJ2
-ZXIgd2VyZSBub3QKcmVjb2duaXplZCBhbmQgd2VyZSBtaXNzaW5nIGZyb20gdGhlIGhlYWRlci4K
-ClJldmlld2VkLWJ5OiBQYXVsbyBBbGNhbnRhcmEgKFNVU0UpIDxwY0BjanIubno+ClNpZ25lZC1v
-ZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBpbmNsdWRl
-L2xpbnV4L29pZF9yZWdpc3RyeS5oIHwgNyArKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgNyBpbnNl
-cnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9vaWRfcmVnaXN0cnkuaCBiL2lu
-Y2x1ZGUvbGludXgvb2lkX3JlZ2lzdHJ5LmgKaW5kZXggM2Q4ZGIxZjZhNWRiLi4wZjRhODkwMzky
-MmEgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvb2lkX3JlZ2lzdHJ5LmgKKysrIGIvaW5jbHVk
-ZS9saW51eC9vaWRfcmVnaXN0cnkuaApAQCAtNzAsNiArNzAsOSBAQCBlbnVtIE9JRCB7CiAKIAlP
-SURfc3BuZWdvLAkJCS8qIDEuMy42LjEuNS41LjIgKi8KIAorCU9JRF9JQUtlcmIsCQkJLyogMS4z
-LjYuMS41LjIuNSAqLworCU9JRF9QS1UyVSwJCQkvKiAxLjMuNS4xLjUuMi43ICovCisJT0lEX1Nj
-cmFtLAkJCS8qIDEuMy42LjEuNS41LjE0ICovCiAJT0lEX2NlcnRBdXRoSW5mb0FjY2VzcywJCS8q
-IDEuMy42LjEuNS41LjcuMS4xICovCiAJT0lEX3NoYTEsCQkJLyogMS4zLjE0LjMuMi4yNiAqLwog
-CU9JRF9pZF9hbnNpcDM4NHIxLAkJLyogMS4zLjEzMi4wLjM0ICovCkBAIC0xMDQsNiArMTA3LDEw
-IEBAIGVudW0gT0lEIHsKIAlPSURfYXV0aG9yaXR5S2V5SWRlbnRpZmllciwJLyogMi41LjI5LjM1
-ICovCiAJT0lEX2V4dEtleVVzYWdlLAkJLyogMi41LjI5LjM3ICovCiAKKwkvKiBIZWltZGFsIG1l
-Y2hhbmlzbXMgKi8KKwlPSURfTmV0bG9nb25NZWNoYW5pc20sCQkvKiAxLjIuNzUyLjQzLjE0LjIg
-Ki8KKwlPSURfYXBwbGVMb2NhbEtkY1N1cHBvcnRlZCwJLyogMS4yLjc1Mi40My4xNC4zICovCisK
-IAkvKiBFQy1SRFNBICovCiAJT0lEX2dvc3RDUFNpZ25BLAkJLyogMS4yLjY0My4yLjIuMzUuMSAq
-LwogCU9JRF9nb3N0Q1BTaWduQiwJCS8qIDEuMi42NDMuMi4yLjM1LjIgKi8KLS0gCjIuMzAuMgoK
---000000000000ff730805ca09aa11--
+Thanks!
+>
+>    Both with "perm" and "noperm" chown() and chmod() report success but
+>    without actually changing ownership or mode. That seems to be in line
+>    with what I can gather from various mangpages.
+>
+> Christian
+>
