@@ -8,96 +8,114 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 434A9C4338F
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Aug 2021 23:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2A1C4338F
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Aug 2021 03:49:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A07F61175
-	for <linux-cifs@archiver.kernel.org>; Fri, 20 Aug 2021 23:19:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2674D611C3
+	for <linux-cifs@archiver.kernel.org>; Sat, 21 Aug 2021 03:49:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231767AbhHTXTq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 20 Aug 2021 19:19:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44292 "EHLO
+        id S232295AbhHUDt5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 20 Aug 2021 23:49:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbhHTXTm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Aug 2021 19:19:42 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A12C061575;
-        Fri, 20 Aug 2021 16:19:03 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id n7so19786231ljq.0;
-        Fri, 20 Aug 2021 16:19:03 -0700 (PDT)
+        with ESMTP id S229610AbhHUDt5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 20 Aug 2021 23:49:57 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA00C061575;
+        Fri, 20 Aug 2021 20:49:17 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id u22so24609496lfq.13;
+        Fri, 20 Aug 2021 20:49:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=injNyqk0O05AWAjdLiK5Yd2rg5V8yrPBZJK/UIJi/0o=;
-        b=OhxktmJd+PAjFzfrGtZaXuFU/maWnJT19lhfCcPO/L8J8X+Oo/ESSzcDGrn4sYcoMk
-         kPS4N3xChJi2pDtasRzktUbuMMqZXEAJPH8gLv6BXeGnRaW7cJjI0LMtaezF1G9bH6lU
-         WzkRpPRR6a7udCiBtXnRy/ybXzqlb65uC3/GWpQA/G+d4DsX4AFUmkxAtyWV9iaVkSzj
-         CcGrhkBuVfsY4013/Bft+F+a4d3+G6z0bkGvNKhmeFdCMacMv7WTHpC/zfDTgyF/6PXk
-         DwUdQcy3j3prh7pR1+s7zLIyIPMDjfC8htOkA5m+1sHQV4Rvdea7qOOnjpTGzTXt8lzE
-         RaYA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zHOVDDy6Elh+zfWbuB2hVkW/DiSiV2mlyNyWlRpko1k=;
+        b=dDwcE8t7q/kyfCmqNuWd5qCbT4xcdx1l0pa96J5KWVMZ4d/FJdNXj53i4Zz0e/Ksj/
+         ApUVZLoXFhXLBJge6j7CqP6X4Y0MgZ2MEjHd0LCKMzsB+LAWKLiitgiNKQPbtN3KX9L0
+         DRVNkRQ77FenzaDRP8j4xfPdyE1WOQIpIDVaxu8Cj5YmdAi5EGo5o6/0w+ohtJhQmwBq
+         uyEPvXuIe44GPXkmxkho++tNovgzAsuLXhbBzsGeB13wBpfiVeCLddD1Kx3jwIFDXN3H
+         laxsPrnL96nMpcgDOYylmemk95dV9q9hCOSZgHIPdQWKJbBApQY3rhMIYNG+1PbJjDDj
+         4/8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=injNyqk0O05AWAjdLiK5Yd2rg5V8yrPBZJK/UIJi/0o=;
-        b=RpHWOi17CSHdGAH+pG0gAiEB8CJNRg1WMqdVEmrnYtpolNqElBfFVHcHvrKFrBaLJs
-         as4b210f1MOazaKUkw4OlsCPnlNpfAborqiHx6iTEz5DOI+r2k3x5MJtKZi7nITFsObK
-         GoxMI/pQ4v94nkYUnKsnLNhDmHF60Uxdw4wXXHYymr/RJZyOA/wiFO9wbKJdNq61VS1i
-         /kKecMJPXzx/lSBX2pV5MSPCZvB6lmdPd8l0hHze7IxrQXYFgM9XlfrJ8ojSX+xI2Ogy
-         mA6ZRYb4GkwepSLk78W8IpXd9HS6L+yVj9sUbiND/9iqsjGH24CcOm1mwMPIerGhf/sy
-         UTdQ==
-X-Gm-Message-State: AOAM533oP8AbwDxERndFxh3CSAqYv8j5nym6Vj0K+8O5S4yOMVB8g6pQ
-        WfeMF9AR05qIAN+R3WQJokxR191wBZarMlShTi9AJXCiNWp/fw==
-X-Google-Smtp-Source: ABdhPJzyeII4XBwTu1jh+7vIYJxM4YYTmKb9f2YNy+vDAz9XkX6KruBe+a/aKqw7IhEh0xoyZPVueZ3V2sNx4Y8AX0k=
-X-Received: by 2002:a2e:2417:: with SMTP id k23mr17886463ljk.256.1629501541700;
- Fri, 20 Aug 2021 16:19:01 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zHOVDDy6Elh+zfWbuB2hVkW/DiSiV2mlyNyWlRpko1k=;
+        b=XPp8wofHzNZE4FMC8rDOQ4L22CT/GwpqhBy/w3btYLavExkNh5sw61NWWJNtE3R+H9
+         A4FwsTmOnwEuAXD+7/b/s4mIs5fHGu8vJaNVA4l1vxgSQ+AYb+v8HPGwd8iMBFa9jY1y
+         1t7eC7jLQ6fslsU2jmoZ3oGUota/tCchs2Y+uqtBNih3+biNaJjM9EZYEjjUivu2au9m
+         OJCgshuAXMoGAnpZAF855ipCnYOFrQQ7uw08u+4095nvKUBZ+CrgpzrlF/hUWNpDoIUV
+         liFnbmPKvgunSXwnLS9I68c4gy1PGYaeZEOK+ZIys0Lf9kWArrhJg0w8qpXsrdDA/TRF
+         qa7g==
+X-Gm-Message-State: AOAM531KILRomGaaYU72OLi3aVycs7DzQL0oVgRqSb4rGi6TxzwNe6CG
+        +PL6bWRlkUVvmwnQk/AcrPLO3xcLV1Ce4mbUVU3nzJlJ6ms=
+X-Google-Smtp-Source: ABdhPJz9Yp/cOICdPWWe7C4f0+W/y7G8ogcXIR/JW21OvDVIDHMjDp+d36/NP9TLWjzkPBR7HX1+myUjZfHpuQc0IS0=
+X-Received: by 2002:a05:6512:3455:: with SMTP id j21mr12302316lfr.282.1629517755929;
+ Fri, 20 Aug 2021 20:49:15 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAH2r5mvxX6BqLvgWO18QE+rQsAZoAzopvu5S3fyy45a+Y-w_MQ@mail.gmail.com>
+In-Reply-To: <CAH2r5mvxX6BqLvgWO18QE+rQsAZoAzopvu5S3fyy45a+Y-w_MQ@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Fri, 20 Aug 2021 18:18:50 -0500
-Message-ID: <CAH2r5mvxX6BqLvgWO18QE+rQsAZoAzopvu5S3fyy45a+Y-w_MQ@mail.gmail.com>
-Subject: [PATCH] oid_registry: Add OIDs for missing Spnego auth mechanisms to Macs
+Date:   Fri, 20 Aug 2021 22:49:04 -0500
+Message-ID: <CAH2r5mvVHHgNcg1=YM25e7rK+LnXcvq0iTLW6Jf1BiP1XqoQDw@mail.gmail.com>
+Subject: Re: [PATCH] oid_registry: Add OIDs for missing Spnego auth mechanisms
+ to Macs
 To:     CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>
+        David Howells <dhowells@redhat.com>,
+        Paulo Alcantara <pc@cjr.nz>
 Cc:     samba-technical <samba-technical@lists.samba.org>
-Content-Type: multipart/mixed; boundary="0000000000008def7405ca05e408"
+Content-Type: multipart/mixed; boundary="000000000000ff730805ca09aa11"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000008def7405ca05e408
+--000000000000ff730805ca09aa11
 Content-Type: text/plain; charset="UTF-8"
 
- In testing mounts to Macs, noticed that the OIDS for some
- GSSAPI/SPNEGO auth mechanisms sent by the server were not
- recognized and were missing from the header.
+Fixed a typo in the patch (missing ',').  Updated patch attached.
 
- Signed-off-by: Steve French <stfrench@microsoft.com>
 
-diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-index 3d8db1f6a5db..2728842721bc 100644
---- a/include/linux/oid_registry.h
-+++ b/include/linux/oid_registry.h
-@@ -70,6 +70,9 @@ enum OID {
+On Fri, Aug 20, 2021 at 6:18 PM Steve French <smfrench@gmail.com> wrote:
+>
+>  In testing mounts to Macs, noticed that the OIDS for some
+>  GSSAPI/SPNEGO auth mechanisms sent by the server were not
+>  recognized and were missing from the header.
+>
+>  Signed-off-by: Steve French <stfrench@microsoft.com>
+>
+> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
+> index 3d8db1f6a5db..2728842721bc 100644
+> --- a/include/linux/oid_registry.h
+> +++ b/include/linux/oid_registry.h
+> @@ -70,6 +70,9 @@ enum OID {
+>
+>         OID_spnego,                     /* 1.3.6.1.5.5.2 */
+>
+> +       OID_IAKerb,                     /* 1.3.6.1.5.2.5 */
+> +       OID_PKU2U                       /* 1.3.5.1.5.2.7 */
+> +       OID_Scram,                      /* 1.3.6.1.5.5.14 */
+>         OID_certAuthInfoAccess,         /* 1.3.6.1.5.5.7.1.1 */
+>         OID_sha1,                       /* 1.3.14.3.2.26 */
+>         OID_id_ansip384r1,              /* 1.3.132.0.34 */
+> @@ -104,6 +107,10 @@ enum OID {
+>         OID_authorityKeyIdentifier,     /* 2.5.29.35 */
+>         OID_extKeyUsage,                /* 2.5.29.37 */
+>
+> +       /* Heimdal mechanisms */
+> +       OID_NetlogonMechanism,          /* 1.2.752.43.14.2 */
+> +       OID_appleLocalKdcSupported,     /* 1.2.752.43.14.3 */
+> +
+>         /* EC-RDSA */
+>         OID_gostCPSignA,                /* 1.2.643.2.2.35.1 */
+>         OID_gostCPSignB,                /* 1.2.643.2.2.35.2 */
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-        OID_spnego,                     /* 1.3.6.1.5.5.2 */
-
-+       OID_IAKerb,                     /* 1.3.6.1.5.2.5 */
-+       OID_PKU2U                       /* 1.3.5.1.5.2.7 */
-+       OID_Scram,                      /* 1.3.6.1.5.5.14 */
-        OID_certAuthInfoAccess,         /* 1.3.6.1.5.5.7.1.1 */
-        OID_sha1,                       /* 1.3.14.3.2.26 */
-        OID_id_ansip384r1,              /* 1.3.132.0.34 */
-@@ -104,6 +107,10 @@ enum OID {
-        OID_authorityKeyIdentifier,     /* 2.5.29.35 */
-        OID_extKeyUsage,                /* 2.5.29.37 */
-
-+       /* Heimdal mechanisms */
-+       OID_NetlogonMechanism,          /* 1.2.752.43.14.2 */
-+       OID_appleLocalKdcSupported,     /* 1.2.752.43.14.3 */
-+
-        /* EC-RDSA */
-        OID_gostCPSignA,                /* 1.2.643.2.2.35.1 */
-        OID_gostCPSignB,                /* 1.2.643.2.2.35.2 */
 
 
 -- 
@@ -105,38 +123,38 @@ Thanks,
 
 Steve
 
---0000000000008def7405ca05e408
+--000000000000ff730805ca09aa11
 Content-Type: text/x-patch; charset="US-ASCII"; 
 	name="0001-oid_registry-Add-OIDs-for-missing-Spnego-auth-mechan.patch"
 Content-Disposition: attachment; 
 	filename="0001-oid_registry-Add-OIDs-for-missing-Spnego-auth-mechan.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_kskz4e7j0>
-X-Attachment-Id: f_kskz4e7j0
+Content-ID: <f_ksl8sgpp0>
+X-Attachment-Id: f_ksl8sgpp0
 
-RnJvbSBmNDRlODEzYmVlNDdhOTA3YTA2MmE4NjNiMWYwMWZmZTJhOGY5ODY1IE1vbiBTZXAgMTcg
+RnJvbSA5ZDVhZTM0YWE5Y2ZhYTAzZDIwNWY0YTdhMjY4ZDVlZTliMzNjNTdlIE1vbiBTZXAgMTcg
 MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
 CkRhdGU6IEZyaSwgMjAgQXVnIDIwMjEgMTg6MTA6MzYgLTA1MDAKU3ViamVjdDogW1BBVENIXSBv
 aWRfcmVnaXN0cnk6IEFkZCBPSURzIGZvciBtaXNzaW5nIFNwbmVnbyBhdXRoIG1lY2hhbmlzbXMg
 dG8KIE1hY3MKCkluIHRlc3RpbmcgbW91bnRzIHRvIE1hY3MsIG5vdGljZWQgdGhhdCB0aGUgT0lE
 UyBmb3Igc29tZQpHU1NBUEkvU1BORUdPIGF1dGggbWVjaGFuaXNtcyBzZW50IGJ5IHRoZSBzZXJ2
 ZXIgd2VyZSBub3QKcmVjb2duaXplZCBhbmQgd2VyZSBtaXNzaW5nIGZyb20gdGhlIGhlYWRlci4K
-ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0t
-CiBpbmNsdWRlL2xpbnV4L29pZF9yZWdpc3RyeS5oIHwgNyArKysrKysrCiAxIGZpbGUgY2hhbmdl
-ZCwgNyBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9vaWRfcmVnaXN0
-cnkuaCBiL2luY2x1ZGUvbGludXgvb2lkX3JlZ2lzdHJ5LmgKaW5kZXggM2Q4ZGIxZjZhNWRiLi4y
-NzI4ODQyNzIxYmMgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvb2lkX3JlZ2lzdHJ5LmgKKysr
-IGIvaW5jbHVkZS9saW51eC9vaWRfcmVnaXN0cnkuaApAQCAtNzAsNiArNzAsOSBAQCBlbnVtIE9J
-RCB7CiAKIAlPSURfc3BuZWdvLAkJCS8qIDEuMy42LjEuNS41LjIgKi8KIAorCU9JRF9JQUtlcmIs
-CQkJLyogMS4zLjYuMS41LjIuNSAqLworCU9JRF9QS1UyVQkJCS8qIDEuMy41LjEuNS4yLjcgKi8K
-KwlPSURfU2NyYW0sCQkJLyogMS4zLjYuMS41LjUuMTQgKi8KIAlPSURfY2VydEF1dGhJbmZvQWNj
-ZXNzLAkJLyogMS4zLjYuMS41LjUuNy4xLjEgKi8KIAlPSURfc2hhMSwJCQkvKiAxLjMuMTQuMy4y
-LjI2ICovCiAJT0lEX2lkX2Fuc2lwMzg0cjEsCQkvKiAxLjMuMTMyLjAuMzQgKi8KQEAgLTEwNCw2
-ICsxMDcsMTAgQEAgZW51bSBPSUQgewogCU9JRF9hdXRob3JpdHlLZXlJZGVudGlmaWVyLAkvKiAy
-LjUuMjkuMzUgKi8KIAlPSURfZXh0S2V5VXNhZ2UsCQkvKiAyLjUuMjkuMzcgKi8KIAorCS8qIEhl
-aW1kYWwgbWVjaGFuaXNtcyAqLworCU9JRF9OZXRsb2dvbk1lY2hhbmlzbSwJCS8qIDEuMi43NTIu
-NDMuMTQuMiAqLworCU9JRF9hcHBsZUxvY2FsS2RjU3VwcG9ydGVkLAkvKiAxLjIuNzUyLjQzLjE0
-LjMgKi8KKwogCS8qIEVDLVJEU0EgKi8KIAlPSURfZ29zdENQU2lnbkEsCQkvKiAxLjIuNjQzLjIu
-Mi4zNS4xICovCiAJT0lEX2dvc3RDUFNpZ25CLAkJLyogMS4yLjY0My4yLjIuMzUuMiAqLwotLSAK
-Mi4zMC4yCgo=
---0000000000008def7405ca05e408--
+ClJldmlld2VkLWJ5OiBQYXVsbyBBbGNhbnRhcmEgKFNVU0UpIDxwY0BjanIubno+ClNpZ25lZC1v
+ZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0tCiBpbmNsdWRl
+L2xpbnV4L29pZF9yZWdpc3RyeS5oIHwgNyArKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgNyBpbnNl
+cnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9vaWRfcmVnaXN0cnkuaCBiL2lu
+Y2x1ZGUvbGludXgvb2lkX3JlZ2lzdHJ5LmgKaW5kZXggM2Q4ZGIxZjZhNWRiLi4wZjRhODkwMzky
+MmEgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvbGludXgvb2lkX3JlZ2lzdHJ5LmgKKysrIGIvaW5jbHVk
+ZS9saW51eC9vaWRfcmVnaXN0cnkuaApAQCAtNzAsNiArNzAsOSBAQCBlbnVtIE9JRCB7CiAKIAlP
+SURfc3BuZWdvLAkJCS8qIDEuMy42LjEuNS41LjIgKi8KIAorCU9JRF9JQUtlcmIsCQkJLyogMS4z
+LjYuMS41LjIuNSAqLworCU9JRF9QS1UyVSwJCQkvKiAxLjMuNS4xLjUuMi43ICovCisJT0lEX1Nj
+cmFtLAkJCS8qIDEuMy42LjEuNS41LjE0ICovCiAJT0lEX2NlcnRBdXRoSW5mb0FjY2VzcywJCS8q
+IDEuMy42LjEuNS41LjcuMS4xICovCiAJT0lEX3NoYTEsCQkJLyogMS4zLjE0LjMuMi4yNiAqLwog
+CU9JRF9pZF9hbnNpcDM4NHIxLAkJLyogMS4zLjEzMi4wLjM0ICovCkBAIC0xMDQsNiArMTA3LDEw
+IEBAIGVudW0gT0lEIHsKIAlPSURfYXV0aG9yaXR5S2V5SWRlbnRpZmllciwJLyogMi41LjI5LjM1
+ICovCiAJT0lEX2V4dEtleVVzYWdlLAkJLyogMi41LjI5LjM3ICovCiAKKwkvKiBIZWltZGFsIG1l
+Y2hhbmlzbXMgKi8KKwlPSURfTmV0bG9nb25NZWNoYW5pc20sCQkvKiAxLjIuNzUyLjQzLjE0LjIg
+Ki8KKwlPSURfYXBwbGVMb2NhbEtkY1N1cHBvcnRlZCwJLyogMS4yLjc1Mi40My4xNC4zICovCisK
+IAkvKiBFQy1SRFNBICovCiAJT0lEX2dvc3RDUFNpZ25BLAkJLyogMS4yLjY0My4yLjIuMzUuMSAq
+LwogCU9JRF9nb3N0Q1BTaWduQiwJCS8qIDEuMi42NDMuMi4yLjM1LjIgKi8KLS0gCjIuMzAuMgoK
+--000000000000ff730805ca09aa11--
