@@ -2,506 +2,127 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60834C4338F
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Aug 2021 14:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D22C4338F
+	for <linux-cifs@archiver.kernel.org>; Sun, 22 Aug 2021 23:39:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3980C61208
-	for <linux-cifs@archiver.kernel.org>; Sat, 21 Aug 2021 14:33:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BB2F61266
+	for <linux-cifs@archiver.kernel.org>; Sun, 22 Aug 2021 23:39:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230233AbhHUOeX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 21 Aug 2021 10:34:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47192 "EHLO mail.kernel.org"
+        id S231841AbhHVXjy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 22 Aug 2021 19:39:54 -0400
+Received: from ozlabs.org ([203.11.71.1]:58503 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230167AbhHUOeX (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 21 Aug 2021 10:34:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id F08936121F
-        for <linux-cifs@vger.kernel.org>; Sat, 21 Aug 2021 14:33:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629556424;
-        bh=QwUETiy/aHcr8TIR9nJyzIcvj66z1A7pVJFq72yp8c4=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=eXDWZb0TC1vd6gKP8J3cOzFe8S/p3P09b4rQMTgrLfIP86cEI9mmORY6/WUVrFWlk
-         yIGaRS/cZsmshkYO0K9gdbZYYx4bEWKuZ62ur7+nAsJOr9U/8T9/ZvkCul/pbudUQN
-         dQpuTda8Xa0opc2yobq8rg5/jjKnQANSG6Z7f8fhLfG1Jnr6IAZSDZjLnw4Zj7Gn4k
-         zR9Ew8h8+V3VYTCxOWujiSAKCAt5UbGHjGv+juryt8Agh3aBV05onKHvvKk698+vbi
-         /nd7UMBJPCojlRiDoW0LcaWbjTLMwDAgKuZvpcebiPs8cJGMSjR9hX5ETypCnimhwZ
-         g/c45nLZT355A==
-Received: by mail-ot1-f44.google.com with SMTP id x10-20020a056830408a00b004f26cead745so22052966ott.10
-        for <linux-cifs@vger.kernel.org>; Sat, 21 Aug 2021 07:33:43 -0700 (PDT)
-X-Gm-Message-State: AOAM533Mi/W//Yx3osHPon2EdiSSCM1hXRceR9+QfIebZ3GZzTQvUagz
-        XmTb+DXI7uzVMfK7CsoHOh6cpEtIdHzEa0vWatc=
-X-Google-Smtp-Source: ABdhPJxNhWls8UDlZjmJKJfsNCF35FTHhTYFNVT9JiH1CM8sUuYG9zkGnT1V6ySSOBBEQxP6hODF8uX0wIBbnu+69/M=
-X-Received: by 2002:a05:6830:25ce:: with SMTP id d14mr21377674otu.87.1629556423197;
- Sat, 21 Aug 2021 07:33:43 -0700 (PDT)
+        id S229969AbhHVXjw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 22 Aug 2021 19:39:52 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4GtBfG3xvBz9sW8;
+        Mon, 23 Aug 2021 09:39:02 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1629675544;
+        bh=1sz5u3AauCDCg/fz1WO6AJrZt+kY3RAZZ5f0McBDyp4=;
+        h=Date:From:To:Cc:Subject:From;
+        b=YlvoTscNGCEoZsJwZiiaJCpubkIg3a6pDuDHVtGP3ORayZBsL4tfHTObl6EGxdhlv
+         g6AfBKGMnVMYoztDR9XbqIyMXwh2YIlvXaXLqQ1TMEx6RFjixL1tKiEU0j7+YR1Lnm
+         DZsSlYO6Pk/X9+FS8AEksyfxchZqOT4LdIwN7deWANHytbn/hQdA2uYfNP4sEY+Pnz
+         t3/yU8169X4ca5f4fxVqItdSExI0CIDMNRr2/rnVur2r6BvOp404VFYeRc87fQjOCw
+         i6QADWoY1j2KyIco326qZLkQM1t+jDBetaWITYuAkQC9cU/v/1YBX+8SNvahCcTuBs
+         0DW+qiWwIZyxQ==
+Date:   Mon, 23 Aug 2021 09:39:01 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     Hyunchul Lee <hyc.lee@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Namjae Jeon <namjae.jeon@samsung.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Steve French <stfrench@microsoft.com>
+Subject: linux-next: manual merge of the cifsd tree with the cifs tree
+Message-ID: <20210823093901.4b24a10d@canb.auug.org.au>
 MIME-Version: 1.0
-Received: by 2002:ac9:1bc6:0:0:0:0:0 with HTTP; Sat, 21 Aug 2021 07:33:42
- -0700 (PDT)
-In-Reply-To: <20210821141013.n7sg7r2j37fiin5k@wittgenstein>
-References: <CGME20210816115835epcas1p410fb2a768b1af42d2458027de74dcd3c@epcas1p4.samsung.com>
- <20210816115605.178441-1-brauner@kernel.org> <008d01d792f6$c2735f30$475a1d90$@samsung.com>
- <20210818174539.ro2ryrbku3ozdjvi@wittgenstein> <000001d794a0$94ec20a0$bec461e0$@samsung.com>
- <20210819130136.zziq7yr4htiowb5n@wittgenstein> <CAKYAXd9ON8-j9_uPTE4fi_kW9Zi_8ov++3ujJm5etnigiZ6uQw@mail.gmail.com>
- <20210821111117.ngkyc5n6vplayrhx@wittgenstein> <20210821113948.nxzdktqnw36vsyhb@wittgenstein>
- <CAKYAXd8O8+jrR9Pou46OW3zdCJg=vbr8WzA_pOnhpCTzBX_QAw@mail.gmail.com> <20210821141013.n7sg7r2j37fiin5k@wittgenstein>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sat, 21 Aug 2021 23:33:42 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9ce3Zz2w5u=wG1Dgqb9gco8spaaPc2PJXgvwiQzaR5KA@mail.gmail.com>
-Message-ID: <CAKYAXd9ce3Zz2w5u=wG1Dgqb9gco8spaaPc2PJXgvwiQzaR5KA@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix lookup on idmapped mounts
-To:     Christian Brauner <christian.brauner@ubuntu.com>
-Cc:     Namjae Jeon <namjae.jeon@samsung.com>,
-        Steve French <stfrench@microsoft.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        David Sterba <dsterba@suse.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/cHrfN6G=BHIzbeUpFo=_KYd";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-08-21 23:10 GMT+09:00, Christian Brauner <christian.brauner@ubuntu.com>:
-> On Sat, Aug 21, 2021 at 09:09:28PM +0900, Namjae Jeon wrote:
->> 2021-08-21 20:39 GMT+09:00, Christian Brauner
->> <christian.brauner@ubuntu.com>:
->> > On Sat, Aug 21, 2021 at 01:11:17PM +0200, Christian Brauner wrote:
->> >> On Sat, Aug 21, 2021 at 02:59:21PM +0900, Namjae Jeon wrote:
->> >> > 2021-08-19 22:01 GMT+09:00, Christian Brauner
->> >> > <christian.brauner@ubuntu.com>:
->> >> > > On Thu, Aug 19, 2021 at 11:19:04AM +0900, Namjae Jeon wrote:
->> >> > >> > On Tue, Aug 17, 2021 at 08:30:55AM +0900, Namjae Jeon wrote:
->> >> > >> > > > From: Christian Brauner <christian.brauner@ubuntu.com>
->> >> > >> > > >
->> >> > >> > > > It's great that the new in-kernel ksmbd server will support
->> >> > >> > > > idmapped
->> >> > >> > > > mounts out of the box! However, lookup is currently broken.
->> >> > >> > > > Lookup
->> >> > >> > > > helpers such as lookup_one_len() call inode_permission()
->> >> > >> > > > internally
->> >> > >> > > > to ensure that the caller is privileged over the inode of
->> >> > >> > > > the
->> >> > >> > > > base
->> >> > >> > > > dentry they are trying to
->> >> > >> > lookup under. So the permission checking here is currently
->> >> > >> > wrong.
->> >> > >> > > >
->> >> > >> > > > Linux v5.15 will gain a new lookup helper lookup_one() that
->> >> > >> > > > does
->> >> > >> > > > take idmappings into account. I've added it as part of my
->> >> > >> > > > patch
->> >> > >> > > > series to make btrfs support idmapped mounts. The new helper
->> >> > >> > > > is
->> >> > >> > > > in
->> >> > >> > > > linux- next as part of David's (Sterba) btrfs for-next
->> >> > >> > > > branch
->> >> > >> > > > as
->> >> > >> > > > commit c972214c133b ("namei: add
->> >> > >> > mapping aware lookup helper").
->> >> > >> > > >
->> >> > >> > > > I've said it before during one of my first reviews: I would
->> >> > >> > > > very
->> >> > >> > > > much recommend adding fstests to
->> >> > >> > [1].
->> >> > >> > > > It already seems to have very rudimentary cifs support.
->> >> > >> > > > There
->> >> > >> > > > is a
->> >> > >> > > > completely generic idmapped mount testsuite that supports
->> >> > >> > > > idmapped
->> >> > >> > > > mounts.
->> >> > >> > > >
->> >> > >> > > > [1]:
->> >> > >> > > > https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/
->> >> > >> > > > Cc: Steve French <stfrench@microsoft.com>
->> >> > >> > > > Cc: Christoph Hellwig <hch@infradead.org>
->> >> > >> > > > Cc: Namjae Jeon <namjae.jeon@samsung.com>
->> >> > >> > > > Cc: Hyunchul Lee <hyc.lee@gmail.com>
->> >> > >> > > > Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
->> >> > >> > > > Cc: David Sterba <dsterba@suse.com>
->> >> > >> > > > Cc: linux-cifs@vger.kernel.org
->> >> > >> > > > Signed-off-by: Christian Brauner
->> >> > >> > > > <christian.brauner@ubuntu.com>
->> >> > >> > > > ---
->> >> > >> > > Hi Christian,
->> >> > >> > >
->> >> > >> > > > I merged David's for-next tree into cifsd-next to test this.
->> >> > >> > > > I
->> >> > >> > > > did
->> >> > >> > > > only compile test this. If someone gives me a clear set of
->> >> > >> > > > instructions how to test ksmbd on my local machine I can at
->> >> > >> > > > least
->> >> > >> > > > try to cut some time out of my week to do more reviews.
->> >> > >> > > > (I'd
->> >> > >> > > > especially like to see acl behavior with ksmbd.)
->> >> > >> > >
->> >> > >> > > There is "How to run ksmbd" section in patch cover letter.
->> >> > >> > >
->> >> > >> > > https://protect2.fireeye.com/v1/url?k=65ecaaf0-3a779239-65ed21bf-0cc47
->> >> > >> > > a336fae-53bc47005a1a97a9&q=1&e=e44c9f9f-d7ae-4768-8cc2-8f02d748fc6e&u=
->> >> > >> > > https%3A%2F%2Flkml.org%2Flkml%2F2021%2F8%2F5%2F54
->> >> > >> > >
->> >> > >> > > Let me know if it doesn't work well even if you try to run it
->> >> > >> > > with
->> >> > >> > > this step.
->> >> > >> > > And We will also check whether your patch work fine.
->> >> > >> > >
->> >> > >> > > >
->> >> > >> > > > One more thing, the tree for ksmbd was very hard to find. I
->> >> > >> > > > had
->> >> > >> > > > to
->> >> > >> > > > do a lot archeology to end up
->> >> > >> > at:
->> >> > >> > > >
->> >> > >> > > > git://git.samba.org/ksmbd.git
->> >> > >> > > This is also in the patch cover letter. See "Mailing list and
->> >> > >> > > repositories" section.
->> >> > >> > > I think that you can use :
->> >> > >> > >
->> >> > >> > > https://protect2.fireeye.com/v1/url?k=8af83a5d-d5630294-8af9b112-0cc47
->> >> > >> > > a336fae-e471ffbdb93d05b7&q=1&e=e44c9f9f-d7ae-4768-8cc2-8f02d748fc6e&u=
->> >> > >> > > https%3A%2F%2Fgithub.com%2Fnamjaejeon%2Fsmb3-kernel%2Ftree%2Fksmbd-v7-
->> >> > >> > > series
->> >> > >> > >
->> >> > >> > > >
->> >> > >> > > > Would be appreciated if this tree could be reflected in
->> >> > >> > > > MAINTAINERS
->> >> > >> > > > or somewhere else. The github repos with the broken out
->> >> > >> > > > patches/module aren't really that helpful.
->> >> > >> > > Okay, I will add git address of ksmbd in MAINTAINERS on next
->> >> > >> > > spin.
->> >> > >> > >
->> >> > >> > > >
->> >> > >> > > > Thanks!
->> >> > >> > > > Christian
->> >> > >> > > Really thanks for your review and I will apply this patch
->> >> > >> > > after
->> >> > >> > > checking it.
->> >> > >> >
->> >> > >> > Thank your for the pointers.
->> >> > >> >
->> >> > >> > Ok, so I've been taking the time to look into cifs and ksmbd
->> >> > >> > today.
->> >> > >> > My
->> >> > >> > mental model was wrong. There
->> >> > >> > are two things to consider here:
->> >> > >> >
->> >> > >> > 1. server: idmapped mounts with ksmbd
->> >> > >> > 2. client: idmapped mounts with cifs
->> >> > >> >
->> >> > >> > Your patchset adds support for 1.
->> >> > >> Right.
->> >> > >>
->> >> > >> > Let's say I have the following ksmbd config:
->> >> > >> >
->> >> > >> > root@f2-vm:~# cat /etc/ksmbd/smb.conf
->> >> > >> > [global]
->> >> > >> >         netbios name = SMBD
->> >> > >> >         server max protocol = SMB3
->> >> > >> > [test]
->> >> > >> >         path = /opt
->> >> > >> >         writeable = yes
->> >> > >> >         comment = TEST
->> >> > >> >         read only = no
->> >> > >> >
->> >> > >> > So /opt can be an idmapped mount and ksmb would know how to
->> >> > >> > deal
->> >> > >> > with
->> >> > >> > that correctly, i.e. you could
->> >> > >> > do:
->> >> > >> >
->> >> > >> > mount-idmapped --map-mount=b:1000:0:1 /opt /opt
->> >> > >> >
->> >> > >> > ksmbd.mountd
->> >> > >> >
->> >> > >> > and ksmbd would take the idmapping of /opt into account.
->> >> > >> Right.
->> >> > >>
->> >> > >> >
->> >> > >> > That however is different from 2. which is cifs itself being
->> >> > >> > idmappable.
->> >> > >> Right.
->> >> > >>
->> >> > >> > Whether or not that makes sense or is needed will need some
->> >> > >> > thinking.
->> >> > >> >
->> >> > >> > In any case, this has consequences for xfstests and now I
->> >> > >> > understand
->> >> > >> > your earlier confusion. In
->> >> > >> > another mail you pointed out that cifs reports that idmapped
->> >> > >> > mounts
->> >> > >> > are
->> >> > >> > not supported. That is correct
->> >> > >> > insofar as it means 2. is not supported, i.e. you can't do:
->> >> > >> Right.
->> >> > >>
->> >> > >> >
->> >> > >> > mount -t cifs -o username=foo,password=bar //server/files /mnt
->> >> > >> >
->> >> > >> > and then
->> >> > >> >
->> >> > >> > mount-idmapped --map-mount=b:1000:0:1 /mnt /mnt
->> >> > >> >
->> >> > >> > but that's also not what you want in order to test for ksmbd.
->> >> > >> > What
->> >> > >> > you
->> >> > >> > want is to test 1.
->> >> > >> Right. So we have manually tested it, not xfstests.
->> >> > >>
->> >> > >> >
->> >> > >> > So your test setup would require you to setup an idmapped mount
->> >> > >> > and
->> >> > >> > have
->> >> > >> > ksmbd use that which can then
->> >> > >> > be mounted by a client.
->> >> > >> >
->> >> > >> > With your instructions I was at least able to get a ksmb
->> >> > >> > instance
->> >> > >> > running and be able to mount a
->> >> > >> > client with -t cifs. All on the same machine, i.e. my server is
->> >> > >> > localhost.
->> >> > >> Okay.
->> >> > >>
->> >> > >> >
->> >> > >> > However, I need to dig a bit into the semantics to make better
->> >> > >> > assertions about what's going on.
->> >> > >> Okay. And I have applied your patch to ksmbd.
->> >> > >>
->> >> > >> >
->> >> > >> > Are unix extension supported with ksmb? Everytime I try to use
->> >> > >> > "posix"
->> >> > >> > as a mount option with mount -t cifs -o //127.0.0.1/test /mnt I
->> >> > >> > get
->> >> > >> > "uid=0" and "gid=0" and "noposix".
->> >> > >> > I do set "unix extensions = yes" in both the samba and ksmbd
->> >> > >> > smb.conf.
->> >> > >> With posix mount option, It should work. It worked well before but
->> >> > >> it
->> >> > >> is
->> >> > >> strange now.
->> >> > >>
->> >> > >> I'm not sure this is the correct fix, But could you please try to
->> >> > >> mount
->> >> > >> with the below change ?
->> >> > >>
->> >> > >> diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
->> >> > >> index eed59bc1d913..5fd0b0ddcc57 100644
->> >> > >> --- a/fs/cifs/fs_context.c
->> >> > >> +++ b/fs/cifs/fs_context.c
->> >> > >> @@ -1268,8 +1268,10 @@ static int
->> >> > >> smb3_fs_context_parse_param(struct
->> >> > >> fs_context *fc,
->> >> > >>         case Opt_unix:
->> >> > >>                 if (result.negated)
->> >> > >>                         ctx->linux_ext = 0;
->> >> > >> -               else
->> >> > >> +               else {
->> >> > >> +                       ctx->linux_ext = 1;
->> >> > >>                         ctx->no_linux_ext = 1;
->> >> > >> +               }
->> >> > >>                 break;
->> >> > >>         case Opt_nocase:
->> >> > >>                 ctx->nocase = 1;
->> >> > >
->> >> > > That stops the bleeding indeed. :)
->> >> > Okay, sorry for late response.
->> >> > > I think a slightly nicer fix might be:
->> >> > >
->> >> > > diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
->> >> > > index eed59bc1d913..424b8dc2232e 100644
->> >> > > --- a/fs/cifs/fs_context.c
->> >> > > +++ b/fs/cifs/fs_context.c
->> >> > > @@ -1269,7 +1269,8 @@ static int
->> >> > > smb3_fs_context_parse_param(struct
->> >> > > fs_context *fc,
->> >> > >                 if (result.negated)
->> >> > >                         ctx->linux_ext = 0;
->> >> > >                 else
->> >> > > -                       ctx->no_linux_ext = 1;
->> >> > > +                       ctx->linux_ext = 1;
->> >> > > +               ctx->no_linux_ext = !ctx->linux_ext;
->> >> > >                 break;
->> >> > >         case Opt_nocase:
->> >> > >                 ctx->nocase = 1;
->> >> > >
->> >> > > So with this patch applied I got unix permissions working after
->> >> > > all.
->> >> > > So
->> >> > > I was able to do some more testing.
->> >> > Okay.
->> >> > >
->> >> > > Just a few questions (independent of idmapped mounts):
->> >> > >
->> >> > > 1. Are the "uid=" and "gid=" mount options ignored when
->> >> > > "username="
->> >> > > is
->> >> > >    specified and "posix" is specified?
->> >> > >
->> >> > >    It seems that "uid=" and "gid=" have are silently ignored when
->> >> > >    "posix' is set. They are neither used to report file ownership
->> >> > > under
->> >> > >    the cifs mountpoint nor are they relevant when determining
->> >> > > ownership
->> >> > >    on disk?
->> >> > >
->> >> > >    As an example, assume I have added a user "foo" with uid 1000
->> >> > > to
->> >> > >    ksmbd via:
->> >> > >
->> >> > >            ksmbd.adduser -a foo
->> >> > >
->> >> > >    And I mounted a share via:
->> >> > >
->> >> > >            mount -t cifs -o
->> >> > > username=foo,password=bar,posix,uid=1234,gid=1234,forceuid,forcegid
->> >> > > //127.0.0.1/test /mnt
->> >> > >
->> >> > >    i) Ownership in /mnt appears posix-correct, i.e. "uid=" and
->> >> > > "gid="
->> >> > > have
->> >> > >       no effect on the reported ownership.
->> >> > >
->> >> > >    ii) Assume I'm logged in as the root user with uid 0. If I
->> >> > > create
->> >> > >        file or directory in /mnt it will be owned by user foo,
->> >> > > i.e.
->> >> > > uid
->> >> > >        1000, i.e., the "uid=1234" and "gid=1234" mount option have
->> >> > > zero
->> >> > >        effect on the ownership of the files?
->> >> > >
->> >> > > 2. Are the "uid=" and "gid=" options ignored for permission
->> >> > > checking
->> >> > >    when "posix" is specified?
->> >> > >
->> >> > > 3. Am I correct in assuming that there is no mount option that
->> >> > > makes
->> >> > >    chown() or chmod() have an actual effect.
->> >> > That will be an answer for 1,2, 3 question. There are mount options
->> >> > for
->> >> > this.
->> >> >  1. modefromsid
->> >> >  2. idsfromsid
->> >> >
->> >> > You can use this mount option and please check it.
->> >>
->> >> Thank you! This works and finally I can hit some codepaths I wasn't
->> >> able
->> >> to until now.
->> >>
->> >> > >
->> >> > >    cifs seems to have support for it but the ksmbd server doesn't
->> >> > > seem
->> >> > >    to?
->> >> > No, you need to use mount options for this as I said.
->> >> > ksmbd have supported it but I found an issue related to chown and
->> >> > have
->> >> > fixed.
->> >> >
->> >> > Could you please check the below git branch (pulled David'tree +
->> >> > ksmbd
->> >> > fixes) ?
->> >> >
->> >> >   git clone --branch=for-christian
->> >> > https://github.com/namjaejeon/smb3-kernel
->> >>
->> >> Thanks, I've pulled that branch.
->> >
->> > There's two problems in this patch. I'll post and point out here
->> > quickly, if you don't mind:
->> Thanks for your reiview!
->> >
->> > commit fd7d13c387798cbc3abd68ecc07b2c868c6d96cb
->> > Author: Namjae Jeon <namjae.jeon@samsung.com>
->> > Date:   Sat Aug 21 14:39:43 2021 +0900
->> >
->> >     ksmbd: fix permission check issue on chown and chmod
->> >
->> >     When commanding chmod and chown on cifs&ksmbd, ksmbd allows it
->> > without
->> > file
->> >     permissions check. There is code to check it in settattr_prepare.
->> >     Instead of setting the inode directly, update the mode and uid/gid
->> >     through notify_change.
->> >
->> >     Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
->> >     Signed-off-by: Steve French <stfrench@microsoft.com>
->> >
->> > diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
->> > index 0131997c2177..d329ea49fa14 100644
->> > --- a/fs/ksmbd/smb2pdu.c
->> > +++ b/fs/ksmbd/smb2pdu.c
->> > @@ -5861,10 +5861,15 @@ int smb2_set_info(struct ksmbd_work *work)
->> >                 break;
->> >         case SMB2_O_INFO_SECURITY:
->> >                 ksmbd_debug(SMB, "GOT SMB2_O_INFO_SECURITY\n");
->> > +               if (ksmbd_override_fsids(work)) {
->> > +                       rc = -ENOMEM;
->> > +                       goto err_out;
->> > +               }
->> >                 rc = smb2_set_info_sec(fp,
->> >
->> > le32_to_cpu(req->AdditionalInformation),
->> >                                        req->Buffer,
->> >                                        le32_to_cpu(req->BufferLength));
->> > +               ksmbd_revert_fsids(work);
->> >                 break;
->> >         default:
->> >                 rc = -EOPNOTSUPP;
->> > diff --git a/fs/ksmbd/smbacl.c b/fs/ksmbd/smbacl.c
->> > index 20455d810523..f28af33c0bd5 100644
->> > --- a/fs/ksmbd/smbacl.c
->> > +++ b/fs/ksmbd/smbacl.c
->> > @@ -1300,6 +1300,7 @@ int set_info_sec(struct ksmbd_conn *conn, struct
->> > ksmbd_tree_connect *tcon,
->> >         struct smb_fattr fattr = {{0}};
->> >         struct inode *inode = d_inode(path->dentry);
->> >         struct user_namespace *user_ns = mnt_user_ns(path->mnt);
->> > +       struct iattr newattrs;
->> >
->> >         fattr.cf_uid = INVALID_UID;
->> >         fattr.cf_gid = INVALID_GID;
->> > @@ -1309,12 +1310,28 @@ int set_info_sec(struct ksmbd_conn *conn,
->> > struct
->> > ksmbd_tree_connect *tcon,
->> >         if (rc)
->> >                 goto out;
->> >
->> > -       inode->i_mode = (inode->i_mode & ~0777) | (fattr.cf_mode &
->> > 0777);
->> > -       if (!uid_eq(fattr.cf_uid, INVALID_UID))
->> > -               inode->i_uid = fattr.cf_uid;
->> > -       if (!gid_eq(fattr.cf_gid, INVALID_GID))
->> > +       newattrs.ia_valid = ATTR_CTIME;
->> > +       if (!uid_eq(fattr.cf_uid, INVALID_UID)) {
->> > +               newattrs.ia_valid |= ATTR_UID;
->> > +               newattrs.ia_uid = fattr.cf_uid;
->> > +       }
->> > +       if (!gid_eq(fattr.cf_gid, INVALID_GID)) {
->> >                 inode->i_gid = fattr.cf_gid;
->> >
->> > This needs to be removed. If setattr_prepare() fails you will still end
->> > up with inode->i_gid changed, i.e. you're changing group ownership even
->> > if you fail the subsequent setattr_prepare().
->> Oops, My mistake, I am missing remove this line.
->> >
->> > -       mark_inode_dirty(inode);
->> > +               newattrs.ia_valid |= ATTR_GID;
->> > +               newattrs.ia_gid = fattr.cf_gid;
->> > +       }
->> > +       newattrs.ia_valid |= ATTR_MODE;
->> > +       newattrs.ia_mode = (inode->i_mode & ~0777) | (fattr.cf_mode &
->> > 0777);
->> > +       rc = setattr_prepare(user_ns, path->dentry, &newattrs);
->
-> Sorry, I also forgot to mention that you need to remove this too. All of
-> this is handled in the underlying filesystem's ->setattr. So this just
-> needs a notify_change().
-Done:)
+--Sig_/cHrfN6G=BHIzbeUpFo=_KYd
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for your review!
->
+Hi all,
+
+Today's linux-next merge of the cifsd tree got a conflict in:
+
+  fs/Kconfig
+
+between commit:
+
+  ac3e4db1b38c ("cifs: fork arc4 and create a separate module for it for ci=
+fs and other users")
+
+from the cifs tree and commits:
+
+  a848c4f15ab6 ("cifsd: add Kconfig and Makefile")
+  1a93084b9a89 ("ksmbd: move fs/cifsd to fs/ksmbd")
+
+from the cifsd tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc fs/Kconfig
+index 6d719f2c5828,720c38f484c6..000000000000
+--- a/fs/Kconfig
++++ b/fs/Kconfig
+@@@ -358,14 -343,8 +358,15 @@@ config NFS_V4_2_SSC_HELPE
+ =20
+  source "net/sunrpc/Kconfig"
+  source "fs/ceph/Kconfig"
+ +
+  source "fs/cifs/Kconfig"
+ +
+ +config CIFS_COMMON
+ +	tristate
+ +	default y if CIFS=3Dy
+ +	default m if CIFS=3Dm
+ +
++ source "fs/ksmbd/Kconfig"
+  source "fs/coda/Kconfig"
+  source "fs/afs/Kconfig"
+  source "fs/9p/Kconfig"
+
+--Sig_/cHrfN6G=BHIzbeUpFo=_KYd
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmEi4BUACgkQAVBC80lX
+0Gzy5Af/Xs6eRqwfcahQXxbOjoAxM2X1r/BkeAuV923OybxPv4QCNMdrSy8CfATF
+WncJAfvf/lIONOdJLkMYg89Ynvg4oPT6FsVqki0UKimQOeE8ZUmWkn15l13+zITA
+OCJsR8i7TUATUmn8TKlMrrLQCy7ZeRhEjdDgjwNdbK+hIGMrjbs4YC3X0aZKMAmb
+by4DGyQ3PYkaD7Q1QcG1+K4hpnAWOoHrTlIz1C8M3uLyIaa4mHUImWNFaAGfXMH5
+WLqY31RjQE35mfa+Vzh3ohI2MFgzmqlThY223dRqUzECscXx7sNwNscf456B+u+z
+w9goGX85Ja3Ra8XwClw5/XYXKuBjSQ==
+=GveZ
+-----END PGP SIGNATURE-----
+
+--Sig_/cHrfN6G=BHIzbeUpFo=_KYd--
