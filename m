@@ -2,264 +2,365 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-24.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CBE0C43214
-	for <linux-cifs@archiver.kernel.org>; Mon, 23 Aug 2021 03:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA29C432BE
+	for <linux-cifs@archiver.kernel.org>; Mon, 23 Aug 2021 03:51:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7594B6135D
-	for <linux-cifs@archiver.kernel.org>; Mon, 23 Aug 2021 03:09:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D7416135F
+	for <linux-cifs@archiver.kernel.org>; Mon, 23 Aug 2021 03:51:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234996AbhHWDKP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 22 Aug 2021 23:10:15 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:29307 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232813AbhHWDJh (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 22 Aug 2021 23:09:37 -0400
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210823030854epoutp02cf5557ef6a80d659bfcc403c7599b86e~d0LlQQ9aV1656816568epoutp02W
-        for <linux-cifs@vger.kernel.org>; Mon, 23 Aug 2021 03:08:54 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210823030854epoutp02cf5557ef6a80d659bfcc403c7599b86e~d0LlQQ9aV1656816568epoutp02W
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1629688134;
-        bh=MC2Fl02a3BEVITF2sB18pyIm/t9CQ5bEb/5ZK3zaAb8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=R+v4sZdF0h+ZQcX7CcII2X2EROa//Dgg2ll0aHenOAgpOhVhOuuWCTFUIboPZcz+M
-         4Png024aBQSFSmY3e97J9xh3QoN3pNxLYTGe8kFGyB11FBEoaDjJEC6wEkTlVZB6DF
-         dufoVTonYx5Ca201yooJQnN9Q4VHUR8Wvzv/YK1w=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
-        20210823030853epcas1p4b1e139fa85fe73f850f1b571f9beaaa3~d0LkbiSSe3021430214epcas1p4J;
-        Mon, 23 Aug 2021 03:08:53 +0000 (GMT)
-Received: from epsmges1p4.samsung.com (unknown [182.195.38.247]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4GtHJM41m5z4x9QF; Mon, 23 Aug
-        2021 03:08:51 +0000 (GMT)
-Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
-        epsmges1p4.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A9.03.10095.34113216; Mon, 23 Aug 2021 12:08:51 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210823030851epcas1p2d141386b64cd9039121a9f6a5074a362~d0LiGH2EL2227422274epcas1p2z;
-        Mon, 23 Aug 2021 03:08:51 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20210823030851epsmtrp19a5c76bcacc5f0b8e0867f3e6281cb9f~d0LiFLWLI2901829018epsmtrp1G;
-        Mon, 23 Aug 2021 03:08:51 +0000 (GMT)
-X-AuditID: b6c32a38-691ff7000000276f-64-612311432d64
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        94.35.09091.24113216; Mon, 23 Aug 2021 12:08:51 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.89.31.111]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20210823030850epsmtip2d2b41ba624db77d5319d8ed50a78e240~d0Lh400Nh0638306383epsmtip2s;
-        Mon, 23 Aug 2021 03:08:50 +0000 (GMT)
-From:   Namjae Jeon <namjae.jeon@samsung.com>
-To:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-cifs@vger.kernel.org
-Cc:     linux-cifsd-devel@lists.sourceforge.net, aurelien.aptel@gmail.com,
-        sandeen@sandeen.net, willy@infradead.org, hch@infradead.org,
-        senozhatsky@chromium.org, christian@brauner.io,
-        viro@zeniv.linux.org.uk, ronniesahlberg@gmail.com, hch@lst.de,
-        dan.carpenter@oracle.com, metze@samba.org, smfrench@gmail.com,
-        hyc.lee@gmail.com, Namjae Jeon <namjae.jeon@samsung.com>,
-        Steve French <stfrench@microsoft.com>
-Subject: [PATCH v8 12/13] ksmbd: add Kconfig and Makefile
-Date:   Mon, 23 Aug 2021 11:58:15 +0900
-Message-Id: <20210823025816.7496-13-namjae.jeon@samsung.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210823025816.7496-1-namjae.jeon@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA0WTf1BUVRTHue+9fbsQm08Qva0kuMQwSwG7sOBdBxwmrd5U01AyI8NU+GLf
-        ALK/Zt9ukdMQMCPyqxXQ0eKHClYom4PCFgsbxg+RkCBIxpDUhpLAJQh0BExX2t1H9d/3fO/n
-        3HPO/SHCAzpIiShHZ2KNOkYjJf2Ib/pk8qjdG8MYeWVBMBqYcwlR4UIYmntygkBDlY0YOmft
-        x9D1X/8Sotm1Thw9XFsB6NuuQQJd66wj0diXDwm0euJj9InlngAdGo9EjouNJPpzto9Ek1Wn
-        SPSja0CAHq3WkcmBtKt+CadrC8YIuqPmlpBuOxtJO07fx2jHjQKSPmR3Ceml6UmCru+0ANpi
-        awa07cwURt9v3Ua33pnHUsTpuYnZLKNmjaGsLlOvztFlJUlf25uxOyM+Qa6IUqjQDmmojtGy
-        SdI9r6dEvZyjcY8pDX2f0ZjdVgrDcdKYXYlGvdnEhmbrOVOSlDWoNYYEQzTHaDmzLitax5p2
-        KuTy2Hg3uD83+26hv2EsPG9qfkBQABwhZcBXBCklPDzUCsqAnyiAsgNYdGxZwAf3AJz8o07I
-        B8sANthKsTIg8qbcfiDn/S4Af5n0+L58hqNJ5mFI6nn42BbksTdR78AJ+xzu4XGqFoczXVcJ
-        z0IgpYJHp+24RxNUOLw0+p1Xi6lEaOlqAXx7IdB6odvr+7r9pWqnt1VITYjgkbZqkof2wM/O
-        FhG8DoTOAZuQ1xJ490jxuv4Afj/4N8brj+CFk5eE/DBxsGLW5JE4JYMtnTE8sR12PKr3toBT
-        T8OFBxUCnhbDkuIAHgmHlp/61jfcCssOL64XomFH/+c4fzxHALTZfiYqwbaa/yucBqAZbGYN
-        nDaL5RQG5X/XlanXtgLvG45EdlA/vxjdCzAR6AVQhEs3iV1YGBMgVjMfHmSN+gyjWcNyvSDe
-        fXZVuCQoU+/+BDpThkKpkisTYpUoThWXIN0iBs5gJoDKYkxsLssaWOO/eZjIV1KAFWsTI6q2
-        qq/4CDZuWHxz+kyYUP1iOugJGk2nJ84PZwqJWyFDp/bLRnZVlm3OH35mMs3q/Pqm9aSlnRzJ
-        6cZfEsUHTbeTyY63uJ32JcOOtvn84/FXbpSWR6V1J5suIvPas42u0dTbKj/88sp7eef3Ba6+
-        2vDDXKxdmJu699jBEqfz7S9aaFPESm15UT8VwfVURP8+NN7dszwiWfa/ee3dN8AdazXBOObW
-        qmWKV5x5KQtPaKtPft5TjE+7f9O4z4ZPm4J/u266XOIrs+xLk+TFCLWxlsdTM5opcjgz2dTA
-        LjxHouaVUqV2EL9aaPbbMnPgwHb5ubbyGtXx5NQXsr+ySQkum1FE4kaO+Qfsj3G+TAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMLMWRmVeSWpSXmKPExsWy7bCSvK6zoHKiwedWJovjr/+yWzS+U7Z4
-        /W86i8XpCYuYLFauPspkce3+e3aLF/93MVv8/P+d0WLP3pMsFpd3zWGzuLjsJ4vFj+n1Fr19
-        n1gtWq9oWezeuIjN4s2Lw2wWtybOZ7M4//c4q8XvH3PYHIQ9/s79yOwxu+Eii8fOWXfZPTav
-        0PLYveAzk8fumw1sHq07/rJ7fHx6i8Vj7q4+Ro++LasYPbYsfsjk8XmTnMemJ2+ZAnijuGxS
-        UnMyy1KL9O0SuDJeNvIUXFStePj2OGsD4275LkYODgkBE4l7Xw26GDk5hAR2M0qc2uMIYksI
-        SEscO3GGGaJEWOLw4eIuRi6gkg+MEisPtLGBxNkEtCX+bBEFKRcRiJe42XCbBaSGWWA9s8TZ
-        100sIAlhAUuJyU93MIPYLAKqEvsu7AezeQVsJPr2rmeE2CUvsXrDAbA4J1D846RXjBD3WEv8
-        2bOWaQIj3wJGhlWMkqkFxbnpucWGBYZ5qeV6xYm5xaV56XrJ+bmbGMHxoqW5g3H7qg96hxiZ
-        OBgPMUpwMCuJ8P5lUk4U4k1JrKxKLcqPLyrNSS0+xCjNwaIkznuh62S8kEB6YklqdmpqQWoR
-        TJaJg1OqgWnTqb6f2TV+J+bkzt7/J0vMNvRC/LKnFjYq5QsOnWeudj53Tdmi6Mm758+tKvhN
-        L8QE/uibvKLnFNPR2MJAxus/BA++v3iiqePW3ti1Nwsbp3Af6tkkVbt88f2Tfx87pDwNX3vO
-        SknGj7Ojt05gnoaL2x6vz+85a/4v7s7f+KHHZ1qY2YmmKSrMf023L3w2m92oRk5b2yX0h8WS
-        mXE2dybpzTgq8kZ6c8YMxh0LIp9zKXw9KsL7XVd/1cclO46cTJ+mwCAeIVv8VVRmy7ZPEokf
-        MiYY3rsy3Uh0XojlLmuWosdOKQaXVBls7s47M+v2mVcuDDcVo1uWPWfI0XkrxbGXL/DpYfPq
-        uFXbL9dd+3xZiaU4I9FQi7moOBEAxhEdPQYDAAA=
-X-CMS-MailID: 20210823030851epcas1p2d141386b64cd9039121a9f6a5074a362
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210823030851epcas1p2d141386b64cd9039121a9f6a5074a362
-References: <20210823025816.7496-1-namjae.jeon@samsung.com>
-        <CGME20210823030851epcas1p2d141386b64cd9039121a9f6a5074a362@epcas1p2.samsung.com>
+        id S233585AbhHWDwh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 22 Aug 2021 23:52:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233206AbhHWDwh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 22 Aug 2021 23:52:37 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA49EC061575;
+        Sun, 22 Aug 2021 20:51:54 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id w4so27472722ljh.13;
+        Sun, 22 Aug 2021 20:51:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=YXggvvJGU/2niaUKbO0v/QADh07U6yAQkyzAsFT18iI=;
+        b=pZP32dTVrxV6d9QTUL+O9qckLk62N9IB+Val0/rPOQR1n1iYwfJAB+oL5QQa+x7yia
+         8sudterClxPPFYXYbjKVOiYQBJODWiEdMuEsZMG/95XGDieLJnC4GjUOPwnP2CUNQvni
+         Mn3rX1lneiCluNph40bxp13w/LdlrFvtWKFORgR+V527c9LGpGI59VL7PuivrwP2wZI6
+         Yklk3W7p+MFAyFXWlOLJaD4OpiD6zm/i7aWuDvuh+gSMXAu1yTHRnDv0IRwKyNm9CZKi
+         SX9iNiLzvyRPZBFhsAcVz2VkypwASBts7PVFUB0OqezRk0mXX9a6sp8pIjfU4yNJLUFz
+         v9nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=YXggvvJGU/2niaUKbO0v/QADh07U6yAQkyzAsFT18iI=;
+        b=TioeOmnubIs32qgzF+IpBO2qWhPSNdr7zgk+UhJVSjCE1w+KRi8dTbS3qsfva7giJC
+         nTEhpjLICB1bRgVq5P+sQ48BCsy+t7rhllG0y5HIn/L8zL44fIViHie3HRCqf/vX3sYi
+         1cuLjxL9faorHTbYlMItGgaTAk2Ojp9DSlgXLfGvjgdpOMpRvo0fO3cEBkGcjO/ysRa7
+         6vc670xdc9mq633lBbZg5YbtFNMyrs5Fha8ecoeysedl0wUR1S3xp41Rm1/uX2wRphFj
+         HiHAAhsO9OcPdqkY1uQZK7fGctxrB8JYKZTnwg8xQNLwTAs+nXFuLhFgUvOqPtZZOenR
+         /f0g==
+X-Gm-Message-State: AOAM530OVK+1loqp2wMmr+WvvQG05IiUFi7UgKUSFguaDumkv5d561WS
+        hLCczc1ZWdEULIT6kSH0vt4=
+X-Google-Smtp-Source: ABdhPJxQkUy2TQf5bz8oPZZ/nk5Fv18rLXSwVovzoQWSVZCQ8h0Lla97sc/Sn/YkZYvNkwf86SIemQ==
+X-Received: by 2002:a2e:85c4:: with SMTP id h4mr26341146ljj.321.1629690713320;
+        Sun, 22 Aug 2021 20:51:53 -0700 (PDT)
+Received: from kari-VirtualBox (85-23-89-224.bb.dnainternet.fi. [85.23.89.224])
+        by smtp.gmail.com with ESMTPSA id n18sm1313191ljg.40.2021.08.22.20.51.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Aug 2021 20:51:52 -0700 (PDT)
+Date:   Mon, 23 Aug 2021 06:51:50 +0300
+From:   Kari Argillander <kari.argillander@gmail.com>
+To:     Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-cifs@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jan Kara <jack@suse.cz>,
+        OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+        "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Luis de Bethencourt <luisbg@kernel.org>,
+        Salah Triki <salah.triki@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dave Kleikamp <shaggy@kernel.org>,
+        Anton Altaparmakov <anton@tuxera.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Marek =?utf-8?B?QmVow7pu?= <marek.behun@nic.cz>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [RFC PATCH 01/20] fat: Fix iocharset=utf8 mount option
+Message-ID: <20210823035150.h3dor7hanhzua7lh@kari-VirtualBox>
+References: <20210808162453.1653-1-pali@kernel.org>
+ <20210808162453.1653-2-pali@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210808162453.1653-2-pali@kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This adds the Kconfig and Makefile for ksmbd.
+On Sun, Aug 08, 2021 at 06:24:34PM +0200, Pali Rohár wrote:
+> Currently iocharset=utf8 mount option is broken and error is printed to
+> dmesg when it is used. To use UTF-8 as iocharset, it is required to use
+> utf8=1 mount option.
+> 
+> Fix iocharset=utf8 mount option to use be equivalent to the utf8=1 mount
+> option and remove printing error from dmesg.
+> 
+> FAT by definition is case-insensitive but current Linux implementation is
+> case-sensitive for non-ASCII characters when UTF-8 is used. This patch does
+> not change this UTF-8 behavior. Only more comments in fat_utf8_strnicmp()
+> function are added about it.
+> 
+> After this patch iocharset=utf8 starts working, so there is no need to have
+> separate config option FAT_DEFAULT_UTF8 as FAT_DEFAULT_IOCHARSET for utf8
+> also starts working. So remove redundant config option FAT_DEFAULT_UTF8.
+> 
+> Signed-off-by: Pali Rohár <pali@kernel.org>
+> ---
+>  fs/fat/Kconfig      | 15 ---------------
+>  fs/fat/dir.c        | 17 +++++++----------
+>  fs/fat/fat.h        | 22 ++++++++++++++++++++++
+>  fs/fat/inode.c      | 28 +++++++++++-----------------
+>  fs/fat/namei_vfat.c | 26 +++++++++++++++++++-------
+>  5 files changed, 59 insertions(+), 49 deletions(-)
+> 
+> diff --git a/fs/fat/Kconfig b/fs/fat/Kconfig
+> index 66532a71e8fd..a31594137d5e 100644
+> --- a/fs/fat/Kconfig
+> +++ b/fs/fat/Kconfig
+> @@ -100,18 +100,3 @@ config FAT_DEFAULT_IOCHARSET
+>  
+>  	  Enable any character sets you need in File Systems/Native Language
+>  	  Support.
+> -
+> -config FAT_DEFAULT_UTF8
+> -	bool "Enable FAT UTF-8 option by default"
+> -	depends on VFAT_FS
+> -	default n
+> -	help
+> -	  Set this if you would like to have "utf8" mount option set
+> -	  by default when mounting FAT filesystems.
+> -
+> -	  Even if you say Y here can always disable UTF-8 for
+> -	  particular mount by adding "utf8=0" to mount options.
+> -
+> -	  Say Y if you use UTF-8 encoding for file names, N otherwise.
+> -
+> -	  See <file:Documentation/filesystems/vfat.rst> for more information.
+> diff --git a/fs/fat/dir.c b/fs/fat/dir.c
+> index c4a274285858..49fe8dc6e5f0 100644
+> --- a/fs/fat/dir.c
+> +++ b/fs/fat/dir.c
+> @@ -33,11 +33,6 @@
+>  #define FAT_MAX_UNI_CHARS	((MSDOS_SLOTS - 1) * 13 + 1)
+>  #define FAT_MAX_UNI_SIZE	(FAT_MAX_UNI_CHARS * sizeof(wchar_t))
+>  
+> -static inline unsigned char fat_tolower(unsigned char c)
+> -{
+> -	return ((c >= 'A') && (c <= 'Z')) ? c+32 : c;
+> -}
+> -
+>  static inline loff_t fat_make_i_pos(struct super_block *sb,
+>  				    struct buffer_head *bh,
+>  				    struct msdos_dir_entry *de)
+> @@ -258,10 +253,12 @@ static inline int fat_name_match(struct msdos_sb_info *sbi,
+>  	if (a_len != b_len)
+>  		return 0;
+>  
+> -	if (sbi->options.name_check != 's')
+> -		return !nls_strnicmp(sbi->nls_io, a, b, a_len);
+> -	else
+> +	if (sbi->options.name_check == 's')
+>  		return !memcmp(a, b, a_len);
+> +	else if (sbi->options.utf8)
+> +		return !fat_utf8_strnicmp(a, b, a_len);
+> +	else
+> +		return !nls_strnicmp(sbi->nls_io, a, b, a_len);
+>  }
+>  
+>  enum { PARSE_INVALID = 1, PARSE_NOT_LONGNAME, PARSE_EOF, };
+> @@ -384,7 +381,7 @@ static int fat_parse_short(struct super_block *sb,
+>  					de->lcase & CASE_LOWER_BASE);
+>  		if (chl <= 1) {
+>  			if (!isvfat)
+> -				ptname[i] = nocase ? c : fat_tolower(c);
+> +				ptname[i] = nocase ? c : fat_ascii_to_lower(c);
+>  			i++;
+>  			if (c != ' ') {
+>  				name_len = i;
+> @@ -421,7 +418,7 @@ static int fat_parse_short(struct super_block *sb,
+>  		if (chl <= 1) {
+>  			k++;
+>  			if (!isvfat)
+> -				ptname[i] = nocase ? c : fat_tolower(c);
+> +				ptname[i] = nocase ? c : fat_ascii_to_lower(c);
+>  			i++;
+>  			if (c != ' ') {
+>  				name_len = i;
+> diff --git a/fs/fat/fat.h b/fs/fat/fat.h
+> index 02d4d4234956..0cd15fb3b042 100644
+> --- a/fs/fat/fat.h
+> +++ b/fs/fat/fat.h
+> @@ -310,6 +310,28 @@ static inline void fatwchar_to16(__u8 *dst, const wchar_t *src, size_t len)
+>  #endif
+>  }
+>  
+> +static inline unsigned char fat_ascii_to_lower(unsigned char c)
+> +{
+> +	return ((c >= 'A') && (c <= 'Z')) ? c+32 : c;
+> +}
+> +
+> +static inline int fat_utf8_strnicmp(const unsigned char *a,
+> +				    const unsigned char *b,
+> +				    int len)
+> +{
+> +	int i;
+> +
+> +	/*
+> +	 * FIXME: UTF-8 doesn't provide FAT semantics
+> +	 * Case-insensitive support is only for 7-bit ASCII characters
+> +	 */
+> +	for (i = 0; i < len; i++) {
+> +		if (fat_ascii_to_lower(a[i]) != fat_ascii_to_lower(b[i]))
+> +			return 1;
+> +	}
+> +	return 0;
+> +}
+> +
+>  /* fat/cache.c */
+>  extern void fat_cache_inval_inode(struct inode *inode);
+>  extern int fat_get_cluster(struct inode *inode, int cluster,
+> diff --git a/fs/fat/inode.c b/fs/fat/inode.c
+> index de0c9b013a85..f8c8a739f8f0 100644
+> --- a/fs/fat/inode.c
+> +++ b/fs/fat/inode.c
+> @@ -957,7 +957,9 @@ static int fat_show_options(struct seq_file *m, struct dentry *root)
+>  		/* strip "cp" prefix from displayed option */
+>  		seq_printf(m, ",codepage=%s", &sbi->nls_disk->charset[2]);
+>  	if (isvfat) {
+> -		if (sbi->nls_io)
+> +		if (opts->utf8)
+> +			seq_printf(m, ",iocharset=utf8");
 
-Signed-off-by: Namjae Jeon <namjae.jeon@samsung.com>
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
- fs/Kconfig        |  1 +
- fs/Makefile       |  1 +
- fs/ksmbd/Kconfig  | 68 +++++++++++++++++++++++++++++++++++++++++++++++
- fs/ksmbd/Makefile | 20 ++++++++++++++
- 4 files changed, 90 insertions(+)
- create mode 100644 fs/ksmbd/Kconfig
- create mode 100644 fs/ksmbd/Makefile
+checkpatch will probably warn you about this.
 
-diff --git a/fs/Kconfig b/fs/Kconfig
-index a7749c126b8e..9237728678cd 100644
---- a/fs/Kconfig
-+++ b/fs/Kconfig
-@@ -359,6 +359,7 @@ config NFS_V4_2_SSC_HELPER
- source "net/sunrpc/Kconfig"
- source "fs/ceph/Kconfig"
- source "fs/cifs/Kconfig"
-+source "fs/ksmbd/Kconfig"
- source "fs/coda/Kconfig"
- source "fs/afs/Kconfig"
- source "fs/9p/Kconfig"
-diff --git a/fs/Makefile b/fs/Makefile
-index f98f3e691c37..b7e65c39f98d 100644
---- a/fs/Makefile
-+++ b/fs/Makefile
-@@ -97,6 +97,7 @@ obj-$(CONFIG_NLS)		+= nls/
- obj-$(CONFIG_UNICODE)		+= unicode/
- obj-$(CONFIG_SYSV_FS)		+= sysv/
- obj-$(CONFIG_CIFS)		+= cifs/
-+obj-$(CONFIG_SMB_SERVER)	+= ksmbd/
- obj-$(CONFIG_HPFS_FS)		+= hpfs/
- obj-$(CONFIG_NTFS_FS)		+= ntfs/
- obj-$(CONFIG_UFS_FS)		+= ufs/
-diff --git a/fs/ksmbd/Kconfig b/fs/ksmbd/Kconfig
-new file mode 100644
-index 000000000000..b83cbd756ae5
---- /dev/null
-+++ b/fs/ksmbd/Kconfig
-@@ -0,0 +1,68 @@
-+config SMB_SERVER
-+	tristate "SMB3 server support (EXPERIMENTAL)"
-+	depends on INET
-+	depends on MULTIUSER
-+	depends on FILE_LOCKING
-+	select NLS
-+	select NLS_UTF8
-+	select CRYPTO
-+	select CRYPTO_MD4
-+	select CRYPTO_MD5
-+	select CRYPTO_HMAC
-+	select CRYPTO_ECB
-+	select CRYPTO_LIB_DES
-+	select CRYPTO_SHA256
-+	select CRYPTO_CMAC
-+	select CRYPTO_SHA512
-+	select CRYPTO_AEAD2
-+	select CRYPTO_CCM
-+	select CRYPTO_GCM
-+	select ASN1
-+	select OID_REGISTRY
-+	default n
-+	help
-+	  Choose Y here if you want to allow SMB3 compliant clients
-+	  to access files residing on this system using SMB3 protocol.
-+	  To compile the SMB3 server support as a module,
-+	  choose M here: the module will be called ksmbd.
-+
-+	  You may choose to use a samba server instead, in which
-+	  case you can choose N here.
-+
-+	  You also need to install user space programs which can be found
-+	  in ksmbd-tools, available from
-+	  https://github.com/cifsd-team/ksmbd-tools.
-+	  More detail about how to run the ksmbd kernel server is
-+	  available via README file
-+	  (https://github.com/cifsd-team/ksmbd-tools/blob/master/README).
-+
-+	  ksmbd kernel server includes support for auto-negotiation,
-+	  Secure negotiate, Pre-authentication integrity, oplock/lease,
-+	  compound requests, multi-credit, packet signing, RDMA(smbdirect),
-+	  smb3 encryption, copy-offload, secure per-user session
-+	  establishment via NTLM or NTLMv2.
-+
-+config SMB_SERVER_SMBDIRECT
-+	bool "Support for SMB Direct protocol"
-+	depends on SMB_SERVER=m && INFINIBAND && INFINIBAND_ADDR_TRANS || SMB_SERVER=y && INFINIBAND=y && INFINIBAND_ADDR_TRANS=y
-+	select SG_POOL
-+	default n
-+
-+	help
-+	  Enables SMB Direct support for SMB 3.0, 3.02 and 3.1.1.
-+
-+	  SMB Direct allows transferring SMB packets over RDMA. If unsure,
-+	  say N.
-+
-+config SMB_SERVER_CHECK_CAP_NET_ADMIN
-+	bool "Enable check network administration capability"
-+	depends on SMB_SERVER
-+	default y
-+
-+	help
-+	  Prevent unprivileged processes to start the ksmbd kernel server.
-+
-+config SMB_SERVER_KERBEROS5
-+	bool "Support for Kerberos 5"
-+	depends on SMB_SERVER
-+	default n
-diff --git a/fs/ksmbd/Makefile b/fs/ksmbd/Makefile
-new file mode 100644
-index 000000000000..7d6337a7dee4
---- /dev/null
-+++ b/fs/ksmbd/Makefile
-@@ -0,0 +1,20 @@
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+#
-+# Makefile for Linux SMB3 kernel server
-+#
-+obj-$(CONFIG_SMB_SERVER) += ksmbd.o
-+
-+ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o server.o ndr.o \
-+		misc.o oplock.o connection.o ksmbd_work.o crypto_ctx.o \
-+		mgmt/ksmbd_ida.o mgmt/user_config.o mgmt/share_config.o \
-+		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
-+		transport_tcp.o transport_ipc.o smbacl.o smb2pdu.o \
-+		smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
-+		ksmbd_spnego_negtokentarg.asn1.o asn1.o
-+
-+$(obj)/asn1.o: $(obj)/ksmbd_spnego_negtokeninit.asn1.h $(obj)/ksmbd_spnego_negtokentarg.asn1.h
-+
-+$(obj)/ksmbd_spnego_negtokeninit.asn1.o: $(obj)/ksmbd_spnego_negtokeninit.asn1.c $(obj)/ksmbd_spnego_negtokeninit.asn1.h
-+$(obj)/ksmbd_spnego_negtokentarg.asn1.o: $(obj)/ksmbd_spnego_negtokentarg.asn1.c $(obj)/ksmbd_spnego_negtokentarg.asn1.h
-+
-+ksmbd-$(CONFIG_SMB_SERVER_SMBDIRECT) += transport_rdma.o
--- 
-2.17.1
+WARNING: Prefer seq_puts to seq_printf
 
+> +		else if (sbi->nls_io)
+>  			seq_printf(m, ",iocharset=%s", sbi->nls_io->charset);
+>  
+>  		switch (opts->shortname) {
+> @@ -994,8 +996,6 @@ static int fat_show_options(struct seq_file *m, struct dentry *root)
+>  		if (opts->nocase)
+>  			seq_puts(m, ",nocase");
+>  	} else {
+> -		if (opts->utf8)
+> -			seq_puts(m, ",utf8");
+>  		if (opts->unicode_xlate)
+>  			seq_puts(m, ",uni_xlate");
+>  		if (!opts->numtail)
+> @@ -1157,8 +1157,6 @@ static int parse_options(struct super_block *sb, char *options, int is_vfat,
+>  	opts->errors = FAT_ERRORS_RO;
+>  	*debug = 0;
+>  
+> -	opts->utf8 = IS_ENABLED(CONFIG_FAT_DEFAULT_UTF8) && is_vfat;
+> -
+>  	if (!options)
+>  		goto out;
+>  
+> @@ -1319,10 +1317,14 @@ static int parse_options(struct super_block *sb, char *options, int is_vfat,
+>  					| VFAT_SFN_CREATE_WIN95;
+>  			break;
+>  		case Opt_utf8_no:		/* 0 or no or false */
+> -			opts->utf8 = 0;
+> +			fat_reset_iocharset(opts);
+>  			break;
+>  		case Opt_utf8_yes:		/* empty or 1 or yes or true */
+> -			opts->utf8 = 1;
+> +			fat_reset_iocharset(opts);
+> +			iocharset = kstrdup("utf8", GFP_KERNEL);
+> +			if (!iocharset)
+> +				return -ENOMEM;
+> +			opts->iocharset = iocharset;
+>  			break;
+>  		case Opt_uni_xl_no:		/* 0 or no or false */
+>  			opts->unicode_xlate = 0;
+> @@ -1360,18 +1362,11 @@ static int parse_options(struct super_block *sb, char *options, int is_vfat,
+>  	}
+>  
+>  out:
+> -	/* UTF-8 doesn't provide FAT semantics */
+> -	if (!strcmp(opts->iocharset, "utf8")) {
+> -		fat_msg(sb, KERN_WARNING, "utf8 is not a recommended IO charset"
+> -		       " for FAT filesystems, filesystem will be "
+> -		       "case sensitive!");
+> -	}
+> +	opts->utf8 = !strcmp(opts->iocharset, "utf8") && is_vfat;
+>  
+>  	/* If user doesn't specify allow_utime, it's initialized from dmask. */
+>  	if (opts->allow_utime == (unsigned short)-1)
+>  		opts->allow_utime = ~opts->fs_dmask & (S_IWGRP | S_IWOTH);
+> -	if (opts->unicode_xlate)
+> -		opts->utf8 = 0;
+>  	if (opts->nfs == FAT_NFS_NOSTALE_RO) {
+>  		sb->s_flags |= SB_RDONLY;
+>  		sb->s_export_op = &fat_export_ops_nostale;
+> @@ -1832,8 +1827,7 @@ int fat_fill_super(struct super_block *sb, void *data, int silent, int isvfat,
+>  		goto out_fail;
+>  	}
+>  
+> -	/* FIXME: utf8 is using iocharset for upper/lower conversion */
+> -	if (sbi->options.isvfat) {
+> +	if (sbi->options.isvfat && !sbi->options.utf8) {
+>  		sbi->nls_io = load_nls(sbi->options.iocharset);
+>  		if (!sbi->nls_io) {
+>  			fat_msg(sb, KERN_ERR, "IO charset %s not found",
+> diff --git a/fs/fat/namei_vfat.c b/fs/fat/namei_vfat.c
+> index 5369d82e0bfb..efb3cb9ea8a8 100644
+> --- a/fs/fat/namei_vfat.c
+> +++ b/fs/fat/namei_vfat.c
+> @@ -134,6 +134,7 @@ static int vfat_hash(const struct dentry *dentry, struct qstr *qstr)
+>  static int vfat_hashi(const struct dentry *dentry, struct qstr *qstr)
+>  {
+>  	struct nls_table *t = MSDOS_SB(dentry->d_sb)->nls_io;
+> +	int utf8 = MSDOS_SB(dentry->d_sb)->options.utf8;
+>  	const unsigned char *name;
+>  	unsigned int len;
+>  	unsigned long hash;
+> @@ -142,8 +143,17 @@ static int vfat_hashi(const struct dentry *dentry, struct qstr *qstr)
+>  	len = vfat_striptail_len(qstr);
+>  
+>  	hash = init_name_hash(dentry);
+> -	while (len--)
+> -		hash = partial_name_hash(nls_tolower(t, *name++), hash);
+> +	if (utf8) {
+> +		/*
+> +		 * FIXME: UTF-8 doesn't provide FAT semantics
+> +		 * Case-insensitive support is only for 7-bit ASCII characters
+> +		 */
+> +		while (len--)
+> +			hash = partial_name_hash(fat_ascii_to_lower(*name++), hash);
+> +	} else {
+> +		while (len--)
+> +			hash = partial_name_hash(nls_tolower(t, *name++), hash);
+> +	}
+>  	qstr->hash = end_name_hash(hash);
+>  
+>  	return 0;
+> @@ -156,16 +166,18 @@ static int vfat_cmpi(const struct dentry *dentry,
+>  		unsigned int len, const char *str, const struct qstr *name)
+>  {
+>  	struct nls_table *t = MSDOS_SB(dentry->d_sb)->nls_io;
+> +	int utf8 = MSDOS_SB(dentry->d_sb)->options.utf8;
+>  	unsigned int alen, blen;
+>  
+>  	/* A filename cannot end in '.' or we treat it like it has none */
+>  	alen = vfat_striptail_len(name);
+>  	blen = __vfat_striptail_len(len, str);
+> -	if (alen == blen) {
+> -		if (nls_strnicmp(t, name->name, str, alen) == 0)
+> -			return 0;
+> -	}
+> -	return 1;
+> +	if (alen != blen)
+> +		return 1;
+> +	else if (utf8)
+> +		return fat_utf8_strnicmp(name->name, str, alen);
+> +	else
+> +		return nls_strnicmp(t, name->name, str, alen);
+>  }
+>  
+>  /*
+> -- 
+> 2.20.1
+> 
