@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D91C4338F
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Aug 2021 08:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA6BC4338F
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Aug 2021 08:20:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B6C446124B
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Aug 2021 08:13:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E51FB61181
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Aug 2021 08:20:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234997AbhHXINq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 24 Aug 2021 04:13:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53610 "EHLO mail.kernel.org"
+        id S235308AbhHXIVi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 24 Aug 2021 04:21:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55428 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234936AbhHXINq (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 24 Aug 2021 04:13:46 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A7E2D61248
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Aug 2021 08:13:02 +0000 (UTC)
+        id S233692AbhHXIVd (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 24 Aug 2021 04:21:33 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0058961262
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Aug 2021 08:20:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629792782;
-        bh=xC4tpTCT9yOfvdaxSweWZmt0il8MVJ8dITY8S8fDa9M=;
+        s=k20201202; t=1629793250;
+        bh=szO3stcJugb0KqsHB8TXgaGEqmKiRGbhqWdW8OKDYnQ=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=NSuBY5sBlcmwem1E17WsMvSDwFlLWk4/auTBMc7bdsfpq0D6SMtT5DneHdubxV4s3
-         kBPnlXPJCzfzZqxbNQlg7D+AvPdSsYby0VPQebZ4WCH4HKYKBB/dqcU5+Q/ohJ0+/O
-         hTzJm0NeGK1EUFV9+hewAMb3DhL0laxJlbw+HL3/+BJO76rwNjwgz7J2Tt7LLQS9NY
-         8y9cS1X8MfRSHkiL/yMEO4vdq/vE2tzcRfw9b4K6IddQ8t22J8Wfn/dpYaTOywBlmL
-         UtH27BStQO029sTeesTiDdKOZ5ytl36PPTZBEnfz35RCEb4dNJ8WNv6fFtFV5tX1Z/
-         Chn/BobaQHAUA==
-Received: by mail-ot1-f46.google.com with SMTP id i3-20020a056830210300b0051af5666070so34030854otc.4
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Aug 2021 01:13:02 -0700 (PDT)
-X-Gm-Message-State: AOAM533cVhLKq4xT3VIytOy6NG9+djH+pXcPLlv5wwbaCj8kNtUhvmuH
-        JQ+nU7fwTYmc93NW3DcKCgNuUoCIfv7p10xTqgI=
-X-Google-Smtp-Source: ABdhPJzBtO7HYYr9+5BGBwqG46bvMwZ7itx8zReJZHeTzcRkfiPqwFgy6J6WiUwqpQUr2qmdM6JboNRbqhANrpXtrOY=
-X-Received: by 2002:a9d:7651:: with SMTP id o17mr30294412otl.205.1629792782076;
- Tue, 24 Aug 2021 01:13:02 -0700 (PDT)
+        b=mgs3yIZ+H5N90fAmd9PDU4yMu/wAiEaaBSMaRNMk5eCc39jN81cofkEqdDQ2ULgz8
+         9/98ezW820+o5+nTlSV8X7Kqn3mzR3cZLB9tcu9blTK8G8mfHKSxIobMpj7Sb1KFwJ
+         7Pz5sxmrZb+d03MLuYzjTyeO/PYw0k/040/KCK7F7jZAHHxrmEMZkRRrGrBhF75dJY
+         BaVwr4/FGxZKJw3ZO8mlxcWT2A1Oy6Rs8HVRNPQbVnFwpi7usA9ceauSKzRTt4i7sT
+         xJWeNd66RlKDNY/n7kYd53ItIOqQHWCjxGhoCvpXpCUVrvWNHzRvp4aF0TeZXQnGpu
+         EX4/2+w7V4H9g==
+Received: by mail-oo1-f53.google.com with SMTP id z3-20020a4a98430000b029025f4693434bso6249702ooi.3
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Aug 2021 01:20:49 -0700 (PDT)
+X-Gm-Message-State: AOAM532bPX/M4T/YzwDCAUAeuJ/zYEjaQzBRFgk1ESI4LQoTOuIo6NQW
+        ooxYivfBc/WwQq0NfyrbVQ1IIk6I84HvmyJ0x/s=
+X-Google-Smtp-Source: ABdhPJxgOzRR5P5BM1MsB37iz01PqUqgu/kIAGpQ42EjDQvxA3L+e4qa4fho67synEmeaHTNRXS58/FNjbjbssqx4Jo=
+X-Received: by 2002:a4a:e792:: with SMTP id x18mr1116312oov.53.1629793249342;
+ Tue, 24 Aug 2021 01:20:49 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:ac9:1bc6:0:0:0:0:0 with HTTP; Tue, 24 Aug 2021 01:13:01
+Received: by 2002:ac9:1bc6:0:0:0:0:0 with HTTP; Tue, 24 Aug 2021 01:20:48
  -0700 (PDT)
-In-Reply-To: <20210823151357.471691-7-brauner@kernel.org>
+In-Reply-To: <20210823151357.471691-12-brauner@kernel.org>
 References: <20210823025816.7496-1-namjae.jeon@samsung.com>
- <20210823151357.471691-1-brauner@kernel.org> <20210823151357.471691-7-brauner@kernel.org>
+ <20210823151357.471691-1-brauner@kernel.org> <20210823151357.471691-12-brauner@kernel.org>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 24 Aug 2021 17:13:01 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd86gaPoYJJHW6STdHhN282p5JFdr-xWwdvgv4HobFOBUg@mail.gmail.com>
-Message-ID: <CAKYAXd86gaPoYJJHW6STdHhN282p5JFdr-xWwdvgv4HobFOBUg@mail.gmail.com>
-Subject: Re: [PATCH 06/11] ksmbd: fix subauth 0 handling in sid_to_id()
+Date:   Tue, 24 Aug 2021 17:20:48 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_B1uJEh_Y_JRi1o_zucd92-tAvDFjJ8ZW2my2D86-Zsg@mail.gmail.com>
+Message-ID: <CAKYAXd_B1uJEh_Y_JRi1o_zucd92-tAvDFjJ8ZW2my2D86-Zsg@mail.gmail.com>
+Subject: Re: [PATCH 11/11] ksmbd: defer notify_change() call
 To:     Christian Brauner <brauner@kernel.org>
 Cc:     Steve French <stfrench@microsoft.com>,
         Christoph Hellwig <hch@infradead.org>,
@@ -64,8 +64,18 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 2021-08-24 0:13 GMT+09:00, Christian Brauner <brauner@kernel.org>:
 > From: Christian Brauner <christian.brauner@ubuntu.com>
 >
-> It's not obvious why subauth 0 would be excluded from translation. This
-> would lead to wrong results whenever a non-identity idmapping is used.
+> When ownership is changed we might in certain scenarios loose the
+> ability to alter the inode after we changed ownership. This can e.g.
+> happen when we are on an idmapped mount where uid 0 is mapped to uid
+> 1000 and uid 1000 is mapped to uid 0.
+> A caller with fs*id 1000 will be able to create files as *id 1000 on
+> disk. They will also be able to change ownership of files owned by *id 0
+> to *id 1000 but they won't be able to change ownership in the other
+> direction. This means acl operations following notify_change() would
+> fail. Move the notify_change() call after the acls have been updated.
+> This guarantees that we don't end up with spurious "hash value diff"
+> warnings later on because we managed to change ownership but didn't
+> manage to alter acls.
 >
 > Cc: Steve French <stfrench@microsoft.com>
 > Cc: Christoph Hellwig <hch@infradead.org>
@@ -75,59 +85,67 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 > Cc: linux-cifs@vger.kernel.org
 > Signed-off-by: Christian Brauner <christian.brauner@ubuntu.com>
 > ---
->  fs/ksmbd/smbacl.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  fs/ksmbd/smbacl.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
 >
 > diff --git a/fs/ksmbd/smbacl.c b/fs/ksmbd/smbacl.c
-> index 3307ca776eb1..0d269b28f163 100644
+> index ef5896297607..8457a3c27c12 100644
 > --- a/fs/ksmbd/smbacl.c
 > +++ b/fs/ksmbd/smbacl.c
-> @@ -274,7 +274,7 @@ static int sid_to_id(struct user_namespace *user_ns,
->  		uid_t id;
+> @@ -1334,25 +1334,27 @@ int set_info_sec(struct ksmbd_conn *conn, struct
+> ksmbd_tree_connect *tcon,
+>  	newattrs.ia_valid |= ATTR_MODE;
+>  	newattrs.ia_mode = (inode->i_mode & ~0777) | (fattr.cf_mode & 0777);
 >
->  		id = le32_to_cpu(psid->sub_auth[psid->num_subauth - 1]);
-> -		if (id > 0) {
-> +		if (id >= 0) {
->  			uid = make_kuid(user_ns, id);
->  			if (uid_valid(uid) && kuid_has_mapping(user_ns, uid)) {
->  				fattr->cf_uid = uid;
-> @@ -286,9 +286,9 @@ static int sid_to_id(struct user_namespace *user_ns,
->  		gid_t id;
->
->  		id = le32_to_cpu(psid->sub_auth[psid->num_subauth - 1]);
-> -		if (id > 0) {
->  			gid = make_kgid(user_ns, id);
->  			if (gid_valid(gid) && kgid_has_mapping(user_ns, gid)) {
-> +		if (id >= 0) {
-Checkpatch.pl give warning messages like the following :
-
-WARNING: suspect code indent for conditional statements (24, 16)
-#110: FILE: fs/ksmbd/smbacl.c:290:
- 			if (gid_valid(gid) && kgid_has_mapping(user_ns, gid)) {
-+		if (id >= 0) {
-
-WARNING: suspect code indent for conditional statements (16, 32)
-#111: FILE: fs/ksmbd/smbacl.c:291:
-+		if (id >= 0) {
- 				fattr->cf_gid = gid;
-
-With 7th patch, it shouldn't be a problem, but this patch itself seems
-to have a problem.
-I will directly update it like this if you don't mind :
-
-                id = le32_to_cpu(psid->sub_auth[psid->num_subauth - 1]);
--               if (id > 0) {
-+               if (id >= 0) {
-                        gid = make_kgid(user_ns, id);
-                        if (gid_valid(gid) && kgid_has_mapping(user_ns, gid)) {
-                                fattr->cf_gid = gid;
-                                rc = 0;
-                        }
+> -	inode_lock(inode);
+> -	rc = notify_change(user_ns, path->dentry, &newattrs, NULL);
+> -	inode_unlock(inode);
+> -	if (rc)
+> -		goto out;
+> -
+>  	ksmbd_vfs_remove_acl_xattrs(user_ns, path->dentry);
+>  	/* Update posix acls */
+>  	if (IS_ENABLED(CONFIG_FS_POSIX_ACL) && fattr.cf_dacls) {
+>  		rc = set_posix_acl(user_ns, inode,
+>  				   ACL_TYPE_ACCESS, fattr.cf_acls);
+> +		if (rc < 0)
+> +			ksmbd_debug(SMB,
+> +				    "Set posix acl(ACL_TYPE_ACCESS) failed, rc : %d\n",
+> +				    rc);
+>  		if (S_ISDIR(inode->i_mode) && fattr.cf_dacls)
+You seem to have missed adding braces after adding a debug print.
+I will directly update it if you don't mind.
 
 Thanks!
-				fattr->cf_gid = gid;
->  				rc = 0;
->  			}
+>  			rc = set_posix_acl(user_ns, inode,
+>  					   ACL_TYPE_DEFAULT, fattr.cf_dacls);
+> +		if (rc)
+> +			ksmbd_debug(SMB,
+> +				    "Set posix acl(ACL_TYPE_DEFAULT) failed, rc : %d\n",
+> +				    rc);
+>  	}
+>
+>  	/* Check it only calling from SD BUFFER context */
+>  	if (type_check && !(le16_to_cpu(pntsd->type) & DACL_PRESENT))
+> -		goto out;
+> +		goto out_change;
+>
+>  	if (test_share_config_flag(tcon->share_conf, KSMBD_SHARE_FLAG_ACL_XATTR))
+> {
+>  		/* Update WinACL in xattr */
+> @@ -1361,6 +1363,11 @@ int set_info_sec(struct ksmbd_conn *conn, struct
+> ksmbd_tree_connect *tcon,
+>  				       path->dentry, pntsd, ntsd_len);
+>  	}
+>
+> +out_change:
+> +	inode_lock(inode);
+> +	rc = notify_change(user_ns, path->dentry, &newattrs, NULL);
+> +	inode_unlock(inode);
+> +
+>  out:
+>  	posix_acl_release(fattr.cf_acls);
+>  	posix_acl_release(fattr.cf_dacls);
 > --
 > 2.30.2
 >
