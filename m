@@ -2,136 +2,215 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96756C4320E
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Aug 2021 16:03:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EEBCC4338F
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Aug 2021 16:11:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77AAF60462
-	for <linux-cifs@archiver.kernel.org>; Tue, 24 Aug 2021 16:03:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10A8F61220
+	for <linux-cifs@archiver.kernel.org>; Tue, 24 Aug 2021 16:11:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238457AbhHXQDl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 24 Aug 2021 12:03:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43436 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238425AbhHXQDe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 24 Aug 2021 12:03:34 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AADFC061764
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Aug 2021 09:02:49 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id i28so38518700ljm.7
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Aug 2021 09:02:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hXg2Ml3SZo28O5nkrCB2Rdk/VnH8vh7JcaznJAO7/1w=;
-        b=vA4EAitHX05c5EqQ2yH7pbiwh1aoweDEov4VR/6YhXj12McxpSWnad+0yF/82M8KLB
-         7eDdDOfQAUWjfuUA/BYI/JZnA5GE+0qARgEm/+87Q0SBvMScg7UQ+fYXUNowbdm5+kv3
-         KfDpVVhpVdZLTPggzYIl6A87qoEDWaKhumgQ1jvjMTF0VfwP3gJ1aXkB5rh90PHzESvI
-         bPOseDLNaJrcCApgVECzr08I4XJ0bjBhwpS8Ieg6oJRZrfJnoTmjAMtr5TO4Zt+JJlgz
-         xhzwUX+a6ivtBU3N1c4uL0DHdRNgftslbSfB43+9OkFHGZeN2/tYUGRCRaV15DFGoL9p
-         nbxA==
+        id S229837AbhHXQMR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 24 Aug 2021 12:12:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30550 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229478AbhHXQMP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 24 Aug 2021 12:12:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629821491;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zztC89NUsnI49tBFDzJHfqMcg0PYYsKWW693C6SIn40=;
+        b=ROP2AlunAim0vB18DNyFNZufoU3UtiTE8Q6zHhDVrQpv4lZjPoJT9qhGjgWaCIdhr1xaS7
+        26uVvrc7J07XNPuAzBlX0bnu89b1PDQeGiV5sL2F09lfntDnguq/gqEnnHMRRm92E8UGka
+        19ZySxyawzvV0Np7bxU8ZooiBLhzOZI=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-VpnpWFAVOJ-6mMEajOEYNg-1; Tue, 24 Aug 2021 12:11:29 -0400
+X-MC-Unique: VpnpWFAVOJ-6mMEajOEYNg-1
+Received: by mail-qv1-f71.google.com with SMTP id gg8-20020a056214252800b00363a9ba9f52so13863834qvb.4
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Aug 2021 09:11:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hXg2Ml3SZo28O5nkrCB2Rdk/VnH8vh7JcaznJAO7/1w=;
-        b=CUTkOkAiJvQ3trsw1IPjTxjpkO4AO8u7ojTFWKUVau5LzGFw6uaFFuPtMZE2QCpqfq
-         0PHlU66v7D31I6fCGE1FlcAGmkMLlAZLbEOqhdk262xTdysqEaRv4CYFx9vhRvvIEvbS
-         YrKlpQAgTsGDY9G0auckbeSf0rMPMId0eeBzSpbPD4iw7HBMOGnNHGW8b1JwspWx7YKB
-         5xy5CO9PsFUePXw3JIVDmLwSxQ3acBxW7VNeJUY2xiFlwujZwp+lAKkq0+gYBbeY7gQ9
-         zqDZMHoIqxcFA6BFjFBUSqaFzgGV43eBKxQasGfVyEg3/f5fORHPfNQsMGGGHhPPr15V
-         hEcw==
-X-Gm-Message-State: AOAM530GVXkhJ9WdBUhW6sYFX1laIhG9ylu3DiVyARgdr7CdSDFgM3UT
-        dYhbdvBJXkCPK9hpmqKFoS790yKb5xlUIYFEkBU=
-X-Google-Smtp-Source: ABdhPJz9htFmJZwC3DPn0ncO4HIStdgasUmiUt0V2KVCou5v60H9k92PVsUg0nqf1IepWmpyMH7/DHrbW+xjpbo9KPc=
-X-Received: by 2002:a2e:8e39:: with SMTP id r25mr32040435ljk.272.1629820967343;
- Tue, 24 Aug 2021 09:02:47 -0700 (PDT)
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=zztC89NUsnI49tBFDzJHfqMcg0PYYsKWW693C6SIn40=;
+        b=gDNC0nrqq8DKb02DehTSJpA8pEjCxH2ZyEmNp4k1jMa3VCcVljIQQN/SlDkVPlibxd
+         9NhhrHI6XrWxN2POulxnAsUwCO6sxaIiVjw20aONO52hkafZt1LKBrToOwYj4qWMy7fO
+         rCai55/CPUYIKew8hf4dXk/nQOYnE474iBSZDih1PirBpher8xOirO3eRSeMzklGjZDA
+         B6A6MaUDF0Ue3qIxjRxmwgBvwpXLspuPGFaq0N4bWdaIrEbC2z84Qrd6mxIJhQFqVifh
+         muuhC/BvPhOWEWve1C0mm4iUVmfnRkKum+cBX4bxL0C3ZCkzRkggs4WsBQBtN9p8uXU/
+         88aQ==
+X-Gm-Message-State: AOAM530t6XUF+0mvSMZYaJL5d0kdIaf9V9G/7j3Jvruwo+r/tsU7Aknh
+        JJyQS5QtD9wTsSjda6g+p/MDCTi1OK20gFOUzi4pNXhqJrGsk0U1YS39JZpZOsdWHW1OPFd4VNG
+        EtPAe8FGWCc8N64GMZQWVLA==
+X-Received: by 2002:ac8:58ce:: with SMTP id u14mr1640615qta.99.1629821489398;
+        Tue, 24 Aug 2021 09:11:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyCKqllfX/tvqrWatVeQf20ul8F8guKIBuisU0F+aEkBMrzdmA5+I16yDHMCyu87N39B0rdPQ==
+X-Received: by 2002:ac8:58ce:: with SMTP id u14mr1640586qta.99.1629821489175;
+        Tue, 24 Aug 2021 09:11:29 -0700 (PDT)
+Received: from [192.168.1.3] (68-20-15-154.lightspeed.rlghnc.sbcglobal.net. [68.20.15.154])
+        by smtp.gmail.com with ESMTPSA id l13sm11361132qkp.97.2021.08.24.09.11.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Aug 2021 09:11:28 -0700 (PDT)
+Message-ID: <3d98729b59c2afcad1299a7742211bcdf1598623.camel@redhat.com>
+Subject: Re: [PATCH 10/12] fscache: Fix cookie key hashing
+From:   Jeff Layton <jlayton@redhat.com>
+To:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com
+Cc:     Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        David Wysochanski <dwysocha@redhat.com>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Tue, 24 Aug 2021 12:11:27 -0400
+In-Reply-To: <162431201844.2908479.8293647220901514696.stgit@warthog.procyon.org.uk>
+References: <162431188431.2908479.14031376932042135080.stgit@warthog.procyon.org.uk>
+         <162431201844.2908479.8293647220901514696.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.40.4 (3.40.4-1.fc34) 
 MIME-Version: 1.0
-References: <CAH2r5muZqv0Zv415suhAjv5s9a=rU8nMkY1p7doq5koMYU0wBA@mail.gmail.com>
- <20210824115249.gdd3jlf6wi2joxdt@wittgenstein>
-In-Reply-To: <20210824115249.gdd3jlf6wi2joxdt@wittgenstein>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 24 Aug 2021 11:02:35 -0500
-Message-ID: <CAH2r5mtM2tUUsWfUJLbsVJ-y=XKC-wjbS_fuZYpQedte3_O04A@mail.gmail.com>
-Subject: Re: [PATCH][SMB3.1.1] incorrect initialization of the posix
- extensions in new mount API
-To:     Christian Brauner <christian.brauner@ubuntu.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Namjae Jeon <namjae.jeon@samsung.com>
-Content-Type: multipart/mixed; boundary="000000000000ce6e0905ca504334"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000ce6e0905ca504334
-Content-Type: text/plain; charset="UTF-8"
+On Mon, 2021-06-21 at 22:46 +0100, David Howells wrote:
+> The current hash algorithm used for hashing cookie keys is really bad,
+> producing almost no dispersion (after a test kernel build, ~30000 files
+> were split over just 18 out of the 32768 hash buckets).
+> 
+> Borrow the full_name_hash() hash function into fscache to do the hashing
+> for cookie keys and, in the future, volume keys.
+> 
+> I don't want to use full_name_hash() as-is because I want the hash value to
+> be consistent across arches and over time as the hash value produced may
+> get used on disk.
+> 
+> I can also optimise parts of it away as the key will always be a padded
+> array of aligned 32-bit words.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> ---
+> 
 
-Yes - the indentation is just cut-n-paste gmail strangeness - you can
-see the proper indentation in the attachment
+What happens when this patch encounters a cache that was built before
+it? Do you need to couple this with some sort of global cache
+invalidation or rehashing event?
 
-
-On Tue, Aug 24, 2021 at 6:52 AM Christian Brauner
-<christian.brauner@ubuntu.com> wrote:
->
-> On Mon, Aug 23, 2021 at 02:07:22PM -0500, Steve French wrote:
-> > We were incorrectly initializing the posix extensions in the
-> > conversion to the new mount API.
-> >
-> > CC: <stable@vger.kernel.org> # 5.11+
-> > Reported-by: Christian Brauner <christian.brauner@ubuntu.com>
-> > Suggested-by: Namjae Jeon <namjae.jeon@samsung.com>
-> > Signed-off-by: Steve French <stfrench@microsoft.com>
-> > ---
->
-> The indentation looks rather strange to me but maybe that's just mail
-> that got garbled. In any case, with the indentation fixed:
->
-> Acked-by: Christian Brauner <christian.brauner@ubuntu.com>
-
-
+>  fs/fscache/cookie.c   |   14 +-------------
+>  fs/fscache/internal.h |    2 ++
+>  fs/fscache/main.c     |   39 +++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 42 insertions(+), 13 deletions(-)
+> 
+> diff --git a/fs/fscache/cookie.c b/fs/fscache/cookie.c
+> index ec9bce33085f..2558814193e9 100644
+> --- a/fs/fscache/cookie.c
+> +++ b/fs/fscache/cookie.c
+> @@ -87,10 +87,8 @@ void fscache_free_cookie(struct fscache_cookie *cookie)
+>  static int fscache_set_key(struct fscache_cookie *cookie,
+>  			   const void *index_key, size_t index_key_len)
+>  {
+> -	unsigned long long h;
+>  	u32 *buf;
+>  	int bufs;
+> -	int i;
+>  
+>  	bufs = DIV_ROUND_UP(index_key_len, sizeof(*buf));
+>  
+> @@ -104,17 +102,7 @@ static int fscache_set_key(struct fscache_cookie *cookie,
+>  	}
+>  
+>  	memcpy(buf, index_key, index_key_len);
+> -
+> -	/* Calculate a hash and combine this with the length in the first word
+> -	 * or first half word
+> -	 */
+> -	h = (unsigned long)cookie->parent;
+> -	h += index_key_len + cookie->type;
+> -
+> -	for (i = 0; i < bufs; i++)
+> -		h += buf[i];
+> -
+> -	cookie->key_hash = h ^ (h >> 32);
+> +	cookie->key_hash = fscache_hash(0, buf, bufs);
+>  	return 0;
+>  }
+>  
+> diff --git a/fs/fscache/internal.h b/fs/fscache/internal.h
+> index 200082cafdda..a49136c63e4b 100644
+> --- a/fs/fscache/internal.h
+> +++ b/fs/fscache/internal.h
+> @@ -74,6 +74,8 @@ extern struct workqueue_struct *fscache_object_wq;
+>  extern struct workqueue_struct *fscache_op_wq;
+>  DECLARE_PER_CPU(wait_queue_head_t, fscache_object_cong_wait);
+>  
+> +extern unsigned int fscache_hash(unsigned int salt, unsigned int *data, unsigned int n);
+> +
+>  static inline bool fscache_object_congested(void)
+>  {
+>  	return workqueue_congested(WORK_CPU_UNBOUND, fscache_object_wq);
+> diff --git a/fs/fscache/main.c b/fs/fscache/main.c
+> index c1e6cc9091aa..4207f98e405f 100644
+> --- a/fs/fscache/main.c
+> +++ b/fs/fscache/main.c
+> @@ -93,6 +93,45 @@ static struct ctl_table fscache_sysctls_root[] = {
+>  };
+>  #endif
+>  
+> +/*
+> + * Mixing scores (in bits) for (7,20):
+> + * Input delta: 1-bit      2-bit
+> + * 1 round:     330.3     9201.6
+> + * 2 rounds:   1246.4    25475.4
+> + * 3 rounds:   1907.1    31295.1
+> + * 4 rounds:   2042.3    31718.6
+> + * Perfect:    2048      31744
+> + *            (32*64)   (32*31/2 * 64)
+> + */
+> +#define HASH_MIX(x, y, a)	\
+> +	(	x ^= (a),	\
+> +	y ^= x,	x = rol32(x, 7),\
+> +	x += y,	y = rol32(y,20),\
+> +	y *= 9			)
+> +
+> +static inline unsigned int fold_hash(unsigned long x, unsigned long y)
+> +{
+> +	/* Use arch-optimized multiply if one exists */
+> +	return __hash_32(y ^ __hash_32(x));
+> +}
+> +
+> +/*
+> + * Generate a hash.  This is derived from full_name_hash(), but we want to be
+> + * sure it is arch independent and that it doesn't change as bits of the
+> + * computed hash value might appear on disk.  The caller also guarantees that
+> + * the hashed data will be a series of aligned 32-bit words.
+> + */
+> +unsigned int fscache_hash(unsigned int salt, unsigned int *data, unsigned int n)
+> +{
+> +	unsigned int a, x = 0, y = salt;
+> +
+> +	for (; n; n--) {
+> +		a = *data++;
+> +		HASH_MIX(x, y, a);
+> +	}
+> +	return fold_hash(x, y);
+> +}
+> +
+>  /*
+>   * initialise the fs caching module
+>   */
+> 
+> 
 
 -- 
-Thanks,
+Jeff Layton <jlayton@redhat.com>
 
-Steve
-
---000000000000ce6e0905ca504334
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb3-fix-posix-extensions-mount-option.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb3-fix-posix-extensions-mount-option.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ksq9bcns0>
-X-Attachment-Id: f_ksq9bcns0
-
-RnJvbSBiZmI3ZDFiODgwNmZlOGRlY2M5Nzc5NjNiOWVkZGJmOWM0Y2VkOWQ1IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IE1vbiwgMjMgQXVnIDIwMjEgMTM6NTI6MTIgLTA1MDAKU3ViamVjdDogW1BBVENIXSBz
-bWIzOiBmaXggcG9zaXggZXh0ZW5zaW9ucyBtb3VudCBvcHRpb24KCldlIHdlcmUgaW5jb3JyZWN0
-bHkgaW5pdGlhbGl6aW5nIHRoZSBwb3NpeCBleHRlbnNpb25zIGluIHRoZQpjb252ZXJzaW9uIHRv
-IHRoZSBuZXcgbW91bnQgQVBJLgoKQ0M6IDxzdGFibGVAdmdlci5rZXJuZWwub3JnPiAjIDUuMTEr
-ClJlcG9ydGVkLWJ5OiBDaHJpc3RpYW4gQnJhdW5lciA8Y2hyaXN0aWFuLmJyYXVuZXJAdWJ1bnR1
-LmNvbT4KU3VnZ2VzdGVkLWJ5OiBOYW1qYWUgSmVvbiA8bmFtamFlLmplb25Ac2Ftc3VuZy5jb20+
-ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4KLS0t
-CiBmcy9jaWZzL2ZzX2NvbnRleHQuYyB8IDExICsrKysrKysrKy0tCiAxIGZpbGUgY2hhbmdlZCwg
-OSBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvZnNf
-Y29udGV4dC5jIGIvZnMvY2lmcy9mc19jb250ZXh0LmMKaW5kZXggNDUxNWEwODgzMjYyLi4zMTA5
-ZGVmOGUxOTkgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvZnNfY29udGV4dC5jCisrKyBiL2ZzL2NpZnMv
-ZnNfY29udGV4dC5jCkBAIC0xMjUyLDEwICsxMjUyLDE3IEBAIHN0YXRpYyBpbnQgc21iM19mc19j
-b250ZXh0X3BhcnNlX3BhcmFtKHN0cnVjdCBmc19jb250ZXh0ICpmYywKIAkJCWN0eC0+cG9zaXhf
-cGF0aHMgPSAxOwogCQlicmVhazsKIAljYXNlIE9wdF91bml4OgotCQlpZiAocmVzdWx0Lm5lZ2F0
-ZWQpCisJCWlmIChyZXN1bHQubmVnYXRlZCkgeworCQkJaWYgKGN0eC0+bGludXhfZXh0ID09IDEp
-CisJCQkJcHJfd2Fybl9vbmNlKCJjb25mbGljdGluZyBwb3NpeCBtb3VudCBvcHRpb25zIHNwZWNp
-ZmllZFxuIik7CiAJCQljdHgtPmxpbnV4X2V4dCA9IDA7Ci0JCWVsc2UKIAkJCWN0eC0+bm9fbGlu
-dXhfZXh0ID0gMTsKKwkJfSBlbHNlIHsKKwkJCWlmIChjdHgtPm5vX2xpbnV4X2V4dCA9PSAxKQor
-CQkJCXByX3dhcm5fb25jZSgiY29uZmxpY3RpbmcgcG9zaXggbW91bnQgb3B0aW9ucyBzcGVjaWZp
-ZWRcbiIpOworCQkJY3R4LT5saW51eF9leHQgPSAxOworCQkJY3R4LT5ub19saW51eF9leHQgPSAw
-OworCQl9CiAJCWJyZWFrOwogCWNhc2UgT3B0X25vY2FzZToKIAkJY3R4LT5ub2Nhc2UgPSAxOwot
-LSAKMi4zMC4yCgo=
---000000000000ce6e0905ca504334--
