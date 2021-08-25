@@ -2,82 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9EAC4338F
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Aug 2021 11:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A158AC4338F
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Aug 2021 14:04:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 890D160F5C
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Aug 2021 11:48:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84229610E8
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Aug 2021 14:04:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239257AbhHYLtL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 25 Aug 2021 07:49:11 -0400
-Received: from mailrelay2-1.pub.mailoutpod1-cph3.one.com ([46.30.210.183]:26136
-        "EHLO mailrelay2-1.pub.mailoutpod1-cph3.one.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232199AbhHYLtL (ORCPT
+        id S240810AbhHYOFP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 25 Aug 2021 10:05:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22175 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240634AbhHYOFN (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 25 Aug 2021 07:49:11 -0400
-X-Greylist: delayed 963 seconds by postgrey-1.27 at vger.kernel.org; Wed, 25 Aug 2021 07:49:10 EDT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tjernlund.se; s=20191106;
-        h=content-transfer-encoding:mime-version:content-type:date:to:from:subject:
-         message-id:from;
-        bh=kjHYQrynI033dEyMNzkrcT20LZafwWRpkmtgJtMg78I=;
-        b=qa0LrV93KubioTbz3u6uXGxJ3VXNcOh0JBmvVXlSq4m8+vJNLigj8B8dMLb8acq5l6LzCVjkmAp/e
-         kxqrVE/iQKovMo9jsmkcSzriobLCYKimXr6Wr8PvGknTqtfR9hIWzCgcOYkOw0hxORvhu2WiKUjsSN
-         uEUMXmUQHBZZqUF4XTjC+UKmM4F7aarbi1KQBVnKy5x9uvbrfHoGoJsD8HNDOvQLdJkH2uiojaeNMX
-         K5NBqLwM+U0WqUEgDvuCmuQxoqBBV8Oh5WXCVOA9qHAB5gtkmQx3g6ZePxH50DcNgwNDlnKo2CMGDF
-         tPDUa6Aqm4WZBOvaLidLFRiZKKekoqQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tjernlund.se; s=rsa1;
-        h=content-transfer-encoding:mime-version:content-type:date:to:from:subject:
-         message-id:from;
-        bh=kjHYQrynI033dEyMNzkrcT20LZafwWRpkmtgJtMg78I=;
-        b=EI2nttjSC+u2J5xyV2/Yxdidsd08qiwXsQy/5WqdY+O2XqmThFwSNlhyBP12b1N3Rg9VZPPyJjRSw
-         R2PodOBrv7iOCF1Bgw0XIrfsISIKMAc/b6LMBm/qReyuY+Xbea7k5XNUBmm+EsMAhav+HAgR4Q6qr0
-         YgVQBswUd81mKQ0LDtPUBUQXMdx1+XO6RGSDw5Bdy3rieoEPQSHaVQLl9h+UhMT8YCRuuvD/45TCSa
-         eCxZTqDBq9qNvpXSYzhWqbfDJrpvGS2P4DEwXDvLjOUaecX1vuaQMrJ3nqe7cnFCD5/FU/tnB799vE
-         j6JesJFQxmBGa0qT3umnaPNN2bSb8Pg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
-        d=tjernlund.se; s=ed1;
-        h=content-transfer-encoding:mime-version:content-type:date:to:from:subject:
-         message-id:from;
-        bh=kjHYQrynI033dEyMNzkrcT20LZafwWRpkmtgJtMg78I=;
-        b=JB+yo7mo4NQDiNUHmN/KWQjB38yvFm2fUoZYrsQlD5kioD2gcIA6HOyPl19aHxVC3dkDnrtobdgVv
-         tEvEXw8DQ==
-X-HalOne-Cookie: 577a3b87c360f9e7fd529f755463a6701fdee6db
-X-HalOne-ID: 1b23d3d0-0598-11ec-bd51-d0431ea8a290
-Received: from jocke.my.home (h-158-174-186-24.na.cust.bahnhof.se [158.174.186.24])
-        by mailrelay2.pub.mailoutpod1-cph3.one.com (Halon) with ESMTPSA
-        id 1b23d3d0-0598-11ec-bd51-d0431ea8a290;
-        Wed, 25 Aug 2021 11:32:19 +0000 (UTC)
-Message-ID: <bec6e1554ba990330cf812050f4b43feda92aeb9.camel@tjernlund.se>
-Subject: CIFS version 1/2 negotiate ?
-From:   Tjernlund <tjernlund@tjernlund.se>
-To:     linux-cifs@vger.kernel.org
-Date:   Wed, 25 Aug 2021 13:32:18 +0200
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.3 
+        Wed, 25 Aug 2021 10:05:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1629900267;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kE8Hzeh9FYFuKZ/G19btpp2uodcRTcaVsAerPbdqFCE=;
+        b=H9T1W8aU6dFiayAryoqAZouyz1/N+VBNPEaoexKdb8l8VET3xSNjigaXAmJh6mJSgu0Nm7
+        UasECGeJBAX8YYZ+NqZfjUd6C0tMJQIAfkZdtf9YcPWwh6KfLbM69z3Pfo18cd/mtZL3Kw
+        0Q6d/Zc2jPOcs6x7Xsx/NgsmEIRoyJ4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-ASdezzy4PASj34NJfVUMLw-1; Wed, 25 Aug 2021 10:04:25 -0400
+X-MC-Unique: ASdezzy4PASj34NJfVUMLw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28BC01853026;
+        Wed, 25 Aug 2021 14:04:24 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.36])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB6F72B3DF;
+        Wed, 25 Aug 2021 14:04:09 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <3d98729b59c2afcad1299a7742211bcdf1598623.camel@redhat.com>
+References: <3d98729b59c2afcad1299a7742211bcdf1598623.camel@redhat.com> <162431188431.2908479.14031376932042135080.stgit@warthog.procyon.org.uk> <162431201844.2908479.8293647220901514696.stgit@warthog.procyon.org.uk>
+To:     Jeff Layton <jlayton@redhat.com>
+Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        David Wysochanski <dwysocha@redhat.com>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/12] fscache: Fix cookie key hashing
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2030820.1629900248.1@warthog.procyon.org.uk>
+Date:   Wed, 25 Aug 2021 15:04:08 +0100
+Message-ID: <2030821.1629900248@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-We got an old netapp server which exposes CIFS vers=1 and when trying to mount shares
-from this netapp we get:
-CIFS: VFS: \\netapp2 Dialect not supported by server. Consider  specifying vers=1.0 or vers=2.0 on mount for accessing older servers
-CIFS: VFS: cifs_mount failed w/return code = -95
+Jeff Layton <jlayton@redhat.com> wrote:
 
-If I specify vers=1 manually on the mount cmd it works.
-However, GUI file managers cannot handle this and less Linux savy users don't know how to
-use the mount cmd manually.
+> What happens when this patch encounters a cache that was built before
+> it? Do you need to couple this with some sort of global cache
+> invalidation or rehashing event?
 
-I wonder if kernel could grow a SMB1 version negotiate so a standard CIFS mount can work?
-We are at kernel 5.13 and I can test/use a kernel patch.
+At the moment, nothing.  cachefiles generates a second hash value, but doing
+so is a duplication of effort.
 
- Jocke
-
+David
 
