@@ -8,83 +8,127 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8733EC432BE
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Aug 2021 20:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 628B0C432BE
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Aug 2021 21:10:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68D1D6108E
-	for <linux-cifs@archiver.kernel.org>; Wed, 25 Aug 2021 20:53:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E8A760F11
+	for <linux-cifs@archiver.kernel.org>; Wed, 25 Aug 2021 21:10:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233413AbhHYUyi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 25 Aug 2021 16:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45464 "EHLO
+        id S230007AbhHYVKr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 25 Aug 2021 17:10:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230025AbhHYUyi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 25 Aug 2021 16:54:38 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE6EC061757
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Aug 2021 13:53:51 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id bq28so1661103lfb.7
-        for <linux-cifs@vger.kernel.org>; Wed, 25 Aug 2021 13:53:51 -0700 (PDT)
+        with ESMTP id S229560AbhHYVKr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 25 Aug 2021 17:10:47 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1A00C061757
+        for <linux-cifs@vger.kernel.org>; Wed, 25 Aug 2021 14:10:00 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id x27so1767842lfu.5
+        for <linux-cifs@vger.kernel.org>; Wed, 25 Aug 2021 14:10:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=C9//a+LSuIWJkkEL76kxV5/lkLm/niGmSfRELtsM7Ug=;
-        b=fTX9lNNy9nklfnn3MsTand4oEIvDqYsL2MVuNouXPfNEtk4bIchclxBMq2AfdsJEqg
-         5Q9KfvAOJKVrWXlGLQyY9Gen6UwcZO52tG059yHDGHIYTygDwXZ6FQRp+pkkNdBokz8b
-         0Bnde/daOI1dvpSSt5n0zHqjeQgd+XvSENWa8ALY5SI4bxcVeDNxu89DcN3nxAMXYSej
-         rGEJal52ezRzIzDAGBpMPpopjb6qYyJgYZfqDYnTIWRYYsi6jzMYljEW4ugaY3LPTeX1
-         1rgE3CaW6SFZYlbF1+3eMFU4ujCkC2X46a5cNhbF4LZkjIwYDmcQqTCYrNZ52eiXM85P
-         r0YQ==
+        bh=kthIjAnahfC1JXexjMxRwfPUXTEZcPOImtTp9qveKDw=;
+        b=Dpwy1Vj2aisftuwVq57lO3bFu4aoHPQ4vpBuss7SX6NPgAM2YP2VJYT6dh8vc+hZJt
+         QG75rb8SbvOo011ihHj9pZvqD0iTTrJan61OKh9LQIVCcwjfN5eCNlixpZS/saHSGpCi
+         7xFeRTZuOI+jjW+stcN7Oj6586XF9FLNrI7aTQiaC14ML/TCoo65jAxRg/ZeFr5IdFCA
+         aFdbBHMdseStikcpx4S99GTY2Bax0c6+lJNKruDHtwWkc6unsJF4kqjeZ11sIvbIwCj3
+         Rs9B7Topqw0VTCrRkuqKYlcnH7kp3vule0UmS4UnbqylvAM0jqbY1wkTLVuGMDfAAcKZ
+         L0Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=C9//a+LSuIWJkkEL76kxV5/lkLm/niGmSfRELtsM7Ug=;
-        b=Kw5BF91iSCX/kpr7F6BTYRcyowTP2Ia3T7mJIvts0K6Si40CtFDNTFz2cEGu5w/0/z
-         zZiDpa8FWaErlpthg6hzlQywCLK3oC9/W4jJbJJtoC6KMU2BhZxVh9Qp0wJlGKlg6N0k
-         KSBlIBACvHbqQa9GGpVumHX2ur+hCs4XI4jOwRJvOTIcrwOhA/69uNr1fsF8IrSCUa9C
-         YIKlR9Cla+x1NtQcirT1K03rfEyMVC7xu32YPQAEJFvVDGvzy806DjtbqKJ2XbJNVori
-         X+TDQc9JdjGjVykCb4Nz38K1u71loBkA6t2aGnpvXKOGbzHOeOFmGokfl+yLKx6e6BeS
-         0BRA==
-X-Gm-Message-State: AOAM530cgQgood7RNiRUQROnvbDG/7YPro7Z3H2qyzx1oEgH3PcWgfQ0
-        fgx8EES7e1K5a0fgqba5yHaZupBP49EDQrVehqgwzUJL
-X-Google-Smtp-Source: ABdhPJzSuqHixgfZoxefLM2Mxx9TyxYrWqbKTziQDSXT0BVU6vjJmiv+6VwPFAk7l0SBrLcJQCVwqHPihpf+GIij20Q=
-X-Received: by 2002:a05:6512:3ef:: with SMTP id n15mr58019lfq.184.1629924829953;
- Wed, 25 Aug 2021 13:53:49 -0700 (PDT)
+        bh=kthIjAnahfC1JXexjMxRwfPUXTEZcPOImtTp9qveKDw=;
+        b=JfW4bY/ccdqQyOEj1cm8x4guBn9LTKkC/SQXJ8OFylgu/CWdJdSSfFL3V5D1wsNLPs
+         GF7Vr19oIkGCf2H4PKMlY3DS1K/g+Im1Xy98xUH3i7FPTGrgRtVelP4fZAGY+ifIKU34
+         Lh0/GOmaKHZRb/Q6Oh+R3pv4zx1C9fShH2FN6SUb68jrxa03aguua3LqjUG6XtWQrydA
+         zJVUB/8w9d+FYzmXnyAR8lM7+73yBcgq5QZqlKMQAQF/1YZoO1veDDpNCC4dLDqiBP9i
+         iX3/9Wphfu1nLND8rG/V82FS+oi+da9HqonvklZy/l/0OS/cHHQ39c4Jj13C1/pl5omf
+         Vrag==
+X-Gm-Message-State: AOAM531p0qjWIwruKispbsxIuVOC7V+DjrN72qzv5pN8j7VVWavhcn32
+        XhiRjzfCpgq8nEWjlcQmSfNoFisCT8aMj+dy4X9yDx2E
+X-Google-Smtp-Source: ABdhPJyspmToAJVrAfW6HmSbnu81+L5Sn0UwbHryiv9G4jBJ8yz/t4EkxKJO9Y5y+tXskZaNAzbQ/Mmg4kDwD3mr14g=
+X-Received: by 2002:ac2:4d0d:: with SMTP id r13mr69708lfi.307.1629925798851;
+ Wed, 25 Aug 2021 14:09:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mu-QRnkdaB=nNVY2Q3Dhb5vgnk4n0XnMADMWkEGbtchFw@mail.gmail.com>
- <YSXgH2KobLW0JEjP@infradead.org>
-In-Reply-To: <YSXgH2KobLW0JEjP@infradead.org>
+References: <20210825111656.1635954-1-lsahlber@redhat.com> <20210825111656.1635954-2-lsahlber@redhat.com>
+In-Reply-To: <20210825111656.1635954-2-lsahlber@redhat.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 25 Aug 2021 15:53:38 -0500
-Message-ID: <CAH2r5mvDcO8aHfw8Do4jS=DDpsCE6P+SNjCguKDMuusBeA898w@mail.gmail.com>
-Subject: Re: [PATCH] cifs: cifs_md4 convert to SPDX identifier
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="00000000000080228b05ca6872d0"
+Date:   Wed, 25 Aug 2021 16:09:47 -0500
+Message-ID: <CAH2r5ms2KzVf-7ei2+m_GbwcvZ7PHTCbv33bhNaH9dXXWcVO1w@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Do not leak EDEADLK to dgetents64 for STATUS_USER_SESSION_DELETED
+To:     Ronnie Sahlberg <lsahlber@redhat.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="0000000000004051cb05ca68ac60"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000080228b05ca6872d0
+--0000000000004051cb05ca68ac60
 Content-Type: text/plain; charset="UTF-8"
 
-Removed the file name from the top of header comments as suggested.
+lightly updated to add short sleep before retry
 
-On Wed, Aug 25, 2021 at 1:16 AM Christoph Hellwig <hch@infradead.org> wrote:
+
+On Wed, Aug 25, 2021 at 6:17 AM Ronnie Sahlberg <lsahlber@redhat.com> wrote:
 >
-> On Tue, Aug 24, 2021 at 12:15:05PM -0500, Steve French wrote:
-> > - *   fs/smb2/smb2maperror.c
-> > + *   fs/cifs/smb2maperror.c
+> RHBZ: 1994393
 >
+> If we hit a STATUS_USER_SESSION_DELETED for the Create part in the
+> Create/QueryDirectory compound that starts a directory scan
+> we will leak EDEADLK back to userspace and surprise glibc and the application.
 >
-> >  /*
-> > + * fs/cifs_common/cifs_md4.c
-> > + *
+> Pick this up initiate_cifs_search() and retry a small number of tries before we
+> return an error to userspace.
 >
-> This is a good reminder on why putting the file name into the top of
-> file comment is stupid.  Just don't do it.
+> Cc: stable@vger.kernel.org
+> Reported-by: Xiaoli Feng <xifeng@redhat.com>
+> Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> ---
+>  fs/cifs/readdir.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/cifs/readdir.c b/fs/cifs/readdir.c
+> index bfee176b901d..4518e3ca64df 100644
+> --- a/fs/cifs/readdir.c
+> +++ b/fs/cifs/readdir.c
+> @@ -369,7 +369,7 @@ int get_symlink_reparse_path(char *full_path, struct cifs_sb_info *cifs_sb,
+>   */
+>
+>  static int
+> -initiate_cifs_search(const unsigned int xid, struct file *file,
+> +_initiate_cifs_search(const unsigned int xid, struct file *file,
+>                      const char *full_path)
+>  {
+>         __u16 search_flags;
+> @@ -451,6 +451,23 @@ initiate_cifs_search(const unsigned int xid, struct file *file,
+>         return rc;
+>  }
+>
+> +static int
+> +initiate_cifs_search(const unsigned int xid, struct file *file,
+> +                    const char *full_path)
+> +{
+> +       int rc, retry_count = 0;
+> +
+> +       do {
+> +               rc = _initiate_cifs_search(xid, file, full_path);
+> +               /*
+> +                * We don't have enough credits to start reading the
+> +                * directory so just try again.
+> +                */
+> +       } while (rc == -EDEADLK && retry_count++ < 5);
+> +
+> +       return rc;
+> +}
+> +
+>  /* return length of unicode string in bytes */
+>  static int cifs_unicode_bytelen(const char *str)
+>  {
+> --
+> 2.30.2
 >
 
 
@@ -93,40 +137,48 @@ Thanks,
 
 Steve
 
---00000000000080228b05ca6872d0
+--0000000000004051cb05ca68ac60
 Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-cifs_md4-convert-to-SPDX-identifier.patch"
+	name="0001-cifs-Do-not-leak-EDEADLK-to-dgetents64-for-STATUS_US.patch"
 Content-Disposition: attachment; 
-	filename="0001-cifs-cifs_md4-convert-to-SPDX-identifier.patch"
+	filename="0001-cifs-Do-not-leak-EDEADLK-to-dgetents64-for-STATUS_US.patch"
 Content-Transfer-Encoding: base64
-Content-ID: <f_ksrz4u3f0>
-X-Attachment-Id: f_ksrz4u3f0
+Content-ID: <f_ksrzq5aw0>
+X-Attachment-Id: f_ksrzq5aw0
 
-RnJvbSAzOGY0OTEwYjhiMjZkM2E5NDAxNjdmMjA3YmRkZmNjNTg5MzEwYzhhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
-CkRhdGU6IFR1ZSwgMjQgQXVnIDIwMjEgMTI6MDc6NDYgLTA1MDAKU3ViamVjdDogW1BBVENIXSBj
-aWZzOiBjaWZzX21kNCBjb252ZXJ0IHRvIFNQRFggaWRlbnRpZmllcgoKQWRkIFNQRFggbGljZW5z
-ZSBpZGVudGlmaWVyIGFuZCByZXBsYWNlIGxpY2Vuc2UgYm9pbGVycGxhdGUKZm9yIGNpZnNfbWQ0
-LmMKClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4K
-LS0tCiBmcy9jaWZzL3NtYjJtYXBlcnJvci5jICAgIHwgMSAtCiBmcy9jaWZzX2NvbW1vbi9jaWZz
-X21kNC5jIHwgNiArLS0tLS0KIDIgZmlsZXMgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDYgZGVs
-ZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9zbWIybWFwZXJyb3IuYyBiL2ZzL2NpZnMv
-c21iMm1hcGVycm9yLmMKaW5kZXggY2VhMzliY2VjYmFiLi4xODE1MTRiODc3MGQgMTAwNjQ0Ci0t
-LSBhL2ZzL2NpZnMvc21iMm1hcGVycm9yLmMKKysrIGIvZnMvY2lmcy9zbWIybWFwZXJyb3IuYwpA
-QCAtMSw2ICsxLDUgQEAKIC8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBMR1BMLTIuMQogLyoK
-LSAqICAgZnMvc21iMi9zbWIybWFwZXJyb3IuYwogICoKICAqICAgRnVuY3Rpb25zIHdoaWNoIGRv
-IGVycm9yIG1hcHBpbmcgb2YgU01CMiBzdGF0dXMgY29kZXMgdG8gUE9TSVggZXJyb3JzCiAgKgpk
-aWZmIC0tZ2l0IGEvZnMvY2lmc19jb21tb24vY2lmc19tZDQuYyBiL2ZzL2NpZnNfY29tbW9uL2Np
-ZnNfbWQ0LmMKaW5kZXggZGJmOTExM2I4NjAwLi41MGY3OGNmYzZjZTkgMTAwNjQ0Ci0tLSBhL2Zz
-L2NpZnNfY29tbW9uL2NpZnNfbWQ0LmMKKysrIGIvZnMvY2lmc19jb21tb24vY2lmc19tZDQuYwpA
-QCAtMSwzICsxLDQgQEAKKy8vIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wCiAvKgog
-ICogQ3J5cHRvZ3JhcGhpYyBBUEkuCiAgKgpAQCAtMTQsMTEgKzE1LDYgQEAKICAqIENvcHlyaWdo
-dCAoYykgMjAwMiBEYXZpZCBTLiBNaWxsZXIgKGRhdmVtQHJlZGhhdC5jb20pCiAgKiBDb3B5cmln
-aHQgKGMpIDIwMDIgSmFtZXMgTW9ycmlzIDxqbW9ycmlzQGludGVyY29kZS5jb20uYXU+CiAgKgot
-ICogVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0
-IGFuZC9vciBtb2RpZnkKLSAqIGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwg
-UHVibGljIExpY2Vuc2UgYXMgcHVibGlzaGVkIGJ5Ci0gKiB0aGUgRnJlZSBTb2Z0d2FyZSBGb3Vu
-ZGF0aW9uOyBlaXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBMaWNlbnNlLCBvcgotICogKGF0IHlvdXIg
-b3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lvbi4KLSAqCiAgKi8KICNpbmNsdWRlIDxsaW51eC9pbml0
-Lmg+CiAjaW5jbHVkZSA8bGludXgva2VybmVsLmg+Ci0tIAoyLjMwLjIKCg==
---00000000000080228b05ca6872d0--
+RnJvbSA1N2NlYTUwZmE1YTMwMDY4NzUyYTgxNTVlMWM3MjMwYzhjNTg1NDkzIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBSb25uaWUgU2FobGJlcmcgPGxzYWhsYmVyQHJlZGhhdC5jb20+
+CkRhdGU6IFdlZCwgMjUgQXVnIDIwMjEgMjE6MTY6NTYgKzEwMDAKU3ViamVjdDogW1BBVENIXSBj
+aWZzOiBEbyBub3QgbGVhayBFREVBRExLIHRvIGRnZXRlbnRzNjQgZm9yCiBTVEFUVVNfVVNFUl9T
+RVNTSU9OX0RFTEVURUQKClJIQlo6IDE5OTQzOTMKCklmIHdlIGhpdCBhIFNUQVRVU19VU0VSX1NF
+U1NJT05fREVMRVRFRCBmb3IgdGhlIENyZWF0ZSBwYXJ0IGluIHRoZQpDcmVhdGUvUXVlcnlEaXJl
+Y3RvcnkgY29tcG91bmQgdGhhdCBzdGFydHMgYSBkaXJlY3Rvcnkgc2Nhbgp3ZSB3aWxsIGxlYWsg
+RURFQURMSyBiYWNrIHRvIHVzZXJzcGFjZSBhbmQgc3VycHJpc2UgZ2xpYmMgYW5kIHRoZSBhcHBs
+aWNhdGlvbi4KClBpY2sgdGhpcyB1cCBpbml0aWF0ZV9jaWZzX3NlYXJjaCgpIGFuZCByZXRyeSBh
+IHNtYWxsIG51bWJlciBvZiB0cmllcyBiZWZvcmUgd2UKcmV0dXJuIGFuIGVycm9yIHRvIHVzZXJz
+cGFjZS4KCkNjOiBzdGFibGVAdmdlci5rZXJuZWwub3JnClJlcG9ydGVkLWJ5OiBYaWFvbGkgRmVu
+ZyA8eGlmZW5nQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6IFJvbm5pZSBTYWhsYmVyZyA8bHNh
+aGxiZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBt
+aWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvcmVhZGRpci5jIHwgMjMgKysrKysrKysrKysrKysr
+KysrKysrKy0KIDEgZmlsZSBjaGFuZ2VkLCAyMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0p
+CgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9yZWFkZGlyLmMgYi9mcy9jaWZzL3JlYWRkaXIuYwppbmRl
+eCBiZmVlMTc2YjkwMWQuLjU0ZDc3Yzk5ZTIxYyAxMDA2NDQKLS0tIGEvZnMvY2lmcy9yZWFkZGly
+LmMKKysrIGIvZnMvY2lmcy9yZWFkZGlyLmMKQEAgLTM2OSw3ICszNjksNyBAQCBpbnQgZ2V0X3N5
+bWxpbmtfcmVwYXJzZV9wYXRoKGNoYXIgKmZ1bGxfcGF0aCwgc3RydWN0IGNpZnNfc2JfaW5mbyAq
+Y2lmc19zYiwKICAqLwogCiBzdGF0aWMgaW50Ci1pbml0aWF0ZV9jaWZzX3NlYXJjaChjb25zdCB1
+bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgZmlsZSAqZmlsZSwKK19pbml0aWF0ZV9jaWZzX3NlYXJj
+aChjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1Y3QgZmlsZSAqZmlsZSwKIAkJICAgICBjb25z
+dCBjaGFyICpmdWxsX3BhdGgpCiB7CiAJX191MTYgc2VhcmNoX2ZsYWdzOwpAQCAtNDUxLDYgKzQ1
+MSwyNyBAQCBpbml0aWF0ZV9jaWZzX3NlYXJjaChjb25zdCB1bnNpZ25lZCBpbnQgeGlkLCBzdHJ1
+Y3QgZmlsZSAqZmlsZSwKIAlyZXR1cm4gcmM7CiB9CiAKK3N0YXRpYyBpbnQKK2luaXRpYXRlX2Np
+ZnNfc2VhcmNoKGNvbnN0IHVuc2lnbmVkIGludCB4aWQsIHN0cnVjdCBmaWxlICpmaWxlLAorCQkg
+ICAgIGNvbnN0IGNoYXIgKmZ1bGxfcGF0aCkKK3sKKwlpbnQgcmMsIHJldHJ5X2NvdW50ID0gMDsK
+KworCWRvIHsKKwkJcmMgPSBfaW5pdGlhdGVfY2lmc19zZWFyY2goeGlkLCBmaWxlLCBmdWxsX3Bh
+dGgpOworCQkvKgorCQkgKiBJZiB3ZSBkb24ndCBoYXZlIGVub3VnaCBjcmVkaXRzIHRvIHN0YXJ0
+IHJlYWRpbmcgdGhlCisJCSAqIGRpcmVjdG9yeSBqdXN0IHRyeSBhZ2FpbiBhZnRlciBzaG9ydCB3
+YWl0LgorCQkgKi8KKwkJaWYgKHJjICE9IC1FREVBRExLKQorCQkJYnJlYWs7CisKKwkJdXNsZWVw
+X3JhbmdlKDUxMiwgMjA0OCk7CisJfSB3aGlsZSAocmV0cnlfY291bnQrKyA8IDUpOworCisJcmV0
+dXJuIHJjOworfQorCiAvKiByZXR1cm4gbGVuZ3RoIG9mIHVuaWNvZGUgc3RyaW5nIGluIGJ5dGVz
+ICovCiBzdGF0aWMgaW50IGNpZnNfdW5pY29kZV9ieXRlbGVuKGNvbnN0IGNoYXIgKnN0cikKIHsK
+LS0gCjIuMzAuMgoK
+--0000000000004051cb05ca68ac60--
