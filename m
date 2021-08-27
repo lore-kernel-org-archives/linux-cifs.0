@@ -2,103 +2,94 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BCAEC432BE
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Aug 2021 12:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C492C432BE
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Aug 2021 12:49:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6994B604DC
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Aug 2021 12:37:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F05960560
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Aug 2021 12:49:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235534AbhH0Mh7 convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 Aug 2021 08:37:59 -0400
-Received: from mx01.geo.uzh.ch ([130.60.176.135]:33204 "EHLO mx01.geo.uzh.ch"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231414AbhH0Mh7 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 27 Aug 2021 08:37:59 -0400
-X-Virus-Scanned: Debian amavisd-new at geo.uzh.ch
-Received: from brisen.service.geo.uzh.ch (unknown [130.60.176.40])
-        by mx01.geo.uzh.ch (Postfix) with ESMTP id 4C77B260121;
-        Fri, 27 Aug 2021 14:37:09 +0200 (CEST)
-Received: from smtpclient.apple (unknown [192.168.246.10])
-        by brisen.service.geo.uzh.ch (Postfix) with ESMTPSA id 3A50FBD518;
-        Fri, 27 Aug 2021 14:37:09 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: Kernel lockup upon dfs_cache_update
-From:   Thomas Werschlein <thomas.werschlein@geo.uzh.ch>
-In-Reply-To: <87wnotmjgi.fsf@cjr.nz>
-Date:   Fri, 27 Aug 2021 14:37:08 +0200
-Cc:     linux-cifs@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <129D2168-B041-402A-B111-D9A68B85E5D9@geo.uzh.ch>
-References: <C36709C4-A89B-40A8-819B-F54828F8788D@geo.uzh.ch>
- <87wnotmjgi.fsf@cjr.nz>
-To:     Paulo Alcantara <pc@cjr.nz>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        id S245105AbhH0Mui (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 Aug 2021 08:50:38 -0400
+Received: from mail-ed1-f53.google.com ([209.85.208.53]:39607 "EHLO
+        mail-ed1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231271AbhH0Mui (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 27 Aug 2021 08:50:38 -0400
+Received: by mail-ed1-f53.google.com with SMTP id z10so9708414edb.6;
+        Fri, 27 Aug 2021 05:49:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6BL24id7m8wPcedNjNI4ZZt0Go13BjZ8iUQt2C7HOss=;
+        b=MaBPemzNUUDEKOhzhtzL0KzbdrQMYRJodbbaWmySuLfia+ocwpM+Wekp2DOAwDkdz0
+         shnThjlRclnLy8RQTwZl8s0dMNGjfbg/3Q2Mp3uuuLv7XYMnVJ8QacJr7ms10GMh/9kM
+         ThS4A8c3k0G7Nv/MO/FNW5tz9mumomfmSULmKISlVnOrU7ngcjywpqEvYrVKvlJoKT43
+         mUrJ+lNU+fmHUCSy0qBbpCc7vY4wPmoZ5uFcsvP2HiRuh6V9vNyl93cucpYyLx2ydY06
+         vCX99xbRbSl2vKwg4H4Xm+cOCzL1KaIH9EKel5l5fUZM+VHiahx/UvLiL/QMnCKnP/WY
+         ll1w==
+X-Gm-Message-State: AOAM532j4geRmapEztXd+PbT21utGr0kIb8YZ9u14mHOTNEWU8v9rgd1
+        7U4PM+ggrPYNPmMDPdqm+0rl9925UJDZ9zr8
+X-Google-Smtp-Source: ABdhPJy370SJ1btGaw0ga5We9U64ToDoPTBFKka6j32kf3xWuyOxS5J+jcxpBzYUVwK9pBMWYamuig==
+X-Received: by 2002:a05:6402:5188:: with SMTP id q8mr10048823edd.138.1630068588024;
+        Fri, 27 Aug 2021 05:49:48 -0700 (PDT)
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com. [209.85.128.46])
+        by smtp.gmail.com with ESMTPSA id l19sm3292422edb.86.2021.08.27.05.49.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Aug 2021 05:49:47 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 79-20020a1c0452000000b002e6cf79e572so9158652wme.1;
+        Fri, 27 Aug 2021 05:49:47 -0700 (PDT)
+X-Received: by 2002:a05:600c:35c1:: with SMTP id r1mr8646060wmq.101.1630068587111;
+ Fri, 27 Aug 2021 05:49:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <162431188431.2908479.14031376932042135080.stgit@warthog.procyon.org.uk>
+ <162431193544.2908479.17556704572948300790.stgit@warthog.procyon.org.uk> <2512396.1630067489@warthog.procyon.org.uk>
+In-Reply-To: <2512396.1630067489@warthog.procyon.org.uk>
+From:   Marc Dionne <marc.dionne@auristor.com>
+Date:   Fri, 27 Aug 2021 09:49:35 -0300
+X-Gmail-Original-Message-ID: <CAB9dFdufkVyqS4NadbqVrtjmciLvpuAZOU8woWWcURcnuaZ=GA@mail.gmail.com>
+Message-ID: <CAB9dFdufkVyqS4NadbqVrtjmciLvpuAZOU8woWWcURcnuaZ=GA@mail.gmail.com>
+Subject: Re: [Linux-cachefs] [PATCH v2 04/12] fscache: Add a cookie debug ID
+ and use that in traces
+To:     David Howells <dhowells@redhat.com>
+Cc:     linux-cachefs@redhat.com, Steve French <sfrench@samba.org>,
+        linux-nfs@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, ceph-devel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+On Fri, Aug 27, 2021 at 9:31 AM David Howells <dhowells@redhat.com> wrote:
+>
+>
+> Add a cookie debug ID and use that in traces and in procfiles rather than
+> displaying the (hashed) pointer to the cookie.  This is easier to correlate
+> and we don't lose anything when interpreting oops output since that shows
+> unhashed addresses and registers that aren't comparable to the hashed
+> values.
+>
+> Changes:
+>
+> ver #2:
+>  - Fix the fscache_op tracepoint to handle a NULL cookie pointer.
+>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Reviewed-by: Jeff Layton <jlayton@redhat.com>
+> cc: linux-cachefs@redhat.com
+> Link: https://lore.kernel.org/r/158861210988.340223.11688464116498247790.stgit@warthog.procyon.org.uk/ # rfc
+> Link: https://lore.kernel.org/r/159465769844.1376105.14119502774019865432.stgit@warthog.procyon.org.uk/
+> Link: https://lore.kernel.org/r/160588459097.3465195.1273313637721852165.stgit@warthog.procyon.org.uk/ # rfc
+> Link: https://lore.kernel.org/r/162431193544.2908479.17556704572948300790.stgit@warthog.procyon.org.uk/
 
-> On Tue, Aug 10, 2021 at 5:02 PM Paulo Alcantara <pc@cjr.nz> wrote:
-> 
-> Thomas Werschlein <thomas.werschlein@geo.uzh.ch> writes:
-> 
->> Hi
->> 
->> We are mounting SMB shares from Windows and FreeBSD servers to AD-joined (Ubuntu) Linux clients, using DFS and Kerberos.
->> 
->> A sample /etc/fstab entry looks like this:
->> //files.d.example.com/shared /files/shared cifs defaults,sec=krb5i,vers=3,seal,multiuser,noserverino,username=LINUXCLIENT$ 0 0
->> 
->> The machine account LINUXCLIENT$ is able to browse the DFS tree and mount the shares.
->> The credentials for the principal LINUXCLIENT$@D.EXAMPLE.COM are stored in the default keytab (/etc/krb5.keytab).
->> In order to access a share a user needs a personal KRB ticket (either through kinit or GSSAPI delegated credentials upon ssh login).
->> 
->> This works fine on Ubuntu 18.04 (4.15.0-153-generic Kernel, 2.10 cifs.ko), but doesn't on Ubuntu 20.04 (5.4.0-80-generic, 2.23).
->> To be precise: it works for the first 10 hours (the ticket lifetime) even on Ubuntu 20.04.
->> 
->> My findings so far:
->> - this lockup (after 10h) *only* occurs when DFS is involved. Mounting a target share directly "survives" the ticket expiry
->> - this problem does *not* manifest with the newest kernel/cifs.ko combo (5.14.0-051400rc5-generic/2.33)
->> 
->> Therefore:
->> Could it be, that the DFS patches contributed by Paulo Alcantara on June 4 2021 (https://www.spinics.net/lists/linux-cifs/msg21999.html)
->> fixed this problem?
-> 
-> Yes, that is possible.  We found out some deadlock and race scenarios
-> but couldn't remember if the above was one of them.  Still worth having
-> those commits backported.
+Reviewed-by: Marc Dionne <marc.dionne@auristor.com>
 
-Thanks for your (possible) confirmation.
-
-> 
->> 
->> Two of his comments point into that direction: 
->>  [...]
->>  - keep SMB sessions alive as long as dfs mounts are actives in order
->>    to refresh cached entries by using IPC tcons.
->>  [...]
->>  - skip unnecessary tree disconnect of IPCs when shutting down SMB
->>    sessions (it didn't even work before).
->> 
->> Am I on the right track here? And if so: are there any plans to backport Paulo's patches to current kernels?
-> 
-> Yes.  I don't know if there any plans, but the only tricky part is
-> changing the commits to work with the old mount api on <5.11 kernels.
-
-I wasn't aware of Ubuntu's "LTS enablement stack" (https://wiki.ubuntu.com/Kernel/LTSEnablementStack).
-A simple 'sudo apt install --install-recommends linux-generic-hwe-20.04' brings the latest LTS to Kernel 5.11.0-27 and cifs.ko to 2.30.
-
-Strange enough (but gratefully so) this did solve my problem - the lockups don't manifest anymore.
-I wouldn't have expected this, since your patches from June 4 brought cifs.ko to 2.31. Must be some earlier change then?
-
-Anyway, our problem is gone. Thanks again.
-
-Best regards
-Thomas
+Marc
