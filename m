@@ -2,107 +2,115 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E185C432BE
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Aug 2021 19:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E8D3C4320E
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Aug 2021 09:44:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EEAB60EFE
-	for <linux-cifs@archiver.kernel.org>; Thu, 26 Aug 2021 19:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9BE360FD8
+	for <linux-cifs@archiver.kernel.org>; Fri, 27 Aug 2021 09:44:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243488AbhHZTTX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 26 Aug 2021 15:19:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42552 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243494AbhHZTTV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 26 Aug 2021 15:19:21 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B617C061757
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Aug 2021 12:18:33 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id h1so7024841ljl.9
-        for <linux-cifs@vger.kernel.org>; Thu, 26 Aug 2021 12:18:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MnXDnvEa5pEjcGJwfJwz1IjuV9YT7XSsO+QYPYQmxDc=;
-        b=FOEjJTucJIEKxg3dOfHww9vmbh9JsU697XKlCHDJ14oPPkaQzS2nxkSxSkvWg1ewxf
-         zfPyyJoc8J/of0wuzRqVbpbeiHP6G1l2WFzNHoMWdVp0jJMEKInp+hZComiMyF9HJ1Q5
-         mVipWSunEm5Sjl5YAHD98UtJHGnmyU7Ddqql/u/0XoS+r4SmWxv0lnnXo2bQdOqMfb96
-         J0LMvINqtI80NiYOYFKGRgn8kQFdg0DTptHCDM2cjjZbWjERyxF9q+pDlVn7VekiBdjm
-         DnYaRTqnEtjdkT2VyjQxp4Q6soOdFT/I5VzAN2gQ8LcfDnADPRhsMjB9RcRkWxnpyVUm
-         Pogg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MnXDnvEa5pEjcGJwfJwz1IjuV9YT7XSsO+QYPYQmxDc=;
-        b=mCE8gC9wQv4XhiPsuqT+pCFYrzAu7YMWVbyiQlkVFgWg9BFnLB3unnAiOnaYpkUrLf
-         gBMivt+NmuFMXj/SFuzTuSC1JeTTpYh08mKN0I3HL8/WyJvSK3mx73S7q9YgBID4nLhk
-         HRphIe9tsM9srLOU78U2fO8qUr8D+7Ze0hjdnTEsXvIA6dyWwRk4ceGBWBUvMkSflKuI
-         DZ+TOT9grW5wtIFNQfQNbybaer78agiuNCZ85/OZk19JBDdsb5CKfOBSFglbgnlQ2I5I
-         OHFYpsB+qHA7jj+ZRu8Oh38nchQHWxyQkSq4fMjgd1AUwGOUC8RXgUZkB7hLKGFJFEHd
-         hzCw==
-X-Gm-Message-State: AOAM533RIf67sezPsR6ILIRS5+6t8fADxmIT8YFi49G+khqG5koWLxJ+
-        L+w5ZZtQB/dppOlyzF0Dl9/ozq9qQolb0V/FhRYJ4T0x
-X-Google-Smtp-Source: ABdhPJxizp3kaB5ykUW3hD278EHuu5rdnHi2d61KXLQ82SsFNvUyXuFq7KPxYnJv824+E5HmyQlyLa/pyL4vQ0498IE=
-X-Received: by 2002:a2e:8e62:: with SMTP id t2mr4462929ljk.477.1630005511739;
- Thu, 26 Aug 2021 12:18:31 -0700 (PDT)
+        id S244997AbhH0Jov (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 27 Aug 2021 05:44:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56190 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244898AbhH0Jos (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 27 Aug 2021 05:44:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630057439;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Db4J9qqzVtQ4nd+3HQst+edgAm4oaZrD+OaQmGzLIq8=;
+        b=duN+2oGVL9Q9rQewV8OfwzxIo1mIywSpVp5AEiVGabq/9Ey0OAHrSQ/RFy91K5GGRCj9JZ
+        nojxXQ0noZPn93HLQbjuIv7cVFWww/zhgdehKENhGMBSGSMFpjZb1uUL2up3498v06IbJ7
+        JBdn/4Okgt/Xh5FeiNfjmMKccEFHOJs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-9Sg_JrpyPwC_i1p3yT2gAQ-1; Fri, 27 Aug 2021 05:43:57 -0400
+X-MC-Unique: 9Sg_JrpyPwC_i1p3yT2gAQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D8191015193;
+        Fri, 27 Aug 2021 09:43:31 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.36])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 07ED9752A0;
+        Fri, 27 Aug 2021 09:43:27 +0000 (UTC)
+Subject: [PATCH v2 0/6] netfs, afs, ceph: Support folios, at least partially
+From:   David Howells <dhowells@redhat.com>
+To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc:     linux-afs@lists.infradead.org, linux-cachefs@redhat.com,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Jeffrey Altman <jaltman@auristor.com>,
+        ceph-devel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>, dhowells@redhat.com,
+        Jeff Layton <jlayton@kernel.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        linux-fsdevel@vger.kernel.org, linux-cachefs@redhat.com,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, devel@lists.orangefs.org,
+        linux-mm@kvack.org, linux-kernel@vger.kernel.org
+Date:   Fri, 27 Aug 2021 10:43:27 +0100
+Message-ID: <163005740700.2472992.12365214290752300378.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-References: <bec6e1554ba990330cf812050f4b43feda92aeb9.camel@tjernlund.se> <CAN05THRp0AcQvgn2ro-0M12i90FMnQfBCo7AFbf1qQCF2dtUjQ@mail.gmail.com>
-In-Reply-To: <CAN05THRp0AcQvgn2ro-0M12i90FMnQfBCo7AFbf1qQCF2dtUjQ@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 26 Aug 2021 14:18:20 -0500
-Message-ID: <CAH2r5mtCefKR2sqspkjGS6kg0D5YKvwi0Xz=j+4xbf8542OFVQ@mail.gmail.com>
-Subject: Re: CIFS version 1/2 negotiate ?
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Tjernlund <tjernlund@tjernlund.se>,
-        linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Aug 26, 2021 at 1:35 PM ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
->
-> On Wed, Aug 25, 2021 at 9:49 PM Tjernlund <tjernlund@tjernlund.se> wrote:
-> >
-> > We got an old netapp server which exposes CIFS vers=1 and when trying to mount shares
-> > from this netapp we get:
-> > CIFS: VFS: \\netapp2 Dialect not supported by server. Consider  specifying vers=1.0 or vers=2.0 on mount for accessing older servers
-> > CIFS: VFS: cifs_mount failed w/return code = -95
-> >
-> > If I specify vers=1 manually on the mount cmd it works.
-> > However, GUI file managers cannot handle this and less Linux savy users don't know how to
-> > use the mount cmd manually.
-> >
-> > I wonder if kernel could grow a SMB1 version negotiate so a standard CIFS mount can work?
-> > We are at kernel 5.13 and I can test/use a kernel patch.
->
-> I don't think we can do that in the client.  We are all trying to move
-> away from SMB1, and a lot of servers already today
-> have it either disabled by default or even removed from the compile.
-> So enabling automatic multi-protocol support for SMB1 is the wrong
-> direction for us.
->
-> For that reason I think there will also be pushback from GUI
-> filemanagers to add a "smb1 tickbox", but you can try.
->
-> Other solutions could be to locally hack and replace mount.cifs with a
-> patch to "detect if servername matches the old netapp and
-> automatically add a vers=1 to the mount argument string passed to the
-> kernel".
-> It would require you to build a patched version of cifs-utils and
-> distribute to all the client machines though, so ...
-You could do a small mount.cifs pass through script that adds
-"vers=1.0" and then calls the real mount.cifs ... might also be able
-to put the mount options in /etc/fstab with vers=1.0
 
--- 
-Thanks,
+Here's a set of patches to convert netfs and afs to use folios and to
+provide sufficient conversion for ceph that it can continue to use the
+netfs library.  Jeff Layton is working on fully converting ceph.
 
-Steve
+This based on top of part of Matthew Wilcox's folio changes[1]
+
+Changes:
+
+ver #2:
+ - Reorder the patches to put both non-folio afs patches to the front.
+ - Use page_offset() rather than manual calculation[2].
+ - Fix folio_inode() to directly access the inode[3].
+
+David
+
+Link: https://git.infradead.org/users/willy/pagecache.git/shortlog/refs/heads/for-next [1]
+Link: https://lore.kernel.org/r/YST/0e92OdSH0zjg@casper.infradead.org/ [2]
+Link: https://lore.kernel.org/r/YST8OcVNy02Rivbm@casper.infradead.org/ [3]
+Link: https://lore.kernel.org/r/2408234.1628687271@warthog.procyon.org.uk/ # v0
+Link: https://lore.kernel.org/r/162981147473.1901565.1455657509200944265.stgit@warthog.procyon.org.uk/ # v1
+---
+David Howells (6):
+      afs: Fix afs_launder_page() to set correct start file position
+      afs: Sort out symlink reading
+      folio: Add a function to change the private data attached to a folio
+      folio: Add a function to get the host inode for a folio
+      netfs, afs, ceph: Use folios
+      afs: Use folios in directory handling
+
+
+ fs/afs/dir.c               | 229 +++++++++++--------------
+ fs/afs/dir_edit.c          | 154 ++++++++---------
+ fs/afs/file.c              |  82 +++++----
+ fs/afs/inode.c             |   6 +-
+ fs/afs/internal.h          |  49 +++---
+ fs/afs/write.c             | 332 ++++++++++++++++++-------------------
+ fs/ceph/addr.c             |  80 ++++-----
+ fs/netfs/read_helper.c     | 165 +++++++++---------
+ include/linux/netfs.h      |  12 +-
+ include/linux/pagemap.h    |  33 ++++
+ include/trace/events/afs.h |  21 +--
+ mm/page-writeback.c        |   2 +-
+ 12 files changed, 584 insertions(+), 581 deletions(-)
+
+
