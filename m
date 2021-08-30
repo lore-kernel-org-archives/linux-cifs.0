@@ -2,187 +2,541 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F7DC432BE
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Aug 2021 13:27:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B335C432BE
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Aug 2021 00:32:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43A5B60EE7
-	for <linux-cifs@archiver.kernel.org>; Fri, 27 Aug 2021 13:27:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED2D760F4C
+	for <linux-cifs@archiver.kernel.org>; Mon, 30 Aug 2021 00:32:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245231AbhH0N2P (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 27 Aug 2021 09:28:15 -0400
-Received: from smtp2.axis.com ([195.60.68.18]:50423 "EHLO smtp2.axis.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231964AbhH0N2O (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 27 Aug 2021 09:28:14 -0400
+        id S236145AbhH3Ads (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 29 Aug 2021 20:33:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56474 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236130AbhH3Adr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 29 Aug 2021 20:33:47 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6981DC061575;
+        Sun, 29 Aug 2021 17:32:54 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id z2so27882648lft.1;
+        Sun, 29 Aug 2021 17:32:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=axis.com; q=dns/txt; s=axis-central1; t=1630070846;
-  x=1661606846;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8jEUbn7ptnmVDyB/tf9F6ROul/ehBcpe2veqNqgzwu8=;
-  b=i9Hgu7BTwB1a7u82oTUdwGPUcWbDWF51ZOcxM4/HNolMFZgLWMoLxdWK
-   aPIq6VY9bJCknA1Hw47JUeMG2Xsg+ngl5i2u9824sUdZfs1tQ9pxsDji1
-   Wx0ps6vmhiO0ULmHPN8cb32xggFkBasxxLY6k1T/4e6LPx2qk7HAD0NxE
-   mi1YpK77fK9JS9Pwz9LI9s4yA+j0LTVJIB97DrjvAATqeBZvtX99GS1GU
-   k5LKghDRTK3eL1F6oE+Naa1SmLS1Ayd1agn7452ADboMzkCBEyKCvFMH9
-   6juc+5ZiW0agaZpD10bvIiUrygJyBgLa9lvO6Yhje7h+XKhLwCIlaAhyv
-   g==;
-Date:   Fri, 27 Aug 2021 15:27:24 +0200
-From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
-To:     Hillf Danton <hdanton@sina.com>
-CC:     Bruno Goncalves <bgoncalv@redhat.com>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Xiong Zhou <xzhou@redhat.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Steve French <stfrench@microsoft.com>, <aaptel@suse.com>
-Subject: Re: possible circular locking dependency detected:
- compound_send_recv+0x189/0x910 [cifs] vm_mmap_pgoff+0x85/0x160
-Message-ID: <20210827132724.GA30322@axis.com>
-References: <CA+QYu4rS+UkLUS-BDwNAOaMW2nQ4JY3V0OqdnLe3=zNoTrDDYQ@mail.gmail.com>
- <20210827082746.2490-1-hdanton@sina.com>
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=wtNVwEUjsLgdYmUrZNBA5L7yC3BqiPCAP8llSBvZleY=;
+        b=V5IAeCh5T4Ar/B2IvLD590lVaw+9NMQRtqtG7w9lqZAq0QcciIUavmbM9YjpabEqYU
+         MkiyuLqnzh/FBDy3U437MijfnOLmcfVagThRo8Fj7OEduMVgXZYI8u7evekRV/IS34I3
+         BM/uzh74ZqgB6drxIOTy6jI9P3YjBhUN8StdJ4hixcof6zMSaXGKlvXpEtBmNBPt/SOp
+         kxAMlhPd+Ojm/J1fUxLaVYbXMa7MRVXHXxPvCmwlT79svZ0QK/ueCn83w7IjjmSnUH8I
+         5/GkZbIVpv7ameg+yOOCsXhK2b6Mu3EsPRtvOmU0Mjxh77rZakjxl4xOwdoRQiDNlYty
+         n9SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=wtNVwEUjsLgdYmUrZNBA5L7yC3BqiPCAP8llSBvZleY=;
+        b=n92cXij6T6nPtOekbFeOA8RbPE8bhLI7IF/4CO8rvI2xEE0NLn8RMR2ilEd/Kyg2Xk
+         sYhskom8WXbv1c9Q76f2WLcWJeQeO89aQSOUeaIw/70Qpq1JlcRJxk9jYmw4F/wic6VO
+         zjjNXH9MmLpW3YVcmP2shY9ZKoRY56gODtN+JTXbeYzDM2cwHnO/Zko1j4jAnw2ENw/U
+         eixQ2tyKDMhwYZC2UDRsiEdSllivDc4rAijHCbyDG4aSKrx4yQNN3cef7Pp8N2OaUXvR
+         5F1Q4lh6bJOW6qo4Y91q6+hDYgOnsGVFFbD4aIm270RNDa0+7C0ai4RoME9O+oAtkgJb
+         CT2w==
+X-Gm-Message-State: AOAM533TWP1XB1rOXhalQoo8TDvtgLGjmqld7qlaNhzpCbDu4TNcOo8y
+        9uuy9OYeX1WuRkwkL7JH5WMzvPK0wYLpZREa068=
+X-Google-Smtp-Source: ABdhPJxxUupi5qLLHICiqqDCtcBr9mcMwvZqzPnmpKaif72sBB0f2o3I+YYUjkFLy3crkzMlpHLO00jo4/NT6i10JcI=
+X-Received: by 2002:a05:6512:2201:: with SMTP id h1mr1499966lfu.307.1630283572556;
+ Sun, 29 Aug 2021 17:32:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20210827082746.2490-1-hdanton@sina.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 29 Aug 2021 19:32:41 -0500
+Message-ID: <CAH2r5msoKV7qAgoKipa+QNDJ+xR83YGuz+he+GH9sPTSzBMLHA@mail.gmail.com>
+Subject: [GIT PULL] new smb3 kernel server (ksmbd)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Namjae Jeon <linkinjeon@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 10:27:46AM +0200, Hillf Danton wrote:
-> On Thu, 26 Aug 2021 14:05:32 +0200 Bruno Goncalves wrote:
-> >[13107.832907] ======================================================
-> >[13107.839805] WARNING: possible circular locking dependency detected
-> >[13107.846702] 5.14.0-rc7 #1 Not tainted
-> >[13107.850789] ------------------------------------------------------
-> >[13107.857686] fio/1323391 is trying to acquire lock:
-> >[13107.863025] ffff9cdf0cae72e0 (&tcp_ses->srv_mutex){+.+.}-{3:3}, at:
-> >compound_send_recv+0x189/0x910 [cifs]
-> >[13107.873786]
-> >               but task is already holding lock:
-> >[13107.880295] ffff9cdf07f9c8a8 (&mm->mmap_lock#2){++++}-{3:3}, at:
-> >vm_mmap_pgoff+0x85/0x160
-> >[13107.889425]
-> >               which lock already depends on the new lock.
-> >
-> >[13107.898559]
-> >               the existing dependency chain (in reverse order) is:
-> >[13107.906910]
-> >               -> #3 (&mm->mmap_lock#2){++++}-{3:3}:
-> >[13107.913815]        down_write+0x3d/0x70
-> >[13107.918105]        mpol_rebind_mm+0x27/0xe0
-> >[13107.922784]        cpuset_attach+0x226/0x3e0
-> >[13107.927566]        cgroup_migrate_execute+0x414/0x520
-> >[13107.933206]        cgroup_update_dfl_csses+0x212/0x240
-> >[13107.938943]        cgroup_subtree_control_write+0x352/0x430
-> >[13107.945163]        kernfs_fop_write_iter+0x134/0x1d0
-> >[13107.950710]        new_sync_write+0x10b/0x180
-> >[13107.955575]        vfs_write+0x26a/0x380
-> >[13107.959953]        ksys_write+0x58/0xd0
-> >[13107.964226]        do_syscall_64+0x5c/0x80
-> >[13107.968804]        entry_SYSCALL_64_after_hwframe+0x44/0xae
-> >[13107.975030]
-> >               -> #2 (&cpuset_rwsem){++++}-{0:0}:
-> >[13107.981642]        cpuset_read_lock+0x3e/0xb0
-> >[13107.986507]        __sched_setscheduler+0x420/0xa00
-> >[13107.991956]        sched_setscheduler_nocheck+0x68/0x70
-> >[13107.997788]        __kthread_create_on_node+0x12f/0x1a0
-> >[13108.003627]        kthread_create_on_node+0x39/0x40
-> >[13108.009072]        cryptomgr_notify+0x379/0x4d0
-> >[13108.014127]        blocking_notifier_call_chain+0x63/0x90
-> >[13108.020172]        crypto_probing_notify+0x20/0x50
-> >[13108.025522]        crypto_wait_for_test+0x1a/0x70
-> >[13108.030771]        crypto_register_alg+0x56/0x70
-> >[13108.035921]        do_one_initcall+0x5b/0x2d0
-> >[13108.040777]        kernel_init_freeable+0x284/0x2d0
-> >[13108.046215]        kernel_init+0x16/0x120
-> >[13108.050681]        ret_from_fork+0x22/0x30
-> >[13108.055250]
-> >               -> #1 ((crypto_chain).rwsem){++++}-{3:3}:
-> >[13108.062538]        down_read+0x40/0x50
-> >[13108.066720]        blocking_notifier_call_chain+0x2c/0x90
-> >[13108.072745]        crypto_alg_mod_lookup+0x10b/0x220
-> >[13108.078287]        crypto_alloc_tfm_node+0x4c/0xd0
-> >[13108.083635]        cifs_alloc_hash+0x30/0xe0 [cifs]
-> >[13108.089156]        smb311_crypto_shash_allocate+0x65/0xc0 [cifs]
-> >[13108.095929]        smb311_update_preauth_hash+0x78/0x1c0 [cifs]
-> >[13108.102584]        compound_send_recv+0x56f/0x910 [cifs]
-> >[13108.108555]        cifs_send_recv+0x1f/0x30 [cifs]
-> >[13108.113958]        SMB2_negotiate+0x3a8/0x1230 [cifs]
-> >[13108.119660]        smb2_negotiate+0x4f/0x70 [cifs]
-> >[13108.125052]        cifs_negotiate_protocol+0x6b/0xd0 [cifs]
-> >[13108.131309]        cifs_get_smb_ses+0x2f6/0x1110 [cifs]
-> >[13108.137177]        mount_get_conns+0x98/0x400 [cifs]
-> >[13108.142755]        cifs_mount+0x89/0x780 [cifs]
-> >[13108.147850]        cifs_smb3_do_mount+0x15d/0x6a0 [cifs]
-> >[13108.153813]        smb3_get_tree+0xeb/0x1e0 [cifs]
-> >[13108.159207]        vfs_get_tree+0x28/0xc0
-> >[13108.163680]        path_mount+0x42f/0xb60
-> >[13108.168154]        __x64_sys_mount+0xe3/0x120
-> >[13108.173014]        do_syscall_64+0x5c/0x80
-> >[13108.177586]        entry_SYSCALL_64_after_hwframe+0x44/0xae
-> >[13108.183806]
-> >               -> #0 (&tcp_ses->srv_mutex){+.+.}-{3:3}:
-> >[13108.190993]        __lock_acquire+0x1158/0x1de0
-> >[13108.196050]        lock_acquire+0xb5/0x2b0
-> >[13108.200618]        __mutex_lock+0x8a/0x760
-> >[13108.205187]        compound_send_recv+0x189/0x910 [cifs]
-> >[13108.211158]        cifs_send_recv+0x1f/0x30 [cifs]
-> >[13108.216547]        SMB2_write+0x192/0x4b0 [cifs]
-> >[13108.221746]        cifs_write+0x181/0x600 [cifs]
-> >[13108.226939]        cifs_writepage_locked+0x34c/0x670 [cifs]
-> >[13108.233247]        cifs_launder_page+0xcf/0xe0 [cifs]
-> >[13108.238925]        invalidate_inode_pages2_range+0x3c6/0x4d0
-> >[13108.245264]        cifs_invalidate_mapping+0x35/0x60 [cifs]
-> >[13108.251523]        cifs_revalidate_mapping+0x9c/0xb0 [cifs]
-> >[13108.257787]        cifs_file_mmap+0x4b/0x3c0 [cifs]
-> >[13108.263318]        mmap_region+0x415/0x690
-> >[13108.267896]        do_mmap+0x362/0x560
-> >[13108.272082]        vm_mmap_pgoff+0xb8/0x160
-> >[13108.276758]        ksys_mmap_pgoff+0x1a1/0x200
-> >[13108.281724]        do_syscall_64+0x5c/0x80
-> >[13108.286302]        entry_SYSCALL_64_after_hwframe+0x44/0xae
-> >[13108.292525]
-> >               other info that might help us debug this:
-> >
-> >[13108.301457] Chain exists of:
-> >                 &tcp_ses->srv_mutex --> &cpuset_rwsem --> &mm->mmap_lock#2
-> >
-> >[13108.313788]  Possible unsafe locking scenario:
-> >
-> >[13108.320395]        CPU0                    CPU1
-> >[13108.325450]        ----                    ----
-> >[13108.330503]   lock(&mm->mmap_lock#2);
-> >[13108.334590]                                lock(&cpuset_rwsem);
-> >[13108.341196]                                lock(&mm->mmap_lock#2);
-> >[13108.348099]   lock(&tcp_ses->srv_mutex);
-> >[13108.352478]
-> >                *** DEADLOCK ***
-> >
-> >[1] https://gitlab.com/cki-project/kernel-tests/-/tree/main/filesystems/xfs/xfstests
-> >[2] https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/index.html?prefix=datawarehouse-public/2021/08/24/358739877/build_x86_64_redhat%3A1530602378/tests/xfstests_cifsv3_11/
-> 
-> 
-> Only if it is too difficult to fix 05946d4b7a73 ("cifs: Fix preauth hash
-> corruption") within cifs then fix the deadlock by replacing kthread_run()
-> with queue_work().
+Please pull the following changes since commit
+6efb943b8616ec53a5e444193dccf1af9ad627b5:
 
-Perhaps I'm missing something, but would the lockdep complaint really go
-away without 05946d4b7a73?  cifs_alloc_hash() is called under the
-srv_mutex in other places (for example setup_ntlmv2_rsp()), so the
+  Linux 5.13-rc1 (2021-05-09 14:17:44 -0700)
 
-	&tcp_ses->srv_mutex --> &cpuset_rwsem --> &mm->mmap_lock
+are available in the Git repository at:
 
-chain would still exist, and compound_send_recv() takes srv_mutex before
-05946d4b7a73 too, so &mm->mmap_lock -> srv_mutex would exist too.
+  git://git.samba.org/ksmbd.git tags/5.15-rc-first-ksmbd-merge
 
-For cifs_alloc_hash() to be able to be called without the srv_mutex I
-guess it would have to be done when the tcp_ses is allocated.  That
-however would essentially be a revert of commit 95dc8dd14e2e84cc3ada
-("Limit allocation of crypto mechanisms to dialect which requires").
+for you to fetch changes up to 7d5d8d7156892f82cf40b63228ce788248cc57a3:
+
+  ksmbd: fix __write_overflow warning in ndr_read_string (2021-08-27
+14:03:49 -0500)
+
+----------------------------------------------------------------
+Initial merge of kernel smb3 file server, ksmbd
+
+The SMB family of protocols is the most widely deployed
+network filesystem protocol, the default on Windows and Macs (and even
+on many phones and tablets), with clients and servers on all major
+operating systems, but lacked a kernel server for Linux. For many
+cases the current userspace server choices were suboptimal
+either due to memory footprint, performance or difficulty integrating
+well with advanced Linux features.
+
+ksmbd is a new kernel module which implements the server-side of the
+SMB3 protocol.  The target is to provide optimized performance, GPLv2
+SMB server,
+better lease handling (distributed caching). The bigger goal is to add new
+features more rapidly (e.g. RDMA aka "smbdirect", and recent encryption
+and signing improvements to the protocol) which are easier to develop
+on a smaller, more tightly optimized kernel server than for example in
+Samba.  The Samba project is much broader in scope (tools, security services,
+LDAP, Active Directory Domain Controller, and a cross platform file server
+for a wider variety of purposes) but the user space file server portion
+of Samba has proved hard to optimize for some Linux workloads, including
+for smaller devices. This is not meant to replace Samba, but rather be
+an extension to allow better optimizing for Linux, and will continue to
+integrate well with Samba user space tools and libraries where appropriate.
+Working with the Samba team we have already made sure that the configuration
+files and xattrs are in a compatible format between the kernel and
+user space server.
+
+Various types of functional and regression tests are regularly run against it.
+One example is the automated 'buildbot' regression tests which use the
+Linux client to test against ksmbd (e.g.
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/56)
+but other
+test suites, including Samba's smbtorture functional test suite are also used
+regularly.
+----------------------------------------------------------------
+Colin Ian King (4):
+      cifsd: Fix a handful of spelling mistakes
+      cifsd: remove redundant assignment to variable err
+      ksmbd: fix kfree of uninitialized pointer oid
+      ksmbd: Fix read on the uninitialized pointer sess
+
+Dan Carpenter (8):
+      cifsd: fix a precedence bug in parse_dacl()
+      cifsd: fix a IS_ERR() vs NULL bug
+      cifsd: Fix a use after free on error path
+      cifsd: Fix an error code in smb2_read()
+      cifsd: fix error handling in ksmbd_server_init()
+      ksmbd: delete some stray tabs
+      ksmbd: use kasprintf() in ksmbd_vfs_xattr_stream_name()
+      ksmbd: fix an oops in error handling in smb2_open()
+
+Gibeom Kim (1):
+      cifsd: remove stale prototype and variables
+
+Hyunchul Lee (33):
+      cifsd: fix incorrect comments
+      cifsd: remove calling d_path in error paths
+      cifsd: handle unhashed dentry in ksmbd_vfs_mkdir
+      cifsd: use file_inode() instead of d_inode()
+      cifsd: remove useless error handling in ksmbd_vfs_read
+      cifsd: re-implement ksmbd_vfs_kern_path
+      cifsd: fix reference count decrement of unclaimed file in
+__ksmbd_lookup_fd
+      cifsd: decoding gss token using lib/asn1_decoder.c
+      cifsd: lookup a file with LOOKUP_FOLLOW only if 'follow symlinks = yes'
+      cifsd: enclose macro variables in parenthesis
+      cifsd: make alignment match open parenthesis
+      cifsd: fix possible compile error for asn1.c
+      cifsd: append ksmbd prefix into names for asn1 decoder
+      ksmbd: factor out a ksmbd_vfs_lock_parent helper
+      ksmbd: set MAY_* flags together with open flags
+      ksmbd: remove macros in transport_ipc.c
+      ksmbd: replace BUFFER_NR_PAGES with inline function
+      ksmbd: replace KSMBD_ALIGN with kernel ALIGN macro
+      ksmbd: replace PAYLOAD_HEAD with inline function
+      ksmbd: remove getting worker state macros
+      ksmbd: remove and replace macros with inline functions in smb_common.h
+      ksmbd: replace struct dentry with struct path in some function's arguments
+      ksmbd: add user namespace support
+      ksmbd: call mnt_user_ns once in a function
+      ksmbd: fix the running request count decrement
+      ksmbd: free ksmbd_lock when file is closed
+      ksmbd: uninterruptible wait for a file being unlocked
+      ksmbd: make smb2_find_context_vals return NULL if not found
+      ksmbd: handle error cases first in smb2_create_sd_buffers
+      ksmbd: set RDMA capability for FSCTL_QUERY_NETWORK_INTERFACE_INFO
+      ksmbd: fix an error message in ksmbd_conn_trasnport_init
+      ksmbd: fix -Wstringop-truncation warnings
+      ksmbd: smbd: fix kernel oops during server shutdown
+
+Marios Makassikis (13):
+      cifsd: Remove smb2_put_name()
+      cifsd: Fix potential null-ptr-deref in smb2_open()
+      cifsd: Update access check in
+set_file_allocation_info/set_end_of_file_info
+      cifsd: Remove is_attributes_write_allowed() wrapper
+      cifsd: Call smb2_set_err_rsp() in smb2_read/smb2_write error path
+      cifsd: Handle ksmbd_session_rpc_open() failure in create_smb2_pipe()
+      cifsd: Update out_buf_len in smb2_populate_readdir_entry()
+      cifsd: Fix potential null-ptr-deref in destroy_previous_session()
+      cifsd: Do not use 0 or 0xFFFFFFFF for TreeID
+      ksmbd: Relax credit_charge check in smb2_validate_credit_charge()
+      ksmbd: Fix potential memory leak in tcp_destroy_socket()
+      ksmbd: Return STATUS_OBJECT_PATH_NOT_FOUND if smb2_creat() returns ENOENT
+      ksmbd: Fix multi-protocol negotiation
+
+Mauro Carvalho Chehab (1):
+      doc: cifsd: change the reference to configuration.txt
+
+Muhammad Usama Anjum (2):
+      cifsd: fix memory leak when loop ends
+      cifsd: use kfree to free memory allocated by kmalloc or kzalloc
+
+Namjae Jeon (145):
+      cifsd: add server handler for central processing and tranport layers
+      cifsd: add server-side procedures for SMB3
+      cifsd: add file operations
+      cifsd: add Kconfig and Makefile
+      MAINTAINERS: add cifsd kernel server
+      cifsd: fix WARNING: Title overline too short
+      cifsd: fix WARNING: document isn't included in any toctree
+      cifsd: fix WARNING: unmet direct dependencies detected for CRYPTO_ARC4
+      cifsd: fix static checker warning from smb_direct_post_send_data()
+      cifsd: fix static checker warning from smb_check_perm_dacl()
+      cifsd: update cifsd.rst document
+      cifsd: add index.rst in cifs documentation
+      cifsd: fix warning: variable 'total_ace_size' and
+'posix_ccontext' set but not used
+      cifsd: Pass string length parameter to match_pattern()
+      cifsd: fix build warnings from cifsd.rst
+      cifsd: remove unneeded macros
+      cifsd: fix wrong use of rw semaphore in __session_create()
+      cifsd: use kmalloc() for small allocations
+      cifsd: add the check to work file lock and rename behaviors like
+Windows unless POSIX extensions are negotiated
+      cifsd: fix error return code in ksmbd_vfs_remove_file()
+      cifsd: clean-up codes using chechpatch.pl --strict
+      cifsd: merge time_wrappers.h into smb_common.h
+      cifsd: fix wrong prototype in comment
+      cifsd: fix implicit declaration of function 'groups_alloc'
+      cifsd: fix implicit declaration of function 'locks_alloc_lock'
+      cifsd: remove smack inherit leftovers
+      cifsd: use xarray instead of linked list for tree connect list
+      cifsd: remove wrappers of kvmalloc/kvfree
+      cifsd: prevent a integer overflow in wm_alloc()
+      cifsd: declare ida statically
+      cifsd: add the check if parent is stable by unexpected rename
+      cifsd: get parent dentry from child in ksmbd_vfs_remove_file()
+      cifsd: remove unused smberr.h
+      cifsd: remove unused nterr.c file
+      cifsd: move nt time functions to misc.c
+      cifsd: use d_inode()
+      cifsd: remove the dead code of unimplemented durable handle
+      cifsd: add ksmbd/nfsd interoperability to feature table
+      cifsd: add support for AES256 encryption
+      cifsd: fix invalid memory access in smb2_write()
+      cifsd: fix WARNING: Possible unnecessary 'out of memory' message
+      cifsd: fix WARNING: Too many leading tabs
+      cifsd: fix build break from asn1
+      cifsd: fix xfstests generic/504 test failure
+      cifsd: add support for FSCTL_DUPLICATE_EXTENTS_TO_FILE
+      cifsd: add goto fail in asn1_oid_decode()
+      cifsd: use memcmp instead of for loop check in oid_eq()
+      cifsd: add goto fail in neg_token_init_mech_type()
+      cifsd: move fips_enabled check before the str_to_key()
+      cifsd: just return smbhash() instead of using rc return value
+      cifsd: move ret check before the out label
+      cifsd: simplify error handling in ksmbd_auth_ntlm()
+      cifsd: remove unneeded type casting
+      cifsd: set error return value for memcmp() difference
+      cifsd: return zero in always success case
+      cifsd: never return 1 on failure
+      cifsd: add the check if nvec is zero
+      cifsd: len can never be negative in ksmbd_init_sg()
+      cifsd: remove unneeded initialization of rc variable in
+ksmbd_crypt_message()
+      cifsd: fix wrong return value in ksmbd_crypt_message()
+      cifsd: change success handling to failure handling
+      cifsd: add default case in switch statment in alloc_shash_desc()
+      cifsd: call kzalloc() directly instead of wrapper
+      cifsd: simplify error handling in ksmbd_gen_preauth_integrity_hash()
+      cifsd: return -ENOMEM about error from ksmbd_crypto_ctx_find_xxx calls
+      cifsd: alignment match open parenthesis
+      cifsd: add the check to prevent potential overflow with
+smb_strtoUTF16() and UNICODE_LEN()
+      cifsd: braces {} should be used on all arms of this statement
+      cifsd: spaces preferred around that '/'
+      cifsd: don't use multiple blank lines
+      cifsd: No space is necessary after a cast
+      cifsd: Blank lines aren't necessary after an open brace '{'
+      cifsd: Alignment should match open parenthesis
+      cifsd: remove unnecessary parentheses around
+      cifsd: Prefer kernel type 'u16' over 'uint16_t'
+      cifsd: fix Control flow issues in ksmbd_build_ntlmssp_challenge_blob()
+      cifsd: fix potential read overflow in ksmbd_vfs_stream_read()
+      cifsd: fix additional warnings from checkpatch.pl --strict
+      cifsd: fix list_add double add BUG_ON trap in setup_async_work()
+      cifsd: set epoch in smb2_lease_break response
+      ksmbd: add support for SMB3 multichannel
+      ksmbd: remove cache read/trans buffer support
+      ksmbd: initialize variables on the declaration
+      ksmbd: remove ksmbd_vfs_copy_file_range
+      ksmbd: use list_for_each_entry instead of list_for_each
+      ksmbd: use goto instead of duplicating the resoure cleanup in
+ksmbd_open_fd
+      ksmbd: fix overly long line
+      ksmbd: remove unneeded FIXME comment
+      ksmbd: remove ____ksmbd_align in ksmbd_server.h
+      ksmbd: replace KSMBD_SHARE_CONFIG_PATH with inline function
+      ksmbd: remove ksmbd_err/info
+      ksmbd: opencode to avoid trivial wrappers
+      ksmbd: factor out a ksmbd_validate_entry_in_use helper from
+__ksmbd_vfs_rename
+      ksmbd: opencode posix acl functions instead of wrappers
+      ksmbd: change stream type macro to enumeration
+      ksmbd: use f_bsize instead of q->limits.logical_block_size
+      ksmbd: remove unneeded NULL check in the list iterator
+      ksmbd: use f_bsize in FS_SECTOR_SIZE_INFORMATION
+      ksmbd: move fs/cifsd to fs/ksmbd
+      MAINTAINERS: rename cifsd to ksmbd
+      ksmbd: replace SMB_DIRECT_TRANS macro with inline function
+      ksmbd: replace request and respone buffer macro with inline functions
+      ksmbd: allow PROTECTED_DACL_SECINFO and UNPROTECTED_DACL_SECINFO
+addition information in smb2 set info security
+      ksmbd: fix dentry racy with rename()
+      ksmbd: opencode to remove FP_INODE macro
+      ksmbd: use ksmbd_vfs_lock_parent to get stable parent dentry
+      ksmbd: opencode to remove ATTR_FP macro
+      ksmbd: remove SMB1 oplock level macros
+      ksmbd: change ACE types to enumeration
+      ksmbd: change sid types to enumeration
+      ksmbd: change server state type macro to enumeration
+      ksmbd: change server config string index to enumeration
+      ksmbd: reorder and document on-disk and netlink structures in headers
+      ksmbd: fix kernel oops in ksmbd_rpc_ioctl/rap()
+      ksmbd: remove unneeded NULL check in for_each_netdev
+      ksmbd: fix read on the uninitialized send_ctx
+      ksmbd: fix memory leak smb2_populate_readdir_entry()
+      ksmbd: fix memory leak in smb_inherit_dacl()
+      ksmbd: change data type of volatile/persistent id to u64
+      ksmbd: remove unneeded check_context_err
+      ksmbd: fix memory leak in ksmbd_vfs_get_sd_xattr()
+      ksmbd: fix unused err value in smb2_lock
+      ksmbd: fix typo in comment
+      ksmbd: fix wrong compression context size
+      ksmbd: fix wrong error status return on session setup
+      ksmbd: set STATUS_INVALID_PARAMETER error status if credit
+charge is invalid
+      ksmbd: move credit charge verification over smb2 request size verification
+      ksmbd: fix typo of MS-SMBD
+      ksmbd: add negotiate context verification
+      ksmbd: add support for negotiating signing algorithm
+      ksmbd: don't set RSS capable in FSCTL_QUERY_NETWORK_INTERFACE_INFO
+      ksmbd: use channel signingkey for binding SMB2 session setup
+      ksmbd: fix missing error code in smb2_lock
+      ksmbd: add ipv6_addr_v4mapped check to know if connection from
+client is ipv4
+      ksmbd: change int data type to boolean
+      ksmbd: update the comment for smb2_get_ksmbd_tcon()
+      ksmbd: use proper errno instead of -1 in smb2_get_ksmbd_tcon()
+      ksmbd: remove select FS_POSIX_ACL in Kconfig
+      ksmbd: update SMB3 multi-channel support in ksmbd.rst
+      MAINTAINERS: add git adddress of ksmbd
+      ksmbd: don't set FILE DELETE and FILE_DELETE_CHILD in access
+mask by default
+      ksmbd: fix permission check issue on chown and chmod
+      MAINTAINERS: ksmbd: update my email address
+      MAINTAINERS: ksmbd: add cifs_common directory to ksmbd entry
+      ksmbd: fix __write_overflow warning in ndr_read_string
+
+Sebastian Gottschall (1):
+      cifsd: Fix regression in smb2_get_info
+
+Sergey Senozhatsky (1):
+      cifsd: remove unneeded FIXME comments
+
+Stephen Rothwell (1):
+      cifsd: uniquify extract_sharename()
+
+Steve French (22):
+      Merge pull request #46 from namjaejeon/cifsd-for-next
+      Merge pull request #47 from namjaejeon/cifsd-for-next
+      Merge pull request #48 from namjaejeon/cifsd-for-next
+      Merge pull request #49 from namjaejeon/cifsd-for-next
+      Merge pull request #50 from namjaejeon/cifsd-for-next
+      Merge pull request #51 from namjaejeon/cifsd-for-next
+      Merge pull request #52 from namjaejeon/cifsd-for-next
+      Merge pull request #53 from namjaejeon/cifsd-for-next
+      Merge pull request #54 from namjaejeon/cifsd-for-next
+      Merge pull request #55 from namjaejeon/cifsd-for-next
+      Merge pull request #56 from namjaejeon/cifsd-for-next
+      Merge pull request #57 from namjaejeon/cifsd-for-next
+      Merge pull request #58 from namjaejeon/cifsd-for-next
+      Merge pull request #59 from namjaejeon/cifsd-for-next
+      Merge pull request #60 from namjaejeon/cifsd-for-next
+      Merge pull request #61 from namjaejeon/cifsd-for-next
+      Merge pull request #62 from namjaejeon/cifsd-for-next
+      Merge pull request #63 from namjaejeon/cifsd-for-next
+      Merge pull request #64 from namjaejeon/cifsd-for-next
+      Merge pull request #66 from namjaejeon/cifsd-for-next
+      Merge pull request #68 from namjaejeon/cifsd-for-next
+      Merge pull request #69 from namjaejeon/cifsd-for-next
+
+Tian Tao (1):
+      cifsd: remove unused including <linux/version.h>
+
+Wan Jiabing (1):
+      cifsd: remove duplicated argument
+
+Wei Yongjun (1):
+      cifsd: fix build error without CONFIG_OID_REGISTRY
+
+Yang Yingliang (3):
+      cifsd: fix memleak in ksmbd_vfs_stream_write()
+      cifsd: fix memleak in ksmbd_vfs_stream_read()
+      cifsd: check return value of ksmbd_vfs_getcasexattr() correctly
+
+Zhang Xiaoxu (1):
+      cifsd: Select SG_POOL for SMB_SERVER_SMBDIRECT
+
+kernel test robot (2):
+      cifsd: fix memdup.cocci warnings
+      cifsd: fix boolreturn.cocci warnings
+
+ Documentation/filesystems/cifs/index.rst |   10 +
+ Documentation/filesystems/cifs/ksmbd.rst |  165 +
+ Documentation/filesystems/index.rst      |    2 +-
+ MAINTAINERS                              |   13 +-
+ fs/Kconfig                               |    1 +
+ fs/Makefile                              |    1 +
+ fs/ksmbd/Kconfig                         |   68 +
+ fs/ksmbd/Makefile                        |   20 +
+ fs/ksmbd/asn1.c                          |  343 ++
+ fs/ksmbd/asn1.h                          |   21 +
+ fs/ksmbd/auth.c                          | 1364 +++++
+ fs/ksmbd/auth.h                          |   67 +
+ fs/ksmbd/connection.c                    |  413 ++
+ fs/ksmbd/connection.h                    |  213 +
+ fs/ksmbd/crypto_ctx.c                    |  282 +
+ fs/ksmbd/crypto_ctx.h                    |   74 +
+ fs/ksmbd/glob.h                          |   49 +
+ fs/ksmbd/ksmbd_netlink.h                 |  395 ++
+ fs/ksmbd/ksmbd_spnego_negtokeninit.asn1  |   31 +
+ fs/ksmbd/ksmbd_spnego_negtokentarg.asn1  |   19 +
+ fs/ksmbd/ksmbd_work.c                    |   80 +
+ fs/ksmbd/ksmbd_work.h                    |  117 +
+ fs/ksmbd/mgmt/ksmbd_ida.c                |   46 +
+ fs/ksmbd/mgmt/ksmbd_ida.h                |   34 +
+ fs/ksmbd/mgmt/share_config.c             |  238 +
+ fs/ksmbd/mgmt/share_config.h             |   81 +
+ fs/ksmbd/mgmt/tree_connect.c             |  121 +
+ fs/ksmbd/mgmt/tree_connect.h             |   56 +
+ fs/ksmbd/mgmt/user_config.c              |   69 +
+ fs/ksmbd/mgmt/user_config.h              |   66 +
+ fs/ksmbd/mgmt/user_session.c             |  369 ++
+ fs/ksmbd/mgmt/user_session.h             |  106 +
+ fs/ksmbd/misc.c                          |  338 ++
+ fs/ksmbd/misc.h                          |   35 +
+ fs/ksmbd/ndr.c                           |  345 ++
+ fs/ksmbd/ndr.h                           |   22 +
+ fs/ksmbd/nterr.h                         |  543 ++
+ fs/ksmbd/ntlmssp.h                       |  169 +
+ fs/ksmbd/oplock.c                        | 1709 ++++++
+ fs/ksmbd/oplock.h                        |  131 +
+ fs/ksmbd/server.c                        |  633 +++
+ fs/ksmbd/server.h                        |   70 +
+ fs/ksmbd/smb2misc.c                      |  438 ++
+ fs/ksmbd/smb2ops.c                       |  312 ++
+ fs/ksmbd/smb2pdu.c                       | 8373 ++++++++++++++++++++++++++++++
+ fs/ksmbd/smb2pdu.h                       | 1698 ++++++
+ fs/ksmbd/smb_common.c                    |  674 +++
+ fs/ksmbd/smb_common.h                    |  542 ++
+ fs/ksmbd/smbacl.c                        | 1366 +++++
+ fs/ksmbd/smbacl.h                        |  212 +
+ fs/ksmbd/smbfsctl.h                      |   91 +
+ fs/ksmbd/smbstatus.h                     | 1822 +++++++
+ fs/ksmbd/transport_ipc.c                 |  874 ++++
+ fs/ksmbd/transport_ipc.h                 |   47 +
+ fs/ksmbd/transport_rdma.c                | 2058 ++++++++
+ fs/ksmbd/transport_rdma.h                |   63 +
+ fs/ksmbd/transport_tcp.c                 |  618 +++
+ fs/ksmbd/transport_tcp.h                 |   13 +
+ fs/ksmbd/unicode.c                       |  384 ++
+ fs/ksmbd/unicode.h                       |  357 ++
+ fs/ksmbd/uniupr.h                        |  268 +
+ fs/ksmbd/vfs.c                           | 1895 +++++++
+ fs/ksmbd/vfs.h                           |  197 +
+ fs/ksmbd/vfs_cache.c                     |  725 +++
+ fs/ksmbd/vfs_cache.h                     |  178 +
+ fs/ksmbd/xattr.h                         |  122 +
+ 66 files changed, 32254 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/filesystems/cifs/index.rst
+ create mode 100644 Documentation/filesystems/cifs/ksmbd.rst
+ create mode 100644 fs/ksmbd/Kconfig
+ create mode 100644 fs/ksmbd/Makefile
+ create mode 100644 fs/ksmbd/asn1.c
+ create mode 100644 fs/ksmbd/asn1.h
+ create mode 100644 fs/ksmbd/auth.c
+ create mode 100644 fs/ksmbd/auth.h
+ create mode 100644 fs/ksmbd/connection.c
+ create mode 100644 fs/ksmbd/connection.h
+ create mode 100644 fs/ksmbd/crypto_ctx.c
+ create mode 100644 fs/ksmbd/crypto_ctx.h
+ create mode 100644 fs/ksmbd/glob.h
+ create mode 100644 fs/ksmbd/ksmbd_netlink.h
+ create mode 100644 fs/ksmbd/ksmbd_spnego_negtokeninit.asn1
+ create mode 100644 fs/ksmbd/ksmbd_spnego_negtokentarg.asn1
+ create mode 100644 fs/ksmbd/ksmbd_work.c
+ create mode 100644 fs/ksmbd/ksmbd_work.h
+ create mode 100644 fs/ksmbd/mgmt/ksmbd_ida.c
+ create mode 100644 fs/ksmbd/mgmt/ksmbd_ida.h
+ create mode 100644 fs/ksmbd/mgmt/share_config.c
+ create mode 100644 fs/ksmbd/mgmt/share_config.h
+ create mode 100644 fs/ksmbd/mgmt/tree_connect.c
+ create mode 100644 fs/ksmbd/mgmt/tree_connect.h
+ create mode 100644 fs/ksmbd/mgmt/user_config.c
+ create mode 100644 fs/ksmbd/mgmt/user_config.h
+ create mode 100644 fs/ksmbd/mgmt/user_session.c
+ create mode 100644 fs/ksmbd/mgmt/user_session.h
+ create mode 100644 fs/ksmbd/misc.c
+ create mode 100644 fs/ksmbd/misc.h
+ create mode 100644 fs/ksmbd/ndr.c
+ create mode 100644 fs/ksmbd/ndr.h
+ create mode 100644 fs/ksmbd/nterr.h
+ create mode 100644 fs/ksmbd/ntlmssp.h
+ create mode 100644 fs/ksmbd/oplock.c
+ create mode 100644 fs/ksmbd/oplock.h
+ create mode 100644 fs/ksmbd/server.c
+ create mode 100644 fs/ksmbd/server.h
+ create mode 100644 fs/ksmbd/smb2misc.c
+ create mode 100644 fs/ksmbd/smb2ops.c
+ create mode 100644 fs/ksmbd/smb2pdu.c
+ create mode 100644 fs/ksmbd/smb2pdu.h
+ create mode 100644 fs/ksmbd/smb_common.c
+ create mode 100644 fs/ksmbd/smb_common.h
+ create mode 100644 fs/ksmbd/smbacl.c
+ create mode 100644 fs/ksmbd/smbacl.h
+ create mode 100644 fs/ksmbd/smbfsctl.h
+ create mode 100644 fs/ksmbd/smbstatus.h
+ create mode 100644 fs/ksmbd/transport_ipc.c
+ create mode 100644 fs/ksmbd/transport_ipc.h
+ create mode 100644 fs/ksmbd/transport_rdma.c
+ create mode 100644 fs/ksmbd/transport_rdma.h
+ create mode 100644 fs/ksmbd/transport_tcp.c
+ create mode 100644 fs/ksmbd/transport_tcp.h
+ create mode 100644 fs/ksmbd/unicode.c
+ create mode 100644 fs/ksmbd/unicode.h
+ create mode 100644 fs/ksmbd/uniupr.h
+ create mode 100644 fs/ksmbd/vfs.c
+ create mode 100644 fs/ksmbd/vfs.h
+ create mode 100644 fs/ksmbd/vfs_cache.c
+ create mode 100644 fs/ksmbd/vfs_cache.h
+ create mode 100644 fs/ksmbd/xattr.h
+
+-- 
+Thanks,
+
+Steve
