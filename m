@@ -2,135 +2,191 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C411C432BE
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Aug 2021 18:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C882C432BE
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Aug 2021 21:38:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 524756109D
-	for <linux-cifs@archiver.kernel.org>; Tue, 31 Aug 2021 18:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BE146102A
+	for <linux-cifs@archiver.kernel.org>; Tue, 31 Aug 2021 21:38:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234218AbhHaSHt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 31 Aug 2021 14:07:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60166 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230145AbhHaSHt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 31 Aug 2021 14:07:49 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2FC9C061575;
-        Tue, 31 Aug 2021 11:06:53 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id w4so125828ljh.13;
-        Tue, 31 Aug 2021 11:06:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4uoFy8lFPfOaRv20kXGYEUnEgHw1OP9Lm88Uu/BMnVE=;
-        b=u1zPg1ZS36y+OJdwnG9hcpPsMVJIN/gOuB5RL3hnCHyd5TqigUN5AO9MKcJ8QrQ57f
-         tihJTWu7OorM/pV7Ri9OHGMxCemm2s3jyILoDdCzS07iOmhoE/ct7C9O0wn7I83AEjEa
-         ZgRgkBc6ND/hFiHUUT1KTE6GBf/oi/1bWz533CN421bo51io3jv79cxhSj62mYDfNTVi
-         EtsJ1O5PIz03FeNvBbwEsBgGDVAgXGgVJWGP/eGF1hfScw4y4TF2Rxn1a+KwyEwQOb84
-         LpqYpgqt7ZN3OD84pJHXjA6yx9/GcfT+7sJlnZ+RdmZOFFEXeXhGP2TrzPpinwoG7izs
-         1RXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4uoFy8lFPfOaRv20kXGYEUnEgHw1OP9Lm88Uu/BMnVE=;
-        b=VZt78c+RNmqkFxpSjcMIzFgb+00oRkJYqQgtJ7q/tBsyl1vV0LqwZuElkGWZgpOixm
-         o1xR9pxMThecitlTay7ZlytENI1gtlv7eBSqE2wb2awNm4e/wuAM6pJU8zzThk6KCsLi
-         qT3/hd7BHLdvXOrubGBF9Zn8NiRTO2CIROrkcIfrqwvuhOiDtNL1Sa93yTOnoV7LMQFs
-         hfrHHIq+MAXq8Va+ILfTFFRjRUYYff1LmBA/pOxtjim1zazT2QJpW+DQrcCIf9Uuw6gd
-         vsjTUfU7tk+dFUZXiC8o7oWBoWXj068rCjAJ2tnBvrUFe1nIrTJdbZmWW7xtEnufx+JI
-         v9kg==
-X-Gm-Message-State: AOAM53062wQkc0lxD8x6Ho1J9qmlCOYEWr7Zvy49KVpbk5O0tRYAn9P5
-        ZJCcbVSsUH7nsox/Ir+j2bSp2V5iYVvpjpKWP+yLJTfg
-X-Google-Smtp-Source: ABdhPJwHI/awRoxhF/yFyqZlpxqd+L2fpZ9GRmrzEMOYW6p5QGXjiKG/Ums/ZeYJAQVJprqmbAFf8ykZZvNpgGthLSo=
-X-Received: by 2002:a2e:bb8f:: with SMTP id y15mr25733061lje.148.1630433212221;
- Tue, 31 Aug 2021 11:06:52 -0700 (PDT)
+        id S241376AbhHaVjl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 31 Aug 2021 17:39:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44232 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233231AbhHaVjk (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 31 Aug 2021 17:39:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1630445924;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=jF9rwEM7cmKziqpDUf57DgLJOh4uDfmAVb6WTLHCRQc=;
+        b=dtBhnEepaX+y5PjIVpeB4fG7JlkgnqbDaSVxrk0x8k5OXb3CZojB6HeN3OD6WHbMsrmK/I
+        Iw88+xNrXSix5MqDfjU1xCSap4NfMOYRdblju7AyOeHKtPHC0MWWoxvciutqPdRrRdgIEg
+        dvPQOqVUbn6iVLwTK4HSMQSL2U9Ahm4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-etE7GrocP62B622SZDpz4g-1; Tue, 31 Aug 2021 17:38:43 -0400
+X-MC-Unique: etE7GrocP62B622SZDpz4g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1928D8CC784;
+        Tue, 31 Aug 2021 21:38:42 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.36])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6CB1D60843;
+        Tue, 31 Aug 2021 21:38:35 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     dhowells@redhat.com, Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@redhat.com>,
+        David Wysochanski <dwysocha@redhat.com>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [GIT PULL] fscache: Fixes and rewrite preparation
 MIME-Version: 1.0
-References: <CAH2r5mvVdBoUW-0BfsxiRAE6X30cqhBtNDvG7pwKdQwsu+wXfg@mail.gmail.com>
- <CAHk-=wiNvB_j3VZYJ1yZqq+9JjgWCO1MUmRsjTKBwQ+x=kB5tg@mail.gmail.com>
- <CAH2r5mtTLUQa2U=MGHOVk_FsPZg6owMsw+RoTudWxGuoQej41g@mail.gmail.com> <CAHk-=wjxmDks6CS41PCy_BZG70pjAhcPBV_7ga8kSJySvvDezQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wjxmDks6CS41PCy_BZG70pjAhcPBV_7ga8kSJySvvDezQ@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 31 Aug 2021 13:06:41 -0500
-Message-ID: <CAH2r5mt72NYan9q8MR5H8cNkYzT4jn1ZM1f3jp5V-fDs2cyB-A@mail.gmail.com>
-Subject: Re: [GIT PULL] cifs/smb3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3282507.1630445914.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Tue, 31 Aug 2021 22:38:34 +0100
+Message-ID: <3282508.1630445914@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Aug 31, 2021 at 12:43 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Tue, Aug 31, 2021 at 10:09 AM Steve French <smfrench@gmail.com> wrote:
-> >
-> >   So if you are ok with renaming the client dir and module
-> > name - we can gradually stop using the word/name "cifs" except for the
-> > parts of code which really are needed to access the (unfortunately
-> > hundreds of millions of) very old devices which require SMB1 ("CIFS").
->
-> I'm ok with directory renames, git handles it all well enough that the
-> pain should be fairly minimal.
->
-> I'd ask for that to be done during a fairly calm cycle, though, when
-> there isn't a lot pending, so that any rename conflicts will be
-> minimized.
+Hi Linus,
 
-Given likely movement of various common server/client functions into
-cifs_common in the short term - we can delay renaming "fs/cifs"
-(and fs/cifs_common) to e.g. "fs/smbfs" to 5.16 or 5.17
+Can you pull these changes please?  They perform some preparatory work for=
+ the
+fscache rewrite that's being worked on and fix some bugs.  These include:
 
+ (1) Always select netfs stats when enabling fscache stats since they're
+     displayed through the same procfile.
 
-> > We could even build two versions of the module "smb3.ko" which does not
-> > include support for the less secure legacy dialects and "cifs.ko" which does
-> > include it.   Is there a precedent for something similar.
->
-> I'm not sure there is precedent for that, but that's not a huge issue per se.
+ (2) Add a cookie debug ID that can be used in tracepoints instead of a
+     pointer and cache it in the netfs_cache_resources struct rather than
+     in the netfs_read_request struct to make it more available.
 
-<snip>
+ (3) Use file_inode() in cachefiles rather than dereferencing file->f_inod=
+e
+     directly.
 
-> > Do you have any objections to me renaming the client's source
-> > directory to "fs/smb3" (or fs/smb) and fs/smb3_common ...?
->
-> So no objections to the rename per se, but can we please use a more
-> specific name that is *not* tainted by history?
->
-> I'll throw out two suggestions, but they are just that: (a) "smbfs" or
-> (b) "smb-client".
->
-> I think "smbfs" has the nice property of making it clear that this is
-> just the filesystem part of the smb protocols - that otherwise cover a
-> lot of other things too (at least historically printers, although I
-> have no idea how true that is any more).
+ (4) Provide a procfile to display fscache cookies.
 
-"smbfs" would likely be fine and I can bounce the idea around
-others on Samba team etc.  And yes you are right, the broader
-"SMB family of protocols" covers a lot of other functions
-(from systems management, DCE/RPC, clustering, change notification,
-named pipes, global name space ... not just files and printers) so "smbfs"
-as a name for the client fs module going forward may be a bit less confusing.
+ (5) Remove the fscache and cachefiles histogram procfiles.
 
-> So if we rename, we should rename it to something new and slightly
-> more specific than what we used to have.
->
-> I'd rather have a module called "smbfs.ko" (or "smb-fs.ko" or
-> "smb-client.ko" etc) than "smb.ko".
+ (6) Remove the fscache object list procfile.
 
-That should be easy enough (IIRC FreeBSD called their
-module "smbfs), but presumably wait until 5.16 or 5.17
-to lessen merge conflicts etc.
+ (7) Avoid using %p in fscache and cachefiles as the value is hashed and
+     not comparable to the register dump in an oops trace.
 
+ (8) Fix the cookie hash function to actually achieve useful dispersion.
 
--- 
-Thanks,
+ (9) Fix fscache_cookie_put() so that it doesn't dereference the cookie
+     pointer in the tracepoint after the refcount has been decremented
+     (we're only allowed to do that if we decremented it to zero).
 
-Steve
+(10) Use refcount_t rather than atomic_t for the fscache_cookie refcount.
+
+Some of these patches have been posted before as part of a larger patchset
+that effected almost the whole rewrite[1].
+
+Changes
+=3D=3D=3D=3D=3D=3D=3D
+ver #2:
+ - Fix a NULL pointer ref in a tracepoint (that patch reposted here [2]).
+
+David
+
+Link: https://lore.kernel.org/r/162431188431.2908479.14031376932042135080.=
+stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/160588455242.3465195.3214733858273019178.s=
+tgit@warthog.procyon.org.uk/ [1]
+Link: https://lore.kernel.org/r/2512396.1630067489@warthog.procyon.org.uk/=
+ [2]
+
+---
+The following changes since commit e73f0f0ee7541171d89f2e2491130c7771ba58d=
+3:
+
+  Linux 5.14-rc1 (2021-07-11 15:07:40 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
+/fscache-next-20210829
+
+for you to fetch changes up to 20ec197bfa13c5b799fc9527790ea7b5374fc8f2:
+
+  fscache: Use refcount_t for the cookie refcount instead of atomic_t (202=
+1-08-27 13:34:03 +0100)
+
+----------------------------------------------------------------
+fscache changes and fixes
+
+----------------------------------------------------------------
+David Howells (12):
+      fscache: Select netfs stats if fscache stats are enabled
+      netfs: Move cookie debug ID to struct netfs_cache_resources
+      cachefiles: Use file_inode() rather than accessing ->f_inode
+      fscache: Add a cookie debug ID and use that in traces
+      fscache: Procfile to display cookies
+      fscache, cachefiles: Remove the histogram stuff
+      fscache: Remove the object list procfile
+      fscache: Change %p in format strings to something else
+      cachefiles: Change %p in format strings to something else
+      fscache: Fix cookie key hashing
+      fscache: Fix fscache_cookie_put() to not deref after dec
+      fscache: Use refcount_t for the cookie refcount instead of atomic_t
+
+ fs/cachefiles/Kconfig             |  19 --
+ fs/cachefiles/Makefile            |   2 -
+ fs/cachefiles/bind.c              |   2 -
+ fs/cachefiles/interface.c         |   6 +-
+ fs/cachefiles/internal.h          |  25 ---
+ fs/cachefiles/io.c                |   6 +-
+ fs/cachefiles/key.c               |   2 +-
+ fs/cachefiles/main.c              |   7 -
+ fs/cachefiles/namei.c             |  61 ++----
+ fs/cachefiles/proc.c              | 114 -----------
+ fs/cachefiles/xattr.c             |   4 +-
+ fs/fscache/Kconfig                |  25 +--
+ fs/fscache/Makefile               |   2 -
+ fs/fscache/cache.c                |  11 +-
+ fs/fscache/cookie.c               | 201 +++++++++++++-----
+ fs/fscache/fsdef.c                |   3 +-
+ fs/fscache/histogram.c            |  87 --------
+ fs/fscache/internal.h             |  57 ++----
+ fs/fscache/main.c                 |  39 ++++
+ fs/fscache/netfs.c                |   2 +-
+ fs/fscache/object-list.c          | 414 ---------------------------------=
+-----
+ fs/fscache/object.c               |   8 -
+ fs/fscache/operation.c            |   3 -
+ fs/fscache/page.c                 |   6 -
+ fs/fscache/proc.c                 |  20 +-
+ include/linux/fscache-cache.h     |   4 -
+ include/linux/fscache.h           |   4 +-
+ include/linux/netfs.h             |   2 +-
+ include/trace/events/cachefiles.h |  68 +++----
+ include/trace/events/fscache.h    | 160 +++++++--------
+ include/trace/events/netfs.h      |   2 +-
+ 31 files changed, 368 insertions(+), 998 deletions(-)
+ delete mode 100644 fs/cachefiles/proc.c
+ delete mode 100644 fs/fscache/histogram.c
+ delete mode 100644 fs/fscache/object-list.c
+
