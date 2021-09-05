@@ -2,86 +2,105 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B7D9C433F5
-	for <linux-cifs@archiver.kernel.org>; Sun,  5 Sep 2021 14:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CECC433F5
+	for <linux-cifs@archiver.kernel.org>; Sun,  5 Sep 2021 23:38:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1611A60EC0
-	for <linux-cifs@archiver.kernel.org>; Sun,  5 Sep 2021 14:10:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 575B360F90
+	for <linux-cifs@archiver.kernel.org>; Sun,  5 Sep 2021 23:38:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232242AbhIEOLq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 5 Sep 2021 10:11:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46154 "EHLO
+        id S238331AbhIEXj3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 5 Sep 2021 19:39:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbhIEOLp (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 5 Sep 2021 10:11:45 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A612C061575;
-        Sun,  5 Sep 2021 07:10:42 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id u15-20020a05600c19cf00b002f6445b8f55so2976295wmq.0;
-        Sun, 05 Sep 2021 07:10:42 -0700 (PDT)
+        with ESMTP id S238225AbhIEXj2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 5 Sep 2021 19:39:28 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E92ECC061575;
+        Sun,  5 Sep 2021 16:38:24 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id f2so8308224ljn.1;
+        Sun, 05 Sep 2021 16:38:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=ESbKLeNsLnxks8j4gUKa9N22AZupbWMMz8A0h0s8pbs=;
-        b=aFa/WFKPa8FTj7sMuJX3RV1hGn05T1Ty2QYLB17FTdW70TCep3QGBjksWIOAYhs/Jm
-         GUVMlxDE0TfiYgoHn7meKhFo5Yg7pVObLM9c8tVx4LZf16vPqCbzHrvN5WbkpFgtfRA2
-         SzatcjoqNVtT8QnCSS4r9J/C7vBe5Vijb6jjrdu7AoeLNVzd0Nf44BKbOc04LM5vUu9b
-         KIfm1VQ4/7K/rIME4zQfZMbElpKBJKmgxSDG/0M9IUz4qGtxtTqBFIz0HEP+uPzFW/TH
-         xDVdq49t2Oxtqe8O56Gi0v4wnWzRrnBkYya2hiBZNP3eLaR4Wzm0ViiBZFnRnc2jez1R
-         yMew==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Nsax2rDUTiQyof9NbrTb6O4dsdu98uSbFRqYitM/x4s=;
+        b=S3FWTOKhb1nEfX3pb8BuZ7hQx8KVAjUUmt44UXgdlbtoB/jLHSQ2Jv7S84GttZPbfx
+         7KU50dH22aJDJYMlUfB/8VzX0S5HVa3u5EtbASZbPQyTrwQUTcd5y1Ek593TOpA509//
+         8jfPN3ecTUuVP/Cx1iGUOtrgzptnKEC08IiKF7i21puLWu/yZ/urBsIovVkLK6jHq0bf
+         K8SjMOkyRUTnoJbRamYeO2inw/okx74rRgzYEOsatgwu33vqsNurVjfbzeWsqbl/1Vxl
+         SSzo4v22kNlPGrXLJF0OvBh1BsvIaUj0AUc5oIVTVUu8r+gN1R/LU0Jf3s9oWErGba5z
+         6dOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ESbKLeNsLnxks8j4gUKa9N22AZupbWMMz8A0h0s8pbs=;
-        b=LTku1cd6x7uT2iMcxAYMC2xsmYF3Si3jH9uxD2yDeY3NLIdfCxRj7mZkr4VLyOChP/
-         6eMOUt1ngeSbGx30viQkAj18UBC02mX3CghLwHuqfYfeJ0Es5oWJqmOOo/erNaEOnge+
-         gRS3s0OxGd37gA6tHbM0gh9VFowLRY5n/fR17s0M+Y9fcT0qP+21T4s2TQbMk1/6tJbu
-         hTUdgRnzyyrfihwfb39PuQk5i+DNuRYKTo2yN2xr5Q8e0wDa82s1K1HKF/aw4aPjkqBY
-         HqwZDhb/h7jl1k1JXf3T+lRMjVVJqAzDhRxrDlum/Ov5lFw1yEKWTdrDo6iQryV6nUTl
-         eQQQ==
-X-Gm-Message-State: AOAM533tAMGGZVa3MfJzi+j3PYgK34elYWyNvJBiHNm17z0qkQOOiSZ7
-        cKLGUFo1sOhQwn++sbxcm0Q=
-X-Google-Smtp-Source: ABdhPJyGuae+vRDbUtx/y9ysoOjF8UFtVqRRuiZGTgJhrqqniTg5gQKF3hxLeGC9w5EzIHoCsMIjpw==
-X-Received: by 2002:a1c:2705:: with SMTP id n5mr7167229wmn.176.1630851040576;
-        Sun, 05 Sep 2021 07:10:40 -0700 (PDT)
-Received: from curtine-ThinkPad-P1-Gen-3.Home (bl9-74-29.dsl.telepac.pt. [85.242.74.29])
-        by smtp.gmail.com with ESMTPSA id f20sm4602376wmb.32.2021.09.05.07.10.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Sep 2021 07:10:40 -0700 (PDT)
-From:   Eric Curtin <ericcurtin17@gmail.com>
-To:     vfedorenko@novek.ru
-Cc:     aahringo@redhat.com, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, lsahlber@redhat.com,
-        netdev@vger.kernel.org, smfrench@gmail.com, swhiteho@redhat.com
-Subject: Re: quic in-kernel implementation?
-Date:   Sun,  5 Sep 2021 15:09:31 +0100
-Message-Id: <20210905140931.345774-1-ericcurtin17@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <9ce530f5-cfe7-b1d4-ede6-d88801a769ba@novek.ru>
-References: <9ce530f5-cfe7-b1d4-ede6-d88801a769ba@novek.ru>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Nsax2rDUTiQyof9NbrTb6O4dsdu98uSbFRqYitM/x4s=;
+        b=TF6IwEhB7nTR2Xxj1bezbCYL3vGcI3ptepCpexoQuUq0HC27ZC16sTV7kjZIbwWE/R
+         qVi0HumNgM5cnduUsEBIwd22WrT597n9kCEgx2R74/Svs/yrsRiUcH9cetBiTjrt7zwi
+         k67AwgnltcWCD6ss6T8CCfKz8Efy/8CIWkedpZpIxMocGp52sw4SuTbpGA/8JDS/sP8V
+         TUOBsXlizsrQ2sNpxiXD69RIJtMoKq5bPLS3bdYJgcdzcn91bEnujL777m/6yPWbHm1V
+         aaZk3UomCNt/56UfyhzdS6lqjvzjA9j9Ar51Ti1amK7tdWLsl6CbvqhSC+TfaRW86AHN
+         TdnQ==
+X-Gm-Message-State: AOAM533T548ONmt8ADgV3otgFufYg5OxxDAxpOYneIQ9QAUls7EZEEqB
+        k8BhkBMRp+Uacgea9Z6fEKX/SP/hA3Ge0IppeM8=
+X-Google-Smtp-Source: ABdhPJw2S1D58BMsX4Sb3AdihE5h2NhM77ZVb1PcP2XSoMRs+TIYU12tGoawlJPGvcmkDBtK2QQvOnBuKGtaNAyNep8=
+X-Received: by 2002:a2e:7c10:: with SMTP id x16mr8214225ljc.398.1630885102214;
+ Sun, 05 Sep 2021 16:38:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <9ce530f5-cfe7-b1d4-ede6-d88801a769ba@novek.ru> <20210905140931.345774-1-ericcurtin17@gmail.com>
+In-Reply-To: <20210905140931.345774-1-ericcurtin17@gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Sun, 5 Sep 2021 18:38:11 -0500
+Message-ID: <CAH2r5msLcLV-Mbk14ABW28BKwH9524=VKBNV278qQqJGKT6PAA@mail.gmail.com>
+Subject: Re: quic in-kernel implementation?
+To:     Eric Curtin <ericcurtin17@gmail.com>
+Cc:     vfedorenko@novek.ru,
+        Alexander Ahring Oder Aring <aahringo@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Network Development <netdev@vger.kernel.org>,
+        Steven Whitehouse <swhiteho@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Guys,
+I am interested in this as well (encrypted and non-encrypted QUIC
+cases in kernel)
 
-Great idea, something I have been hoping to see in the kernel for a
-while. How has your implementation been going @Vadim? I'd be interested
-in a non-encrypted version of QUIC also in the kernel (may not be
-supported in the spec but possible and I think worth having), would be
-useful for cases where you don't care about network ossification
-protection or data-in-transit encryption, say a trusted local network
-where you would prefer the performance and reliability advantages of
-going plaintext and you don't want to figure out how to deploy
-certififcates. Something that could be used as a straight swap for a
-TCP socket.
+Short term given that Windows is the only server than currently
+support it - testing probably needs to be done via upcall with
+SMB3.1.1 Linux mounts to Windows, and once that is verified to work
+(as a baseline for comparison) - start work on the kernel QUIC driver
 
+But for the initial point of comparison - would be helpful to have
+example code that exposes a kernel "socket like" ("sock_sendmsg") API
+for upcall ... and once we verify that that works start the work on
+the kernel driver
+
+On Sun, Sep 5, 2021 at 9:10 AM Eric Curtin <ericcurtin17@gmail.com> wrote:
+>
+> Hi Guys,
+>
+> Great idea, something I have been hoping to see in the kernel for a
+> while. How has your implementation been going @Vadim? I'd be interested
+> in a non-encrypted version of QUIC also in the kernel (may not be
+> supported in the spec but possible and I think worth having), would be
+> useful for cases where you don't care about network ossification
+> protection or data-in-transit encryption, say a trusted local network
+> where you would prefer the performance and reliability advantages of
+> going plaintext and you don't want to figure out how to deploy
+> certififcates. Something that could be used as a straight swap for a
+> TCP socket.
+>
+
+
+-- 
+Thanks,
+
+Steve
