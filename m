@@ -7,326 +7,546 @@ X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9273C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Sep 2021 22:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED8FC433F5
+	for <linux-cifs@archiver.kernel.org>; Mon,  6 Sep 2021 22:47:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C56961057
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Sep 2021 22:47:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 444C361051
+	for <linux-cifs@archiver.kernel.org>; Mon,  6 Sep 2021 22:47:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbhIFWsH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 6 Sep 2021 18:48:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:53684 "EHLO
+        id S230435AbhIFWsO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 6 Sep 2021 18:48:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45439 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229949AbhIFWsH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Sep 2021 18:48:07 -0400
+        by vger.kernel.org with ESMTP id S229949AbhIFWsO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Sep 2021 18:48:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1630968421;
+        s=mimecast20190719; t=1630968428;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=c89C1BG7sf8eIHe55IUDKhi+lSzNBA8h/V4y47mw8fU=;
-        b=gZ78z5ybexLISV/6+I//axEO32QEzvm7qWGt1udFjvxOJJXVEJfbiS+rrIQ9ML0MDqWzFU
-        YcEDHycTw2644fZxZDa4ur0/eBJk9TTZKpRxh5FOeERne4GatgFby/Xe/tN+gAu7zMunsC
-        E+1GwSZd4BeTv6S8y4EUVQpbFqu5n04=
+        bh=C04L9JxXu/khTdqX8PdaY/MM4eTt+e9+diA/OiwjdhY=;
+        b=jKQKFZgKtj2oQkPdbkvcUOG5iwE5brK44i7YY5nR1fnR32YdkVJcmJfJ0y2u/eOUUyOdNL
+        uITkxbklvdm1GPBkdDBI8EK5XdZp9Ep+vSpvHHTr1s3Hx26HQyCdYgx/3JUNUA1kBssrJX
+        PoXLNLZ7tUUeqJGYB50m4+Up+wzq/OE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-cZnx2whpOMi5G0rxVkKVag-1; Mon, 06 Sep 2021 18:47:00 -0400
-X-MC-Unique: cZnx2whpOMi5G0rxVkKVag-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-257--t8ePCelPFehTe5u2SlfGw-1; Mon, 06 Sep 2021 18:47:07 -0400
+X-MC-Unique: -t8ePCelPFehTe5u2SlfGw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9A291854E27;
-        Mon,  6 Sep 2021 22:46:58 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A22B5180;
+        Mon,  6 Sep 2021 22:47:06 +0000 (UTC)
 Received: from localhost.localdomain (vpn2-54-114.bne.redhat.com [10.64.54.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9B49C272A4;
-        Mon,  6 Sep 2021 22:46:57 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C6EC1007611;
+        Mon,  6 Sep 2021 22:47:04 +0000 (UTC)
 From:   Ronnie Sahlberg <lsahlber@redhat.com>
 To:     linux-cifs <linux-cifs@vger.kernel.org>
 Cc:     Steve French <smfrench@gmail.com>
-Subject: [PATCH 2/4] ksmbd: switch to use shared definitions where available
-Date:   Tue,  7 Sep 2021 08:46:46 +1000
-Message-Id: <20210906224648.2062040-3-lsahlber@redhat.com>
+Subject: [PATCH 3/4] cifs: move NEGOTIATE_PROTOCOL definitions out into the common area
+Date:   Tue,  7 Sep 2021 08:46:47 +1000
+Message-Id: <20210906224648.2062040-4-lsahlber@redhat.com>
 In-Reply-To: <20210906224648.2062040-1-lsahlber@redhat.com>
 References: <20210906224648.2062040-1-lsahlber@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 ---
- fs/ksmbd/smb2misc.c   |   1 -
- fs/ksmbd/smb2ops.c    |   1 -
- fs/ksmbd/smb2pdu.c    |   3 +-
- fs/ksmbd/smb2pdu.h    | 176 ------------------------------------------
- fs/ksmbd/smb_common.h |   1 +
- 5 files changed, 2 insertions(+), 180 deletions(-)
+ fs/cifs/smb2pdu.c        |   4 +-
+ fs/cifs/smb2pdu.h        | 220 -------------------------------------
+ fs/cifs_common/smb2pdu.h | 229 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 231 insertions(+), 222 deletions(-)
 
-diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
-index 66052b5a88ac..6c12ee502a69 100644
---- a/fs/ksmbd/smb2misc.c
-+++ b/fs/ksmbd/smb2misc.c
-@@ -6,7 +6,6 @@
+diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
+index 565ab538a1f0..07fa8bc1d45a 100644
+--- a/fs/cifs/smb2pdu.c
++++ b/fs/cifs/smb2pdu.c
+@@ -414,8 +414,8 @@ build_preauth_ctxt(struct smb2_preauth_neg_context *pneg_ctxt)
+ 	pneg_ctxt->ContextType = SMB2_PREAUTH_INTEGRITY_CAPABILITIES;
+ 	pneg_ctxt->DataLength = cpu_to_le16(38);
+ 	pneg_ctxt->HashAlgorithmCount = cpu_to_le16(1);
+-	pneg_ctxt->SaltLength = cpu_to_le16(SMB311_LINUX_CLIENT_SALT_SIZE);
+-	get_random_bytes(pneg_ctxt->Salt, SMB311_LINUX_CLIENT_SALT_SIZE);
++	pneg_ctxt->SaltLength = cpu_to_le16(SMB311_SALT_SIZE);
++	get_random_bytes(pneg_ctxt->Salt, SMB311_SALT_SIZE);
+ 	pneg_ctxt->HashAlgorithms = SMB2_PREAUTH_INTEGRITY_SHA512;
+ }
  
- #include "glob.h"
- #include "nterr.h"
--#include "smb2pdu.h"
- #include "smb_common.h"
- #include "smbstatus.h"
- #include "mgmt/user_session.h"
-diff --git a/fs/ksmbd/smb2ops.c b/fs/ksmbd/smb2ops.c
-index 197473871aa4..7b7801d9b2b8 100644
---- a/fs/ksmbd/smb2ops.c
-+++ b/fs/ksmbd/smb2ops.c
-@@ -6,7 +6,6 @@
- 
- #include <linux/slab.h>
- #include "glob.h"
--#include "smb2pdu.h"
- 
- #include "auth.h"
- #include "connection.h"
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 319b6a8a0db0..87a041d6a0c1 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -13,7 +13,6 @@
- #include <linux/falloc.h>
- 
- #include "glob.h"
--#include "smb2pdu.h"
- #include "smbfsctl.h"
- #include "oplock.h"
- #include "smbacl.h"
-@@ -8249,7 +8248,7 @@ static void fill_transform_hdr(void *tr_buf, char *old_buf, __le16 cipher_type)
- 	memset(tr_buf, 0, sizeof(struct smb2_transform_hdr) + 4);
- 	tr_hdr->ProtocolId = SMB2_TRANSFORM_PROTO_NUM;
- 	tr_hdr->OriginalMessageSize = cpu_to_le32(orig_len);
--	tr_hdr->Flags = cpu_to_le16(0x01);
-+	tr_hdr->Flags = cpu_to_le16(TRANSFORM_FLAG_ENCRYPTED);
- 	if (cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
- 	    cipher_type == SMB2_ENCRYPTION_AES256_GCM)
- 		get_random_bytes(&tr_hdr->Nonce, SMB3_AES_GCM_NONCE);
-diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
-index c13b425c0f62..71d1411d97d9 100644
---- a/fs/ksmbd/smb2pdu.h
-+++ b/fs/ksmbd/smb2pdu.h
-@@ -10,60 +10,6 @@
- #include "ntlmssp.h"
- #include "smbacl.h"
- 
--/*
-- * Note that, due to trying to use names similar to the protocol specifications,
-- * there are many mixed case field names in the structures below.  Although
-- * this does not match typical Linux kernel style, it is necessary to be
-- * able to match against the protocol specfication.
-- *
-- * SMB2 commands
-- * Some commands have minimal (wct=0,bcc=0), or uninteresting, responses
-- * (ie no useful data other than the SMB error code itself) and are marked such.
-- * Knowing this helps avoid response buffer allocations and copy in some cases.
-- */
--
--/* List of commands in host endian */
--#define SMB2_NEGOTIATE_HE	0x0000
--#define SMB2_SESSION_SETUP_HE	0x0001
--#define SMB2_LOGOFF_HE		0x0002 /* trivial request/resp */
--#define SMB2_TREE_CONNECT_HE	0x0003
--#define SMB2_TREE_DISCONNECT_HE	0x0004 /* trivial req/resp */
--#define SMB2_CREATE_HE		0x0005
--#define SMB2_CLOSE_HE		0x0006
--#define SMB2_FLUSH_HE		0x0007 /* trivial resp */
--#define SMB2_READ_HE		0x0008
--#define SMB2_WRITE_HE		0x0009
--#define SMB2_LOCK_HE		0x000A
--#define SMB2_IOCTL_HE		0x000B
--#define SMB2_CANCEL_HE		0x000C
--#define SMB2_ECHO_HE		0x000D
--#define SMB2_QUERY_DIRECTORY_HE	0x000E
--#define SMB2_CHANGE_NOTIFY_HE	0x000F
--#define SMB2_QUERY_INFO_HE	0x0010
--#define SMB2_SET_INFO_HE	0x0011
--#define SMB2_OPLOCK_BREAK_HE	0x0012
--
--/* The same list in little endian */
--#define SMB2_NEGOTIATE		cpu_to_le16(SMB2_NEGOTIATE_HE)
--#define SMB2_SESSION_SETUP	cpu_to_le16(SMB2_SESSION_SETUP_HE)
--#define SMB2_LOGOFF		cpu_to_le16(SMB2_LOGOFF_HE)
--#define SMB2_TREE_CONNECT	cpu_to_le16(SMB2_TREE_CONNECT_HE)
--#define SMB2_TREE_DISCONNECT	cpu_to_le16(SMB2_TREE_DISCONNECT_HE)
--#define SMB2_CREATE		cpu_to_le16(SMB2_CREATE_HE)
--#define SMB2_CLOSE		cpu_to_le16(SMB2_CLOSE_HE)
--#define SMB2_FLUSH		cpu_to_le16(SMB2_FLUSH_HE)
--#define SMB2_READ		cpu_to_le16(SMB2_READ_HE)
--#define SMB2_WRITE		cpu_to_le16(SMB2_WRITE_HE)
--#define SMB2_LOCK		cpu_to_le16(SMB2_LOCK_HE)
--#define SMB2_IOCTL		cpu_to_le16(SMB2_IOCTL_HE)
--#define SMB2_CANCEL		cpu_to_le16(SMB2_CANCEL_HE)
--#define SMB2_ECHO		cpu_to_le16(SMB2_ECHO_HE)
--#define SMB2_QUERY_DIRECTORY	cpu_to_le16(SMB2_QUERY_DIRECTORY_HE)
--#define SMB2_CHANGE_NOTIFY	cpu_to_le16(SMB2_CHANGE_NOTIFY_HE)
--#define SMB2_QUERY_INFO		cpu_to_le16(SMB2_QUERY_INFO_HE)
--#define SMB2_SET_INFO		cpu_to_le16(SMB2_SET_INFO_HE)
--#define SMB2_OPLOCK_BREAK	cpu_to_le16(SMB2_OPLOCK_BREAK_HE)
--
- /*Create Action Flags*/
- #define FILE_SUPERSEDED                0x00000000
- #define FILE_OPENED            0x00000001
-@@ -107,75 +53,10 @@
- /* BB FIXME - analyze following length BB */
- #define MAX_SMB2_HDR_SIZE 0x78 /* 4 len + 64 hdr + (2*24 wct) + 2 bct + 2 pad */
- 
--#define SMB2_PROTO_NUMBER cpu_to_le32(0x424d53fe) /* 'B''M''S' */
--#define SMB2_TRANSFORM_PROTO_NUM cpu_to_le32(0x424d53fd)
--
- #define SMB21_DEFAULT_IOSIZE	(1024 * 1024)
- #define SMB3_DEFAULT_IOSIZE	(4 * 1024 * 1024)
- #define SMB3_DEFAULT_TRANS_SIZE	(1024 * 1024)
- 
--/*
-- * SMB2 Header Definition
-- *
-- * "MBZ" :  Must be Zero
-- * "BB"  :  BugBug, Something to check/review/analyze later
-- * "PDU" :  "Protocol Data Unit" (ie a network "frame")
-- *
-- */
--
--#define __SMB2_HEADER_STRUCTURE_SIZE	64
--#define SMB2_HEADER_STRUCTURE_SIZE				\
--	cpu_to_le16(__SMB2_HEADER_STRUCTURE_SIZE)
--
--struct smb2_hdr {
--	__le32 ProtocolId;	/* 0xFE 'S' 'M' 'B' */
--	__le16 StructureSize;	/* 64 */
--	__le16 CreditCharge;	/* MBZ */
--	__le32 Status;		/* Error from server */
--	__le16 Command;
--	__le16 CreditRequest;	/* CreditResponse */
--	__le32 Flags;
--	__le32 NextCommand;
--	__le64 MessageId;
--	union {
--		struct {
--			__le32 ProcessId;
--			__le32  TreeId;
--		} __packed SyncId;
--		__le64  AsyncId;
--	} __packed Id;
--	__le64  SessionId;
--	__u8   Signature[16];
--} __packed;
--
--struct smb2_pdu {
--	struct smb2_hdr hdr;
--	__le16 StructureSize2; /* size of wct area (varies, request specific) */
--} __packed;
--
--#define SMB3_AES_CCM_NONCE 11
--#define SMB3_AES_GCM_NONCE 12
--
--struct smb2_transform_hdr {
--	__le32 ProtocolId;      /* 0xFD 'S' 'M' 'B' */
--	__u8   Signature[16];
--	__u8   Nonce[16];
--	__le32 OriginalMessageSize;
--	__u16  Reserved1;
--	__le16 Flags; /* EncryptionAlgorithm */
--	__le64  SessionId;
--} __packed;
--
--/*
-- *	SMB2 flag definitions
-- */
--#define SMB2_FLAGS_SERVER_TO_REDIR	cpu_to_le32(0x00000001)
--#define SMB2_FLAGS_ASYNC_COMMAND	cpu_to_le32(0x00000002)
--#define SMB2_FLAGS_RELATED_OPERATIONS	cpu_to_le32(0x00000004)
--#define SMB2_FLAGS_SIGNED		cpu_to_le32(0x00000008)
--#define SMB2_FLAGS_DFS_OPERATIONS	cpu_to_le32(0x10000000)
--#define SMB2_FLAGS_REPLAY_OPERATIONS	cpu_to_le32(0x20000000)
--
- /*
-  *	Definitions for SMB2 Protocol Data Units (network frames)
-  *
-@@ -408,63 +289,6 @@ struct smb2_logoff_rsp {
- 	__le16 Reserved;
+diff --git a/fs/cifs/smb2pdu.h b/fs/cifs/smb2pdu.h
+index 293bf2a791c2..61060a0618b4 100644
+--- a/fs/cifs/smb2pdu.h
++++ b/fs/cifs/smb2pdu.h
+@@ -116,226 +116,6 @@ struct share_redirect_error_context_rsp {
+ 	/* __u8 ResourceName[] */ /* Name of share as counted Unicode string */
  } __packed;
  
--struct smb2_tree_connect_req {
+-#define SMB2_CLIENT_GUID_SIZE 16
+-
+-struct smb2_negotiate_req {
 -	struct smb2_hdr hdr;
--	__le16 StructureSize;	/* Must be 9 */
--	__le16 Reserved;	/* Flags in SMB3.1.1 */
--	__le16 PathOffset;
--	__le16 PathLength;
--	__u8   Buffer[1];	/* variable length */
+-	__le16 StructureSize; /* Must be 36 */
+-	__le16 DialectCount;
+-	__le16 SecurityMode;
+-	__le16 Reserved;	/* MBZ */
+-	__le32 Capabilities;
+-	__u8   ClientGUID[SMB2_CLIENT_GUID_SIZE];
+-	/* In SMB3.02 and earlier next three were MBZ le64 ClientStartTime */
+-	__le32 NegotiateContextOffset; /* SMB3.1.1 only. MBZ earlier */
+-	__le16 NegotiateContextCount;  /* SMB3.1.1 only. MBZ earlier */
+-	__le16 Reserved2;
+-	__le16 Dialects[4]; /* BB expand this if autonegotiate > 4 dialects */
 -} __packed;
 -
--struct smb2_tree_connect_rsp {
--	struct smb2_hdr hdr;
--	__le16 StructureSize;	/* Must be 16 */
--	__u8   ShareType;  /* see below */
--	__u8   Reserved;
--	__le32 ShareFlags; /* see below */
--	__le32 Capabilities; /* see below */
--	__le32 MaximalAccess;
+-/* Dialects */
+-#define SMB10_PROT_ID 0x0000 /* local only, not sent on wire w/CIFS negprot */
+-#define SMB20_PROT_ID 0x0202
+-#define SMB21_PROT_ID 0x0210
+-#define SMB30_PROT_ID 0x0300
+-#define SMB302_PROT_ID 0x0302
+-#define SMB311_PROT_ID 0x0311
+-#define BAD_PROT_ID   0xFFFF
+-
+-/* SecurityMode flags */
+-#define	SMB2_NEGOTIATE_SIGNING_ENABLED	0x0001
+-#define SMB2_NEGOTIATE_SIGNING_REQUIRED	0x0002
+-#define SMB2_SEC_MODE_FLAGS_ALL		0x0003
+-
+-/* Capabilities flags */
+-#define SMB2_GLOBAL_CAP_DFS		0x00000001
+-#define SMB2_GLOBAL_CAP_LEASING		0x00000002 /* Resp only New to SMB2.1 */
+-#define SMB2_GLOBAL_CAP_LARGE_MTU	0X00000004 /* Resp only New to SMB2.1 */
+-#define SMB2_GLOBAL_CAP_MULTI_CHANNEL	0x00000008 /* New to SMB3 */
+-#define SMB2_GLOBAL_CAP_PERSISTENT_HANDLES 0x00000010 /* New to SMB3 */
+-#define SMB2_GLOBAL_CAP_DIRECTORY_LEASING  0x00000020 /* New to SMB3 */
+-#define SMB2_GLOBAL_CAP_ENCRYPTION	0x00000040 /* New to SMB3 */
+-/* Internal types */
+-#define SMB2_NT_FIND			0x00100000
+-#define SMB2_LARGE_FILES		0x00200000
+-
+-
+-/* Negotiate Contexts - ContextTypes. See MS-SMB2 section 2.2.3.1 for details */
+-#define SMB2_PREAUTH_INTEGRITY_CAPABILITIES	cpu_to_le16(1)
+-#define SMB2_ENCRYPTION_CAPABILITIES		cpu_to_le16(2)
+-#define SMB2_COMPRESSION_CAPABILITIES		cpu_to_le16(3)
+-#define SMB2_NETNAME_NEGOTIATE_CONTEXT_ID	cpu_to_le16(5)
+-#define SMB2_TRANSPORT_CAPABILITIES		cpu_to_le16(6)
+-#define SMB2_RDMA_TRANSFORM_CAPABILITIES	cpu_to_le16(7)
+-#define SMB2_SIGNING_CAPABILITIES		cpu_to_le16(8)
+-#define SMB2_POSIX_EXTENSIONS_AVAILABLE		cpu_to_le16(0x100)
+-
+-struct smb2_neg_context {
+-	__le16	ContextType;
+-	__le16	DataLength;
+-	__le32	Reserved;
+-	/* Followed by array of data. NOTE: some servers require padding to 8 byte boundary */
 -} __packed;
 -
--/* Possible ShareType values */
--#define SMB2_SHARE_TYPE_DISK	0x01
--#define SMB2_SHARE_TYPE_PIPE	0x02
--#define	SMB2_SHARE_TYPE_PRINT	0x03
+-#define SMB311_LINUX_CLIENT_SALT_SIZE			32
+-/* Hash Algorithm Types */
+-#define SMB2_PREAUTH_INTEGRITY_SHA512	cpu_to_le16(0x0001)
+-#define SMB2_PREAUTH_HASH_SIZE 64
 -
 -/*
-- * Possible ShareFlags - exactly one and only one of the first 4 caching flags
-- * must be set (any of the remaining, SHI1005, flags may be set individually
-- * or in combination.
+- * SaltLength that the server send can be zero, so the only three required
+- * fields (all __le16) end up six bytes total, so the minimum context data len
+- * in the response is six bytes which accounts for
+- *
+- *      HashAlgorithmCount, SaltLength, and 1 HashAlgorithm.
 - */
--#define SMB2_SHAREFLAG_MANUAL_CACHING			0x00000000
--#define SMB2_SHAREFLAG_AUTO_CACHING			0x00000010
--#define SMB2_SHAREFLAG_VDO_CACHING			0x00000020
--#define SMB2_SHAREFLAG_NO_CACHING			0x00000030
--#define SHI1005_FLAGS_DFS				0x00000001
--#define SHI1005_FLAGS_DFS_ROOT				0x00000002
--#define SHI1005_FLAGS_RESTRICT_EXCLUSIVE_OPENS		0x00000100
--#define SHI1005_FLAGS_FORCE_SHARED_DELETE		0x00000200
--#define SHI1005_FLAGS_ALLOW_NAMESPACE_CACHING		0x00000400
--#define SHI1005_FLAGS_ACCESS_BASED_DIRECTORY_ENUM	0x00000800
--#define SHI1005_FLAGS_FORCE_LEVELII_OPLOCK		0x00001000
--#define SHI1005_FLAGS_ENABLE_HASH			0x00002000
+-#define MIN_PREAUTH_CTXT_DATA_LEN 6
 -
--/* Possible share capabilities */
--#define SMB2_SHARE_CAP_DFS	cpu_to_le32(0x00000008)
--
--struct smb2_tree_disconnect_req {
--	struct smb2_hdr hdr;
--	__le16 StructureSize;	/* Must be 4 */
--	__le16 Reserved;
+-struct smb2_preauth_neg_context {
+-	__le16	ContextType; /* 1 */
+-	__le16	DataLength;
+-	__le32	Reserved;
+-	__le16	HashAlgorithmCount; /* 1 */
+-	__le16	SaltLength;
+-	__le16	HashAlgorithms; /* HashAlgorithms[0] since only one defined */
+-	__u8	Salt[SMB311_LINUX_CLIENT_SALT_SIZE];
 -} __packed;
 -
--struct smb2_tree_disconnect_rsp {
--	struct smb2_hdr hdr;
--	__le16 StructureSize;	/* Must be 4 */
--	__le16 Reserved;
+-/* Encryption Algorithms Ciphers */
+-#define SMB2_ENCRYPTION_AES128_CCM	cpu_to_le16(0x0001)
+-#define SMB2_ENCRYPTION_AES128_GCM	cpu_to_le16(0x0002)
+-/* we currently do not request AES256_CCM since presumably GCM faster */
+-#define SMB2_ENCRYPTION_AES256_CCM      cpu_to_le16(0x0003)
+-#define SMB2_ENCRYPTION_AES256_GCM      cpu_to_le16(0x0004)
+-
+-/* Min encrypt context data is one cipher so 2 bytes + 2 byte count field */
+-#define MIN_ENCRYPT_CTXT_DATA_LEN	4
+-struct smb2_encryption_neg_context {
+-	__le16	ContextType; /* 2 */
+-	__le16	DataLength;
+-	__le32	Reserved;
+-	/* CipherCount usally 2, but can be 3 when AES256-GCM enabled */
+-	__le16	CipherCount; /* AES128-GCM and AES128-CCM by default */
+-	__le16	Ciphers[3];
 -} __packed;
 -
- #define ATTR_READONLY_LE	cpu_to_le32(ATTR_READONLY)
- #define ATTR_HIDDEN_LE		cpu_to_le32(ATTR_HIDDEN)
- #define ATTR_SYSTEM_LE		cpu_to_le32(ATTR_SYSTEM)
-diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
-index 2ecbc180ad5c..f15ebb864ead 100644
---- a/fs/ksmbd/smb_common.h
-+++ b/fs/ksmbd/smb_common.h
-@@ -10,6 +10,7 @@
+-/* See MS-SMB2 2.2.3.1.3 */
+-#define SMB3_COMPRESS_NONE	cpu_to_le16(0x0000)
+-#define SMB3_COMPRESS_LZNT1	cpu_to_le16(0x0001)
+-#define SMB3_COMPRESS_LZ77	cpu_to_le16(0x0002)
+-#define SMB3_COMPRESS_LZ77_HUFF	cpu_to_le16(0x0003)
+-/* Pattern scanning algorithm See MS-SMB2 3.1.4.4.1 */
+-#define SMB3_COMPRESS_PATTERN	cpu_to_le16(0x0004) /* Pattern_V1 */
+-
+-/* Compression Flags */
+-#define SMB2_COMPRESSION_CAPABILITIES_FLAG_NONE		cpu_to_le32(0x00000000)
+-#define SMB2_COMPRESSION_CAPABILITIES_FLAG_CHAINED	cpu_to_le32(0x00000001)
+-
+-struct smb2_compression_capabilities_context {
+-	__le16	ContextType; /* 3 */
+-	__le16  DataLength;
+-	__u32	Reserved;
+-	__le16	CompressionAlgorithmCount;
+-	__u16	Padding;
+-	__u32	Flags;
+-	__le16	CompressionAlgorithms[3];
+-	__u16	Pad;  /* Some servers require pad to DataLen multiple of 8 */
+-	/* Check if pad needed */
+-} __packed;
+-
+-/*
+- * For smb2_netname_negotiate_context_id See MS-SMB2 2.2.3.1.4.
+- * Its struct simply contains NetName, an array of Unicode characters
+- */
+-struct smb2_netname_neg_context {
+-	__le16	ContextType; /* 5 */
+-	__le16	DataLength;
+-	__le32	Reserved;
+-	__le16	NetName[]; /* hostname of target converted to UCS-2 */
+-} __packed;
+-
+-/*
+- * For smb2_transport_capabilities context see MS-SMB2 2.2.3.1.5
+- * and 2.2.4.1.5
+- */
+-
+-/* Flags */
+-#define SMB2_ACCEPT_TRANSFORM_LEVEL_SECURITY	0x00000001
+-
+-struct smb2_transport_capabilities_context {
+-	__le16	ContextType; /* 6 */
+-	__le16  DataLength;
+-	__u32	Reserved;
+-	__le32	Flags;
+-	__u32	Pad;
+-} __packed;
+-
+-/*
+- * For rdma transform capabilities context see MS-SMB2 2.2.3.1.6
+- * and 2.2.4.1.6
+- */
+-
+-/* RDMA Transform IDs */
+-#define SMB2_RDMA_TRANSFORM_NONE	0x0000
+-#define SMB2_RDMA_TRANSFORM_ENCRYPTION	0x0001
+-#define SMB2_RDMA_TRANSFORM_SIGNING	0x0002
+-
+-struct smb2_rdma_transform_capabilities_context {
+-	__le16	ContextType; /* 7 */
+-	__le16  DataLength;
+-	__u32	Reserved;
+-	__le16	TransformCount;
+-	__u16	Reserved1;
+-	__u32	Reserved2;
+-	__le16	RDMATransformIds[];
+-} __packed;
+-
+-/*
+- * For signing capabilities context see MS-SMB2 2.2.3.1.7
+- * and 2.2.4.1.7
+- */
+-
+-/* Signing algorithms */
+-#define SIGNING_ALG_HMAC_SHA256	0
+-#define SIGNING_ALG_AES_CMAC	1
+-#define SIGNING_ALG_AES_GMAC	2
+-
+-struct smb2_signing_capabilities {
+-	__le16	ContextType; /* 8 */
+-	__le16	DataLength;
+-	__u32	Reserved;
+-	__le16	SigningAlgorithmCount;
+-	__le16	SigningAlgorithms[];
+-	/*  Followed by padding to 8 byte boundary (required by some servers) */
+-} __packed;
+-
+-#define POSIX_CTXT_DATA_LEN	16
+-struct smb2_posix_neg_context {
+-	__le16	ContextType; /* 0x100 */
+-	__le16	DataLength;
+-	__le32	Reserved;
+-	__u8	Name[16]; /* POSIX ctxt GUID 93AD25509CB411E7B42383DE968BCD7C */
+-} __packed;
+-
+-struct smb2_negotiate_rsp {
+-	struct smb2_hdr hdr;
+-	__le16 StructureSize;	/* Must be 65 */
+-	__le16 SecurityMode;
+-	__le16 DialectRevision;
+-	__le16 NegotiateContextCount;	/* Prior to SMB3.1.1 was Reserved & MBZ */
+-	__u8   ServerGUID[16];
+-	__le32 Capabilities;
+-	__le32 MaxTransactSize;
+-	__le32 MaxReadSize;
+-	__le32 MaxWriteSize;
+-	__le64 SystemTime;	/* MBZ */
+-	__le64 ServerStartTime;
+-	__le16 SecurityBufferOffset;
+-	__le16 SecurityBufferLength;
+-	__le32 NegotiateContextOffset;	/* Pre:SMB3.1.1 was reserved/ignored */
+-	__u8   Buffer[1];	/* variable length GSS security buffer */
+-} __packed;
+-
+ /* Flags */
+ #define SMB2_SESSION_REQ_FLAG_BINDING		0x01
+ #define SMB2_SESSION_REQ_FLAG_ENCRYPT_DATA	0x04
+diff --git a/fs/cifs_common/smb2pdu.h b/fs/cifs_common/smb2pdu.h
+index 07a295d800cb..f5a87a737473 100644
+--- a/fs/cifs_common/smb2pdu.h
++++ b/fs/cifs_common/smb2pdu.h
+@@ -315,4 +315,233 @@ struct smb2_tree_disconnect_rsp {
+ } __packed;
  
- #include "glob.h"
- #include "nterr.h"
-+#include "../cifs_common/smb2pdu.h"
- #include "smb2pdu.h"
  
- /* ksmbd's Specific ERRNO */
++/*
++ * SMB2_NEGOTIATE_PROTOCOL  See MS-SMB2 section 2.2.3
++ */
++/* SecurityMode flags */
++#define	SMB2_NEGOTIATE_SIGNING_ENABLED     0x0001
++#define	SMB2_NEGOTIATE_SIGNING_ENABLED_LE  cpu_to_le16(0x0001)
++#define SMB2_NEGOTIATE_SIGNING_REQUIRED	   0x0002
++#define SMB2_NEGOTIATE_SIGNING_REQUIRED_LE cpu_to_le16(0x0002)
++#define SMB2_SEC_MODE_FLAGS_ALL            0x0003
++
++/* Capabilities flags */
++#define SMB2_GLOBAL_CAP_DFS		0x00000001
++#define SMB2_GLOBAL_CAP_LEASING		0x00000002 /* Resp only New to SMB2.1 */
++#define SMB2_GLOBAL_CAP_LARGE_MTU	0X00000004 /* Resp only New to SMB2.1 */
++#define SMB2_GLOBAL_CAP_MULTI_CHANNEL	0x00000008 /* New to SMB3 */
++#define SMB2_GLOBAL_CAP_PERSISTENT_HANDLES 0x00000010 /* New to SMB3 */
++#define SMB2_GLOBAL_CAP_DIRECTORY_LEASING  0x00000020 /* New to SMB3 */
++#define SMB2_GLOBAL_CAP_ENCRYPTION	0x00000040 /* New to SMB3 */
++/* Internal types */
++#define SMB2_NT_FIND			0x00100000
++#define SMB2_LARGE_FILES		0x00200000
++
++#define SMB2_CLIENT_GUID_SIZE		16
++#define SMB2_CREATE_GUID_SIZE		16
++
++/* Dialects */
++#define SMB10_PROT_ID  0x0000 /* local only, not sent on wire w/CIFS negprot */
++#define SMB20_PROT_ID  0x0202
++#define SMB21_PROT_ID  0x0210
++#define SMB2X_PROT_ID  0x02FF
++#define SMB30_PROT_ID  0x0300
++#define SMB302_PROT_ID 0x0302
++#define SMB311_PROT_ID 0x0311
++#define BAD_PROT_ID    0xFFFF
++
++#define SMB311_SALT_SIZE			32
++/* Hash Algorithm Types */
++#define SMB2_PREAUTH_INTEGRITY_SHA512	cpu_to_le16(0x0001)
++#define SMB2_PREAUTH_HASH_SIZE 64
++
++/* Negotiate Contexts - ContextTypes. See MS-SMB2 section 2.2.3.1 for details */
++#define SMB2_PREAUTH_INTEGRITY_CAPABILITIES	cpu_to_le16(1)
++#define SMB2_ENCRYPTION_CAPABILITIES		cpu_to_le16(2)
++#define SMB2_COMPRESSION_CAPABILITIES		cpu_to_le16(3)
++#define SMB2_NETNAME_NEGOTIATE_CONTEXT_ID	cpu_to_le16(5)
++#define SMB2_TRANSPORT_CAPABILITIES		cpu_to_le16(6)
++#define SMB2_RDMA_TRANSFORM_CAPABILITIES	cpu_to_le16(7)
++#define SMB2_SIGNING_CAPABILITIES		cpu_to_le16(8)
++#define SMB2_POSIX_EXTENSIONS_AVAILABLE		cpu_to_le16(0x100)
++
++struct smb2_neg_context {
++	__le16	ContextType;
++	__le16	DataLength;
++	__le32	Reserved;
++	/* Followed by array of data. NOTE: some servers require padding to 8 byte boundary */
++} __packed;
++
++/*
++ * SaltLength that the server send can be zero, so the only three required
++ * fields (all __le16) end up six bytes total, so the minimum context data len
++ * in the response is six bytes which accounts for
++ *
++ *      HashAlgorithmCount, SaltLength, and 1 HashAlgorithm.
++ */
++#define MIN_PREAUTH_CTXT_DATA_LEN 6
++
++struct smb2_preauth_neg_context {
++	__le16	ContextType; /* 1 */
++	__le16	DataLength;
++	__le32	Reserved;
++	__le16	HashAlgorithmCount; /* 1 */
++	__le16	SaltLength;
++	__le16	HashAlgorithms; /* HashAlgorithms[0] since only one defined */
++	__u8	Salt[SMB311_SALT_SIZE];
++} __packed;
++
++/* Encryption Algorithms Ciphers */
++#define SMB2_ENCRYPTION_AES128_CCM	cpu_to_le16(0x0001)
++#define SMB2_ENCRYPTION_AES128_GCM	cpu_to_le16(0x0002)
++#define SMB2_ENCRYPTION_AES256_CCM      cpu_to_le16(0x0003)
++#define SMB2_ENCRYPTION_AES256_GCM      cpu_to_le16(0x0004)
++
++/* Min encrypt context data is one cipher so 2 bytes + 2 byte count field */
++#define MIN_ENCRYPT_CTXT_DATA_LEN	4
++struct smb2_encryption_neg_context {
++	__le16	ContextType; /* 2 */
++	__le16	DataLength;
++	__le32	Reserved;
++	/* CipherCount usally 2, but can be 3 when AES256-GCM enabled */
++	__le16	CipherCount; /* AES128-GCM and AES128-CCM by default */
++	__le16	Ciphers[];
++} __packed;
++
++/* See MS-SMB2 2.2.3.1.3 */
++#define SMB3_COMPRESS_NONE	cpu_to_le16(0x0000)
++#define SMB3_COMPRESS_LZNT1	cpu_to_le16(0x0001)
++#define SMB3_COMPRESS_LZ77	cpu_to_le16(0x0002)
++#define SMB3_COMPRESS_LZ77_HUFF	cpu_to_le16(0x0003)
++/* Pattern scanning algorithm See MS-SMB2 3.1.4.4.1 */
++#define SMB3_COMPRESS_PATTERN	cpu_to_le16(0x0004) /* Pattern_V1 */
++
++/* Compression Flags */
++#define SMB2_COMPRESSION_CAPABILITIES_FLAG_NONE		cpu_to_le32(0x00000000)
++#define SMB2_COMPRESSION_CAPABILITIES_FLAG_CHAINED	cpu_to_le32(0x00000001)
++
++struct smb2_compression_capabilities_context {
++	__le16	ContextType; /* 3 */
++	__le16  DataLength;
++	__u32	Reserved;
++	__le16	CompressionAlgorithmCount;
++	__u16	Padding;
++	__u32	Flags;
++	__le16	CompressionAlgorithms[3];
++	__u16	Pad;  /* Some servers require pad to DataLen multiple of 8 */
++	/* Check if pad needed */
++} __packed;
++
++/*
++ * For smb2_netname_negotiate_context_id See MS-SMB2 2.2.3.1.4.
++ * Its struct simply contains NetName, an array of Unicode characters
++ */
++struct smb2_netname_neg_context {
++	__le16	ContextType; /* 5 */
++	__le16	DataLength;
++	__le32	Reserved;
++	__le16	NetName[]; /* hostname of target converted to UCS-2 */
++} __packed;
++
++/*
++ * For smb2_transport_capabilities context see MS-SMB2 2.2.3.1.5
++ * and 2.2.4.1.5
++ */
++
++/* Flags */
++#define SMB2_ACCEPT_TRANSFORM_LEVEL_SECURITY	0x00000001
++
++struct smb2_transport_capabilities_context {
++	__le16	ContextType; /* 6 */
++	__le16  DataLength;
++	__u32	Reserved;
++	__le32	Flags;
++	__u32	Pad;
++} __packed;
++
++/*
++ * For rdma transform capabilities context see MS-SMB2 2.2.3.1.6
++ * and 2.2.4.1.6
++ */
++
++/* RDMA Transform IDs */
++#define SMB2_RDMA_TRANSFORM_NONE	0x0000
++#define SMB2_RDMA_TRANSFORM_ENCRYPTION	0x0001
++#define SMB2_RDMA_TRANSFORM_SIGNING	0x0002
++
++struct smb2_rdma_transform_capabilities_context {
++	__le16	ContextType; /* 7 */
++	__le16  DataLength;
++	__u32	Reserved;
++	__le16	TransformCount;
++	__u16	Reserved1;
++	__u32	Reserved2;
++	__le16	RDMATransformIds[];
++} __packed;
++
++/*
++ * For signing capabilities context see MS-SMB2 2.2.3.1.7
++ * and 2.2.4.1.7
++ */
++
++/* Signing algorithms */
++#define SIGNING_ALG_HMAC_SHA256    0
++#define SIGNING_ALG_HMAC_SHA256_LE cpu_to_le16(0)
++#define SIGNING_ALG_AES_CMAC       1
++#define SIGNING_ALG_AES_CMAC_LE    cpu_to_le16(1)
++#define SIGNING_ALG_AES_GMAC       2
++#define SIGNING_ALG_AES_GMAC_LE    cpu_to_le16(2)
++
++struct smb2_signing_capabilities {
++	__le16	ContextType; /* 8 */
++	__le16	DataLength;
++	__u32	Reserved;
++	__le16	SigningAlgorithmCount;
++	__le16	SigningAlgorithms[];
++	/*  Followed by padding to 8 byte boundary (required by some servers) */
++} __packed;
++
++#define POSIX_CTXT_DATA_LEN	16
++struct smb2_posix_neg_context {
++	__le16	ContextType; /* 0x100 */
++	__le16	DataLength;
++	__le32	Reserved;
++	__u8	Name[16]; /* POSIX ctxt GUID 93AD25509CB411E7B42383DE968BCD7C */
++} __packed;
++
++struct smb2_negotiate_req {
++	struct smb2_hdr hdr;
++	__le16 StructureSize; /* Must be 36 */
++	__le16 DialectCount;
++	__le16 SecurityMode;
++	__le16 Reserved;	/* MBZ */
++	__le32 Capabilities;
++	__u8   ClientGUID[SMB2_CLIENT_GUID_SIZE];
++	/* In SMB3.02 and earlier next three were MBZ le64 ClientStartTime */
++	__le32 NegotiateContextOffset; /* SMB3.1.1 only. MBZ earlier */
++	__le16 NegotiateContextCount;  /* SMB3.1.1 only. MBZ earlier */
++	__le16 Reserved2;
++	__le16 Dialects[];
++} __packed;
++
++struct smb2_negotiate_rsp {
++	struct smb2_hdr hdr;
++	__le16 StructureSize;	/* Must be 65 */
++	__le16 SecurityMode;
++	__le16 DialectRevision;
++	__le16 NegotiateContextCount;	/* Prior to SMB3.1.1 was Reserved & MBZ */
++	__u8   ServerGUID[16];
++	__le32 Capabilities;
++	__le32 MaxTransactSize;
++	__le32 MaxReadSize;
++	__le32 MaxWriteSize;
++	__le64 SystemTime;	/* MBZ */
++	__le64 ServerStartTime;
++	__le16 SecurityBufferOffset;
++	__le16 SecurityBufferLength;
++	__le32 NegotiateContextOffset;	/* Pre:SMB3.1.1 was reserved/ignored */
++	__u8   Buffer[1];	/* variable length GSS security buffer */
++} __packed;
++
++
+ #endif				/* _COMMON_SMB2PDU_H */
 -- 
 2.30.2
 
