@@ -2,70 +2,94 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F6EC433F5
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Sep 2021 23:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C919C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Sep 2021 00:06:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 781AB60F9E
-	for <linux-cifs@archiver.kernel.org>; Mon,  6 Sep 2021 23:31:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68C146109D
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Sep 2021 00:06:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232066AbhIFXcY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 6 Sep 2021 19:32:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55176 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229866AbhIFXcX (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 6 Sep 2021 19:32:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 202CF600CC;
-        Mon,  6 Sep 2021 23:31:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630971078;
-        bh=aoF1H2UmYoxlhAhStuXzzpNjbkpPfAGfpYh/lGmuDEg=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=OjDLMmnnKOHtkIAlfmFhaXxgCWmpBa6lvAYUCM0kGTm8uWvUzEcjThPTAwrTCaF5i
-         fUVhx41tWiSHoqrss3kt8aRM6rsBUnkPAGuTobZwnLMbZY9CC/Q3Xenpa6XRsbKRhp
-         YTOjzDUp6q3Vquas3qETf4QEvVXyglMBFhgBnekU2ZCJzpvVbJy0JE/2AJQ89iwKvM
-         yzwgjoYCqXNq2uJr9+tCTEPuIWkVHX+pKN+y/vrekqH9EA2QMue6D7ASKRw8fO6yBy
-         Qo1cZAY/a421tTbUdINxP2Vfr9egSE1Iqf4/r92ALqhfMrG4igTjUZoBkO3XMYQDhR
-         bfESv5kQRGl8w==
-Received: by mail-ot1-f48.google.com with SMTP id v33-20020a0568300921b0290517cd06302dso10528022ott.13;
-        Mon, 06 Sep 2021 16:31:18 -0700 (PDT)
-X-Gm-Message-State: AOAM531Fzgy3YN0725ra+ySWtUjsl8xio+dtoBMD359Qm2HDkhQFJ1Ik
-        91/UoXYJOHqWElWaJdAowVnwcndR58/wT6SIHCc=
-X-Google-Smtp-Source: ABdhPJzZiG8rIbqxwlSWGA0Tqz4WOy8/QHQkuIyQDs+xgXpfvUI35OFZ7hYDAoZFNtK6porraGbx4rx6ZKjxKAaglRo=
-X-Received: by 2002:a9d:6c04:: with SMTP id f4mr12489798otq.185.1630971077487;
- Mon, 06 Sep 2021 16:31:17 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a8a:74d:0:0:0:0:0 with HTTP; Mon, 6 Sep 2021 16:31:16 -0700 (PDT)
-In-Reply-To: <20210906134438.14250-1-colin.king@canonical.com>
-References: <20210906134438.14250-1-colin.king@canonical.com>
+        id S230484AbhIGAIB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 6 Sep 2021 20:08:01 -0400
+Received: from mail-pj1-f42.google.com ([209.85.216.42]:55966 "EHLO
+        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230169AbhIGAIB (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Sep 2021 20:08:01 -0400
+Received: by mail-pj1-f42.google.com with SMTP id i13so5148674pjv.5
+        for <linux-cifs@vger.kernel.org>; Mon, 06 Sep 2021 17:06:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ucOG/xB0xoB4J/wP5D+elrrblfPP9rByEVn07YtPYmU=;
+        b=EFLsFs2QNv4N8QFB/vLuZNu6tZ1TsJnhXjjlcVYXH5lVtWa0R1lprRZvQjMeG9GbFK
+         xwXotV43dFBhnZdag6NpOq+bVaeW4GKG4c9c65JdSFl5fyHL0oEPAJnkXCFLM+p8aW3y
+         FxBgGu0IYdkuBK129pjDmzFoWOlJdpZ4v+znvNIM0xEzGaYvVbmikTjxO7BCa/5lmOXN
+         1jxln3A6t5e7Jef/dBwXYT0QQ3+bL6BKMtowz46mUbM+u0NjQMpevGY5fCxISiaoFWTK
+         lIUz/FxVWeNkinYqEv3/q6JnyVzAQKX56uL/glRs8/9B3WJPMIIKTfjs5ylE983ATp4F
+         vHMA==
+X-Gm-Message-State: AOAM530XI+xk+dA36TDPx2NJ6HosvzW88WZnk3yg7RkyzH73R3Gz1i6l
+        Kz/kmairBS5xvrX6gO0ucZbeQIhvv+sAtg==
+X-Google-Smtp-Source: ABdhPJxv+JFVZ1VwTTaCUpMgjYGYyd4ckSEPmpfTFKJMpwSqU6zy0f6dZZ8+H1M0pRcgNm0CLXLJbA==
+X-Received: by 2002:a17:90a:420c:: with SMTP id o12mr1548547pjg.101.1630973215671;
+        Mon, 06 Sep 2021 17:06:55 -0700 (PDT)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id cq8sm438029pjb.31.2021.09.06.17.06.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Sep 2021 17:06:55 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 7 Sep 2021 08:31:16 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8Rsu88exReJCt8hW8d_D=cqpRy1G7siaK+2AOo3EOO4w@mail.gmail.com>
-Message-ID: <CAKYAXd8Rsu88exReJCt8hW8d_D=cqpRy1G7siaK+2AOo3EOO4w@mail.gmail.com>
-Subject: Re: [PATCH][next] ksmbd: add missing assignments to ret on
- ndr_read_int64 read calls
-To:     Colin King <colin.king@canonical.com>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <sfrench@samba.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH 1/2] ksmbd: fix read of uninitialized variable ret in set_file_basic_info
+Date:   Tue,  7 Sep 2021 09:06:25 +0900
+Message-Id: <20210907000626.14385-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-09-06 22:44 GMT+09:00, Colin King <colin.king@canonical.com>:
-> From: Colin Ian King <colin.king@canonical.com>
->
-> Currently there are two ndr_read_int64 calls where ret is being checked
-> for failure but ret is not being assigned a return value from the call.
-> Static analyis is reporting the checks on ret as dead code.  Fix this.
->
-> Addresses-Coverity: ("Logical dead code")
-> Fixes: 303fff2b8c77 ("ksmbd: add validation for ndr read/write functions")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-Applied it to my queue. I will send it to Steve after testing.
-Thanks for your patch!
+Addresses-Coverity reported Uninitialized variables warninig :
+
+/fs/ksmbd/smb2pdu.c: 5525 in set_file_basic_info()
+5519                    if (!rc) {
+5520                            inode->i_ctime = ctime;
+5521                            mark_inode_dirty(inode);
+5522                    }
+5523                    inode_unlock(inode);
+5524            }
+>>>     CID 1506805:  Uninitialized variables  (UNINIT)
+>>>     Using uninitialized value "rc".
+5525            return rc;
+5526     }
+5527
+5528     static int set_file_allocation_info(struct ksmbd_work *work,
+5529                                 struct ksmbd_file *fp, char *buf)
+5530     {
+
+Addresses-Coverity: ("Uninitialized variable")
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 745d3f5eac09..56ebd3d7dc35 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -5449,7 +5449,7 @@ static int set_file_basic_info(struct ksmbd_file *fp, char *buf,
+ 	struct file *filp;
+ 	struct inode *inode;
+ 	struct user_namespace *user_ns;
+-	int rc;
++	int rc = 0;
+ 
+ 	if (!(fp->daccess & FILE_WRITE_ATTRIBUTES_LE))
+ 		return -EACCES;
+-- 
+2.25.1
+
