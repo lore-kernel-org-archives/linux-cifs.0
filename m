@@ -5,44 +5,44 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7325C43219
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Sep 2021 13:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E84A1C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Sep 2021 13:17:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5F2760E94
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Sep 2021 13:17:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D064C60E94
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Sep 2021 13:17:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359291AbhIINST (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 9 Sep 2021 09:18:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53470 "EHLO mail.kernel.org"
+        id S1353926AbhIINSW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 9 Sep 2021 09:18:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54046 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1357889AbhIINFS (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 9 Sep 2021 09:05:18 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 28B6761212;
-        Thu,  9 Sep 2021 12:00:00 +0000 (UTC)
+        id S1358766AbhIINJh (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 9 Sep 2021 09:09:37 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3524F632B3;
+        Thu,  9 Sep 2021 12:01:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631188801;
-        bh=Hf2RRelyE2amnSnIibj8OQSt2FVQFWgfHCv0/xYHdsY=;
+        s=k20201202; t=1631188867;
+        bh=dTsEYmOqiKMEA1kAAcVAf3A056PrnmdV4UpiscEpHoE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OHJTIs4KZhqW82qcHmcdITIWiR8j9QCPxGRJxa5P1dqWVdbkdaHwkc9ZlMjJQthNx
-         fnDMgmMi0CN3cabukU0VyVCahnJ8EJEcmkp1B+asxb5entoh7nFwX6qdrmqC0J7XuR
-         XXXHaO1kqqsmZXuEmLlaWmFau7Fj45PMX3ZNsv/ytVI6v26Ly7uwv0Cqb1v50X4Mp6
-         TdYKsBum5wCFOit8RzhMqTVmZW7l8RdHeS5mK5YG8Io3149U8QtAchf36tzoiQJoXk
-         HbuxOQiyxaVii40yiwvVkNHhfgU0noYtuRDUqPeJ2XcfcZxSrPEJtn2SZcv/TXKlcD
-         tHoAwR6x4juWA==
+        b=IrPWkgicy9H7anS7VOAe/PHQTpElvXA9xEnFapZfRGo24zUW19oiR+8oojg1B9Ddy
+         UyD/XG0iElZva/woOaV7c/C7EshhbiEV1nXZzn/zjrvXqwTZ0mO3NAp4q6HNumehq4
+         eIlZOB77q0b081RXVArqj7uZohgcvunqYR+1x+bxjxS09q4lHvLI5OzYIhJ01RpO7N
+         4ZzcgiSJCLwcXKGaNhY6GCCMKzTc+e7gcjMkizsQiXxdxZknU76mN5tRFtlSNya/Pa
+         RTR12yXHuQrB8T9OrMqO9uYWF8AB6mgLc2VlvgdF6Q2nqs5WjpuEs09grtKVrzLiUp
+         f+SlmCc4TdouQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ding Hui <dinghui@sangfor.com.cn>, Paulo Alcantara <pc@cjr.nz>,
         Steve French <stfrench@microsoft.com>,
         Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.14 48/59] cifs: fix wrong release in sess_alloc_buffer() failed path
-Date:   Thu,  9 Sep 2021 07:58:49 -0400
-Message-Id: <20210909115900.149795-48-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 41/48] cifs: fix wrong release in sess_alloc_buffer() failed path
+Date:   Thu,  9 Sep 2021 08:00:08 -0400
+Message-Id: <20210909120015.150411-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210909115900.149795-1-sashal@kernel.org>
-References: <20210909115900.149795-1-sashal@kernel.org>
+In-Reply-To: <20210909120015.150411-1-sashal@kernel.org>
+References: <20210909120015.150411-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -68,7 +68,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index aa23c00367ec..0113dba28eb0 100644
+index bb208076cb71..aeec5a896ea6 100644
 --- a/fs/cifs/sess.c
 +++ b/fs/cifs/sess.c
 @@ -602,7 +602,7 @@ sess_alloc_buffer(struct sess_data *sess_data, int wct)
