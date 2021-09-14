@@ -2,126 +2,171 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB24C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 12:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8295DC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 13:54:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0CC760F24
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 12:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 655456112E
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 13:54:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232412AbhINM2C (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Sep 2021 08:28:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45902 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232507AbhINM2C (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 14 Sep 2021 08:28:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D4A560F9F
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Sep 2021 12:26:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631622405;
-        bh=u+lt6FbASVnWwsy1G1daS3h0pYyhh7gKSHfWmqp8y/E=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=neYBjlk8nopa4vnzVuHa6C3OsfH9U6QvY8FmM9CfFgHJC9gQdOB3V/oBv+C7GHPvw
-         E6WeQUG54rnG5lCPwwsmXMOMRAkJViO/v3bHS/7TU4ZlIuVVfsb6C1Tif24oKutVWP
-         Mf/4hwzV97yWHfEyaRF8Xs3KfdrJWg8itPdwFWE9eJAnlZjqBynodBg8jqdNOnjQ7z
-         AWycmAmNhpuFb1rUURJHJa6LBuHjEikrX1MQBSh9O+gjFAHHH5Eaw4XCZz8zgLMPnQ
-         SEIt0s1IC7AtmnJ7bRNNfoSOzFTLspWkLokfX6tWASqB6bG3xKHjfwfG8E264mLfFo
-         ZMVn+PMDhpPXQ==
-Received: by mail-oo1-f42.google.com with SMTP id t2-20020a4ae9a2000000b0028c7144f106so4544856ood.6
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Sep 2021 05:26:45 -0700 (PDT)
-X-Gm-Message-State: AOAM530wcp+3zWbIfqF+9safkM/Zexo/OOKtBtkAL07Dtq5c6xQc4hRu
-        AOi1ucfEMtB1Ejqkx6AUL1cgbt5B/W802IJUdj4=
-X-Google-Smtp-Source: ABdhPJxuSSMwpPexcM23sKCNrf+0/luv++aGoyPR/t1vU1dGbXH+MFdwLk4i1SDzG6Xoln1UH5swPsUAqh3B487hyC4=
-X-Received: by 2002:a4a:db86:: with SMTP id s6mr14030834oou.58.1631622404750;
- Tue, 14 Sep 2021 05:26:44 -0700 (PDT)
+        id S233441AbhINN4N (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Sep 2021 09:56:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49245 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233306AbhINN4F (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 14 Sep 2021 09:56:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1631627687;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=rIzfcnXtGjc7TySfbNX1AsWwNTm/MWDBD4Ry2MXdNBs=;
+        b=XmnkoZSOd7HX3mrH5FBowUbUGhjYheBvLGPRaiype9CkgP+i8gSaa8xwRHRqDvJ+yptqlj
+        Veuf3SrXNDX+nNH02o0EMMtVAJgHiDhWoIDoji1RnugZERYeKpgiIXxXx0q1g4EN4NSSO6
+        CUHx3j/z74trKYCLdNFUCCcDQSLcp+g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-114-dIBVNSzYOdueWmxj2p5K1Q-1; Tue, 14 Sep 2021 09:54:46 -0400
+X-MC-Unique: dIBVNSzYOdueWmxj2p5K1Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97C6F8145EE;
+        Tue, 14 Sep 2021 13:54:43 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.44])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C68460583;
+        Tue, 14 Sep 2021 13:54:36 +0000 (UTC)
+Subject: [RFC PATCH 0/8] fscache: Replace and remove old I/O API
+From:   David Howells <dhowells@redhat.com>
+To:     Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>
+Cc:     linux-nfs@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        Shyam Prasad N <nspmangalore@gmail.com>, dhowells@redhat.com,
+        Jeff Layton <jlayton@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Tue, 14 Sep 2021 14:54:36 +0100
+Message-ID: <163162767601.438332.9017034724960075707.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-Received: by 2002:a8a:74d:0:0:0:0:0 with HTTP; Tue, 14 Sep 2021 05:26:44 -0700 (PDT)
-In-Reply-To: <CAKYAXd8jndu748oK92Q3xEASFT_5fjX4GuvJxCG5GgUpQANrzQ@mail.gmail.com>
-References: <CAH2r5msfMxY5NSULfUr91j-QLJV7U0CD_BsyzvuNDRvBF7pcTA@mail.gmail.com>
- <CAKYAXd8jndu748oK92Q3xEASFT_5fjX4GuvJxCG5GgUpQANrzQ@mail.gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 14 Sep 2021 21:26:44 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-sfqxHv-vFAa91etk5zXubh1JaYkUbz-NGD0ZGFz7nMQ@mail.gmail.com>
-Message-ID: <CAKYAXd-sfqxHv-vFAa91etk5zXubh1JaYkUbz-NGD0ZGFz7nMQ@mail.gmail.com>
-Subject: Re: newly passing xfstests
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-09-13 17:17 GMT+09:00, Namjae Jeon <linkinjeon@kernel.org>:
-> 2021-09-13 14:54 GMT+09:00, Steve French <smfrench@gmail.com>:
->> Do you notice additional xfstests that we should be adding to the
->> ksmbd buildbot group?
-> I am relying on the xfstests test list you shared. I haven't recently
-> ever run the total tests. And some tests may have pass/fail
-> differences depending on the local fs (i.e. reflink).
->>
->> e.g. I noticed xfstests generic/115 116 and 121 passing ... do you see
->> those passing in your test setups as well?
-> Yep, You have shared these tests passed since ksmbd support
-> FSCTL_DUPLICATE_EXTENTS_TO_FILE ioctl. i.e. Local filesystem need to
-> support reflink.
-> After a while, I'll re-run the total xfstest tests including them and
-> share if there are any additional ones.
 
-I can also see generic/115 116 and 121 passing on my setup. I am
-running total xfstest tests now.
+Here's a set of patches that removes the old fscache I/O API by the following
+means:
 
-linkinjeon@linkinjeon-System-Product-Name:~/git/xfstests-cifsd$ sudo
-./check generic/115
-FSTYP         -- cifs
-PLATFORM      -- Linux/x86_64 linkinjeon-System-Product-Name 5.14.0+
-#1 SMP Sun Sep 5 10:40:54 JST 2021
-MKFS_OPTIONS  -- //127.0.0.1/homes2
-MOUNT_OPTIONS --
--ousername=linkinjeon,password=1234,noperm,vers=3.11,mfsymlinks
-//127.0.0.1/homes2 /mnt/scratch
+ (1) A simple fallback API is added that can read or write a single page
+     synchronously.  The functions for this have "deprecated" in their names
+     as they have to be removed at some point.
 
-generic/115	 1s
-Ran: generic/115
-Passed all 1 tests
+ (2) An implementation of this is provided in cachefiles.  It creates a kiocb
+     to use DIO to the backing file rather than calling readpage on the
+     backing filesystem page and then snooping the page wait queue.
 
-linkinjeon@linkinjeon-System-Product-Name:~/git/xfstests-cifsd$ sudo
-./check generic/116
-FSTYP         -- cifs
-PLATFORM      -- Linux/x86_64 linkinjeon-System-Product-Name 5.14.0+
-#1 SMP Sun Sep 5 10:40:54 JST 2021
-MKFS_OPTIONS  -- //127.0.0.1/homes2
-MOUNT_OPTIONS --
--ousername=linkinjeon,password=1234,noperm,vers=3.11,mfsymlinks
-//127.0.0.1/homes2 /mnt/scratch
+ (3) NFS is switched to use the fallback API.
 
-generic/116	 1s
-Ran: generic/116
-Passed all 1 tests
+ (4) CIFS is switched to use the fallback API also for the moment.
 
-linkinjeon@linkinjeon-System-Product-Name:~/git/xfstests-cifsd$ sudo
-./check generic/121
-FSTYP         -- cifs
-PLATFORM      -- Linux/x86_64 linkinjeon-System-Product-Name 5.14.0+
-#1 SMP Sun Sep 5 10:40:54 JST 2021
-MKFS_OPTIONS  -- //127.0.0.1/homes2
-MOUNT_OPTIONS --
--ousername=linkinjeon,password=1234,noperm,vers=3.11,mfsymlinks
-//127.0.0.1/homes2 /mnt/scratch
+ (5) 9P is switched to using netfslib.
 
-generic/121	 1s
-Ran: generic/121
-Passed all 1 tests
+ (6) The old I/O API is removed from fscache and the page snooping
+     implementation is removed from cachefiles.
 
-Thanks!
->
-> Thanks!
->>
->> --
->> Thanks,
->>
->> Steve
->>
->
+The reasons for doing this are:
+
+ (A) Using a kiocb to do asynchronous DIO from/to the pages of the backing
+     file is now a possibility that didn't exist when cachefiles was created.
+     This is much simpler than the snooping mechanism with a proper callback
+     path and it also requires fewer copies and less memory.
+
+ (B) We have to stop using bmap() or SEEK_DATA/SEEK_HOLE to work out what
+     blocks are present in the backing file is dangerous and can lead to data
+     corruption if the backing filesystem can insert or remove blocks of zeros
+     arbitrarily in order to optimise its extent list[1].
+
+     Whilst this patchset doesn't fix that yet, it does simplify the code and
+     the fix for that can be made in a subsequent patchset.
+
+ (C) In order to fix (B), the cache will need to keep track itself of what
+     data is present.  To make this easier to manage, the intention is to
+     increase the cache block granularity to, say, 256KiB - importantly, a
+     size that will span multiple pages - which means the single-page
+     interface will have to go away.  netfslib is designed to deal with
+     that on behalf of a filesystem, though a filesystem could use raw
+     cache calls instead and manage things itself.
+
+These patches can be found also on:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=fscache-iter-3
+
+David
+
+Link: https://lore.kernel.org/r/YO17ZNOcq+9PajfQ@mit.edu [1]
+---
+David Howells (8):
+      fscache: Generalise the ->begin_read_operation method
+      fscache: Implement an alternate I/O interface to replace the old API
+      nfs: Move to using the alternate (deprecated) fscache I/O API
+      9p: (untested) Convert to using the netfs helper lib to do reads and caching
+      cifs: (untested) Move to using the alternate (deprecated) fscache I/O API
+      fscache: Remove the old I/O API
+      fscache: Remove stats that are no longer used
+      fscache: Update the documentation to reflect I/O API changes
+
+
+ .../filesystems/caching/backend-api.rst       |  138 +--
+ .../filesystems/caching/netfs-api.rst         |  386 +-----
+ fs/9p/Kconfig                                 |    1 +
+ fs/9p/cache.c                                 |  137 ---
+ fs/9p/cache.h                                 |   98 +-
+ fs/9p/v9fs.h                                  |    9 +
+ fs/9p/vfs_addr.c                              |  174 ++-
+ fs/9p/vfs_file.c                              |   21 +-
+ fs/cachefiles/Makefile                        |    1 -
+ fs/cachefiles/interface.c                     |   15 -
+ fs/cachefiles/internal.h                      |   38 -
+ fs/cachefiles/io.c                            |   28 +-
+ fs/cachefiles/main.c                          |    1 -
+ fs/cachefiles/rdwr.c                          |  972 ---------------
+ fs/cifs/file.c                                |   64 +-
+ fs/cifs/fscache.c                             |  105 +-
+ fs/cifs/fscache.h                             |   74 +-
+ fs/fscache/cache.c                            |    6 -
+ fs/fscache/cookie.c                           |   10 -
+ fs/fscache/internal.h                         |   58 +-
+ fs/fscache/io.c                               |  140 ++-
+ fs/fscache/object.c                           |    2 -
+ fs/fscache/page.c                             | 1066 -----------------
+ fs/fscache/stats.c                            |   73 +-
+ fs/nfs/file.c                                 |   14 +-
+ fs/nfs/fscache-index.c                        |   26 -
+ fs/nfs/fscache.c                              |  161 +--
+ fs/nfs/fscache.h                              |   84 +-
+ fs/nfs/read.c                                 |   25 +-
+ fs/nfs/write.c                                |    7 +-
+ include/linux/fscache-cache.h                 |  131 --
+ include/linux/fscache.h                       |  418 ++-----
+ include/linux/netfs.h                         |   17 +-
+ 33 files changed, 508 insertions(+), 3992 deletions(-)
+ delete mode 100644 fs/cachefiles/rdwr.c
+
+
