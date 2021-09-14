@@ -2,65 +2,59 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF0EC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 21:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 234EDC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 21:25:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1ABEC6112D
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 21:22:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3BC360F8F
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 21:25:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234969AbhINVXV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Sep 2021 17:23:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51292 "EHLO
+        id S234363AbhINV0c (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Sep 2021 17:26:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235357AbhINVXM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Sep 2021 17:23:12 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DAACC0613EE;
-        Tue, 14 Sep 2021 14:21:49 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id x27so1379892lfu.5;
-        Tue, 14 Sep 2021 14:21:49 -0700 (PDT)
+        with ESMTP id S231472AbhINV0c (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Sep 2021 17:26:32 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1521CC061574;
+        Tue, 14 Sep 2021 14:25:14 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id k4so1368418lfj.7;
+        Tue, 14 Sep 2021 14:25:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uo/LrTByBuM+thHtzRuHWUtLdiKYW1ebh0CY7Ez0iow=;
-        b=jeVUwEqzat+R2k0OIZLYt9s5LaqMT79H+JeUmw5eLwUbTrGEl/9tnHyVgazX2aUqlQ
-         tvtDxfMewrdORjzyXhDz+J4m/x7mkS9Uchh3MCCZkCX3XZsTUV/Jeh1O2JUMcroA6Qq3
-         hYI8oGd0H0YOFEkrR5W0k0vnl1nkYYxvJZWEzU5zhGSCyNd1iEGhKfU1VZNJvIjYqac4
-         SGQIU//roCq1aW4S2t47ula622a0P/WAzUYvoaIsgfsmm90uF5sv/fyy97/agOeLZjk2
-         syDqhoKrmrcJWrciBZytf+aEd2wZevBIj4VcDf1JCg4NaV0dAvxEdvjeNPxKyx7nGlqI
-         ZmMA==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=p9Di1H/sPScsBnJhT6+8DvY3hxXtr8Z+jopctHhwJjw=;
+        b=TDQuSjwYOZvrYdxcQUXG6Bc4x1ic56uWkxXqM6+R/XWnVlf6OG6RAJjU5iHhRnKjBA
+         6ytT+U9woL17V4ajqDtEKIm/rVcs+Se/JCPdQbbFVek/sAm1DI1boTYE92tHN20ETyNm
+         2n83v9rnRxKCXNrNZSUW1zocXwsl/upZKFiyjycfyzF1EiVoczk+bWHG5ukWLr2YVdcT
+         +V/jk241L4HEm6UGNr7D+vO3S95wc50copXCkiVqp36H2H3rMPzRte+p/7MNGdWHfsLH
+         5XUQXkfvpFJVrU9vQ2H5LUo1bpORwM+0EINAXFmFapRLzrGDTZz0EhlYfw8SkY1xjFbg
+         uL3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uo/LrTByBuM+thHtzRuHWUtLdiKYW1ebh0CY7Ez0iow=;
-        b=vh3/QcWC5gqNPAiKvLj4i1X2VpNSKFZz+wXpx9PvM09UoYBIrcHN5Vfu1Y3zDMJ2yi
-         O3IqUplx1QyfTww8jD3htv5mHaz2g5gIXifyssS/5t65GBKrFq9NH8EQiEJ+ordHObCT
-         N5vN5qxndz5D/171NLmfq1ez2iSScpIYSqnowfKHloQT1yX69iCrsLRyMRhPuDWR0vHy
-         dAYnLid+GeQW3IjwgGYE77QDBL9b/3WbzZkd7RKrgzZ1WS7nFtgusGYUO6OswUOeDvPU
-         wN2FkThIPNKTY8VCsL0QdWMErEPy3rQiFSP6rgJrcXeJlkvnSR3Asg3uqKd06lGuN7aB
-         IWHQ==
-X-Gm-Message-State: AOAM530v419IK5v/DlpxTj+1QvZwRrJZt4KDUvZlS7qUe65UettKlK4X
-        mzQyAZy/SQnO8BgBdI4tvdvOLCT4f2QioUoLWz4=
-X-Google-Smtp-Source: ABdhPJxYxUwDbsIFF8eGusAVg9bszlieDML1vS548jRVAiFxa3aPFGAznC8pWnTKFGS4fdIiXsXhatDQ5nFZK372+CY=
-X-Received: by 2002:a05:6512:78:: with SMTP id i24mr14419410lfo.595.1631654506946;
- Tue, 14 Sep 2021 14:21:46 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=p9Di1H/sPScsBnJhT6+8DvY3hxXtr8Z+jopctHhwJjw=;
+        b=P/HhP4oe3/7EG/vC+COli5g8FxGxBToNgQcyhYzs54te/26Tdp45zYnBEwWxRUYexr
+         0VYnvahiM6j2jtaYUx1A3708tUj2SxXZ4Qc9PaWSYi6eAzwHWwELrAlY/2N9bzXljBTm
+         sRfMiObkoJHnWtZU+XHtScFOuP/s0D8bdgc4PHL4S1lkJouurbqXKQ5/vwlQ3EmoxZrE
+         PVx2Cdjg3QNSLhdIEaX1spa6rBpP5QHcJf81j+zXJyNCP8VUZXueQ+O2YNg3aC81zYKe
+         +f4C0suTyxy086r0+odRShFAfzTvivdcOD/dvmTsMg9+qdUPLS55lMheXdH4KlB1yfXm
+         4wSA==
+X-Gm-Message-State: AOAM532+PsrzkfPfAWyxO4daAfP5FNbt6yVsqU2jfGcEJhP3yq2lhKY4
+        yk2mdYRcec8BarCQJ+t/DEtAoqDa337c+77b2eDZTTRqNeo=
+X-Google-Smtp-Source: ABdhPJwBG/ysp5mH3EGjmvFj84gBOsSjxyEzON0R1x21Vt7YYV49n6T4DGQZik0j7XNFrNAFtcWnz/6GLbn5Rxm+FjU=
+X-Received: by 2002:a19:c388:: with SMTP id t130mr533170lff.601.1631654712244;
+ Tue, 14 Sep 2021 14:25:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvVdBoUW-0BfsxiRAE6X30cqhBtNDvG7pwKdQwsu+wXfg@mail.gmail.com>
- <CAHk-=wiNvB_j3VZYJ1yZqq+9JjgWCO1MUmRsjTKBwQ+x=kB5tg@mail.gmail.com>
- <CAH2r5mtTLUQa2U=MGHOVk_FsPZg6owMsw+RoTudWxGuoQej41g@mail.gmail.com>
- <CAHk-=wjxmDks6CS41PCy_BZG70pjAhcPBV_7ga8kSJySvvDezQ@mail.gmail.com> <CAH2r5mt72NYan9q8MR5H8cNkYzT4jn1ZM1f3jp5V-fDs2cyB-A@mail.gmail.com>
-In-Reply-To: <CAH2r5mt72NYan9q8MR5H8cNkYzT4jn1ZM1f3jp5V-fDs2cyB-A@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 14 Sep 2021 16:21:36 -0500
-Message-ID: <CAH2r5much4q6bETPPCbqmhb+ksrX=5RXu_fcNVNk8dHiqN+g2Q@mail.gmail.com>
-Subject: Re: [GIT PULL] cifs/smb3 client fixes
+Date:   Tue, 14 Sep 2021 16:25:01 -0500
+Message-ID: <CAH2r5msxj6Wy_2KJYECdVxdMPupKsvjPKRzk9B3+a1AA4ayvPg@mail.gmail.com>
+Subject: [GIT PULL] rename fs/cifs source directory to fs/smbfs_client
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>,
@@ -70,35 +64,204 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Aug 31, 2021 at 1:06 PM Steve French <smfrench@gmail.com> wrote:
-> On Tue, Aug 31, 2021 at 12:43 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
-> >
-> > On Tue, Aug 31, 2021 at 10:09 AM Steve French <smfrench@gmail.com> wrote:
-<snip>
-> > I'm ok with directory renames, git handles it all well enough that the
-> > pain should be fairly minimal.
-> >
-> > I'd ask for that to be done during a fairly calm cycle, though, when
-> > there isn't a lot pending, so that any rename conflicts will be
-> > minimized.
-<snip>
-> > > Do you have any objections to me renaming the client's source
-> > > directory to "fs/smb3" (or fs/smb) and fs/smb3_common ...?
-> >
-> > So no objections to the rename per se, but can we please use a more
-> > specific name that is *not* tainted by history?
-> >
-> > I'll throw out two suggestions, but they are just that: (a) "smbfs" or
-> > (b) "smb-client".
+Please pull the following changes since commit
+6880fa6c56601bb8ed59df6c30fd390cc5f6dd8f:
 
-Due to git history for fs/smbfs directory (from many, many years ago) rename
-to "fs/smbfs" could be more confusing. So alternative suggestion which
-I implemented
-was rename the source directory from fs/cifs to "fs/smbfs_client."  I
-will send a P/R
-for that since it is fairly quiet right now.  If you would prefer that
-we wait for a future
-release that is fine too, but seems like low risk now and might reduce
-future confusion in
-the future (to rename the source directory).
+  Linux 5.15-rc1 (2021-09-12 16:28:37 -0700)
+
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git
+tags/5.15-rc1-cifs-smbfs_client-rename
+
+for you to fetch changes up to c1abf13059571edd59d42d676ffe593fb987c019:
+
+  cifs: rename uapi/linux/cifs directory to uapi/linux/smbfs_client
+(2021-09-14 00:22:02 -0500)
+
+----------------------------------------------------------------
+4 cifs fixes, all relating to renaming fs/cifs source directory to the
+less confusing name "fs/smbfs_client":
+
+- rename the fs/cifs directory to fs/smbfs_client, and the corresponding
+    include/uapi/linux/cifs directory
+- remove the path name from the headers of various cifs/smb3 files
+    (also fixes a checkpatch warning)
+- fix the kernel-doc format of two files (to avoid kernel test robot warnings
+    due to the move)
+
+In a future release we could consider renaming cifs.ko itself but that requires
+broader changes than renaming the source code directory.
+----------------------------------------------------------------
+Steve French (4):
+      cifs: remove pathname for file from SPDX header
+      cifs: fix incorrect kernel doc comments
+      cifs: rename fs/cifs directory to fs/smbfs_client
+      cifs: rename uapi/linux/cifs directory to uapi/linux/smbfs_client
+
+ Documentation/admin-guide/cifs/changes.rst               |  2 +-
+ Documentation/admin-guide/cifs/usage.rst                 | 14 +++++++-------
+ Documentation/filesystems/cifs/cifsroot.rst              |  2 +-
+ Documentation/userspace-api/ioctl/ioctl-number.rst       |  2 +-
+ MAINTAINERS                                              |  4 ++--
+ fs/Kconfig                                               |  2 +-
+ fs/Makefile                                              |  2 +-
+ fs/{cifs => smbfs_client}/Kconfig                        |  0
+ fs/{cifs => smbfs_client}/Makefile                       |  0
+ fs/{cifs => smbfs_client}/asn1.c                         |  0
+ fs/{cifs => smbfs_client}/cache.c                        |  2 +-
+ fs/{cifs => smbfs_client}/cifs_debug.c                   |  1 -
+ fs/{cifs => smbfs_client}/cifs_debug.h                   |  0
+ fs/{cifs => smbfs_client}/cifs_dfs_ref.c                 |  0
+ fs/{cifs => smbfs_client}/cifs_fs_sb.h                   |  1 -
+ fs/{cifs => smbfs_client}/cifs_ioctl.h                   |  1 -
+ fs/{cifs => smbfs_client}/cifs_spnego.c                  |  2 +-
+ fs/{cifs => smbfs_client}/cifs_spnego.h                  |  2 +-
+ fs/{cifs => smbfs_client}/cifs_spnego_negtokeninit.asn1  |  0
+ fs/{cifs => smbfs_client}/cifs_swn.c                     |  2 +-
+ fs/{cifs => smbfs_client}/cifs_swn.h                     |  0
+ fs/{cifs => smbfs_client}/cifs_unicode.c                 |  1 -
+ fs/{cifs => smbfs_client}/cifs_unicode.h                 |  0
+ fs/{cifs => smbfs_client}/cifs_uniupr.h                  |  0
+ fs/{cifs => smbfs_client}/cifsacl.c                      |  1 -
+ fs/{cifs => smbfs_client}/cifsacl.h                      |  1 -
+ fs/{cifs => smbfs_client}/cifsencrypt.c                  |  1 -
+ fs/{cifs => smbfs_client}/cifsfs.c                       |  1 -
+ fs/{cifs => smbfs_client}/cifsfs.h                       |  1 -
+ fs/{cifs => smbfs_client}/cifsglob.h                     |  3 +--
+ fs/{cifs => smbfs_client}/cifspdu.h                      |  1 -
+ fs/{cifs => smbfs_client}/cifsproto.h                    |  1 -
+ fs/{cifs => smbfs_client}/cifsroot.c                     |  0
+ fs/{cifs => smbfs_client}/cifssmb.c                      |  1 -
+ fs/{cifs => smbfs_client}/connect.c                      | 13 ++++++++++---
+ fs/{cifs => smbfs_client}/dfs_cache.c                    |  0
+ fs/{cifs => smbfs_client}/dfs_cache.h                    |  0
+ fs/{cifs => smbfs_client}/dir.c                          |  1 -
+ fs/{cifs => smbfs_client}/dns_resolve.c                  |  1 -
+ fs/{cifs => smbfs_client}/dns_resolve.h                  |  4 ++--
+ fs/{cifs => smbfs_client}/export.c                       |  1 -
+ fs/{cifs => smbfs_client}/file.c                         |  1 -
+ fs/{cifs => smbfs_client}/fs_context.c                   |  0
+ fs/{cifs => smbfs_client}/fs_context.h                   |  0
+ fs/{cifs => smbfs_client}/fscache.c                      |  2 +-
+ fs/{cifs => smbfs_client}/fscache.h                      |  2 +-
+ fs/{cifs => smbfs_client}/inode.c                        |  1 -
+ fs/{cifs => smbfs_client}/ioctl.c                        |  3 +--
+ fs/{cifs => smbfs_client}/link.c                         |  1 -
+ fs/{cifs => smbfs_client}/misc.c                         |  1 -
+ fs/{cifs => smbfs_client}/netlink.c                      |  2 +-
+ fs/{cifs => smbfs_client}/netlink.h                      |  0
+ fs/{cifs => smbfs_client}/netmisc.c                      |  1 -
+ fs/{cifs => smbfs_client}/nterr.c                        |  0
+ fs/{cifs => smbfs_client}/nterr.h                        |  0
+ fs/{cifs => smbfs_client}/ntlmssp.h                      |  1 -
+ fs/{cifs => smbfs_client}/readdir.c                      |  1 -
+ fs/{cifs => smbfs_client}/rfc1002pdu.h                   |  1 -
+ fs/{cifs => smbfs_client}/sess.c                         |  1 -
+ fs/{cifs => smbfs_client}/smb1ops.c                      |  0
+ fs/{cifs => smbfs_client}/smb2file.c                     |  1 -
+ fs/{cifs => smbfs_client}/smb2glob.h                     |  1 -
+ fs/{cifs => smbfs_client}/smb2inode.c                    |  1 -
+ fs/{cifs => smbfs_client}/smb2maperror.c                 |  0
+ fs/{cifs => smbfs_client}/smb2misc.c                     |  1 -
+ fs/{cifs => smbfs_client}/smb2ops.c                      |  0
+ fs/{cifs => smbfs_client}/smb2pdu.c                      |  1 -
+ fs/{cifs => smbfs_client}/smb2pdu.h                      |  1 -
+ fs/{cifs => smbfs_client}/smb2proto.h                    |  1 -
+ fs/{cifs => smbfs_client}/smb2status.h                   |  1 -
+ fs/{cifs => smbfs_client}/smb2transport.c                |  1 -
+ fs/{cifs => smbfs_client}/smbdirect.c                    |  0
+ fs/{cifs => smbfs_client}/smbdirect.h                    |  0
+ fs/{cifs => smbfs_client}/smbencrypt.c                   |  0
+ fs/{cifs => smbfs_client}/smberr.h                       |  1 -
+ fs/{cifs => smbfs_client}/trace.c                        |  0
+ fs/{cifs => smbfs_client}/trace.h                        |  0
+ fs/{cifs => smbfs_client}/transport.c                    |  1 -
+ fs/{cifs => smbfs_client}/unc.c                          |  0
+ fs/{cifs => smbfs_client}/winucase.c                     |  1 -
+ fs/{cifs => smbfs_client}/xattr.c                        |  1 -
+ fs/smbfs_common/smbfsctl.h                               |  2 +-
+ include/uapi/linux/{cifs => smbfs_client}/cifs_mount.h   |  1 -
+ include/uapi/linux/{cifs => smbfs_client}/cifs_netlink.h |  0
+ 84 files changed, 36 insertions(+), 69 deletions(-)
+ rename fs/{cifs => smbfs_client}/Kconfig (100%)
+ rename fs/{cifs => smbfs_client}/Makefile (100%)
+ rename fs/{cifs => smbfs_client}/asn1.c (100%)
+ rename fs/{cifs => smbfs_client}/cache.c (97%)
+ rename fs/{cifs => smbfs_client}/cifs_debug.c (99%)
+ rename fs/{cifs => smbfs_client}/cifs_debug.h (100%)
+ rename fs/{cifs => smbfs_client}/cifs_dfs_ref.c (100%)
+ rename fs/{cifs => smbfs_client}/cifs_fs_sb.h (99%)
+ rename fs/{cifs => smbfs_client}/cifs_ioctl.h (99%)
+ rename fs/{cifs => smbfs_client}/cifs_spnego.c (98%)
+ rename fs/{cifs => smbfs_client}/cifs_spnego.h (92%)
+ rename fs/{cifs => smbfs_client}/cifs_spnego_negtokeninit.asn1 (100%)
+ rename fs/{cifs => smbfs_client}/cifs_swn.c (99%)
+ rename fs/{cifs => smbfs_client}/cifs_swn.h (100%)
+ rename fs/{cifs => smbfs_client}/cifs_unicode.c (99%)
+ rename fs/{cifs => smbfs_client}/cifs_unicode.h (100%)
+ rename fs/{cifs => smbfs_client}/cifs_uniupr.h (100%)
+ rename fs/{cifs => smbfs_client}/cifsacl.c (99%)
+ rename fs/{cifs => smbfs_client}/cifsacl.h (99%)
+ rename fs/{cifs => smbfs_client}/cifsencrypt.c (99%)
+ rename fs/{cifs => smbfs_client}/cifsfs.c (99%)
+ rename fs/{cifs => smbfs_client}/cifsfs.h (99%)
+ rename fs/{cifs => smbfs_client}/cifsglob.h (99%)
+ rename fs/{cifs => smbfs_client}/cifspdu.h (99%)
+ rename fs/{cifs => smbfs_client}/cifsproto.h (99%)
+ rename fs/{cifs => smbfs_client}/cifsroot.c (100%)
+ rename fs/{cifs => smbfs_client}/cifssmb.c (99%)
+ rename fs/{cifs => smbfs_client}/connect.c (99%)
+ rename fs/{cifs => smbfs_client}/dfs_cache.c (100%)
+ rename fs/{cifs => smbfs_client}/dfs_cache.h (100%)
+ rename fs/{cifs => smbfs_client}/dir.c (99%)
+ rename fs/{cifs => smbfs_client}/dns_resolve.c (98%)
+ rename fs/{cifs => smbfs_client}/dns_resolve.h (71%)
+ rename fs/{cifs => smbfs_client}/export.c (98%)
+ rename fs/{cifs => smbfs_client}/file.c (99%)
+ rename fs/{cifs => smbfs_client}/fs_context.c (100%)
+ rename fs/{cifs => smbfs_client}/fs_context.h (100%)
+ rename fs/{cifs => smbfs_client}/fscache.c (99%)
+ rename fs/{cifs => smbfs_client}/fscache.h (98%)
+ rename fs/{cifs => smbfs_client}/inode.c (99%)
+ rename fs/{cifs => smbfs_client}/ioctl.c (99%)
+ rename fs/{cifs => smbfs_client}/link.c (99%)
+ rename fs/{cifs => smbfs_client}/misc.c (99%)
+ rename fs/{cifs => smbfs_client}/netlink.c (97%)
+ rename fs/{cifs => smbfs_client}/netlink.h (100%)
+ rename fs/{cifs => smbfs_client}/netmisc.c (99%)
+ rename fs/{cifs => smbfs_client}/nterr.c (100%)
+ rename fs/{cifs => smbfs_client}/nterr.h (100%)
+ rename fs/{cifs => smbfs_client}/ntlmssp.h (99%)
+ rename fs/{cifs => smbfs_client}/readdir.c (99%)
+ rename fs/{cifs => smbfs_client}/rfc1002pdu.h (98%)
+ rename fs/{cifs => smbfs_client}/sess.c (99%)
+ rename fs/{cifs => smbfs_client}/smb1ops.c (100%)
+ rename fs/{cifs => smbfs_client}/smb2file.c (99%)
+ rename fs/{cifs => smbfs_client}/smb2glob.h (98%)
+ rename fs/{cifs => smbfs_client}/smb2inode.c (99%)
+ rename fs/{cifs => smbfs_client}/smb2maperror.c (100%)
+ rename fs/{cifs => smbfs_client}/smb2misc.c (99%)
+ rename fs/{cifs => smbfs_client}/smb2ops.c (100%)
+ rename fs/{cifs => smbfs_client}/smb2pdu.c (99%)
+ rename fs/{cifs => smbfs_client}/smb2pdu.h (99%)
+ rename fs/{cifs => smbfs_client}/smb2proto.h (99%)
+ rename fs/{cifs => smbfs_client}/smb2status.h (99%)
+ rename fs/{cifs => smbfs_client}/smb2transport.c (99%)
+ rename fs/{cifs => smbfs_client}/smbdirect.c (100%)
+ rename fs/{cifs => smbfs_client}/smbdirect.h (100%)
+ rename fs/{cifs => smbfs_client}/smbencrypt.c (100%)
+ rename fs/{cifs => smbfs_client}/smberr.h (99%)
+ rename fs/{cifs => smbfs_client}/trace.c (100%)
+ rename fs/{cifs => smbfs_client}/trace.h (100%)
+ rename fs/{cifs => smbfs_client}/transport.c (99%)
+ rename fs/{cifs => smbfs_client}/unc.c (100%)
+ rename fs/{cifs => smbfs_client}/winucase.c (99%)
+ rename fs/{cifs => smbfs_client}/xattr.c (99%)
+ rename include/uapi/linux/{cifs => smbfs_client}/cifs_mount.h (96%)
+ rename include/uapi/linux/{cifs => smbfs_client}/cifs_netlink.h (100%)
+
+-- 
+Thanks,
+
+Steve
