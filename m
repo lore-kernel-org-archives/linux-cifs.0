@@ -2,96 +2,103 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA62C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 18:59:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF0EC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 21:22:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E74A61130
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 18:59:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1ABEC6112D
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 21:22:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229869AbhINTAe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Sep 2021 15:00:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47123 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230061AbhINTAd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 14 Sep 2021 15:00:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1631645955;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3OUaDnOxKNbvKbqhxE7IAvlc8abcRFpZR5Sv/ym/5Ys=;
-        b=HgYG/KafbKgO+BXNs9Zhcd6/iZK+FC77ru1gwnOrxeqL/TFNHKmz2bNehXRWmQpDb/daIb
-        02N6B06/wRRO0BL3UQ+J31ENedGYe+/rXcS2TFMiR7Kkqa1LaqghtUs9HZJ4MATPI8ZymA
-        37EYBaeLZwh9D9BcP4igvMTxa04yjSM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-DTeW0HMUPTu9bfacEsuHNg-1; Tue, 14 Sep 2021 14:59:14 -0400
-X-MC-Unique: DTeW0HMUPTu9bfacEsuHNg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCC78100CC84;
-        Tue, 14 Sep 2021 18:59:11 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.44])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 26FAE7A8D2;
-        Tue, 14 Sep 2021 18:59:05 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wgR_unCDRZ+8iTb5gBO6bgRkuS4JYBpi25v12Yp6TzWVA@mail.gmail.com>
-References: <CAHk-=wgR_unCDRZ+8iTb5gBO6bgRkuS4JYBpi25v12Yp6TzWVA@mail.gmail.com> <163162767601.438332.9017034724960075707.stgit@warthog.procyon.org.uk> <CAHk-=wiVK+1CyEjW8u71zVPK8msea=qPpznX35gnX+s8sXnJTg@mail.gmail.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        linux-cachefs@redhat.com, CIFS <linux-cifs@vger.kernel.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Jeff Layton <jlayton@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 0/8] fscache: Replace and remove old I/O API
+        id S234969AbhINVXV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Sep 2021 17:23:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51292 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235357AbhINVXM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Sep 2021 17:23:12 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DAACC0613EE;
+        Tue, 14 Sep 2021 14:21:49 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id x27so1379892lfu.5;
+        Tue, 14 Sep 2021 14:21:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uo/LrTByBuM+thHtzRuHWUtLdiKYW1ebh0CY7Ez0iow=;
+        b=jeVUwEqzat+R2k0OIZLYt9s5LaqMT79H+JeUmw5eLwUbTrGEl/9tnHyVgazX2aUqlQ
+         tvtDxfMewrdORjzyXhDz+J4m/x7mkS9Uchh3MCCZkCX3XZsTUV/Jeh1O2JUMcroA6Qq3
+         hYI8oGd0H0YOFEkrR5W0k0vnl1nkYYxvJZWEzU5zhGSCyNd1iEGhKfU1VZNJvIjYqac4
+         SGQIU//roCq1aW4S2t47ula622a0P/WAzUYvoaIsgfsmm90uF5sv/fyy97/agOeLZjk2
+         syDqhoKrmrcJWrciBZytf+aEd2wZevBIj4VcDf1JCg4NaV0dAvxEdvjeNPxKyx7nGlqI
+         ZmMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uo/LrTByBuM+thHtzRuHWUtLdiKYW1ebh0CY7Ez0iow=;
+        b=vh3/QcWC5gqNPAiKvLj4i1X2VpNSKFZz+wXpx9PvM09UoYBIrcHN5Vfu1Y3zDMJ2yi
+         O3IqUplx1QyfTww8jD3htv5mHaz2g5gIXifyssS/5t65GBKrFq9NH8EQiEJ+ordHObCT
+         N5vN5qxndz5D/171NLmfq1ez2iSScpIYSqnowfKHloQT1yX69iCrsLRyMRhPuDWR0vHy
+         dAYnLid+GeQW3IjwgGYE77QDBL9b/3WbzZkd7RKrgzZ1WS7nFtgusGYUO6OswUOeDvPU
+         wN2FkThIPNKTY8VCsL0QdWMErEPy3rQiFSP6rgJrcXeJlkvnSR3Asg3uqKd06lGuN7aB
+         IWHQ==
+X-Gm-Message-State: AOAM530v419IK5v/DlpxTj+1QvZwRrJZt4KDUvZlS7qUe65UettKlK4X
+        mzQyAZy/SQnO8BgBdI4tvdvOLCT4f2QioUoLWz4=
+X-Google-Smtp-Source: ABdhPJxYxUwDbsIFF8eGusAVg9bszlieDML1vS548jRVAiFxa3aPFGAznC8pWnTKFGS4fdIiXsXhatDQ5nFZK372+CY=
+X-Received: by 2002:a05:6512:78:: with SMTP id i24mr14419410lfo.595.1631654506946;
+ Tue, 14 Sep 2021 14:21:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <738325.1631645944.1@warthog.procyon.org.uk>
-Date:   Tue, 14 Sep 2021 19:59:04 +0100
-Message-ID: <738326.1631645944@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <CAH2r5mvVdBoUW-0BfsxiRAE6X30cqhBtNDvG7pwKdQwsu+wXfg@mail.gmail.com>
+ <CAHk-=wiNvB_j3VZYJ1yZqq+9JjgWCO1MUmRsjTKBwQ+x=kB5tg@mail.gmail.com>
+ <CAH2r5mtTLUQa2U=MGHOVk_FsPZg6owMsw+RoTudWxGuoQej41g@mail.gmail.com>
+ <CAHk-=wjxmDks6CS41PCy_BZG70pjAhcPBV_7ga8kSJySvvDezQ@mail.gmail.com> <CAH2r5mt72NYan9q8MR5H8cNkYzT4jn1ZM1f3jp5V-fDs2cyB-A@mail.gmail.com>
+In-Reply-To: <CAH2r5mt72NYan9q8MR5H8cNkYzT4jn1ZM1f3jp5V-fDs2cyB-A@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 14 Sep 2021 16:21:36 -0500
+Message-ID: <CAH2r5much4q6bETPPCbqmhb+ksrX=5RXu_fcNVNk8dHiqN+g2Q@mail.gmail.com>
+Subject: Re: [GIT PULL] cifs/smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        ronnie sahlberg <ronniesahlberg@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+On Tue, Aug 31, 2021 at 1:06 PM Steve French <smfrench@gmail.com> wrote:
+> On Tue, Aug 31, 2021 at 12:43 PM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> >
+> > On Tue, Aug 31, 2021 at 10:09 AM Steve French <smfrench@gmail.com> wrote:
+<snip>
+> > I'm ok with directory renames, git handles it all well enough that the
+> > pain should be fairly minimal.
+> >
+> > I'd ask for that to be done during a fairly calm cycle, though, when
+> > there isn't a lot pending, so that any rename conflicts will be
+> > minimized.
+<snip>
+> > > Do you have any objections to me renaming the client's source
+> > > directory to "fs/smb3" (or fs/smb) and fs/smb3_common ...?
+> >
+> > So no objections to the rename per se, but can we please use a more
+> > specific name that is *not* tainted by history?
+> >
+> > I'll throw out two suggestions, but they are just that: (a) "smbfs" or
+> > (b) "smb-client".
 
-> > Call it "fallback" or "simple" or something that shows the intent, but
-> > no, I'm not taking patches that introduce a _new_ interface and call
-> > it "deprecated".
-
-Yeah, I'll change it to "fallback" - I started talking about it like that in
-the docs anyway.
-
-> Put another way: to call something "deprecated", you have to already
-> have the replacement all ready to go.
-
-We're not far off.  There's a fair distance (in number of patches) between
-this patchset and the completion, hence why I marked them as deprecated here,
-intending to remove them at the end.  Between myself, Jeff and Dave we have
-fscache, cachefiles, afs, ceph and nfs (almost) covered.  I have patches for
-9p and I've given a partial patch for cifs to Steve and Shyam.
-
-David
-
+Due to git history for fs/smbfs directory (from many, many years ago) rename
+to "fs/smbfs" could be more confusing. So alternative suggestion which
+I implemented
+was rename the source directory from fs/cifs to "fs/smbfs_client."  I
+will send a P/R
+for that since it is fairly quiet right now.  If you would prefer that
+we wait for a future
+release that is fine too, but seems like low risk now and might reduce
+future confusion in
+the future (to rename the source directory).
