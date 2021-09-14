@@ -6,63 +6,64 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB7A0C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 16:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CFA9C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 16:24:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A9DE560F25
-	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 16:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16CDB610FB
+	for <linux-cifs@archiver.kernel.org>; Tue, 14 Sep 2021 16:24:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229689AbhINQXh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 14 Sep 2021 12:23:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36964 "EHLO
+        id S229567AbhINQZm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 14 Sep 2021 12:25:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbhINQXg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Sep 2021 12:23:36 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E03C061762
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Sep 2021 09:22:18 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id x27so30041354lfu.5
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Sep 2021 09:22:18 -0700 (PDT)
+        with ESMTP id S229492AbhINQZm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 14 Sep 2021 12:25:42 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A179C061762
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Sep 2021 09:24:24 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id y28so5811885lfb.0
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Sep 2021 09:24:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=3dYD2uKNORcxZ6YMCdwcOxjjHXEclNcfa/CTjAP47gc=;
-        b=aWJRDZPRQV27jEUKoc4qE6zGbRoWbKwm9kcYSPpoNuqjBLGs9WKOvCqbYQZ04P3jy1
-         4wsAum1KxojNT2yyO1DmteAlpzy+vIjQ6bjIvwLNB76bbbmj19VrvzgTZnYd6uwWG6vX
-         yWKNOrbr5bi7cuk7kXat3qOTmWTGGPHSlwsBA=
+        bh=uU34i+EgJe3tqn17AWoGwVGTTIh0KVlY0SraTTmp6T0=;
+        b=VZdty0cyn24mKo+cOeBnS1zUwWEVr/Aq14PaZvBBUD6vKS7TpA6mbyHIis/pVaXAaf
+         SJ1YKxtYZYsZj/EY0JHr31tuvOq/g1o7mjxt6H1zfFHVSNCDSLB6nO1xycpBsN8+GLla
+         CROAP4iHjqNA3Dw+oLPHZ225XyXcBn1WLfKpY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=3dYD2uKNORcxZ6YMCdwcOxjjHXEclNcfa/CTjAP47gc=;
-        b=zDcr7O5MAwoIV9QV3iblHUv2sX2WYfYqD0cqUW6lcytqREvj0pHfDAOEBD7FRkN3q8
-         RKNDtlC0JjTaLGQj02iuxZSESC+3DVC2rDjMKPtdBUjAEPxOTXU4aPhoON7tO1cpQVe0
-         KPOpY/5wKiyL5el/JRfONEyrzHb0OiqOqfD4zu1yXsUZHec4YK5V+g5KJ+4THMEQWIyA
-         K30mfB7tQRP+tslMHCzt5Jxvwt3lncLsoO3ZO1rG0lSrP/I7bpJ/XPzPJ/M4yAHHu6W4
-         PljgriASH9TW8NydETGVlVK2IGcXKWpYUoEmVsxLfgKnPWlE4LCU7xRBMwXq4pZctcT4
-         wdLg==
-X-Gm-Message-State: AOAM531gtgeaFJGiwAICllZCeFAlLTiBgo20YB+5VdzJ0pn5+b4fGtYd
-        8OLvlIkVY/WAqEvndAfNhIzDWJPTMcZSFoJEeIE=
-X-Google-Smtp-Source: ABdhPJxyLLsyDbtS3rrjynTkbnxdRc9WakHDM5E3QgU3vSJDXq+3rGwzmcnHSebXb6YbjNYPazz6IQ==
-X-Received: by 2002:a05:6512:2253:: with SMTP id i19mr14081332lfu.281.1631636535380;
-        Tue, 14 Sep 2021 09:22:15 -0700 (PDT)
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com. [209.85.167.53])
-        by smtp.gmail.com with ESMTPSA id d15sm1250058lfn.220.2021.09.14.09.22.14
+        bh=uU34i+EgJe3tqn17AWoGwVGTTIh0KVlY0SraTTmp6T0=;
+        b=vGXkiy+Fle5yZtzae5nYJD00UTPeeC5rb4F652c5ZSDduQCdABpSA8rF1ltLodQcKt
+         nhs00v3Te4r1vtwVevPEkmQHfvihuyTaW+R5/4MVb29k6rJYcDjcsvs6HWeB9tt6nE7q
+         4hVhnczlJo+VgUgjyS3F1g28Ruze/368oz2TALMYfN2PFYgN5818SWuMS0sku0KLehXQ
+         1OvGI0P9ZOMo5qTikkmx4QU4eHjTZdLS8VEFMnebdugon6FAOftNFNGq3VX27R200ZNS
+         l4X55EGRapN6QaDXVjt6qmCJivdyv0NHi8R9tq2EWkoSIKKlZ12MTeKQIop/SpDl/hoI
+         TEjg==
+X-Gm-Message-State: AOAM53021O5HO6nKFrv7iZZOoDO3FzT174flB7OxnCdOHa21Okhsz8kB
+        DUCC2Ie5DT795lqLJvK0WTyXER1x5hxoP/JarDk=
+X-Google-Smtp-Source: ABdhPJxw3R4B+cpRLmS4wnyp6pzH0biN9+AO7l87f4SqBQv5ABZV++d5kYTsYWyrIvkYRNtGxT2FJg==
+X-Received: by 2002:a05:6512:751:: with SMTP id c17mr13428975lfs.131.1631636662645;
+        Tue, 14 Sep 2021 09:24:22 -0700 (PDT)
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
+        by smtp.gmail.com with ESMTPSA id a22sm1164625lfb.17.2021.09.14.09.24.21
         for <linux-cifs@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Sep 2021 09:22:14 -0700 (PDT)
-Received: by mail-lf1-f53.google.com with SMTP id i25so26066030lfg.6
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Sep 2021 09:22:14 -0700 (PDT)
-X-Received: by 2002:a05:6512:3da5:: with SMTP id k37mr14013881lfv.655.1631636533920;
- Tue, 14 Sep 2021 09:22:13 -0700 (PDT)
+        Tue, 14 Sep 2021 09:24:21 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id j12so24961994ljg.10
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Sep 2021 09:24:21 -0700 (PDT)
+X-Received: by 2002:a2e:b53a:: with SMTP id z26mr15485756ljm.95.1631636661566;
+ Tue, 14 Sep 2021 09:24:21 -0700 (PDT)
 MIME-Version: 1.0
 References: <163162767601.438332.9017034724960075707.stgit@warthog.procyon.org.uk>
-In-Reply-To: <163162767601.438332.9017034724960075707.stgit@warthog.procyon.org.uk>
+ <CAHk-=wiVK+1CyEjW8u71zVPK8msea=qPpznX35gnX+s8sXnJTg@mail.gmail.com>
+In-Reply-To: <CAHk-=wiVK+1CyEjW8u71zVPK8msea=qPpznX35gnX+s8sXnJTg@mail.gmail.com>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 14 Sep 2021 09:21:58 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiVK+1CyEjW8u71zVPK8msea=qPpznX35gnX+s8sXnJTg@mail.gmail.com>
-Message-ID: <CAHk-=wiVK+1CyEjW8u71zVPK8msea=qPpznX35gnX+s8sXnJTg@mail.gmail.com>
+Date:   Tue, 14 Sep 2021 09:24:05 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgR_unCDRZ+8iTb5gBO6bgRkuS4JYBpi25v12Yp6TzWVA@mail.gmail.com>
+Message-ID: <CAHk-=wgR_unCDRZ+8iTb5gBO6bgRkuS4JYBpi25v12Yp6TzWVA@mail.gmail.com>
 Subject: Re: [RFC PATCH 0/8] fscache: Replace and remove old I/O API
 To:     David Howells <dhowells@redhat.com>
 Cc:     Trond Myklebust <trondmy@hammerspace.com>,
@@ -85,17 +86,20 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Sep 14, 2021 at 6:54 AM David Howells <dhowells@redhat.com> wrote:
+On Tue, Sep 14, 2021 at 9:21 AM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
->  (1) A simple fallback API is added that can read or write a single page
->      synchronously.  The functions for this have "deprecated" in their names
->      as they have to be removed at some point.
+> Call it "fallback" or "simple" or something that shows the intent, but
+> no, I'm not taking patches that introduce a _new_ interface and call
+> it "deprecated".
 
-I'm looking at those patches, and there's no way I'll apply anything
-that starts out with moving to a "deprecated" interface.
+Put another way: to call something "deprecated", you have to already
+have the replacement all ready to go.
 
-Call it "fallback" or "simple" or something that shows the intent, but
-no, I'm not taking patches that introduce a _new_ interface and call
-it "deprecated".
+And if you have that, then converting existing code to a deprecated
+model isn't the way to go.
 
-            Linus
+So in neither situation does it make any sense to convert anything to
+a model that is deprecated.
+
+          Linus
