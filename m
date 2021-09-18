@@ -8,56 +8,57 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B26C433F5
-	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 15:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C41E8C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 17:58:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0500161268
-	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 15:55:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91F7E6101B
+	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 17:58:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239984AbhIRP5U (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 18 Sep 2021 11:57:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35256 "EHLO
+        id S235575AbhIRR7c (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 18 Sep 2021 13:59:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237245AbhIRP5U (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 18 Sep 2021 11:57:20 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52729C061574
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Sep 2021 08:55:56 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id m3so44059303lfu.2
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Sep 2021 08:55:56 -0700 (PDT)
+        with ESMTP id S231576AbhIRR7c (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 18 Sep 2021 13:59:32 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FDF1C061574
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Sep 2021 10:58:08 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id t8so13712797wri.1
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Sep 2021 10:58:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=eDMHBmaWjaHCIU6sQEEJo6LJuwPDvoeJD8kWUeS2lDA=;
-        b=afqhdyjaVKrqe20kYPaKpI33dwH+lZCj4abEXRWs5plGIlOzLgfrvE/8cyKo4CbIN9
-         k0V1eqQeAqzuR3zQ2Hfeji7Nv2+CcmL9OHWS2Z7PzEE/nuihyrXEI8Aw/MlLe6czrIo+
-         tHAYFlrsMe+o+L9R9csf4728mzJJO9pMp0zaJDoo93nt9ZnI2ZwRRBcmDWeQxNWOHfhd
-         vG7C7xutkvFv5cl7CBi9nLjUHFSWUNjXGmZsXqw2M8ld/qeOvuatG5NT49uxJ9RtEfGh
-         N1ha0wlu8I7eg1JnnzBoVi5JGHIreaFLKwpZ50tO70DJYe4WYENtjRfBChthFEMm9TYT
-         leGQ==
+        bh=K/F0zbw7dmFEnaRjTC5v0My6bBvEK1oz+d07Z/T1Rz8=;
+        b=FrbHdp3YswarDONc27SwfbKEbglm8FnyL/zl/Z5zNw8XNRkXTU6qMT6CPzAM0eHuMk
+         f7EZcWEbMd6CUMk3u2Tu07QpTU1MkAdSEBv5f9KiNaE6geby1wvtQnknNbBNsNCLYluJ
+         H5kpArDlu16fLeDj1kU7dC4/FvHj8UMH/SWuSdwGLOT5iK2/VqbbRIllTpPwq0BLRofg
+         zWmiFp3yA6aD7Py9g3kz+flX4AsBUMkzNEmDxHyP9Qo7Y3vChmWFv9mH/IKqnipmnMe+
+         GnpqERQ64qJR7FjwRCmKFRvhJTBiZyKeEQwZVHDqMfB/kQPqdh4Ax8LA8WSumr2K5Joh
+         gvTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=eDMHBmaWjaHCIU6sQEEJo6LJuwPDvoeJD8kWUeS2lDA=;
-        b=0iUATE3GWmacTEvjqkWqqmB7w1j+ezdoWaECIpWW5uIBTOzJcyMPnmibgdfCxlEO/R
-         dv0lKSEvJftIvaMGuDJGaIEltY7yqweTnt7O0gw4sFSxx4tqXCjir2h8+EFFxm6SKfKq
-         LcJQnET4woZ3LVIYf5IhOBUFxgXitVRK5t1yASW79xma6x08aDSGFfW2D/wlMmR9rqwW
-         2+shp/lHd9XsOiF3az4IdC/24hMhr2bbmgqmNq139OK5e4fcbA5wsiLipTzmXGJ+BlIF
-         ywhCKM0jiFV3kIpgp3jbshUrcdxjBU7E8xj/FLrhQNAHe8vHpeIcHXSy7SMvv3tdSKyn
-         2euQ==
-X-Gm-Message-State: AOAM5323PgIXfeyP4+Pe8WQW4i8Hw4vZ5v1trp0v+yZjKRJmCtvY4lOK
-        uD8wOr8GK9il0nPl2dqpIQz6B4rAmVPyN2oOIt4=
-X-Google-Smtp-Source: ABdhPJxGRKLlrfYiZDDWrc+vkwSUIfmoEBAN5AFZxPs78dvhgqfkTmpkVYnZk1tombDHZ3eQWwu2O8dSvDZCepCq6do=
-X-Received: by 2002:a2e:4e01:: with SMTP id c1mr14061040ljb.460.1631980554590;
- Sat, 18 Sep 2021 08:55:54 -0700 (PDT)
+        bh=K/F0zbw7dmFEnaRjTC5v0My6bBvEK1oz+d07Z/T1Rz8=;
+        b=IPC+weF/zyK6dNa7QCTqazo1oMsh5geO439BeqaomTvFA1j+/nGqdtsMGn+XvIVUat
+         irR/auwAJBaqPvl8QpJMap+J/ecKxKZXAXTzaNWNxFoK8DvW2RrtzdFJXgGkMpMoPy1x
+         5QpA+cTLXsFrxJFQL+djEa5X6dVtUSBgVh8EpnIVEG0QVRqqzpjgi7zSdxH+xyg8Ox2U
+         CiWbh37Vm9XzxYbtwqMKM86hG3jwfn0f/oIhRqB8U/2N3S1uJ6kDr7GxycXVe7CjC3sg
+         Q9E3FqvOzh+Vb4G21WpxvBeAypnVG7PE5+8y/Yagz6huRSow8AlbtLVIWn2W154VdtDS
+         28rg==
+X-Gm-Message-State: AOAM530XPeOS6DLQVYXSslWWgdIPU3+MZ2x4CNrA1TdF2Qo10Bs7Mrka
+        k+QAV0NsDpNhBI+jGQtLkzUi5fbIHgNrupiaxO92OjsVVI4=
+X-Google-Smtp-Source: ABdhPJzG4Am5KrvD9MFmNjDOGFmYKNAE9JHlibEl9mzQsNlBQY7IzRTXSlqltOyk+Y9argnUrZKd/f3F3ShUW+GxgjQ=
+X-Received: by 2002:adf:fcca:: with SMTP id f10mr19104863wrs.304.1631987886524;
+ Sat, 18 Sep 2021 10:58:06 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210918094513.89480-1-linkinjeon@kernel.org> <20210918094513.89480-3-linkinjeon@kernel.org>
-In-Reply-To: <20210918094513.89480-3-linkinjeon@kernel.org>
+ <CAH2r5mumOAqEgkitSK4yrxithPUUF1d9GihTLQAOdrX8-kK2Eg@mail.gmail.com>
+In-Reply-To: <CAH2r5mumOAqEgkitSK4yrxithPUUF1d9GihTLQAOdrX8-kK2Eg@mail.gmail.com>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 18 Sep 2021 10:55:43 -0500
-Message-ID: <CAH2r5mumOAqEgkitSK4yrxithPUUF1d9GihTLQAOdrX8-kK2Eg@mail.gmail.com>
+Date:   Sat, 18 Sep 2021 12:57:55 -0500
+Message-ID: <CAH2r5muy+yA+B0hD8iTXm+s2VWj86Fb5F3A0WqdkPp7tfuay_g@mail.gmail.com>
 Subject: Re: [PATCH 3/4] ksmbd: add validatioin for FILE_FULL_EA_INFORMATION
  of smb2_get_info
 To:     Namjae Jeon <linkinjeon@kernel.org>
@@ -70,43 +71,58 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Merged into cifsd-for-next (smbd-for-next) after fixing typo in title.
-The other three look promising but want to look in more detail at
-those unless others have review feedback on those - those patches
-include some potentially very important checks.
+Regression tests with the three in linux-next passed ...
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/bui=
+lds/67
 
-On Sat, Sep 18, 2021 at 4:45 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
+On Sat, Sep 18, 2021 at 10:55 AM Steve French <smfrench@gmail.com> wrote:
 >
-> Add validation to check whether req->InputBufferLength is smaller than
-> smb2_ea_info_req structure size.
+> Merged into cifsd-for-next (smbd-for-next) after fixing typo in title.
+> The other three look promising but want to look in more detail at
+> those unless others have review feedback on those - those patches
+> include some potentially very important checks.
 >
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: Ralph B=C3=B6hme <slow@samba.org>
-> Cc: Steve French <smfrench@gmail.com>
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-> ---
->  fs/ksmbd/smb2pdu.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> On Sat, Sep 18, 2021 at 4:45 AM Namjae Jeon <linkinjeon@kernel.org> wrote=
+:
+> >
+> > Add validation to check whether req->InputBufferLength is smaller than
+> > smb2_ea_info_req structure size.
+> >
+> > Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> > Cc: Ralph B=C3=B6hme <slow@samba.org>
+> > Cc: Steve French <smfrench@gmail.com>
+> > Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> > ---
+> >  fs/ksmbd/smb2pdu.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> > index e589e8cc389f..e92af212583e 100644
+> > --- a/fs/ksmbd/smb2pdu.c
+> > +++ b/fs/ksmbd/smb2pdu.c
+> > @@ -4059,6 +4059,10 @@ static int smb2_get_ea(struct ksmbd_work *work, =
+struct ksmbd_file *fp,
+> >         path =3D &fp->filp->f_path;
+> >         /* single EA entry is requested with given user.* name */
+> >         if (req->InputBufferLength) {
+> > +               if (le32_to_cpu(req->InputBufferLength) <
+> > +                   sizeof(struct smb2_ea_info_req))
+> > +                       return -EINVAL;
+> > +
+> >                 ea_req =3D (struct smb2_ea_info_req *)req->Buffer;
+> >         } else {
+> >                 /* need to send all EAs, if no specific EA is requested=
+*/
+> > --
+> > 2.25.1
+> >
 >
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index e589e8cc389f..e92af212583e 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -4059,6 +4059,10 @@ static int smb2_get_ea(struct ksmbd_work *work, st=
-ruct ksmbd_file *fp,
->         path =3D &fp->filp->f_path;
->         /* single EA entry is requested with given user.* name */
->         if (req->InputBufferLength) {
-> +               if (le32_to_cpu(req->InputBufferLength) <
-> +                   sizeof(struct smb2_ea_info_req))
-> +                       return -EINVAL;
-> +
->                 ea_req =3D (struct smb2_ea_info_req *)req->Buffer;
->         } else {
->                 /* need to send all EAs, if no specific EA is requested*/
+>
 > --
-> 2.25.1
+> Thanks,
 >
+> Steve
+
 
 
 --=20
