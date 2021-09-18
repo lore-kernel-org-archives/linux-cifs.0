@@ -2,290 +2,243 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 061EDC433EF
-	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 21:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD2F7C433EF
+	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 21:43:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CF5B361076
-	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 21:36:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91F6E610C7
+	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 21:43:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239877AbhIRViQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 18 Sep 2021 17:38:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36832 "EHLO mail.kernel.org"
+        id S234959AbhIRVpR (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 18 Sep 2021 17:45:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40018 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232932AbhIRViP (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 18 Sep 2021 17:38:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 99CA461076
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Sep 2021 21:36:51 +0000 (UTC)
+        id S234140AbhIRVpQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 18 Sep 2021 17:45:16 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6BAD261050
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Sep 2021 21:43:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632001011;
-        bh=U6GWh3Q/GXK7mEd0YhLxeVzEH7s6uwX5nVMe8d7AMPY=;
+        s=k20201202; t=1632001432;
+        bh=Wrf4mzIFZlsxh/J69mudywq4gRdCPFY3UTqhinPrr0s=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=tKrRct0P69wgs6ThQ1F+ZMnU9xe4fRsvwTIr3MgMFsLWUGSH+RgHAj3cww1SjpgUh
-         QaCnvlNU/wYbPxyyZE7+9H73Dj3ZQm9VLMqGM5BLZDFcNEACrY7jZY1XOCO/U12anl
-         AG0/hKsnOIHpSxPPNdjvJGnPY3lj3BrvXW2cT28Pdhce3UurYUfkihB7nQAqm6LTAn
-         80vzusBQRdxf7pymDLfUUDMLI3GpT4DSUUqVDOp6FGHvsYJQNnKt7d2EaWinhRhp/h
-         JOMuzHzmpdbG1NJX8KrQXUMLGucNh+WgPEALiTG4NKHIv2x6I1sbSZMYQpc2A9513S
-         yJqAmM91xy0CA==
-Received: by mail-ot1-f44.google.com with SMTP id 97-20020a9d006a000000b00545420bff9eso11005609ota.8
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Sep 2021 14:36:51 -0700 (PDT)
-X-Gm-Message-State: AOAM531H+MvR/ohXAljPSgQ5RQFPBw5NdgIEscPjzm+Tu7ana9GlEroQ
-        c1riN6cz20Avu6AzYMrEfFmNq6Ooypx5J9gl3Nw=
-X-Google-Smtp-Source: ABdhPJya0I8EUttR/E79+ZRblxEPvRlvMTBmYS7VmZZsFFs35mTQMgDBoZBmoaFNoOs5ghWnL3ln2F4e0kc1BOw8raU=
-X-Received: by 2002:a9d:36d:: with SMTP id 100mr15020251otv.237.1632001010858;
- Sat, 18 Sep 2021 14:36:50 -0700 (PDT)
+        b=OkUt0RwImjBP+Uc4tmQuWO+edR6thN3A1TQOmtmgVAEGDcjg54TPgYFwvZuKukBkV
+         13kc8jERLiBRAKQmUBC1lOHFvV+P9WiGkE/veSNP51XmFnsrfvQZN+nGQjAhp6N2Qw
+         XRTQVuDkJc+3/xyEcXNNSlmtWWX3WrzTh5tWzoNqNkiJ11ZFQJYShGJ3Hmu9sbflNs
+         hmv9v3GZT9CE2dsr7gjgnsxDAhRTsNEYj14R/e3ijGlSqEp+aHUU6GcTBYBZWUYFoU
+         +m6ASkWiOwz5N6ANlENtgjpgTt6HQK+C+ZTCRLj/YnTSTRucn1FqM6Fch9bu78Nd5j
+         oLDTWm964+hdw==
+Received: by mail-ot1-f48.google.com with SMTP id j11-20020a9d190b000000b00546fac94456so1514057ota.6
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Sep 2021 14:43:52 -0700 (PDT)
+X-Gm-Message-State: AOAM533wAKBSvXpeJ2n/cNTa5shHur48EboHfwlCqawWIVePPlkJtkFU
+        PF8SYi1NF65LccPReYOqIPzbpPBvwjZXvQBYhlk=
+X-Google-Smtp-Source: ABdhPJysKns+bv3JlrpAGjT6uzIWgeL2v9zQM3XmuP6WR+CBRQQpZGFlSVYT4PW4t8qy0LYgZBjTbqDxK3WtrAMcM7o=
+X-Received: by 2002:a9d:5e05:: with SMTP id d5mr15021152oti.61.1632001431810;
+ Sat, 18 Sep 2021 14:43:51 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Sat, 18 Sep 2021 14:36:50
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Sat, 18 Sep 2021 14:43:51
  -0700 (PDT)
-In-Reply-To: <ac18e062-e835-b575-66af-72631df7ef7d@talpey.com>
-References: <20210918120239.96627-1-linkinjeon@kernel.org> <ac18e062-e835-b575-66af-72631df7ef7d@talpey.com>
+In-Reply-To: <202109190257.fZUGN7K6-lkp@intel.com>
+References: <20210918094513.89480-2-linkinjeon@kernel.org> <202109190257.fZUGN7K6-lkp@intel.com>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sun, 19 Sep 2021 06:36:50 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8kcZY_BbtOeKXR2ycH+tOSjYkNev=yhznH6Hbx-QEKMg@mail.gmail.com>
-Message-ID: <CAKYAXd8kcZY_BbtOeKXR2ycH+tOSjYkNev=yhznH6Hbx-QEKMg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: add default data stream name in FILE_STREAM_INFORMATION
-To:     Tom Talpey <tom@talpey.com>
-Cc:     linux-cifs@vger.kernel.org
+Date:   Sun, 19 Sep 2021 06:43:51 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_jE3MwfwqbSxJ0E5DjPxU9mSH11onkqFcumbdMO21w8Q@mail.gmail.com>
+Message-ID: <CAKYAXd_jE3MwfwqbSxJ0E5DjPxU9mSH11onkqFcumbdMO21w8Q@mail.gmail.com>
+Subject: Re: [PATCH 2/4] ksmbd: add validation in smb2_ioctl
+To:     kernel test robot <lkp@intel.com>
+Cc:     linux-cifs@vger.kernel.org, llvm@lists.linux.dev,
+        kbuild-all@lists.01.org,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Tom,
-2021-09-18 21:39 GMT+09:00, Tom Talpey <tom@talpey.com>:
-> This doesn't appear to be what's documented in MS-FSA section 2.1.5.11.29.
-> There, it appears to call for returning an empty stream list,
-> and STATUS_SUCCESS, when no streams are present.
-As I know, Specification doesn't describe all windows behavior. So
-smbtorture testcase test such corner cases.
->
-> Also, why does the code special-case directories? The conditionals
-> on StreamSize and StreamAllocation size are entirely redundant,
-> after the top-level if (!S_ISDIR...), btw.
-As I know, default data stream(::DATA) is for only file, not
-directory. And streams tests in smbtorture pass, Please see:
+2021-09-19 3:51 GMT+09:00, kernel test robot <lkp@intel.com>:
+> Hi Namjae,
+Hi,
 
-$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234 smb2.streams.dir
-smbtorture 4.10.6
-Using seed 1631969885
-time: 2021-09-18 12:58:05.268099
-test: dir
-time: 2021-09-18 12:58:05.268848
-teststreams\stream.txt:Stream One
-(../../source4/torture/smb2/streams.c:248) opening non-existent directory stream
-(../../source4/torture/smb2/streams.c:263) opening basedir  stream
-(../../source4/torture/smb2/streams.c:279) opening basedir ::$DATA stream
-(../../source4/torture/smb2/streams.c:295) list the streams on the basedir
-time: 2021-09-18 12:58:05.313561
-success: dir
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.dir" exited with 0.
-0.11s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234 smb2.streams.io
-smbtorture 4.10.6
-Using seed 1631969885
-time: 2021-09-18 12:58:05.357178
-test: io
-time: 2021-09-18 12:58:05.357884
-(../../source4/torture/smb2/streams.c:335) creating a stream on a
-non-existent file
-(../../source4/torture/smb2/streams.c:355) check that open of base
-file is allowed
-(../../source4/torture/smb2/streams.c:362) writing to stream
-(../../source4/torture/smb2/streams.c:377) modifying stream
-(../../source4/torture/smb2/streams.c:387) creating a stream2 on a existing file
-(../../source4/torture/smb2/streams.c:394) modifying stream
-(../../source4/torture/smb2/streams.c:431) deleting stream
-(../../source4/torture/smb2/streams.c:444) delete a stream via delete-on-close
-(../../source4/torture/smb2/streams.c:476) deleting file
-time: 2021-09-18 12:58:05.422830
-success: io
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.io" exited with 0.
-0.09s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.sharemodes
-smbtorture 4.10.6
-Using seed 1631969885
-time: 2021-09-18 12:58:05.467364
-test: sharemodes
-time: 2021-09-18 12:58:05.468186
-(../../source4/torture/smb2/streams.c:592) Testing stream share mode conflicts
-time: 2021-09-18 12:58:05.521840
-success: sharemodes
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.sharemodes" exited with 0.
-0.10s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.names
-smbtorture 4.10.6
-Using seed 1631969885
-time: 2021-09-18 12:58:05.565595
-test: names
-time: 2021-09-18 12:58:05.566433
-(../../source4/torture/smb2/streams.c:869) testing stream names
-time: 2021-09-18 12:58:05.626686
-success: names
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.names" exited with 0.
-0.12s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.names2
-smbtorture 4.10.6
-Using seed 1631969885
-time: 2021-09-18 12:58:05.671829
-test: names2
-time: 2021-09-18 12:58:05.672704
-(../../source4/torture/smb2/streams.c:1160) testing stream names
-time: 2021-09-18 12:58:05.751656
-success: names2
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.names2" exited with 0.
-0.08s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.names3
-smbtorture 4.10.6
-Using seed 1631969885
-time: 2021-09-18 12:58:05.796248
-test: names3
-time: 2021-09-18 12:58:05.797156
-(../../source4/torture/smb2/streams.c:1288) testing case insensitive
-stream names
-time: 2021-09-18 12:58:05.835048
-success: names3
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.names3" exited with 0.
-0.10s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.rename
-smbtorture 4.10.6
-Using seed 1631969885
-time: 2021-09-18 12:58:05.879226
-test: rename
-time: 2021-09-18 12:58:05.880108
-(../../source4/torture/smb2/streams.c:1379) testing stream renames
-time: 2021-09-18 12:58:05.938765
-success: rename
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.rename" exited with 0.
-0.11s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.rename2
-smbtorture 4.10.6
-Using seed 1631969885
-time: 2021-09-18 12:58:05.983358
-test: rename2
-time: 2021-09-18 12:58:05.984182
-(../../source4/torture/smb2/streams.c:1504) Checking SMB2 rename of a
-stream using :<stream>
-(../../source4/torture/smb2/streams.c:1518) Checking SMB2 rename of an
-overwriting stream using :<stream>
-(../../source4/torture/smb2/streams.c:1548) Checking SMB2 rename of a
-stream using <base>:<stream>
-(../../source4/torture/smb2/streams.c:1559) Checking SMB2 rename to
-default stream using :<stream>
-time: 2021-09-18 12:58:06.048102
-success: rename2
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.rename2" exited with 0.
-0.10s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.create-disposition
-smbtorture 4.10.6
-Using seed 1631969886
-time: 2021-09-18 12:58:06.094196
-test: create-disposition
-time: 2021-09-18 12:58:06.095203
-(../../source4/torture/smb2/streams.c:1666) Checking create disp: open
-(../../source4/torture/smb2/streams.c:1680) Checking create disp: overwrite
-(../../source4/torture/smb2/streams.c:1694) Checking create disp: overwrite_if
-(../../source4/torture/smb2/streams.c:1712) Checking create disp: supersede
-(../../source4/torture/smb2/streams.c:1732) Checking create disp:
-overwrite_if on stream
-time: 2021-09-18 12:58:06.148406
-success: create-disposition
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.create-disposition" exited with 0.
-0.10s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.attributes
-smbtorture 4.10.6
-Using seed 1631969886
-time: 2021-09-18 12:58:06.192777
-test: attributes
-time: 2021-09-18 12:58:06.193624
-(../../source4/torture/smb2/streams.c:1810) testing attribute setting on stream
-time: 2021-09-18 12:58:06.256161
-success: attributes
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.attributes" exited with 0.
-0.09s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.zero-byte
-smbtorture 4.10.6
-Using seed 1631969886
-time: 2021-09-18 12:58:06.302540
-test: zero-byte
-time: 2021-09-18 12:58:06.303431
-(../../source4/torture/smb2/streams.c:512) Check 0 byte named stream
-time: 2021-09-18 12:58:06.353826
-success: zero-byte
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.zero-byte" exited with 0.
-0.21s$ ./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.basefile-rename-with-open-stream
-smbtorture 4.10.6
-Using seed 1631969886
-time: 2021-09-18 12:58:06.397700
-test: basefile-rename-with-open-stream
-time: 2021-09-18 12:58:06.398478
-Creating file with stream
-Writing to stream
-Renaming base file
-time: 2021-09-18 12:58:06.565832
-success: basefile-rename-with-open-stream
-The command "./bin/smbtorture //127.0.0.1/cifsd-test3/ -Utestuser%1234
-smb2.streams.basefile-rename-with-open-stream" exited with 0.
+I will fix it, Thanks for your report!
 >
-> I'd suggest asking Microsoft dochelp for clarification before
-> implementing this.
-I'm not sure I'll get the answer I want from the dochelp quickly. I
-vote we can apply this patch to fix existing issue, and parallel
-contact the dochelp and update the code if there is some points.
-
-Thanks!
+> I love your patch! Perhaps something to improve:
 >
-> Tom.
+> [auto build test WARNING on linus/master]
+> [also build test WARNING on v5.15-rc1 next-20210917]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch]
 >
-> On 9/18/2021 8:02 AM, Namjae Jeon wrote:
->> Windows client expect to get default stream name(::DATA) in
->> FILE_STREAM_INFORMATION response even if there is no stream data in file.
->> This patch fix update failure when writing ppt or doc files.
->>
->> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->> ---
->>   fs/ksmbd/smb2pdu.c | 8 +++-----
->>   1 file changed, 3 insertions(+), 5 deletions(-)
->>
->> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
->> index 49a1ca75f427..301605e0cbf7 100644
->> --- a/fs/ksmbd/smb2pdu.c
->> +++ b/fs/ksmbd/smb2pdu.c
->> @@ -4465,17 +4465,15 @@ static void get_file_stream_info(struct ksmbd_work
->> *work,
->>   		file_info->NextEntryOffset = cpu_to_le32(next);
->>   	}
->>
->> -	if (nbytes) {
->> +	if (!S_ISDIR(stat.mode)) {
->>   		file_info = (struct smb2_file_stream_info *)
->>   			&rsp->Buffer[nbytes];
->>   		streamlen = smbConvertToUTF16((__le16 *)file_info->StreamName,
->>   					      "::$DATA", 7, conn->local_nls, 0);
->>   		streamlen *= 2;
->>   		file_info->StreamNameLength = cpu_to_le32(streamlen);
->> -		file_info->StreamSize = S_ISDIR(stat.mode) ? 0 :
->> -			cpu_to_le64(stat.size);
->> -		file_info->StreamAllocationSize = S_ISDIR(stat.mode) ? 0 :
->> -			cpu_to_le64(stat.size);
->> +		file_info->StreamSize = 0;
->> +		file_info->StreamAllocationSize = 0;
->>   		nbytes += sizeof(struct smb2_file_stream_info) + streamlen;
->>   	}
->>
->>
+> url:
+> https://github.com/0day-ci/linux/commits/Namjae-Jeon/ksmbd-add-request-buffer-validation-in-smb2_set_info/20210918-174717
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> 4357f03d6611753936e4d52fc251b54a6afb1b54
+> config: hexagon-randconfig-r022-20210918 (attached as .config)
+> compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project
+> c8b3d7d6d6de37af68b2f379d0e37304f78e115f)
+> reproduce (this is a W=1 build):
+>         wget
+> https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O
+> ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         #
+> https://github.com/0day-ci/linux/commit/57e7ede2bf2d38cb0f368f2fc54d646168b3d119
+>         git remote add linux-review https://github.com/0day-ci/linux
+>         git fetch --no-tags linux-review
+> Namjae-Jeon/ksmbd-add-request-buffer-validation-in-smb2_set_info/20210918-174717
+>         git checkout 57e7ede2bf2d38cb0f368f2fc54d646168b3d119
+>         # save the attached .config to linux build tree
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1
+> ARCH=hexagon
+>
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+>
+> All warnings (new ones prefixed by >>):
+>
+>>> fs/ksmbd/smb2pdu.c:7037:6: warning: variable 'ret' is used uninitialized
+>>> whenever 'if' condition is true [-Wsometimes-uninitialized]
+>            if (chunk_count == 0)
+>                ^~~~~~~~~~~~~~~~
+>    fs/ksmbd/smb2pdu.c:7120:9: note: uninitialized use occurs here
+>            return ret;
+>                   ^~~
+>    fs/ksmbd/smb2pdu.c:7037:2: note: remove the 'if' if its condition is
+> always false
+>            if (chunk_count == 0)
+>            ^~~~~~~~~~~~~~~~~~~~~
+>    fs/ksmbd/smb2pdu.c:7020:9: note: initialize the variable 'ret' to silence
+> this warning
+>            int ret, cnt_code;
+>                   ^
+>                    = 0
+>    1 warning generated.
+>
+>
+> vim +7037 fs/ksmbd/smb2pdu.c
+>
+>   7009	
+>   7010	static int fsctl_copychunk(struct ksmbd_work *work, struct
+> smb2_ioctl_req *req,
+>   7011				   struct smb2_ioctl_rsp *rsp)
+>   7012	{
+>   7013		struct copychunk_ioctl_req *ci_req;
+>   7014		struct copychunk_ioctl_rsp *ci_rsp;
+>   7015		struct ksmbd_file *src_fp = NULL, *dst_fp = NULL;
+>   7016		struct srv_copychunk *chunks;
+>   7017		unsigned int i, chunk_count, chunk_count_written = 0;
+>   7018		unsigned int chunk_size_written = 0;
+>   7019		loff_t total_size_written = 0;
+>   7020		int ret, cnt_code;
+>   7021	
+>   7022		cnt_code = le32_to_cpu(req->CntCode);
+>   7023		ci_req = (struct copychunk_ioctl_req *)&req->Buffer[0];
+>   7024		ci_rsp = (struct copychunk_ioctl_rsp *)&rsp->Buffer[0];
+>   7025	
+>   7026		rsp->VolatileFileId = req->VolatileFileId;
+>   7027		rsp->PersistentFileId = req->PersistentFileId;
+>   7028		ci_rsp->ChunksWritten =
+>   7029			cpu_to_le32(ksmbd_server_side_copy_max_chunk_count());
+>   7030		ci_rsp->ChunkBytesWritten =
+>   7031			cpu_to_le32(ksmbd_server_side_copy_max_chunk_size());
+>   7032		ci_rsp->TotalBytesWritten =
+>   7033			cpu_to_le32(ksmbd_server_side_copy_max_total_size());
+>   7034	
+>   7035		chunks = (struct srv_copychunk *)&ci_req->Chunks[0];
+>   7036		chunk_count = le32_to_cpu(ci_req->ChunkCount);
+>> 7037		if (chunk_count == 0)
+>   7038			goto out;
+>   7039		total_size_written = 0;
+>   7040	
+>   7041		/* verify the SRV_COPYCHUNK_COPY packet */
+>   7042		if (chunk_count > ksmbd_server_side_copy_max_chunk_count() ||
+>   7043		    le32_to_cpu(req->InputCount) <
+>   7044		     offsetof(struct copychunk_ioctl_req, Chunks) +
+>   7045		     chunk_count * sizeof(struct srv_copychunk)) {
+>   7046			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+>   7047			return -EINVAL;
+>   7048		}
+>   7049	
+>   7050		for (i = 0; i < chunk_count; i++) {
+>   7051			if (le32_to_cpu(chunks[i].Length) == 0 ||
+>   7052			    le32_to_cpu(chunks[i].Length) >
+> ksmbd_server_side_copy_max_chunk_size())
+>   7053				break;
+>   7054			total_size_written += le32_to_cpu(chunks[i].Length);
+>   7055		}
+>   7056	
+>   7057		if (i < chunk_count ||
+>   7058		    total_size_written > ksmbd_server_side_copy_max_total_size()) {
+>   7059			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+>   7060			return -EINVAL;
+>   7061		}
+>   7062	
+>   7063		src_fp = ksmbd_lookup_foreign_fd(work,
+>   7064						 le64_to_cpu(ci_req->ResumeKey[0]));
+>   7065		dst_fp = ksmbd_lookup_fd_slow(work,
+>   7066					      le64_to_cpu(req->VolatileFileId),
+>   7067					      le64_to_cpu(req->PersistentFileId));
+>   7068		ret = -EINVAL;
+>   7069		if (!src_fp ||
+>   7070		    src_fp->persistent_id != le64_to_cpu(ci_req->ResumeKey[1])) {
+>   7071			rsp->hdr.Status = STATUS_OBJECT_NAME_NOT_FOUND;
+>   7072			goto out;
+>   7073		}
+>   7074	
+>   7075		if (!dst_fp) {
+>   7076			rsp->hdr.Status = STATUS_FILE_CLOSED;
+>   7077			goto out;
+>   7078		}
+>   7079	
+>   7080		/*
+>   7081		 * FILE_READ_DATA should only be included in
+>   7082		 * the FSCTL_COPYCHUNK case
+>   7083		 */
+>   7084		if (cnt_code == FSCTL_COPYCHUNK &&
+>   7085		    !(dst_fp->daccess & (FILE_READ_DATA_LE | FILE_GENERIC_READ_LE)))
+> {
+>   7086			rsp->hdr.Status = STATUS_ACCESS_DENIED;
+>   7087			goto out;
+>   7088		}
+>   7089	
+>   7090		ret = ksmbd_vfs_copy_file_ranges(work, src_fp, dst_fp,
+>   7091						 chunks, chunk_count,
+>   7092						 &chunk_count_written,
+>   7093						 &chunk_size_written,
+>   7094						 &total_size_written);
+>   7095		if (ret < 0) {
+>   7096			if (ret == -EACCES)
+>   7097				rsp->hdr.Status = STATUS_ACCESS_DENIED;
+>   7098			if (ret == -EAGAIN)
+>   7099				rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
+>   7100			else if (ret == -EBADF)
+>   7101				rsp->hdr.Status = STATUS_INVALID_HANDLE;
+>   7102			else if (ret == -EFBIG || ret == -ENOSPC)
+>   7103				rsp->hdr.Status = STATUS_DISK_FULL;
+>   7104			else if (ret == -EINVAL)
+>   7105				rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+>   7106			else if (ret == -EISDIR)
+>   7107				rsp->hdr.Status = STATUS_FILE_IS_A_DIRECTORY;
+>   7108			else if (ret == -E2BIG)
+>   7109				rsp->hdr.Status = STATUS_INVALID_VIEW_SIZE;
+>   7110			else
+>   7111				rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
+>   7112		}
+>   7113	
+>   7114		ci_rsp->ChunksWritten = cpu_to_le32(chunk_count_written);
+>   7115		ci_rsp->ChunkBytesWritten = cpu_to_le32(chunk_size_written);
+>   7116		ci_rsp->TotalBytesWritten = cpu_to_le32(total_size_written);
+>   7117	out:
+>   7118		ksmbd_fd_put(work, src_fp);
+>   7119		ksmbd_fd_put(work, dst_fp);
+>   7120		return ret;
+>   7121	}
+>   7122	
+>
+> ---
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 >
