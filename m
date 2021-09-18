@@ -2,228 +2,342 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D395FC433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Sep 2021 18:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F468C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 09:45:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7BC3611C4
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Sep 2021 18:34:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F257860F51
+	for <linux-cifs@archiver.kernel.org>; Sat, 18 Sep 2021 09:45:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240131AbhIQSfc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Sep 2021 14:35:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36794 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231364AbhIQSfb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Sep 2021 14:35:31 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47949C061574
-        for <linux-cifs@vger.kernel.org>; Fri, 17 Sep 2021 11:34:09 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id t10so30344177lfd.8
-        for <linux-cifs@vger.kernel.org>; Fri, 17 Sep 2021 11:34:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=UieSeN8aNh1qORydpnhfrrqALKMKEQXHBwzzAEFmxqk=;
-        b=i6Nr3UCiymw70mnS5noN8dnzqWfV7uIZdmARF/wbOYQiUwvmmsvQPYjhvxHP5tOLoR
-         br+vf/5f7Ft7SYLCGQm7TTD0J5kpxiN0qoX2QOOl3qkR89vWEpbj3rMV7PGkL7Un0Y+q
-         EqJRfdD6TIzosci6OyE4yUHudeoZWwYAXZi7WJ4t+XXI6p7WgXt9oMT9jnNhCg6qZqXx
-         sCAiNW07Gcj5qzOF26RVhMja2J28VWcGZ6XZ6XSekOGQg1ixwl95QZbzObjk2bUbgARs
-         wAfe41mxWV1/GttHtgtNBVe4cImygsw4iQ+L9YJFJbQK7vPdcSSDxJ7e5FRBismW90tf
-         osDA==
+        id S241035AbhIRJrA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 18 Sep 2021 05:47:00 -0400
+Received: from mail-pl1-f182.google.com ([209.85.214.182]:46593 "EHLO
+        mail-pl1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240815AbhIRJq7 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 18 Sep 2021 05:46:59 -0400
+Received: by mail-pl1-f182.google.com with SMTP id bg1so7780900plb.13
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Sep 2021 02:45:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=UieSeN8aNh1qORydpnhfrrqALKMKEQXHBwzzAEFmxqk=;
-        b=e2HuOfQWxgI6X7TRAGEJySg2XzPCJqRM+imfcGuEDrEaTCdgufXZ5yVXEsknnsV8wj
-         xmHrAze7eD3bi0bVtWRKnWpPgboir1/s0FGIaIPiio6Rh+dFj6iHZenXocdrbhVRSNKJ
-         BgpQT1fSCjc0+IqTpR7Xyji2PH3ZPF1sKqdVXwB2O8WTdxUqw8sOlgyAeDCnyQ+1MR1a
-         0vb2w21jq8CLKsQBwdawlpRrPxw7ETJY5fPDPCD+F1GA80whW6ScwzWltvVnaTBc8bX3
-         Axw8obfFSsXE61tsGLQWYdkh5Ilqovdwiz0deaKqqIBYIF+qMX7GWASmzcgJ079fpqcb
-         /nbg==
-X-Gm-Message-State: AOAM532JNNu9n4SkD1pD2sPYJgvKTFBejW83R/Phf7XasKImH834fUyr
-        qs4HiDVn5dlUIGk/Hibqbc/e2iJOfDrmV8V5pXw=
-X-Google-Smtp-Source: ABdhPJxg5qyMqaafdrE4DbLfltYjoAeWjS9yv88wGZqqZOiTaWu1Dbpv2lnIwvCzRIdz4ICdgWHe8vhsIXWL5tBfH0k=
-X-Received: by 2002:a19:7607:: with SMTP id c7mr9523828lff.130.1631903647641;
- Fri, 17 Sep 2021 11:34:07 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=cqvXCZfm3adVvpKDRvLprk1jzSNCqo8c6LALxEqk90o=;
+        b=QyJzRGQVfkEHOFF0NfiZBuQGySmXUoOioyXqOalidIaUXdW21VOduZvWHAQZiRMeOi
+         byEyknXKYHDXwUnl8yjAec/UrkxmOVTQ7gKd0MkpI6bo/w5MSg+bCGhSA+IhG1Bt17aJ
+         +SfqWmc+4CXqiLFdN22TLpP51L2td85HJVs4uYr1Js3tbVztdqe6eRUv37YXETHXjDWZ
+         iKHZQvsRfeOS/Owc1VU+69JQbF8pLBb5cuETkIFOY5hhS2+4kwedjNF8Vm+Iwy882Bs4
+         HRJpC0vim3mYpYDiyRd2dE2BvNhUG+JoA2gpAaFwTi9en6bSNfKl8Wtw3u7Gv7v5Tl9z
+         Xg7w==
+X-Gm-Message-State: AOAM531JmSUd8A9+mI9gRmS8FCIDrWI11qhFcPzeWtB/FFYhhbndflB/
+        WruW466t/bMDDtu60Z00nv9phlT6Gke5qA==
+X-Google-Smtp-Source: ABdhPJwrxCI5/7ze40GyUYnIg6MlCBxDRs6Yno8KBeV3A6cFdsxmW1NeHzaH1sn1pzWZcA6jck5ghw==
+X-Received: by 2002:a17:90a:ec12:: with SMTP id l18mr17562089pjy.213.1631958335868;
+        Sat, 18 Sep 2021 02:45:35 -0700 (PDT)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id l10sm8928966pgn.22.2021.09.18.02.45.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Sep 2021 02:45:35 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
+        Steve French <smfrench@gmail.com>
+Subject: [PATCH 1/4] ksmbd: add request buffer validation in smb2_set_info
+Date:   Sat, 18 Sep 2021 18:45:10 +0900
+Message-Id: <20210918094513.89480-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   Rohith Surabattula <rohiths.msft@gmail.com>
-Date:   Sat, 18 Sep 2021 00:03:56 +0530
-Message-ID: <CACdtm0bFZ0RKRvH4vX4ujFxHU7+PtW6d-BZvRnHOs40ir1KNNg@mail.gmail.com>
-Subject: [Patch] cifs: Deferred close perfomance improvements
-To:     Steve French <smfrench@gmail.com>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        ronnie sahlberg <ronniesahlberg@gmail.com>,
-        sribhat.msa@outlook.com
-Content-Type: multipart/mixed; boundary="00000000000039e71d05cc352d3b"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---00000000000039e71d05cc352d3b
-Content-Type: text/plain; charset="UTF-8"
+Add buffer validation in smb2_set_info.
 
-Hi Steve/All,
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Ralph Böhme <slow@samba.org>
+Cc: Steve French <smfrench@gmail.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/smb2pdu.c | 113 +++++++++++++++++++++++++++++++++++----------
+ fs/ksmbd/smb2pdu.h |   9 ++++
+ 2 files changed, 97 insertions(+), 25 deletions(-)
 
-Please find the attached patches related to deferred close fixes for
-recently found xfstests failures(generic/478 -- locking test,
-generic/461 -- fsstress test) and also performance improvement patch
-related to close of deferred handles during rename/unlink.
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 46e0275a77a8..7763f69e1ae8 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -2107,17 +2107,23 @@ static noinline int create_smb2_pipe(struct ksmbd_work *work)
+  * smb2_set_ea() - handler for setting extended attributes using set
+  *		info command
+  * @eabuf:	set info command buffer
++ * @buf_len:	set info command buffer length
+  * @path:	dentry path for get ea
+  *
+  * Return:	0 on success, otherwise error
+  */
+-static int smb2_set_ea(struct smb2_ea_info *eabuf, struct path *path)
++static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
++		       struct path *path)
+ {
+ 	struct user_namespace *user_ns = mnt_user_ns(path->mnt);
+ 	char *attr_name = NULL, *value;
+ 	int rc = 0;
+ 	int next = 0;
+ 
++	if (buf_len < sizeof(struct smb2_ea_info) + eabuf->EaNameLength +
++			le16_to_cpu(eabuf->EaValueLength))
++		return -EINVAL;
++
+ 	attr_name = kmalloc(XATTR_NAME_MAX + 1, GFP_KERNEL);
+ 	if (!attr_name)
+ 		return -ENOMEM;
+@@ -2181,7 +2187,13 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, struct path *path)
+ 
+ next:
+ 		next = le32_to_cpu(eabuf->NextEntryOffset);
++		if (next == 0 || buf_len < next)
++			break;
++		buf_len -= next;
+ 		eabuf = (struct smb2_ea_info *)((char *)eabuf + next);
++		if (next < eabuf->EaNameLength + le16_to_cpu(eabuf->EaValueLength))
++			break;
++
+ 	} while (next != 0);
+ 
+ 	kfree(attr_name);
+@@ -2790,7 +2802,9 @@ int smb2_open(struct ksmbd_work *work)
+ 		created = true;
+ 		user_ns = mnt_user_ns(path.mnt);
+ 		if (ea_buf) {
+-			rc = smb2_set_ea(&ea_buf->ea, &path);
++			rc = smb2_set_ea(&ea_buf->ea,
++					 le32_to_cpu(ea_buf->ccontext.DataLength),
++					 &path);
+ 			if (rc == -EOPNOTSUPP)
+ 				rc = 0;
+ 			else if (rc)
+@@ -5375,7 +5389,7 @@ static int smb2_rename(struct ksmbd_work *work,
+ static int smb2_create_link(struct ksmbd_work *work,
+ 			    struct ksmbd_share_config *share,
+ 			    struct smb2_file_link_info *file_info,
+-			    struct file *filp,
++			    int buf_len, struct file *filp,
+ 			    struct nls_table *local_nls)
+ {
+ 	char *link_name = NULL, *target_name = NULL, *pathname = NULL;
+@@ -5383,6 +5397,10 @@ static int smb2_create_link(struct ksmbd_work *work,
+ 	bool file_present = true;
+ 	int rc;
+ 
++	if (buf_len < sizeof(struct smb2_file_link_info) +
++			le32_to_cpu(file_info->FileNameLength))
++		return -EINVAL;
++
+ 	ksmbd_debug(SMB, "setting FILE_LINK_INFORMATION\n");
+ 	pathname = kmalloc(PATH_MAX, GFP_KERNEL);
+ 	if (!pathname)
+@@ -5442,7 +5460,7 @@ static int smb2_create_link(struct ksmbd_work *work,
+ static int set_file_basic_info(struct ksmbd_file *fp, char *buf,
+ 			       struct ksmbd_share_config *share)
+ {
+-	struct smb2_file_all_info *file_info;
++	struct smb2_file_basic_info *file_info;
+ 	struct iattr attrs;
+ 	struct timespec64 ctime;
+ 	struct file *filp;
+@@ -5453,7 +5471,7 @@ static int set_file_basic_info(struct ksmbd_file *fp, char *buf,
+ 	if (!(fp->daccess & FILE_WRITE_ATTRIBUTES_LE))
+ 		return -EACCES;
+ 
+-	file_info = (struct smb2_file_all_info *)buf;
++	file_info = (struct smb2_file_basic_info *)buf;
+ 	attrs.ia_valid = 0;
+ 	filp = fp->filp;
+ 	inode = file_inode(filp);
+@@ -5619,7 +5637,8 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
+ }
+ 
+ static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file *fp,
+-			   char *buf)
++			   struct smb2_file_rename_info *rename_info,
++			   int buf_len)
+ {
+ 	struct user_namespace *user_ns;
+ 	struct ksmbd_file *parent_fp;
+@@ -5632,6 +5651,10 @@ static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 		return -EACCES;
+ 	}
+ 
++	if (buf_len < sizeof(struct smb2_file_rename_info) +
++			le32_to_cpu(rename_info->FileNameLength))
++		return -EINVAL;
++
+ 	user_ns = file_mnt_user_ns(fp->filp);
+ 	if (ksmbd_stream_fd(fp))
+ 		goto next;
+@@ -5654,8 +5677,7 @@ static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 		}
+ 	}
+ next:
+-	return smb2_rename(work, fp, user_ns,
+-			   (struct smb2_file_rename_info *)buf,
++	return smb2_rename(work, fp, user_ns, rename_info,
+ 			   work->sess->conn->local_nls);
+ }
+ 
+@@ -5741,40 +5763,71 @@ static int set_file_mode_info(struct ksmbd_file *fp, char *buf)
+  * TODO: need to implement an error handling for STATUS_INFO_LENGTH_MISMATCH
+  */
+ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
+-			      int info_class, char *buf,
++			      struct smb2_set_info_req *req,
+ 			      struct ksmbd_share_config *share)
+ {
+-	switch (info_class) {
++	int buf_len = le32_to_cpu(req->BufferLength);
++
++	switch (req->FileInfoClass) {
+ 	case FILE_BASIC_INFORMATION:
+-		return set_file_basic_info(fp, buf, share);
++	{
++		if (buf_len < sizeof(struct smb2_file_basic_info))
++			return -EINVAL;
+ 
++		return set_file_basic_info(fp, req->Buffer, share);
++	}
+ 	case FILE_ALLOCATION_INFORMATION:
+-		return set_file_allocation_info(work, fp, buf);
++	{
++		if (buf_len < sizeof(struct smb2_file_alloc_info))
++			return -EINVAL;
+ 
++		return set_file_allocation_info(work, fp, req->Buffer);
++	}
+ 	case FILE_END_OF_FILE_INFORMATION:
+-		return set_end_of_file_info(work, fp, buf);
++	{
++		if (buf_len < sizeof(struct smb2_file_eof_info))
++			return -EINVAL;
+ 
++		return set_end_of_file_info(work, fp, req->Buffer);
++	}
+ 	case FILE_RENAME_INFORMATION:
++	{
+ 		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
+ 			ksmbd_debug(SMB,
+ 				    "User does not have write permission\n");
+ 			return -EACCES;
+ 		}
+-		return set_rename_info(work, fp, buf);
+ 
++		if (buf_len < sizeof(struct smb2_file_rename_info))
++			return -EINVAL;
++
++		return set_rename_info(work, fp,
++				       (struct smb2_file_rename_info *)req->Buffer,
++				       buf_len);
++	}
+ 	case FILE_LINK_INFORMATION:
++	{
++		if (buf_len < sizeof(struct smb2_file_link_info))
++			return -EINVAL;
++
+ 		return smb2_create_link(work, work->tcon->share_conf,
+-					(struct smb2_file_link_info *)buf, fp->filp,
++					(struct smb2_file_link_info *)req->Buffer,
++					buf_len, fp->filp,
+ 					work->sess->conn->local_nls);
+-
++	}
+ 	case FILE_DISPOSITION_INFORMATION:
++	{
+ 		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
+ 			ksmbd_debug(SMB,
+ 				    "User does not have write permission\n");
+ 			return -EACCES;
+ 		}
+-		return set_file_disposition_info(fp, buf);
+ 
++		if (buf_len < sizeof(struct smb2_file_disposition_info))
++			return -EINVAL;
++
++		return set_file_disposition_info(fp, req->Buffer);
++	}
+ 	case FILE_FULL_EA_INFORMATION:
+ 	{
+ 		if (!(fp->daccess & FILE_WRITE_EA_LE)) {
+@@ -5783,18 +5836,29 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 			return -EACCES;
+ 		}
+ 
+-		return smb2_set_ea((struct smb2_ea_info *)buf,
+-				   &fp->filp->f_path);
+-	}
++		if (buf_len < sizeof(struct smb2_ea_info))
++			return -EINVAL;
+ 
++		return smb2_set_ea((struct smb2_ea_info *)req->Buffer,
++				   buf_len, &fp->filp->f_path);
++	}
+ 	case FILE_POSITION_INFORMATION:
+-		return set_file_position_info(fp, buf);
++	{
++		if (buf_len < sizeof(struct smb2_file_pos_info))
++			return -EINVAL;
+ 
++		return set_file_position_info(fp, req->Buffer);
++	}
+ 	case FILE_MODE_INFORMATION:
+-		return set_file_mode_info(fp, buf);
++	{
++		if (buf_len < sizeof(struct smb2_file_mode_info))
++			return -EINVAL;
++
++		return set_file_mode_info(fp, req->Buffer);
++	}
+ 	}
+ 
+-	pr_err("Unimplemented Fileinfoclass :%d\n", info_class);
++	pr_err("Unimplemented Fileinfoclass :%d\n", req->FileInfoClass);
+ 	return -EOPNOTSUPP;
+ }
+ 
+@@ -5855,8 +5919,7 @@ int smb2_set_info(struct ksmbd_work *work)
+ 	switch (req->InfoType) {
+ 	case SMB2_O_INFO_FILE:
+ 		ksmbd_debug(SMB, "GOT SMB2_O_INFO_FILE\n");
+-		rc = smb2_set_info_file(work, fp, req->FileInfoClass,
+-					req->Buffer, work->tcon->share_conf);
++		rc = smb2_set_info_file(work, fp, req, work->tcon->share_conf);
+ 		break;
+ 	case SMB2_O_INFO_SECURITY:
+ 		ksmbd_debug(SMB, "GOT SMB2_O_INFO_SECURITY\n");
+diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
+index bcec845b03f3..261825d06391 100644
+--- a/fs/ksmbd/smb2pdu.h
++++ b/fs/ksmbd/smb2pdu.h
+@@ -1464,6 +1464,15 @@ struct smb2_file_all_info { /* data block encoding of response to level 18 */
+ 	char   FileName[1];
+ } __packed; /* level 18 Query */
+ 
++struct smb2_file_basic_info { /* data block encoding of response to level 18 */
++	__le64 CreationTime;	/* Beginning of FILE_BASIC_INFO equivalent */
++	__le64 LastAccessTime;
++	__le64 LastWriteTime;
++	__le64 ChangeTime;
++	__le32 Attributes;
++	__u32  Pad1;		/* End of FILE_BASIC_INFO_INFO equivalent */
++} __packed;
++
+ struct smb2_file_alt_name_info {
+ 	__le32 FileNameLength;
+ 	char FileName[0];
+-- 
+2.25.1
 
-Regards,
-Rohith
-
---00000000000039e71d05cc352d3b
-Content-Type: application/octet-stream; 
-	name="cifs-Not-to-defer-close-on-file-when-lock-is-set.patch"
-Content-Disposition: attachment; 
-	filename="cifs-Not-to-defer-close-on-file-when-lock-is-set.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ktop54yj0>
-X-Attachment-Id: f_ktop54yj0
-
-RnJvbSAyNWUxNGJkMWViZGE4ODNlNWY5MjIyYjAxMDU4OGI1YjYzMjI3NWZhIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSb2hpdGggU3VyYWJhdHR1bGEgPHJvaGl0aHNAbWljcm9zb2Z0
-LmNvbT4KRGF0ZTogRnJpLCAxNyBTZXAgMjAyMSAxNzoyMzozMCArMDAwMApTdWJqZWN0OiBbUEFU
-Q0hdIGNpZnM6IE5vdCB0byBkZWZlciBjbG9zZSBvbiBmaWxlIHdoZW4gbG9jayBpcyBzZXQKCkNs
-b3NlIGZpbGUgaW1tZWRpYXRlbHkgd2hlbiBsb2NrIGlzIHNldC4KClNpZ25lZC1vZmYtYnk6IFJv
-aGl0aCBTdXJhYmF0dHVsYSA8cm9oaXRoc0BtaWNyb3NvZnQuY29tPgotLS0KIGZzL2NpZnMvY2lm
-c2dsb2IuaCB8IDEgKwogZnMvY2lmcy9maWxlLmMgICAgIHwgMiArKwogMiBmaWxlcyBjaGFuZ2Vk
-LCAzIGluc2VydGlvbnMoKykKCmRpZmYgLS1naXQgYS9mcy9jaWZzL2NpZnNnbG9iLmggYi9mcy9j
-aWZzL2NpZnNnbG9iLmgKaW5kZXggYzZhOTU0MmNhMjgxLi5jZjIxNDE0ODNiMzcgMTAwNjQ0Ci0t
-LSBhL2ZzL2NpZnMvY2lmc2dsb2IuaAorKysgYi9mcy9jaWZzL2NpZnNnbG9iLmgKQEAgLTE0MDMs
-NiArMTQwMyw3IEBAIHN0cnVjdCBjaWZzSW5vZGVJbmZvIHsKICNkZWZpbmUgQ0lGU19JTk9fSU5W
-QUxJRF9NQVBQSU5HCSAgKDQpIC8qIHBhZ2VjYWNoZSBpcyBpbnZhbGlkICovCiAjZGVmaW5lIENJ
-RlNfSU5PX0xPQ0sJCQkgICg1KSAvKiBsb2NrIGJpdCBmb3Igc3luY2hyb25pemF0aW9uICovCiAj
-ZGVmaW5lIENJRlNfSU5PX01PRElGSUVEX0FUVFIgICAgICAgICAgICAoNikgLyogSW5kaWNhdGUg
-Y2hhbmdlIGluIG10aW1lL2N0aW1lICovCisjZGVmaW5lIENJRlNfSU5PX0NMT1NFX09OX0xPQ0sg
-ICAgICAgICAgICAoNykgLyogTm90IHRvIGRlZmVyIHRoZSBjbG9zZSB3aGVuIGxvY2sgaXMgc2V0
-ICovCiAJdW5zaWduZWQgbG9uZyBmbGFnczsKIAlzcGlubG9ja190IHdyaXRlcnNfbG9jazsKIAl1
-bnNpZ25lZCBpbnQgd3JpdGVyczsJCS8qIE51bWJlciBvZiB3cml0ZXJzIG9uIHRoaXMgaW5vZGUg
-Ki8KZGlmZiAtLWdpdCBhL2ZzL2NpZnMvZmlsZS5jIGIvZnMvY2lmcy9maWxlLmMKaW5kZXggYmI5
-OGZiZGQyMmE5Li45ZDNiYzY3ODQ3NzEgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvZmlsZS5jCisrKyBi
-L2ZzL2NpZnMvZmlsZS5jCkBAIC04ODEsNiArODgxLDcgQEAgaW50IGNpZnNfY2xvc2Uoc3RydWN0
-IGlub2RlICppbm9kZSwgc3RydWN0IGZpbGUgKmZpbGUpCiAJCWRjbG9zZSA9IGttYWxsb2Moc2l6
-ZW9mKHN0cnVjdCBjaWZzX2RlZmVycmVkX2Nsb3NlKSwgR0ZQX0tFUk5FTCk7CiAJCWlmICgoY2lu
-b2RlLT5vcGxvY2sgPT0gQ0lGU19DQUNIRV9SSFdfRkxHKSAmJgogCQkgICAgY2lub2RlLT5sZWFz
-ZV9ncmFudGVkICYmCisJCSAgICAhdGVzdF9iaXQoQ0lGU19JTk9fQ0xPU0VfT05fTE9DSywgJmNp
-bm9kZS0+ZmxhZ3MpICYmCiAJCSAgICBkY2xvc2UpIHsKIAkJCWlmICh0ZXN0X2JpdChDSUZTX0lO
-T19NT0RJRklFRF9BVFRSLCAmY2lub2RlLT5mbGFncykpCiAJCQkJaW5vZGUtPmlfY3RpbWUgPSBp
-bm9kZS0+aV9tdGltZSA9IGN1cnJlbnRfdGltZShpbm9kZSk7CkBAIC0xODYxLDYgKzE4NjIsNyBA
-QCBpbnQgY2lmc19sb2NrKHN0cnVjdCBmaWxlICpmaWxlLCBpbnQgY21kLCBzdHJ1Y3QgZmlsZV9s
-b2NrICpmbG9jaykKIAljaWZzX3JlYWRfZmxvY2soZmxvY2ssICZ0eXBlLCAmbG9jaywgJnVubG9j
-aywgJndhaXRfZmxhZywKIAkJCXRjb24tPnNlcy0+c2VydmVyKTsKIAljaWZzX3NiID0gQ0lGU19G
-SUxFX1NCKGZpbGUpOworCXNldF9iaXQoQ0lGU19JTk9fQ0xPU0VfT05fTE9DSywgJkNJRlNfSShk
-X2lub2RlKGNmaWxlLT5kZW50cnkpKS0+ZmxhZ3MpOwogCiAJaWYgKGNhcF91bml4KHRjb24tPnNl
-cykgJiYKIAkgICAgKENJRlNfVU5JWF9GQ05UTF9DQVAgJiBsZTY0X3RvX2NwdSh0Y29uLT5mc1Vu
-aXhJbmZvLkNhcGFiaWxpdHkpKSAmJgotLSAKMi4zMy4wLnJjMQoK
---00000000000039e71d05cc352d3b
-Content-Type: application/octet-stream; 
-	name="cifs-Deferred-close-performance-improvements.patch"
-Content-Disposition: attachment; 
-	filename="cifs-Deferred-close-performance-improvements.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ktop5eqr1>
-X-Attachment-Id: f_ktop5eqr1
-
-RnJvbSBjZThiMTRlYjQ2MjFkZjc5YjFlYTliYTliMDZiOTk3MDRhYmJiYjQwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSb2hpdGggU3VyYWJhdHR1bGEgPHJvaGl0aHNAbWljcm9zb2Z0
-LmNvbT4KRGF0ZTogRnJpLCAxNyBTZXAgMjAyMSAxODoxNDoyNiArMDAwMApTdWJqZWN0OiBbUEFU
-Q0hdIGNpZnM6IERlZmVycmVkIGNsb3NlIHBlcmZvcm1hbmNlIGltcHJvdmVtZW50cwoKRHVyaW5n
-IHVubGluay9yZW5hbWUgaW5zdGVhZCBvZiBjbG9zaW5nIGFsbCB0aGUgZGVmZXJyZWQgaGFuZGxl
-cwp1bmRlciB0Y29uLCBjbG9zZSBvbmx5IGhhbmRsZXMgdW5kZXIgdGhlIHJlcXVlc3RlZCBkZW50
-cnkuCgpTaWduZWQtb2ZmLWJ5OiBSb2hpdGggU3VyYWJhdHR1bGEgPHJvaGl0aHNAbWljcm9zb2Z0
-LmNvbT4KLS0tCiBmcy9jaWZzL2NpZnNwcm90by5oIHwgIDMgKysrCiBmcy9jaWZzL2lub2RlLmMg
-ICAgIHwgIDYgKysrLS0tCiBmcy9jaWZzL21pc2MuYyAgICAgIHwgMzcgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKwogMyBmaWxlcyBjaGFuZ2VkLCA0MyBpbnNlcnRpb25zKCsp
-LCAzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvY2lmc3Byb3RvLmggYi9mcy9j
-aWZzL2NpZnNwcm90by5oCmluZGV4IGUwZGVmMGYwNzE0Yi4uNjg5ZDczODY5YTI1IDEwMDY0NAot
-LS0gYS9mcy9jaWZzL2NpZnNwcm90by5oCisrKyBiL2ZzL2NpZnMvY2lmc3Byb3RvLmgKQEAgLTI2
-OCw2ICsyNjgsOSBAQCBleHRlcm4gdm9pZCBjaWZzX2Nsb3NlX2RlZmVycmVkX2ZpbGUoc3RydWN0
-IGNpZnNJbm9kZUluZm8gKmNpZnNfaW5vZGUpOwogCiBleHRlcm4gdm9pZCBjaWZzX2Nsb3NlX2Fs
-bF9kZWZlcnJlZF9maWxlcyhzdHJ1Y3QgY2lmc190Y29uICpjaWZzX3Rjb24pOwogCitleHRlcm4g
-dm9pZCBjaWZzX2Nsb3NlX2RlZmVycmVkX2ZpbGVfdW5kZXJfZGVudHJ5KHN0cnVjdCBjaWZzX3Rj
-b24gKmNpZnNfdGNvbiwKKwkJCQljb25zdCBjaGFyICpwYXRoKTsKKwogZXh0ZXJuIHN0cnVjdCBU
-Q1BfU2VydmVyX0luZm8gKmNpZnNfZ2V0X3RjcF9zZXNzaW9uKHN0cnVjdCBzbWIzX2ZzX2NvbnRl
-eHQgKmN0eCk7CiBleHRlcm4gdm9pZCBjaWZzX3B1dF90Y3Bfc2Vzc2lvbihzdHJ1Y3QgVENQX1Nl
-cnZlcl9JbmZvICpzZXJ2ZXIsCiAJCQkJIGludCBmcm9tX3JlY29ubmVjdCk7CmRpZmYgLS1naXQg
-YS9mcy9jaWZzL2lub2RlLmMgYi9mcy9jaWZzL2lub2RlLmMKaW5kZXggNjVmOGE3MGNlY2UzLi41
-OWMyZmU2MzRmNzcgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvaW5vZGUuYworKysgYi9mcy9jaWZzL2lu
-b2RlLmMKQEAgLTE2MjUsNyArMTYyNSw3IEBAIGludCBjaWZzX3VubGluayhzdHJ1Y3QgaW5vZGUg
-KmRpciwgc3RydWN0IGRlbnRyeSAqZGVudHJ5KQogCQlnb3RvIHVubGlua19vdXQ7CiAJfQogCi0J
-Y2lmc19jbG9zZV9kZWZlcnJlZF9maWxlKENJRlNfSShpbm9kZSkpOworCWNpZnNfY2xvc2VfZGVm
-ZXJyZWRfZmlsZV91bmRlcl9kZW50cnkodGNvbiwgZnVsbF9wYXRoKTsKIAlpZiAoY2FwX3VuaXgo
-dGNvbi0+c2VzKSAmJiAoQ0lGU19VTklYX1BPU0lYX1BBVEhfT1BTX0NBUCAmCiAJCQkJbGU2NF90
-b19jcHUodGNvbi0+ZnNVbml4SW5mby5DYXBhYmlsaXR5KSkpIHsKIAkJcmMgPSBDSUZTUE9TSVhE
-ZWxGaWxlKHhpZCwgdGNvbiwgZnVsbF9wYXRoLApAQCAtMjExNCw5ICsyMTE0LDkgQEAgY2lmc19y
-ZW5hbWUyKHN0cnVjdCB1c2VyX25hbWVzcGFjZSAqbW50X3VzZXJucywgc3RydWN0IGlub2RlICpz
-b3VyY2VfZGlyLAogCQlnb3RvIGNpZnNfcmVuYW1lX2V4aXQ7CiAJfQogCi0JY2lmc19jbG9zZV9k
-ZWZlcnJlZF9maWxlKENJRlNfSShkX2lub2RlKHNvdXJjZV9kZW50cnkpKSk7CisJY2lmc19jbG9z
-ZV9kZWZlcnJlZF9maWxlX3VuZGVyX2RlbnRyeSh0Y29uLCBmcm9tX25hbWUpOwogCWlmIChkX2lu
-b2RlKHRhcmdldF9kZW50cnkpICE9IE5VTEwpCi0JCWNpZnNfY2xvc2VfZGVmZXJyZWRfZmlsZShD
-SUZTX0koZF9pbm9kZSh0YXJnZXRfZGVudHJ5KSkpOworCQljaWZzX2Nsb3NlX2RlZmVycmVkX2Zp
-bGVfdW5kZXJfZGVudHJ5KHRjb24sIHRvX25hbWUpOwogCiAJcmMgPSBjaWZzX2RvX3JlbmFtZSh4
-aWQsIHNvdXJjZV9kZW50cnksIGZyb21fbmFtZSwgdGFyZ2V0X2RlbnRyeSwKIAkJCSAgICB0b19u
-YW1lKTsKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvbWlzYy5jIGIvZnMvY2lmcy9taXNjLmMKaW5kZXgg
-NTdlNjk1ZTNjOTY5Li5lMTZmOWNiY2Q5N2QgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvbWlzYy5jCisr
-KyBiL2ZzL2NpZnMvbWlzYy5jCkBAIC03ODEsNiArNzgxLDQzIEBAIGNpZnNfY2xvc2VfYWxsX2Rl
-ZmVycmVkX2ZpbGVzKHN0cnVjdCBjaWZzX3Rjb24gKnRjb24pCiAJCWtmcmVlKHRtcF9saXN0KTsK
-IAl9CiB9Cit2b2lkCitjaWZzX2Nsb3NlX2RlZmVycmVkX2ZpbGVfdW5kZXJfZGVudHJ5KHN0cnVj
-dCBjaWZzX3Rjb24gKnRjb24sIGNvbnN0IGNoYXIgKnBhdGgpCit7CisJc3RydWN0IGNpZnNGaWxl
-SW5mbyAqY2ZpbGU7CisJc3RydWN0IGxpc3RfaGVhZCAqdG1wOworCXN0cnVjdCBmaWxlX2xpc3Qg
-KnRtcF9saXN0LCAqdG1wX25leHRfbGlzdDsKKwlzdHJ1Y3QgbGlzdF9oZWFkIGZpbGVfaGVhZDsK
-Kwl2b2lkICpwYWdlOworCWNvbnN0IGNoYXIgKmZ1bGxfcGF0aDsKKworCUlOSVRfTElTVF9IRUFE
-KCZmaWxlX2hlYWQpOworCXBhZ2UgPSBhbGxvY19kZW50cnlfcGF0aCgpOworCXNwaW5fbG9jaygm
-dGNvbi0+b3Blbl9maWxlX2xvY2spOworCWxpc3RfZm9yX2VhY2godG1wLCAmdGNvbi0+b3BlbkZp
-bGVMaXN0KSB7CisJCWNmaWxlID0gbGlzdF9lbnRyeSh0bXAsIHN0cnVjdCBjaWZzRmlsZUluZm8s
-IHRsaXN0KTsKKwkJZnVsbF9wYXRoID0gYnVpbGRfcGF0aF9mcm9tX2RlbnRyeShjZmlsZS0+ZGVu
-dHJ5LCBwYWdlKTsKKwkJaWYgKHN0cnN0cihmdWxsX3BhdGgsIHBhdGgpKSB7CisJCQlpZiAoZGVs
-YXllZF93b3JrX3BlbmRpbmcoJmNmaWxlLT5kZWZlcnJlZCkpIHsKKwkJCQlpZiAoY2FuY2VsX2Rl
-bGF5ZWRfd29yaygmY2ZpbGUtPmRlZmVycmVkKSkgeworCQkJCQl0bXBfbGlzdCA9IGttYWxsb2Mo
-c2l6ZW9mKHN0cnVjdCBmaWxlX2xpc3QpLCBHRlBfQVRPTUlDKTsKKwkJCQkJaWYgKHRtcF9saXN0
-ID09IE5VTEwpCisJCQkJCQlicmVhazsKKwkJCQkJdG1wX2xpc3QtPmNmaWxlID0gY2ZpbGU7CisJ
-CQkJCWxpc3RfYWRkX3RhaWwoJnRtcF9saXN0LT5saXN0LCAmZmlsZV9oZWFkKTsKKwkJCQl9CisJ
-CQl9CisJCX0KKwl9CisJc3Bpbl91bmxvY2soJnRjb24tPm9wZW5fZmlsZV9sb2NrKTsKKworCWxp
-c3RfZm9yX2VhY2hfZW50cnlfc2FmZSh0bXBfbGlzdCwgdG1wX25leHRfbGlzdCwgJmZpbGVfaGVh
-ZCwgbGlzdCkgeworCQlfY2lmc0ZpbGVJbmZvX3B1dCh0bXBfbGlzdC0+Y2ZpbGUsIHRydWUsIGZh
-bHNlKTsKKwkJbGlzdF9kZWwoJnRtcF9saXN0LT5saXN0KTsKKwkJa2ZyZWUodG1wX2xpc3QpOwor
-CX0KKwlmcmVlX2RlbnRyeV9wYXRoKHBhZ2UpOworfQogCiAvKiBwYXJzZXMgREZTIHJlZmZlcmFs
-IFYzIHN0cnVjdHVyZQogICogY2FsbGVyIGlzIHJlc3BvbnNpYmxlIGZvciBmcmVlaW5nIHRhcmdl
-dF9ub2RlcwotLSAKMi4zMy4wLnJjMQoK
---00000000000039e71d05cc352d3b
-Content-Type: application/octet-stream; 
-	name="cifs-Fix-soft-lockup-during-fsstress.patch"
-Content-Disposition: attachment; 
-	filename="cifs-Fix-soft-lockup-during-fsstress.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ktop5er62>
-X-Attachment-Id: f_ktop5er62
-
-RnJvbSA1NDc2MGQ4MTYyNGVmMmFiZTY2MmRhMTdlM2YyYzg2YmY5ZTBhZjQ5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBSb2hpdGggU3VyYWJhdHR1bGEgPHJvaGl0aHNAbWljcm9zb2Z0
-LmNvbT4KRGF0ZTogRnJpLCAxNyBTZXAgMjAyMSAxNzoyOTo0MiArMDAwMApTdWJqZWN0OiBbUEFU
-Q0hdIGNpZnM6IEZpeCBzb2Z0IGxvY2t1cCBkdXJpbmcgZnNzdHJlc3MKCkJlbG93IHRyYWNlcyBh
-cmUgb2JzZXJ2ZWQgZHVyaW5nIGZzc3RyZXNzIGFuZCBzeXN0ZW0gZ290IGh1bmcuClsgIDEzMC42
-OTgzOTZdIHdhdGNoZG9nOiBCVUc6IHNvZnQgbG9ja3VwIC0gQ1BVIzYgc3R1Y2sgZm9yIDI2cyEK
-ClNpZ25lZC1vZmYtYnk6IFJvaGl0aCBTdXJhYmF0dHVsYSA8cm9oaXRoc0BtaWNyb3NvZnQuY29t
-PgotLS0KIGZzL2NpZnMvbWlzYy5jIHwgNCArKy0tCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRp
-b25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL2NpZnMvbWlzYy5jIGIvZnMv
-Y2lmcy9taXNjLmMKaW5kZXggOTQ2OWYxY2YwYjQ2Li41N2U2OTVlM2M5NjkgMTAwNjQ0Ci0tLSBh
-L2ZzL2NpZnMvbWlzYy5jCisrKyBiL2ZzL2NpZnMvbWlzYy5jCkBAIC03MzYsNyArNzM2LDcgQEAg
-Y2lmc19jbG9zZV9kZWZlcnJlZF9maWxlKHN0cnVjdCBjaWZzSW5vZGVJbmZvICpjaWZzX2lub2Rl
-KQogCQkJaWYgKGNhbmNlbF9kZWxheWVkX3dvcmsoJmNmaWxlLT5kZWZlcnJlZCkpIHsKIAkJCQl0
-bXBfbGlzdCA9IGttYWxsb2Moc2l6ZW9mKHN0cnVjdCBmaWxlX2xpc3QpLCBHRlBfQVRPTUlDKTsK
-IAkJCQlpZiAodG1wX2xpc3QgPT0gTlVMTCkKLQkJCQkJY29udGludWU7CisJCQkJCWJyZWFrOwog
-CQkJCXRtcF9saXN0LT5jZmlsZSA9IGNmaWxlOwogCQkJCWxpc3RfYWRkX3RhaWwoJnRtcF9saXN0
-LT5saXN0LCAmZmlsZV9oZWFkKTsKIAkJCX0KQEAgLTc2Nyw3ICs3NjcsNyBAQCBjaWZzX2Nsb3Nl
-X2FsbF9kZWZlcnJlZF9maWxlcyhzdHJ1Y3QgY2lmc190Y29uICp0Y29uKQogCQkJaWYgKGNhbmNl
-bF9kZWxheWVkX3dvcmsoJmNmaWxlLT5kZWZlcnJlZCkpIHsKIAkJCQl0bXBfbGlzdCA9IGttYWxs
-b2Moc2l6ZW9mKHN0cnVjdCBmaWxlX2xpc3QpLCBHRlBfQVRPTUlDKTsKIAkJCQlpZiAodG1wX2xp
-c3QgPT0gTlVMTCkKLQkJCQkJY29udGludWU7CisJCQkJCWJyZWFrOwogCQkJCXRtcF9saXN0LT5j
-ZmlsZSA9IGNmaWxlOwogCQkJCWxpc3RfYWRkX3RhaWwoJnRtcF9saXN0LT5saXN0LCAmZmlsZV9o
-ZWFkKTsKIAkJCX0KLS0gCjIuMzMuMC5yYzEKCg==
---00000000000039e71d05cc352d3b--
