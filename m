@@ -2,133 +2,114 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A6EC433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 16:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88729C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 16:34:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24C5361019
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 16:30:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 679986115B
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 16:34:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231277AbhITQbv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Sep 2021 12:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52116 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231213AbhITQbv (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Sep 2021 12:31:51 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4D5C061574
-        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 09:30:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Date:Message-ID:From:Cc:To;
-        bh=V0LA6pLKObUfz2Pv1TmzSpRrP2fBW1yhVEmk4/ofFo0=; b=OZxuYZ8aCCbAq4zdW7n0ALTqVp
-        a6RVL6y4qsfFuf5WVzqgVl8TkwUJa5cX3IBNG9uswv1soDWyqVRScGWKD2TgCwzgNrpi4V4xJ1aT6
-        aQQJb748shkqAYjNfsd6n67IvQ4s9BVssLqZDxjWTbwB+GCzfoAxjq55Q12eeezgMcpsOdK+0XyYW
-        CTrCia8Bru3qkRH+hm10cXh5Ja1ARBn7LaSR/3PsPKp1Q+K1yJOKAiL8q+mE8/vpUkj4qtl1wzbJF
-        UWnOT0rNLBZKDJohMcKiIGMmgBzE3XDfdROU59JBGdaFpJrVTKBDwFH8z6Q/0CO9w0Ly2nKTbuDtY
-        fnN3cqRLUCErge/ehNRQFzQbtvcHNk9gUEWRt0bPOudZbxwjgFiTXR+daGfPjmX84LzF9Ou/vy1xz
-        pagZlIGvoS37jy07Z5rvuLAPIeH47hOK4N2nJBokoBjzZ7PDLy2ffvHyDjX7UyvOes8zx69u6V8pP
-        LKH8HrRtjMOT1UAA3UunQBMS;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1mSMBS-00717b-5Y; Mon, 20 Sep 2021 16:30:22 +0000
-Subject: Re: [PATCH v2 1/4] ksmbd: add request buffer validation in
- smb2_set_info
-To:     Steve French <smfrench@gmail.com>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>
-References: <20210919021315.642856-1-linkinjeon@kernel.org>
- <85871805-c9fb-6df9-be6d-ff57074426a3@samba.org>
- <27cdc659-cf4d-cc9e-e5c5-6a3d23987e72@samba.org>
- <CAH2r5mt8gxSS56kDvmtRTOi7Dm0fXwD6zL45WAP2hw2_TxDPow@mail.gmail.com>
- <97166b9e-b0e2-2cc2-5d53-c0f8687faf80@samba.org>
- <CAH2r5mtHCpy9n6LXDU+V2uJAEQqh4J80gRzinxbpiVs7HTh81g@mail.gmail.com>
-From:   Ralph Boehme <slow@samba.org>
-Message-ID: <8cf2eb1d-a236-5db2-19a9-4749c29aa807@samba.org>
-Date:   Mon, 20 Sep 2021 18:30:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S230026AbhITQgG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Sep 2021 12:36:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60212 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230099AbhITQgG (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 20 Sep 2021 12:36:06 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 819F361177
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 16:34:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632155679;
+        bh=pxF29AaQATzGhRHb4RnXU6CyjQbrv7GsTPhZECcrj18=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=WxNWHBxAl7/VZAWhvJwxQ7uOZZgNr4XqNDvUQWCs7FmyXBRaUuyuJkE1zt9vqo6sg
+         5rAIIuN4TKkELQKV0yeD8dGnOFFV5CbcaesGuUkPXbcKY1jQf0+52dfqhSuZch7zME
+         e7/ncA3UkwdHhhlDjr84eHgYqX4Q4ZY8yKg7ZclqsnyFmiyvJZHsJHP/NO8tP6lAkI
+         sF+Kzj1Rs+ialHF7aCpH5zkDDgNPkVdLSQDWXTNFJsvjrhAsN0pre8qU4VlqotLwmx
+         RyBkPXgjPI+OEbLMoZy84W1vAV4vzrlrmajbuptYPvxbEKy3/S+H0cRoIDMqJ/dMr9
+         Ksd2drw3y1B8w==
+Received: by mail-oi1-f172.google.com with SMTP id 6so25518745oiy.8
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 09:34:39 -0700 (PDT)
+X-Gm-Message-State: AOAM530hM51TFhEiqs4rm61/+V02ySzQQFY1iGh/e+9AV2Rmxa0jmKgX
+        EpGnBB7400FcpsyupjO0oTTYWk4y4Sdmopwgu7U=
+X-Google-Smtp-Source: ABdhPJydz7U9HSk+kDpZ3tERLRy99sFuERbDqpHoVb/fNUp6TKAULbqAA9YTHA2k2lCI4bPj1FFTk0CDrbmiH5bqD3Y=
+X-Received: by 2002:aca:1b19:: with SMTP id b25mr22848495oib.138.1632155678927;
+ Mon, 20 Sep 2021 09:34:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5mtHCpy9n6LXDU+V2uJAEQqh4J80gRzinxbpiVs7HTh81g@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Mc50VP8HL2nzYxgOYfQjcyJvlPUMMlUsD"
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Mon, 20 Sep 2021 09:34:38
+ -0700 (PDT)
+In-Reply-To: <2cf8a2d1-41df-eef4-dfe0-dca076e8db54@talpey.com>
+References: <20210918120239.96627-1-linkinjeon@kernel.org> <ac18e062-e835-b575-66af-72631df7ef7d@talpey.com>
+ <CAH2r5msa4XeaLy=_HY9RrLpK0NyS9n3iMdYnvX7F4n2zNQNXgQ@mail.gmail.com> <2cf8a2d1-41df-eef4-dfe0-dca076e8db54@talpey.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue, 21 Sep 2021 01:34:38 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9VJ52QOEdAaNC3ZVAZk3mBAZFHo=uME_ygK0Axk=yivQ@mail.gmail.com>
+Message-ID: <CAKYAXd9VJ52QOEdAaNC3ZVAZk3mBAZFHo=uME_ygK0Axk=yivQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: add default data stream name in FILE_STREAM_INFORMATION
+To:     Tom Talpey <tom@talpey.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Mc50VP8HL2nzYxgOYfQjcyJvlPUMMlUsD
-Content-Type: multipart/mixed; boundary="pUO82kBUl8uA6VMortKqAc5deRJL3A8X2";
- protected-headers="v1"
-From: Ralph Boehme <slow@samba.org>
-To: Steve French <smfrench@gmail.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Message-ID: <8cf2eb1d-a236-5db2-19a9-4749c29aa807@samba.org>
-Subject: Re: [PATCH v2 1/4] ksmbd: add request buffer validation in
- smb2_set_info
-References: <20210919021315.642856-1-linkinjeon@kernel.org>
- <85871805-c9fb-6df9-be6d-ff57074426a3@samba.org>
- <27cdc659-cf4d-cc9e-e5c5-6a3d23987e72@samba.org>
- <CAH2r5mt8gxSS56kDvmtRTOi7Dm0fXwD6zL45WAP2hw2_TxDPow@mail.gmail.com>
- <97166b9e-b0e2-2cc2-5d53-c0f8687faf80@samba.org>
- <CAH2r5mtHCpy9n6LXDU+V2uJAEQqh4J80gRzinxbpiVs7HTh81g@mail.gmail.com>
-In-Reply-To: <CAH2r5mtHCpy9n6LXDU+V2uJAEQqh4J80gRzinxbpiVs7HTh81g@mail.gmail.com>
-
---pUO82kBUl8uA6VMortKqAc5deRJL3A8X2
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-Am 20.09.21 um 18:20 schrieb Steve French:
-> It is not too late to do review of any of these 8.  Given the
-> importance of security, the more reviews the better.  Earliest we
-> would send them (the larger set of 8) upstream would be in a few days.
->    I typically like to have them sit in for-next for 48 hours (although=
-
-> in some cases make exceptions, e.g.  for important bug fixes I will
-> shorten this if later in the week so they make it in time for the next
-> rc)
-
-which "for-next"?
-
-git://git.samba.org/ksmbd.git/ksmbd-for-next ?
-
-Thanks!
--slow
-
---=20
-Ralph Boehme, Samba Team                 https://samba.org/
-SerNet Samba Team Lead      https://sernet.de/en/team-samba
-
-
---pUO82kBUl8uA6VMortKqAc5deRJL3A8X2--
-
---Mc50VP8HL2nzYxgOYfQjcyJvlPUMMlUsD
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFItx0FAwAAAAAACgkQqh6bcSY5nkbk
-DQ/+IT3xFDw3jZGKCdYiVMDg4VHP4kJObDgM8NzvhGy+/0uL03jVIbLCQnicjyDHqpkCm0Kb6uaB
-H3V2OXoTKoR0ZLeZ4v9SWckjCDvmIlz6BXTLgHiXH87CB+xKIMXkqYhGRrWCz6CK8Hqu/mHsQ+LZ
-BfKmgC7AMtzSEFw6+cuIjn+T5gJAM5mo2foE2VQGNKe+OZaWSHo5QiOGczPAtEq4Qq9mZioWPkJ1
-X92CskxbWdDEcqyNF3B7jV6OpYNf+iDPdnCpsdF+Aong9vDnSfO4MBYbUS5xA0my2n1/ptwL+GcV
-B8GdpyXEQAVOnVi2+gaZl1cF/QqE+rx8VzVkFVwvqbzYvirO9k/yRg5T+1/VGqTJi9vrc7Fa6WKP
-zjXncdpPpZ2avkSyRtL4fJOzF9/lfdJVHJVfWRyAzyBb4NM1KwxNkoW7RcB7meAoULqqWkdUE/j2
-WMu3R3jDGqwsJjm8AEUI/iARRaUEgs1grtjaZEtaizahKY/klIqlx6tdYkenfNoKV4orVoi0Mvhx
-peX0QyOb7MDLuMqzPk46GJd7V0AT62RWcfkyC++s6M6ZR8QcvGOKhgGA1JIi6uPLi8myQiWaR74p
-EA+y4lENz7zTKvvBs5rnWu5TE2d6Vf4OepwihVNLdAwAvHDfBVWMJKbSLxmWRSxoTIPclwEK/w4W
-fBY=
-=Oz9a
------END PGP SIGNATURE-----
-
---Mc50VP8HL2nzYxgOYfQjcyJvlPUMMlUsD--
+2021-09-21 1:08 GMT+09:00, Tom Talpey <tom@talpey.com>:
+> On 9/20/2021 12:47 AM, Steve French wrote:
+>> On Sat, Sep 18, 2021 at 9:06 PM Tom Talpey <tom@talpey.com> wrote:
+>>>
+>>> This doesn't appear to be what's documented in MS-FSA section
+>>> 2.1.5.11.29.
+>>> There, it appears to call for returning an empty stream list,
+>>> and STATUS_SUCCESS, when no streams are present.
+>>
+>> I tried a quick test to Windows and it does appear to return $DATA
+>> stream by default:
+>>
+>> # ./smbinfo filestreaminfo /mnt/junk
+>> Name: ::$DATA
+>> Size: 179765 bytes
+>> Allocation size: 196608 bytes
+>
+> Ok, so the implication is that the default stream is indeed always
+> present, if the filesystem supports streams. The language in MS-FSA
+> would therefore be correct, but a bit vague. I agree that returning
+> a ::$DATA for ordinary files is appropriate.
+>
+>> when I tried the same thing to a directory on a share mounted to Windows
+>> 10
+>> (NTFS), I get no streams returned.
+>>
+>> So it does look like default stream ($DATA) is only returned for files
+>
+>
+> My concern here is, what's so special about directories? A special file
+> or fifo, a symlink or reparse/junction, etc. Is it appropriate to cons
+> up a ::$DATA for these? What should the size values be, if so?
+Special files in linux(ksmbd share) is showing as regular file on
+windows client.
+>
+> Tom.
+>
+>
+>>> Also, why does the code special-case directories? The conditionals
+>>> on StreamSize and StreamAllocation size are entirely redundant,
+>>> after the top-level if (!S_ISDIR...), btw.
+>>>
+>>> I'd suggest asking Microsoft dochelp for clarification before
+>>> implementing this.
+>>>
+>>> Tom.
+>>>
+>>> On 9/18/2021 8:02 AM, Namjae Jeon wrote:
+>>>> Windows client expect to get default stream name(::DATA) in
+>>>> FILE_STREAM_INFORMATION response even if there is no stream data in
+>>>> file.
+>>>> This patch fix update failure when writing ppt or doc files.
+>>
+>>
+>>
+>>
+>
