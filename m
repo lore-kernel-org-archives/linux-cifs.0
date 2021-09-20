@@ -2,144 +2,232 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29162C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 15:56:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A68C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 15:57:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04BB860FE6
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 15:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F12B561159
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 15:57:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238660AbhITP5b (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Sep 2021 11:57:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44174 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238611AbhITP5a (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Sep 2021 11:57:30 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 148C6C061574
-        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 08:56:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Date:Message-ID:From:Cc:To;
-        bh=h6pPNVw9qGFj/VTc8YEVMwA3WtAEBlQ6t+RUyrxfFL4=; b=YR/+x1Vy7sEQXDZ9lJFPopo3kn
-        exo+cLFEeSrgbK96a2ssSCfcVPWDLUidWWVog6IPk2hUt1+AWX0RssctxWBpcloVpCeRIx4slG2vp
-        fqKFMf2vm0WF7Icq7N0c3RnnizZOtYk5PeyTO+iUqOUuRvrVWVuSM4Co5ucn17gbl/wZWtTvVxWV7
-        5JYWD9fsO3DKrUTxcyb4lfpTzLCgQiGcga+yoFf5mMziIse2lvZV+q+gUm7WBZcy27jLELG8XYuIt
-        05YeFHS7aYqcThPoGCLudp/mwyA38ALUz4dXPrPe3lLdwTtCnm/nHExIt0i3VIqiwFI1RHrZMTAKh
-        04qACL1E5AuXqVX9ISQehBQAOE/17kT6oeGB9TDU3qyXVvRQHWgA9XhjXeuNCK1ZuQCLvMICJTHMy
-        WQ9wmUYwda8GPQnjeCUTEbM+yCp8k2g3kL6z6T4wJ3xqZfPzrBEwRGV4NpjTzUMBVezKK7k0NOWq6
-        eFoYhx/sHOzilhpXJgNzQDIm;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1mSLeC-0070ei-QV; Mon, 20 Sep 2021 15:56:00 +0000
-Subject: Re: [PATCH] ksmbd: remove follow symlinks support
-To:     Steve French <smfrench@gmail.com>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>
-References: <20210920065613.5506-1-linkinjeon@kernel.org>
- <d42feeb6-51e6-e897-27ae-f66e8543556a@samba.org>
- <CAH2r5mtT2b_9HGP1_Yii8tVu6vmwyDu6y_9pj_Y8haqQtvqnRw@mail.gmail.com>
-From:   Ralph Boehme <slow@samba.org>
-Message-ID: <cca5b3e4-02c5-cfe3-f6c7-00135cd2eed2@samba.org>
-Date:   Mon, 20 Sep 2021 17:55:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S238594AbhITP6k (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Sep 2021 11:58:40 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42846 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234405AbhITP6j (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 20 Sep 2021 11:58:39 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9E356610FB
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 15:57:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632153432;
+        bh=jGrSml6hSnZQGmZ92U5hUVWUWjVR2Y2WUtcat8RM5bI=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=doBwhQi4KVRbUCvIl+5g1EvVw2P6OibSdDI+xcKNmWTK2CaV0ialdx5s/6EOD5WmL
+         cWzYUxs+a0nNOWM8GF2ggtS/2Lp8QX27TdzVitdytk1CQzEuAo77kEJWRPElueDee6
+         uhswc4tq+2rZYLFV7IdC5QWep7WzAVFLOyS2H6xid85sHvc7VciZC4FoOreznARTNd
+         RrN2QczreeUonmmbOhSEPsY3f8gbYYO9ozsQvq0GFT3m52gWqzbB4NnNAkyPn+zwga
+         T8K0VMCLUG24CdjaPgyQttAg13jxn+qNddeAO2EkxogH2TH3Yx1GV4mfibPmu4ejmf
+         qLhL5XNwoN+iw==
+Received: by mail-oo1-f47.google.com with SMTP id p22-20020a4a8156000000b002a8c9ea1858so2066117oog.11
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 08:57:12 -0700 (PDT)
+X-Gm-Message-State: AOAM533PTJpNh/V83/2UC2LmAfYRiIyAxl0SkrZPzUR0Y4Dx84DXP9s9
+        oVyGZiPZWu43io6BSBvFB9euy5QZBLMoYk5IpeM=
+X-Google-Smtp-Source: ABdhPJxnqzTTTXmwKKCShGd2VrgVFSNg++StybxNI+6zbKg6hnySfr8wYlKiWV5E9MVK/IsxtI4iMASGRWGBH0Ll8YI=
+X-Received: by 2002:a4a:b78c:: with SMTP id a12mr7545866oop.58.1632153431998;
+ Mon, 20 Sep 2021 08:57:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAH2r5mtT2b_9HGP1_Yii8tVu6vmwyDu6y_9pj_Y8haqQtvqnRw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="qxNa5hNuphubXFw4DQFcpF3ohVF0QyI3h"
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Mon, 20 Sep 2021 08:57:11
+ -0700 (PDT)
+In-Reply-To: <6e8b6c79-3394-f39c-8e1b-06b3c2950a28@samba.org>
+References: <20210920065613.5506-1-linkinjeon@kernel.org> <6e8b6c79-3394-f39c-8e1b-06b3c2950a28@samba.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue, 21 Sep 2021 00:57:11 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9Re_iHpwKq4t4GUibKo8g_D3QB1rzBOYiTvv5dLhdvsw@mail.gmail.com>
+Message-ID: <CAKYAXd9Re_iHpwKq4t4GUibKo8g_D3QB1rzBOYiTvv5dLhdvsw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: remove follow symlinks support
+To:     Ralph Boehme <slow@samba.org>
+Cc:     linux-cifs@vger.kernel.org,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qxNa5hNuphubXFw4DQFcpF3ohVF0QyI3h
-Content-Type: multipart/mixed; boundary="4iVEu5N0gyNX24ZC74Xf8GtVxCcjnBw2K";
- protected-headers="v1"
-From: Ralph Boehme <slow@samba.org>
-To: Steve French <smfrench@gmail.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, CIFS <linux-cifs@vger.kernel.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Message-ID: <cca5b3e4-02c5-cfe3-f6c7-00135cd2eed2@samba.org>
-Subject: Re: [PATCH] ksmbd: remove follow symlinks support
-References: <20210920065613.5506-1-linkinjeon@kernel.org>
- <d42feeb6-51e6-e897-27ae-f66e8543556a@samba.org>
- <CAH2r5mtT2b_9HGP1_Yii8tVu6vmwyDu6y_9pj_Y8haqQtvqnRw@mail.gmail.com>
-In-Reply-To: <CAH2r5mtT2b_9HGP1_Yii8tVu6vmwyDu6y_9pj_Y8haqQtvqnRw@mail.gmail.com>
+2021-09-20 22:57 GMT+09:00, Ralph Boehme <slow@samba.org>:
+> Hi Namjae,
+>
+> Am 20.09.21 um 08:56 schrieb Namjae Jeon:
+>> This patch remove symlink support that can be vulnerable, and we
+>> re-implement it as reparse point later.
+>>
+>> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+>> Cc: Ralph B=C3=B6hme <slow@samba.org>
+>> Cc: Steve French <smfrench@gmail.com>
+>> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+>> ---
+>>   fs/ksmbd/smb2pdu.c | 55 ++++++++++------------------------------------
+>>   fs/ksmbd/vfs.c     | 50 +++++++++--------------------------------
+>>   2 files changed, 21 insertions(+), 84 deletions(-)
+>>
+>> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+>> index afc508c2656d..911c5e97678d 100644
+>> --- a/fs/ksmbd/smb2pdu.c
+>> +++ b/fs/ksmbd/smb2pdu.c
+>> @@ -2661,17 +2661,7 @@ int smb2_open(struct ksmbd_work *work)
+>>   	}
+>>
+>>   	if (req->CreateOptions & FILE_DELETE_ON_CLOSE_LE) {
+>> -		if (test_share_config_flag(work->tcon->share_conf,
+>> -					   KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS)) {
+>> -			/*
+>> -			 * On delete request, instead of following up, need to
+>> -			 * look the current entity
+>> -			 */
+>> -			rc =3D ksmbd_vfs_kern_path(name, 0, &path, 1);
+>> -		} else {
+>> -			rc =3D ksmbd_vfs_kern_path(name, LOOKUP_NO_SYMLINKS, &path, 1);
+>> -		}
+>> -
+>> +		rc =3D ksmbd_vfs_kern_path(name, LOOKUP_NO_SYMLINKS, &path, 1);
+>>   		if (!rc) {
+>>   			/*
+>>   			 * If file exists with under flags, return access
+>> @@ -2693,24 +2683,11 @@ int smb2_open(struct ksmbd_work *work)
+>>   			}
+>>   		}
+>>   	} else {
+>> -		if (test_share_config_flag(work->tcon->share_conf,
+>> -					   KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS)) {
+>> -			/*
+>> -			 * Use LOOKUP_FOLLOW to follow the path of
+>> -			 * symlink in path buildup
+>> -			 */
+>> -			rc =3D ksmbd_vfs_kern_path(name, LOOKUP_FOLLOW, &path, 1);
+>> -			if (rc) { /* Case for broken link ?*/
+>> -				rc =3D ksmbd_vfs_kern_path(name, 0, &path, 1);
+>> -			}
+>> -		} else {
+>> -			rc =3D ksmbd_vfs_kern_path(name, LOOKUP_NO_SYMLINKS,
+>> -						 &path, 1);
+>> -			if (!rc && d_is_symlink(path.dentry)) {
+>> -				rc =3D -EACCES;
+>> -				path_put(&path);
+>> -				goto err_out;
+>> -			}
+>> +		rc =3D ksmbd_vfs_kern_path(name, LOOKUP_NO_SYMLINKS, &path, 1);
+>> +		if (!rc && d_is_symlink(path.dentry)) {
+>> +			rc =3D -EACCES;
+>> +			path_put(&path);
+>> +			goto err_out;
+>
+> why the the check for d_is_symlink()? Wouldn't ksmbd_vfs_kern_path()
+> just return -ELOOP if a path component is a symlink? Hence I guess the
+> below if (rc) where we handle EACCESS should be expanded to handle ELOOP.
+ksmbd_vfs_kern_path() doesn't return -ELOOP if last component is a
+symlink. So need to check it using d_is_symlink().
+>
+> I guess I would also refactor the
+>
+> if (req->CreateOptions & FILE_DELETE_ON_CLOSE_LE)
+>
+> logic in a previous commit to change the codeflow so there's only one
+> call to ksmbd_vfs_kern_path().
+Right. Will do it on v2.
+>
+>>   		}
+>>   	}
+>>
+>> @@ -4795,12 +4772,8 @@ static int smb2_get_info_filesystem(struct
+>> ksmbd_work *work,
+>>   	struct path path;
+>>   	int rc =3D 0, len;
+>>   	int fs_infoclass_size =3D 0;
+>> -	int lookup_flags =3D LOOKUP_NO_SYMLINKS;
+>>
+>> -	if (test_share_config_flag(share, KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS))
+>> -		lookup_flags =3D LOOKUP_FOLLOW;
+>> -
+>> -	rc =3D ksmbd_vfs_kern_path(share->path, lookup_flags, &path, 0);
+>> +	rc =3D ksmbd_vfs_kern_path(share->path, LOOKUP_NO_SYMLINKS, &path, 0);
+>>   	if (rc) {
+>>   		pr_err("cannot create vfs path\n");
+>>   		return -EIO;
+>
+> why doesn't this return rc?
+This is not related with this patch. If needed, we can fix it on another pa=
+tch.
+As I remember, To return STATUS_UNEXPECTED_IO_ERROR error?
+>
+>> @@ -5307,7 +5280,7 @@ static int smb2_rename(struct ksmbd_work *work,
+>>   	char *pathname =3D NULL;
+>>   	struct path path;
+>>   	bool file_present =3D true;
+>> -	int rc, lookup_flags =3D LOOKUP_NO_SYMLINKS;
+>> +	int rc;
+>>
+>>   	ksmbd_debug(SMB, "setting FILE_RENAME_INFO\n");
+>>   	pathname =3D kmalloc(PATH_MAX, GFP_KERNEL);
+>> @@ -5376,11 +5349,8 @@ static int smb2_rename(struct ksmbd_work *work,
+>>   		goto out;
+>>   	}
+>>
+>> -	if (test_share_config_flag(share, KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS))
+>> -		lookup_flags =3D LOOKUP_FOLLOW;
+>> -
+>>   	ksmbd_debug(SMB, "new name %s\n", new_name);
+>> -	rc =3D ksmbd_vfs_kern_path(new_name, lookup_flags, &path, 1);
+>> +	rc =3D ksmbd_vfs_kern_path(new_name, LOOKUP_NO_SYMLINKS, &path, 1);
+>>   	if (rc)
+>>   		file_present =3D false;
+>
+> I guess this should handle ELOOP?
+I have answered above. ksmbd_vfs_kern_path doesn't return it.
+>
+>>   	else
+>> @@ -5430,7 +5400,7 @@ static int smb2_create_link(struct ksmbd_work
+>> *work,
+>>   	char *link_name =3D NULL, *target_name =3D NULL, *pathname =3D NULL;
+>>   	struct path path;
+>>   	bool file_present =3D true;
+>> -	int rc, lookup_flags =3D LOOKUP_NO_SYMLINKS;
+>> +	int rc;
+>>
+>>   	if (buf_len < sizeof(struct smb2_file_link_info) +
+>>   			le32_to_cpu(file_info->FileNameLength))
+>> @@ -5457,11 +5427,8 @@ static int smb2_create_link(struct ksmbd_work
+>> *work,
+>>   		goto out;
+>>   	}
+>>
+>> -	if (test_share_config_flag(share, KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS))
+>> -		lookup_flags =3D LOOKUP_FOLLOW;
+>> -
+>>   	ksmbd_debug(SMB, "target name is %s\n", target_name);
+>> -	rc =3D ksmbd_vfs_kern_path(link_name, lookup_flags, &path, 0);
+>> +	rc =3D ksmbd_vfs_kern_path(link_name, LOOKUP_NO_SYMLINKS, &path, 0);
+>>   	if (rc)
+>>   		file_present =3D false;
+>
+> same here?
+ditto.
+>
+> Other then that: lgtm. Oh, besides, guess this needs an accomanying
+> change to ksmbd-tools?
+Yes. It is needed, but I will change ksmbd-tools also after this patch
+is applied.
 
---4iVEu5N0gyNX24ZC74Xf8GtVxCcjnBw2K
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-Am 20.09.21 um 17:19 schrieb Steve French:
-> On Mon, Sep 20, 2021 at 9:44 AM Ralph Boehme <slow@samba.org> wrote:
->>=20
->> Am 19.09.21 um 04:13 schrieb Namjae Jeon:
->>> Use  LOOKUP_NO_SYMLINKS flags for default lookup to prohibit the=20
->>> middle of symlink component lookup.
->>=20
->> maybe this patch should be squashed with the "ksmbd: remove follow=20
->> symlinks support" patch?
->=20
-> These two could be merged if it makes review easier or less likely
-> to cause merge conflicts later (in this case that may be true since
-> they both touch smb2_open),
-
-from a high level perspective having both patches in the history is at
-least confusing and should be avoided.
-
-The first patch changes the semantics of "follow symlinks" and the
-second one then changes it again by basically removing the option,
-enforcing "never follow symlinks" behaviour.
-
-> but that assumes that removing ability to follow all symlinks is
-> agreed upon.
-
-Well, as discussed you could use LOOKUP_BENEATH. The only downside would
-be that symlinks with absolute paths are not allowed.
-
-Note that with the current WIP patches we either
-
-a) don't support symlink at all ("follow symlinks =3D yes")
-
-b) have no protection against follow symlinks outside of a configured
-share ("follow symlinks =3D no")
-
--slow
-
---=20
-Ralph Boehme, Samba Team                 https://samba.org/
-SerNet Samba Team Lead      https://sernet.de/en/team-samba
-
-
---4iVEu5N0gyNX24ZC74Xf8GtVxCcjnBw2K--
-
---qxNa5hNuphubXFw4DQFcpF3ohVF0QyI3h
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFIrw8FAwAAAAAACgkQqh6bcSY5nkZW
-kA//R1HxzO7uOl756ULo2YiaO8FaVvxSFoiKpeGdaOKLnFF0UJqob00MxZ7M8YOx1hSz0WwJg6jB
-3k6HWg7BbZt6gFLB28f+NqaiUxl2DdOubVFofDkobUiHqZG66pS4c5i0TIwOlo5P3vuiBjTUJE1j
-WGukxXH+FgVnN2RbFpo/zdma2xeJlEdQPHAPTq44Ty9ka01K2NB78g+sbcBYozp9R4jHq/EzHvOb
-Ke1ZbGip9iZdlvaruw1FoqIp+qQQ2SnkEVrznQ+b+M+iRzQLF7VaZldmBcSrLamtoqEEuSo2+TsP
-3PqIUWkypAtdP0CbFpN+NU8kYOt+Zxm0dwitKhskGYGVdpGS3VXGpD10H/62GV9jBh4mJWP5U4wl
-Acyxq6fqzI9x0v2J2B0uSHIQjkY4ANc0PBWnKy9aiXAt38sch2k0xtaXNN3MmtRNMQQab2P9bnDp
-GRWpdCkUZ3fjKeyOvyOmtMLJApGGsyfnEJY2p6h7QF8oBOpChIZ52OGFAe0dslbjONw2dcpinrwl
-N/b1pohZdpan9C0arVl1l5PFnjhlin8IfesGW0HHpU/MzDkWWmH7cmcKjHdm4ESCt9KG3MX9VV3r
-6OedUGZfd0rBMrag4w8ZPBs4Puo8oRcsvs1opJv6UpE5vCGlu7D6jXKCC8k8+QepNYngmmr3aPD4
-m1M=
-=uQvs
------END PGP SIGNATURE-----
-
---qxNa5hNuphubXFw4DQFcpF3ohVF0QyI3h--
+Thanks for your review!
+>
+> Cheers!
+> -slow
+>
+> --
+> Ralph Boehme, Samba Team                 https://samba.org/
+> SerNet Samba Team Lead      https://sernet.de/en/team-samba
+>
+>
