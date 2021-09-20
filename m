@@ -2,125 +2,119 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC381C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 16:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29599C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 16:28:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8ED3B60F70
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 16:21:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3AF66115B
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Sep 2021 16:28:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234601AbhITQWk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Sep 2021 12:22:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49988 "EHLO
+        id S229914AbhITQaA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Sep 2021 12:30:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230331AbhITQWk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Sep 2021 12:22:40 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522E7C061574
-        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 09:21:13 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id x27so69976459lfu.5
-        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 09:21:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=BhCI2cIhzJ8kct2CUgtFgQETNiilvR37UST17NS4nRo=;
-        b=lOVSj4VD4vu74BAeKGoPV/lJwZbIT4XZXRfGniKrBFIO+2aS/fPK7R7OtPvNlnj99p
-         H2vSLBNidvOEK1GwaN8gRZytIaZ25UXt4ubPHXjzvIzcrwvuk/df5d2fT5LVE9LboJJp
-         wsMLwU8xRuaNK4WqDcTw2VNlcIdkvzfoXpzT9uhX23nG2H5vLJoIsCEXyVJkgdxDzdiz
-         pF2WJpK6luV8kKdMB4zKu/rnaAIh2kkk/zkCFiX4EwyA5lVNgIN/Hp6vsos6UXhh1i+F
-         1MERJ7ZJfd+NagnfN1VX8upR2KtYOVgWSm4ONx5+55zRjg10FVkgUPxas4f741p/AV4G
-         SEQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=BhCI2cIhzJ8kct2CUgtFgQETNiilvR37UST17NS4nRo=;
-        b=on5nOKaAs+0A0iQRkEVM3DeurCrSk7CnptabuA+YwePMMHgt/gIA6OvkNWph4ltPMh
-         CSOj6jn6EsRl+C50Iulbtw3s97aMNlzXPIW17VRpQsvp4+HhDHL7s3cj3PscCzx1MXsb
-         WT5n7lQ30Lv2ZPTtOOdFtlCp4dGNSPOI5uuXuCXjjp7v3P6+iF84xCW8uhLefK8/0nvx
-         2GyHY5ox5EwS2tgeEru/aIHYcmUY9bwOT725JYkxuPw4azZIWVn6Px8EaPYCFh33zaW6
-         uoH56E5bWe79WrHT9uYajMtMHgzahSoHiFbhv9n/pWXMqza4L5XZUFJntlCP30j4Yg/4
-         lwgA==
-X-Gm-Message-State: AOAM532/y9/4VDC4228f6ZegIbJfca+GPrdQyp7E70CJ9pSF4NTJ/fQS
-        zpcLX8vBJlwonFFgXBP1FkgHHIKALdGpuCZINTg=
-X-Google-Smtp-Source: ABdhPJyeDlTRDrGJuPH0LkTqcNPxuAoyo2DAdJia7nm5grSXYVWSVECQF9aRb65Yi1EkHVYCUxa2F86ITTAr1aaAbCo=
-X-Received: by 2002:ac2:44b6:: with SMTP id c22mr5724597lfm.601.1632154836160;
- Mon, 20 Sep 2021 09:20:36 -0700 (PDT)
+        with ESMTP id S234804AbhITQ37 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Sep 2021 12:29:59 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC6F4C061574
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 09:28:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Date:Message-ID:From:Cc:To;
+        bh=vKH5gmqSKd6AnVjuaYiVeBOkirqJ4ySDLctNRL6/7rQ=; b=iJQ4puivquojTH4x0FPb1OXNlR
+        5sbUL+89dY9m4Z+QWZxu9rcnkuS7DXExAqqOQRfLfIZCsBvIHWN8nYyvN5nAq6Gr17o7PYkmxAGgK
+        FXkC+PwRXpzk/KFZv7wBYUdrdnfy3aNzR3yZ5kLEzkaJ8/id0k97MT4BOpy/IrkOkhRrZbd7I7sB3
+        8mtk/ze0fa0C85qMn8Wb8RpxIGhVB9z2jWdC09IJZFKzSnKjab1TBJXmCP1C5yeuXWDmscHEqNfI7
+        5Z1Cf27hnyEI2mKGn0e3YFWnT7N2sABtWH447A1Or2ojnTcTqwDji04nZ7bZ06el9p5oKumnHh7H3
+        7Y9D3nlQQMfdh1LbjHGWukoI/Q/YHbMmGEG/3JC/JhWl7EfiaYyovRMg5qqy4Dj04L/H1HsHBogpG
+        mHIN0c9EZswoIFQgLI0oSe0+/Nb1E69kykwo5wiwLQLQ+zqH1PVStQk1jFL5TyXbFNUjdff6/2Kju
+        FNPWh4FKXIxN6sVVLrPJCxpD;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1mSM9e-00716U-T4; Mon, 20 Sep 2021 16:28:31 +0000
+Subject: Re: [PATCH] ksmbd: remove follow symlinks support
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>
+References: <20210920065613.5506-1-linkinjeon@kernel.org>
+ <6e8b6c79-3394-f39c-8e1b-06b3c2950a28@samba.org>
+ <CAKYAXd9Re_iHpwKq4t4GUibKo8g_D3QB1rzBOYiTvv5dLhdvsw@mail.gmail.com>
+From:   Ralph Boehme <slow@samba.org>
+Message-ID: <5633aaea-84f3-ce70-ff14-aa2dc80a93b8@samba.org>
+Date:   Mon, 20 Sep 2021 18:28:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210919021315.642856-1-linkinjeon@kernel.org>
- <85871805-c9fb-6df9-be6d-ff57074426a3@samba.org> <27cdc659-cf4d-cc9e-e5c5-6a3d23987e72@samba.org>
- <CAH2r5mt8gxSS56kDvmtRTOi7Dm0fXwD6zL45WAP2hw2_TxDPow@mail.gmail.com> <97166b9e-b0e2-2cc2-5d53-c0f8687faf80@samba.org>
-In-Reply-To: <97166b9e-b0e2-2cc2-5d53-c0f8687faf80@samba.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 20 Sep 2021 11:20:24 -0500
-Message-ID: <CAH2r5mtHCpy9n6LXDU+V2uJAEQqh4J80gRzinxbpiVs7HTh81g@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] ksmbd: add request buffer validation in smb2_set_info
-To:     Ralph Boehme <slow@samba.org>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAKYAXd9Re_iHpwKq4t4GUibKo8g_D3QB1rzBOYiTvv5dLhdvsw@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="g1icO1bqwddcLxjSmGGtbpX7zdu2NnY55"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 11:11 AM Ralph Boehme <slow@samba.org> wrote:
->
-> Am 20.09.21 um 17:10 schrieb Steve French:
-> > On Mon, Sep 20, 2021 at 10:03 AM Ralph Boehme <slow@samba.org> wrote:
-> >>
-> >> Am 20.09.21 um 16:45 schrieb Ralph Boehme:
-> >>> Am 19.09.21 um 04:13 schrieb Namjae Jeon:
-> >>>> Use  LOOKUP_NO_SYMLINKS flags for default lookup to prohibit the
-> >>>> middle of symlink component lookup.
-> >>>
-> >>> maybe this patch should be squashed with the "ksmbd: remove follow
-> >>> symlinks support" patch?
-> >>
-> >> also, I noticed that the patches are already included in ksmbd-for-next.
-> >> Did I miss Steve's ack on the ML?
-> >>
-> >> I wonder why the patches are already included in ksmbd-for-next without
-> >> a proper review, I just started to look at the patches and wanted to
-> >> raise several issues.
-> >
-> > I included them at Namjae's request in for-next to allow the automated
-> > tests to run on them (e.g. the Intel test robot etc.) - those
-> > automated bots can be useful ... but I had done some review of all of
-> > them, and detailed review of most, and had run the automated tests
-> > (buildbot) on them (which passed, even after adding more subtests),
-> > and the smbtorture tests were also automatically run (it is triggered
-> > in Namjae's github setup).
-> >
-> > Of the 8 patches in for-next, these 3 are the remaining ones that I am
-> > looking at in more detail now:
-> >
-> > 24f0f4fc5f76 ksmbd: use LOOKUP_NO_SYMLINKS flags for default lookup
-> > 1ec1e6928354 ksmbd: add buffer validation for SMB2_CREATE_CONTEXT
-> > e2cd5c814442 ksmbd: add validation in smb2_ioctl
->
-> ok, thanks for explaining.
->
-> To be honest, I'm still trying to make sense of the patch workflow.
-> Hopefully I get there eventually.
->
-> How can I detect if a patch is already reviewed and queued for upstrea
-> merge, so it's "too late" for me to do a review?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--g1icO1bqwddcLxjSmGGtbpX7zdu2NnY55
+Content-Type: multipart/mixed; boundary="VWkYWP1JGfLnvuFPSgosM1P0XKCfCPqQM";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Steve French <smfrench@gmail.com>
+Message-ID: <5633aaea-84f3-ce70-ff14-aa2dc80a93b8@samba.org>
+Subject: Re: [PATCH] ksmbd: remove follow symlinks support
+References: <20210920065613.5506-1-linkinjeon@kernel.org>
+ <6e8b6c79-3394-f39c-8e1b-06b3c2950a28@samba.org>
+ <CAKYAXd9Re_iHpwKq4t4GUibKo8g_D3QB1rzBOYiTvv5dLhdvsw@mail.gmail.com>
+In-Reply-To: <CAKYAXd9Re_iHpwKq4t4GUibKo8g_D3QB1rzBOYiTvv5dLhdvsw@mail.gmail.com>
 
-It is not too late to do review of any of these 8.  Given the
-importance of security, the more reviews the better.  Earliest we
-would send them (the larger set of 8) upstream would be in a few days.
-  I typically like to have them sit in for-next for 48 hours (although
-in some cases make exceptions, e.g.  for important bug fixes I will
-shorten this if later in the week so they make it in time for the next
-rc)
+--VWkYWP1JGfLnvuFPSgosM1P0XKCfCPqQM
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Thanks,
+Am 20.09.21 um 17:57 schrieb Namjae Jeon:
+> ksmbd_vfs_kern_path() doesn't return -ELOOP if last component is a
+> symlink. So need to check it using d_is_symlink().
 
-Steve
+Really? I missed that. Is that a behaviour of kern_path() when passing=20
+LOOKUP_NO_SYMLINKS? I don't see the behaviour expressed inside=20
+ksmbd_vfs_kern_path(), but maybe I'm looking at the wrong branch+patchset=
+?
+
+-slow
+
+--=20
+Ralph Boehme, Samba Team                 https://samba.org/
+SerNet Samba Team Lead      https://sernet.de/en/team-samba
+
+
+--VWkYWP1JGfLnvuFPSgosM1P0XKCfCPqQM--
+
+--g1icO1bqwddcLxjSmGGtbpX7zdu2NnY55
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFItq4FAwAAAAAACgkQqh6bcSY5nkYR
++w/9FYaZyk1I7X82PB+zO9JfIDJo88GKGcm5HkCy8JTfXgcG+QH0lLqXJli4J+xrci6wLZlOaBLF
+srZWWn0lsduVH24tRkL8VawX7odEA/8zyplLE6iljwKnfvSB+2AZ5jNslBiqizo7h1B+eHJBmLom
+BqcmcFqDqkE4U37kLzosjeMZFyK4bwi+Gjv4/tXRWeQlfFaiRNVL9hqJRR1rVEDRG2BcCTfIu/A2
+/MYZu7HX2f7oTm+ktOD8kaa8k8gkshcOT02WdcqVdfIQ9BsGkSpHXaE72Nm+GSaGtcH7dZX7KqiO
+NrQ0bUinPzyzLAgSLbCi9ef5YYGmQ+/3xcd7STmLHdEdjK2ye/V7XI9WZTtVE6YfsqMlJYWqazC+
+K6NNky2Rosvveu8QzZa3SL25fhMg8wvUZmY7BLWa1j/iRgoIIWvYPe4voFzysZl/a6tgQHQFqcIt
+RE2+j85/HTdRbFOIkro7o8/QnYcBuqDBfmpgB7WJFT41QnmZ0objddlCLIKotrneMhruxPP0uUjf
+/L8Mo/P51CwkQ5/4nAuXt75YaZG4UtL/uR3U8C1ah/y+y1YmblzpY2NRSmRFozByhNhTrAu+5WYK
+Kx7b7Dzi5IOcEmvwki10iNQLP4KpaP5UR/2sf04nUlMTcT7j51ZtFsUwLOJtoWSsjh/6/g1Lp81p
+ojw=
+=2X4G
+-----END PGP SIGNATURE-----
+
+--g1icO1bqwddcLxjSmGGtbpX7zdu2NnY55--
