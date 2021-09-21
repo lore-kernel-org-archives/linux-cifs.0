@@ -2,447 +2,83 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ADD9C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 04:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E540C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 04:47:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC0E661038
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 04:41:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4580660EDF
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 04:47:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbhIUEmj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Sep 2021 00:42:39 -0400
-Received: from mail-pg1-f181.google.com ([209.85.215.181]:41487 "EHLO
-        mail-pg1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbhIUEmi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Sep 2021 00:42:38 -0400
-Received: by mail-pg1-f181.google.com with SMTP id k24so19560692pgh.8
-        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 21:41:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=QKg8L4ATXd737XtTpF1bmC7D3pe33d9YpOqC4XOihq8=;
-        b=MIVbJ9Ax6mO3nNvpniTemN95jRSwN2JLCjq1jqH0/2hrrQzSvDQtmulvUqeApISPm4
-         ekuVot8JK33S1qxaQEXK6e1KcESUMuFHxnCUk5WVvMOeE+CbIfOcr4jA9M1YLfBMl+uF
-         NpoEShesMYXm98jqi4WnZJ4+vGr8c1Q5dwwxtr/sCtGAZ/ufvHcyjSTLH2L9K6R2pijT
-         pszxk4IO26Zz/UzLxYR6aQ6rFIGgTxdJ0dCO/9uJRmZBxJJU0nxxaGB6M4Fv2oWHGnXb
-         ExKQ9CfviVstP5YQ4/8ZIEEN4/F8IW+AglIDpTLl4TTjallOAJvfn7cheQ702K1WTf+S
-         GjKQ==
-X-Gm-Message-State: AOAM532c8HxfbrD6go1o8+/HjIslK9cAGD/uOf/7OM8lmtG0NyD/YGCo
-        vypmpiTrGOoeTCVJqHvNSPF+O8tXeZU7wA==
-X-Google-Smtp-Source: ABdhPJyxWElowgl/WdlPVUkLV0zeQNS9UrOg3PWnW3M9pEU2NEyqRwF3wyA5xbxDA6RTBGC1T2otww==
-X-Received: by 2002:a63:235f:: with SMTP id u31mr27015013pgm.248.1632199270604;
-        Mon, 20 Sep 2021 21:41:10 -0700 (PDT)
-Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id u24sm16863257pfm.81.2021.09.20.21.41.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Sep 2021 21:41:10 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
-        Steve French <smfrench@gmail.com>
-Subject: [PATCH v2] ksmbd: add request buffer validation in smb2_set_info
-Date:   Tue, 21 Sep 2021 13:40:40 +0900
-Message-Id: <20210921044040.624769-2-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210921044040.624769-1-linkinjeon@kernel.org>
-References: <20210921044040.624769-1-linkinjeon@kernel.org>
+        id S229590AbhIUEse (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Sep 2021 00:48:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50080 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229577AbhIUEse (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 21 Sep 2021 00:48:34 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5CEFA61100
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 04:47:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632199626;
+        bh=t68agCg100NBjeR/VnAJCHadMXdP6+AbcWPin8dd0XM=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=t1ErGrQqy3Fl/tURzejl7irv8nXcqf1u4pK9M4iUpECVbuK69XYHbhXVhxfCTLRMW
+         cNtBOmh3R4ypzF9R3CJ+B81MgkFqqun5oQ+64SpqCdTmjMdvDSYsj8SzDZ1NvwPSy+
+         MUxY3mc0LTg1Vp8uZxabuXWMxPt/WHclsN7i7WGhhFKebSWD5NhjmWkuaJhnAg2D24
+         4VuY5b3ToohE7+WzV3NF7sEPU+MYWXVHutk/WUelVOmEGlceaOKaI73O7CrtOzWDMU
+         OMBIXtpTM7OR4qJvwhEhW1cENRZso0fj1qqT/xofq54DfUwKvGRzcT7ICR9QtzHG8+
+         T69nZHDYOOYRg==
+Received: by mail-ot1-f45.google.com with SMTP id 77-20020a9d0ed3000000b00546e10e6699so15583621otj.2
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 21:47:06 -0700 (PDT)
+X-Gm-Message-State: AOAM530BM+oUfD91BAc7ecss7tJXr2ui01jPmQhO5+HB0jrwwnRACuv8
+        1OS3t6OkNYslyj2n0LuXJvz8f8BP90b47dvr/wc=
+X-Google-Smtp-Source: ABdhPJyHJo0JenrAsHnUelU6Ru0Aq8Q6zdyL4KxZxad9EhUx7raeCdb0tMq0P+JK2cnpDv1ouwjO7OtGr/Gr5UHiCn0=
+X-Received: by 2002:a9d:4705:: with SMTP id a5mr7302357otf.237.1632199625729;
+ Mon, 20 Sep 2021 21:47:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Mon, 20 Sep 2021 21:47:05
+ -0700 (PDT)
+In-Reply-To: <CAN05THTGgqcDQJAqf_PVNz=Wj_fH297ATEfmx3bzN3oyTLJqkw@mail.gmail.com>
+References: <CAN05THTGgqcDQJAqf_PVNz=Wj_fH297ATEfmx3bzN3oyTLJqkw@mail.gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue, 21 Sep 2021 13:47:05 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8uEpkPCcGM-kxD4JSP9g73E+nLF8bLFDmTG37rWFgK9A@mail.gmail.com>
+Message-ID: <CAKYAXd8uEpkPCcGM-kxD4JSP9g73E+nLF8bLFDmTG37rWFgK9A@mail.gmail.com>
+Subject: Re: ksmbd_smb_request can be removed
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add buffer validation in smb2_set_info.
-
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Ralph Böhme <slow@samba.org>
-Cc: Steve French <smfrench@gmail.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- v2:
-   - smb2_set_info infolevel functions take structure pointer argument.
-
- fs/ksmbd/smb2pdu.c | 141 ++++++++++++++++++++++++++++++++-------------
- fs/ksmbd/smb2pdu.h |   9 +++
- 2 files changed, 109 insertions(+), 41 deletions(-)
-
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index de044802fc5b..e26e6b29e655 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -2107,17 +2107,23 @@ static noinline int create_smb2_pipe(struct ksmbd_work *work)
-  * smb2_set_ea() - handler for setting extended attributes using set
-  *		info command
-  * @eabuf:	set info command buffer
-+ * @buf_len:	set info command buffer length
-  * @path:	dentry path for get ea
-  *
-  * Return:	0 on success, otherwise error
-  */
--static int smb2_set_ea(struct smb2_ea_info *eabuf, struct path *path)
-+static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
-+		       struct path *path)
- {
- 	struct user_namespace *user_ns = mnt_user_ns(path->mnt);
- 	char *attr_name = NULL, *value;
- 	int rc = 0;
- 	int next = 0;
- 
-+	if (buf_len < sizeof(struct smb2_ea_info) + eabuf->EaNameLength +
-+			le16_to_cpu(eabuf->EaValueLength))
-+		return -EINVAL;
-+
- 	attr_name = kmalloc(XATTR_NAME_MAX + 1, GFP_KERNEL);
- 	if (!attr_name)
- 		return -ENOMEM;
-@@ -2181,7 +2187,13 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, struct path *path)
- 
- next:
- 		next = le32_to_cpu(eabuf->NextEntryOffset);
-+		if (next == 0 || buf_len < next)
-+			break;
-+		buf_len -= next;
- 		eabuf = (struct smb2_ea_info *)((char *)eabuf + next);
-+		if (next < eabuf->EaNameLength + le16_to_cpu(eabuf->EaValueLength))
-+			break;
-+
- 	} while (next != 0);
- 
- 	kfree(attr_name);
-@@ -2787,7 +2799,9 @@ int smb2_open(struct ksmbd_work *work)
- 		created = true;
- 		user_ns = mnt_user_ns(path.mnt);
- 		if (ea_buf) {
--			rc = smb2_set_ea(&ea_buf->ea, &path);
-+			rc = smb2_set_ea(&ea_buf->ea,
-+					 le32_to_cpu(ea_buf->ccontext.DataLength),
-+					 &path);
- 			if (rc == -EOPNOTSUPP)
- 				rc = 0;
- 			else if (rc)
-@@ -5377,7 +5391,7 @@ static int smb2_rename(struct ksmbd_work *work,
- static int smb2_create_link(struct ksmbd_work *work,
- 			    struct ksmbd_share_config *share,
- 			    struct smb2_file_link_info *file_info,
--			    struct file *filp,
-+			    int buf_len, struct file *filp,
- 			    struct nls_table *local_nls)
- {
- 	char *link_name = NULL, *target_name = NULL, *pathname = NULL;
-@@ -5385,6 +5399,10 @@ static int smb2_create_link(struct ksmbd_work *work,
- 	bool file_present = true;
- 	int rc;
- 
-+	if (buf_len < sizeof(struct smb2_file_link_info) +
-+			le32_to_cpu(file_info->FileNameLength))
-+		return -EINVAL;
-+
- 	ksmbd_debug(SMB, "setting FILE_LINK_INFORMATION\n");
- 	pathname = kmalloc(PATH_MAX, GFP_KERNEL);
- 	if (!pathname)
-@@ -5441,10 +5459,10 @@ static int smb2_create_link(struct ksmbd_work *work,
- 	return rc;
- }
- 
--static int set_file_basic_info(struct ksmbd_file *fp, char *buf,
-+static int set_file_basic_info(struct ksmbd_file *fp,
-+			       struct smb2_file_basic_info *file_info,
- 			       struct ksmbd_share_config *share)
- {
--	struct smb2_file_all_info *file_info;
- 	struct iattr attrs;
- 	struct timespec64 ctime;
- 	struct file *filp;
-@@ -5455,7 +5473,6 @@ static int set_file_basic_info(struct ksmbd_file *fp, char *buf,
- 	if (!(fp->daccess & FILE_WRITE_ATTRIBUTES_LE))
- 		return -EACCES;
- 
--	file_info = (struct smb2_file_all_info *)buf;
- 	attrs.ia_valid = 0;
- 	filp = fp->filp;
- 	inode = file_inode(filp);
-@@ -5532,7 +5549,8 @@ static int set_file_basic_info(struct ksmbd_file *fp, char *buf,
- }
- 
- static int set_file_allocation_info(struct ksmbd_work *work,
--				    struct ksmbd_file *fp, char *buf)
-+				    struct ksmbd_file *fp,
-+				    struct smb2_file_alloc_info *file_alloc_info)
- {
- 	/*
- 	 * TODO : It's working fine only when store dos attributes
-@@ -5540,7 +5558,6 @@ static int set_file_allocation_info(struct ksmbd_work *work,
- 	 * properly with any smb.conf option
- 	 */
- 
--	struct smb2_file_alloc_info *file_alloc_info;
- 	loff_t alloc_blks;
- 	struct inode *inode;
- 	int rc;
-@@ -5548,7 +5565,6 @@ static int set_file_allocation_info(struct ksmbd_work *work,
- 	if (!(fp->daccess & FILE_WRITE_DATA_LE))
- 		return -EACCES;
- 
--	file_alloc_info = (struct smb2_file_alloc_info *)buf;
- 	alloc_blks = (le64_to_cpu(file_alloc_info->AllocationSize) + 511) >> 9;
- 	inode = file_inode(fp->filp);
- 
-@@ -5584,9 +5600,8 @@ static int set_file_allocation_info(struct ksmbd_work *work,
- }
- 
- static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
--				char *buf)
-+				struct smb2_file_eof_info *file_eof_info)
- {
--	struct smb2_file_eof_info *file_eof_info;
- 	loff_t newsize;
- 	struct inode *inode;
- 	int rc;
-@@ -5594,7 +5609,6 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
- 	if (!(fp->daccess & FILE_WRITE_DATA_LE))
- 		return -EACCES;
- 
--	file_eof_info = (struct smb2_file_eof_info *)buf;
- 	newsize = le64_to_cpu(file_eof_info->EndOfFile);
- 	inode = file_inode(fp->filp);
- 
-@@ -5621,7 +5635,8 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
- }
- 
- static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file *fp,
--			   char *buf)
-+			   struct smb2_file_rename_info *rename_info,
-+			   int buf_len)
- {
- 	struct user_namespace *user_ns;
- 	struct ksmbd_file *parent_fp;
-@@ -5634,6 +5649,10 @@ static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file *fp,
- 		return -EACCES;
- 	}
- 
-+	if (buf_len < sizeof(struct smb2_file_rename_info) +
-+			le32_to_cpu(rename_info->FileNameLength))
-+		return -EINVAL;
-+
- 	user_ns = file_mnt_user_ns(fp->filp);
- 	if (ksmbd_stream_fd(fp))
- 		goto next;
-@@ -5656,14 +5675,13 @@ static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file *fp,
- 		}
- 	}
- next:
--	return smb2_rename(work, fp, user_ns,
--			   (struct smb2_file_rename_info *)buf,
-+	return smb2_rename(work, fp, user_ns, rename_info,
- 			   work->sess->conn->local_nls);
- }
- 
--static int set_file_disposition_info(struct ksmbd_file *fp, char *buf)
-+static int set_file_disposition_info(struct ksmbd_file *fp,
-+				     struct smb2_file_disposition_info *file_info)
- {
--	struct smb2_file_disposition_info *file_info;
- 	struct inode *inode;
- 
- 	if (!(fp->daccess & FILE_DELETE_LE)) {
-@@ -5672,7 +5690,6 @@ static int set_file_disposition_info(struct ksmbd_file *fp, char *buf)
- 	}
- 
- 	inode = file_inode(fp->filp);
--	file_info = (struct smb2_file_disposition_info *)buf;
- 	if (file_info->DeletePending) {
- 		if (S_ISDIR(inode->i_mode) &&
- 		    ksmbd_vfs_empty_dir(fp) == -ENOTEMPTY)
-@@ -5684,15 +5701,14 @@ static int set_file_disposition_info(struct ksmbd_file *fp, char *buf)
- 	return 0;
- }
- 
--static int set_file_position_info(struct ksmbd_file *fp, char *buf)
-+static int set_file_position_info(struct ksmbd_file *fp,
-+				  struct smb2_file_pos_info *file_info)
- {
--	struct smb2_file_pos_info *file_info;
- 	loff_t current_byte_offset;
- 	unsigned long sector_size;
- 	struct inode *inode;
- 
- 	inode = file_inode(fp->filp);
--	file_info = (struct smb2_file_pos_info *)buf;
- 	current_byte_offset = le64_to_cpu(file_info->CurrentByteOffset);
- 	sector_size = inode->i_sb->s_blocksize;
- 
-@@ -5708,12 +5724,11 @@ static int set_file_position_info(struct ksmbd_file *fp, char *buf)
- 	return 0;
- }
- 
--static int set_file_mode_info(struct ksmbd_file *fp, char *buf)
-+static int set_file_mode_info(struct ksmbd_file *fp,
-+			      struct smb2_file_mode_info *file_info)
- {
--	struct smb2_file_mode_info *file_info;
- 	__le32 mode;
- 
--	file_info = (struct smb2_file_mode_info *)buf;
- 	mode = file_info->Mode;
- 
- 	if ((mode & ~FILE_MODE_INFO_MASK) ||
-@@ -5743,40 +5758,74 @@ static int set_file_mode_info(struct ksmbd_file *fp, char *buf)
-  * TODO: need to implement an error handling for STATUS_INFO_LENGTH_MISMATCH
-  */
- static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
--			      int info_class, char *buf,
-+			      struct smb2_set_info_req *req,
- 			      struct ksmbd_share_config *share)
- {
--	switch (info_class) {
-+	int buf_len = le32_to_cpu(req->BufferLength);
-+
-+	switch (req->FileInfoClass) {
- 	case FILE_BASIC_INFORMATION:
--		return set_file_basic_info(fp, buf, share);
-+	{
-+		if (buf_len < sizeof(struct smb2_file_basic_info))
-+			return -EINVAL;
- 
-+		return set_file_basic_info(fp, (struct smb2_file_basic_info *)req->Buffer, share);
-+	}
- 	case FILE_ALLOCATION_INFORMATION:
--		return set_file_allocation_info(work, fp, buf);
-+	{
-+		if (buf_len < sizeof(struct smb2_file_alloc_info))
-+			return -EINVAL;
- 
-+		return set_file_allocation_info(work, fp,
-+						(struct smb2_file_alloc_info *)req->Buffer);
-+	}
- 	case FILE_END_OF_FILE_INFORMATION:
--		return set_end_of_file_info(work, fp, buf);
-+	{
-+		if (buf_len < sizeof(struct smb2_file_eof_info))
-+			return -EINVAL;
- 
-+		return set_end_of_file_info(work, fp,
-+					    (struct smb2_file_eof_info *)req->Buffer);
-+	}
- 	case FILE_RENAME_INFORMATION:
-+	{
- 		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
- 			ksmbd_debug(SMB,
- 				    "User does not have write permission\n");
- 			return -EACCES;
- 		}
--		return set_rename_info(work, fp, buf);
- 
-+		if (buf_len < sizeof(struct smb2_file_rename_info))
-+			return -EINVAL;
-+
-+		return set_rename_info(work, fp,
-+				       (struct smb2_file_rename_info *)req->Buffer,
-+				       buf_len);
-+	}
- 	case FILE_LINK_INFORMATION:
-+	{
-+		if (buf_len < sizeof(struct smb2_file_link_info))
-+			return -EINVAL;
-+
- 		return smb2_create_link(work, work->tcon->share_conf,
--					(struct smb2_file_link_info *)buf, fp->filp,
-+					(struct smb2_file_link_info *)req->Buffer,
-+					buf_len, fp->filp,
- 					work->sess->conn->local_nls);
--
-+	}
- 	case FILE_DISPOSITION_INFORMATION:
-+	{
- 		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
- 			ksmbd_debug(SMB,
- 				    "User does not have write permission\n");
- 			return -EACCES;
- 		}
--		return set_file_disposition_info(fp, buf);
- 
-+		if (buf_len < sizeof(struct smb2_file_disposition_info))
-+			return -EINVAL;
-+
-+		return set_file_disposition_info(fp,
-+						 (struct smb2_file_disposition_info *)req->Buffer);
-+	}
- 	case FILE_FULL_EA_INFORMATION:
- 	{
- 		if (!(fp->daccess & FILE_WRITE_EA_LE)) {
-@@ -5785,18 +5834,29 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
- 			return -EACCES;
- 		}
- 
--		return smb2_set_ea((struct smb2_ea_info *)buf,
--				   &fp->filp->f_path);
--	}
-+		if (buf_len < sizeof(struct smb2_ea_info))
-+			return -EINVAL;
- 
-+		return smb2_set_ea((struct smb2_ea_info *)req->Buffer,
-+				   buf_len, &fp->filp->f_path);
-+	}
- 	case FILE_POSITION_INFORMATION:
--		return set_file_position_info(fp, buf);
-+	{
-+		if (buf_len < sizeof(struct smb2_file_pos_info))
-+			return -EINVAL;
- 
-+		return set_file_position_info(fp, (struct smb2_file_pos_info *)req->Buffer);
-+	}
- 	case FILE_MODE_INFORMATION:
--		return set_file_mode_info(fp, buf);
-+	{
-+		if (buf_len < sizeof(struct smb2_file_mode_info))
-+			return -EINVAL;
-+
-+		return set_file_mode_info(fp, (struct smb2_file_mode_info *)req->Buffer);
-+	}
- 	}
- 
--	pr_err("Unimplemented Fileinfoclass :%d\n", info_class);
-+	pr_err("Unimplemented Fileinfoclass :%d\n", req->FileInfoClass);
- 	return -EOPNOTSUPP;
- }
- 
-@@ -5857,8 +5917,7 @@ int smb2_set_info(struct ksmbd_work *work)
- 	switch (req->InfoType) {
- 	case SMB2_O_INFO_FILE:
- 		ksmbd_debug(SMB, "GOT SMB2_O_INFO_FILE\n");
--		rc = smb2_set_info_file(work, fp, req->FileInfoClass,
--					req->Buffer, work->tcon->share_conf);
-+		rc = smb2_set_info_file(work, fp, req, work->tcon->share_conf);
- 		break;
- 	case SMB2_O_INFO_SECURITY:
- 		ksmbd_debug(SMB, "GOT SMB2_O_INFO_SECURITY\n");
-diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
-index bcec845b03f3..261825d06391 100644
---- a/fs/ksmbd/smb2pdu.h
-+++ b/fs/ksmbd/smb2pdu.h
-@@ -1464,6 +1464,15 @@ struct smb2_file_all_info { /* data block encoding of response to level 18 */
- 	char   FileName[1];
- } __packed; /* level 18 Query */
- 
-+struct smb2_file_basic_info { /* data block encoding of response to level 18 */
-+	__le64 CreationTime;	/* Beginning of FILE_BASIC_INFO equivalent */
-+	__le64 LastAccessTime;
-+	__le64 LastWriteTime;
-+	__le64 ChangeTime;
-+	__le32 Attributes;
-+	__u32  Pad1;		/* End of FILE_BASIC_INFO_INFO equivalent */
-+} __packed;
-+
- struct smb2_file_alt_name_info {
- 	__le32 FileNameLength;
- 	char FileName[0];
--- 
-2.25.1
-
+2021-09-21 12:49 GMT+09:00, ronnie sahlberg <ronniesahlberg@gmail.com>:
+> In smb_common.c you have this function :   ksmbd_smb_request() which
+> is called from connection.c once you have read the initial 4 bytes for
+> the next length+smb2 blob.
+>
+> It checks the first byte of this 4 byte preamble for valid values,
+> i.e. a NETBIOSoverTCP SESSION_MESSAGE or a SESSION_KEEP_ALIVE.
+>
+> We don't need to check this for ksmbd since it only implements SMB2
+> over TCP port 445.
+> The netbios stuff was only used in very old servers when SMB ran over
+> TCP port 139.
+> Now that we run over TCP port 445, this is actually not a NB header anymore
+> and you can just treat it as a 4 byte length field that must be less
+> than 16Mbyte.
+>
+> I.e. you can change it to just be :
+> bool ksmbd_smb_request(struct ksmbd_conn *conn)
+> {
+>     return conn->request_buf[0] == 0;
+> }
+>
+> and remove the references to the RFC1002 constants that no longer applies.
+>
+> (See MS-SMB2 2.1)
+Okay, Thanks for your review, I will fix it.
+Thanks!
+>
