@@ -6,51 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 496EBC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 22:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C81C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 22:51:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C3B9610E8
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 22:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 301C661100
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 22:51:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229815AbhIUWwy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Sep 2021 18:52:54 -0400
-Received: from mail-pj1-f44.google.com ([209.85.216.44]:40735 "EHLO
-        mail-pj1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbhIUWwy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Sep 2021 18:52:54 -0400
-Received: by mail-pj1-f44.google.com with SMTP id n13-20020a17090a4e0d00b0017946980d8dso3094563pjh.5
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 15:51:25 -0700 (PDT)
+        id S230082AbhIUWw5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Sep 2021 18:52:57 -0400
+Received: from mail-pg1-f171.google.com ([209.85.215.171]:44830 "EHLO
+        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229589AbhIUWw4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Sep 2021 18:52:56 -0400
+Received: by mail-pg1-f171.google.com with SMTP id s11so564795pgr.11
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 15:51:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OgUSJFDCxfO+zJiv7fiOqhQzlx1nbgY517uQ/d2YFvg=;
-        b=3+nJ0UlSi14frGrkO6699GXakz48e5sCnV9CLRDSqH/Ml6hua8bPQmtGOl8RLwYIPz
-         K0F+lqkYE5wWxnw00UtZIBriYvUJIrRjxB/5PqW632whrOhs+rgRF/kMcHSFPCVBz7xH
-         12wwvOeNa+wnBHH/FEf0eKkqXyffvw13pLEvobsZ7wpvg35tsiq44Qz6I3ZZz8wu4GK+
-         gPum5FHGUcN6/5oJXoq4RPSMoS8C4ubCI9GYcP5LGTFWtPRgTkZ1qBqS8GYP7gRb1zUL
-         2hMqiRPRHAwIp2iHyP+nZy7SWgca4MShLV2aN0WPJ4DpMhhVs4C2Ev2TkLcs1qXs1AOH
-         N1Sg==
-X-Gm-Message-State: AOAM532smqUsjpMiy26nec7s9pBIVU42Mk/FsmjVCOJIE5MB26ge156S
-        qCQpP7C2kdCDqz+Ji3hIijjjON+WQFncXQ==
-X-Google-Smtp-Source: ABdhPJxFX6a5m9HGjgSanTb5FUr+uj8pzzv+SsqymcyIyf7rURq7FLLu7so0mtA+Av0z/847wP87sw==
-X-Received: by 2002:a17:90a:8505:: with SMTP id l5mr7961079pjn.173.1632264684653;
-        Tue, 21 Sep 2021 15:51:24 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=TscF5aL76QOIfd+LuFeUnYJd6cstd4+TrgvEpI/mcHk=;
+        b=cOmTV8rykOzWPLBlpktaoKt1xJO0AZr3m1aMbmsnz3NjJH1U9/qZ3vhxbjUw8B64yl
+         7vLvetSrGNSwCNzAdYajQp+OCgp43fxPTcHIKGU1GDe6SQCOvXI2tMdH7By797TDi0Y0
+         z5dDXnL5v0AG6WXFTWxvSabIVhc2cXzUNTjTe3fP5LWVJcFnkALaGB1NELq8nMjP43g5
+         nnNSw406is7wXSRBDnLJf13nqb/Cs/JTNmqggwPXHYhicqC1oUTI/lueidT2n3rNLgu3
+         YeNCRgsTe6Iih/j6rZXwfO6c3ubnbQgkHcaRFeo1kXKW8hYEEs83sRN8ma6zqD4pjA/c
+         tJJA==
+X-Gm-Message-State: AOAM531Xpy/cQiQqKqn0ufxdukZe2GQHStohrhLpHI0wzCZIFQwWq+lE
+        o+U0wrgC9NPuSx7LwZ5+XfJrvbot6UzECw==
+X-Google-Smtp-Source: ABdhPJwxE8jr/AY3U4/5C2OcGVPO1ssuFbTy0KXCJO5pys0WJdaJTCPtuceY6ADvRdcxMkP2NRQOQA==
+X-Received: by 2002:a63:185b:: with SMTP id 27mr30401311pgy.0.1632264687475;
+        Tue, 21 Sep 2021 15:51:27 -0700 (PDT)
 Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id e18sm167053pfj.159.2021.09.21.15.51.22
+        by smtp.gmail.com with ESMTPSA id e18sm167053pfj.159.2021.09.21.15.51.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 15:51:24 -0700 (PDT)
+        Tue, 21 Sep 2021 15:51:27 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
-Cc:     Ronnie Sahlberg <lsahlber@redhat.com>,
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         Ronnie Sahlberg <ronniesahlberg@gmail.com>,
         =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
-        Steve French <smfrench@gmail.com>,
-        Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2 1/3] ksmbd: remove RFC1002 check in smb2 request
-Date:   Wed, 22 Sep 2021 07:51:07 +0900
-Message-Id: <20210921225109.6388-1-linkinjeon@kernel.org>
+        Steve French <smfrench@gmail.com>
+Subject: [PATCH v2 2/3] ksmbd: add validation in smb2 negotiate
+Date:   Wed, 22 Sep 2021 07:51:08 +0900
+Message-Id: <20210921225109.6388-2-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210921225109.6388-1-linkinjeon@kernel.org>
+References: <20210921225109.6388-1-linkinjeon@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -58,79 +59,126 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Ronnie Sahlberg <lsahlber@redhat.com>
-
-In smb_common.c you have this function :   ksmbd_smb_request() which
-is called from connection.c once you have read the initial 4 bytes for
-the next length+smb2 blob.
-
-It checks the first byte of this 4 byte preamble for valid values,
-i.e. a NETBIOSoverTCP SESSION_MESSAGE or a SESSION_KEEP_ALIVE.
-
-We don't need to check this for ksmbd since it only implements SMB2
-over TCP port 445.
-The netbios stuff was only used in very old servers when SMB ran over
-TCP port 139.
-Now that we run over TCP port 445, this is actually not a NB header anymore
-and you can just treat it as a 4 byte length field that must be less
-than 16Mbyte. and remove the references to the RFC1002 constants that no
-longer applies.
+This patch add validation to check request buffer check in smb2
+negotiate.
 
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: Ralph Böhme <slow@samba.org>
 Cc: Steve French <smfrench@gmail.com>
-Signed-off-by: Ronnie Sahlberg <lsahlber@redhat.com>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/ksmbd/smb_common.c | 15 +--------------
- fs/ksmbd/smb_common.h |  8 --------
- 2 files changed, 1 insertion(+), 22 deletions(-)
+ fs/ksmbd/smb2pdu.c    | 41 ++++++++++++++++++++++++++++++++++++++++-
+ fs/ksmbd/smb_common.c | 22 ++++++++++++++++++++--
+ 2 files changed, 60 insertions(+), 3 deletions(-)
 
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index baf7ce31d557..1fe37ad4e5bc 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -1071,7 +1071,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 	struct ksmbd_conn *conn = work->conn;
+ 	struct smb2_negotiate_req *req = work->request_buf;
+ 	struct smb2_negotiate_rsp *rsp = work->response_buf;
+-	int rc = 0;
++	int rc = 0, smb2_buf_len, smb2_neg_size;
+ 	__le32 status;
+ 
+ 	ksmbd_debug(SMB, "Received negotiate request\n");
+@@ -1089,6 +1089,45 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 		goto err_out;
+ 	}
+ 
++	smb2_buf_len = get_rfc1002_len(work->request_buf);
++	smb2_neg_size = offsetof(struct smb2_negotiate_req, Dialects) - 4;
++	if (conn->dialect == SMB311_PROT_ID) {
++		int nego_ctxt_off = le32_to_cpu(req->NegotiateContextOffset);
++		int nego_ctxt_count = le16_to_cpu(req->NegotiateContextCount);
++
++		if (smb2_buf_len < nego_ctxt_off + nego_ctxt_count) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++
++		if (smb2_neg_size > nego_ctxt_off) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++
++		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
++		    nego_ctxt_off) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++	} else {
++		if (smb2_neg_size > smb2_buf_len) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++
++		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
++		    smb2_buf_len) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++	}
++
+ 	conn->cli_cap = le32_to_cpu(req->Capabilities);
+ 	switch (conn->dialect) {
+ 	case SMB311_PROT_ID:
 diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
-index 43d3123d8b62..1da67217698d 100644
+index 1da67217698d..da17b21ac685 100644
 --- a/fs/ksmbd/smb_common.c
 +++ b/fs/ksmbd/smb_common.c
-@@ -149,20 +149,7 @@ int ksmbd_verify_smb_message(struct ksmbd_work *work)
-  */
- bool ksmbd_smb_request(struct ksmbd_conn *conn)
+@@ -229,13 +229,22 @@ int ksmbd_lookup_dialect_by_id(__le16 *cli_dialects, __le16 dialects_count)
+ 
+ static int ksmbd_negotiate_smb_dialect(void *buf)
  {
--	int type = *(char *)conn->request_buf;
--
--	switch (type) {
--	case RFC1002_SESSION_MESSAGE:
--		/* Regular SMB request */
--		return true;
--	case RFC1002_SESSION_KEEP_ALIVE:
--		ksmbd_debug(SMB, "RFC 1002 session keep alive\n");
--		break;
--	default:
--		ksmbd_debug(SMB, "RFC 1002 unknown request type 0x%x\n", type);
--	}
--
--	return false;
-+	return conn->request_buf[0] == 0;
+-	__le32 proto;
++	int smb_buf_length = get_rfc1002_len(buf);
++	__le32 proto = ((struct smb2_hdr *)buf)->ProtocolId;
+ 
+-	proto = ((struct smb2_hdr *)buf)->ProtocolId;
+ 	if (proto == SMB2_PROTO_NUMBER) {
+ 		struct smb2_negotiate_req *req;
++		int smb2_neg_size =
++			offsetof(struct smb2_negotiate_req, Dialects) - 4;
+ 
+ 		req = (struct smb2_negotiate_req *)buf;
++		if (smb2_neg_size > smb_buf_length)
++			goto err_out;
++
++		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
++		    smb_buf_length)
++			goto err_out;
++
+ 		return ksmbd_lookup_dialect_by_id(req->Dialects,
+ 						  req->DialectCount);
+ 	}
+@@ -245,10 +254,19 @@ static int ksmbd_negotiate_smb_dialect(void *buf)
+ 		struct smb_negotiate_req *req;
+ 
+ 		req = (struct smb_negotiate_req *)buf;
++		if (le16_to_cpu(req->ByteCount) < 2)
++			goto err_out;
++
++		if (offsetof(struct smb_negotiate_req, DialectsArray) - 4 +
++			le16_to_cpu(req->ByteCount) > smb_buf_length) {
++			goto err_out;
++		}
++
+ 		return ksmbd_lookup_dialect_by_name(req->DialectsArray,
+ 						    req->ByteCount);
+ 	}
+ 
++err_out:
+ 	return BAD_PROT_ID;
  }
  
- static bool supported_protocol(int idx)
-diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
-index 57c667c1be06..d7df19c97c4c 100644
---- a/fs/ksmbd/smb_common.h
-+++ b/fs/ksmbd/smb_common.h
-@@ -48,14 +48,6 @@
- #define CIFS_DEFAULT_IOSIZE	(64 * 1024)
- #define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
- 
--/* RFC 1002 session packet types */
--#define RFC1002_SESSION_MESSAGE			0x00
--#define RFC1002_SESSION_REQUEST			0x81
--#define RFC1002_POSITIVE_SESSION_RESPONSE	0x82
--#define RFC1002_NEGATIVE_SESSION_RESPONSE	0x83
--#define RFC1002_RETARGET_SESSION_RESPONSE	0x84
--#define RFC1002_SESSION_KEEP_ALIVE		0x85
--
- /* Responses when opening a file. */
- #define F_SUPERSEDED	0
- #define F_OPENED	1
 -- 
 2.25.1
 
