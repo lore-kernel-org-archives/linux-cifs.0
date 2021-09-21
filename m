@@ -4,104 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B7B0C433FE
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 03:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8709C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 03:50:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5616D60F91
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 03:25:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDF66611C5
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 03:50:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231328AbhIUD0g (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Sep 2021 23:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44294 "EHLO
+        id S231956AbhIUDvc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Sep 2021 23:51:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351606AbhIUCkG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Sep 2021 22:40:06 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54663C08E9AC;
-        Mon, 20 Sep 2021 19:16:29 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id u8so23935592lff.9;
-        Mon, 20 Sep 2021 19:16:29 -0700 (PDT)
+        with ESMTP id S231940AbhIUDvb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Sep 2021 23:51:31 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 084D1C061574
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 20:50:04 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id v22so64389031edd.11
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 20:50:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Bklc5LnpHbXXRZG1hQdUHVP8Fhs6SyMfJaYgRp3O//E=;
-        b=dsm+JAsusa9xNL32okfaioo2aQiS0BiadMNz2FsHDp4+QLFvhoqOtZD2YVdfKQa7JJ
-         7STYnQPwVTnDXCgGt+S/ckrydR/yId4oG8qMJ2JiRP2H1GTMMmYI0bxP0LtiW8zTzA63
-         6OIks84cyz5jmCMphJy9tqgSq2ooXxjs1GVEs+hSauO5dLdjFXJ71uvdXqZoeMdAtQSu
-         C/ciiqyA1BFQmJnpmSnm9vmzYHldMU+aAG98k1K3rDVb14bnkQVkB9dSff2yw5Lk1Dj8
-         F1HyMHHa8w09chMVw9dReBuFUR+NsQtgYPV4mMMCsLI1bhJuZOOXfOfCIm2RprYtD5xu
-         lmcA==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=iwATZxMGgzU4GhXhfVcpz7I3yLZTSa6h2lOtUl9sgU0=;
+        b=FYv+T+P3CW5sDJDAz/tiQqO4HplkfXDseo5ZP82Z1ihB1CTsTu5qzDVgoJT7UglWdq
+         9HTSMLOGPWRQsVHiuHdBeIe725FtvH7eVTZnri34q9RvGNG+eeBORLqUcE4NmIasQkXJ
+         UCDtw7ebQArP4NNb7zBTUl34dqDRYQj5CwK0Tpc6udEhaDvDdv1JQOA0ALmkuv3p5GVQ
+         FJROtWktv3VqtzA4ABTwDpw4Ox7UUyrOGro8RYT09hbiUttR2WDyEDpoHofTZji1Qdya
+         Q/CAa5yaEbqo6O5ypvpWQ4ugY2YxHQhgnCmWEHPhZEgaXGleQYzzmJJZ2HSXMnpDxv06
+         Eu2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Bklc5LnpHbXXRZG1hQdUHVP8Fhs6SyMfJaYgRp3O//E=;
-        b=IE999Vk1PVQtgayOLHgkKAljAbzRQqYQ/5O9gZYVJU5GWlszfkEm+pPeBYgJQzrqux
-         hE0RybDy2/wLJ3E+4QjxmP/oKcx9aBG27borDBWminWbVl4LEIYC3Ch0Dl9ko1Je1qor
-         lnCzMioBBwquLZw5ZrV4OLitMUURVZFL3h/6bKpl9YfyCPqYC1RKI6YPfA3VuBBXS5l+
-         cos0R9TODmmxIx9CoasYgBtxWKqMdvnCnC2j9v0HhMnErT1UQ60fOBDllO5oSTvsdW1c
-         irvzhP785ktolgfXCsIpMeuEtb7jxa5C7RhBqM6ezk7ObI6+6rrCgEmg7yyKQtzKTCXy
-         Tofg==
-X-Gm-Message-State: AOAM531knN+ZZIUTQtWNwfXu4T/RHLwDtUZQp/hK20hvJULCnKcA5Kzb
-        azbNMbZmrdmP1+BrtcWMp2vv/oEl58meZsJASM323RTr
-X-Google-Smtp-Source: ABdhPJyzjfrt4j2H+fAlrXP+MgZcR4mnt936HzL/meXUT4p6FFtd+99NoogxeE2WrucliHMlrGKm83XD00j7mCVYiqQ=
-X-Received: by 2002:ac2:44b6:: with SMTP id c22mr7348048lfm.601.1632190587579;
- Mon, 20 Sep 2021 19:16:27 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=iwATZxMGgzU4GhXhfVcpz7I3yLZTSa6h2lOtUl9sgU0=;
+        b=Apx3WqZ4X21aBdGaCKSvZPUT7voC3sZy9KL/okjQTO2yfKdDqGOoVmOT6IPtmwEAMJ
+         MDdPdEp4jyweZ6rrfQy77hNXQIvtWub55s0F+3vK+n4mC4NXKtTgs2k61IIVzccZci5E
+         ODTGEwkmylZKoSt6KONOIbVqe9wjSgmGhNwZDOcXdz2yU3ZqE3c/wD4sHLjT7+3oJn7p
+         pW81p64DT9zBIpSJ7HCSn71vkHAL2KWAm2/ZsUih1DA+0eSjlVcZwAXKXCp4LIXE0WOs
+         MWHHBbZLMfSkKWq/7u7aXGGsqVRILG5ZfTZZuHX6erEHA6uj6/3wybM6/mhMzsTu5Bin
+         ukRw==
+X-Gm-Message-State: AOAM530sIgWHHU/a+qrSWbfsQhy4F3jNxlEXwAUdmoPCf1qrsblZD4T1
+        WhN/CtryQ1ppkHRSjb1/y1IPgTdpfuUTTLKWidfriq9JsCE=
+X-Google-Smtp-Source: ABdhPJxAh/FZioxWX07vWsNqqorqJS41QJaK7u4xOwMwdvorlE1F4wp6S3UcD8dE1cNAkrx8rIRj3A67l77Q3Go8eEQ=
+X-Received: by 2002:a17:906:680c:: with SMTP id k12mr33021436ejr.85.1632196201981;
+ Mon, 20 Sep 2021 20:50:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAH2r5mvu5wTcgoR-EeXLcoZOvhEiMR0Lfmwt6gd1J1wvtTLDHA@mail.gmail.com>
- <CAHk-=wi6_m_d88kx7wWYQS+waEk6hv5szwFYvy2PjP1naj87Hw@mail.gmail.com>
-In-Reply-To: <CAHk-=wi6_m_d88kx7wWYQS+waEk6hv5szwFYvy2PjP1naj87Hw@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 20 Sep 2021 21:16:16 -0500
-Message-ID: <CAH2r5ms0P9r6N_Tqw02TtpmHXaiJejdQgL2Rur1GMP=tyr0CMg@mail.gmail.com>
-Subject: Re: [GIT PULL] ksmbd server security fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Namjae Jeon <linkinjeon@kernel.org>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Tue, 21 Sep 2021 13:49:50 +1000
+Message-ID: <CAN05THTGgqcDQJAqf_PVNz=Wj_fH297ATEfmx3bzN3oyTLJqkw@mail.gmail.com>
+Subject: ksmbd_smb_request can be removed
+To:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, Sep 20, 2021 at 5:46 PM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Sun, Sep 19, 2021 at 7:22 AM Steve French <smfrench@gmail.com> wrote:
-> >
-> > 3 ksmbd fixes: including an important security fix for path
-> > processing, and a missing buffer overflow check, and a trivial fix for
-> > incorrect header inclusion
-> >
-> > There are three additional patches (and also a patch to improve
-> > symlink checks) for other buffer overflow cases that are being
-> > reviewed and tested.
->
-> Note that if you are working on a path basis, you should really take a
-> look at our vfs lookup_flags, and LOOKUP_BENEATH in particular.
+In smb_common.c you have this function :   ksmbd_smb_request() which
+is called from connection.c once you have read the initial 4 bytes for
+the next length+smb2 blob.
 
-This was also something that Ralph brought up, and Namjae is looking
-at now.
+It checks the first byte of this 4 byte preamble for valid values,
+i.e. a NETBIOSoverTCP SESSION_MESSAGE or a SESSION_KEEP_ALIVE.
 
-> The way to deal with '..' and symlinks is not to try to figure it out
-> yourself. You'll get it wrong, partly because the races with rename
-> are quite interesting. The VFS layer knows how to limit pathname
-> lookup to the particular directory you started in these days.
->
-> Of course, that is only true for the actual path lookup functions.
-> Once you start doing things manually one component at a time yourself,
-> you're on your own.
+We don't need to check this for ksmbd since it only implements SMB2
+over TCP port 445.
+The netbios stuff was only used in very old servers when SMB ran over
+TCP port 139.
+Now that we run over TCP port 445, this is actually not a NB header anymore
+and you can just treat it as a 4 byte length field that must be less
+than 16Mbyte.
 
-Agreed.  Also FYI I removed the "ksmbd: Use LOOKUP_NO_SYMLINKS"
-changeset from for-next (I left the first two buffer validation changesets
-in, since those have been reviewed), since Namjae is working on
-an updated version following your suggestion (and others' review feedback).
+I.e. you can change it to just be :
+bool ksmbd_smb_request(struct ksmbd_conn *conn)
+{
+    return conn->request_buf[0] == 0;
+}
 
--- 
-Thanks,
+and remove the references to the RFC1002 constants that no longer applies.
 
-Steve
+(See MS-SMB2 2.1)
