@@ -2,105 +2,323 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E4CFC433FE
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 05:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDA8C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 06:27:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4931C6112F
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 05:52:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E18B61157
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 06:27:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbhIUFx6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Sep 2021 01:53:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60370 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229745AbhIUFx6 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 21 Sep 2021 01:53:58 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 242D161166
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 05:52:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632203550;
-        bh=Rrd2R2p6w684SsWgqESzrYwqsVkKT0sVv5DgbNIkFME=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=M37tl51M0Cqu8bPaB+j54IM7H1CXgH5rhr5BFlA9CVoQgdI9+I1zB8rRVvZ572qxY
-         w1DMgNbw2lrngQ27isbOa+b0rN/41HmSkRMv94yeFBrKgMq1Iohsj8qG60Z60FewcM
-         ogucNv3KsySaMXBB7fDlnoIcbnxrIofwKot/9loRV+IorjqgqMYhjgUmD7uwBY5il6
-         QaL7LTvy3rXzdqXTg+Csqa7fM78+HWgg7/PfqALAE/0xTxD6WvBOAAC/sXqP5D21gD
-         Iy5gJUz+785SDbSk8qmP94AfO/CUQ6GOb0QtfNBpoZ6scwMPZSxLDDIYbEcglLFm7t
-         K1k6m+R57u0ew==
-Received: by mail-oi1-f172.google.com with SMTP id u22so19951859oie.5
-        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 22:52:30 -0700 (PDT)
-X-Gm-Message-State: AOAM531x+TonlX700ECZpfXwA1p2eQ6SuUJvtN2alQjCPAYQTpKkXPT4
-        YCmJcX6mEhQu4lAwk6SWtq/DzA1/+lVnuGd7lzQ=
-X-Google-Smtp-Source: ABdhPJxqZ2VO9YLxC62Xo96/kD2BBwTRYzFHwPvEraXQxWczqOw/jMyfnkb2KWhBTiX3gYucgqVH/m98LFrMiu+x1q4=
-X-Received: by 2002:a54:4f03:: with SMTP id e3mr2291977oiy.32.1632203549535;
- Mon, 20 Sep 2021 22:52:29 -0700 (PDT)
+        id S229827AbhIUG3D (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Sep 2021 02:29:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39004 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229848AbhIUG3C (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Sep 2021 02:29:02 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3758BC061574
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 23:27:34 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id i25so77974364lfg.6
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Sep 2021 23:27:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=RTDg85Qc0HTU+iFbgIAhQHoYSQIMFTU/wtwFlzXsv2M=;
+        b=Qs9D0R+4JrbGg7gcvyHhKQq4AfDZZJ+ksKUxxtFVoCuRrNewazxb3e8RrsHWWEHLKg
+         7ZVS/imb6Y66igPUaPXz5WnUhYkUSK4x5QIDJuhQOUH1oC+lzPV3VzmO9aHSJyK2tmrW
+         cjtZm12Y350sVgI3V37JDknrdxJU934lm6Xs+rDAJOhdy/Q313b6kfXnypV+1vDdZxqk
+         0mf0GD679npq9jpJfd6DULg6Pi5l0tG4ddJhCpB5DJwFx6hUxOGPqIwRVmwiieW0EpBz
+         vMbaBTolYrkcSmoaa5BrpiXF1uPXIf5v3QbUKS3mmraZvBcNPRZoAD185YAQNeoqFZfF
+         Ml8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=RTDg85Qc0HTU+iFbgIAhQHoYSQIMFTU/wtwFlzXsv2M=;
+        b=7H4kk+mQd+tpoL9pdvaoesjv/qlegGOsxakga4fY62BSLCOm/G2/qf2M5HjqwctPvk
+         STCy9qtA4whnVUdWjA8whzeSzpr/NSViW7tgGD+VPYKydspN4zdFLIDPDh6C00VeL+9P
+         LN4IaE/+5HWXoShm7d+W2FPxr9nPGt2L6/wXilToBxw/P2A6/iSfE+a2DCOT0KYuXuCI
+         kCbKkieH5ehWw0YMre78JWrI5EtNZcQEJXuSV+JPpdJLz9Mcru4AX4rnWWCFQ7JqArGU
+         xcT/LU5iyjQItbOrwvOKumdi3MIRUyMU+gvOovy54JwOclTLDNTyFpP7/bXLq9XKzQOn
+         r9Mg==
+X-Gm-Message-State: AOAM531YkcXxzCFCe8O1zEYNuSeZpjxtxPo0jove81fxFfAaOX+YvAWX
+        2bAGs/HI4zkgS0nJkJDP8fMJcuO5kgYExp9jCWJWHkDyxQc=
+X-Google-Smtp-Source: ABdhPJw22NW+eWtz2ZQXAqmBnJxaG90G7AMhkxaKKItTl2TujQSapKPpflitwNN961ZYh7w17j8fMdwVi1ZB9y1rRMc=
+X-Received: by 2002:ac2:41c9:: with SMTP id d9mr21561841lfi.667.1632205652357;
+ Mon, 20 Sep 2021 23:27:32 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Mon, 20 Sep 2021 22:52:28
- -0700 (PDT)
-In-Reply-To: <CAGvGhF6Vf7vmd2vRC6Vv22ZNoxbhX4ym3_NjjiOncvx=ay9X8w@mail.gmail.com>
-References: <CAGvGhF6Vf7vmd2vRC6Vv22ZNoxbhX4ym3_NjjiOncvx=ay9X8w@mail.gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 21 Sep 2021 14:52:28 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8h86Fa2JCKdqjKktk5oonarOemm1=Z9+VeA7_PDpoyLA@mail.gmail.com>
-Message-ID: <CAKYAXd8h86Fa2JCKdqjKktk5oonarOemm1=Z9+VeA7_PDpoyLA@mail.gmail.com>
-Subject: Re: ksmbd: missing validation of hdr->next_offset
-To:     Leif Sahlberg <lsahlber@redhat.com>
-Cc:     linux-cifs@vger.kernel.org
+References: <20210921051933.626532-1-linkinjeon@kernel.org>
+In-Reply-To: <20210921051933.626532-1-linkinjeon@kernel.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 21 Sep 2021 01:27:21 -0500
+Message-ID: <CAH2r5mvW8MjN46LmLexLqnkV6q1eL3YKGiaY8_whNR_b=VUn2Q@mail.gmail.com>
+Subject: Re: [PATCH v3] ksmbd: remove follow symlinks support
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-09-21 14:02 GMT+09:00, Leif Sahlberg <lsahlber@redhat.com>:
-> List, Namjae,
-Hi Ronnie,
->
-> I have been looking at next_offset and we need some additional
-> validation of when we
-> walk to the next pdu without validating we have enough buffer.
->
-> I think the problem is down in is_chained_smb2_message()/
-> init_chained_smb2_rsp()
-> where it advances work->next_smb2_rcv_hdr_off without checking that
-> the new offset is valid and contains a smb2 header and payload.
->
->
-> A simple reproducer is libsmb2.
-> Apply this patch to break "next_offset"  for compounds in libsmb2 :
-> diff --git a/lib/pdu.c b/lib/pdu.c
-> index 1329388..4eab8d7 100644
-> --- a/lib/pdu.c
-> +++ b/lib/pdu.c
-> @@ -174,6 +174,7 @@ smb2_add_compound_pdu(struct smb2_context *smb2,
->          }
->
->          pdu->header.next_command = offset;
-> +        pdu->header.next_command = 0x0f0ff0f0;
->          smb2_set_uint32(&pdu->out.iov[0], 20, pdu->header.next_command);
->
->          /* Fixup flags */
->
-> And then just run this command which uses compounds:
-> ./examples/smb2-stat-sync smb://192.168.124.221/Share/
-> it should oops right away.
->
->
-> I don't know where the best place to check for this is,  either in
-> init_chained_smb2_rsp()
-> but it was a little hard to track it down.
-> A different place to check this might be from
-> ksmbd_conn_handler_loop()
-> and just walk the headers and check next_offset header by header
-> before even trying to process any of the pdus.
-Really thanks for your review! I will fix it now.
+regression tests in progress
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/bui=
+lds/72
 
-Thanks again!
+against ksmbd with these six patches:
+
+ksmbd: remove follow symlinks support
+7a26fb55d40c ksmbd: add request buffer validation in smb2_set_info
+927426347090 ksmbd: add validation in smb2_ioctl
+88b78c62812d ksmbd: add buffer validation for SMB2_CREATE_CONTEXT
+069d9345c759 ksmbd: add default data stream name in FILE_STREAM_INFORMATION
+996782bfb465 ksmbd: log that server is experimental at module load
+
+On Tue, Sep 21, 2021 at 12:19 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
 >
+> Use  LOOKUP_NO_SYMLINKS flags for default lookup to prohibit the middle o=
+f
+> symlink component lookup and remove follow symlinks parameter support.
+> We re-implement it as reparse point later.
 >
-> regards
-> ronnie shalberg
+> Test result:
+> smbclient -Ulinkinjeon%1234 //172.30.1.42/share -c
+> "get hacked/passwd passwd"
+> NT_STATUS_OBJECT_NAME_NOT_FOUND opening remote file \hacked\passwd
 >
+> Cc: Ralph B=C3=B6hme <slow@samba.org>
+> Cc: Steve French <smfrench@gmail.com>
+> Acked-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  v2:
+>   - reorganize path lookup in smb2_open to call only one
+>     ksmbd_vfs_kern_path().
+>  v3:
+>   - combine "ksmbd: use LOOKUP_NO_SYMLINKS flags for default lookup"
+>     patch into this patch.
 >
+>  fs/ksmbd/smb2pdu.c | 43 ++++++++++---------------------------------
+>  fs/ksmbd/vfs.c     | 32 +++++++++-----------------------
+>  2 files changed, 19 insertions(+), 56 deletions(-)
+>
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index 4399c399284b..baf7ce31d557 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -2660,13 +2660,9 @@ int smb2_open(struct ksmbd_work *work)
+>                 goto err_out1;
+>         }
+>
+> -       if (req->CreateOptions & FILE_DELETE_ON_CLOSE_LE) {
+> -               /*
+> -                * On delete request, instead of following up, need to
+> -                * look the current entity
+> -                */
+> -               rc =3D ksmbd_vfs_kern_path(name, 0, &path, 1);
+> -               if (!rc) {
+> +       rc =3D ksmbd_vfs_kern_path(name, LOOKUP_NO_SYMLINKS, &path, 1);
+> +       if (!rc) {
+> +               if (req->CreateOptions & FILE_DELETE_ON_CLOSE_LE) {
+>                         /*
+>                          * If file exists with under flags, return access
+>                          * denied error.
+> @@ -2685,25 +2681,10 @@ int smb2_open(struct ksmbd_work *work)
+>                                 path_put(&path);
+>                                 goto err_out;
+>                         }
+> -               }
+> -       } else {
+> -               if (test_share_config_flag(work->tcon->share_conf,
+> -                                          KSMBD_SHARE_FLAG_FOLLOW_SYMLIN=
+KS)) {
+> -                       /*
+> -                        * Use LOOKUP_FOLLOW to follow the path of
+> -                        * symlink in path buildup
+> -                        */
+> -                       rc =3D ksmbd_vfs_kern_path(name, LOOKUP_FOLLOW, &=
+path, 1);
+> -                       if (rc) { /* Case for broken link ?*/
+> -                               rc =3D ksmbd_vfs_kern_path(name, 0, &path=
+, 1);
+> -                       }
+> -               } else {
+> -                       rc =3D ksmbd_vfs_kern_path(name, 0, &path, 1);
+> -                       if (!rc && d_is_symlink(path.dentry)) {
+> -                               rc =3D -EACCES;
+> -                               path_put(&path);
+> -                               goto err_out;
+> -                       }
+> +               } else if (d_is_symlink(path.dentry)) {
+> +                       rc =3D -EACCES;
+> +                       path_put(&path);
+> +                       goto err_out;
+>                 }
+>         }
+>
+> @@ -4788,12 +4769,8 @@ static int smb2_get_info_filesystem(struct ksmbd_w=
+ork *work,
+>         struct path path;
+>         int rc =3D 0, len;
+>         int fs_infoclass_size =3D 0;
+> -       int lookup_flags =3D 0;
+> -
+> -       if (test_share_config_flag(share, KSMBD_SHARE_FLAG_FOLLOW_SYMLINK=
+S))
+> -               lookup_flags =3D LOOKUP_FOLLOW;
+>
+> -       rc =3D ksmbd_vfs_kern_path(share->path, lookup_flags, &path, 0);
+> +       rc =3D ksmbd_vfs_kern_path(share->path, LOOKUP_NO_SYMLINKS, &path=
+, 0);
+>         if (rc) {
+>                 pr_err("cannot create vfs path\n");
+>                 return -EIO;
+> @@ -5370,7 +5347,7 @@ static int smb2_rename(struct ksmbd_work *work,
+>         }
+>
+>         ksmbd_debug(SMB, "new name %s\n", new_name);
+> -       rc =3D ksmbd_vfs_kern_path(new_name, 0, &path, 1);
+> +       rc =3D ksmbd_vfs_kern_path(new_name, LOOKUP_NO_SYMLINKS, &path, 1=
+);
+>         if (rc)
+>                 file_present =3D false;
+>         else
+> @@ -5448,7 +5425,7 @@ static int smb2_create_link(struct ksmbd_work *work=
+,
+>         }
+>
+>         ksmbd_debug(SMB, "target name is %s\n", target_name);
+> -       rc =3D ksmbd_vfs_kern_path(link_name, 0, &path, 0);
+> +       rc =3D ksmbd_vfs_kern_path(link_name, LOOKUP_NO_SYMLINKS, &path, =
+0);
+>         if (rc)
+>                 file_present =3D false;
+>         else
+> diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
+> index b047f2980d96..3733e4944c1d 100644
+> --- a/fs/ksmbd/vfs.c
+> +++ b/fs/ksmbd/vfs.c
+> @@ -166,7 +166,7 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const c=
+har *name, umode_t mode)
+>         struct dentry *dentry;
+>         int err;
+>
+> -       dentry =3D kern_path_create(AT_FDCWD, name, &path, 0);
+> +       dentry =3D kern_path_create(AT_FDCWD, name, &path, LOOKUP_NO_SYML=
+INKS);
+>         if (IS_ERR(dentry)) {
+>                 err =3D PTR_ERR(dentry);
+>                 if (err !=3D -ENOENT)
+> @@ -203,7 +203,8 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const ch=
+ar *name, umode_t mode)
+>         struct dentry *dentry;
+>         int err;
+>
+> -       dentry =3D kern_path_create(AT_FDCWD, name, &path, LOOKUP_DIRECTO=
+RY);
+> +       dentry =3D kern_path_create(AT_FDCWD, name, &path,
+> +                                 LOOKUP_NO_SYMLINKS | LOOKUP_DIRECTORY);
+>         if (IS_ERR(dentry)) {
+>                 err =3D PTR_ERR(dentry);
+>                 if (err !=3D -EEXIST)
+> @@ -588,16 +589,11 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, =
+char *name)
+>         struct path path;
+>         struct dentry *parent;
+>         int err;
+> -       int flags =3D 0;
+>
+>         if (ksmbd_override_fsids(work))
+>                 return -ENOMEM;
+>
+> -       if (test_share_config_flag(work->tcon->share_conf,
+> -                                  KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS))
+> -               flags =3D LOOKUP_FOLLOW;
+> -
+> -       err =3D kern_path(name, flags, &path);
+> +       err =3D kern_path(name, LOOKUP_NO_SYMLINKS, &path);
+>         if (err) {
+>                 ksmbd_debug(VFS, "can't get %s, err %d\n", name, err);
+>                 ksmbd_revert_fsids(work);
+> @@ -652,16 +648,11 @@ int ksmbd_vfs_link(struct ksmbd_work *work, const c=
+har *oldname,
+>         struct path oldpath, newpath;
+>         struct dentry *dentry;
+>         int err;
+> -       int flags =3D 0;
+>
+>         if (ksmbd_override_fsids(work))
+>                 return -ENOMEM;
+>
+> -       if (test_share_config_flag(work->tcon->share_conf,
+> -                                  KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS))
+> -               flags =3D LOOKUP_FOLLOW;
+> -
+> -       err =3D kern_path(oldname, flags, &oldpath);
+> +       err =3D kern_path(oldname, LOOKUP_NO_SYMLINKS, &oldpath);
+>         if (err) {
+>                 pr_err("cannot get linux path for %s, err =3D %d\n",
+>                        oldname, err);
+> @@ -669,7 +660,7 @@ int ksmbd_vfs_link(struct ksmbd_work *work, const cha=
+r *oldname,
+>         }
+>
+>         dentry =3D kern_path_create(AT_FDCWD, newname, &newpath,
+> -                                 flags | LOOKUP_REVAL);
+> +                                 LOOKUP_NO_SYMLINKS | LOOKUP_REVAL);
+>         if (IS_ERR(dentry)) {
+>                 err =3D PTR_ERR(dentry);
+>                 pr_err("path create err for %s, err %d\n", newname, err);
+> @@ -788,7 +779,6 @@ int ksmbd_vfs_fp_rename(struct ksmbd_work *work, stru=
+ct ksmbd_file *fp,
+>         struct dentry *src_dent, *trap_dent, *src_child;
+>         char *dst_name;
+>         int err;
+> -       int flags;
+>
+>         dst_name =3D extract_last_component(newname);
+>         if (!dst_name)
+> @@ -797,12 +787,8 @@ int ksmbd_vfs_fp_rename(struct ksmbd_work *work, str=
+uct ksmbd_file *fp,
+>         src_dent_parent =3D dget_parent(fp->filp->f_path.dentry);
+>         src_dent =3D fp->filp->f_path.dentry;
+>
+> -       flags =3D LOOKUP_DIRECTORY;
+> -       if (test_share_config_flag(work->tcon->share_conf,
+> -                                  KSMBD_SHARE_FLAG_FOLLOW_SYMLINKS))
+> -               flags |=3D LOOKUP_FOLLOW;
+> -
+> -       err =3D kern_path(newname, flags, &dst_path);
+> +       err =3D kern_path(newname, LOOKUP_NO_SYMLINKS | LOOKUP_DIRECTORY,
+> +                       &dst_path);
+>         if (err) {
+>                 ksmbd_debug(VFS, "Cannot get path for %s [%d]\n", newname=
+, err);
+>                 goto out;
+> @@ -861,7 +847,7 @@ int ksmbd_vfs_truncate(struct ksmbd_work *work, const=
+ char *name,
+>         int err =3D 0;
+>
+>         if (name) {
+> -               err =3D kern_path(name, 0, &path);
+> +               err =3D kern_path(name, LOOKUP_NO_SYMLINKS, &path);
+>                 if (err) {
+>                         pr_err("cannot get linux path for %s, err %d\n",
+>                                name, err);
+> --
+> 2.25.1
+>
+
+
+--=20
+Thanks,
+
+Steve
