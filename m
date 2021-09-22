@@ -7,161 +7,96 @@ X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7627C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 23:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80B00C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 23:15:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BFA6260F24
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 23:13:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CBC261153
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 23:15:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238389AbhIVXOh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 22 Sep 2021 19:14:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49632 "EHLO mail.kernel.org"
+        id S238414AbhIVXQn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 22 Sep 2021 19:16:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50126 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238388AbhIVXOh (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 22 Sep 2021 19:14:37 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5BFF160F24
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 23:13:06 +0000 (UTC)
+        id S238293AbhIVXQm (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 22 Sep 2021 19:16:42 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 628A060F24
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 23:15:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632352386;
-        bh=4PIgJbS2rq/+Pm76zW98EnG0dqExgnvC11TmKQQp5xw=;
+        s=k20201202; t=1632352512;
+        bh=VcgtLw8KpstqMGTrCTxUHOBKFBeKcg117yySaoz9Aog=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=thSl/Tb3vlF4MrFpA/pbkoVFWnez8aleMvuSoetJzxXctDYm0psFh9l1D2za8kbMz
-         4nxJPi5c91S4xVzEUdmSDmyaEyyxXZbIYjb+ZIHfXRlYNaM17BbCa0pijVbwNWTUC/
-         k1N1r4uhz7F23nNVQv1ZTTC2mptsXkpU00yUkUU2/Al1Z8cDrFOe4GOI8hesQOCEAI
-         Mt0Hd9pgyQZ30gUonPLAsxwq8qMY5aqK2OT6+bK99QWRYV0PH0aumsj7Of2NSuPg48
-         N3lKUCRNBuU+SLtR/DaILk1bYN9Yh6tx8n55RIlldHwrLORZnlvWI3A5t7CsCLogGi
-         zyzsdLpyeXHNQ==
-Received: by mail-ot1-f46.google.com with SMTP id h9-20020a9d2f09000000b005453f95356cso5888136otb.11
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 16:13:06 -0700 (PDT)
-X-Gm-Message-State: AOAM531Ww6xC9jp2hV16mL8D81QxMg36KMrWYtP/L54XT6vM+Wj3N537
-        HwDglONpNjyZjZriwhiGFHbMbZpTdDiAokfmcDQ=
-X-Google-Smtp-Source: ABdhPJyVF2nbEWSNtzGC3A+aPFY53dtOhYgyacFBhYJK5sXK3jVNgVxR2kFDf1PviTYItYaAUTNZebe5+KgCchKsKdw=
-X-Received: by 2002:a05:6830:24a8:: with SMTP id v8mr1477120ots.185.1632352385743;
- Wed, 22 Sep 2021 16:13:05 -0700 (PDT)
+        b=Y0MUyOf6oeKAgIpG4F2jEx+O+zaB4zM1qDWbfn7svH/wd79MX7ZgLZeZ9HYUJOxpt
+         01CRwV92RcLqs6lZJi0qkGVCxxPQ2L/vW3Y5FVGOU+A7lH4gNP0KX/6WzjGt4mojAl
+         dgNrQJyALPnnK8LN0UpkX020Tnrqf77sPWKdUS5SsOoT180e5Mz6Xfmm5tewpIw91N
+         yd/4oNSGCiYQa6HJ1AP/GqR1QM/yXNT1yhVg2sEowM3beXVL2ys6XDDa6o61BJ/7Qr
+         uubYTDrS6OFfVhqhp1h4nD2KDuuJ7PAFtw2A5DdJGKTk2xC1m7oBirtDvYq21U9ou/
+         qNys5004yNt6w==
+Received: by mail-oi1-f175.google.com with SMTP id u22so6996413oie.5
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 16:15:12 -0700 (PDT)
+X-Gm-Message-State: AOAM530gpHTotHjB04riB2waHlGphg1gYC6il8iDhPwEQjEPD/QnKzjp
+        6Ushw1cvAbAGogK/1MbeVwFnmo8ycCmLwWxHl44=
+X-Google-Smtp-Source: ABdhPJwpGaCs2O10mv3UJXrgS9z61WeEJYo2Y6q/wzeYR2r4ppKfsCj9sRYvkRnfBHL28VJDiPEPwnsa6Aetsemd5y8=
+X-Received: by 2002:a05:6808:1a29:: with SMTP id bk41mr10136504oib.167.1632352511796;
+ Wed, 22 Sep 2021 16:15:11 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Wed, 22 Sep 2021 16:13:05
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Wed, 22 Sep 2021 16:15:11
  -0700 (PDT)
-In-Reply-To: <433e36b5-f07c-0105-fd30-c7bb4cb8957d@samba.org>
-References: <20210921225109.6388-1-linkinjeon@kernel.org> <20210921225109.6388-2-linkinjeon@kernel.org>
- <433e36b5-f07c-0105-fd30-c7bb4cb8957d@samba.org>
+In-Reply-To: <447d958e-2470-4ddb-2064-0aeaf1a47ba0@samba.org>
+References: <20210922120143.45953-1-linkinjeon@kernel.org> <447d958e-2470-4ddb-2064-0aeaf1a47ba0@samba.org>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 23 Sep 2021 08:13:05 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-+jfKqonB8=At-znCUBpF-J8Z3NfK=vvUJOfcUMFemoQ@mail.gmail.com>
-Message-ID: <CAKYAXd-+jfKqonB8=At-znCUBpF-J8Z3NfK=vvUJOfcUMFemoQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] ksmbd: add validation in smb2 negotiate
+Date:   Thu, 23 Sep 2021 08:15:11 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8S7Vc7MpOgHQ5+u0Fje92c417Ti48vDdZsPv8FTcwVwQ@mail.gmail.com>
+Message-ID: <CAKYAXd8S7Vc7MpOgHQ5+u0Fje92c417Ti48vDdZsPv8FTcwVwQ@mail.gmail.com>
+Subject: Re: [PATCH v3] ksmbd: fix invalid request buffer access in compound request
 To:     Ralph Boehme <slow@samba.org>
 Cc:     linux-cifs@vger.kernel.org,
         Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>
+        Steve French <smfrench@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-09-22 23:17 GMT+09:00, Ralph Boehme <slow@samba.org>:
-> Hi Namjae
->
-> patch looks great! Few nitpicks below.
->
-> Am 22.09.21 um 00:51 schrieb Namjae Jeon:
->> This patch add validation to check request buffer check in smb2
->> negotiate.
+2021-09-22 23:23 GMT+09:00, Ralph Boehme <slow@samba.org>:
+> Am 22.09.21 um 14:01 schrieb Namjae Jeon:
+>> Ronnie reported invalid request buffer access in chained command when
+>> inserting garbage value to NextCommand of compound request.
+>> This patch add validation check to avoid this issue.
 >>
 >> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
 >> Cc: Ralph B=C3=B6hme <slow@samba.org>
 >> Cc: Steve French <smfrench@gmail.com>
+>> Reported-by: Ronnie Sahlberg <lsahlber@redhat.com>
 >> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 >> ---
->>   fs/ksmbd/smb2pdu.c    | 41 ++++++++++++++++++++++++++++++++++++++++-
->>   fs/ksmbd/smb_common.c | 22 ++++++++++++++++++++--
->>   2 files changed, 60 insertions(+), 3 deletions(-)
+>>    v2:
+>>     - fix integer overflow from work->next_smb2_rcv_hdr_off.
+>>    v3:
+>>     - check next command offset and at least header size of next pdu at
+>>       the same time.
+>>   fs/ksmbd/smb2pdu.c | 7 +++++++
+>>   1 file changed, 7 insertions(+)
 >>
 >> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
->> index baf7ce31d557..1fe37ad4e5bc 100644
+>> index 4f11eb85bb6b..3d250e2539e6 100644
 >> --- a/fs/ksmbd/smb2pdu.c
 >> +++ b/fs/ksmbd/smb2pdu.c
->> @@ -1071,7 +1071,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
->>   	struct ksmbd_conn *conn =3D work->conn;
->>   	struct smb2_negotiate_req *req =3D work->request_buf;
->>   	struct smb2_negotiate_rsp *rsp =3D work->response_buf;
->> -	int rc =3D 0;
->> +	int rc =3D 0, smb2_buf_len, smb2_neg_size;
->
-> I guess all len variables should use unsigned types to facilitate well
-> defined overflow checks.
-As Ronnie pointed out, if checking max stream size, will be no problem.
-I'll fix it though.
->
->>   	__le32 status;
+>> @@ -466,6 +466,13 @@ bool is_chained_smb2_message(struct ksmbd_work
+>> *work)
 >>
->>   	ksmbd_debug(SMB, "Received negotiate request\n");
->> @@ -1089,6 +1089,45 @@ int smb2_handle_negotiate(struct ksmbd_work *work=
-)
->>   		goto err_out;
->>   	}
->>
->> +	smb2_buf_len =3D get_rfc1002_len(work->request_buf);
->> +	smb2_neg_size =3D offsetof(struct smb2_negotiate_req, Dialects) - 4;
->> +	if (conn->dialect =3D=3D SMB311_PROT_ID) {
->> +		int nego_ctxt_off =3D le32_to_cpu(req->NegotiateContextOffset);
->> +		int nego_ctxt_count =3D le16_to_cpu(req->NegotiateContextCount);
->> +
->> +		if (smb2_buf_len < nego_ctxt_off + nego_ctxt_count) {
+>>   	hdr =3D ksmbd_req_buf_next(work);
+>>   	if (le32_to_cpu(hdr->NextCommand) > 0) {
+>> +		if ((u64)work->next_smb2_rcv_hdr_off + le32_to_cpu(hdr->NextCommand) =
++
+>> 64 >
+>> +		    get_rfc1002_len(work->request_buf)) {
 >
-> overflow check needed for 32 bit arch?
-Okay, will fix it on v3.
-Thanks!
->
->> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
->> +			rc =3D -EINVAL;
->> +			goto err_out;
->> +		}
->> +
->> +		if (smb2_neg_size > nego_ctxt_off) {
->> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
->> +			rc =3D -EINVAL;
->> +			goto err_out;
->> +		}
->> +
->> +		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
->> +		    nego_ctxt_off) {
->> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
->> +			rc =3D -EINVAL;
->> +			goto err_out;
->> +		}
->> +	} else {
->> +		if (smb2_neg_size > smb2_buf_len) {
->> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
->> +			rc =3D -EINVAL;
->> +			goto err_out;
->> +		}
->> +
->> +		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
->> +		    smb2_buf_len) {
->> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
->> +			rc =3D -EINVAL;
->> +			goto err_out;
->> +		}
->> +	}
->> +
->>   	conn->cli_cap =3D le32_to_cpu(req->Capabilities);
->>   	switch (conn->dialect) {
->>   	case SMB311_PROT_ID:
->> diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
->> index 1da67217698d..da17b21ac685 100644
->> --- a/fs/ksmbd/smb_common.c
->> +++ b/fs/ksmbd/smb_common.c
->> @@ -229,13 +229,22 @@ int ksmbd_lookup_dialect_by_id(__le16 *cli_dialect=
-s,
->> __le16 dialects_count)
->>
->>   static int ksmbd_negotiate_smb_dialect(void *buf)
->>   {
->> -	__le32 proto;
->> +	int smb_buf_length =3D get_rfc1002_len(buf);
->
-> unsigned
+> is this safe from overflows on 32 bit arch?
+Okay, will fix it on next version.
+
+Thanks for your review!
 >
 > Thanks!
 > -slow
