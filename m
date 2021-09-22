@@ -2,98 +2,161 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF35DC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 22:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C51CC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 00:26:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C23C661107
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Sep 2021 22:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B8A561166
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 00:26:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230090AbhIUWxA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Sep 2021 18:53:00 -0400
-Received: from mail-pf1-f176.google.com ([209.85.210.176]:37802 "EHLO
-        mail-pf1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbhIUWw7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Sep 2021 18:52:59 -0400
-Received: by mail-pf1-f176.google.com with SMTP id j6so983906pfa.4
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 15:51:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Ucg+j7F1oU0EVCrtP7KfvBr0C46ii/UDAZ4jZdbZ+6I=;
-        b=J2Oi0uuVxTL0sHK8tSwIQIAmhB08I55P8okBtKhmZ4NpkIWgNcre3orqEpA1ekL7lG
-         8lJruf2kb4Azz7F+LSQpdIJEnttqgTlBJAuSvThEioat5iScWscaZklSVE6opWn6kOh2
-         KHxU98EwwUnmCYxi9rr32kxKoXkrFGWqbW1NHlBAbBTj1sJDeTGCMG4gDCqd3UNexp2r
-         Ni9z6c4WGQJosdwL4EdRnWv7fUXXvyTKIL4ErYoxWdaAGR7fviutrXGDC2JQxoazqILf
-         SD3XuNx9A+euxDGYuE7n9ADWKJQjLlauO/5rzTGQvXvrHh8bQ4lLlRm34lydTei4P7Br
-         bPFw==
-X-Gm-Message-State: AOAM532MrPaCR/sLNiVBmDmO9bm/x8uUqgDUbkMoq/zkoh52RiwU6zxx
-        MrzrFBNfDjHLzgWELe1+3efzs1RemS8MQw==
-X-Google-Smtp-Source: ABdhPJzXSKKx0I5zkfLKC7SnTMyWVMu2Vf1GuOmFxHQ5BwNwV1e6ocjl6A4h9E5oHtRyRI3urHuG4g==
-X-Received: by 2002:a63:6f42:: with SMTP id k63mr30112967pgc.358.1632264690197;
-        Tue, 21 Sep 2021 15:51:30 -0700 (PDT)
-Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id e18sm167053pfj.159.2021.09.21.15.51.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 15:51:29 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
-        Steve French <smfrench@gmail.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
-Subject: [PATCH v2 3/3] ksmbd: fix invalid request buffer access in compound request
-Date:   Wed, 22 Sep 2021 07:51:09 +0900
-Message-Id: <20210921225109.6388-3-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210921225109.6388-1-linkinjeon@kernel.org>
-References: <20210921225109.6388-1-linkinjeon@kernel.org>
+        id S229786AbhIVA1x (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Sep 2021 20:27:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49832 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229685AbhIVA1x (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 21 Sep 2021 20:27:53 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 35DA461166
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 00:26:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632270384;
+        bh=PRJQRecnSOc52CCuEv2l3Jzq+gzLNwrUooAlw9wZ0b0=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=hIRR5wVNrrC0dBe8Pycms1jh+Oe6iVvt21ZQD1yJPzWbtp/N5Uv+Zuu8fI6m+5McN
+         kmxcvZIrw0uPsg2k6BKr9OWcpSnIZucSXgTbTdk2lNtVmiIxPIeeklCl1a8InDWjnm
+         RRMbsePNGLGbDCUvKdGDo2HmPL1pGghSl/h1vwPBw5VmggKGcndY9BylR70euLaOJq
+         53ViLx7/hMuau5Oq5ksSlVJdrzrEW/igZupTia5xCLNKZ8BqAKdCsBtP9RW27yJ+eJ
+         OpY0uOsRzXL+9fxvRyYrVNMTsg6ZfBk9SB0Tz/3Gz5w2so8P2MCfYtceGYvh68y8rv
+         3REcoQ+674tOA==
+Received: by mail-oi1-f176.google.com with SMTP id 6so1802306oiy.8
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 17:26:24 -0700 (PDT)
+X-Gm-Message-State: AOAM5328Kz4zC5GOXMABrisrzMPLXwXXjVDesA/PHaqZVfIXrG/XvxMe
+        YFSkgV5pe7/vDWJ2NFkBS6ck94U3GQ5eMMfLvDQ=
+X-Google-Smtp-Source: ABdhPJwWzJVm1I4x76g4s+5zP91S8GztexUeu1CDB3XRVe2Pc1qLZXkGpRsh3KzwjmXWP7kj4FLSQshOyOwqZgd0714=
+X-Received: by 2002:a05:6808:1a29:: with SMTP id bk41mr5832678oib.167.1632270383620;
+ Tue, 21 Sep 2021 17:26:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Tue, 21 Sep 2021 17:26:23
+ -0700 (PDT)
+In-Reply-To: <3ab97b10-d94c-6cb2-0134-a4f3878a5ee2@samba.org>
+References: <20210919021315.642856-1-linkinjeon@kernel.org>
+ <20210919021315.642856-5-linkinjeon@kernel.org> <3ab97b10-d94c-6cb2-0134-a4f3878a5ee2@samba.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Wed, 22 Sep 2021 09:26:23 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_8GVoxxkSNhzjQ5YLAWVguG5Vaz5_yi_4Jgc3PLToVYg@mail.gmail.com>
+Message-ID: <CAKYAXd_8GVoxxkSNhzjQ5YLAWVguG5Vaz5_yi_4Jgc3PLToVYg@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] ksmbd: add buffer validation for SMB2_CREATE_CONTEXT
+To:     Ralph Boehme <slow@samba.org>
+Cc:     linux-cifs@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Ronnie reported invalid request buffer access in chained command when
-inserting garbage value to NextCommand of compound request.
-This patch add validation check to avoid this issue.
+2021-09-21 17:32 GMT+09:00, Ralph Boehme <slow@samba.org>:
+> Hi Namjae,
+>
+> thanks! One nitpick below.
+>
+> Am 19.09.21 um 04:13 schrieb Namjae Jeon:
+>> From: Hyunchul Lee <hyc.lee@gmail.com>
+>>
+>> Add buffer validation for SMB2_CREATE_CONTEXT.
+>>
+>> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+>> Cc: Ralph B=C3=B6hme <slow@samba.org>
+>> Cc: Steve French <smfrench@gmail.com>
+>> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+>> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+>> ---
+>>   fs/ksmbd/oplock.c  | 35 +++++++++++++++++++++++++----------
+>>   fs/ksmbd/smb2pdu.c | 25 ++++++++++++++++++++++++-
+>>   fs/ksmbd/smbacl.c  |  9 ++++++++-
+>>   3 files changed, 57 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/fs/ksmbd/oplock.c b/fs/ksmbd/oplock.c
+>> index 16b6236d1bd2..3fd2713f2282 100644
+>> --- a/fs/ksmbd/oplock.c
+>> +++ b/fs/ksmbd/oplock.c
+>> @@ -1451,26 +1451,41 @@ struct lease_ctx_info *parse_lease_state(void
+>> *open_req)
+>>    */
+>>   struct create_context *smb2_find_context_vals(void *open_req, const ch=
+ar
+>> *tag)
+>>   {
+>> -	char *data_offset;
+>> +	struct smb2_create_req *req =3D (struct smb2_create_req *)open_req;
+>>   	struct create_context *cc;
+>> -	unsigned int next =3D 0;
+>> +	char *data_offset, *data_end;
+>>   	char *name;
+>> -	struct smb2_create_req *req =3D (struct smb2_create_req *)open_req;
+>> +	unsigned int next =3D 0;
+>> +	unsigned int name_off, name_len, value_off, value_len;
+>>
+>>   	data_offset =3D (char *)req + 4 +
+>> le32_to_cpu(req->CreateContextsOffset);
+>> +	data_end =3D data_offset + le32_to_cpu(req->CreateContextsLength);
+>>   	cc =3D (struct create_context *)data_offset;
+>>   	do {
+>> -		int val;
+>> -
+>>   		cc =3D (struct create_context *)((char *)cc + next);
+>> -		name =3D le16_to_cpu(cc->NameOffset) + (char *)cc;
+>> -		val =3D le16_to_cpu(cc->NameLength);
+>> -		if (val < 4)
+>> +		if ((char *)cc + offsetof(struct create_context, Buffer) >
+>> +		    data_end)
+>>   			return ERR_PTR(-EINVAL);
+>>
+>> -		if (memcmp(name, tag, val) =3D=3D 0)
+>> -			return cc;
+>>   		next =3D le32_to_cpu(cc->Next);
+>> +		name_off =3D le16_to_cpu(cc->NameOffset);
+>> +		name_len =3D le16_to_cpu(cc->NameLength);
+>> +		value_off =3D le16_to_cpu(cc->DataOffset);
+>> +		value_len =3D le32_to_cpu(cc->DataLength);
+>> +
+>> +		if ((char *)cc + name_off + name_len > data_end ||
+>> +		    (value_len && (char *)cc + value_off + value_len > data_end))
+>> +			return ERR_PTR(-EINVAL);
+>> +		else if (next && (next < name_off + name_len ||
+>> +			 (value_len && next < value_off + value_len)))
+>> +			return ERR_PTR(-EINVAL);
+>
+> The else is a bit confusing and not needed. Also, Samba has a few
+> additional checks, I wonder whether we should add those two:
+>
+>                  if ((next & 0x7) !=3D 0 ||
+>                      next > remaining ||
+>                      name_offset !=3D 16 ||
+>                      name_length < 4 ||
+>                      name_offset + name_length > remaining ||
+>                      (data_offset & 0x7) !=3D 0 ||
+>                      (data_offset && (data_offset < name_offset +
+> name_length)) ||
+>                      (data_offset > remaining) ||
+>                      (data_offset + (uint64_t)data_length > remaining)) {
+>                          return NT_STATUS_INVALID_PARAMETER;
+>                  }
+I will fix it on v2.
 
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Ralph Böhme <slow@samba.org>
-Cc: Steve French <smfrench@gmail.com>
-Reported-by: Ronnie Sahlberg <lsahlber@redhat.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- v2:
-  - fix integer overflow from work->next_smb2_rcv_hdr_off.
-
- fs/ksmbd/smb2pdu.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 1fe37ad4e5bc..cae796ea1148 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -466,6 +466,13 @@ bool is_chained_smb2_message(struct ksmbd_work *work)
- 
- 	hdr = ksmbd_req_buf_next(work);
- 	if (le32_to_cpu(hdr->NextCommand) > 0) {
-+		if ((u64)work->next_smb2_rcv_hdr_off + le32_to_cpu(hdr->NextCommand) >
-+		    get_rfc1002_len(work->request_buf)) {
-+			pr_err("next command(%u) offset exceeds smb msg size\n",
-+			       hdr->NextCommand);
-+			return false;
-+		}
-+
- 		ksmbd_debug(SMB, "got SMB2 chained command\n");
- 		init_chained_smb2_rsp(work);
- 		return true;
--- 
-2.25.1
-
+Thank your review!
+>
+> Other then that lgtm.
+>
+> Thanks!
+> -slow
+>
+> --
+> Ralph Boehme, Samba Team                 https://samba.org/
+> SerNet Samba Team Lead      https://sernet.de/en/team-samba
+>
+>
