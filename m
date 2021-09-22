@@ -2,161 +2,162 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C51CC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 00:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08213C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 00:39:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B8A561166
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 00:26:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB21A61184
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 00:39:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229786AbhIVA1x (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Sep 2021 20:27:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49832 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229685AbhIVA1x (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 21 Sep 2021 20:27:53 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 35DA461166
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 00:26:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632270384;
-        bh=PRJQRecnSOc52CCuEv2l3Jzq+gzLNwrUooAlw9wZ0b0=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=hIRR5wVNrrC0dBe8Pycms1jh+Oe6iVvt21ZQD1yJPzWbtp/N5Uv+Zuu8fI6m+5McN
-         kmxcvZIrw0uPsg2k6BKr9OWcpSnIZucSXgTbTdk2lNtVmiIxPIeeklCl1a8InDWjnm
-         RRMbsePNGLGbDCUvKdGDo2HmPL1pGghSl/h1vwPBw5VmggKGcndY9BylR70euLaOJq
-         53ViLx7/hMuau5Oq5ksSlVJdrzrEW/igZupTia5xCLNKZ8BqAKdCsBtP9RW27yJ+eJ
-         OpY0uOsRzXL+9fxvRyYrVNMTsg6ZfBk9SB0Tz/3Gz5w2so8P2MCfYtceGYvh68y8rv
-         3REcoQ+674tOA==
-Received: by mail-oi1-f176.google.com with SMTP id 6so1802306oiy.8
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 17:26:24 -0700 (PDT)
-X-Gm-Message-State: AOAM5328Kz4zC5GOXMABrisrzMPLXwXXjVDesA/PHaqZVfIXrG/XvxMe
-        YFSkgV5pe7/vDWJ2NFkBS6ck94U3GQ5eMMfLvDQ=
-X-Google-Smtp-Source: ABdhPJwWzJVm1I4x76g4s+5zP91S8GztexUeu1CDB3XRVe2Pc1qLZXkGpRsh3KzwjmXWP7kj4FLSQshOyOwqZgd0714=
-X-Received: by 2002:a05:6808:1a29:: with SMTP id bk41mr5832678oib.167.1632270383620;
- Tue, 21 Sep 2021 17:26:23 -0700 (PDT)
+        id S229712AbhIVAlP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Sep 2021 20:41:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35972 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229480AbhIVAlO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Sep 2021 20:41:14 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D78C061574
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 17:39:45 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id dj4so3189144edb.5
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 17:39:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=loQj5b+GT85stdSpIsUXFNJ1fu0UKMVfsPC+RV9gXmU=;
+        b=DDEPuOglFnCJs6bQxmSUK/N3I7rhbdg26XsI7UJ6rQ4lDPmlVWgbPMjcZ2fP66dVpM
+         GizEznDcZK72+KZ87ZtyYUI6xeK19cX5SR+eUslF8w5SgJ6ONLTmtjx1tC8DzsUKsu8f
+         L97Wff4xeGO6LJcpdXjfgMflCv11bfCMRvrdA4qifV+SvDjEuV0yKClssbY+XTwR5oKQ
+         wvBaTV44f4ZseNgV6MaiQEk37voJwiYgdog6eUqUAAwBgBJFS0lxMdDl/nuLWovIEdOl
+         pLjT+o84fuDEq+RTePWRcvCgab23BLVyItXzUptlDgYP48jvA8IsUyiZXd0AH9fYPNuv
+         RoNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=loQj5b+GT85stdSpIsUXFNJ1fu0UKMVfsPC+RV9gXmU=;
+        b=Kcvmuh3xwAA0eIn5xo56TUt1vgj18ej16ZBX/aoEZ2o6yyezwjM0oSBE+hHCvlHWzY
+         woqTO2rlXn7GY2GEgTJKvjqAxXH9AdqFrVUShepHIDwC1/hKmq3alJef6UkduaObv2U8
+         cAzDeAbVLLnXZCFLGlLbOJEQpsokL42L5nLdg2ZLbxF43wyVPdaSS6rOrZ0udosvxrKf
+         AOrZ7wrojZI0iAUfbEXhjn/rzrpWuroC2urZFo2lolcIFo/X+VAaw4xEtiR+i4eD7Sw4
+         8ueNIdAlCs22mxiqNUxSAwDr03FPndl1ANRucn+UjgAYOp4b3TmHDdxujXL2Qh3t2SRG
+         +6fA==
+X-Gm-Message-State: AOAM5332/h4q2poj3jzrRCOxB9K6MSrg7lUySeOmOsa5Pu7bvvQdwzNr
+        4xlWkKdC0kLOEyADiSbUgC4s5zsQASA1YOkbmXw=
+X-Google-Smtp-Source: ABdhPJyO97CMprzkufy9VQuT+xWtwdY7CdvQNtbLTbCWL9Yv+NjzNceb4SGS3ew5qj/jR4F9136V1Ojfa2juopdUdr0=
+X-Received: by 2002:a17:906:680c:: with SMTP id k12mr38823364ejr.85.1632271184400;
+ Tue, 21 Sep 2021 17:39:44 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Tue, 21 Sep 2021 17:26:23
- -0700 (PDT)
-In-Reply-To: <3ab97b10-d94c-6cb2-0134-a4f3878a5ee2@samba.org>
-References: <20210919021315.642856-1-linkinjeon@kernel.org>
- <20210919021315.642856-5-linkinjeon@kernel.org> <3ab97b10-d94c-6cb2-0134-a4f3878a5ee2@samba.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 22 Sep 2021 09:26:23 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_8GVoxxkSNhzjQ5YLAWVguG5Vaz5_yi_4Jgc3PLToVYg@mail.gmail.com>
-Message-ID: <CAKYAXd_8GVoxxkSNhzjQ5YLAWVguG5Vaz5_yi_4Jgc3PLToVYg@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] ksmbd: add buffer validation for SMB2_CREATE_CONTEXT
-To:     Ralph Boehme <slow@samba.org>
-Cc:     linux-cifs@vger.kernel.org, Hyunchul Lee <hyc.lee@gmail.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>
+References: <20210921225109.6388-1-linkinjeon@kernel.org> <20210921225109.6388-3-linkinjeon@kernel.org>
+In-Reply-To: <20210921225109.6388-3-linkinjeon@kernel.org>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Wed, 22 Sep 2021 10:39:32 +1000
+Message-ID: <CAN05THSRTAC4Na+_cMwTFEJ3WrmKQMUjq_0Tmn44RE2KHhVA3A@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] ksmbd: fix invalid request buffer access in
+ compound request
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
+        Steve French <smfrench@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-09-21 17:32 GMT+09:00, Ralph Boehme <slow@samba.org>:
-> Hi Namjae,
+On Wed, Sep 22, 2021 at 8:51 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
 >
-> thanks! One nitpick below.
+> Ronnie reported invalid request buffer access in chained command when
+> inserting garbage value to NextCommand of compound request.
+> This patch add validation check to avoid this issue.
 >
-> Am 19.09.21 um 04:13 schrieb Namjae Jeon:
->> From: Hyunchul Lee <hyc.lee@gmail.com>
->>
->> Add buffer validation for SMB2_CREATE_CONTEXT.
->>
->> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
->> Cc: Ralph B=C3=B6hme <slow@samba.org>
->> Cc: Steve French <smfrench@gmail.com>
->> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
->> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->> ---
->>   fs/ksmbd/oplock.c  | 35 +++++++++++++++++++++++++----------
->>   fs/ksmbd/smb2pdu.c | 25 ++++++++++++++++++++++++-
->>   fs/ksmbd/smbacl.c  |  9 ++++++++-
->>   3 files changed, 57 insertions(+), 12 deletions(-)
->>
->> diff --git a/fs/ksmbd/oplock.c b/fs/ksmbd/oplock.c
->> index 16b6236d1bd2..3fd2713f2282 100644
->> --- a/fs/ksmbd/oplock.c
->> +++ b/fs/ksmbd/oplock.c
->> @@ -1451,26 +1451,41 @@ struct lease_ctx_info *parse_lease_state(void
->> *open_req)
->>    */
->>   struct create_context *smb2_find_context_vals(void *open_req, const ch=
-ar
->> *tag)
->>   {
->> -	char *data_offset;
->> +	struct smb2_create_req *req =3D (struct smb2_create_req *)open_req;
->>   	struct create_context *cc;
->> -	unsigned int next =3D 0;
->> +	char *data_offset, *data_end;
->>   	char *name;
->> -	struct smb2_create_req *req =3D (struct smb2_create_req *)open_req;
->> +	unsigned int next =3D 0;
->> +	unsigned int name_off, name_len, value_off, value_len;
->>
->>   	data_offset =3D (char *)req + 4 +
->> le32_to_cpu(req->CreateContextsOffset);
->> +	data_end =3D data_offset + le32_to_cpu(req->CreateContextsLength);
->>   	cc =3D (struct create_context *)data_offset;
->>   	do {
->> -		int val;
->> -
->>   		cc =3D (struct create_context *)((char *)cc + next);
->> -		name =3D le16_to_cpu(cc->NameOffset) + (char *)cc;
->> -		val =3D le16_to_cpu(cc->NameLength);
->> -		if (val < 4)
->> +		if ((char *)cc + offsetof(struct create_context, Buffer) >
->> +		    data_end)
->>   			return ERR_PTR(-EINVAL);
->>
->> -		if (memcmp(name, tag, val) =3D=3D 0)
->> -			return cc;
->>   		next =3D le32_to_cpu(cc->Next);
->> +		name_off =3D le16_to_cpu(cc->NameOffset);
->> +		name_len =3D le16_to_cpu(cc->NameLength);
->> +		value_off =3D le16_to_cpu(cc->DataOffset);
->> +		value_len =3D le32_to_cpu(cc->DataLength);
->> +
->> +		if ((char *)cc + name_off + name_len > data_end ||
->> +		    (value_len && (char *)cc + value_off + value_len > data_end))
->> +			return ERR_PTR(-EINVAL);
->> +		else if (next && (next < name_off + name_len ||
->> +			 (value_len && next < value_off + value_len)))
->> +			return ERR_PTR(-EINVAL);
+> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> Cc: Ralph B=C3=B6hme <slow@samba.org>
+> Cc: Steve French <smfrench@gmail.com>
+> Reported-by: Ronnie Sahlberg <lsahlber@redhat.com>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  v2:
+>   - fix integer overflow from work->next_smb2_rcv_hdr_off.
 >
-> The else is a bit confusing and not needed. Also, Samba has a few
-> additional checks, I wonder whether we should add those two:
+>  fs/ksmbd/smb2pdu.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
->                  if ((next & 0x7) !=3D 0 ||
->                      next > remaining ||
->                      name_offset !=3D 16 ||
->                      name_length < 4 ||
->                      name_offset + name_length > remaining ||
->                      (data_offset & 0x7) !=3D 0 ||
->                      (data_offset && (data_offset < name_offset +
-> name_length)) ||
->                      (data_offset > remaining) ||
->                      (data_offset + (uint64_t)data_length > remaining)) {
->                          return NT_STATUS_INVALID_PARAMETER;
->                  }
-I will fix it on v2.
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index 1fe37ad4e5bc..cae796ea1148 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -466,6 +466,13 @@ bool is_chained_smb2_message(struct ksmbd_work *work=
+)
+>
+>         hdr =3D ksmbd_req_buf_next(work);
+>         if (le32_to_cpu(hdr->NextCommand) > 0) {
+> +               if ((u64)work->next_smb2_rcv_hdr_off + le32_to_cpu(hdr->N=
+extCommand) >
+> +                   get_rfc1002_len(work->request_buf)) {
+> +                       pr_err("next command(%u) offset exceeds smb msg s=
+ize\n",
+> +                              hdr->NextCommand);
+> +                       return false;
+> +               }
+> +
+>                 ksmbd_debug(SMB, "got SMB2 chained command\n");
+>                 init_chained_smb2_rsp(work);
+>                 return true;
 
-Thank your review!
->
-> Other then that lgtm.
->
-> Thanks!
-> -slow
->
+Very good, reviewed by me.
+The conditional though, since you know there will be at least a full
+smb2 header there you could already check that change it to
+> +               if ((u64)work->next_smb2_rcv_hdr_off + le32_to_cpu(hdr->N=
+extCommand) >
+> +                   get_rfc1002_len(work->request_buf) +  64) {
+
+
+Which leads to another question.  Where do you check that the buffer
+contains enough data to hold the smb2 header and the full fixed part
+of the request?
+There is a check that you have enough space for the smb2 header in
+ksmbd_conn_handler_loop()
+that there is enough space for the smb2 header
+(ksmbd_pdu_size_has_room()) but that function assumes that the smb2
+header always start at the head of the buffer.
+So if you have a compound chain, this functrion only checks the first pdu.
+
+
+I know that the buffer handling is copied from the cifs client.  It
+used to also do these "just pass a buffer around and the first 4 bytes
+is the size" (and still does for smb1)  and there was a lot of
+terrible +4 or -4 to all sort of casts and conditionals.
+I changed that in cifs.ko to remove the 4 byte length completely from
+the buffer.
+I also changed it as part of the compounding to pass an array of
+requests (each containing an iovector) to the functions instead of
+just one large byte array.
+That made things a lot easier to manage since you could then assume
+that the SMB2 header would always start at offset 0 in the
+corresponding iovector, even for compounded commands since they all
+had their own private vector.
+And since an iovector contains both a pointer and a length there is no
+need anymore to read the first 4 bytes/validate them/and covnert into
+a length all the time.
+
+I think that would help, but it would be a MAJOR amount of work, so
+maybe that should wait until later.
+That approach is very nice since it completely avoids keeping track of
+offset-to-where-this-pdu-starts which makes all checks and
+conditionals so much more complex.
+
+
+regards
+ronnie sahlberg
+
+
 > --
-> Ralph Boehme, Samba Team                 https://samba.org/
-> SerNet Samba Team Lead      https://sernet.de/en/team-samba
->
+> 2.25.1
 >
