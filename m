@@ -2,183 +2,172 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76098C433FE
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 22:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7627C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 23:13:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4DFCC61100
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 22:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFA6260F24
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 23:13:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234970AbhIVWZ4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 22 Sep 2021 18:25:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54702 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232149AbhIVWZz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Sep 2021 18:25:55 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D743C061574
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 15:24:25 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id b20so18238026lfv.3
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 15:24:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=UN65BtvKlOu33U43G8Ts4qwFvrRO8AL1x20WR4u2wz8=;
-        b=OlG75jz6FL2hYPEe680EIf8r3U/qo2RRIHgV6Y4grdqySVDEiFfoTPA14VRLDxWHLk
-         fOfpdWmq7l5dizGWvm5JikQD0eB7UOG8kmePllsHQGpSzUwcigJSp61IA8YbtfVhrtCH
-         CiQbzf6JofgFph0GdGDsFj7r6cc9dOihlambnUvDH7iqcWVzkp1iqHG4HJK835maH+8b
-         Yl1KnwiJ0mozTJINlzrUj7Xe8SgyHeKnrInRuUPmXsHEcEYrIlwWYHdlFgykWMS7/tzn
-         dhpqWzhKB3F5Ya+m5KMruRFazcIymkoo3gDHW1VEGJBg68KPhQJ/uxqFBTz8Bt5OwA3m
-         TEmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=UN65BtvKlOu33U43G8Ts4qwFvrRO8AL1x20WR4u2wz8=;
-        b=tSQHuS7uqBhlXUXQeBoqkkYhwkDtM8tc3v2o5ltYabDkMM91V/wjQPs2MYQAHod82K
-         Lu3k/AhsK9QMUYYot1ZHmKeR7En0ixEriYaN5BfFLtyN240zGC6a+ijsm6v+iWHw8GMR
-         lSAcaATBNV7oMQIPKo7Kw91mhieq3Rbhfvj4P6aqmfBSirUwiJe/JcxrZgjFSayYTeiV
-         XQpfcF/X6XJLGZa2ctCIqFnOzipNsf4D7rWMG+j4EDdszxQGkvuxwNgpMsZZJyBBbTJA
-         1hFbn6LgFJI8h+dCBMvCr4TEqWtchlbcCl6Zhd6OsxRDWqPRbrkji+2IqmAe4fsaVrtL
-         k3rQ==
-X-Gm-Message-State: AOAM532znqTGGVY9EBE7cXeFt6bJNkkCnLVMwxAQtnTy/L4LTEqHbjCu
-        7kjWasYn6/cFWYJHT7HfKLw/mg3Y2fQDCsn545M=
-X-Google-Smtp-Source: ABdhPJy2/Z8do57x2HQvjYtCqnhzoomNTfI5OeWkB3x41HIwKEi6FEdm3U1VHVTEv5pjZcg9v0FHTF6VPd2TFwTkSFQ=
-X-Received: by 2002:ac2:5467:: with SMTP id e7mr1127444lfn.537.1632349463314;
- Wed, 22 Sep 2021 15:24:23 -0700 (PDT)
+        id S238389AbhIVXOh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 22 Sep 2021 19:14:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49632 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238388AbhIVXOh (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 22 Sep 2021 19:14:37 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5BFF160F24
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 23:13:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632352386;
+        bh=4PIgJbS2rq/+Pm76zW98EnG0dqExgnvC11TmKQQp5xw=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=thSl/Tb3vlF4MrFpA/pbkoVFWnez8aleMvuSoetJzxXctDYm0psFh9l1D2za8kbMz
+         4nxJPi5c91S4xVzEUdmSDmyaEyyxXZbIYjb+ZIHfXRlYNaM17BbCa0pijVbwNWTUC/
+         k1N1r4uhz7F23nNVQv1ZTTC2mptsXkpU00yUkUU2/Al1Z8cDrFOe4GOI8hesQOCEAI
+         Mt0Hd9pgyQZ30gUonPLAsxwq8qMY5aqK2OT6+bK99QWRYV0PH0aumsj7Of2NSuPg48
+         N3lKUCRNBuU+SLtR/DaILk1bYN9Yh6tx8n55RIlldHwrLORZnlvWI3A5t7CsCLogGi
+         zyzsdLpyeXHNQ==
+Received: by mail-ot1-f46.google.com with SMTP id h9-20020a9d2f09000000b005453f95356cso5888136otb.11
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 16:13:06 -0700 (PDT)
+X-Gm-Message-State: AOAM531Ww6xC9jp2hV16mL8D81QxMg36KMrWYtP/L54XT6vM+Wj3N537
+        HwDglONpNjyZjZriwhiGFHbMbZpTdDiAokfmcDQ=
+X-Google-Smtp-Source: ABdhPJyVF2nbEWSNtzGC3A+aPFY53dtOhYgyacFBhYJK5sXK3jVNgVxR2kFDf1PviTYItYaAUTNZebe5+KgCchKsKdw=
+X-Received: by 2002:a05:6830:24a8:: with SMTP id v8mr1477120ots.185.1632352385743;
+ Wed, 22 Sep 2021 16:13:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210922120057.45789-1-linkinjeon@kernel.org> <CAN05THQVgu33LmFx5u3xm7MjdJZMYe81-bJEvAVJLPrMkjYYZg@mail.gmail.com>
-In-Reply-To: <CAN05THQVgu33LmFx5u3xm7MjdJZMYe81-bJEvAVJLPrMkjYYZg@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 22 Sep 2021 17:24:12 -0500
-Message-ID: <CAH2r5mvaDzXeuooUq+_GkR_F5EeSPrt-yUGjPsfR=MVbv6joMw@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: check protocol id in ksmbd_verify_smb_message()
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Wed, 22 Sep 2021 16:13:05
+ -0700 (PDT)
+In-Reply-To: <433e36b5-f07c-0105-fd30-c7bb4cb8957d@samba.org>
+References: <20210921225109.6388-1-linkinjeon@kernel.org> <20210921225109.6388-2-linkinjeon@kernel.org>
+ <433e36b5-f07c-0105-fd30-c7bb4cb8957d@samba.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 23 Sep 2021 08:13:05 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-+jfKqonB8=At-znCUBpF-J8Z3NfK=vvUJOfcUMFemoQ@mail.gmail.com>
+Message-ID: <CAKYAXd-+jfKqonB8=At-znCUBpF-J8Z3NfK=vvUJOfcUMFemoQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] ksmbd: add validation in smb2 negotiate
+To:     Ralph Boehme <slow@samba.org>
+Cc:     linux-cifs@vger.kernel.org,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-added the R-Bs and merged into cifsd-for-next  (current content is
-below, although looks like we could update the "buffer invalidation in
-smb2_set_info" patch)
-
-e6201b4a0bac (HEAD -> cifsd-for-next, origin/cifsd-for-next) ksmbd:
-add request buffer validation in smb2_set_info
-743d886affeb ksmbd: remove follow symlinks support
-3bee78ad0062 ksmbd: fix invalid request buffer access in compound request
-18a015bccf9e ksmbd: check protocol id in ksmbd_verify_smb_message()
-9f6323311c70 ksmbd: add default data stream name in FILE_STREAM_INFORMATION
-e44fd5081c50 ksmbd: log that server is experimental at module load
-
-On Wed, Sep 22, 2021 at 4:33 PM ronnie sahlberg
-<ronniesahlberg@gmail.com> wrote:
+2021-09-22 23:17 GMT+09:00, Ralph Boehme <slow@samba.org>:
+> Hi Namjae
 >
-> reviewed by me
+> patch looks great! Few nitpicks below.
 >
-> On Wed, Sep 22, 2021 at 10:01 PM Namjae Jeon <linkinjeon@kernel.org> wrot=
-e:
-> >
-> > When second smb2 pdu has invalid protocol id, ksmbd doesn't detect it
-> > and allow to process smb2 request. This patch add the check it in
-> > ksmbd_verify_smb_message() and don't use protocol id of smb2 request as
-> > protocol id of response.
-> >
-> > Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> > Cc: Ralph B=C3=B6hme <slow@samba.org>
-> > Cc: Steve French <smfrench@gmail.com>
-> > Reported-by: Ronnie Sahlberg <lsahlber@redhat.com>
-> > Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-> > ---
-> >  fs/ksmbd/smb2pdu.c    |  2 +-
-> >  fs/ksmbd/smb_common.c | 13 +++++++++----
-> >  fs/ksmbd/smb_common.h |  1 +
-> >  3 files changed, 11 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> > index 3d250e2539e6..3be1493cb18d 100644
-> > --- a/fs/ksmbd/smb2pdu.c
-> > +++ b/fs/ksmbd/smb2pdu.c
-> > @@ -433,7 +433,7 @@ static void init_chained_smb2_rsp(struct ksmbd_work=
- *work)
-> >                 work->compound_pfid =3D KSMBD_NO_FID;
-> >         }
-> >         memset((char *)rsp_hdr + 4, 0, sizeof(struct smb2_hdr) + 2);
-> > -       rsp_hdr->ProtocolId =3D rcv_hdr->ProtocolId;
-> > +       rsp_hdr->ProtocolId =3D SMB2_PROTO_NUMBER;
-> >         rsp_hdr->StructureSize =3D SMB2_HEADER_STRUCTURE_SIZE;
-> >         rsp_hdr->Command =3D rcv_hdr->Command;
-> >
-> > diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
-> > index da17b21ac685..ace8a1b02c81 100644
-> > --- a/fs/ksmbd/smb_common.c
-> > +++ b/fs/ksmbd/smb_common.c
-> > @@ -129,16 +129,22 @@ int ksmbd_lookup_protocol_idx(char *str)
-> >   *
-> >   * check for valid smb signature and packet direction(request/response=
+> Am 22.09.21 um 00:51 schrieb Namjae Jeon:
+>> This patch add validation to check request buffer check in smb2
+>> negotiate.
+>>
+>> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+>> Cc: Ralph B=C3=B6hme <slow@samba.org>
+>> Cc: Steve French <smfrench@gmail.com>
+>> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+>> ---
+>>   fs/ksmbd/smb2pdu.c    | 41 ++++++++++++++++++++++++++++++++++++++++-
+>>   fs/ksmbd/smb_common.c | 22 ++++++++++++++++++++--
+>>   2 files changed, 60 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+>> index baf7ce31d557..1fe37ad4e5bc 100644
+>> --- a/fs/ksmbd/smb2pdu.c
+>> +++ b/fs/ksmbd/smb2pdu.c
+>> @@ -1071,7 +1071,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+>>   	struct ksmbd_conn *conn =3D work->conn;
+>>   	struct smb2_negotiate_req *req =3D work->request_buf;
+>>   	struct smb2_negotiate_rsp *rsp =3D work->response_buf;
+>> -	int rc =3D 0;
+>> +	int rc =3D 0, smb2_buf_len, smb2_neg_size;
+>
+> I guess all len variables should use unsigned types to facilitate well
+> defined overflow checks.
+As Ronnie pointed out, if checking max stream size, will be no problem.
+I'll fix it though.
+>
+>>   	__le32 status;
+>>
+>>   	ksmbd_debug(SMB, "Received negotiate request\n");
+>> @@ -1089,6 +1089,45 @@ int smb2_handle_negotiate(struct ksmbd_work *work=
 )
-> >   *
-> > - * Return:      0 on success, otherwise 1
-> > + * Return:      0 on success, otherwise -EINVAL
-> >   */
-> >  int ksmbd_verify_smb_message(struct ksmbd_work *work)
-> >  {
-> > -       struct smb2_hdr *smb2_hdr =3D work->request_buf;
-> > +       struct smb2_hdr *smb2_hdr =3D work->request_buf + work->next_sm=
-b2_rcv_hdr_off;
-> > +       struct smb_hdr *hdr;
-> >
-> >         if (smb2_hdr->ProtocolId =3D=3D SMB2_PROTO_NUMBER)
-> >                 return ksmbd_smb2_check_message(work);
-> >
-> > -       return 0;
-> > +       hdr =3D work->request_buf;
-> > +       if (*(__le32 *)hdr->Protocol =3D=3D SMB1_PROTO_NUMBER &&
-> > +           hdr->Command =3D=3D SMB_COM_NEGOTIATE)
-> > +               return 0;
-> > +
-> > +       return -EINVAL;
-> >  }
-> >
-> >  /**
-> > @@ -270,7 +276,6 @@ static int ksmbd_negotiate_smb_dialect(void *buf)
-> >         return BAD_PROT_ID;
-> >  }
-> >
-> > -#define SMB_COM_NEGOTIATE      0x72
-> >  int ksmbd_init_smb_server(struct ksmbd_work *work)
-> >  {
-> >         struct ksmbd_conn *conn =3D work->conn;
-> > diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
-> > index d7df19c97c4c..994abede27e9 100644
-> > --- a/fs/ksmbd/smb_common.h
-> > +++ b/fs/ksmbd/smb_common.h
-> > @@ -202,6 +202,7 @@
-> >                 FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES)
-> >
-> >  #define SMB1_PROTO_NUMBER              cpu_to_le32(0x424d53ff)
-> > +#define SMB_COM_NEGOTIATE              0x72
-> >
-> >  #define SMB1_CLIENT_GUID_SIZE          (16)
-> >  struct smb_hdr {
-> > --
-> > 2.25.1
-> >
-
-
-
---=20
-Thanks,
-
-Steve
+>>   		goto err_out;
+>>   	}
+>>
+>> +	smb2_buf_len =3D get_rfc1002_len(work->request_buf);
+>> +	smb2_neg_size =3D offsetof(struct smb2_negotiate_req, Dialects) - 4;
+>> +	if (conn->dialect =3D=3D SMB311_PROT_ID) {
+>> +		int nego_ctxt_off =3D le32_to_cpu(req->NegotiateContextOffset);
+>> +		int nego_ctxt_count =3D le16_to_cpu(req->NegotiateContextCount);
+>> +
+>> +		if (smb2_buf_len < nego_ctxt_off + nego_ctxt_count) {
+>
+> overflow check needed for 32 bit arch?
+Okay, will fix it on v3.
+Thanks!
+>
+>> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
+>> +			rc =3D -EINVAL;
+>> +			goto err_out;
+>> +		}
+>> +
+>> +		if (smb2_neg_size > nego_ctxt_off) {
+>> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
+>> +			rc =3D -EINVAL;
+>> +			goto err_out;
+>> +		}
+>> +
+>> +		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
+>> +		    nego_ctxt_off) {
+>> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
+>> +			rc =3D -EINVAL;
+>> +			goto err_out;
+>> +		}
+>> +	} else {
+>> +		if (smb2_neg_size > smb2_buf_len) {
+>> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
+>> +			rc =3D -EINVAL;
+>> +			goto err_out;
+>> +		}
+>> +
+>> +		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
+>> +		    smb2_buf_len) {
+>> +			rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
+>> +			rc =3D -EINVAL;
+>> +			goto err_out;
+>> +		}
+>> +	}
+>> +
+>>   	conn->cli_cap =3D le32_to_cpu(req->Capabilities);
+>>   	switch (conn->dialect) {
+>>   	case SMB311_PROT_ID:
+>> diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
+>> index 1da67217698d..da17b21ac685 100644
+>> --- a/fs/ksmbd/smb_common.c
+>> +++ b/fs/ksmbd/smb_common.c
+>> @@ -229,13 +229,22 @@ int ksmbd_lookup_dialect_by_id(__le16 *cli_dialect=
+s,
+>> __le16 dialects_count)
+>>
+>>   static int ksmbd_negotiate_smb_dialect(void *buf)
+>>   {
+>> -	__le32 proto;
+>> +	int smb_buf_length =3D get_rfc1002_len(buf);
+>
+> unsigned
+>
+> Thanks!
+> -slow
+>
+> --
+> Ralph Boehme, Samba Team                 https://samba.org/
+> SerNet Samba Team Lead      https://sernet.de/en/team-samba
+>
+>
