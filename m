@@ -2,56 +2,65 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F13BC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 03:40:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07309C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 03:48:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7836861178
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 03:40:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D95C8604DA
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 03:48:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230490AbhIVDlv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Sep 2021 23:41:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41774 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230054AbhIVDlu (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 21 Sep 2021 23:41:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3F2B6611C9
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 03:40:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632282021;
-        bh=5qdfUbzU/D83juDcA8dR0S2UGoReYJi4LWDJJGn6G/I=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=fhEx2rBKm5RmdZvKBMhFSVfla+IFTkkRhk5D/k8aR07wl7KiIyLR/kFArA+ShqJLv
-         RG2/nrjqRm1gQ7rU/N1+wF9qbez/JKdCj428FpUByHDHFxWf+M1I5vgF9fYZRqFeHS
-         BEiRBbWHDfmgTXidkGoK56bAKn44WBZAKWuyp/SSUzQHzW37qG+yxJZqMtKYNmZ9jU
-         FrpDeIRCE6XkEdO6itx0yo621YDQhAxmtXyvf8zat1Gyr8wC35CcGP4pT0bIPRmG+S
-         NoRqPJRCzW0TFCK2ULuLGibXQPDkxvojH1EBWegwq1n0Pb3z0aSi7B8kR/ZmvXNWUI
-         Cb66FLggJ0+bQ==
-Received: by mail-ot1-f45.google.com with SMTP id l7-20020a0568302b0700b0051c0181deebso1545768otv.12
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 20:40:21 -0700 (PDT)
-X-Gm-Message-State: AOAM533aGyEpe5i0P91TR2j3jRwMleOA772h3yT3OX6x+CW77VykgYju
-        3htGM4jKQXV77ljiBL0ILVG9UTslmggAe+T45Ms=
-X-Google-Smtp-Source: ABdhPJz3jiQZ1MIk+ZDvC/JQ/Jy1MW7yvucaBaSVPuyNlxlgF4k6dMk8v0Dc2W0KbmjhXHMdYfMRftV4XmAelF9Pzck=
-X-Received: by 2002:a05:6830:2050:: with SMTP id f16mr5217840otp.185.1632282020600;
- Tue, 21 Sep 2021 20:40:20 -0700 (PDT)
+        id S231169AbhIVDtu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Sep 2021 23:49:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49838 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230054AbhIVDtu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Sep 2021 23:49:50 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E922C061574
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 20:48:20 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id co2so4442970edb.8
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Sep 2021 20:48:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=oKzTNeGhzL0PZsXgVAG7GbBGf5TCYBdNSN8rnmTpKsw=;
+        b=Uzcitn2OUKpBs0C5iMVQWtbSQgGqNLHv2MosKTo8wN88OGEkmrOH3lP85VgMDDHM4I
+         W6dSr0MEGNwTmWH2f995e24coIiLwHSCLqVH3bbowyk5i3zAGNbfsivmBCz/DfTn3JKo
+         bkijmj9tYzFV+OuCCrtB4H/3jqBG6ry9h8CIuTY8OYhHhAGLBz6oTgmpezCgQJJVQ7BJ
+         iSTNS/5VIXRibHlWQDQ5omKVukjD4h6240aeVDt5gbiisU8FxiCx+T2xgV9foREoIwMU
+         ilg/VE9SRJ2GKs7TwpNtrCuIBkXNvd+PnD1CAQuPkqykPX2Hg0jnlbbXfa/Yc1nCXkCl
+         DebA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=oKzTNeGhzL0PZsXgVAG7GbBGf5TCYBdNSN8rnmTpKsw=;
+        b=3vo91RmJBLiqtR7bfEJIfWfV3rvm5dPZQVLCYKYAMT24f6/drXPQ1DS8dSsbRILPpG
+         KFcuCUbnUaKypmBQDcM6GmO1VIKjpoOS25kTqc1YniMRrOGSeD9dWZCY+OjMFu+OTg4N
+         gB0vH2vOMkNgrQ3G7TK09bTvXJlGy6B7RG+HnysgQWofPbD8qFIzmlYbubwm8wRSt8ZD
+         S4q0OJCbt7M78PzlhBlFX+bo7GsjIiPFcgBOlgVSf/kzkGu6YKfHNec82mMWl1QV7RR2
+         XaQ2kVl5FQ2CmYim/8RyYSZRdxyEsYI114wSWaLmMZVkwEJuKkgtiBWaAjIWPgDYgGVc
+         fL+w==
+X-Gm-Message-State: AOAM531s9eToMf+/T1kTcTPwKWDlNWo44duH+yVcp8Nva7p7nG7P15V4
+        BA0qMnESYydCiuzIbh7rZZVpQZwfGlvnald92QbvkcDw
+X-Google-Smtp-Source: ABdhPJwhNYHsxc17BAuZ/Dpc+tm/KHlwnNd3oeFpB6xj/1HpOAn3WzfZxGTFhv0wTQFJJspJGNS7OvhZYbITVyuqt7M=
+X-Received: by 2002:a17:906:49d5:: with SMTP id w21mr38929068ejv.30.1632282499237;
+ Tue, 21 Sep 2021 20:48:19 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Tue, 21 Sep 2021 20:40:20
- -0700 (PDT)
-In-Reply-To: <CAKYAXd-FLBQ9hTmP6xPi2zNveD4nj3UNKPvGKHfGvba+11Kzqg@mail.gmail.com>
-References: <20210919021315.642856-1-linkinjeon@kernel.org>
- <890f7c14-b0b9-12e1-8d2e-e1ca5fb9c2d5@talpey.com> <CAKYAXd-FLBQ9hTmP6xPi2zNveD4nj3UNKPvGKHfGvba+11Kzqg@mail.gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 22 Sep 2021 12:40:20 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8z7w_E7hCqhrCQnjdfPc_cx5apQkZfWjhaE3L3i3rDhA@mail.gmail.com>
-Message-ID: <CAKYAXd8z7w_E7hCqhrCQnjdfPc_cx5apQkZfWjhaE3L3i3rDhA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] ksmbd: add request buffer validation in smb2_set_info
-To:     Tom Talpey <tom@talpey.com>
-Cc:     linux-cifs@vger.kernel.org,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+References: <20210922022811.654412-1-linkinjeon@kernel.org>
+In-Reply-To: <20210922022811.654412-1-linkinjeon@kernel.org>
+From:   ronnie sahlberg <ronniesahlberg@gmail.com>
+Date:   Wed, 22 Sep 2021 13:48:07 +1000
+Message-ID: <CAN05THQGvRqAsej02b6uje8duTAoOv_tdnT9dLHyWg1pDrsXJA@mail.gmail.com>
+Subject: Re: [PATCH v3] ksmbd: add validation in smb2_ioctl
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
         =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
         Steve French <smfrench@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -60,356 +69,313 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-09-22 11:31 GMT+09:00, Namjae Jeon <linkinjeon@kernel.org>:
-> 2021-09-21 23:23 GMT+09:00, Tom Talpey <tom@talpey.com>:
->> On 9/18/2021 10:13 PM, Namjae Jeon wrote:
->>> Add buffer validation in smb2_set_info.
->>>
->>> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
->>> Cc: Ralph B=C3=B6hme <slow@samba.org>
->>> Cc: Steve French <smfrench@gmail.com>
->>> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->>> ---
->>>   fs/ksmbd/smb2pdu.c | 113 +++++++++++++++++++++++++++++++++++---------=
--
->>>   fs/ksmbd/smb2pdu.h |   9 ++++
->>>   2 files changed, 97 insertions(+), 25 deletions(-)
->>>
->>> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
->>> index 46e0275a77a8..7763f69e1ae8 100644
->>> --- a/fs/ksmbd/smb2pdu.c
->>> +++ b/fs/ksmbd/smb2pdu.c
->>> @@ -2107,17 +2107,23 @@ static noinline int create_smb2_pipe(struct
->>> ksmbd_work *work)
->>>    * smb2_set_ea() - handler for setting extended attributes using set
->>>    *		info command
->>>    * @eabuf:	set info command buffer
->>> + * @buf_len:	set info command buffer length
->>>    * @path:	dentry path for get ea
->>>    *
->>>    * Return:	0 on success, otherwise error
->>>    */
->>> -static int smb2_set_ea(struct smb2_ea_info *eabuf, struct path *path)
->>> +static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int
->>> buf_len,
->>> +		       struct path *path)
->>>   {
->>>   	struct user_namespace *user_ns =3D mnt_user_ns(path->mnt);
->>>   	char *attr_name =3D NULL, *value;
->>>   	int rc =3D 0;
->>>   	int next =3D 0;
->>>
->>> +	if (buf_len < sizeof(struct smb2_ea_info) + eabuf->EaNameLength +
->>> +			le16_to_cpu(eabuf->EaValueLength))
->>> +		return -EINVAL;
->>
->> How certain is it that EaNameLength and EaValueLength are sane? One
->> might imagine a forged packet with various combinations of invalid
->> values, which arithmetically satisfy the above check...
-> Sorry, I didn't fully understand what you pointed out. Could you
-> please elaborate more ?
+I hope I look at the right patches/branches, appologies if not.
 
-Maybe, You are saying we need the below check?
-@@ -2577,6 +2581,12 @@ int smb2_open(struct ksmbd_work *work)
- 			goto err_out1;
- 		} else if (context) {
- 			ea_buf =3D (struct create_ea_buf_req *)context;
-+			if (le16_to_cpu(context->DataOffset) +
-+			    le32_to_cpu(context->DataLength) <
-+			    sizeof(struct create_ea_buf_req)) {
-+				rc =3D -EINVAL;
-+				goto err_out1;
-+			}
+Do you have a branch where you have all these patches applied?
 
-This check is in create context patch.
-(https://marc.info/?l=3Dlinux-cifs&m=3D163227401430586&w=3D2)
+On Wed, Sep 22, 2021 at 12:28 PM Namjae Jeon <linkinjeon@kernel.org> wrote:
 >
->>
->>> +
->>>   	attr_name =3D kmalloc(XATTR_NAME_MAX + 1, GFP_KERNEL);
->>>   	if (!attr_name)
->>>   		return -ENOMEM;
->>> @@ -2181,7 +2187,13 @@ static int smb2_set_ea(struct smb2_ea_info
->>> *eabuf,
->>> struct path *path)
->>>
->>>   next:
->>>   		next =3D le32_to_cpu(eabuf->NextEntryOffset);
->>> +		if (next =3D=3D 0 || buf_len < next)
->>> +			break;
->>> +		buf_len -=3D next;
->>
->> Because buf_len is unsigned int and next is signed int, these compares
->> are risky. I think "next" should also be unsigned, but if not, testing
->> it for negative values before these checks is important.
->>
->> In the many changes below, buf_len is passed in as signed. Those should
->> be consistent with the same criteria. It pays to be paranoid everywhere!
-> Okay, I will update it on next version.
->>
->> Tom.
->>
->>>   		eabuf =3D (struct smb2_ea_info *)((char *)eabuf + next);
->>> +		if (next < eabuf->EaNameLength + le16_to_cpu(eabuf->EaValueLength))
->>> +			break;
->>> +
->>>   	} while (next !=3D 0);
->>>
->>>   	kfree(attr_name);
->>> @@ -2790,7 +2802,9 @@ int smb2_open(struct ksmbd_work *work)
->>>   		created =3D true;
->>>   		user_ns =3D mnt_user_ns(path.mnt);
->>>   		if (ea_buf) {
->>> -			rc =3D smb2_set_ea(&ea_buf->ea, &path);
->>> +			rc =3D smb2_set_ea(&ea_buf->ea,
->>> +					 le32_to_cpu(ea_buf->ccontext.DataLength),
->>> +					 &path);
->>
->> Again, is DataLength verified?
-> This field is checked by create context validation patch.
-> See: https://marc.info/?l=3Dlinux-cifs&m=3D163227401430586&w=3D2
->>
->>>   			if (rc =3D=3D -EOPNOTSUPP)
->>>   				rc =3D 0;
->>>   			else if (rc)
->>> @@ -5375,7 +5389,7 @@ static int smb2_rename(struct ksmbd_work *work,
->>>   static int smb2_create_link(struct ksmbd_work *work,
->>>   			    struct ksmbd_share_config *share,
->>>   			    struct smb2_file_link_info *file_info,
->>> -			    struct file *filp,
->>> +			    int buf_len, struct file *filp,
->>>   			    struct nls_table *local_nls)
->>>   {
->>>   	char *link_name =3D NULL, *target_name =3D NULL, *pathname =3D NULL;
->>> @@ -5383,6 +5397,10 @@ static int smb2_create_link(struct ksmbd_work
->>> *work,
->>>   	bool file_present =3D true;
->>>   	int rc;
->>>
->>> +	if (buf_len < sizeof(struct smb2_file_link_info) +
->>> +			le32_to_cpu(file_info->FileNameLength))
->>> +		return -EINVAL;
->>> +
->>>   	ksmbd_debug(SMB, "setting FILE_LINK_INFORMATION\n");
->>>   	pathname =3D kmalloc(PATH_MAX, GFP_KERNEL);
->>>   	if (!pathname)
->>> @@ -5442,7 +5460,7 @@ static int smb2_create_link(struct ksmbd_work
->>> *work,
->>>   static int set_file_basic_info(struct ksmbd_file *fp, char *buf,
->>>   			       struct ksmbd_share_config *share)
->>>   {
->>> -	struct smb2_file_all_info *file_info;
->>> +	struct smb2_file_basic_info *file_info;
->>>   	struct iattr attrs;
->>>   	struct timespec64 ctime;
->>>   	struct file *filp;
->>> @@ -5453,7 +5471,7 @@ static int set_file_basic_info(struct ksmbd_file
->>> *fp, char *buf,
->>>   	if (!(fp->daccess & FILE_WRITE_ATTRIBUTES_LE))
->>>   		return -EACCES;
->>>
->>> -	file_info =3D (struct smb2_file_all_info *)buf;
->>> +	file_info =3D (struct smb2_file_basic_info *)buf;
->>>   	attrs.ia_valid =3D 0;
->>>   	filp =3D fp->filp;
->>>   	inode =3D file_inode(filp);
->>> @@ -5619,7 +5637,8 @@ static int set_end_of_file_info(struct ksmbd_work
->>> *work, struct ksmbd_file *fp,
->>>   }
->>>
->>>   static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file
->>> *fp,
->>> -			   char *buf)
->>> +			   struct smb2_file_rename_info *rename_info,
->>> +			   int buf_len)
->>>   {
->>>   	struct user_namespace *user_ns;
->>>   	struct ksmbd_file *parent_fp;
->>> @@ -5632,6 +5651,10 @@ static int set_rename_info(struct ksmbd_work
->>> *work,
->>> struct ksmbd_file *fp,
->>>   		return -EACCES;
->>>   	}
->>>
->>> +	if (buf_len < sizeof(struct smb2_file_rename_info) +
->>> +			le32_to_cpu(rename_info->FileNameLength))
->>> +		return -EINVAL;
->>> +
->>>   	user_ns =3D file_mnt_user_ns(fp->filp);
->>>   	if (ksmbd_stream_fd(fp))
->>>   		goto next;
->>> @@ -5654,8 +5677,7 @@ static int set_rename_info(struct ksmbd_work
->>> *work,
->>> struct ksmbd_file *fp,
->>>   		}
->>>   	}
->>>   next:
->>> -	return smb2_rename(work, fp, user_ns,
->>> -			   (struct smb2_file_rename_info *)buf,
->>> +	return smb2_rename(work, fp, user_ns, rename_info,
->>>   			   work->sess->conn->local_nls);
->>>   }
->>>
->>> @@ -5741,40 +5763,71 @@ static int set_file_mode_info(struct ksmbd_file
->>> *fp, char *buf)
->>>    * TODO: need to implement an error handling for
->>> STATUS_INFO_LENGTH_MISMATCH
->>>    */
->>>   static int smb2_set_info_file(struct ksmbd_work *work, struct
->>> ksmbd_file
->>> *fp,
->>> -			      int info_class, char *buf,
->>> +			      struct smb2_set_info_req *req,
->>>   			      struct ksmbd_share_config *share)
->>>   {
->>> -	switch (info_class) {
->>> +	int buf_len =3D le32_to_cpu(req->BufferLength);
->>> +
->>> +	switch (req->FileInfoClass) {
->>>   	case FILE_BASIC_INFORMATION:
->>> -		return set_file_basic_info(fp, buf, share);
->>> +	{
->>> +		if (buf_len < sizeof(struct smb2_file_basic_info))
->>> +			return -EINVAL;
->>>
->>> +		return set_file_basic_info(fp, req->Buffer, share);
->>> +	}
->>>   	case FILE_ALLOCATION_INFORMATION:
->>> -		return set_file_allocation_info(work, fp, buf);
->>> +	{
->>> +		if (buf_len < sizeof(struct smb2_file_alloc_info))
->>> +			return -EINVAL;
->>>
->>> +		return set_file_allocation_info(work, fp, req->Buffer);
->>> +	}
->>>   	case FILE_END_OF_FILE_INFORMATION:
->>> -		return set_end_of_file_info(work, fp, buf);
->>> +	{
->>> +		if (buf_len < sizeof(struct smb2_file_eof_info))
->>> +			return -EINVAL;
->>>
->>> +		return set_end_of_file_info(work, fp, req->Buffer);
->>> +	}
->>>   	case FILE_RENAME_INFORMATION:
->>> +	{
->>>   		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)=
-)
->>> {
->>>   			ksmbd_debug(SMB,
->>>   				    "User does not have write permission\n");
->>>   			return -EACCES;
->>>   		}
->>> -		return set_rename_info(work, fp, buf);
->>>
->>> +		if (buf_len < sizeof(struct smb2_file_rename_info))
->>> +			return -EINVAL;
->>> +
->>> +		return set_rename_info(work, fp,
->>> +				       (struct smb2_file_rename_info *)req->Buffer,
->>> +				       buf_len);
->>> +	}
->>>   	case FILE_LINK_INFORMATION:
->>> +	{
->>> +		if (buf_len < sizeof(struct smb2_file_link_info))
->>> +			return -EINVAL;
->>> +
->>>   		return smb2_create_link(work, work->tcon->share_conf,
->>> -					(struct smb2_file_link_info *)buf, fp->filp,
->>> +					(struct smb2_file_link_info *)req->Buffer,
->>> +					buf_len, fp->filp,
->>>   					work->sess->conn->local_nls);
->>> -
->>> +	}
->>>   	case FILE_DISPOSITION_INFORMATION:
->>> +	{
->>>   		if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)=
-)
->>> {
->>>   			ksmbd_debug(SMB,
->>>   				    "User does not have write permission\n");
->>>   			return -EACCES;
->>>   		}
->>> -		return set_file_disposition_info(fp, buf);
->>>
->>> +		if (buf_len < sizeof(struct smb2_file_disposition_info))
->>> +			return -EINVAL;
->>> +
->>> +		return set_file_disposition_info(fp, req->Buffer);
->>> +	}
->>>   	case FILE_FULL_EA_INFORMATION:
->>>   	{
->>>   		if (!(fp->daccess & FILE_WRITE_EA_LE)) {
->>> @@ -5783,18 +5836,29 @@ static int smb2_set_info_file(struct ksmbd_work
->>> *work, struct ksmbd_file *fp,
->>>   			return -EACCES;
->>>   		}
->>>
->>> -		return smb2_set_ea((struct smb2_ea_info *)buf,
->>> -				   &fp->filp->f_path);
->>> -	}
->>> +		if (buf_len < sizeof(struct smb2_ea_info))
->>> +			return -EINVAL;
->>>
->>> +		return smb2_set_ea((struct smb2_ea_info *)req->Buffer,
->>> +				   buf_len, &fp->filp->f_path);
->>> +	}
->>>   	case FILE_POSITION_INFORMATION:
->>> -		return set_file_position_info(fp, buf);
->>> +	{
->>> +		if (buf_len < sizeof(struct smb2_file_pos_info))
->>> +			return -EINVAL;
->>>
->>> +		return set_file_position_info(fp, req->Buffer);
->>> +	}
->>>   	case FILE_MODE_INFORMATION:
->>> -		return set_file_mode_info(fp, buf);
->>> +	{
->>> +		if (buf_len < sizeof(struct smb2_file_mode_info))
->>> +			return -EINVAL;
->>> +
->>> +		return set_file_mode_info(fp, req->Buffer);
->>> +	}
->>>   	}
->>>
->>> -	pr_err("Unimplemented Fileinfoclass :%d\n", info_class);
->>> +	pr_err("Unimplemented Fileinfoclass :%d\n", req->FileInfoClass);
->>>   	return -EOPNOTSUPP;
->>>   }
->>>
->>> @@ -5855,8 +5919,7 @@ int smb2_set_info(struct ksmbd_work *work)
->>>   	switch (req->InfoType) {
->>>   	case SMB2_O_INFO_FILE:
->>>   		ksmbd_debug(SMB, "GOT SMB2_O_INFO_FILE\n");
->>> -		rc =3D smb2_set_info_file(work, fp, req->FileInfoClass,
->>> -					req->Buffer, work->tcon->share_conf);
->>> +		rc =3D smb2_set_info_file(work, fp, req, work->tcon->share_conf);
->>>   		break;
->>>   	case SMB2_O_INFO_SECURITY:
->>>   		ksmbd_debug(SMB, "GOT SMB2_O_INFO_SECURITY\n");
->>> diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
->>> index bcec845b03f3..261825d06391 100644
->>> --- a/fs/ksmbd/smb2pdu.h
->>> +++ b/fs/ksmbd/smb2pdu.h
->>> @@ -1464,6 +1464,15 @@ struct smb2_file_all_info { /* data block
->>> encoding
->>> of response to level 18 */
->>>   	char   FileName[1];
->>>   } __packed; /* level 18 Query */
->>>
->>> +struct smb2_file_basic_info { /* data block encoding of response to
->>> level
->>> 18 */
->>> +	__le64 CreationTime;	/* Beginning of FILE_BASIC_INFO equivalent */
->>> +	__le64 LastAccessTime;
->>> +	__le64 LastWriteTime;
->>> +	__le64 ChangeTime;
->>> +	__le32 Attributes;
->>> +	__u32  Pad1;		/* End of FILE_BASIC_INFO_INFO equivalent */
->>> +} __packed;
->>> +
->>>   struct smb2_file_alt_name_info {
->>>   	__le32 FileNameLength;
->>>   	char FileName[0];
->>>
->>
+> Add validation for request/response buffer size check in smb2_ioctl and
+> fsctl_copychunk() take copychunk_ioctl_req pointer and the other argument=
+s
+> instead of smb2_ioctl_req structure and remove an unused smb2_ioctl_req
+> argument of fsctl_validate_negotiate_info.
+>
+> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> Cc: Ralph B=C3=B6hme <slow@samba.org>
+> Cc: Steve French <smfrench@gmail.com>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  v2:
+>    - fix warning: variable 'ret' is used uninitialized ret.
+>  v3:
+>    - fsctl_copychunk() take copychunk_ioctl_req pointer and the other arg=
+uments
+>      instead of smb2_ioctl_req structure.
+>    - remove an unused smb2_ioctl_req argument of fsctl_validate_negotiate=
+_info.
+>  fs/ksmbd/smb2pdu.c | 87 ++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 68 insertions(+), 19 deletions(-)
+>
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index aaf50f677194..e96491c9ab92 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -6986,24 +6986,26 @@ int smb2_lock(struct ksmbd_work *work)
+>         return err;
+>  }
+>
+> -static int fsctl_copychunk(struct ksmbd_work *work, struct smb2_ioctl_re=
+q *req,
+> +static int fsctl_copychunk(struct ksmbd_work *work,
+> +                          struct copychunk_ioctl_req *ci_req,
+> +                          unsigned int cnt_code,
+> +                          unsigned int input_count,
+> +                          unsigned long long volatile_id,
+> +                          unsigned long long persistent_id,
+>                            struct smb2_ioctl_rsp *rsp)
+>  {
+> -       struct copychunk_ioctl_req *ci_req;
+>         struct copychunk_ioctl_rsp *ci_rsp;
+>         struct ksmbd_file *src_fp =3D NULL, *dst_fp =3D NULL;
+>         struct srv_copychunk *chunks;
+>         unsigned int i, chunk_count, chunk_count_written =3D 0;
+>         unsigned int chunk_size_written =3D 0;
+>         loff_t total_size_written =3D 0;
+> -       int ret, cnt_code;
+> +       int ret =3D 0;
+>
+> -       cnt_code =3D le32_to_cpu(req->CntCode);
+> -       ci_req =3D (struct copychunk_ioctl_req *)&req->Buffer[0];
+>         ci_rsp =3D (struct copychunk_ioctl_rsp *)&rsp->Buffer[0];
+>
+> -       rsp->VolatileFileId =3D req->VolatileFileId;
+> -       rsp->PersistentFileId =3D req->PersistentFileId;
+> +       rsp->VolatileFileId =3D cpu_to_le64(volatile_id);
+> +       rsp->PersistentFileId =3D cpu_to_le64(persistent_id);
+>         ci_rsp->ChunksWritten =3D
+>                 cpu_to_le32(ksmbd_server_side_copy_max_chunk_count());
+>         ci_rsp->ChunkBytesWritten =3D
+> @@ -7013,12 +7015,13 @@ static int fsctl_copychunk(struct ksmbd_work *wor=
+k, struct smb2_ioctl_req *req,
+>
+>         chunks =3D (struct srv_copychunk *)&ci_req->Chunks[0];
+>         chunk_count =3D le32_to_cpu(ci_req->ChunkCount);
+> +       if (chunk_count =3D=3D 0)
+> +               goto out;
+>         total_size_written =3D 0;
+>
+>         /* verify the SRV_COPYCHUNK_COPY packet */
+>         if (chunk_count > ksmbd_server_side_copy_max_chunk_count() ||
+> -           le32_to_cpu(req->InputCount) <
+> -            offsetof(struct copychunk_ioctl_req, Chunks) +
+> +           input_count < offsetof(struct copychunk_ioctl_req, Chunks) +
+>              chunk_count * sizeof(struct srv_copychunk)) {
+>                 rsp->hdr.Status =3D STATUS_INVALID_PARAMETER;
+>                 return -EINVAL;
+> @@ -7039,9 +7042,7 @@ static int fsctl_copychunk(struct ksmbd_work *work,=
+ struct smb2_ioctl_req *req,
+>
+>         src_fp =3D ksmbd_lookup_foreign_fd(work,
+>                                          le64_to_cpu(ci_req->ResumeKey[0]=
+));
+> -       dst_fp =3D ksmbd_lookup_fd_slow(work,
+> -                                     le64_to_cpu(req->VolatileFileId),
+> -                                     le64_to_cpu(req->PersistentFileId))=
+;
+> +       dst_fp =3D ksmbd_lookup_fd_slow(work, volatile_id, persistent_id)=
+;
+>         ret =3D -EINVAL;
+>         if (!src_fp ||
+>             src_fp->persistent_id !=3D le64_to_cpu(ci_req->ResumeKey[1]))=
+ {
+> @@ -7116,8 +7117,8 @@ static __be32 idev_ipv4_address(struct in_device *i=
+dev)
+>  }
+>
+>  static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+> -                                       struct smb2_ioctl_req *req,
+> -                                       struct smb2_ioctl_rsp *rsp)
+> +                                       struct smb2_ioctl_rsp *rsp,
+> +                                       int out_buf_len)
+>  {
+>         struct network_interface_info_ioctl_rsp *nii_rsp =3D NULL;
+>         int nbytes =3D 0;
+> @@ -7200,6 +7201,8 @@ static int fsctl_query_iface_info_ioctl(struct ksmb=
+d_conn *conn,
+>                         sockaddr_storage->addr6.ScopeId =3D 0;
+>                 }
+>
+> +               if (out_buf_len < sizeof(struct network_interface_info_io=
+ctl_rsp))
+> +                       break;
+>                 nbytes +=3D sizeof(struct network_interface_info_ioctl_rs=
+p);
+>         }
+>         rtnl_unlock();
+> @@ -7220,11 +7223,16 @@ static int fsctl_query_iface_info_ioctl(struct ks=
+mbd_conn *conn,
+>
+>  static int fsctl_validate_negotiate_info(struct ksmbd_conn *conn,
+>                                          struct validate_negotiate_info_r=
+eq *neg_req,
+> -                                        struct validate_negotiate_info_r=
+sp *neg_rsp)
+> +                                        struct validate_negotiate_info_r=
+sp *neg_rsp,
+> +                                        int in_buf_len)
+>  {
+>         int ret =3D 0;
+>         int dialect;
+>
+> +       if (in_buf_len < sizeof(struct validate_negotiate_info_req) +
+> +                       le16_to_cpu(neg_req->DialectCount) * sizeof(__le1=
+6))
+> +               return -EINVAL;
+> +
+>         dialect =3D ksmbd_lookup_dialect_by_id(neg_req->Dialects,
+>                                              neg_req->DialectCount);
+>         if (dialect =3D=3D BAD_PROT_ID || dialect !=3D conn->dialect) {
+> @@ -7400,7 +7408,7 @@ int smb2_ioctl(struct ksmbd_work *work)
+>         struct smb2_ioctl_req *req;
+>         struct smb2_ioctl_rsp *rsp, *rsp_org;
+>         int cnt_code, nbytes =3D 0;
+> -       int out_buf_len;
+> +       int out_buf_len, in_buf_len;
+>         u64 id =3D KSMBD_NO_FID;
+>         struct ksmbd_conn *conn =3D work->conn;
+>         int ret =3D 0;
+> @@ -7430,6 +7438,7 @@ int smb2_ioctl(struct ksmbd_work *work)
+>         cnt_code =3D le32_to_cpu(req->CntCode);
+>         out_buf_len =3D le32_to_cpu(req->MaxOutputResponse);
+>         out_buf_len =3D min(KSMBD_IPC_MAX_PAYLOAD, out_buf_len);
+> +       in_buf_len =3D le32_to_cpu(req->InputCount);
+
+Do you check if you have these many bytes remaining in the buffer?
+
+Also earlier in this function, where you assign req.
+If this is not a component in a compound, then you assign req =3D
+work->request_buf
+which starts with 4 bytes for the length and the smb2_hdr starts at
+offset 4, right?
+
+But if the ioctl is inside a compound, you assign req =3D ksmbd_req_buf_nex=
+t()
+which just returns the offset to wherever NextCommand is?
+There are two problems here.
+Now req points to something where teh smb2 header starts at offset 0
+instead of 4.
+I unfortunately do not have any code to create Create/Ioctl/Close
+compounds to test this,
+but it looks like this is a problem.
+
+The second is that there is no check I can see that we validate that
+req now points to valid data,
+which means that when we dereference req just a few lines later
+(req->VolatileFileId)
+we might read random data beyond the end of request_buf   or we might oops.
+
+
+The same might be an issue in other functions as well.
+
+
+>
+>         switch (cnt_code) {
+>         case FSCTL_DFS_GET_REFERRALS:
+> @@ -7465,9 +7474,16 @@ int smb2_ioctl(struct ksmbd_work *work)
+>                         goto out;
+>                 }
+>
+> +               if (in_buf_len < sizeof(struct validate_negotiate_info_re=
+q))
+> +                       return -EINVAL;
+> +
+> +               if (out_buf_len < sizeof(struct validate_negotiate_info_r=
+sp))
+> +                       return -EINVAL;
+> +
+>                 ret =3D fsctl_validate_negotiate_info(conn,
+>                         (struct validate_negotiate_info_req *)&req->Buffe=
+r[0],
+> -                       (struct validate_negotiate_info_rsp *)&rsp->Buffe=
+r[0]);
+> +                       (struct validate_negotiate_info_rsp *)&rsp->Buffe=
+r[0],
+> +                       in_buf_len);
+>                 if (ret < 0)
+>                         goto out;
+>
+> @@ -7476,7 +7492,7 @@ int smb2_ioctl(struct ksmbd_work *work)
+>                 rsp->VolatileFileId =3D cpu_to_le64(SMB2_NO_FID);
+>                 break;
+>         case FSCTL_QUERY_NETWORK_INTERFACE_INFO:
+> -               nbytes =3D fsctl_query_iface_info_ioctl(conn, req, rsp);
+> +               nbytes =3D fsctl_query_iface_info_ioctl(conn, rsp, out_bu=
+f_len);
+>                 if (nbytes < 0)
+>                         goto out;
+>                 break;
+> @@ -7503,15 +7519,33 @@ int smb2_ioctl(struct ksmbd_work *work)
+>                         goto out;
+>                 }
+>
+> +               if (in_buf_len < sizeof(struct copychunk_ioctl_req)) {
+> +                       ret =3D -EINVAL;
+> +                       goto out;
+> +               }
+> +
+>                 if (out_buf_len < sizeof(struct copychunk_ioctl_rsp)) {
+>                         ret =3D -EINVAL;
+>                         goto out;
+>                 }
+>
+>                 nbytes =3D sizeof(struct copychunk_ioctl_rsp);
+> -               fsctl_copychunk(work, req, rsp);
+> +               rsp->VolatileFileId =3D req->VolatileFileId;
+> +               rsp->PersistentFileId =3D req->PersistentFileId;
+> +               fsctl_copychunk(work,
+> +                               (struct copychunk_ioctl_req *)&req->Buffe=
+r[0],
+> +                               le32_to_cpu(req->CntCode),
+> +                               le32_to_cpu(req->InputCount),
+> +                               le64_to_cpu(req->VolatileFileId),
+> +                               le64_to_cpu(req->PersistentFileId),
+> +                               rsp);
+>                 break;
+>         case FSCTL_SET_SPARSE:
+> +               if (in_buf_len < sizeof(struct file_sparse)) {
+> +                       ret =3D -EINVAL;
+> +                       goto out;
+> +               }
+> +
+>                 ret =3D fsctl_set_sparse(work, id,
+>                                        (struct file_sparse *)&req->Buffer=
+[0]);
+>                 if (ret < 0)
+> @@ -7530,6 +7564,11 @@ int smb2_ioctl(struct ksmbd_work *work)
+>                         goto out;
+>                 }
+>
+> +               if (in_buf_len < sizeof(struct file_zero_data_information=
+)) {
+> +                       ret =3D -EINVAL;
+> +                       goto out;
+> +               }
+> +
+>                 zero_data =3D
+>                         (struct file_zero_data_information *)&req->Buffer=
+[0];
+>
+> @@ -7549,6 +7588,11 @@ int smb2_ioctl(struct ksmbd_work *work)
+>                 break;
+>         }
+>         case FSCTL_QUERY_ALLOCATED_RANGES:
+> +               if (in_buf_len < sizeof(struct file_allocated_range_buffe=
+r)) {
+> +                       ret =3D -EINVAL;
+> +                       goto out;
+> +               }
+> +
+>                 ret =3D fsctl_query_allocated_ranges(work, id,
+>                         (struct file_allocated_range_buffer *)&req->Buffe=
+r[0],
+>                         (struct file_allocated_range_buffer *)&rsp->Buffe=
+r[0],
+> @@ -7589,6 +7633,11 @@ int smb2_ioctl(struct ksmbd_work *work)
+>                 struct duplicate_extents_to_file *dup_ext;
+>                 loff_t src_off, dst_off, length, cloned;
+>
+> +               if (in_buf_len < sizeof(struct duplicate_extents_to_file)=
+) {
+> +                       ret =3D -EINVAL;
+> +                       goto out;
+> +               }
+> +
+>                 dup_ext =3D (struct duplicate_extents_to_file *)&req->Buf=
+fer[0];
+>
+>                 fp_in =3D ksmbd_lookup_fd_slow(work, dup_ext->VolatileFil=
+eHandle,
+> --
+> 2.25.1
 >
