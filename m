@@ -8,276 +8,177 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BF8C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 21:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76098C433FE
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 22:24:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B606611C4
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 21:39:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DFCC61100
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Sep 2021 22:24:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238066AbhIVVlG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 22 Sep 2021 17:41:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44676 "EHLO
+        id S234970AbhIVWZ4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 22 Sep 2021 18:25:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238014AbhIVVlG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Sep 2021 17:41:06 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C87F8C061574
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 14:39:35 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id v24so15475523eda.3
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 14:39:35 -0700 (PDT)
+        with ESMTP id S232149AbhIVWZz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Sep 2021 18:25:55 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D743C061574
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 15:24:25 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id b20so18238026lfv.3
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 15:24:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xoGOJbrFgiBiYElWZw3E9VNAjHDDlWC93qKpt3jh4Kc=;
-        b=YZ2fVEz9EBq2xKxvDJDkDXr5J6Ksn5GeRbA35FRDG2MjI3vW7za4FIo9I2IAb88Hdi
-         gaexLw9LpUsd01+lbQfO9p15EhNoDx/QKooJ2HmVioXi6UcuPFfQ3Ddmvf3gRvGLOEIC
-         JBAatCFRMHE8o+hfYiYYomN18zp2VPYaItZiJK8FwsoUSKcRwtScFcoj8osBwUdBmI5j
-         Sjvy+P+it1oYXAwBXBDx+KaOp9dtVHE4Qb384m42oraXmjWEFb8NmdphvQWgBbH7khrk
-         4xdxezm1LJZkSKNSESCXrSdmIL+O8TcY27ncmt7oMabrNYiEDo+6ok/ypwPnSD3rVp/D
-         KbjA==
+         :cc:content-transfer-encoding;
+        bh=UN65BtvKlOu33U43G8Ts4qwFvrRO8AL1x20WR4u2wz8=;
+        b=OlG75jz6FL2hYPEe680EIf8r3U/qo2RRIHgV6Y4grdqySVDEiFfoTPA14VRLDxWHLk
+         fOfpdWmq7l5dizGWvm5JikQD0eB7UOG8kmePllsHQGpSzUwcigJSp61IA8YbtfVhrtCH
+         CiQbzf6JofgFph0GdGDsFj7r6cc9dOihlambnUvDH7iqcWVzkp1iqHG4HJK835maH+8b
+         Yl1KnwiJ0mozTJINlzrUj7Xe8SgyHeKnrInRuUPmXsHEcEYrIlwWYHdlFgykWMS7/tzn
+         dhpqWzhKB3F5Ya+m5KMruRFazcIymkoo3gDHW1VEGJBg68KPhQJ/uxqFBTz8Bt5OwA3m
+         TEmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xoGOJbrFgiBiYElWZw3E9VNAjHDDlWC93qKpt3jh4Kc=;
-        b=6+ksN5Gy4XSvBpE2J0DtFqaEBf+KH+UCadYA75af8iNL4KeBUdVse7WEbzVVCYln42
-         PuOgHIAomEiMtIHdbcnhqQbb9yniJbYii+gtBXpVMSP0D2YpU1CMl83CKGcc29ZZkpXm
-         2Ld4mCXlcPoahZRj446IHJCYQaQWhzZ42qbhN60LKSG05WnL3hcvaSwV3fFy3irdToYH
-         uEbUmTCqUpG3+pQb+eZdu7wh1bKYow3Q4BeFHLQJ/hZ746U6tQPHV/7Vfs29Vn3FvHMv
-         riVZkvi+YC/mKzw1RXDUkksCgnO7nroLZMcmeZWL9++i+1TPHOxiP4fA/VzE4bX78GWy
-         GREA==
-X-Gm-Message-State: AOAM532U46xFUKwVQT/FX1RI/6maEVUfFU17S3CIw83BNiAQd5RJRLZU
-        xjaefjS9qh0bn93EjH0TGl2MhVm2kd5X0CYEKXmqpIjP
-X-Google-Smtp-Source: ABdhPJyrn/LiMA54fDYBLRCxMJm3l6/nEnd1Co4AZ6k8Vxf3cbCWfHPNhe32LVa8GtnEvzA4FuH1DFD0pGCWVXBrN/g=
-X-Received: by 2002:aa7:da41:: with SMTP id w1mr1798362eds.344.1632346774373;
- Wed, 22 Sep 2021 14:39:34 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=UN65BtvKlOu33U43G8Ts4qwFvrRO8AL1x20WR4u2wz8=;
+        b=tSQHuS7uqBhlXUXQeBoqkkYhwkDtM8tc3v2o5ltYabDkMM91V/wjQPs2MYQAHod82K
+         Lu3k/AhsK9QMUYYot1ZHmKeR7En0ixEriYaN5BfFLtyN240zGC6a+ijsm6v+iWHw8GMR
+         lSAcaATBNV7oMQIPKo7Kw91mhieq3Rbhfvj4P6aqmfBSirUwiJe/JcxrZgjFSayYTeiV
+         XQpfcF/X6XJLGZa2ctCIqFnOzipNsf4D7rWMG+j4EDdszxQGkvuxwNgpMsZZJyBBbTJA
+         1hFbn6LgFJI8h+dCBMvCr4TEqWtchlbcCl6Zhd6OsxRDWqPRbrkji+2IqmAe4fsaVrtL
+         k3rQ==
+X-Gm-Message-State: AOAM532znqTGGVY9EBE7cXeFt6bJNkkCnLVMwxAQtnTy/L4LTEqHbjCu
+        7kjWasYn6/cFWYJHT7HfKLw/mg3Y2fQDCsn545M=
+X-Google-Smtp-Source: ABdhPJy2/Z8do57x2HQvjYtCqnhzoomNTfI5OeWkB3x41HIwKEi6FEdm3U1VHVTEv5pjZcg9v0FHTF6VPd2TFwTkSFQ=
+X-Received: by 2002:ac2:5467:: with SMTP id e7mr1127444lfn.537.1632349463314;
+ Wed, 22 Sep 2021 15:24:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210922012651.513888-1-hyc.lee@gmail.com> <90804f93-9a51-9562-758f-b63ab71c9f74@samba.org>
-In-Reply-To: <90804f93-9a51-9562-758f-b63ab71c9f74@samba.org>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Thu, 23 Sep 2021 07:39:22 +1000
-Message-ID: <CAN05THTmB=TWLEmSB1so9KnM7zG0D4i3J6NnksXW5=zX+UxQtA@mail.gmail.com>
-Subject: Re: [PATCH v3] ksmbd: add buffer validation for SMB2_CREATE_CONTEXT
-To:     Ralph Boehme <slow@samba.org>
-Cc:     Hyunchul Lee <hyc.lee@gmail.com>,
+References: <20210922120057.45789-1-linkinjeon@kernel.org> <CAN05THQVgu33LmFx5u3xm7MjdJZMYe81-bJEvAVJLPrMkjYYZg@mail.gmail.com>
+In-Reply-To: <CAN05THQVgu33LmFx5u3xm7MjdJZMYe81-bJEvAVJLPrMkjYYZg@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Wed, 22 Sep 2021 17:24:12 -0500
+Message-ID: <CAH2r5mvaDzXeuooUq+_GkR_F5EeSPrt-yUGjPsfR=MVbv6joMw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: check protocol id in ksmbd_verify_smb_message()
+To:     ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         linux-cifs <linux-cifs@vger.kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        Namjae Jeon <linkinjeon@kernel.org>
+        =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Wed, Sep 22, 2021 at 11:08 PM Ralph Boehme <slow@samba.org> wrote:
+added the R-Bs and merged into cifsd-for-next  (current content is
+below, although looks like we could update the "buffer invalidation in
+smb2_set_info" patch)
+
+e6201b4a0bac (HEAD -> cifsd-for-next, origin/cifsd-for-next) ksmbd:
+add request buffer validation in smb2_set_info
+743d886affeb ksmbd: remove follow symlinks support
+3bee78ad0062 ksmbd: fix invalid request buffer access in compound request
+18a015bccf9e ksmbd: check protocol id in ksmbd_verify_smb_message()
+9f6323311c70 ksmbd: add default data stream name in FILE_STREAM_INFORMATION
+e44fd5081c50 ksmbd: log that server is experimental at module load
+
+On Wed, Sep 22, 2021 at 4:33 PM ronnie sahlberg
+<ronniesahlberg@gmail.com> wrote:
 >
-> Hi Hyunchul,
+> reviewed by me
 >
-> patch looks excellent, few more nitpicks below.
->
-> Am 22.09.21 um 03:26 schrieb Hyunchul Lee:
-> > Add buffer validation for SMB2_CREATE_CONTEXT.
+> On Wed, Sep 22, 2021 at 10:01 PM Namjae Jeon <linkinjeon@kernel.org> wrot=
+e:
+> >
+> > When second smb2 pdu has invalid protocol id, ksmbd doesn't detect it
+> > and allow to process smb2 request. This patch add the check it in
+> > ksmbd_verify_smb_message() and don't use protocol id of smb2 request as
+> > protocol id of response.
 > >
 > > Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> > Cc: Ralph Boehme <slow@samba.org>
+> > Cc: Ralph B=C3=B6hme <slow@samba.org>
 > > Cc: Steve French <smfrench@gmail.com>
-> > Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+> > Reported-by: Ronnie Sahlberg <lsahlber@redhat.com>
 > > Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 > > ---
-> > Changes from v2:
-> >   - check struct create_context's fields more in smb2_find_context_vals
-> >     (suggested by Ralph Boehme).
+> >  fs/ksmbd/smb2pdu.c    |  2 +-
+> >  fs/ksmbd/smb_common.c | 13 +++++++++----
+> >  fs/ksmbd/smb_common.h |  1 +
+> >  3 files changed, 11 insertions(+), 5 deletions(-)
 > >
-> >   fs/ksmbd/oplock.c  | 34 ++++++++++++++++++++++++----------
-> >   fs/ksmbd/smb2pdu.c | 25 ++++++++++++++++++++++++-
-> >   fs/ksmbd/smbacl.c  |  9 ++++++++-
-> >   3 files changed, 56 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/fs/ksmbd/oplock.c b/fs/ksmbd/oplock.c
-> > index 16b6236d1bd2..8f743913b1cf 100644
-> > --- a/fs/ksmbd/oplock.c
-> > +++ b/fs/ksmbd/oplock.c
-> > @@ -1451,26 +1451,40 @@ struct lease_ctx_info *parse_lease_state(void *open_req)
-> >    */
-> >   struct create_context *smb2_find_context_vals(void *open_req, const char *tag)
-> >   {
-> > -     char *data_offset;
-> > +     struct smb2_create_req *req = (struct smb2_create_req *)open_req;
-> >       struct create_context *cc;
-> > -     unsigned int next = 0;
-> > +     char *data_offset, *data_end;
-> >       char *name;
-> > -     struct smb2_create_req *req = (struct smb2_create_req *)open_req;
->
-> this line is only moved, not changed. Can we remove this change from the
-> diff?
->
-> > +     unsigned int next = 0;
-> > +     unsigned int name_off, name_len, value_off, value_len;
-> >
-> >       data_offset = (char *)req + 4 + le32_to_cpu(req->CreateContextsOffset);
-> > +     data_end = data_offset + le32_to_cpu(req->CreateContextsLength);
->
-> do we need overflow checks here? At least on 32-bit arch this could
-> easily overflow.
->
-> >       cc = (struct create_context *)data_offset;
-> >       do {
-> > -             int val;
-> > -
-> >               cc = (struct create_context *)((char *)cc + next);
-> > -             name = le16_to_cpu(cc->NameOffset) + (char *)cc;
-> > -             val = le16_to_cpu(cc->NameLength);
-> > -             if (val < 4)
-> > +             if ((char *)cc + offsetof(struct create_context, Buffer) >
-> > +                 data_end)
-> >                       return ERR_PTR(-EINVAL);
-> >
-> > -             if (memcmp(name, tag, val) == 0)
-> > -                     return cc;
-> >               next = le32_to_cpu(cc->Next);
-> > +             name_off = le16_to_cpu(cc->NameOffset);
-> > +             name_len = le16_to_cpu(cc->NameLength);
-> > +             value_off = le16_to_cpu(cc->DataOffset);
-> > +             value_len = le32_to_cpu(cc->DataLength);
->
-> same here: possible overflow checks needed?
->
-> > +
-> > +             if ((next & 0x7) != 0 ||
-> > +                 name_off != 16 ||
-> > +                 name_len < 4 ||
-> > +                 (char *)cc + name_off + name_len > data_end ||
-> > +                 (value_off & 0x7) != 0 ||
-> > +                 (value_off && value_off < name_off + name_len) ||
->
-> I guess this must be
->
->             (value_off && (value_off < name_off + name_len)) ||
->
-> > +                 (char *)cc + value_off + value_len > data_end)
-> > +                     return ERR_PTR(-EINVAL);
-> > +
-> > +             name = (char *)cc + name_off;
-> > +             if (memcmp(name, tag, name_len) == 0)
-> > +                     return cc;
-> >       } while (next != 0);
-> >
-> >       return NULL;
 > > diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> > index c86164dc70bb..976490bfd93c 100644
+> > index 3d250e2539e6..3be1493cb18d 100644
 > > --- a/fs/ksmbd/smb2pdu.c
 > > +++ b/fs/ksmbd/smb2pdu.c
-> > @@ -2377,6 +2377,10 @@ static int smb2_create_sd_buffer(struct ksmbd_work *work,
-> >       ksmbd_debug(SMB,
-> >                   "Set ACLs using SMB2_CREATE_SD_BUFFER context\n");
-> >       sd_buf = (struct create_sd_buf_req *)context;
-> > +     if (le16_to_cpu(context->DataOffset) +
-> > +         le32_to_cpu(context->DataLength) <
-> > +         sizeof(struct create_sd_buf_req))
-> > +             return -EINVAL;
-> >       return set_info_sec(work->conn, work->tcon, path, &sd_buf->ntsd,
-> >                           le32_to_cpu(sd_buf->ccontext.DataLength), true);
-> >   }
-> > @@ -2577,6 +2581,12 @@ int smb2_open(struct ksmbd_work *work)
-> >                       goto err_out1;
-> >               } else if (context) {
-> >                       ea_buf = (struct create_ea_buf_req *)context;
-> > +                     if (le16_to_cpu(context->DataOffset) +
-> > +                         le32_to_cpu(context->DataLength) <
-> > +                         sizeof(struct create_ea_buf_req)) {
-> > +                             rc = -EINVAL;
-> > +                             goto err_out1;
-> > +                     }
-> >                       if (req->CreateOptions & FILE_NO_EA_KNOWLEDGE_LE) {
-> >                               rsp->hdr.Status = STATUS_ACCESS_DENIED;
-> >                               rc = -EACCES;
-> > @@ -2615,6 +2625,12 @@ int smb2_open(struct ksmbd_work *work)
-> >                       } else if (context) {
-> >                               struct create_posix *posix =
-> >                                       (struct create_posix *)context;
-> > +                             if (le16_to_cpu(context->DataOffset) +
-> > +                                 le32_to_cpu(context->DataLength) <
-> > +                                 sizeof(struct create_posix)) {
-> > +                                     rc = -EINVAL;
-> > +                                     goto err_out1;
-> > +                             }
-> >                               ksmbd_debug(SMB, "get posix context\n");
+> > @@ -433,7 +433,7 @@ static void init_chained_smb2_rsp(struct ksmbd_work=
+ *work)
+> >                 work->compound_pfid =3D KSMBD_NO_FID;
+> >         }
+> >         memset((char *)rsp_hdr + 4, 0, sizeof(struct smb2_hdr) + 2);
+> > -       rsp_hdr->ProtocolId =3D rcv_hdr->ProtocolId;
+> > +       rsp_hdr->ProtocolId =3D SMB2_PROTO_NUMBER;
+> >         rsp_hdr->StructureSize =3D SMB2_HEADER_STRUCTURE_SIZE;
+> >         rsp_hdr->Command =3D rcv_hdr->Command;
 > >
-> >                               posix_mode = le32_to_cpu(posix->Mode);
-> > @@ -3019,9 +3035,16 @@ int smb2_open(struct ksmbd_work *work)
-> >                       rc = PTR_ERR(az_req);
-> >                       goto err_out;
-> >               } else if (az_req) {
-> > -                     loff_t alloc_size = le64_to_cpu(az_req->AllocationSize);
-> > +                     loff_t alloc_size;
-> >                       int err;
+> > diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
+> > index da17b21ac685..ace8a1b02c81 100644
+> > --- a/fs/ksmbd/smb_common.c
+> > +++ b/fs/ksmbd/smb_common.c
+> > @@ -129,16 +129,22 @@ int ksmbd_lookup_protocol_idx(char *str)
+> >   *
+> >   * check for valid smb signature and packet direction(request/response=
+)
+> >   *
+> > - * Return:      0 on success, otherwise 1
+> > + * Return:      0 on success, otherwise -EINVAL
+> >   */
+> >  int ksmbd_verify_smb_message(struct ksmbd_work *work)
+> >  {
+> > -       struct smb2_hdr *smb2_hdr =3D work->request_buf;
+> > +       struct smb2_hdr *smb2_hdr =3D work->request_buf + work->next_sm=
+b2_rcv_hdr_off;
+> > +       struct smb_hdr *hdr;
 > >
-> > +                     if (le16_to_cpu(az_req->ccontext.DataOffset) +
-> > +                         le32_to_cpu(az_req->ccontext.DataLength) <
-> > +                         sizeof(struct create_alloc_size_req)) {
-> > +                             rc = -EINVAL;
-> > +                             goto err_out;
-> > +                     }
-> > +                     alloc_size = le64_to_cpu(az_req->AllocationSize);
-> >                       ksmbd_debug(SMB,
-> >                                   "request smb2 create allocate size : %llu\n",
-> >                                   alloc_size);
-> > diff --git a/fs/ksmbd/smbacl.c b/fs/ksmbd/smbacl.c
-> > index 0a95cdec8c80..f67567e1e178 100644
-> > --- a/fs/ksmbd/smbacl.c
-> > +++ b/fs/ksmbd/smbacl.c
-> > @@ -392,7 +392,7 @@ static void parse_dacl(struct user_namespace *user_ns,
-> >               return;
+> >         if (smb2_hdr->ProtocolId =3D=3D SMB2_PROTO_NUMBER)
+> >                 return ksmbd_smb2_check_message(work);
 > >
-> >       /* validate that we do not go past end of acl */
-> > -     if (end_of_acl <= (char *)pdacl ||
-> > +     if (end_of_acl < (char *)pdacl + sizeof(struct smb_acl) ||
-> >           end_of_acl < (char *)pdacl + le16_to_cpu(pdacl->size)) {
-> >               pr_err("ACL too small to parse DACL\n");
-> >               return;
-> > @@ -434,6 +434,10 @@ static void parse_dacl(struct user_namespace *user_ns,
-> >               ppace[i] = (struct smb_ace *)(acl_base + acl_size);
-> >               acl_base = (char *)ppace[i];
-> >               acl_size = le16_to_cpu(ppace[i]->size);
->
-> overflow check needed?
->
+> > -       return 0;
+> > +       hdr =3D work->request_buf;
+> > +       if (*(__le32 *)hdr->Protocol =3D=3D SMB1_PROTO_NUMBER &&
+> > +           hdr->Command =3D=3D SMB_COM_NEGOTIATE)
+> > +               return 0;
 > > +
-> > +             if (acl_base + acl_size > end_of_acl)
-> > +                     break;
-> > +
-> >               ppace[i]->access_req =
-> >                       smb_map_generic_desired_access(ppace[i]->access_req);
+> > +       return -EINVAL;
+> >  }
 > >
-> > @@ -807,6 +811,9 @@ int parse_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
-> >       if (!pntsd)
-> >               return -EIO;
+> >  /**
+> > @@ -270,7 +276,6 @@ static int ksmbd_negotiate_smb_dialect(void *buf)
+> >         return BAD_PROT_ID;
+> >  }
 > >
-> > +     if (acl_len < sizeof(struct smb_ntsd))
-> > +             return -EINVAL;
-> > +
-> >       owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
-> >                       le32_to_cpu(pntsd->osidoffset));
-> >       group_sid_ptr = (struct smb_sid *)((char *)pntsd +
+> > -#define SMB_COM_NEGOTIATE      0x72
+> >  int ksmbd_init_smb_server(struct ksmbd_work *work)
+> >  {
+> >         struct ksmbd_conn *conn =3D work->conn;
+> > diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
+> > index d7df19c97c4c..994abede27e9 100644
+> > --- a/fs/ksmbd/smb_common.h
+> > +++ b/fs/ksmbd/smb_common.h
+> > @@ -202,6 +202,7 @@
+> >                 FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES)
+> >
+> >  #define SMB1_PROTO_NUMBER              cpu_to_le32(0x424d53ff)
+> > +#define SMB_COM_NEGOTIATE              0x72
+> >
+> >  #define SMB1_CLIENT_GUID_SIZE          (16)
+> >  struct smb_hdr {
+> > --
+> > 2.25.1
 > >
 
-Agree with Ralph.
-Overflow checks needs in all these places. But there are several ways
-to do them.
-Note that the maximum stream length is 0x00ffffff  which means that
-every Offset or Length must be
-< 0x01000000
-If you check every single Length and Offset for < 0x01000000   then
-overflow can not happen.
-(well, at least Offset + Length can not overflow)
 
 
->
-> Thanks!
-> -slow
->
-> --
-> Ralph Boehme, Samba Team                 https://samba.org/
-> SerNet Samba Team Lead      https://sernet.de/en/team-samba
->
+--=20
+Thanks,
+
+Steve
