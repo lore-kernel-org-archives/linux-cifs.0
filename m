@@ -6,50 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD441C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 23 Sep 2021 03:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DC9BC433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 23 Sep 2021 03:49:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7E7E6103C
-	for <linux-cifs@archiver.kernel.org>; Thu, 23 Sep 2021 03:49:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E60D6103C
+	for <linux-cifs@archiver.kernel.org>; Thu, 23 Sep 2021 03:49:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239132AbhIWDu7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        id S239171AbhIWDu7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
         Wed, 22 Sep 2021 23:50:59 -0400
-Received: from mail-pg1-f169.google.com ([209.85.215.169]:40494 "EHLO
-        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239274AbhIWDuo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Sep 2021 23:50:44 -0400
-Received: by mail-pg1-f169.google.com with SMTP id h3so4964255pgb.7
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 20:49:13 -0700 (PDT)
+Received: from mail-pl1-f171.google.com ([209.85.214.171]:44681 "EHLO
+        mail-pl1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239312AbhIWDus (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Sep 2021 23:50:48 -0400
+Received: by mail-pl1-f171.google.com with SMTP id t11so3115751plq.11
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Sep 2021 20:49:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=vSW4qZXrracnIWsPdfbxmPif1l69DD2iiiT3U7qLgAU=;
-        b=H9rEF1YbIHoOUZDUkKeuqtLD4xalaS3RZP4vP3LhxOZOpK2Rkvh2/TKKipsINzs64U
-         Gqw/Y9wh2/gF8SJMsyCvHJPe0pWN4QfwoScXihXXQJUk2Eu6EnwJ+QnZp8sg3CU+FU2T
-         mDCtiwj9ICW4HSv8oJhCYZWrRq8kPXrXTt8ZGhhMGaXMS7+96qTo8V1bEQB6H5QbQn7+
-         Q1EJMG4WX4FLqgz30+Zs6fC+Ow4UQ2d2o+kJjZn+BeTY3lGtviLP6FNzboz8yq3XO19Q
-         ZhcEtAfyKKUf2/utBYpzR8/O7DNiYrF8DR5ZvKJujYYgOFkw1bmhgExVMSxnIUzgbUeN
-         MCPA==
-X-Gm-Message-State: AOAM533CtHjzWrguXjLnRygHEP+R4tQk+20QBx97DQeMI5pwQq//o3zQ
-        u0onVE+vIjdKmskPF5u3MhPYzKzPwbvfnw==
-X-Google-Smtp-Source: ABdhPJyQJCfVHtV/rOPdBSeXA6+BZXjVDHrgg2/s1XX5hzSjBEO0sTiRuDiQko2jemATQoKSv3wUTg==
-X-Received: by 2002:a63:4e45:: with SMTP id o5mr2273518pgl.191.1632368953272;
-        Wed, 22 Sep 2021 20:49:13 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=JnroerlrJfQOlxtLeMGl8hDYpX0iq3qmP1Trv9UIhOk=;
+        b=P3CyFKocfsvD98+l2CZUfWiqtx7sUR7uetCdA5pIWsOp4qir9ePko8uqMcJTSSGjwo
+         2sE6T7uuSHK75gnGm0ND5aA/iOwlpdkUfZBqmZ6DGXdC80QmUYHCStDWiIwXyypTVW0I
+         okqcTAYMyzTqQPZCwnnDL2UXsmrijZr46pLMX5hMpwSVmHWvf0VNUTWvoS9VSZTDsP2w
+         2SOHTAiEHlijAV7WyIQxVcatSrJrzX4y5pIZl3EnWazSAh8GGxzduXGQWaXjxbPTcBKR
+         8OFc/YfrBkdArd3FOpODItBXg/VVZdSswdUAaz3vABjF7oB837VU2ZNzpbTdhyDoo7uO
+         m2RA==
+X-Gm-Message-State: AOAM533YyVGJXA7lVUObESlKpVNUZei7yKO/NJIVd8+bri8EzSDtvYVB
+        hy4uqjU/iA3jzwVjATpplu12A8Rl+PD15A==
+X-Google-Smtp-Source: ABdhPJytJdc5q4SY5+yHb023Ccgcm30t6mOKs14es+cgdehpWhTh0tYl7UpIC2tfnRPyOBH0SAirPw==
+X-Received: by 2002:a17:903:1d1:b0:13c:897c:c04b with SMTP id e17-20020a17090301d100b0013c897cc04bmr1948873plh.76.1632368956939;
+        Wed, 22 Sep 2021 20:49:16 -0700 (PDT)
 Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id y204sm3045883pfc.100.2021.09.22.20.49.11
+        by smtp.gmail.com with ESMTPSA id y204sm3045883pfc.100.2021.09.22.20.49.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 20:49:12 -0700 (PDT)
+        Wed, 22 Sep 2021 20:49:16 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
         Ronnie Sahlberg <ronniesahlberg@gmail.com>,
         =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
-        Steve French <smfrench@gmail.com>
-Subject: [PATCH] ksmbd: add the check to vaildate if stream protocol length exceeds maximum value
-Date:   Thu, 23 Sep 2021 12:48:53 +0900
-Message-Id: <20210923034855.612832-1-linkinjeon@kernel.org>
+        Steve French <smfrench@gmail.com>,
+        Ronnie Sahlberg <lsahlber@redhat.com>
+Subject: [PATCH v4] ksmbd: fix invalid request buffer access in compound
+Date:   Thu, 23 Sep 2021 12:48:54 +0900
+Message-Id: <20210923034855.612832-2-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210923034855.612832-1-linkinjeon@kernel.org>
+References: <20210923034855.612832-1-linkinjeon@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -57,46 +60,56 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This patch add MAX_STREAM_PROT_LEN macro and check if stream protocol
-length exceeds maximum value in ksmbd_pdu_size_has_room().
+Ronnie reported invalid request buffer access in chained command when
+inserting garbage value to NextCommand of compound request.
+This patch add validation check to avoid this issue.
 
 Cc: Tom Talpey <tom@talpey.com>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: Ralph Böhme <slow@samba.org>
 Cc: Steve French <smfrench@gmail.com>
+Reported-by: Ronnie Sahlberg <lsahlber@redhat.com>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/ksmbd/smb_common.c | 3 ++-
- fs/ksmbd/smb_common.h | 2 ++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+  v2:
+   - fix integer overflow from work->next_smb2_rcv_hdr_off.
+  v3:
+   - check next command offset and at least header size of next pdu at
+     the same time.
+  v4:
+   - add next_cmd variable not to avoid repeat conversion.
 
-diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
-index 5901b2884c60..ebc835ab414c 100644
---- a/fs/ksmbd/smb_common.c
-+++ b/fs/ksmbd/smb_common.c
-@@ -274,7 +274,8 @@ int ksmbd_init_smb_server(struct ksmbd_work *work)
- 
- bool ksmbd_pdu_size_has_room(unsigned int pdu)
+ fs/ksmbd/smb2pdu.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 90f867b9d560..301558a04298 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -459,13 +459,21 @@ static void init_chained_smb2_rsp(struct ksmbd_work *work)
+ bool is_chained_smb2_message(struct ksmbd_work *work)
  {
--	return (pdu >= KSMBD_MIN_SUPPORTED_HEADER_SIZE - 4);
-+	return (pdu >= KSMBD_MIN_SUPPORTED_HEADER_SIZE - 4 &&
-+		pdu <= MAX_STREAM_PROT_LEN);
- }
+ 	struct smb2_hdr *hdr = work->request_buf;
+-	unsigned int len;
++	unsigned int len, next_cmd;
  
- int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work, int info_level,
-diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
-index 994abede27e9..10b8d7224dfa 100644
---- a/fs/ksmbd/smb_common.h
-+++ b/fs/ksmbd/smb_common.h
-@@ -48,6 +48,8 @@
- #define CIFS_DEFAULT_IOSIZE	(64 * 1024)
- #define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
+ 	if (hdr->ProtocolId != SMB2_PROTO_NUMBER)
+ 		return false;
  
-+#define MAX_STREAM_PROT_LEN	0x00FFFFFF
+ 	hdr = ksmbd_req_buf_next(work);
+-	if (le32_to_cpu(hdr->NextCommand) > 0) {
++	next_cmd = le32_to_cpu(hdr->NextCommand);
++	if (next_cmd > 0) {
++		if ((u64)work->next_smb2_rcv_hdr_off + next_cmd + 64 >
++		    get_rfc1002_len(work->request_buf)) {
++			pr_err("next command(%u) offset exceeds smb msg size\n",
++			       next_cmd);
++			return false;
++		}
 +
- /* Responses when opening a file. */
- #define F_SUPERSEDED	0
- #define F_OPENED	1
+ 		ksmbd_debug(SMB, "got SMB2 chained command\n");
+ 		init_chained_smb2_rsp(work);
+ 		return true;
 -- 
 2.25.1
 
