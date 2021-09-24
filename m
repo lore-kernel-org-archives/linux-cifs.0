@@ -2,133 +2,198 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30DA1C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 04:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B48C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 04:58:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D55A6124B
-	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 04:55:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5517C61241
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 04:58:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242781AbhIXE5Y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 24 Sep 2021 00:57:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47848 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231256AbhIXE5Y (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 24 Sep 2021 00:57:24 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74EC6C061574;
-        Thu, 23 Sep 2021 21:55:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Date:Message-ID:From:Cc:To;
-        bh=K35Y6RRgd6E8Pi0+5eEn871tiwSUjxMbbFGmn0WfGwM=; b=x7csDKOXFy5DOjx8br8VQaL+8Q
-        /seMNXnngvLDSJgMv+oo3aI5VlZYy2Yqvvj+EnL7SozR3F289M6y5LdrUxZqtYOhB+6WATWB+uxSL
-        ijJk8OzcGc7Ncd32r0yp8TCaMWm9jx4FMmYeNTbRLkxF91JqAjSF2mMOJLiLbMCBNFnv2poYnIRaK
-        WJ69MN9kQwp8g5LgdlZ8TbDs8PrXr6ZSmO15GSfk/Qt8qHXunyoXyNrRNtUwswP2R/q5sY3MrDP8M
-        bWidlWPYHehFMh/1igsWRceir+rAOt/CGXlS2G0tuycJLdUEVvSCqs+HiHZINaNPoPle1V3z6QGxS
-        hNcZLfTLI0j6K8S0H2Czd2EDyKSHy6Uc59puJECx/VaVhLt+QIKvgoAk2SuQDMb+ImQ0Ebm37bO1k
-        2XIx5wReQ4iKy4wBwZqURrgVVuZpp/AGSY9hYVb6kQsrmK0d6Roib8sVQTyO1cNT51I2Kkuxj6ZJ0
-        lOqhbL+hOGQlmAKAIRN6s+bl;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1mTdFT-007cEc-VZ; Fri, 24 Sep 2021 04:55:48 +0000
-Subject: Re: Locking issue between NFSv4 and SMB client
-To:     Trond Myklebust <trondmy@hammerspace.com>,
-        "bfields@fieldses.org" <bfields@fieldses.org>,
-        "jra@samba.org" <jra@samba.org>,
-        "dai.ngo@oracle.com" <dai.ngo@oracle.com>
-Cc:     "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
-        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-References: <5b7be2c0-95a6-048c-581f-17e5e3750daa@oracle.com>
- <20210923215056.GH18334@fieldses.org>
- <48b3a41e2dbea7948b0df3fea002208a273409fd.camel@hammerspace.com>
- <f4b9eb02-73e6-f082-6657-87a007b99198@samba.org>
- <ea40f67038f822d13407becb7e4eedc31e5edbb0.camel@hammerspace.com>
-From:   Ralph Boehme <slow@samba.org>
-Message-ID: <16ebef76-05f9-f604-6104-50be0c2cb0a3@samba.org>
-Date:   Fri, 24 Sep 2021 06:55:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S229678AbhIXE7m (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 24 Sep 2021 00:59:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56122 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231256AbhIXE7l (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 24 Sep 2021 00:59:41 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 18AE16124D
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Sep 2021 04:58:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632459489;
+        bh=pmCj9sfhmIHN7vGtHYK0vaWs5nXH80OsxzBzs/Yg8dw=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=JDpo7FViIt0mRAloPaRDD/V6zJ87NTqvwSHJ5HSt/DLd59mvapn+CRQml4MlV35Pk
+         RCM6a3t4vtOy8rFs0BQgDNlupJU58yrXdtznCJtYh65am11R18zxZb2FegpBHgQvg0
+         ryM0B31ZQpAJ1HBhgByIQbAApJ4R20qfwyq4FQg+v6BUg/Z69rLKxc2lWx8eoa87pO
+         P8DY/dqQtdsIbovCRypwKct/S1kK6mcJ7PiS8M0+wi8LGn+ontW2R58jd0FGUJOv6Y
+         XIQo6uz/UmQtxDtwBPZxpR/AOHeqViuOzZjitqCqZMBRuxvW7N/xrFyOh6OVAoxmuJ
+         LkhN+7V1Y6Mgg==
+Received: by mail-ot1-f48.google.com with SMTP id x33-20020a9d37a4000000b0054733a85462so11573615otb.10
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Sep 2021 21:58:09 -0700 (PDT)
+X-Gm-Message-State: AOAM533ElRPT1ymEVZTwqXxI9dZxulco/A8D/sdCrbgNn6SRpcGuVYXx
+        AOQtefKrAAVpBZI6A1BnEn7gGy8l1Zx2oJHCJJo=
+X-Google-Smtp-Source: ABdhPJyCUz0PXtRPQNFB8arkbvzHRI03cPbVNzjl56cAAiSLwDNQzPGhE1B4Pvss0i9vcyk43n47qOMoLTCSpcZVxSE=
+X-Received: by 2002:a9d:4705:: with SMTP id a5mr2194399otf.237.1632459488413;
+ Thu, 23 Sep 2021 21:58:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ea40f67038f822d13407becb7e4eedc31e5edbb0.camel@hammerspace.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="1w0DF6h0GDacOWlXK0lT6Da6vYcFa1WX4"
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Thu, 23 Sep 2021 21:58:07
+ -0700 (PDT)
+In-Reply-To: <20210924021254.27096-8-linkinjeon@kernel.org>
+References: <20210924021254.27096-1-linkinjeon@kernel.org> <20210924021254.27096-8-linkinjeon@kernel.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Fri, 24 Sep 2021 13:58:07 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-8W6Oed-0GwH64a+3rqTOD2d8UyEsMXSYxOu8edyEtAw@mail.gmail.com>
+Message-ID: <CAKYAXd-8W6Oed-0GwH64a+3rqTOD2d8UyEsMXSYxOu8edyEtAw@mail.gmail.com>
+Subject: Re: [PATCH 7/7] ksmbd: add validation in smb2 negotiate
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
+        Steve French <smfrench@gmail.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1w0DF6h0GDacOWlXK0lT6Da6vYcFa1WX4
-Content-Type: multipart/mixed; boundary="GGLBMnaFDa6mQtSPvS5s6n9LCB1LdUIrp";
- protected-headers="v1"
-From: Ralph Boehme <slow@samba.org>
-To: Trond Myklebust <trondmy@hammerspace.com>,
- "bfields@fieldses.org" <bfields@fieldses.org>, "jra@samba.org"
- <jra@samba.org>, "dai.ngo@oracle.com" <dai.ngo@oracle.com>
-Cc: "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-Message-ID: <16ebef76-05f9-f604-6104-50be0c2cb0a3@samba.org>
-Subject: Re: Locking issue between NFSv4 and SMB client
-References: <5b7be2c0-95a6-048c-581f-17e5e3750daa@oracle.com>
- <20210923215056.GH18334@fieldses.org>
- <48b3a41e2dbea7948b0df3fea002208a273409fd.camel@hammerspace.com>
- <f4b9eb02-73e6-f082-6657-87a007b99198@samba.org>
- <ea40f67038f822d13407becb7e4eedc31e5edbb0.camel@hammerspace.com>
-In-Reply-To: <ea40f67038f822d13407becb7e4eedc31e5edbb0.camel@hammerspace.com>
+I found null dereferencing kenel oops while testing and updated this patch.
+Please review the below patch, thanks!
 
---GGLBMnaFDa6mQtSPvS5s6n9LCB1LdUIrp
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+From 85e1ce56bb0c37e8ea2083cd0e62e160f2bf6677 Mon Sep 17 00:00:00 2001
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 24 Sep 2021 13:07:17 +0900
+Subject: [PATCH] ksmbd: add validation in smb2 negotiate
 
-Am 24.09.21 um 06:13 schrieb Trond Myklebust:
-> On Fri, 2021-09-24 at 05:46 +0200, Ralph Boehme wrote:
->> leases can be shared among file handles. When someone requests a
->> lease
->> he passes a cookie. Then when he opens the same file with the same
->> cookie the lease is not broken.
->=20
-> Right, but that is easily solved in user space by having the cookie act=
+This patch add validation to check request buffer check in smb2
+negotiate and fix null pointer dereferencing oops in smb3_preauth_hash_rsp()
+that found from manual test.
 
-> as a key that references the file descriptor that holds the lease. This=
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/smb2pdu.c    | 42 +++++++++++++++++++++++++++++++++++++++++-
+ fs/ksmbd/smb_common.c | 22 ++++++++++++++++++++--
+ 2 files changed, 61 insertions(+), 3 deletions(-)
 
-> is how we typically implement NFSv4 delegations as well
-yeah. We already track the required state in userspace anyway, so this=20
-should be a low hanging fruit (more or less :) ).
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 4c7e7aaba525..9eb8b86ddb27 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -1081,6 +1081,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 	struct smb2_negotiate_req *req = work->request_buf;
+ 	struct smb2_negotiate_rsp *rsp = work->response_buf;
+ 	int rc = 0;
++	unsigned int smb2_buf_len, smb2_neg_size;
+ 	__le32 status;
 
--slow
+ 	ksmbd_debug(SMB, "Received negotiate request\n");
+@@ -1098,6 +1099,44 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 		goto err_out;
+ 	}
 
---=20
-Ralph Boehme, Samba Team                 https://samba.org/
-SerNet Samba Team Lead      https://sernet.de/en/team-samba
++	smb2_buf_len = get_rfc1002_len(work->request_buf);
++	smb2_neg_size = offsetof(struct smb2_negotiate_req, Dialects) - 4;
++	if (conn->dialect == SMB311_PROT_ID) {
++		unsigned int nego_ctxt_off = le32_to_cpu(req->NegotiateContextOffset);
++
++		if (smb2_buf_len < nego_ctxt_off) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++
++		if (smb2_neg_size > nego_ctxt_off) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++
++		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
++		    nego_ctxt_off) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++	} else {
++		if (smb2_neg_size > smb2_buf_len) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++
++		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
++		    smb2_buf_len) {
++			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rc = -EINVAL;
++			goto err_out;
++		}
++	}
++
+ 	conn->cli_cap = le32_to_cpu(req->Capabilities);
+ 	switch (conn->dialect) {
+ 	case SMB311_PROT_ID:
+@@ -8335,7 +8374,8 @@ void smb3_preauth_hash_rsp(struct ksmbd_work *work)
 
+ 	WORK_BUFFERS(work, req, rsp);
 
---GGLBMnaFDa6mQtSPvS5s6n9LCB1LdUIrp--
+-	if (le16_to_cpu(req->Command) == SMB2_NEGOTIATE_HE)
++	if (le16_to_cpu(req->Command) == SMB2_NEGOTIATE_HE &&
++	    conn->preauth_info)
+ 		ksmbd_gen_preauth_integrity_hash(conn, (char *)rsp,
+ 						 conn->preauth_info->Preauth_HashValue);
 
---1w0DF6h0GDacOWlXK0lT6Da6vYcFa1WX4
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
+diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
+index 20bd5b8e3c0a..85937d497dcb 100644
+--- a/fs/ksmbd/smb_common.c
++++ b/fs/ksmbd/smb_common.c
+@@ -234,13 +234,22 @@ int ksmbd_lookup_dialect_by_id(__le16
+*cli_dialects, __le16 dialects_count)
 
------BEGIN PGP SIGNATURE-----
+ static int ksmbd_negotiate_smb_dialect(void *buf)
+ {
+-	__le32 proto;
++	int smb_buf_length = get_rfc1002_len(buf);
++	__le32 proto = ((struct smb2_hdr *)buf)->ProtocolId;
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFNWlIFAwAAAAAACgkQqh6bcSY5nkYe
-QRAArvF05m5ZhE2feTfUBGyUqxGqx5UFo+yZaGRs/xji2DwfX05OviKCyaeyc0bDk/Umyg/SpDPZ
-A09oMRABy6JNZ7jjZX2swyykJ7yA4rH/TyThaKuKNRKdgX11erFXeV4jQJ3B75YNocDVuEmT0UHm
-+KN0Z1aY0YGoUPxf5Wxz7KHOZuegRfgg5PHgyONdO5ISn1YWhM1v52fvehnEvRG3mJ7oSN58rpwC
-oJ7iWX5Dm3XnBe83DinwdGNikeLxH+XCqTByj4zecL0N3BBcEg2mE1EY/nGcSt2QtEMkofw5nu6k
-E2GyB8J2iraKZ1Kv/zSIv2W+/PBmm4nmtrgiZDSzJjBNaAHZrpdJ7AVGDzUdWcmMSxTM9Ept+IGL
-bKCT0lp/9at8ZoLar25WkQ8qdFJFun3M2cAYHvNRBkS7U2H556HohR4OFr0x4n/GKobgOqkgRQl7
-8p41VIIZVH10YfpnHC/V0E4W1r1EU5zHhew6NVkR3Ryuemr152r12u7BxjU0b8o8ea4GB3y7qijc
-FPm2sJ/8EiSKag0NjVL9FgzKs8cMZN7Y4NrNjnD88ITC+6+1VEaSAe6rq8/nj6phiOmUtwe43DJc
-sVHW76817AC/f1311GClDlQenSrsFgyn0KgIV72Tkj5mZ64lCYNkyJTAULJwJIEy4+qMuqkPhAQ/
-ZvA=
-=WaVU
------END PGP SIGNATURE-----
+-	proto = ((struct smb2_hdr *)buf)->ProtocolId;
+ 	if (proto == SMB2_PROTO_NUMBER) {
+ 		struct smb2_negotiate_req *req;
++		int smb2_neg_size =
++			offsetof(struct smb2_negotiate_req, Dialects) - 4;
 
---1w0DF6h0GDacOWlXK0lT6Da6vYcFa1WX4--
+ 		req = (struct smb2_negotiate_req *)buf;
++		if (smb2_neg_size > smb_buf_length)
++			goto err_out;
++
++		if (smb2_neg_size + le16_to_cpu(req->DialectCount) * sizeof(__le16) >
++		    smb_buf_length)
++			goto err_out;
++
+ 		return ksmbd_lookup_dialect_by_id(req->Dialects,
+ 						  req->DialectCount);
+ 	}
+@@ -250,10 +259,19 @@ static int ksmbd_negotiate_smb_dialect(void *buf)
+ 		struct smb_negotiate_req *req;
+
+ 		req = (struct smb_negotiate_req *)buf;
++		if (le16_to_cpu(req->ByteCount) < 2)
++			goto err_out;
++
++		if (offsetof(struct smb_negotiate_req, DialectsArray) - 4 +
++			le16_to_cpu(req->ByteCount) > smb_buf_length) {
++			goto err_out;
++		}
++
+ 		return ksmbd_lookup_dialect_by_name(req->DialectsArray,
+ 						    req->ByteCount);
+ 	}
+
++err_out:
+ 	return BAD_PROT_ID;
+ }
+
+-- 
+2.25.1
