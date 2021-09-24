@@ -2,116 +2,97 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA75C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 00:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A80F9C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 00:51:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05D05610CB
-	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 00:12:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8540D60EB6
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 00:51:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243599AbhIXAOP convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 23 Sep 2021 20:14:15 -0400
-Received: from mail-ed1-f43.google.com ([209.85.208.43]:45921 "EHLO
-        mail-ed1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232143AbhIXAOO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Sep 2021 20:14:14 -0400
-Received: by mail-ed1-f43.google.com with SMTP id c22so29005213edn.12
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Sep 2021 17:12:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=RCcja10SFVdtOiyzrCk0cciDdOc7qdrHC+TrP8HCrOI=;
-        b=FBUKOFK4n+Vbmzgh8VHHUi/hFifNQcTlqXuIMBQNoYKkq5vcMyNPhHE7J6mXql62Is
-         FB5FBqbXkxeThP8OpT8FKFV4BnDRrvNXOaqnqpc9LLPFKk/V5NYJdlE8Bh1C5mlV8Fo3
-         ivR6OMK/zC60r02wjnKhexTPSqwkqK+A4jhLnjJCa22lXhzg0f7inbAGBftslxp95quC
-         Vj79C3+7RkQ+fV3pUVBAp8SJx7OQdFP4I1T/tgvx1OVV9atwxNQl64IjizvE0lhtn6pu
-         htJIQuxce58/t0f27wf+m3pue3HYcKvqMl5rpoKIkN1LYqov6cFP99a/90b/w21Hn/fW
-         I9Qw==
-X-Gm-Message-State: AOAM5308u0jy5m0A782yxAEcl5Ycrn/nYyLXnFpxOEb9sIMQQ2Mm0i7V
-        xu+y0Ax5yXezOOCmix2X7tM6fnaayj1booFXAwV+0p7MbQ==
-X-Google-Smtp-Source: ABdhPJz3JjjUyhYPJIOW1z5xWcYpz78UIFLcF4VV88Yayaum7TNYIyxGtiUiqMs2DEeRTUK2B3FJBJmxcyng61fSIkg=
-X-Received: by 2002:a17:907:2624:: with SMTP id aq4mr8311794ejc.448.1632442361513;
- Thu, 23 Sep 2021 17:12:41 -0700 (PDT)
+        id S243664AbhIXAwx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 23 Sep 2021 20:52:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49852 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232143AbhIXAww (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Sep 2021 20:52:52 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18EC9C061574;
+        Thu, 23 Sep 2021 17:51:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-ID:Cc:To:From:Date;
+        bh=CWVoHnd9YD9j5Yfm2Ruc2Ef0D19E5HElFIQwBIliFRI=; b=1lHliXFsFSgfm1zry+IZ6HB6Xg
+        ZSJNdfTICvIWjmQ/Zl8b10WaII6d01xGsSLut7hm/ixypObNm/jZaeHwJY0jSXovqClylEvlGeJF+
+        nndX8mtTeg12WWYjT/IbQ7fOsVJdlWv/825t86zLSxkUwLkNArDjiIojUPobHH7Fc6ryuKDpcTSOB
+        sXMh9UDM57eVjJXO6CB04Of/yCvhsWDlN7syxgNtKJHR5Deyu7wnDGs6zWg/1i38bIyWAf04ZFXXD
+        dDkvlwgBitEn8JTinx3asfrZSoqrS8yYRr9ceWZItn+B3inCRGqXxdWFEH95eTFsH8cfSnF683S/s
+        lyrI1SFdkdT/tZwWkrrcD3SrPgMhTq8eFwRVc5ILRXkHX3QdraHdjEPE2MaW3yp8ehpvz4POyepRy
+        Ij/uyHHH7DausEvjCDnYEom5+eSkfjouBZp18z+Ww/42Ic4hOph7+Mpf7waxsutEoV3dYdfANVTL/
+        pAQ4fkzV5hlZpPrNt6UjOxQ+;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1mTZQq-007an9-LO; Fri, 24 Sep 2021 00:51:17 +0000
+Date:   Thu, 23 Sep 2021 17:51:13 -0700
+From:   Jeremy Allison <jra@samba.org>
+To:     dai.ngo@oracle.com
+Cc:     Bruce Fields <bfields@fieldses.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: Locking issue between NFSv4 and SMB client
+Message-ID: <YU0hAYLow+8n8siT@jeremy-acer>
+Reply-To: Jeremy Allison <jra@samba.org>
+References: <5b7be2c0-95a6-048c-581f-17e5e3750daa@oracle.com>
+ <20210923215056.GH18334@fieldses.org>
+ <90a8f89b-e8ac-2187-2926-d723ebbcb839@oracle.com>
 MIME-Version: 1.0
-From:   Pavel Shilovsky <pshilovsky@samba.org>
-Date:   Thu, 23 Sep 2021 17:12:30 -0700
-Message-ID: <CAKywueRSG5NiomwOnR=8+bVgVTzMaZ-Atua1Csed+Af=Jq5xGw@mail.gmail.com>
-Subject: [ANNOUNCE] cifs-utils release 6.14 ready for download
-To:     linux-cifs <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        samba@lists.samba.org,
-        =?UTF-8?Q?Aur=C3=A9lien_Aptel?= <aaptel@suse.com>,
-        "Paulo Alcantara (SUSE)" <pc@cjr.nz>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Boris Protopopov <pboris@amazon.com>,
-        Steve French <stfrench@microsoft.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Rohith Surabattula <rohiths.msft@gmail.com>,
-        Alexander Bokovoy <ab@samba.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <90a8f89b-e8ac-2187-2926-d723ebbcb839@oracle.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-New version 6.14 of cifs-utils has been released today.
+On Thu, Sep 23, 2021 at 03:39:52PM -0700, dai.ngo@oracle.com wrote:
+>
+>On 9/23/21 2:50 PM, Bruce Fields wrote:
+>>On Thu, Jul 15, 2021 at 04:45:22PM -0700, dai.ngo@oracle.com wrote:
+>>>Hi Bruce,
+>>Oops, sorry for neglecting this.
+>>
+>>>I'm doing some locking testing between NFSv4 and SMB client and
+>>>think there are some issues on the server that allows both clients
+>>>to lock the same file at the same time.
+>>It's not too surprising to me that getting consistent locks between the
+>>two would be hard.
+>>
+>>Did you get any review from a Samba expert?  I seem to recall it having
+>>a lot of options, and I wonder if it's configured correctly for this
+>>case.
+>
+>No, I have not heard from any Samba expert.
+>
+>>
+>>It sounds like Samba may be giving out oplocks without getting a lease
+>>from the kernel.
+>
+>I will have to circle back to this when we're done with the 1st
+>phase of courteous server.
+>
+>-Dai
+>
+>>
+>>--b.
+>>
+>>>Here is what I did:
+>>>
+>>>NOTE: lck is a simple program that use lockf(3) to lock a file from
+>>>offset 0 to the length specified by '-l'.
 
-Highlighted changes:
+What does lockf map to in NFS ?
 
-- smbinfo is enhanced with capability to display alternate data streams
-- setcifsacl is improved to optionally reorder ACEs in preferred order
-- cifs.upcall regression in kerberos mount is fixed
-
-webpage: https://wiki.samba.org/index.php/LinuxCIFS_utils
-tarball: https://download.samba.org/pub/linux-cifs/cifs-utils/
-git: git://git.samba.org/cifs-utils.git
-gitweb: http://git.samba.org/?p=cifs-utils.git;a=summary
-
-Detailed list of changes since 6.13 was released:
-
-8c06dce cifs-utils: bump version to 6.14
-e2e216c setcifsacl: fix formatting
-1a70243 smbinfo: add support for new key dump ioctl
-9ad46fc mount.cifs: fix crash when mount point does not exist
-7f9711d cifs.upcall: fix regression in kerberos mount
-02cd3aa smbinfo: Add command for displaying alternate data streams
-4d5daf5 Reorder ACEs in preferred order during setcifsacl
-
-Summary:
-
-Aurelien Aptel (2):
-  cifs.upcall: fix regression in kerberos mount
-  smbinfo: add support for new key dump ioctl
-
-Juan Pablo González (1):
-  smbinfo: Add command for displaying alternate data streams
-
-Paulo Alcantara (1):
-  mount.cifs: fix crash when mount point does not exist
-
-Pavel Shilovsky (2):
-  setcifsacl: fix formatting
-  cifs-utils: bump version to 6.14
-
-Rohith Surabattula (1):
-  Reorder ACEs in preferred order during setcifsacl
-
- cifs.upcall.c     | 214 +++++++++++++++++++++++++++++++++++-------------------
- configure.ac      |   2 +-
- mount.cifs.c      |  13 ++--
- setcifsacl.c      | 129 +++++++++++++++++++++++++++++++-
- setcifsacl.rst.in |  20 ++++-
- smbinfo           | 120 ++++++++++++++++++++++++++----
- smbinfo.rst       |   2 +
- 7 files changed, 399 insertions(+), 101 deletions(-)
-
-Thanks to everyone who contributed to the release!
-
-Best regards,
-Pavel Shilovsky
+Samba only uses posix fcntl byte range locks (and only when
+told to map SMB locks onto underlying posix locks), we don't use
+lockf at all.
