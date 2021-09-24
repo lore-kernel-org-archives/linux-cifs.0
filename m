@@ -1,61 +1,55 @@
 Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF7DC433FE
-	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 13:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1528EC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 15:07:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E13E60E9B
-	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 13:31:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E105761038
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Sep 2021 15:07:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346562AbhIXNdH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 24 Sep 2021 09:33:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
+        id S1346969AbhIXPIg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 24 Sep 2021 11:08:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346443AbhIXNdE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 24 Sep 2021 09:33:04 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94172C03B1AE
-        for <linux-cifs@vger.kernel.org>; Fri, 24 Sep 2021 06:22:55 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id j14so6474284plx.4
-        for <linux-cifs@vger.kernel.org>; Fri, 24 Sep 2021 06:22:55 -0700 (PDT)
+        with ESMTP id S1346921AbhIXPIg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 24 Sep 2021 11:08:36 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE517C061571
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Sep 2021 08:07:02 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id e7so10156938pgk.2
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Sep 2021 08:07:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=fN4X5uwjq/73I4k/hupepuR/MbgZgQrLoftOE7b54NI=;
-        b=MlmDPIwVP/JehalIcvSC+i0++Ck2MszFzBc7A6fCZIRPsRjFOc7Im7s/tite9+SBrS
-         eVHycskbLa+B5mmoHUuLgnN5EgpcMCGG1ScXtCJ1wG5YcG8CkIq1dAmDYTaGkw/txB4A
-         J20TXDdtdtoWOOPlIPmMbPZ8KagTTXwVwuHaPt4tiSjaL2tS7chv/LcELD5FPpNp7Jk2
-         qFokaXPro4g2/A+gx9Z5pVfM/xQ6IkiY4O3wKo3s59f5riY83I3BIqoKzOC1itIce+Lv
-         Jqdu7Hmg2yZ6b1p3SkMgFOT7E11zHKpK6yjpuUvmb5Lt04Gg74orb8r2hrW00hKy8dAI
-         R8Wg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=cCAcy0hZBbYdZF1K/9k3ZvOKcmA3YgmW7LolrVZyM6E=;
+        b=lZSK9W3aqGS3T4LXM64u8XCHP+ld/e1NUXaRudQpwfU2j2qrgEYDhH//gGeWd0G8vP
+         pobkUpcwcMq/Js1lnxAWzMLdmE2xXagedhOxuCUrmzkT5nOZkLXFSIHMd5OReMH4iSPU
+         5XN8KvM9/DhdUXvklqtFOerg4ro4YM5UA8QniF9vL/A4y013WfuCk4IWbu0en4UCNtFC
+         zP6nN8lxzvVXoEEdnwgycoehgPla6cn/Ux23bcRdklfy5zBCxSu6Iavos7cpMUbbPdQz
+         EF3h7naiUahZr04rn2LjtxtLzAqrCEMEucgDQuHjxlEpvsHtN8l7N6oLfMDZHaOw6HSn
+         TJGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=fN4X5uwjq/73I4k/hupepuR/MbgZgQrLoftOE7b54NI=;
-        b=HxJBzdMkO/FNRIi3WQvSFbDAzx8icIjLUYQvxvkF8THXOuypRfWnqBaDJJ7J7YwogI
-         7YLhU4oWv1e1RjhYg6vp3ihZG4arDqjzIkGnMHEUvJMrdBdwQpq//ZI1HssHZiJwVPHq
-         ykxNqDNSds1tA6ihODqOndWDLvBpcm0TlIbMne0qGVGhhsmGACbn9yXV407+XXI0H0ut
-         9E9O1dZKujisUSHSrCC80kGveE7gvlw/6oVg4CuCTo5NG9SOZkySKzA2hF+ICk76V8q7
-         V4+ROwI7pawlE6Tn2aebPaLxN15dHMfH/BBAOKyv9kbE4yNvmqCYMzGb/TGZVP4OHBYF
-         wz/Q==
-X-Gm-Message-State: AOAM531wSonRp+Ah7xCbejW4ujcjou6pGEwz0WBScLfEzRR5sw/Jnr6h
-        fOMO+gpl/KLsS+I2adEF8N+noya0MsIMFkEw
-X-Google-Smtp-Source: ABdhPJwtIYDALiZqKqAFuhB3TB41NG6ZHhaQwmZpLU3RYiRniXB6GkFgnR90rK4esli/x43QUVm8Bg==
-X-Received: by 2002:a17:90a:9289:: with SMTP id n9mr2231045pjo.27.1632489774852;
-        Fri, 24 Sep 2021 06:22:54 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=cCAcy0hZBbYdZF1K/9k3ZvOKcmA3YgmW7LolrVZyM6E=;
+        b=LHh6q1P+1U/DNDxQgks31k36C9hTmgP1LUGXOFzBsQbQW75sKimnlHLdnNO26haHy5
+         VeX5TB+16JV4EQtGQ3PNqvgRznlDSapVX+E0tf2KP9TcEiDw9Z68Sg4oMu+514K/N1SL
+         VXYo6o4BmZ+jw41owu7nYcFGjrPia+Kqv6TWoPKO9n1nCb5pWNmGyvjlUIbxhuLx4KkX
+         fkENJjcmEIIfqF+Z78Ix429kD2ab7/pbUJAcWLCxRNeRnpRBAoXOB7a9C0SxWKEM9qbo
+         TIBthgGYXvGXTBsCVosou59LaULcmWnvO9gjEa7BY/EOC6mNx0o9ubywIA/ezqmN8wBN
+         DobA==
+X-Gm-Message-State: AOAM530aPek0nkrAamScHu0MiQb2iz0mLF6I2U3x8jZzy+tWkOqAYcal
+        OtVtPI8NuFqlyy+R4aEqCaGIOalcrBo66lT0
+X-Google-Smtp-Source: ABdhPJyyYvxHvnfyhzIjc+YDYSX09QhQ+T5Mf4GA24F7jCryNVrCw2Afg8ZrWv+u4b0G75BEikXwng==
+X-Received: by 2002:a62:2905:0:b0:3f3:d4ce:443d with SMTP id p5-20020a622905000000b003f3d4ce443dmr10385823pfp.44.1632496021596;
+        Fri, 24 Sep 2021 08:07:01 -0700 (PDT)
 Received: from localhost.localdomain ([125.177.232.58])
-        by smtp.googlemail.com with ESMTPSA id m126sm9682495pga.53.2021.09.24.06.22.51
+        by smtp.googlemail.com with ESMTPSA id b10sm9163751pfi.122.2021.09.24.08.06.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Sep 2021 06:22:54 -0700 (PDT)
+        Fri, 24 Sep 2021 08:07:01 -0700 (PDT)
 From:   Hyunchul Lee <hyc.lee@gmail.com>
 To:     linux-cifs@vger.kernel.org
 Cc:     Hyunchul Lee <hyc.lee@gmail.com>,
@@ -63,214 +57,737 @@ Cc:     Hyunchul Lee <hyc.lee@gmail.com>,
         Ralph Boehme <slow@samba.org>,
         Steve French <smfrench@gmail.com>,
         Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v4] ksmbd: add buffer validation for SMB2_CREATE_CONTEXT
-Date:   Fri, 24 Sep 2021 22:22:22 +0900
-Message-Id: <20210924132222.914168-2-hyc.lee@gmail.com>
+Subject: [PATCH v4] ksmbd: use LOOKUP_BENEATH to prevent the out of share access
+Date:   Sat, 25 Sep 2021 00:06:16 +0900
+Message-Id: <20210924150616.926503-1-hyc.lee@gmail.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210924132222.914168-1-hyc.lee@gmail.com>
-References: <20210924132222.914168-1-hyc.lee@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add buffer validation for SMB2_CREATE_CONTEXT.
+instead of removing '..' in a given path, call
+kern_path with LOOKUP_BENEATH flag to prevent
+the out of share access.
+
+ran various test on this:
+smb2-cat-async smb://127.0.0.1/homes/../out_of_share
+smb2-cat-async smb://127.0.0.1/homes/foo/../../out_of_share
+smbclient //127.0.0.1/homes -c "mkdir ../foo2"
+smbclient //127.0.0.1/homes -c "rename bar ../bar"
 
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: Ralph Boehme <slow@samba.org>
 Cc: Steve French <smfrench@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
+Changes from v1:
+ - pass path of file that is relative to share to ksmbd vfs functions.
 Changes from v2:
- - check struct create_context's fields more in smb2_find_context_vals()
+ - fix smbtorture smb2.streams.rename, smb2.streams.rename2 failure.
 Changes from v3:
- - fix possible overflow when accessing create_context structure in
-   smb2_find_context_vals()
- - fix possible overflow when accessing smb_ace structure in parse_dacl()
+ - fix uninitialized variable free in ksmbd_vfs_kern_path.
 
- fs/ksmbd/oplock.c  | 41 +++++++++++++++++++++++++++++++----------
- fs/ksmbd/smb2pdu.c | 25 ++++++++++++++++++++++++-
- fs/ksmbd/smbacl.c  | 21 +++++++++++++++++++--
- 3 files changed, 74 insertions(+), 13 deletions(-)
+ fs/ksmbd/misc.c    | 100 ++++++-----------------------
+ fs/ksmbd/misc.h    |   7 +-
+ fs/ksmbd/smb2pdu.c |  74 ++++++++-------------
+ fs/ksmbd/vfs.c     | 156 ++++++++++++++++++++++++---------------------
+ fs/ksmbd/vfs.h     |   9 ++-
+ 5 files changed, 140 insertions(+), 206 deletions(-)
 
-diff --git a/fs/ksmbd/oplock.c b/fs/ksmbd/oplock.c
-index 16b6236d1bd2..f9dae6ef2115 100644
---- a/fs/ksmbd/oplock.c
-+++ b/fs/ksmbd/oplock.c
-@@ -1451,26 +1451,47 @@ struct lease_ctx_info *parse_lease_state(void *open_req)
+diff --git a/fs/ksmbd/misc.c b/fs/ksmbd/misc.c
+index 3eac3c01749f..6a19f4bc692d 100644
+--- a/fs/ksmbd/misc.c
++++ b/fs/ksmbd/misc.c
+@@ -158,25 +158,21 @@ int parse_stream_name(char *filename, char **stream_name, int *s_type)
+  * Return : windows path string or error
   */
- struct create_context *smb2_find_context_vals(void *open_req, const char *tag)
+ 
+-char *convert_to_nt_pathname(char *filename, char *sharepath)
++char *convert_to_nt_pathname(char *filename)
  {
--	char *data_offset;
- 	struct create_context *cc;
- 	unsigned int next = 0;
- 	char *name;
- 	struct smb2_create_req *req = (struct smb2_create_req *)open_req;
-+	unsigned int remain_len, name_off, name_len, value_off, value_len,
-+		     cc_len;
+ 	char *ab_pathname;
+-	int len, name_len;
  
--	data_offset = (char *)req + 4 + le32_to_cpu(req->CreateContextsOffset);
--	cc = (struct create_context *)data_offset;
-+	/*
-+	 * CreateContextsOffset and CreateContextsLength are guaranteed to
-+	 * be valid because of ksmbd_smb2_check_message().
-+	 */
-+	cc = (struct create_context *)((char *)req + 4 +
-+				       le32_to_cpu(req->CreateContextsOffset));
-+	remain_len = le32_to_cpu(req->CreateContextsLength);
- 	do {
--		int val;
+-	name_len = strlen(filename);
+-	ab_pathname = kmalloc(name_len, GFP_KERNEL);
+-	if (!ab_pathname)
+-		return NULL;
 -
- 		cc = (struct create_context *)((char *)cc + next);
--		name = le16_to_cpu(cc->NameOffset) + (char *)cc;
--		val = le16_to_cpu(cc->NameLength);
--		if (val < 4)
-+		if (remain_len < offsetof(struct create_context, Buffer))
- 			return ERR_PTR(-EINVAL);
+-	ab_pathname[0] = '\\';
+-	ab_pathname[1] = '\0';
++	if (strlen(filename) == 0) {
++		ab_pathname = kmalloc(2, GFP_KERNEL);
++		ab_pathname[0] = '\\';
++		ab_pathname[1] = '\0';
++	} else {
++		ab_pathname = kstrdup(filename, GFP_KERNEL);
++		if (!ab_pathname)
++			return NULL;
  
--		if (memcmp(name, tag, val) == 0)
--			return cc;
- 		next = le32_to_cpu(cc->Next);
-+		name_off = le16_to_cpu(cc->NameOffset);
-+		name_len = le16_to_cpu(cc->NameLength);
-+		value_off = le16_to_cpu(cc->DataOffset);
-+		value_len = le32_to_cpu(cc->DataLength);
-+		cc_len = next ? next : remain_len;
-+
-+		if ((next & 0x7) != 0 ||
-+		    next > remain_len ||
-+		    name_off != offsetof(struct create_context, Buffer) ||
-+		    name_len < 4 ||
-+		    name_off + name_len > cc_len ||
-+		    (value_off & 0x7) != 0 ||
-+		    (value_off && (value_off < name_off + name_len)) ||
-+		    ((u64)value_off + value_len > cc_len))
-+			return ERR_PTR(-EINVAL);
-+
-+		name = (char *)cc + name_off;
-+		if (memcmp(name, tag, name_len) == 0)
-+			return cc;
-+
-+		remain_len -= next;
- 	} while (next != 0);
+-	len = strlen(sharepath);
+-	if (!strncmp(filename, sharepath, len) && name_len != len) {
+-		strscpy(ab_pathname, &filename[len], name_len);
+ 		ksmbd_conv_path_to_windows(ab_pathname);
+ 	}
+-
+ 	return ab_pathname;
+ }
  
- 	return NULL;
+@@ -191,77 +187,19 @@ int get_nlink(struct kstat *st)
+ 	return nlink;
+ }
+ 
+-char *ksmbd_conv_path_to_unix(char *path)
++void ksmbd_conv_path_to_unix(char *path)
+ {
+-	size_t path_len, remain_path_len, out_path_len;
+-	char *out_path, *out_next;
+-	int i, pre_dotdot_cnt = 0, slash_cnt = 0;
+-	bool is_last;
+-
+ 	strreplace(path, '\\', '/');
+-	path_len = strlen(path);
+-	remain_path_len = path_len;
+-	if (path_len == 0)
+-		return ERR_PTR(-EINVAL);
+-
+-	out_path = kzalloc(path_len + 2, GFP_KERNEL);
+-	if (!out_path)
+-		return ERR_PTR(-ENOMEM);
+-	out_path_len = 0;
+-	out_next = out_path;
+-
+-	do {
+-		char *name = path + path_len - remain_path_len;
+-		char *next = strchrnul(name, '/');
+-		size_t name_len = next - name;
+-
+-		is_last = !next[0];
+-		if (name_len == 2 && name[0] == '.' && name[1] == '.') {
+-			pre_dotdot_cnt++;
+-			/* handle the case that path ends with "/.." */
+-			if (is_last)
+-				goto follow_dotdot;
+-		} else {
+-			if (pre_dotdot_cnt) {
+-follow_dotdot:
+-				slash_cnt = 0;
+-				for (i = out_path_len - 1; i >= 0; i--) {
+-					if (out_path[i] == '/' &&
+-					    ++slash_cnt == pre_dotdot_cnt + 1)
+-						break;
+-				}
+-
+-				if (i < 0 &&
+-				    slash_cnt != pre_dotdot_cnt) {
+-					kfree(out_path);
+-					return ERR_PTR(-EINVAL);
+-				}
+-
+-				out_next = &out_path[i+1];
+-				*out_next = '\0';
+-				out_path_len = i + 1;
+-
+-			}
+-
+-			if (name_len != 0 &&
+-			    !(name_len == 1 && name[0] == '.') &&
+-			    !(name_len == 2 && name[0] == '.' && name[1] == '.')) {
+-				next[0] = '\0';
+-				sprintf(out_next, "%s/", name);
+-				out_next += name_len + 1;
+-				out_path_len += name_len + 1;
+-				next[0] = '/';
+-			}
+-			pre_dotdot_cnt = 0;
+-		}
++}
+ 
+-		remain_path_len -= name_len + 1;
+-	} while (!is_last);
++void ksmbd_strip_last_slash(char *path)
++{
++	int len = strlen(path);
+ 
+-	if (out_path_len > 0)
+-		out_path[out_path_len-1] = '\0';
+-	path[path_len] = '\0';
+-	return out_path;
++	while (len && path[len - 1] == '/') {
++		path[len - 1] = '\0';
++		len--;
++	}
+ }
+ 
+ void ksmbd_conv_path_to_windows(char *path)
+@@ -298,7 +236,7 @@ char *ksmbd_extract_sharename(char *treename)
+  *
+  * Return:	converted name on success, otherwise NULL
+  */
+-char *convert_to_unix_name(struct ksmbd_share_config *share, char *name)
++char *convert_to_unix_name(struct ksmbd_share_config *share, const char *name)
+ {
+ 	int no_slash = 0, name_len, path_len;
+ 	char *new_name;
+diff --git a/fs/ksmbd/misc.h b/fs/ksmbd/misc.h
+index b7b10139ada2..253366bd0951 100644
+--- a/fs/ksmbd/misc.h
++++ b/fs/ksmbd/misc.h
+@@ -14,12 +14,13 @@ struct ksmbd_file;
+ int match_pattern(const char *str, size_t len, const char *pattern);
+ int ksmbd_validate_filename(char *filename);
+ int parse_stream_name(char *filename, char **stream_name, int *s_type);
+-char *convert_to_nt_pathname(char *filename, char *sharepath);
++char *convert_to_nt_pathname(char *filename);
+ int get_nlink(struct kstat *st);
+-char *ksmbd_conv_path_to_unix(char *path);
++void ksmbd_conv_path_to_unix(char *path);
++void ksmbd_strip_last_slash(char *path);
+ void ksmbd_conv_path_to_windows(char *path);
+ char *ksmbd_extract_sharename(char *treename);
+-char *convert_to_unix_name(struct ksmbd_share_config *share, char *name);
++char *convert_to_unix_name(struct ksmbd_share_config *share, const char *name);
+ 
+ #define KSMBD_DIR_INFO_ALIGNMENT	8
+ struct ksmbd_dir_info;
 diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index bb39b18a6673..6220f1f7322e 100644
+index 378e0b4a216d..4c799fef9883 100644
 --- a/fs/ksmbd/smb2pdu.c
 +++ b/fs/ksmbd/smb2pdu.c
-@@ -2427,6 +2427,10 @@ static int smb2_create_sd_buffer(struct ksmbd_work *work,
- 	ksmbd_debug(SMB,
- 		    "Set ACLs using SMB2_CREATE_SD_BUFFER context\n");
- 	sd_buf = (struct create_sd_buf_req *)context;
-+	if (le16_to_cpu(context->DataOffset) +
-+	    le32_to_cpu(context->DataLength) <
-+	    sizeof(struct create_sd_buf_req))
-+		return -EINVAL;
- 	return set_info_sec(work->conn, work->tcon, path, &sd_buf->ntsd,
- 			    le32_to_cpu(sd_buf->ccontext.DataLength), true);
- }
-@@ -2621,6 +2625,12 @@ int smb2_open(struct ksmbd_work *work)
- 			goto err_out1;
- 		} else if (context) {
- 			ea_buf = (struct create_ea_buf_req *)context;
-+			if (le16_to_cpu(context->DataOffset) +
-+			    le32_to_cpu(context->DataLength) <
-+			    sizeof(struct create_ea_buf_req)) {
-+				rc = -EINVAL;
-+				goto err_out1;
-+			}
- 			if (req->CreateOptions & FILE_NO_EA_KNOWLEDGE_LE) {
- 				rsp->hdr.Status = STATUS_ACCESS_DENIED;
- 				rc = -EACCES;
-@@ -2659,6 +2669,12 @@ int smb2_open(struct ksmbd_work *work)
- 			} else if (context) {
- 				struct create_posix *posix =
- 					(struct create_posix *)context;
-+				if (le16_to_cpu(context->DataOffset) +
-+				    le32_to_cpu(context->DataLength) <
-+				    sizeof(struct create_posix)) {
-+					rc = -EINVAL;
-+					goto err_out1;
-+				}
- 				ksmbd_debug(SMB, "get posix context\n");
- 
- 				posix_mode = le32_to_cpu(posix->Mode);
-@@ -3049,9 +3065,16 @@ int smb2_open(struct ksmbd_work *work)
- 			rc = PTR_ERR(az_req);
- 			goto err_out;
- 		} else if (az_req) {
--			loff_t alloc_size = le64_to_cpu(az_req->AllocationSize);
-+			loff_t alloc_size;
- 			int err;
- 
-+			if (le16_to_cpu(az_req->ccontext.DataOffset) +
-+			    le32_to_cpu(az_req->ccontext.DataLength) <
-+			    sizeof(struct create_alloc_size_req)) {
-+				rc = -EINVAL;
-+				goto err_out;
-+			}
-+			alloc_size = le64_to_cpu(az_req->AllocationSize);
- 			ksmbd_debug(SMB,
- 				    "request smb2 create allocate size : %llu\n",
- 				    alloc_size);
-diff --git a/fs/ksmbd/smbacl.c b/fs/ksmbd/smbacl.c
-index 0a95cdec8c80..bd792db32623 100644
---- a/fs/ksmbd/smbacl.c
-+++ b/fs/ksmbd/smbacl.c
-@@ -380,7 +380,7 @@ static void parse_dacl(struct user_namespace *user_ns,
+@@ -643,7 +643,7 @@ static char *
+ smb2_get_name(struct ksmbd_share_config *share, const char *src,
+ 	      const int maxlen, struct nls_table *local_nls)
  {
- 	int i, ret;
- 	int num_aces = 0;
--	int acl_size;
-+	unsigned int acl_size;
- 	char *acl_base;
- 	struct smb_ace **ppace;
- 	struct posix_acl_entry *cf_pace, *cf_pdace;
-@@ -392,7 +392,7 @@ static void parse_dacl(struct user_namespace *user_ns,
- 		return;
+-	char *name, *norm_name, *unixname;
++	char *name;
  
- 	/* validate that we do not go past end of acl */
--	if (end_of_acl <= (char *)pdacl ||
-+	if (end_of_acl < (char *)pdacl + sizeof(struct smb_acl) ||
- 	    end_of_acl < (char *)pdacl + le16_to_cpu(pdacl->size)) {
- 		pr_err("ACL too small to parse DACL\n");
- 		return;
-@@ -431,8 +431,22 @@ static void parse_dacl(struct user_namespace *user_ns,
- 	 * user/group/other have no permissions
- 	 */
- 	for (i = 0; i < num_aces; ++i) {
-+		if (end_of_acl - acl_base < acl_size)
-+			break;
-+
- 		ppace[i] = (struct smb_ace *)(acl_base + acl_size);
- 		acl_base = (char *)ppace[i];
-+		acl_size = offsetof(struct smb_ace, sid) +
-+			offsetof(struct smb_sid, sub_auth);
-+
-+		if (end_of_acl - acl_base < acl_size ||
-+		    ppace[i]->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
-+		    (end_of_acl - acl_base <
-+		     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth) ||
-+		    (le16_to_cpu(ppace[i]->size) <
-+		     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth))
-+			break;
-+
- 		acl_size = le16_to_cpu(ppace[i]->size);
- 		ppace[i]->access_req =
- 			smb_map_generic_desired_access(ppace[i]->access_req);
-@@ -807,6 +821,9 @@ int parse_sec_desc(struct user_namespace *user_ns, struct smb_ntsd *pntsd,
- 	if (!pntsd)
+ 	name = smb_strndup_from_utf16(src, maxlen, 1, local_nls);
+ 	if (IS_ERR(name)) {
+@@ -651,23 +651,9 @@ smb2_get_name(struct ksmbd_share_config *share, const char *src,
+ 		return name;
+ 	}
+ 
+-	/* change it to absolute unix name */
+-	norm_name = ksmbd_conv_path_to_unix(name);
+-	if (IS_ERR(norm_name)) {
+-		kfree(name);
+-		return norm_name;
+-	}
+-	kfree(name);
+-
+-	unixname = convert_to_unix_name(share, norm_name);
+-	kfree(norm_name);
+-	if (!unixname) {
+-		pr_err("can not convert absolute name\n");
+-		return ERR_PTR(-ENOMEM);
+-	}
+-
+-	ksmbd_debug(SMB, "absolute name = %s\n", unixname);
+-	return unixname;
++	ksmbd_conv_path_to_unix(name);
++	ksmbd_strip_last_slash(name);
++	return name;
+ }
+ 
+ int setup_async_work(struct ksmbd_work *work, void (*fn)(void **), void **arg)
+@@ -2412,7 +2398,7 @@ static int smb2_creat(struct ksmbd_work *work, struct path *path, char *name,
+ 			return rc;
+ 	}
+ 
+-	rc = ksmbd_vfs_kern_path(name, 0, path, 0);
++	rc = ksmbd_vfs_kern_path(work, name, 0, path, 0);
+ 	if (rc) {
+ 		pr_err("cannot get linux path (%s), err = %d\n",
+ 		       name, rc);
+@@ -2487,7 +2473,7 @@ int smb2_open(struct ksmbd_work *work)
+ 	struct oplock_info *opinfo;
+ 	__le32 *next_ptr = NULL;
+ 	int req_op_level = 0, open_flags = 0, may_flags = 0, file_info = 0;
+-	int rc = 0, len = 0;
++	int rc = 0;
+ 	int contxt_cnt = 0, query_disk_id = 0;
+ 	int maximal_access_ctxt = 0, posix_ctxt = 0;
+ 	int s_type = 0;
+@@ -2559,17 +2545,11 @@ int smb2_open(struct ksmbd_work *work)
+ 			goto err_out1;
+ 		}
+ 	} else {
+-		len = strlen(share->path);
+-		ksmbd_debug(SMB, "share path len %d\n", len);
+-		name = kmalloc(len + 1, GFP_KERNEL);
++		name = kstrdup("", GFP_KERNEL);
+ 		if (!name) {
+-			rsp->hdr.Status = STATUS_NO_MEMORY;
+ 			rc = -ENOMEM;
+ 			goto err_out1;
+ 		}
+-
+-		memcpy(name, share->path, len);
+-		*(name + len) = '\0';
+ 	}
+ 
+ 	req_op_level = req->RequestedOplockLevel;
+@@ -2692,7 +2672,7 @@ int smb2_open(struct ksmbd_work *work)
+ 		goto err_out1;
+ 	}
+ 
+-	rc = ksmbd_vfs_kern_path(name, LOOKUP_NO_SYMLINKS, &path, 1);
++	rc = ksmbd_vfs_kern_path(work, name, LOOKUP_NO_SYMLINKS, &path, 1);
+ 	if (!rc) {
+ 		if (req->CreateOptions & FILE_DELETE_ON_CLOSE_LE) {
+ 			/*
+@@ -2721,11 +2701,8 @@ int smb2_open(struct ksmbd_work *work)
+ 	}
+ 
+ 	if (rc) {
+-		if (rc == -EACCES) {
+-			ksmbd_debug(SMB,
+-				    "User does not have right permission\n");
++		if (rc != -ENOENT)
+ 			goto err_out;
+-		}
+ 		ksmbd_debug(SMB, "can not get linux path for %s, rc = %d\n",
+ 			    name, rc);
+ 		rc = 0;
+@@ -3229,7 +3206,7 @@ int smb2_open(struct ksmbd_work *work)
+ 			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+ 		else if (rc == -EOPNOTSUPP)
+ 			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+-		else if (rc == -EACCES || rc == -ESTALE)
++		else if (rc == -EACCES || rc == -ESTALE || rc == -EXDEV)
+ 			rsp->hdr.Status = STATUS_ACCESS_DENIED;
+ 		else if (rc == -ENOENT)
+ 			rsp->hdr.Status = STATUS_OBJECT_NAME_INVALID;
+@@ -4345,8 +4322,7 @@ static int get_file_all_info(struct ksmbd_work *work,
+ 		return -EACCES;
+ 	}
+ 
+-	filename = convert_to_nt_pathname(fp->filename,
+-					  work->tcon->share_conf->path);
++	filename = convert_to_nt_pathname(fp->filename);
+ 	if (!filename)
+ 		return -ENOMEM;
+ 
+@@ -4801,7 +4777,7 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
+ 	int rc = 0, len;
+ 	int fs_infoclass_size = 0;
+ 
+-	rc = ksmbd_vfs_kern_path(share->path, LOOKUP_NO_SYMLINKS, &path, 0);
++	rc = kern_path(share->path, LOOKUP_NO_SYMLINKS, &path);
+ 	if (rc) {
+ 		pr_err("cannot create vfs path\n");
  		return -EIO;
+@@ -5350,7 +5326,7 @@ static int smb2_rename(struct ksmbd_work *work,
+ 			goto out;
  
-+	if (acl_len < sizeof(struct smb_ntsd))
-+		return -EINVAL;
+ 		len = strlen(new_name);
+-		if (new_name[len - 1] != '/') {
++		if (len > 0 && new_name[len - 1] != '/') {
+ 			pr_err("not allow base filename in rename\n");
+ 			rc = -ESHARE;
+ 			goto out;
+@@ -5378,11 +5354,14 @@ static int smb2_rename(struct ksmbd_work *work,
+ 	}
+ 
+ 	ksmbd_debug(SMB, "new name %s\n", new_name);
+-	rc = ksmbd_vfs_kern_path(new_name, LOOKUP_NO_SYMLINKS, &path, 1);
+-	if (rc)
++	rc = ksmbd_vfs_kern_path(work, new_name, LOOKUP_NO_SYMLINKS, &path, 1);
++	if (rc) {
++		if (rc != -ENOENT)
++			goto out;
+ 		file_present = false;
+-	else
++	} else {
+ 		path_put(&path);
++	}
+ 
+ 	if (ksmbd_share_veto_filename(share, new_name)) {
+ 		rc = -ENOENT;
+@@ -5456,11 +5435,14 @@ static int smb2_create_link(struct ksmbd_work *work,
+ 	}
+ 
+ 	ksmbd_debug(SMB, "target name is %s\n", target_name);
+-	rc = ksmbd_vfs_kern_path(link_name, LOOKUP_NO_SYMLINKS, &path, 0);
+-	if (rc)
++	rc = ksmbd_vfs_kern_path(work, link_name, LOOKUP_NO_SYMLINKS, &path, 0);
++	if (rc) {
++		if (rc != -ENOENT)
++			goto out;
+ 		file_present = false;
+-	else
++	} else {
+ 		path_put(&path);
++	}
+ 
+ 	if (file_info->ReplaceIfExists) {
+ 		if (file_present) {
+@@ -5618,7 +5600,7 @@ static int set_file_allocation_info(struct ksmbd_work *work,
+ 		 * inode size is retained by backup inode size.
+ 		 */
+ 		size = i_size_read(inode);
+-		rc = ksmbd_vfs_truncate(work, NULL, fp, alloc_blks * 512);
++		rc = ksmbd_vfs_truncate(work, fp, alloc_blks * 512);
+ 		if (rc) {
+ 			pr_err("truncate failed! filename : %s, err %d\n",
+ 			       fp->filename, rc);
+@@ -5653,7 +5635,7 @@ static int set_end_of_file_info(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 	if (inode->i_sb->s_magic != MSDOS_SUPER_MAGIC) {
+ 		ksmbd_debug(SMB, "filename : %s truncated to newsize %lld\n",
+ 			    fp->filename, newsize);
+-		rc = ksmbd_vfs_truncate(work, NULL, fp, newsize);
++		rc = ksmbd_vfs_truncate(work, fp, newsize);
+ 		if (rc) {
+ 			ksmbd_debug(SMB, "truncate failed! filename : %s err %d\n",
+ 				    fp->filename, rc);
+@@ -5975,7 +5957,7 @@ int smb2_set_info(struct ksmbd_work *work)
+ 	return 0;
+ 
+ err_out:
+-	if (rc == -EACCES || rc == -EPERM)
++	if (rc == -EACCES || rc == -EPERM || rc == -EXDEV)
+ 		rsp->hdr.Status = STATUS_ACCESS_DENIED;
+ 	else if (rc == -EINVAL)
+ 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+diff --git a/fs/ksmbd/vfs.c b/fs/ksmbd/vfs.c
+index 3733e4944c1d..b41954294d38 100644
+--- a/fs/ksmbd/vfs.c
++++ b/fs/ksmbd/vfs.c
+@@ -19,6 +19,8 @@
+ #include <linux/sched/xacct.h>
+ #include <linux/crc32c.h>
+ 
++#include "../internal.h"	/* for vfs_path_lookup */
 +
- 	owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
- 			le32_to_cpu(pntsd->osidoffset));
- 	group_sid_ptr = (struct smb_sid *)((char *)pntsd +
+ #include "glob.h"
+ #include "oplock.h"
+ #include "connection.h"
+@@ -44,7 +46,6 @@ static char *extract_last_component(char *path)
+ 		p++;
+ 	} else {
+ 		p = NULL;
+-		pr_err("Invalid path %s\n", path);
+ 	}
+ 	return p;
+ }
+@@ -155,7 +156,7 @@ int ksmbd_vfs_query_maximal_access(struct user_namespace *user_ns,
+ /**
+  * ksmbd_vfs_create() - vfs helper for smb create file
+  * @work:	work
+- * @name:	file name
++ * @name:	file name that is relative to share
+  * @mode:	file create mode
+  *
+  * Return:	0 on success, otherwise error
+@@ -166,7 +167,8 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mode)
+ 	struct dentry *dentry;
+ 	int err;
+ 
+-	dentry = kern_path_create(AT_FDCWD, name, &path, LOOKUP_NO_SYMLINKS);
++	dentry = ksmbd_vfs_kern_path_create(work, name,
++					    LOOKUP_NO_SYMLINKS, &path);
+ 	if (IS_ERR(dentry)) {
+ 		err = PTR_ERR(dentry);
+ 		if (err != -ENOENT)
+@@ -191,7 +193,7 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mode)
+ /**
+  * ksmbd_vfs_mkdir() - vfs helper for smb create directory
+  * @work:	work
+- * @name:	directory name
++ * @name:	directory name that is relative to share
+  * @mode:	directory create mode
+  *
+  * Return:	0 on success, otherwise error
+@@ -203,8 +205,9 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode)
+ 	struct dentry *dentry;
+ 	int err;
+ 
+-	dentry = kern_path_create(AT_FDCWD, name, &path,
+-				  LOOKUP_NO_SYMLINKS | LOOKUP_DIRECTORY);
++	dentry = ksmbd_vfs_kern_path_create(work, name,
++					    LOOKUP_NO_SYMLINKS | LOOKUP_DIRECTORY,
++					    &path);
+ 	if (IS_ERR(dentry)) {
+ 		err = PTR_ERR(dentry);
+ 		if (err != -EEXIST)
+@@ -579,7 +582,7 @@ int ksmbd_vfs_fsync(struct ksmbd_work *work, u64 fid, u64 p_id)
+ 
+ /**
+  * ksmbd_vfs_remove_file() - vfs helper for smb rmdir or unlink
+- * @name:	absolute directory or file name
++ * @name:	directory or file name that is relative to share
+  *
+  * Return:	0 on success, otherwise error
+  */
+@@ -593,7 +596,7 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, char *name)
+ 	if (ksmbd_override_fsids(work))
+ 		return -ENOMEM;
+ 
+-	err = kern_path(name, LOOKUP_NO_SYMLINKS, &path);
++	err = ksmbd_vfs_kern_path(work, name, LOOKUP_NO_SYMLINKS, &path, false);
+ 	if (err) {
+ 		ksmbd_debug(VFS, "can't get %s, err %d\n", name, err);
+ 		ksmbd_revert_fsids(work);
+@@ -638,7 +641,7 @@ int ksmbd_vfs_remove_file(struct ksmbd_work *work, char *name)
+ /**
+  * ksmbd_vfs_link() - vfs helper for creating smb hardlink
+  * @oldname:	source file name
+- * @newname:	hardlink name
++ * @newname:	hardlink name that is relative to share
+  *
+  * Return:	0 on success, otherwise error
+  */
+@@ -659,8 +662,9 @@ int ksmbd_vfs_link(struct ksmbd_work *work, const char *oldname,
+ 		goto out1;
+ 	}
+ 
+-	dentry = kern_path_create(AT_FDCWD, newname, &newpath,
+-				  LOOKUP_NO_SYMLINKS | LOOKUP_REVAL);
++	dentry = ksmbd_vfs_kern_path_create(work, newname,
++					    LOOKUP_NO_SYMLINKS | LOOKUP_REVAL,
++					    &newpath);
+ 	if (IS_ERR(dentry)) {
+ 		err = PTR_ERR(dentry);
+ 		pr_err("path create err for %s, err %d\n", newname, err);
+@@ -781,14 +785,17 @@ int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 	int err;
+ 
+ 	dst_name = extract_last_component(newname);
+-	if (!dst_name)
+-		return -EINVAL;
++	if (!dst_name) {
++		dst_name = newname;
++		newname = "";
++	}
+ 
+ 	src_dent_parent = dget_parent(fp->filp->f_path.dentry);
+ 	src_dent = fp->filp->f_path.dentry;
+ 
+-	err = kern_path(newname, LOOKUP_NO_SYMLINKS | LOOKUP_DIRECTORY,
+-			&dst_path);
++	err = ksmbd_vfs_kern_path(work, newname,
++				  LOOKUP_NO_SYMLINKS | LOOKUP_DIRECTORY,
++				  &dst_path, false);
+ 	if (err) {
+ 		ksmbd_debug(VFS, "Cannot get path for %s [%d]\n", newname, err);
+ 		goto out;
+@@ -834,61 +841,43 @@ int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
+ /**
+  * ksmbd_vfs_truncate() - vfs helper for smb file truncate
+  * @work:	work
+- * @name:	old filename
+  * @fid:	file id of old file
+  * @size:	truncate to given size
+  *
+  * Return:	0 on success, otherwise error
+  */
+-int ksmbd_vfs_truncate(struct ksmbd_work *work, const char *name,
++int ksmbd_vfs_truncate(struct ksmbd_work *work,
+ 		       struct ksmbd_file *fp, loff_t size)
+ {
+-	struct path path;
+ 	int err = 0;
++	struct file *filp;
+ 
+-	if (name) {
+-		err = kern_path(name, LOOKUP_NO_SYMLINKS, &path);
+-		if (err) {
+-			pr_err("cannot get linux path for %s, err %d\n",
+-			       name, err);
+-			return err;
+-		}
+-		err = vfs_truncate(&path, size);
+-		if (err)
+-			pr_err("truncate failed for %s err %d\n",
+-			       name, err);
+-		path_put(&path);
+-	} else {
+-		struct file *filp;
+-
+-		filp = fp->filp;
+-
+-		/* Do we need to break any of a levelII oplock? */
+-		smb_break_all_levII_oplock(work, fp, 1);
++	filp = fp->filp;
+ 
+-		if (!work->tcon->posix_extensions) {
+-			struct inode *inode = file_inode(filp);
++	/* Do we need to break any of a levelII oplock? */
++	smb_break_all_levII_oplock(work, fp, 1);
+ 
+-			if (size < inode->i_size) {
+-				err = check_lock_range(filp, size,
+-						       inode->i_size - 1, WRITE);
+-			} else {
+-				err = check_lock_range(filp, inode->i_size,
+-						       size - 1, WRITE);
+-			}
++	if (!work->tcon->posix_extensions) {
++		struct inode *inode = file_inode(filp);
+ 
+-			if (err) {
+-				pr_err("failed due to lock\n");
+-				return -EAGAIN;
+-			}
++		if (size < inode->i_size) {
++			err = check_lock_range(filp, size,
++					       inode->i_size - 1, WRITE);
++		} else {
++			err = check_lock_range(filp, inode->i_size,
++					       size - 1, WRITE);
+ 		}
+ 
+-		err = vfs_truncate(&filp->f_path, size);
+-		if (err)
+-			pr_err("truncate failed for filename : %s err %d\n",
+-			       fp->filename, err);
++		if (err) {
++			pr_err("failed due to lock\n");
++			return -EAGAIN;
++		}
+ 	}
+ 
++	err = vfs_truncate(&filp->f_path, size);
++	if (err)
++		pr_err("truncate failed for filename : %s err %d\n",
++		       fp->filename, err);
+ 	return err;
+ }
+ 
+@@ -1206,22 +1195,25 @@ static int ksmbd_vfs_lookup_in_dir(struct path *dir, char *name, size_t namelen)
+ 
+ /**
+  * ksmbd_vfs_kern_path() - lookup a file and get path info
+- * @name:	name of file for lookup
++ * @name:	file path that is relative to share
+  * @flags:	lookup flags
+  * @path:	if lookup succeed, return path info
+  * @caseless:	caseless filename lookup
+  *
+  * Return:	0 on success, otherwise error
+  */
+-int ksmbd_vfs_kern_path(char *name, unsigned int flags, struct path *path,
+-			bool caseless)
++int ksmbd_vfs_kern_path(struct ksmbd_work *work, char *name,
++			unsigned int flags, struct path *path, bool caseless)
+ {
++	struct ksmbd_share_config *share_conf = work->tcon->share_conf;
+ 	int err;
+ 
+-	if (name[0] != '/')
+-		return -EINVAL;
+-
+-	err = kern_path(name, flags, path);
++	flags |= LOOKUP_BENEATH;
++	err = vfs_path_lookup(share_conf->vfs_path.dentry,
++			      share_conf->vfs_path.mnt,
++			      name,
++			      flags,
++			      path);
+ 	if (!err)
+ 		return 0;
+ 
+@@ -1235,11 +1227,10 @@ int ksmbd_vfs_kern_path(char *name, unsigned int flags, struct path *path,
+ 			return -ENOMEM;
+ 
+ 		path_len = strlen(filepath);
+-		remain_len = path_len - 1;
++		remain_len = path_len;
+ 
+-		err = kern_path("/", flags, &parent);
+-		if (err)
+-			goto out;
++		parent = share_conf->vfs_path;
++		path_get(&parent);
+ 
+ 		while (d_can_lookup(parent.dentry)) {
+ 			char *filename = filepath + path_len - remain_len;
+@@ -1252,21 +1243,21 @@ int ksmbd_vfs_kern_path(char *name, unsigned int flags, struct path *path,
+ 
+ 			err = ksmbd_vfs_lookup_in_dir(&parent, filename,
+ 						      filename_len);
+-			if (err) {
+-				path_put(&parent);
++			path_put(&parent);
++			if (err)
+ 				goto out;
+-			}
+ 
+-			path_put(&parent);
+ 			next[0] = '\0';
+ 
+-			err = kern_path(filepath, flags, &parent);
++			err = vfs_path_lookup(share_conf->vfs_path.dentry,
++					      share_conf->vfs_path.mnt,
++					      filepath,
++					      flags,
++					      &parent);
+ 			if (err)
+ 				goto out;
+-
+-			if (is_last) {
+-				path->mnt = parent.mnt;
+-				path->dentry = parent.dentry;
++			else if (is_last) {
++				*path = parent;
+ 				goto out;
+ 			}
+ 
+@@ -1282,6 +1273,23 @@ int ksmbd_vfs_kern_path(char *name, unsigned int flags, struct path *path,
+ 	return err;
+ }
+ 
++struct dentry *ksmbd_vfs_kern_path_create(struct ksmbd_work *work,
++					  const char *name,
++					  unsigned int flags,
++					  struct path *path)
++{
++	char *abs_name;
++	struct dentry *dent;
++
++	abs_name = convert_to_unix_name(work->tcon->share_conf, name);
++	if (!abs_name)
++		return ERR_PTR(-ENOMEM);
++
++	dent = kern_path_create(AT_FDCWD, abs_name, path, flags);
++	kfree(abs_name);
++	return dent;
++}
++
+ int ksmbd_vfs_remove_acl_xattrs(struct user_namespace *user_ns,
+ 				struct dentry *dentry)
+ {
+diff --git a/fs/ksmbd/vfs.h b/fs/ksmbd/vfs.h
+index 85db50abdb24..7b1dcaa3fbdc 100644
+--- a/fs/ksmbd/vfs.h
++++ b/fs/ksmbd/vfs.h
+@@ -126,7 +126,7 @@ int ksmbd_vfs_link(struct ksmbd_work *work,
+ int ksmbd_vfs_getattr(struct path *path, struct kstat *stat);
+ int ksmbd_vfs_fp_rename(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 			char *newname);
+-int ksmbd_vfs_truncate(struct ksmbd_work *work, const char *name,
++int ksmbd_vfs_truncate(struct ksmbd_work *work,
+ 		       struct ksmbd_file *fp, loff_t size);
+ struct srv_copychunk;
+ int ksmbd_vfs_copy_file_ranges(struct ksmbd_work *work,
+@@ -152,8 +152,13 @@ int ksmbd_vfs_xattr_stream_name(char *stream_name, char **xattr_stream_name,
+ 				size_t *xattr_stream_name_size, int s_type);
+ int ksmbd_vfs_remove_xattr(struct user_namespace *user_ns,
+ 			   struct dentry *dentry, char *attr_name);
+-int ksmbd_vfs_kern_path(char *name, unsigned int flags, struct path *path,
++int ksmbd_vfs_kern_path(struct ksmbd_work *work,
++			char *name, unsigned int flags, struct path *path,
+ 			bool caseless);
++struct dentry *ksmbd_vfs_kern_path_create(struct ksmbd_work *work,
++					  const char *name,
++					  unsigned int flags,
++					  struct path *path);
+ int ksmbd_vfs_empty_dir(struct ksmbd_file *fp);
+ void ksmbd_vfs_set_fadvise(struct file *filp, __le32 option);
+ int ksmbd_vfs_zero_data(struct ksmbd_work *work, struct ksmbd_file *fp,
 -- 
 2.25.1
 
