@@ -2,128 +2,111 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4AA2C433F5
-	for <linux-cifs@archiver.kernel.org>; Sat, 25 Sep 2021 09:41:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24FCDC433EF
+	for <linux-cifs@archiver.kernel.org>; Sat, 25 Sep 2021 09:51:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A2F5761279
-	for <linux-cifs@archiver.kernel.org>; Sat, 25 Sep 2021 09:41:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CAE360F70
+	for <linux-cifs@archiver.kernel.org>; Sat, 25 Sep 2021 09:51:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239410AbhIYJn0 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 25 Sep 2021 05:43:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39940 "EHLO
+        id S236190AbhIYJwm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 25 Sep 2021 05:52:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237469AbhIYJnZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 25 Sep 2021 05:43:25 -0400
-Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AD76C061570
-        for <linux-cifs@vger.kernel.org>; Sat, 25 Sep 2021 02:41:51 -0700 (PDT)
-Received: by mail-vs1-xe2b.google.com with SMTP id o124so12657640vsc.6
-        for <linux-cifs@vger.kernel.org>; Sat, 25 Sep 2021 02:41:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=wz95OJVJwN+SVhLQaz7k3fGr6Ely/9klCeXZ94cMHFs=;
-        b=M3pDUvr9JRCUN72JPV0BxhtbQNolfftV+9SS+hOowmcp0Dt16m6TcBSd7npMLXiV+x
-         ghpkBRCniyvTFclWJYTnT1lM7wTWp5ML6UtHeuXdCJt5+slG/AZDA4IsF8y8n3siYDZ3
-         9JyNNFOcQImnVNRPhNyWAR1e1XwWtvVwVIXq4VIXxf30jKIytO6IXSqZbXIDb4JZ11Mv
-         oFbw6SLWLv+UjEYxP3H8qDoqLPz6qPfqMIPOefRvVMz+eRU28Hss9GBjJbXtvRtGs6at
-         nF7peX2F6kd8ixWr790eVbIdfW9gZohAXz9VKnR5KbhSTcxn96iUViqwT+HnVRSymfK6
-         LNEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=wz95OJVJwN+SVhLQaz7k3fGr6Ely/9klCeXZ94cMHFs=;
-        b=jA5dxp+IBTNOzwFFMOe0VVRPQuYkazXTHp562l496wNjwJ5TwHVrRmcLGS3/E/MbJP
-         P4CH98ioqIZU6OUVu1+WP8t5+EqbHX7T8j3dwXhFp+IsyCfM4nKRuvw2nGSau8ZFNLac
-         2WCyf0WauT6/hPRH2cmi31Wmxwl6x3+qmpMtHeWt3vs0VN5/3BR+ShNmm8wh2N09cBVC
-         YSELBeHPvCvZP1MmcIhYqjjvI2qCc7orMNuRVbHlzkDIXucE9CsH57h6ZwG/4XWChXik
-         V5CQFhXrGXdMg2dy6YLCs70Ngvw6Q/6b6S1IeHtUWniYZjtme0e5Kv1Y8KU2A48FHVE/
-         PXhQ==
-X-Gm-Message-State: AOAM5318POwVvULaUYM/K3qSgeThSuWQvLfSLYy483wfdiQmD4Zw1Zbv
-        JKptP+qQ0vS1fkqaVBCjxYQtLcws2OrEK9aM5PY=
-X-Google-Smtp-Source: ABdhPJyXFIcruGCFR46vMtpxAh99x9/B+6LyvyihRuuovAk23Jtq7twmFL2Mj8rS8rQRjoSehGrInbqdJuExW402tR8=
-X-Received: by 2002:a67:c088:: with SMTP id x8mr12927792vsi.45.1632562910295;
- Sat, 25 Sep 2021 02:41:50 -0700 (PDT)
+        with ESMTP id S234958AbhIYJwl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 25 Sep 2021 05:52:41 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAED3C061570
+        for <linux-cifs@vger.kernel.org>; Sat, 25 Sep 2021 02:51:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Date:Message-ID:Cc:To:From;
+        bh=+pEd05JYcEvoB1lN00fgIR3R0MTA649eG9GxPWEO09o=; b=YLyYkwmo3y1XzILvgVx2nsmcfy
+        grvYdgzF73bHFbayjtJ/P7HgO2b4otAuuHIjXKZc3SVKIb/0SImq+q6lbGj2f2OYnFSnEjen56oWL
+        XdeAfBqRdA2jsx3YqKfmibtf6SAxEVJK+92hGuVM0k+K1QGlx33dPzMrr7xMqtlMTqhbybRPBQwB+
+        Bx40stIcuWR/JaMccj62VtcsTES3JRS8Aj5R+0e0T6p3jc5EXQrQIiVvsEx5LjKN7ds+va+TQZilb
+        PRWshcYFqkHdxgOvoKzswiy0aan85L2Hid1tjJbZvyYi/wjhBU644Nz9Ba6o4hLuOh/sjL+3lEIYm
+        SFMNeRVoydjjVfzWKg6ad2iujMvr8e+Rm3CzDHeYfZXyekxzasw2SAP8GvzBSFZ2hlsORHG38FpKx
+        YXtPzm6drTgdSrxN+vFjAMK7laAxBWGIKBEGcCFqL4Wz0olIb/C19x/n+NZdUxCpx0CKhMC5b6sph
+        zkriBk/+9+uQM+FmQep94DOj;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1mU4Km-007ojW-KB; Sat, 25 Sep 2021 09:51:04 +0000
+Subject: Re: Building ksmbd as external module on kernel < 5.15
+From:   Ralph Boehme <slow@samba.org>
+To:     COMMON INTERNET FILE SYSTEM SERVER <linux-cifs@vger.kernel.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>
+References: <040d44a6-5c7c-5053-6e03-8db045519c0a@samba.org>
+Message-ID: <408a97fe-19dc-54dd-eb15-284043ddee69@samba.org>
+Date:   Sat, 25 Sep 2021 11:51:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-References: <20210924021254.27096-1-linkinjeon@kernel.org> <20210924021254.27096-7-linkinjeon@kernel.org>
-In-Reply-To: <20210924021254.27096-7-linkinjeon@kernel.org>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Sat, 25 Sep 2021 18:41:39 +0900
-Message-ID: <CANFS6bbS4N2A_TegWnf+-tEQOMkJk8i2tG89PQdGC3bb3wWhbQ@mail.gmail.com>
-Subject: Re: [PATCH 6/7] ksmbd: fix invalid request buffer access in compound
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Tom Talpey <tom@talpey.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
-        Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <040d44a6-5c7c-5053-6e03-8db045519c0a@samba.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="WnQvrqhuZ2nrBobghHql160LOllREDUm3"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Looks good to me.
-Acked-by: Hyunchul Lee <hyc.lee@gmail.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WnQvrqhuZ2nrBobghHql160LOllREDUm3
+Content-Type: multipart/mixed; boundary="fGQ5h86SuXewGCY9SYGyS7b7wmjk1ouzD";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: COMMON INTERNET FILE SYSTEM SERVER <linux-cifs@vger.kernel.org>
+Cc: Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>
+Message-ID: <408a97fe-19dc-54dd-eb15-284043ddee69@samba.org>
+Subject: Re: Building ksmbd as external module on kernel < 5.15
+References: <040d44a6-5c7c-5053-6e03-8db045519c0a@samba.org>
+In-Reply-To: <040d44a6-5c7c-5053-6e03-8db045519c0a@samba.org>
 
-2021=EB=85=84 9=EC=9B=94 24=EC=9D=BC (=EA=B8=88) =EC=98=A4=EC=A0=84 11:13, =
-Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+--fGQ5h86SuXewGCY9SYGyS7b7wmjk1ouzD
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
->
-> Ronnie reported invalid request buffer access in chained command when
-> inserting garbage value to NextCommand of compound request.
-> This patch add validation check to avoid this issue.
->
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: Ralph B=C3=B6hme <slow@samba.org>
-> Cc: Steve French <smfrench@gmail.com>
-> Cc: Hyunchul Lee <hyc.lee@gmail.com>
-> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-> ---
->  fs/ksmbd/smb2pdu.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index a930838fd6ac..4f7b5e18a7b9 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -459,13 +459,22 @@ static void init_chained_smb2_rsp(struct ksmbd_work=
- *work)
->  bool is_chained_smb2_message(struct ksmbd_work *work)
->  {
->         struct smb2_hdr *hdr =3D work->request_buf;
-> -       unsigned int len;
-> +       unsigned int len, next_cmd;
->
->         if (hdr->ProtocolId !=3D SMB2_PROTO_NUMBER)
->                 return false;
->
->         hdr =3D ksmbd_req_buf_next(work);
-> -       if (le32_to_cpu(hdr->NextCommand) > 0) {
-> +       next_cmd =3D le32_to_cpu(hdr->NextCommand);
-> +       if (next_cmd > 0) {
-> +               if ((u64)work->next_smb2_rcv_hdr_off + next_cmd +
-> +                       __SMB2_HEADER_STRUCTURE_SIZE >
-> +                   get_rfc1002_len(work->request_buf)) {
-> +                       pr_err("next command(%u) offset exceeds smb msg s=
-ize\n",
-> +                              next_cmd);
-> +                       return false;
-> +               }
-> +
->                 ksmbd_debug(SMB, "got SMB2 chained command\n");
->                 init_chained_smb2_rsp(work);
->                 return true;
-> --
-> 2.25.1
->
+Am 25.09.21 um 11:15 schrieb Ralph Boehme:
+> Is building the module on older kernels (I'm=20
+> on 5.13.14-200.fc34.x86_64) actually supported?
+
+as checkpatch.pl warns about using LINUX_VERSION_CODE, I guess the=20
+building on older kernels is not supported anymore.
+
+Is there any other way to just compile the module against a running=20
+distro kernel? Or do I have to bite the bullit and build and install the =
+
+full kernel?
+
+-slow
+
+--=20
+Ralph Boehme, Samba Team                 https://samba.org/
+SerNet Samba Team Lead      https://sernet.de/en/team-samba
 
 
---
-Thanks,
-Hyunchul
+--fGQ5h86SuXewGCY9SYGyS7b7wmjk1ouzD--
+
+--WnQvrqhuZ2nrBobghHql160LOllREDUm3
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFO8QYFAwAAAAAACgkQqh6bcSY5nkYV
+5BAAmFbCYMihFDG/ArX9W2SqElf9Ul2IvdXOVF7QB3LOQp4meIKHphEjeqx+OBH75Sveo0aCU1xA
+p30zj1NiYFq0GjeiXYPWNb1Dsp6YRO2PBf9Lyhx4Ae0bkkxFsSm6tPRVgdBZFh85Ntr+zjiutzKN
+NBUejJT5G8wuRCzQTHlBCr7Qw4BDbdmgOGoP80DmptZCQPyMlMtQrD03+jQp7zzuW1f83KbM6rTy
+TAIXP4XbPDNfebHt+wbaLbtDpCD1HKIqTFnDAeo8h9OjDj/2MU2Ulx4WqOTqe4DOo1eGJ9m7zixc
+qscHO22mq01BkbY0E7K/JQ7v0UQ6uwDbE1AbyRCG8jGdhhc2Thkwa8R4jg7/GoZLFexKAOKZl5h2
+xH+LhU7b295bq2CODrkCuEvSEdGe3mM6kwf+d1M0slGBwZqC/ss0YWId+AdW5vLiM1zNgaNam/bS
+Td15775N6ljmVwSoQvcRQO1oShICXvmOBjGF56XlDzE52If2i94Eux6UHooJxY6xRmMo5q0RT9r9
+sPsDYFH68gLdgzTYAm8v0j+chsbkkenzFhDhb7jRbcsDkHGQCrb6FXeQarEkE6e9dw87+HX7voL2
+JhmanzDHAl6rlSWkMuFoFqqc4uuoVpZHQ6McKIpMjy6CotphsZs7O5U6c2p3YVQiTlHZjTv+SjQJ
+iWg=
+=3XHF
+-----END PGP SIGNATURE-----
+
+--WnQvrqhuZ2nrBobghHql160LOllREDUm3--
