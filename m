@@ -2,60 +2,134 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62BB4C433F5
-	for <linux-cifs@archiver.kernel.org>; Sat, 25 Sep 2021 19:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9749C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 25 Sep 2021 23:42:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C94861090
-	for <linux-cifs@archiver.kernel.org>; Sat, 25 Sep 2021 19:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBB9D6108C
+	for <linux-cifs@archiver.kernel.org>; Sat, 25 Sep 2021 23:42:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbhIYTI2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 25 Sep 2021 15:08:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59372 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229711AbhIYTI2 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 25 Sep 2021 15:08:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 3E1CB60F21;
-        Sat, 25 Sep 2021 19:06:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632596813;
-        bh=q04A9ypAsYSv2vrV0NyiUYkOR63+DjriFSB3N3AsLDU=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=b6yks09HtRy1XpCmS2Gv9aFb+Xv2woA6D+jLmyU0nBWuYGpDeX/pFwktzmkO6RyFZ
-         xxhnaTTIYGh3F/byMxv129kcZOsH8MNbuCrUG7NKBsuY5xiWXpHbWGNAtuEAzu2/0B
-         5l8guW7dInciBeN97PHZU6iJQAHtrrpHSd1U7NOrxclFFr0+NJoEUbaocHdJphP1JC
-         HiUu+eF41k7ClWADfGwupCAolo1DmG7SF7sMMMBLQAiOj6GvcOOKXWjgg4Rgm1syC5
-         CAKDXLru70qaXfwJ8MKkpYU7cF/S7FDS2BQbYSG+ljiziQ5/Nf5nn9Ur6l465pjbcu
-         pVvWK+IXXoA+Q==
-Subject: Re: [GIT PULL] cifs/smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5msXrOGB1_JC-4jg0F4jbq5G33bGE8-uvdO6Doyw79E_mA@mail.gmail.com>
-References: <CAH2r5msXrOGB1_JC-4jg0F4jbq5G33bGE8-uvdO6Doyw79E_mA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5msXrOGB1_JC-4jg0F4jbq5G33bGE8-uvdO6Doyw79E_mA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.15-rc2-smb3-fixes
-X-PR-Tracked-Commit-Id: 9ed38fd4a15417cac83967360cf20b853bfab9b6
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b8f4296560e33e4e3cbed17a674d1b6dd23191af
-Message-Id: <163259681312.4077.4575437466377837829.pr-tracker-bot@kernel.org>
-Date:   Sat, 25 Sep 2021 19:06:53 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        id S230157AbhIYXoc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 25 Sep 2021 19:44:32 -0400
+Received: from mail109.syd.optusnet.com.au ([211.29.132.80]:34355 "EHLO
+        mail109.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230078AbhIYXob (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 25 Sep 2021 19:44:31 -0400
+Received: from dread.disaster.area (pa49-195-238-16.pa.nsw.optusnet.com.au [49.195.238.16])
+        by mail109.syd.optusnet.com.au (Postfix) with ESMTPS id 08B668A154;
+        Sun, 26 Sep 2021 09:42:44 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1mUHJb-00GjRM-K9; Sun, 26 Sep 2021 09:42:43 +1000
+Date:   Sun, 26 Sep 2021 09:42:43 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     willy@infradead.org, hch@lst.de, trond.myklebust@primarydata.com,
+        Theodore Ts'o <tytso@mit.edu>, linux-block@vger.kernel.org,
+        ceph-devel@vger.kernel.org,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Anna Schumaker <anna.schumaker@netapp.com>, linux-mm@kvack.org,
+        Bob Liu <bob.liu@oracle.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Seth Jennings <sjenning@linux.vnet.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-cifs@vger.kernel.org, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Steve French <sfrench@samba.org>, NeilBrown <neilb@suse.de>,
+        Dan Magenheimer <dan.magenheimer@oracle.com>,
+        linux-nfs@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
+        linux-btrfs@vger.kernel.org, viro@zeniv.linux.org.uk,
+        torvalds@linux-foundation.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC][PATCH v3 0/9] mm: Use DIO for swap and fix NFS swapfiles
+Message-ID: <20210925234243.GA1756565@dread.disaster.area>
+References: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0
+        a=DzKKRZjfViQTE5W6EVc0VA==:117 a=DzKKRZjfViQTE5W6EVc0VA==:17
+        a=kj9zAlcOel0A:10 a=7QKq2e-ADPsA:10 a=7-415B0cAAAA:8
+        a=MUEH3GQPxMcp5Lh2lNUA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Fri, 24 Sep 2021 18:23:14 -0500:
+On Fri, Sep 24, 2021 at 06:17:52PM +0100, David Howells wrote:
+> 
+> Hi Willy, Trond, Christoph,
+> 
+> Here's v3 of a change to make reads and writes from the swapfile use async
+> DIO, adding a new ->swap_rw() address_space method, rather than readpage()
+> or direct_IO(), as requested by Willy.  This allows NFS to bypass the write
+> checks that prevent swapfiles from working, plus a bunch of other checks
+> that may or may not be necessary.
+> 
+> Whilst trying to make this work, I found that NFS's support for swapfiles
+> seems to have been non-functional since Aug 2019 (I think), so the first
+> patch fixes that.  Question is: do we actually *want* to keep this
+> functionality, given that it seems that no one's tested it with an upstream
+> kernel in the last couple of years?
+> 
+> There are additional patches to get rid of noop_direct_IO and replace it
+> with a feature bitmask, to make btrfs, ext4, xfs and raw blockdevs use the
+> new ->swap_rw method and thence remove the direct BIO submission paths from
+> swap.
+> 
+> I kept the IOCB_SWAP flag, using it to enable REQ_SWAP.  I'm not sure if
+> that's necessary, but it seems accounting related.
+> 
+> The synchronous DIO I/O code on NFS, raw blockdev, ext4 swapfile and xfs
+> swapfile all seem to work fine.  Btrfs refuses to swapon because the file
+> might be CoW'd.  I've tried doing "chattr +C", but that didn't help.
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.15-rc2-smb3-fixes
+Ok, so if the filesystem is doing block mapping in the IO path now,
+why does the swap file still need to map the file into a private
+block mapping now?  i.e all the work that iomap_swapfile_activate()
+does for filesystems like XFS and ext4 - it's this completely
+redundant now that we are doing block mapping during swap file IO
+via iomap_dio_rw()?
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b8f4296560e33e4e3cbed17a674d1b6dd23191af
+Actually, that path does all the "can we use this file as a swap
+file" checking. So the extent iteration can't go away, just the swap
+file mapping part (iomap_swapfile_add_extent()). This is necessary
+to ensure there aren't any holes in the file, and we still need that
+because the DIO write path will allocate into holes, which leads
+me to my main concern here.
 
-Thank you!
+Using the DIO path opens up the possibility that the filesystem
+could want to run transactions are part of the DIO. Right now we
+support unwritten extents for swap files (so they don't have to be
+written to allocate the backing store before activation) and that
+means we'll be doing DIO to unwritten extents. IO completion of a
+DIO write to an unwritten extent will run a transaction to convert
+that extent to written. A similar problem with sparse files exists,
+because allocation of blocks can be done from the DIO path, and that
+requires transactions. File extension is another potential
+transaction path we open up by using DIO writes dor swap.
 
+The problem is that a transaction run in swap IO context will will
+deadlock the filesystem. Either through the unbound memory demand of
+metadata modification, or from needing log space that can't be freed
+up because the metadata IO that will free the log space is waiting
+on memory allocation that is waiting on swap IO...
+
+I think some more thought needs to be put into controlling the
+behaviour/semantics of the DIO path so that it can be safely used
+by swap IO, because it's not a direct 1:1 behavioural mapping with
+existing DIO and there are potential deadlock vectors we need to
+avoid.
+
+Cheers,
+
+Dave.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Dave Chinner
+david@fromorbit.com
