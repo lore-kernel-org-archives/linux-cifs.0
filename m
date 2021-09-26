@@ -2,52 +2,54 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0ADAC433F5
-	for <linux-cifs@archiver.kernel.org>; Sun, 26 Sep 2021 14:12:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26753C433FE
+	for <linux-cifs@archiver.kernel.org>; Sun, 26 Sep 2021 14:12:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B285460F9B
-	for <linux-cifs@archiver.kernel.org>; Sun, 26 Sep 2021 14:12:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF5CD60F9B
+	for <linux-cifs@archiver.kernel.org>; Sun, 26 Sep 2021 14:12:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231808AbhIZONy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 26 Sep 2021 10:13:54 -0400
-Received: from mail-pl1-f172.google.com ([209.85.214.172]:37600 "EHLO
-        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231806AbhIZONx (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 26 Sep 2021 10:13:53 -0400
-Received: by mail-pl1-f172.google.com with SMTP id j14so9926486plx.4
-        for <linux-cifs@vger.kernel.org>; Sun, 26 Sep 2021 07:12:17 -0700 (PDT)
+        id S231823AbhIZON6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 26 Sep 2021 10:13:58 -0400
+Received: from mail-pj1-f49.google.com ([209.85.216.49]:42631 "EHLO
+        mail-pj1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231743AbhIZON5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 26 Sep 2021 10:13:57 -0400
+Received: by mail-pj1-f49.google.com with SMTP id rm6-20020a17090b3ec600b0019ece2bdd20so1636677pjb.1
+        for <linux-cifs@vger.kernel.org>; Sun, 26 Sep 2021 07:12:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lKzSMOtDJgCQmEZpZxoIamue2VEdKi8EZahRa0SDfQg=;
-        b=MD/HYYp3DmsLn9c9b+sZJfw67FjzlksYnTzlrsOv/wD1x9yLv7woQKaqLlT6HoBal5
-         DzdMhZpYDI/QKZPoT0PS0znSg4sgG+aB89SrHVAtkdmohx9y1jWYiPFhW/TL4cNer9xL
-         Kio2y5ikW1DPLSLrJr9cJveZVSYaRhyF6L+B4sVBmp8Jtuy3LPecIm497sDz+Za3pAkt
-         YqfxyxNKD2lJEfikJII3B0YhjGJrimJShosK/Rnn5VBIum2wk6tTx1g8TuMKnc9srYV1
-         68shqzTRzLsNBjzkVL8pdgh8utIwzZ7k/ot7Fo/y/T7JG+wKB1SABx3dwTagj7QHgz95
-         +sPw==
-X-Gm-Message-State: AOAM53257W+bGdlhmiDqRn9P9+M1Dcu3NmS8gaFD231s1K6sdXE7AIae
-        1BX9j2FXKV4i40kOfJPPcWEL3glWRRytOw==
-X-Google-Smtp-Source: ABdhPJz2JvnAXmMhSe49C3kyh3yZkPVeQBPr+r2aXdW+hD4oMUbSCqZvh6GYN3zWlBaE0xHutUoA/Q==
-X-Received: by 2002:a17:90a:384a:: with SMTP id l10mr13758638pjf.168.1632665537019;
-        Sun, 26 Sep 2021 07:12:17 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=hRxqyy3nibfhhA7qXc2RlbQEqbMe/ajEuAVhjSLNFsY=;
+        b=qiR+WDsoDJZFkizOkPdsiFvKGhkhcRgaLMQzsCAntQSZoFR19mpCQQTXhGO6vtwC1t
+         M6c0uLOtlUtkpz8TbHVAcj0GWPcqTbSGr96YOrkTdQsbJvruoXij+th71ubhd7WLAEti
+         eydAYamHcjJ9SEBayrakImptZcrbJzcAHMcXxOWvX53GaCuVpOkhfTmCTQwz4Xh+4FOy
+         mZR1obI9iKol45/Da9pzZoTCbWq3JaLOpojCVPeAPG1nHVL3itxLh9FNKb7Rsl/BWwAu
+         jrjuklYiiVUY8i3k90MFpJ9BOwfQltMx6/zmC37dP2rly0rhHi67jlbU/OaGb5eTgNiL
+         w+zg==
+X-Gm-Message-State: AOAM532SJqiY+eJa7vBP663Feu/IxujcoUxa2uVwUx+byFPV2wqYI80W
+        A0pmOwc7V6uMuIKVwcON3JCIhE23RVVi2A==
+X-Google-Smtp-Source: ABdhPJzyb/wpUI7L0PQk5GUTQnmfViY29n7um1C2/OSQMRcUoIhict6WGWbR1I2iuqn/962sTIWhWA==
+X-Received: by 2002:a17:90b:3715:: with SMTP id mg21mr14075569pjb.186.1632665541236;
+        Sun, 26 Sep 2021 07:12:21 -0700 (PDT)
 Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id g3sm16521742pgf.1.2021.09.26.07.12.14
+        by smtp.gmail.com with ESMTPSA id g3sm16521742pgf.1.2021.09.26.07.12.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Sep 2021 07:12:16 -0700 (PDT)
+        Sun, 26 Sep 2021 07:12:20 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
         Ronnie Sahlberg <ronniesahlberg@gmail.com>,
         =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
         Steve French <smfrench@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH v3 0/5] ksmbd: a bunch of patches
-Date:   Sun, 26 Sep 2021 22:55:38 +0900
-Message-Id: <20210926135543.119127-1-linkinjeon@kernel.org>
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>
+Subject: [PATCH v3 1/5] ksmbd: add the check to vaildate if stream protocol length exceeds maximum value
+Date:   Sun, 26 Sep 2021 22:55:39 +0900
+Message-Id: <20210926135543.119127-2-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210926135543.119127-1-linkinjeon@kernel.org>
+References: <20210926135543.119127-1-linkinjeon@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -55,44 +57,90 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+This patch add MAX_STREAM_PROT_LEN macro and check if stream protocol
+length exceeds maximum value. opencode pdu size check in
+ksmbd_pdu_size_has_room().
+
 Cc: Tom Talpey <tom@talpey.com>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: Ralph Böhme <slow@samba.org>
 Cc: Steve French <smfrench@gmail.com>
-Cc: Hyunchul Lee <hyc.lee@gmail.com>
 Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Acked-by: Hyunchul Lee <hyc.lee@gmail.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/connection.c | 10 ++++++----
+ fs/ksmbd/smb_common.c |  6 ------
+ fs/ksmbd/smb_common.h |  4 ++--
+ 3 files changed, 8 insertions(+), 12 deletions(-)
 
-v2:
-  - update comments of smb2_get_data_area_len().
-  - fix wrong buffer size check in fsctl_query_iface_info_ioctl().
-  - fix 32bit overflow in smb2_set_info.
-
-v3:
-  - add buffer check for ByteCount of smb negotiate request.
-  - Moved buffer check of to the top of loop to avoid unneeded behavior when
-    out_buf_len is smaller than network_interface_info_ioctl_rsp.
-  - get correct out_buf_len which doesn't exceed max stream protocol length.
-  - subtract single smb2_lock_element for correct buffer size check in
-    ksmbd_smb2_check_message(). 
-
-Namjae Jeon (5):
-  ksmbd: add the check to vaildate if stream protocol length exceeds
-    maximum value
-  ksmbd: add validation in smb2_ioctl
-  ksmbd: add request buffer validation in smb2_set_info
-  ksmbd: check strictly data area in ksmbd_smb2_check_message()
-  ksmbd: add validation in smb2 negotiate
-
- fs/ksmbd/connection.c |  10 +-
- fs/ksmbd/smb2misc.c   |  98 +++++++-------
- fs/ksmbd/smb2pdu.c    | 295 ++++++++++++++++++++++++++++++++----------
- fs/ksmbd/smb2pdu.h    |   9 ++
- fs/ksmbd/smb_common.c |  38 ++++--
- fs/ksmbd/smb_common.h |   4 +-
- fs/ksmbd/vfs.c        |   2 +-
- fs/ksmbd/vfs.h        |   2 +-
- 8 files changed, 321 insertions(+), 137 deletions(-)
-
+diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
+index af086d35398a..48b18b4ec117 100644
+--- a/fs/ksmbd/connection.c
++++ b/fs/ksmbd/connection.c
+@@ -296,10 +296,12 @@ int ksmbd_conn_handler_loop(void *p)
+ 		pdu_size = get_rfc1002_len(hdr_buf);
+ 		ksmbd_debug(CONN, "RFC1002 header %u bytes\n", pdu_size);
+ 
+-		/* make sure we have enough to get to SMB header end */
+-		if (!ksmbd_pdu_size_has_room(pdu_size)) {
+-			ksmbd_debug(CONN, "SMB request too short (%u bytes)\n",
+-				    pdu_size);
++		/*
++		 * Check if pdu size is valid (min : smb header size,
++		 * max : 0x00FFFFFF).
++		 */
++		if (pdu_size < __SMB2_HEADER_STRUCTURE_SIZE ||
++		    pdu_size > MAX_STREAM_PROT_LEN) {
+ 			continue;
+ 		}
+ 
+diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
+index 1da67217698d..36fd9695fbc5 100644
+--- a/fs/ksmbd/smb_common.c
++++ b/fs/ksmbd/smb_common.c
+@@ -21,7 +21,6 @@ static const char basechars[43] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_-!@#$%";
+ #define MAGIC_CHAR '~'
+ #define PERIOD '.'
+ #define mangle(V) ((char)(basechars[(V) % MANGLE_BASE]))
+-#define KSMBD_MIN_SUPPORTED_HEADER_SIZE	(sizeof(struct smb2_hdr))
+ 
+ struct smb_protocol {
+ 	int		index;
+@@ -267,11 +266,6 @@ int ksmbd_init_smb_server(struct ksmbd_work *work)
+ 	return 0;
+ }
+ 
+-bool ksmbd_pdu_size_has_room(unsigned int pdu)
+-{
+-	return (pdu >= KSMBD_MIN_SUPPORTED_HEADER_SIZE - 4);
+-}
+-
+ int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work, int info_level,
+ 				      struct ksmbd_file *dir,
+ 				      struct ksmbd_dir_info *d_info,
+diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
+index d7df19c97c4c..b8d225f7dbfc 100644
+--- a/fs/ksmbd/smb_common.h
++++ b/fs/ksmbd/smb_common.h
+@@ -48,6 +48,8 @@
+ #define CIFS_DEFAULT_IOSIZE	(64 * 1024)
+ #define MAX_CIFS_SMALL_BUFFER_SIZE 448 /* big enough for most */
+ 
++#define MAX_STREAM_PROT_LEN	0x00FFFFFF
++
+ /* Responses when opening a file. */
+ #define F_SUPERSEDED	0
+ #define F_OPENED	1
+@@ -492,8 +494,6 @@ int ksmbd_lookup_dialect_by_id(__le16 *cli_dialects, __le16 dialects_count);
+ 
+ int ksmbd_init_smb_server(struct ksmbd_work *work);
+ 
+-bool ksmbd_pdu_size_has_room(unsigned int pdu);
+-
+ struct ksmbd_kstat;
+ int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work,
+ 				      int info_level,
 -- 
 2.25.1
 
