@@ -2,101 +2,99 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31B42C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 27 Sep 2021 23:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4474CC433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 03:11:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CF66611CE
-	for <linux-cifs@archiver.kernel.org>; Mon, 27 Sep 2021 23:57:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2AFE46124B
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 03:11:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238200AbhI0X6y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 27 Sep 2021 19:58:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36220 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231674AbhI0X6y (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 27 Sep 2021 19:58:54 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DE3E4611F2
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Sep 2021 23:57:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632787035;
-        bh=lt7FxVYqWddYgEGJ/C2skEgCgRjr9y9cupAnOQ9Obko=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Dm/qktmul+NuuqxhAGidGNLLIi2ItYUMeHNv7gUpUbCJXK+INrgzXRsppl3Hd3lbr
-         FdhVIvjY0MYTFS41IDwRPjF/ng9pDZGrqTu01dWT19bn9BWjXIfzVaei8gyEJ+qMow
-         XDrKT12GQrPFcUMpAioryZYK1xwIBioKvHEQ0jGoT3sVNcijFeRJZP28Nw5Lec8OQ7
-         2ejxTDOEICQXzir6OmPecgJ5Zs7DPxLjEWP/j7hmSJ8bNGheJDU+UaU4l416bzQUzQ
-         47zFMim1gjKyvQiz7wxFkHfSk0dy5sT00dbl2dVVAEJ72bfD4czq0LJG3IYOY01hLE
-         PQPAcxlvkpZsg==
-Received: by mail-oi1-f180.google.com with SMTP id u22so27832452oie.5
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Sep 2021 16:57:15 -0700 (PDT)
-X-Gm-Message-State: AOAM533PH/NQUarWlVxtoaCX7jKKVT6P5IMWTtcBPKyHYnqNkvKgH97u
-        oIBqFjmWLTHDalzqztcbayfMGWS+DdN4w8NXhsM=
-X-Google-Smtp-Source: ABdhPJwf91WrRG6QaC9sTTv9xVafR8ow2ZkrEARy7hlcY2UNEKnel3N7YENSODoZeNMA20fyZ0jeYFxuRZSmCzqWls0=
-X-Received: by 2002:a05:6808:21a7:: with SMTP id be39mr1375694oib.138.1632787035246;
- Mon, 27 Sep 2021 16:57:15 -0700 (PDT)
+        id S238803AbhI1DNX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 27 Sep 2021 23:13:23 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:35268 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238748AbhI1DNX (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 27 Sep 2021 23:13:23 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 95E6C222DF;
+        Tue, 28 Sep 2021 03:11:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1632798701; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k1irZcE6GgE63UfMaZ69q7wFQxdxy8PkJV1UDRuOwDA=;
+        b=Af8PPYiGG/KoV03reINXBzNVPccmiyHVMrwNt2UIFxlU1jhXBp5nI2Gka9opvfla6EYXOa
+        u9dubE+5BF4AwBJlVzPfA+nwLlAQkhckDkag+FkKT+kBsnwd6qmqqlWA/pOjn0C1Ffe5V9
+        HYSxfFfncwL3S6Y8kijKplmMugjgsEE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1632798701;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=k1irZcE6GgE63UfMaZ69q7wFQxdxy8PkJV1UDRuOwDA=;
+        b=rvEM/v30W6HdMnLZksiPaBfoRjZ8iPYI6P23HeASJG7DpSxpqPRoywlWfOvhpMFCEARX9U
+        W3t0wcFCENMdaDDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C1463132D4;
+        Tue, 28 Sep 2021 03:11:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HD3CH+SHUmHafwAAMHmgww
+        (envelope-from <neilb@suse.de>); Tue, 28 Sep 2021 03:11:32 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Mon, 27 Sep 2021 16:57:14
- -0700 (PDT)
-In-Reply-To: <a15a1d99-1a2f-0f41-773e-def5b83f2304@samba.org>
-References: <20210926135543.119127-1-linkinjeon@kernel.org> <a15a1d99-1a2f-0f41-773e-def5b83f2304@samba.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 28 Sep 2021 08:57:14 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8G5xBBLTS0vS_p1TFoULuxSf-CFjE4n98D+sQrtjpjcw@mail.gmail.com>
-Message-ID: <CAKYAXd8G5xBBLTS0vS_p1TFoULuxSf-CFjE4n98D+sQrtjpjcw@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] ksmbd: a bunch of patches
-To:     Ralph Boehme <slow@samba.org>
-Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   "NeilBrown" <neilb@suse.de>
+To:     "David Howells" <dhowells@redhat.com>
+Cc:     willy@infradead.org, hch@lst.de, trond.myklebust@primarydata.com,
+        "Theodore Ts'o" <tytso@mit.edu>, linux-block@vger.kernel.org,
+        ceph-devel@vger.kernel.org,
+        "Trond Myklebust" <trond.myklebust@hammerspace.com>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        "Jeff Layton" <jlayton@kernel.org>,
+        "Andreas Dilger" <adilger.kernel@dilger.ca>,
+        "Anna Schumaker" <anna.schumaker@netapp.com>, linux-mm@kvack.org,
+        "Bob Liu" <bob.liu@oracle.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "Josef Bacik" <josef@toxicpanda.com>,
+        "Seth Jennings" <sjenning@linux.vnet.ibm.com>,
+        "Jens Axboe" <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-cifs@vger.kernel.org, "Chris Mason" <clm@fb.com>,
+        "David Sterba" <dsterba@suse.com>,
+        "Minchan Kim" <minchan@kernel.org>,
+        "Steve French" <sfrench@samba.org>,
+        "Dan Magenheimer" <dan.magenheimer@oracle.com>,
+        linux-nfs@vger.kernel.org, "Ilya Dryomov" <idryomov@gmail.com>,
+        linux-btrfs@vger.kernel.org, dhowells@redhat.com,
+        viro@zeniv.linux.org.uk, torvalds@linux-foundation.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC][PATCH v3 0/9] mm: Use DIO for swap and fix NFS swapfiles
+In-reply-to: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
+References: <163250387273.2330363.13240781819520072222.stgit@warthog.procyon.org.uk>
+Date:   Tue, 28 Sep 2021 13:11:29 +1000
+Message-id: <163279868982.18792.10448745714922373194@noble.neil.brown.name>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-09-28 0:42 GMT+09:00, Ralph Boehme <slow@samba.org>:
-> Hi Namjae
-Hi Ralph,
+On Sat, 25 Sep 2021, David Howells wrote:
+> Whilst trying to make this work, I found that NFS's support for swapfiles
+> seems to have been non-functional since Aug 2019 (I think), so the first
+> patch fixes that.  Question is: do we actually *want* to keep this
+> functionality, given that it seems that no one's tested it with an upstream
+> kernel in the last couple of years?
 
->
-> Am 26.09.21 um 15:55 schrieb Namjae Jeon:
->> Cc: Tom Talpey <tom@talpey.com>
->> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
->> Cc: Ralph B=C3=B6hme <slow@samba.org>
->> Cc: Steve French <smfrench@gmail.com>
->> Cc: Hyunchul Lee <hyc.lee@gmail.com>
->> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
->>
->> v2:
->>    - update comments of smb2_get_data_area_len().
->>    - fix wrong buffer size check in fsctl_query_iface_info_ioctl().
->>    - fix 32bit overflow in smb2_set_info.
->>
->> v3:
->>    - add buffer check for ByteCount of smb negotiate request.
->>    - Moved buffer check of to the top of loop to avoid unneeded behavior
->> when
->>      out_buf_len is smaller than network_interface_info_ioctl_rsp.
->>    - get correct out_buf_len which doesn't exceed max stream protocol
->> length.
->>    - subtract single smb2_lock_element for correct buffer size check in
->>      ksmbd_smb2_check_message().
->
-> I think there are a few issues with this patchset. I'm working on fixes
-> and improvements and will push my branch to my github clone once I'm
-> ready. I guess it's going to take a few days.
-It sounds like you're making a patch based on this patch-set. If there
-is missing something for buffer check, You can add a patch on top of
-this, but if there are wrong codes in patch-set, It is right to leave
-a review comment to update this patch-set.
+SUSE definitely want to keep this functionality.  We have customers
+using it.
+I agree it would be good if it was being tested somewhere....
 
-Thanks!
->
-> Cheers!
-> -slow
->
-> --
-> Ralph Boehme, Samba Team                 https://samba.org/
-> SerNet Samba Team Lead      https://sernet.de/en/team-samba
->
+Thanks,
+NeilBrown
