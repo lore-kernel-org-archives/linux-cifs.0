@@ -2,30 +2,30 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBB8C43217
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 05:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A4CC43219
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 05:59:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74F006108F
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 05:57:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0036A6108F
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 05:59:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239412AbhI1F7a (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Sep 2021 01:59:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49526 "EHLO mail.kernel.org"
+        id S239670AbhI1GBF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Sep 2021 02:01:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49598 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239097AbhI1F6i (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 28 Sep 2021 01:58:38 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 30F996134F;
-        Tue, 28 Sep 2021 05:56:35 +0000 (UTC)
+        id S239425AbhI1F7d (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 28 Sep 2021 01:59:33 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C868B611CB;
+        Tue, 28 Sep 2021 05:57:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632808595;
-        bh=crqvBOsxyoY5DzoUVWd4iR+3mgG1KyOOOtX4Z+Mn0zY=;
+        s=k20201202; t=1632808621;
+        bh=3ji6Muwf1LO3vqFgZ4Q+xM0r25/pBU9QOfCfBP+acHA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iC1TXuGYYV76tE3zy7GqjBHsmdKP3v1X+9pWUFu8MScwGwH8KReIgj2NuBoAwvwG+
-         Uozij6nQpMRmlpDVuYDpL6CGH77q6IY0Xq6qUGBLDf9MjYNZC5KHMCiBhDL9o2NkFj
-         S3PGR+XPEPuivqclUDRL8nfWqO6B7gmTDXFmJdynF6olJvVA5cq633AeaL+0bl9M7F
-         7HAkoW3TncMuaPIu7AvuKZZuFr9YWjky32Ml35gqgcsjCx0dl3oYdTlf2VCwyIWSNQ
-         szgbz31Ytdl0uDBx486OrVUJvRjiloOyEpzwk1dPPyrO9rLgJNTKknMoFGegOs3heN
-         mr1GkXwfX3jJw==
+        b=hRKumrelWBuNWIK1m3Ubnjzqs+CUuwY6r1XtONBiX9tqeQ00MDTUpRcg8Wuja5P+L
+         6fJoUjv5aWBwE7s5bJ99bNbwFtdDCT/VW6OSfC1vhl47i89ZiJlDiObI10AB7TcIwC
+         HqcedgeaktRaqT0T5DFL/Fr/em8npUn+fkRuLTueB114+CbMg9OL55s2Oo97rt79W9
+         pQbg8RFBgfETqAKqm3z3tDcVZ0OIb619wxvIefcN/yhh9VqxSiHcFKV6GFPvMspuv2
+         6v8gPFgQaT++a+glaGf7KnK4VZMuwRPGfZXpSZZeHxeVDCs39Tf4isGScKqWMPRlf5
+         Z0fF6Wlj7HBCA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Steve French <stfrench@microsoft.com>,
@@ -33,12 +33,12 @@ Cc:     Steve French <stfrench@microsoft.com>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
         Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
         linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.14 35/40] smb3: correct smb3 ACL security descriptor
-Date:   Tue, 28 Sep 2021 01:55:19 -0400
-Message-Id: <20210928055524.172051-35-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 22/23] smb3: correct smb3 ACL security descriptor
+Date:   Tue, 28 Sep 2021 01:56:43 -0400
+Message-Id: <20210928055645.172544-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20210928055524.172051-1-sashal@kernel.org>
-References: <20210928055524.172051-1-sashal@kernel.org>
+In-Reply-To: <20210928055645.172544-1-sashal@kernel.org>
+References: <20210928055645.172544-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -67,10 +67,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index b6d2e3591927..e1739d0135b4 100644
+index ca5102773b72..88554b640b0d 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -2398,7 +2398,7 @@ create_sd_buf(umode_t mode, bool set_owner, unsigned int *len)
+@@ -2339,7 +2339,7 @@ create_sd_buf(umode_t mode, bool set_owner, unsigned int *len)
  	buf->sd.OffsetDacl = cpu_to_le32(ptr - (__u8 *)&buf->sd);
  	/* Ship the ACL for now. we will copy it into buf later. */
  	aclptr = ptr;
@@ -79,7 +79,7 @@ index b6d2e3591927..e1739d0135b4 100644
  
  	/* create one ACE to hold the mode embedded in reserved special SID */
  	acelen = setup_special_mode_ACE((struct cifs_ace *)ptr, (__u64)mode);
-@@ -2423,7 +2423,7 @@ create_sd_buf(umode_t mode, bool set_owner, unsigned int *len)
+@@ -2364,7 +2364,7 @@ create_sd_buf(umode_t mode, bool set_owner, unsigned int *len)
  	acl.AclRevision = ACL_REVISION; /* See 2.4.4.1 of MS-DTYP */
  	acl.AclSize = cpu_to_le16(acl_size);
  	acl.AceCount = cpu_to_le16(ace_count);
