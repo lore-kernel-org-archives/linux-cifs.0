@@ -2,91 +2,113 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C3DC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 06:05:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C2BC433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 06:11:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3AC16101A
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 06:05:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2578F611C7
+	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 06:11:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238910AbhI1GHV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Sep 2021 02:07:21 -0400
-Received: from mail-pl1-f179.google.com ([209.85.214.179]:39775 "EHLO
-        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239594AbhI1GGH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Sep 2021 02:06:07 -0400
-Received: by mail-pl1-f179.google.com with SMTP id c4so13427594pls.6
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Sep 2021 23:04:28 -0700 (PDT)
+        id S238897AbhI1GMj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Sep 2021 02:12:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47884 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238814AbhI1GMh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 28 Sep 2021 02:12:37 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3902C061575
+        for <linux-cifs@vger.kernel.org>; Mon, 27 Sep 2021 23:10:58 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id m3so88158155lfu.2
+        for <linux-cifs@vger.kernel.org>; Mon, 27 Sep 2021 23:10:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NXI/4FSGtBP5QyrUDUozYHA30fFsmmruOEpZVP79nZ8=;
+        b=paN+G1E27l3mEIDnBIBqia4lABnAMNDhMvBPRQuK6Y9YGnsd77tyhOncrdTlnN4CZV
+         I1xZHOY3MEVlIqkER3Hxo/62wL8O7IpEkuXOsZjnxCOW4vRuDaxnVSZLKxzNpj4RyWSo
+         /64UJIn0sGWV8zOPxXtxpzSjy7DNRdiOglIFxII9GQHg+P/4cC8D4YvGdIsQib8sfWpS
+         Jv6CCduJdOnr3A1T6bPKnO/aS9bfw168Or9tNr8Qu2qhFZtKiMefvjD/d69N1mHQINf3
+         5s/nMZww7k/aKJq5IGz+ebpsPfus4iSxNhnM8h2GaOGnQ0vPijrQ+EZ87iDDP2Ow+Gu8
+         OlrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=U9ccFgVl6bmGNhtZUpDr1NBEpOTUvie5Cgr0hMxHZgQ=;
-        b=uthIohNF/yV/lkRuKyK4YNvlMZjJM0p6pNvatONEt1b3rXXbBQ433LQOS9kTkDf6Y3
-         ob3x+XxW5IOvyzA2VQTvctZ/YRGgd8WlwhT0LorIFFunvIpa5OALETNgQ1LFSono3sCW
-         ozjrzMyyUztUdTgjkB707Qb3y9Kdp7yrULxzcayMBXy6kSC/ADW1EvpQxGhPsPp0DcG9
-         83jWOiY6VOlYsF4GQpX1yF5YkpaiDJckM8GaiGkzd17SNUtI0udDulAs/QXz4pMAu3/f
-         WkFp8L+lf304T7d/AzPIMO5G1RGNo4mMZPiPddKLL91WBW1kntdjLM2zn0ufQB+/ZTGi
-         XdGg==
-X-Gm-Message-State: AOAM533T8Dfln9Aa3VTkj0MeSqjM6eWQyzJtnVMJpP+MIQOogLV8x31F
-        cESXLfl0xs5hic0OqASWhFCU/6IqY+rQgg==
-X-Google-Smtp-Source: ABdhPJzRSCEptZL243ozBXIp7ObxmyEJXzx+pKMNJszY09c8RP8eqz89/LlCUQj8EvFwyUy67KjuHA==
-X-Received: by 2002:a17:90a:8403:: with SMTP id j3mr3495351pjn.195.1632809068392;
-        Mon, 27 Sep 2021 23:04:28 -0700 (PDT)
-Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id s2sm18646817pfe.215.2021.09.27.23.04.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Sep 2021 23:04:28 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     smfrench@gmail.com, Namjae Jeon <linkinjeon@kernel.org>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] MAINTAINERS: rename cifs_common to smbfs_common in cifs and ksmbd entry
-Date:   Tue, 28 Sep 2021 15:04:04 +0900
-Message-Id: <20210928060404.6329-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NXI/4FSGtBP5QyrUDUozYHA30fFsmmruOEpZVP79nZ8=;
+        b=bw9/xOwPKGn/3NSLcmKce07YtbSkpXDbAeipRUpfVi2aZ2bxLWb9YdAUI83pLXz1li
+         p9yDOqcAhMpG1brQ6EvxON5KJsGGBl7hUlRitv99uQpDMSsbDikFxphQ+vmprijTdRz1
+         We6poli1VQFvmFXEN+jihIo8xf2WF/Nl+j2Z0bqtvqJGZ5+BGYKyInJaR4Lj2aUK13S4
+         KVGMBydc144HnoPEuDtzHOqAsENbPVvB2pAxEqrx5wxRSsywICeEkmWewz6OzJGZPM6t
+         UDYBJ6ZuBNVbU070y0hPBZ7DBS2E/aFA3GSyhk6R2N4EYjMhmWkUyRRUZdW/e0XLSwuE
+         svTQ==
+X-Gm-Message-State: AOAM530WkVgUq9TQgBLvpHtPhs/h6kwua8Wmd7Jyng4PdMNL2zD6jVR4
+        GJs8MUu7HfGkYKXZdSSdWZDSkimcjrJsgBF81x2p8a8I
+X-Google-Smtp-Source: ABdhPJz8+7ClAF4H1FY7rX/CZ1Zmnt6GhefUGLVqsSv3ZTD4UM/YguW/WjuN/H4Wot3QgDOXSNyuZJ/Y6fdHAKRA0gQ=
+X-Received: by 2002:a2e:4619:: with SMTP id t25mr4058951lja.398.1632809456911;
+ Mon, 27 Sep 2021 23:10:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210928060404.6329-1-linkinjeon@kernel.org>
+In-Reply-To: <20210928060404.6329-1-linkinjeon@kernel.org>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 28 Sep 2021 01:10:44 -0500
+Message-ID: <CAH2r5muUHmKxrSq4QYZy+7kxjYh4uss3DctTLoUskWYRsy709g@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: rename cifs_common to smbfs_common in cifs
+ and ksmbd entry
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-commit 23e91d8b7c5a("cifs: rename cifs_common to smbfs_common") cause
-the following warning from get_maintainer.pl.
+merged into cifsd-for-next
 
-./scripts/get_maintainer.pl --self-test=patterns complains:
-  warning: no file matches    F:    fs/cifs_common/
+On Tue, Sep 28, 2021 at 1:04 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
+>
+> commit 23e91d8b7c5a("cifs: rename cifs_common to smbfs_common") cause
+> the following warning from get_maintainer.pl.
+>
+> ./scripts/get_maintainer.pl --self-test=patterns complains:
+>   warning: no file matches    F:    fs/cifs_common/
+>
+> This patch rename cifs_common to smbfs_common in cifs and ksmbd entry.
+>
+> Reported-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  MAINTAINERS | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5b33791bb8e9..8a8c0e6eb458 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -4655,7 +4655,7 @@ W:        http://linux-cifs.samba.org/
+>  T:     git git://git.samba.org/sfrench/cifs-2.6.git
+>  F:     Documentation/admin-guide/cifs/
+>  F:     fs/cifs/
+> -F:     fs/cifs_common/
+> +F:     fs/smbfs_common/
+>
+>  COMPACTPCI HOTPLUG CORE
+>  M:     Scott Murray <scott@spiteful.org>
+> @@ -10193,8 +10193,8 @@ M:      Hyunchul Lee <hyc.lee@gmail.com>
+>  L:     linux-cifs@vger.kernel.org
+>  S:     Maintained
+>  T:     git git://git.samba.org/ksmbd.git
+> -F:     fs/cifs_common/
+>  F:     fs/ksmbd/
+> +F:     fs/smbfs_common/
+>
+>  KERNEL UNIT TESTING FRAMEWORK (KUnit)
+>  M:     Brendan Higgins <brendanhiggins@google.com>
+> --
+> 2.25.1
+>
 
-This patch rename cifs_common to smbfs_common in cifs and ksmbd entry.
 
-Reported-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5b33791bb8e9..8a8c0e6eb458 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4655,7 +4655,7 @@ W:	http://linux-cifs.samba.org/
- T:	git git://git.samba.org/sfrench/cifs-2.6.git
- F:	Documentation/admin-guide/cifs/
- F:	fs/cifs/
--F:	fs/cifs_common/
-+F:	fs/smbfs_common/
- 
- COMPACTPCI HOTPLUG CORE
- M:	Scott Murray <scott@spiteful.org>
-@@ -10193,8 +10193,8 @@ M:	Hyunchul Lee <hyc.lee@gmail.com>
- L:	linux-cifs@vger.kernel.org
- S:	Maintained
- T:	git git://git.samba.org/ksmbd.git
--F:	fs/cifs_common/
- F:	fs/ksmbd/
-+F:	fs/smbfs_common/
- 
- KERNEL UNIT TESTING FRAMEWORK (KUnit)
- M:	Brendan Higgins <brendanhiggins@google.com>
 -- 
-2.25.1
+Thanks,
 
+Steve
