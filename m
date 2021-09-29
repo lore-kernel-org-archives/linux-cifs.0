@@ -2,94 +2,98 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 526FBC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Sep 2021 22:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 313A6C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Sep 2021 23:52:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3574E61440
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Sep 2021 22:46:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 166626152A
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Sep 2021 23:52:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347321AbhI2WsH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Sep 2021 18:48:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45626 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346734AbhI2WsH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Sep 2021 18:48:07 -0400
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 008E3C061767
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Sep 2021 15:46:26 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HKWh019Lzz4xbP;
-        Thu, 30 Sep 2021 08:46:24 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1632955584;
-        bh=F1KSJW9tgExlSUhSWA21dJAYwChDnBlScLEOOuaLX5s=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=h6PrrLuCRM58SOS0jW3KbSrpbpIodog71ILNwSuKLP1nO2QDkrlwDaABV2m4VAghr
-         GC4vYama75yerO77YxYeK6zTvFltmyWqn2LJpgPLVCBkRGhm17xXlBeEkn3R89h4OV
-         Jj+AAztqyHRJSNHoD0mu9c3mNQdpGwvneWQeZpBPuYTTp5quv6Ke6Q6v1XchFB1dar
-         ADpUSzFHaZpLX5+hP7+Vf4X7aSRNu1cz6lka985iJUtoVeuXqy1xnq42Mtm4CVzdqJ
-         v0KN2XTY3HWjhCtFcF33ijvVu6zYSS80QmmJRahNeuS/1/0lnW4aeIGO4dY8BaNIIF
-         F0mXiP8bG2uDQ==
-Date:   Thu, 30 Sep 2021 08:46:23 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Steve French <smfrench@gmail.com>
-Cc:     ronnie sahlberg <ronniesahlberg@gmail.com>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Use less confusing branch name for populating ksmbd changes in
- for-next
-Message-ID: <20210930084623.3391092d@canb.auug.org.au>
-In-Reply-To: <CAH2r5mt_cFskiqbVvMn_M44p=0L-zFdkKsJj2JNYC3QLriEAXg@mail.gmail.com>
-References: <CAH2r5mt_cFskiqbVvMn_M44p=0L-zFdkKsJj2JNYC3QLriEAXg@mail.gmail.com>
+        id S234199AbhI2Xy2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Sep 2021 19:54:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58152 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233892AbhI2Xy1 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 29 Sep 2021 19:54:27 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 07B196138E
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Sep 2021 23:52:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632959566;
+        bh=DGsWN3ooaVYQkr5UutYUn3sBEDxPJk7Q39ZdhWXS/Co=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=etqUk6CcLgDKtIh3SLfcN9W/488+51llrL1/WhrCJCPaeG9xhYCcTALsUAzIxSmoK
+         TIIlILJ7lE+FWq+UWVoSN5Xfd6srfgXxEPP01RhfKM3T2Ow6193wzykA50Gg0hBWAT
+         Hz30v4UHafOfcsJFsAajRgobBZxGt7wFFGgbNsj6Hhuv6T0l8uVAKmEYv0sdiQmlV0
+         Uo49NZzgIL/jSX5tzOxnPYpyE6WYHtslLAlSIh0Elomu6FrSGp9xEqhS1HexQuy0Gz
+         aCrpl7+lnagEPYdCxzarURWELrDK6adF1ovCc2cUlECykOku/zMywF4N1et1qmhVb6
+         zg2Lto0m3EBWw==
+Received: by mail-oo1-f44.google.com with SMTP id l8-20020a4ae2c8000000b002b5ec765d9fso1273632oot.13
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Sep 2021 16:52:45 -0700 (PDT)
+X-Gm-Message-State: AOAM533Xs2L6v9KYOASr0Th5CtK9b3ol2jUv4dhbNYkj3MH2oZxx5gas
+        wL5m1kiu0W0w+vi57qTBWAVIKCSq4S/qFFt2Uuk=
+X-Google-Smtp-Source: ABdhPJxMMEq4iiw3GMxcTt+tNOXiwOTl8TWxgY//xzxyy68AZaXbZxqCyJq3G5SE8VBkh1fDEYmirMkaRfliVR4jNvA=
+X-Received: by 2002:a05:6820:1018:: with SMTP id v24mr2248646oor.27.1632959565369;
+ Wed, 29 Sep 2021 16:52:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/AdcJnnwnE4shj.e4qR44R/5";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Wed, 29 Sep 2021 16:52:44
+ -0700 (PDT)
+In-Reply-To: <3ea034dc-971f-4ea1-b65a-2ff06c8a1c81@talpey.com>
+References: <20210924150616.926503-1-hyc.lee@gmail.com> <7f120930-27d1-831c-4697-2d41769da14d@talpey.com>
+ <CAKYAXd-aC9Zfc-tsN_VSABELFdhFfE7y28gX3_B-yoTzyqCviw@mail.gmail.com> <3ea034dc-971f-4ea1-b65a-2ff06c8a1c81@talpey.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 30 Sep 2021 08:52:44 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-ZYTw7NdTB1nspMWuygM8qMpbtNbHyNFB6h60QUm-Z9w@mail.gmail.com>
+Message-ID: <CAKYAXd-ZYTw7NdTB1nspMWuygM8qMpbtNbHyNFB6h60QUm-Z9w@mail.gmail.com>
+Subject: Re: [PATCH v4] ksmbd: use LOOKUP_BENEATH to prevent the out of share access
+To:     Tom Talpey <tom@talpey.com>
+Cc:     Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Ralph Boehme <slow@samba.org>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/AdcJnnwnE4shj.e4qR44R/5
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi Steve,
-
-On Wed, 29 Sep 2021 13:22:34 -0500 Steve French <smfrench@gmail.com> wrote:
+2021-09-30 0:01 GMT+09:00, Tom Talpey <tom@talpey.com>:
+> On 9/29/2021 8:40 AM, Namjae Jeon wrote:
+>> 2021-09-29 0:18 GMT+09:00, Tom Talpey <tom@talpey.com>:
+>>> On 9/24/2021 11:06 AM, Hyunchul Lee wrote:
+>>>> instead of removing '..' in a given path, call
+>>>> kern_path with LOOKUP_BENEATH flag to prevent
+>>>> the out of share access.
+>>>> <snip> <snip> <snip>
+>>>> -char *convert_to_nt_pathname(char *filename, char *sharepath)
+>>>> +char *convert_to_nt_pathname(char *filename)
+>>>>    {
+>>>>    	char *ab_pathname;
+>>>> -	int len, name_len;
+>>>>
+>>>> -	name_len = strlen(filename);
+>>>> -	ab_pathname = kmalloc(name_len, GFP_KERNEL);
+>>>> -	if (!ab_pathname)
+>>>> -		return NULL;
+>>>> -
+>>>> -	ab_pathname[0] = '\\';
+>>>> -	ab_pathname[1] = '\0';
+>>>> +	if (strlen(filename) == 0) {
+>>>> +		ab_pathname = kmalloc(2, GFP_KERNEL);
+>>>> +		ab_pathname[0] = '\\';
+>>>> +		ab_pathname[1] = '\0';
+>>>
+>>> This converts the empty filename to "\" - the volume root!?
+>> "\" is relative to the share. i.e. the share root.
 >
-> Can we switch from using "cifsd-for-next" branch to "ksmbd-for-next"
-> when pulling changes
-> automatically into linux-next (since the module is fs/ksmbd/ksmbd.ko
-> using the branch name "ksmbd-for-next" is probably less confusing to
-> some)
->=20
-> ie from:
->   https://github.com/smfrench/smb3-kernel/commits/cifsd-for-next
-> to
->  https://github.com/smfrench/smb3-kernel/commits/ksmbd-for-next
+> Is that the right thing to do? Does the Samba server do this?
+>
+> I believe the Windows server will fail such a path, but I can't
+> check right now.
+I am trying to check whether windows fail, but windows doesn't send
+FILE_ALL_INFORMATION to ksmbd...
+And smbtorture of samba have passed regardless of "/". So I didn't
+probably notice such issue. I will fix it on another patch.
 
-Done.  I also renamed the tree in linux-next from cifsd to ksmbd.
+Thanks for your review!
 
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/AdcJnnwnE4shj.e4qR44R/5
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmFU7L8ACgkQAVBC80lX
-0GyknAgApX4RYFGQaCTagXY8fxEk0LC9ttQQZBgfGsvzqhYWHCJSFde2x9PHV9xZ
-deVQ21gvcT1TuBSaZA6k0uU7iUNbEkzWZLQ1o9s38v0lgRVyUmINvGzFKHADmBvn
-VSe7n8T50mTm+a/BbjHwpQ+biJBwgMgNToSqeJj+a5BAMJRm3nhU7W2Xvh2qHF4q
-MO3DLzl1lGnllWAUzJNxXpY+CgwtJEzdwucp9V28zaajYTQCsoEPN3TFmjj2O+6n
-iPqkavg1pnyh3Ui2gq7nxoOgpotofLKVjY8cfb0dy7CCZ5Wa6hSuyKgzb+PZ+WGU
-FGBoX3QkiaH1hE4in3Fwcgj9v24luA==
-=Y3nm
------END PGP SIGNATURE-----
-
---Sig_/AdcJnnwnE4shj.e4qR44R/5--
+>
+> Tom.
+>
