@@ -2,93 +2,62 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 427BEC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 23:27:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDF4C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Sep 2021 00:08:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D22261368
-	for <linux-cifs@archiver.kernel.org>; Tue, 28 Sep 2021 23:27:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FCB6613C8
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Sep 2021 00:08:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243161AbhI1X3R (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 28 Sep 2021 19:29:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53308 "EHLO mail.kernel.org"
+        id S243393AbhI2AKQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 28 Sep 2021 20:10:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50644 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243145AbhI1X3R (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 28 Sep 2021 19:29:17 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E5D1D61368
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Sep 2021 23:27:36 +0000 (UTC)
+        id S243331AbhI2AKQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 28 Sep 2021 20:10:16 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 58455613CD;
+        Wed, 29 Sep 2021 00:08:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632871656;
-        bh=5sASmYa7bLMuEbBuvsUhEMUHuMv6POVXx5uco4/hqVk=;
+        s=k20201202; t=1632874116;
+        bh=Yz6ymVU7cTJ4u+rGuKK394k0z6PZYGEQG1U2TC4MqSc=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=X1yJpuQfQqTkFSQunxqfr0CdUZ97Hh2VtaWyHDXcv17j7W3y1YbdVgusmwH1REXdG
-         gbi5RwpTovsNTBoz3zyKxEIXaDWhe2aWQHnWVHDRpnLeqS/u85IUDXyXsEI2wshzW9
-         8BymviyRfaIfRna5ujFJBULKH4iHMoXQ0t30WbqQn27UtXhQyr75cMb3kkxA0yDnfQ
-         pQgshqGkBdmfNSGcxA4rRooBNvCQ6OAUwN5OTJtUv5Bz/3oCnQWfvqwPm0kpPJ+Sxw
-         uleep4SVenBTCjS1bv+NnHnKyHwkFSUHBpKf6q5RL1n/MDP4ExfwoWHL3GUKwO5Vnp
-         AjAquSJsdN0Rw==
-Received: by mail-oi1-f181.google.com with SMTP id 24so635199oix.0
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Sep 2021 16:27:36 -0700 (PDT)
-X-Gm-Message-State: AOAM530o9O9xgj0L+G6SeMvQrDVvDOoN0TpVFjwqbutvtEoYsgThZMeE
-        PFSL0OA31UXIF9U2Xin1DIT149VqyjwF+8rZpG8=
-X-Google-Smtp-Source: ABdhPJyCd38aP84106g5IN72wrzOG3ifV3H+Qck2pH9oD4XFG/sikamE90ZPtyQElN0IJAuSCIpwN1xS7VEpk6yx4dY=
-X-Received: by 2002:a05:6808:21a7:: with SMTP id be39mr5568974oib.138.1632871656297;
- Tue, 28 Sep 2021 16:27:36 -0700 (PDT)
+        b=AhBgxiBGi8zGMQVP7Q8ZMUQ4F9AdlYKwy3ySAQZ4xVQhjYcgAGo8XWTpQ3aYjjF2V
+         f0abswTJAcPesVCF/xmX2JYHqjBPNh2gYBPU9BYu910R3o7iKaANkFt1DbihR1gJtb
+         EwABzojPIHmu5zRFOqSmfiS1n18e41jB8G5QhJuvf6JUm9IQiw8tQWTVcqfXphyKFc
+         njxYzQHwTm7/nYn4s2LGHSFhDQbg002unHDtT/jP4eM8NbpgVrZQLPRKUwnn2A2fYi
+         eKTNGc0bPIIz0fhHVD/vywf2+2Nnp5GHQ14fXd5eQRNCsPlYnueq/BlR4Awasjw/k6
+         zBXXYqwu6jCCw==
+Received: by mail-ot1-f51.google.com with SMTP id j11-20020a9d190b000000b00546fac94456so690457ota.6;
+        Tue, 28 Sep 2021 17:08:36 -0700 (PDT)
+X-Gm-Message-State: AOAM5316z8q6pbLTKq7fADwEvKg2m++kykTIUcqR9DxsB9wHlaL0IfFp
+        5+Z+BZO0iv7JnUHHIM0gB2691dzcYk7u2+eA2qU=
+X-Google-Smtp-Source: ABdhPJwxPMPdV1/HFmDUb6vrmv/TRyl+W0TBXZALfVKhpJvcyXmvZk3ZkXK4KVDsIdQ1tDSP2OCxGHsmaCXd5GCi9sc=
+X-Received: by 2002:a05:6830:24a8:: with SMTP id v8mr7316221ots.185.1632874115754;
+ Tue, 28 Sep 2021 17:08:35 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Tue, 28 Sep 2021 16:27:35
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Tue, 28 Sep 2021 17:08:35
  -0700 (PDT)
-In-Reply-To: <CAKYAXd88PNFg4oXisxw8fnUBzCQyceC=2KvPhdU7q6DUgatQbw@mail.gmail.com>
-References: <20210926135543.119127-1-linkinjeon@kernel.org>
- <a15a1d99-1a2f-0f41-773e-def5b83f2304@samba.org> <CAKYAXd8G5xBBLTS0vS_p1TFoULuxSf-CFjE4n98D+sQrtjpjcw@mail.gmail.com>
- <b9449e7f-5c27-c766-f8e0-1564b8848f7b@samba.org> <8f57cac6-1c8a-cbce-b245-bb4015575569@samba.org>
- <CAKYAXd88PNFg4oXisxw8fnUBzCQyceC=2KvPhdU7q6DUgatQbw@mail.gmail.com>
+In-Reply-To: <20210928225634.28432-1-ematsumiya@suse.de>
+References: <20210928225634.28432-1-ematsumiya@suse.de>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 29 Sep 2021 08:27:35 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8wHcrNYNvkHsePUsmb+JKb2n8UkdywaLwU7eG-JD5t2w@mail.gmail.com>
-Message-ID: <CAKYAXd8wHcrNYNvkHsePUsmb+JKb2n8UkdywaLwU7eG-JD5t2w@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] ksmbd: a bunch of patches
-To:     Ralph Boehme <slow@samba.org>
-Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
+Date:   Wed, 29 Sep 2021 09:08:35 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd82wCtdNOSzPu7LaivkGVga5QoXcHsU-z5KEGDd8R+o2A@mail.gmail.com>
+Message-ID: <CAKYAXd82wCtdNOSzPu7LaivkGVga5QoXcHsU-z5KEGDd8R+o2A@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix documentation for 2 functions
+To:     Enzo Matsumiya <ematsumiya@suse.de>
+Cc:     linux-cifs@vger.kernel.org, pc@cjr.nz,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <sfrench@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-09-28 23:23 GMT+09:00, Namjae Jeon <linkinjeon@kernel.org>:
-> 2021-09-28 22:43 GMT+09:00, Ralph Boehme <slow@samba.org>:
->> Am 28.09.21 um 05:26 schrieb Ralph Boehme:
->>> both: there are issues with the patch and I have changes on-top. :) It
->>> just takes a bit of time due to other stuff going on currently like SDC.
->>
->> finally... :)
->>
->> Please check my branch
->> <https://github.com/slowfranklin/smb3-kernel/commits/ksmbd-for-next-pending>
->>
->> for added commits and two SQUASHes. Remaining commits reviewed-by: me.
-> Yep, looks good, I will update them in patches. And thanks for your review!
-When I take a look, I found issues in two squashes. I leave comments...
-I still prefer you give review comments on patches in the list.
+2021-09-29 7:56 GMT+09:00, Enzo Matsumiya <ematsumiya@suse.de>:
+> ksmbd_kthread_fn() and create_socket() returns 0 or error code, and not
+> task_struct/ERR_PTR.
+>
+> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
->>
->> Oh, and I also split out the setinfo basic infolevel changes into its
->> own commit.
-> If you want to add clean-up patch first, we can change
-> get_file_basic_info() together in patch. I will update it also.
->>
->> Let me know what you think of the additional checks I've added.
-> You should submit patches to the list to be checked by other developers.
->
-> Thanks!
->>
->> Cheers!
->> -slow
->>
->> --
->> Ralph Boehme, Samba Team                 https://samba.org/
->> SerNet Samba Team Lead      https://sernet.de/en/team-samba
->>
->
+Thanks for your patch!
