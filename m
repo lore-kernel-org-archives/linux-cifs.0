@@ -2,70 +2,52 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A829C433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Sep 2021 00:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E189C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Sep 2021 01:01:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 553C06128C
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Sep 2021 00:52:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3324961425
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Sep 2021 01:01:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347443AbhI3Axt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Sep 2021 20:53:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45972 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347311AbhI3Axs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Sep 2021 20:53:48 -0400
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 369CEC06161C
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Sep 2021 17:52:07 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id 188so5359412vsv.0
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Sep 2021 17:52:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=COMRjryoPRLGKtOpS6FwHUFTbYKtvyCU57G2pPa3sV8=;
-        b=YGVT5u6KShHDHK0gkazCb0m12Ea5Jh4R2j37FzpaUDM6WHL5pKTuDl7i2i7JUt8T8P
-         KFJIjUnRNaUdOotECUnTBcJJ13KDQ+F7yqpKfJ7EKHFW/VJ8cQxetC+7gHZnBvUmsBjW
-         Mt2lIDcCanXBDzVabOxS8fIkVJ7ecZwpOL7Nu3rF/cJMP62qrdGWzWBhpKp2y5pro6y3
-         hXjmqRB98tWaO7ObUQJel3xBPbDwbLwt/0sHytrl/s7LvRYO6zQbVyWLq4COi4UD9LB4
-         LQZcxyeV7YpEh/gRcL6acpQTEKy/BpSNIspILUGHjr/3ZSc2ahvLHUCwVzWAskYbh4Ft
-         I2DQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=COMRjryoPRLGKtOpS6FwHUFTbYKtvyCU57G2pPa3sV8=;
-        b=ZQSbsdBL3OjOrfQmnijrOzuzZFBflsrVDoVT9Cz5pNZoA0ipKRi0VpI4Zg59TKvFxR
-         4MWILU/LhFK8E22YjwMvOfzkCh7J3/rQYcHbsExkUvkOv/UwtzPtQtlGwSNCTUKbqXXq
-         jJDFRDAO3yqSjlbCWxrmvixZcVsKjCTbdPlU/tzt2DYzpJm0oABTA+kRV+R8jFmeuklM
-         XqQ/rBNkj/Q35XtL+5X9iRGnnw28zDz4wiZLG40LO1abxDmzDxaGJKIODauJ8grv2KHT
-         RkA99zgZDPICeym43h3Ne/jXNM2gLrcXctGaWZVNq5WTr6+mbwAIvJu62ZJgTVGXxgCt
-         QEFQ==
-X-Gm-Message-State: AOAM5301/Wv4BwDDqV4elVz1K5nmzhjFpuNuTFYpzp9e5cFmh+wjqbYm
-        qQZzCkIDxFxzBtEZ0SRigXDReeD5kgacdvKVEdhmQwQIRz0zx8u9
-X-Google-Smtp-Source: ABdhPJziC0dXduhCSV2LcZYaUp3FB0tQNpPIEtA+XSbZtOngxedta4Ntv/8l5buhpRUFVzadB187kPySguF4Oy4liRE=
-X-Received: by 2002:a67:c088:: with SMTP id x8mr1300645vsi.45.1632963126295;
- Wed, 29 Sep 2021 17:52:06 -0700 (PDT)
+        id S1347376AbhI3BDN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Sep 2021 21:03:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42084 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232383AbhI3BDI (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 29 Sep 2021 21:03:08 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 34E9B61425
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Sep 2021 01:01:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632963686;
+        bh=v0jbI79VA4txYi4kGAbWVZQgT6dLbXK+ERvhSJylqbI=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=MroBckjSEnHi5PbMxOqTiSbY4T7PJg7TpkEj/2/f1pCmgb6MSlzlNTy6PyosAiCdk
+         /OyQchx3rMN2uIZTpNFoCL0B32KMVYJXO1ooCUAf6ugW6ewuIZ2YH3zLNXERcOBln9
+         l2SIMiuKWFt6CfkLVi1S8a8kn02ypnCJVU0WOTJHMKMc7GISKVDyNyQgLFFA0+1WLj
+         yfmtl1GVrHsgjPovw7dViZvwsf8yqLcOaAIzzHn4oxIS4HkRcEYR1Zbko2IwABHFPW
+         7hwsrjiMNdd+QhIjRHN02kLOAIpqTzXehBpdmF7zRAl/0hdnSPjS4XngYzq5JbLGQx
+         Cq97wQO2lVyUg==
+Received: by mail-oi1-f174.google.com with SMTP id e24so5197997oig.11
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Sep 2021 18:01:26 -0700 (PDT)
+X-Gm-Message-State: AOAM533MTn64/+BEEcw0O4TiHGNiIQleUyauJdkdh/cBjv3CZLBcc7jn
+        v7YPhx9KwuhZxwKDOvqC9BrtGK6e6D2bqkLJLOc=
+X-Google-Smtp-Source: ABdhPJy8mPwgUb9WYn1x0s8lSduliypHWIncfczvQHgKl0lK5u7d6eW6DEZUzaTZaifipnik3WVOVUQ+3x4SIv+NyyU=
+X-Received: by 2002:a05:6808:1a29:: with SMTP id bk41mr498819oib.167.1632963685576;
+ Wed, 29 Sep 2021 18:01:25 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210926135543.119127-1-linkinjeon@kernel.org>
- <a15a1d99-1a2f-0f41-773e-def5b83f2304@samba.org> <CAKYAXd8G5xBBLTS0vS_p1TFoULuxSf-CFjE4n98D+sQrtjpjcw@mail.gmail.com>
- <b9449e7f-5c27-c766-f8e0-1564b8848f7b@samba.org> <8f57cac6-1c8a-cbce-b245-bb4015575569@samba.org>
- <CAKYAXd88PNFg4oXisxw8fnUBzCQyceC=2KvPhdU7q6DUgatQbw@mail.gmail.com>
- <79ed52be-c92e-1c62-423f-ee126b3da409@samba.org> <YVNR6w7dq0HMIcFA@jeremy-acer>
- <76fcdc45-0a94-d9e6-14c8-1c638d0bd00f@talpey.com> <YVSJWPa8dalyzsl0@jeremy-acer>
- <ce52c130-74de-feaa-6995-6a0d947816a6@samba.org> <27908e3e-140e-8c7a-e792-414fec5b5190@talpey.com>
- <CAH2r5mvPy0UBJ2z=gSbyOSK9cMYMdB-Unr4Jk14Fve4W1XFTJQ@mail.gmail.com>
- <0132d0cb-5efd-f042-d8d6-720e7f3dc69b@samba.org> <CAKYAXd8R2OQ3=m8HjUffph5+hw_D2KaT60ZDsYmEtCqEFE3gQQ@mail.gmail.com>
-In-Reply-To: <CAKYAXd8R2OQ3=m8HjUffph5+hw_D2KaT60ZDsYmEtCqEFE3gQQ@mail.gmail.com>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Thu, 30 Sep 2021 09:51:55 +0900
-Message-ID: <CANFS6bZRLygxNGO7RJ-Nz9s4-Q7ykoxEK2yCAVPADyCytKfUPg@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] ksmbd: a bunch of patches
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     Ralph Boehme <slow@samba.org>, Steve French <smfrench@gmail.com>,
-        Tom Talpey <tom@talpey.com>, Jeremy Allison <jra@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Wed, 29 Sep 2021 18:01:24
+ -0700 (PDT)
+In-Reply-To: <bf665917-cf8c-30ca-4ce0-4614adaf0988@samba.org>
+References: <20210929084501.94846-1-linkinjeon@kernel.org> <bf665917-cf8c-30ca-4ce0-4614adaf0988@samba.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 30 Sep 2021 10:01:24 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-A4FLznKAVesfOiSpNy0KPAkXUppN4rkbGPBMdBMQLkA@mail.gmail.com>
+Message-ID: <CAKYAXd-A4FLznKAVesfOiSpNy0KPAkXUppN4rkbGPBMdBMQLkA@mail.gmail.com>
+Subject: Re: [PATCH v4 0/9] ksmbd: a bunch of patches that is being reviewed
+To:     Ralph Boehme <slow@samba.org>
+Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
         Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
         Sergey Senozhatsky <senozhatsky@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -73,62 +55,86 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021=EB=85=84 9=EC=9B=94 30=EC=9D=BC (=EB=AA=A9) =EC=98=A4=EC=A0=84 9:32, N=
-amjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+2021-09-30 2:55 GMT+09:00, Ralph Boehme <slow@samba.org>:
+> Am 29.09.21 um 10:44 schrieb Namjae Jeon:
+>> Cc: Tom Talpey <tom@talpey.com>
+>> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+>> Cc: Ralph B=C3=B6hme <slow@samba.org>
+>> Cc: Steve French <smfrench@gmail.com>
+>> Cc: Hyunchul Lee <hyc.lee@gmail.com>
+>> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+>>
+>> v2:
+>>    - update comments of smb2_get_data_area_len().
+>>    - fix wrong buffer size check in fsctl_query_iface_info_ioctl().
+>>    - fix 32bit overflow in smb2_set_info.
+>>
+>> v3:
+>>    - add buffer check for ByteCount of smb negotiate request.
+>>    - Moved buffer check of to the top of loop to avoid unneeded behavior
+>> when
+>>      out_buf_len is smaller than network_interface_info_ioctl_rsp.
+>>    - get correct out_buf_len which doesn't exceed max stream protocol
+>> length.
+>>    - subtract single smb2_lock_element for correct buffer size check in
+>>      ksmbd_smb2_check_message().
+>>
+>> v4:
+>>    - use work->response_sz for out_buf_len calculation in smb2_ioctl.
+>>    - move smb2_neg size check to above to validate NegotiateContextOffse=
+t
+>>      field.
+>>    - remove unneeded dialect checks in smb2_sess_setup() and
+>>      smb2_handle_negotiate().
+>>    - split smb2_set_info patch into two patches(declaring
+>>      smb2_file_basic_info and buffer check)
 >
-> 2021-09-30 2:18 GMT+09:00, Ralph Boehme <slow@samba.org>:
-> > Am 29.09.21 um 19:11 schrieb Steve French:
-> >> gitnub is fine for many things, and we can automated "kernel
-> >> development process"
-> >> things presumably with github easier than alternatives:
-> >> - running "scripts/checkpatch"
-> >> - make with C=3D1 and "_CHECK_ENDIAN" support turned on
-> >> - kick off smbtorture tests (as Namjae already does in his branches in
-> >> github)
-> >
-> > you can also add "doing review". :)
-> >
-> > As for running tests: I want that as well! :) How can I get that? Maybe
-> > other want to run CI on their patches too before posting them.
-> >
-> >> BUT ... we have to ensure a couple things.
-> >> - we don't annoy Linus (and linux-next and stable maintainers) by doin=
-g
-> >> things
-> >> like web merges in github (he complained about the
-> >> meaningless/distracting
-> >> github web ui empty merge messages)
-> >
-> > as said before: just don't do the merge there, just the review. That's
-> > the way Samba has been doing it for years. Are you actually aware of th=
-e
-> > current Samba workflow?
-> Is it friendly to new developers? I know samba workflow now too. New
-> developers can do everything easily by simply subscribing to the
-> mailing list. And do we review only the SMB protocol on github? If we
-> review and discuss kernel common code usage and touching, it should be
-> visible to the component kernel maintainers as well.
+> it looks like you dropped all my patches and didn't comment on the
+> SQUASHES that pointed at some issues.
 >
+> Did I miss anything where you explained why you did this?
+Please see v4 change list in this cover letter
+  - use work->response_sz for out_buf_len calculation in smb2_ioctl.
+  - split smb2_set_info patch into two patches(declaring...
 
-I agreed. Kernel developers are familiar with reviews in the mailing list.
-And only for patches about the SMB protocol, If someone asks for
-review in github,
-we can do it.
+I didn't apply "SQUASH: at this layer we should only against the
+MAX_STREAM_PROT_LEN =E2=80=A6"
+because smb2 header is used before ksmbd_verify_smb_message is reached.
+See init_rsp_hdr and check_user_session() in __handle_ksmbd_work().
 
-> And is the review history likely to be discarded on github? Doesn't it
-> get thrown away the moment you change or update a patch? Also, review
-> discussions left on each individual's github cannot be easily searched
-> like mailing list.
-> >
-> > -slow
-> >
-> > --
-> > Ralph Boehme, Samba Team                 https://samba.org/
-> > SerNet Samba Team Lead      https://sernet.de/en/team-samba
-> >
-
-
-
---=20
-Thanks,
-Hyunchul
+Have you checked my comments on your squash patches of github ?
+I didn't get any response from you :)
+>
+> The changes I made imho consolidated the SMB2 PDU packet size checking
+> logic. With your changes the check for valid SMB2 PDU sizes of compound
+> offsets is spread across the network receive layer and the compound
+> parsing layer.
+>
+> The changes I made, adding a nice helper function along the way, moved
+> the core PDU validation into the function were it should be done: inside
+> ksmbd_smb2_check_message().
+ksmbd is checking whether session id and tree id are vaild in smb
+header before processing smb requests. is_chained_smb2_message is
+checking next command header size.
+>
+> You also dropped the fix for the possible invalid read in
+> ksmbd_verify_smb_message() of the protocol_id field.
+Where ? You are saying your patch in github ? If it is right, I didn't drop=
+.
+>
+> I might be missing something because I'm still new to the code. But
+> generally we really sanitize the logic while we're at it now instead of
+> adding band aids everywhere.
+I saw your patch and it's nice. However, we have not yet agreed on
+where the review will be conducted. You also didn't respond to my
+comments on my squash patch in your github. So I thought I'd take a
+deeper look if you send the patch to the list.
+>
+> Thanks!
+Thanks :)
+> -slow
+>
+> --
+> Ralph Boehme, Samba Team                 https://samba.org/
+> SerNet Samba Team Lead      https://sernet.de/en/team-samba
+>
