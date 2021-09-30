@@ -2,194 +2,189 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 771A4C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Sep 2021 12:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDF2C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Sep 2021 13:17:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5652E610A4
-	for <linux-cifs@archiver.kernel.org>; Thu, 30 Sep 2021 12:53:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45EDD613A7
+	for <linux-cifs@archiver.kernel.org>; Thu, 30 Sep 2021 13:17:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351133AbhI3MzC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 30 Sep 2021 08:55:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351051AbhI3MzB (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 30 Sep 2021 08:55:01 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B347AC06176A
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Sep 2021 05:53:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=From:Cc:To:Date:Message-ID;
-        bh=hUu18Dxh7upZxeWEivrXM563jmPeHBDfJXHhLe/peDo=; b=F6av1YAd3+O58f003+UHaSZ4ZW
-        e+XvRz5QaQI24vJOfqnLFEzS9ypE0L8MLkHcg75zn/Y3I0ei1Iggt+CmyT7qvZPyhU7N7r8T0mtKQ
-        cMWJVO4FvOuMq5pX3nt5FAc74txhVZRdply3kJKbo/t0TKrBhRMqZov0y00/9y+UnWBBRqYf0V/eP
-        54SiOnNm8/++skPuPHsoxulfvg5aAlZzwFicuCToYnTwPOyKp/yG5wgDiFY+YiOIj/zuPx5Vvn0KR
-        02v4cECKaky/qDOCPThFEk1S5CvBDL7IKEh/B07EXs6FBgtppNmF4IE+xOKxtvKKaMFOgcZFLtbGX
-        nrGxtnc+mcvo9N59YhzDRzrYMw0kSGoU6DtONl8KlMibgBVY7Hzon2RBtS+AqjwFNon5pq/WUNWT6
-        NJU6J4DXHj6ZAP7lRSnoQ4LCUs6JGE2qxNQ2d/cxh1w4rBEsEaydGGejeOqpMhQgpTMMryQduiP89
-        rgFBwEoYynsaURuLV50paroW;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1mVvYp-000swP-SZ; Thu, 30 Sep 2021 12:53:16 +0000
-Message-ID: <2b536a89-cba6-88a0-b7d8-c5435d183679@samba.org>
-Date:   Thu, 30 Sep 2021 14:53:14 +0200
+        id S1350632AbhI3NTN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 30 Sep 2021 09:19:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39016 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1350846AbhI3NTM (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 30 Sep 2021 09:19:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 623F5613A7
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Sep 2021 13:17:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1633007850;
+        bh=By1OvL0LX2mnfUweruemegd44RileLdcFc7ukBhhYkA=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=qapPKNwEfd0hIak3peuW2k3f2Mpws/GOP9GuaFBARZGseBjY0rWRivoN/NY7JDm8V
+         qs3ZIy4PoTjOOE6CLA5JrorvaSKoHMLM/o7K183t4VUMiS4L5XiPaCT+8/itshfMVB
+         ujW1yNnOUryThvvxSl6mfGPkX0Ggl4PHLx81j35pkVrb3Dr94toINmDdK3UTkqIHWS
+         c7iZHf2n8r72L1cLHqTy8M6NpAiyFQabtdJ64AdP4KhP7H6HBPc763RJ+ma3Ohq22w
+         AuUj8otJiT2SRgBsMOmRAMcRYmD3arvNno2+y9MBxnOZXSg5TZt7jq2qZZLD3fY5pc
+         zrhYB+QIt/Tqg==
+Received: by mail-oi1-f173.google.com with SMTP id t189so7185311oie.7
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Sep 2021 06:17:30 -0700 (PDT)
+X-Gm-Message-State: AOAM530WBWFce/vjrAHlzW5ODH41KPDCEX0H4eDmiQ0HIjF54ReiG3D4
+        DnWZituhVRu4t6nMUkuFPPcL0MKPhH3OCG9MXh8=
+X-Google-Smtp-Source: ABdhPJxXau3kSlC8cb1eKMAaOGhRx++7zbIu5K5ZnThU+366DP6E3nUCCWzL5TnntZexTobyJnI6vRT6aKxwT9qIWiU=
+X-Received: by 2002:aca:3704:: with SMTP id e4mr2757298oia.32.1633007849704;
+ Thu, 30 Sep 2021 06:17:29 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Thu, 30 Sep 2021 06:17:29
+ -0700 (PDT)
+In-Reply-To: <2b536a89-cba6-88a0-b7d8-c5435d183679@samba.org>
+References: <20210929084501.94846-1-linkinjeon@kernel.org> <bf665917-cf8c-30ca-4ce0-4614adaf0988@samba.org>
+ <CAKYAXd-A4FLznKAVesfOiSpNy0KPAkXUppN4rkbGPBMdBMQLkA@mail.gmail.com> <2b536a89-cba6-88a0-b7d8-c5435d183679@samba.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Thu, 30 Sep 2021 22:17:29 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd87aCAMZ56Ch68-NRjCH41MDdYYHUOSo3mfiMAOq_+QFA@mail.gmail.com>
+Message-ID: <CAKYAXd87aCAMZ56Ch68-NRjCH41MDdYYHUOSo3mfiMAOq_+QFA@mail.gmail.com>
 Subject: Re: [PATCH v4 0/9] ksmbd: a bunch of patches that is being reviewed
-Content-Language: en-US
-To:     Namjae Jeon <linkinjeon@kernel.org>
+To:     Ralph Boehme <slow@samba.org>
 Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
         Ronnie Sahlberg <ronniesahlberg@gmail.com>,
         Steve French <smfrench@gmail.com>,
         Hyunchul Lee <hyc.lee@gmail.com>,
         Sergey Senozhatsky <senozhatsky@chromium.org>
-References: <20210929084501.94846-1-linkinjeon@kernel.org>
- <bf665917-cf8c-30ca-4ce0-4614adaf0988@samba.org>
- <CAKYAXd-A4FLznKAVesfOiSpNy0KPAkXUppN4rkbGPBMdBMQLkA@mail.gmail.com>
-From:   Ralph Boehme <slow@samba.org>
-In-Reply-To: <CAKYAXd-A4FLznKAVesfOiSpNy0KPAkXUppN4rkbGPBMdBMQLkA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------6q0lEgC0P3rgv0M0ceUP5qs9"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------6q0lEgC0P3rgv0M0ceUP5qs9
-Content-Type: multipart/mixed; boundary="------------uJuk0vQgi07Qkn9r92tS50XE";
- protected-headers="v1"
-From: Ralph Boehme <slow@samba.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, Steve French
- <smfrench@gmail.com>, Hyunchul Lee <hyc.lee@gmail.com>,
- Sergey Senozhatsky <senozhatsky@chromium.org>
-Message-ID: <2b536a89-cba6-88a0-b7d8-c5435d183679@samba.org>
-Subject: Re: [PATCH v4 0/9] ksmbd: a bunch of patches that is being reviewed
-References: <20210929084501.94846-1-linkinjeon@kernel.org>
- <bf665917-cf8c-30ca-4ce0-4614adaf0988@samba.org>
- <CAKYAXd-A4FLznKAVesfOiSpNy0KPAkXUppN4rkbGPBMdBMQLkA@mail.gmail.com>
-In-Reply-To: <CAKYAXd-A4FLznKAVesfOiSpNy0KPAkXUppN4rkbGPBMdBMQLkA@mail.gmail.com>
+2021-09-30 21:53 GMT+09:00, Ralph Boehme <slow@samba.org>:
+> Am 30.09.21 um 03:01 schrieb Namjae Jeon:
+>> 2021-09-30 2:55 GMT+09:00, Ralph Boehme <slow@samba.org>:
+>>> Am 29.09.21 um 10:44 schrieb Namjae Jeon:
+>>>> Cc: Tom Talpey <tom@talpey.com>
+>>>> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+>>>> Cc: Ralph B=C3=B6hme <slow@samba.org>
+>>>> Cc: Steve French <smfrench@gmail.com>
+>>>> Cc: Hyunchul Lee <hyc.lee@gmail.com>
+>>>> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+>>>>
+>>>> v2:
+>>>>     - update comments of smb2_get_data_area_len().
+>>>>     - fix wrong buffer size check in fsctl_query_iface_info_ioctl().
+>>>>     - fix 32bit overflow in smb2_set_info.
+>>>>
+>>>> v3:
+>>>>     - add buffer check for ByteCount of smb negotiate request.
+>>>>     - Moved buffer check of to the top of loop to avoid unneeded
+>>>> behavior
+>>>> when
+>>>>       out_buf_len is smaller than network_interface_info_ioctl_rsp.
+>>>>     - get correct out_buf_len which doesn't exceed max stream protocol
+>>>> length.
+>>>>     - subtract single smb2_lock_element for correct buffer size check
+>>>> in
+>>>>       ksmbd_smb2_check_message().
+>>>>
+>>>> v4:
+>>>>     - use work->response_sz for out_buf_len calculation in smb2_ioctl.
+>>>>     - move smb2_neg size check to above to validate
+>>>> NegotiateContextOffset
+>>>>       field.
+>>>>     - remove unneeded dialect checks in smb2_sess_setup() and
+>>>>       smb2_handle_negotiate().
+>>>>     - split smb2_set_info patch into two patches(declaring
+>>>>       smb2_file_basic_info and buffer check)
+>>>
+>>> it looks like you dropped all my patches and didn't comment on the
+>>> SQUASHES that pointed at some issues.
+>>>
+>>> Did I miss anything where you explained why you did this?
+>> Please see v4 change list in this cover letter
+>>    - use work->response_sz for out_buf_len calculation in smb2_ioctl.
+>>    - split smb2_set_info patch into two patches(declaring...
+>>
+>> I didn't apply "SQUASH: at this layer we should only against the
+>> MAX_STREAM_PROT_LEN =E2=80=A6"
+>> because smb2 header is used before ksmbd_verify_smb_message is reached.
+>> See init_rsp_hdr and check_user_session() in __handle_ksmbd_work().
+>
+> Let me check.
+>
+>> Have you checked my comments on your squash patches of github ?
+>> I didn't get any response from you :)
+>
+> Oh my! Looks like I didn't get github email notifications so I wasn't
+> aware of your comments... Sorry! :) Currently taking a look.
+>
+>>>
+>>> The changes I made imho consolidated the SMB2 PDU packet size checking
+>>> logic. With your changes the check for valid SMB2 PDU sizes of compound
+>>> offsets is spread across the network receive layer and the compound
+>>> parsing layer.
+>>>
+>>> The changes I made, adding a nice helper function along the way, moved
+>>> the core PDU validation into the function were it should be done: insid=
+e
+>>> ksmbd_smb2_check_message().
+>> ksmbd is checking whether session id and tree id are vaild in smb
+>> header before processing smb requests.
+>
+> yes, this was next on my list, sorry forgot to mention this. Afaict in
+> the current code the session and tcon checks are only done once on the
+> first SMB2 PDU for a series of compound non-related PDUs, while for
+> non-related PDUs the calls to check_user_session() and
+> smb2_get_ksmbd_tcon() should be probably be done inside
+> __process_request(), or eventually just inside ksmbd_smb2_check_message()=
+.
+check_user_session and get_ksmbd_tcon should not be moved inside
+__process_request()
+because session id and tree id of related pdu is 0xFFFFFFFFFFFFFFFF
+and 0xFFFFFFFF.
 
---------------uJuk0vQgi07Qkn9r92tS50XE
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-
-QW0gMzAuMDkuMjEgdW0gMDM6MDEgc2NocmllYiBOYW1qYWUgSmVvbjoNCj4gMjAyMS0wOS0z
-MCAyOjU1IEdNVCswOTowMCwgUmFscGggQm9laG1lIDxzbG93QHNhbWJhLm9yZz46DQo+PiBB
-bSAyOS4wOS4yMSB1bSAxMDo0NCBzY2hyaWViIE5hbWphZSBKZW9uOg0KPj4+IENjOiBUb20g
-VGFscGV5IDx0b21AdGFscGV5LmNvbT4NCj4+PiBDYzogUm9ubmllIFNhaGxiZXJnIDxyb25u
-aWVzYWhsYmVyZ0BnbWFpbC5jb20+DQo+Pj4gQ2M6IFJhbHBoIELDtmhtZSA8c2xvd0BzYW1i
-YS5vcmc+DQo+Pj4gQ2M6IFN0ZXZlIEZyZW5jaCA8c21mcmVuY2hAZ21haWwuY29tPg0KPj4+
-IENjOiBIeXVuY2h1bCBMZWUgPGh5Yy5sZWVAZ21haWwuY29tPg0KPj4+IENjOiBTZXJnZXkg
-U2Vub3poYXRza3kgPHNlbm96aGF0c2t5QGNocm9taXVtLm9yZz4NCj4+Pg0KPj4+IHYyOg0K
-Pj4+ICAgICAtIHVwZGF0ZSBjb21tZW50cyBvZiBzbWIyX2dldF9kYXRhX2FyZWFfbGVuKCku
-DQo+Pj4gICAgIC0gZml4IHdyb25nIGJ1ZmZlciBzaXplIGNoZWNrIGluIGZzY3RsX3F1ZXJ5
-X2lmYWNlX2luZm9faW9jdGwoKS4NCj4+PiAgICAgLSBmaXggMzJiaXQgb3ZlcmZsb3cgaW4g
-c21iMl9zZXRfaW5mby4NCj4+Pg0KPj4+IHYzOg0KPj4+ICAgICAtIGFkZCBidWZmZXIgY2hl
-Y2sgZm9yIEJ5dGVDb3VudCBvZiBzbWIgbmVnb3RpYXRlIHJlcXVlc3QuDQo+Pj4gICAgIC0g
-TW92ZWQgYnVmZmVyIGNoZWNrIG9mIHRvIHRoZSB0b3Agb2YgbG9vcCB0byBhdm9pZCB1bm5l
-ZWRlZCBiZWhhdmlvcg0KPj4+IHdoZW4NCj4+PiAgICAgICBvdXRfYnVmX2xlbiBpcyBzbWFs
-bGVyIHRoYW4gbmV0d29ya19pbnRlcmZhY2VfaW5mb19pb2N0bF9yc3AuDQo+Pj4gICAgIC0g
-Z2V0IGNvcnJlY3Qgb3V0X2J1Zl9sZW4gd2hpY2ggZG9lc24ndCBleGNlZWQgbWF4IHN0cmVh
-bSBwcm90b2NvbA0KPj4+IGxlbmd0aC4NCj4+PiAgICAgLSBzdWJ0cmFjdCBzaW5nbGUgc21i
-Ml9sb2NrX2VsZW1lbnQgZm9yIGNvcnJlY3QgYnVmZmVyIHNpemUgY2hlY2sgaW4NCj4+PiAg
-ICAgICBrc21iZF9zbWIyX2NoZWNrX21lc3NhZ2UoKS4NCj4+Pg0KPj4+IHY0Og0KPj4+ICAg
-ICAtIHVzZSB3b3JrLT5yZXNwb25zZV9zeiBmb3Igb3V0X2J1Zl9sZW4gY2FsY3VsYXRpb24g
-aW4gc21iMl9pb2N0bC4NCj4+PiAgICAgLSBtb3ZlIHNtYjJfbmVnIHNpemUgY2hlY2sgdG8g
-YWJvdmUgdG8gdmFsaWRhdGUgTmVnb3RpYXRlQ29udGV4dE9mZnNldA0KPj4+ICAgICAgIGZp
-ZWxkLg0KPj4+ICAgICAtIHJlbW92ZSB1bm5lZWRlZCBkaWFsZWN0IGNoZWNrcyBpbiBzbWIy
-X3Nlc3Nfc2V0dXAoKSBhbmQNCj4+PiAgICAgICBzbWIyX2hhbmRsZV9uZWdvdGlhdGUoKS4N
-Cj4+PiAgICAgLSBzcGxpdCBzbWIyX3NldF9pbmZvIHBhdGNoIGludG8gdHdvIHBhdGNoZXMo
-ZGVjbGFyaW5nDQo+Pj4gICAgICAgc21iMl9maWxlX2Jhc2ljX2luZm8gYW5kIGJ1ZmZlciBj
-aGVjaykNCj4+DQo+PiBpdCBsb29rcyBsaWtlIHlvdSBkcm9wcGVkIGFsbCBteSBwYXRjaGVz
-IGFuZCBkaWRuJ3QgY29tbWVudCBvbiB0aGUNCj4+IFNRVUFTSEVTIHRoYXQgcG9pbnRlZCBh
-dCBzb21lIGlzc3Vlcy4NCj4+DQo+PiBEaWQgSSBtaXNzIGFueXRoaW5nIHdoZXJlIHlvdSBl
-eHBsYWluZWQgd2h5IHlvdSBkaWQgdGhpcz8NCj4gUGxlYXNlIHNlZSB2NCBjaGFuZ2UgbGlz
-dCBpbiB0aGlzIGNvdmVyIGxldHRlcg0KPiAgICAtIHVzZSB3b3JrLT5yZXNwb25zZV9zeiBm
-b3Igb3V0X2J1Zl9sZW4gY2FsY3VsYXRpb24gaW4gc21iMl9pb2N0bC4NCj4gICAgLSBzcGxp
-dCBzbWIyX3NldF9pbmZvIHBhdGNoIGludG8gdHdvIHBhdGNoZXMoZGVjbGFyaW5nLi4uDQo+
-IA0KPiBJIGRpZG4ndCBhcHBseSAiU1FVQVNIOiBhdCB0aGlzIGxheWVyIHdlIHNob3VsZCBv
-bmx5IGFnYWluc3QgdGhlDQo+IE1BWF9TVFJFQU1fUFJPVF9MRU4g4oCmIg0KPiBiZWNhdXNl
-IHNtYjIgaGVhZGVyIGlzIHVzZWQgYmVmb3JlIGtzbWJkX3ZlcmlmeV9zbWJfbWVzc2FnZSBp
-cyByZWFjaGVkLg0KPiBTZWUgaW5pdF9yc3BfaGRyIGFuZCBjaGVja191c2VyX3Nlc3Npb24o
-KSBpbiBfX2hhbmRsZV9rc21iZF93b3JrKCkuDQoNCkxldCBtZSBjaGVjay4NCg0KPiBIYXZl
-IHlvdSBjaGVja2VkIG15IGNvbW1lbnRzIG9uIHlvdXIgc3F1YXNoIHBhdGNoZXMgb2YgZ2l0
-aHViID8NCj4gSSBkaWRuJ3QgZ2V0IGFueSByZXNwb25zZSBmcm9tIHlvdSA6KQ0KDQpPaCBt
-eSEgTG9va3MgbGlrZSBJIGRpZG4ndCBnZXQgZ2l0aHViIGVtYWlsIG5vdGlmaWNhdGlvbnMg
-c28gSSB3YXNuJ3QgDQphd2FyZSBvZiB5b3VyIGNvbW1lbnRzLi4uIFNvcnJ5ISA6KSBDdXJy
-ZW50bHkgdGFraW5nIGEgbG9vay4NCg0KPj4NCj4+IFRoZSBjaGFuZ2VzIEkgbWFkZSBpbWhv
-IGNvbnNvbGlkYXRlZCB0aGUgU01CMiBQRFUgcGFja2V0IHNpemUgY2hlY2tpbmcNCj4+IGxv
-Z2ljLiBXaXRoIHlvdXIgY2hhbmdlcyB0aGUgY2hlY2sgZm9yIHZhbGlkIFNNQjIgUERVIHNp
-emVzIG9mIGNvbXBvdW5kDQo+PiBvZmZzZXRzIGlzIHNwcmVhZCBhY3Jvc3MgdGhlIG5ldHdv
-cmsgcmVjZWl2ZSBsYXllciBhbmQgdGhlIGNvbXBvdW5kDQo+PiBwYXJzaW5nIGxheWVyLg0K
-Pj4NCj4+IFRoZSBjaGFuZ2VzIEkgbWFkZSwgYWRkaW5nIGEgbmljZSBoZWxwZXIgZnVuY3Rp
-b24gYWxvbmcgdGhlIHdheSwgbW92ZWQNCj4+IHRoZSBjb3JlIFBEVSB2YWxpZGF0aW9uIGlu
-dG8gdGhlIGZ1bmN0aW9uIHdlcmUgaXQgc2hvdWxkIGJlIGRvbmU6IGluc2lkZQ0KPj4ga3Nt
-YmRfc21iMl9jaGVja19tZXNzYWdlKCkuDQo+IGtzbWJkIGlzIGNoZWNraW5nIHdoZXRoZXIg
-c2Vzc2lvbiBpZCBhbmQgdHJlZSBpZCBhcmUgdmFpbGQgaW4gc21iDQo+IGhlYWRlciBiZWZv
-cmUgcHJvY2Vzc2luZyBzbWIgcmVxdWVzdHMuIA0KDQp5ZXMsIHRoaXMgd2FzIG5leHQgb24g
-bXkgbGlzdCwgc29ycnkgZm9yZ290IHRvIG1lbnRpb24gdGhpcy4gQWZhaWN0IGluIA0KdGhl
-IGN1cnJlbnQgY29kZSB0aGUgc2Vzc2lvbiBhbmQgdGNvbiBjaGVja3MgYXJlIG9ubHkgZG9u
-ZSBvbmNlIG9uIHRoZSANCmZpcnN0IFNNQjIgUERVIGZvciBhIHNlcmllcyBvZiBjb21wb3Vu
-ZCBub24tcmVsYXRlZCBQRFVzLCB3aGlsZSBmb3IgDQpub24tcmVsYXRlZCBQRFVzIHRoZSBj
-YWxscyB0byBjaGVja191c2VyX3Nlc3Npb24oKSBhbmQgDQpzbWIyX2dldF9rc21iZF90Y29u
-KCkgc2hvdWxkIGJlIHByb2JhYmx5IGJlIGRvbmUgaW5zaWRlIA0KX19wcm9jZXNzX3JlcXVl
-c3QoKSwgb3IgZXZlbnR1YWxseSBqdXN0IGluc2lkZSBrc21iZF9zbWIyX2NoZWNrX21lc3Nh
-Z2UoKS4NCg0KPiBpc19jaGFpbmVkX3NtYjJfbWVzc2FnZSBpcw0KPiBjaGVja2luZyBuZXh0
-IGNvbW1hbmQgaGVhZGVyIHNpemUuDQo+Pg0KPj4gWW91IGFsc28gZHJvcHBlZCB0aGUgZml4
-IGZvciB0aGUgcG9zc2libGUgaW52YWxpZCByZWFkIGluDQo+PiBrc21iZF92ZXJpZnlfc21i
-X21lc3NhZ2UoKSBvZiB0aGUgcHJvdG9jb2xfaWQgZmllbGQuDQo+IFdoZXJlID8gWW91IGFy
-ZSBzYXlpbmcgeW91ciBwYXRjaCBpbiBnaXRodWIgPyBJZiBpdCBpcyByaWdodCwgSSBkaWRu
-J3QgZHJvcC4NCg0KdGhpcyBvbmU6DQoNCjxodHRwczovL2dpdGh1Yi5jb20vc21mcmVuY2gv
-c21iMy1rZXJuZWwvY29tbWl0L2ZmYzQxMGYxZDE5YTBmMDZhOTUyYzdmMjhlOWJjYTRmYTRi
-ZDRhNzQ+DQoNCkFuZCBhbHNvIHRoZSBjbGVhbnVwIGNvbW1pdHMgdXNpbmcga3NtYmRfcmVx
-X2J1Zl9uZXh0KCkgaW4gYSBmZXcgcGxhY2VzLg0KDQo+PiBJIG1pZ2h0IGJlIG1pc3Npbmcg
-c29tZXRoaW5nIGJlY2F1c2UgSSdtIHN0aWxsIG5ldyB0byB0aGUgY29kZS4gQnV0DQo+PiBn
-ZW5lcmFsbHkgd2UgcmVhbGx5IHNhbml0aXplIHRoZSBsb2dpYyB3aGlsZSB3ZSdyZSBhdCBp
-dCBub3cgaW5zdGVhZCBvZg0KPj4gYWRkaW5nIGJhbmQgYWlkcyBldmVyeXdoZXJlLg0KPiBJ
-IHNhdyB5b3VyIHBhdGNoIGFuZCBpdCdzIG5pY2UuIEhvd2V2ZXIsIHdlIGhhdmUgbm90IHll
-dCBhZ3JlZWQgb24NCj4gd2hlcmUgdGhlIHJldmlldyB3aWxsIGJlIGNvbmR1Y3RlZC4gWW91
-IGFsc28gZGlkbid0IHJlc3BvbmQgdG8gbXkNCj4gY29tbWVudHMgb24gbXkgc3F1YXNoIHBh
-dGNoIGluIHlvdXIgZ2l0aHViLiBTbyBJIHRob3VnaHQgSSdkIHRha2UgYQ0KPiBkZWVwZXIg
-bG9vayBpZiB5b3Ugc2VuZCB0aGUgcGF0Y2ggdG8gdGhlIGxpc3QuDQoNCkkgcmVhbGl6ZSB0
-aGF0IG15IHdlbGwgdGhvdWdodCBpZGVhIHRvIGlkZWEgb2Ygc2ltcGxpZnlpbmcgdGhpbmdz
-IGJ5IA0KcHVzaGluZyBteSBsYXJnZXIgY2hhbmdlcyB0byBnaXRodWIgaXMgbm90IGdvaW5n
-IHZlcnkgd2VsbC4gOikgVGhlcmVmb3IgDQpJJ2xsIHJlc3VibWl0IHRoZSBwYXRjaHNldCB0
-byB0aGUgTUwgbGF0ZXIgb24uDQoNCkZ3aXcsIGhlcmUncyBpcyB3aGF0IGFuIGFjdHVhbCBy
-ZXZpZXcgb24gZ2l0aHViIG9uIGEgTVIgd291bGQgbG9vayBsaWtlOg0KDQo8aHR0cHM6Ly9n
-aXRodWIuY29tL3NtZnJlbmNoL3NtYjMta2VybmVsL3B1bGwvNzI+DQoNClRoaXMgd2FzIGp1
-c3QgYW4gZXhwZXJpbWVudC4gSXQgZGVtb25zdHJhdGVzIGEgZmV3IGZlYXR1cmVzOiB0cmFj
-a2luZyANCmNvbW1lbnRzLCB0cmFja2luZyBuZXcgcHVzaGVzIHRvIHRoZSBzb3VyY2UgYnJh
-bmNoIGFuZCBvdGhlciByZWxhdGVkIA0KYWN0aW9ucy4NCg0KTm90ZSB0aGF0IEknbSBOT1Qg
-UFJPUE9TSU5HIHVzaW5nIGdpdGh1YiBNUnMgcmlnaHQgYXdheS4gSnVzdCBzaG93aW5nIA0K
-d2hhdCdzIHBvc3NpYmxlLiA6KQ0KDQotc2xvdw0KDQotLSANClJhbHBoIEJvZWhtZSwgU2Ft
-YmEgVGVhbSAgICAgICAgICAgICAgICAgaHR0cHM6Ly9zYW1iYS5vcmcvDQpTZXJOZXQgU2Ft
-YmEgVGVhbSBMZWFkICAgICAgaHR0cHM6Ly9zZXJuZXQuZGUvZW4vdGVhbS1zYW1iYQ0K
-
---------------uJuk0vQgi07Qkn9r92tS50XE--
-
---------------6q0lEgC0P3rgv0M0ceUP5qs9
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFVszoFAwAAAAAACgkQqh6bcSY5nkZk
-fxAAr+yI1TZNVhM0JoEtawjSYUaKbq+uCgZVGTPxM5lK/B1tYxJMBl6DnLrpXhaHhiS1HGGXu5Lw
-1ruLRRdN8r2sF4R8aTQHmTfSNIafIZ+tlHe0wncaEWYPigc00LAMMasr7o+rRpMPW9N8N53OcWqA
-t+PFnUhreYWn7ZL1ftDbAdASUpuGKPiL7+aZV1n21IZPoejFc+rdkV0ucwu9Y+tAWS9uzq3LGi3n
-Aj1BhgxiAnN3CjcZZW0+cYSOWNodRgBrv+0iImPsXxlulg/FPLvDQi+EPll8o1b1/Bnrt+6PzHCZ
-Jz4GiWWaKDxg7hK9tcdF2LFaOFh7iPTK3ADNICy7EYEPQ/+gW4FsNOXIHTJlIK5Cgy4a60BJaYwr
-OuKIvDB9mW38qZctUrF1/hOlCiR23tzSh3wJ3Vijm/PT5oz7i0daB+lZclklMK8vRTPsl1AaFd1L
-mwU7Josq+u9hWhr8CIGKtGfWhjpf0r2pEDpBsY9hOHjMnipdDmybwIBCopeBBoRXPQFCM6NtCyZ3
-CYvHwPeW8Rio/IFM/+U/LScH5JjEeGku+h4ToPyK3Ot8l2UfcZNl05RI/VbJzSHvo+9T1F6w8+hJ
-jDDQvpU9WgRsS750V07SJO8iZ5LTEWrdGKPY3G/Om+sIawacX5omw+PHOplzcPH8IEsvwFVAw6gc
-hHE=
-=m34s
------END PGP SIGNATURE-----
-
---------------6q0lEgC0P3rgv0M0ceUP5qs9--
+>
+>> is_chained_smb2_message is
+>> checking next command header size.
+>>>
+>>> You also dropped the fix for the possible invalid read in
+>>> ksmbd_verify_smb_message() of the protocol_id field.
+>> Where ? You are saying your patch in github ? If it is right, I didn't
+>> drop.
+>
+> this one:
+>
+> <https://github.com/smfrench/smb3-kernel/commit/ffc410f1d19a0f06a952c7f28=
+e9bca4fa4bd4a74>
+Ah.. You pushed this patch to ksmbd-for-next-pending ?
+Sorry for that, my mistake, I will check branch before applying my patch.
+>
+> And also the cleanup commits using ksmbd_req_buf_next() in a few places.
+>
+>>> I might be missing something because I'm still new to the code. But
+>>> generally we really sanitize the logic while we're at it now instead of
+>>> adding band aids everywhere.
+>> I saw your patch and it's nice. However, we have not yet agreed on
+>> where the review will be conducted. You also didn't respond to my
+>> comments on my squash patch in your github. So I thought I'd take a
+>> deeper look if you send the patch to the list.
+>
+> I realize that my well thought idea to idea of simplifying things by
+> pushing my larger changes to github is not going very well. :) Therefor
+> I'll resubmit the patchset to the ML later on.
+>
+> Fwiw, here's is what an actual review on github on a MR would look like:
+>
+> <https://github.com/smfrench/smb3-kernel/pull/72>
+>
+> This was just an experiment. It demonstrates a few features: tracking
+> comments, tracking new pushes to the source branch and other related
+> actions.
+>
+> Note that I'm NOT PROPOSING using github MRs right away. Just showing
+> what's possible. :)
+Sound good. Thanks for your check:)
+>
+> -slow
+>
+> --
+> Ralph Boehme, Samba Team                 https://samba.org/
+> SerNet Samba Team Lead      https://sernet.de/en/team-samba
+>
