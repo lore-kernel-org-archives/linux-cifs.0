@@ -2,142 +2,122 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D9AC433EF
-	for <linux-cifs@archiver.kernel.org>; Fri,  1 Oct 2021 11:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0579DC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  1 Oct 2021 12:05:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9217761A82
-	for <linux-cifs@archiver.kernel.org>; Fri,  1 Oct 2021 11:59:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E498C610EA
+	for <linux-cifs@archiver.kernel.org>; Fri,  1 Oct 2021 12:04:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354193AbhJAMBP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 1 Oct 2021 08:01:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47092 "EHLO
+        id S231263AbhJAMGn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 1 Oct 2021 08:06:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354196AbhJAMBN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 1 Oct 2021 08:01:13 -0400
+        with ESMTP id S1354266AbhJAMGm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 1 Oct 2021 08:06:42 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A57BEC06177D
-        for <linux-cifs@vger.kernel.org>; Fri,  1 Oct 2021 04:59:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC8FEC061775
+        for <linux-cifs@vger.kernel.org>; Fri,  1 Oct 2021 05:04:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=From:Cc:To:Date:Message-ID;
-        bh=hwwXDBLWPtfg2XJWUiNJ6wJB9ABUzO0rPMx/JSZb888=; b=CuGIHc4+aSYYBhI0I5Ev2WfwCf
-        iblDRqH92J8jrcQRUnNZYUM0xTyq7BzNpJIYSdo07kaSd5rAzYDnqOzrZjdx/CwhSBedpYrP81a4p
-        m2GYuMTtZpuDCfMJehM7EIjv4WIN8UgtacJnzFDAoYFdMLlsjRAiWbOS7Q2dv8rC5HRL0NICA1Nwb
-        qNlx7DNHPto5xjyfHFoRTcDmrOAbLscTKLdwxfXaBw0yn8I8mXA6peJ6LkXtFVau9yKKcl7O7gXbL
-        gAiP00sagR8ccGlZE81rEXj0vGebx8/hTi9F4hSILElMvn+Fr8q8dtXnfepOyRW+rqPCmVloXX92A
-        HV9RaeImvHYSKIinuU3WqK9uKAX2F/sxyiyixDEEeNIztgJh/pnJuuYUHL60Oc/gVgqcNBv4C4XUg
-        yY8gbY8/Ap3MNH4S1KSCmAP1sVe1bEJBAfaRZ3lD23EQVWZq7lVp2u2LtidbtaS6U5iB0r1qu8DoP
-        IvfFsGhEEoj68Wz+hhxIxPf3;
+        s=42; h=Message-Id:Date:Cc:To:From;
+        bh=1xIhith6qdeG6Me+xiem9N7veeAYqNV0OvCOvctxFz4=; b=InvYDEmWhzShH/g67lJigBLiz4
+        cWq86wI/JC8JuBArJg+dnbL1GywKx1YD19msTzwEstLlv9vkNoVfenBRsCt7QRYR5CNIskHBXGzqB
+        JeFWk+xTXEWSR0Mb0f+4HXR/fXgl6kP6F9api0hrLPq2DSfbY2EZsWvaDmJyaW33HbnxYiSXBATRF
+        lS55UVSmvHYvWj5GLIF+9loCs9fmz1fKOfT/hz+YmWNU/lDBQBNlqCseq1SO+zJ0U6ZoGuWn0v9+d
+        15z0Sp+vFBokpMZZeu0RwyL+uByFJtCWP6EFkQuhgvZMAmLGGh5MsCgqUiClzf2LwY8GYyYqHRXA4
+        XoW8GLAbNFJsZpjG+Nml2mbqpYmtKN9TPXyULFEw+4jSROiUOYfc15rbMEFJLyhdnFsfeH2M7cqTC
+        KJpk2s/JezHiByd9KkywWnA2BcviW8A0h1a+DByRd9agdqTjlSjOhdIuI4iis7uyOws7O8SCbIbKi
+        iQQMTGYWxmoFfOI3v69O8ABO;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
         (Exim)
-        id 1mWHCI-0013W7-5n; Fri, 01 Oct 2021 11:59:26 +0000
-Message-ID: <db055e2c-b5c5-8def-e2dd-066f84b29e36@samba.org>
-Date:   Fri, 1 Oct 2021 13:59:25 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v4 0/9] ksmbd: a bunch of patches that is being reviewed
-Content-Language: en-US
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-References: <20210929084501.94846-1-linkinjeon@kernel.org>
- <bf665917-cf8c-30ca-4ce0-4614adaf0988@samba.org>
- <CAKYAXd-A4FLznKAVesfOiSpNy0KPAkXUppN4rkbGPBMdBMQLkA@mail.gmail.com>
- <2b536a89-cba6-88a0-b7d8-c5435d183679@samba.org>
- <CAKYAXd87aCAMZ56Ch68-NRjCH41MDdYYHUOSo3mfiMAOq_+QFA@mail.gmail.com>
- <40575524-51ff-0c78-98d9-23878e8390fb@samba.org>
- <CAKYAXd8uU=4U1+_rXNeNtu1sAztshzXVi2SGVjcuSSmVtTc+8A@mail.gmail.com>
+        id 1mWHHc-0013Z3-It; Fri, 01 Oct 2021 12:04:56 +0000
 From:   Ralph Boehme <slow@samba.org>
-In-Reply-To: <CAKYAXd8uU=4U1+_rXNeNtu1sAztshzXVi2SGVjcuSSmVtTc+8A@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------kNC0S2chUQ0Z0CUsbIMdOEdw"
+To:     linux-cifs@vger.kernel.org
+Cc:     Ralph Boehme <slow@samba.org>
+Subject: [PATCH v5 00/20] Buffer validation patches
+Date:   Fri,  1 Oct 2021 14:04:01 +0200
+Message-Id: <20211001120421.327245-1-slow@samba.org>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------kNC0S2chUQ0Z0CUsbIMdOEdw
-Content-Type: multipart/mixed; boundary="------------gZi6XFdK4KDaz0L4h7b5t3c5";
- protected-headers="v1"
-From: Ralph Boehme <slow@samba.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, Steve French
- <smfrench@gmail.com>, Hyunchul Lee <hyc.lee@gmail.com>,
- Sergey Senozhatsky <senozhatsky@chromium.org>
-Message-ID: <db055e2c-b5c5-8def-e2dd-066f84b29e36@samba.org>
-Subject: Re: [PATCH v4 0/9] ksmbd: a bunch of patches that is being reviewed
-References: <20210929084501.94846-1-linkinjeon@kernel.org>
- <bf665917-cf8c-30ca-4ce0-4614adaf0988@samba.org>
- <CAKYAXd-A4FLznKAVesfOiSpNy0KPAkXUppN4rkbGPBMdBMQLkA@mail.gmail.com>
- <2b536a89-cba6-88a0-b7d8-c5435d183679@samba.org>
- <CAKYAXd87aCAMZ56Ch68-NRjCH41MDdYYHUOSo3mfiMAOq_+QFA@mail.gmail.com>
- <40575524-51ff-0c78-98d9-23878e8390fb@samba.org>
- <CAKYAXd8uU=4U1+_rXNeNtu1sAztshzXVi2SGVjcuSSmVtTc+8A@mail.gmail.com>
-In-Reply-To: <CAKYAXd8uU=4U1+_rXNeNtu1sAztshzXVi2SGVjcuSSmVtTc+8A@mail.gmail.com>
+v2:
+  - update comments of smb2_get_data_area_len().
+  - fix wrong buffer size check in fsctl_query_iface_info_ioctl().
+  - fix 32bit overflow in smb2_set_info.
 
---------------gZi6XFdK4KDaz0L4h7b5t3c5
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+v3:
+  - add buffer check for ByteCount of smb negotiate request.
+  - Moved buffer check of to the top of loop to avoid unneeded behavior when
+    out_buf_len is smaller than network_interface_info_ioctl_rsp.
+  - get correct out_buf_len which doesn't exceed max stream protocol length.
+  - subtract single smb2_lock_element for correct buffer size check in
+    ksmbd_smb2_check_message().
 
-QW0gMDEuMTAuMjEgdW0gMDM6MTAgc2NocmllYiBOYW1qYWUgSmVvbjoNCj4gMS4gWW91IG5l
-ZWQgdG8gY2hlY2sgaGVhZGVyIHNpemUgb2YgcmVsYXRlZCBwZHUgb2YgY29tcG91bmQgcmVx
-dWVzdCBpcw0KPiBhbHJlYWR5IGNoZWNrZWQgaW4gdGhlIGlzX2NoYWluZWRfc21iMl9tZXNz
-YWdlIGZ1bmN0aW9uLg0KPiANCj4gaXNfY2hhaW5lZF9zbWIyX21lc3NhZ2UoKQ0KPiAuLi4N
-Cj4gICAgICAgICAgaWYgKG5leHRfY21kID4gMCkgew0KPiAgICAgICAgICAgICAgICAgIGlm
-ICgodTY0KXdvcmstPm5leHRfc21iMl9yY3ZfaGRyX29mZiArIG5leHRfY21kICsNCj4gICAg
-ICAgICAgICAgICAgICAgICAgICAgIF9fU01CMl9IRUFERVJfU1RSVUNUVVJFX1NJWkUgPg0K
-PiAgICAgICAgICAgICAgICAgICAgICBnZXRfcmZjMTAwMl9sZW4od29yay0+cmVxdWVzdF9i
-dWYpKSB7DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICBwcl9lcnIoIm5leHQgY29tbWFu
-ZCgldSkgb2Zmc2V0IGV4Y2VlZHMgc21iIG1zZyBzaXplXG4iLA0KPiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIG5leHRfY21kKTsNCj4gICAgICAgICAgICAgICAgICAgICAg
-ICAgIHJldHVybiBmYWxzZTsNCj4gICAgICAgICAgICAgICAgICB9DQoNCnllYWgsIEkgYWxy
-ZWFkeSBtZW50aW9uZWQgdGhhdCBpbiB0aGUgY29tbWl0IG1lc3NhZ2UgaWlyYy4gVGhlIHBy
-b2JsZW0gDQp3aXRoIHRoaXMgaXMgdGhhdCB0aGlzIGxvZ2ljIGlzIHRvbyBicml0dGxlIGFu
-ZCBoYXJkIHRvIHVuZGVyc3RhbmQuIFRoZSANCmNvZGUgc2hvdWxkIGJlIHJvYnVzdCBhbmQg
-ZWFzeSB0byB1bmRlcnN0YW5kLCB0aGF0J3Mgd2h5IEkgc3Ryb25nbHkgDQpzdWdnZXN0IHRv
-IGFkZCB0aGUgY2hlY2sgdG8ga3NtYmRfc21iMl9jaGVja19tZXNzYWdlKCkuDQoNCj4gMi4g
-c2Vzc2lvbiBpZCBhbmQgdHJlZSBpZCBvbmx5IG5lZWRzIHRvIGJlIGNoZWNrZWQgaW4gdGhl
-IGhlYWRlciBvZg0KPiB0aGUgZmlyc3QgcGR1IHJlZ2FyZGxlc3Mgb2YgY29tcG91bmQgYW5k
-IHNpbmdsZSBvbmUuDQoNClVubGVzcyBJJ20gY29tcGxldGVseSBvZmYgKHdoaWNoIEkgc29t
-ZXRpbWVzIGFyZSwgc28gSSdtIHByZXBhcmVkIHRvIGJlIA0KcHJvdmVuIGZhbHNlIDopICks
-IHRoaXMgaXMgbm90IGNvcnJlY3QuIENmIE1TLVNNQjIgMy4zLjUuMi43LiBGb3IgDQpub24t
-cmVsYXRlZCBjb21wb3VuZCByZXF1ZXN0cyBzZXNzaW9uLWlkIGFuZCB0cmVlLWlkIGFyZSB0
-byBiZSB0YWtlbiANCmZyb20gZWFjaCBQRFUuDQoNCkNmIGFsc28gdGhlIFNhbWJhIGNvZGUg
-aW4gc21iZF9zbWIyX3JlcXVlc3RfZGlzcGF0Y2goKSB3aGljaCBjYWxscyANCnNtYmRfc21i
-Ml9yZXF1ZXN0X2NoZWNrX3Nlc3Npb24oKSBhbmQgc21iZF9zbWIyX3JlcXVlc3RfY2hlY2tf
-dGNvbigpIHRvIA0KaW1wbGVtZW50IHRoZSByZWxldmFudCBsb2dpYy4NCg0KSSdsbCBzZW5k
-IHdoYXQgSSBoYXZlIGluIGEgc2Vjb25kLg0KDQotc2xvdw0KDQotLSANClJhbHBoIEJvZWht
-ZSwgU2FtYmEgVGVhbSAgICAgICAgICAgICAgICAgaHR0cHM6Ly9zYW1iYS5vcmcvDQpTZXJO
-ZXQgU2FtYmEgVGVhbSBMZWFkICAgICAgaHR0cHM6Ly9zZXJuZXQuZGUvZW4vdGVhbS1zYW1i
-YQ0K
+v4: 
+  - use work->response_sz for out_buf_len calculation in smb2_ioctl.
+  - move smb2_neg size check to above to validate NegotiateContextOffset
+    field.
+  - remove unneeded dialect checks in smb2_sess_setup() and
+    smb2_handle_negotiate().
+  - split smb2_set_info patch into two patches(declaring
+    smb2_file_basic_info and buffer check) 
 
---------------gZi6XFdK4KDaz0L4h7b5t3c5--
+v5:
+  - remove PDU size validation from ksmbd_conn_handler_loop()
+  - add PDU size validation to ksmbd_smb2_check_message()
+  - fix compound non-related request handling
 
---------------kNC0S2chUQ0Z0CUsbIMdOEdw
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
+Hyunchul Lee (1):
+  ksmbd: add buffer validation for SMB2_CREATE_CONTEXT
 
------BEGIN PGP SIGNATURE-----
+Namjae Jeon (9):
+  ksmbd: add the check to vaildate if stream protocol length exceeds
+    maximum value
+  ksmbd: add validation in smb2_ioctl
+  ksmbd: use correct basic info level in set_file_basic_info()
+  ksmbd: add request buffer validation in smb2_set_info
+  ksmbd: check strictly data area in ksmbd_smb2_check_message()
+  ksmbd: add validation in smb2 negotiate
+  ksmbd: remove the leftover of smb2.0 dialect support
+  ksmbd: remove NTLMv1 authentication
+  ksmbd: fix transform header validation
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFW+B0FAwAAAAAACgkQqh6bcSY5nkay
-yBAAhb5eVarGD1XqMC9aCMIjuFyO4u84ix2/TRWPDzEQN76A+EVscpscNB+I4TThD+B2BISzQeUi
-GcKpr4oDnPeaZPufYqHd1jbDQQ8LMeMXwAxHeLsYK4NSQ5u4PvCnt/Vz7noXqLzVny/y4CP4WYoa
-C02aDXptgL/7XJFdOt62a0F0OMTgYBwFhiWe3I9JR4D+bWXQXuib8hZVt8DOVFRCyyYxrdTbdWDt
-hn1wjnCNVJmYOmCYE1q2Vb6DKumndGETcwrPooeROchF7WaD1CFne0DtuSGTqmzRY6pjJ9HaK6Is
-HiQ0vJlmDLv3bOirogTtIHYpPsJEUf2Qh4KMvckFmsdTZKtCj0OsO4iWykL0R8h8SX3kl69IGweJ
-JlOsofKoAN8pzENpHmKZJCHL8YwXmKOpa+zoX/CMcgKcBXb0UlG2iHc4MUnm28wgMle08Lb8ZI3L
-jOSQ6g8NapYnqdUEerffKNFFUCS5UFTejhrnZlQvntDwLTkaH/O612sk2A7jbC06EbUq/fDR41gI
-Ep9NhWUw3dX72hJQ/1gIsgRGZ7ZkPir3mcxV4Ecvtg/SjkGng0EeMgVkES0PCaSvgp3J+3tbHn68
-+GKzXcODIgj1DyfMkN1pdChOIbN7YfvYiWGJ+GwVtvsHCs+mUX94ZQApPr2fpHR/lPa+nmH0cWNv
-RWY=
-=Yxi0
------END PGP SIGNATURE-----
+Ralph Boehme (10):
+  ksmbd: use ksmbd_req_buf_next() in ksmbd_smb2_check_message()
+  ksmbd: use ksmbd_req_buf_next() in ksmbd_verify_smb_message()
+  ksmbd: remove ksmbd_verify_smb_message()
+  ksmbd: add ksmbd_smb2_cur_pdu_buflen()
+  ksmbd: use ksmbd_smb2_cur_pdu_buflen() in ksmbd_smb2_check_message()
+  ksmbd: check PDU len is at least header plus body size in
+    ksmbd_smb2_check_message()
+  ksmdb: use cmd helper variable in smb2_get_ksmbd_tcon()
+  ksmdb: make smb2_get_ksmbd_tcon() callable with chained PDUs
+  ksmbd: make smb2_check_user_session() callabe for compound PDUs
+  ksmdb: move session and tcon validation to ksmbd_smb2_check_message()
 
---------------kNC0S2chUQ0Z0CUsbIMdOEdw--
+ fs/ksmbd/auth.c       | 205 ---------------------
+ fs/ksmbd/connection.c |   9 +-
+ fs/ksmbd/crypto_ctx.c |  16 --
+ fs/ksmbd/crypto_ctx.h |   8 -
+ fs/ksmbd/ksmbd_work.h |   1 +
+ fs/ksmbd/oplock.c     |  41 ++++-
+ fs/ksmbd/server.c     |  19 +-
+ fs/ksmbd/smb2misc.c   | 164 ++++++++++-------
+ fs/ksmbd/smb2ops.c    |   5 -
+ fs/ksmbd/smb2pdu.c    | 411 ++++++++++++++++++++++++++++++------------
+ fs/ksmbd/smb2pdu.h    |  11 +-
+ fs/ksmbd/smb_common.c |  68 +++----
+ fs/ksmbd/smb_common.h |   5 +-
+ fs/ksmbd/smbacl.c     |  21 ++-
+ fs/ksmbd/vfs.c        |   2 +-
+ fs/ksmbd/vfs.h        |   2 +-
+ 16 files changed, 496 insertions(+), 492 deletions(-)
+
+-- 
+2.31.1
+
