@@ -2,163 +2,129 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 943C2C433EF
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 06:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73692C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 11:54:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6353561A7B
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 06:05:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53B6461AED
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 11:54:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232278AbhJBGHK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 2 Oct 2021 02:07:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38352 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229591AbhJBGHK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 2 Oct 2021 02:07:10 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 28E3161A7B
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 06:05:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633154725;
-        bh=ucbJHt+s8dRYh3XhPp+ipTZASRp6gb//rTfv9dm/6Xk=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Zh3FtLfW2oxaFRMMYesehBvgOzvfFNnvq9vUziQFYiyMgapWWh866gR155cE5lkKt
-         MuPe2fF/bSRLHthRpcGike1y7+RuiGhfQLRYiuyaIvIcgzGsZsoE5PG2Aqlb66zR/M
-         6XzwVfEGi5QGg3dNwNTL9cn8MfhxCGJQp0nz/IGSpSjH6zgiWUAmtCf66zhR1iy4rd
-         WYmj4rmYQfACGMkoWMahHB1d8kXRkcnqG68PNDQCN7+/hD1SKnD9Zs8brbXRK9sZyz
-         26t46TRfA6n8sWathGborIr33GG63j9GTWT78moHHH3XXUcZD/eIYdWh+kOOiudwws
-         biYCVMNcSFeDw==
-Received: by mail-ot1-f53.google.com with SMTP id 77-20020a9d0ed3000000b00546e10e6699so14253937otj.2
-        for <linux-cifs@vger.kernel.org>; Fri, 01 Oct 2021 23:05:25 -0700 (PDT)
-X-Gm-Message-State: AOAM532HshZgJwGRGdew2J3RZN0IcPwQ7DhM6+glTZX+Aqr6abjO4p41
-        TYEE6c8NjedTSU58MDW9fSFktIzuPlxgW5VzH7g=
-X-Google-Smtp-Source: ABdhPJzVH+D+dokk+u5KNelYlOK4DkM2jyiQw3d3MGqxaL+Z+kJ4XpOyWViWik9p/+N/7Ia3RGK3+5SOYcM/SL56R34=
-X-Received: by 2002:a9d:4705:: with SMTP id a5mr1451608otf.237.1633154724476;
- Fri, 01 Oct 2021 23:05:24 -0700 (PDT)
+        id S232890AbhJBL4g (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 2 Oct 2021 07:56:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58854 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232855AbhJBL4f (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Oct 2021 07:56:35 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF28DC061570
+        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 04:54:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=From:Cc:To:Date:Message-ID;
+        bh=GgXatO0zKH8dUxHucDwPBdpoQ+Z/hPcIiZdrzlJSEJU=; b=JeP0tv+7+LAEqoi6nIQUiLWyLr
+        cIoPv9F/57bJrhOW3mlVwtLznk5cDp4jxkWdAB7WJZN0HLOrhlz5DIL5wO8sk+3rRcOBKiV92+KWm
+        0Bu/F/HH76IPMdUtIak/QHYJiBIlioamAc6ZvB2TfntGbwPVS5HWodaj91Vw6qshGjuUa/Q3nCdVS
+        dlqf2CXloXEes6pXTJH/QSmC0DPt+X7ya12i1/kVy655zBTi938cavVUhcyvJ7e1sPeJq09VasrZ9
+        SkJZuiDfsZZBvdl8qL7Hs4SH/PbzZD7myD18Inr/H6HvBDRxZ+0zObqdK4fz7/N+ZNj//fT6+TMv1
+        PtZSgEF+e3DEZU1xMXLBCSWaj6saZjl0ZwJ2VyAXnbjmrKHl3T4B6mNfh3ifm9ldS6/sXb1/g1uCX
+        zAAyp1cb+PpxIAXzpWx+AzQzCEB14qilMFyszApABrnZCDGTTfIrnGSja1tmerAEVgOIzmz76IsmE
+        ltBVSxn0P1GWnx897s0gdiyH;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1mWdbK-001DHi-Ua; Sat, 02 Oct 2021 11:54:47 +0000
+Message-ID: <3d8ac96d-f996-3e22-8a73-7d5083953d8b@samba.org>
+Date:   Sat, 2 Oct 2021 13:54:46 +0200
 MIME-Version: 1.0
-Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Fri, 1 Oct 2021 23:05:24 -0700 (PDT)
-In-Reply-To: <20211001120421.327245-1-slow@samba.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v5 16/20] ksmbd: check PDU len is at least header plus
+ body size in ksmbd_smb2_check_message()
+Content-Language: en-US
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>
 References: <20211001120421.327245-1-slow@samba.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sat, 2 Oct 2021 15:05:24 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_5LS3_Wptb3SULciOyKYzmijrFRn2+7MuNmemmyQoD7Q@mail.gmail.com>
-Message-ID: <CAKYAXd_5LS3_Wptb3SULciOyKYzmijrFRn2+7MuNmemmyQoD7Q@mail.gmail.com>
-Subject: Re: [PATCH v5 00/20] Buffer validation patches
-To:     Ralph Boehme <slow@samba.org>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+ <20211001120421.327245-17-slow@samba.org>
+ <CAKYAXd8UH+LBDFSNCOHJOEFco=9CTzFmTzP9D+u_h1USm1bj1Q@mail.gmail.com>
+From:   Ralph Boehme <slow@samba.org>
+In-Reply-To: <CAKYAXd8UH+LBDFSNCOHJOEFco=9CTzFmTzP9D+u_h1USm1bj1Q@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------0y1Oz2huduH2AVPlvbRchum0"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-10-01 21:04 GMT+09:00, Ralph Boehme <slow@samba.org>:
-> v2:
->   - update comments of smb2_get_data_area_len().
->   - fix wrong buffer size check in fsctl_query_iface_info_ioctl().
->   - fix 32bit overflow in smb2_set_info.
->
-> v3:
->   - add buffer check for ByteCount of smb negotiate request.
->   - Moved buffer check of to the top of loop to avoid unneeded behavior
-> when
->     out_buf_len is smaller than network_interface_info_ioctl_rsp.
->   - get correct out_buf_len which doesn't exceed max stream protocol
-> length.
->   - subtract single smb2_lock_element for correct buffer size check in
->     ksmbd_smb2_check_message().
->
-> v4:
->   - use work->response_sz for out_buf_len calculation in smb2_ioctl.
->   - move smb2_neg size check to above to validate NegotiateContextOffset
->     field.
->   - remove unneeded dialect checks in smb2_sess_setup() and
->     smb2_handle_negotiate().
->   - split smb2_set_info patch into two patches(declaring
->     smb2_file_basic_info and buffer check)
->
-> v5:
->   - remove PDU size validation from ksmbd_conn_handler_loop()
->   - add PDU size validation to ksmbd_smb2_check_message()
->   - fix compound non-related request handling
-Hi Ralph,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------0y1Oz2huduH2AVPlvbRchum0
+Content-Type: multipart/mixed; boundary="------------UGHPC7x0lS6jslcm72czMS9X";
+ protected-headers="v1"
+From: Ralph Boehme <slow@samba.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, Steve French
+ <smfrench@gmail.com>, Hyunchul Lee <hyc.lee@gmail.com>
+Message-ID: <3d8ac96d-f996-3e22-8a73-7d5083953d8b@samba.org>
+Subject: Re: [PATCH v5 16/20] ksmbd: check PDU len is at least header plus
+ body size in ksmbd_smb2_check_message()
+References: <20211001120421.327245-1-slow@samba.org>
+ <20211001120421.327245-17-slow@samba.org>
+ <CAKYAXd8UH+LBDFSNCOHJOEFco=9CTzFmTzP9D+u_h1USm1bj1Q@mail.gmail.com>
+In-Reply-To: <CAKYAXd8UH+LBDFSNCOHJOEFco=9CTzFmTzP9D+u_h1USm1bj1Q@mail.gmail.com>
 
-Have you tested this patch-set ? When I tried to run xfstests test,
-kernel oops happen.
-Can you run xfstests and check kernel oops  ?
+--------------UGHPC7x0lS6jslcm72czMS9X
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-These are my xfstests command and tests.
+QW0gMDIuMTAuMjEgdW0gMDc6NTUgc2NocmllYiBOYW1qYWUgSmVvbjoNCj4gMjAyMS0xMC0w
+MSAyMTowNCBHTVQrMDk6MDAsIFJhbHBoIEJvZWhtZSA8c2xvd0BzYW1iYS5vcmc+Og0KPj4g
+Tm90ZTogd2UgYWxyZWFkeSBoYXZlIHRoZSBzYW1lIGNoZWNrIGluIGlzX2NoYWluZWRfc21i
+Ml9tZXNzYWdlKCksIGJ1dCB0aGVyZQ0KPj4gaXQNCj4+IG9ubHkgYXBwbGllcyB0byBjb21w
+b3VuZCByZXF1ZXN0cywgc28gd2UgaGF2ZSB0byByZXBlYXQgdGhlIGNoZWNrIGhlcmUgdG8N
+Cj4+IGNvdmVyDQo+PiBib3RoIGNhc2VzLg0KPj4NCj4+IENjOiBOYW1qYWUgSmVvbiA8bGlu
+a2luamVvbkBrZXJuZWwub3JnPg0KPj4gQ2M6IFRvbSBUYWxwZXkgPHRvbUB0YWxwZXkuY29t
+Pg0KPj4gQ2M6IFJvbm5pZSBTYWhsYmVyZyA8cm9ubmllc2FobGJlcmdAZ21haWwuY29tPg0K
+Pj4gQ2M6IFN0ZXZlIEZyZW5jaCA8c21mcmVuY2hAZ21haWwuY29tPg0KPj4gQ2M6IEh5dW5j
+aHVsIExlZSA8aHljLmxlZUBnbWFpbC5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBSYWxwaCBC
+b2VobWUgPHNsb3dAc2FtYmEub3JnPg0KPj4gLS0tDQo+PiAgIGZzL2tzbWJkL3NtYjJtaXNj
+LmMgfCAzICsrKw0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspDQo+Pg0K
+Pj4gZGlmZiAtLWdpdCBhL2ZzL2tzbWJkL3NtYjJtaXNjLmMgYi9mcy9rc21iZC9zbWIybWlz
+Yy5jDQo+PiBpbmRleCA3ZWQyNjZlYjZjNWUuLjU0MWIzOWI3YTg0YiAxMDA2NDQNCj4+IC0t
+LSBhL2ZzL2tzbWJkL3NtYjJtaXNjLmMNCj4+ICsrKyBiL2ZzL2tzbWJkL3NtYjJtaXNjLmMN
+Cj4+IEBAIC0zMzgsNiArMzM4LDkgQEAgaW50IGtzbWJkX3NtYjJfY2hlY2tfbWVzc2FnZShz
+dHJ1Y3Qga3NtYmRfd29yayAqd29yaykNCj4+ICAgCWlmIChjaGVja19zbWIyX2hkcihoZHIp
+KQ0KPj4gICAJCXJldHVybiAxOw0KPj4NCj4+ICsJaWYgKGxlbiA8IHNpemVvZihzdHJ1Y3Qg
+c21iMl9wZHUpIC0gNCkNCj4+ICsJCXJldHVybiAxOw0KPiB3aGVuIG9ubHkgdGhpcyBwYXRj
+aCBpcyBhcHBsaWVkLCBob3cgY2FuIHlvdSBndWFyYW50ZWUgdGhhdCBzZXNzaW9uIGlkDQo+
+IGFuZCB0cmVlIGlkIG9mIHNtYjIgaGVhZGVyIGFyZSB2YWlsZCA/DQoNCndoYXQgZG8geW91
+IG1lYW4/IFRoaXMganVzdCBjaGVja3MgdGhlIGFjdHVhbCBwYWNrZXQgbGVuZ2h0IGlzIGxh
+cmdlIA0KZW5vdWdoIHRvIGFjY2VzcyB0aGUgaGVhZGVyIGFuZCB0aGUgYm9keSBsZW5naHQg
+ZmllbGQuDQoNCi1zbG93DQoNCi0tIA0KUmFscGggQm9laG1lLCBTYW1iYSBUZWFtICAgICAg
+ICAgICAgICAgICBodHRwczovL3NhbWJhLm9yZy8NClNlck5ldCBTYW1iYSBUZWFtIExlYWQg
+ICAgICBodHRwczovL3Nlcm5ldC5kZS9lbi90ZWFtLXNhbWJhDQo=
 
-sudo ./check cifs/001 generic/001 generic/002 generic/005 generic/006
-generic/007 generic/008 generic/011 generic/013 generic/014
-generic/020 generic/023 generic/024 generic/028 generic/029
-generic/030 generic/032 generic/033 generic/036 generic/037
-generic/069 generic/070 generic/071 generic/074 generic/080
-generic/084 generic/086 generic/095 generic/098 generic/100
-generic/103 generic/109 generic/113 generic/117 generic/124
-generic/125 generic/129 generic/130 generic/132 generic/133
-generic/135 generic/141 generic/169 generic/198 generic/207
-generic/208 generic/210 generic/211 generic/212 generic/214
-generic/215 generic/221 generic/225 generic/228 generic/236
-generic/239 generic/241 generic/245 generic/246 generic/247
-generic/248 generic/249 generic/257 generic/258 generic/286
-generic/308 generic/309 generic/310 generic/313 generic/315
-generic/316 generic/337 generic/339 generic/340 generic/344
-generic/345 generic/346 generic/349 generic/350 generic/354
-generic/360 generic/377 generic/391 generic/393 generic/394
-generic/406 generic/412 generic/420 generic/422 generic/432
-generic/433 generic/436 generic/437 generic/438 generic/439
-generic/443 generic/445 generic/446 generic/448 generic/451
-generic/452 generic/454 generic/460 generic/464 generic/465
-generic/490 generic/504 generic/523 generic/524 generic/533
-generic/539 generic/567 generic/568 generic/590 generic/591
+--------------UGHPC7x0lS6jslcm72czMS9X--
 
-Thanks!
->
-> Hyunchul Lee (1):
->   ksmbd: add buffer validation for SMB2_CREATE_CONTEXT
->
-> Namjae Jeon (9):
->   ksmbd: add the check to vaildate if stream protocol length exceeds
->     maximum value
->   ksmbd: add validation in smb2_ioctl
->   ksmbd: use correct basic info level in set_file_basic_info()
->   ksmbd: add request buffer validation in smb2_set_info
->   ksmbd: check strictly data area in ksmbd_smb2_check_message()
->   ksmbd: add validation in smb2 negotiate
->   ksmbd: remove the leftover of smb2.0 dialect support
->   ksmbd: remove NTLMv1 authentication
->   ksmbd: fix transform header validation
->
-> Ralph Boehme (10):
->   ksmbd: use ksmbd_req_buf_next() in ksmbd_smb2_check_message()
->   ksmbd: use ksmbd_req_buf_next() in ksmbd_verify_smb_message()
->   ksmbd: remove ksmbd_verify_smb_message()
->   ksmbd: add ksmbd_smb2_cur_pdu_buflen()
->   ksmbd: use ksmbd_smb2_cur_pdu_buflen() in ksmbd_smb2_check_message()
->   ksmbd: check PDU len is at least header plus body size in
->     ksmbd_smb2_check_message()
->   ksmdb: use cmd helper variable in smb2_get_ksmbd_tcon()
->   ksmdb: make smb2_get_ksmbd_tcon() callable with chained PDUs
->   ksmbd: make smb2_check_user_session() callabe for compound PDUs
->   ksmdb: move session and tcon validation to ksmbd_smb2_check_message()
->
->  fs/ksmbd/auth.c       | 205 ---------------------
->  fs/ksmbd/connection.c |   9 +-
->  fs/ksmbd/crypto_ctx.c |  16 --
->  fs/ksmbd/crypto_ctx.h |   8 -
->  fs/ksmbd/ksmbd_work.h |   1 +
->  fs/ksmbd/oplock.c     |  41 ++++-
->  fs/ksmbd/server.c     |  19 +-
->  fs/ksmbd/smb2misc.c   | 164 ++++++++++-------
->  fs/ksmbd/smb2ops.c    |   5 -
->  fs/ksmbd/smb2pdu.c    | 411 ++++++++++++++++++++++++++++++------------
->  fs/ksmbd/smb2pdu.h    |  11 +-
->  fs/ksmbd/smb_common.c |  68 +++----
->  fs/ksmbd/smb_common.h |   5 +-
->  fs/ksmbd/smbacl.c     |  21 ++-
->  fs/ksmbd/vfs.c        |   2 +-
->  fs/ksmbd/vfs.h        |   2 +-
->  16 files changed, 496 insertions(+), 492 deletions(-)
->
-> --
-> 2.31.1
->
->
+--------------0y1Oz2huduH2AVPlvbRchum0
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFYSIYFAwAAAAAACgkQqh6bcSY5nkbH
+dg/8CgmHFJfpm9wE6tA4xHz1NQyHZgefg3SKqRMiQWvnjtOwXyCDEOliGX3T86nzaXwmuVp2HhrU
+HlfzftzwFhuoactZcyDB36SANzk6c0iCq0UzBZ0H8G9XfLSCO6YXQF/0DxMgJWlX/Y/qfqJD+cpz
+LnU9+sNYUiKm9kZU4eV06bhxCrgisgN1Ui5I+6VkH7L0HQklMzpBDnRrAzaxC7NC4omRwgELmcep
+744ilcAc4uYqDlB++/42nsnsIwDoJob1q4Vvp6Fky2u7YPllDafF8BtGX2CUb4NWhIzXkR4thPzz
+NL9GG65DUW0ApeQXj9kAnVH/vcQ6W+3bpHTImSOnyG+NqrHNuGqmMCtYs+hqreaaKUvkA3kuhOhc
+aOZ7BBCc6rIjZi5/k9WC3umNjPY7CMuNjDBrDacOaClFjngW1Qyva9Y6hRoOq+az1AVHpJhXPRlb
+uB4xQdV0GN5grphSrcnnUnaNlApF48e13vOTHdTYlSWRpiSgeOekD0NJlJj3yJ9GL1iYLDhXsTyr
+az8sQU+cv9irI2zPhf9VFD7lN1JL8BMJVvGNzQWONQUymXXKzIIi1e15x0mO6VR3b05D+gtrR7jd
+GVmD0HtCYSyXYaNqdvgyH7rKGgn43oGPAGmU3Kjw/v9bM5yvlwZBydsjCR9V1axmg1qD0TK6CP37
+n9M=
+=kbJh
+-----END PGP SIGNATURE-----
+
+--------------0y1Oz2huduH2AVPlvbRchum0--
