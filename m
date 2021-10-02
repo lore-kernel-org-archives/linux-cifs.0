@@ -2,46 +2,46 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5640CC433EF
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 05:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EBCC433F5
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 05:49:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2709F61440
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 05:46:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE4F161A54
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 05:49:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230305AbhJBFsD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 2 Oct 2021 01:48:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35024 "EHLO mail.kernel.org"
+        id S230311AbhJBFvL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 2 Oct 2021 01:51:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35938 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229591AbhJBFsD (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 2 Oct 2021 01:48:03 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B86E361A54
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 05:46:17 +0000 (UTC)
+        id S229591AbhJBFvK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 2 Oct 2021 01:51:10 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7223661AAD
+        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 05:49:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633153577;
-        bh=X6dqMJFd2bpycC17wQzqbrzcMZfIUhW6JNxCiEVEWBE=;
+        s=k20201202; t=1633153765;
+        bh=RoMzyT9xTsFjTu6EGSMLGidmjyDZJ2Xa4bv4hKZ2F7I=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=qeIZchfiecds2m+7aTBVRruARPoOO/uDWuicjCqycO33ACWr2xhljloTVKDrc+F9W
-         0OCSyNBqAp8Z3jgATE9e8Gu3bgH8X5mia9qi5RD9qEP/ELQM9yOmkhm6Xhs6sVMSab
-         hUoM30qY6Jv6qZXaVDf+SSO4YIZ1ZZjUzJ8LSdltgXk1bpsuWTRJOw1uK8UfrIWVEN
-         hFnYh4VOLTwmVCxk3BFcVa3FZBf1AhMhJYBWx0876+fO8u05R2Um6hb7GKY8RbabYG
-         /b5VlBJQDrIHXrXgD6Av9TsdzVUoyYqkiVERDjFxAS48miNcyaxlMm+aohpeFpCHcD
-         LlqKfl5+DYYfQ==
-Received: by mail-ot1-f42.google.com with SMTP id 97-20020a9d006a000000b00545420bff9eso14201240ota.8
-        for <linux-cifs@vger.kernel.org>; Fri, 01 Oct 2021 22:46:17 -0700 (PDT)
-X-Gm-Message-State: AOAM532jRX6oj3sn7TDH9vzCdo52/iZ0YvlXf2rtm67y7LmaYUiXKHzD
-        /8C68pGCCxiboqlos2QZFkAi1eitCoz5eqDlpwM=
-X-Google-Smtp-Source: ABdhPJzX8vi9kwzHVScAkQS4sPufq6Y//tC63szfYbBWHkCxOcrWIJHEoZAAPzBiYj5+Ct7fGq92TxkyTooxwPm4pz4=
-X-Received: by 2002:a05:6830:24a8:: with SMTP id v8mr1364729ots.185.1633153577069;
- Fri, 01 Oct 2021 22:46:17 -0700 (PDT)
+        b=d18+k692HpccVeBkkRzO45iP+W0JGT1A/Ud2EK8Tf6a2Xa4Yp9Zqwsyi5iBZdCVSR
+         KcJ0z43BVoHyvE+Pb9yHSKdBKBza6M5nrPlx+ym+3dS4FvT/X5hsG5wsETn1MAe1Nz
+         huQ+lmCqdR66Y0LtfTziSyxgzfvhV8u3tcpuc70l3I7Lh/pAQeUsHiPpFJAcfke9Ei
+         Qp0J+Mx6msMXvQTqwWfgKuTMmGohjN7dcXLZ/QPJHy9b5hHaK3WJqT5s2+NYX6ZrDn
+         lHBVtZrWcVvdPD+fNd9wKTlj5/pnDMIN2j+xb0EOUqW2D6VJ182tHSo1mgDsLKolY5
+         frN++6V+ONVBA==
+Received: by mail-oo1-f44.google.com with SMTP id b5-20020a4ac285000000b0029038344c3dso3554071ooq.8
+        for <linux-cifs@vger.kernel.org>; Fri, 01 Oct 2021 22:49:25 -0700 (PDT)
+X-Gm-Message-State: AOAM5339uvAwibVLgpBOg8MpebeEqAiF1dKxJ5Sa/dSbV1lGxtGB21iS
+        jmGQYFjt1fDfZE41BqtsH87fQDF1HydSv+lIoRA=
+X-Google-Smtp-Source: ABdhPJxWOaYBjqua9no1YPpHvlAgK7HTRxHsu7dx1LD3+nJ45AGHVNkKySv4SaakkDfG9Cal3p4iPpm5HA+uiJA+iNI=
+X-Received: by 2002:a05:6820:1018:: with SMTP id v24mr1582695oor.27.1633153764821;
+ Fri, 01 Oct 2021 22:49:24 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Fri, 1 Oct 2021 22:46:16 -0700 (PDT)
-In-Reply-To: <20211001120421.327245-14-slow@samba.org>
-References: <20211001120421.327245-1-slow@samba.org> <20211001120421.327245-14-slow@samba.org>
+Received: by 2002:a8a:1342:0:0:0:0:0 with HTTP; Fri, 1 Oct 2021 22:49:24 -0700 (PDT)
+In-Reply-To: <20211001120421.327245-15-slow@samba.org>
+References: <20211001120421.327245-1-slow@samba.org> <20211001120421.327245-15-slow@samba.org>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sat, 2 Oct 2021 14:46:16 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-PsL4adDyK3wLRQGp51wvuH6QX0r6xW5rywyUT_+a+3g@mail.gmail.com>
-Message-ID: <CAKYAXd-PsL4adDyK3wLRQGp51wvuH6QX0r6xW5rywyUT_+a+3g@mail.gmail.com>
-Subject: Re: [PATCH v5 13/20] ksmbd: remove ksmbd_verify_smb_message()
+Date:   Sat, 2 Oct 2021 14:49:24 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_i+L0CwnS4zSpaRq7Yrnq0myEaoAYs6T9mD9+CkUM1pg@mail.gmail.com>
+Message-ID: <CAKYAXd_i+L0CwnS4zSpaRq7Yrnq0myEaoAYs6T9mD9+CkUM1pg@mail.gmail.com>
+Subject: Re: [PATCH v5 14/20] ksmbd: add ksmbd_smb2_cur_pdu_buflen()
 To:     Ralph Boehme <slow@samba.org>
 Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
         Ronnie Sahlberg <ronniesahlberg@gmail.com>,
@@ -53,10 +53,6 @@ List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 2021-10-01 21:04 GMT+09:00, Ralph Boehme <slow@samba.org>:
-> Another leftover from SMB1 support. Remove it and use
-> ksmbd_verify_smb_message()
-> directly in __process_request().
->
 > Cc: Namjae Jeon <linkinjeon@kernel.org>
 > Cc: Tom Talpey <tom@talpey.com>
 > Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
@@ -64,76 +60,60 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 > Cc: Hyunchul Lee <hyc.lee@gmail.com>
 > Signed-off-by: Ralph Boehme <slow@samba.org>
 > ---
->  fs/ksmbd/server.c     |  2 +-
->  fs/ksmbd/smb_common.c | 24 ------------------------
->  fs/ksmbd/smb_common.h |  1 -
->  3 files changed, 1 insertion(+), 26 deletions(-)
+>  fs/ksmbd/smb2misc.c | 25 +++++++++++++++++++++++++
+>  fs/ksmbd/smb2pdu.h  |  1 +
+>  2 files changed, 26 insertions(+)
 >
-> diff --git a/fs/ksmbd/server.c b/fs/ksmbd/server.c
-> index 2a2b2135bfde..328c4225cec1 100644
-> --- a/fs/ksmbd/server.c
-> +++ b/fs/ksmbd/server.c
-> @@ -114,7 +114,7 @@ static int __process_request(struct ksmbd_work *work,
-> struct ksmbd_conn *conn,
->  	if (check_conn_state(work))
->  		return SERVER_HANDLER_CONTINUE;
->
-> -	if (ksmbd_verify_smb_message(work))
-> +	if (ksmbd_smb2_check_message(work))
->  		return SERVER_HANDLER_ABORT;
->
->  	command = conn->ops->get_cmd_val(work);
-> diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
-> index e1e5a071678e..4a283cd6d6e1 100644
-> --- a/fs/ksmbd/smb_common.c
-> +++ b/fs/ksmbd/smb_common.c
-> @@ -122,30 +122,6 @@ int ksmbd_lookup_protocol_idx(char *str)
->  	return -1;
+> diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
+> index 2cc031c39514..76f53db7db8d 100644
+> --- a/fs/ksmbd/smb2misc.c
+> +++ b/fs/ksmbd/smb2misc.c
+> @@ -427,3 +427,28 @@ int smb2_negotiate_request(struct ksmbd_work *work)
+>  {
+>  	return ksmbd_smb_negotiate_common(work, SMB2_NEGOTIATE_HE);
 >  }
->
-> -/**
-> - * ksmbd_verify_smb_message() - check for valid smb2 request header
-> - * @work:	smb work
-> - *
-> - * check for valid smb signature and packet direction(request/response)
-> - *
-> - * Return:      0 on success, otherwise -EINVAL
-> - */
-> -int ksmbd_verify_smb_message(struct ksmbd_work *work)
-> -{
-> -	struct smb2_hdr *smb2_hdr = ksmbd_req_buf_next(work);
-> -	struct smb_hdr *hdr;
-> -
-> -	if (smb2_hdr->ProtocolId == SMB2_PROTO_NUMBER)
-> -		return ksmbd_smb2_check_message(work);
-> -
-> -	hdr = work->request_buf;
-> -	if (*(__le32 *)hdr->Protocol == SMB1_PROTO_NUMBER &&
-> -	    hdr->Command == SMB_COM_NEGOTIATE)
-> -		return 0;
-smb1 negotiate is needed for windows connection. Have you tested with
-windows client ?
+> +
+> +/**
+> + * ksmbd_smb2_cur_pdu_buflen() - Get len of current SMB2 PDU buffer
+> + * This returns the lenght including any possible padding.
+> + * @work: smb work containing request buffer
+> + */
+> +unsigned int ksmbd_smb2_cur_pdu_buflen(struct ksmbd_work *work)
+> +{
+This patch will cause unused function build warning. so need to
+combine it with "ksmbd: use ksmbd_smb2_cur_pdu_buflen() in
+ksmbd_smb2_check_message() "
 
-> -
-> -	return -EINVAL;
-> -}
-> -
->  /**
->   * ksmbd_smb_request() - check for valid smb request type
->   * @conn:	connection instance
-> diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
-> index 6e79e7577f6b..782c06292020 100644
-> --- a/fs/ksmbd/smb_common.h
-> +++ b/fs/ksmbd/smb_common.h
-> @@ -488,7 +488,6 @@ int ksmbd_max_protocol(void);
+Thanks!
+> +	struct smb2_hdr *hdr = ksmbd_req_buf_next(work);
+> +	unsigned int buf_len;
+> +	unsigned int pdu_len;
+> +
+> +	if (hdr->NextCommand != 0) {
+> +		/*
+> +		 * hdr->NextCommand has already been validated by
+> +		 * init_chained_smb2_rsp().
+> +		 */
+> +		return __le32_to_cpu(hdr->NextCommand);
+> +	}
+> +
+> +	buf_len = get_rfc1002_len(work->request_buf);
+> +	pdu_len = buf_len - work->next_smb2_rcv_hdr_off;
+> +	return pdu_len;
+> +}
+> +
+> diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
+> index a6dec5ec6a54..c5fa8256b0bb 100644
+> --- a/fs/ksmbd/smb2pdu.h
+> +++ b/fs/ksmbd/smb2pdu.h
+> @@ -1680,6 +1680,7 @@ int smb2_set_rsp_credits(struct ksmbd_work *work);
 >
->  int ksmbd_lookup_protocol_idx(char *str);
+>  /* smb2 misc functions */
+>  int ksmbd_smb2_check_message(struct ksmbd_work *work);
+> +unsigned int ksmbd_smb2_cur_pdu_buflen(struct ksmbd_work *work);
 >
-> -int ksmbd_verify_smb_message(struct ksmbd_work *work);
->  bool ksmbd_smb_request(struct ksmbd_conn *conn);
->
->  int ksmbd_lookup_dialect_by_id(__le16 *cli_dialects, __le16
-> dialects_count);
+>  /* smb2 command handlers */
+>  int smb2_handle_negotiate(struct ksmbd_work *work);
 > --
 > 2.31.1
 >
