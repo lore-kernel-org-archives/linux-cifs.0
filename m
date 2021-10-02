@@ -2,137 +2,114 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 577C1C433EF
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 12:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F39FC433F5
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 12:45:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31DFB61B00
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 12:08:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2FE461AA9
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 12:45:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233056AbhJBMKb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 2 Oct 2021 08:10:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33888 "EHLO
+        id S233152AbhJBMrO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 2 Oct 2021 08:47:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233006AbhJBMKb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Oct 2021 08:10:31 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68497C061570
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 05:08:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=From:Cc:To:Date:Message-ID;
-        bh=b+pivfOcaHYd5ylFcy9U4sPa1nwGY13pDl2Q+y/9UIk=; b=WpJmWIup/nYt3nmcI+sGuX74tB
-        AHZV3ldiUqCWfN7x87/qdPuMTqeIhB2lOIqwh4zO0uqB+8nq1Yp2mcnWgBVNkBUZeRiVqjKzT+p5g
-        E2W3Q889RdJpoZq760fo38vkIj6z8omSCPk1NnfBfuhh2AahlcSuJl52dCv2/iFN2qq4DOyUqzMYC
-        NHFc3gANB1gIxGbryRL8koiZeQr9Eh+VE1PnO616wGZBmdeh1/8fLeI87nSrCn5B5CKwvKYmKBlxq
-        NPrTsouXl7KBi5xt+51CUgKVejKneAZZve0qnj20DpeXTh2lklZjCknE7NSASDWp+dx09y89Hb+Ea
-        w8X3AbL1G87BBs/72kWLPVcDvhOUkWsHc3J2SiY6wL0VxTuU2aJdMXqds1F36D4qpTybF1ohdTi1K
-        7D/lA0BsyOtmlfOX+7VQfbzeVDhNi8KTFcp3wcufRMfiq8A7Tz9+lYBnkyuD8Mg2WiMHbdD7on9NF
-        Ny1t1xsMCrVqwcDkTYUjGbpz;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1mWdop-001DLp-IV; Sat, 02 Oct 2021 12:08:43 +0000
-Message-ID: <be4f8694-ba18-8f4f-3568-aac74b9545dc@samba.org>
-Date:   Sat, 2 Oct 2021 14:08:42 +0200
+        with ESMTP id S232821AbhJBMrO (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Oct 2021 08:47:14 -0400
+Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B44CFC0613EC
+        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 05:45:28 -0700 (PDT)
+Received: by mail-vs1-xe2b.google.com with SMTP id x1so14407861vsp.12
+        for <linux-cifs@vger.kernel.org>; Sat, 02 Oct 2021 05:45:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=yRINJ/bwOnL2izz2Bvx36MbdkDPWAc9YjnDgNvRaJz4=;
+        b=orsrYtWP3XrtlZI8m4KOrGUojfR+3TQPBftEhNHTnK4XQUDWyd0zjPLjPU1SYzchkI
+         6B3B8Az3cn1kJ4yUbGilxKU/QiBB9GVBAkXjM9vyU/3jG84l9u7doO8ZmTgqAF8QOGmf
+         GriH1DAdu02N4pvqQQmLFoDyHmjYE3Hd2iHJkxIUlQclUrtsO0amClzrgoLtTrlbKG6a
+         8f4gpdFG8uiP+HnQpmFaN3EM7wuJK9kA9iNzWFE8Nk2On38m2DvCMKb1vGGeTOfb2AD+
+         P/kPNxEN96rJZip6AB1R35mHARHNk/3yFDhG9t0MIAFm59ms+TGFY7IJ96ZCMY1/maKC
+         fUwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=yRINJ/bwOnL2izz2Bvx36MbdkDPWAc9YjnDgNvRaJz4=;
+        b=ahEBb3mX+6+1PLQLUgaIBanmMAxtDo+TRVS/yixvrh7ZPrVdxdUddpPk+k1WsaC+QF
+         oRS9CXdO5OkwzzthpZfEQAYm8FWZD1GoWG/C3nQGkEisQhOuIT3mxtT4/Sk7YFbnomF2
+         GACY1FsAc2h5oeOzJ8oE8kOdFe+rmzwF8V58+S2r+5estOqtaKhrBz/VInS6IVuGA8nf
+         9U5OevyE4DK2xyCEkYS/HIV0SYwY0UZlRf7h7f2LP53FuwXbeWvtHJUP1rlNGBsvDVG8
+         G5vbUt+feVS9PX9vZ1ENEHcDSnWFfjzMlxkX3NhW1M+BAGmpt3uNVybkDXGj5PLlc/ZQ
+         nHgA==
+X-Gm-Message-State: AOAM530ZAe8dHwH/B+a0r1drYbDiAmspW4VI2UfvPbve7/S2sLRGhY37
+        0bAIF1XZ9vtBvpNHrADxmWukdX333xUE0aCyXDI=
+X-Google-Smtp-Source: ABdhPJzrUSzlea1Uprxa54oKaUAfbvPlXZDJIkX2d8gD/BNUuaCEYq1NnoX3N18jsR9/HMe34geXAo78BY/ci013wUo=
+X-Received: by 2002:a67:e11c:: with SMTP id d28mr368757vsl.44.1633178727839;
+ Sat, 02 Oct 2021 05:45:27 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v5 19/20] ksmbd: make smb2_check_user_session() callabe
- for compound PDUs
-Content-Language: en-US
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
+References: <20211001120421.327245-1-slow@samba.org> <20211001120421.327245-17-slow@samba.org>
+In-Reply-To: <20211001120421.327245-17-slow@samba.org>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Sat, 2 Oct 2021 21:45:16 +0900
+Message-ID: <CANFS6bauPdTuE-QRuUwLDJD59C62M9dd6Kxoq-emUOib=xiysg@mail.gmail.com>
+Subject: Re: [PATCH v5 16/20] ksmbd: check PDU len is at least header plus
+ body size in ksmbd_smb2_check_message()
+To:     Ralph Boehme <slow@samba.org>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Tom Talpey <tom@talpey.com>,
         Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>
-References: <20211001120421.327245-1-slow@samba.org>
- <20211001120421.327245-20-slow@samba.org>
- <CAKYAXd83=qxkzrzO_72U4tQsRzWks0CdYLGLnZqQXoXqQ67Vbw@mail.gmail.com>
-From:   Ralph Boehme <slow@samba.org>
-In-Reply-To: <CAKYAXd83=qxkzrzO_72U4tQsRzWks0CdYLGLnZqQXoXqQ67Vbw@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------5Nl3Q5GfLmjMqEbA8LWFKUJS"
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------5Nl3Q5GfLmjMqEbA8LWFKUJS
-Content-Type: multipart/mixed; boundary="------------SJ0HZ9JOS9a0RqeY7GEUeDOx";
- protected-headers="v1"
-From: Ralph Boehme <slow@samba.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, Steve French
- <smfrench@gmail.com>, Hyunchul Lee <hyc.lee@gmail.com>
-Message-ID: <be4f8694-ba18-8f4f-3568-aac74b9545dc@samba.org>
-Subject: Re: [PATCH v5 19/20] ksmbd: make smb2_check_user_session() callabe
- for compound PDUs
-References: <20211001120421.327245-1-slow@samba.org>
- <20211001120421.327245-20-slow@samba.org>
- <CAKYAXd83=qxkzrzO_72U4tQsRzWks0CdYLGLnZqQXoXqQ67Vbw@mail.gmail.com>
-In-Reply-To: <CAKYAXd83=qxkzrzO_72U4tQsRzWks0CdYLGLnZqQXoXqQ67Vbw@mail.gmail.com>
+Hi Ralph,
 
---------------SJ0HZ9JOS9a0RqeY7GEUeDOx
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+2021=EB=85=84 10=EC=9B=94 1=EC=9D=BC (=EA=B8=88) =EC=98=A4=ED=9B=84 9:25, R=
+alph Boehme <slow@samba.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> Note: we already have the same check in is_chained_smb2_message(), but th=
+ere it
+> only applies to compound requests, so we have to repeat the check here to=
+ cover
+> both cases.
+>
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> Cc: Steve French <smfrench@gmail.com>
+> Cc: Hyunchul Lee <hyc.lee@gmail.com>
+> Signed-off-by: Ralph Boehme <slow@samba.org>
+> ---
+>  fs/ksmbd/smb2misc.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
+> index 7ed266eb6c5e..541b39b7a84b 100644
+> --- a/fs/ksmbd/smb2misc.c
+> +++ b/fs/ksmbd/smb2misc.c
+> @@ -338,6 +338,9 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
+>         if (check_smb2_hdr(hdr))
+>                 return 1;
+>
+> +       if (len < sizeof(struct smb2_pdu) - 4)
+> +               return 1;
+> +
 
-QW0gMDIuMTAuMjEgdW0gMDg6MDEgc2NocmllYiBOYW1qYWUgSmVvbjoNCj4gMjAyMS0xMC0w
-MSAyMTowNCBHTVQrMDk6MDAsIFJhbHBoIEJvZWhtZSA8c2xvd0BzYW1iYS5vcmc+Og0KPj4g
-Q2M6IE5hbWphZSBKZW9uIDxsaW5raW5qZW9uQGtlcm5lbC5vcmc+DQo+PiBDYzogVG9tIFRh
-bHBleSA8dG9tQHRhbHBleS5jb20+DQo+PiBDYzogUm9ubmllIFNhaGxiZXJnIDxyb25uaWVz
-YWhsYmVyZ0BnbWFpbC5jb20+DQo+PiBDYzogU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFp
-bC5jb20+DQo+PiBDYzogSHl1bmNodWwgTGVlIDxoeWMubGVlQGdtYWlsLmNvbT4NCj4+IFNp
-Z25lZC1vZmYtYnk6IFJhbHBoIEJvZWhtZSA8c2xvd0BzYW1iYS5vcmc+DQo+PiAtLS0NCj4+
-ICAgZnMva3NtYmQvc21iMnBkdS5jIHwgMTMgKysrKysrKysrKy0tLQ0KPj4gICAxIGZpbGUg
-Y2hhbmdlZCwgMTAgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZm
-IC0tZ2l0IGEvZnMva3NtYmQvc21iMnBkdS5jIGIvZnMva3NtYmQvc21iMnBkdS5jDQo+PiBp
-bmRleCA1YjFmZWFkMDVjNDkuLmVmNTUxZTM2MzNkYiAxMDA2NDQNCj4+IC0tLSBhL2ZzL2tz
-bWJkL3NtYjJwZHUuYw0KPj4gKysrIGIvZnMva3NtYmQvc21iMnBkdS5jDQo+PiBAQCAtNDEx
-LDcgKzQxMSw2IEBAIHN0YXRpYyB2b2lkIGluaXRfY2hhaW5lZF9zbWIyX3JzcChzdHJ1Y3Qg
-a3NtYmRfd29yaw0KPj4gKndvcmspDQo+PiAgIAkJd29yay0+Y29tcG91bmRfcGZpZCA9DQo+
-PiAgIAkJCWxlNjRfdG9fY3B1KCgoc3RydWN0IHNtYjJfY3JlYXRlX3JzcCAqKXJzcCktPg0K
-Pj4gICAJCQkJUGVyc2lzdGVudEZpbGVJZCk7DQo+PiAtCQl3b3JrLT5jb21wb3VuZF9zaWQg
-PSBsZTY0X3RvX2NwdShyc3AtPlNlc3Npb25JZCk7DQo+PiAgIAl9DQo+Pg0KPj4gICAJbGVu
-ID0gZ2V0X3JmYzEwMDJfbGVuKHdvcmstPnJlc3BvbnNlX2J1ZikgLSB3b3JrLT5uZXh0X3Nt
-YjJfcnNwX2hkcl9vZmY7DQo+PiBAQCAtNTkyLDYgKzU5MSw4IEBAIGludCBzbWIyX2NoZWNr
-X3VzZXJfc2Vzc2lvbihzdHJ1Y3Qga3NtYmRfd29yayAqd29yaykNCj4+ICAgCXVuc2lnbmVk
-IGxvbmcgbG9uZyBzZXNzX2lkOw0KPj4NCj4+ICAgCXdvcmstPnNlc3MgPSBOVUxMOw0KPj4g
-Kwl3b3JrLT5jb21wb3VuZF9zaWQgPSAwOw0KPj4gKw0KPj4gICAJLyoNCj4+ICAgCSAqIFNN
-QjJfRUNITywgU01CMl9ORUdPVElBVEUsIFNNQjJfU0VTU0lPTl9TRVRVUCBjb21tYW5kIGRv
-IG5vdA0KPj4gICAJICogcmVxdWlyZSBhIHNlc3Npb24gaWQsIHNvIG5vIG5lZWQgdG8gdmFs
-aWRhdGUgdXNlciBzZXNzaW9uJ3MgZm9yDQo+PiBAQCAtNjA0LDExICs2MDUsMTcgQEAgaW50
-IHNtYjJfY2hlY2tfdXNlcl9zZXNzaW9uKHN0cnVjdCBrc21iZF93b3JrICp3b3JrKQ0KPj4g
-ICAJaWYgKCFrc21iZF9jb25uX2dvb2Qod29yaykpDQo+PiAgIAkJcmV0dXJuIC1FSU5WQUw7
-DQo+Pg0KPj4gLQlzZXNzX2lkID0gbGU2NF90b19jcHUocmVxX2hkci0+U2Vzc2lvbklkKTsN
-Cj4+ICsJaWYgKHJlcV9oZHItPkZsYWdzICYgU01CMl9GTEFHU19SRUxBVEVEX09QRVJBVElP
-TlMpDQo+PiArCQlzZXNzX2lkID0gd29yay0+Y29tcG91bmRfc2lkOw0KPiBzYW1lIGNvbW1l
-bnQgd2l0aCBwcmV2aW91cyB0cmVlIGlkIHBhdGNoLg0KDQpzYW1lIGFuc3dlci4gOikNCg0K
-LXNsb3cNCg0KLS0gDQpSYWxwaCBCb2VobWUsIFNhbWJhIFRlYW0gICAgICAgICAgICAgICAg
-IGh0dHBzOi8vc2FtYmEub3JnLw0KU2VyTmV0IFNhbWJhIFRlYW0gTGVhZCAgICAgIGh0dHBz
-Oi8vc2VybmV0LmRlL2VuL3RlYW0tc2FtYmENCg==
+Do we need this check before accessing any fields of smb2_hdr in
+ksmbd_verify_smb_message()?
 
---------------SJ0HZ9JOS9a0RqeY7GEUeDOx--
+>         if (hdr->StructureSize !=3D SMB2_HEADER_STRUCTURE_SIZE) {
+>                 ksmbd_debug(SMB, "Illegal structure size %u\n",
+>                             le16_to_cpu(hdr->StructureSize));
+> --
+> 2.31.1
+>
 
---------------5Nl3Q5GfLmjMqEbA8LWFKUJS
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
 
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFYS8oFAwAAAAAACgkQqh6bcSY5nkYp
-bxAApudhG9TEJ2yrgFG4IifAC5/SMoMCp+El1rHSPJ5e+CCDOb7ibVzToBEKtBZFPtDAHUccsja4
-Id4fZgC4mSW0eizJ6609OcsieiPT1PPql0i11rufY/QgxTgOogkjFxnE2oT0eQe1f620928zXF/1
-V1clm2GpN2arerTk/DM/nAGABNhtonSmIV0WUuC+7DW3gKgBhFdNJM5CFx2R3r3ifi9PVNmvkIg4
-Q7cIWzGjB9jE0qS03nhekWOISC+6THtaqaBkHEsYuoAVAuZQ0ZNtqnBUeCPKFZgrdBj9/mpQNUFZ
-VHHIdx5gENtofvhvmvls6fxRAVVJ2hJerOvkRwGsQcn+ZhIrKADiW3xfYpYNZIjIaKN3oVFzFDNL
-STkW+P4DzEWiOXeBhqpgVsfVOVYzp40H/7Dq3xO3koFwVUbvDifXmkykvSiQTcls+cbofCZj7ZjN
-Qn7boNJkiKDRIz5DrU19znECl3QWJgzPGkVOeatMU/yW0UFE0qdaPpuEMey1hRSlvDeBt27KeA4l
-bjPOmqxMOVyBjUaS1vHcSRUP8Ekkn+DQ95OLa56tMgY4easpWrCYUJ+n4s+kNrg7Ck2Rc0cC5Ex+
-yIxfrzX1hwNJMblKau5RKE3YTgk/zM1JrqZ7n26nNhRv++VUpgqQGNFz4jX8wyQ7knYohTdquWuQ
-Kgk=
-=nFF0
------END PGP SIGNATURE-----
-
---------------5Nl3Q5GfLmjMqEbA8LWFKUJS--
+--=20
+Thanks,
+Hyunchul
