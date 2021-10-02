@@ -2,42 +2,42 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6CDBC433F5
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 12:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 577C1C433EF
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 12:08:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91EA261B07
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 12:08:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31DFB61B00
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 12:08:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233055AbhJBMKH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 2 Oct 2021 08:10:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33788 "EHLO
+        id S233056AbhJBMKb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 2 Oct 2021 08:10:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233006AbhJBMKD (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Oct 2021 08:10:03 -0400
+        with ESMTP id S233006AbhJBMKb (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Oct 2021 08:10:31 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08AE0C061570
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 05:08:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68497C061570
+        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 05:08:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
         s=42; h=From:Cc:To:Date:Message-ID;
-        bh=spUg7Q3SJGZkVEPjgiONMRgKTIzCbAKsWWiEMKUyCyg=; b=vb58QA5Ty/URB0MvF3w3JtgNo0
-        nllI7iIH7jVHziRG+nwEVWDCGATEer2Lz9N2dzobmIU1WHrqhRawL5EBaMOS3x172dsSQcv1a5a0h
-        ONLSEpRfhcy+wKmaAbg3VnXQdkDgDXPfHPEm2ODJVnfmvI93/nGYZf7VbFPEW6+06xwP3l2d4iS+0
-        R/N7/6EDzCxjbhv3UDiTat3Ithig8/zMMZgtaauCpxw6CXsL9RHFYUalTE5Rzg4ULKyzb/LDIEvn5
-        LMZzi9yd9/hBz2X7kwzlCce3stR9XTSZHsFCa6/v+WyU1ucW6PAl688cP7LaMx4ah9g8QGH6+4ww6
-        0gHsze5sGeTm5SIwqvprxa+1E9e0I9/vVmTatALMQkXi1A0ToWnMJhsbheAIRNdCf/38BQDIm5jlu
-        cyTD1OF4QUuFZbrUxfkYNd8mxqkphuzWNX8s51Xye+cqWfhIvjL7b9wSHaeApvKLFxMGBH0Hy+XNp
-        XKeUGEztdUB/UE7K2gorLPAE;
+        bh=b+pivfOcaHYd5ylFcy9U4sPa1nwGY13pDl2Q+y/9UIk=; b=WpJmWIup/nYt3nmcI+sGuX74tB
+        AHZV3ldiUqCWfN7x87/qdPuMTqeIhB2lOIqwh4zO0uqB+8nq1Yp2mcnWgBVNkBUZeRiVqjKzT+p5g
+        E2W3Q889RdJpoZq760fo38vkIj6z8omSCPk1NnfBfuhh2AahlcSuJl52dCv2/iFN2qq4DOyUqzMYC
+        NHFc3gANB1gIxGbryRL8koiZeQr9Eh+VE1PnO616wGZBmdeh1/8fLeI87nSrCn5B5CKwvKYmKBlxq
+        NPrTsouXl7KBi5xt+51CUgKVejKneAZZve0qnj20DpeXTh2lklZjCknE7NSASDWp+dx09y89Hb+Ea
+        w8X3AbL1G87BBs/72kWLPVcDvhOUkWsHc3J2SiY6wL0VxTuU2aJdMXqds1F36D4qpTybF1ohdTi1K
+        7D/lA0BsyOtmlfOX+7VQfbzeVDhNi8KTFcp3wcufRMfiq8A7Tz9+lYBnkyuD8Mg2WiMHbdD7on9NF
+        Ny1t1xsMCrVqwcDkTYUjGbpz;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
         (Exim)
-        id 1mWdoO-001DLW-5I; Sat, 02 Oct 2021 12:08:16 +0000
-Message-ID: <93da95f5-231d-7f06-f3e7-3209f84b395d@samba.org>
-Date:   Sat, 2 Oct 2021 14:08:15 +0200
+        id 1mWdop-001DLp-IV; Sat, 02 Oct 2021 12:08:43 +0000
+Message-ID: <be4f8694-ba18-8f4f-3568-aac74b9545dc@samba.org>
+Date:   Sat, 2 Oct 2021 14:08:42 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v5 18/20] ksmdb: make smb2_get_ksmbd_tcon() callable with
- chained PDUs
+Subject: Re: [PATCH v5 19/20] ksmbd: make smb2_check_user_session() callabe
+ for compound PDUs
 Content-Language: en-US
 To:     Namjae Jeon <linkinjeon@kernel.org>
 Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
@@ -45,98 +45,94 @@ Cc:     linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
         Steve French <smfrench@gmail.com>,
         Hyunchul Lee <hyc.lee@gmail.com>
 References: <20211001120421.327245-1-slow@samba.org>
- <20211001120421.327245-19-slow@samba.org>
- <CAKYAXd_rfAXxhzPmr6rkZB2m5uJKSyD7qQqHempE7cCYdr1WQQ@mail.gmail.com>
+ <20211001120421.327245-20-slow@samba.org>
+ <CAKYAXd83=qxkzrzO_72U4tQsRzWks0CdYLGLnZqQXoXqQ67Vbw@mail.gmail.com>
 From:   Ralph Boehme <slow@samba.org>
-In-Reply-To: <CAKYAXd_rfAXxhzPmr6rkZB2m5uJKSyD7qQqHempE7cCYdr1WQQ@mail.gmail.com>
+In-Reply-To: <CAKYAXd83=qxkzrzO_72U4tQsRzWks0CdYLGLnZqQXoXqQ67Vbw@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------GTL3qzOoQ1vYPVLrdNtKCzAp"
+ boundary="------------5Nl3Q5GfLmjMqEbA8LWFKUJS"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------GTL3qzOoQ1vYPVLrdNtKCzAp
-Content-Type: multipart/mixed; boundary="------------MmmvSM2bnZZeN9TKdacXSw0P";
+--------------5Nl3Q5GfLmjMqEbA8LWFKUJS
+Content-Type: multipart/mixed; boundary="------------SJ0HZ9JOS9a0RqeY7GEUeDOx";
  protected-headers="v1"
 From: Ralph Boehme <slow@samba.org>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org, Tom Talpey <tom@talpey.com>,
  Ronnie Sahlberg <ronniesahlberg@gmail.com>, Steve French
  <smfrench@gmail.com>, Hyunchul Lee <hyc.lee@gmail.com>
-Message-ID: <93da95f5-231d-7f06-f3e7-3209f84b395d@samba.org>
-Subject: Re: [PATCH v5 18/20] ksmdb: make smb2_get_ksmbd_tcon() callable with
- chained PDUs
+Message-ID: <be4f8694-ba18-8f4f-3568-aac74b9545dc@samba.org>
+Subject: Re: [PATCH v5 19/20] ksmbd: make smb2_check_user_session() callabe
+ for compound PDUs
 References: <20211001120421.327245-1-slow@samba.org>
- <20211001120421.327245-19-slow@samba.org>
- <CAKYAXd_rfAXxhzPmr6rkZB2m5uJKSyD7qQqHempE7cCYdr1WQQ@mail.gmail.com>
-In-Reply-To: <CAKYAXd_rfAXxhzPmr6rkZB2m5uJKSyD7qQqHempE7cCYdr1WQQ@mail.gmail.com>
+ <20211001120421.327245-20-slow@samba.org>
+ <CAKYAXd83=qxkzrzO_72U4tQsRzWks0CdYLGLnZqQXoXqQ67Vbw@mail.gmail.com>
+In-Reply-To: <CAKYAXd83=qxkzrzO_72U4tQsRzWks0CdYLGLnZqQXoXqQ67Vbw@mail.gmail.com>
 
---------------MmmvSM2bnZZeN9TKdacXSw0P
+--------------SJ0HZ9JOS9a0RqeY7GEUeDOx
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: base64
 
-QW0gMDIuMTAuMjEgdW0gMDg6MDAgc2NocmllYiBOYW1qYWUgSmVvbjoNCj4gMjAyMS0xMC0w
+QW0gMDIuMTAuMjEgdW0gMDg6MDEgc2NocmllYiBOYW1qYWUgSmVvbjoNCj4gMjAyMS0xMC0w
 MSAyMTowNCBHTVQrMDk6MDAsIFJhbHBoIEJvZWhtZSA8c2xvd0BzYW1iYS5vcmc+Og0KPj4g
-QWxzbyB0cmFjayB0aGUgdGNvbiBpZCBvZiBjb21wb3VuZCByZXF1ZXN0cy4NCj4+DQo+PiBD
-YzogTmFtamFlIEplb24gPGxpbmtpbmplb25Aa2VybmVsLm9yZz4NCj4+IENjOiBUb20gVGFs
-cGV5IDx0b21AdGFscGV5LmNvbT4NCj4+IENjOiBSb25uaWUgU2FobGJlcmcgPHJvbm5pZXNh
-aGxiZXJnQGdtYWlsLmNvbT4NCj4+IENjOiBTdGV2ZSBGcmVuY2ggPHNtZnJlbmNoQGdtYWls
-LmNvbT4NCj4+IENjOiBIeXVuY2h1bCBMZWUgPGh5Yy5sZWVAZ21haWwuY29tPg0KPj4gU2ln
-bmVkLW9mZi1ieTogUmFscGggQm9laG1lIDxzbG93QHNhbWJhLm9yZz4NCj4+IC0tLQ0KPj4g
-ICBmcy9rc21iZC9rc21iZF93b3JrLmggfCAxICsNCj4+ICAgZnMva3NtYmQvc21iMnBkdS5j
-ICAgIHwgOSArKysrKysrKy0NCj4+ICAgMiBmaWxlcyBjaGFuZ2VkLCA5IGluc2VydGlvbnMo
-KyksIDEgZGVsZXRpb24oLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvZnMva3NtYmQva3NtYmRf
-d29yay5oIGIvZnMva3NtYmQva3NtYmRfd29yay5oDQo+PiBpbmRleCBmNzE1NmJjNTAwNDku
-LjkxMzYzZDUwODkwOSAxMDA2NDQNCj4+IC0tLSBhL2ZzL2tzbWJkL2tzbWJkX3dvcmsuaA0K
-Pj4gKysrIGIvZnMva3NtYmQva3NtYmRfd29yay5oDQo+PiBAQCAtNDYsNiArNDYsNyBAQCBz
-dHJ1Y3Qga3NtYmRfd29yayB7DQo+PiAgIAl1NjQJCQkJY29tcG91bmRfZmlkOw0KPj4gICAJ
-dTY0CQkJCWNvbXBvdW5kX3BmaWQ7DQo+PiAgIAl1NjQJCQkJY29tcG91bmRfc2lkOw0KPj4g
-Kwl1MzIJCQkJY29tcG91bmRfdGlkOw0KPj4NCj4+ICAgCWNvbnN0IHN0cnVjdCBjcmVkCQkq
-c2F2ZWRfY3JlZDsNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvZnMva3NtYmQvc21iMnBkdS5jIGIv
-ZnMva3NtYmQvc21iMnBkdS5jDQo+PiBpbmRleCA3ZDMzNDRiNTUxOWMuLjViMWZlYWQwNWM0
-OSAxMDA2NDQNCj4+IC0tLSBhL2ZzL2tzbWJkL3NtYjJwZHUuYw0KPj4gKysrIGIvZnMva3Nt
-YmQvc21iMnBkdS5jDQo+PiBAQCAtOTgsNiArOTgsOCBAQCBpbnQgc21iMl9nZXRfa3NtYmRf
-dGNvbihzdHJ1Y3Qga3NtYmRfd29yayAqd29yaykNCj4+ICAgCWludCB0cmVlX2lkOw0KPj4N
-Cj4+ICAgCXdvcmstPnRjb24gPSBOVUxMOw0KPj4gKwl3b3JrLT5jb21wb3VuZF90aWQgPSAw
-Ow0KPj4gKw0KPj4gICAJaWYgKGNtZCA9PSBTTUIyX1RSRUVfQ09OTkVDVF9IRSB8fA0KPj4g
-ICAJICAgIGNtZCA9PSAgU01CMl9DQU5DRUxfSEUgfHwNCj4+ICAgCSAgICBjbWQgPT0gIFNN
-QjJfTE9HT0ZGX0hFKSB7DQo+PiBAQCAtMTEwLDEzICsxMTIsMTggQEAgaW50IHNtYjJfZ2V0
-X2tzbWJkX3Rjb24oc3RydWN0IGtzbWJkX3dvcmsgKndvcmspDQo+PiAgIAkJcmV0dXJuIC1F
-Tk9FTlQ7DQo+PiAgIAl9DQo+Pg0KPj4gLQl0cmVlX2lkID0gbGUzMl90b19jcHUocmVxX2hk
-ci0+SWQuU3luY0lkLlRyZWVJZCk7DQo+PiArCWlmIChyZXFfaGRyLT5GbGFncyAmIFNNQjJf
-RkxBR1NfUkVMQVRFRF9PUEVSQVRJT05TKQ0KPj4gKwkJdHJlZV9pZCA9IHdvcmstPmNvbXBv
-dW5kX3RpZDsNCj4gV2VsbCwgSXNuJ3QgdGhhdCBhIHBlcmZvcm1hbmNlIGRlZ3JhZGF0aW9u
-IGR1ZSB0byB1bm5lZWRlZCBsb29rdXBzPw0KDQpJIHdvdWxkbid0IHRoaW5rIHRoYXQgdGhp
-cyBoYXMgYW55IG5vdGljYWJsZSBwZXJmb3JtYW5jZSBpbXBhY3QsIGhhcyBpdD8gDQpUaGlz
-IHdheSB0aGUgbG9naWMgaXMgZWFzeSB0byBmb2xsb3csIGJ1dCBJJ2xsIHJld3JpdGUgdG8g
-YXZvaWQgdGhlIA0KbG9va3VwIGZvciByZWxhdGVkIG9wZXJhdGlvbnMuDQoNCi1zbG93DQoN
-Ci0tIA0KUmFscGggQm9laG1lLCBTYW1iYSBUZWFtICAgICAgICAgICAgICAgICBodHRwczov
-L3NhbWJhLm9yZy8NClNlck5ldCBTYW1iYSBUZWFtIExlYWQgICAgICBodHRwczovL3Nlcm5l
-dC5kZS9lbi90ZWFtLXNhbWJhDQo=
+Q2M6IE5hbWphZSBKZW9uIDxsaW5raW5qZW9uQGtlcm5lbC5vcmc+DQo+PiBDYzogVG9tIFRh
+bHBleSA8dG9tQHRhbHBleS5jb20+DQo+PiBDYzogUm9ubmllIFNhaGxiZXJnIDxyb25uaWVz
+YWhsYmVyZ0BnbWFpbC5jb20+DQo+PiBDYzogU3RldmUgRnJlbmNoIDxzbWZyZW5jaEBnbWFp
+bC5jb20+DQo+PiBDYzogSHl1bmNodWwgTGVlIDxoeWMubGVlQGdtYWlsLmNvbT4NCj4+IFNp
+Z25lZC1vZmYtYnk6IFJhbHBoIEJvZWhtZSA8c2xvd0BzYW1iYS5vcmc+DQo+PiAtLS0NCj4+
+ICAgZnMva3NtYmQvc21iMnBkdS5jIHwgMTMgKysrKysrKysrKy0tLQ0KPj4gICAxIGZpbGUg
+Y2hhbmdlZCwgMTAgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZm
+IC0tZ2l0IGEvZnMva3NtYmQvc21iMnBkdS5jIGIvZnMva3NtYmQvc21iMnBkdS5jDQo+PiBp
+bmRleCA1YjFmZWFkMDVjNDkuLmVmNTUxZTM2MzNkYiAxMDA2NDQNCj4+IC0tLSBhL2ZzL2tz
+bWJkL3NtYjJwZHUuYw0KPj4gKysrIGIvZnMva3NtYmQvc21iMnBkdS5jDQo+PiBAQCAtNDEx
+LDcgKzQxMSw2IEBAIHN0YXRpYyB2b2lkIGluaXRfY2hhaW5lZF9zbWIyX3JzcChzdHJ1Y3Qg
+a3NtYmRfd29yaw0KPj4gKndvcmspDQo+PiAgIAkJd29yay0+Y29tcG91bmRfcGZpZCA9DQo+
+PiAgIAkJCWxlNjRfdG9fY3B1KCgoc3RydWN0IHNtYjJfY3JlYXRlX3JzcCAqKXJzcCktPg0K
+Pj4gICAJCQkJUGVyc2lzdGVudEZpbGVJZCk7DQo+PiAtCQl3b3JrLT5jb21wb3VuZF9zaWQg
+PSBsZTY0X3RvX2NwdShyc3AtPlNlc3Npb25JZCk7DQo+PiAgIAl9DQo+Pg0KPj4gICAJbGVu
+ID0gZ2V0X3JmYzEwMDJfbGVuKHdvcmstPnJlc3BvbnNlX2J1ZikgLSB3b3JrLT5uZXh0X3Nt
+YjJfcnNwX2hkcl9vZmY7DQo+PiBAQCAtNTkyLDYgKzU5MSw4IEBAIGludCBzbWIyX2NoZWNr
+X3VzZXJfc2Vzc2lvbihzdHJ1Y3Qga3NtYmRfd29yayAqd29yaykNCj4+ICAgCXVuc2lnbmVk
+IGxvbmcgbG9uZyBzZXNzX2lkOw0KPj4NCj4+ICAgCXdvcmstPnNlc3MgPSBOVUxMOw0KPj4g
+Kwl3b3JrLT5jb21wb3VuZF9zaWQgPSAwOw0KPj4gKw0KPj4gICAJLyoNCj4+ICAgCSAqIFNN
+QjJfRUNITywgU01CMl9ORUdPVElBVEUsIFNNQjJfU0VTU0lPTl9TRVRVUCBjb21tYW5kIGRv
+IG5vdA0KPj4gICAJICogcmVxdWlyZSBhIHNlc3Npb24gaWQsIHNvIG5vIG5lZWQgdG8gdmFs
+aWRhdGUgdXNlciBzZXNzaW9uJ3MgZm9yDQo+PiBAQCAtNjA0LDExICs2MDUsMTcgQEAgaW50
+IHNtYjJfY2hlY2tfdXNlcl9zZXNzaW9uKHN0cnVjdCBrc21iZF93b3JrICp3b3JrKQ0KPj4g
+ICAJaWYgKCFrc21iZF9jb25uX2dvb2Qod29yaykpDQo+PiAgIAkJcmV0dXJuIC1FSU5WQUw7
+DQo+Pg0KPj4gLQlzZXNzX2lkID0gbGU2NF90b19jcHUocmVxX2hkci0+U2Vzc2lvbklkKTsN
+Cj4+ICsJaWYgKHJlcV9oZHItPkZsYWdzICYgU01CMl9GTEFHU19SRUxBVEVEX09QRVJBVElP
+TlMpDQo+PiArCQlzZXNzX2lkID0gd29yay0+Y29tcG91bmRfc2lkOw0KPiBzYW1lIGNvbW1l
+bnQgd2l0aCBwcmV2aW91cyB0cmVlIGlkIHBhdGNoLg0KDQpzYW1lIGFuc3dlci4gOikNCg0K
+LXNsb3cNCg0KLS0gDQpSYWxwaCBCb2VobWUsIFNhbWJhIFRlYW0gICAgICAgICAgICAgICAg
+IGh0dHBzOi8vc2FtYmEub3JnLw0KU2VyTmV0IFNhbWJhIFRlYW0gTGVhZCAgICAgIGh0dHBz
+Oi8vc2VybmV0LmRlL2VuL3RlYW0tc2FtYmENCg==
 
---------------MmmvSM2bnZZeN9TKdacXSw0P--
+--------------SJ0HZ9JOS9a0RqeY7GEUeDOx--
 
---------------GTL3qzOoQ1vYPVLrdNtKCzAp
+--------------5Nl3Q5GfLmjMqEbA8LWFKUJS
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFYS68FAwAAAAAACgkQqh6bcSY5nkbn
-ew//YyW0BUS6NCokA2F/bfc8WIyiNmJ5VzHlPa/R0JEVFFFuJI/VxYqXBenSBotWimYNcq7wUJW8
-71J1y1znyzYvNqsoriNqVFNRKCRl6OLRN/N8ZmgomVbsqWOaWHuBemZ+4eIWoqS7Ppo8cvIoHnRz
-3VmEeVKQs4l4w33i34Mso9k6SO0hZKGuE7+BcsGZqaAGIDmElDuWPmIXGJNkRLrNQyeyf48Gn9W8
-xf6qvNcXsNu7Z/nVZNhmlyzC8Dm21TmuKXbGiCBgDWDoN//Lp9OkUZmIybvYbJn7PRnrvYEdi7nv
-BG6xKw4PLqDdGAzkq3PCiHWTArJa78r0TGYqfakfNVMTc5Z4a00BQ34dSHTUdnu8ScA8MGTgNEGj
-Xq/0VH7wxwTyYjHzPQH707APB1e9ruV8HlP+fUr0niqn61GCCtWoZjTahYnt8PH5tSMKKWjYfqFr
-6YzCIezQZ2GgWsZ2jCttxtE/MC3Z/2RVSPkuGMfT/n8BX4fEmY6So4v4B+iT1U6KceAcErrkkVkR
-aCaoy8Y+JVpILnBR8LLju28crrHFVIQQwh4BWNcirUN4AD22wH+xNTRJFRRk75MgDGuZqv8Z68cg
-iVR/q/csC3kQ9Lw8KLLYoqM6+flaupki0/QOl5nuIPQct/jptmZoVCySelZQLqHriG8UfLBkRVaV
-SdA=
-=MoDl
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFYS8oFAwAAAAAACgkQqh6bcSY5nkYp
+bxAApudhG9TEJ2yrgFG4IifAC5/SMoMCp+El1rHSPJ5e+CCDOb7ibVzToBEKtBZFPtDAHUccsja4
+Id4fZgC4mSW0eizJ6609OcsieiPT1PPql0i11rufY/QgxTgOogkjFxnE2oT0eQe1f620928zXF/1
+V1clm2GpN2arerTk/DM/nAGABNhtonSmIV0WUuC+7DW3gKgBhFdNJM5CFx2R3r3ifi9PVNmvkIg4
+Q7cIWzGjB9jE0qS03nhekWOISC+6THtaqaBkHEsYuoAVAuZQ0ZNtqnBUeCPKFZgrdBj9/mpQNUFZ
+VHHIdx5gENtofvhvmvls6fxRAVVJ2hJerOvkRwGsQcn+ZhIrKADiW3xfYpYNZIjIaKN3oVFzFDNL
+STkW+P4DzEWiOXeBhqpgVsfVOVYzp40H/7Dq3xO3koFwVUbvDifXmkykvSiQTcls+cbofCZj7ZjN
+Qn7boNJkiKDRIz5DrU19znECl3QWJgzPGkVOeatMU/yW0UFE0qdaPpuEMey1hRSlvDeBt27KeA4l
+bjPOmqxMOVyBjUaS1vHcSRUP8Ekkn+DQ95OLa56tMgY4easpWrCYUJ+n4s+kNrg7Ck2Rc0cC5Ex+
+yIxfrzX1hwNJMblKau5RKE3YTgk/zM1JrqZ7n26nNhRv++VUpgqQGNFz4jX8wyQ7knYohTdquWuQ
+Kgk=
+=nFF0
 -----END PGP SIGNATURE-----
 
---------------GTL3qzOoQ1vYPVLrdNtKCzAp--
+--------------5Nl3Q5GfLmjMqEbA8LWFKUJS--
