@@ -2,42 +2,49 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A874CC433F5
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 13:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 648A7C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 13:12:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FF9C61284
-	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 13:12:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DFDA619F6
+	for <linux-cifs@archiver.kernel.org>; Sat,  2 Oct 2021 13:12:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233139AbhJBNOH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 2 Oct 2021 09:14:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48300 "EHLO
+        id S231506AbhJBNOK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 2 Oct 2021 09:14:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232877AbhJBNOH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Oct 2021 09:14:07 -0400
+        with ESMTP id S233182AbhJBNOJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 2 Oct 2021 09:14:09 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3410BC0613EE
-        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 06:12:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BB44C0613EC
+        for <linux-cifs@vger.kernel.org>; Sat,  2 Oct 2021 06:12:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
         s=42; h=Message-Id:Date:Cc:To:From;
-        bh=PL5cMQjWVZMWF5DFXnCkGcrbNUGlz5WUau8iM0ri+s4=; b=ctxpBhcEN7swo6ECs739W7V4zc
-        2XtGPynrTh6ApsxEd2e/fTN8nafj0ADorvkyKCm3qsNoGunLT1YHqSNxTL6v4Z55H8R1krsmwA1zS
-        fEva1YsY8o53V+oLcENikOv4ce5X5fjJ+JU9Da1UUdByaJb6eG9KGIizlF+az7JuKrV/kSCEN6h2E
-        yP3bQkcJIQ/ZqKzvqkMmX9LOJldvBdA4C9lOl2CPLAIn5oBBH+1/zMHq9+GlYWYsBRXljXwKlq0Nq
-        q/NouyNs6eHg6xAAp9DmaepdIz8mqtIDEK/GbuU8n6oVY+vhGg+AJjwF6X8mLsI9KMUz7CNrkeIwJ
-        u6RjclIvt3IXUYa02YTGpe0YLDHl5uo2LejRT+VqiqWVWcjLH+tkFrHlWf4pknnOI/M6DCGgu/T7c
-        iY6qg2++/DXHTZQ3jWaHc38+403LZkqIGT6rJK0TKCB7qVh/u5dfENhl6dVaAKusl6mvTGPXe5UhL
-        01JxarXyfWawxav2dSljPsSM;
+        bh=JQAU88d/DWlvSzZYOK92vQiLSfTLScGZWUwTPm82qEU=; b=Lst3EksyyFGPyiSU1WbeppE+5R
+        6GYwUthmgHF5JhE4xtInT80LHx1Y2tZ7sn/BGY1zJA3hD6i92Eh3xcAJSVxoneU8Q+U5Jv1+pvCJa
+        Tw/4E/Bp66LBGL1Kd712NnjIVUNDQjrdV5gjCZRziySfu3CGXc6X+ZarrNa5Ixi3tFQvcpSSW60se
+        0utyUl4IC5bIoP5L0qt6kywEWxMDjwQTWGbx1Y5cMxD/VpcynS36qMvovPHPY2IHCKY3d+Y3+KEUy
+        2BJDEMDSrPkl2Z9diJynqGZ+rCO7ZJ2XTIL78z0yUBfurPA2E+1GqACdyyGQLZ1Qv/12LpO7pbAwd
+        MZQridp4kN2iwBo+VWWwe3wQeUE+BR1AU/FEuzlOUz/eJuTQxedcJxIXGHzMSixUfg1IAlAbDmBxE
+        sEK//+BEIp9tpAESU58tyjJTVTBKsXztTeHM1Wb2AoHSZ52G+YMQNpgxkN0sDxudYH4GC3ZfnRJEp
+        8vUD7lm3LSK38hzWTCZ0KTmm;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
         (Exim)
-        id 1mWeoN-001DcY-4r; Sat, 02 Oct 2021 13:12:19 +0000
+        id 1mWeoP-001DcY-L2; Sat, 02 Oct 2021 13:12:21 +0000
 From:   Ralph Boehme <slow@samba.org>
 To:     linux-cifs@vger.kernel.org
-Cc:     Ralph Boehme <slow@samba.org>
-Subject: [PATCH v6 00/14] Buffer validation patches
-Date:   Sat,  2 Oct 2021 15:11:58 +0200
-Message-Id: <20211002131212.130629-1-slow@samba.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
+        Steve French <smfrench@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>
+Subject: [PATCH v6 04/14] ksmbd: remove the leftover of smb2.0 dialect support
+Date:   Sat,  2 Oct 2021 15:12:02 +0200
+Message-Id: <20211002131212.130629-5-slow@samba.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211002131212.130629-1-slow@samba.org>
+References: <20211002131212.130629-1-slow@samba.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -45,72 +52,158 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-v2:
-  - update comments of smb2_get_data_area_len().
-  - fix wrong buffer size check in fsctl_query_iface_info_ioctl().
-  - fix 32bit overflow in smb2_set_info.
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-v3:
-  - add buffer check for ByteCount of smb negotiate request.
-  - Moved buffer check of to the top of loop to avoid unneeded behavior when
-    out_buf_len is smaller than network_interface_info_ioctl_rsp.
-  - get correct out_buf_len which doesn't exceed max stream protocol length.
-  - subtract single smb2_lock_element for correct buffer size check in
-    ksmbd_smb2_check_message().
+Although ksmbd doesn't send SMB2.0 support in supported dialect list of smb
+negotiate response, There is the leftover of smb2.0 dialect.
+This patch remove it not to support SMB2.0 in ksmbd.
 
-v4: 
-  - use work->response_sz for out_buf_len calculation in smb2_ioctl.
-  - move smb2_neg size check to above to validate NegotiateContextOffset
-    field.
-  - remove unneeded dialect checks in smb2_sess_setup() and
-    smb2_handle_negotiate().
-  - split smb2_set_info patch into two patches(declaring
-    smb2_file_basic_info and buffer check) 
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Ralph Böhme <slow@samba.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Hyunchul Lee <hyc.lee@gmail.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/smb2ops.c    |  5 -----
+ fs/ksmbd/smb2pdu.c    | 34 +++++++++-------------------------
+ fs/ksmbd/smb2pdu.h    |  1 -
+ fs/ksmbd/smb_common.c |  6 +++---
+ 4 files changed, 12 insertions(+), 34 deletions(-)
 
-v5:
-  - remove PDU size validation from ksmbd_conn_handler_loop()
-  - add PDU size validation to ksmbd_smb2_check_message()
-  - fix compound non-related request handling
-
-v6:
-  - check we can access ProtocolId in ksmbd_verify_smb_message()
-  - optimize tcon and session check functions for compound related PDUs
-  - drop patch that broke SMB1 negprot
-  - check credits after fully validating PDU size
-
-Namjae Jeon (4):
-  ksmbd: add the check to vaildate if stream protocol length exceeds
-    maximum value
-  ksmbd: add validation in smb2_ioctl
-  ksmbd: check strictly data area in ksmbd_smb2_check_message()
-  ksmbd: remove the leftover of smb2.0 dialect support
-
-Ralph Boehme (10):
-  ksmbd: use ksmbd_req_buf_next() in ksmbd_verify_smb_message()
-  ksmbd: check buffer is big enough to access the ProtocolId field
-  ksmbd: use ksmbd_req_buf_next() in ksmbd_smb2_check_message()
-  ksmbd: use ksmbd_smb2_cur_pdu_buflen() in ksmbd_smb2_check_message()
-  ksmbd: check PDU len is at least header plus body size in
-    ksmbd_smb2_check_message()
-  ksmdb: use cmd helper variable in smb2_get_ksmbd_tcon()
-  ksmdb: make smb2_get_ksmbd_tcon() callable with chained PDUs
-  ksmbd: make smb2_check_user_session() callable for compound PDUs
-  ksmdb: move session and tcon validation to ksmbd_smb2_check_message()
-  ksmdb: validate credit charge after validating SMB2 PDU body size
-
- fs/ksmbd/connection.c |   9 ++-
- fs/ksmbd/ksmbd_work.h |   1 +
- fs/ksmbd/server.c     |  46 +++++++----
- fs/ksmbd/smb2misc.c   | 152 +++++++++++++++++++-----------------
- fs/ksmbd/smb2ops.c    |   5 --
- fs/ksmbd/smb2pdu.c    | 178 +++++++++++++++++++++++++++++-------------
- fs/ksmbd/smb2pdu.h    |   2 +-
- fs/ksmbd/smb_common.c |  22 +++---
- fs/ksmbd/smb_common.h |   4 +-
- fs/ksmbd/vfs.c        |   2 +-
- fs/ksmbd/vfs.h        |   2 +-
- 11 files changed, 256 insertions(+), 167 deletions(-)
-
+diff --git a/fs/ksmbd/smb2ops.c b/fs/ksmbd/smb2ops.c
+index 197473871aa4..b06456eb587b 100644
+--- a/fs/ksmbd/smb2ops.c
++++ b/fs/ksmbd/smb2ops.c
+@@ -187,11 +187,6 @@ static struct smb_version_cmds smb2_0_server_cmds[NUMBER_OF_SMB2_COMMANDS] = {
+ 	[SMB2_CHANGE_NOTIFY_HE]	=	{ .proc = smb2_notify},
+ };
+ 
+-int init_smb2_0_server(struct ksmbd_conn *conn)
+-{
+-	return -EOPNOTSUPP;
+-}
+-
+ /**
+  * init_smb2_1_server() - initialize a smb server connection with smb2.1
+  *			command dispatcher
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 3476cacd2784..b06361313889 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -236,9 +236,6 @@ int init_smb2_neg_rsp(struct ksmbd_work *work)
+ 
+ 	if (conn->need_neg == false)
+ 		return -EINVAL;
+-	if (!(conn->dialect >= SMB20_PROT_ID &&
+-	      conn->dialect <= SMB311_PROT_ID))
+-		return -EINVAL;
+ 
+ 	rsp_hdr = work->response_buf;
+ 
+@@ -1166,13 +1163,6 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 	case SMB21_PROT_ID:
+ 		init_smb2_1_server(conn);
+ 		break;
+-	case SMB20_PROT_ID:
+-		rc = init_smb2_0_server(conn);
+-		if (rc) {
+-			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+-			goto err_out;
+-		}
+-		break;
+ 	case SMB2X_PROT_ID:
+ 	case BAD_PROT_ID:
+ 	default:
+@@ -1191,11 +1181,9 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 	rsp->MaxReadSize = cpu_to_le32(conn->vals->max_read_size);
+ 	rsp->MaxWriteSize = cpu_to_le32(conn->vals->max_write_size);
+ 
+-	if (conn->dialect > SMB20_PROT_ID) {
+-		memcpy(conn->ClientGUID, req->ClientGUID,
+-		       SMB2_CLIENT_GUID_SIZE);
+-		conn->cli_sec_mode = le16_to_cpu(req->SecurityMode);
+-	}
++	memcpy(conn->ClientGUID, req->ClientGUID,
++			SMB2_CLIENT_GUID_SIZE);
++	conn->cli_sec_mode = le16_to_cpu(req->SecurityMode);
+ 
+ 	rsp->StructureSize = cpu_to_le16(65);
+ 	rsp->DialectRevision = cpu_to_le16(conn->dialect);
+@@ -1537,11 +1525,9 @@ static int ntlm_authenticate(struct ksmbd_work *work)
+ 		}
+ 	}
+ 
+-	if (conn->dialect > SMB20_PROT_ID) {
+-		if (!ksmbd_conn_lookup_dialect(conn)) {
+-			pr_err("fail to verify the dialect\n");
+-			return -ENOENT;
+-		}
++	if (!ksmbd_conn_lookup_dialect(conn)) {
++		pr_err("fail to verify the dialect\n");
++		return -ENOENT;
+ 	}
+ 	return 0;
+ }
+@@ -1623,11 +1609,9 @@ static int krb5_authenticate(struct ksmbd_work *work)
+ 		}
+ 	}
+ 
+-	if (conn->dialect > SMB20_PROT_ID) {
+-		if (!ksmbd_conn_lookup_dialect(conn)) {
+-			pr_err("fail to verify the dialect\n");
+-			return -ENOENT;
+-		}
++	if (!ksmbd_conn_lookup_dialect(conn)) {
++		pr_err("fail to verify the dialect\n");
++		return -ENOENT;
+ 	}
+ 	return 0;
+ }
+diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
+index 261825d06391..a6dec5ec6a54 100644
+--- a/fs/ksmbd/smb2pdu.h
++++ b/fs/ksmbd/smb2pdu.h
+@@ -1637,7 +1637,6 @@ struct smb2_posix_info {
+ } __packed;
+ 
+ /* functions */
+-int init_smb2_0_server(struct ksmbd_conn *conn);
+ void init_smb2_1_server(struct ksmbd_conn *conn);
+ void init_smb3_0_server(struct ksmbd_conn *conn);
+ void init_smb3_02_server(struct ksmbd_conn *conn);
+diff --git a/fs/ksmbd/smb_common.c b/fs/ksmbd/smb_common.c
+index b6c4c7e960fa..707490ab1f4c 100644
+--- a/fs/ksmbd/smb_common.c
++++ b/fs/ksmbd/smb_common.c
+@@ -88,7 +88,7 @@ unsigned int ksmbd_server_side_copy_max_total_size(void)
+ 
+ inline int ksmbd_min_protocol(void)
+ {
+-	return SMB2_PROT;
++	return SMB21_PROT;
+ }
+ 
+ inline int ksmbd_max_protocol(void)
+@@ -427,7 +427,7 @@ int ksmbd_extract_shortname(struct ksmbd_conn *conn, const char *longname,
+ 
+ static int __smb2_negotiate(struct ksmbd_conn *conn)
+ {
+-	return (conn->dialect >= SMB20_PROT_ID &&
++	return (conn->dialect >= SMB21_PROT_ID &&
+ 		conn->dialect <= SMB311_PROT_ID);
+ }
+ 
+@@ -457,7 +457,7 @@ int ksmbd_smb_negotiate_common(struct ksmbd_work *work, unsigned int command)
+ 		}
+ 	}
+ 
+-	if (command == SMB2_NEGOTIATE_HE) {
++	if (command == SMB2_NEGOTIATE_HE && __smb2_negotiate(conn)) {
+ 		ret = smb2_handle_negotiate(work);
+ 		init_smb2_neg_rsp(work);
+ 		return ret;
 -- 
 2.31.1
 
