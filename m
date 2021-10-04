@@ -2,152 +2,112 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5775C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon,  4 Oct 2021 11:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2947AC433F5
+	for <linux-cifs@archiver.kernel.org>; Mon,  4 Oct 2021 12:12:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACDDB6120D
-	for <linux-cifs@archiver.kernel.org>; Mon,  4 Oct 2021 11:39:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FE7461166
+	for <linux-cifs@archiver.kernel.org>; Mon,  4 Oct 2021 12:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230238AbhJDLlO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 4 Oct 2021 07:41:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38366 "EHLO mail.kernel.org"
+        id S232591AbhJDMO2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 4 Oct 2021 08:14:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47108 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230200AbhJDLlO (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 4 Oct 2021 07:41:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D38A6120D
-        for <linux-cifs@vger.kernel.org>; Mon,  4 Oct 2021 11:39:25 +0000 (UTC)
+        id S232549AbhJDMO0 (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 4 Oct 2021 08:14:26 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2514161181
+        for <linux-cifs@vger.kernel.org>; Mon,  4 Oct 2021 12:12:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633347565;
-        bh=3N+vgWV/cGIjRV1zRgYAvmOkAY50odazJyS6m4seAdA=;
+        s=k20201202; t=1633349558;
+        bh=oI+uvjOXMxjt5A9vo4n8127tkLZCtdr/aOee3MJgW0U=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=sIIAMEP5Bc8R1J6wPdxVkUW1O15nxZcQvuIotanVitER63Wyyp/oRhyuOpl4psXuR
-         CoxzJAVV/QbHGeMZXYl54e4tTl3riAOOQZCjpVH8lZDSHbJ4Y3/pJ4rrMmS0CMCy+4
-         N2fpplwdFs5CxN/c2ltuyExCT7lhfVAqPzCjeB84Ar/MioqNNaFzwZomklXBxTIs3D
-         OW6IfmD1+NZOtpbjLKy6R8dZx+wOv7ueuQMX09HWmP1nGqRSON52EjL6/gSgqPxPxN
-         Ge4IsqS3jdzyFCLoc2lJfxCeWTKwox54YU0SQRu7/+nDugDJAavenmfXFAGjoHNcml
-         RfoPbSL59RqEg==
-Received: by mail-oi1-f181.google.com with SMTP id z11so21153915oih.1
-        for <linux-cifs@vger.kernel.org>; Mon, 04 Oct 2021 04:39:25 -0700 (PDT)
-X-Gm-Message-State: AOAM5326Qc7HLaCA31QnOuy/ciNsFfe1Q3+whb+PTHOGyeX9jnzbXdhZ
-        EDE7Q2/QaWbnEI+jFYmmXHO5C91V6Im898xcZ/I=
-X-Google-Smtp-Source: ABdhPJxd8jt5oA+mDjHyeS7E9Gg9FYTpuqxuuyC+fiN9tQsS3NnOYyPG6CXsx/+beWNdG3tMtOkNaEGSqRz7fIfRg9I=
-X-Received: by 2002:a05:6808:64f:: with SMTP id z15mr12172234oih.65.1633347564730;
- Mon, 04 Oct 2021 04:39:24 -0700 (PDT)
+        b=pkp5ZTYyj/Im60CMYrUy3E4xmUKPmNPO6ofPaG9iJ8bFBJkwWb8YLH3Ep6GIry/1a
+         UXz708/0qHKdT/qPQwD8FMPgGb5Kyjg9YJRT0EYuyzfBFRTSKgHHAvLJ1uCeZFMp+v
+         26MJL6mYrlyHlrELx0eVP+T0NCtLw0Gl8t9UGQ9yHg9qWXJxm+qFyQshfKBhWS20EN
+         H25DmvupWnCeaIrEPUKOMSt4Hk955QIEhykvauTLZZ0SvH2fLIrI6iuxXGMklUeG1R
+         kJT1gHlzk5JY0QAflggtkPa8FXCABymFuh2JdjAy0vWtNRnmzsRqlT8x1HqsjENLU3
+         ZzqybWYnrMg1g==
+Received: by mail-ot1-f54.google.com with SMTP id c26-20020a056830349a00b0054d96d25c1eso21190056otu.9
+        for <linux-cifs@vger.kernel.org>; Mon, 04 Oct 2021 05:12:38 -0700 (PDT)
+X-Gm-Message-State: AOAM533dRrJtkzsgernKKscKGbw1TN8SlclfkDvj7fBeP2kDBe3Qlhwk
+        YrTG0ygwJGuHJ1UMB8g4hcoWMSLvkklZVxQIo2M=
+X-Google-Smtp-Source: ABdhPJyH9Ij35xClvGXpXwaM9lJphbUv1snnfciyI8w1xeFx0OolOih4POkUM6TYW0QVV3AEHBjw6dZDb9PedF1+Bkc=
+X-Received: by 2002:a05:6830:1147:: with SMTP id x7mr9192511otq.18.1633349556796;
+ Mon, 04 Oct 2021 05:12:36 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Mon, 4 Oct 2021 04:39:24 -0700 (PDT)
-In-Reply-To: <CANFS6bbnBK6uqyimrK_7AhMw=dB1oeYMb7jQa9w3xrOfM1TWTQ@mail.gmail.com>
-References: <20211003043105.10453-1-linkinjeon@kernel.org> <CANFS6bb+hqid_YvkkSnMajwsQeOF_6NFke5ffuRVnPVoiHdKug@mail.gmail.com>
- <CAKYAXd-Cyv2qXgGmuGKQn1jr8SQu4kF4wyMrDxeAt_8Ao4pudg@mail.gmail.com> <CANFS6bbnBK6uqyimrK_7AhMw=dB1oeYMb7jQa9w3xrOfM1TWTQ@mail.gmail.com>
+Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Mon, 4 Oct 2021 05:12:36 -0700 (PDT)
+In-Reply-To: <20211004104544.GA25640@kili>
+References: <20211004104544.GA25640@kili>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Mon, 4 Oct 2021 20:39:24 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd92FVnUqWTmz5XSM7MEydGtYgjKFG4MapdUAbWUuBMm2w@mail.gmail.com>
-Message-ID: <CAKYAXd92FVnUqWTmz5XSM7MEydGtYgjKFG4MapdUAbWUuBMm2w@mail.gmail.com>
-Subject: Re: [PATCH 1/3] ksmbd: use buf_data_size instead of recalculation in smb3_decrypt_req()
-To:     Hyunchul Lee <hyc.lee@gmail.com>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Tom Talpey <tom@talpey.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        =?UTF-8?B?UmFscGggQsO2aG1l?= <slow@samba.org>,
-        Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
+Date:   Mon, 4 Oct 2021 21:12:36 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-v8tM_56V0U2m3piUfUipB4EHe5-aCBbC=mJ0MP2J4XA@mail.gmail.com>
+Message-ID: <CAKYAXd-v8tM_56V0U2m3piUfUipB4EHe5-aCBbC=mJ0MP2J4XA@mail.gmail.com>
+Subject: Re: [bug report] ksmbd: add validation in smb2 negotiate
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-10-04 20:14 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> 2021=EB=85=84 10=EC=9B=94 4=EC=9D=BC (=EC=9B=94) =EC=98=A4=ED=9B=84 5:58,=
- Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+2021-10-04 19:45 GMT+09:00, Dan Carpenter <dan.carpenter@oracle.com>:
+> Hello Namjae Jeon,
 >
->>
->> 2021-10-04 17:38 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
->> > 2021=EB=85=84 10=EC=9B=94 3=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 1:=
-31, Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=
-=B1:
->> >>
->> >> Tom suggested to use buf_data_size that is already calculated, to
->> >> verify
->> >> these offsets.
->> >>
->> >> Cc: Tom Talpey <tom@talpey.com>
->> >> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
->> >> Cc: Ralph B=C3=B6hme <slow@samba.org>
->> >> Cc: Steve French <smfrench@gmail.com>
->> >> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
->> >> Cc: Hyunchul Lee <hyc.lee@gmail.com>
->> >> Suggested-by: Tom Talpey <tom@talpey.com>
->> >> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->> >> ---
->> >>  fs/ksmbd/smb2pdu.c | 6 ++----
->> >>  1 file changed, 2 insertions(+), 4 deletions(-)
->> >>
->> >> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
->> >> index b06361313889..4d1be224dd8e 100644
->> >> --- a/fs/ksmbd/smb2pdu.c
->> >> +++ b/fs/ksmbd/smb2pdu.c
->> >> @@ -8457,15 +8457,13 @@ int smb3_decrypt_req(struct ksmbd_work *work)
->> >>         struct smb2_transform_hdr *tr_hdr =3D (struct smb2_transform_=
-hdr
->> >> *)buf;
->> >>         int rc =3D 0;
->> >>
->> >> -       if (pdu_length + 4 <
->> >> -           sizeof(struct smb2_transform_hdr) + sizeof(struct
->> >> smb2_hdr))
->> >> {
->> >> +       if (buf_data_size < sizeof(struct smb2_hdr)) {
->> >
->> > Could integer overflow occur when buf_data_size is initialized?
->> > buf_data_size is initialized with "pdu_length + 4 -
->> > sizeof(struct smb2_transform_hdr)".
->> overflow does not occur. See the comments below.
->> >
+> This is a semi-automatic email about new static checker warnings.
 >
-> Ah, I am worried that pdu_length + 4 is less than
-> sizeof(struct smb2_transform_hdr). And I can't find the check
-> that pdu size is enough before this function is called.
-Got it, I will change data type of buf_data_size to signed on next version.
+> The patch 442ff9ebeb01: "ksmbd: add validation in smb2 negotiate"
+> from Sep 29, 2021, leads to the following Smatch complaint:
+>
+>     fs/ksmbd/smb2pdu.c:8330 smb3_preauth_hash_rsp()
+>     error: we previously assumed 'conn->preauth_info' could be null (see
+> line 8310)
+>
+> fs/ksmbd/smb2pdu.c
+>   8309		if (le16_to_cpu(req->Command) == SMB2_NEGOTIATE_HE &&
+>   8310		    conn->preauth_info)
+>                     ^^^^^^^^^^^^^^^^^^
+> The patch adds a new check for "conn->preauth_info"
+>
+>   8311			ksmbd_gen_preauth_integrity_hash(conn, (char *)rsp,
+>   8312							 conn->preauth_info->Preauth_HashValue);
+>   8313	
+>   8314		if (le16_to_cpu(rsp->Command) == SMB2_SESSION_SETUP_HE && sess) {
+>   8315			__u8 *hash_value;
+>   8316	
+>   8317			if (conn->binding) {
+>   8318				struct preauth_session *preauth_sess;
+>   8319	
+>   8320				preauth_sess = ksmbd_preauth_session_lookup(conn, sess->id);
+>   8321				if (!preauth_sess)
+>   8322					return;
+>   8323				hash_value = preauth_sess->Preauth_HashValue;
+>   8324			} else {
+>   8325				hash_value = sess->Preauth_HashValue;
+>   8326				if (!hash_value)
+>   8327					return;
+>   8328			}
+>   8329			ksmbd_gen_preauth_integrity_hash(conn, (char *)rsp,
+>
+Hi Dan,
+
+First, Thanks for your report:)
+> But it's not checked inside the ksmbd_gen_preauth_integrity_hash()
+> function.
+conn->preauth_info can not be NULL on smb3.1.1 session setup stage.
+
+smb2 negotate(smb3.1.1, allocate conn->preauth_info) ->  smb3.1.1
+session setup -> smb3_preauth_hash_rsp().
+
+This is the check not to call ksmbd_gen_preauth_integrity_hash().
+if (le16_to_cpu(rsp->Command) == SMB2_SESSION_SETUP_HE && sess) {
+
+Let me know if I am missing something:)
 
 Thanks!
 >
+>   8330							 hash_value);
+>   8331		}
+>   8332	}
 >
->> > There was the check that the pdu size is greater than at least
->> > __SMB2_HEADER_STRUCTURE_SIZE at ksmbd_conn_handler_loop(),
->> > But I can't find this check in the latest patch set.
->> Please check "ksmbd: add the check to vaildate if stream protocol
->> length exceeds maximum value". pdu_length will never exceed
->> MAX_STREAM_PROT_LEN(0x00FFFFFF).
->>
->> Thanks!
->> >
->> >
->> >>                 pr_err("Transform message is too small (%u)\n",
->> >>                        pdu_length);
->> >>                 return -ECONNABORTED;
->> >>         }
->> >>
->> >> -       if (pdu_length + 4 <
->> >> -           le32_to_cpu(tr_hdr->OriginalMessageSize) + sizeof(struct
->> >> smb2_transform_hdr)) {
->> >> +       if (buf_data_size < le32_to_cpu(tr_hdr->OriginalMessageSize))
->> >> {
->> >>                 pr_err("Transform message is broken\n");
->> >>                 return -ECONNABORTED;
->> >>         }
->> >> --
->> >> 2.25.1
->> >>
->> >
->> >
->> > --
->> > Thanks,
->> > Hyunchul
->> >
->
->
->
-> --
-> Thanks,
-> Hyunchul
+> regards,
+> dan carpenter
 >
