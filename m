@@ -2,138 +2,57 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 463BFC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Oct 2021 05:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2007BC433F5
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Oct 2021 07:26:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C710613AC
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Oct 2021 05:25:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E18760F59
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Oct 2021 07:26:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231142AbhJEF1Y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Oct 2021 01:27:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231753AbhJEF1X (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Oct 2021 01:27:23 -0400
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BB2AC061745
-        for <linux-cifs@vger.kernel.org>; Mon,  4 Oct 2021 22:25:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Message-Id:Date:Cc:To:From;
-        bh=Umiz6jNkxJhh7bHGki0vDMexgYdOtVbyRz8bFzWT1jc=; b=J++e8P4WsuFEIdFLY3HlEpDP0l
-        VVdwbIEOvszoIy9gQ2PPYjfUR4LihIybvDUPqDJNPmaFP+P4SU1XOyIJjdexzi5D2wDwVxVfvrMzS
-        vSk4jdZfLUodfY0ZOl/fHjxHcN+cZetHwjPzTdPeUj8U/SA0S5jBGlvTbTYcc4arluwljLQ2kHp73
-        +SmZSwURfmFaz71EcCyHpMXB+yq5TNr6rgGEN5l3WEVSi+sIwi2my4zVWFFt54zioOBwzx5hsEkTZ
-        apx7Ilr0jbSdohFuiewTWZBRRztSGR1MSQQ0VlQyUrD2Mg8VGJ6pwwemPcqT+6PTTUJGFXzNYyaJK
-        8p8l4S87yXudO/0xiJQb4teXEWm97O5rAdgbfJEEqVaKO2TsRqqiulPwwVv1TxNTjTCNm9RU7Xpch
-        dUNNyCMVvcS+nCzT8ts6Z/+V48avjrw0036m0L2pGUoFRTSgfh4HLMoRTvk1355YxiS9xhkXnR/yT
-        8xC3gdENFrCZ7vI7G7xni734;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1mXcce-001Yyq-83; Tue, 05 Oct 2021 05:04:12 +0000
-From:   Ralph Boehme <slow@samba.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     Ralph Boehme <slow@samba.org>, Namjae Jeon <linkinjeon@kernel.org>,
-        Tom Talpey <tom@talpey.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>
-Subject: [PATCH v7 9/9] ksmdb: move session and tcon validation to __process_request()
-Date:   Tue,  5 Oct 2021 07:03:43 +0200
-Message-Id: <20211005050343.268514-10-slow@samba.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211005050343.268514-1-slow@samba.org>
-References: <20211005050343.268514-1-slow@samba.org>
+        id S232824AbhJEH2c (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 5 Oct 2021 03:28:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59022 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232809AbhJEH2b (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 5 Oct 2021 03:28:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 47F226117A
+        for <linux-cifs@vger.kernel.org>; Tue,  5 Oct 2021 07:26:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1633418801;
+        bh=5TVnfea7HX1WtzgzC2AdPVD4u/jJugyfk0TktnT5D2s=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=AIdAe/2FhN48CuinnrZdJaTR9BTlq7E+/U07AKGPTWYJbEOmZHoZQ0uNCUynhY1fn
+         37uQJVGhSXivOwAeS27XiYIWUYuQfWUbPz4o2cF0S2RvglNjwqYhcYChFyuh/JOX1I
+         BQsZgIoNa7y5mPEG8iUofOFSFG5/Jk6MPSWnaiQmXvgu1Z6ik+RODzSE0pW9+wNQQO
+         OUPtev37erQeV2qjqf9KTHLhVERbyWBe8bTEg76OgezHeb53STeaEhJ5Fe5KArcInb
+         5xuB68z7vElTmmjxF9/S9SMDv1uia8t2+tYy34b9YZkMX7T85Uxr2/l3xejXGUGmZo
+         YXAgOypcmadHQ==
+Received: by mail-ot1-f49.google.com with SMTP id l16-20020a9d6a90000000b0053b71f7dc83so24744125otq.7
+        for <linux-cifs@vger.kernel.org>; Tue, 05 Oct 2021 00:26:41 -0700 (PDT)
+X-Gm-Message-State: AOAM532D1+Qq3ZAtQzGHWcoek8rOtRoIsOh28P8IlfNNCQb3dKbN5yc5
+        JkYyfogngZ+9CisI/l0Sn2b5eXtpKlzSnN0YUfI=
+X-Google-Smtp-Source: ABdhPJxiCF6v4Hn1DHbIFV/JhoEdfZeSBMgRLW+E4L6xoReagqmL6y+eUe2cGXnBsszt7LPu32Q6m48cK1M1m46z6yQ=
+X-Received: by 2002:a9d:67cf:: with SMTP id c15mr13054422otn.232.1633418800650;
+ Tue, 05 Oct 2021 00:26:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Tue, 5 Oct 2021 00:26:40 -0700 (PDT)
+In-Reply-To: <20211005050343.268514-2-slow@samba.org>
+References: <20211005050343.268514-1-slow@samba.org> <20211005050343.268514-2-slow@samba.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue, 5 Oct 2021 16:26:40 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9BAAFhQKw=mffwMY6i7LVRm9U_8q-20S7JZsHCs2YCqg@mail.gmail.com>
+Message-ID: <CAKYAXd9BAAFhQKw=mffwMY6i7LVRm9U_8q-20S7JZsHCs2YCqg@mail.gmail.com>
+Subject: Re: [PATCH v7 1/9] ksmbd: use ksmbd_req_buf_next() in ksmbd_verify_smb_message()
+To:     Ralph Boehme <slow@samba.org>
+Cc:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-For compound non-related operations session id and tree id must be taken from
-earch PDU.
+2021-10-05 14:03 GMT+09:00, Ralph Boehme <slow@samba.org>:
+> No change in behaviour.
+>
+> Signed-off-by: Ralph Boehme <slow@samba.org>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Hyunchul Lee <hyc.lee@gmail.com>
-Signed-off-by: Ralph Boehme <slow@samba.org>
----
- fs/ksmbd/server.c | 46 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 29 insertions(+), 17 deletions(-)
-
-diff --git a/fs/ksmbd/server.c b/fs/ksmbd/server.c
-index 2a2b2135bfde..5d1ef277653f 100644
---- a/fs/ksmbd/server.c
-+++ b/fs/ksmbd/server.c
-@@ -101,6 +101,32 @@ static inline int check_conn_state(struct ksmbd_work *work)
- 	return 0;
- }
- 
-+static int check_session_and_tcon(struct ksmbd_work *work)
-+{
-+	int rc;
-+
-+	if (work->conn->ops->check_user_session == NULL)
-+		return 0;
-+
-+	rc = work->conn->ops->check_user_session(work);
-+	if (rc < 0) {
-+		work->conn->ops->set_rsp_status(work,
-+						STATUS_USER_SESSION_DELETED);
-+		return 1;
-+	}
-+	if (rc == 0)
-+		return 0;
-+
-+	rc = work->conn->ops->get_ksmbd_tcon(work);
-+	if (rc < 0) {
-+		work->conn->ops->set_rsp_status(work,
-+						STATUS_NETWORK_NAME_DELETED);
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
- #define SERVER_HANDLER_CONTINUE		0
- #define SERVER_HANDLER_ABORT		1
- 
-@@ -117,6 +143,9 @@ static int __process_request(struct ksmbd_work *work, struct ksmbd_conn *conn,
- 	if (ksmbd_verify_smb_message(work))
- 		return SERVER_HANDLER_ABORT;
- 
-+	if (check_session_and_tcon(work))
-+		return SERVER_HANDLER_ABORT;
-+
- 	command = conn->ops->get_cmd_val(work);
- 	*cmd = command;
- 
-@@ -184,23 +213,6 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
- 		goto send;
- 	}
- 
--	if (conn->ops->check_user_session) {
--		rc = conn->ops->check_user_session(work);
--		if (rc < 0) {
--			command = conn->ops->get_cmd_val(work);
--			conn->ops->set_rsp_status(work,
--					STATUS_USER_SESSION_DELETED);
--			goto send;
--		} else if (rc > 0) {
--			rc = conn->ops->get_ksmbd_tcon(work);
--			if (rc < 0) {
--				conn->ops->set_rsp_status(work,
--					STATUS_NETWORK_NAME_DELETED);
--				goto send;
--			}
--		}
--	}
--
- 	do {
- 		rc = __process_request(work, conn, &command);
- 		if (rc == SERVER_HANDLER_ABORT)
--- 
-2.31.1
-
+Thanks for your patch!
