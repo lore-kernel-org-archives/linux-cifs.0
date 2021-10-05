@@ -2,152 +2,105 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DEFDC433EF
-	for <linux-cifs@archiver.kernel.org>; Mon,  4 Oct 2021 12:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC890C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Oct 2021 01:20:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D5126101A
-	for <linux-cifs@archiver.kernel.org>; Mon,  4 Oct 2021 12:47:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 976F9613AC
+	for <linux-cifs@archiver.kernel.org>; Tue,  5 Oct 2021 01:20:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229836AbhJDMtB (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 4 Oct 2021 08:49:01 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:40472 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233216AbhJDMtA (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 4 Oct 2021 08:49:00 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 4FC261FDE4;
-        Mon,  4 Oct 2021 12:47:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1633351631; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=SoOqLW1X+Iq4MDGFhD2Lq321ygi5vVzLuBYSOccGbSU=;
-        b=1gM6edeJWUuqGUPlhImhcLExge+QHPvYYcI1/H8AFgo+GTG0P9mm5yx+5o3/uEtvB++BJO
-        Y+qVQUPYylgU/GH2CAl4IkJZl5gU2eAGVzgm/objBpprfGUiCz9BHfoR073ofx0kYgCqev
-        hVKMnd64bLVFHD11SFEQpzBQ4G08zPg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1633351631;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=SoOqLW1X+Iq4MDGFhD2Lq321ygi5vVzLuBYSOccGbSU=;
-        b=2DmrLw2YbueYoq0eNMzBBQ9JhKrryJSjSI/zYna/czfOLProzOEpSF8Hlg6Xy7Dq5LSiIr
-        IXzuUw0sGqWGWKAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CA77313CEE;
-        Mon,  4 Oct 2021 12:47:10 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id mFl7Jc73WmEILwAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Mon, 04 Oct 2021 12:47:10 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linkinjeon@kernel.org
-Cc:     linux-cifs@vger.kernel.org, Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH] ksmbd-tools: Add ksmbd-tools.spec template
-Date:   Mon,  4 Oct 2021 09:47:04 -0300
-Message-Id: <20211004124704.17616-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.33.0
+        id S229813AbhJEBWp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 4 Oct 2021 21:22:45 -0400
+Received: from mail-pj1-f49.google.com ([209.85.216.49]:34323 "EHLO
+        mail-pj1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229659AbhJEBWp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 4 Oct 2021 21:22:45 -0400
+Received: by mail-pj1-f49.google.com with SMTP id on12-20020a17090b1d0c00b001997c60aa29so936076pjb.1
+        for <linux-cifs@vger.kernel.org>; Mon, 04 Oct 2021 18:20:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=q0KjeZWQ0xizszROKEMOYM1F0ftvj+iTfL4eFuXNmiA=;
+        b=BMEPDQOCdQLndsSiU3Lxhr3KlV97LFO+a1qkaEdPSjIMUx6Kw0TM1l9S0IDEjfNPMK
+         flYZveDvuqM2UcYvGGTCtD0qMyrQZH4SrLPwf+gzLWVDpPvpEn1RVgd23S3urkQ+Hcsr
+         BDZUzNvmJZDwuZXvXix6UhtOHjU+Kok5nzzZyzpYsdz7uG6+TWK4HnsDbWMYnG1bsRM3
+         j6WCHF15Fs6x4oTGS8mySgLP74oYvzCNGle64RCXx8kjSdfS95fJ+JA68odx8OGasapG
+         IpTBg7JHKNIenWXXn2q6YDtpycLRnRAR8ZRb/BwNn/iP1+bT5KT4Qt8tcCWXgk0Dos0a
+         aAxQ==
+X-Gm-Message-State: AOAM532zflSVQBaYvsXiBR9YTvzOMaw9/gmZzgYRcx/n7Hj7kGRTOT29
+        mWqr7IgHVqq914aiMrbib4xnZmPyVK1OwA==
+X-Google-Smtp-Source: ABdhPJz7RiYgv2S7qPD6654JFcUD/iktTb3bzjIyzrw4KYMW6MRYBj9qe+MUjDPPrieEug+pbQCTzA==
+X-Received: by 2002:a17:90a:191a:: with SMTP id 26mr385043pjg.79.1633396855035;
+        Mon, 04 Oct 2021 18:20:55 -0700 (PDT)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id s38sm14939341pfw.209.2021.10.04.18.20.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Oct 2021 18:20:54 -0700 (PDT)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
+        Steve French <smfrench@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>
+Subject: [PATCH v2] ksmbd: use buf_data_size instead of recalculation in smb3_decrypt_req()
+Date:   Tue,  5 Oct 2021 10:20:42 +0900
+Message-Id: <20211005012042.4263-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-ksmbd-tools.spec should serve as a base template for RPM packagers.
+Tom suggested to use buf_data_size that is already calculated, to verify
+these offsets.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Ralph Böhme <slow@samba.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Hyunchul Lee <hyc.lee@gmail.com>
+Suggested-by: Tom Talpey <tom@talpey.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- README           |  2 ++
- ksmbd-tools.spec | 63 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
- create mode 100644 ksmbd-tools.spec
+ v2:
+   - change data type of buf_data_size to signed to validate
+     smb2_transfrom_hdr size.
+ fs/ksmbd/smb2pdu.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/README b/README
-index 3dce3bb41c6e..c64b75c58c2f 100644
---- a/README
-+++ b/README
-@@ -13,6 +13,8 @@ Install preprequisite packages:
- 	For CentOS:
- 	sudo yum install glib2-devel libnl3-devel
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index b06361313889..bb030e4366ad 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -8452,20 +8452,18 @@ int smb3_decrypt_req(struct ksmbd_work *work)
+ 	struct smb2_hdr *hdr;
+ 	unsigned int pdu_length = get_rfc1002_len(buf);
+ 	struct kvec iov[2];
+-	unsigned int buf_data_size = pdu_length + 4 -
++	int buf_data_size = pdu_length + 4 -
+ 		sizeof(struct smb2_transform_hdr);
+ 	struct smb2_transform_hdr *tr_hdr = (struct smb2_transform_hdr *)buf;
+ 	int rc = 0;
  
-+ksmbd-tools.spec should serve as a base template for RPM packagers.
-+
- Build steps:
-         - cd into the ksmbd-tools directory
-         - ./autogen.sh
-diff --git a/ksmbd-tools.spec b/ksmbd-tools.spec
-new file mode 100644
-index 000000000000..901ca6e6cb76
---- /dev/null
-+++ b/ksmbd-tools.spec
-@@ -0,0 +1,63 @@
-+#
-+# spec file for package ksmbd-tools
-+#
-+# Copyright (c) 2021 SUSE LLC
-+#
-+# All modifications and additions to the file contributed by third parties
-+# remain the property of their copyright owners, unless otherwise agreed
-+# upon. The license for this file, and modifications and additions to the
-+# file, is the same license as for the pristine package itself (unless the
-+# license for the pristine package is not an Open Source License, in which
-+# case the license is the MIT License). An "Open Source License" is a
-+# license that conforms to the Open Source Definition (Version 1.9)
-+# published by the Open Source Initiative.
-+#
-+# Please submit bugfixes or comments via https://bugs.opensuse.org/
-+#
-+
-+Name:           ksmbd-tools
-+Version:        3.4.2
-+Release:        0
-+Summary:        cifsd/ksmbd kernel server userspace utilities
-+License:        GPL-2.0-or-later
-+Group:          System/Filesystems
-+Url:            https://github.com/namjaejeon/ksmbd-tools
-+Source:         %{name}-%{version}.tar.bz2
-+
-+# ksmbd kernel module was only added in kernel 5.15
-+BuildRequires:  kernel-default >= 5.15
-+BuildRequires:  glib2-devel
-+BuildRequires:  libnl3-devel
-+BuildRequires:  autoconf
-+BuildRequires:  automake
-+BuildRequires:	libtool
-+
-+Requires(pre):	kernel-default >= 5.15
-+
-+%description
-+Set of utilities for creating and managing SMB3 shares for the ksmbd kernel
-+module.
-+
-+%prep
-+%setup -q
-+
-+%build
-+./autogen.sh
-+%configure
-+make %{?_smp_mflags}
-+
-+%install
-+mkdir -p %{buildroot}/%{_sysconfdir}/ksmbd
-+
-+%make_install
-+install -m 644 -p smb.conf.example %{buildroot}%{_sysconfdir}/ksmbd
-+
-+%files
-+%{_sbindir}/ksmbd.addshare
-+%{_sbindir}/ksmbd.adduser
-+%{_sbindir}/ksmbd.control
-+%{_sbindir}/ksmbd.mountd
-+%dir %{_sysconfdir}/ksmbd
-+%config %{_sysconfdir}/ksmbd/smb.conf.example
-+
-+%changelog
+-	if (pdu_length + 4 <
+-	    sizeof(struct smb2_transform_hdr) + sizeof(struct smb2_hdr)) {
++	if (buf_data_size < sizeof(struct smb2_hdr)) {
+ 		pr_err("Transform message is too small (%u)\n",
+ 		       pdu_length);
+ 		return -ECONNABORTED;
+ 	}
+ 
+-	if (pdu_length + 4 <
+-	    le32_to_cpu(tr_hdr->OriginalMessageSize) + sizeof(struct smb2_transform_hdr)) {
++	if (buf_data_size < le32_to_cpu(tr_hdr->OriginalMessageSize)) {
+ 		pr_err("Transform message is broken\n");
+ 		return -ECONNABORTED;
+ 	}
 -- 
-2.33.0
+2.25.1
 
