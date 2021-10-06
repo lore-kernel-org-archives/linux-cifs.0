@@ -2,116 +2,143 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 514EAC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Oct 2021 20:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57964C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Oct 2021 02:06:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F983611C0
-	for <linux-cifs@archiver.kernel.org>; Tue,  5 Oct 2021 20:20:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3694D60EE3
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Oct 2021 02:06:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235134AbhJEUWS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 5 Oct 2021 16:22:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43250 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230019AbhJEUWP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 5 Oct 2021 16:22:15 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D3BC061749
-        for <linux-cifs@vger.kernel.org>; Tue,  5 Oct 2021 13:20:24 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id i24so778919lfj.13
-        for <linux-cifs@vger.kernel.org>; Tue, 05 Oct 2021 13:20:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jaTur/0YsNRhkLVzdY4flgs2hS4lNdqogfiomozirV4=;
-        b=W+oytqMD60WjTHcbfUUCmbrA+GwM6S39HNrSZv8M+q5pse8ZCeipJLXkj5KGcZX4TY
-         hieG+YcRfGg+7ExmcbqKs9SzBeLIk0Krne0Z7K6XcF4GW8fAP7fZwy5JV0BBwWHUrzG8
-         wLX5bpkL/+kNX1nEfFhbYU1mMHJUOrjnxiMmkoEyeGg51yD+tF08I24HlqEBpJ0aqQIZ
-         rQezE7AxnTrnhuF0EJxqmW4MdSL/nVcik+8D8zo2LpJ3bCS1hrGqzpP2FLGPVQ+r39dR
-         nvUXifchZOWz9hZWR1dKO/hxB0BHxDBnPGOQF2NSnUtFBAlEXq1XC+IsDos61FCfXXYI
-         nQpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jaTur/0YsNRhkLVzdY4flgs2hS4lNdqogfiomozirV4=;
-        b=tTN/jKuUxtTODDwj1vKx/FGEP41NdC9FQo12FWRKHebr9nmgAcpU7Y4CGBqJVGJml8
-         YmvHKdYw9JG+W5RSd72oQruQcCJLuHT4/GlXcSM52j+kuAwjynHMAo5/Q1HSTLOIIpTm
-         w8brH6GL2L0tzt6c5zGcM+u17GlMXDA/ONPGeW1iHd7ciq2ZBikTUlqDMs55lZXQPxge
-         wPwXFR/tWXZmxiKVKt7wLds0wrF72bLR4aSgsmEUS5DgoIW6xmShZAuiZm5JFv36ajZT
-         485JHfFHW2OE79orVlpoZLJb537vJHtxFTZWuc/C8N1ht+H2T+al0IkFnP0JxX20KKgS
-         Y8Cw==
-X-Gm-Message-State: AOAM533U62pFGESxehi+cLuGiutF/otaBzIPClPVQAZJzyLtUI0h7FHt
-        VEJ7V6dardpz/QYapNliUOkurM5pnwvnUSJaSfU=
-X-Google-Smtp-Source: ABdhPJz5kZUms2tJWgsXf2+SBvQscqYAJ/UnTcZpOMFoUaUQNyEm6c32wwTCq9EkkJaAsjjRUO+v0aZMozi0ppzPoZg=
-X-Received: by 2002:a2e:bc16:: with SMTP id b22mr25470418ljf.500.1633465222320;
- Tue, 05 Oct 2021 13:20:22 -0700 (PDT)
+        id S231867AbhJFCIh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 5 Oct 2021 22:08:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38300 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229908AbhJFCIh (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 5 Oct 2021 22:08:37 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DA1C360EE3
+        for <linux-cifs@vger.kernel.org>; Wed,  6 Oct 2021 02:06:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1633486005;
+        bh=wAMGv/jbMDqpfv5ml+QnJlnzt5ConvjoZenAsy01lcM=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=UWOghRf6t3BxPHvQRzqh9YaZrRvMAbw1Y9AnQyTXxApuU56vsGvE+rL42eBUBl1Dh
+         g7MDMuIjgDhjHAZuvwBFwjen2hQ+ED7DAno0muTwh9k1Nhe0da1nVTR2V3A3BHF/8r
+         crkGZGt7HLEtxovuLUu6KWIenoI+uvBrveCDwAJL0HBGr2Jmm+1X0ztzlMMKJ+0il5
+         xgoxLq1W/IU31BbqVlX2vgsoLaKwkXknzS5+8sC47NoU+LHLmsphKj3LoDCKmRhQeY
+         yFjGlT7xru5XZaLrPofDT2aPpTy2EGQhuLIQrnu9F7uHkRzPSuripDLS6KJXYI9iZ1
+         1xMnpWJ/fY/0Q==
+Received: by mail-oi1-f170.google.com with SMTP id t4so66387oie.5
+        for <linux-cifs@vger.kernel.org>; Tue, 05 Oct 2021 19:06:45 -0700 (PDT)
+X-Gm-Message-State: AOAM5336pR62QA7AK8an5OJM1KzRWf8DOUWto6R4w9whjWpH0sUyXF8U
+        6+pmnhR5QZHzNfV8AaP1Bb5qUgAJemXEtZUCrc0=
+X-Google-Smtp-Source: ABdhPJwrRrWIgte712ihDtVbXCIUiY1v72taHR0/sXLcb0Zp+3zekITNrTaNCilmXkAnLr0Iia6EKH9wdfEZjc1KWaU=
+X-Received: by 2002:a05:6808:64f:: with SMTP id z15mr5009900oih.65.1633486005291;
+ Tue, 05 Oct 2021 19:06:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211002131212.130629-1-slow@samba.org> <20211002131212.130629-8-slow@samba.org>
- <CAKYAXd_jYHCnUbOoBGpsAPo_=H3wsbXcE8LOaAgvZT+dXzpPEA@mail.gmail.com>
- <84fca1c3-2ee2-2a13-d367-6878b56f200a@samba.org> <CAH2r5mukpkfuf951rVC97EBA8KLVPc3chF2+33Ms31uR_ty5dg@mail.gmail.com>
- <cc20019e-7c51-1b8f-bc29-dcdaadeaed7b@samba.org>
-In-Reply-To: <cc20019e-7c51-1b8f-bc29-dcdaadeaed7b@samba.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 5 Oct 2021 15:20:11 -0500
-Message-ID: <CAH2r5mtSdYbb6G_k6MJDac845_VC2S89oEd-LCHBuB6o1YCx5Q@mail.gmail.com>
-Subject: Re: [PATCH v6 07/14] ksmbd: use ksmbd_req_buf_next() in ksmbd_smb2_check_message()
-To:     Ralph Boehme <slow@samba.org>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>, Tom Talpey <tom@talpey.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>
+Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Tue, 5 Oct 2021 19:06:44 -0700 (PDT)
+In-Reply-To: <20211005100026.250280-1-hyc.lee@gmail.com>
+References: <20211005100026.250280-1-hyc.lee@gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Wed, 6 Oct 2021 11:06:44 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9KuopMe8B_BrjxXDv+XZe6=_uWXoNXv6_f8YxYMAiTiA@mail.gmail.com>
+Message-ID: <CAKYAXd9KuopMe8B_BrjxXDv+XZe6=_uWXoNXv6_f8YxYMAiTiA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: improve credits management
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     linux-cifs@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>,
+        Ralph Boehme <slow@samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Oct 5, 2021 at 2:28 PM Ralph Boehme <slow@samba.org> wrote:
+[snip]
 >
-> Am 05.10.21 um 20:43 schrieb Steve French:
-> > Typically kernel style encourages even a brief description in all
-> > changesets (even trivial ones) e.g.
-> >
-> > "Simplifies message parsing slightly.  No change in behavior"
+> -	if (credits_requested > 0) {
+> +	/* We must grant 0 credit for the final response of an asynchronous
+> +	 * operation.
+> +	 */
+> +	if ((hdr->Flags & SMB2_FLAGS_ASYNC_COMMAND) && !work->multiRsp) {
+Can you elaborate what is this check ? especially this !work->multiRsp..
+> +		credits_granted = 0;
+> +	} else {
+> +		/* according to smb2.credits smbtorture, Windows server
+> +		 * 2016 or later grant up to 8192 credits at one.
+> +		 */
+>  		aux_credits = credits_requested - 1;
+> -		aux_max = 32;
+>  		if (hdr->Command == SMB2_NEGOTIATE)
+>  			aux_max = 0;
+> -		aux_credits = (aux_credits < aux_max) ? aux_credits : aux_max;
+> -		credits_granted = aux_credits + credit_charge;
+> +		else
+> +			aux_max = conn->max_credits - credit_charge;
+> +		aux_credits = min_t(unsigned short, aux_credits, aux_max);
+> +		credits_granted = credit_charge + aux_credits;
+> +
+> +		if (conn->max_credits - conn->total_credits < credits_granted)
+> +			credits_granted = conn->max_credits -
+> +				conn->total_credits;
 >
-> Sure, I could add this. Otoh
+> -		/* if credits granted per client is getting bigger than default
+> -		 * minimum credits then we should wrap it up within the limits.
+> -		 */
+> -		if ((conn->total_credits + credits_granted) > min_credits)
+> -			credits_granted = min_credits -	conn->total_credits;
+>  		/*
+>  		 * TODO: Need to adjuct CreditRequest value according to
+>  		 * current cpu load
+>  		 */
+> -	} else if (conn->total_credits == 0) {
+> -		credits_granted = 1;
+>  	}
 >
-> bcf130f9dfbaccf91376a44b18f51ed8007840d6
+>  	conn->total_credits += credits_granted;
+> @@ -371,7 +358,6 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
+>  		/* Update CreditRequest in last request */
+>  		hdr->CreditRequest = cpu_to_le16(work->credits_granted);
+>  	}
+> -out:
+>  	ksmbd_debug(SMB,
+>  		    "credits: requested[%d] granted[%d] total_granted[%d]\n",
+>  		    credits_requested, credits_granted,
+> @@ -692,13 +678,18 @@ int setup_async_work(struct ksmbd_work *work, void
+> (*fn)(void **), void **arg)
 >
-> :)
+>  void smb2_send_interim_resp(struct ksmbd_work *work, __le32 status)
+>  {
+> -	struct smb2_hdr *rsp_hdr;
+> +	struct smb2_hdr *rsp_hdr = work->response_buf;
+> +
+> +	work->multiRsp = 1;
+> +	if (status != STATUS_CANCELLED) {
+> +		spin_lock(&work->conn->credits_lock);
+> +		smb2_set_rsp_credits(work);
+Can you explain why this code is needed in smb2_send_interim_resp() ?
+
+> +		spin_unlock(&work->conn->credits_lock);
+> +	}
 >
-> To me it doesn't make sense.
+> -	rsp_hdr = work->response_buf;
+>  	smb2_set_err_rsp(work);
+>  	rsp_hdr->Status = status;
+>
+> -	work->multiRsp = 1;
+>  	ksmbd_conn_write(work);
+>  	rsp_hdr->Status = 0;
+>  	work->multiRsp = 0;
+> @@ -1233,6 +1224,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+>
+>  	conn->srv_sec_mode = le16_to_cpu(rsp->SecurityMode);
+>  	ksmbd_conn_set_need_negotiate(work);
+> +	conn->total_credits = 0;
+This line is needed ?
 
-The patch submission guidelines for the kernel (see
-Documentation/process/submitting-patches.rst) are not too bad to
-understand (you can see why slightly more description is needed from
-some examples mentioned there), and seem reasonably logical.  Also
-checkpatch already auto-verifies a few of the things mentioned in the
-submitting-patches guidelines.
-
-Note that your example is an old patch (from 10 years ago); rules have
-gotten a bit stricter.  Here is a more recent patch from the same
-committer, note that he no longer uses the minimalist description ("No
-change in behavior") see below (and another example from same
-committer commit 4b03d99794eeed27650597a886247c6427ce1055)
-
-commit ebd9d2c2f5a7ebaaed2d7bb4dee148755f46033d
-Author: J. Bruce Fields <bfields@redhat.com>
-Date:   Fri Apr 16 14:00:17 2021 -0400
-
-    nfsd: reshuffle some code
-
-    No change in behavior, I'm just moving some code around to avoid forward
-    references in a following patch.
-
-    (To do someday: figure out how to split up nfs4state.c.  It's big and
-    disorganized.)
-
-    Signed-off-by: J. Bruce Fields <bfields@redhat.com>
-    Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
-
-
--- 
-Thanks,
-
-Steve
+Thanks!
+>
+>  err_out:
+>  	if (rc < 0)
+> --
+> 2.25.1
+>
+>
