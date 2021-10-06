@@ -2,42 +2,43 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F472C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Oct 2021 08:50:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E102EC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Oct 2021 09:09:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3C8961184
-	for <linux-cifs@archiver.kernel.org>; Wed,  6 Oct 2021 08:50:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C78A561154
+	for <linux-cifs@archiver.kernel.org>; Wed,  6 Oct 2021 09:09:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237832AbhJFIwg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 6 Oct 2021 04:52:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43496 "EHLO
+        id S237801AbhJFJLm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 6 Oct 2021 05:11:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237703AbhJFIwf (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Oct 2021 04:52:35 -0400
+        with ESMTP id S237703AbhJFJLm (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 6 Oct 2021 05:11:42 -0400
 Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0B6DC061749
-        for <linux-cifs@vger.kernel.org>; Wed,  6 Oct 2021 01:50:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F47FC061749
+        for <linux-cifs@vger.kernel.org>; Wed,  6 Oct 2021 02:09:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=From:Cc:To:Date:Message-ID;
-        bh=0I9LdEhLHU6em9MUnwphc+DYh6YadIdSbV55cpLtGHs=; b=oYe9E7G0xovyIpDI3tS8qSwNnU
-        eaH3Qez6xFB4/JrdSGMemPXivk704BNX6Ff1MhMdesbueSknaGufx4Rq7/gn6WTY4YbdjyaLTUidW
-        1311Pqv0nCyfZuPaTDa0nBE86xoHDybEv9L73As3Da2x/bL7rsvLwYq6+ALImuj7eN/zfMnwSJc2L
-        JZPPtu0M1I1/Yji6sZy+alQVd/M5st7v0w/Q/vyZLFYKSxt4+YEumYOv9L/i3qOj4zen/v7gIaeJz
-        ZD+EbM049DMEs6ptLcwpjVi7ctnAwVJMiwzyFyilnWR2IiJw6G9xPIWPrK2ElNfmf3W/8m3Dgl6oW
-        ya2pSgUWoqrdCl2ixxBkCj7126uGrovv6Pmcj1ktzh9sm1OXBd4BKlAeBL3i5j3YSHy6xsWjotU+K
-        smdThMA+VDalTcFoRCRaVCqFZ/i5MUquOSGD2qmChG87WZIoEuR/RLMwRiIhmrQAqDcpQBgKNIyMP
-        mm8Tcfh82PuLiDSm2ceVmISX;
+        s=42; h=Cc:To:From:Date:Message-ID;
+        bh=Aq0AQtBcr4TxjVJdQeuIptpavJQXQ/B7iOaQfMFemBg=; b=TNNiwgGN+fdoy3WhaYdOlFL/e/
+        +/x7B/zfilwc9z7klqUmV+sUpoYYFS3anfIDuTbojgYjNsN+/crkVwww7mDXiqyjXKnq6erMN8xRD
+        CHU+asCE8962l4pbuptw2cZwIXL1QGsknDr4n9cmFMt6Nh6hmzITZbWLUieJD9lYV73ug69PZS3zs
+        IBzuEBC0q1HuRz3SwbVBMbZUc+b6Zb3IoRGzNU6CvW6LvXST0z1IVvttyIrqwN23u3EF2aIf0N2eX
+        Cr9KIopuPOdsK6Fngb6ja7N6fjE1k4GDMww0186gfS47A85H5YVlWGulD84Q2OFbnOqtI1q0cwpzb
+        oWQkrrNErA1xgYPLio5RZYRXztoCV1ReibOmmNfSo34pYA2USTA3IYCNJIGrEbQ5EoIQeR21tHeNS
+        tWNHlac0+tsb+gNIeQTImMP29FixPcRSipmK+dZhl+aBEH+ZOAfhS6aZUiTwjxpIuqLxNB82jaA1A
+        PArlnEq9KbFFJSHLmvw7fgjc;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
         by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
         (Exim)
-        id 1mY2dN-001nLU-47; Wed, 06 Oct 2021 08:50:41 +0000
-Message-ID: <64519e7d-d82f-91f6-5c8c-ce9aa8935b30@samba.org>
-Date:   Wed, 6 Oct 2021 10:50:40 +0200
+        id 1mY2vr-001nQS-R0; Wed, 06 Oct 2021 09:09:47 +0000
+Message-ID: <acc7e8fa-5049-83b4-20e3-21430c361019@samba.org>
+Date:   Wed, 6 Oct 2021 11:09:46 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
 Subject: Re: [PATCH] ksmbd: improve credits management
 Content-Language: en-US
+From:   Ralph Boehme <slow@samba.org>
 To:     Hyunchul Lee <hyc.lee@gmail.com>,
         Namjae Jeon <linkinjeon@kernel.org>
 Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
@@ -46,67 +47,69 @@ Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
 References: <20211005100026.250280-1-hyc.lee@gmail.com>
  <de0ecb81-0313-266e-cc5b-94ec40201141@samba.org>
  <CANFS6basCNTcN7Myz0bAd_LTXEji43HiqLE0B8McpaemUjSp8Q@mail.gmail.com>
-From:   Ralph Boehme <slow@samba.org>
-In-Reply-To: <CANFS6basCNTcN7Myz0bAd_LTXEji43HiqLE0B8McpaemUjSp8Q@mail.gmail.com>
+ <64519e7d-d82f-91f6-5c8c-ce9aa8935b30@samba.org>
+In-Reply-To: <64519e7d-d82f-91f6-5c8c-ce9aa8935b30@samba.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------JFzpnDdJzzAC5P4BbX0p7dPc"
+ boundary="------------lD0AqLLwRZxBr2RTCtJVyPey"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------JFzpnDdJzzAC5P4BbX0p7dPc
-Content-Type: multipart/mixed; boundary="------------gorU1g8rR7B1qQtuv0KFBeDI";
+--------------lD0AqLLwRZxBr2RTCtJVyPey
+Content-Type: multipart/mixed; boundary="------------aVu9zM8lwB8r5XkB2024KZh4";
  protected-headers="v1"
 From: Ralph Boehme <slow@samba.org>
 To: Hyunchul Lee <hyc.lee@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs <linux-cifs@vger.kernel.org>,
  Sergey Senozhatsky <senozhatsky@chromium.org>,
  Steve French <smfrench@gmail.com>
-Message-ID: <64519e7d-d82f-91f6-5c8c-ce9aa8935b30@samba.org>
+Message-ID: <acc7e8fa-5049-83b4-20e3-21430c361019@samba.org>
 Subject: Re: [PATCH] ksmbd: improve credits management
 References: <20211005100026.250280-1-hyc.lee@gmail.com>
  <de0ecb81-0313-266e-cc5b-94ec40201141@samba.org>
  <CANFS6basCNTcN7Myz0bAd_LTXEji43HiqLE0B8McpaemUjSp8Q@mail.gmail.com>
-In-Reply-To: <CANFS6basCNTcN7Myz0bAd_LTXEji43HiqLE0B8McpaemUjSp8Q@mail.gmail.com>
+ <64519e7d-d82f-91f6-5c8c-ce9aa8935b30@samba.org>
+In-Reply-To: <64519e7d-d82f-91f6-5c8c-ce9aa8935b30@samba.org>
 
---------------gorU1g8rR7B1qQtuv0KFBeDI
+--------------aVu9zM8lwB8r5XkB2024KZh4
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: base64
 
-QW0gMDYuMTAuMjEgdW0gMTA6NDMgc2NocmllYiBIeXVuY2h1bCBMZWU6DQo+IE9rYXksIEkg
-d2lsbCBkcm9wIHRoaXMgaW4gdGhlIHBhdGNoLiBBbmQgY291bGQgeW91IGVsYWJvcmF0ZQ0K
-PiBvbiB0aGUgc2l0dWF0aW9uIHRoYXQgY2xpZW50cyBjYXVzZSB0aGUgcHJvYmxlbT8NCg0K
-dGhlIGNsaWVudCB3aWxsIGp1c3Qgc3dhbXAgeW91IHdpdGggSU8gcmVxdWVzdHMgYW5kIHlv
-dSd2ZSBsb3N0IGNvbnRyb2wgDQpvdmVyIHRoZSBjcmVkaXR0aW5nIHdpbmRvdy4gSWlyYyBp
-biBTYW1iYSB0aGlzIHJlc3VsdGVkIGluIE9PTSBkdWUgdG8gDQp0aGUgbWFueSBidWZmZXIg
-YWxsb2NhdGlvbnMgZm9yIHRoZSBpbi1wcm9jZXNzIElPIHJlcXVlc3RzLg0KDQotc2xvdw0K
-DQotLSANClJhbHBoIEJvZWhtZSwgU2FtYmEgVGVhbSAgICAgICAgICAgICAgICAgaHR0cHM6
-Ly9zYW1iYS5vcmcvDQpTZXJOZXQgU2FtYmEgVGVhbSBMZWFkICAgICAgaHR0cHM6Ly9zZXJu
-ZXQuZGUvZW4vdGVhbS1zYW1iYQ0K
+QW0gMDYuMTAuMjEgdW0gMTA6NTAgc2NocmllYiBSYWxwaCBCb2VobWU6DQo+IEFtIDA2LjEw
+LjIxIHVtIDEwOjQzIHNjaHJpZWIgSHl1bmNodWwgTGVlOg0KPj4gT2theSwgSSB3aWxsIGRy
+b3AgdGhpcyBpbiB0aGUgcGF0Y2guIEFuZCBjb3VsZCB5b3UgZWxhYm9yYXRlDQo+PiBvbiB0
+aGUgc2l0dWF0aW9uIHRoYXQgY2xpZW50cyBjYXVzZSB0aGUgcHJvYmxlbT8NCj4gDQo+IHRo
+ZSBjbGllbnQgd2lsbCBqdXN0IHN3YW1wLi4uDQoNCm1vcmUgcHJlY2lzZWx5OiB0aGUgY2xp
+ZW50ICptYXkqIHN3YW1wIHlvdS4gSWlyYyB3ZSd2ZSBzZWVuIHRoaXMgd2l0aCBhIA0KY2xp
+ZW50IHdoZXJlIHRoZSAoaWlyYyBMaW51eCkgYXBwbGljYXRpb24gd2FzIHdyaXRpbmcgc29t
+ZSBkYXRhIHRoYXQgaXQgDQpnZW5lcmF0ZWQgdmVyeSBxdWlja2x5ICppbiBtZW1vcnkqLg0K
+DQotc2xvdw0KDQotLSANClJhbHBoIEJvZWhtZSwgU2FtYmEgVGVhbSAgICAgICAgICAgICAg
+ICAgaHR0cHM6Ly9zYW1iYS5vcmcvDQpTZXJOZXQgU2FtYmEgVGVhbSBMZWFkICAgICAgaHR0
+cHM6Ly9zZXJuZXQuZGUvZW4vdGVhbS1zYW1iYQ0K
 
---------------gorU1g8rR7B1qQtuv0KFBeDI--
+--------------aVu9zM8lwB8r5XkB2024KZh4--
 
---------------JFzpnDdJzzAC5P4BbX0p7dPc
+--------------lD0AqLLwRZxBr2RTCtJVyPey
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFdY2AFAwAAAAAACgkQqh6bcSY5nkZo
-EQ//ef3N96G9eCOnknEWVmaOqsTYvsfognzMkhomX7HtbC/l1LdGb471GTG7TcGBYp3mL+gy3Y5L
-xFxHcSY82nFCCcHad3t2u0/i+y/DDPhqzLT/9KXAV72RXAiSXi9NeAWTm6i9g/wDLsATIaTLe3Hm
-3G8EsRvYcxNfq2IQgevGeTWRXOVEn4NdMuZBS3V/PJ5wN6qlnqyC27RmHRmfd2XH8SWj/4+6X1DH
-pIx62W4+mceU4uIB/H36kQSw+F63c/k9NS10OES0R7Pabyhz70oQgLUM6NZ3lqMjGt0uMsvV0r36
-yhk4QdoDHgWxGfnpdkdq9Bfo0piqRiBgPUudlPQxIS8WGcuga2di+MA8FSXcySkJAnTdXPniFHyk
-vGvgYiXJ6aY64EVRhA3dMzM0YZ0EcUb6hQ9Ib2fzdpzcFf65FyTlB8DQfg4fKRUiOU0p37xjH5bu
-uDA8RoNYUTm8nN4hkjGYWoVEPaMYqUk5mSprLlRG5S73FSHS1iZssMFIf/snehHozcZVqk1dJvok
-MiNIVarwFpbE1AT0tt1uurakyK1ia7lQPAlglHwfH/bqoycSC0e4ym8QWChUSBe0/kCZWzPt5bl/
-ueT0ExZC2gMNv7Q5lL5uQKQU19uf/lgNjC4CKPqNk/AJ4wYpM5TnY45ZK1TFocjBNuru3xjZ6Zix
-zjw=
-=g2PT
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmFdZ9oFAwAAAAAACgkQqh6bcSY5nkYA
++w//QmHvJTYMkDwOxre82vFbWZ8US9/FMLP/a7IfVQ4hVQRXI+f0FNz1xC7aL7CVJOA/3jQv9ijg
+VrkHyeEhP0bMVkxt6V1bFu9d62Dkgiw+f92IJNIHDu6OH4eJkr9eAWCUwub90S5+3BOyVwPW1zbb
+i6vnh+6bd07WDU9aaw6KqMbMgVydNKX0pkuaiVVmUI6HN5FkKICFCeRCJPL8FzZ4aWdQBJ4Cbymj
+OuUyFvjpIwjjwsRVwSPTMWger3fxEPQW+67yOa9ghQ/fUQq1+1KdaGDp9FBdIQIES1QbAF7v22Z6
+kKFLdkLc0mnvTc2EDzjf+ymPTkh/sBFRr65I2nABSepdVJcQNi/tQUhAPApZEjuBMm2nlQin1/B0
+L1GdMWApGGjAt+wXgbU7XXjbWRa2u0cgkj7JqetopcsKbxVLHL+1c1m1tXVftxv+hqdpL/kY35yc
+vvF76jqH2X2TVgTF1ehkM32BtnXt3xxAZ/T+Yxj5f6bSs+R7CCvp8yMQbAGBx+qFyX6mHHHpio5e
+iZX6fEqpoBcQwA0dtAhaDWb60j74y0ndcgCcJtIkJmt6YZyKdd7ryBtLr+H9JtAmz0D/bcJWeN2g
+6CKsL468F+s4C8fRjCKV1HJrxa0VSIRbDyENQ8FYEOPbA3D/NHqECRC59Hmwy6dDe6q0dl1QL5NE
+uas=
+=BJ2F
 -----END PGP SIGNATURE-----
 
---------------JFzpnDdJzzAC5P4BbX0p7dPc--
+--------------lD0AqLLwRZxBr2RTCtJVyPey--
