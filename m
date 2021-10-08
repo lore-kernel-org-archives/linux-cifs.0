@@ -2,53 +2,104 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F30C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 Oct 2021 01:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44785C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Oct 2021 03:29:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4054860FE8
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 Oct 2021 01:59:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2007A60FC1
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Oct 2021 03:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234217AbhJHCBp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 7 Oct 2021 22:01:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58614 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233169AbhJHCBm (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 7 Oct 2021 22:01:42 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E2DE361039
-        for <linux-cifs@vger.kernel.org>; Fri,  8 Oct 2021 01:59:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633658387;
-        bh=DbS+P56iCeRryXc2+m9wNel10vnZza2iCp9TIKxr6vQ=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=igXAXMnHbunPsW2miiBfZa01HM7LeUdGpFnJIgK3GtbTjOoWLXdWYFQGGXhKogtfI
-         7CbR5uPAnbRfXW+4OZI64+eVdg1yeGN4JImjm5Hu2UtT5cWXP3QqOEStByDFY5lNDi
-         73hR3Q5B4AtkSgGYIWdp91xwmh/12Ef2mceGu3AzLiZMhjef5DYC1iDqyD+ypPoYE3
-         Z76zzMWAt9/L1QX46rAh6YuRtWmPqtA/ihU3+0ew2ezC+7ytJ0BcmlhJaObB66M7iY
-         P4YWmtrfltFeXNOJco7jxK0ha3mM5jEO2IXSITME3v7uv7TYRIdoQqiVgP7mHjZK4m
-         MAA4R0m5lPfnA==
-Received: by mail-oi1-f171.google.com with SMTP id s24so11698768oij.8
-        for <linux-cifs@vger.kernel.org>; Thu, 07 Oct 2021 18:59:47 -0700 (PDT)
-X-Gm-Message-State: AOAM533gG2+m7+35uMeVB9Bxi4+wm4zXWvqZc+hgB6f3kDIl83kQoxoP
-        /gaBOY4YP9WBFjRdJe+RmGyBujwKAcAgc4I9IRo=
-X-Google-Smtp-Source: ABdhPJx9xlW3YnsPnWlTZ3ss8WnoitNO2emm+I7Z9cTWVCmJVcD0Jj4YeztlmF6IXtz0y2ud1coOQmnyfHs+t+Mwv9Q=
-X-Received: by 2002:a05:6808:287:: with SMTP id z7mr5804112oic.8.1633658387354;
- Thu, 07 Oct 2021 18:59:47 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Thu, 7 Oct 2021 18:59:46 -0700 (PDT)
-In-Reply-To: <20211006161431.4638-1-ematsumiya@suse.de>
-References: <20211006161431.4638-1-ematsumiya@suse.de>
+        id S229559AbhJHDbe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 7 Oct 2021 23:31:34 -0400
+Received: from mail-pj1-f54.google.com ([209.85.216.54]:53855 "EHLO
+        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229501AbhJHDbe (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Oct 2021 23:31:34 -0400
+Received: by mail-pj1-f54.google.com with SMTP id ls18so6506062pjb.3
+        for <linux-cifs@vger.kernel.org>; Thu, 07 Oct 2021 20:29:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+REYJPyFGlgzJKB3AvckVAO1PJD5GKoE48TFB4TSQ/E=;
+        b=fAMnMgGsQe4GM0/H+jURHX+DAejwwkqwbSabDY5iNYV0u4VrLMZyJibh5Nli+pWwDM
+         BnPXPnPK6madIKNIt6COccZnKPGNcBt0naxWXNAqvF0AfNhAkaS/7/hg03hja0d8xNEE
+         RXZrOa4HoYUB0CmGPg8mRKmOnu9Thkuj01USS2Xyb6FE27RZ1+ADQln34OJQGZw7azkU
+         AbMY/8yJ4x6cKal9A3JkTbHtA8f19UqtBDevep57cHr0hWaK1khKeqOpfjSWy9VkXp0W
+         dU/P4LUiAd/cct4WBDugYKyqnUZsCuFhm5JLKGd2/6uPFDGCACTQMrHRIOCLN/t4Kt5b
+         9Baw==
+X-Gm-Message-State: AOAM530zhUy4qGZIB6/+1JiqUUX4Qp66amVaG72ki1gq8AgDp6BASDuP
+        h1UwDLinmj/tiUuzotjPKzBWhr1CRGmW0g==
+X-Google-Smtp-Source: ABdhPJxfkH7yAS1l30Wg7TqASG+3gHaluZluuXdY294WIui3UoA30xbS3sLUo6V9/gtl/4U0M1FY5g==
+X-Received: by 2002:a17:90a:4502:: with SMTP id u2mr9497985pjg.186.1633663779447;
+        Thu, 07 Oct 2021 20:29:39 -0700 (PDT)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id g3sm683615pgj.66.2021.10.07.20.29.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Oct 2021 20:29:39 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 8 Oct 2021 10:59:46 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_V7+QAwi8QpD6a5Z9zbqtrEw-ZEjk8cp=mZnwb7_HtHA@mail.gmail.com>
-Message-ID: <CAKYAXd_V7+QAwi8QpD6a5Z9zbqtrEw-ZEjk8cp=mZnwb7_HtHA@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd-tools: update names in logger
-To:     Enzo Matsumiya <ematsumiya@suse.de>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>,
+        Steve French <smfrench@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH v2] ksmbd: limit read/write/trans buffer size not to exceed MAX_STREAM_PROT_LEN
+Date:   Fri,  8 Oct 2021 12:29:31 +0900
+Message-Id: <20211008032931.60797-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-10-07 1:14 GMT+09:00, Enzo Matsumiya <ematsumiya@suse.de>:
-> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-Applied, Thanks for your patch:)
+ksmbd limit read/write/trans buffer size not to exceed
+maximum stream protocol length(0x00FFFFFF).
+
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Ralph Böhme <slow@samba.org>
+Cc: Hyunchul Lee <hyc.lee@gmail.com>
+Cc: Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ v2:
+  - change 8MB limitation to MAX_STREAM_PROT_LEN.
+
+ fs/ksmbd/smb2ops.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/fs/ksmbd/smb2ops.c b/fs/ksmbd/smb2ops.c
+index b06456eb587b..63289872da97 100644
+--- a/fs/ksmbd/smb2ops.c
++++ b/fs/ksmbd/smb2ops.c
+@@ -284,6 +284,7 @@ int init_smb3_11_server(struct ksmbd_conn *conn)
+ 
+ void init_smb2_max_read_size(unsigned int sz)
+ {
++	sz = min_t(u32, sz, MAX_STREAM_PROT_LEN);
+ 	smb21_server_values.max_read_size = sz;
+ 	smb30_server_values.max_read_size = sz;
+ 	smb302_server_values.max_read_size = sz;
+@@ -292,6 +293,7 @@ void init_smb2_max_read_size(unsigned int sz)
+ 
+ void init_smb2_max_write_size(unsigned int sz)
+ {
++	sz = min_t(u32, sz, MAX_STREAM_PROT_LEN);
+ 	smb21_server_values.max_write_size = sz;
+ 	smb30_server_values.max_write_size = sz;
+ 	smb302_server_values.max_write_size = sz;
+@@ -300,6 +302,7 @@ void init_smb2_max_write_size(unsigned int sz)
+ 
+ void init_smb2_max_trans_size(unsigned int sz)
+ {
++	sz = min_t(u32, sz, MAX_STREAM_PROT_LEN);
+ 	smb21_server_values.max_trans_size = sz;
+ 	smb30_server_values.max_trans_size = sz;
+ 	smb302_server_values.max_trans_size = sz;
+-- 
+2.25.1
+
