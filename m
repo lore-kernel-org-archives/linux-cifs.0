@@ -2,104 +2,65 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44785C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 Oct 2021 03:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 791F0C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Oct 2021 23:45:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2007A60FC1
-	for <linux-cifs@archiver.kernel.org>; Fri,  8 Oct 2021 03:29:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5803360F5E
+	for <linux-cifs@archiver.kernel.org>; Fri,  8 Oct 2021 23:45:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229559AbhJHDbe (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 7 Oct 2021 23:31:34 -0400
-Received: from mail-pj1-f54.google.com ([209.85.216.54]:53855 "EHLO
-        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbhJHDbe (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 7 Oct 2021 23:31:34 -0400
-Received: by mail-pj1-f54.google.com with SMTP id ls18so6506062pjb.3
-        for <linux-cifs@vger.kernel.org>; Thu, 07 Oct 2021 20:29:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+REYJPyFGlgzJKB3AvckVAO1PJD5GKoE48TFB4TSQ/E=;
-        b=fAMnMgGsQe4GM0/H+jURHX+DAejwwkqwbSabDY5iNYV0u4VrLMZyJibh5Nli+pWwDM
-         BnPXPnPK6madIKNIt6COccZnKPGNcBt0naxWXNAqvF0AfNhAkaS/7/hg03hja0d8xNEE
-         RXZrOa4HoYUB0CmGPg8mRKmOnu9Thkuj01USS2Xyb6FE27RZ1+ADQln34OJQGZw7azkU
-         AbMY/8yJ4x6cKal9A3JkTbHtA8f19UqtBDevep57cHr0hWaK1khKeqOpfjSWy9VkXp0W
-         dU/P4LUiAd/cct4WBDugYKyqnUZsCuFhm5JLKGd2/6uPFDGCACTQMrHRIOCLN/t4Kt5b
-         9Baw==
-X-Gm-Message-State: AOAM530zhUy4qGZIB6/+1JiqUUX4Qp66amVaG72ki1gq8AgDp6BASDuP
-        h1UwDLinmj/tiUuzotjPKzBWhr1CRGmW0g==
-X-Google-Smtp-Source: ABdhPJxfkH7yAS1l30Wg7TqASG+3gHaluZluuXdY294WIui3UoA30xbS3sLUo6V9/gtl/4U0M1FY5g==
-X-Received: by 2002:a17:90a:4502:: with SMTP id u2mr9497985pjg.186.1633663779447;
-        Thu, 07 Oct 2021 20:29:39 -0700 (PDT)
-Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id g3sm683615pgj.66.2021.10.07.20.29.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Oct 2021 20:29:39 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        =?UTF-8?q?Ralph=20B=C3=B6hme?= <slow@samba.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH v2] ksmbd: limit read/write/trans buffer size not to exceed MAX_STREAM_PROT_LEN
-Date:   Fri,  8 Oct 2021 12:29:31 +0900
-Message-Id: <20211008032931.60797-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        id S243810AbhJHXri (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 8 Oct 2021 19:47:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40610 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231964AbhJHXri (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 8 Oct 2021 19:47:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2529F60F5E
+        for <linux-cifs@vger.kernel.org>; Fri,  8 Oct 2021 23:45:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1633736742;
+        bh=zQxQN3FVxxVo6MjNF6iYC0bH7hHUEO6s6HZwUtuzeNA=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=FOnJAj1d4sdPEmY1egOtlmV0GbVJffm+ejyRsUBih1+/kr4fnavaR/mU3h9qo0mG3
+         rOWwb3gC+vsCaF57FN6RR35825qrstMjScD7gBQNbrd+v0Kn4E+J07gvMt0or4Rcdk
+         q2KGoKDxRVGvDEQ78cJ+lyxEDoXmQvViBCYkO7EbzVK3M+Czypii9romXdV29KlvdP
+         6XyuZS9hRyXML8SXOJHcvi2hEkPAQTu5hPw7PwcVxw3yWck3Tr9DnMHyem07VabGoC
+         ScGcmF/jpCWvBQ0So2tq1XRoX7uR27IwAX/chDmNO8iIYgb/YMbTSWzieQQwyxgnBd
+         8HKHuzwepvTJQ==
+Received: by mail-oi1-f170.google.com with SMTP id o83so8321073oif.4
+        for <linux-cifs@vger.kernel.org>; Fri, 08 Oct 2021 16:45:42 -0700 (PDT)
+X-Gm-Message-State: AOAM532IePyqcM8ZioRO1jQlB5OTRefYhdsxifnhyuUBUOMdBokpkok/
+        6HhbQpBU4zFy/ae26j+bw80MeZCrWJ13EJ8SKCM=
+X-Google-Smtp-Source: ABdhPJyMVRjX0JJb+7aRkOqbTvG7PuWWD/phvgceDojU4D9u10Iy3u/P8PDpuwxDPZ0xKHXmo103KrL8k1C4DRyS88M=
+X-Received: by 2002:a05:6808:64f:: with SMTP id z15mr17716235oih.65.1633736741499;
+ Fri, 08 Oct 2021 16:45:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Fri, 8 Oct 2021 16:45:40 -0700 (PDT)
+In-Reply-To: <20211007072658.352494-1-hyc.lee@gmail.com>
+References: <20211007072658.352494-1-hyc.lee@gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sat, 9 Oct 2021 08:45:40 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_AG_4wHNbuD8SQQvDQZH-iv5b93E9rrs+3PM+4t3TUSQ@mail.gmail.com>
+Message-ID: <CAKYAXd_AG_4wHNbuD8SQQvDQZH-iv5b93E9rrs+3PM+4t3TUSQ@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: improve credits management
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     linux-cifs@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>,
+        Ralph Boehme <slow@samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-ksmbd limit read/write/trans buffer size not to exceed
-maximum stream protocol length(0x00FFFFFF).
+2021-10-07 16:26 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> * Requests except READ, WRITE, IOCTL, INFO, QUERY
+> DIRECOTRY, CANCEL must consume one credit.
+> * If client's granted credits are insufficient,
+> refuse to handle requests.
+> * Windows server 2016 or later grant up to 8192
+> credits to clients at once.
+>
+> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Ralph Böhme <slow@samba.org>
-Cc: Hyunchul Lee <hyc.lee@gmail.com>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- v2:
-  - change 8MB limitation to MAX_STREAM_PROT_LEN.
-
- fs/ksmbd/smb2ops.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/fs/ksmbd/smb2ops.c b/fs/ksmbd/smb2ops.c
-index b06456eb587b..63289872da97 100644
---- a/fs/ksmbd/smb2ops.c
-+++ b/fs/ksmbd/smb2ops.c
-@@ -284,6 +284,7 @@ int init_smb3_11_server(struct ksmbd_conn *conn)
- 
- void init_smb2_max_read_size(unsigned int sz)
- {
-+	sz = min_t(u32, sz, MAX_STREAM_PROT_LEN);
- 	smb21_server_values.max_read_size = sz;
- 	smb30_server_values.max_read_size = sz;
- 	smb302_server_values.max_read_size = sz;
-@@ -292,6 +293,7 @@ void init_smb2_max_read_size(unsigned int sz)
- 
- void init_smb2_max_write_size(unsigned int sz)
- {
-+	sz = min_t(u32, sz, MAX_STREAM_PROT_LEN);
- 	smb21_server_values.max_write_size = sz;
- 	smb30_server_values.max_write_size = sz;
- 	smb302_server_values.max_write_size = sz;
-@@ -300,6 +302,7 @@ void init_smb2_max_write_size(unsigned int sz)
- 
- void init_smb2_max_trans_size(unsigned int sz)
- {
-+	sz = min_t(u32, sz, MAX_STREAM_PROT_LEN);
- 	smb21_server_values.max_trans_size = sz;
- 	smb30_server_values.max_trans_size = sz;
- 	smb302_server_values.max_trans_size = sz;
--- 
-2.25.1
-
+Thanks!
