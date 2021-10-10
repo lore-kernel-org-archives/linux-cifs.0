@@ -2,87 +2,84 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98323C4332F
-	for <linux-cifs@archiver.kernel.org>; Sun, 10 Oct 2021 01:12:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B29C433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 10 Oct 2021 13:21:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 733A260F57
-	for <linux-cifs@archiver.kernel.org>; Sun, 10 Oct 2021 01:12:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CF936109E
+	for <linux-cifs@archiver.kernel.org>; Sun, 10 Oct 2021 13:21:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229740AbhJJBOm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 9 Oct 2021 21:14:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49508 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229636AbhJJBOm (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sat, 9 Oct 2021 21:14:42 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 55FD660F4B
-        for <linux-cifs@vger.kernel.org>; Sun, 10 Oct 2021 01:12:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633828364;
-        bh=byZDhs1iVL7et711REfITfHTs2PyO3xr4vBNHY+SowQ=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=mdypyVOT8NzorjdEGd8abXYRHm9ijw7/11aoH7vrpfZJQDUN3kXIsmzXQCGlk+0cj
-         vdMIkT+1GpbQtf1j41o0sakEKe/EX1nScOT6scZ5T1Rdr9dLvN9WZtLABcOtf3WDY2
-         qkUbkW1k9GIFrTI3HTT4y6YmA/Wrypw8lb5W/9Hh/1u43Bs9ASN0yxQyb7Bf8Q3Mc4
-         V+WUALjqBeWExRKbyeFr3zc1DG0AGELxkQAjeSMdkYwneTRbeW9ud+eHQsHg0WF4Ln
-         nKEHDFn9+jpKvEnl4nKpuUD+eWTrZltj/JMV7SQgjMT5YOBx485++KbU20mta0QJxN
-         3i+pBT/QomRNg==
-Received: by mail-oi1-f175.google.com with SMTP id z11so19135606oih.1
-        for <linux-cifs@vger.kernel.org>; Sat, 09 Oct 2021 18:12:44 -0700 (PDT)
-X-Gm-Message-State: AOAM531bN/KYenveTeQRDFwbZd0lVqIrPl5jgqCXGhx3u1WlcAwP8DIi
-        VGauD3Q51iQXwcl+xPTjLvkVbYpIZnKm8o0eznc=
-X-Google-Smtp-Source: ABdhPJw5bt3dkubaXSg8lc2vHWBr1OIj9fepXRIvfBMcgZXVdKfQpHdK2ltRSowWdsDbhNAS0BR2ykBNxpi5OUr0SVw=
-X-Received: by 2002:aca:b5c3:: with SMTP id e186mr22428378oif.51.1633828363629;
- Sat, 09 Oct 2021 18:12:43 -0700 (PDT)
+        id S232730AbhJJNXo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 10 Oct 2021 09:23:44 -0400
+Received: from smtp13.smtpout.orange.fr ([80.12.242.135]:34279 "EHLO
+        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S232043AbhJJNXi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 10 Oct 2021 09:23:38 -0400
+Received: from pop-os.home ([90.126.248.220])
+        by mwinf5d78 with ME
+        id 4DMc2600C4m3Hzu03DMdYq; Sun, 10 Oct 2021 15:21:38 +0200
+X-ME-Helo: pop-os.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 10 Oct 2021 15:21:38 +0200
+X-ME-IP: 90.126.248.220
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     linkinjeon@kernel.org, senozhatsky@chromium.org, sfrench@samba.org,
+        hyc.lee@gmail.com
+Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: [PATCH] ksmbd: Remove redundant 'flush_workqueue()' calls
+Date:   Sun, 10 Oct 2021 15:21:35 +0200
+Message-Id: <bf5648ef0933536661e42cc73aa06722522d5862.1633872027.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Sat, 9 Oct 2021 18:12:43 -0700 (PDT)
-In-Reply-To: <CAH2r5mtcGY1Aomh1LHDs=gwL68TEEmD9Qzf17+4C34MpqHhuqw@mail.gmail.com>
-References: <20211009054903.9788-1-linkinjeon@kernel.org> <CAH2r5mtcGY1Aomh1LHDs=gwL68TEEmD9Qzf17+4C34MpqHhuqw@mail.gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sun, 10 Oct 2021 10:12:43 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9NKo3kX6e-=uMFwuXkYcYvhKgA=9wRA1KTzLf5oxObjQ@mail.gmail.com>
-Message-ID: <CAKYAXd9NKo3kX6e-=uMFwuXkYcYvhKgA=9wRA1KTzLf5oxObjQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd-tools: set a minimum character limit for password
-To:     Steve French <smfrench@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-10-10 0:12 GMT+09:00, Steve French <smfrench@gmail.com>:
-> Maybe make it configurable but default to 8 as minimum!
-Okay. I will check it.
+'destroy_workqueue()' already drains the queue before destroying it, so
+there is no need to flush it explicitly.
 
-Thanks!
->
-> On Sat, Oct 9, 2021, 00:49 Namjae Jeon <linkinjeon@kernel.org> wrote:
->
->> Set minimum password length with 8 characters by default to protect
->> passwords vulnerable.
->>
->> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
->> ---
->>  adduser/user_admin.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/adduser/user_admin.c b/adduser/user_admin.c
->> index 4e85915..36b9ad2 100644
->> --- a/adduser/user_admin.c
->> +++ b/adduser/user_admin.c
->> @@ -119,6 +119,11 @@ again:
->>                 goto again;
->>         }
->>
->> +       if (len <= 7) {
->> +               pr_err("Minimum password length is 8 characters\n");
->> +               goto again;
->> +       }
->> +
->>         *sz = len;
->>         free(pswd2);
->>         return pswd1;
->> --
->> 2.25.1
->>
->>
->
+Remove the redundant 'flush_workqueue()' calls.
+
+This was generated with coccinelle:
+
+@@
+expression E;
+@@
+- 	flush_workqueue(E);
+	destroy_workqueue(E);
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ fs/ksmbd/ksmbd_work.c     | 1 -
+ fs/ksmbd/transport_rdma.c | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/fs/ksmbd/ksmbd_work.c b/fs/ksmbd/ksmbd_work.c
+index fd58eb4809f6..14b9caebf7a4 100644
+--- a/fs/ksmbd/ksmbd_work.c
++++ b/fs/ksmbd/ksmbd_work.c
+@@ -69,7 +69,6 @@ int ksmbd_workqueue_init(void)
+ 
+ void ksmbd_workqueue_destroy(void)
+ {
+-	flush_workqueue(ksmbd_wq);
+ 	destroy_workqueue(ksmbd_wq);
+ 	ksmbd_wq = NULL;
+ }
+diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
+index 3a7fa23ba850..0fa7b9c17af3 100644
+--- a/fs/ksmbd/transport_rdma.c
++++ b/fs/ksmbd/transport_rdma.c
+@@ -2026,7 +2026,6 @@ int ksmbd_rdma_destroy(void)
+ 	smb_direct_listener.cm_id = NULL;
+ 
+ 	if (smb_direct_wq) {
+-		flush_workqueue(smb_direct_wq);
+ 		destroy_workqueue(smb_direct_wq);
+ 		smb_direct_wq = NULL;
+ 	}
+-- 
+2.30.2
+
