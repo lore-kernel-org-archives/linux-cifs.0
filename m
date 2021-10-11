@@ -2,112 +2,124 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB1E4C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 11 Oct 2021 12:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC05DC433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 Oct 2021 12:19:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 825B760EBB
-	for <linux-cifs@archiver.kernel.org>; Mon, 11 Oct 2021 12:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B80A461038
+	for <linux-cifs@archiver.kernel.org>; Mon, 11 Oct 2021 12:19:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235021AbhJKMQY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 11 Oct 2021 08:16:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41124 "EHLO
+        id S235214AbhJKMVp (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 11 Oct 2021 08:21:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234961AbhJKMQX (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 11 Oct 2021 08:16:23 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9487C061570
-        for <linux-cifs@vger.kernel.org>; Mon, 11 Oct 2021 05:14:23 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id k23-20020a17090a591700b001976d2db364so13316956pji.2
-        for <linux-cifs@vger.kernel.org>; Mon, 11 Oct 2021 05:14:23 -0700 (PDT)
+        with ESMTP id S234762AbhJKMVo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 11 Oct 2021 08:21:44 -0400
+Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A38D2C061570;
+        Mon, 11 Oct 2021 05:19:44 -0700 (PDT)
+Received: by mail-ua1-x932.google.com with SMTP id h4so12406032uaw.1;
+        Mon, 11 Oct 2021 05:19:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CX+u+L0X7T6ynmX3V3xF6RZtr261ahDcU71E36By+HA=;
-        b=feWgGp2uzM79+qYTUQA2bvCv3G8M0PwhE7IzC/7PIABwk4nCA2MJZmosSn6MkAAQxD
-         u5MvbGkqOkytUDt59eaE3O+DU5KRz4DR54FS+aIo7YbNG5dJof12JOxk3DTChGisa0Yi
-         x/etctViwatSVmWqQFc61Symgb5JfH3Bwb1+l2KQIk6E/ionELAYXwABk+MeLICtixSM
-         NVQ675de32Eu/uPLiwk7knZjH/zSv3WwjNzOc10VePuVmJyPGYGBS9LqZ4FDdZDmdhjF
-         EpnrVu1fKLYmAw/qaM9QW73O4EcR3fJgvezxXE9GnNeOZotcNy22pTTDnq8bPtxp0wB2
-         Z+IQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=GmDig8uR6zWhf7zrT1U+cYAgHxtWyD/idN3V+pqxfVE=;
+        b=UKRDw1MY9529cio6+Ud/0HXNC1CG9Em4E9iVWUVEuHPLRmniv6VpVhtIcYk2eDo8W5
+         sZ2p3tVf/pDmEpWzKV6OLBGzUHTBvQUwtGbwCAkzCcyc4ix2t+du4cQXDgJN4oi827E5
+         WftwthEpoSIoQXwxWcrVD/2YsVm1RYrsqkiHtBrVO4dSEcm15wPuHNG8C80u2u7SYtK9
+         jJcaCa3dU1gZ8bzgC1jHRpff/2bvLp2eNqqqd1oCW0OSdWSrvJJd5gOMUbM8VD+LYDiI
+         MzHOJzA/MfP5v7YKH0545v39rjyueOvV0Ben1oBh6HtQtxoQ4Lp6VUsivr661bgnKrKY
+         o8Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CX+u+L0X7T6ynmX3V3xF6RZtr261ahDcU71E36By+HA=;
-        b=creCxaZdHQQb7CvXD+eUCWjxrifq/cy/WJ8a5ZKoYSXHfGCfRJeeqjVaQRnE1sIOCo
-         I4kYByVliHnpzkXZWMxPgq0bO/QqrwvDqCyO2ZbtQPi9zTCsThVfaae8P2pBTV2m9fwh
-         5a9Ci2fE0/WtvnPRmes3H5HbAl61G/9V5YPyn+VoPnfdQVHOA4gjlqq6b2qoFb5ZOlcv
-         xTZQjRT0zhtYCTt6UMKkk42uMO/3XlmrMgbQHxjSMOep8yAcfEOZde74Pa0exM6hAjSS
-         o0NsPiJtP2rEvBuBAGLs4A7/Q8YdpEbbY8r7gO+pxAJp74X5wgpKvKZeoPAV+fLGKyST
-         KA1Q==
-X-Gm-Message-State: AOAM532jCLE7tjU/D1FLpCJGvtpKjGgMuITUhXQLKAyZqhNLzUmHbeeA
-        aRVKWyFApUOjhmDyyKT2DSdfzkvbz4URfu2u
-X-Google-Smtp-Source: ABdhPJwVHVmTLG1TtoPQun1l+B1dtdq8n2beqNR3wbZnW+okyo478tbsHzvnUTgZhv0IkFaUI9SgrA==
-X-Received: by 2002:a17:902:650c:b0:13d:baac:1da5 with SMTP id b12-20020a170902650c00b0013dbaac1da5mr24463964plk.20.1633954461776;
-        Mon, 11 Oct 2021 05:14:21 -0700 (PDT)
-Received: from localhost.localdomain ([125.177.232.58])
-        by smtp.googlemail.com with ESMTPSA id x17sm7026486pfa.209.2021.10.11.05.14.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Oct 2021 05:14:21 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=GmDig8uR6zWhf7zrT1U+cYAgHxtWyD/idN3V+pqxfVE=;
+        b=4Yc+BYFTK9q65nSHIovogE30CAZKAN/QuWQnvon5VfThY4Njc04KcraMueNNEK2rjI
+         wBfu9jdb7obf9rdVPPymnFRSzJABoHGssah8RhFfsnxWJrBXKnjS88mE/MJuwB03Jz6E
+         5UHaVtCAW4yGAd9IBlMJy1bGPYJosYahW80X/pSnrvx1UMVlEO7pApwymbK7CBhuWTPC
+         4SMiU/+sgmcOseOu9k3dvyCF3IlGjWTNe09Vp4N8ik1RqBiht1G84grIVC9FVpGuFGqJ
+         8FNl98crEMLjpu9P9aVzWAOj2sWAzp3U0D/5q9zolGAA9nd9p26oUYwk71N6wtz1pj1J
+         vSZw==
+X-Gm-Message-State: AOAM5319rZN3gXSGNp43qySWLw8xfX+C5YNDm9RkMWV9NqBFh8cCDfpz
+        ITFjhKFbYHHhfn/+wivl1FAcRGnmV94A7xgPIjY=
+X-Google-Smtp-Source: ABdhPJwuowsev0gau00Zx+r18LA5VdDlSrEUHqHB+mlJ6Cd4KwPc0ry6MBaEzvgjd0rJoW3AGvWjSAwRulhgnPYFBEk=
+X-Received: by 2002:a67:ca96:: with SMTP id a22mr9059095vsl.44.1633954783838;
+ Mon, 11 Oct 2021 05:19:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <bf5648ef0933536661e42cc73aa06722522d5862.1633872027.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <bf5648ef0933536661e42cc73aa06722522d5862.1633872027.git.christophe.jaillet@wanadoo.fr>
 From:   Hyunchul Lee <hyc.lee@gmail.com>
-To:     linux-cifs@vger.kernel.org
+Date:   Mon, 11 Oct 2021 21:19:32 +0900
+Message-ID: <CANFS6bY-BOKVzDSPSnKOJRxn8dkW+V+xKy0JR_WtfHoiJV4CxA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: Remove redundant 'flush_workqueue()' calls
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>,
-        Ralph Boehme <slow@samba.org>, Hyunchul Lee <hyc.lee@gmail.com>
-Subject: [PATCH] ksmbd: add buffer validation for smb direct
-Date:   Mon, 11 Oct 2021 21:14:04 +0900
-Message-Id: <20211011121404.26392-1-hyc.lee@gmail.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Steve French <sfrench@samba.org>,
+        linux-cifs <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add buffer validation for smb direct.
+Acked-by: Hyunchul Lee <hyc.lee@gmail.com>
 
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
----
- fs/ksmbd/transport_rdma.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+2021=EB=85=84 10=EC=9B=94 10=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 10:29,=
+ Christophe JAILLET
+<christophe.jaillet@wanadoo.fr>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> 'destroy_workqueue()' already drains the queue before destroying it, so
+> there is no need to flush it explicitly.
+>
+> Remove the redundant 'flush_workqueue()' calls.
+>
+> This was generated with coccinelle:
+>
+> @@
+> expression E;
+> @@
+> -       flush_workqueue(E);
+>         destroy_workqueue(E);
+>
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+>  fs/ksmbd/ksmbd_work.c     | 1 -
+>  fs/ksmbd/transport_rdma.c | 1 -
+>  2 files changed, 2 deletions(-)
+>
+> diff --git a/fs/ksmbd/ksmbd_work.c b/fs/ksmbd/ksmbd_work.c
+> index fd58eb4809f6..14b9caebf7a4 100644
+> --- a/fs/ksmbd/ksmbd_work.c
+> +++ b/fs/ksmbd/ksmbd_work.c
+> @@ -69,7 +69,6 @@ int ksmbd_workqueue_init(void)
+>
+>  void ksmbd_workqueue_destroy(void)
+>  {
+> -       flush_workqueue(ksmbd_wq);
+>         destroy_workqueue(ksmbd_wq);
+>         ksmbd_wq =3D NULL;
+>  }
+> diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
+> index 3a7fa23ba850..0fa7b9c17af3 100644
+> --- a/fs/ksmbd/transport_rdma.c
+> +++ b/fs/ksmbd/transport_rdma.c
+> @@ -2026,7 +2026,6 @@ int ksmbd_rdma_destroy(void)
+>         smb_direct_listener.cm_id =3D NULL;
+>
+>         if (smb_direct_wq) {
+> -               flush_workqueue(smb_direct_wq);
+>                 destroy_workqueue(smb_direct_wq);
+>                 smb_direct_wq =3D NULL;
+>         }
+> --
+> 2.30.2
+>
 
-diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-index 3a7fa23ba850..18f50e06ad15 100644
---- a/fs/ksmbd/transport_rdma.c
-+++ b/fs/ksmbd/transport_rdma.c
-@@ -549,6 +549,10 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 
- 	switch (recvmsg->type) {
- 	case SMB_DIRECT_MSG_NEGOTIATE_REQ:
-+		if (wc->byte_len < sizeof(struct smb_direct_negotiate_req)) {
-+			put_empty_recvmsg(t, recvmsg);
-+			return;
-+		}
- 		t->negotiation_requested = true;
- 		t->full_packet_received = true;
- 		wake_up_interruptible(&t->wait_status);
-@@ -556,9 +560,18 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 	case SMB_DIRECT_MSG_DATA_TRANSFER: {
- 		struct smb_direct_data_transfer *data_transfer =
- 			(struct smb_direct_data_transfer *)recvmsg->packet;
--		int data_length = le32_to_cpu(data_transfer->data_length);
-+		int data_length;
- 		int avail_recvmsg_count, receive_credits;
- 
-+		if (wc->byte_len < offsetof(struct smb_direct_data_transfer, padding) ||
-+		    (le32_to_cpu(data_transfer->data_length) > 0 &&
-+		     wc->byte_len < sizeof(struct smb_direct_data_transfer) +
-+		     le32_to_cpu(data_transfer->data_length))) {
-+			put_empty_recvmsg(t, recvmsg);
-+			return;
-+		}
-+
-+		data_length = le32_to_cpu(data_transfer->data_length);
- 		if (data_length) {
- 			if (t->full_packet_received)
- 				recvmsg->first_segment = true;
--- 
-2.25.1
 
+--=20
+Thanks,
+Hyunchul
