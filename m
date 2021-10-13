@@ -2,145 +2,208 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1C1EC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Oct 2021 23:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08019C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 08:08:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B39D60555
-	for <linux-cifs@archiver.kernel.org>; Tue, 12 Oct 2021 23:10:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE2A260FDA
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 08:08:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233627AbhJLXMP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 12 Oct 2021 19:12:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37952 "EHLO
+        id S233231AbhJMIKy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 Oct 2021 04:10:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbhJLXMP (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 12 Oct 2021 19:12:15 -0400
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54290C061570
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Oct 2021 16:10:13 -0700 (PDT)
-Received: by mail-vk1-xa33.google.com with SMTP id s137so419170vke.11
-        for <linux-cifs@vger.kernel.org>; Tue, 12 Oct 2021 16:10:13 -0700 (PDT)
+        with ESMTP id S233096AbhJMIKy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Oct 2021 04:10:54 -0400
+Received: from mail-ua1-x936.google.com (mail-ua1-x936.google.com [IPv6:2607:f8b0:4864:20::936])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85396C061570
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Oct 2021 01:08:50 -0700 (PDT)
+Received: by mail-ua1-x936.google.com with SMTP id h19so2834207uax.5
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Oct 2021 01:08:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=+tYe6eaBIigDzWYfuy9l9zxJY/O0R3MYg6R12XCfM5E=;
-        b=Qdw1HhZ8wFOP2MEDeGO6ulocZ4sMwqS7OooCO5WPYnWaNYeCxiMfxbb1sNcyuMqLtl
-         1K0ECoBAUTFLsYwifOqfgwq+sjpNeXBPMsIt840VjGrMVqeKrZln66asc42vYaS+2qaV
-         Odqo/+i6Ch1c9QPRWGJSIx07slgTC9kQnaz6HMXXOpcP7omWL7KPagGgC5hv2ohxgFmA
-         Jgvug9QUTUiG2aw2cT5HXmQYY301GfvRqpoDAKJEl5AQKBlePwTMydgvnfT8+PsCjXoH
-         aa819zEgmWFAFDjkVwRYZo2PCIpuUiwq/do/53rgETQobE6XB9hUiTENiiL2UziLIvSO
-         bMPQ==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=86xTQSo/pKY2BTMt8+IdJQd+Y2AqHXA66quWI//azE4=;
+        b=Er+KTcdzH2wQnXcdcChopNOdkwwlFABRioBDCL+FRS6hU52OsL9oZYTGNpx6rYDUsL
+         4sgCWlEhrEIZZ8dQu4tpCipVWCYdKCWi7HcPNfclxKRlODqa8zXWnobYUosOqGc3riq2
+         KthU+NQ4ArNzHNUSvB4gT5B3yygoG6AGl4bRzTIH7vY+oBYgfAJGJMtUvYVdYqHprgvd
+         2tW+Dkw16bKoOV+fz4HJ3zeB/lf/Ksi/mKI+XEMiN5h8JStLNOf7WGRkhbrkptOkA1CI
+         KiPaAlHkcctMOxjQKCkx2Crs1M2FNxEuVOvvnxIDHYKWQFMHbJsbmBEDk3vEGF55XfmS
+         FZ6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=+tYe6eaBIigDzWYfuy9l9zxJY/O0R3MYg6R12XCfM5E=;
-        b=ThUuPDnDi6xXTPlOKwudJaK2dqtUAzKguKHGuwONa75vhgfOOhP2/d89pvC4YxSDKB
-         3YOa2DsB0cOFROB22xB431qTGTweJHNNmWrk4y1NTda1YgjnHpy5l8nxOohB3oQRBQ7m
-         yYcGVR31kTIu15D9m7OXSuhQmxevATxNdsP9QxhIM6/5ZBzqT5Y/Uvi3SnheJ/9rnJWu
-         fLV6hKudJGqTw7/2jCirnfZSeP7yRkz34DP3aHIp8jUXqPh8MXP42B4TvvLdiPv7joix
-         4B6OqRyEaSwy/kL+GgA655/v29BAV2pvpYj5ZIH1eynEcSc25jzleLqGI4zUh2PN6CKO
-         EDWA==
-X-Gm-Message-State: AOAM530rHjlnYkUsdqKg7l0miHSDIa5N4a4QM5pPesnp0Ty3EI0dUvH1
-        1fZNdzwZcEJDpAylAGFfohZJ+CPr8jwAC9oedC0=
-X-Google-Smtp-Source: ABdhPJyXpnFj+Y4u7S5LbcfRnkn+knh4jxY0XRG9uIt2UrtCj+kRnrv4NH52T8id41CX8hK/kWewlvkmnzAeD8nKyA0=
-X-Received: by 2002:a67:ca96:: with SMTP id a22mr21360016vsl.44.1634080212428;
- Tue, 12 Oct 2021 16:10:12 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=86xTQSo/pKY2BTMt8+IdJQd+Y2AqHXA66quWI//azE4=;
+        b=mpnJ2x7CduNbE2g49VWNcb0zGUomBStP8c1MWcy151dSDftY27F/I7pQmy5SWV27KU
+         MVnQ/Sa1clA5XBCwHaUSxSrZA7/IbNIFvApuTSSM3ASGU/cD5XsOOwfFuiTWxxM7oacr
+         t42/SQbZ2LAovMErmS6yk6hwAXNCv/JQuw/5oLHpg0OMHUqi5sEUgYKPDMxIFyPDX0x8
+         +3pr2HVdVIMRtkwFoTnev3Y7Y39AuHHpgvQed5EDadxf8K2vVPTd3mG0noNyKePaZK5S
+         v2QBBg9nS4QmjG/40EqfPcxf7/LfRGTHF98JG6yn4H7TpS3oSKD+GYE4Zeki+WDGwwOi
+         SAPQ==
+X-Gm-Message-State: AOAM530LamLiFQNH3QHMY88tbLKCZsdJ/dY2z/NI8FQc7KVBrIGSWNUH
+        kU7DWcrfp6FNCI7Cp5oKadDxKevpMt+jYsku1ibacDUlcds=
+X-Google-Smtp-Source: ABdhPJz9vSJtsd/HqI4rzrUFgiwHm9gF53Y7KyZjMJwnvx/4cuGpsJ9uOL7SNqk8dPLBW3ReVoZwnOTelor29xLxJu0=
+X-Received: by 2002:ab0:29da:: with SMTP id i26mr27586691uaq.129.1634112529486;
+ Wed, 13 Oct 2021 01:08:49 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211011121404.26392-1-hyc.lee@gmail.com> <CAKYAXd_5a7As-g+YBZve76bgyp=-axQyHt67d-B0Zy3EcyShJQ@mail.gmail.com>
-In-Reply-To: <CAKYAXd_5a7As-g+YBZve76bgyp=-axQyHt67d-B0Zy3EcyShJQ@mail.gmail.com>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Wed, 13 Oct 2021 08:10:01 +0900
-Message-ID: <CANFS6bZv6Qds+F8pVXREfpMNzVKf9azrXCpjL4EK7_tM_WSeLw@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: add buffer validation for smb direct
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>,
-        Ralph Boehme <slow@samba.org>
+From:   "Diederick C. Niehorster" <dcnieho@gmail.com>
+Date:   Wed, 13 Oct 2021 10:08:31 +0200
+Message-ID: <CABcAi1gfBefYh+2Qok5Z-=05TVGkgRMkog4HG4Pa_0+H7A22aw@mail.gmail.com>
+Subject: [question] how to set up SMB direct connection with Windows server
+To:     linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021=EB=85=84 10=EC=9B=94 12=EC=9D=BC (=ED=99=94) =EC=98=A4=ED=9B=84 5:01, =
-Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
-> 2021-10-11 21:14 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> > Add buffer validation for smb direct.
-> >
-> > Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-> > ---
-> >  fs/ksmbd/transport_rdma.c | 15 ++++++++++++++-
-> >  1 file changed, 14 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-> > index 3a7fa23ba850..18f50e06ad15 100644
-> > --- a/fs/ksmbd/transport_rdma.c
-> > +++ b/fs/ksmbd/transport_rdma.c
-> > @@ -549,6 +549,10 @@ static void recv_done(struct ib_cq *cq, struct ib_=
-wc
-> > *wc)
-> >
-> >       switch (recvmsg->type) {
-> >       case SMB_DIRECT_MSG_NEGOTIATE_REQ:
-> > +             if (wc->byte_len < sizeof(struct smb_direct_negotiate_req=
-)) {
-> > +                     put_empty_recvmsg(t, recvmsg);
-> > +                     return;
-> > +             }
-> >               t->negotiation_requested =3D true;
-> >               t->full_packet_received =3D true;
-> >               wake_up_interruptible(&t->wait_status);
-> > @@ -556,9 +560,18 @@ static void recv_done(struct ib_cq *cq, struct ib_=
-wc
-> > *wc)
-> >       case SMB_DIRECT_MSG_DATA_TRANSFER: {
-> >               struct smb_direct_data_transfer *data_transfer =3D
-> >                       (struct smb_direct_data_transfer *)recvmsg->packe=
-t;
-> > -             int data_length =3D le32_to_cpu(data_transfer->data_lengt=
-h);
-> > +             int data_length;
->                 int data_length =3D le32_to_cpu(data_transfer->data_lengt=
-h);
->
-> >               int avail_recvmsg_count, receive_credits;
-> >
-> > +             if (wc->byte_len < offsetof(struct smb_direct_data_transf=
-er, padding) ||
-> > +                 (le32_to_cpu(data_transfer->data_length) > 0 &&
-> > +                  wc->byte_len < sizeof(struct smb_direct_data_transfe=
-r) +
-> > +                  le32_to_cpu(data_transfer->data_length))) {
-> 32bit overflow is possible here?
+Hello,
 
-Yes, type casting is needed.
+I am running latest firmware on a QLogic/Cavium/Marvell QL41112HLRJ,
+and inbox Linux drivers. I'm using Ubuntu 21.04, kernel
+5.11.0-37-generic.
 
->
-> > +                     put_empty_recvmsg(t, recvmsg);
-> > +                     return;
-> > +             }
-> > +
-> > +             data_length =3D le32_to_cpu(data_transfer->data_length);
-> this can be moved to the above to avoid redundant le conversion.
+I am trying to connect to an SMB share on a Windows Server 2019
+machine from the Ubuntu machine, but am unable to get an RDMA
+connection going. After having recompiled the kernel with
+CONFIG_CIFS_SMB_DIRECT=y (default is n), trying to connect with
+$ sudo mount -t cifs --verbose -o
+rdma,multichannel,vers=3.1.1,username=***,password=***
+//10.0.1.45/scratch /mnt/test
+i get:
 
-Okay, I will move this.
-Thank you for your comments.
+$ dmesg:
+[ 1484.306940] CIFS: Attempting to mount \\10.0.1.45\scratch
+[ 1484.310637] CIFS: VFS: _smbd_get_connection:1556 warning: device
+max_send_sge = 4 too small
+[ 1484.310647] CIFS: VFS: _smbd_get_connection:1559 Queue Pair creation may fail
+[ 1484.310651] CIFS: VFS: _smbd_get_connection:1562 warning: device
+max_recv_sge = 4 too small
+[ 1484.310655] CIFS: VFS: _smbd_get_connection:1565 Queue Pair creation may fail
+[ 1484.310793] [qedr_check_qp_attrs:1230(qedr0)]create qp: unsupported
+send_sge=0x10 requested (max_send_sge=0x4)
+[ 1484.310799] CIFS: VFS: _smbd_get_connection:1602 rdma_create_qp failed -22
 
->
-> Thanks!
-> >               if (data_length) {
-> >                       if (t->full_packet_received)
-> >                               recvmsg->first_segment =3D true;
-> > --
-> > 2.25.1
-> >
-> >
+Is there a way i can increase this max_send_sge under Linux, or is
+there some other (e.g. cifs) configuration i should do? SMB Direct
+works well Windows Server -> Windows Server.
 
+Thanks and all the best,
+Dee
 
+Further info that may be relevant:
 
---=20
-Thanks,
-Hyunchul
+$ dmesg | grep qed
+[   1.408266] QLogic FastLinQ 4xxxx Core Module qed 8.37.0.20
+[   1.416589] qede_init: QLogic FastLinQ 4xxxx Ethernet Driver qede 8.37.0.20
+[   1.768448] qede 0000:19:00.0: no suspend buffer for PTM
+[   2.061021] qede 19:00.00: Storm FW 8.42.2.0, Management FW
+8.55.43.0 [MBI 8.55.24] [eth0]
+[   2.148912] qede 19:00.01: Storm FW 8.42.2.0, Management FW
+8.55.43.0 [MBI 8.55.24] [eth1]
+[   2.157843] qede 0000:19:00.0 enp25s0f0: renamed from eth0
+[   2.188371] qede 0000:19:00.1 enp25s0f1: renamed from eth1
+[   8.917308] [qede_link_update:2495(enp25s0f0)]Link is up
+[   8.947363] [qede_link_update:2495(enp25s0f1)]Link is up
+[ 1481.149961] qedr: discovered and registered 2 RDMA funcs
+
+$ lsmod | grep qed
+qedr 110592 0
+ib_uverbs 151552 2 rdma_ucm,qedr
+ib_core 364544 6 rdma_cm,iw_cm,rdma_ucm,ib_uverbs,qedr,ib_cm
+qede 151552 1 qedr
+qed 700416 2 qede,qedr
+crc8 16384 1 qed
+
+$ mount.cifs -V
+mount.cifs version: 6.11
+
+$ ibv_devinfo -d qedr0 -v
+hca_id:   qedr0
+   transport:         iWARP (1)
+   fw_ver:            8.42.2.0
+   node_guid:         f6e9:d4ff:fe73:6fec
+   sys_image_guid:         f6e9:d4ff:fe73:6fec
+   vendor_id:         0x1077
+   vendor_part_id:         32880
+   hw_ver:            0x0
+   phys_port_cnt:         1
+   max_mr_size:         0x10000000000
+   page_size_cap:         0xfffff000
+   max_qp:            7936
+   max_qp_wr:         32767
+   device_cap_flags:      0x00209080
+               CURR_QP_STATE_MOD
+               RC_RNR_NAK_GEN
+               MEM_MGT_EXTENSIONS
+               Unknown flags: 0x8000
+   max_sge:         4
+   max_sge_rd:         4
+   max_cq:            7936
+   max_cqe:         8388480
+   max_mr:            131070
+   max_pd:            65536
+   max_qp_rd_atom:         32
+   max_ee_rd_atom:         0
+   max_res_rd_atom:      0
+   max_qp_init_rd_atom:      32
+   max_ee_init_rd_atom:      0
+   atomic_cap:         ATOMIC_GLOB (2)
+   max_ee:            0
+   max_rdd:         0
+   max_mw:            0
+   max_raw_ipv6_qp:      0
+   max_raw_ethy_qp:      0
+   max_mcast_grp:         0
+   max_mcast_qp_attach:      0
+   max_total_mcast_qp_attach:   0
+   max_ah:            8192
+   max_fmr:         0
+   max_srq:         8192
+   max_srq_wr:         32767
+   max_srq_sge:         0
+   max_pkeys:         0
+   local_ca_ack_delay:      15
+   general_odp_caps:
+   rc_odp_caps:
+               NO SUPPORT
+   uc_odp_caps:
+               NO SUPPORT
+   ud_odp_caps:
+               NO SUPPORT
+   xrc_odp_caps:
+               NO SUPPORT
+   completion_timestamp_mask not supported
+   core clock not supported
+   device_cap_flags_ex:      0x209080
+   tso_caps:
+      max_tso:         0
+   rss_caps:
+      max_rwq_indirection_tables:         0
+      max_rwq_indirection_table_size:         0
+      rx_hash_function:            0x0
+      rx_hash_fields_mask:            0x0
+   max_wq_type_rq:         0
+   packet_pacing_caps:
+      qp_rate_limit_min:   0kbps
+      qp_rate_limit_max:   0kbps
+   tag matching not supported
+      port:   1
+         state:         PORT_ACTIVE (4)
+         max_mtu:      4096 (5)
+         active_mtu:      1024 (3)
+         sm_lid:         0
+         port_lid:      0
+         port_lmc:      0x00
+         link_layer:      Ethernet
+         max_msg_sz:      0x80000000
+         port_cap_flags:      0x04000000
+         port_cap_flags2:   0x0000
+         max_vl_num:      8 (4)
+         bad_pkey_cntr:      0x0
+         qkey_viol_cntr:      0x0
+         sm_sl:         0
+         pkey_tbl_len:      0
+         gid_tbl_len:      1
+         subnet_timeout:      0
+         init_type_reply:   0
+         active_width:      1X (1)
+         active_speed:      10.0 Gbps (4)
