@@ -2,186 +2,96 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35009C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 08:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4119C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 16:18:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E26361053
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 08:44:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCF3160D42
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 16:18:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229644AbhJMIqg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 Oct 2021 04:46:36 -0400
-Received: from mail-pj1-f50.google.com ([209.85.216.50]:52890 "EHLO
-        mail-pj1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233400AbhJMIqd (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Oct 2021 04:46:33 -0400
-Received: by mail-pj1-f50.google.com with SMTP id oa4so1659990pjb.2
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Oct 2021 01:44:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lI9jQrBfRsnWfyp2k7WbB7rQukSCScdfFndqD8TYlxM=;
-        b=hn3moPPLoycQN6MZpzU7GZbxZmZzl5dzTZrj2uWaQjlXy4f+1dGNw1EVPLSk9tdEcq
-         9RLwf1lBUBs78odQCK1ENxlTNTbIZetMVSwL8wyJwnApKCpSlOaSD/h/ERbPKGphhpjG
-         UJx9qAfRVErbxvgWKSz+kUgnaaxWeQjRGL9diBCAGhYJnoC1TtdtqYbfd5mg2Y+lXY6l
-         0CdxVbo/1/Lw6pTtL0NPVO0e3MTm45yzZgv8e8VpwORZXsE2JwsYmwN8HPjgSPPar906
-         Pz99oGTJNOKaITuxYGJGyirZw3W4QSjXajjrtEVwekaWcwdsdnZEgmfDdx35d8ao/k6i
-         wfnA==
-X-Gm-Message-State: AOAM533ibyWzhNegm3SHetQtRSnSQ0fGGG7NuwPQ5ps815m39H7xEXMW
-        GjLxVDxAIsZzYzc33gxYq4ReG6bPHRYGuQ==
-X-Google-Smtp-Source: ABdhPJwzc42xe/2KxanYnhvpOKeJKjwZJzwElRdDZt8wv0s2wrVJ2XM5j92OF1aPcy0zUXaPdX2kvg==
-X-Received: by 2002:a17:90b:3a88:: with SMTP id om8mr11080162pjb.164.1634114669610;
-        Wed, 13 Oct 2021 01:44:29 -0700 (PDT)
-Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id s2sm5480563pjs.56.2021.10.13.01.44.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 01:44:29 -0700 (PDT)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: throttle session setup failures to avoid dictionary attacks
-Date:   Wed, 13 Oct 2021 17:44:21 +0900
-Message-Id: <20211013084421.22608-1-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        id S233812AbhJMQUn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 Oct 2021 12:20:43 -0400
+Received: from smtp-out2.suse.de ([195.135.220.29]:37222 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235372AbhJMQUc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Oct 2021 12:20:32 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 615441FEFC;
+        Wed, 13 Oct 2021 16:18:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1634141908; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0BOJPdFDTAkL0wTqXMiDKT3k23y8wxMbldPzgicVkiY=;
+        b=vmKZTmnAkUZkcTyjnqYoDYEd9b0ZzwiqeDdtdCGRDH+iJPs33qphxbnQ0q8VHvQEMOn6j+
+        Ooha1LK6R689QDhkMwt0zCLxxXAMV+Q0Qu9jX8j1A6e8El9hHzL2Jeuqx0hUf1tQ+FFk99
+        kaW0R7/ylU6IjJ1W1hg0m7yiwbn5/eg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1634141908;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0BOJPdFDTAkL0wTqXMiDKT3k23y8wxMbldPzgicVkiY=;
+        b=5pU9TIF9159mf4vAXE8Zj/maxyMeyGUip9BFQEjM0zx84Ecm+VRZ5qUIwMDrwP0UJiBaPF
+        vqyXAh6TqNw2z7Cg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E66F413ED0;
+        Wed, 13 Oct 2021 16:18:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 3uC4K9MGZ2HGEQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Wed, 13 Oct 2021 16:18:27 +0000
+Date:   Wed, 13 Oct 2021 13:18:25 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs@vger.kernel.org
+Subject: Re: [PATCH] ksmbd-tools: update README
+Message-ID: <20211013161825.jwkygjjyqpxloedr@cyberdelia>
+References: <20211006161442.4724-1-ematsumiya@suse.de>
+ <CAKYAXd-NF1VuCoRX54bd7SEBoY0uO+sOf0-mmye_YpP7xyjF0A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAKYAXd-NF1VuCoRX54bd7SEBoY0uO+sOf0-mmye_YpP7xyjF0A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-To avoid dictionary attacks (repeated session setups rapidly sent) to
-connect to server, ksmbd make a delay of a 5 seconds on session setup
-failure to make it harder to send enough random connection requests
-to break into a server if a user insert the wrong password 10 times
-in a row.
+On 10/08, Namjae Jeon wrote:
+>> +##### Stopping and restarting the daemon:
+>> +
+>> +- Kill user and kernel space daemon
+>> +  - `ksmbd.control -s`
+>> +- To restart user space daemon
+>> +  - `ksmbd.mountd`
+>> +- To shut it down
+>> +  - `rmmod ksmbd`
+>It is unclear to me. ksmbd.mountd is still alive.
+>If session is still opening, We need to call "ksmbd.control -s" first
+>to kill server(both ksmbd.mountd and ksmbd kernel thread).
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/ksmbd/ksmbd_netlink.h    |  2 ++
- fs/ksmbd/mgmt/user_config.c |  2 +-
- fs/ksmbd/mgmt/user_config.h |  1 +
- fs/ksmbd/smb2pdu.c          | 27 ++++++++++++++++++++++++---
- fs/ksmbd/transport_ipc.c    |  3 ++-
- fs/ksmbd/transport_ipc.h    |  2 +-
- 6 files changed, 31 insertions(+), 6 deletions(-)
+Hm I don't understand your concern actually. What is said is that to
+both restart and shutdown the server, you need to run "ksmbd.control -s"
+before.
 
-diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
-index 2fbe2bc1e093..c6718a05d347 100644
---- a/fs/ksmbd/ksmbd_netlink.h
-+++ b/fs/ksmbd/ksmbd_netlink.h
-@@ -211,6 +211,7 @@ struct ksmbd_tree_disconnect_request {
-  */
- struct ksmbd_logout_request {
- 	__s8	account[KSMBD_REQ_MAX_ACCOUNT_NAME_SZ]; /* user account name */
-+	__u32	account_flags;
- };
- 
- /*
-@@ -317,6 +318,7 @@ enum KSMBD_TREE_CONN_STATUS {
- #define KSMBD_USER_FLAG_BAD_UID		BIT(2)
- #define KSMBD_USER_FLAG_BAD_USER	BIT(3)
- #define KSMBD_USER_FLAG_GUEST_ACCOUNT	BIT(4)
-+#define KSMBD_USER_FLAG_DELAY_SESSION	BIT(5)
- 
- /*
-  * Share config flags.
-diff --git a/fs/ksmbd/mgmt/user_config.c b/fs/ksmbd/mgmt/user_config.c
-index d21629ae5c89..1019d3677d55 100644
---- a/fs/ksmbd/mgmt/user_config.c
-+++ b/fs/ksmbd/mgmt/user_config.c
-@@ -55,7 +55,7 @@ struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp)
- 
- void ksmbd_free_user(struct ksmbd_user *user)
- {
--	ksmbd_ipc_logout_request(user->name);
-+	ksmbd_ipc_logout_request(user->name, user->flags);
- 	kfree(user->name);
- 	kfree(user->passkey);
- 	kfree(user);
-diff --git a/fs/ksmbd/mgmt/user_config.h b/fs/ksmbd/mgmt/user_config.h
-index b2bb074a0150..44c3e954f9c6 100644
---- a/fs/ksmbd/mgmt/user_config.h
-+++ b/fs/ksmbd/mgmt/user_config.h
-@@ -18,6 +18,7 @@ struct ksmbd_user {
- 
- 	size_t			passkey_sz;
- 	char			*passkey;
-+	unsigned int		failed_login_count;
- };
- 
- static inline bool user_guest(struct ksmbd_user *user)
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 89c187aa8db2..050ca60abe72 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -1779,9 +1779,30 @@ int smb2_sess_setup(struct ksmbd_work *work)
- 		conn->mechToken = NULL;
- 	}
- 
--	if (rc < 0 && sess) {
--		ksmbd_session_destroy(sess);
--		work->sess = NULL;
-+	if (rc < 0) {
-+		/*
-+		 * SecurityBufferOffset should be set to zero
-+		 * in session setup error response.
-+		 */
-+		rsp->SecurityBufferOffset = 0;
-+
-+		if (sess) {
-+			bool try_delay = false;
-+
-+			/*
-+			 * To avoid dictionary attacks (repeated session setups rapidly sent) to
-+			 * connect to server, ksmbd make a delay of a 5 seconds on session setup
-+			 * failure to make it harder to send enough random connection requests
-+			 * to break into a server.
-+			 */
-+			if (sess->user && sess->user->flags & KSMBD_USER_FLAG_DELAY_SESSION)
-+				try_delay = true;
-+
-+			ksmbd_session_destroy(sess);
-+			work->sess = NULL;
-+			if (try_delay)
-+				ssleep(5);
-+		}
- 	}
- 
- 	return rc;
-diff --git a/fs/ksmbd/transport_ipc.c b/fs/ksmbd/transport_ipc.c
-index 44aea33a67fa..1acf1892a466 100644
---- a/fs/ksmbd/transport_ipc.c
-+++ b/fs/ksmbd/transport_ipc.c
-@@ -601,7 +601,7 @@ int ksmbd_ipc_tree_disconnect_request(unsigned long long session_id,
- 	return ret;
- }
- 
--int ksmbd_ipc_logout_request(const char *account)
-+int ksmbd_ipc_logout_request(const char *account, int flags)
- {
- 	struct ksmbd_ipc_msg *msg;
- 	struct ksmbd_logout_request *req;
-@@ -616,6 +616,7 @@ int ksmbd_ipc_logout_request(const char *account)
- 
- 	msg->type = KSMBD_EVENT_LOGOUT_REQUEST;
- 	req = (struct ksmbd_logout_request *)msg->payload;
-+	req->account_flags = flags;
- 	strscpy(req->account, account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);
- 
- 	ret = ipc_msg_send(msg);
-diff --git a/fs/ksmbd/transport_ipc.h b/fs/ksmbd/transport_ipc.h
-index 9eacc895ffdb..5e5b90a0c187 100644
---- a/fs/ksmbd/transport_ipc.h
-+++ b/fs/ksmbd/transport_ipc.h
-@@ -25,7 +25,7 @@ ksmbd_ipc_tree_connect_request(struct ksmbd_session *sess,
- 			       struct sockaddr *peer_addr);
- int ksmbd_ipc_tree_disconnect_request(unsigned long long session_id,
- 				      unsigned long long connect_id);
--int ksmbd_ipc_logout_request(const char *account);
-+int ksmbd_ipc_logout_request(const char *account, int flags);
- struct ksmbd_share_config_response *
- ksmbd_ipc_share_config_request(const char *name);
- struct ksmbd_spnego_authen_response *
--- 
-2.25.1
+Then, to restart you run "ksmbd.mountd" again. To shut it down, run
+"rmmod ksmbd".
 
+I'll try coming up with better wording.
+
+>> +		
+>ERROR: trailing whitespace
+>#263: FILE: README.md:70:
+>+^I^I$
+
+Thanks, will fix!
+
+
+Cheers,
+
+Enzo
