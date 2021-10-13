@@ -2,46 +2,46 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0363C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 08:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35009C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 08:44:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 850A561027
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 08:44:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E26361053
+	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 08:44:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230461AbhJMIqG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 Oct 2021 04:46:06 -0400
-Received: from mail-pg1-f170.google.com ([209.85.215.170]:42902 "EHLO
-        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229644AbhJMIqF (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Oct 2021 04:46:05 -0400
-Received: by mail-pg1-f170.google.com with SMTP id 66so1640451pgc.9
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Oct 2021 01:44:03 -0700 (PDT)
+        id S229644AbhJMIqg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 13 Oct 2021 04:46:36 -0400
+Received: from mail-pj1-f50.google.com ([209.85.216.50]:52890 "EHLO
+        mail-pj1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233400AbhJMIqd (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Oct 2021 04:46:33 -0400
+Received: by mail-pj1-f50.google.com with SMTP id oa4so1659990pjb.2
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Oct 2021 01:44:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=lURRwrKU/V+ypYEIAHqkzvKKZKAqXAQWJAPD0gIPRC8=;
-        b=pdIGHbqU5dYveJ4BMoQ97JfSiVGzgtYKvkDLf5R2KNhOr9RDu2fheRqXgjyyCMdfYj
-         ACvnMP6yfiR4s7D/uj7HREWdkByAUOp0jguCck585Y/58J6Km4EByLH08OmxDBq5yi5R
-         Ot8K49LaU2QkkZh/ZwSJcKg7QhzvKbhmZBEhCaPn6mmld0TvnHYhHp6PXJ/c32WR6Lzr
-         CPCTKLHAhcpMHAJ1v34O+s2cqgjHqdB2/EaBZxRWrzQ5JUga4XJCNk4xch6mqGnHivH1
-         XAdkXRYJp8r3beAkwl7jUogIp4fV0uC3CNvf//wcJ00u+oktCzmJl+EcOQTUXPt+4aU5
-         VStg==
-X-Gm-Message-State: AOAM530kfGfyLaYXu6U8NN36LR8uraPPUsneVhvKW97VPHiusPWBdfr9
-        cxsVZz3l05Ck6dWGHZ3jl+SbjXIczVC0zQ==
-X-Google-Smtp-Source: ABdhPJwId+rEOiQ3naKkm+ER7+B59SJpN291UE+Wh/KmoT6zZoVUwhPCTEvcidBukbOgR6ZfBqXsvw==
-X-Received: by 2002:a63:3d4c:: with SMTP id k73mr26865427pga.44.1634114642654;
-        Wed, 13 Oct 2021 01:44:02 -0700 (PDT)
+        bh=lI9jQrBfRsnWfyp2k7WbB7rQukSCScdfFndqD8TYlxM=;
+        b=hn3moPPLoycQN6MZpzU7GZbxZmZzl5dzTZrj2uWaQjlXy4f+1dGNw1EVPLSk9tdEcq
+         9RLwf1lBUBs78odQCK1ENxlTNTbIZetMVSwL8wyJwnApKCpSlOaSD/h/ERbPKGphhpjG
+         UJx9qAfRVErbxvgWKSz+kUgnaaxWeQjRGL9diBCAGhYJnoC1TtdtqYbfd5mg2Y+lXY6l
+         0CdxVbo/1/Lw6pTtL0NPVO0e3MTm45yzZgv8e8VpwORZXsE2JwsYmwN8HPjgSPPar906
+         Pz99oGTJNOKaITuxYGJGyirZw3W4QSjXajjrtEVwekaWcwdsdnZEgmfDdx35d8ao/k6i
+         wfnA==
+X-Gm-Message-State: AOAM533ibyWzhNegm3SHetQtRSnSQ0fGGG7NuwPQ5ps815m39H7xEXMW
+        GjLxVDxAIsZzYzc33gxYq4ReG6bPHRYGuQ==
+X-Google-Smtp-Source: ABdhPJwzc42xe/2KxanYnhvpOKeJKjwZJzwElRdDZt8wv0s2wrVJ2XM5j92OF1aPcy0zUXaPdX2kvg==
+X-Received: by 2002:a17:90b:3a88:: with SMTP id om8mr11080162pjb.164.1634114669610;
+        Wed, 13 Oct 2021 01:44:29 -0700 (PDT)
 Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id z11sm13186694pfk.204.2021.10.13.01.44.01
+        by smtp.gmail.com with ESMTPSA id s2sm5480563pjs.56.2021.10.13.01.44.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 01:44:02 -0700 (PDT)
+        Wed, 13 Oct 2021 01:44:29 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd-tools: throttle session setup failures to avoid dictionary attacks
-Date:   Wed, 13 Oct 2021 17:43:27 +0900
-Message-Id: <20211013084327.22515-1-linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: throttle session setup failures to avoid dictionary attacks
+Date:   Wed, 13 Oct 2021 17:44:21 +0900
+Message-Id: <20211013084421.22608-1-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -52,115 +52,136 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 To avoid dictionary attacks (repeated session setups rapidly sent) to
 connect to server, ksmbd make a delay of a 5 seconds on session setup
 failure to make it harder to send enough random connection requests
-to break into a server if an user insert the wrong password 10 times
+to break into a server if a user insert the wrong password 10 times
 in a row.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- include/linux/ksmbd_server.h |  2 ++
- include/management/user.h    |  3 +++
- lib/management/tree_conn.c   |  3 +++
- lib/management/user.c        | 19 +++++++++++++++++++
- mountd/worker.c              |  2 +-
- 5 files changed, 28 insertions(+), 1 deletion(-)
+ fs/ksmbd/ksmbd_netlink.h    |  2 ++
+ fs/ksmbd/mgmt/user_config.c |  2 +-
+ fs/ksmbd/mgmt/user_config.h |  1 +
+ fs/ksmbd/smb2pdu.c          | 27 ++++++++++++++++++++++++---
+ fs/ksmbd/transport_ipc.c    |  3 ++-
+ fs/ksmbd/transport_ipc.h    |  2 +-
+ 6 files changed, 31 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/ksmbd_server.h b/include/linux/ksmbd_server.h
-index 800925c..b1c5e63 100644
---- a/include/linux/ksmbd_server.h
-+++ b/include/linux/ksmbd_server.h
-@@ -122,6 +122,7 @@ struct ksmbd_tree_disconnect_request {
- 
+diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
+index 2fbe2bc1e093..c6718a05d347 100644
+--- a/fs/ksmbd/ksmbd_netlink.h
++++ b/fs/ksmbd/ksmbd_netlink.h
+@@ -211,6 +211,7 @@ struct ksmbd_tree_disconnect_request {
+  */
  struct ksmbd_logout_request {
- 	__s8	account[KSMBD_REQ_MAX_ACCOUNT_NAME_SZ];
+ 	__s8	account[KSMBD_REQ_MAX_ACCOUNT_NAME_SZ]; /* user account name */
 +	__u32	account_flags;
  };
  
- struct ksmbd_rpc_command {
-@@ -203,6 +204,7 @@ enum KSMBD_TREE_CONN_STATUS {
- #define KSMBD_USER_FLAG_BAD_UID		(1 << 2)
- #define KSMBD_USER_FLAG_BAD_USER	(1 << 3)
- #define KSMBD_USER_FLAG_GUEST_ACCOUNT	(1 << 4)
-+#define KSMBD_USER_FLAG_DELAY_SESSION	(1 << 5)
+ /*
+@@ -317,6 +318,7 @@ enum KSMBD_TREE_CONN_STATUS {
+ #define KSMBD_USER_FLAG_BAD_UID		BIT(2)
+ #define KSMBD_USER_FLAG_BAD_USER	BIT(3)
+ #define KSMBD_USER_FLAG_GUEST_ACCOUNT	BIT(4)
++#define KSMBD_USER_FLAG_DELAY_SESSION	BIT(5)
  
  /*
   * Share config flags.
-diff --git a/include/management/user.h b/include/management/user.h
-index 26132d2..7482051 100644
---- a/include/management/user.h
-+++ b/include/management/user.h
-@@ -26,6 +26,7 @@ struct ksmbd_user {
- 	int		flags;
- 	int		state;
- 	GRWLock		update_lock;
-+	unsigned int	failed_login_count;
+diff --git a/fs/ksmbd/mgmt/user_config.c b/fs/ksmbd/mgmt/user_config.c
+index d21629ae5c89..1019d3677d55 100644
+--- a/fs/ksmbd/mgmt/user_config.c
++++ b/fs/ksmbd/mgmt/user_config.c
+@@ -55,7 +55,7 @@ struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp)
+ 
+ void ksmbd_free_user(struct ksmbd_user *user)
+ {
+-	ksmbd_ipc_logout_request(user->name);
++	ksmbd_ipc_logout_request(user->name, user->flags);
+ 	kfree(user->name);
+ 	kfree(user->passkey);
+ 	kfree(user);
+diff --git a/fs/ksmbd/mgmt/user_config.h b/fs/ksmbd/mgmt/user_config.h
+index b2bb074a0150..44c3e954f9c6 100644
+--- a/fs/ksmbd/mgmt/user_config.h
++++ b/fs/ksmbd/mgmt/user_config.h
+@@ -18,6 +18,7 @@ struct ksmbd_user {
+ 
+ 	size_t			passkey_sz;
+ 	char			*passkey;
++	unsigned int		failed_login_count;
  };
  
- static inline void set_user_flag(struct ksmbd_user *user, int bit)
-@@ -61,8 +62,10 @@ void for_each_ksmbd_user(walk_users cb, gpointer user_data);
- 
- struct ksmbd_login_request;
- struct ksmbd_login_response;
-+struct ksmbd_logout_request;
- 
- int usm_handle_login_request(struct ksmbd_login_request *req,
- 			     struct ksmbd_login_response *resp);
-+int usm_handle_logout_request(struct ksmbd_logout_request *req);
- 
- #endif /* __MANAGEMENT_USER_H__ */
-diff --git a/lib/management/tree_conn.c b/lib/management/tree_conn.c
-index 7158e8a..e6fc185 100644
---- a/lib/management/tree_conn.c
-+++ b/lib/management/tree_conn.c
-@@ -145,6 +145,9 @@ int tcm_handle_tree_connect(struct ksmbd_tree_connect_request *req,
- 		goto out_error;
+ static inline bool user_guest(struct ksmbd_user *user)
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 89c187aa8db2..050ca60abe72 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -1779,9 +1779,30 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 		conn->mechToken = NULL;
  	}
  
-+	user->failed_login_count = 0;
-+	user->flags &= ~KSMBD_USER_FLAG_DELAY_SESSION;
+-	if (rc < 0 && sess) {
+-		ksmbd_session_destroy(sess);
+-		work->sess = NULL;
++	if (rc < 0) {
++		/*
++		 * SecurityBufferOffset should be set to zero
++		 * in session setup error response.
++		 */
++		rsp->SecurityBufferOffset = 0;
 +
- 	if (test_user_flag(user, KSMBD_USER_FLAG_GUEST_ACCOUNT))
- 		set_conn_flag(conn, KSMBD_TREE_CONN_FLAG_GUEST_ACCOUNT);
++		if (sess) {
++			bool try_delay = false;
++
++			/*
++			 * To avoid dictionary attacks (repeated session setups rapidly sent) to
++			 * connect to server, ksmbd make a delay of a 5 seconds on session setup
++			 * failure to make it harder to send enough random connection requests
++			 * to break into a server.
++			 */
++			if (sess->user && sess->user->flags & KSMBD_USER_FLAG_DELAY_SESSION)
++				try_delay = true;
++
++			ksmbd_session_destroy(sess);
++			work->sess = NULL;
++			if (try_delay)
++				ssleep(5);
++		}
+ 	}
  
-diff --git a/lib/management/user.c b/lib/management/user.c
-index 28c4dcd..b4727a7 100644
---- a/lib/management/user.c
-+++ b/lib/management/user.c
-@@ -387,3 +387,22 @@ int usm_handle_login_request(struct ksmbd_login_request *req,
- 	put_ksmbd_user(user);
- 	return 0;
- }
-+
-+int usm_handle_logout_request(struct ksmbd_logout_request *req)
-+{
-+	struct ksmbd_user *user;
-+
-+	user = usm_lookup_user(req->account);
-+	if (!user)
-+		return -ENOENT;
-+
-+	if (req->account_flags & KSMBD_USER_FLAG_BAD_PASSWORD) {
-+		if (user->failed_login_count < 10)
-+			user->failed_login_count++;
-+		else
-+			user->flags |= KSMBD_USER_FLAG_DELAY_SESSION;
-+	} else {
-+		user->failed_login_count = 0;
-+		user->flags &= ~KSMBD_USER_FLAG_DELAY_SESSION;
-+	}
-+}
-diff --git a/mountd/worker.c b/mountd/worker.c
-index 06ebb81..70f2655 100644
---- a/mountd/worker.c
-+++ b/mountd/worker.c
-@@ -204,7 +204,7 @@ static int logout_request(struct ksmbd_ipc_msg *msg)
- 	if (!VALID_IPC_MSG(msg, struct ksmbd_logout_request))
- 		return -EINVAL;
- 
--	return 0;
-+	return usm_handle_logout_request(KSMBD_IPC_MSG_PAYLOAD(msg));
+ 	return rc;
+diff --git a/fs/ksmbd/transport_ipc.c b/fs/ksmbd/transport_ipc.c
+index 44aea33a67fa..1acf1892a466 100644
+--- a/fs/ksmbd/transport_ipc.c
++++ b/fs/ksmbd/transport_ipc.c
+@@ -601,7 +601,7 @@ int ksmbd_ipc_tree_disconnect_request(unsigned long long session_id,
+ 	return ret;
  }
  
- static int heartbeat_request(struct ksmbd_ipc_msg *msg)
+-int ksmbd_ipc_logout_request(const char *account)
++int ksmbd_ipc_logout_request(const char *account, int flags)
+ {
+ 	struct ksmbd_ipc_msg *msg;
+ 	struct ksmbd_logout_request *req;
+@@ -616,6 +616,7 @@ int ksmbd_ipc_logout_request(const char *account)
+ 
+ 	msg->type = KSMBD_EVENT_LOGOUT_REQUEST;
+ 	req = (struct ksmbd_logout_request *)msg->payload;
++	req->account_flags = flags;
+ 	strscpy(req->account, account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);
+ 
+ 	ret = ipc_msg_send(msg);
+diff --git a/fs/ksmbd/transport_ipc.h b/fs/ksmbd/transport_ipc.h
+index 9eacc895ffdb..5e5b90a0c187 100644
+--- a/fs/ksmbd/transport_ipc.h
++++ b/fs/ksmbd/transport_ipc.h
+@@ -25,7 +25,7 @@ ksmbd_ipc_tree_connect_request(struct ksmbd_session *sess,
+ 			       struct sockaddr *peer_addr);
+ int ksmbd_ipc_tree_disconnect_request(unsigned long long session_id,
+ 				      unsigned long long connect_id);
+-int ksmbd_ipc_logout_request(const char *account);
++int ksmbd_ipc_logout_request(const char *account, int flags);
+ struct ksmbd_share_config_response *
+ ksmbd_ipc_share_config_request(const char *name);
+ struct ksmbd_spnego_authen_response *
 -- 
 2.25.1
 
