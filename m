@@ -2,56 +2,53 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 141D4C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 10:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F85AC433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 12:07:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEE86610D0
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 10:41:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F0C7610D2
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 12:07:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbhJNKoD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Oct 2021 06:44:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43976 "EHLO
+        id S231180AbhJNMJz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Oct 2021 08:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbhJNKoC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Oct 2021 06:44:02 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978F5C061570
-        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 03:41:57 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id z20so22500954edc.13
-        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 03:41:57 -0700 (PDT)
+        with ESMTP id S230026AbhJNMJy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Oct 2021 08:09:54 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A3B8C061570
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 05:07:50 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id w14so23235310edv.11
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 05:07:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=PmFvocnv0o/Zzee6LPyIglqGy1MwTWb9E6dtnPse8gE=;
-        b=pvdJlLxK1nt4cMzxkcC3N/kYccKJyO30LQmNlsnKuPkUj5yTMhx02nm7mNn4RIY18A
-         qpw1KJ4Q6Er+Yp1fD26GhhSAkzNeOFJQnvOE4ve9rAWbKofI8m5iaWbk5yyVi8fEWjkj
-         vHI7vKB115KTGZlgBnuKI2eQHlLnSiN3fsf8s/gkZdSp6rlxBt9w8hV67us4Hy2AdLM6
-         vYomrZ3qx6GHHm7AEHH+fvd3fFo+4RBZKtpMyU8WapFBUYgp02SttE5fhWdnPztMZVDx
-         rJGbIK/VdDLgbR0u55958F+I5Jo3qZuNDIcKxPy96JNloxvLaGcrbss3BXdTx66KAf4x
-         +GRw==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=27CRBCnT4N82zZ/m3JrkRYFdSRUhcD3VPc9Gu2TEuZ0=;
+        b=Hrkh+Gx/CXI2lLXqOPd6VovMz1pqPdtQJHyuHxqBulrzAlvPOom536uCCaurWzKSsg
+         bvIpcde1QdqNa+D2n0dsOtEjPma6Mc5K51+KnviVWfVZrD+JOjfn143rtDb4qMGIYIr/
+         VzJOX3Op5u4mvcibFCN8fkxuxIaxEn1dHr7ZeiB6DhnGC3bqzIZ4gKZ5KOnIt5hOizXV
+         leZZOSGhzp5yHybST+/sp/ASwpEC0U4+0MrK2e6e3UlKfteBImc4ZVBfLny1IQU43yGR
+         7waLR2ONGM+t4h388FP5HG6ixoSK43skPiJ7vnINqWsb+8+KNl1uLIcdw8HlLvRE1qsR
+         6DEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=PmFvocnv0o/Zzee6LPyIglqGy1MwTWb9E6dtnPse8gE=;
-        b=j8hSOnn3vDFzliCN0bO1wAeGLiAZ6md8FPU5PW+P1LSZ4oS0qugUJOhJLLmta2kDEP
-         m5yVAr8w3HhIIWkq/XzyHGix5Box4pFJ1NJ60mAtQ4gI7/zIAeIqVcCc384AtxLxTtQf
-         Rbx/5tx2OzUtB9mQkQRLo/jU08Kslqi+pioDs/Jk0svYAEKRxmbEO+LYAb54pbO8U84u
-         jUIgOyl97CFUpFXXRZ0/OEMU0ZmU3Iypqqykb8gP/jRBmjhxclwsHItHgrAh26jyVxD4
-         tTMpLlPAzbs/u1FuDHiXQ1jJsVce1H3GNSaaBVk/CjD0nkeS189mGkhb7EK+JPx2yrf2
-         vEAg==
-X-Gm-Message-State: AOAM530VSsh0xc5Xbwjmx2fJUrjtyEOQBv6Z/cT8bYFe6ywn6Bfda0tw
-        1gEYfgGyw1j+DiqQnb8U/+00ESc5dwnM/6DIVBk=
-X-Google-Smtp-Source: ABdhPJzHzcm9ekrQwHKvFgxXnTPJzGr/CsRUxGRKCWMVqkX7lWlrSRE7U79EYcJ2wLmAzFO2zGQz0xT2OvPCKl8V8OA=
-X-Received: by 2002:a17:906:4fc7:: with SMTP id i7mr3058830ejw.14.1634208116051;
- Thu, 14 Oct 2021 03:41:56 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=27CRBCnT4N82zZ/m3JrkRYFdSRUhcD3VPc9Gu2TEuZ0=;
+        b=Zw1cU7nwnpV9GkWvy/iZZZx0ExnhfrTRRF714WYXDdkgi9A4+LWaaZ2xxe2TXE7zvh
+         Tdt8anB5EY2kGoHVLGz14+MmCj7qW/rSx7QaRwPb19PDu4SAx/MS0cKXlqHv4rubBACl
+         l7z15555Pdq2xbv0vyKw/g+Dt73bSyHnMQT7V7PJoxh54dGLpUFF1QFZp5VZgArYbbil
+         GPcC6QtO9zQQmzSOZNA23Qh0Kr/4+hLanrbd1t8tJMKM1GZDybYm0bzKoGhWbpGwfYQ7
+         owxLrCegUh1K+pgsWb+PzWzvRNeHO5kmrRmjLEYdtbBJZbnM1j11h3BNCGhBtVxGqwo4
+         R1Rg==
+X-Gm-Message-State: AOAM532wJJOzjYG5opqaIkmc2BsAa5FKi/zse/5ziLeaUey8H6WbCQJe
+        MmuTXtJlI8c1JR5+VNpQo6OIGNAE01m3wmwnVIbjOwKzoepphP/N
+X-Google-Smtp-Source: ABdhPJxHkTS+DZpsmO5is6xwr43iOUTchk6RxQsk5+hogv0HE1rxibfocUo9rXenP5TIJ+9S5lkCkn/A4NXpmto0Cwk=
+X-Received: by 2002:a17:906:54c3:: with SMTP id c3mr3340134ejp.536.1634213268621;
+ Thu, 14 Oct 2021 05:07:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <CANT5p=qBKEj5Nz_5Vwj0WWL7-V_78j6Fry5OjvDXGCrejnsu3Q@mail.gmail.com>
-In-Reply-To: <CANT5p=qBKEj5Nz_5Vwj0WWL7-V_78j6Fry5OjvDXGCrejnsu3Q@mail.gmail.com>
 From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Thu, 14 Oct 2021 16:11:44 +0530
-Message-ID: <CANT5p=ovLNLKwxsnik4pNkCbaznydWKAJz1AbBp6EhBy=nGTiQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: for compound requests, use open handle if possible
+Date:   Thu, 14 Oct 2021 17:37:37 +0530
+Message-ID: <CANT5p=ogvdT9nH=EksBnauqdr5u3Z_u4rJRHShwqvTY3YnEGbw@mail.gmail.com>
+Subject: [PATCH] cifs: To match file servers, make sure the server hostname matches
 To:     Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -61,28 +58,12 @@ X-Mailing-List: linux-cifs@vger.kernel.org
 
 Hi Steve,
 
-I don't think this patch was taken. Can we take this?
-https://github.com/sprasad-microsoft/smb3-kernel-client/commit/34c44cf16b97ee71b6d07720199b97ed328e7c97.patch
+Had submitted a patch for this earlier. But it had a bug, so had asked
+you not to merge.
+Submitting the new version of the patch after fixing a bug.
+Please review.
 
-Regards,
-Shyam
-
-On Fri, Jul 30, 2021 at 10:44 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
->
-> Hi Steve,
->
-> Please review the patch.
-> It fixes the issue of some compound requests unnecessarily breaking leases held by the same client.
->
-> https://github.com/sprasad-microsoft/smb3-kernel-client/pull/2/commits/34bf1885b26db09a60bc276ea1a3f798f4cbb05f.patch
->
-> We saw this yesterday when testing with generic/013 xfstests with the multichannel fixes.
->
-> --
-> Regards,
-> Shyam
-
-
+https://github.com/sprasad-microsoft/smb3-kernel-client/commit/a02fa56af1817b960ba841d00af87ef93ded1f22.patch
 
 -- 
 Regards,
