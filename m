@@ -2,132 +2,104 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8194C433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 21:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC183C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 21:58:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 909E16109E
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 21:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC98261090
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 21:58:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232809AbhJNVFO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Oct 2021 17:05:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45324 "EHLO
+        id S231760AbhJNWA3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Oct 2021 18:00:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232171AbhJNVFN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Oct 2021 17:05:13 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50AD4C061570
-        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 14:03:08 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id s1so3180953plg.12
-        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 14:03:08 -0700 (PDT)
+        with ESMTP id S229829AbhJNWA2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Oct 2021 18:00:28 -0400
+Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88E52C061570
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 14:58:23 -0700 (PDT)
+Received: by mail-ua1-x935.google.com with SMTP id e10so9620387uab.3
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 14:58:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qggdj5QoS4roiUGx8vc1yCFSq9Xcau2q6FANWnw9iz8=;
-        b=k22xwgu4AI8jafK58Y7WaW3V5EVPQIrbsFlNd0Pi79CUQ2HZfn4hJw8WTnr6+IZ1/W
-         7ovvzV03tZzLkTouXi6ywxOCJZ6scPNJ7NhugvSWC1gtq7nCmFnDE6aLUryuSqpJgXm0
-         K2q460XFV1GF5CTwgMv9xa/0YxNDGb9/uYToMHAoXXH9l0YwEJJvMFT+eay2VBNxCnr6
-         qMvmMt4YQat8R88w4HbrlXV379yAQHhHr0c602M7P2bckFtGSbCoNuDXyZccqrubukD6
-         Ni5LIK+iDLcmMG7LAtV/kpyQX+lE8EphhiTOXKrnfmX3iSj2XMRFC5cY6glit8+dfW1+
-         z61Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=8cyEJ4E7CceaF+AYo5i3A5KMDLBVdGE1QnvckL/wP68=;
+        b=Ir7esuxumVdmsEfe0gloUF/hjzk0M4lSbv6IYo1/KnwVZ1DmybzHh4G6US2m1Q965L
+         sx0skVLOpMbAA2vsWAj3m3Yg4/aLJ8bMCj+5V3jbvFwSnq26U9y58N/k5Hv4IVq3oNyh
+         PLd+So++OXNAExz8cchKWIDEsCyR1pQTL9GbeWIbXEeMUHi5XE8h1cWVcy4p+Q3mkrAS
+         TTCM5BVTPvHLsZA1LpNYehdOzBUJbXw8qRGbpOf6Y4+oY8B678gn7xYIOZwZZT2652Hl
+         LHUw+k22Wl9LEufC+Ad5C/jz85sCEwlPIGJpG5EUlFHyUgzZesjDZS2Dif6iJ/qhhjGh
+         rffQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qggdj5QoS4roiUGx8vc1yCFSq9Xcau2q6FANWnw9iz8=;
-        b=RDMVY/uwZIbi3eKRMA9+1qYBl9OEhyZPJmwjE2i36AhbU9pQw90X3kwIwSDaAo+4vt
-         Qrqlf0hpts4mgixSS4r9APA9+ny4pyRsfOBhRHxHQEDjCbi1A7nMbcfo17bCATPoMeup
-         V0zep/E4Spg1uAuUN5QyYAWBS/dqPSWT3bxqSI1HatpraX+f9TTstuaOg2QHvRrLQbJT
-         Si+stZHbHO26BJNN/rN3IP+Ek9TSkp99HAWoeAw/UddYyhjk106Ns94ojFlWjozYeEeA
-         27uKxxnu99PTTt6gczw7FhIfXkS2NgBiIKPEhYWiUIh3qg+G5jNY9qYOl580/4d0r8/N
-         ScWA==
-X-Gm-Message-State: AOAM532nYyCJUNbty3UVXTwXA+nOaowItxAwddnQuYqR4Witq64hWAqi
-        w0YXg3T9kINPoKRkThQCJhXfBLJyTsm1pFHp
-X-Google-Smtp-Source: ABdhPJxAKgYCRaui9aWUGikGRCBHiG+TagbEbqGvVbOwLbHSDphMpUygNzI6GOIXrX4jbMiaNuNq8A==
-X-Received: by 2002:a17:90b:2493:: with SMTP id nt19mr23638772pjb.78.1634245387564;
-        Thu, 14 Oct 2021 14:03:07 -0700 (PDT)
-Received: from localhost.localdomain ([125.177.232.58])
-        by smtp.googlemail.com with ESMTPSA id a67sm3248130pfa.128.2021.10.14.14.03.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Oct 2021 14:03:07 -0700 (PDT)
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>,
-        Ralph Boehme <slow@samba.org>, Hyunchul Lee <hyc.lee@gmail.com>
-Subject: [PATCH v2] ksmbd: add buffer validation for smb direct
-Date:   Fri, 15 Oct 2021 06:02:50 +0900
-Message-Id: <20211014210250.119723-1-hyc.lee@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=8cyEJ4E7CceaF+AYo5i3A5KMDLBVdGE1QnvckL/wP68=;
+        b=mM3dg1FUPZNbnHL4iEZSN7Zx9nekle38PMRvzhYNiV4fDVNmBen73m79UXy+LnGPzD
+         9dD08oWUGUXXkHgEikUA/FwSGQP3rFZnXKoG5CzX28jBzs8woA8fY3aiNUvhkud7r6pA
+         ErCU582I+k0Dt+JMbrQiBi+kVdVvWeO1cAq3MDKrfHDEdn9kKuTrsVu71HPRwIRtmWfR
+         /vQuBJ1m0kG3OKPViNpvWh/5bAn2N3e7QFAPe93/BXVAmpBHPCrk6jFuzBJ82yY4Yutr
+         zmxfUisSIxSM/r4Qemh5r8tVkvX9fA+/29hBsuNCQov27cb8uSLEP3IQCmVeFpWOTXIO
+         kGtg==
+X-Gm-Message-State: AOAM5314WQeewaypcxdiZO148OG0HgxvGwGBYAQxm3UjI00IFOHowjXX
+        70Sda4BrhqKzTEWXsW/NJgIH3KAIw+COZ6WfiHE=
+X-Google-Smtp-Source: ABdhPJydxmGn/T25uzyhweQdlMcDY/AJH9l3atro4cncmP4Ukizr9Qhd13r7jBFtZunqjGJy6radt4+7IbkCyX3Kapk=
+X-Received: by 2002:a67:c81a:: with SMTP id u26mr10899552vsk.27.1634248702692;
+ Thu, 14 Oct 2021 14:58:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAH2r5ms_S9WsLNnQ=AYE7Ykss5+VCfeFtL01VVqt6tp=CY5sRw@mail.gmail.com>
+In-Reply-To: <CAH2r5ms_S9WsLNnQ=AYE7Ykss5+VCfeFtL01VVqt6tp=CY5sRw@mail.gmail.com>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Fri, 15 Oct 2021 06:58:11 +0900
+Message-ID: <CANFS6bbzu+OjJKaTVnvDS7GogzCzhD=jVMPoQC2xjcFx-STWhg@mail.gmail.com>
+Subject: Re: Ksmbd and max credits
+To:     Steve French <smfrench@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add buffer validation for smb direct.
+2021=EB=85=84 10=EC=9B=94 14=EC=9D=BC (=EB=AA=A9) =EC=98=A4=ED=9B=84 2:03, =
+Steve French <smfrench@gmail.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> Thinking about the patch "ksmbd: improve credits management"
+> (https://github.com/smfrench/smb3-kernel/commit/bf8acc9e10e21c28452dfa067=
+a7d31e6067104b1)
+>
+> Hyunchul noted in the description:
+> "Windows server 2016 or later grant up to 8192 credits to clients at once=
+."
+>
+> I noticed that SMB2_MAX_CREDITS is defined as 8192 in
+> fs/ksmbd/smb2pdu.h.  Isn't this a little low, although I see Samba
+> default to it as well.
+>
+> Was thinking that that is roughly equivalent to 64 8MB writes, or 128
+> 4MB writes.   Although Samba defaults to 8192 max credits as well, for
+> Samba it is configurable (via "smb2 max credits" in smb.conf).
+> Should it be configurable?  What do more current Windows servers
+> default to as the max?
+>
 
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
----
-Changes from v1:
- - Change the data type of data_length to unsigned int.
- - To avoid integer overflow, convert the data type of data_length
-   to u64 in comparision.
- - Remove duplicate le32_to_cpu() calls.
+According to MS-SMB2, the maximum credit limit is configurable, but
+the default maximum credit limit in Windows Server 2022 is also 8192.
 
- fs/ksmbd/transport_rdma.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+It looks good if it can be configurable, but I can't find out the possible =
+range
+of values.
+And there is a description, "You should never need to set this parameter"
+about "smb2 max credits in smb.conf" in the Samba manual.
 
-diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-index 3a7fa23ba850..a2fd5a4d4cd5 100644
---- a/fs/ksmbd/transport_rdma.c
-+++ b/fs/ksmbd/transport_rdma.c
-@@ -549,6 +549,10 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 
- 	switch (recvmsg->type) {
- 	case SMB_DIRECT_MSG_NEGOTIATE_REQ:
-+		if (wc->byte_len < sizeof(struct smb_direct_negotiate_req)) {
-+			put_empty_recvmsg(t, recvmsg);
-+			return;
-+		}
- 		t->negotiation_requested = true;
- 		t->full_packet_received = true;
- 		wake_up_interruptible(&t->wait_status);
-@@ -556,10 +560,23 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 	case SMB_DIRECT_MSG_DATA_TRANSFER: {
- 		struct smb_direct_data_transfer *data_transfer =
- 			(struct smb_direct_data_transfer *)recvmsg->packet;
--		int data_length = le32_to_cpu(data_transfer->data_length);
-+		unsigned int data_length;
- 		int avail_recvmsg_count, receive_credits;
- 
-+		if (wc->byte_len <
-+		    offsetof(struct smb_direct_data_transfer, padding)) {
-+			put_empty_recvmsg(t, recvmsg);
-+			return;
-+		}
-+
-+		data_length = le32_to_cpu(data_transfer->data_length);
- 		if (data_length) {
-+			if (wc->byte_len < sizeof(struct smb_direct_data_transfer) +
-+			    (u64)data_length) {
-+				put_empty_recvmsg(t, recvmsg);
-+				return;
-+			}
-+
- 			if (t->full_packet_received)
- 				recvmsg->first_segment = true;
- 
-@@ -568,7 +585,7 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 			else
- 				t->full_packet_received = true;
- 
--			enqueue_reassembly(t, recvmsg, data_length);
-+			enqueue_reassembly(t, recvmsg, (int)data_length);
- 			wake_up_interruptible(&t->wait_reassembly_queue);
- 
- 			spin_lock(&t->receive_credit_lock);
--- 
-2.25.1
+>
+> --
+> Thanks,
+>
+> Steve
 
+
+
+--=20
+Thanks,
+Hyunchul
