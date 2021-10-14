@@ -2,77 +2,88 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53854C433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 05:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 141D4C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 10:42:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3115D60200
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 05:03:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEE86610D0
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 10:41:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbhJNFFP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Oct 2021 01:05:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51536 "EHLO
+        id S229691AbhJNKoD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Oct 2021 06:44:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbhJNFFL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Oct 2021 01:05:11 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F848C061570
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Oct 2021 22:03:07 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id i24so20959779lfj.13
-        for <linux-cifs@vger.kernel.org>; Wed, 13 Oct 2021 22:03:07 -0700 (PDT)
+        with ESMTP id S229468AbhJNKoC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Oct 2021 06:44:02 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978F5C061570
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 03:41:57 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id z20so22500954edc.13
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 03:41:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=O8TLFgk57XdbkaQ4K/PPceaDpsS47PDJl+JgDGaSbYI=;
-        b=UIycxm1WApCja1yFA7p7Jg7iiVnnOrCahSgoIkA/47on2A2HjdP/OCxX6WhcQyGrXX
-         6Cn9gm++erEa9v5smR1emCcnlZ868cck2F9cmg833cvJ69RYLy93mybnW/A3t7Ur0b8h
-         bPF+tDZ3HckNzoZStdy5Tzcez7XHxdvoMZ9ddrNzIQIvn+tCCDDrS2+2dJT+Kc/u7SyC
-         dspFd3QlFwA51ENC7u8OlL4BY8zzr6gP60PKLOa+sELB+C/8lx5jh8EAOnxnTSO5uJHv
-         43FEhlUpXkCDcfRYgPjmXZ+h/ZHsNQhz40u/lYHx3k0Z90iCvJCSHXrJYDZyrrIjZb9e
-         YANA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=PmFvocnv0o/Zzee6LPyIglqGy1MwTWb9E6dtnPse8gE=;
+        b=pvdJlLxK1nt4cMzxkcC3N/kYccKJyO30LQmNlsnKuPkUj5yTMhx02nm7mNn4RIY18A
+         qpw1KJ4Q6Er+Yp1fD26GhhSAkzNeOFJQnvOE4ve9rAWbKofI8m5iaWbk5yyVi8fEWjkj
+         vHI7vKB115KTGZlgBnuKI2eQHlLnSiN3fsf8s/gkZdSp6rlxBt9w8hV67us4Hy2AdLM6
+         vYomrZ3qx6GHHm7AEHH+fvd3fFo+4RBZKtpMyU8WapFBUYgp02SttE5fhWdnPztMZVDx
+         rJGbIK/VdDLgbR0u55958F+I5Jo3qZuNDIcKxPy96JNloxvLaGcrbss3BXdTx66KAf4x
+         +GRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=O8TLFgk57XdbkaQ4K/PPceaDpsS47PDJl+JgDGaSbYI=;
-        b=PoioRMUEWTW+GQuIOYDWT/dmmjqo9zs4gQZcz4bX/hNWDgWikFJNWL5d6+EgqAvGk0
-         PGQ0D4zOIhsDllz32d9dnu+k1F2aduLqYJEVCcrOm/n6jwnY13rG7UmrjCBreUFZqMaW
-         ehqr3v6v+EMoa3ZYSN44BqIKYCAat9aXdmvGEPvf1s/COGseN2ZKq1K4H+67Ba3zSaBs
-         KgG30i44ZQ9+V7CpeGTTvjqExyYcXUN1Py/Oqcykd1MfNYF/KbAEVxAslrt704zD2mov
-         IVLvdh1eiyFe0tsIQgcpn/gyHqsKcu+mlB4XGO4ZvWchaM0IFTekdIXfNATJg5hTVLlq
-         xTeA==
-X-Gm-Message-State: AOAM530vCNJvcr9RYD+7BwKV1DPG1ycgu8cPvzRnrtw9baVsUpi3lNfj
-        ovdtN66RJ414sxG3fzuKsUUGL187erjqOfvHgjrubxi7XlI=
-X-Google-Smtp-Source: ABdhPJzKZ0r1DX1brzjTu2rkJ+e/RtJEqrdgYWqmcDUstNHQqpH8bY5e3PnwiLkv0QO6xzCdsopEGqWVSnLQ6nomKeI=
-X-Received: by 2002:a2e:a26c:: with SMTP id k12mr3830289ljm.23.1634187785313;
- Wed, 13 Oct 2021 22:03:05 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=PmFvocnv0o/Zzee6LPyIglqGy1MwTWb9E6dtnPse8gE=;
+        b=j8hSOnn3vDFzliCN0bO1wAeGLiAZ6md8FPU5PW+P1LSZ4oS0qugUJOhJLLmta2kDEP
+         m5yVAr8w3HhIIWkq/XzyHGix5Box4pFJ1NJ60mAtQ4gI7/zIAeIqVcCc384AtxLxTtQf
+         Rbx/5tx2OzUtB9mQkQRLo/jU08Kslqi+pioDs/Jk0svYAEKRxmbEO+LYAb54pbO8U84u
+         jUIgOyl97CFUpFXXRZ0/OEMU0ZmU3Iypqqykb8gP/jRBmjhxclwsHItHgrAh26jyVxD4
+         tTMpLlPAzbs/u1FuDHiXQ1jJsVce1H3GNSaaBVk/CjD0nkeS189mGkhb7EK+JPx2yrf2
+         vEAg==
+X-Gm-Message-State: AOAM530VSsh0xc5Xbwjmx2fJUrjtyEOQBv6Z/cT8bYFe6ywn6Bfda0tw
+        1gEYfgGyw1j+DiqQnb8U/+00ESc5dwnM/6DIVBk=
+X-Google-Smtp-Source: ABdhPJzHzcm9ekrQwHKvFgxXnTPJzGr/CsRUxGRKCWMVqkX7lWlrSRE7U79EYcJ2wLmAzFO2zGQz0xT2OvPCKl8V8OA=
+X-Received: by 2002:a17:906:4fc7:: with SMTP id i7mr3058830ejw.14.1634208116051;
+ Thu, 14 Oct 2021 03:41:56 -0700 (PDT)
 MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 14 Oct 2021 00:02:54 -0500
-Message-ID: <CAH2r5ms_S9WsLNnQ=AYE7Ykss5+VCfeFtL01VVqt6tp=CY5sRw@mail.gmail.com>
-Subject: Ksmbd and max credits
-To:     CIFS <linux-cifs@vger.kernel.org>
+References: <CANT5p=qBKEj5Nz_5Vwj0WWL7-V_78j6Fry5OjvDXGCrejnsu3Q@mail.gmail.com>
+In-Reply-To: <CANT5p=qBKEj5Nz_5Vwj0WWL7-V_78j6Fry5OjvDXGCrejnsu3Q@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Thu, 14 Oct 2021 16:11:44 +0530
+Message-ID: <CANT5p=ovLNLKwxsnik4pNkCbaznydWKAJz1AbBp6EhBy=nGTiQ@mail.gmail.com>
+Subject: Re: [PATCH] cifs: for compound requests, use open handle if possible
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Thinking about the patch "ksmbd: improve credits management"
-(https://github.com/smfrench/smb3-kernel/commit/bf8acc9e10e21c28452dfa067a7d31e6067104b1)
+Hi Steve,
 
-Hyunchul noted in the description:
-"Windows server 2016 or later grant up to 8192 credits to clients at once."
+I don't think this patch was taken. Can we take this?
+https://github.com/sprasad-microsoft/smb3-kernel-client/commit/34c44cf16b97ee71b6d07720199b97ed328e7c97.patch
 
-I noticed that SMB2_MAX_CREDITS is defined as 8192 in
-fs/ksmbd/smb2pdu.h.  Isn't this a little low, although I see Samba
-default to it as well.
+Regards,
+Shyam
 
-Was thinking that that is roughly equivalent to 64 8MB writes, or 128
-4MB writes.   Although Samba defaults to 8192 max credits as well, for
-Samba it is configurable (via "smb2 max credits" in smb.conf).
-Should it be configurable?  What do more current Windows servers
-default to as the max?
+On Fri, Jul 30, 2021 at 10:44 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+>
+> Hi Steve,
+>
+> Please review the patch.
+> It fixes the issue of some compound requests unnecessarily breaking leases held by the same client.
+>
+> https://github.com/sprasad-microsoft/smb3-kernel-client/pull/2/commits/34bf1885b26db09a60bc276ea1a3f798f4cbb05f.patch
+>
+> We saw this yesterday when testing with generic/013 xfstests with the multichannel fixes.
+>
+> --
+> Regards,
+> Shyam
+
 
 
 -- 
-Thanks,
-
-Steve
+Regards,
+Shyam
