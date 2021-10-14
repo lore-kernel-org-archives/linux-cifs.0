@@ -2,81 +2,77 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE49C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 16:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53854C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 05:03:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B448C61053
-	for <linux-cifs@archiver.kernel.org>; Wed, 13 Oct 2021 16:24:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3115D60200
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 05:03:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237018AbhJMQ0v (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 13 Oct 2021 12:26:51 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:37720 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237406AbhJMQ0s (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 13 Oct 2021 12:26:48 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id D97FB21A2A;
-        Wed, 13 Oct 2021 16:24:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1634142284; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ceaw2yiKCsZwykFk+YqWCeVWz0lR3L3OQ9udsk+Ykkw=;
-        b=JxJSVydUTvcSaJO+LGdtBxeesJ8UiSOvNB0hJH8kO5ZCxZUpnXyrRmhWk9BZIV9NOkDWZA
-        nBPBREGmXWgYrVuus7PVenKHj/8n1OfbMsUHjPourJIIKJ4qjt/MD1GU7IKqFKJaemq05P
-        F1ajh+Kc5VJ21OJenjppplR4vWtCnyM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1634142284;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ceaw2yiKCsZwykFk+YqWCeVWz0lR3L3OQ9udsk+Ykkw=;
-        b=f3oZENNBufyhxCqfSHcA0arwTr8AQoTlxc32cGHC5OP++kZCoE5nUdaellrx8mPFYSDKGU
-        AmMg3fP6LbPIQqBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6A0D213D04;
-        Wed, 13 Oct 2021 16:24:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id p6ywDUwIZ2HhFAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Wed, 13 Oct 2021 16:24:44 +0000
-Date:   Wed, 13 Oct 2021 13:24:42 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     linux-cifs@vger.kernel.org
-Subject: Re: [PATCH] ksmbd-tools: change default db file name to users.db
-Message-ID: <20211013162442.fnuztfdrhf2efq6j@cyberdelia>
-References: <20211006161331.4510-1-ematsumiya@suse.de>
- <CAKYAXd_WozbzSy-cVrpiMKN1a6WWa8gGSWBS8f6XJpWuJaXQpg@mail.gmail.com>
+        id S229498AbhJNFFP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Oct 2021 01:05:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51536 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229472AbhJNFFL (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Oct 2021 01:05:11 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F848C061570
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Oct 2021 22:03:07 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id i24so20959779lfj.13
+        for <linux-cifs@vger.kernel.org>; Wed, 13 Oct 2021 22:03:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=O8TLFgk57XdbkaQ4K/PPceaDpsS47PDJl+JgDGaSbYI=;
+        b=UIycxm1WApCja1yFA7p7Jg7iiVnnOrCahSgoIkA/47on2A2HjdP/OCxX6WhcQyGrXX
+         6Cn9gm++erEa9v5smR1emCcnlZ868cck2F9cmg833cvJ69RYLy93mybnW/A3t7Ur0b8h
+         bPF+tDZ3HckNzoZStdy5Tzcez7XHxdvoMZ9ddrNzIQIvn+tCCDDrS2+2dJT+Kc/u7SyC
+         dspFd3QlFwA51ENC7u8OlL4BY8zzr6gP60PKLOa+sELB+C/8lx5jh8EAOnxnTSO5uJHv
+         43FEhlUpXkCDcfRYgPjmXZ+h/ZHsNQhz40u/lYHx3k0Z90iCvJCSHXrJYDZyrrIjZb9e
+         YANA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=O8TLFgk57XdbkaQ4K/PPceaDpsS47PDJl+JgDGaSbYI=;
+        b=PoioRMUEWTW+GQuIOYDWT/dmmjqo9zs4gQZcz4bX/hNWDgWikFJNWL5d6+EgqAvGk0
+         PGQ0D4zOIhsDllz32d9dnu+k1F2aduLqYJEVCcrOm/n6jwnY13rG7UmrjCBreUFZqMaW
+         ehqr3v6v+EMoa3ZYSN44BqIKYCAat9aXdmvGEPvf1s/COGseN2ZKq1K4H+67Ba3zSaBs
+         KgG30i44ZQ9+V7CpeGTTvjqExyYcXUN1Py/Oqcykd1MfNYF/KbAEVxAslrt704zD2mov
+         IVLvdh1eiyFe0tsIQgcpn/gyHqsKcu+mlB4XGO4ZvWchaM0IFTekdIXfNATJg5hTVLlq
+         xTeA==
+X-Gm-Message-State: AOAM530vCNJvcr9RYD+7BwKV1DPG1ycgu8cPvzRnrtw9baVsUpi3lNfj
+        ovdtN66RJ414sxG3fzuKsUUGL187erjqOfvHgjrubxi7XlI=
+X-Google-Smtp-Source: ABdhPJzKZ0r1DX1brzjTu2rkJ+e/RtJEqrdgYWqmcDUstNHQqpH8bY5e3PnwiLkv0QO6xzCdsopEGqWVSnLQ6nomKeI=
+X-Received: by 2002:a2e:a26c:: with SMTP id k12mr3830289ljm.23.1634187785313;
+ Wed, 13 Oct 2021 22:03:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAKYAXd_WozbzSy-cVrpiMKN1a6WWa8gGSWBS8f6XJpWuJaXQpg@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 14 Oct 2021 00:02:54 -0500
+Message-ID: <CAH2r5ms_S9WsLNnQ=AYE7Ykss5+VCfeFtL01VVqt6tp=CY5sRw@mail.gmail.com>
+Subject: Ksmbd and max credits
+To:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 10/08, Namjae Jeon wrote:
->Okay. When existing users upgrade ksmbd-tools, the ksmbdpwd.db file
->remains as the garbage and the user account setting must also be
->reset. How do you usually deal with this? If there is old db file, do
->we need to add code to rename it?
+Thinking about the patch "ksmbd: improve credits management"
+(https://github.com/smfrench/smb3-kernel/commit/bf8acc9e10e21c28452dfa067a7d31e6067104b1)
 
-Thanks, I haven't thought about this TBH.
+Hyunchul noted in the description:
+"Windows server 2016 or later grant up to 8192 credits to clients at once."
 
-Don't you think it's better to just open and user ksmbdpwd.db and warn the
-user about this change? I mean, instead of renaming the file (which can be
-too intrusive IMHO).
+I noticed that SMB2_MAX_CREDITS is defined as 8192 in
+fs/ksmbd/smb2pdu.h.  Isn't this a little low, although I see Samba
+default to it as well.
 
-If anyone has a better idea, please let me know.
+Was thinking that that is roughly equivalent to 64 8MB writes, or 128
+4MB writes.   Although Samba defaults to 8192 max credits as well, for
+Samba it is configurable (via "smb2 max credits" in smb.conf).
+Should it be configurable?  What do more current Windows servers
+default to as the max?
 
 
-Cheers,
+-- 
+Thanks,
 
-Enzo
+Steve
