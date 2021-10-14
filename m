@@ -2,269 +2,101 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E92FC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 15:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA6BC433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 17:36:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E605C60551
-	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 15:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDBA461166
+	for <linux-cifs@archiver.kernel.org>; Thu, 14 Oct 2021 17:36:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233411AbhJNPLM (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Oct 2021 11:11:12 -0400
-Received: from smtp-out1.suse.de ([195.135.220.28]:49404 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231570AbhJNPKq (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Oct 2021 11:10:46 -0400
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0BA3521A88;
-        Thu, 14 Oct 2021 15:08:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1634224121; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=YduEijuzjHWdFU9jJTQd4vV4P/3neJT7nxNy2Dz1J38=;
-        b=ex1CAXHaN8VsW+iI4c//jkCU7de2YYgH5kx6alVXarAB2EHiSaCjwP0MMhayDYnk2PiD7q
-        qWiAJASnMq/lrkqfmp8IvE1YgtasZNvb41ttMa8G+O53ane7fOM8wxwXDZ/+Nra6m42RhB
-        VFJVPlW1GDySR+xf8oUGFIHWERNQgLo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1634224121;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=YduEijuzjHWdFU9jJTQd4vV4P/3neJT7nxNy2Dz1J38=;
-        b=VvIGRL/LS1j6V0y0CL0PIBJrJaRblECTpBEnEZhxTR4gDXt5y8BMZ4z2rGKEvVt3qs7Zyu
-        Rd+XyeXYgRqsgdCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 91DA213D9F;
-        Thu, 14 Oct 2021 15:08:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id ALomF/hHaGF4EAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Thu, 14 Oct 2021 15:08:40 +0000
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     linux-cifs@vger.kernel.org
-Cc:     linkinjeon@kernel.org
-Subject: [PATCH v2] ksmbd-tools: update README
-Date:   Thu, 14 Oct 2021 12:08:38 -0300
-Message-Id: <20211014150838.19339-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.33.0
+        id S231265AbhJNRiI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 14 Oct 2021 13:38:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54844 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232389AbhJNRiH (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 14 Oct 2021 13:38:07 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7274DC061570
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 10:36:02 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id r19so29175450lfe.10
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 10:36:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1q2cwlwdjHHVayhRiCLIE4bMG2HYAMVNN1kvVEMrn4s=;
+        b=dKdbWVwV5SAuRlHq95goCijvh7SkwKuP3Spwukflgejj+9BlPzWYLjmGY62qmWtk0s
+         pn5UPriUmQ+9gXlRYFq6FzoVhYu+/GXxw/H3tfm4b/4BYpZCumjrAbzXD/SGtUfLR0ZP
+         smM7nB7aZknCS1rmeiLiLbpldJe5xzc+KVotX2aWuAzs39dRjlLBdAVURmQ5vosLpl4v
+         LFFKpHvTwnSVlTdS/tC/yQegb7Cd6XUOvdUYnH74nuDREss4a/mAw1yP+KITtvdfqmJ2
+         2bnJwJDYsicx4reCppFFPtMmJ68RpxzwHOS7DKGRpoNfUCHFZuQXuKdyAzkLAl02icwi
+         wJWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1q2cwlwdjHHVayhRiCLIE4bMG2HYAMVNN1kvVEMrn4s=;
+        b=xYc0qlmZn19WXLMahIzvT2PUrS8KL7Oado/EdkFCIf4xB2pOr/B97AS0l7/wfJih2d
+         +oWwtUsk6EIb1/lTMJkYUKMWabdQtu5xM2/+1Sf39mD9Xur9Mzmz3fvuQWm3AdALuVib
+         wkH8tm06BD0L1HMbgoJinIsbi2QfLaAmbns+CobenGVgMOFNobfhZcco8p6Fo/GZqQ9M
+         EaFErN6lYp+227DNCNBIghXCNyNqrZ7vNCPlg6IvpNjA5N2FgHguEfb6qghMLyCpny21
+         /yDpU+Svcjd/Gyf1y/ig6yTGQtrj1r0C4SwIJ9ToQZO8NNEq+eam9rO2y9qBqikjDgPG
+         CJ9w==
+X-Gm-Message-State: AOAM533do69iAaH0C8pRMzfhtoqy5dqwgj4hzSUiBLDjcIlqHMbPJCRc
+        hXPRXliXlRUGGvw7obYdEqx3D2OOk7NR03yMedrkpxdB
+X-Google-Smtp-Source: ABdhPJyyf3fcRWZ4FCxxz7H1e7ICTL7XYehoDJoqKb38TIOcOHmplISZunjanj4yEirB2aS/b9dnTa1v5o7K6MMrUf8=
+X-Received: by 2002:a05:6512:3408:: with SMTP id i8mr6743771lfr.234.1634232960578;
+ Thu, 14 Oct 2021 10:36:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CANT5p=qBKEj5Nz_5Vwj0WWL7-V_78j6Fry5OjvDXGCrejnsu3Q@mail.gmail.com>
+ <CANT5p=ovLNLKwxsnik4pNkCbaznydWKAJz1AbBp6EhBy=nGTiQ@mail.gmail.com>
+In-Reply-To: <CANT5p=ovLNLKwxsnik4pNkCbaznydWKAJz1AbBp6EhBy=nGTiQ@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 14 Oct 2021 12:35:49 -0500
+Message-ID: <CAH2r5mvWb4s22yN5adjnw14HGR11Az47WLk+UfKH_axuiB5r8Q@mail.gmail.com>
+Subject: Re: [PATCH] cifs: for compound requests, use open handle if possible
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Prettify README with markdown and fix some typos/commands.
+tentatively merged the two you posted today into for-next pending testing etc.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
- README    | 98 -------------------------------------------------------
- README.md | 88 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 88 insertions(+), 98 deletions(-)
- delete mode 100644 README
- create mode 100644 README.md
+On Thu, Oct 14, 2021 at 5:41 AM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+>
+> Hi Steve,
+>
+> I don't think this patch was taken. Can we take this?
+> https://github.com/sprasad-microsoft/smb3-kernel-client/commit/34c44cf16b97ee71b6d07720199b97ed328e7c97.patch
+>
+> Regards,
+> Shyam
+>
+> On Fri, Jul 30, 2021 at 10:44 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> >
+> > Hi Steve,
+> >
+> > Please review the patch.
+> > It fixes the issue of some compound requests unnecessarily breaking leases held by the same client.
+> >
+> > https://github.com/sprasad-microsoft/smb3-kernel-client/pull/2/commits/34bf1885b26db09a60bc276ea1a3f798f4cbb05f.patch
+> >
+> > We saw this yesterday when testing with generic/013 xfstests with the multichannel fixes.
+> >
+> > --
+> > Regards,
+> > Shyam
+>
+>
+>
+> --
+> Regards,
+> Shyam
 
-diff --git a/README b/README
-deleted file mode 100644
-index 3dce3bb41c6e..000000000000
---- a/README
-+++ /dev/null
-@@ -1,98 +0,0 @@
--________________________
--BUILDING KSMBD TOOLS
--________________________
--
--Install preprequisite packages:
--	For Ubuntu:
--	sudo apt-get install autoconf libtool pkg-config libnl-3-dev \
--	libnl-genl-3-dev libglib2.0-dev
--
--	For Fedora, RHEL:
--	sudo yum install autoconf automake libtool glib2-devel libnl3-devel
--
--	For CentOS:
--	sudo yum install glib2-devel libnl3-devel
--
--Build steps:
--        - cd into the ksmbd-tools directory
--        - ./autogen.sh
--        - ./configure
--        - make
--        - make install
--
--_____________________
--USING KSMBD TOOLS
--_____________________
--
--Setup steps:
--	- install smbd kernel driver
--		modprobe ksmbd
--	- create user/password for SMB share
--		mkdir /etc/ksmbd/
--		ksmbd.adduser -a <Enter USERNAME for SMB share access>
--		Enter password for SMB share access
--	- create /etc/ksmbd/smb.conf file, add SMB share in smb.conf file
--		Refer smb.conf.example
--	- start smbd user space daemon
--		ksmbd.mountd
--	- access share from Windows or Linux using CIFS
--
--_____________________
--RESTART KSMBD
--_____________________
--
--steps:
--	- kill user and kernel space daemon
--		sudo ksmbd.control -s
--	- restart user space daemon
--		ksmbd.mountd
--
--_____________________
--Shutdown KSMBD
--_____________________
--
--steps:
--	- kill user and kernel space daemon
--		sudo ksmbd.control -s
--	- unload ksmbd module
--		rmmod ksmbd
--
--
--_____________________
--Enable debug prints
--_____________________
--
--steps:
--	- Enable all component prints
--		sudo ksmbd.control -d "all"
--	- Enable one of components(smb, auth, vfs, oplock, ipc, conn, rdma)
--		sudo ksmbd.control -d "smb"
--	- Disable prints:
--		If you try the selected component once more, It is disabled without brackets.
--
--
----------------------
--ADMIN TOOLS
----------------------
--
--- ksmbd.adduser
--	Adds, updates or removes (-a/-u/-d) a user from ksmbd pwd file.
--
--- ksmbd.addshare
--	Adds, updates or removes (-a/-u/-d) a net share from smb.conf file.
--
--Usage example:
--
--Creating a new share:
--
--ksmbd.addshare -a files -o "\
--		     path=/home/users/files \
--		     comment=exported files \
--		     writeable=yes \
--		     read only = no \
--		     "
--
--Note that share options (-o) must always be enquoted ("...").
--
--ksmbd.addshare tool does not modify [global] smb.conf section; only net
--share configs are supported at the moment.
-diff --git a/README.md b/README.md
-new file mode 100644
-index 000000000000..7156c2e20dee
---- /dev/null
-+++ b/README.md
-@@ -0,0 +1,88 @@
-+# ksmbd-tools
-+
-+### Building
-+
-+##### Install prerequisite packages:
-+
-+- For Ubuntu:
-+  - `sudo apt-get install autoconf libtool pkg-config libnl-3-dev libnl-genl-3-dev libglib2.0-dev`
-+
-+- For Fedora, RHEL:
-+  - `sudo yum install autoconf automake libtool glib2-devel libnl3-devel`
-+
-+- For CentOS:
-+  - `sudo yum install glib2-devel libnl3-devel`
-+
-+- For openSUSE:
-+  - `sudo zypper install glib2-devel libnl3-devel`
-+
-+##### Building:
-+
-+- clone this repository
-+- `cd ksmbd-tools`
-+- `./autogen.sh`
-+- `./configure`
-+- `make`
-+- `make install`
-+
-+
-+### Usage
-+
-+All administration tasks must be done as root.
-+
-+##### Setup:
-+
-+- Install ksmbd kernel driver
-+	- `modprobe ksmbd`
-+- Create user/password for SMB share
-+	- `mkdir /etc/ksmbd`
-+	- `ksmbd.adduser -a <username>`
-+	- Enter password for SMB share access
-+- Create `/etc/ksmbd/smb.conf` file
-+	- Refer `smb.conf.example`
-+- Add share to `smb.conf`
-+	- This can be done manually or with `ksmbd.addshare`, e.g.:
-+	- `ksmbd.addshare -a myshare -o "guest ok = yes, writable = yes, path = /mnt/data"`
-+
-+	- Note: share options (-o) must always be enclosed with double quotes ("...").
-+- Start ksmbd user space daemon
-+	- `ksmbd.mountd`
-+- Access share from Windows or Linux using CIFS
-+
-+
-+##### Stopping and restarting the daemon:
-+
-+First, kill user and kernel space daemon
-+  - `ksmbd.control -s`
-+
-+Then, to restart the daemon, run:
-+  - `ksmbd.mountd`
-+
-+Or to shut it down completely:
-+  - `rmmod ksmbd`
-+
-+
-+### Debugging
-+
-+- Enable all component prints
-+  - `ksmbd.control -d "all"`
-+- Enable a single component (see below)
-+  - `ksmbd.control -d "smb"`
-+- Run the command with the same component name again to disable it
-+
-+Currently available debug components:
-+smb, auth, vfs, oplock, ipc, conn, rdma
-+
-+
-+### More...
-+
-+- ksmbd.adduser
-+  - Adds (-a), updates (-u), or deletes (-d) a user from user database.
-+  - Default database file is `/etc/ksmbd/users.db`
-+
-+- ksmbd.addshare
-+  - Adds (-a), updates (-u), or deletes (-d) a net share from config file.
-+  - Default config file is `/etc/ksmbd/smb.conf`
-+
-+`ksmbd.addshare` does not modify `[global]` section in config file; only net
-+share configs are supported at the moment.
+
+
 -- 
-2.33.0
+Thanks,
 
+Steve
