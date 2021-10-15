@@ -2,56 +2,125 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6AA4C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Oct 2021 02:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95AAEC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Oct 2021 04:46:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9059460F4A
-	for <linux-cifs@archiver.kernel.org>; Fri, 15 Oct 2021 02:09:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 767B660FDA
+	for <linux-cifs@archiver.kernel.org>; Fri, 15 Oct 2021 04:46:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234880AbhJOCLJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 14 Oct 2021 22:11:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46548 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229938AbhJOCLI (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 14 Oct 2021 22:11:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 56B0E60F4A
-        for <linux-cifs@vger.kernel.org>; Fri, 15 Oct 2021 02:09:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1634263743;
-        bh=MY2Y6t9qe9Sth63v3mMxCujh/pidCy1fVMzedCo5dFo=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Zml+9eYfAjC6rUEkkdV327MlnHghWH0QA+e7k8xPOcxvaWikN7DpzgQ1A2LHFQZDD
-         hL4g9pwaav4z1PumopXAsgm7S0RH3qIRFDGNS/lfQlZV7M2PMa+Hk+HFZf55/SvQ4p
-         fuWvnPD2F9OGjUMjdV80nr9aqhpQ+Qvf2lYQMyfcRtlb0+D6V6Qxfc4upM+J1CjhaD
-         WCTF5egbDCrdaRjp2gQvDVpUngCFvxMK2GuZAZcckADyg3afYIb/Ic3jHYgEOkvvxk
-         tqCPuhopQOKXYOMMHz0KrIwFM/uqPhYudwuDk9U8cecMWOQOmZM1rui64ZVRM3vzKd
-         Tlxc+LesKzxfQ==
-Received: by mail-ot1-f45.google.com with SMTP id e59-20020a9d01c1000000b00552c91a99f7so1509931ote.6
-        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 19:09:03 -0700 (PDT)
-X-Gm-Message-State: AOAM533/RaIwNPg612kOifRnLBm7eQSshcwnjcDdMy2c4VKNh5ri9PMP
-        KL6O38sOfTKiOHa8k8OaRNIDErIH5MJc+HwPApk=
-X-Google-Smtp-Source: ABdhPJwcff3tHtXDmeExaRg/yD88nlh10LgJfikWzXG0NZZZ2ltu87gFJ8uknNbgotfoDT+S9S/VA+aXuJmERICiHQ8=
-X-Received: by 2002:a05:6830:17da:: with SMTP id p26mr5761707ota.116.1634263742668;
- Thu, 14 Oct 2021 19:09:02 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Thu, 14 Oct 2021 19:09:02
- -0700 (PDT)
-In-Reply-To: <20211014150838.19339-1-ematsumiya@suse.de>
-References: <20211014150838.19339-1-ematsumiya@suse.de>
+        id S235308AbhJOEsJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 15 Oct 2021 00:48:09 -0400
+Received: from mail-pl1-f171.google.com ([209.85.214.171]:34452 "EHLO
+        mail-pl1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230186AbhJOEsI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 15 Oct 2021 00:48:08 -0400
+Received: by mail-pl1-f171.google.com with SMTP id g5so5659269plg.1
+        for <linux-cifs@vger.kernel.org>; Thu, 14 Oct 2021 21:46:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nB2/f2Bq9mvMFtcHgn/LPMxNOoIYF+8+gz3V+7mMCn4=;
+        b=af63wDgebrgJUgBsBJCRWMtdffB9bw4EbNv+wun3s8myQ5ftZjojBnx/IKbxRi+Cbk
+         dKZmevF4RZDiJdUN2c51a92p++nay7xKW/H8vIpsrNx8vQme5AyWlfITZo0bS+2CSwCK
+         fMGIIv9ZTPNdMhQ6Kp2f6ZGWkZfWH97GzHnwGwRt6m0wU6kWy7XVnfzKiLhUPW3tRcIY
+         JYc5s+UYTHUaA3mM2dafBdvhMc6ean0xHgA83ot7ZVZIxqgosijTKwdvv0aBw3PuM8bI
+         Jd9n5/DonN7R96Y+Zxv7Qn0geuBF/a0HmAEj6OncNvVWfm8ME0FBm2WCDrekct4SVOfE
+         OQcg==
+X-Gm-Message-State: AOAM531DRUBls3HdkW6aNMbmCsKLE0VuiIEQdqMmVi9u4K7Xp6i2UZef
+        EwncfCv2pwcUxGGydXqM/+tAarqC+yWQYg==
+X-Google-Smtp-Source: ABdhPJyu7IVBW54QO8KLpFeQwovrx1TSDy2nke+WmMet0Szszu8Veilwmo86PLr/BAfcg4PqZrxbpw==
+X-Received: by 2002:a17:902:8f90:b0:13e:a44e:2d3c with SMTP id z16-20020a1709028f9000b0013ea44e2d3cmr9127332plo.85.1634273162733;
+        Thu, 14 Oct 2021 21:46:02 -0700 (PDT)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id ls7sm4105243pjb.16.2021.10.14.21.46.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Oct 2021 21:46:02 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 15 Oct 2021 11:09:02 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8EdvkPVWQztbPcZZQUwAFpp959Psk7fpwdG4_KDxXREA@mail.gmail.com>
-Message-ID: <CAKYAXd8EdvkPVWQztbPcZZQUwAFpp959Psk7fpwdG4_KDxXREA@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd-tools: update README
-To:     Enzo Matsumiya <ematsumiya@suse.de>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>, Ralph Boehme <slow@samba.org>
+Subject: [PATCH v2] ksmbd: validate credit charge after validating SMB2 PDU body size
+Date:   Fri, 15 Oct 2021 13:45:53 +0900
+Message-Id: <20211015044553.70582-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-10-15 0:08 GMT+09:00, Enzo Matsumiya <ematsumiya@suse.de>:
-> Prettify README with markdown and fix some typos/commands.
->
-> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-Applied, Thanks for your patch!
+From: Ralph Boehme <slow@samba.org>
+
+smb2_validate_credit_charge() accesses fields in the SMB2 PDU body,
+but until smb2_calc_size() is called the PDU has not yet been verified
+to be large enough to access the PDU dynamic part length field.
+
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Ralph Boehme <slow@samba.org>
+---
+ v2:
+  - add goto statement not to skip to validate credit charge.
+  - fix conflict with credit management patch.
+
+ fs/ksmbd/smb2misc.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
+index e7e441c8f050..030ca57c3784 100644
+--- a/fs/ksmbd/smb2misc.c
++++ b/fs/ksmbd/smb2misc.c
+@@ -400,26 +400,20 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
+ 		}
+ 	}
+ 
+-	if ((work->conn->vals->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU) &&
+-	    smb2_validate_credit_charge(work->conn, hdr)) {
+-		work->conn->ops->set_rsp_status(work, STATUS_INVALID_PARAMETER);
+-		return 1;
+-	}
+-
+ 	if (smb2_calc_size(hdr, &clc_len))
+ 		return 1;
+ 
+ 	if (len != clc_len) {
+ 		/* client can return one byte more due to implied bcc[0] */
+ 		if (clc_len == len + 1)
+-			return 0;
++			goto validate_credit;
+ 
+ 		/*
+ 		 * Some windows servers (win2016) will pad also the final
+ 		 * PDU in a compound to 8 bytes.
+ 		 */
+ 		if (ALIGN(clc_len, 8) == len)
+-			return 0;
++			goto validate_credit;
+ 
+ 		/*
+ 		 * windows client also pad up to 8 bytes when compounding.
+@@ -432,7 +426,7 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
+ 				    "cli req padded more than expected. Length %d not %d for cmd:%d mid:%llu\n",
+ 				    len, clc_len, command,
+ 				    le64_to_cpu(hdr->MessageId));
+-			return 0;
++			goto validate_credit;
+ 		}
+ 
+ 		ksmbd_debug(SMB,
+@@ -443,6 +437,13 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
+ 		return 1;
+ 	}
+ 
++validate_credit:
++	if ((work->conn->vals->capabilities & SMB2_GLOBAL_CAP_LARGE_MTU) &&
++	    smb2_validate_credit_charge(work->conn, hdr)) {
++		work->conn->ops->set_rsp_status(work, STATUS_INVALID_PARAMETER);
++		return 1;
++	}
++
+ 	return 0;
+ }
+ 
+-- 
+2.25.1
+
