@@ -2,49 +2,51 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6617C433FE
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02EA0C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:02:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF74760EC0
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:02:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC4F260EC0
+	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:02:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233313AbhJRPEW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 18 Oct 2021 11:04:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43639 "EHLO
+        id S232067AbhJRPEi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 18 Oct 2021 11:04:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43241 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233284AbhJRPDH (ORCPT
+        by vger.kernel.org with ESMTP id S233476AbhJRPDT (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 18 Oct 2021 11:03:07 -0400
+        Mon, 18 Oct 2021 11:03:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634569255;
+        s=mimecast20190719; t=1634569267;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=De0jqwH/v0yTKtY0BasvsuLkI5xzm/i5IM30qZPwEs0=;
-        b=D1cIsx8l5YFU5IlJCL9syhUClH4++BICXPbkIOLBEQGA1z/y2gziD5qpSf3sMwIiyRpspg
-        W7NNLb5KcHZIjBZD08Rb44iXLNCnKC3HspgKDbg07PffCIK76KTzE0cO45pv5k1DHepllQ
-        g4Evh88KpvFVSLS+jQqTjFSxuxiArpY=
+        bh=tyfueRWcvZbFZpicF1tHL+3lmAtJffKA8+YjsGo6828=;
+        b=J/PepAiR/xLvL0ukququJkxldIXIFFWwZEB+4UpT+A/PF1Yt6XSY6oErxbEc+QrWfi0POi
+        OM8kTM2szKQKyOmiKFosvF08unCHgem6MkRvXfOTz8VtJ6Eyf31UqJo7vncISIOWIyiX11
+        JmWcH/RJ+K7N1Bxe/9hzOMtO34dHVo4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-oRDe2hXsMXKdtd5p2LIFWw-1; Mon, 18 Oct 2021 11:00:44 -0400
-X-MC-Unique: oRDe2hXsMXKdtd5p2LIFWw-1
+ us-mta-321-2IzxT3O8Mg-udXAv-P67-Q-1; Mon, 18 Oct 2021 11:01:04 -0400
+X-MC-Unique: 2IzxT3O8Mg-udXAv-P67-Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 228148042E1;
-        Mon, 18 Oct 2021 15:00:42 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4C4C80DDE3;
+        Mon, 18 Oct 2021 15:01:00 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D793660BF4;
-        Mon, 18 Oct 2021 15:00:38 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 943FF60BF4;
+        Mon, 18 Oct 2021 15:00:57 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 39/67] fscache: Note the object size during invalidation
+Subject: [PATCH 41/67] afs: Render cache cookie key as big endian
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
-Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+Cc:     Marc Dionne <marc.dionne@auristor.com>,
+        linux-afs@lists.infradead.org, dhowells@redhat.com,
+        Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
@@ -57,8 +59,8 @@ Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 18 Oct 2021 16:00:37 +0100
-Message-ID: <163456923795.2614702.17791069992979263352.stgit@warthog.procyon.org.uk>
+Date:   Mon, 18 Oct 2021 16:00:56 +0100
+Message-ID: <163456925673.2614702.17571187496574827113.stgit@warthog.procyon.org.uk>
 In-Reply-To: <163456861570.2614702.14754548462706508617.stgit@warthog.procyon.org.uk>
 References: <163456861570.2614702.14754548462706508617.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
@@ -70,85 +72,85 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Note the size of the cache object during invalidation.  For AFS, we set
-this to the file size when invalidating a file due to third-party
-interference.
+Render the parts of the cookie key for an afs inode cookie as big endian.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: linux-afs@lists.infradead.org
 ---
 
- fs/afs/inode.c          |    2 +-
- fs/fscache/cookie.c     |    3 ++-
- include/linux/fscache.h |    7 ++++---
- 3 files changed, 7 insertions(+), 5 deletions(-)
+ fs/afs/file.c     |    2 +-
+ fs/afs/inode.c    |   16 ++++++++--------
+ fs/afs/internal.h |    8 +++++++-
+ 3 files changed, 16 insertions(+), 10 deletions(-)
 
+diff --git a/fs/afs/file.c b/fs/afs/file.c
+index b4666da93b54..5e29d433960d 100644
+--- a/fs/afs/file.c
++++ b/fs/afs/file.c
+@@ -189,7 +189,7 @@ int afs_release(struct inode *inode, struct file *file)
+ 
+ 	if ((file->f_mode & FMODE_WRITE)) {
+ 		i_size = i_size_read(&vnode->vfs_inode);
+-		aux.data_version = vnode->status.data_version;
++		afs_set_cache_aux(vnode, &aux);
+ 		fscache_unuse_cookie(afs_vnode_cache(vnode), &aux, &i_size);
+ 	} else {
+ 		fscache_unuse_cookie(afs_vnode_cache(vnode), NULL, NULL);
 diff --git a/fs/afs/inode.c b/fs/afs/inode.c
-index c2f4afff9837..c21c1352b149 100644
+index c21c1352b149..842570e4470f 100644
 --- a/fs/afs/inode.c
 +++ b/fs/afs/inode.c
-@@ -565,7 +565,7 @@ static void afs_zap_data(struct afs_vnode *vnode)
- 	_enter("{%llx:%llu}", vnode->fid.vid, vnode->fid.vnode);
- 
+@@ -413,9 +413,9 @@ static void afs_get_inode_cache(struct afs_vnode *vnode)
+ {
  #ifdef CONFIG_AFS_FSCACHE
--	fscache_invalidate(vnode->cache);
-+	fscache_invalidate(vnode->cache, i_size_read(&vnode->vfs_inode));
- #endif
+ 	struct {
+-		u32 vnode_id;
+-		u32 unique;
+-		u32 vnode_id_ext[2];	/* Allow for a 96-bit key */
++		__be32 vnode_id;
++		__be32 unique;
++		__be32 vnode_id_ext[2];	/* Allow for a 96-bit key */
+ 	} __packed key;
+ 	struct afs_vnode_cache_aux aux;
  
- 	/* nuke all the non-dirty pages that aren't locked, mapped or being
-diff --git a/fs/fscache/cookie.c b/fs/fscache/cookie.c
-index 94976f90dc71..6b49c2321256 100644
---- a/fs/fscache/cookie.c
-+++ b/fs/fscache/cookie.c
-@@ -704,7 +704,7 @@ static void fscache_invalidate_cookie(struct fscache_cookie *cookie)
+@@ -424,11 +424,11 @@ static void afs_get_inode_cache(struct afs_vnode *vnode)
+ 		return;
+ 	}
+ 
+-	key.vnode_id		= vnode->fid.vnode;
+-	key.unique		= vnode->fid.unique;
+-	key.vnode_id_ext[0]	= vnode->fid.vnode >> 32;
+-	key.vnode_id_ext[1]	= vnode->fid.vnode_hi;
+-	aux.data_version	= vnode->status.data_version;
++	key.vnode_id		= htonl(vnode->fid.vnode);
++	key.unique		= htonl(vnode->fid.unique);
++	key.vnode_id_ext[0]	= htonl(vnode->fid.vnode >> 32);
++	key.vnode_id_ext[1]	= htonl(vnode->fid.vnode_hi);
++	afs_set_cache_aux(vnode, &aux);
+ 
+ 	vnode->cache = fscache_acquire_cookie(
+ 		vnode->volume->cache,
+diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+index 8e168c3fa5d1..3180ba6bd46d 100644
+--- a/fs/afs/internal.h
++++ b/fs/afs/internal.h
+@@ -869,9 +869,15 @@ struct afs_operation {
+  * Cache auxiliary data.
+  */
+ struct afs_vnode_cache_aux {
+-	u64			data_version;
++	__be64			data_version;
+ } __packed;
+ 
++static inline void afs_set_cache_aux(struct afs_vnode *vnode,
++				     struct afs_vnode_cache_aux *aux)
++{
++	aux->data_version = cpu_to_be64(vnode->status.data_version);
++}
++
  /*
-  * Invalidate an object.  Callable with spinlocks held.
-  */
--void __fscache_invalidate(struct fscache_cookie *cookie)
-+void __fscache_invalidate(struct fscache_cookie *cookie, loff_t new_size)
- {
- 	bool is_caching;
- 
-@@ -718,6 +718,7 @@ void __fscache_invalidate(struct fscache_cookie *cookie)
- 
- 	spin_lock(&cookie->lock);
- 	set_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
-+	cookie->object_size = new_size;
- 	cookie->inval_counter++;
- 
- 	switch (cookie->stage) {
-diff --git a/include/linux/fscache.h b/include/linux/fscache.h
-index 41e579ff65ee..fa7eef2674bf 100644
---- a/include/linux/fscache.h
-+++ b/include/linux/fscache.h
-@@ -159,7 +159,7 @@ extern struct fscache_cookie *__fscache_acquire_cookie(
- extern void __fscache_use_cookie(struct fscache_cookie *, bool);
- extern void __fscache_unuse_cookie(struct fscache_cookie *, const void *, const loff_t *);
- extern void __fscache_relinquish_cookie(struct fscache_cookie *, bool);
--extern void __fscache_invalidate(struct fscache_cookie *);
-+extern void __fscache_invalidate(struct fscache_cookie *, loff_t);
- #ifdef FSCACHE_USE_NEW_IO_API
- extern int __fscache_begin_read_operation(struct netfs_cache_resources *, struct fscache_cookie *);
- #endif
-@@ -388,6 +388,7 @@ void fscache_unpin_cookie(struct fscache_cookie *cookie)
- /**
-  * fscache_invalidate - Notify cache that an object needs invalidation
-  * @cookie: The cookie representing the cache object
-+ * @size: The revised size of the object.
-  *
-  * Notify the cache that an object is needs to be invalidated and that it
-  * should abort any retrievals or stores it is doing on the cache.  The object
-@@ -399,10 +400,10 @@ void fscache_unpin_cookie(struct fscache_cookie *cookie)
-  * description.
-  */
- static inline
--void fscache_invalidate(struct fscache_cookie *cookie)
-+void fscache_invalidate(struct fscache_cookie *cookie, loff_t size)
- {
- 	if (fscache_cookie_valid(cookie))
--		__fscache_invalidate(cookie);
-+		__fscache_invalidate(cookie, size);
- }
- 
- /**
+  * We use page->private to hold the amount of the page that we've written to,
+  * splitting the field into two parts.  However, we need to represent a range
 
 
