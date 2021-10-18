@@ -2,49 +2,51 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4F24C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6841C433EF
 	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:02:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1C9A60E0C
+	by mail.kernel.org (Postfix) with ESMTP id D2D42610A1
 	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:02:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233279AbhJRPEj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 18 Oct 2021 11:04:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58473 "EHLO
+        id S233394AbhJRPEn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 18 Oct 2021 11:04:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58010 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233559AbhJRPD1 (ORCPT
+        by vger.kernel.org with ESMTP id S233790AbhJRPDz (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 18 Oct 2021 11:03:27 -0400
+        Mon, 18 Oct 2021 11:03:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634569275;
+        s=mimecast20190719; t=1634569303;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=X/VMVPY3Zd09milyYLfDMV0nw0wF/nfvqEV6fmUcSps=;
-        b=StTyaL0qnueHb74wtf9TnwMx+PdVKEs13P8fLNQ619zRFidNRv8YQWGxQuyH2v3DOEB52+
-        DZT6OSzE/9ppDUWVla2lsM5UV3176PlUPKB7hP4UfZjHfF8mkIL9/VeV6OvPH7CoWtDdMu
-        zaOmePtr9+XFhm+yMXPNrsaSnHR5/bE=
+        bh=EuP1b5wi/prrLttPJMaPCO/uxdQhwIzMYqp5U826ZAY=;
+        b=WWs1KaNAiw7Emwg7P5gd6MCFXT4ILwsNLmU+fe1SbGbRqBvmaBSZEZFhxK+HK5WtaM0Btn
+        evjRMi9T6YK/cmpY2ZAlID2CrbtRf4W8kfiJaH4QG8Y4J7ofRlqsHCVJJqsOxQ7GwT8U5y
+        QAAAEq9kmK3Gp9T0TfpVDeLMOaDTr+A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-LJGDIiC4MxavSMMQ0x2aqg-1; Mon, 18 Oct 2021 11:01:12 -0400
-X-MC-Unique: LJGDIiC4MxavSMMQ0x2aqg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-467-bWgVBC04P6a3jJhJWZ1_LQ-1; Mon, 18 Oct 2021 11:01:40 -0400
+X-MC-Unique: bWgVBC04P6a3jJhJWZ1_LQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FBC880DDE1;
-        Mon, 18 Oct 2021 15:01:10 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD1AE101AFC3;
+        Mon, 18 Oct 2021 15:01:37 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DD31A5C1D0;
-        Mon, 18 Oct 2021 15:01:06 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B51751A7E9;
+        Mon, 18 Oct 2021 15:01:25 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 42/67] cachefiles: Use tmpfile/link
+Subject: [PATCH 44/67] fscache: disable cookie when doing an invalidation for
+ DIO write
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
-Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+Cc:     Jeff Layton <jlayton@kernel.org>, dhowells@redhat.com,
+        Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
@@ -57,570 +59,151 @@ Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 18 Oct 2021 16:01:06 +0100
-Message-ID: <163456926609.2614702.17249270156115609970.stgit@warthog.procyon.org.uk>
+Date:   Mon, 18 Oct 2021 16:01:24 +0100
+Message-ID: <163456928482.2614702.6139737560803005640.stgit@warthog.procyon.org.uk>
 In-Reply-To: <163456861570.2614702.14754548462706508617.stgit@warthog.procyon.org.uk>
 References: <163456861570.2614702.14754548462706508617.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make cachefiles use a temporary file (created with vfs_tmpfile()) for a new
-file rather than creating it immediately.  This means we don't have to wait
-exclusively on the directory's inode lock at this point.
+From: Jeff Layton <jlayton@kernel.org>
 
-The directory entry creation is then deferred to the point at which the
-file is committed.  Indeed, if the file is deleted before that point, it
-can just be abandoned without ever modifying the directory.
+O_DIRECT I/O is probably a good indicator that we don't need to be
+caching this file at the moment. Disable the cookie by treating it
+as we would a NULL cookie after the invalidation completes. Reenable
+when the last unuse is done.
 
-Invalidation is achieved by simply closing the old file and creating a new
-tmpfile.  Any in-progress ops hold the old file open till they've finished.
-We don't need to cancel them and can just deal with reissuing a read to the
-server upon completion (that will be a separate patch).
-
-Note: This would be easier if linkat() could be given a flag to indicate
-the destination should be overwritten or if RENAME_EXCHANGE could be
-applied to tmpfiles, effectively unlinking the destination.
-
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- fs/cachefiles/interface.c         |   85 +++++++++-----
- fs/cachefiles/internal.h          |    9 ++
- fs/cachefiles/namei.c             |  219 ++++++++++++++++++++++++++-----------
- include/trace/events/cachefiles.h |   48 ++++++--
- 4 files changed, 251 insertions(+), 110 deletions(-)
+ fs/afs/file.c           |    2 +-
+ fs/fscache/cookie.c     |    5 +++++
+ include/linux/fscache.h |   15 ++++++++++-----
+ 3 files changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/fs/cachefiles/interface.c b/fs/cachefiles/interface.c
-index d186a68ff810..a114b59e5b29 100644
---- a/fs/cachefiles/interface.c
-+++ b/fs/cachefiles/interface.c
-@@ -197,6 +197,9 @@ static void cachefiles_commit_object(struct cachefiles_object *object,
- 		update = true;
- 	if (update)
- 		cachefiles_update_object(object);
-+
-+	if (test_bit(CACHEFILES_OBJECT_USING_TMPFILE, &object->flags))
-+		cachefiles_commit_tmpfile(cache, object);
+diff --git a/fs/afs/file.c b/fs/afs/file.c
+index 5e29d433960d..5e674a503c1b 100644
+--- a/fs/afs/file.c
++++ b/fs/afs/file.c
+@@ -357,7 +357,7 @@ static bool afs_is_cache_enabled(struct inode *inode)
+ {
+ 	struct fscache_cookie *cookie = afs_vnode_cache(AFS_FS_I(inode));
+ 
+-	return fscache_cookie_valid(cookie) && cookie->cache_priv;
++	return fscache_cookie_enabled(cookie) && cookie->cache_priv;
  }
  
- /*
-@@ -206,9 +209,14 @@ static void cachefiles_clean_up_object(struct cachefiles_object *object,
- 				       struct cachefiles_cache *cache)
+ static int afs_begin_cache_operation(struct netfs_read_request *rreq)
+diff --git a/fs/fscache/cookie.c b/fs/fscache/cookie.c
+index 8731188a5ac7..70bfbd269652 100644
+--- a/fs/fscache/cookie.c
++++ b/fs/fscache/cookie.c
+@@ -522,6 +522,7 @@ void __fscache_unuse_cookie(struct fscache_cookie *cookie,
+ 		__fscache_update_cookie(cookie, aux_data, object_size);
+ 	cookie->unused_at = jiffies;
+ 	if (atomic_dec_return(&cookie->n_active) == 0) {
++		clear_bit(FSCACHE_COOKIE_DISABLED, &cookie->flags);
+ 		if (test_bit(FSCACHE_COOKIE_IS_CACHING, &cookie->flags)) {
+ 			spin_lock(&fscache_cookie_lru_lock);
+ 			if (list_empty(&cookie->commit_link)) {
+@@ -715,6 +716,10 @@ void __fscache_invalidate(struct fscache_cookie *cookie,
+ 		 "Trying to invalidate relinquished cookie\n"))
+ 		return;
+ 
++	if ((flags & FSCACHE_INVAL_DIO_WRITE) &&
++	    test_and_set_bit(FSCACHE_COOKIE_DISABLED, &cookie->flags))
++		return;
++
+ 	spin_lock(&cookie->lock);
+ 	set_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
+ 	fscache_update_aux(cookie, aux_data, &new_size);
+diff --git a/include/linux/fscache.h b/include/linux/fscache.h
+index a29bd81996ea..08663ad7feed 100644
+--- a/include/linux/fscache.h
++++ b/include/linux/fscache.h
+@@ -28,12 +28,14 @@
+ #define fscache_volume_valid(volume) (volume)
+ #define fscache_cookie_valid(cookie) (cookie)
+ #define fscache_resources_valid(cres) ((cres)->cache_priv)
++#define fscache_cookie_enabled(cookie) (cookie && !test_bit(FSCACHE_COOKIE_DISABLED, &cookie->flags))
+ #else
+ #define __fscache_available (0)
+ #define fscache_available() (0)
+ #define fscache_volume_valid(volume) (0)
+ #define fscache_cookie_valid(cookie) (0)
+ #define fscache_resources_valid(cres) (false)
++#define fscache_cookie_enabled(cookie) (0)
+ #endif
+ 
+ struct fscache_cookie;
+@@ -43,6 +45,8 @@ struct fscache_cookie;
+ #define FSCACHE_ADV_WRITE_NOCACHE	0x02 /* Don't cache if written to locally */
+ #define FSCACHE_ADV_FALLBACK_IO		0x04 /* Going to use the fallback I/O API (dangerous) */
+ 
++#define FSCACHE_INVAL_DIO_WRITE		0x01 /* Invalidate due to DIO write */
++
+ enum fscache_want_stage {
+ 	FSCACHE_WANT_PARAMS,
+ 	FSCACHE_WANT_WRITE,
+@@ -120,6 +124,7 @@ struct fscache_cookie {
+ #define FSCACHE_COOKIE_NO_DATA_TO_READ	3		/* T if this cookie has nothing to read */
+ #define FSCACHE_COOKIE_NEEDS_UPDATE	4		/* T if attrs have been updated */
+ #define FSCACHE_COOKIE_HAS_BEEN_CACHED	5		/* T if cookie needs withdraw-on-relinq */
++#define FSCACHE_COOKIE_DISABLED		6		/* T if cookie has been disabled */
+ #define FSCACHE_COOKIE_NACC_ELEVATED	8		/* T if n_accesses is incremented */
+ #define FSCACHE_COOKIE_DO_RELINQUISH	9		/* T if this cookie needs relinquishment */
+ #define FSCACHE_COOKIE_DO_WITHDRAW	10		/* T if this cookie needs withdrawing */
+@@ -352,7 +357,7 @@ static inline
+ void fscache_update_cookie(struct fscache_cookie *cookie, const void *aux_data,
+ 			   const loff_t *object_size)
  {
- 	if (test_bit(FSCACHE_COOKIE_RETIRED, &object->cookie->flags)) {
--		cachefiles_see_object(object, cachefiles_obj_see_clean_delete);
--		_debug("- inval object OBJ%x", object->debug_id);
--		cachefiles_delete_object(object, FSCACHE_OBJECT_WAS_RETIRED);
-+		if (!test_bit(CACHEFILES_OBJECT_USING_TMPFILE, &object->flags)) {
-+			cachefiles_see_object(object, cachefiles_obj_see_clean_delete);
-+			_debug("- inval object OBJ%x", object->debug_id);
-+			cachefiles_delete_object(object, FSCACHE_OBJECT_WAS_RETIRED);
-+		} else {
-+			cachefiles_see_object(object, cachefiles_obj_see_clean_drop_tmp);
-+			_debug("- inval object OBJ%x tmpfile", object->debug_id);
-+		}
- 	} else {
- 		cachefiles_see_object(object, cachefiles_obj_see_clean_commit);
- 		cachefiles_commit_object(object, cache);
-@@ -372,41 +380,58 @@ static bool cachefiles_invalidate_cookie(struct fscache_cookie *cookie,
- 					 unsigned int flags)
- {
- 	struct cachefiles_object *object = cookie->cache_priv;
--	struct cachefiles_cache *cache = object->volume->cache;
--	const struct cred *saved_cred;
--	struct file *file = object->file;
--	uint64_t ni_size = cookie->object_size;
--	int ret;
-+	struct file *new_file, *old_file;
-+	bool old_tmpfile;
- 
--	_enter("{OBJ%x},[%llu]",
--	       object->debug_id, (unsigned long long)ni_size);
-+	_enter("o=%x,[%llu]", object->debug_id, object->cookie->object_size);
- 
--	if (file) {
--		ASSERT(d_is_reg(file->f_path.dentry));
-+	old_tmpfile = test_bit(CACHEFILES_OBJECT_USING_TMPFILE, &object->flags);
- 
--		cachefiles_begin_secure(cache, &saved_cred);
--		trace_cachefiles_trunc(object, file_inode(file),
--				       i_size_read(file_inode(file)), 0,
--				       cachefiles_trunc_invalidate);
--		ret = vfs_truncate(&file->f_path, 0);
--		if (ret == 0) {
--			ni_size = round_up(ni_size, CACHEFILES_DIO_BLOCK_SIZE);
--			trace_cachefiles_trunc(object, file_inode(file),
--					       0, ni_size,
--					       cachefiles_trunc_set_size);
--			ret = vfs_truncate(&file->f_path, ni_size);
--		}
--		cachefiles_end_secure(cache, saved_cred);
-+	if (!object->file) {
-+		fscache_set_cookie_stage(cookie, FSCACHE_COOKIE_STAGE_ACTIVE);
-+		_leave(" = t [light]");
-+		return true;
-+	}
-+
-+	new_file = cachefiles_create_tmpfile(object);
-+	if (IS_ERR(new_file))
-+		goto failed;
-+
-+	/* Substitute the VFS target */
-+	_debug("sub");
-+	spin_lock(&object->lock);
-+
-+	old_file = object->file;
-+	object->file = new_file;
-+	set_bit(CACHEFILES_OBJECT_USING_TMPFILE, &object->flags);
-+	set_bit(FSCACHE_COOKIE_NEEDS_UPDATE, &object->cookie->flags);
-+
-+	spin_unlock(&object->lock);
-+	_debug("subbed");
-+
-+	/* Allow I/O to take place again */
-+	fscache_set_cookie_stage(cookie, FSCACHE_COOKIE_STAGE_ACTIVE);
- 
--		if (ret != 0) {
--			if (ret == -EIO)
--				cachefiles_io_error_obj(object,
--							"Invalidate failed");
--			return false;
-+	if (old_file) {
-+		if (!old_tmpfile) {
-+			struct cachefiles_volume *volume = object->volume;
-+			struct dentry *fan = volume->fanout[(u8)object->key_hash];
-+
-+			inode_lock_nested(d_inode(fan), I_MUTEX_PARENT);
-+			cachefiles_bury_object(volume->cache, object, fan,
-+					       old_file->f_path.dentry,
-+					       FSCACHE_OBJECT_INVALIDATED);
- 		}
-+		fput(old_file);
- 	}
- 
-+	_leave(" = t");
- 	return true;
-+
-+failed:
-+	fscache_set_cookie_stage(cookie, FSCACHE_COOKIE_STAGE_FAILED);
-+	_leave(" = f");
-+	return false;
+-	if (fscache_cookie_valid(cookie))
++	if (fscache_cookie_enabled(cookie))
+ 		__fscache_update_cookie(cookie, aux_data, object_size);
  }
  
- const struct fscache_cache_ops cachefiles_cache_ops = {
-diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
-index d8a70ecbe94a..6cc22c85c8f2 100644
---- a/fs/cachefiles/internal.h
-+++ b/fs/cachefiles/internal.h
-@@ -59,6 +59,7 @@ struct cachefiles_object {
- 	u8				key_hash;	/* Hash of object key */
- 	unsigned long			flags;
- #define CACHEFILES_OBJECT_IS_NEW	0		/* Set if object is new */
-+#define CACHEFILES_OBJECT_USING_TMPFILE	1		/* Have an unlinked tmpfile */
- };
- 
- extern struct kmem_cache *cachefiles_object_jar;
-@@ -171,6 +172,11 @@ extern bool cachefiles_cook_key(struct cachefiles_object *object);
-  * namei.c
-  */
- extern void cachefiles_unmark_inode_in_use(struct cachefiles_object *object);
-+extern int cachefiles_bury_object(struct cachefiles_cache *cache,
-+				  struct cachefiles_object *object,
-+				  struct dentry *dir,
-+				  struct dentry *rep,
-+				  enum fscache_why_object_killed why);
- extern int cachefiles_delete_object(struct cachefiles_object *object,
- 				    enum fscache_why_object_killed why);
- extern bool cachefiles_walk_to_object(struct cachefiles_object *object);
-@@ -183,6 +189,9 @@ extern int cachefiles_cull(struct cachefiles_cache *cache, struct dentry *dir,
- 
- extern int cachefiles_check_in_use(struct cachefiles_cache *cache,
- 				   struct dentry *dir, char *filename);
-+extern struct file *cachefiles_create_tmpfile(struct cachefiles_object *object);
-+extern bool cachefiles_commit_tmpfile(struct cachefiles_cache *cache,
-+				      struct cachefiles_object *object);
- 
- /*
-  * security.c
-diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
-index f7e73aba9104..0edf1276768b 100644
---- a/fs/cachefiles/namei.c
-+++ b/fs/cachefiles/namei.c
-@@ -80,11 +80,11 @@ static void cachefiles_mark_object_inactive(struct cachefiles_object *object)
-  * - directory backed objects are stuffed into the graveyard for userspace to
-  *   delete
-  */
--static int cachefiles_bury_object(struct cachefiles_cache *cache,
--				  struct cachefiles_object *object,
--				  struct dentry *dir,
--				  struct dentry *rep,
--				  enum fscache_why_object_killed why)
-+int cachefiles_bury_object(struct cachefiles_cache *cache,
-+			   struct cachefiles_object *object,
-+			   struct dentry *dir,
-+			   struct dentry *rep,
-+			   enum fscache_why_object_killed why)
+@@ -410,7 +415,7 @@ static inline
+ void fscache_invalidate(struct fscache_cookie *cookie,
+ 			const void *aux_data, loff_t size, unsigned int flags)
  {
- 	struct dentry *grave, *trap;
- 	struct path path, path_to_graveyard;
-@@ -302,83 +302,73 @@ static int cachefiles_open_file(struct cachefiles_object *object,
- {
- 	struct cachefiles_cache *cache = object->volume->cache;
- 	struct dentry *dentry;
--	struct inode *dinode = d_backing_inode(fan), *inode;
- 	struct file *file;
--	struct path fan_path, path;
-+	struct path path;
- 	int ret;
- 
- 	_enter("%pd %s", fan, object->d_name);
- 
--	inode_lock_nested(dinode, I_MUTEX_PARENT);
--
--	dentry = lookup_one_len(object->d_name, fan, object->d_name_len);
-+	dentry = lookup_positive_unlocked(object->d_name, fan, object->d_name_len);
- 	trace_cachefiles_lookup(object, dentry);
--	if (IS_ERR(dentry)) {
--		ret = PTR_ERR(dentry);
--		goto error_unlock;
--	}
--
--	if (d_is_negative(dentry)) {
-+	if (dentry == ERR_PTR(-ENOENT)) {
-+		set_bit(CACHEFILES_OBJECT_IS_NEW, &object->flags);
- 		fscache_cookie_lookup_negative(object->cookie);
- 
- 		ret = cachefiles_has_space(cache, 1, 0);
- 		if (ret < 0)
--			goto error_dput;
--
--		fan_path.mnt = cache->mnt;
--		fan_path.dentry = fan;
--		ret = security_path_mknod(&fan_path, dentry, S_IFREG, 0);
--		if (ret < 0)
--			goto error_dput;
--		ret = vfs_create(&init_user_ns, dinode, dentry, S_IFREG, true);
--		trace_cachefiles_create(object, dentry, ret);
--		if (ret < 0)
--			goto error_dput;
-+			goto error;
- 
--		inode = d_backing_inode(dentry);
--		_debug("create -> %pd{ino=%lu}", dentry, inode->i_ino);
--		set_bit(CACHEFILES_OBJECT_IS_NEW, &object->flags);
-+		file = cachefiles_create_tmpfile(object);
-+		if (IS_ERR(file)) {
-+			ret = PTR_ERR(file);
-+			goto error;
-+		}
- 
--	} else if (!d_is_reg(dentry)) {
--		inode = d_backing_inode(dentry);
--		pr_err("inode %lu is not a file\n", inode->i_ino);
--		ret = -EIO;
--		goto error_dput;
--	} else {
--		inode = d_backing_inode(dentry);
--		_debug("file -> %pd positive", dentry);
-+		set_bit(FSCACHE_COOKIE_NEEDS_UPDATE, &object->cookie->flags);
-+		set_bit(CACHEFILES_OBJECT_USING_TMPFILE, &object->flags);
-+		_debug("create -> %pD{ino=%lu}", file, file_inode(file)->i_ino);
-+		goto out;
- 	}
- 
--	inode_unlock(dinode);
--
--	/* We need to open a file interface onto a data file now as we can't do
--	 * it on demand because writeback called from do_exit() sees
--	 * current->fs == NULL - which breaks d_path() called from ext4 open.
--	 */
--	path.mnt = cache->mnt;
--	path.dentry = dentry;
--	file = open_with_fake_path(&path, O_RDWR | O_LARGEFILE | O_DIRECT,
--				   inode, cache->cache_cred);
--	dput(dentry);
--	if (IS_ERR(file)) {
--		ret = PTR_ERR(file);
-+	if (IS_ERR(dentry)) {
-+		ret = PTR_ERR(dentry);
- 		goto error;
- 	}
--	if (unlikely(!file->f_op->read_iter) ||
--	    unlikely(!file->f_op->write_iter)) {
--		pr_notice("Cache does not support read_iter and write_iter\n");
-+
-+	if (!d_is_reg(dentry)) {
-+		pr_err("%pd is not a file\n", dentry);
-+		dput(dentry);
- 		ret = -EIO;
--		goto error_fput;
-+		goto error;
-+	} else {
-+		clear_bit(CACHEFILES_OBJECT_IS_NEW, &object->flags);
-+
-+		/* We need to open a file interface onto a data file now as we
-+		 * can't do it on demand because writeback called from
-+		 * do_exit() sees current->fs == NULL - which breaks d_path()
-+		 * called from ext4 open.
-+		 */
-+		path.mnt = cache->mnt;
-+		path.dentry = dentry;
-+		file = open_with_fake_path(&path, O_RDWR | O_LARGEFILE | O_DIRECT,
-+					   d_backing_inode(dentry), cache->cache_cred);
-+		dput(dentry);
-+		if (IS_ERR(file)) {
-+			ret = PTR_ERR(file);
-+			goto error;
-+		}
-+		if (unlikely(!file->f_op->read_iter) ||
-+		    unlikely(!file->f_op->write_iter)) {
-+			pr_notice("Cache does not support read_iter and write_iter\n");
-+			ret = -EIO;
-+			goto error_fput;
-+		}
-+		_debug("file -> %pd positive", dentry);
- 	}
- 
-+out:
- 	object->file = file;
- 	return 0;
--
--error_dput:
--	dput(dentry);
--error_unlock:
--	inode_unlock(dinode);
--	return ret;
- error_fput:
- 	fput(file);
- error:
-@@ -458,9 +448,11 @@ struct dentry *cachefiles_get_directory(struct cachefiles_cache *cache,
- 
- 	/* we need to create the subdir if it doesn't exist yet */
- 	if (d_is_negative(subdir)) {
--		ret = cachefiles_has_space(cache, 1, 0);
--		if (ret < 0)
--			goto mkdir_error;
-+		if (cache->store) {
-+			ret = cachefiles_has_space(cache, 1, 0);
-+			if (ret < 0)
-+				goto mkdir_error;
-+		}
- 
- 		_debug("attempt mkdir");
- 
-@@ -498,7 +490,6 @@ struct dentry *cachefiles_get_directory(struct cachefiles_cache *cache,
- 	if (!(d_backing_inode(subdir)->i_opflags & IOP_XATTR) ||
- 	    !d_backing_inode(subdir)->i_op->lookup ||
- 	    !d_backing_inode(subdir)->i_op->mkdir ||
--	    !d_backing_inode(subdir)->i_op->create ||
- 	    !d_backing_inode(subdir)->i_op->rename ||
- 	    !d_backing_inode(subdir)->i_op->rmdir ||
- 	    !d_backing_inode(subdir)->i_op->unlink)
-@@ -687,3 +678,101 @@ int cachefiles_check_in_use(struct cachefiles_cache *cache, struct dentry *dir,
- 	//_leave(" = 0");
- 	return ret;
+-	if (fscache_cookie_valid(cookie))
++	if (fscache_cookie_enabled(cookie))
+ 		__fscache_invalidate(cookie, aux_data, size, flags);
  }
-+
-+/*
-+ * Create a temporary file and leave it unattached and un-xattr'd until the
-+ * time comes to discard the object from memory.
-+ */
-+struct file *cachefiles_create_tmpfile(struct cachefiles_object *object)
-+{
-+	struct cachefiles_volume *volume = object->volume;
-+	struct cachefiles_cache *cache = volume->cache;
-+	const struct cred *saved_cred;
-+	struct dentry *fan = volume->fanout[(u8)object->key_hash];
-+	struct file *file;
-+	struct path path;
-+	uint64_t ni_size = object->cookie->object_size;
-+	long ret;
-+
-+	ni_size = round_up(ni_size, CACHEFILES_DIO_BLOCK_SIZE);
-+
-+	cachefiles_begin_secure(cache, &saved_cred);
-+
-+	path.mnt = cache->mnt,
-+	path.dentry = vfs_tmpfile(&init_user_ns, fan, S_IFREG, O_RDWR);
-+	if (IS_ERR(path.dentry)) {
-+		if (PTR_ERR(path.dentry) == -EIO)
-+			cachefiles_io_error_obj(object, "Failed to create tmpfile");
-+		file = ERR_CAST(path.dentry);
-+		goto out;
-+	}
-+
-+	trace_cachefiles_tmpfile(object, d_backing_inode(path.dentry));
-+
-+	if (ni_size > 0) {
-+		trace_cachefiles_trunc(object, d_backing_inode(path.dentry), 0, ni_size,
-+				       cachefiles_trunc_expand_tmpfile);
-+		ret = vfs_truncate(&path, ni_size);
-+		if (ret < 0) {
-+			file = ERR_PTR(ret);
-+			goto out_dput;
-+		}
-+	}
-+
-+	file = open_with_fake_path(&path, O_RDWR | O_LARGEFILE | O_DIRECT,
-+				   d_backing_inode(path.dentry), cache->cache_cred);
-+	if (IS_ERR(file))
-+		goto out_dput;
-+	if (unlikely(!file->f_op->read_iter) ||
-+	    unlikely(!file->f_op->write_iter)) {
-+		fput(file);
-+		pr_notice("Cache does not support read_iter and write_iter\n");
-+		file = ERR_PTR(-EINVAL);
-+	}
-+
-+out_dput:
-+	dput(path.dentry);
-+out:
-+	cachefiles_end_secure(cache, saved_cred);
-+	return file;
-+}
-+
-+/*
-+ * Attempt to link a temporary file into its rightful place in the cache.
-+ */
-+bool cachefiles_commit_tmpfile(struct cachefiles_cache *cache,
-+			       struct cachefiles_object *object)
-+{
-+	struct cachefiles_volume *volume = object->volume;
-+	struct dentry *dentry, *fan = volume->fanout[(u8)object->key_hash];
-+	bool success = false;
-+	int ret;
-+
-+	_enter(",%pD", object->file);
-+
-+	inode_lock_nested(d_inode(fan), I_MUTEX_PARENT);
-+	dentry = lookup_one_len(object->d_name, fan, object->d_name_len);
-+	if (IS_ERR(dentry)) {
-+		_debug("lookup fail %ld", PTR_ERR(dentry));
-+		goto out_unlock;
-+	}
-+
-+	ret = vfs_link(object->file->f_path.dentry, &init_user_ns,
-+		       d_inode(fan), dentry, NULL);
-+	if (ret < 0) {
-+		_debug("link fail %d", ret);
-+	} else {
-+		trace_cachefiles_link(object, file_inode(object->file));
-+		spin_lock(&object->lock);
-+		/* TODO: Do we want to switch the file pointer to the new dentry? */
-+		clear_bit(CACHEFILES_OBJECT_USING_TMPFILE, &object->flags);
-+		spin_unlock(&object->lock);
-+		success = true;
-+	}
-+
-+	dput(dentry);
-+out_unlock:
-+	inode_unlock(d_inode(fan));
-+	_leave(" = %u", success);
-+	return success;
-+}
-diff --git a/include/trace/events/cachefiles.h b/include/trace/events/cachefiles.h
-index d63e5fb46d27..c0632ee8cf69 100644
---- a/include/trace/events/cachefiles.h
-+++ b/include/trace/events/cachefiles.h
-@@ -35,6 +35,7 @@ enum cachefiles_obj_ref_trace {
  
- enum fscache_why_object_killed {
- 	FSCACHE_OBJECT_IS_STALE,
-+	FSCACHE_OBJECT_INVALIDATED,
- 	FSCACHE_OBJECT_NO_SPACE,
- 	FSCACHE_OBJECT_WAS_RETIRED,
- 	FSCACHE_OBJECT_WAS_CULLED,
-@@ -54,9 +55,8 @@ enum cachefiles_coherency_trace {
- };
- 
- enum cachefiles_trunc_trace {
--	cachefiles_trunc_invalidate,
--	cachefiles_trunc_set_size,
- 	cachefiles_trunc_dio_adjust,
-+	cachefiles_trunc_expand_tmpfile,
- 	cachefiles_trunc_shrink,
- };
- 
-@@ -78,6 +78,7 @@ enum cachefiles_prepare_read_trace {
-  */
- #define cachefiles_obj_kill_traces				\
- 	EM(FSCACHE_OBJECT_IS_STALE,	"stale")		\
-+	EM(FSCACHE_OBJECT_INVALIDATED,	"inval")		\
- 	EM(FSCACHE_OBJECT_NO_SPACE,	"no_space")		\
- 	EM(FSCACHE_OBJECT_WAS_RETIRED,	"was_retired")		\
- 	E_(FSCACHE_OBJECT_WAS_CULLED,	"was_culled")
-@@ -109,9 +110,8 @@ enum cachefiles_prepare_read_trace {
- 	E_(cachefiles_coherency_set_ok,		"SET ok  ")
- 
- #define cachefiles_trunc_traces						\
--	EM(cachefiles_trunc_invalidate,		"INVAL ")		\
--	EM(cachefiles_trunc_set_size,		"SETSIZ")		\
- 	EM(cachefiles_trunc_dio_adjust,		"DIOADJ")		\
-+	EM(cachefiles_trunc_expand_tmpfile,	"EXPTMP")		\
- 	E_(cachefiles_trunc_shrink,		"SHRINK")
- 
- #define cachefiles_prepare_read_traces					\
-@@ -200,26 +200,44 @@ TRACE_EVENT(cachefiles_lookup,
- 		      __entry->obj, __entry->ino, __entry->error)
- 	    );
- 
--TRACE_EVENT(cachefiles_create,
--	    TP_PROTO(struct cachefiles_object *obj,
--		     struct dentry *de, int ret),
-+TRACE_EVENT(cachefiles_tmpfile,
-+	    TP_PROTO(struct cachefiles_object *obj, struct inode *backer),
- 
--	    TP_ARGS(obj, de, ret),
-+	    TP_ARGS(obj, backer),
- 
- 	    TP_STRUCT__entry(
--		    __field(unsigned int,		obj	)
--		    __field(struct dentry *,		de	)
--		    __field(int,			ret	)
-+		    __field(unsigned int,			obj	)
-+		    __field(unsigned int,			backer	)
- 			     ),
- 
- 	    TP_fast_assign(
- 		    __entry->obj	= obj->debug_id;
--		    __entry->de		= de;
--		    __entry->ret	= ret;
-+		    __entry->backer	= backer->i_ino;
-+			   ),
-+
-+	    TP_printk("o=%08x b=%08x",
-+		      __entry->obj,
-+		      __entry->backer)
-+	    );
-+
-+TRACE_EVENT(cachefiles_link,
-+	    TP_PROTO(struct cachefiles_object *obj, struct inode *backer),
-+
-+	    TP_ARGS(obj, backer),
-+
-+	    TP_STRUCT__entry(
-+		    __field(unsigned int,			obj	)
-+		    __field(unsigned int,			backer	)
-+			     ),
-+
-+	    TP_fast_assign(
-+		    __entry->obj	= obj->debug_id;
-+		    __entry->backer	= backer->i_ino;
- 			   ),
- 
--	    TP_printk("o=%08x d=%p r=%u",
--		      __entry->obj, __entry->de, __entry->ret)
-+	    TP_printk("o=%08x b=%08x",
-+		      __entry->obj,
-+		      __entry->backer)
- 	    );
- 
- TRACE_EVENT(cachefiles_unlink,
+@@ -449,7 +454,7 @@ static inline
+ int fscache_begin_read_operation(struct netfs_cache_resources *cres,
+ 				 struct fscache_cookie *cookie)
+ {
+-	if (fscache_cookie_valid(cookie))
++	if (fscache_cookie_enabled(cookie))
+ 		return __fscache_begin_read_operation(cres, cookie);
+ 	return -ENOBUFS;
+ }
+@@ -578,7 +583,7 @@ static inline void fscache_clear_inode_writeback(struct fscache_cookie *cookie,
+ static inline
+ int fscache_fallback_read_page(struct fscache_cookie *cookie, struct page *page)
+ {
+-	if (fscache_cookie_valid(cookie))
++	if (fscache_cookie_enabled(cookie))
+ 		return __fscache_fallback_read_page(cookie, page);
+ 	return -ENOBUFS;
+ }
+@@ -598,7 +603,7 @@ int fscache_fallback_read_page(struct fscache_cookie *cookie, struct page *page)
+ static inline
+ int fscache_fallback_write_page(struct fscache_cookie *cookie, struct page *page)
+ {
+-	if (fscache_cookie_valid(cookie))
++	if (fscache_cookie_enabled(cookie))
+ 		return __fscache_fallback_write_page(cookie, page);
+ 	return -ENOBUFS;
+ }
 
 
