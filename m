@@ -2,51 +2,49 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEDF2C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3733C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:06:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D500C610A1
-	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:05:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB32A60E0C
+	for <linux-cifs@archiver.kernel.org>; Mon, 18 Oct 2021 15:06:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231676AbhJRPIG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 18 Oct 2021 11:08:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58258 "EHLO
+        id S233280AbhJRPIr (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 18 Oct 2021 11:08:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21524 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233352AbhJRPHX (ORCPT
+        by vger.kernel.org with ESMTP id S233935AbhJRPIg (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 18 Oct 2021 11:07:23 -0400
+        Mon, 18 Oct 2021 11:08:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634569511;
+        s=mimecast20190719; t=1634569584;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=awbJf1qi+AjflO5r5/tdZDW0h34mY/1A+ED+H3+96GA=;
-        b=PCWaltYDEMwRwlf8wXqZteghQyJwmuD9oCShLldzrQiRZYpWcv76RUBAFXYmebtQSnEvia
-        5t4pRqcHVk5Mad/cVOsA62WsDNetvJ+DEhoNhB/P6ym5fYJ95QZPbCNFZonlRPUBww1wDy
-        QuYEkUVzAHcJ4nzMxqSkZsgtJBEe21g=
+        bh=veiaXltL6VCtrjdWipdEmPq2N2GsVmVphqdEUrpeTnQ=;
+        b=WyVZ/QZt1gvi/RMv1BLtz97ZsJnUtbLXXtbgO5cLbrvqCA9AzA7DgU2QDHZ6nlbFKN7vYo
+        dTVCM2kNm6XgcgT1Ea8kJ5lLygeTTEs4jOPYcrOzf70GwlzfFFl6AvqHCWF5MIbiC4rBKW
+        pXUdKrl4yogr7U2/g3PMb1z6Q59v6Dw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-443-1YjU_XZfMoSeu8aXA63h0w-1; Mon, 18 Oct 2021 11:05:10 -0400
-X-MC-Unique: 1YjU_XZfMoSeu8aXA63h0w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-278-Ey0meNAIMT-wBxUNPFUEoA-1; Mon, 18 Oct 2021 11:06:21 -0400
+X-MC-Unique: Ey0meNAIMT-wBxUNPFUEoA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D0BA1018723;
-        Mon, 18 Oct 2021 15:05:06 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 754B0DF8A4;
+        Mon, 18 Oct 2021 15:06:19 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1F3C95D6D7;
-        Mon, 18 Oct 2021 15:04:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2E37C60E1C;
+        Mon, 18 Oct 2021 15:05:53 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 54/67] afs: Add O_DIRECT read support
+Subject: [PATCH 57/67] cachefiles, afs: Drive FSCACHE_COOKIE_NO_DATA_TO_READ
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
-Cc:     Marc Dionne <marc.dionne@auristor.com>,
-        linux-afs@lists.infradead.org, dhowells@redhat.com,
-        Trond Myklebust <trondmy@hammerspace.com>,
+Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
@@ -59,327 +57,103 @@ Cc:     Marc Dionne <marc.dionne@auristor.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 18 Oct 2021 16:04:56 +0100
-Message-ID: <163456949634.2614702.977164796285038310.stgit@warthog.procyon.org.uk>
+Date:   Mon, 18 Oct 2021 16:05:52 +0100
+Message-ID: <163456955230.2614702.5960779119312105796.stgit@warthog.procyon.org.uk>
 In-Reply-To: <163456861570.2614702.14754548462706508617.stgit@warthog.procyon.org.uk>
 References: <163456861570.2614702.14754548462706508617.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add synchronous O_DIRECT read support to AFS (no AIO yet).  It can
-theoretically handle reads up to the maximum size describable by loff_t -
-and given an iterator with sufficiently capacity to handle that and given
-support on the server.
+Drive the FSCACHE_COOKIE_NO_DATA_TO_READ bit to skip reads on cache files
+that can't have any data available to read.  This needs clearing once we've
+written some data and then released the netfs page that contained it.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: linux-afs@lists.infradead.org
 ---
 
- fs/afs/file.c      |   59 +++++++++++++++++++++++++++++++++++++++++++
- fs/afs/fsclient.c  |   18 +++++++++----
- fs/afs/internal.h  |    2 +
- fs/afs/write.c     |   72 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- fs/afs/yfsclient.c |   12 ++++++---
- 5 files changed, 153 insertions(+), 10 deletions(-)
+ fs/afs/file.c           |    1 +
+ fs/cachefiles/io.c      |    1 +
+ fs/fscache/cookie.c     |    2 ++
+ include/linux/fscache.h |   16 ++++++++++++++++
+ 4 files changed, 20 insertions(+)
 
 diff --git a/fs/afs/file.c b/fs/afs/file.c
-index 4af7ef607cf6..5db1e7d29ad5 100644
+index 5db1e7d29ad5..7fe57f210259 100644
 --- a/fs/afs/file.c
 +++ b/fs/afs/file.c
-@@ -28,6 +28,7 @@ static ssize_t afs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter);
- static void afs_vm_open(struct vm_area_struct *area);
- static void afs_vm_close(struct vm_area_struct *area);
- static vm_fault_t afs_vm_map_pages(struct vm_fault *vmf, pgoff_t start_pgoff, pgoff_t end_pgoff);
-+static ssize_t afs_direct_IO(struct kiocb *iocb, struct iov_iter *iter);
+@@ -506,6 +506,7 @@ static int afs_releasepage(struct page *page, gfp_t gfp_flags)
+ 			return false;
+ 		wait_on_page_fscache(page);
+ 	}
++	fscache_note_page_release(afs_vnode_cache(vnode));
+ #endif
  
- const struct file_operations afs_file_operations = {
- 	.open		= afs_open,
-@@ -56,6 +57,7 @@ const struct address_space_operations afs_fs_aops = {
- 	.launder_page	= afs_launder_page,
- 	.releasepage	= afs_releasepage,
- 	.invalidatepage	= afs_invalidatepage,
-+	.direct_IO	= afs_direct_IO,
- 	.write_begin	= afs_write_begin,
- 	.write_end	= afs_write_end,
- 	.writepage	= afs_writepage,
-@@ -601,3 +603,60 @@ static ssize_t afs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+ 	if (PagePrivate(page)) {
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index 9b3b55a94e66..5e3579800689 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -195,6 +195,7 @@ static void cachefiles_write_complete(struct kiocb *iocb, long ret, long ret2)
+ 	__sb_writers_acquired(inode->i_sb, SB_FREEZE_WRITE);
+ 	__sb_end_write(inode->i_sb, SB_FREEZE_WRITE);
  
- 	return generic_file_read_iter(iocb, iter);
- }
-+
-+/*
-+ * Direct file read operation for an AFS file.
++	set_bit(FSCACHE_COOKIE_HAVE_DATA, &ki->object->cookie->flags);
+ 	if (ki->term_func)
+ 		ki->term_func(ki->term_func_priv, ret, ki->was_async);
+ 	cachefiles_put_kiocb(ki);
+diff --git a/fs/fscache/cookie.c b/fs/fscache/cookie.c
+index 1420027cfe97..369f9258bb50 100644
+--- a/fs/fscache/cookie.c
++++ b/fs/fscache/cookie.c
+@@ -263,6 +263,8 @@ static struct fscache_cookie *fscache_alloc_cookie(
+ 	cookie->key_len		= index_key_len;
+ 	cookie->aux_len		= aux_data_len;
+ 	cookie->object_size	= object_size;
++	if (object_size == 0)
++		__set_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
+ 
+ 	if (fscache_set_key(cookie, index_key, index_key_len) < 0)
+ 		goto nomem;
+diff --git a/include/linux/fscache.h b/include/linux/fscache.h
+index ba192567d099..d18b7d3564ab 100644
+--- a/include/linux/fscache.h
++++ b/include/linux/fscache.h
+@@ -131,6 +131,7 @@ struct fscache_cookie {
+ #define FSCACHE_COOKIE_DO_WITHDRAW	10		/* T if this cookie needs withdrawing */
+ #define FSCACHE_COOKIE_DO_COMMIT	11		/* T if this cookie needs committing */
+ #define FSCACHE_COOKIE_DO_PREP_TO_WRITE	12		/* T if cookie needs write preparation */
++#define FSCACHE_COOKIE_HAVE_DATA	13		/* T if this cookie has data stored */
+ 
+ 	enum fscache_cookie_stage	stage;
+ 	u8				advice;		/* FSCACHE_ADV_* */
+@@ -643,7 +644,22 @@ static inline void fscache_clear_inode_writeback(struct fscache_cookie *cookie,
+ 		loff_t i_size = i_size_read(inode);
+ 		fscache_unuse_cookie(cookie, aux, &i_size);
+ 	}
++}
+ 
++/**
++ * fscache_note_page_release - Note that a netfs page got released
++ * @cookie: The cookie corresponding to the file
 + *
-+ * TODO: To support AIO, the pages in the iterator have to be copied and
-+ * refs taken on them.  Then -EIOCBQUEUED needs to be returned.
-+ * iocb->ki_complete must then be called upon completion of the operation.
++ * Note that a page that has been copied to the cache has been released.  This
++ * means that future reads will need to look in the cache to see if it's there.
 + */
-+static ssize_t afs_file_direct_read(struct kiocb *iocb, struct iov_iter *iter)
++static inline
++void fscache_note_page_release(struct fscache_cookie *cookie)
 +{
-+	struct file *file = iocb->ki_filp;
-+	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
-+	struct afs_read *req;
-+	ssize_t ret, transferred;
-+
-+	_enter("%llx,%zx", iocb->ki_pos, iov_iter_count(iter));
-+
-+	req = afs_alloc_read(GFP_KERNEL);
-+	if (!req)
-+		return -ENOMEM;
-+
-+	req->vnode	= vnode;
-+	req->key	= key_get(afs_file_key(file));
-+	req->pos	= iocb->ki_pos;
-+	req->len	= iov_iter_count(iter);
-+	req->iter	= iter;
-+
-+	task_io_account_read(req->len);
-+
-+	// TODO nfs_start_io_direct(inode);
-+	ret = afs_fetch_data(vnode, req);
-+	if (ret == 0)
-+		transferred = req->actual_len;
-+	afs_put_read(req);
-+
-+	// TODO nfs_end_io_direct(inode);
-+
-+	if (ret == 0)
-+		ret = transferred;
-+
-+	BUG_ON(ret == -EIOCBQUEUED); // TODO
-+	//if (iocb->ki_complete)
-+	//	iocb->ki_complete(iocb, ret, 0); // only if ret == -EIOCBQUEUED
-+
-+	_leave(" = %zu", ret);
-+	return ret;
-+}
-+
-+/*
-+ * Do direct I/O.
-+ */
-+static ssize_t afs_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
-+{
-+	if (iov_iter_rw(iter) == READ)
-+		return afs_file_direct_read(iocb, iter);
-+	return afs_file_direct_write(iocb, iter);
-+}
-diff --git a/fs/afs/fsclient.c b/fs/afs/fsclient.c
-index 4943413d9c5f..290d4d391a0e 100644
---- a/fs/afs/fsclient.c
-+++ b/fs/afs/fsclient.c
-@@ -439,7 +439,7 @@ static void afs_fs_fetch_data64(struct afs_operation *op)
- 	bp[3] = htonl(vp->fid.unique);
- 	bp[4] = htonl(upper_32_bits(req->pos));
- 	bp[5] = htonl(lower_32_bits(req->pos));
--	bp[6] = 0;
-+	bp[6] = htonl(upper_32_bits(req->len));
- 	bp[7] = htonl(lower_32_bits(req->len));
- 
- 	trace_afs_make_fs_call(call, &vp->fid);
-@@ -1057,6 +1057,7 @@ static void afs_fs_store_data64(struct afs_operation *op)
- 	struct afs_vnode_param *vp = &op->file[0];
- 	struct afs_call *call;
- 	__be32 *bp;
-+	u32 mask = 0;
- 
- 	_enter(",%x,{%llx:%llu},,",
- 	       key_serial(op->key), vp->fid.vid, vp->fid.vnode);
-@@ -1069,6 +1070,9 @@ static void afs_fs_store_data64(struct afs_operation *op)
- 
- 	call->write_iter = op->store.write_iter;
- 
-+	if (op->flags & AFS_OPERATION_SET_MTIME)
-+		mask |= AFS_SET_MTIME;
-+
- 	/* marshall the parameters */
- 	bp = call->request;
- 	*bp++ = htonl(FSSTOREDATA64);
-@@ -1076,8 +1080,8 @@ static void afs_fs_store_data64(struct afs_operation *op)
- 	*bp++ = htonl(vp->fid.vnode);
- 	*bp++ = htonl(vp->fid.unique);
- 
--	*bp++ = htonl(AFS_SET_MTIME); /* mask */
--	*bp++ = htonl(op->mtime.tv_sec); /* mtime */
-+	*bp++ = htonl(mask);
-+	*bp++ = htonl(op->mtime.tv_sec);
- 	*bp++ = 0; /* owner */
- 	*bp++ = 0; /* group */
- 	*bp++ = 0; /* unix mode */
-@@ -1102,6 +1106,7 @@ void afs_fs_store_data(struct afs_operation *op)
- 	struct afs_vnode_param *vp = &op->file[0];
- 	struct afs_call *call;
- 	__be32 *bp;
-+	u32 mask = 0;
- 
- 	_enter(",%x,{%llx:%llu},,",
- 	       key_serial(op->key), vp->fid.vid, vp->fid.vnode);
-@@ -1122,6 +1127,9 @@ void afs_fs_store_data(struct afs_operation *op)
- 
- 	call->write_iter = op->store.write_iter;
- 
-+	if (op->flags & AFS_OPERATION_SET_MTIME)
-+		mask |= AFS_SET_MTIME;
-+
- 	/* marshall the parameters */
- 	bp = call->request;
- 	*bp++ = htonl(FSSTOREDATA);
-@@ -1129,8 +1137,8 @@ void afs_fs_store_data(struct afs_operation *op)
- 	*bp++ = htonl(vp->fid.vnode);
- 	*bp++ = htonl(vp->fid.unique);
- 
--	*bp++ = htonl(AFS_SET_MTIME); /* mask */
--	*bp++ = htonl(op->mtime.tv_sec); /* mtime */
-+	*bp++ = htonl(mask);
-+	*bp++ = htonl(op->mtime.tv_sec);
- 	*bp++ = 0; /* owner */
- 	*bp++ = 0; /* group */
- 	*bp++ = 0; /* unix mode */
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index 07d34291bf4f..d3fb9b3845bc 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -863,6 +863,7 @@ struct afs_operation {
- #define AFS_OPERATION_TRIED_ALL		0x0400	/* Set if we've tried all the fileservers */
- #define AFS_OPERATION_RETRY_SERVER	0x0800	/* Set if we should retry the current server */
- #define AFS_OPERATION_DIR_CONFLICT	0x1000	/* Set if we detected a 3rd-party dir change */
-+#define AFS_OPERATION_SET_MTIME		0x2000	/* Set if we should try to store the mtime */
- };
- 
- /*
-@@ -1538,6 +1539,7 @@ extern int afs_fsync(struct file *, loff_t, loff_t, int);
- extern vm_fault_t afs_page_mkwrite(struct vm_fault *vmf);
- extern void afs_prune_wb_keys(struct afs_vnode *);
- extern int afs_launder_page(struct page *);
-+extern ssize_t afs_file_direct_write(struct kiocb *, struct iov_iter *);
- 
- /*
-  * xattr.c
-diff --git a/fs/afs/write.c b/fs/afs/write.c
-index a540da6ad423..281f0e93e2c6 100644
---- a/fs/afs/write.c
-+++ b/fs/afs/write.c
-@@ -406,7 +406,7 @@ static int afs_store_data(struct afs_vnode *vnode, struct iov_iter *iter, loff_t
- 	op->store.i_size = max(pos + size, i_size);
- 	op->store.laundering = laundering;
- 	op->mtime = vnode->vfs_inode.i_mtime;
--	op->flags |= AFS_OPERATION_UNINTR;
-+	op->flags |= AFS_OPERATION_SET_MTIME | AFS_OPERATION_UNINTR;
- 	op->ops = &afs_store_data_operation;
- 
- try_next_key:
-@@ -1039,3 +1039,73 @@ static void afs_write_to_cache(struct afs_vnode *vnode,
- 			       vnode->vfs_inode.i_mapping, start, len, i_size,
- 			       afs_write_to_cache_done, vnode);
- }
-+
-+static void afs_dio_store_data_success(struct afs_operation *op)
-+{
-+	struct afs_vnode *vnode = op->file[0].vnode;
-+
-+	op->ctime = op->file[0].scb.status.mtime_client;
-+	afs_vnode_commit_status(op, &op->file[0]);
-+	if (op->error == 0) {
-+		afs_stat_v(vnode, n_stores);
-+		atomic_long_add(op->store.size, &afs_v2net(vnode)->n_store_bytes);
-+	}
-+}
-+
-+static const struct afs_operation_ops afs_dio_store_data_operation = {
-+	.issue_afs_rpc	= afs_fs_store_data,
-+	.issue_yfs_rpc	= yfs_fs_store_data,
-+	.success	= afs_dio_store_data_success,
-+};
-+
-+/*
-+ * Direct file write operation for an AFS file.
-+ *
-+ * TODO: To support AIO, the pages in the iterator have to be copied and
-+ * refs taken on them.  Then -EIOCBQUEUED needs to be returned.
-+ * iocb->ki_complete must then be called upon completion of the operation.
-+ */
-+ssize_t afs_file_direct_write(struct kiocb *iocb, struct iov_iter *iter)
-+{
-+	struct file *file = iocb->ki_filp;
-+	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
-+	struct afs_operation *op;
-+	loff_t size = iov_iter_count(iter), i_size;
-+	ssize_t ret;
-+
-+	_enter("%s{%llx:%llu.%u},%llx,%llx",
-+	       vnode->volume->name,
-+	       vnode->fid.vid,
-+	       vnode->fid.vnode,
-+	       vnode->fid.unique,
-+	       size, iocb->ki_pos);
-+
-+	op = afs_alloc_operation(afs_file_key(file), vnode->volume);
-+	if (IS_ERR(op))
-+		return -ENOMEM;
-+
-+	i_size = i_size_read(&vnode->vfs_inode);
-+
-+	afs_op_set_vnode(op, 0, vnode);
-+	op->file[0].dv_delta	= 1;
-+	op->file[0].set_size	= true;
-+	op->store.write_iter	= iter;
-+	op->store.pos		= iocb->ki_pos;
-+	op->store.size		= size;
-+	op->store.i_size	= max(iocb->ki_pos + size, i_size);
-+	op->ops			= &afs_dio_store_data_operation;
-+
-+	//if (!is_sync_kiocb(iocb)) {
-+
-+	ret = afs_do_sync_operation(op);
-+	if (ret == 0)
-+		ret = size;
-+
-+	afs_invalidate_cache(vnode, FSCACHE_INVAL_DIO_WRITE);
-+
-+	//if (iocb->ki_complete)
-+	//	iocb->ki_complete(iocb, ret, 0); // only if ret == -EIOCBQUEUED
-+
-+	_leave(" = %zd", ret);
-+	return ret;
-+}
-diff --git a/fs/afs/yfsclient.c b/fs/afs/yfsclient.c
-index 2b35cba8ad62..a8c4e230002d 100644
---- a/fs/afs/yfsclient.c
-+++ b/fs/afs/yfsclient.c
-@@ -95,12 +95,16 @@ static __be32 *xdr_encode_YFSStoreStatus_mode(__be32 *bp, mode_t mode)
- 	return bp + xdr_size(x);
++	if (cookie &&
++	    test_bit(FSCACHE_COOKIE_HAVE_DATA, &cookie->flags) &&
++	    test_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags))
++		clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
  }
  
--static __be32 *xdr_encode_YFSStoreStatus_mtime(__be32 *bp, const struct timespec64 *t)
-+static __be32 *xdr_encode_YFSStoreStatus_mtime(__be32 *bp, struct afs_operation *op)
- {
- 	struct yfs_xdr_YFSStoreStatus *x = (void *)bp;
--	s64 mtime = linux_to_yfs_time(t);
-+	s64 mtime = linux_to_yfs_time(&op->mtime);
-+	u32 mask = 0;
- 
--	x->mask		= htonl(AFS_SET_MTIME);
-+	if (op->flags & AFS_OPERATION_SET_MTIME)
-+		mask |= AFS_SET_MTIME;
-+
-+	x->mask		= htonl(mask);
- 	x->mode		= htonl(0);
- 	x->mtime_client	= u64_to_xdr(mtime);
- 	x->owner	= u64_to_xdr(0);
-@@ -1103,7 +1107,7 @@ void yfs_fs_store_data(struct afs_operation *op)
- 	bp = xdr_encode_u32(bp, YFSSTOREDATA64);
- 	bp = xdr_encode_u32(bp, 0); /* RPC flags */
- 	bp = xdr_encode_YFSFid(bp, &vp->fid);
--	bp = xdr_encode_YFSStoreStatus_mtime(bp, &op->mtime);
-+	bp = xdr_encode_YFSStoreStatus_mtime(bp, op);
- 	bp = xdr_encode_u64(bp, op->store.pos);
- 	bp = xdr_encode_u64(bp, op->store.size);
- 	bp = xdr_encode_u64(bp, op->store.i_size);
+ #ifdef FSCACHE_USE_FALLBACK_IO_API
 
 
