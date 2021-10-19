@@ -2,231 +2,131 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D21C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Oct 2021 15:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E92DC433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Oct 2021 17:13:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 987A860FDA
-	for <linux-cifs@archiver.kernel.org>; Tue, 19 Oct 2021 15:41:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A34C6113B
+	for <linux-cifs@archiver.kernel.org>; Tue, 19 Oct 2021 17:13:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbhJSPnQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 19 Oct 2021 11:43:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53540 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232118AbhJSPnL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 19 Oct 2021 11:43:11 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE054C06161C
-        for <linux-cifs@vger.kernel.org>; Tue, 19 Oct 2021 08:40:58 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id b189-20020a1c1bc6000000b0030da052dd4fso3688012wmb.3
-        for <linux-cifs@vger.kernel.org>; Tue, 19 Oct 2021 08:40:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Pray0YL9Xpgon9w10zkXrjQClc70cS5lb6qxzuwVzjY=;
-        b=bVFbZZlXpD9M1mY6JhtPVSgylwoxm5OgxeqnYaVvnZnZsb1JgER/fkYgLbuQ+WfpTB
-         c47BHOMedoWRdFr2lz64Uzn8EBJBg9dgCuptctZYdsyFW20BPQT+aM5Rj5PIGapmTzvE
-         YCYtMNw3sZ327iuOYl1Wskw+oytLPOokiPrBhOzJpYJC7fLVjfeLgXLDsWVyFLeMd5hC
-         o8iPGkNwB3mOO0ufHK9TJG08hSR1Kh+y5E8plBRFw21Td3Xx6ah5+C+IdBdGY6pyZJ7y
-         1xC3uDPdOj9Rgy0sSYD8eh2xFc9sAOBIjd3P4/0oEhH1gXRkXzfCJZ9KVzvcjHts+aMm
-         W14g==
+        id S231231AbhJSRPV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 19 Oct 2021 13:15:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60085 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229894AbhJSRPU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 19 Oct 2021 13:15:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634663587;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4i8IYWG9Vqjc7NrxHtrIVVcfleXY1klKtzfa0ewfz4w=;
+        b=gCwv+PqV7NJfQgAG0eVDmGkuM3HW+5uSYXJbWK5MCwk5Vbt85RxTazvEo6NGuzc4tJxOK4
+        DpcrvPUl8kljKr99KkE/01KuiZj59w/L5pG7UsKpWlJ69uDq7mNxdvDT/VSpFNlk8KbV+7
+        SNvICqWKMDTILFgEFIR/u+CdFy4IzfQ=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-M0I9baZmNNyRFambnXmT0Q-1; Tue, 19 Oct 2021 13:13:06 -0400
+X-MC-Unique: M0I9baZmNNyRFambnXmT0Q-1
+Received: by mail-qv1-f70.google.com with SMTP id s12-20020ad44b2c000000b00383ab64e632so460548qvw.17
+        for <linux-cifs@vger.kernel.org>; Tue, 19 Oct 2021 10:13:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Pray0YL9Xpgon9w10zkXrjQClc70cS5lb6qxzuwVzjY=;
-        b=fooGt8xJHu14p7akAV2pjb+ZIvg0SZoWTUEI/VPBJ5Q0+4ZAY698gglVnnpHBkqtTt
-         KR6Cu72BhM3N9cQP3ivq2xUyhWvp2D+Xid/EEy42gbk+6noSzZVy4WXhIT3qDMbZL5Xu
-         qipW41hJwwjV3qXnHMrbk9TPnuAa4FiPm6ma48nTnx3NJgtf066MPwUQmw97w4dblvVu
-         NIlLrBLsOLTLe8ZFXZSph07cgiptmTR7QzTbdkNZunfHTXA8Nr3bN2fmbL5dMKy6ZQTt
-         eZ7bHnQdC8K14pKjau3AMeLufrhsZWmcHhHPaKBUftqm27enAK+Pgw8TIVhNPyEAsESx
-         52tw==
-X-Gm-Message-State: AOAM532TTsxdNO3vE+NmcySof6ysSZzrzcqR1aDpLPs+u9fPSEFdSMO0
-        d+M+65FT2ZYmrZEQiMBYuxXoXVOHcLV8FQ==
-X-Google-Smtp-Source: ABdhPJyQnaXCCbJL0ct+xqYQf3CfEC+7jTKh5HddzlMX3ALKQSArXT3+NdHTF4TConeg+mDQvwCbcg==
-X-Received: by 2002:a5d:4d06:: with SMTP id z6mr44206989wrt.149.1634658057258;
-        Tue, 19 Oct 2021 08:40:57 -0700 (PDT)
-Received: from localhost.localdomain (freebox.vlq16.iliad.fr. [213.36.7.13])
-        by smtp.gmail.com with ESMTPSA id o10sm2573380wmq.46.2021.10.19.08.40.56
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=4i8IYWG9Vqjc7NrxHtrIVVcfleXY1klKtzfa0ewfz4w=;
+        b=ZDMyrY8GBHCyOsn52OFaP/00vM0Txde4jnIGEGNx6F5NyOAdZtb255hzag2ChtYJrP
+         d1NIE/GfXx2Zz6Pmaoe0qz8Qas00fY/13NhYMAMakkJD6cjcofNGqniOuFPuz7WKzBuO
+         Vlmh2usbAk61cTBBbNv+xuQnCuWEEayfQL8nQdtUwL5pcryZAXV9q4i+ixz6BRsnccub
+         aCH4FfmYTr42j/ANmtOVtonsHUTUvqYvurnxHLqT6zsdFB9iCgd1N4dRFKV+OgYXoaVU
+         UdXnGQH5wZ3+L8rhVBBhYz54oQ87fKCrzlG0xElCfoHkBBkMidVmk6xxCAb3RRptDbry
+         TORw==
+X-Gm-Message-State: AOAM530iLnUrsofs24gjA2QrqrQX5UHgXiOF324INchyX/4qM24O1wkX
+        oDYpt1axP8eWBfPeZ3ef+1BVUhAjNWF38sTCWc11baDu5kZc25Lz0/pKru2lctdU+hn3wipX5Yx
+        ugd7AKW1A3aO68zWjBIQQwg==
+X-Received: by 2002:ac8:59ce:: with SMTP id f14mr1309288qtf.418.1634663585803;
+        Tue, 19 Oct 2021 10:13:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCTLnI4O14CVDS0WnTvhZl4wAoj8tNDS3DFRVR0xteRC6rTs30rKL1ujbd9t4swW1RKTIeyw==
+X-Received: by 2002:ac8:59ce:: with SMTP id f14mr1309267qtf.418.1634663585628;
+        Tue, 19 Oct 2021 10:13:05 -0700 (PDT)
+Received: from [192.168.1.3] (68-20-15-154.lightspeed.rlghnc.sbcglobal.net. [68.20.15.154])
+        by smtp.gmail.com with ESMTPSA id s203sm8190618qke.21.2021.10.19.10.13.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 08:40:56 -0700 (PDT)
-From:   Marios Makassikis <mmakassikis@freebox.fr>
-To:     linux-cifs@vger.kernel.org
-Cc:     Marios Makassikis <mmakassikis@freebox.fr>
-Subject: [PATCH v4] ksmbd: add buffer validation in session setup
-Date:   Tue, 19 Oct 2021 17:39:38 +0200
-Message-Id: <20211019153937.412534-1-mmakassikis@freebox.fr>
-X-Mailer: git-send-email 2.25.1
+        Tue, 19 Oct 2021 10:13:05 -0700 (PDT)
+Message-ID: <b8cd66bd0c6341b5f9fb8c885013bbb7a8abd3f2.camel@redhat.com>
+Subject: Re: [PATCH 01/67] mm: Stop filemap_read() from grabbing a
+ superfluous page
+From:   Jeff Layton <jlayton@redhat.com>
+To:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com
+Cc:     Kent Overstreet <kent.overstreet@gmail.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org
+Date:   Tue, 19 Oct 2021 13:13:04 -0400
+In-Reply-To: <163456863216.2614702.6384850026368833133.stgit@warthog.procyon.org.uk>
+References: <163456861570.2614702.14754548462706508617.stgit@warthog.procyon.org.uk>
+         <163456863216.2614702.6384850026368833133.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Make sure the security buffer's length/offset are valid with regards to
-the packet length.
+On Mon, 2021-10-18 at 15:50 +0100, David Howells wrote:
+> Under some circumstances, filemap_read() will allocate sufficient pages to
+> read to the end of the file, call readahead/readpages on them and copy the
+> data over - and then it will allocate another page at the EOF and call
+> readpage on that and then ignore it.  This is unnecessary and a waste of
+> time and resources.
+> 
+> filemap_read() *does* check for this, but only after it has already done
+> the allocation and I/O.  Fix this by checking before calling
+> filemap_get_pages() also.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Acked-by: Kent Overstreet <kent.overstreet@gmail.com>
+> cc: Matthew Wilcox (Oracle) <willy@infradead.org>
+> cc: linux-mm@kvack.org
+> cc: linux-fsdevel@vger.kernel.org
+> Link: https://lore.kernel.org/r/160588481358.3465195.16552616179674485179.stgit@warthog.procyon.org.uk/
+> ---
+> 
+>  mm/filemap.c |    4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index dae481293b5d..c0cdc44c844e 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -2625,6 +2625,10 @@ ssize_t filemap_read(struct kiocb *iocb, struct iov_iter *iter,
+>  		if ((iocb->ki_flags & IOCB_WAITQ) && already_read)
+>  			iocb->ki_flags |= IOCB_NOWAIT;
+>  
+> +		isize = i_size_read(inode);
+> +		if (unlikely(iocb->ki_pos >= isize))
+> +			goto put_pages;
+> +
+>  		error = filemap_get_pages(iocb, iter, &pvec);
+>  		if (error < 0)
+>  			break;
+> 
+> 
 
-Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
----
-Changes since v3:
- - removed unused lm_off variable in ksmbd_decode_ntlmssp_auth_blob()
- - fixed previously invalid bounds check in ksmbd_decode_ntlmssp_auth_blob()
+I would wager that it's worth checking for this. I imagine read calls
+beyond EOF are common enough that it's probably helpful to optimize that
+case:
 
- fs/ksmbd/auth.c    | 16 ++++++++-------
- fs/ksmbd/smb2pdu.c | 51 ++++++++++++++++++++++++++++------------------
- 2 files changed, 40 insertions(+), 27 deletions(-)
-
-diff --git a/fs/ksmbd/auth.c b/fs/ksmbd/auth.c
-index 71c989f1568d..30a92ddc1817 100644
---- a/fs/ksmbd/auth.c
-+++ b/fs/ksmbd/auth.c
-@@ -298,8 +298,8 @@ int ksmbd_decode_ntlmssp_auth_blob(struct authenticate_message *authblob,
- 				   int blob_len, struct ksmbd_session *sess)
- {
- 	char *domain_name;
--	unsigned int lm_off, nt_off;
--	unsigned short nt_len;
-+	unsigned int nt_off, dn_off;
-+	unsigned short nt_len, dn_len;
- 	int ret;
- 
- 	if (blob_len < sizeof(struct authenticate_message)) {
-@@ -314,15 +314,17 @@ int ksmbd_decode_ntlmssp_auth_blob(struct authenticate_message *authblob,
- 		return -EINVAL;
- 	}
- 
--	lm_off = le32_to_cpu(authblob->LmChallengeResponse.BufferOffset);
- 	nt_off = le32_to_cpu(authblob->NtChallengeResponse.BufferOffset);
- 	nt_len = le16_to_cpu(authblob->NtChallengeResponse.Length);
-+	dn_off = le32_to_cpu(authblob->DomainName.BufferOffset);
-+	dn_len = le16_to_cpu(authblob->DomainName.Length);
-+
-+	if (blob_len < (u64)dn_off + dn_len || blob_len < (u64)nt_off + nt_len)
-+		return -EINVAL;
- 
- 	/* TODO : use domain name that imported from configuration file */
--	domain_name = smb_strndup_from_utf16((const char *)authblob +
--			le32_to_cpu(authblob->DomainName.BufferOffset),
--			le16_to_cpu(authblob->DomainName.Length), true,
--			sess->conn->local_nls);
-+	domain_name = smb_strndup_from_utf16((const char *)authblob + dn_off,
-+					     dn_len, true, sess->conn->local_nls);
- 	if (IS_ERR(domain_name))
- 		return PTR_ERR(domain_name);
- 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 005aa93a49d6..f02766b1e9ce 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -1274,19 +1274,13 @@ static int generate_preauth_hash(struct ksmbd_work *work)
- 	return 0;
- }
- 
--static int decode_negotiation_token(struct ksmbd_work *work,
--				    struct negotiate_message *negblob)
-+static int decode_negotiation_token(struct ksmbd_conn *conn,
-+				    struct negotiate_message *negblob,
-+				    size_t sz)
- {
--	struct ksmbd_conn *conn = work->conn;
--	struct smb2_sess_setup_req *req;
--	int sz;
--
- 	if (!conn->use_spnego)
- 		return -EINVAL;
- 
--	req = work->request_buf;
--	sz = le16_to_cpu(req->SecurityBufferLength);
--
- 	if (ksmbd_decode_negTokenInit((char *)negblob, sz, conn)) {
- 		if (ksmbd_decode_negTokenTarg((char *)negblob, sz, conn)) {
- 			conn->auth_mechs |= KSMBD_AUTH_NTLMSSP;
-@@ -1298,9 +1292,9 @@ static int decode_negotiation_token(struct ksmbd_work *work,
- }
- 
- static int ntlm_negotiate(struct ksmbd_work *work,
--			  struct negotiate_message *negblob)
-+			  struct negotiate_message *negblob,
-+			  size_t negblob_len)
- {
--	struct smb2_sess_setup_req *req = work->request_buf;
- 	struct smb2_sess_setup_rsp *rsp = work->response_buf;
- 	struct challenge_message *chgblob;
- 	unsigned char *spnego_blob = NULL;
-@@ -1309,8 +1303,7 @@ static int ntlm_negotiate(struct ksmbd_work *work,
- 	int sz, rc;
- 
- 	ksmbd_debug(SMB, "negotiate phase\n");
--	sz = le16_to_cpu(req->SecurityBufferLength);
--	rc = ksmbd_decode_ntlmssp_neg_blob(negblob, sz, work->sess);
-+	rc = ksmbd_decode_ntlmssp_neg_blob(negblob, negblob_len, work->sess);
- 	if (rc)
- 		return rc;
- 
-@@ -1378,12 +1371,23 @@ static struct ksmbd_user *session_user(struct ksmbd_conn *conn,
- 	struct authenticate_message *authblob;
- 	struct ksmbd_user *user;
- 	char *name;
--	int sz;
-+	unsigned int auth_msg_len, name_off, name_len, secbuf_len;
- 
-+	secbuf_len = le16_to_cpu(req->SecurityBufferLength);
-+	if (secbuf_len < sizeof(struct authenticate_message)) {
-+		ksmbd_debug(SMB, "blob len %d too small\n", secbuf_len);
-+		return NULL;
-+	}
- 	authblob = user_authblob(conn, req);
--	sz = le32_to_cpu(authblob->UserName.BufferOffset);
--	name = smb_strndup_from_utf16((const char *)authblob + sz,
--				      le16_to_cpu(authblob->UserName.Length),
-+	name_off = le32_to_cpu(authblob->UserName.BufferOffset);
-+	name_len = le16_to_cpu(authblob->UserName.Length);
-+	auth_msg_len = le16_to_cpu(req->SecurityBufferOffset) + secbuf_len;
-+
-+	if (auth_msg_len < (u64)name_off + name_len)
-+		return NULL;
-+
-+	name = smb_strndup_from_utf16((const char *)authblob + name_off,
-+				      name_len,
- 				      true,
- 				      conn->local_nls);
- 	if (IS_ERR(name)) {
-@@ -1629,6 +1633,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
- 	struct smb2_sess_setup_rsp *rsp = work->response_buf;
- 	struct ksmbd_session *sess;
- 	struct negotiate_message *negblob;
-+	unsigned int negblob_len, negblob_off;
- 	int rc = 0;
- 
- 	ksmbd_debug(SMB, "Received request for session setup\n");
-@@ -1709,10 +1714,16 @@ int smb2_sess_setup(struct ksmbd_work *work)
- 	if (sess->state == SMB2_SESSION_EXPIRED)
- 		sess->state = SMB2_SESSION_IN_PROGRESS;
- 
-+	negblob_off = le16_to_cpu(req->SecurityBufferOffset);
-+	negblob_len = le16_to_cpu(req->SecurityBufferLength);
-+	if (negblob_off < (offsetof(struct smb2_sess_setup_req, Buffer) - 4) ||
-+	    negblob_len < offsetof(struct negotiate_message, NegotiateFlags))
-+		return -EINVAL;
-+
- 	negblob = (struct negotiate_message *)((char *)&req->hdr.ProtocolId +
--			le16_to_cpu(req->SecurityBufferOffset));
-+			negblob_off);
- 
--	if (decode_negotiation_token(work, negblob) == 0) {
-+	if (decode_negotiation_token(conn, negblob, negblob_len) == 0) {
- 		if (conn->mechToken)
- 			negblob = (struct negotiate_message *)conn->mechToken;
- 	}
-@@ -1736,7 +1747,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
- 			sess->Preauth_HashValue = NULL;
- 		} else if (conn->preferred_auth_mech == KSMBD_AUTH_NTLMSSP) {
- 			if (negblob->MessageType == NtLmNegotiate) {
--				rc = ntlm_negotiate(work, negblob);
-+				rc = ntlm_negotiate(work, negblob, negblob_len);
- 				if (rc)
- 					goto out_err;
- 				rsp->hdr.Status =
--- 
-2.25.1
+Acked-by: Jeff Layton <jlayton@redhat.com>
 
