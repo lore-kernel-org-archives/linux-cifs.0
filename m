@@ -2,49 +2,51 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56380C4332F
-	for <linux-cifs@archiver.kernel.org>; Fri, 22 Oct 2021 19:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2240C433FE
+	for <linux-cifs@archiver.kernel.org>; Fri, 22 Oct 2021 19:09:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F17361038
-	for <linux-cifs@archiver.kernel.org>; Fri, 22 Oct 2021 19:09:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0C93610D0
+	for <linux-cifs@archiver.kernel.org>; Fri, 22 Oct 2021 19:09:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234384AbhJVTMA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 22 Oct 2021 15:12:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:56993 "EHLO
+        id S234190AbhJVTL7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 22 Oct 2021 15:11:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29628 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234336AbhJVTLR (ORCPT
+        by vger.kernel.org with ESMTP id S234125AbhJVTLG (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 22 Oct 2021 15:11:17 -0400
+        Fri, 22 Oct 2021 15:11:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1634929738;
+        s=mimecast20190719; t=1634929728;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=56csLWKOXC3CFqzKs+ecqrHyAxkY2LTXGKgqQ8XEXPg=;
-        b=ZTkQ+N7OSNliIvK1R9fhl9sFIZNPyYLSdd6NBuu7f9WbYEBE+Kv5WU7lWepvrCEhVDCH5A
-        MfvxV4W7p4TZ+mg4QUbReSKRjuN2VzM3FqXdzR1PQuMhznXTAYfH1t0kW+WnmxEl2HPj6g
-        x66FuGC0+fKiuP5Ha92TYbIldebYCJ0=
+        bh=n1VZb0Xn4N6NISvttD2ZUsy8jQn+4P0ig2av100Y160=;
+        b=cPIvBj4HvUifeZSqabg9Xd4Z2HpNm9N/MYoqef+f4wSvaAUVONrvweEkmhhRd124c3gfRc
+        8mdARncpAZEalI+reUq3a85RCbeYtBSF0DSqUPJR4vekbe0MtKq4mpCcLlelyhzqd/KWWB
+        ls/eCfctMfSwyMBBtO59ic2AugjHUOY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-sENI_xwvNY6IZ-Qj0JDDIg-1; Fri, 22 Oct 2021 15:08:55 -0400
-X-MC-Unique: sENI_xwvNY6IZ-Qj0JDDIg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-563-cvUP9piaPTO_Ct04vmPNag-1; Fri, 22 Oct 2021 15:08:42 -0400
+X-MC-Unique: cvUP9piaPTO_Ct04vmPNag-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24B73362F8;
-        Fri, 22 Oct 2021 19:08:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 414A4801FCE;
+        Fri, 22 Oct 2021 19:08:40 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4DBB31017E28;
-        Fri, 22 Oct 2021 19:08:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DAD7E17CDB;
+        Fri, 22 Oct 2021 19:08:33 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v2 43/53] afs: Make afs_write_begin() return the THP subpage
+Subject: [PATCH v2 42/53] afs: Fix afs_write_end() to handle len > page size
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
-Cc:     Marc Dionne <marc.dionne@auristor.com>,
+Cc:     Jeff Layton <jlayton@kernel.org>, Jeff Layton <jlayton@kernel.org>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
         Matthew Wilcox <willy@infradead.org>,
         linux-afs@lists.infradead.org, dhowells@redhat.com,
         Trond Myklebust <trondmy@hammerspace.com>,
@@ -60,56 +62,51 @@ Cc:     Marc Dionne <marc.dionne@auristor.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Fri, 22 Oct 2021 20:08:45 +0100
-Message-ID: <163492972548.1038219.2862380188907793320.stgit@warthog.procyon.org.uk>
+Date:   Fri, 22 Oct 2021 20:08:33 +0100
+Message-ID: <163492971302.1038219.3619344566416020631.stgit@warthog.procyon.org.uk>
 In-Reply-To: <163492911924.1038219.13107463173777870713.stgit@warthog.procyon.org.uk>
 References: <163492911924.1038219.13107463173777870713.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-generic_perform_write() can't handle a THP, so we have to return the
-subpage of that THP from afs_write_begin() and then convert it back into
-the head on entry to afs_write_end().
+It is possible for the len argument to afs_write_end() to overrun the end
+of the page (len is used to key the size of the page in afs_write_start()
+when compound pages become a regular thing).
 
+Fix afs_write_end() to correctly trim the write length so that it doesn't
+exceed the end of the page.
+
+Fixes: 3003bbd0697b ("afs: Use the netfs_write_begin() helper")
+Reported-by: Jeff Layton <jlayton@kernel.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
+Acked-by: Jeff Layton <jlayton@kernel.org>
 cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Al Viro <viro@zeniv.linux.org.uk>
 cc: Matthew Wilcox <willy@infradead.org>
 cc: linux-afs@lists.infradead.org
+Link: https://lore.kernel.org/r/162367682522.460125.5652091227576721609.stgit@warthog.procyon.org.uk/ # v1
 ---
 
- fs/afs/write.c |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ fs/afs/write.c |    1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/fs/afs/write.c b/fs/afs/write.c
-index 19be3153d610..a01b1687a146 100644
+index ced72c6b9a80..19be3153d610 100644
 --- a/fs/afs/write.c
 +++ b/fs/afs/write.c
-@@ -78,7 +78,7 @@ int afs_write_begin(struct file *file, struct address_space *mapping,
- 			goto flush_conflicting_write;
- 	}
+@@ -119,6 +119,7 @@ int afs_write_end(struct file *file, struct address_space *mapping,
+ 	_enter("{%llx:%llu},{%lx}",
+ 	       vnode->fid.vid, vnode->fid.vnode, page->index);
  
--	*_page = page;
-+	*_page = find_subpage(page, pos / PAGE_SIZE);
- 	_leave(" = 0");
- 	return 0;
- 
-@@ -108,9 +108,10 @@ int afs_write_begin(struct file *file, struct address_space *mapping,
-  */
- int afs_write_end(struct file *file, struct address_space *mapping,
- 		  loff_t pos, unsigned len, unsigned copied,
--		  struct page *page, void *fsdata)
-+		  struct page *subpage, void *fsdata)
- {
- 	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
-+	struct page *page = thp_head(subpage);
- 	unsigned long priv;
- 	unsigned int f, from = offset_in_thp(page, pos);
- 	unsigned int t, to = from + copied;
++	len = min_t(size_t, len, thp_size(page) - from);
+ 	if (!PageUptodate(page)) {
+ 		if (copied < len) {
+ 			copied = 0;
 
 
