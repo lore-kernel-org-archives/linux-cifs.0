@@ -2,115 +2,125 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19307C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 22 Oct 2021 20:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB073C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 23 Oct 2021 15:06:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F117E61059
-	for <linux-cifs@archiver.kernel.org>; Fri, 22 Oct 2021 20:31:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7C5960FD8
+	for <linux-cifs@archiver.kernel.org>; Sat, 23 Oct 2021 15:06:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233417AbhJVUeD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 22 Oct 2021 16:34:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51842 "EHLO
+        id S229901AbhJWPJO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 23 Oct 2021 11:09:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232411AbhJVUeC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 22 Oct 2021 16:34:02 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C5BDC061764
-        for <linux-cifs@vger.kernel.org>; Fri, 22 Oct 2021 13:31:44 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id q16so1010120ljg.3
-        for <linux-cifs@vger.kernel.org>; Fri, 22 Oct 2021 13:31:44 -0700 (PDT)
+        with ESMTP id S229819AbhJWPJN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 23 Oct 2021 11:09:13 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46551C061714;
+        Sat, 23 Oct 2021 08:06:54 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id x192so153285lff.12;
+        Sat, 23 Oct 2021 08:06:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VL4lca6iHsx6oQ/wg6H7clLpP/uNe7ZsGNa7hBqT+88=;
-        b=Xm2NbmUwKJoW+515TkyEWt2nuCvePzoqxLYJAFPnOe+lbdK5JzMmyaBBRaBeBIIVr6
-         5Y2Ltv7T1OVUR3yQVc1hEpZ4faavbhalIte0tSbwN89GggYecoOBuJphVvusUfCFdqxX
-         UgjPbDpPnxZpf2xYUJtsUcqxyBe+gW6XgMyZo=
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=UhVKiBkM27S8utl/+Lqsx9ZhjhKwnMJnJoQC1dkuYBw=;
+        b=p9qxO81kQYrkKeU6U/rkrAbu4nrgKkDBWB24T9b/7rp9T4sjyNUoZQxE9RmQ4sPVhF
+         IBfWQUpEQrCOcUdhMJE3k8bKXkoMgAAUftYKchN85rOYeMkg94a5GCeggJW1Dm8xwxQM
+         d0UHyBWi87xG5SCyjhTkIrsvBjc2T8qKlRxnTUJI1CPM/DtCGb7D2BXWCpnaq3roIDCr
+         bwOPLOiengkE4t4bF05iF0sapv41dOP71YTAUStkueVF8k9/RTRQl7+3ePsr2dUlEHm9
+         NTYVf8pmLkuuce32OGjqT8hyebCSARDg4rXYtGG9g+zr/xIpq+0lNhw66mr23+UQwFR1
+         Zj4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VL4lca6iHsx6oQ/wg6H7clLpP/uNe7ZsGNa7hBqT+88=;
-        b=ClOvH+M9CAswPlBWZSaeK8Hai5jruV4kFUltms/e6elQiF7xFgcX3ihsaf4vhHejim
-         KT2HdLtAK76nSG0IUcQMEpk16aYcyR8tIyTyPQpUqTD3+ozr3gCat8a3XW6PiNjzUDUE
-         IlcrleL8umr2hBgucdWqiQr0kQQ3K7RmHilEgy5zXQApRRnArkD0jBFvLHCjtWByhv3h
-         LZkFdqgi+JhRGq058iavaSdHhKEsJVnGnBA/jGfMn2z6kHvd51YJKtGs2EIbYGVfj4Z+
-         uONfmZfokwpUCiGSidJYLhxNBtRtvsPISqdzUdyb/UzFbUf7HedRMHMEIq1fhFw4BSkm
-         EgqA==
-X-Gm-Message-State: AOAM5321KzOdkVTpyZ142xzggEby89w1z+XrLk3Uc9CExMQWRXbSBUbV
-        HlNzY9J84uU137bGbyR/e8fwnhVZ6h3CTcBaKgc=
-X-Google-Smtp-Source: ABdhPJzdDM6goT56xy8NrC1Im5h2PLxsK1z1B5smHVWh5gRK6bhyWFVsr8jnF/vGAQOl234xaL+GEg==
-X-Received: by 2002:a2e:a413:: with SMTP id p19mr2187289ljn.488.1634934702606;
-        Fri, 22 Oct 2021 13:31:42 -0700 (PDT)
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com. [209.85.208.176])
-        by smtp.gmail.com with ESMTPSA id r14sm1065319ljj.0.2021.10.22.13.31.42
-        for <linux-cifs@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Oct 2021 13:31:42 -0700 (PDT)
-Received: by mail-lj1-f176.google.com with SMTP id e19so1098427ljk.12
-        for <linux-cifs@vger.kernel.org>; Fri, 22 Oct 2021 13:31:42 -0700 (PDT)
-X-Received: by 2002:a2e:9945:: with SMTP id r5mr2174611ljj.249.1634934297582;
- Fri, 22 Oct 2021 13:24:57 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=UhVKiBkM27S8utl/+Lqsx9ZhjhKwnMJnJoQC1dkuYBw=;
+        b=A/UTlSD6WpMHuB//S00xCYsXg5l803Y7GWejy7HQ3l7tNwrPU++Pdb63NIjSBfgE+C
+         KE2zRJC0C6AbM3iqjr5WWkRRdXf8chE8GfOVKtNl04nIF0SnlNivR89487+YvJXx769x
+         po7uzM7mBfntoe9npRb0kOae2h6NDPX1ULORBSqUyJVXi6StEm88A8V9oK6MpaoddrX9
+         FsTRXUuApk4lznooJKvASEx896lMEKMZXIrXFZWaNhFz6v+nYNSAgrLw0RSl4fx0Byh0
+         A9OF6rwhmfBoEnACdWVagyiYoyA5cHlE4AsKIIAZaNGdU54Vfy673ancF3+9zyqoxD3+
+         VTCQ==
+X-Gm-Message-State: AOAM530Tcmwe05Q2EUg3rGMo5vIvSaRHTc942w9HI1KbumTcBePo4Ij6
+        XuHbWeWrK3WpgtnCpoUUDRgOI9ltWJ6w0mv708A09f2B05w=
+X-Google-Smtp-Source: ABdhPJxpIzSSD2q2KmIx/m8nlfIxWVTU/kNkPVGyN4E4uZfkQjX2F9cUxx+Kif31HG2AGNpVfx2NuJFH/dnxOYRY3Y4=
+X-Received: by 2002:a05:6512:3763:: with SMTP id z3mr6453033lft.601.1635001612411;
+ Sat, 23 Oct 2021 08:06:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <163492911924.1038219.13107463173777870713.stgit@warthog.procyon.org.uk>
- <CAHk-=wjmx7+PD0hzWj5Bg2b807xYD2KCZApTvFje=ufo+MxBMQ@mail.gmail.com>
- <1041557.1634931616@warthog.procyon.org.uk> <CAHk-=wg2LQtWC3e4Z4EGQzEmsLjmk6jm67Ga6UMLY1MH6iDcNQ@mail.gmail.com>
-In-Reply-To: <CAHk-=wg2LQtWC3e4Z4EGQzEmsLjmk6jm67Ga6UMLY1MH6iDcNQ@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 22 Oct 2021 10:24:41 -1000
-X-Gmail-Original-Message-ID: <CAHk-=wi7K64wo4PtROxq_cLhfq-c-3aCbW5CjRfnKYA439YFUw@mail.gmail.com>
-Message-ID: <CAHk-=wi7K64wo4PtROxq_cLhfq-c-3aCbW5CjRfnKYA439YFUw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/53] fscache: Rewrite index API and management system
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Dave Wysochanski <dwysocha@redhat.com>,
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 23 Oct 2021 10:06:41 -0500
+Message-ID: <CAH2r5mvY5kWAHs=0Lzgst0rjRaej+VW1ZLdFc8kDJ-07QmWQsA@mail.gmail.com>
+Subject: [GIT PULL] ksmbd fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Steve French <sfrench@samba.org>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        v9fs-developer@lists.sourceforge.net,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Jeff Layton <jlayton@kernel.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>,
-        ceph-devel@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Oct 22, 2021 at 9:58 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> and if (c) is the thing that all the network filesystem people want,
-> then what the heck is the point in keeping dead code around? At that
-> point, all the rename crap is just extra work, extra noise, and only a
-> distraction. There's no upside that I can see.
+Please pull the following changes since commit
+64570fbc14f8d7cb3fe3995f20e26bc25ce4b2cc:
 
-Again, I'm not a fan of (c) as an option, but if done, then the
-simplest model would appear to be:
+  Linux 5.15-rc5 (2021-10-10 17:01:59 -0700)
 
- - remove the old fscache code, obviously disabling the Kconfig for it
-for each filesystem, all in one fell swoop.
+are available in the Git repository at:
 
- - add the new fscache code (possibly preferably in sane chunks that
-explains the parts).
+  git://git.samba.org/ksmbd.git tags/5.15-rc6-ksmbd-fixes
 
- - then do a "convert to new world order and enable" commit
-individually for each filesystem
+for you to fetch changes up to 0d994cd482ee4e8e851388a70869beee51be1c54:
 
-but as mentioned, there's no sane way to bisect things, or have a sane
-development history in this kind of situation.
+  ksmbd: add buffer validation in session setup (2021-10-20 00:07:10 -0500)
 
-                Linus
+----------------------------------------------------------------
+Ten fixes for the ksmbd kernel server:
+- a security improvement to session establishment to reduce the
+possibility of dictionary attacks
+- fix to ensure that maximum i/o size negotiated in the protocol is
+not less than 64K and not more than 8MB to better match expected
+behavior
+- fix for crediting (flow control) important to properly verify that
+sufficient credits are available for the requested operation
+- seven additional buffer overflow, buffer validation checks
+
+Regression test results for current linux-next:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/89
+----------------------------------------------------------------
+Hyunchul Lee (3):
+      ksmbd: improve credits management
+      ksmbd: add buffer validation for smb direct
+      ksmbd: validate OutputBufferLength of QUERY_DIR, QUERY_INFO,
+IOCTL requests
+
+Marios Makassikis (1):
+      ksmbd: add buffer validation in session setup
+
+Namjae Jeon (5):
+      ksmbd: add validation in smb2_ioctl
+      ksmbd: fix potencial 32bit overflow from data area check in smb2_write
+      ksmbd: validate compound response buffer
+      ksmbd: limit read/write/trans buffer size not to exceed 8MB
+      ksmbd: throttle session setup failures to avoid dictionary attacks
+
+Ralph Boehme (1):
+      ksmbd: validate credit charge after validating SMB2 PDU body size
+
+ fs/ksmbd/auth.c             |  16 +-
+ fs/ksmbd/connection.c       |   2 +
+ fs/ksmbd/ksmbd_netlink.h    |   2 +
+ fs/ksmbd/mgmt/user_config.c |   2 +-
+ fs/ksmbd/mgmt/user_config.h |   1 +
+ fs/ksmbd/smb2misc.c         |  55 ++++---
+ fs/ksmbd/smb2ops.c          |   3 +
+ fs/ksmbd/smb2pdu.c          | 346 ++++++++++++++++++++++++++++---------------
+ fs/ksmbd/smb2pdu.h          |   2 +
+ fs/ksmbd/transport_ipc.c    |   3 +-
+ fs/ksmbd/transport_ipc.h    |   2 +-
+ fs/ksmbd/transport_rdma.c   |  21 ++-
+ fs/ksmbd/vfs.c              |   2 +-
+ fs/ksmbd/vfs.h              |   2 +-
+ 14 files changed, 306 insertions(+), 153 deletions(-)
+
+-- 
+Thanks,
+
+Steve
