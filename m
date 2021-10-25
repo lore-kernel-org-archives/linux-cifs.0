@@ -2,61 +2,48 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F6A1C433F5
-	for <linux-cifs@archiver.kernel.org>; Sun, 24 Oct 2021 17:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC21C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Oct 2021 21:59:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CA1760F57
-	for <linux-cifs@archiver.kernel.org>; Sun, 24 Oct 2021 17:12:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87E5460EC0
+	for <linux-cifs@archiver.kernel.org>; Mon, 25 Oct 2021 21:59:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229852AbhJXROt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 24 Oct 2021 13:14:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54978 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229755AbhJXROs (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Sun, 24 Oct 2021 13:14:48 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id B918260F57;
-        Sun, 24 Oct 2021 17:12:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635095547;
-        bh=6LLZ/Uy4Y4V5vtZiJniIctam32DQV8odrSmP2OdRbZE=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=TxpM4/kOiLaqT8icWPHQm64yRktio8JgmsSB+d66VoxkNkoTj8hmFkvQoIYITgiq4
-         FvQeuVaVHG+noMPeAXKZkteU95FIUSMKP42ubG8I6nua/nYADrvV3D0rqz69KWCgpZ
-         Uhh3Zy6kajOlVVAvmRZ+u+DMkbMKaa1IUTbwO4jgwMuPrEYqrw49Tk9ko70V5rdAyV
-         ANMqsKhDNkogcx7qz3JWYZ5oZFBCMkbr22V0vvTC/sitB50MyTBI8ACWo+2E/1qZlN
-         gcN/P7bXmsfy9EBJio8bgp2f7POD95LZjUVfR0lvKrCDapyDPweL/L8b8nxnvWp0T6
-         2nrD2zuKrJ4tg==
-Subject: Re: [GIT PULL] ksmbd fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mvY5kWAHs=0Lzgst0rjRaej+VW1ZLdFc8kDJ-07QmWQsA@mail.gmail.com>
-References: <CAH2r5mvY5kWAHs=0Lzgst0rjRaej+VW1ZLdFc8kDJ-07QmWQsA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mvY5kWAHs=0Lzgst0rjRaej+VW1ZLdFc8kDJ-07QmWQsA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/5.15-rc6-ksmbd-fixes
-X-PR-Tracked-Commit-Id: 0d994cd482ee4e8e851388a70869beee51be1c54
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: c460e7896e6906d4e154f2e7fb7f40d46edbd006
-Message-Id: <163509554761.13231.1579725077807302134.pr-tracker-bot@kernel.org>
-Date:   Sun, 24 Oct 2021 17:12:27 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        id S231359AbhJYWCF (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 25 Oct 2021 18:02:05 -0400
+Received: from relay.shared-server.net ([211.13.204.73]:34604 "EHLO
+        relay.shared-server.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231289AbhJYWCE (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 25 Oct 2021 18:02:04 -0400
+X-Greylist: delayed 511 seconds by postgrey-1.27 at vger.kernel.org; Mon, 25 Oct 2021 18:02:04 EDT
+Received: from w23-blue.in.shared-server.net (w23-blue.in.shared-server.net [192.168.2.46])
+        by relay09.in.shared-server.net (Postfix) with ESMTP id 7B7701665D3
+        for <linux-cifs@vger.kernel.org>; Tue, 26 Oct 2021 06:51:08 +0900 (JST)
+Received: by w23-blue.in.shared-server.net (Postfix, from userid 177972)
+        id 7C705E0BFB; Tue, 26 Oct 2021 06:51:08 +0900 (JST)
+To:     linux-cifs@vger.kernel.org
+Subject: =?UTF-8?B?44OV44Kn44Oq44O844K544K944OL44O844OJ44KI44KK44GK5ZWP44GE5ZCI?=  =?UTF-8?B?44KP44Gb5YaF5a6544Gu6YCB5L+h?=
+Date:   Mon, 25 Oct 2021 21:51:08 +0000
+From:   =?UTF-8?B?44OV44Kn44Oq44O844K544K944OL44O844OJ?= <info@felisoni.jp>
+Message-ID: <BRmxGLLGABehm7SREPVLcnJ4tX0KGAvgCtwTl38@www.felisoni.jp>
+X-Mailer: PHPMailer 6.1.6 (https://github.com/PHPMailer/PHPMailer)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 23 Oct 2021 10:06:41 -0500:
+フェリースソニードサイトよりお問い合わせいただきました内容を送信します。
 
-> git://git.samba.org/ksmbd.git tags/5.15-rc6-ksmbd-fixes
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/c460e7896e6906d4e154f2e7fb7f40d46edbd006
-
-Thank you!
+会社名：❤️ There are candid videos for you! Click here: http://bit.do/hotvideo2?q9u0s ❤️
+お名前：sta4538 
+ふりがな：5xn6nout
+メールアドレス：linux-cifs@vger.kernel.org
+電話番号：675057044149
+お問い合わせ内容：[shubetsu]
+メッセージ本文:
+ogbi25m
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+このメールは フェリースソニード（フェリソニ）Felis Sonido (http://hsg-s.sakura.ne.jp/felisoni) のお問い合わせフォームから送信されました
+
