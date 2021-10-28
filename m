@@ -2,63 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2FEC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 22:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9130C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 23:13:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 442DC610E5
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 22:41:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A670E610CA
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 23:13:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231352AbhJ1WoQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Oct 2021 18:44:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49504 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231235AbhJ1WoQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 28 Oct 2021 18:44:16 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 05B8560E8F
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Oct 2021 22:41:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635460909;
-        bh=ZMwav7MCoqrBO+/gIXvwEP9Z8ECWbX62BdYT6UfIkzE=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=G8BapWL78cKAzOMjjUMXmvJHu9pXiDz4Y2QN+snFqi6PrfuYO8iB/pwinBcMzH1Bz
-         F3+d5NHEOB4B+cpqXOAIW7NbfRK3i+FFmcV1K8RfMZPUWubdGSccydaYJi0Rfut7mL
-         n65gRalZ+nHcHSkAdXM6mrGjyJyATwLgdjgXA1+xPq5Rv6Hl1JL83nd+j8Ex8ZqjJ6
-         rAe6QERKIot5YJdQrf7NfFIFKgd5xbUDNeX0LMT0ZWfzbi6jzKWyKiNFEWjCu4heNq
-         nuOBqDgMNJbzGgl0xW7D6awZS7DcHK89zTam8kNBalhdzj/ufjmdAsPD5strVf6b9Y
-         +GR3bnIz7OJJw==
-Received: by mail-ot1-f45.google.com with SMTP id 107-20020a9d0a74000000b00553bfb53348so10884111otg.0
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Oct 2021 15:41:48 -0700 (PDT)
-X-Gm-Message-State: AOAM533sXAsPjaDtifGl2d6qUYs7C5f+ehnE5xn20Rm5EyT/CJljWsL7
-        84gW5WSCkBp6OhFkXkFrLsFzrZpKyRbtyp07+EA=
-X-Google-Smtp-Source: ABdhPJw1kod9RfW+Vf5ngwjN1zZEQKL6rd+UlZPxT21C6vwGcj06uC/227osVFz/AQRdX698z7n+PGFWHmA0yaBPUhc=
-X-Received: by 2002:a05:6830:25c2:: with SMTP id d2mr5879237otu.116.1635460908336;
- Thu, 28 Oct 2021 15:41:48 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Thu, 28 Oct 2021 15:41:47
- -0700 (PDT)
-In-Reply-To: <20211028190125.391374-1-mmakassikis@freebox.fr>
-References: <20211028190125.391374-1-mmakassikis@freebox.fr>
+        id S231463AbhJ1XPy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Oct 2021 19:15:54 -0400
+Received: from mail-pf1-f180.google.com ([209.85.210.180]:38621 "EHLO
+        mail-pf1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230516AbhJ1XPx (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Oct 2021 19:15:53 -0400
+Received: by mail-pf1-f180.google.com with SMTP id l1so993756pfu.5
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Oct 2021 16:13:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yeHrycLhnBnPb9PJvRTWmcAph5jEMj3KlZ3YoFaYlA0=;
+        b=mT+KFmbQLxl+crIiPTKhxYKesFYT/manACgBkwrHDUI4TOhpAqRsTfPvBMABmdyykQ
+         nJKzdqJ900j+sm5wpiwLUrgt8pKaz3HaR0JYVnqi+J8JsK6l05eKq6XfElNQ9U35J6xK
+         4nIGai7DYaoQ5PCOdPQrvMqjNOseOo/R7j2jZmxxFGzAQCM0Zsecw9wzeGp3d+lmDKa+
+         ri3A8jf4xieBlElWFjAWxzn2BcLqWpt9tw/Nk5mJbMkgHnStqSqYDVN4obGD4t+5Ghyt
+         APRhZUnS68/T2V9OtKp71QDCmqobQ/qbJEVNnkeDBcVtpdXcTWUh61c7G2f2WkRs0k2R
+         xZLg==
+X-Gm-Message-State: AOAM533TeJlPNfNIU9f1WQhRKwt4zgkeFPgOj3fJDs6qr8QDaS1cQ8YE
+        BEC+xjPQjfaAmQT8tDC6doS4R5QOQtU=
+X-Google-Smtp-Source: ABdhPJz+ygXpvww/uRgcZgeiFo2yBaXuzkEL/DCF8K2PmG7XVWpqTz55yVAZQYXmHYIRnbu/nhAPrg==
+X-Received: by 2002:a63:e208:: with SMTP id q8mr4121174pgh.291.1635462806055;
+        Thu, 28 Oct 2021 16:13:26 -0700 (PDT)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id b10sm4765871pfl.200.2021.10.28.16.13.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Oct 2021 16:13:25 -0700 (PDT)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Fri, 29 Oct 2021 07:41:47 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-MeXyPu-ONTw115S+AbqJxrV8RZBW1H=isKEyCS5xVtg@mail.gmail.com>
-Message-ID: <CAKYAXd-MeXyPu-ONTw115S+AbqJxrV8RZBW1H=isKEyCS5xVtg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: Fix buffer length check in fsctl_validate_negotiate_info()
-To:     Marios Makassikis <mmakassikis@freebox.fr>
-Cc:     linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: don't need 8byte alignment for request length in ksmbd_check_message
+Date:   Fri, 29 Oct 2021 08:13:17 +0900
+Message-Id: <20211028231317.18522-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-10-29 4:01 GMT+09:00, Marios Makassikis <mmakassikis@freebox.fr>:
-> The validate_negotiate_info_req struct definition includes an extra
-> field to access the data coming after the header. This causes the check
-> in fsctl_validate_negotiate_info() to count the first element of the
-> array twice. This in turn makes some valid requests fail, depending on
-> whether they include padding or not.
->
-> Fixes: f7db8fd03a4b ("ksmbd: add validation in smb2_ioctl")
-> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+When validating request length in ksmbd_check_message, 8byte alignment
+is not needed for compound request. It can cause wrong validation
+of request length.
 
-Thanks for your patch!
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/smb2misc.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
+index 2385622cc3c8..0239fa96926c 100644
+--- a/fs/ksmbd/smb2misc.c
++++ b/fs/ksmbd/smb2misc.c
+@@ -353,12 +353,10 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
+ 	__u32 clc_len;  /* calculated length */
+ 	__u32 len = get_rfc1002_len(pdu);
+ 
+-	if (le32_to_cpu(hdr->NextCommand) > 0) {
++	if (le32_to_cpu(hdr->NextCommand) > 0)
+ 		len = le32_to_cpu(hdr->NextCommand);
+-	} else if (work->next_smb2_rcv_hdr_off) {
++	else if (work->next_smb2_rcv_hdr_off)
+ 		len -= work->next_smb2_rcv_hdr_off;
+-		len = round_up(len, 8);
+-	}
+ 
+ 	if (check_smb2_hdr(hdr))
+ 		return 1;
+-- 
+2.25.1
+
