@@ -2,95 +2,63 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F6FC433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 19:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2FEC433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 22:41:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DDC260524
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 19:01:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 442DC610E5
+	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 22:41:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230448AbhJ1TEL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Oct 2021 15:04:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38054 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbhJ1TEL (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Oct 2021 15:04:11 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3CE6C061570
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Oct 2021 12:01:43 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id p14so11872582wrd.10
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Oct 2021 12:01:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=G7jTJSPqK7GcsLP1mWujIY+vR8W5851kmvgTfQoUVSI=;
-        b=8PD2PaeOv70+0vnITFslX0F4o/DeUpkZPAoM8c5ybGptN9Y+jjwaAw3ph1dLFVXyG1
-         1WEVrl0Y+hzU5Qj2f5XjZML9njoogO2OQou1HTHV/+Q8TdSdPaFM6lTvjja6D7VeV50A
-         Y83GYuNdQzo2r66mk4na17ZZu7ji/dKQ88P84OmxEGN7K0d8v2Fn8PFvdWnpVZhKZLU8
-         C5a2O0mo3WRKikjjLsKjrNaKnW7DpLspD02PcVEm5FurNE43Y0MgjVpTpnDFnWNaCMDN
-         3EDe83Nuo+FYiCsY31viCt4CObTelrKomcxVxdMibXDYT1Vn7U+09QN/r/NE20kp6sFm
-         tuhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=G7jTJSPqK7GcsLP1mWujIY+vR8W5851kmvgTfQoUVSI=;
-        b=wT50B33O2oOD/iitA6/CBHscFN8qeu3URil6Nf7bnRXfLPr91BknkaGiQA02uV0w9v
-         SzlMy6MA0tCTwpiUFXcJkycMMKKhTFULFhLvYiayhnN7VDhAP7wGW4aPmUhe7zbbGQgn
-         NQAl7hSNsbJJOrehB1lwyMElYycsbp0kejva1BeuhTOeEbFs6dnryOtU6jYq1cS8Tlag
-         k67oR1y2qSu7+1myMVjxnwDkopXaKKlvpn6t1cuc7BaW7F200y2u2HTyS1viqQtgOtph
-         3P+GGDgjqDtMJukrIChU2yC/l+aXZjzrgelz/ivkSrR0ndRK5n2mkY5/zencxtwVkZWJ
-         Uz8w==
-X-Gm-Message-State: AOAM5323cW66Z/Mk+zEvlE51dy4tT6B1UK30z6Wcz6vSp9i4+35WsOhc
-        WtM9DxRVJZPPbd3f1HaneleBQcIu4e8Cig==
-X-Google-Smtp-Source: ABdhPJzJZk4j2SEYmgCUMOJ90cJ5u7BN8OXPQzeEVTyjuhUNwjtJlGIsDNlI9rbA2TWb10DDh/l0aw==
-X-Received: by 2002:adf:ee0c:: with SMTP id y12mr5340082wrn.82.1635447701896;
-        Thu, 28 Oct 2021 12:01:41 -0700 (PDT)
-Received: from localhost.localdomain (freebox.vlq16.iliad.fr. [213.36.7.13])
-        by smtp.gmail.com with ESMTPSA id j20sm3017511wmp.27.2021.10.28.12.01.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Oct 2021 12:01:41 -0700 (PDT)
-From:   Marios Makassikis <mmakassikis@freebox.fr>
-To:     linux-cifs@vger.kernel.org
-Cc:     Marios Makassikis <mmakassikis@freebox.fr>
-Subject: [PATCH] ksmbd: Fix buffer length check in fsctl_validate_negotiate_info()
-Date:   Thu, 28 Oct 2021 21:01:27 +0200
-Message-Id: <20211028190125.391374-1-mmakassikis@freebox.fr>
-X-Mailer: git-send-email 2.25.1
+        id S231352AbhJ1WoQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 28 Oct 2021 18:44:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49504 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231235AbhJ1WoQ (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 28 Oct 2021 18:44:16 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 05B8560E8F
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Oct 2021 22:41:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1635460909;
+        bh=ZMwav7MCoqrBO+/gIXvwEP9Z8ECWbX62BdYT6UfIkzE=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=G8BapWL78cKAzOMjjUMXmvJHu9pXiDz4Y2QN+snFqi6PrfuYO8iB/pwinBcMzH1Bz
+         F3+d5NHEOB4B+cpqXOAIW7NbfRK3i+FFmcV1K8RfMZPUWubdGSccydaYJi0Rfut7mL
+         n65gRalZ+nHcHSkAdXM6mrGjyJyATwLgdjgXA1+xPq5Rv6Hl1JL83nd+j8Ex8ZqjJ6
+         rAe6QERKIot5YJdQrf7NfFIFKgd5xbUDNeX0LMT0ZWfzbi6jzKWyKiNFEWjCu4heNq
+         nuOBqDgMNJbzGgl0xW7D6awZS7DcHK89zTam8kNBalhdzj/ufjmdAsPD5strVf6b9Y
+         +GR3bnIz7OJJw==
+Received: by mail-ot1-f45.google.com with SMTP id 107-20020a9d0a74000000b00553bfb53348so10884111otg.0
+        for <linux-cifs@vger.kernel.org>; Thu, 28 Oct 2021 15:41:48 -0700 (PDT)
+X-Gm-Message-State: AOAM533sXAsPjaDtifGl2d6qUYs7C5f+ehnE5xn20Rm5EyT/CJljWsL7
+        84gW5WSCkBp6OhFkXkFrLsFzrZpKyRbtyp07+EA=
+X-Google-Smtp-Source: ABdhPJw1kod9RfW+Vf5ngwjN1zZEQKL6rd+UlZPxT21C6vwGcj06uC/227osVFz/AQRdX698z7n+PGFWHmA0yaBPUhc=
+X-Received: by 2002:a05:6830:25c2:: with SMTP id d2mr5879237otu.116.1635460908336;
+ Thu, 28 Oct 2021 15:41:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Thu, 28 Oct 2021 15:41:47
+ -0700 (PDT)
+In-Reply-To: <20211028190125.391374-1-mmakassikis@freebox.fr>
+References: <20211028190125.391374-1-mmakassikis@freebox.fr>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Fri, 29 Oct 2021 07:41:47 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-MeXyPu-ONTw115S+AbqJxrV8RZBW1H=isKEyCS5xVtg@mail.gmail.com>
+Message-ID: <CAKYAXd-MeXyPu-ONTw115S+AbqJxrV8RZBW1H=isKEyCS5xVtg@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: Fix buffer length check in fsctl_validate_negotiate_info()
+To:     Marios Makassikis <mmakassikis@freebox.fr>
+Cc:     linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The validate_negotiate_info_req struct definition includes an extra
-field to access the data coming after the header. This causes the check
-in fsctl_validate_negotiate_info() to count the first element of the
-array twice. This in turn makes some valid requests fail, depending on
-whether they include padding or not.
+2021-10-29 4:01 GMT+09:00, Marios Makassikis <mmakassikis@freebox.fr>:
+> The validate_negotiate_info_req struct definition includes an extra
+> field to access the data coming after the header. This causes the check
+> in fsctl_validate_negotiate_info() to count the first element of the
+> array twice. This in turn makes some valid requests fail, depending on
+> whether they include padding or not.
+>
+> Fixes: f7db8fd03a4b ("ksmbd: add validation in smb2_ioctl")
+> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 
-Fixes: f7db8fd03a4b ("ksmbd: add validation in smb2_ioctl")
-Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
----
-This causes mounts to fail on older kernels (v4.19 on debian10) when
-specifying vers=3.0.
-
- fs/ksmbd/smb2pdu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 7e448df3f847..a03b53df3f04 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -7312,7 +7312,7 @@ static int fsctl_validate_negotiate_info(struct ksmbd_conn *conn,
- 	int ret = 0;
- 	int dialect;
- 
--	if (in_buf_len < sizeof(struct validate_negotiate_info_req) +
-+	if (in_buf_len < offsetof(struct validate_negotiate_info_req, Dialects) +
- 			le16_to_cpu(neg_req->DialectCount) * sizeof(__le16))
- 		return -EINVAL;
- 
--- 
-2.25.1
-
+Thanks for your patch!
