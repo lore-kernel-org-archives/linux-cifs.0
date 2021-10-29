@@ -2,107 +2,128 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD12C433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 23:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 204B0C433FE
+	for <linux-cifs@archiver.kernel.org>; Fri, 29 Oct 2021 14:03:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1674F610A4
-	for <linux-cifs@archiver.kernel.org>; Thu, 28 Oct 2021 23:57:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00D3D6115C
+	for <linux-cifs@archiver.kernel.org>; Fri, 29 Oct 2021 14:03:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbhJ1X7a (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 28 Oct 2021 19:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48208 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbhJ1X73 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 28 Oct 2021 19:59:29 -0400
-Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B83CC061570
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Oct 2021 16:57:02 -0700 (PDT)
-Received: by mail-ua1-x92e.google.com with SMTP id z22so12493645uaq.12
-        for <linux-cifs@vger.kernel.org>; Thu, 28 Oct 2021 16:57:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=xhNcZSlJDduUlHwB5TzYi6IdunLaUYgdnsb5cn5YG3o=;
-        b=Ja9qbAcJUjTiE2wzxERS0JOh8Vpr2bdl3IZiMXPg8YeQGQwzAwE7E/amfMXFT1qyg0
-         L5Zbhuy7yEtHGkbt7T4RoiY7djKZdHCx02W6Cj2+e/eIMtaAmEV08ByQiVq6htkoznRj
-         uZqDV9Qr9tNCJmnNuzTpYld4RESuh12z/1heet0cqgPIbrL10Fkt4OkvnejDVeLmF6KB
-         3Pvw6pencIsIlDgnQR1bGeP9O8h2bP+Ytu9/IdgCtlDOudfZQniyqYCFG3PquW7Vdo1i
-         ozDqjbG+CeDhJB7Zg4cosNzibjPR/5KnbZGQPNfYF8Onf/u7lBWKM5HK2JXA7gQ/sZiu
-         CT4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=xhNcZSlJDduUlHwB5TzYi6IdunLaUYgdnsb5cn5YG3o=;
-        b=OGDzKTG6Ya8ZaRV04yTjz8HRuAWoDlGIZDm8v1Hzk+R8bMTpM9QeaBX8NVDRO/QPer
-         Sp/CIMnsc/9iRKdWDmx9r4fEBUgZ3JPMPR2Hk4UAVlLOBj7jgH+hR/ONy7K/EWhgQ0VK
-         i/nKLsmhis84Wk9w6xhM9m2KKzMLybPGpuAejDwvYEBQQMO2Ga9LPlqYqfq5QuCJDmhx
-         ERZgFQkTzibcC+E7Q/D9m/WQcJpUug6Gc3aP4LKcJdIyGQ3WlSGpfecPsEYgY7pEn2U6
-         Az06Qdijl7YSZWmz5Ws+Gpamf94fYOBYkirU9FOWxirmv1sWRnFjSwaVihCK+vq1OaPP
-         hctA==
-X-Gm-Message-State: AOAM532gVLtoOs9GpsxCAwY1VECOkLJpowfldDzDZpc0sc06A5N8h67W
-        wm8vOe4W0JUGlm1mni9ETvbibsw7ML5+VnKzpmliyBf/Xek=
-X-Google-Smtp-Source: ABdhPJyezO8INqlv19X30ja7xhR5DljuXwABfTNDaGvzAqmg03lGVtVoi1+jbhfco199GntVii/eQ/PrjXTidIk11l4=
-X-Received: by 2002:a67:c19d:: with SMTP id h29mr8856595vsj.18.1635465421246;
- Thu, 28 Oct 2021 16:57:01 -0700 (PDT)
+        id S230521AbhJ2OFq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 29 Oct 2021 10:05:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27025 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229692AbhJ2OFp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 29 Oct 2021 10:05:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635516196;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=UAO5hlBNRIsi6HHTbgauN8V1YNxASqG4MUTjtXwDRGE=;
+        b=c2hG8fTo9qfEN/7fTNmI+OFUoX15vdLW6yWuJX0PbEPnv7UF4O0qVGfZDDkZZpCNNQlW/9
+        oVXBdEWohG5rOG3nNOUXFS1ai7rYBNl0Bfy+4k8BrkS+jpdt1TqjiPADDxQRdAz7YJlqHO
+        S4eue1fdOddwVL6QxP4PuFERXzqX2lo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-6oVbE3goM2C8LodwzHbb4Q-1; Fri, 29 Oct 2021 10:03:15 -0400
+X-MC-Unique: 6oVbE3goM2C8LodwzHbb4Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C248236304;
+        Fri, 29 Oct 2021 14:03:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5727F79452;
+        Fri, 29 Oct 2021 14:02:37 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <163363944839.1980952.3311507543724895463.stgit@warthog.procyon.org.uk>
+References: <163363944839.1980952.3311507543724895463.stgit@warthog.procyon.org.uk> <163363935000.1980952.15279841414072653108.stgit@warthog.procyon.org.uk>
+Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        linux-cifs@vger.kernel.org, linux-cachefs@redhat.com,
+        Jeff Layton <jlayton@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 07/10] cifs: (untested) Move to using the alternate fallback fscache I/O API
 MIME-Version: 1.0
-References: <20211028190125.391374-1-mmakassikis@freebox.fr>
-In-Reply-To: <20211028190125.391374-1-mmakassikis@freebox.fr>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Fri, 29 Oct 2021 08:56:50 +0900
-Message-ID: <CANFS6bYYpxzNjakeQ6GRMwAAd0rzaF2sgcpbZ5Qd3pOVmKpS5w@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: Fix buffer length check in fsctl_validate_negotiate_info()
-To:     Marios Makassikis <mmakassikis@freebox.fr>
-Cc:     linux-cifs <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1876664.1635516156.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 29 Oct 2021 15:02:36 +0100
+Message-ID: <1876665.1635516156@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Acked-by: Hyunchul Lee <hyc.lee@gmail.com>
+David Howells <dhowells@redhat.com> wrote:
 
-2021=EB=85=84 10=EC=9B=94 29=EC=9D=BC (=EA=B8=88) =EC=98=A4=EC=A0=84 4:02, =
-Marios Makassikis <mmakassikis@freebox.fr>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=
-=84=B1:
->
-> The validate_negotiate_info_req struct definition includes an extra
-> field to access the data coming after the header. This causes the check
-> in fsctl_validate_negotiate_info() to count the first element of the
-> array twice. This in turn makes some valid requests fail, depending on
-> whether they include padding or not.
->
-> Fixes: f7db8fd03a4b ("ksmbd: add validation in smb2_ioctl")
-> Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
-> ---
-> This causes mounts to fail on older kernels (v4.19 on debian10) when
-> specifying vers=3D3.0.
->
->  fs/ksmbd/smb2pdu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index 7e448df3f847..a03b53df3f04 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -7312,7 +7312,7 @@ static int fsctl_validate_negotiate_info(struct ksm=
-bd_conn *conn,
->         int ret =3D 0;
->         int dialect;
->
-> -       if (in_buf_len < sizeof(struct validate_negotiate_info_req) +
-> +       if (in_buf_len < offsetof(struct validate_negotiate_info_req, Dia=
-lects) +
->                         le16_to_cpu(neg_req->DialectCount) * sizeof(__le1=
-6))
->                 return -EINVAL;
->
-> --
-> 2.25.1
->
+> Move cifs/smb to using the alternate fallback fscache I/O API instead of
+> the old upstream I/O API as that is about to be deleted.  The alternate =
+API
+> will also be deleted at some point in the future as it's dangerous (as i=
+s
+> the old API) and can lead to data corruption if the backing filesystem c=
+an
+> insert/remove bridging blocks of zeros into its extent list[1].
+> =
+
+> The alternate API reads and writes pages synchronously, with the intenti=
+on
+> of allowing removal of the operation management framework and thence the
+> object management framework from fscache.
+> =
+
+> The preferred change would be to use the netfs lib, but the new I/O API =
+can
+> be used directly.  It's just that as the cache now needs to track data f=
+or
+> itself, caching blocks may exceed page size...
+> =
+
+> Changes
+> =3D=3D=3D=3D=3D=3D=3D
+> ver #2:
+>   - Changed "deprecated" to "fallback" in the new function names[2].
+
+I've managed to test this now.  There was a bug in it, fixed by the follow=
+ing
+incremental change:
+
+--- a/fs/cifs/fscache.h
++++ b/fs/cifs/fscache.h
+@@ -75,7 +75,7 @@ static inline int cifs_readpage_from_fscache(struct inod=
+e *inode,
+ static inline void cifs_readpage_to_fscache(struct inode *inode,
+ 					    struct page *page)
+ {
+-	if (PageFsCache(page))
++	if (CIFS_I(inode)->fscache)
+ 		__cifs_readpage_to_fscache(inode, page);
+ }
+ =
 
 
---=20
-Thanks,
-Hyunchul
+It shouldn't be using PageFsCache() here.  That's only used to indicate th=
+at
+an async DIO is in progress on the page, but since we're using the synchro=
+nous
+fallback API, that should not happen.  Also, it's no longer used to indica=
+te
+that a page is being cached and trigger writeback that way.
+
+David
+
