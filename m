@@ -2,120 +2,73 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1828DC433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 29 Oct 2021 18:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0BF2C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 Oct 2021 11:57:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 003F060F22
-	for <linux-cifs@archiver.kernel.org>; Fri, 29 Oct 2021 18:52:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF85060E0C
+	for <linux-cifs@archiver.kernel.org>; Sat, 30 Oct 2021 11:57:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230426AbhJ2Sy3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 29 Oct 2021 14:54:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56411 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230216AbhJ2Sy2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 29 Oct 2021 14:54:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635533518;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/vX1aXmgWDOmHXytC/xtmTFfVJMO+hskcobUwtJeMmI=;
-        b=H8seKFppfj7RTniLl8qMPFbNHiBTU/Cx6TGPmDtuYq7STB6GNxpFB/+QjX7t8a4wzfU6SA
-        p2JWZriQeHgAGkSlA3V11yBruuF+HkBR3tgbxZC3CPVge2OsRYNbzZ+EmYgxhDc7oM3GWc
-        Kh0dM4UchE9yJKCS4JjlS00zJFUzE8U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-475-p1zGB8TrMduU9GKrjace1w-1; Fri, 29 Oct 2021 14:51:55 -0400
-X-MC-Unique: p1zGB8TrMduU9GKrjace1w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 008188F515;
-        Fri, 29 Oct 2021 18:51:53 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E18845D6CF;
-        Fri, 29 Oct 2021 18:51:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wg_C6V_S+Aox5Fn7MuFe13ADiRVnh6UcvY4WX9JjXn3dg@mail.gmail.com>
-References: <CAHk-=wg_C6V_S+Aox5Fn7MuFe13ADiRVnh6UcvY4WX9JjXn3dg@mail.gmail.com> <163551653404.1877519.12363794970541005441.stgit@warthog.procyon.org.uk> <CAHk-=wiy4KNREEqvd10Ku8VVSY1Lb=fxTA1TzGmqnLaHM3gdTg@mail.gmail.com> <1889041.1635530124@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        v9fs-developer@lists.sourceforge.net,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
-        linux-cachefs@redhat.com, Dave Wysochanski <dwysocha@redhat.com>,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Jeff Layton <jlayton@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 00/10] fscache: Replace and remove old I/O API
+        id S230327AbhJ3MA3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 30 Oct 2021 08:00:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46660 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229911AbhJ3MA2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 30 Oct 2021 08:00:28 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F69C061570
+        for <linux-cifs@vger.kernel.org>; Sat, 30 Oct 2021 04:57:58 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id p16so26465709lfa.2
+        for <linux-cifs@vger.kernel.org>; Sat, 30 Oct 2021 04:57:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=lBP0q8SugUz5/4ONVbrDiZru/Cxg7lBnii1q1Zyb+wA=;
+        b=fjR8e9kS4IUIJnjnwr+uW5vsXUsFVSSPcZ19onoptDYh3tdXYUS5CRKIx4YR9UyxjJ
+         hKU1NdEX7aXc46W+43YbV+5azWEYiVMr0D+Sfu2k/bE6BuLAP5dF29B5zUB7XDZnH1HO
+         7asJKzSN+d7/XEgwRp4cqAAcP3cdUBErlik1XCpj4HCtzDyUIqB/TdK1qlq2lhhoudZG
+         44JMTElrWZL7c/gACV4PhKEilI5W/mb8uDzvvpi7HFXUf11SdO5oI/oZNkuLB/TuMW+l
+         /F3hAUlBVXD9J3t0O7s6SxfPMnWzBFuIJ11oI5EeZqgRInI7x8rw/ElQZan6c8nqtfsd
+         x8hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=lBP0q8SugUz5/4ONVbrDiZru/Cxg7lBnii1q1Zyb+wA=;
+        b=5xUPd8HkF6zkk8bJ6rrx4Nv4D6F8yl6ymrHT6GK4oYSMst7kUXBk67ii5E2tYTVPLB
+         0cYU0wk7WO3fHKnhHjA0s6SHidrJ85nYaXdTT16sdSUq+IEa7AQedUt6hmogndACjilx
+         l9uE0+IknkOVh5fCW3sG0t1OkGL2Z2U3XvQwCy36j4Xie4lI0aHlG36sEcifRgRQfEGj
+         OoBGo2Pji/M60TcZWwnK/TRZXPu/kBTOWpH/gT3HU5vGE3zo0VUaFCl97wxD3qQAnO09
+         6VTo1AOnRXzKiYVSDM9x47b8ykWhKkF8nOKgZ7HmSfFeHPnt9p/LP9PIl8ulKpAoczL9
+         1hyQ==
+X-Gm-Message-State: AOAM533F6Shezy1/ybnJwntZXXjJfBWPy0AIb12Eyh4WF1uSn+GbpjRl
+        Y4yDb9Isr1YAO3TgqHeDfzRj9SReCZCIi+LycUE=
+X-Google-Smtp-Source: ABdhPJzUNITIx1Uq08faePyGlHANPDfDgG3YU8gYYxeNnymsmLuTlpeE+kOqa38R1I9PNMEajrMkVx70SEe6tv8wGWY=
+X-Received: by 2002:ac2:4309:: with SMTP id l9mr15958097lfh.667.1635595076587;
+ Sat, 30 Oct 2021 04:57:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1891410.1635533494.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 29 Oct 2021 19:51:34 +0100
-Message-ID: <1891411.1635533494@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 30 Oct 2021 06:57:45 -0500
+Message-ID: <CAH2r5mv8HDTp6mQD=JQE8z1vZMZ8JytsB-Te7JnhPOiKzwe_2w@mail.gmail.com>
+Subject: Volume Serial Number and Creation time not populated by ksmbd server
+To:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+When debugging an fscache problem with Dave Howells, I noticed that
+ksmbd does not populate the VolumeCreationTime or VolumeSerialNumber
+in QUERY_FS_INFO for level FS_VOLUME_INFO (see
+smb2_get_info_filesystem() in fs/ksmbd/smb2pdu.c)
 
-> But:
-> =
+                info->VolumeCreationTime = 0;
+                /* Taking dummy value of serial number*/
+                info->SerialNumber = cpu_to_le32(0xbc3ac512);
 
-> > However, if you would rather I just removed all of fscache and (most o=
-f[*])
-> > cachefiles, that I can do.
-> =
+Can we fix at least one of these to query info from the underlying fs
+to populate this so our fscache info is more unique by fs?
+-- 
+Thanks,
 
-> I assume and think that if you just do that part first, then the
-> "convert to netfslib" of afs and ceph at that later stage will mean
-> that the fallback code will never be needed?
-
-The netfslib coversions for afs and ceph are already in your tree and I ha=
-ve a
-patch here to do that for 9p (if you're willing to take that in the upcomi=
-ng
-merge window?).
-
-The issue is cifs[*] and nfs.  I could leave caching in those disabled,
-pending approved patches for those filesystems.  This would mean that I
-wouldn't need the fallback code.
-
-An alternative is that I could move the "fallback" code into fs/nfs/fscach=
-e.c
-and fs/cifs/fscache.c if that would be easier and merge it into the functi=
-ons
-there.  The problem will come when the cache wants to do I/O in larger uni=
-ts
-than page size to suit its own block size[**].
-
-David
-
-[*] As it happens, it turns out that cifs seems to have a bug in it that
-causes the entire cache for a superblock to be discarded each time that
-superblock is mounted.
-
-[**] At some point the cache *has* to start keeping track of what data it =
-is
-holding rather than relying on bmap/SEEK_DATA/SEEK_HOLE to get round the
-extent-bridging problem.  I'm trying to take a leaf out of the book of oth=
-er
-caching filesystems and use larger block sizes (e.g. 256K) to reduce the
-overhead of cache metadata.
-
+Steve
