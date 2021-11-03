@@ -2,82 +2,113 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 184C5C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  3 Nov 2021 13:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF38C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed,  3 Nov 2021 14:25:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0092361108
-	for <linux-cifs@archiver.kernel.org>; Wed,  3 Nov 2021 13:51:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17C3860EB4
+	for <linux-cifs@archiver.kernel.org>; Wed,  3 Nov 2021 14:25:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231434AbhKCNxt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 3 Nov 2021 09:53:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53396 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230213AbhKCNxs (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Wed, 3 Nov 2021 09:53:48 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5DE4061101;
-        Wed,  3 Nov 2021 13:51:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635947472;
-        bh=FuC3InfUiUzftFrFY+xCzxY6nwi+F5ahmotN+IR5InA=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=gjkxqj0TaNVbEpotyLbLGfCn9JPQVZOpjZzFJC0FNRgzIT2JoSFDcYzWQoCaJf8P1
-         rsSzo1cMgX5KGitL/rXO1GeMTPA/OU0sKPo5eDz403664JUHoQEOIN/ap1mhwjA/dj
-         BA2iapg4J40RD0ByDi8z9Ko65Uk7ivsdtIcLi6rJLjHGXlT8pYQc0YsNp823o6rs7l
-         uQ1VhdJMp4mXTqKYOZ2mAgk7fzwRTYrvrF/1Q4odp+3WOgwuOgO3EapP+eMVoxjhpB
-         3Cy3osqOMRb9t93InyDDwiWlMmqGnFPrxeoSCOc/3c0gSh4JKUYQfSK2j/77UtQzT+
-         /b2hM5der7Tnw==
-Received: by mail-oi1-f172.google.com with SMTP id u2so3740324oiu.12;
-        Wed, 03 Nov 2021 06:51:12 -0700 (PDT)
-X-Gm-Message-State: AOAM531dmO03m9GUUoJfk0edk17i9BtNGRuoPExrJ4mGN+CgpRRwZJXx
-        k7ztlvQU7tA7r5VjmEVf68/0rYnuqoaOrDp7aDE=
-X-Google-Smtp-Source: ABdhPJym86zgQIkWMOH6sF8Ud42fAMTDq6MWFF5vgxyB9VSEK34PWSOV1PpvGh24w0DA4nyBeuVDOG9Ryw11EsXCLVs=
-X-Received: by 2002:aca:3885:: with SMTP id f127mr10743369oia.65.1635947471658;
- Wed, 03 Nov 2021 06:51:11 -0700 (PDT)
+        id S231510AbhKCO2N (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 3 Nov 2021 10:28:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57388 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230527AbhKCO2M (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 3 Nov 2021 10:28:12 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF57C061714;
+        Wed,  3 Nov 2021 07:25:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=MHA8/5DT9+P3H8EQ2DoH0Mu3SBzybKb1RrICo62RwQ4=; b=t9eJNkfzrgV+QiZqspfhcfToYC
+        3Ec3SF3Q9ZLFQr4jT4+hVBAtuUAKgl1oeoJE6scE4G7P3IEjD2W/m5e99yCHLHHqSDI4E6rXc3JMg
+        w4hmwDJRapYDTm+u3lLY6FNZbczw88eT0WhKs9l37aOExnpxsFT0/MIanKBtIqeteHjLCUNpHkY3t
+        6V8IAR1xpI1GYombL4N7TBPf8hVo3yBjiDFh6Q6ZiaTO73ciucIzhdBOKDW+BOs+2QBbEDNk1eJ27
+        55B12uY/pzWiNJcJpqjIYYeUkBZkGAu0Sd3MqWEnqhWN6VDdSlaDtEesmkfjbJgM/JJGlieavLNzj
+        4sxQUXrw==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1miH8f-005FeW-AM; Wed, 03 Nov 2021 14:21:52 +0000
+Date:   Wed, 3 Nov 2021 14:21:17 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jeff Layton <jlayton@kernel.org>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        linux-cachefs@redhat.com, linux-fsdevel@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        devel@lists.orangefs.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 5/6] netfs, 9p, afs, ceph: Use folios
+Message-ID: <YYKa3bfQZxK5/wDN@casper.infradead.org>
+References: <163584174921.4023316.8927114426959755223.stgit@warthog.procyon.org.uk>
+ <163584187452.4023316.500389675405550116.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Received: by 2002:ac9:31e7:0:0:0:0:0 with HTTP; Wed, 3 Nov 2021 06:51:11 -0700 (PDT)
-In-Reply-To: <20211103131901.28695-1-guozhengkui@vivo.com>
-References: <20211103131901.28695-1-guozhengkui@vivo.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 3 Nov 2021 22:51:11 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8dd83NoCetj+-Cza5EnTvSZXBbu4UWR0WHT5YjAD-05g@mail.gmail.com>
-Message-ID: <CAKYAXd8dd83NoCetj+-Cza5EnTvSZXBbu4UWR0WHT5YjAD-05g@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix flexible_array.cocci warnings
-To:     Guo Zhengkui <guozhengkui@vivo.com>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <sfrench@samba.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel@vivo.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <163584187452.4023316.500389675405550116.stgit@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-11-03 22:19 GMT+09:00, Guo Zhengkui <guozhengkui@vivo.com>:
-> Fix following coccicheck warning:
-> ./fs/ksmbd/transport_rdma.c:201:20-27: WARNING use flexible-array
-> member instead.
-Is there only one here? It would be better to change them together in
-this patch.
->
-> Signed-off-by: Guo Zhengkui <guozhengkui@vivo.com>
-> ---
->  fs/ksmbd/transport_rdma.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-> index 6330dfc302ff..ca62060acd2b 100644
-> --- a/fs/ksmbd/transport_rdma.c
-> +++ b/fs/ksmbd/transport_rdma.c
-> @@ -198,7 +198,7 @@ struct smb_direct_rdma_rw_msg {
->  	struct completion	*completion;
->  	struct rdma_rw_ctx	rw_ctx;
->  	struct sg_table		sgt;
-> -	struct scatterlist	sg_list[0];
-> +	struct scatterlist	sg_list[];
->  };
->
->  static inline int get_buf_page_count(void *buf, int size)
-> --
-> 2.20.1
->
->
+On Tue, Nov 02, 2021 at 08:31:14AM +0000, David Howells wrote:
+> -static int v9fs_vfs_writepage_locked(struct page *page)
+> +static int v9fs_vfs_write_folio_locked(struct folio *folio)
+>  {
+> -	struct inode *inode = page->mapping->host;
+> +	struct inode *inode = folio_inode(folio);
+>  	struct v9fs_inode *v9inode = V9FS_I(inode);
+> -	loff_t start = page_offset(page);
+> +	loff_t start = folio_pos(folio);
+>  	loff_t size = i_size_read(inode);
+>  	struct iov_iter from;
+> -	int err, len;
+> +	size_t gran = folio_size(folio), len;
+> +	int err;
+>  
+> -	if (page->index == size >> PAGE_SHIFT)
+> -		len = size & ~PAGE_MASK;
+> -	else
+> -		len = PAGE_SIZE;
+> +	len = (size >= start + gran) ? gran : size - start;
+
+This seems like the most complicated way to write this ... how about:
+
+        size_t len = min_t(loff_t, isize - start, folio_size(folio));
+
+> @@ -322,23 +322,24 @@ static void afs_req_issue_op(struct netfs_read_subrequest *subreq)
+>  
+>  static int afs_symlink_readpage(struct file *file, struct page *page)
+>  {
+> -	struct afs_vnode *vnode = AFS_FS_I(page->mapping->host);
+> +	struct afs_vnode *vnode = AFS_FS_I(page_mapping(page)->host);
+
+How does swap end up calling readpage on a symlink?
+
+>  	ret = afs_fetch_data(fsreq->vnode, fsreq);
+> -	page_endio(page, false, ret);
+> +	page_endio(&folio->page, false, ret);
+
+We need a folio_endio() ...
+
+>  int afs_write_end(struct file *file, struct address_space *mapping,
+>  		  loff_t pos, unsigned len, unsigned copied,
+> -		  struct page *page, void *fsdata)
+> +		  struct page *subpage, void *fsdata)
+>  {
+> +	struct folio *folio = page_folio(subpage);
+>  	struct afs_vnode *vnode = AFS_FS_I(file_inode(file));
+>  	unsigned long priv;
+> -	unsigned int f, from = pos & (thp_size(page) - 1);
+> +	unsigned int f, from = pos & (folio_size(folio) - 1);
+
+Isn't that:
+
+	size_t from = offset_in_folio(folio, pos);
+
+(not that i think we're getting folios larger than 4GB any time soon,
+but it'd be nice to be prepared for it)
+
