@@ -2,124 +2,146 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 106BAC433EF
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Nov 2021 14:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F7DC433EF
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Nov 2021 15:43:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E432D6120A
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Nov 2021 14:19:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7465A61183
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Nov 2021 15:43:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232410AbhKEOWH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 Nov 2021 10:22:07 -0400
-Received: from mail-eopbgr1410129.outbound.protection.outlook.com ([40.107.141.129]:48129
-        "EHLO JPN01-OS2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232106AbhKEOWH (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 5 Nov 2021 10:22:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TTAd5aHHvc5GAti2876bQH/QuLsSSMV2QKkyUscWrDGxCsR6lGGyJSaCeWeFzfZ9IfiEYdFsyghljzS7TXce/HDvzr4iISQjqyJhqcuVqu1OhqqjJLOHrpYPD5E7V+agG9fXlTQ/4lSzXhyQ14o5bPQ2rAvQxG8yZYnwNu3YpBs+sfJH3mvhrmOCMhGLltwOz5/7vBS91H60Y4gR2kFW9gt6OUNFsn6Wyt/ANDevs94ZSnuC9RkNJN7T87BKgVF0N3YmRGx41jSPbFC1XUsfLD5/5Zz8ft4/yy1cx5sTPff7c2kLj9i1znekHdaKfoCvK3Pw0WIheQIk0+tZPwdJRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+xWq827sC3JgR8pvkIM0C3iOIiW+MiX2gd03nq0JrnM=;
- b=L28+LtNXZnrxB7C62POUYaLR437x54e58eTzFgyDVSH4HcraF/4X017IiHWVcvzE1tmLf26BTuFm89T9en0q3irNw6sG4nRUJmYOpzOH+4QO9zwtwXNWI/RGDBh0432xL1yfXiw1ynZr4WJSdyXwM45qVb8YUpKXtcQ9PYXOJVMcqXt8fSup7bI2Hbz3FnHfCpRrDLV5kK5VBlg4FDx9YXSEbpFUhRPKSs2fxgOjqGwbQvQ20FM237nU6XSk6IceOrZheQMbjcSxGPdnIftAEWDqXEgHQgg5iZuF3fvWud4kNrWSQezxPjUVmonVxumNAsovaDBbMEDPritorWW4Fg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=connect.ust.hk; dmarc=pass action=none
- header.from=connect.ust.hk; dkim=pass header.d=connect.ust.hk; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=connect.ust.hk;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+xWq827sC3JgR8pvkIM0C3iOIiW+MiX2gd03nq0JrnM=;
- b=vxvRVjMlg49zC5AKdGehnsdSAf8obo1BMb6BXlMxjavPPqdHPy8qMSPjDXOWubLhb/XcxBb3roziPuZAfULQJGnnVicDAXuLfIge0QvoePyPzeyhFQK7Rozzq2yoHHPDks8oxirKuSVT0eixAn6ousULytL9gBqemOnssXGPzfI=
-Received: from TYCP286MB1188.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:b7::8) by
- TYAP286MB0633.JPNP286.PROD.OUTLOOK.COM (2603:1096:402:37::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4669.10; Fri, 5 Nov 2021 14:19:25 +0000
-Received: from TYCP286MB1188.JPNP286.PROD.OUTLOOK.COM
- ([fe80::c0af:a534:cead:3a04]) by TYCP286MB1188.JPNP286.PROD.OUTLOOK.COM
- ([fe80::c0af:a534:cead:3a04%6]) with mapi id 15.20.4669.013; Fri, 5 Nov 2021
- 14:19:25 +0000
-From:   YE Chengfeng <cyeaa@connect.ust.hk>
-To:     "sfrench@samba.org" <sfrench@samba.org>
-CC:     "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: cifs: suscpected double free in cifs_oplock_break on error
-Thread-Topic: cifs: suscpected double free in cifs_oplock_break on error
-Thread-Index: AdfSTvIUI+djSELHRAGbEEdvxjgNYg==
-Date:   Fri, 5 Nov 2021 14:19:25 +0000
-Message-ID: <TYCP286MB118867BCD206596ED6C8971C8A8E9@TYCP286MB1188.JPNP286.PROD.OUTLOOK.COM>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: samba.org; dkim=none (message not signed)
- header.d=none;samba.org; dmarc=none action=none header.from=connect.ust.hk;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 03af2a98-21e9-41b0-0404-08d9a0674533
-x-ms-traffictypediagnostic: TYAP286MB0633:
-x-microsoft-antispam-prvs: <TYAP286MB06333D94B110CD5BD726D8E18A8E9@TYAP286MB0633.JPNP286.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XukmKmIgA3CyfvW0x0Pe9Vz7mOAvd9jVSNJqvM9NOlU9eXa7931Ape6a+brg0cn0226/TDmygV6vrrtmBGlGYWdqmi9w3Fi2oY+ZQX+ztXo3do4St9oQrwP5JebPhQV8MoIVPbqLt816QYGnGk9WgKgtpLB6Amm3XASRd4e0W9WnGaQIeUNHhWgkGSJG7t/XOH0exciwp9QB+j3bG+k2IwNP3x9D85YbKAuSU6vZPsyOJtghok3lWoc7VT0KI3VZAXAAaOOhlxAN2Tx51XN0SfEAy3hyXtvF1kduSuRZI+il8VfYb8CMwnGmiI6NlsMotOZIO8gwz9klL7nGnEj+lcdZcmnvK8GdfC/4xkp/rwP2HR13ot6m7RvE7+YwPi0oyUywG6BQHvt0xCkdajUE6rUo1daMDLQ1TYyGatjPqP10nQyYYnkoMH5sAQZby+eRXsjspuijiTZ7/GQnmrAGFGrAHCDoSzjElkKQa+JTO2NLNtx1dosWmOJVu0sbmQNPOc7Pn5+YWxB+b104Rp/I+r+qnN7XodHC7ZJHna1OhExTenvK/bgChpCb8pxncHKOcfJ/MNBw0ysHC1YJSlBeDn+4ECRbPZD4geFxJeaeH6n63meJLiLrNlPIf47WCs7+zf8Vm3jVjLtMoLtq+r35KIwiQCiqlcTM3qvxZb1YuLpC4x/VbDetWKltnslwoxwZbvkxqLLYR0G0Cig44p9iIuFOZ0XLhZA7/+gfkSnsuA1OIgKXsCcEc2x5BPYkO9NA2r19Vhwv3S+Mt+Qb+2T+AK9ssiH71Wh76GUCl2P4JU0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYCP286MB1188.JPNP286.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(4636009)(366004)(38070700005)(2906002)(966005)(4326008)(86362001)(66476007)(6506007)(71200400001)(508600001)(83380400001)(33656002)(316002)(786003)(6916009)(52536014)(54906003)(66446008)(66556008)(38100700002)(64756008)(5660300002)(186003)(122000001)(4744005)(8936002)(8676002)(7696005)(26005)(66946007)(9686003)(55016002)(76116006);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?gx6eOEpwpV5ys/rHibkYi7e8hxnrt4jU6VbmGqeY94AW2cER3Z1z8jl0chUZ?=
- =?us-ascii?Q?SK3xW7uyY2+9L+yvoKic0i7U03lIbescKZL71XQ1B5VBgJGxDvS5ViroU0jk?=
- =?us-ascii?Q?C+koWVQ4fNThLlzIu9hxdp2AqiCAHeLORLhoHpwL+Yzoet+T4/GUT4/9pmWU?=
- =?us-ascii?Q?nVsU7YjTTmUXLAdWJqtcfFetkXXbrr51jdAoqiZxCE5JX3FcpCuR9p4j2wbt?=
- =?us-ascii?Q?YPOEW1QNOyuUSY3EYPh4WCDaI97arBosYK1Oklfku6FQdOVZgHh6oLzH1sTY?=
- =?us-ascii?Q?fjfetGTLf1C3w8ecYQD21lZq0A2M13ekSRQlQ2SAumZYboHmaALcTJImKY71?=
- =?us-ascii?Q?FAw5Wgb8isMhigHBm8aXhLPa2pGhVeDl85HXw5nzlnLIKHibr8KZ4+MDLx6J?=
- =?us-ascii?Q?0+8xtjnB+LgKT2+d63WUA0nUEBmv0bgQ0rCQuAawsXI+oCAraUQdrmDFZL7K?=
- =?us-ascii?Q?MSvJ6MOCPulsfKk9g+N7/ixSOMp7g3XyBq/YD6fJ1YWxypp6yGYtvwCg78/2?=
- =?us-ascii?Q?jb2Ld/2h0CsnSSNroPBwDxo0LiAdAD4/29eh+YbIOVqMEIg2waXlURTGFGZO?=
- =?us-ascii?Q?PD4vTZE2iPXDOeeBf2SbUFPka9Gf/UYRxhJrxws/gkAJW+foxXw2PrHRsCAo?=
- =?us-ascii?Q?WRJlj/OhHKq9Ldg0tGHU+Ej1SrRRZOE+SuXLsp0pp8zEt1q4KwLs3FnbF2o3?=
- =?us-ascii?Q?z/9/XsCbvaZBYhdBy+FGtkZEDm0S3DZbOF4/BUQB3+go002iAiM1O7/vSzkN?=
- =?us-ascii?Q?iFnBXqu71Ggj934pkjg/cICZAWNtjRsLOQBlWzaAftgYspfzuQd90MQ/dtiJ?=
- =?us-ascii?Q?XfIs5X9ol/5zpiujSzatDT3JVL3HO1vWR/nUL2b0lmOfAaA6aXIXxnv4lxHd?=
- =?us-ascii?Q?1sfBIpBsSc6e8iWCab3RgzR5RI6er1Tf3yZCAO7Kap+kG6Ot0jfu/h4ADPWb?=
- =?us-ascii?Q?mO39mk1TS4azDBr7SBuotNSRo3E+kfVsivcUnHjUm00mwyHd9OzT0gGnuiqj?=
- =?us-ascii?Q?nD30UWlyQNzf/4OBa9z4354mWG5k8jqNQ6zpfPiBEYUtsmY3u1rmlqZNnmyL?=
- =?us-ascii?Q?8gkfbqN/zlKXn0xGRXeJ8yblc48VmMCMi6sUqINzrBWewTWwIFioFeu1cvEC?=
- =?us-ascii?Q?F8MxAgp4qjb32+P4CfumMMhTmjxRUp5t9Nl1Oa5zGz5iDga8Rnz1HjcexZwH?=
- =?us-ascii?Q?CEFAR75TxAQYXpWCuu0XKG/WrgcbmOfOsm26il8mGFXxE8SH4UXPIvkh6OCc?=
- =?us-ascii?Q?A7HT0C47bJZbrpi+IqJsDr5RGrquKVa8REm2zgF/IHp1nxW8AWdzBtZIVSuO?=
- =?us-ascii?Q?BsOyMs9BHUT+dqsq+1MEuUgiVYcPjrcrjqpt/Ghquy9Jz8/zBp8VOzQsm1oo?=
- =?us-ascii?Q?tMsI1KyjkEhBl/AZjrEbffkauNLLuz7tWrhy1lLUwhEJ5o+LtRTq3iPpLlK+?=
- =?us-ascii?Q?226u6A0buNKU1JOtJrdj6wujnNH0xkjXTcGS9uMle+cv1DjdnruM2ae2DK4T?=
- =?us-ascii?Q?n68NSSA9tX6kMTcFjfC2qY5rOQbFiKf8Wp16g/qscALonqaf2laGR55iN8sd?=
- =?us-ascii?Q?xRaF/JzRCGtgudvjQci5mqZ1i/tfkWTjt5O4d48b+6fEnAPXOfVulwPvaXor?=
- =?us-ascii?Q?efaiUz24dcU95GYoWErteio=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S229785AbhKEPqV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Nov 2021 11:46:21 -0400
+Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:55030
+        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230153AbhKEPqU (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Nov 2021 11:46:20 -0400
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 50E5040001
+        for <linux-cifs@vger.kernel.org>; Fri,  5 Nov 2021 15:43:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1636127019;
+        bh=Kma2r6Cjt1RWiEDiySihOnGrp1HFvlTplV2HdiifHKA=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=Pv2s9dMT5q38F9GPg01SpNA4Yyt4qClouRXUzF5/gxS8l5bcAQXllxbIaASR8LV36
+         09z4TY4JVhcAX1yDfM4MVTml5JOAtaW8AuwNn0Ck7c7kbCrAiMDdkFvHTweXSTh/e9
+         m4cGsOPWKJjXEi7dXp/EJUCf7wa2gkWJPheJbeOoJsrJbJWY0dL0O+rcvTweNGE4cg
+         9UxD7SDNKwXX0ZubTKs2GpzBYDzC751U+d7FJ0qHl3e57i3oZ5dzsBGAhynwQqExEq
+         BZA4ut6pIT2iTutRL192dcNAxDJf5aqmgcqGcYZEmAVRGbIyMldA+XRee/9cuw+vHE
+         M1l/uJPQgJWZw==
+Received: by mail-wm1-f72.google.com with SMTP id r6-20020a1c4406000000b0033119c22fdbso3428244wma.4
+        for <linux-cifs@vger.kernel.org>; Fri, 05 Nov 2021 08:43:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Kma2r6Cjt1RWiEDiySihOnGrp1HFvlTplV2HdiifHKA=;
+        b=OIMmeXVD3GRJ+NW5Ez0G/2wF4JFKFRfKqfH7o72eONJNUjj+MEaOHNIGqjNkGrRIJ2
+         L2f/cEzX5RERLK15k0uQaRovr4nOnadTvo/p5YTLQTyjQTbXdSwqsObreFsqNZyvI5te
+         s+xDB+W/4i7iIX3Kl8pZMwG8Tm3r+78as/w9ERpHETB77AbxV6YtufM2ilq0DEsq4a5a
+         VkhgbbKbiMFitUo5SbL0we9SqkZ3ef+Hq7yj7YuianwpZAt3ih958XWDpwo4ntzglN0j
+         CEIGQZhHTRlyGtGl8XtF7HC95/2XnPGVDRDKZOj0X4NBjkRLxlj/6KJDRodeBsMt2OaS
+         iwbw==
+X-Gm-Message-State: AOAM530sxnRz9g698Xc7AHseZUFxe6AyuH32icJ8nT45yxD3r4gTG/8e
+        gnCWXe7bJ7kFdkHyfM7bXh89iebIvGuIC9nebcuTsbyJUt1F3IJxz/rH6hizMs7WGmVpjnXll3F
+        fcNCKg4FtpqdHi+2JkmamDbAOrrzX5Xg0r0xz8HQ=
+X-Received: by 2002:a1c:f601:: with SMTP id w1mr30738305wmc.112.1636127019053;
+        Fri, 05 Nov 2021 08:43:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyoyh8Lr4yX65exQreiyo/watjC1Mfw4IA67+fs0m2xRDqQJ5/nM+wMDOQKHo1Bn9rMO/Br/w==
+X-Received: by 2002:a1c:f601:: with SMTP id w1mr30738272wmc.112.1636127018901;
+        Fri, 05 Nov 2021 08:43:38 -0700 (PDT)
+Received: from localhost.localdomain (lfbn-lyo-1-470-249.w2-7.abo.wanadoo.fr. [2.7.60.249])
+        by smtp.gmail.com with ESMTPSA id m2sm11245691wml.15.2021.11.05.08.43.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Nov 2021 08:43:38 -0700 (PDT)
+From:   Alexandre Ghiti <alexandre.ghiti@canonical.com>
+To:     Steve French <sfrench@samba.org>, Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Rich Felker <dalias@libc.org>,
+        Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Kalle Valo <kvalo@codeaurora.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-cachefs@redhat.com,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
+        linux-power@fi.rohmeurope.com
+Cc:     Alexandre Ghiti <alexandre.ghiti@canonical.com>
+Subject: [PATCH 0/7] Cleanup after removal of configs
+Date:   Fri,  5 Nov 2021 16:43:27 +0100
+Message-Id: <20211105154334.1841927-1-alexandre.ghiti@canonical.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-X-OriginatorOrg: connect.ust.hk
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYCP286MB1188.JPNP286.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03af2a98-21e9-41b0-0404-08d9a0674533
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Nov 2021 14:19:25.1348
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 6c1d4152-39d0-44ca-88d9-b8d6ddca0708
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JZtD7vPYJhbY484hjYE/kri2QR3wQ85oW4ktTh1UB5y4Lu1O0vv/pAUvDD7C+FudNFqdl9tk5oAZpkCn6YZqlw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYAP286MB0633
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi,
+While bumping from 5.13 to 5.15, I found that a few deleted configs had
+left some pieces here and there: this patchset cleans that.
 
-We notice that _cifsFileInfo_put() is called twice for cfile follow branch =
-at #line 4874. Follow _cifsFileInfo_put->_cifsFileInfo_put->cifsFileInfo_pu=
-t_final, cfile will be freed finally, so it calling this function on the sa=
-me variable at twice looks like a double free issue. Would you like to have=
- a look at it? We would like to provide a patch after confirmation.
+Alexandre Ghiti (7):
+  Documentation, arch: Remove leftovers from fscache/cachefiles
+    histograms
+  Documentation, arch: Remove leftovers from raw device
+  Documentation, arch: Remove leftovers from CIFS_WEAK_PW_HASH
+  arch: Remove leftovers from mandatory file locking
+  Documentation, arch, fs: Remove leftovers from fscache object list
+  include: mfd: Remove leftovers from bd70528 watchdog
+  arch: Remove leftovers from prism54 wireless driver
 
-https://github.com/torvalds/linux/blob/master/fs/cifs/file.c#L4874
+ Documentation/admin-guide/cifs/usage.rst      |   7 +-
+ Documentation/admin-guide/devices.txt         |   8 +-
+ .../filesystems/caching/cachefiles.rst        |  34 -----
+ Documentation/filesystems/caching/fscache.rst | 123 +-----------------
+ arch/arm/configs/axm55xx_defconfig            |   3 -
+ arch/arm/configs/cm_x300_defconfig            |   1 -
+ arch/arm/configs/ezx_defconfig                |   1 -
+ arch/arm/configs/imote2_defconfig             |   1 -
+ arch/arm/configs/nhk8815_defconfig            |   1 -
+ arch/arm/configs/pxa_defconfig                |   1 -
+ arch/arm/configs/spear13xx_defconfig          |   1 -
+ arch/arm/configs/spear3xx_defconfig           |   1 -
+ arch/arm/configs/spear6xx_defconfig           |   1 -
+ arch/mips/configs/decstation_64_defconfig     |   1 -
+ arch/mips/configs/decstation_defconfig        |   1 -
+ arch/mips/configs/decstation_r4k_defconfig    |   1 -
+ arch/mips/configs/fuloong2e_defconfig         |   1 -
+ arch/mips/configs/ip27_defconfig              |   1 -
+ arch/mips/configs/malta_defconfig             |   1 -
+ arch/mips/configs/malta_kvm_defconfig         |   1 -
+ arch/mips/configs/malta_qemu_32r6_defconfig   |   1 -
+ arch/mips/configs/maltaaprp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_eva_defconfig     |   1 -
+ arch/mips/configs/maltaup_defconfig           |   1 -
+ arch/mips/configs/maltaup_xpa_defconfig       |   1 -
+ arch/mips/configs/nlm_xlp_defconfig           |   2 -
+ arch/mips/configs/nlm_xlr_defconfig           |   2 -
+ arch/powerpc/configs/pmac32_defconfig         |   1 -
+ arch/powerpc/configs/ppc6xx_defconfig         |   1 -
+ arch/powerpc/configs/pseries_defconfig        |   1 -
+ arch/sh/configs/titan_defconfig               |   1 -
+ fs/fscache/object.c                           |   3 -
+ fs/fscache/proc.c                             |  12 --
+ include/linux/mfd/rohm-bd70528.h              |  24 ----
+ 35 files changed, 6 insertions(+), 237 deletions(-)
 
-Best regards,
-Chengfeng
+-- 
+2.32.0
+
