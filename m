@@ -2,38 +2,36 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 072DBC433FE
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Nov 2021 15:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD45C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Nov 2021 16:32:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E019D61059
-	for <linux-cifs@archiver.kernel.org>; Fri,  5 Nov 2021 15:56:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7634560EB9
+	for <linux-cifs@archiver.kernel.org>; Fri,  5 Nov 2021 16:32:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232541AbhKEP72 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 5 Nov 2021 11:59:28 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:44653 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232537AbhKEP72 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 5 Nov 2021 11:59:28 -0400
-Received: from mail-wm1-f51.google.com ([209.85.128.51]) by
- mrelayeu.kundenserver.de (mreue109 [213.165.67.113]) with ESMTPSA (Nemesis)
- id 1MWAay-1nGX1I0Boo-00XbVP; Fri, 05 Nov 2021 16:56:46 +0100
-Received: by mail-wm1-f51.google.com with SMTP id 71so7419296wma.4;
-        Fri, 05 Nov 2021 08:56:45 -0700 (PDT)
-X-Gm-Message-State: AOAM531XExDFhY6RTcGaC/MKKOKGa/Gny3QO9MrCT+XLqbZzfr+1ICK4
-        yMBGaa4yunUBky/9TmO+rskc4YPZsnGMflcnIEE=
-X-Google-Smtp-Source: ABdhPJxk4OCRMtLkil/Eyj8Bt7IiEC6cv8x2wWvEo25EBDjZmSRZavU4Cmw8YwQkdpld9oVGpzqUDybBNFF63jz+S4E=
-X-Received: by 2002:a1c:2382:: with SMTP id j124mr20339339wmj.35.1636127805532;
- Fri, 05 Nov 2021 08:56:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211105154334.1841927-1-alexandre.ghiti@canonical.com>
-In-Reply-To: <20211105154334.1841927-1-alexandre.ghiti@canonical.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Fri, 5 Nov 2021 16:56:29 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a2AnLJgGNBFvjUQqXd-Az9vjgE7yJQXGDwCav5E0btSsg@mail.gmail.com>
-Message-ID: <CAK8P3a2AnLJgGNBFvjUQqXd-Az9vjgE7yJQXGDwCav5E0btSsg@mail.gmail.com>
-Subject: Re: [PATCH 0/7] Cleanup after removal of configs
-To:     Alexandre Ghiti <alexandre.ghiti@canonical.com>
-Cc:     Steve French <sfrench@samba.org>, Jonathan Corbet <corbet@lwn.net>,
+        id S233771AbhKEQet (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 5 Nov 2021 12:34:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55842 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233613AbhKEQes (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 5 Nov 2021 12:34:48 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5AD3960ED7;
+        Fri,  5 Nov 2021 16:32:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1636129928;
+        bh=dqYO0XzUwPNOkJ5l8PyhvzZqAKwTOsnYGLx7c5aZVRQ=;
+        h=Subject:From:To:Date:In-Reply-To:References:From;
+        b=qM/fG2i6LOkcRxe8dKJqlyHOGZYXZJLw+Di6HZONjtJHOuMTNuHd0DfcnS6C27jxX
+         6wronV4yauGcwwCatN3CBOwcBJvw3PjqIIq0pTYXTIMjp8ywCjwi2h7qBWswegtCkw
+         h0rY0njZkuw3TS/krXJz5XKmW9MxQOlDmC7X8AkLB4ZqswZa2ykIr+WQY90Do/hT55
+         xfU31PI8fArm349i5UTD866xEr6od957ENnw+p0qnIGBY7i+hpTwX6k3UFnTzvtAYy
+         6N0V54hRfOQ6+JMuiMW2tDqYlI0Z2itR/5nK04Q696SkZJCr6oWz3J9RIgKkA4dxZy
+         aqjQjBVo+gRKw==
+Message-ID: <7921f7c5e6e72f1eb4fa39d6a7c4d5d42380d000.camel@kernel.org>
+Subject: Re: [PATCH 4/7] arch: Remove leftovers from mandatory file locking
+From:   Jeff Layton <jlayton@kernel.org>
+To:     Alexandre Ghiti <alexandre.ghiti@canonical.com>,
+        Steve French <sfrench@samba.org>,
+        Jonathan Corbet <corbet@lwn.net>,
         David Howells <dhowells@redhat.com>,
         Russell King <linux@armlinux.org.uk>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
@@ -44,7 +42,6 @@ Cc:     Steve French <sfrench@samba.org>, Jonathan Corbet <corbet@lwn.net>,
         Rich Felker <dalias@libc.org>,
         Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
         Lee Jones <lee.jones@linaro.org>,
-        Jeff Layton <jlayton@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Arnd Bergmann <arnd@arndb.de>,
         Ronnie Sahlberg <lsahlber@redhat.com>,
@@ -53,60 +50,69 @@ Cc:     Steve French <sfrench@samba.org>, Jonathan Corbet <corbet@lwn.net>,
         Lukas Bulwahn <lukas.bulwahn@gmail.com>,
         Luis Chamberlain <mcgrof@kernel.org>,
         Kalle Valo <kvalo@codeaurora.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-cachefs@redhat.com,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Linux-sh list <linux-sh@vger.kernel.org>,
+        samba-technical@lists.samba.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-cachefs@redhat.com,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
         linux-power@fi.rohmeurope.com
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:fij7/SER06A7KMmIZKvkypGSwg7HLiJRVpIgzg3ljOcForLoY4w
- eLeHFD4J3aPVbVpMxQqrFolisrBLDve8zXu9zbYPBWe0DqmVdQJ2GRUbLAa3QP4Q4PJfppB
- IQBF7W46Nsw5ZgzeQGqNxXf4LrA8I6QOUo463lz43vj830XDMc9iCv7qz0euuKQT02Y/YQF
- +NrWAPP67WWtEOObyVYcA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Tcftb7RxW8U=:g4x23/n7TJpuGHj4VT1NBC
- tdng1U2+X8GaDbsa+ZW2Q8NGO7dEvp3gwP3jnFQP0z+2zkUc5XD637G6U78VuDfNJAZ2SEFP6
- vVRQHWTNcF1DshmXofpZ1yJDarZNNuHlwfy4pHGwhTh4CmNAvcbgOdTyaXVxTvFESF1Ij4y3b
- +wbSvADNg1IuZPq6mjE060be7QYJmnlOb5qqL/x+lo3Yj9g6vjXDkH0kJaybnJvkUNnltKwPs
- Ftig0sjiUdhgNmwmjuf8hVWG5/fH/koaR/oKlrTHMsigW14PtfoPjezc7Bg3pm7txgqSiBDBb
- HYZiko9VjqLiXFFDYH4sUw5TXALC38SRGCVB35cA5Wn0M1ZsbgRx0e9CraatzivP+ZXUrJbR5
- wThS3TncapvrTx/eNFkJOj0cPh6afow2KO3kIed9Fm1JFooD5jIkyUFqQMrd5Th8PHKs3lNO3
- +MCGCJqz4JAuGZcEada06YAAt1BA117+xKwfaffWhdTvNGw6/jE9Dy4CkUWbprJIwGb8HtTjT
- XPnTn1KvGj84825pt10Iy7XLAabCbaZf9K/469rcMfRpGxebMy7A4BInYyL2OH2MlLwu0VR8b
- GR17ZN3M2DuQTE/NeJqgb4bujWYuigq5DyVNZ28gC8cxQifE77OM9GikvQjIPXDlW9UPGbYPB
- UPv3nbs4oBTLD4l1FHDy3m3+dzOf+bW8czR5tS39wx4t1ONhnNRQqeKfeQP4N+k5R7Gm29e7q
- kgXHdVoBtn33vmNTTZTCiImeUosp2Z18ET0GkfPICUatb4kIrZMv7ts9dt2VL+GVrZuxmMzlX
- FtAWC/r0ges0zc2MCfn3SCafQ1qeFlI+TyTArk08W9Yy0vTlBk=
+Date:   Fri, 05 Nov 2021 12:32:05 -0400
+In-Reply-To: <20211105154334.1841927-5-alexandre.ghiti@canonical.com>
+References: <20211105154334.1841927-1-alexandre.ghiti@canonical.com>
+         <20211105154334.1841927-5-alexandre.ghiti@canonical.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.42.1 (3.42.1-1.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Nov 5, 2021 at 4:43 PM Alexandre Ghiti
-<alexandre.ghiti@canonical.com> wrote:
->
-> While bumping from 5.13 to 5.15, I found that a few deleted configs had
-> left some pieces here and there: this patchset cleans that.
->
-> Alexandre Ghiti (7):
->   Documentation, arch: Remove leftovers from fscache/cachefiles
->     histograms
->   Documentation, arch: Remove leftovers from raw device
->   Documentation, arch: Remove leftovers from CIFS_WEAK_PW_HASH
->   arch: Remove leftovers from mandatory file locking
->   Documentation, arch, fs: Remove leftovers from fscache object list
->   include: mfd: Remove leftovers from bd70528 watchdog
->   arch: Remove leftovers from prism54 wireless driver
+On Fri, 2021-11-05 at 16:43 +0100, Alexandre Ghiti wrote:
+> This config was removed so remove all references to it.
+> 
+> Fixes: f7e33bdbd6d1 ("fs: remove mandatory file locking support")
+> Signed-off-by: Alexandre Ghiti <alexandre.ghiti@canonical.com>
+> ---
+>  arch/mips/configs/decstation_64_defconfig  | 1 -
+>  arch/mips/configs/decstation_defconfig     | 1 -
+>  arch/mips/configs/decstation_r4k_defconfig | 1 -
+>  3 files changed, 3 deletions(-)
+> 
+> diff --git a/arch/mips/configs/decstation_64_defconfig b/arch/mips/configs/decstation_64_defconfig
+> index 85f1955b4b00..e2ed105f8c97 100644
+> --- a/arch/mips/configs/decstation_64_defconfig
+> +++ b/arch/mips/configs/decstation_64_defconfig
+> @@ -144,7 +144,6 @@ CONFIG_EXT2_FS_SECURITY=y
+>  CONFIG_EXT3_FS=y
+>  CONFIG_EXT3_FS_POSIX_ACL=y
+>  CONFIG_EXT3_FS_SECURITY=y
+> -# CONFIG_MANDATORY_FILE_LOCKING is not set
+>  CONFIG_ISO9660_FS=y
+>  CONFIG_JOLIET=y
+>  CONFIG_PROC_KCORE=y
+> diff --git a/arch/mips/configs/decstation_defconfig b/arch/mips/configs/decstation_defconfig
+> index 30a6eafdb1d0..7e987d6f5e34 100644
+> --- a/arch/mips/configs/decstation_defconfig
+> +++ b/arch/mips/configs/decstation_defconfig
+> @@ -140,7 +140,6 @@ CONFIG_EXT2_FS_SECURITY=y
+>  CONFIG_EXT3_FS=y
+>  CONFIG_EXT3_FS_POSIX_ACL=y
+>  CONFIG_EXT3_FS_SECURITY=y
+> -# CONFIG_MANDATORY_FILE_LOCKING is not set
+>  CONFIG_ISO9660_FS=y
+>  CONFIG_JOLIET=y
+>  CONFIG_PROC_KCORE=y
+> diff --git a/arch/mips/configs/decstation_r4k_defconfig b/arch/mips/configs/decstation_r4k_defconfig
+> index e2b58dbf4aa9..6df5f6f2ac8e 100644
+> --- a/arch/mips/configs/decstation_r4k_defconfig
+> +++ b/arch/mips/configs/decstation_r4k_defconfig
+> @@ -140,7 +140,6 @@ CONFIG_EXT2_FS_SECURITY=y
+>  CONFIG_EXT3_FS=y
+>  CONFIG_EXT3_FS_POSIX_ACL=y
+>  CONFIG_EXT3_FS_SECURITY=y
+> -# CONFIG_MANDATORY_FILE_LOCKING is not set
+>  CONFIG_ISO9660_FS=y
+>  CONFIG_JOLIET=y
+>  CONFIG_PROC_KCORE=y
 
-Looks all good to me, thanks a lot for the cleanup!
-
-For arch/arm/configs:
-
-Acked-by: Arnd Bergmann <arnd@arndb.de>
-
-assuming this goes through someone else's tree. Let me know if you need me
-to pick up the patches in the asm-generic tree for cross-architecture work.
-
-         Arnd
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
