@@ -2,101 +2,140 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A39C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 19:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A595C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 21:27:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31E0D61208
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 19:25:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 217AA60FED
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 21:27:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243179AbhKIT23 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 Nov 2021 14:28:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39940 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243162AbhKIT23 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Nov 2021 14:28:29 -0500
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D820BC061764
-        for <linux-cifs@vger.kernel.org>; Tue,  9 Nov 2021 11:25:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Message-ID:Cc:To:From:Date;
-        bh=qygfyLEN4eaVE+Sw02Kp6H3CXjcndNGpsSpaATuZiSs=; b=wOic78eoyy/9hZ/D+2Bv2kQdnb
-        VTPc3BmMwDY7fhqDMGbhYp5u0O/0gELqxjXymSPdleaM90GRPlJucAF1u4TeLzDNabO7lRt43Ow40
-        y8hJPdheYuDB/N7ltw6fAU4bq6hGkmRFInUkp52TIsI+WK7uLhnEEekoowUPFTed3wUKi0VkBRZIK
-        7sIsRp7+gOPiCkS7oE8njJHGZDERs9eyaF+5eyT1DrRMJPR//2xf0jbEEpDUaLO5tDAAHfyOAnkS8
-        xa/Q+okERf+r6G7Acw5Rtw08A5BBoDkLo8SphJ89FiFy4lUdDhxFszXpr9bSya5coPVdY8YmQwvre
-        fOnHWhPpDK4pILaoP/HotzLjst22DIG++iNfCmFooLiVatMubQg8wx4EZC3HqBDCLvahCBYGEyjo5
-        202POEAmyRSdxf5e9eObjzMcorD406UvqzKjVbeXUFKNrq9FuBpWdfrHBBTKOgzAiOODO2h8ifoq+
-        NgAtFHEn3KbcQir6k6OPhiGj;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1mkWkV-0068UZ-Qt; Tue, 09 Nov 2021 19:25:40 +0000
-Date:   Tue, 9 Nov 2021 11:25:37 -0800
-From:   Jeremy Allison <jra@samba.org>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Julian Sikorski <belegdol@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Permission denied when chainbuilding packages with mock
-Message-ID: <YYrLMdUQccK+8IQc@jeremy-acer>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <24b60b8a-febb-cee9-d96b-d7b8469309a4@gmail.com>
- <YYhI1bpioEOXnFYf@jeremy-acer>
- <YYhJ+8ehPFX1XDhv@jeremy-acer>
- <7abcce96-9293-cd47-780b-cdc971da07e5@gmail.com>
- <YYhXjG46ZZ1tqpxJ@jeremy-acer>
- <5c25c989-1e58-fb23-810f-a431024da11e@gmail.com>
- <YYiCAcxxnIbHz4xv@jeremy-acer>
- <cd649ed2-60d3-72e3-e09a-9f0074af99cc@gmail.com>
- <YYlUgc6UOyKfZr7d@jeremy-acer>
- <CAH2r5muWLJu_Yhx1pv0rCaTRPqeEd_8X8DP2cipUVaMekU9xFg@mail.gmail.com>
+        id S245109AbhKIVaO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 Nov 2021 16:30:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22667 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236933AbhKIVaN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Nov 2021 16:30:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636493246;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=7KsArju8ppySIcA4To0LdNtm7ws2ZxZFgR4knlX4mWQ=;
+        b=PRFm725LiY+eJReeUnKr+TRSrN+XxWWvA4dn0nftwkDSNyI4v2HwnS4gFe9511bt+VbviL
+        /4i0Tv/Xk28VzmDapS1NVIVF22AkG4QDSkQqdJjko8/TQ9o57YH3/mhKnLj44REu/pxZ+o
+        IITbYVZaK/Xx/RkH5FglwWoqRrQIQUE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-590--XC-8eGxM_298xtEp9_5EA-1; Tue, 09 Nov 2021 16:27:20 -0500
+X-MC-Unique: -XC-8eGxM_298xtEp9_5EA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0266F1808329;
+        Tue,  9 Nov 2021 21:27:18 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.37.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F0D7110016F4;
+        Tue,  9 Nov 2021 21:27:14 +0000 (UTC)
+Subject: [PATCH v4 0/5] netfs, 9p, afs, ceph: Support folios,
+ at least partially
+From:   David Howells <dhowells@redhat.com>
+To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc:     kafs-testing@auristor.com, Ilya Dryomov <idryomov@gmail.com>,
+        linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+        ceph-devel@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        v9fs-developer@lists.sourceforge.net, dhowells@redhat.com,
+        Jeff Layton <jlayton@kernel.org>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        linux-fsdevel@vger.kernel.org, linux-cachefs@redhat.com,
+        v9fs-developer@lists.sourceforge.net,
+        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Date:   Tue, 09 Nov 2021 21:27:14 +0000
+Message-ID: <163649323416.309189.4637503793406396694.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/0.23
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAH2r5muWLJu_Yhx1pv0rCaTRPqeEd_8X8DP2cipUVaMekU9xFg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Tue, Nov 09, 2021 at 02:10:19AM -0600, Steve French wrote:
->Yes - here is a trivial reproducer (excuse the ugly sample cut-n-paste)
->
->#include <stdio.h>
->#include <stdlib.h>
->#include <unistd.h>
->#include <string.h>
->#include <fcntl.h>
->#include <sys/types.h>
->#include <sys/stat.h>
->
->int main(int argc, char *argv[]) {
->char *str = "Text to be added";
->int fd, ret, fsyncrc, fsyncr_rc, openrc, closerc, close2rc;
->
->fd = creat("test.txt", S_IWUSR | S_IRUSR);
->if (fd < 0) {
->perror("creat()");
->exit(1);
->}
->ret = write(fd, str, strlen(str));
->if (ret < 0) {
->perror("write()");
->exit(1);
->}
->openrc = open("test.txt", O_RDONLY);
->        if (openrc < 0) {
->                perror("creat()");
->                exit(1);
->        }
->fsyncr_rc = fsync(openrc);
->if (fsyncr_rc < 0)
->perror("fsync()");
->fsyncrc = fsync(fd);
->closerc = close(fd);
->close2rc = close(openrc);
->printf("read fsync rc=%d, write fsync rc=%d, close rc=%d, RO close
->rc=%d\n", fsyncr_rc, fsyncrc, closerc, close2rc);
->}
 
-Yep, I expected such. cifsfs needs to keep track of
-open mode and silently eat fsync calls on non-writeable
-files/directory opens.
+Here's a set of patches to convert netfs, 9p and afs to use folios and to
+provide sufficient conversion for ceph that it can continue to use the
+netfs library.  Jeff Layton is working on fully converting ceph.
+
+This has been rebased on to the 9p merge in Linus's tree[5] so that it has
+access to both the 9p conversion to fscache and folios.
+
+Changes
+=======
+ver #4:
+ - Detached and sent the afs symlink split patch separately.
+ - Handed the 9p netfslibisation patch off to Dominique Martinet.
+ - Added a patch to foliate page_endio().
+ - Fixed a bug in afs_redirty_page() whereby it didn't set the next page
+   index in the loop and returned too early.
+ - Simplified a check in v9fs_vfs_write_folio_locked()[4].
+ - Undid a change to afs_symlink_readpage()[4].
+ - Used offset_in_folio() in afs_write_end()[4].
+ - Rebased on 9p-folio merge upstream[5].
+
+ver #3:
+ - Rebased on upstream as folios have been pulled.
+ - Imported a patch to convert 9p to netfslib from my
+   fscache-remove-old-api branch[3].
+ - Foliated netfslib.
+
+ver #2:
+ - Reorder the patches to put both non-folio afs patches to the front.
+ - Use page_offset() rather than manual calculation[1].
+ - Fix folio_inode() to directly access the inode[2].
+
+David
+
+Link: https://lore.kernel.org/r/YST/0e92OdSH0zjg@casper.infradead.org/ [1]
+Link: https://lore.kernel.org/r/YST8OcVNy02Rivbm@casper.infradead.org/ [2]
+Link: https://lore.kernel.org/r/163551653404.1877519.12363794970541005441.stgit@warthog.procyon.org.uk/ [3]
+Link: https://lore.kernel.org/r/YYKa3bfQZxK5/wDN@casper.infradead.org/ [4]
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f89ce84bc33330607a782e47a8b19406ed109b15 [5]
+Link: https://lore.kernel.org/r/2408234.1628687271@warthog.procyon.org.uk/ # v0
+Link: https://lore.kernel.org/r/162981147473.1901565.1455657509200944265.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/163005740700.2472992.12365214290752300378.stgit@warthog.procyon.org.uk/ # v2
+Link: https://lore.kernel.org/r/163584174921.4023316.8927114426959755223.stgit@warthog.procyon.org.uk>/ # v3
+---
+David Howells (5):
+      folio: Add a function to change the private data attached to a folio
+      folio: Add a function to get the host inode for a folio
+      folio: Add replacements for page_endio()
+      netfs, 9p, afs, ceph: Use folios
+      afs: Use folios in directory handling
+
+
+ fs/9p/vfs_addr.c           |  83 +++++----
+ fs/9p/vfs_file.c           |  20 +--
+ fs/afs/dir.c               | 229 ++++++++++--------------
+ fs/afs/dir_edit.c          | 154 ++++++++--------
+ fs/afs/file.c              |  68 ++++----
+ fs/afs/internal.h          |  46 ++---
+ fs/afs/write.c             | 347 ++++++++++++++++++-------------------
+ fs/ceph/addr.c             |  80 +++++----
+ fs/netfs/read_helper.c     | 165 +++++++++---------
+ include/linux/netfs.h      |  12 +-
+ include/linux/pagemap.h    |  23 ++-
+ include/trace/events/afs.h |  21 +--
+ mm/filemap.c               |  64 ++++---
+ mm/page-writeback.c        |   2 +-
+ 14 files changed, 666 insertions(+), 648 deletions(-)
+
+
+
+Tested-by: Jeff Layton <jlayton@kernel.org>
+Tested-by: Dominique Martinet <asmadeus@codewreck.org>
+Tested-by: kafs-testing@auristor.com
+
