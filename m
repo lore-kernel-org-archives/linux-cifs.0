@@ -2,137 +2,100 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89AFFC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 21:31:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C6AC433F5
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 23:12:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71825610A0
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 21:31:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE3D8610F8
+	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 23:12:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245197AbhKIVeO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 Nov 2021 16:34:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60841 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239478AbhKIVeO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Nov 2021 16:34:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636493487;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BOSFjmze2lq+KCADzfQWnIbaZ/LmbdWfVW3/mH571yI=;
-        b=C//nxo+LCtgr8dzOSLyhPly4xiqxTzqtMnduXKaqEzjtrhdWT0Nl/Atkk7wDWjhnAT5Jci
-        fJWQfj61IxI/CdBh66BXG8TezlbVczB2wdcqyVHLZuEeJchdUUpTjGTsNJ0qFPUReQ9CPn
-        3gnkDCuC/AblVYejBEgaQJhcdkzyzNw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-tj2_vvt-PxSmzOnxbJoAxw-1; Tue, 09 Nov 2021 16:27:40 -0500
-X-MC-Unique: tj2_vvt-PxSmzOnxbJoAxw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE03787D54C;
-        Tue,  9 Nov 2021 21:27:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.37.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 23BB710016F4;
-        Tue,  9 Nov 2021 21:27:35 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v4 2/5] folio: Add a function to get the host inode for a
- folio
-From:   David Howells <dhowells@redhat.com>
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     Jeff Layton <jlayton@kernel.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        kafs-testing@auristor.com, dhowells@redhat.com,
-        Jeff Layton <jlayton@kernel.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        linux-fsdevel@vger.kernel.org, linux-cachefs@redhat.com,
-        v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, ceph-devel@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Date:   Tue, 09 Nov 2021 21:27:35 +0000
-Message-ID: <163649325519.309189.15072332908703129455.stgit@warthog.procyon.org.uk>
-In-Reply-To: <163649323416.309189.4637503793406396694.stgit@warthog.procyon.org.uk>
-References: <163649323416.309189.4637503793406396694.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/0.23
+        id S232168AbhKIXPc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 Nov 2021 18:15:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45724 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229850AbhKIXPc (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 9 Nov 2021 18:15:32 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8318E610F8;
+        Tue,  9 Nov 2021 23:12:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1636499565;
+        bh=Fom+Ax97u7w3PNz5gEkObwZv8n8uQp3HEcHMODzeDQY=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=aetsznP4yOAsjEQs7jqrWe6yQsbp+tTxzOitiv/Hw5E2wMyPmezTQDAIUJiIV2cZg
+         UJ6w0phW3JPyplEc7cfmmMNxl/qHOt4CHVy3sN4ltMmAKqZNuFdchdlXCHEalcn4uk
+         G5kVk4hiejqtOY5s+l2GHH9mgV839wlro8Pzsa6O3Myq/1JuV+9LYQ43tS2f6IfgDu
+         F2A0Js1WiDGRlyp+v4WQgRMx0PBjDWAjRjGmIwFYYvBh9+Dv4EPoWCDBd0q1DqsPt7
+         Rsk+LAuN/kJkjQruQd6yaEl6VoaYM7CQ5wp4VX1qvzF8PjO3JR6wvL5OQ5vqqvx59G
+         6UvaAtQZ9B6pg==
+Received: by mail-ua1-f51.google.com with SMTP id b17so1084921uas.0;
+        Tue, 09 Nov 2021 15:12:45 -0800 (PST)
+X-Gm-Message-State: AOAM533KECI8xdGQFFEdcYpFXDEF73mii4fT3WDTDTDN2EYvnSP70O3+
+        cRP4l1onKipXs3Tp0Q9UGqFyPl5Vyvxn8FN7ZVI=
+X-Google-Smtp-Source: ABdhPJxuXdjeYFdP2XLe30D3LVXr20BcPrblW7q+ZORd5K8SzYaxNACcJ+DOxlzHLmwok6f+53C26ggQDT241Gok5uU=
+X-Received: by 2002:a67:e40d:: with SMTP id d13mr69103151vsf.11.1636499564639;
+ Tue, 09 Nov 2021 15:12:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Received: by 2002:a67:b20c:0:0:0:0:0 with HTTP; Tue, 9 Nov 2021 15:12:43 -0800 (PST)
+In-Reply-To: <YYp40A2lNrxaZji8@casper.infradead.org>
+References: <CAKYAXd8KvqTQ-RnmWPFChmMEKGw9zA37chPM0H=FSewfRqx1zA@mail.gmail.com>
+ <YYp40A2lNrxaZji8@casper.infradead.org>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Wed, 10 Nov 2021 08:12:43 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-zxdAiM7A0b=Zy-hycJ66dPxPYt7zG_-_u+fSYms5FTQ@mail.gmail.com>
+Message-ID: <CAKYAXd-zxdAiM7A0b=Zy-hycJ66dPxPYt7zG_-_u+fSYms5FTQ@mail.gmail.com>
+Subject: Re: Hitting BUG_ON trap in read_pages() - : [PATCH v2] mm: Optimise put_pages_list()
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Steve French <smfrench@gmail.com>,
+        Hyeoncheol Lee <hyc.lee@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a convenience function, folio_inode() that will get the host inode from
-a folio's mapping.
+2021-11-09 22:34 GMT+09:00, Matthew Wilcox <willy@infradead.org>:
+> On Tue, Nov 09, 2021 at 07:45:47PM +0900, Namjae Jeon wrote:
+>> Hi Matthew,
+>>
+>> This patch is hitting BUG_ON trap in read_pages() when running
+>> xfstests for cifs.
+>> There seems to be a same issue with other filesystems using .readpages ?
+>
+> The real fix, of course, is to migrate away from using ->readpages ;-)
+> I think both 9p and nfs are going away this cycle.  CIFS really needs
+> to move to using the netfs interfaces.
+Okay.
+>
+>> Could you please take a look ?
+>
+> Please try this patch:
+Work fine.
+>
+> While free_unref_page_list() puts pages onto the CPU local LRU list, it
+> does not remove them from the list they were passed in on.  That makes
+> the list_head appear to be non-empty, and would lead to various corruption
+> problems if we didn't have an assertion that the list was empty.
+>
+> Reinitialise the list after calling free_unref_page_list() to avoid
+> this problem.
+>
+> Fixes: 988c69f1bc23 ("mm: optimise put_pages_list()")
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 
-Changes:
- ver #3:
-  - Fix mistake in function description[2].
- ver #2:
-  - Fix contradiction between doc and implementation by disallowing use
-    with swap caches[1].
+Tested-by: Namjae Jeon <linkinjeon@kernel.org>
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-Tested-by: Jeff Layton <jlayton@kernel.org>
-Tested-by: Dominique Martinet <asmadeus@codewreck.org>
-Tested-by: kafs-testing@auristor.com
-Link: https://lore.kernel.org/r/YST8OcVNy02Rivbm@casper.infradead.org/ [1]
-Link: https://lore.kernel.org/r/YYKLkBwQdtn4ja+i@casper.infradead.org/ [2]
-Link: https://lore.kernel.org/r/162880453171.3369675.3704943108660112470.stgit@warthog.procyon.org.uk/ # rfc
-Link: https://lore.kernel.org/r/162981151155.1901565.7010079316994382707.stgit@warthog.procyon.org.uk/
-Link: https://lore.kernel.org/r/163005744370.2472992.18324470937328925723.stgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/163584184628.4023316.9386282630968981869.stgit@warthog.procyon.org.uk/ # v3
----
-
- include/linux/pagemap.h |   14 ++++++++++++++
- mm/page-writeback.c     |    2 +-
- 2 files changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 1f560aecd9b5..1a0c646eb6ff 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -253,6 +253,20 @@ static inline struct address_space *page_mapping_file(struct page *page)
- 	return folio_mapping(folio);
- }
- 
-+/**
-+ * folio_inode - Get the host inode for this folio.
-+ * @folio: The folio.
-+ *
-+ * For folios which are in the page cache, return the inode that this folio
-+ * belongs to.
-+ *
-+ * Do not call this for folios which aren't in the page cache.
-+ */
-+static inline struct inode *folio_inode(struct folio *folio)
-+{
-+	return folio->mapping->host;
-+}
-+
- static inline bool page_cache_add_speculative(struct page *page, int count)
- {
- 	VM_BUG_ON_PAGE(PageTail(page), page);
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 2d498bb62248..a613f8ef6a02 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2967,7 +2967,7 @@ EXPORT_SYMBOL_GPL(folio_wait_writeback_killable);
-  */
- void folio_wait_stable(struct folio *folio)
- {
--	if (folio->mapping->host->i_sb->s_iflags & SB_I_STABLE_WRITES)
-+	if (folio_inode(folio)->i_sb->s_iflags & SB_I_STABLE_WRITES)
- 		folio_wait_writeback(folio);
- }
- EXPORT_SYMBOL_GPL(folio_wait_stable);
-
-
+Thanks!
+>
+> diff --git a/mm/swap.c b/mm/swap.c
+> index 1841c24682f8..e8c9dc6d0377 100644
+> --- a/mm/swap.c
+> +++ b/mm/swap.c
+> @@ -156,6 +156,7 @@ void put_pages_list(struct list_head *pages)
+>  	}
+>
+>  	free_unref_page_list(pages);
+> +	INIT_LIST_HEAD(pages);
+>  }
+>  EXPORT_SYMBOL(put_pages_list);
+>
+>
