@@ -2,100 +2,119 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C6AC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 23:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CE0C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Nov 2021 00:54:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE3D8610F8
-	for <linux-cifs@archiver.kernel.org>; Tue,  9 Nov 2021 23:12:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67BD4610A5
+	for <linux-cifs@archiver.kernel.org>; Wed, 10 Nov 2021 00:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232168AbhKIXPc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 9 Nov 2021 18:15:32 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45724 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229850AbhKIXPc (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 9 Nov 2021 18:15:32 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8318E610F8;
-        Tue,  9 Nov 2021 23:12:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1636499565;
-        bh=Fom+Ax97u7w3PNz5gEkObwZv8n8uQp3HEcHMODzeDQY=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=aetsznP4yOAsjEQs7jqrWe6yQsbp+tTxzOitiv/Hw5E2wMyPmezTQDAIUJiIV2cZg
-         UJ6w0phW3JPyplEc7cfmmMNxl/qHOt4CHVy3sN4ltMmAKqZNuFdchdlXCHEalcn4uk
-         G5kVk4hiejqtOY5s+l2GHH9mgV839wlro8Pzsa6O3Myq/1JuV+9LYQ43tS2f6IfgDu
-         F2A0Js1WiDGRlyp+v4WQgRMx0PBjDWAjRjGmIwFYYvBh9+Dv4EPoWCDBd0q1DqsPt7
-         Rsk+LAuN/kJkjQruQd6yaEl6VoaYM7CQ5wp4VX1qvzF8PjO3JR6wvL5OQ5vqqvx59G
-         6UvaAtQZ9B6pg==
-Received: by mail-ua1-f51.google.com with SMTP id b17so1084921uas.0;
-        Tue, 09 Nov 2021 15:12:45 -0800 (PST)
-X-Gm-Message-State: AOAM533KECI8xdGQFFEdcYpFXDEF73mii4fT3WDTDTDN2EYvnSP70O3+
-        cRP4l1onKipXs3Tp0Q9UGqFyPl5Vyvxn8FN7ZVI=
-X-Google-Smtp-Source: ABdhPJxuXdjeYFdP2XLe30D3LVXr20BcPrblW7q+ZORd5K8SzYaxNACcJ+DOxlzHLmwok6f+53C26ggQDT241Gok5uU=
-X-Received: by 2002:a67:e40d:: with SMTP id d13mr69103151vsf.11.1636499564639;
- Tue, 09 Nov 2021 15:12:44 -0800 (PST)
+        id S229512AbhKJA4z (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 9 Nov 2021 19:56:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57064 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229506AbhKJA4z (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 9 Nov 2021 19:56:55 -0500
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10F8BC061764
+        for <linux-cifs@vger.kernel.org>; Tue,  9 Nov 2021 16:54:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-ID:Cc:To:From:Date;
+        bh=pOpAn6ZXdXMxDlk2kQlIYGpqwdXcWbkNFTTihurcUBc=; b=QjBY5s/Pxpsca7ZJKV2tJTAWX8
+        4h1riQ7ONUmAKlr39UJq45KpI3M89rjwtGG//KK0jCO7jJKuRjLbLghSISc/bWwo9wJf617qL2r3c
+        aRjwVSaOSAZmAkiO3nBpiaCDKScAnxZYNBK4TDDfd82updloay8yFOaQW+T8Imjwn8GMw2eAR+5RG
+        2iw+BMnbgiC8FJ5t5luveU0ajA1fqufECM/zvjqZMQxTP43vxuxodRdJlQoLY7Jd3D/XgbH00Kmbk
+        hSn87JIoOYXdCnk5uP7xEmRuHeLhFxpaqWiiPUz2aHZukebNft7a6RhkjediKz3TZ6HAGYONLhxFu
+        y9FR7p7omVtwBzl2Ew3RYWp8afaBrWDMKLRjQ59h4XXkv0GjlYLQagwar2SgnBcmpwv00lnGRKWhC
+        w6+SNZKlxh4UpHGBDTuxzK6CNi6VIF+Ryo7dbBoXcZBDDO5+zc0FU4F3aDK1708V5j8E30um4VpS4
+        dsiBAbF93/ANPXc2c+YzgUG6;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1mkbsL-006Hmj-DZ; Wed, 10 Nov 2021 00:54:05 +0000
+Date:   Tue, 9 Nov 2021 16:54:02 -0800
+From:   Jeremy Allison <jra@samba.org>
+To:     Julian Sikorski <belegdol@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: Permission denied when chainbuilding packages with mock
+Message-ID: <YYsYKvyevyXjHgku@jeremy-acer>
+Reply-To: Jeremy Allison <jra@samba.org>
+References: <YYhI1bpioEOXnFYf@jeremy-acer>
+ <YYhJ+8ehPFX1XDhv@jeremy-acer>
+ <7abcce96-9293-cd47-780b-cdc971da07e5@gmail.com>
+ <YYhXjG46ZZ1tqpxJ@jeremy-acer>
+ <5c25c989-1e58-fb23-810f-a431024da11e@gmail.com>
+ <YYiCAcxxnIbHz4xv@jeremy-acer>
+ <cd649ed2-60d3-72e3-e09a-9f0074af99cc@gmail.com>
+ <YYlUgc6UOyKfZr7d@jeremy-acer>
+ <CAH2r5muWLJu_Yhx1pv0rCaTRPqeEd_8X8DP2cipUVaMekU9xFg@mail.gmail.com>
+ <eadd8209-7dcf-30fe-2c8e-cc0fd7c823a1@gmail.com>
 MIME-Version: 1.0
-Received: by 2002:a67:b20c:0:0:0:0:0 with HTTP; Tue, 9 Nov 2021 15:12:43 -0800 (PST)
-In-Reply-To: <YYp40A2lNrxaZji8@casper.infradead.org>
-References: <CAKYAXd8KvqTQ-RnmWPFChmMEKGw9zA37chPM0H=FSewfRqx1zA@mail.gmail.com>
- <YYp40A2lNrxaZji8@casper.infradead.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 10 Nov 2021 08:12:43 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-zxdAiM7A0b=Zy-hycJ66dPxPYt7zG_-_u+fSYms5FTQ@mail.gmail.com>
-Message-ID: <CAKYAXd-zxdAiM7A0b=Zy-hycJ66dPxPYt7zG_-_u+fSYms5FTQ@mail.gmail.com>
-Subject: Re: Hitting BUG_ON trap in read_pages() - : [PATCH v2] mm: Optimise put_pages_list()
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Steve French <smfrench@gmail.com>,
-        Hyeoncheol Lee <hyc.lee@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <eadd8209-7dcf-30fe-2c8e-cc0fd7c823a1@gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-11-09 22:34 GMT+09:00, Matthew Wilcox <willy@infradead.org>:
-> On Tue, Nov 09, 2021 at 07:45:47PM +0900, Namjae Jeon wrote:
->> Hi Matthew,
+On Tue, Nov 09, 2021 at 10:26:59AM +0100, Julian Sikorski wrote:
+>Am 09.11.21 um 09:10 schrieb Steve French:
+>>Yes - here is a trivial reproducer (excuse the ugly sample cut-n-paste)
 >>
->> This patch is hitting BUG_ON trap in read_pages() when running
->> xfstests for cifs.
->> There seems to be a same issue with other filesystems using .readpages ?
+>>#include <stdio.h>
+>>#include <stdlib.h>
+>>#include <unistd.h>
+>>#include <string.h>
+>>#include <fcntl.h>
+>>#include <sys/types.h>
+>>#include <sys/stat.h>
+>>
+>>int main(int argc, char *argv[]) {
+>>char *str = "Text to be added";
+>>int fd, ret, fsyncrc, fsyncr_rc, openrc, closerc, close2rc;
+>>
+>>fd = creat("test.txt", S_IWUSR | S_IRUSR);
+>>if (fd < 0) {
+>>perror("creat()");
+>>exit(1);
+>>}
+>>ret = write(fd, str, strlen(str));
+>>if (ret < 0) {
+>>perror("write()");
+>>exit(1);
+>>}
+>>openrc = open("test.txt", O_RDONLY);
+>>         if (openrc < 0) {
+>>                 perror("creat()");
+>>                 exit(1);
+>>         }
+>>fsyncr_rc = fsync(openrc);
+>>if (fsyncr_rc < 0)
+>>perror("fsync()");
+>>fsyncrc = fsync(fd);
+>>closerc = close(fd);
+>>close2rc = close(openrc);
+>>printf("read fsync rc=%d, write fsync rc=%d, close rc=%d, RO close
+>>rc=%d\n", fsyncr_rc, fsyncrc, closerc, close2rc);
+>>}
+>>
 >
-> The real fix, of course, is to migrate away from using ->readpages ;-)
-> I think both 9p and nfs are going away this cycle.  CIFS really needs
-> to move to using the netfs interfaces.
-Okay.
+>I can confirm this fails on my machine without nostrictsync:
 >
->> Could you please take a look ?
+>$ ./test
 >
-> Please try this patch:
-Work fine.
+>fsync(): Permission denied
 >
-> While free_unref_page_list() puts pages onto the CPU local LRU list, it
-> does not remove them from the list they were passed in on.  That makes
-> the list_head appear to be non-empty, and would lead to various corruption
-> problems if we didn't have an assertion that the list was empty.
+>read fsync rc=-1, write fsync rc=0, close rc=0, RO close rc=0
 >
-> Reinitialise the list after calling free_unref_page_list() to avoid
-> this problem.
+>and works with nostrictsync:
 >
-> Fixes: 988c69f1bc23 ("mm: optimise put_pages_list()")
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+>$ ./test
+>
+>read fsync rc=0, write fsync rc=0, close rc=0, RO close rc=0
+>
+>So is the bug in the Linux kernel?
 
-Tested-by: Namjae Jeon <linkinjeon@kernel.org>
-
-Thanks!
->
-> diff --git a/mm/swap.c b/mm/swap.c
-> index 1841c24682f8..e8c9dc6d0377 100644
-> --- a/mm/swap.c
-> +++ b/mm/swap.c
-> @@ -156,6 +156,7 @@ void put_pages_list(struct list_head *pages)
->  	}
->
->  	free_unref_page_list(pages);
-> +	INIT_LIST_HEAD(pages);
->  }
->  EXPORT_SYMBOL(put_pages_list);
->
->
+Yes, it's in the kernel cifsfs module which is forwarding an SMB_FLUSH request
+(which the spec says must fail on a non-writable handle) to
+a handle opened as non-writable. Steve hopefully will fix :-).
