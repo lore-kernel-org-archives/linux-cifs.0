@@ -2,184 +2,135 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E42EC43217
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Nov 2021 16:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46714C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Nov 2021 22:28:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 122F46124C
-	for <linux-cifs@archiver.kernel.org>; Thu, 11 Nov 2021 16:26:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21DB861211
+	for <linux-cifs@archiver.kernel.org>; Thu, 11 Nov 2021 22:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234247AbhKKQ3A (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 11 Nov 2021 11:29:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38767 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234229AbhKKQ27 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 11 Nov 2021 11:28:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636647969;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=8bm581BkhHLAgHXcU5RDiPE2gfVwKDukiIT1uir51Iw=;
-        b=EXP6MR8IKcT7HrMEmDq1FcNrZOWgnM8xAQVMH79lPquFjZuJVcOUa/LIh4M9hCEzd0Cy/8
-        nh/CmSHPqq53oGwJEXPQhBBr8Mn1iOMOWKzoyhOqlNDmHFi9PGSGiA9oqAKrCaXAnNjRdE
-        Ec8HnM/ol7I26V0L+HE9Y8sD3HauPd4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-sDZ7WAxrN6qb7l0ozDVudQ-1; Thu, 11 Nov 2021 11:26:04 -0500
-X-MC-Unique: sDZ7WAxrN6qb7l0ozDVudQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34743100C660;
-        Thu, 11 Nov 2021 16:26:00 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.37.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3BD4A5C1D5;
-        Thu, 11 Nov 2021 16:25:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     dhowells@redhat.com,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Jeffrey E Altman <jaltman@auristor.com>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-afs@lists.infradead.org, linux-cachefs@redhat.com,
-        ceph-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-kernel@vger.kernel.org
-Subject: [GIT PULL] netfs, 9p, afs, ceph: Use folios
+        id S229952AbhKKWbi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 11 Nov 2021 17:31:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229652AbhKKWbi (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 11 Nov 2021 17:31:38 -0500
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA86C061766
+        for <linux-cifs@vger.kernel.org>; Thu, 11 Nov 2021 14:28:48 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id e7so213919ljq.12
+        for <linux-cifs@vger.kernel.org>; Thu, 11 Nov 2021 14:28:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=Yirq4K8XolEC05Cs1kNK4TfUIcMOnp+1RnMez4kFB7E=;
+        b=llT5s+M8py7MssrqS9YSSUVt5shiD5Ryoc1FRyKfBE9Rxu0qaZ2Of7QSIwehOkxjBk
+         r2qxgnHvoDq+nEy6ZpUeF40ehHojrSBO/qgpMn2Fjtx9u/NXzUxRVb1dgshhk5h4WqnS
+         wV6Ndh7O9Cs9VNeNmNDGm41JWY8HltR+iF5x0/1CAXjg0UsXEh4HmJ6EeSEoPHhkizoW
+         T361zb5HbrsxbnAIoLilfFzlITZNe0Zh8xKRCketUC9H/RIb66nveIY6s6Z/0qY/BFIR
+         L9ebOveUHdABwdiKKsDMzkax5/+sK0VBc2DOb1BAVjffr0VUff5DL0fhgSux6tTEWMIu
+         vOvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=Yirq4K8XolEC05Cs1kNK4TfUIcMOnp+1RnMez4kFB7E=;
+        b=6Nbj8Oe/vPr+sjMFTRF+XYxMmBgchWEzHXuDA2NOUjMtWlJqtG/c0l4f8v6X9gSl+I
+         bYlvMtglS9GDMvYUpLoMwQeM2x7yJI2IS9eWwTIdG6Yc3X0lzQQ7hf0tY460/VO6qNIe
+         1jBZuyNIu8qMvSth8W33scg0tWsfqDGJ3JTo/oqg5Jlx3OEXf5SJImvEXQpIJgkDpery
+         PVSR5eP79u2hFkA9WOMzbQOJbTo6I/tB3/QpBo9vi2G8iKErz1jK3mmFBAheEe+o6UE2
+         W300zXpksLTaIz6L6A78p29GHusfDpwC/fhpdGDAs/6j4jfy6PVFKkwwggkIf1tGSoMW
+         0ALw==
+X-Gm-Message-State: AOAM53321e77V+6YbSlBYKKXPTCqfhqnbCe7OMiFgQRR5dKUjm3CztfV
+        Wbns3J9yuLgWjWlrbABgp5ExtzxT4uvsZygbf7/VtlMW
+X-Google-Smtp-Source: ABdhPJyCNKMDU7p2KKbHdPO9RDCpo4Bow0tAOv9Cl64pkdUDdEttURqIe5qHmdGPOjfvJLzshA7J6mMQksNvGCdzcKg=
+X-Received: by 2002:a2e:9107:: with SMTP id m7mr10267806ljg.209.1636669727064;
+ Thu, 11 Nov 2021 14:28:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1134870.1636647952.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 11 Nov 2021 16:25:52 +0000
-Message-ID: <1134871.1636647952@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <CAH2r5mvM2hEP6TTOWipZayRapLwZ-=BzrLBJDK_0J4ZHiRc6og@mail.gmail.com>
+In-Reply-To: <CAH2r5mvM2hEP6TTOWipZayRapLwZ-=BzrLBJDK_0J4ZHiRc6og@mail.gmail.com>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 11 Nov 2021 16:28:36 -0600
+Message-ID: <CAH2r5msHng+COdwwJ0QUb2drTq-=5NMQFOK4W97Fd0=kvdoTuw@mail.gmail.com>
+Subject: Re: [PATCH] wait until we have the FS info from the server befor
+ initializing fscache cookie
+To:     David Howells <dhowells@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="000000000000b258e605d08addde"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Linus,
+--000000000000b258e605d08addde
+Content-Type: text/plain; charset="UTF-8"
 
-[Apologies for the late request, but I needed to wait for folios and 9p to
-be pulled into your tree so that I could get rid of the temporary merge I
-was using and then I had to wait for my branch to be retested before I
-could send this your way - and then Willy changed his mind about how to
-handle foliation of page_endio().]
+Updated patch to check whether would be initializing the super cookie twice
 
-Anyway, could you consider pulling this please?  It converts netfslib, 9p
-and afs to use folios.  It also partially converts ceph so that it uses
-folios on the boundaries with netfslib.
+cifs
 
-To help with this, a couple of folio helper functions are added in the
-first two patches.  If you don't want to take the netfs/9p/afs/ceph bits,
-could you at least consider taking the folio helpers?  Then they would be
-available to others.
+On Wed, Nov 10, 2021 at 3:20 AM Steve French <smfrench@gmail.com> wrote:
+>
+> With this patch now that the fscache cookie is initialized properly -
+> I do see an oops on the 2nd unmount if we mount the same share twice
+> ... any ideas on fixing that?
+>
+>
+>     smb3: do not call setup the fscache_super_cookie until fsinfo initialized
+>
+>     We were calling cifs_fscache_get_super_cookie after tcon but before
+>     we queried the info (QFS_Info) we need to initialize the cookie
+>     properly.
+>
+>     Suggested-by: David Howells <dhowells@redhat.com>
+>     Signed-off-by: Steve French <stfrench@microsoft.com>
+>
+>
+> --
+> Thanks,
+>
+> Steve
 
-These patches don't touch fscache and cachefiles as I intend to remove all
-the code that deals with pages directly from there.  Only nfs and cifs are
-using the old fscache I/O API now.  The new API uses iov_iter instead.
 
-Thanks to Jeff Layton, Dominique Martinet and AuriStor for testing and
-retesting the patches.
 
+-- 
 Thanks,
-David
 
-Changes
-=3D=3D=3D=3D=3D=3D=3D
-ver #5:
- - Got rid of the folio_endio bits again as Willy changed his mind and
-   would rather I inlined the code directly instead.
+Steve
 
-ver #4:
- - Detached and sent the afs symlink split patch separately.
- - Handed the 9p netfslibisation patch off to Dominique Martinet.
- - Added a patch to foliate page_endio().
- - Fixed a bug in afs_redirty_page() whereby it didn't set the next page
-   index in the loop and returned too early.
- - Simplified a check in v9fs_vfs_write_folio_locked()[4].
- - Undid a change to afs_symlink_readpage()[4].
- - Used offset_in_folio() in afs_write_end()[4].
- - Rebased on 9p-folio merge upstream[5].
+--000000000000b258e605d08addde
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-smb3-do-not-setup-the-fscache_super_cookie-until-fsi.patch"
+Content-Disposition: attachment; 
+	filename="0001-smb3-do-not-setup-the-fscache_super_cookie-until-fsi.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_kvvivqgp0>
+X-Attachment-Id: f_kvvivqgp0
 
-ver #3:
- - Rebased on upstream as folios have been pulled.
- - Imported a patch to convert 9p to netfslib from my
-   fscache-remove-old-api branch[3].
- - Foliated netfslib.
-
-ver #2:
- - Reorder the patches to put both non-folio afs patches to the front.
- - Use page_offset() rather than manual calculation[1].
- - Fix folio_inode() to directly access the inode[2].
-
-Link: https://lore.kernel.org/r/YST/0e92OdSH0zjg@casper.infradead.org/ [1]
-Link: https://lore.kernel.org/r/YST8OcVNy02Rivbm@casper.infradead.org/ [2]
-Link: https://lore.kernel.org/r/163551653404.1877519.12363794970541005441.=
-stgit@warthog.procyon.org.uk/ [3]
-Link: https://lore.kernel.org/r/YYKa3bfQZxK5/wDN@casper.infradead.org/ [4]
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/c=
-ommit/?id=3Df89ce84bc33330607a782e47a8b19406ed109b15 [5]
-Link: https://lore.kernel.org/r/2408234.1628687271@warthog.procyon.org.uk/=
- # v0
-Link: https://lore.kernel.org/r/162981147473.1901565.1455657509200944265.s=
-tgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/163005740700.2472992.12365214290752300378.=
-stgit@warthog.procyon.org.uk/ # v2
-Link: https://lore.kernel.org/r/163584174921.4023316.8927114426959755223.s=
-tgit@warthog.procyon.org.uk>/ # v3
-Link: https://lore.kernel.org/r/163649323416.309189.4637503793406396694.st=
-git@warthog.procyon.org.uk/ # v4
-Link: https://lore.kernel.org/r/163657847613.834781.7923681076643317435.st=
-git@warthog.procyon.org.uk/ # v5
-
----
-The following changes since commit f89ce84bc33330607a782e47a8b19406ed109b1=
-5:
-
-  Merge tag '9p-for-5.16-rc1' of git://github.com/martinetd/linux (2021-11=
--09 10:30:13 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
-/netfs-folio-20211111
-
-for you to fetch changes up to 255ed63638da190e2485d32c0f696cd04d34fbc0:
-
-  afs: Use folios in directory handling (2021-11-10 21:17:09 +0000)
-
-----------------------------------------------------------------
-netfs, 9p, afs and ceph (partial) foliation
-
-----------------------------------------------------------------
-David Howells (4):
-      folio: Add a function to change the private data attached to a folio
-      folio: Add a function to get the host inode for a folio
-      netfs, 9p, afs, ceph: Use folios
-      afs: Use folios in directory handling
-
- fs/9p/vfs_addr.c           |  83 ++++++-----
- fs/9p/vfs_file.c           |  20 +--
- fs/afs/dir.c               | 229 +++++++++++++-----------------
- fs/afs/dir_edit.c          | 154 ++++++++++----------
- fs/afs/file.c              |  70 +++++----
- fs/afs/internal.h          |  46 +++---
- fs/afs/write.c             | 347 ++++++++++++++++++++++------------------=
------
- fs/ceph/addr.c             |  80 ++++++-----
- fs/netfs/read_helper.c     | 165 ++++++++++-----------
- include/linux/netfs.h      |  12 +-
- include/linux/pagemap.h    |  33 +++++
- include/trace/events/afs.h |  21 +--
- mm/page-writeback.c        |   2 +-
- 13 files changed, 636 insertions(+), 626 deletions(-)
-
+RnJvbSA1NjI3MTNmZTliNDk3MGZiYzgzZmZkYmMxYTI5NWU1ZjBjN2Y5ZjEwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdGV2ZSBGcmVuY2ggPHN0ZnJlbmNoQG1pY3Jvc29mdC5jb20+
+CkRhdGU6IFdlZCwgMTAgTm92IDIwMjEgMDM6MTU6MjkgLTA2MDAKU3ViamVjdDogW1BBVENIXSBz
+bWIzOiBkbyBub3Qgc2V0dXAgdGhlIGZzY2FjaGVfc3VwZXJfY29va2llIHVudGlsIGZzaW5mbwog
+aW5pdGlhbGl6ZWQKCldlIHdlcmUgY2FsbGluZyBjaWZzX2ZzY2FjaGVfZ2V0X3N1cGVyX2Nvb2tp
+ZSBhZnRlciB0Y29uIGJ1dCBiZWZvcmUKd2UgcXVlcmllZCB0aGUgaW5mbyAoUUZTX0luZm8pIHdl
+IG5lZWQgdG8gaW5pdGlhbGl6ZSB0aGUgY29va2llCnByb3Blcmx5LiAgQWxzbyBpbmNsdWRlcyBh
+biBhZGRpdGlvbmFsIGNoZWNrIHN1Z2dlc3RlZCBieSBQYXVsbwp0byBtYWtlIHN1cmUgd2UgZG9u
+J3QgaW5pdGlhbGl6ZSBzdXBlciBjb29raWUgdHdpY2UuCgpTdWdnZXN0ZWQtYnk6IERhdmlkIEhv
+d2VsbHMgPGRob3dlbGxzQHJlZGhhdC5jb20+ClJldmlld2VkLWJ5OiBQYXVsbyBBbGNhbnRhcmEg
+KFNVU0UpIDxwY0BjanIubno+ClNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hA
+bWljcm9zb2Z0LmNvbT4KLS0tCiBmcy9jaWZzL2Nvbm5lY3QuYyB8IDkgKysrKysrKy0tCiAxIGZp
+bGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBh
+L2ZzL2NpZnMvY29ubmVjdC5jIGIvZnMvY2lmcy9jb25uZWN0LmMKaW5kZXggZGYzMzY1OTU4NjAz
+Li40MmU0ZDdiNDhlOTcgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvY29ubmVjdC5jCisrKyBiL2ZzL2Np
+ZnMvY29ubmVjdC5jCkBAIC0yMzQ5LDggKzIzNDksNiBAQCBjaWZzX2dldF90Y29uKHN0cnVjdCBj
+aWZzX3NlcyAqc2VzLCBzdHJ1Y3Qgc21iM19mc19jb250ZXh0ICpjdHgpCiAJbGlzdF9hZGQoJnRj
+b24tPnRjb25fbGlzdCwgJnNlcy0+dGNvbl9saXN0KTsKIAlzcGluX3VubG9jaygmY2lmc190Y3Bf
+c2VzX2xvY2spOwogCi0JY2lmc19mc2NhY2hlX2dldF9zdXBlcl9jb29raWUodGNvbik7Ci0KIAly
+ZXR1cm4gdGNvbjsKIAogb3V0X2ZhaWw6CkBAIC0zMDAyLDYgKzMwMDAsMTMgQEAgc3RhdGljIGlu
+dCBtb3VudF9nZXRfY29ubnMoc3RydWN0IG1vdW50X2N0eCAqbW50X2N0eCkKIAkJCQljaWZzX2Ri
+ZyhWRlMsICJyZWFkIG9ubHkgbW91bnQgb2YgUlcgc2hhcmVcbiIpOwogCQkJLyogbm8gbmVlZCB0
+byBsb2cgYSBSVyBtb3VudCBvZiBhIHR5cGljYWwgUlcgc2hhcmUgKi8KIAkJfQorCQkvKgorCQkg
+KiBUaGUgY29va2llIGlzIGluaXRpYWxpemVkIGZyb20gdm9sdW1lIGluZm8gcmV0dXJuZWQgYWJv
+dmUuCisJCSAqIEFuZCB3ZSBtaWdodCBiZSByZXVzaW5nIGEgdGNvbiwgc28gbmVlZCB0byBlbnN1
+cmUKKwkJICogdGhhdCB3ZSBkbyBub3QgZ2V0IHN1cGVyIGNvb2tpZSB0d2ljZS4KKwkJICovCisJ
+CWlmICghdGNvbi0+ZnNjYWNoZSkKKwkJCWNpZnNfZnNjYWNoZV9nZXRfc3VwZXJfY29va2llKHRj
+b24pOwogCX0KIAogCS8qCi0tIAoyLjMyLjAKCg==
+--000000000000b258e605d08addde--
