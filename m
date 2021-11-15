@@ -2,125 +2,69 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55EA7C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Nov 2021 05:13:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F0DC433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Nov 2021 06:01:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AF4563211
-	for <linux-cifs@archiver.kernel.org>; Mon, 15 Nov 2021 05:13:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 336E362F90
+	for <linux-cifs@archiver.kernel.org>; Mon, 15 Nov 2021 06:01:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229795AbhKOFQc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 15 Nov 2021 00:16:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42248 "EHLO
+        id S229915AbhKOGEi (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 15 Nov 2021 01:04:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbhKOFQZ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 15 Nov 2021 00:16:25 -0500
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33420C061746;
-        Sun, 14 Nov 2021 21:13:29 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id k37so40284247lfv.3;
-        Sun, 14 Nov 2021 21:13:29 -0800 (PST)
+        with ESMTP id S229935AbhKOGEh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 15 Nov 2021 01:04:37 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D911EC0613B9;
+        Sun, 14 Nov 2021 22:01:41 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id bu18so40680062lfb.0;
+        Sun, 14 Nov 2021 22:01:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zZoE+xQ2U7qWcLCwPm3BWxfe1Es+mpw14CoOgK3M7Ok=;
-        b=mwm1VjQ772gRZ4PuPgObB+pw+oQgHGo0gH8xXfY20IrpKUmrCNqdtnQD17BsNf6flb
-         fqYRtMBtI8ssq47EvKK7k7me43tk/1EnUxRmYFUbhTTxtJNsECVuv6H+9l7mM2L8kMHl
-         Ti1HfiRu2dIiAJWG/R1O7ne2eNsNFDVJi1P42Sqihk2iGMQOmkczpZQDvo5Ck1SHfRH1
-         8d5la2PFPHcSPqrjh8OdXiQmYMw9LKgpnjowZpsrK7pAMT1Yo1gYkbvcuzvt1WvNazI/
-         EJgF9gNnwRrNIyAXiwWOYHO5F0ojNXbNmrbx5TX26Oem6zIYnrkUfhFQ8gbRfhcbUyI0
-         VenA==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=rE3n8ewSQTA1WhktnlAlSMmD91ffVaRf6It50caE7gE=;
+        b=BIJEge6NiFp9hJvkJWZopOSnSOODWyIoO9Wo/x5CMgvb4dAVHwubVw2w+KPCTT71YR
+         7STG2kpODR1iTyC3s+tyHwkXDCWb06PTRiXaNuHmIARYTlR5DB5z9RjQ2sWEe6cuJqDZ
+         zbcVKRM1fVbm4d2Dw69hCv39Dw47GGDcTwPqbSmF4CGcLwa3eCChU9KVQ8NANUN2mEcH
+         m771LeSD1J1FVTNEr3bDhZxeECczQV+8gngxUPp8HDttRMw6JM08emT3B5jtgxK3oDJB
+         gFs+YtE8u9vXnQ1AosEVgEZ6ro3jsxm/nk1O2Ss9fxpv4abPTP+AGVBtgse111IYTnSp
+         mLXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zZoE+xQ2U7qWcLCwPm3BWxfe1Es+mpw14CoOgK3M7Ok=;
-        b=YMAP2cksaI9sJcedQDl5tOxbW3nXe/CAsagNXham2KLfh1CTrx8YEtgdiaJIp3RUM9
-         2VLcIkj0ueX0iDOKD27UyCncnOO1b6h9X0Ze3/22vkVtfAe9Ez+EKdD60IZp5FsKJ8l4
-         2W/SjnMsOmb4i8UHmwVSPJyTpkdD+sNJ5g7SjNNeOlXyKlhoyAriGtBTDx2J0fADK61L
-         W0vSKDPgo6wrp4YOy64a7VgfvqsXm3+yjki2czWU28JXDd7BawzX+dUdF1vw5j/jZqaV
-         qWquxWQsCEUwemU8PTa0f0zGFc4CGbc6C6VkGk2sxlJluE0yIJvKodM2qw7m2Jhm/bMd
-         vI+Q==
-X-Gm-Message-State: AOAM533B1Fovs5PTaiRJY8t4hUtCKbhAWLnT3rE88MaZy+5V7xcSBRbd
-        99cHTPlJhrfiPXmxjYuQ/0OIJwFaXfjo2XthMEw=
-X-Google-Smtp-Source: ABdhPJxXns1wG+psRT62X8UPM7sHi3HbTaMCW/uGnIXCXyY36drmrlPsz+a6JG96myvs8cZdB598PP5mo7jAIvMlvZs=
-X-Received: by 2002:a19:770a:: with SMTP id s10mr34265127lfc.234.1636953207366;
- Sun, 14 Nov 2021 21:13:27 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=rE3n8ewSQTA1WhktnlAlSMmD91ffVaRf6It50caE7gE=;
+        b=4mf58Gn9VhMnd+IYMH/lJxW2xqhr4pOWBNxxgS0HC7pown1IcKZ2anV2NnTHmuXr+n
+         jTckVdKtnuK8M+IHi1IihEQRB49CZVkx5Tu3RBFg+NOgzJ+TehkG7cqooQ2mWlNKt3nL
+         iwBBWTi/SsQsz8Jv3hhvPBOoj36xEKfpuAWWG0je1cw1UB92oP/X65CIE3i0XejUchhP
+         CYFAeQWuC7oQhkCMo+zTXcS0VV6fsKb3lYBO6TfvwEYftqkRd9hhmxBZtt8HcCfVvI+i
+         a109jgzgxMIIyI9Td8n9qoFjm6DRXPIBJ2I3uO7KsU3D7Ie94aCyuXoFTLjHutkVEW4q
+         EQwQ==
+X-Gm-Message-State: AOAM5312HbWtcDp3dKU+i0UHI86EpKwIgDOhZSyh1xiCZBdhVNs8dfvl
+        1kT0XNK5AC69YTE57YcrzH6RCJIDZbHtJegRH6kHiYXpe38=
+X-Google-Smtp-Source: ABdhPJwyQ1qHjpsctfdy+ZfPQjknqFskYXg0aC0H5HAw9nCK/HhfYjPRT5PG6cWnQKfVwKWDFhCVUr1XXFPcET9gAzw=
+X-Received: by 2002:ac2:5ddb:: with SMTP id x27mr32277423lfq.595.1636956099911;
+ Sun, 14 Nov 2021 22:01:39 -0800 (PST)
 MIME-Version: 1.0
-References: <20211112093051.9366-1-chi.minghao@zte.com.cn>
-In-Reply-To: <20211112093051.9366-1-chi.minghao@zte.com.cn>
 From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 14 Nov 2021 23:13:16 -0600
-Message-ID: <CAH2r5muJ14DbEax2N2p30MD_wWcteeHfH4TCJM4K_eSDsU2dBQ@mail.gmail.com>
-Subject: Re: [PATCH] fs:cifs: convert from atomic_t to refcount_t on tlink->tl_count
-To:     cgel.zte@gmail.com
-Cc:     Steve French <sfrench@samba.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        chiminghao <chi.minghao@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cm>
+Date:   Mon, 15 Nov 2021 00:01:29 -0600
+Message-ID: <CAH2r5msbc9A0V2qh2Prx4WSNsDAWp4m5Sj76YgKN8Qb7fWbZdw@mail.gmail.com>
+Subject: smb3: do not error on fsync when readonly
+To:     Stable <stable@vger.kernel.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Julian Sikorski <belegdol@gmail.com>,
+        Jeremy Allison <jra@samba.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next pending testing
+Please include "smb3: do not error on fsync when readonly"
 
-On Fri, Nov 12, 2021 at 3:32 AM <cgel.zte@gmail.com> wrote:
->
-> From: chiminghao <chi.minghao@zte.com.cn>
->
-> use refcount_t instead of atomic_t
-> which prevents reference counter overflows.
->
-> Reported-by: Zeal Robot <zealci@zte.com.cm>
-> Signed-off-by: chiminghao <chi.minghao@zte.com.cn>
-> ---
->  fs/cifs/cifsglob.h | 4 ++--
->  fs/cifs/connect.c  | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/cifs/cifsglob.h b/fs/cifs/cifsglob.h
-> index 41e97df4e0e5..a8edaada0fea 100644
-> --- a/fs/cifs/cifsglob.h
-> +++ b/fs/cifs/cifsglob.h
-> @@ -8,7 +8,7 @@
->   */
->  #ifndef _CIFS_GLOB_H
->  #define _CIFS_GLOB_H
-> -
-> +#include <linux/refcount.h>
->  #include <linux/in.h>
->  #include <linux/in6.h>
->  #include <linux/inet.h>
-> @@ -1115,7 +1115,7 @@ struct tcon_link {
->  #define TCON_LINK_PENDING      1
->  #define TCON_LINK_IN_TREE      2
->         unsigned long           tl_time;
-> -       atomic_t                tl_count;
-> +       refcount_t              tl_count;
->         struct cifs_tcon        *tl_tcon;
->  };
->
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 9637465d23db..4aad8c9acf2e 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -2318,7 +2318,7 @@ cifs_put_tlink(struct tcon_link *tlink)
->         if (!tlink || IS_ERR(tlink))
->                 return;
->
-> -       if (!atomic_dec_and_test(&tlink->tl_count) ||
-> +       if (!refcount_dec_and_test(&tlink->tl_count) ||
->             test_bit(TCON_LINK_IN_TREE, &tlink->tl_flags)) {
->                 tlink->tl_time = jiffies;
->                 return;
-> --
-> 2.25.1
->
+Commit id:
+71e6864eacbef0b2645ca043cdfbac272cb6cea3
 
-
+It fixes an fsync problem over SMB3 mounts, reported by Julian, when
+the file is not opened for write.
 -- 
 Thanks,
 
