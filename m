@@ -2,146 +2,117 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E13C4332F
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Nov 2021 23:23:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 916C0C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Nov 2021 23:36:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE7C261B96
-	for <linux-cifs@archiver.kernel.org>; Tue, 16 Nov 2021 23:23:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7248761B71
+	for <linux-cifs@archiver.kernel.org>; Tue, 16 Nov 2021 23:36:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbhKPX0Y (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 16 Nov 2021 18:26:24 -0500
-Received: from vulcan.natalenko.name ([104.207.131.136]:33440 "EHLO
-        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232308AbhKPX0Y (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 16 Nov 2021 18:26:24 -0500
-Received: from spock.localnet (unknown [151.237.229.131])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by vulcan.natalenko.name (Postfix) with ESMTPSA id 29AABC9F44C;
-        Wed, 17 Nov 2021 00:23:24 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=dkim-20170712; t=1637105004;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=v3cajH+nftkRylUmyQ7XyT0sa+oEqmsLI9ulOPFbqd8=;
-        b=sDcKf+/7D/v0FAstWgSQAG2nOPXv6mVAhPJnjTwMqUSXkQwBdQs71f+6hegK1mkFa/feXz
-        zRjllutN5bGF6SDy9QpeLIOOkUlwAcLroKyzDUHd1JEcVv8RVSknZJte77wPkDU1COzRRi
-        uy9eVPJRTRIW+sO+MxjdOmyNQ0fkN3Q=
-From:   Oleksandr Natalenko <oleksandr@natalenko.name>
-To:     Marios Makassikis <mmakassikis@freebox.fr>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <sfrench@samba.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: ksmbd: Unsupported addition info
-Date:   Wed, 17 Nov 2021 00:23:22 +0100
-Message-ID: <2147198.irdbgypaU6@natalenko.name>
-In-Reply-To: <CAF6XXKXKivX-_OR+ZtqQP4yMVtJ=rGTPWvBDQSdys1vTCBHKUw@mail.gmail.com>
-References: <5831447.lOV4Wx5bFT@natalenko.name> <CAF6XXKXKivX-_OR+ZtqQP4yMVtJ=rGTPWvBDQSdys1vTCBHKUw@mail.gmail.com>
+        id S229544AbhKPXjw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 16 Nov 2021 18:39:52 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58696 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229532AbhKPXjw (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Tue, 16 Nov 2021 18:39:52 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6C05E61B71;
+        Tue, 16 Nov 2021 23:36:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637105814;
+        bh=yYPlVugWDLGu9reVQ8/u3/GZP8SiDuuyCaxKBOzfcVM=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=m/AKUdkjjyY6+d3sb0CiKGOAeikfv8YLummaMW7zDUzdxdGIBMHIgraY5HCMertt6
+         aCyeOUzgjLzA+TmhsPK5+MPE8EKVQkHMOKLI/S8DRZIbBgAIR473kqWjV8w7YWC2iI
+         nSAf6KYVYkMwDPV7mecs797zARv0uMUQBbrpkVIPRD8pb6zMWWYauJeJVh5FqIr7yz
+         B68kdvu6bwkaWUun0+7coAlOBQ54NOvvYApr3VMJRK7Zy+Zpa+CdVk1Vxcu4O9SUsb
+         K2udHY1hlFrD9hYW/B3OaYrkTbuj6mRM+/DP5P8NlbEQAkK/5OaChjDBP++xcOTkQ0
+         DGYUWMCKx/R9A==
+Received: by mail-oi1-f179.google.com with SMTP id t23so2163863oiw.3;
+        Tue, 16 Nov 2021 15:36:54 -0800 (PST)
+X-Gm-Message-State: AOAM53179ESS9Vryg+su2NIZvHa76tLk4aBWsqKEwnxtlIT3MMnh5JCb
+        IUIe9CIZR1Tm84aVcOPJb4BslsbC+0tI8WSkv0c=
+X-Google-Smtp-Source: ABdhPJzsFjtMS0Pa8Z55mHQ8ceBA+FC1Ld+XmJGtIqRgm4plYpcEVCG7bhZzJ90L91LUeE1jf1i9fj2sZHC8gedbV1c=
+X-Received: by 2002:a05:6808:14c3:: with SMTP id f3mr37766948oiw.51.1637105813781;
+ Tue, 16 Nov 2021 15:36:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Received: by 2002:ac9:4448:0:0:0:0:0 with HTTP; Tue, 16 Nov 2021 15:36:53
+ -0800 (PST)
+In-Reply-To: <5831447.lOV4Wx5bFT@natalenko.name>
+References: <5831447.lOV4Wx5bFT@natalenko.name>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Wed, 17 Nov 2021 08:36:53 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-KmxMeYWP8z6RYYK6za-Sj81Qtb3RO=oG+Yy3kXDaLjg@mail.gmail.com>
+Message-ID: <CAKYAXd-KmxMeYWP8z6RYYK6za-Sj81Qtb3RO=oG+Yy3kXDaLjg@mail.gmail.com>
+Subject: Re: ksmbd: Unsupported addition info
+To:     Oleksandr Natalenko <oleksandr@natalenko.name>
+Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <sfrench@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hello.
+2021-11-17 6:44 GMT+09:00, Oleksandr Natalenko <oleksandr@natalenko.name>:
+> Hello Namjae et al.
+Hi Oleksandr,
+>
+> With the latest ksmbd from the next branch I have an issue with wife's
+> Windows
+> 10 laptop while copying/removing files from the network share. On her cli=
+ent
+> it
+> looks like copy operation (server -> laptop) reaches 99% and then stalls,
+> and
+> on the server side there's this in the kernel log:
+>
+> ```
+> ksmbd: Unsupported addition info: 0xf)
+> ksmbd: Unsupported addition info: 0x20)
+> ```
+>
+> repeated multiple times. I must note that in fact the file gets copied to
+> her
+> laptop, but Windows copy dialog just hangs.
+>
+> Any idea what it could be and how to avoid it? This also happened before
+> (I'm
+> a pretty early ksmbd adopter), but I'm reporting it just now because I
+> na=C3=AFvely
+> hoped it would be fixed automagically :). This never happened to me with
+> userspace Samba though.
+>
+> This is my smb.conf:
+>
+> ```
+> [global]
+> workgroup =3D KANAPKA
+> server string =3D ksmbd server %v
+> netbios name =3D defiant
+> valid users =3D __guest
+>
+> [Shared]
+> valid users =3D __guest
+> path =3D /mnt/shared
+> force user =3D _shared
+> force group =3D _shared
+> browsable =3D no
+> writeable =3D yes
+> veto files =3D /lost+found/
+> ```
+>
+> Appreciate your time and looking forward to your response.
+Thanks for your report, I have seen same symptom before, I thought it
+was a windows issue as it is also reproduced against samba. If you
+wait for a few minutes, does not the 99% message window close?
 
-Thanks for your response. Please find my answers inline.
-
-On st=C5=99eda 17. listopadu 2021 0:03:34 CET Marios Makassikis wrote:
-> On Tue, Nov 16, 2021 at 10:44 PM Oleksandr Natalenko
->=20
-> <oleksandr@natalenko.name> wrote:
-> > Hello Namjae et al.
-> >=20
-> > With the latest ksmbd from the next branch I have an issue with wife's
-> > Windows 10 laptop while copying/removing files from the network share. =
-On
-> > her client it looks like copy operation (server -> laptop) reaches 99%
-> > and then stalls, and on the server side there's this in the kernel log:
-> >=20
-> > ```
-> > ksmbd: Unsupported addition info: 0xf)
-> > ksmbd: Unsupported addition info: 0x20)
-> > ```
-> >=20
-> > repeated multiple times. I must note that in fact the file gets copied =
-to
-> > her laptop, but Windows copy dialog just hangs.
-> >=20
-> > Any idea what it could be and how to avoid it? This also happened before
-> > (I'm a pretty early ksmbd adopter), but I'm reporting it just now becau=
-se
-> > I na=C3=AFvely hoped it would be fixed automagically :). This never hap=
-pened
-> > to me with userspace Samba though.
-> >=20
-> > This is my smb.conf:
-> >=20
-> > ```
-> > [global]
-> > workgroup =3D KANAPKA
-> > server string =3D ksmbd server %v
-> > netbios name =3D defiant
-> > valid users =3D __guest
-> >=20
-> > [Shared]
-> > valid users =3D __guest
-> > path =3D /mnt/shared
-> > force user =3D _shared
-> > force group =3D _shared
-> > browsable =3D no
-> > writeable =3D yes
-> > veto files =3D /lost+found/
-> > ```
-> >=20
-> > Appreciate your time and looking forward to your response.
->=20
-> This sounds like an issue reported on github a couple of months ago [1].
->=20
-> Can you specify the exact Windows version (+ edition) ?
-
-It is Windows 10 Pro 21H1 19043.1348
-
-> Are you accessing the share through a network-mapped drive ? If not,
-> can you try to reproduce it ?
-
-Yes, the share is "mounted" as a network-mapped drive Z:.
-
-> Does this happen with files of any type ?
-
-I didn't find it depending on a specific file type. Just tried a couple of =
-fresh=20
-jpgs and xslx, all hung, but another pair of old jpgs went fine instantly,=
-=20
-although the same message was logged in the kernel log on the server side f=
-or=20
-all the files.
-
-> IIRC, the "Unsupported addition
-> info" message you're seeing is related to Windows requesting some
-> attributes that are not handled yet by ksmbd. It seems it was added to fix
-> windows 10 clients
-> after ACLs support was added [2]. Makes me wonder if Windows doesn't like
-> the fake response it is getting when it's trying to read the SACLs.
-
-Cannot comment on this since I have no idea how things work or are supposed=
- to=20
-work, but I'm ready to test patches as well as ksmbd options if there are s=
-ome=20
-suggestions.
-
-Thanks you!
-
-> https://github.com/cifsd-team/ksmbd-tools/issues/208
-> https://github.com/namjaejeon/ksmbd/commit/cb9167856ffca6483
-
-=2D-=20
-Oleksandr Natalenko (post-factum)
-
-
+Thanks!
+>
+> Thanks.
+>
+> --
+> Oleksandr Natalenko (post-factum)
+>
+>
+>
