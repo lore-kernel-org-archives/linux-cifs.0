@@ -2,56 +2,90 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92604C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Nov 2021 21:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D406C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Nov 2021 01:21:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 70240611EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 18 Nov 2021 21:32:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D59D6138D
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Nov 2021 01:21:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230484AbhKRVfS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Nov 2021 16:35:18 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45808 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230481AbhKRVfS (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 18 Nov 2021 16:35:18 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 24F6E61179;
-        Thu, 18 Nov 2021 21:32:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1637271137;
-        bh=KD3bI4st4bInSJx58BqiEup1qRmegX6pcoDZrS9IaKI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=UB8ojPFtzr35tHYZeJ9Vq6Hi9qT1jqBVNPWobFHjTp2FulxEP0daR2Lf0jwBoPfXD
-         QgxRhVXKPZWPDapx4x2PkPF6VpkkF36oZQ4abt03PDlP6sm7yi2hduOEIY2Pmwx3Ry
-         NMjGUkvTk3zb8P7HGImkPz6iRyNvSUdugWKWqFjg=
-Date:   Thu, 18 Nov 2021 13:32:15 -0800
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Murphy Zhou <jencce.kernel@gmail.com>,
+        id S231802AbhKSBYa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 18 Nov 2021 20:24:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51674 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229754AbhKSBYa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Nov 2021 20:24:30 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D65C7C061574;
+        Thu, 18 Nov 2021 17:21:28 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id 200so7155945pga.1;
+        Thu, 18 Nov 2021 17:21:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=2tqyKsYyBJPy8juVSwDxf6dA198i0oRskzgoD5wXhVA=;
+        b=gh7FKTdHnIkH40vcOiXEHQSc40+CbmMLGxXHQL1TM99/KotE6UZ7BAevMuqQe9cOnq
+         cPQSgKuj2YhRiUbKHPjZKr37BHXeuorXGXaGNi78kEAqgVnH8xHAYEKxEzmK8fL0j0a/
+         eNhEh63l+dMtwaCFTD8+TGOOoXfCDQMNd83QtWZTHtgCy1iAFwLx1XgWpbdvKOgQtJQw
+         VtniABkAE6EOPsZus685AGQMhsmlalV7xv2edoJ01ZDmh7YRy9b9MG23K6PakVhfdPsT
+         K78iT8u3Tvm7PwKA7NGujUyPgfinvEaq04qXzFs0u11UtCk5jvkFBZxBzASTRvKr/v11
+         C80g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2tqyKsYyBJPy8juVSwDxf6dA198i0oRskzgoD5wXhVA=;
+        b=n0/lTBcgPcQ1gaou/3zdeEdxeq4MLFfzjuhExL6j9T8VxYHBd5YYen2TpbRyHnoHA9
+         flBdRUN4/ljsoycMSvopsC8KIcaoDh/sY5SIEP+1oZgFnGyZEMYPcHoHChCb2pSZu6eG
+         0JQjF2I1GQ6ySXLFWntNaI0Us4/lF6PFQXn2rGeurE1/yGCGEP54G2xOPkQvAgZtQj4h
+         US6ycq7BkU4rmG7/K737BanEsB4Zm83+e7YDeaa2wPdmhpgNMBjY6HAvZDWTtjj69RvW
+         khZqaJJktTcIvFpOPHs86tPd1hTX39aclV1+corWTxb2kJnu3P0kOhpzDf4wSQppEP5J
+         zcXQ==
+X-Gm-Message-State: AOAM533JYBPtfBUQShf6lKubes6waMZgtUCWXskSCM/TnrgXSqhSGJ3Z
+        iAOm6HwWg68AJ2gf+ki2A58=
+X-Google-Smtp-Source: ABdhPJwJFPs73QBS6Z9LcgPajEZ8yhsB/CqsdXRVwU3900TXljo/1EJcdB6WG1/SfZUkU+Ji+PWrHA==
+X-Received: by 2002:a63:7882:: with SMTP id t124mr14673903pgc.149.1637284888100;
+        Thu, 18 Nov 2021 17:21:28 -0800 (PST)
+Received: from xzhoux.usersys.redhat.com ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id x33sm805475pfh.133.2021.11.18.17.21.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Nov 2021 17:21:27 -0800 (PST)
+Date:   Fri, 19 Nov 2021 09:21:18 +0800
+From:   Murphy Zhou <jencce.kernel@gmail.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Murphy Zhou <jencce.kernel@gmail.com>,
         Matthew Wilcox <willy@infradead.org>,
         linux-mm <linux-mm@kvack.org>, CIFS <linux-cifs@vger.kernel.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>
 Subject: Re: [regression] mm, cifs panic
-Message-Id: <20211118133215.4b8168a062693b32442eb928@linux-foundation.org>
-In-Reply-To: <CAH2r5mtW35HzmNDNxPXj1cKiEsyaz45_mcsQmWkTa_orOkS7ug@mail.gmail.com>
+Message-ID: <20211119012118.qh3awizpkuimlhrj@xzhoux.usersys.redhat.com>
 References: <20211118042914.wnffm3ytzmxjdubn@xzhoux.usersys.redhat.com>
-        <CAH2r5mtW35HzmNDNxPXj1cKiEsyaz45_mcsQmWkTa_orOkS7ug@mail.gmail.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+ <CAH2r5mtW35HzmNDNxPXj1cKiEsyaz45_mcsQmWkTa_orOkS7ug@mail.gmail.com>
+ <20211118133215.4b8168a062693b32442eb928@linux-foundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211118133215.4b8168a062693b32442eb928@linux-foundation.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, 18 Nov 2021 10:18:16 -0600 Steve French <smfrench@gmail.com> wrote:
-
-> Andrew Morton had posted Matthew Wilcox's patch (to fix the recent
-> regression in mm/swap.c) in email (on the 9th) to fs-devel titled:
+On Thu, Nov 18, 2021 at 01:32:15PM -0800, Andrew Morton wrote:
+> On Thu, 18 Nov 2021 10:18:16 -0600 Steve French <smfrench@gmail.com> wrote:
 > 
->        "+ hitting-bug_on-trap-in-read_pages-mm-optimise-put_pages_list.patch"
+> > Andrew Morton had posted Matthew Wilcox's patch (to fix the recent
+> > regression in mm/swap.c) in email (on the 9th) to fs-devel titled:
+> > 
+> >        "+ hitting-bug_on-trap-in-read_pages-mm-optimise-put_pages_list.patch"
+> > 
+> > The patch was reviewed and verified (tested) to fix the problem but
+> > has not been merged into mainline.  Various xfstests break without
+> > this patch.
 > 
-> The patch was reviewed and verified (tested) to fix the problem but
-> has not been merged into mainline.  Various xfstests break without
-> this patch.
+> It's in my next batch of fixes to send to Linus.  Hopefully tomorrow.
 
-It's in my next batch of fixes to send to Linus.  Hopefully tomorrow.
+Great! Thanks!
+
+-- 
+Murphy
