@@ -1,91 +1,118 @@
 Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D406C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 19 Nov 2021 01:21:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D59D6138D
-	for <linux-cifs@archiver.kernel.org>; Fri, 19 Nov 2021 01:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E9AC433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 19 Nov 2021 21:12:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231802AbhKSBYa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 18 Nov 2021 20:24:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51674 "EHLO
+        id S232344AbhKSVPa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 19 Nov 2021 16:15:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbhKSBYa (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 18 Nov 2021 20:24:30 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D65C7C061574;
-        Thu, 18 Nov 2021 17:21:28 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id 200so7155945pga.1;
-        Thu, 18 Nov 2021 17:21:28 -0800 (PST)
+        with ESMTP id S231761AbhKSVPa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 19 Nov 2021 16:15:30 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06DF2C061574;
+        Fri, 19 Nov 2021 13:12:28 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id u18so20282564wrg.5;
+        Fri, 19 Nov 2021 13:12:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2tqyKsYyBJPy8juVSwDxf6dA198i0oRskzgoD5wXhVA=;
-        b=gh7FKTdHnIkH40vcOiXEHQSc40+CbmMLGxXHQL1TM99/KotE6UZ7BAevMuqQe9cOnq
-         cPQSgKuj2YhRiUbKHPjZKr37BHXeuorXGXaGNi78kEAqgVnH8xHAYEKxEzmK8fL0j0a/
-         eNhEh63l+dMtwaCFTD8+TGOOoXfCDQMNd83QtWZTHtgCy1iAFwLx1XgWpbdvKOgQtJQw
-         VtniABkAE6EOPsZus685AGQMhsmlalV7xv2edoJ01ZDmh7YRy9b9MG23K6PakVhfdPsT
-         K78iT8u3Tvm7PwKA7NGujUyPgfinvEaq04qXzFs0u11UtCk5jvkFBZxBzASTRvKr/v11
-         C80g==
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=myqMq5JJldoxRnxPAx5ijKAxfMyvPLaQ6eIycx8Zmgk=;
+        b=QWGPohrxW6g9WpbnJaihqSJvHimsOxT6/Ojw1de3vhzbKZq7MEovhjNAfl2bOvz2Xe
+         4UdrCH1laBTgF09K7x8GV9O6P3dFqvp/jAFyflU6mNOBY5KLoKu2rqsXZTp9KWxYXXUa
+         uaDuIcrWIaixnqMPvhSAtqy/Gfpudy9Vi2MqJbgwKN0czkEGJGQCW9gJhjXcu2S62nTA
+         oorr1P7QUNTcy6Hq6XBVnvg7aajv0r2+KyK81EP7JU02bt6T7XPE4tDJVZSYOo+/O6F1
+         Pu5MZqP5MZscXYPa2MksluWSd7s4jNJybNQBaMFvZyp0MMsPmeHL9/OnmIVL5PsBRgqi
+         h4Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2tqyKsYyBJPy8juVSwDxf6dA198i0oRskzgoD5wXhVA=;
-        b=n0/lTBcgPcQ1gaou/3zdeEdxeq4MLFfzjuhExL6j9T8VxYHBd5YYen2TpbRyHnoHA9
-         flBdRUN4/ljsoycMSvopsC8KIcaoDh/sY5SIEP+1oZgFnGyZEMYPcHoHChCb2pSZu6eG
-         0JQjF2I1GQ6ySXLFWntNaI0Us4/lF6PFQXn2rGeurE1/yGCGEP54G2xOPkQvAgZtQj4h
-         US6ycq7BkU4rmG7/K737BanEsB4Zm83+e7YDeaa2wPdmhpgNMBjY6HAvZDWTtjj69RvW
-         khZqaJJktTcIvFpOPHs86tPd1hTX39aclV1+corWTxb2kJnu3P0kOhpzDf4wSQppEP5J
-         zcXQ==
-X-Gm-Message-State: AOAM533JYBPtfBUQShf6lKubes6waMZgtUCWXskSCM/TnrgXSqhSGJ3Z
-        iAOm6HwWg68AJ2gf+ki2A58=
-X-Google-Smtp-Source: ABdhPJwJFPs73QBS6Z9LcgPajEZ8yhsB/CqsdXRVwU3900TXljo/1EJcdB6WG1/SfZUkU+Ji+PWrHA==
-X-Received: by 2002:a63:7882:: with SMTP id t124mr14673903pgc.149.1637284888100;
-        Thu, 18 Nov 2021 17:21:28 -0800 (PST)
-Received: from xzhoux.usersys.redhat.com ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id x33sm805475pfh.133.2021.11.18.17.21.25
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :mime-version:content-transfer-encoding;
+        bh=myqMq5JJldoxRnxPAx5ijKAxfMyvPLaQ6eIycx8Zmgk=;
+        b=n5hWpvvukCAU5I3/fSz4rjlZFYwa3EfNEvuGQ14L7+QlaZwiSJ9g59mMlxHCmOeEux
+         u5cUT6YC8WT3FuGLdj6GJV5mQJ9XFY8G+kP3uVmLRUstjXZKnMpt2yGH4drpZfWX9Rh8
+         vLf56dh5wY8L+8VtqZpESMLv4nz2Ef9PRb9n3aaH3qyViXhw734bkcS5T56x02mG3I28
+         WxOySvLMLfJhPTOUd2lwGLPxPcS5JfHWHEweArv2L0Sewzvjp1VcIW5Dy3LPt4V6AmiB
+         tb5mdRx73RWPl3jAGRIgdXFI//30tnX4uuTL/OUlsn6XV6GixqNPh6u03dDPptgAIvO0
+         UXXA==
+X-Gm-Message-State: AOAM530LGqFDibFROvnBIAe90b/QYRdQt/+Byp5P9TYuXAGtF7Y4A757
+        GoXKTYVlWLRsuF2ybADrEXc=
+X-Google-Smtp-Source: ABdhPJzNPjxngLb+dDQlFnMWApFKjPqCiA1IQlAG6qG6d76l84IaJcgU0H1pRsAJIlv9i4fw5ND5yA==
+X-Received: by 2002:adf:ee42:: with SMTP id w2mr11427228wro.7.1637356346511;
+        Fri, 19 Nov 2021 13:12:26 -0800 (PST)
+Received: from eldamar (80-218-24-251.dclient.hispeed.ch. [80.218.24.251])
+        by smtp.gmail.com with ESMTPSA id b11sm13070427wmj.35.2021.11.19.13.12.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Nov 2021 17:21:27 -0800 (PST)
-Date:   Fri, 19 Nov 2021 09:21:18 +0800
-From:   Murphy Zhou <jencce.kernel@gmail.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Steve French <smfrench@gmail.com>,
-        Murphy Zhou <jencce.kernel@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-mm <linux-mm@kvack.org>, CIFS <linux-cifs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-Subject: Re: [regression] mm, cifs panic
-Message-ID: <20211119012118.qh3awizpkuimlhrj@xzhoux.usersys.redhat.com>
-References: <20211118042914.wnffm3ytzmxjdubn@xzhoux.usersys.redhat.com>
- <CAH2r5mtW35HzmNDNxPXj1cKiEsyaz45_mcsQmWkTa_orOkS7ug@mail.gmail.com>
- <20211118133215.4b8168a062693b32442eb928@linux-foundation.org>
+        Fri, 19 Nov 2021 13:12:26 -0800 (PST)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+From:   Salvatore Bonaccorso <carnil@debian.org>
+To:     Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <sfrench@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Salvatore Bonaccorso <carnil@debian.org>
+Subject: [PATCH] docs: filesystem: cifs: ksmbd: Fix small layout issues
+Date:   Fri, 19 Nov 2021 22:12:14 +0100
+Message-Id: <20211119211214.2038038-1-carnil@debian.org>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211118133215.4b8168a062693b32442eb928@linux-foundation.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Nov 18, 2021 at 01:32:15PM -0800, Andrew Morton wrote:
-> On Thu, 18 Nov 2021 10:18:16 -0600 Steve French <smfrench@gmail.com> wrote:
-> 
-> > Andrew Morton had posted Matthew Wilcox's patch (to fix the recent
-> > regression in mm/swap.c) in email (on the 9th) to fs-devel titled:
-> > 
-> >        "+ hitting-bug_on-trap-in-read_pages-mm-optimise-put_pages_list.patch"
-> > 
-> > The patch was reviewed and verified (tested) to fix the problem but
-> > has not been merged into mainline.  Various xfstests break without
-> > this patch.
-> 
-> It's in my next batch of fixes to send to Linus.  Hopefully tomorrow.
+In some senteces there were missing spaces between words.
 
-Great! Thanks!
+Fix wording in item to show which prints are enabled and add a space
+beween the cat command and its argument.
 
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Steve French <sfrench@samba.org>
+CC: Hyunchul Lee <hyc.lee@gmail.com>
+Cc: linux-cifs@vger.kernel.org
+Signed-off-by: Salvatore Bonaccorso <carnil@debian.org>
+---
+ Documentation/filesystems/cifs/ksmbd.rst | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Documentation/filesystems/cifs/ksmbd.rst b/Documentation/filesystems/cifs/ksmbd.rst
+index a1326157d53f..b0d354fd8066 100644
+--- a/Documentation/filesystems/cifs/ksmbd.rst
++++ b/Documentation/filesystems/cifs/ksmbd.rst
+@@ -50,11 +50,11 @@ ksmbd.mountd (user space daemon)
+ --------------------------------
+ 
+ ksmbd.mountd is userspace process to, transfer user account and password that
+-are registered using ksmbd.adduser(part of utils for user space). Further it
++are registered using ksmbd.adduser (part of utils for user space). Further it
+ allows sharing information parameters that parsed from smb.conf to ksmbd in
+ kernel. For the execution part it has a daemon which is continuously running
+ and connected to the kernel interface using netlink socket, it waits for the
+-requests(dcerpc and share/user info). It handles RPC calls (at a minimum few
++requests (dcerpc and share/user info). It handles RPC calls (at a minimum few
+ dozen) that are most important for file server from NetShareEnum and
+ NetServerGetInfo. Complete DCE/RPC response is prepared from the user space
+ and passed over to the associated kernel thread for the client.
+@@ -154,11 +154,11 @@ Each layer
+ 1. Enable all component prints
+ 	# sudo ksmbd.control -d "all"
+ 
+-2. Enable one of components(smb, auth, vfs, oplock, ipc, conn, rdma)
++2. Enable one of components (smb, auth, vfs, oplock, ipc, conn, rdma)
+ 	# sudo ksmbd.control -d "smb"
+ 
+-3. Show what prints are enable.
+-	# cat/sys/class/ksmbd-control/debug
++3. Show what prints are enabled.
++	# cat /sys/class/ksmbd-control/debug
+ 	  [smb] auth vfs oplock ipc conn [rdma]
+ 
+ 4. Disable prints:
 -- 
-Murphy
+2.33.1
+
