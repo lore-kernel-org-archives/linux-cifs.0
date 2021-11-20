@@ -2,66 +2,60 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70DD2C433F5
-	for <linux-cifs@archiver.kernel.org>; Sat, 20 Nov 2021 01:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BACB9C433F5
+	for <linux-cifs@archiver.kernel.org>; Sat, 20 Nov 2021 19:20:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbhKTBMb (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 19 Nov 2021 20:12:31 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55870 "EHLO mail.kernel.org"
+        id S231298AbhKTTXY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 20 Nov 2021 14:23:24 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50290 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229523AbhKTBMa (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Fri, 19 Nov 2021 20:12:30 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1D80061B30;
-        Sat, 20 Nov 2021 01:09:28 +0000 (UTC)
+        id S231325AbhKTTXW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sat, 20 Nov 2021 14:23:22 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 35D3960E78;
+        Sat, 20 Nov 2021 19:20:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637370568;
-        bh=kJvDKwVsecZSZFCI1WaWAgRzPjk+pZ/KYYb2X6zEPtQ=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=QujDWoF9/Tpw8upwfM8D028xOPa5jf1h/b3Ij6SwPA+377CipbcDqNhrj097w0w3q
-         MGMV6dxvnsDvE+ZcXW3zmte+VPg1nb6WNY134tVp9jo4Ditoe0Ng15eI0v0wxMZf6S
-         4hkI/QpsdJq8lvRWmXq+YHXFcGgmbRngD+ZYlQTxW44+gWM7mWRhjmj+TooHlRN0Jx
-         PFvcLhxCQKkHzse5X3GqDLUafMI4peHkF6PkSbtIICYdf30tvvqgjw8/XyH+RhKOlc
-         VNd8sKt22lI2EMw4xHBDbUUa5TH64hfequnPuYqevNA2l5QDErO+m80L8vxJqRWuCq
-         0i0p21AUZkmKg==
-Received: by mail-ot1-f43.google.com with SMTP id v15-20020a9d604f000000b0056cdb373b82so19293675otj.7;
-        Fri, 19 Nov 2021 17:09:28 -0800 (PST)
-X-Gm-Message-State: AOAM5323FWaHDuGNBi93zBLNS0r7aOdHp2t8/lFsIrm+54v/43wBefKD
-        K+AFAdpAceU86pXOSm2F8CFkx3yoezgc9XiVL74=
-X-Google-Smtp-Source: ABdhPJwUbt4cjCIb3q7JNHQ5fGe0oM0aTtabh4KqjDS8VRDFBcpxTPvD707PBHyD2C/ZwLHjsZdfbTdfRhVG4rx+gVk=
-X-Received: by 2002:a9d:12b4:: with SMTP id g49mr5186525otg.232.1637370567459;
- Fri, 19 Nov 2021 17:09:27 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:ac9:4448:0:0:0:0:0 with HTTP; Fri, 19 Nov 2021 17:09:26
- -0800 (PST)
-In-Reply-To: <20211119211214.2038038-1-carnil@debian.org>
-References: <20211119211214.2038038-1-carnil@debian.org>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Sat, 20 Nov 2021 10:09:26 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8VdrCNuO_dt+A4x1QKeoV1wR2XzK_zFVCe6ENkQ15xsg@mail.gmail.com>
-Message-ID: <CAKYAXd8VdrCNuO_dt+A4x1QKeoV1wR2XzK_zFVCe6ENkQ15xsg@mail.gmail.com>
-Subject: Re: [PATCH] docs: filesystem: cifs: ksmbd: Fix small layout issues
-To:     Salvatore Bonaccorso <carnil@debian.org>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <sfrench@samba.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        s=k20201202; t=1637436019;
+        bh=ftEJNZ2QfKM3eLMFRijzFwpxU4lf8BYGKrwmGeb2Ukk=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=HxpGB6kvnkaOYD67uuSuNWWhDJZQRMV0IokfAeDIeFfdY1SXyksZX1oehB4BXjk3D
+         9NX03DBOQLEZ13BNwcYr5juG15YPeEaINm2g1N+H4qdLgze5XuKAj0SXJ//B+59n+y
+         XKCp6K5Vf3rFJcTJvq4kdn5jYg2k0MGJCoIPPZM34MFFL6QRxr1aWodEiE4jYSCdOP
+         gyrJQOVjpO/nAXRs/SdGuhufTwY3cNQ8xs/XLVlzGEBosuuTqhbS1H3/tgMDjvAoqO
+         FOgE7FJjYXCcc28PLxxnrNXQDR/dYeAluKanpx0ivZ378iH4D0vsDZ4Bq4vmSGOlUB
+         nSGaae5uCWYLg==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 30A42609B4;
+        Sat, 20 Nov 2021 19:20:19 +0000 (UTC)
+Subject: Re: [GIT PULL] cifs/smb3 fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mvH+e=5dxKsmnKVYttaQk=7u+KO0uucQ+z4fxH9RemwhQ@mail.gmail.com>
+References: <CAH2r5mvH+e=5dxKsmnKVYttaQk=7u+KO0uucQ+z4fxH9RemwhQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mvH+e=5dxKsmnKVYttaQk=7u+KO0uucQ+z4fxH9RemwhQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc1-smb3-fixes
+X-PR-Tracked-Commit-Id: 8ae87bbeb5d1bfd4ddf2f73f72be51d02d6be2eb
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b38bfc747cb48a3f73a196a11400f5094b887a56
+Message-Id: <163743601919.29153.18328651547749272907.pr-tracker-bot@kernel.org>
+Date:   Sat, 20 Nov 2021 19:20:19 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-11-20 6:12 GMT+09:00, Salvatore Bonaccorso <carnil@debian.org>:
-> In some senteces there were missing spaces between words.
->
-> Fix wording in item to show which prints are enabled and add a space
-> beween the cat command and its argument.
->
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-> Cc: Steve French <sfrench@samba.org>
-> CC: Hyunchul Lee <hyc.lee@gmail.com>
-> Cc: linux-cifs@vger.kernel.org
-> Signed-off-by: Salvatore Bonaccorso <carnil@debian.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+The pull request you sent on Fri, 19 Nov 2021 16:45:10 -0600:
 
-Thanks!
+> git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc1-smb3-fixes
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b38bfc747cb48a3f73a196a11400f5094b887a56
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
