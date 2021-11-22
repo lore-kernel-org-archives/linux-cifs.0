@@ -2,81 +2,118 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A0AC433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 22 Nov 2021 03:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D94C6C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Nov 2021 09:29:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232251AbhKVDyW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 21 Nov 2021 22:54:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44292 "EHLO
+        id S239181AbhKVJcN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 22 Nov 2021 04:32:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229862AbhKVDyV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Nov 2021 22:54:21 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB2BC061574
-        for <linux-cifs@vger.kernel.org>; Sun, 21 Nov 2021 19:51:15 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id z5so70842206edd.3
-        for <linux-cifs@vger.kernel.org>; Sun, 21 Nov 2021 19:51:15 -0800 (PST)
+        with ESMTP id S239094AbhKVJcM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 22 Nov 2021 04:32:12 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E000CC061714
+        for <linux-cifs@vger.kernel.org>; Mon, 22 Nov 2021 01:29:05 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id y12so73918697eda.12
+        for <linux-cifs@vger.kernel.org>; Mon, 22 Nov 2021 01:29:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=C/68/oGQLQ9zCrXtSOnerJe+nZWIYVdVUmHA2qPg/ss=;
-        b=FhQQ4xT4P6l213au6GucP4rBYcLdZyUGaCwjSA1OgnXYRTBp893CbSkNBt11OgMFVZ
-         6HHrXiDBDfypqoKCXHAjLPK4GtPJWSgW7A72Hi5GnjM5pJRH0OkznYjtrkSllup94uXK
-         tkY1dEDnXtpoF8gm7gAviHJk524a3x4hYiwMXusOaquHUoVQKHFj1Q3aKgXEzHY5xVN5
-         TM9M/HqnQ4Y2KJFlmwv+h+BksryyLUI7oQ+iGXGTRzBuIRfpP4UF1dbFMqr1yDsEP/nY
-         5Vstl4dYH/gB2g1Y/7bg1SQ89Ps3vBSjLUvdrEF1Tro37dBOaVsW/0i7ODfa0kw9eOmh
-         2paQ==
+        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=r1Nw/wamKqCxNQCPnHsnXRdnYd3/HL2OyNDY7VJGOGQ=;
+        b=cp+Y91MAiWYK/LJT2eNwpPdgG4aN11K3/6ExwiCyN5BScBWp5G1XWx+yyd5mXxYh+D
+         ZWxqkSC08SO4Pa4/SOmt00i66R77TBSQIu2KNajRjWIy1CW3DtQx3mhPTxVPivKqteg0
+         +GrIO4YkxmkjUu60sQqIqifh999jAgBP2cdaAfDyTIApu5EUFPouaDx/oLGH2MTZWAlU
+         PwYt72YHB8h2KcJqokcs7T48xph2S9genR8rE6R8tBsZHkdMKGIgLoEIweFBZo+jeuBJ
+         l1iRCwvArA25aeheq+UgPWvmzFejiNTKaQJQ9i/5py8ES1cEl65OlCQYP2Rvn3S4WCOY
+         7xcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=C/68/oGQLQ9zCrXtSOnerJe+nZWIYVdVUmHA2qPg/ss=;
-        b=iiAKGRXVMws+STy9EHUAqCzymMcGGbD8oOfqP4UkOCmabkEVVCoezR5oEFW426BMbt
-         KlA28a/qwPqgYnCt5watzpNspLn5RaclQQ2CmIV+V2w8GbWYLcmvBO2r0OSuo/IPn4OL
-         snvSCaOoljjOOjIB3AyojIEcfl9bywY3nj3o2ltg7hCmdP1sZRESYcVzBERXjtj9FmN6
-         t1v9MFLLW5QWE4I18ozlEVjoZrLhIS/aBXimyfHfCWE156w3hDmKeK2+v2ORBeKLp3Vp
-         uOBbCyA2XATgJvWMJQMfiWCaWElRqZM2LRcP5yKOGtcrGO+4P7D/Le0eocyc6b59OjW8
-         /C1g==
-X-Gm-Message-State: AOAM532AoDNDI87kB2XkxJzwsfYw4cB6R2G67aCwmrC27se7EdQWlpAT
-        rl6Ebsz2Sx7Od6i7j0Q7nPl6CIMtYLeZHKvHwR/G+fVZcV9KGg==
-X-Google-Smtp-Source: ABdhPJwemoLhxhKiCVNqPzx7RsqRBL/izWAMomYrdzIgrq5scSk3f33yWpnlEiPsmVXrQI/sBQAP8cXu5vg0ApzQvyA=
-X-Received: by 2002:aa7:d4c3:: with SMTP id t3mr59689154edr.268.1637553074267;
- Sun, 21 Nov 2021 19:51:14 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=r1Nw/wamKqCxNQCPnHsnXRdnYd3/HL2OyNDY7VJGOGQ=;
+        b=y/4E2GRz4vK/Z3oSpPo6O/utc/cTSiuzgeyD5GYs6jwWoDOk/PVbL5K5IuizCYdjSF
+         DzI214GGiCk+yCESMaLL4Q3u/qQRnk3m6UBblUfqS2gRwpXorSdHWEwu4o6P12yt3dCH
+         4Et1Ok8E5ZSKFjGRv7c8/pJb3XY9bdrUxMgIywutZuoIjUadVMA4aMOCA6rOSgiH0B+g
+         h55vQNOzYG3f7xj0GVOG3mc2lqDpIJWFcrlzo7K+DIcFeVr8F0LfkWp7fWg+/apGbQ76
+         PV5JUaY5AkdvgU4+JYXfXFuMo17oTX/BjUrOeJ4zFqUUaHtKVjEDKliiWqA+5AmFgIGQ
+         0f/g==
+X-Gm-Message-State: AOAM532t2WwYS0MM6TsVFARC3eEZK6cJMuP/01cE7XBSVV+UK+IV3uxG
+        /Yh+Pn2scSbjpb8E32I0plMfXjX4kH4AxJhmHemmZhctMvfGGLCK
+X-Google-Smtp-Source: ABdhPJyBWJAu/a2/6ed7/l/fykF6++Di1TIVbMs5/G+1yH6Cwu9HJPYjdhLy2P9gImfhABkkkGkKT73BhaA2w5iWeDU=
+X-Received: by 2002:a05:6402:2930:: with SMTP id ee48mr64642011edb.295.1637573344479;
+ Mon, 22 Nov 2021 01:29:04 -0800 (PST)
 MIME-Version: 1.0
-References: <CANT5p=rw6OqPgPcgRQRk-ujM43x7j_Rw7c97z6Lk4Tpb=vL1VQ@mail.gmail.com>
-In-Reply-To: <CANT5p=rw6OqPgPcgRQRk-ujM43x7j_Rw7c97z6Lk4Tpb=vL1VQ@mail.gmail.com>
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Mon, 22 Nov 2021 09:21:03 +0530
-Message-ID: <CANT5p=ojh1OjgJ-285Xh6PCG4EEmF1SJqPQ7J775PeDmkBQCaA@mail.gmail.com>
-Subject: Re: [PATCH] cifs: nosharesock should not share socket with future sessions
-To:     Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
-        rohiths msft <rohiths.msft@gmail.com>,
-        Enzo Matsumiya <ematsumiya@suse.de>,
-        CIFS <linux-cifs@vger.kernel.org>
+References: <20211121114009.6039-1-linkinjeon@kernel.org>
+In-Reply-To: <20211121114009.6039-1-linkinjeon@kernel.org>
+From:   Marios Makassikis <mmakassikis@freebox.fr>
+Date:   Mon, 22 Nov 2021 10:28:53 +0100
+Message-ID: <CAF6XXKWr0w5hsKgs2QLh+W9=+T2xK_OkNM7_cBjKFSpLfN_V4w@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd-tools: fix file transfer stuck at 99%
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        Olha Cherevyk <olha.cherevyk@gmail.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, Nov 6, 2021 at 5:25 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+On Sun, Nov 21, 2021 at 12:40 PM Namjae Jeon <linkinjeon@kernel.org> wrote:
 >
-> Hi Steve,
+> When user set share name included upper character in smb.conf,
+> Windows File transfer will stuck at 99%. When copying file, windows send
+> SRVSVC GET_SHARE_INFO command to ksmbd server. but ksmbd store after
+> converting share name from smb.conf to lower cases. So ksmbd.mountd
+> can't not find share and return error to windows client.
+> This patch find share using name converted share name from client to
+> lower cases.
 >
-> Please consider this fix for CC stable. This will be important for
-> Azure workloads.
+> Reported-by: Olha Cherevyk <olha.cherevyk@gmail.com>
+> Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  mountd/rpc_srvsvc.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 >
-> https://github.com/sprasad-microsoft/smb3-kernel-client/commit/8f7a939555d6df2255b89d403ba5a30218852568.patch
+> diff --git a/mountd/rpc_srvsvc.c b/mountd/rpc_srvsvc.c
+> index 8608b2e..f3b4d06 100644
+> --- a/mountd/rpc_srvsvc.c
+> +++ b/mountd/rpc_srvsvc.c
+> @@ -169,8 +169,11 @@ static int srvsvc_share_get_info_invoke(struct ksmbd_rpc_pipe *pipe,
+>  {
+>         struct ksmbd_share *share;
+>         int ret;
+> +       gchar *share_name;
 >
+> -       share = shm_lookup_share(STR_VAL(hdr->share_name));
+> +       share_name = g_ascii_strdown(STR_VAL(hdr->share_name),
+> +                       strlen(STR_VAL(hdr->share_name)));
+> +       share = shm_lookup_share(share_name);
+>         if (!share)
+>                 return 0;
+>
+> @@ -188,9 +191,12 @@ static int srvsvc_share_get_info_invoke(struct ksmbd_rpc_pipe *pipe,
+>         }
+>
+>         if (ret != 0) {
+> +               gchar *server_name = g_ascii_strdown(STR_VAL(hdr->server_name),
+> +                               strlen(STR_VAL(hdr->server_name)));
+> +
+>                 ret = shm_lookup_hosts_map(share,
+>                                            KSMBD_SHARE_HOSTS_DENY_MAP,
+> -                                          STR_VAL(hdr->server_name));
+> +                                          server_name);
+>                 if (ret == 0) {
+>                         put_ksmbd_share(share);
+>                         return 0;
 > --
-> Regards,
-> Shyam
+> 2.25.1
+>
 
-Hi Steve,
+Awesome work tracking this down. This raises a question though: why is
+ksmbd.mountd
+converting share names to lowercase to begin with ?
 
-The above patch had a bug, which showed up for multichannel scenario.
-Fixed with this patch:
-https://github.com/sprasad-microsoft/smb3-kernel-client/commit/6be89071827998bfa6c714aea64f39966cc54b0b.patch
-
--- 
-Regards,
-Shyam
+I checked samba, and the share name sent back to the client has the same case as
+defined in smb.conf.
