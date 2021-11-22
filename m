@@ -2,119 +2,81 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CBF7C433F5
-	for <linux-cifs@archiver.kernel.org>; Sun, 21 Nov 2021 11:43:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A0AC433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 22 Nov 2021 03:51:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238161AbhKULqy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 21 Nov 2021 06:46:54 -0500
-Received: from mail-pl1-f175.google.com ([209.85.214.175]:45645 "EHLO
-        mail-pl1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237933AbhKULqy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Nov 2021 06:46:54 -0500
-Received: by mail-pl1-f175.google.com with SMTP id b11so11666346pld.12;
-        Sun, 21 Nov 2021 03:43:49 -0800 (PST)
+        id S232251AbhKVDyW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 21 Nov 2021 22:54:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44292 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229862AbhKVDyV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 21 Nov 2021 22:54:21 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB2BC061574
+        for <linux-cifs@vger.kernel.org>; Sun, 21 Nov 2021 19:51:15 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id z5so70842206edd.3
+        for <linux-cifs@vger.kernel.org>; Sun, 21 Nov 2021 19:51:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=C/68/oGQLQ9zCrXtSOnerJe+nZWIYVdVUmHA2qPg/ss=;
+        b=FhQQ4xT4P6l213au6GucP4rBYcLdZyUGaCwjSA1OgnXYRTBp893CbSkNBt11OgMFVZ
+         6HHrXiDBDfypqoKCXHAjLPK4GtPJWSgW7A72Hi5GnjM5pJRH0OkznYjtrkSllup94uXK
+         tkY1dEDnXtpoF8gm7gAviHJk524a3x4hYiwMXusOaquHUoVQKHFj1Q3aKgXEzHY5xVN5
+         TM9M/HqnQ4Y2KJFlmwv+h+BksryyLUI7oQ+iGXGTRzBuIRfpP4UF1dbFMqr1yDsEP/nY
+         5Vstl4dYH/gB2g1Y/7bg1SQ89Ps3vBSjLUvdrEF1Tro37dBOaVsW/0i7ODfa0kw9eOmh
+         2paQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=pJfPYBJyfkcBnBGdY7sChz7Sol37Z/WHAjh3mHtNWsM=;
-        b=jxuKFpbJhM7N7O4tFrM40ZxRg4Q8+aNvDHjIXhMiUwv2AgpBAbyK+8Y/kRkSSCu9/1
-         JTKuZkf5QKy8eXh2x59G6TsnbEtLhyO8lcGZrCX1dWrg1FCEBh+8KGZ4W9OwVzavGTTU
-         6T5vLL55O1H8/LXIdW95YoVhKG+6P7tof57jMUng+7+KoqXlQQfwiJM5HRj5iUvLRK1c
-         H3VD+DoOkc2lWiq2iwAgTexb5Qhr6KGUTNGOkQ92fATEPmddGJfzU/JnIVVT35mlqOz8
-         7EG1ASfdIgbxc9BWhQT/jA97aBBS9JY+3KxOU6PoraTLBSqbBpws7MYNS/wLFivDO3xi
-         DrUg==
-X-Gm-Message-State: AOAM530FyEk1+h+/yMYzA1hvPTiip8ntpuzNm4Ajh1KvMK9Wy10MtSOd
-        wT4Vrun0LrOHrhMc++ea9kHsMtHU/e4=
-X-Google-Smtp-Source: ABdhPJzuL/07kOaznyGgUXoKDxfOiFuscj8ySJkwRM7sTDd25UU1Hya/aMBagjM40rDlROUwg6qusw==
-X-Received: by 2002:a17:90b:94:: with SMTP id bb20mr20095116pjb.210.1637495029402;
-        Sun, 21 Nov 2021 03:43:49 -0800 (PST)
-Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id s2sm5721266pfg.124.2021.11.21.03.43.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Nov 2021 03:43:49 -0800 (PST)
-From:   Namjae Jeon <linkinjeon@kernel.org>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>, stable@vger.kernel.org
-Subject: [PATCH 2/2] ksmbd: contain default data stream even if xattr is empty
-Date:   Sun, 21 Nov 2021 20:43:33 +0900
-Message-Id: <20211121114333.6179-2-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211121114333.6179-1-linkinjeon@kernel.org>
-References: <20211121114333.6179-1-linkinjeon@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=C/68/oGQLQ9zCrXtSOnerJe+nZWIYVdVUmHA2qPg/ss=;
+        b=iiAKGRXVMws+STy9EHUAqCzymMcGGbD8oOfqP4UkOCmabkEVVCoezR5oEFW426BMbt
+         KlA28a/qwPqgYnCt5watzpNspLn5RaclQQ2CmIV+V2w8GbWYLcmvBO2r0OSuo/IPn4OL
+         snvSCaOoljjOOjIB3AyojIEcfl9bywY3nj3o2ltg7hCmdP1sZRESYcVzBERXjtj9FmN6
+         t1v9MFLLW5QWE4I18ozlEVjoZrLhIS/aBXimyfHfCWE156w3hDmKeK2+v2ORBeKLp3Vp
+         uOBbCyA2XATgJvWMJQMfiWCaWElRqZM2LRcP5yKOGtcrGO+4P7D/Le0eocyc6b59OjW8
+         /C1g==
+X-Gm-Message-State: AOAM532AoDNDI87kB2XkxJzwsfYw4cB6R2G67aCwmrC27se7EdQWlpAT
+        rl6Ebsz2Sx7Od6i7j0Q7nPl6CIMtYLeZHKvHwR/G+fVZcV9KGg==
+X-Google-Smtp-Source: ABdhPJwemoLhxhKiCVNqPzx7RsqRBL/izWAMomYrdzIgrq5scSk3f33yWpnlEiPsmVXrQI/sBQAP8cXu5vg0ApzQvyA=
+X-Received: by 2002:aa7:d4c3:: with SMTP id t3mr59689154edr.268.1637553074267;
+ Sun, 21 Nov 2021 19:51:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CANT5p=rw6OqPgPcgRQRk-ujM43x7j_Rw7c97z6Lk4Tpb=vL1VQ@mail.gmail.com>
+In-Reply-To: <CANT5p=rw6OqPgPcgRQRk-ujM43x7j_Rw7c97z6Lk4Tpb=vL1VQ@mail.gmail.com>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Mon, 22 Nov 2021 09:21:03 +0530
+Message-ID: <CANT5p=ojh1OjgJ-285Xh6PCG4EEmF1SJqPQ7J775PeDmkBQCaA@mail.gmail.com>
+Subject: Re: [PATCH] cifs: nosharesock should not share socket with future sessions
+To:     Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
+        rohiths msft <rohiths.msft@gmail.com>,
+        Enzo Matsumiya <ematsumiya@suse.de>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-If xattr is not supported like exfat or fat, ksmbd server doesn't
-contain default data stream in FILE_STREAM_INFORMATION response. It will
-cause ppt or doc file update issue if local filesystem is such as ones.
-This patch move goto statement to contain it.
+On Sat, Nov 6, 2021 at 5:25 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+>
+> Hi Steve,
+>
+> Please consider this fix for CC stable. This will be important for
+> Azure workloads.
+>
+> https://github.com/sprasad-microsoft/smb3-kernel-client/commit/8f7a939555d6df2255b89d403ba5a30218852568.patch
+>
+> --
+> Regards,
+> Shyam
 
-Fixes: 9f6323311c70 ("ksmbd: add default data stream name in FILE_STREAM_INFORMATION")
-Cc: stable@vger.kernel.org # v5.15
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/ksmbd/smb2pdu.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Hi Steve,
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index 82954b2b8d31..2067d5bab1b0 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -4457,6 +4457,12 @@ static void get_file_stream_info(struct ksmbd_work *work,
- 			 &stat);
- 	file_info = (struct smb2_file_stream_info *)rsp->Buffer;
- 
-+	buf_free_len =
-+		smb2_calc_max_out_buf_len(work, 8,
-+					  le32_to_cpu(req->OutputBufferLength));
-+	if (buf_free_len < 0)
-+		goto out;
-+
- 	xattr_list_len = ksmbd_vfs_listxattr(path->dentry, &xattr_list);
- 	if (xattr_list_len < 0) {
- 		goto out;
-@@ -4465,12 +4471,6 @@ static void get_file_stream_info(struct ksmbd_work *work,
- 		goto out;
- 	}
- 
--	buf_free_len =
--		smb2_calc_max_out_buf_len(work, 8,
--					  le32_to_cpu(req->OutputBufferLength));
--	if (buf_free_len < 0)
--		goto out;
--
- 	while (idx < xattr_list_len) {
- 		stream_name = xattr_list + idx;
- 		streamlen = strlen(stream_name);
-@@ -4514,6 +4514,7 @@ static void get_file_stream_info(struct ksmbd_work *work,
- 		file_info->NextEntryOffset = cpu_to_le32(next);
- 	}
- 
-+out:
- 	if (!S_ISDIR(stat.mode) &&
- 	    buf_free_len >= sizeof(struct smb2_file_stream_info) + 7 * 2) {
- 		file_info = (struct smb2_file_stream_info *)
-@@ -4522,14 +4523,13 @@ static void get_file_stream_info(struct ksmbd_work *work,
- 					      "::$DATA", 7, conn->local_nls, 0);
- 		streamlen *= 2;
- 		file_info->StreamNameLength = cpu_to_le32(streamlen);
--		file_info->StreamSize = 0;
--		file_info->StreamAllocationSize = 0;
-+		file_info->StreamSize = cpu_to_le64(stat.size);
-+		file_info->StreamAllocationSize = cpu_to_le64(stat.blocks << 9);
- 		nbytes += sizeof(struct smb2_file_stream_info) + streamlen;
- 	}
- 
- 	/* last entry offset should be 0 */
- 	file_info->NextEntryOffset = 0;
--out:
- 	kvfree(xattr_list);
- 
- 	rsp->OutputBufferLength = cpu_to_le32(nbytes);
+The above patch had a bug, which showed up for multichannel scenario.
+Fixed with this patch:
+https://github.com/sprasad-microsoft/smb3-kernel-client/commit/6be89071827998bfa6c714aea64f39966cc54b0b.patch
+
 -- 
-2.25.1
-
+Regards,
+Shyam
