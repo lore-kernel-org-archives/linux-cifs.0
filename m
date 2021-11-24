@@ -2,58 +2,77 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62DD0C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 24 Nov 2021 00:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70628C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 24 Nov 2021 01:45:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233846AbhKXAbW (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 23 Nov 2021 19:31:22 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54838 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239746AbhKXAbW (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 23 Nov 2021 19:31:22 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 573AB60240
-        for <linux-cifs@vger.kernel.org>; Wed, 24 Nov 2021 00:28:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637713693;
-        bh=2USpfCXgZhdtlWOxtsBJks70U8VVDTMSqwUUVzI2D6U=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=Jor4tYsFlkIPILrvwxbPv2KQsSbzqsoLwNaQsATpFlwELgTRhVCbN+eqqbjvD9fmC
-         /5sto+aoUDQwSha7j54OjSo27rK1T6/4nc9COWHZGrfxNQ5LQmRW6X7014LS+yf3rw
-         O/lM4iFWGoHpgDc3gHhKA16Io0JC50UerWwhus4S8qS294u7VxDuVcoJn8Bo3oztmP
-         LldBkWvaim0mbgH81jisC6IV5xZKpRZvK30cIMVcOy7IhRcJP/TKyBabNbbqTT0oGM
-         fytpZqxvKlB/7oqRUpM3tdMHrOXwu6LQmQDRW/BuV17qTIGUus+eB16uGKiyt7lXTt
-         9wvv7c2BjRXOw==
-Received: by mail-ot1-f53.google.com with SMTP id 35-20020a9d08a6000000b00579cd5e605eso1565202otf.0
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Nov 2021 16:28:13 -0800 (PST)
-X-Gm-Message-State: AOAM532vU1H1i5kLbGwnWA7v69ZXXqaKfL+j8D935QcRk74AW5A7dxbU
-        55Iupm7uHY5Qs3EuhloaMFBIy0TEAJp1LkX20rY=
-X-Google-Smtp-Source: ABdhPJxPL1mSSESu8C0mC4kJ4SEWkzXlaOK2GsbURGrFN1ZoXzzkCpA8PzJ5HdZLV8tzJtDmWYb16mhMA6DdBFnD460=
-X-Received: by 2002:a9d:12b4:: with SMTP id g49mr8700332otg.232.1637713692713;
- Tue, 23 Nov 2021 16:28:12 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:ac9:428a:0:0:0:0:0 with HTTP; Tue, 23 Nov 2021 16:28:12
- -0800 (PST)
-In-Reply-To: <20211123021013.32566-1-hyc.lee@gmail.com>
-References: <20211123021013.32566-1-hyc.lee@gmail.com>
+        id S235991AbhKXBss (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 23 Nov 2021 20:48:48 -0500
+Received: from mail-pg1-f174.google.com ([209.85.215.174]:37482 "EHLO
+        mail-pg1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236317AbhKXBss (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 23 Nov 2021 20:48:48 -0500
+Received: by mail-pg1-f174.google.com with SMTP id 71so668447pgb.4;
+        Tue, 23 Nov 2021 17:45:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ohTgjHlzbGc0VJOUJWLdSdqVRKqE+ASflNlxV1obW+g=;
+        b=wyanNoXq3+QZ0VxZK8zvizJ7j/i/PHAPdzFat/K9QcOaQqJJe3IJOT4mwltomxHK2J
+         FBb+q8Ui7GiiuZmBJvjcbERPPdgR0c6Lj2/TgjFOWuh1IUy5Um4k6VZlJgTktYhGqQgG
+         Js1CNg9ZHtHHoocnZF/PcUmwC84ve08XwjBI+xsehxuxup80K1wwM1kRVaMrtkQPsPzy
+         AwqTLgYvpBGlu7YCPFkGekHIcg1T21ioW0P4Fg/6dytAAMgv2V3kBC+sYJ/83sILsP4f
+         4wSF1ZawVpEe3UXD/OyJbv74B5UoTQ7I/n9AtraAoVNDx0MBb5oTSyoxJv0MVeKXxp/i
+         9qGw==
+X-Gm-Message-State: AOAM530W1EtWJ5Xrz2rr8b3TJh/aPYpN3ibXev1T9xnnPbOuFPzH1y4s
+        Yqb+9qbMnB3RNCPquaJqPAGTTpQaXYQ=
+X-Google-Smtp-Source: ABdhPJznKzDL1pqEw661Gr/VfpJnu5toV9LVduER40jpyI5bSOMKtxquNc7JW6sABFeceNhNWgBJzw==
+X-Received: by 2002:a63:f702:: with SMTP id x2mr7151804pgh.162.1637718338755;
+        Tue, 23 Nov 2021 17:45:38 -0800 (PST)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id nv12sm2687733pjb.49.2021.11.23.17.45.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Nov 2021 17:45:38 -0800 (PST)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 24 Nov 2021 09:28:12 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_FPQ8bZJQaFs=Oj3NLZ6wyzJHbd6E-ACqxydaQdiGP+A@mail.gmail.com>
-Message-ID: <CAKYAXd_FPQ8bZJQaFs=Oj3NLZ6wyzJHbd6E-ACqxydaQdiGP+A@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: use oid registry functions to decode OIDs
-To:     Hyunchul Lee <hyc.lee@gmail.com>
-Cc:     linux-cifs@vger.kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>, stable@vger.kernel.org,
+        Coverity Scan <scan-admin@coverity.com>
+Subject: [PATCH] ksmbd: fix memleak in get_file_stream_info()
+Date:   Wed, 24 Nov 2021 10:45:11 +0900
+Message-Id: <20211124014511.12510-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-11-23 11:10 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> Use look_up_OID to decode OIDs rather than
-> implementing functions.
->
-> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Fix memleak in get_file_stream_info()
 
-Thanks!
+Fixes: 34061d6b76a4 ("ksmbd: validate OutputBufferLength of QUERY_DIR, QUERY_INFO, IOCTL requests")
+Cc: stable@vger.kernel.org # v5.15
+Reported-by: Coverity Scan <scan-admin@coverity.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/smb2pdu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 2067d5bab1b0..c70972b49da8 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -4496,8 +4496,10 @@ static void get_file_stream_info(struct ksmbd_work *work,
+ 				     ":%s", &stream_name[XATTR_NAME_STREAM_LEN]);
+ 
+ 		next = sizeof(struct smb2_file_stream_info) + streamlen * 2;
+-		if (next > buf_free_len)
++		if (next > buf_free_len) {
++			kfree(stream_buf);
+ 			break;
++		}
+ 
+ 		file_info = (struct smb2_file_stream_info *)&rsp->Buffer[nbytes];
+ 		streamlen  = smbConvertToUTF16((__le16 *)file_info->StreamName,
+-- 
+2.25.1
+
