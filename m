@@ -2,134 +2,98 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A09DC433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 26 Nov 2021 02:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A748DC433FE
+	for <linux-cifs@archiver.kernel.org>; Sat, 27 Nov 2021 21:45:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357828AbhKZCgL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 25 Nov 2021 21:36:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47490 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1357681AbhKZCeK (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 25 Nov 2021 21:34:10 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 514D1611B0;
-        Fri, 26 Nov 2021 02:30:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637893846;
-        bh=QAD3ptvlGC+BvA30Vstdp30URlCY8G9HzYf9jhFi2Nw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=p8UHzpGP9E18+78DwxPevR8DfyFrfr5EgpB1oyKIIlTVLpKBf9ys14e5F2bsfbwdK
-         SjvvSrBsM4xJ5jHfeaLRZ2l2I2Snw8NL0Sra2bTTO8v/YCMrvZeQUe9+IESjx8xQ+p
-         J/xQ0VbyeIxxHzKpCToWYkqGmLBlMbfjg2ZkAFw+GxkNR6i8FCgsWEJNXa66QIgJvp
-         hzrVZyXJptbDbLN1Vy8j3wrs7QCCYY3J70lHlUpGBLHT3zG7R4kuv+vTCGv4HDeLoM
-         cP2RCpP8dEUooppHuTC6jq0XAgWL3g3SgIb8vAhgMqGUSVSMx/pZY0phWshW1lXvum
-         aa2UuY2JpfJyQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Steve French <stfrench@microsoft.com>,
-        Julian Sikorski <belegdol@gmail.com>,
-        Jeremy Allison <jra@samba.org>, Paulo Alcantara <pc@cjr.nz>,
-        Sasha Levin <sashal@kernel.org>, sfrench@samba.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 2/2] smb3: do not error on fsync when readonly
-Date:   Thu, 25 Nov 2021 21:30:42 -0500
-Message-Id: <20211126023042.441107-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211126023042.441107-1-sashal@kernel.org>
-References: <20211126023042.441107-1-sashal@kernel.org>
+        id S229723AbhK0Vsl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 27 Nov 2021 16:48:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46540 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236029AbhK0Vql (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 27 Nov 2021 16:46:41 -0500
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F218CC06173E;
+        Sat, 27 Nov 2021 13:43:25 -0800 (PST)
+Received: by mail-lj1-x22a.google.com with SMTP id z8so26217158ljz.9;
+        Sat, 27 Nov 2021 13:43:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=bml/NFEGd+kn2xT1YP9f+ZlUupFkhTxDiEEx32jkgxE=;
+        b=JOqkRW43e6TcCGAPFLnBkSQdIfssD9Azf6og3dR9yvmXAI3gVxvJEepM0UnPcx119s
+         riYuSjToPNg7lD+NTORkQvucIx3Mpnlky/1tOq19Dso2IHIIiWZkx3I/1liUE/XRuccm
+         JtyCvC1z7J78qLsgcDqiIXpTOTlDHU94Pf3EtmjN1suTMUeq+ovf1gAcsKqLbZ1wBKsQ
+         1Rpiqt4uOseKaWhdVRdkwoRHu8CXIvQk59W+w1w24S8lKUSytzgDGkQa3B4jvPh+FqNj
+         2NKcto9+cj1sQrmhSR+FfUxQusI+rs+HNyuh6qrN7YC2OBkiToOO3apWsvygNxXYRV0Z
+         6PVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=bml/NFEGd+kn2xT1YP9f+ZlUupFkhTxDiEEx32jkgxE=;
+        b=EiXjcq6hnfOS7922mRGC6H5GCa8OQPxRGi2pRq+XrFXsGu7m8EDtq+57HpRT2u2XPa
+         BdFuU/UwXy8xBon2SUvme8Sm95qhEriYpFfx25yxB9TFrFWErWEssKujZp6g8pBbsmtH
+         t5EO8FuMjJ/v5SUXRAxVPfDUMkhrEIQHqbHuLO7SIvvlYIAHYUTYTUbsiPsQNIiJvbET
+         48K+D9DR8weN51j9x7yAZWwIre/jbQhmtt6VAe+qNWBkHAgGMiFLheVVN09gPfYaRFxi
+         cMqE5L80oRozlEHS+K8Jvt24UDRuk1mG9hb3VPzsyjtyAamcG6Cag63Z7N28ftESKenM
+         5pBg==
+X-Gm-Message-State: AOAM533PxTw0PekzVmtj4rfv8NI5OwbAKeQaNt8G6kqQB4LlHJviZTje
+        haHxclqdT+J7Bn/JWGLVTrm59COp/0in3gV6oMmYsQVdSAI=
+X-Google-Smtp-Source: ABdhPJysnOc964BpO4TupD4dIS0Ool7Gb54XEmp+KMn4jhq00tT7dD+BK4WxxdgF1RtX0iVIVeV4tCSZyBSPMreER1I=
+X-Received: by 2002:a2e:7c16:: with SMTP id x22mr40218388ljc.460.1638049403985;
+ Sat, 27 Nov 2021 13:43:23 -0800 (PST)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 27 Nov 2021 15:43:13 -0600
+Message-ID: <CAH2r5muqy=YYFYkgZFenPSx0WexNmnp6GYL0qHP2hbyHA--Ckw@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Namjae Jeon <linkinjeon@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Steve French <stfrench@microsoft.com>
+Please pull the following changes since commit
+136057256686de39cc3a07c2e39ef6bc43003ff6:
 
-[ Upstream commit 71e6864eacbef0b2645ca043cdfbac272cb6cea3 ]
+  Linux 5.16-rc2 (2021-11-21 13:47:39 -0800)
 
-Linux allows doing a flush/fsync on a file open for read-only,
-but the protocol does not allow that.  If the file passed in
-on the flush is read-only try to find a writeable handle for
-the same inode, if that is not possible skip sending the
-fsync call to the server to avoid breaking the apps.
+are available in the Git repository at:
 
-Reported-by: Julian Sikorski <belegdol@gmail.com>
-Tested-by: Julian Sikorski <belegdol@gmail.com>
-Suggested-by: Jeremy Allison <jra@samba.org>
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/cifs/file.c | 35 +++++++++++++++++++++++++++++------
- 1 file changed, 29 insertions(+), 6 deletions(-)
+  git://git.samba.org/ksmbd.git tags/5.16-rc2-ksmbd-fixes
 
-diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-index a9746af5a44db..03c85beecec10 100644
---- a/fs/cifs/file.c
-+++ b/fs/cifs/file.c
-@@ -2577,12 +2577,23 @@ int cifs_strict_fsync(struct file *file, loff_t start, loff_t end,
- 	tcon = tlink_tcon(smbfile->tlink);
- 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC)) {
- 		server = tcon->ses->server;
--		if (server->ops->flush)
--			rc = server->ops->flush(xid, tcon, &smbfile->fid);
--		else
-+		if (server->ops->flush == NULL) {
- 			rc = -ENOSYS;
-+			goto strict_fsync_exit;
-+		}
-+
-+		if ((OPEN_FMODE(smbfile->f_flags) & FMODE_WRITE) == 0) {
-+			smbfile = find_writable_file(CIFS_I(inode), FIND_WR_ANY);
-+			if (smbfile) {
-+				rc = server->ops->flush(xid, tcon, &smbfile->fid);
-+				cifsFileInfo_put(smbfile);
-+			} else
-+				cifs_dbg(FYI, "ignore fsync for file not open for write\n");
-+		} else
-+			rc = server->ops->flush(xid, tcon, &smbfile->fid);
- 	}
- 
-+strict_fsync_exit:
- 	free_xid(xid);
- 	return rc;
- }
-@@ -2594,6 +2605,7 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
- 	struct cifs_tcon *tcon;
- 	struct TCP_Server_Info *server;
- 	struct cifsFileInfo *smbfile = file->private_data;
-+	struct inode *inode = file_inode(file);
- 	struct cifs_sb_info *cifs_sb = CIFS_FILE_SB(file);
- 
- 	rc = file_write_and_wait_range(file, start, end);
-@@ -2608,12 +2620,23 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
- 	tcon = tlink_tcon(smbfile->tlink);
- 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NOSSYNC)) {
- 		server = tcon->ses->server;
--		if (server->ops->flush)
--			rc = server->ops->flush(xid, tcon, &smbfile->fid);
--		else
-+		if (server->ops->flush == NULL) {
- 			rc = -ENOSYS;
-+			goto fsync_exit;
-+		}
-+
-+		if ((OPEN_FMODE(smbfile->f_flags) & FMODE_WRITE) == 0) {
-+			smbfile = find_writable_file(CIFS_I(inode), FIND_WR_ANY);
-+			if (smbfile) {
-+				rc = server->ops->flush(xid, tcon, &smbfile->fid);
-+				cifsFileInfo_put(smbfile);
-+			} else
-+				cifs_dbg(FYI, "ignore fsync for file not open for write\n");
-+		} else
-+			rc = server->ops->flush(xid, tcon, &smbfile->fid);
- 	}
- 
-+fsync_exit:
- 	free_xid(xid);
- 	return rc;
- }
+for you to fetch changes up to 178ca6f85aa3231094467691f5ea1ff2f398aa8d:
+
+  ksmbd: fix memleak in get_file_stream_info() (2021-11-25 00:09:26 -0600)
+
+----------------------------------------------------------------
+5 ksmbd server fixes, 4 for stable
+- memleak fix
+- fix for default data stream on fs that don't support xattr
+- error logging fix
+- session setup fix
+- minor doc cleanup
+
+Regression test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/96
+----------------------------------------------------------------
+Christophe JAILLET (1):
+      ksmbd: Fix an error handling path in 'smb2_sess_setup()'
+
+Namjae Jeon (3):
+      ksmbd: downgrade addition info error msg to debug in smb2_get_info_sec()
+      ksmbd: contain default data stream even if xattr is empty
+      ksmbd: fix memleak in get_file_stream_info()
+
+Salvatore Bonaccorso (1):
+      docs: filesystem: cifs: ksmbd: Fix small layout issues
+
+ Documentation/filesystems/cifs/ksmbd.rst | 10 +++++-----
+ fs/ksmbd/smb2pdu.c                       | 30 +++++++++++++++++-------------
+
 -- 
-2.33.0
+Thanks,
 
+Steve
