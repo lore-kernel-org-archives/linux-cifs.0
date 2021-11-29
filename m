@@ -2,93 +2,152 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5647C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Nov 2021 19:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACACC433FE
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Nov 2021 20:09:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351923AbhK2Tpn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Nov 2021 14:45:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49970 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239907AbhK2Tnk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 29 Nov 2021 14:43:40 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F736C0698C0;
-        Mon, 29 Nov 2021 08:01:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D60E61536;
-        Mon, 29 Nov 2021 16:01:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4EDCC53FCB;
-        Mon, 29 Nov 2021 16:01:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638201689;
-        bh=Kv6MBJXYeHo0IxkIpDY6gwYHS2TLFxXrBu9ZJWu8kyc=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=HIUMWJn5i/ZkPEx2uv6ITIpHeBvPAEUJfIJWXd9m0bj0hSSR5mEDTX3OqcLtzzV1A
-         VGyL4y2zK5MTat1iGPwpQ4bylq9ZcdfIblhCGEJt8EDu7Vwci/CWwM6/qZqrK8Bxfc
-         jLKw2VgdNKPfMIp0PpkNcd4fnBnxdALIdbBoGNn8wKQRp0BuGtCQc8tSbIjo8FAecg
-         plAAemFtuTDREl7q+APVmry/1jfQTJPC5UIFUHa4Hnmkc0Oc0QLx+3tEiVA65tbBsa
-         9bNfCX/dSo3ieKAm9Kle4XQIul8QjWQYAftLs6WQlGUqHI9tLv/XM+3dOBuDbgRh0H
-         ZZkEN9ot/hNxA==
-Message-ID: <0e6e66f7368621128a810bb604eab229dd279187.camel@kernel.org>
-Subject: Re: Commit f980d055a0f858d73d9467bb0b570721bbfcdfb8 causes a
- regression
-From:   Jeff Layton <jlayton@kernel.org>
-To:     Tim Gardner <tim.gardner@canonical.com>, len.baker@gmx.com
-Cc:     pc@cjr.nz, stfrench@microsoft.com,
-        Kamal Mostafa <Kamal.Mostafa@canonical.com>,
-        linux-cifs@vger.kernel.org,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>, stable@vger.kernel.org
-Date:   Mon, 29 Nov 2021 11:01:27 -0500
-In-Reply-To: <a8b2287b-c459-2169-fbf4-31f3065e0897@canonical.com>
-References: <a8b2287b-c459-2169-fbf4-31f3065e0897@canonical.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.42.1 (3.42.1-1.fc35) 
+        id S234318AbhK2UNN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Nov 2021 15:13:13 -0500
+Received: from sdc-v-sdnmail1-ext.epnet.com ([140.234.254.212]:60662 "EHLO
+        sdc-v-sdnmail1-ext.epnet.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232577AbhK2ULM (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 29 Nov 2021 15:11:12 -0500
+X-Greylist: delayed 303 seconds by postgrey-1.27 at vger.kernel.org; Mon, 29 Nov 2021 15:11:12 EST
+Received: from sdc-epwebmail1 (sdc-v-epwebmail1.epnet.com [10.83.102.226])
+        by sdc-v-sdnmail1-ext.epnet.com (8.14.7/8.14.7/EIS8.14) with ESMTP id 1ATJujS9015735;
+        Mon, 29 Nov 2021 15:05:42 -0500
+Message-Id: <202111292005.1ATJujS9015735@sdc-v-sdnmail1-ext.epnet.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Sender: ephost@ebsco.com
+From:   support@ebsco.com
+To:     info@soblex.de, stephanie.evans@phe.gov.uk, cktech@ckgroup.co.uk,
+        pharmacontracts@ckagroup.co.uk, nicole.poole@csiro.au,
+        aguimard@ckqls.ch, sfarrow@ckgroup.co.uk, math4mat-search@epfl.ch,
+        yueling.seow@tandf.com.sg, irjournal@uw.edu.pl,
+        editorial@open-research-europe.ec.europa.eu,
+        linux-acpi@archiver.kernel.org, linux-acpi@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        andrew@lunn.ch, arnd@arndb.de,
+        77eed.1635317102.git.yu.c.chen@intel.com,
+        9110e.1635317102.git.yu.c.chen@intel.com,
+        35715.1635317102.git.yu.c.chen@intel.com,
+        47b8f.1635317102.git.yu.c.chen@intel.com,
+        7519.4789817107293464743.stgit@warthog.procyon.org.uk,
+        7519.6594360917661719152.stgit@warthog.procyon.org.uk,
+        519.11215118047756175525.stgit@warthog.procyon.org.uk,
+        519.13954182746095781120.stgit@warthog.procyon.org.uk,
+        519.14706391695553204156.stgit@warthog.procyon.org.uk,
+        7519.8649368675533788865.stgit@warthog.procyon.org.uk,
+        519.17630241595380785887.stgit@warthog.procyon.org.uk,
+        7519.2951437510049163050.stgit@warthog.procyon.org.uk,
+        7519.8303891885033763947.stgit@warthog.procyon.org.uk,
+        7519.5910362900676754518.stgit@warthog.procyon.org.uk,
+        028190125.391374-1-mmakassikis@freebox.fr,
+        jwoithe@physics.adelaide.edu.au, hmh@hmh.eng.br,
+        astarikovskiy@suse.de, rjw@sisk.pl, linux-cifs@archiver.kernel.org,
+        linux-cifs@vger.kernel.org, mmakassikis@freebox.fr,
+        019153937.412534-1-mmakassikis@freebox.fr,
+        019083641.116783-1-mmakassikis@freebox.fr,
+        16235715.3469969-1-mmakassikis@freebox.fr,
+        15130222.2976760-1-mmakassikis@freebox.fr,
+        joe.keller@futurenet.com, luke.filipowicz@futurenet.com,
+        it.rubelsaiful@gmail.com, maria@oleg-avilov.ru,
+        mac.browliamaillard@gmail.com, donald.e.kemper@gmail.com,
+        wendel.dennis@sthenryschools.org, scott.broerman@vtigers.org,
+        mu-admin@obdev.at, contact@titanium-software.fr, xld@tmkk.undo.jp,
+        den.denden@yahoo.com, joshua.garnham@yahoo.co.uk,
+        evgeny.br@gmail.com, gb@birke-software.de, rxw1@protonmail.ch,
+        josefavaughan@worldnet.att.net, gerd.j@adslhome.dk,
+        kemal.kazan@csiro.au, wangyi@cau.edu.cn, rschan@cau.edu.cn,
+        greice.amaralcarneiro@natec.unibz.it,
+        magdalena.walcher@schule.suedtirol.it, sanja.baric@unibz.it,
+        zarei@jahromu.ac.ir, dbarfield@rvc.ac.uk, nccic@dhs.sgov.gov,
+        isabella.breda@heraldnet.com,
+        parentlink.challenger@howellschools.com, marciel.stadnik@ufsc.br,
+        yellowfriend90@yahoo.com.sg, isoken@free.fr, miked@networkm.co.uk,
+        bobbysokhi@hotmail.co.uk, abilitylocksmiths@yahoo.com.au,
+        cocotaso01@hotmail.co.uk, vyshensky@mail.ru,
+        baps1000@hotmail.co.uk, marrykwok@yahoo.com.sg,
+        missmillion@live.co.uk, gabriellux@hotmail.it,
+        liverpool_ere_95@hotmail.co.uk, matt.friendshuh@norfleetgroup.com,
+        molly@plan.design, collier.cheyara222@gmail.com,
+        kristy.estes@teg-tx.com, humberto.friede@hafcoservices.com,
+        holly.dekle@setboundaries.com, leandra@lt.design,
+        norma.brito1@gmail.com, rudy.delarosa@mervalconstruction.com,
+        joan@topio.design, alan_murray01@yahoo.co.uk, showsend@gmass.co.uk,
+        ajay@iquipu.nl, ajay@arena.tec.br, fabricio@mydomainname.com.br
+Date:   29 Nov 2021 15:05:43 -0500
+Subject: Fat Removes and Protein Bars
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Mon, 2021-11-29 at 08:35 -0700, Tim Gardner wrote:
-> Hi Len,
-> 
-> I have a report (https://bugs.launchpad.net/bugs/1952094) that commit 
-> f980d055a0f858d73d9467bb0b570721bbfcdfb8 ("CIFS: Fix a potencially 
-> linear read overflow") causes a regression as a stable backport in a 5.4 
-> based kernel. I don't know if this regression exists in tip as well, or 
-> if it is unique to the backported environment. I suspect, given the 
-> content of the patch, that it is generic. As such, it has been 
-> backported to a number of stable releases:
-> 
-> linux-4.4.y.txt:0955df2d9bf4857e3e2287e3028903e6cec06c30
-> linux-4.9.y.txt:8878af780747f498551b7d360cae61b415798f18
-> linux-4.14.y.txt:20967547ffc6039f17c63a1c24eb779ee166b245
-> linux-4.19.y.txt:bea655491daf39f1934a71bf576bf3499092d3a4
-> linux-5.4.y.txt:b444064a0e0ef64491b8739a9ae05a952b5f8974
-> linux-5.10.y.txt:6c4857203ffa36918136756a889b12c5864bc4ad
-> linux-5.13.y.txt:9bffe470e9b537075345406512df01ca2188b725
-> linux-5.14.y.txt:c41dd61c86482ab34f6f039b13296308018fd99b
-> 
-> Could this be an off-by-one issue if the source string is full length ?
-> 
-> rtg
+Q29tbWVudHM6DQpIZXksDQripLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXi
+pLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXi
+pLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXi
+pLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXi
+pLXipLXipLXipLXipLXipLXipLXipLXipLUNCkFmcmljYW4gTWFuZ28gaXMgYSB3ZWln
+aHQgbG9zcyBzdXBwbGVtZW50IHRoYXQgYnVybnMgZmF0LCBzdXBwcmVzc2VzDQpodW5n
+ZXIgYW5kIGNyYXZpbmdzLCBhbmQgaGVscHMgbWFpbnRhaW4gaGVhbHRoeSBjaG9sZXN0
+ZXJvbCBsZXZlbHMuIEl0cw0KdW5pcXVlIGZvcm11bGF0aW9uIGlzIGJhc2VkIG9uIGEg
+bmF0dXJhbCBtb2xlY3VsZSBjYWxsZWQgcGFsbWl0b2xlaWMNCmFjaWQsIGFsc28ga25v
+d24gYXMgT21lZ2EgNy4gVGhpcyB1bmlxdWUgZmF0dHkgYWNpZCBoZWxwcyBmYXQgY2Vs
+bHMNCmNvbW11bmljYXRlIHdpdGggZWFjaCBvdGhlciwgZm9yY2luZyDigJxiYWQgZmF0
+4oCdIGluIHRoZSBib2R5IHRvIGJlDQpyZWxlYXNlZCBhbmQgdXNlZCBmb3IgZW5lcmd5
+LiBXaGljaCBtZWFucyBldmVuIGFzIHlvdSBzdGFydCBkcm9wcGluZw0KdGhvc2Ugc3R1
+YmJvcm4gcG91bmRzLCB5b3XigJlyZSBnb2luZyB0byBmZWVsIGdyZWF0IGFuZCBmdWxs
+IG9mIGVuZXJneSBhcw0KZmF0IHRoYXTigJlzIHJlbGVhc2VkIGZyb20geW91ciBjZWxs
+cyBnZXQgY29udmVydGVkIGludG8gZnVlbCBmb3IgeW91cg0KYm9keS4gPj4+PiBodHRw
+czovL2N1dHQubHkvM1Q4WjdNeA0K4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
+4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
+4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
+4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
+4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1DQpOdXZpYUdvIGlzIGEgZGVsaWNp
+b3VzIHByb3RlaW4gYmFyIHdpdGggYSBjb29raWUgYW5kIGNyZWFtIGZsYXZvciBsb3Zl
+ZA0KYWxsIG92ZXIgdGhlIHdvcmxkISBEdWUgdG8gdGhlIGxhcmdlIGRvc2Ugb2YgcHJv
+dGVpbiBhbmQgYSBzbWFsbCBhbW91bnQNCm9mIHN1Z2FyLCB0aGlzIHByb2R1Y3QgY2Fu
+IHJlcGxhY2UgYW55IG1lYWwuIE51dmlhR28gcHJvdmlkZXMgdGhlIGJvZHkNCndpdGgg
+YW4gZW5lcmd5IGJvb3N0LCBoZWxwcyBidWlsZCBtdXNjbGUgbWFzcyBhbmQgYWNjZWxl
+cmF0ZXMgcmVjb3ZlcnkNCmFmdGVyIHRyYWluaW5nLiBOdXZpYUdvIGJhcnMgYXJlIGNy
+ZWF0ZWQgd2l0aCBwYXNzaW9uIGFuZCBpbiBoYXJtb255DQp3aXRoIG5hdHVyZS4gVGhp
+cyBwcm9kdWN0IGNvbnRhaW5zIHRoZSByaWdodCBwcm9wb3J0aW9ucyBvZg0KbWFjcm9u
+dXRyaWVudHMgdG8gc3RyZW5ndGhlbiB0aGUgYm9keSBhbmQgaGVscCBtYWludGFpbiBh
+IGZpdC1maWd1cmUuDQpOdXZpYUdvIGJhcnMgYXJlIG5vdCBvbmx5IGEgZGVsaWNpb3Vz
+LCBzd2VldCBzbmFjaywgYnV0IGFib3ZlIGFsbCBhDQpyZWFsLCB3aG9sZXNvbWUgbWVh
+bCE+Pj4gaHR0cHM6Ly9jdXR0Lmx5L2tUOFhLZkUNCuKkteKkteKkteKkteKkteKkteKk
+teKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKk
+teKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKk
+teKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKk
+teKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKktQ0KUmVnYXJkcw0K
+4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
+4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
+4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
+4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
+4qS14qS14qS1DQpKdWxpYQ0KICBfX19fXyAgDQoNCg0KUmVjb3JkOiAxDQoNClRpdGxl
+OglCT09LUy4gCQ0KDQpTb3VyY2U6CVByZXNlbnQgU3RhdGUgb2YgRXVyb3BlLiBKdW4x
+Njk4LCBWb2wuIDkgSXNzdWUgNiwgZm9sbG93aW5nDQpwMjQ5LTI0OS4gMXAuIAkNCg0K
+UHVibGljYXRpb24gVHlwZToJUGVyaW9kaWNhbAkNCg0KRG9jdW1lbnQgVHlwZToJQXJ0
+aWNsZQkNCg0KU3ViamVjdHM6CVJIT0RFUywgSGVucnkNCkJPT0tTCQ0KDQpMQ0NOOglz
+bjg0LTQ2MzY1CQ0KDQpBY2Nlc3Npb24gTnVtYmVyOgkzMzIzODg5MQkNCg0KUGVyc2lz
+dGVudCBsaW5rIHRvIHRoaXMgcmVjb3JkIChQZXJtYWxpbmspOiANCmh0dHBzOi8vc2Vh
+cmNoLmVic2NvaG9zdC5jb20vbG9naW4uYXNweD9kaXJlY3Q9dHJ1ZSZkYj1oOWgmQU49
+MzMyMzg4OTEmcw0KaXRlPWVob3N0LWxpdmUNCkN1dCBhbmQgUGFzdGU6IDxhDQpocmVm
+PSJodHRwczovL3NlYXJjaC5lYnNjb2hvc3QuY29tL2xvZ2luLmFzcHg/ZGlyZWN0PXRy
+dWUmZGI9aDloJkFOPTMzMjMNCjg4OTEmc2l0ZT1laG9zdC1saXZlIj5CT09LUy48L2E+
+DQoNCiAgX19fX18gIA0KDQpUaGUgbGluayBpbmZvcm1hdGlvbiBhYm92ZSBwcm92aWRl
+cyBhIHBlcnNpc3RlbnQgbGluayB0byB0aGUgYXJ0aWNsZQ0KeW91J3ZlIHJlcXVlc3Rl
+ZC4NCg0KUGVyc2lzdGVudCBsaW5rIHRvIHRoaXMgcmVjb3JkOiBGb2xsb3dpbmcgdGhl
+IGxpbmsgYWJvdmUgd2lsbCBicmluZyB5b3UNCnRvIHRoZSBzdGFydCBvZiB0aGUgYXJ0
+aWNsZSBvciBjaXRhdGlvbi4NCg0KQ3V0IGFuZCBQYXN0ZTogVG8gcGxhY2UgYXJ0aWNs
+ZSBsaW5rcyBpbiBhbiBleHRlcm5hbCB3ZWIgZG9jdW1lbnQsDQpzaW1wbHkgY29weSBh
+bmQgcGFzdGUgdGhlIEhUTUwgYWJvdmUsIHN0YXJ0aW5nIHdpdGggIjxhIGhyZWYiDQoN
+CklmIHlvdSBoYXZlIGFueSBwcm9ibGVtcyBvciBxdWVzdGlvbnMsIGNvbnRhY3QgVGVj
+aG5pY2FsIFN1cHBvcnQgYXQNCmh0dHA6Ly9zdXBwb3J0LmVwbmV0LmNvbS9jb250YWN0
+L2Fza3VzLnBocCBvciBjYWxsIDgwMC03NTgtNTk5NS4NCg0KVGhpcyBlLW1haWwgd2Fz
+IGdlbmVyYXRlZCBieSBhIHVzZXIgb2YgRUJTQ09ob3N0IHdobyBnYWluZWQgYWNjZXNz
+IHZpYQ0KdGhlIE1JTklURVggTElCUkFSWSBJTkZPIE5FVFdPUksgYWNjb3VudC4gTmVp
+dGhlciBFQlNDTyBub3IgTUlOSVRFWA0KTElCUkFSWSBJTkZPIE5FVFdPUksgaXMgcmVz
+cG9uc2libGUgZm9yIHRoZSBjb250ZW50IG9mIHRoaXMgZS1tYWlsLg0K
 
-Maybe? But it doesn't seem to be that long. The error message evidently
-says:
-
-    "CIFS VFS: CIFS mount error: iocharset utf8 not found"
-
-The iocharset string ("utf8" here) usually gets set in the mount string
-and then we just pass that string to load_nls().
-
-The patch you're pointing out though doesn't seem to be involved in any
-of that. It sounds like something else is wrong. I'd validate that that
-patch was applied correctly, and get more details about what this guy is
-doing.
-
-g/l!
--- 
-Jeff Layton <jlayton@kernel.org>
