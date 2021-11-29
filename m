@@ -2,47 +2,52 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE0F5C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Nov 2021 14:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2BDEC433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Nov 2021 14:38:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245425AbhK2Ol3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Nov 2021 09:41:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42564 "EHLO
+        id S1378262AbhK2OmO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Nov 2021 09:42:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29375 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1378088AbhK2Oj2 (ORCPT
+        by vger.kernel.org with ESMTP id S1378784AbhK2OkO (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 29 Nov 2021 09:39:28 -0500
+        Mon, 29 Nov 2021 09:40:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638196570;
+        s=mimecast20190719; t=1638196616;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pJDPFxgX06oOQ2c/dIGfi7miyqMxm6oCFsrN75aNgPo=;
-        b=eI2F7/TUo+fWdHtLzUCWBbKXk54IitSlDAfuH8yuCvugvstF9Nf+6nsu7mwXYrxw9hqpPx
-        iBgSFQX6AIl/LlXSnPJ7Z7m5yJKKQiwFBhJbXn7uzQMKgTG34biEhnKyT/s9HYqUMxqJF2
-        KDyLpjpN3YzLvWlSutfpT3TM4KfCKBw=
+        bh=t7/nBtQMQQVL54bdxv3deAexmf7NtT4xc4Kt8/beD5o=;
+        b=g9+fMvysOV15LcA5ky6DIF1Xs5RLrkEhjX5WzMjgkuOChe5PxzhIiVr3vN98Q80RJ4RV0X
+        +bBQR4vCAw9wgI7RFuPbrrPiurSfMdHt/iVoz40iLBPhkyOycEJjxUU8VboWq+rXneCUhF
+        48E4eucRrybbLJM5hx/MOhW2CVqu58k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-556-NA8WHczfPH61ksIitEOFOw-1; Mon, 29 Nov 2021 09:36:07 -0500
-X-MC-Unique: NA8WHczfPH61ksIitEOFOw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-281-dHSnJnsaMFmuVy5hyAwE-Q-1; Mon, 29 Nov 2021 09:36:51 -0500
+X-MC-Unique: dHSnJnsaMFmuVy5hyAwE-Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71C4010168C0;
-        Mon, 29 Nov 2021 14:36:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9618D10151EA;
+        Mon, 29 Nov 2021 14:36:48 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 75F4371CBF;
-        Mon, 29 Nov 2021 14:35:42 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7313F45D60;
+        Mon, 29 Nov 2021 14:36:45 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 54/64] fscache, cachefiles: Display stat of culling events
+Subject: [PATCH 56/64] afs: Fix afs_write_end() to handle len > page size
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
-Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
+Cc:     Jeff Layton <jlayton@kernel.org>, Jeff Layton <jlayton@kernel.org>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-afs@lists.infradead.org, dhowells@redhat.com,
+        Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
@@ -55,92 +60,51 @@ Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 29 Nov 2021 14:35:41 +0000
-Message-ID: <163819654165.215744.3797804661644212436.stgit@warthog.procyon.org.uk>
+Date:   Mon, 29 Nov 2021 14:36:44 +0000
+Message-ID: <163819660464.215744.4576104569408497052.stgit@warthog.procyon.org.uk>
 In-Reply-To: <163819575444.215744.318477214576928110.stgit@warthog.procyon.org.uk>
 References: <163819575444.215744.318477214576928110.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Add a stat counter of culling events whereby the cache backend culls a file
-to make space (when asked by cachefilesd in this case) and display in
-/proc/fs/fscache/stats.
+It is possible for the len argument to afs_write_end() to overrun the end
+of the page (len is used to key the size of the page in afs_write_start()
+when compound pages become a regular thing).
 
+Fix afs_write_end() to correctly trim the write length so that it doesn't
+exceed the end of the page.
+
+Fixes: 3003bbd0697b ("afs: Use the netfs_write_begin() helper")
+Reported-by: Jeff Layton <jlayton@kernel.org>
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: linux-cachefs@redhat.com
+Acked-by: Jeff Layton <jlayton@kernel.org>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Al Viro <viro@zeniv.linux.org.uk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: linux-afs@lists.infradead.org
+Link: https://lore.kernel.org/r/162367682522.460125.5652091227576721609.stgit@warthog.procyon.org.uk/ # v1
 ---
 
- fs/cachefiles/namei.c         |    1 +
- fs/fscache/stats.c            |    7 +++++--
- include/linux/fscache-cache.h |    3 +++
- 3 files changed, 9 insertions(+), 2 deletions(-)
+ fs/afs/write.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
-index 7e24a7a2234d..a651da35dcd0 100644
---- a/fs/cachefiles/namei.c
-+++ b/fs/cachefiles/namei.c
-@@ -803,6 +803,7 @@ int cachefiles_cull(struct cachefiles_cache *cache, struct dentry *dir,
- 	if (ret < 0)
- 		goto error;
+diff --git a/fs/afs/write.c b/fs/afs/write.c
+index 8e4e87d66855..9db3ddb1c45b 100644
+--- a/fs/afs/write.c
++++ b/fs/afs/write.c
+@@ -120,6 +120,7 @@ int afs_write_end(struct file *file, struct address_space *mapping,
+ 	_enter("{%llx:%llu},{%lx}",
+ 	       vnode->fid.vid, vnode->fid.vnode, folio_index(folio));
  
-+	fscache_count_culled();
- 	dput(victim);
- 	_leave(" = 0");
- 	return 0;
-diff --git a/fs/fscache/stats.c b/fs/fscache/stats.c
-index db2f4e225dd9..fc94e5e79f1c 100644
---- a/fs/fscache/stats.c
-+++ b/fs/fscache/stats.c
-@@ -46,6 +46,8 @@ atomic_t fscache_n_no_write_space;
- EXPORT_SYMBOL(fscache_n_no_write_space);
- atomic_t fscache_n_no_create_space;
- EXPORT_SYMBOL(fscache_n_no_create_space);
-+atomic_t fscache_n_culled;
-+EXPORT_SYMBOL(fscache_n_culled);
- 
- /*
-  * display the general statistics
-@@ -86,9 +88,10 @@ int fscache_stats_show(struct seq_file *m, void *v)
- 		   atomic_read(&fscache_n_relinquishes_retire),
- 		   atomic_read(&fscache_n_relinquishes_dropped));
- 
--	seq_printf(m, "NoSpace: nwr=%u ncr=%u\n",
-+	seq_printf(m, "NoSpace: nwr=%u ncr=%u cull=%u\n",
- 		   atomic_read(&fscache_n_no_write_space),
--		   atomic_read(&fscache_n_no_create_space));
-+		   atomic_read(&fscache_n_no_create_space),
-+		   atomic_read(&fscache_n_culled));
- 
- 	seq_printf(m, "IO     : rd=%u wr=%u\n",
- 		   atomic_read(&fscache_n_read),
-diff --git a/include/linux/fscache-cache.h b/include/linux/fscache-cache.h
-index 1d7d43171243..7665bcab945e 100644
---- a/include/linux/fscache-cache.h
-+++ b/include/linux/fscache-cache.h
-@@ -188,15 +188,18 @@ extern atomic_t fscache_n_read;
- extern atomic_t fscache_n_write;
- extern atomic_t fscache_n_no_write_space;
- extern atomic_t fscache_n_no_create_space;
-+extern atomic_t fscache_n_culled;
- #define fscache_count_read() atomic_inc(&fscache_n_read)
- #define fscache_count_write() atomic_inc(&fscache_n_write)
- #define fscache_count_no_write_space() atomic_inc(&fscache_n_no_write_space)
- #define fscache_count_no_create_space() atomic_inc(&fscache_n_no_create_space)
-+#define fscache_count_culled() atomic_inc(&fscache_n_culled)
- #else
- #define fscache_count_read() do {} while(0)
- #define fscache_count_write() do {} while(0)
- #define fscache_count_no_write_space() do {} while(0)
- #define fscache_count_no_create_space() do {} while(0)
-+#define fscache_count_culled() do {} while(0)
- #endif
- 
- #endif /* _LINUX_FSCACHE_CACHE_H */
++	len = min_t(size_t, len, folio_size(folio) - from);
+ 	if (!folio_test_uptodate(folio)) {
+ 		if (copied < len) {
+ 			copied = 0;
 
 
