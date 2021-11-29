@@ -2,44 +2,45 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3163CC4332F
-	for <linux-cifs@archiver.kernel.org>; Mon, 29 Nov 2021 14:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A58F1C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 29 Nov 2021 14:30:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343642AbhK2Odz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 29 Nov 2021 09:33:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46253 "EHLO
+        id S233472AbhK2OeD (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 29 Nov 2021 09:34:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:46593 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1378678AbhK2Obe (ORCPT
+        by vger.kernel.org with ESMTP id S1378712AbhK2OcC (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 29 Nov 2021 09:31:34 -0500
+        Mon, 29 Nov 2021 09:32:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638196096;
+        s=mimecast20190719; t=1638196124;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KNojixOatt1+MpKFdvk/uwQosxOUIf5IGMIyxitmd7I=;
-        b=Wg8xWunDS6iSlU4ZZ8EMRHp8TA0vxe9Kw2rw2ZwZbP8YdJVkQXHLJ4tDNeY67lIsN+kE2n
-        wd0SUb0Mkp4C0U1A0kL4D2ozTYN0chA8CX0ad7Sq/0GTgzT8h2Hk0dQjlQ2aoAKj2Z4Szb
-        3GGSRptzvP16qpga5tXlvktlPE2WtOY=
+        bh=F//cC+xXbc/IInxxIda5sfPblnLErpIi5Uwt/zq7kos=;
+        b=QALgyEZ8h13iSqOjqSYSlEiQgxNna9ra7OUMWifchaQ2CQku6Xnc0acdkp6mCnHJMfQHjx
+        WE8ugRPxXoNKTqKgOpyAwZ447a9s6rfsH1SME8DO5tvIZQIPECNMycjv/XINiswHIIKLfc
+        Slbp1iBbWsa6LXfdXFhnKc+uuwSst6Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-460-Dbpn0yK1Ml-RK9M7Q5OrZA-1; Mon, 29 Nov 2021 09:28:04 -0500
-X-MC-Unique: Dbpn0yK1Ml-RK9M7Q5OrZA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-531-u-5V9RctNbO4QFReeRGinQ-1; Mon, 29 Nov 2021 09:28:40 -0500
+X-MC-Unique: u-5V9RctNbO4QFReeRGinQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B61921015DBA;
-        Mon, 29 Nov 2021 14:28:00 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01F7410B7440;
+        Mon, 29 Nov 2021 14:28:38 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B970E72FA9;
-        Mon, 29 Nov 2021 14:27:17 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C20E196E5;
+        Mon, 29 Nov 2021 14:28:25 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 20/64] fscache: Provide a means to begin an operation
+Subject: [PATCH 23/64] fscache: Provide a function to let the netfs update its
+ coherency data
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
 Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
@@ -55,391 +56,70 @@ Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 29 Nov 2021 14:27:16 +0000
-Message-ID: <163819603692.215744.146724961588817028.stgit@warthog.procyon.org.uk>
+Date:   Mon, 29 Nov 2021 14:28:24 +0000
+Message-ID: <163819610438.215744.4223265964131424954.stgit@warthog.procyon.org.uk>
 In-Reply-To: <163819575444.215744.318477214576928110.stgit@warthog.procyon.org.uk>
 References: <163819575444.215744.318477214576928110.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Provide a function to begin a read operation:
+Provide a function to let the netfs update its coherency data:
 
-	int fscache_begin_read_operation(
-		struct netfs_cache_resources *cres,
-		struct fscache_cookie *cookie)
+	void fscache_update_cookie(struct fscache_cookie *cookie,
+				   const void *aux_data,
+				   const loff_t *object_size);
 
-This is primarily intended to be called by network filesystems on behalf of
-netfslib, but may also be called to use the I/O access functions directly.
-It attaches the resources required by the cache to cres struct from the
-supplied cookie.
+This will update the auxiliary data and/or the size of the object attached
+to a cookie if either pointer is not-NULL and flag that the disk needs to
+be updated.
 
-This holds access to the cache behind the cookie for the duration of the
-operation and forces cache withdrawal and cookie invalidation to perform
-synchronisation on the operation.  cres->inval_counter is set from the
-cookie at this point so that it can be compared at the end of the
-operation.
-
-Note that this does not guarantee that the cache state is fully set up and
-able to perform I/O immediately; looking up and creation may be left in
-progress in the background.  The operations intended to be called by the
-network filesystem, such as reading and writing, are expected to wait for
-the cookie to move to the correct state.
-
-This will, however, potentially sleep, waiting for a certain minimum state
-to be set or for operations such as invalidate to advance far enough that
-I/O can resume.
-
-
-Also provide a function for the cache to call to wait for the cache object
-to get to a state where it can be used for certain things:
-
-	bool fscache_wait_for_operation(struct netfs_cache_resources *cres,
-					enum fscache_want_stage stage);
-
-This looks at the cache resources provided by the begin function and waits
-for them to get to an appropriate stage.  There's a choice of wanting just
-some parameters (FSCACHE_WANT_PARAM) or the ability to do I/O
-(FSCACHE_WANT_READ or FSCACHE_WANT_WRITE).
+Note that fscache_unuse_cookie() also allows this to be done.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: linux-cachefs@redhat.com
 ---
 
- fs/fscache/Makefile            |    1 
- fs/fscache/internal.h          |   11 +++
- fs/fscache/io.c                |  151 ++++++++++++++++++++++++++++++++++++++++
- include/linux/fscache-cache.h  |   11 +++
- include/linux/fscache.h        |   49 +++++++++++++
- include/trace/events/fscache.h |    6 ++
- 6 files changed, 229 insertions(+)
- create mode 100644 fs/fscache/io.c
+ include/linux/fscache.h |   22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/fs/fscache/Makefile b/fs/fscache/Makefile
-index bcc79615f93a..afb090ea16c4 100644
---- a/fs/fscache/Makefile
-+++ b/fs/fscache/Makefile
-@@ -6,6 +6,7 @@
- fscache-y := \
- 	cache.o \
- 	cookie.o \
-+	io.o \
- 	main.o \
- 	volume.o
- 
-diff --git a/fs/fscache/internal.h b/fs/fscache/internal.h
-index e4f3a1a993f6..1308bfff94fb 100644
---- a/fs/fscache/internal.h
-+++ b/fs/fscache/internal.h
-@@ -70,6 +70,17 @@ static inline void fscache_see_cookie(struct fscache_cookie *cookie,
- 			     where);
- }
- 
-+/*
-+ * io.c
-+ */
-+static inline void fscache_end_operation(struct netfs_cache_resources *cres)
-+{
-+	const struct netfs_cache_ops *ops = fscache_operation_valid(cres);
-+
-+	if (ops)
-+		ops->end_operation(cres);
-+}
-+
- /*
-  * main.c
-  */
-diff --git a/fs/fscache/io.c b/fs/fscache/io.c
-new file mode 100644
-index 000000000000..460a43473019
---- /dev/null
-+++ b/fs/fscache/io.c
-@@ -0,0 +1,151 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Cache data I/O routines
-+ *
-+ * Copyright (C) 2021 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+#define FSCACHE_DEBUG_LEVEL OPERATION
-+#include <linux/fscache-cache.h>
-+#include <linux/uio.h>
-+#include <linux/bvec.h>
-+#include <linux/slab.h>
-+#include <linux/uio.h>
-+#include "internal.h"
-+
-+/**
-+ * fscache_wait_for_operation - Wait for an object become accessible
-+ * @cres: The cache resources for the operation being performed
-+ * @want_state: The minimum state the object must be at
-+ *
-+ * See if the target cache object is at the specified minimum state of
-+ * accessibility yet, and if not, wait for it.
-+ */
-+bool fscache_wait_for_operation(struct netfs_cache_resources *cres,
-+				enum fscache_want_state want_state)
-+{
-+	struct fscache_cookie *cookie = fscache_cres_cookie(cres);
-+	enum fscache_cookie_state state;
-+
-+again:
-+	if (!fscache_cache_is_live(cookie->volume->cache)) {
-+		_leave(" [broken]");
-+		return false;
-+	}
-+
-+	state = fscache_cookie_state(cookie);
-+	_enter("c=%08x{%u},%x", cookie->debug_id, state, want_state);
-+
-+	switch (state) {
-+	case FSCACHE_COOKIE_STATE_CREATING:
-+	case FSCACHE_COOKIE_STATE_INVALIDATING:
-+		if (want_state == FSCACHE_WANT_PARAMS)
-+			goto ready; /* There can be no content */
-+		fallthrough;
-+	case FSCACHE_COOKIE_STATE_LOOKING_UP:
-+	case FSCACHE_COOKIE_STATE_LRU_DISCARDING:
-+		wait_var_event(&cookie->state,
-+			       fscache_cookie_state(cookie) != state);
-+		goto again;
-+
-+	case FSCACHE_COOKIE_STATE_ACTIVE:
-+		goto ready;
-+	case FSCACHE_COOKIE_STATE_DROPPED:
-+	case FSCACHE_COOKIE_STATE_RELINQUISHING:
-+	default:
-+		_leave(" [not live]");
-+		return false;
-+	}
-+
-+ready:
-+	if (!cres->cache_priv2)
-+		return cookie->volume->cache->ops->begin_operation(cres, want_state);
-+	return true;
-+}
-+EXPORT_SYMBOL(fscache_wait_for_operation);
-+
-+/*
-+ * Begin an I/O operation on the cache, waiting till we reach the right state.
-+ *
-+ * Attaches the resources required to the operation resources record.
-+ */
-+static int fscache_begin_operation(struct netfs_cache_resources *cres,
-+				   struct fscache_cookie *cookie,
-+				   enum fscache_want_state want_state,
-+				   enum fscache_access_trace why)
-+{
-+	enum fscache_cookie_state state;
-+	long timeo;
-+	bool once_only = false;
-+
-+	cres->ops		= NULL;
-+	cres->cache_priv	= cookie;
-+	cres->cache_priv2	= NULL;
-+	cres->debug_id		= cookie->debug_id;
-+	cres->inval_counter	= cookie->inval_counter;
-+
-+	if (!fscache_begin_cookie_access(cookie, why))
-+		return -ENOBUFS;
-+
-+again:
-+	spin_lock(&cookie->lock);
-+
-+	state = fscache_cookie_state(cookie);
-+	_enter("c=%08x{%u},%x", cookie->debug_id, state, want_state);
-+
-+	switch (state) {
-+	case FSCACHE_COOKIE_STATE_LOOKING_UP:
-+	case FSCACHE_COOKIE_STATE_LRU_DISCARDING:
-+	case FSCACHE_COOKIE_STATE_INVALIDATING:
-+		goto wait_for_file_wrangling;
-+	case FSCACHE_COOKIE_STATE_CREATING:
-+		if (want_state == FSCACHE_WANT_PARAMS)
-+			goto ready; /* There can be no content */
-+		goto wait_for_file_wrangling;
-+	case FSCACHE_COOKIE_STATE_ACTIVE:
-+		goto ready;
-+	case FSCACHE_COOKIE_STATE_DROPPED:
-+	case FSCACHE_COOKIE_STATE_RELINQUISHING:
-+		WARN(1, "Can't use cookie in state %u\n", cookie->state);
-+		goto not_live;
-+	default:
-+		goto not_live;
-+	}
-+
-+ready:
-+	spin_unlock(&cookie->lock);
-+	if (!cookie->volume->cache->ops->begin_operation(cres, want_state))
-+		goto failed;
-+	return 0;
-+
-+wait_for_file_wrangling:
-+	spin_unlock(&cookie->lock);
-+	trace_fscache_access(cookie->debug_id, refcount_read(&cookie->ref),
-+			     atomic_read(&cookie->n_accesses),
-+			     fscache_access_io_wait);
-+	timeo = wait_var_event_timeout(&cookie->state,
-+				       fscache_cookie_state(cookie) != state, 20 * HZ);
-+	if (timeo <= 1 && !once_only) {
-+		pr_warn("%s: cookie state change wait timed out: cookie->state=%u state=%u",
-+			__func__, fscache_cookie_state(cookie), state);
-+		fscache_print_cookie(cookie, 'O');
-+		once_only = true;
-+	}
-+	goto again;
-+
-+not_live:
-+	spin_unlock(&cookie->lock);
-+failed:
-+	cres->cache_priv = NULL;
-+	cres->ops = NULL;
-+	fscache_end_cookie_access(cookie, fscache_access_io_not_live);
-+	_leave(" = -ENOBUFS");
-+	return -ENOBUFS;
-+}
-+
-+int __fscache_begin_read_operation(struct netfs_cache_resources *cres,
-+				   struct fscache_cookie *cookie)
-+{
-+	return fscache_begin_operation(cres, cookie, FSCACHE_WANT_PARAMS,
-+				       fscache_access_io_read);
-+}
-+EXPORT_SYMBOL(__fscache_begin_read_operation);
-diff --git a/include/linux/fscache-cache.h b/include/linux/fscache-cache.h
-index 1ad56bfd9d72..566497cf5f13 100644
---- a/include/linux/fscache-cache.h
-+++ b/include/linux/fscache-cache.h
-@@ -67,6 +67,10 @@ struct fscache_cache_ops {
- 	/* Invalidate an object */
- 	bool (*invalidate_cookie)(struct fscache_cookie *cookie);
- 
-+	/* Begin an operation for the netfs lib */
-+	bool (*begin_operation)(struct netfs_cache_resources *cres,
-+				enum fscache_want_state want_state);
-+
- 	/* Prepare to write to a live cache object */
- 	void (*prepare_to_write)(struct fscache_cookie *cookie);
- };
-@@ -101,6 +105,8 @@ extern void fscache_end_cookie_access(struct fscache_cookie *cookie,
- extern void fscache_cookie_lookup_negative(struct fscache_cookie *cookie);
- extern void fscache_resume_after_invalidation(struct fscache_cookie *cookie);
- extern void fscache_caching_failed(struct fscache_cookie *cookie);
-+extern bool fscache_wait_for_operation(struct netfs_cache_resources *cred,
-+				       enum fscache_want_state state);
- 
- /**
-  * fscache_cookie_state - Read the state of a cookie
-@@ -129,4 +135,9 @@ static inline void *fscache_get_key(struct fscache_cookie *cookie)
- 		return cookie->key;
- }
- 
-+static inline struct fscache_cookie *fscache_cres_cookie(struct netfs_cache_resources *cres)
-+{
-+	return cres->cache_priv;
-+}
-+
- #endif /* _LINUX_FSCACHE_CACHE_H */
 diff --git a/include/linux/fscache.h b/include/linux/fscache.h
-index cfbace3bdc88..b60be20107e1 100644
+index b60be20107e1..ccdfdfc700cd 100644
 --- a/include/linux/fscache.h
 +++ b/include/linux/fscache.h
-@@ -41,6 +41,12 @@ struct fscache_cookie;
- 
- #define FSCACHE_INVAL_DIO_WRITE		0x01 /* Invalidate due to DIO write */
- 
-+enum fscache_want_state {
-+	FSCACHE_WANT_PARAMS,
-+	FSCACHE_WANT_WRITE,
-+	FSCACHE_WANT_READ,
-+};
-+
- /*
-  * Data object state.
-  */
-@@ -156,6 +162,7 @@ extern void __fscache_use_cookie(struct fscache_cookie *, bool);
- extern void __fscache_unuse_cookie(struct fscache_cookie *, const void *, const loff_t *);
- extern void __fscache_relinquish_cookie(struct fscache_cookie *, bool);
- extern void __fscache_invalidate(struct fscache_cookie *, const void *, loff_t, unsigned int);
-+extern int __fscache_begin_read_operation(struct netfs_cache_resources *, struct fscache_cookie *);
- 
- /**
-  * fscache_acquire_volume - Register a volume as desiring caching services
-@@ -350,4 +357,46 @@ void fscache_invalidate(struct fscache_cookie *cookie,
- 		__fscache_invalidate(cookie, aux_data, size, flags);
+@@ -330,6 +330,28 @@ void __fscache_update_cookie(struct fscache_cookie *cookie, const void *aux_data
+ 	set_bit(FSCACHE_COOKIE_NEEDS_UPDATE, &cookie->flags);
  }
  
 +/**
-+ * fscache_operation_valid - Return true if operations resources are usable
-+ * @cres: The resources to check.
-+ *
-+ * Returns a pointer to the operations table if usable or NULL if not.
-+ */
-+static inline
-+const struct netfs_cache_ops *fscache_operation_valid(const struct netfs_cache_resources *cres)
-+{
-+	return fscache_resources_valid(cres) ? cres->ops : NULL;
-+}
-+
-+/**
-+ * fscache_begin_read_operation - Begin a read operation for the netfs lib
-+ * @cres: The cache resources for the read being performed
++ * fscache_update_cookie - Request that a cache object be updated
 + * @cookie: The cookie representing the cache object
++ * @aux_data: The updated auxiliary data for the cookie (may be NULL)
++ * @object_size: The current size of the object (may be NULL)
 + *
-+ * Begin a read operation on behalf of the netfs helper library.  @cres
-+ * indicates the cache resources to which the operation state should be
-+ * attached; @cookie indicates the cache object that will be accessed.
++ * Request an update of the index data for the cache object associated with the
++ * cookie.  The auxiliary data on the cookie will be updated first if @aux_data
++ * is set and the object size will be updated and the object possibly trimmed
++ * if @object_size is set.
 + *
-+ * This is intended to be called from the ->begin_cache_operation() netfs lib
-+ * operation as implemented by the network filesystem.
-+ *
-+ * @cres->inval_counter is set from @cookie->inval_counter for comparison at
-+ * the end of the operation.  This allows invalidation during the operation to
-+ * be detected by the caller.
-+ *
-+ * Returns:
-+ * * 0		- Success
-+ * * -ENOBUFS	- No caching available
-+ * * Other error code from the cache, such as -ENOMEM.
++ * See Documentation/filesystems/caching/netfs-api.rst for a complete
++ * description.
 + */
 +static inline
-+int fscache_begin_read_operation(struct netfs_cache_resources *cres,
-+				 struct fscache_cookie *cookie)
++void fscache_update_cookie(struct fscache_cookie *cookie, const void *aux_data,
++			   const loff_t *object_size)
 +{
 +	if (fscache_cookie_enabled(cookie))
-+		return __fscache_begin_read_operation(cres, cookie);
-+	return -ENOBUFS;
++		__fscache_update_cookie(cookie, aux_data, object_size);
 +}
 +
- #endif /* _LINUX_FSCACHE_H */
-diff --git a/include/trace/events/fscache.h b/include/trace/events/fscache.h
-index 5f88479fb06a..d8a8c56eb5d6 100644
---- a/include/trace/events/fscache.h
-+++ b/include/trace/events/fscache.h
-@@ -76,6 +76,9 @@ enum fscache_access_trace {
- 	fscache_access_cache_unpin,
- 	fscache_access_invalidate_cookie,
- 	fscache_access_invalidate_cookie_end,
-+	fscache_access_io_not_live,
-+	fscache_access_io_read,
-+	fscache_access_io_wait,
- 	fscache_access_lookup_cookie,
- 	fscache_access_lookup_cookie_end,
- 	fscache_access_lookup_cookie_end_failed,
-@@ -143,6 +146,9 @@ enum fscache_access_trace {
- 	EM(fscache_access_cache_unpin,		"UNPIN cache  ")	\
- 	EM(fscache_access_invalidate_cookie,	"BEGIN inval  ")	\
- 	EM(fscache_access_invalidate_cookie_end,"END   inval  ")	\
-+	EM(fscache_access_io_not_live,		"END   io_notl")	\
-+	EM(fscache_access_io_read,		"BEGIN io_read")	\
-+	EM(fscache_access_io_wait,		"WAIT  io     ")	\
- 	EM(fscache_access_lookup_cookie,	"BEGIN lookup ")	\
- 	EM(fscache_access_lookup_cookie_end,	"END   lookup ")	\
- 	EM(fscache_access_lookup_cookie_end_failed,"END   lookupf")	\
+ /**
+  * fscache_invalidate - Notify cache that an object needs invalidation
+  * @cookie: The cookie representing the cache object
 
 
