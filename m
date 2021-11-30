@@ -2,85 +2,112 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C25C3C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Nov 2021 15:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FEF8C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Nov 2021 16:15:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245461AbhK3PHS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Nov 2021 10:07:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33406 "EHLO
+        id S234405AbhK3QSj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Nov 2021 11:18:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244746AbhK3PCl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Nov 2021 10:02:41 -0500
+        with ESMTP id S238219AbhK3QSg (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Nov 2021 11:18:36 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D01BC08EA75;
-        Tue, 30 Nov 2021 06:54:00 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91B5CC061746;
+        Tue, 30 Nov 2021 08:15:16 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E7CBAB81A49;
-        Tue, 30 Nov 2021 14:53:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9832C53FCD;
-        Tue, 30 Nov 2021 14:53:56 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3E095B81A55;
+        Tue, 30 Nov 2021 16:15:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB047C53FC1;
+        Tue, 30 Nov 2021 16:15:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638284037;
-        bh=K+2c0PSx2JjRSSxO9jEIm1R5OerG8X4f4oMwS+g/AZ4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FLKAg7sYZn0K5KidvS8a9x812aWblIMETwLFnaifahGDX+bW7YiOe/VSFn+0kJMdc
-         8d79fypRcN/IE/AAdklCGf3DJv7XLme+2CCRuhzdtOxWNvmc18nunDJD2wgTH+2MOQ
-         A0M3WCXpeMU1hGznx64iGKlSHoBO0oxvOZVoAOvMHVPFpO9OvvY/eEurVSyyUDhxaa
-         uvUo/jFePvGuaOr5MKpUtAIx5lYla8uXQOzilwdDpoXIXr65tPfkyoDGv8o/VfrmNd
-         wjsqwXXwVtQ/4T2LgPE8BT65pRqM9FvVapRqmUtdj7nBzP1W2QnRgDI9RV3xzPexh8
-         GGl/HvFpxcebA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Steve French <stfrench@microsoft.com>,
-        kernel test robot <lkp@intel.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Paulo Alcantara <pc@cjr.nz>, Sasha Levin <sashal@kernel.org>,
-        sfrench@samba.org, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.9 09/12] smb2: clarify rc initialization in smb2_reconnect
-Date:   Tue, 30 Nov 2021 09:53:37 -0500
-Message-Id: <20211130145341.946891-9-sashal@kernel.org>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211130145341.946891-1-sashal@kernel.org>
-References: <20211130145341.946891-1-sashal@kernel.org>
+        s=k20201202; t=1638288913;
+        bh=P8o3xJoZ9GulqCm3by9ySAYZOhiX00eAxdialhufxvY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=OetwOYtBIbikZ7LhnB77SBsvM18Jm92Lg+sWp1Bvq5NVYWIn707PetzCzKVQF1gBH
+         hNp2rvzS0GtDyA/Bx2OpdVp0YnKbr+LEQ2zKIXjGaHGVfTHD1CNhgpEYU5J9PMG+00
+         IhCpzigsWUjK+JLVGt8LYCrs8x0B/a3b9CCnAQG4P6L7x38XQJ+PGJ+UkP6cuKfFtQ
+         +w7m1GQzxL2JB1Iyi/KFgpyMccj7+60rXdqdDGz77eXCn910146xaAcM4AoJcraRc7
+         1HbdNXcgXI29uQxAK6lwOENIPqHsaiCEzKVtpoMFZ7seIi08nc1OU1mWsQlaTVmu5o
+         8Enk0P0netdMA==
+Date:   Tue, 30 Nov 2021 09:15:06 -0700
+From:   Nathan Chancellor <nathan@kernel.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     linux-cachefs@redhat.com,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev
+Subject: Re: [PATCH 51/64] cachefiles: Implement the I/O routines
+Message-ID: <YaZOCk9zxApPattb@archlinux-ax161>
+References: <163819575444.215744.318477214576928110.stgit@warthog.procyon.org.uk>
+ <163819647945.215744.17827962047487125939.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <163819647945.215744.17827962047487125939.stgit@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Steve French <stfrench@microsoft.com>
+On Mon, Nov 29, 2021 at 02:34:39PM +0000, David Howells wrote:
+> Implement the I/O routines for cachefiles.  There are two sets of routines
+> here: preparation and actual I/O.
+> 
+> Preparation for read involves looking to see whether there is data present,
+> and how much.  Netfslib tells us what it wants us to do and we have the
+> option of adjusting shrinking and telling it whether to read from the
+> cache, download from the server or simply clear a region.
+> 
+> Preparation for write involves checking for space and defending against
+> possibly running short of space, if necessary punching out a hole in the
+> file so that we don't leave old data in the cache if we update the
+> coherency information.
+> 
+> Then there's a read routine and a write routine.  They wait for the cookie
+> state to move to something appropriate and then start a potentially
+> asynchronous direct I/O operation upon it.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: linux-cachefs@redhat.com
 
-[ Upstream commit 350f4a562e1ffc2e4869e3083dc9b0ec4bca6c3a ]
+This patch as commit 0443b01eccbb ("cachefiles: Implement the I/O
+routines") in -next causes the following clang warning/error:
 
-It is clearer to initialize rc at the beginning of the function.
+fs/cachefiles/io.c:489:6: error: variable 'ret' is used uninitialized whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
+        if (pos == 0)
+            ^~~~~~~~
+fs/cachefiles/io.c:492:6: note: uninitialized use occurs here
+        if (ret < 0) {
+            ^~~
+fs/cachefiles/io.c:489:2: note: remove the 'if' if its condition is always true
+        if (pos == 0)
+        ^~~~~~~~~~~~~
+fs/cachefiles/io.c:440:9: note: initialize the variable 'ret' to silence this warning
+        int ret;
+               ^
+                = 0
+1 error generated.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/cifs/smb2pdu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It is the same one that has been reported two other times over the past
+two months:
 
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index cf1a3d2f6ad8b..a6ae56bf8996a 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -155,7 +155,7 @@ smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
- static int
- smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
- {
--	int rc;
-+	int rc = 0;
- 	struct nls_table *nls_codepage;
- 	struct cifs_ses *ses;
- 	struct TCP_Server_Info *server;
--- 
-2.33.0
+https://lore.kernel.org/r/202110150048.HPNa2Mn7-lkp@intel.com/
+https://lore.kernel.org/r/202111070451.bsfAyznx-lkp@intel.com/
 
+Should ret just be initialized to zero or does it need to be set to
+something else if pos is not equal to zero at the end?
+
+Cheers,
+Nathan
