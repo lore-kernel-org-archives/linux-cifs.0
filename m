@@ -2,35 +2,35 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC20C43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C25C3C433F5
 	for <linux-cifs@archiver.kernel.org>; Tue, 30 Nov 2021 15:04:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245438AbhK3PHQ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Nov 2021 10:07:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33502 "EHLO
+        id S245461AbhK3PHS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Nov 2021 10:07:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244555AbhK3PCb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Nov 2021 10:02:31 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E3D9C0619F8;
-        Tue, 30 Nov 2021 06:53:38 -0800 (PST)
+        with ESMTP id S244746AbhK3PCl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Nov 2021 10:02:41 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D01BC08EA75;
+        Tue, 30 Nov 2021 06:54:00 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 55EB6CE1A7B;
-        Tue, 30 Nov 2021 14:53:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 945B0C53FCF;
-        Tue, 30 Nov 2021 14:53:33 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E7CBAB81A49;
+        Tue, 30 Nov 2021 14:53:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9832C53FCD;
+        Tue, 30 Nov 2021 14:53:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638284014;
-        bh=BVEFfntB/jq5JO8ybbq+Gh00U2lXAIUL6PqDDymVjTo=;
+        s=k20201202; t=1638284037;
+        bh=K+2c0PSx2JjRSSxO9jEIm1R5OerG8X4f4oMwS+g/AZ4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KGlyif/+MGVgzXOvA0fN/6HejTbKygxHlsdaC55P9Jx40ZTFGEnwTnY/eAESzb/UI
-         cIs2+KZI4GCpnUE5JvVxDWFUzke/Gg3yr2LWZJH/lkKrXXsGMEhqhzLqi55Tguw8jg
-         NY3KDxKU62u8PPr6wReKtvKstAV6ljmsk4pjAEKivpyeWDKDFNqSnR91MZgQEyakwr
-         By7ASfUpUmvsF2N5FVwO9cpn6DzM1kGGVBC34XtoG60NHX+2BCT0adhXVMd0zXXjjm
-         5zv9uHIkWm/+0gnI9MTSo9c/Oh8HU5e3DWIzpDUtpo5yjJqIomtQ7PQZgspIyf0hGk
-         kYbp2j+QDdIcQ==
+        b=FLKAg7sYZn0K5KidvS8a9x812aWblIMETwLFnaifahGDX+bW7YiOe/VSFn+0kJMdc
+         8d79fypRcN/IE/AAdklCGf3DJv7XLme+2CCRuhzdtOxWNvmc18nunDJD2wgTH+2MOQ
+         A0M3WCXpeMU1hGznx64iGKlSHoBO0oxvOZVoAOvMHVPFpO9OvvY/eEurVSyyUDhxaa
+         uvUo/jFePvGuaOr5MKpUtAIx5lYla8uXQOzilwdDpoXIXr65tPfkyoDGv8o/VfrmNd
+         wjsqwXXwVtQ/4T2LgPE8BT65pRqM9FvVapRqmUtdj7nBzP1W2QnRgDI9RV3xzPexh8
+         GGl/HvFpxcebA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Steve French <stfrench@microsoft.com>,
@@ -39,12 +39,12 @@ Cc:     Steve French <stfrench@microsoft.com>,
         Paulo Alcantara <pc@cjr.nz>, Sasha Levin <sashal@kernel.org>,
         sfrench@samba.org, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 4.14 10/14] smb2: clarify rc initialization in smb2_reconnect
-Date:   Tue, 30 Nov 2021 09:53:11 -0500
-Message-Id: <20211130145317.946676-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 09/12] smb2: clarify rc initialization in smb2_reconnect
+Date:   Tue, 30 Nov 2021 09:53:37 -0500
+Message-Id: <20211130145341.946891-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211130145317.946676-1-sashal@kernel.org>
-References: <20211130145317.946676-1-sashal@kernel.org>
+In-Reply-To: <20211130145341.946891-1-sashal@kernel.org>
+References: <20211130145341.946891-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -69,10 +69,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 77a9aeaf2cb11..ae019210b26a6 100644
+index cf1a3d2f6ad8b..a6ae56bf8996a 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -153,7 +153,7 @@ smb2_hdr_assemble(struct smb2_sync_hdr *shdr, __le16 smb2_cmd,
+@@ -155,7 +155,7 @@ smb2_hdr_assemble(struct smb2_hdr *hdr, __le16 smb2_cmd /* command */ ,
  static int
  smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
  {
