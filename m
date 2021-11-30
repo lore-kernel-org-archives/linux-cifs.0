@@ -2,32 +2,32 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CBB3C433FE
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Nov 2021 14:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E904C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Nov 2021 14:55:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242649AbhK3O5v (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Nov 2021 09:57:51 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:49610 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237739AbhK3Ozs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Nov 2021 09:55:48 -0500
+        id S243747AbhK3O6c (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Nov 2021 09:58:32 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:59958 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243154AbhK3O4c (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Nov 2021 09:56:32 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 03788B81A62;
-        Tue, 30 Nov 2021 14:52:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD06FC8D186;
-        Tue, 30 Nov 2021 14:52:25 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 6E063CE1A67;
+        Tue, 30 Nov 2021 14:53:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1F55C53FCF;
+        Tue, 30 Nov 2021 14:53:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638283946;
-        bh=IhfbY0YSU+daeOm17P9EDHIdDnraEHpXLX63bYEEBz4=;
+        s=k20201202; t=1638283989;
+        bh=XvDXe8QlYkOVYvlj8rPsLiboo21ZuxznWhjSYzSen4E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gPYBB1E1hkBK+KvJLv9xkayC4v2yDpMiI8mWHEtOL4OYXSBx3h/PfOD6xAlx08oWG
-         IKMDYGOVvIhml+B8vo31GDzLlmnE07AlnPUQ/3uUsYD7y+KXw4fXc8DwDM/hQH8Zzj
-         kH+Vx2u7OzHN297BUrNpGybCZVbxQ8MViI5mnxxN3rQEtu7WY/ecSRuHrt3hbSMITx
-         S5Ce7OhX9jWlJeyc53ccMbXJUxeGacPouwOswEukuQQ5w4UhVUPohstL9jXKg+iJBp
-         ePFYmGnZeUvBVoPKW3naqxOG3lh5q3DfrFGF69HeC7p0K1rgWzsz7ztv37CUpSBshm
-         CK+c31LbpiGsA==
+        b=Y6x6t91QEzkLH2ieIMjS0BJ/oFQfQkVi+ZnnEzaX66URI2zQg4wt8yBGlPjzFQ+R3
+         L/lATZOrqNUWzONeBTpEkBU2RQELogag/8LLwnW+iwZxQ2BSBCYiEbIkTZOpE+8U+q
+         6A0NGYMGYhHBMnby+F8frEztZIIaqXZLA+MAoyX3MJbDkJfP7OC4yCxLL6nSVd+09V
+         09qWbB3rG6ik7pKHkSiQ0q7Ae7fUADzcQLPlPm2gUDkSAUghc0qFut6467swVu6hxQ
+         1H5AOKUpd8fLFHZO4LLEh+60v8NnSe8QR8wrfJck8ntELc/gi3zFWcL4xfCJGiLHGA
+         N7CA4ehEKzgUw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Steve French <stfrench@microsoft.com>,
@@ -36,12 +36,12 @@ Cc:     Steve French <stfrench@microsoft.com>,
         Paulo Alcantara <pc@cjr.nz>, Sasha Levin <sashal@kernel.org>,
         sfrench@samba.org, linux-cifs@vger.kernel.org,
         samba-technical@lists.samba.org
-Subject: [PATCH AUTOSEL 5.4 15/25] smb2: clarify rc initialization in smb2_reconnect
-Date:   Tue, 30 Nov 2021 09:51:45 -0500
-Message-Id: <20211130145156.946083-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 13/17] smb2: clarify rc initialization in smb2_reconnect
+Date:   Tue, 30 Nov 2021 09:52:37 -0500
+Message-Id: <20211130145243.946407-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211130145156.946083-1-sashal@kernel.org>
-References: <20211130145156.946083-1-sashal@kernel.org>
+In-Reply-To: <20211130145243.946407-1-sashal@kernel.org>
+References: <20211130145243.946407-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -66,10 +66,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index e068f82ffeddf..da43365aa1420 100644
+index 43478ec6fd67a..757ac782f405b 100644
 --- a/fs/cifs/smb2pdu.c
 +++ b/fs/cifs/smb2pdu.c
-@@ -238,7 +238,7 @@ static inline int __smb2_reconnect(const struct nls_table *nlsc,
+@@ -155,7 +155,7 @@ smb2_hdr_assemble(struct smb2_sync_hdr *shdr, __le16 smb2_cmd,
  static int
  smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon)
  {
