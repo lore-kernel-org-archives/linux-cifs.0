@@ -2,149 +2,203 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 752EFC433F5
-	for <linux-cifs@archiver.kernel.org>; Tue, 30 Nov 2021 07:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94950C4332F
+	for <linux-cifs@archiver.kernel.org>; Tue, 30 Nov 2021 11:55:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233975AbhK3HQY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Nov 2021 02:16:24 -0500
-Received: from sdc-v-sdnmail2-ext.epnet.com ([140.234.254.213]:53188 "EHLO
-        sdc-v-sdnmail2-ext.epnet.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233216AbhK3HQX (ORCPT
+        id S233134AbhK3L6R (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Nov 2021 06:58:17 -0500
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:16708 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233080AbhK3L6P (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 30 Nov 2021 02:16:23 -0500
-Received: from sdc-epwebmail2 (sdc-v-epwebmail2.epnet.com [10.83.102.231])
-        by sdc-v-sdnmail2-ext.epnet.com (8.14.7/8.14.7/EIS8.14) with ESMTP id 1ATJwYmD010009;
-        Mon, 29 Nov 2021 14:58:34 -0500
-Message-Id: <202111291958.1ATJwYmD010009@sdc-v-sdnmail2-ext.epnet.com>
+        Tue, 30 Nov 2021 06:58:15 -0500
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AUAUn2u026595;
+        Tue, 30 Nov 2021 11:54:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : content-type : mime-version; s=corp-2021-07-09;
+ bh=8DMHX69vVsuf1PPkyMohSLaUcIjCjbRKdqM6zhgk0eM=;
+ b=SRa07cu3GBAaqnwtMiXxxl7asoGD/8hkddS4Fm1IuIglJNQrqHyeCnVIkIgPuEF6uDsA
+ rIwsVbSvBFSHwoKxgl9LDrCaY7+4JYbETIfTaPprLciBG/sNgkIu8WhhW86XnM+JnT5V
+ 3LqPCQ9Z1wmkgjbBwohhOKBIVARIcvd2NhM/2xePHynw8Jgj0WIeTq1hLxGHrA875O93
+ 8SHaTWQ084GZz8/l4qUU+o9ynPj809IXkWJ3LEzhuDjll3Ffn4wN37v2uwXD/t3NUfNS
+ Vwr5duDzIm55HTkEBZ+3mmNhRoLD3mo4CdEeik5DlB4rU9IOReicpiQ2zbDF4eY5bWnv RQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3cmt8c8bg1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Nov 2021 11:54:52 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1AUBpgDu091107;
+        Tue, 30 Nov 2021 11:54:52 GMT
+Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam07lp2044.outbound.protection.outlook.com [104.47.51.44])
+        by aserp3020.oracle.com with ESMTP id 3cnhvcm4d8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Nov 2021 11:54:51 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c2adbbwwQBy/qVo1KdAWIZDxYPmhiuA3H8+N8FFXKvz/sdc+k8909YbD1qEN4McMi7+75yqUqnId0FTiBSz20SApVqFgEZXk7jRM5P4VZmVOYl0NlzbSNN2fhcIak/GNeaBSMZB3w9No7AWIxYqXOb5T43dn+gB00bDuHajQGdiOAJdgzI5Ccd3Dik4KphqJBQKuiLg4N4mBsfLhSU5vYeIpo6RAukG0sXa4EQHTw/whXcJEnWpXHy7X6PXvgrmQRwgBiS03mMB0FhRlIiU+mqsuKjdGJXOxwxhJM7CJF7khmnbaqxtUHagM6QRu5o5t6ffHSeerDFyssnQvmhcvWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8DMHX69vVsuf1PPkyMohSLaUcIjCjbRKdqM6zhgk0eM=;
+ b=KmmtfBANfu1aEmNOWvbMlrFUkCLONoJ24r9hL+YtXRpRi6j0yIYBcG+S9Em+DmBafOYLGkXBCh46ZU0M4CB3eg9tamVz1sYfHq0j7bluy9IQyy6d5ZaJDvCIoMLP40F3QRdXF48MllArWle6Qb38SqJ3ybPWIES2NxQiYGSMnUYMe0/y3pF/iP7nQ3WmpwPBiSrHzhMcrWqLCNuhCngIvdsS+pZdlgM62wahmvPJs7ZIfYfzVMPdY+6k1n0gKeV+uLxAcTKUY27ybq7seTT3/LCU6sXtHg7d16vMVGVy9WAzxCQXkRo+4WGCb3qMeF6ZcEHIEjpmwxIXQ/wSR7gH1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8DMHX69vVsuf1PPkyMohSLaUcIjCjbRKdqM6zhgk0eM=;
+ b=d8IkRKy6OueG1rY95T5ny5g7+RBUYiO3r91w7MajziFOIvhkhTLlxCrOhrIHlyR5xTleNKjPRQle7mtUk+2lXFIBqlhkReZEMGbcI8egazTkycKPUuM6W8vrQ+f0v6libooce2pIvpB02n0Uma+azee423FvXwtQ8PyRVtrOHek=
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28) by MWHPR10MB1550.namprd10.prod.outlook.com
+ (2603:10b6:300:25::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23; Tue, 30 Nov
+ 2021 11:54:50 +0000
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::7194:c377:36cc:d9f0]) by MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::7194:c377:36cc:d9f0%6]) with mapi id 15.20.4734.024; Tue, 30 Nov 2021
+ 11:54:50 +0000
+Date:   Tue, 30 Nov 2021 14:54:30 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     namjae.jeon@samsung.com
+Cc:     linux-cifs@vger.kernel.org
+Subject: [bug report] cifsd: add server-side procedures for SMB3
+Message-ID: <20211130115430.GA16669@kili>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-ClientProxiedBy: AM6PR10CA0044.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:209:80::21) To MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28)
 MIME-Version: 1.0
-Sender: ephost@ebsco.com
-From:   support@ebsco.com
-To:     a.chan@auckland.ac.nz, gianluca.grimalda@ifw-kiel.de,
-        rp237@le.ac.uk, tim.skelton@nihr.ac.uk, u003erp237@leicester.ac.uk,
-        rp237@leicester.ac.uk, vitor.calegaro@ufsm.br,
-        loreta.cannito@unich.it, baiyun@bjmu.edu.cn, jun_xu@bjmu.edu.cn,
-        hongkui_deng@pku.edu.cn, lino@uc-biotech.pt,
-        d.stavish@sheffield.ac.uk, fsxiao@mail.jlu.edu.cn,
-        communications@swissuniversities.ch, cathal.mccauley@mu.ie,
-        support@prodigi.uk, sebastian.arcq@mendeley.com,
-        talents4sse@cuhk.edu.cn, generalinfo@oipc.ab.ca, info@oipc.bc.ca,
-        yumi.yoshizawa@tandf.com.sg, howard.kim@tandf.com.sg,
-        hyosoon.kim@tandf.com.sg, andy.chuang@tandf.com.sg,
-        jason.lin@tandf.com.sg, samantha.chua@tandf.com.sg,
-        theo.chevalier11@gmail.com, ainar-g@yandex.ru, codebugs@yandex.ru,
-        contato@clicksistema.com.br, dmthomas.hoffmann@gmx.de,
-        kairo@kairo.at, luke@warlow.dev, m.kurz@irregular.at,
-        me@rachelandrew.co.uk, steven@sdf.me.uk, jacek@kuzemczak.co.uk,
-        carlsen@flairproductions.dk, j.skoczek@createit.com,
-        chadreitsma@shaw.ca, julian.reschke@gmx.de, kilian@catsoft.ch,
-        teun@be.nl, j.norahntambi@gmail.com, jjmeric@free.fr,
-        marcoagpinto@sapo.pt, sander@lepik.eu, bjoern@j3e.de,
-        jihui.choi@gmail.com, team@firefox.no, ambs@di.uminho.pt,
-        lolkeklololo3@yandex.ru, jose.h.espinosa@gmail.com, info@soblex.de,
-        stephanie.evans@phe.gov.uk, ccce@cheminst.ca, cktech@ckgroup.co.uk,
-        pharmacontracts@ckagroup.co.uk, nicole.poole@csiro.au,
-        aguimard@ckqls.ch, sfarrow@ckgroup.co.uk, math4mat-search@epfl.ch,
-        yueling.seow@tandf.com.sg, irjournal@uw.edu.pl,
-        editorial@open-research-europe.ec.europa.eu,
-        linux-acpi@archiver.kernel.org, linux-acpi@vger.kernel.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        andrew@lunn.ch, arnd@arndb.de,
-        77eed.1635317102.git.yu.c.chen@intel.com,
-        9110e.1635317102.git.yu.c.chen@intel.com,
-        35715.1635317102.git.yu.c.chen@intel.com,
-        47b8f.1635317102.git.yu.c.chen@intel.com,
-        7519.4789817107293464743.stgit@warthog.procyon.org.uk,
-        7519.6594360917661719152.stgit@warthog.procyon.org.uk,
-        519.11215118047756175525.stgit@warthog.procyon.org.uk,
-        519.13954182746095781120.stgit@warthog.procyon.org.uk,
-        519.14706391695553204156.stgit@warthog.procyon.org.uk,
-        7519.8649368675533788865.stgit@warthog.procyon.org.uk,
-        519.17630241595380785887.stgit@warthog.procyon.org.uk,
-        7519.2951437510049163050.stgit@warthog.procyon.org.uk,
-        7519.8303891885033763947.stgit@warthog.procyon.org.uk,
-        7519.5910362900676754518.stgit@warthog.procyon.org.uk,
-        028190125.391374-1-mmakassikis@freebox.fr,
-        jwoithe@physics.adelaide.edu.au, hmh@hmh.eng.br,
-        astarikovskiy@suse.de, rjw@sisk.pl, linux-cifs@archiver.kernel.org,
-        linux-cifs@vger.kernel.org, mmakassikis@freebox.fr,
-        019153937.412534-1-mmakassikis@freebox.fr,
-        019083641.116783-1-mmakassikis@freebox.fr,
-        16235715.3469969-1-mmakassikis@freebox.fr,
-        15130222.2976760-1-mmakassikis@freebox.fr,
-        joe.keller@futurenet.com, luke.filipowicz@futurenet.com
-Date:   29 Nov 2021 14:58:50 -0500
-Subject: Fat Removes and Protein Bars
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: base64
+Received: from kili (102.222.70.114) by AM6PR10CA0044.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:209:80::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.21 via Frontend Transport; Tue, 30 Nov 2021 11:54:47 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 71cc8e83-c43a-4653-8d0e-08d9b3f83694
+X-MS-TrafficTypeDiagnostic: MWHPR10MB1550:
+X-Microsoft-Antispam-PRVS: <MWHPR10MB1550EE3A97DD4FD23316E3CC8E679@MWHPR10MB1550.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xmK/1rwB4GkxdwDbztMXEKpCBZ9nJvoQrMx2pwcZUvjvfWH2Sgn0KeMc6eVnpY9mlZqysTwx/67IFJSerdJXQP7Deq8gnKpQxBW2xzu+9TTlItGnjew9WvgLQ/gaNJTraivFoNbCRs13g9BpEPxkN5feROUtiOL6p9jGCUzmQmgSCgBbkYzWP9ZhFJO3vr3xJN4dsHPkl9GdI45ZykrYn+PBtvSzCa56DpaNWILHRAsKAgdbWb/Gl+s/edfvWXdYQJ8qKrYu9792yUL+jbmFsWF3K9lsNdTplKmMHKr5kdj/QHZd+Oc2JZyb0ZuxtV6Zxb2wzP3q043uKuweeCVsVRq923pT9VixHmemdHHhPVPpLCZ+s7cyh8AidPTtjRKHCXX/oGt9D7v+ITGQVfXFNwAzRWarI1mnB4ua8EmGrH31bQfEBh4pKXmKyPI034nCbWJdpCA52lv/MAIRkvFTTz7hBAFPNC+wAoob5ITMNEpigSCvkUGR9mHwvmk5Xf2qMOJ6I8QshLSUrrRffgcwZ0CIaU+1MyPGCf2T4lH8KDy9gX6qM4WoVprYilxFbwUjcYE3Ev8AHvFJDJyMZMAo9XIckZjcHg8T5GVzj/hjBfieN8vIbG8KVbT+DZQxyicmRzRM9g/FkN8l/AiL9F19l6snW0mCwkhh0XSi1pjBdBrATGoKGq3cNk5ZZhnFCHuJxspGIeMhzK3owvePUzv86Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(1076003)(956004)(26005)(6666004)(55016003)(9686003)(6496006)(8676002)(38350700002)(4326008)(44832011)(33656002)(5660300002)(83380400001)(86362001)(33716001)(508600001)(316002)(6916009)(8936002)(9576002)(66556008)(66476007)(38100700002)(52116002)(2906002)(66946007)(186003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VLedNngFPrFOwS5BOviDZffMbzQJq1/9oEtg1gexag+cV5iKpxuh6ptuewIf?=
+ =?us-ascii?Q?bEZSNSjZa8QzhRjegLgAa62i2+iooxcHrvEC5hK8n8UdSt289hOsaAq4Gcch?=
+ =?us-ascii?Q?BAxQdeUdCa921uJAFmLlJmY/XrYb7tTjqDERkYbdLx4ndbF2AbUziEp4gxkr?=
+ =?us-ascii?Q?Cm0n7q67+lb2si9iR0fjciNdrK7Li4dGeTWw6JyJadzEKzmw8HoX4RpZDu5u?=
+ =?us-ascii?Q?36mTqLaEu3m+r3LEqGfC9dfU7g5hI8UmCB8rgCfCo51WW7xGPlEDfaZHSsyv?=
+ =?us-ascii?Q?PIsURlHylVY33dLdfPSVxwzvOtXSF78ErXKfv0/MhVhhoJ77t/EWrUDzlvGJ?=
+ =?us-ascii?Q?ZFf6SfGO1UNB1otkYNAk8B7R8IhXvYm14xJhiax1nOUNyebuJH2aZKJoCV/j?=
+ =?us-ascii?Q?/+BCKiv8Q6RAPY+rEscOYPRwEm4qyKvG7JrbcBhdqQ2uvAWyihtQwxAuxtOl?=
+ =?us-ascii?Q?UFmYNU7c3vkBy9rBFdflUahSEi/buAYqWHI1F462VLBWohsEPse5KwK8YLzV?=
+ =?us-ascii?Q?ZT0WUdk2C/fa8UsxWx9lx6tyqH81UjIuTyZVXgtfvjSTen1DVjLTtEZ7jUg7?=
+ =?us-ascii?Q?7SGx8Y8K+ynmNhHthoeRIDZ3/tMZ32P8CRhnANz/0vBIA+qFWY5sRiAh+Np0?=
+ =?us-ascii?Q?cKaABdon7WM6sOevkoJUCPvGDgzkoO/CcrNJuMKzibwZkf1TgLLEp9vFf022?=
+ =?us-ascii?Q?TZKK4KwFHkLTq0xaYpcfVYC4C20o+m5Pb7WEBMR2N2iNyowI+7k6xYI97bLs?=
+ =?us-ascii?Q?ZxvtobjPKUKULG9zP6f27KwefjgMy5B7EBbU3wRUkkqskQSDFiwjxTK0p4id?=
+ =?us-ascii?Q?YylrVv4Tt+s8VHuBnaw488Vush+nsZQpcGM2e45NMWqqSMQpX238PaglwTmt?=
+ =?us-ascii?Q?K9KzA/7r71FdZJQckArO7/ZyaIqMBayoeVBUNDeoTQHXdC2fKwrEfmz5fTSF?=
+ =?us-ascii?Q?SoUyeCueCEnuMGawYnNf3Lf2p4TqKWusZLkGborDdhbUcbNIo14FmRaleVj4?=
+ =?us-ascii?Q?Cu9nB4jDzI5tw9CoBGOKEBDbkb8sdHKkO+oTKhNVUVAB23BfyeuwosBD52xh?=
+ =?us-ascii?Q?ce/VIK+PJKN3B/BIV8PZuklSYMCT1a3tg+ouyDgZ4Ug0iYZKn+un0YkinENC?=
+ =?us-ascii?Q?TTPnGr46t0jCRc98L/kqwLh23Ntrwr+k924YLHdg25cO8Jdbh0NJRaxB/itR?=
+ =?us-ascii?Q?FG+ds9bp4XRORR/fkVRkWd9LqgK7QCWT8MWU9SF10JleRW9Ja4lhiz//d8j+?=
+ =?us-ascii?Q?5hWEPEjqMdkwffh++TANJsDppXnv4493fO076ySn1VoQQrZSsE0X0Sl3aNGw?=
+ =?us-ascii?Q?7oqWsuVYFl7MTQhmtVf6/152GWqMH/v3W/GHHTY5y9Pb+qgCgE/qKJvF0ISX?=
+ =?us-ascii?Q?UEYnz63i/sM+BjgZtgrFUdZ3jHt7g0EF4HGrn/aq7ZsT/7QolLUFpAz6GhcG?=
+ =?us-ascii?Q?TZfp5MrmRd50FV1aEr5ybqT4f57kPt2q7a4aSJrcb4/84n93fJvPi3VkJg8A?=
+ =?us-ascii?Q?cP/5U2hhkZ7wwoOVTdJbcNdf9sjtU7xL7SQhX9Nd0XJSpa9MZvohk8Ta2dm5?=
+ =?us-ascii?Q?0pwWlR7DEQcAEAlJzXvOfVkGpSh9RZt+3Y/4xSt9tyM8+CqCCgb4lPS7tZ7j?=
+ =?us-ascii?Q?YKgJPGLU+WMC6/nY+IdH1Mgku9L7xNTd39d3zp/k+wsDlJp56V4R34DgTkCX?=
+ =?us-ascii?Q?6U4pM37m8yHFZDGE1ewj+PRhWpg=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71cc8e83-c43a-4653-8d0e-08d9b3f83694
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Nov 2021 11:54:50.2440
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3+0b7lQ5lViDfRrYiqAhXLGmCo/boK3THb5st4WIoO6i9OxnIP7kK7AOLuGWh+yn2he3z/BW4m1dXDLtJF18XoQR8LIZwJ+2B3Y5XrEbw1o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR10MB1550
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10183 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0 adultscore=0
+ bulkscore=0 malwarescore=0 mlxlogscore=894 mlxscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2111300068
+X-Proofpoint-ORIG-GUID: jC2bJmz3kHBArvZ43jcqBD6PDS0Bf2WE
+X-Proofpoint-GUID: jC2bJmz3kHBArvZ43jcqBD6PDS0Bf2WE
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Q29tbWVudHM6DQpIZXksDQripLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXi
-pLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXi
-pLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXi
-pLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXipLXi
-pLXipLXipLXipLXipLXipLXipLXipLXipLUNCkFmcmljYW4gTWFuZ28gaXMgYSB3ZWln
-aHQgbG9zcyBzdXBwbGVtZW50IHRoYXQgYnVybnMgZmF0LCBzdXBwcmVzc2VzDQpodW5n
-ZXIgYW5kIGNyYXZpbmdzLCBhbmQgaGVscHMgbWFpbnRhaW4gaGVhbHRoeSBjaG9sZXN0
-ZXJvbCBsZXZlbHMuIEl0cw0KdW5pcXVlIGZvcm11bGF0aW9uIGlzIGJhc2VkIG9uIGEg
-bmF0dXJhbCBtb2xlY3VsZSBjYWxsZWQgcGFsbWl0b2xlaWMNCmFjaWQsIGFsc28ga25v
-d24gYXMgT21lZ2EgNy4gVGhpcyB1bmlxdWUgZmF0dHkgYWNpZCBoZWxwcyBmYXQgY2Vs
-bHMNCmNvbW11bmljYXRlIHdpdGggZWFjaCBvdGhlciwgZm9yY2luZyDigJxiYWQgZmF0
-4oCdIGluIHRoZSBib2R5IHRvIGJlDQpyZWxlYXNlZCBhbmQgdXNlZCBmb3IgZW5lcmd5
-LiBXaGljaCBtZWFucyBldmVuIGFzIHlvdSBzdGFydCBkcm9wcGluZw0KdGhvc2Ugc3R1
-YmJvcm4gcG91bmRzLCB5b3XigJlyZSBnb2luZyB0byBmZWVsIGdyZWF0IGFuZCBmdWxs
-IG9mIGVuZXJneSBhcw0KZmF0IHRoYXTigJlzIHJlbGVhc2VkIGZyb20geW91ciBjZWxs
-cyBnZXQgY29udmVydGVkIGludG8gZnVlbCBmb3IgeW91cg0KYm9keS4gPj4+PiBodHRw
-czovL2N1dHQubHkvM1Q4WjdNeA0K4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
-4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
-4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
-4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
-4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1DQpOdXZpYUdvIGlzIGEgZGVsaWNp
-b3VzIHByb3RlaW4gYmFyIHdpdGggYSBjb29raWUgYW5kIGNyZWFtIGZsYXZvciBsb3Zl
-ZA0KYWxsIG92ZXIgdGhlIHdvcmxkISBEdWUgdG8gdGhlIGxhcmdlIGRvc2Ugb2YgcHJv
-dGVpbiBhbmQgYSBzbWFsbCBhbW91bnQNCm9mIHN1Z2FyLCB0aGlzIHByb2R1Y3QgY2Fu
-IHJlcGxhY2UgYW55IG1lYWwuIE51dmlhR28gcHJvdmlkZXMgdGhlIGJvZHkNCndpdGgg
-YW4gZW5lcmd5IGJvb3N0LCBoZWxwcyBidWlsZCBtdXNjbGUgbWFzcyBhbmQgYWNjZWxl
-cmF0ZXMgcmVjb3ZlcnkNCmFmdGVyIHRyYWluaW5nLiBOdXZpYUdvIGJhcnMgYXJlIGNy
-ZWF0ZWQgd2l0aCBwYXNzaW9uIGFuZCBpbiBoYXJtb255DQp3aXRoIG5hdHVyZS4gVGhp
-cyBwcm9kdWN0IGNvbnRhaW5zIHRoZSByaWdodCBwcm9wb3J0aW9ucyBvZg0KbWFjcm9u
-dXRyaWVudHMgdG8gc3RyZW5ndGhlbiB0aGUgYm9keSBhbmQgaGVscCBtYWludGFpbiBh
-IGZpdC1maWd1cmUuDQpOdXZpYUdvIGJhcnMgYXJlIG5vdCBvbmx5IGEgZGVsaWNpb3Vz
-LCBzd2VldCBzbmFjaywgYnV0IGFib3ZlIGFsbCBhDQpyZWFsLCB3aG9sZXNvbWUgbWVh
-bCE+Pj4gaHR0cHM6Ly9jdXR0Lmx5L2tUOFhLZkUNCuKkteKkteKkteKkteKkteKkteKk
-teKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKk
-teKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKk
-teKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKk
-teKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKkteKktQ0KUmVnYXJkcw0K
-4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
-4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
-4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
-4qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS14qS1
-4qS14qS14qS1DQpKdWxpYQ0KICBfX19fXyAgDQoNCg0KUmVjb3JkOiAxDQoNClRpdGxl
-OglUbyB0aGUgQXV0aG9yIG9mIHRoZSBORVcgQU1FUklDQU4gTUFHQVpJTkUuIAkNCg0K
-U291cmNlOglOZXcgQW1lcmljYW4gTWFnYXppbmUuIE1hcjE3NjAsIElzc3VlIDI3LCBw
-ODctODguIDJwLiAJDQoNClB1YmxpY2F0aW9uIFR5cGU6CVBlcmlvZGljYWwJDQoNCkRv
-Y3VtZW50IFR5cGU6CUxldHRlcgkNCg0KU3ViamVjdHM6CUxFVFRFUlMgdG8gdGhlIGVk
-aXRvcg0KUFNZQ0hPTE9HSUNBTCBzdHJlc3MJDQoNCkFjY2Vzc2lvbiBOdW1iZXI6CTM0
-ODQxMDM0CQ0KDQpQZXJzaXN0ZW50IGxpbmsgdG8gdGhpcyByZWNvcmQgKFBlcm1hbGlu
-ayk6IA0KaHR0cHM6Ly9zZWFyY2guZWJzY29ob3N0LmNvbS9sb2dpbi5hc3B4P2RpcmVj
-dD10cnVlJmRiPWg5aCZBTj0zNDg0MTAzNCZzDQppdGU9ZWhvc3QtbGl2ZQ0KQ3V0IGFu
-ZCBQYXN0ZTogPGENCmhyZWY9Imh0dHBzOi8vc2VhcmNoLmVic2NvaG9zdC5jb20vbG9n
-aW4uYXNweD9kaXJlY3Q9dHJ1ZSZkYj1oOWgmQU49MzQ4NA0KMTAzNCZzaXRlPWVob3N0
-LWxpdmUiPlRvIHRoZSBBdXRob3Igb2YgdGhlIE5FVyBBTUVSSUNBTiBNQUdBWklORS48
-L2E+DQoNCiAgX19fX18gIA0KDQpUaGUgbGluayBpbmZvcm1hdGlvbiBhYm92ZSBwcm92
-aWRlcyBhIHBlcnNpc3RlbnQgbGluayB0byB0aGUgYXJ0aWNsZQ0KeW91J3ZlIHJlcXVl
-c3RlZC4NCg0KUGVyc2lzdGVudCBsaW5rIHRvIHRoaXMgcmVjb3JkOiBGb2xsb3dpbmcg
-dGhlIGxpbmsgYWJvdmUgd2lsbCBicmluZyB5b3UNCnRvIHRoZSBzdGFydCBvZiB0aGUg
-YXJ0aWNsZSBvciBjaXRhdGlvbi4NCg0KQ3V0IGFuZCBQYXN0ZTogVG8gcGxhY2UgYXJ0
-aWNsZSBsaW5rcyBpbiBhbiBleHRlcm5hbCB3ZWIgZG9jdW1lbnQsDQpzaW1wbHkgY29w
-eSBhbmQgcGFzdGUgdGhlIEhUTUwgYWJvdmUsIHN0YXJ0aW5nIHdpdGggIjxhIGhyZWYi
-DQoNCklmIHlvdSBoYXZlIGFueSBwcm9ibGVtcyBvciBxdWVzdGlvbnMsIGNvbnRhY3Qg
-VGVjaG5pY2FsIFN1cHBvcnQgYXQNCmh0dHA6Ly9zdXBwb3J0LmVwbmV0LmNvbS9jb250
-YWN0L2Fza3VzLnBocCBvciBjYWxsIDgwMC03NTgtNTk5NS4NCg0KVGhpcyBlLW1haWwg
-d2FzIGdlbmVyYXRlZCBieSBhIHVzZXIgb2YgRUJTQ09ob3N0IHdobyBnYWluZWQgYWNj
-ZXNzIHZpYQ0KdGhlIE1JTklURVggTElCUkFSWSBJTkZPIE5FVFdPUksgYWNjb3VudC4g
-TmVpdGhlciBFQlNDTyBub3IgTUlOSVRFWA0KTElCUkFSWSBJTkZPIE5FVFdPUksgaXMg
-cmVzcG9uc2libGUgZm9yIHRoZSBjb250ZW50IG9mIHRoaXMgZS1tYWlsLg0K
+Hello Namjae Jeon,
 
+The patch e2f34481b24d: "cifsd: add server-side procedures for SMB3"
+from Mar 16, 2021, leads to the following Smatch static checker
+warning:
+
+	fs/ksmbd/smb2pdu.c:2970 smb2_open()
+	error: uninitialized symbol 'pntsd_size'.
+
+fs/ksmbd/smb2pdu.c
+    2930                 if (rc) {
+    2931                         rc = smb2_create_sd_buffer(work, req, &path);
+    2932                         if (rc) {
+    2933                                 if (posix_acl_rc)
+    2934                                         ksmbd_vfs_set_init_posix_acl(user_ns,
+    2935                                                                      inode);
+    2936 
+    2937                                 if (test_share_config_flag(work->tcon->share_conf,
+    2938                                                            KSMBD_SHARE_FLAG_ACL_XATTR)) {
+    2939                                         struct smb_fattr fattr;
+    2940                                         struct smb_ntsd *pntsd;
+    2941                                         int pntsd_size, ace_num = 0;
+    2942 
+    2943                                         ksmbd_acls_fattr(&fattr, user_ns, inode);
+    2944                                         if (fattr.cf_acls)
+    2945                                                 ace_num = fattr.cf_acls->a_count;
+    2946                                         if (fattr.cf_dacls)
+    2947                                                 ace_num += fattr.cf_dacls->a_count;
+    2948 
+    2949                                         pntsd = kmalloc(sizeof(struct smb_ntsd) +
+    2950                                                         sizeof(struct smb_sid) * 3 +
+    2951                                                         sizeof(struct smb_acl) +
+    2952                                                         sizeof(struct smb_ace) * ace_num * 2,
+    2953                                                         GFP_KERNEL);
+    2954                                         if (!pntsd)
+    2955                                                 goto err_out;
+    2956 
+    2957                                         rc = build_sec_desc(user_ns,
+    2958                                                             pntsd, NULL,
+    2959                                                             OWNER_SECINFO |
+    2960                                                             GROUP_SECINFO |
+    2961                                                             DACL_SECINFO,
+    2962                                                             &pntsd_size, &fattr);
+
+No check for if "rc" is an error code.
+
+    2963                                         posix_acl_release(fattr.cf_acls);
+    2964                                         posix_acl_release(fattr.cf_dacls);
+    2965 
+    2966                                         rc = ksmbd_vfs_set_sd_xattr(conn,
+    2967                                                                     user_ns,
+    2968                                                                     path.dentry,
+    2969                                                                     pntsd,
+--> 2970                                                                     pntsd_size);
+                                                                             ^^^^^^^^^^
+
+    2971                                         kfree(pntsd);
+    2972                                         if (rc)
+    2973                                                 pr_err("failed to store ntacl in xattr : %d\n",
+    2974                                                        rc);
+    2975                                 }
+    2976                         }
+    2977                 }
+    2978                 rc = 0;
+    2979         }
+
+regards,
+dan carpenter
