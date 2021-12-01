@@ -2,102 +2,134 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C213EC4332F
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Dec 2021 08:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 913F5C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Dec 2021 16:57:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347973AbhLAIc6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Dec 2021 03:32:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29389 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1347969AbhLAIc6 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Dec 2021 03:32:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638347377;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4tUl7G8alL78nfbRo0WLNZl+gkt+X3mS2JKYOztBaCw=;
-        b=Q9HTm2UK5n3YyPaocpbkGIT5GvvKs130tSBFOthRPS0We8O5q0q0Gtc4w75CTKqDgE3WFO
-        XuiW0kuCl7iVjNlOLHIFV88qNNb/vS9d4TEqc7XK5Qct8yo1YZZqEMGiBh0QBVcXI8iuwp
-        //esibe6Ljr4T6St26rp7mdaj0s+muY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-521-AnOULJD2MFCLO_7J_kL0gQ-1; Wed, 01 Dec 2021 03:29:34 -0500
-X-MC-Unique: AnOULJD2MFCLO_7J_kL0gQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1351143AbhLARA7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Dec 2021 12:00:59 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:51830 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232427AbhLARAw (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Dec 2021 12:00:52 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2A42190B2A1;
-        Wed,  1 Dec 2021 08:29:30 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A14EB4D73A;
-        Wed,  1 Dec 2021 08:29:26 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <bcefb8f2-576a-b3fc-cc29-89808ebfd7c1@linux.alibaba.com>
-References: <bcefb8f2-576a-b3fc-cc29-89808ebfd7c1@linux.alibaba.com> <163819575444.215744.318477214576928110.stgit@warthog.procyon.org.uk> <163819640393.215744.15212364106412961104.stgit@warthog.procyon.org.uk>
-To:     JeffleXu <jefflexu@linux.alibaba.com>
-Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 44/64] cachefiles: Implement key to filename encoding
+        by smtp-out1.suse.de (Postfix) with ESMTPS id E3672212C0;
+        Wed,  1 Dec 2021 16:57:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1638377850; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ymluOGecTiavMSeVQ9ERm6KR1+C6xRixSKMhXGdT8dk=;
+        b=z+UbGj7R5+hRrBaXAlCZmrJiDiOHmNRTDLV9OSZUzLGis4u7oI/q30o4+JZSPWIoA+cWUN
+        OlKuqucBFEyaemEMfnaP6R4R51e5/Ue74kAz7ti4aJVx8v0DxfzdQ/mtKn93RXYr6/0iBg
+        IPzuN+AUwEkmGzZqeD7jxFofeKjs74g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1638377850;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ymluOGecTiavMSeVQ9ERm6KR1+C6xRixSKMhXGdT8dk=;
+        b=uBeiTdYn1hWMR60DRJKllhJNbp7E5eQ4duIZXLg5Y+6JUP0o+haJb2XoGA2xd8FBBDsX2J
+        kqMoxT1S4Wz6+UBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 63D8613D90;
+        Wed,  1 Dec 2021 16:57:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id uRsuC3qpp2GHKQAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Wed, 01 Dec 2021 16:57:30 +0000
+Date:   Wed, 1 Dec 2021 13:57:28 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Hyeoncheol Lee <hyc.lee@gmail.com>,
+        Steve French <smfrench@gmail.com>
+Subject: Re: [RFC] Unify all programs into a single 'ksmbdctl' binary
+Message-ID: <20211201165728.r3jvaan2hw5icfvp@cyberdelia>
+References: <20211130184710.r7dzzfhak4w3eoi6@cyberdelia>
+ <CAKYAXd9b0Pji2+Ek9ZcRjN0SfZd4jzyNtDLKwzySh4WCjmSYkQ@mail.gmail.com>
+ <CA+_sParqF63m24NjL4o42agyk3mU_Cq1A-kpKFBpZaGmhdWYqg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <571667.1638347365.1@warthog.procyon.org.uk>
-Date:   Wed, 01 Dec 2021 08:29:25 +0000
-Message-ID: <571668.1638347365@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CA+_sParqF63m24NjL4o42agyk3mU_Cq1A-kpKFBpZaGmhdWYqg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-JeffleXu <jefflexu@linux.alibaba.com> wrote:
+On 12/01, Sergey Senozhatsky wrote:
+>On Wed, Dec 1, 2021 at 11:17 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
+>>
+>> > I've been working on the unification of all ksmbd-tools programs into a
+>> > single 'ksmbdctl' binary, and I would like to invite everyone to test
+>> > and/or provide me feedback on the implementation.
+>
+>Why?
 
-> > +	/* If the path is usable ASCII, then we render it directly */
-> > +	if (print) {
-> > +		len = 1 + keylen + 1;
-> > +		name = kmalloc(len, GFP_KERNEL);
-> > +		if (!name)
-> > +			return false;
-> > +
-> > +		name[0] = 'D'; /* Data object type, string encoding */
-> > +		name[1 + keylen] = 0;
-> > +		memcpy(name + 1, key, keylen);
-> > +		goto success;
-> 			^
-> If we goto success from here,
+Hi Sergey. The reasoning was in the commit message included in the
+email, but I'll quote it here and elaborate:
+
 > ...
-> > +
-> > +success:
-> > +	name[len] = 0;
-> 	     ^
-> then it seems that this will cause an out-of-boundary access.
+> The intention is to make it more like other modern tools (e.g. git,
+> nvme, virsh, etc) which have more clear user interface, readable
+> commands, and also makes it easier to script.
+> 
+> Example commands:
+>   # ksmbdctl share add myshare -o "guest ok=yes, writable=yes, path=/mnt/data"
+>   # ksmbdctl user add myuser
+>   # ksmbdctl user add -i $HOME/mysmb.conf anotheruser
+>   # ksmbdctl daemon start
+> 
+> Besides adding a new "share list" command, any previously working
+> functionality shouldn't be affected.
 
-You're right.  I'll change that to:
+- clearer user interface: having a single binary looks much clearer than
+   having several separate programs when, e.g. the user is looking which
+   program does what.
 
-		len = 1 + keylen;
-		name = kmalloc(len + 1, GFP_KERNEL);
+- more readable commands: continuing from topic above, the situation is
+   improved especially when you see that, e.g., the ksmbd.addshare program
+   also updates and deletes shares. With this unification, it is way more
+   intuitive to use:
 
-and I shouldn't need:
+---- snip ----
+% ./ksmbdctl share
+Usage: ksmbdctl share <subcommand> <args> [options]
+Share management.
 
-		name[1 + keylen] = 0;
+List of available subcommands:
+   add               Add a share
+   delete            Delete a share
+   update            Update a share
+   list              List the names of all shares available
+---- snip ----
 
-as that's also done after the success label.
+- easier to script: having a defined structure for the commands makes it
+   easier for users to automate ksmbd deployments. This is more of a
+   consequence of the topics above, but should count as an advantage IMO.
 
-David
+As I also said in the commit message, the idea is to have an abstract
+implementation so we can add/manage/remove commands without having to
+rely on each command specifics. Of course, this shouldn't have much/any
+effect for users, but will have great benefit for developers.
 
+And, again, I ask you to consider the applications I used as inspiration
+for such change, such as git, nvme-cli, virsh, which are tools that many
+of us use every day and, e.g. "git help -a | grep "^   " | wc -l" says
+there are about 144 git commands, but I sure don't have 144 git binaries
+spread over my system.
+
+I hope to have made myself clearer now, but please let me know
+otherwise.
+
+
+Cheers,
+
+Enzo
