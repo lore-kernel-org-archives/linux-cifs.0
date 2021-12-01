@@ -2,65 +2,77 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C22BC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Dec 2021 00:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D5EC433FE
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Dec 2021 01:55:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345762AbhLAAf7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 30 Nov 2021 19:35:59 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:45174 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345744AbhLAAf7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Nov 2021 19:35:59 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id D99DFCE1D19;
-        Wed,  1 Dec 2021 00:32:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6244C53FCB;
-        Wed,  1 Dec 2021 00:32:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638318755;
-        bh=o/vguVdCIFrn8XRMYWINw9V41uwBDFShZeJRxnqWwho=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=lAA5qm4h4CeqHj7icP81QtUK9i8XTP7N1jKrKdgs7Pietyn+Gpb4BLyGFfH+QZ/lW
-         3IENHjFLQayGdnN0/cTzM2xT2Lxh18YA6sFngAx11xcM86WY9+mVyO6mKyxFiXhckC
-         1Vey1/8/59+fWf55QiJG2cGc/BVUIwUv3yf0HKYyyI0+GD1CkphpkFz4M8kp86D2aL
-         NPEjpBSGRvFm4zTB8r8d75v9Z7oRd7kIb5u3IjEMK8f2I5UT6KKHgLNsfcpMl7VqY8
-         UGyssa1hQvaHjAzslbzXJ4nBa0zJ9eUdy9oqAnwxby/wZDhkh1pIGpVIL2CMUttnRO
-         0VZLd/7mq5KDA==
-Received: by mail-oi1-f179.google.com with SMTP id u74so44842414oie.8;
-        Tue, 30 Nov 2021 16:32:35 -0800 (PST)
-X-Gm-Message-State: AOAM5312AJ3lKlRS1l9PyNvKk3VSWBQFM7p4G8cXccprwfke4GXlyQsx
-        WLE6rgcefbppY7eV+VMMk67JWGoXjPbxdkM8FX0=
-X-Google-Smtp-Source: ABdhPJxI1ik1dYJ6aPpTMBKWTgaM63xxSd+huBLdtmpJhNxeFVO031rRXXlqI3Ss5WQ1uJtWNwT1GPsfePUXXoFEcT0=
-X-Received: by 2002:aca:eb0b:: with SMTP id j11mr2564526oih.51.1638318755138;
- Tue, 30 Nov 2021 16:32:35 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:ac9:428a:0:0:0:0:0 with HTTP; Tue, 30 Nov 2021 16:32:34
- -0800 (PST)
-In-Reply-To: <20211130125047.GA24578@kili>
-References: <20211130125047.GA24578@kili>
+        id S1345614AbhLAB6w (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 30 Nov 2021 20:58:52 -0500
+Received: from mail-pf1-f173.google.com ([209.85.210.173]:46040 "EHLO
+        mail-pf1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230168AbhLAB6v (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 30 Nov 2021 20:58:51 -0500
+Received: by mail-pf1-f173.google.com with SMTP id x131so22587996pfc.12;
+        Tue, 30 Nov 2021 17:55:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CSlY3kDkqNpr0i143EnhPyM2hS2hMm/Ui4ojaZheVnw=;
+        b=JatidTEl7eca0VwCsIn3I+hlsuLHxMvJVFmZ6sE1QieBIM6xPyaaBmcEY7BjsleQbk
+         4DgVsXsaCpazBwbxaoygNJe67u4fFHLOIVWqs11Hd7NwtluzsnU/E0Ijz84y/PjgOerk
+         J+SeAuTrYwCdUcomUf95gZF1QFevNS49ADk+PpOoPheT5pv+n+JUxYo85PvVZtMxXgj8
+         Dep32cuqL18wFYtCGXTjBC8YkhlcY8RNjdn4nTOjuNxnjyjnsdDNYa9v15zgrggUO5B7
+         dJNeUoF4Zs+6TEgrzSE/+10s/t80svleCKw3hLyW93Dlipbknv7GowP+fN+zNGsskUi4
+         pjAw==
+X-Gm-Message-State: AOAM532MUEHepbqDWZ9gsUb8QLMAhxVq+VXb6fL4ooB2mT8Il0TsKhJT
+        CmY5ZltPi5pByqlIEEOAtCqWRbPBG2A=
+X-Google-Smtp-Source: ABdhPJz35m2vF5a5muU8RxSqhsB3eyN31BC/XqgtkbYkYegJxfSQgoChDgIG6yUJrLBLrVsjxnDnCQ==
+X-Received: by 2002:a05:6a00:1c56:b0:4a4:f8cb:2604 with SMTP id s22-20020a056a001c5600b004a4f8cb2604mr3015274pfw.34.1638323730694;
+        Tue, 30 Nov 2021 17:55:30 -0800 (PST)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id g19sm15930560pgi.10.2021.11.30.17.55.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Nov 2021 17:55:16 -0800 (PST)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Wed, 1 Dec 2021 09:32:34 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8MWZCft5s3tu2omjU__9J46sCXqO2rbph5Aqivzp3rUg@mail.gmail.com>
-Message-ID: <CAKYAXd8MWZCft5s3tu2omjU__9J46sCXqO2rbph5Aqivzp3rUg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix error code in ndr_read_int32()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <sfrench@samba.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>, stable@vger.kernel.org,
+        Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH] ksmbd: fix uninitialized symbol 'pntsd_size'
+Date:   Wed,  1 Dec 2021 10:54:59 +0900
+Message-Id: <20211201015459.26242-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-11-30 21:50 GMT+09:00, Dan Carpenter <dan.carpenter@oracle.com>:
-> This is a failure path and it should return -EINVAL instead of success.
-> Otherwise it could result in the caller using uninitialized memory.
->
-> Fixes: 303fff2b8c77 ("ksmbd: add validation for ndr read/write functions")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+No check for if "rc" is an error code for build_sec_desc().
+This can cause problems with using uninitialized pntsd_size.
 
-Thanks!
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org # v5.15
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/smb2pdu.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index c70972b49da8..615f977b9d15 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -2960,6 +2960,10 @@ int smb2_open(struct ksmbd_work *work)
+ 							    &pntsd_size, &fattr);
+ 					posix_acl_release(fattr.cf_acls);
+ 					posix_acl_release(fattr.cf_dacls);
++					if (rc) {
++						kfree(pntsd);
++						goto err_out;
++					}
+ 
+ 					rc = ksmbd_vfs_set_sd_xattr(conn,
+ 								    user_ns,
+-- 
+2.25.1
+
