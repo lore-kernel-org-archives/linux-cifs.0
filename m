@@ -2,28 +2,47 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6626C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Dec 2021 05:46:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C213EC4332F
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Dec 2021 08:29:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234654AbhLAFt3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Dec 2021 00:49:29 -0500
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:37247 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230497AbhLAFt2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Dec 2021 00:49:28 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0UywY0em_1638337562;
-Received: from 30.225.24.24(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UywY0em_1638337562)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 01 Dec 2021 13:46:04 +0800
-Message-ID: <bcefb8f2-576a-b3fc-cc29-89808ebfd7c1@linux.alibaba.com>
-Date:   Wed, 1 Dec 2021 13:46:02 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.3.0
-Subject: Re: [PATCH 44/64] cachefiles: Implement key to filename encoding
-Content-Language: en-US
-To:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com
-Cc:     Trond Myklebust <trondmy@hammerspace.com>,
+        id S1347973AbhLAIc6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Dec 2021 03:32:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29389 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347969AbhLAIc6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Dec 2021 03:32:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638347377;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4tUl7G8alL78nfbRo0WLNZl+gkt+X3mS2JKYOztBaCw=;
+        b=Q9HTm2UK5n3YyPaocpbkGIT5GvvKs130tSBFOthRPS0We8O5q0q0Gtc4w75CTKqDgE3WFO
+        XuiW0kuCl7iVjNlOLHIFV88qNNb/vS9d4TEqc7XK5Qct8yo1YZZqEMGiBh0QBVcXI8iuwp
+        //esibe6Ljr4T6St26rp7mdaj0s+muY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-521-AnOULJD2MFCLO_7J_kL0gQ-1; Wed, 01 Dec 2021 03:29:34 -0500
+X-MC-Unique: AnOULJD2MFCLO_7J_kL0gQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2A42190B2A1;
+        Wed,  1 Dec 2021 08:29:30 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A14EB4D73A;
+        Wed,  1 Dec 2021 08:29:26 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <bcefb8f2-576a-b3fc-cc29-89808ebfd7c1@linux.alibaba.com>
+References: <bcefb8f2-576a-b3fc-cc29-89808ebfd7c1@linux.alibaba.com> <163819575444.215744.318477214576928110.stgit@warthog.procyon.org.uk> <163819640393.215744.15212364106412961104.stgit@warthog.procyon.org.uk>
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
+        Trond Myklebust <trondmy@hammerspace.com>,
         Anna Schumaker <anna.schumaker@netapp.com>,
         Steve French <sfrench@samba.org>,
         Dominique Martinet <asmadeus@codewreck.org>,
@@ -36,139 +55,49 @@ Cc:     Trond Myklebust <trondmy@hammerspace.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <163819575444.215744.318477214576928110.stgit@warthog.procyon.org.uk>
- <163819640393.215744.15212364106412961104.stgit@warthog.procyon.org.uk>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-In-Reply-To: <163819640393.215744.15212364106412961104.stgit@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 44/64] cachefiles: Implement key to filename encoding
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <571667.1638347365.1@warthog.procyon.org.uk>
+Date:   Wed, 01 Dec 2021 08:29:25 +0000
+Message-ID: <571668.1638347365@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
+JeffleXu <jefflexu@linux.alibaba.com> wrote:
 
+> > +	/* If the path is usable ASCII, then we render it directly */
+> > +	if (print) {
+> > +		len = 1 + keylen + 1;
+> > +		name = kmalloc(len, GFP_KERNEL);
+> > +		if (!name)
+> > +			return false;
+> > +
+> > +		name[0] = 'D'; /* Data object type, string encoding */
+> > +		name[1 + keylen] = 0;
+> > +		memcpy(name + 1, key, keylen);
+> > +		goto success;
+> 			^
+> If we goto success from here,
+> ...
+> > +
+> > +success:
+> > +	name[len] = 0;
+> 	     ^
+> then it seems that this will cause an out-of-boundary access.
 
-On 11/29/21 10:33 PM, David Howells wrote:
+You're right.  I'll change that to:
 
-> +/*
-> + * turn the raw key into something cooked
-> + * - the key may be up to NAME_MAX in length (including the length word)
-> + *   - "base64" encode the strange keys, mapping 3 bytes of raw to four of
-> + *     cooked
-> + *   - need to cut the cooked key into 252 char lengths (189 raw bytes)
-> + */
-> +bool cachefiles_cook_key(struct cachefiles_object *object)
-> +{
-> +	const u8 *key = fscache_get_key(object->cookie), *kend;
-> +	unsigned char ch;
-> +	unsigned int acc, i, n, nle, nbe, keylen = object->cookie->key_len;
-> +	unsigned int b64len, len, print, pad;
-> +	char *name, sep;
-> +
-> +	_enter(",%u,%*phN", keylen, keylen, key);
-> +
-> +	BUG_ON(keylen > NAME_MAX - 3);
-> +
-> +	print = 1;
-> +	for (i = 0; i < keylen; i++) {
-> +		ch = key[i];
-> +		print &= cachefiles_filecharmap[ch];
-> +	}
-> +
-> +	/* If the path is usable ASCII, then we render it directly */
-> +	if (print) {
-> +		len = 1 + keylen + 1;
-> +		name = kmalloc(len, GFP_KERNEL);
-> +		if (!name)
-> +			return false;
-> +
-> +		name[0] = 'D'; /* Data object type, string encoding */
-> +		name[1 + keylen] = 0;
-> +		memcpy(name + 1, key, keylen);
-> +		goto success;
-			^
-If we goto success from here,
+		len = 1 + keylen;
+		name = kmalloc(len + 1, GFP_KERNEL);
 
-> +	}
-> +
-> +	/* See if it makes sense to encode it as "hex,hex,hex" for each 32-bit
-> +	 * chunk.  We rely on the key having been padded out to a whole number
-> +	 * of 32-bit words.
-> +	 */
-> +	n = round_up(keylen, 4);
-> +	nbe = nle = 0;
-> +	for (i = 0; i < n; i += 4) {
-> +		u32 be = be32_to_cpu(*(__be32 *)(key + i));
-> +		u32 le = le32_to_cpu(*(__le32 *)(key + i));
-> +
-> +		nbe += 1 + how_many_hex_digits(be);
-> +		nle += 1 + how_many_hex_digits(le);
-> +	}
-> +
-> +	b64len = DIV_ROUND_UP(keylen, 3);
-> +	pad = b64len * 3 - keylen;
-> +	b64len = 2 + b64len * 4; /* Length if we base64-encode it */
-> +	_debug("len=%u nbe=%u nle=%u b64=%u", keylen, nbe, nle, b64len);
-> +	if (nbe < b64len || nle < b64len) {
-> +		unsigned int nlen = min(nbe, nle) + 1;
-> +		name = kmalloc(nlen, GFP_KERNEL);
-> +		if (!name)
-> +			return false;
-> +		sep = (nbe <= nle) ? 'S' : 'T'; /* Encoding indicator */
-> +		len = 0;
-> +		for (i = 0; i < n; i += 4) {
-> +			u32 x;
-> +			if (nbe <= nle)
-> +				x = be32_to_cpu(*(__be32 *)(key + i));
-> +			else
-> +				x = le32_to_cpu(*(__le32 *)(key + i));
-> +			name[len++] = sep;
-> +			if (x != 0)
-> +				len += snprintf(name + len, nlen - len, "%x", x);
-> +			sep = ',';
-> +		}
-> +		goto success;
-> +	}
-> +
-> +	/* We need to base64-encode it */
-> +	name = kmalloc(b64len + 1, GFP_KERNEL);
-> +	if (!name)
-> +		return false;
-> +
-> +	name[0] = 'E';
-> +	name[1] = '0' + pad;
-> +	len = 2;
-> +	kend = key + keylen;
-> +	do {
-> +		acc  = *key++;
-> +		if (key < kend) {
-> +			acc |= *key++ << 8;
-> +			if (key < kend)
-> +				acc |= *key++ << 16;
-> +		}
-> +
-> +		name[len++] = cachefiles_charmap[acc & 63];
-> +		acc >>= 6;
-> +		name[len++] = cachefiles_charmap[acc & 63];
-> +		acc >>= 6;
-> +		name[len++] = cachefiles_charmap[acc & 63];
-> +		acc >>= 6;
-> +		name[len++] = cachefiles_charmap[acc & 63];
-> +	} while (key < kend);
-> +
-> +success:
-> +	name[len] = 0;
-	     ^
-then it seems that this will cause an out-of-boundary access.
+and I shouldn't need:
 
+		name[1 + keylen] = 0;
 
-> +	object->d_name = name;
-> +	object->d_name_len = len;
-> +	_leave(" = %s", object->d_name);
-> +	return true;
-> +}
-> 
+as that's also done after the success label.
 
--- 
-Thanks,
-Jeffle
+David
+
