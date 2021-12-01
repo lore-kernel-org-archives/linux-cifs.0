@@ -2,134 +2,125 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 913F5C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  1 Dec 2021 16:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FB1BC433F5
+	for <linux-cifs@archiver.kernel.org>; Wed,  1 Dec 2021 20:42:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351143AbhLARA7 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 1 Dec 2021 12:00:59 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:51830 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232427AbhLARAw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Dec 2021 12:00:52 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E3672212C0;
-        Wed,  1 Dec 2021 16:57:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1638377850; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ymluOGecTiavMSeVQ9ERm6KR1+C6xRixSKMhXGdT8dk=;
-        b=z+UbGj7R5+hRrBaXAlCZmrJiDiOHmNRTDLV9OSZUzLGis4u7oI/q30o4+JZSPWIoA+cWUN
-        OlKuqucBFEyaemEMfnaP6R4R51e5/Ue74kAz7ti4aJVx8v0DxfzdQ/mtKn93RXYr6/0iBg
-        IPzuN+AUwEkmGzZqeD7jxFofeKjs74g=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1638377850;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ymluOGecTiavMSeVQ9ERm6KR1+C6xRixSKMhXGdT8dk=;
-        b=uBeiTdYn1hWMR60DRJKllhJNbp7E5eQ4duIZXLg5Y+6JUP0o+haJb2XoGA2xd8FBBDsX2J
-        kqMoxT1S4Wz6+UBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 63D8613D90;
-        Wed,  1 Dec 2021 16:57:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id uRsuC3qpp2GHKQAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Wed, 01 Dec 2021 16:57:30 +0000
-Date:   Wed, 1 Dec 2021 13:57:28 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-        Hyeoncheol Lee <hyc.lee@gmail.com>,
-        Steve French <smfrench@gmail.com>
-Subject: Re: [RFC] Unify all programs into a single 'ksmbdctl' binary
-Message-ID: <20211201165728.r3jvaan2hw5icfvp@cyberdelia>
-References: <20211130184710.r7dzzfhak4w3eoi6@cyberdelia>
- <CAKYAXd9b0Pji2+Ek9ZcRjN0SfZd4jzyNtDLKwzySh4WCjmSYkQ@mail.gmail.com>
- <CA+_sParqF63m24NjL4o42agyk3mU_Cq1A-kpKFBpZaGmhdWYqg@mail.gmail.com>
+        id S1353005AbhLAUpT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 1 Dec 2021 15:45:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48276 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1353033AbhLAUpD (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 1 Dec 2021 15:45:03 -0500
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7CA4C0613D7
+        for <linux-cifs@vger.kernel.org>; Wed,  1 Dec 2021 12:41:40 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id q3so32161662wru.5
+        for <linux-cifs@vger.kernel.org>; Wed, 01 Dec 2021 12:41:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=freebox-fr.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=l//lAquFJsJlyejqCexAu+Y+9jr6gTNi1DSeoz57KBw=;
+        b=HxBj9PVbjs0YS/rLsqKMCCF+fVLUi6O+F9aRSFhM1G+4HGKfgoDrWSzGdu2h5+K2Iu
+         dbBDOhvIwtT1N32vbAFUtL3I3TgZyCLW4jNjX3t3T2KghL1IwmRC/I2haRSMcQxbpJTK
+         BAfLN78s8KbjSJxeju+g2TOOOYq3yRrsJ9jNaUCYO3tCZ8b2lMGpUmXBS9HZZenT4ch0
+         oRi9PaH90wCb3tKmNa46t+0H7TuYB+ZW2vEBXv5TZZ/pS69t8ZEnUdjSG6UTwGZJdaWz
+         CgDOSvsKgQH48WkRV7yFq+N83/Yw3cfFPy5QSz4wH1OrGQjBH6JkuPrL0OfMixSeqHKu
+         HQ1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=l//lAquFJsJlyejqCexAu+Y+9jr6gTNi1DSeoz57KBw=;
+        b=PRXsGVPTdKdm8nNAgWTr/lCj/08z/Y1qjVuQVUNtRf9MiwKdV2FzG+UzGvmVcEdk1A
+         Fcpu6Y7fn2WNlr2HaH6bJfhLH/VgxPAeNpit8d+Dudw5pdrZVAUn56G6N+ULJQxcaHvz
+         1i5ReWp/otLpKES+HsQTSNdLbFuq0dPeRW/9ljxiHD4bOgVJnvhnte1cALH7cEmW+qxQ
+         phuOSf3O5mA4oYW3Fqk1Hvs/xPM8kAIuhQ8A1cMWbI2yCCLTswV+Gkx16PT8Nwm50w8J
+         eEENStRfq0Z6SYTTeZ6osPloEftpvkgOY2nvSQ+8bgb7O97LUCTHbYF9N+asnnU3Scdd
+         lEVA==
+X-Gm-Message-State: AOAM5310FfEf9HQW9RSzbqUxbwnpt0RhOplcCwIqBQ81ykHyOqUrFbJW
+        6d2M2eTC58UmvEqAPLYnPkWKWkgY/lGb+A==
+X-Google-Smtp-Source: ABdhPJxz3fCQpjBMfW/NdFU+OOmIFHjJXvhllaMIwrLGz3+CmHPUm79Jyo14au1msyh47nvtImfumA==
+X-Received: by 2002:a5d:4a0b:: with SMTP id m11mr9433204wrq.120.1638391299378;
+        Wed, 01 Dec 2021 12:41:39 -0800 (PST)
+Received: from localhost.localdomain (freebox.vlq16.iliad.fr. [213.36.7.13])
+        by smtp.gmail.com with ESMTPSA id o5sm687492wrx.83.2021.12.01.12.41.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Dec 2021 12:41:39 -0800 (PST)
+From:   Marios Makassikis <mmakassikis@freebox.fr>
+To:     linux-cifs@vger.kernel.org
+Cc:     Marios Makassikis <mmakassikis@freebox.fr>
+Subject: [PATCH] ksmbd: Remove unused parameter from smb2_get_name()
+Date:   Wed,  1 Dec 2021 21:41:19 +0100
+Message-Id: <20211201204118.3617544-1-mmakassikis@freebox.fr>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CA+_sParqF63m24NjL4o42agyk3mU_Cq1A-kpKFBpZaGmhdWYqg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 12/01, Sergey Senozhatsky wrote:
->On Wed, Dec 1, 2021 at 11:17 AM Namjae Jeon <linkinjeon@kernel.org> wrote:
->>
->> > I've been working on the unification of all ksmbd-tools programs into a
->> > single 'ksmbdctl' binary, and I would like to invite everyone to test
->> > and/or provide me feedback on the implementation.
->
->Why?
+The 'share' parameter is no longer used by smb2_get_name() since
+commit 265fd1991c1d ("ksmbd: use LOOKUP_BENEATH to prevent the out of
+share access").
 
-Hi Sergey. The reasoning was in the commit message included in the
-email, but I'll quote it here and elaborate:
+Signed-off-by: Marios Makassikis <mmakassikis@freebox.fr>
+---
+ fs/ksmbd/smb2pdu.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-> ...
-> The intention is to make it more like other modern tools (e.g. git,
-> nvme, virsh, etc) which have more clear user interface, readable
-> commands, and also makes it easier to script.
-> 
-> Example commands:
->   # ksmbdctl share add myshare -o "guest ok=yes, writable=yes, path=/mnt/data"
->   # ksmbdctl user add myuser
->   # ksmbdctl user add -i $HOME/mysmb.conf anotheruser
->   # ksmbdctl daemon start
-> 
-> Besides adding a new "share list" command, any previously working
-> functionality shouldn't be affected.
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 125590d5e940..1edb536fbf75 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -610,7 +610,6 @@ static void destroy_previous_session(struct ksmbd_user *user, u64 id)
+ 
+ /**
+  * smb2_get_name() - get filename string from on the wire smb format
+- * @share:	ksmbd_share_config pointer
+  * @src:	source buffer
+  * @maxlen:	maxlen of source string
+  * @nls_table:	nls_table pointer
+@@ -618,8 +617,7 @@ static void destroy_previous_session(struct ksmbd_user *user, u64 id)
+  * Return:      matching converted filename on success, otherwise error ptr
+  */
+ static char *
+-smb2_get_name(struct ksmbd_share_config *share, const char *src,
+-	      const int maxlen, struct nls_table *local_nls)
++smb2_get_name(const char *src, const int maxlen, struct nls_table *local_nls)
+ {
+ 	char *name;
+ 
+@@ -2513,8 +2511,7 @@ int smb2_open(struct ksmbd_work *work)
+ 			goto err_out1;
+ 		}
+ 
+-		name = smb2_get_name(share,
+-				     req->Buffer,
++		name = smb2_get_name(req->Buffer,
+ 				     le16_to_cpu(req->NameLength),
+ 				     work->conn->local_nls);
+ 		if (IS_ERR(name)) {
+@@ -5381,8 +5378,7 @@ static int smb2_rename(struct ksmbd_work *work,
+ 		goto out;
+ 	}
+ 
+-	new_name = smb2_get_name(share,
+-				 file_info->FileName,
++	new_name = smb2_get_name(file_info->FileName,
+ 				 le32_to_cpu(file_info->FileNameLength),
+ 				 local_nls);
+ 	if (IS_ERR(new_name)) {
+@@ -5493,8 +5489,7 @@ static int smb2_create_link(struct ksmbd_work *work,
+ 	if (!pathname)
+ 		return -ENOMEM;
+ 
+-	link_name = smb2_get_name(share,
+-				  file_info->FileName,
++	link_name = smb2_get_name(file_info->FileName,
+ 				  le32_to_cpu(file_info->FileNameLength),
+ 				  local_nls);
+ 	if (IS_ERR(link_name) || S_ISDIR(file_inode(filp)->i_mode)) {
+-- 
+2.25.1
 
-- clearer user interface: having a single binary looks much clearer than
-   having several separate programs when, e.g. the user is looking which
-   program does what.
-
-- more readable commands: continuing from topic above, the situation is
-   improved especially when you see that, e.g., the ksmbd.addshare program
-   also updates and deletes shares. With this unification, it is way more
-   intuitive to use:
-
----- snip ----
-% ./ksmbdctl share
-Usage: ksmbdctl share <subcommand> <args> [options]
-Share management.
-
-List of available subcommands:
-   add               Add a share
-   delete            Delete a share
-   update            Update a share
-   list              List the names of all shares available
----- snip ----
-
-- easier to script: having a defined structure for the commands makes it
-   easier for users to automate ksmbd deployments. This is more of a
-   consequence of the topics above, but should count as an advantage IMO.
-
-As I also said in the commit message, the idea is to have an abstract
-implementation so we can add/manage/remove commands without having to
-rely on each command specifics. Of course, this shouldn't have much/any
-effect for users, but will have great benefit for developers.
-
-And, again, I ask you to consider the applications I used as inspiration
-for such change, such as git, nvme-cli, virsh, which are tools that many
-of us use every day and, e.g. "git help -a | grep "^   " | wc -l" says
-there are about 144 git commands, but I sure don't have 144 git binaries
-spread over my system.
-
-I hope to have made myself clearer now, but please let me know
-otherwise.
-
-
-Cheers,
-
-Enzo
