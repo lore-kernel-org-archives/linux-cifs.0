@@ -2,60 +2,102 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F20FCC433F5
-	for <linux-cifs@archiver.kernel.org>; Thu,  2 Dec 2021 20:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20660C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu,  2 Dec 2021 22:41:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242614AbhLBUO4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 2 Dec 2021 15:14:56 -0500
-Received: from mx.cjr.nz ([51.158.111.142]:40986 "EHLO mx.cjr.nz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242416AbhLBUOz (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 2 Dec 2021 15:14:55 -0500
-Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        id S1356350AbhLBWpL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 2 Dec 2021 17:45:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35888 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1377554AbhLBWpG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 2 Dec 2021 17:45:06 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB661C06174A;
+        Thu,  2 Dec 2021 14:41:43 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        (Authenticated sender: pc)
-        by mx.cjr.nz (Postfix) with ESMTPSA id 6F7EA808AC;
-        Thu,  2 Dec 2021 20:11:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
-        t=1638475891;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JDBvf9aqogE+CEZtaTifdNx+Cd7bsW/9rwsXJ2U1U3M=;
-        b=UHCcBdocXvj/Hff7bP/2AJGbcApeupRpisO/YynUttyH81jNwmOyzcEZm+yZvNZkzK+w7k
-        gR/sMAWYRXZ53wDm6AUMyGCngtchLaldOh3t8Z0SWDG2cmSUOcuskah5Rktol5U9o6Ry55
-        AmGEm++dMF4O/QAZGtjD0BHvJCSDnp7FnvMmW+aFt7B4FY9pCSlrfq+iXjyjdnL/EFLEbd
-        qrFoVWxFOOvrUzIt1J/LCL7t+11DutvPCNNYY1FKzFGEEGWI1aprulHHHNHSxlORCaEIgr
-        93KWe6/e+r3+c/KC2Jx5dsRKFKay2vgFlgLF0TJ62HA68S47gUxBljSZ1QTLKw==
-From:   Paulo Alcantara <pc@cjr.nz>
-To:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH SET] fscache fixes
-In-Reply-To: <CANT5p=qfOdaFQF+EUgjgQx=zGb09FCu=zjZ7q622G--dUy7F3w@mail.gmail.com>
-References: <CANT5p=qfOdaFQF+EUgjgQx=zGb09FCu=zjZ7q622G--dUy7F3w@mail.gmail.com>
-Date:   Thu, 02 Dec 2021 17:11:24 -0300
-Message-ID: <87tufq7onn.fsf@cjr.nz>
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4J4rY11VwZz4xbC;
+        Fri,  3 Dec 2021 09:41:41 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1638484901;
+        bh=iKoJ3e7Vln4wWSOXTdmE1OutZTVWQ38ma1K80CvNKN0=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Vp/vMIr+Y7hvh08OQks8A7zCkz0uuEKVTEdqdw0Eh2iF41Y1nmYo2hljwUs/XAh8D
+         70KIheflsJqlkbiUTaOopPhThUPOV88U5M2hIlVhUf7dAu3eXzJCDvCHUP1xDiX6Mw
+         SAm84yaSM8+nf0480k4V1wJ3Q4Z5+LM79oMreybxV4Jsd2ffO7QkI7uTOwlS12jp4r
+         j8Ts/NoAT5J5+npRc4ETCCsb21dfdfVthFQN1upKCqcyM4gnrOCUAGxtHY+DtEFP84
+         L37tEaj97AzEMRLtrZOREXhlj0SBPrnBtjTK2xuNgU6wqTcZhXJLDrUCnLri57CbqM
+         eEp7OlG8YnSiA==
+Date:   Fri, 3 Dec 2021 09:41:39 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Steve French <stfrench@microsoft.com>
+Subject: linux-next: manual merge of the cifs tree with the fscache tree
+Message-ID: <20211203094139.059541cd@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; boundary="Sig_/K_eCIX1EeiRLUj2YMHc5lM+";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Shyam,
+--Sig_/K_eCIX1EeiRLUj2YMHc5lM+
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+Hi all,
 
-> Please review and consider the following fixes in fscache integration
-> of cifs.ko.
->
-> https://github.com/sprasad-microsoft/smb3-kernel-client/commit/d70e50047c7daa3de17c7c41a0c4ef4f9e4443c9.patch
-> https://github.com/sprasad-microsoft/smb3-kernel-client/commit/089dd629653b857b6096966e9d2df301653a36ea.patch
-> https://github.com/sprasad-microsoft/smb3-kernel-client/commit/a9a62cdfe26c782dadd0b94ab529b883426d0acd.patch
+Today's linux-next merge of the cifs tree got conflicts in:
 
-Thank you!  BTW, this fixes the duplicated cookie warnings I noticed
-while running DFS tests with fscache enabled today.
+  fs/cifs/connect.c
+  fs/cifs/fscache.c
 
-Reviewed-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
+between commit:
+
+  935b45107a80 ("cifs: Support fscache indexing rewrite (untested)")
+
+from the fscache tree and commits:
+
+  9d0245fc6a2e ("cifs: wait for tcon resource_id before getting fscache sup=
+er")
+  c148f8eb032f ("cifs: add server conn_id to fscache client cookie")
+  b1f962ba272b ("cifs: avoid use of dstaddr as key for fscache client cooki=
+e")
+
+from the cifs tree.
+
+I fixed it up (I just used the former versions) and can carry the fix as
+necessary. This is now fixed as far as linux-next is concerned, but any
+non trivial conflicts should be mentioned to your upstream maintainer
+when your tree is submitted for merging.  You may also want to consider
+cooperating with the maintainer of the conflicting tree to minimise any
+particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/K_eCIX1EeiRLUj2YMHc5lM+
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmGpS6MACgkQAVBC80lX
+0Gzzywf/S1ePVXdZnC0QO6fcU/w/irn0NN9Piu2lnsURSO7eLH0/ZFhv+6m2XmaW
+NLBSoh5NjVZUPgwsOXKugOEkVBGh7OQFlnw5lbclr+EViD4na1d7ckqbPLjBbAEo
+gmbeNWaQSe3Kx3igLNBL9AcTyGv5l59DkTcfSwA13nzNkSGIWQ0E1LQMVIjnMwTe
+X5JylpmVpEU/T3WZGMyVY2cNSolCdJdQi25aniCvIWDdLGY7ZOu4kbXzaujrv3pE
+HKnxcGXc1GMt7XOskaHqPtfWBd0GcENVyExVyFsLR5OY4pwtCTF5cURrTW6aIgNm
+/VKa/9X9mAe1PpHhHftRC+qM5vkkjA==
+=4SXJ
+-----END PGP SIGNATURE-----
+
+--Sig_/K_eCIX1EeiRLUj2YMHc5lM+--
