@@ -2,143 +2,171 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC199C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Dec 2021 16:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B181C433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  3 Dec 2021 16:37:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245403AbhLCQYn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 3 Dec 2021 11:24:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58716 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245119AbhLCQYn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Dec 2021 11:24:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638548478;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        id S231511AbhLCQlL (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 3 Dec 2021 11:41:11 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:33872 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1382104AbhLCQlI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Dec 2021 11:41:08 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 70FF51FD3F;
+        Fri,  3 Dec 2021 16:37:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1638549463; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=WmwKI0Rrs6s+p5PMIOByDWLRKuoxB60ntIhXHHr7XFw=;
-        b=Dyv2e9Fc/Q+bioGqQCzX/QMNLr5j/wksZ5rc4i/AI0PD/nzChl0xh4csNZn1Ht5zLxs+Dc
-        D8ATFEWkgFGON7BLTIIvNJWq7/KnXQRuEIU/WiA8W5zk3UIzv7BZUUFgueszoIj+Fuv/8S
-        wZotqDXxP9x8CpBb7Gjm6blSm0OtF+o=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-56-AhfXXUlaP1mEYPwyIRS_UA-1; Fri, 03 Dec 2021 11:21:17 -0500
-X-MC-Unique: AhfXXUlaP1mEYPwyIRS_UA-1
-Received: by mail-qt1-f200.google.com with SMTP id h8-20020a05622a170800b002acc8656e05so4105003qtk.7
-        for <linux-cifs@vger.kernel.org>; Fri, 03 Dec 2021 08:21:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=WmwKI0Rrs6s+p5PMIOByDWLRKuoxB60ntIhXHHr7XFw=;
-        b=0X0HfNWDNX1JkNbv0ghXXGKCxorAFdREwWLrRoJG0py0Ll0QA4+k9rXW+Bw+LV4zaY
-         skS+qcvs6uhdL7yoVhByKYxYzgHfgAfSKaSxSJ3Cr7VOFABIA2JEg2fAohC3UH3+UEkq
-         wQ2SX2yk6uOOiOk+K5mMx9j9pgSVl5gmT6RWai1EFEw4na94xbAg5Vz2pvdLfQZaH/Y6
-         rmjThjD0Sv5CJ9nNf6ANqmwkI95g0SQ+znfdcDtXS1lRI1NEkjVU5iIGszLrYzlbDzvy
-         FmIR8RVRybnJBi91AgEZV6XguJXV+4IWXEz4UDNnnEp6JiictG2BLGhNDCXjB0lp9Ifk
-         J05g==
-X-Gm-Message-State: AOAM531hUfW3YLQnvOePGSx6CwRIQTYz+gzPx+vy4+Udp4l4/nvJRA+f
-        WujQ78P9cy+s9gGovLe5aQjPDiVx2gubrS5Yt0f9+1WnCEKazpfoNzeNugGsE8YfgnrUZuWVurL
-        gspIKt4QOORfoiQr8NEKX2Q==
-X-Received: by 2002:a37:712:: with SMTP id 18mr18618342qkh.366.1638548476900;
-        Fri, 03 Dec 2021 08:21:16 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJytQeHHjaOvWbjY3ttJKV9uzms29bDNbIS2T0Gm6yNwfaWmDh0HATyYXYPHOuRSyahKw5mlKw==
-X-Received: by 2002:a37:712:: with SMTP id 18mr18618322qkh.366.1638548476666;
-        Fri, 03 Dec 2021 08:21:16 -0800 (PST)
-Received: from [192.168.1.3] (68-20-15-154.lightspeed.rlghnc.sbcglobal.net. [68.20.15.154])
-        by smtp.gmail.com with ESMTPSA id e20sm2692363qty.14.2021.12.03.08.21.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Dec 2021 08:21:16 -0800 (PST)
-Message-ID: <88b88564292f84714c83bfe14cae75691e4387c5.camel@redhat.com>
-Subject: Re: [PATCH] cifs: wait for tcon resource_id before getting fscache
- super
-From:   Jeff Layton <jlayton@redhat.com>
-To:     Shyam Prasad N <nspmangalore@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>,
-        linux-cachefs@redhat.com
-Date:   Fri, 03 Dec 2021 11:21:15 -0500
-In-Reply-To: <CANT5p=qXbQU4g4VX=W9mOQo1SjMxnFGfpkLOJWgCpicyDLvt-w@mail.gmail.com>
-References: <CANT5p=qXbQU4g4VX=W9mOQo1SjMxnFGfpkLOJWgCpicyDLvt-w@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.42.1 (3.42.1-1.fc35) 
+        bh=8efOtvUhyHgKYQc0xc/hAJcs0V5q/XuxuY7JrLPylPE=;
+        b=YWkgCAMzS1uRh9rFmOirq6ONpPdtH82ErXeO/qJB1x4PlQC+B7l0z7eEsfyENkz76XWlcW
+        Kb94u6yBWkNrinGQVq2LTx6iL6GzZJ1Le1iyWA0f8N+S3YWEwwbJ0LcuJqteFTcDTHAHCM
+        NIIRoiG5EJpl7A62rtiVfBKe8exHYcQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1638549463;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8efOtvUhyHgKYQc0xc/hAJcs0V5q/XuxuY7JrLPylPE=;
+        b=bdjDi6gLOY6xfrnujtbg7qBzMXJGciD3cUa79lWTLhHQh5ks4Ra0r7mPsv5xXz6psOVh4y
+        3oyXkQcR12Udf/Aw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F20E013EC2;
+        Fri,  3 Dec 2021 16:37:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id lg+5LtZHqmHYOAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Fri, 03 Dec 2021 16:37:42 +0000
+Date:   Fri, 3 Dec 2021 13:37:40 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
+        Hyeoncheol Lee <hyc.lee@gmail.com>,
+        Steve French <smfrench@gmail.com>
+Subject: Re: [RFC] Unify all programs into a single 'ksmbdctl' binary
+Message-ID: <20211203163740.ob64ykyg3mzisc7v@cyberdelia>
+References: <20211130184710.r7dzzfhak4w3eoi6@cyberdelia>
+ <CAKYAXd9b0Pji2+Ek9ZcRjN0SfZd4jzyNtDLKwzySh4WCjmSYkQ@mail.gmail.com>
+ <CA+_sParqF63m24NjL4o42agyk3mU_Cq1A-kpKFBpZaGmhdWYqg@mail.gmail.com>
+ <20211201165728.r3jvaan2hw5icfvp@cyberdelia>
+ <CA+_sPar2eifjAt_+gbLfdH9ns+YmWtQG3HhXVep5dx0=wqGs_w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CA+_sPar2eifjAt_+gbLfdH9ns+YmWtQG3HhXVep5dx0=wqGs_w@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 2021-12-03 at 14:52 +0530, Shyam Prasad N wrote:
-> The logic for initializing tcon->resource_id is done inside
-> cifs_root_iget. fscache super cookie relies on this for aux
-> data. So we need to push the fscache initialization to this
-> later point during mount.
-> 
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/cifs/connect.c | 6 ------
->  fs/cifs/fscache.c | 2 +-
->  fs/cifs/inode.c   | 7 +++++++
->  3 files changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-> index 6b705026da1a3..eee994b0925ff 100644
-> --- a/fs/cifs/connect.c
-> +++ b/fs/cifs/connect.c
-> @@ -3046,12 +3046,6 @@ static int mount_get_conns(struct mount_ctx *mnt_ctx)
->   cifs_dbg(VFS, "read only mount of RW share\n");
->   /* no need to log a RW mount of a typical RW share */
->   }
-> - /*
-> - * The cookie is initialized from volume info returned above.
-> - * Inside cifs_fscache_get_super_cookie it checks
-> - * that we do not get super cookie twice.
-> - */
-> - cifs_fscache_get_super_cookie(tcon);
->   }
-> 
->   /*
-> diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-> index 7e409a38a2d7c..f4da693760c11 100644
-> --- a/fs/cifs/fscache.c
-> +++ b/fs/cifs/fscache.c
-> @@ -92,7 +92,7 @@ void cifs_fscache_get_super_cookie(struct cifs_tcon *tcon)
->   * In the future, as we integrate with newer fscache features,
->   * we may want to instead add a check if cookie has changed
->   */
-> - if (tcon->fscache == NULL)
-> + if (tcon->fscache)
->   return;
-> 
+On 12/03, Sergey Senozhatsky wrote:
+>Hello,
+>
+>On Thu, Dec 2, 2021 at 1:57 AM Enzo Matsumiya <ematsumiya@suse.de> wrote:
+>> > ...
+>> > The intention is to make it more like other modern tools (e.g. git,
+>> > nvme, virsh, etc) which have more clear user interface, readable
+>> > commands, and also makes it easier to script.
+>> >
+>> > Example commands:
+>> >   # ksmbdctl share add myshare -o "guest ok=yes, writable=yes, path=/mnt/data"
+>> >   # ksmbdctl user add myuser
+>> >   # ksmbdctl user add -i $HOME/mysmb.conf anotheruser
+>> >   # ksmbdctl daemon start
+>> >
+>> > Besides adding a new "share list" command, any previously working
+>> > functionality shouldn't be affected.
+>>
+>> - clearer user interface: having a single binary looks much clearer than
+>>    having several separate programs when, e.g. the user is looking which
+>>    program does what.
+>>
+>> - more readable commands: continuing from topic above, the situation is
+>>    improved especially when you see that, e.g., the ksmbd.addshare program
+>>    also updates and deletes shares. With this unification, it is way more
+>>    intuitive to use:
+>
+>I've always preferred the UNIX way: one app does one thing and one thing only.
+>This is why we have cp and mv, mkdir and touch, etc. we don't have a
+>single vfs-ctl
+>app that takes several hundred arguments and whose man page is basically a
+>small book (20+ pages long). This way we:
+>- keep manpages short and clear
+>- avoid params conflicts and ambiguity
+>- keep eggs in different baskets
 
-Ouch! Does the above mean that fscache on cifs is just plain broken at
-the moment? If this is the routine that sets the tcon cookie, then it
-looks like it just never gets set?
+Sure, I agree. Again, this could also be worked out in my proposal (I
+haven't touched much besides README yet though).
+For the missing stuff, e.g. manpages, we can also implement them the git
+way, like "man 1 ksmbdctl" vs "man 1 ksmbdctl-share", where the former
+would mention the latter, but only briefly and then indicate that a
+sub-manpage exists for that command.
 
->   sharename = extract_sharename(tcon->treeName);
-> diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-> index 82848412ad852..96d083db17372 100644
-> --- a/fs/cifs/inode.c
-> +++ b/fs/cifs/inode.c
-> @@ -1376,6 +1376,13 @@ struct inode *cifs_root_iget(struct super_block *sb)
->   inode = ERR_PTR(rc);
->   }
-> 
-> + /*
-> + * The cookie is initialized from volume info returned above.
-> + * Inside cifs_fscache_get_super_cookie it checks
-> + * that we do not get super cookie twice.
-> + */
-> + cifs_fscache_get_super_cookie(tcon);
-> +
->  out:
->   kfree(path);
->   free_xid(xid);
-> 
+>> I ask you to consider the applications I used as inspiration for such change, such as git
+>
+> ... snip ...
+>
+>Built-in commands are, basically, independent binaris that have a
+>common ancestor with the
+>only exception that git does not fork/exec them (not all of them).
+>They even have entry points
+>that resemble main() - they take "int argc, const char **argv" - and
+>git passes its argc and argv
+>down to built-ins.
+>
+>Schematically
+>
+>git: main(int argc, char **argv) {
+>      builtin = lookup_builtin_command();
+>      builtin->run(argc, argv);
+>}
+>
+>Is this what you have in mind?
 
--- 
-Jeff Layton <jlayton@redhat.com>
+Yes, I've implemented it exactly that way:
 
+share/share_admin.h:
+void share_usage(ksmbd_share_cmd cmd);
+int share_cmd(int argc, char *argv[]);
+
+user/user_admin.h:
+void user_usage(ksmbd_user_cmd cmd);
+int user_cmd(int argc, char *argv[]);
+
+daemon/daemon.h:
+void daemon_usage(ksmbd_daemon_cmd cmd);
+int daemon_cmd(int argc, char *argv[]);
+
+The *_usage() functions were something I was preparing to accomodate the
+new command abstraction I mentioned earlier, but I still haven't got to
+finish. I wanted to get this unification approved first.
+
+>>   # ksmbdctl daemon start
+>
+>Is this going to fork ksmb daemon? Otherwise this looks confusing. I'd
+>say that ksmbd daemon
+>needs to have a different name that will clearly show that it's a ksmb
+>daemon, not the "control"
+>tool that adds shares and deletes users.
+
+At daemon_process_start(), I did:
+
+...
+if(prctl(PR_SET_NAME, "ksmbd-daemon\0", 0, 0, 0);
+	pr_info("Can't set program name: %s\n", strerr(errno));
+...
+
+which TBH I'm not sure is good enough. Alternatives/opinions are
+welcome.
+
+
+Cheers,
+
+Enzo
