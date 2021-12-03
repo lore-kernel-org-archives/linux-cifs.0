@@ -2,136 +2,61 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21006C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri,  3 Dec 2021 09:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC71C433FE
+	for <linux-cifs@archiver.kernel.org>; Fri,  3 Dec 2021 16:08:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232207AbhLCJdH (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 3 Dec 2021 04:33:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40728 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234623AbhLCJdG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Dec 2021 04:33:06 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191AEC06173E
-        for <linux-cifs@vger.kernel.org>; Fri,  3 Dec 2021 01:29:43 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id g14so8893393edb.8
-        for <linux-cifs@vger.kernel.org>; Fri, 03 Dec 2021 01:29:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=+fTpQsiVspdrwNhGEHy3nxuV6g89hhbjw8PRloN3S0g=;
-        b=f6TsAsAN6Cs/9zs/4DyXdb9acto5keUWk/uFtNElLW+I2ugFO4x3zt7Tf4GMV4bELE
-         wjJF72l0APTy0RlRJt9U7ZTUEXxPjWifAfYrMXdl7MaykJ+Wzoa6rflBuaxzOFkXWGhp
-         VW78yRHcHHoXeX54mxuVfoS57grq+EYmyS80MFb3BH6BFdi5XMQsRKtj0PGdqzFd2jj6
-         aQrXy1PQL94TUB8wuOW6ewGaCwGXFaGBSlVp5Y5Kh8F6/cHOZqujAKUR2KC5AtD/EUZQ
-         qeIcj/3escq/IByB9EUIlKT/VWRnohEJ5UvqwzT6avClwsC2GJRnH8HywfK5AMpn2Vip
-         37iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=+fTpQsiVspdrwNhGEHy3nxuV6g89hhbjw8PRloN3S0g=;
-        b=dQcz+1sFDdF/NT1Za6Sp8EALC3FpXEFawkMAIJLKCAm1PltH3NeIrAlFTpXYSSp+6W
-         kEEjMoa3b2NASvHrtIpB6RZorAOnHxIoN2Fin25nDJlBg57AUIrnhoVmCVzyqUec8BEE
-         O2EKeLmANtqUUi3DO99OlxwrpGuTBGECkgQZCGghYs6YWLICf+M5dmlZsv/j6aijtA2s
-         TpxNZllQG1tB9TpmMdEAsHCI/lR8ewwsnYhs9PAJNhLSdWOwlemNpRT6H0/x6hLpwu9E
-         5qaFFmczg65WtEzoNapavKWEkuLxkIk3er1g81y0VqCzpzTseBTmzp/vnp14TqLUutVo
-         loog==
-X-Gm-Message-State: AOAM531/ugTjzGL3uJJN73ZDzw5lCsQhcHjWPgEVNONNkoIxYOWRh4hn
-        pJoMgLVHyh0JaNUyUHTMLftgqraR0/S0ZrbK7q8LHenWnqVdvyK8
-X-Google-Smtp-Source: ABdhPJz3t08bFdTixoOJSVOQ+knQee+tCLa2FLW5z74Q5D9T14EIKfiObOlnKXdZ9e8ZrziKU36l59t2KEKFHMkWV5E=
-X-Received: by 2002:a05:6402:1292:: with SMTP id w18mr25097887edv.46.1638523781628;
- Fri, 03 Dec 2021 01:29:41 -0800 (PST)
+        id S1381996AbhLCQLq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 3 Dec 2021 11:11:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56018 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1381976AbhLCQLp (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 3 Dec 2021 11:11:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638547701;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=W33Vv9l+YmnIu6ksqWy9UI6RMm5Zuz5BerrqQoMOV8o=;
+        b=WydrKDCdgsBKwwn3iRPfvuU526tWyMRnmhTfzt8q3rrY1E1zD7s0WhwxtB2apUX3SvLXGp
+        Y39FScmpQ9sRj1p5+7jaDp7QcOGcfnNQfHB/VLtmJ9np8DHDzQImS9HqMcZhMvJH7+WfYq
+        YfljHtlrV+B0lc2K6AUUe974ks1xfYQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-336-e3mvcxqsONWwojBF7nFagA-1; Fri, 03 Dec 2021 11:08:18 -0500
+X-MC-Unique: e3mvcxqsONWwojBF7nFagA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22F9A2F41;
+        Fri,  3 Dec 2021 16:08:17 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E710060C13;
+        Fri,  3 Dec 2021 16:08:05 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CANT5p=qXbQU4g4VX=W9mOQo1SjMxnFGfpkLOJWgCpicyDLvt-w@mail.gmail.com>
+References: <CANT5p=qXbQU4g4VX=W9mOQo1SjMxnFGfpkLOJWgCpicyDLvt-w@mail.gmail.com>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     dhowells@redhat.com, Jeff Layton <jlayton@redhat.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>,
+        linux-cachefs@redhat.com
+Subject: Re: [PATCH] cifs: wait for tcon resource_id before getting fscache super
 MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Fri, 3 Dec 2021 14:59:30 +0530
-Message-ID: <CANT5p=oTtfOJxq009jzGLEWxztShPa3cORzHjriO2DNRU8KDtA@mail.gmail.com>
-Subject: [PATCH] cifs: avoid use of dstaddr as key for fscache client cookie
-To:     David Howells <dhowells@redhat.com>,
-        Jeff Layton <jlayton@redhat.com>,
-        Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
-        CIFS <linux-cifs@vger.kernel.org>, linux-cachefs@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <997926.1638547684.1@warthog.procyon.org.uk>
+Date:   Fri, 03 Dec 2021 16:08:04 +0000
+Message-ID: <997927.1638547684@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-server->dstaddr can change when the DNS mapping for the
-server hostname changes. But conn_id is a u64 counter
-that is incremented each time a new TCP connection
-is setup. So use only that as a key.
+Your patches all got mangled.  Spaces converted to tabs.
 
-Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
----
- fs/cifs/fscache.c | 38 +-------------------------------------
- 1 file changed, 1 insertion(+), 37 deletions(-)
+David
 
-diff --git a/fs/cifs/fscache.c b/fs/cifs/fscache.c
-index 1db3437f3b7d..003c5f1f4dfb 100644
---- a/fs/cifs/fscache.c
-+++ b/fs/cifs/fscache.c
-@@ -16,14 +16,6 @@
-  * Key layout of CIFS server cache index object
-  */
- struct cifs_server_key {
-- struct {
-- uint16_t family; /* address family */
-- __be16 port; /* IP port */
-- } hdr;
-- union {
-- struct in_addr ipv4_addr;
-- struct in6_addr ipv6_addr;
-- };
-  __u64 conn_id;
- } __packed;
-
-@@ -32,11 +24,7 @@ struct cifs_server_key {
-  */
- void cifs_fscache_get_client_cookie(struct TCP_Server_Info *server)
- {
-- const struct sockaddr *sa = (struct sockaddr *) &server->dstaddr;
-- const struct sockaddr_in *addr = (struct sockaddr_in *) sa;
-- const struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *) sa;
-  struct cifs_server_key key;
-- uint16_t key_len = sizeof(key.hdr);
-
-  /*
-  * Check if cookie was already initialized so don't reinitialize it.
-@@ -47,36 +35,12 @@ void cifs_fscache_get_client_cookie(struct
-TCP_Server_Info *server)
-  return;
-
-  memset(&key, 0, sizeof(key));
--
-- /*
-- * Should not be a problem as sin_family/sin6_family overlays
-- * sa_family field
-- */
-- key.hdr.family = sa->sa_family;
-- switch (sa->sa_family) {
-- case AF_INET:
-- key.hdr.port = addr->sin_port;
-- key.ipv4_addr = addr->sin_addr;
-- key_len += sizeof(key.ipv4_addr);
-- break;
--
-- case AF_INET6:
-- key.hdr.port = addr6->sin6_port;
-- key.ipv6_addr = addr6->sin6_addr;
-- key_len += sizeof(key.ipv6_addr);
-- break;
--
-- default:
-- cifs_dbg(VFS, "Unknown network family '%d'\n", sa->sa_family);
-- server->fscache = NULL;
-- return;
-- }
-  key.conn_id = server->conn_id;
-
-  server->fscache =
-  fscache_acquire_cookie(cifs_fscache_netfs.primary_index,
-        &cifs_fscache_server_index_def,
--       &key, key_len,
-+       &key, sizeof(key),
-        NULL, 0,
-        server, 0, true);
-  cifs_dbg(FYI, "%s: (0x%p/0x%p)\n",
