@@ -2,95 +2,65 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A50AAC433F5
-	for <linux-cifs@archiver.kernel.org>; Sat,  4 Dec 2021 20:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B386CC433F5
+	for <linux-cifs@archiver.kernel.org>; Sat,  4 Dec 2021 21:51:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350952AbhLDUpP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 4 Dec 2021 15:45:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58976 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351034AbhLDUpO (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 4 Dec 2021 15:45:14 -0500
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B25F9C061751;
-        Sat,  4 Dec 2021 12:41:48 -0800 (PST)
-Received: by mail-lj1-x229.google.com with SMTP id 207so13055574ljf.10;
-        Sat, 04 Dec 2021 12:41:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=BwyEUIOnJUD80uAEwJlMTSHXVRvqwA6nJjgGBs8ClYw=;
-        b=YiJ4H8z/mnNfGQtG3TL/NGJCoQTstL+Ozg2g3rOD5TCKdpZTh3U+aW6aw519AqiVnz
-         jbavApfqHpJ4LGz6CBA9neeRPUqefnVZhdn5HG8U9VupT+hnrFWQeOS27IPx/aCNXAL6
-         knU0314zsIW5sR7BvxxVaa1VHncMGsusgV2ZpojzI/TeyR4rhFeufQo6rVuJvt9Pz6PA
-         pveoz1K1rMZ6upGoaBIsV8vkrkvurxQ6K1+DyRF8swt7PUBiu0OFYM/JrorBJXZFp6aI
-         89gVID3dYoucMmSjL3nttLVEXVc1V0GBFMBwKPAPNyYVcAAet/eNLjdWEl/p6NuNqPQn
-         eLxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=BwyEUIOnJUD80uAEwJlMTSHXVRvqwA6nJjgGBs8ClYw=;
-        b=LPnvaygG/7W1mICy+4B5U6VsNc1Ai/F3jq0bgKONBv7sxKuFd89tnhh79HH8jcJgMN
-         QRaTSts4ppjPwurcA1/s5bgDDsII0ka5vXxOalAynNYrMCbZQTvPlryoQp/6sSAW7FVY
-         WskNc+nA8jdLk7pPvewiKMDmMumTNXT4Rp93qr02XB9/pIZ8huKbjj6IyVwY2Bcop9Wf
-         fFxa6Kr0+yPnoCJYS8mCz5uMzCAn/AZfWBXlrJSurQfW+/eJfDJwCNWeFqxXyonAx9ax
-         PiPSx5yPR2eIIvLU52Gbpqfhg6EAi8qhY85dKk3MISXQdAzG7/OhYLCWRfKiB82bEKbn
-         GauA==
-X-Gm-Message-State: AOAM532okJciYKrnoTw9ulTQAJFv7uTeMij/gJwqFr3G0nPduOSRE6R7
-        nhi+AJBsrB7qmgdKzbRWWfbxilHnjnb2NqAc7aw=
-X-Google-Smtp-Source: ABdhPJy7oOdPgcI5T/nVwAhI99+r+9y8mmJ3cdJOFl1xc9Lb7/hlKTtWDgB3cZTWDWO8HMRSpH9kWgYGTNpVcC3cchY=
-X-Received: by 2002:a2e:a588:: with SMTP id m8mr26925937ljp.23.1638650506883;
- Sat, 04 Dec 2021 12:41:46 -0800 (PST)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Sat, 4 Dec 2021 14:41:36 -0600
-Message-ID: <CAH2r5mt5WfWBs_d+og=eOG08P4z8iQumes05PxEbpi0k4HTNPA@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        id S1379740AbhLDVym (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 4 Dec 2021 16:54:42 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:37386 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1379788AbhLDVy3 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 4 Dec 2021 16:54:29 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3DB6060F5D;
+        Sat,  4 Dec 2021 21:51:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 96486C341CE;
+        Sat,  4 Dec 2021 21:50:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638654659;
+        bh=UM+IrdNo/wgjsrh8Bk0hVESLB8NeRb/FBHKEfIzEO2s=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=plWISxMqqhZLFRRhcY/YQE5QutDAlYPygUB86hXeYJSAYy6+zE0uVmoBNZVQfqFoZ
+         gu/iN3Jy20mq3Q/HCTd5dvM+Y/ScxHxM6vQaNCBhY2KUTsYHX7iE1NwP73mUgYXxo2
+         SOn3BWkdf4ScI2LUR3xT2xEdiFeG76fg1uCq5TYU0cDzWw7AoUlF8KuyHw0CBocodd
+         DuWuG6WmHBouUjlNgFDDoov3rgKtLvlymN/T07W3pofoEACPdByj53XKxpt6D+D0ps
+         jxMIh/K3hvnYJ25o1k9vvNzashsJmfb2WlAG1pLVU1g59Xqa0BWkMAZnxtWu+1oR4G
+         mh7DmSU8h8ftw==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 60D556008E;
+        Sat,  4 Dec 2021 21:50:59 +0000 (UTC)
+Subject: Re: [GIT PULL] smb3 client fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mt5WfWBs_d+og=eOG08P4z8iQumes05PxEbpi0k4HTNPA@mail.gmail.com>
+References: <CAH2r5mt5WfWBs_d+og=eOG08P4z8iQumes05PxEbpi0k4HTNPA@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mt5WfWBs_d+og=eOG08P4z8iQumes05PxEbpi0k4HTNPA@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc3-smb3-fixes
+X-PR-Tracked-Commit-Id: bbb9db5e2a7a1ca0926d26a279000384be21b789
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 23b55d673d7527b093cd97b7c217c82e70cd1af0
+Message-Id: <163865465933.20485.8569939900111755390.pr-tracker-bot@kernel.org>
+Date:   Sat, 04 Dec 2021 21:50:59 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-d58071a8a76d779eedab38033ae4c821c30295a5:
+The pull request you sent on Sat, 4 Dec 2021 14:41:36 -0600:
 
-  Linux 5.16-rc3 (2021-11-28 14:09:19 -0800)
+> git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc3-smb3-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/23b55d673d7527b093cd97b7c217c82e70cd1af0
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc3-smb3-fixes
-
-for you to fetch changes up to bbb9db5e2a7a1ca0926d26a279000384be21b789:
-
-  cifs: avoid use of dstaddr as key for fscache client cookie
-(2021-12-03 12:38:25 -0600)
-
-----------------------------------------------------------------
-3 SMB3 multichannel/fscache fixes and a DFS fix. In testing
-multichannel reconnect scenarios recently various problems with the
-cifs.ko implementation of fscache were found (e.g. incorrect
-initialization of fscache cookies in some cases).
-
-Regression test results:
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/846
-----------------------------------------------------------------
-Paulo Alcantara (1):
-      cifs: fix missed refcounting of ipc tcon
-
-Shyam Prasad N (3):
-      cifs: wait for tcon resource_id before getting fscache super
-      cifs: add server conn_id to fscache client cookie
-      cifs: avoid use of dstaddr as key for fscache client cookie
-
- fs/cifs/connect.c | 11 +++++------
- fs/cifs/fscache.c | 46 ++++++++++------------------------------------
- fs/cifs/inode.c   |  7 +++++++
- 3 files changed, 22 insertions(+), 42 deletions(-)
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
