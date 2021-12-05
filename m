@@ -2,65 +2,111 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B386CC433F5
-	for <linux-cifs@archiver.kernel.org>; Sat,  4 Dec 2021 21:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC7DC433F5
+	for <linux-cifs@archiver.kernel.org>; Sun,  5 Dec 2021 21:56:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379740AbhLDVym (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 4 Dec 2021 16:54:42 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:37386 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379788AbhLDVy3 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 4 Dec 2021 16:54:29 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S234103AbhLEWAV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 5 Dec 2021 17:00:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232165AbhLEWAV (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 5 Dec 2021 17:00:21 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 546AFC061714;
+        Sun,  5 Dec 2021 13:56:53 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3DB6060F5D;
-        Sat,  4 Dec 2021 21:51:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 96486C341CE;
-        Sat,  4 Dec 2021 21:50:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638654659;
-        bh=UM+IrdNo/wgjsrh8Bk0hVESLB8NeRb/FBHKEfIzEO2s=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=plWISxMqqhZLFRRhcY/YQE5QutDAlYPygUB86hXeYJSAYy6+zE0uVmoBNZVQfqFoZ
-         gu/iN3Jy20mq3Q/HCTd5dvM+Y/ScxHxM6vQaNCBhY2KUTsYHX7iE1NwP73mUgYXxo2
-         SOn3BWkdf4ScI2LUR3xT2xEdiFeG76fg1uCq5TYU0cDzWw7AoUlF8KuyHw0CBocodd
-         DuWuG6WmHBouUjlNgFDDoov3rgKtLvlymN/T07W3pofoEACPdByj53XKxpt6D+D0ps
-         jxMIh/K3hvnYJ25o1k9vvNzashsJmfb2WlAG1pLVU1g59Xqa0BWkMAZnxtWu+1oR4G
-         mh7DmSU8h8ftw==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 60D556008E;
-        Sat,  4 Dec 2021 21:50:59 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mt5WfWBs_d+og=eOG08P4z8iQumes05PxEbpi0k4HTNPA@mail.gmail.com>
-References: <CAH2r5mt5WfWBs_d+og=eOG08P4z8iQumes05PxEbpi0k4HTNPA@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mt5WfWBs_d+og=eOG08P4z8iQumes05PxEbpi0k4HTNPA@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc3-smb3-fixes
-X-PR-Tracked-Commit-Id: bbb9db5e2a7a1ca0926d26a279000384be21b789
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 23b55d673d7527b093cd97b7c217c82e70cd1af0
-Message-Id: <163865465933.20485.8569939900111755390.pr-tracker-bot@kernel.org>
-Date:   Sat, 04 Dec 2021 21:50:59 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4J6gPt64b0z4xgY;
+        Mon,  6 Dec 2021 08:56:50 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1638741411;
+        bh=vNSoC4TnagwVZgyyg3N+IOkNZVLWyrUR517QIhyGaX0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=IpzNW/GfJLyDwW2hITQZtGr+kKaFoglozSU2e/cfzuHSA3Q8yfwtpQBeH7bdJOdYA
+         ClEJUUtsVMTMrkkAyWpqo2SYtd1QDvTNZDMiwqXQEq3yqxETIrqibfo/2FvGksj0wc
+         RdbWj+x0DcH6LnPLDbnz56aG9yvy2nDNbMNlqIUOdPoKI7XfumijePl/LxvsG2Uy9d
+         bsOqeekES2T7qrXPWYlAAGmcroEY3PFZ5S7t/7ykSRBeHFMImCHDlzkdQk94tFvfE5
+         e0glcggjb/lB9zGmwKyji4cmJZu6G/RDM+6MZaoCO+ISGyLK4zl5S5NLrtSJ1edQOG
+         n9uUeFT5kHQyA==
+Date:   Mon, 6 Dec 2021 08:56:50 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Steve French <stfrench@microsoft.com>
+Subject: Re: linux-next: manual merge of the cifs tree with the fscache tree
+Message-ID: <20211206085650.09dcb11e@canb.auug.org.au>
+In-Reply-To: <20211203094139.059541cd@canb.auug.org.au>
+References: <20211203094139.059541cd@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/fras5=MuidKBp2oz2fvryqG";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 4 Dec 2021 14:41:36 -0600:
+--Sig_/fras5=MuidKBp2oz2fvryqG
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc3-smb3-fixes
+Hi all,
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/23b55d673d7527b093cd97b7c217c82e70cd1af0
+On Fri, 3 Dec 2021 09:41:39 +1100 Stephen Rothwell <sfr@canb.auug.org.au> w=
+rote:
+>
+> Hi all,
+>=20
+> Today's linux-next merge of the cifs tree got conflicts in:
+>=20
+>   fs/cifs/connect.c
+>   fs/cifs/fscache.c
+>=20
+> between commit:
+>=20
+>   935b45107a80 ("cifs: Support fscache indexing rewrite (untested)")
+>=20
+> from the fscache tree and commits:
+>=20
+>   9d0245fc6a2e ("cifs: wait for tcon resource_id before getting fscache s=
+uper")
+>   c148f8eb032f ("cifs: add server conn_id to fscache client cookie")
+>   b1f962ba272b ("cifs: avoid use of dstaddr as key for fscache client coo=
+kie")
+>=20
+> from the cifs tree.
+>=20
+> I fixed it up (I just used the former versions) and can carry the fix as
+> necessary. This is now fixed as far as linux-next is concerned, but any
+> non trivial conflicts should be mentioned to your upstream maintainer
+> when your tree is submitted for merging.  You may also want to consider
+> cooperating with the maintainer of the conflicting tree to minimise any
+> particularly complex conflicts.
 
-Thank you!
+These are now conflict between the fscache tree and Linus' tree.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/fras5=MuidKBp2oz2fvryqG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmGtNaIACgkQAVBC80lX
+0GyvfAf+OaKQPepClKNIFWpCtDI1s7xYxOA9GQtTYwFwkwL8pFlueE0SnA1xld4Z
+hRcuSd8hfJhoQSekHWjlqRtTC3r9T5d6XifnAQWIpX35ic8fUPU0ddmE9pxZ7w1y
+k33zZ34TbIPgz/jZ3a1p8tEXQiWOj/i/QA98Hs8NkkRcE2bI7SfLjoppZgBNFQ1E
+GtlU8kvB6tkC0LNRIqVpEoUW0n1HVoNMqpM/t68IDlJN2J0befOpAWk5gfQhFumd
+DcduIagMObqFsMr877Sa1t5LQdjXckuU9fSrqpNSdHkBum3gLj+RGzJdUOGppm63
+u7ERS/opi/KAhHBOKECJCs0ER35qaQ==
+=iFhg
+-----END PGP SIGNATURE-----
+
+--Sig_/fras5=MuidKBp2oz2fvryqG--
