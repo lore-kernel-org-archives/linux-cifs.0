@@ -2,111 +2,177 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC7DC433F5
-	for <linux-cifs@archiver.kernel.org>; Sun,  5 Dec 2021 21:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F96C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon,  6 Dec 2021 11:42:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234103AbhLEWAV (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 5 Dec 2021 17:00:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48066 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232165AbhLEWAV (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 5 Dec 2021 17:00:21 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 546AFC061714;
-        Sun,  5 Dec 2021 13:56:53 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4J6gPt64b0z4xgY;
-        Mon,  6 Dec 2021 08:56:50 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1638741411;
-        bh=vNSoC4TnagwVZgyyg3N+IOkNZVLWyrUR517QIhyGaX0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=IpzNW/GfJLyDwW2hITQZtGr+kKaFoglozSU2e/cfzuHSA3Q8yfwtpQBeH7bdJOdYA
-         ClEJUUtsVMTMrkkAyWpqo2SYtd1QDvTNZDMiwqXQEq3yqxETIrqibfo/2FvGksj0wc
-         RdbWj+x0DcH6LnPLDbnz56aG9yvy2nDNbMNlqIUOdPoKI7XfumijePl/LxvsG2Uy9d
-         bsOqeekES2T7qrXPWYlAAGmcroEY3PFZ5S7t/7ykSRBeHFMImCHDlzkdQk94tFvfE5
-         e0glcggjb/lB9zGmwKyji4cmJZu6G/RDM+6MZaoCO+ISGyLK4zl5S5NLrtSJ1edQOG
-         n9uUeFT5kHQyA==
-Date:   Mon, 6 Dec 2021 08:56:50 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Steve French <stfrench@microsoft.com>
-Subject: Re: linux-next: manual merge of the cifs tree with the fscache tree
-Message-ID: <20211206085650.09dcb11e@canb.auug.org.au>
-In-Reply-To: <20211203094139.059541cd@canb.auug.org.au>
-References: <20211203094139.059541cd@canb.auug.org.au>
+        id S241877AbhLFLpz (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 6 Dec 2021 06:45:55 -0500
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:54919 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237397AbhLFLpz (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 6 Dec 2021 06:45:55 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R271e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0UzcMKwq_1638790938;
+Received: from 30.225.24.25(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UzcMKwq_1638790938)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 06 Dec 2021 19:42:19 +0800
+Message-ID: <d4167c15-b3ce-73b2-1d66-97d651723305@linux.alibaba.com>
+Date:   Mon, 6 Dec 2021 19:42:18 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/fras5=MuidKBp2oz2fvryqG";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.3.0
+Subject: Re: [PATCH 24/64] netfs: Pass more information on how to deal with a
+ hole in the cache
+Content-Language: en-US
+To:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com
+Cc:     Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <163819575444.215744.318477214576928110.stgit@warthog.procyon.org.uk>
+ <163819612321.215744.9738308885948264476.stgit@warthog.procyon.org.uk>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+In-Reply-To: <163819612321.215744.9738308885948264476.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/fras5=MuidKBp2oz2fvryqG
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
 
-On Fri, 3 Dec 2021 09:41:39 +1100 Stephen Rothwell <sfr@canb.auug.org.au> w=
-rote:
->
-> Hi all,
->=20
-> Today's linux-next merge of the cifs tree got conflicts in:
->=20
->   fs/cifs/connect.c
->   fs/cifs/fscache.c
->=20
-> between commit:
->=20
->   935b45107a80 ("cifs: Support fscache indexing rewrite (untested)")
->=20
-> from the fscache tree and commits:
->=20
->   9d0245fc6a2e ("cifs: wait for tcon resource_id before getting fscache s=
-uper")
->   c148f8eb032f ("cifs: add server conn_id to fscache client cookie")
->   b1f962ba272b ("cifs: avoid use of dstaddr as key for fscache client coo=
-kie")
->=20
-> from the cifs tree.
->=20
-> I fixed it up (I just used the former versions) and can carry the fix as
-> necessary. This is now fixed as far as linux-next is concerned, but any
-> non trivial conflicts should be mentioned to your upstream maintainer
-> when your tree is submitted for merging.  You may also want to consider
-> cooperating with the maintainer of the conflicting tree to minimise any
-> particularly complex conflicts.
+On 11/29/21 10:28 PM, David Howells wrote:
+> Pass more information to the cache on how to deal with a hole if it
+> encounters one when trying to read from the cache.  Three options are
+> provided:
+> 
+>  (1) NETFS_READ_HOLE_IGNORE.  Read the hole along with the data, assuming
+>      it to be a punched-out extent by the backing filesystem.
+> 
+>  (2) NETFS_READ_HOLE_CLEAR.  If there's a hole, erase the requested region
+>      of the cache and clear the read buffer.
+> 
+>  (3) NETFS_READ_HOLE_FAIL.  Fail the read if a hole is detected.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: linux-cachefs@redhat.com
+> ---
+> 
+>  fs/netfs/read_helper.c |    8 ++++----
+>  include/linux/netfs.h  |   11 ++++++++++-
+>  2 files changed, 14 insertions(+), 5 deletions(-)
+> 
+> diff --git a/fs/netfs/read_helper.c b/fs/netfs/read_helper.c
+> index 7dc79fa8a1f3..08df413efdf3 100644
+> --- a/fs/netfs/read_helper.c
+> +++ b/fs/netfs/read_helper.c
+> @@ -170,7 +170,7 @@ static void netfs_cache_read_terminated(void *priv, ssize_t transferred_or_error
+>   */
+>  static void netfs_read_from_cache(struct netfs_read_request *rreq,
+>  				  struct netfs_read_subrequest *subreq,
+> -				  bool seek_data)
+> +				  enum netfs_read_from_hole read_hole)
+>  {
+>  	struct netfs_cache_resources *cres = &rreq->cache_resources;
+>  	struct iov_iter iter;
+> @@ -180,7 +180,7 @@ static void netfs_read_from_cache(struct netfs_read_request *rreq,
+>  			subreq->start + subreq->transferred,
+>  			subreq->len   - subreq->transferred);
+>  
+> -	cres->ops->read(cres, subreq->start, &iter, seek_data,
+> +	cres->ops->read(cres, subreq->start, &iter, read_hole,
+>  			netfs_cache_read_terminated, subreq);
+>  }
+>  
+> @@ -466,7 +466,7 @@ static void netfs_rreq_short_read(struct netfs_read_request *rreq,
+>  	netfs_get_read_subrequest(subreq);
+>  	atomic_inc(&rreq->nr_rd_ops);
+>  	if (subreq->source == NETFS_READ_FROM_CACHE)
+> -		netfs_read_from_cache(rreq, subreq, true);
+> +		netfs_read_from_cache(rreq, subreq, NETFS_READ_HOLE_CLEAR);
 
-These are now conflict between the fscache tree and Linus' tree.
+Hi I'm not sure why NETFS_READ_HOLE_CLEAR style should be used in 'short
+read' case.
 
---=20
-Cheers,
-Stephen Rothwell
+Besides,
 
---Sig_/fras5=MuidKBp2oz2fvryqG
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+```
+static void netfs_read_from_cache(struct netfs_read_request *rreq,
+				  struct netfs_read_subrequest *subreq,
+				  enum netfs_read_from_hole read_hole)
+{
+	struct netfs_cache_resources *cres = &rreq->cache_resources;
+	struct iov_iter iter;
 
------BEGIN PGP SIGNATURE-----
+	netfs_stat(&netfs_n_rh_read);
+	iov_iter_xarray(&iter, READ, &rreq->mapping->i_pages,
+			subreq->start + subreq->transferred,
+			subreq->len   - subreq->transferred);
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmGtNaIACgkQAVBC80lX
-0GyvfAf+OaKQPepClKNIFWpCtDI1s7xYxOA9GQtTYwFwkwL8pFlueE0SnA1xld4Z
-hRcuSd8hfJhoQSekHWjlqRtTC3r9T5d6XifnAQWIpX35ic8fUPU0ddmE9pxZ7w1y
-k33zZ34TbIPgz/jZ3a1p8tEXQiWOj/i/QA98Hs8NkkRcE2bI7SfLjoppZgBNFQ1E
-GtlU8kvB6tkC0LNRIqVpEoUW0n1HVoNMqpM/t68IDlJN2J0befOpAWk5gfQhFumd
-DcduIagMObqFsMr877Sa1t5LQdjXckuU9fSrqpNSdHkBum3gLj+RGzJdUOGppm63
-u7ERS/opi/KAhHBOKECJCs0ER35qaQ==
-=iFhg
------END PGP SIGNATURE-----
+	cres->ops->read(cres, subreq->start, &iter, read_hole,
+			netfs_cache_read_terminated, subreq);
+}
+```
 
---Sig_/fras5=MuidKBp2oz2fvryqG--
+I'm not sure why 'subreq->start' is not incremented with
+'subreq->transferred' when calling cres->ops->read() in 'short read' case.
+
+
+>  	else
+>  		netfs_read_from_server(rreq, subreq);
+>  }
+> @@ -794,7 +794,7 @@ static bool netfs_rreq_submit_slice(struct netfs_read_request *rreq,
+>  		netfs_read_from_server(rreq, subreq);
+>  		break;
+>  	case NETFS_READ_FROM_CACHE:
+> -		netfs_read_from_cache(rreq, subreq, false);
+> +		netfs_read_from_cache(rreq, subreq, NETFS_READ_HOLE_IGNORE);
+>  		break;
+>  	default:
+>  		BUG();
+
+
+
+
+> diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+> index 5a46fde65759..b46c39d98bbd 100644
+> --- a/include/linux/netfs.h
+> +++ b/include/linux/netfs.h
+> @@ -196,6 +196,15 @@ struct netfs_read_request_ops {
+>  	void (*cleanup)(struct address_space *mapping, void *netfs_priv);
+>  };
+>  
+> +/*
+> + * How to handle reading from a hole.
+> + */
+> +enum netfs_read_from_hole {
+> +	NETFS_READ_HOLE_IGNORE,
+> +	NETFS_READ_HOLE_CLEAR,
+> +	NETFS_READ_HOLE_FAIL,
+> +};
+> +
+>  /*
+>   * Table of operations for access to a cache.  This is obtained by
+>   * rreq->ops->begin_cache_operation().
+> @@ -208,7 +217,7 @@ struct netfs_cache_ops {
+>  	int (*read)(struct netfs_cache_resources *cres,
+>  		    loff_t start_pos,
+>  		    struct iov_iter *iter,
+> -		    bool seek_data,
+> +		    enum netfs_read_from_hole read_hole,
+>  		    netfs_io_terminated_t term_func,
+>  		    void *term_func_priv);
+>  
+> 
+
+-- 
+Thanks,
+Jeffle
