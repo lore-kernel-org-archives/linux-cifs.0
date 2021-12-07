@@ -2,81 +2,73 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F70C433F5
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 Dec 2021 11:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB69C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Dec 2021 21:12:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235644AbhLGL6K (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 Dec 2021 06:58:10 -0500
-Received: from smtp1.axis.com ([195.60.68.17]:53438 "EHLO smtp1.axis.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230001AbhLGL6K (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Tue, 7 Dec 2021 06:58:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=axis.com; q=dns/txt; s=axis-central1; t=1638878080;
-  x=1670414080;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=t92Mo+JxZG/jlt/VfGUzsrJ7nO3Csh7wPw0sfmctulE=;
-  b=e+UfbUaP2byf4NcltFbLNUSaXFWNukmJKw7vxc2opbzn48o+/hG+jVzj
-   GfjdPbuewewi0rUPEharaHhmNsGa4kd3R5N4nesdTnik1cUPo/svInbom
-   tDLNBycljncpDOJSkTWLkMlULDtTd3wp7s24OxetND03f8qDiJwv5nElZ
-   /Hu1Mq/QLJJB89yx5haj8FoLQh2IfqSAdJUERU13EiZ6TOZ1bH5FuRYo+
-   2ySqcZ31SoCr9r/OHJxr7ZO8laF4eCfG17U+7asHSIS1mWj1N0cTUvAEP
-   +Xy3GYUz6mRa7OTB2E0u3nW7mrq/kVLeRPHeePDhUmXAJPL8rVZsc9nyX
-   A==;
-From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
-To:     Steve French <sfrench@samba.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>
-CC:     <kernel@axis.com>,
-        Vincent Whitchurch <vincent.whitchurch@axis.com>,
-        Steve French <stfrench@microsoft.com>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        <linux-cifs@vger.kernel.org>, <samba-technical@lists.samba.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] cifs: Fix crash on unload of cifs_arc4.ko
-Date:   Tue, 7 Dec 2021 12:54:19 +0100
-Message-ID: <20211207115420.18713-1-vincent.whitchurch@axis.com>
-X-Mailer: git-send-email 2.33.1
+        id S232033AbhLGVQC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 7 Dec 2021 16:16:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39278 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230374AbhLGVQC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Dec 2021 16:16:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638911551;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tijy8IJRnUTNbj2S9eoX8mcwYCPBzJ5p8C6oGn1r/G0=;
+        b=X67xRP641rOkkYZUh2rIODPCyOtPteUvc9Xu55CWojfHse3Xtc/X6aHghPK8fIiAUy7HRc
+        61MYZ1EWf1esrAXrJaDswYCbr70dDeWYXGtCRPGj/0TVxQJnZrPS2QPnVVGyI+6HQKwFVk
+        2iBXP7nxQGl/4aQOTiwzTrgogNHPmHQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-344-MPYj1MoTMGiNUIxROE_svQ-1; Tue, 07 Dec 2021 16:12:28 -0500
+X-MC-Unique: MPYj1MoTMGiNUIxROE_svQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C731B3E746;
+        Tue,  7 Dec 2021 21:12:26 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2EE345D9C0;
+        Tue,  7 Dec 2021 21:12:25 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20211206085650.09dcb11e@canb.auug.org.au>
+References: <20211206085650.09dcb11e@canb.auug.org.au> <20211203094139.059541cd@canb.auug.org.au>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Steve French <stfrench@microsoft.com>
+Subject: Re: linux-next: manual merge of the cifs tree with the fscache tree
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2419229.1638911544.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Tue, 07 Dec 2021 21:12:24 +0000
+Message-ID: <2419230.1638911544@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The exit function is wrongly placed in the __init section and this leads
-to a crash when the module is unloaded.  Just remove both the init and
-exit functions since this module does not need them.
+Hi Stephen,
 
-Fixes: 71c02863246167b3d ("cifs: fork arc4 and create a separate module...")
-Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
----
- fs/smbfs_common/cifs_arc4.c | 13 -------------
- 1 file changed, 13 deletions(-)
+> >   9d0245fc6a2e ("cifs: wait for tcon resource_id before getting fscach=
+e super")
+> >   c148f8eb032f ("cifs: add server conn_id to fscache client cookie")
+> >   b1f962ba272b ("cifs: avoid use of dstaddr as key for fscache client =
+cookie")
 
-diff --git a/fs/smbfs_common/cifs_arc4.c b/fs/smbfs_common/cifs_arc4.c
-index 85ba15a60b13..043e4cb839fa 100644
---- a/fs/smbfs_common/cifs_arc4.c
-+++ b/fs/smbfs_common/cifs_arc4.c
-@@ -72,16 +72,3 @@ void cifs_arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in, unsigned int l
- 	ctx->y = y;
- }
- EXPORT_SYMBOL_GPL(cifs_arc4_crypt);
--
--static int __init
--init_smbfs_common(void)
--{
--	return 0;
--}
--static void __init
--exit_smbfs_common(void)
--{
--}
--
--module_init(init_smbfs_common)
--module_exit(exit_smbfs_common)
--- 
-2.33.1
+I've rebased onto -rc4 to pick up these and another patch.
+
+David
 
