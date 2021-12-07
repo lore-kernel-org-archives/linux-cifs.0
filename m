@@ -2,73 +2,87 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB69C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue,  7 Dec 2021 21:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A144C433EF
+	for <linux-cifs@archiver.kernel.org>; Tue,  7 Dec 2021 22:53:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232033AbhLGVQC (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 Dec 2021 16:16:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39278 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230374AbhLGVQC (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Dec 2021 16:16:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638911551;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tijy8IJRnUTNbj2S9eoX8mcwYCPBzJ5p8C6oGn1r/G0=;
-        b=X67xRP641rOkkYZUh2rIODPCyOtPteUvc9Xu55CWojfHse3Xtc/X6aHghPK8fIiAUy7HRc
-        61MYZ1EWf1esrAXrJaDswYCbr70dDeWYXGtCRPGj/0TVxQJnZrPS2QPnVVGyI+6HQKwFVk
-        2iBXP7nxQGl/4aQOTiwzTrgogNHPmHQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-344-MPYj1MoTMGiNUIxROE_svQ-1; Tue, 07 Dec 2021 16:12:28 -0500
-X-MC-Unique: MPYj1MoTMGiNUIxROE_svQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C731B3E746;
-        Tue,  7 Dec 2021 21:12:26 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2EE345D9C0;
-        Tue,  7 Dec 2021 21:12:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20211206085650.09dcb11e@canb.auug.org.au>
-References: <20211206085650.09dcb11e@canb.auug.org.au> <20211203094139.059541cd@canb.auug.org.au>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Steve French <stfrench@microsoft.com>
-Subject: Re: linux-next: manual merge of the cifs tree with the fscache tree
+        id S242299AbhLGW5O (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 7 Dec 2021 17:57:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53426 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233920AbhLGW5O (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Dec 2021 17:57:14 -0500
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14AE7C061574;
+        Tue,  7 Dec 2021 14:53:43 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id a9so753910wrr.8;
+        Tue, 07 Dec 2021 14:53:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZK3s8Av4bPqpJYSEgcMIEDCp3LprqI7QXlbouiexF64=;
+        b=DmiMJfW2DNxWs4g2BximzSUfaH4s0cWWf5zSJJpwDm4PUBYv+f2wqOhk4mqp94DORC
+         hy1zI2iXx3VmJ89emF7hn+GE1/QBlb3k7YwMEeGcy0xrWdwlTmxxuTvUwgywKCsvQaBM
+         9TCAnaS5iFUQK2QietG6/AZ3c22fihfcbSIdHYnDy1JVbVdBWFxqQXj5iY2/aILrIdQA
+         J1gfxm46AJy+9quDMYG2hiqKTtuyNU2BYdUXs1VrWyvwjx3Z8QvrrXb13kalN3ArWAsP
+         oWZCnQkRLgJGjRRuFJW7d8LTHBlYnGujAEmPbgVjnnyHh/oOrZvIiwxxTvrN3yHQ5dlF
+         KXhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZK3s8Av4bPqpJYSEgcMIEDCp3LprqI7QXlbouiexF64=;
+        b=7th+Ib/IeTVwJO3XEfCEsJlW8mwvaDZbzpx/qP+3muUJeNx0FPtzmQO4RJR4KrGsUB
+         PaMAp3Kdwe8ecY/kkiUmehEgw0/gp0K7ZSt9IohF1fjDQWMWTTg2ZUJxzcaLqtuxdrCQ
+         SqlkNnBl66L8tDff4llGS0ouSUGo7h2NljrZtie+borG/6hi+pzqI3A/rUwRwFbiB5dt
+         iId5q+Al0LiygwLJnh66iuYN+OhYYBiZuVcnky1+UyEy4T61E+wVkF0qiwqrGQ/pcmcm
+         UnYptNfnM7o8DE4SOGWERXvz1XMDKAFs/tsZbQgYvxYLsUHLjvQbiWSWIBffLnhLcKZL
+         /3tw==
+X-Gm-Message-State: AOAM5309EIzRv2vplXDe1E7qhbkzWIKXfa7/E7OJu+J1k4aWeXNG73Vf
+        PDn6sYFM1rbqKEv55iR8XVo=
+X-Google-Smtp-Source: ABdhPJwfkVUsz+KfsP5NQDRkczNlMfg0uqEogRRtMLpe9+Fge9yQAzaKaBFnq5wryj8y0w3v/Zh7Dw==
+X-Received: by 2002:adf:82f7:: with SMTP id 110mr54962031wrc.111.1638917621766;
+        Tue, 07 Dec 2021 14:53:41 -0800 (PST)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id 138sm4104915wma.17.2021.12.07.14.53.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Dec 2021 14:53:41 -0800 (PST)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: remove redundant assignment to pointer p
+Date:   Tue,  7 Dec 2021 22:53:40 +0000
+Message-Id: <20211207225340.83827-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2419229.1638911544.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Tue, 07 Dec 2021 21:12:24 +0000
-Message-ID: <2419230.1638911544@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Stephen,
+The pointer p is assigned a value that is never read, it is being
+re-assigned later. The assignment is redundant and can be removed.
 
-> >   9d0245fc6a2e ("cifs: wait for tcon resource_id before getting fscach=
-e super")
-> >   c148f8eb032f ("cifs: add server conn_id to fscache client cookie")
-> >   b1f962ba272b ("cifs: avoid use of dstaddr as key for fscache client =
-cookie")
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ fs/cifs/cifsfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I've rebased onto -rc4 to pick up these and another patch.
-
-David
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index d3f3acf340f1..61091eed8c65 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -775,7 +775,7 @@ cifs_get_root(struct smb3_fs_context *ctx, struct super_block *sb)
+ 
+ 	sep = CIFS_DIR_SEP(cifs_sb);
+ 	dentry = dget(sb->s_root);
+-	p = s = full_path;
++	s = full_path;
+ 
+ 	do {
+ 		struct inode *dir = d_inode(dentry);
+-- 
+2.33.1
 
