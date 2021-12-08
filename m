@@ -2,112 +2,104 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0DE4C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed,  8 Dec 2021 04:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 782F1C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed,  8 Dec 2021 14:45:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244195AbhLHEg4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 7 Dec 2021 23:36:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46054 "EHLO
+        id S230161AbhLHOsl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 8 Dec 2021 09:48:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240064AbhLHEgz (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 7 Dec 2021 23:36:55 -0500
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDF74C061574;
-        Tue,  7 Dec 2021 20:33:23 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id bi37so3066607lfb.5;
-        Tue, 07 Dec 2021 20:33:23 -0800 (PST)
+        with ESMTP id S233159AbhLHOsl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 8 Dec 2021 09:48:41 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1387C061746
+        for <linux-cifs@vger.kernel.org>; Wed,  8 Dec 2021 06:45:08 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id u80so2618884pfc.9
+        for <linux-cifs@vger.kernel.org>; Wed, 08 Dec 2021 06:45:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=EN1o8XpoKN4as2yUaOYdrp8Cti7k7n7wDJbtCFFci+Y=;
-        b=lzk6Ja0MRaTF0ii1RSV3qpELQCzRZ2oDBAf+jsOusYOmESpT5SRM9S8Jyg6NSP9xgI
-         ifjeG5Zs1YF+A6Xp2qkVaN36SIzfuOo9wfXseZt42E6Wasnu1Rc99acbnndCpuYWAGat
-         dtny7bZZ8z+x4PJubJQy1S/B/dtf9wOHSS3MFT/bskThLk2EHJfoGnLuYtlpIUxyFCQW
-         P1dv3UwwoPGIuhnggYWQ1/ZMZs8J6nSCA0DwYvtT8R90GSK4ak1yGa27F9BqmEKKC+ER
-         JpRB1E53P2f97NcLueqUpt98tZWAHZCZIvb8Hu9c1BH1B4CXCRWhJIjbp1n2rmuc/1XH
-         SK6A==
+        bh=Zsky/SImT4uldRT10XDmxx67FpXPJPw2EiqrddSCfA4=;
+        b=XXs86iAQcpnSiDP8uLJdJhVrdy1g7bvBlOt2QnENhKAz6+ocalZzg+c2ommwpJB0Fd
+         sXdFk6QJJWRj64oz4VFPycIW4ofOTLOhGKd42ifL/uP9A6clkyxDRxmfAANvnINijdcP
+         nkURWOYwE4ch8ReWfMuU/a4vtBsezEBYZ1Gn3UKAfGbvsYD3f7uyFTSccNh+PjDvVCvX
+         r1dTYgDjQqniS/Y7BHzJG+uGKBnSfNboLV1CZqB/f+WbwAXAzV3IXpBUojBYUCZhl5HY
+         WGJoKcsE6PZcFytLaCtfK/c5xte1ZRmmxSLcaqBq3SaxeD74Lgog4SyvKsdZxv8BUTju
+         rlwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=EN1o8XpoKN4as2yUaOYdrp8Cti7k7n7wDJbtCFFci+Y=;
-        b=aXd5dDqSM1gqGsTan/GJWg/H2mxquVu/gQ/yzrNVs4fx0Ptwadox9WNuKzo0IyjUFf
-         ZkxGlX6nbztP4ig1vYx/z7xyXR+8N38YqB6Bx15ebJZCch1LC9aEuxf1PMI8qjpMpord
-         gLNmTdNxkAObFvUPCngKOOa6TTNCfmBZEQKw7dDMpnw/q9RLb5LELJOi7itTUZ3vsXu1
-         jBRgPT2E8q2w30pcUWWZUTEC2hu0tai+Q9YL0TzorZB1jyJk6x7NLPQA5mtz7qb5GnVE
-         aNX5tVu7Artfv962Unl2Vt9smB/v9h0RplhOQENZAAND9d/+fM74WCS7LAFK+J1jKC7b
-         i8lw==
-X-Gm-Message-State: AOAM533YOPkMyYkFqbu6wChwMEGY3MjK+IxDysP5y3EfIWq4Wr7/BTju
-        rXuFbfDf6vsobzR2T/Xu0TpNEwFd7hhcr5eICew=
-X-Google-Smtp-Source: ABdhPJwIdiWlGyg9QKfiqlNkmB52N2pXz78n6hNt6wd/g8Q34QRsZhd+Zv1DyXbdwQWK8+nGuCI+uiTucfKvH8IFsow=
-X-Received: by 2002:a05:6512:3991:: with SMTP id j17mr45568787lfu.545.1638938002185;
- Tue, 07 Dec 2021 20:33:22 -0800 (PST)
+        bh=Zsky/SImT4uldRT10XDmxx67FpXPJPw2EiqrddSCfA4=;
+        b=PN6oOrEywsUd9CHXSnv9WkRlOPNODIYUM5yP406blPb4ASi/aNCY45KVIHnPMJueKQ
+         ZrYqZQatfD5dqf02g5FOFyqfiHyGKTE/FMcZGsOu6i6aC6n4LsNI0iZnsLNlZbLJobLl
+         dEN32XHV82oa36CXSscrJnKiBGEI7+d3z/qKHAFb2ZkkR+Bd67H+dVFqga/gggVY9EG5
+         t6E0PcL5DmvYsiJAa+HW0J+L2jmzgIGYSLMWN6+Ik0b0Obo0C8YZPKCcQYtFtUxGa9ev
+         +me0C3O1eOeXi3tDJ3ir+9kt8umOmfcRyerh9yJVBdXVLjUBPEuObtE4W9BJw4saQmzn
+         Zc+A==
+X-Gm-Message-State: AOAM530J3vzzmzUrJeopcf96fXC7MeZimCtUYxm6dlRtE+FnPUHkc2AS
+        Uz/a207VYi7Gu0bgXBmXQDvpdOFBQAp702Q9m3g=
+X-Google-Smtp-Source: ABdhPJxc9cTDpHs08QVitQUMjgdgvv2YzEHQg7VXhoJnZm5HfFqj3S9MqMfDZ9Mcj5uBqJK725+RUAiLGePH+urT03Q=
+X-Received: by 2002:a63:b50a:: with SMTP id y10mr26513587pge.596.1638974708424;
+ Wed, 08 Dec 2021 06:45:08 -0800 (PST)
 MIME-Version: 1.0
-References: <20211207115420.18713-1-vincent.whitchurch@axis.com>
-In-Reply-To: <20211207115420.18713-1-vincent.whitchurch@axis.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 7 Dec 2021 22:33:10 -0600
-Message-ID: <CAH2r5mtxkO9whCCKrFXMYNr26RcShx-QT4_EZvLJj52AkQjWqw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Fix crash on unload of cifs_arc4.ko
-To:     Vincent Whitchurch <vincent.whitchurch@axis.com>
-Cc:     Steve French <sfrench@samba.org>,
-        Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        samba-technical <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        kernel <kernel@axis.com>, Steve French <stfrench@microsoft.com>
+References: <CANT5p=qXbQU4g4VX=W9mOQo1SjMxnFGfpkLOJWgCpicyDLvt-w@mail.gmail.com>
+ <1355654.1638798741@warthog.procyon.org.uk>
+In-Reply-To: <1355654.1638798741@warthog.procyon.org.uk>
+From:   Shyam Prasad N <nspmangalore@gmail.com>
+Date:   Wed, 8 Dec 2021 20:14:56 +0530
+Message-ID: <CANT5p=ogoa2ndAs5n5zzy4+NR-T6tyKmyB_1xQyqw6BTgBaXtw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: wait for tcon resource_id before getting fscache super
+To:     David Howells <dhowells@redhat.com>
+Cc:     Jeff Layton <jlayton@redhat.com>,
+        Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>,
+        linux-cachefs@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-merged into cifs-2.6.git for-next
-
-On Tue, Dec 7, 2021 at 6:11 AM Vincent Whitchurch via samba-technical
-<samba-technical@lists.samba.org> wrote:
+On Mon, Dec 6, 2021 at 7:22 PM David Howells <dhowells@redhat.com> wrote:
 >
-> The exit function is wrongly placed in the __init section and this leads
-> to a crash when the module is unloaded.  Just remove both the init and
-> exit functions since this module does not need them.
+> Shyam Prasad N <nspmangalore@gmail.com> wrote:
 >
-> Fixes: 71c02863246167b3d ("cifs: fork arc4 and create a separate module...")
-> Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
-> ---
->  fs/smbfs_common/cifs_arc4.c | 13 -------------
->  1 file changed, 13 deletions(-)
+> > @@ -1376,6 +1376,13 @@ struct inode *cifs_root_iget(struct super_block *sb)
+> >   inode = ERR_PTR(rc);
+> >   }
+> >
+> > + /*
+> > + * The cookie is initialized from volume info returned above.
+> > + * Inside cifs_fscache_get_super_cookie it checks
+> > + * that we do not get super cookie twice.
+> > + */
+> > + cifs_fscache_get_super_cookie(tcon);
 >
-> diff --git a/fs/smbfs_common/cifs_arc4.c b/fs/smbfs_common/cifs_arc4.c
-> index 85ba15a60b13..043e4cb839fa 100644
-> --- a/fs/smbfs_common/cifs_arc4.c
-> +++ b/fs/smbfs_common/cifs_arc4.c
-> @@ -72,16 +72,3 @@ void cifs_arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in, unsigned int l
->         ctx->y = y;
->  }
->  EXPORT_SYMBOL_GPL(cifs_arc4_crypt);
-> -
-> -static int __init
-> -init_smbfs_common(void)
-> -{
-> -       return 0;
-> -}
-> -static void __init
-> -exit_smbfs_common(void)
-> -{
-> -}
-> -
-> -module_init(init_smbfs_common)
-> -module_exit(exit_smbfs_common)
-> --
-> 2.33.1
+> Ummm...  Does this handle the errors correctly?  What happens if rc != 0 at
+> this point and the inode has been marked failed?  It looks like it will
+> abandon creation of the superblock without cleaning up the super cookie.
+> Maybe - or maybe it can't happen because of the:
 >
+>         iget_no_retry:
+>                 if (!inode) {
+>                         inode = ERR_PTR(rc);
+>                         goto out;
+>                 }
+>
+> check - but then why is rc being checked?
+>
+> > +
+> >  out:
+> >   kfree(path);
+> >   free_xid(xid);
+>
+> David
 >
 
+Thanks David. I think that there still needs to be more error handling here.
+I'll check on this and send out another patch.
 
 -- 
-Thanks,
-
-Steve
+Regards,
+Shyam
