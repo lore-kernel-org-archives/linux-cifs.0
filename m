@@ -2,44 +2,43 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E452EC433FE
-	for <linux-cifs@archiver.kernel.org>; Thu,  9 Dec 2021 16:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0EBC43219
+	for <linux-cifs@archiver.kernel.org>; Thu,  9 Dec 2021 16:58:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240533AbhLIRBx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 9 Dec 2021 12:01:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41287 "EHLO
+        id S241593AbhLIRCX (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 9 Dec 2021 12:02:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55859 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237796AbhLIRBw (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Dec 2021 12:01:52 -0500
+        by vger.kernel.org with ESMTP id S241876AbhLIRCK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 9 Dec 2021 12:02:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639069098;
+        s=mimecast20190719; t=1639069116;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lFuof9mu8XXcK2o9Un3f1KqG8qg97LK/4rS5KpZbai0=;
-        b=NKJscmlacd0R0d+qXz2PqOnBBYQIuMqw8vJdw3V7zoYke/Zb3AFAeU45GGSVNP+AKgfGBg
-        F+RtCNC8cZfedYc7slIKmWrO6D9Y16PrNirCMuhtsHGTWnsKi+OZes2cVRVjgPqbm4AjKA
-        ZOcv2MOWV5Sz8xuYrm5atF0Wl6R2ROs=
+        bh=lsR6Kq1JaC3YuGI6o7H6dVIRsPOR4elb36pjreB7bEk=;
+        b=gC3IE46McnEha90zfQcJtziMlcnp/6zkFk6vUF661K1a47TV++tBAnvwNvXdxWj+0uT0Bg
+        UOQHpaX9dG8pwZMC2COOd/mHccD4b7VN9qe9Wmp8hqESwo6hqRIHxjYPMF+hCgIkf+bSX6
+        m48SPfFVvauX43QEqSsLSCzFnIAKBaQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-192-PTw3Ej6rMZi0Lr-xw7MoEw-1; Thu, 09 Dec 2021 11:58:14 -0500
-X-MC-Unique: PTw3Ej6rMZi0Lr-xw7MoEw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-418-5n0f3Yv5MzGCkYgycxFZZg-1; Thu, 09 Dec 2021 11:58:33 -0500
+X-MC-Unique: 5n0f3Yv5MzGCkYgycxFZZg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFC38192CC43;
-        Thu,  9 Dec 2021 16:58:11 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BD9A802E68;
+        Thu,  9 Dec 2021 16:58:31 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.122])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8250C5D6D5;
-        Thu,  9 Dec 2021 16:57:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9041819729;
+        Thu,  9 Dec 2021 16:58:27 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v2 18/67] fscache: Implement cookie user counting and resource
- pinning
+Subject: [PATCH v2 20/67] fscache: Provide a means to begin an operation
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
 Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
@@ -56,592 +55,392 @@ Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 09 Dec 2021 16:57:55 +0000
-Message-ID: <163906907567.143852.16979631199380722019.stgit@warthog.procyon.org.uk>
+Date:   Thu, 09 Dec 2021 16:58:26 +0000
+Message-ID: <163906910672.143852.13856103384424986357.stgit@warthog.procyon.org.uk>
 In-Reply-To: <163906878733.143852.5604115678965006622.stgit@warthog.procyon.org.uk>
 References: <163906878733.143852.5604115678965006622.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Provide a pair of functions to count the number of users of a cookie (open
-files, writeback, invalidation, resizing, reads, writes), to obtain and pin
-resources for the cookie and to prevent culling for the whilst there are
-users.
+Provide a function to begin a read operation:
 
-The first function marks a cookie as being in use:
+	int fscache_begin_read_operation(
+		struct netfs_cache_resources *cres,
+		struct fscache_cookie *cookie)
 
-	void fscache_use_cookie(struct fscache_cookie *cookie,
-				bool will_modify);
+This is primarily intended to be called by network filesystems on behalf of
+netfslib, but may also be called to use the I/O access functions directly.
+It attaches the resources required by the cache to cres struct from the
+supplied cookie.
 
-The caller should indicate the cookie to use and whether or not the caller
-is in a context that may modify the cookie (e.g. a file open O_RDWR).
+This holds access to the cache behind the cookie for the duration of the
+operation and forces cache withdrawal and cookie invalidation to perform
+synchronisation on the operation.  cres->inval_counter is set from the
+cookie at this point so that it can be compared at the end of the
+operation.
 
-If the cookie is not already resourced, fscache will ask the cache backend
-in the background to do whatever it needs to look up, create or otherwise
-obtain the resources necessary to access data.  This is pinned to the
-cookie and may not be culled, though it may be withdrawn if the cache as a
-whole is withdrawn.
+Note that this does not guarantee that the cache state is fully set up and
+able to perform I/O immediately; looking up and creation may be left in
+progress in the background.  The operations intended to be called by the
+network filesystem, such as reading and writing, are expected to wait for
+the cookie to move to the correct state.
 
-The second function removes the in-use mark from a cookie and, optionally,
-updates the coherency data:
+This will, however, potentially sleep, waiting for a certain minimum state
+to be set or for operations such as invalidate to advance far enough that
+I/O can resume.
 
-	void fscache_unuse_cookie(struct fscache_cookie *cookie,
-				  const void *aux_data,
-				  const loff_t *object_size);
 
-If non-NULL, the aux_data buffer and/or the object_size will be saved into
-the cookie and will be set on the backing store when the object is
-committed.
+Also provide a function for the cache to call to wait for the cache object
+to get to a state where it can be used for certain things:
 
-If this removes the last usage on a cookie, the cookie is placed onto an
-LRU list from which it will be removed and closed after a couple of seconds
-if it doesn't get reused.  This prevents resource overload in the cache -
-in particular it prevents it from holding too many files open.
+	bool fscache_wait_for_operation(struct netfs_cache_resources *cres,
+					enum fscache_want_stage stage);
 
-Changes
-=======
-ver #2:
- - Fix fscache_unuse_cookie() to use atomic_dec_and_lock() to avoid a
-   potential race if the cookie gets reused before it completes the
-   unusement.
- - Added missing transition to LRU_DISCARDING state.
+This looks at the cache resources provided by the begin function and waits
+for them to get to an appropriate stage.  There's a choice of wanting just
+some parameters (FSCACHE_WANT_PARAM) or the ability to do I/O
+(FSCACHE_WANT_READ or FSCACHE_WANT_WRITE).
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: linux-cachefs@redhat.com
-Link: https://lore.kernel.org/r/163819600612.215744.13678350304176542741.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/163819603692.215744.146724961588817028.stgit@warthog.procyon.org.uk/ # v1
 ---
 
- fs/fscache/cookie.c            |  217 ++++++++++++++++++++++++++++++++++++++++
- fs/fscache/internal.h          |    5 +
- fs/fscache/stats.c             |   12 ++
- include/linux/fscache.h        |   82 +++++++++++++++
- include/trace/events/fscache.h |   12 ++
- 5 files changed, 326 insertions(+), 2 deletions(-)
+ fs/fscache/Makefile            |    1 
+ fs/fscache/internal.h          |   11 +++
+ fs/fscache/io.c                |  151 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/fscache-cache.h  |   11 +++
+ include/linux/fscache.h        |   49 +++++++++++++
+ include/trace/events/fscache.h |    6 ++
+ 6 files changed, 229 insertions(+)
+ create mode 100644 fs/fscache/io.c
 
-diff --git a/fs/fscache/cookie.c b/fs/fscache/cookie.c
-index 91ace2e8b596..f2b539c71b91 100644
---- a/fs/fscache/cookie.c
-+++ b/fs/fscache/cookie.c
-@@ -15,6 +15,8 @@
- 
- struct kmem_cache *fscache_cookie_jar;
- 
-+static void fscache_cookie_lru_timed_out(struct timer_list *timer);
-+static void fscache_cookie_lru_worker(struct work_struct *work);
- static void fscache_cookie_worker(struct work_struct *work);
- static void fscache_unhash_cookie(struct fscache_cookie *cookie);
- 
-@@ -22,7 +24,12 @@ static void fscache_unhash_cookie(struct fscache_cookie *cookie);
- static struct hlist_bl_head fscache_cookie_hash[1 << fscache_cookie_hash_shift];
- static LIST_HEAD(fscache_cookies);
- static DEFINE_RWLOCK(fscache_cookies_lock);
--static const char fscache_cookie_states[FSCACHE_COOKIE_STATE__NR] = "-LCAFWRD";
-+static LIST_HEAD(fscache_cookie_lru);
-+static DEFINE_SPINLOCK(fscache_cookie_lru_lock);
-+DEFINE_TIMER(fscache_cookie_lru_timer, fscache_cookie_lru_timed_out);
-+static DECLARE_WORK(fscache_cookie_lru_work, fscache_cookie_lru_worker);
-+static const char fscache_cookie_states[FSCACHE_COOKIE_STATE__NR] = "-LCAFUWRD";
-+unsigned int fscache_lru_cookie_timeout = 10 * HZ;
- 
- void fscache_print_cookie(struct fscache_cookie *cookie, char prefix)
- {
-@@ -47,6 +54,13 @@ void fscache_print_cookie(struct fscache_cookie *cookie, char prefix)
- 
- static void fscache_free_cookie(struct fscache_cookie *cookie)
- {
-+	if (WARN_ON_ONCE(!list_empty(&cookie->commit_link))) {
-+		spin_lock(&fscache_cookie_lru_lock);
-+		list_del_init(&cookie->commit_link);
-+		spin_unlock(&fscache_cookie_lru_lock);
-+		fscache_stat_d(&fscache_n_cookies_lru);
-+		fscache_stat(&fscache_n_cookies_lru_removed);
-+	}
- 	write_lock(&fscache_cookies_lock);
- 	list_del(&cookie->proc_link);
- 	write_unlock(&fscache_cookies_lock);
-@@ -493,6 +507,126 @@ static void fscache_perform_lookup(struct fscache_cookie *cookie)
- 	fscache_end_volume_access(cookie->volume, cookie, trace);
- }
- 
-+/*
-+ * Begin the process of looking up a cookie.  We offload the actual process to
-+ * a worker thread.
-+ */
-+static bool fscache_begin_lookup(struct fscache_cookie *cookie, bool will_modify)
-+{
-+	if (will_modify) {
-+		set_bit(FSCACHE_COOKIE_LOCAL_WRITE, &cookie->flags);
-+		set_bit(FSCACHE_COOKIE_DO_PREP_TO_WRITE, &cookie->flags);
-+	}
-+	if (!fscache_begin_volume_access(cookie->volume, cookie,
-+					 fscache_access_lookup_cookie))
-+		return false;
-+
-+	__fscache_begin_cookie_access(cookie, fscache_access_lookup_cookie);
-+	__fscache_set_cookie_state(cookie, FSCACHE_COOKIE_STATE_LOOKING_UP);
-+	set_bit(FSCACHE_COOKIE_IS_CACHING, &cookie->flags);
-+	set_bit(FSCACHE_COOKIE_HAS_BEEN_CACHED, &cookie->flags);
-+	return true;
-+}
-+
-+/*
-+ * Start using the cookie for I/O.  This prevents the backing object from being
-+ * reaped by VM pressure.
-+ */
-+void __fscache_use_cookie(struct fscache_cookie *cookie, bool will_modify)
-+{
-+	enum fscache_cookie_state state;
-+	bool queue = false;
-+
-+	_enter("c=%08x", cookie->debug_id);
-+
-+	if (WARN(test_bit(FSCACHE_COOKIE_RELINQUISHED, &cookie->flags),
-+		 "Trying to use relinquished cookie\n"))
-+		return;
-+
-+	spin_lock(&cookie->lock);
-+
-+	atomic_inc(&cookie->n_active);
-+
-+again:
-+	state = fscache_cookie_state(cookie);
-+	switch (state) {
-+	case FSCACHE_COOKIE_STATE_QUIESCENT:
-+		queue = fscache_begin_lookup(cookie, will_modify);
-+		break;
-+
-+	case FSCACHE_COOKIE_STATE_LOOKING_UP:
-+	case FSCACHE_COOKIE_STATE_CREATING:
-+		if (will_modify)
-+			set_bit(FSCACHE_COOKIE_LOCAL_WRITE, &cookie->flags);
-+		break;
-+	case FSCACHE_COOKIE_STATE_ACTIVE:
-+		if (will_modify &&
-+		    !test_and_set_bit(FSCACHE_COOKIE_LOCAL_WRITE, &cookie->flags)) {
-+			set_bit(FSCACHE_COOKIE_DO_PREP_TO_WRITE, &cookie->flags);
-+			queue = true;
-+		}
-+		break;
-+
-+	case FSCACHE_COOKIE_STATE_FAILED:
-+	case FSCACHE_COOKIE_STATE_WITHDRAWING:
-+		break;
-+
-+	case FSCACHE_COOKIE_STATE_LRU_DISCARDING:
-+		spin_unlock(&cookie->lock);
-+		wait_var_event(&cookie->state,
-+			       fscache_cookie_state(cookie) !=
-+			       FSCACHE_COOKIE_STATE_LRU_DISCARDING);
-+		spin_lock(&cookie->lock);
-+		goto again;
-+
-+	case FSCACHE_COOKIE_STATE_DROPPED:
-+	case FSCACHE_COOKIE_STATE_RELINQUISHING:
-+		WARN(1, "Can't use cookie in state %u\n", state);
-+		break;
-+	}
-+
-+	spin_unlock(&cookie->lock);
-+	if (queue)
-+		fscache_queue_cookie(cookie, fscache_cookie_get_use_work);
-+	_leave("");
-+}
-+EXPORT_SYMBOL(__fscache_use_cookie);
-+
-+static void fscache_unuse_cookie_locked(struct fscache_cookie *cookie)
-+{
-+	clear_bit(FSCACHE_COOKIE_DISABLED, &cookie->flags);
-+	if (!test_bit(FSCACHE_COOKIE_IS_CACHING, &cookie->flags))
-+		return;
-+
-+	cookie->unused_at = jiffies;
-+	spin_lock(&fscache_cookie_lru_lock);
-+	if (list_empty(&cookie->commit_link)) {
-+		fscache_get_cookie(cookie, fscache_cookie_get_lru);
-+		fscache_stat(&fscache_n_cookies_lru);
-+	}
-+	list_move_tail(&cookie->commit_link, &fscache_cookie_lru);
-+
-+	spin_unlock(&fscache_cookie_lru_lock);
-+	timer_reduce(&fscache_cookie_lru_timer,
-+		     jiffies + fscache_lru_cookie_timeout);
-+}
-+
-+/*
-+ * Stop using the cookie for I/O.
-+ */
-+void __fscache_unuse_cookie(struct fscache_cookie *cookie,
-+			    const void *aux_data, const loff_t *object_size)
-+{
-+	if (aux_data || object_size)
-+		__fscache_update_cookie(cookie, aux_data, object_size);
-+
-+	if (atomic_dec_and_lock(&cookie->n_active, &cookie->lock)) {
-+		fscache_unuse_cookie_locked(cookie);
-+		spin_unlock(&cookie->lock);
-+	}
-+}
-+EXPORT_SYMBOL(__fscache_unuse_cookie);
-+
- /*
-  * Perform work upon the cookie, such as committing its cache state,
-  * relinquishing it or withdrawing the backing cache.  We're protected from the
-@@ -537,6 +671,12 @@ static void fscache_cookie_state_machine(struct fscache_cookie *cookie)
- 			fscache_prepare_to_write(cookie);
- 			spin_lock(&cookie->lock);
- 		}
-+		if (test_bit(FSCACHE_COOKIE_DO_LRU_DISCARD, &cookie->flags)) {
-+			__fscache_set_cookie_state(cookie,
-+						   FSCACHE_COOKIE_STATE_LRU_DISCARDING);
-+			wake = true;
-+			goto again_locked;
-+		}
- 		fallthrough;
- 
- 	case FSCACHE_COOKIE_STATE_FAILED:
-@@ -556,6 +696,7 @@ static void fscache_cookie_state_machine(struct fscache_cookie *cookie)
- 		}
- 		break;
- 
-+	case FSCACHE_COOKIE_STATE_LRU_DISCARDING:
- 	case FSCACHE_COOKIE_STATE_RELINQUISHING:
- 	case FSCACHE_COOKIE_STATE_WITHDRAWING:
- 		if (cookie->cache_priv) {
-@@ -572,6 +713,9 @@ static void fscache_cookie_state_machine(struct fscache_cookie *cookie)
- 						   FSCACHE_COOKIE_STATE_DROPPED);
- 			wake = true;
- 			goto out;
-+		case FSCACHE_COOKIE_STATE_LRU_DISCARDING:
-+			fscache_see_cookie(cookie, fscache_cookie_see_lru_discard);
-+			break;
- 		case FSCACHE_COOKIE_STATE_WITHDRAWING:
- 			fscache_see_cookie(cookie, fscache_cookie_see_withdraw);
- 			break;
-@@ -634,6 +778,76 @@ static void __fscache_withdraw_cookie(struct fscache_cookie *cookie)
- 		fscache_queue_cookie(cookie, fscache_cookie_get_end_access);
- }
- 
-+static void fscache_cookie_lru_do_one(struct fscache_cookie *cookie)
-+{
-+	fscache_see_cookie(cookie, fscache_cookie_see_lru_do_one);
-+
-+	spin_lock(&cookie->lock);
-+	if (cookie->state != FSCACHE_COOKIE_STATE_ACTIVE ||
-+	    time_before(jiffies, cookie->unused_at + fscache_lru_cookie_timeout) ||
-+	    atomic_read(&cookie->n_active) > 0) {
-+		spin_unlock(&cookie->lock);
-+		fscache_stat(&fscache_n_cookies_lru_removed);
-+	} else {
-+		set_bit(FSCACHE_COOKIE_DO_LRU_DISCARD, &cookie->flags);
-+		spin_unlock(&cookie->lock);
-+		fscache_stat(&fscache_n_cookies_lru_expired);
-+		_debug("lru c=%x", cookie->debug_id);
-+		__fscache_withdraw_cookie(cookie);
-+	}
-+
-+	fscache_put_cookie(cookie, fscache_cookie_put_lru);
-+}
-+
-+static void fscache_cookie_lru_worker(struct work_struct *work)
-+{
-+	struct fscache_cookie *cookie;
-+	unsigned long unused_at;
-+
-+	spin_lock(&fscache_cookie_lru_lock);
-+
-+	while (!list_empty(&fscache_cookie_lru)) {
-+		cookie = list_first_entry(&fscache_cookie_lru,
-+					  struct fscache_cookie, commit_link);
-+		unused_at = cookie->unused_at + fscache_lru_cookie_timeout;
-+		if (time_before(jiffies, unused_at)) {
-+			timer_reduce(&fscache_cookie_lru_timer, unused_at);
-+			break;
-+		}
-+
-+		list_del_init(&cookie->commit_link);
-+		fscache_stat_d(&fscache_n_cookies_lru);
-+		spin_unlock(&fscache_cookie_lru_lock);
-+		fscache_cookie_lru_do_one(cookie);
-+		spin_lock(&fscache_cookie_lru_lock);
-+	}
-+
-+	spin_unlock(&fscache_cookie_lru_lock);
-+}
-+
-+static void fscache_cookie_lru_timed_out(struct timer_list *timer)
-+{
-+	queue_work(fscache_wq, &fscache_cookie_lru_work);
-+}
-+
-+static void fscache_cookie_drop_from_lru(struct fscache_cookie *cookie)
-+{
-+	bool need_put = false;
-+
-+	if (!list_empty(&cookie->commit_link)) {
-+		spin_lock(&fscache_cookie_lru_lock);
-+		if (!list_empty(&cookie->commit_link)) {
-+			list_del_init(&cookie->commit_link);
-+			fscache_stat_d(&fscache_n_cookies_lru);
-+			fscache_stat(&fscache_n_cookies_lru_dropped);
-+			need_put = true;
-+		}
-+		spin_unlock(&fscache_cookie_lru_lock);
-+		if (need_put)
-+			fscache_put_cookie(cookie, fscache_cookie_put_lru);
-+	}
-+}
-+
- /*
-  * Remove a cookie from the hash table.
-  */
-@@ -653,6 +867,7 @@ static void fscache_unhash_cookie(struct fscache_cookie *cookie)
- 
- static void fscache_drop_withdraw_cookie(struct fscache_cookie *cookie)
- {
-+	fscache_cookie_drop_from_lru(cookie);
- 	__fscache_withdraw_cookie(cookie);
- }
+diff --git a/fs/fscache/Makefile b/fs/fscache/Makefile
+index bcc79615f93a..afb090ea16c4 100644
+--- a/fs/fscache/Makefile
++++ b/fs/fscache/Makefile
+@@ -6,6 +6,7 @@
+ fscache-y := \
+ 	cache.o \
+ 	cookie.o \
++	io.o \
+ 	main.o \
+ 	volume.o
  
 diff --git a/fs/fscache/internal.h b/fs/fscache/internal.h
-index 712be6819297..9af8de906bf0 100644
+index e4f3a1a993f6..1308bfff94fb 100644
 --- a/fs/fscache/internal.h
 +++ b/fs/fscache/internal.h
-@@ -57,6 +57,7 @@ static inline bool fscache_set_cache_state_maybe(struct fscache_cache *cache,
-  */
- extern struct kmem_cache *fscache_cookie_jar;
- extern const struct seq_operations fscache_cookies_seq_ops;
-+extern struct timer_list fscache_cookie_lru_timer;
+@@ -70,6 +70,17 @@ static inline void fscache_see_cookie(struct fscache_cookie *cookie,
+ 			     where);
+ }
  
- extern void fscache_print_cookie(struct fscache_cookie *cookie, char prefix);
- extern bool fscache_begin_cookie_access(struct fscache_cookie *cookie,
-@@ -95,6 +96,10 @@ extern atomic_t fscache_n_volumes;
- extern atomic_t fscache_n_volumes_collision;
- extern atomic_t fscache_n_volumes_nomem;
- extern atomic_t fscache_n_cookies;
-+extern atomic_t fscache_n_cookies_lru;
-+extern atomic_t fscache_n_cookies_lru_expired;
-+extern atomic_t fscache_n_cookies_lru_removed;
-+extern atomic_t fscache_n_cookies_lru_dropped;
- 
- extern atomic_t fscache_n_acquires;
- extern atomic_t fscache_n_acquires_ok;
-diff --git a/fs/fscache/stats.c b/fs/fscache/stats.c
-index 252e883ae148..5aa4bd9fe207 100644
---- a/fs/fscache/stats.c
-+++ b/fs/fscache/stats.c
-@@ -17,6 +17,10 @@ atomic_t fscache_n_volumes;
- atomic_t fscache_n_volumes_collision;
- atomic_t fscache_n_volumes_nomem;
- atomic_t fscache_n_cookies;
-+atomic_t fscache_n_cookies_lru;
-+atomic_t fscache_n_cookies_lru_expired;
-+atomic_t fscache_n_cookies_lru_removed;
-+atomic_t fscache_n_cookies_lru_dropped;
- 
- atomic_t fscache_n_acquires;
- atomic_t fscache_n_acquires_ok;
-@@ -47,6 +51,14 @@ int fscache_stats_show(struct seq_file *m, void *v)
- 		   atomic_read(&fscache_n_acquires_ok),
- 		   atomic_read(&fscache_n_acquires_oom));
- 
-+	seq_printf(m, "LRU    : n=%u exp=%u rmv=%u drp=%u at=%ld\n",
-+		   atomic_read(&fscache_n_cookies_lru),
-+		   atomic_read(&fscache_n_cookies_lru_expired),
-+		   atomic_read(&fscache_n_cookies_lru_removed),
-+		   atomic_read(&fscache_n_cookies_lru_dropped),
-+		   timer_pending(&fscache_cookie_lru_timer) ?
-+		   fscache_cookie_lru_timer.expires - jiffies : 0);
++/*
++ * io.c
++ */
++static inline void fscache_end_operation(struct netfs_cache_resources *cres)
++{
++	const struct netfs_cache_ops *ops = fscache_operation_valid(cres);
 +
- 	seq_printf(m, "Updates: n=%u\n",
- 		   atomic_read(&fscache_n_updates));
++	if (ops)
++		ops->end_operation(cres);
++}
++
+ /*
+  * main.c
+  */
+diff --git a/fs/fscache/io.c b/fs/fscache/io.c
+new file mode 100644
+index 000000000000..460a43473019
+--- /dev/null
++++ b/fs/fscache/io.c
+@@ -0,0 +1,151 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Cache data I/O routines
++ *
++ * Copyright (C) 2021 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++#define FSCACHE_DEBUG_LEVEL OPERATION
++#include <linux/fscache-cache.h>
++#include <linux/uio.h>
++#include <linux/bvec.h>
++#include <linux/slab.h>
++#include <linux/uio.h>
++#include "internal.h"
++
++/**
++ * fscache_wait_for_operation - Wait for an object become accessible
++ * @cres: The cache resources for the operation being performed
++ * @want_state: The minimum state the object must be at
++ *
++ * See if the target cache object is at the specified minimum state of
++ * accessibility yet, and if not, wait for it.
++ */
++bool fscache_wait_for_operation(struct netfs_cache_resources *cres,
++				enum fscache_want_state want_state)
++{
++	struct fscache_cookie *cookie = fscache_cres_cookie(cres);
++	enum fscache_cookie_state state;
++
++again:
++	if (!fscache_cache_is_live(cookie->volume->cache)) {
++		_leave(" [broken]");
++		return false;
++	}
++
++	state = fscache_cookie_state(cookie);
++	_enter("c=%08x{%u},%x", cookie->debug_id, state, want_state);
++
++	switch (state) {
++	case FSCACHE_COOKIE_STATE_CREATING:
++	case FSCACHE_COOKIE_STATE_INVALIDATING:
++		if (want_state == FSCACHE_WANT_PARAMS)
++			goto ready; /* There can be no content */
++		fallthrough;
++	case FSCACHE_COOKIE_STATE_LOOKING_UP:
++	case FSCACHE_COOKIE_STATE_LRU_DISCARDING:
++		wait_var_event(&cookie->state,
++			       fscache_cookie_state(cookie) != state);
++		goto again;
++
++	case FSCACHE_COOKIE_STATE_ACTIVE:
++		goto ready;
++	case FSCACHE_COOKIE_STATE_DROPPED:
++	case FSCACHE_COOKIE_STATE_RELINQUISHING:
++	default:
++		_leave(" [not live]");
++		return false;
++	}
++
++ready:
++	if (!cres->cache_priv2)
++		return cookie->volume->cache->ops->begin_operation(cres, want_state);
++	return true;
++}
++EXPORT_SYMBOL(fscache_wait_for_operation);
++
++/*
++ * Begin an I/O operation on the cache, waiting till we reach the right state.
++ *
++ * Attaches the resources required to the operation resources record.
++ */
++static int fscache_begin_operation(struct netfs_cache_resources *cres,
++				   struct fscache_cookie *cookie,
++				   enum fscache_want_state want_state,
++				   enum fscache_access_trace why)
++{
++	enum fscache_cookie_state state;
++	long timeo;
++	bool once_only = false;
++
++	cres->ops		= NULL;
++	cres->cache_priv	= cookie;
++	cres->cache_priv2	= NULL;
++	cres->debug_id		= cookie->debug_id;
++	cres->inval_counter	= cookie->inval_counter;
++
++	if (!fscache_begin_cookie_access(cookie, why))
++		return -ENOBUFS;
++
++again:
++	spin_lock(&cookie->lock);
++
++	state = fscache_cookie_state(cookie);
++	_enter("c=%08x{%u},%x", cookie->debug_id, state, want_state);
++
++	switch (state) {
++	case FSCACHE_COOKIE_STATE_LOOKING_UP:
++	case FSCACHE_COOKIE_STATE_LRU_DISCARDING:
++	case FSCACHE_COOKIE_STATE_INVALIDATING:
++		goto wait_for_file_wrangling;
++	case FSCACHE_COOKIE_STATE_CREATING:
++		if (want_state == FSCACHE_WANT_PARAMS)
++			goto ready; /* There can be no content */
++		goto wait_for_file_wrangling;
++	case FSCACHE_COOKIE_STATE_ACTIVE:
++		goto ready;
++	case FSCACHE_COOKIE_STATE_DROPPED:
++	case FSCACHE_COOKIE_STATE_RELINQUISHING:
++		WARN(1, "Can't use cookie in state %u\n", cookie->state);
++		goto not_live;
++	default:
++		goto not_live;
++	}
++
++ready:
++	spin_unlock(&cookie->lock);
++	if (!cookie->volume->cache->ops->begin_operation(cres, want_state))
++		goto failed;
++	return 0;
++
++wait_for_file_wrangling:
++	spin_unlock(&cookie->lock);
++	trace_fscache_access(cookie->debug_id, refcount_read(&cookie->ref),
++			     atomic_read(&cookie->n_accesses),
++			     fscache_access_io_wait);
++	timeo = wait_var_event_timeout(&cookie->state,
++				       fscache_cookie_state(cookie) != state, 20 * HZ);
++	if (timeo <= 1 && !once_only) {
++		pr_warn("%s: cookie state change wait timed out: cookie->state=%u state=%u",
++			__func__, fscache_cookie_state(cookie), state);
++		fscache_print_cookie(cookie, 'O');
++		once_only = true;
++	}
++	goto again;
++
++not_live:
++	spin_unlock(&cookie->lock);
++failed:
++	cres->cache_priv = NULL;
++	cres->ops = NULL;
++	fscache_end_cookie_access(cookie, fscache_access_io_not_live);
++	_leave(" = -ENOBUFS");
++	return -ENOBUFS;
++}
++
++int __fscache_begin_read_operation(struct netfs_cache_resources *cres,
++				   struct fscache_cookie *cookie)
++{
++	return fscache_begin_operation(cres, cookie, FSCACHE_WANT_PARAMS,
++				       fscache_access_io_read);
++}
++EXPORT_SYMBOL(__fscache_begin_read_operation);
+diff --git a/include/linux/fscache-cache.h b/include/linux/fscache-cache.h
+index 1ad56bfd9d72..566497cf5f13 100644
+--- a/include/linux/fscache-cache.h
++++ b/include/linux/fscache-cache.h
+@@ -67,6 +67,10 @@ struct fscache_cache_ops {
+ 	/* Invalidate an object */
+ 	bool (*invalidate_cookie)(struct fscache_cookie *cookie);
  
++	/* Begin an operation for the netfs lib */
++	bool (*begin_operation)(struct netfs_cache_resources *cres,
++				enum fscache_want_state want_state);
++
+ 	/* Prepare to write to a live cache object */
+ 	void (*prepare_to_write)(struct fscache_cookie *cookie);
+ };
+@@ -101,6 +105,8 @@ extern void fscache_end_cookie_access(struct fscache_cookie *cookie,
+ extern void fscache_cookie_lookup_negative(struct fscache_cookie *cookie);
+ extern void fscache_resume_after_invalidation(struct fscache_cookie *cookie);
+ extern void fscache_caching_failed(struct fscache_cookie *cookie);
++extern bool fscache_wait_for_operation(struct netfs_cache_resources *cred,
++				       enum fscache_want_state state);
+ 
+ /**
+  * fscache_cookie_state - Read the state of a cookie
+@@ -129,4 +135,9 @@ static inline void *fscache_get_key(struct fscache_cookie *cookie)
+ 		return cookie->key;
+ }
+ 
++static inline struct fscache_cookie *fscache_cres_cookie(struct netfs_cache_resources *cres)
++{
++	return cres->cache_priv;
++}
++
+ #endif /* _LINUX_FSCACHE_CACHE_H */
 diff --git a/include/linux/fscache.h b/include/linux/fscache.h
-index 381735308c0b..97f66c88d6f1 100644
+index 39913ccae07f..329ed9dcd22f 100644
 --- a/include/linux/fscache.h
 +++ b/include/linux/fscache.h
-@@ -22,12 +22,14 @@
- #define fscache_available() (1)
- #define fscache_volume_valid(volume) (volume)
- #define fscache_cookie_valid(cookie) (cookie)
--#define fscache_cookie_enabled(cookie) (cookie)
-+#define fscache_resources_valid(cres) ((cres)->cache_priv)
-+#define fscache_cookie_enabled(cookie) (cookie && !test_bit(FSCACHE_COOKIE_DISABLED, &cookie->flags))
- #else
- #define __fscache_available (0)
- #define fscache_available() (0)
- #define fscache_volume_valid(volume) (0)
- #define fscache_cookie_valid(cookie) (0)
-+#define fscache_resources_valid(cres) (false)
- #define fscache_cookie_enabled(cookie) (0)
- #endif
+@@ -41,6 +41,12 @@ struct fscache_cookie;
  
-@@ -46,6 +48,7 @@ enum fscache_cookie_state {
- 	FSCACHE_COOKIE_STATE_CREATING,		/* The cache object is being created */
- 	FSCACHE_COOKIE_STATE_ACTIVE,		/* The cache is active, readable and writable */
- 	FSCACHE_COOKIE_STATE_FAILED,		/* The cache failed, withdraw to clear */
-+	FSCACHE_COOKIE_STATE_LRU_DISCARDING,	/* The cookie is being discarded by the LRU */
- 	FSCACHE_COOKIE_STATE_WITHDRAWING,	/* The cookie is being withdrawn */
- 	FSCACHE_COOKIE_STATE_RELINQUISHING,	/* The cookie is being relinquished */
- 	FSCACHE_COOKIE_STATE_DROPPED,		/* The cookie has been dropped */
-@@ -146,6 +149,8 @@ extern struct fscache_cookie *__fscache_acquire_cookie(
- 	const void *, size_t,
- 	const void *, size_t,
- 	loff_t);
-+extern void __fscache_use_cookie(struct fscache_cookie *, bool);
-+extern void __fscache_unuse_cookie(struct fscache_cookie *, const void *, const loff_t *);
+ #define FSCACHE_INVAL_DIO_WRITE		0x01 /* Invalidate due to DIO write */
+ 
++enum fscache_want_state {
++	FSCACHE_WANT_PARAMS,
++	FSCACHE_WANT_WRITE,
++	FSCACHE_WANT_READ,
++};
++
+ /*
+  * Data object state.
+  */
+@@ -156,6 +162,7 @@ extern void __fscache_use_cookie(struct fscache_cookie *, bool);
+ extern void __fscache_unuse_cookie(struct fscache_cookie *, const void *, const loff_t *);
  extern void __fscache_relinquish_cookie(struct fscache_cookie *, bool);
+ extern void __fscache_invalidate(struct fscache_cookie *, const void *, loff_t, unsigned int);
++extern int __fscache_begin_read_operation(struct netfs_cache_resources *, struct fscache_cookie *);
  
  /**
-@@ -224,6 +229,39 @@ struct fscache_cookie *fscache_acquire_cookie(struct fscache_volume *volume,
- 					object_size);
+  * fscache_acquire_volume - Register a volume as desiring caching services
+@@ -354,4 +361,46 @@ void fscache_invalidate(struct fscache_cookie *cookie,
+ 		__fscache_invalidate(cookie, aux_data, size, flags);
  }
  
 +/**
-+ * fscache_use_cookie - Request usage of cookie attached to an object
-+ * @object: Object description
-+ * @will_modify: If cache is expected to be modified locally
++ * fscache_operation_valid - Return true if operations resources are usable
++ * @cres: The resources to check.
 + *
-+ * Request usage of the cookie attached to an object.  The caller should tell
-+ * the cache if the object's contents are about to be modified locally and then
-+ * the cache can apply the policy that has been set to handle this case.
++ * Returns a pointer to the operations table if usable or NULL if not.
 + */
-+static inline void fscache_use_cookie(struct fscache_cookie *cookie,
-+				      bool will_modify)
++static inline
++const struct netfs_cache_ops *fscache_operation_valid(const struct netfs_cache_resources *cres)
 +{
-+	if (fscache_cookie_valid(cookie))
-+		__fscache_use_cookie(cookie, will_modify);
++	return fscache_resources_valid(cres) ? cres->ops : NULL;
 +}
 +
 +/**
-+ * fscache_unuse_cookie - Cease usage of cookie attached to an object
-+ * @object: Object description
-+ * @aux_data: Updated auxiliary data (or NULL)
-+ * @object_size: Revised size of the object (or NULL)
++ * fscache_begin_read_operation - Begin a read operation for the netfs lib
++ * @cres: The cache resources for the read being performed
++ * @cookie: The cookie representing the cache object
 + *
-+ * Cease usage of the cookie attached to an object.  When the users count
-+ * reaches zero then the cookie relinquishment will be permitted to proceed.
-+ */
-+static inline void fscache_unuse_cookie(struct fscache_cookie *cookie,
-+					const void *aux_data,
-+					const loff_t *object_size)
-+{
-+	if (fscache_cookie_valid(cookie))
-+		__fscache_unuse_cookie(cookie, aux_data, object_size);
-+}
-+
- /**
-  * fscache_relinquish_cookie - Return the cookie to the cache, maybe discarding
-  * it
-@@ -243,4 +281,46 @@ void fscache_relinquish_cookie(struct fscache_cookie *cookie, bool retire)
- 		__fscache_relinquish_cookie(cookie, retire);
- }
- 
-+/*
-+ * Find the auxiliary data on a cookie.
-+ */
-+static inline void *fscache_get_aux(struct fscache_cookie *cookie)
-+{
-+	if (cookie->aux_len <= sizeof(cookie->inline_aux))
-+		return cookie->inline_aux;
-+	else
-+		return cookie->aux;
-+}
-+
-+/*
-+ * Update the auxiliary data on a cookie.
++ * Begin a read operation on behalf of the netfs helper library.  @cres
++ * indicates the cache resources to which the operation state should be
++ * attached; @cookie indicates the cache object that will be accessed.
++ *
++ * This is intended to be called from the ->begin_cache_operation() netfs lib
++ * operation as implemented by the network filesystem.
++ *
++ * @cres->inval_counter is set from @cookie->inval_counter for comparison at
++ * the end of the operation.  This allows invalidation during the operation to
++ * be detected by the caller.
++ *
++ * Returns:
++ * * 0		- Success
++ * * -ENOBUFS	- No caching available
++ * * Other error code from the cache, such as -ENOMEM.
 + */
 +static inline
-+void fscache_update_aux(struct fscache_cookie *cookie,
-+			const void *aux_data, const loff_t *object_size)
++int fscache_begin_read_operation(struct netfs_cache_resources *cres,
++				 struct fscache_cookie *cookie)
 +{
-+	void *p = fscache_get_aux(cookie);
-+
-+	if (aux_data && p)
-+		memcpy(p, aux_data, cookie->aux_len);
-+	if (object_size)
-+		cookie->object_size = *object_size;
-+}
-+
-+#ifdef CONFIG_FSCACHE_STATS
-+extern atomic_t fscache_n_updates;
-+#endif
-+
-+static inline
-+void __fscache_update_cookie(struct fscache_cookie *cookie, const void *aux_data,
-+			     const loff_t *object_size)
-+{
-+#ifdef CONFIG_FSCACHE_STATS
-+	atomic_inc(&fscache_n_updates);
-+#endif
-+	fscache_update_aux(cookie, aux_data, object_size);
-+	smp_wmb();
-+	set_bit(FSCACHE_COOKIE_NEEDS_UPDATE, &cookie->flags);
++	if (fscache_cookie_enabled(cookie))
++		return __fscache_begin_read_operation(cres, cookie);
++	return -ENOBUFS;
 +}
 +
  #endif /* _LINUX_FSCACHE_H */
 diff --git a/include/trace/events/fscache.h b/include/trace/events/fscache.h
-index 030c97bb9c8b..b0409b1fad23 100644
+index 294792881434..9f78c903b00a 100644
 --- a/include/trace/events/fscache.h
 +++ b/include/trace/events/fscache.h
-@@ -51,13 +51,18 @@ enum fscache_cookie_trace {
- 	fscache_cookie_discard,
- 	fscache_cookie_get_end_access,
- 	fscache_cookie_get_hash_collision,
-+	fscache_cookie_get_lru,
-+	fscache_cookie_get_use_work,
- 	fscache_cookie_new_acquire,
- 	fscache_cookie_put_hash_collision,
-+	fscache_cookie_put_lru,
- 	fscache_cookie_put_over_queued,
- 	fscache_cookie_put_relinquish,
- 	fscache_cookie_put_withdrawn,
- 	fscache_cookie_put_work,
- 	fscache_cookie_see_active,
-+	fscache_cookie_see_lru_discard,
-+	fscache_cookie_see_lru_do_one,
- 	fscache_cookie_see_relinquish,
- 	fscache_cookie_see_withdraw,
- 	fscache_cookie_see_work,
-@@ -68,6 +73,7 @@ enum fscache_access_trace {
- 	fscache_access_acquire_volume_end,
- 	fscache_access_cache_pin,
+@@ -76,6 +76,9 @@ enum fscache_access_trace {
  	fscache_access_cache_unpin,
-+	fscache_access_lookup_cookie,
+ 	fscache_access_invalidate_cookie,
+ 	fscache_access_invalidate_cookie_end,
++	fscache_access_io_not_live,
++	fscache_access_io_read,
++	fscache_access_io_wait,
+ 	fscache_access_lookup_cookie,
  	fscache_access_lookup_cookie_end,
  	fscache_access_lookup_cookie_end_failed,
- 	fscache_access_relinquish_volume,
-@@ -110,13 +116,18 @@ enum fscache_access_trace {
- 	EM(fscache_cookie_discard,		"DISCARD  ")		\
- 	EM(fscache_cookie_get_hash_collision,	"GET hcoll")		\
- 	EM(fscache_cookie_get_end_access,	"GQ  endac")		\
-+	EM(fscache_cookie_get_lru,		"GET lru  ")		\
-+	EM(fscache_cookie_get_use_work,		"GQ  use  ")		\
- 	EM(fscache_cookie_new_acquire,		"NEW acq  ")		\
- 	EM(fscache_cookie_put_hash_collision,	"PUT hcoll")		\
-+	EM(fscache_cookie_put_lru,		"PUT lru  ")		\
- 	EM(fscache_cookie_put_over_queued,	"PQ  overq")		\
- 	EM(fscache_cookie_put_relinquish,	"PUT relnq")		\
- 	EM(fscache_cookie_put_withdrawn,	"PUT wthdn")		\
- 	EM(fscache_cookie_put_work,		"PQ  work ")		\
- 	EM(fscache_cookie_see_active,		"-   activ")		\
-+	EM(fscache_cookie_see_lru_discard,	"-   x-lru")		\
-+	EM(fscache_cookie_see_lru_do_one,	"-   lrudo")		\
- 	EM(fscache_cookie_see_relinquish,	"-   x-rlq")		\
- 	EM(fscache_cookie_see_withdraw,		"-   x-wth")		\
- 	E_(fscache_cookie_see_work,		"-   work ")
-@@ -126,6 +137,7 @@ enum fscache_access_trace {
- 	EM(fscache_access_acquire_volume_end,	"END   acq_vol")	\
- 	EM(fscache_access_cache_pin,		"PIN   cache  ")	\
+@@ -143,6 +146,9 @@ enum fscache_access_trace {
  	EM(fscache_access_cache_unpin,		"UNPIN cache  ")	\
-+	EM(fscache_access_lookup_cookie,	"BEGIN lookup ")	\
+ 	EM(fscache_access_invalidate_cookie,	"BEGIN inval  ")	\
+ 	EM(fscache_access_invalidate_cookie_end,"END   inval  ")	\
++	EM(fscache_access_io_not_live,		"END   io_notl")	\
++	EM(fscache_access_io_read,		"BEGIN io_read")	\
++	EM(fscache_access_io_wait,		"WAIT  io     ")	\
+ 	EM(fscache_access_lookup_cookie,	"BEGIN lookup ")	\
  	EM(fscache_access_lookup_cookie_end,	"END   lookup ")	\
  	EM(fscache_access_lookup_cookie_end_failed,"END   lookupf")	\
- 	EM(fscache_access_relinquish_volume,	"BEGIN rlq_vol")	\
 
 
