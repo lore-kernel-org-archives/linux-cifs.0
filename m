@@ -2,205 +2,233 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B23C433F5
-	for <linux-cifs@archiver.kernel.org>; Fri, 10 Dec 2021 06:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84AC5C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 10 Dec 2021 14:36:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236883AbhLJGLU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 10 Dec 2021 01:11:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53006 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236848AbhLJGLT (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 10 Dec 2021 01:11:19 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FCB8C061746;
-        Thu,  9 Dec 2021 22:07:45 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id w1so26401988edc.6;
-        Thu, 09 Dec 2021 22:07:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zXEf5ciGXddH1ZfFRYVx4mwEmUGCCuDnsqJ2/P7I5AU=;
-        b=bK7Zask2yeAga2ouVgokE6QDublXAawFaxpzUxmHjVbpVXWCNzlNa3eideLaZ+agpu
-         yY5NNWqBxgIWkHeQDThVN/Rj5hurWezLmB8XJH8ni2+ySEDtwwng16FEn+tHDbtOM06n
-         7JXBQRjtmF/ShGhpFtXe0AeA1h92uRTvpz9PcmDKKXiLVQPAwn0oFt4K3kVNfQkuD5jC
-         BWTgv+7s4c1BfMI2HUtlUu36f+rOMJRgjhuu2HxRJZxc4GIXCbzdnhh6Qe3MMHzWvgsG
-         NJb/kOtwgaKs4Z6SopYuFRLum+RSledCha5TZjZ5NbSrRYqOK83SdujKHveUGb38lNTg
-         uKcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zXEf5ciGXddH1ZfFRYVx4mwEmUGCCuDnsqJ2/P7I5AU=;
-        b=ATzKvzCYXWbzz4oK1MS9NOsGk41VlFNFhBYHhoO3zhigj6o8AGIgC7b3SXcO35Rx1+
-         ltdVbjnH/hI0b6jYz2emsKEbhY+iTjTV7dduKEry3l9vaB8pPqb/MeUzsIWAeGV3beT8
-         HRjF+7PetZz0NO/7KsBQeQCAeT5H5ba+Fl2HjVTZjNZ8qcZN9ijjybxR5F4axXG1qq8o
-         uPX0OsoqrQktzQ8HHJNrasNsMDpMZCL7NlroOfdyxnh1TunaCUZZn1pSRd1X1kU2yEzP
-         33ir4PszJ2tSJeSXz7LtEJw75SKON/YL/jKUm3ysc/mnpq0V7ok5+rOOuby+BuCGJg8I
-         QTyw==
-X-Gm-Message-State: AOAM533aRf/rsFykcBmTu+57Wg+kM1V4lQ0uvuvSycoXRgY/cf8r5X8g
-        aO0nR+GNhIV0SdzrCwtjPBSqOI//WgMeiaSCDFzwqFDz
-X-Google-Smtp-Source: ABdhPJyWYXlb6l/w47UWbJpwOuSKOp6yYutuLd9C211GDbWN3Qfdqjx1pftoYUmAzJt950yQGsi2RXLdv3SG2/p36us=
-X-Received: by 2002:a05:6402:5156:: with SMTP id n22mr36260598edd.222.1639116463549;
- Thu, 09 Dec 2021 22:07:43 -0800 (PST)
+        id S242200AbhLJOkO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 10 Dec 2021 09:40:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58384 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238575AbhLJOkN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Fri, 10 Dec 2021 09:40:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639146998;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1jWKu+fTBFJcT/HgMEzu6APh752fKYh1kEvLz4HhKOI=;
+        b=h2a/AU7dxRAd6HqxgT5A+aqxYutbsg6oE3fxvjq5/OWNLUZ3Esona7tjy+hcED3x/THddc
+        7ET90MMuZPmsTCYFUx31yiU+ijMV184eULTNJaGA2tcGVgykR2DyuvHbG9Au1gIF9NSNaP
+        i1DPjEREK8M8SsQEgyGzSfCLFQsMxSg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-330-bJd98xMGPKSZIQ3ttcegtA-1; Fri, 10 Dec 2021 09:36:35 -0500
+X-MC-Unique: bJd98xMGPKSZIQ3ttcegtA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0B04874993;
+        Fri, 10 Dec 2021 14:36:27 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.122])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6223F10016F7;
+        Fri, 10 Dec 2021 14:36:00 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=whtkzB446+hX0zdLsdcUJsJ=8_-0S1mE_R+YurThfUbLA@mail.gmail.com>
+References: <CAHk-=whtkzB446+hX0zdLsdcUJsJ=8_-0S1mE_R+YurThfUbLA@mail.gmail.com> <163906878733.143852.5604115678965006622.stgit@warthog.procyon.org.uk> <163906888735.143852.10944614318596881429.stgit@warthog.procyon.org.uk> <CAHk-=wiTquFUu-b5ME=rbGEF8r2Vh1TXGfaZZuXyOutVrgRzfw@mail.gmail.com> <159180.1639087053@warthog.procyon.org.uk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        linux-afs@lists.infradead.org,
+        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 07/67] fscache: Implement a hash function
 MIME-Version: 1.0
-References: <CADJHv_u3bqj82sFUWT=JJBWd1kjc14FUbVBd_9r18cMQOeudJw@mail.gmail.com>
- <CANT5p=rjTGNu2WooxRcu4JMM9wSyYY6S3kXtdfQ5caj1WnAEOA@mail.gmail.com>
- <CANT5p=pW1t5ggVsrMgNWi+CBpym5XXQ1dSwm-eH=vpczmL_nTg@mail.gmail.com>
- <CANT5p=oQeR90LPJKRUJ6eF+ti3Mefs48FfasT=fE79vyZKQU5g@mail.gmail.com> <CADJHv_s1-P20E=m+tWMYtWF-vJjcsEC3jq4Qd7seLxFJebgX2g@mail.gmail.com>
-In-Reply-To: <CADJHv_s1-P20E=m+tWMYtWF-vJjcsEC3jq4Qd7seLxFJebgX2g@mail.gmail.com>
-From:   Murphy Zhou <jencce.kernel@gmail.com>
-Date:   Fri, 10 Dec 2021 14:07:31 +0800
-Message-ID: <CADJHv_tfZRPtXqxTG-cnkXx=BQjq-danJQ0Q-rZZwS8PeCr_Eg@mail.gmail.com>
-Subject: Re: [ linux-next ] 20211206 tree cifs panic
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Linux-Next <linux-next@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <288129.1639146959.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Fri, 10 Dec 2021 14:35:59 +0000
+Message-ID: <288130.1639146959@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The patch can't be applied on the 1208 tree and does not fix the issue
-on the 1207 tree.
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-On Thu, Dec 9, 2021 at 7:05 PM Murphy Zhou <jencce.kernel@gmail.com> wrote:
->
-> Test is running.
->
-> And the kernel config is attached.
->
-> Thanks for looking into this!
->
-> On Thu, Dec 9, 2021 at 6:53 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
+> > What I'm trying to get at is that the hash needs to be consistent, no =
+matter
+> > the endianness of the cpu, for any particular input blob.
+> =
+
+> Yeah, if that's the case, then you should probably make that "unsigned
+> int *data" argument probably just be "void *" and then:
+> =
+
+> >                 a =3D *data++;   <<<<<<<
+> >                 HASH_MIX(x, y, a);
+> >         }
+> >         return fold_hash(x, y);
+> > }
 > >
-> > On Thu, Dec 9, 2021 at 3:06 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
-> > >
-> > > On Thu, Dec 9, 2021 at 2:40 PM Shyam Prasad N <nspmangalore@gmail.com> wrote:
-> > > >
-> > > > Hi Murphy,
-> > > >
-> > > > Can you please share the kernel config file used for this test?
-> > > > Is cachefilesd configured on this test setup?
-> > > >
-> > > > Regards,
-> > > > Shyam
-> > > >
-> > > > On Wed, Dec 8, 2021 at 2:57 PM Murphy Zhou <jencce.kernel@gmail.com> wrote:
-> > > > >
-> > > > > Hi,
-> > > > >
-> > > > > A connectathon test triggers panic like below. The server is a  smb
-> > > > > share on the same server with the test client.
-> > > > >
-> > > > >
-> > > > > [  594.061343] Key type cifs.spnego registered
-> > > > > [  594.082337] Key type cifs.idmap registered
-> > > > > [  594.104961] CIFS: No dialect specified on mount. Default has
-> > > > > changed to a more secure dialect, SMB2.1 or later (e.g. SMB3.1.1),
-> > > > > from CIFS (SMB1). To use the less secure SMB1 dialect to access old
-> > > > > servers which do not support SMB3.1.1 (or even SMB3 or SMB2.1) specify
-> > > > > vers=1.0 on mount.
-> > > > > [  594.223460] CIFS: Attempting to mount \\hp-dl380pg8\testuser
-> > > > > [  594.287771] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> > > > > [  594.319712] #PF: supervisor write access in kernel mode
-> > > > > [  594.343627] #PF: error_code(0x0002) - not-present page
-> > > > > [  594.366791] PGD 0 P4D 0
-> > > > > [  594.378172] Oops: 0002 [#1] PREEMPT SMP PTI
-> > > > > [  594.397047] CPU: 0 PID: 52196 Comm: mount.cifs Kdump: loaded
-> > > > > Tainted: G          I       5.16.0-rc4-next-20211206 #1
-> > > > > [  594.445144] Hardware name: HP ProLiant DL380p Gen8, BIOS P70 08/02/2014
-> > > > > [  594.475201] RIP: 0010:cifs_fscache_get_inode_cookie+0x2f/0xb0 [cifs]
-> > > > > [  594.503934] Code: 53 48 89 fb 48 83 ec 20 65 48 8b 04 25 28 00 00
-> > > > > 00 48 89 44 24 18 48 8b 47 28 48 8b b8 88 03 00 00 e8 35 c6 fa ff 48
-> > > > > 8b 53 68 <48> 89 14 25 00 00 00 00 48 8b 53 70 89 14 25 10 00 00 00 48
-> > > > > 8b 53
-> > > > > [  594.590004] RSP: 0018:ffffb93c4998fc10 EFLAGS: 00010282
-> > > > > [  594.614861] RAX: ffff970743ab5000 RBX: ffff970411193168 RCX: 0000000000000000
-> > > > > [  594.650920] RDX: 0000000061b01059 RSI: 00000000000041ed RDI: ffff970453924780
-> > > > > [  594.686189] RBP: ffffb93c4998fce8 R08: ffff970411193168 R09: ffff970743ab1548
-> > > > > [  594.718776] R10: 000000009f8bdc24 R11: 000000009053e561 R12: 000000000e1c25d9
-> > > > > [  594.750925] R13: ffff970411193168 R14: ffff970743ab1000 R15: ffff970743ab5000
-> > > > > [  594.783532] FS:  00007f2037080780(0000) GS:ffff97072f600000(0000)
-> > > > > knlGS:0000000000000000
-> > > > > [  594.820129] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > > [  594.846183] CR2: 0000000000000000 CR3: 0000000141820006 CR4: 00000000001706f0
-> > > > > [  594.878376] Call Trace:
-> > > > > [  594.889469]  <TASK>
-> > > > > [  594.898870]  cifs_iget+0x14b/0x160 [cifs]
-> > > > > [  594.917781]  cifs_get_inode_info+0x430/0x750 [cifs]
-> > > > > [  594.941267]  ? __d_instantiate+0x34/0xf0
-> > > > > [  594.960012]  ? _raw_spin_unlock+0x16/0x30
-> > > > > [  594.978111]  ? d_instantiate+0x3e/0x60
-> > > > > [  594.994982]  cifs_root_iget+0x33b/0x4b0 [cifs]
-> > > > > [  595.015099]  cifs_read_super+0x125/0x200 [cifs]
-> > > > > [  595.035596]  cifs_smb3_do_mount+0x224/0x330 [cifs]
-> > > > > [  595.057009]  smb3_get_tree+0x2d/0x50 [cifs]
-> > > > > [  595.076065]  vfs_get_tree+0x25/0xb0
-> > > > > [  595.092562]  do_new_mount+0x176/0x310
-> > > > > [  595.110929]  __x64_sys_mount+0x103/0x140
-> > > > > [  595.130439]  do_syscall_64+0x3b/0x90
-> > > > > [  595.147929]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> > > > > [  595.172646] RIP: 0033:0x7f2037195c4e
-> > > > > [  595.188703] Code: 48 8b 0d dd 71 0e 00 f7 d8 64 89 01 48 83 c8 ff
-> > > > > c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 a5 00 00
-> > > > > 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d aa 71 0e 00 f7 d8 64 89
-> > > > > 01 48
-> > > > > [  595.273644] RSP: 002b:00007fff27645a38 EFLAGS: 00000202 ORIG_RAX:
-> > > > > 00000000000000a5
-> > > > > [  595.307790] RAX: ffffffffffffffda RBX: 000055690a1bb910 RCX: 00007f2037195c4e
-> > > > > [  595.340187] RDX: 0000556908d5946b RSI: 0000556908d594b6 RDI: 00007fff27647fbe
-> > > > > [  595.372419] RBP: 000055690a1bb8f0 R08: 000055690a1bb910 R09: 0000000000000077
-> > > > > [  595.404633] R10: 0000000000000000 R11: 0000000000000202 R12: 00007fff27647fb3
-> > > > > [  595.436882] R13: 00007f203729d000 R14: 00007f203729f70e R15: 00007fff27647fbe
-> > > > > [  595.468980]  </TASK>
-> > > > > [  595.478769] Modules linked in: cifs cifs_arc4 cifs_md4 loop nfsv3
-> > > > > rpcsec_gss_krb5 nfsv4 dns_resolver nfs fscache netfs rpcrdma rdma_cm
-> > > > > iw_cm ib_cm ib_core nfsd auth_rpcgss nfs_acl lockd grace rfkill sunrpc
-> > > > > intel_rapl_msr intel_rapl_common sb_edac x86_pkg_temp_thermal
-> > > > > intel_powerclamp mgag200 coretemp i2c_algo_bit kvm_intel
-> > > > > drm_shmem_helper drm_kms_helper ipmi_ssif iTCO_wdt kvm
-> > > > > iTCO_vendor_support acpi_ipmi syscopyarea irqbypass sysfillrect
-> > > > > ipmi_si rapl intel_cstate ioatdma ipmi_devintf sysimgblt intel_uncore
-> > > > > fb_sys_fops cec lpc_ich ipmi_msghandler acpi_power_meter pcspkr dca
-> > > > > hpilo drm fuse xfs libcrc32c sr_mod cdrom sd_mod ata_generic t10_pi sg
-> > > > > ata_piix crct10dif_pclmul crc32_pclmul crc32c_intel libata serio_raw
-> > > > > tg3 ghash_clmulni_intel hpsa hpwdt scsi_transport_sas dm_mirror
-> > > > > dm_region_hash dm_log dm_mod
-> > > > > [  595.821049] CR2: 0000000000000000
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Regards,
-> > > > Shyam
-> > >
-> > > This does not repro against a Windows server.
-> > > My suspicion is that the recent change of location of
-> > > cifs_fscache_get_super_cookie to cifs_root_iget caused this. We maybe
-> > > trying to initialize the inode cookie when the super cookie is yet to
-> > > be initialized.
-> > >
-> > > The bigger point here is that there seems to be a circular dependency:
-> > > We need tcon->resource_id to setup the super cookie. This is populated
-> > > using inode number of root directory. Getting this inode number needs
-> > > opening of the root dir. Open causes inode cookie to be initialized,
-> > > which trips when it sees that the super cookie is still NULL.
-> > >
-> > > Steve: Do you agree with this assessment? How do we fix this? Can we
-> > > use some other value for resource_id, and not have to rely on the root
-> > > inode number? How about tcon->tid? Or a combination of tcon->tid and
-> > > ses->Suid?
-> > >
-> > > --
-> > > Regards,
-> > > Shyam
-> >
-> > Hi Murphy,
-> >
-> > Will you be able to test out with this patch as a possible fix for this issue?
-> >
-> > --
-> > Regards,
-> > Shyam
+> > The marked line should probably use something like le/be32_to_cpu().
+> =
+
+> Yes, it should be using a '__le32 *' inside that function and you
+> should use l32_to_cpu(). Obviously, BE would work too, but cause
+> unnecessary work on common hardware.
+
+Okay, how about I make the attached change to make the hashing stable?  Th=
+is
+will make fscache_hash() take an opaque buffer and a length (the length mu=
+st
+be a multiple of four).
+
+David
+---
+diff --git a/fs/fscache/cookie.c b/fs/fscache/cookie.c
+index e287952292c5..65cf2ae22a70 100644
+--- a/fs/fscache/cookie.c
++++ b/fs/fscache/cookie.c
+@@ -269,22 +269,23 @@ EXPORT_SYMBOL(fscache_caching_failed);
+ static int fscache_set_key(struct fscache_cookie *cookie,
+ 			   const void *index_key, size_t index_key_len)
+ {
+-	u32 *buf;
+-	int bufs;
++	void *buf;
++	size_t buf_size;
+ =
+
+-	bufs =3D DIV_ROUND_UP(index_key_len, sizeof(*buf));
++	buf_size =3D round_up(index_key_len, sizeof(__le32));
+ =
+
+ 	if (index_key_len > sizeof(cookie->inline_key)) {
+-		buf =3D kcalloc(bufs, sizeof(*buf), GFP_KERNEL);
++		buf =3D kzalloc(buf_size, GFP_KERNEL);
+ 		if (!buf)
+ 			return -ENOMEM;
+ 		cookie->key =3D buf;
+ 	} else {
+-		buf =3D (u32 *)cookie->inline_key;
++		buf =3D cookie->inline_key;
+ 	}
+ =
+
+ 	memcpy(buf, index_key, index_key_len);
+-	cookie->key_hash =3D fscache_hash(cookie->volume->key_hash, buf, bufs);
++	cookie->key_hash =3D fscache_hash(cookie->volume->key_hash,
++					buf, buf_size);
+ 	return 0;
+ }
+ =
+
+diff --git a/fs/fscache/internal.h b/fs/fscache/internal.h
+index 87884f4b34fb..f121c21590dc 100644
+--- a/fs/fscache/internal.h
++++ b/fs/fscache/internal.h
+@@ -86,7 +86,7 @@ static inline void fscache_end_operation(struct netfs_ca=
+che_resources *cres)
+  */
+ extern unsigned fscache_debug;
+ =
+
+-extern unsigned int fscache_hash(unsigned int salt, unsigned int *data, u=
+nsigned int n);
++extern unsigned int fscache_hash(unsigned int salt, const void *data, siz=
+e_t len);
+ =
+
+ /*
+  * proc.c
+diff --git a/fs/fscache/main.c b/fs/fscache/main.c
+index 01d57433702c..dad85fd84f6f 100644
+--- a/fs/fscache/main.c
++++ b/fs/fscache/main.c
+@@ -53,15 +53,16 @@ static inline unsigned int fold_hash(unsigned long x, =
+unsigned long y)
+ /*
+  * Generate a hash.  This is derived from full_name_hash(), but we want t=
+o be
+  * sure it is arch independent and that it doesn't change as bits of the
+- * computed hash value might appear on disk.  The caller also guarantees =
+that
+- * the hashed data will be a series of aligned 32-bit words.
++ * computed hash value might appear on disk.  The caller must guarantee t=
+hat
++ * the source data is a multiple of four bytes in size.
+  */
+-unsigned int fscache_hash(unsigned int salt, unsigned int *data, unsigned=
+ int n)
++unsigned int fscache_hash(unsigned int salt, const void *data, size_t len=
+)
+ {
+-	unsigned int a, x =3D 0, y =3D salt;
++	const __le32 *p =3D data;
++	unsigned int a, x =3D 0, y =3D salt, n =3D len / sizeof(__le32);
+ =
+
+ 	for (; n; n--) {
+-		a =3D *data++;
++		a =3D le32_to_cpu(*p++);
+ 		HASH_MIX(x, y, a);
+ 	}
+ 	return fold_hash(x, y);
+diff --git a/fs/fscache/volume.c b/fs/fscache/volume.c
+index edd3c245010e..26a6b8f315e1 100644
+--- a/fs/fscache/volume.c
++++ b/fs/fscache/volume.c
+@@ -131,7 +131,7 @@ static long fscache_compare_volume(const struct fscach=
+e_volume *a,
+ 	if (a->key[0] !=3D b->key[0])
+ 		return (long)a->key[0]   - (long)b->key[0];
+ =
+
+-	klen =3D round_up(a->key[0] + 1, sizeof(unsigned int));
++	klen =3D round_up(a->key[0] + 1, sizeof(__le32));
+ 	return memcmp(a->key, b->key, klen);
+ }
+ =
+
+@@ -225,7 +225,7 @@ static struct fscache_volume *fscache_alloc_volume(con=
+st char *volume_key,
+ 	 * hashing easier.
+ 	 */
+ 	klen =3D strlen(volume_key);
+-	hlen =3D round_up(1 + klen + 1, sizeof(unsigned int));
++	hlen =3D round_up(1 + klen + 1, sizeof(__le32));
+ 	key =3D kzalloc(hlen, GFP_KERNEL);
+ 	if (!key)
+ 		goto err_vol;
+@@ -233,8 +233,7 @@ static struct fscache_volume *fscache_alloc_volume(con=
+st char *volume_key,
+ 	memcpy(key + 1, volume_key, klen);
+ =
+
+ 	volume->key =3D key;
+-	volume->key_hash =3D fscache_hash(0, (unsigned int *)key,
+-					hlen / sizeof(unsigned int));
++	volume->key_hash =3D fscache_hash(0, key, hlen);
+ =
+
+ 	volume->debug_id =3D atomic_inc_return(&fscache_volume_debug_id);
+ 	down_write(&fscache_addremove_sem);
+
