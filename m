@@ -2,99 +2,119 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF61C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 15 Dec 2021 15:00:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C100C433FE
+	for <linux-cifs@archiver.kernel.org>; Wed, 15 Dec 2021 21:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230319AbhLOPAN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 15 Dec 2021 10:00:13 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:43554 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbhLOPAM (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Dec 2021 10:00:12 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C22D41F387;
-        Wed, 15 Dec 2021 15:00:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1639580411; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UjHU9eeARh2nsvFFi8bFZ0PXwreU2H+07/gPf3/32Y0=;
-        b=QOimXr3b4nzClydgVlLZKrZk9idiEqTala8HwyLdgQX0rLFucH+ovKrCOhKNJ+a6n5V0Ac
-        bok/EqPooRNTYF2L6F3E/L7OdqLq8yNHLWVQy3nYOrMxfaOI6LgXMZ5/lNJf+jmjmu8UzS
-        A5NsP8+eb9UBN+rNklnYWF9SKcfh738=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1639580411;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UjHU9eeARh2nsvFFi8bFZ0PXwreU2H+07/gPf3/32Y0=;
-        b=xqOldk1vxUbRIw0bgIqzZBlplK8yxzrYDR3fdGsLbFOnsH1zx86T2nCVC7/cdJoaQ2x/SC
-        CrrAJkB+G2qyBaCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 443681330B;
-        Wed, 15 Dec 2021 15:00:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id /6NIAvsCumHyeAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Wed, 15 Dec 2021 15:00:11 +0000
-Date:   Wed, 15 Dec 2021 12:00:08 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Namjae Jeon <linkinjeon@kernel.org>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>,
-        Hyeoncheol Lee <hyc.lee@gmail.com>,
-        Steve French <smfrench@gmail.com>
-Subject: Re: [RFC] Unify all programs into a single 'ksmbdctl' binary
-Message-ID: <20211215150008.u26snbaml5amlaep@cyberdelia>
-References: <20211130184710.r7dzzfhak4w3eoi6@cyberdelia>
- <CAKYAXd9b0Pji2+Ek9ZcRjN0SfZd4jzyNtDLKwzySh4WCjmSYkQ@mail.gmail.com>
+        id S229964AbhLOVtm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 15 Dec 2021 16:49:42 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:57705 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229957AbhLOVtl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Dec 2021 16:49:41 -0500
+Received: from mail-wr1-f51.google.com ([209.85.221.51]) by
+ mrelayeu.kundenserver.de (mreue107 [213.165.67.113]) with ESMTPSA (Nemesis)
+ id 1MdeKd-1mOpV42v2n-00ZhgC; Wed, 15 Dec 2021 22:49:39 +0100
+Received: by mail-wr1-f51.google.com with SMTP id t9so40561711wrx.7;
+        Wed, 15 Dec 2021 13:49:39 -0800 (PST)
+X-Gm-Message-State: AOAM5303tLyEPqp+DZ1578ZBUv0l3AaCo/05okCaN1m84A3lHkG1tIqw
+        gK/D+e5EuNSxXoCwBGrO8BAOqfdEiWyFcr8Yzm4=
+X-Google-Smtp-Source: ABdhPJyI4sFfqi3WV9r3gOmk1U//npIrS4nf8wBAkc7GviXMWmaD3dsHGyhZUXFZ+uysDsSwkLsuIqVlj3CoEC95hIQ=
+X-Received: by 2002:a5d:530e:: with SMTP id e14mr6188596wrv.12.1639604979240;
+ Wed, 15 Dec 2021 13:49:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAKYAXd9b0Pji2+Ek9ZcRjN0SfZd4jzyNtDLKwzySh4WCjmSYkQ@mail.gmail.com>
+References: <20211105154334.1841927-1-alexandre.ghiti@canonical.com>
+ <CAK8P3a2AnLJgGNBFvjUQqXd-Az9vjgE7yJQXGDwCav5E0btSsg@mail.gmail.com> <CA+zEjCtajRJhs8zSdR_oFBOO3P5FWWZJ3L6N-GK+JnUjdymTiA@mail.gmail.com>
+In-Reply-To: <CA+zEjCtajRJhs8zSdR_oFBOO3P5FWWZJ3L6N-GK+JnUjdymTiA@mail.gmail.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 15 Dec 2021 22:49:23 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a3aJJYcONV9JMcn47=mW4P4kvYFdwnTdyZfRqeo+eGndQ@mail.gmail.com>
+Message-ID: <CAK8P3a3aJJYcONV9JMcn47=mW4P4kvYFdwnTdyZfRqeo+eGndQ@mail.gmail.com>
+Subject: Re: [PATCH 0/7] Cleanup after removal of configs
+To:     Alexandre Ghiti <alexandre.ghiti@canonical.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Steve French <sfrench@samba.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Rich Felker <dalias@libc.org>,
+        Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Kalle Valo <kvalo@codeaurora.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-cachefs@redhat.com,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Linux-sh list <linux-sh@vger.kernel.org>,
+        linux-power@fi.rohmeurope.com
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:Io+rAnOukRGsESnCj52tUXFsPjVCtRLppZBZmKntlAeVeXpSrHi
+ qcxK9k04dshwgrWQYiw878XedRH47AsrLy4n/gdfxwlX7u2EYvjqUjIKEXIjY0tuCEb4D4b
+ LwE4dKpbjXgggXVUh7oHMARa5sG2Nx8fzgjtBBQhJLpcxn/XzSdD2djB3j6dwZlyKw7hv1G
+ drYUyPNFv42Qoql8UBrlg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:c07D+hGrL+w=:9x8C/icw8ntMTFqTZrSJrn
+ 6fyDDf4A/Q11iHr55nqwsGbPmkNrTebx43qkhrG1kKn+QweoG2MdgmEAMiSPsM0a18L18+Aur
+ rWclUKaX1DLwnkMvBTMNEBclBZYir8NYTvXSxZkzrJqynEv8CDsIwVEO73ysx3dkU79TaUJqq
+ ZGIEJjiEnuGE16rReyAdFECgxf6LmiGPDDLM/iBKdx9uO4BQGoXW18Cr/4+W/93SFzg8KuPCl
+ 4cO5C618BYZCT/TM34l2u/+7s0zYwWnnG5DneRm5zATDIaOpzQmASCntR1+q10bQ5shpFWfQ9
+ 349jAEyhYcUS51FiqkwWtW9U8nugU7PtrsLIOoJvF9O6RLHenDq4UhSZ+4wLl69agk/IGFwdY
+ e1pmV61H6prVazhtH0IJav8Tq+SlZA9eEL9ciwmNKDoqBq2UMGDU6NsiVlBC5IBfmFFwwW6vp
+ KnJgdSRkvw5StV8PRak8JngW4z38sMAssrPaLhMZnB58ohEI8vyai/WrofA3ZMAhqSXdUVHVW
+ MA94AVgnaRrqkS4aBiCwQXpehyyIGYzmaYvHQ5t5Rmcze8cs9pcwXtBm5NMjHJ7zQZh/sjcvD
+ 3VDHt9JKKeJ+17u9vpzBc/CqU/JYO47NgWL88LV8n1MafnwPo9YqI9ttnCx66ln9cZui2m3f0
+ bGWS9lZmArQRHp8q2TygJ//o8TTWVCEP5dbnuH3rBp3ln7RSib74/2lkOGLR1fuMQcLY=
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi all,
-
-On 12/01, Namjae Jeon wrote:
->2021-12-01 3:47 GMT+09:00, Enzo Matsumiya <ematsumiya@suse.de>:
->> Hi Namjae, list,
->Hi Enzo,
+On Fri, Dec 10, 2021 at 9:38 PM Alexandre Ghiti
+<alexandre.ghiti@canonical.com> wrote:
 >
->First, Thanks for your work!
->Cc: other maintainers.
+> On Fri, Nov 5, 2021 at 4:56 PM Arnd Bergmann <arnd@arndb.de> wrote:
+> >
+> > On Fri, Nov 5, 2021 at 4:43 PM Alexandre Ghiti
+> > <alexandre.ghiti@canonical.com> wrote:
+> > >
+> > > While bumping from 5.13 to 5.15, I found that a few deleted configs had
+> > > left some pieces here and there: this patchset cleans that.
+> > >
+> > > Alexandre Ghiti (7):
+> > >   Documentation, arch: Remove leftovers from fscache/cachefiles
+> > >     histograms
+> > >   Documentation, arch: Remove leftovers from raw device
+> > >   Documentation, arch: Remove leftovers from CIFS_WEAK_PW_HASH
+> > >   arch: Remove leftovers from mandatory file locking
+> > >   Documentation, arch, fs: Remove leftovers from fscache object list
+> > >   include: mfd: Remove leftovers from bd70528 watchdog
+> > >   arch: Remove leftovers from prism54 wireless driver
+> >
+> > Looks all good to me, thanks a lot for the cleanup!
+> >
+> > For arch/arm/configs:
+> >
+> > Acked-by: Arnd Bergmann <arnd@arndb.de>
+> >
+> > assuming this goes through someone else's tree. Let me know if you need me
+> > to pick up the patches in the asm-generic tree for cross-architecture work.
 >
->>
->> I've been working on the unification of all ksmbd-tools programs into a
->> single 'ksmbdctl' binary, and I would like to invite everyone to test
->> and/or provide me feedback on the implementation.
->While checking this out, I'd love to hear from other maintainers.
->>
->> Since this a big-ish refactor, for now I'm sharing the code via my
->> GitHub repo:
->>
->> https://github.com/ematsumiya/ksmbd-tools/tree/ksmbdctl
->>
->> I can split it into smaller commits later on, if approved for merge.
->Great.
->>
->> Commit message below, for a better explanation.
->I will check it and give feedback soon.
->Thanks!
+> Arnd, do you mind taking the whole series except patch 6 ("include:
+> mfd: Remove leftovers from bd70528 watchdog") as this will be handled
+> separately. I can ask Jonathan for the doc patches if needed.
 
-Any feedback on this proposal? Should I focus on polishing + splitting
-into meaningful commits?
+I tried to apply them, but only three of the patches applied cleanly. Can you
+resend them based on v5.16-rc1?
 
-
-Cheers,
-
-Enzo
+        Arnd
