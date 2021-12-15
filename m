@@ -2,119 +2,162 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C100C433FE
-	for <linux-cifs@archiver.kernel.org>; Wed, 15 Dec 2021 21:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E287CC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 15 Dec 2021 22:15:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbhLOVtm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 15 Dec 2021 16:49:42 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:57705 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229957AbhLOVtl (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Dec 2021 16:49:41 -0500
-Received: from mail-wr1-f51.google.com ([209.85.221.51]) by
- mrelayeu.kundenserver.de (mreue107 [213.165.67.113]) with ESMTPSA (Nemesis)
- id 1MdeKd-1mOpV42v2n-00ZhgC; Wed, 15 Dec 2021 22:49:39 +0100
-Received: by mail-wr1-f51.google.com with SMTP id t9so40561711wrx.7;
-        Wed, 15 Dec 2021 13:49:39 -0800 (PST)
-X-Gm-Message-State: AOAM5303tLyEPqp+DZ1578ZBUv0l3AaCo/05okCaN1m84A3lHkG1tIqw
-        gK/D+e5EuNSxXoCwBGrO8BAOqfdEiWyFcr8Yzm4=
-X-Google-Smtp-Source: ABdhPJyI4sFfqi3WV9r3gOmk1U//npIrS4nf8wBAkc7GviXMWmaD3dsHGyhZUXFZ+uysDsSwkLsuIqVlj3CoEC95hIQ=
-X-Received: by 2002:a5d:530e:: with SMTP id e14mr6188596wrv.12.1639604979240;
- Wed, 15 Dec 2021 13:49:39 -0800 (PST)
+        id S229513AbhLOWPm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 15 Dec 2021 17:15:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47440 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229472AbhLOWPl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Dec 2021 17:15:41 -0500
+Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E03EC061574
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Dec 2021 14:15:41 -0800 (PST)
+Received: by mail-ua1-x92e.google.com with SMTP id 107so3264961uaj.10
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Dec 2021 14:15:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=JoswED7qzqKT418K1crj6NtptIQbNWbJT9sBQWoRpII=;
+        b=lm39nEvlTsMxd1RkpPh3lUuAT1hzz/FHueZn3VxNaZj7jhO766kIvOctPMpjnj9jmw
+         Fm+C0dBM3zOLfbUYleYd91Ivu9/75xwDPLrgr1VxI+1mKYtbQurAdbCSpV7HoqJUvnZN
+         K0Ouhqxb+rpapFpD8fUgJMLGFVgazbofR7Nm3Gu4b/gxgeY7+pw3cv2y6gwcPUcJs91h
+         DTngzgSPedPLaaISxX0axT6SCMqUOswYDjF3HOCrgcfVfcqrKBl5j7ft+jfaI5oWc7SX
+         oY2XOY8DUbotdeishEVIE+2W7/AiaemOmQbHheUeOjX2UpYw3MBsUaZ4Q64sNFf3iKQm
+         hDDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=JoswED7qzqKT418K1crj6NtptIQbNWbJT9sBQWoRpII=;
+        b=3KtspgV7Eb0GWIj6kEPLgjmUXRjFX7CpAbE2iOFN/rorypxeXUFRmg52BlQGiOzVPZ
+         S1Zqk076DjWm/MpvcyPwhqI4LMGGnlNAQ4ooyFpawk3Re+UZI/OEiWslnQbDYSoqr9vW
+         0aC9doO60E2vGNfkukdjRAeju/Oq7EhgleMD+6DSYxwW4f9DTwd6SK44oyBuNzwaLeUd
+         TPmDhDmJ8PVjF9uUxixla6zVAek0Mspnsc4h8Vl4ZRFxeEL5tXmfDrbXu4/JbpqSeQGY
+         7KFxGMCNLHkx+dhv5aXlfxmZToK2URqwCBmxUBhMBRx2isgZeNc6TCZONPDkzg63a5fK
+         HkKQ==
+X-Gm-Message-State: AOAM531XCNFs1Oj5MlwPnZzuoYh8S/H9AO9tPaaJgH65/uIW5K8Wz39g
+        riKJxsGwrSXlT/ydyIOMYSh+USBM27cyr8vHpWRYTHBuDi8=
+X-Google-Smtp-Source: ABdhPJxMjdYRBqV/Hmn2v1qiM+W4e7xXE43VIo2OTTsVP63jBPApbeGrXxN8xHocXo35t/jXJnln0Xyku/leWLlfhG8=
+X-Received: by 2002:a05:6102:2c6:: with SMTP id h6mr4490868vsh.13.1639606540068;
+ Wed, 15 Dec 2021 14:15:40 -0800 (PST)
 MIME-Version: 1.0
-References: <20211105154334.1841927-1-alexandre.ghiti@canonical.com>
- <CAK8P3a2AnLJgGNBFvjUQqXd-Az9vjgE7yJQXGDwCav5E0btSsg@mail.gmail.com> <CA+zEjCtajRJhs8zSdR_oFBOO3P5FWWZJ3L6N-GK+JnUjdymTiA@mail.gmail.com>
-In-Reply-To: <CA+zEjCtajRJhs8zSdR_oFBOO3P5FWWZJ3L6N-GK+JnUjdymTiA@mail.gmail.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Wed, 15 Dec 2021 22:49:23 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a3aJJYcONV9JMcn47=mW4P4kvYFdwnTdyZfRqeo+eGndQ@mail.gmail.com>
-Message-ID: <CAK8P3a3aJJYcONV9JMcn47=mW4P4kvYFdwnTdyZfRqeo+eGndQ@mail.gmail.com>
-Subject: Re: [PATCH 0/7] Cleanup after removal of configs
-To:     Alexandre Ghiti <alexandre.ghiti@canonical.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Steve French <sfrench@samba.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Rich Felker <dalias@libc.org>,
-        Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kalle Valo <kvalo@codeaurora.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-cachefs@redhat.com,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Linux-sh list <linux-sh@vger.kernel.org>,
-        linux-power@fi.rohmeurope.com
+References: <20211215060206.8048-1-linkinjeon@kernel.org>
+In-Reply-To: <20211215060206.8048-1-linkinjeon@kernel.org>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Thu, 16 Dec 2021 07:15:28 +0900
+Message-ID: <CANFS6bZdA+ZDHLCgbi3P2hej0a1-nNweDc0HOeF8rNe8ayrP_g@mail.gmail.com>
+Subject: Re: [PATCH 1/3] ksmbd: set RSS capable in FSCTL_QUERY_NETWORK_INTERFACE_INFO
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     linux-cifs <linux-cifs@vger.kernel.org>,
+        Ziwei Xie <zw.xie@high-flyer.cn>
 Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:Io+rAnOukRGsESnCj52tUXFsPjVCtRLppZBZmKntlAeVeXpSrHi
- qcxK9k04dshwgrWQYiw878XedRH47AsrLy4n/gdfxwlX7u2EYvjqUjIKEXIjY0tuCEb4D4b
- LwE4dKpbjXgggXVUh7oHMARa5sG2Nx8fzgjtBBQhJLpcxn/XzSdD2djB3j6dwZlyKw7hv1G
- drYUyPNFv42Qoql8UBrlg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:c07D+hGrL+w=:9x8C/icw8ntMTFqTZrSJrn
- 6fyDDf4A/Q11iHr55nqwsGbPmkNrTebx43qkhrG1kKn+QweoG2MdgmEAMiSPsM0a18L18+Aur
- rWclUKaX1DLwnkMvBTMNEBclBZYir8NYTvXSxZkzrJqynEv8CDsIwVEO73ysx3dkU79TaUJqq
- ZGIEJjiEnuGE16rReyAdFECgxf6LmiGPDDLM/iBKdx9uO4BQGoXW18Cr/4+W/93SFzg8KuPCl
- 4cO5C618BYZCT/TM34l2u/+7s0zYwWnnG5DneRm5zATDIaOpzQmASCntR1+q10bQ5shpFWfQ9
- 349jAEyhYcUS51FiqkwWtW9U8nugU7PtrsLIOoJvF9O6RLHenDq4UhSZ+4wLl69agk/IGFwdY
- e1pmV61H6prVazhtH0IJav8Tq+SlZA9eEL9ciwmNKDoqBq2UMGDU6NsiVlBC5IBfmFFwwW6vp
- KnJgdSRkvw5StV8PRak8JngW4z38sMAssrPaLhMZnB58ohEI8vyai/WrofA3ZMAhqSXdUVHVW
- MA94AVgnaRrqkS4aBiCwQXpehyyIGYzmaYvHQ5t5Rmcze8cs9pcwXtBm5NMjHJ7zQZh/sjcvD
- 3VDHt9JKKeJ+17u9vpzBc/CqU/JYO47NgWL88LV8n1MafnwPo9YqI9ttnCx66ln9cZui2m3f0
- bGWS9lZmArQRHp8q2TygJ//o8TTWVCEP5dbnuH3rBp3ln7RSib74/2lkOGLR1fuMQcLY=
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 9:38 PM Alexandre Ghiti
-<alexandre.ghiti@canonical.com> wrote:
+2021=EB=85=84 12=EC=9B=94 16=EC=9D=BC (=EB=AA=A9) =EC=98=A4=EC=A0=84 4:47, =
+Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
 >
-> On Fri, Nov 5, 2021 at 4:56 PM Arnd Bergmann <arnd@arndb.de> wrote:
-> >
-> > On Fri, Nov 5, 2021 at 4:43 PM Alexandre Ghiti
-> > <alexandre.ghiti@canonical.com> wrote:
-> > >
-> > > While bumping from 5.13 to 5.15, I found that a few deleted configs had
-> > > left some pieces here and there: this patchset cleans that.
-> > >
-> > > Alexandre Ghiti (7):
-> > >   Documentation, arch: Remove leftovers from fscache/cachefiles
-> > >     histograms
-> > >   Documentation, arch: Remove leftovers from raw device
-> > >   Documentation, arch: Remove leftovers from CIFS_WEAK_PW_HASH
-> > >   arch: Remove leftovers from mandatory file locking
-> > >   Documentation, arch, fs: Remove leftovers from fscache object list
-> > >   include: mfd: Remove leftovers from bd70528 watchdog
-> > >   arch: Remove leftovers from prism54 wireless driver
-> >
-> > Looks all good to me, thanks a lot for the cleanup!
-> >
-> > For arch/arm/configs:
-> >
-> > Acked-by: Arnd Bergmann <arnd@arndb.de>
-> >
-> > assuming this goes through someone else's tree. Let me know if you need me
-> > to pick up the patches in the asm-generic tree for cross-architecture work.
+> Set RSS capable in FSCTL_QUERY_NETWORK_INTERFACE_INFO if netdev has
+> multi tx queues. And add ksmbd_compare_user() to avoid racy condition
+> issue in ksmbd_free_user(). because windows client is simultaneously used
+> to send session setup requests for multichannel connection.
 >
-> Arnd, do you mind taking the whole series except patch 6 ("include:
-> mfd: Remove leftovers from bd70528 watchdog") as this will be handled
-> separately. I can ask Jonathan for the doc patches if needed.
+> Tested-by: Ziwei Xie <zw.xie@high-flyer.cn>
+> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+> ---
+>  fs/ksmbd/mgmt/user_config.c | 10 ++++++++++
+>  fs/ksmbd/mgmt/user_config.h |  1 +
+>  fs/ksmbd/smb2pdu.c          | 14 +++++++++-----
+>  3 files changed, 20 insertions(+), 5 deletions(-)
+>
+> diff --git a/fs/ksmbd/mgmt/user_config.c b/fs/ksmbd/mgmt/user_config.c
+> index 1019d3677d55..279d00feff21 100644
+> --- a/fs/ksmbd/mgmt/user_config.c
+> +++ b/fs/ksmbd/mgmt/user_config.c
+> @@ -67,3 +67,13 @@ int ksmbd_anonymous_user(struct ksmbd_user *user)
+>                 return 1;
+>         return 0;
+>  }
+> +
+> +bool ksmbd_compare_user(struct ksmbd_user *u1, struct ksmbd_user *u2)
+> +{
+> +       if (strcmp(u1->name, u2->name))
+> +               return false;
+> +       if (memcmp(u1->passkey, u2->passkey, u1->passkey_sz))
+> +               return false;
+> +
+> +       return true;
+> +}
+> diff --git a/fs/ksmbd/mgmt/user_config.h b/fs/ksmbd/mgmt/user_config.h
+> index aff80b029579..6a44109617f1 100644
+> --- a/fs/ksmbd/mgmt/user_config.h
+> +++ b/fs/ksmbd/mgmt/user_config.h
+> @@ -64,4 +64,5 @@ struct ksmbd_user *ksmbd_login_user(const char *account=
+);
+>  struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp);
+>  void ksmbd_free_user(struct ksmbd_user *user);
+>  int ksmbd_anonymous_user(struct ksmbd_user *user);
+> +bool ksmbd_compare_user(struct ksmbd_user *u1, struct ksmbd_user *u2);
+>  #endif /* __USER_CONFIG_MANAGEMENT_H__ */
+> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+> index f7bea92d4c98..7aee3b58b16f 100644
+> --- a/fs/ksmbd/smb2pdu.c
+> +++ b/fs/ksmbd/smb2pdu.c
+> @@ -1429,10 +1429,15 @@ static int ntlm_authenticate(struct ksmbd_work *w=
+ork)
+>                         ksmbd_free_user(user);
+>                         return 0;
+>                 }
+> -               ksmbd_free_user(sess->user);
+> +
+> +               if (!ksmbd_compare_user(sess->user, user))
+> +                       return -EPERM;
+> +
 
-I tried to apply them, but only three of the patches applied cleanly. Can you
-resend them based on v5.16-rc1?
+We  don't need to free the user? Other than that, this looks good to me.
 
-        Arnd
+> +               ksmbd_free_user(user);
+> +       } else {
+> +               sess->user =3D user;
+>         }
+>
+> -       sess->user =3D user;
+>         if (user_guest(sess->user)) {
+>                 if (conn->sign) {
+>                         ksmbd_debug(SMB, "Guest login not allowed when si=
+gning enabled\n");
+> @@ -2036,9 +2041,6 @@ int smb2_session_logoff(struct ksmbd_work *work)
+>
+>         ksmbd_debug(SMB, "request\n");
+>
+> -       /* Got a valid session, set connection state */
+> -       WARN_ON(sess->conn !=3D conn);
+> -
+>         /* setting CifsExiting here may race with start_tcp_sess */
+>         ksmbd_conn_set_need_reconnect(work);
+>         ksmbd_close_session_fds(work);
+> @@ -7243,6 +7245,8 @@ static int fsctl_query_iface_info_ioctl(struct ksmb=
+d_conn *conn,
+>                 nii_rsp->IfIndex =3D cpu_to_le32(netdev->ifindex);
+>
+>                 nii_rsp->Capability =3D 0;
+> +               if (netdev->real_num_tx_queues > 1)
+> +                       nii_rsp->Capability |=3D cpu_to_le32(RSS_CAPABLE)=
+;
+>                 if (ksmbd_rdma_capable_netdev(netdev))
+>                         nii_rsp->Capability |=3D cpu_to_le32(RDMA_CAPABLE=
+);
+>
+> --
+> 2.25.1
+>
+
+
+--=20
+Thanks,
+Hyunchul
