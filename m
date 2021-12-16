@@ -2,33 +2,64 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F36D8C433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 19:29:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A016C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 19:54:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237121AbhLPT33 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Dec 2021 14:29:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59314 "EHLO
+        id S238712AbhLPTy2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Dec 2021 14:54:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232560AbhLPT32 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Dec 2021 14:29:28 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9922BC061574;
-        Thu, 16 Dec 2021 11:29:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=N9CxEizcUKUMKe7tygLAy2SKNqVIaZunBZQhmUvlaCo=; b=TfIC8wH+3iPtFaTNNHTiwoOSwz
-        Bpsoi/K/YScFLbzdHHr0K8D4ikaBbFc/WqSk3CClQHeadtbcZldeGLW1OWzKGfUrcONUURVgJ3AKW
-        7vvwE7ExhcmC69CTT6pe0i9JUhRALDvQ/XpthdOB/NXqZHs1AuyGOUHNH/oNkTuSwVfvAjuIfuhGC
-        Y605ibUw+jfKHeuEPoHslvWaMnVjItExifSdcTybxLgeV5XJXC9PJB18n9KIcEQwZFGm02AaimUXN
-        XxcV0oSs+Qu5b4zlqfrJAGknSX+Z66iNgHKFBxEBI2dGXXpHL/POwbDa64BswFZhhWynw0aJMTSGl
-        MNr1Gg0w==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mxwQj-00Ft6U-EP; Thu, 16 Dec 2021 19:28:41 +0000
-Date:   Thu, 16 Dec 2021 19:28:41 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
+        with ESMTP id S241104AbhLPTy1 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Dec 2021 14:54:27 -0500
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7062BC06173E
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Dec 2021 11:54:26 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id y22so20142980edq.2
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Dec 2021 11:54:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1YEg3xCizKQigIIVaj+7NPGS0vV5YzouOWDo8EKHI8Y=;
+        b=dGLplsJKLLH7R55fT9CGKpQ+QAOXByetGDAZO4Qe5hOY96iYDADZXPv6IaRTnkyzZU
+         YI08eiKnx/i5FnO61PQJoSbspOCrTKasx1Wska9nu2oEvPHzOmLFcQpapSbFWwnZ/gZJ
+         a5Drpm7Pl4iYA3ZnJI1TCTMw/SmbnFNAdcPBg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1YEg3xCizKQigIIVaj+7NPGS0vV5YzouOWDo8EKHI8Y=;
+        b=I3JZhhz2du5NlHoZa6iOe9n1yyoE3wE5YqzroBN/czpG7w91TUJoNzunRhjvwOH7tN
+         oKXNe2aXWkM4WtK3T1H1LTdNZJm+bkaZ1kQvRyteMQtVDdcjjD9eGHe7nsIfHEMRKC7S
+         1n0ragtehTAshvGNehVt/8IblO9p76impSRvfeJcfugVugQaqd5Ea8RfiwZWGOK2Snft
+         EEVVuP4vlpt2SWmTCvbMUi8+K6rP4w7UJWN0/J2uOt9opQxmhObrmI5PWsGlTOvmarDL
+         CVFLSjUXXceZLb+qq/XumlLpt7WxKgAjnU/ei4yswGiihM30xfK6StqloIgaGXt+IeKD
+         wCgw==
+X-Gm-Message-State: AOAM533HWEx4azLSvLyaM0Aapc4wMMRXBzKEwY+BeCJXZQTmcJABpSCq
+        VQl9uyufM7T8WfPsEGE8/QLr2afxrJB+bfZCP6c=
+X-Google-Smtp-Source: ABdhPJzj391wgA98RF+e7acabZdruq53KM1KIXflnVJsEnQLOeylnx+9bKYkEcjuvhyB+Ftr/7PuSg==
+X-Received: by 2002:aa7:c78f:: with SMTP id n15mr21920503eds.344.1639684464866;
+        Thu, 16 Dec 2021 11:54:24 -0800 (PST)
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com. [209.85.221.52])
+        by smtp.gmail.com with ESMTPSA id qk9sm2033837ejc.68.2021.12.16.11.54.24
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Dec 2021 11:54:24 -0800 (PST)
+Received: by mail-wr1-f52.google.com with SMTP id c4so6351wrd.9
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Dec 2021 11:54:24 -0800 (PST)
+X-Received: by 2002:a5d:4575:: with SMTP id a21mr10519052wrc.193.1639683994422;
+ Thu, 16 Dec 2021 11:46:34 -0800 (PST)
+MIME-Version: 1.0
+References: <163967073889.1823006.12237147297060239168.stgit@warthog.procyon.org.uk>
+ <163967169723.1823006.2868573008412053995.stgit@warthog.procyon.org.uk>
+ <CAHk-=wi0H5vmka1_iWe0+Yc6bwtgWn_bEEHCMYsPHYtNJKZHCQ@mail.gmail.com> <YbuTaRbNUAJx5xOA@casper.infradead.org>
+In-Reply-To: <YbuTaRbNUAJx5xOA@casper.infradead.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu, 16 Dec 2021 11:46:18 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wh2dr=NgVSVj0sw-gSuzhxhLRV5FymfPS146zGgF4kBjA@mail.gmail.com>
+Message-ID: <CAHk-=wh2dr=NgVSVj0sw-gSuzhxhLRV5FymfPS146zGgF4kBjA@mail.gmail.com>
+Subject: Re: [PATCH v3 56/68] afs: Handle len being extending over page end in write_begin/write_end
+To:     Matthew Wilcox <willy@infradead.org>
 Cc:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com,
         Jeff Layton <jlayton@kernel.org>,
         Marc Dionne <marc.dionne@auristor.com>,
@@ -45,54 +76,43 @@ Cc:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 56/68] afs: Handle len being extending over page end
- in write_begin/write_end
-Message-ID: <YbuTaRbNUAJx5xOA@casper.infradead.org>
-References: <163967073889.1823006.12237147297060239168.stgit@warthog.procyon.org.uk>
- <163967169723.1823006.2868573008412053995.stgit@warthog.procyon.org.uk>
- <CAHk-=wi0H5vmka1_iWe0+Yc6bwtgWn_bEEHCMYsPHYtNJKZHCQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wi0H5vmka1_iWe0+Yc6bwtgWn_bEEHCMYsPHYtNJKZHCQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Dec 16, 2021 at 08:31:19AM -0800, Linus Torvalds wrote:
-> On Thu, Dec 16, 2021 at 8:22 AM David Howells <dhowells@redhat.com> wrote:
-> >
-> > With transparent huge pages, in the future, write_begin() and write_end()
-> > may be passed a length parameter that, in combination with the offset into
-> > the page, exceeds the length of that page.  This allows
-> > grab_cache_page_write_begin() to better choose the size of THP to allocate.
-> 
-> I still think this is a fundamental bug in the caller. That
-> "explanation" is weak, and the whole concept smells like week-old fish
-> to me.
+On Thu, Dec 16, 2021 at 11:28 AM Matthew Wilcox <willy@infradead.org> wrote:
+>
+> Since ->write_begin is the place where we actually create folios, it
+> needs to know what size folio to create.  Unless you'd rather we do
+> something to actually create the folio before calling ->write_begin?
 
-You're right that  ->write_end can't be called with more bytes than fit
-in the folio.  That makes no sense at all.
+I don't think we can create a folio before that, because the
+filesystem may not even want a folio (think persistent memory or
+whatever).
 
-I haven't finished fully fleshing this out yet (and as a result we still
-only create PAGE_SIZE folios on writes), but my basic plan was:
+Honestly, I think you need to describe more what you actually want to
+happen. Because generic_perform_write() has already decided to use a
+PAGE_SIZE by the time write_begin() is called,
 
-generic_perform_write:
--	bytes = min_t(unsigned long, PAGE_SIZE - offset,
-+	bytes = min_t(unsigned long, FOLIO_MAX_PAGE_CACHE_SIZE - offset,
- 					iov_iter_count(i));
-...
-                status = a_ops->write_begin(file, mapping, pos, bytes, flags,
--                                               &page, &fsdata);
-+                                               &folio, &fsdata);
+Right now the world order is "we chunk things by PAGE_SIZE", and
+that's just how it is.
 
-+		offset = offset_in_folio(folio, pos);
-+		bytes = folio_size(folio - offset);
-...
-                status = a_ops->write_end(file, mapping, pos, bytes, copied,
--                                               page, fsdata);
-+                                               folio, fsdata);
+I can see other options - like the filesystem passing in the chunk
+size when it calls generic_perform_write().
 
-Since ->write_begin is the place where we actually create folios, it
-needs to know what size folio to create.  Unless you'd rather we do
-something to actually create the folio before calling ->write_begin?
+Or we make the rule be that ->write_begin() simply always is given the
+whole area, and the filesystem can decide how it wants to chunk things
+up, and return the size of the write chunk in the status (rather than
+the current "success or error").
+
+But at no point will this *EVER* be a "afs will limit the size to the
+folio size" issue. Nothing like that will ever make sense. Allowing
+bigger chunks will not be about any fscache issues, it will be about
+every single filesystem that uses generic_perform_write().
+
+So I will NAK these patches by David, because they are fundamentally
+wrong, whichever way we turn. Any "write in bigger chunks" patch will
+be something else entirely.
+
+                 Linus
