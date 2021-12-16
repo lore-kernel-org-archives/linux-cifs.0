@@ -2,134 +2,126 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1597C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 01:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0302FC433FE
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 01:38:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbhLPBiG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 15 Dec 2021 20:38:06 -0500
-Received: from mail-pj1-f51.google.com ([209.85.216.51]:43768 "EHLO
-        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbhLPBiG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Dec 2021 20:38:06 -0500
-Received: by mail-pj1-f51.google.com with SMTP id a11-20020a17090a854b00b001b11aae38d6so1616375pjw.2
-        for <linux-cifs@vger.kernel.org>; Wed, 15 Dec 2021 17:38:05 -0800 (PST)
+        id S232570AbhLPBiI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 15 Dec 2021 20:38:08 -0500
+Received: from mail-pf1-f175.google.com ([209.85.210.175]:44935 "EHLO
+        mail-pf1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229533AbhLPBiI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Dec 2021 20:38:08 -0500
+Received: by mail-pf1-f175.google.com with SMTP id k64so22221929pfd.11
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Dec 2021 17:38:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mR/pNZK3poKwo86OIX2osbO0iAKqYX0UcsElvn8l3WU=;
-        b=RUUdEB8Zob2mur4VDz5wXcALsmTOCHavzf4bhrd1v2hVwPEzmLdi+5XOlzRFCha1ua
-         FV5hfKMhXe0kGPS5lRpd6OiYefcqMqrIfRj2G7677Hpo+7Pq0Z+S3N5JLm1IC3+eZMOg
-         3DsDb8bYW9XrLdx5NcaotjIxFQdJ+GkryPwlao+TP+GLqX17eOhkGe7Pk/p2XlI+Vgi3
-         8gqFycWyHsPQ925xIVJNoBtjl6C4cUvchtRYEE8ZCyk6c02viHgbecbWEKEFCoQ2MnS4
-         AbRmk/k1Cf1b6FshHx9sftkMdhqsMeVKylszuPY7FgIiDHVpVH1lbAyttU9k6GnzaJoB
-         qiXA==
-X-Gm-Message-State: AOAM530RYHbfjiJ2CTIEZLBGkbPemDZ52BHYXPygde11b8S/Kf5iWQSV
-        m5U4d2Czy2ARBS03rAcXh19fULOLXB0=
-X-Google-Smtp-Source: ABdhPJxa3QN7rpcyQCiGGmMz0MKVW3joZwxAlWKCRimOQXt11ySSq6+pDEfBceAE8d8MMqWogua0tQ==
-X-Received: by 2002:a17:902:b712:b0:148:a2e7:fb4f with SMTP id d18-20020a170902b71200b00148a2e7fb4fmr7397780pls.144.1639618685329;
-        Wed, 15 Dec 2021 17:38:05 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=zPpPuOpkw2hR3lP1AVsGBjGDVXt2KOxCg3WSpt4vsLc=;
+        b=QvGZr3GuCmzBrAgQGUhN1xMKAmmbb6iHLEIGGyqg9GubmQiVlCdQRYBnjee6nDq5Wv
+         RVa+p1Fvs/pzSXGXDVSeajS5Iwey/PYIpU+DNAaBk3MTJqSX4GjFj7/S39g58CFkrDWu
+         XlLWXeUnQNNluX1YuXlJttWFf+VJtZQ99QzR+21emZE28O2CUpVbD2DQcQNB2clezzEf
+         9BAUyq0JvyRUeblajSMAG9CQnC1f22YwFfHfmcYncDocwaMf+s1A+VtbQWcWIUHa4WkR
+         jQeol8RxIBne1Dys2RIxlRdOXn1oif/0u0a5vLFRs92kb9yd9jeGHjzuK69fUTw9YIVS
+         wnQQ==
+X-Gm-Message-State: AOAM531K4gG6AI1p4OHMS+6T9QMIO/1Q+WwtWD2JndeyD6Rn3Te4mKXd
+        jZ/P7nOoEm8f6jLRyZ19yE2teczffHY=
+X-Google-Smtp-Source: ABdhPJygTIPih6byA97PhMrL37IOwvIpg0XG21+oeZWvjqhb+0eOo7HCJnihdbSygudCF2CTpzYYcw==
+X-Received: by 2002:a63:2cd1:: with SMTP id s200mr10063582pgs.251.1639618687710;
+        Wed, 15 Dec 2021 17:38:07 -0800 (PST)
 Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id m15sm3483643pgd.44.2021.12.15.17.38.03
+        by smtp.gmail.com with ESMTPSA id m15sm3483643pgd.44.2021.12.15.17.38.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Dec 2021 17:38:04 -0800 (PST)
+        Wed, 15 Dec 2021 17:38:07 -0800 (PST)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2 1/2] ksmbd: set RSS capable in FSCTL_QUERY_NETWORK_INTERFACE_INFO
-Date:   Thu, 16 Dec 2021 10:37:24 +0900
-Message-Id: <20211216013725.8065-1-linkinjeon@kernel.org>
+Subject: [PATCH v2 2/2] ksmbd: set both ipv4 and ipv6 in FSCTL_QUERY_NETWORK_INTERFACE_INFO
+Date:   Thu, 16 Dec 2021 10:37:25 +0900
+Message-Id: <20211216013725.8065-2-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20211216013725.8065-1-linkinjeon@kernel.org>
+References: <20211216013725.8065-1-linkinjeon@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Set RSS capable in FSCTL_QUERY_NETWORK_INTERFACE_INFO if netdev has
-multi tx queues. And add ksmbd_compare_user() to avoid racy condition
-issue in ksmbd_free_user(). because windows client is simultaneously used
-to send session setup requests for multichannel connection.
+Set ipv4 and ipv6 address in FSCTL_QUERY_NETWORK_INTERFACE_INFO.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
  v2:
-   - Add missing free ksmbd_user before returning.
+   - move buffer check to under ipv6_retry to validate overflow.
 
- fs/ksmbd/mgmt/user_config.c | 10 ++++++++++
- fs/ksmbd/mgmt/user_config.h |  1 +
- fs/ksmbd/smb2pdu.c          | 15 ++++++++++-----
- 3 files changed, 21 insertions(+), 5 deletions(-)
+ fs/ksmbd/smb2pdu.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/fs/ksmbd/mgmt/user_config.c b/fs/ksmbd/mgmt/user_config.c
-index 1019d3677d55..279d00feff21 100644
---- a/fs/ksmbd/mgmt/user_config.c
-+++ b/fs/ksmbd/mgmt/user_config.c
-@@ -67,3 +67,13 @@ int ksmbd_anonymous_user(struct ksmbd_user *user)
- 		return 1;
- 	return 0;
- }
-+
-+bool ksmbd_compare_user(struct ksmbd_user *u1, struct ksmbd_user *u2)
-+{
-+	if (strcmp(u1->name, u2->name))
-+		return false;
-+	if (memcmp(u1->passkey, u2->passkey, u1->passkey_sz))
-+		return false;
-+
-+	return true;
-+}
-diff --git a/fs/ksmbd/mgmt/user_config.h b/fs/ksmbd/mgmt/user_config.h
-index aff80b029579..6a44109617f1 100644
---- a/fs/ksmbd/mgmt/user_config.h
-+++ b/fs/ksmbd/mgmt/user_config.h
-@@ -64,4 +64,5 @@ struct ksmbd_user *ksmbd_login_user(const char *account);
- struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp);
- void ksmbd_free_user(struct ksmbd_user *user);
- int ksmbd_anonymous_user(struct ksmbd_user *user);
-+bool ksmbd_compare_user(struct ksmbd_user *u1, struct ksmbd_user *u2);
- #endif /* __USER_CONFIG_MANAGEMENT_H__ */
 diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index f7bea92d4c98..2ff4f813026e 100644
+index 2ff4f813026e..0fbb62f9d509 100644
 --- a/fs/ksmbd/smb2pdu.c
 +++ b/fs/ksmbd/smb2pdu.c
-@@ -1429,10 +1429,16 @@ static int ntlm_authenticate(struct ksmbd_work *work)
- 			ksmbd_free_user(user);
- 			return 0;
- 		}
--		ksmbd_free_user(sess->user);
-+
-+		if (!ksmbd_compare_user(sess->user, user)) {
-+			ksmbd_free_user(user);
-+			return -EPERM;
+@@ -7224,15 +7224,10 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 	struct sockaddr_storage_rsp *sockaddr_storage;
+ 	unsigned int flags;
+ 	unsigned long long speed;
+-	struct sockaddr_in6 *csin6 = (struct sockaddr_in6 *)&conn->peer_addr;
+ 
+ 	rtnl_lock();
+ 	for_each_netdev(&init_net, netdev) {
+-		if (out_buf_len <
+-		    nbytes + sizeof(struct network_interface_info_ioctl_rsp)) {
+-			rtnl_unlock();
+-			return -ENOSPC;
+-		}
++		bool ipv4_set = false;
+ 
+ 		if (netdev->type == ARPHRD_LOOPBACK)
+ 			continue;
+@@ -7240,6 +7235,12 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 		flags = dev_get_flags(netdev);
+ 		if (!(flags & IFF_RUNNING))
+ 			continue;
++ipv6_retry:
++		if (out_buf_len <
++		    nbytes + sizeof(struct network_interface_info_ioctl_rsp)) {
++			rtnl_unlock();
++			return -ENOSPC;
 +		}
-+		ksmbd_free_user(user);
-+	} else {
-+		sess->user = user;
- 	}
  
--	sess->user = user;
- 	if (user_guest(sess->user)) {
- 		if (conn->sign) {
- 			ksmbd_debug(SMB, "Guest login not allowed when signing enabled\n");
-@@ -2036,9 +2042,6 @@ int smb2_session_logoff(struct ksmbd_work *work)
+ 		nii_rsp = (struct network_interface_info_ioctl_rsp *)
+ 				&rsp->Buffer[nbytes];
+@@ -7272,8 +7273,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 					nii_rsp->SockAddr_Storage;
+ 		memset(sockaddr_storage, 0, 128);
  
- 	ksmbd_debug(SMB, "request\n");
+-		if (conn->peer_addr.ss_family == PF_INET ||
+-		    ipv6_addr_v4mapped(&csin6->sin6_addr)) {
++		if (!ipv4_set) {
+ 			struct in_device *idev;
  
--	/* Got a valid session, set connection state */
--	WARN_ON(sess->conn != conn);
+ 			sockaddr_storage->Family = cpu_to_le16(INTERNETWORK);
+@@ -7284,6 +7284,9 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 				continue;
+ 			sockaddr_storage->addr4.IPv4address =
+ 						idev_ipv4_address(idev);
++			nbytes += sizeof(struct network_interface_info_ioctl_rsp);
++			ipv4_set = true;
++			goto ipv6_retry;
+ 		} else {
+ 			struct inet6_dev *idev6;
+ 			struct inet6_ifaddr *ifa;
+@@ -7305,9 +7308,8 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 				break;
+ 			}
+ 			sockaddr_storage->addr6.ScopeId = 0;
++			nbytes += sizeof(struct network_interface_info_ioctl_rsp);
+ 		}
 -
- 	/* setting CifsExiting here may race with start_tcp_sess */
- 	ksmbd_conn_set_need_reconnect(work);
- 	ksmbd_close_session_fds(work);
-@@ -7243,6 +7246,8 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 		nii_rsp->IfIndex = cpu_to_le32(netdev->ifindex);
- 
- 		nii_rsp->Capability = 0;
-+		if (netdev->real_num_tx_queues > 1)
-+			nii_rsp->Capability |= cpu_to_le32(RSS_CAPABLE);
- 		if (ksmbd_rdma_capable_netdev(netdev))
- 			nii_rsp->Capability |= cpu_to_le32(RDMA_CAPABLE);
+-		nbytes += sizeof(struct network_interface_info_ioctl_rsp);
+ 	}
+ 	rtnl_unlock();
  
 -- 
 2.25.1
