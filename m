@@ -2,44 +2,45 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12831C433FE
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 16:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 043DFC433FE
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 16:18:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239479AbhLPQSq (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Dec 2021 11:18:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27707 "EHLO
+        id S239358AbhLPQSw (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Dec 2021 11:18:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22427 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238521AbhLPQSm (ORCPT
+        by vger.kernel.org with ESMTP id S239568AbhLPQRH (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 16 Dec 2021 11:18:42 -0500
+        Thu, 16 Dec 2021 11:17:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639671521;
+        s=mimecast20190719; t=1639671427;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=efjHSR9yvqtT49afRsxXb6zKzxK8bdo5iUK7s8P+3fQ=;
-        b=bwJmtg5NFxu6bQwmnMgvCWx9a9VOKTq5iJ9rdvOlS7RU2Hpf362S5ypagjQRG4Dhr4ZtaI
-        nEsZ1RiQUNs273zd/efB+hDIxeEsK4iquSeyx1s5orI8WfIbF0VD29g08BWUeTc3kYMux5
-        bC986jlwBttkq3OTuyW77AGuh9VO0Gc=
+        bh=f3X0UCFiaEdO/ctmvb/WDPO6rzNjBrmRroZrBfAw3cE=;
+        b=J0hZptla+kWCEl5C4gwhd//IUg8c2fzaUhUjll9g1pXQFljPvx4/o+vxku8Vmz2W1NFkIN
+        STGa9P5hY0kHTUfotPORfirOusXAmu4TUFWZsTXTN0mV8rNi7xBk4Q2Y5QqQLpeURXIkXy
+        JZRKsAOFm0pBGCfNz7WIaq+NfcjIlLo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-647-6vXFgxdVNSeT8Ps8Ks3DjQ-1; Thu, 16 Dec 2021 11:18:35 -0500
-X-MC-Unique: 6vXFgxdVNSeT8Ps8Ks3DjQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-344-RiCk6kitOg2JtKOGVO01Zg-1; Thu, 16 Dec 2021 11:17:02 -0500
+X-MC-Unique: RiCk6kitOg2JtKOGVO01Zg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DBE081CCB6;
-        Thu, 16 Dec 2021 16:18:32 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A8735F9D7;
+        Thu, 16 Dec 2021 16:16:54 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.122])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1233AE2C8;
-        Thu, 16 Dec 2021 16:18:18 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA8D31037F42;
+        Thu, 16 Dec 2021 16:16:50 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v3 44/68] cachefiles: Implement key to filename encoding
+Subject: [PATCH v3 38/68] vfs,
+ cachefiles: Mark a backing file in use with an inode flag
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
 Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
@@ -56,232 +57,188 @@ Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 16 Dec 2021 16:18:18 +0000
-Message-ID: <163967149827.1823006.6088580775428487961.stgit@warthog.procyon.org.uk>
+Date:   Thu, 16 Dec 2021 16:16:50 +0000
+Message-ID: <163967141000.1823006.12920680657559677789.stgit@warthog.procyon.org.uk>
 In-Reply-To: <163967073889.1823006.12237147297060239168.stgit@warthog.procyon.org.uk>
 References: <163967073889.1823006.12237147297060239168.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Implement a function to encode a binary cookie key as something that can be
-used as a filename.  Four options are considered:
+Use an inode flag, S_KERNEL_FILE, to mark that a backing file is in use by
+the kernel to prevent cachefiles or other kernel services from interfering
+with that file.
 
- (1) All printable chars with no '/' characters.  Prepend a 'D' to indicate
-     the encoding but otherwise use as-is.
+Alter rmdir to reject attempts to remove a directory marked with this flag.
+This is used by cachefiles to prevent cachefilesd from removing them.
 
- (2) Appears to be an array of __be32.  Encode as 'S' plus a list of
-     hex-encoded 32-bit ints separated by commas.  If a number is 0, it is
-     rendered as "" instead of "0".
-
- (3) Appears to be an array of __le32.  Encoded as (2) but with a 'T'
-     encoding prefix.
-
- (4) Encoded as base64 with an 'E' prefix plus a second char indicating how
-     much padding is involved.  A non-standard base64 encoding is used
-     because '/' cannot be used in the encoded form.
-
-If (1) is not possible, whichever of (2), (3) or (4) produces the shortest
-string is selected (hex-encoding a number may be less dense than base64
-encoding it).
-
-Note that the prefix characters have to be selected from the set [DEIJST@]
-lest cachefilesd remove the files because it recognise the name.
+Using S_SWAPFILE instead isn't really viable as that has other effects in
+the I/O paths.
 
 Changes
 =======
-ver #2:
- - Fix a short allocation that didn't allow for a string terminator[1]
+ver #3:
+ - Check for the object pointer being NULL in the tracepoints rather than
+   the caller.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: linux-cachefs@redhat.com
-Link: https://lore.kernel.org/r/bcefb8f2-576a-b3fc-cc29-89808ebfd7c1@linux.alibaba.com/ [1]
-Link: https://lore.kernel.org/r/163819640393.215744.15212364106412961104.stgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/163906940529.143852.17352132319136117053.stgit@warthog.procyon.org.uk/ # v2
+Link: https://lore.kernel.org/r/163819630256.215744.4815885535039369574.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/163906931596.143852.8642051223094013028.stgit@warthog.procyon.org.uk/ # v2
 ---
 
- fs/cachefiles/Makefile   |    1 
- fs/cachefiles/internal.h |    5 ++
- fs/cachefiles/key.c      |  138 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 144 insertions(+)
- create mode 100644 fs/cachefiles/key.c
+ fs/cachefiles/Makefile            |    1 +
+ fs/cachefiles/namei.c             |   43 +++++++++++++++++++++++++++++++++++++
+ fs/namei.c                        |    3 ++-
+ include/linux/fs.h                |    1 +
+ include/trace/events/cachefiles.h |   42 ++++++++++++++++++++++++++++++++++++
+ 5 files changed, 89 insertions(+), 1 deletion(-)
+ create mode 100644 fs/cachefiles/namei.c
 
 diff --git a/fs/cachefiles/Makefile b/fs/cachefiles/Makefile
-index d67210ece9cd..6f025940a65c 100644
+index 463e3d608b75..e0b092ca077f 100644
 --- a/fs/cachefiles/Makefile
 +++ b/fs/cachefiles/Makefile
 @@ -7,6 +7,7 @@ cachefiles-y := \
  	cache.o \
  	daemon.o \
- 	interface.o \
-+	key.o \
  	main.o \
- 	namei.o \
- 	security.o \
-diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
-index 8763ee4a0df2..dbc37f5d4714 100644
---- a/fs/cachefiles/internal.h
-+++ b/fs/cachefiles/internal.h
-@@ -173,6 +173,11 @@ extern struct cachefiles_object *cachefiles_grab_object(struct cachefiles_object
- extern void cachefiles_put_object(struct cachefiles_object *object,
- 				  enum cachefiles_obj_ref_trace why);
++	namei.o \
+ 	security.o
  
-+/*
-+ * key.c
-+ */
-+extern bool cachefiles_cook_key(struct cachefiles_object *object);
-+
- /*
-  * main.c
-  */
-diff --git a/fs/cachefiles/key.c b/fs/cachefiles/key.c
+ cachefiles-$(CONFIG_CACHEFILES_ERROR_INJECTION) += error_inject.o
+diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
 new file mode 100644
-index 000000000000..bf935e25bdbe
+index 000000000000..913f83f1c900
 --- /dev/null
-+++ b/fs/cachefiles/key.c
-@@ -0,0 +1,138 @@
++++ b/fs/cachefiles/namei.c
+@@ -0,0 +1,43 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Key to pathname encoder
++/* CacheFiles path walking and related routines
 + *
 + * Copyright (C) 2021 Red Hat, Inc. All Rights Reserved.
 + * Written by David Howells (dhowells@redhat.com)
 + */
 +
-+#include <linux/slab.h>
++#include <linux/fs.h>
 +#include "internal.h"
 +
-+static const char cachefiles_charmap[64] =
-+	"0123456789"			/* 0 - 9 */
-+	"abcdefghijklmnopqrstuvwxyz"	/* 10 - 35 */
-+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"	/* 36 - 61 */
-+	"_-"				/* 62 - 63 */
-+	;
-+
-+static const char cachefiles_filecharmap[256] = {
-+	/* we skip space and tab and control chars */
-+	[33 ... 46] = 1,		/* '!' -> '.' */
-+	/* we skip '/' as it's significant to pathwalk */
-+	[48 ... 127] = 1,		/* '0' -> '~' */
-+};
-+
-+static inline unsigned int how_many_hex_digits(unsigned int x)
++/*
++ * Mark the backing file as being a cache file if it's not already in use.  The
++ * mark tells the culling request command that it's not allowed to cull the
++ * file or directory.  The caller must hold the inode lock.
++ */
++static bool __cachefiles_mark_inode_in_use(struct cachefiles_object *object,
++					   struct dentry *dentry)
 +{
-+	return x ? round_up(ilog2(x) + 1, 4) / 4 : 0;
++	struct inode *inode = d_backing_inode(dentry);
++	bool can_use = false;
++
++	if (!(inode->i_flags & S_KERNEL_FILE)) {
++		inode->i_flags |= S_KERNEL_FILE;
++		trace_cachefiles_mark_active(object, inode);
++		can_use = true;
++	} else {
++		pr_notice("cachefiles: Inode already in use: %pd\n", dentry);
++	}
++
++	return can_use;
 +}
 +
 +/*
-+ * turn the raw key into something cooked
-+ * - the key may be up to NAME_MAX in length (including the length word)
-+ *   - "base64" encode the strange keys, mapping 3 bytes of raw to four of
-+ *     cooked
-+ *   - need to cut the cooked key into 252 char lengths (189 raw bytes)
++ * Unmark a backing inode.  The caller must hold the inode lock.
 + */
-+bool cachefiles_cook_key(struct cachefiles_object *object)
++static void __cachefiles_unmark_inode_in_use(struct cachefiles_object *object,
++					     struct dentry *dentry)
 +{
-+	const u8 *key = fscache_get_key(object->cookie), *kend;
-+	unsigned char ch;
-+	unsigned int acc, i, n, nle, nbe, keylen = object->cookie->key_len;
-+	unsigned int b64len, len, print, pad;
-+	char *name, sep;
++	struct inode *inode = d_backing_inode(dentry);
 +
-+	_enter(",%u,%*phN", keylen, keylen, key);
-+
-+	BUG_ON(keylen > NAME_MAX - 3);
-+
-+	print = 1;
-+	for (i = 0; i < keylen; i++) {
-+		ch = key[i];
-+		print &= cachefiles_filecharmap[ch];
-+	}
-+
-+	/* If the path is usable ASCII, then we render it directly */
-+	if (print) {
-+		len = 1 + keylen;
-+		name = kmalloc(len + 1, GFP_KERNEL);
-+		if (!name)
-+			return false;
-+
-+		name[0] = 'D'; /* Data object type, string encoding */
-+		memcpy(name + 1, key, keylen);
-+		goto success;
-+	}
-+
-+	/* See if it makes sense to encode it as "hex,hex,hex" for each 32-bit
-+	 * chunk.  We rely on the key having been padded out to a whole number
-+	 * of 32-bit words.
-+	 */
-+	n = round_up(keylen, 4);
-+	nbe = nle = 0;
-+	for (i = 0; i < n; i += 4) {
-+		u32 be = be32_to_cpu(*(__be32 *)(key + i));
-+		u32 le = le32_to_cpu(*(__le32 *)(key + i));
-+
-+		nbe += 1 + how_many_hex_digits(be);
-+		nle += 1 + how_many_hex_digits(le);
-+	}
-+
-+	b64len = DIV_ROUND_UP(keylen, 3);
-+	pad = b64len * 3 - keylen;
-+	b64len = 2 + b64len * 4; /* Length if we base64-encode it */
-+	_debug("len=%u nbe=%u nle=%u b64=%u", keylen, nbe, nle, b64len);
-+	if (nbe < b64len || nle < b64len) {
-+		unsigned int nlen = min(nbe, nle) + 1;
-+		name = kmalloc(nlen, GFP_KERNEL);
-+		if (!name)
-+			return false;
-+		sep = (nbe <= nle) ? 'S' : 'T'; /* Encoding indicator */
-+		len = 0;
-+		for (i = 0; i < n; i += 4) {
-+			u32 x;
-+			if (nbe <= nle)
-+				x = be32_to_cpu(*(__be32 *)(key + i));
-+			else
-+				x = le32_to_cpu(*(__le32 *)(key + i));
-+			name[len++] = sep;
-+			if (x != 0)
-+				len += snprintf(name + len, nlen - len, "%x", x);
-+			sep = ',';
-+		}
-+		goto success;
-+	}
-+
-+	/* We need to base64-encode it */
-+	name = kmalloc(b64len + 1, GFP_KERNEL);
-+	if (!name)
-+		return false;
-+
-+	name[0] = 'E';
-+	name[1] = '0' + pad;
-+	len = 2;
-+	kend = key + keylen;
-+	do {
-+		acc  = *key++;
-+		if (key < kend) {
-+			acc |= *key++ << 8;
-+			if (key < kend)
-+				acc |= *key++ << 16;
-+		}
-+
-+		name[len++] = cachefiles_charmap[acc & 63];
-+		acc >>= 6;
-+		name[len++] = cachefiles_charmap[acc & 63];
-+		acc >>= 6;
-+		name[len++] = cachefiles_charmap[acc & 63];
-+		acc >>= 6;
-+		name[len++] = cachefiles_charmap[acc & 63];
-+	} while (key < kend);
-+
-+success:
-+	name[len] = 0;
-+	object->d_name = name;
-+	object->d_name_len = len;
-+	_leave(" = %s", object->d_name);
-+	return true;
++	inode->i_flags &= ~S_KERNEL_FILE;
++	trace_cachefiles_mark_inactive(object, inode);
 +}
+diff --git a/fs/namei.c b/fs/namei.c
+index 1f9d2187c765..d81f04f8d818 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -3958,7 +3958,8 @@ int vfs_rmdir(struct user_namespace *mnt_userns, struct inode *dir,
+ 	inode_lock(dentry->d_inode);
+ 
+ 	error = -EBUSY;
+-	if (is_local_mountpoint(dentry))
++	if (is_local_mountpoint(dentry) ||
++	    (dentry->d_inode->i_flags & S_KERNEL_FILE))
+ 		goto out;
+ 
+ 	error = security_inode_rmdir(dir, dentry);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 2c0b8e77d9ab..bcf1ca430139 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2249,6 +2249,7 @@ struct super_operations {
+ #define S_ENCRYPTED	(1 << 14) /* Encrypted file (using fs/crypto/) */
+ #define S_CASEFOLD	(1 << 15) /* Casefolded file */
+ #define S_VERITY	(1 << 16) /* Verity file (using fs/verity/) */
++#define S_KERNEL_FILE	(1 << 17) /* File is in use by the kernel (eg. fs/cachefiles) */
+ 
+ /*
+  * Note that nosuid etc flags are inode-specific: setting some file-system
+diff --git a/include/trace/events/cachefiles.h b/include/trace/events/cachefiles.h
+index 9bd5a8a60801..6331cd29880d 100644
+--- a/include/trace/events/cachefiles.h
++++ b/include/trace/events/cachefiles.h
+@@ -83,6 +83,48 @@ cachefiles_error_traces;
+ #define E_(a, b)	{ a, b }
+ 
+ 
++TRACE_EVENT(cachefiles_mark_active,
++	    TP_PROTO(struct cachefiles_object *obj,
++		     struct inode *inode),
++
++	    TP_ARGS(obj, inode),
++
++	    /* Note that obj may be NULL */
++	    TP_STRUCT__entry(
++		    __field(unsigned int,		obj		)
++		    __field(ino_t,			inode		)
++			     ),
++
++	    TP_fast_assign(
++		    __entry->obj	= obj ? obj->debug_id : 0;
++		    __entry->inode	= inode->i_ino;
++			   ),
++
++	    TP_printk("o=%08x i=%lx",
++		      __entry->obj, __entry->inode)
++	    );
++
++TRACE_EVENT(cachefiles_mark_inactive,
++	    TP_PROTO(struct cachefiles_object *obj,
++		     struct inode *inode),
++
++	    TP_ARGS(obj, inode),
++
++	    /* Note that obj may be NULL */
++	    TP_STRUCT__entry(
++		    __field(unsigned int,		obj		)
++		    __field(ino_t,			inode		)
++			     ),
++
++	    TP_fast_assign(
++		    __entry->obj	= obj ? obj->debug_id : 0;
++		    __entry->inode	= inode->i_ino;
++			   ),
++
++	    TP_printk("o=%08x i=%lx",
++		      __entry->obj, __entry->inode)
++	    );
++
+ TRACE_EVENT(cachefiles_vfs_error,
+ 	    TP_PROTO(struct cachefiles_object *obj, struct inode *backer,
+ 		     int error, enum cachefiles_error_trace where),
 
 
