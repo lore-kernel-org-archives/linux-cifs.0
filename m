@@ -2,196 +2,145 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CFFC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 03:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70284C433FE
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 09:44:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233276AbhLPDOZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 15 Dec 2021 22:14:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57912 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233289AbhLPDOY (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Dec 2021 22:14:24 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16E8FC061574;
-        Wed, 15 Dec 2021 19:14:24 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id c32so46956938lfv.4;
-        Wed, 15 Dec 2021 19:14:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=E8ckiiPMBvsnpYvn/PbmVfcEnddoPyMOCAfOlq+kQHA=;
-        b=c0FhMJVjEAcd5oUSI1BgUaNEPxuKnBfQDjzdaiyLy50G3qa3PrT/nNfzjz2gUAErpv
-         gzkvUufdQVXXHdjE5uQU19clz18PQZPhXNoAxhLjblgsuvUMDy8GK4/mS9FJn6Le1MYj
-         kT84I6gpMgwBWg1CEHVAtUAJgeWsnPyvjabQR3yZ9W1yhuFy57UmTP7zjt4ka17ZeXWy
-         EfA4fvJUG5y+rqx7fWP9I3Qp3l7ZT8B9M7TdCgT6pcRxsdiVvothSCXAymSYRfUItRCf
-         mlzE/U71njG9tNk7BtwjriOBiUDo0W4YpdY4pJ980aNORSeT0vVWABrNIUa3vW/IRDeE
-         nZ4g==
+        id S235508AbhLPJo4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Dec 2021 04:44:56 -0500
+Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:50850
+        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235530AbhLPJo4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Thu, 16 Dec 2021 04:44:56 -0500
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id AA07A40703
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Dec 2021 09:44:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1639647894;
+        bh=QTOsClZwyZOKWiOCdpIZ53KKqBtgpNixsjVEw+qtuPg=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=jofQGy9bxDhJovnAmriRtPsAeBWkfMI11f5mRC7BakbypG5tYhyMznhrHR3LE5pqc
+         LvcB1mZr6JrhyMrjF31cK7PhZWHEXWMbOFjsCtZwGdH89bt5EfS33X0obUPPRN3AIE
+         pJ2QOilO4hotMLCVmNFbfHB3iXM8em0zqvCZaRTnaC/dA0A1Sv3cbybcW4mtJqZ+Xt
+         U973jDeYd8sPU2R3tOZSdQ7+jCxvEIa3ZdZvw2efPM3f1agyrJUVFxxYffDx/af8vc
+         zry+5WwIhzQesrVT4F3rBWAfov/4HkmLNjCWhMvvfldl1/1FE3IzhSl9JxDMrrA6De
+         keYn/E0DF8j4Q==
+Received: by mail-wm1-f70.google.com with SMTP id b75-20020a1c804e000000b0034569bde713so1012685wmd.9
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Dec 2021 01:44:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=E8ckiiPMBvsnpYvn/PbmVfcEnddoPyMOCAfOlq+kQHA=;
-        b=CuXeWT6h12c+zJgLoJfBBURoNlj5fIkVXE/XfVEvYxgm608r0K7UZERrwkZnT5HJYK
-         5jRZPXTeFjbLA3oBJG0oRnNC/EgfKN6nlTiOHn3BMp0d3W2bF2xLd+LpgasA7ttlSY/h
-         9LRK8FaKrQ1f4zymtm8MTrqcptz0mCeRozUK0nkwhv6A9Sz9fPrqQlA871lFaBhvQhC6
-         Y1QX/Y9FgA3DvxMGxH9msNp4c4ZIjxUCL07XlY6iO+6tSfG0oUX5fYkhlw/4Z/TAilhv
-         F/u2h1reo/lzeCBwygR3NkXZVWA0NuBBIVfZgB7JzOhSE4LWufCjz6tqs2fO+4G/MpwM
-         E0pg==
-X-Gm-Message-State: AOAM5300qpiFabOR/mcuo03j/WfwgsjGPuaH5wMX+wI5+TGUJ/zh8oiU
-        cCXksZ2E6DOB4wHmrj/ciuEnE1TveV6nuOe+C+w=
-X-Google-Smtp-Source: ABdhPJw1LAVcHOFwVzqutxZmdR6XrjWaQemxTXaA+zKjydgsC60bObDWCRvTFnL3ehHrR/un2fAyFPJzUzxSI36qucM=
-X-Received: by 2002:a19:770a:: with SMTP id s10mr13668232lfc.234.1639624462078;
- Wed, 15 Dec 2021 19:14:22 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QTOsClZwyZOKWiOCdpIZ53KKqBtgpNixsjVEw+qtuPg=;
+        b=hX0X/taVMNA8AVeEGTNoYGPZopr3HCmNZxPhQxC/8klGEZAeAqJ9mADH7lDDFvD9i0
+         LhoF1LN7I+rKAsBXcyzwDJtooTMtBZpyCHetQY0xOVhR8aOhCmuYuqTtG8tgdQnR+J+J
+         cI2tNypO9L4ymPOqBJhufGBJDMbN/pYrKCcyieTLEqoLJmPCkG6HMKm85ZdzjvP9zTzu
+         +0QfFUw9xA2KtaGCyz/sNK2xfz8zdMCww5zGDvY0HuPWkDMd5qPnAC38r64FSgF8h1px
+         +HlaBnnA4oPSUHwjSxU58YHwR56+bYq29rkO67L1Adl6+/bzahhMmV2abj0+BsonOTmJ
+         TGuQ==
+X-Gm-Message-State: AOAM531MNd2DcEBdxQQW22y+LeLUC8rQRqAjMQl/H7qs8D+canXL28v6
+        xiN0IZYOheXVPm1PMj8V6JPvAtVwuIwMd8jSFgQSkSqqdIBUN5yuityqGb8p55kXK5x657+FnvL
+        J5P9Vyl/NqzLKOLnbL94PIF6qfeBKNf4mUERgDKg=
+X-Received: by 2002:a5d:650f:: with SMTP id x15mr646226wru.57.1639647893946;
+        Thu, 16 Dec 2021 01:44:53 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxZMiPMQ+W+qW8IbAibX8DdTl4xnrovvGfEQoGvcsc6W8MrweFtPS/7ET8ki9T9yPPhmGQd1g==
+X-Received: by 2002:a5d:650f:: with SMTP id x15mr646199wru.57.1639647893659;
+        Thu, 16 Dec 2021 01:44:53 -0800 (PST)
+Received: from alex.home (lfbn-gre-1-195-1.w90-112.abo.wanadoo.fr. [90.112.158.1])
+        by smtp.gmail.com with ESMTPSA id h4sm4313251wrf.93.2021.12.16.01.44.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Dec 2021 01:44:53 -0800 (PST)
+From:   Alexandre Ghiti <alexandre.ghiti@canonical.com>
+To:     Steve French <sfrench@samba.org>, Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Rich Felker <dalias@libc.org>,
+        Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ronnie Sahlberg <lsahlber@redhat.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Kalle Valo <kvalo@codeaurora.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-cachefs@redhat.com,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
+        linux-power@fi.rohmeurope.com
+Cc:     Alexandre Ghiti <alexandre.ghiti@canonical.com>
+Subject: [PATCH v2 0/6] Cleanup after removal of configs
+Date:   Thu, 16 Dec 2021 10:44:20 +0100
+Message-Id: <20211216094426.2083802-1-alexandre.ghiti@canonical.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-References: <20211215030831.24058-1-trbecker@gmail.com> <CAGvGhF4y4ydeuQg9CmTF5OrrVmXG6D05PtBCWHb-EFmY8Y4zOA@mail.gmail.com>
-In-Reply-To: <CAGvGhF4y4ydeuQg9CmTF5OrrVmXG6D05PtBCWHb-EFmY8Y4zOA@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 15 Dec 2021 21:14:11 -0600
-Message-ID: <CAH2r5msjUiD_4YUm-sJbmNC0ARk+qDd0JoY7c7f2Wm1qNJ6K2w@mail.gmail.com>
-Subject: Re: [PATCH 1/1] cifs: sanitize multiple delimiters in prepath
-To:     Leif Sahlberg <lsahlber@redhat.com>
-Cc:     Thiago Rafael Becker <trbecker@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000a10ae705d33ad1b5"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---000000000000a10ae705d33ad1b5
-Content-Type: text/plain; charset="UTF-8"
+While bumping from 5.13 to 5.15, I found that a few deleted configs had
+left some pieces here and there: this patchset cleans that.
 
-fixed various whitespace problems (pointed out by checkpatch), added
-the suggested Acked-by, Fixes etc.
-and tentatively merged into cifs-2.6.git for-next pending testing
+Changes in v2:
+- Rebase on top of v5.16-rc1
+- Removed patch 6 since Matti said he would take care of that
+- Added AB, RB
 
-See attached.
+Alexandre Ghiti (6):
+  Documentation, arch: Remove leftovers from fscache/cachefiles
+    histograms
+  Documentation, arch: Remove leftovers from raw device
+  Documentation, arch: Remove leftovers from CIFS_WEAK_PW_HASH
+  arch: Remove leftovers from mandatory file locking
+  Documentation, arch, fs: Remove leftovers from fscache object list
+  arch: Remove leftovers from prism54 wireless driver
 
-On Wed, Dec 15, 2021 at 1:49 PM Leif Sahlberg <lsahlber@redhat.com> wrote:
->
-> Steve,
->
-> Acked-by: me
-> Steve, we should have this in stable
->
->     Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
->     Cc: stable@vger.kernel.org # 5.11+
->
->
-> On Wed, Dec 15, 2021 at 1:09 PM Thiago Rafael Becker <trbecker@gmail.com> wrote:
-> >
-> > mount.cifs can pass a device with multiple delimiters in it. This will
-> > cause rename(2) to fail with ENOENT.
-> >
-> > BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=2031200
-> > Signed-off-by: Thiago Rafael Becker <trbecker@gmail.com>
-> > ---
-> >  fs/cifs/fs_context.c | 30 ++++++++++++++++++++++++++++++
-> >  1 file changed, 30 insertions(+)
-> >
-> > diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
-> > index 6a179ae753c1..4ce8a7df3a02 100644
-> > --- a/fs/cifs/fs_context.c
-> > +++ b/fs/cifs/fs_context.c
-> > @@ -434,6 +434,34 @@ int smb3_parse_opt(const char *options, const char *key, char **val)
-> >         return rc;
-> >  }
-> >
-> > +/*
-> > + * remove duplicate path delimiters. Windows is supposed to do that
-> > + * but there are some bugs that prevent rename from working if there are
-> > + * multiple delimiters.
-> > + */
-> > +void sanitize_path(char *path) {
-> > +        char *pos = path, last = *path;
-> > +        unsigned int offset = 0;
-> > +
-> > +        while(*(++pos)) {
-> > +                if ((*pos == '/' || *pos == '\\') && (last == '/' || last == '\\')) {
-> > +                        offset++;
-> > +                        continue;
-> > +                }
-> > +
-> > +                last = *pos;
-> > +                *(pos - offset) = *pos;
-> > +        }
-> > +
-> > +        pos = pos - offset - 1;
-> > +
-> > +        /* At this point, there should be only zero or one delimiter at the end of the string */
-> > +        if (*pos != '/' && *pos != '\\')
-> > +                pos++;
-> > +
-> > +        *pos = '\0';
-> > +}
-> > +
-> >  /*
-> >   * Parse a devname into substrings and populate the ctx->UNC and ctx->prepath
-> >   * fields with the result. Returns 0 on success and an error otherwise
-> > @@ -497,6 +525,8 @@ smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx)
-> >         if (!ctx->prepath)
-> >                 return -ENOMEM;
-> >
-> > +       sanitize_path(ctx->prepath);
-> > +
-> >         return 0;
-> >  }
-> >
-> > --
-> > 2.31.1
-> >
->
-
+ Documentation/admin-guide/cifs/usage.rst      |   7 +-
+ Documentation/admin-guide/devices.txt         |   8 +-
+ .../filesystems/caching/cachefiles.rst        |  34 -----
+ Documentation/filesystems/caching/fscache.rst | 123 +-----------------
+ arch/arm/configs/axm55xx_defconfig            |   3 -
+ arch/arm/configs/cm_x300_defconfig            |   1 -
+ arch/arm/configs/ezx_defconfig                |   1 -
+ arch/arm/configs/imote2_defconfig             |   1 -
+ arch/arm/configs/nhk8815_defconfig            |   1 -
+ arch/arm/configs/pxa_defconfig                |   1 -
+ arch/arm/configs/spear13xx_defconfig          |   1 -
+ arch/arm/configs/spear3xx_defconfig           |   1 -
+ arch/arm/configs/spear6xx_defconfig           |   1 -
+ arch/mips/configs/decstation_64_defconfig     |   1 -
+ arch/mips/configs/decstation_defconfig        |   1 -
+ arch/mips/configs/decstation_r4k_defconfig    |   1 -
+ arch/mips/configs/fuloong2e_defconfig         |   1 -
+ arch/mips/configs/ip27_defconfig              |   1 -
+ arch/mips/configs/malta_defconfig             |   1 -
+ arch/mips/configs/malta_kvm_defconfig         |   1 -
+ arch/mips/configs/malta_qemu_32r6_defconfig   |   1 -
+ arch/mips/configs/maltaaprp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_eva_defconfig     |   1 -
+ arch/mips/configs/maltaup_defconfig           |   1 -
+ arch/mips/configs/maltaup_xpa_defconfig       |   1 -
+ arch/powerpc/configs/pmac32_defconfig         |   1 -
+ arch/powerpc/configs/ppc6xx_defconfig         |   1 -
+ arch/powerpc/configs/pseries_defconfig        |   1 -
+ arch/sh/configs/titan_defconfig               |   1 -
+ fs/fscache/object.c                           |   3 -
+ fs/fscache/proc.c                             |  12 --
+ 32 files changed, 6 insertions(+), 209 deletions(-)
 
 -- 
-Thanks,
+2.32.0
 
-Steve
-
---000000000000a10ae705d33ad1b5
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-cifs-sanitize-multiple-delimiters-in-prepath.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-sanitize-multiple-delimiters-in-prepath.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kx8e1v3z0>
-X-Attachment-Id: f_kx8e1v3z0
-
-RnJvbSA4NTkwNTdjYzk3Y2M5NDliMDA5N2NkMWU3NzZhNjcwOGIzNjdlOTljIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBUaGlhZ28gUmFmYWVsIEJlY2tlciA8dHJiZWNrZXJAZ21haWwu
-Y29tPgpEYXRlOiBXZWQsIDE1IERlYyAyMDIxIDAwOjA4OjMxIC0wMzAwClN1YmplY3Q6IFtQQVRD
-SF0gY2lmczogc2FuaXRpemUgbXVsdGlwbGUgZGVsaW1pdGVycyBpbiBwcmVwYXRoCgptb3VudC5j
-aWZzIGNhbiBwYXNzIGEgZGV2aWNlIHdpdGggbXVsdGlwbGUgZGVsaW1pdGVycyBpbiBpdC4gVGhp
-cyB3aWxsCmNhdXNlIHJlbmFtZSgyKSB0byBmYWlsIHdpdGggRU5PRU5ULgoKQnVnTGluazogaHR0
-cHM6Ly9idWd6aWxsYS5yZWRoYXQuY29tL3Nob3dfYnVnLmNnaT9pZD0yMDMxMjAwCkZpeGVzOiAy
-NGUwYTFlZmY5ZTIgKCJjaWZzOiBzd2l0Y2ggdG8gbmV3IG1vdW50IGFwaSIpCkNjOiBzdGFibGVA
-dmdlci5rZXJuZWwub3JnICMgNS4xMSsKQWNrZWQtYnk6IFJvbm5pZSBTYWhsYmVyZyA8bHNhaGxi
-ZXJAcmVkaGF0LmNvbT4KU2lnbmVkLW9mZi1ieTogVGhpYWdvIFJhZmFlbCBCZWNrZXIgPHRyYmVj
-a2VyQGdtYWlsLmNvbT4KU2lnbmVkLW9mZi1ieTogU3RldmUgRnJlbmNoIDxzdGZyZW5jaEBtaWNy
-b3NvZnQuY29tPgotLS0KIGZzL2NpZnMvZnNfY29udGV4dC5jIHwgMzAgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgMzAgaW5zZXJ0aW9ucygrKQoKZGlmZiAt
-LWdpdCBhL2ZzL2NpZnMvZnNfY29udGV4dC5jIGIvZnMvY2lmcy9mc19jb250ZXh0LmMKaW5kZXgg
-NmExNzlhZTc1M2MxLi40Y2U4YTdkZjNhMDIgMTAwNjQ0Ci0tLSBhL2ZzL2NpZnMvZnNfY29udGV4
-dC5jCisrKyBiL2ZzL2NpZnMvZnNfY29udGV4dC5jCkBAIC00MzQsNiArNDM0LDM0IEBAIGludCBz
-bWIzX3BhcnNlX29wdChjb25zdCBjaGFyICpvcHRpb25zLCBjb25zdCBjaGFyICprZXksIGNoYXIg
-Kip2YWwpCiAJcmV0dXJuIHJjOwogfQogCisvKgorICogcmVtb3ZlIGR1cGxpY2F0ZSBwYXRoIGRl
-bGltaXRlcnMuIFdpbmRvd3MgaXMgc3VwcG9zZWQgdG8gZG8gdGhhdAorICogYnV0IHRoZXJlIGFy
-ZSBzb21lIGJ1Z3MgdGhhdCBwcmV2ZW50IHJlbmFtZSBmcm9tIHdvcmtpbmcgaWYgdGhlcmUgYXJl
-CisgKiBtdWx0aXBsZSBkZWxpbWl0ZXJzLgorICovCit2b2lkIHNhbml0aXplX3BhdGgoY2hhciAq
-cGF0aCkKK3sKKwljaGFyICpwb3MgPSBwYXRoLCBsYXN0ID0gKnBhdGg7CisJdW5zaWduZWQgaW50
-IG9mZnNldCA9IDA7CisKKwl3aGlsZSAoKigrK3BvcykpIHsKKwkJaWYgKCgqcG9zID09ICcvJyB8
-fCAqcG9zID09ICdcXCcpICYmIChsYXN0ID09ICcvJyB8fCBsYXN0ID09ICdcXCcpKSB7CisJCQlv
-ZmZzZXQrKzsKKwkJCWNvbnRpbnVlOworCQl9CisJCWxhc3QgPSAqcG9zOworCQkqKHBvcyAtIG9m
-ZnNldCkgPSAqcG9zOworCX0KKworCXBvcyA9IHBvcyAtIG9mZnNldCAtIDE7CisKKwkvKiBBdCB0
-aGlzIHBvaW50LCB0aGVyZSBzaG91bGQgYmUgb25seSB6ZXJvIG9yIG9uZSBkZWxpbWl0ZXIgYXQg
-dGhlIGVuZCBvZiB0aGUgc3RyaW5nICovCisJaWYgKCpwb3MgIT0gJy8nICYmICpwb3MgIT0gJ1xc
-JykKKwkJcG9zKys7CisKKwkqcG9zID0gJ1wwJzsKK30KKwogLyoKICAqIFBhcnNlIGEgZGV2bmFt
-ZSBpbnRvIHN1YnN0cmluZ3MgYW5kIHBvcHVsYXRlIHRoZSBjdHgtPlVOQyBhbmQgY3R4LT5wcmVw
-YXRoCiAgKiBmaWVsZHMgd2l0aCB0aGUgcmVzdWx0LiBSZXR1cm5zIDAgb24gc3VjY2VzcyBhbmQg
-YW4gZXJyb3Igb3RoZXJ3aXNlCkBAIC00OTcsNiArNTI1LDggQEAgc21iM19wYXJzZV9kZXZuYW1l
-KGNvbnN0IGNoYXIgKmRldm5hbWUsIHN0cnVjdCBzbWIzX2ZzX2NvbnRleHQgKmN0eCkKIAlpZiAo
-IWN0eC0+cHJlcGF0aCkKIAkJcmV0dXJuIC1FTk9NRU07CiAKKwlzYW5pdGl6ZV9wYXRoKGN0eC0+
-cHJlcGF0aCk7CisKIAlyZXR1cm4gMDsKIH0KIAotLSAKMi4zMi4wCgo=
---000000000000a10ae705d33ad1b5--
