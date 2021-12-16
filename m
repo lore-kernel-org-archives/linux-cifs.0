@@ -2,68 +2,95 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C4DC433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 11:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E389AC433FE
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 12:43:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233064AbhLPLxI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Dec 2021 06:53:08 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:50132 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229845AbhLPLxH (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Dec 2021 06:53:07 -0500
+        id S236880AbhLPMn2 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Dec 2021 07:43:28 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:49038 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236878AbhLPMn2 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Dec 2021 07:43:28 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8AB41B823AF;
-        Thu, 16 Dec 2021 11:53:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F82C36AE3;
-        Thu, 16 Dec 2021 11:53:05 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D92FD61D91;
+        Thu, 16 Dec 2021 12:43:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A69A0C36AE3;
+        Thu, 16 Dec 2021 12:43:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639655585;
-        bh=kutu15ERamquSNkAlx1bDeUoCF/UYHWL53rUHvMX9Fs=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=dy2jQEMV/6qhdfMxYGoMk3fxP/8MUfJbRzw8gHQySz0QH3zyZRHenVLGijH9fyhx+
-         n1poY8RFt+g6d2Z9u+PU8/pZS4oVDNJgRdvs16n+NXQULs3Q0WZr2wdZ1aSAnS9jIG
-         T/h99G3hwgzWyhNcURgcUbvzQAvob7QhC7VJwood8MD1JePK10cg6x4sFjisont3ts
-         hcQoVC3GKWNUKJ7PqsAr5VO4GNzsl7nX8eUuGEImuqMpc/A3DZE78Jk4MxW6bkeaTc
-         7Z4gQd1LymaLhnLuqZ7/8cfdQYC2SYkwAx1EM/bWP12RqISEidaw8jZUDJlVOWRyHZ
-         xSajFQnvX9Uqw==
-Received: by mail-oo1-f50.google.com with SMTP id p2-20020a4adfc2000000b002c2676904fdso6842717ood.13;
-        Thu, 16 Dec 2021 03:53:05 -0800 (PST)
-X-Gm-Message-State: AOAM532Y9CaCyXzpxmVL4h6odr65K3Mw6jAM+x+eCNBsDbEraicaiRaC
-        mXb0pCCpToWnZFstszg+ESNDYTW0mxnMXOHBltU=
-X-Google-Smtp-Source: ABdhPJy7gZKCLdC21/xK+PNfiB9yQVQzSFUsRma50bn2AQjzfMW4vD2rV9nkaZOTdtRE0NE9NTMra70dag3UXjY6JQM=
-X-Received: by 2002:a05:6820:622:: with SMTP id e34mr10975602oow.19.1639655584417;
- Thu, 16 Dec 2021 03:53:04 -0800 (PST)
+        s=k20201202; t=1639658607;
+        bh=T+/eGeLJ2ZTmFQV2tYX+uvVjjBJjduRCV4T8gY3fi88=;
+        h=From:To:Cc:Subject:Date:From;
+        b=l+6zahUnLZO+LXkM9aOyJBUgMtgR16TwB/iZBzUODMpsLaA8oZBnKWpIZg2Ic1rXe
+         dJ1PeDnC6yD5rAElRjtzqQ5ohlQbmuVYFoOj0OkmO3AhledUXkBxx6RXdLj+heMkKu
+         542uxKs2eRDQDTzFqL9gvrgLPmFZ81c2uhv8mEQNJrtxXQHENDGxkTVSXESYeDQ34U
+         wNCzpuePtsGfldvHIup5mwIPtbluvRvvNxxy4d90YR/lEuSJIIp5xO2qU2AyA1NIJj
+         7Z89W6hLUtiIblOecLY9Arw8nSuO1pgEtTjciwaeN2PnVzKm+MHVh8WIcfIJ/10DaQ
+         f0gTLDxAI8NEA==
+From:   broonie@kernel.org
+To:     Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Cc:     David Howells <dhowells@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Steve French <stfrench@microsoft.com>
+Subject: linux-next: manual merge of the cifs tree with the fscache tree
+Date:   Thu, 16 Dec 2021 12:43:17 +0000
+Message-Id: <20211216124317.4143405-1-broonie@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Received: by 2002:ac9:428a:0:0:0:0:0 with HTTP; Thu, 16 Dec 2021 03:53:04
- -0800 (PST)
-In-Reply-To: <20211216103721.1686600-1-marcos@orca.pet>
-References: <20211216103721.1686600-1-marcos@orca.pet>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 16 Dec 2021 20:53:04 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9w7BBGBn_ZuSNZ-KVL_YLUW0_TFAKXSRr=YAdETsMv6A@mail.gmail.com>
-Message-ID: <CAKYAXd9w7BBGBn_ZuSNZ-KVL_YLUW0_TFAKXSRr=YAdETsMv6A@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: disable SMB2_GLOBAL_CAP_ENCRYPTION for SMB 3.1.1
-To:     Marcos Del Sol Vives <marcos@orca.pet>
-Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-12-16 19:37 GMT+09:00, Marcos Del Sol Vives <marcos@orca.pet>:
-> According to the official Microsoft MS-SMB2 document section 3.3.5.4, this
-> flag should be used only for 3.0 and 3.0.2 dialects. Setting it for 3.1.1
-> is a violation of the specification.
->
-> This causes my Windows 10 client to detect an anomaly in the negotiation,
-> and disable encryption entirely despite being explicitly enabled in ksmbd,
-> causing all data transfers to go in plain text.
->
-> Signed-off-by: Marcos Del Sol Vives <marcos@orca.pet>
-> Cc: linux-kernel@vger.kernel.org
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Hi all,
 
-Thanks!
+Today's linux-next merge of the cifs tree got a conflict in:
+
+  fs/cifs/inode.c
+
+between commit:
+
+  830c476f5eb82 ("cifs: Support fscache indexing rewrite (untested)")
+
+from the fscache tree and commit:
+
+  68f87ec9c1ce3 ("cifs: ignore resource_id while getting fscache super cookie")
+
+from the cifs tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc fs/cifs/inode.c
+index dc2fe76450b96,279622e4eb1c2..0000000000000
+--- a/fs/cifs/inode.c
++++ b/fs/cifs/inode.c
+@@@ -1372,20 -1370,6 +1367,7 @@@ iget_no_retry
+  		iget_failed(inode);
+  		inode = ERR_PTR(rc);
+  	}
+ +
+- 	if (!rc) {
+- 		/*
+- 		 * The cookie is initialized from volume info returned above.
+- 		 * Inside cifs_fscache_get_super_cookie it checks
+- 		 * that we do not get super cookie twice.
+- 		 */
+- 		rc = cifs_fscache_get_super_cookie(tcon);
+- 		if (rc < 0) {
+- 			iget_failed(inode);
+- 			inode = ERR_PTR(rc);
+- 		}
+- 	}
+- 
+  out:
+  	kfree(path);
+  	free_xid(xid);
