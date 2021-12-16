@@ -2,49 +2,34 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BD0C4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 16:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F36D8C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 19:29:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239659AbhLPQrt (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Dec 2021 11:47:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:44759 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239589AbhLPQrs (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 16 Dec 2021 11:47:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639673268;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=H4QQrv5yHw8uvREotMjEQW9H2R0fBtaao4kUBQhmBFY=;
-        b=auNVdRF6pboxYXCb3pvPQEgy0GMZY3rfdCfGDmZMFrzS8bfjsFn2PbRxfgNb8R2uQQm5On
-        Yn5nER/+JUaqi+P6UOihpGnhVkDh/7Wajsy2hD1xiqz2ZRSBO/EC1Qg6jdIRZRNV3cgxEQ
-        WZIfrufsTtL29eQDEIog7r1okVL7llE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-263-6-Ukhu7bM6ieiGRqMNkqew-1; Thu, 16 Dec 2021 11:47:42 -0500
-X-MC-Unique: 6-Ukhu7bM6ieiGRqMNkqew-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75392801ADC;
-        Thu, 16 Dec 2021 16:47:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.122])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E6B51037F51;
-        Thu, 16 Dec 2021 16:47:33 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wi0H5vmka1_iWe0+Yc6bwtgWn_bEEHCMYsPHYtNJKZHCQ@mail.gmail.com>
-References: <CAHk-=wi0H5vmka1_iWe0+Yc6bwtgWn_bEEHCMYsPHYtNJKZHCQ@mail.gmail.com> <163967073889.1823006.12237147297060239168.stgit@warthog.procyon.org.uk> <163967169723.1823006.2868573008412053995.stgit@warthog.procyon.org.uk>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
+        id S237121AbhLPT33 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Dec 2021 14:29:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59314 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232560AbhLPT32 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Dec 2021 14:29:28 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9922BC061574;
+        Thu, 16 Dec 2021 11:29:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=N9CxEizcUKUMKe7tygLAy2SKNqVIaZunBZQhmUvlaCo=; b=TfIC8wH+3iPtFaTNNHTiwoOSwz
+        Bpsoi/K/YScFLbzdHHr0K8D4ikaBbFc/WqSk3CClQHeadtbcZldeGLW1OWzKGfUrcONUURVgJ3AKW
+        7vvwE7ExhcmC69CTT6pe0i9JUhRALDvQ/XpthdOB/NXqZHs1AuyGOUHNH/oNkTuSwVfvAjuIfuhGC
+        Y605ibUw+jfKHeuEPoHslvWaMnVjItExifSdcTybxLgeV5XJXC9PJB18n9KIcEQwZFGm02AaimUXN
+        XxcV0oSs+Qu5b4zlqfrJAGknSX+Z66iNgHKFBxEBI2dGXXpHL/POwbDa64BswFZhhWynw0aJMTSGl
+        MNr1Gg0w==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mxwQj-00Ft6U-EP; Thu, 16 Dec 2021 19:28:41 +0000
+Date:   Thu, 16 Dec 2021 19:28:41 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com,
         Jeff Layton <jlayton@kernel.org>,
         Marc Dionne <marc.dionne@auristor.com>,
         linux-afs@lists.infradead.org,
@@ -60,57 +45,54 @@ Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 56/68] afs: Handle len being extending over page end in write_begin/write_end
+Subject: Re: [PATCH v3 56/68] afs: Handle len being extending over page end
+ in write_begin/write_end
+Message-ID: <YbuTaRbNUAJx5xOA@casper.infradead.org>
+References: <163967073889.1823006.12237147297060239168.stgit@warthog.procyon.org.uk>
+ <163967169723.1823006.2868573008412053995.stgit@warthog.procyon.org.uk>
+ <CAHk-=wi0H5vmka1_iWe0+Yc6bwtgWn_bEEHCMYsPHYtNJKZHCQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1828148.1639673252.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Thu, 16 Dec 2021 16:47:32 +0000
-Message-ID: <1828149.1639673252@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wi0H5vmka1_iWe0+Yc6bwtgWn_bEEHCMYsPHYtNJKZHCQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
-
-> > With transparent huge pages, in the future, write_begin() and write_en=
-d()
-> > may be passed a length parameter that, in combination with the offset =
-into
+On Thu, Dec 16, 2021 at 08:31:19AM -0800, Linus Torvalds wrote:
+> On Thu, Dec 16, 2021 at 8:22 AM David Howells <dhowells@redhat.com> wrote:
+> >
+> > With transparent huge pages, in the future, write_begin() and write_end()
+> > may be passed a length parameter that, in combination with the offset into
 > > the page, exceeds the length of that page.  This allows
-> > grab_cache_page_write_begin() to better choose the size of THP to allo=
-cate.
-> =
-
+> > grab_cache_page_write_begin() to better choose the size of THP to allocate.
+> 
 > I still think this is a fundamental bug in the caller. That
 > "explanation" is weak, and the whole concept smells like week-old fish
 > to me.
 
-You really should ask Willy about this as it's multipage folio-related.
+You're right that  ->write_end can't be called with more bytes than fit
+in the folio.  That makes no sense at all.
 
-AIUI, because the page/folio may be allocated inside ->write_begin(),
-generic_perform_write() tells the filesystem how much it has been asked to
-write and then the folio allocation can be made to fit that.
+I haven't finished fully fleshing this out yet (and as a result we still
+only create PAGE_SIZE folios on writes), but my basic plan was:
 
-However, at this time, ->write_begin() and ->write_end() have a page point=
-er
-(or pointer-to-pointer), not a folio pointer, in their signature, so the
-filesystem has to convert between them.
+generic_perform_write:
+-	bytes = min_t(unsigned long, PAGE_SIZE - offset,
++	bytes = min_t(unsigned long, FOLIO_MAX_PAGE_CACHE_SIZE - offset,
+ 					iov_iter_count(i));
+...
+                status = a_ops->write_begin(file, mapping, pos, bytes, flags,
+-                                               &page, &fsdata);
++                                               &folio, &fsdata);
 
-I'm working on write helpers for netfslib that absorb this out of the
-filesystems that use it into its own take on generic_perform_write(), ther=
-eby
-eliminating the need for ->write_begin and ->write_end.  I have this kind =
-of
-working for afs and 9p at the moment and am looking at ceph, but there's a=
- way
-to go yet.  I believe iomap does the same for block-based filesystems that=
- use
-it (such as xfs).
++		offset = offset_in_folio(folio, pos);
++		bytes = folio_size(folio - offset);
+...
+                status = a_ops->write_end(file, mapping, pos, bytes, copied,
+-                                               page, fsdata);
++                                               folio, fsdata);
 
-I think Willy's aim is to get rid of ->write_begin and ->write_end entirel=
-y.
-
-David
-
+Since ->write_begin is the place where we actually create folios, it
+needs to know what size folio to create.  Unless you'd rather we do
+something to actually create the folio before calling ->write_begin?
