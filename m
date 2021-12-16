@@ -2,115 +2,131 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A149C4332F
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 10:41:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B356EC433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 10:44:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236148AbhLPKlS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Dec 2021 05:41:18 -0500
-Received: from elvis.franken.de ([193.175.24.41]:50245 "EHLO elvis.franken.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230467AbhLPKlS (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 16 Dec 2021 05:41:18 -0500
-Received: from uucp (helo=alpha)
-        by elvis.franken.de with local-bsmtp (Exim 3.36 #1)
-        id 1mxoC2-00089d-00; Thu, 16 Dec 2021 11:40:58 +0100
-Received: by alpha.franken.de (Postfix, from userid 1000)
-        id 5AA86C075D; Thu, 16 Dec 2021 11:40:49 +0100 (CET)
-Date:   Thu, 16 Dec 2021 11:40:49 +0100
-From:   Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-To:     Alexandre Ghiti <alexandre.ghiti@canonical.com>
-Cc:     Steve French <sfrench@samba.org>, Jonathan Corbet <corbet@lwn.net>,
-        David Howells <dhowells@redhat.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Rich Felker <dalias@libc.org>,
-        Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
-        Lee Jones <lee.jones@linaro.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Ronnie Sahlberg <lsahlber@redhat.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Kalle Valo <kvalo@codeaurora.org>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-cachefs@redhat.com,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
-        linux-power@fi.rohmeurope.com
-Subject: Re: [PATCH v2 0/6] Cleanup after removal of configs
-Message-ID: <20211216104049.GA10578@alpha.franken.de>
-References: <20211216094426.2083802-1-alexandre.ghiti@canonical.com>
+        id S236177AbhLPKoG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Dec 2021 05:44:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46220 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233456AbhLPKoF (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 16 Dec 2021 05:44:05 -0500
+X-Greylist: delayed 382 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 16 Dec 2021 02:44:05 PST
+Received: from forward101p.mail.yandex.net (forward101p.mail.yandex.net [IPv6:2a02:6b8:0:1472:2741:0:8b7:101])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84823C061574;
+        Thu, 16 Dec 2021 02:44:05 -0800 (PST)
+Received: from sas1-0a2be8f95474.qloud-c.yandex.net (sas1-0a2be8f95474.qloud-c.yandex.net [IPv6:2a02:6b8:c08:f21f:0:640:a2b:e8f9])
+        by forward101p.mail.yandex.net (Yandex) with ESMTP id 8081159CCE00;
+        Thu, 16 Dec 2021 13:37:39 +0300 (MSK)
+Received: from sas8-b61c542d7279.qloud-c.yandex.net (sas8-b61c542d7279.qloud-c.yandex.net [2a02:6b8:c1b:2912:0:640:b61c:542d])
+        by sas1-0a2be8f95474.qloud-c.yandex.net (mxback/Yandex) with ESMTP id BJmvtfpYM5-bdeuFB9F;
+        Thu, 16 Dec 2021 13:37:39 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=orca.pet; s=mail; t=1639651059;
+        bh=Nf3LvXH5AXN+JC9P+ix28xro/gBL7qkBplUcuybM6lA=;
+        h=Date:Subject:To:From:Message-Id:Cc;
+        b=U+s/h9l0u5kShf3mXigHbGHjM2XStxiGACPEiXDq/1xYLN6NoBuEOIFTTiRc9h9Tb
+         ppwWBZ2ABxjbG2NUigdE4EKBCfRWZ4KLB2NgQ+V+3NhRBATMeNO9Fga7Jun7CbOBbg
+         cg5nWy+Qh6StKns5Gs0/j8sK+d0yn3yIFPhJ4vT0=
+Authentication-Results: sas1-0a2be8f95474.qloud-c.yandex.net; dkim=pass header.i=@orca.pet
+Received: by sas8-b61c542d7279.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id TkkqXHcr21-bbPqYmKS;
+        Thu, 16 Dec 2021 13:37:38 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+X-Yandex-Fwd: 2
+From:   Marcos Del Sol Vives <marcos@orca.pet>
+To:     linux-cifs@vger.kernel.org
+Cc:     Marcos Del Sol Vives <marcos@orca.pet>,
+        linux-kernel@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH v2] ksmbd: disable SMB2_GLOBAL_CAP_ENCRYPTION for SMB 3.1.1
+Date:   Thu, 16 Dec 2021 11:37:22 +0100
+Message-Id: <20211216103721.1686600-1-marcos@orca.pet>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211216094426.2083802-1-alexandre.ghiti@canonical.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Dec 16, 2021 at 10:44:20AM +0100, Alexandre Ghiti wrote:
-> While bumping from 5.13 to 5.15, I found that a few deleted configs had
-> left some pieces here and there: this patchset cleans that.
-> 
-> Changes in v2:
-> - Rebase on top of v5.16-rc1
-> - Removed patch 6 since Matti said he would take care of that
-> - Added AB, RB
-> 
-> Alexandre Ghiti (6):
->   Documentation, arch: Remove leftovers from fscache/cachefiles
->     histograms
->   Documentation, arch: Remove leftovers from raw device
->   Documentation, arch: Remove leftovers from CIFS_WEAK_PW_HASH
->   arch: Remove leftovers from mandatory file locking
->   Documentation, arch, fs: Remove leftovers from fscache object list
->   arch: Remove leftovers from prism54 wireless driver
-> 
->  Documentation/admin-guide/cifs/usage.rst      |   7 +-
->  Documentation/admin-guide/devices.txt         |   8 +-
->  .../filesystems/caching/cachefiles.rst        |  34 -----
->  Documentation/filesystems/caching/fscache.rst | 123 +-----------------
->  arch/arm/configs/axm55xx_defconfig            |   3 -
->  arch/arm/configs/cm_x300_defconfig            |   1 -
->  arch/arm/configs/ezx_defconfig                |   1 -
->  arch/arm/configs/imote2_defconfig             |   1 -
->  arch/arm/configs/nhk8815_defconfig            |   1 -
->  arch/arm/configs/pxa_defconfig                |   1 -
->  arch/arm/configs/spear13xx_defconfig          |   1 -
->  arch/arm/configs/spear3xx_defconfig           |   1 -
->  arch/arm/configs/spear6xx_defconfig           |   1 -
->  arch/mips/configs/decstation_64_defconfig     |   1 -
->  arch/mips/configs/decstation_defconfig        |   1 -
->  arch/mips/configs/decstation_r4k_defconfig    |   1 -
->  arch/mips/configs/fuloong2e_defconfig         |   1 -
->  arch/mips/configs/ip27_defconfig              |   1 -
->  arch/mips/configs/malta_defconfig             |   1 -
->  arch/mips/configs/malta_kvm_defconfig         |   1 -
->  arch/mips/configs/malta_qemu_32r6_defconfig   |   1 -
->  arch/mips/configs/maltaaprp_defconfig         |   1 -
->  arch/mips/configs/maltasmvp_defconfig         |   1 -
->  arch/mips/configs/maltasmvp_eva_defconfig     |   1 -
->  arch/mips/configs/maltaup_defconfig           |   1 -
->  arch/mips/configs/maltaup_xpa_defconfig       |   1 -
->  arch/powerpc/configs/pmac32_defconfig         |   1 -
->  arch/powerpc/configs/ppc6xx_defconfig         |   1 -
->  arch/powerpc/configs/pseries_defconfig        |   1 -
->  arch/sh/configs/titan_defconfig               |   1 -
->  fs/fscache/object.c                           |   3 -
->  fs/fscache/proc.c                             |  12 --
->  32 files changed, 6 insertions(+), 209 deletions(-)
+According to the official Microsoft MS-SMB2 document section 3.3.5.4, this
+flag should be used only for 3.0 and 3.0.2 dialects. Setting it for 3.1.1
+is a violation of the specification.
 
-for the MIPS parts:
+This causes my Windows 10 client to detect an anomaly in the negotiation,
+and disable encryption entirely despite being explicitly enabled in ksmbd,
+causing all data transfers to go in plain text.
 
-Acked-by: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Signed-off-by: Marcos Del Sol Vives <marcos@orca.pet>
+Cc: linux-kernel@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/smb2ops.c |  3 ---
+ fs/ksmbd/smb2pdu.c | 25 +++++++++++++++++++++----
+ 2 files changed, 21 insertions(+), 7 deletions(-)
 
+diff --git a/fs/ksmbd/smb2ops.c b/fs/ksmbd/smb2ops.c
+index 0a5d8450e835..02a44d28bdaf 100644
+--- a/fs/ksmbd/smb2ops.c
++++ b/fs/ksmbd/smb2ops.c
+@@ -271,9 +271,6 @@ int init_smb3_11_server(struct ksmbd_conn *conn)
+ 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
+ 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_LEASING;
+ 
+-	if (conn->cipher_type)
+-		conn->vals->capabilities |= SMB2_GLOBAL_CAP_ENCRYPTION;
+-
+ 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL)
+ 		conn->vals->capabilities |= SMB2_GLOBAL_CAP_MULTI_CHANNEL;
+ 
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 49c9da37315c..049fa81281b4 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -915,6 +915,25 @@ static void decode_encrypt_ctxt(struct ksmbd_conn *conn,
+ 	}
+ }
+ 
++/**
++ * smb3_encryption_negotiated() - checks if server and client agreed on enabling encryption
++ * @conn:	smb connection
++ *
++ * Return:	true if connection should be encrypted, else false
++ */
++static bool smb3_encryption_negotiated(struct ksmbd_conn *conn)
++{
++	if (!conn->ops->generate_encryptionkey)
++		return false;
++
++	/*
++	 * SMB 3.0 and 3.0.2 dialects use the SMB2_GLOBAL_CAP_ENCRYPTION flag.
++	 * SMB 3.1.1 uses the cipher_type field.
++	 */
++	return (conn->vals->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION) ||
++	    conn->cipher_type;
++}
++
+ static void decode_compress_ctxt(struct ksmbd_conn *conn,
+ 				 struct smb2_compression_capabilities_context *pneg_ctxt)
+ {
+@@ -1469,8 +1488,7 @@ static int ntlm_authenticate(struct ksmbd_work *work)
+ 		    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
+ 			sess->sign = true;
+ 
+-		if (conn->vals->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION &&
+-		    conn->ops->generate_encryptionkey &&
++		if (smb3_encryption_negotiated(conn) &&
+ 		    !(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
+ 			rc = conn->ops->generate_encryptionkey(sess);
+ 			if (rc) {
+@@ -1559,8 +1577,7 @@ static int krb5_authenticate(struct ksmbd_work *work)
+ 	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
+ 		sess->sign = true;
+ 
+-	if ((conn->vals->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION) &&
+-	    conn->ops->generate_encryptionkey) {
++	if (smb3_encryption_negotiated(conn)) {
+ 		retval = conn->ops->generate_encryptionkey(sess);
+ 		if (retval) {
+ 			ksmbd_debug(SMB,
 -- 
-Crap can work. Given enough thrust pigs will fly, but it's not necessarily a
-good idea.                                                [ RFC1925, 2.3 ]
+2.25.1
+
