@@ -2,45 +2,44 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27259C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 16:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A1FC433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 16:17:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236151AbhLPQRd (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 16 Dec 2021 11:17:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:36866 "EHLO
+        id S236177AbhLPQRx (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 16 Dec 2021 11:17:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:44741 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239395AbhLPQRc (ORCPT
+        by vger.kernel.org with ESMTP id S233412AbhLPQRx (ORCPT
         <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 16 Dec 2021 11:17:32 -0500
+        Thu, 16 Dec 2021 11:17:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639671452;
+        s=mimecast20190719; t=1639671472;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KLMNgmVAoRi/NMJEjfBUwrT1pdlHf9vhqCbKzHWcqWI=;
-        b=h1+M1XV4gAurbwvpRQv8BkMlvGAH1rCY3gYe+RbRdVpchpzx/gmMmx6paLxRVt3oCkBvu1
-        a4ny7I3anlKG5Yi1fe2WEh2ny4CyGEzYN2WJiKBOSxT2IPfDnEAQRaYRmQqfvKG2HQKQCN
-        8BXfTNUo/09+mM/LXiVjnzKuPjvv6DM=
+        bh=Ld167JAH6429LUEv2B9EeG2r0urA5cA4gaIK41FYsk8=;
+        b=KRna/96qWmYk4SkGu7oZM7jqyKcP0+MEqXHWPECcrYurARRbrugoSB20TaV2dyQt7s0qyM
+        HQ/OcudLievOgiDjb+Cuzrjy0m7z4mBbVatu8oNPSVLViF5S1hv/of7FzwR7IfCogfH8Mt
+        Ua5VjIWx2jfAG5FMHg4CfKNtwDxVQkM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-625-EMw59qA4OiC-vGYIqS6Tfw-1; Thu, 16 Dec 2021 11:16:47 -0500
-X-MC-Unique: EMw59qA4OiC-vGYIqS6Tfw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-423--yZ3vEEKNkCtZ7uM6XLxDQ-1; Thu, 16 Dec 2021 11:17:49 -0500
+X-MC-Unique: -yZ3vEEKNkCtZ7uM6XLxDQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE065100D844;
-        Thu, 16 Dec 2021 16:16:44 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29B8C8015CD;
+        Thu, 16 Dec 2021 16:17:46 +0000 (UTC)
 Received: from warthog.procyon.org.uk (unknown [10.33.36.122])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 59933795AD;
-        Thu, 16 Dec 2021 16:16:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 80A435BD02;
+        Thu, 16 Dec 2021 16:17:19 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH v3 37/68] cachefiles: Provide a function to check how much
- space there is
+Subject: [PATCH v3 41/68] cachefiles: Implement volume support
 From:   David Howells <dhowells@redhat.com>
 To:     linux-cachefs@redhat.com
 Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
@@ -57,198 +56,294 @@ Cc:     dhowells@redhat.com, Trond Myklebust <trondmy@hammerspace.com>,
         linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
         v9fs-developer@lists.sourceforge.net,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Thu, 16 Dec 2021 16:16:40 +0000
-Message-ID: <163967140058.1823006.7781243664702837128.stgit@warthog.procyon.org.uk>
+Date:   Thu, 16 Dec 2021 16:17:18 +0000
+Message-ID: <163967143860.1823006.7185205806080225038.stgit@warthog.procyon.org.uk>
 In-Reply-To: <163967073889.1823006.12237147297060239168.stgit@warthog.procyon.org.uk>
 References: <163967073889.1823006.12237147297060239168.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Provide a function to check how much space there is.  This also flips the
-state on the cache and will signal the daemon to inform it of the change
-and to ask it to do some culling if necessary.
+Implement support for creating the directory layout for a volume on disk
+and setting up and withdrawing volume caching.
 
-We will also need to subtract the amount of data currently being written to
-the cache (cache->b_writing) from the amount of available space to avoid
-hitting ENOSPC accidentally.
+Each volume has a directory named for the volume key under the root of the
+cache (prefixed with an 'I' to indicate to cachefilesd that it's an index)
+and then creates a bunch of hash bucket subdirectories under that (named as
+'@' plus a hex number) in which cookie files will be created.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: linux-cachefs@redhat.com
-Link: https://lore.kernel.org/r/163819629322.215744.13457425294680841213.stgit@warthog.procyon.org.uk/ # v1
-Link: https://lore.kernel.org/r/163906930100.143852.1681026700865762069.stgit@warthog.procyon.org.uk/ # v2
+Link: https://lore.kernel.org/r/163819635314.215744.13081522301564537723.stgit@warthog.procyon.org.uk/ # v1
+Link: https://lore.kernel.org/r/163906936397.143852.17788457778396467161.stgit@warthog.procyon.org.uk/ # v2
 ---
 
- fs/cachefiles/Makefile   |    1 
- fs/cachefiles/cache.c    |  103 ++++++++++++++++++++++++++++++++++++++++++++++
- fs/cachefiles/daemon.c   |    2 -
- fs/cachefiles/internal.h |    7 +++
- 4 files changed, 112 insertions(+), 1 deletion(-)
- create mode 100644 fs/cachefiles/cache.c
+ fs/cachefiles/Makefile    |    3 +
+ fs/cachefiles/cache.c     |   28 ++++++++++-
+ fs/cachefiles/daemon.c    |    2 +
+ fs/cachefiles/interface.c |    2 +
+ fs/cachefiles/internal.h  |   20 ++++++++
+ fs/cachefiles/volume.c    |  118 +++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 171 insertions(+), 2 deletions(-)
+ create mode 100644 fs/cachefiles/volume.c
 
 diff --git a/fs/cachefiles/Makefile b/fs/cachefiles/Makefile
-index f008524bb78f..463e3d608b75 100644
+index 92af5daee8ce..d67210ece9cd 100644
 --- a/fs/cachefiles/Makefile
 +++ b/fs/cachefiles/Makefile
-@@ -4,6 +4,7 @@
- #
- 
- cachefiles-y := \
-+	cache.o \
- 	daemon.o \
+@@ -9,7 +9,8 @@ cachefiles-y := \
+ 	interface.o \
  	main.o \
- 	security.o
+ 	namei.o \
+-	security.o
++	security.o \
++	volume.o
+ 
+ cachefiles-$(CONFIG_CACHEFILES_ERROR_INJECTION) += error_inject.o
+ 
 diff --git a/fs/cachefiles/cache.c b/fs/cachefiles/cache.c
-new file mode 100644
-index 000000000000..73636f89eefa
---- /dev/null
+index 0462e7af87fb..c4b9280ca0cd 100644
+--- a/fs/cachefiles/cache.c
 +++ b/fs/cachefiles/cache.c
-@@ -0,0 +1,103 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Manage high-level VFS aspects of a cache.
-+ *
-+ * Copyright (C) 2007, 2021 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+
-+#include <linux/slab.h>
-+#include <linux/statfs.h>
-+#include <linux/namei.h>
-+#include "internal.h"
-+
-+/*
-+ * See if we have space for a number of pages and/or a number of files in the
-+ * cache
-+ */
-+int cachefiles_has_space(struct cachefiles_cache *cache,
-+			 unsigned fnr, unsigned bnr)
-+{
-+	struct kstatfs stats;
-+	u64 b_avail, b_writing;
-+	int ret;
-+
-+	struct path path = {
-+		.mnt	= cache->mnt,
-+		.dentry	= cache->mnt->mnt_root,
-+	};
-+
-+	//_enter("{%llu,%llu,%llu,%llu,%llu,%llu},%u,%u",
-+	//       (unsigned long long) cache->frun,
-+	//       (unsigned long long) cache->fcull,
-+	//       (unsigned long long) cache->fstop,
-+	//       (unsigned long long) cache->brun,
-+	//       (unsigned long long) cache->bcull,
-+	//       (unsigned long long) cache->bstop,
-+	//       fnr, bnr);
-+
-+	/* find out how many pages of blockdev are available */
-+	memset(&stats, 0, sizeof(stats));
-+
-+	ret = vfs_statfs(&path, &stats);
-+	if (ret < 0) {
-+		trace_cachefiles_vfs_error(NULL, d_inode(path.dentry), ret,
-+					   cachefiles_trace_statfs_error);
-+		if (ret == -EIO)
-+			cachefiles_io_error(cache, "statfs failed");
-+		_leave(" = %d", ret);
-+		return ret;
-+	}
-+
-+	b_avail = stats.f_bavail >> cache->bshift;
-+	b_writing = atomic_long_read(&cache->b_writing);
-+	if (b_avail > b_writing)
-+		b_avail -= b_writing;
-+	else
-+		b_avail = 0;
-+
-+	//_debug("avail %llu,%llu",
-+	//       (unsigned long long)stats.f_ffree,
-+	//       (unsigned long long)b_avail);
-+
-+	/* see if there is sufficient space */
-+	if (stats.f_ffree > fnr)
-+		stats.f_ffree -= fnr;
-+	else
-+		stats.f_ffree = 0;
-+
-+	if (b_avail > bnr)
-+		b_avail -= bnr;
-+	else
-+		b_avail = 0;
-+
-+	ret = -ENOBUFS;
-+	if (stats.f_ffree < cache->fstop ||
-+	    b_avail < cache->bstop)
-+		goto begin_cull;
-+
-+	ret = 0;
-+	if (stats.f_ffree < cache->fcull ||
-+	    b_avail < cache->bcull)
-+		goto begin_cull;
-+
-+	if (test_bit(CACHEFILES_CULLING, &cache->flags) &&
-+	    stats.f_ffree >= cache->frun &&
-+	    b_avail >= cache->brun &&
-+	    test_and_clear_bit(CACHEFILES_CULLING, &cache->flags)
-+	    ) {
-+		_debug("cease culling");
-+		cachefiles_state_changed(cache);
-+	}
-+
-+	//_leave(" = 0");
-+	return 0;
-+
-+begin_cull:
-+	if (!test_and_set_bit(CACHEFILES_CULLING, &cache->flags)) {
-+		_debug("### CULL CACHE ###");
-+		cachefiles_state_changed(cache);
-+	}
-+
-+	_leave(" = %d", ret);
-+	return ret;
-+}
-diff --git a/fs/cachefiles/daemon.c b/fs/cachefiles/daemon.c
-index 4cfb7c8b37d0..7d4691614cec 100644
---- a/fs/cachefiles/daemon.c
-+++ b/fs/cachefiles/daemon.c
-@@ -167,7 +167,7 @@ static ssize_t cachefiles_daemon_read(struct file *file, char __user *_buffer,
- 		return 0;
- 
- 	/* check how much space the cache has */
--	// PLACEHOLDER: Check space
-+	cachefiles_has_space(cache, 0, 0);
- 
- 	/* summarise */
- 	f_released = atomic_xchg(&cache->f_released, 0);
-diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
-index 7fd5429715ea..3783a3e01027 100644
---- a/fs/cachefiles/internal.h
-+++ b/fs/cachefiles/internal.h
-@@ -39,6 +39,7 @@ struct cachefiles_cache {
- 	atomic_t			gravecounter;	/* graveyard uniquifier */
- 	atomic_t			f_released;	/* number of objects released lately */
- 	atomic_long_t			b_released;	/* number of blocks released lately */
-+	atomic_long_t			b_writing;	/* Number of blocks being written */
- 	unsigned			frun_percent;	/* when to stop culling (% files) */
- 	unsigned			fcull_percent;	/* when to start culling (% files) */
- 	unsigned			fstop_percent;	/* when to stop allocating (% files) */
-@@ -74,6 +75,12 @@ static inline void cachefiles_state_changed(struct cachefiles_cache *cache)
- 	wake_up_all(&cache->daemon_pollwq);
+@@ -262,6 +262,32 @@ int cachefiles_has_space(struct cachefiles_cache *cache,
+ 	return ret;
  }
  
 +/*
-+ * cache.c
++ * Withdraw volumes.
 + */
-+extern int cachefiles_has_space(struct cachefiles_cache *cache,
-+				unsigned fnr, unsigned bnr);
++static void cachefiles_withdraw_volumes(struct cachefiles_cache *cache)
++{
++	_enter("");
++
++	for (;;) {
++		struct cachefiles_volume *volume = NULL;
++
++		spin_lock(&cache->object_list_lock);
++		if (!list_empty(&cache->volumes)) {
++			volume = list_first_entry(&cache->volumes,
++						  struct cachefiles_volume, cache_link);
++			list_del_init(&volume->cache_link);
++		}
++		spin_unlock(&cache->object_list_lock);
++		if (!volume)
++			break;
++
++		cachefiles_withdraw_volume(volume);
++	}
++
++	_leave("");
++}
 +
  /*
-  * daemon.c
+  * Sync a cache to backing disk.
   */
+@@ -303,7 +329,7 @@ void cachefiles_withdraw_cache(struct cachefiles_cache *cache)
+ 	// PLACEHOLDER: Withdraw objects
+ 	fscache_wait_for_objects(fscache);
+ 
+-	// PLACEHOLDER: Withdraw volume
++	cachefiles_withdraw_volumes(cache);
+ 	cachefiles_sync_cache(cache);
+ 	cache->cache = NULL;
+ 	fscache_relinquish_cache(fscache);
+diff --git a/fs/cachefiles/daemon.c b/fs/cachefiles/daemon.c
+index a449ee661987..337597a4e30c 100644
+--- a/fs/cachefiles/daemon.c
++++ b/fs/cachefiles/daemon.c
+@@ -105,6 +105,8 @@ static int cachefiles_daemon_open(struct inode *inode, struct file *file)
+ 
+ 	mutex_init(&cache->daemon_mutex);
+ 	init_waitqueue_head(&cache->daemon_pollwq);
++	INIT_LIST_HEAD(&cache->volumes);
++	spin_lock_init(&cache->object_list_lock);
+ 
+ 	/* set default caching limits
+ 	 * - limit at 1% free space and/or free files
+diff --git a/fs/cachefiles/interface.c b/fs/cachefiles/interface.c
+index 564ea8fa6641..1793e46bd3e7 100644
+--- a/fs/cachefiles/interface.c
++++ b/fs/cachefiles/interface.c
+@@ -15,4 +15,6 @@
+ 
+ const struct fscache_cache_ops cachefiles_cache_ops = {
+ 	.name			= "cachefiles",
++	.acquire_volume		= cachefiles_acquire_volume,
++	.free_volume		= cachefiles_free_volume,
+ };
+diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
+index 77e874c2bbe7..ab0e9307be7b 100644
+--- a/fs/cachefiles/internal.h
++++ b/fs/cachefiles/internal.h
+@@ -19,6 +19,17 @@
+ struct cachefiles_cache;
+ struct cachefiles_object;
+ 
++/*
++ * Cached volume representation.
++ */
++struct cachefiles_volume {
++	struct cachefiles_cache		*cache;
++	struct list_head		cache_link;	/* Link in cache->volumes */
++	struct fscache_volume		*vcookie;	/* The netfs's representation */
++	struct dentry			*dentry;	/* The volume dentry */
++	struct dentry			*fanout[256];	/* Fanout subdirs */
++};
++
+ /*
+  * Data file records.
+  */
+@@ -35,6 +46,8 @@ struct cachefiles_cache {
+ 	struct dentry			*store;		/* Directory into which live objects go */
+ 	struct dentry			*graveyard;	/* directory into which dead objects go */
+ 	struct file			*cachefilesd;	/* manager daemon handle */
++	struct list_head		volumes;	/* List of volume objects */
++	spinlock_t			object_list_lock; /* Lock for volumes and object_list */
+ 	const struct cred		*cache_cred;	/* security override for accessing cache */
+ 	struct mutex			daemon_mutex;	/* command serialisation mutex */
+ 	wait_queue_head_t		daemon_pollwq;	/* poll waitqueue for daemon */
+@@ -163,6 +176,13 @@ static inline void cachefiles_end_secure(struct cachefiles_cache *cache,
+ 	revert_creds(saved_cred);
+ }
+ 
++/*
++ * volume.c
++ */
++void cachefiles_acquire_volume(struct fscache_volume *volume);
++void cachefiles_free_volume(struct fscache_volume *volume);
++void cachefiles_withdraw_volume(struct cachefiles_volume *volume);
++
+ /*
+  * Error handling
+  */
+diff --git a/fs/cachefiles/volume.c b/fs/cachefiles/volume.c
+new file mode 100644
+index 000000000000..4a14f5e72764
+--- /dev/null
++++ b/fs/cachefiles/volume.c
+@@ -0,0 +1,118 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/* Volume handling.
++ *
++ * Copyright (C) 2021 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++
++#include <linux/fs.h>
++#include <linux/slab.h>
++#include "internal.h"
++#include <trace/events/fscache.h>
++
++/*
++ * Allocate and set up a volume representation.  We make sure all the fanout
++ * directories are created and pinned.
++ */
++void cachefiles_acquire_volume(struct fscache_volume *vcookie)
++{
++	struct cachefiles_volume *volume;
++	struct cachefiles_cache *cache = vcookie->cache->cache_priv;
++	const struct cred *saved_cred;
++	struct dentry *vdentry, *fan;
++	size_t len;
++	char *name;
++	int n_accesses, i;
++
++	_enter("");
++
++	volume = kzalloc(sizeof(struct cachefiles_volume), GFP_KERNEL);
++	if (!volume)
++		return;
++	volume->vcookie = vcookie;
++	volume->cache = cache;
++	INIT_LIST_HEAD(&volume->cache_link);
++
++	cachefiles_begin_secure(cache, &saved_cred);
++
++	len = vcookie->key[0];
++	name = kmalloc(len + 3, GFP_NOFS);
++	if (!name)
++		goto error_vol;
++	name[0] = 'I';
++	memcpy(name + 1, vcookie->key + 1, len);
++	name[len + 1] = 0;
++
++	vdentry = cachefiles_get_directory(cache, cache->store, name, NULL);
++	if (IS_ERR(vdentry))
++		goto error_name;
++	volume->dentry = vdentry;
++
++	for (i = 0; i < 256; i++) {
++		sprintf(name, "@%02x", i);
++		fan = cachefiles_get_directory(cache, vdentry, name, NULL);
++		if (IS_ERR(fan))
++			goto error_fan;
++		volume->fanout[i] = fan;
++	}
++
++	cachefiles_end_secure(cache, saved_cred);
++
++	vcookie->cache_priv = volume;
++	n_accesses = atomic_inc_return(&vcookie->n_accesses); /* Stop wakeups on dec-to-0 */
++	trace_fscache_access_volume(vcookie->debug_id, 0,
++				    refcount_read(&vcookie->ref),
++				    n_accesses, fscache_access_cache_pin);
++
++	spin_lock(&cache->object_list_lock);
++	list_add(&volume->cache_link, &volume->cache->volumes);
++	spin_unlock(&cache->object_list_lock);
++
++	kfree(name);
++	return;
++
++error_fan:
++	for (i = 0; i < 256; i++)
++		cachefiles_put_directory(volume->fanout[i]);
++	cachefiles_put_directory(volume->dentry);
++error_name:
++	kfree(name);
++error_vol:
++	kfree(volume);
++	cachefiles_end_secure(cache, saved_cred);
++}
++
++/*
++ * Release a volume representation.
++ */
++static void __cachefiles_free_volume(struct cachefiles_volume *volume)
++{
++	int i;
++
++	_enter("");
++
++	volume->vcookie->cache_priv = NULL;
++
++	for (i = 0; i < 256; i++)
++		cachefiles_put_directory(volume->fanout[i]);
++	cachefiles_put_directory(volume->dentry);
++	kfree(volume);
++}
++
++void cachefiles_free_volume(struct fscache_volume *vcookie)
++{
++	struct cachefiles_volume *volume = vcookie->cache_priv;
++
++	if (volume) {
++		spin_lock(&volume->cache->object_list_lock);
++		list_del_init(&volume->cache_link);
++		spin_unlock(&volume->cache->object_list_lock);
++		__cachefiles_free_volume(volume);
++	}
++}
++
++void cachefiles_withdraw_volume(struct cachefiles_volume *volume)
++{
++	fscache_withdraw_volume(volume->vcookie);
++	__cachefiles_free_volume(volume);
++}
 
 
