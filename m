@@ -2,146 +2,135 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B568C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 01:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1597C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 16 Dec 2021 01:38:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232532AbhLPBOl (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 15 Dec 2021 20:14:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59454 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbhLPBOk (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Dec 2021 20:14:40 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74ACEC061574;
-        Wed, 15 Dec 2021 17:14:40 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3F6BAB8226B;
-        Thu, 16 Dec 2021 01:14:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AEC8C36AE3;
-        Thu, 16 Dec 2021 01:14:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639617278;
-        bh=7PNDRZJ4FbAVuHjGSTVy+l4yWgjIoYFTFZdR4hDgoqc=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=n6+Eu11oVtWPj4FndZxqhf2r3AegHuwckCYwjrLiKemrQrttqenJzXVsUrPYOLTyB
-         lUShMxsFYqp1dc2PJuoEgdCvxDodqUgBEvKnBOMlL2E2/VDOfN++5ifte5NEVykHoM
-         2I0lzoyWYvL3jBoBDTk1EzcJzV8r/zn9YlQ4wectmSkwwUQoXglpInUaPsNpHQPqQo
-         X97OJ6pluiKrP8IRrA9KUh4J/BhEUAOGpua2L7W+qR9gFFHS0tFsE6HCRRuTcWQFF3
-         viLq+BKkQMz3GRCLEdJAf3VwEX0N3s4x+TyrcLNkgSxNboQJ9f//FA+dCes6pDpGWN
-         hdSWy6zCUTTAw==
-Received: by mail-oi1-f173.google.com with SMTP id q25so34306437oiw.0;
-        Wed, 15 Dec 2021 17:14:37 -0800 (PST)
-X-Gm-Message-State: AOAM532FwMGqsJu1dJ4iPG0oY7ClqsgsAw4Ry3K1U25zBPiaf5YJmrqs
-        Xql7GDA8sNg+e6fKpJYgp5sKWW+u1zTJzLXleC8=
-X-Google-Smtp-Source: ABdhPJxm0JeQTmsX1Ge9ZJeaUSWSnRjuqWebegLGsOj1aQTLNLzLJo/0ZjqC/uoKtnAyPNjCeAmM1Z2/tcbK2kx2c64=
-X-Received: by 2002:a05:6808:a8f:: with SMTP id q15mr2281978oij.65.1639617277171;
- Wed, 15 Dec 2021 17:14:37 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:ac9:428a:0:0:0:0:0 with HTTP; Wed, 15 Dec 2021 17:14:36
- -0800 (PST)
-In-Reply-To: <20211216003119.1609352-1-marcos@orca.pet>
-References: <20211216003119.1609352-1-marcos@orca.pet>
+        id S229616AbhLPBiG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 15 Dec 2021 20:38:06 -0500
+Received: from mail-pj1-f51.google.com ([209.85.216.51]:43768 "EHLO
+        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229533AbhLPBiG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 15 Dec 2021 20:38:06 -0500
+Received: by mail-pj1-f51.google.com with SMTP id a11-20020a17090a854b00b001b11aae38d6so1616375pjw.2
+        for <linux-cifs@vger.kernel.org>; Wed, 15 Dec 2021 17:38:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mR/pNZK3poKwo86OIX2osbO0iAKqYX0UcsElvn8l3WU=;
+        b=RUUdEB8Zob2mur4VDz5wXcALsmTOCHavzf4bhrd1v2hVwPEzmLdi+5XOlzRFCha1ua
+         FV5hfKMhXe0kGPS5lRpd6OiYefcqMqrIfRj2G7677Hpo+7Pq0Z+S3N5JLm1IC3+eZMOg
+         3DsDb8bYW9XrLdx5NcaotjIxFQdJ+GkryPwlao+TP+GLqX17eOhkGe7Pk/p2XlI+Vgi3
+         8gqFycWyHsPQ925xIVJNoBtjl6C4cUvchtRYEE8ZCyk6c02viHgbecbWEKEFCoQ2MnS4
+         AbRmk/k1Cf1b6FshHx9sftkMdhqsMeVKylszuPY7FgIiDHVpVH1lbAyttU9k6GnzaJoB
+         qiXA==
+X-Gm-Message-State: AOAM530RYHbfjiJ2CTIEZLBGkbPemDZ52BHYXPygde11b8S/Kf5iWQSV
+        m5U4d2Czy2ARBS03rAcXh19fULOLXB0=
+X-Google-Smtp-Source: ABdhPJxa3QN7rpcyQCiGGmMz0MKVW3joZwxAlWKCRimOQXt11ySSq6+pDEfBceAE8d8MMqWogua0tQ==
+X-Received: by 2002:a17:902:b712:b0:148:a2e7:fb4f with SMTP id d18-20020a170902b71200b00148a2e7fb4fmr7397780pls.144.1639618685329;
+        Wed, 15 Dec 2021 17:38:05 -0800 (PST)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id m15sm3483643pgd.44.2021.12.15.17.38.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Dec 2021 17:38:04 -0800 (PST)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Thu, 16 Dec 2021 10:14:36 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-r14FNB-jKfCS+v69dgjxPBNdm109jRQ7BKxngN_qWTg@mail.gmail.com>
-Message-ID: <CAKYAXd-r14FNB-jKfCS+v69dgjxPBNdm109jRQ7BKxngN_qWTg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: disable SMB2_GLOBAL_CAP_ENCRYPTION for SMB 3.1.1
-To:     Marcos Del Sol Vives <marcos@orca.pet>
-Cc:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH v2 1/2] ksmbd: set RSS capable in FSCTL_QUERY_NETWORK_INTERFACE_INFO
+Date:   Thu, 16 Dec 2021 10:37:24 +0900
+Message-Id: <20211216013725.8065-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-12-16 9:31 GMT+09:00, Marcos Del Sol Vives <marcos@orca.pet>:
-> According to the official Microsoft MS-SMB2 document section 3.3.5.4, this
-> flag should be used only for 3.0 and 3.0.2 dialects. Setting it for 3.1.1
-> is a violation of the specification.
->
-> This causes my Windows 10 client to detect an anomaly in the negotiation,
-> and disable encryption entirely despite being explicitly enabled in ksmbd,
-> causing all data transfers to go in plain text.
->
-> Signed-off-by: Marcos Del Sol Vives <marcos@orca.pet>
-> Cc: linux-kernel@vger.kernel.org
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> ---
->  fs/ksmbd/smb2ops.c |  3 ---
->  fs/ksmbd/smb2pdu.c | 25 +++++++++++++++++++++----
->  2 files changed, 21 insertions(+), 7 deletions(-)
->
-> diff --git a/fs/ksmbd/smb2ops.c b/fs/ksmbd/smb2ops.c
-> index 0a5d8450e835..02a44d28bdaf 100644
-> --- a/fs/ksmbd/smb2ops.c
-> +++ b/fs/ksmbd/smb2ops.c
-> @@ -271,9 +271,6 @@ int init_smb3_11_server(struct ksmbd_conn *conn)
->  	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
->  		conn->vals->capabilities |= SMB2_GLOBAL_CAP_LEASING;
->
-> -	if (conn->cipher_type)
-> -		conn->vals->capabilities |= SMB2_GLOBAL_CAP_ENCRYPTION;
-> -
->  	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL)
->  		conn->vals->capabilities |= SMB2_GLOBAL_CAP_MULTI_CHANNEL;
->
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index 49c9da37315c..6193d5a1d653 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -915,6 +915,25 @@ static void decode_encrypt_ctxt(struct ksmbd_conn
-> *conn,
->  	}
->  }
->
-> +/**
-> + * should_encrypt() - checks if connection should be encrypted
-> + * @conn:	smb connection
-> + *
-> + * Return:	true if should be encrypted, else false
-> + */
-> +static bool should_encrypt(struct ksmbd_conn *conn)
-Can you change function name to smb3_encryption_negotiated() ?
-And need to update function description also.
+Set RSS capable in FSCTL_QUERY_NETWORK_INTERFACE_INFO if netdev has
+multi tx queues. And add ksmbd_compare_user() to avoid racy condition
+issue in ksmbd_free_user(). because windows client is simultaneously used
+to send session setup requests for multichannel connection.
 
-Thanks for your patch!
-> +{
-> +	if (!conn->ops->generate_encryptionkey)
-> +		return false;
-> +
-> +	/*
-> +	 * SMB 3.0 and 3.0.2 dialects use the SMB2_GLOBAL_CAP_ENCRYPTION flag.
-> +	 * SMB 3.1.1 uses the cipher_type field.
-> +	 */
-> +	return (conn->vals->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION) ||
-> +	    conn->cipher_type;
-> +}
-> +
->  static void decode_compress_ctxt(struct ksmbd_conn *conn,
->  				 struct smb2_compression_capabilities_context *pneg_ctxt)
->  {
-> @@ -1469,8 +1488,7 @@ static int ntlm_authenticate(struct ksmbd_work *work)
->  		    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
->  			sess->sign = true;
->
-> -		if (conn->vals->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION &&
-> -		    conn->ops->generate_encryptionkey &&
-> +		if (should_encrypt(conn) &&
->  		    !(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
->  			rc = conn->ops->generate_encryptionkey(sess);
->  			if (rc) {
-> @@ -1559,8 +1577,7 @@ static int krb5_authenticate(struct ksmbd_work *work)
->  	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
->  		sess->sign = true;
->
-> -	if ((conn->vals->capabilities & SMB2_GLOBAL_CAP_ENCRYPTION) &&
-> -	    conn->ops->generate_encryptionkey) {
-> +	if (should_encrypt(conn)) {
->  		retval = conn->ops->generate_encryptionkey(sess);
->  		if (retval) {
->  			ksmbd_debug(SMB,
-> --
-> 2.25.1
->
->
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ v2:
+   - Add missing free ksmbd_user before returning.
+
+ fs/ksmbd/mgmt/user_config.c | 10 ++++++++++
+ fs/ksmbd/mgmt/user_config.h |  1 +
+ fs/ksmbd/smb2pdu.c          | 15 ++++++++++-----
+ 3 files changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/fs/ksmbd/mgmt/user_config.c b/fs/ksmbd/mgmt/user_config.c
+index 1019d3677d55..279d00feff21 100644
+--- a/fs/ksmbd/mgmt/user_config.c
++++ b/fs/ksmbd/mgmt/user_config.c
+@@ -67,3 +67,13 @@ int ksmbd_anonymous_user(struct ksmbd_user *user)
+ 		return 1;
+ 	return 0;
+ }
++
++bool ksmbd_compare_user(struct ksmbd_user *u1, struct ksmbd_user *u2)
++{
++	if (strcmp(u1->name, u2->name))
++		return false;
++	if (memcmp(u1->passkey, u2->passkey, u1->passkey_sz))
++		return false;
++
++	return true;
++}
+diff --git a/fs/ksmbd/mgmt/user_config.h b/fs/ksmbd/mgmt/user_config.h
+index aff80b029579..6a44109617f1 100644
+--- a/fs/ksmbd/mgmt/user_config.h
++++ b/fs/ksmbd/mgmt/user_config.h
+@@ -64,4 +64,5 @@ struct ksmbd_user *ksmbd_login_user(const char *account);
+ struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp);
+ void ksmbd_free_user(struct ksmbd_user *user);
+ int ksmbd_anonymous_user(struct ksmbd_user *user);
++bool ksmbd_compare_user(struct ksmbd_user *u1, struct ksmbd_user *u2);
+ #endif /* __USER_CONFIG_MANAGEMENT_H__ */
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index f7bea92d4c98..2ff4f813026e 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -1429,10 +1429,16 @@ static int ntlm_authenticate(struct ksmbd_work *work)
+ 			ksmbd_free_user(user);
+ 			return 0;
+ 		}
+-		ksmbd_free_user(sess->user);
++
++		if (!ksmbd_compare_user(sess->user, user)) {
++			ksmbd_free_user(user);
++			return -EPERM;
++		}
++		ksmbd_free_user(user);
++	} else {
++		sess->user = user;
+ 	}
+ 
+-	sess->user = user;
+ 	if (user_guest(sess->user)) {
+ 		if (conn->sign) {
+ 			ksmbd_debug(SMB, "Guest login not allowed when signing enabled\n");
+@@ -2036,9 +2042,6 @@ int smb2_session_logoff(struct ksmbd_work *work)
+ 
+ 	ksmbd_debug(SMB, "request\n");
+ 
+-	/* Got a valid session, set connection state */
+-	WARN_ON(sess->conn != conn);
+-
+ 	/* setting CifsExiting here may race with start_tcp_sess */
+ 	ksmbd_conn_set_need_reconnect(work);
+ 	ksmbd_close_session_fds(work);
+@@ -7243,6 +7246,8 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 		nii_rsp->IfIndex = cpu_to_le32(netdev->ifindex);
+ 
+ 		nii_rsp->Capability = 0;
++		if (netdev->real_num_tx_queues > 1)
++			nii_rsp->Capability |= cpu_to_le32(RSS_CAPABLE);
+ 		if (ksmbd_rdma_capable_netdev(netdev))
+ 			nii_rsp->Capability |= cpu_to_le32(RDMA_CAPABLE);
+ 
+-- 
+2.25.1
+
