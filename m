@@ -2,79 +2,139 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 084A3C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 17 Dec 2021 13:09:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F7BC433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 17 Dec 2021 18:21:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236546AbhLQNJu (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 17 Dec 2021 08:09:50 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:37793 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236544AbhLQNJt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Dec 2021 08:09:49 -0500
-Received: from mail-wm1-f51.google.com ([209.85.128.51]) by
- mrelayeu.kundenserver.de (mreue106 [213.165.67.113]) with ESMTPSA (Nemesis)
- id 1MKt3r-1nCq863kJJ-00LH3c; Fri, 17 Dec 2021 14:09:47 +0100
-Received: by mail-wm1-f51.google.com with SMTP id p18so1549578wmq.5;
-        Fri, 17 Dec 2021 05:09:47 -0800 (PST)
-X-Gm-Message-State: AOAM532Q3TgVP8Hm9bfs7rnlBao8UUC8lgXgmRMhg68dB30Ki/qLf9Mx
-        Dgc7Z8pvhsD4uGq1A9LByYyxf4hAdEi+f0mqlso=
-X-Google-Smtp-Source: ABdhPJz7G1Jphi5B+WPZUUBROjJfTQT5bMgaRQTtBbW6svcijGRnk/NTqL4833WgkZbH4dijpWWNsIR992CZFrm3sB8=
-X-Received: by 2002:a05:600c:6d2:: with SMTP id b18mr2709166wmn.98.1639746587350;
- Fri, 17 Dec 2021 05:09:47 -0800 (PST)
+        id S236561AbhLQSVo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 17 Dec 2021 13:21:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42270 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234149AbhLQSVn (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 17 Dec 2021 13:21:43 -0500
+Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FF6DC061574;
+        Fri, 17 Dec 2021 10:21:43 -0800 (PST)
+Received: by mail-ua1-x934.google.com with SMTP id t13so5907414uad.9;
+        Fri, 17 Dec 2021 10:21:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+y22jHbqQZDK8m/WWN/kME90chEPhhMX+wdbHczsHEY=;
+        b=ia3gfZArhfZPnaCC4+1Z3+XNE42MlPD3hDLf2pwl+2T3/apxOFS6/XMhcWzHa70KJI
+         yaCVnJ4BT7yCyO3n8Vklnzaf6uaYkagIFPj5pYgPBf7p+xqH5O+z+SzC7jLrYqf/nDqQ
+         gjqlp4C0sXCcXas8GsQ9hWlSpTbP28erOOgwmyZtA/lz2h/xrNbmD/i3WtiQFJGxw5In
+         lNToEKS9RX3ue8YHHR+VS5NG8rtUIbn8CWoERlnERbUterRof7Vm04L3safj+WWxlOuX
+         ogAC0vHK6crMvbuCKFb1GVhLJOUz9JwH1qWJOfUSZLLIy43kOupRUnbp7lEm5NR4r1p/
+         nsKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+y22jHbqQZDK8m/WWN/kME90chEPhhMX+wdbHczsHEY=;
+        b=Xm0ZqPqGNFdj/vYDM/D5vObDcRrhI/t/bBFTbPLcrfRbO001QA46UwPnxTWzijH+IT
+         V63raQ+jqoC43izVC6a0jYLOmHX7K1bE0F9oH1Lk+veI5I0VwTD5zDCeMqvBrizG3lDZ
+         lGNg/CjiqIkNrcLbk1tHfeYVztXv5or84Vzm+T30svxeg1z9Hv9CFbsBRTZpDunZ+sU6
+         o4B0p5n7gW34DagVRfNBklQW5y4c4W5bTlTqyIX9794pmnAs5PyTOCyqJs6zGNqM3HNP
+         X4x/U8hBFZnE/IDb61WuhK/G4Wp604VhEb9vDBEbzEIqCjEkqEvXaN53FVtQxgQnE4x3
+         4Ffg==
+X-Gm-Message-State: AOAM532gpFTxmKfYRb0FaXZ33f4srgjckGXA9y2t2oi+s7zoO7MteU3R
+        2y2qpoUa63z7vf90S8ayXSGPQg5w6QQ=
+X-Google-Smtp-Source: ABdhPJxKnmcyycAGJAvFuCeTRDfhFLEuw9yCgTJ6xlpx1roas+eSve61HUfTgFQHt1nbTWCHrA2ygg==
+X-Received: by 2002:a9f:24d6:: with SMTP id 80mr1661616uar.132.1639765302215;
+        Fri, 17 Dec 2021 10:21:42 -0800 (PST)
+Received: from nyarly.rlyeh.local ([179.233.248.238])
+        by smtp.gmail.com with ESMTPSA id l28sm2127439vkn.45.2021.12.17.10.21.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Dec 2021 10:21:41 -0800 (PST)
+From:   Thiago Rafael Becker <trbecker@gmail.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     Steve French <sfrench@samba.org>, linux-kernel@vger.kernel.org,
+        lsahlber@redhat.com, Thiago Rafael Becker <trbecker@gmail.com>,
+        stable@vger.kernel.org
+Subject: [PATCH v2] cifs: sanitize multiple delimiters in prepath
+Date:   Fri, 17 Dec 2021 15:20:22 -0300
+Message-Id: <20211217182022.589857-1-trbecker@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <20211216094426.2083802-1-alexandre.ghiti@canonical.com>
- <20211216094426.2083802-6-alexandre.ghiti@canonical.com> <1956456.1639746081@warthog.procyon.org.uk>
-In-Reply-To: <1956456.1639746081@warthog.procyon.org.uk>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Fri, 17 Dec 2021 14:09:31 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a1M-kDqe0uwzyfUiErOavoEi3bVpy4m4BPbBXQr6JrHdw@mail.gmail.com>
-Message-ID: <CAK8P3a1M-kDqe0uwzyfUiErOavoEi3bVpy4m4BPbBXQr6JrHdw@mail.gmail.com>
-Subject: Re: [PATCH v2 5/6] Documentation, arch, fs: Remove leftovers from
- fscache object list
-To:     David Howells <dhowells@redhat.com>
-Cc:     Alexandre Ghiti <alexandre.ghiti@canonical.com>,
-        Steve French <sfrench@samba.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jeff Layton <jlayton@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, linux-cifs@vger.kernel.org,
-        samba-technical@lists.samba.org,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-cachefs@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:hLxcLGJobju1Hy8o/4lalmO21mxrA/gxXSLx1+T+8tRx09fRKR2
- kZSLHoQ7vwqmWXkWZUtGybzIbvtXcwWRK7RfmkdE7bS3c0OTJh+iJUF7P05+9KfxMasilqv
- BCTj0ePnXc4M/3VDcHI3ZwM5ccl7OgKjUkULNuC0g5dkDmTOX0+ZgBT/CKj8oUgBBaJj2e4
- 1g9zSlYYH7DpvM2iXdpsQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:2PZaWxpMsa4=:A3gCyZo3oFOL7En6B4sCju
- jyk7WAOL88OO5k13jwzXV+bAh1Oya0qRARReutgSW/6dWu/3lKqc/pwYIUBuAgPqErM0GAfMO
- z/FG0fiqLUe+3hTm2Fi5d1HXkByYl866t0ByFKB2EdxhWj+CAyqgw8U+OBMv0TaKt5QhMSThX
- OObETgmklFI+6AZgio+onY2v7SmJhbR7h56RfT49Ne5QT8po75XQ80U3JEWZk/p7ihs/t7nvz
- CtvvEvXRHq6ttwG+Hb2lmdy2i0ur7idobdid+Vk9gBIjHoajw+t4BC5UnZFOQ69WfXx18dJcg
- J2/shj55SgNMz5yWlcGC2MFw8PawgXuB4QWJSH4DEI5TJvgs8Hlrx9HvYbVFE4v9ifiNE7Ta+
- aI/pLqyocw2vn5XP1ieLZnHFBwzjsyGvmYAQ/Yc2mzF7mLxGEjFuOT6IG+qYLSAioPZblqeNc
- qlMypxs+6tUJH2u+8WzlnnkcavtKeNfJ456Kyla0swuAeb9hfBPXa3q++9ambCLIX0NwoTLw4
- 5tBREScyY2C97z2LJx1DKQ9mbCkBXVyKOZocdnHtRlhDK3ah6l5DLiFRUJeY5JYOFrI+BLogP
- BdnWPLk3OFI08oVsmH1MdJPOetN1DOCEnFxUkiGyoaaHN4swQktM0hZWuSpdvxjK2V8PL/+/T
- HJOqxGP+DWNEjL4Mh/E/n+p2YE3pSBbyaIRLmlnecrTKH9J5fYrby2kNHQA5izEKB6Xo23poD
- 41DN2pzbQ4Pk1fL/O13wCxKgTDALpl6Nv0yc5TwQCuJQbalgyEtmoWVHzmA12p2j3AchHjGRE
- Fn+nHLnTEgjor+3Txt8DMZlXUJtk3lgRvXIETt6JuBKjlzF+kg=
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, Dec 17, 2021 at 2:01 PM David Howells <dhowells@redhat.com> wrote:
->
-> Hi Alexandre,
->
-> >  Documentation/filesystems/caching/fscache.rst | 89 -------------------
-> > ...
-> >  fs/fscache/object.c                           |  3 -
-> >  fs/fscache/proc.c                             | 12 ---
->
-> Can you please drop all of the fscache bits?  They're dealt with by my
-> fscache-rewrite patchset that I'm proposing for the next merge window[1].
+mount.cifs can pass a device with multiple delimiters in it. This will
+cause rename(2) to fail with ENOENT.
 
-I've dropped them both from the asm-generic tree.
+V2:
+  - Make sanitize_path more readable.
+  - Fix multiple delimiters between UNC and prepath.
+  - Avoid a memory leak if a bad user starts putting a lot of delimiters
+    in the path on purpose.
 
-       Arnd
+BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=2031200
+Fixes: 24e0a1eff9e2 ("cifs: switch to new mount api")
+Cc: stable@vger.kernel.org # 5.11+
+Signed-off-by: Thiago Rafael Becker <trbecker@gmail.com>
+---
+ fs/cifs/fs_context.c | 38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/fs/cifs/fs_context.c b/fs/cifs/fs_context.c
+index 6a179ae753c1..e3ed25dc6f3f 100644
+--- a/fs/cifs/fs_context.c
++++ b/fs/cifs/fs_context.c
+@@ -434,6 +434,42 @@ int smb3_parse_opt(const char *options, const char *key, char **val)
+ 	return rc;
+ }
+ 
++/*
++ * Remove duplicate path delimiters. Windows is supposed to do that
++ * but there are some bugs that prevent rename from working if there are
++ * multiple delimiters.
++ *
++ * Returns a sanitized duplicate of @path. The caller is responsible for
++ * cleaning up the original.
++ */
++#define IS_DELIM(c) ((c) == '/' || (c) == '\\')
++static char *sanitize_path(char *path)
++{
++	char *cursor1 = path, *cursor2 = path;
++
++	/* skip all prepended delimiters */
++	while (IS_DELIM(*cursor1))
++		cursor1++;
++
++	/* copy the first letter */
++	*cursor2 = *cursor1;
++
++	/* copy the remainder... */
++	while (*(cursor1++)) {
++		/* ... skipping all duplicated delimiters */
++		if (IS_DELIM(*cursor1) && IS_DELIM(*cursor2))
++			continue;
++		*(++cursor2) = *cursor1;
++	}
++
++	/* if the last character is a delimiter, skip it */
++	if (IS_DELIM(*(cursor2 - 1)))
++		cursor2--;
++
++	*(cursor2) = '\0';
++	return kstrdup(path, GFP_KERNEL);
++}
++
+ /*
+  * Parse a devname into substrings and populate the ctx->UNC and ctx->prepath
+  * fields with the result. Returns 0 on success and an error otherwise
+@@ -493,7 +529,7 @@ smb3_parse_devname(const char *devname, struct smb3_fs_context *ctx)
+ 	if (!*pos)
+ 		return 0;
+ 
+-	ctx->prepath = kstrdup(pos, GFP_KERNEL);
++	ctx->prepath = sanitize_path(pos);
+ 	if (!ctx->prepath)
+ 		return -ENOMEM;
+ 
+-- 
+2.31.1
+
