@@ -2,110 +2,94 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95222C433F5
-	for <linux-cifs@archiver.kernel.org>; Sat, 18 Dec 2021 17:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCF6C433F5
+	for <linux-cifs@archiver.kernel.org>; Sun, 19 Dec 2021 01:36:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233675AbhLRRxc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 18 Dec 2021 12:53:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39700 "EHLO
+        id S232973AbhLSBg4 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 18 Dec 2021 20:36:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229552AbhLRRxb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 18 Dec 2021 12:53:31 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BCE9C061574
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Dec 2021 09:53:31 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id e3so20684574edu.4
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Dec 2021 09:53:31 -0800 (PST)
+        with ESMTP id S232124AbhLSBg4 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 18 Dec 2021 20:36:56 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4288C061574;
+        Sat, 18 Dec 2021 17:36:55 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id b22so13132299lfb.9;
+        Sat, 18 Dec 2021 17:36:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=t62NWQiwnOdt+14Z2toQZOP8/GtC2S9kHkHLHMKXVk4=;
-        b=O13zQYwNslMa7MVHyuCJB6hv+OIyjjmgZz3FLZj0/l35Tyrf7n4NQC+20hvSjAFs+k
-         zWxdf1wDiXgqKIOa5b3/tay7OBZuqTedmQB4pA4XqJJZVuYy8jOngLaF2XV2Pid+h9GZ
-         0ew0ZaNUquVfPMjv4ue2glfDUogYn+W8KZlF50w7oYSkkWlJ6LU3LR2HpOrlVLSiUlId
-         vxI4tRp2QkizW1/r8aCD3FqsbcRnzhcYEUslUMm+N9tDd57PCcdeni++4juovjEvfbd7
-         DnWQJZJ/BJCuzHHbJbpp8wLDp1h8i1IG+H6WX/9K07mM0uFDVxmNe5F8Rx16IGC6KAoo
-         0HiQ==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=3Ry7SmKoKguXUT7bfZoG81QGnb2TSFmPGW+FtRu9lR8=;
+        b=HcMT+QLgPD3c2c3ukmrnzBf25KH4KNzX1qWoi/HMD9K0kX91ZC56fubVw3+VflS1NR
+         Tb4XY140RJyjbFxoI6Ovv0BLYJ1PBUBLvouEvZbVRTCut7LMNoPkdAuizjXfcaNGd5fx
+         eAALKX0mzObtmEqmWtQYY9zx4KVWXs6Sy/FUFSuqTDW2q0/FePPCT09TGkSZyXAGqtwU
+         zirKA3KeQmrjuJXt2jH8IdXHBYPEGIU2FQitgcxAqKXfGKyXH7TEMNVZMMfWlhWInSTm
+         qs0oppJgTCMnn3gxEVvUZjJhU7+ZcAeYWcAVvH5gR5AU6KwzB4CD6U8wIbfX36FdmH8o
+         VGQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=t62NWQiwnOdt+14Z2toQZOP8/GtC2S9kHkHLHMKXVk4=;
-        b=v/2/lmueNjmhADD5lT7OFGzM1pvIJxGLEAxDrv3cG9xwiR424JTbIoj2f1A94MI7Lm
-         hZKFGWjjDAkzTtEd+I4EBZWs47mklw/m2Ir0GArUPJh95V6dVFSjkeZf+PzhxQgcdnoP
-         ktZcjyZxMFoTPn3LJIdz9D9NZpWLr3ts2wAjx4p4r/QxKB9Vpadl4koIdAzrbC0bVyCc
-         OFLsHcAlvWgPKoxyIrI2K+lrECXdKdNyaiebWPdH2mYqRYr+iqezGRXiFtUpUbcBBE6L
-         W746djW0MHuStEm2aYRReuXzY7f+ArBsRBdAKh297X98K55LQOqP3j+8NN5T1di1aUik
-         6I7Q==
-X-Gm-Message-State: AOAM530hw2SbGA7MGoXnWR3Vr49n0YrfvGerWmBd3+ylGRPqJ0rzENdl
-        e1JIwbMAeZbRdvFffEecQDUYH7HicrFkS7gb4ho=
-X-Google-Smtp-Source: ABdhPJzhAzVYJalUvamGQ6mL3NlhV0PbM/56iogGWyMsVzK4v8Qf/V95WGi/Ckkx4F0fLZ2hOaSxbFJE9aHIGEBFJDI=
-X-Received: by 2002:a17:907:869e:: with SMTP id qa30mr6594813ejc.356.1639850009907;
- Sat, 18 Dec 2021 09:53:29 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=3Ry7SmKoKguXUT7bfZoG81QGnb2TSFmPGW+FtRu9lR8=;
+        b=db0oIvAzbaPlry9gOC1WhYkCaEvJyoCgRxwZR/AL9E/FYRxU+lKyH/LLX4jI/ZKqiw
+         QZ83yNjLKCS2Tair3HHozrvhcZXMKEUQ0GyP3Ruzbd1W1spnD2J8Zsunp+dIAv6iLf/K
+         CjostMU6XfOI99rvYg8Tx65u6HaAwsDkYHntBiF8U2BReIFKy+Fs5Cnm7hqM2Aon2ZYa
+         Rp3/FHfq3tFUrE5DhwB03vKyFsd4/jbrtYCiGDQt7rnBoKFX/rllz+/rjBdC5/j79YiP
+         kDgbo6ok5Jlk9+4R1sZztb1y/kwR9sWGNignfyHxosEeUOUiCxx1AM9tU5NC5XaYLp0/
+         Zp+w==
+X-Gm-Message-State: AOAM5300TkonDb4uFtdOc83yKyrRa6lPWoCe9HdbmZzu9s6BQm8gjWBS
+        1J5nayg8xS7OoGxfW4//myLbSqkyv6qMuS8fDG3x+eHCFi4=
+X-Google-Smtp-Source: ABdhPJz8W5QgyUjwjp6CbmmtDTHu60euntNCJoBE0l6Tk7S/1XlRgrH2MlQnLejesQzpdhkh3RMKgwbH1Wj76lujZjE=
+X-Received: by 2002:a05:6512:11e5:: with SMTP id p5mr9389707lfs.537.1639877813927;
+ Sat, 18 Dec 2021 17:36:53 -0800 (PST)
 MIME-Version: 1.0
-From:   Shyam Prasad N <nspmangalore@gmail.com>
-Date:   Sat, 18 Dec 2021 09:53:18 -0800
-Message-ID: <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
-Subject: [PATCH] cifs: invalidate dns resolver keys after use
-To:     Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
-        David Howells <dhowells@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000005384c505d36f558b"
+From:   Steve French <smfrench@gmail.com>
+Date:   Sat, 18 Dec 2021 19:36:43 -0600
+Message-ID: <CAH2r5mtRV8WbGZZcgNRJ4MEnaLWP08JRWJQRftFkkvjieW6Q+A@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---0000000000005384c505d36f558b
-Content-Type: text/plain; charset="UTF-8"
+Please pull the following changes since commit
+2585cf9dfaaddf00b069673f27bb3f8530e2039c:
 
-Hi Steve/Paulo/David,
+  Linux 5.16-rc5 (2021-12-12 14:53:01 -0800)
 
-Please review the attached patch.
+are available in the Git repository at:
 
-I noticed that DNS resolution did not always upcall to userspace when
-the IP address changed. This addresses the fix for it.
+  git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc5-smb3-client-fixes
 
-I would even recommend CC:stable for this one.
+for you to fetch changes up to a31080899d5fdafcccf7f39dd214a814a2c82626:
 
--- 
-Regards,
-Shyam
+  cifs: sanitize multiple delimiters in prepath (2021-12-17 19:16:49 -0600)
 
---0000000000005384c505d36f558b
-Content-Type: application/octet-stream; 
-	name="0001-cifs-invalidate-dns-resolver-keys-after-use.patch"
-Content-Disposition: attachment; 
-	filename="0001-cifs-invalidate-dns-resolver-keys-after-use.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_kxc495ww0>
-X-Attachment-Id: f_kxc495ww0
+----------------------------------------------------------------
+Two cifs/smb3 fixes, one fscache related, and one mount path parsing
+related (for stable)
 
-RnJvbSA2MDRhYjRjMzUwYzI1NTJkYWE4ZTc3Zjg2MWE1NDAzMmI0OWJjNzA2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTaHlhbSBQcmFzYWQgTiA8c3ByYXNhZEBtaWNyb3NvZnQuY29t
-PgpEYXRlOiBTYXQsIDE4IERlYyAyMDIxIDE3OjI4OjEwICswMDAwClN1YmplY3Q6IFtQQVRDSF0g
-Y2lmczogaW52YWxpZGF0ZSBkbnMgcmVzb2x2ZXIga2V5cyBhZnRlciB1c2UKCldlIHJlbHkgb24g
-ZG5zIHJlc29sdmVyIG1vZHVsZSB0byB1cGNhbGwgdG8gdXNlcnNwYWNlCnVzaW5nIHJlcXVlc3Rf
-a2V5IGFuZCBnZXQgdXMgdGhlIEROUyBtYXBwaW5nLgpIb3dldmVyLCB0aGUgaW52YWxpZGF0ZSBh
-cmcgZm9yIGRuc19xdWVyeSB3YXMgc2V0CnRvIGZhbHNlLCB3aGljaCBtZWFudCB0aGF0IHRoZSBr
-ZXkgY3JlYXRlZCBkdXJpbmcgdGhlCmZpcnN0IGNhbGwgZm9yIGEgaG9zdG5hbWUgd291bGQgY29u
-dGludWUgdG8gYmUgY2FjaGVkCnRpbGwgaXQgZXhwaXJlcy4gVGhpcyBleHBpcmF0aW9uIHBlcmlv
-ZCBkZXBlbmRzIG9uCmhvdyB0aGUgZG5zX3Jlc29sdmVyIGlzIGNvbmZpZ3VyZWQuCgpGaXhpbmcg
-dGhpcyBieSBzZXR0aW5nIGludmFsaWRhdGU9dHJ1ZSBkdXJpbmcgZG5zX3F1ZXJ5LgpUaGlzIG1l
-YW5zIHRoYXQgdGhlIGtleSB3aWxsIGJlIGNsZWFuZWQgdXAgYnkgZG5zX3Jlc29sdmVyCnNvb24g
-YWZ0ZXIgaXQgcmV0dXJucyB0aGUgZGF0YS4gVGhpcyBhbHNvIG1lYW5zIHRoYXQKdGhlIGRuc19y
-ZXNvbHZlciBzdWJzeXN0ZW0gd2lsbCBub3QgY2FjaGUgdGhlIGtleSBmb3IKYW4gaW50ZXJ2YWwg
-aW5kaWNhdGVkIGJ5IHRoZSBETlMgcmVjb3JkcyBUVEwuIEJ1dCB0aGlzIGlzCm9rYXkgc2luY2Ug
-d2UgdXNlIHRoZSBUVEwgdmFsdWUgcmV0dXJuZWQgdG8gc2NoZWR1bGUgdGhlCm5leHQgbG9va3Vw
-LgoKQ2M6IERhdmlkIEhvd2VsbHMgPGRob3dlbGxzQHJlZGhhdC5jb20+ClNpZ25lZC1vZmYtYnk6
-IFNoeWFtIFByYXNhZCBOIDxzcHJhc2FkQG1pY3Jvc29mdC5jb20+Ci0tLQogZnMvY2lmcy9kbnNf
-cmVzb2x2ZS5jIHwgMiArLQogMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0
-aW9uKC0pCgpkaWZmIC0tZ2l0IGEvZnMvY2lmcy9kbnNfcmVzb2x2ZS5jIGIvZnMvY2lmcy9kbnNf
-cmVzb2x2ZS5jCmluZGV4IDA0NThkMjhkNzFhYS4uODg5MGFmMTUzN2VmIDEwMDY0NAotLS0gYS9m
-cy9jaWZzL2Ruc19yZXNvbHZlLmMKKysrIGIvZnMvY2lmcy9kbnNfcmVzb2x2ZS5jCkBAIC02Niw3
-ICs2Niw3IEBAIGRuc19yZXNvbHZlX3NlcnZlcl9uYW1lX3RvX2lwKGNvbnN0IGNoYXIgKnVuYywg
-Y2hhciAqKmlwX2FkZHIsIHRpbWU2NF90ICpleHBpcnkpCiAKIAkvKiBQZXJmb3JtIHRoZSB1cGNh
-bGwgKi8KIAlyYyA9IGRuc19xdWVyeShjdXJyZW50LT5uc3Byb3h5LT5uZXRfbnMsIE5VTEwsIGhv
-c3RuYW1lLCBsZW4sCi0JCSAgICAgICBOVUxMLCBpcF9hZGRyLCBleHBpcnksIGZhbHNlKTsKKwkJ
-ICAgICAgIE5VTEwsIGlwX2FkZHIsIGV4cGlyeSwgdHJ1ZSk7CiAJaWYgKHJjIDwgMCkKIAkJY2lm
-c19kYmcoRllJLCAiJXM6IHVuYWJsZSB0byByZXNvbHZlOiAlKi4qc1xuIiwKIAkJCSBfX2Z1bmNf
-XywgbGVuLCBsZW4sIGhvc3RuYW1lKTsK
---0000000000005384c505d36f558b--
+(Does not include the recent kernel DNS caching fix, which is still
+being tested and reviewed)
+
+Regression test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/2/builds/856
+----------------------------------------------------------------
+Shyam Prasad N (1):
+      cifs: ignore resource_id while getting fscache super cookie
+
+Thiago Rafael Becker (1):
+      cifs: sanitize multiple delimiters in prepath
+
+ fs/cifs/connect.c    |  7 +++++++
+ fs/cifs/fs_context.c | 38 +++++++++++++++++++++++++++++++++++++-
+ fs/cifs/inode.c      | 13 -------------
+ 3 files changed, 44 insertions(+), 14 deletions(-)
+
+
+--
+Thanks,
+
+Steve
