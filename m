@@ -2,151 +2,130 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2ACC433EF
-	for <linux-cifs@archiver.kernel.org>; Sun, 19 Dec 2021 22:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 222A4C433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 19 Dec 2021 23:46:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236784AbhLSWZs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 19 Dec 2021 17:25:48 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:38880 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231572AbhLSWZr (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 Dec 2021 17:25:47 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        id S233960AbhLSXqO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 19 Dec 2021 18:46:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59114 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229628AbhLSXqN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 Dec 2021 18:46:13 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95688C061574;
+        Sun, 19 Dec 2021 15:46:13 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8C9861F37B;
-        Sun, 19 Dec 2021 22:25:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1639952746; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cNj5DlnCHyjaPrWIau4XhkrXVY1jEriZcdRQj3Namjo=;
-        b=Yh763UTixeLAfh7ho0Yg0vCQL5sAxSo0RsPtXIUsvLf3NuDeq3Hskapog+e3gT+Ewkn9kw
-        6TSUFytsybLP4a1VeVu1HVs/X2IlI5msZxQa3bLmVWAEZOi5mZa46arppkWttgvLGqNmZM
-        6XgHOJI1qyE+po96nEhaVeVMcDONxMI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1639952746;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cNj5DlnCHyjaPrWIau4XhkrXVY1jEriZcdRQj3Namjo=;
-        b=GDb/FrsLYJNoxSVLIG8xF/0bNztWmMJXlMK9X5RiL7HUfVuMrNAeihgX3SXKxfu9p95DpU
-        rhvasxV8/WHGAAAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 00801133FE;
-        Sun, 19 Dec 2021 22:25:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Ot4ULWmxv2F7SAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Sun, 19 Dec 2021 22:25:45 +0000
-Date:   Sun, 19 Dec 2021 19:25:43 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
-        David Howells <dhowells@redhat.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH] cifs: invalidate dns resolver keys after use
-Message-ID: <20211219222214.zetr4d26qqumqgub@cyberdelia>
-References: <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JHK9b2P2Hz4xbt;
+        Mon, 20 Dec 2021 10:46:11 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1639957571;
+        bh=jZ+M4GM4XoEZ7eWzEwsAjRNXfEWBySADp84bOP2qZI8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VP8B0+cpazRQB3BjcXThfQ5U3y82fBM4MbVq4REtTkHiKDPDtuyrH6FTa3ykLznF7
+         am0FYhlK4FaRh4wQfIsBRG1fJfJtK63I5hyaZPqHM0N/3yy0pP8Zt7yOHsXFVCJpFI
+         LG1paJ8IWG3CE0OLbjoMx89+5atE2XRR8KQUYUvLuLvgF6hvro3W7az1f6gt6ID+TT
+         ylC123isCwB0pQlxgT/U4omy4rZqqYGhho3L+2YnUb2KhhhrO/9XCQJsI2luH5YPir
+         Ujvbif8PGEE8FV+WxhBTu9ROASxAF6xTLIrxnAtfrzq1h5qXyg1nmipWl8vKI2ybXq
+         ryYg/KFyCcCug==
+Date:   Mon, 20 Dec 2021 10:46:10 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     David Howells <dhowells@redhat.com>
+Cc:     broonie@kernel.org, Steve French <smfrench@gmail.com>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Shyam Prasad N <sprasad@microsoft.com>,
+        Steve French <stfrench@microsoft.com>
+Subject: Re: linux-next: manual merge of the cifs tree with the fscache tree
+Message-ID: <20211220104610.5f074aec@canb.auug.org.au>
+In-Reply-To: <20211216124317.4143405-1-broonie@kernel.org>
+References: <20211216124317.4143405-1-broonie@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/9RwpTx/TZjurmp4EB2a1cba";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Shyam,
+--Sig_/9RwpTx/TZjurmp4EB2a1cba
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 12/18, Shyam Prasad N wrote:
->Hi Steve/Paulo/David,
+Hi all,
+
+On Thu, 16 Dec 2021 12:43:17 +0000 broonie@kernel.org wrote:
 >
->Please review the attached patch.
->
->I noticed that DNS resolution did not always upcall to userspace when
->the IP address changed. This addresses the fix for it.
->
->I would even recommend CC:stable for this one.
+> Today's linux-next merge of the cifs tree got a conflict in:
+>=20
+>   fs/cifs/inode.c
+>=20
+> between commit:
+>=20
+>   830c476f5eb82 ("cifs: Support fscache indexing rewrite (untested)")
+>=20
+> from the fscache tree and commit:
+>=20
+>   68f87ec9c1ce3 ("cifs: ignore resource_id while getting fscache super co=
+okie")
 
-(I'm pasting the patch here so I can comment inline)
+This is now commit
 
-> From 604ab4c350c2552daa8e77f861a54032b49bc706 Mon Sep 17 00:00:00 2001
-> From: Shyam Prasad N <sprasad@microsoft.com>
-> Date: Sat, 18 Dec 2021 17:28:10 +0000
-> Subject: [PATCH] cifs: invalidate dns resolver keys after use
-> 
-> We rely on dns resolver module to upcall to userspace
-> using request_key and get us the DNS mapping.
-> However, the invalidate arg for dns_query was set
-> to false, which meant that the key created during the
-> first call for a hostname would continue to be cached
-> till it expires. This expiration period depends on
-> how the dns_resolver is configured.
+  b774302e8856 ("cifs: ignore resource_id while getting fscache super cooki=
+e")
 
-Ok.
+in Linus' tree.
 
-> 
-> Fixing this by setting invalidate=true during dns_query.
-> This means that the key will be cleaned up by dns_resolver
-> soon after it returns the data. This also means that
-> the dns_resolver subsystem will not cache the key for
-> an interval indicated by the DNS records TTL.
+> from the cifs tree.
+>=20
+> diff --cc fs/cifs/inode.c
+> index dc2fe76450b96,279622e4eb1c2..0000000000000
+> --- a/fs/cifs/inode.c
+> +++ b/fs/cifs/inode.c
+> @@@ -1372,20 -1370,6 +1367,7 @@@ iget_no_retry
+>   		iget_failed(inode);
+>   		inode =3D ERR_PTR(rc);
+>   	}
+>  +
+> - 	if (!rc) {
+> - 		/*
+> - 		 * The cookie is initialized from volume info returned above.
+> - 		 * Inside cifs_fscache_get_super_cookie it checks
+> - 		 * that we do not get super cookie twice.
+> - 		 */
+> - 		rc =3D cifs_fscache_get_super_cookie(tcon);
+> - 		if (rc < 0) {
+> - 			iget_failed(inode);
+> - 			inode =3D ERR_PTR(rc);
+> - 		}
+> - 	}
+> -=20
+>   out:
+>   	kfree(path);
+>   	free_xid(xid);
 
-This is ok too, which is an approach that I did try before, but
-didn't work (see below).
+so this is now a conflict between the fscache tree and Linus's tree.
 
-> But this is
-> okay since we use the TTL value returned to schedule the
-> next lookup.
-
-This is an incorrect assumption. keyutils' key.dns_resolve uses
-getaddrinfo() for A/AAAA queries, which doesn't contain DNS TTL
-information.
-
-Meaning that the TTL returned to dns_resolve_server_name_to_ip() is
-actually either key.dns_resolve.conf's default_ttl value, or the default
-key_expiry value (5).
-
-I have a patch ready (working, but still testing) for keyutils that implements
-a "common" DNS interface, and the caller only specifies the query type,
-which is then resolved via res_nquery(). This way, all returned records
-have generic their metadata (TTL included), along with type-specific
-metadata (e.g. AFSDB or SRV specifics) as well.
-
-Another option/suggestion would be to:
-1. decrease SMB_DNS_RESOLVE_INTERVAL_DEFAULT
-2. and/or make it user-configurable via sysfs
-3. call dns_query() with expiry=NULL and invalidate=true
-
-So we'd use keyutils exclusively for kernel-userspace communication, and
-handle the expiration checking/configuration on cifs side.
-
-> 
-> Cc: David Howells <dhowells@redhat.com>
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
-> ---
->  fs/cifs/dns_resolve.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
-> index 0458d28d71aa..8890af1537ef 100644
-> --- a/fs/cifs/dns_resolve.c
-> +++ b/fs/cifs/dns_resolve.c
-> @@ -66,7 +66,7 @@ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr, time64_t *expiry)
->  
->  	/* Perform the upcall */
->  	rc = dns_query(current->nsproxy->net_ns, NULL, hostname, len,
-> -		       NULL, ip_addr, expiry, false);
-> +		       NULL, ip_addr, expiry, true);
->  	if (rc < 0)
->  		cifs_dbg(FYI, "%s: unable to resolve: %*.*s\n",
->  			 __func__, len, len, hostname);
-
-
+--=20
 Cheers,
+Stephen Rothwell
 
-Enzo
+--Sig_/9RwpTx/TZjurmp4EB2a1cba
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmG/xEIACgkQAVBC80lX
+0Gz32Af+JYzcgRqXkzVcfP/tAeLSjgkA0q3fyqVZhXJOkyBzc2LTMi7AhEiDKCAJ
+S8Mm/Wa/N8ISV5c81wP5RJr5ClD1kcyHjo2bcD1q0dmEmTyume8YoXO/neVZjHdA
+ceRiAf3CEZnGgE05xWtaYcudBBveJ+8OuayLn4Be6ePRlbfNwPy8R2J4+QScxqMD
+5vO7SX0jTDErUS6ObY+yxhfC6ZEQoYg3Kh+b+ilyFyMqNqT9rz8Vvdg8iVGSLxiZ
+4RkqhSyz2LWnXwLu72OYMMhZ2c2tgBJQw3cZbkFSeAOPF2lW4qmDHNP6oanxdCjg
+AGW8iLnDlf4EHyZlX8Cjz1arF96ghA==
+=d0KT
+-----END PGP SIGNATURE-----
+
+--Sig_/9RwpTx/TZjurmp4EB2a1cba--
