@@ -2,65 +2,151 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1729EC433FE
-	for <linux-cifs@archiver.kernel.org>; Sun, 19 Dec 2021 20:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2ACC433EF
+	for <linux-cifs@archiver.kernel.org>; Sun, 19 Dec 2021 22:25:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229582AbhLSUe3 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 19 Dec 2021 15:34:29 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:44592 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236535AbhLSUe2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 Dec 2021 15:34:28 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S236784AbhLSWZs (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 19 Dec 2021 17:25:48 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:38880 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231572AbhLSWZr (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 Dec 2021 17:25:47 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3021860EFC;
-        Sun, 19 Dec 2021 20:34:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 98E03C36AE7;
-        Sun, 19 Dec 2021 20:34:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639946067;
-        bh=C+kAmQZcndM0LEx+8+PLRNkETCQS026wqOpxi1A4oGw=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=IRqmf5M2LWz1oGRbwXBEMYdvGTyCxt8ap+GPIrh9SIP0iiRzktcOXaJggkVpiRbgr
-         VnM3ah8LUP+Eel9sk6QH/STEeKZXdSNQcflIuieNtF7x6VEEmKVjzbQx6HRKF6pbdI
-         mjbjFU86tm6Hxem+jZC4q3DuNAblh3K5rT1Dn7AbM062jS1W20h8KX1/wGudhDa9Ma
-         PpOE3H5PyftIzMYdz1OLT9KwePXc1PWlfvYofHs4rAPopCy4iO36N+TPP66Hk6+No8
-         rex/PEL6bnT8qY6YCeNx0R5P0dXM1g3FLGUxZlL03wVL0tkRZ3ku+PWnUN0Pq/PBXs
-         tp0QPtso/iHLQ==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 7D47060A27;
-        Sun, 19 Dec 2021 20:34:27 +0000 (UTC)
-Subject: Re: [GIT PULL] smb3 client fixes
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5mtRV8WbGZZcgNRJ4MEnaLWP08JRWJQRftFkkvjieW6Q+A@mail.gmail.com>
-References: <CAH2r5mtRV8WbGZZcgNRJ4MEnaLWP08JRWJQRftFkkvjieW6Q+A@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-cifs.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5mtRV8WbGZZcgNRJ4MEnaLWP08JRWJQRftFkkvjieW6Q+A@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc5-smb3-client-fixes
-X-PR-Tracked-Commit-Id: a31080899d5fdafcccf7f39dd214a814a2c82626
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 9273d6cb9935f536c309186744e5163c9e488a57
-Message-Id: <163994606750.11038.1860183149607180877.pr-tracker-bot@kernel.org>
-Date:   Sun, 19 Dec 2021 20:34:27 +0000
-To:     Steve French <smfrench@gmail.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8C9861F37B;
+        Sun, 19 Dec 2021 22:25:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1639952746; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cNj5DlnCHyjaPrWIau4XhkrXVY1jEriZcdRQj3Namjo=;
+        b=Yh763UTixeLAfh7ho0Yg0vCQL5sAxSo0RsPtXIUsvLf3NuDeq3Hskapog+e3gT+Ewkn9kw
+        6TSUFytsybLP4a1VeVu1HVs/X2IlI5msZxQa3bLmVWAEZOi5mZa46arppkWttgvLGqNmZM
+        6XgHOJI1qyE+po96nEhaVeVMcDONxMI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1639952746;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cNj5DlnCHyjaPrWIau4XhkrXVY1jEriZcdRQj3Namjo=;
+        b=GDb/FrsLYJNoxSVLIG8xF/0bNztWmMJXlMK9X5RiL7HUfVuMrNAeihgX3SXKxfu9p95DpU
+        rhvasxV8/WHGAAAg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 00801133FE;
+        Sun, 19 Dec 2021 22:25:45 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Ot4ULWmxv2F7SAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Sun, 19 Dec 2021 22:25:45 +0000
+Date:   Sun, 19 Dec 2021 19:25:43 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
+        David Howells <dhowells@redhat.com>,
+        CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH] cifs: invalidate dns resolver keys after use
+Message-ID: <20211219222214.zetr4d26qqumqgub@cyberdelia>
+References: <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-The pull request you sent on Sat, 18 Dec 2021 19:36:43 -0600:
+Hi Shyam,
 
-> git://git.samba.org/sfrench/cifs-2.6.git tags/5.16-rc5-smb3-client-fixes
+On 12/18, Shyam Prasad N wrote:
+>Hi Steve/Paulo/David,
+>
+>Please review the attached patch.
+>
+>I noticed that DNS resolution did not always upcall to userspace when
+>the IP address changed. This addresses the fix for it.
+>
+>I would even recommend CC:stable for this one.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/9273d6cb9935f536c309186744e5163c9e488a57
+(I'm pasting the patch here so I can comment inline)
 
-Thank you!
+> From 604ab4c350c2552daa8e77f861a54032b49bc706 Mon Sep 17 00:00:00 2001
+> From: Shyam Prasad N <sprasad@microsoft.com>
+> Date: Sat, 18 Dec 2021 17:28:10 +0000
+> Subject: [PATCH] cifs: invalidate dns resolver keys after use
+> 
+> We rely on dns resolver module to upcall to userspace
+> using request_key and get us the DNS mapping.
+> However, the invalidate arg for dns_query was set
+> to false, which meant that the key created during the
+> first call for a hostname would continue to be cached
+> till it expires. This expiration period depends on
+> how the dns_resolver is configured.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Ok.
+
+> 
+> Fixing this by setting invalidate=true during dns_query.
+> This means that the key will be cleaned up by dns_resolver
+> soon after it returns the data. This also means that
+> the dns_resolver subsystem will not cache the key for
+> an interval indicated by the DNS records TTL.
+
+This is ok too, which is an approach that I did try before, but
+didn't work (see below).
+
+> But this is
+> okay since we use the TTL value returned to schedule the
+> next lookup.
+
+This is an incorrect assumption. keyutils' key.dns_resolve uses
+getaddrinfo() for A/AAAA queries, which doesn't contain DNS TTL
+information.
+
+Meaning that the TTL returned to dns_resolve_server_name_to_ip() is
+actually either key.dns_resolve.conf's default_ttl value, or the default
+key_expiry value (5).
+
+I have a patch ready (working, but still testing) for keyutils that implements
+a "common" DNS interface, and the caller only specifies the query type,
+which is then resolved via res_nquery(). This way, all returned records
+have generic their metadata (TTL included), along with type-specific
+metadata (e.g. AFSDB or SRV specifics) as well.
+
+Another option/suggestion would be to:
+1. decrease SMB_DNS_RESOLVE_INTERVAL_DEFAULT
+2. and/or make it user-configurable via sysfs
+3. call dns_query() with expiry=NULL and invalidate=true
+
+So we'd use keyutils exclusively for kernel-userspace communication, and
+handle the expiration checking/configuration on cifs side.
+
+> 
+> Cc: David Howells <dhowells@redhat.com>
+> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+> ---
+>  fs/cifs/dns_resolve.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/cifs/dns_resolve.c b/fs/cifs/dns_resolve.c
+> index 0458d28d71aa..8890af1537ef 100644
+> --- a/fs/cifs/dns_resolve.c
+> +++ b/fs/cifs/dns_resolve.c
+> @@ -66,7 +66,7 @@ dns_resolve_server_name_to_ip(const char *unc, char **ip_addr, time64_t *expiry)
+>  
+>  	/* Perform the upcall */
+>  	rc = dns_query(current->nsproxy->net_ns, NULL, hostname, len,
+> -		       NULL, ip_addr, expiry, false);
+> +		       NULL, ip_addr, expiry, true);
+>  	if (rc < 0)
+>  		cifs_dbg(FYI, "%s: unable to resolve: %*.*s\n",
+>  			 __func__, len, len, hostname);
+
+
+Cheers,
+
+Enzo
