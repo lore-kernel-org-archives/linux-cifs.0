@@ -2,165 +2,83 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7324C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Dec 2021 06:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC53C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Dec 2021 12:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233144AbhLTGLn (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Dec 2021 01:11:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57230 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231863AbhLTGLn (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Dec 2021 01:11:43 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AC31C061574;
-        Sun, 19 Dec 2021 22:11:42 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S230380AbhLTMzo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Dec 2021 07:55:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59879 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230262AbhLTMzo (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Mon, 20 Dec 2021 07:55:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640004943;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4Nx2DfSvlqgcOdRMIezU5EsxEs3lXx6qD/Th3FCB/qU=;
+        b=frtVV6kHBTjYwcZHJyCv0asxOR5DsqmXm449eDz/7X+ohCvAV3r85teeai+fCAuqooGrfh
+        ZtZhQsn0uXSEnzX/llRJQhUurWiVaI9F2nolzPRKYRFmnW4MztOj3gPr3mLvdX154+XeDq
+        eIYiQJQ4oWLKyh0/fHHDkWqIdA9WyM0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-10-Pa9M7hy4PemwqaYlX_bczA-1; Mon, 20 Dec 2021 07:55:42 -0500
+X-MC-Unique: Pa9M7hy4PemwqaYlX_bczA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JHTkN1CFSz4xPw;
-        Mon, 20 Dec 2021 17:11:40 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1639980700;
-        bh=xUlUVm970/HDHnNVurSk+4XF/Ezez2ohLvfSRRoJbM4=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=SEp/epnL6qdbv90kJWGlYGuhVK4Ez7R0Awf2nKuRWydWKi7rJ0hnJ2Yu/PtuY37LQ
-         NYgmiI2zpm1j9GJKntZLcP8OBtZNfi4DoZMbfVZQ4EHv3ng+RcL9hUaePIv9yfH4gx
-         UCQ9quKDi/Du7pjo7pZ57iPY8WDbel5f7esrzhPW9UdSQ23dfkUyjXKMOizcuLrXL7
-         T0jUrEFRXisTrLxEOl3BSnMVWkl5dvVxfJbtWFOFGoJZvPyYh/vF3BPRrIGuwBhSCv
-         RJtYfHXlGe+C3mJVD8kzRyKTRu6OoiHFBgklnXfSAQ3Euth7BKlYm332ytrO/HZWOg
-         k4H+8ZXUOVuRA==
-Date:   Mon, 20 Dec 2021 17:11:39 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Shyam Prasad <Shyam.Prasad@microsoft.com>
-Cc:     David Howells <dhowells@redhat.com>,
-        "broonie@kernel.org" <broonie@kernel.org>,
-        Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Steven French <Steven.French@microsoft.com>
-Subject: Re: [EXTERNAL] Re: linux-next: manual merge of the cifs tree with
- the fscache tree
-Message-ID: <20211220171139.654db374@canb.auug.org.au>
-In-Reply-To: <KL1P15301MB034331969F371B30AAD6642D947B9@KL1P15301MB0343.APCP153.PROD.OUTLOOK.COM>
-References: <20211216124317.4143405-1-broonie@kernel.org>
-        <20211220104610.5f074aec@canb.auug.org.au>
-        <KL1P15301MB034331969F371B30AAD6642D947B9@KL1P15301MB0343.APCP153.PROD.OUTLOOK.COM>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED4F510168EA;
+        Mon, 20 Dec 2021 12:55:40 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.122])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 97D5A1059156;
+        Mon, 20 Dec 2021 12:55:39 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
+References: <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
+        Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH] cifs: invalidate dns resolver keys after use
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/NAS0vxE=0Wbe/BCj7JU5yKv";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2353799.1640004938.1@warthog.procyon.org.uk>
+Date:   Mon, 20 Dec 2021 12:55:38 +0000
+Message-ID: <2353800.1640004938@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/NAS0vxE=0Wbe/BCj7JU5yKv
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Shyam Prasad N <nspmangalore@gmail.com> wrote:
 
-Hi Shyam,
+> From 604ab4c350c2552daa8e77f861a54032b49bc706 Mon Sep 17 00:00:00 2001
+> From: Shyam Prasad N <sprasad@microsoft.com>
+> Date: Sat, 18 Dec 2021 17:28:10 +0000
+> Subject: [PATCH] cifs: invalidate dns resolver keys after use
+> 
+> We rely on dns resolver module to upcall to userspace
+> using request_key and get us the DNS mapping.
+> However, the invalidate arg for dns_query was set
+> to false, which meant that the key created during the
+> first call for a hostname would continue to be cached
+> till it expires. This expiration period depends on
+> how the dns_resolver is configured.
+> 
+> Fixing this by setting invalidate=true during dns_query.
+> This means that the key will be cleaned up by dns_resolver
+> soon after it returns the data. This also means that
+> the dns_resolver subsystem will not cache the key for
+> an interval indicated by the DNS records TTL. But this is
+> okay since we use the TTL value returned to schedule the
+> next lookup.
+> 
+> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 
-On Mon, 20 Dec 2021 04:31:27 +0000 Shyam Prasad <Shyam.Prasad@microsoft.com=
-> wrote:
->
-> -----Original Message-----
-> From: Stephen Rothwell <sfr@canb.auug.org.au>=20
-> Sent: Monday, December 20, 2021 5:16 AM
-> To: David Howells <dhowells@redhat.com>
-> Cc: broonie@kernel.org; Steve French <smfrench@gmail.com>; CIFS <linux-ci=
-fs@vger.kernel.org>; Linux Kernel Mailing List <linux-kernel@vger.kernel.or=
-g>; Linux Next Mailing List <linux-next@vger.kernel.org>; Shyam Prasad <Shy=
-am.Prasad@microsoft.com>; Steven French <Steven.French@microsoft.com>
-> Subject: [EXTERNAL] Re: linux-next: manual merge of the cifs tree with th=
-e fscache tree
->=20
-> Hi all,
->=20
-> On Thu, 16 Dec 2021 12:43:17 +0000 broonie@kernel.org wrote:
-> >
-> > Today's linux-next merge of the cifs tree got a conflict in:
-> >=20
-> >   fs/cifs/inode.c
-> >=20
-> > between commit:
-> >=20
-> >   830c476f5eb82 ("cifs: Support fscache indexing rewrite (untested)")
-> >=20
-> > from the fscache tree and commit:
-> >=20
-> >   68f87ec9c1ce3 ("cifs: ignore resource_id while getting fscache super =
-cookie") =20
->=20
-> This is now commit
->=20
->   b774302e8856 ("cifs: ignore resource_id while getting fscache super coo=
-kie")
->=20
-> in Linus' tree.
->=20
-> > from the cifs tree.
-> >=20
-> > diff --cc fs/cifs/inode.c
-> > index dc2fe76450b96,279622e4eb1c2..0000000000000
-> > --- a/fs/cifs/inode.c
-> > +++ b/fs/cifs/inode.c
-> > @@@ -1372,20 -1370,6 +1367,7 @@@ iget_no_retry
-> >   		iget_failed(inode);
-> >   		inode =3D ERR_PTR(rc);
-> >   	}
-> >  +
-> > - 	if (!rc) {
-> > - 		/*
-> > - 		 * The cookie is initialized from volume info returned above.
-> > - 		 * Inside cifs_fscache_get_super_cookie it checks
-> > - 		 * that we do not get super cookie twice.
-> > - 		 */
-> > - 		rc =3D cifs_fscache_get_super_cookie(tcon);
-> > - 		if (rc < 0) {
-> > - 			iget_failed(inode);
-> > - 			inode =3D ERR_PTR(rc);
-> > - 		}
-> > - 	}
-> > -=20
-> >   out:
-> >   	kfree(path);
-> >   	free_xid(xid); =20
->=20
-> so this is now a conflict between the fscache tree and Linus's tree.
->=20
-> --=20
-> Cheers,
-> Stephen Rothwell
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > so this is now a conflict between the fscache tree and Linus's tree. =20
->=20
-> Hi David and Steve,
->=20
-> I think one of these two branches need to be rebased. Can one of you plea=
-se do it?
+Acked-by: David Howells <dhowells@redhat.com>
 
-Nothing needs t be done, the conflict is trivial.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/NAS0vxE=0Wbe/BCj7JU5yKv
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmHAHpsACgkQAVBC80lX
-0GyyOQf/c+PTloCznCkaa65/7FonJm0jDjkFIcxrmAhwu1Q8bV2qwtRsYoDOz0vF
-e9l48cGmORVRBcAjM4q9YxbEPDnL351zO6iK7V7KAAXTedXAP3kR9kdoDgEfuMPu
-AcBKlnbDOvabFDLVPfR0n0rjUoUVF7LD7Z8dHQSAnVqnC3JsJx2VrA2FrxUVL5ua
-XtPbEVv2DDYQFbVAmMDEiLr+YpvU6Y/VzVTiqTB/ZeaEu1mhlgYt+YyUSqs11GIU
-eR6M72mRyNhuD2/zPiqmcrFzi/4fat6tdy9mBnqKQ58MVjiRMkUr+zf4SRf4VQ/J
-vFAqclCUC54k3dHibYZqWVt8XEMeuw==
-=2uMb
------END PGP SIGNATURE-----
-
---Sig_/NAS0vxE=0Wbe/BCj7JU5yKv--
