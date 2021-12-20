@@ -2,57 +2,133 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 222A4C433EF
-	for <linux-cifs@archiver.kernel.org>; Sun, 19 Dec 2021 23:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DBDDC433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 20 Dec 2021 04:31:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233960AbhLSXqO (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 19 Dec 2021 18:46:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59114 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbhLSXqN (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 19 Dec 2021 18:46:13 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95688C061574;
-        Sun, 19 Dec 2021 15:46:13 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JHK9b2P2Hz4xbt;
-        Mon, 20 Dec 2021 10:46:11 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1639957571;
-        bh=jZ+M4GM4XoEZ7eWzEwsAjRNXfEWBySADp84bOP2qZI8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VP8B0+cpazRQB3BjcXThfQ5U3y82fBM4MbVq4REtTkHiKDPDtuyrH6FTa3ykLznF7
-         am0FYhlK4FaRh4wQfIsBRG1fJfJtK63I5hyaZPqHM0N/3yy0pP8Zt7yOHsXFVCJpFI
-         LG1paJ8IWG3CE0OLbjoMx89+5atE2XRR8KQUYUvLuLvgF6hvro3W7az1f6gt6ID+TT
-         ylC123isCwB0pQlxgT/U4omy4rZqqYGhho3L+2YnUb2KhhhrO/9XCQJsI2luH5YPir
-         Ujvbif8PGEE8FV+WxhBTu9ROASxAF6xTLIrxnAtfrzq1h5qXyg1nmipWl8vKI2ybXq
-         ryYg/KFyCcCug==
-Date:   Mon, 20 Dec 2021 10:46:10 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     David Howells <dhowells@redhat.com>
-Cc:     broonie@kernel.org, Steve French <smfrench@gmail.com>,
+        id S234038AbhLTEbk (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 19 Dec 2021 23:31:40 -0500
+Received: from mail-hk2apc01lp2053.outbound.protection.outlook.com ([104.47.124.53]:17158
+        "EHLO APC01-HK2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234032AbhLTEbk (ORCPT <rfc822;linux-cifs@vger.kernel.org>);
+        Sun, 19 Dec 2021 23:31:40 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DR2t3yFEf9ZyLwJbkeSChkBDzt6OJ/KQUVDSisbXu8m9QF8YsjCHRLWCQgNmqnIohfOyV+BPTTCuAC0JXVfUGipVLSgwTCrnr+52+yR4HJltcsuKnfJn/XOX236sHMtvlK9PE+f6vmF0AK6Vkit/+GSobwgH0o3zw1PLSZUGA1DDjHaY1r5OZ4+NGPqhbMXAbriNR3p1x1blCvl2xiDyDVs8Wa/9wKgjecT2LiGQNv5bqA4clGHmNqfpUIw4cuVFkQFrlpwiELjKejZHdIeXc7yT+wmKH/pNPVYtGq8HoXOUBKf1rx2Kaz8dSs05vjmfNJuxV3dGK7BAcuqLN/7UZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=obqvwouy1Y4hNxH9wksRgxrrDVlpd1whIdbTau+fQlI=;
+ b=Ppp3DToQ3/0EJ7ytiGnaV4hgNuN48gIbhVa0kgMSh+nQp3xFIfqHhTVH34F0R88zc/Njb0wMMzsuNYsL6meVGbTRkSMqHHTqN0EKIkW3C2nSczYI7kHmcYBELswJCKuBVRZAyF4pN54FhbUZLbWsWiLbabq5g4xCs+/x1zKZgMMbOTzmlJNL0FEWzEb4wTSJbpoeTSLueOLFJGEmk6jplQzDBc0FAdmBiQL3dYoTceMMn7iTAPz+EOA7dB+CGgMdkDDAWI3VeY+2cjA0nQ3GQs+8BByKAE/WOFRwES+O5ZJLldTlkzRVVQRMfIiRiAzO7uxadLBZIePGW8M2liDXzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=obqvwouy1Y4hNxH9wksRgxrrDVlpd1whIdbTau+fQlI=;
+ b=I6oSuYi1nZf2LIVFos9l5VfyADDZVV+e7RZLdkXh2M8N2SbDooXGK1MA6EUfkx0+TjskNwA7dtLg0YIHilXspxXP+kxia3Xl1CUyINvjRKkIAh8sA2Fzf3Twues3mGBhqE4d4ciOnCWi9xtlL9INHk+0cPYnTxZFc5ia5A/0Lcc=
+Received: from KL1P15301MB0343.APCP153.PROD.OUTLOOK.COM (2603:1096:820:17::13)
+ by SG2P153MB0128.APCP153.PROD.OUTLOOK.COM (2603:1096:3:19::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4823.7; Mon, 20 Dec 2021 04:31:28 +0000
+Received: from KL1P15301MB0343.APCP153.PROD.OUTLOOK.COM
+ ([fe80::7d3f:25dc:6a3a:abec]) by KL1P15301MB0343.APCP153.PROD.OUTLOOK.COM
+ ([fe80::7d3f:25dc:6a3a:abec%8]) with mapi id 15.20.4844.003; Mon, 20 Dec 2021
+ 04:31:27 +0000
+From:   Shyam Prasad <Shyam.Prasad@microsoft.com>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        David Howells <dhowells@redhat.com>
+CC:     "broonie@kernel.org" <broonie@kernel.org>,
+        Steve French <smfrench@gmail.com>,
         CIFS <linux-cifs@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Shyam Prasad N <sprasad@microsoft.com>,
-        Steve French <stfrench@microsoft.com>
-Subject: Re: linux-next: manual merge of the cifs tree with the fscache tree
-Message-ID: <20211220104610.5f074aec@canb.auug.org.au>
-In-Reply-To: <20211216124317.4143405-1-broonie@kernel.org>
+        Steven French <Steven.French@microsoft.com>
+Subject: RE: [EXTERNAL] Re: linux-next: manual merge of the cifs tree with the
+ fscache tree
+Thread-Topic: [EXTERNAL] Re: linux-next: manual merge of the cifs tree with
+ the fscache tree
+Thread-Index: AQHX9TKhye1qL/QcOUyrdzVobsjS86w6yIEQ
+Date:   Mon, 20 Dec 2021 04:31:27 +0000
+Message-ID: <KL1P15301MB034331969F371B30AAD6642D947B9@KL1P15301MB0343.APCP153.PROD.OUTLOOK.COM>
 References: <20211216124317.4143405-1-broonie@kernel.org>
+ <20211220104610.5f074aec@canb.auug.org.au>
+In-Reply-To: <20211220104610.5f074aec@canb.auug.org.au>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=ea113c83-9174-49a1-a88a-6c3325a211e4;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2021-12-20T04:24:16Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8c9ad012-950b-4f70-ce43-08d9c37196d9
+x-ms-traffictypediagnostic: SG2P153MB0128:EE_
+x-microsoft-antispam-prvs: <SG2P153MB01286C4D4FC1239887A3E3A5947B9@SG2P153MB0128.APCP153.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: w/BLAwMlJExAPxspCDWBes6D9/ITpkE+LGdyAMMmXwypAv1sDGUD6I+hh4mHxzH5HHHfmEwX5Q+qZaLLbAGc6v9nVDWBWUmdd3H9Lv6nFefro0Ph+Zo5QTr7WobwNS2hxvkKqIQMvyg4FTcUGoe5nwZdAthmjMw7Qw6ZjPkV1donJk/gdp7UfZu3fLaDKkdkhu0dU15BOQWPyY708bA/MlrWSVZzh+XtP06+Yci5OX/CZaD3nPUx2erHHXWE1KKQ7HtKVkedt1NbE11cvGbdi9jiUVPob/pn5k0gIZ38VSC8iXnciyhxv+xBHk4JNDPoYwaXNV95DFnQa5bUZRG4zb4T13eKRxjqYlJ/VKWc4qW3u590tLbw1tvwf8UCSOc9If3bp6YMUlV9uu7v7V9Rksy1V9cYqb3Q7BVyfxY6AIsgoBgZTeXHdtjNe+OoMoND9NCMK4mvdIpZagoPnjPAO10dJL3SMb8yzBMvlbIVWfoOwxnNC8OiN7TnKZwQtM3fqU5p910u+cwhLiD5UlP/2yO+CDuxKLx8DHrmc0Ei7TfOqxqifiKUGItRclinJTFOL3boJxOeMGrjNOrbtvHBOaTVs5v/4JXX9TxH/6OHxPsNKQTyHLL2gRqyqogO/KLnyzg28fwuPMYoDP5bcjHKEFfRr6iJ+Bc5dg5zywtKuxZRnhuRFe3a2dnes8OPVfxY8lQL6zks92+EWf4TH7wSLsUCDvgxvgBHUXDejIBkH3iLlpYBkrk5vibF745oacaA
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1P15301MB0343.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(5660300002)(6506007)(71200400001)(186003)(86362001)(8990500004)(38070700005)(316002)(7696005)(83380400001)(53546011)(9686003)(10290500003)(26005)(122000001)(2906002)(38100700002)(82950400001)(508600001)(55016003)(76116006)(66946007)(107886003)(54906003)(52536014)(33656002)(110136005)(4326008)(82960400001)(66476007)(8936002)(66556008)(66446008)(55236004)(64756008)(8676002)(20210929001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/vFk3dMN4aH7F1TZQ0Rzr8z8GNEHULLGeiq2mEH8lkUjBihQdw6S8nH5GBOb?=
+ =?us-ascii?Q?0ZcBRzWhkXOB6+y94PlA0dsG7KBNHo3dT2lHNrbRh8tLV0mNAx6sszX5HSMN?=
+ =?us-ascii?Q?0pagN358mpKNN05/YS2ME15TGopMzFrq4VRGiZM98q/JiURPIOItPmH3656W?=
+ =?us-ascii?Q?KMYSgo12Q7RlRHNU1HyQRTeFAKTzpFC1oO71nfglf+SKgA90nemzy10cBv8M?=
+ =?us-ascii?Q?VDHcRelDHbxoY3lkIDUdtDB+P7gMqZLtdhuQfNGc4i6lVPXzLkkXhld5ZwOz?=
+ =?us-ascii?Q?M3vXOlAH4sO47LbuB6QZC3Q7AhyKaomV5YDiN1bc+rqMg2FKnxAJCIvzDY3v?=
+ =?us-ascii?Q?NXSsfUvxOZyzlVmu++WLVtjLzfJu2MTZv2tIh05RCSymqA8KUYC61LMtGUwJ?=
+ =?us-ascii?Q?g/kwjxxdcYnpI0QQG8wqokAAYHFseUXwPiAeRHtCaF8SZrNmdVuIkftB8zx8?=
+ =?us-ascii?Q?B2+kl1C69SxRkzfoSQ1zTMgX4fOMbBErFT40GSeOMO8RUVmpvsR55cJLcvcv?=
+ =?us-ascii?Q?92w1jOMLIBoQIZZI1jKFmfEnRPSVN9DZmCt62F1k3OP/DIHWL0Bmy6K+7+50?=
+ =?us-ascii?Q?9hLLL1XejB/Ayimfq1uMXfE36o6T3oayS8Zc3gqL3h3jSxKFi3Dksf4CPU7M?=
+ =?us-ascii?Q?ZTzVRs/W6Y3mxwBDmqzW6qCwF7C4BmsdOpDzQmZq5Aell/iPsYSK/VNqgL6U?=
+ =?us-ascii?Q?M/pf+ZPeO63q/tSIfvctxMPS7LzJRcUzIM7xzXKsP/8wp90wJvrC4jP5S+vi?=
+ =?us-ascii?Q?oVl8Ole0HCzTWNHHXcKyNu0PouiprpRLDF02+eRe/n4lCXjCwOkiv1EuWsbC?=
+ =?us-ascii?Q?mnVtZ3pNsq97KQ+oBxA6c0/FY4qMxSdWE0ZFcubi4ZfudTC3YFaN2XdK2cq3?=
+ =?us-ascii?Q?R8IQfuv9CqGwzx1oQH9QplBpgBhmXrf7KW/imXnCmSlbe5eRqz77bexPb/VW?=
+ =?us-ascii?Q?+vdaq98M1/uqH8CSOJgrGgHrR+3x5SOEveIHyo9NbbKfz/Mw3fg7KHHg9BQN?=
+ =?us-ascii?Q?12qPfOjCN7Rr69KZEivBNxXEcW4oeY/3mMq6BUY1qFLzrUE12Crv17tQOwfs?=
+ =?us-ascii?Q?wiHJ2FRRXj54A1yt/XcP+IeYES/OFSzIm08jlKDjrO10XtoGv9ylJPy1vP0q?=
+ =?us-ascii?Q?JA9j3XFp5AYte38+nK6TWacy7kRgRQQOP7v9I09KZ6zv919Cdh3XQNKQQAkK?=
+ =?us-ascii?Q?rGm1s9ZmXX2qSTYOniIKERcmTjwk/q5Y/PA4jVOPWXfrbIv41o1p4oW0vj4Z?=
+ =?us-ascii?Q?e/5E+G+qinxX3Ie6aUzrZZj96TdDNN3cQmDqPgrjhxtbH/nwAT48kaDPD11E?=
+ =?us-ascii?Q?AJDveyMrIgVlBrxUvj9Io2kFLujdM2I19NkDkbjktTVhQrPNC4kSFopJgXNw?=
+ =?us-ascii?Q?tlUtwOyb0Pq3Y/f5dxRv3eBwc0CzaA+5WrEKhflZVQZduUz8RHw17fzRxlRZ?=
+ =?us-ascii?Q?15+f9ghZGbQMBpjScJB6PpHuQ5Zz5CQQHP0iSEdQh59YldEJIxrmyjkfCah6?=
+ =?us-ascii?Q?ZJeE4eETxO4m94rT5EjYgjLWXEwiAcdX0pcvgPy7Cm0qV3Ddxl5V3f/qPw3R?=
+ =?us-ascii?Q?1M8rIa2hXKgHkuUGQ9vQLwwLlHHU1LMuPbU/ZmUc1eX2EO17N//4Cv8iBP/X?=
+ =?us-ascii?Q?9sSYr08fcp+DyF4PqVmLYzE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/9RwpTx/TZjurmp4EB2a1cba";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: KL1P15301MB0343.APCP153.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8c9ad012-950b-4f70-ce43-08d9c37196d9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Dec 2021 04:31:27.6013
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0sh2to00FtKizG9M3WV4mgrdlyYR03Hrv2lDE/Y3U2AEkvNCf7bjrCEvCMN7jet6gis+u17nZs0NlGiy8IhJhA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2P153MB0128
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
---Sig_/9RwpTx/TZjurmp4EB2a1cba
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+
+-----Original Message-----
+From: Stephen Rothwell <sfr@canb.auug.org.au>=20
+Sent: Monday, December 20, 2021 5:16 AM
+To: David Howells <dhowells@redhat.com>
+Cc: broonie@kernel.org; Steve French <smfrench@gmail.com>; CIFS <linux-cifs=
+@vger.kernel.org>; Linux Kernel Mailing List <linux-kernel@vger.kernel.org>=
+; Linux Next Mailing List <linux-next@vger.kernel.org>; Shyam Prasad <Shyam=
+.Prasad@microsoft.com>; Steven French <Steven.French@microsoft.com>
+Subject: [EXTERNAL] Re: linux-next: manual merge of the cifs tree with the =
+fscache tree
 
 Hi all,
 
@@ -112,20 +188,14 @@ so this is now a conflict between the fscache tree and Linus's tree.
 Cheers,
 Stephen Rothwell
 
---Sig_/9RwpTx/TZjurmp4EB2a1cba
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
+> so this is now a conflict between the fscache tree and Linus's tree.
 
------BEGIN PGP SIGNATURE-----
+Hi David and Steve,
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmG/xEIACgkQAVBC80lX
-0Gz32Af+JYzcgRqXkzVcfP/tAeLSjgkA0q3fyqVZhXJOkyBzc2LTMi7AhEiDKCAJ
-S8Mm/Wa/N8ISV5c81wP5RJr5ClD1kcyHjo2bcD1q0dmEmTyume8YoXO/neVZjHdA
-ceRiAf3CEZnGgE05xWtaYcudBBveJ+8OuayLn4Be6ePRlbfNwPy8R2J4+QScxqMD
-5vO7SX0jTDErUS6ObY+yxhfC6ZEQoYg3Kh+b+ilyFyMqNqT9rz8Vvdg8iVGSLxiZ
-4RkqhSyz2LWnXwLu72OYMMhZ2c2tgBJQw3cZbkFSeAOPF2lW4qmDHNP6oanxdCjg
-AGW8iLnDlf4EHyZlX8Cjz1arF96ghA==
-=d0KT
------END PGP SIGNATURE-----
+I think one of these two branches need to be rebased. Can one of you please=
+ do it?
 
---Sig_/9RwpTx/TZjurmp4EB2a1cba--
+Regards,
+Shyam
