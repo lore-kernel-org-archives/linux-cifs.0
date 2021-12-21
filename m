@@ -2,96 +2,94 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42AEBC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 21 Dec 2021 11:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C40DDC433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Dec 2021 12:02:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237204AbhLULkA (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 21 Dec 2021 06:40:00 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:53772 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237206AbhLULj7 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Dec 2021 06:39:59 -0500
+        id S234147AbhLUMCS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 21 Dec 2021 07:02:18 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:49752 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230184AbhLUMCR (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 21 Dec 2021 07:02:17 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 38C4F6153C;
-        Tue, 21 Dec 2021 11:39:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97FABC36AF4;
-        Tue, 21 Dec 2021 11:39:58 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 93CC7B81677;
+        Tue, 21 Dec 2021 12:02:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 523AFC36AE2;
+        Tue, 21 Dec 2021 12:02:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640086798;
-        bh=FZveIUfSLfCEZ1y0HfpyCoozxsgZmMxrhPNBuggw9dc=;
+        s=k20201202; t=1640088135;
+        bh=/cDqb+k+/DozT6Zaq2smBv7oklT7ITD/1he8tAejXHU=;
         h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=YyaC04+iHm3HCJGC9E2C40+3bVu/qLLlAVy5b7+loiUEADd9jUwQU0LmJ48GBdpAG
-         gBNdD4v0wlsMufOeHD+LPNdN4Sau/5okchAnLgZuSADk0SXd8W9zV+fElH0yhJymz7
-         6vW6Q/MXj1r1FGIhctGFQv/gYpa26friD4MAkdwmBJgKMGO5kkjjyJBuTBGfU2p/+O
-         S8nhXBEVe7FZtbQVQZlNtebh4Xm5u6nSlaL10UUpYi3y13hsCqd2sTDPbIM7pAfspq
-         1JHl94PgI/IUGlTlca8QCAv7RstUxHcuwRsVqBbvH4mwUfUQcpYQuPieaJUYA8pjAD
-         dVsh0ULUW7s4A==
-Received: by mail-ot1-f53.google.com with SMTP id 35-20020a9d08a6000000b00579cd5e605eso16353021otf.0;
-        Tue, 21 Dec 2021 03:39:58 -0800 (PST)
-X-Gm-Message-State: AOAM533lRAWy3ATzxzyyKu0/4V/jcrFynG6QqRE4dh4T5A8HbMuIAivl
-        YbeAv5jDEHJeuzUbG/mP8PzYJD3kYVNAWnvohp4=
-X-Google-Smtp-Source: ABdhPJwcUhvpKWIr2DIfWcBlHa2apSuyJ0A17Xaah/Z1k9S/dtSf0z1WUHPmahfEPQDvYBZmR7Ln+0ZhtSPwCQXL3tE=
-X-Received: by 2002:a9d:43:: with SMTP id 61mr1855862ota.18.1640086797831;
- Tue, 21 Dec 2021 03:39:57 -0800 (PST)
+        b=kxEUMBDJN9PiErljpRu9UHqIy26sU0qz2KLdpcPaEVu5p8Z7pYltaY8OaHkZqbpI4
+         bEROfPQ9+RqceVywgW2Vl+JMSl6pMZAsXOaWenBLtQ4uLm+ASM/7GHZTdaeoOBS8uV
+         1Uy+iqoLfdHRWSD5jYBYSmXPRzuzBj43NNRSR0vp8fF71zHJpp8DzCnXb4XdrQQWQZ
+         ivtMiH7uSmQNqq7O4TpOhYBKD6BpyfgPqGKXPr5jz3pK2c8MnHN1w271MPd8pBvLCB
+         2ahS/GOcI/5WpQzYvhjtH9XDE9y+Js3tV+VGfprFadRA70Y4bQo4d9vpSZ7tn++TSt
+         qU1IZ3nuTy7MQ==
+Received: by mail-ot1-f43.google.com with SMTP id v15-20020a9d604f000000b0056cdb373b82so16359577otj.7;
+        Tue, 21 Dec 2021 04:02:15 -0800 (PST)
+X-Gm-Message-State: AOAM532EAOGewnYlXmhcA7KRxPNqP65+/xDZPQWN8/zVrkPUB/QElIPl
+        FXmOhWLlVobd5rPhG66YZ9rgXFOMgRgmr/XRfrM=
+X-Google-Smtp-Source: ABdhPJxmzJL5QI+4YZoyyFnJ8hnTCiG2Z8L/x7tzCSEyArXz+Ae7jrpcXn57GKSCloAVMTfjuVHEO5W5eVk3D7NSouc=
+X-Received: by 2002:a9d:6653:: with SMTP id q19mr1963162otm.116.1640088134567;
+ Tue, 21 Dec 2021 04:02:14 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:ac9:428a:0:0:0:0:0 with HTTP; Tue, 21 Dec 2021 03:39:57
+Received: by 2002:ac9:428a:0:0:0:0:0 with HTTP; Tue, 21 Dec 2021 04:02:14
  -0800 (PST)
-In-Reply-To: <20211221090714.122543-2-yang.lee@linux.alibaba.com>
-References: <20211221090714.122543-1-yang.lee@linux.alibaba.com> <20211221090714.122543-2-yang.lee@linux.alibaba.com>
+In-Reply-To: <e2aef4e7-a9b9-e44e-94a2-29ed6bc20091@virtuozzo.com>
+References: <e2aef4e7-a9b9-e44e-94a2-29ed6bc20091@virtuozzo.com>
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 21 Dec 2021 20:39:57 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_5M6Wajx2Zqv9vaAs1oRLO7YCv4iKxzoqpZ4UqVc+oPA@mail.gmail.com>
-Message-ID: <CAKYAXd_5M6Wajx2Zqv9vaAs1oRLO7YCv4iKxzoqpZ4UqVc+oPA@mail.gmail.com>
-Subject: Re: [PATCH -next 2/4] ksmbd: Fix smb2_set_info_file() kernel-doc comment
-To:     Yang Li <yang.lee@linux.alibaba.com>
-Cc:     senozhatsky@chromium.org, sfrench@samba.org, hyc.lee@gmail.com,
-        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Abaci Robot <abaci@linux.alibaba.com>
+Date:   Tue, 21 Dec 2021 21:02:14 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8pCfUBPRXT-44N_g2GD_BKtjboiepgTGz5DQ93YEiz-A@mail.gmail.com>
+Message-ID: <CAKYAXd8pCfUBPRXT-44N_g2GD_BKtjboiepgTGz5DQ93YEiz-A@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: use F_SETLK to force vfs_file_lock() to return asynchronously
+To:     Vasily Averin <vvs@virtuozzo.com>
+Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <sfrench@samba.org>,
+        Hyunchul Lee <hyc.lee@gmail.com>, kernel@openvz.org,
+        linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2021-12-21 18:07 GMT+09:00, Yang Li <yang.lee@linux.alibaba.com>:
-> Fix argument list that the kdoc format and script verified in
-> smb2_set_info_file().
+2021-12-19 18:34 GMT+09:00, Vasily Averin <vvs@virtuozzo.com>:
+> To avoid possible deadlock ksmbd should process locks asynchronously.
+> Callers expecting vfs_file_locks() to return asynchronously should only
+> use F_SETLK, not F_SETLKW.
+Should I check this patch instead of
+[PATCH] ksmbd: force "fail immediately" flag on fs with its own ->lock ?
+
 >
-> The warnings were found by running scripts/kernel-doc, which is
-> caused by using 'make W=1'.
-> fs/ksmbd/smb2pdu.c:5862: warning: Function parameter or member 'req' not
-> described in 'smb2_set_info_file'
-> fs/ksmbd/smb2pdu.c:5862: warning: Excess function parameter 'info_class'
-> description in 'smb2_set_info_file'
->
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Fixes: 9496e268e3af ("ksmbd: add request buffer validation in
-> smb2_set_info")
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+> Signed-off-by: Vasily Averin <vvs@virtuozzo.com>
 > ---
->  fs/ksmbd/smb2pdu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  fs/ksmbd/smb2pdu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
 > diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index ee2bcd02d0d7..2d55a186b825 100644
+> index 0c020deb76bb..34f333549767 100644
 > --- a/fs/ksmbd/smb2pdu.c
 > +++ b/fs/ksmbd/smb2pdu.c
-> @@ -5850,7 +5850,7 @@ static int set_file_mode_info(struct ksmbd_file *fp,
->   * smb2_set_info_file() - handler for smb2 set info command
->   * @work:	smb work containing set info command buffer
->   * @fp:		ksmbd_file pointer
-> - * @info_class:	smb2 set info class
-> + * @req:        request buffer validation
-I will directly update it to "request buffer pointer".
-
-About your 4 patches, Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-
-Thanks!
->   * @share:	ksmbd_share_config pointer
->   *
->   * Return:	0 on success, otherwise error
+> @@ -6646,13 +6646,13 @@ static int smb2_set_flock_flags(struct file_lock
+> *flock, int flags)
+>  	switch (flags) {
+>  	case SMB2_LOCKFLAG_SHARED:
+>  		ksmbd_debug(SMB, "received shared request\n");
+> -		cmd = F_SETLKW;
+> +		cmd = F_SETLK;
+>  		flock->fl_type = F_RDLCK;
+>  		flock->fl_flags |= FL_SLEEP;
+>  		break;
+>  	case SMB2_LOCKFLAG_EXCLUSIVE:
+>  		ksmbd_debug(SMB, "received exclusive request\n");
+> -		cmd = F_SETLKW;
+> +		cmd = F_SETLK;
+>  		flock->fl_type = F_WRLCK;
+>  		flock->fl_flags |= FL_SLEEP;
+>  		break;
 > --
-> 2.20.1.7.g153144c
+> 2.25.1
 >
 >
