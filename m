@@ -2,83 +2,87 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC53C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 20 Dec 2021 12:55:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4E0C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 21 Dec 2021 00:48:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230380AbhLTMzo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 20 Dec 2021 07:55:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59879 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230262AbhLTMzo (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Mon, 20 Dec 2021 07:55:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1640004943;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4Nx2DfSvlqgcOdRMIezU5EsxEs3lXx6qD/Th3FCB/qU=;
-        b=frtVV6kHBTjYwcZHJyCv0asxOR5DsqmXm449eDz/7X+ohCvAV3r85teeai+fCAuqooGrfh
-        ZtZhQsn0uXSEnzX/llRJQhUurWiVaI9F2nolzPRKYRFmnW4MztOj3gPr3mLvdX154+XeDq
-        eIYiQJQ4oWLKyh0/fHHDkWqIdA9WyM0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-10-Pa9M7hy4PemwqaYlX_bczA-1; Mon, 20 Dec 2021 07:55:42 -0500
-X-MC-Unique: Pa9M7hy4PemwqaYlX_bczA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED4F510168EA;
-        Mon, 20 Dec 2021 12:55:40 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.122])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 97D5A1059156;
-        Mon, 20 Dec 2021 12:55:39 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
-References: <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
-To:     Shyam Prasad N <nspmangalore@gmail.com>
-Cc:     dhowells@redhat.com, Steve French <smfrench@gmail.com>,
-        Paulo Alcantara <pc@cjr.nz>, CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH] cifs: invalidate dns resolver keys after use
+        id S231950AbhLUAsN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 20 Dec 2021 19:48:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57410 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231254AbhLUAsN (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 20 Dec 2021 19:48:13 -0500
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B15EC061574;
+        Mon, 20 Dec 2021 16:48:12 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id 185-20020a1c01c2000000b00345b7a50a7bso147232wmb.3;
+        Mon, 20 Dec 2021 16:48:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/kPfUDXgs/I5bXAuQrDJgSbN/QtfIuaiRvGXMYN9BHs=;
+        b=IpeqEo0vDIcG9LNaNsjUcUK7ecr2IjmvTO2xIbXXL831sIdXOxVN/8WNMb/n7zxcGJ
+         Nrd37AD61C8usPSfKUTs8xEj34IFZmzpecXKkdpckcd6Yf0eDY6I8KZdxFIiSwmmQVbO
+         moV/ISXcMG6kTovU3g70EjodnfJnKUZmRcUHEKXjX1a0znO96BL5zmaTvWGU/9wVBDvb
+         jzzcIzZ2f76f+blbfe1X22GF5noBUmsVa2us3I4wHoJ6WA0P1Gu8ta20lt2CFncYAycD
+         JualuUSkJK35OuvJI8lTcCSEi8XLq2FnTUYL+ULs8x5TIg6OE75P4konL26HRZen+6nJ
+         CNoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/kPfUDXgs/I5bXAuQrDJgSbN/QtfIuaiRvGXMYN9BHs=;
+        b=jwgghIK69XD2BbKNrWKy4QEzb3mywahoOwuL74fPJyrQi3rEgtUmM4qL76XpfWWR6a
+         NagI2HLSlG5zzh5QN/geJX36krzFCt+S1ZlG9O10+PaLD4bOm3nksOt7P9p6imcgKFs1
+         ycK9REKB1weacNQzH/IEucvaA7CT6DfDwNvYT94acAiBJUICwL0iNWwDtyZDG2t5oZLl
+         aR+yl9o34zNcarOk9M5wKTxV5+xwErJYiq1+P0WUnzAKQMzf1NRufnIvfvfuAAaokGia
+         fJqYaIcklulsdU1T5ke1KJ2rUcc5g/Ps8yeW+CiWD+RasSqwTlH9W9hCc36IzQeUnxya
+         TKuw==
+X-Gm-Message-State: AOAM530yn8GcLKgPDbuzTkWf48DMeUGsXfJ9zeIVOxGmxWIx5thOrqn7
+        V2rfdGBGPUBpWvGig1IF/ok=
+X-Google-Smtp-Source: ABdhPJyXDI1q8mxV7GeqUWqzghf86fbpn8/L62NzGAUcAcp5DO7GgyRsexOq1rSdZcn1uo0X8y2PiQ==
+X-Received: by 2002:a05:600c:33a5:: with SMTP id o37mr418327wmp.83.1640047690903;
+        Mon, 20 Dec 2021 16:48:10 -0800 (PST)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id f18sm16498263wre.7.2021.12.20.16.48.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Dec 2021 16:48:10 -0800 (PST)
+From:   Colin Ian King <colin.i.king@gmail.com>
+To:     Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
+        samba-technical@lists.samba.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: remove redundant assignment to pointer p
+Date:   Tue, 21 Dec 2021 00:48:09 +0000
+Message-Id: <20211221004809.213602-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2353799.1640004938.1@warthog.procyon.org.uk>
-Date:   Mon, 20 Dec 2021 12:55:38 +0000
-Message-ID: <2353800.1640004938@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Shyam Prasad N <nspmangalore@gmail.com> wrote:
+The pointer p is being assigned with a value that is never read. The
+pointer is being re-assigned a different value inside the do-while
+loop. The assignment is redundant and can be removed.
 
-> From 604ab4c350c2552daa8e77f861a54032b49bc706 Mon Sep 17 00:00:00 2001
-> From: Shyam Prasad N <sprasad@microsoft.com>
-> Date: Sat, 18 Dec 2021 17:28:10 +0000
-> Subject: [PATCH] cifs: invalidate dns resolver keys after use
-> 
-> We rely on dns resolver module to upcall to userspace
-> using request_key and get us the DNS mapping.
-> However, the invalidate arg for dns_query was set
-> to false, which meant that the key created during the
-> first call for a hostname would continue to be cached
-> till it expires. This expiration period depends on
-> how the dns_resolver is configured.
-> 
-> Fixing this by setting invalidate=true during dns_query.
-> This means that the key will be cleaned up by dns_resolver
-> soon after it returns the data. This also means that
-> the dns_resolver subsystem will not cache the key for
-> an interval indicated by the DNS records TTL. But this is
-> okay since we use the TTL value returned to schedule the
-> next lookup.
-> 
-> Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ fs/cifs/cifsfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Acked-by: David Howells <dhowells@redhat.com>
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index d3f3acf340f1..61091eed8c65 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -775,7 +775,7 @@ cifs_get_root(struct smb3_fs_context *ctx, struct super_block *sb)
+ 
+ 	sep = CIFS_DIR_SEP(cifs_sb);
+ 	dentry = dget(sb->s_root);
+-	p = s = full_path;
++	s = full_path;
+ 
+ 	do {
+ 		struct inode *dir = d_inode(dentry);
+-- 
+2.32.0
 
