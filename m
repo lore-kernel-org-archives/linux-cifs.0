@@ -2,117 +2,203 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F3DDC433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 22 Dec 2021 16:04:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C65C433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 22 Dec 2021 22:43:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232013AbhLVQEy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 22 Dec 2021 11:04:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55642 "EHLO
+        id S236620AbhLVWnm (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 22 Dec 2021 17:43:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241680AbhLVQEp (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Dec 2021 11:04:45 -0500
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48E47C061574
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Dec 2021 08:04:45 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id m2so1109362qkd.8
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Dec 2021 08:04:45 -0800 (PST)
+        with ESMTP id S229665AbhLVWnl (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 22 Dec 2021 17:43:41 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B4FFC061574
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Dec 2021 14:43:41 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id a23so3263917pgm.4
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Dec 2021 14:43:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=vIG2t5+LtGXZOPLhVlhtsrjR+79QaX0lEIveEZrE/2I=;
-        b=iLNjWPcYRc9cg9frCns2r1QE5HFv2HGr6nN5Tt/zx6KpJbYhqb4xds3KqwwfEYgsUK
-         Sh+gRYOKGtDDj6BfoHzYwhb4+JHv4gWyTm5Kn5122PXdIJAPzU4EWr7nX1Km8krSBDkT
-         umfoBcIe2gA+yakDxTqLhEE1T1hHYxqfrYbqBRwhmng9IU53kxf7UFXCdgRl/VbN/JW3
-         5dF4G51Bf2uK8qdbt3Y8htrDR7SXK9J9INXB0qHDuaEVjyUi1/lX3g3Ue0NRDIoTtayp
-         P1rMMPQU9YHSLnU2r6uJ8ALaHefxjYyKWSwltT4bFkWBhELAv5cLIwSkYABs/TlooyhJ
-         2n0A==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dOYUsd6iLHCd+rD7aWETdKghCzhsytnkU82xT7soRwQ=;
+        b=gpKKag8rHAgdBzL36ELYaFoAjHECxu8IvHfBuhTjfN8U3SmPDohx8ynokiUMbauhvr
+         tSQSZHlJfAWxZkZZ0wRHU8bG4XLozFu6Psryk1xth+OUjIDjX2BkyLz8gYGSWdrbmgeD
+         cHznVPS+VVlsum6TSqsCGlIyobdPIZPhQd6PHeRhA9CtSy78xHc0CXgR0uo/pa8SaWZM
+         5PcUUAc4+AqCNlbgCbE34MJ49Hfo2J7OpGaT6iywaZQK2rQlB69FxJ07MFCBSwMfVETg
+         zxQ5g72BktxXP/NmIlnyrzyMXFsYj+I/oNfudg1Jp4FRY/jyLWWw3SMmiVQZsLDaWz7e
+         0Lsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=vIG2t5+LtGXZOPLhVlhtsrjR+79QaX0lEIveEZrE/2I=;
-        b=463rzg/NZ7leusWFANHY1GesmQs7xo880HuivJ2oRT0a7VWtj56387+L1JyZyct5gV
-         C59QIXJK8J1YYwG2StS/ybb+WvK5KD8ctMffrp2N1lMROVlDrqHg/xOHm+QCPYmlmGIy
-         ClG1NvLsTbMhNEZeB5tDgkGieOkOAA/s0qak4IL9IlYv3bHrIggHuNFHmHI7DvtOdm5p
-         Lz0B3LE+81apmpLoOXWWz7TiXdDZH34qm30wXvMvqVy8H1vtfruebGkD77//otjKvX4o
-         juKg+KmgTqNHeOX+uGrc1B7DKqjq88Yy+IyRxy2SnQRjPjWsmFaWtXsVCsVdOKZygkx5
-         0YdQ==
-X-Gm-Message-State: AOAM531FPbYcUjIr73qTmP2H35M+TqrIzvRmSVntAfzmPsaD7Gyv0DIj
-        tKdOw89f7r4N5xJZOYj452UORBOajQk=
-X-Google-Smtp-Source: ABdhPJwdi5DHcWOVRde2QfudgL+W4Pgpq2fODT5OSt594N/N6jtYp2wltTArPa+PZ7WF/4zGDAGUCg==
-X-Received: by 2002:a37:752:: with SMTP id 79mr1473190qkh.98.1640189084376;
-        Wed, 22 Dec 2021 08:04:44 -0800 (PST)
-Received: from pascal.home.bair.one (2603-7000-0d07-ad00-0000-0000-0000-081b.res6.spectrum.com. [2603:7000:d07:ad00::81b])
-        by smtp.googlemail.com with ESMTPSA id d17sm1909361qtx.96.2021.12.22.08.04.43
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=dOYUsd6iLHCd+rD7aWETdKghCzhsytnkU82xT7soRwQ=;
+        b=3N4jdPd2ozP01pyLZdLGqvpM34Ih0UqEBbnljYAs/LATdisA8wrmX9rmvhoHriJ+wN
+         RKzZR4KKAd4GPFOjtzSZwI2yDRGb6SMNaWGpCeqsKwY3F1Xn4C3Y8ODagbbve/hba32J
+         lLpaXYR/2VnhDzeDcDDr3fJlI+d6ksnvlD6ki8MEozagRaZi2FcPH816nfn0PlfAi3t0
+         EZlVgsGrhQ+9sUwMEOuNlWLKdamSqPOfdFfx4n7IO1ruyzjeb88iwrBDgjmqgwhdaFFr
+         IrXIOOc+AMGMSruj1aeVi46kGdiG0cYqIjRGhtVouFpyNwKca+nAj3NwJcLDNJ7NCo9c
+         eczg==
+X-Gm-Message-State: AOAM533MfEDSTPiDmQ+j0vwKQjkMx3lgeOPGJHW12IjANelYmfz2PdMM
+        EaHtZma6ICdNIJJi6VONoyyVXHIFmVo=
+X-Google-Smtp-Source: ABdhPJwOj+BRT/Ke74J0WV+zgr5eEENV48JjT0N3njrguAbuVv7qhUu5QkNsYF0u10mJJPhRIMSKJg==
+X-Received: by 2002:a63:2:: with SMTP id 2mr4380481pga.285.1640213020285;
+        Wed, 22 Dec 2021 14:43:40 -0800 (PST)
+Received: from localhost.localdomain ([125.177.232.58])
+        by smtp.googlemail.com with ESMTPSA id w5sm3258201pjq.16.2021.12.22.14.43.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Dec 2021 08:04:44 -0800 (PST)
-From:   Ryan Bair <ryandbair@gmail.com>
+        Wed, 22 Dec 2021 14:43:40 -0800 (PST)
+From:   Hyunchul Lee <hyc.lee@gmail.com>
 To:     linux-cifs@vger.kernel.org
-Cc:     Ryan Bair <ryandbair@gmail.com>
-Subject: [PATCH] cifs: fix workstation_name for multiuser mounts
-Date:   Wed, 22 Dec 2021 11:04:05 -0500
-Message-Id: <20211222160405.3174438-2-ryandbair@gmail.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211222160405.3174438-1-ryandbair@gmail.com>
-References: <20211222160405.3174438-1-ryandbair@gmail.com>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>
+Subject: [PATCH] ksmbd: set the rdma capability of network adapter using ib_client
+Date:   Thu, 23 Dec 2021 07:43:06 +0900
+Message-Id: <20211222224306.198076-1-hyc.lee@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Set workstation_name from the master_tcon for multiuser mounts.
+Set the rdma capability using ib_clien, Because
+For some devices, ib_device_get_by_netdev() returns NULL.
 
-Just in case, protect size_of_ntlmssp_blob against a NULL workstation_name.
-
-Signed-off-by: Ryan Bair <ryandbair@gmail.com>
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
 ---
- fs/cifs/connect.c | 13 +++++++++++++
- fs/cifs/sess.c    |  6 +++++-
- 2 files changed, 18 insertions(+), 1 deletion(-)
+ fs/ksmbd/transport_rdma.c | 89 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 83 insertions(+), 6 deletions(-)
 
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index 1060164b984a..cefd0e9623ba 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -1945,6 +1945,19 @@ cifs_set_cifscreds(struct smb3_fs_context *ctx, struct cifs_ses *ses)
- 		}
- 	}
+diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
+index 7e57cbb0bb35..0820c6a9d75e 100644
+--- a/fs/ksmbd/transport_rdma.c
++++ b/fs/ksmbd/transport_rdma.c
+@@ -79,6 +79,14 @@ static int smb_direct_max_read_write_size = 1024 * 1024;
  
-+	ctx->workstation_name = kstrdup(ses->workstation_name, GFP_KERNEL);
-+	if (!ctx->workstation_name) {
-+		cifs_dbg(FYI, "Unable to allocate memory for workstation_name\n");
-+		rc = -ENOMEM;
-+		kfree(ctx->username);
-+		ctx->username = NULL;
-+		kfree_sensitive(ctx->password);
-+		ctx->password = NULL;
-+		kfree(ctx->domainname);
-+		ctx->domainname = NULL;
-+		goto out_key_put;
+ static int smb_direct_max_outstanding_rw_ops = 8;
+ 
++static LIST_HEAD(smb_direct_device_list);
++static DEFINE_RWLOCK(smb_direct_device_lock);
++
++struct smb_direct_device {
++	struct ib_device	*ib_dev;
++	struct list_head	list;
++};
++
+ static struct smb_direct_listener {
+ 	struct rdma_cm_id	*cm_id;
+ } smb_direct_listener;
+@@ -2007,12 +2015,62 @@ static int smb_direct_listen(int port)
+ 	return ret;
+ }
+ 
++static int smb_direct_ib_client_add(struct ib_device *ib_dev)
++{
++	struct smb_direct_device *smb_dev;
++
++	if (!ib_dev->ops.get_netdev ||
++	    ib_dev->node_type != RDMA_NODE_IB_CA ||
++	    !rdma_frwr_is_supported(&ib_dev->attrs))
++		return 0;
++
++	smb_dev = kzalloc(sizeof(*smb_dev), GFP_KERNEL);
++	if (!smb_dev)
++		return -ENOMEM;
++	smb_dev->ib_dev = ib_dev;
++
++	write_lock(&smb_direct_device_lock);
++	list_add(&smb_dev->list, &smb_direct_device_list);
++	write_unlock(&smb_direct_device_lock);
++
++	ksmbd_debug(RDMA, "ib device added: name %s\n", ib_dev->name);
++	return 0;
++}
++
++static void smb_direct_ib_client_remove(struct ib_device *ib_dev,
++					void *client_data)
++{
++	struct smb_direct_device *smb_dev, *tmp;
++
++	write_lock(&smb_direct_device_lock);
++	list_for_each_entry_safe(smb_dev, tmp, &smb_direct_device_list, list) {
++		if (smb_dev->ib_dev == ib_dev) {
++			list_del(&smb_dev->list);
++			kfree(smb_dev);
++			break;
++		}
++	}
++	write_unlock(&smb_direct_device_lock);
++}
++
++static struct ib_client smb_direct_ib_client = {
++	.name	= "ksmbd_smb_direct_ib",
++};
++
+ int ksmbd_rdma_init(void)
+ {
+ 	int ret;
+ 
+ 	smb_direct_listener.cm_id = NULL;
+ 
++	smb_direct_ib_client.add = smb_direct_ib_client_add;
++	smb_direct_ib_client.remove = smb_direct_ib_client_remove;
++	ret = ib_register_client(&smb_direct_ib_client);
++	if (ret) {
++		pr_err("failed to ib_register_client\n");
++		return ret;
 +	}
 +
- out_key_put:
- 	up_read(&key->sem);
- 	key_put(key);
-diff --git a/fs/cifs/sess.c b/fs/cifs/sess.c
-index 035dc3e245dc..42133939f35d 100644
---- a/fs/cifs/sess.c
-+++ b/fs/cifs/sess.c
-@@ -675,7 +675,11 @@ static int size_of_ntlmssp_blob(struct cifs_ses *ses, int base_size)
- 	else
- 		sz += sizeof(__le16);
- 
--	sz += sizeof(__le16) * strnlen(ses->workstation_name, CIFS_MAX_WORKSTATION_LEN);
-+	if (ses->workstation_name)
-+		sz += sizeof(__le16) * strnlen(ses->workstation_name,
-+			CIFS_MAX_WORKSTATION_LEN);
-+	else
-+		sz += sizeof(__le16);
- 
- 	return sz;
+ 	/* When a client is running out of send credits, the credits are
+ 	 * granted by the server's sending a packet using this queue.
+ 	 * This avoids the situation that a clients cannot send packets
+@@ -2046,20 +2104,39 @@ int ksmbd_rdma_destroy(void)
+ 		destroy_workqueue(smb_direct_wq);
+ 		smb_direct_wq = NULL;
+ 	}
++
++	if (smb_direct_ib_client.add)
++		ib_unregister_client(&smb_direct_ib_client);
++	smb_direct_ib_client.add = NULL;
+ 	return 0;
  }
+ 
+ bool ksmbd_rdma_capable_netdev(struct net_device *netdev)
+ {
+-	struct ib_device *ibdev;
++	struct smb_direct_device *smb_dev;
++	int i;
+ 	bool rdma_capable = false;
+ 
+-	ibdev = ib_device_get_by_netdev(netdev, RDMA_DRIVER_UNKNOWN);
+-	if (ibdev) {
+-		if (rdma_frwr_is_supported(&ibdev->attrs))
+-			rdma_capable = true;
+-		ib_device_put(ibdev);
++	read_lock(&smb_direct_device_lock);
++	list_for_each_entry(smb_dev, &smb_direct_device_list, list) {
++		for (i = 0; i < smb_dev->ib_dev->phys_port_cnt; i++) {
++			struct net_device *ndev;
++
++			ndev = smb_dev->ib_dev->ops.get_netdev(smb_dev->ib_dev,
++							       i + 1);
++			if (!ndev)
++				continue;
++
++			if (ndev == netdev) {
++				dev_put(ndev);
++				rdma_capable = true;
++				goto out;
++			}
++			dev_put(ndev);
++		}
+ 	}
++out:
++	read_unlock(&smb_direct_device_lock);
+ 	return rdma_capable;
+ }
+ 
 -- 
-2.33.1
+2.25.1
 
