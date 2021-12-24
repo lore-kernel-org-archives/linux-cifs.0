@@ -2,76 +2,97 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA3CC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 23 Dec 2021 20:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 366C4C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Dec 2021 00:46:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245098AbhLWUdc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 23 Dec 2021 15:33:32 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:58692 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245049AbhLWUdb (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Dec 2021 15:33:31 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id CDC74210FC;
-        Thu, 23 Dec 2021 20:33:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1640291610; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iX1sJKmPUmgZodiyG/FL0wXuEw06S9GFb0HmfJ2z/QM=;
-        b=SZkOKcg1jMJ6itDAFyqpXL0L3DTyeJeBKoH3OkfRg0Fe9RQattvjHE0Hy90bEv6rXQocyV
-        ICW60V2vTie0pqVRz/X3yjA57sNDuWuDy4ByhuGxVylUZ8uLstp5m/Ra+WbNg/43AJyF7a
-        NBbjj5aZF18+5mEcQshT+fvP0SlFTLA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1640291610;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iX1sJKmPUmgZodiyG/FL0wXuEw06S9GFb0HmfJ2z/QM=;
-        b=dlryhZIdC5RPyMKAlXt+KvMd0goSfvj7CJ5/rK0cGyy56Bub8DYlU82cdQ+lqV6Ra5oWir
-        DMgkCoaQeB9o97Cg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4D25613C84;
-        Thu, 23 Dec 2021 20:33:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id dGAPBBrdxGHqcwAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Thu, 23 Dec 2021 20:33:30 +0000
-Date:   Thu, 23 Dec 2021 17:33:27 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@cjr.nz>,
-        CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH] cifs: invalidate dns resolver keys after use
-Message-ID: <20211223203327.mvzmj3mtlpke3wxn@cyberdelia>
-References: <CANT5p=rE+Yr_xybEQ7T+guZXTt4Ddyx0ekhd-t2r89R5Ob5QNA@mail.gmail.com>
- <CANT5p=rxedYesnqitKypJ3X9YU6eANo4zSDid_aKjk7EBCDStg@mail.gmail.com>
- <20211219222214.zetr4d26qqumqgub@cyberdelia>
- <674860.1640248947@warthog.procyon.org.uk>
+        id S241066AbhLXAqG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 23 Dec 2021 19:46:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41314 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229995AbhLXAqG (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Dec 2021 19:46:06 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85EEC061401;
+        Thu, 23 Dec 2021 16:46:05 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id r22so11491274ljk.11;
+        Thu, 23 Dec 2021 16:46:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=Y7lGzIGJA/SrDoJPFHjLxzVUJb2W2HU99JuGJnsMimY=;
+        b=bgsoOT2XqcPymxvpF+nTHe884XwvaE0m5QI6NmfCXH6chURLow0flQwGwuwpEDuNV6
+         uHEfrZa8eM5JupXl2FiHzxMX+s8gn1yUaKXbtchjYJK1QwIpBKdVQULm3dOedNa4Fnj0
+         i+NaN0pQv0hNk+4Fv+SQ+59uJNzwxkjfBw1VzgHXyTGUut8A7uPLeQZhopoOgmFbsGgu
+         7sjADfvZzBWCsNIeZOeF8kKWtvJz59Z3AKF6MYzMb7+jsZaPYML93HLPgJm7XXESRpjv
+         7WB5PAUoOgf2p52yh/wSRXsPcI6X9FaSLdI6nSJFcLAVjNTJWwD8mFGK0zrxP/jnSU3j
+         Z7NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=Y7lGzIGJA/SrDoJPFHjLxzVUJb2W2HU99JuGJnsMimY=;
+        b=dWkHvafPSlWpr+ffse3mLLFfzXmvU5UMkfM//xiEQsiz7LxF+VwmMewao/vqlJFVtd
+         415kQd8u8Nq/Ft/AI5QRxwXHo0tJ52BwhBh5iDhVECHUP6A2mhm1V9R9ytZAG3jGnGPt
+         uviF7F8YsbiuqiIoeIqZw6EyV6FJFLUSZBZ1BBeAd2oFOrmKgQhEUiwcoKVddbD9wzck
+         Z4sDelEsWclbu3lqFYQGVOt98cOfWPwDS+6rvDEKC/5RF/Hjk3Lu/Z4RjVQbHu4OQWp4
+         YAK8WcDOX7vXP0U0pjHUa8CaGtc+lLZHrv28DD0RcyLIY9R7kD3+XtHa3HU3r5S+rMwg
+         iZGw==
+X-Gm-Message-State: AOAM5302mzg3a8KyW3qCn3CI9wKaiEUK+YTeUDHWDk6wFjMTZ3ZW4cmO
+        8vE5MS2zBypkMkgTeK3rZyTCElMvsBH2OL3GQcTWFLQWLpU=
+X-Google-Smtp-Source: ABdhPJw8/MHMppQt0xYdXEcxyoLc8i4TYiwKCOxkwpO6+YVMLSojUAqW6PbxLziLZZTkfjT/vrk+wt9yUrrywkgiExU=
+X-Received: by 2002:a2e:2a46:: with SMTP id q67mr3107394ljq.398.1640306763699;
+ Thu, 23 Dec 2021 16:46:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <674860.1640248947@warthog.procyon.org.uk>
+From:   Steve French <smfrench@gmail.com>
+Date:   Thu, 23 Dec 2021 18:45:52 -0600
+Message-ID: <CAH2r5mvWBb7-Br3fz-Y6Jn4d3vQL_OEpRcnR_AjqEpSmNwxHtQ@mail.gmail.com>
+Subject: [GIT PULL] ksmbd fixes
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 12/23, David Howells wrote:
->Shyam Prasad N <nspmangalore@gmail.com> wrote:
->
->> Having such an option is useful. Although, getting the right TTL is
->> important.
->
->That is the real trick as the libc interface you're supposed to use these days
->doesn't give you that information - and, indeed, might draw from a source that
->doesn't have such information.
+Please pull the following changes since commit
+2585cf9dfaaddf00b069673f27bb3f8530e2039c:
 
-I'm not sure I understand. I'm using res_nquery() on my to-be-proposed
-patch and it works fine.
+  Linux 5.16-rc5 (2021-12-12 14:53:01 -0800)
+
+are available in the Git repository at:
+
+  git://git.samba.org/ksmbd.git tags/5.16-rc5-ksmbd-fixes
+
+for you to fetch changes up to 83912d6d55be10d65b5268d1871168b9ebe1ec4b:
+
+  ksmbd: disable SMB2_GLOBAL_CAP_ENCRYPTION for SMB 3.1.1 (2021-12-17
+19:19:45 -0600)
+
+----------------------------------------------------------------
+Three ksmbd fixes, all for stable.
+- Two fix potential uninitialized memory
+- One fixes a security problem where encryption ends up
+unintentionally disabled from some clients
+
+Regression test results:
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/97
+----------------------------------------------------------------
+Dan Carpenter (1):
+      ksmbd: fix error code in ndr_read_int32()
+
+Marcos Del Sol Vives (1):
+      ksmbd: disable SMB2_GLOBAL_CAP_ENCRYPTION for SMB 3.1.1
+
+Namjae Jeon (1):
+      ksmbd: fix uninitialized symbol 'pntsd_size'
+
+ fs/ksmbd/ndr.c     |  2 +-
+ fs/ksmbd/smb2ops.c |  3 ---
+ fs/ksmbd/smb2pdu.c | 29 +++++++++++++++++++++++++----
+ 3 files changed, 26 insertions(+), 8 deletions(-)
+
+-- 
+Thanks,
+
+Steve
