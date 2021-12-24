@@ -2,97 +2,66 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 366C4C433EF
-	for <linux-cifs@archiver.kernel.org>; Fri, 24 Dec 2021 00:46:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9224C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 24 Dec 2021 01:22:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241066AbhLXAqG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 23 Dec 2021 19:46:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41314 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229995AbhLXAqG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Dec 2021 19:46:06 -0500
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85EEC061401;
-        Thu, 23 Dec 2021 16:46:05 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id r22so11491274ljk.11;
-        Thu, 23 Dec 2021 16:46:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=Y7lGzIGJA/SrDoJPFHjLxzVUJb2W2HU99JuGJnsMimY=;
-        b=bgsoOT2XqcPymxvpF+nTHe884XwvaE0m5QI6NmfCXH6chURLow0flQwGwuwpEDuNV6
-         uHEfrZa8eM5JupXl2FiHzxMX+s8gn1yUaKXbtchjYJK1QwIpBKdVQULm3dOedNa4Fnj0
-         i+NaN0pQv0hNk+4Fv+SQ+59uJNzwxkjfBw1VzgHXyTGUut8A7uPLeQZhopoOgmFbsGgu
-         7sjADfvZzBWCsNIeZOeF8kKWtvJz59Z3AKF6MYzMb7+jsZaPYML93HLPgJm7XXESRpjv
-         7WB5PAUoOgf2p52yh/wSRXsPcI6X9FaSLdI6nSJFcLAVjNTJWwD8mFGK0zrxP/jnSU3j
-         Z7NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=Y7lGzIGJA/SrDoJPFHjLxzVUJb2W2HU99JuGJnsMimY=;
-        b=dWkHvafPSlWpr+ffse3mLLFfzXmvU5UMkfM//xiEQsiz7LxF+VwmMewao/vqlJFVtd
-         415kQd8u8Nq/Ft/AI5QRxwXHo0tJ52BwhBh5iDhVECHUP6A2mhm1V9R9ytZAG3jGnGPt
-         uviF7F8YsbiuqiIoeIqZw6EyV6FJFLUSZBZ1BBeAd2oFOrmKgQhEUiwcoKVddbD9wzck
-         Z4sDelEsWclbu3lqFYQGVOt98cOfWPwDS+6rvDEKC/5RF/Hjk3Lu/Z4RjVQbHu4OQWp4
-         YAK8WcDOX7vXP0U0pjHUa8CaGtc+lLZHrv28DD0RcyLIY9R7kD3+XtHa3HU3r5S+rMwg
-         iZGw==
-X-Gm-Message-State: AOAM5302mzg3a8KyW3qCn3CI9wKaiEUK+YTeUDHWDk6wFjMTZ3ZW4cmO
-        8vE5MS2zBypkMkgTeK3rZyTCElMvsBH2OL3GQcTWFLQWLpU=
-X-Google-Smtp-Source: ABdhPJw8/MHMppQt0xYdXEcxyoLc8i4TYiwKCOxkwpO6+YVMLSojUAqW6PbxLziLZZTkfjT/vrk+wt9yUrrywkgiExU=
-X-Received: by 2002:a2e:2a46:: with SMTP id q67mr3107394ljq.398.1640306763699;
- Thu, 23 Dec 2021 16:46:03 -0800 (PST)
-MIME-Version: 1.0
-From:   Steve French <smfrench@gmail.com>
-Date:   Thu, 23 Dec 2021 18:45:52 -0600
-Message-ID: <CAH2r5mvWBb7-Br3fz-Y6Jn4d3vQL_OEpRcnR_AjqEpSmNwxHtQ@mail.gmail.com>
-Subject: [GIT PULL] ksmbd fixes
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        id S240550AbhLXBWP (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 23 Dec 2021 20:22:15 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:51402 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235793AbhLXBWP (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 23 Dec 2021 20:22:15 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BBD42B8224F;
+        Fri, 24 Dec 2021 01:22:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 84C61C36AE5;
+        Fri, 24 Dec 2021 01:22:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1640308932;
+        bh=xm3Vj5goYYccdBozB75K4lm+Ob70Qf5rWD1y8iszGTA=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=fkcIRHrehLGlba9A9O7TSD3Y2NA9eB2DK5veNYG3S6cDijQoh4pVdZCvd7ntzSJtn
+         ekTI3tY8F0LN+ZGWzFICozyAPqJ1hW0L0VKQVu4PH0HMy5kv5scMiq5s14KIVAMMKd
+         fdhQF/yODOSnHS9a6JTuYu+N3Q4zLB2FveUlgnAM9ryw3c4HNKiMbxkTaon81L92pI
+         6HajZPUAJSfcVu+a+c/DP3UAP6EBN4Lhb6HPeotMznuRb4lLGsodRbtNDb8gSxJfDC
+         CumC/Nwq93x+2G1nn6+xhinznadJZOMT7j1RRiJqN7dNH4M8GVyWcbW2LsrNOXTWWG
+         XuxYEQ8BKibkQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 60B91EAC06C;
+        Fri, 24 Dec 2021 01:22:12 +0000 (UTC)
+Subject: Re: [GIT PULL] ksmbd fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <CAH2r5mvWBb7-Br3fz-Y6Jn4d3vQL_OEpRcnR_AjqEpSmNwxHtQ@mail.gmail.com>
+References: <CAH2r5mvWBb7-Br3fz-Y6Jn4d3vQL_OEpRcnR_AjqEpSmNwxHtQ@mail.gmail.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <CAH2r5mvWBb7-Br3fz-Y6Jn4d3vQL_OEpRcnR_AjqEpSmNwxHtQ@mail.gmail.com>
+X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/5.16-rc5-ksmbd-fixes
+X-PR-Tracked-Commit-Id: 83912d6d55be10d65b5268d1871168b9ebe1ec4b
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 7a29b11da9651ef6a970e2f6bfd276f053aeb06a
+Message-Id: <164030893232.23059.557863938742866724.pr-tracker-bot@kernel.org>
+Date:   Fri, 24 Dec 2021 01:22:12 +0000
+To:     Steve French <smfrench@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Namjae Jeon <linkinjeon@kernel.org>,
         CIFS <linux-cifs@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Please pull the following changes since commit
-2585cf9dfaaddf00b069673f27bb3f8530e2039c:
+The pull request you sent on Thu, 23 Dec 2021 18:45:52 -0600:
 
-  Linux 5.16-rc5 (2021-12-12 14:53:01 -0800)
+> git://git.samba.org/ksmbd.git tags/5.16-rc5-ksmbd-fixes
 
-are available in the Git repository at:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/7a29b11da9651ef6a970e2f6bfd276f053aeb06a
 
-  git://git.samba.org/ksmbd.git tags/5.16-rc5-ksmbd-fixes
-
-for you to fetch changes up to 83912d6d55be10d65b5268d1871168b9ebe1ec4b:
-
-  ksmbd: disable SMB2_GLOBAL_CAP_ENCRYPTION for SMB 3.1.1 (2021-12-17
-19:19:45 -0600)
-
-----------------------------------------------------------------
-Three ksmbd fixes, all for stable.
-- Two fix potential uninitialized memory
-- One fixes a security problem where encryption ends up
-unintentionally disabled from some clients
-
-Regression test results:
-http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/8/builds/97
-----------------------------------------------------------------
-Dan Carpenter (1):
-      ksmbd: fix error code in ndr_read_int32()
-
-Marcos Del Sol Vives (1):
-      ksmbd: disable SMB2_GLOBAL_CAP_ENCRYPTION for SMB 3.1.1
-
-Namjae Jeon (1):
-      ksmbd: fix uninitialized symbol 'pntsd_size'
-
- fs/ksmbd/ndr.c     |  2 +-
- fs/ksmbd/smb2ops.c |  3 ---
- fs/ksmbd/smb2pdu.c | 29 +++++++++++++++++++++++++----
- 3 files changed, 26 insertions(+), 8 deletions(-)
+Thank you!
 
 -- 
-Thanks,
-
-Steve
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
