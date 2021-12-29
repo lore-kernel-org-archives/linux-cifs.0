@@ -2,229 +2,129 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F72C433F5
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Dec 2021 14:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E6EAC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Dec 2021 14:15:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240156AbhL2OPG (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Dec 2021 09:15:06 -0500
-Received: from mail-pj1-f47.google.com ([209.85.216.47]:43561 "EHLO
-        mail-pj1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240165AbhL2OPG (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Dec 2021 09:15:06 -0500
-Received: by mail-pj1-f47.google.com with SMTP id a11-20020a17090a854b00b001b11aae38d6so20049927pjw.2
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Dec 2021 06:15:06 -0800 (PST)
+        id S240163AbhL2OPI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Dec 2021 09:15:08 -0500
+Received: from mail-pj1-f41.google.com ([209.85.216.41]:33546 "EHLO
+        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233713AbhL2OPI (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Dec 2021 09:15:08 -0500
+Received: by mail-pj1-f41.google.com with SMTP id g11-20020a17090a7d0b00b001b2c12c7273so37917pjl.0
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Dec 2021 06:15:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=tC5lvHndYuwvIwdteYCb2Dn5pmmwb+ST8/R9rP/9B+Q=;
-        b=mh3NnuNAlV5tiOoRzH9JGDwmI0buKXM/DBRAbhlmkt6iUd7G4XWK60kRa/8Bw+xV//
-         POxgWF84iuSsuQwYPgxa2wByNV+LtwhCNMX5i3MZdsi/2ZQiZiXyurJh2QrsnPY+UCUe
-         ttCloRKfXtplJapxPjJRfAtUiuEIYEQX3ol9IbeGa6nUvGe30GMuFaB23whhlQspxw9R
-         ayxAmGhkS6ub/tV7vZoWScAQ+cKXp0SkXj9dK9HifaEctKDV1fV9GFzR8jXaiJrN+Ml0
-         pLd/2dWnqWZHJpdLfCLo/VOAgkaCVg5K/3UXP0N0oLXs35nz0NcIs93jSClgDa7Wk25Y
-         vekQ==
-X-Gm-Message-State: AOAM532OakqZZ2Bwv9RLknRiYlgcXvq3zj/BX4saJP7j+uFW/fHJwGA0
-        5DIM2+cYBsW+q92i2S4XeDjTp6S28q4=
-X-Google-Smtp-Source: ABdhPJwCy7T61LC5l32C4tPNYUMuVKxqqtlpS/XXfCI5B2DsKJ5MkQqzTgBUruCA5mz7BYOumZwxcA==
-X-Received: by 2002:a17:902:ec87:b0:149:4910:e4dd with SMTP id x7-20020a170902ec8700b001494910e4ddmr27137043plg.36.1640787305535;
-        Wed, 29 Dec 2021 06:15:05 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=IbCQ9ZB8P7hM04U4HfuIm7QmPMxuv5y7Zm1gAGXuI0E=;
+        b=ioSw/+qzIhQ0ycppkf9jgWOHWRWXyPRYfqqlUZasyhtSRiadg7xWCHTZ7Vdbdbs3g3
+         bRATGrG5TD4KIepC1FY/zDb8zhPndhYEIDKDZEneA3bgWEgy6hh3r/kL9CDJaFZ0W+/G
+         EmzTYZILxVDDNN1PS+HI8ytI5/zEZGDYumzBwwOhAG+3gqEO/ekMl1A2aAeXk9cN0o8a
+         V6/Dcm3zTbU3+8OTyn9SgU5iXZwezVkPTOLTzcnxXtV3OxgvQRNZrDEaqyYQAXXNQdSl
+         jkHb5JNHiCbFy0kTz6hc4Lg32bmNwE8YLWi6LegKtkzOI77VTFrE3aLSeO91j56XDL4r
+         V5zQ==
+X-Gm-Message-State: AOAM531ZnQOhR/REA6gw0lQDSWmycp7rQrdSMH/64W7ZvgyUPDZkhqwc
+        82CXSriJx/9WNTvEtPJnNp9W6wYKbpM=
+X-Google-Smtp-Source: ABdhPJyUeOh77yWizTvMdFBCnQ8bWHM20tzEO3PjoKc+5lRqpHQb78PXbX+Of+pTDgQPy24zqrQCLw==
+X-Received: by 2002:a17:902:c60b:b0:149:2afe:489f with SMTP id r11-20020a170902c60b00b001492afe489fmr26157924plr.104.1640787307732;
+        Wed, 29 Dec 2021 06:15:07 -0800 (PST)
 Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id s9sm15822287pfw.174.2021.12.29.06.15.03
+        by smtp.gmail.com with ESMTPSA id s9sm15822287pfw.174.2021.12.29.06.15.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Dec 2021 06:15:05 -0800 (PST)
+        Wed, 29 Dec 2021 06:15:07 -0800 (PST)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Hyunchul Lee <hyc.lee@gmail.com>
-Subject: [PATCH 1/4] ksmbd: register ksmbd ib client with ib_register_client()
-Date:   Wed, 29 Dec 2021 23:14:54 +0900
-Message-Id: <20211229141457.11636-1-linkinjeon@kernel.org>
+Cc:     Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH 2/4] ksmbd: set 445 port to smbdirect port by default
+Date:   Wed, 29 Dec 2021 23:14:55 +0900
+Message-Id: <20211229141457.11636-2-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20211229141457.11636-1-linkinjeon@kernel.org>
+References: <20211229141457.11636-1-linkinjeon@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-From: Hyunchul Lee <hyc.lee@gmail.com>
+When SMB Direct is used with iWARP, Windows use 5445 port for smb direct
+port, 445 port for SMB. This patch check ib_device using ib_client to
+know if NICs type is iWARP or Infiniband.
 
-Register ksmbd ib client with ib_register_client() to find the rdma capable
-network adapter. If ops.get_netdev(Chelsio NICs) is NULL, ksmbd will find
-it using ib_device_get_by_netdev in old way.
-
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/ksmbd/transport_rdma.c | 107 ++++++++++++++++++++++++++++++++++----
- fs/ksmbd/transport_rdma.h |   2 +-
- 2 files changed, 98 insertions(+), 11 deletions(-)
+ fs/ksmbd/transport_rdma.c | 15 ++++++++++++---
+ fs/ksmbd/transport_rdma.h |  2 --
+ 2 files changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-index 7e57cbb0bb35..339fa4f025f7 100644
+index 339fa4f025f7..f89b64e27836 100644
 --- a/fs/ksmbd/transport_rdma.c
 +++ b/fs/ksmbd/transport_rdma.c
-@@ -79,6 +79,14 @@ static int smb_direct_max_read_write_size = 1024 * 1024;
+@@ -34,7 +34,8 @@
+ #include "smbstatus.h"
+ #include "transport_rdma.h"
  
- static int smb_direct_max_outstanding_rw_ops = 8;
+-#define SMB_DIRECT_PORT	5445
++#define SMB_DIRECT_PORT_IWARP		5445
++#define SMB_DIRECT_PORT_INFINIBAND	445
  
-+static LIST_HEAD(smb_direct_device_list);
-+static DEFINE_RWLOCK(smb_direct_device_lock);
-+
-+struct smb_direct_device {
-+	struct ib_device	*ib_dev;
-+	struct list_head	list;
-+};
-+
- static struct smb_direct_listener {
- 	struct rdma_cm_id	*cm_id;
- } smb_direct_listener;
-@@ -2007,12 +2015,61 @@ static int smb_direct_listen(int port)
- 	return ret;
- }
+ #define SMB_DIRECT_VERSION_LE		cpu_to_le16(0x0100)
  
-+static int smb_direct_ib_client_add(struct ib_device *ib_dev)
-+{
-+	struct smb_direct_device *smb_dev;
+@@ -60,6 +61,10 @@
+  * as defined in [MS-SMBD] 3.1.1.1
+  * Those may change after a SMB_DIRECT negotiation
+  */
 +
-+	if (!ib_dev->ops.get_netdev ||
-+	    !rdma_frwr_is_supported(&ib_dev->attrs))
-+		return 0;
++/* Set 445 port to SMB Direct port by default */
++static int smb_direct_port = SMB_DIRECT_PORT_INFINIBAND;
 +
-+	smb_dev = kzalloc(sizeof(*smb_dev), GFP_KERNEL);
-+	if (!smb_dev)
-+		return -ENOMEM;
-+	smb_dev->ib_dev = ib_dev;
-+
-+	write_lock(&smb_direct_device_lock);
-+	list_add(&smb_dev->list, &smb_direct_device_list);
-+	write_unlock(&smb_direct_device_lock);
-+
-+	ksmbd_debug(RDMA, "ib device added: name %s\n", ib_dev->name);
-+	return 0;
-+}
-+
-+static void smb_direct_ib_client_remove(struct ib_device *ib_dev,
-+					void *client_data)
-+{
-+	struct smb_direct_device *smb_dev, *tmp;
-+
-+	write_lock(&smb_direct_device_lock);
-+	list_for_each_entry_safe(smb_dev, tmp, &smb_direct_device_list, list) {
-+		if (smb_dev->ib_dev == ib_dev) {
-+			list_del(&smb_dev->list);
-+			kfree(smb_dev);
-+			break;
-+		}
-+	}
-+	write_unlock(&smb_direct_device_lock);
-+}
-+
-+static struct ib_client smb_direct_ib_client = {
-+	.name	= "ksmbd_smb_direct_ib",
-+	.add	= smb_direct_ib_client_add,
-+	.remove	= smb_direct_ib_client_remove,
-+};
-+
- int ksmbd_rdma_init(void)
+ /* The local peer's maximum number of credits to grant to the peer */
+ static int smb_direct_receive_credit_max = 255;
+ 
+@@ -1942,7 +1947,7 @@ static int smb_direct_handle_connect_request(struct rdma_cm_id *new_cm_id)
+ 
+ 	KSMBD_TRANS(t)->handler = kthread_run(ksmbd_conn_handler_loop,
+ 					      KSMBD_TRANS(t)->conn, "ksmbd:r%u",
+-					      SMB_DIRECT_PORT);
++					      smb_direct_port);
+ 	if (IS_ERR(KSMBD_TRANS(t)->handler)) {
+ 		int ret = PTR_ERR(KSMBD_TRANS(t)->handler);
+ 
+@@ -2019,6 +2024,10 @@ static int smb_direct_ib_client_add(struct ib_device *ib_dev)
  {
- 	int ret;
+ 	struct smb_direct_device *smb_dev;
  
- 	smb_direct_listener.cm_id = NULL;
- 
-+	ret = ib_register_client(&smb_direct_ib_client);
-+	if (ret) {
-+		pr_err("failed to ib_register_client\n");
-+		return ret;
-+	}
++	/* Set 5445 port if device type is iWARP(No IB) */
++	if (ib_dev->node_type != RDMA_NODE_IB_CA)
++		smb_direct_port = SMB_DIRECT_PORT_IWARP;
 +
- 	/* When a client is running out of send credits, the credits are
- 	 * granted by the server's sending a packet using this queue.
- 	 * This avoids the situation that a clients cannot send packets
-@@ -2036,30 +2093,60 @@ int ksmbd_rdma_init(void)
- 	return 0;
- }
+ 	if (!ib_dev->ops.get_netdev ||
+ 	    !rdma_frwr_is_supported(&ib_dev->attrs))
+ 		return 0;
+@@ -2080,7 +2089,7 @@ int ksmbd_rdma_init(void)
+ 	if (!smb_direct_wq)
+ 		return -ENOMEM;
  
--int ksmbd_rdma_destroy(void)
-+void ksmbd_rdma_destroy(void)
- {
--	if (smb_direct_listener.cm_id)
--		rdma_destroy_id(smb_direct_listener.cm_id);
-+	if (!smb_direct_listener.cm_id)
-+		return;
-+
-+	ib_unregister_client(&smb_direct_ib_client);
-+	rdma_destroy_id(smb_direct_listener.cm_id);
-+
- 	smb_direct_listener.cm_id = NULL;
- 
- 	if (smb_direct_wq) {
+-	ret = smb_direct_listen(SMB_DIRECT_PORT);
++	ret = smb_direct_listen(smb_direct_port);
+ 	if (ret) {
  		destroy_workqueue(smb_direct_wq);
  		smb_direct_wq = NULL;
- 	}
--	return 0;
- }
- 
- bool ksmbd_rdma_capable_netdev(struct net_device *netdev)
- {
--	struct ib_device *ibdev;
-+	struct smb_direct_device *smb_dev;
-+	int i;
- 	bool rdma_capable = false;
- 
--	ibdev = ib_device_get_by_netdev(netdev, RDMA_DRIVER_UNKNOWN);
--	if (ibdev) {
--		if (rdma_frwr_is_supported(&ibdev->attrs))
--			rdma_capable = true;
--		ib_device_put(ibdev);
-+	read_lock(&smb_direct_device_lock);
-+	list_for_each_entry(smb_dev, &smb_direct_device_list, list) {
-+		for (i = 0; i < smb_dev->ib_dev->phys_port_cnt; i++) {
-+			struct net_device *ndev;
-+
-+			ndev = smb_dev->ib_dev->ops.get_netdev(smb_dev->ib_dev,
-+							       i + 1);
-+			if (!ndev)
-+				continue;
-+
-+			if (ndev == netdev) {
-+				dev_put(ndev);
-+				rdma_capable = true;
-+				goto out;
-+			}
-+			dev_put(ndev);
-+		}
-+	}
-+out:
-+	read_unlock(&smb_direct_device_lock);
-+
-+	if (rdma_capable == false) {
-+		struct ib_device *ibdev;
-+
-+		ibdev = ib_device_get_by_netdev(netdev, RDMA_DRIVER_UNKNOWN);
-+		if (ibdev) {
-+			if (rdma_frwr_is_supported(&ibdev->attrs))
-+				rdma_capable = true;
-+			ib_device_put(ibdev);
-+		}
- 	}
-+
- 	return rdma_capable;
- }
- 
 diff --git a/fs/ksmbd/transport_rdma.h b/fs/ksmbd/transport_rdma.h
-index 0fa8adc0776f..ab9250a7cb86 100644
+index ab9250a7cb86..5567d93a6f96 100644
 --- a/fs/ksmbd/transport_rdma.h
 +++ b/fs/ksmbd/transport_rdma.h
-@@ -52,7 +52,7 @@ struct smb_direct_data_transfer {
+@@ -7,8 +7,6 @@
+ #ifndef __KSMBD_TRANSPORT_RDMA_H__
+ #define __KSMBD_TRANSPORT_RDMA_H__
  
- #ifdef CONFIG_SMB_SERVER_SMBDIRECT
- int ksmbd_rdma_init(void);
--int ksmbd_rdma_destroy(void);
-+void ksmbd_rdma_destroy(void);
- bool ksmbd_rdma_capable_netdev(struct net_device *netdev);
- #else
- static inline int ksmbd_rdma_init(void) { return 0; }
+-#define SMB_DIRECT_PORT	5445
+-
+ /* SMB DIRECT negotiation request packet [MS-SMBD] 2.2.1 */
+ struct smb_direct_negotiate_req {
+ 	__le16 min_version;
 -- 
 2.25.1
 
