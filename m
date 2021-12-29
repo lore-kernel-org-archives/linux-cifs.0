@@ -2,39 +2,38 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E729AC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Dec 2021 21:32:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE412C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Dec 2021 21:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232366AbhL2Vcg (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Dec 2021 16:32:36 -0500
-Received: from mail.astralinux.ru ([217.74.38.119]:41918 "EHLO
+        id S232396AbhL2VdZ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Dec 2021 16:33:25 -0500
+Received: from mail.astralinux.ru ([217.74.38.119]:42070 "EHLO
         mail.astralinux.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231322AbhL2Vcg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Dec 2021 16:32:36 -0500
-X-Greylist: delayed 399 seconds by postgrey-1.27 at vger.kernel.org; Wed, 29 Dec 2021 16:32:35 EST
+        with ESMTP id S231322AbhL2VdZ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Dec 2021 16:33:25 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by mail.astralinux.ru (Postfix) with ESMTP id C96052FA8066;
-        Thu, 30 Dec 2021 00:32:34 +0300 (MSK)
+        by mail.astralinux.ru (Postfix) with ESMTP id 3ED362FA8044;
+        Thu, 30 Dec 2021 00:25:55 +0300 (MSK)
 Received: from mail.astralinux.ru ([127.0.0.1])
         by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id VA3HS0ZxnR7w; Thu, 30 Dec 2021 00:32:34 +0300 (MSK)
+        with ESMTP id 87V0zwb7cS-h; Thu, 30 Dec 2021 00:25:54 +0300 (MSK)
 Received: from localhost (localhost [127.0.0.1])
-        by mail.astralinux.ru (Postfix) with ESMTP id 466972FA8069;
-        Thu, 30 Dec 2021 00:32:34 +0300 (MSK)
+        by mail.astralinux.ru (Postfix) with ESMTP id A51F32FA804A;
+        Thu, 30 Dec 2021 00:25:54 +0300 (MSK)
 X-Virus-Scanned: amavisd-new at astralinux.ru
 Received: from mail.astralinux.ru ([127.0.0.1])
         by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id JeSdrgKkN6fo; Thu, 30 Dec 2021 00:32:34 +0300 (MSK)
+        with ESMTP id E_1TCyw-BQH3; Thu, 30 Dec 2021 00:25:54 +0300 (MSK)
 Received: from himera.home (37-145-209-165.broadband.corbina.ru [37.145.209.165])
-        by mail.astralinux.ru (Postfix) with ESMTPSA id EFC212FA8066;
-        Thu, 30 Dec 2021 00:32:33 +0300 (MSK)
-Date:   Thu, 30 Dec 2021 00:32:32 +0300
+        by mail.astralinux.ru (Postfix) with ESMTPSA id 67E3A2FA8044;
+        Thu, 30 Dec 2021 00:25:54 +0300 (MSK)
+Date:   Thu, 30 Dec 2021 00:25:52 +0300
 From:   Eugene Korenevsky <ekorenevsky@astralinux.ru>
 To:     linux-cifs@vger.kernel.org
 Cc:     Steve French <sfrench@samba.org>
 Subject: [PATCH] cifs: alloc_path_with_tree_prefix: do not append sep. if the
  path is empty
-Message-ID: <YczT8K47eA6JqEIB@himera.home>
+Message-ID: <YczSYDk/eklOzc2e@himera.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -76,3 +75,4 @@ index 8b3670388cda..88ea0163257c 100644
  	return 0;
 -- 
 2.30.2
+
