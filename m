@@ -2,43 +2,43 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E6EAC433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 29 Dec 2021 14:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E08FC433F5
+	for <linux-cifs@archiver.kernel.org>; Wed, 29 Dec 2021 14:15:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240163AbhL2OPI (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 29 Dec 2021 09:15:08 -0500
-Received: from mail-pj1-f41.google.com ([209.85.216.41]:33546 "EHLO
-        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233713AbhL2OPI (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Dec 2021 09:15:08 -0500
-Received: by mail-pj1-f41.google.com with SMTP id g11-20020a17090a7d0b00b001b2c12c7273so37917pjl.0
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Dec 2021 06:15:08 -0800 (PST)
+        id S240166AbhL2OPK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 29 Dec 2021 09:15:10 -0500
+Received: from mail-pg1-f178.google.com ([209.85.215.178]:35498 "EHLO
+        mail-pg1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240164AbhL2OPK (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 29 Dec 2021 09:15:10 -0500
+Received: by mail-pg1-f178.google.com with SMTP id v25so18625532pge.2
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Dec 2021 06:15:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=IbCQ9ZB8P7hM04U4HfuIm7QmPMxuv5y7Zm1gAGXuI0E=;
-        b=ioSw/+qzIhQ0ycppkf9jgWOHWRWXyPRYfqqlUZasyhtSRiadg7xWCHTZ7Vdbdbs3g3
-         bRATGrG5TD4KIepC1FY/zDb8zhPndhYEIDKDZEneA3bgWEgy6hh3r/kL9CDJaFZ0W+/G
-         EmzTYZILxVDDNN1PS+HI8ytI5/zEZGDYumzBwwOhAG+3gqEO/ekMl1A2aAeXk9cN0o8a
-         V6/Dcm3zTbU3+8OTyn9SgU5iXZwezVkPTOLTzcnxXtV3OxgvQRNZrDEaqyYQAXXNQdSl
-         jkHb5JNHiCbFy0kTz6hc4Lg32bmNwE8YLWi6LegKtkzOI77VTFrE3aLSeO91j56XDL4r
-         V5zQ==
-X-Gm-Message-State: AOAM531ZnQOhR/REA6gw0lQDSWmycp7rQrdSMH/64W7ZvgyUPDZkhqwc
-        82CXSriJx/9WNTvEtPJnNp9W6wYKbpM=
-X-Google-Smtp-Source: ABdhPJyUeOh77yWizTvMdFBCnQ8bWHM20tzEO3PjoKc+5lRqpHQb78PXbX+Of+pTDgQPy24zqrQCLw==
-X-Received: by 2002:a17:902:c60b:b0:149:2afe:489f with SMTP id r11-20020a170902c60b00b001492afe489fmr26157924plr.104.1640787307732;
-        Wed, 29 Dec 2021 06:15:07 -0800 (PST)
+        bh=1G9NerenFSOVWHkv+H4Pvyj2rWPmWnguFhVmx6Ym5X4=;
+        b=IPWcLmI+OGQyO1wmEKgayyFeZh+1zKpHBNJUAJ/QOlUpcl2TYVfnn7nkVFFr8ePpsI
+         gaSXVKb5IqBYHI8tI5Reg5QQ4mbz4sfWyampfNHTPsJ+WEnhFNppSgjOn1Wmjl56KXwb
+         xdyFoURnMmTae1pw9wlwHdrimv/NOZHHm6Zc3uKDj0tTc+xwjZLSMeDTqrL3or3eNjok
+         6DBXkWosooQgM+5zqPf5o17S4XK/RJHHo45rSLPaiWSlFt4W9lGlBPiSdoGffhUYDCHc
+         Znu7PnMHSPH2MrZAyBwZlwHNsiQKhq/L53xxXVVVMSeQ4PztMUtFY1uADjUzmR0CTqpi
+         K/Fg==
+X-Gm-Message-State: AOAM530MjM0W0QIV0p7Ee4e5q8RqKooDoDAYLn60YE38IhvdQGPjYs8B
+        02LpQu+gyZjqolkuoVei+dhIjsOGuew=
+X-Google-Smtp-Source: ABdhPJxcMZKOPYbivBXQiTY62P6Cex2I647xeNMWZCmPq6q0n7p0fGpq2Xg7n/nYCqoCRy/VuQww0w==
+X-Received: by 2002:a63:34c9:: with SMTP id b192mr18138559pga.284.1640787309715;
+        Wed, 29 Dec 2021 06:15:09 -0800 (PST)
 Received: from localhost.localdomain ([61.74.27.164])
-        by smtp.gmail.com with ESMTPSA id s9sm15822287pfw.174.2021.12.29.06.15.06
+        by smtp.gmail.com with ESMTPSA id s9sm15822287pfw.174.2021.12.29.06.15.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Dec 2021 06:15:07 -0800 (PST)
+        Wed, 29 Dec 2021 06:15:09 -0800 (PST)
 From:   Namjae Jeon <linkinjeon@kernel.org>
 To:     linux-cifs@vger.kernel.org
 Cc:     Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 2/4] ksmbd: set 445 port to smbdirect port by default
-Date:   Wed, 29 Dec 2021 23:14:55 +0900
-Message-Id: <20211229141457.11636-2-linkinjeon@kernel.org>
+Subject: [PATCH 3/4] ksmbd: add support for smb2 max credit parameter
+Date:   Wed, 29 Dec 2021 23:14:56 +0900
+Message-Id: <20211229141457.11636-3-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211229141457.11636-1-linkinjeon@kernel.org>
 References: <20211229141457.11636-1-linkinjeon@kernel.org>
@@ -48,83 +48,204 @@ Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-When SMB Direct is used with iWARP, Windows use 5445 port for smb direct
-port, 445 port for SMB. This patch check ib_device using ib_client to
-know if NICs type is iWARP or Infiniband.
+Add smb2 max credits parameter to adjust maximum credits value to limit
+number of outstanding requests.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/ksmbd/transport_rdma.c | 15 ++++++++++++---
- fs/ksmbd/transport_rdma.h |  2 --
- 2 files changed, 12 insertions(+), 5 deletions(-)
+ fs/ksmbd/connection.h    |  1 -
+ fs/ksmbd/ksmbd_netlink.h |  1 +
+ fs/ksmbd/smb2misc.c      |  2 +-
+ fs/ksmbd/smb2ops.c       | 16 ++++++++++++----
+ fs/ksmbd/smb2pdu.c       |  8 ++++----
+ fs/ksmbd/smb2pdu.h       |  1 +
+ fs/ksmbd/smb_common.h    |  1 +
+ fs/ksmbd/transport_ipc.c |  2 ++
+ 8 files changed, 22 insertions(+), 10 deletions(-)
 
-diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
-index 339fa4f025f7..f89b64e27836 100644
---- a/fs/ksmbd/transport_rdma.c
-+++ b/fs/ksmbd/transport_rdma.c
-@@ -34,7 +34,8 @@
- #include "smbstatus.h"
- #include "transport_rdma.h"
+diff --git a/fs/ksmbd/connection.h b/fs/ksmbd/connection.h
+index 72dfd155b5bf..42ffb6d9c5d8 100644
+--- a/fs/ksmbd/connection.h
++++ b/fs/ksmbd/connection.h
+@@ -62,7 +62,6 @@ struct ksmbd_conn {
+ 	/* References which are made for this Server object*/
+ 	atomic_t			r_count;
+ 	unsigned short			total_credits;
+-	unsigned short			max_credits;
+ 	spinlock_t			credits_lock;
+ 	wait_queue_head_t		req_running_q;
+ 	/* Lock to protect requests list*/
+diff --git a/fs/ksmbd/ksmbd_netlink.h b/fs/ksmbd/ksmbd_netlink.h
+index c6718a05d347..a5c2861792ae 100644
+--- a/fs/ksmbd/ksmbd_netlink.h
++++ b/fs/ksmbd/ksmbd_netlink.h
+@@ -103,6 +103,7 @@ struct ksmbd_startup_request {
+ 					 * we set the SPARSE_FILES bit (0x40).
+ 					 */
+ 	__u32	sub_auth[3];		/* Subauth value for Security ID */
++	__u32	smb2_max_credits;	/* MAX credits */
+ 	__u32	ifc_list_sz;		/* interfaces list size */
+ 	__s8	____payload[];
+ };
+diff --git a/fs/ksmbd/smb2misc.c b/fs/ksmbd/smb2misc.c
+index 50d0b1022289..6892d1822269 100644
+--- a/fs/ksmbd/smb2misc.c
++++ b/fs/ksmbd/smb2misc.c
+@@ -326,7 +326,7 @@ static int smb2_validate_credit_charge(struct ksmbd_conn *conn,
+ 		ksmbd_debug(SMB, "Insufficient credit charge, given: %d, needed: %d\n",
+ 			    credit_charge, calc_credit_num);
+ 		return 1;
+-	} else if (credit_charge > conn->max_credits) {
++	} else if (credit_charge > conn->vals->max_credits) {
+ 		ksmbd_debug(SMB, "Too large credit charge: %d\n", credit_charge);
+ 		return 1;
+ 	}
+diff --git a/fs/ksmbd/smb2ops.c b/fs/ksmbd/smb2ops.c
+index 02a44d28bdaf..ab23da2120b9 100644
+--- a/fs/ksmbd/smb2ops.c
++++ b/fs/ksmbd/smb2ops.c
+@@ -19,6 +19,7 @@ static struct smb_version_values smb21_server_values = {
+ 	.max_read_size = SMB21_DEFAULT_IOSIZE,
+ 	.max_write_size = SMB21_DEFAULT_IOSIZE,
+ 	.max_trans_size = SMB21_DEFAULT_IOSIZE,
++	.max_credits = SMB2_MAX_CREDITS,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED,
+@@ -44,6 +45,7 @@ static struct smb_version_values smb30_server_values = {
+ 	.max_read_size = SMB3_DEFAULT_IOSIZE,
+ 	.max_write_size = SMB3_DEFAULT_IOSIZE,
+ 	.max_trans_size = SMB3_DEFAULT_TRANS_SIZE,
++	.max_credits = SMB2_MAX_CREDITS,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED,
+@@ -70,6 +72,7 @@ static struct smb_version_values smb302_server_values = {
+ 	.max_read_size = SMB3_DEFAULT_IOSIZE,
+ 	.max_write_size = SMB3_DEFAULT_IOSIZE,
+ 	.max_trans_size = SMB3_DEFAULT_TRANS_SIZE,
++	.max_credits = SMB2_MAX_CREDITS,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED,
+@@ -96,6 +99,7 @@ static struct smb_version_values smb311_server_values = {
+ 	.max_read_size = SMB3_DEFAULT_IOSIZE,
+ 	.max_write_size = SMB3_DEFAULT_IOSIZE,
+ 	.max_trans_size = SMB3_DEFAULT_TRANS_SIZE,
++	.max_credits = SMB2_MAX_CREDITS,
+ 	.large_lock_type = 0,
+ 	.exclusive_lock_type = SMB2_LOCKFLAG_EXCLUSIVE,
+ 	.shared_lock_type = SMB2_LOCKFLAG_SHARED,
+@@ -197,7 +201,6 @@ void init_smb2_1_server(struct ksmbd_conn *conn)
+ 	conn->ops = &smb2_0_server_ops;
+ 	conn->cmds = smb2_0_server_cmds;
+ 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
+-	conn->max_credits = SMB2_MAX_CREDITS;
+ 	conn->signing_algorithm = SIGNING_ALG_HMAC_SHA256_LE;
  
--#define SMB_DIRECT_PORT	5445
-+#define SMB_DIRECT_PORT_IWARP		5445
-+#define SMB_DIRECT_PORT_INFINIBAND	445
+ 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
+@@ -215,7 +218,6 @@ void init_smb3_0_server(struct ksmbd_conn *conn)
+ 	conn->ops = &smb3_0_server_ops;
+ 	conn->cmds = smb2_0_server_cmds;
+ 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
+-	conn->max_credits = SMB2_MAX_CREDITS;
+ 	conn->signing_algorithm = SIGNING_ALG_AES_CMAC_LE;
  
- #define SMB_DIRECT_VERSION_LE		cpu_to_le16(0x0100)
+ 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
+@@ -240,7 +242,6 @@ void init_smb3_02_server(struct ksmbd_conn *conn)
+ 	conn->ops = &smb3_0_server_ops;
+ 	conn->cmds = smb2_0_server_cmds;
+ 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
+-	conn->max_credits = SMB2_MAX_CREDITS;
+ 	conn->signing_algorithm = SIGNING_ALG_AES_CMAC_LE;
  
-@@ -60,6 +61,10 @@
-  * as defined in [MS-SMBD] 3.1.1.1
-  * Those may change after a SMB_DIRECT negotiation
-  */
+ 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
+@@ -265,7 +266,6 @@ int init_smb3_11_server(struct ksmbd_conn *conn)
+ 	conn->ops = &smb3_11_server_ops;
+ 	conn->cmds = smb2_0_server_cmds;
+ 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
+-	conn->max_credits = SMB2_MAX_CREDITS;
+ 	conn->signing_algorithm = SIGNING_ALG_AES_CMAC_LE;
+ 
+ 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
+@@ -304,3 +304,11 @@ void init_smb2_max_trans_size(unsigned int sz)
+ 	smb302_server_values.max_trans_size = sz;
+ 	smb311_server_values.max_trans_size = sz;
+ }
 +
-+/* Set 445 port to SMB Direct port by default */
-+static int smb_direct_port = SMB_DIRECT_PORT_INFINIBAND;
-+
- /* The local peer's maximum number of credits to grant to the peer */
- static int smb_direct_receive_credit_max = 255;
++void init_smb2_max_credits(unsigned int sz)
++{
++	smb21_server_values.max_credits = sz;
++	smb30_server_values.max_credits = sz;
++	smb302_server_values.max_credits = sz;
++	smb311_server_values.max_credits = sz;
++}
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index b00108921bbb..860fe3a03ad7 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -308,7 +308,7 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
  
-@@ -1942,7 +1947,7 @@ static int smb_direct_handle_connect_request(struct rdma_cm_id *new_cm_id)
+ 	hdr->CreditCharge = req_hdr->CreditCharge;
  
- 	KSMBD_TRANS(t)->handler = kthread_run(ksmbd_conn_handler_loop,
- 					      KSMBD_TRANS(t)->conn, "ksmbd:r%u",
--					      SMB_DIRECT_PORT);
-+					      smb_direct_port);
- 	if (IS_ERR(KSMBD_TRANS(t)->handler)) {
- 		int ret = PTR_ERR(KSMBD_TRANS(t)->handler);
+-	if (conn->total_credits > conn->max_credits) {
++	if (conn->total_credits > conn->vals->max_credits) {
+ 		hdr->CreditRequest = 0;
+ 		pr_err("Total credits overflow: %d\n", conn->total_credits);
+ 		return -EINVAL;
+@@ -329,12 +329,12 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
+ 	if (hdr->Command == SMB2_NEGOTIATE)
+ 		aux_max = 0;
+ 	else
+-		aux_max = conn->max_credits - credit_charge;
++		aux_max = conn->vals->max_credits - credit_charge;
+ 	aux_credits = min_t(unsigned short, aux_credits, aux_max);
+ 	credits_granted = credit_charge + aux_credits;
  
-@@ -2019,6 +2024,10 @@ static int smb_direct_ib_client_add(struct ib_device *ib_dev)
- {
- 	struct smb_direct_device *smb_dev;
+-	if (conn->max_credits - conn->total_credits < credits_granted)
+-		credits_granted = conn->max_credits -
++	if (conn->vals->max_credits - conn->total_credits < credits_granted)
++		credits_granted = conn->vals->max_credits -
+ 			conn->total_credits;
  
-+	/* Set 5445 port if device type is iWARP(No IB) */
-+	if (ib_dev->node_type != RDMA_NODE_IB_CA)
-+		smb_direct_port = SMB_DIRECT_PORT_IWARP;
-+
- 	if (!ib_dev->ops.get_netdev ||
- 	    !rdma_frwr_is_supported(&ib_dev->attrs))
- 		return 0;
-@@ -2080,7 +2089,7 @@ int ksmbd_rdma_init(void)
- 	if (!smb_direct_wq)
- 		return -ENOMEM;
+ 	conn->total_credits += credits_granted;
+diff --git a/fs/ksmbd/smb2pdu.h b/fs/ksmbd/smb2pdu.h
+index 4a3e4339d4c4..725b800c29c8 100644
+--- a/fs/ksmbd/smb2pdu.h
++++ b/fs/ksmbd/smb2pdu.h
+@@ -980,6 +980,7 @@ int init_smb3_11_server(struct ksmbd_conn *conn);
+ void init_smb2_max_read_size(unsigned int sz);
+ void init_smb2_max_write_size(unsigned int sz);
+ void init_smb2_max_trans_size(unsigned int sz);
++void init_smb2_max_credits(unsigned int sz);
  
--	ret = smb_direct_listen(SMB_DIRECT_PORT);
-+	ret = smb_direct_listen(smb_direct_port);
- 	if (ret) {
- 		destroy_workqueue(smb_direct_wq);
- 		smb_direct_wq = NULL;
-diff --git a/fs/ksmbd/transport_rdma.h b/fs/ksmbd/transport_rdma.h
-index ab9250a7cb86..5567d93a6f96 100644
---- a/fs/ksmbd/transport_rdma.h
-+++ b/fs/ksmbd/transport_rdma.h
-@@ -7,8 +7,6 @@
- #ifndef __KSMBD_TRANSPORT_RDMA_H__
- #define __KSMBD_TRANSPORT_RDMA_H__
+ bool is_smb2_neg_cmd(struct ksmbd_work *work);
+ bool is_smb2_rsp(struct ksmbd_work *work);
+diff --git a/fs/ksmbd/smb_common.h b/fs/ksmbd/smb_common.h
+index 50590842b651..e1369b4345a9 100644
+--- a/fs/ksmbd/smb_common.h
++++ b/fs/ksmbd/smb_common.h
+@@ -365,6 +365,7 @@ struct smb_version_values {
+ 	__u32		max_read_size;
+ 	__u32		max_write_size;
+ 	__u32		max_trans_size;
++	__u32		max_credits;
+ 	__u32		large_lock_type;
+ 	__u32		exclusive_lock_type;
+ 	__u32		shared_lock_type;
+diff --git a/fs/ksmbd/transport_ipc.c b/fs/ksmbd/transport_ipc.c
+index 1acf1892a466..3ad6881e0f7e 100644
+--- a/fs/ksmbd/transport_ipc.c
++++ b/fs/ksmbd/transport_ipc.c
+@@ -301,6 +301,8 @@ static int ipc_server_config_on_startup(struct ksmbd_startup_request *req)
+ 		init_smb2_max_write_size(req->smb2_max_write);
+ 	if (req->smb2_max_trans)
+ 		init_smb2_max_trans_size(req->smb2_max_trans);
++	if (req->smb2_max_credits)
++		init_smb2_max_credits(req->smb2_max_credits);
  
--#define SMB_DIRECT_PORT	5445
--
- /* SMB DIRECT negotiation request packet [MS-SMBD] 2.2.1 */
- struct smb_direct_negotiate_req {
- 	__le16 min_version;
+ 	ret = ksmbd_set_netbios_name(req->netbios_name);
+ 	ret |= ksmbd_set_server_string(req->server_string);
 -- 
 2.25.1
 
