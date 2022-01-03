@@ -2,120 +2,121 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB06C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon,  3 Jan 2022 14:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B713BC433F5
+	for <linux-cifs@archiver.kernel.org>; Mon,  3 Jan 2022 16:56:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232323AbiACOul (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 3 Jan 2022 09:50:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44864 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232301AbiACOul (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Jan 2022 09:50:41 -0500
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A01B0C061761
-        for <linux-cifs@vger.kernel.org>; Mon,  3 Jan 2022 06:50:40 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id l4so21553303wmq.3
-        for <linux-cifs@vger.kernel.org>; Mon, 03 Jan 2022 06:50:40 -0800 (PST)
+        id S230288AbiACQ4G (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 3 Jan 2022 11:56:06 -0500
+Received: from smtp-fw-80007.amazon.com ([99.78.197.218]:22513 "EHLO
+        smtp-fw-80007.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229514AbiACQ4G (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 3 Jan 2022 11:56:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=re67WGqWcG/HXr1cYssMtIWoyahh9zUkXGzeD4T8vyo=;
-        b=HByRcjvB1fNXdy8FsnFigwcbjfoqq4/8BiI9wi9GHn9dwFOpW1ixFtvGKL/bM4PynW
-         xTQKFs/IKcUQ/IJO01WMG0JUmwYPwxhgtTF6CGjisF/HJbgfTCYwXKLr9sIs7LzmXV0A
-         thJjA5/rVZNOiTgyesmu1r/ZiiwgCr3hCFVwkdPO7dANDicQCyqG1Z0wndbWEbeWpEme
-         ZeD4psZWYkdWGG+e0nrfjdlqYaEJsdNAmkEnE4m5RCvvznc+kEfvkxWuDV1Ljztf1HEP
-         5joY+geaLVYSpSxslgSaTtP6t1jp5G55BjTGE8ceC/7o535uWX5HMMZEfeG4x4MYPNF6
-         bpQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=re67WGqWcG/HXr1cYssMtIWoyahh9zUkXGzeD4T8vyo=;
-        b=66nrQ8NmSeZDGjR02jl+6oamMmSbNIU0Wq8mDZ0qISE/8FW1YC0S11KlubzHUbHzLE
-         FvaT3ZYZY1ZF0FFuN/D6Ex9asI+3yTfVzldA9OJtlTFESQmZwQgUFInRvqGrC7dkUiTJ
-         pgT1HldtRMOv20Fx4bnX8wAlS2R++xWbqXbnpTfbWBQgjNooq1bIhzFr4f4VN3Zi7Zsa
-         fh8ofq2vJmZQZWeWXUAFKa4jGQEVr0z6yilLt5rVA9OJLj0hijAd8WJ5KPDI0ifkg7O+
-         YdFPa5r26LSUObddU/ot1KAHnV+grE1FND6M5BjvA31dKNGCEN7Q2c2YjIsB58eR3xkR
-         RgnA==
-X-Gm-Message-State: AOAM533Qwm5MXAm+6mGFXD7VG2JT1XffFUG9pZCjRiw7zgchDyDm0Gt/
-        8fS1DIX9wFPnP/x+I0QMki5/CK5P7QA=
-X-Google-Smtp-Source: ABdhPJyNTsnV82RtboxGSY3V+cP1PPdpDd2YI3hrZdtBdSGgEhj55429D0408/U8+XA3YeQQqsILPg==
-X-Received: by 2002:a7b:cd82:: with SMTP id y2mr11095691wmj.99.1641221439212;
-        Mon, 03 Jan 2022 06:50:39 -0800 (PST)
-Received: from amir-ThinkPad-T480.ctera.local (bzq-166-168-31-246.red.bezeqint.net. [31.168.166.246])
-        by smtp.gmail.com with ESMTPSA id i15sm25787423wrf.6.2022.01.03.06.50.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jan 2022 06:50:38 -0800 (PST)
-From:   Amir Goldstein <amir73il@gmail.com>
-To:     Steve French <smfrench@gmail.com>,
-        Boris Protopopov <pboris@amazon.com>
-Cc:     Pavel Shilovsky <pshilovsky@samba.org>,
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1641228966; x=1672764966;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=u5++/tRleuXfaSvhkivfMg75D3kJejNAiAaxDrnqMBE=;
+  b=mjvnbJxXol2YpEm8mA3wlueqHx3FY3zD00K65Dy4lToZ7q5SuFPkGPP/
+   F9kud5Ydsu2xouTV/kFSKIHzvK+Taqz0MTn93qMlPM1C7n/OuYs6YTXM3
+   1SKK/5BUOb352IbsXg3GN1Xb1ERuyYgKtBkk+7dknKlKO5NzkjX18UKPX
+   k=;
+X-IronPort-AV: E=Sophos;i="5.88,258,1635206400"; 
+   d="scan'208";a="52312812"
+Subject: Re: [PATCH] cifs: fix set of group SID via NTSD xattrs
+Thread-Topic: [PATCH] cifs: fix set of group SID via NTSD xattrs
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-c92fe759.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP; 03 Jan 2022 16:56:05 +0000
+Received: from EX13MTAUEE002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1a-c92fe759.us-east-1.amazon.com (Postfix) with ESMTPS id 797AFC0952;
+        Mon,  3 Jan 2022 16:56:03 +0000 (UTC)
+Received: from EX13D11UEE002.ant.amazon.com (10.43.62.113) by
+ EX13MTAUEE002.ant.amazon.com (10.43.62.24) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.26; Mon, 3 Jan 2022 16:56:02 +0000
+Received: from EX13D11UEE004.ant.amazon.com (10.43.62.104) by
+ EX13D11UEE002.ant.amazon.com (10.43.62.113) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.26; Mon, 3 Jan 2022 16:56:01 +0000
+Received: from EX13D11UEE004.ant.amazon.com ([10.43.62.104]) by
+ EX13D11UEE004.ant.amazon.com ([10.43.62.104]) with mapi id 15.00.1497.026;
+ Mon, 3 Jan 2022 16:56:02 +0000
+From:   "Protopopov, Boris" <pboris@amazon.com>
+To:     Amir Goldstein <amir73il@gmail.com>,
+        Steve French <smfrench@gmail.com>
+CC:     Pavel Shilovsky <pshilovsky@samba.org>,
         Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cifs@vger.kernel.org
-Subject: [PATCH] cifs: fix set of group SID via NTSD xattrs
-Date:   Mon,  3 Jan 2022 16:50:25 +0200
-Message-Id: <20220103145025.3867146-1-amir73il@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Thread-Index: AQHYALFobvizg40BHEe6zXFOv0dDQKxRMF6A
+Date:   Mon, 3 Jan 2022 16:56:02 +0000
+Message-ID: <69FC68E2-31C6-493A-BC60-ED1DF5860FC2@amazon.com>
+References: <20220103145025.3867146-1-amir73il@gmail.com>
+In-Reply-To: <20220103145025.3867146-1-amir73il@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.60.244]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C8C8F05678DF93459E189DD3F0968EF9@amazon.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-'setcifsacl -g <SID>' silently fails to set the group SID on server.
-
-Actually, the bug existed since commit 438471b67963 ("CIFS: Add support
-for setting owner info, dos attributes, and create time"), but this fix
-will not apply cleanly to kernel versions <= v5.10.
-
-Fixes: a9352ee926eb ("SMB3: Add support for getting and setting SACLs")
-Signed-off-by: Amir Goldstein <amir73il@gmail.com>
----
-
-Boris,
-
-I am a little confused from the comments in the code an emails.
-In this thread [1] you wrote that you tested "setting/getting the owner,
-DACL, and SACL...".
-
-Does it mean that you did not test setting group SID?
-
-It is also confusing that comments in the code says /* owner plus DACL */
-and /* owner/DACL/SACL */.
-Does it mean that setting group SID is not supposed to be supported?
-Or was this just an oversight?
-
-Anyway, with this patch, setcifsacl -g <SID> works as expected,
-at least when the server is samba.
-
-Thanks,
-Amir.
-
-
-[1] https://lore.kernel.org/linux-cifs/CAHhKpQ7PwgDysS3nUAA0ALLdMZqnzG6q6wL1tmn3aqOPwZbyyg@mail.gmail.com/
-
- fs/cifs/xattr.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/fs/cifs/xattr.c b/fs/cifs/xattr.c
-index 7d8b72d67c80..9d486fbbfbbd 100644
---- a/fs/cifs/xattr.c
-+++ b/fs/cifs/xattr.c
-@@ -175,11 +175,13 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
- 				switch (handler->flags) {
- 				case XATTR_CIFS_NTSD_FULL:
- 					aclflags = (CIFS_ACL_OWNER |
-+						    CIFS_ACL_GROUP |
- 						    CIFS_ACL_DACL |
- 						    CIFS_ACL_SACL);
- 					break;
- 				case XATTR_CIFS_NTSD:
- 					aclflags = (CIFS_ACL_OWNER |
-+						    CIFS_ACL_GROUP |
- 						    CIFS_ACL_DACL);
- 					break;
- 				case XATTR_CIFS_ACL:
--- 
-2.25.1
-
+SGVsbG8sIEFtaXIsIA0KDQpJdCBoYXMgYmVlbiBhIHdoaWxlLCBidXQgSSByZWNhbGwgdGhhdCBm
+cm9tIG15IHJlYWRpbmcgb2YgdGhlIE1TIGRvY3MsIHRoZSBub3Rpb24gb2YgIm93bmVyIiB3YXMg
+c3VwcG9zZWQgdG8gaW5jbHVkZSBib3RoIHVzZXIgYW5kIHRoZSBwcmltYXJ5IGdyb3VwIFNJRHMs
+IHdoaWNoIGlzIHdoeSB0aGUgY29tbWVudHMgaW4gdGhlIGNvZGUgZGlkIG5vdCBjYWxsIG91dCBn
+cm91cHMgZXhwbGljaXRseS4NCkkgYWxzbyByZWNhbGwgdGhhdCBkdXJpbmcgZGV2ZWxvcG1lbnQs
+IEkgdGVzdGVkIHdpdGggQ0lGU19BQ0xfR1JPVVAgZmxhZyBhZ2FpbnN0IFdpbmRvd3MgMjAxMiBh
+bmQgMjAxOSBzZXJ2ZXJzLCBhbmQgZGlkIG5vdCBzZWUgYSBkaWZmZXJlbmNlLiBJIGRpZCBub3Qg
+dGVzdCBhZ2FpbnN0IFNhbWJhLCB3aGljaCBjbGVhcmx5LCBzaG93ZWQgYW4gaXNzdWUgZGlzY3Vz
+c2VkIGJlbG93Lg0KDQpCb3Jpcy4NCg0K77u/T24gMS8zLzIyLCA5OjUxIEFNLCAiQW1pciBHb2xk
+c3RlaW4iIDxhbWlyNzNpbEBnbWFpbC5jb20+IHdyb3RlOg0KDQogICAgQ0FVVElPTjogVGhpcyBl
+bWFpbCBvcmlnaW5hdGVkIGZyb20gb3V0c2lkZSBvZiB0aGUgb3JnYW5pemF0aW9uLiBEbyBub3Qg
+Y2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91IGNhbiBjb25maXJtIHRo
+ZSBzZW5kZXIgYW5kIGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZS4NCg0KDQoNCiAgICAnc2V0Y2lm
+c2FjbCAtZyA8U0lEPicgc2lsZW50bHkgZmFpbHMgdG8gc2V0IHRoZSBncm91cCBTSUQgb24gc2Vy
+dmVyLg0KDQogICAgQWN0dWFsbHksIHRoZSBidWcgZXhpc3RlZCBzaW5jZSBjb21taXQgNDM4NDcx
+YjY3OTYzICgiQ0lGUzogQWRkIHN1cHBvcnQNCiAgICBmb3Igc2V0dGluZyBvd25lciBpbmZvLCBk
+b3MgYXR0cmlidXRlcywgYW5kIGNyZWF0ZSB0aW1lIiksIGJ1dCB0aGlzIGZpeA0KICAgIHdpbGwg
+bm90IGFwcGx5IGNsZWFubHkgdG8ga2VybmVsIHZlcnNpb25zIDw9IHY1LjEwLg0KDQogICAgRml4
+ZXM6IGE5MzUyZWU5MjZlYiAoIlNNQjM6IEFkZCBzdXBwb3J0IGZvciBnZXR0aW5nIGFuZCBzZXR0
+aW5nIFNBQ0xzIikNCiAgICBTaWduZWQtb2ZmLWJ5OiBBbWlyIEdvbGRzdGVpbiA8YW1pcjczaWxA
+Z21haWwuY29tPg0KICAgIC0tLQ0KDQogICAgQm9yaXMsDQoNCiAgICBJIGFtIGEgbGl0dGxlIGNv
+bmZ1c2VkIGZyb20gdGhlIGNvbW1lbnRzIGluIHRoZSBjb2RlIGFuIGVtYWlscy4NCiAgICBJbiB0
+aGlzIHRocmVhZCBbMV0geW91IHdyb3RlIHRoYXQgeW91IHRlc3RlZCAic2V0dGluZy9nZXR0aW5n
+IHRoZSBvd25lciwNCiAgICBEQUNMLCBhbmQgU0FDTC4uLiIuDQoNCiAgICBEb2VzIGl0IG1lYW4g
+dGhhdCB5b3UgZGlkIG5vdCB0ZXN0IHNldHRpbmcgZ3JvdXAgU0lEPw0KDQogICAgSXQgaXMgYWxz
+byBjb25mdXNpbmcgdGhhdCBjb21tZW50cyBpbiB0aGUgY29kZSBzYXlzIC8qIG93bmVyIHBsdXMg
+REFDTCAqLw0KICAgIGFuZCAvKiBvd25lci9EQUNML1NBQ0wgKi8uDQogICAgRG9lcyBpdCBtZWFu
+IHRoYXQgc2V0dGluZyBncm91cCBTSUQgaXMgbm90IHN1cHBvc2VkIHRvIGJlIHN1cHBvcnRlZD8N
+CiAgICBPciB3YXMgdGhpcyBqdXN0IGFuIG92ZXJzaWdodD8NCg0KICAgIEFueXdheSwgd2l0aCB0
+aGlzIHBhdGNoLCBzZXRjaWZzYWNsIC1nIDxTSUQ+IHdvcmtzIGFzIGV4cGVjdGVkLA0KICAgIGF0
+IGxlYXN0IHdoZW4gdGhlIHNlcnZlciBpcyBzYW1iYS4NCg0KICAgIFRoYW5rcywNCiAgICBBbWly
+Lg0KDQoNCiAgICBbMV0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtY2lmcy9DQUhoS3BR
+N1B3Z0R5c1MzblVBQTBBTExkTVpxbnpHNnE2d0wxdG1uM2FxT1B3WmJ5eWdAbWFpbC5nbWFpbC5j
+b20vDQoNCiAgICAgZnMvY2lmcy94YXR0ci5jIHwgMiArKw0KICAgICAxIGZpbGUgY2hhbmdlZCwg
+MiBpbnNlcnRpb25zKCspDQoNCiAgICBkaWZmIC0tZ2l0IGEvZnMvY2lmcy94YXR0ci5jIGIvZnMv
+Y2lmcy94YXR0ci5jDQogICAgaW5kZXggN2Q4YjcyZDY3YzgwLi45ZDQ4NmZiYmZiYmQgMTAwNjQ0
+DQogICAgLS0tIGEvZnMvY2lmcy94YXR0ci5jDQogICAgKysrIGIvZnMvY2lmcy94YXR0ci5jDQog
+ICAgQEAgLTE3NSwxMSArMTc1LDEzIEBAIHN0YXRpYyBpbnQgY2lmc194YXR0cl9zZXQoY29uc3Qg
+c3RydWN0IHhhdHRyX2hhbmRsZXIgKmhhbmRsZXIsDQogICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBzd2l0Y2ggKGhhbmRsZXItPmZsYWdzKSB7DQogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBjYXNlIFhBVFRSX0NJRlNfTlRTRF9GVUxMOg0KICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhY2xmbGFncyA9IChDSUZTX0FDTF9PV05F
+UiB8DQogICAgKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIENJRlNfQUNMX0dST1VQIHwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgQ0lGU19BQ0xfREFDTCB8DQogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIENJRlNfQUNMX1NBQ0wpOw0KICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBicmVhazsNCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNhc2UgWEFUVFJfQ0lGU19OVFNEOg0KICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhY2xmbGFncyA9IChDSUZTX0FD
+TF9PV05FUiB8DQogICAgKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIENJRlNfQUNMX0dST1VQIHwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgQ0lGU19BQ0xfREFDTCk7DQogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgY2FzZSBYQVRUUl9DSUZTX0FDTDoNCiAgICAtLQ0KICAgIDIuMjUu
+MQ0KDQoNCg==
