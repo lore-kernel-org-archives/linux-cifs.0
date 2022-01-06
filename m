@@ -2,122 +2,115 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C795C433FE
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Jan 2022 04:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A64F2C433FE
+	for <linux-cifs@archiver.kernel.org>; Thu,  6 Jan 2022 15:55:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232305AbiAFEkE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 5 Jan 2022 23:40:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38744 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230283AbiAFEkE (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 5 Jan 2022 23:40:04 -0500
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A45C061245
-        for <linux-cifs@vger.kernel.org>; Wed,  5 Jan 2022 20:40:03 -0800 (PST)
-Received: by mail-lj1-x233.google.com with SMTP id s4so2230512ljd.5
-        for <linux-cifs@vger.kernel.org>; Wed, 05 Jan 2022 20:40:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=8VnfHHPkYLCceNyOGpGiwdAV0CzZy8BhUi3EoaHG9Mk=;
-        b=NE+DiqAgBaihA3wwhxFlwBOXuVzHBiFFzXbeQg+Hq2PYs2OYJtNtcso/0xJ8hp03zI
-         92zSO27CPMIPFPxlykE3PCPRYmYLR6bWSkkHLOtTMTL3+QMo0BamUyrpXFl1meJXaYU6
-         Au7Vb4d92kAqCBimLSLEbDqq1mohJ2MX35TK+cGDQIw6JSJ5qmmbnnHZa95FLxqkdZyH
-         VdWDDPhySiurb7knc6pZuEl1PkC8Dr1CzCyc5LtmSveC7Uwtk37LCUZh+wUEEtwPdv0e
-         KZL0OTN96dreZvIshrx8pCjJYOC7zsPfxILDyM8GP8UdA8HoVTXb6vcEzSrt77mnKs6D
-         9kXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=8VnfHHPkYLCceNyOGpGiwdAV0CzZy8BhUi3EoaHG9Mk=;
-        b=bZc5Wv41R/eMuix1wQdk/w5JYaFW/WyeIqk0RvL0HR+n6VAt4joqjR56ZeAMmvZXjO
-         vYtTF68vKxRqXOZVi8Nw/QhZpxwXCKdC6YDYriCfxanh7oHcF3mjA+lr+ML7c3Cw5q0y
-         BIipVNVYjavzbOGnvWTh6WjrxrzVUzIRvGSG/MHSRkLtF583k+3Xo4pTTSfvl6fQweGf
-         rZ7kIIs+rKgCfS/xJnMzh3+P0Hh4kOHJ4l814fxek+qcdU8tF3nLM+gx78sFkr+deLsB
-         7wRVaNuSb72b+gVRBvDzg5k9G2xOgnvlQaycisKP6dcs0NvfmwLgCmYPVZs7JFk5SXVp
-         eAlg==
-X-Gm-Message-State: AOAM5316DJ/WrXSV0WkUY59vIVWlU9PvvLT3ujw+VBeVQu5bm2cWf+eL
-        Cy90zUJs/4GJ9bvoUXnpE0dRh6LzBcqE61L4TxIO+F1h
-X-Google-Smtp-Source: ABdhPJxOYTyhs+oYFcML9YpvNV3op31Cib246M5fZNe2Sl3DPZbiriakt/U6SyW2othZv1a/zZhwVXsSeEUTWCyn1F4=
-X-Received: by 2002:a2e:a26d:: with SMTP id k13mr46915339ljm.229.1641444002016;
- Wed, 05 Jan 2022 20:40:02 -0800 (PST)
+        id S240763AbiAFPzS (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 6 Jan 2022 10:55:18 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:55946 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240757AbiAFPzQ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Jan 2022 10:55:16 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 523EC61CCD;
+        Thu,  6 Jan 2022 15:55:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EA9EC36AED;
+        Thu,  6 Jan 2022 15:55:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641484515;
+        bh=Zs49UM4op7FhcCag8kpRl0gmJmPkQMG6LyUseoRbg+0=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=u/X2RYkCkXWlEbdzZylMfFjFSEVyRT5Ca3qVn7cp9C12kkSDpjgzNfNvUmOCIJizx
+         DommcboOU+mfgMmoOi08pZRyP+WiWUHP2RIG7uehFtB1oWZtypyF8sWK4S/xTD38sh
+         Y1XgFY7Ix5jLFUTR/9KYwRCm4cHtFN4stWf7TxUjUkUiy5DK4m/VEiFiF0MUQQtwM5
+         CO6xPJVth9K2ogc2C0OdzBJPzd9r7HwWMa3eqeonRWKWg2fW5fpAghr2pKvhzexsb+
+         afyqg3LXWlrEtyE5ww0K0lsmykZcj63W0+M+mg0S4X+1a8SAezzwD6LHmxXCGzt6RL
+         uY4rs4xgdqKUA==
+Message-ID: <043a206f03929c2667a465314144e518070a9b2d.camel@kernel.org>
+Subject: Re: [PATCH v4 28/68] fscache: Provide a function to note the
+ release of a page
+From:   Jeff Layton <jlayton@kernel.org>
+To:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com
+Cc:     Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Thu, 06 Jan 2022 10:55:12 -0500
+In-Reply-To: <164021525963.640689.9264556596205140044.stgit@warthog.procyon.org.uk>
+References: <164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk>
+         <164021525963.640689.9264556596205140044.stgit@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.42.2 (3.42.2-1.fc35) 
 MIME-Version: 1.0
-References: <YdS7Fb/MzAy+IRyP@debian-BULLSEYE-live-builder-AMD64>
-In-Reply-To: <YdS7Fb/MzAy+IRyP@debian-BULLSEYE-live-builder-AMD64>
-From:   Steve French <smfrench@gmail.com>
-Date:   Wed, 5 Jan 2022 22:39:51 -0600
-Message-ID: <CAH2r5mt=BpKGaCN=h4F9Nqh6SLVDMs+F=XANBBfWE098+7WzNA@mail.gmail.com>
-Subject: Fwd: [PATCH] cifs: remove unused variable ses_selected
-To:     Shyam Prasad N <nspmangalore@gmail.com>,
-        Muhammad Usama Anjum <musamaanjum@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Shyam,
-How did you want to use this field? It is in your patch series but as
-he notes it is unused.
+On Wed, 2021-12-22 at 23:20 +0000, David Howells wrote:
+> Provide a function to be called from a network filesystem's releasepage
+> method to indicate that a page has been released that might have been a
+> reflection of data upon the server - and now that data must be reloaded
+> from the server or the cache.
+> 
+> This is used to end an optimisation for empty files, in particular files
+> that have just been created locally, whereby we know there cannot yet be
+> any data that we would need to read from the server or the cache.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: linux-cachefs@redhat.com
+> Link: https://lore.kernel.org/r/163819617128.215744.4725572296135656508.stgit@warthog.procyon.org.uk/ # v1
+> Link: https://lore.kernel.org/r/163906920354.143852.7511819614661372008.stgit@warthog.procyon.org.uk/ # v2
+> Link: https://lore.kernel.org/r/163967128061.1823006.611781655060034988.stgit@warthog.procyon.org.uk/ # v3
+> ---
+> 
+>  include/linux/fscache.h |   16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/include/linux/fscache.h b/include/linux/fscache.h
+> index 18e725671594..28ce258c1f87 100644
+> --- a/include/linux/fscache.h
+> +++ b/include/linux/fscache.h
+> @@ -607,4 +607,20 @@ static inline void fscache_clear_inode_writeback(struct fscache_cookie *cookie,
+>  	}
+>  }
+>  
+> +/**
+> + * fscache_note_page_release - Note that a netfs page got released
+> + * @cookie: The cookie corresponding to the file
+> + *
+> + * Note that a page that has been copied to the cache has been released.  This
+> + * means that future reads will need to look in the cache to see if it's there.
+> + */
+> +static inline
+> +void fscache_note_page_release(struct fscache_cookie *cookie)
+> +{
+> +	if (cookie &&
+> +	    test_bit(FSCACHE_COOKIE_HAVE_DATA, &cookie->flags) &&
+> +	    test_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags))
+> +		clear_bit(FSCACHE_COOKIE_NO_DATA_TO_READ, &cookie->flags);
+> +}
+> +
+>  #endif /* _LINUX_FSCACHE_H */
+> 
+> 
 
----------- Forwarded message ---------
-From: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Date: Wed, Jan 5, 2022 at 3:38 AM
-Subject: [PATCH] cifs: remove unused variable ses_selected
-To: Steve French <sfrench@samba.org>, open list:COMMON INTERNET FILE
-SYSTEM CLIENT (CIFS) <linux-cifs@vger.kernel.org>, moderated
-list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS)
-<samba-technical@lists.samba.org>, open list
-<linux-kernel@vger.kernel.org>
-Cc: <usama.anjum@collabora.com>
+Is this logic correct?
 
+FSCACHE_COOKIE_HAVE_DATA gets set in cachefiles_write_complete, but will
+that ever be called on a cookie that has no data? Will we ever call
+cachefiles_write at all when there is no data to be written?
 
-ses_selected is being declared and set at several places. It is not
-being used. Remove it.
-
-Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
----
- fs/cifs/smb2pdu.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/fs/cifs/smb2pdu.c b/fs/cifs/smb2pdu.c
-index 19c54b309e39..9a72c22bb189 100644
---- a/fs/cifs/smb2pdu.c
-+++ b/fs/cifs/smb2pdu.c
-@@ -3790,7 +3790,7 @@ void smb2_reconnect_server(struct work_struct *work)
-        struct cifs_tcon *tcon, *tcon2;
-        struct list_head tmp_list, tmp_ses_list;
-        bool tcon_exist = false, ses_exist = false;
--       bool tcon_selected = false, ses_selected = false;
-+       bool tcon_selected = false;
-        int rc;
-        bool resched = false;
-
-@@ -3807,7 +3807,7 @@ void smb2_reconnect_server(struct work_struct *work)
-        spin_lock(&cifs_tcp_ses_lock);
-        list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
-
--               tcon_selected = ses_selected = false;
-+               tcon_selected = false;
-
-                list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
-                        if (tcon->need_reconnect || tcon->need_reopen_files) {
-@@ -3833,7 +3833,7 @@ void smb2_reconnect_server(struct work_struct *work)
-                spin_lock(&ses->chan_lock);
-                if (!tcon_selected && cifs_chan_needs_reconnect(ses, server)) {
-                        list_add_tail(&ses->rlist, &tmp_ses_list);
--                       ses_selected = ses_exist = true;
-+                       ses_exist = true;
-                        ses->ses_count++;
-                }
-                spin_unlock(&ses->chan_lock);
 --
-2.30.2
-
-
-
--- 
-Thanks,
-
-Steve
+Jeff Layton <jlayton@kernel.org>
