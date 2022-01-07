@@ -2,77 +2,79 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E22CC433F5
-	for <linux-cifs@archiver.kernel.org>; Fri,  7 Jan 2022 11:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D947AC433F5
+	for <linux-cifs@archiver.kernel.org>; Fri,  7 Jan 2022 18:39:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347103AbiAGLZo (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Fri, 7 Jan 2022 06:25:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31523 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1347095AbiAGLZm (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Jan 2022 06:25:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641554741;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LihP/f7kkQcoH5EB358WZj2ActRS2QGX7JqNWfqK9rU=;
-        b=gFvKGa1wWIPYVY+Frs5OfyVJxbZzmB3ATD13/EuvOAiFFafKl1AfK946JVFd1zwa5OPAtj
-        fbLK/terXisLsMuLBD2G3Zudyxz6daLbIx29vbsFnA9yjntGE8S+uEsRCqI1xZLQeChNIF
-        RhFw0UpnYPeZTJo/NZ8JfOFhyPBHvxg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-25-ujFKLBTZNaCuaYSpYvGkxQ-1; Fri, 07 Jan 2022 06:25:33 -0500
-X-MC-Unique: ujFKLBTZNaCuaYSpYvGkxQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C3041800D50;
-        Fri,  7 Jan 2022 11:25:31 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C1DF02A189;
-        Fri,  7 Jan 2022 11:25:17 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <94b5163b0652c6106aa01a0f4c03bdf57c0a7e71.camel@kernel.org>
-References: <94b5163b0652c6106aa01a0f4c03bdf57c0a7e71.camel@kernel.org> <164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk> <164021552299.640689.10578652796777392062.stgit@warthog.procyon.org.uk>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>,
-        JeffleXu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-cifs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 46/68] cachefiles: Mark a backing file in use with an inode flag
+        id S229726AbiAGSji (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 7 Jan 2022 13:39:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44840 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229653AbiAGSjh (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 7 Jan 2022 13:39:37 -0500
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C1FC061574
+        for <linux-cifs@vger.kernel.org>; Fri,  7 Jan 2022 10:39:37 -0800 (PST)
+Received: by mail-lf1-x134.google.com with SMTP id h7so18715393lfu.4
+        for <linux-cifs@vger.kernel.org>; Fri, 07 Jan 2022 10:39:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=ew0pMfk9tLa2l4sigwNVWgyRYXoTsicS3j8D7qnLrRw=;
+        b=pCUhEeF8WD9AputXy+U55S9bxOTiyEYXVZUyVHQ0SAtKZ3XAnxyPGBVAoM9+mgNrFa
+         Or0wkLfU8sG3BGDGCGR/1/yYkgq4vbiO9sxFkQKOPBs5YbuwFo/xDTYwSExt2piuKDfP
+         rur5kDaEBjVIVObXOIk2i566dAPHnhmLLvJ2RlOjKIxx9Ag0Og8NtXaaeXdlGcRr8x37
+         l34Mn58C5l3J9hFIwjkO/Y28SemV4OwTRPrmYDPJTXTbpsbN34zw2Nnbz8DZPaXkJm8N
+         68M3sw0a96mR9t7GtK+I+JEr8IVBcIy1OTM9ne6SgbrS838oRUmbKYj1Y13zaUOb2Aes
+         BEKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=ew0pMfk9tLa2l4sigwNVWgyRYXoTsicS3j8D7qnLrRw=;
+        b=tgxzdVQOnoEDWyADmif+10/6/tc1LAmlBw7kuUu9ce7WjVOy9zIKkG13cPGjGcUEre
+         JVTOZr4Ca1XNLTWi/8k6EhSDLXBB7KdcXmbnmO2Na8VREC/TfuU5FaoXOWu7vAeWKtxt
+         vyy9FWn8cReIgeoYmcy0Hix0MC2/CubUuD5gjbdE6w/i5tHiwgY2eFW+nOrThUDr7YNo
+         aeuiulkIo08R/6C241XUoyZJTdzY52TqlZYzhA/0Q+yqNk03trIL/UkOSU4E19dQok7m
+         MxFDzlBv9UWnanqyyq9zjFsAi6N0k3zc8wVJ6ftZziJ2Z+6mAQb78tmf50W+kbNgAz6k
+         cXIA==
+X-Gm-Message-State: AOAM5327AJ0Nh6/3jjLQOhwV+FWZb28cIyo3zAtMNmYgucy/NSK6ltVa
+        5FH3SfpjOJWvasg0fXOt/0O+AijGXoueOave6x5HrIy9dTU=
+X-Google-Smtp-Source: ABdhPJwuy1a5SRCVI2/7fqHnnCPYyWF/PJWU97xc9B116+1bXHzAOfyI7s45Xn0b2VTgygTkbHdGwZLjoR7Jg7YOND0=
+X-Received: by 2002:a2e:9c8a:: with SMTP id x10mr48010473lji.209.1641580775584;
+ Fri, 07 Jan 2022 10:39:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3149601.1641554716.1@warthog.procyon.org.uk>
-Date:   Fri, 07 Jan 2022 11:25:16 +0000
-Message-ID: <3149602.1641554716@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+From:   Steve French <smfrench@gmail.com>
+Date:   Fri, 7 Jan 2022 12:39:24 -0600
+Message-ID: <CAH2r5msWYcefntP4Dks69W+Oq3DKc8qHp5mow07g49TN7fV50w@mail.gmail.com>
+Subject: SMB1 regression with multichannel patches in for-next
+To:     Shyam Prasad N <nspmangalore@gmail.com>
+Cc:     CIFS <linux-cifs@vger.kernel.org>, Paulo Alcantara <pc@cjr.nz>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Jeff Layton <jlayton@kernel.org> wrote:
+The buildbot passed with the first six patches in for-next
 
-> Probably, this patch should be merged with #38. The commit logs are the
-> same, and they are at least somewhat related.
+183eea2ee5ba cifs: reconnect only the connection and not smb session
+where possible
+2e0fa298d149 cifs: add WARN_ON for when chan_count goes below minimum
+66eb0c6e6661 cifs: adjust DebugData to use chans_need_reconnect for conn status
+f486ef8e2003 cifs: use the chans_need_reconnect bitmap for reconnect status
+d1a931ce2e3b cifs: track individual channel status using chans_need_reconnect
+0b66fa776c36 cifs: remove redundant assignment to pointer p
+c9e6606c7fe9 Linux 5.16-rc8
 
-That's not so simple, unfortunately.  Patch 46 requires bits of patches 43 and
-45 in addition to patch 38 and patch 39 depends on patch 38.
+See: http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/3/builds/137
 
-David
+but failed for SMB1 related tests in the DFS test group when run with
+the next patch: 220c5bc25d87 cifs: take cifs_tcp_ses_lock for status
+checks
 
+http://smb3-test-rhel-75.southcentralus.cloudapp.azure.com/#/builders/3/builds/136
+
+Let me know if you spot anything obvious wrong with that patch.
+
+-- 
+Thanks,
+
+Steve
