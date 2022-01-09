@@ -2,82 +2,65 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31CE0C433F5
-	for <linux-cifs@archiver.kernel.org>; Sat,  8 Jan 2022 08:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F93BC433EF
+	for <linux-cifs@archiver.kernel.org>; Sun,  9 Jan 2022 02:43:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231294AbiAHInc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sat, 8 Jan 2022 03:43:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:21341 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233957AbiAHIn2 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sat, 8 Jan 2022 03:43:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641631407;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CuAQLvFAvrXC/CGaNT1eE7oPqrX2KbSln6Qc3hozJtk=;
-        b=EUHK/6g5AIERKm2PuBh3Mx/SvYrM6gQJWAZtfPvKUHiKrx/MUjUcSYIaKTUNpk8cTQYZwT
-        vrPD1l7F6pM6unKx6FxWkeolL8rjL2nhjZeiFkut5rg9lBw1b2I0/P8W3Zu+/nuI58regp
-        FN3m5pFDKNt57dQTS4jnpoXmUjvABF8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-118-xHmu0LN6MMyH2esABKG0fQ-1; Sat, 08 Jan 2022 03:43:22 -0500
-X-MC-Unique: xHmu0LN6MMyH2esABKG0fQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S235073AbiAICm6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sat, 8 Jan 2022 21:42:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41242 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232210AbiAICm6 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sat, 8 Jan 2022 21:42:58 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46278C06173F
+        for <linux-cifs@vger.kernel.org>; Sat,  8 Jan 2022 18:42:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3CF418397A7;
-        Sat,  8 Jan 2022 08:43:19 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2554F5F4EA;
-        Sat,  8 Jan 2022 08:43:11 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <Ydk6jWmFH6TZLPZq@casper.infradead.org>
-References: <Ydk6jWmFH6TZLPZq@casper.infradead.org> <164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk> <164021541207.640689.564689725898537127.stgit@warthog.procyon.org.uk> <CAOQ4uxjEcvffv=rNXS-r+NLz+=6yk4abRuX_AMq9v-M4nf_PtA@mail.gmail.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dhowells@redhat.com, Amir Goldstein <amir73il@gmail.com>,
-        linux-cachefs@redhat.com,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>,
-        JeffleXu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 38/68] vfs, cachefiles: Mark a backing file in use with an inode flag
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4300D60A1F
+        for <linux-cifs@vger.kernel.org>; Sun,  9 Jan 2022 02:42:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9678EC36AE9
+        for <linux-cifs@vger.kernel.org>; Sun,  9 Jan 2022 02:42:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641696176;
+        bh=HEq8nbV6aAVfVjeJ8hiqcXhlrzyl2VPYDIjVNrtxOqY=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=hUdMHuM+kIvgkW2+a89j6BnrzigpH8XhtChEtAzhcKOURkT9rjOHum4jIQAl8nFDr
+         TQVkL/Jqyvt1wt56A7pPpoymOaFK8YIsdOQoVf1PDHbUAti8jCiZRN4LFWbDL1Kp1U
+         BDXP/bHKCj4chEwa3YsCthZ+brelHjaA2ZXgequ805jHQK3c7q/kC+GdnpC/i0AWEU
+         uOVSmcZRCiiTgiNFJF6KzajfnbPhPKiL/o+nMbGXSRS1W6QKjBpKWVO5vT3O/UW6FS
+         YcLEcE7mLxAgC/1ral66zNrScPYUaD4KkdwMRIs3pnBMlc0qZGk5Iq7DC/7TXr+qo4
+         wNMTVfCgUWjAA==
+Received: by mail-yb1-f182.google.com with SMTP id c6so26462238ybk.3
+        for <linux-cifs@vger.kernel.org>; Sat, 08 Jan 2022 18:42:56 -0800 (PST)
+X-Gm-Message-State: AOAM531bt6oi91qYlXjQesyOndszYF13Oc9Vogmd2MGj9bbHKikYjQLk
+        pJa+BFR1CGK9mV+xy5yRA3hcIjin+kUgZX1GSCc=
+X-Google-Smtp-Source: ABdhPJw3BHKZbFUc1ogKz2MLrB2k+CPx7HUbvZFmIdQldTJxHkOGLYJeiX5A02UP8JWC9JizYk5s3n/t2H6LCR+UQW0=
+X-Received: by 2002:a05:6902:102e:: with SMTP id x14mr64612288ybt.265.1641696175707;
+ Sat, 08 Jan 2022 18:42:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3492247.1641631391.1@warthog.procyon.org.uk>
-Date:   Sat, 08 Jan 2022 08:43:11 +0000
-Message-ID: <3492248.1641631391@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received: by 2002:a05:7110:5011:b0:123:6c39:8652 with HTTP; Sat, 8 Jan 2022
+ 18:42:55 -0800 (PST)
+In-Reply-To: <20220107054531.619487-1-hyc.lee@gmail.com>
+References: <20220107054531.619487-1-hyc.lee@gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Sun, 9 Jan 2022 11:42:55 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9OBsUrFv5KjZ0b-6-N3-DE9Tz0e+5kcEhXtEjZfXHRPw@mail.gmail.com>
+Message-ID: <CAKYAXd9OBsUrFv5KjZ0b-6-N3-DE9Tz0e+5kcEhXtEjZfXHRPw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] ksmbd: smbd: create MR pool
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     linux-cifs@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Matthew Wilcox <willy@infradead.org> wrote:
-
-> 
-> Huh?  If some other kernel module sets it, cachefiles will try to set it,
-> see it's already set, and fail.  Presumably cachefiles does not go round
-> randomly "unusing" files that it has not previously started using.
-
-Correct.  It only unuses a file that it marked in-use in the first place.
-
-David
-
+2022-01-07 14:45 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> Create a memory region pool because rdma_rw_ctx_init()
+> uses memory registration if memory registration yields
+> better performance than using multiple SGE entries.
+>
+> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
