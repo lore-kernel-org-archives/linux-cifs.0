@@ -2,86 +2,82 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D274AC433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 06:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C36C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 08:00:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbiAJGGv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Jan 2022 01:06:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59006 "EHLO
+        id S240915AbiAJIAY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Jan 2022 03:00:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230078AbiAJGGt (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jan 2022 01:06:49 -0500
-Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F0CC06173F;
-        Sun,  9 Jan 2022 22:06:49 -0800 (PST)
-Received: by mail-vk1-xa32.google.com with SMTP id b77so7449926vka.11;
-        Sun, 09 Jan 2022 22:06:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=LK3tmlug+DMfgByubmuTTbml4FXkpQCC66d1KNzfJC4=;
-        b=Vi0k//5j8p2xpFzFUPfJSHx1/TavX6yCKRtKYEfQRWbqHTbKLD9s22o13V9k8QB+Ax
-         dJwPL7GDVIx/4o/aO6Toov5KJVbC5CiNP2SlVCWtVH+BlAK7VdtNDQSdGRPsuC1hepXG
-         UlRZvF43jZedZwBMZhLbGsHp8P4IQNSIx4fHlB3XnwFQ3O45Ohm7AGGxYOvIU5ogU1gr
-         HzM9IAPbbaCVuiZKW69RiciB0PmWggJzuptXWOnwB6BhyVtqnEskD6ezMWdesHE579KF
-         eBgph6aR+TcIlA0PuzD7aanNPVn/Nl7DBfKrWyHQJRLdD4+W5Isf7HUJevqFb+MdlIfD
-         gRMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=LK3tmlug+DMfgByubmuTTbml4FXkpQCC66d1KNzfJC4=;
-        b=qLMCbB8zVLe3NTVCCaMH5/kz084lLTf8yieGvkjpJaCqEq59AY8XXPSYZGKeDRh4w2
-         ymwhGXuhktIsci/XHN0+pSwZ+VL8zrz5Vv97jdBNq9ptPKLSYjWOXyr9XafSUN+a6AS1
-         DlXIWweDHUm9NwR4bxwrnKPZ8qBvAsq0UOOARjH2M03gMF0Cw6ed1b4cNs3K3gab8Fyi
-         b201yW1rdyJrGWyPO6I+fai0AUfzCNdp6KdtgjAEYfjIQaiEIGAYtYky2DuVXZWDyHRT
-         gstYNulfb1nZE04nBP/84oGbCzD3Csche1bqQdv8O788VOq+8KukX1NpdAvKUcXV+I5y
-         av7w==
-X-Gm-Message-State: AOAM530po60MjiMY45jtyS2RQZ2tW7VNxkXPAvYbIbCCAy+P9p0bAtVa
-        pinIyQhNvz+uSggDHZkT0EMJ407bJRzFqrMWSBDe3+1o/Zo=
-X-Google-Smtp-Source: ABdhPJzRkFi8X3uZCbxDPI80V/p/7TM6f2eWnIbdmtMCHJMTqd7tnwn99jORBO2CfBXUQIjkDH2kWLAY+oXJLoRfCd8=
-X-Received: by 2002:a1f:e243:: with SMTP id z64mr25606383vkg.28.1641794808093;
- Sun, 09 Jan 2022 22:06:48 -0800 (PST)
+        with ESMTP id S241519AbiAJH7O (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jan 2022 02:59:14 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A01C025481;
+        Sun,  9 Jan 2022 23:53:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ck+GCTXTq6vx0+UGObJZ+hDxsPyCcfaXptvnTMJa0B0=; b=2fXREzZXspdztwjUGN/nEr1V70
+        ULFZg+uWcgCbVkT9RJ99GqDgBw03zzhprDIvLyzvZ7qRVO9+vpG3FpKNTtBLHUdI9wLAcco3KVtxU
+        FmAawMv8GbYeU0N7j7B/Biz03mtuJx5DEGglJ9/5CKfI7DrqrZ/czk6IuLzylhKySlqk0Z8M9x2B9
+        CL1qFxrETDgCNuBKXP/FrfvkiFauss03mL7R/dx00Aq6l+KQYF/bcCTcc/XaFeXO9wNYnLfNlrQgC
+        YYkQXrYpcLMG3JuaGDp0ZnslXqFynsyaAfJUGtIboPtq2WUvjyLVSa5+1X7l7Sna31kLM21NjUxyO
+        AHqQxnZQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1n6pUW-009jUS-SL; Mon, 10 Jan 2022 07:53:20 +0000
+Date:   Sun, 9 Jan 2022 23:53:20 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Amir Goldstein <amir73il@gmail.com>,
+        David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 38/68] vfs, cachefiles: Mark a backing file in use
+ with an inode flag
+Message-ID: <Ydvl8Dk8z0mF0KFl@infradead.org>
+References: <164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk>
+ <164021541207.640689.564689725898537127.stgit@warthog.procyon.org.uk>
+ <CAOQ4uxjEcvffv=rNXS-r+NLz+=6yk4abRuX_AMq9v-M4nf_PtA@mail.gmail.com>
+ <Ydk6jWmFH6TZLPZq@casper.infradead.org>
 MIME-Version: 1.0
-From:   Davyd McColl <davydm@gmail.com>
-Date:   Mon, 10 Jan 2022 08:06:37 +0200
-Message-ID: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
-Subject: Possible regression: unable to mount CIFS 1.0 shares from older
- machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
-To:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ydk6jWmFH6TZLPZq@casper.infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Good day
+On Sat, Jan 08, 2022 at 07:17:33AM +0000, Matthew Wilcox wrote:
+> On Sat, Jan 08, 2022 at 09:08:57AM +0200, Amir Goldstein wrote:
+> > > +#define S_KERNEL_FILE  (1 << 17) /* File is in use by the kernel (eg. fs/cachefiles) */
+> > 
+> > Trying to brand this flag as a generic "in use by kernel" is misleading.
+> > Modules other than cachefiles cannot set/clear this flag, because then
+> > cachefiles won't know that it is allowed to set/clear the flag.
+> 
+> Huh?  If some other kernel module sets it, cachefiles will try to set it,
+> see it's already set, and fail.  Presumably cachefiles does not go round
+> randomly "unusing" files that it has not previously started using.
+> 
+> I mean, yes, obviously, it's a kernel module, it can set and clear
+> whatever flags it likes on any inode in the system, but conceptually,
+> it's an advisory whole-file lock.
 
-I'm following advice from the thread at
-https://bugzilla.kernel.org/show_bug.cgi?id=215375 as to how to report
-this, so please bear with me and redirect me as necessary.
-
-Since commit 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c, I'm unable to
-mount a CIFS 1.0 share ( from a media player: mede8er med600x3d, which
-runs some older linux). Apparently I'm not the only one, according to
-that thread, though the other affected party there is windows-based.
-
-I first logged this in the Gentoo bugtracker
-(https://bugs.gentoo.org/821895) and a reversion patch is available
-there for the time being.
-
-I understand that some of the encryption methods upon which the
-original feature relied are to be removed and, as such, the ability to
-mount these older shares was removed. This is sure to affect anyone
-running older Windows virtual machines (or older, internally-visible
-windows hosts) in addition to anyone attempting to connect to shares
-from esoteric devices like mine.
-
-Whilst I understand the desire to clean up code and remove dead
-branches, I'd really appreciate it if this particular feature remains
-available either by kernel configuration (which suits me fine, but is
-likely to be a hassle for anyone running a binary distribution) or via
-boot parameters. In the mean-time, I'm updating my own sync software
-to support this older device because if I can't sync media to the
-player, the device is not very useful to me.
-
-Thanks
--d
+So let's name it that way.  We have plenty of files in kernel use using
+filp_open and this flag very obviously means something else.
