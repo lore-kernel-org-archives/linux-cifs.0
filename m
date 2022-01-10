@@ -2,82 +2,138 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C36C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 08:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C221EC433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 08:02:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240915AbiAJIAY (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Jan 2022 03:00:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55918 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241519AbiAJH7O (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jan 2022 02:59:14 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A01C025481;
-        Sun,  9 Jan 2022 23:53:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ck+GCTXTq6vx0+UGObJZ+hDxsPyCcfaXptvnTMJa0B0=; b=2fXREzZXspdztwjUGN/nEr1V70
-        ULFZg+uWcgCbVkT9RJ99GqDgBw03zzhprDIvLyzvZ7qRVO9+vpG3FpKNTtBLHUdI9wLAcco3KVtxU
-        FmAawMv8GbYeU0N7j7B/Biz03mtuJx5DEGglJ9/5CKfI7DrqrZ/czk6IuLzylhKySlqk0Z8M9x2B9
-        CL1qFxrETDgCNuBKXP/FrfvkiFauss03mL7R/dx00Aq6l+KQYF/bcCTcc/XaFeXO9wNYnLfNlrQgC
-        YYkQXrYpcLMG3JuaGDp0ZnslXqFynsyaAfJUGtIboPtq2WUvjyLVSa5+1X7l7Sna31kLM21NjUxyO
-        AHqQxnZQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1n6pUW-009jUS-SL; Mon, 10 Jan 2022 07:53:20 +0000
-Date:   Sun, 9 Jan 2022 23:53:20 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Amir Goldstein <amir73il@gmail.com>,
-        David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Steve French <sfrench@samba.org>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Jeff Layton <jlayton@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>,
-        JeffleXu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org,
-        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 38/68] vfs, cachefiles: Mark a backing file in use
- with an inode flag
-Message-ID: <Ydvl8Dk8z0mF0KFl@infradead.org>
-References: <164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk>
- <164021541207.640689.564689725898537127.stgit@warthog.procyon.org.uk>
- <CAOQ4uxjEcvffv=rNXS-r+NLz+=6yk4abRuX_AMq9v-M4nf_PtA@mail.gmail.com>
- <Ydk6jWmFH6TZLPZq@casper.infradead.org>
+        id S240671AbiAJICc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Jan 2022 03:02:32 -0500
+Received: from mail-pj1-f48.google.com ([209.85.216.48]:42824 "EHLO
+        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242103AbiAJIBA (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jan 2022 03:01:00 -0500
+Received: by mail-pj1-f48.google.com with SMTP id lr15-20020a17090b4b8f00b001b19671cbebso14976219pjb.1
+        for <linux-cifs@vger.kernel.org>; Mon, 10 Jan 2022 00:00:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nOcJN/H7vatO+ZP8BZrVVA+4NzcovEiOHsUE059+wsE=;
+        b=e7hW94QQUrSh6A6AKBBdpkw9XdUba14N7uT4+3WB1QKp9LQtlbzfSp2b+8VxCrJpaJ
+         xYqqFqkPWh+5oJwcrhUXjrpJAF7jvlpaUh+DlBPE6jeM8HsOdmIEMeOzhm5wQOK1vcWS
+         TShohBY1G6iG/OrQCjY6dMSgIY2M9fnSdKFYuscM09fQnzsWE/frxO3ng7skwonggW8D
+         MzK9j0nw5NNDQ1OtotSAhrytRvEjmmdCi17yS5cPcU3tZUQqKgDw78yh3BLH8kawhyF5
+         5tT8w0vVD2vsOFljzpUc2E62JUpLtTm1eAd3qHE0AT9AnX6WBdEejQGc/YV7DKPGUtRq
+         hhtw==
+X-Gm-Message-State: AOAM531KS6OEy1h7I1QaUKota0PcV/AJga/Rm+KsWERL67FUO3M7HylI
+        vlt3Ea/uwrkbZiAmSigeD98Rm0me74Y=
+X-Google-Smtp-Source: ABdhPJxwm9WVv/ICk0Elxkk7htT5avoVtwKaMSOo9UJRho/CcIcjzmmglrwcmcKEjoA1/10wNZMtSQ==
+X-Received: by 2002:a17:90b:3891:: with SMTP id mu17mr29213173pjb.242.1641801658372;
+        Mon, 10 Jan 2022 00:00:58 -0800 (PST)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id q22sm6227387pfk.27.2022.01.10.00.00.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jan 2022 00:00:58 -0800 (PST)
+From:   Namjae Jeon <linkinjeon@kernel.org>
+To:     linux-cifs@vger.kernel.org
+Cc:     Yufan Chen <wiz.chen@gmail.com>,
+        Namjae Jeon <linkinjeon@kernel.org>,
+        Steve French <stfrench@microsoft.com>
+Subject: [PATCH] ksmbd: add smb-direct shutdown
+Date:   Mon, 10 Jan 2022 17:00:45 +0900
+Message-Id: <20220110080045.4715-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ydk6jWmFH6TZLPZq@casper.infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Sat, Jan 08, 2022 at 07:17:33AM +0000, Matthew Wilcox wrote:
-> On Sat, Jan 08, 2022 at 09:08:57AM +0200, Amir Goldstein wrote:
-> > > +#define S_KERNEL_FILE  (1 << 17) /* File is in use by the kernel (eg. fs/cachefiles) */
-> > 
-> > Trying to brand this flag as a generic "in use by kernel" is misleading.
-> > Modules other than cachefiles cannot set/clear this flag, because then
-> > cachefiles won't know that it is allowed to set/clear the flag.
-> 
-> Huh?  If some other kernel module sets it, cachefiles will try to set it,
-> see it's already set, and fail.  Presumably cachefiles does not go round
-> randomly "unusing" files that it has not previously started using.
-> 
-> I mean, yes, obviously, it's a kernel module, it can set and clear
-> whatever flags it likes on any inode in the system, but conceptually,
-> it's an advisory whole-file lock.
+From: Yufan Chen <wiz.chen@gmail.com>
 
-So let's name it that way.  We have plenty of files in kernel use using
-filp_open and this flag very obviously means something else.
+When killing ksmbd server after connecting rdma, ksmbd threads does not
+terminate properly because the rdma connection is still alive.
+This patch add shutdown operation to disconnect rdma connection while
+ksmbd threads terminate.
+
+Signed-off-by: Yufan Chen <wiz.chen@gmail.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ fs/ksmbd/connection.c     |  9 ++++++++-
+ fs/ksmbd/connection.h     |  1 +
+ fs/ksmbd/transport_rdma.c | 10 ++++++++++
+ 3 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
+index d1d0105be5b1..208d2cff7bd3 100644
+--- a/fs/ksmbd/connection.c
++++ b/fs/ksmbd/connection.c
+@@ -387,17 +387,24 @@ int ksmbd_conn_transport_init(void)
+ static void stop_sessions(void)
+ {
+ 	struct ksmbd_conn *conn;
++	struct ksmbd_transport *t;
+ 
+ again:
+ 	read_lock(&conn_list_lock);
+ 	list_for_each_entry(conn, &conn_list, conns_list) {
+ 		struct task_struct *task;
+ 
+-		task = conn->transport->handler;
++		t = conn->transport;
++		task = t->handler;
+ 		if (task)
+ 			ksmbd_debug(CONN, "Stop session handler %s/%d\n",
+ 				    task->comm, task_pid_nr(task));
+ 		conn->status = KSMBD_SESS_EXITING;
++		if (t->ops->shutdown) {
++			read_unlock(&conn_list_lock);
++			t->ops->shutdown(t);
++			read_lock(&conn_list_lock);
++		}
+ 	}
+ 	read_unlock(&conn_list_lock);
+ 
+diff --git a/fs/ksmbd/connection.h b/fs/ksmbd/connection.h
+index 7e0730a262da..7a59aacb5daa 100644
+--- a/fs/ksmbd/connection.h
++++ b/fs/ksmbd/connection.h
+@@ -117,6 +117,7 @@ struct ksmbd_conn_ops {
+ struct ksmbd_transport_ops {
+ 	int (*prepare)(struct ksmbd_transport *t);
+ 	void (*disconnect)(struct ksmbd_transport *t);
++	void (*shutdown)(struct ksmbd_transport *t);
+ 	int (*read)(struct ksmbd_transport *t, char *buf, unsigned int size);
+ 	int (*writev)(struct ksmbd_transport *t, struct kvec *iovs, int niov,
+ 		      int size, bool need_invalidate_rkey,
+diff --git a/fs/ksmbd/transport_rdma.c b/fs/ksmbd/transport_rdma.c
+index 86fd64511512..3c1ec1ac0b27 100644
+--- a/fs/ksmbd/transport_rdma.c
++++ b/fs/ksmbd/transport_rdma.c
+@@ -1453,6 +1453,15 @@ static void smb_direct_disconnect(struct ksmbd_transport *t)
+ 	free_transport(st);
+ }
+ 
++static void smb_direct_shutdown(struct ksmbd_transport *t)
++{
++	struct smb_direct_transport *st = smb_trans_direct_transfort(t);
++
++	ksmbd_debug(RDMA, "smb-direct shutdown cm_id=%p\n", st->cm_id);
++
++	smb_direct_disconnect_rdma_work(&st->disconnect_work);
++}
++
+ static int smb_direct_cm_handler(struct rdma_cm_id *cm_id,
+ 				 struct rdma_cm_event *event)
+ {
+@@ -2201,6 +2210,7 @@ bool ksmbd_rdma_capable_netdev(struct net_device *netdev)
+ static struct ksmbd_transport_ops ksmbd_smb_direct_transport_ops = {
+ 	.prepare	= smb_direct_prepare,
+ 	.disconnect	= smb_direct_disconnect,
++	.shutdown	= smb_direct_shutdown,
+ 	.writev		= smb_direct_writev,
+ 	.read		= smb_direct_read,
+ 	.rdma_read	= smb_direct_rdma_read,
+-- 
+2.25.1
+
