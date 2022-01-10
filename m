@@ -2,85 +2,91 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E671AC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu,  6 Jan 2022 17:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD91C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 14:11:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241764AbiAFR63 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 6 Jan 2022 12:58:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48881 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241753AbiAFR63 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 6 Jan 2022 12:58:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641491908;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=PT9ey7hZx8cRSUsGa96WlhWve6b1NE4HPbJbyeLjnMk=;
-        b=izmvUUBFgEZ5lN2DOMQsm91O1hvdceWuXqsM8/ENKCpXTSGYfvEBRXE7Q8yYMOTrHPROCf
-        75F5kTIf9t1Jg1mrS3N9uIiVuDEqJuXX+93sevQxJXnEzaOZSV+74Fdn8TqWiHznRq5QkF
-        5xayyj0HOwIUd+lZGXuSDJ7YuJ2vwVk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-264-ctdbpef8NvS4DpJI91OUXA-1; Thu, 06 Jan 2022 12:58:25 -0500
-X-MC-Unique: ctdbpef8NvS4DpJI91OUXA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F63781EE64;
-        Thu,  6 Jan 2022 17:58:24 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4C5381091EF6;
-        Thu,  6 Jan 2022 17:58:20 +0000 (UTC)
-Subject: 
-From:   David Howells <dhowells@redhat.com>
-To:     smfrench@gmail.com
-Cc:     nspmangalore@gmail.com, dhowells@redhat.com, jlayton@kernel.org,
-        linux-cifs@vger.kernel.org, linux-cachefs@redhat.com
-Date:   Thu, 06 Jan 2022 17:58:19 +0000
-Message-ID: <164149189935.2867367.12096515579793121868.stgit@warthog.procyon.org.uk>
-User-Agent: StGit/0.23
+        id S235267AbiAJOLa (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Jan 2022 09:11:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58416 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235090AbiAJOLa (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jan 2022 09:11:30 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 241CCC06173F;
+        Mon, 10 Jan 2022 06:11:30 -0800 (PST)
+Received: from ip4d173d02.dynamic.kabel-deutschland.de ([77.23.61.2] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1n6vOS-0006f9-IU; Mon, 10 Jan 2022 15:11:28 +0100
+Message-ID: <933e14cb-7fac-c4bf-39fc-77a7ef48d175@leemhuis.info>
+Date:   Mon, 10 Jan 2022 15:11:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
+ machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
+Content-Language: en-BS
+To:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1641823890;8752d967;
+X-HE-SMSGID: 1n6vOS-0006f9-IU
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-[RFC][PATCH 0/3] cifs: In-progress conversion to use iov_iters instead of page lists
-Date: 
+Hi, this is your Linux kernel regression tracker speaking.
 
+Top-posting for once, to make this easy accessible to everyone.
 
-Hi Steve,
+TWIMC, the parent mail quoted below misses all the important people in
+To/CC. That was not the case in an earlier mail from the author that got
+rejected as it was HTML. There is a reply to that mail now that made it
+to the lists and everyone in the loop, hence it afaics is better to
+reply there instead if you consider to send one:
 
-For your illumination, here's where I'm currently at with making cifs use
-netfslib more fully.  I ended up delving into the realms of converting it
-to use iov_iter instead of page lists and doing partial foliation.
+https://lore.kernel.org/lkml/ff982786-4033-7450-c10c-8ce71c28d6eb@leemhuis.info/
 
-It isn't complete yet and some of the patches don't compile, but if you
-want a look at what I've been doing...
+Ciao, Thorsten
 
-David
----
-David Howells (3):
-      cifs: Use netfslib
-      cifs: Reverse the way iov_iters are used in reading
-      cifs: Eliminate cifs_readdata::pages
+P.S.: Trying to make regzbot handle this:
 
+#regzbot ^introduced 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
+#regzbot title cifs: unable to shares that require NTLM or weaker
+authentication algorithms
+#regzbot link: https://bugzilla.kernel.org/show_bug.cgi?id=215375
+#regzbot monitor:
+https://lore.kernel.org/lkml/ff982786-4033-7450-c10c-8ce71c28d6eb@leemhuis.info/
 
- fs/cifs/cifsfs.h    |    3 +
- fs/cifs/cifsglob.h  |   28 +-
- fs/cifs/cifsproto.h |    8 +-
- fs/cifs/cifssmb.c   |  219 +++++----
- fs/cifs/file.c      | 1041 ++++++++++++++-----------------------------
- fs/cifs/misc.c      |  109 -----
- fs/cifs/smb2ops.c   |  132 +++---
- fs/cifs/smb2pdu.c   |   12 +-
- fs/cifs/transport.c |   41 +-
- include/linux/uio.h |    3 +
- lib/iov_iter.c      |   94 ++++
- 11 files changed, 647 insertions(+), 1043 deletions(-)
-
-
+On 10.01.22 07:06, Davyd McColl wrote:
+> Good day
+> 
+> I'm following advice from the thread at
+> https://bugzilla.kernel.org/show_bug.cgi?id=215375 as to how to report
+> this, so please bear with me and redirect me as necessary.
+> 
+> Since commit 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c, I'm unable to
+> mount a CIFS 1.0 share ( from a media player: mede8er med600x3d, which
+> runs some older linux). Apparently I'm not the only one, according to
+> that thread, though the other affected party there is windows-based.
+> 
+> I first logged this in the Gentoo bugtracker
+> (https://bugs.gentoo.org/821895) and a reversion patch is available
+> there for the time being.
+> 
+> I understand that some of the encryption methods upon which the
+> original feature relied are to be removed and, as such, the ability to
+> mount these older shares was removed. This is sure to affect anyone
+> running older Windows virtual machines (or older, internally-visible
+> windows hosts) in addition to anyone attempting to connect to shares
+> from esoteric devices like mine.
+> 
+> Whilst I understand the desire to clean up code and remove dead
+> branches, I'd really appreciate it if this particular feature remains
+> available either by kernel configuration (which suits me fine, but is
+> likely to be a hassle for anyone running a binary distribution) or via
+> boot parameters. In the mean-time, I'm updating my own sync software
+> to support this older device because if I can't sync media to the
+> player, the device is not very useful to me.
