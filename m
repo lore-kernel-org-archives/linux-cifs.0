@@ -2,191 +2,126 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C78D5C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 01:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F97C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 01:37:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbiAJBg6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 9 Jan 2022 20:36:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56440 "EHLO
+        id S236896AbiAJBha (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 9 Jan 2022 20:37:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236795AbiAJBg5 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 Jan 2022 20:36:57 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A0BDC06173F
-        for <linux-cifs@vger.kernel.org>; Sun,  9 Jan 2022 17:36:57 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id t32so9860973pgm.7
-        for <linux-cifs@vger.kernel.org>; Sun, 09 Jan 2022 17:36:57 -0800 (PST)
+        with ESMTP id S237853AbiAJBha (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 Jan 2022 20:37:30 -0500
+Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7162AC06173F
+        for <linux-cifs@vger.kernel.org>; Sun,  9 Jan 2022 17:37:29 -0800 (PST)
+Received: by mail-ua1-x92c.google.com with SMTP id i5so20809307uaq.10
+        for <linux-cifs@vger.kernel.org>; Sun, 09 Jan 2022 17:37:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=BrGgYV4UjtJiHMu++vLlr26TC8Rv/REkSwpd8IoFqdE=;
-        b=GywJRJOvxmbk7SA1940xXmD05N53Aym2dEwN6XOedbHWslyFZhMhzJiCmvmNM0lHZf
-         m98rezUqNw8SlMMrpG24dJ9RR0i0IjL8on++/M8VrwG01v0pmXsiyqHlEOwaPLw4NGTp
-         5h+nlSqFBNsLUGbEiHcmr5fXJ6GRaxJ13qasEjXRTOrwZYwqK0BqvmlQptHCs/hLwBTa
-         7u0Ei3vzLQvxCj8JVn3rHAoi3zLKnbXZtd50khWIRryMfgToBUuCriHmqy6mMolBnzGV
-         3fZ+wzoZm56ZEmJBWvi/OK5Y6EUuOW3JFOi8gp1Toa0LW2MnS9d8Jnwzza9Imxa5DhHQ
-         3Ing==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=DdH5Jl/JF3RbYbOKGoTmW1vfPEemFE0sOCwMifN6nws=;
+        b=PSAbqpMCTFVypHe6qu5S6kF0SjtwkOn4ZIT428iZpaZWX7+t4Hn1lyK/DHp0/6rdjd
+         DKABV4mM6ccdSAvfFHO2VsF89rV7Aw9bMaESJ65Rvi8B1+EVzErh1PdDh2r9LNfMJ7Vi
+         nb4K/q/dwnql8Q7P7fOdRZg808+gvBsC5oCUYg1FT1A2R5xhj/027W1LMel5VahTt2Jj
+         Cfix03gQGS1JdVxhMSp+N7mdTxGR/ksp+X8/qWXfwQ2QsKgEunZUl8hr7eu2vkwgHIyf
+         ckL8iugQKzRvF/Q+GXn+oo/zn0S72J40Uq6hDA/vuMBlzBM1xvoSQi6VY1br+i1eneOa
+         AjGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=BrGgYV4UjtJiHMu++vLlr26TC8Rv/REkSwpd8IoFqdE=;
-        b=P/yV5dijCJinAXsvkqkzrQxe5s5CV2xuud/KLlalW39Ux8NKQ2XlFHmuMcX9wOx7Zn
-         Fx8hXtN659pj4iXrfXayBdjYK1PdSy9BOapY/4aAM68Ft9cBRXYX9UzTnZnrAAaxGjFx
-         0nJMLosl5HxTGB3NcwvPerMabqM3Rmp6LH7XcAlcKe593wW3A0v9Nej2qonkMuKc8fE4
-         nLbIqWwlai43l16izs8so7rfyMYxEpfh3GQaDlTWoUmKHNvEpS6gfas81Q8MaKgXgGwS
-         rTm9sOtaGFkb++z89/QHxOdJlprqUC9cTHx7/ldbNZnod50nQkbDeKjTPRuu8xdN5YHb
-         oKew==
-X-Gm-Message-State: AOAM531kbBM/cSGimX8DV7P16ep2PD/lncryoI+3tOqPWo0gCMLheop/
-        yfOgcK7KTE0bRn1pdFb1yp8FmqGLXXI=
-X-Google-Smtp-Source: ABdhPJy2DG86zVJfnBd11iTbFH9OPlJREGbJt9LjryYNRWbWfLvZZrYHxzXFNgRfljY0bX+Tjmiyzw==
-X-Received: by 2002:a63:156:: with SMTP id 83mr52291728pgb.196.1641778616454;
-        Sun, 09 Jan 2022 17:36:56 -0800 (PST)
-Received: from localhost.localdomain ([125.177.232.58])
-        by smtp.googlemail.com with ESMTPSA id n10sm5822828pje.0.2022.01.09.17.36.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jan 2022 17:36:55 -0800 (PST)
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>
-Subject: [PATCH] ksmbd: smbd: fix missing client's memory region invalidation
-Date:   Mon, 10 Jan 2022 10:36:39 +0900
-Message-Id: <20220110013639.841324-1-hyc.lee@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=DdH5Jl/JF3RbYbOKGoTmW1vfPEemFE0sOCwMifN6nws=;
+        b=lIjK5K3phaQbR+aXpDDtTFrl0Tncrb3w5H5F1GuCoXd06xCSCpd3aBx4axK/JijS/k
+         BcGK9p7HRBl1P7i6S+jObk6JxWxONONTq3vRGHdk5KbL48XIOvEb0OGEDQwonrSbRnO1
+         694hG93hVFR25HiXrISADgg9u3eUIWl6DLt7wZ001O9Gs45FmvjUEfr65s4DUjPZMXDW
+         4oPie4P/z4F6TyreeAzBSpiqmUTlXr/ucj1up7Zp37aJk/b+zI9OE4NwIoSAy6V2b9lA
+         iScEqcL/yCprnzA1X1iZp096Dss3fcFxHCXEDLTUbLwoU6580WEb1MLHlwb5c8nWUsbM
+         R/uw==
+X-Gm-Message-State: AOAM532sQp80/a2moYhjaaRRmfe+EaDwAXfuif/XTqYrRYdGliTS6yZI
+        Yzb8OGpRWfMj12f/LwSXS6BzItAoJR8Sg/1dtkw=
+X-Google-Smtp-Source: ABdhPJzbRt7kqn94wJ0DRoQ4qSBkvD7W4sADChseXylRB3b3WBlhXqatgSPWv1yy/z5YQiJaNw3j+9v2DAXeSRU3SNU=
+X-Received: by 2002:a67:2f58:: with SMTP id v85mr2153390vsv.13.1641778648530;
+ Sun, 09 Jan 2022 17:37:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220107054531.619487-1-hyc.lee@gmail.com> <20220107054531.619487-2-hyc.lee@gmail.com>
+ <CAKYAXd9qYgpf9oGhK5bdE2M6nbfpeTEAOg+zDGGXomOLaNmR9Q@mail.gmail.com>
+ <CAH2r5mtTs5bxF9+_M0-3a7YkZB4zqBCm4_kL_QpHAPhEVAG-WA@mail.gmail.com> <CAKYAXd9ndasXA3q2F05f9JMXHPT6cQRf0M8owP-dwdv_LWggwQ@mail.gmail.com>
+In-Reply-To: <CAKYAXd9ndasXA3q2F05f9JMXHPT6cQRf0M8owP-dwdv_LWggwQ@mail.gmail.com>
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+Date:   Mon, 10 Jan 2022 10:37:17 +0900
+Message-ID: <CANFS6baREfEidN+FqZROiF+6QtOQ6FXae6f0L9EVKaUFK2L3hg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] ksmbd: smbd: change the default maximum read/write,
+ receive size
+To:     Namjae Jeon <linkinjeon@kernel.org>
+Cc:     Steve French <smfrench@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-if the Channel of a SMB2 WRITE request is
-SMB2_CHANNEL_RDMA_V1_INVALIDTE, a client
-does not invalidate its memory regions but
-ksmbd must do it by sending a SMB2 WRITE response
-with IB_WR_SEND_WITH_INV.
+2022=EB=85=84 1=EC=9B=94 9=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 9:56, Na=
+mjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>
+> 2022-01-09 15:44 GMT+09:00, Steve French <smfrench@gmail.com>:
+> > Do you have more detail on what the negotiated readsize/writesize
+> > would be for Windows clients with this size? for Linux clients?
+> Hyunchul, Please answer.
+>
 
-But if errors occur while processing a SMB2
-READ/WRITE request, ksmbd sends a response
-with IB_WR_SEND. So a client could use memory
-regions already in use.
+For a Linux client, if connected using smb-direct,
+the size will be 1048512. But connected with multichannel,
+the size will be 4MB instead of 1048512. And this causes
+problems because the read/write size is bigger than 1048512.
+It looks like a bug. I have to limit the ksmbd's SMB2 maximum
+read/write size for a test.
 
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
----
- fs/ksmbd/smb2pdu.c | 76 ++++++++++++++++++++++++++++++----------------
- 1 file changed, 49 insertions(+), 27 deletions(-)
+For Windows clients, the actual read/write size is less than
+1048512.
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index ced8f949a4d6..19355511b777 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -6132,18 +6132,6 @@ static ssize_t smb2_read_rdma_channel(struct ksmbd_work *work,
- 		(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
- 	int err;
- 
--	if (work->conn->dialect == SMB30_PROT_ID &&
--	    req->Channel != SMB2_CHANNEL_RDMA_V1)
--		return -EINVAL;
--
--	if (req->ReadChannelInfoOffset == 0 ||
--	    le16_to_cpu(req->ReadChannelInfoLength) < sizeof(*desc))
--		return -EINVAL;
--
--	work->need_invalidate_rkey =
--		(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
--	work->remote_key = le32_to_cpu(desc->token);
--
- 	err = ksmbd_conn_rdma_write(work->conn, data_buf, length,
- 				    le32_to_cpu(desc->token),
- 				    le64_to_cpu(desc->offset),
-@@ -6179,6 +6167,28 @@ int smb2_read(struct ksmbd_work *work)
- 		return smb2_read_pipe(work);
- 	}
- 
-+	if (req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE ||
-+	    req->Channel == SMB2_CHANNEL_RDMA_V1) {
-+		struct smb2_buffer_desc_v1 *desc =
-+			(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
-+
-+		if (work->conn->dialect == SMB30_PROT_ID &&
-+		    req->Channel != SMB2_CHANNEL_RDMA_V1) {
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		if (req->ReadChannelInfoOffset == 0 ||
-+		    le16_to_cpu(req->ReadChannelInfoLength) < sizeof(*desc)) {
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		work->need_invalidate_rkey =
-+			(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
-+		work->remote_key = le32_to_cpu(desc->token);
-+	}
-+
- 	fp = ksmbd_lookup_fd_slow(work, le64_to_cpu(req->VolatileFileId),
- 				  le64_to_cpu(req->PersistentFileId));
- 	if (!fp) {
-@@ -6364,21 +6374,6 @@ static ssize_t smb2_write_rdma_channel(struct ksmbd_work *work,
- 
- 	desc = (struct smb2_buffer_desc_v1 *)&req->Buffer[0];
- 
--	if (work->conn->dialect == SMB30_PROT_ID &&
--	    req->Channel != SMB2_CHANNEL_RDMA_V1)
--		return -EINVAL;
--
--	if (req->Length != 0 || req->DataOffset != 0)
--		return -EINVAL;
--
--	if (req->WriteChannelInfoOffset == 0 ||
--	    le16_to_cpu(req->WriteChannelInfoLength) < sizeof(*desc))
--		return -EINVAL;
--
--	work->need_invalidate_rkey =
--		(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
--	work->remote_key = le32_to_cpu(desc->token);
--
- 	data_buf = kvmalloc(length, GFP_KERNEL | __GFP_ZERO);
- 	if (!data_buf)
- 		return -ENOMEM;
-@@ -6425,6 +6420,33 @@ int smb2_write(struct ksmbd_work *work)
- 		return smb2_write_pipe(work);
- 	}
- 
-+	if (req->Channel == SMB2_CHANNEL_RDMA_V1 ||
-+	    req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE) {
-+		struct smb2_buffer_desc_v1 *desc =
-+			(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
-+
-+		if (work->conn->dialect == SMB30_PROT_ID &&
-+		    req->Channel != SMB2_CHANNEL_RDMA_V1) {
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		if (req->Length != 0 || req->DataOffset != 0) {
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		if (req->WriteChannelInfoOffset == 0 ||
-+		    le16_to_cpu(req->WriteChannelInfoLength) < sizeof(*desc)) {
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		work->need_invalidate_rkey =
-+			(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
-+		work->remote_key = le32_to_cpu(desc->token);
-+	}
-+
- 	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
- 		ksmbd_debug(SMB, "User does not have write permission\n");
- 		err = -EACCES;
--- 
-2.25.1
+> >
+> > It looked like it would still be 4MB at first glance (although in
+> > theory some Windows could do 8MB) ... I may have missed something
+> I understood that multiple-buffer descriptor support was required to
+> set a read/write size of 1MB or more. As I know, Hyunchul is currently
+> working on it.
+> It seems to be set to the smaller of max read/write size in smb-direct
+> negotiate and max read/write size in smb2 negotiate.
+>
+> Hyunchul, I have one question more, How did you get 1048512 setting value=
+ ?
+> >
 
+I remember when the size was 1MB, Windows clients requested read/write with
+1048512 and 64.
+
+> > On Sat, Jan 8, 2022 at 8:43 PM Namjae Jeon <linkinjeon@kernel.org> wrot=
+e:
+> >>
+> >> 2022-01-07 14:45 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> >> > Due to restriction that cannot handle multiple
+> >> > buffer descriptor structures, decrease the maximum
+> >> > read/write size for Windows clients.
+> >> >
+> >> > And set the maximum fragmented receive size
+> >> > in consideration of the receive queue size.
+> >> >
+> >> > Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+> >> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+> >
+> >
+> >
+> > --
+> > Thanks,
+> >
+> > Steve
+> >
+
+
+
+--
+Thanks,
+Hyunchul
