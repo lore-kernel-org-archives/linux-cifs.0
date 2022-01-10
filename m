@@ -2,177 +2,191 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FB3C433EF
-	for <linux-cifs@archiver.kernel.org>; Sun,  9 Jan 2022 15:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C78D5C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 01:36:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229675AbiAIP1e (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 9 Jan 2022 10:27:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36122 "EHLO
+        id S230079AbiAJBg6 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Sun, 9 Jan 2022 20:36:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234160AbiAIP1b (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 Jan 2022 10:27:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64ED9C06173F;
-        Sun,  9 Jan 2022 07:27:31 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1C4A0B80C72;
-        Sun,  9 Jan 2022 15:27:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EEB8C36AED;
-        Sun,  9 Jan 2022 15:27:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641742048;
-        bh=3b6/4NoAXJJWUq2gsg5iKUmGqebtBOvDSo33LeKf8cI=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=a1hj3BUPWWcC7naVx2AqX6O5K4Bl3I+t2LBa9cQpCeBaYAyBwaQn/PS+HGCeidy8q
-         V59tCbLL4SVGkupihAebTzDinf84wfBOUo5fKOH7h3X5A0HUfBNkBat2GC2klEJeJY
-         z+IrlZGIg9r8ZNjuzIUxUmJMEv6GlWlOIoflShkFfNhrr3x3ss7+217Fc1LcujWwRm
-         7pL1r7FXe40v8cxvGgS62Sd7KvDKkZkLRU+AyfWhS4/bR++UNpoDXsTk0iczsBxVVz
-         WuIg7JKBR2T5fTONlCI3jYhT3vWzHFWf9ioixoaAQwvW7eDBJGFhPbJuSq/hJfW7C+
-         gd+Ip0LdKRERQ==
-Message-ID: <6e44856a8711bf1eb95c16de9efdb1bb108cf25c.camel@kernel.org>
-Subject: Re: [PATCH v4 63/68] cifs: Support fscache indexing rewrite
- (untested)
-From:   Jeff Layton <jlayton@kernel.org>
-To:     David Howells <dhowells@redhat.com>, linux-cachefs@redhat.com,
-        Steve French <sfrench@samba.org>
-Cc:     Shyam Prasad N <nspmangalore@gmail.com>,
-        linux-cifs@vger.kernel.org,
-        Trond Myklebust <trondmy@hammerspace.com>,
-        Anna Schumaker <anna.schumaker@netapp.com>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Omar Sandoval <osandov@osandov.com>,
-        JeffleXu <jefflexu@linux.alibaba.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Sun, 09 Jan 2022 10:27:25 -0500
-In-Reply-To: <3419813.1641592362@warthog.procyon.org.uk>
-References: <164021579335.640689.2681324337038770579.stgit@warthog.procyon.org.uk>
-         <164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk>
-         <3419813.1641592362@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.42.2 (3.42.2-1.fc35) 
+        with ESMTP id S236795AbiAJBg5 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 Jan 2022 20:36:57 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A0BDC06173F
+        for <linux-cifs@vger.kernel.org>; Sun,  9 Jan 2022 17:36:57 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id t32so9860973pgm.7
+        for <linux-cifs@vger.kernel.org>; Sun, 09 Jan 2022 17:36:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BrGgYV4UjtJiHMu++vLlr26TC8Rv/REkSwpd8IoFqdE=;
+        b=GywJRJOvxmbk7SA1940xXmD05N53Aym2dEwN6XOedbHWslyFZhMhzJiCmvmNM0lHZf
+         m98rezUqNw8SlMMrpG24dJ9RR0i0IjL8on++/M8VrwG01v0pmXsiyqHlEOwaPLw4NGTp
+         5h+nlSqFBNsLUGbEiHcmr5fXJ6GRaxJ13qasEjXRTOrwZYwqK0BqvmlQptHCs/hLwBTa
+         7u0Ei3vzLQvxCj8JVn3rHAoi3zLKnbXZtd50khWIRryMfgToBUuCriHmqy6mMolBnzGV
+         3fZ+wzoZm56ZEmJBWvi/OK5Y6EUuOW3JFOi8gp1Toa0LW2MnS9d8Jnwzza9Imxa5DhHQ
+         3Ing==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=BrGgYV4UjtJiHMu++vLlr26TC8Rv/REkSwpd8IoFqdE=;
+        b=P/yV5dijCJinAXsvkqkzrQxe5s5CV2xuud/KLlalW39Ux8NKQ2XlFHmuMcX9wOx7Zn
+         Fx8hXtN659pj4iXrfXayBdjYK1PdSy9BOapY/4aAM68Ft9cBRXYX9UzTnZnrAAaxGjFx
+         0nJMLosl5HxTGB3NcwvPerMabqM3Rmp6LH7XcAlcKe593wW3A0v9Nej2qonkMuKc8fE4
+         nLbIqWwlai43l16izs8so7rfyMYxEpfh3GQaDlTWoUmKHNvEpS6gfas81Q8MaKgXgGwS
+         rTm9sOtaGFkb++z89/QHxOdJlprqUC9cTHx7/ldbNZnod50nQkbDeKjTPRuu8xdN5YHb
+         oKew==
+X-Gm-Message-State: AOAM531kbBM/cSGimX8DV7P16ep2PD/lncryoI+3tOqPWo0gCMLheop/
+        yfOgcK7KTE0bRn1pdFb1yp8FmqGLXXI=
+X-Google-Smtp-Source: ABdhPJy2DG86zVJfnBd11iTbFH9OPlJREGbJt9LjryYNRWbWfLvZZrYHxzXFNgRfljY0bX+Tjmiyzw==
+X-Received: by 2002:a63:156:: with SMTP id 83mr52291728pgb.196.1641778616454;
+        Sun, 09 Jan 2022 17:36:56 -0800 (PST)
+Received: from localhost.localdomain ([125.177.232.58])
+        by smtp.googlemail.com with ESMTPSA id n10sm5822828pje.0.2022.01.09.17.36.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jan 2022 17:36:55 -0800 (PST)
+From:   Hyunchul Lee <hyc.lee@gmail.com>
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Steve French <smfrench@gmail.com>,
+        Hyunchul Lee <hyc.lee@gmail.com>
+Subject: [PATCH] ksmbd: smbd: fix missing client's memory region invalidation
+Date:   Mon, 10 Jan 2022 10:36:39 +0900
+Message-Id: <20220110013639.841324-1-hyc.lee@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Fri, 2022-01-07 at 21:52 +0000, David Howells wrote:
-> This patch isn't quite right and needs a fix.  The attached patch fixes it.
-> I'll fold that in and post a v5 of this patch.
-> 
-> David
-> ---
-> cifs: Fix the fscache cookie management
-> 
-> Fix the fscache cookie management in cifs in the following ways:
-> 
->  (1) The cookie should be released in cifs_evict_inode() after it has been
->      unused from being pinned by cifs_set_page_dirty().
-> 
->  (2) The cookie shouldn't be released in cifsFileInfo_put_final().  That's
->      dealing with closing a file, not getting rid of an inode.  The cookie
->      needs to persist beyond the last file close because writepages may
->      happen after closure.
-> 
->  (3) The cookie needs to be used in cifs_atomic_open() to match
->      cifs_open().  As yet unknown files being opened for writing seem to go
->      by the former route rather than the latter.
-> 
-> This can be triggered by something like:
-> 
->         # systemctl start cachefilesd
->         # mount //carina/test /xfstest.test -o user=shares,pass=xxxx.fsc
->         # bash 5</xfstest.test/bar
->         # echo hello >/xfstest.test/bar
-> 
-> The key is to open the file R/O and then open it R/W and write to it whilst
-> it's still open for R/O.  A cookie isn't acquired if it's just opened R/W
-> as it goes through the atomic_open method rather than the open method.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> ---
->  fs/cifs/cifsfs.c |    8 ++++++++
->  fs/cifs/dir.c    |    4 ++++
->  fs/cifs/file.c   |    2 --
->  3 files changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-> index d3f3acf340f1..26cf2193c9a2 100644
-> --- a/fs/cifs/cifsfs.c
-> +++ b/fs/cifs/cifsfs.c
-> @@ -398,6 +398,7 @@ cifs_evict_inode(struct inode *inode)
->  	truncate_inode_pages_final(&inode->i_data);
->  	if (inode->i_state & I_PINNING_FSCACHE_WB)
->  		cifs_fscache_unuse_inode_cookie(inode, true);
-> +	cifs_fscache_release_inode_cookie(inode);
->  	clear_inode(inode);
->  }
->  
-> @@ -722,6 +723,12 @@ static int cifs_show_stats(struct seq_file *s, struct dentry *root)
->  }
->  #endif
->  
-> +static int cifs_write_inode(struct inode *inode, struct writeback_control *wbc)
-> +{
-> +	fscache_unpin_writeback(wbc, cifs_inode_cookie(inode));
-> +	return 0;
-> +}
-> +
->  static int cifs_drop_inode(struct inode *inode)
->  {
->  	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-> @@ -734,6 +741,7 @@ static int cifs_drop_inode(struct inode *inode)
->  static const struct super_operations cifs_super_ops = {
->  	.statfs = cifs_statfs,
->  	.alloc_inode = cifs_alloc_inode,
-> +	.write_inode	= cifs_write_inode,
->  	.free_inode = cifs_free_inode,
->  	.drop_inode	= cifs_drop_inode,
->  	.evict_inode	= cifs_evict_inode,
-> diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
-> index 6e8e7cc26ae2..6186824b366e 100644
-> --- a/fs/cifs/dir.c
-> +++ b/fs/cifs/dir.c
-> @@ -22,6 +22,7 @@
->  #include "cifs_unicode.h"
->  #include "fs_context.h"
->  #include "cifs_ioctl.h"
-> +#include "fscache.h"
->  
->  static void
->  renew_parental_timestamps(struct dentry *direntry)
-> @@ -509,6 +510,9 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
->  		rc = -ENOMEM;
->  	}
->  
-> +	fscache_use_cookie(cifs_inode_cookie(file_inode(file)),
-> +			   file->f_mode & FMODE_WRITE);
-> +
->  out:
->  	cifs_put_tlink(tlink);
->  out_free_xid:
-> diff --git a/fs/cifs/file.c b/fs/cifs/file.c
-> index d872f6fe8e7d..44da7646f789 100644
-> --- a/fs/cifs/file.c
-> +++ b/fs/cifs/file.c
-> @@ -376,8 +376,6 @@ static void cifsFileInfo_put_final(struct cifsFileInfo *cifs_file)
->  	struct cifsLockInfo *li, *tmp;
->  	struct super_block *sb = inode->i_sb;
->  
-> -	cifs_fscache_release_inode_cookie(inode);
-> -
->  	/*
->  	 * Delete any outstanding lock records. We'll lose them when the file
->  	 * is closed anyway.
-> 
+if the Channel of a SMB2 WRITE request is
+SMB2_CHANNEL_RDMA_V1_INVALIDTE, a client
+does not invalidate its memory regions but
+ksmbd must do it by sending a SMB2 WRITE response
+with IB_WR_SEND_WITH_INV.
 
-Looks good.
+But if errors occur while processing a SMB2
+READ/WRITE request, ksmbd sends a response
+with IB_WR_SEND. So a client could use memory
+regions already in use.
 
-Acked-by: Jeff Layton <jlayton@kernel.org>
+Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+---
+ fs/ksmbd/smb2pdu.c | 76 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 49 insertions(+), 27 deletions(-)
+
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index ced8f949a4d6..19355511b777 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -6132,18 +6132,6 @@ static ssize_t smb2_read_rdma_channel(struct ksmbd_work *work,
+ 		(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
+ 	int err;
+ 
+-	if (work->conn->dialect == SMB30_PROT_ID &&
+-	    req->Channel != SMB2_CHANNEL_RDMA_V1)
+-		return -EINVAL;
+-
+-	if (req->ReadChannelInfoOffset == 0 ||
+-	    le16_to_cpu(req->ReadChannelInfoLength) < sizeof(*desc))
+-		return -EINVAL;
+-
+-	work->need_invalidate_rkey =
+-		(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
+-	work->remote_key = le32_to_cpu(desc->token);
+-
+ 	err = ksmbd_conn_rdma_write(work->conn, data_buf, length,
+ 				    le32_to_cpu(desc->token),
+ 				    le64_to_cpu(desc->offset),
+@@ -6179,6 +6167,28 @@ int smb2_read(struct ksmbd_work *work)
+ 		return smb2_read_pipe(work);
+ 	}
+ 
++	if (req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE ||
++	    req->Channel == SMB2_CHANNEL_RDMA_V1) {
++		struct smb2_buffer_desc_v1 *desc =
++			(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
++
++		if (work->conn->dialect == SMB30_PROT_ID &&
++		    req->Channel != SMB2_CHANNEL_RDMA_V1) {
++			err = -EINVAL;
++			goto out;
++		}
++
++		if (req->ReadChannelInfoOffset == 0 ||
++		    le16_to_cpu(req->ReadChannelInfoLength) < sizeof(*desc)) {
++			err = -EINVAL;
++			goto out;
++		}
++
++		work->need_invalidate_rkey =
++			(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
++		work->remote_key = le32_to_cpu(desc->token);
++	}
++
+ 	fp = ksmbd_lookup_fd_slow(work, le64_to_cpu(req->VolatileFileId),
+ 				  le64_to_cpu(req->PersistentFileId));
+ 	if (!fp) {
+@@ -6364,21 +6374,6 @@ static ssize_t smb2_write_rdma_channel(struct ksmbd_work *work,
+ 
+ 	desc = (struct smb2_buffer_desc_v1 *)&req->Buffer[0];
+ 
+-	if (work->conn->dialect == SMB30_PROT_ID &&
+-	    req->Channel != SMB2_CHANNEL_RDMA_V1)
+-		return -EINVAL;
+-
+-	if (req->Length != 0 || req->DataOffset != 0)
+-		return -EINVAL;
+-
+-	if (req->WriteChannelInfoOffset == 0 ||
+-	    le16_to_cpu(req->WriteChannelInfoLength) < sizeof(*desc))
+-		return -EINVAL;
+-
+-	work->need_invalidate_rkey =
+-		(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
+-	work->remote_key = le32_to_cpu(desc->token);
+-
+ 	data_buf = kvmalloc(length, GFP_KERNEL | __GFP_ZERO);
+ 	if (!data_buf)
+ 		return -ENOMEM;
+@@ -6425,6 +6420,33 @@ int smb2_write(struct ksmbd_work *work)
+ 		return smb2_write_pipe(work);
+ 	}
+ 
++	if (req->Channel == SMB2_CHANNEL_RDMA_V1 ||
++	    req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE) {
++		struct smb2_buffer_desc_v1 *desc =
++			(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
++
++		if (work->conn->dialect == SMB30_PROT_ID &&
++		    req->Channel != SMB2_CHANNEL_RDMA_V1) {
++			err = -EINVAL;
++			goto out;
++		}
++
++		if (req->Length != 0 || req->DataOffset != 0) {
++			err = -EINVAL;
++			goto out;
++		}
++
++		if (req->WriteChannelInfoOffset == 0 ||
++		    le16_to_cpu(req->WriteChannelInfoLength) < sizeof(*desc)) {
++			err = -EINVAL;
++			goto out;
++		}
++
++		work->need_invalidate_rkey =
++			(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
++		work->remote_key = le32_to_cpu(desc->token);
++	}
++
+ 	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
+ 		ksmbd_debug(SMB, "User does not have write permission\n");
+ 		err = -EACCES;
+-- 
+2.25.1
+
