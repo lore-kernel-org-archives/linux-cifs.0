@@ -2,160 +2,86 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2538C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 04:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D274AC433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 10 Jan 2022 06:06:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232975AbiAJEDy (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Sun, 9 Jan 2022 23:03:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60314 "EHLO
+        id S230236AbiAJGGv (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Jan 2022 01:06:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232926AbiAJEDy (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Sun, 9 Jan 2022 23:03:54 -0500
-Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16553C06173F
-        for <linux-cifs@vger.kernel.org>; Sun,  9 Jan 2022 20:03:53 -0800 (PST)
-Received: by mail-vk1-xa2c.google.com with SMTP id d189so7373456vkg.3
-        for <linux-cifs@vger.kernel.org>; Sun, 09 Jan 2022 20:03:53 -0800 (PST)
+        with ESMTP id S230078AbiAJGGt (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jan 2022 01:06:49 -0500
+Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F0CC06173F;
+        Sun,  9 Jan 2022 22:06:49 -0800 (PST)
+Received: by mail-vk1-xa32.google.com with SMTP id b77so7449926vka.11;
+        Sun, 09 Jan 2022 22:06:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=J2jwyz5AOvsGcw0bfpRLOPpj1VzuPTYD92etKvAZVo8=;
-        b=KVebSpy1pZCpWSjoPJGkCJVOuuYbin0JOpHxlG/o5W6SyvWND4zInpPCaIIlqleYO5
-         RMs98BmsPHQAjlMhpzXwgyK1Udyy+Xk70Y87hthDFTtnoxt5jNmHs4f+lJi1ZRvSUnyd
-         bHLGfssZTZPeZlunO0sic56q9/Q5e2PFr4UjUYcB+Kn9NdmpTu/HNcMD0oZc00yhBP9f
-         qcDDWFH/dWuFdlamXgKx0/oTBYw6adLzFaImncL4/ZPOoWHGYr8R4CI09Ke+cDgBrvXy
-         Uv7a6zf49gZD+5PcW4UnTspPPI9YI2Vw/h1AcfdOuDRPh3raw4dYu2AhPtnZOXNaAiU+
-         MrPA==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=LK3tmlug+DMfgByubmuTTbml4FXkpQCC66d1KNzfJC4=;
+        b=Vi0k//5j8p2xpFzFUPfJSHx1/TavX6yCKRtKYEfQRWbqHTbKLD9s22o13V9k8QB+Ax
+         dJwPL7GDVIx/4o/aO6Toov5KJVbC5CiNP2SlVCWtVH+BlAK7VdtNDQSdGRPsuC1hepXG
+         UlRZvF43jZedZwBMZhLbGsHp8P4IQNSIx4fHlB3XnwFQ3O45Ohm7AGGxYOvIU5ogU1gr
+         HzM9IAPbbaCVuiZKW69RiciB0PmWggJzuptXWOnwB6BhyVtqnEskD6ezMWdesHE579KF
+         eBgph6aR+TcIlA0PuzD7aanNPVn/Nl7DBfKrWyHQJRLdD4+W5Isf7HUJevqFb+MdlIfD
+         gRMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=J2jwyz5AOvsGcw0bfpRLOPpj1VzuPTYD92etKvAZVo8=;
-        b=tT5axuNRPnz3DcXyVqwpHU8V/+0g0D8NBWsetvj+e910zVkv0PioYOZRA7nCu7cDl8
-         cdkyIjInvCXbcrJfhpQOzCFKYTV3tAwiSJtEDY27tgM52mguubdX5pCuGxvwgu8r18NC
-         A5Ks8jSxFCURWBZuWMmGXkJ7BukEUh5LCxfAUHKaeihhPd9tyCaD/gp9BzWZ5Yrk0Ux/
-         LJ1dXzu1Yx2sO6X1a9yXXSecLwnwSL5K4h/kqjqjemYfxgIQMjVgaKb9hLTcLT3+WgBz
-         B5Vrj/VgaKrxR/VjL+90z3cNLokoy/Mz5F1GMaouueSKToILPdlrigU2TWG5X/en4gh/
-         lraw==
-X-Gm-Message-State: AOAM5324cF7VoPlnx0QR5Wt58WVPFMIkHArS+DrV0Z05RnmYmkywi1LI
-        OiOdyUlSuc9bcOgMQFxYMA4uqv+9Hxe8FlHShGU=
-X-Google-Smtp-Source: ABdhPJzaOTLIc6MC/Am/hCfe6KsuxfGWS2BzjvlTLlsT1rR+bgMAeaED0xWneSwhUiRPugXZwuiQNNzzfB1YyrlKoeo=
-X-Received: by 2002:a1f:2a47:: with SMTP id q68mr14565339vkq.9.1641787433030;
- Sun, 09 Jan 2022 20:03:53 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=LK3tmlug+DMfgByubmuTTbml4FXkpQCC66d1KNzfJC4=;
+        b=qLMCbB8zVLe3NTVCCaMH5/kz084lLTf8yieGvkjpJaCqEq59AY8XXPSYZGKeDRh4w2
+         ymwhGXuhktIsci/XHN0+pSwZ+VL8zrz5Vv97jdBNq9ptPKLSYjWOXyr9XafSUN+a6AS1
+         DlXIWweDHUm9NwR4bxwrnKPZ8qBvAsq0UOOARjH2M03gMF0Cw6ed1b4cNs3K3gab8Fyi
+         b201yW1rdyJrGWyPO6I+fai0AUfzCNdp6KdtgjAEYfjIQaiEIGAYtYky2DuVXZWDyHRT
+         gstYNulfb1nZE04nBP/84oGbCzD3Csche1bqQdv8O788VOq+8KukX1NpdAvKUcXV+I5y
+         av7w==
+X-Gm-Message-State: AOAM530po60MjiMY45jtyS2RQZ2tW7VNxkXPAvYbIbCCAy+P9p0bAtVa
+        pinIyQhNvz+uSggDHZkT0EMJ407bJRzFqrMWSBDe3+1o/Zo=
+X-Google-Smtp-Source: ABdhPJzRkFi8X3uZCbxDPI80V/p/7TM6f2eWnIbdmtMCHJMTqd7tnwn99jORBO2CfBXUQIjkDH2kWLAY+oXJLoRfCd8=
+X-Received: by 2002:a1f:e243:: with SMTP id z64mr25606383vkg.28.1641794808093;
+ Sun, 09 Jan 2022 22:06:48 -0800 (PST)
 MIME-Version: 1.0
-References: <20220107054531.619487-1-hyc.lee@gmail.com> <20220107054531.619487-2-hyc.lee@gmail.com>
- <CAKYAXd9qYgpf9oGhK5bdE2M6nbfpeTEAOg+zDGGXomOLaNmR9Q@mail.gmail.com>
- <CAH2r5mtTs5bxF9+_M0-3a7YkZB4zqBCm4_kL_QpHAPhEVAG-WA@mail.gmail.com>
- <CAKYAXd9ndasXA3q2F05f9JMXHPT6cQRf0M8owP-dwdv_LWggwQ@mail.gmail.com>
- <CANFS6baREfEidN+FqZROiF+6QtOQ6FXae6f0L9EVKaUFK2L3hg@mail.gmail.com> <CAH2r5msGLvF4-9h2TXxCrYXsEXvLtVoRyY77PXxzE3MeP_vKHQ@mail.gmail.com>
-In-Reply-To: <CAH2r5msGLvF4-9h2TXxCrYXsEXvLtVoRyY77PXxzE3MeP_vKHQ@mail.gmail.com>
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-Date:   Mon, 10 Jan 2022 13:03:42 +0900
-Message-ID: <CANFS6bbVm6So4DrVK-nr2EV9dK2byANZ_f1A5orQFwhQiswOTQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] ksmbd: smbd: change the default maximum read/write,
- receive size
-To:     Steve French <smfrench@gmail.com>
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        CIFS <linux-cifs@vger.kernel.org>
+From:   Davyd McColl <davydm@gmail.com>
+Date:   Mon, 10 Jan 2022 08:06:37 +0200
+Message-ID: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
+Subject: Possible regression: unable to mount CIFS 1.0 shares from older
+ machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
+To:     linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022=EB=85=84 1=EC=9B=94 10=EC=9D=BC (=EC=9B=94) =EC=98=A4=EC=A0=84 10:43, =
-Steve French <smfrench@gmail.com>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->
-> I was concerned because I saw significant improvements in large i/o
-> (file copy to or from the server) to Windows and Azure going to 1MB
-> (negotiated max read/write size), then slightly better to 2MB and
-> slightly better still to 4MB (was hard to show gain with 8MB in my
-> earlier tests though)
->
+Good day
 
-This patch limits the size only when the SMB Direct protocol is used.
-If handling multiple buffer descriptors is implemented, we can increase
-the size.
+I'm following advice from the thread at
+https://bugzilla.kernel.org/show_bug.cgi?id=215375 as to how to report
+this, so please bear with me and redirect me as necessary.
 
-> On Sun, Jan 9, 2022 at 7:37 PM Hyunchul Lee <hyc.lee@gmail.com> wrote:
-> >
-> > 2022=EB=85=84 1=EC=9B=94 9=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 9:56=
-, Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
-> > >
-> > > 2022-01-09 15:44 GMT+09:00, Steve French <smfrench@gmail.com>:
-> > > > Do you have more detail on what the negotiated readsize/writesize
-> > > > would be for Windows clients with this size? for Linux clients?
-> > > Hyunchul, Please answer.
-> > >
-> >
-> > For a Linux client, if connected using smb-direct,
-> > the size will be 1048512. But connected with multichannel,
-> > the size will be 4MB instead of 1048512. And this causes
-> > problems because the read/write size is bigger than 1048512.
-> > It looks like a bug. I have to limit the ksmbd's SMB2 maximum
-> > read/write size for a test.
-> >
-> > For Windows clients, the actual read/write size is less than
-> > 1048512.
-> >
-> > > >
-> > > > It looked like it would still be 4MB at first glance (although in
-> > > > theory some Windows could do 8MB) ... I may have missed something
-> > > I understood that multiple-buffer descriptor support was required to
-> > > set a read/write size of 1MB or more. As I know, Hyunchul is currentl=
-y
-> > > working on it.
-> > > It seems to be set to the smaller of max read/write size in smb-direc=
-t
-> > > negotiate and max read/write size in smb2 negotiate.
-> > >
-> > > Hyunchul, I have one question more, How did you get 1048512 setting v=
-alue ?
-> > > >
-> >
-> > I remember when the size was 1MB, Windows clients requested read/write =
-with
-> > 1048512 and 64.
-> >
-> > > > On Sat, Jan 8, 2022 at 8:43 PM Namjae Jeon <linkinjeon@kernel.org> =
-wrote:
-> > > >>
-> > > >> 2022-01-07 14:45 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> > > >> > Due to restriction that cannot handle multiple
-> > > >> > buffer descriptor structures, decrease the maximum
-> > > >> > read/write size for Windows clients.
-> > > >> >
-> > > >> > And set the maximum fragmented receive size
-> > > >> > in consideration of the receive queue size.
-> > > >> >
-> > > >> > Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-> > > >> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Thanks,
-> > > >
-> > > > Steve
-> > > >
-> >
-> >
-> >
-> > --
-> > Thanks,
-> > Hyunchul
->
->
->
-> --
-> Thanks,
->
-> Steve
+Since commit 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c, I'm unable to
+mount a CIFS 1.0 share ( from a media player: mede8er med600x3d, which
+runs some older linux). Apparently I'm not the only one, according to
+that thread, though the other affected party there is windows-based.
 
+I first logged this in the Gentoo bugtracker
+(https://bugs.gentoo.org/821895) and a reversion patch is available
+there for the time being.
 
+I understand that some of the encryption methods upon which the
+original feature relied are to be removed and, as such, the ability to
+mount these older shares was removed. This is sure to affect anyone
+running older Windows virtual machines (or older, internally-visible
+windows hosts) in addition to anyone attempting to connect to shares
+from esoteric devices like mine.
 
---=20
-Thanks,
-Hyunchul
+Whilst I understand the desire to clean up code and remove dead
+branches, I'd really appreciate it if this particular feature remains
+available either by kernel configuration (which suits me fine, but is
+likely to be a hassle for anyone running a binary distribution) or via
+boot parameters. In the mean-time, I'm updating my own sync software
+to support this older device because if I can't sync media to the
+player, the device is not very useful to me.
+
+Thanks
+-d
