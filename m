@@ -2,247 +2,107 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8543C433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jan 2022 23:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E19C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jan 2022 23:32:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234767AbiAKX02 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Tue, 11 Jan 2022 18:26:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41970 "EHLO
+        id S1346829AbiAKXcE (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Tue, 11 Jan 2022 18:32:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233873AbiAKX02 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Jan 2022 18:26:28 -0500
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B38FC06173F;
-        Tue, 11 Jan 2022 15:26:27 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id x6so2084576lfa.5;
-        Tue, 11 Jan 2022 15:26:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/jUsT80H33sCWVBf7V2AxrGTqngl2aMqhhu5AjObxr4=;
-        b=VxZBVPUkr9/78WX3VfUX8ouO3ghZsnJG6/1bZzIFjC1gheG69Om4GG+8ChF9iD9pP8
-         oPejsIL8AR4eYEGD8BlO3/UWtlTY7LEXPH/I9T8uhFxqE69GCcipUvpyxccw1zEZ5XvO
-         EHaV/q3xk+6dS/scmpTeLUQ14eypWA+V6gEGxhQOQE2njptlexCJTb1GWTDQFX/teqjT
-         euQwrPfv2JvfwlZyWheKsWhWrJOguiaYWyNV0ru0RHchXZlxQuk/53HpAE2z+5vp26tY
-         R/XnFMZVrB50P8PMGbQd5psv3JaDIUei7VW/1obBYcJ9yNHDtT/YLXaMx+zuZEK+LmDX
-         AWnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/jUsT80H33sCWVBf7V2AxrGTqngl2aMqhhu5AjObxr4=;
-        b=2tGFKU358HJQjzkNF43ufOKxB5BFJoQ5WU7VFa8CyZKrv06qiJAOyZEylT0zIQSM+j
-         vIdW0s6cj7fA+Ftsw6r+T/c86uhtBH0TcSQwyjz84icc0/opOYvMtPnzH4U8xXnLXG16
-         81/w9U/pbnwK92GbjIVOrdZZWIi9KGrNA8MqbkcWLUzNqPbMLHiEGxGmu4a2WCo+C11l
-         h6AQlbBNDKpR/i/KnYKzPHVMm2l5eNPynIILZ3wx80Z38EuPwQxdPkof/Cl3TaGTcYYv
-         WE/REicb2I3XU6XSluR5D6MwQ6hsYygpcvPKbs6sg54Je7WWbYIrRBjP+Q/WnuxLt/pS
-         uUVQ==
-X-Gm-Message-State: AOAM532iVufpfKuFqF/nJy4PhQJB7X7nOcz9qZtDsongVSWZ6wVAclmH
-        tTuXlGaSWczc94skLZSukXN0wbe+x2pR4pn7n1FN7X2G
-X-Google-Smtp-Source: ABdhPJxzpEIx/33ls/2TcEgnmGG92ynGj18k8+i4Y/j+X7AwMae0dwH+RLx9dsMFsA5pl3Wo9CrZ+TkkIXkuRFe3YPY=
-X-Received: by 2002:a05:6512:74a:: with SMTP id c10mr5201696lfs.234.1641943585709;
- Tue, 11 Jan 2022 15:26:25 -0800 (PST)
+        with ESMTP id S233873AbiAKXcC (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Tue, 11 Jan 2022 18:32:02 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDC41C06173F;
+        Tue, 11 Jan 2022 15:32:01 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4JYRmM5gZ5z4xmx;
+        Wed, 12 Jan 2022 10:31:47 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1641943919;
+        bh=4Z3sqpGIFVL84J+SH3/JqcsCmk3/t539vZt80mjQAn0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=CAL+VhB7tnGuerjBXg+KBrIXNM5L47Grr2Z7MctVembeA/rhXP/4Qlff+eCDzsasV
+         m07b4UblcBcm43Gt6g+CJaaPiTBASmT/8BpIYuXG0NheZif123+Jx3mSG4ghjD5Bnr
+         vKKAPvQRgL6gxoRfQc3w+t52HyU2Os/2DuZKOZTS1fOqFAoDtgP7C2312g4o2oCT9E
+         ERz+u6FsuLxtJw9CYnZASZbrKyZ1A31xsC+V69GzuN44Trb8RVnjGBHrbSpTbGiYjQ
+         FJEC1IE7aJxnO2oJnV8uNmJItDD1jVnRm6IH/ot9+21m/9tIAwlSSUqFWNTrs1TqXI
+         8mSVssM+Jlbjw==
+Date:   Wed, 12 Jan 2022 10:31:46 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Daire Byrne <daire@dneg.com>,
+        Dave Wysochanski <dwysocha@redhat.com>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Omar Sandoval <osandov@osandov.com>,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        Steve French <sfrench@samba.org>,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Zhaoyang Huang <zhaoyang.huang@unisoc.com>,
+        ceph-devel@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cachefs@redhat.com, linux-cifs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-kernel@vger.kernel.org
+Subject: Re: [GIT PULL] fscache, cachefiles: Rewrite
+Message-ID: <20220112103146.03c88319@canb.auug.org.au>
+In-Reply-To: <510611.1641942444@warthog.procyon.org.uk>
+References: <510611.1641942444@warthog.procyon.org.uk>
 MIME-Version: 1.0
-References: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
- <CAH2r5mt_2f==5reyc0HmMLvYJVmP4Enykwauo+LQoFGFbVFeRQ@mail.gmail.com>
- <CAJjP=BvNVOj3KRnhFgk6xiwnxVhxE-sN98-pr6e1Kzc5Xg5EvQ@mail.gmail.com>
- <CAH2r5mvsetx5G+c=8ePh+X8ng7FvMrnuM9+FJ4Sid4b3E+T41Q@mail.gmail.com>
- <CAJjP=BvqZUnJPq=C0OUKbXr=mbJd7a6YDSJC-sNY1j_33_e-uw@mail.gmail.com> <CAH2r5mserz2O8M5YEwHu=PgCxwDCEBAJkYADUZt9XbQWGTZ2Yg@mail.gmail.com>
-In-Reply-To: <CAH2r5mserz2O8M5YEwHu=PgCxwDCEBAJkYADUZt9XbQWGTZ2Yg@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 11 Jan 2022 17:26:14 -0600
-Message-ID: <CAH2r5mvjk02Y1YWUw3r10OLbpcs0=5Wzh6HsZNKK4j9frPQeNQ@mail.gmail.com>
-Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
- machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
-To:     Davyd McColl <davydm@gmail.com>
-Cc:     CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/TSD_6X.o4QL4mtle5E/6NvU";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-And trying with sec=ntlmv2 ("raw ntlmv2" instead of encapsulated in
-NTLMSSP) looks broken.  This very old server does not advertise
-"Extended Security" exchanges (NTLMSSP encapsulation) so this is a
-very little used codepath and looks broken
+--Sig_/TSD_6X.o4QL4mtle5E/6NvU
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 11, 2022 at 3:51 PM Steve French <smfrench@gmail.com> wrote:
->
-> Interesting but may be a slightly different issue than NTLMv1
->
-> Looking at the wireshark trace the problem looks to be the SMB1 tree
-> connect being badly formatted (the share name being corrupted due to
-> the password field in the treeconnect being empty) not a problem with
-> NTLMv1 authentication on the session setup (although there may be an
-> issue when we fix the alignment of tree connect request).
->
-> Samba server added SMB2.1 support in Samba version 3.5 back in 2010
-> and it looks like yours is Samba 3.0.23 (from 2003) so predates SMB2
-> support much less SMB3 and SMB3.1.1 support.
->
-> On Tue, Jan 11, 2022 at 12:45 AM Davyd McColl <davydm@gmail.com> wrote:
-> >
-> > Hi Steve
-> >
-> > As requested, wireshark captures to the device in question, as well as
-> > the fstab entry I have for the device:
-> > - win11, browsing with explorer
-> > - win11, net use
-> > - unpatched linux 5.16.0 attempt to mount
-> > - patched linux 5.16.0 successful mount
-> > - fstab entry - note that I have to specify samba version 1.0 as the
-> > default has changed and the mount fails otherwise. Explicitly
-> > specifying 2.0 errors and suggests that I should select a different
-> > version.
-> >
-> > -d
-> >
-> > On Tue, 11 Jan 2022 at 00:13, Steve French <smfrench@gmail.com> wrote:
-> > >
-> > > I would be surprised if Windows 11 still negotiates (with default
-> > > registry settings) SMB1 much less NTLMv1 in SMB1, but I have not tried
-> > > Windows 11 with an NTLMv1 only server (they are hard to find - I may
-> > > have an original NT4 and an NT3.5 CD somewhere - might be possible to
-> > > install a VM with NT3.5 but that is really really old and not sure I
-> > > can find those CDs).
-> > >
-> > > Is it possible to send me the wireshark trace (or other network trace)
-> > > of the failing mount from Linux and also the one with the succeeding
-> > > NET USE from Windows 11 to the same server?
-> > >
-> > > Hopefully it is something unrelated to NTLMv1, there has been a LOT of
-> > > pushback across the world, across products in making sure no one uses
-> > > SMB1 anymore.  See e.g.
-> > > https://techcommunity.microsoft.com/t5/storage-at-microsoft/stop-using-smb1/ba-p/425858
-> > > and https://twitter.com/nerdpyle/status/776900804712148993
-> > >
-> > > On Mon, Jan 10, 2022 at 2:30 PM Davyd McColl <davydm@gmail.com> wrote:
-> > > >
-> > > > I don't understand. I tracked down the exact commit where the issue
-> > > > occurs with a 2 hour git bisect. This was after first confirming that
-> > > > my older 5.14 kernel did not display the symptoms. I can still connect
-> > > > to the share via windows 11 explorer. I don't know what else I need to
-> > > > do here to show where the issue was introduced?
-> > > >
-> > > > Apologies for bouncing mails - literally no email client I have seems
-> > > > to be capable of plaintext emails, so every time I forget, I have to
-> > > > find a browser with the gmail web interface to reply.
-> > > >
-> > > > -d
-> > > >
-> > > > On Mon, 10 Jan 2022 at 19:31, Steve French <smfrench@gmail.com> wrote:
-> > > > >
-> > > > > I want to make sure that we don't have an unrelated regression
-> > > > > involved here since NTLMv2 replaced NTLMv1 over 20 years ago (googling
-> > > > > this e.g. I see "NTLMv2, introduced in Windows NT 4.0 SP4 and natively
-> > > > > supported in Windows 2000")  and should be the default for Windows
-> > > > > NT4, Windows 2000 etc. as well as any version of Samba from the last
-> > > > > 15 years+.  I have significant concerns with adding mechanisms that
-> > > > > were asked to be disabled ~19 years ago e.g. see
-> > > > > https://support.microsoft.com/en-us/topic/security-guidance-for-ntlmv1-and-lm-network-authentication-da2168b6-4a31-0088-fb03-f081acde6e73
-> > > > > due to security concerns.
-> > > > >
-> > > > > Can we double check that there are not other issues involved in your example?
-> > > > >
-> > > > > The concerns about NTLMv1 security concerns (and why it should never
-> > > > > be used) are very persuasive e.g. many articles like
-> > > > > https://miriamxyra.com/2017/11/08/stop-using-lan-manager-and-ntlmv1/
-> > > > >
-> > > > > On Mon, Jan 10, 2022 at 7:48 AM Davyd McColl <davydm@gmail.com> wrote:
-> > > > > >
-> > > > > > Good day
-> > > > > >
-> > > > > > I'm following advice from the thread at
-> > > > > > https://bugzilla.kernel.org/show_bug.cgi?id=215375 as to how to report
-> > > > > > this, so please bear with me and redirect me as necessary.
-> > > > > >
-> > > > > > Since commit 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c, I'm unable to
-> > > > > > mount a CIFS 1.0 share ( from a media player: mede8er med600x3d, which
-> > > > > > runs some older linux). Apparently I'm not the only one, according to
-> > > > > > that thread, though the other affected party there is windows-based.
-> > > > > >
-> > > > > > I first logged this in the Gentoo bugtracker
-> > > > > > (https://bugs.gentoo.org/821895) and a reversion patch is available
-> > > > > > there for the time being.
-> > > > > >
-> > > > > > I understand that some of the encryption methods upon which the
-> > > > > > original feature relied are to be removed and, as such, the ability to
-> > > > > > mount these older shares was removed. This is sure to affect anyone
-> > > > > > running older Windows virtual machines (or older, internally-visible
-> > > > > > windows hosts) in addition to anyone attempting to connect to shares
-> > > > > > from esoteric devices like mine.
-> > > > > >
-> > > > > > Whilst I understand the desire to clean up code and remove dead
-> > > > > > branches, I'd really appreciate it if this particular feature remains
-> > > > > > available either by kernel configuration (which suits me fine, but is
-> > > > > > likely to be a hassle for anyone running a binary distribution) or via
-> > > > > > boot parameters. In the mean-time, I'm updating my own sync software
-> > > > > > to support this older device because if I can't sync media to the
-> > > > > > player, the device is not very useful to me.
-> > > > > >
-> > > > > > Thanks
-> > > > > > -d
-> > > > >
-> > > > >
-> > > > >
-> > > > > --
-> > > > > Thanks,
-> > > > >
-> > > > > Steve
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-> > > > If you say that getting the money is the most important thing
-> > > > You will spend your life completely wasting your time
-> > > > You will be doing things you don't like doing
-> > > > In order to go on living
-> > > > That is, to go on doing things you don't like doing
-> > > >
-> > > > Which is stupid.
-> > > >
-> > > > - Alan Watts
-> > > > https://www.youtube.com/watch?v=-gXTZM_uPMY
-> > > >
-> > > > Quidquid latine dictum sit, altum sonatur.
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> >
-> >
-> >
-> > --
-> > -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-> > If you say that getting the money is the most important thing
-> > You will spend your life completely wasting your time
-> > You will be doing things you don't like doing
-> > In order to go on living
-> > That is, to go on doing things you don't like doing
-> >
-> > Which is stupid.
-> >
-> > - Alan Watts
-> > https://www.youtube.com/watch?v=-gXTZM_uPMY
-> >
-> > Quidquid latine dictum sit, altum sonatur.
->
->
->
-> --
-> Thanks,
->
-> Steve
+Hi David,
 
+On Tue, 11 Jan 2022 23:07:24 +0000 David Howells <dhowells@redhat.com> wrot=
+e:
+>
+>     I think also that a conflict[10] spotted by Stephen Rothwell between =
+my
+>     series and some changes that went in since the branching point
+>     shouldn't be an issue with this removed.
 
+There is also this conflict against the pifdf tree (which may or may
+not be merged before this):
 
--- 
-Thanks,
+https://lore.kernel.org/all/20211206090755.3c6f6fe4@canb.auug.org.au/
 
-Steve
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/TSD_6X.o4QL4mtle5E/6NvU
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmHeE2IACgkQAVBC80lX
+0GykKgf+LY4OWHMyvWj+UkQIEcaKG5r9OhPcLyt0zfDe0PRZQmlxXnY3gTri4emO
+7Fj3IMkvEOSOP3VZlIRTpYauhwuCpB+yQDB/8X303z+a2aF9f/K1wrt0wvfGAqUY
+qlGXd0zwWB9XPkGCkYEMi5oVP6TbMKajCMkq5rFhZcQS7YfHrWS/uJhpcmeVU0gn
+BYKtZyQ5RBY8RImGGBnhGjQLxhXBn90mi729iNaFVPzeonasUxYQzZaiWSMGxWov
+a2RcKHhg+dwlj1BTgB3lEnny9EM57priTBX8HnJwconRDhrWaGBv+k973nnHHZq0
+x1fteziRSjCPvg4mlWtvA8XrBSjL1g==
+=alke
+-----END PGP SIGNATURE-----
+
+--Sig_/TSD_6X.o4QL4mtle5E/6NvU--
