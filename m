@@ -2,193 +2,135 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF18AC433EF
-	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jan 2022 01:58:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF51C433F5
+	for <linux-cifs@archiver.kernel.org>; Tue, 11 Jan 2022 03:16:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346471AbiAKB6c (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 10 Jan 2022 20:58:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52790 "EHLO
+        id S231484AbiAKDQT (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 10 Jan 2022 22:16:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346469AbiAKB6b (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jan 2022 20:58:31 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FBEBC06173F
-        for <linux-cifs@vger.kernel.org>; Mon, 10 Jan 2022 17:58:31 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D18C6149E
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Jan 2022 01:58:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1388C36AED
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Jan 2022 01:58:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641866310;
-        bh=dwngxYGwJ9hrzOZ84o2eiuCocomF4dmUAOcf3RDioMg=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=tpYN/HkpDOD9/bWVPno7WGIVRNpafWbO8BV7oHV8qOgwsu5RFFuF3tT35CMoKNOPq
-         4A1+RiJZthxBKBGgta7QiAHqdwMFQpiP5jXzpqHwN56HmrVX5HfBbto1qY5t5p+l5+
-         t1efpyRS2/4t1u0V46DbsceBXMERtUv7H1MTF2yMD3t2GWjYfHZzY5ZX4RJzkR3y8R
-         6SpraNhPY3xLjD5N/VqHoiD68eATL7ZTPSFndffeVP30nnQsZS7zDkyFeJa41inaCy
-         aZVCQhJUxfW5EbHxCrWyg3/fMApAdXGKrlG7dNn/MmjG8SeGUVFnQHo324lG/FpYky
-         uNbcj0lDj2q8Q==
-Received: by mail-yb1-f181.google.com with SMTP id p5so35967751ybd.13
-        for <linux-cifs@vger.kernel.org>; Mon, 10 Jan 2022 17:58:30 -0800 (PST)
-X-Gm-Message-State: AOAM530K8ii+mkCBYFI/uGiz4BbpHVcuwC0A+LxKG4PEfRdS4SIaYdgx
-        yBUFvrA2TWhjFzfFAdGUrSKNBH4dzvk3zLucFjg=
-X-Google-Smtp-Source: ABdhPJwlixXwb+EmwCsTbF9WnsFWDwp2p0F0nK+LjibKwiM+doJds8xGRoTKdMkN4Z2Ud+O6+GPGH8fQzWCR8GYOxd8=
-X-Received: by 2002:a25:a321:: with SMTP id d30mr3564003ybi.373.1641866309741;
- Mon, 10 Jan 2022 17:58:29 -0800 (PST)
+        with ESMTP id S231293AbiAKDQS (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 10 Jan 2022 22:16:18 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEECBC06173F;
+        Mon, 10 Jan 2022 19:16:17 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id m1so18276081lfq.4;
+        Mon, 10 Jan 2022 19:16:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tnWatjEgyJ9FaJC0eKyvOWSFHkKwoNBRdfNz32BOWbE=;
+        b=pvQgk6WPtiBTpIIyj88Tt/GisS81oFMofetcLKN3sOU6bPpnu0GDVyxIytbhDGZOkN
+         eRKNihQzDJUElKaZ4vTc+dQw6CLObT2uqdDjw5srFd7RMIe37sXcGDvjADJiCdi1oeOT
+         ssJqESC0Ww4m0+P+evVF5e3MVETSy/0TfrolckyYCiYVcT87vr6myAaFMvHFpL1LhZWh
+         NMEP3ja4iIVCAPAOSEZhi8hEtbZ4bvicmK4XxV6/U59gh+cLpmSOxHg3rU+yP8YJWzjM
+         T4gBySONopcqtbPh25Sa1xDlOOSbSs5MsuL5A3fKLEE0E4kPyVtf9wxNMkcS64L8bZzR
+         yZlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tnWatjEgyJ9FaJC0eKyvOWSFHkKwoNBRdfNz32BOWbE=;
+        b=bK9fvm4b+xtf9wyurCf2BSA18FxgF2CHW04NaecH/eqZ752WPKCRa7rkacqEtGCWEM
+         yVJ4sAfv9KdI0ycaIV1UWqY8GlacKSBy9QvKEuXHwRz/4ChWdWYE4cTcp3y4LoXluohJ
+         91YkpT4+lNaNYR5Zf1QhXR2wDKHpyS05hB+3NsiiIifWUi4PrMo3eM3VM0LRKMJlG6tZ
+         caaBvlHDlC7qnowda2D4Lv7/kQpv2GAiFYKS0JPUvFfIHjnYUkVabK1llTQhDYedJpAQ
+         xiB+rRIkHXLc+YjsFKDigKhtgVKZAESM0hgc5/lOaPkHhFnFsgUkKlr2P1oXeih1QFx4
+         U4Dg==
+X-Gm-Message-State: AOAM533jCu6JAm5Zl1qsUjPe8CDHVv7AFPAbIvmVJyy+2mmbpEIpdj69
+        AO4hRN4R+xvjrq/BlCfaVONfb1lwteBnwCAKHK3jUibR
+X-Google-Smtp-Source: ABdhPJz0pfbIUNFY/jTTUD+wPeqdHZIzltUsCUeAh/QExyS0hTGeCDFj1To+Ow5RM7SA564uZgvAiNV97+dt9BvaT5w=
+X-Received: by 2002:a19:8c4a:: with SMTP id i10mr1885122lfj.537.1641870975462;
+ Mon, 10 Jan 2022 19:16:15 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:7110:5011:b0:123:6c39:8652 with HTTP; Mon, 10 Jan 2022
- 17:58:29 -0800 (PST)
-In-Reply-To: <20220110013639.841324-1-hyc.lee@gmail.com>
-References: <20220110013639.841324-1-hyc.lee@gmail.com>
-From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 11 Jan 2022 10:58:29 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8cXmqoQFwc1b-cT21SX5Yt7Lv=qqs0syaCc17DiPHBQw@mail.gmail.com>
-Message-ID: <CAKYAXd8cXmqoQFwc1b-cT21SX5Yt7Lv=qqs0syaCc17DiPHBQw@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: smbd: fix missing client's memory region invalidation
-To:     Hyunchul Lee <hyc.lee@gmail.com>
-Cc:     linux-cifs@vger.kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>
+References: <D58238A4-F04E-458E-AB05-4A74235B2C65@getmailspring.com> <ff982786-4033-7450-c10c-8ce71c28d6eb@leemhuis.info>
+In-Reply-To: <ff982786-4033-7450-c10c-8ce71c28d6eb@leemhuis.info>
+From:   Steve French <smfrench@gmail.com>
+Date:   Mon, 10 Jan 2022 21:16:04 -0600
+Message-ID: <CAH2r5mtE-EjNbF3OhCLmbGQFMbJgRZphQHS+hHLBiWRJPEBqKA@mail.gmail.com>
+Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
+ machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     Davyd McColl <davydm@gmail.com>,
+        "lsahlber@redhat.com" <lsahlber@redhat.com>,
+        "stfrench@microsoft.com" <stfrench@microsoft.com>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-01-10 10:36 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> if the Channel of a SMB2 WRITE request is
-> SMB2_CHANNEL_RDMA_V1_INVALIDTE, a client
-> does not invalidate its memory regions but
-> ksmbd must do it by sending a SMB2 WRITE response
-> with IB_WR_SEND_WITH_INV.
->
-> But if errors occur while processing a SMB2
-> READ/WRITE request, ksmbd sends a response
-> with IB_WR_SEND. So a client could use memory
-> regions already in use.
->
-> Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
-> ---
->  fs/ksmbd/smb2pdu.c | 76 ++++++++++++++++++++++++++++++----------------
->  1 file changed, 49 insertions(+), 27 deletions(-)
->
-> diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-> index ced8f949a4d6..19355511b777 100644
-> --- a/fs/ksmbd/smb2pdu.c
-> +++ b/fs/ksmbd/smb2pdu.c
-> @@ -6132,18 +6132,6 @@ static ssize_t smb2_read_rdma_channel(struct
-> ksmbd_work *work,
->  		(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
->  	int err;
->
-> -	if (work->conn->dialect == SMB30_PROT_ID &&
-> -	    req->Channel != SMB2_CHANNEL_RDMA_V1)
-> -		return -EINVAL;
-> -
-> -	if (req->ReadChannelInfoOffset == 0 ||
-> -	    le16_to_cpu(req->ReadChannelInfoLength) < sizeof(*desc))
-> -		return -EINVAL;
-> -
-> -	work->need_invalidate_rkey =
-> -		(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
-> -	work->remote_key = le32_to_cpu(desc->token);
-> -
->  	err = ksmbd_conn_rdma_write(work->conn, data_buf, length,
->  				    le32_to_cpu(desc->token),
->  				    le64_to_cpu(desc->offset),
-> @@ -6179,6 +6167,28 @@ int smb2_read(struct ksmbd_work *work)
->  		return smb2_read_pipe(work);
->  	}
->
-> +	if (req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE ||
-> +	    req->Channel == SMB2_CHANNEL_RDMA_V1) {
-> +		struct smb2_buffer_desc_v1 *desc =
-> +			(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
-> +
-> +		if (work->conn->dialect == SMB30_PROT_ID &&
-> +		    req->Channel != SMB2_CHANNEL_RDMA_V1) {
-> +			err = -EINVAL;
-> +			goto out;
-> +		}
-> +
-> +		if (req->ReadChannelInfoOffset == 0 ||
-> +		    le16_to_cpu(req->ReadChannelInfoLength) < sizeof(*desc)) {
-> +			err = -EINVAL;
-> +			goto out;
-> +		}
-> +
-> +		work->need_invalidate_rkey =
-> +			(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
-> +		work->remote_key = le32_to_cpu(desc->token);
-> +	}
-Can we factor out a helper for this ?
-> +
->  	fp = ksmbd_lookup_fd_slow(work, le64_to_cpu(req->VolatileFileId),
->  				  le64_to_cpu(req->PersistentFileId));
->  	if (!fp) {
-> @@ -6364,21 +6374,6 @@ static ssize_t smb2_write_rdma_channel(struct
-> ksmbd_work *work,
->
->  	desc = (struct smb2_buffer_desc_v1 *)&req->Buffer[0];
->
-> -	if (work->conn->dialect == SMB30_PROT_ID &&
-> -	    req->Channel != SMB2_CHANNEL_RDMA_V1)
-> -		return -EINVAL;
-> -
-> -	if (req->Length != 0 || req->DataOffset != 0)
-> -		return -EINVAL;
-> -
-> -	if (req->WriteChannelInfoOffset == 0 ||
-> -	    le16_to_cpu(req->WriteChannelInfoLength) < sizeof(*desc))
-> -		return -EINVAL;
-> -
-> -	work->need_invalidate_rkey =
-> -		(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
-> -	work->remote_key = le32_to_cpu(desc->token);
-> -
->  	data_buf = kvmalloc(length, GFP_KERNEL | __GFP_ZERO);
->  	if (!data_buf)
->  		return -ENOMEM;
-> @@ -6425,6 +6420,33 @@ int smb2_write(struct ksmbd_work *work)
->  		return smb2_write_pipe(work);
->  	}
->
-> +	if (req->Channel == SMB2_CHANNEL_RDMA_V1 ||
-> +	    req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE) {
-> +		struct smb2_buffer_desc_v1 *desc =
-> +			(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
-> +
-> +		if (work->conn->dialect == SMB30_PROT_ID &&
-> +		    req->Channel != SMB2_CHANNEL_RDMA_V1) {
-> +			err = -EINVAL;
-> +			goto out;
-> +		}
-> +
-> +		if (req->Length != 0 || req->DataOffset != 0) {
-> +			err = -EINVAL;
-> +			goto out;
-> +		}
-> +
-> +		if (req->WriteChannelInfoOffset == 0 ||
-> +		    le16_to_cpu(req->WriteChannelInfoLength) < sizeof(*desc)) {
-> +			err = -EINVAL;
-> +			goto out;
-> +		}
-> +
-> +		work->need_invalidate_rkey =
-> +			(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
-> +		work->remote_key = le32_to_cpu(desc->token);
-> +	}
-Ditto.
+We do still need a little more data from the users affected to ensure
+that it isn't something more subtle.  One user noted Windows 11 worked
+as a client, but not Linux which would imply that it is probably
+something other than NTLM (NTLM has been strongly discouraged if not
+disabled for more than 20 years).
 
-Thanks!
-> +
->  	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
->  		ksmbd_debug(SMB, "User does not have write permission\n");
->  		err = -EACCES;
-> --
-> 2.25.1
+On Mon, Jan 10, 2022 at 9:07 PM Thorsten Leemhuis
+<regressions@leemhuis.info> wrote:
 >
+> Hi, this is your Linux kernel regression tracker speaking.
 >
+> On 10.01.22 06:53, Davyd McColl wrote:
+> >
+> > I'm following advice from the thread at
+> > https://bugzilla.kernel.org/show_bug.cgi?id=215375
+> > <https://bugzilla.kernel.org/show_bug.cgi?id=215375> as to how to report
+> > this, so please bear with me and redirect me as necessary.
+> >
+> > Since commit 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c,
+>
+> FWIW, that is "cifs: remove support for NTLM and weaker authentication
+> algorithms"
+>
+> > I'm unable to
+> > mount a CIFS 1.0 share ( from a media player: mede8er med600x3d, which
+> > runs some older linux). Apparently I'm not the only one, according to
+> > that thread, though the other affected party there is windows-based.
+> >
+> > I first logged this in the Gentoo bugtracker
+> > (https://bugs.gentoo.org/821895 <https://bugs.gentoo.org/821895>) and a
+> > reversion patch is available there for the time being.
+> >
+> > I understand that some of the encryption methods upon which the original
+> > feature relied are to be removed and, as such, the ability to mount
+> > these older shares was removed. This is sure to affect anyone running
+> > older Windows virtual machines (or older, internally-visible windows
+> > hosts) in addition to anyone attempting to connect to shares from
+> > esoteric devices like mine.
+>
+> > Whilst I understand the desire to clean up code and remove dead
+> > branches, I'd really appreciate it if this particular feature remains
+> > available either by kernel configuration (which suits me fine, but is
+> > likely to be a hassle for anyone running a binary distribution) or via
+> > boot parameters. In the mean-time, I'm updating my own sync software to
+> > support this older device because if I can't sync media to the player,
+> > the device is not very useful to me.
+>
+> From my point of view this afaics looks like one of those issues where
+> the "no regressions" rule gets tricky. But I told Davyd to bring it
+> forward here to get it discussed in the open. I also wonder if some
+> middle-ground solution could be found in this particular case -- e.g.
+> one where the commit stated above gets reverted and the code then
+> slightly changed to only allow weaker authentication if the user
+> manually requests in somehow, for example using a module parameter or
+> something in /proc or /sys.
+>
+> Ciao, Thorsten
+>
+> P.S.: Anyway, getting this tracked:
+>
+> #regzbot ^introduced 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
+> #regzbot title cifs: unable to shares that require NTLM or weaker
+> authentication algorithms
+> #regzbot link: https://bugzilla.kernel.org/show_bug.cgi?id=215375
+
+
+
+-- 
+Thanks,
+
+Steve
