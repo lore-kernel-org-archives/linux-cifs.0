@@ -2,93 +2,157 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2F2C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jan 2022 05:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F20DC433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jan 2022 07:20:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbiALF72 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 12 Jan 2022 00:59:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44632 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236614AbiALF72 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jan 2022 00:59:28 -0500
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DCA7C06173F
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Jan 2022 21:59:28 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id g11so4421463lfu.2
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Jan 2022 21:59:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kjDixZmTx8xyndUL+x06vwqxFKRPaFwZHkeC5y5TVME=;
-        b=k/aqVt+HCbKwYejpcbMfsBqdtvtELtP2W04AYYJX3065P/LZzEty/eDoodT+TIuHhb
-         RRIEYQbRSMM0BamuG3f6hcootA5AQ9er9L9D3xzGRJ8hES16VpagoVqIEOHnoE31Nw1f
-         OEOM/bzRwaohM0OuOunBoECVf9+hXrU0zRH0Kc13LKCHpvkgozyTQk2/MZ6r8JbS933n
-         xo6aCopQazn+Sa9iiaYEwAkOheo/gr+9SRTHteUhNdsW5Td9kF2x2hPJfg4RvHQOd3HK
-         PDLmVEAZPaO+3Sx1zQzdAcyzvCrGEpcaMsBazzy16fxUTe7Fec4Kb0xFtEgM/hWFKNro
-         INLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kjDixZmTx8xyndUL+x06vwqxFKRPaFwZHkeC5y5TVME=;
-        b=33xgc/mNzlM2dUqdBCkVVXn2CVRtkmci0heJ5RKDBpULyGtaiRlgcoOcnrU4HbVAfc
-         iYbHmlyRSPJfOoHHrAIBEjy1MSQWAxoMo+dlmXyQyQyr/hFTNMh4wwjXr6sVMoLJFXMJ
-         8hUjsskbqvbMi/QEpuzd6kopwsVZOhE9GUKrmzmP/6Yrg1zVq4tfytiRX4voIfyXMjPk
-         Qj+hkjh+ke1dZoeYjDn5kMYVSyb/schJ5Uyz372AhZFXApppLKA+XOsEp3tUrNHRznIV
-         jCosc6psr8OLyIqzdEOoxG0Bpd0kURv3YP/lgQaXSkSphKD/VJLk7ThemRiaxTmLsWpn
-         74cg==
-X-Gm-Message-State: AOAM531X3gjg/s8eP4kZxW9SE5bOBKmnSJWXVE0fJ5N/pQfCJNltx+H1
-        BRk6OMeJIfTAx+BrC6PtcEL99mRHBninjQHgUsE=
-X-Google-Smtp-Source: ABdhPJyP34FS+KiNNxuANKDkje406R74zxtGwPeGm7YKqozLutyMEJB4VWRjYyI8L5mAeyeXgjPVxRswX6jYaJJ3/8c=
-X-Received: by 2002:a05:6512:ad0:: with SMTP id n16mr5908712lfu.320.1641967166302;
- Tue, 11 Jan 2022 21:59:26 -0800 (PST)
+        id S1351178AbiALHU5 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 Jan 2022 02:20:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59005 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1351174AbiALHUy (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>);
+        Wed, 12 Jan 2022 02:20:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641972054;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FtIbmDuJfaFcyPVq4lejO1YQT8JqBoet7CpPdE4P+Vs=;
+        b=IXafCJIzO5ETuapzspmbW7eCTFLED2jMHQYLrrL5fVUTSD3b0+OuR+HQD1cKWLU1MrVjQc
+        re6Qcz7KnTqx2dmaiyO19a0hM/73gYAwzOzWK29725Dqvad799ZkgGZvtXdWcCIrP3JGAY
+        doKF6sxwm+baPmA5cuGQNgSpJRVaCq8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-664-iG6Fe2TPNT6yCUhnGs8TxA-1; Wed, 12 Jan 2022 02:20:50 -0500
+X-MC-Unique: iG6Fe2TPNT6yCUhnGs8TxA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 158141023F50;
+        Wed, 12 Jan 2022 07:20:48 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 914407B9D2;
+        Wed, 12 Jan 2022 07:20:41 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <3462849.1641593783@warthog.procyon.org.uk>
+References: <3462849.1641593783@warthog.procyon.org.uk> <164021579335.640689.2681324337038770579.stgit@warthog.procyon.org.uk> <164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk>
+To:     Steve French <smfrench@gmail.com>
+Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
+        Shyam Prasad N <nspmangalore@gmail.com>,
+        linux-cifs@vger.kernel.org,
+        Trond Myklebust <trondmy@hammerspace.com>,
+        Anna Schumaker <anna.schumaker@netapp.com>,
+        Steve French <sfrench@samba.org>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Jeff Layton <jlayton@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Omar Sandoval <osandov@osandov.com>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        ceph-devel@vger.kernel.org, v9fs-developer@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 63/68] cifs: Support fscache indexing rewrite
 MIME-Version: 1.0
-References: <Yd1BojYhOVOkyoZt@himera.home>
-In-Reply-To: <Yd1BojYhOVOkyoZt@himera.home>
-From:   Steve French <smfrench@gmail.com>
-Date:   Tue, 11 Jan 2022 23:59:15 -0600
-Message-ID: <CAH2r5mtGxjBNdn9NENjc_GLSrmEvF-hwJkfK6oWFk48OV6nFXw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix FILE_BOTH_DIRECTORY_INFO definition
-To:     Eugene Korenevsky <ekorenevsky@astralinux.ru>
-Cc:     CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <534839.1641972040.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Wed, 12 Jan 2022 07:20:40 +0000
+Message-ID: <534840.1641972040@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Merged into cifs-2.6.git for-next
+Hi Steve,
 
-On Tue, Jan 11, 2022 at 6:16 PM Eugene Korenevsky
-<ekorenevsky@astralinux.ru> wrote:
->
-> The size of FILE_BOTH_DIRECTORY_INFO.ShortName must be 24 bytes, not 12
-> (see MS-FSCC documentation).
->
-> Signed-off-by: Eugene Korenevsky <ekorenevsky@astralinux.ru>
-> ---
->  fs/cifs/cifspdu.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
-> index d2ff438fd31f..68b9a436af4b 100644
-> --- a/fs/cifs/cifspdu.h
-> +++ b/fs/cifs/cifspdu.h
-> @@ -2560,7 +2560,7 @@ typedef struct {
->         __le32 EaSize; /* length of the xattrs */
->         __u8   ShortNameLength;
->         __u8   Reserved;
-> -       __u8   ShortName[12];
-> +       __u8   ShortName[24];
->         char FileName[1];
->  } __attribute__((packed)) FILE_BOTH_DIRECTORY_INFO; /* level 0x104 FFrsp data */
->
-> --
-> 2.30.2
->
+I think this needs the further changes below, which I will fold in.  The
+issues are:
 
+ (1) One of the error paths in cifs_atomic_open() uses the cookie when it
+     should jump around that.
 
--- 
-Thanks,
+ (2) There's an additional successful return from the middle of cifs_open(=
+)
+     that I mistook for an error path, but does need to use the cookie on
+     the way out.
 
-Steve
+David
+---
+diff --git a/fs/cifs/dir.c b/fs/cifs/dir.c
+index 6186824b366e..bf3b4c9901b9 100644
+--- a/fs/cifs/dir.c
++++ b/fs/cifs/dir.c
+@@ -508,6 +508,7 @@ cifs_atomic_open(struct inode *inode, struct dentry *d=
+irentry,
+ 			server->ops->close(xid, tcon, &fid);
+ 		cifs_del_pending_open(&open);
+ 		rc =3D -ENOMEM;
++		goto out;
+ 	}
+ =
+
+ 	fscache_use_cookie(cifs_inode_cookie(file_inode(file)),
+diff --git a/fs/cifs/file.c b/fs/cifs/file.c
+index 44da7646f789..47333730c963 100644
+--- a/fs/cifs/file.c
++++ b/fs/cifs/file.c
+@@ -568,7 +568,7 @@ int cifs_open(struct inode *inode, struct file *file)
+ 			spin_lock(&CIFS_I(inode)->deferred_lock);
+ 			cifs_del_deferred_close(cfile);
+ 			spin_unlock(&CIFS_I(inode)->deferred_lock);
+-			goto out;
++			goto use_cache;
+ 		} else {
+ 			_cifsFileInfo_put(cfile, true, false);
+ 		}
+@@ -630,19 +630,6 @@ int cifs_open(struct inode *inode, struct file *file)
+ 		goto out;
+ 	}
+ =
+
+-
+-	fscache_use_cookie(cifs_inode_cookie(file_inode(file)),
+-			   file->f_mode & FMODE_WRITE);
+-	if (file->f_flags & O_DIRECT &&
+-	    (!((file->f_flags & O_ACCMODE) !=3D O_RDONLY) ||
+-	     file->f_flags & O_APPEND)) {
+-		struct cifs_fscache_inode_coherency_data cd;
+-		cifs_fscache_fill_coherency(file_inode(file), &cd);
+-		fscache_invalidate(cifs_inode_cookie(file_inode(file)),
+-				   &cd, i_size_read(file_inode(file)),
+-				   FSCACHE_INVAL_DIO_WRITE);
+-	}
+-
+ 	if ((oplock & CIFS_CREATE_ACTION) && !posix_open_ok && tcon->unix_ext) {
+ 		/*
+ 		 * Time to set mode which we can not set earlier due to
+@@ -661,6 +648,19 @@ int cifs_open(struct inode *inode, struct file *file)
+ 				       cfile->pid);
+ 	}
+ =
+
++use_cache:
++	fscache_use_cookie(cifs_inode_cookie(file_inode(file)),
++			   file->f_mode & FMODE_WRITE);
++	if (file->f_flags & O_DIRECT &&
++	    (!((file->f_flags & O_ACCMODE) !=3D O_RDONLY) ||
++	     file->f_flags & O_APPEND)) {
++		struct cifs_fscache_inode_coherency_data cd;
++		cifs_fscache_fill_coherency(file_inode(file), &cd);
++		fscache_invalidate(cifs_inode_cookie(file_inode(file)),
++				   &cd, i_size_read(file_inode(file)),
++				   FSCACHE_INVAL_DIO_WRITE);
++	}
++
+ out:
+ 	free_dentry_path(page);
+ 	free_xid(xid);
+
