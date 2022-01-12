@@ -2,276 +2,93 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A76C433EF
-	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jan 2022 05:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2F2C433EF
+	for <linux-cifs@archiver.kernel.org>; Wed, 12 Jan 2022 05:59:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350947AbiALFuJ (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 12 Jan 2022 00:50:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42392 "EHLO
+        id S229629AbiALF72 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 Jan 2022 00:59:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350953AbiALFuJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jan 2022 00:50:09 -0500
-Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01B61C06173F;
-        Tue, 11 Jan 2022 21:50:09 -0800 (PST)
-Received: by mail-ua1-x931.google.com with SMTP id p37so2748273uae.8;
-        Tue, 11 Jan 2022 21:50:08 -0800 (PST)
+        with ESMTP id S236614AbiALF72 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jan 2022 00:59:28 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DCA7C06173F
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Jan 2022 21:59:28 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id g11so4421463lfu.2
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Jan 2022 21:59:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=81RrSKaMYzHzRVmwiFgL6qFDtdCtyRRjy6UlCfpIl9c=;
-        b=WEjPcL0PrVBhGlC5RuTZXniJKZ8tVzUqpvI2PUWqMWLonleHUqAds/z6LSI+GhV1MJ
-         KzdmJW23f1xTLHYV/ruVJJoS8Utd5mbslgVqdiFRevQxwlJ3fbTNXs3gtoVu9iXswEj9
-         51VU8xEnb6h7SG2km4YWB1jlYq3GW0n6ZFE5lLmpP4NipFTZW6dZapyutEk95iV46WoO
-         4YntvzdT6HqU5AN6+WKUreLTd/InXxaK+xGFHOpsAB9v4bo2S1dlWwV9HajC7cHSifFU
-         zksQH+cQg4JVrfXyOh3dNQgVKfvcdcCXkfLeAzyTfMiHby3T1UY2V8dTObTsDkdQaT1y
-         CRFQ==
+        bh=kjDixZmTx8xyndUL+x06vwqxFKRPaFwZHkeC5y5TVME=;
+        b=k/aqVt+HCbKwYejpcbMfsBqdtvtELtP2W04AYYJX3065P/LZzEty/eDoodT+TIuHhb
+         RRIEYQbRSMM0BamuG3f6hcootA5AQ9er9L9D3xzGRJ8hES16VpagoVqIEOHnoE31Nw1f
+         OEOM/bzRwaohM0OuOunBoECVf9+hXrU0zRH0Kc13LKCHpvkgozyTQk2/MZ6r8JbS933n
+         xo6aCopQazn+Sa9iiaYEwAkOheo/gr+9SRTHteUhNdsW5Td9kF2x2hPJfg4RvHQOd3HK
+         PDLmVEAZPaO+3Sx1zQzdAcyzvCrGEpcaMsBazzy16fxUTe7Fec4Kb0xFtEgM/hWFKNro
+         INLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=81RrSKaMYzHzRVmwiFgL6qFDtdCtyRRjy6UlCfpIl9c=;
-        b=5BXWoSaL1XBrpoPGdgE9MMnFlKEYtXS9Tl0+HG4Ri5ygezzJQJiknbhZu1h9ct/pRq
-         IRtbxDd31mr1OYUw2cFd94OameMC+2IcmGJmRCk52/XeTg5W1+fsBRUCdPns+DNl8ToP
-         w5FJKxdxDngTe9dyr2gRjGxBS/b7jaI6UfLJa8cyl0dw+sZWrLT5VzUVDWTxjVW/pK3N
-         fA3mTEFD2Kv0aaAexyCISjdGG7cxaRhVL5u3m5dZCleFRHszTjD0FIjSru3FIitHPOUA
-         XNhq4kauFgtNhy31tCn4Gur0u5hs6s1vlgUcsRv2CCrrTgV6XBxmuL6D958juCioSfKR
-         wlKw==
-X-Gm-Message-State: AOAM532y6wI0v5HmLbxECtL/hHUiqCxh7ZPlW3PW0094TPFVgz0g4yTY
-        P3sZ+/fu+FWgXSC8Rj5LkSsg7arYBLHdFkTjRLBomypPQr8=
-X-Google-Smtp-Source: ABdhPJxirclRhhpNoeBGWtih/Mbh3Du/jDTqc/Turdjrp1ynfLWf6pTyYxtz+bnCpFGK9awjZmpo0V6s7Az6qf4+1n4=
-X-Received: by 2002:a05:6102:485:: with SMTP id n5mr144298vsa.57.1641966607860;
- Tue, 11 Jan 2022 21:50:07 -0800 (PST)
+        bh=kjDixZmTx8xyndUL+x06vwqxFKRPaFwZHkeC5y5TVME=;
+        b=33xgc/mNzlM2dUqdBCkVVXn2CVRtkmci0heJ5RKDBpULyGtaiRlgcoOcnrU4HbVAfc
+         iYbHmlyRSPJfOoHHrAIBEjy1MSQWAxoMo+dlmXyQyQyr/hFTNMh4wwjXr6sVMoLJFXMJ
+         8hUjsskbqvbMi/QEpuzd6kopwsVZOhE9GUKrmzmP/6Yrg1zVq4tfytiRX4voIfyXMjPk
+         Qj+hkjh+ke1dZoeYjDn5kMYVSyb/schJ5Uyz372AhZFXApppLKA+XOsEp3tUrNHRznIV
+         jCosc6psr8OLyIqzdEOoxG0Bpd0kURv3YP/lgQaXSkSphKD/VJLk7ThemRiaxTmLsWpn
+         74cg==
+X-Gm-Message-State: AOAM531X3gjg/s8eP4kZxW9SE5bOBKmnSJWXVE0fJ5N/pQfCJNltx+H1
+        BRk6OMeJIfTAx+BrC6PtcEL99mRHBninjQHgUsE=
+X-Google-Smtp-Source: ABdhPJyP34FS+KiNNxuANKDkje406R74zxtGwPeGm7YKqozLutyMEJB4VWRjYyI8L5mAeyeXgjPVxRswX6jYaJJ3/8c=
+X-Received: by 2002:a05:6512:ad0:: with SMTP id n16mr5908712lfu.320.1641967166302;
+ Tue, 11 Jan 2022 21:59:26 -0800 (PST)
 MIME-Version: 1.0
-References: <CAJjP=Bt52AW_w2sKnM=MbckPkH1hevPMJVWm_Wf+wThmR72YTg@mail.gmail.com>
- <CAH2r5mt_2f==5reyc0HmMLvYJVmP4Enykwauo+LQoFGFbVFeRQ@mail.gmail.com>
- <CAJjP=BvNVOj3KRnhFgk6xiwnxVhxE-sN98-pr6e1Kzc5Xg5EvQ@mail.gmail.com>
- <CAH2r5mvsetx5G+c=8ePh+X8ng7FvMrnuM9+FJ4Sid4b3E+T41Q@mail.gmail.com>
- <CAJjP=BvqZUnJPq=C0OUKbXr=mbJd7a6YDSJC-sNY1j_33_e-uw@mail.gmail.com> <CAN05THSGwCKckQoeB6D91iBv0Sed+ethK7tde7GSc1UzS-0OYg@mail.gmail.com>
-In-Reply-To: <CAN05THSGwCKckQoeB6D91iBv0Sed+ethK7tde7GSc1UzS-0OYg@mail.gmail.com>
-From:   Davyd McColl <davydm@gmail.com>
-Date:   Wed, 12 Jan 2022 07:49:56 +0200
-Message-ID: <CAJjP=BvcWrF-k_sFxak1mgHAHVVS7_JZow+h_47XB1VzG2+Drw@mail.gmail.com>
-Subject: Re: Possible regression: unable to mount CIFS 1.0 shares from older
- machines since 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c
-To:     ronnie sahlberg <ronniesahlberg@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+References: <Yd1BojYhOVOkyoZt@himera.home>
+In-Reply-To: <Yd1BojYhOVOkyoZt@himera.home>
+From:   Steve French <smfrench@gmail.com>
+Date:   Tue, 11 Jan 2022 23:59:15 -0600
+Message-ID: <CAH2r5mtGxjBNdn9NENjc_GLSrmEvF-hwJkfK6oWFk48OV6nFXw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix FILE_BOTH_DIRECTORY_INFO definition
+To:     Eugene Korenevsky <ekorenevsky@astralinux.ru>
+Cc:     CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-Hi Ronnie
+Merged into cifs-2.6.git for-next
 
-The regular fstab line for this mount is:
-
-//mede8er/mede8er  /mnt/mede8er-smb  cifs
-noauto,guest,users,uid=daf,gid=daf,iocharset=utf8,vers=1.0,nobrl,sec=none
- 0  0
-
-Altering the end of the options from "sec=none" to
-"username=guest,sec=ntlmssp" or "guest,sec=ntlmssp" results in failure
-to mount
-(tested on my patched kernel, which still supports the original fstab
-line), with dmesg containing:
-
-[45753.525219] CIFS: VFS: Use of the less secure dialect vers=1.0 is
-not recommended unless required for acc
-ess to very old servers
-[45753.525222] CIFS: Attempting to mount \\mede8er\mede8er
-[45756.861351] CIFS: VFS: Unable to select appropriate authentication method!
-[45756.861361] CIFS: VFS: \\mede8er Send error in SessSetup = -22
-[45756.861395] CIFS: VFS: cifs_mount failed w/return code = -22
-
-There is no way that I know of to set up users for smb auth on this
-device - it only supports guest connections.
-
--d
-
-
-On Wed, 12 Jan 2022 at 04:32, ronnie sahlberg <ronniesahlberg@gmail.com> wrote:
+On Tue, Jan 11, 2022 at 6:16 PM Eugene Korenevsky
+<ekorenevsky@astralinux.ru> wrote:
 >
-> Thanks for the network traces.
+> The size of FILE_BOTH_DIRECTORY_INFO.ShortName must be 24 bytes, not 12
+> (see MS-FSCC documentation).
 >
-> In the traces, both win11 and linux are not using even NTLM but the
-> even older "share password" authentication mode where you specify a
-> password for the share in the TreeConnect command.
-> That is something I think we should not support at all.
+> Signed-off-by: Eugene Korenevsky <ekorenevsky@astralinux.ru>
+> ---
+>  fs/cifs/cifspdu.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> What is the exact mount command line you use?
-> Can you try mounting the share using a username and ntlmssp ?
-> I.e. username=your-user,sec=ntlmssp  on the mount command
+> diff --git a/fs/cifs/cifspdu.h b/fs/cifs/cifspdu.h
+> index d2ff438fd31f..68b9a436af4b 100644
+> --- a/fs/cifs/cifspdu.h
+> +++ b/fs/cifs/cifspdu.h
+> @@ -2560,7 +2560,7 @@ typedef struct {
+>         __le32 EaSize; /* length of the xattrs */
+>         __u8   ShortNameLength;
+>         __u8   Reserved;
+> -       __u8   ShortName[12];
+> +       __u8   ShortName[24];
+>         char FileName[1];
+>  } __attribute__((packed)) FILE_BOTH_DIRECTORY_INFO; /* level 0x104 FFrsp data */
 >
-> regards
-> ronnie sahlberg
+> --
+> 2.30.2
 >
-> On Wed, Jan 12, 2022 at 6:57 AM Davyd McColl <davydm@gmail.com> wrote:
-> >
-> > Hi Steve
-> >
-> > As requested, wireshark captures to the device in question, as well as
-> > the fstab entry I have for the device:
-> > - win11, browsing with explorer
-> > - win11, net use
-> > - unpatched linux 5.16.0 attempt to mount
-> > - patched linux 5.16.0 successful mount
-> > - fstab entry - note that I have to specify samba version 1.0 as the
-> > default has changed and the mount fails otherwise. Explicitly
-> > specifying 2.0 errors and suggests that I should select a different
-> > version.
-> >
-> > -d
-> >
-> > On Tue, 11 Jan 2022 at 00:13, Steve French <smfrench@gmail.com> wrote:
-> > >
-> > > I would be surprised if Windows 11 still negotiates (with default
-> > > registry settings) SMB1 much less NTLMv1 in SMB1, but I have not tried
-> > > Windows 11 with an NTLMv1 only server (they are hard to find - I may
-> > > have an original NT4 and an NT3.5 CD somewhere - might be possible to
-> > > install a VM with NT3.5 but that is really really old and not sure I
-> > > can find those CDs).
-> > >
-> > > Is it possible to send me the wireshark trace (or other network trace)
-> > > of the failing mount from Linux and also the one with the succeeding
-> > > NET USE from Windows 11 to the same server?
-> > >
-> > > Hopefully it is something unrelated to NTLMv1, there has been a LOT of
-> > > pushback across the world, across products in making sure no one uses
-> > > SMB1 anymore.  See e.g.
-> > > https://techcommunity.microsoft.com/t5/storage-at-microsoft/stop-using-smb1/ba-p/425858
-> > > and https://twitter.com/nerdpyle/status/776900804712148993
-> > >
-> > > On Mon, Jan 10, 2022 at 2:30 PM Davyd McColl <davydm@gmail.com> wrote:
-> > > >
-> > > > I don't understand. I tracked down the exact commit where the issue
-> > > > occurs with a 2 hour git bisect. This was after first confirming that
-> > > > my older 5.14 kernel did not display the symptoms. I can still connect
-> > > > to the share via windows 11 explorer. I don't know what else I need to
-> > > > do here to show where the issue was introduced?
-> > > >
-> > > > Apologies for bouncing mails - literally no email client I have seems
-> > > > to be capable of plaintext emails, so every time I forget, I have to
-> > > > find a browser with the gmail web interface to reply.
-> > > >
-> > > > -d
-> > > >
-> > > > On Mon, 10 Jan 2022 at 19:31, Steve French <smfrench@gmail.com> wrote:
-> > > > >
-> > > > > I want to make sure that we don't have an unrelated regression
-> > > > > involved here since NTLMv2 replaced NTLMv1 over 20 years ago (googling
-> > > > > this e.g. I see "NTLMv2, introduced in Windows NT 4.0 SP4 and natively
-> > > > > supported in Windows 2000")  and should be the default for Windows
-> > > > > NT4, Windows 2000 etc. as well as any version of Samba from the last
-> > > > > 15 years+.  I have significant concerns with adding mechanisms that
-> > > > > were asked to be disabled ~19 years ago e.g. see
-> > > > > https://support.microsoft.com/en-us/topic/security-guidance-for-ntlmv1-and-lm-network-authentication-da2168b6-4a31-0088-fb03-f081acde6e73
-> > > > > due to security concerns.
-> > > > >
-> > > > > Can we double check that there are not other issues involved in your example?
-> > > > >
-> > > > > The concerns about NTLMv1 security concerns (and why it should never
-> > > > > be used) are very persuasive e.g. many articles like
-> > > > > https://miriamxyra.com/2017/11/08/stop-using-lan-manager-and-ntlmv1/
-> > > > >
-> > > > > On Mon, Jan 10, 2022 at 7:48 AM Davyd McColl <davydm@gmail.com> wrote:
-> > > > > >
-> > > > > > Good day
-> > > > > >
-> > > > > > I'm following advice from the thread at
-> > > > > > https://bugzilla.kernel.org/show_bug.cgi?id=215375 as to how to report
-> > > > > > this, so please bear with me and redirect me as necessary.
-> > > > > >
-> > > > > > Since commit 76a3c92ec9e0668e4cd0e9ff1782eb68f61a179c, I'm unable to
-> > > > > > mount a CIFS 1.0 share ( from a media player: mede8er med600x3d, which
-> > > > > > runs some older linux). Apparently I'm not the only one, according to
-> > > > > > that thread, though the other affected party there is windows-based.
-> > > > > >
-> > > > > > I first logged this in the Gentoo bugtracker
-> > > > > > (https://bugs.gentoo.org/821895) and a reversion patch is available
-> > > > > > there for the time being.
-> > > > > >
-> > > > > > I understand that some of the encryption methods upon which the
-> > > > > > original feature relied are to be removed and, as such, the ability to
-> > > > > > mount these older shares was removed. This is sure to affect anyone
-> > > > > > running older Windows virtual machines (or older, internally-visible
-> > > > > > windows hosts) in addition to anyone attempting to connect to shares
-> > > > > > from esoteric devices like mine.
-> > > > > >
-> > > > > > Whilst I understand the desire to clean up code and remove dead
-> > > > > > branches, I'd really appreciate it if this particular feature remains
-> > > > > > available either by kernel configuration (which suits me fine, but is
-> > > > > > likely to be a hassle for anyone running a binary distribution) or via
-> > > > > > boot parameters. In the mean-time, I'm updating my own sync software
-> > > > > > to support this older device because if I can't sync media to the
-> > > > > > player, the device is not very useful to me.
-> > > > > >
-> > > > > > Thanks
-> > > > > > -d
-> > > > >
-> > > > >
-> > > > >
-> > > > > --
-> > > > > Thanks,
-> > > > >
-> > > > > Steve
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-> > > > If you say that getting the money is the most important thing
-> > > > You will spend your life completely wasting your time
-> > > > You will be doing things you don't like doing
-> > > > In order to go on living
-> > > > That is, to go on doing things you don't like doing
-> > > >
-> > > > Which is stupid.
-> > > >
-> > > > - Alan Watts
-> > > > https://www.youtube.com/watch?v=-gXTZM_uPMY
-> > > >
-> > > > Quidquid latine dictum sit, altum sonatur.
-> > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> >
-> >
-> >
-> > --
-> > -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-> > If you say that getting the money is the most important thing
-> > You will spend your life completely wasting your time
-> > You will be doing things you don't like doing
-> > In order to go on living
-> > That is, to go on doing things you don't like doing
-> >
-> > Which is stupid.
-> >
-> > - Alan Watts
-> > https://www.youtube.com/watch?v=-gXTZM_uPMY
-> >
-> > Quidquid latine dictum sit, altum sonatur.
-
 
 
 -- 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-If you say that getting the money is the most important thing
-You will spend your life completely wasting your time
-You will be doing things you don't like doing
-In order to go on living
-That is, to go on doing things you don't like doing
+Thanks,
 
-Which is stupid.
-
-- Alan Watts
-https://www.youtube.com/watch?v=-gXTZM_uPMY
-
-Quidquid latine dictum sit, altum sonatur.
+Steve
