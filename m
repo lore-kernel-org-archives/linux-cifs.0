@@ -2,137 +2,104 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61ED1C433F5
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 Jan 2022 16:20:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A37E1C433F5
+	for <linux-cifs@archiver.kernel.org>; Thu, 13 Jan 2022 17:43:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236485AbiAMQUj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 13 Jan 2022 11:20:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:37337 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229758AbiAMQUi (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>);
-        Thu, 13 Jan 2022 11:20:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642090838;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HS16jLN7unkxFPQM4nOJZ2m0CdE5wbqWBb1jBUddR4w=;
-        b=ZORGs6/j62WbnIVoaWZ3/3PNUgZdvhVbCVMoV04WQ/ZSLVITX1aGaUTnXSjrE5GBjuK0u/
-        FYtCLW3uevhdnmM61nmKBqIscB5JRmJl+BhZ1djjoBbHks46AEjJ3FaQDHLy7m26VUoeWo
-        XltSuI+tQyXt2rolJlq2TsQXcw0u4FE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-509-8x3gcAjBM2aWgWXKN56oZg-1; Thu, 13 Jan 2022 11:20:34 -0500
-X-MC-Unique: 8x3gcAjBM2aWgWXKN56oZg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B791E10CDB66;
-        Thu, 13 Jan 2022 16:20:32 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.165])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0FC447D3D2;
-        Thu, 13 Jan 2022 16:20:29 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <1318953.1642024578@warthog.procyon.org.uk>
-References: <1318953.1642024578@warthog.procyon.org.uk> <164021579335.640689.2681324337038770579.stgit@warthog.procyon.org.uk> <164021479106.640689.17404516570194656552.stgit@warthog.procyon.org.uk>
-To:     Steve French <smfrench@gmail.com>
-Cc:     dhowells@redhat.com, linux-cachefs@redhat.com,
-        Shyam Prasad N <nspmangalore@gmail.com>,
-        Murphy Zhou <jencce.kernel@gmail.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-cifs@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6] cifs: Support fscache indexing rewrite
+        id S237210AbiAMRnj (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Thu, 13 Jan 2022 12:43:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52708 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229702AbiAMRni (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Thu, 13 Jan 2022 12:43:38 -0500
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E15CC061574
+        for <linux-cifs@vger.kernel.org>; Thu, 13 Jan 2022 09:43:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=Message-ID:Cc:To:From:Date;
+        bh=AX+apUDBrxobioPT77OGxzifvo+Bt2Sj6om9k9Xxl0s=; b=TJl6A/qtoPvVJsNpAfh6C0D4dW
+        sOyUyR3I6IcTnvhGL4oBARDDe7WKqYYeP91biqm6wadMe5AaPxr0KfZmdO6u4+hqjV8B5zLkR96HP
+        bCfSILn486lOqndtsGPjgp7BJOpWzLcOp/VwM+lQUF8R/LmkpWPcWA2X5yswUqktqgc8F0mjSfEHi
+        OSCJYfq7mrQy5NkHuBXoP/i3eyijyjiGPI9zNAtHY6WFMIzgAOWyqe4haGyZIh1lErUZhYW92vi3i
+        +h6EGfSK7qd5yycBtw5KoZo5+C1F/X6gKZhxWqjglsfYlxmxTMx9wGu4zI0YhRV666xcSjgjyOxc6
+        bK0hI0+dY9YFlTxIWbmqpf484Jx3eJl+1CrvMLllqNoAhxKmoQoD0ZMrVzm13uhCel/6Xaon45qyG
+        zVhx9RRjX/4ZRBS5HGF6wnQrxsmNtVN96OQobKlb3pSLI26xGrY0Fm8JqLz4EQ7IkrWJPf61vnHXJ
+        JQmxemLuhCWVfpz75ASUPtNj;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1n848N-0078QB-4G; Thu, 13 Jan 2022 17:43:35 +0000
+Date:   Thu, 13 Jan 2022 09:43:32 -0800
+From:   Jeremy Allison <jra@samba.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     smfrench@gmail.com, Shyam Prasad N <nspmangalore@gmail.com>,
+        jlayton@kernel.org, linux-cifs@vger.kernel.org
+Subject: Re: Incorrect fallocate behaviour in cifs or samba?
+Message-ID: <YeBkxLnh8+sUv968@jeremy-acer>
+Reply-To: Jeremy Allison <jra@samba.org>
+References: <1828480.1642079920@warthog.procyon.org.uk>
+ <1856457.1642087232@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1886509.1642090829.1@warthog.procyon.org.uk>
-Date:   Thu, 13 Jan 2022 16:20:29 +0000
-Message-ID: <1886510.1642090829@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <1856457.1642087232@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-David Howells <dhowells@redhat.com> wrote:
+On Thu, Jan 13, 2022 at 03:20:32PM +0000, David Howells wrote:
+>David Howells <dhowells@redhat.com> wrote:
+>
+>> If I do the following:
+>>
+>> 	mount //carina/test /xfstest.test -o user=shares,pass=foobar,noperm,vers=3.0,mfsymlinks,actimeo=0
+>> 	/usr/sbin/xfs_io -f -t \
+>> 		-c "pwrite -S 0x41 0 4096"
+>> 		-c "pwrite -S 0x42 4096 4096"
+>> 		-c "fzero 0 4096" \
+>> 		-c "pread 0 8192" \
+>> 		/xfstest.test/008.7067
+>> ...
+>>    31 0.321638749  192.168.6.2 -> 192.168.6.1  SMB2 206 Ioctl Request FSCTL_SET_ZERO_DATA File: 008.7067
+>
+>So what I see is that Samba does:
+>
+>	fallocate(24, FALLOC_FL_KEEP_SIZE|FALLOC_FL_PUNCH_HOLE, 0, 4096) = 0
+>
+>for this... but that's not what cifs was asked to do.  Should Samba be using
+>FALLOC_FL_ZERO_RANGE instead?
 
-> -	/*
-> -	 * The cookie is initialized from volume info returned above.
-> -	 * Inside cifs_fscache_get_super_cookie it checks
-> -	 * that we do not get super cookie twice.
-> -	 */
-> -	cifs_fscache_get_super_cookie(tcon);
-> +	if (!rc &&
-> +	    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_FSCACHE)) {
-> +		/*
-> +		 * The cookie is initialized from volume info returned above.
-> +		 * Inside cifs_fscache_get_super_cookie it checks
-> +		 * that we do not get super cookie twice.
-> +		 */
-> +		rc = cifs_fscache_get_super_cookie(tcon);
-> +		if (rc < 0) {
-> +			iget_failed(inode);
-> +			inode = ERR_PTR(rc);
-> +		}
-> +	}
+This is from fsctl_zero_data() in Samba. We have:
 
-This bit should've been removed - and the bit it is modifying was removed by
-commit b774302e885697dde027825f8de9beb985d037bd which is now upstream.
+         /*
+          * MS-FSCC <58> Section 2.3.67
+          * This FSCTL sets the range of bytes to zero (0) without extending the
+          * file size.
+          *
+          * The VFS_FALLOCATE_FL_KEEP_SIZE flag is used to satisfy this
+          * constraint.
+          */
 
-The invocation of cifs_fscache_get_super_cookie() added by that commit should
-be altered to make it conditional.
+         mode = VFS_FALLOCATE_FL_PUNCH_HOLE | VFS_FALLOCATE_FL_KEEP_SIZE;
+         ret = SMB_VFS_FALLOCATE(fsp, mode, zdata_info.file_off, len);
+         if (ret == -1)  {
+                 status = map_nt_error_from_unix_common(errno);
+                 DEBUG(2, ("zero-data fallocate(0x%x) failed: %s\n", mode,
+                       strerror(errno)));
+                 return status;
+         }
 
-To this end, I've rebased the patch on linus/master and something
-approximating the attached change needs to be made.
+         if (!fsp->fsp_flags.is_sparse && lp_strict_allocate(SNUM(fsp->conn))) {
+                 /*
+                  * File marked non-sparse and "strict allocate" is enabled -
+                  * allocate the range that we just punched out.
+                  * In future FALLOC_FL_ZERO_RANGE could be used exclusively for
+                  * this, but it's currently only supported on XFS and ext4.
+                  *
+                  * The newly allocated range still won't be found by SEEK_DATA
+                  * for QAR, but stat.st_blocks will reflect it.
+                  */
+                 ret = SMB_VFS_FALLOCATE(fsp, VFS_FALLOCATE_FL_KEEP_SIZE,
+                                         zdata_info.file_off, len);
 
-David
----
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index f977e02bd21e..598be9890f2a 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -3057,7 +3057,8 @@ static int mount_get_conns(struct mount_ctx *mnt_ctx)
- 	 * Inside cifs_fscache_get_super_cookie it checks
- 	 * that we do not get super cookie twice.
- 	 */
--	cifs_fscache_get_super_cookie(tcon);
-+	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_FSCACHE)
-+		cifs_fscache_get_super_cookie(tcon);
- 
- out:
- 	mnt_ctx->server = server;
-diff --git a/fs/cifs/inode.c b/fs/cifs/inode.c
-index 3c3bc28090d8..9b93e7d3e0e1 100644
---- a/fs/cifs/inode.c
-+++ b/fs/cifs/inode.c
-@@ -1368,20 +1368,6 @@ struct inode *cifs_root_iget(struct super_block *sb)
- 		inode = ERR_PTR(rc);
- 	}
- 
--	if (!rc &&
--	    (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_FSCACHE)) {
--		/*
--		 * The cookie is initialized from volume info returned above.
--		 * Inside cifs_fscache_get_super_cookie it checks
--		 * that we do not get super cookie twice.
--		 */
--		rc = cifs_fscache_get_super_cookie(tcon);
--		if (rc < 0) {
--			iget_failed(inode);
--			inode = ERR_PTR(rc);
--		}
--	}
--
- out:
- 	kfree(path);
- 	free_xid(xid);
-
+Note the "currently only supported on XFS and ext4" problem
+with FALLOC_FL_ZERO_RANGE.
