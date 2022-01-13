@@ -2,211 +2,128 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F46AC433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 Jan 2022 00:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC73C433EF
+	for <linux-cifs@archiver.kernel.org>; Thu, 13 Jan 2022 03:52:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229809AbiAMAwN (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Wed, 12 Jan 2022 19:52:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49290 "EHLO
+        id S232380AbiAMDww (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Wed, 12 Jan 2022 22:52:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbiAMAwK (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jan 2022 19:52:10 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA40C06173F
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Jan 2022 16:52:10 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id 59-20020a17090a09c100b001b34a13745eso15847262pjo.5
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Jan 2022 16:52:10 -0800 (PST)
+        with ESMTP id S232376AbiAMDww (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Wed, 12 Jan 2022 22:52:52 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 218CBC06173F;
+        Wed, 12 Jan 2022 19:52:52 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id h23so6652070iol.11;
+        Wed, 12 Jan 2022 19:52:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GM+Cli/GCCmwNv8gy4gcEIxwQxKx9zeCTJt/eB5NJ14=;
-        b=V9U4lDbqGajWNMfzUePbilgtnwYWFAi7Z0gtJ49IC61bp2D44lSBqrX7kPMGWpJSXH
-         q04/a/3rdAQkPuB98G8mgNNclVQF9/CvpQCgEZvyu3n0X+MJd6lNLyiy382Ck68y6NQG
-         TsmcM1h8/nCyg41+7M9aqIyfhDO0JUVQ/DHDpWieCdM15idJWv4QSXo4Igy1gma/KwBB
-         fqZfDG2SrrliOTjWKlK+k3MBJIrTZXZMf0OkpQG0YGYcIx5rZ4kPmcwmSXI9HkpM9pil
-         wXf08PWYz5PKDS1hQFs8PK8uoyo+qpp6eGVGagemgo/CSwzcSa49b5N3qyibfpb2IhFE
-         Bt9Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IkTW/f1btDdtmebJOs9va1brO9n2byvbc/TGFMyWGVA=;
+        b=D4dKKHpgBJu2/atbonwXBGxVJ6n560QSSx4z9Bf9BPfse7wy1LFez2vTj7XNQS++EJ
+         YsPHn0Yi3PgCr8YyGKKNWCjLJcnzyIux8ggWkwc2v/AySv+7EY/Eqv8mnjjxNTnjnB2y
+         F+Zg4PqzXHV3AggNVy4Nl/b26Wczp2qUBY13R6iUrO7wuqQvnna7veM+nnI/RYBtowJu
+         hDffD8cI5EcgbIl7OeOGoZQ8HIdJfDlv9DWQHUwKB2YhzoUQ2i04M+XsshSitl4jPN4h
+         k1EUTr7xHgaye4gjMXc2G0UzBm0IZ4ZOAPogopZv3b9csUn9VuhQJ4AaMSAF8gdGPL2B
+         JvAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GM+Cli/GCCmwNv8gy4gcEIxwQxKx9zeCTJt/eB5NJ14=;
-        b=0ru+IF4W7u/w7POgC+cWZocdvmnHEc65DTJejwtlwb0BNqooN+76XKtBB6adNbTBac
-         WKzOPjE0vbp50y9ARKIivndnng3ptjtC1oC2HcYZ5JB64M7KFGZcsurdKHXbWQC9nC4a
-         Hs1fnJMwgh13nBYuY9ayWaeq+RkHzsB7GPt133dCNW51H0MRmPxrxSVu8PwCjM0FLben
-         CU8ZrnISqmtI8BR4WLuOJ7A4jYRj4m8cEOfXP+Am10bGOHcE6TLPUeKKg4yiZZBpE/LO
-         52zxqOLsCR8faBajyX9jfQtuA/8PstyH9WA+BjiL0Tv7Lw36x+4pusGHFAqB8oiD1EcY
-         xvdw==
-X-Gm-Message-State: AOAM5309uDRHWg6qk8oLD863G1+fRqvmCKaAjrWuqroajbzNiJhr3Rmv
-        JQpUX4/ZjpLk5087pxdVFBFmKh9nNrs=
-X-Google-Smtp-Source: ABdhPJxPMmrNCufdFjhLoT5iojh6mu8XFJGIWvEiC/f5WPEbmWRF2FjDecS2C85nFKeEDF+CyOJXlg==
-X-Received: by 2002:a62:2743:0:b0:4bd:356:21e with SMTP id n64-20020a622743000000b004bd0356021emr1900127pfn.51.1642035129723;
-        Wed, 12 Jan 2022 16:52:09 -0800 (PST)
-Received: from localhost.localdomain ([125.177.232.58])
-        by smtp.googlemail.com with ESMTPSA id z24sm6796749pjq.17.2022.01.12.16.52.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 16:52:09 -0800 (PST)
-From:   Hyunchul Lee <hyc.lee@gmail.com>
-To:     linux-cifs@vger.kernel.org
-Cc:     Namjae Jeon <linkinjeon@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Steve French <smfrench@gmail.com>,
-        Hyunchul Lee <hyc.lee@gmail.com>
-Subject: [PATCH v4] ksmbd: smbd: fix missing client's memory region invalidation
-Date:   Thu, 13 Jan 2022 09:51:39 +0900
-Message-Id: <20220113005139.236076-1-hyc.lee@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IkTW/f1btDdtmebJOs9va1brO9n2byvbc/TGFMyWGVA=;
+        b=ALAaP3rR4MciCRmFBi6LftcEB/0bDXF8VDgsQprovk7Tl3MQLDKZ+EcVhJ5EOOeOyz
+         9GCIJkg0gDE9tD5PMwPFK8CPYFNvWPUCP9a4LIdnUCwUwDofGjlVplbo/APtqci5Oo5l
+         F6HkW9RfTox6rFefkxOVvI5HyMoyek4p6hMdvyEvrUBuYCWxgg3aIJImEvBYb0pWWlsz
+         xqZviXWlOgPAjXT06LbBo1aQxqxi6JQ3T9XAlo84YtKwnn4qZcgMngdrIDa5G6YuvHoN
+         8c3fvACoMlkw31KkOcizkN6xXi445/I9PRGveDmZ707IUsZxppsFy0+0MlsMvQR+bBBq
+         LBfA==
+X-Gm-Message-State: AOAM530KxdnXqbF+F2c/ovaL/VG7qi7vrF6jsqT4Xd2tBDpEhSjBUEzf
+        t4N3kyRby907g1f1K4l7O9NiCRu3SfYqknvxyFs=
+X-Google-Smtp-Source: ABdhPJwgMuCPjLMe0KKbmpitTjVZUuTLSsyhB1hPisBBTzYcZ/TPIDnRp9aDvCtWNvEoMorQRff/QkX80COOvac4y80=
+X-Received: by 2002:a5d:9155:: with SMTP id y21mr1264833ioq.112.1642045971472;
+ Wed, 12 Jan 2022 19:52:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220111074309.GA12918@kili> <Yd1ETmx/HCigOrzl@infradead.org>
+ <CAOQ4uxg9V4Jsg3jRPnsk2AN7gPrNY8jRAc87tLvGW+TqH9OU-A@mail.gmail.com> <20220112174301.GB19154@magnolia>
+In-Reply-To: <20220112174301.GB19154@magnolia>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Thu, 13 Jan 2022 05:52:40 +0200
+Message-ID: <CAOQ4uxh7wpxx2H6Vpm26OdigXbWCCLO1xbFapupvLCn8xOiL=w@mail.gmail.com>
+Subject: Re: [bug report] NFS: Support statx_get and statx_set ioctls
+To:     "Darrick J. Wong" <djwong@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        richard.sharpe@primarydata.com,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        lance.shelton@hammerspace.com,
+        Anna Schumaker <Anna.Schumaker@netapp.com>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>, ntfs3@lists.linux.dev,
+        Steve French <sfrench@samba.org>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Ralph Boehme <slow@samba.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-if the Channel of a SMB2 WRITE request is
-SMB2_CHANNEL_RDMA_V1_INVALIDTE, a client
-does not invalidate its memory regions but
-ksmbd must do it by sending a SMB2 WRITE response
-with IB_WR_SEND_WITH_INV.
+> > Which leaves us with an API to set the 'time backup' attribute, which
+> > is a "mutable creation time" [*].
+> > cifs supports setting it via setxattr and I guess ntfs3 could use an
+> > API to set it as well.
+> >
+> > One natural interface that comes to mind is:
+> >
+> > struct timespec times[3] = {/* atime, mtime, crtime */}
+> > utimensat(dirfd, path, times, AT_UTIMES_ARCHIVE);
+> >
+> > and add ia_crtime with ATTR_CRTIME to struct iattr.
+> >
+> > Trond,
+> >
+> > Do you agree to rework your patches in this direction?
+> > Perhaps as the first stage, just use statx() and ioctls to set the
+> > attributes to give enough time for bikeshedding the set APIs
+> > and follow up with the generic set API patches later?
+> >
+> > Thanks,
+> > Amir.
+> >
+> > [*] I find it convenient to use the statx() terminology of "btime"
+> > to refer to the immutable birth time provided by some filesystems
+> > and to use "crtime" for the mutable creation time for archiving,
+> > so that at some point, some filesystems may provide both of
+> > these times independently.
+>
+> I disagree because XFS and ext4 both use 'crtime' for the immutable
+> birth time, not a mutable creation time for archiving.  I think we'd
+> need to be careful about wording here if there is interest in adding a
+> user-modifiable file creation time (as opposed to creation time for a
+> specific instance of an inode) to filesystems.
+>
+> Once a year or so we get a question/complaint from a user about how they
+> can't change the file creation time and we have to explain to them
+> what's really going on.
+>
 
-But if errors occur while processing a SMB2
-READ/WRITE request, ksmbd sends a response
-with IB_WR_SEND. So a client could use memory
-regions already in use.
+To add one more terminology to the mix - when Samba needed to cope
+with these two terminologies they came up with itime for "instantiation time"
+(one may also consider it "immutable time").
 
-Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
----
-changes from v1:
- - factor out setting a remote key to helper functions.
-changes from v2:
- - Make helper functions one smb2_set_remote_key_for_rdma.
-changes from v3:
- - initialize fp to NULL for fixing the warning message,
-   "variable fp is used unintialized..".
+Another issue besides wording, is that statx btime can be either of those
+things depending on the filesystem, so if we ever add mutable btime to
+ext4/xfs, what's statx btime going to return?
 
- fs/ksmbd/smb2pdu.c | 73 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 46 insertions(+), 27 deletions(-)
+One more question to ask, if we were to add mutable btime to ext4/xfs
+should it be an additional attribute at all or should we allow with explicit
+filesystem flag and maybe also mount option to modify the existing crtime
+inode field? if we can accept that some users are willing to trade the
+immutable crtime with mutable btime, then we can settle with a flag
+indicating "warranty seal removed" from the existing crtime field.
+At least one advantage of this approach is that it simplifies terminology.
 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index ced8f949a4d6..b232f78d5b8a 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -6124,25 +6124,33 @@ static noinline int smb2_read_pipe(struct ksmbd_work *work)
- 	return err;
- }
- 
--static ssize_t smb2_read_rdma_channel(struct ksmbd_work *work,
--				      struct smb2_read_req *req, void *data_buf,
--				      size_t length)
-+static int smb2_set_remote_key_for_rdma(struct ksmbd_work *work,
-+					struct smb2_buffer_desc_v1 *desc,
-+					__le32 Channel,
-+					__le16 ChannelInfoOffset,
-+					__le16 ChannelInfoLength)
- {
--	struct smb2_buffer_desc_v1 *desc =
--		(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
--	int err;
--
- 	if (work->conn->dialect == SMB30_PROT_ID &&
--	    req->Channel != SMB2_CHANNEL_RDMA_V1)
-+	    Channel != SMB2_CHANNEL_RDMA_V1)
- 		return -EINVAL;
- 
--	if (req->ReadChannelInfoOffset == 0 ||
--	    le16_to_cpu(req->ReadChannelInfoLength) < sizeof(*desc))
-+	if (ChannelInfoOffset == 0 ||
-+	    le16_to_cpu(ChannelInfoLength) < sizeof(*desc))
- 		return -EINVAL;
- 
- 	work->need_invalidate_rkey =
--		(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
-+		(Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
- 	work->remote_key = le32_to_cpu(desc->token);
-+	return 0;
-+}
-+
-+static ssize_t smb2_read_rdma_channel(struct ksmbd_work *work,
-+				      struct smb2_read_req *req, void *data_buf,
-+				      size_t length)
-+{
-+	struct smb2_buffer_desc_v1 *desc =
-+		(struct smb2_buffer_desc_v1 *)&req->Buffer[0];
-+	int err;
- 
- 	err = ksmbd_conn_rdma_write(work->conn, data_buf, length,
- 				    le32_to_cpu(desc->token),
-@@ -6165,7 +6173,7 @@ int smb2_read(struct ksmbd_work *work)
- 	struct ksmbd_conn *conn = work->conn;
- 	struct smb2_read_req *req;
- 	struct smb2_read_rsp *rsp;
--	struct ksmbd_file *fp;
-+	struct ksmbd_file *fp = NULL;
- 	loff_t offset;
- 	size_t length, mincount;
- 	ssize_t nbytes = 0, remain_bytes = 0;
-@@ -6179,6 +6187,18 @@ int smb2_read(struct ksmbd_work *work)
- 		return smb2_read_pipe(work);
- 	}
- 
-+	if (req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE ||
-+	    req->Channel == SMB2_CHANNEL_RDMA_V1) {
-+		err = smb2_set_remote_key_for_rdma(work,
-+						   (struct smb2_buffer_desc_v1 *)
-+						   &req->Buffer[0],
-+						   req->Channel,
-+						   req->ReadChannelInfoOffset,
-+						   req->ReadChannelInfoLength);
-+		if (err)
-+			goto out;
-+	}
-+
- 	fp = ksmbd_lookup_fd_slow(work, le64_to_cpu(req->VolatileFileId),
- 				  le64_to_cpu(req->PersistentFileId));
- 	if (!fp) {
-@@ -6364,21 +6384,6 @@ static ssize_t smb2_write_rdma_channel(struct ksmbd_work *work,
- 
- 	desc = (struct smb2_buffer_desc_v1 *)&req->Buffer[0];
- 
--	if (work->conn->dialect == SMB30_PROT_ID &&
--	    req->Channel != SMB2_CHANNEL_RDMA_V1)
--		return -EINVAL;
--
--	if (req->Length != 0 || req->DataOffset != 0)
--		return -EINVAL;
--
--	if (req->WriteChannelInfoOffset == 0 ||
--	    le16_to_cpu(req->WriteChannelInfoLength) < sizeof(*desc))
--		return -EINVAL;
--
--	work->need_invalidate_rkey =
--		(req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE);
--	work->remote_key = le32_to_cpu(desc->token);
--
- 	data_buf = kvmalloc(length, GFP_KERNEL | __GFP_ZERO);
- 	if (!data_buf)
- 		return -ENOMEM;
-@@ -6425,6 +6430,20 @@ int smb2_write(struct ksmbd_work *work)
- 		return smb2_write_pipe(work);
- 	}
- 
-+	if (req->Channel == SMB2_CHANNEL_RDMA_V1 ||
-+	    req->Channel == SMB2_CHANNEL_RDMA_V1_INVALIDATE) {
-+		if (req->Length != 0 || req->DataOffset != 0)
-+			return -EINVAL;
-+		err = smb2_set_remote_key_for_rdma(work,
-+						   (struct smb2_buffer_desc_v1 *)
-+						   &req->Buffer[0],
-+						   req->Channel,
-+						   req->WriteChannelInfoOffset,
-+						   req->WriteChannelInfoLength);
-+		if (err)
-+			goto out;
-+	}
-+
- 	if (!test_tree_conn_flag(work->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE)) {
- 		ksmbd_debug(SMB, "User does not have write permission\n");
- 		err = -EACCES;
--- 
-2.25.1
-
+Thanks,
+Amir.
