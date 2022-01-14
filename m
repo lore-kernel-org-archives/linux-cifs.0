@@ -2,75 +2,100 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7B8C433EF
-	for <linux-cifs@archiver.kernel.org>; Thu, 13 Jan 2022 18:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B64E3C433EF
+	for <linux-cifs@archiver.kernel.org>; Fri, 14 Jan 2022 06:46:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237306AbiAMSWU (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Thu, 13 Jan 2022 13:22:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33136 "EHLO
+        id S233466AbiANGqc (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Fri, 14 Jan 2022 01:46:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230329AbiAMSWU (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Thu, 13 Jan 2022 13:22:20 -0500
-Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 221D0C061574
-        for <linux-cifs@vger.kernel.org>; Thu, 13 Jan 2022 10:22:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-        s=42; h=Message-ID:Cc:To:From:Date;
-        bh=upzyRxSQEVcd+sZJ5pXTbxbYz783mKH0c6SU5ycDxQY=; b=XMJOM8+QE8b3PX3FZj71mTb3MZ
-        Gx+xnjBo1RKz07P0ytoqFxhFwueDCxn4XldrgztjZ0MVkhs/cMgpkGPo4zUuRZndn9qGTnmJbq/ra
-        N2ClQ6B7hM+TJdpYJk2NhuSFRJBksl7t13ssmlW1NcXkrEwGgwEyOMCOxLnHKrlM4KTjDsAvoEUWe
-        3Jkz1xzyAbI+OT/HJBcXsgMz9zWPjnoRHLSNZ/0+c86SZuN4TGf311cQs0kE5VZGaTeKlhtHWNpF0
-        fbcaBEkh07XV3a7MEdWLpe621lgIeLNcMWYqd5VxsYxleZZFgWzAang5Lf1j/L0fCWH4uI8TEa1z1
-        /kdU5QGozCambxuk66tLe8jRJ2JqUS09SdTm6cnlfvQ89v6QKrijmB+wMg+VlRuEVINqG/SnKdH2W
-        kfBwROj2pxysqqbSrvgqyOsOc5j5JGBA6uGXA7cC6Oq1aZu1740g0NsciWwG9kI1Fzhd5+kEOoejl
-        OYuboEjV0GKyohP5xI1PXV9O;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-        (Exim)
-        id 1n84jp-0078lO-BA; Thu, 13 Jan 2022 18:22:17 +0000
-Date:   Thu, 13 Jan 2022 10:22:14 -0800
-From:   Jeremy Allison <jra@samba.org>
-To:     David Disseldorp <ddiss@suse.de>
-Cc:     David Howells <dhowells@redhat.com>, smfrench@gmail.com,
-        Shyam Prasad N <nspmangalore@gmail.com>, jlayton@kernel.org,
-        linux-cifs@vger.kernel.org
-Subject: Re: Incorrect fallocate behaviour in cifs or samba?
-Message-ID: <YeBt1g9+syau0j1w@jeremy-acer>
-Reply-To: Jeremy Allison <jra@samba.org>
-References: <1828480.1642079920@warthog.procyon.org.uk>
- <1856457.1642087232@warthog.procyon.org.uk>
- <YeBkxLnh8+sUv968@jeremy-acer>
- <20220113191607.04e20180@suse.de>
+        with ESMTP id S233481AbiANGqc (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Fri, 14 Jan 2022 01:46:32 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED243C061574;
+        Thu, 13 Jan 2022 22:46:31 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id ie23-20020a17090b401700b001b38a5318easo13303389pjb.2;
+        Thu, 13 Jan 2022 22:46:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=60RR5RY0BZL0/Lke1Efhyp4YheRzC1dv7rn1c/0ivY0=;
+        b=S4hbf+xby5wSt3TcP+HCkU4m/3sA+E3ggOqPLKFj+dIkHGNn5Yb11R80tZwoGU+3ro
+         nTapbQ5ju1GFvB0FPaS6n78Ttr1H1xvnZKG0n29fMsqwSz6f+6QbBANC20eXwR8MVvcr
+         JmQ4ZmG4L3TcuXu10Q3N7a73TONH6BjPwfpov+Bt1e3rnQG6HdqE+PTiX6ELJSzuccXf
+         S0G9maukPD93aSbTE+45mMJULnfffHApeU8wc4U2isv3+xJPtC2PaHQNS7fI/ql+Rsn2
+         vZ0Mf+iT6Wm1YoRz7D01iJ0IKByOWXWyiCW6FVZoJYv+YUopFo+7nxh3qwCasfP6q6d4
+         92Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=60RR5RY0BZL0/Lke1Efhyp4YheRzC1dv7rn1c/0ivY0=;
+        b=zXcDtvWIhVjNr6YauiJbBzwpLoe8FyTKTsUKXAaWLtG6R5ju5KswJwiBT+su0AI74O
+         LqIPJFrwRQNu+gM6nSQGNoWsvmGF/rRcJQMqWMMPzkDRPOJ6MspAsd80oKK/+XX/LZfg
+         NcOAjq+BwQaR2IN9JloxPLN0MfUbRK/x1gyt6ok7dutkUGkl6J1YexX2d6gRbsNW0547
+         T4aVarovL0xnFea8rHyk7Tq3MfRCOFDm40mXE4kavwky9FMLwWg4OJ8YTGgs8XAPrb2X
+         40SHoErBEtYlFBcRdBSEqIAgiWw8WMyZNkk7VtU9QTXlCSLehVP5/W5ieZulXHYc+DWr
+         9IJA==
+X-Gm-Message-State: AOAM531JrXlHqxbqJM5mB38JAbyDBcrH1isXGQkVeJmjbEGQxVyJ40hl
+        Gb7X51p1AYXsp5e8gLrvvZG+HwM9cV4=
+X-Google-Smtp-Source: ABdhPJwmD+sPDAyu7I2wlipvAonyc4QC+uR0hMvVedvmdoCCRGxWuZXEfSV/ozJ1txzyLwhNNe20FQ==
+X-Received: by 2002:a17:902:c64b:b0:14a:6895:949b with SMTP id s11-20020a170902c64b00b0014a6895949bmr8254929pls.147.1642142791431;
+        Thu, 13 Jan 2022 22:46:31 -0800 (PST)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id h12sm3752057pfv.214.2022.01.13.22.46.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 22:46:30 -0800 (PST)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: deng.changcheng@zte.com.cn
+To:     sfrench@samba.org
+Cc:     linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-kernel@vger.kernel.org,
+        Changcheng Deng <deng.changcheng@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH] cifs: Replace one-element array with flexible-array member
+Date:   Fri, 14 Jan 2022 06:46:25 +0000
+Message-Id: <20220114064625.765511-1-deng.changcheng@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220113191607.04e20180@suse.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On Thu, Jan 13, 2022 at 07:16:07PM +0100, David Disseldorp wrote:
->FWIW, Samba's fsctl_zero_data semantics are based on observed Windows
->server behaviour and the MS specs, which state(d at the time):
->/*
-> * 2.3.57 FSCTL_SET_ZERO_DATA Request
-> *
-> * How an implementation zeros data within a file is implementation-dependent.
-> * A file system MAY choose to deallocate regions of disk space that have been
-> * zeroed.<50>
-> * <50>
-> * ... NTFS might deallocate disk space in the file if the file is stored on an
-> * NTFS volume, and the file is sparse or compressed. It will free any allocated
-> * space in chunks of 64 kilobytes that begin at an offset that is a multiple of
-> * 64 kilobytes. Other bytes in the file (prior to the first freed 64-kilobyte
-> * chunk and after the last freed 64-kilobyte chunk) will be zeroed but not
-> * deallocated.
-> */
->
->IIRC while implementing this I observed Windows deallocation behaviour
->using FSCTL_QUERY_ALLOCATED_RANGES (referred to as QAR in the previous
->code snippit).
+From: Changcheng Deng <deng.changcheng@zte.com.cn>
 
-Oh thanks so much for clarifying David. It's always nice
-to hear things from the person who actually wrote the
-code :-).
+There is a regular need in the kernel to provide a way to declare having
+a dynamically sized set of trailing elements in a structure. Kernel code
+should always use "flexible array members" for these cases. The older
+style of one-element or zero-length arrays should no longer be used.
+Reference:
+https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays
+
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Changcheng Deng <deng.changcheng@zte.com.cn>
+---
+ fs/cifs/smb2ops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
+index af5d0830bc8a..5c104b2f308a 100644
+--- a/fs/cifs/smb2ops.c
++++ b/fs/cifs/smb2ops.c
+@@ -1609,10 +1609,10 @@ struct iqi_vars {
+ 	struct smb_rqst rqst[3];
+ 	struct kvec rsp_iov[3];
+ 	struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
+-	struct kvec qi_iov[1];
++	struct kvec qi_iov[];
+ 	struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
+ 	struct kvec si_iov[SMB2_SET_INFO_IOV_SIZE];
+-	struct kvec close_iov[1];
++	struct kvec close_iov[];
+ };
+ 
+ static int
+-- 
+2.25.1
+
