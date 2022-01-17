@@ -2,112 +2,133 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C852C433EF
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jan 2022 21:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6160C433F5
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jan 2022 23:33:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229825AbiAQVOK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Jan 2022 16:14:10 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:48366 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiAQVOJ (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 16:14:09 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        id S238516AbiAQXd1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Jan 2022 18:33:27 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:54806 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235399AbiAQXd0 (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 18:33:26 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 59A9F1F39B;
-        Mon, 17 Jan 2022 21:14:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1642454048; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EeqxpD1RxWxWo1eKvUtdi3vom9jFUH9xC1bDnMxTmAg=;
-        b=eqHNfAFFFkieJItG85Ht0dpmjB1JzDEI/3Nx1Beoby93G3/qEgCCnjwZT+4A3uqqx46fjl
-        jlFlrAND+nECbkw3+bE+rUKpkAHscMsWXZV7c6wzNtd0aXqRHwACzCeSvaoEFKpmyTE9zQ
-        Gq2Qhh9Ifn8hmEd/uwN3GNPkmUEkKOY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1642454048;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EeqxpD1RxWxWo1eKvUtdi3vom9jFUH9xC1bDnMxTmAg=;
-        b=Q60z17RuODFcOSRWgjfjD3AR7PDvDV44az+sL5WsRq2P8JEygmO5OKKQIY5a5IduYEcl2K
-        U+2CvnSGJTZtVrAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DA08213E95;
-        Mon, 17 Jan 2022 21:14:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id O0gmKR/c5WHbZAAAMHmgww
-        (envelope-from <ematsumiya@suse.de>); Mon, 17 Jan 2022 21:14:07 +0000
-Date:   Mon, 17 Jan 2022 18:14:05 -0300
-From:   Enzo Matsumiya <ematsumiya@suse.de>
-To:     Eugene Korenevsky <ekorenevsky@astralinux.ru>
-Cc:     linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
-Subject: Re: [PATCH v2 2/2] cifs: quirk for STATUS_OBJECT_NAME_INVALID
- returned for non-ASCII dfs refs
-Message-ID: <20220117211305.ambdxok747u6kwlm@cyberdelia>
-References: <YeHUxJ9zTVNrKveF@himera.home>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 71A8161214
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 23:33:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2B55C36AEC
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 23:33:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642462405;
+        bh=VmBWN2H3E22ZoxRcEW7nmBkKMnNB0ZPO/rXDNFPOAuI=;
+        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
+        b=L1KzUD5aCBL1mKusQGO64oIctme0OOjx47o8axDtvSWQalrSTG2Xorfk5R0UAFJcK
+         1BmW41Jt14CUTu3sB6pFTlGuhK9aW0SY4WAqaqRF8GuA2jAZZh2orlIaLdjCdhk+yF
+         A0IdNpf/jC58+f4tVie/G2Pu4JMkd0ET0ocbAZst5h6YbfHtFecAWy45CtvXSB5xF+
+         2tUfEt0vaeAp2Wx+AF+x0RwgZiRLuwTlJj/S8AeQnfOLR1E5mxvtVOrZ3YDv3jNo6j
+         fzWNHFtnSxOuqsgjCf+Lc3gFnG4GUFpdZrwK5j9+eQm3Mt9UEKC5h8UVG21Me25nRw
+         s5TfdPdzXnBEQ==
+Received: by mail-yb1-f177.google.com with SMTP id g81so50400971ybg.10
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 15:33:25 -0800 (PST)
+X-Gm-Message-State: AOAM530f8Bo+MqcW2llKBl83F3Z2wWyS/iHDUTVZr4LUTkb7pghaMwvW
+        ZbCjtFWNtrMnlO8cIBkwhjR5JKRed/1GdywylwI=
+X-Google-Smtp-Source: ABdhPJw0rpa74x+4pOfad4LpoDkJrp3llH+rXiuP665mNT5j/5e8RvX7TXT6rIPVi2z2GRwBLTiR4A0BChtOo7BmUGY=
+X-Received: by 2002:a5b:244:: with SMTP id g4mr30357796ybp.507.1642462404940;
+ Mon, 17 Jan 2022 15:33:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+Received: by 2002:a05:7110:5011:b0:123:6c39:8652 with HTTP; Mon, 17 Jan 2022
+ 15:33:24 -0800 (PST)
+In-Reply-To: <CANFS6baREfEidN+FqZROiF+6QtOQ6FXae6f0L9EVKaUFK2L3hg@mail.gmail.com>
+References: <20220107054531.619487-1-hyc.lee@gmail.com> <20220107054531.619487-2-hyc.lee@gmail.com>
+ <CAKYAXd9qYgpf9oGhK5bdE2M6nbfpeTEAOg+zDGGXomOLaNmR9Q@mail.gmail.com>
+ <CAH2r5mtTs5bxF9+_M0-3a7YkZB4zqBCm4_kL_QpHAPhEVAG-WA@mail.gmail.com>
+ <CAKYAXd9ndasXA3q2F05f9JMXHPT6cQRf0M8owP-dwdv_LWggwQ@mail.gmail.com> <CANFS6baREfEidN+FqZROiF+6QtOQ6FXae6f0L9EVKaUFK2L3hg@mail.gmail.com>
+From:   Namjae Jeon <linkinjeon@kernel.org>
+Date:   Tue, 18 Jan 2022 08:33:24 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8uQ4MG=y8_GqhAwPX0CVfk9EoEu=WZuO7+UCCYJ2RBDw@mail.gmail.com>
+Message-ID: <CAKYAXd8uQ4MG=y8_GqhAwPX0CVfk9EoEu=WZuO7+UCCYJ2RBDw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] ksmbd: smbd: change the default maximum read/write,
+ receive size
+To:     Hyunchul Lee <hyc.lee@gmail.com>
+Cc:     Steve French <smfrench@gmail.com>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <YeHUxJ9zTVNrKveF@himera.home>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-On 01/14, Eugene Korenevsky wrote:
->Windows SMB server responds with STATUS_OBJECT_NAME_INVALID code to
->SMB2 QUERY_INFO request for "\<server>\<dfsname>\<linkpath>" DFS reference,
->where <dfsname> contains non-ASCII unicode symbols.
+2022-01-10 10:37 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+> 2022=EB=85=84 1=EC=9B=94 9=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 9:56, =
+Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
+>>
+>> 2022-01-09 15:44 GMT+09:00, Steve French <smfrench@gmail.com>:
+>> > Do you have more detail on what the negotiated readsize/writesize
+>> > would be for Windows clients with this size? for Linux clients?
+>> Hyunchul, Please answer.
+>>
 >
->Check such DFS reference and emulate -EREMOTE if it is actual.
+> For a Linux client, if connected using smb-direct,
+> the size will be 1048512. But connected with multichannel,
+> the size will be 4MB instead of 1048512. And this causes
+> problems because the read/write size is bigger than 1048512.
+> It looks like a bug. I have to limit the ksmbd's SMB2 maximum
+> read/write size for a test.
 >
->BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=3D215440
->Signed-off-by: Eugene Korenevsky <ekorenevsky@astralinux.ru>
+> For Windows clients, the actual read/write size is less than
+> 1048512.
+In the case of my Chelsio device, Need to set it to about
+512K(512*1024 - 64) for it to work.
+The 1048512 value seems insufficient to cover all devices. Is there
+any other way to set the minimum read/write value? Calibrate this
+minimum value by looking at
+the device information? For example variables in ib_dev->attrs.
 
-The patch fixes the initial issue (mount and listing files) as per
-reported in the mentioned bugzilla, but it still fails to create files:
-
-% echo "test" | sudo tee myfile
-tee: myfile: No such file or directory
-test
-
-% dmesg
-=2E..
-[20510.826644] CIFS: fs/cifs/dfs_cache.c: cache_refresh_path: search path: =
-\w19-addc.mori.test\=D0=B4=D1=84=D1=81\test
-[20510.826653] CIFS: fs/cifs/dfs_cache.c: get_dfs_referral: get an DFS refe=
-rral for \w19-addc.mori.test\=D0=B4=D1=84=D1=81\test                       =
-                                                                      [45/5=
-04]
-[20510.826658] CIFS: fs/cifs/smb2ops.c: smb2_get_dfs_refer: path: \w19-addc=
-=2Emori.test\=D0=B4=D1=84=D1=81\test
-[20510.826665] CIFS: fs/cifs/smb2pdu.c: SMB2 IOCTL
-[20510.826670] CIFS: fs/cifs/transport.c: wait_for_free_credits: remove 1 c=
-redits total=3D577
-[20510.826690] CIFS: fs/cifs/transport.c: Sending smb: smb_len=3D184
-[20510.828315] CIFS: fs/cifs/connect.c: RFC1002 header 0x12a
-[20510.828331] CIFS: fs/cifs/smb2misc.c: SMB2 data length 186 offset 112
-[20510.828336] CIFS: fs/cifs/smb2misc.c: SMB2 len 298
-[20510.828342] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 10 credits =
-total=3D587
-[20510.828364] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=3D11 mi=
-d=3D41 state=3D4
-[20510.828397] CIFS: fs/cifs/misc.c: Null buffer passed to cifs_small_buf_r=
-elease
-[20510.828406] CIFS: fs/cifs/misc.c: num_referrals: 1 dfs flags: 0x3 ...
-[20510.828432] CIFS: fs/cifs/misc.c: DFS ref '\w19-addc.mori.test\=D0=B4=D1=
-=84=D1=81\test' is not found, emulate -ENOENT
-=2E..
-
-
-Cheers,
-
-Enzo
+>
+>> >
+>> > It looked like it would still be 4MB at first glance (although in
+>> > theory some Windows could do 8MB) ... I may have missed something
+>> I understood that multiple-buffer descriptor support was required to
+>> set a read/write size of 1MB or more. As I know, Hyunchul is currently
+>> working on it.
+>> It seems to be set to the smaller of max read/write size in smb-direct
+>> negotiate and max read/write size in smb2 negotiate.
+>>
+>> Hyunchul, I have one question more, How did you get 1048512 setting valu=
+e
+>> ?
+>> >
+>
+> I remember when the size was 1MB, Windows clients requested read/write wi=
+th
+> 1048512 and 64.
+>
+>> > On Sat, Jan 8, 2022 at 8:43 PM Namjae Jeon <linkinjeon@kernel.org>
+>> > wrote:
+>> >>
+>> >> 2022-01-07 14:45 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
+>> >> > Due to restriction that cannot handle multiple
+>> >> > buffer descriptor structures, decrease the maximum
+>> >> > read/write size for Windows clients.
+>> >> >
+>> >> > And set the maximum fragmented receive size
+>> >> > in consideration of the receive queue size.
+>> >> >
+>> >> > Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
+>> >> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+>> >
+>> >
+>> >
+>> > --
+>> > Thanks,
+>> >
+>> > Steve
+>> >
+>
+>
+>
+> --
+> Thanks,
+> Hyunchul
+>
