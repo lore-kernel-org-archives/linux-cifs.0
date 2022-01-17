@@ -2,133 +2,155 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6160C433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jan 2022 23:33:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2AC4C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jan 2022 23:52:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238516AbiAQXd1 (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Jan 2022 18:33:27 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:54806 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235399AbiAQXd0 (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 18:33:26 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 71A8161214
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 23:33:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2B55C36AEC
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 23:33:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642462405;
-        bh=VmBWN2H3E22ZoxRcEW7nmBkKMnNB0ZPO/rXDNFPOAuI=;
-        h=In-Reply-To:References:From:Date:Subject:To:Cc:From;
-        b=L1KzUD5aCBL1mKusQGO64oIctme0OOjx47o8axDtvSWQalrSTG2Xorfk5R0UAFJcK
-         1BmW41Jt14CUTu3sB6pFTlGuhK9aW0SY4WAqaqRF8GuA2jAZZh2orlIaLdjCdhk+yF
-         A0IdNpf/jC58+f4tVie/G2Pu4JMkd0ET0ocbAZst5h6YbfHtFecAWy45CtvXSB5xF+
-         2tUfEt0vaeAp2Wx+AF+x0RwgZiRLuwTlJj/S8AeQnfOLR1E5mxvtVOrZ3YDv3jNo6j
-         fzWNHFtnSxOuqsgjCf+Lc3gFnG4GUFpdZrwK5j9+eQm3Mt9UEKC5h8UVG21Me25nRw
-         s5TfdPdzXnBEQ==
-Received: by mail-yb1-f177.google.com with SMTP id g81so50400971ybg.10
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Jan 2022 15:33:25 -0800 (PST)
-X-Gm-Message-State: AOAM530f8Bo+MqcW2llKBl83F3Z2wWyS/iHDUTVZr4LUTkb7pghaMwvW
-        ZbCjtFWNtrMnlO8cIBkwhjR5JKRed/1GdywylwI=
-X-Google-Smtp-Source: ABdhPJw0rpa74x+4pOfad4LpoDkJrp3llH+rXiuP665mNT5j/5e8RvX7TXT6rIPVi2z2GRwBLTiR4A0BChtOo7BmUGY=
-X-Received: by 2002:a5b:244:: with SMTP id g4mr30357796ybp.507.1642462404940;
- Mon, 17 Jan 2022 15:33:24 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a05:7110:5011:b0:123:6c39:8652 with HTTP; Mon, 17 Jan 2022
- 15:33:24 -0800 (PST)
-In-Reply-To: <CANFS6baREfEidN+FqZROiF+6QtOQ6FXae6f0L9EVKaUFK2L3hg@mail.gmail.com>
-References: <20220107054531.619487-1-hyc.lee@gmail.com> <20220107054531.619487-2-hyc.lee@gmail.com>
- <CAKYAXd9qYgpf9oGhK5bdE2M6nbfpeTEAOg+zDGGXomOLaNmR9Q@mail.gmail.com>
- <CAH2r5mtTs5bxF9+_M0-3a7YkZB4zqBCm4_kL_QpHAPhEVAG-WA@mail.gmail.com>
- <CAKYAXd9ndasXA3q2F05f9JMXHPT6cQRf0M8owP-dwdv_LWggwQ@mail.gmail.com> <CANFS6baREfEidN+FqZROiF+6QtOQ6FXae6f0L9EVKaUFK2L3hg@mail.gmail.com>
+        id S235692AbiAQXww (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Jan 2022 18:52:52 -0500
+Received: from mail-pl1-f174.google.com ([209.85.214.174]:44954 "EHLO
+        mail-pl1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231768AbiAQXwu (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 18:52:50 -0500
+Received: by mail-pl1-f174.google.com with SMTP id v2so7885199ply.11;
+        Mon, 17 Jan 2022 15:52:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=E3Vs4IXxZ1o53P+v4lST9asSyi4iNaTfykJHulxAP6I=;
+        b=38Yw2iTO6o3QAQGw/srBNIoeGQ+tvzTIOOzpN0EPdlQa66302aMLRXCP5KjTPNonWo
+         l0QavEZFwSLpJPj7p1xCO+RG+ZmECkqNzFV6852nri0IUAYXx8Qjk78ytLiVzNWL6sBu
+         LHXOJpkU7fVCaROKUSw1LTE+PTTo3FCqKXN+XvZzuDQG/zfdufPSk+iUw8v9SMixmAo1
+         xC5C/Z/yAGmaEnvOQNVI8Rb8JPy5b+AV9UphkkWxcgWvAZtUsPhKqYIzGYURlFmeuh39
+         YXNmDq3Ti1ls3q7nfzd6rKWblpk2+J/d+2ZcxFOw4gj0lTxcwR1jHg57vdpXD9a887LV
+         jKrw==
+X-Gm-Message-State: AOAM5303/XuJuHEKhpemxomAwTgYyG2nLOX330FpJZeEdOwllUSm+8Pu
+        VrKM+y2ZPJ7SkUs+HnXoCGp2fIl53t4=
+X-Google-Smtp-Source: ABdhPJz4ZuSC9e8w3+8LhUWLe9QPlc2LklE09KfjXKRJLZVfJd2L4Hj4kOSjzkoNHa8F+bDJ71z6qg==
+X-Received: by 2002:a17:902:8d82:b0:149:a740:d8d0 with SMTP id v2-20020a1709028d8200b00149a740d8d0mr25253359plo.5.1642463570215;
+        Mon, 17 Jan 2022 15:52:50 -0800 (PST)
+Received: from localhost.localdomain ([61.74.27.164])
+        by smtp.gmail.com with ESMTPSA id x6sm12883412pge.50.2022.01.17.15.52.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jan 2022 15:52:49 -0800 (PST)
 From:   Namjae Jeon <linkinjeon@kernel.org>
-Date:   Tue, 18 Jan 2022 08:33:24 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8uQ4MG=y8_GqhAwPX0CVfk9EoEu=WZuO7+UCCYJ2RBDw@mail.gmail.com>
-Message-ID: <CAKYAXd8uQ4MG=y8_GqhAwPX0CVfk9EoEu=WZuO7+UCCYJ2RBDw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] ksmbd: smbd: change the default maximum read/write,
- receive size
-To:     Hyunchul Lee <hyc.lee@gmail.com>
-Cc:     Steve French <smfrench@gmail.com>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-cifs@vger.kernel.org
+Cc:     Namjae Jeon <linkinjeon@kernel.org>, stable@vger.kernel.org
+Subject: [PATCH] ksmbd: fix guest connection failure with nautilus
+Date:   Tue, 18 Jan 2022 08:52:42 +0900
+Message-Id: <20220117235242.9385-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-2022-01-10 10:37 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
-> 2022=EB=85=84 1=EC=9B=94 9=EC=9D=BC (=EC=9D=BC) =EC=98=A4=ED=9B=84 9:56, =
-Namjae Jeon <linkinjeon@kernel.org>=EB=8B=98=EC=9D=B4 =EC=9E=91=EC=84=B1:
->>
->> 2022-01-09 15:44 GMT+09:00, Steve French <smfrench@gmail.com>:
->> > Do you have more detail on what the negotiated readsize/writesize
->> > would be for Windows clients with this size? for Linux clients?
->> Hyunchul, Please answer.
->>
->
-> For a Linux client, if connected using smb-direct,
-> the size will be 1048512. But connected with multichannel,
-> the size will be 4MB instead of 1048512. And this causes
-> problems because the read/write size is bigger than 1048512.
-> It looks like a bug. I have to limit the ksmbd's SMB2 maximum
-> read/write size for a test.
->
-> For Windows clients, the actual read/write size is less than
-> 1048512.
-In the case of my Chelsio device, Need to set it to about
-512K(512*1024 - 64) for it to work.
-The 1048512 value seems insufficient to cover all devices. Is there
-any other way to set the minimum read/write value? Calibrate this
-minimum value by looking at
-the device information? For example variables in ib_dev->attrs.
+MS-SMB2 describe session sign like the following.
+Session.SigningRequired MUST be set to TRUE under the following conditions:
+ - If the SMB2_NEGOTIATE_SIGNING_REQUIRED bit is set in the SecurityMode
+   field of the client request.
+ - If the SMB2_SESSION_FLAG_IS_GUEST bit is not set in the SessionFlags
+   field and Session.IsAnonymous is FALSE and either Connection.ShouldSign
+   or global RequireMessageSigning is TRUE.
 
->
->> >
->> > It looked like it would still be 4MB at first glance (although in
->> > theory some Windows could do 8MB) ... I may have missed something
->> I understood that multiple-buffer descriptor support was required to
->> set a read/write size of 1MB or more. As I know, Hyunchul is currently
->> working on it.
->> It seems to be set to the smaller of max read/write size in smb-direct
->> negotiate and max read/write size in smb2 negotiate.
->>
->> Hyunchul, I have one question more, How did you get 1048512 setting valu=
-e
->> ?
->> >
->
-> I remember when the size was 1MB, Windows clients requested read/write wi=
-th
-> 1048512 and 64.
->
->> > On Sat, Jan 8, 2022 at 8:43 PM Namjae Jeon <linkinjeon@kernel.org>
->> > wrote:
->> >>
->> >> 2022-01-07 14:45 GMT+09:00, Hyunchul Lee <hyc.lee@gmail.com>:
->> >> > Due to restriction that cannot handle multiple
->> >> > buffer descriptor structures, decrease the maximum
->> >> > read/write size for Windows clients.
->> >> >
->> >> > And set the maximum fragmented receive size
->> >> > in consideration of the receive queue size.
->> >> >
->> >> > Signed-off-by: Hyunchul Lee <hyc.lee@gmail.com>
->> >> Acked-by: Namjae Jeon <linkinjeon@kernel.org>
->> >
->> >
->> >
->> > --
->> > Thanks,
->> >
->> > Steve
->> >
->
->
->
-> --
-> Thanks,
-> Hyunchul
->
+When trying guest account connection using nautilus, The login failure
+happened on session setup. ksmbd does not allow this connection
+when the user is a guest and the connection sign is set. Just do not set
+session sign instead of error response as described in the specification.
+And this change improves the guest connection in Nautilus.
+
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org # v5.15+
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/ksmbd/smb2pdu.c | 62 ++++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 33 deletions(-)
+
+diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
+index 15f331dbe17a..1866c81c5c99 100644
+--- a/fs/ksmbd/smb2pdu.c
++++ b/fs/ksmbd/smb2pdu.c
+@@ -1464,11 +1464,6 @@ static int ntlm_authenticate(struct ksmbd_work *work)
+ 	}
+ 
+ 	if (user_guest(sess->user)) {
+-		if (conn->sign) {
+-			ksmbd_debug(SMB, "Guest login not allowed when signing enabled\n");
+-			return -EPERM;
+-		}
+-
+ 		rsp->SessionFlags = SMB2_SESSION_FLAG_IS_GUEST_LE;
+ 	} else {
+ 		struct authenticate_message *authblob;
+@@ -1481,38 +1476,39 @@ static int ntlm_authenticate(struct ksmbd_work *work)
+ 			ksmbd_debug(SMB, "authentication failed\n");
+ 			return -EPERM;
+ 		}
++	}
+ 
+-		/*
+-		 * If session state is SMB2_SESSION_VALID, We can assume
+-		 * that it is reauthentication. And the user/password
+-		 * has been verified, so return it here.
+-		 */
+-		if (sess->state == SMB2_SESSION_VALID) {
+-			if (conn->binding)
+-				goto binding_session;
+-			return 0;
+-		}
++	/*
++	 * If session state is SMB2_SESSION_VALID, We can assume
++	 * that it is reauthentication. And the user/password
++	 * has been verified, so return it here.
++	 */
++	if (sess->state == SMB2_SESSION_VALID) {
++		if (conn->binding)
++			goto binding_session;
++		return 0;
++	}
+ 
+-		if ((conn->sign || server_conf.enforced_signing) ||
+-		    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
+-			sess->sign = true;
++	if ((rsp->SessionFlags != SMB2_SESSION_FLAG_IS_GUEST_LE &&
++	     (conn->sign || server_conf.enforced_signing)) ||
++	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
++		sess->sign = true;
+ 
+-		if (smb3_encryption_negotiated(conn) &&
+-		    !(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
+-			rc = conn->ops->generate_encryptionkey(sess);
+-			if (rc) {
+-				ksmbd_debug(SMB,
+-					    "SMB3 encryption key generation failed\n");
+-				return -EINVAL;
+-			}
+-			sess->enc = true;
+-			rsp->SessionFlags = SMB2_SESSION_FLAG_ENCRYPT_DATA_LE;
+-			/*
+-			 * signing is disable if encryption is enable
+-			 * on this session
+-			 */
+-			sess->sign = false;
++	if (smb3_encryption_negotiated(conn) &&
++			!(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
++		rc = conn->ops->generate_encryptionkey(sess);
++		if (rc) {
++			ksmbd_debug(SMB,
++					"SMB3 encryption key generation failed\n");
++			return -EINVAL;
+ 		}
++		sess->enc = true;
++		rsp->SessionFlags = SMB2_SESSION_FLAG_ENCRYPT_DATA_LE;
++		/*
++		 * signing is disable if encryption is enable
++		 * on this session
++		 */
++		sess->sign = false;
+ 	}
+ 
+ binding_session:
+-- 
+2.25.1
+
