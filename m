@@ -2,115 +2,112 @@ Return-Path: <linux-cifs-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CBDCC433F5
-	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jan 2022 21:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C852C433EF
+	for <linux-cifs@archiver.kernel.org>; Mon, 17 Jan 2022 21:14:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235807AbiAQVBh (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
-        Mon, 17 Jan 2022 16:01:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43202 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235646AbiAQVBg (ORCPT
-        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 16:01:36 -0500
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6775C061574;
-        Mon, 17 Jan 2022 13:01:35 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id m196so21138487ybf.4;
-        Mon, 17 Jan 2022 13:01:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=E/L36AdK5Ipen2tmpRXUP0pX59XDvEK9cBawMrh2MjE=;
-        b=DligtBPwqn6VtiU+rpAn5X+wN11F98GkoqMRJbBi53/INouP3OZYi4BtPYLmhfHf7W
-         YAbGiO6l/guh3I1zu20VxIFUqvd2xlQ4X2C7GWESOPxMC1Rtmvysn0lBEoc0krZG2eDh
-         +EHyAxlxaB91ofBqytmoOm6j3O3EhP+ujjSCroUGMLct0ASx49rMLrK95JesRNrkO97j
-         L/5hAuK3K08Y80yWzXfXX9DtZqRenb2y2Gnm40NOQvZUaal9aV8Q+puBweI0GDpnJ31Z
-         mPVhhzwNuk8lvKAdau1XGZj3HSTJpTLmM3eurQKuW6CJNz//eHH4uJEJaB28/wgmpS8m
-         uyxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=E/L36AdK5Ipen2tmpRXUP0pX59XDvEK9cBawMrh2MjE=;
-        b=FvdIVExb3eHWlsvtpTVHkYIw+ps3EvojSl+O2i31Hj7uhJnvg4JPF14Ib0C3BxnV01
-         ErcgPYh8kDvAeMEV7Kx4QZEum8MtMTth2tjQqtXPrSE5S+yNCXUksAHcdZ29WvBpbiw5
-         2m9BSSwMDPWoN58g6xY/efcGzMXC2tc2nUVEkCnLa+b3RCho95zgqwi2xPq0BZM0GRuh
-         6JcOs3DIBmCQhVmsroMf9qOgtj+N/DiMqWnVI4gKbgTA7ej3LgtFRfiLyxOJO6LDN1aF
-         /NJES2X2ZaykDxM6vBPhzBDDb6QERjUixRd3KARqSS9W2XG1Umkc+UJVzFhfYlZhwTRM
-         06kg==
-X-Gm-Message-State: AOAM533TElS5eNJTUFJVpADAq0NfL0HPJDHjC0Vcngt/KX4hEJjQTecl
-        dTccfLYfkEt+SjVBe4SJPKGU6Rrxe/xY7m2uN1kSmcRf
-X-Google-Smtp-Source: ABdhPJz2qC1gbLERDHPFPmDnVv4rb4ybLBXYBQWsc0lxZSVX9k2ZYOya1CMbAN8jg7o53QZDYaTP6MHHW0h2Q+EsfXA=
-X-Received: by 2002:a25:b184:: with SMTP id h4mr13155000ybj.738.1642453295121;
- Mon, 17 Jan 2022 13:01:35 -0800 (PST)
+        id S229825AbiAQVOK (ORCPT <rfc822;linux-cifs@archiver.kernel.org>);
+        Mon, 17 Jan 2022 16:14:10 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:48366 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229695AbiAQVOJ (ORCPT
+        <rfc822;linux-cifs@vger.kernel.org>); Mon, 17 Jan 2022 16:14:09 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 59A9F1F39B;
+        Mon, 17 Jan 2022 21:14:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1642454048; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EeqxpD1RxWxWo1eKvUtdi3vom9jFUH9xC1bDnMxTmAg=;
+        b=eqHNfAFFFkieJItG85Ht0dpmjB1JzDEI/3Nx1Beoby93G3/qEgCCnjwZT+4A3uqqx46fjl
+        jlFlrAND+nECbkw3+bE+rUKpkAHscMsWXZV7c6wzNtd0aXqRHwACzCeSvaoEFKpmyTE9zQ
+        Gq2Qhh9Ifn8hmEd/uwN3GNPkmUEkKOY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1642454048;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EeqxpD1RxWxWo1eKvUtdi3vom9jFUH9xC1bDnMxTmAg=;
+        b=Q60z17RuODFcOSRWgjfjD3AR7PDvDV44az+sL5WsRq2P8JEygmO5OKKQIY5a5IduYEcl2K
+        U+2CvnSGJTZtVrAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DA08213E95;
+        Mon, 17 Jan 2022 21:14:07 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id O0gmKR/c5WHbZAAAMHmgww
+        (envelope-from <ematsumiya@suse.de>); Mon, 17 Jan 2022 21:14:07 +0000
+Date:   Mon, 17 Jan 2022 18:14:05 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Eugene Korenevsky <ekorenevsky@astralinux.ru>
+Cc:     linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
+Subject: Re: [PATCH v2 2/2] cifs: quirk for STATUS_OBJECT_NAME_INVALID
+ returned for non-ASCII dfs refs
+Message-ID: <20220117211305.ambdxok747u6kwlm@cyberdelia>
+References: <YeHUxJ9zTVNrKveF@himera.home>
 MIME-Version: 1.0
-References: <20220114064625.765511-1-deng.changcheng@zte.com.cn>
-In-Reply-To: <20220114064625.765511-1-deng.changcheng@zte.com.cn>
-From:   ronnie sahlberg <ronniesahlberg@gmail.com>
-Date:   Tue, 18 Jan 2022 07:01:23 +1000
-Message-ID: <CAN05THS5A5r8PgaHk8BaK+8kTyT8mJ3LdB__tJCbSb8Cs+yaKQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: Replace one-element array with flexible-array member
-To:     cgel.zte@gmail.com
-Cc:     Steve French <sfrench@samba.org>,
-        linux-cifs <linux-cifs@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Changcheng Deng <deng.changcheng@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <YeHUxJ9zTVNrKveF@himera.home>
 Precedence: bulk
 List-ID: <linux-cifs.vger.kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 
-This patch is wrong.
-qi_iov is not even the trailing element of the array so we cant change
-it to be a flexible array member.
-This change will likely clobber io_iov so the potential for breaking,
-memory leaks or ooops is quite possible.
-qi_iov is supposed to be exactly one element in size.
+On 01/14, Eugene Korenevsky wrote:
+>Windows SMB server responds with STATUS_OBJECT_NAME_INVALID code to
+>SMB2 QUERY_INFO request for "\<server>\<dfsname>\<linkpath>" DFS reference,
+>where <dfsname> contains non-ASCII unicode symbols.
+>
+>Check such DFS reference and emulate -EREMOTE if it is actual.
+>
+>BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=3D215440
+>Signed-off-by: Eugene Korenevsky <ekorenevsky@astralinux.ru>
 
-Same for close_iov, while it is the last element in the structure, it
-is not a flexible array but an array of exactly one member.
-This change to close_iov would likely lead to reading/writing beyond
-the end of the structure.
+The patch fixes the initial issue (mount and listing files) as per
+reported in the mentioned bugzilla, but it still fails to create files:
+
+% echo "test" | sudo tee myfile
+tee: myfile: No such file or directory
+test
+
+% dmesg
+=2E..
+[20510.826644] CIFS: fs/cifs/dfs_cache.c: cache_refresh_path: search path: =
+\w19-addc.mori.test\=D0=B4=D1=84=D1=81\test
+[20510.826653] CIFS: fs/cifs/dfs_cache.c: get_dfs_referral: get an DFS refe=
+rral for \w19-addc.mori.test\=D0=B4=D1=84=D1=81\test                       =
+                                                                      [45/5=
+04]
+[20510.826658] CIFS: fs/cifs/smb2ops.c: smb2_get_dfs_refer: path: \w19-addc=
+=2Emori.test\=D0=B4=D1=84=D1=81\test
+[20510.826665] CIFS: fs/cifs/smb2pdu.c: SMB2 IOCTL
+[20510.826670] CIFS: fs/cifs/transport.c: wait_for_free_credits: remove 1 c=
+redits total=3D577
+[20510.826690] CIFS: fs/cifs/transport.c: Sending smb: smb_len=3D184
+[20510.828315] CIFS: fs/cifs/connect.c: RFC1002 header 0x12a
+[20510.828331] CIFS: fs/cifs/smb2misc.c: SMB2 data length 186 offset 112
+[20510.828336] CIFS: fs/cifs/smb2misc.c: SMB2 len 298
+[20510.828342] CIFS: fs/cifs/smb2ops.c: smb2_add_credits: added 10 credits =
+total=3D587
+[20510.828364] CIFS: fs/cifs/transport.c: cifs_sync_mid_result: cmd=3D11 mi=
+d=3D41 state=3D4
+[20510.828397] CIFS: fs/cifs/misc.c: Null buffer passed to cifs_small_buf_r=
+elease
+[20510.828406] CIFS: fs/cifs/misc.c: num_referrals: 1 dfs flags: 0x3 ...
+[20510.828432] CIFS: fs/cifs/misc.c: DFS ref '\w19-addc.mori.test\=D0=B4=D1=
+=84=D1=81\test' is not found, emulate -ENOENT
+=2E..
 
 
-NACK
+Cheers,
 
-On Sat, Jan 15, 2022 at 12:44 AM <cgel.zte@gmail.com> wrote:
->
-> From: Changcheng Deng <deng.changcheng@zte.com.cn>
->
-> There is a regular need in the kernel to provide a way to declare having
-> a dynamically sized set of trailing elements in a structure. Kernel code
-> should always use "flexible array members" for these cases. The older
-> style of one-element or zero-length arrays should no longer be used.
-> Reference:
-> https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays
->
-> Reported-by: Zeal Robot <zealci@zte.com.cn>
-> Signed-off-by: Changcheng Deng <deng.changcheng@zte.com.cn>
-> ---
->  fs/cifs/smb2ops.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/cifs/smb2ops.c b/fs/cifs/smb2ops.c
-> index af5d0830bc8a..5c104b2f308a 100644
-> --- a/fs/cifs/smb2ops.c
-> +++ b/fs/cifs/smb2ops.c
-> @@ -1609,10 +1609,10 @@ struct iqi_vars {
->         struct smb_rqst rqst[3];
->         struct kvec rsp_iov[3];
->         struct kvec open_iov[SMB2_CREATE_IOV_SIZE];
-> -       struct kvec qi_iov[1];
-> +       struct kvec qi_iov[];
->         struct kvec io_iov[SMB2_IOCTL_IOV_SIZE];
->         struct kvec si_iov[SMB2_SET_INFO_IOV_SIZE];
-> -       struct kvec close_iov[1];
-> +       struct kvec close_iov[];
->  };
->
->  static int
-> --
-> 2.25.1
->
+Enzo
